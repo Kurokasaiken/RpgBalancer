@@ -1,0 +1,18 @@
+<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Stone base -->
+  <rect width="32" height="32" fill="#64748b"/>
+  
+  <!-- Stone blocks -->
+  <rect x="0" y="0" width="15" height="15" fill="#475569" stroke="#334155" stroke-width="0.5"/>
+  <rect x="16" y="0" width="16" height="15" fill="#475569" stroke="#334155" stroke-width="0.5"/>
+  <rect x="0" y="16" width="16" height="16" fill="#475569" stroke="#334155" stroke-width="0.5"/>
+  <rect x="17" y="16" width="15" height="16" fill="#475569" stroke="#334155" stroke-width="0.5"/>
+  
+  <!-- Highlights -->
+  <circle cx="8" cy="8" r="1.5" fill="#94a3b8" opacity="0.4"/>
+  <circle cx="24" cy="24" r="1.2" fill="#94a3b8" opacity="0.4"/>
+  
+  <!-- Shadows -->
+  <circle cx="28" cy="8" r="2" fill="#1e293b" opacity="0.2"/>
+  <circle cx="8" cy="28" r="1.8" fill="#1e293b" opacity="0.2"/>
+</svg>

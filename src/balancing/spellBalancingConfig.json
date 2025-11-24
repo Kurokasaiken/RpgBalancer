@@ -1,0 +1,145 @@
+{
+    "baseline": {
+        "name": "Basic Attack",
+        "type": "damage",
+        "effect": 100,
+        "scale": 0,
+        "eco": 1,
+        "aoe": 1,
+        "dangerous": 0,
+        "pierce": 0,
+        "castTime": 0.5,
+        "cooldown": 0,
+        "range": 1,
+        "priority": 0,
+        "doubleSpell": false,
+        "legendary": false,
+        "manaCost": 0,
+        "duration": 0,
+        "damageType": "physical",
+        "charges": 1,
+        "channel": 0,
+        "isPassive": false,
+        "maxStacks": 1,
+        "spellLevel": 0,
+        "reflection": 0
+    },
+    "weights": {
+        "effect": 0.01,
+        "scale": 5,
+        "eco": 20,
+        "aoe": 30,
+        "dangerous": 0.5,
+        "pierce": 1,
+        "castTime": -3,
+        "cooldown": -2,
+        "range": 3,
+        "priority": 2,
+        "manaCost": -0.1,
+        "duration": 5,
+        "charges": 15,
+        "channel": -5,
+        "reflection": 0.5,
+        "maxStacks": 10
+    },
+    "ranges": {
+        "effect": {
+            "min": 0,
+            "max": 300,
+            "step": 25
+        },
+        "scale": {
+            "min": -10,
+            "max": 10,
+            "step": 1
+        },
+        "eco": {
+            "min": 1,
+            "max": 10,
+            "step": 1
+        },
+        "aoe": {
+            "min": 1,
+            "max": 10,
+            "step": 1
+        },
+        "dangerous": {
+            "min": -50,
+            "max": 50,
+            "step": 5
+        },
+        "pierce": {
+            "min": 0,
+            "max": 100,
+            "step": 5
+        },
+        "castTime": {
+            "min": 0,
+            "max": 3,
+            "step": 0.1
+        },
+        "cooldown": {
+            "min": 0,
+            "max": 20,
+            "step": 1
+        },
+        "range": {
+            "min": 1,
+            "max": 10,
+            "step": 1
+        },
+        "priority": {
+            "min": -5,
+            "max": 5,
+            "step": 1
+        },
+        "manaCost": {
+            "min": 0,
+            "max": 200,
+            "step": 10
+        },
+        "duration": {
+            "min": 0,
+            "max": 10,
+            "step": 1
+        },
+        "charges": {
+            "min": 1,
+            "max": 5,
+            "step": 1
+        },
+        "channel": {
+            "min": 0,
+            "max": 5,
+            "step": 0.5
+        },
+        "reflection": {
+            "min": 0,
+            "max": 100,
+            "step": 5
+        },
+        "maxStacks": {
+            "min": 1,
+            "max": 10,
+            "step": 1
+        }
+    },
+    "descriptions": {
+        "effect": "Damage/Heal percentage (100% = basic attack base)",
+        "scale": "Scaling modifier (affects stat scaling)",
+        "eco": "Number of times effect repeats (DOT/HoT)",
+        "aoe": "Number of targets hit simultaneously",
+        "dangerous": "Hit chance BONUS (0% = baseline, positive = easier to hit)",
+        "pierce": "Damage dealt even if spell MISSES (0% = no damage on miss)",
+        "castTime": "Time to cast in seconds (MALUS: higher = more budget)",
+        "cooldown": "Turns before reuse (MALUS: higher = more budget)",
+        "range": "Maximum distance in tiles",
+        "priority": "Turn order modifier (negative = earlier)",
+        "manaCost": "Mana cost (MALUS: higher = more budget)",
+        "duration": "Effect duration in turns",
+        "charges": "Number of uses before cooldown",
+        "channel": "Channeling time in seconds (MALUS)",
+        "reflection": "Damage reflected back to attacker (%)",
+        "maxStacks": "Maximum stacks for buffs/passives"
+    }
+}
