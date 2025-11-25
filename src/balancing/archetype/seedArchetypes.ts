@@ -1,0 +1,327 @@
+/**
+ * Seed Archetypes - Populate archetypes.json with 16 base templates
+ * 
+ * Run with: npx tsx src/balancing/archetype/seedArchetypes.ts
+ */
+
+import { saveArchetypes } from './storage';
+import type { ArchetypeTemplate } from './types';
+
+const BASE_ARCHETYPES: ArchetypeTemplate[] = [
+    // ==================
+    // TANK (5 variants)
+    // ==================
+    {
+        id: 'tank_high_hp',
+        name: 'Tank - High HP',
+        category: 'tank',
+        variant: 'HighHP',
+        description: 'Massive health pool focused tank',
+        statAllocation: {
+            hp: 70,
+            armor: 20,
+            resistance: 10,
+        },
+        minBudget: 10,
+        maxBudget: 100,
+        createdBy: 'system',
+        tags: ['tank', 'high-hp', 'durable'],
+    },
+    {
+        id: 'tank_armor',
+        name: 'Tank - Armor',
+        category: 'tank',
+        variant: 'Armor',
+        description: 'Heavy armor mitigation specialist',
+        statAllocation: {
+            armor: 50,
+            hp: 30,
+            resistance: 20,
+        },
+        minBudget: 10,
+        maxBudget: 100,
+        createdBy: 'system',
+        tags: ['tank', 'armor', 'mitigation'],
+    },
+    {
+        id: 'tank_evasion',
+        name: 'Tank - Evasion',
+        category: 'tank',
+        variant: 'Evasion',
+        description: 'Dodges attacks with high evasion',
+        statAllocation: {
+            evasion: 40,
+            hp: 40,
+            armor: 20,
+        },
+        minBudget: 10,
+        maxBudget: 100,
+        createdBy: 'system',
+        tags: ['tank', 'evasion', 'dodge'],
+    },
+    {
+        id: 'tank_support',
+        name: 'Tank - Support',
+        category: 'tank',
+        variant: 'Support',
+        description: 'Self-sustaining tank with healing',
+        statAllocation: {
+            hp: 40,
+            regen: 30,
+            lifesteal: 20,
+            armor: 10,
+        },
+        minBudget: 10,
+        maxBudget: 100,
+        createdBy: 'system',
+        tags: ['tank', 'sustain', 'regen'],
+    },
+    {
+        id: 'tank_shield',
+        name: 'Tank - Shield',
+        category: 'tank',
+        variant: 'Shield',
+        description: 'Shield-based damage absorption',
+        statAllocation: {
+            hp: 40,
+            ward: 30,
+            energyShield: 20,
+            block: 10,
+        },
+        minBudget: 10,
+        maxBudget: 100,
+        createdBy: 'system',
+        tags: ['tank', 'shield', 'ward'],
+    },
+
+    // ==================
+    // DPS (4 variants)
+    // ==================
+    {
+        id: 'dps_pure',
+        name: 'DPS - Pure Damage',
+        category: 'dps',
+        variant: 'Pure',
+        description: 'Maximum raw damage output',
+        statAllocation: {
+            damage: 70,
+            hitChance: 20,
+            hp: 10,
+        },
+        minBudget: 10,
+        maxBudget: 100,
+        createdBy: 'system',
+        tags: ['dps', 'burst', 'damage'],
+    },
+    {
+        id: 'dps_crit',
+        name: 'DPS - Critical',
+        category: 'dps',
+        variant: 'Crit',
+        description: 'Critical strike specialist',
+        statAllocation: {
+            damage: 40,
+            critChance: 30,
+            critMult: 20,
+            hitChance: 10,
+        },
+        minBudget: 10,
+        maxBudget: 100,
+        createdBy: 'system',
+        tags: ['dps', 'crit', 'burst'],
+    },
+    {
+        id: 'dps_penetration',
+        name: 'DPS - Penetration',
+        category: 'dps',
+        variant: 'Penetration',
+        description: 'Armor and resistance penetration',
+        statAllocation: {
+            damage: 50,
+            armorPen: 25,
+            penPercent: 15,
+            hitChance: 10,
+        },
+        minBudget: 10,
+        maxBudget: 100,
+        createdBy: 'system',
+        tags: ['dps', 'penetration', 'anti-tank'],
+    },
+    {
+        id: 'dps_accurate',
+        name: 'DPS - Accurate',
+        category: 'dps',
+        variant: 'Accurate',
+        description: 'High accuracy and consistent damage',
+        statAllocation: {
+            damage: 50,
+            hitChance: 40,
+            critTxCBonus: 10,
+        },
+        minBudget: 10,
+        maxBudget: 100,
+        createdBy: 'system',
+        tags: ['dps', 'accuracy', 'consistent'],
+    },
+
+    // ==================
+    // ASSASSIN (2 variants)
+    // ==================
+    {
+        id: 'assassin_oneshot',
+        name: 'Assassin - One-Shot King',
+        category: 'assassin',
+        variant: 'OneShotKing',
+        description: 'Maximum burst damage in one hit',
+        statAllocation: {
+            damage: 35,
+            critChance: 30,
+            critMult: 30,
+            hp: 5,
+        },
+        minBudget: 10,
+        maxBudget: 100,
+        createdBy: 'system',
+        tags: ['assassin', 'burst', 'glass-cannon'],
+    },
+    {
+        id: 'assassin_evasive',
+        name: 'Assassin - Evasive',
+        category: 'assassin',
+        variant: 'Evasive',
+        description: 'High damage with hit-and-run evasion',
+        statAllocation: {
+            damage: 40,
+            critChance: 25,
+            evasion: 25,
+            hp: 10,
+        },
+        minBudget: 10,
+        maxBudget: 100,
+        createdBy: 'system',
+        tags: ['assassin', 'evasion', 'mobile'],
+    },
+
+    // ==================
+    // BRUISER (3 variants)
+    // ==================
+    {
+        id: 'bruiser_balanced',
+        name: 'Bruiser - Balanced',
+        category: 'bruiser',
+        variant: 'Balanced',
+        description: 'Equal parts offense and defense',
+        statAllocation: {
+            damage: 30,
+            hp: 30,
+            armor: 20,
+            lifesteal: 20,
+        },
+        minBudget: 10,
+        maxBudget: 100,
+        createdBy: 'system',
+        tags: ['bruiser', 'balanced', 'versatile'],
+    },
+    {
+        id: 'bruiser_sustain',
+        name: 'Bruiser - Sustain',
+        category: 'bruiser',
+        variant: 'Sustain',
+        description: 'Outlasts enemies with healing',
+        statAllocation: {
+            damage: 35,
+            lifesteal: 30,
+            regen: 20,
+            hp: 15,
+        },
+        minBudget: 10,
+        maxBudget: 100,
+        createdBy: 'system',
+        tags: ['bruiser', 'sustain', 'lifesteal'],
+    },
+    {
+        id: 'bruiser_duelist',
+        name: 'Bruiser - Duelist',
+        category: 'bruiser',
+        variant: 'Duelist',
+        description: 'Specialized for 1v1 combat',
+        statAllocation: {
+            damage: 40,
+            hp: 25,
+            critChance: 20,
+            armor: 15,
+        },
+        minBudget: 10,
+        maxBudget: 100,
+        createdBy: 'system',
+        tags: ['bruiser', 'duelist', '1v1'],
+    },
+
+    // ==================
+    // SUPPORT (2 variants)
+    // ==================
+    {
+        id: 'support_healer',
+        name: 'Support - Healer',
+        category: 'support',
+        variant: 'Healer',
+        description: 'Regeneration and healing over time',
+        statAllocation: {
+            regen: 50,
+            hp: 30,
+            resistance: 20,
+        },
+        minBudget: 10,
+        maxBudget: 100,
+        createdBy: 'system',
+        tags: ['support', 'healer', 'regen'],
+    },
+    {
+        id: 'support_shielder',
+        name: 'Support - Shielder',
+        category: 'support',
+        variant: 'Shielder',
+        description: 'Protective shields and barriers',
+        statAllocation: {
+            ward: 40,
+            energyShield: 30,
+            hp: 20,
+            block: 10,
+        },
+        minBudget: 10,
+        maxBudget: 100,
+        createdBy: 'system',
+        tags: ['support', 'shield', 'protection'],
+    },
+];
+
+// Run seeding
+function seedArchetypes() {
+    console.log('🌱 Seeding archetypes...');
+    console.log(`Creating ${BASE_ARCHETYPES.length} base archetype templates`);
+
+    try {
+        saveArchetypes(BASE_ARCHETYPES);
+        console.log('✅ Successfully seeded archetypes.json');
+
+        // Print summary
+        const byCategory = BASE_ARCHETYPES.reduce((acc, arch) => {
+            acc[arch.category] = (acc[arch.category] || 0) + 1;
+            return acc;
+        }, {} as Record<string, number>);
+
+        console.log('\n📊 Summary:');
+        Object.entries(byCategory).forEach(([category, count]) => {
+            console.log(`  ${category}: ${count} variants`);
+        });
+
+    } catch (error) {
+        console.error('❌ Error seeding archetypes:', error);
+        throw error;
+    }
+}
+
+// Run if executed directly (ESM version)
+seedArchetypes();
+
+export { seedArchetypes, BASE_ARCHETYPES };
