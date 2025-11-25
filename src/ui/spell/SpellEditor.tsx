@@ -2,13 +2,8 @@ import React, { useState, useEffect } from 'react';
 import type { Spell } from '../../balancing/spellTypes';
 import { upsertSpell, loadSpells } from '../../balancing/spellStorage';
 import { Tooltip } from '../components/Tooltip';
-
-// Placeholder functions (TODO: implement proper config system)
-const calculateSpellBudget = (spell: Spell, customWeights?: Record<string, number>) => 0;
-const getStatWeight = (stat: string) => 1;
-const getStatRange = (stat: string) => ({ min: 0, max: 100, step: 1 });
-const getStatDescription = (stat: string) => '';
-const isMalus = (stat: string) => false;
+import { SpellCostModule } from '../../balancing/modules/spellcost';
+import { SPELL_CONFIG, getStatWeight, getStatRange, getStatDescription, isMalus } from '../../balancing/spellBalancingConfig';
 
 interface SpellEditorProps {
     spellId: string;
@@ -16,28 +11,29 @@ interface SpellEditorProps {
 }
 
 export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) => {
-    const [spell, setSpell] = useState<Spell | null>(null);
+    const [editedSpell, setEditedSpell] = useState<Spell | null>(null);
     const [customWeights, setCustomWeights] = useState<Record<string, number>>({});
 
-    const cost = spell ? calculateSpellBudget(spell, Object.keys(customWeights).length > 0 ? customWeights : undefined) : 0;
+    // Calculate spell power and recommended mana cost
+    const powerBreakdown = editedSpell ? SpellCostModule.calculateSpellPower(editedSpell) : null;
+    const recommendedMana = editedSpell ? SpellCostModule.calculateManaCost(editedSpell) : 0;
+    const isBalanced = editedSpell ? SpellCostModule.isBalanced(editedSpell) : false;
+    const budget = powerBreakdown ? powerBreakdown.totalPower - (editedSpell?.manaCost || 0) * 2.0 : 0;
 
     useEffect(() => {
         // Load spell based on spellId
         const loadedSpells = loadSpells();
         const foundSpell = loadedSpells.find(s => s.id === spellId);
         if (foundSpell) {
-            setSpell(foundSpell);
+            setEditedSpell(foundSpell);
         } else {
-            // Handle case where spell is not found, maybe create a new one or show error
-            // For now, let's just close or initialize an empty spell
-            // setSpell(createEmptySpell(spellId)); // If createEmptySpell is still needed
             onClose();
         }
     }, [spellId, onClose]);
 
 
     const updateField = (field: keyof Spell, value: any) => {
-        setSpell(prev => prev ? ({ ...prev, [field]: value }) : null);
+        setEditedSpell(prev => prev ? ({ ...prev, [field]: value }) : null);
     };
 
     const updateWeight = (field: string, value: number) => {
@@ -49,12 +45,19 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
     };
 
     const handleSave = () => {
+        if (!editedSpell) return;
         const finalSpell = { ...editedSpell, spellLevel: Math.round(budget) };
-        onSave(finalSpell);
+        upsertSpell(finalSpell);
+        onClose();
     };
 
     const handleReset = () => {
-        setEditedSpell(createEmptySpell(editedSpell.id));
+        // Reload original spell
+        const loadedSpells = loadSpells();
+        const foundSpell = loadedSpells.find(s => s.id === spellId);
+        if (foundSpell) {
+            setEditedSpell(foundSpell);
+        }
         setCustomWeights({});
     };
 
@@ -62,16 +65,18 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
         return customWeights[field] !== undefined ? customWeights[field] : getStatWeight(field);
     };
 
+    if (!editedSpell) return null;
+
     return (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" onClick={onCancel}>
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" onClick={onClose}>
             <div
                 className="bg-gray-900 rounded-xl border border-gray-700 w-full max-w-6xl max-h-[90vh] overflow-y-auto"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <h2 className="text-xl font-bold text-white mb-2">Edit Spell</h2>
                 <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-gray-800 sticky top-0 z-10">
                     <div className="flex-1">
+                        <h2 className="text-xl font-bold text-white mb-2">Edit Spell</h2>
                         <input
                             type="text"
                             value={editedSpell.name}
@@ -95,13 +100,39 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
                             </select>
                         </div>
                     </div>
-                    <div className={`px-4 py-2 rounded font-bold text-lg ${Math.abs(budget) < 1 ? 'bg-green-900 text-green-200' :
-                        budget < 0 ? 'bg-red-900 text-red-200' :
-                            'bg-yellow-900 text-yellow-200'
-                        }`}>
-                        Budget: {budget.toFixed(1)}
-                        <div className="text-xs font-normal">
-                            {Math.abs(budget) < 1 ? '✓ Balanced' : budget < 0 ? 'Too expensive!' : 'Too cheap!'}
+
+                    {/* Power Display */}
+                    <div className="flex gap-4">
+                        {/* HP-Equivalent Power */}
+                        <div className="text-center">
+                            <div className="text-xs text-gray-400 mb-1">Spell Power</div>
+                            <div className="text-2xl font-bold text-cyan-400">
+                                {powerBreakdown?.totalPower.toFixed(1)}
+                            </div>
+                            <div className="text-[10px] text-gray-500">HP-equivalent</div>
+                        </div>
+
+                        {/* Recommended Mana */}
+                        <div className="text-center">
+                            <div className="text-xs text-gray-400 mb-1">Recommended</div>
+                            <div className={`text-2xl font-bold ${editedSpell.manaCost === recommendedMana ? 'text-green-400' :
+                                    Math.abs((editedSpell.manaCost || 0) - recommendedMana) <= 2 ? 'text-yellow-400' :
+                                        'text-red-400'
+                                }`}>
+                                {recommendedMana}
+                            </div>
+                            <div className="text-[10px] text-gray-500">mana</div>
+                        </div>
+
+                        {/* Balance Status */}
+                        <div className={`px-4 py-2 rounded font-bold text-lg ${isBalanced ? 'bg-green-900 text-green-200' :
+                                budget < 0 ? 'bg-red-900 text-red-200' :
+                                    'bg-yellow-900 text-yellow-200'
+                            }`}>
+                            {isBalanced ? '✓ Balanced' : budget < 0 ? 'Overpriced' : 'Underpriced'}
+                            <div className="text-xs font-normal">
+                                Budget: {budget.toFixed(1)}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -317,7 +348,7 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
                 {/* Footer */}
                 <div className="p-4 border-t border-gray-800 flex justify-between items-center bg-gray-800/50 sticky bottom-0">
                     <button
-                        onClick={onCancel}
+                        onClick={onClose}
                         className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded transition text-sm"
                     >
                         Cancel

@@ -109,7 +109,7 @@ export class Entity {
         // We will just recalculate derived stats based on current attributes + equipment bonuses
 
         // Reset derived stats to base calculation
-        let effectiveAttributes = { ...this.attributes };
+        const effectiveAttributes = { ...this.attributes };
 
         // Apply equipment attribute modifiers
         if (this.equipment.weapon?.attributeModifiers) {
@@ -154,7 +154,15 @@ export class Entity {
     }
 
     takeDamage(amount: number) {
-        const actualDamage = Math.max(1, amount - this.derivedStats.defense); // Simple defense logic
+        // If using StatBlock (Balancing Lab), mitigation is already applied in logic.ts
+        // So we apply damage directly.
+        // If using Legacy Attributes, we apply simple defense here.
+        let actualDamage = amount;
+
+        if (!this.statBlock) {
+            actualDamage = Math.max(1, amount - this.derivedStats.defense);
+        }
+
         this.currentHp = Math.max(0, this.currentHp - actualDamage);
         this.currentHealth = this.currentHp; // Sync
     }

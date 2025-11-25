@@ -1,0 +1,20 @@
+[
+    {
+        "id": "basic-attack",
+        "name": "Basic Attack",
+        "type": "damage",
+        "effect": 100,
+        "scale": 0,
+        "cooldown": 0,
+        "eco": 1,
+        "aoe": 1,
+        "dangerous": 0,
+        "pierce": 0,
+        "castTime": 0.5,
+        "range": 1,
+        "priority": 0,
+        "doubleSpell": false,
+        "legendary": false,
+        "spellLevel": 0
+    }
+]

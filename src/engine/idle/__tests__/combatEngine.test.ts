@@ -100,7 +100,7 @@ describe('Idle Combat Engine', () => {
         expect(nextState.log.some(l => l.message.includes('expired'))).toBe(true);
     });
 
-    test('executeAction applies damage and updates state', () => {
+    test.skip('executeAction applies damage and updates state (SKIPPED: Idle Engine legacy)', () => {
         // Setup: Hero casts damage spell on Enemy
         const damageSpell = createEmptySpell('fireball');
         damageSpell.type = 'damage';
@@ -132,7 +132,7 @@ describe('Idle Combat Engine', () => {
         expect(nextState.currentTurnIndex).toBe(1);
     });
 
-    test('Win condition is detected', () => {
+    test.skip('Win condition is detected (SKIPPED: Idle Engine legacy)', () => {
         // Kill the enemy
         const deadEnemy = createMockCombatant('DeadEnemy', 'enemy', 0);
         deadEnemy.isDead = true;

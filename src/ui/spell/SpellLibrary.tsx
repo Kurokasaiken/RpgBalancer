@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import type { Spell } from '../../balancing/spellTypes';
-import { loadSpells, deleteSpell, upsertSpell } from '../../balancing/spellStorage';
+import { loadSpells, deleteSpell } from '../../balancing/spellStorage';
 import { Tooltip } from '../components/Tooltip';
 import { STAT_DESCRIPTIONS } from '../../data/tooltips';
 import { SpellEditor } from './SpellEditor';
@@ -202,13 +202,10 @@ export const SpellLibrary: React.FC = () => {
 
             {isEditing && selectedSpell && (
                 <SpellEditor
-                    spell={selectedSpell}
-                    onCancel={() => setIsEditing(false)}
-                    onSave={(updated) => {
-                        upsertSpell(updated);
-                        setSpells(loadSpells());
-                        setSelectedSpell(updated);
+                    spellId={selectedSpell.id}
+                    onClose={() => {
                         setIsEditing(false);
+                        refresh();
                     }}
                 />
             )}

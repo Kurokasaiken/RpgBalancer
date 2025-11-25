@@ -245,8 +245,7 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, spells, onCl
                     <StatDisplay label="Damage" value={character.statBlock.damage} />
                     <StatDisplay label="Armor" value={character.statBlock.armor} />
                     <StatDisplay label="Crit Chance" value={`${character.statBlock.critChance}%`} />
-                    <StatDisplay label="Crit Damage" value={`${character.statBlock.critDamage}%`} />
-                    <StatDisplay label="Attack Speed" value={character.statBlock.attackSpeed.toFixed(2)} />
+                    <StatDisplay label="Crit Mult" value={`${character.statBlock.critMult}x`} />
                 </div>
 
                 {/* Equipped Spells */}
@@ -261,8 +260,7 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, spells, onCl
                                         <div className="text-xs text-gray-400">{spell.type}</div>
                                     </div>
                                     <div className="text-right text-xs text-gray-300">
-                                        {spell.flatDamage > 0 && <div>+{spell.flatDamage} flat</div>}
-                                        {spell.scalingPercent > 0 && <div>+{spell.scalingPercent}% scaling</div>}
+                                        {spell.effect > 0 && <div>{spell.effect}% effect</div>}
                                     </div>
                                 </div>
                             </div>

@@ -3,7 +3,7 @@
 export const HitChanceModule = {
     calculateHitChance: (txc: number, evasion: number): number => {
         // Formula: TxC + 50 - Evasione
-        let chance = txc + 50 - evasion;
+        const chance = txc + 50 - evasion;
         // Clamp between 1% and 100%
         return Math.max(1, Math.min(100, chance));
     },

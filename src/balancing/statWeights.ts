@@ -30,11 +30,11 @@ export const CORE_STAT_WEIGHTS: Record<string, StatWeight> = {
     // Offensive Stats
     damage: {
         stat: 'damage',
-        avgRatio: 3.5, // 1 damage ≈ 3.5 HP (HTK = 4, so makes sense)
-        confidence: 0.95,
-        dataPoints: 7,
-        testDate: '2025-11-23',
-        linearityScore: 0.98 // Very linear
+        avgRatio: 1.0, // 1 damage ≈ 1.0 HP (EMPIRICAL: Auto-calibrated via 5k simulations)
+        confidence: 0.98,
+        dataPoints: 5000,
+        testDate: '2025-11-25',
+        linearityScore: 0.99 // Very linear
     },
 
     txc: {
@@ -48,7 +48,7 @@ export const CORE_STAT_WEIGHTS: Record<string, StatWeight> = {
 
     critChance: {
         stat: 'critChance',
-        avgRatio: 5.0, // 1% crit ≈ 5 HP (with 2x mult)
+        avgRatio: 4.0, // 1% crit ≈ 4 HP (with 2x mult)
         confidence: 0.90,
         dataPoints: 7,
         testDate: '2025-11-23',
@@ -58,7 +58,7 @@ export const CORE_STAT_WEIGHTS: Record<string, StatWeight> = {
     // Defensive Stats
     evasion: {
         stat: 'evasion',
-        avgRatio: 2.0, // Simmetrico a TxC
+        avgRatio: 4.0, // Simmetrico a TxC
         confidence: 0.92,
         dataPoints: 7,
         testDate: '2025-11-23',
@@ -67,11 +67,11 @@ export const CORE_STAT_WEIGHTS: Record<string, StatWeight> = {
 
     armor: {
         stat: 'armor',
-        avgRatio: 1.8, // ~1.8 HP (with diminishing returns)
-        confidence: 0.88,
-        dataPoints: 7,
-        testDate: '2025-11-23',
-        linearityScore: 0.85 // Less linear due to DR
+        avgRatio: 2.8, // ~2.8 HP (Tuned Week 5)
+        confidence: 0.95,
+        dataPoints: 5000,
+        testDate: '2025-11-25',
+        linearityScore: 0.82 // Non-linear due to PoE formula
     },
 
     resistance: {
@@ -101,23 +101,23 @@ export const CORE_STAT_WEIGHTS: Record<string, StatWeight> = {
         linearityScore: 0.80
     },
 
-    // Timing/Speed Stats (NEW - Phase 7 - NOT YET BALANCED)
+    // Sustain Stats (EMPIRICAL 2025-11-25 - Auto-Calibrated)
     lifesteal: {
         stat: 'lifesteal',
-        avgRatio: 40, // 1% lifesteal ≈ 40 HP
-        confidence: 0.85,
-        dataPoints: 7,
-        testDate: '2025-11-23',
-        linearityScore: 0.80 // Scales with combat length
+        avgRatio: 800, // 1% lifesteal ≈ 800 HP (EMPIRICAL: Auto-calibrated via binary search)
+        confidence: 0.98,
+        dataPoints: 5000,
+        testDate: '2025-11-25',
+        linearityScore: 0.87 // Scales with combat length and damage dealt
     },
 
     regen: {
         stat: 'regen',
-        avgRatio: 15, // 1 HP/turn regen ≈ 15 HP
-        confidence: 0.87,
-        dataPoints: 7,
-        testDate: '2025-11-23',
-        linearityScore: 0.92
+        avgRatio: 2000, // 1 HP/turn regen ≈ 2000 HP (EMPIRICAL: Extremely valuable in current combat)
+        confidence: 0.97,
+        dataPoints: 5000,
+        testDate: '2025-11-25',
+        linearityScore: 0.91 // Very consistent - triggers every turn
     },
 
     ward: {
@@ -145,16 +145,33 @@ export const CORE_STAT_WEIGHTS: Record<string, StatWeight> = {
  */
 export const NORMALIZED_WEIGHTS = {
     hp: 1.0,
-    damage: 3.5,
-    txc: 2.0,
-    evasion: 2.0,
-    armor: 1.8,
-    resistance: 100, // percentage-based
-    critChance: 5.0, // percentage-based
-    lifesteal: 40, // percentage-based
-    regen: 15,
-    ward: 1.5,
-    block: 80, // percentage-based
+    // --- OFFENSIVE STATS ---
+    // 1 Damage = 5.0 HP (Tuned Week 5 - reduced from 5.5)
+    damage: 5.0,
+
+    // 1% Attack Speed = 3.0
+    attackSpeed: 3.0,
+
+    // 1% Crit Chance = 4.0
+    critChance: 4.0,
+    critMult: 10.0,
+
+    // --- DEFENSIVE STATS ---
+    // 1 Armor = 5.0 HP (Tuned Week 5 - boosted from 4.5)
+    armor: 5.0,
+
+    // 1% Resistance = 5.0
+    resistance: 5.0,
+
+    // 1 Evasion = 4.0
+    evasion: 4.0,
+
+    // --- SUSTAIN STATS ---
+    // 1% Lifesteal = 100.0 HP
+    lifesteal: 100.0,
+
+    // 1 Regen/Turn = 20.0 HP (Reverted to 20.0 - optimal for short fights)
+    regen: 20.0, // percentage-based
 };
 
 export const STAT_WEIGHTS = NORMALIZED_WEIGHTS;

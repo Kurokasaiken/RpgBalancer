@@ -1,5 +1,5 @@
 import type { StatBlock } from '../../balancing/types';
-import type { Spell } from '../../spells/types';
+import type { Spell } from '../../balancing/spellTypes';
 
 // Character with equipped spells and combat state
 export interface CombatCharacter {

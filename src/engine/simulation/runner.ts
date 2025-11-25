@@ -23,10 +23,22 @@ export function runSimulation(entityA: Entity, entityB: Entity, iterations: numb
 
     for (let i = 0; i < iterations; i++) {
         // Reset HP/Mana
-        entityA.currentHp = entityA.derivedStats.maxHp;
-        entityA.currentMana = entityA.derivedStats.maxMana;
-        entityB.currentHp = entityB.derivedStats.maxHp;
-        entityB.currentMana = entityB.derivedStats.maxMana;
+        // Reset HP/Mana
+        if (entityA.statBlock) {
+            entityA.currentHp = entityA.statBlock.hp;
+            entityA.currentMana = 20; // Default mana for now
+        } else {
+            entityA.currentHp = entityA.derivedStats.maxHp;
+            entityA.currentMana = entityA.derivedStats.maxMana;
+        }
+
+        if (entityB.statBlock) {
+            entityB.currentHp = entityB.statBlock.hp;
+            entityB.currentMana = 20; // Default mana for now
+        } else {
+            entityB.currentHp = entityB.derivedStats.maxHp;
+            entityB.currentMana = entityB.derivedStats.maxMana;
+        }
 
         let state = createCombatState([entityA], [entityB]);
 
@@ -34,10 +46,24 @@ export function runSimulation(entityA: Entity, entityB: Entity, iterations: numb
         // Optimization: We could have a "fastResolve" that doesn't generate logs
         while (!state.isFinished) {
             state = resolveCombatRound(state);
+
+            // CRITICAL: Check for HP <= 0 immediately after round
+            // This ensures combat stops even if isFinished flag isn't set
+            if (entityA.currentHp <= 0 || entityB.currentHp <= 0) {
+                state.isFinished = true;
+                state.winner = entityA.currentHp > entityB.currentHp ? 'teamA' : 'teamB';
+                // Handle draw case (both died simultaneously)
+                if (entityA.currentHp <= 0 && entityB.currentHp <= 0) {
+                    state.winner = 'draw';
+                }
+                break;
+            }
+
             // Safety break for infinite loops
             if (state.turn > 100) {
                 state.isFinished = true;
                 state.winner = 'draw';
+                break;
             }
         }
 

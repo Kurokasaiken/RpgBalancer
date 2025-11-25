@@ -128,7 +128,7 @@ export const IdleArena: React.FC = () => {
         for (let i = 0; i < simulationCount; i++) {
             let state = startCombat(heroes, enemies);
 
-            let maxTurns = 1000;
+            const maxTurns = 1000;
             let turns = 0;
 
             while (!state.winner && turns < maxTurns) {

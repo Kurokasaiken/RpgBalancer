@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { Spell } from '../../balancing/spellTypes';
 import { createEmptySpell } from '../../balancing/spellTypes';
+import { DEFAULT_SPELLS } from '../../balancing/defaultSpells';
 import {
     calculateSpellBudget,
     getStatWeight,
@@ -31,7 +32,20 @@ export const SpellCreation: React.FC = () => {
     };
 
     const handleSave = () => {
-        const finalSpell = { ...spell, spellLevel: Math.round(cost) };
+        // Get the default spell (basic attack) for comparison
+        const defaultSpell = DEFAULT_SPELLS[0];
+        // Build a minimal spell object keeping only fields that differ from defaults
+        const minimalSpell: Partial<Spell> = { id: spell.id, name: spell.name, type: spell.type };
+        (Object.keys(spell) as (keyof Spell)[]).forEach((key) => {
+            if (key === 'id' || key === 'name' || key === 'type') return; // always keep these
+
+            const value = spell[key];
+            const defaultValue = (defaultSpell as any)[key];
+            if (value !== undefined && value !== defaultValue) {
+                (minimalSpell as any)[key] = value;
+            }
+        });
+        const finalSpell = { ...minimalSpell, spellLevel: Math.round(cost) } as Spell;
         upsertSpell(finalSpell);
         alert(`Spell "${finalSpell.name}" saved!`);
         setSpell(createEmptySpell());

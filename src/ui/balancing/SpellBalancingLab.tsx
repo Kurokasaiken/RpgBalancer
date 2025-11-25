@@ -23,7 +23,7 @@ export const SpellBalancingLab: React.FC = () => {
 
         let winsA = 0;
         const sims = 1000;
-        let lastLog: string[] = [];
+        const lastLog: string[] = [];
 
         for (let i = 0; i < sims; i++) {
             let hpA = 1000;

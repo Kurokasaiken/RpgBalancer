@@ -18,9 +18,9 @@ A powerful, web-based tool for designing, testing, and balancing RPG combat syst
 - **Diminishing Returns**: Visualize effectiveness curves for stats like Armor and Evasion.
 
 ### 🔮 Spell & Entity Editor
-- **Spell Creation**: Visual editor for designing spells with custom effects, costs, and scaling.
+- **Spell Creation**: Visual editor for designing spells. Now loads base spells from `src/balancing/spells.json`. When saving, only fields that differ from the default *Basic Attack* are persisted, keeping the JSON lean.
 - **Entity Manager**: Create and save characters with custom stat blocks for testing.
-- **Idle Arena**: Watch AI-controlled entities fight indefinitely to test long-term balance.
+- **Idle Arena**: Watch AI‑controlled entities fight indefinitely to test long‑term balance.
 
 ## 🛠️ Tech Stack
 - **Frontend**: React 18, TypeScript, Vite

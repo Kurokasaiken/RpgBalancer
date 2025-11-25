@@ -2,6 +2,9 @@ import type { CombatState } from './state';
 import { HitChanceModule } from '../../balancing/modules/hitchance';
 import { MitigationModule } from '../../balancing/modules/mitigation';
 import { CriticalModule } from '../../balancing/modules/critical';
+import { SustainModule } from '../../balancing/modules/sustain';
+import { DotModule } from '../../balancing/modules/dot';
+import { BuffModule } from '../../balancing/modules/buffs';
 
 // ... (inside resolveCombatRound)
 
@@ -19,6 +22,67 @@ export function resolveCombatRound(state: CombatState): CombatState {
         ...state.teamA.filter(e => e.isAlive()).map(e => ({ entity: e, team: 'A' })),
         ...state.teamB.filter(e => e.isAlive()).map(e => ({ entity: e, team: 'B' }))
     ];
+
+    // ========== SUSTAIN: Apply Regen at Start of Turn ==========
+    // ARCHITECTURE: Inheriting formula from SustainModule
+    for (const { entity } of allEntities) {
+        if (entity.statBlock && entity.statBlock.regen > 0) {
+            const regenHeal = SustainModule.calculateRegenHeal(entity.statBlock.regen);
+            const actualHeal = SustainModule.applyHealingCap(
+                entity.currentHp,
+                regenHeal,
+                entity.statBlock.hp
+            );
+
+            if (actualHeal > 0) {
+                entity.currentHp += actualHeal;
+                state.log.push({
+                    turn: state.turn,
+                    message: `${entity.name} regenerates ${actualHeal.toFixed(1)} HP (${entity.currentHp.toFixed(0)}/${entity.statBlock.hp})`,
+                    type: 'heal'
+                });
+            }
+        }
+    }
+
+    // ========== DOT/HOT: Apply Periodic Effects ==========
+    // ARCHITECTURE: Inheriting formula from DotModule
+    for (const { entity } of allEntities) {
+        const effects = state.entityEffects.get(entity.id);
+        if (!effects || effects.dots.length === 0) continue;
+
+        // Apply each DoT/HoT tick
+        effects.dots.forEach(dot => {
+            const result = DotModule.applyTick(
+                entity.currentHp,
+                dot.amountPerTurn * (dot.currentStacks || 1),
+                entity.statBlock?.hp || entity.currentHp
+            );
+
+            entity.currentHp = result.newHp;
+
+            if (Math.abs(result.actualAmount) > 0) {
+                const dotType = dot.type === 'damage' ? 'takes' : 'heals';
+                state.log.push({
+                    turn: state.turn,
+                    message: `${entity.name} ${dotType} ${Math.abs(result.actualAmount).toFixed(1)} from ${dot.source}`,
+                    type: dot.type
+                });
+            }
+        });
+
+        // Tick down durations
+        effects.dots = DotModule.tickDurations(effects.dots);
+    }
+
+    // ========== BUFFS: Tick Down Durations ==========
+    // ARCHITECTURE: Inheriting from BuffModule
+    for (const { entity } of allEntities) {
+        const effects = state.entityEffects.get(entity.id);
+        if (!effects) continue;
+
+        effects.buffs = BuffModule.tickDurations(effects.buffs);
+    }
 
     // Sort by speed (descending)
     allEntities.sort((a, b) => b.entity.derivedStats.speed - a.entity.derivedStats.speed);
@@ -42,13 +106,27 @@ export function resolveCombatRound(state: CombatState): CombatState {
 
         // Perform Attack
         let totalDamage = 0;
-        let isCrit = false;
-        let isHit = true; // Default to true for legacy
+        const isHit = true; // Default to true for legacy
 
         // --- STAT BLOCK LOGIC (Balancing Lab) ---
         if (entity.statBlock && target.statBlock) {
             const attackerStats = entity.statBlock;
             const defenderStats = target.statBlock;
+
+            // ========== BUFFS: Apply to Stats ==========
+            // ARCHITECTURE: Inheriting from BuffModule
+            const attackerEffects = state.entityEffects.get(entity.id);
+            const defenderEffects = state.entityEffects.get(target.id);
+
+            // Apply buffs to attacker damage
+            const buffedDamage = attackerEffects
+                ? BuffModule.applyStatModifiers(attackerStats.damage, attackerEffects.buffs, 'damage')
+                : attackerStats.damage;
+
+            // Apply buffs to defender armor
+            const buffedArmor = defenderEffects
+                ? BuffModule.applyStatModifiers(defenderStats.armor, defenderEffects.buffs, 'armor')
+                : defenderStats.armor;
 
             // 1. Hit Chance
             const hitChance = HitChanceModule.calculateHitChance(attackerStats.txc, defenderStats.evasion);
@@ -69,21 +147,21 @@ export function resolveCombatRound(state: CombatState): CombatState {
             // Logic always runs. If user wants "no crits", they should set chance to 0.
             // "Deactivated" module just means it's a fixed global rule, not dynamic.
             let isCritical = false;
-            let rawDamage = attackerStats.damage;
+            let rawDamage = buffedDamage; // Use buffed damage!
 
             const critRoll = Math.random() * 100;
             isCritical = critRoll <= attackerStats.critChance;
 
             if (isCritical) {
-                rawDamage = CriticalModule.calculateCriticalDamage(attackerStats.damage, attackerStats.critMult);
+                rawDamage = CriticalModule.calculateCriticalDamage(buffedDamage, attackerStats.critMult);
                 state.log.push({ turn: state.turn, message: `${entity.name} CRITS!`, type: 'info' });
             }
 
-            // 3. Mitigation
+            // 3. Mitigation (using buffed armor!)
             // Logic always runs.
             const finalDamage = MitigationModule.calculateEffectiveDamage(
                 rawDamage,
-                defenderStats.armor,
+                buffedArmor, // Buffed armor!
                 defenderStats.resistance,
                 attackerStats.armorPen,
                 attackerStats.penPercent,
@@ -113,13 +191,61 @@ export function resolveCombatRound(state: CombatState): CombatState {
         }
 
         if (isHit) {
-            target.takeDamage(Math.floor(totalDamage));
+            // ========== SHIELDS: Absorb Damage First ==========
+            // ARCHITECTURE: Inheriting from BuffModule
+            const targetEffects = state.entityEffects.get(target.id);
+            let damageToHp = totalDamage;
+
+            if (targetEffects && targetEffects.buffs.length > 0) {
+                const result = BuffModule.applyDamageToShields(
+                    totalDamage,
+                    targetEffects.buffs
+                );
+
+                targetEffects.buffs = result.updatedBuffs;
+                damageToHp = result.remainingDamage;
+
+                const shieldAbsorbed = totalDamage - damageToHp;
+                if (shieldAbsorbed > 0) {
+                    state.log.push({
+                        turn: state.turn,
+                        message: `${target.name}'s shield absorbs ${shieldAbsorbed.toFixed(0)} damage!`,
+                        type: 'info'
+                    });
+                }
+            }
+
+            // Apply remaining damage to HP
+            target.takeDamage(Math.floor(damageToHp));
 
             state.log.push({
                 turn: state.turn,
                 message: `${entity.name} attacks ${target.name} for ${Math.floor(totalDamage)} damage. (${target.currentHp}/${target.derivedStats.maxHp} HP left)`,
                 type: 'attack'
             });
+
+            // ========== SUSTAIN: Apply Lifesteal After Damage ==========
+            // ARCHITECTURE: Inheriting formula from SustainModule
+            if (entity.statBlock && entity.statBlock.lifesteal > 0) {
+                const lifestealHeal = SustainModule.calculateLifestealHeal(
+                    totalDamage,
+                    entity.statBlock.lifesteal
+                );
+                const actualHeal = SustainModule.applyHealingCap(
+                    entity.currentHp,
+                    lifestealHeal,
+                    entity.statBlock.hp
+                );
+
+                if (actualHeal > 0) {
+                    entity.currentHp += actualHeal;
+                    state.log.push({
+                        turn: state.turn,
+                        message: `${entity.name} lifesteals ${actualHeal.toFixed(1)} HP (${entity.currentHp.toFixed(0)}/${entity.statBlock.hp})`,
+                        type: 'heal'
+                    });
+                }
+            }
 
             if (!target.isAlive()) {
                 state.log.push({ turn: state.turn, message: `${target.name} dies!`, type: 'death' });
