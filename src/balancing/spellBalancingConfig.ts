@@ -10,8 +10,57 @@ export interface SpellBalancingConfig {
     descriptions: Record<string, string>;
 }
 
-// Load config from JSON
-export const SPELL_CONFIG: SpellBalancingConfig = spellConfigData as SpellBalancingConfig;
+// Load config from JSON (default)
+const DEFAULT_CONFIG: SpellBalancingConfig = spellConfigData as SpellBalancingConfig;
+
+// In-memory config (initialized from localStorage or default)
+export let SPELL_CONFIG: SpellBalancingConfig = loadConfig();
+
+// Load config from localStorage or fall back to default
+export function loadConfig(): SpellBalancingConfig {
+    try {
+        const saved = localStorage.getItem('spell_balancing_config');
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            // Merge with default to ensure structure
+            return {
+                ...DEFAULT_CONFIG,
+                ...parsed,
+                baseline: { ...DEFAULT_CONFIG.baseline, ...parsed.baseline },
+                weights: { ...DEFAULT_CONFIG.weights, ...parsed.weights }
+            };
+        }
+    } catch (e) {
+        console.error("Failed to load spell config", e);
+    }
+    return JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+}
+
+// Save config to localStorage
+export function saveConfig(config: SpellBalancingConfig): void {
+    SPELL_CONFIG = config;
+    localStorage.setItem('spell_balancing_config', JSON.stringify(config));
+}
+
+
+
+// Update range for a specific stat
+export function updateRange(stat: string, range: { min: number; max: number; step: number }): void {
+    const newConfig = {
+        ...SPELL_CONFIG,
+        ranges: {
+            ...SPELL_CONFIG.ranges,
+            [stat]: range
+        }
+    };
+    saveConfig(newConfig);
+}
+
+// Reset config to defaults
+export function resetConfig(): void {
+    SPELL_CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+    localStorage.removeItem('spell_balancing_config');
+}
 
 // Get baseline spell (reference for 0 budget)
 export function getBaselineSpell(): Partial<Spell> {
@@ -34,16 +83,19 @@ export function getStatDescription(stat: string): string {
 }
 
 // Calculate budget based on difference from baseline
-export function calculateSpellBudget(spell: Spell, customWeights?: Record<string, number>): number {
-    const baseline = getBaselineSpell();
+export function calculateSpellBudget(
+    spell: Spell,
+    customWeights?: Record<string, number>,
+    customBaselines?: Partial<Spell>
+): number {
+    const baseline = customBaselines || getBaselineSpell();
     const weights = customWeights || SPELL_CONFIG.weights;
     let budget = 0;
 
     // Iterate over all numeric fields that affect balance
     const balanceableFields = [
-        'effect', 'scale', 'eco', 'aoe', 'dangerous', 'pierce',
-        'castTime', 'cooldown', 'range', 'priority', 'manaCost',
-        'duration', 'charges', 'channel', 'reflection', 'maxStacks'
+        'effect', 'scale', 'eco', 'aoe', 'precision', 'dangerous',
+        'cooldown', 'range', 'priority', 'manaCost'
     ];
 
     for (const field of balanceableFields) {
@@ -56,9 +108,6 @@ export function calculateSpellBudget(spell: Spell, customWeights?: Record<string
     }
 
     // Additional fields cost adjustments
-    if (spell.doubleSpell) {
-        budget -= 1; // double spell reduces cost by 1
-    }
     if (spell.ccEffect) {
         budget += 2; // cc effect adds fixed cost of 2
     }
@@ -68,16 +117,14 @@ export function calculateSpellBudget(spell: Spell, customWeights?: Record<string
 
 // Update config (for balancing the balancer)
 export function updateConfig(newConfig: Partial<SpellBalancingConfig>): void {
-    // In a real app, this would save to file or server
-    // For now, update in-memory (would need state management in React)
     Object.assign(SPELL_CONFIG, newConfig);
+    saveConfig(SPELL_CONFIG);
 }
 
 // Export stat fields that are balanceable
 export const BALANCEABLE_STAT_FIELDS = [
-    'effect', 'scale', 'eco', 'aoe', 'dangerous', 'pierce',
-    'castTime', 'cooldown', 'range', 'priority', 'manaCost',
-    'duration', 'charges', 'channel', 'reflection', 'maxStacks'
+    'effect', 'scale', 'eco', 'aoe', 'precision', 'dangerous',
+    'cooldown', 'range', 'priority', 'manaCost'
 ] as const;
 
 // Check if a field is a MALUS (negative weight = higher value gives budget)

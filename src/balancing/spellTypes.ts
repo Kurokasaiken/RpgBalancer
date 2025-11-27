@@ -21,26 +21,18 @@ export interface Spell {
   eco: number; // >=1
   /** Number of targets hit (AoE) */
   aoe: number; // >=1
-  /** Success chance of the effect (percentage). 100 = always hits */
-  dangerous: number; // 0 – 100
-  /** Damage that passes through a successful save (percentage of effect) */
-  pierce: number; // 0 – 50 (step 5)
-  /** Cast time in seconds */
-  castTime: number; // 0.1 – 2.0 (step 0.1)
+  /** Hit chance modifier (renamed from dangerous) */
+  precision: number; // -50 – 50
+  /** Damage on miss/save (renamed from pierce) */
+  dangerous: number; // 0 – 50 (step 5)
   /** Cooldown in seconds */
   cooldown: number; // 0 – 5.0 (step 0.5)
   /** Range in game units */
   range: number; // 1 – 10
   /** Initiative priority: negative = early, positive = late */
   priority: number; // -5 … +5
-  /** If true, this spell is part of a double‑spell pair */
-  doubleSpell: boolean;
-  /** Legendary spells have a fixed positive cost and ignore the zero‑cost rule */
-  legendary: boolean;
   /** Specific crowd‑control effect when type === 'cc'. */
   ccEffect?: 'stun' | 'slow' | 'knockback' | 'silence';
-  /** Damage reflection percentage. */
-  reflection?: number; // 0 – 100
   /** Situational modifiers – array of condition/adjustment objects */
   situationalModifiers?: Array<{
     /** Human readable description, e.g. "Target below 25% HP" */
@@ -52,21 +44,12 @@ export interface Spell {
   scalingStat?: 'attack' | 'magic' | 'health' | 'mana' | 'defense';
   /** Customizable slots (gem‑like) */
   slots?: Slot[];
-  /** New optional fields for LoL‑style abilities */
   /** Mana cost of the ability */
   manaCost?: number; // 0 – 200
-  /** Duration in seconds (for buffs, shields, DoT, etc.) */
-  duration?: number; // >=0
   /** Damage type – influences interaction with resistances */
   damageType?: 'physical' | 'magical' | 'true';
-  /** Number of charges (e.g., Flash has 2 charges) */
-  charges?: number; // >=1
-  /** Channel time in seconds (for channeled abilities) */
-  channel?: number; // >=0
   /** Indicates this entry is a passive (no active cast) */
   isPassive?: boolean;
-  /** Maximum stack count for a passive or buff */
-  maxStacks?: number; // >=1
   /** Arbitrary custom fields for edge‑case data */
   customFields?: Record<string, any>;
   /** Calculated cost (spell level) – should be 0 for normal spells */
@@ -99,24 +82,21 @@ export type TagOption =
   | 'lifeSteal'         // % of damage returned as heal
   | 'manaCostReduction'; // -% mana cost
 
-/** Factory that returns a spell with all default values (based on base attack) */
+/** Factory that returns a spell with all default values (zero-cost baseline) */
 export const createEmptySpell = (id: string = crypto.randomUUID()): Spell => ({
   id,
   name: 'New Spell',
   type: 'damage',
-  effect: 100,
-  scale: 0,
-  eco: 1,
-  aoe: 1,
-  dangerous: 100,
-  pierce: 0,
-  castTime: 0.5,
-  cooldown: 0,
-  range: 1,
-  priority: 0,
-  doubleSpell: false,
-  legendary: false,
-  // optional new fields default to undefined / empty
+  effect: 0,          // baseline = 0
+  scale: 0,           // baseline = 0
+  eco: 0,             // baseline = 0
+  aoe: 0,             // baseline = 0
+  precision: 0,       // baseline = 0 (renamed from dangerous)
+  dangerous: 0,       // baseline = 0 (renamed from pierce)
+  cooldown: 0,        // baseline = 0
+  range: 0,           // baseline = 0
+  priority: 0,        // baseline = 0
+  manaCost: 0,        // baseline = 0
   scalingStat: undefined,
   slots: [],
   spellLevel: 0,

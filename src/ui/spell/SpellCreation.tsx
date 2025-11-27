@@ -1,35 +1,105 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { SpellInfoForm } from './components/SpellInfoForm';
+import { StatsGrid } from './components/StatsGrid';
+import { ActionsBar } from './components/ActionsBar';
 import type { Spell } from '../../balancing/spellTypes';
 import { createEmptySpell } from '../../balancing/spellTypes';
 import { DEFAULT_SPELLS } from '../../balancing/defaultSpells';
 import {
     calculateSpellBudget,
-    getStatWeight,
-    getStatRange,
     getStatDescription,
     isMalus,
-    SPELL_CONFIG
+    SPELL_CONFIG,
+    updateConfig,
+    updateRange
 } from '../../balancing/spellBalancingConfig';
 import { upsertSpell } from '../../balancing/spellStorage';
-import { Tooltip } from '../components/Tooltip';
 
 export const SpellCreation: React.FC = () => {
-    const [spell, setSpell] = useState<Spell>(createEmptySpell());
-    const [customWeights, setCustomWeights] = useState<Record<string, number>>({});
+    // Stato per gli step di ogni stat
+    const [statSteps, setStatSteps] = useState<Record<string, Array<{ value: number; weight: number }>>>({});
+    const [selectedTicks, setSelectedTicks] = useState<Record<string, number>>({});
 
-    const cost = calculateSpellBudget(spell, Object.keys(customWeights).length > 0 ? customWeights : undefined);
+    // Funzione per ottenere gli step di una stat
+    const getStatSteps = (field: string) => statSteps[field] || [{ value: (spell as any)[field] || 0, weight: 1 }];
+
+    // Funzione per aggiornare uno step
+    const updateStatStep = (field: string, idx: number, step: { value: number; weight: number }) => {
+        setStatSteps(prev => {
+            const steps = [...(prev[field] || [{ value: (spell as any)[field] || 0, weight: 1 }])];
+            steps[idx] = step;
+            return { ...prev, [field]: steps };
+        });
+
+        // Se stiamo modificando il tick selezionato, aggiorna anche la spell
+        const currentTick = selectedTicks[field] || 0;
+        if (idx === currentTick) {
+            updateField(field as keyof Spell, step.value);
+        }
+    };
+
+    const handleSelectTick = (field: string, idx: number) => {
+        setSelectedTicks(prev => ({ ...prev, [field]: idx }));
+        // Aggiorna il valore nella spell quando cambia il tick selezionato
+        const steps = statSteps[field] || [{ value: (spell as any)[field] || 0, weight: 1 }];
+        if (steps[idx]) {
+            updateField(field as keyof Spell, steps[idx].value);
+        }
+    };
+
+    // Funzione per aggiungere uno step
+    const addStatStep = (field: string, idx: number) => {
+        setStatSteps(prev => {
+            const steps = [...(prev[field] || [{ value: (spell as any)[field] || 0, weight: 1 }])];
+            steps.splice(idx + 1, 0, { value: 0, weight: 1 });
+            return { ...prev, [field]: steps };
+        });
+    };
+
+    // Funzione per rimuovere uno step
+    const removeStatStep = (field: string, idx: number) => {
+        setStatSteps(prev => {
+            const steps = [...(prev[field] || [{ value: (spell as any)[field] || 0, weight: 1 }])];
+            if (steps.length > 3) steps.splice(idx, 1);
+            return { ...prev, [field]: steps };
+        });
+    };
+    // Main component for spell creation logic
+    const [spell, setSpell] = useState<Spell>(createEmptySpell());
+    // const [customWeights, setCustomWeights] = useState<Record<string, number>>({});
+    // const [customBaselines, setCustomBaselines] = useState<Partial<Spell>>({});
+    const [targetBudget, setTargetBudget] = useState<number>(0);
+    // Carica lo stato collapsed da file di config (es. spellBalanceConfig.json)
+    const [collapsedStats, setCollapsedStats] = useState<Set<string>>(() => {
+        try {
+            const config = localStorage.getItem('spellCollapsedStats') || localStorage.getItem('spellBalanceConfig');
+            if (config) {
+                const parsed = JSON.parse(config);
+                if (Array.isArray(parsed.collapsedStats)) {
+                    return new Set(parsed.collapsedStats);
+                } else if (Array.isArray(parsed)) {
+                    return new Set(parsed);
+                }
+            }
+        } catch { }
+        return new Set();
+    });
+
+    // Initialize custom baselines from config on mount
+    // useEffect(() => {
+    //     setCustomBaselines(getBaselineSpell());
+    // }, []);
+
+    const cost = calculateSpellBudget(spell);
+    const balance = cost - targetBudget;
 
     const updateField = (field: keyof Spell, value: any) => {
         setSpell(prev => ({ ...prev, [field]: value }));
     };
 
-    const updateWeight = (field: string, value: number) => {
-        setCustomWeights(prev => ({ ...prev, [field]: value }));
-    };
+    // Rimosso custom weight/baseline logic
 
-    const getEffectiveWeight = (field: string): number => {
-        return customWeights[field] !== undefined ? customWeights[field] : getStatWeight(field);
-    };
+    // Rimosso handleSaveConfig
 
     const handleSave = () => {
         // Get the default spell (basic attack) for comparison
@@ -49,410 +119,118 @@ export const SpellCreation: React.FC = () => {
         upsertSpell(finalSpell);
         alert(`Spell "${finalSpell.name}" saved!`);
         setSpell(createEmptySpell());
-        setCustomWeights({});
+        // setCustomWeights({});
     };
 
     const handleReset = () => {
         setSpell(createEmptySpell());
-        setCustomWeights({});
+        // setCustomWeights({});
     };
 
-    const coreStats = ['effect', 'cooldown', 'eco', 'aoe', 'dangerous', 'pierce'];
-    const advancedStats = ['castTime', 'range', 'priority', 'scale', 'manaCost', 'duration'];
-    const specialStats = ['charges', 'channel', 'reflection', 'maxStacks'];
+    const coreStats = ['effect', 'eco', 'dangerous'];
+    const advancedStats = ['scale', 'precision'];
+    const optionalStats = ['aoe', 'cooldown', 'range', 'priority', 'manaCost'];
+    // Somma dei pesi di tutte le stat
+    const totalWeight = [...coreStats, ...advancedStats, ...optionalStats].length;
+
+    const toggleCollapse = (field: string) => {
+        setCollapsedStats(prev => {
+            const next = new Set(prev);
+            if (next.has(field)) {
+                next.delete(field);
+            } else {
+                next.add(field);
+            }
+            // Salva anche in spellBalanceConfig per persistenza avanzata
+            localStorage.setItem('spellCollapsedStats', JSON.stringify(Array.from(next)));
+            localStorage.setItem('spellBalanceConfig', JSON.stringify({ collapsedStats: Array.from(next) }));
+            return next;
+        });
+    };
+
+    // handleRangeChange rimosso (non usato)
+
+
 
     return (
-        <div className="h-full overflow-y-auto bg-gray-900 p-4">
-            <div className="max-w-7xl mx-auto">
-                {/* Header */}
-                <div className="mb-6">
-                    <h1 className="text-3xl font-bold text-white mb-2">🔮 Spell Creation</h1>
-                    <p className="text-gray-400 text-sm">
-                        Create balanced spells by adjusting stats until <strong>Cost = 0</strong>
-                    </p>
-                </div>
-
-                {/* Cost Display */}
-                <div className={`mb-6 p-4 rounded-xl border-2 flex items-center justify-between ${Math.abs(cost) < 0.5 ? 'bg-green-900/20 border-green-500' :
-                    cost < 0 ? 'bg-red-900/20 border-red-500' :
-                        'bg-yellow-900/20 border-yellow-500'
-                    }`}>
-                    <div>
-                        <div className="text-sm text-gray-400">Total Cost</div>
-                        <div className={`text-4xl font-bold ${Math.abs(cost) < 0.5 ? 'text-green-400' :
-                            cost < 0 ? 'text-red-400' : 'text-yellow-400'
-                            }`}>
-                            {cost.toFixed(2)}
-                        </div>
-                    </div>
-                    <div className="text-right">
-                        <div className="text-2xl mb-1">
-                            {Math.abs(cost) < 0.5 ? '✓' : cost < 0 ? '⚠️' : '⚠️'}
-                        </div>
-                        <div className="text-sm">
-                            {Math.abs(cost) < 0.5 ? 'Balanced!' : cost < 0 ? 'Too Expensive' : 'Too Cheap'}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Spell Info */}
-                <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm text-gray-400 mb-1">Spell Name</label>
-                        <input
-                            type="text"
-                            value={spell.name}
-                            onChange={(e) => updateField('name', e.target.value)}
-                            className="w-full bg-gray-800 text-white px-4 py-2 rounded border border-gray-700 focus:border-blue-500 outline-none"
-                            placeholder="Enter spell name..."
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm text-gray-400 mb-1">Type</label>
-                        <select
-                            value={spell.type}
-                            onChange={(e) => updateField('type', e.target.value)}
-                            className="w-full bg-gray-800 text-white px-4 py-2 rounded border border-gray-700 focus:border-blue-500 outline-none"
-                        >
-                            <option value="damage">Damage</option>
-                            <option value="heal">Heal</option>
-                            <option value="shield">Shield</option>
-                            <option value="buff">Buff</option>
-                            <option value="debuff">Debuff</option>
-                            <option value="cc">Crowd Control</option>
-                        </select>
-                    </div>
-                </div>
-
-                {/* Stats Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
-                    {/* Core Stats */}
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-bold text-blue-400 border-b border-gray-700 pb-2">Core Stats</h3>
-                        {coreStats.map(field => (
-                            <EnhancedStatSlider
-                                key={field}
-                                field={field}
-                                value={(spell as any)[field] || 0}
-                                baseline={(SPELL_CONFIG.baseline as any)[field] || 0}
-                                range={getStatRange(field)}
-                                weight={getEffectiveWeight(field)}
-                                defaultWeight={getStatWeight(field)}
-                                description={getStatDescription(field)}
-                                isMalus={isMalus(field)}
-                                onValueChange={(v) => updateField(field as keyof Spell, v)}
-                                onWeightChange={(w) => updateWeight(field, w)}
+        <div className="h-full overflow-y-auto bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-950 p-4 relative">
+            {/* Animated background particles */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute w-96 h-96 bg-purple-500/10 rounded-full blur-3xl top-10 -left-20 animate-pulse" />
+                <div className="absolute w-96 h-96 bg-blue-500/10 rounded-full blur-3xl bottom-10 -right-20 animate-pulse" style={{ animationDelay: '1s' }} />
+            </div>
+            <div className="max-w-7xl mx-auto relative z-10">
+                <h1 className="text-3xl font-bold text-white mb-6 drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]">🔮 Spell Creation</h1>
+                <div className="flex flex-col md:flex-row items-start gap-4 mb-6">
+                    <div className="flex flex-col gap-3 flex-1 backdrop-blur-md bg-white/5 border border-white/10 rounded-lg p-4 shadow-[0_4px_16px_rgba(0,0,0,0.3)]">
+                        <div className="flex items-center gap-2">
+                            <span className="text-gray-300 text-lg">Cost</span>
+                            <input
+                                type="number"
+                                value={targetBudget}
+                                onChange={e => setTargetBudget(Number(e.target.value))}
+                                className="w-20 bg-white/5 text-white px-2 py-1 rounded border border-white/10 text-lg font-bold focus:border-blue-400 focus:shadow-[0_0_8px_rgba(96,165,250,0.5)] transition-all"
                             />
-                        ))}
-                    </div>
-
-                    {/* Advanced Stats */}
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-bold text-purple-400 border-b border-gray-700 pb-2">Advanced Stats</h3>
-                        {advancedStats.map(field => (
-                            <EnhancedStatSlider
-                                key={field}
-                                field={field}
-                                value={(spell as any)[field] || 0}
-                                baseline={(SPELL_CONFIG.baseline as any)[field] || 0}
-                                range={getStatRange(field)}
-                                weight={getEffectiveWeight(field)}
-                                defaultWeight={getStatWeight(field)}
-                                description={getStatDescription(field)}
-                                isMalus={isMalus(field)}
-                                onValueChange={(v) => updateField(field as keyof Spell, v)}
-                                onWeightChange={(w) => updateWeight(field, w)}
-                            />
-                        ))}
-                    </div>
-
-                    {/* Special Stats */}
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-bold text-yellow-400 border-b border-gray-700 pb-2">Special Stats</h3>
-                        {specialStats.map(field => (
-                            <EnhancedStatSlider
-                                key={field}
-                                field={field}
-                                value={(spell as any)[field] || 0}
-                                baseline={(SPELL_CONFIG.baseline as any)[field] || 0}
-                                range={getStatRange(field)}
-                                weight={getEffectiveWeight(field)}
-                                defaultWeight={getStatWeight(field)}
-                                description={getStatDescription(field)}
-                                isMalus={isMalus(field)}
-                                onValueChange={(v) => updateField(field as keyof Spell, v)}
-                                onWeightChange={(w) => updateWeight(field, w)}
-                            />
-                        ))}
-                    </div>
-                </div>
-
-                {/* Additional Fields */}
-                <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* CC Effect (only for type cc) */}
-                    {spell.type === 'cc' && (
-                        <div>
-                            <label className="block text-sm text-gray-400 mb-1">CC Effect</label>
-                            <select
-                                value={spell.ccEffect || ''}
-                                onChange={e => updateField('ccEffect', e.target.value || undefined)}
-                                className="w-full bg-gray-800 text-white px-4 py-2 rounded border border-gray-700 focus:border-blue-500 outline-none"
-                            >
-                                <option value="">None</option>
-                                <option value="stun">Stun</option>
-                                <option value="slow">Slow</option>
-                                <option value="knockback">Knockback</option>
-                                <option value="silence">Silence</option>
-                            </select>
                         </div>
-                    )}
-                    {/* Reflection */}
-                    <div>
-                        <label className="block text-sm text-gray-400 mb-1">Reflection %</label>
-                        <input
-                            type="number"
-                            min={0}
-                            max={100}
-                            value={spell.reflection ?? 0}
-                            onChange={e => updateField('reflection', Number(e.target.value) || undefined)}
-                            className="w-full bg-gray-800 text-white px-4 py-2 rounded border border-gray-700 focus:border-blue-500 outline-none"
-                        />
+                        <div className="flex items-center gap-2">
+                            <span className="text-gray-300 text-lg">Somma pesi:</span>
+                            <span className="text-lg font-bold text-blue-400 drop-shadow-[0_0_4px_rgba(96,165,250,0.6)]">{totalWeight.toFixed(2)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="text-gray-300 text-lg">Bilanciamento:</span>
+                            <span className={`text-lg font-bold drop-shadow-[0_0_6px_currentColor] ${balance === 0 ? 'text-emerald-400' : 'text-red-400'}`}>{balance.toFixed(2)}</span>
+                        </div>
                     </div>
-                    {/* Mana Cost */}
-                    <div>
-                        <label className="block text-sm text-gray-400 mb-1">Mana Cost</label>
-                        <input
-                            type="number"
-                            min={0}
-                            max={200}
-                            value={spell.manaCost ?? 0}
-                            onChange={e => updateField('manaCost', Number(e.target.value) || undefined)}
-                            className="w-full bg-gray-800 text-white px-4 py-2 rounded border border-gray-700 focus:border-blue-500 outline-none"
-                        />
-                    </div>
-                    {/* Duration */}
-                    <div>
-                        <label className="block text-sm text-gray-400 mb-1">Duration (s)</label>
-                        <input
-                            type="number"
-                            min={0}
-                            value={spell.duration ?? 0}
-                            onChange={e => updateField('duration', Number(e.target.value) || undefined)}
-                            className="w-full bg-gray-800 text-white px-4 py-2 rounded border border-gray-700 focus:border-blue-500 outline-none"
-                        />
-                    </div>
-                    {/* Damage Type */}
-                    <div>
-                        <label className="block text-sm text-gray-400 mb-1">Damage Type</label>
-                        <select
-                            value={spell.damageType || ''}
-                            onChange={e => updateField('damageType', e.target.value || undefined)}
-                            className="w-full bg-gray-800 text-white px-4 py-2 rounded border border-gray-700 focus:border-blue-500 outline-none"
-                        >
-                            <option value="">None</option>
-                            <option value="physical">Physical</option>
-                            <option value="magical">Magical</option>
-                            <option value="true">True</option>
-                        </select>
-                    </div>
-                    {/* Legendary */}
-                    <div className="flex items-center">
-                        <input
-                            type="checkbox"
-                            checked={spell.legendary ?? false}
-                            onChange={e => updateField('legendary', e.target.checked)}
-                            className="mr-2"
-                        />
-                        <label className="text-sm text-gray-400">Legendary (ignore zero‑cost rule)</label>
-                    </div>
-                    {/* Double Spell */}
-                    <div className="flex items-center">
-                        <input
-                            type="checkbox"
-                            checked={spell.doubleSpell ?? false}
-                            onChange={e => updateField('doubleSpell', e.target.checked)}
-                            className="mr-2"
-                        />
-                        <label className="text-sm text-gray-400">Double Spell</label>
-                    </div>
-                    {/* Scaling Stat */}
-                    <div>
-                        <label className="block text-sm text-gray-400 mb-1">Scaling Stat</label>
-                        <select
-                            value={spell.scalingStat || ''}
-                            onChange={e => updateField('scalingStat', e.target.value || undefined)}
-                            className="w-full bg-gray-800 text-white px-4 py-2 rounded border border-gray-700 focus:border-blue-500 outline-none"
-                        >
-                            <option value="">None</option>
-                            <option value="attack">Attack</option>
-                            <option value="magic">Magic</option>
-                            <option value="health">Health</option>
-                            <option value="mana">Mana</option>
-                            <option value="defense">Defense</option>
-                        </select>
-                    </div>
-                    {/* Tags */}
-                    <div>
-                        <label className="block text-sm text-gray-400 mb-1">Tags (comma‑separated)</label>
-                        <input
-                            type="text"
-                            value={(spell.tags || []).join(', ')}
-                            onChange={e => updateField('tags', e.target.value.split(',').map(t => t.trim()).filter(t => t))}
-                            className="w-full bg-gray-800 text-white px-4 py-2 rounded border border-gray-700 focus:border-blue-500 outline-none"
-                        />
-                    </div>
-                    {/* Situational Modifiers (JSON textarea) */}
-                    <div className="col-span-2">
-                        <label className="block text-sm text-gray-400 mb-1">Situational Modifiers (JSON array)</label>
-                        <textarea
-                            rows={4}
-                            value={JSON.stringify(spell.situationalModifiers || [], null, 2)}
-                            onChange={e => {
-                                try {
-                                    const parsed = JSON.parse(e.target.value);
-                                    updateField('situationalModifiers', parsed);
-                                } catch {
-                                    // ignore invalid JSON
-                                }
-                            }}
-                            className="w-full bg-gray-800 text-white px-4 py-2 rounded border border-gray-700 focus:border-blue-500 outline-none"
-                        />
+                    {/* Preview card a destra */}
+                    <div className="flex-1 flex justify-end">
+                        <div className="backdrop-blur-lg bg-white/10 border border-purple-400/30 rounded-lg p-4 min-w-[220px] max-w-xs shadow-[0_8px_32px_rgba(139,92,246,0.15)]">
+                            <div className="text-lg font-bold text-white mb-2 drop-shadow-[0_0_6px_rgba(168,85,247,0.6)]">Preview Spell</div>
+                            <ul className="text-sm text-gray-100 space-y-1">
+                                {Object.entries(spell)
+                                    .filter(([key, value]) => {
+                                        const defaultSpell = DEFAULT_SPELLS[0];
+                                        return key !== 'id' && key !== 'name' && key !== 'type' && value !== undefined && value !== (defaultSpell as any)[key];
+                                    })
+                                    .map(([key, value]) => (
+                                        <li key={key} className="flex justify-between">
+                                            <span className="font-medium text-gray-300">{key}</span>
+                                            <span className="font-mono text-blue-300 drop-shadow-[0_0_4px_rgba(96,165,250,0.4)]">{String(value)}</span>
+                                        </li>
+                                    ))}
+                            </ul>
+                        </div>
                     </div>
                 </div>
-                {/* Actions */}
-                <div className="flex justify-between items-center border-t border-gray-700 pt-4">
-                    <button
-                        onClick={handleReset}
-                        className="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded transition"
-                    >
-                        Reset
-                    </button>
-                    <button
-                        onClick={handleSave}
-                        disabled={Math.abs(cost) > 1}
-                        className={`px-8 py-3 rounded font-bold text-lg transition ${Math.abs(cost) > 1
-                            ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                            : 'bg-green-600 hover:bg-green-500 text-white shadow-lg'
-                            }`}
-                    >
-                        {Math.abs(cost) > 1 ? 'Balance Required (Cost ≠ 0)' : 'Save Spell'}
-                    </button>
-                </div>
+
+                {/* Visual separator */}
+                <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-8" />
+
+                <StatsGrid
+                    coreStats={coreStats}
+                    advancedStats={advancedStats}
+                    optionalStats={optionalStats}
+                    getStatDescription={getStatDescription}
+                    isMalus={isMalus}
+                    collapsedStats={collapsedStats}
+                    toggleCollapse={toggleCollapse}
+                    getStatSteps={getStatSteps}
+                    updateStatStep={updateStatStep}
+                    addStatStep={addStatStep}
+                    removeStatStep={removeStatStep}
+                    selectedTicks={selectedTicks}
+                    onSelectTick={handleSelectTick}
+                />
+
+                {/* Visual separator */}
+                <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-8" />
+
+                <SpellInfoForm spell={spell} updateField={updateField} />
+
+                {/* Visual separator */}
+                <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-8" />
+
+                <ActionsBar onReset={handleReset} onSave={handleSave} balance={balance} />
             </div>
         </div>
     );
-};
-
-// Enhanced Stat Slider with tick labels
-interface EnhancedStatSliderProps {
-    field: string;
-    value: number;
-    baseline: number;
-    range: { min: number; max: number; step: number };
-    weight: number;
-    defaultWeight: number;
-    description: string;
-    isMalus: boolean;
-    onValueChange: (value: number) => void;
-    onWeightChange: (weight: number) => void;
 }
-
-const EnhancedStatSlider: React.FC<EnhancedStatSliderProps> = ({
-    field,
-    value,
-    baseline,
-    range,
-    weight,
-    defaultWeight,
-    description,
-    isMalus,
-    onValueChange,
-    onWeightChange
-}) => {
-    const delta = value - baseline;
-    const cost = delta * weight;
-    const isCustomWeight = weight !== defaultWeight;
-
-    // Generate tick positions
-    const ticks: number[] = [];
-    for (let v = range.min; v <= range.max; v += range.step) {
-        ticks.push(v);
-    }
-
-    // Limit ticks if too many
-    const displayTicks = ticks.length > 20 ?
-        ticks.filter((_, i) => i % Math.ceil(ticks.length / 10) === 0) :
-        ticks;
-
-    return (
-        <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
-            {/* Header */}
-            <div className="flex justify-between items-center mb-2">
-                <Tooltip content={description}>
-                    <label className="text-sm font-medium text-gray-300 cursor-help">
-                        {field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1')}
-                        {isMalus && <span className="text-yellow-400 ml-1">⚠️</span>}
-                    </label>
-                </Tooltip>
-                <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-white">
-                        {value.toFixed(range.step < 1 ? 1 : 0)}
-                    </span>
-                    <span className={`text-xs px-2 py-0.5 rounded font-mono ${Math.abs(cost) < 0.01 ? 'bg-gray-700 text-gray-400' :
-                        cost < 0 ? 'bg-green-900/70 text-green-300' : 'bg-red-900/70 text-red-300'
-                        }`}>
-                        {cost >= 0 ? '+' : ''}{cost.toFixed(1)}
-                    </span>
-                </div>
-            </div>
-
-            {/* Slider with tick labels */}
-            <div className="relative">
-                <input
-                    type="range"
-                    min={range.min}
-                    max={range.max}
-                    step={range.step}
-                    value={value}
-                    onChange={(e) => onValueChange(Number(e.target.value))}
-                    className="w-full accent-blue-500"
-                />
-
-                {/* Tick Labels */}
-                <div className="flex justify-between text-[9px] text-gray-500 mt-0.5 px-1">
-                    {displayTicks.map((tick, i) => (
-                        <span
-                            key={i}
-                            className={tick === baseline ? 'text-blue-400 font-bold' : ''}
-                            title={tick === baseline ? 'Baseline' : undefined}
-                        >
-                            {tick.toFixed(range.step < 1 ? 1 : 0)}
-                        </span>
-                    ))}
-                </div>
-            </div>
-
-            {/* Weight Control */}
-            <div className="flex items-center gap-2 mt-2 text-xs">
-                <span className="text-gray-500">Weight:</span>
-                <input
-                    type="number"
-                    value={weight}
-                    onChange={(e) => onWeightChange(Number(e.target.value))}
-                    step={0.1}
-                    className={`w-16 bg-gray-700 text-gray-300 px-2 py-1 rounded ${isCustomWeight ? 'border border-purple-400' : ''
-                        }`}
-                />
-                {isCustomWeight && (
-                    <button
-                        onClick={() => onWeightChange(defaultWeight)}
-                        className="text-purple-400 hover:text-purple-300"
-                        title="Reset to default weight"
-                    >
-                        ↻
-                    </button>
-                )}
-            </div>
-        </div>
-    );
-};

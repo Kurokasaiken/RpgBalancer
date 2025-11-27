@@ -30,25 +30,45 @@ A powerful, web-based tool for designing, testing, and balancing RPG combat syst
 
 ## 📦 Getting Started
 
+### Prerequisites
+- **Node.js v20.19.6** (required for Vite and testing tools)
+- **nvm** (Node Version Manager) - recommended for managing Node versions
+
+### Setup
+
 1. **Clone the repository**
    ```bash
    git clone https://github.com/yourusername/rpg-combat-simulator.git
+   cd rpg-combat-simulator
    ```
 
-2. **Install dependencies**
+2. **Activate Node 20** (via nvm)
+   ```bash
+   nvm use
+   # This will automatically use v20.19.6 from .nvmrc
+   ```
+
+3. **Install dependencies**
    ```bash
    npm install
    ```
 
-3. **Run development server**
+4. **Run development server**
    ```bash
    npm run dev
    ```
 
-4. **Open in browser**
+5. **Open in browser**
    Navigate to `http://localhost:5173`
 
+### Running Tests
+```bash
+nvm use  # Ensure Node 20 is active
+npm test
+```
+
 ## 📚 Documentation
+- **[Development Guidelines](DEVELOPMENT_GUIDELINES.md)** - ⚠️ **MUST READ** before implementing anything
 - [Implementation Plan](docs/implementation_plan.md)
 - [Combat System Audit](docs/combat_system_audit.md)
 - [Changelog](CHANGELOG.md)

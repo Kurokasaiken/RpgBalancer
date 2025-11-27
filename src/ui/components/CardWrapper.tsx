@@ -5,11 +5,12 @@ interface CardWrapperProps {
     color: string;
     onReset?: () => void;
     children: React.ReactNode;
+    defaultVisible?: boolean;
 }
 
-export const CardWrapper: React.FC<CardWrapperProps> = ({ title, color, onReset, children }) => {
+export const CardWrapper: React.FC<CardWrapperProps> = ({ title, color, onReset, children, defaultVisible = true }) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const [isVisible, setIsVisible] = useState(true);
+    const [isVisible, setIsVisible] = useState(defaultVisible);
 
     if (!isVisible) {
         return (
@@ -32,16 +33,13 @@ export const CardWrapper: React.FC<CardWrapperProps> = ({ title, color, onReset,
             <div className={`flex justify-between items-center ${isCollapsed ? '' : 'pb-1'}`}>
                 <h3 className={`font-bold ${color} flex items-center gap-1 ${isCollapsed ? 'text-xs' : 'text-sm'}`}>
                     <button
-                        onClick={() => {
-                            console.log('Toggling collapse:', !isCollapsed);
-                            setIsCollapsed(!isCollapsed);
-                        }}
+                        onClick={() => setIsCollapsed(!isCollapsed)}
                         className="hover:text-white transition-colors"
                         title={isCollapsed ? "Espandi" : "Collassa"}
                     >
                         {isCollapsed ? '▶' : '▼'}
                     </button>
-                    {title} <span className="text-[10px] text-red-500">({isCollapsed ? 'COLLAPSED' : 'EXPANDED'})</span>
+                    {title}
                 </h3>
 
                 <div className="flex items-center gap-0.5">
