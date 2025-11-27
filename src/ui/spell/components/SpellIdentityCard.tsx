@@ -6,15 +6,13 @@ interface SpellIdentityCardProps {
     updateField: (field: keyof Spell, value: any) => void;
     targetBudget: number;
     setTargetBudget: (value: number) => void;
-    totalWeight: number;
 }
 
 export const SpellIdentityCard: React.FC<SpellIdentityCardProps> = ({
     spell,
     updateField,
     targetBudget,
-    setTargetBudget,
-    totalWeight
+    setTargetBudget
 }) => {
     return (
         <div className="flex flex-col gap-4 backdrop-blur-md bg-cyan-900/20 border border-cyan-500/30 rounded-lg p-4 shadow-[0_4px_16px_rgba(6,182,212,0.15)] h-full">
@@ -57,14 +55,6 @@ export const SpellIdentityCard: React.FC<SpellIdentityCardProps> = ({
                         onChange={e => setTargetBudget(Number(e.target.value))}
                         className="w-full bg-black/20 text-cyan-50 px-3 py-2 rounded border border-cyan-500/20 text-sm font-mono text-right focus:border-cyan-400 focus:shadow-[0_0_8px_rgba(34,211,238,0.5)] outline-none transition-all"
                     />
-                </div>
-
-                {/* Total Weight (Read-only) */}
-                <div className="flex flex-col gap-1">
-                    <label className="text-xs uppercase tracking-wider text-cyan-300/70 font-semibold">Total Weight</label>
-                    <div className="w-full bg-black/20 text-cyan-300 px-3 py-2 rounded border border-cyan-500/20 text-sm font-mono text-right">
-                        {totalWeight.toFixed(2)}
-                    </div>
                 </div>
             </div>
         </div>

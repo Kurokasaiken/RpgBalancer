@@ -9,7 +9,8 @@ import { DEFAULT_SPELLS } from '../../balancing/defaultSpells';
 import {
     calculateSpellBudget,
     getStatDescription,
-    isMalus
+    isMalus,
+    getBaselineSpell
 } from '../../balancing/spellBalancingConfig';
 import { upsertSpell } from '../../balancing/spellStorage';
 
@@ -149,8 +150,78 @@ export const SpellCreation: React.FC = () => {
     //     setCustomBaselines(getBaselineSpell());
     // }, []);
 
-    const cost = calculateSpellBudget(spell);
-    const balance = cost - targetBudget;
+    // Define stat arrays first (used in multiple places)
+    const coreStats = ['effect', 'eco', 'dangerous'];
+    const advancedStats = ['scale', 'precision'];
+    const optionalStats = ['aoe', 'cooldown', 'range', 'priority', 'manaCost'];
+
+    // Cost calculation using user baseline AND custom weights from sliders
+    const getUserBaseline = (): Partial<Spell> => {
+        try {
+            const savedBaseline = localStorage.getItem('userSpellBaseline');
+            if (savedBaseline) {
+                return JSON.parse(savedBaseline);
+            }
+        } catch { }
+        // Fallback to default baseline from config
+        return getBaselineSpell();
+    };
+
+    // Extract custom weights from selected ticks
+    const getCustomWeights = (): Record<string, number> => {
+        const weights: Record<string, number> = {};
+        const allStats = [...coreStats, ...advancedStats, ...optionalStats];
+
+        allStats.forEach(field => {
+            const steps = statSteps[field];
+            if (steps && steps.length > 0) {
+                const selectedIdx = selectedTicks[field] || 0;
+                const selectedStep = steps[selectedIdx];
+                weights[field] = selectedStep?.weight || 1;
+            } else {
+                weights[field] = 1; // Default weight
+            }
+        });
+
+        return weights;
+    };
+
+    // Balance calculation: sum of selected weights - target cost
+    // This represents the "cost" of the current configuration
+    const calculateBalance = (): number => {
+        const allStats = [...coreStats, ...advancedStats, ...optionalStats];
+        const totalWeightCost = allStats.reduce((sum, field) => {
+            const steps = statSteps[field];
+            if (steps && steps.length > 0) {
+                const selectedIdx = selectedTicks[field] || 0;
+                const selectedStep = steps[selectedIdx];
+                return sum + (selectedStep?.weight || 0);
+            }
+            return sum;
+        }, 0);
+
+        return totalWeightCost - targetBudget;
+    };
+
+    const balance = calculateBalance();
+
+    // Keep the old cost calculation for spell level (might be useful later)
+    const cost = calculateSpellBudget(spell, getCustomWeights(), getUserBaseline());
+
+    // Calculate damage range for preview (min - max)
+    // TODO: Implement full formula: hitChance% * effect * (1 + dangerous/100) * other_modifiers
+    const calculateDamageRange = (): { min: number; max: number } | null => {
+        // Placeholder - will be implemented with full combat formulas
+        // const hitChance = spell.hitChance || 100;
+        // const effect = spell.effect || 0;
+        // const dangerous = spell.dangerous || 0;
+        // const baseDamage = (hitChance / 100) * effect * (1 + dangerous / 100);
+        // return { min: Math.floor(baseDamage * 0.9), max: Math.ceil(baseDamage * 1.1) };
+        return null; // Return null for now
+    };
+
+    const damageRange = calculateDamageRange();
+    const damageRangeText = damageRange ? `${damageRange.min} - ${damageRange.max}` : '-- - --';
 
     const updateField = (field: keyof Spell, value: any) => {
         setSpell(prev => ({ ...prev, [field]: value }));
@@ -210,18 +281,18 @@ export const SpellCreation: React.FC = () => {
                 statSteps
             };
             localStorage.setItem('userDefaultSpell', JSON.stringify(defaultConfig));
-            alert('Current configuration saved as default (including card order and collapsed states)!');
+
+            // Also save as baseline for budget calculations
+            localStorage.setItem('userSpellBaseline', JSON.stringify(spell));
+
+            alert('Configuration saved as default AND baseline for cost calculations!');
         } catch (e) {
             console.error('Failed to save default spell', e);
             alert('Failed to save default.');
         }
     };
 
-    const coreStats = ['effect', 'eco', 'dangerous'];
-    const advancedStats = ['scale', 'precision'];
-    const optionalStats = ['aoe', 'cooldown', 'range', 'priority', 'manaCost'];
-    // Somma dei pesi di tutte le stat
-    const totalWeight = [...coreStats, ...advancedStats, ...optionalStats].length;
+
 
     const toggleCollapse = (field: string) => {
         setCollapsedStats(prev => {
@@ -268,19 +339,28 @@ export const SpellCreation: React.FC = () => {
                             updateField={updateField}
                             targetBudget={targetBudget}
                             setTargetBudget={setTargetBudget}
-                            totalWeight={totalWeight}
                         />
                     </div>
 
                     {/* Right Card: Preview Spell */}
                     <div className="w-full md:w-7/12 min-w-[300px]">
                         <div className="backdrop-blur-md bg-cyan-900/20 border border-cyan-500/30 rounded-lg p-4 h-full shadow-[0_4px_16px_rgba(6,182,212,0.15)] overflow-y-auto">
-                            <div className="text-lg font-bold text-cyan-100 mb-2 drop-shadow-[0_0_6px_rgba(6,182,212,0.6)] border-b border-cyan-500/20 pb-1">Preview Spell</div>
+                            <div className="flex justify-between items-center text-lg font-bold text-cyan-100 mb-2 drop-shadow-[0_0_6px_rgba(6,182,212,0.6)] border-b border-cyan-500/20 pb-1">
+                                <span>Preview Spell</span>
+                                <span className="text-sm font-mono text-cyan-400">{damageRangeText}</span>
+                            </div>
                             <ul className="text-xs text-cyan-50 grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-1">
+                                {/* Always show Effect first */}
+                                {spell.effect !== undefined && (
+                                    <li className="flex justify-between items-center hover:bg-cyan-500/10 p-0.5 rounded transition-colors border-b border-cyan-500/10">
+                                        <span className="font-medium text-cyan-300/70 capitalize truncate mr-2">Effect</span>
+                                        <span className="font-mono text-cyan-300 font-bold drop-shadow-[0_0_4px_rgba(34,211,238,0.4)]">{spell.effect}</span>
+                                    </li>
+                                )}
                                 {Object.entries(spell)
                                     .filter(([key, value]) => {
                                         const defaultSpell = DEFAULT_SPELLS[0];
-                                        return key !== 'id' && key !== 'name' && key !== 'type' && value !== undefined && value !== (defaultSpell as any)[key];
+                                        return key !== 'id' && key !== 'name' && key !== 'type' && key !== 'effect' && value !== undefined && value !== (defaultSpell as any)[key];
                                     })
                                     .map(([key, value]) => (
                                         <li key={key} className="flex justify-between items-center hover:bg-cyan-500/10 p-0.5 rounded transition-colors border-b border-cyan-500/10">
