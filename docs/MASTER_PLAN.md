@@ -85,10 +85,10 @@ Example:
 │ PHASE                    STATUS      TASKS          │
 ├─────────────────────────────────────────────────────┤
 │ Phase 1: Foundation      ✅ DONE    ~160 tasks     │
-│ Phase 2: Archetypes      ⏸️ PAUSED  ~200 tasks     │
+│ Phase 2: Archetypes      🔄 ACTIVE  ~200 tasks     │
 │ Phase 3: Scenario UI     📋 TODO    ~50 tasks      │
 │ Phase 4: Atomic UI       ✅ DONE    ~60 tasks      │
-│ Phase 5: Universal       🔄 ACTIVE  ~40 tasks      │
+│ Phase 5: Universal       ⏸️ PAUSED  ~40 tasks      │
 │ Phase 6: Logic Sep.      📋 TODO    ~30 tasks      │
 ├─────────────────────────────────────────────────────┤
 │ TOTAL PROGRESS: ███████████░░░░░░░░░ 45%           │
@@ -143,22 +143,9 @@ Example:
 
 ---
 
-### 🔄 **PHASE 5: Universal Creators (In Progress)**
+### 🔄 **PHASE 2: Archetype Balancing System (Active)**
 
-**Status:** 10% (Started)
-
-**Goal:** Apply the "Weight-Based Creator" pattern to Items and Characters.
-
-**Key Tasks:**
-- ✅ Create `WeightBasedCreator` template
-- [ ] Implement `ItemCreator`
-- [ ] Implement `CharacterCreator`
-
----
-
-### ⏸️ **PHASE 2: Archetype Balancing System (Paused)**
-
-**Status:** Paused (Will resume after Universal Creators)
+**Status:** 10% (In Progress)
 
 | Document | Purpose |
 |----------|------------|
@@ -170,6 +157,20 @@ Example:
 - 16 base archetypes (Tank×5, DPS×4, Assassin×2, etc.)
 - TTK-based testing (Time-To-Kill validation)
 - Interactive dashboard (heatmaps, charts)
+
+---
+
+### 📋 **PHASE 5: Universal Creators (Future)**
+
+**Status:** 10% (Paused)
+
+**Goal:** Apply the "Weight-Based Creator" pattern to Items and Characters.
+**Note:** Postponed until after core balancing is complete.
+
+**Key Tasks:**
+- ✅ Create `WeightBasedCreator` template
+- [ ] Implement `ItemCreator`
+- [ ] Implement `CharacterCreator`
 
 ---
 
@@ -205,14 +206,14 @@ Example:
 
 ## 🎯 CURRENT FOCUS
 
-### This Week: Phase 5 - Universal Creators
+### This Week: Phase 2 - Archetype Balancing
 
 **Next 3 Tasks:**
-1. Implement `ItemCreator` using `WeightBasedCreator` template
-2. Define `ItemStatDefinitions`
-3. Implement `CharacterCreator`
+1. Define 16 base archetypes (Tank, DPS, etc.)
+2. Build ArchetypeBuilder service
+3. Implement TTK Testing Engine
 
-**📋 Full checklist:** [plans/atomic_evolution_tasks.md](plans/atomic_evolution_tasks.md)
+**📋 Full checklist:** [plans/archetype_tasks.md](plans/archetype_tasks.md)
 
 ---
 

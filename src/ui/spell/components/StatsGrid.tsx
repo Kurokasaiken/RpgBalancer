@@ -40,7 +40,7 @@ export const StatsGrid: React.FC<StatsGridProps> = ({
         <EnhancedStatSlider
           key={field}
           field={field}
-          steps={getStatSteps(field)}
+          ticks={getStatSteps(field)}
           selectedTick={selectedTicks[field] || 0}
           onSelectTick={(idx) => onSelectTick(field, idx)}
           description={getStatDescription(field)}
