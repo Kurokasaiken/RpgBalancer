@@ -44,131 +44,141 @@ export const CharacterManager: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col h-full p-4 space-y-4">
-            <div className="bg-gray-800 p-4 rounded">
-                <h1 className="text-2xl font-bold text-white mb-4">Character Manager</h1>
-                <p className="text-gray-300 text-sm">
-                    Crea e gestisci i tuoi personaggi usando le stats del modulo di bilanciamento.
-                </p>
+        <div className="h-full overflow-y-auto bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-950 p-4 relative">
+            {/* Animated background particles */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute w-96 h-96 bg-purple-500/10 rounded-full blur-3xl top-10 -left-20 animate-pulse" />
+                <div className="absolute w-96 h-96 bg-blue-500/10 rounded-full blur-3xl bottom-10 -right-20 animate-pulse" style={{ animationDelay: '1s' }} />
             </div>
-
-            <div className="flex flex-1 space-x-4 overflow-hidden">
-                {/* Left: Character Builder */}
-                <div className="w-1/2 overflow-y-auto bg-gray-900 p-4 rounded">
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-bold text-white">
-                            {selectedCharacter ? `Modifica: ${selectedCharacter.name}` : 'Nuovo Personaggio'}
-                        </h2>
-                        {selectedCharacter && (
-                            <button
-                                onClick={handleCancelEdit}
-                                className="px-3 py-1 bg-gray-600 hover:bg-gray-500 text-white rounded text-sm"
-                            >
-                                Annulla
-                            </button>
-                        )}
-                    </div>
-                    <CharacterBuilder
-                        onSave={handleSaveCharacter}
-                        initialCharacter={selectedCharacter}
-                    />
+            <div className="flex flex-col h-full space-y-4 relative z-10">
+                <div className="backdrop-blur-md bg-white/5 border border-white/10 p-6 rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.3)]">
+                    <h1 className="text-3xl font-bold text-white mb-3 drop-shadow-[0_0_8px_rgba(96,165,250,0.6)]">👤 Character Manager</h1>
+                    <p className="text-gray-300 text-sm">
+                        Crea e gestisci i tuoi personaggi usando le stats del modulo di bilanciamento.
+                    </p>
                 </div>
 
-                {/* Right: Saved Characters List */}
-                <div className="w-1/2 overflow-y-auto bg-gray-900 p-4 rounded">
-                    <h2 className="text-xl font-bold text-white mb-4">
-                        Personaggi Salvati ({characters.length})
-                    </h2>
+                {/* Visual separator */}
+                <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-4" />
 
-                    {characters.length === 0 ? (
-                        <div className="text-gray-400 text-center py-8">
-                            Nessun personaggio salvato. Creane uno!
+                <div className="flex flex-1 space-x-4 overflow-hidden">
+                    {/* Left: Character Builder */}
+                    <div className="w-1/2 overflow-y-auto backdrop-blur-md bg-white/5 border border-white/10 p-4 rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.3)]">
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-xl font-bold text-white drop-shadow-[0_0_6px_rgba(168,85,247,0.6)]">
+                                {selectedCharacter ? `✏️ Modifica: ${selectedCharacter.name}` : '➕ Nuovo Personaggio'}
+                            </h2>
+                            {selectedCharacter && (
+                                <button
+                                    onClick={handleCancelEdit}
+                                    className="px-4 py-2 bg-white/10 border border-white/20 hover:bg-white/15 hover:shadow-[0_0_12px_rgba(255,255,255,0.3)] text-white rounded transition-all"
+                                >
+                                    Annulla
+                                </button>
+                            )}
                         </div>
-                    ) : (
-                        <div className="space-y-2">
-                            {characters.map(char => {
-                                // Safety check for old data without statBlock
-                                if (!char.statBlock) {
-                                    return (
-                                        <div key={char.id} className="bg-red-900 p-4 rounded border-2 border-red-700">
-                                            <div className="text-white font-bold">{char.name}</div>
-                                            <div className="text-red-300 text-sm">Vecchio format - rimuovere e ricreare</div>
-                                            <button
-                                                onClick={() => handleDelete(char.id)}
-                                                className="mt-2 px-3 py-1 bg-red-600 hover:bg-red-500 text-white rounded text-sm"
-                                            >
-                                                Elimina
-                                            </button>
-                                        </div>
-                                    );
-                                }
+                        <CharacterBuilder
+                            onSave={handleSaveCharacter}
+                            initialCharacter={selectedCharacter}
+                        />
+                    </div>
 
-                                return (
-                                    <div
-                                        key={char.id}
-                                        className={`bg-gray-800 p-4 rounded border-2 transition-colors ${selectedCharacter?.id === char.id
-                                            ? 'border-blue-500'
-                                            : 'border-gray-700 hover:border-gray-600'
-                                            }`}
-                                    >
-                                        <div className="flex justify-between items-start mb-2">
-                                            <div>
-                                                <h3 className="text-lg font-bold text-white">{char.name}</h3>
-                                                <div className="text-sm text-gray-400">
-                                                    <span className="capitalize">{char.aiBehavior}</span>
-                                                </div>
-                                            </div>
-                                            <div className="flex space-x-2">
-                                                <button
-                                                    onClick={() => handleEdit(char)}
-                                                    className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded text-sm"
-                                                >
-                                                    Modifica
-                                                </button>
+                    {/* Right: Saved Characters List */}
+                    <div className="w-1/2 overflow-y-auto backdrop-blur-md bg-white/5 border border-white/10 p-4 rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.3)]">
+                        <h2 className="text-xl font-bold text-white mb-4 drop-shadow-[0_0_6px_rgba(168,85,247,0.6)]">
+                            📋 Personaggi Salvati ({characters.length})
+                        </h2>
+
+                        {characters.length === 0 ? (
+                            <div className="text-gray-400 text-center py-8">
+                                Nessun personaggio salvato. Creane uno!
+                            </div>
+                        ) : (
+                            <div className="space-y-2">
+                                {characters.map(char => {
+                                    // Safety check for old data without statBlock
+                                    if (!char.statBlock) {
+                                        return (
+                                            <div key={char.id} className="bg-red-900 p-4 rounded border-2 border-red-700">
+                                                <div className="text-white font-bold">{char.name}</div>
+                                                <div className="text-red-300 text-sm">Vecchio format - rimuovere e ricreare</div>
                                                 <button
                                                     onClick={() => handleDelete(char.id)}
-                                                    className="px-3 py-1 bg-red-600 hover:bg-red-500 text-white rounded text-sm"
+                                                    className="mt-2 px-3 py-1 bg-red-600 hover:bg-red-500 text-white rounded text-sm"
                                                 >
                                                     Elimina
                                                 </button>
                                             </div>
-                                        </div>
+                                        );
+                                    }
 
-                                        <div className="grid grid-cols-3 gap-2 text-xs text-gray-300 mt-3">
-                                            <div>
-                                                <div className="text-gray-500">HP</div>
-                                                <div className="font-bold">{char.statBlock.hp}</div>
+                                    return (
+                                        <div
+                                            key={char.id}
+                                            className={`bg-white/5 backdrop-blur-md p-4 rounded-lg border-2 transition-all hover:scale-[1.01] ${selectedCharacter?.id === char.id
+                                                ? 'border-blue-400 shadow-[0_0_12px_rgba(96,165,250,0.4)]'
+                                                : 'border-white/10 hover:border-purple-400/30'
+                                                }`}
+                                        >
+                                            <div className="flex justify-between items-start mb-2">
+                                                <div>
+                                                    <h3 className="text-lg font-bold text-white">{char.name}</h3>
+                                                    <div className="text-sm text-gray-400">
+                                                        <span className="capitalize">{char.aiBehavior}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="flex space-x-2">
+                                                    <button
+                                                        onClick={() => handleEdit(char)}
+                                                        className="px-3 py-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:shadow-[0_0_12px_rgba(59,130,246,0.6)] text-white rounded text-sm transition-all"
+                                                    >
+                                                        Modifica
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(char.id)}
+                                                        className="px-3 py-1 bg-white/10 border border-red-400/50 hover:bg-red-950/30 hover:shadow-[0_0_12px_rgba(248,113,113,0.4)] text-red-400 rounded text-sm transition-all"
+                                                    >
+                                                        Elimina
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <div className="text-gray-500">DMG</div>
-                                                <div className="font-bold">{char.statBlock.damage}</div>
-                                            </div>
-                                            <div>
-                                                <div className="text-gray-500">TxC</div>
-                                                <div className="font-bold">{char.statBlock.txc}</div>
-                                            </div>
-                                            <div>
-                                                <div className="text-gray-500">Evasion</div>
-                                                <div className="font-bold">{char.statBlock.evasion}</div>
-                                            </div>
-                                            <div>
-                                                <div className="text-gray-500">Armor</div>
-                                                <div className="font-bold">{char.statBlock.armor}</div>
-                                            </div>
-                                            <div>
-                                                <div className="text-gray-500">Crit%</div>
-                                                <div className="font-bold">{char.statBlock.critChance}%</div>
-                                            </div>
-                                        </div>
 
-                                        <div className="mt-2 text-xs text-gray-400">
-                                            Skills: {char.equippedSpellIds.length}/4
+                                            <div className="grid grid-cols-3 gap-2 text-xs text-gray-300 mt-3">
+                                                <div>
+                                                    <div className="text-gray-500">HP</div>
+                                                    <div className="font-bold">{char.statBlock.hp}</div>
+                                                </div>
+                                                <div>
+                                                    <div className="text-gray-500">DMG</div>
+                                                    <div className="font-bold">{char.statBlock.damage}</div>
+                                                </div>
+                                                <div>
+                                                    <div className="text-gray-500">TxC</div>
+                                                    <div className="font-bold">{char.statBlock.txc}</div>
+                                                </div>
+                                                <div>
+                                                    <div className="text-gray-500">Evasion</div>
+                                                    <div className="font-bold">{char.statBlock.evasion}</div>
+                                                </div>
+                                                <div>
+                                                    <div className="text-gray-500">Armor</div>
+                                                    <div className="font-bold">{char.statBlock.armor}</div>
+                                                </div>
+                                                <div>
+                                                    <div className="text-gray-500">Crit%</div>
+                                                    <div className="font-bold">{char.statBlock.critChance}%</div>
+                                                </div>
+                                            </div>
+
+                                            <div className="mt-2 text-xs text-gray-400">
+                                                Skills: {char.equippedSpellIds.length}/4
+                                            </div>
                                         </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

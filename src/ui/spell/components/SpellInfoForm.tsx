@@ -8,31 +8,6 @@ interface SpellInfoFormProps {
 
 export const SpellInfoForm: React.FC<SpellInfoFormProps> = ({ spell, updateField }) => (
   <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4 backdrop-blur-md bg-white/5 border border-white/10 rounded-lg p-4 shadow-[0_4px_16px_rgba(0,0,0,0.3)]">
-    <div>
-      <label className="block text-sm text-gray-300 mb-1">Spell Name</label>
-      <input
-        type="text"
-        value={spell.name}
-        onChange={e => updateField('name', e.target.value)}
-        className="w-full bg-white/5 text-white px-4 py-2 rounded border border-white/10 focus:border-blue-400 focus:shadow-[0_0_8px_rgba(96,165,250,0.5)] outline-none transition-all"
-        placeholder="Enter spell name..."
-      />
-    </div>
-    <div>
-      <label className="block text-sm text-gray-300 mb-1">Type</label>
-      <select
-        value={spell.type}
-        onChange={e => updateField('type', e.target.value)}
-        className="w-full bg-white/5 text-white px-4 py-2 rounded border border-white/10 focus:border-blue-400 focus:shadow-[0_0_8px_rgba(96,165,250,0.5)] outline-none transition-all"
-      >
-        <option value="damage">Damage</option>
-        <option value="heal">Heal</option>
-        <option value="shield">Shield</option>
-        <option value="buff">Buff</option>
-        <option value="debuff">Debuff</option>
-        <option value="cc">Crowd Control</option>
-      </select>
-    </div>
     {/* CC Effect (only for type cc) */}
     {spell.type === 'cc' && (
       <div>

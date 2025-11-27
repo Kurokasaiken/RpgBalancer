@@ -65,9 +65,9 @@ export const SmartInput: React.FC<SmartInputProps> = ({
 
     if (!isVisible) {
         return (
-            <div className="bg-gray-700 p-1 rounded flex justify-between items-center opacity-50">
-                <span className="text-xs text-gray-400">{def?.name || paramId}</span>
-                <button onClick={() => setIsVisible(true)} className="text-xs text-gray-400 hover:text-white">
+            <div className="bg-white/5 backdrop-blur-sm p-1.5 rounded-lg flex justify-between items-center opacity-50 hover:opacity-75 transition-opacity border border-white/10">
+                <span className="text-xs text-gray-300">{def?.name || paramId}</span>
+                <button onClick={() => setIsVisible(true)} className="text-xs text-gray-300 hover:text-white hover:drop-shadow-[0_0_4px_rgba(255,255,255,0.8)] transition-all">
                     👁️
                 </button>
             </div>
@@ -75,7 +75,7 @@ export const SmartInput: React.FC<SmartInputProps> = ({
     }
 
     return (
-        <div className={`relative bg-gray-700 p-1.5 rounded transition-all ${!isActive ? 'opacity-60 grayscale' : ''} ${isChanging ? 'ring-2 ring-yellow-400' : ''}`}>
+        <div className={`relative bg-white/5 backdrop-blur-sm p-2 rounded-lg transition-all border ${!isActive ? 'opacity-60 grayscale border-white/5' : 'border-white/10'} ${isChanging ? 'ring-2 ring-yellow-400/50 shadow-[0_0_12px_rgba(250,204,21,0.4)]' : ''}`}>
             {/* Header */}
             <div className="flex justify-between items-center mb-1">
                 <div className="flex items-center gap-1">
@@ -105,7 +105,7 @@ export const SmartInput: React.FC<SmartInputProps> = ({
                     <button
                         onMouseEnter={() => setShowTooltip(true)}
                         onMouseLeave={() => setShowTooltip(false)}
-                        className="p-0.5 rounded text-xs bg-gray-600 text-gray-300 hover:bg-gray-500"
+                        className="p-0.5 rounded text-xs bg-white/10 border border-white/20 text-gray-300 hover:bg-white/15 hover:text-white transition-all"
                         title="Info"
                     >
                         ?
@@ -113,7 +113,7 @@ export const SmartInput: React.FC<SmartInputProps> = ({
 
                     <button
                         onClick={() => setIsVisible(false)}
-                        className="p-0.5 rounded text-xs bg-gray-600 hover:bg-gray-500 text-gray-300"
+                        className="p-0.5 rounded text-xs bg-white/10 border border-white/20 hover:bg-white/15 text-gray-300 hover:text-white transition-all"
                         title="Nascondi"
                     >
                         👁️
@@ -122,7 +122,7 @@ export const SmartInput: React.FC<SmartInputProps> = ({
                     {!readOnly && (
                         <button
                             onClick={() => !readOnly && onLockToggle(isLocked ? 'none' : paramId as LockedParameter)}
-                            className={`p-0.5 rounded text-xs ${isLocked ? 'bg-red-600 text-white' : 'bg-gray-600 text-gray-300 hover:bg-gray-500'}`}
+                            className={`p-0.5 rounded text-xs transition-all ${isLocked ? 'bg-red-500/30 border border-red-400 text-red-400 shadow-[0_0_8px_rgba(239,68,68,0.4)]' : 'bg-white/10 border border-white/20 text-gray-300 hover:bg-white/15 hover:text-white'}`}
                             title="Lock"
                             disabled={!isActive}
                         >
@@ -133,7 +133,7 @@ export const SmartInput: React.FC<SmartInputProps> = ({
                     {onReset && !readOnly && (
                         <button
                             onClick={() => isActive && !isLocked && onReset()}
-                            className="p-0.5 rounded text-xs bg-orange-900 text-orange-400 hover:bg-orange-800"
+                            className="p-0.5 rounded text-xs bg-white/10 border border-white/20 text-white hover:bg-white/15 hover:shadow-[0_0_8px_rgba(255,255,255,0.4)] transition-all"
                             title="Reset Default"
                             disabled={!isActive || isLocked}
                         >
@@ -158,7 +158,7 @@ export const SmartInput: React.FC<SmartInputProps> = ({
                         }
                     }}
                     disabled={!isActive || isLocked}
-                    className={`text-sm font-mono bg-transparent border-b border-gray-600 focus:border-blue-500 outline-none w-full transition-colors ${isLocked ? 'text-red-400' : isChanging ? 'text-yellow-300' : 'text-blue-300'}`}
+                    className={`text-sm font-mono bg-transparent border-b-2 focus:border-cyan-400 focus:shadow-[0_0_8px_rgba(34,211,238,0.5)] outline-none w-full transition-all ${isLocked ? 'border-red-400 text-red-400' : isChanging ? 'border-yellow-400 text-yellow-300' : 'border-white/20 text-cyan-300'}`}
                 />
                 {isPercentage && <span className="text-gray-400 text-xs ml-0.5">%</span>}
             </div>
@@ -186,7 +186,7 @@ export const SmartInput: React.FC<SmartInputProps> = ({
                     min={min}
                     max={max}
                     step={step}
-                    className="w-full h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                    className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-cyan-400"
                 />
             )}
         </div>

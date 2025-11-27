@@ -14,10 +14,10 @@ export const CardWrapper: React.FC<CardWrapperProps> = ({ title, color, onReset,
 
     if (!isVisible) {
         return (
-            <div className="bg-gray-800 p-1 rounded shadow border border-gray-700 opacity-50">
+            <div className="backdrop-blur-md bg-white/5 p-2 rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.3)] border border-white/10 opacity-50 hover:opacity-75 transition-opacity">
                 <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-400">{title}</span>
-                    <button onClick={() => setIsVisible(true)} className="text-xs text-gray-400 hover:text-white p-0.5">
+                    <span className="text-xs text-gray-300">{title}</span>
+                    <button onClick={() => setIsVisible(true)} className="text-xs text-gray-300 hover:text-white hover:drop-shadow-[0_0_4px_rgba(255,255,255,0.8)] p-0.5 transition-all">
                         👁️
                     </button>
                 </div>
@@ -27,7 +27,7 @@ export const CardWrapper: React.FC<CardWrapperProps> = ({ title, color, onReset,
 
     return (
         <div
-            className={`bg-gray-800 rounded shadow border border-gray-700 transition-all duration-200 ${isCollapsed ? 'p-1.5' : 'p-2'}`}
+            className={`backdrop-blur-md bg-white/5 rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.3)] border border-white/10 hover:border-purple-400/30 transition-all duration-300 ${isCollapsed ? 'p-2' : 'p-3'}`}
         >
             {/* Header */}
             <div className={`flex justify-between items-center ${isCollapsed ? '' : 'pb-1'}`}>
@@ -46,7 +46,7 @@ export const CardWrapper: React.FC<CardWrapperProps> = ({ title, color, onReset,
                     {onReset && (
                         <button
                             onClick={() => onReset()}
-                            className="p-0.5 rounded text-xs bg-orange-900 text-orange-400 hover:bg-orange-800"
+                            className="p-1 rounded text-xs bg-white/10 border border-white/20 text-white hover:bg-white/15 hover:shadow-[0_0_8px_rgba(255,255,255,0.4)] transition-all"
                             title="Reset Card"
                         >
                             ↺
@@ -54,7 +54,7 @@ export const CardWrapper: React.FC<CardWrapperProps> = ({ title, color, onReset,
                     )}
                     <button
                         onClick={() => setIsVisible(false)}
-                        className="p-0.5 rounded text-xs bg-gray-600 hover:bg-gray-500 text-gray-300"
+                        className="p-1 rounded text-xs bg-white/10 border border-white/20 hover:bg-white/15 text-gray-300 hover:text-white transition-all"
                         title="Nascondi"
                     >
                         👁️
