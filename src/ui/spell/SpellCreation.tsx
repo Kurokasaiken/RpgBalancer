@@ -14,52 +14,45 @@ import {
     getBaselineSpell
 } from '../../balancing/spellBalancingConfig';
 import { upsertSpell } from '../../balancing/spellStorage';
+import { useDefaultStorage } from '../../shared/hooks/useDefaultStorage';
+import { useWeightedBalance } from '../../shared/hooks/useWeightedBalance';
+import { ALL_SPELL_STATS } from '../../balancing/spellStatDefinitions';
 
 export const SpellCreation: React.FC = () => {
-    // Stato per gli step di ogni stat - load from saved defaults
-    const [statSteps, setStatSteps] = useState<Record<string, Array<{ value: number; weight: number }>>>(() => {
-        try {
-            const savedDefault = localStorage.getItem('userDefaultSpell');
-            if (savedDefault) {
-                const config = JSON.parse(savedDefault);
-                if (config.statSteps) return config.statSteps;
-            }
-        } catch { }
-        return {};
-    });
-    const [selectedTicks, setSelectedTicks] = useState<Record<string, number>>(() => {
-        try {
-            const savedDefault = localStorage.getItem('userDefaultSpell');
-            if (savedDefault) {
-                const config = JSON.parse(savedDefault);
-                if (config.selectedTicks) return config.selectedTicks;
-            }
-        } catch { }
-        return {};
-    });
+    // Use custom hooks for state management
+    const {
+        spell,
+        setSpell,
+        statOrder,
+        setStatOrder,
+        collapsedStats,
+        setCollapsedStats,
+        statSteps,
+        setStatSteps,
+        selectedTicks,
+        setSelectedTicks,
+        saveDefaultConfig,
+        resetToDefaults
+    } = useDefaultStorage();
 
-    // Initial stat order - load from saved defaults if available
-    const [statOrder, setStatOrder] = useState<string[]>(() => {
-        try {
-            const savedDefault = localStorage.getItem('userDefaultSpell');
-            if (savedDefault) {
-                const config = JSON.parse(savedDefault);
-                if (config.statOrder) return config.statOrder;
-            }
-        } catch { }
-        return [
-            'effect', 'eco', 'dangerous', // core
-            'scale', 'precision', // advanced
-            'aoe', 'cooldown', 'range', 'priority', 'manaCost' // optional
-        ];
-    });
+    const [targetBudget, setTargetBudget] = useState<number>(0);
 
+    // Use balance calculation hook
+    const balance = useWeightedBalance(
+        spell,
+        statSteps,
+        selectedTicks,
+        targetBudget,
+        ALL_SPELL_STATS
+    );
+
+    // Drag and drop handlers
     const handleDragStart = (e: React.DragEvent, field: string) => {
         e.dataTransfer.setData('text/plain', field);
     };
 
     const handleDragOver = (e: React.DragEvent) => {
-        e.preventDefault(); // Necessary to allow dropping
+        e.preventDefault();
     };
 
     const handleDrop = (e: React.DragEvent, targetField: string) => {
@@ -71,7 +64,6 @@ export const SpellCreation: React.FC = () => {
             const newOrder = [...prev];
             const draggedIdx = newOrder.indexOf(draggedField);
             const targetIdx = newOrder.indexOf(targetField);
-
             if (draggedIdx !== -1 && targetIdx !== -1) {
                 newOrder.splice(draggedIdx, 1);
                 newOrder.splice(targetIdx, 0, draggedField);
@@ -80,18 +72,15 @@ export const SpellCreation: React.FC = () => {
         });
     };
 
-    // Funzione per ottenere gli step di una stat
+    // Stat step management
     const getStatSteps = (field: string) => statSteps[field] || [{ value: (spell as any)[field] || 0, weight: 1 }];
 
-    // Funzione per aggiornare uno step
     const updateStatStep = (field: string, idx: number, step: { value: number; weight: number }) => {
         setStatSteps(prev => {
             const steps = [...(prev[field] || [{ value: (spell as any)[field] || 0, weight: 1 }])];
             steps[idx] = step;
             return { ...prev, [field]: steps };
         });
-
-        // Se stiamo modificando il tick selezionato, aggiorna anche la spell
         const currentTick = selectedTicks[field] || 0;
         if (idx === currentTick) {
             updateField(field as keyof Spell, step.value);
@@ -100,14 +89,12 @@ export const SpellCreation: React.FC = () => {
 
     const handleSelectTick = (field: string, idx: number) => {
         setSelectedTicks(prev => ({ ...prev, [field]: idx }));
-        // Aggiorna il valore nella spell quando cambia il tick selezionato
         const steps = statSteps[field] || [{ value: (spell as any)[field] || 0, weight: 1 }];
         if (steps[idx]) {
             updateField(field as keyof Spell, steps[idx].value);
         }
     };
 
-    // Funzione per aggiungere uno step
     const addStatStep = (field: string, idx: number) => {
         setStatSteps(prev => {
             const steps = [...(prev[field] || [{ value: (spell as any)[field] || 0, weight: 1 }])];
@@ -116,7 +103,6 @@ export const SpellCreation: React.FC = () => {
         });
     };
 
-    // Funzione per rimuovere uno step
     const removeStatStep = (field: string, idx: number) => {
         setStatSteps(prev => {
             const steps = [...(prev[field] || [{ value: (spell as any)[field] || 0, weight: 1 }])];
@@ -124,55 +110,6 @@ export const SpellCreation: React.FC = () => {
             return { ...prev, [field]: steps };
         });
     };
-    // Main component for spell creation logic
-    const [spell, setSpell] = useState<Spell>(() => {
-        try {
-            const savedDefault = localStorage.getItem('userDefaultSpell');
-            if (savedDefault) {
-                const config = JSON.parse(savedDefault);
-                // Handle both old format (just spell) and new format (full config)
-                return config.spell || config;
-            }
-        } catch { }
-        return createEmptySpell();
-    });
-    // const [customWeights, setCustomWeights] = useState<Record<string, number>>({});
-    // const [customBaselines, setCustomBaselines] = useState<Partial<Spell>>({});
-    const [targetBudget, setTargetBudget] = useState<number>(0);
-    // Carica lo stato collapsed da file di config (es. spellBalanceConfig.json)
-    const [collapsedStats, setCollapsedStats] = useState<Set<string>>(() => {
-        try {
-            // First try to load from userDefaultSpell
-            const savedDefault = localStorage.getItem('userDefaultSpell');
-            if (savedDefault) {
-                const config = JSON.parse(savedDefault);
-                if (config.collapsedStats) {
-                    return new Set(config.collapsedStats);
-                }
-            }
-            // Fall back to old config
-            const config = localStorage.getItem('spellCollapsedStats') || localStorage.getItem('spellBalanceConfig');
-            if (config) {
-                const parsed = JSON.parse(config);
-                if (Array.isArray(parsed.collapsedStats)) {
-                    return new Set(parsed.collapsedStats);
-                } else if (Array.isArray(parsed)) {
-                    return new Set(parsed);
-                }
-            }
-        } catch { }
-        return new Set();
-    });
-
-    // Initialize custom baselines from config on mount
-    // useEffect(() => {
-    //     setCustomBaselines(getBaselineSpell());
-    // }, []);
-
-    // Define stat arrays first (used in multiple places)
-    const coreStats = ['effect', 'eco', 'dangerous'];
-    const advancedStats = ['scale', 'precision'];
-    const optionalStats = ['aoe', 'cooldown', 'range', 'priority', 'manaCost'];
 
     // Cost calculation using user baseline AND custom weights from sliders
     const getUserBaseline = (): Partial<Spell> => {
@@ -182,49 +119,24 @@ export const SpellCreation: React.FC = () => {
                 return JSON.parse(savedBaseline);
             }
         } catch { }
-        // Fallback to default baseline from config
         return getBaselineSpell();
     };
 
-    // Extract custom weights from selected ticks
     const getCustomWeights = (): Record<string, number> => {
         const weights: Record<string, number> = {};
-        const allStats = [...coreStats, ...advancedStats, ...optionalStats];
-
-        allStats.forEach(field => {
+        ALL_SPELL_STATS.forEach(field => {
             const steps = statSteps[field];
             if (steps && steps.length > 0) {
                 const selectedIdx = selectedTicks[field] || 0;
                 const selectedStep = steps[selectedIdx];
                 weights[field] = selectedStep?.weight || 1;
             } else {
-                weights[field] = 1; // Default weight
+                weights[field] = 1;
             }
         });
-
         return weights;
     };
 
-    // Balance calculation: sum of selected weights - target cost
-    // This represents the "cost" of the current configuration
-    const calculateBalance = (): number => {
-        const allStats = [...coreStats, ...advancedStats, ...optionalStats];
-        const totalWeightCost = allStats.reduce((sum, field) => {
-            const steps = statSteps[field];
-            if (steps && steps.length > 0) {
-                const selectedIdx = selectedTicks[field] || 0;
-                const selectedStep = steps[selectedIdx];
-                return sum + (selectedStep?.weight || 0);
-            }
-            return sum;
-        }, 0);
-
-        return totalWeightCost - targetBudget;
-    };
-
-    const balance = calculateBalance();
-
-    // Keep the old cost calculation for spell level (might be useful later)
     const cost = calculateSpellBudget(spell, getCustomWeights(), getUserBaseline());
 
     // Calculate damage range for preview (min - max)
@@ -274,44 +186,23 @@ export const SpellCreation: React.FC = () => {
     };
 
     const handleReset = () => {
-        try {
-            const savedDefault = localStorage.getItem('userDefaultSpell');
-            if (savedDefault) {
-                const config = JSON.parse(savedDefault);
-                // Handle both old format (just spell) and new format (full config)
-                if (config.spell) {
-                    setSpell(config.spell);
-                    if (config.statOrder) setStatOrder(config.statOrder);
-                    if (config.collapsedStats) setCollapsedStats(new Set(config.collapsedStats));
-                    if (config.statSteps) setStatSteps(config.statSteps);
-                } else {
-                    setSpell(config);
-                }
-                return;
-            }
-        } catch { }
-        setSpell(createEmptySpell());
+        resetToDefaults();
     };
 
     const handleSaveDefault = () => {
-        try {
-            const defaultConfig = {
-                spell,
-                statOrder,
-                collapsedStats: Array.from(collapsedStats),
-                statSteps,
-                selectedTicks  // ADDED: Save slider positions
-            };
-            localStorage.setItem('userDefaultSpell', JSON.stringify(defaultConfig));
+        const success = saveDefaultConfig({
+            spell,
+            statOrder,
+            collapsedStats,
+            statSteps,
+            selectedTicks
+        });
 
-            // Also save as baseline for budget calculations
-            localStorage.setItem('userSpellBaseline', JSON.stringify(spell));
-
+        if (success) {
             toast.success('Configuration saved as default!', {
                 description: 'Spell, card order, collapsed states, and slider positions saved'
             });
-        } catch (e) {
-            console.error('Failed to save default spell', e);
+        } else {
             toast.error('Failed to save default', {
                 description: 'Please try again or check console for errors'
             });
