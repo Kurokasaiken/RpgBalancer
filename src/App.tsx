@@ -1,7 +1,5 @@
-```javascript
 // Updated App navigation to include Spell Editor and Spell Library
 import { useState, useEffect } from 'react';
-import { AtomTest } from './ui/atoms/AtomTest';
 import { Balancer } from './ui/Balancer';
 import { SpellLibrary } from './ui/spell/SpellLibrary';
 import { SpellCreation } from './ui/spell/SpellCreation';
@@ -32,11 +30,10 @@ function App() {
             {/* BALANCING */}
             <button
               onClick={() => setActiveTab('balancer')}
-              className={`py - 4 px - 2 border - b - 2 font - medium text - sm transition - colors ${
-  activeTab === 'balancer'
-    ? 'border-purple-500 text-white'
-    : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-} `}
+              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'balancer'
+                  ? 'border-purple-500 text-white'
+                  : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                }`}
             >
               ⚖️ Balancer
             </button>
@@ -44,21 +41,19 @@ function App() {
             {/* SPELLS */}
             <button
               onClick={() => setActiveTab('spellLibrary')}
-              className={`py - 4 px - 2 border - b - 2 font - medium text - sm transition - colors ${
-  activeTab === 'spellLibrary'
-    ? 'border-purple-500 text-white'
-    : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-} `}
+              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'spellLibrary'
+                  ? 'border-purple-500 text-white'
+                  : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                }`}
             >
               📚 Spell Library
             </button>
             <button
               onClick={() => setActiveTab('spellCreation')}
-              className={`py - 4 px - 2 border - b - 2 font - medium text - sm transition - colors ${
-  activeTab === 'spellCreation'
-    ? 'border-purple-500 text-white'
-    : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-} `}
+              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'spellCreation'
+                  ? 'border-purple-500 text-white'
+                  : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                }`}
             >
               🔮 Spell Creation
             </button>
@@ -66,11 +61,10 @@ function App() {
             {/* CHARACTERS */}
             <button
               onClick={() => setActiveTab('characterManager')}
-              className={`py - 4 px - 2 border - b - 2 font - medium text - sm transition - colors ${
-  activeTab === 'characterManager'
-    ? 'border-purple-500 text-white'
-    : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-} `}
+              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'characterManager'
+                  ? 'border-purple-500 text-white'
+                  : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                }`}
             >
               👤 Character Manager
             </button>
@@ -78,11 +72,10 @@ function App() {
             {/* ARENAS */}
             <button
               onClick={() => setActiveTab('gridArena')}
-              className={`py - 4 px - 2 border - b - 2 font - medium text - sm transition - colors ${
-  activeTab === 'gridArena'
-    ? 'border-purple-500 text-white'
-    : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-} `}
+              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'gridArena'
+                  ? 'border-purple-500 text-white'
+                  : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                }`}
             >
               ⚔️ Grid Arena
             </button>
@@ -90,21 +83,19 @@ function App() {
             {/* TESTING */}
             <button
               onClick={() => setActiveTab('testing')}
-              className={`py - 4 px - 2 border - b - 2 font - medium text - sm transition - colors ${
-  activeTab === 'testing'
-    ? 'border-purple-500 text-white'
-    : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-} `}
+              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'testing'
+                  ? 'border-purple-500 text-white'
+                  : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                }`}
             >
               🧪 Testing
             </button>
             <button
               onClick={() => setActiveTab('idleArena')}
-              className={`py - 4 px - 2 border - b - 2 font - medium text - sm transition - colors ${
-  activeTab === 'idleArena'
-    ? 'border-purple-500 text-white'
-    : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-} `}
+              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'idleArena'
+                  ? 'border-purple-500 text-white'
+                  : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                }`}
             >
               🤖 Idle Arena
             </button>
