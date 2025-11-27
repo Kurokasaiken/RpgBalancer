@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'sonner';
 import { SpellInfoForm } from './components/SpellInfoForm';
 import { StatsGrid } from './components/StatsGrid';
 import { ActionsBar } from './components/ActionsBar';
@@ -15,9 +16,27 @@ import {
 import { upsertSpell } from '../../balancing/spellStorage';
 
 export const SpellCreation: React.FC = () => {
-    // Stato per gli step di ogni stat
-    const [statSteps, setStatSteps] = useState<Record<string, Array<{ value: number; weight: number }>>>({});
-    const [selectedTicks, setSelectedTicks] = useState<Record<string, number>>({});
+    // Stato per gli step di ogni stat - load from saved defaults
+    const [statSteps, setStatSteps] = useState<Record<string, Array<{ value: number; weight: number }>>>(() => {
+        try {
+            const savedDefault = localStorage.getItem('userDefaultSpell');
+            if (savedDefault) {
+                const config = JSON.parse(savedDefault);
+                if (config.statSteps) return config.statSteps;
+            }
+        } catch { }
+        return {};
+    });
+    const [selectedTicks, setSelectedTicks] = useState<Record<string, number>>(() => {
+        try {
+            const savedDefault = localStorage.getItem('userDefaultSpell');
+            if (savedDefault) {
+                const config = JSON.parse(savedDefault);
+                if (config.selectedTicks) return config.selectedTicks;
+            }
+        } catch { }
+        return {};
+    });
 
     // Initial stat order - load from saved defaults if available
     const [statOrder, setStatOrder] = useState<string[]>(() => {
@@ -247,7 +266,9 @@ export const SpellCreation: React.FC = () => {
         });
         const finalSpell = { ...minimalSpell, spellLevel: Math.round(cost) } as Spell;
         upsertSpell(finalSpell);
-        alert(`Spell "${finalSpell.name}" saved!`);
+        toast.success('Spell saved successfully!', {
+            description: `"${finalSpell.name}" has been added to your library`
+        });
         setSpell(createEmptySpell());
         // setCustomWeights({});
     };
@@ -278,17 +299,22 @@ export const SpellCreation: React.FC = () => {
                 spell,
                 statOrder,
                 collapsedStats: Array.from(collapsedStats),
-                statSteps
+                statSteps,
+                selectedTicks  // ADDED: Save slider positions
             };
             localStorage.setItem('userDefaultSpell', JSON.stringify(defaultConfig));
 
             // Also save as baseline for budget calculations
             localStorage.setItem('userSpellBaseline', JSON.stringify(spell));
 
-            alert('Configuration saved as default AND baseline for cost calculations!');
+            toast.success('Configuration saved as default!', {
+                description: 'Spell, card order, collapsed states, and slider positions saved'
+            });
         } catch (e) {
             console.error('Failed to save default spell', e);
-            alert('Failed to save default.');
+            toast.error('Failed to save default', {
+                description: 'Please try again or check console for errors'
+            });
         }
     };
 

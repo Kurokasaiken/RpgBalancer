@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 
 export interface EnhancedStatSliderProps {
   field: string;
@@ -35,8 +35,49 @@ export const EnhancedStatSlider: React.FC<EnhancedStatSliderProps> = ({
   onDragOver,
   onDrop
 }) => {
-  // Ensure at least 3 ticks for visual consistency
   const ticks = steps.length >= 3 ? steps : [...steps, ...Array(3 - steps.length).fill({ value: 0, weight: 1 })];
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  // Handle mouse/touch drag
+  const handleSliderInteraction = (clientX: number) => {
+    if (!trackRef.current) return;
+
+    const rect = trackRef.current.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const percentage = Math.max(0, Math.min(1, x / rect.width));
+    const tickIndex = Math.round(percentage * (ticks.length - 1));
+
+    if (tickIndex !== selectedTick) {
+      onSelectTick(tickIndex);
+    }
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    handleSliderInteraction(e.clientX);
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (isDragging) {
+      handleSliderInteraction(e.clientX);
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDragging]);
 
   return (
     <div
@@ -77,161 +118,117 @@ export const EnhancedStatSlider: React.FC<EnhancedStatSliderProps> = ({
 
       {!collapsed && (
         <div className="p-4">
-          <div className="flex flex-col gap-2 overflow-x-auto custom-scrollbar pb-2">
+          <div className="flex flex-col gap-3">
 
-            {/* Row 1: Values */}
-            <div className="flex items-end justify-between px-2 min-w-max gap-4">
-              {ticks.map((step, idx) => (
-                <div key={`val-${idx}`} className="flex flex-col items-center relative group/val">
-                  {/* Add Button (Left) */}
-                  <button
-                    type="button"
-                    onClick={() => onAddStep(idx - 1)}
-                    className="absolute -left-3 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center opacity-0 group-hover/val:opacity-100 hover:bg-green-500/40 transition-all z-20 text-[10px]"
-                    title="Add tick before"
-                  >
-                    +
-                  </button>
-
-                  <input
-                    type="number"
-                    value={step.value}
-                    onChange={e => onStepChange(idx, { ...step, value: Number(e.target.value) })}
-                    className={`w-14 px-1 py-1 text-center text-sm bg-transparent rounded outline-none transition-all ${selectedTick === idx
-                      ? 'text-blue-300 font-bold bg-blue-500/10 border border-blue-400/30 shadow-[0_0_8px_rgba(59,130,246,0.3)]'
-                      : 'text-gray-300 border border-transparent hover:border-white/20 focus:border-blue-400'
-                      }`}
-                    placeholder="Val"
-                  />
-                </div>
-              ))}
-              {/* Add Button (End) */}
+            {/* Row 1: Value Inputs */}
+            <div className="flex items-center justify-start gap-2">
+              <span className="text-xs text-gray-400 font-semibold w-12 text-center">VALUE</span>
+              <div className="flex items-center gap-1 flex-1">
+                {ticks.map((step, idx) => (
+                  <div key={`val-${idx}`} className="flex-1 flex justify-center">
+                    <input
+                      type="number"
+                      value={step.value}
+                      onChange={e => onStepChange(idx, { ...step, value: Number(e.target.value) })}
+                      className={`w-full max-w-[70px] px-1 py-1.5 text-center text-sm rounded outline-none transition-all ${selectedTick === idx
+                        ? 'text-blue-300 font-bold bg-blue-500/20 border-2 border-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.5)]'
+                        : 'text-gray-300 bg-white/5 border border-white/10 hover:border-white/30 focus:border-blue-400'
+                        }`}
+                      placeholder="Val"
+                    />
+                  </div>
+                ))}
+              </div>
+              {/* Add button at end */}
               <button
                 type="button"
                 onClick={() => onAddStep(ticks.length - 1)}
-                className="w-4 h-4 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 flex items-center justify-center transition-colors text-[10px]"
-                title="Add tick at end"
+                className="w-6 h-6 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center hover:bg-green-500/40 transition-all text-sm font-bold flex-shrink-0"
+                title="Add tick"
               >
                 +
               </button>
             </div>
 
-            {/* Row 2: Slider Track */}
-            <div className="relative h-8 w-full min-w-max px-2">
-              {/* Track Background */}
-              <div className="absolute top-1/2 left-2 right-6 h-2 bg-gradient-to-r from-purple-900/40 via-blue-900/40 to-purple-900/40 rounded-full -translate-y-1/2 shadow-inner" />
-
-              {/* Ticks on Track */}
-              <div className="absolute inset-0 left-2 right-6 flex justify-between items-center pointer-events-none">
+            {/* Row 2: Draggable Slider Track */}
+            <div className="flex items-center justify-start gap-2">
+              <span className="text-xs text-gray-400 font-semibold w-12 text-center">SLIDE</span>
+              <div className="flex-1 flex items-center gap-1 relative h-10">
+                {/* Invisible positioned elements to match input layout */}
                 {ticks.map((_, idx) => (
-                  <div
-                    key={`tick-${idx}`}
-                    className={`w-2 h-2 rounded-full transition-all ${selectedTick === idx
-                      ? 'bg-blue-400 scale-150 shadow-[0_0_8px_rgba(59,130,246,0.8)]'
-                      : 'bg-gray-600 scale-100'
-                      }`}
-                  />
+                  <div key={`pos-${idx}`} className="flex-1 flex justify-center relative">
+                    <div className="w-full max-w-[70px]" />
+                  </div>
                 ))}
-              </div>
 
-              {/* Custom Range Input with styled thumb */}
-              <input
-                type="range"
-                min={0}
-                max={ticks.length - 1}
-                value={selectedTick}
-                onChange={(e) => onSelectTick(Number(e.target.value))}
-                className="slider-custom absolute inset-0 w-full h-full cursor-pointer z-10"
-                title="Drag to select tick"
-                style={{
-                  background: 'transparent',
-                }}
-              />
+                {/* Track overlay - positioned absolutely */}
+                <div
+                  ref={trackRef}
+                  onMouseDown={handleMouseDown}
+                  className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-2 bg-gradient-to-r from-purple-900/40 via-blue-900/40 to-purple-900/40 rounded-full cursor-pointer"
+                >
+                  {/* Draggable thumb - positioned by flex column center */}
+                  <div className="absolute inset-0 flex items-center pointer-events-none">
+                    <div className="flex items-center gap-1 w-full">
+                      {ticks.map((_, idx) => (
+                        <div key={`thumb-pos-${idx}`} className="flex-1 flex justify-center">
+                          <div className={`w-6 h-6 rounded-full border-2 border-white transition-all ${selectedTick === idx
+                            ? isDragging
+                              ? 'scale-125 bg-blue-400 shadow-[0_0_20px_rgba(59,130,246,1)]'
+                              : 'bg-blue-500 shadow-[0_0_16px_rgba(59,130,246,0.8)]'
+                            : 'opacity-0'
+                            }`} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="w-6 flex-shrink-0" /> {/* Spacer for alignment */}
             </div>
 
-            {/* Row 3: Weights */}
-            <div className="flex items-start justify-between px-2 min-w-max gap-4">
-              {ticks.map((step, idx) => (
-                <div key={`wgt-${idx}`} className="flex flex-col items-center relative group/wgt">
-                  <input
-                    type="number"
-                    value={step.weight}
-                    step={0.1}
-                    onChange={e => onStepChange(idx, { ...step, weight: Number(e.target.value) })}
-                    className={`w-14 px-1 py-1 text-center text-xs bg-transparent rounded outline-none transition-all ${selectedTick === idx
-                      ? 'text-purple-300 font-bold bg-purple-500/10 border border-purple-400/30 shadow-[0_0_8px_rgba(168,85,247,0.3)]'
-                      : 'text-gray-400 border border-transparent hover:border-white/20 focus:border-purple-400'
-                      }`}
-                    placeholder="Wgt"
-                  />
-
-                  {/* Remove Button (Bottom) */}
-                  {ticks.length > 3 && (
-                    <button
-                      type="button"
-                      onClick={() => onRemoveStep(idx)}
-                      className="text-red-400/50 hover:text-red-400 text-[10px] opacity-0 group-hover/wgt:opacity-100 transition-opacity mt-1"
-                    >
-                      ×
-                    </button>
-                  )}
-                </div>
-              ))}
-              {/* Spacer to align with top add button */}
-              <div className="w-4" />
+            {/* Row 3: Weight Inputs */}
+            <div className="flex items-center justify-start gap-2">
+              <span className="text-xs text-gray-400 font-semibold w-12 text-center">WEIGHT</span>
+              <div className="flex items-center gap-1 flex-1">
+                {ticks.map((step, idx) => (
+                  <div key={`wgt-${idx}`} className="flex-1 flex justify-center relative group/wgt">
+                    <input
+                      type="number"
+                      value={step.weight}
+                      step={0.1}
+                      onChange={e => onStepChange(idx, { ...step, weight: Number(e.target.value) })}
+                      className={`w-full max-w-[70px] px-1 py-1.5 text-center text-xs rounded outline-none transition-all ${selectedTick === idx
+                        ? 'text-purple-300 font-bold bg-purple-500/20 border-2 border-purple-400 shadow-[0_0_8px_rgba(168,85,247,0.5)]'
+                        : 'text-gray-400 bg-white/5 border border-white/10 hover:border-white/30 focus:border-purple-400'
+                        }`}
+                      placeholder="Wgt"
+                    />
+                    {/* Remove button (bottom) - visible on hover when > 3 ticks */}
+                    {ticks.length > 3 && (
+                      <button
+                        type="button"
+                        onClick={() => onRemoveStep(idx)}
+                        className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center opacity-0 group-hover/wgt:opacity-100 hover:bg-red-500/40 transition-all z-10 text-xs font-bold"
+                        title="Remove tick"
+                      >
+                        −
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div className="w-6 flex-shrink-0" /> {/* Spacer for alignment */}
             </div>
 
           </div>
 
-          <div className="mt-2 text-xs text-gray-500 italic truncate text-center">
+          {/* Description */}
+          <div className="mt-6 text-xs text-gray-500 italic text-center">
             {description}
           </div>
         </div>
       )}
-
-      {/* Custom Slider Styles */}
-      <style jsx>{`
-        .slider-custom::-webkit-slider-thumb {
-          appearance: none;
-          width: 20px;
-          height: 20px;
-          border-radius: 50%;
-          background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-          cursor: pointer;
-          box-shadow: 0 0 12px rgba(59, 130, 246, 0.6), 0 0 20px rgba(59, 130, 246, 0.4);
-          border: 2px solid #ffffff;
-          transition: all 0.2s ease;
-        }
-        
-        .slider-custom::-webkit-slider-thumb:hover {
-          transform: scale(1.15);
-          box-shadow: 0 0 16px rgba(59, 130, 246, 0.8), 0 0 28px rgba(59, 130, 246, 0.6);
-        }
-        
-        .slider-custom::-moz-range-thumb {
-          width: 20px;
-          height: 20px;
-          border-radius: 50%;
-          background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-          cursor: pointer;
-          box-shadow: 0 0 12px rgba(59, 130, 246, 0.6), 0 0 20px rgba(59, 130, 246, 0.4);
-          border: 2px solid #ffffff;
-          transition: all 0.2s ease;
-        }
-        
-        .slider-custom::-moz-range-thumb:hover {
-          transform: scale(1.15);
-          box-shadow: 0 0 16px rgba(59, 130, 246, 0.8), 0 0 28px rgba(59, 130, 246, 0.6);
-        }
-
-        .slider-custom::-webkit-slider-runnable-track {
-          background: transparent;
-        }
-
-        .slider-custom::-moz-range-track {
-          background: transparent;
-        }
-      `}</style>
     </div>
   );
 };
