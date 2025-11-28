@@ -1,11 +1,11 @@
-// import type { StatBlock } from '../types';
+import { BALANCING_CONFIG } from '../balancingConfig';
 
 export const HitChanceModule = {
     calculateHitChance: (txc: number, evasion: number): number => {
-        // Formula: TxC + 50 - Evasione
-        const chance = txc + 50 - evasion;
-        // Clamp between 1% and 100%
-        return Math.max(1, Math.min(100, chance));
+        // Formula: TxC + BASE - Evasione
+        const chance = txc + BALANCING_CONFIG.BASE_HIT_CHANCE - evasion;
+        // Clamp between MIN and MAX
+        return Math.max(BALANCING_CONFIG.MIN_HIT_CHANCE, Math.min(BALANCING_CONFIG.MAX_HIT_CHANCE, chance));
     },
 
     calculateAttacksPerKo: (htkPure: number, hitChance: number): number => {
@@ -16,15 +16,15 @@ export const HitChanceModule = {
 
     // Inverse calculations for locks
     calculateEvasionForChance: (txc: number, targetChance: number): number => {
-        // Chance = TxC + 50 - Ev
-        // Ev = TxC + 50 - Chance
-        return txc + 50 - targetChance;
+        // Chance = TxC + BASE - Ev
+        // Ev = TxC + BASE - Chance
+        return txc + BALANCING_CONFIG.BASE_HIT_CHANCE - targetChance;
     },
 
     calculateTxcForChance: (evasion: number, targetChance: number): number => {
-        // Chance = TxC + 50 - Ev
-        // TxC = Chance - 50 + Ev
-        return targetChance - 50 + evasion;
+        // Chance = TxC + BASE - Ev
+        // TxC = Chance - BASE + Ev
+        return targetChance - BALANCING_CONFIG.BASE_HIT_CHANCE + evasion;
     },
 
     // --- Derived Stats (Efficiency & Consistency) ---

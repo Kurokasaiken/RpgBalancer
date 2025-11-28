@@ -17,6 +17,49 @@ import { upsertSpell } from '../../balancing/spellStorage';
 import { useDefaultStorage } from '../../shared/hooks/useDefaultStorage';
 import { ALL_SPELL_STATS } from '../../balancing/spellStatDefinitions';
 import { HitChanceModule } from '../../balancing/modules/hitchance';
+import { BALANCING_CONFIG } from '../../balancing/balancingConfig';
+import { CombatPredictor } from '../../balancing/modules/combatPredictor';
+import { CombatPreview } from './components/CombatPreview';
+
+// Helper component for derived stats
+const DerivedStatInput: React.FC<{
+    label: string;
+    value: number;
+    unit: string;
+    color: string;
+    tooltip: string;
+    onChange: (val: number) => void;
+}> = ({ label, value, unit, color, tooltip, onChange }) => {
+    const colorClasses: Record<string, { text: string, bg: string, border: string, focus: string }> = {
+        cyan: { text: 'text-cyan-100', bg: 'bg-cyan-950/30', border: 'border-cyan-500/20', focus: 'focus:border-cyan-400' },
+        purple: { text: 'text-purple-100', bg: 'bg-purple-950/30', border: 'border-purple-500/20', focus: 'focus:border-purple-400' },
+        yellow: { text: 'text-yellow-100', bg: 'bg-yellow-950/30', border: 'border-yellow-500/20', focus: 'focus:border-yellow-400' },
+        red: { text: 'text-red-100', bg: 'bg-red-950/30', border: 'border-red-500/20', focus: 'focus:border-red-400' },
+        green: { text: 'text-green-100', bg: 'bg-green-950/30', border: 'border-green-500/20', focus: 'focus:border-green-400' },
+    };
+    const c = colorClasses[color] || colorClasses.cyan;
+
+    return (
+        <div className="flex flex-col">
+            <label className={`text-[10px] ${c.text} opacity-70 uppercase tracking-wider mb-0.5`}>
+                {label}
+            </label>
+            <div className="relative group">
+                <input
+                    type="number"
+                    value={Math.round(value * 10) / 10} // Round to 1 decimal
+                    onChange={(e) => onChange(Number(e.target.value))}
+                    className={`w-full ${c.bg} border ${c.border} rounded px-2 py-1 text-xs ${c.text} ${c.focus} outline-none text-center font-mono`}
+                />
+                <span className={`absolute right-1 top-1/2 -translate-y-1/2 text-[10px] ${c.text} opacity-50 pointer-events-none`}>{unit}</span>
+                {/* Tooltip */}
+                <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-black/90 border ${c.border} rounded text-[10px] text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50`}>
+                    {tooltip}
+                </div>
+            </div>
+        </div>
+    );
+};
 
 export const SpellCreation: React.FC = () => {
     // Use custom hooks for state management
@@ -242,7 +285,26 @@ export const SpellCreation: React.FC = () => {
 
     // handleRangeChange rimosso (non usato)
 
+    // Helper to get current stat value from spell
+    const getStatValue = (statName: string): number => {
+        const fieldValue = (spell as any)[statName];
+        if (fieldValue === undefined) return 0;
+        return Number(fieldValue) || 0;
+    };
 
+    // Calculate Combat Metrics for preview
+    const playerStats = {
+        hp: 100, // Assume baseline HP for spell context
+        damage: getStatValue('damage'),
+        txc: getStatValue('txc'),
+        armor: getStatValue('armor'),
+        evasion: getStatValue('evasion'),
+        critChance: getStatValue('critChance'),
+        lifesteal: getStatValue('lifesteal'),
+        regen: getStatValue('regen'),
+    };
+
+    const combatMetrics = CombatPredictor.predict(playerStats);
 
     return (
         <div className="h-full overflow-y-auto bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-950 p-4 relative">
@@ -250,9 +312,13 @@ export const SpellCreation: React.FC = () => {
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute w-96 h-96 bg-purple-500/10 rounded-full blur-3xl top-10 -left-20 animate-pulse" />
                 <div className="absolute w-96 h-96 bg-blue-500/10 rounded-full blur-3xl bottom-10 -right-20 animate-pulse" style={{ animationDelay: '1s' }} />
+                <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid.svg')] opacity-10"></div>
+                <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
+                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
             </div>
-            <div className="max-w-7xl mx-auto relative z-10">
 
+            <div className="max-w-7xl mx-auto relative z-10">
+                {/* Header Section */}
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-3xl font-bold text-white drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]">🔮 Spell Creation</h1>
                     <div className="flex items-center gap-4 bg-black/40 px-4 py-2 rounded-lg border border-white/10 backdrop-blur-md">
@@ -271,6 +337,10 @@ export const SpellCreation: React.FC = () => {
                             targetBudget={targetBudget}
                             setTargetBudget={setTargetBudget}
                         />
+                        {/* Add Combat Preview here or below? */}
+                        <div className="mt-4">
+                            <CombatPreview metrics={combatMetrics} />
+                        </div>
                     </div>
 
                     {/* Right Card: Preview Spell */}
@@ -281,7 +351,6 @@ export const SpellCreation: React.FC = () => {
                                 <span className="text-sm font-mono text-cyan-400">{damageRangeText}</span>
                             </div>
                             <ul className="text-xs text-cyan-50 grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-1">
-                                {/* Always show Effect first */}
                                 {spell.effect !== undefined && (
                                     <li className="flex justify-between items-center hover:bg-cyan-500/10 p-0.5 rounded transition-colors border-b border-cyan-500/10">
                                         <span className="font-medium text-cyan-300/70 capitalize truncate mr-2">Effect</span>
@@ -323,71 +392,122 @@ export const SpellCreation: React.FC = () => {
                     onDragOver={handleDragOver}
                     onDrop={handleDrop}
                     renderDerivedStats={(field, currentValue, onUpdate) => {
+                        // --- TxC: Efficiency & Consistency ---
                         if (field === 'txc') {
-                            const evasion = 0; // Assume 0 for now as baseline
-                            const htk = 4; // Standard HTK baseline
+                            const evasion = BALANCING_CONFIG.TARGET_EVASION;
+                            const htk = BALANCING_CONFIG.BASELINE_HTK;
 
                             const efficiency = HitChanceModule.calculateEfficiency(currentValue, evasion);
                             const consistency = HitChanceModule.calculateConsistency(currentValue, htk, evasion);
 
                             return (
                                 <div className="grid grid-cols-2 gap-2 mt-1">
-                                    {/* Efficiency Input */}
-                                    <div className="flex flex-col">
-                                        <label className="text-[10px] text-cyan-300/70 uppercase tracking-wider mb-0.5">
-                                            Efficiency
-                                        </label>
-                                        <div className="relative group">
-                                            <input
-                                                type="number"
-                                                value={Math.round(efficiency)}
-                                                onChange={(e) => {
-                                                    const newEff = Number(e.target.value);
-                                                    const newTxc = HitChanceModule.calculateTxcFromEfficiency(newEff, evasion);
-                                                    onUpdate(newTxc);
-                                                }}
-                                                className="w-full bg-cyan-950/30 border border-cyan-500/20 rounded px-2 py-1 text-xs text-cyan-100 focus:border-cyan-400 outline-none text-center font-mono"
-                                            />
-                                            <span className="absolute right-1 top-1/2 -translate-y-1/2 text-[10px] text-cyan-500/50 pointer-events-none">%</span>
-                                            {/* Tooltip */}
-                                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-black/90 border border-cyan-500/30 rounded text-[10px] text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                                                Percentage of raw damage potential actually realized over time.
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Consistency Input */}
-                                    <div className="flex flex-col">
-                                        <label className="text-[10px] text-purple-300/70 uppercase tracking-wider mb-0.5">
-                                            Consistency
-                                        </label>
-                                        <div className="relative group">
-                                            <input
-                                                type="number"
-                                                value={Math.round(consistency)}
-                                                onChange={(e) => {
-                                                    const newConst = Number(e.target.value);
-                                                    const newTxc = HitChanceModule.calculateTxcFromConsistency(newConst, htk, evasion);
-                                                    onUpdate(newTxc);
-                                                }}
-                                                className="w-full bg-purple-950/30 border border-purple-500/20 rounded px-2 py-1 text-xs text-purple-100 focus:border-purple-400 outline-none text-center font-mono"
-                                            />
-                                            <span className="absolute right-1 top-1/2 -translate-y-1/2 text-[10px] text-purple-500/50 pointer-events-none">%</span>
-                                            {/* Tooltip */}
-                                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-black/90 border border-purple-500/30 rounded text-[10px] text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                                                Probability of eliminating the target in the minimum theoretical turns (4 hits) without missing.
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <DerivedStatInput
+                                        label="Efficiency"
+                                        value={efficiency}
+                                        unit="%"
+                                        color="cyan"
+                                        tooltip="Realized damage potential (Hit Chance)"
+                                        onChange={(val) => onUpdate(HitChanceModule.calculateTxcFromEfficiency(val, evasion))}
+                                    />
+                                    <DerivedStatInput
+                                        label="Consistency"
+                                        value={consistency}
+                                        unit="%"
+                                        color="purple"
+                                        tooltip={`Probability to kill in ${htk} hits`}
+                                        onChange={(val) => onUpdate(HitChanceModule.calculateTxcFromConsistency(val, htk, evasion))}
+                                    />
                                 </div>
                             );
                         }
+
+                        // --- Armor: EHP Boost ---
+                        if (field === 'armor') {
+                            // Formula: Reduction = Armor / (Armor + K * Damage)
+                            // EHP Mult = 1 / (1 - Reduction)
+                            // EHP Mult = 1 + Armor / (K * Damage)
+                            const k = BALANCING_CONFIG.ARMOR_CONSTANT; // e.g. 10
+                            const dmg = BALANCING_CONFIG.BASELINE_DAMAGE; // e.g. 25
+                            const denominator = k * dmg;
+
+                            // EHP Boost % = (EHP Mult - 1) * 100
+                            // EHP Boost % = (Armor / denominator) * 100
+                            const ehpBoost = (currentValue / denominator) * 100;
+
+                            return (
+                                <div className="mt-1">
+                                    <DerivedStatInput
+                                        label="EHP Boost"
+                                        value={ehpBoost}
+                                        unit="%"
+                                        color="yellow"
+                                        tooltip="Effective HP increase against physical damage"
+                                        onChange={(val) => {
+                                            // val is percentage boost
+                                            // Armor = (val / 100) * denominator
+                                            const newArmor = (val / 100) * denominator;
+                                            onUpdate(newArmor);
+                                        }}
+                                    />
+                                </div>
+                            );
+                        }
+
+                        // --- Crit Chance: DPS Multiplier ---
+                        if (field === 'critChance') {
+                            // DPS Mult = 1 + (Chance/100 * (CritMult - 1))
+                            // Boost % = (DPS Mult - 1) * 100
+                            // Boost % = Chance * (CritMult - 1)
+                            const critMult = BALANCING_CONFIG.BASE_CRIT_MULT; // e.g. 2.0
+                            const dpsBoost = currentValue * (critMult - 1);
+
+                            return (
+                                <div className="mt-1">
+                                    <DerivedStatInput
+                                        label="DPS Boost"
+                                        value={dpsBoost}
+                                        unit="%"
+                                        color="red"
+                                        tooltip="Average damage increase from crits"
+                                        onChange={(val) => {
+                                            // Chance = val / (CritMult - 1)
+                                            const newChance = val / (critMult - 1);
+                                            onUpdate(newChance);
+                                        }}
+                                    />
+                                </div>
+                            );
+                        }
+
+                        // --- Lifesteal: Heal per Hit ---
+                        if (field === 'lifesteal') {
+                            // Heal = AvgDamage * (Lifesteal / 100)
+                            const avgDmg = BALANCING_CONFIG.BASELINE_DAMAGE;
+                            const healPerHit = avgDmg * (currentValue / 100);
+
+                            return (
+                                <div className="mt-1">
+                                    <DerivedStatInput
+                                        label="Heal/Hit"
+                                        value={healPerHit}
+                                        unit="HP"
+                                        color="green"
+                                        tooltip={`Healing per hit (based on ${avgDmg} dmg)`}
+                                        onChange={(val) => {
+                                            // Lifesteal = (Heal / AvgDmg) * 100
+                                            const newLifesteal = (val / avgDmg) * 100;
+                                            onUpdate(newLifesteal);
+                                        }}
+                                    />
+                                </div>
+                            );
+                        }
+
                         return null;
                     }}
                 />
 
-                {/* Visual separator */}
-                <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-8" />
 
                 <SpellInfoForm spell={spell} updateField={updateField} />
 
@@ -395,7 +515,7 @@ export const SpellCreation: React.FC = () => {
                 <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-8" />
 
                 <ActionsBar onReset={handleReset} onSave={handleSave} onSaveDefault={handleSaveDefault} balance={balance} />
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }
