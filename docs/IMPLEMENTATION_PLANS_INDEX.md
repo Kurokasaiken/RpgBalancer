@@ -38,6 +38,22 @@
 - Hybrid CSS approach (Tailwind + CSS Modules)
 - Custom hooks for shared logic
 
+### combat_simulation_plan.md ✅ **ACTIVE**
+**Title:** Combat Simulation Testing System  
+**Status:** Phase 1 In Progress (Core Engine)  
+
+**Phases:**
+- 🔄 **Phase 1:** Core Engine (CombatSimulator + MonteCarloSimulation)
+- ⏳ **Phase 2:** Analysis Tools (StatValueAnalyzer + Export)
+- ⏳ **Phase 3:** CLI Interface
+- ⏸️ **Phase 4:** UI Dashboard (Future)
+
+**Key Concepts:**
+- Monte Carlo simulation (10k+ iterations)
+- Statistical analysis (win rates, confidence intervals, TTK)
+- HP as currency for stat value equivalency
+- Zero hardcoding (inherit all formulas from balancing/)
+
 ---
 
 ## 🔧 Previous Sessions

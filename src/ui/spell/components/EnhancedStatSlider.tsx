@@ -57,7 +57,7 @@ export const EnhancedStatSlider: React.FC<EnhancedStatSliderProps> = ({
           <button
             type="button"
             onClick={onToggleCollapse}
-            className="text-gray-400 hover:text-white transition-colors w-5 h-5 flex items-center justify-center"
+            className="text-gray-400 hover:text-white transition-colors w-5 h-5 flex items-center justify-center flex-shrink-0"
             title={collapsed ? "Show" : "Hide"}
           >
             {collapsed ? (
@@ -75,11 +75,11 @@ export const EnhancedStatSlider: React.FC<EnhancedStatSliderProps> = ({
 
         {/* CONTENT - NOT Draggable */}
         {!collapsed && (
-          <div className="p-4">
-            <div className="flex flex-col gap-2 overflow-x-auto custom-scrollbar pb-2">
+          <div className="p-4 h-[230px]">
+            <div className="flex flex-col gap-2 overflow-x-auto overflow-y-hidden custom-scrollbar pb-2 h-full">
 
               {/* Row 1: Values */}
-              <div className="flex items-end justify-between px-2 min-w-max gap-4">
+              <div className="flex flex-nowrap items-end justify-between px-2 min-w-max gap-4">
                 {ticks.map((step, idx) => (
                   <div key={`val-${idx}`} className="flex flex-col items-center relative group/val">
                     {/* Add Button (Left) */}
@@ -116,7 +116,7 @@ export const EnhancedStatSlider: React.FC<EnhancedStatSliderProps> = ({
               </div>
 
               {/* Row 2: Slider Track */}
-              <div className="flex items-center justify-between px-2 min-w-max gap-4 relative h-8">
+              <div className="flex flex-nowrap items-center justify-between px-2 min-w-max gap-4 relative h-8">
                 {/* Create same flex layout as input boxes to get exact positions */}
                 {ticks.map((_, idx) => (
                   <div key={`track-spacer-${idx}`} className="w-14 relative flex items-center justify-center">
@@ -145,7 +145,7 @@ export const EnhancedStatSlider: React.FC<EnhancedStatSliderProps> = ({
               </div>
 
               {/* Row 3: Weights */}
-              <div className="flex items-start justify-between px-2 min-w-max gap-4">
+              <div className="flex flex-nowrap items-start justify-between px-2 min-w-max gap-4">
                 {ticks.map((step, idx) => (
                   <div key={`wgt-${idx}`} className="flex flex-col items-center relative group/wgt">
                     <input

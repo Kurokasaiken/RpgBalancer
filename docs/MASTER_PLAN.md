@@ -145,7 +145,24 @@ Example:
 
 ### 🔄 **PHASE 2: Archetype Balancing System (Active)**
 
-**Status:** 10% (In Progress)
+**Status:** 15% (In Progress)
+
+#### **2.1: Combat Simulation Testing (In Progress)**
+
+| Document | Purpose |
+|----------|------------|
+| **📋 Plan** | [plans/combat_simulation_plan.md](plans/combat_simulation_plan.md) |
+| **✅ Tasks** | [plans/combat_simulation_tasks.md](plans/combat_simulation_tasks.md) |
+
+**Overview:**
+- Monte Carlo simulation engine (10k+ combat iterations)
+- Statistical analysis (win rates, confidence intervals, TTK)
+- Stat value equivalency calculator (HP as currency)
+- Turn-based 1v1 combat testing framework
+
+**Status:** Phase 1 starting - Core Engine implementation
+
+#### **2.2: Archetype Definition (Planned)**
 
 | Document | Purpose |
 |----------|------------|
@@ -155,7 +172,7 @@ Example:
 
 **Overview:**
 - 16 base archetypes (Tank×5, DPS×4, Assassin×2, etc.)
-- TTK-based testing (Time-To-Kill validation)
+- TTK-based validation using simulation system
 - Interactive dashboard (heatmaps, charts)
 
 ---
