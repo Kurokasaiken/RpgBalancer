@@ -26,6 +26,17 @@ export interface SpellPowerBreakdown {
     totalPower: number;
 }
 
+/**
+ * Spell Tier Boundaries (in Spell Points)
+ */
+export const SPELL_TIERS = {
+    COMMON: { min: 0, max: 20, name: 'Common', color: '#9CA3AF', icon: '⚪' },
+    UNCOMMON: { min: 21, max: 40, name: 'Uncommon', color: '#60A5FA', icon: '🔵' },
+    RARE: { min: 41, max: 60, name: 'Rare', color: '#A78BFA', icon: '🟣' },
+    EPIC: { min: 61, max: 80, name: 'Epic', color: '#F59E0B', icon: '🟠' },
+    LEGENDARY: { min: 81, max: Infinity, name: 'Legendary', color: '#FBBF24', icon: '🟡' }
+} as const;
+
 export const SpellCostModule = {
     /**
      * Calculate total spell power in HP-equivalent
@@ -249,6 +260,41 @@ export const SpellCostModule = {
             hpEquivalent: totalPower,
             damageEquivalent: totalPower / damageWeight,
             description: `This spell with ${spell.manaCost || 0} mana is worth ${totalPower.toFixed(0)} HP or ${(totalPower / damageWeight).toFixed(1)} damage`
+        };
+    },
+
+    /**
+     * Calculate spell points from HP cost
+     * Currently 1:1 mapping, but can be adjusted for game balance
+     */
+    calculateSpellPoints(spell: Spell): number {
+        const { totalPower } = this.calculateSpellPower(spell);
+        // Simple 1:1 conversion for now
+        // Could add multipliers based on spell category later
+        return Math.round(totalPower);
+    },
+
+    /**
+     * Assign tier based on spell points
+     */
+    calculateTier(spellPoints: number): 1 | 2 | 3 | 4 | 5 {
+        if (spellPoints <= SPELL_TIERS.COMMON.max) return 1;
+        if (spellPoints <= SPELL_TIERS.UNCOMMON.max) return 2;
+        if (spellPoints <= SPELL_TIERS.RARE.max) return 3;
+        if (spellPoints <= SPELL_TIERS.EPIC.max) return 4;
+        return 5; // LEGENDARY
+    },
+
+    /**
+     * Get complete SpellCost object
+     */
+    getSpellCost(spell: Spell): import('../archetype/types').SpellCost {
+        const points = this.calculateSpellPoints(spell);
+        const tier = this.calculateTier(points);
+
+        return {
+            spellPoints: points,
+            tier
         };
     }
 };

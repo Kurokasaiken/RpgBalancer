@@ -1,216 +1,172 @@
 /**
- * Archetype Balancing System - Type Definitions
+ * Archetype System - Type Definitions
  * 
- * Core interfaces for archetype-based balancing:
- * - ArchetypeTemplate: Blueprint for character archetypes
- * - TTKTarget: Time-To-Kill validation targets
- * - BalanceConfiguration: Global balance settings
- * - SpellCost: SpellPoints currency system
+ * These types define the structure of the archetype system, which allows
+ * creating characters/builds by distributing a budget across stats according to templates.
  */
 
-import type { StatBlock } from '../types';
+/**
+ * Archetype Category - The role/playstyle of the archetype
+ */
+export type ArchetypeCategory = 'Tank' | 'DPS' | 'Assassin' | 'Bruiser' | 'Support' | 'Hybrid';
 
 /**
- * Archetype Template - Blueprint for creating archetype instances
- * 
- * Defines how stat points should be allocated for a specific archetype variant
+ * How stats are allocated (as percentages that sum to 100%)
+ */
+export interface StatAllocation {
+    damage: number;      // % of budget to damage
+    hp: number;          // % of budget to HP
+    armor: number;       // % of budget to armor
+    resistance: number;  // % of budget to resistance
+    txc: number;         // % of budget to accuracy
+    evasion: number;     // % of budget to evasion
+    critChance: number;  // % of budget to crit chance
+    critMult: number;    // % of budget to crit multiplier
+    lifesteal: number;   // % of budget to lifesteal
+    regen: number;       // % of budget to regen
+    ward: number;        // % of budget to ward
+    block: number;       // % of budget to block
+    armorPen: number;    // % of budget to armor penetration
+    penPercent: number;  // % of budget to resistance penetration
+}
+
+/**
+ * Archetype Template - The "blueprint" for creating instances
  */
 export interface ArchetypeTemplate {
-    // Identity
     id: string;
     name: string;
-    category: 'tank' | 'dps' | 'assassin' | 'bruiser' | 'support';
-    variant: string; // e.g., "HighHP", "Crit", "Evasive"
     description: string;
+    category: ArchetypeCategory;
 
-    // Stat Allocation Strategy (percentage-based)
-    // Must sum to 100%
-    statAllocation: Partial<Record<keyof StatBlock, number>>;
+    // Stat Distribution (percentages, sum must be ≤ 100)
+    allocation: StatAllocation;
 
     // Budget Constraints
-    minBudget: number;  // Minimum viable budget (e.g., 10 points)
-    maxBudget: number;  // Maximum recommended budget (e.g., 100 points)
+    minBudget: number;  // Minimum HP cost to build
+    maxBudget: number;  // Maximum HP cost to build
 
     // Metadata
-    createdBy: 'system' | 'user';
-    tags: string[]; // For search/filtering
-
-    // Test Results (populated after testing)
-    testResults?: ArchetypeTestResults;
+    tags: string[];     // e.g., ['melee', 'aggressive', 'defensive']
+    author?: string;
+    version: string;    // Semantic versioning for templates
 }
 
 /**
- * Test results for an archetype across all matchups
- */
-export interface ArchetypeTestResults {
-    avgWinRate: number;           // Average winrate vs all other archetypes
-    avgTTK: number;               // Average rounds to kill
-    counters: string[];           // Archetype IDs this archetype beats (>60% WR)
-    counteredBy: string[];        // Archetype IDs that beat this archetype (>60% WR)
-    lastTested: Date;
-    budgetLevel: number;          // Budget level used for testing
-}
-
-/**
- * Archetype Instance - Generated StatBlock from template + budget
+ * Archetype Instance - A specific build created from a template at a budget
  */
 export interface ArchetypeInstance {
     templateId: string;
-    template: ArchetypeTemplate;
-    budget: number;
-    statBlock: StatBlock;
-    createdAt: Date;
+    budget: number;      // HP cost used
+    statBlock: import('../types').StatBlock; // Resulting stats
+    metadata: {
+        createdAt: Date;
+        createdBy?: string;
+    };
 }
 
 /**
- * TTK Target - Expected Time-To-Kill for a matchup
- * 
- * Defines expected combat duration and winner for balance validation
+ * TTK Target - Expected Time-To-Kill for matchups
  */
 export interface TTKTarget {
-    // Matchup
-    archetypeA: string;  // Archetype ID or category
-    archetypeB: string;  // Archetype ID or category
+    matchup: {
+        archetypeA: string; // Archetype ID
+        archetypeB: string; // Archetype ID
+    };
+    budget: number;         // Budget level (10, 20, 50, etc.)
+
+    // Expected Rounds
+    minRounds: number;
+    targetRounds: number;
+    maxRounds: number;
+    tolerance: number;      // ±tolerance for passing validation
 
     // Expected Winner
-    expectedWinner: 'A' | 'B' | 'even';  // 'even' = 45-55% winrate
-
-    // Expected Rounds to Kill
-    minRounds: number;       // Minimum acceptable combat duration
-    maxRounds: number;       // Maximum acceptable (timeout threshold)
-    targetRounds: number;    // Ideal average
-    tolerance: number;       // ±X rounds acceptable
-
-    // Metadata
-    description?: string;
-    budgetLevel?: number;    // If target is budget-specific
+    expectedWinner: 'A' | 'B' | 'Either'; // 'Either' for balanced matchups
 }
 
 /**
- * TTK Validation Result
+ * TTK Test Result - Outcome of running a matchup simulation
+ */
+export interface TTKResult {
+    matchup: {
+        archetypeA: string;
+        archetypeB: string;
+    };
+    budget: number;
+
+    // Simulation Results
+    totalSimulations: number;
+    winnerCounts: {
+        A: number;
+        B: number;
+    };
+
+    // Round Statistics
+    roundsToKill: {
+        avg: number;
+        median: number;
+        stdDev: number;
+        min: number;
+        max: number;
+    };
+
+    // Derived Metrics
+    winRate: {
+        A: number; // 0-1
+        B: number; // 0-1
+    };
+}
+
+/**
+ * TTK Validation Result - Comparison of result vs target
  */
 export interface TTKValidation {
-    valid: boolean;
-    actualRounds: number;
-    targetRounds: number;
-    deviation: number;          // actualRounds - targetRounds
-    deviationPercent: number;   // (deviation / targetRounds) * 100
-    winnerCorrect: boolean;
-    severity: 'ok' | 'minor' | 'major' | 'critical';
-    message: string;
+    result: TTKResult;
+    target: TTKTarget;
+
+    // Validation Status
+    isValid: boolean;
+    deviations: {
+        roundsDeviation: number;  // How far from target rounds
+        roundsDeviationPercent: number;
+        winnerMismatch: boolean;  // Is the winner wrong?
+    };
+
+    // Messages
+    warnings: string[];
+    errors: string[];
 }
 
 /**
- * Balance Configuration - Global balance settings
+ * Balance Configuration - Global settings for the archetype system
  */
 export interface BalanceConfiguration {
     // TTK Targets
     ttkTargets: TTKTarget[];
 
-    // Counter Relationships
-    // Maps archetype ID to its expected relationships
-    counters: Record<string, {
-        strongAgainst: string[];  // Should win 60%+ against these
-        weakAgainst: string[];    // Should lose 40%- against these
-        evenWith: string[];       // Should be 50% ±10% against these
-    }>;
-
     // Budget Tiers
     budgetTiers: BudgetTier[];
 
-    // Global Settings
-    winRateTolerance: number;      // ±X% for "even" matchups (default: 10)
-    roundsTolerancePercent: number; // ±X% for TTK validation (default: 20)
-    maxSimulationRounds: number;    // Prevent infinite loops (default: 50)
+    // Counter Matrix (optional - defines strength relationships)
+    counterMatrix?: Record<string, Record<string, 'Strong' | 'Weak' | 'Even'>>;
 }
 
 /**
- * Budget Tier - Predefined budget levels
+ * Budget Tier - Pre-defined budget levels for testing
  */
 export interface BudgetTier {
-    name: string;           // "Early Game", "Mid Game", etc.
-    points: number;         // 10, 20, 50, etc.
+    name: string;           // e.g., "Common", "Rare", "Legendary"
+    points: number;         // HP cost
     description: string;
+    color?: string;         // For UI
+    icon?: string;          // For UI
 }
 
 /**
- * Spell Cost - SpellPoints currency system
- * 
- * Replaces mana-based costing with HP-equivalent budget
+ * Spell Cost (using Spell Points currency)
  */
 export interface SpellCost {
-    spellPoints: number;    // HP-equivalent / 5.0 (granular cost)
-    tier: 1 | 2 | 3 | 4 | 5; // Tier categorization (Common → Legendary)
-    description: string;    // "Common", "Rare", etc.
-}
-
-/**
- * Spell Tier Definition
- */
-export interface SpellTier {
-    tier: 1 | 2 | 3 | 4 | 5;
-    name: string;           // "Common", "Uncommon", "Rare", "Epic", "Legendary"
-    minPoints: number;      // Minimum spell points for this tier
-    maxPoints: number;      // Maximum spell points for this tier
-    color: string;          // Visual color code
-    icon: string;           // Emoji or icon
-}
-
-/**
- * TTK Test Result - Single matchup result
- */
-export interface TTKResult {
-    archetypeA: string;
-    archetypeB: string;
-    budget: number;
-
-    // Simulation Results
-    simulations: number;
-    winsA: number;
-    winsB: number;
-    draws: number;
-
-    // Calculated Metrics
-    winRateA: number;       // winsA / simulations
-    winRateB: number;       // winsB / simulations
-    avgRoundsToKill: number;
-
-    // Validation
-    target?: TTKTarget;
-    validation?: TTKValidation;
-
-    // Timestamp
-    testedAt: Date;
-}
-
-/**
- * Batch Test Result - Full matrix results
- */
-export interface BatchTestResult {
-    archetypes: string[];   // List of tested archetype IDs
-    budgetLevel: number;
-    results: TTKResult[];   // N × N results
-    summary: {
-        totalMatchups: number;
-        balancedMatchups: number;  // Within tolerance
-        imbalancedMatchups: number;
-        balanceScore: number;      // balancedMatchups / totalMatchups
-    };
-    testedAt: Date;
-}
-
-/**
- * Imbalance Report - Analysis of balance issues
- */
-export interface ImbalanceReport {
-    imbalances: Array<{
-        matchup: string;        // "Tank_HighHP vs DPS_Pure"
-        severity: 'minor' | 'major' | 'critical';
-        issue: string;          // Description
-        actualWinRate: number;
-        expectedWinRate: number;
-        deviation: number;
-    }>;
-    affectedStats: Record<string, number>;  // Stat → impact score
-    recommendedAdjustments: Record<string, number>;  // Stat → suggested weight change
+    spellPoints: number;    // Cost in spell points (derived from HP)
+    tier: 1 | 2 | 3 | 4 | 5; // Tier classification
 }

@@ -9,7 +9,9 @@ import { GridArena } from './ui/grid/GridArena';
 import { TestingLab } from './ui/testing/TestingLab';
 import { ErrorBoundary } from './ui/organisms/ErrorBoundary';
 
-type Tab = 'balancer' | 'spellLibrary' | 'spellCreation' | 'characterManager' | 'gridArena' | 'idleArena' | 'testing';
+import { ArchetypeManager } from './components/balancing/archetype/ArchetypeManager';
+
+type Tab = 'balancer' | 'archetypes' | 'spellLibrary' | 'spellCreation' | 'characterManager' | 'gridArena' | 'idleArena' | 'testing';
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('balancer');
@@ -31,19 +33,30 @@ function App() {
             <button
               onClick={() => setActiveTab('balancer')}
               className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'balancer'
-                  ? 'border-purple-500 text-white'
-                  : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                ? 'border-purple-500 text-white'
+                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
                 }`}
             >
               ⚖️ Balancer
+            </button>
+
+            {/* ARCHETYPES */}
+            <button
+              onClick={() => setActiveTab('archetypes')}
+              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'archetypes'
+                ? 'border-purple-500 text-white'
+                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                }`}
+            >
+              🎭 Archetypes
             </button>
 
             {/* SPELLS */}
             <button
               onClick={() => setActiveTab('spellLibrary')}
               className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'spellLibrary'
-                  ? 'border-purple-500 text-white'
-                  : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                ? 'border-purple-500 text-white'
+                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
                 }`}
             >
               📚 Spell Library
@@ -51,8 +64,8 @@ function App() {
             <button
               onClick={() => setActiveTab('spellCreation')}
               className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'spellCreation'
-                  ? 'border-purple-500 text-white'
-                  : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                ? 'border-purple-500 text-white'
+                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
                 }`}
             >
               🔮 Spell Creation
@@ -62,8 +75,8 @@ function App() {
             <button
               onClick={() => setActiveTab('characterManager')}
               className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'characterManager'
-                  ? 'border-purple-500 text-white'
-                  : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                ? 'border-purple-500 text-white'
+                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
                 }`}
             >
               👤 Character Manager
@@ -73,8 +86,8 @@ function App() {
             <button
               onClick={() => setActiveTab('gridArena')}
               className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'gridArena'
-                  ? 'border-purple-500 text-white'
-                  : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                ? 'border-purple-500 text-white'
+                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
                 }`}
             >
               ⚔️ Grid Arena
@@ -84,8 +97,8 @@ function App() {
             <button
               onClick={() => setActiveTab('testing')}
               className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'testing'
-                  ? 'border-purple-500 text-white'
-                  : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                ? 'border-purple-500 text-white'
+                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
                 }`}
             >
               🧪 Testing
@@ -93,8 +106,8 @@ function App() {
             <button
               onClick={() => setActiveTab('idleArena')}
               className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'idleArena'
-                  ? 'border-purple-500 text-white'
-                  : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                ? 'border-purple-500 text-white'
+                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
                 }`}
             >
               🤖 Idle Arena
@@ -139,6 +152,11 @@ function App() {
       {activeTab === 'gridArena' && (
         <ErrorBoundary componentName="Grid Arena">
           <GridArena />
+        </ErrorBoundary>
+      )}
+      {activeTab === 'archetypes' && (
+        <ErrorBoundary componentName="Archetype Manager">
+          <ArchetypeManager />
         </ErrorBoundary>
       )}
     </div>

@@ -156,6 +156,15 @@ export const NORMALIZED_WEIGHTS = {
     critChance: 4.0,
     critMult: 10.0,
 
+    // 1 TxC = 2.0 HP
+    txc: 2.0,
+
+    // 1 Armor Pen = 1.5 HP
+    armorPen: 1.5,
+
+    // 1% Pen Percent = 80.0 HP
+    penPercent: 80.0,
+
     // --- DEFENSIVE STATS ---
     // 1 Armor = 5.0 HP (Tuned Week 5 - boosted from 4.5)
     armor: 5.0,
@@ -166,12 +175,18 @@ export const NORMALIZED_WEIGHTS = {
     // 1 Evasion = 4.0
     evasion: 4.0,
 
+    // 1% Block = 80.0 HP
+    block: 80.0,
+
     // --- SUSTAIN STATS ---
     // 1% Lifesteal = 100.0 HP
     lifesteal: 100.0,
 
     // 1 Regen/Turn = 20.0 HP (Reverted to 20.0 - optimal for short fights)
     regen: 20.0, // percentage-based
+
+    // 1 Ward = 1.5 HP
+    ward: 1.5,
 };
 
 export const STAT_WEIGHTS = NORMALIZED_WEIGHTS;

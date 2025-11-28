@@ -1,250 +1,194 @@
 /**
- * Archetype Builder - Generate StatBlock from archetype template
+ * Archetype Builder Service
  * 
- * Converts percentage-based stat allocations into concrete StatBlock values
+ * Converts archetype templates into concrete StatBlocks by:
+ * 1. Taking an allocation (percentages)
+ * 2. Distributing a budget across stats according to allocation
+ * 3. Using stat weights to convert HP_eq into stat values
  */
 
-import type { ArchetypeTemplate, ArchetypeInstance } from './types';
 import type { StatBlock } from '../types';
-import { STAT_WEIGHTS } from '../statWeights';
-import { DEFAULT_STATS } from '../types';
+import type { ArchetypeTemplate, StatAllocation, ArchetypeInstance } from './types';
+import { BalanceConfigManager } from '../BalanceConfigManager';
 
-/**
- * Build a StatBlock from archetype template and budget
- * 
- * Formula: For each stat, value = (allocation% * budget) / weight
- * 
- * Example:
- *   Template: { hp: 70%, damage: 30% }
- *   Budget: 50 points
- *   Weights: { hp: 1.0, damage: 5.0 }
- *   
- *   HP = (0.70 * 50) / 1.0 = 35
- *   Damage = (0.30 * 50) / 5.0 = 3
- */
-export function buildArchetype(
-    template: ArchetypeTemplate,
-    budget: number
-): ArchetypeInstance {
-    // Validate budget
-    if (budget < template.minBudget || budget > template.maxBudget) {
-        throw new Error(
-            `Budget ${budget} outside template bounds [${template.minBudget}, ${template.maxBudget}]`
+export const ArchetypeBuilder = {
+    /**
+     * Build a StatBlock from an archetype template at a given budget
+     */
+    buildArchetype: (template: ArchetypeTemplate, budget: number): StatBlock => {
+        // Validate inputs
+        ArchetypeBuilder.validateTemplate(template);
+        ArchetypeBuilder.validateBudget(budget, template);
+
+        // Calculate stat values using ACTIVE preset weights
+        return ArchetypeBuilder.calculateStatValues(
+            template.allocation,
+            budget,
+            BalanceConfigManager.getWeights()
         );
-    }
+    },
 
-    // Validate allocation
-    const validation = validateAllocation(template.statAllocation);
-    if (!validation.valid) {
-        throw new Error(`Invalid stat allocation: ${validation.errors.join(', ')}`);
-    }
-
-    // Calculate stat values
-    const statBlock = calculateStatValues(template.statAllocation, budget);
-
-    return {
-        templateId: template.id,
-        template,
-        budget,
-        statBlock,
-        createdAt: new Date(),
-    };
-}
-
-/**
- * Validate stat allocation percentages
- * 
- * Rules:
- * - Sum must equal 100% (±0.1% tolerance for floating point)
- * - All values must be >= 0
- * - No allocation > 100%
- */
-export function validateAllocation(
-    allocation: Partial<Record<keyof StatBlock, number>>
-): { valid: boolean; errors: string[] } {
-    const errors: string[] = [];
-
-    // Check for negative values
-    Object.entries(allocation).forEach(([stat, value]) => {
-        if (value < 0) {
-            errors.push(`${stat} has negative allocation: ${value}%`);
-        }
-        if (value > 100) {
-            errors.push(`${stat} allocation exceeds 100%: ${value}%`);
-        }
-    });
-
-    // Check sum
-    const sum = Object.values(allocation).reduce((acc, val) => acc + val, 0);
-    const tolerance = 0.1;
-
-    if (Math.abs(sum - 100) > tolerance) {
-        errors.push(`Allocation sum is ${sum}%, expected 100% (±${tolerance}%)`);
-    }
-
-    return {
-        valid: errors.length === 0,
-        errors,
-    };
-}
-
-/**
- * Calculate concrete stat values from allocation percentages
- * 
- * @param allocation - Percentage allocation per stat
- * @param budget - Total HP-equivalent budget
- * @returns Complete StatBlock with calculated values
- */
-export function calculateStatValues(
-    allocation: Partial<Record<keyof StatBlock, number>>,
-    budget: number
-): StatBlock {
-    // Start with default stats
-    const stats: StatBlock = { ...DEFAULT_STATS };
-
-    // Apply allocations
-    Object.entries(allocation).forEach(([statName, percentage]) => {
-        const stat = statName as keyof StatBlock;
-        const weight = STAT_WEIGHTS[stat];
-
-        if (weight === undefined) {
-            console.warn(`No weight defined for stat: ${stat}, skipping`);
-            return;
+    /**
+     * Validate that an allocation is valid
+     */
+    validateAllocation: (allocation: StatAllocation): boolean => {
+        // Check all values are non-negative
+        const allPositive = Object.values(allocation).every(val => val >= 0);
+        if (!allPositive) {
+            throw new ValidationError('Allocation values must be non-negative');
         }
 
-        // Formula: value = (percentage * budget) / weight
-        const points = (percentage / 100) * budget;
-        const value = points / weight;
-
-        // Round to appropriate precision
-        stats[stat] = roundStat(stat, value);
-    });
-
-    // Derived stats will be recalculated by Balancer
-    // We don't need to manually set htk, hitChance, etc.
-
-    return stats;
-}
-
-/**
- * Round stat to appropriate precision
- * 
- * - Percentages (resistance, critChance, etc.): 1 decimal
- * - Flat values (hp, damage, armor): integer
- * - Multipliers (critMult, failMult): 2 decimals
- */
-function roundStat(stat: keyof StatBlock, value: number): number {
-    // Percentage stats
-    const percentageStats: Array<keyof StatBlock> = [
-        'resistance', 'critChance', 'failChance', 'lifesteal', 'block',
-        'penPercent', 'cooldownReduction', 'castSpeed', 'movementSpeed'
-    ];
-
-    // Multiplier stats
-    const multiplierStats: Array<keyof StatBlock> = [
-        'critMult', 'failMult'
-    ];
-
-    if (percentageStats.includes(stat)) {
-        return Math.round(value * 10) / 10; // 1 decimal
-    } else if (multiplierStats.includes(stat)) {
-        return Math.round(value * 100) / 100; // 2 decimals
-    } else {
-        return Math.round(value); // integer
-    }
-}
-
-/**
- * Optimize allocation by redistributing unallocated percentage
- * 
- * If allocation sum < 100%, distribute remaining % proportionally
- * If locked stats are provided, don't touch those
- */
-export function optimizeAllocation(
-    allocation: Partial<Record<keyof StatBlock, number>>,
-    lockedStats: Array<keyof StatBlock> = []
-): Partial<Record<keyof StatBlock, number>> {
-    const sum = Object.values(allocation).reduce((acc, val) => acc + val, 0);
-
-    if (sum >= 100) {
-        return allocation; // Already at or over 100%
-    }
-
-    const remaining = 100 - sum;
-
-    // Get non-locked stats with allocation
-    const adjustableStats = Object.entries(allocation).filter(
-        ([stat]) => !lockedStats.includes(stat as keyof StatBlock) && allocation[stat as keyof StatBlock]! > 0
-    );
-
-    if (adjustableStats.length === 0) {
-        console.warn('No adjustable stats to optimize');
-        return allocation;
-    }
-
-    // Distribute remaining percentage proportionally
-    const adjustableSum = adjustableStats.reduce((acc, [, val]) => acc + val, 0);
-    const optimized = { ...allocation };
-
-    adjustableStats.forEach(([stat, value]) => {
-        const proportion = value / adjustableSum;
-        const bonus = proportion * remaining;
-        optimized[stat as keyof StatBlock] = value + bonus;
-    });
-
-    return optimized;
-}
-
-/**
- * Compare two archetypes and show stat differences
- */
-export function compareArchetypes(
-    archetypeA: ArchetypeInstance,
-    archetypeB: ArchetypeInstance
-): Record<keyof StatBlock, { a: number; b: number; diff: number; diffPercent: number } | null> {
-    const comparison: any = {};
-
-    const allStats = new Set([
-        ...Object.keys(archetypeA.statBlock),
-        ...Object.keys(archetypeB.statBlock),
-    ]) as Set<keyof StatBlock>;
-
-    allStats.forEach(stat => {
-        const valA = archetypeA.statBlock[stat] as number;
-        const valB = archetypeB.statBlock[stat] as number;
-
-        if (typeof valA === 'number' && typeof valB === 'number') {
-            const diff = valA - valB;
-            const diffPercent = valB !== 0 ? (diff / valB) * 100 : 0;
-
-            comparison[stat] = {
-                a: valA,
-                b: valB,
-                diff,
-                diffPercent,
-            };
-        } else {
-            comparison[stat] = null; // Non-numeric stat (e.g., config flags)
+        // Check sum is exactly 100%
+        const sum = Object.values(allocation).reduce((a, b) => a + b, 0);
+        if (Math.abs(sum - 100) > 0.01) { // Allow tiny floating point errors
+            throw new ValidationError(`Allocation must sum to 100%, got ${sum.toFixed(2)}%`);
         }
-    });
 
-    return comparison;
-}
+        return true;
+    },
 
-/**
- * Calculate "power score" - total HP-equivalent budget used
- */
-export function calculatePowerScore(instance: ArchetypeInstance): number {
-    let total = 0;
-
-    Object.entries(instance.statBlock).forEach(([stat, value]) => {
-        if (typeof value !== 'number') return;
-
-        const weight = STAT_WEIGHTS[stat as keyof StatBlock];
-        if (weight) {
-            total += value * weight;
+    /**
+     * Validate that a template is well-formed
+     */
+    validateTemplate: (template: ArchetypeTemplate): boolean => {
+        if (!template.id || !template.name) {
+            throw new ValidationError('Template must have id and name');
         }
-    });
 
-    return total;
-}
+        if (template.minBudget <= 0) {
+            throw new ValidationError('minBudget must be positive');
+        }
+
+        if (template.maxBudget <= template.minBudget) {
+            throw new ValidationError('maxBudget must be greater than minBudget');
+        }
+
+        ArchetypeBuilder.validateAllocation(template.allocation);
+
+        return true;
+    },
+
+    /**
+     * Validate that budget is within template constraints
+     */
+    validateBudget: (budget: number, template: ArchetypeTemplate): boolean => {
+        if (budget < template.minBudget) {
+            throw new ValidationError(
+                `Budget ${budget} is below template minimum ${template.minBudget}`
+            );
+        }
+
+        if (budget > template.maxBudget) {
+            throw new ValidationError(
+                `Budget ${budget} exceeds template maximum ${template.maxBudget}`
+            );
+        }
+
+        return true;
+    },
+
+    /**
+     * Calculate actual stat values from allocation and budget
+     * 
+     * Algorithm:
+     * 1. For each stat, allocate HP_eq = budget * (allocation% / 100)
+     * 2. Convert HP_eq to stat value using weight: value = HP_eq / weight
+     */
+    calculateStatValues: (
+        allocation: StatAllocation,
+        budget: number,
+        weights: Record<string, number | { avgRatio: number }>
+    ): StatBlock => {
+        const statBlock: Partial<StatBlock> = {};
+
+        // Iterate through allocation
+        (Object.keys(allocation) as (keyof StatAllocation)[]).forEach(statName => {
+            const allocPercent = allocation[statName];
+
+            // Skip if not allocated
+            if (allocPercent === 0) {
+                (statBlock as any)[statName] = 0;
+                return;
+            }
+
+            // Calculate HP equivalency for this stat
+            const hpEq = budget * (allocPercent / 100);
+
+            // Get weight for this stat
+            const entry = weights[statName];
+            const weight = typeof entry === 'number' ? entry : entry?.avgRatio;
+
+            if (!weight) {
+                console.warn(`No weight found for stat: ${statName}, defaulting to 1.0`);
+                (statBlock as any)[statName] = hpEq; // Fallback: 1:1 conversion
+                return;
+            }
+
+            // Convert HP_eq to stat value
+            // Formula: stat_value = HP_eq / weight
+            const statValue = hpEq / weight;
+            (statBlock as any)[statName] = Math.round(statValue * 100) / 100; // Round to 2 decimals
+        });
+
+        return statBlock as StatBlock;
+    },
+
+    /**
+     * Optimize allocation to distribute unallocated budget
+     * 
+     * If allocation sums to < 100%, distribute remainder proportionally
+     * to existing non-zero allocations
+     */
+    optimizeAllocation: (allocation: StatAllocation): StatAllocation => {
+        const sum = Object.values(allocation).reduce((a, b) => a + b, 0);
+
+        // If already at 100%, no optimization needed
+        if (Math.abs(sum - 100) < 0.01) {
+            return { ...allocation };
+        }
+
+        // If over 100%, throw error
+        if (sum > 100) {
+            throw new ValidationError(`Allocation exceeds 100%: ${sum.toFixed(2)}%`);
+        }
+
+        // Calculate unallocated percentage
+        const unallocated = 100 - sum;
+
+        // Find stats with non-zero allocation
+        const nonZeroStats = (Object.keys(allocation) as (keyof StatAllocation)[])
+            .filter(key => allocation[key] > 0);
+
+        if (nonZeroStats.length === 0) {
+            throw new ValidationError('Cannot optimize: all allocations are zero');
+        }
+
+        // Distribute unallocated proportionally
+        const optimized = { ...allocation };
+        const totalAllocated = sum;
+
+        nonZeroStats.forEach(statName => {
+            const proportion = allocation[statName] / totalAllocated;
+            const bonus = unallocated * proportion;
+            optimized[statName] = allocation[statName] + bonus;
+        });
+
+        return optimized;
+    },
+
+    /**
+     * Create an ArchetypeInstance from a template
+     */
+    createInstance: (template: ArchetypeTemplate, budget: number): ArchetypeInstance => {
+        const statBlock = ArchetypeBuilder.buildArchetype(template, budget);
+
+        return {
+            templateId: template.id,
+            budget,
+            statBlock,
+            metadata: {
+                createdAt: new Date()
+            }
+        };
+    }
+};
