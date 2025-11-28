@@ -17,7 +17,8 @@
     "docs:watch": "typedoc --watch",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
-    "tauri:build": "tauri build"
+    "tauri:build": "tauri build",
+    "calibrate": "npx tsx src/balancing/simulation/cli.ts"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.17",

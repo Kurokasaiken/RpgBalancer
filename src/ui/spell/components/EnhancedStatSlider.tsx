@@ -75,8 +75,8 @@ export const EnhancedStatSlider: React.FC<EnhancedStatSliderProps> = ({
 
         {/* CONTENT - NOT Draggable */}
         {!collapsed && (
-          <div className="p-4 h-[230px]">
-            <div className="flex flex-col gap-2 overflow-x-auto overflow-y-hidden custom-scrollbar pb-2 h-full">
+          <div className="p-4 h-[180px]">
+            <div className="flex flex-col gap-2 overflow-x-auto overflow-y-hidden custom-scrollbar">
 
               {/* Row 1: Values */}
               <div className="flex flex-nowrap items-end justify-between px-2 min-w-max gap-4">
@@ -176,10 +176,11 @@ export const EnhancedStatSlider: React.FC<EnhancedStatSliderProps> = ({
                 <div className="w-4" />
               </div>
 
-            </div>
+              {/* Row 4: Description - NOW INSIDE flex container */}
+              <div className="text-xs text-gray-500 italic truncate text-center px-2 pt-1">
+                {description}
+              </div>
 
-            <div className="mt-2 text-xs text-gray-500 italic truncate text-center">
-              {description}
             </div>
           </div>
         )}

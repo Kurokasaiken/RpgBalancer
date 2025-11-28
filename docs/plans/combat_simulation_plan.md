@@ -4,6 +4,17 @@
 **Priority:** High  
 **Type:** Core Testing Infrastructure
 
+> **🚨 CRITICAL: ZERO HARDCODING RULE**
+> 
+> ALL baseline stats, formulas, and configurations MUST be imported from existing modules:
+> - Baseline Stats: `BASELINE_STATS` from `src/balancing/baseline.ts`
+> - Default Stats: `DEFAULT_STATS` from `src/balancing/types.ts`
+> - Combat Formulas: `src/balancing/modules/*`
+> - Stat Weights: `src/balancing/statWeights.ts`
+> 
+> **NEVER define stats manually in examples or code.**
+> This is the **SINGLE SOURCE OF TRUTH** principle.
+
 ---
 
 ## 🎯 Obiettivo

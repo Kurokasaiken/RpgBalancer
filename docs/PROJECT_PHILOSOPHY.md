@@ -225,7 +225,64 @@ src/
    - Don't: Pass props through 5+ levels
    - Do: Use Context or custom hooks
 
-## Future Vision
+## 🚨 CRITICAL: Single Source of Truth - ZERO Hardcoding
+
+### The Inheritance Rule
+
+**EVERY component, function, and module MUST inherit from existing sources:**
+
+```typescript
+// ✅ CORRECT: Import from single source
+import { BASELINE_STATS } from './balancing/baseline';
+import { DEFAULT_STATS } from './balancing/types';
+import { getStatWeight } from './balancing/statWeights';
+import { MitigationModule } from './balancing/modules/mitigation';
+
+const entity = { ...BASELINE_STATS };
+const weight = getStatWeight('damage');
+const damage = MitigationModule.calculateEffectiveDamage(...);
+```
+
+```typescript
+// ❌ WRONG: Hardcoded values
+const entity = {
+  hp: 100,          // VIOLAZIONE!
+  attack: 20,       // VIOLAZIONE!
+  defense: 10       // VIOLAZIONE!
+};
+
+const weight = 5.0; // VIOLAZIONE - use getStatWeight()!
+```
+
+### Why This is Non-Negotiable
+
+1. **Maintainability:** Change formula once, updates everywhere
+2. **Testing:** Simulations use same values as production
+3. **Consistency:** No drift between modules
+4. **Debugging:** Single point of failure, easy to fix
+5. **Evolution:** Game balance can evolve without code changes
+
+### Enforcement Checklist
+
+Before committing code, verify:
+- [ ] No hardcoded stat values (hp, damage, etc.)
+- [ ] No hardcoded weights or ratios
+- [ ] No duplicated formulas (use modules)
+- [ ] All imports from `/balancing/*`
+- [ ] TypeScript types match `StatBlock` interface
+
+### Where to Import From
+
+| Need | Import From | Example |
+|------|-------------|---------|
+| Balanced baseline | `baseline.ts` | `BASELINE_STATS` |
+| Default UI values | `types.ts` | `DEFAULT_STATS` |
+| Stat weights | `statWeights.ts` | `getStatWeight('damage')` |
+| Damage calculations | `modules/mitigation.ts` | `MitigationModule.calculateEffectiveDamage()` |
+| Hit chance | `modules/hitchance.ts` | `HitChanceModule.calculateHitChance()` |
+| Critical hits | `modules/critical.ts` | `CriticalModule.calculateCriticalDamage()` |
+
+---
 
 ### Short Term (Next 3 Months)
 - Item Creator using weight-based pattern

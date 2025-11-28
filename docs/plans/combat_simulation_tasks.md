@@ -24,14 +24,14 @@
 - [x] Add optional turn-by-turn logging <!-- id: 12 -->
 - [x] Return complete CombatResult <!-- id: 13 -->
 
-### 1.3 CombatSimulator Testing
-- [ ] Create `__tests__/CombatSimulator.test.ts` <!-- id: 14 -->
-- [ ] Test: known damage → verify HP loss <!-- id: 15 -->
-- [ ] Test: turn limit edge case <!-- id: 16 -->
-- [ ] Test: draw conditions <!-- id: 17 -->
-- [ ] Test: overkill calculation <!-- id: 18 -->
-- [ ] Test: winner determination <!-- id: 19 -->
-- [ ] Achieve >90% code coverage <!-- id: 20 -->
+### 1.3 Combat Simulator Testing
+- [x] Create `__tests__/CombatSimulator.test.ts` <!-- id: 14 -->
+- [x] Test: known damage → verify HP loss <!-- id: 15 -->
+- [x] Test: turn limit edge case <!-- id: 16 -->
+- [x] Test: draw conditions <!-- id: 17 -->
+- [x] Test: overkill calculation <!-- id: 18 -->
+- [x] Test: winner determination <!-- id: 19 -->
+- [x] Achieve >90% code coverage <!-- id: 20 -->
 
 ### 1.4 MonteCarloSimulation Implementation
 - [x] Create `MonteCarloSimulation.ts` skeleton <!-- id: 21 -->
@@ -48,23 +48,23 @@
 - [ ] Optimize for performance (<5s for 10k sims) <!-- id: 32 -->
 
 ### 1.5 MonteCarloSimulation Testing
-- [ ] Create `__tests__/MonteCarloSimulation.test.ts` <!-- id: 33 -->
-- [ ] Test: 100 sims trend matches 10k sims (within CI) <!-- id: 34 -->
-- [ ] Test: known balanced matchup → ~50% win rate <!-- id: 35 -->
-- [ ] Test: extreme mismatch → expected win rate <!-- id: 36 -->
-- [ ] Test: confidence interval calculations <!-- id: 37 -->
-- [ ] Measure performance (10k sims timing) <!-- id: 38 -->
+- [x] Create `__tests__/MonteCarloSimulation.test.ts` <!-- id: 33 -->
+- [x] Test: 100 sims trend matches 10k sims (within CI) <!-- id: 34 -->
+- [x] Test: known balanced matchup → ~50% win rate <!-- id: 35 -->
+- [x] Test: extreme mismatch → expected win rate <!-- id: 36 -->
+- [x] Test: confidence interval calculations <!-- id: 37 -->
+- [x] Measure performance (10k sims timing) <!-- id: 38 -->
 
 ---
 
 ## Phase 2: Analysis Tools (PLANNED)
 
 ### 2.1 StatValueAnalyzer Implementation
-- [ ] Create `StatValueAnalyzer.ts` skeleton <!-- id: 39 -->
-- [ ] Implement baseline simulation runner <!-- id: 40 -->
-- [ ] Implement single-stat variation testing <!-- id: 41 -->
-- [ ] Calculate HP equivalency per stat <!-- id: 42 -->
-- [ ] Calculate confidence for HP values <!-- id: 43 -->
+- [x] Create `StatValueAnalyzer.ts` skeleton <!-- id: 39 -->
+- [x] Implement baseline simulation runner <!-- id: 40 -->
+- [x] Implement single-stat variation testing <!-- id: 41 -->
+- [x] Calculate HP equivalency per stat <!-- id: 42 -->
+- [x] Calculate confidence for HP values <!-- id: 43 -->
 - [ ] Generate balance recommendations <!-- id: 44 -->
 - [ ] Create comparison report generator <!-- id: 45 -->
 
@@ -84,14 +84,14 @@
 ## Phase 3: CLI Interface (PLANNED)
 
 ### 3.1 Command Line Runner
-- [ ] Create `src/balancing/simulation/cli.ts` <!-- id: 53 -->
-- [ ] Add argument parsing (entity configs, iterations) <!-- id: 54 -->
-- [ ] Add progress display (console output) <!-- id: 55 -->
-- [ ] Add results summary display <!-- id: 56 -->
+- [x] Create `src/balancing/simulation/cli.ts` <!-- id: 53 -->
+- [x] Add argument parsing (entity configs, iterations) <!-- id: 54 -->
+- [x] Add progress display (console output) <!-- id: 55 -->
+- [x] Add results summary display <!-- id: 56 -->
 - [ ] Add export to file option <!-- id: 57 -->
 
 ### 3.2 Integration
-- [ ] Add npm script `npm run simulate` <!-- id: 58 -->
+- [x] Add npm script `npm run simulate` (renamed to `calibrate`) <!-- id: 58 -->
 - [ ] Document CLI usage in README <!-- id: 59 -->
 
 ---
