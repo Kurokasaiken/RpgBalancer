@@ -16,6 +16,7 @@ import {
 import { upsertSpell } from '../../balancing/spellStorage';
 import { useDefaultStorage } from '../../shared/hooks/useDefaultStorage';
 import { ALL_SPELL_STATS } from '../../balancing/spellStatDefinitions';
+import { HitChanceModule } from '../../balancing/modules/hitchance';
 
 export const SpellCreation: React.FC = () => {
     // Use custom hooks for state management
@@ -321,6 +322,68 @@ export const SpellCreation: React.FC = () => {
                     onDragStart={handleDragStart}
                     onDragOver={handleDragOver}
                     onDrop={handleDrop}
+                    renderDerivedStats={(field, currentValue, onUpdate) => {
+                        if (field === 'txc') {
+                            const evasion = 0; // Assume 0 for now as baseline
+                            const htk = 4; // Standard HTK baseline
+
+                            const efficiency = HitChanceModule.calculateEfficiency(currentValue, evasion);
+                            const consistency = HitChanceModule.calculateConsistency(currentValue, htk, evasion);
+
+                            return (
+                                <div className="grid grid-cols-2 gap-2 mt-1">
+                                    {/* Efficiency Input */}
+                                    <div className="flex flex-col">
+                                        <label className="text-[10px] text-cyan-300/70 uppercase tracking-wider mb-0.5">
+                                            Efficiency
+                                        </label>
+                                        <div className="relative group">
+                                            <input
+                                                type="number"
+                                                value={Math.round(efficiency)}
+                                                onChange={(e) => {
+                                                    const newEff = Number(e.target.value);
+                                                    const newTxc = HitChanceModule.calculateTxcFromEfficiency(newEff, evasion);
+                                                    onUpdate(newTxc);
+                                                }}
+                                                className="w-full bg-cyan-950/30 border border-cyan-500/20 rounded px-2 py-1 text-xs text-cyan-100 focus:border-cyan-400 outline-none text-center font-mono"
+                                            />
+                                            <span className="absolute right-1 top-1/2 -translate-y-1/2 text-[10px] text-cyan-500/50 pointer-events-none">%</span>
+                                            {/* Tooltip */}
+                                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-black/90 border border-cyan-500/30 rounded text-[10px] text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                                                Percentage of raw damage potential actually realized over time.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Consistency Input */}
+                                    <div className="flex flex-col">
+                                        <label className="text-[10px] text-purple-300/70 uppercase tracking-wider mb-0.5">
+                                            Consistency
+                                        </label>
+                                        <div className="relative group">
+                                            <input
+                                                type="number"
+                                                value={Math.round(consistency)}
+                                                onChange={(e) => {
+                                                    const newConst = Number(e.target.value);
+                                                    const newTxc = HitChanceModule.calculateTxcFromConsistency(newConst, htk, evasion);
+                                                    onUpdate(newTxc);
+                                                }}
+                                                className="w-full bg-purple-950/30 border border-purple-500/20 rounded px-2 py-1 text-xs text-purple-100 focus:border-purple-400 outline-none text-center font-mono"
+                                            />
+                                            <span className="absolute right-1 top-1/2 -translate-y-1/2 text-[10px] text-purple-500/50 pointer-events-none">%</span>
+                                            {/* Tooltip */}
+                                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-black/90 border border-purple-500/30 rounded text-[10px] text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                                                Probability of eliminating the target in the minimum theoretical turns (4 hits) without missing.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        }
+                        return null;
+                    }}
                 />
 
                 {/* Visual separator */}

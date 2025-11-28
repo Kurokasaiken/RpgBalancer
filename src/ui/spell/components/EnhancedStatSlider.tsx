@@ -17,6 +17,7 @@ interface EnhancedStatSliderProps {
   onDragStart?: (e: React.DragEvent, field: string) => void;
   onDragOver?: (e: React.DragEvent) => void;
   onDrop?: (e: React.DragEvent, field: string) => void;
+  renderDerivedStats?: (currentValue: number) => React.ReactNode;
 }
 
 export const EnhancedStatSlider: React.FC<EnhancedStatSliderProps> = ({
@@ -34,7 +35,8 @@ export const EnhancedStatSlider: React.FC<EnhancedStatSliderProps> = ({
   draggable = false,
   onDragStart,
   onDragOver,
-  onDrop
+  onDrop,
+  renderDerivedStats
 }) => {
   return (
     <div className="mb-2 transition-all duration-300">
@@ -75,8 +77,8 @@ export const EnhancedStatSlider: React.FC<EnhancedStatSliderProps> = ({
 
         {/* CONTENT - NOT Draggable */}
         {!collapsed && (
-          <div className="p-4 h-[180px]">
-            <div className="flex flex-col gap-2 overflow-x-auto overflow-y-hidden custom-scrollbar">
+          <div className="p-4 h-[180px] flex flex-col justify-between">
+            <div className="flex flex-col gap-2 overflow-x-auto overflow-y-hidden custom-scrollbar flex-grow">
 
               {/* Row 1: Values */}
               <div className="flex flex-nowrap items-end justify-between px-2 min-w-max gap-4">
@@ -176,11 +178,18 @@ export const EnhancedStatSlider: React.FC<EnhancedStatSliderProps> = ({
                 <div className="w-4" />
               </div>
 
-              {/* Row 4: Description - NOW INSIDE flex container */}
-              <div className="text-xs text-gray-500 italic truncate text-center px-2 pt-1">
-                {description}
-              </div>
+              {/* Row 3.5: Derived Stats (Optional) */}
+              {renderDerivedStats && (
+                <div className="px-2 mb-2">
+                  {renderDerivedStats(ticks[selectedTick].value)}
+                </div>
+              )}
 
+            </div>
+
+            {/* Row 4: Description - MOVED OUTSIDE scroll container */}
+            <div className="text-xs text-gray-500 italic truncate text-center px-2 pt-2 border-t border-white/5 mt-1">
+              {description}
             </div>
           </div>
         )}

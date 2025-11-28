@@ -16,6 +16,7 @@ interface StatsGridProps {
   onDragStart: (e: React.DragEvent, field: string) => void;
   onDragOver: (e: React.DragEvent) => void;
   onDrop: (e: React.DragEvent, field: string) => void;
+  renderDerivedStats?: (field: string, currentValue: number, onUpdate: (newValue: number) => void) => React.ReactNode;
 }
 
 export const StatsGrid: React.FC<StatsGridProps> = ({
@@ -32,7 +33,8 @@ export const StatsGrid: React.FC<StatsGridProps> = ({
   onSelectTick,
   onDragStart,
   onDragOver,
-  onDrop
+  onDrop,
+  renderDerivedStats
 }) => {
   return (
     <div className="flex flex-wrap gap-4 mb-4">
@@ -54,6 +56,16 @@ export const StatsGrid: React.FC<StatsGridProps> = ({
           onDragStart={(e) => onDragStart(e, field)}
           onDragOver={onDragOver}
           onDrop={(e) => onDrop(e, field)}
+          renderDerivedStats={renderDerivedStats ? (val) => renderDerivedStats(field, val, (newVal) => {
+            // Find current tick index
+            const currentIdx = selectedTicks[field] || 0;
+            // Create updated step
+            const currentSteps = getStatSteps(field);
+            const currentStep = currentSteps[currentIdx];
+            const updatedStep = { ...currentStep, value: newVal };
+            // Update
+            updateStatStep(field, currentIdx, updatedStep);
+          }) : undefined}
         />
       ))}
     </div>
