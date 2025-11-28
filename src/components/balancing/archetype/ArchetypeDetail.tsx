@@ -14,6 +14,7 @@ import { NORMALIZED_WEIGHTS } from '../../../balancing/statWeights';
 import { GlassCard } from '../../../ui/atoms/GlassCard';
 import { GlassButton } from '../../../ui/atoms/GlassButton';
 import { StatAllocationPie } from './StatAllocationPie';
+import { ArchetypeBalanceCard } from './ArchetypeBalanceCard';
 
 interface ArchetypeDetailProps {
     archetype: ArchetypeTemplate;
@@ -107,37 +108,41 @@ export const ArchetypeDetail: React.FC<ArchetypeDetailProps> = ({
                     </GlassCard>
 
                     {/* Right: Stats by Budget */}
-                    <GlassCard>
-                        <h2 className="text-xl font-bold text-cyan-100 mb-4">Stats at Different Budgets</h2>
+                    <div className="flex flex-col gap-6">
+                        <ArchetypeBalanceCard archetype={archetype} budget={50} />
 
-                        <div className="space-y-4">
-                            {statsByBudget.map(({ budget, stats }) => (
-                                <div key={budget} className="border-b border-white/10 pb-4 last:border-0">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <h3 className="text-sm font-bold text-gray-300">@ {budget} HP Budget</h3>
-                                        <span className="text-xs text-gray-500">Power: {
-                                            Object.values(stats).reduce((sum: number, val) =>
-                                                sum + (typeof val === 'number' ? val : 0), 0
-                                            ).toFixed(0)
-                                        }</span>
+                        <GlassCard>
+                            <h2 className="text-xl font-bold text-cyan-100 mb-4">Stats at Different Budgets</h2>
+
+                            <div className="space-y-4">
+                                {statsByBudget.map(({ budget, stats }) => (
+                                    <div key={budget} className="border-b border-white/10 pb-4 last:border-0">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <h3 className="text-sm font-bold text-gray-300">@ {budget} HP Budget</h3>
+                                            <span className="text-xs text-gray-500">Power: {
+                                                Object.values(stats).reduce((sum: number, val) =>
+                                                    sum + (typeof val === 'number' ? val : 0), 0
+                                                ).toFixed(0)
+                                            }</span>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                                            {Object.entries(stats)
+                                                .filter(([, val]) => typeof val === 'number' && val > 0)
+                                                .slice(0, 6)
+                                                .map(([stat, value]) => (
+                                                    <div key={stat} className="flex justify-between text-xs">
+                                                        <span className="text-gray-400 capitalize">{stat}</span>
+                                                        <span className="font-mono text-cyan-300">
+                                                            {typeof value === 'number' ? value.toFixed(1) : value}
+                                                        </span>
+                                                    </div>
+                                                ))}
+                                        </div>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-                                        {Object.entries(stats)
-                                            .filter(([, val]) => typeof val === 'number' && val > 0)
-                                            .slice(0, 6)
-                                            .map(([stat, value]) => (
-                                                <div key={stat} className="flex justify-between text-xs">
-                                                    <span className="text-gray-400 capitalize">{stat}</span>
-                                                    <span className="font-mono text-cyan-300">
-                                                        {typeof value === 'number' ? value.toFixed(1) : value}
-                                                    </span>
-                                                </div>
-                                            ))}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </GlassCard>
+                                ))}
+                            </div>
+                        </GlassCard>
+                    </div>
                 </div>
 
                 {/* Metadata */}

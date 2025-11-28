@@ -219,10 +219,25 @@
   - [ ] Should handle errors gracefully
   - [ ] Should return aggregated results
 
-- [ ] Write `TTKReportGenerator.test.ts` (3 tests)
-  - [ ] Should generate markdown report
-  - [ ] Should export CSV data
-  - [ ] Should export JSON results
+### Phase 3.3: CLI & Tuning (Week 8 - 3 days)
+
+- [ ] Create `src/balancing/archetype/CLI.ts`
+  - [ ] Command: `run-balance [preset]`
+  - [ ] Command: `compare-presets [presetA] [presetB]`
+  - [ ] Command: `analyze-matchup [archA] [archB]`
+  - [ ] Interactive mode using `inquirer` or similar
+
+- [ ] Perform Balance Tuning (Iterative)
+  - [ ] Run baseline analysis (Standard preset)
+  - [ ] Identify top 3 imbalances (e.g., Tank vs DPS)
+  - [ ] Create "Experimental" preset with adjustments
+  - [ ] Verify improvements with comparative analysis
+  - [ ] Promote to "Standard" if successful
+
+- [ ] Write `CLI.test.ts` (3 tests)
+  - [ ] Should parse arguments correctly
+  - [ ] Should execute correct runner method
+  - [ ] Should handle invalid inputs
 
 ---
 

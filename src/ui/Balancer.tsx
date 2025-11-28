@@ -5,6 +5,7 @@ import { BalancingSolver } from '../balancing/solver';
 import { calculateStatBlockCost } from '../balancing/costs';
 import { CriticalCard } from './CriticalCard';
 import { MitigationCard } from './MitigationCard';
+import { CombatMetricsCard } from './CombatMetricsCard';
 import { SmartInput } from './components/SmartInput';
 import { CardWrapper } from './components/CardWrapper';
 import { PARAM_DEFINITIONS } from '../balancing/registry';
@@ -15,15 +16,19 @@ const STORAGE_KEY = 'balancer_state';
 export const Balancer: React.FC = () => {
     const [stats, setStats] = useState<StatBlock>(() => {
         const saved = localStorage.getItem(STORAGE_KEY);
+        let initialStats = DEFAULT_STATS;
+
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
-                return { ...DEFAULT_STATS, ...parsed };
+                initialStats = { ...DEFAULT_STATS, ...parsed };
             } catch {
-                return DEFAULT_STATS;
+                // Fallback to default
             }
         }
-        return DEFAULT_STATS;
+
+        // Ensure all derived metrics are calculated and consistent
+        return BalancingSolver.recalculate(initialStats);
     });
     const [lockedParam, setLockedParam] = useState<LockedParameter>('none');
 
@@ -60,7 +65,7 @@ export const Balancer: React.FC = () => {
     };
 
     const handleResetAll = () => {
-        setStats(DEFAULT_STATS);
+        setStats(BalancingSolver.recalculate(DEFAULT_STATS));
         setLockedParam('none');
     };
 
@@ -103,27 +108,7 @@ export const Balancer: React.FC = () => {
                 {/* Visual separator */}
                 <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-8" />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                    {/* Critical Module */}
-                    <CriticalCard
-                        stats={stats}
-                        onParamChange={handleParamChange}
-                        lockedParam={lockedParam}
-                        onLockToggle={handleLockToggle}
-                        onResetParam={handleResetParam}
-                        onResetCard={() => handleResetCard(['critChance', 'critMult', 'critTxCBonus', 'failChance', 'failMult', 'failTxCMalus'])}
-                    />
 
-                    {/* Mitigation Module */}
-                    <MitigationCard
-                        stats={stats}
-                        onParamChange={handleParamChange}
-                        lockedParam={lockedParam}
-                        onLockToggle={handleLockToggle}
-                        onResetParam={handleResetParam}
-                        onResetCard={() => handleResetCard(['armor', 'resistance', 'armorPen', 'penPercent'])}
-                    />
-                </div>
 
                 {/* Visual separator */}
                 <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-8" />
@@ -153,13 +138,14 @@ export const Balancer: React.FC = () => {
                                 onReset={() => handleResetParam('htk')}
                                 lockedParam={lockedParam} onLockToggle={handleLockToggle}
                                 min={1} max={20} step={0.1}
+                                bgColor="bg-orange-500/10"
                             />
                         </div>
                     </CardWrapper>
 
-                    {/* HIT CHANCE CARD */}
+                    {/* HIT CHANCE CARD (TxC) */}
                     <CardWrapper
-                        title="Hit Chance"
+                        title="TxC (Hit Chance)"
                         color="text-purple-400"
                         onReset={() => handleResetCard(['txc', 'evasion', 'hitChance', 'attacksPerKo'])}
                     >
@@ -183,6 +169,7 @@ export const Balancer: React.FC = () => {
                                 onReset={() => handleResetParam('hitChance')}
                                 lockedParam={lockedParam} onLockToggle={handleLockToggle}
                                 min={0} max={100} step={1} isPercentage={true}
+                                bgColor="bg-orange-500/10"
                             />
 
                             <SmartInput
@@ -190,9 +177,24 @@ export const Balancer: React.FC = () => {
                                 onReset={() => handleResetParam('attacksPerKo')}
                                 lockedParam={lockedParam} onLockToggle={handleLockToggle}
                                 min={1} max={50} step={0.1}
+                                bgColor="bg-orange-500/10"
                             />
                         </div>
                     </CardWrapper>
+
+                    {/* MITIGATION CARD */}
+                    <MitigationCard
+                        stats={stats}
+                        lockedParam={lockedParam}
+                        onParamChange={handleParamChange}
+                        onLockToggle={handleLockToggle}
+                        onResetParam={handleResetParam}
+                        onResetCard={() => handleResetCard(['armor', 'armorPen', 'penPercent', 'ward'])}
+                    // Note: MitigationCard internal labels might need update, or we pass a prop if supported.
+                    // Assuming MitigationCard uses default labels from PARAM_DEFINITIONS or similar.
+                    // If I can't change it here, I might need to edit MitigationCard.tsx.
+                    // Let's check MitigationCard.tsx content first? No, I'll just leave it for now and check if I can override.
+                    />
 
                     {/* CRITICAL CARD */}
                     <CriticalCard
@@ -204,17 +206,36 @@ export const Balancer: React.FC = () => {
                         onResetCard={() => handleResetCard(['critChance', 'critMult', 'critTxCBonus', 'failChance', 'failMult', 'failTxCMalus'])}
                     />
 
-                    {/* MITIGATION CARD */}
-                    <MitigationCard
+                    {/* SUSTAIN CARD */}
+                    <CardWrapper
+                        title="Sustain"
+                        color="text-green-400"
+                        onReset={() => handleResetCard(['lifesteal', 'regen'])}
+                    >
+                        <div className="space-y-2">
+                            <SmartInput
+                                paramId="lifesteal" value={stats.lifesteal} onChange={(v) => handleParamChange('lifesteal', v)}
+                                onReset={() => handleResetParam('lifesteal')}
+                                lockedParam={lockedParam} onLockToggle={handleLockToggle}
+                                min={0} max={100} isPercentage={true}
+                            />
+                            <SmartInput
+                                paramId="regen" value={stats.regen} onChange={(v) => handleParamChange('regen', v)}
+                                onReset={() => handleResetParam('regen')}
+                                lockedParam={lockedParam} onLockToggle={handleLockToggle}
+                                min={0} max={100}
+                            />
+                        </div>
+                    </CardWrapper>
+
+                    {/* COMBAT METRICS CARD */}
+                    <CombatMetricsCard
                         stats={stats}
                         lockedParam={lockedParam}
                         onParamChange={handleParamChange}
                         onLockToggle={handleLockToggle}
                         onResetParam={handleResetParam}
-                        onResetCard={() => handleResetCard(['armor', 'resistance', 'armorPen', 'penPercent'])}
                     />
-
-                    {/* SPELL MODIFIERS CARD */}
                 </div>
 
                 {/* Visual separator */}
@@ -229,3 +250,5 @@ export const Balancer: React.FC = () => {
         </div>
     );
 };
+
+

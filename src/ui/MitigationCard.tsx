@@ -36,22 +36,23 @@ export const MitigationCard: React.FC<MitigationCardProps> = ({ stats, lockedPar
                 <div className="grid grid-cols-2 gap-1.5">
                     {/* DIFESA */}
                     <div className="space-y-1.5 border-r border-gray-700 pr-1.5">
-                        <h4 className="text-xs font-semibold text-blue-400">Def</h4>
                         <SmartInput
+                            label="Armor (Flat)"
+                            paramId="ward"
+                            value={stats.ward}
+                            onChange={(v) => onParamChange('ward', v)}
+                            onReset={() => onResetParam('ward')}
+                            lockedParam={lockedParam} onLockToggle={onLockToggle}
+                            min={0} max={500}
+                        />
+                        <SmartInput
+                            label="Armor (%)"
                             paramId="armor"
                             value={stats.armor}
                             onChange={(v) => onParamChange('armor', v)}
                             onReset={() => onResetParam('armor')}
                             lockedParam={lockedParam} onLockToggle={onLockToggle}
                             min={0} max={100}
-                        />
-                        <SmartInput
-                            paramId="resistance"
-                            value={stats.resistance}
-                            onChange={(v) => onParamChange('resistance', v)}
-                            onReset={() => onResetParam('resistance')}
-                            lockedParam={lockedParam} onLockToggle={onLockToggle}
-                            min={0} max={100} isPercentage
                         />
                     </div>
 
@@ -89,6 +90,7 @@ export const MitigationCard: React.FC<MitigationCardProps> = ({ stats, lockedPar
                     min={1}
                     max={200}
                     step={0.1}
+                    bgColor="bg-orange-500/10"
                 />
             </div>
         </CardWrapper>

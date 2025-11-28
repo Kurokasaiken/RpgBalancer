@@ -121,17 +121,24 @@ export const PARAM_DEFINITIONS: Record<string, ParameterDefinition> = {
     // MITIGATION
     armor: {
         id: 'armor',
-        name: "Armatura (Flat)",
-        description: "Riduzione fissa del danno subito.",
+        name: "Armatura (%)",
+        description: "Riduzione percentuale del danno (Formula: Armor / (Armor + 50)).",
         defaultValue: 0,
-        formulas: ["Danno Effettivo", "AttacchiPerKO"]
+        formulas: ["Danno Effettivo", "EDPT"]
+    },
+    ward: {
+        id: 'ward',
+        name: "Armatura (Flat)",
+        description: "Riduzione fissa del danno subito (applicata dopo la % mitigation).",
+        defaultValue: 0,
+        formulas: ["Danno Effettivo", "EDPT"]
     },
     resistance: {
         id: 'resistance',
         name: "Resistenza (%)",
-        description: "Riduzione percentuale del danno subito.",
+        description: "Riduzione percentuale del danno (Legacy/Secondaria).",
         defaultValue: 0,
-        formulas: ["Danno Effettivo", "AttacchiPerKO"]
+        formulas: ["Danno Effettivo"]
     },
     armorPen: {
         id: 'armorPen',
@@ -153,6 +160,45 @@ export const PARAM_DEFINITIONS: Record<string, ParameterDefinition> = {
         description: "Il danno finale dopo aver applicato mitigazione (armatura e resistenza).",
         defaultValue: 25,
         formulas: ["AttacchiPerKO"]
+    },
+
+    // SUSTAIN
+    lifesteal: {
+        id: 'lifesteal',
+        name: "Rubavita (%)",
+        description: "Percentuale del danno inflitto recuperata come HP.",
+        defaultValue: 0,
+        formulas: ["Sustain", "TTK"]
+    },
+    regen: {
+        id: 'regen',
+        name: "Rigenerazione",
+        description: "HP recuperati per turno.",
+        defaultValue: 0,
+        formulas: ["Sustain", "TTK"]
+    },
+
+    // COMBAT METRICS (Self vs Self)
+    ttk: {
+        id: 'ttk',
+        name: "Time To Kill (TTK)",
+        description: "Turni medi necessari per sconfiggere l'avversario (HP / EDPT).",
+        defaultValue: 0,
+        formulas: ["HP / EDPT"]
+    },
+    edpt: {
+        id: 'edpt',
+        name: "Effective Dmg/Turn",
+        description: "Danno medio inflitto per turno, considerando Hit%, Crit%, Mitigation e Sustain avversario.",
+        defaultValue: 0,
+        formulas: ["Danno * Hit% * Crit% * (1-Mit%)"]
+    },
+    earlyImpact: {
+        id: 'earlyImpact',
+        name: "Early Impact",
+        description: "Danno totale inflitto nei primi 3 turni (Burst).",
+        defaultValue: 0,
+        formulas: ["EDPT * 3"]
     },
 
     // TIMING/SPEED (NOT YET BALANCED)

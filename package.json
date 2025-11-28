@@ -18,7 +18,8 @@
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
-    "calibrate": "npx tsx src/balancing/simulation/cli.ts"
+    "calibrate": "npx tsx src/balancing/simulation/cli.ts",
+    "balance": "npx tsx src/balancing/archetype/CLI.ts"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.17",

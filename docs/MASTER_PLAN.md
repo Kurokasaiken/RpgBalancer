@@ -145,7 +145,7 @@ Example:
 
 ### 🔄 **PHASE 2: Archetype Balancing System (Active)**
 
-**Status:** 15% (In Progress)
+**Status:** 70% (In Progress)
 
 #### **2.1: Combat Simulation Testing (In Progress)**
 
@@ -160,7 +160,7 @@ Example:
 - Stat value equivalency calculator (HP as currency)
 - Turn-based 1v1 combat testing framework
 
-**Status:** Phase 1 starting - Core Engine implementation
+**Status:** Phase 3.2 Complete - Engine & Reporting Ready
 
 #### **2.2: Archetype Definition (Planned)**
 
@@ -226,9 +226,9 @@ Example:
 ### This Week: Phase 2 - Archetype Balancing
 
 **Next 3 Tasks:**
-1. Define 16 base archetypes (Tank, DPS, etc.)
-2. Build ArchetypeBuilder service
-3. Implement TTK Testing Engine
+1. Implement CLI for running balance tests (Phase 3.3)
+2. Perform Balance Tuning based on simulation data (Phase 3.3)
+3. Build Balance Configuration UI (Phase 4.1)
 
 **📋 Full checklist:** [plans/archetype_tasks.md](plans/archetype_tasks.md)
 

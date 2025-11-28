@@ -3,6 +3,8 @@ import { CoreModule } from './modules/core';
 import { HitChanceModule } from './modules/hitchance';
 import { CriticalModule } from './modules/critical';
 import { MitigationModule } from './modules/mitigation';
+import { CombatMetrics } from './metrics/CombatMetrics';
+
 
 export class BalancingSolver {
     static solve(
@@ -21,52 +23,28 @@ export class BalancingSolver {
         }
 
         // 2. REVERSE SOLVER (Handle changes to derived stats)
-        // If we change a derived value (HTK, HitChance), we must adjust base values (HP, Dmg, TxC, Ev)
-        // BEFORE we do any other locking logic or recalculation.
-
         if (changedParam === 'htk') {
-            // HTK changed -> Adjust Damage or HP
             if (lockedParam === 'hp') {
-                // HP locked -> Adjust Damage
                 result.damage = CoreModule.calculateDamageForHTK(result.hp, newValue);
             } else if (lockedParam === 'damage') {
-                // Damage locked -> Adjust HP
                 result.hp = CoreModule.calculateHpForHTK(result.damage, newValue);
             } else {
-                // No relevant lock -> Default to adjusting Damage (keeping HP as anchor is standard)
                 result.damage = CoreModule.calculateDamageForHTK(result.hp, newValue);
             }
         }
         else if (changedParam === 'hitChance') {
-            // HitChance changed -> Adjust Evasion or TxC
-            // HitChance = 50 + TxC - Evasion
-            // If TxC locked -> Adjust Evasion
-            // Evasion = 50 + TxC - NewHitChance
             if (lockedParam === 'txc') {
                 result.evasion = 50 + result.txc - newValue;
             } else {
-                // Default: Adjust TxC
-                // TxC = NewHitChance - 50 + Evasion
                 result.txc = newValue - 50 + result.evasion;
             }
         }
         else if (changedParam === 'attacksPerKo') {
-            // AttacksPerKO changed -> Need to adjust underlying stats
-            // APK = HTK / (HitChance / 100)
-            // This is complex because it depends on HTK (hp/dmg) and HitChance (txc-ev)
-            // Simplest approach: Adjust HitChance (which adjusts TxC or Ev)
-            // newAPK = HTK / (newHitChance / 100)
-            // newHitChance = (HTK / newAPK) * 100
-
             if (newValue > 0) {
-                // Calculate current HTK from hp and damage
                 const currentHTK = CoreModule.calculateHTK(result.hp, result.damage);
                 const targetHitChance = (currentHTK / newValue) * 100;
-
-                // Clamp to reasonable range
                 const clampedHitChance = Math.max(0, Math.min(100, targetHitChance));
 
-                // Adjust TxC or Evasion to achieve this HitChance
                 if (lockedParam === 'txc') {
                     result.evasion = 50 + result.txc - clampedHitChance;
                 } else {
@@ -74,42 +52,49 @@ export class BalancingSolver {
                 }
             }
         }
-
         else if (changedParam === 'effectiveDamage') {
-            // EffectiveDamage changed -> Adjust base Damage
-            // This is complex because it depends on mitigation stats
-
             const effArmor = Math.max(0, result.armor - result.armorPen);
             const effResPercent = result.resistance * (1 - (result.penPercent / 100));
             const effResFactor = Math.max(0, Math.min(1, effResPercent / 100));
 
-            // Solve for rawDamage given targetEffectiveDamage
             if (result.configFlatFirst) {
-                // Formula: effectiveDmg = max(1, max(0, rawDmg - effArmor) * (1 - effResFactor))
-                // Reverse: rawDmg = (effectiveDmg / (1 - effResFactor)) + effArmor
-                const resistDivisor = Math.max(0.001, 1 - effResFactor); // Protect from division by zero
+                const resistDivisor = Math.max(0.001, 1 - effResFactor);
                 const beforeResist = newValue / resistDivisor;
                 result.damage = beforeResist + effArmor;
             } else {
-                // Formula: effectiveDmg = max(1, max(0, rawDmg * (1 - effResFactor) - effArmor))
-                // Reverse: rawDmg = (effectiveDmg + effArmor) / (1 - effResFactor)
                 const beforeArmor = newValue + effArmor;
                 const resistDivisor = Math.max(0.001, 1 - effResFactor);
                 result.damage = beforeArmor / resistDivisor;
             }
-
-            // Ensure damage is positive and reasonable
             result.damage = Math.max(1, result.damage);
+        }
+        // New Metrics Reverse Solving
+        else if (changedParam === 'earlyImpact') {
+            const currentEI = CombatMetrics.calculateEarlyImpact(currentStats, currentStats);
+            if (currentEI > 0) {
+                const ratioEI = newValue / currentEI;
+                result.damage = Math.max(1, currentStats.damage * ratioEI);
+            }
+        }
+        else if (changedParam === 'edpt') {
+            const currentEDPT = CombatMetrics.calculateEDPT(currentStats, currentStats);
+            if (currentEDPT > 0) {
+                const ratioEDPT = newValue / currentEDPT;
+                result.damage = Math.max(1, currentStats.damage * ratioEDPT);
+            }
+        }
+        else if (changedParam === 'ttk') {
+            const currentEDPT_TTK = CombatMetrics.calculateEDPT(currentStats, currentStats);
+            if (currentEDPT_TTK > 0) {
+                result.hp = Math.max(1, Math.round(newValue * currentEDPT_TTK));
+            }
         }
 
 
         // 3. FORWARD SOLVER (Handle Locks when base stats change)
-        // Only run this if we didn't just do a reverse solve (i.e. if we changed a base stat)
-        const isDerivedChange = changedParam === 'htk' || changedParam === 'hitChance' || changedParam === 'attacksPerKo' || changedParam === 'effectiveDamage';
+        const isDerivedChange = changedParam === 'htk' || changedParam === 'hitChance' || changedParam === 'attacksPerKo' || changedParam === 'effectiveDamage' || changedParam === 'edpt' || changedParam === 'ttk' || changedParam === 'earlyImpact';
 
         if (!isDerivedChange && lockedParam !== 'none' && changedParam !== lockedParam) {
-
-            // HTK Locked
             if (lockedParam === 'htk') {
                 if (changedParam === 'hp') {
                     result.damage = CoreModule.calculateDamageForHTK(result.hp, result.htk);
@@ -117,13 +102,7 @@ export class BalancingSolver {
                     result.hp = CoreModule.calculateHpForHTK(result.damage, result.htk);
                 }
             }
-
-            // HitChance Locked (Not strictly a lock in types yet, but good to handle if we add it)
-            // ...
-
-            // AttacksPerKO Locked
             else if (lockedParam === 'attacksPerKo') {
-                // Simplified compensation logic for mitigation changes
                 if (changedParam === 'armor') {
                     const delta = newValue - currentStats.armor;
                     result.armorPen = Math.max(0, currentStats.armorPen + delta);
@@ -132,27 +111,9 @@ export class BalancingSolver {
                     const delta = newValue - currentStats.resistance;
                     result.penPercent = Math.max(0, Math.min(100, currentStats.penPercent + delta));
                 }
-                // For TxC changes, adjust Evasion to maintain HitChance (which helps maintain APK)
                 else if (changedParam === 'txc') {
-                    // This is an approximation. Ideally we'd solve for APK directly.
-                    // But maintaining HitChance is a good proxy if Dmg/HP are constant.
-                    // New TxC -> Adjust Evasion to keep HitChance constant?
-                    // Wait, if APK is locked, we want APK constant.
-                    // If we change TxC, HitChance changes, APK changes.
-                    // So yes, we should adjust Evasion to keep HitChance constant.
-                    // Old HitChance = 50 + OldTxC - OldEv
-                    // New HitChance should be same.
-                    // 50 + NewTxC - NewEv = 50 + OldTxC - OldEv
-                    // NewEv = NewTxC - (OldTxC - OldEv)
                     const oldHitChance = 50 + currentStats.txc - currentStats.evasion;
                     result.evasion = result.txc + 50 - oldHitChance;
-                }
-            }
-
-            // HP Locked (Adjust Damage if HTK changes - but HTK is derived, so this case is rare unless we have circular logic)
-            else if (lockedParam === 'hp') {
-                if (changedParam === 'damage') {
-                    // If Damage changes and HP is locked, HTK changes. No conflict.
                 }
             }
         }
@@ -171,7 +132,6 @@ export class BalancingSolver {
             result.penPercent,
             result.configFlatFirst
         );
-
 
         // Recalculate Complex Derived Stats (Effective Chance, Avg Dmg, APK)
         const effectiveChance = CriticalModule.calculateEffectiveHitChance(
@@ -192,6 +152,59 @@ export class BalancingSolver {
         if (denominator <= 0) result.attacksPerKo = 999;
         else result.attacksPerKo = result.hp / denominator;
 
+        // Recalculate Combat Metrics
+        result.edpt = CombatMetrics.calculateEDPT(result, result);
+        result.ttk = CombatMetrics.calculateTTK(result.hp, result.edpt);
+        result.earlyImpact = CombatMetrics.calculateEarlyImpact(result, result);
+
         return result;
+    }
+
+    /**
+     * Recalculates all derived stats and metrics for a given stat block.
+     * Useful for initialization or validation.
+     */
+    static recalculate(stats: StatBlock): StatBlock {
+        // We can reuse solve with a dummy change to trigger full recalculation
+        // Or just implement it directly. Direct is safer/cleaner.
+        const newStats = { ...stats };
+
+        // 1. Recalculate Derived Stats (Standard)
+        newStats.htk = CoreModule.calculateHTK(newStats.hp, newStats.damage);
+        newStats.hitChance = HitChanceModule.calculateHitChance(newStats.txc, newStats.evasion);
+
+        newStats.effectiveDamage = MitigationModule.calculateEffectiveDamage(
+            newStats.damage,
+            newStats.armor,
+            newStats.resistance,
+            newStats.armorPen,
+            newStats.penPercent,
+            newStats.configFlatFirst
+        );
+
+        // Complex Stats
+        const effectiveChance = CriticalModule.calculateEffectiveHitChance(
+            newStats.txc, newStats.evasion, newStats.critChance, newStats.critTxCBonus, newStats.failChance, newStats.failTxCMalus
+        );
+
+        const avgEffectiveDamage = MitigationModule.calculateAverageEffectiveDamage(
+            newStats.damage,
+            newStats.critChance, newStats.critMult, newStats.failChance, newStats.failMult,
+            newStats.armor, newStats.resistance, newStats.armorPen, newStats.penPercent,
+            newStats.configFlatFirst, newStats.configApplyBeforeCrit
+        );
+
+        const chanceFactor = effectiveChance / 100;
+        const denominator = chanceFactor * avgEffectiveDamage;
+
+        if (denominator <= 0) newStats.attacksPerKo = 999;
+        else newStats.attacksPerKo = newStats.hp / denominator;
+
+        // 2. Recalculate Combat Metrics
+        newStats.edpt = CombatMetrics.calculateEDPT(newStats, newStats);
+        newStats.ttk = CombatMetrics.calculateTTK(newStats.hp, newStats.edpt);
+        newStats.earlyImpact = CombatMetrics.calculateEarlyImpact(newStats, newStats);
+
+        return newStats;
     }
 }

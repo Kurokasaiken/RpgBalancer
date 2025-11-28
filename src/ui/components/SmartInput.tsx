@@ -14,6 +14,8 @@ interface SmartInputProps {
     step?: number;
     isPercentage?: boolean;
     readOnly?: boolean;
+    label?: string;
+    bgColor?: string;
 }
 
 export const SmartInput: React.FC<SmartInputProps> = ({
@@ -27,7 +29,9 @@ export const SmartInput: React.FC<SmartInputProps> = ({
     max,
     step = 1,
     isPercentage = false,
-    readOnly = false
+    readOnly = false,
+    label,
+    bgColor
 }) => {
     const def = PARAM_DEFINITIONS[paramId];
     const [isVisible, setIsVisible] = useState(true);
@@ -40,6 +44,7 @@ export const SmartInput: React.FC<SmartInputProps> = ({
 
     const isActive = !readOnly;
     const isLocked = lockedParam === paramId;
+    const displayLabel = label || def?.name || paramId;
 
     // Update input value when prop changes
     useEffect(() => {
@@ -66,7 +71,7 @@ export const SmartInput: React.FC<SmartInputProps> = ({
     if (!isVisible) {
         return (
             <div className="bg-white/5 backdrop-blur-sm p-1.5 rounded-lg flex justify-between items-center opacity-50 hover:opacity-75 transition-opacity border border-white/10">
-                <span className="text-xs text-gray-300">{def?.name || paramId}</span>
+                <span className="text-xs text-gray-300">{displayLabel}</span>
                 <button onClick={() => setIsVisible(true)} className="text-xs text-gray-300 hover:text-white hover:drop-shadow-[0_0_4px_rgba(255,255,255,0.8)] transition-all">
                     👁️
                 </button>
@@ -74,8 +79,12 @@ export const SmartInput: React.FC<SmartInputProps> = ({
         );
     }
 
+    const containerStyle = !isActive && !bgColor
+        ? 'opacity-60 grayscale border-white/5'
+        : 'border-white/10 opacity-100';
+
     return (
-        <div className={`relative bg-white/5 backdrop-blur-sm p-2 rounded-lg transition-all border ${!isActive ? 'opacity-60 grayscale border-white/5' : 'border-white/10'} ${isChanging ? 'ring-2 ring-yellow-400/50 shadow-[0_0_12px_rgba(250,204,21,0.4)]' : ''}`}>
+        <div className={`relative backdrop-blur-sm p-2 rounded-lg transition-all border ${bgColor || 'bg-white/5'} ${containerStyle} ${isChanging ? 'ring-2 ring-yellow-400/50 shadow-[0_0_12px_rgba(250,204,21,0.4)]' : ''}`}>
             {/* Header */}
             <div className="flex justify-between items-center mb-1">
                 <div className="flex items-center gap-1">
@@ -84,7 +93,7 @@ export const SmartInput: React.FC<SmartInputProps> = ({
                         onMouseEnter={() => setShowTooltip(true)}
                         onMouseLeave={() => setShowTooltip(false)}
                     >
-                        {def?.name || paramId}
+                        {displayLabel}
                         {isChanging && <span className="ml-1 text-yellow-400">⚡</span>}
                     </label>
                     {/* Tooltip */}

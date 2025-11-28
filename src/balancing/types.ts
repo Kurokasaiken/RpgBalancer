@@ -4,11 +4,16 @@ export interface StatBlock {
     txc: number; // Flat value
     evasion: number; // Flat value
 
-    // Derived
-    htk: number; // Pure HTK: hp / damage
+    // Derived stats
     hitChance: number; // %: txc + 50 - evasion
-    attacksPerKo: number; // htk / (hitChance / 100)
     effectiveDamage: number; // Damage after mitigation (simple, no crit)
+    attacksPerKo: number; // htk / (hitChance / 100)
+    htk: number; // Hits to kill
+
+    // Combat Metrics (Self vs Self)
+    edpt: number; // Effective Damage Per Turn
+    ttk: number; // Time To Kill (Turns)
+    earlyImpact: number; // Damage over first 3 turns
 
     // Critical Module
     critChance: number; // %
@@ -48,16 +53,24 @@ export const DEFAULT_STATS: StatBlock = {
     damage: 25,
     txc: 25,
     evasion: 0,
-    htk: 6,  // Updated: 150 / 25 = 6 (was 4)
-    hitChance: 75,
-    attacksPerKo: 8,  // Updated: 6 / 0.75 = 8 (was 5.33)
-    effectiveDamage: 25,
+
+    // Derived
+    hitChance: 0,
+    effectiveDamage: 0,
+    attacksPerKo: 0,
+    htk: 0,
+
+    // Metrics
+    edpt: 0,
+    ttk: 0,
+    earlyImpact: 0,
 
     critChance: 5,
     critMult: 2.0,
     critTxCBonus: 20,
 
-    failChance: 5,
+    // Critical Failure
+    failChance: 0,
     failMult: 0.0,
     failTxCMalus: 20,
 
