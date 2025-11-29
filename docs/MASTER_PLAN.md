@@ -2,9 +2,9 @@
 
 > **Navigator + Governance** - Single source of truth for project organization
 
-**Last Updated:** 2025-11-27  
-**Total Tasks:** 500+ (across dedicated task files)  
-**Current Phase:** Phase 5: Universal Creators
+**Last Updated:** 2025-11-29  
+**Total Tasks:** 600+ (across dedicated task files)  
+**Current Phase:** Phase 2.3: 1v1 Balancing Module
 
 ---
 
@@ -174,6 +174,23 @@ Example:
 - 16 base archetypes (Tank×5, DPS×4, Assassin×2, etc.)
 - TTK-based validation using simulation system
 - Interactive dashboard (heatmaps, charts)
+
+#### **2.3: 1v1 Balancing Module (In Progress)**
+
+| Document | Purpose |
+|----------|---------|
+| **📋 Plan** | [Session da16ef3e: implementation_plan.md](../../.gemini/antigravity/brain/da16ef3e-de83-4980-8e04-0dac67057a6b/implementation_plan.md) |
+| **✅ Tasks** | [Session da16ef3e: task.md](../../.gemini/antigravity/brain/da16ef3e-de83-4980-8e04-0dac67057a6b/task.md) |
+
+**Overview:**
+- Pure math engine (EDPT, TTK, EHP calculations)
+- Deterministic + Monte Carlo simulators for matchup analysis
+- SWI (Stat Weight Index) per matchup cell
+- NxN matrix runner with full metrics
+- Auto-balancer with versioning and automatic nerf/buff proposals
+- UI: ArchetypeBuilder, MatchupMatrix, DetailPanel, RunBrowser, AutoBalanceConsole
+
+**Status:** Phase 1 Starting - Math Engine Implementation
 
 ---
 
