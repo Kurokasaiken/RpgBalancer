@@ -10,8 +10,9 @@ import { TestingLab } from './ui/testing/TestingLab';
 import { ErrorBoundary } from './ui/organisms/ErrorBoundary';
 
 import { ArchetypeManager } from './components/balancing/archetype/ArchetypeManager';
+import { CharacterCreator } from './ui/character/CharacterCreator';
 
-type Tab = 'balancer' | 'archetypes' | 'spellLibrary' | 'spellCreation' | 'characterManager' | 'gridArena' | 'idleArena' | 'testing';
+type Tab = 'balancer' | 'archetypes' | 'characterCreator' | 'spellLibrary' | 'spellCreation' | 'characterManager' | 'gridArena' | 'idleArena' | 'testing';
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('balancer');
@@ -49,6 +50,17 @@ function App() {
                 }`}
             >
               🎭 Archetypes
+            </button>
+
+            {/* CHARACTER CREATOR */}
+            <button
+              onClick={() => setActiveTab('characterCreator')}
+              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'characterCreator'
+                ? 'border-purple-500 text-white'
+                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                }`}
+            >
+              ⚔️ Character Creator
             </button>
 
             {/* SPELLS */}
@@ -132,6 +144,11 @@ function App() {
       {activeTab === 'idleArena' && (
         <ErrorBoundary componentName="Idle Arena">
           <IdleArena />
+        </ErrorBoundary>
+      )}
+      {activeTab === 'characterCreator' && (
+        <ErrorBoundary componentName="Character Creator">
+          <CharacterCreator />
         </ErrorBoundary>
       )}
       {activeTab === 'spellLibrary' && (

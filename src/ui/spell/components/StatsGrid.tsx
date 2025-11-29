@@ -1,8 +1,11 @@
 import React from 'react';
 import { EnhancedStatSlider } from './EnhancedStatSlider';
+import type { Spell } from '../../../balancing/spellTypes';
 
 interface StatsGridProps {
-  statOrder: string[];
+  coreStats: string[];
+  advancedStats: string[];
+  optionalStats: string[];
   getStatDescription: (field: string) => string;
   isMalus: (field: string) => boolean;
   collapsedStats: Set<string>;
@@ -11,16 +14,12 @@ interface StatsGridProps {
   updateStatStep: (field: string, idx: number, step: { value: number; weight: number }) => void;
   addStatStep: (field: string, idx: number) => void;
   removeStatStep: (field: string, idx: number) => void;
-  selectedTicks: Record<string, number>;
-  onSelectTick: (field: string, idx: number) => void;
-  onDragStart: (e: React.DragEvent, field: string) => void;
-  onDragOver: (e: React.DragEvent) => void;
-  onDrop: (e: React.DragEvent, field: string) => void;
-  renderDerivedStats?: (field: string, currentValue: number, onUpdate: (newValue: number) => void) => React.ReactNode;
 }
 
 export const StatsGrid: React.FC<StatsGridProps> = ({
-  statOrder,
+  coreStats,
+  advancedStats,
+  optionalStats,
   getStatDescription,
   isMalus,
   collapsedStats,
@@ -28,46 +27,53 @@ export const StatsGrid: React.FC<StatsGridProps> = ({
   getStatSteps,
   updateStatStep,
   addStatStep,
-  removeStatStep,
-  selectedTicks,
-  onSelectTick,
-  onDragStart,
-  onDragOver,
-  onDrop,
-  renderDerivedStats
-}) => {
-  return (
-    <div className="flex flex-wrap gap-4 mb-4">
-      {statOrder.map(field => (
-        <EnhancedStatSlider
-          key={field}
-          field={field}
-          ticks={getStatSteps(field)}
-          selectedTick={selectedTicks[field] || 0}
-          onSelectTick={(idx) => onSelectTick(field, idx)}
-          description={getStatDescription(field)}
-          isMalus={isMalus(field)}
-          collapsed={collapsedStats.has(field)}
-          onToggleCollapse={() => toggleCollapse(field)}
-          onStepChange={(idx, step) => updateStatStep(field, idx, step)}
-          onAddStep={(idx) => addStatStep(field, idx)}
-          onRemoveStep={(idx) => removeStatStep(field, idx)}
-          draggable={true}
-          onDragStart={(e) => onDragStart(e, field)}
-          onDragOver={onDragOver}
-          onDrop={(e) => onDrop(e, field)}
-          renderDerivedStats={renderDerivedStats ? (val) => renderDerivedStats(field, val, (newVal) => {
-            // Find current tick index
-            const currentIdx = selectedTicks[field] || 0;
-            // Create updated step
-            const currentSteps = getStatSteps(field);
-            const currentStep = currentSteps[currentIdx];
-            const updatedStep = { ...currentStep, value: newVal };
-            // Update
-            updateStatStep(field, currentIdx, updatedStep);
-          }) : undefined}
-        />
-      ))}
-    </div>
-  );
-};
+  removeStatStep
+}) => (
+  <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2 mb-4">
+    {/* Core Stats */}
+    {coreStats.map(field => (
+      <EnhancedStatSlider
+        key={field}
+        field={field}
+        steps={getStatSteps(field)}
+        description={getStatDescription(field)}
+        isMalus={isMalus(field)}
+        collapsed={collapsedStats.has(field)}
+        onToggleCollapse={() => toggleCollapse(field)}
+        onStepChange={(idx: number, step: { value: number; weight: number }) => updateStatStep(field, idx, step)}
+        onAddStep={(idx: number) => addStatStep(field, idx)}
+        onRemoveStep={(idx: number) => removeStatStep(field, idx)}
+      />
+    ))}
+    {/* Advanced Stats */}
+    {advancedStats.map(field => (
+      <EnhancedStatSlider
+        key={field}
+        field={field}
+        steps={getStatSteps(field)}
+        description={getStatDescription(field)}
+        isMalus={isMalus(field)}
+        collapsed={collapsedStats.has(field)}
+        onToggleCollapse={() => toggleCollapse(field)}
+        onStepChange={(idx: number, step: { value: number; weight: number }) => updateStatStep(field, idx, step)}
+        onAddStep={(idx: number) => addStatStep(field, idx)}
+        onRemoveStep={(idx: number) => removeStatStep(field, idx)}
+      />
+    ))}
+    {/* Optional Stats: collassate di default */}
+    {optionalStats.map(field => (
+      <EnhancedStatSlider
+        key={field}
+        field={field}
+        steps={getStatSteps(field)}
+        description={getStatDescription(field)}
+        isMalus={isMalus(field)}
+        collapsed={collapsedStats.has(field) || true}
+        onToggleCollapse={() => toggleCollapse(field)}
+        onStepChange={(idx: number, step: { value: number; weight: number }) => updateStatStep(field, idx, step)}
+        onAddStep={(idx: number) => addStatStep(field, idx)}
+        onRemoveStep={(idx: number) => removeStatStep(field, idx)}
+      />
+    ))}
+  </div>
+);

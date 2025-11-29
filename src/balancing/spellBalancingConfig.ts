@@ -2,6 +2,13 @@
 
 import spellConfigData from './spellBalancingConfig.json';
 import type { Spell } from './spellTypes';
+import { BalanceConfigManager } from './BalanceConfigManager';
+
+// Mapping between spell stats and global stats
+const STAT_MAPPING: Record<string, string> = {
+    'effect': 'damage', // Spell effect (damage) maps to global damage weight
+    // Add other mappings if needed
+};
 
 export interface SpellBalancingConfig {
     baseline: Partial<Spell>;
@@ -69,6 +76,16 @@ export function getBaselineSpell(): Partial<Spell> {
 
 // Get weight for a stat
 export function getStatWeight(stat: string): number {
+    // 1. Check if there is a global mapping
+    const globalStat = STAT_MAPPING[stat];
+    if (globalStat) {
+        const globalWeights = BalanceConfigManager.getWeights();
+        if (globalWeights[globalStat] !== undefined) {
+            return globalWeights[globalStat];
+        }
+    }
+
+    // 2. Fallback to local spell config
     return SPELL_CONFIG.weights[stat] || 0;
 }
 
@@ -89,7 +106,8 @@ export function calculateSpellBudget(
     customBaselines?: Partial<Spell>
 ): number {
     const baseline = customBaselines || getBaselineSpell();
-    const weights = customWeights || SPELL_CONFIG.weights;
+    // Use getStatWeight for each field instead of raw weights object
+    // to ensure we use the global overrides
     let budget = 0;
 
     // Iterate over all numeric fields that affect balance
@@ -101,7 +119,9 @@ export function calculateSpellBudget(
     for (const field of balanceableFields) {
         const spellValue = (spell as any)[field] || 0;
         const baselineValue = (baseline as any)[field] || 0;
-        const weight = weights[field] || 0;
+
+        // Use custom weights if provided, otherwise use the getter (which handles global sync)
+        const weight = customWeights ? (customWeights[field] || 0) : getStatWeight(field);
 
         const delta = spellValue - baselineValue;
         budget += delta * weight;

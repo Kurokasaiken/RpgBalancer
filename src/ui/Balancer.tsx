@@ -9,6 +9,10 @@ import { CombatMetricsCard } from './CombatMetricsCard';
 import { SmartInput } from './components/SmartInput';
 import { CardWrapper } from './components/CardWrapper';
 import { PARAM_DEFINITIONS } from '../balancing/registry';
+import { BalanceConfigManager } from '../balancing/BalanceConfigManager';
+import { getActivePresetId, setActivePresetId } from '../balancing/presetStorage';
+import { PresetSelector } from './balancing/PresetSelector';
+import { WeightEditor } from './balancing/WeightEditor';
 
 
 const STORAGE_KEY = 'balancer_state';
@@ -31,6 +35,8 @@ export const Balancer: React.FC = () => {
         return BalancingSolver.recalculate(initialStats);
     });
     const [lockedParam, setLockedParam] = useState<LockedParameter>('none');
+    const [activePresetId, setActivePresetIdState] = useState<string>(() => getActivePresetId());
+    const [showWeightEditor, setShowWeightEditor] = useState(false);
 
     // Auto-save to localStorage
     useEffect(() => {
@@ -69,6 +75,19 @@ export const Balancer: React.FC = () => {
         setLockedParam('none');
     };
 
+    const handlePresetChange = (id: string) => {
+        BalanceConfigManager.setPreset(id);
+        setActivePresetIdState(id);
+        setActivePresetId(id);
+
+        // Trigger recalculation with new weights
+        setStats(prev => BalancingSolver.recalculate(prev));
+    };
+
+    const handleWeightEditorSave = (newPresetId: string) => {
+        handlePresetChange(newPresetId);
+    };
+
     return (
         <div className="h-full overflow-y-auto bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-950 p-4 relative">
             {/* Animated background particles */}
@@ -78,7 +97,16 @@ export const Balancer: React.FC = () => {
             </div>
             <div className="max-w-7xl mx-auto relative z-10">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                    <h2 className="text-3xl font-bold text-white drop-shadow-[0_0_8px_rgba(96,165,250,0.6)]">⚖️ Game Balancing</h2>
+                    <div>
+                        <h2 className="text-3xl font-bold text-white drop-shadow-[0_0_8px_rgba(96,165,250,0.6)]">⚖️ Game Balancing</h2>
+                        <div className="mt-2">
+                            <PresetSelector
+                                activePresetId={activePresetId}
+                                onPresetChange={handlePresetChange}
+                                onEditMode={() => setShowWeightEditor(true)}
+                            />
+                        </div>
+                    </div>
                     <div className="flex gap-2">
                         <button
                             onClick={handleResetAll}
@@ -247,8 +275,15 @@ export const Balancer: React.FC = () => {
                     <span className="text-emerald-400 drop-shadow-[0_0_6px_rgba(52,211,153,0.6)]">✓ Auto-saved</span>
                 </div>
             </div>
+
+            {/* Weight Editor Modal */}
+            {showWeightEditor && (
+                <WeightEditor
+                    currentPreset={BalanceConfigManager.activePreset}
+                    onSave={handleWeightEditorSave}
+                    onClose={() => setShowWeightEditor(false)}
+                />
+            )}
         </div>
     );
 };
-
-

@@ -1,0 +1,269 @@
+/**
+ * Preset Storage - User-defined weight presets
+ * 
+ * Manages user-created presets with localStorage persistence
+ */
+
+import type { BalancePreset } from './BalanceConfigManager';
+import { BALANCE_PRESETS } from './BalanceConfigManager';
+import { NORMALIZED_WEIGHTS } from './statWeights';
+
+const STORAGE_KEY = 'rpg_balancer_user_presets';
+const ACTIVE_PRESET_KEY = 'rpg_balancer_active_preset';
+
+export interface UserPreset extends BalancePreset {
+    isUserCreated: boolean;
+    createdAt: Date;
+    modifiedAt: Date;
+}
+
+/**
+ * Load all presets (built-in + user-created)
+ */
+export function loadAllPresets(): Record<string, BalancePreset> {
+    const userPresets = loadUserPresets();
+    return {
+        ...BALANCE_PRESETS,
+        ...userPresets
+    };
+}
+
+/**
+ * Load only user-created presets from localStorage
+ */
+export function loadUserPresets(): Record<string, UserPreset> {
+    try {
+        const data = localStorage.getItem(STORAGE_KEY);
+        if (!data) return {};
+
+        const parsed = JSON.parse(data);
+        // Convert date strings back to Date objects
+        Object.keys(parsed).forEach(key => {
+            parsed[key].createdAt = new Date(parsed[key].createdAt);
+            parsed[key].modifiedAt = new Date(parsed[key].modifiedAt);
+        });
+
+        return parsed;
+    } catch (error) {
+        console.error('Error loading user presets:', error);
+        return {};
+    }
+}
+
+/**
+ * Save user presets to localStorage
+ */
+function saveUserPresets(presets: Record<string, UserPreset>): void {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(presets));
+    } catch (error) {
+        console.error('Error saving user presets:', error);
+        throw error;
+    }
+}
+
+/**
+ * Create a new user preset
+ */
+export function createUserPreset(
+    name: string,
+    description: string,
+    weights: Record<string, number>
+): UserPreset {
+    const id = `user_${Date.now()}_${name.toLowerCase().replace(/\s+/g, '_')}`;
+
+    const preset: UserPreset = {
+        id,
+        name,
+        description,
+        weights,
+        isUserCreated: true,
+        createdAt: new Date(),
+        modifiedAt: new Date()
+    };
+
+    const userPresets = loadUserPresets();
+    userPresets[id] = preset;
+    saveUserPresets(userPresets);
+
+    return preset;
+}
+
+/**
+ * Update an existing user preset
+ */
+export function updateUserPreset(
+    id: string,
+    updates: Partial<Omit<UserPreset, 'id' | 'isUserCreated' | 'createdAt'>>
+): void {
+    const userPresets = loadUserPresets();
+
+    if (!userPresets[id]) {
+        throw new Error(`Preset ${id} not found or is not a user preset`);
+    }
+
+    userPresets[id] = {
+        ...userPresets[id],
+        ...updates,
+        modifiedAt: new Date()
+    };
+
+    saveUserPresets(userPresets);
+}
+
+/**
+ * Delete a user preset
+ */
+export function deleteUserPreset(id: string): void {
+    const userPresets = loadUserPresets();
+
+    if (!userPresets[id]) {
+        throw new Error(`Preset ${id} not found or is not a user preset`);
+    }
+
+    delete userPresets[id];
+    saveUserPresets(userPresets);
+
+    // If deleted preset was active, switch to standard
+    if (getActivePresetId() === id) {
+        setActivePresetId('standard');
+    }
+}
+
+/**
+ * Get active preset ID
+ */
+export function getActivePresetId(): string {
+    return localStorage.getItem(ACTIVE_PRESET_KEY) || 'standard';
+}
+
+/**
+ * Set active preset ID
+ */
+export function setActivePresetId(id: string): void {
+    localStorage.setItem(ACTIVE_PRESET_KEY, id);
+}
+
+/**
+ * Get active preset
+ */
+export function getActivePreset(): BalancePreset {
+    const id = getActivePresetId();
+    const allPresets = loadAllPresets();
+    return allPresets[id] || allPresets['standard'];
+}
+
+/**
+ * Export preset to JSON string
+ */
+export function exportPresetJSON(preset: BalancePreset): string {
+    return JSON.stringify(preset, null, 2);
+}
+
+/**
+ * Import preset from JSON string
+ */
+export function importPresetJSON(json: string): UserPreset {
+    try {
+        const parsed = JSON.parse(json);
+
+        // Validate required fields
+        if (!parsed.name || !parsed.weights) {
+            throw new Error('Invalid preset JSON: missing required fields');
+        }
+
+        // Create as new user preset
+        return createUserPreset(
+            parsed.name,
+            parsed.description || 'Imported preset',
+            parsed.weights
+        );
+    } catch (error) {
+        console.error('Error importing preset:', error);
+        throw new Error('Failed to import preset: ' + (error as Error).message);
+    }
+}
+
+/**
+ * Export all user presets to JSON
+ */
+export function exportAllPresetsJSON(): string {
+    const userPresets = loadUserPresets();
+    return JSON.stringify(Object.values(userPresets), null, 2);
+}
+
+/**
+ * Create a preset from current weights
+ */
+export function createPresetFromWeights(
+    name: string,
+    description: string,
+    weights: Record<string, number>
+): UserPreset {
+    return createUserPreset(name, description, weights);
+}
+
+/**
+ * Duplicate an existing preset
+ */
+export function duplicatePreset(sourceId: string, newName: string): UserPreset {
+    const allPresets = loadAllPresets();
+    const source = allPresets[sourceId];
+
+    if (!source) {
+        throw new Error(`Preset ${sourceId} not found`);
+    }
+
+    return createUserPreset(
+        newName,
+        `Copy of ${source.name}`,
+        { ...source.weights }
+    );
+}
+
+/**
+ * Calculate diff between two presets
+ */
+export function calculatePresetDiff(
+    preset1Id: string,
+    preset2Id: string
+): Record<string, { old: number; new: number; diff: number; diffPercent: number }> {
+    const allPresets = loadAllPresets();
+    const preset1 = allPresets[preset1Id];
+    const preset2 = allPresets[preset2Id];
+
+    if (!preset1 || !preset2) {
+        throw new Error('One or both presets not found');
+    }
+
+    const diff: Record<string, any> = {};
+    const allKeys = new Set([
+        ...Object.keys(preset1.weights),
+        ...Object.keys(preset2.weights)
+    ]);
+
+    allKeys.forEach(key => {
+        const old = preset1.weights[key] || 0;
+        const newVal = preset2.weights[key] || 0;
+        const diffVal = newVal - old;
+        const diffPercent = old !== 0 ? (diffVal / old) * 100 : 0;
+
+        if (diffVal !== 0) {
+            diff[key] = {
+                old,
+                new: newVal,
+                diff: diffVal,
+                diffPercent
+            };
+        }
+    });
+
+    return diff;
+}
+
+/**
+ * Get default preset weights
+ */
+export function getDefaultWeights(): Record<string, number> {
+    return { ...NORMALIZED_WEIGHTS };
+}

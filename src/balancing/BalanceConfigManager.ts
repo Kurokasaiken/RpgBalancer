@@ -1,5 +1,6 @@
 import type { TTKTarget } from './archetype/types';
 import { NORMALIZED_WEIGHTS } from './statWeights';
+import { getActivePreset, setActivePresetId, loadAllPresets } from './presetStorage';
 
 export interface BalancePreset {
     id: string;
@@ -84,21 +85,50 @@ export const BALANCE_PRESETS: Record<string, BalancePreset> = {
 };
 
 export class BalanceConfigManager {
-    private static currentPreset: BalancePreset = BALANCE_PRESETS['standard'];
+    private static currentPreset: BalancePreset | null = null;
+
+    /**
+     * Initialize and load active preset from storage
+     */
+    static initialize() {
+        this.currentPreset = getActivePreset();
+    }
 
     static get activePreset(): BalancePreset {
-        return this.currentPreset;
+        if (!this.currentPreset) {
+            this.initialize();
+        }
+        return this.currentPreset!;
     }
 
     static setPreset(id: string) {
-        if (BALANCE_PRESETS[id]) {
-            this.currentPreset = BALANCE_PRESETS[id];
+        const allPresets = loadAllPresets();
+        if (allPresets[id]) {
+            this.currentPreset = allPresets[id];
+            setActivePresetId(id);
         } else {
-            console.warn(`Preset ${id} not found, keeping ${this.currentPreset.id}`);
+            console.warn(`Preset ${id} not found, keeping ${this.currentPreset?.id || 'standard'}`);
         }
     }
 
     static getWeights(): Record<string, number> {
-        return this.currentPreset.weights;
+        return this.activePreset.weights;
+    }
+
+    /**
+     * Get all available presets (built-in + user)
+     */
+    static getAllPresets(): Record<string, BalancePreset> {
+        return loadAllPresets();
+    }
+
+    /**
+     * Check if a preset is user-created
+     */
+    static isUserPreset(id: string): boolean {
+        return id.startsWith('user_');
     }
 }
+
+// Auto-initialize on module load
+BalanceConfigManager.initialize();
