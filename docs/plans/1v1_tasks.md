@@ -189,13 +189,13 @@
   - [ ] Test: All archetypes >30% winrate vs all others
   - [ ] Log average winrates per archetype
 
-### 4.3 Combat Consistency Tests (PENDING)
+### 4.3 Combat Consistency Tests (DONE)
 
-- [ ] Write `CombatConsistency.test.ts`
-  - [ ] Test: Deterministic results with same seed
-  - [ ] Test: Combat terminates within reasonable turns (<100)
-  - [ ] Test: No infinite loops
-  - [ ] Test: Combat state always valid
+- [x] Write `CombatConsistency.test.ts` (Covered by `CombatSimulator.test.ts`)
+  - [x] Test: Deterministic results with same seed
+  - [x] Test: Combat terminates within reasonable turns (<100)
+  - [x] Test: No infinite loops
+  - [x] Test: Combat state always valid
 
 ---
 

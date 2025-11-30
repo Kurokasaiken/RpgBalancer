@@ -117,6 +117,17 @@ Example:
 - ✅ **Development Guidelines** (MUST READ before coding)
 - ✅ **Codebase audit** (Single Source of Truth violations)
 
+### 3.1 Command Line Runner
+- [x] Create `src/balancing/simulation/cli.ts` <!-- id: 53 -->
+- [x] Add argument parsing (entity configs, iterations) <!-- id: 54 -->
+- [x] Add progress display (console output) <!-- id: 55 -->
+- [x] Add results summary display <!-- id: 56 -->
+- [x] Add export to file option (Console Table) <!-- id: 57 -->
+
+### 3.2 Integration
+- [x] Add npm script `npm run simulate` (renamed to `calibrate`) <!-- id: 58 -->
+- [x] Document CLI usage in README (Walkthrough) <!-- id: 59 -->
+
 </details>
 
 ---
@@ -190,7 +201,7 @@ Example:
 - Auto-balancer with versioning and automatic nerf/buff proposals
 - UI: ArchetypeBuilder, MatchupMatrix, DetailPanel, RunBrowser, AutoBalanceConsole
 
-**Status:** Phase 1 Starting - Math Engine Implementation
+**Status:** Phase 1 Complete - Math Engine & Deterministic Simulator Ready
 
 ---
 
@@ -246,6 +257,10 @@ Example:
 1. Implement CLI for running balance tests (Phase 3.3)
 2. Perform Balance Tuning based on simulation data (Phase 3.3)
 3. Build Balance Configuration UI (Phase 4.1)
+
+**Recently Completed:**
+- ✅ Combat Simulator Determinism & Regression Pack
+- ✅ Matrix Reproducibility Verification
 
 **📋 Full checklist:** [plans/archetype_tasks.md](plans/archetype_tasks.md)
 

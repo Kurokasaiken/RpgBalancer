@@ -32,6 +32,8 @@
 - [x] Test: overkill calculation <!-- id: 18 -->
 - [x] Test: winner determination <!-- id: 19 -->
 - [x] Achieve >90% code coverage <!-- id: 20 -->
+- [x] **Deterministic RNG Implementation** <!-- id: 20b -->
+- [x] **Regression Test Pack (20+ tests)** <!-- id: 20c -->
 
 ### 1.4 MonteCarloSimulation Implementation
 - [x] Create `MonteCarloSimulation.ts` skeleton <!-- id: 21 -->

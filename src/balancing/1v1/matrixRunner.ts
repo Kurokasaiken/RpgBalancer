@@ -51,24 +51,17 @@ export async function runMatrix(
 
     const startTime = Date.now();
 
-    // Load archetypes
+    // Load archetypes from testArchetypes
+    const { getArchetype } = await import('./testArchetypes');
+
     const archetypes: Archetype[] = [];
     const archetypesById: Map<string, Archetype> = new Map();
 
     for (const id of archetypeIds) {
-        // For now, we'll create dummy archetypes
-        // In production, these would be loaded from IO
-        const archetype: Archetype = {
-            id,
-            name: id,
-            role: 'Unknown',
-            description: `Archetype ${id}`,
-            stats: { ...config } as any, // TODO: Load real stats
-            meta: {
-                createdBy: 'system',
-                createdAt: new Date().toISOString(),
-            },
-        };
+        const archetype = getArchetype(id);
+        if (!archetype) {
+            throw new Error(`Archetype not found: ${id}`);
+        }
         archetypes.push(archetype);
         archetypesById.set(id, archetype);
     }
