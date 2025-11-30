@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import type { Spell } from '../../balancing/spellTypes';
 import { upsertSpell, loadSpells } from '../../balancing/spellStorage';
-import { Tooltip } from '../components/Tooltip';
+
 import { SpellCostModule } from '../../balancing/modules/spellcost';
-import { SPELL_CONFIG, getStatWeight, getStatRange, getStatDescription, isMalus } from '../../balancing/spellBalancingConfig';
+import { SPELL_CONFIG, getStatWeight, getStatRange, getStatDescription, isMalus, BUFFABLE_STATS } from '../../balancing/spellBalancingConfig';
+
 
 interface SpellEditorProps {
     spellId: string;
@@ -99,6 +100,24 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
                                 <option value="cc">CC</option>
                             </select>
                         </div>
+
+                        {/* Target Stat for Buff/Debuff */}
+                        {(editedSpell.type === 'buff' || editedSpell.type === 'debuff') && (
+                            <div className="mt-2">
+                                <label className="block text-xs text-gray-400 mb-1">Target Stat</label>
+                                <select
+                                    value={editedSpell.targetStat || 'damage'}
+                                    onChange={(e) => updateField('targetStat', e.target.value)}
+                                    className="w-full bg-gray-700 text-white px-2 py-1 rounded text-xs border border-gray-600 focus:border-blue-500 outline-none"
+                                >
+                                    {Array.from(BUFFABLE_STATS).map(stat => (
+                                        <option key={stat} value={stat}>
+                                            {stat.charAt(0).toUpperCase() + stat.slice(1).replace(/([A-Z])/g, ' $1').trim()}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
                     </div>
 
                     {/* Power Display */}
@@ -116,8 +135,8 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
                         <div className="text-center">
                             <div className="text-xs text-gray-400 mb-1">Recommended</div>
                             <div className={`text-2xl font-bold ${editedSpell.manaCost === recommendedMana ? 'text-green-400' :
-                                    Math.abs((editedSpell.manaCost || 0) - recommendedMana) <= 2 ? 'text-yellow-400' :
-                                        'text-red-400'
+                                Math.abs((editedSpell.manaCost || 0) - recommendedMana) <= 2 ? 'text-yellow-400' :
+                                    'text-red-400'
                                 }`}>
                                 {recommendedMana}
                             </div>
@@ -126,8 +145,8 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
 
                         {/* Balance Status */}
                         <div className={`px-4 py-2 rounded font-bold text-lg ${isBalanced ? 'bg-green-900 text-green-200' :
-                                budget < 0 ? 'bg-red-900 text-red-200' :
-                                    'bg-yellow-900 text-yellow-200'
+                            budget < 0 ? 'bg-red-900 text-red-200' :
+                                'bg-yellow-900 text-yellow-200'
                             }`}>
                             {isBalanced ? '✓ Balanced' : budget < 0 ? 'Overpriced' : 'Underpriced'}
                             <div className="text-xs font-normal">
@@ -141,21 +160,30 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
                     {/* Core Stats */}
                     <div className="space-y-3">
                         <h3 className="text-lg font-bold text-blue-400 border-b border-gray-700 pb-2">Core Stats</h3>
-                        {['effect', 'cooldown', 'eco', 'aoe', 'dangerous', 'pierce'].map(field => (
-                            <StatSlider
-                                key={field}
-                                field={field}
-                                value={(editedSpell as any)[field] || 0}
-                                baseline={(SPELL_CONFIG.baseline as any)[field] || 0}
-                                range={getStatRange(field)}
-                                weight={getEffectiveWeight(field)}
-                                defaultWeight={getStatWeight(field)}
-                                description={getStatDescription(field)}
-                                isMalus={isMalus(field)}
-                                onValueChange={(v) => updateField(field as keyof Spell, v)}
-                                onWeightChange={(w) => updateWeight(field, w)}
-                            />
-                        ))}
+                        {['effect', 'cooldown', 'eco', 'aoe', 'dangerous', 'pierce'].map(field => {
+                            let label = field.charAt(0).toUpperCase() + field.slice(1);
+                            if ((editedSpell.type === 'buff' || editedSpell.type === 'debuff')) {
+                                if (field === 'eco') label = 'Duration (Turns)';
+                                if (field === 'effect') label = 'Modification %';
+                            }
+
+                            return (
+                                <StatSlider
+                                    key={field}
+                                    field={field}
+                                    label={label}
+                                    value={(editedSpell as any)[field] || 0}
+                                    baseline={(SPELL_CONFIG.baseline as any)[field] || 0}
+                                    range={getStatRange(field)}
+                                    weight={getEffectiveWeight(field)}
+                                    defaultWeight={getStatWeight(field)}
+                                    description={getStatDescription(field)}
+                                    isMalus={isMalus(field)}
+                                    onValueChange={(v) => updateField(field as keyof Spell, v)}
+                                    onWeightChange={(w) => updateWeight(field, w)}
+                                />
+                            )
+                        })}
                     </div>
 
                     {/* Advanced Stats */}
@@ -202,6 +230,8 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
                     />
                 </div>
 
+
+
                 {/* Weight Controls */}
                 <div className="px-4 pb-4 flex justify-end">
                     {Object.keys(customWeights).length > 0 && (
@@ -233,18 +263,7 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
                             </select>
                         </div>
                     )}
-                    {/* Reflection */}
-                    <div>
-                        <label className="block text-sm text-gray-400 mb-1">Reflection %</label>
-                        <input
-                            type="number"
-                            min={0}
-                            max={100}
-                            value={editedSpell.reflection ?? 0}
-                            onChange={e => updateField('reflection', Number(e.target.value) || undefined)}
-                            className="w-full bg-gray-800 text-white px-4 py-2 rounded border border-gray-700 focus:border-blue-500 outline-none"
-                        />
-                    </div>
+
                     {/* Mana Cost */}
                     <div>
                         <label className="block text-sm text-gray-400 mb-1">Mana Cost</label>
@@ -257,17 +276,7 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
                             className="w-full bg-gray-800 text-white px-4 py-2 rounded border border-gray-700 focus:border-blue-500 outline-none"
                         />
                     </div>
-                    {/* Duration */}
-                    <div>
-                        <label className="block text-sm text-gray-400 mb-1">Duration (s)</label>
-                        <input
-                            type="number"
-                            min={0}
-                            value={editedSpell.duration ?? 0}
-                            onChange={e => updateField('duration', Number(e.target.value) || undefined)}
-                            className="w-full bg-gray-800 text-white px-4 py-2 rounded border border-gray-700 focus:border-blue-500 outline-none"
-                        />
-                    </div>
+
                     {/* Damage Type */}
                     <div>
                         <label className="block text-sm text-gray-400 mb-1">Damage Type</label>
@@ -282,26 +291,7 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
                             <option value="true">True</option>
                         </select>
                     </div>
-                    {/* Legendary */}
-                    <div className="flex items-center">
-                        <input
-                            type="checkbox"
-                            checked={editedSpell.legendary ?? false}
-                            onChange={e => updateField('legendary', e.target.checked)}
-                            className="mr-2"
-                        />
-                        <label className="text-sm text-gray-400">Legendary (ignore zero-cost rule)</label>
-                    </div>
-                    {/* Double Spell */}
-                    <div className="flex items-center">
-                        <input
-                            type="checkbox"
-                            checked={editedSpell.doubleSpell ?? false}
-                            onChange={e => updateField('doubleSpell', e.target.checked)}
-                            className="mr-2"
-                        />
-                        <label className="text-sm text-gray-400">Double Spell</label>
-                    </div>
+
                     {/* Scaling Stat */}
                     <div>
                         <label className="block text-sm text-gray-400 mb-1">Scaling Stat</label>
@@ -362,13 +352,13 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
                         </button>
                         <button
                             onClick={handleSave}
-                            disabled={Math.abs(budget) > 1 && !editedSpell.legendary}
-                            className={`px-6 py-2 rounded font-bold transition text-sm ${Math.abs(budget) > 1 && !editedSpell.legendary
+                            disabled={Math.abs(budget) > 1}
+                            className={`px-6 py-2 rounded font-bold transition text-sm ${Math.abs(budget) > 1
                                 ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                                 : 'bg-green-600 hover:bg-green-500 text-white'
                                 }`}
                         >
-                            {Math.abs(budget) > 1 && !editedSpell.legendary ? 'Balance Required (Cost ≠ 0)' : 'Save Spell'}
+                            {Math.abs(budget) > 1 ? 'Balance Required (Cost ≠ 0)' : 'Save Spell'}
                         </button>
                     </div>
                 </div>
@@ -380,6 +370,7 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
 // Stat Slider Component
 interface StatSliderProps {
     field: string;
+    label?: string;
     value: number;
     baseline: number;
     range: { min: number; max: number; step: number };
@@ -393,6 +384,7 @@ interface StatSliderProps {
 
 const StatSlider: React.FC<StatSliderProps> = ({
     field,
+    label,
     value,
     baseline,
     range,
@@ -411,7 +403,7 @@ const StatSlider: React.FC<StatSliderProps> = ({
         <div className="bg-gray-800/50 rounded-lg p-2 border border-gray-700">
             <div className="flex justify-between items-center mb-1">
                 <label className="text-xs text-gray-300 font-medium" title={description}>
-                    {field.charAt(0).toUpperCase() + field.slice(1)}
+                    {label || field.charAt(0).toUpperCase() + field.slice(1)}
                     {isMalus && <span className="text-yellow-400 ml-1 text-xs">⚠️</span>}
                 </label>
                 <div className="flex items-center gap-2">

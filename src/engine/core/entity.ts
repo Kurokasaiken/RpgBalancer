@@ -2,6 +2,7 @@ import { calculateDerivedStats } from './stats';
 import type { Attributes, DerivedStats } from './stats';
 import type { WeaponModule, ArmorModule, SkillModule } from '../modules/definitions';
 import type { StatBlock } from '../../balancing/types';
+import type { Spell } from '../../balancing/spellTypes';
 
 export class Entity {
     id: string;
@@ -27,6 +28,7 @@ export class Entity {
     };
 
     skills: SkillModule[];
+    spells: Spell[] = [];
 
     // Optional StatBlock for Balancing Lab simulations
     statBlock?: StatBlock;

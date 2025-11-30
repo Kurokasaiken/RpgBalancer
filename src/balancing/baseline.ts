@@ -18,10 +18,16 @@ export const BASELINE_STATS: StatBlock = {
     damage: 25,
     txc: 25,
     evasion: 0,
+    agility: 50, // Initiative stat (not yet calibrated, weight TBD)
     htk: 4,
     hitChance: 75,
     attacksPerKo: 5.33,
     effectiveDamage: 25,
+
+    // Combat Metrics (Self vs Self)
+    edpt: 18.75, // Effective Damage Per Turn (25 × 0.75 hit rate)
+    ttk: 5.33,   // Time To Kill (attacksPerKo)
+    earlyImpact: 56.25, // Damage over first 3 turns (18.75 × 3)
 
     critChance: 5,
     critMult: 2.0,

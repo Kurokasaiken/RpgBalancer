@@ -3,6 +3,7 @@ export interface StatBlock {
     damage: number;
     txc: number; // Flat value
     evasion: number; // Flat value
+    agility: number; // Initiative stat - determines turn order
 
     // Derived stats
     hitChance: number; // %: txc + 50 - evasion
@@ -53,6 +54,7 @@ export const DEFAULT_STATS: StatBlock = {
     damage: 25,
     txc: 25,
     evasion: 0,
+    agility: 50, // Default initiative stat (weight: 0.5 HP/point)
 
     // Derived
     hitChance: 0,

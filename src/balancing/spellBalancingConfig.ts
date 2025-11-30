@@ -151,3 +151,12 @@ export const BALANCEABLE_STAT_FIELDS = [
 export function isMalus(field: string): boolean {
     return getStatWeight(field) < 0;
 }
+
+// List of stats that can be targeted by Buffs/Debuffs
+// Derived from StatBlock but excluding derived metrics
+export const BUFFABLE_STATS = [
+    'damage', 'hp', 'armor', 'resistance', 'agility',
+    'critChance', 'critMult', 'evasion', 'txc',
+    'lifesteal', 'regen', 'ward', 'block', 'energyShield', 'thorns',
+    'armorPen', 'penPercent'
+] as const;

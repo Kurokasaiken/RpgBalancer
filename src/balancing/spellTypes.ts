@@ -33,6 +33,13 @@ export interface Spell {
   priority: number; // -5 … +5
   /** Specific crowd‑control effect when type === 'cc'. */
   ccEffect?: 'stun' | 'slow' | 'knockback' | 'silence';
+  evasion?: number;
+  agility?: number;
+  critChance?: number;
+  critMult?: number;
+  lifesteal?: number;
+  regen?: number;
+
   /** Situational modifiers – array of condition/adjustment objects */
   situationalModifiers?: Array<{
     /** Human readable description, e.g. "Target below 25% HP" */
@@ -58,6 +65,8 @@ export interface Spell {
   description?: string;
   /** Tags for categorization */
   tags?: string[];
+  /** Target stat for buff/debuff spells */
+  targetStat?: string;
 }
 
 /** Definition of a customizable slot (gem‑like) */
@@ -102,4 +111,5 @@ export const createEmptySpell = (id: string = crypto.randomUUID()): Spell => ({
   spellLevel: 0,
   description: '',
   tags: [],
+  targetStat: 'damage', // baseline = no modifications
 });

@@ -38,14 +38,11 @@ export function calculateSpellCost(spell: Spell): number {
     // AoE (extra targets)
     cost += spell.aoe - 1;
 
-    // Dangerous (success chance). Reducing success subtracts points.
-    cost -= Math.round((100 - spell.dangerous) / 10);
+    // Precision (success chance modifier).
+    cost += Math.round(spell.precision / 5);
 
-    // Pierce (5% steps)
-    cost += Math.round(spell.pierce / 5);
-
-    // Cast time (0.1s steps from 0.5s baseline)
-    cost += Math.round((spell.castTime - 0.5) / 0.1);
+    // Dangerous (damage on miss/save).
+    cost += Math.round(spell.dangerous / 5);
 
     // Cooldown (0.5s steps)
     cost += Math.round(spell.cooldown / 0.5);
@@ -56,15 +53,19 @@ export function calculateSpellCost(spell: Spell): number {
     // Priority (steps from 0)
     cost += spell.priority;
 
-    // Double spell flag
-    if (spell.doubleSpell) cost -= 1;
-
-    // Legendary fixed cost
-    if (spell.legendary) cost += LEGENDARY_COST;
-
     // New fields
     if (spell.ccEffect) cost += 2; // crowd‑control effect adds fixed cost
-    if (spell.reflection) cost += Math.round(spell.reflection / 10);
+
+    // Buff/Debuff cost (based on magnitude and duration)
+    if (spell.type === 'buff' || spell.type === 'debuff') {
+        // Effect is magnitude %, Eco is duration turns
+        const magnitude = Math.abs(spell.effect);
+        const duration = Math.max(1, spell.eco);
+
+        // Base cost: 1 point per 10% magnitude per turn
+        // This is a rough heuristic, can be tuned
+        cost += (magnitude / 10) * duration * 0.5;
+    }
     if (spell.situationalModifiers && spell.situationalModifiers.length > 0) {
         for (const mod of spell.situationalModifiers) {
             const points = Math.round(Math.abs(mod.adjustment) / 25);
@@ -78,5 +79,5 @@ export function calculateSpellCost(spell: Spell): number {
 /** Helper to know if a spell is balanced (cost == 0 for normal spells) */
 export function isSpellBalanced(spell: Spell): boolean {
     const c = calculateSpellCost(spell);
-    return spell.legendary ? c >= LEGENDARY_COST : c === 0;
+    return c === 0;
 }

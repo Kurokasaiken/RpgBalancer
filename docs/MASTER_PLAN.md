@@ -364,34 +364,88 @@ Example:
 
 ---
 
+### 🔄 **PHASE 9: Combat System Expansion (Planned)**
+
+**Status:** 0% (Design Complete)
+
+| Document | Purpose |
+|----------|---------|
+| **📋 Plan** | [plans/combat_expansion_plan.md](plans/combat_expansion_plan.md) |
+| **✅ Tasks** | [Session 41fb7f12: task.md](../../.gemini/antigravity/brain/41fb7f12-d062-4270-aae4-b1bb5d18a77f/task.md) |
+| **📊 Analysis** | [Session 41fb7f12: combat_system_expansion_analysis.md](../../.gemini/antigravity/brain/41fb7f12-d062-4270-aae4-b1bb5d18a77f/combat_system_expansion_analysis.md) |
+
+**Overview:**
+Expand combat system from 1v1 to full tactical grid-based multi-unit combat:
+- **Phase 9.1:** Foundation - Initiative system + Status effects (stun, buff, debuff)
+- **Phase 9.2:** Grid Combat 2D - Pathfinding (A*), range/LOS, basic AI
+- **Phase 9.3:** Multi-Unit - AoE mechanics, team synergies (5v5, 5vMany, boss fights)
+- **Phase 9.4:** Polish - Performance optimization, advanced AI
+
+**Key Features:**
+- Initiative-based turn order (agility stat + variance)
+- Status effects: Stun, DoT, Buff/Debuff with duration tracking
+- Grid movement: A* pathfinding, Dijkstra range calculation
+- AI opponents: Target selection, tactical movement, spell/attack priority
+- AoE system: Circle/Line shapes, friendly fire options
+- Team synergies: Flanking, focus fire, formation bonuses
+
+**Design Decisions (Default):**
+- ✅ New `agility` stat for initiative (weight 0.5 HP/point)
+- ✅ Dynamic initiative (re-roll each round)
+- ✅ AoE damage formula: Single-target × 0.65, Cost × 2.0
+- ✅ Hybrid friendly fire: "Safe" spells (no FF, 0.5× dmg) vs "Dangerous" (with FF, 1.0× dmg)
+- ✅ Incremental archetyps: 6 → 10 → 16
+- ✅ AI Level 1 (greedy) for Phase 2, Level 2 (tactical) for Phase 3
+
+**Timeline:** 8-12 weeks total
+- Phase 9.1: 1-2 weeks
+- Phase 9.2: 3-4 weeks
+- Phase 9.3: 4-6 weeks
+- Phase 9.4: 1-2 weeks
+
+**Notes:**
+- ⚠️ Mana and cooldown systems deferred to post-expansion
+- ✅ Maintains 1v1 compatibility (GridCombatSimulator extends base)
+- ✅ All existing tests must continue passing
+
+---
+
 ## 🎯 CURRENT FOCUS
 
-### This Week: Phase  7 & 8 - Persistence + Fantasy UI Redesign
+### This Week: Phase 9 - Combat System Expansion
 
 **Approved Decisions (2025-11-30):**
-1. ✅ UI Style: 2D Vector Art, Medieval Fantasy
-2. ✅ Color Palette: Custom "Enchanted Forest" (Green + Sky Blue + Marble)
-3. ✅ Architecture: CSS Variables + Tailwind Extension for flexibility
-4. ✅ Persistence: localStorage + version control + migration system
+1. ✅ New `agility` stat for initiative system
+2. ✅ Dynamic initiative (re-roll each round)
+3. ✅ Status effects: Start with Stun, expand to Buff/Debuff in Phase 3
+4. ✅ AoE balancing: 0.65× damage, 2.0× cost (research-based)
+5. ✅ Incremental approach: 1v1 → Grid 2D → Multi-unit
 
 **Next 5 Tasks:**
-1. ⏭️ **Implement Balance Persistence System** (Phase 7)
-   - Create BalanceConfigStore with localStorage
-   - Implement version control & migration
-   - Add conflict resolution UI
-2. ⏭️ **Create Fantasy Theme Foundation** (Phase 8.1)
-   - CSS variables for color palette
-   - Import Google Fonts (Cinzel, Crimson Text, Lato)
-   - Extend Tailwind config
-3. ⏭️ **Build Fantasy Atomic Components** (Phase 8.2)
-   - FantasyCard, FantasyButton, FantasyInput, FantasySlider
-4. ⏭️ **Generate/Source Vector Assets** (Phase 8.3)
-   - Wood frame SVGs
-   - Bronze ornaments
-   - Parchment textures
-5. ⏭️ **Redesign First Page** (Phase 8.5)
-   - Start with ArchetypeBuilder or homepage
-   - Test new components in real context
+1. 🔄 **Fix `configApplyBeforeCrit` bug** (Phase 0)
+   - Implement branching logic in damageCalculator.ts
+   - Add unit tests for both config modes
+2. 🔄 **Implement Initiative System** (Phase 9.1) **← IN PROGRESS**
+   - Add `agility` stat to StatBlock
+   - Create InitiativeModule with turn order generation
+   - Integrate into CombatSimulator
+3. ⏭️ **Implement Status Effect Manager** (Phase 9.1)
+   - Apply/process/tick status effects
+   - Stun mechanic (skip turn)
+   - Enhanced combat logging
+4. ⏭️ **Create Pathfinding System** (Phase 9.2)
+   - A* algorithm for movement
+   - Dijkstra for reachable tiles
+   - Movement range from agility stat
+5. ⏭️ **Implement Range Calculator** (Phase 9.2)
+   - Distance checks (Euclidean)
+   - Line-of-sight raycast
+   - AoE target resolution
+
+**Deferred:**
+- Phase 7 (Persistence) - After combat expansion
+- Phase 8 (Fantasy UI) - After combat expansion
+- Mana/Cooldown systems - Post Phase 9
 
 ---
 
@@ -427,5 +481,5 @@ Example:
 
 ---
 
-**Next Review:** End of Week 7 (2025-12-09)  
-**Last Updated:** 2025-11-30 14:58
+**Next Review:** End of Week 8 (2025-12-16)  
+**Last Updated:** 2025-11-30 21:23

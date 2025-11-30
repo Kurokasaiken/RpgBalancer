@@ -219,6 +219,33 @@ export function executeAction(state: CombatState): CombatState {
             type: 'heal',
             value: healAmount
         });
+    } else if (spell.type === 'buff' || spell.type === 'debuff') {
+        // Apply stat modifications as active effect
+        if (spell.statModifications && Object.keys(spell.statModifications).length > 0) {
+            const statChanges = Object.entries(spell.statModifications)
+                .filter(([_, value]) => value !== undefined && value !== 0)
+                .map(([stat, value]) => `${stat}: ${value! > 0 ? '+' : ''}${value}`)
+                .join(', ');
+
+            target.activeEffects.push({
+                id: crypto.randomUUID(),
+                name: spell.name,
+                type: spell.type, // 'buff' or 'debuff'
+                value: 0, // Not used for stat mods
+                duration: spell.duration || 1,
+                sourceId: combatant.id,
+                spellId: spell.id,
+                statModifications: spell.statModifications
+            });
+
+            newLog.push({
+                round: state.round,
+                sourceId: combatant.id,
+                targetId: target.id,
+                message: `${combatant.name} casts ${spell.name} on ${target.name} (${spell.type === 'buff' ? '⬆️' : '⬇️'} ${statChanges} for ${spell.duration || 1} turns)`,
+                type: spell.type === 'buff' ? 'heal' : 'damage' // Use heal/damage types for visual consistency
+            });
+        }
     }
 
     // Set Cooldown

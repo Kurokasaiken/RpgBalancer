@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { BASELINE_STATS } from '../../balancing/baseline';
 import { toast } from 'sonner';
@@ -12,7 +13,8 @@ import {
     calculateSpellBudget,
     getStatDescription,
     isMalus,
-    getBaselineSpell
+    getBaselineSpell,
+    BUFFABLE_STATS
 } from '../../balancing/spellBalancingConfig';
 import { upsertSpell } from '../../balancing/spellStorage';
 import { useDefaultStorage } from '../../shared/hooks/useDefaultStorage';
@@ -249,7 +251,7 @@ export const SpellCreation: React.FC = () => {
                     <h1 className="text-3xl font-bold text-white drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]">🔮 Spell Creation</h1>
                     <div className="flex items-center gap-4 bg-black/40 px-4 py-2 rounded-lg border border-white/10 backdrop-blur-md">
                         <span className="text-sm uppercase tracking-wider text-gray-400 font-semibold">Balance</span>
-                        <span className={`text-2xl font-bold font-mono drop-shadow-[0_0_8px_currentColor] ${balance === 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                        <span className={`text - 2xl font - bold font - mono drop - shadow - [0_0_8px_currentColor] ${balance === 0 ? 'text-emerald-400' : 'text-red-400'} `}>
                             {balance > 0 ? '+' : ''}{balance.toFixed(2)}
                         </span>
                     </div>
@@ -262,6 +264,7 @@ export const SpellCreation: React.FC = () => {
                             updateField={updateField}
                             targetBudget={targetBudget}
                             setTargetBudget={setTargetBudget}
+                            targetStatOptions={Array.from(BUFFABLE_STATS)}
                         />
                     </div>
 
@@ -270,27 +273,53 @@ export const SpellCreation: React.FC = () => {
                         <div className="backdrop-blur-md bg-cyan-900/20 border border-cyan-500/30 rounded-lg p-4 h-full shadow-[0_4px_16px_rgba(6,182,212,0.15)] overflow-y-auto">
                             <div className="flex justify-between items-center text-lg font-bold text-cyan-100 mb-2 drop-shadow-[0_0_6px_rgba(6,182,212,0.6)] border-b border-cyan-500/20 pb-1">
                                 <span>Preview Spell</span>
-                                <span className="text-sm font-mono text-cyan-400">
-                                    {previewDamage(spell)}
-                                    <span className="text-xs text-cyan-300 ml-2">({spell.effect}% × {BASELINE_STATS.damage} × {spell.eco})</span>
-                                </span>
+                                {spell.type === 'damage' && (
+                                    <span className="text-sm font-mono text-cyan-400">
+                                        {previewDamage(spell)}
+                                        <span className="text-xs text-cyan-300 ml-2">({spell.effect}% × {BASELINE_STATS.damage} × {spell.eco})</span>
+                                    </span>
+                                )}
+                                {(spell.type === 'buff' || spell.type === 'debuff') && (
+                                    <span className="text-sm font-mono text-cyan-400">
+                                        {spell.type === 'buff' ? '⬆️ Buff' : '⬇️ Debuff'} for {spell.eco || 1} turn{(spell.eco || 1) > 1 ? 's' : ''}
+                                    </span>
+                                )}
                             </div>
+
+                            {(spell.type === 'buff' || spell.type === 'debuff') && (
+                                <div className="mt-2 p-2 bg-gray-800/50 rounded border border-gray-700">
+                                    <div className="flex items-center gap-2 text-sm">
+                                        <span className={spell.type === 'buff' ? 'text-green-400' : 'text-red-400'}>
+                                            {spell.type === 'buff' ? 'Increases' : 'Decreases'} {spell.targetStat || 'damage'}
+                                        </span>
+                                        <span className="text-gray-500">by</span>
+                                        <span className="font-bold text-white">{Math.abs(spell.effect)}%</span>
+                                        <span className="text-gray-500">for</span>
+                                        <span className="font-bold text-white">{spell.eco} turns</span>
+                                    </div>
+                                </div>
+                            )}
+
                             <ul className="text-xs text-cyan-50 grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-1">
                                 {/* Always show Effect first */}
                                 {spell.effect !== undefined && (
                                     <li className="flex justify-between items-center hover:bg-cyan-500/10 p-0.5 rounded transition-colors border-b border-cyan-500/10">
-                                        <span className="font-medium text-cyan-300/70 capitalize truncate mr-2">Effect</span>
+                                        <span className="font-medium text-cyan-300/70 capitalize truncate mr-2">
+                                            {spell.type === 'buff' || spell.type === 'debuff' ? 'Modification %' : 'Effect'}
+                                        </span>
                                         <span className="font-mono text-cyan-300 font-bold drop-shadow-[0_0_4px_rgba(34,211,238,0.4)]">{spell.effect}</span>
                                     </li>
                                 )}
                                 {Object.entries(spell)
                                     .filter(([key, value]) => {
                                         const defaultSpell = DEFAULT_SPELLS[0];
-                                        return key !== 'id' && key !== 'name' && key !== 'type' && key !== 'effect' && value !== undefined && value !== (defaultSpell as any)[key];
+                                        return key !== 'id' && key !== 'name' && key !== 'type' && key !== 'effect' && key !== 'targetStat' && value !== undefined && value !== (defaultSpell as any)[key] && typeof value !== 'object';
                                     })
                                     .map(([key, value]) => (
                                         <li key={key} className="flex justify-between items-center hover:bg-cyan-500/10 p-0.5 rounded transition-colors border-b border-cyan-500/10">
-                                            <span className="font-medium text-cyan-300/70 capitalize truncate mr-2" title={key}>{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                                            <span className="font-medium text-cyan-300/70 capitalize truncate mr-2" title={key}>
+                                                {key === 'eco' && (spell.type === 'buff' || spell.type === 'debuff') ? 'Duration (Turns)' : key.replace(/([A-Z])/g, ' $1').trim()}
+                                            </span>
                                             <span className="font-mono text-cyan-300 font-bold drop-shadow-[0_0_4px_rgba(34,211,238,0.4)]">{String(value)}</span>
                                         </li>
                                     ))}

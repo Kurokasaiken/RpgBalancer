@@ -3,9 +3,10 @@ import { HitChanceModule } from '../../balancing/modules/hitchance';
 import { MitigationModule } from '../../balancing/modules/mitigation';
 import { CriticalModule } from '../../balancing/modules/critical';
 import { SustainModule } from '../../balancing/modules/sustain';
-import { DotModule } from '../../balancing/modules/dot';
-import { BuffModule } from '../../balancing/modules/buffs';
+import { StatusEffectManager, StatusEffectFactory } from '../../balancing/statusEffects/StatusEffectManager';
+import type { EffectedCharacter } from '../../balancing/statusEffects/StatusEffectManager';
 import type { RNG } from '../../balancing/simulation/types';
+import { DEFAULT_STATS } from '../../balancing/types';
 
 // ... (inside resolveCombatRound)
 
@@ -14,6 +15,8 @@ import type { RNG } from '../../balancing/simulation/types';
 
 export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
     if (state.isFinished) return state;
+
+    const effectManager = new StatusEffectManager();
 
     state.turn++;
     state.log.push({ turn: state.turn, message: `--- Turn ${state.turn} ---`, type: 'info' });
@@ -46,43 +49,47 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
         }
     }
 
-    // ========== DOT/HOT: Apply Periodic Effects ==========
-    // ARCHITECTURE: Inheriting formula from DotModule
+    // ========== STATUS EFFECTS: Process DoTs, HoTs, Stuns, etc. ==========
     for (const { entity } of allEntities) {
-        const effects = state.entityEffects.get(entity.id);
-        if (!effects || effects.dots.length === 0) continue;
+        const effects = state.entityEffects.get(entity.id) || [];
 
-        // Apply each DoT/HoT tick
-        effects.dots.forEach(dot => {
-            const result = DotModule.applyTick(
-                entity.currentHp,
-                dot.amountPerTurn * (dot.currentStacks || 1),
-                entity.statBlock?.hp || entity.currentHp
-            );
+        // Create adapter for StatusEffectManager
+        const effectedChar: EffectedCharacter = {
+            id: entity.id,
+            name: entity.name,
+            baseStats: entity.statBlock || DEFAULT_STATS,
+            statusEffects: effects
+        };
 
-            entity.currentHp = result.newHp;
+        // Process effects (DoTs, HoTs, etc.)
+        const result = effectManager.processEffects(effectedChar);
 
-            if (Math.abs(result.actualAmount) > 0) {
-                const dotType = dot.type === 'damage' ? 'takes' : 'heals';
-                state.log.push({
-                    turn: state.turn,
-                    message: `${entity.name} ${dotType} ${Math.abs(result.actualAmount).toFixed(1)} from ${dot.source}`,
-                    type: dot.type
-                });
-            }
-        });
+        // Apply DoT damage
+        if (result.damageReceived > 0) {
+            entity.takeDamage(result.damageReceived);
+            state.log.push({
+                turn: state.turn,
+                message: `${entity.name} takes ${result.damageReceived.toFixed(1)} damage from effects`,
+                type: 'dot'
+            });
+        }
 
-        // Tick down durations
-        effects.dots = DotModule.tickDurations(effects.dots);
-    }
+        // Apply HoT healing
+        if (result.healingReceived > 0) {
+            entity.heal(result.healingReceived);
+            state.log.push({
+                turn: state.turn,
+                message: `${entity.name} heals ${result.healingReceived.toFixed(1)} HP from effects`,
+                type: 'hot'
+            });
+        }
 
-    // ========== BUFFS: Tick Down Durations ==========
-    // ARCHITECTURE: Inheriting from BuffModule
-    for (const { entity } of allEntities) {
-        const effects = state.entityEffects.get(entity.id);
-        if (!effects) continue;
+        // Tick down durations at end of turn (or start? usually end, but logic.ts had it at start)
+        // logic.ts had it at start. Let's keep it here.
+        effectManager.tickDuration(effectedChar);
 
-        effects.buffs = BuffModule.tickDurations(effects.buffs);
+        // Update state with modified effects list
+        state.entityEffects.set(entity.id, effectedChar.statusEffects);
     }
 
     // Sort by speed (descending)
@@ -102,11 +109,89 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
             return state;
         }
 
+        // Check for Stun
+        const currentEffects = state.entityEffects.get(entity.id) || [];
+        const isStunned = currentEffects.some(e => e.type === 'stun');
+
+        if (isStunned) {
+            state.log.push({ turn: state.turn, message: `${entity.name} is stunned and cannot act!`, type: 'info' });
+            continue;
+        }
+
         // Simple AI: Attack random living enemy
         const target = livingEnemies[Math.floor(rng() * livingEnemies.length)];
 
+        // --- SPELL CASTING LOGIC ---
+        // Check if entity has spells to cast
+        let spellCast = false;
+        if (entity.spells && entity.spells.length > 0) {
+            // Simple AI: Filter for buff/debuff spells that are off cooldown (assuming all ready for now)
+            const availableSpells = entity.spells.filter(s => s.type === 'buff' || s.type === 'debuff');
+
+            if (availableSpells.length > 0) {
+                // 50% chance to cast a spell if available
+                if (rng() < 0.5) {
+                    const spell = availableSpells[Math.floor(rng() * availableSpells.length)];
+                    spellCast = true;
+
+                    // Create effect
+                    if (spell.type === 'buff' || spell.type === 'debuff') {
+                        const statChanges: Partial<typeof DEFAULT_STATS> = {};
+                        if (spell.targetStat) {
+                            // For debuffs, the effect should be negative if it's not already
+                            // But usually debuffs are defined with negative values or positive values that mean reduction?
+                            // In spellTypes.ts, effect is "Base effect percentage".
+                            // Let's assume for debuffs we invert it if it's positive, or trust the user input.
+                            // User input in UI: "Modification %". If user puts 20% for debuff, it likely means -20%.
+                            // But let's look at SpellCreation.tsx:
+                            // {spell.type === 'buff' ? 'Increases' : 'Decreases'} ... {Math.abs(spell.effect)}%
+                            // So the UI treats it as absolute value and applies sign based on type.
+                            // We should do the same here.
+                            let value = Math.abs(spell.effect);
+                            if (spell.type === 'debuff') value = -value;
+                            (statChanges as any)[spell.targetStat] = value;
+                        }
+
+                        const effect = spell.type === 'buff'
+                            ? StatusEffectFactory.createBuff(statChanges, spell.eco || 1, spell.name, entity.name)
+                            : StatusEffectFactory.createDebuff(statChanges, spell.eco || 1, spell.name, entity.name);
+
+                        // Apply to target (Debuff) or Self (Buff)
+                        // Usually buffs are self, debuffs are enemy.
+                        const targetEntity = spell.type === 'buff' ? entity : target;
+
+                        // We need to get the EffectedCharacter adapter for the target
+                        const targetEffects = state.entityEffects.get(targetEntity.id) || [];
+                        const targetAdapter: EffectedCharacter = {
+                            id: targetEntity.id,
+                            name: targetEntity.name,
+                            baseStats: targetEntity.statBlock || DEFAULT_STATS,
+                            statusEffects: targetEffects
+                        };
+
+                        effectManager.applyEffect(targetAdapter, effect);
+
+                        // Update state
+                        state.entityEffects.set(targetEntity.id, targetAdapter.statusEffects);
+
+                        state.log.push({
+                            turn: state.turn,
+                            message: `${entity.name} casts ${spell.name} on ${targetEntity.name} (${spell.type === 'buff' ? 'Buff' : 'Debuff'} ${spell.targetStat} by ${spell.effect}%)`,
+                            type: spell.type
+                        });
+                    }
+                }
+            }
+        }
+
+        if (spellCast) continue; // Skip basic attack if spell was cast
+
+        // Perform Attack
+
         // Perform Attack
         let totalDamage = 0;
+        // The `isHit` variable is declared here and used later in the `if (isHit)` block.
+        // The `isHit` inside the `if (entity.statBlock && target.statBlock)` block is a separate, block-scoped variable.
         const isHit = true; // Default to true for legacy
 
         // --- STAT BLOCK LOGIC (Balancing Lab) ---
@@ -115,19 +200,30 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
             const defenderStats = target.statBlock;
 
             // ========== BUFFS: Apply to Stats ==========
-            // ARCHITECTURE: Inheriting from BuffModule
-            const attackerEffects = state.entityEffects.get(entity.id);
-            const defenderEffects = state.entityEffects.get(target.id);
+            // ARCHITECTURE: Using StatusEffectManager
+            const attackerEffectsList = state.entityEffects.get(entity.id) || [];
+            const defenderEffectsList = state.entityEffects.get(target.id) || [];
 
-            // Apply buffs to attacker damage
-            const buffedDamage = attackerEffects
-                ? BuffModule.applyStatModifiers(attackerStats.damage, attackerEffects.buffs, 'damage')
-                : attackerStats.damage;
+            const attackerAdapter: EffectedCharacter = {
+                id: entity.id,
+                name: entity.name,
+                baseStats: attackerStats,
+                statusEffects: attackerEffectsList
+            };
 
-            // Apply buffs to defender armor
-            const buffedArmor = defenderEffects
-                ? BuffModule.applyStatModifiers(defenderStats.armor, defenderEffects.buffs, 'armor')
-                : defenderStats.armor;
+            const defenderAdapter: EffectedCharacter = {
+                id: target.id,
+                name: target.name,
+                baseStats: defenderStats,
+                statusEffects: defenderEffectsList
+            };
+
+            const effectiveAttackerStats = effectManager.getEffectiveStats(attackerAdapter);
+            const effectiveDefenderStats = effectManager.getEffectiveStats(defenderAdapter);
+
+            // Use effective stats
+            const buffedDamage = effectiveAttackerStats.damage;
+            const buffedArmor = effectiveDefenderStats.armor;
 
             // 1. Hit Chance
             const hitChance = HitChanceModule.calculateHitChance(attackerStats.txc, defenderStats.evasion);
@@ -193,24 +289,33 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
 
         if (isHit) {
             // ========== SHIELDS: Absorb Damage First ==========
-            // ARCHITECTURE: Inheriting from BuffModule
-            const targetEffects = state.entityEffects.get(target.id);
+            // ARCHITECTURE: Using StatusEffectManager (Manual Shield Logic)
+            const targetEffectsList = state.entityEffects.get(target.id) || [];
             let damageToHp = totalDamage;
 
-            if (targetEffects && targetEffects.buffs.length > 0) {
-                const result = BuffModule.applyDamageToShields(
-                    totalDamage,
-                    targetEffects.buffs
-                );
+            // Filter for shields
+            const shields = targetEffectsList.filter(e => e.type === 'shield') as any[]; // Cast to any to access shieldAmount
 
-                targetEffects.buffs = result.updatedBuffs;
-                damageToHp = result.remainingDamage;
+            if (shields.length > 0) {
+                let absorbedTotal = 0;
 
-                const shieldAbsorbed = totalDamage - damageToHp;
-                if (shieldAbsorbed > 0) {
+                for (const shield of shields) {
+                    if (damageToHp <= 0) break;
+
+                    const absorb = Math.min(damageToHp, shield.shieldAmount);
+                    shield.shieldAmount -= absorb;
+                    damageToHp -= absorb;
+                    absorbedTotal += absorb;
+                }
+
+                // Remove depleted shields
+                const activeEffects = targetEffectsList.filter(e => e.type !== 'shield' || (e as any).shieldAmount > 0);
+                state.entityEffects.set(target.id, activeEffects);
+
+                if (absorbedTotal > 0) {
                     state.log.push({
                         turn: state.turn,
-                        message: `${target.name}'s shield absorbs ${shieldAbsorbed.toFixed(0)} damage!`,
+                        message: `${target.name}'s shield absorbs ${absorbedTotal.toFixed(0)} damage!`,
                         type: 'info'
                     });
                 }

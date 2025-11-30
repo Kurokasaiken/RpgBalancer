@@ -26,7 +26,8 @@ export interface ActiveEffect {
     name: string;
     value: number; // Magnitude (damage, heal amount, stat mod)
     duration: number; // Rounds remaining
-    statModified?: string; // For buffs/debuffs
+    statModified?: string; // For buffs/debuffs (legacy)
+    statModifications?: Record<string, number>; // For new buff/debuff system
 }
 
 export interface CombatState {
