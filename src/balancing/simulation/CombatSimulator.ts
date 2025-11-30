@@ -1,4 +1,4 @@
-import type { CombatConfig, CombatResult, TurnData } from './types';
+import type { CombatConfig, CombatResult, TurnData, RNG } from './types';
 import { Entity } from '../../engine/core/entity';
 import { createCombatState } from '../../engine/combat/state';
 import { resolveCombatRound } from '../../engine/combat/logic';
@@ -16,13 +16,31 @@ import type { StatBlock } from '../types';
  * @see src/balancing/modules/* for all combat formulas
  */
 export class CombatSimulator {
+    private rng: RNG;
+
+    /**
+     * Create a new CombatSimulator with optional RNG
+     * @param rng Random Number Generator function (defaults to Math.random)
+     */
+    constructor(rng: RNG = Math.random) {
+        this.rng = rng;
+    }
+
+    /**
+     * Run a single combat simulation (Static Wrapper)
+     * Uses Math.random by default for backward compatibility, but supports custom RNG
+     */
+    static simulate(config: CombatConfig, rng: RNG = Math.random): CombatResult {
+        return new CombatSimulator(rng).simulate(config);
+    }
+
     /**
      * Run a single combat simulation
      * 
      * @param config Combat configuration (entities, turn limit, logging)
      * @returns Combat result with winner, turns, damage stats, HP remaining, etc.
      */
-    static simulate(config: CombatConfig): CombatResult {
+    simulate(config: CombatConfig): CombatResult {
         const { entity1, entity2, turnLimit, enableDetailedLogging = false } = config;
 
         // Convert EntityStats to StatBlock format
@@ -50,7 +68,8 @@ export class CombatSimulator {
             const hpBefore2 = fighter2.currentHp;
 
             // Resolve combat round using EXISTING logic
-            state = resolveCombatRound(state);
+            // CRITICAL: Pass the seeded RNG to the logic engine
+            state = resolveCombatRound(state, this.rng);
 
             // Calculate damage dealt this turn
             const damageTaken1 = hpBefore1 - fighter1.currentHp;
@@ -116,7 +135,7 @@ export class CombatSimulator {
      * 
      * Uses BASELINE_STATS as reference for missing values
      */
-    private static entityToStatBlock(entity: any): StatBlock {
+    private entityToStatBlock(entity: any): StatBlock {
         // ✅ INHERIT baseline stats, override only what's provided
         return {
             ...BASELINE_STATS, // Start with validated baseline
@@ -154,7 +173,7 @@ export class CombatSimulator {
     /**
    * Extract turn-by-turn data from combat log
    */
-    private static extractTurnLog(state: any): TurnData[] {
+    private extractTurnLog(state: any): TurnData[] {
         const turnLog: TurnData[] = [];
 
         // Parse combat log for attack entries

@@ -167,16 +167,16 @@ export function runMonteCarlo(
     // Run simulations
     for (let i = 0; i < nSim; i++) {
         // Use existing CombatSimulator (it has RNG internally)
-        // Note: We're using a simplified approach here - the existing simulator
-        // doesn't accept a seed, so we're just running it multiple times
-        // For true seedability, we'd need to modify CombatSimulator or reimplement
+        // CRITICAL: Pass the seeded RNG wrapper to the simulator
+        // We bind the next() method to the rng instance to ensure correct 'this' context
+        const rngWrapper = () => rng.next();
 
         const result = CombatSimulator.simulate({
-            entity1: rowStats,
-            entity2: colStats,
+            entity1: { ...rowStats, name: 'Row Entity', attack: rowStats.damage, defense: rowStats.armor },
+            entity2: { ...colStats, name: 'Col Entity', attack: colStats.damage, defense: colStats.armor },
             turnLimit: config.turnLimitPolicy(50), // Estimate
             enableDetailedLogging: false, // Disable for performance
-        });
+        }, rngWrapper);
 
         // Map result to row/col terminology
         const winner = result.winner === 'entity1' ? 'row' : result.winner === 'entity2' ? 'col' : 'draw';

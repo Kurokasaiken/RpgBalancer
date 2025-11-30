@@ -5,13 +5,14 @@ import { CriticalModule } from '../../balancing/modules/critical';
 import { SustainModule } from '../../balancing/modules/sustain';
 import { DotModule } from '../../balancing/modules/dot';
 import { BuffModule } from '../../balancing/modules/buffs';
+import type { RNG } from '../../balancing/simulation/types';
 
 // ... (inside resolveCombatRound)
 
 // 1. Hit Chance (Always active for now, but could be toggled)
 
 
-export function resolveCombatRound(state: CombatState): CombatState {
+export function resolveCombatRound(state: CombatState, rng: RNG = Math.random): CombatState {
     if (state.isFinished) return state;
 
     state.turn++;
@@ -102,7 +103,7 @@ export function resolveCombatRound(state: CombatState): CombatState {
         }
 
         // Simple AI: Attack random living enemy
-        const target = livingEnemies[Math.floor(Math.random() * livingEnemies.length)];
+        const target = livingEnemies[Math.floor(rng() * livingEnemies.length)];
 
         // Perform Attack
         let totalDamage = 0;
@@ -130,7 +131,7 @@ export function resolveCombatRound(state: CombatState): CombatState {
 
             // 1. Hit Chance
             const hitChance = HitChanceModule.calculateHitChance(attackerStats.txc, defenderStats.evasion);
-            const hitRoll = Math.random() * 100;
+            const hitRoll = rng() * 100;
             const isHit = hitRoll <= hitChance;
 
             if (!isHit) {
@@ -149,7 +150,7 @@ export function resolveCombatRound(state: CombatState): CombatState {
             let isCritical = false;
             let rawDamage = buffedDamage; // Use buffed damage!
 
-            const critRoll = Math.random() * 100;
+            const critRoll = rng() * 100;
             isCritical = critRoll <= attackerStats.critChance;
 
             if (isCritical) {
@@ -176,12 +177,12 @@ export function resolveCombatRound(state: CombatState): CombatState {
             // Base damage + Weapon damage + Random variance (0.9 - 1.1)
             const baseDmg = entity.derivedStats.attackPower;
             const weaponDmg = entity.equipment.weapon?.damage || 0;
-            const variance = 0.9 + Math.random() * 0.2;
+            const variance = 0.9 + rng() * 0.2;
 
             totalDamage = Math.floor((baseDmg + weaponDmg) * variance);
 
             // Check Crit
-            if (Math.random() < entity.derivedStats.critChance) {
+            if (rng() < entity.derivedStats.critChance) {
                 totalDamage = Math.floor(totalDamage * 1.5);
                 state.log.push({ turn: state.turn, message: `${entity.name} CRITS!`, type: 'info' });
             }

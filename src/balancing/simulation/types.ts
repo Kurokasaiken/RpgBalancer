@@ -16,6 +16,14 @@ export interface EntityStats {
 }
 
 /**
+ * Random Number Generator interface
+ * Used for deterministic simulations
+ */
+export interface RNG {
+    (): number; // Returns number between 0 and 1
+}
+
+/**
  * Turn data - represents what happened in a single turn
  */
 export interface TurnData {

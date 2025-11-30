@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { BASELINE_STATS } from '../../balancing/baseline';
 import { toast } from 'sonner';
 import { SpellInfoForm } from './components/SpellInfoForm';
 import { StatsGrid } from './components/StatsGrid';
@@ -152,20 +153,12 @@ export const SpellCreation: React.FC = () => {
 
     const cost = calculateSpellBudget(spell, getCustomWeights(), getUserBaseline());
 
-    // Calculate damage range for preview (min - max)
-    // TODO: Implement full formula: hitChance% * effect * (1 + dangerous/100) * other_modifiers
-    const calculateDamageRange = (): { min: number; max: number } | null => {
-        // Placeholder - will be implemented with full combat formulas
-        // const hitChance = spell.hitChance || 100;
-        // const effect = spell.effect || 0;
-        // const dangerous = spell.dangerous || 0;
-        // const baseDamage = (hitChance / 100) * effect * (1 + dangerous / 100);
-        // return { min: Math.floor(baseDamage * 0.9), max: Math.ceil(baseDamage * 1.1) };
-        return null; // Return null for now
+    // Calcolo danno preview: effect% × damageBase × eco
+    const previewDamage = (spell: Spell) => {
+        const damageBase = BASELINE_STATS.damage;
+        const effectPercent = spell.effect / 100;
+        return (effectPercent * damageBase * spell.eco).toFixed(1);
     };
-
-    const damageRange = calculateDamageRange();
-    const damageRangeText = damageRange ? `${damageRange.min} - ${damageRange.max}` : '-- - --';
 
     const updateField = (field: keyof Spell, value: any) => {
         setSpell(prev => ({ ...prev, [field]: value }));
@@ -277,7 +270,10 @@ export const SpellCreation: React.FC = () => {
                         <div className="backdrop-blur-md bg-cyan-900/20 border border-cyan-500/30 rounded-lg p-4 h-full shadow-[0_4px_16px_rgba(6,182,212,0.15)] overflow-y-auto">
                             <div className="flex justify-between items-center text-lg font-bold text-cyan-100 mb-2 drop-shadow-[0_0_6px_rgba(6,182,212,0.6)] border-b border-cyan-500/20 pb-1">
                                 <span>Preview Spell</span>
-                                <span className="text-sm font-mono text-cyan-400">{damageRangeText}</span>
+                                <span className="text-sm font-mono text-cyan-400">
+                                    {previewDamage(spell)}
+                                    <span className="text-xs text-cyan-300 ml-2">({spell.effect}% × {BASELINE_STATS.damage} × {spell.eco})</span>
+                                </span>
                             </div>
                             <ul className="text-xs text-cyan-50 grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-1">
                                 {/* Always show Effect first */}

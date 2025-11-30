@@ -1,0 +1,370 @@
+
+> progetti-personali@0.0.0 test
+> vitest src/balancing/simulation/__tests__/CombatSimulator.test.ts
+
+
+[1m[44m DEV [49m[22m [34mv4.0.14 [39m[90m/Users/faustoboni/projects/progetti personali[39m
+
+[90mstdout[2m | src/balancing/simulation/__tests__/CombatSimulator.test.ts[2m > [22m[2mCombatSimulator Determinism & Regression Pack[2m > [22m[2mDeterminism & RNG[2m > [22m[2mshould produce identical results with the same seed (20 rolls check)
+[22m[39mRNG: [33m0.4131601508916324[39m
+RNG: [33m0.01388460219478738[39m
+RNG: [33m0.3520061728395062[39m
+RNG: [33m0.22073473936899862[39m
+RNG: [33m0.2651320301783265[39m
+RNG: [33m0.20433384773662552[39m
+RNG: [33m0.7204389574759945[39m
+RNG: [33m0.014064643347050754[39m
+RNG: [33m0.026568930041152263[39m
+RNG: [33m0.3289394718792867[39m
+RNG: [33m0.6773491083676269[39m
+RNG: [33m0.23537808641975308[39m
+RNG: [33m0.4629029492455418[39m
+RNG: [33m0.6716520919067215[39m
+RNG: [33m0.24742798353909465[39m
+RNG: [33m0.5389960562414267[39m
+RNG: [33m0.41364026063100134[39m
+RNG: [33m0.47938528806584363[39m
+RNG: [33m0.9738854595336077[39m
+RNG: [33m0.31998028120713307[39m
+RNG: [33m0.4131601508916324[39m
+RNG: [33m0.01388460219478738[39m
+RNG: [33m0.3520061728395062[39m
+RNG: [33m0.22073473936899862[39m
+RNG: [33m0.2651320301783265[39m
+RNG: [33m0.20433384773662552[39m
+RNG: [33m0.7204389574759945[39m
+RNG: [33m0.014064643347050754[39m
+RNG: [33m0.026568930041152263[39m
+RNG: [33m0.3289394718792867[39m
+RNG: [33m0.6773491083676269[39m
+RNG: [33m0.23537808641975308[39m
+RNG: [33m0.4629029492455418[39m
+RNG: [33m0.6716520919067215[39m
+RNG: [33m0.24742798353909465[39m
+RNG: [33m0.5389960562414267[39m
+RNG: [33m0.41364026063100134[39m
+RNG: [33m0.47938528806584363[39m
+RNG: [33m0.9738854595336077[39m
+RNG: [33m0.31998028120713307[39m
+RNG: [33m0.34791666666666665[39m
+RNG: [33m0.18423782578875172[39m
+RNG: [33m0.8073388203017833[39m
+RNG: [33m0.26968878600823043[39m
+RNG: [33m0.5867198216735254[39m
+RNG: [33m0.29238254458161866[39m
+RNG: [33m0.6613683127572016[39m
+RNG: [33m0.5979981138545953[39m
+RNG: [33m0.1917781207133059[39m
+RNG: [33m0.9396219135802469[39m
+RNG: [33m0.6347393689986283[39m
+RNG: [33m0.9221922153635117[39m
+RNG: [33m0.5211162551440329[39m
+RNG: [33m0.11361025377229081[39m
+RNG: [33m0.9002914951989026[39m
+RNG: [33m0.8225180041152264[39m
+RNG: [33m0.45127743484224964[39m
+RNG: [33m0.5427426268861454[39m
+RNG: [33m0.26049382716049385[39m
+RNG: [33m0.06440757887517147[39m
+RNG: [33m0.2662122770919067[39m
+RNG: [33m0.4131601508916324[39m
+RNG: [33m0.01388460219478738[39m
+RNG: [33m0.3520061728395062[39m
+RNG: [33m0.22073473936899862[39m
+RNG: [33m0.2651320301783265[39m
+RNG: [33m0.20433384773662552[39m
+RNG: [33m0.7204389574759945[39m
+RNG: [33m0.014064643347050754[39m
+RNG: [33m0.026568930041152263[39m
+RNG: [33m0.3289394718792867[39m
+RNG: [33m0.6773491083676269[39m
+RNG: [33m0.23537808641975308[39m
+RNG: [33m0.4629029492455418[39m
+RNG: [33m0.6716520919067215[39m
+RNG: [33m0.24742798353909465[39m
+
+[90mstdout[2m | src/balancing/simulation/__tests__/CombatSimulator.test.ts[2m > [22m[2mCombatSimulator Determinism & Regression Pack[2m > [22m[2mDeterminism & RNG[2m > [22m[2mshould produce different results with different seeds
+[22m[39mRNG: [33m0.21291152263374485[39m
+RNG: [33m0.5013931755829903[39m
+RNG: [33m0.669247256515775[39m
+RNG: [33m0.880054012345679[39m
+RNG: [33m0.5936899862825789[39m
+RNG: [33m0.12188357338820302[39m
+RNG: [33m0.8504372427983539[39m
+RNG: [33m0.12811642661179698[39m
+RNG: [33m0.8222050754458162[39m
+RNG: [33m0.5407278806584362[39m
+RNG: [33m0.5213391632373113[39m
+RNG: [33m0.1868784293552812[39m
+RNG: [33m0.3675925925925926[39m
+RNG: [33m0.19002486282578876[39m
+RNG: [33m0.6325703017832648[39m
+RNG: [33m0.7476980452674897[39m
+RNG: [33m0.5508401920438958[39m
+RNG: [33m0.5759473593964335[39m
+RNG: [33m0.09771090534979424[39m
+RNG: [33m0.02045181755829904[39m
+RNG: [33m0.43367626886145405[39m
+RNG: [33m0.22563443072702333[39m
+RNG: [33m0.8371613511659808[39m
+RNG: [33m0.649048353909465[39m
+RNG: [33m0.010060871056241427[39m
+RNG: [33m0.787482853223594[39m
+RNG: [33m0.5893389917695473[39m
+RNG: [33m0.6532836076817559[39m
+RNG: [33m0.402156207133059[39m
+RNG: [33m0.6662037037037037[39m
+RNG: [33m0.5719693072702332[39m
+RNG: [33m0.09784807956104252[39m
+RNG: [33m0.29630915637860084[39m
+RNG: [33m0.1827846364883402[39m
+RNG: [33m0.2912251371742112[39m
+RNG: [33m0.8963220164609054[39m
+RNG: [33m0.9023962620027435[39m
+RNG: [33m0.39895404663923184[39m
+RNG: [33m0.8829089506172839[39m
+RNG: [33m0.14747085048010974[39m
+RNG: [33m0.8377014746227709[39m
+RNG: [33m0.6727366255144033[39m
+RNG: [33m0.3346750685871056[39m
+RNG: [33m0.024134087791495198[39m
+
+[90mstdout[2m | src/balancing/simulation/__tests__/CombatSimulator.test.ts[2m > [22m[2mCombatSimulator Determinism & Regression Pack[2m > [22m[2mGlobal Reproducibility[2m > [22m[2mshould run two identical matrix simulations and get identical results
+[22m[39mRNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+
+ [31m❯[39m src/balancing/simulation/__tests__/CombatSimulator.test.ts [2m([22m[2m8 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 8[2mms[22m[39m
+[31m       [31m×[31m should produce identical results with the same seed (20 rolls check)[39m[32m 6[2mms[22m[39m
+       [32m✓[39m should produce different results with different seeds[32m 1[2mms[22m[39m
+       [32m✓[39m should always hit when hit chance is 100% and evasion is 0%[32m 0[2mms[22m[39m
+       [32m✓[39m should always miss when hit chance is 0%[32m 0[2mms[22m[39m
+       [32m✓[39m should crit when roll is within crit chance[32m 0[2mms[22m[39m
+       [32m✓[39m should apply lifesteal correctly[32m 0[2mms[22m[39m
+       [32m✓[39m should apply regeneration[32m 0[2mms[22m[39m
+       [32m✓[39m should run two identical matrix simulations and get identical results[32m 0[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/balancing/simulation/__tests__/CombatSimulator.test.ts[2m > [22mCombatSimulator Determinism & Regression Pack[2m > [22mDeterminism & RNG[2m > [22mshould produce identical results with the same seed (20 rolls check)
+[31m[1mAssertionError[22m: expected { winner: 'entity1', turns: 4, …(4) } to deeply equal { winner: 'entity1', turns: 3, …(4) }[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[2m  {[22m
+[2m    "damageDealt": {[22m
+[2m      "entity1": 100,[22m
+[32m-     "entity2": 50,[39m
+[31m+     "entity2": 75,[39m
+[2m    },[22m
+[2m    "hpRemaining": {[22m
+[32m-     "entity1": 50,[39m
+[31m+     "entity1": 25,[39m
+[2m      "entity2": 0,[22m
+[2m    },[22m
+[2m    "overkill": {[22m
+[2m      "entity1": 0,[22m
+[2m      "entity2": 0,[22m
+[2m    },[22m
+[2m    "turnByTurnLog": undefined,[22m
+[32m-   "turns": 3,[39m
+[31m+   "turns": 4,[39m
+[2m    "winner": "entity1",[22m
+[2m  }[22m
+
+[36m [2m❯[22m src/balancing/simulation/__tests__/CombatSimulator.test.ts:[2m62:29[22m[39m
+    [90m 60| [39m            [35mconst[39m result2 [33m=[39m sim2[33m.[39m[34msimulate[39m(config)[33m;[39m
+    [90m 61| [39m
+    [90m 62| [39m            [34mexpect[39m(result1)[33m.[39m[34mtoEqual[39m(result2)[33m;[39m
+    [90m   | [39m                            [31m^[39m
+    [90m 63| [39m            [34mexpect[39m(result1[33m.[39mturns)[33m.[39m[34mtoBe[39m(result2[33m.[39mturns)[33m;[39m
+    [90m 64| [39m            [34mexpect[39m(result1[33m.[39mdamageDealt)[33m.[39m[34mtoEqual[39m(result2[33m.[39mdamageDealt)[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m7 passed[39m[22m[90m (8)[39m
+[2m   Start at [22m 09:37:45
+[2m   Duration [22m 299ms[2m (transform 48ms, setup 12ms, import 49ms, tests 8ms, environment 154ms)[22m
+
+[1m[41m FAIL [49m[22m [31mTests failed. Watching for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/balancing/simulation/__tests__/CombatSimulator.test.ts [22m[34mx1 [34m[39m
+       [2m Filename pattern: [22m[34msrc/balancing/simulation/__tests__/CombatSimulator.test.ts[39m
+
+[90mstdout[2m | src/balancing/simulation/__tests__/CombatSimulator.test.ts[2m > [22m[2mCombatSimulator Determinism & Regression Pack[2m > [22m[2mDeterminism & RNG[2m > [22m[2mshould produce identical results with the same seed (20 rolls check)
+[22m[39mRNG: [33m0.4131601508916324[39m
+RNG: [33m0.01388460219478738[39m
+RNG: [33m0.3520061728395062[39m
+RNG: [33m0.22073473936899862[39m
+RNG: [33m0.2651320301783265[39m
+RNG: [33m0.20433384773662552[39m
+RNG: [33m0.7204389574759945[39m
+RNG: [33m0.014064643347050754[39m
+RNG: [33m0.026568930041152263[39m
+RNG: [33m0.3289394718792867[39m
+RNG: [33m0.6773491083676269[39m
+RNG: [33m0.23537808641975308[39m
+RNG: [33m0.4629029492455418[39m
+RNG: [33m0.6716520919067215[39m
+RNG: [33m0.24742798353909465[39m
+RNG: [33m0.5389960562414267[39m
+RNG: [33m0.41364026063100134[39m
+RNG: [33m0.47938528806584363[39m
+RNG: [33m0.9738854595336077[39m
+RNG: [33m0.31998028120713307[39m
+RNG: [33m0.4131601508916324[39m
+RNG: [33m0.01388460219478738[39m
+RNG: [33m0.3520061728395062[39m
+RNG: [33m0.22073473936899862[39m
+RNG: [33m0.2651320301783265[39m
+RNG: [33m0.20433384773662552[39m
+RNG: [33m0.7204389574759945[39m
+RNG: [33m0.014064643347050754[39m
+RNG: [33m0.026568930041152263[39m
+RNG: [33m0.3289394718792867[39m
+RNG: [33m0.6773491083676269[39m
+RNG: [33m0.23537808641975308[39m
+RNG: [33m0.4629029492455418[39m
+RNG: [33m0.6716520919067215[39m
+RNG: [33m0.24742798353909465[39m
+RNG: [33m0.5389960562414267[39m
+RNG: [33m0.41364026063100134[39m
+RNG: [33m0.47938528806584363[39m
+RNG: [33m0.9738854595336077[39m
+RNG: [33m0.31998028120713307[39m
+RNG: [33m0.4131601508916324[39m
+RNG: [33m0.01388460219478738[39m
+RNG: [33m0.3520061728395062[39m
+RNG: [33m0.22073473936899862[39m
+RNG: [33m0.2651320301783265[39m
+RNG: [33m0.20433384773662552[39m
+RNG: [33m0.7204389574759945[39m
+RNG: [33m0.014064643347050754[39m
+RNG: [33m0.026568930041152263[39m
+RNG: [33m0.3289394718792867[39m
+RNG: [33m0.6773491083676269[39m
+RNG: [33m0.23537808641975308[39m
+RNG: [33m0.4629029492455418[39m
+RNG: [33m0.6716520919067215[39m
+RNG: [33m0.24742798353909465[39m
+RNG: [33m0.4131601508916324[39m
+RNG: [33m0.01388460219478738[39m
+RNG: [33m0.3520061728395062[39m
+RNG: [33m0.22073473936899862[39m
+RNG: [33m0.2651320301783265[39m
+RNG: [33m0.20433384773662552[39m
+RNG: [33m0.7204389574759945[39m
+RNG: [33m0.014064643347050754[39m
+RNG: [33m0.026568930041152263[39m
+RNG: [33m0.3289394718792867[39m
+RNG: [33m0.6773491083676269[39m
+RNG: [33m0.23537808641975308[39m
+RNG: [33m0.4629029492455418[39m
+RNG: [33m0.6716520919067215[39m
+RNG: [33m0.24742798353909465[39m
+
+[90mstdout[2m | src/balancing/simulation/__tests__/CombatSimulator.test.ts[2m > [22m[2mCombatSimulator Determinism & Regression Pack[2m > [22m[2mDeterminism & RNG[2m > [22m[2mshould produce different results with different seeds
+[22m[39mRNG: [33m0.21291152263374485[39m
+RNG: [33m0.5013931755829903[39m
+RNG: [33m0.669247256515775[39m
+RNG: [33m0.880054012345679[39m
+RNG: [33m0.5936899862825789[39m
+RNG: [33m0.12188357338820302[39m
+RNG: [33m0.8504372427983539[39m
+RNG: [33m0.12811642661179698[39m
+RNG: [33m0.8222050754458162[39m
+RNG: [33m0.5407278806584362[39m
+RNG: [33m0.5213391632373113[39m
+RNG: [33m0.1868784293552812[39m
+RNG: [33m0.3675925925925926[39m
+RNG: [33m0.19002486282578876[39m
+RNG: [33m0.6325703017832648[39m
+RNG: [33m0.7476980452674897[39m
+RNG: [33m0.5508401920438958[39m
+RNG: [33m0.5759473593964335[39m
+RNG: [33m0.09771090534979424[39m
+RNG: [33m0.02045181755829904[39m
+RNG: [33m0.43367626886145405[39m
+RNG: [33m0.22563443072702333[39m
+RNG: [33m0.8371613511659808[39m
+RNG: [33m0.649048353909465[39m
+RNG: [33m0.010060871056241427[39m
+RNG: [33m0.787482853223594[39m
+RNG: [33m0.5893389917695473[39m
+RNG: [33m0.6532836076817559[39m
+RNG: [33m0.402156207133059[39m
+RNG: [33m0.6662037037037037[39m
+RNG: [33m0.5719693072702332[39m
+RNG: [33m0.09784807956104252[39m
+RNG: [33m0.29630915637860084[39m
+RNG: [33m0.1827846364883402[39m
+RNG: [33m0.2912251371742112[39m
+RNG: [33m0.8963220164609054[39m
+RNG: [33m0.9023962620027435[39m
+RNG: [33m0.39895404663923184[39m
+RNG: [33m0.8829089506172839[39m
+RNG: [33m0.14747085048010974[39m
+RNG: [33m0.8377014746227709[39m
+RNG: [33m0.6727366255144033[39m
+RNG: [33m0.3346750685871056[39m
+RNG: [33m0.024134087791495198[39m
+
+[90mstdout[2m | src/balancing/simulation/__tests__/CombatSimulator.test.ts[2m > [22m[2mCombatSimulator Determinism & Regression Pack[2m > [22m[2mGlobal Reproducibility[2m > [22m[2mshould run two identical matrix simulations and get identical results
+[22m[39mRNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+RNG: [33m0.01902434842249657[39m
+
+ [32m✓[39m src/balancing/simulation/__tests__/CombatSimulator.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m8 passed[39m[22m[90m (8)[39m
+[2m   Start at [22m 09:38:54
+[2m   Duration [22m 53ms
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/balancing/simulation/__tests__/CombatSimulator.test.ts [22m[34mx2 [34m[39m
+       [2m Filename pattern: [22m[34msrc/balancing/simulation/__tests__/CombatSimulator.test.ts[39m
+
+ [32m✓[39m src/balancing/simulation/__tests__/CombatSimulator.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m8 passed[39m[22m[90m (8)[39m
+[2m   Start at [22m 09:39:21
+[2m   Duration [22m 43ms
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m

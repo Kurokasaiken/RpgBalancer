@@ -4,6 +4,7 @@ import { loadSpells, deleteSpell } from '../../balancing/spellStorage';
 import { Tooltip } from '../components/Tooltip';
 import { STAT_DESCRIPTIONS } from '../../data/tooltips';
 import { SpellEditor } from './SpellEditor';
+import { BASELINE_STATS } from '../../balancing/baseline';
 
 /** Enhanced Spell Library with detailed cards */
 export const SpellLibrary: React.FC = () => {
@@ -46,14 +47,10 @@ export const SpellLibrary: React.FC = () => {
     };
 
     const getAvgDamage = (spell: Spell): string => {
-        // Simplified calculation assuming base attack of 100
-        const baseAttack = 100;
-        const baseDamage = (spell.effect / 100) * baseAttack;
-        const scaledDamage = baseDamage * (1 + spell.scale);
-        const totalDamage = scaledDamage * spell.eco;
-        const withSuccess = totalDamage * (spell.dangerous / 100);
-
-        return withSuccess.toFixed(1);
+        const damageBase = BASELINE_STATS.damage;
+        const effectPercent = spell.effect / 100;
+        const totalDamage = effectPercent * damageBase * spell.eco;
+        return totalDamage.toFixed(1);
     };
 
     return (
@@ -126,9 +123,9 @@ export const SpellLibrary: React.FC = () => {
                                     <div className="text-2xl font-bold text-white">{selectedSpell.effect}%</div>
                                 </div>
                                 <div className="backdrop-blur-md bg-white/5 border border-white/10 p-4 rounded hover:scale-[1.02] transition-all">
-                                    <div className="text-gray-400 text-sm mb-1">Avg Damage*</div>
+                                    <div className="text-gray-400 text-sm mb-1">Avg Damage (effect% × base × eco)</div>
                                     <div className="text-2xl font-bold text-green-400">{getAvgDamage(selectedSpell)}</div>
-                                    <div className="text-xs text-gray-500">*base atk 100</div>
+                                    <div className="text-xs text-gray-500">base = {BASELINE_STATS.damage}, eco = {selectedSpell.eco}</div>
                                 </div>
                             </div>
 
