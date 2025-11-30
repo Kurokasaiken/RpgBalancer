@@ -11,11 +11,13 @@ import { ErrorBoundary } from './ui/organisms/ErrorBoundary';
 
 import { ArchetypeManager } from './components/balancing/archetype/ArchetypeManager';
 import { ArchetypeBuilderComponent } from './ui/balancing/archetype/ArchetypeBuilderComponent';
+import { ArchetypeBuilderFantasy } from './ui/balancing/archetype/ArchetypeBuilderFantasy';
 import { MatchupMatrixWrapper } from './ui/balancing/matchup/MatchupMatrixWrapper';
 import { AutoBalancerWrapper } from './ui/balancing/autobalancer/AutoBalancerWrapper';
 import { CharacterCreator } from './ui/character/CharacterCreator';
+import { FantasyComponentShowcase } from './ui/atoms/FantasyComponentShowcase';
 
-type Tab = 'balancer' | 'archetypes' | 'archetypeBuilder' | 'matchupMatrix' | 'autoBalancer' | 'characterCreator' | 'spellLibrary' | 'spellCreation' | 'characterManager' | 'gridArena' | 'idleArena' | 'testing';
+type Tab = 'balancer' | 'archetypes' | 'archetypeBuilder' | 'archetypeFantasy' | 'matchupMatrix' | 'autoBalancer' | 'characterCreator' | 'spellLibrary' | 'spellCreation' | 'characterManager' | 'gridArena' | 'idleArena' | 'testing' | 'fantasyShowcase';
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('balancer');
@@ -27,140 +29,187 @@ function App() {
     return () => window.removeEventListener('navigate-spell-creation', handleNavigate as EventListener);
   }, []);
 
+
+
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      {/* Tab Navigation */}
-      <div className="bg-gray-800 border-b border-gray-700">
-        <div className="max-w-7xl mx-auto px-8">
-          <nav className="flex space-x-8 overflow-x-auto">
-            {/* BALANCING */}
-            <button
-              onClick={() => setActiveTab('balancer')}
-              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'balancer'
-                ? 'border-purple-500 text-white'
-                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-                }`}
-            >
-              ⚖️ Balancer
-            </button>
+    <div className="min-h-screen bg-app text-on-dark font-body bg-wood-dark">
+      {/* Tab Navigation - Wooden Beam Style */}
+      <div className="fantasy-wood-panel z-50 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
+            {/* Logo / Title */}
+            <div className="flex-shrink-0 flex items-center">
+              <span className="font-display text-2xl font-bold text-gradient-gold drop-shadow-md">
+                RPG Balancer
+              </span>
+            </div>
 
-            {/* ARCHETYPES */}
-            <button
-              onClick={() => setActiveTab('archetypes')}
-              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'archetypes'
-                ? 'border-purple-500 text-white'
-                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-                }`}
-            >
-              🎭 Archetypes
-            </button>
+            {/* Navigation */}
+            <nav className="flex space-x-2 overflow-x-auto scrollbar-hide mx-4 items-center h-full">
+              {/* BALANCING */}
+              {/* BALANCING */}
+              <button
+                onClick={() => setActiveTab('balancer')}
+                className={`px-3 py-2 rounded-md text-sm font-display font-bold transition-all ${activeTab === 'balancer'
+                  ? 'bg-sage text-wood-dark shadow-glow-green'
+                  : 'text-parchment-medium hover:text-parchment-light hover:bg-wood-medium'
+                  }`}
+              >
+                ⚖️ Balancer
+              </button>
 
-            {/* ARCHETYPE BUILDER */}
-            <button
-              onClick={() => setActiveTab('archetypeBuilder')}
-              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'archetypeBuilder'
-                ? 'border-purple-500 text-white'
-                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-                }`}
-            >
-              🏗️ Archetype Builder
-            </button>
+              {/* ARCHETYPES */}
+              {/* ARCHETYPES */}
+              <button
+                onClick={() => setActiveTab('archetypes')}
+                className={`px-3 py-2 rounded-md text-sm font-display font-bold transition-all ${activeTab === 'archetypes'
+                  ? 'bg-sage text-wood-dark shadow-glow-green'
+                  : 'text-parchment-medium hover:text-parchment-light hover:bg-wood-medium'
+                  }`}
+              >
+                🎭 Archetypes
+              </button>
 
-            {/* MATCHUP MATRIX */}
-            <button
-              onClick={() => setActiveTab('matchupMatrix')}
-              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'matchupMatrix'
-                ? 'border-purple-500 text-white'
-                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-                }`}
-            >
-              🗺️ Matchup Matrix
-            </button>
+              {/* ARCHETYPE BUILDER */}
+              {/* ARCHETYPE BUILDER */}
+              <button
+                onClick={() => setActiveTab('archetypeBuilder')}
+                className={`px-3 py-2 rounded-md text-sm font-display font-bold transition-all ${activeTab === 'archetypeBuilder'
+                  ? 'bg-sage text-wood-dark shadow-glow-green'
+                  : 'text-parchment-medium hover:text-parchment-light hover:bg-wood-medium'
+                  }`}
+              >
+                🏗️ Builder
+              </button>
 
-            {/* AUTO-BALANCER */}
-            <button
-              onClick={() => setActiveTab('autoBalancer')}
-              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'autoBalancer'
-                ? 'border-purple-500 text-white'
-                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-                }`}
-            >
-              🤖 Auto-Balancer
-            </button>
+              {/* ARCHETYPE FORGE (FANTASY) */}
+              {/* ARCHETYPE FORGE (FANTASY) */}
+              <button
+                onClick={() => setActiveTab('archetypeFantasy')}
+                className={`px-3 py-2 rounded-md text-sm font-display font-bold transition-all ${activeTab === 'archetypeFantasy'
+                  ? 'bg-sage text-wood-dark shadow-glow-green'
+                  : 'text-parchment-medium hover:text-parchment-light hover:bg-wood-medium'
+                  }`}
+              >
+                ⚒️ Forge
+              </button>
 
-            {/* CHARACTER CREATOR */}
-            <button
-              onClick={() => setActiveTab('characterCreator')}
-              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'characterCreator'
-                ? 'border-purple-500 text-white'
-                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-                }`}
-            >
-              ⚔️ Character Creator
-            </button>
+              {/* MATCHUP MATRIX */}
+              {/* MATCHUP MATRIX */}
+              <button
+                onClick={() => setActiveTab('matchupMatrix')}
+                className={`px-3 py-2 rounded-md text-sm font-display font-bold transition-all ${activeTab === 'matchupMatrix'
+                  ? 'bg-sage text-wood-dark shadow-glow-green'
+                  : 'text-parchment-medium hover:text-parchment-light hover:bg-wood-medium'
+                  }`}
+              >
+                🗺️ Matrix
+              </button>
 
-            {/* SPELLS */}
-            <button
-              onClick={() => setActiveTab('spellLibrary')}
-              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'spellLibrary'
-                ? 'border-purple-500 text-white'
-                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-                }`}
-            >
-              📚 Spell Library
-            </button>
-            <button
-              onClick={() => setActiveTab('spellCreation')}
-              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'spellCreation'
-                ? 'border-purple-500 text-white'
-                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-                }`}
-            >
-              🔮 Spell Creation
-            </button>
+              {/* AUTO-BALANCER */}
+              {/* AUTO-BALANCER */}
+              <button
+                onClick={() => setActiveTab('autoBalancer')}
+                className={`px-3 py-2 rounded-md text-sm font-display font-bold transition-all ${activeTab === 'autoBalancer'
+                  ? 'bg-sage text-wood-dark shadow-glow-green'
+                  : 'text-parchment-medium hover:text-parchment-light hover:bg-wood-medium'
+                  }`}
+              >
+                ⚖️ Auto
+              </button>
 
-            {/* CHARACTERS */}
-            <button
-              onClick={() => setActiveTab('characterManager')}
-              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'characterManager'
-                ? 'border-purple-500 text-white'
-                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-                }`}
-            >
-              👤 Character Manager
-            </button>
+              {/* CHARACTER CREATOR */}
+              {/* CHARACTER CREATOR */}
+              <button
+                onClick={() => setActiveTab('characterCreator')}
+                className={`px-3 py-2 rounded-md text-sm font-display font-bold transition-all ${activeTab === 'characterCreator'
+                  ? 'bg-sage text-wood-dark shadow-glow-green'
+                  : 'text-parchment-medium hover:text-parchment-light hover:bg-wood-medium'
+                  }`}
+              >
+                👤 Creator
+              </button>
 
-            {/* ARENAS */}
-            <button
-              onClick={() => setActiveTab('gridArena')}
-              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'gridArena'
-                ? 'border-purple-500 text-white'
-                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-                }`}
-            >
-              ⚔️ Grid Arena
-            </button>
+              {/* SPELLS */}
+              {/* SPELL LIBRARY */}
+              <button
+                onClick={() => setActiveTab('spellLibrary')}
+                className={`px-3 py-2 rounded-md text-sm font-display font-bold transition-all ${activeTab === 'spellLibrary'
+                  ? 'bg-sage text-wood-dark shadow-glow-green'
+                  : 'text-parchment-medium hover:text-parchment-light hover:bg-wood-medium'
+                  }`}
+              >
+                📚 Spells
+              </button>
+              {/* SPELL CREATION */}
+              <button
+                onClick={() => setActiveTab('spellCreation')}
+                className={`px-3 py-2 rounded-md text-sm font-display font-bold transition-all ${activeTab === 'spellCreation'
+                  ? 'bg-sage text-wood-dark shadow-glow-green'
+                  : 'text-parchment-medium hover:text-parchment-light hover:bg-wood-medium'
+                  }`}
+              >
+                ✨ Create Spell
+              </button>
 
-            {/* TESTING */}
-            <button
-              onClick={() => setActiveTab('testing')}
-              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'testing'
-                ? 'border-purple-500 text-white'
-                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-                }`}
-            >
-              🧪 Testing
-            </button>
-            <button
-              onClick={() => setActiveTab('idleArena')}
-              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'idleArena'
-                ? 'border-purple-500 text-white'
-                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-                }`}
-            >
-              🤖 Idle Arena
-            </button>
-          </nav>
+              {/* CHARACTERS */}
+              {/* CHARACTER MANAGER */}
+              <button
+                onClick={() => setActiveTab('characterManager')}
+                className={`px-3 py-2 rounded-md text-sm font-display font-bold transition-all ${activeTab === 'characterManager'
+                  ? 'bg-sage text-wood-dark shadow-glow-green'
+                  : 'text-parchment-medium hover:text-parchment-light hover:bg-wood-medium'
+                  }`}
+              >
+                👥 Manager
+              </button>
+
+              {/* ARENAS */}
+              {/* GRID ARENA */}
+              <button
+                onClick={() => setActiveTab('gridArena')}
+                className={`px-3 py-2 rounded-md text-sm font-display font-bold transition-all ${activeTab === 'gridArena'
+                  ? 'bg-sage text-wood-dark shadow-glow-green'
+                  : 'text-parchment-medium hover:text-parchment-light hover:bg-wood-medium'
+                  }`}
+              >
+                ⚔️ Grid
+              </button>
+
+              {/* TESTING */}
+              {/* TESTING */}
+              <button
+                onClick={() => setActiveTab('testing')}
+                className={`px-3 py-2 rounded-md text-sm font-display font-bold transition-all ${activeTab === 'testing'
+                  ? 'bg-sage text-wood-dark shadow-glow-green'
+                  : 'text-parchment-medium hover:text-parchment-light hover:bg-wood-medium'
+                  }`}
+              >
+                🧪 Testing
+              </button>
+
+              {/* FANTASY SHOWCASE */}
+              <button
+                onClick={() => setActiveTab('fantasyShowcase')}
+                className={`px-3 py-2 rounded-md text-sm font-display font-bold transition-all ${activeTab === 'fantasyShowcase'
+                  ? 'bg-sage text-wood-dark shadow-glow-green'
+                  : 'text-parchment-medium hover:text-parchment-light hover:bg-wood-medium'
+                  }`}
+              >
+                🎨 Fantasy UI
+              </button>
+              {/* IDLE ARENA */}
+              <button
+                onClick={() => setActiveTab('idleArena')}
+                className={`px-3 py-2 rounded-md text-sm font-display font-bold transition-all ${activeTab === 'idleArena'
+                  ? 'bg-sage text-wood-dark shadow-glow-green'
+                  : 'text-parchment-medium hover:text-parchment-light hover:bg-wood-medium'
+                  }`}
+              >
+                💤 Idle
+              </button>
+            </nav>
+          </div>
         </div>
       </div>
 
@@ -217,6 +266,11 @@ function App() {
           <ArchetypeBuilderComponent />
         </ErrorBoundary>
       )}
+      {activeTab === 'archetypeFantasy' && (
+        <ErrorBoundary componentName="Archetype Forge">
+          <ArchetypeBuilderFantasy />
+        </ErrorBoundary>
+      )}
       {activeTab === 'matchupMatrix' && (
         <ErrorBoundary componentName="Matchup Matrix">
           <MatchupMatrixWrapper />
@@ -225,6 +279,11 @@ function App() {
       {activeTab === 'autoBalancer' && (
         <ErrorBoundary componentName="Auto-Balancer">
           <AutoBalancerWrapper />
+        </ErrorBoundary>
+      )}
+      {activeTab === 'fantasyShowcase' && (
+        <ErrorBoundary componentName="Fantasy Showcase">
+          <FantasyComponentShowcase />
         </ErrorBoundary>
       )}
     </div>

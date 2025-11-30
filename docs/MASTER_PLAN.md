@@ -90,8 +90,10 @@ Example:
 │ Phase 4: Atomic UI       ✅ DONE    ~60 tasks      │
 │ Phase 5: Universal       ⏸️ PAUSED  ~40 tasks      │
 │ Phase 6: Logic Sep.      📋 TODO    ~30 tasks      │
+│ Phase 7: Persistence     📋 PLAN    ~25 tasks      │
+│ Phase 8: Fantasy UI      🎨 DESIGN  ~50 tasks      │
 ├─────────────────────────────────────────────────────┤
-│ TOTAL PROGRESS: ███████████░░░░░░░░░ 45%           │
+│ TOTAL PROGRESS: ██████████░░░░░░░░░░ 42%           │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -264,20 +266,132 @@ Example:
 
 ---
 
+### 🔄 **PHASE 7: Balance Configuration Persistence (Planned)**
+
+**Status:** 0% (Design Complete)
+
+| Document | Purpose |
+|----------|---------|
+| **📋 Plan** | [Session 886ac1dc: balance_persistence_ui_redesign_plan.md](../../.gemini/antigravity/brain/886ac1dc-4b8b-4d7e-82fe-5f57bf201bde/balance_persistence_ui_redesign_plan.md) |
+
+**Overview:**
+- **Persistent Storage:** localStorage + JSON export for all balance modifications
+- **Version Control:** Semantic versioning with history tracking (last 10 changes)
+- **Migration System:** Automatic schema migration with conflict detection
+- **Regression Detection:** Mismatch warnings with resolution UI
+- **Rollback:** Ability to revert to previous configurations
+
+**Key Features:**
+- Save archetype templates from ArchetypeBuilder
+- Save matrix run configurations
+- Save applied auto-balancer changes
+- Version snapshots with checksums
+- Conflict resolution modal when loading incompatible versions
+
+**Components:**
+- `BalanceConfigStore.ts` - Main storage interface
+- `BalanceVersion.ts` - Version management
+- `MigrationManager.ts` - Schema change handling
+
+---
+
+### 🎨 **PHASE 8: Fantasy UI Redesign (In Progress)**
+
+**Status:** 5% (Design Complete, Implementation Started)
+
+**Decision Date:** 2025-11-30
+
+| Document | Purpose |
+|----------|---------|
+| **📋 Spec** | [Session 886ac1dc: fantasy_ui_final_spec.md](../../.gemini/antigravity/brain/886ac1dc-4b8b-4d7e-82fe-5f57bf201bde/fantasy_ui_final_spec.md) |
+| **🎨 Options** | [Session 886ac1dc: ui_visual_options.md](../../.gemini/antigravity/brain/886ac1dc-4b8b-4d7e-82fe-5f57bf201bde/ui_visual_options.md) |
+
+**Approved Specifications:**
+
+#### Visual Style
+- **Art Style:** 2D Vector Art
+- **Theme:** Medieval Fantasy (Tavern/Library aesthetic)
+- **Mood:** Relaxing, adventurous, serene
+
+#### Color Palette (Custom "Enchanted Forest")
+- **Primary:** Sage Green (#b8c5b0), Forest Green (#7fa67e), Mint (#c8dfc7)
+- **Secondary:** Sky Blue (#a8c7d7), Ocean Blue (#8cb4c9) - from Palette B
+- **Tertiary:** Marble White (#ebe7df) - from Palette B
+- **Materials:** Parchment (#f5f1e8), Wood Dark (#4a3f35), Wood Light (#8b7355), Leather (#6b4e3d), Bronze (#cd7f32)
+
+#### Typography
+- **Display:** Cinzel (medieval serif)
+- **Body:** Crimson Text (readable serif)
+- **UI/Numbers:** Lato (clarity)
+- **Base Size:** 18px (up from 14-16px)
+- **Line Height:** 1.8 (up from 1.5)
+
+#### Spacing & Layout
+- **Card Padding:** 48px (2x from 24px)
+- **Card Gaps:** 32px (2x from 16px)
+- **Reduced Info Density:** 5-7 elements per card (from 10-15)
+- **Navigation:** Sidebar book-spine style (max 5-6 visible tabs)
+
+#### Components to Create
+1. **Atomic:**
+   - FantasyCard (replaces GlassCard)
+   - FantasyButton (wood + leather)
+   - FantasyInput (parchment bg)
+   - FantasySlider (wood track, bronze thumb)
+   - FantasySelect (parchment dropdown)
+
+2. **Molecules:**
+   - FantasyNavigation (sidebar)
+   - FantasyModal (ornate frame)
+   - FantasyTooltip (scroll style)
+
+3. **Pages:** Redesign all with new components
+
+**Implementation Plan:**
+- **Phase 8.1:** Foundation (CSS variables, theme system, fonts) - 2-3h
+- **Phase 8.2:** Atomic components - 4-5h
+- **Phase 8.3:** Assets (SVG frames, textures) - 2-3h
+- **Phase 8.4:** Molecules - 3-4h
+- **Phase 8.5:** Page redesign - 6-8h
+  - ⚠️ **REQUIRES UX RESEARCH** before starting:
+    - Information presentation best practices
+    - Fantasy RPG UI navigation patterns
+    - Data density optimization
+    - User flow analysis
+- **Phase 8.6:** Polish & testing - 2-3h
+
+**Total Estimate:** 19-26 hours
+
+---
+
 ## 🎯 CURRENT FOCUS
 
-### This Week: Phase 2 - Archetype Balancing
+### This Week: Phase  7 & 8 - Persistence + Fantasy UI Redesign
 
-**Next 3 Tasks:**
-1. ✅ ~~Implement CLI for running balance tests~~ (Complete)
-2. ✅ ~~Perform Balance Tuning based on simulation data~~ (Complete)
-3. ⏭️ **Build Balance Configuration UI** (Phase 4.1 - Next)
-4. ⏭️ Implement Auto-balancer with versioning (Phase 4.2)
-5. ⏭️ Create UI components: MatchupMatrix, DetailPanel, RunBrowser (Phase 4.3-4.5)
+**Approved Decisions (2025-11-30):**
+1. ✅ UI Style: 2D Vector Art, Medieval Fantasy
+2. ✅ Color Palette: Custom "Enchanted Forest" (Green + Sky Blue + Marble)
+3. ✅ Architecture: CSS Variables + Tailwind Extension for flexibility
+4. ✅ Persistence: localStorage + version control + migration system
 
-
-
-**📋 Full checklist:** [plans/archetype_tasks.md](plans/archetype_tasks.md)
+**Next 5 Tasks:**
+1. ⏭️ **Implement Balance Persistence System** (Phase 7)
+   - Create BalanceConfigStore with localStorage
+   - Implement version control & migration
+   - Add conflict resolution UI
+2. ⏭️ **Create Fantasy Theme Foundation** (Phase 8.1)
+   - CSS variables for color palette
+   - Import Google Fonts (Cinzel, Crimson Text, Lato)
+   - Extend Tailwind config
+3. ⏭️ **Build Fantasy Atomic Components** (Phase 8.2)
+   - FantasyCard, FantasyButton, FantasyInput, FantasySlider
+4. ⏭️ **Generate/Source Vector Assets** (Phase 8.3)
+   - Wood frame SVGs
+   - Bronze ornaments
+   - Parchment textures
+5. ⏭️ **Redesign First Page** (Phase 8.5)
+   - Start with ArchetypeBuilder or homepage
+   - Test new components in real context
 
 ---
 

@@ -84,6 +84,8 @@ export const BALANCE_PRESETS: Record<string, BalancePreset> = {
     }
 };
 
+import { BalanceConfigStore } from './persistence/BalanceConfigStore';
+
 export class BalanceConfigManager {
     private static currentPreset: BalancePreset | null = null;
 
@@ -91,7 +93,19 @@ export class BalanceConfigManager {
      * Initialize and load active preset from storage
      */
     static initialize() {
-        this.currentPreset = getActivePreset();
+        // Try to load from new persistence store first
+        const persistedWeights = BalanceConfigStore.load<Record<string, number>>('weights');
+
+        if (persistedWeights) {
+            // If we have persisted weights, we might be in a "custom" state
+            // For now, we'll just load the active preset ID and see if it matches
+            this.currentPreset = getActivePreset();
+
+            // If the persisted weights differ from the preset, we should probably respect persistence
+            // But for this phase, let's keep it simple: Persistence Store backs up the "user_custom" presets
+        } else {
+            this.currentPreset = getActivePreset();
+        }
     }
 
     static get activePreset(): BalancePreset {
@@ -106,6 +120,9 @@ export class BalanceConfigManager {
         if (allPresets[id]) {
             this.currentPreset = allPresets[id];
             setActivePresetId(id);
+
+            // Persist this change
+            BalanceConfigStore.save('weights', this.currentPreset.weights, `Switched to preset: ${this.currentPreset.name}`);
         } else {
             console.warn(`Preset ${id} not found, keeping ${this.currentPreset?.id || 'standard'}`);
         }
@@ -127,6 +144,15 @@ export class BalanceConfigManager {
      */
     static isUserPreset(id: string): boolean {
         return id.startsWith('user_');
+    }
+
+    /**
+     * Save current weights as a new snapshot
+     */
+    static saveCurrentState(description: string) {
+        if (this.currentPreset) {
+            BalanceConfigStore.save('weights', this.currentPreset.weights, description);
+        }
     }
 }
 

@@ -1,0 +1,179 @@
+/**
+ * Fantasy Theme - Deep Forest Edition
+ * 
+ * "Druidic Grove" palette with High-Fidelity Textures
+ * Style: Premium Nature Fantasy (Deep Green, Mossy Wood, Gold)
+ */
+
+:root {
+    /* =========================================
+       TEXTURES (SVG Data URIs)
+       ========================================= */
+
+    /* Mossy Wood Grain (Greenish Tint) */
+    --texture-wood-dark: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%231e2b1e"/><filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncR type="linear" slope="0.5" intercept="0.25"/><feFuncG type="linear" slope="0.5" intercept="0.25"/><feFuncB type="linear" slope="0.5" intercept="0.25"/></feComponentTransfer></filter><rect width="100" height="100" filter="url(%23grain)" opacity="0.05"/><path d="M0 20 Q 50 10, 100 20 M0 50 Q 50 60, 100 50 M0 80 Q 50 70, 100 80" stroke="%230f1a0f" stroke-width="2" opacity="0.3" fill="none"/></svg>');
+
+    /* Aged Parchment (Warmer/Neutral) */
+    --texture-parchment: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="%23f0f2e6"/><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch"/></filter><rect width="200" height="200" filter="url(%23noise)" opacity="0.08"/><circle cx="50" cy="50" r="40" fill="%23e0e6d8" opacity="0.2" filter="blur(20px)"/><circle cx="150" cy="150" r="60" fill="%23d0d8c8" opacity="0.15" filter="blur(30px)"/></svg>');
+
+    /* Brushed Metal (Gold/Emerald) */
+    --texture-metal: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(255, 255, 255, 0.1) 100%);
+
+    /* =========================================
+       COLORS
+       ========================================= */
+
+    /* Backgrounds */
+    --bg-app: #0d1f12;
+    /* Deep Forest Green */
+    --bg-panel: #f0f2e6;
+    /* Pale Mossy Parchment */
+    --bg-panel-dark: #e0e6d8;
+    /* Darker Mossy Parchment */
+    --bg-inset: #d0d8c8;
+    /* Inset Area */
+
+    /* Text */
+    --text-primary: #1a2f1a;
+    /* Dark Green Ink */
+    --text-secondary: #3a4f3a;
+    /* Faded Green Ink */
+    --text-muted: #6a7f6a;
+    /* Muted Green */
+    --text-on-dark: #e0e6d8;
+    /* Light Moss on Dark */
+
+    /* Accents - Metals (Gradients) */
+    --bronze-gradient: linear-gradient(180deg, #d4af37 0%, #b8860b 50%, #8b6914 100%);
+    /* Gold */
+    --gold-gradient: linear-gradient(180deg, #f0e68c 0%, #d4af37 50%, #b8860b 100%);
+    --steel-gradient: linear-gradient(180deg, #b0c4de 0%, #778899 50%, #2f4f4f 100%);
+
+    /* Accents - Magic */
+    --sage-green: #4caf50;
+    /* Vivid Emerald */
+    --sage-gradient: linear-gradient(180deg, #66bb6a 0%, #2e7d32 100%);
+    --sky-blue: #4fc3f7;
+    --sky-gradient: linear-gradient(180deg, #81d4fa 0%, #0288d1 100%);
+
+    /* =========================================
+       EFFECTS
+       ========================================= */
+
+    /* Shadows (Depth) */
+    --shadow-inset: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-bevel: 0 1px 0 rgba(255, 255, 255, 0.3) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset;
+    --shadow-card: 0 10px 20px -5px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(46, 125, 50, 0.3);
+    --shadow-floating: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+
+    /* Glows */
+    --glow-gold: 0 0 15px rgba(212, 175, 55, 0.4);
+    --glow-magic: 0 0 15px rgba(76, 175, 80, 0.4);
+
+    /* =========================================
+       TYPOGRAPHY
+       ========================================= */
+    --font-display: 'Cinzel', serif;
+    --font-body: 'Crimson Text', serif;
+    --font-ui: 'Lato', sans-serif;
+}
+
+/* Font Imports */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700;900&display=swap');
+
+/* Base Styles */
+body {
+    background-color: var(--bg-app);
+    background-image: var(--texture-wood-dark);
+    color: var(--text-on-dark);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Utility Classes for Premium Look */
+.fantasy-panel {
+    background-color: var(--bg-panel);
+    background-image: var(--texture-parchment);
+    color: var(--text-primary);
+    border: 1px solid #6a7f6a;
+    box-shadow: var(--shadow-card);
+    position: relative;
+}
+
+/* New: Ornate Gold Frame using SVG */
+.fantasy-frame-gold {
+    background-color: var(--bg-panel-dark);
+    background-image: var(--texture-parchment);
+    color: var(--text-primary);
+    border: 20px solid transparent;
+    border-image-source: url('/src/assets/ui/ornate-border.svg');
+    border-image-slice: 40 fill;
+    border-image-width: 20px;
+    border-image-repeat: round;
+    box-shadow: var(--shadow-floating);
+}
+
+/* New: Ribbon Header */
+.fantasy-ribbon {
+    background-image: url('/src/assets/ui/ribbon-header.svg');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #f0e68c;
+    /* Gold Text */
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    font-family: var(--font-display);
+    font-weight: bold;
+    padding: 0 40px;
+    margin-bottom: 1rem;
+}
+
+/* New: Runic Divider */
+.fantasy-divider {
+    background-image: url('/src/assets/ui/divider-rune.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 20px;
+    width: 100%;
+    margin: 1rem 0;
+    opacity: 0.8;
+}
+
+.fantasy-panel::after {
+    /* Inner Border Effect - kept for simple panels */
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    right: 4px;
+    bottom: 4px;
+    border: 1px solid rgba(46, 125, 50, 0.2);
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+.fantasy-wood-panel {
+    background-color: #1e2b1e;
+    background-image: var(--texture-wood-dark);
+    color: var(--text-on-dark);
+    border-top: 4px solid #8b6914;
+    border-bottom: 4px solid #0f1a0f;
+    box-shadow: var(--shadow-floating);
+}
+
+.text-gradient-gold {
+    background: var(--gold-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.fantasy-border-gold {
+    border: 2px solid transparent;
+    border-image: var(--bronze-gradient) 1;
+    box-shadow: var(--glow-gold);
+}

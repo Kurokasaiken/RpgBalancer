@@ -27,7 +27,7 @@ export const CardWrapper: React.FC<CardWrapperProps> = ({ title, color, onReset,
 
     return (
         <div
-            className={`backdrop-blur-md bg-white/5 rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.3)] border border-white/10 hover:border-purple-400/30 transition-all duration-300 ${isCollapsed ? 'p-2' : 'p-3'}`}
+            className={`backdrop-blur-md bg-white/5 rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.3)] border border-white/10 hover:border-emerald-400/30 transition-all duration-300 ${isCollapsed ? 'p-2' : 'p-3'}`}
         >
             {/* Header */}
             <div className={`flex justify-between items-center ${isCollapsed ? '' : 'pb-1'}`}>

@@ -167,7 +167,7 @@ export const SmartInput: React.FC<SmartInputProps> = ({
                         }
                     }}
                     disabled={!isActive || isLocked}
-                    className={`text-sm font-mono bg-transparent border-b-2 focus:border-cyan-400 focus:shadow-[0_0_8px_rgba(34,211,238,0.5)] outline-none w-full transition-all ${isLocked ? 'border-red-400 text-red-400' : isChanging ? 'border-yellow-400 text-yellow-300' : 'border-white/20 text-cyan-300'}`}
+                    className={`text-sm font-mono bg-transparent border-b-2 focus:border-emerald-400 focus:shadow-[0_0_8px_rgba(52,211,153,0.5)] outline-none w-full transition-all ${isLocked ? 'border-red-400 text-red-400' : isChanging ? 'border-yellow-400 text-yellow-300' : 'border-white/20 text-emerald-300'}`}
                 />
                 {isPercentage && <span className="text-gray-400 text-xs ml-0.5">%</span>}
             </div>
@@ -195,7 +195,7 @@ export const SmartInput: React.FC<SmartInputProps> = ({
                     min={min}
                     max={max}
                     step={step}
-                    className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-cyan-400"
+                    className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                 />
             )}
         </div>

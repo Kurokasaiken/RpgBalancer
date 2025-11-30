@@ -89,11 +89,11 @@ export const Balancer: React.FC = () => {
     };
 
     return (
-        <div className="h-full overflow-y-auto bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-950 p-4 relative">
+        <div className="h-full overflow-y-auto bg-gradient-to-br from-green-950 via-emerald-950 to-slate-950 p-4 relative">
             {/* Animated background particles */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute w-96 h-96 bg-purple-500/10 rounded-full blur-3xl top-10 -left-20 animate-pulse" />
-                <div className="absolute w-96 h-96 bg-blue-500/10 rounded-full blur-3xl bottom-10 -right-20 animate-pulse" style={{ animationDelay: '1s' }} />
+                <div className="absolute w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl top-10 -left-20 animate-pulse" />
+                <div className="absolute w-96 h-96 bg-teal-500/10 rounded-full blur-3xl bottom-10 -right-20 animate-pulse" style={{ animationDelay: '1s' }} />
             </div>
             <div className="max-w-7xl mx-auto relative z-10">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
