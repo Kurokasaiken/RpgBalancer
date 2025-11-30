@@ -3,6 +3,7 @@ import { describe, it, expect } from 'vitest';
 import { Entity } from '../../engine/core/entity';
 import { runSimulation } from '../../engine/simulation/runner';
 import { DEFAULT_STATS, type StatBlock } from '../types';
+import { createTestRNG } from './TestRNG';
 
 /**
  * Cross-Stat Cost Parity Tests (Week 5 Recalibrated)
@@ -21,7 +22,8 @@ describe('Cross-Stat Cost Parity', () => {
 
     function createTestEntity(name: string, statOverrides: Partial<StatBlock>): Entity {
         const stats = { ...DEFAULT_STATS, ...statOverrides };
-        const id = `test_${name}_${Math.random().toString(36).substr(2, 9)}`;
+        const rng = createTestRNG(1);
+        const id = `test_${name}_${rng().toString(36).substr(2, 9)}`;
         return Entity.fromStatBlock(id, name, stats);
     }
 

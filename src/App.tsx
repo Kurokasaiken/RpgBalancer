@@ -10,9 +10,12 @@ import { TestingLab } from './ui/testing/TestingLab';
 import { ErrorBoundary } from './ui/organisms/ErrorBoundary';
 
 import { ArchetypeManager } from './components/balancing/archetype/ArchetypeManager';
+import { ArchetypeBuilderComponent } from './ui/balancing/archetype/ArchetypeBuilderComponent';
+import { MatchupMatrixWrapper } from './ui/balancing/matchup/MatchupMatrixWrapper';
+import { AutoBalancerWrapper } from './ui/balancing/autobalancer/AutoBalancerWrapper';
 import { CharacterCreator } from './ui/character/CharacterCreator';
 
-type Tab = 'balancer' | 'archetypes' | 'characterCreator' | 'spellLibrary' | 'spellCreation' | 'characterManager' | 'gridArena' | 'idleArena' | 'testing';
+type Tab = 'balancer' | 'archetypes' | 'archetypeBuilder' | 'matchupMatrix' | 'autoBalancer' | 'characterCreator' | 'spellLibrary' | 'spellCreation' | 'characterManager' | 'gridArena' | 'idleArena' | 'testing';
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('balancer');
@@ -50,6 +53,39 @@ function App() {
                 }`}
             >
               🎭 Archetypes
+            </button>
+
+            {/* ARCHETYPE BUILDER */}
+            <button
+              onClick={() => setActiveTab('archetypeBuilder')}
+              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'archetypeBuilder'
+                ? 'border-purple-500 text-white'
+                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                }`}
+            >
+              🏗️ Archetype Builder
+            </button>
+
+            {/* MATCHUP MATRIX */}
+            <button
+              onClick={() => setActiveTab('matchupMatrix')}
+              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'matchupMatrix'
+                ? 'border-purple-500 text-white'
+                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                }`}
+            >
+              🗺️ Matchup Matrix
+            </button>
+
+            {/* AUTO-BALANCER */}
+            <button
+              onClick={() => setActiveTab('autoBalancer')}
+              className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${activeTab === 'autoBalancer'
+                ? 'border-purple-500 text-white'
+                : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                }`}
+            >
+              🤖 Auto-Balancer
             </button>
 
             {/* CHARACTER CREATOR */}
@@ -174,6 +210,21 @@ function App() {
       {activeTab === 'archetypes' && (
         <ErrorBoundary componentName="Archetype Manager">
           <ArchetypeManager />
+        </ErrorBoundary>
+      )}
+      {activeTab === 'archetypeBuilder' && (
+        <ErrorBoundary componentName="Archetype Builder">
+          <ArchetypeBuilderComponent />
+        </ErrorBoundary>
+      )}
+      {activeTab === 'matchupMatrix' && (
+        <ErrorBoundary componentName="Matchup Matrix">
+          <MatchupMatrixWrapper />
+        </ErrorBoundary>
+      )}
+      {activeTab === 'autoBalancer' && (
+        <ErrorBoundary componentName="Auto-Balancer">
+          <AutoBalancerWrapper />
         </ErrorBoundary>
       )}
     </div>

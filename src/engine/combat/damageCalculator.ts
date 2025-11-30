@@ -19,10 +19,11 @@ export interface DamageResult {
  */
 export function calculateDamage(
     attackerStats: StatBlock,
-    defenderStats: StatBlock
-): DamageResult {
-    // 1. Determine Crit/Fail status & modifiers
-    const critFailRoll = Math.random() * 100;
+    defenderStats: StatBlock,
+    rng: () => number
+    ): DamageResult {
+        // 1. Determine Crit/Fail status & modifiers
+        const critFailRoll = rng() * 100;
     let txcModifier = 0;
     let damageMultiplier = 1.0;
     let isCritical = false;
@@ -43,7 +44,7 @@ export function calculateDamage(
     const hitChance = HitChanceModule.calculateHitChance(effectiveTxC, defenderStats.evasion);
 
     // 3. Roll to Hit
-    const hitRoll = Math.random() * 100;
+    const hitRoll = rng() * 100;
     const isHit = hitRoll < hitChance;
 
     if (!isHit) {

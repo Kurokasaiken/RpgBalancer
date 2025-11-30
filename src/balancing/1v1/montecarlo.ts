@@ -81,7 +81,7 @@ export interface MonteCarloResult {
  * Simple seedable RNG (Linear Congruential Generator)
  * Used for reproducibility in Monte Carlo simulations
  */
-class SeededRNG {
+export class SeededRNG {
     private seed: number;
 
     constructor(seed: number) {
@@ -125,6 +125,7 @@ class SeededRNG {
  * @param seed Random seed for reproducibility
  * @param config Configuration
  * @param earlyImpactTurns Number of turns to track for early impact (default: 3)
+ * @param rng Optional external RNG function (if provided, seed is ignored)
  * @returns Aggregated Monte Carlo results
  */
 export function runMonteCarlo(
@@ -133,12 +134,13 @@ export function runMonteCarlo(
     nSim: number,
     seed: number,
     config: BalancerConfig1v1 = DEFAULT_1V1_CONFIG,
-    earlyImpactTurns: number = 3
+    earlyImpactTurns: number = 3,
+    rng?: () => number
 ): MonteCarloResult {
     const startTime = Date.now();
 
-    // Initialize RNG
-    const rng = new SeededRNG(seed);
+    // Initialize RNG (use provided or create new seeded RNG)
+    const rngInstance = rng ? { next: rng } : new SeededRNG(seed);
 
     // Track results
     let wins_row = 0;
@@ -169,7 +171,7 @@ export function runMonteCarlo(
         // Use existing CombatSimulator (it has RNG internally)
         // CRITICAL: Pass the seeded RNG wrapper to the simulator
         // We bind the next() method to the rng instance to ensure correct 'this' context
-        const rngWrapper = () => rng.next();
+        const rngWrapper = () => rngInstance.next();
 
         const result = CombatSimulator.simulate({
             entity1: { ...rowStats, name: 'Row Entity', attack: rowStats.damage, defense: rowStats.armor },

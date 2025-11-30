@@ -124,7 +124,7 @@ function scoreAction(source: Combatant, spell: Spell, target: Combatant, state: 
 
     // RANDOM: Just do whatever (fallback)
     else {
-        score += Math.random() * 50;
+        score += rng() * 50;
     }
 
     // --- Universal Logic ---

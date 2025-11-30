@@ -12,7 +12,7 @@ import type { RNG } from '../../balancing/simulation/types';
 // 1. Hit Chance (Always active for now, but could be toggled)
 
 
-export function resolveCombatRound(state: CombatState, rng: RNG = Math.random): CombatState {
+export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
     if (state.isFinished) return state;
 
     state.turn++;

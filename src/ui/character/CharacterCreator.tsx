@@ -11,27 +11,20 @@
  * - Save/Load JSON functionality
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import type { Character } from '../../balancing/character/types';
 import type { StatBlock } from '../../balancing/types';
+import type { ArchetypeTemplate } from '../../balancing/archetype/types';
 import { CharacterBuilder } from '../../balancing/character/builder';
 import { upsertCharacter, exportCharacterJSON, importCharacterJSON } from '../../balancing/character/storage';
+import { ArchetypeRegistry } from '../../balancing/archetype/ArchetypeRegistry';
+import { DEFAULT_ARCHETYPES } from '../../balancing/archetype/constants';
 import { CharacterSummary } from './components/CharacterSummary';
 import { StatAllocationCard } from './components/StatAllocationCard';
 import { SpellSlotManager } from './components/SpellSlotManager';
 
-// Available archetypes
-const ARCHETYPES = [
-    { id: 'balanced', name: 'Balanced', description: 'Well-rounded stats' },
-    { id: 'tank', name: 'Tank', description: 'High HP and defense' },
-    { id: 'dps', name: 'DPS', description: 'High damage output' },
-    { id: 'glass_cannon', name: 'Glass Cannon', description: 'Maximum damage, low HP' },
-    { id: 'evasive', name: 'Evasive', description: 'High evasion and speed' },
-    { id: 'bruiser', name: 'Bruiser', description: 'Balanced offense and defense' },
-    { id: 'assassin', name: 'Assassin', description: 'High crit and burst damage' },
-    { id: 'support', name: 'Support', description: 'Focus on sustain and utility' }
-];
+
 
 // Stat groupings
 const STAT_GROUPS = {
@@ -42,13 +35,24 @@ const STAT_GROUPS = {
 };
 
 export const CharacterCreator: React.FC = () => {
+    // Archetype state (loaded from registry)
+    const [archetypes, setArchetypes] = useState<ArchetypeTemplate[]>([]);
+    const [loadingArchetypes, setLoadingArchetypes] = useState(true);
+
     const [character, setCharacter] = useState<Character>(() =>
-        CharacterBuilder.createEmpty('balanced')
+        CharacterBuilder.createEmpty(DEFAULT_ARCHETYPES[0]?.id || 'balanced')
     );
 
     const [pointBudget, setPointBudget] = useState<number>(0);
     const [statAllocations, setStatAllocations] = useState<Partial<Record<keyof StatBlock, number>>>({});
     const [customWeights, setCustomWeights] = useState<Partial<Record<keyof StatBlock, number>>>({});
+
+    // Load archetypes from registry on mount
+    useEffect(() => {
+        const registry = new ArchetypeRegistry();
+        setArchetypes(registry.listAll());
+        setLoadingArchetypes(false);
+    }, []);
 
     // Calculate remaining points
     const usedPoints = CharacterBuilder.calculatePointCost(statAllocations);
@@ -270,17 +274,27 @@ export const CharacterCreator: React.FC = () => {
                             {/* Archetype */}
                             <div>
                                 <label className="block text-sm text-gray-400 mb-1">Archetype</label>
-                                <select
-                                    value={character.archetype}
-                                    onChange={(e) => handleArchetypeChange(e.target.value)}
-                                    className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-white focus:outline-none focus:border-purple-500/50"
-                                >
-                                    {ARCHETYPES.map(arch => (
-                                        <option key={arch.id} value={arch.id} className="bg-gray-800">
-                                            {arch.name} - {arch.description}
-                                        </option>
-                                    ))}
-                                </select>
+                                {loadingArchetypes ? (
+                                    <div className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-gray-500">
+                                        Loading archetypes...
+                                    </div>
+                                ) : (
+                                    <select
+                                        value={character.archetype}
+                                        onChange={(e) => handleArchetypeChange(e.target.value)}
+                                        className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-white focus:outline-none focus:border-purple-500/50"
+                                    >
+                                        {archetypes.length === 0 ? (
+                                            <option value="" className="bg-gray-800">No archetypes available</option>
+                                        ) : (
+                                            archetypes.map(arch => (
+                                                <option key={arch.id} value={arch.id} className="bg-gray-800">
+                                                    {arch.name} - {arch.description}
+                                                </option>
+                                            ))
+                                        )}
+                                    </select>
+                                )}
                             </div>
 
                             {/* Variant */}

@@ -8,7 +8,7 @@ import { evaluateTurn } from './ai';
 /**
  * Initializes a new combat state with heroes and enemies.
  */
-export function startCombat(heroes: Combatant[], enemies: Combatant[]): CombatState {
+export function startCombat(heroes: Combatant[], enemies: Combatant[], rng: () => number): CombatState {
     const combatants = [...heroes, ...enemies];
 
     // Roll initiative: Use speed stat with random tie-breaker
@@ -16,7 +16,7 @@ export function startCombat(heroes: Combatant[], enemies: Combatant[]): CombatSt
         .map(c => ({
             id: c.id,
             // Speed + small random value for tie-breaking
-            initiative: c.entity.stats.speed + (Math.random() * 0.99)
+            initiative: c.entity.stats.speed + (rng() * 0.99)
         }))
         .sort((a, b) => b.initiative - a.initiative) // Higher initiative goes first
         .map(x => x.id);

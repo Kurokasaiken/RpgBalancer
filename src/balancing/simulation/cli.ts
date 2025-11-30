@@ -33,9 +33,8 @@ async function main() {
 }
 
 async function handleMatrixCommand(args: string[]) {
-    // Import test archetypes
-    const { getAllArchetypeIds } = await import('../1v1/testArchetypes');
-
+    // Import test archetypes asynchronously
+    const { loadTestArchetypes, getAllArchetypeIds } = await import('../1v1/testArchetypes');
 
     // Parse arguments
     const archetypesArg = args[0] || 'all';
@@ -59,6 +58,9 @@ async function handleMatrixCommand(args: string[]) {
     } else {
         archetypeIds = archetypesArg.split(',').map(s => s.trim());
     }
+
+    // Pre-load archetypes into cache
+    await loadTestArchetypes();
 
     try {
         const result = await runMatrix(archetypeIds, {

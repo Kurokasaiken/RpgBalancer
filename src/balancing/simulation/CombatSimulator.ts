@@ -19,18 +19,18 @@ export class CombatSimulator {
     private rng: RNG;
 
     /**
-     * Create a new CombatSimulator with optional RNG
-     * @param rng Random Number Generator function (defaults to Math.random)
+     * Create a new CombatSimulator con RNG deterministico
+     * @param rng Random Number Generator function (deve essere esplicito)
      */
-    constructor(rng: RNG = Math.random) {
+    constructor(rng: RNG) {
         this.rng = rng;
     }
 
     /**
      * Run a single combat simulation (Static Wrapper)
-     * Uses Math.random by default for backward compatibility, but supports custom RNG
+     * RNG deve essere esplicito: nessun fallback a Math.random
      */
-    static simulate(config: CombatConfig, rng: RNG = Math.random): CombatResult {
+    static simulate(config: CombatConfig, rng: RNG): CombatResult {
         return new CombatSimulator(rng).simulate(config);
     }
 

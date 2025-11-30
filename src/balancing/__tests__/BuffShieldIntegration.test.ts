@@ -11,6 +11,7 @@ import { resolveCombatRound } from '../../engine/combat/logic';
 import { DotModule, type PeriodicEffect } from '../modules/dot';
 import { BuffModule, type Buff } from '../modules/buffs';
 import { DEFAULT_STATS } from '../types';
+import { createTestRNG } from './TestRNG';
 import type { StatBlock } from '../types';
 
 function createTestEntity(name: string, stats: Partial<StatBlock> = {}) {
@@ -20,7 +21,8 @@ function createTestEntity(name: string, stats: Partial<StatBlock> = {}) {
         failChance: 0, // Disable fail for deterministic testing
         ...stats
     };
-    const id = `test_${name}_${Math.random().toString(36).substr(2, 9)}`;
+    const rng = createTestRNG(1);
+    const id = `test_${name}_${rng().toString(36).substr(2, 9)}`;
     return Entity.fromStatBlock(id, name, fullStats);
 }
 

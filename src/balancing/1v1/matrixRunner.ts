@@ -20,6 +20,8 @@ import { runMonteCarlo } from './montecarlo';
 import { computeAllSWIForMatchup } from './swi';
 import type { Archetype, MatrixRunResult, MatchupResult } from './types';
 import { loadArchetypes } from './io';
+import { CombatSimulator } from '../simulation/CombatSimulator';
+import { SeededRNG } from './montecarlo'; // SeededRNG is defined in montecarlo.ts
 
 /**
  * Options for running a matrix
@@ -51,14 +53,14 @@ export async function runMatrix(
 
     const startTime = Date.now();
 
-    // Load archetypes from testArchetypes
+    // Load archetypes from testArchetypes registry
     const { getArchetype } = await import('./testArchetypes');
 
     const archetypes: Archetype[] = [];
     const archetypesById: Map<string, Archetype> = new Map();
 
     for (const id of archetypeIds) {
-        const archetype = getArchetype(id);
+        const archetype = await getArchetype(id);
         if (!archetype) {
             throw new Error(`Archetype not found: ${id}`);
         }
@@ -77,6 +79,9 @@ export async function runMatrix(
     // Results array
     const matrix: MatchupResult[] = [];
 
+    // SINGLE RNG INSTANCE
+    const rng = new SeededRNG(seed);
+
     // Run each matchup
     for (let i = 0; i < n; i++) {
         for (let j = 0; j < n; j++) {
@@ -93,16 +98,15 @@ export async function runMatrix(
             const rowArchetype = archetypesById.get(rowId)!;
             const colArchetype = archetypesById.get(colId)!;
 
-            // Generate cell seed (deterministic based on base seed + cell position)
-            const cellSeed = seed + (i * n + j);
-
             // Run Monte Carlo simulation
             const mcResult = runMonteCarlo(
                 rowArchetype.stats,
                 colArchetype.stats,
                 nSim,
-                cellSeed,
-                config
+                seed, // Use matrix seed
+                config,
+                3, // earlyImpactTurns
+                rng.next.bind(rng) // Pass shared RNG
             );
 
             // Compute SWI for this matchup
@@ -147,7 +151,7 @@ export async function runMatrix(
                 SWI: swiMap,
 
                 runtimeMs: mcResult.runtimeMs,
-                seed: cellSeed,
+                seed: seed,
             };
 
             matrix.push(matchupResult);
@@ -241,4 +245,45 @@ export function findMostImbalanced(
     });
 
     return sorted.slice(0, topN);
+}
+
+/**
+ * Matrix Runner for Combat Simulation
+ * 
+ * Executes NxN matchup matrix using Combat Simulator:
+ * - Calls CombatSimulator.simulate for each cell
+ * - Progress tracking
+ * - Result aggregation
+ * 
+ * @see src/simulation/CombatSimulator.ts
+ */
+
+export interface MatrixRunnerConfig {
+    archetypes: any[];
+    turnLimit?: number;
+    seed?: number;
+    enableDetailedLogging?: boolean;
+}
+
+export function runMatrixCombat(config: MatrixRunnerConfig) {
+    const {
+        archetypes,
+        turnLimit = 20,
+        seed = 12345,
+        enableDetailedLogging = false
+    } = config;
+    const rng = new SeededRNG(seed);
+    const results = [];
+    for (const entity1 of archetypes) {
+        for (const entity2 of archetypes) {
+            const result = CombatSimulator.simulate({
+                entity1,
+                entity2,
+                turnLimit,
+                enableDetailedLogging
+            }, rng);
+            results.push(result);
+        }
+    }
+    return results;
 }

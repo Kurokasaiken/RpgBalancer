@@ -9,6 +9,7 @@ import { describe, it, expect } from 'vitest';
 import { Entity } from '../../engine/core/entity';
 import { runSimulation } from '../../engine/simulation/runner';
 import { DEFAULT_STATS } from '../types';
+import { createTestRNG } from './TestRNG';
 import type { StatBlock } from '../types';
 
 const SIMULATIONS = 5000;
@@ -19,7 +20,8 @@ const MAX_ITERATIONS = 20;
 function createTestEntity(name: string, statOverrides: Partial<StatBlock>): Entity {
     const stats = { ...DEFAULT_STATS, ...statOverrides };
     // Use the factory method to properly initialize with StatBlock
-    const id = `test_${name}_${Math.random().toString(36).substr(2, 9)}`;
+    const rng = createTestRNG(1);
+    const id = `test_${name}_${rng().toString(36).substr(2, 9)}`;
     return Entity.fromStatBlock(id, name, stats);
 }
 

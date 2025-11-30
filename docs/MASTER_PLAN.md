@@ -2,9 +2,9 @@
 
 > **Navigator + Governance** - Single source of truth for project organization
 
-**Last Updated:** 2025-11-29  
+**Last Updated:** 2025-11-30  
 **Total Tasks:** 600+ (across dedicated task files)  
-**Current Phase:** Phase 2.3: 1v1 Balancing Module
+**Current Phase:** Phase 2.3: 1v1 Balancing Module (Balance Tuning Complete)
 
 ---
 
@@ -201,7 +201,22 @@ Example:
 - Auto-balancer with versioning and automatic nerf/buff proposals
 - UI: ArchetypeBuilder, MatchupMatrix, DetailPanel, RunBrowser, AutoBalanceConsole
 
-**Status:** Phase 1 Complete - Math Engine & Deterministic Simulator Ready
+**Status:** ✅ Phase 3.3 Complete - Balance Tuning & Architecture Unification Done
+
+**Recently Completed (2025-11-30):**
+- ✅ Combat Simulator Determinism & Regression Pack (20+ tests)
+- ✅ Matrix Reproducibility Verification
+- ✅ CLI Enhancement (matrix command with seed support)
+- ✅ **Balance Tuning Analysis** - Identified imbalances, applied adjustments
+  - Created 6 test archetypes (Tank, DPS, Assassin, Bruiser, Evasive, Sustain)
+  - Ran baseline 6x6 matrix simulations
+  - Balance score improved from 34.45% → 14.00% (59% improvement)
+  - All archetypes now within 35-65% win rate range
+- ✅ **Architecture Unification** - Enforced Single Source of Truth
+  - Created `ARCHITECTURE_REFERENCE.md` with mandatory design principles
+  - Replaced hardcoded test archetypes with ArchetypeRegistry
+  - Integrated ArchetypeRegistry in CharacterCreator (useEffect loading)
+  - **Formula Audit:** NO violations found - all UI uses balancing modules correctly
 
 ---
 
@@ -254,13 +269,13 @@ Example:
 ### This Week: Phase 2 - Archetype Balancing
 
 **Next 3 Tasks:**
-1. Implement CLI for running balance tests (Phase 3.3)
-2. Perform Balance Tuning based on simulation data (Phase 3.3)
-3. Build Balance Configuration UI (Phase 4.1)
+1. ✅ ~~Implement CLI for running balance tests~~ (Complete)
+2. ✅ ~~Perform Balance Tuning based on simulation data~~ (Complete)
+3. ⏭️ **Build Balance Configuration UI** (Phase 4.1 - Next)
+4. ⏭️ Implement Auto-balancer with versioning (Phase 4.2)
+5. ⏭️ Create UI components: MatchupMatrix, DetailPanel, RunBrowser (Phase 4.3-4.5)
 
-**Recently Completed:**
-- ✅ Combat Simulator Determinism & Regression Pack
-- ✅ Matrix Reproducibility Verification
+
 
 **📋 Full checklist:** [plans/archetype_tasks.md](plans/archetype_tasks.md)
 
@@ -299,4 +314,4 @@ Example:
 ---
 
 **Next Review:** End of Week 7 (2025-12-09)  
-**Last Updated:** 2025-11-27 22:30
+**Last Updated:** 2025-11-30 14:58
