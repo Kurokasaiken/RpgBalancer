@@ -2,30 +2,11 @@
 import { useState, useEffect } from 'react';
 import { SpellLibrary } from './ui/spell/SpellLibrary';
 import { FantasySpellCreation } from './ui/fantasy/FantasySpellCreation';
-
-// ... (inside App component)
-{
-  activeTab === 'spellCreation' && (
-    <ErrorBoundary componentName="Spell Creation">
-      <FantasySpellCreation />
-    </ErrorBoundary>
-  )
-}
 import { IdleArena } from './ui/idle/IdleArena';
 import { CharacterManager } from './ui/idle/CharacterManager';
 import { FantasyGridArena } from './ui/fantasy/FantasyGridArena';
-
-// ... (inside App component)
-{
-  activeTab === 'gridArena' && (
-    <ErrorBoundary componentName="Grid Arena">
-      <FantasyGridArena />
-    </ErrorBoundary>
-  )
-}
 import { TestingLab } from './ui/testing/TestingLab';
 import { ErrorBoundary } from './ui/organisms/ErrorBoundary';
-
 import { ArchetypeManager } from './components/balancing/archetype/ArchetypeManager';
 import { ArchetypeBuilderComponent } from './ui/balancing/archetype/ArchetypeBuilderComponent';
 import { ArchetypeBuilderFantasy } from './ui/balancing/archetype/ArchetypeBuilderFantasy';
@@ -47,8 +28,6 @@ function App() {
     window.addEventListener('navigate-spell-creation', handleNavigate as EventListener);
     return () => window.removeEventListener('navigate-spell-creation', handleNavigate as EventListener);
   }, []);
-
-
 
   return (
     <FantasyLayout activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab as Tab)}>

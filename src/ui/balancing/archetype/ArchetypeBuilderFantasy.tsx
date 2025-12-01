@@ -330,7 +330,7 @@ export const ArchetypeBuilderFantasy: React.FC = () => {
                             )}
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {STAT_NAMES.map(stat => (
+                                {STAT_NAMES.map((stat: keyof StatAllocation) => (
                                     <FantasySlider
                                         key={stat}
                                         label={stat.replace(/([A-Z])/g, ' $1').trim()}

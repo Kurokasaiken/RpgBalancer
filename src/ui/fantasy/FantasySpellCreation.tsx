@@ -1,24 +1,24 @@
 import React, { useState } from 'react';
-import { BASELINE_STATS } from '../../../balancing/baseline';
+import { BASELINE_STATS } from '../../balancing/baseline';
 import { toast } from 'sonner';
 import { FantasyLayout } from './FantasyLayout';
 import { FantasyCard } from './atoms/FantasyCard';
 import { FantasyInput } from './atoms/FantasyInput';
 import { FantasyButton } from './atoms/FantasyButton';
 import { FantasySlider } from './atoms/FantasySlider';
-import type { Spell } from '../../../balancing/spellTypes';
-import { createEmptySpell } from '../../../balancing/spellTypes';
-import { DEFAULT_SPELLS } from '../../../balancing/defaultSpells';
+import type { Spell } from '../../balancing/spellTypes';
+import { createEmptySpell } from '../../balancing/spellTypes';
+import { DEFAULT_SPELLS } from '../../balancing/defaultSpells';
 import {
     calculateSpellBudget,
     getStatDescription,
     isMalus,
     getBaselineSpell,
     BUFFABLE_STATS
-} from '../../../balancing/spellBalancingConfig';
-import { upsertSpell } from '../../../balancing/spellStorage';
-import { useDefaultStorage } from '../../../shared/hooks/useDefaultStorage';
-import { ALL_SPELL_STATS } from '../../../balancing/spellStatDefinitions';
+} from '../../balancing/spellBalancingConfig';
+import { upsertSpell } from '../../balancing/spellStorage';
+import { useDefaultStorage } from '../../shared/hooks/useDefaultStorage';
+import { ALL_SPELL_STATS } from '../../balancing/spellStatDefinitions';
 
 export const FantasySpellCreation: React.FC = () => {
     // Use custom hooks for state management
