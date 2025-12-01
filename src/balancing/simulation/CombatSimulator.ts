@@ -127,6 +127,28 @@ export class CombatSimulator {
                 entity2: overkill2,
             },
             turnByTurnLog,
+
+            // Enhanced Metrics (Phase 9)
+            initiativeRolls: {
+                entity1: state.metrics.initiativeRolls.get(fighter1.id) || [],
+                entity2: state.metrics.initiativeRolls.get(fighter2.id) || [],
+            },
+            hitRate: {
+                entity1: (state.metrics.hits.get(fighter1.id) || 0) / Math.max(1, state.metrics.attacks.get(fighter1.id) || 1),
+                entity2: (state.metrics.hits.get(fighter2.id) || 0) / Math.max(1, state.metrics.attacks.get(fighter2.id) || 1),
+            },
+            critRate: {
+                entity1: (state.metrics.crits.get(fighter1.id) || 0) / Math.max(1, state.metrics.hits.get(fighter1.id) || 1),
+                entity2: (state.metrics.crits.get(fighter2.id) || 0) / Math.max(1, state.metrics.hits.get(fighter2.id) || 1),
+            },
+            statusEffectsApplied: {
+                entity1: state.metrics.statusApplied.get(fighter1.id) || 0,
+                entity2: state.metrics.statusApplied.get(fighter2.id) || 0,
+            },
+            turnsStunned: {
+                entity1: state.metrics.turnsStunned.get(fighter1.id) || 0,
+                entity2: state.metrics.turnsStunned.get(fighter2.id) || 0,
+            },
         };
     }
 

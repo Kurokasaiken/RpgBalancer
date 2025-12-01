@@ -1,5 +1,5 @@
-# Escludi zip di export automatico
-project_clean.zip
+# Escludi tutti i file zip
+*.zip
 # Logs
 logs
 *.log

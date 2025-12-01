@@ -4,6 +4,7 @@ import { MitigationModule } from '../../balancing/modules/mitigation';
 import { CriticalModule } from '../../balancing/modules/critical';
 import { SustainModule } from '../../balancing/modules/sustain';
 import { StatusEffectManager, StatusEffectFactory } from '../../balancing/statusEffects/StatusEffectManager';
+import { InitiativeModule } from '../../balancing/modules/initiative';
 import type { EffectedCharacter } from '../../balancing/statusEffects/StatusEffectManager';
 import type { RNG } from '../../balancing/simulation/types';
 import { DEFAULT_STATS } from '../../balancing/types';
@@ -92,8 +93,38 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
         state.entityEffects.set(entity.id, effectedChar.statusEffects);
     }
 
-    // Sort by speed (descending)
-    allEntities.sort((a, b) => b.entity.derivedStats.speed - a.entity.derivedStats.speed);
+    // ========== INITIATIVE: Determine Turn Order ==========
+    // ARCHITECTURE: Using InitiativeModule for dynamic turn order
+    const initiativeCandidates = allEntities.map(({ entity }) => ({
+        id: entity.id,
+        agility: entity.statBlock?.agility || entity.derivedStats.speed || 0
+    }));
+
+    const initiativeRolls = InitiativeModule.generateDetailedRolls(initiativeCandidates, rng);
+
+    // Record initiative metrics
+    initiativeRolls.forEach(roll => {
+        const rolls = state.metrics.initiativeRolls.get(roll.characterId) || [];
+        rolls.push(roll.totalInitiative);
+        state.metrics.initiativeRolls.set(roll.characterId, rolls);
+    });
+
+    // Log initiative rolls
+    state.log.push({
+        turn: state.turn,
+        message: `Initiative Order: ${initiativeRolls.map(r => {
+            const name = allEntities.find(e => e.entity.id === r.characterId)?.entity.name || r.characterId;
+            return `${name} (${r.totalInitiative.toFixed(1)})`;
+        }).join(', ')}`,
+        type: 'info'
+    });
+
+    // Sort entities based on initiative rolls
+    allEntities.sort((a, b) => {
+        const rollA = initiativeRolls.find(r => r.characterId === a.entity.id)?.totalInitiative || 0;
+        const rollB = initiativeRolls.find(r => r.characterId === b.entity.id)?.totalInitiative || 0;
+        return rollB - rollA;
+    });
 
     for (const { entity, team } of allEntities) {
         if (!entity.isAlive()) continue; // Might have died during this turn
@@ -115,6 +146,7 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
 
         if (isStunned) {
             state.log.push({ turn: state.turn, message: `${entity.name} is stunned and cannot act!`, type: 'info' });
+            state.metrics.turnsStunned.set(entity.id, (state.metrics.turnsStunned.get(entity.id) || 0) + 1);
             continue;
         }
 
@@ -170,6 +202,7 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
                         };
 
                         effectManager.applyEffect(targetAdapter, effect);
+                        state.metrics.statusApplied.set(entity.id, (state.metrics.statusApplied.get(entity.id) || 0) + 1);
 
                         // Update state
                         state.entityEffects.set(targetEntity.id, targetAdapter.statusEffects);
@@ -230,6 +263,8 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
             const hitRoll = rng() * 100;
             const isHit = hitRoll <= hitChance;
 
+            state.metrics.attacks.set(entity.id, (state.metrics.attacks.get(entity.id) || 0) + 1);
+
             if (!isHit) {
                 state.log.push({
                     turn: state.turn,
@@ -252,6 +287,7 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
             if (isCritical) {
                 rawDamage = CriticalModule.calculateCriticalDamage(buffedDamage, attackerStats.critMult);
                 state.log.push({ turn: state.turn, message: `${entity.name} CRITS!`, type: 'info' });
+                state.metrics.crits.set(entity.id, (state.metrics.crits.get(entity.id) || 0) + 1);
             }
 
             // 3. Mitigation (using buffed armor!)
@@ -288,6 +324,8 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
         }
 
         if (isHit) {
+            state.metrics.hits.set(entity.id, (state.metrics.hits.get(entity.id) || 0) + 1);
+
             // ========== SHIELDS: Absorb Damage First ==========
             // ARCHITECTURE: Using StatusEffectManager (Manual Shield Logic)
             const targetEffectsList = state.entityEffects.get(target.id) || [];

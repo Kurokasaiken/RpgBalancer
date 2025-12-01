@@ -40,6 +40,11 @@ export interface Spell {
   lifesteal?: number;
   regen?: number;
 
+  // ========== PHASE 9: MULTI-UNIT COMBAT ==========
+  aoeShape?: 'circle' | 'cone' | 'line' | null; // AoE type
+  aoeRadius?: number; // For circle (tiles), for cone/line (length)
+  friendlyFire?: boolean; // If true, can damage allies
+
   /** Situational modifiers – array of condition/adjustment objects */
   situationalModifiers?: Array<{
     /** Human readable description, e.g. "Target below 25% HP" */
@@ -105,6 +110,10 @@ export const createEmptySpell = (id: string = crypto.randomUUID()): Spell => ({
   cooldown: 0,        // baseline = 0
   range: 0,           // baseline = 0
   priority: 0,        // baseline = 0
+  // Phase 9: Multi-Unit
+  aoeShape: null,
+  aoeRadius: undefined,
+  friendlyFire: false,
   manaCost: 0,        // baseline = 0
   scalingStat: undefined,
   slots: [],

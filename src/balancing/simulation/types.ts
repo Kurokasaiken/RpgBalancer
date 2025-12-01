@@ -64,6 +64,28 @@ export interface CombatResult {
 
     /** Optional: detailed turn-by-turn log */
     turnByTurnLog?: TurnData[];
+
+    /** Enhanced Metrics (Phase 9) */
+    initiativeRolls?: {
+        entity1: number[];
+        entity2: number[];
+    };
+    hitRate?: {
+        entity1: number; // Actual hits / total attacks
+        entity2: number;
+    };
+    critRate?: {
+        entity1: number; // Actual crits / total hits
+        entity2: number;
+    };
+    statusEffectsApplied?: {
+        entity1: number;
+        entity2: number;
+    };
+    turnsStunned?: {
+        entity1: number;
+        entity2: number;
+    };
 }
 
 /**

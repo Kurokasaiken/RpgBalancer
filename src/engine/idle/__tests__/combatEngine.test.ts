@@ -35,7 +35,7 @@ describe('Idle Combat Engine', () => {
     beforeEach(() => {
         hero = createMockCombatant('Hero', 'hero', 100);
         enemy = createMockCombatant('Enemy', 'enemy', 100);
-        state = startCombat([hero], [enemy]);
+        state = startCombat([hero], [enemy], () => 0.5);
     });
 
     test('startCombat initializes state correctly', () => {
@@ -138,7 +138,7 @@ describe('Idle Combat Engine', () => {
         deadEnemy.isDead = true;
         deadEnemy.entity.currentHealth = 0;
 
-        state = startCombat([hero], [deadEnemy]);
+        state = startCombat([hero], [deadEnemy], () => 0.5);
 
         // Force a turn transition to trigger win check
         // We need to simulate a turn ending. 
@@ -155,7 +155,7 @@ describe('Idle Combat Engine', () => {
         // If we manually set state to have a dead enemy and run nextTurn logic via executeAction...
 
         // Let's simulate the kill happening IN action
-        state = startCombat([hero], [enemy]);
+        state = startCombat([hero], [enemy], () => 0.5);
         state.turnOrder = [hero.id];
         state.currentTurnIndex = 0;
 

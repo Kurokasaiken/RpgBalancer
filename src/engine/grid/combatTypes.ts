@@ -1,55 +1,52 @@
 import type { StatBlock } from '../../balancing/types';
 import type { Spell } from '../../balancing/spellTypes';
+import type { AnyStatusEffect } from '../../balancing/statusEffects/StatusEffectManager';
+import type { CombatLogEntry } from '../combat/state';
 
-// Character with equipped spells and combat state
-export interface CombatCharacter {
-    id: string;
-    name: string;
-    baseStats: StatBlock;
-
-    // Equipment
-    equippedSpells: Spell[];
-    maxSpellSlots: number; // Default 4, can be modified by stats
-    equipment?: {
-        weapon?: Equipment;
-        armor?: Equipment;
-        accessory?: Equipment;
-    };
-
-    // Combat state (runtime)
-    position: Position;
-    currentHp: number;
-    currentMana: number;
-    statusEffects: StatusEffect[];
-    cooldowns: Map<string, number>; // spellId -> turns remaining
-
-    // Visual
-    sprite: string;
-    team: 'team1' | 'team2';
-}
-
-export interface Equipment {
-    id: string;
-    name: string;
-    type: 'weapon' | 'armor' | 'accessory';
-    statModifiers: Partial<StatBlock>;
-    abilities?: Spell[]; // Equipment can grant abilities
-}
-
-export interface StatusEffect {
-    id: string;
-    name: string;
-    type: 'buff' | 'debuff' | 'stun' | 'dot'; // damage over time
-    duration: number; // turns
-    effect: Partial<StatBlock> | { damage: number }; // Stat changes or direct damage
-}
+export type AoEShape =
+    | { type: 'circle', radius: number }
+    | { type: 'cone', angle: number, length: number } // angle in degrees
+    | { type: 'line', length: number, width: number };
 
 export interface Position {
     x: number;
     y: number;
 }
 
-// Combat action that a character can take
+export interface GridTile {
+    x: number;
+    y: number;
+    walkable: boolean;
+    terrainCost: number; // 1 = normal, 2 = difficult
+    blocker?: boolean; // Wall or obstacle
+}
+
+export interface GridState {
+    width: number;
+    height: number;
+    tiles: GridTile[][];
+}
+
+export interface GridCombatCharacter {
+    id: string;
+    name: string;
+    baseStats: StatBlock;
+    team: 'team1' | 'team2';
+
+    // Runtime state
+    position: Position;
+    currentHp: number;
+    currentMana: number;
+    statusEffects: AnyStatusEffect[];
+    cooldowns: Map<string, number>; // spellId -> turns remaining
+
+    // Equipment/Spells
+    equippedSpells: Spell[];
+
+    // Visual
+    sprite?: string;
+}
+
 export interface CombatAction {
     characterId: string;
     type: 'spell' | 'move' | 'wait';
@@ -59,40 +56,27 @@ export interface CombatAction {
     moveToPosition?: Position;
 }
 
-// Turn-based combat state
-export interface IdleCombatState {
-    phase: 'setup' | 'positioning' | 'combat' | 'ended';
+export interface GridCombatState {
+    grid: GridState;
+    characters: GridCombatCharacter[];
 
-    characters: CombatCharacter[];
-    gridSize: number;
-
-    currentTurn: number;
+    turn: number;
     turnQueue: string[]; // Character IDs in action order
 
-    // Idle settings
-    autoSpeed: number; // 0.5x, 1x, 2x, 5x
-    isPaused: boolean;
-
-    // Combat result
+    log: CombatLogEntry[];
     winner?: 'team1' | 'team2' | 'draw';
+    isFinished: boolean;
 
-    // Logs
-    events: CombatEvent[];
-}
-
-export interface CombatEvent {
-    turn: number;
-    timestamp: number;
-    type: 'damage' | 'heal' | 'spell_cast' | 'move' | 'status_applied' | 'death';
-    actorId: string;
-    targetId?: string;
-    details: {
-        spellName?: string;
-        damage?: number;
-        healing?: number;
-        statusEffect?: string;
+    // Metrics (Phase 9)
+    metrics: {
+        initiativeRolls: Map<string, number[]>;
+        attacks: Map<string, number>;
+        hits: Map<string, number>;
+        crits: Map<string, number>;
+        statusApplied: Map<string, number>;
+        turnsStunned: Map<string, number>;
+        tilesMoved: Map<string, number>; // NEW for Grid
     };
-    message: string; // Human-readable log
 }
 
 // AI decision for what action to take
@@ -104,17 +88,4 @@ export interface AIDecision {
         icon: string; // emoji or icon name
         target?: Position | string; // Show indicator where AI will act
     };
-}
-
-// Scenario-based positioning (for later phases)
-export type PositioningScenario =
-    | 'surprise' // Player ambushes AI
-    | 'ambushed' // AI ambushes player
-    | 'encounter'; // Both see each other
-
-export interface ScenarioSetup {
-    scenario: PositioningScenario;
-    team1StartZone: Position[]; // Valid starting tiles
-    team2StartZone: Position[];
-    team1GoesFirst: boolean; // Who positions first
 }
