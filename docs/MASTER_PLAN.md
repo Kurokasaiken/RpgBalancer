@@ -90,10 +90,11 @@ Example:
 │ Phase 4: Atomic UI       ✅ DONE    ~60 tasks      │
 │ Phase 5: Universal       ⏸️ PAUSED  ~40 tasks      │
 │ Phase 6: Logic Sep.      📋 TODO    ~30 tasks      │
-│ Phase 7: Persistence     📋 PLAN    ~25 tasks      │
-│ Phase 8: Fantasy UI      🎨 DESIGN  ~50 tasks      │
+│ Phase 7: Persistence     ✅ DONE    ~25 tasks      │
+│ Phase 8: Fantasy UI      ✅ DONE    ~50 tasks      │
+│ Phase 9: Combat Exp.     ✅ DONE    ~100 tasks     │
 ├─────────────────────────────────────────────────────┤
-│ TOTAL PROGRESS: ██████████░░░░░░░░░░ 42%           │
+│ TOTAL PROGRESS: ████████████████░░░░ 80%           │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -295,9 +296,10 @@ Example:
 
 ---
 
-### 🎨 **PHASE 8: Fantasy UI Redesign (In Progress)**
+### ✅ **PHASE 8: Fantasy UI Redesign (Complete)**
 
-**Status:** 5% (Design Complete, Implementation Started)
+**Status:** 100% Done
+**Report:** [phase8_walkthrough.md](../../.gemini/antigravity/brain/41fb7f12-d062-4270-aae4-b1bb5d18a77f/phase8_walkthrough.md)
 
 **Decision Date:** 2025-11-30
 
@@ -412,40 +414,19 @@ Expand combat system from 1v1 to full tactical grid-based multi-unit combat:
 
 ## 🎯 CURRENT FOCUS
 
-### This Week: Phase 9 - Combat System Expansion
+### This Week: Phase 6 - 1v1 Combat Polish
 
-**Approved Decisions (2025-11-30):**
-1. ✅ New `agility` stat for initiative system
-2. ✅ Dynamic initiative (re-roll each round)
-3. ✅ Status effects: Start with Stun, expand to Buff/Debuff in Phase 3
-4. ✅ AoE balancing: 0.65× damage, 2.0× cost (research-based)
-5. ✅ Incremental approach: 1v1 → Grid 2D → Multi-unit
+**Status:** Planned
+**Goal:** Finalize the 1v1 combat experience before moving to advanced scenarios.
 
-**Next 5 Tasks:**
-1. 🔄 **Fix `configApplyBeforeCrit` bug** (Phase 0)
-   - Implement branching logic in damageCalculator.ts
-   - Add unit tests for both config modes
-2. 🔄 **Implement Initiative System** (Phase 9.1) **← IN PROGRESS**
-   - Add `agility` stat to StatBlock
-   - Create InitiativeModule with turn order generation
-   - Integrate into CombatSimulator
-3. ⏭️ **Implement Status Effect Manager** (Phase 9.1)
-   - Apply/process/tick status effects
-   - Stun mechanic (skip turn)
-   - Enhanced combat logging
-4. ⏭️ **Create Pathfinding System** (Phase 9.2)
-   - A* algorithm for movement
-   - Dijkstra for reachable tiles
-   - Movement range from agility stat
-5. ⏭️ **Implement Range Calculator** (Phase 9.2)
-   - Distance checks (Euclidean)
-   - Line-of-sight raycast
-   - AoE target resolution
+**Next Tasks:**
+1. Implement Mana System
+2. Add Cooldown mechanics
+3. Refine Status Effects (visuals)
 
 **Deferred:**
-- Phase 7 (Persistence) - After combat expansion
-- Phase 8 (Fantasy UI) - After combat expansion
-- Mana/Cooldown systems - Post Phase 9
+- Phase 3 (Scenario UI) - After polish
+- Phase 5 (Universal Creators) - Future
 
 ---
 

@@ -1,4 +1,4 @@
-import { GridCombatState, GridCombatCharacter, AIDecision } from './combatTypes';
+import type { GridCombatState, GridCombatCharacter, AIDecision } from './combatTypes';
 import { findPath } from '../pathfinding/AStar';
 import { RangeCalculator } from './RangeCalculator';
 

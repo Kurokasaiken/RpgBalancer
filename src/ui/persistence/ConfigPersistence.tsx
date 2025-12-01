@@ -55,7 +55,7 @@ export function ConfigPersistence() {
     };
 
     return (
-        <CardWrapper title="⚙️ Balance Configuration Manager">
+        <CardWrapper title="⚙️ Balance Configuration Manager" color="blue">
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                     <button

@@ -1,4 +1,4 @@
-import { Position, GridState, AoEShape } from './combatTypes';
+import type { Position, GridState, AoEShape } from './combatTypes';
 
 export const RangeCalculator = {
     /**

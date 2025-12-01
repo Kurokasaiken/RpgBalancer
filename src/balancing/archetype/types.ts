@@ -8,27 +8,18 @@
 /**
  * Archetype Category - The role/playstyle of the archetype
  */
-export type ArchetypeCategory = 'Tank' | 'DPS' | 'Assassin' | 'Bruiser' | 'Support' | 'Hybrid';
-
 /**
- * How stats are allocated (as percentages that sum to 100%)
+ * Archetype Category Definition
  */
-export interface StatAllocation {
-    damage: number;      // % of budget to damage
-    hp: number;          // % of budget to HP
-    armor: number;       // % of budget to armor
-    resistance: number;  // % of budget to resistance
-    txc: number;         // % of budget to accuracy
-    evasion: number;     // % of budget to evasion
-    critChance: number;  // % of budget to crit chance
-    critMult: number;    // % of budget to crit multiplier
-    lifesteal: number;   // % of budget to lifesteal
-    regen: number;       // % of budget to regen
-    ward: number;        // % of budget to ward
-    block: number;       // % of budget to block
-    armorPen: number;    // % of budget to armor penetration
-    penPercent: number;  // % of budget to resistance penetration
+export interface ArchetypeCategoryDef {
+    id: string;
+    name: string;
+    description: string;
+    color: string;
 }
+
+// Legacy type for backward compatibility during migration, eventually replace with string
+export type ArchetypeCategory = string;
 
 /**
  * Archetype Template - The "blueprint" for creating instances
@@ -37,7 +28,9 @@ export interface ArchetypeTemplate {
     id: string;
     name: string;
     description: string;
-    category: ArchetypeCategory;
+    categoryId: string; // ID of the ArchetypeCategoryDef
+    isSystem?: boolean; // If true, cannot be deleted
+
 
     // Stat Distribution (percentages, sum must be ≤ 100)
     allocation: StatAllocation;

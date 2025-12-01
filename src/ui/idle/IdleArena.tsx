@@ -77,7 +77,7 @@ export const IdleArena: React.FC = () => {
 
         if (heroes.length === 0 || enemies.length === 0) return;
 
-        const initialState = startCombat(heroes, enemies);
+        const initialState = startCombat(heroes, enemies, Math.random);
         const withUpkeep = processUpkeep(initialState);
         const withIntent = determineIntent(withUpkeep);
         setCombatState(withIntent);
@@ -126,7 +126,7 @@ export const IdleArena: React.FC = () => {
         let enemyWins = 0;
 
         for (let i = 0; i < simulationCount; i++) {
-            let state = startCombat(heroes, enemies);
+            let state = startCombat(heroes, enemies, Math.random);
 
             const maxTurns = 1000;
             let turns = 0;

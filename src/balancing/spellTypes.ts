@@ -39,6 +39,10 @@ export interface Spell {
   critMult?: number;
   lifesteal?: number;
   regen?: number;
+  /** Duration of the effect in rounds (for buffs/debuffs) */
+  duration?: number;
+  /** Stat modifications for buffs/debuffs */
+  statModifications?: Record<string, number>;
 
   // ========== PHASE 9: MULTI-UNIT COMBAT ==========
   aoeShape?: 'circle' | 'cone' | 'line' | null; // AoE type

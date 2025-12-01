@@ -73,6 +73,15 @@ npm test
 - [Combat System Audit](docs/combat_system_audit.md)
 - [Changelog](CHANGELOG.md)
 
+## 🚀 Deployment & Mobile Access
+
+Want to test on your phone or share with friends?
+
+1. **Deploy to Vercel:** Follow the [Deployment Guide](DEPLOY_GUIDE.md).
+2. **Mobile Setup:** Read the [Mobile Setup Guide](MOBILE_SETUP.md) for the best experience.
+
+**Current Deployment:** _(Run `vercel` to generate URL)_
+
 ## 🤝 Contributing
 Contributions are welcome! Please read the [implementation plan](docs/implementation_plan.md) to understand the current roadmap.
 

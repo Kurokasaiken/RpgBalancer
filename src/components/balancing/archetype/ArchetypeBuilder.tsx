@@ -130,16 +130,22 @@ export const ArchetypeBuilder: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <GlassSlider
-                                    label={`Budget: ${budget} HP`}
-                                    min={10}
-                                    max={100}
-                                    step={5}
-                                    value={budget}
-                                    onChange={(e) => setBudget(Number(e.target.value))}
-                                    minLabel="10 HP"
-                                    maxLabel="100 HP"
-                                />
+                                <div className="space-y-2">
+                                    <div className="flex justify-between text-sm text-gray-300">
+                                        <span>Budget: {budget} HP</span>
+                                    </div>
+                                    <GlassSlider
+                                        min={10}
+                                        max={100}
+                                        step={5}
+                                        value={budget}
+                                        onChange={(val) => setBudget(val)}
+                                    />
+                                    <div className="flex justify-between text-xs text-gray-500">
+                                        <span>10 HP</span>
+                                        <span>100 HP</span>
+                                    </div>
+                                </div>
                             </div>
                         </GlassCard>
 

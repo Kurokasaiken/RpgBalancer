@@ -1,0 +1,14 @@
+<svg width="400" height="100" viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gold-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0e68c;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#d4af37;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#b8860b;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Main Ribbon Body -->
+  <path d="M20,20 L380,20 L400,50 L380,80 L20,80 L0,50 Z" fill="url(#gold-grad)" stroke="#8b6914" stroke-width="2"/>
+  <!-- Fold Effects -->
+  <path d="M20,20 L20,80" stroke="#8b6914" stroke-width="1" opacity="0.5"/>
+  <path d="M380,20 L380,80" stroke="#8b6914" stroke-width="1" opacity="0.5"/>
+</svg>
