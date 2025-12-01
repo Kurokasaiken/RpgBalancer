@@ -25,6 +25,7 @@ import { QuantumScriptorium } from './ui/fantasy/mockups/QuantumScriptorium';
 import { MidnightMeridian } from './ui/fantasy/mockups/MidnightMeridian';
 import { SeraphimArchive } from './ui/fantasy/mockups/SeraphimArchive';
 import { VerdantAlloyDeck } from './ui/fantasy/mockups/VerdantAlloyDeck';
+import { CompactDemo } from './ui/pages/CompactDemo';
 
 type Tab =
   | 'balancer'
@@ -49,7 +50,8 @@ type Tab =
   | 'mockQuantumScriptorium'
   | 'mockMidnightMeridian'
   | 'mockSeraphimArchive'
-  | 'mockVerdantAlloy';
+  | 'mockVerdantAlloy'
+  | 'compactDemo';
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('balancer');
@@ -176,6 +178,11 @@ function App() {
       {activeTab === 'mockVerdantAlloy' && (
         <ErrorBoundary componentName="Verdant Alloy Deck">
           <VerdantAlloyDeck />
+        </ErrorBoundary>
+      )}
+      {activeTab === 'compactDemo' && (
+        <ErrorBoundary componentName="Compact UI Demo">
+          <CompactDemo />
         </ErrorBoundary>
       )}
     </FantasyLayout>

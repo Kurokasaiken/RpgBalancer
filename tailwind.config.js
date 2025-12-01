@@ -7,112 +7,132 @@ export default {
   theme: {
     extend: {
       colors: {
-        // === PARCHMENT (Aged paper, scrolls) ===
-        parchment: {
-          light: '#faf7f0',
-          DEFAULT: '#f0e9db',
-          medium: '#e8dcc4',
-          dark: '#d4c5a8',
-          aged: '#c9b896',
+        // === GILDED OBSERVATORY THEME ===
+        // Deep dark backgrounds
+        obsidian: {
+          darkest: '#050509',
+          dark: '#0f1a1d',
+          DEFAULT: '#132427',
+          light: '#0c1517',
+          muted: '#0b1315',
         },
-        // === WOOD (Frames, panels, furniture) ===
-        wood: {
-          darkest: '#2d2418',
-          dark: '#3d3026',
-          DEFAULT: '#5c4a3a',
-          medium: '#6b5a48',
-          light: '#8b7355',
-          honey: '#a08465',
+        // Teal-grey borders and surfaces
+        slate: {
+          darkest: '#2c3737',
+          dark: '#384444',
+          DEFAULT: '#3b4b4d',
+          light: '#3e4d4d',
+          muted: '#404f51',
+          border: '#475758',
         },
-        // === LEATHER (Straps, book covers, accents) ===
-        leather: {
-          dark: '#4a3228',
-          DEFAULT: '#6b4e3d',
-          worn: '#7a5c4f',
-          light: '#8b6b55',
-          tan: '#a07d65',
+        // Ivory/cream text colors
+        ivory: {
+          DEFAULT: '#f0efe4',
+          bright: '#f6f3e4',
+          warm: '#f5f0dc',
+          muted: '#f3eddb',
+          dark: '#cfdfd8',
         },
-        // === BRONZE (Metal accents, clasps) ===
-        bronze: {
-          dark: '#7a5c20',
-          DEFAULT: '#a67c3d',
-          polished: '#cd7f32',
-          light: '#d4a574',
-          antique: '#8b6914',
+        // Teal accent colors
+        teal: {
+          DEFAULT: '#8db3a5',
+          light: '#9fb3af',
+          muted: '#96aaa6',
+          soft: '#aeb8b4',
+          pale: '#b3c8c4',
+          dim: '#6da8a0',
         },
-        // === GOLD (Premium accents, highlights) ===
+        // Gold/bronze accents
         gold: {
-          dark: '#8b7500',
           DEFAULT: '#c9a227',
-          bright: '#d4af37',
-          light: '#e6c65c',
-          pale: '#f0dfa0',
+          bright: '#f1d69c',
+          warm: '#d9bf7d',
+          dark: '#a7894f',
+          muted: '#c7b996',
           glow: '#ffd700',
         },
-        // === MARBLE (Statues, elegant panels) ===
-        marble: {
-          white: '#f5f3ef',
-          cream: '#ebe7df',
-          veined: '#e0dcd4',
-          grey: '#c9c5bc',
-          warm: '#d4cfc5',
+        // Legacy compatibility
+        parchment: {
+          light: '#f0efe4',
+          DEFAULT: '#f5f0dc',
         },
-        // === NATURE GREENS (Primary theme - bright, not dark!) ===
+        wood: {
+          darkest: '#050509',
+          dark: '#0f1a1d',
+          DEFAULT: '#132427',
+        },
         nature: {
-          mint: '#d4e8d1',
-          sage: '#b8c9ad',
-          leaf: '#8fb573',
-          spring: '#9ec48c',
-          forest: '#6b9b5a',
-          moss: '#a3b889',
-          fern: '#7da668',
+          leaf: '#6da8a0',
+          forest: '#8db3a5',
         },
-        // === SKY BLUES (Secondary accents) ===
-        sky: {
-          pale: '#d4e5ed',
-          light: '#b5d4e1',
-          DEFAULT: '#a8c7d7',
-          ocean: '#8cb4c9',
-          deep: '#6a9ab8',
-        },
-        // === SEMANTIC COLORS ===
-        success: '#7da668',
-        warning: '#d4a535',
-        error: '#b85c5c',
-        info: '#6a9ab8',
+        // Semantic colors
+        success: '#6da8a0',
+        warning: '#c9a227',
+        error: '#a85c5c',
+        info: '#8db3a5',
       },
       fontFamily: {
         display: ['Cinzel', 'serif'],
         body: ['Crimson Text', 'serif'],
         ui: ['Lato', 'sans-serif'],
       },
+      // Compact typography scale (base 14px, not 18px)
       fontSize: {
-        'xs': '14px',
-        'sm': '16px',
-        'base': '18px',
-        'lg': '20px',
-        'xl': '24px',
-        '2xl': '30px',
-        '3xl': '36px',
-        '4xl': '48px',
+        '2xs': ['10px', { lineHeight: '14px' }],
+        'xs': ['11px', { lineHeight: '16px' }],
+        'sm': ['12px', { lineHeight: '18px' }],
+        'base': ['14px', { lineHeight: '20px' }],
+        'lg': ['16px', { lineHeight: '24px' }],
+        'xl': ['18px', { lineHeight: '26px' }],
+        '2xl': ['22px', { lineHeight: '30px' }],
+        '3xl': ['26px', { lineHeight: '34px' }],
+        '4xl': ['32px', { lineHeight: '40px' }],
+        '5xl': ['40px', { lineHeight: '48px' }],
       },
+      // Compact spacing scale (base 4px)
       spacing: {
-        '1': '8px',
-        '2': '16px',
-        '3': '24px',
-        '4': '32px',
-        '5': '40px',
-        '6': '48px',
-        '8': '64px',
-        '10': '80px',
-        '12': '96px',
+        'px': '1px',
+        '0': '0px',
+        '0.5': '2px',
+        '1': '4px',
+        '1.5': '6px',
+        '2': '8px',
+        '2.5': '10px',
+        '3': '12px',
+        '3.5': '14px',
+        '4': '16px',
+        '5': '20px',
+        '6': '24px',
+        '7': '28px',
+        '8': '32px',
+        '9': '36px',
+        '10': '40px',
+        '11': '44px',
+        '12': '48px',
+        '14': '56px',
+        '16': '64px',
+        '20': '80px',
+        '24': '96px',
       },
       borderRadius: {
-        'sm': '4px',
-        'DEFAULT': '8px',
-        'lg': '12px',
-        'xl': '16px',
-        '2xl': '24px',
+        'none': '0px',
+        'sm': '2px',
+        'DEFAULT': '4px',
+        'md': '6px',
+        'lg': '8px',
+        'xl': '12px',
+        '2xl': '16px',
+        '3xl': '24px',
+        'full': '9999px',
+      },
+      // Mobile-first breakpoints
+      screens: {
+        'xs': '480px',
+        'sm': '640px',
+        'md': '768px',
+        'lg': '1024px',
+        'xl': '1280px',
+        '2xl': '1536px',
       },
       boxShadow: {
         // Base shadows

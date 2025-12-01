@@ -3,10 +3,13 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 import { Toaster } from './shared/components/Toaster'
+import { DensityProvider } from './contexts/DensityContext'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
-    <Toaster />
+    <DensityProvider>
+      <App />
+      <Toaster />
+    </DensityProvider>
   </StrictMode>,
 )

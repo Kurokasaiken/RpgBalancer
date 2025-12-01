@@ -1,3 +1,6 @@
+/* Font Imports - MUST be first */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700;900&display=swap');
+
 /**
  * Fantasy Theme - Enchanted Grove Edition
  * 
@@ -176,14 +179,10 @@
     --glow-fantasy-magic: var(--glow-sky);
 }
 
-/* Font Imports */
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700;900&display=swap');
-
-/* Base Styles */
+/* Base Styles - Gilded Observatory */
 body {
-    background-color: var(--fantasy-bg-wood-dark);
-    background-image: var(--texture-wood);
-    color: var(--fantasy-text-light);
+    background: linear-gradient(to bottom right, #050509, #0f1a1d, #132427);
+    color: #f0efe4;
     font-family: var(--font-body);
 }
 

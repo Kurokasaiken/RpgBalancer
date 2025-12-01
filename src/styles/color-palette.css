@@ -1,218 +1,92 @@
-/**
- * Fantasy RPG Color Palette
- * 
- * Dark Fantasy Jewel Tone theme with:
- * - Deep purples/violets for mystical elements
- * - Emerald greens for life/nature stats
- * - Ruby reds for damage/critical elements
- * - Sapphire blues for mana/magic
- * - Gold/amber for value/currency displays
- */
-
 :root {
-    /* ========================================
-     ARCANE / MAGIC (Purples & Violets)
-     ======================================== */
-    --fantasy-arcane-darkest: #2e1a47;
-    --fantasy-arcane-dark: #5b3c8b;
-    --fantasy-arcane-base: #9a5b9f;
-    --fantasy-arcane-light: #b794c4;
-    --fantasy-arcane-lightest: #d4bce2;
+    /* === Gilded Observatory Core Tokens === */
+    --obsidian-darkest: #050509;
+    --obsidian-dark: #0f1a1d;
+    --obsidian: #132427;
+    --obsidian-light: #0c1517;
 
-    /* ========================================
-     NATURE / LIFE (Emerald Greens)
-     ======================================== */
-    --fantasy-nature-darkest: #1a4d2e;
-    --fantasy-nature-dark: #2d6149;
-    --fantasy-nature-base: #4ade80;
-    --fantasy-nature-light: #86efac;
-    --fantasy-nature-lightest: #bbf7d0;
+    --slate-darkest: #2c3737;
+    --slate-dark: #384444;
+    --slate: #3b4b4d;
+    --slate-light: #3e4d4d;
+    --slate-border: #475758;
 
-    /* ========================================
-     FIRE / DAMAGE (Ruby Reds)
-     ======================================== */
-    --fantasy-fire-darkest: #8b2635;
-    --fantasy-fire-dark: #c53030;
-    --fantasy-fire-base: #ef4444;
-    --fantasy-fire-light: #f87171;
-    --fantasy-fire-lightest: #fca5a5;
+    --ivory: #f0efe4;
+    --ivory-bright: #f6f3e4;
+    --ivory-warm: #f5f0dc;
+    --ivory-muted: #f3eddb;
 
-    /* ========================================
-     WATER / MANA (Sapphire Blues)
-     ======================================== */
-    --fantasy-water-darkest: #1e3a8a;
-    --fantasy-water-dark: #3b82f6;
-    --fantasy-water-base: #06b6d4;
-    --fantasy-water-light: #22d3ee;
-    --fantasy-water-lightest: #67e8f9;
+    --teal: #8db3a5;
+    --teal-light: #9fb3af;
+    --teal-muted: #96aaa6;
+    --teal-soft: #aeb8b4;
+    --teal-dim: #6da8a0;
 
-    /* ========================================
-     WEALTH / VALUE (Gold & Amber)
-     ======================================== */
-    --fantasy-wealth-darkest: #92400e;
-    --fantasy-wealth-dark: #d97706;
-    --fantasy-wealth-base: #fbbf24;
-    --fantasy-wealth-light: #fcd34d;
-    --fantasy-wealth-lightest: #fde68a;
+    --gold: #c9a227;
+    --gold-bright: #f1d69c;
+    --gold-warm: #d9bf7d;
+    --gold-dark: #a7894f;
 
-    /* ========================================
-     BACKGROUNDS (Dark Gradients)
-     ======================================== */
-    --fantasy-bg-darkest: #0f172a;
-    --fantasy-bg-dark: #1e1b4b;
-    --fantasy-bg-medium: #312e81;
-    --fantasy-bg-light: #4c1d95;
+    --success: var(--teal);
+    --warning: var(--gold);
+    --error: #a85c5c;
+    --info: var(--teal-light);
 
-    /* ========================================
-     SEMANTIC COLORS
-     ======================================== */
-    --fantasy-success: var(--fantasy-nature-base);
-    --fantasy-warning: var(--fantasy-wealth-base);
-    --fantasy-error: var(--fantasy-fire-base);
-    --fantasy-info: var(--fantasy-water-base);
+    /* === Background & Surface Layers === */
+    --bg-main: linear-gradient(to bottom right, var(--obsidian-darkest), var(--obsidian));
+    --bg-card: linear-gradient(135deg, var(--obsidian-darkest), rgba(0, 0, 0, 0.25));
+    --bg-panel: rgba(12, 21, 23, 0.8);
+    --bg-overlay: rgba(0, 0, 0, 0.35);
 
-    /* ========================================
-     TEXT COLORS
-     ======================================== */
-    --fantasy-text-primary: #f8fafc;
-    --fantasy-text-secondary: #cbd5e1;
-    --fantasy-text-tertiary: #94a3b8;
-    --fantasy-text-muted: #64748b;
+    /* === Text & Borders === */
+    --text-primary: var(--ivory);
+    --text-secondary: var(--ivory-warm);
+    --text-muted: var(--teal-soft);
+    --border-strong: var(--slate);
+    --border-subtle: rgba(255, 255, 255, 0.15);
 
-    /* ========================================
-     GLOW EFFECTS (for fantasy feel)
-     ======================================== */
-    --glow-arcane: 0 0 8px rgba(154, 91, 159, 0.6);
-    --glow-nature: 0 0 8px rgba(74, 222, 128, 0.6);
-    --glow-fire: 0 0 8px rgba(239, 68, 68, 0.6);
-    --glow-water: 0 0 8px rgba(6, 182, 212, 0.6);
-    --glow-wealth: 0 0 8px rgba(251, 191, 36, 0.6);
+    /* === Spreadable Utility Tokens === */
+    --shadow-soft: 0 12px 25px rgba(0, 0, 0, 0.55);
+    --shadow-glow-gold: 0 0 25px rgba(201, 162, 39, 0.35);
+    --shadow-glow-teal: 0 0 25px rgba(141, 179, 165, 0.35);
 
-    /* ========================================
-     STAT-SPECIFIC COLORS
-     ======================================== */
-    /* Core Stats */
-    --stat-hp: var(--fantasy-fire-base);
-    --stat-damage: var(--fantasy-fire-dark);
-    --stat-mana: var(--fantasy-water-base);
-
-    /* Offensive Stats */
-    --stat-crit: var(--fantasy-wealth-base);
-    --stat-accuracy: var(--fantasy-arcane-base);
-    --stat-penetration: var(--fantasy-fire-light);
-
-    /* Defensive Stats */
-    --stat-armor: var(--fantasy-nature-dark);
-    --stat-resistance: var(--fantasy-arcane-dark);
-    --stat-evasion: var(--fantasy-water-light);
-    --stat-ward: var(--fantasy-arcane-light);
-
-    /* Sustain Stats */
-    --stat-lifesteal: var(--fantasy-nature-base);
-    --stat-regen: var(--fantasy-nature-light);
-
-    /* ========================================
-     GRADIENT BACKGROUNDS
-     ======================================== */
-    --gradient-arcane: linear-gradient(135deg, var(--fantasy-arcane-darkest), var(--fantasy-arcane-dark));
-    --gradient-nature: linear-gradient(135deg, var(--fantasy-nature-darkest), var(--fantasy-nature-dark));
-    --gradient-fire: linear-gradient(135deg, var(--fantasy-fire-darkest), var(--fantasy-fire-dark));
-    --gradient-water: linear-gradient(135deg, var(--fantasy-water-darkest), var(--fantasy-water-dark));
-    --gradient-wealth: linear-gradient(135deg, var(--fantasy-wealth-darkest), var(--fantasy-wealth-dark));
-
-    /* Main app gradients */
-    --gradient-bg-main: linear-gradient(to bottom right, var(--fantasy-bg-darkest), var(--fantasy-bg-dark), var(--fantasy-bg-medium));
-    --gradient-bg-card: linear-gradient(135deg, rgba(91, 60, 139, 0.1), rgba(6, 182, 212, 0.1));
-
-    /* ========================================
-     BORDER COLORS
-     ======================================== */
-    --border-arcane: rgba(154, 91, 159, 0.3);
-    --border-nature: rgba(74, 222, 128, 0.3);
-    --border-fire: rgba(239, 68, 68, 0.3);
-    --border-water: rgba(6, 182, 212, 0.3);
-    --border-wealth: rgba(251, 191, 36, 0.3);
-    --border-subtle: rgba(255, 255, 255, 0.1);
+    /* Legacy aliases so existing `.fantasy-*` classes pick up new tokens */
+    --fantasy-bg-wood-dark: var(--obsidian-darkest);
+    --fantasy-bg-wood-light: var(--obsidian);
+    --fantasy-bg-paper: var(--obsidian-light);
+    --fantasy-text-light: var(--ivory);
+    --fantasy-text-bronze: var(--gold);
+    --fantasy-text-ink: var(--ivory);
+    --fantasy-success: var(--success);
+    --fantasy-warning: var(--warning);
+    --fantasy-error: var(--error);
+    --fantasy-info: var(--info);
+    --fantasy-primary: var(--teal);
+    --fantasy-primary-dark: var(--teal-dim);
+    --fantasy-primary-light: var(--teal-light);
+    --fantasy-secondary: var(--slate);
+    --fantasy-secondary-dark: var(--slate-dark);
+    --shadow-fantasy-card: var(--shadow-soft);
+    --shadow-fantasy-inset: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    --shadow-fantasy-float: 0 12px 32px rgba(0, 0, 0, 0.4);
+    --glow-fantasy-gold: var(--shadow-glow-gold);
+    --glow-fantasy-magic: var(--shadow-glow-teal);
 }
 
-/* ========================================
-   UTILITY CLASSES
-   ======================================== */
-
-.fantasy-glow-arcane {
-    text-shadow: var(--glow-arcane);
+.fantasy-theme-bg {
+    background: var(--bg-main);
 }
 
-.fantasy-glow-nature {
-    text-shadow: var(--glow-nature);
-}
-
-.fantasy-glow-fire {
-    text-shadow: var(--glow-fire);
-}
-
-.fantasy-glow-water {
-    text-shadow: var(--glow-water);
-}
-
-.fantasy-glow-wealth {
-    text-shadow: var(--glow-wealth);
-}
-
-/* Glass morphism effect */
-.fantasy-glass {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(16px);
+.fantasy-theme-card {
+    background: var(--bg-panel);
     border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-soft);
 }
 
-/* Animated gradient background */
-.fantasy-bg-animated {
-    background: linear-gradient(-45deg,
-            var(--fantasy-arcane-darkest),
-            var(--fantasy-bg-dark),
-            var(--fantasy-water-darkest),
-            var(--fantasy-bg-medium));
-    background-size: 400% 400%;
-    animation: gradientShift 15s ease infinite;
+.fantasy-theme-text {
+    color: var(--text-primary);
 }
 
-@keyframes gradientShift {
-    0% {
-        background-position: 0% 50%;
-    }
-
-    50% {
-        background-position: 100% 50%;
-    }
-
-    100% {
-        background-position: 0% 50%;
-    }
-}
-
-/* Hover glow effects */
-.fantasy-hover-glow-arcane:hover {
-    box-shadow: var(--glow-arcane);
-    transition: box-shadow 0.3s ease;
-}
-
-.fantasy-hover-glow-nature:hover {
-    box-shadow: var(--glow-nature);
-    transition: box-shadow 0.3s ease;
-}
-
-.fantasy-hover-glow-fire:hover {
-    box-shadow: var(--glow-fire);
-    transition: box-shadow 0.3s ease;
-}
-
-.fantasy-hover-glow-water:hover {
-    box-shadow: var(--glow-water);
-    transition: box-shadow 0.3s ease;
-}
-
-.fantasy-hover-glow-wealth:hover {
-    box-shadow: var(--glow-wealth);
-    transition: box-shadow 0.3s ease;
+.fantasy-theme-border {
+    border-color: var(--border-strong);
 }
