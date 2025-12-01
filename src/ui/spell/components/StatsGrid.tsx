@@ -16,6 +16,7 @@ interface StatsGridProps {
   onDragStart: (e: React.DragEvent, field: string) => void;
   onDragOver: (e: React.DragEvent) => void;
   onDrop: (e: React.DragEvent, field: string) => void;
+  getStatLabel?: (field: string) => string;
 }
 
 export const StatsGrid: React.FC<StatsGridProps> = ({
@@ -32,7 +33,8 @@ export const StatsGrid: React.FC<StatsGridProps> = ({
   onSelectTick,
   onDragStart,
   onDragOver,
-  onDrop
+  onDrop,
+  getStatLabel
 }) => {
   return (
     <div className="flex flex-wrap gap-4 mb-4">
@@ -54,6 +56,7 @@ export const StatsGrid: React.FC<StatsGridProps> = ({
           onDragStart={(e) => onDragStart(e, field)}
           onDragOver={onDragOver}
           onDrop={(e) => onDrop(e, field)}
+          label={getStatLabel ? getStatLabel(field) : undefined}
         />
       ))}
     </div>

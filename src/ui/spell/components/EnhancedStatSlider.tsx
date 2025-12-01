@@ -17,6 +17,7 @@ interface EnhancedStatSliderProps {
   onDragStart?: (e: React.DragEvent, field: string) => void;
   onDragOver?: (e: React.DragEvent) => void;
   onDrop?: (e: React.DragEvent, field: string) => void;
+  label?: string;
 }
 
 export const EnhancedStatSlider: React.FC<EnhancedStatSliderProps> = ({
@@ -34,7 +35,8 @@ export const EnhancedStatSlider: React.FC<EnhancedStatSliderProps> = ({
   draggable = false,
   onDragStart,
   onDragOver,
-  onDrop
+  onDrop,
+  label
 }) => {
   return (
     <div className="mb-2 transition-all duration-300">
@@ -50,7 +52,7 @@ export const EnhancedStatSlider: React.FC<EnhancedStatSliderProps> = ({
           <div className="flex items-center gap-2">
             <span className="text-gray-500">☰</span>
             <span className="font-bold text-blue-200 capitalize">
-              {field}
+              {label || field}
             </span>
             {isMalus && <span className="text-yellow-400 text-xs" title="Malus">⚠️</span>}
           </div>

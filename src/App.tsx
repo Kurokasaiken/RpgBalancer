@@ -16,8 +16,40 @@ import { CharacterCreator } from './ui/character/CharacterCreator';
 import { FantasyLayout } from './ui/fantasy/FantasyLayout';
 import { FantasyBalancer } from './ui/fantasy/FantasyBalancer';
 import { FantasyComponentShowcase } from './ui/atoms/FantasyComponentShowcase';
+import { ArcaneTechGlass } from './ui/fantasy/mockups/ArcaneTechGlass';
+import { GildedObservatory } from './ui/fantasy/mockups/GildedObservatory';
+import { ObsidianSanctum } from './ui/fantasy/mockups/ObsidianSanctum';
+import { AuroraWorkshop } from './ui/fantasy/mockups/AuroraWorkshop';
+import { AetherBrassLab } from './ui/fantasy/mockups/AetherBrassLab';
+import { QuantumScriptorium } from './ui/fantasy/mockups/QuantumScriptorium';
+import { MidnightMeridian } from './ui/fantasy/mockups/MidnightMeridian';
+import { SeraphimArchive } from './ui/fantasy/mockups/SeraphimArchive';
+import { VerdantAlloyDeck } from './ui/fantasy/mockups/VerdantAlloyDeck';
 
-type Tab = 'balancer' | 'archetypes' | 'archetypeBuilder' | 'archetypeFantasy' | 'matchupMatrix' | 'autoBalancer' | 'characterCreator' | 'spellLibrary' | 'spellCreation' | 'characterManager' | 'gridArena' | 'idleArena' | 'testing' | 'fantasyShowcase';
+type Tab =
+  | 'balancer'
+  | 'archetypes'
+  | 'archetypeBuilder'
+  | 'archetypeFantasy'
+  | 'matchupMatrix'
+  | 'autoBalancer'
+  | 'characterCreator'
+  | 'spellLibrary'
+  | 'spellCreation'
+  | 'characterManager'
+  | 'gridArena'
+  | 'idleArena'
+  | 'testing'
+  | 'fantasyShowcase'
+  | 'mockArcaneTech'
+  | 'mockGildedObservatory'
+  | 'mockObsidianSanctum'
+  | 'mockAuroraWorkshop'
+  | 'mockAetherBrass'
+  | 'mockQuantumScriptorium'
+  | 'mockMidnightMeridian'
+  | 'mockSeraphimArchive'
+  | 'mockVerdantAlloy';
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('balancer');
@@ -99,6 +131,51 @@ function App() {
       {activeTab === 'fantasyShowcase' && (
         <ErrorBoundary componentName="Fantasy Showcase">
           <FantasyComponentShowcase />
+        </ErrorBoundary>
+      )}
+      {activeTab === 'mockArcaneTech' && (
+        <ErrorBoundary componentName="Arcane Tech Glass">
+          <ArcaneTechGlass />
+        </ErrorBoundary>
+      )}
+      {activeTab === 'mockGildedObservatory' && (
+        <ErrorBoundary componentName="Gilded Observatory">
+          <GildedObservatory />
+        </ErrorBoundary>
+      )}
+      {activeTab === 'mockObsidianSanctum' && (
+        <ErrorBoundary componentName="Obsidian Sanctum">
+          <ObsidianSanctum />
+        </ErrorBoundary>
+      )}
+      {activeTab === 'mockAuroraWorkshop' && (
+        <ErrorBoundary componentName="Aurora Workshop">
+          <AuroraWorkshop />
+        </ErrorBoundary>
+      )}
+      {activeTab === 'mockAetherBrass' && (
+        <ErrorBoundary componentName="Aether Brass Lab">
+          <AetherBrassLab />
+        </ErrorBoundary>
+      )}
+      {activeTab === 'mockQuantumScriptorium' && (
+        <ErrorBoundary componentName="Quantum Scriptorium">
+          <QuantumScriptorium />
+        </ErrorBoundary>
+      )}
+      {activeTab === 'mockMidnightMeridian' && (
+        <ErrorBoundary componentName="Midnight Meridian">
+          <MidnightMeridian />
+        </ErrorBoundary>
+      )}
+      {activeTab === 'mockSeraphimArchive' && (
+        <ErrorBoundary componentName="Seraphim Archive">
+          <SeraphimArchive />
+        </ErrorBoundary>
+      )}
+      {activeTab === 'mockVerdantAlloy' && (
+        <ErrorBoundary componentName="Verdant Alloy Deck">
+          <VerdantAlloyDeck />
         </ErrorBoundary>
       )}
     </FantasyLayout>

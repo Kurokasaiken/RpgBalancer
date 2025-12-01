@@ -26,45 +26,24 @@ export const LEGENDARY_COST = 2;
 export function calculateSpellCost(spell: Spell): number {
     let cost = 0;
 
-    // Effect (10% steps)
-    cost += Math.round((spell.effect - 100) / 10);
-
-    // Scale
-    cost += spell.scale;
-
-    // Eco (extra rounds)
-    cost += spell.eco - 1;
-
-    // AoE (extra targets)
-    cost += spell.aoe - 1;
-
-    // Precision (success chance modifier).
-    cost += Math.round(spell.precision / 5);
-
-    // Dangerous (damage on miss/save).
-    cost += Math.round(spell.dangerous / 5);
-
-    // Cooldown (0.5s steps)
-    cost += Math.round(spell.cooldown / 0.5);
-
-    // Range (extra units)
-    cost += spell.range - 1;
-
-    // Priority (steps from 0)
-    cost += spell.priority;
-
-    // New fields
-    if (spell.ccEffect) cost += 2; // crowd‑control effect adds fixed cost
-
-    // Buff/Debuff cost (based on magnitude and duration)
+    // Effect & Eco cost logic depends on spell type
     if (spell.type === 'buff' || spell.type === 'debuff') {
-        // Effect is magnitude %, Eco is duration turns
+        // Buff/Debuff: Effect is magnitude %, Eco is duration turns
         const magnitude = Math.abs(spell.effect);
         const duration = Math.max(1, spell.eco);
 
-        // Base cost: 1 point per 10% magnitude per turn
-        // This is a rough heuristic, can be tuned
-        cost += (magnitude / 10) * duration * 0.5;
+        // Cost formula: (Magnitude / 5) * Duration
+        // Example: 20% buff for 3 turns = (20/5) * 3 = 12 points
+        // This needs to be tuned based on actual gameplay value
+        cost += (magnitude / 5) * duration;
+    } else {
+        // Standard (Damage/Heal): Effect is % of baseline, Eco is extra rounds (DoT)
+
+        // Effect (10% steps from 100%)
+        cost += Math.round((spell.effect - 100) / 10);
+
+        // Eco (extra rounds beyond 1)
+        cost += Math.max(0, spell.eco - 1);
     }
     if (spell.situationalModifiers && spell.situationalModifiers.length > 0) {
         for (const mod of spell.situationalModifiers) {

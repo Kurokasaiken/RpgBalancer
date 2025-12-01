@@ -30,33 +30,54 @@ export const FantasyComponentShowcase: React.FC = () => {
                 <section>
                     <h2 className="font-display text-2xl text-wood-dark mb-4">Fantasy Cards</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <FantasyCard variant="parchment">
-                            <h3 className="font-display text-xl font-bold mb-2">Parchment Card</h3>
+                        <FantasyCard variant="parchment" ornate>
+                            <h3 className="font-display text-xl font-bold mb-2">📜 Parchment Card</h3>
                             <p className="font-body text-base">
-                                Classic parchment background with wood border and bronze corner ornaments.
+                                Classic parchment with gold corner ornaments. Perfect for content panels.
                             </p>
                         </FantasyCard>
 
                         <FantasyCard variant="wood">
-                            <h3 className="font-display text-xl font-bold mb-2">Wood Card</h3>
-                            <p className="font-body text-base">
-                                Dark wood background with bronze border for contrast sections.
+                            <h3 className="font-display text-xl font-bold mb-2 text-parchment-light">🪵 Wood Card</h3>
+                            <p className="font-body text-base text-parchment-light/90">
+                                Dark wood texture with leather border. Great for navigation or headers.
                             </p>
                         </FantasyCard>
 
                         <FantasyCard variant="marble">
-                            <h3 className="font-display text-xl font-bold mb-2">Marble Card</h3>
+                            <h3 className="font-display text-xl font-bold mb-2">🏛️ Marble Card</h3>
                             <p className="font-body text-base">
-                                Elegant marble background for important information panels.
+                                Elegant veined marble for important information and stats.
+                            </p>
+                        </FantasyCard>
+
+                        <FantasyCard variant="leather">
+                            <h3 className="font-display text-xl font-bold mb-2 text-parchment-light">📕 Leather Card</h3>
+                            <p className="font-body text-base text-parchment-light/90">
+                                Book cover style. Ideal for inventory items or spell books.
+                            </p>
+                        </FantasyCard>
+
+                        <FantasyCard variant="gold" ornate glowing>
+                            <h3 className="font-display text-xl font-bold mb-2">✨ Gold Frame</h3>
+                            <p className="font-body text-base">
+                                Premium gold frame with glow. Use for legendary items or achievements.
+                            </p>
+                        </FantasyCard>
+
+                        <FantasyCard variant="nature">
+                            <h3 className="font-display text-xl font-bold mb-2">🌿 Nature Card</h3>
+                            <p className="font-body text-base">
+                                Fresh green gradient. Perfect for nature-themed content or success states.
                             </p>
                         </FantasyCard>
                     </div>
 
                     <div className="mt-6">
-                        <FantasyCard variant="parchment" interactive>
+                        <FantasyCard variant="parchment" interactive ornate>
                             <h3 className="font-display text-xl font-bold mb-2">🖱️ Interactive Card</h3>
                             <p className="font-body text-base">
-                                Hover over this card to see the interactive effects with glow and scale.
+                                Hover to see gold glow and scale effects. Click for press animation.
                             </p>
                         </FantasyCard>
                     </div>
@@ -71,13 +92,19 @@ export const FantasyComponentShowcase: React.FC = () => {
                                 <h3 className="font-display text-lg mb-3">Variants</h3>
                                 <div className="flex flex-wrap gap-4">
                                     <FantasyButton variant="primary">
-                                        Primary Action
+                                        🌿 Primary
                                     </FantasyButton>
                                     <FantasyButton variant="secondary">
-                                        Secondary Action
+                                        🪵 Secondary
                                     </FantasyButton>
-                                    <FantasyButton variant="accent">
-                                        Accent Action
+                                    <FantasyButton variant="gold">
+                                        ✨ Gold Premium
+                                    </FantasyButton>
+                                    <FantasyButton variant="nature">
+                                        🍃 Nature
+                                    </FantasyButton>
+                                    <FantasyButton variant="danger">
+                                        ⚠️ Danger
                                     </FantasyButton>
                                 </div>
                             </div>
@@ -100,7 +127,7 @@ export const FantasyComponentShowcase: React.FC = () => {
                                     <FantasyButton rightIcon="🛡️">
                                         Defend
                                     </FantasyButton>
-                                    <FantasyButton variant="accent" leftIcon="✨" rightIcon="🔮">
+                                    <FantasyButton variant="gold" leftIcon="✨" rightIcon="🔮">
                                         Cast Spell
                                     </FantasyButton>
                                 </div>

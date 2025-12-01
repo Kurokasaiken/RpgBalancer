@@ -3,10 +3,12 @@ import React from 'react';
 interface FantasyCardProps {
     children: React.ReactNode;
     className?: string;
-    variant?: 'parchment' | 'wood' | 'marble' | 'ornate';
-    padding?: 'none' | 'sm' | 'md' | 'lg';
+    variant?: 'parchment' | 'wood' | 'marble' | 'leather' | 'gold' | 'nature';
+    padding?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
     bordered?: boolean;
+    ornate?: boolean;
     interactive?: boolean;
+    glowing?: boolean;
     onClick?: () => void;
 }
 
@@ -16,16 +18,20 @@ export const FantasyCard: React.FC<FantasyCardProps> = ({
     variant = 'parchment',
     padding = 'md',
     bordered = true,
+    ornate = false,
     interactive = false,
+    glowing = false,
     onClick
 }) => {
-    const baseStyles = "rounded-xl transition-all duration-base relative";
+    const baseStyles = "rounded-xl transition-all duration-300 relative overflow-hidden";
 
     const variants = {
         parchment: "fantasy-panel",
-        ornate: "fantasy-frame-gold",
         wood: "fantasy-wood-panel",
-        marble: "bg-marble-white text-wood-dark shadow-fantasy-soft border border-marble-gray",
+        marble: "fantasy-marble-panel",
+        leather: "fantasy-leather-panel",
+        gold: "fantasy-frame-gold",
+        nature: "fantasy-nature-panel",
     };
 
     const paddings = {
@@ -33,14 +39,19 @@ export const FantasyCard: React.FC<FantasyCardProps> = ({
         sm: "p-3",
         md: "p-6",
         lg: "p-8",
+        xl: "p-10",
     };
 
-    // Border styles are now handled by the premium classes, but we keep the prop for overrides
-    const borderStyles = bordered ? "" : "border-none shadow-none";
-
+    const borderStyles = bordered ? "" : "border-none !shadow-none";
+    
     const interactiveStyles = interactive
-        ? "cursor-pointer hover:shadow-fantasy-strong hover:scale-[1.01] active:scale-[0.99] transition-transform duration-200"
+        ? "cursor-pointer hover:shadow-fantasy-float hover:scale-[1.01] hover:shadow-glow-gold active:scale-[0.99] active:shadow-fantasy"
         : "";
+
+    const glowStyles = glowing ? "shadow-glow-gold" : "";
+
+    // Determine ornament color based on variant
+    const ornamentColor = variant === 'gold' || variant === 'parchment' ? 'gold' : 'bronze';
 
     return (
         <div
@@ -49,24 +60,30 @@ export const FantasyCard: React.FC<FantasyCardProps> = ({
                 ${variants[variant]} 
                 ${paddings[padding]} 
                 ${borderStyles}
-                ${interactiveStyles} 
+                ${interactiveStyles}
+                ${glowStyles}
                 ${className}
             `}
             onClick={onClick}
         >
-            {/* Corner ornaments (Premium Gold/Bronze) */}
-            {bordered && variant === 'parchment' && (
+            {/* Premium Corner Ornaments */}
+            {bordered && ornate && (
                 <>
-                    <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-bronze opacity-80 rounded-tl-lg" />
-                    <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-bronze opacity-80 rounded-tr-lg" />
-                    <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-bronze opacity-80 rounded-bl-lg" />
-                    <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-bronze opacity-80 rounded-br-lg" />
+                    {/* Corner L-shapes */}
+                    <div className={`absolute top-2 left-2 w-6 h-6 border-t-2 border-l-2 border-${ornamentColor} rounded-tl-md opacity-90`} />
+                    <div className={`absolute top-2 right-2 w-6 h-6 border-t-2 border-r-2 border-${ornamentColor} rounded-tr-md opacity-90`} />
+                    <div className={`absolute bottom-2 left-2 w-6 h-6 border-b-2 border-l-2 border-${ornamentColor} rounded-bl-md opacity-90`} />
+                    <div className={`absolute bottom-2 right-2 w-6 h-6 border-b-2 border-r-2 border-${ornamentColor} rounded-br-md opacity-90`} />
 
-                    {/* Inner Gold Accent */}
-                    <div className="absolute top-1 left-1 w-2 h-2 bg-bronze rounded-full opacity-40" />
-                    <div className="absolute top-1 right-1 w-2 h-2 bg-bronze rounded-full opacity-40" />
-                    <div className="absolute bottom-1 left-1 w-2 h-2 bg-bronze rounded-full opacity-40" />
-                    <div className="absolute bottom-1 right-1 w-2 h-2 bg-bronze rounded-full opacity-40" />
+                    {/* Corner Dots - Gold accents */}
+                    <div className={`absolute top-3 left-3 w-1.5 h-1.5 bg-${ornamentColor} rounded-full shadow-glow-gold opacity-80`} />
+                    <div className={`absolute top-3 right-3 w-1.5 h-1.5 bg-${ornamentColor} rounded-full shadow-glow-gold opacity-80`} />
+                    <div className={`absolute bottom-3 left-3 w-1.5 h-1.5 bg-${ornamentColor} rounded-full shadow-glow-gold opacity-80`} />
+                    <div className={`absolute bottom-3 right-3 w-1.5 h-1.5 bg-${ornamentColor} rounded-full shadow-glow-gold opacity-80`} />
+
+                    {/* Center top/bottom accent bar */}
+                    <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-16 h-0.5 bg-gradient-to-r from-transparent via-${ornamentColor} to-transparent opacity-60`} />
+                    <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-16 h-0.5 bg-gradient-to-r from-transparent via-${ornamentColor} to-transparent opacity-60`} />
                 </>
             )}
 

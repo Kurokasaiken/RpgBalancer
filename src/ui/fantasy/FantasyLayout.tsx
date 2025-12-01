@@ -23,6 +23,16 @@ export const FantasyLayout: React.FC<FantasyLayoutProps> = ({ children, activeTa
         { id: 'gridArena', label: 'Battlefield', icon: '⚔️' },
         { id: 'characterCreator', label: 'Heroes', icon: '👤' },
         { id: 'settings', label: 'Settings', icon: '⚙️' },
+        { id: 'divider-mockups', label: '— Mockups —', type: 'divider' as const },
+        { id: 'mockArcaneTech', label: 'Arcane Tech Glass', icon: '💠' },
+        { id: 'mockGildedObservatory', label: 'Gilded Observatory', icon: '🜂' },
+        { id: 'mockObsidianSanctum', label: 'Obsidian Sanctum', icon: '🜃' },
+        { id: 'mockAuroraWorkshop', label: 'Aurora Workshop', icon: '✺' },
+        { id: 'mockAetherBrass', label: 'Aether Brass Lab', icon: '⚗️' },
+        { id: 'mockQuantumScriptorium', label: 'Quantum Scriptorium', icon: '✒️' },
+        { id: 'mockMidnightMeridian', label: 'Midnight Meridian', icon: '✦' },
+        { id: 'mockSeraphimArchive', label: 'Seraphim Archive', icon: '✶' },
+        { id: 'mockVerdantAlloy', label: 'Verdant Alloy Deck', icon: '🌿' },
     ];
 
     const handleNavSelect = (id: string) => {

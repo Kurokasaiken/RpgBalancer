@@ -1,8 +1,10 @@
 /**
- * Fantasy Theme - Enchanted Forest Edition
+ * Fantasy Theme - Enchanted Grove Edition
  * 
- * Style: Medieval Fantasy (Tavern/Library/Forest)
- * Mood: Relaxing, adventurous, serene
+ * Style: Medieval Fantasy (Nature, Library, Crafted)
+ * Mood: Natural, elegant, magical
+ * 
+ * Palette: Green nature + Parchment + Wood/Leather + Marble + Bronze/Gold
  */
 
 :root {
@@ -14,72 +16,164 @@
     --font-ui: 'Lato', sans-serif;
 
     /* =========================================
-       COLOR PALETTE ("Enchanted Forest")
+       COLOR PALETTE ("Enchanted Grove")
        ========================================= */
 
-    /* Primary & Secondary */
-    --fantasy-primary: #b8c5b0;
-    /* Sage Green */
-    --fantasy-primary-dark: #7fa67e;
-    /* Forest Green */
-    --fantasy-primary-light: #c8dfc7;
-    /* Mint */
+    /* === NATURE GREENS (Primary - Bright, Natural) === */
+    --nature-mint: #d4e8d1;
+    --nature-sage: #b8c9ad;
+    --nature-spring: #9ec48c;
+    --nature-leaf: #8fb573;
+    --nature-fern: #7da668;
+    --nature-forest: #6b9b5a;
+    --nature-moss: #a3b889;
 
-    --fantasy-secondary: #a8c7d7;
-    /* Sky Blue */
-    --fantasy-secondary-dark: #8cb4c9;
-    /* Ocean Blue */
+    /* === PARCHMENT (Paper, Scrolls) === */
+    --parchment-light: #faf7f0;
+    --parchment: #f0e9db;
+    --parchment-medium: #e8dcc4;
+    --parchment-dark: #d4c5a8;
+    --parchment-aged: #c9b896;
 
-    /* Backgrounds & Surfaces */
-    --fantasy-bg-paper: #f5f1e8;
-    /* Parchment */
-    --fantasy-bg-wood-dark: #4a3f35;
-    /* Wood Dark */
-    --fantasy-bg-wood-light: #8b7355;
-    /* Wood Light */
-    --fantasy-bg-leather: #6b4e3d;
-    /* Leather */
+    /* === WOOD (Panels, Frames) === */
+    --wood-darkest: #2d2418;
+    --wood-dark: #3d3026;
+    --wood: #5c4a3a;
+    --wood-medium: #6b5a48;
+    --wood-light: #8b7355;
+    --wood-honey: #a08465;
 
-    /* Text */
-    --fantasy-text-ink: #2c241b;
-    /* Ink Black */
-    --fantasy-text-bronze: #cd7f32;
-    /* Bronze */
-    --fantasy-text-light: #ebe7df;
-    /* Marble White */
+    /* === LEATHER (Straps, Covers) === */
+    --leather-dark: #4a3228;
+    --leather: #6b4e3d;
+    --leather-worn: #7a5c4f;
+    --leather-light: #8b6b55;
+    --leather-tan: #a07d65;
 
-    /* Status Colors (Muted/Natural) */
-    --fantasy-success: #7fa67e;
-    /* Forest Green */
-    --fantasy-warning: #e6b32e;
-    /* Amber */
-    --fantasy-error: #b85c5c;
-    /* Faded Red */
-    --fantasy-info: #8cb4c9;
-    /* Ocean Blue */
+    /* === BRONZE (Metal Accents) === */
+    --bronze-dark: #7a5c20;
+    --bronze: #a67c3d;
+    --bronze-polished: #cd7f32;
+    --bronze-light: #d4a574;
+
+    /* === GOLD (Premium Highlights) === */
+    --gold-dark: #8b7500;
+    --gold: #c9a227;
+    --gold-bright: #d4af37;
+    --gold-light: #e6c65c;
+    --gold-pale: #f0dfa0;
+    --gold-glow: #ffd700;
+
+    /* === MARBLE (Elegant Panels, Statues) === */
+    --marble-white: #f5f3ef;
+    --marble-cream: #ebe7df;
+    --marble-veined: #e0dcd4;
+    --marble-grey: #c9c5bc;
+    --marble-warm: #d4cfc5;
+
+    /* === SKY (Secondary Accents) === */
+    --sky-pale: #d4e5ed;
+    --sky-light: #b5d4e1;
+    --sky: #a8c7d7;
+    --sky-ocean: #8cb4c9;
+    --sky-deep: #6a9ab8;
+
+    /* === SEMANTIC === */
+    --success: #7da668;
+    --warning: #d4a535;
+    --error: #b85c5c;
+    --info: #6a9ab8;
+
+    /* === TEXT === */
+    --text-dark: #2c241b;
+    --text-medium: #4a3f35;
+    --text-light: #f5f3ef;
+    --text-gold: var(--gold-bright);
+    --text-bronze: var(--bronze-polished);
 
     /* =========================================
-       TEXTURES (SVG Data URIs)
+       GRADIENTS
        ========================================= */
-
-    /* Wood Grain */
-    --texture-wood: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' fill='%234a3f35'/%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.1'/%3E%3C/svg%3E");
-
-    /* Parchment Noise */
-    --texture-paper: url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' fill='%23f5f1e8'/%3E%3Crect width='200' height='200' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+    --gradient-nature: linear-gradient(135deg, var(--nature-sage) 0%, var(--nature-spring) 50%, var(--nature-leaf) 100%);
+    --gradient-gold: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold-bright) 50%, var(--gold-light) 100%);
+    --gradient-wood: linear-gradient(180deg, var(--wood-light) 0%, var(--wood) 50%, var(--wood-dark) 100%);
+    --gradient-parchment: linear-gradient(180deg, var(--parchment-light) 0%, var(--parchment) 100%);
+    --gradient-marble: linear-gradient(135deg, var(--marble-white) 0%, var(--marble-cream) 50%, var(--marble-veined) 100%);
+    --gradient-bronze: linear-gradient(180deg, var(--bronze-light) 0%, var(--bronze) 50%, var(--bronze-dark) 100%);
+    --gradient-sky: linear-gradient(135deg, var(--sky-pale) 0%, var(--sky) 50%, var(--sky-ocean) 100%);
 
     /* =========================================
-       EFFECTS
+       TEXTURES (Premium SVG)
        ========================================= */
 
-    /* Shadows */
-    --shadow-fantasy-card: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(139, 115, 85, 0.3);
-    --shadow-fantasy-inset: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-    --shadow-fantasy-float: 0 10px 25px rgba(0, 0, 0, 0.5);
+    /* Wood Grain - Realistic */
+    --texture-wood: url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.03 0.15' numOctaves='4' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3C/defs%3E%3Crect width='200' height='200' fill='%233d3026'/%3E%3Crect width='200' height='200' filter='url(%23grain)' opacity='0.15'/%3E%3C/svg%3E");
 
-    /* Glows */
-    --glow-fantasy-gold: 0 0 15px rgba(205, 127, 50, 0.3);
-    --glow-fantasy-magic: 0 0 15px rgba(168, 199, 215, 0.3);
+    /* Parchment - Aged Paper */
+    --texture-paper: url("data:image/svg+xml,%3Csvg width='300' height='300' viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='5' seed='15' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3C/defs%3E%3Crect width='300' height='300' fill='%23f0e9db'/%3E%3Crect width='300' height='300' filter='url(%23paper)' opacity='0.08'/%3E%3C/svg%3E");
+
+    /* Marble - Veined */
+    --texture-marble: url("data:image/svg+xml,%3Csvg width='400' height='400' viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cfilter id='marble'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.008' numOctaves='3' seed='8' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3C/defs%3E%3Crect width='400' height='400' fill='%23f5f3ef'/%3E%3Crect width='400' height='400' filter='url(%23marble)' opacity='0.06'/%3E%3C/svg%3E");
+
+    /* Leather - Subtle Grain */
+    --texture-leather: url("data:image/svg+xml,%3Csvg width='150' height='150' viewBox='0 0 150 150' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cfilter id='leather'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='4' seed='12' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3C/defs%3E%3Crect width='150' height='150' fill='%236b4e3d'/%3E%3Crect width='150' height='150' filter='url(%23leather)' opacity='0.12'/%3E%3C/svg%3E");
+
+    /* =========================================
+       SHADOWS
+       ========================================= */
+    --shadow-soft: 0 2px 8px rgba(26, 20, 16, 0.12);
+    --shadow-medium: 0 4px 16px rgba(26, 20, 16, 0.2);
+    --shadow-strong: 0 8px 24px rgba(26, 20, 16, 0.35);
+    --shadow-float: 0 12px 32px rgba(26, 20, 16, 0.4);
+    --shadow-inset: inset 0 2px 6px rgba(26, 20, 16, 0.15);
+    --shadow-inset-deep: inset 0 4px 12px rgba(26, 20, 16, 0.25);
+    --shadow-carved: inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.2);
+
+    /* =========================================
+       GLOWS (Gold emphasis!)
+       ========================================= */
+    --glow-gold: 0 0 12px rgba(201, 162, 39, 0.5);
+    --glow-gold-strong: 0 0 24px rgba(201, 162, 39, 0.7), 0 0 48px rgba(255, 215, 0, 0.3);
+    --glow-gold-subtle: 0 0 8px rgba(201, 162, 39, 0.3);
+    --glow-nature: 0 0 12px rgba(139, 181, 115, 0.4);
+    --glow-nature-strong: 0 0 20px rgba(139, 181, 115, 0.6);
+    --glow-sky: 0 0 12px rgba(168, 199, 215, 0.4);
+    --glow-bronze: 0 0 10px rgba(166, 124, 61, 0.4);
+
+    /* =========================================
+       BORDERS & RIMS
+       ========================================= */
+    --border-gold: 1px solid var(--gold);
+    --border-gold-light: 1px solid var(--gold-pale);
+    --border-bronze: 1px solid var(--bronze);
+    --border-wood: 1px solid var(--wood-light);
+    --rim-gold: 0 0 0 1px rgba(201, 162, 39, 0.3), 0 0 0 3px rgba(201, 162, 39, 0.1);
+    --rim-bronze: 0 0 0 1px rgba(166, 124, 61, 0.4), 0 0 0 2px rgba(166, 124, 61, 0.15);
+
+    /* =========================================
+       LEGACY ALIASES (backwards compatibility)
+       ========================================= */
+    --fantasy-primary: var(--nature-sage);
+    --fantasy-primary-dark: var(--nature-forest);
+    --fantasy-primary-light: var(--nature-mint);
+    --fantasy-secondary: var(--sky);
+    --fantasy-secondary-dark: var(--sky-ocean);
+    --fantasy-bg-paper: var(--parchment);
+    --fantasy-bg-wood-dark: var(--wood-dark);
+    --fantasy-bg-wood-light: var(--wood-light);
+    --fantasy-bg-leather: var(--leather);
+    --fantasy-text-ink: var(--text-dark);
+    --fantasy-text-bronze: var(--bronze-polished);
+    --fantasy-text-light: var(--marble-white);
+    --fantasy-success: var(--success);
+    --fantasy-warning: var(--warning);
+    --fantasy-error: var(--error);
+    --fantasy-info: var(--info);
+    --shadow-fantasy-card: var(--shadow-medium);
+    --shadow-fantasy-inset: var(--shadow-inset);
+    --shadow-fantasy-float: var(--shadow-float);
+    --glow-fantasy-gold: var(--glow-gold);
+    --glow-fantasy-magic: var(--glow-sky);
 }
 
 /* Font Imports */
@@ -93,7 +187,11 @@ body {
     font-family: var(--font-body);
 }
 
-/* Utility Classes */
+/* =========================================
+   UTILITY CLASSES
+   ========================================= */
+
+/* Typography */
 .font-fantasy-header {
     font-family: var(--font-display);
 }
@@ -106,12 +204,378 @@ body {
     font-family: var(--font-ui);
 }
 
+/* Text Colors */
 .text-fantasy-bronze {
-    color: var(--fantasy-text-bronze);
+    color: var(--bronze-polished);
 }
 
-.bg-fantasy-paper {
-    background-color: var(--fantasy-bg-paper);
+.text-fantasy-gold {
+    color: var(--gold-bright);
+    text-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+}
+
+.text-fantasy-nature {
+    color: var(--nature-fern);
+}
+
+/* =========================================
+   PREMIUM PANELS & CARDS
+   ========================================= */
+
+/* Parchment Panel - Classic scroll/paper look */
+.fantasy-panel {
+    background: var(--gradient-parchment);
     background-image: var(--texture-paper);
-    color: var(--fantasy-text-ink);
+    color: var(--text-dark);
+    border: 2px solid var(--parchment-dark);
+    box-shadow: 
+        var(--shadow-medium),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+}
+
+/* Wood Panel - Dark tavern/furniture look */
+.fantasy-wood-panel {
+    background: var(--wood);
+    background-image: var(--texture-wood);
+    color: var(--text-light);
+    border: 3px solid var(--wood-dark);
+    box-shadow: 
+        var(--shadow-strong),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+}
+
+/* Marble Panel - Elegant statue/monument look */
+.fantasy-marble-panel {
+    background: var(--gradient-marble);
+    background-image: var(--texture-marble);
+    color: var(--text-dark);
+    border: 2px solid var(--marble-grey);
+    box-shadow: 
+        var(--shadow-medium),
+        inset 0 2px 0 rgba(255, 255, 255, 0.6),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+}
+
+/* Leather Panel - Book cover look */
+.fantasy-leather-panel {
+    background: var(--leather);
+    background-image: var(--texture-leather);
+    color: var(--text-light);
+    border: 2px solid var(--leather-dark);
+    box-shadow: 
+        var(--shadow-medium),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.25);
+    border-radius: 6px;
+}
+
+/* =========================================
+   GOLD FRAMES & ORNAMENTS (Premium!)
+   ========================================= */
+
+/* Gold Frame - Ornate picture frame */
+.fantasy-frame-gold {
+    background: var(--gradient-parchment);
+    background-image: var(--texture-paper);
+    color: var(--text-dark);
+    border: 3px solid var(--gold);
+    box-shadow: 
+        var(--shadow-strong),
+        var(--glow-gold-subtle),
+        inset 0 0 0 1px var(--gold-pale),
+        inset 0 0 0 4px var(--parchment-medium),
+        inset 0 0 0 5px var(--gold-dark);
+    border-radius: 12px;
+    position: relative;
+}
+
+.fantasy-frame-gold::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 13px;
+    background: var(--gradient-gold);
+    opacity: 0.15;
+    pointer-events: none;
+}
+
+/* Bronze Frame - Antique metal look */
+.fantasy-frame-bronze {
+    background: var(--gradient-parchment);
+    background-image: var(--texture-paper);
+    color: var(--text-dark);
+    border: 3px solid var(--bronze);
+    box-shadow: 
+        var(--shadow-medium),
+        var(--glow-bronze),
+        inset 0 0 0 1px var(--bronze-light),
+        inset 0 0 0 3px var(--parchment-medium);
+    border-radius: 10px;
+}
+
+/* =========================================
+   NATURE THEME ELEMENTS
+   ========================================= */
+
+/* Nature Panel - Fresh green accent */
+.fantasy-nature-panel {
+    background: linear-gradient(180deg, var(--nature-mint) 0%, var(--nature-sage) 100%);
+    color: var(--text-dark);
+    border: 2px solid var(--nature-forest);
+    box-shadow: 
+        var(--shadow-medium),
+        var(--glow-nature),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    border-radius: 8px;
+}
+
+/* Nature Accent Bar */
+.fantasy-nature-bar {
+    background: var(--gradient-nature);
+    height: 4px;
+    border-radius: 2px;
+    box-shadow: var(--glow-nature);
+}
+
+/* =========================================
+   INTERACTIVE STATES
+   ========================================= */
+
+/* Hover glow for interactive elements */
+.fantasy-interactive {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.fantasy-interactive:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-float), var(--glow-gold);
+}
+
+.fantasy-interactive:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-soft);
+}
+
+/* Focus ring - Gold */
+.fantasy-focus:focus,
+.fantasy-focus:focus-visible {
+    outline: none;
+    box-shadow: var(--rim-gold), var(--glow-gold);
+}
+
+/* =========================================
+   DECORATIVE ELEMENTS
+   ========================================= */
+
+/* Gold Divider */
+.fantasy-divider {
+    height: 2px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        var(--gold-dark) 15%, 
+        var(--gold-bright) 50%, 
+        var(--gold-dark) 85%, 
+        transparent 100%
+    );
+    margin: 1.5rem 0;
+    position: relative;
+}
+
+.fantasy-divider::before {
+    content: '◆';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--parchment);
+    color: var(--gold);
+    padding: 0 0.5rem;
+    font-size: 0.75rem;
+}
+
+/* Corner Ornaments */
+.fantasy-corner-ornament {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-color: var(--gold);
+    border-style: solid;
+    opacity: 0.8;
+}
+
+.fantasy-corner-ornament.top-left {
+    top: 8px;
+    left: 8px;
+    border-width: 2px 0 0 2px;
+    border-radius: 4px 0 0 0;
+}
+
+.fantasy-corner-ornament.top-right {
+    top: 8px;
+    right: 8px;
+    border-width: 2px 2px 0 0;
+    border-radius: 0 4px 0 0;
+}
+
+.fantasy-corner-ornament.bottom-left {
+    bottom: 8px;
+    left: 8px;
+    border-width: 0 0 2px 2px;
+    border-radius: 0 0 0 4px;
+}
+
+.fantasy-corner-ornament.bottom-right {
+    bottom: 8px;
+    right: 8px;
+    border-width: 0 2px 2px 0;
+    border-radius: 0 0 4px 0;
+}
+
+/* Gold Dot Accents */
+.fantasy-gold-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--gold);
+    border-radius: 50%;
+    box-shadow: var(--glow-gold-subtle);
+}
+
+/* =========================================
+   SCROLLBAR STYLING
+   ========================================= */
+
+.fantasy-scrollbar::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+.fantasy-scrollbar::-webkit-scrollbar-track {
+    background: var(--wood-dark);
+    border-radius: 6px;
+}
+
+.fantasy-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--gradient-bronze);
+    border-radius: 6px;
+    border: 2px solid var(--wood-dark);
+}
+
+.fantasy-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--bronze-polished);
+}
+
+/* =========================================
+   BUTTON VARIANTS
+   ========================================= */
+
+/* Primary - Nature Green */
+.fantasy-btn-primary {
+    background: var(--gradient-nature);
+    color: var(--text-dark);
+    border: 2px solid var(--nature-forest);
+    font-family: var(--font-display);
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 
+        0 4px 0 var(--nature-forest),
+        var(--shadow-medium);
+    transition: all 0.15s ease;
+    cursor: pointer;
+}
+
+.fantasy-btn-primary:hover {
+    transform: translateY(2px);
+    box-shadow: 
+        0 2px 0 var(--nature-forest),
+        var(--shadow-soft);
+}
+
+.fantasy-btn-primary:active {
+    transform: translateY(4px);
+    box-shadow: none;
+}
+
+/* Secondary - Wood/Leather */
+.fantasy-btn-secondary {
+    background: var(--wood);
+    background-image: var(--texture-wood);
+    color: var(--text-light);
+    border: 2px solid var(--bronze);
+    font-family: var(--font-display);
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 
+        0 4px 0 var(--wood-dark),
+        var(--shadow-medium);
+    transition: all 0.15s ease;
+    cursor: pointer;
+}
+
+.fantasy-btn-secondary:hover {
+    transform: translateY(2px);
+    box-shadow: 
+        0 2px 0 var(--wood-dark),
+        var(--shadow-soft);
+}
+
+/* Accent - Gold Premium */
+.fantasy-btn-gold {
+    background: var(--gradient-gold);
+    color: var(--wood-darkest);
+    border: 2px solid var(--gold-dark);
+    font-family: var(--font-display);
+    font-weight: 700;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 
+        0 4px 0 var(--gold-dark),
+        var(--glow-gold),
+        var(--shadow-medium);
+    transition: all 0.15s ease;
+    cursor: pointer;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.fantasy-btn-gold:hover {
+    transform: translateY(2px);
+    box-shadow: 
+        0 2px 0 var(--gold-dark),
+        var(--glow-gold-strong),
+        var(--shadow-soft);
+}
+
+/* =========================================
+   INPUT FIELDS
+   ========================================= */
+
+.fantasy-input {
+    background: var(--parchment-light);
+    background-image: var(--texture-paper);
+    color: var(--text-dark);
+    border: 2px solid var(--parchment-dark);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    box-shadow: var(--shadow-inset);
+    transition: all 0.2s ease;
+}
+
+.fantasy-input:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: var(--shadow-inset), var(--glow-gold-subtle);
+}
+
+.fantasy-input::placeholder {
+    color: var(--wood-light);
+    font-style: italic;
 }

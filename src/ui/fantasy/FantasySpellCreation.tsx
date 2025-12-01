@@ -237,7 +237,14 @@ export const FantasySpellCreation: React.FC = () => {
 
     // handleRangeChange rimosso (non usato)
 
-
+    // Dynamic label for stats based on spell type
+    const getStatLabel = (field: string): string => {
+        if (spell.type === 'buff' || spell.type === 'debuff') {
+            if (field === 'eco') return 'Duration (Turns)';
+            if (field === 'effect') return 'Modification %';
+        }
+        return field;
+    };
 
     return (
         <div className="h-full overflow-y-auto p-4 relative pb-20">
@@ -347,6 +354,7 @@ export const FantasySpellCreation: React.FC = () => {
                     onDragStart={handleDragStart}
                     onDragOver={handleDragOver}
                     onDrop={handleDrop}
+                    getStatLabel={getStatLabel}
                 />
 
                 {/* Visual separator */}

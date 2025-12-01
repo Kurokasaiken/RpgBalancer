@@ -15,40 +15,82 @@ interface FantasyNavigationProps {
 export const FantasyNavigation: React.FC<FantasyNavigationProps> = ({ items, activeId, onSelect }) => {
     return (
         <nav className="
-            w-64 h-full flex flex-col p-4 gap-2
-            bg-[var(--fantasy-bg-wood-dark)] 
-            border-r-4 border-[var(--fantasy-bg-leather)]
-            shadow-[var(--shadow-fantasy-float)]
-        ">
-            <div className="mb-6 text-center">
-                <h1 className="font-fantasy-header text-2xl text-[var(--fantasy-text-bronze)] drop-shadow-md">
-                    Grimoire
+            w-72 h-full flex flex-col
+            bg-gradient-to-b from-wood-dark via-wood to-wood-dark
+            border-r-4 border-leather-dark
+            shadow-fantasy-float
+            relative
+        " style={{ backgroundImage: 'var(--texture-wood)' }}>
+            {/* Top ornamental border */}
+            <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-gold to-transparent opacity-60" />
+            
+            {/* Header */}
+            <div className="p-6 text-center border-b border-wood-dark/50">
+                <h1 className="font-display text-2xl text-gold-bright tracking-widest drop-shadow-lg">
+                    ✦ Grimoire ✦
                 </h1>
-                <div className="h-1 w-16 bg-[var(--fantasy-text-bronze)] mx-auto mt-2 rounded-full opacity-50" />
+                <div className="h-0.5 w-24 bg-gradient-to-r from-transparent via-gold to-transparent mx-auto mt-3 opacity-70" />
             </div>
 
-            {items.map(item => (
-                <button
-                    key={item.id}
-                    onClick={() => onSelect(item.id)}
-                    className={`
-                        w-full text-left px-4 py-3 rounded
-                        font-fantasy-display font-bold tracking-wide
-                        transition-all duration-300
-                        flex items-center gap-3
-                        ${activeId === item.id
-                            ? 'bg-[var(--fantasy-bg-paper)] text-[var(--fantasy-text-ink)] shadow-lg translate-x-2 border-l-4 border-[var(--fantasy-secondary)]'
-                            : 'text-[var(--fantasy-text-light)] hover:bg-[var(--fantasy-bg-wood-light)] hover:translate-x-1'}
-                    `}
-                >
-                    {item.icon && <span className="text-xl">{item.icon}</span>}
-                    {item.label}
-                </button>
-            ))}
-
-            <div className="mt-auto pt-4 border-t border-[var(--fantasy-bg-wood-light)] text-center text-xs text-[var(--fantasy-text-light)] opacity-50 font-fantasy-ui">
-                v1.0.0 Enchanted
+            {/* Navigation Items */}
+            <div className="flex-1 p-4 space-y-1.5 overflow-y-auto fantasy-scrollbar">
+                {items.map(item => {
+                    const isActive = activeId === item.id;
+                    return (
+                        <button
+                            key={item.id}
+                            onClick={() => onSelect(item.id)}
+                            className={`
+                                w-full text-left px-4 py-3 rounded-lg
+                                font-display text-sm font-semibold tracking-wide
+                                transition-all duration-200 ease-out
+                                flex items-center gap-3
+                                relative overflow-hidden
+                                ${isActive
+                                    ? `
+                                        bg-parchment text-wood-dark 
+                                        shadow-fantasy border-l-4 border-gold
+                                        translate-x-1
+                                    `
+                                    : `
+                                        text-parchment-light/90 
+                                        hover:bg-wood-light/30 hover:text-parchment-light
+                                        hover:translate-x-1 hover:shadow-soft
+                                        border-l-4 border-transparent
+                                    `
+                                }
+                            `}
+                        >
+                            {/* Active glow effect */}
+                            {isActive && (
+                                <div className="absolute inset-0 bg-gradient-to-r from-gold/10 to-transparent pointer-events-none" />
+                            )}
+                            
+                            {item.icon && (
+                                <span className={`text-lg ${isActive ? 'drop-shadow-sm' : ''}`}>
+                                    {item.icon}
+                                </span>
+                            )}
+                            <span className="relative z-10">{item.label}</span>
+                            
+                            {/* Active indicator dot */}
+                            {isActive && (
+                                <div className="ml-auto w-2 h-2 rounded-full bg-gold shadow-glow-gold" />
+                            )}
+                        </button>
+                    );
+                })}
             </div>
+
+            {/* Footer */}
+            <div className="p-4 border-t border-wood-light/20">
+                <div className="text-center text-xs text-parchment-light/40 font-ui tracking-wide">
+                    <span className="text-gold/50">✦</span> v1.0.0 Enchanted Grove <span className="text-gold/50">✦</span>
+                </div>
+            </div>
+            
+            {/* Bottom ornamental border */}
+            <div className="absolute bottom-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-bronze to-transparent opacity-40" />
         </nav>
     );
 };

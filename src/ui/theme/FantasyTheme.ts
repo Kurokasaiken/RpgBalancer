@@ -1,67 +1,92 @@
 /**
- * Fantasy Theme - TypeScript Definitions
+ * Fantasy Theme - Enchanted Grove Edition
  * 
  * Type-safe access to fantasy theme values
+ * Palette: Nature greens + Parchment + Wood/Leather + Marble + Bronze/Gold
  */
 
 export const FantasyTheme = {
     colors: {
+        // === NATURE GREENS (Primary - Bright, Natural!) ===
+        nature: {
+            mint: '#d4e8d1',
+            sage: '#b8c9ad',
+            spring: '#9ec48c',
+            leaf: '#8fb573',
+            fern: '#7da668',
+            forest: '#6b9b5a',
+            moss: '#a3b889',
+        },
+        // === PARCHMENT (Paper, Scrolls) ===
         parchment: {
-            light: '#f5f1e8',
+            light: '#faf7f0',
+            DEFAULT: '#f0e9db',
             medium: '#e8dcc4',
             dark: '#d4c5a8',
+            aged: '#c9b896',
         },
+        // === WOOD (Panels, Frames) ===
         wood: {
-            dark: '#4a3f35',
-            medium: '#5c4a3a',
+            darkest: '#2d2418',
+            dark: '#3d3026',
+            DEFAULT: '#5c4a3a',
+            medium: '#6b5a48',
             light: '#8b7355',
-            honey: '#a0826d',
+            honey: '#a08465',
         },
+        // === LEATHER (Straps, Covers) ===
         leather: {
-            dark: '#6b4e3d',
-            medium: '#7a5c4f',
-            light: '#8b7355',
+            dark: '#4a3228',
+            DEFAULT: '#6b4e3d',
+            worn: '#7a5c4f',
+            light: '#8b6b55',
+            tan: '#a07d65',
         },
+        // === BRONZE (Metal Accents) ===
         bronze: {
-            dark: '#8b6914',
-            medium: '#cd7f32',
+            dark: '#7a5c20',
+            DEFAULT: '#a67c3d',
+            polished: '#cd7f32',
             light: '#d4a574',
-            gold: '#c48945',
+            antique: '#8b6914',
         },
+        // === GOLD (Premium Highlights!) ===
+        gold: {
+            dark: '#8b7500',
+            DEFAULT: '#c9a227',
+            bright: '#d4af37',
+            light: '#e6c65c',
+            pale: '#f0dfa0',
+            glow: '#ffd700',
+        },
+        // === MARBLE (Elegant Panels, Statues) ===
         marble: {
-            white: '#ebe7df',
-            cream: '#ece8e0',
+            white: '#f5f3ef',
+            cream: '#ebe7df',
+            veined: '#e0dcd4',
             grey: '#c9c5bc',
+            warm: '#d4cfc5',
         },
-        nature: {
-            sageGreen: '#b8c5b0',
-            forestGreen: '#7fa67e',
-            mint: '#c8dfc7',
-            moss: '#a3b899',
-            skyBlue: '#a8c7d7',
-            skyLight: '#b5d4e1',
+        // === SKY (Secondary Accents) ===
+        sky: {
+            pale: '#d4e5ed',
+            light: '#b5d4e1',
+            DEFAULT: '#a8c7d7',
             ocean: '#8cb4c9',
+            deep: '#6a9ab8',
         },
-        accents: {
-            warmGold: '#d4c5a0',
-            earth: '#c9b8a3',
-            olive: '#a8a574',
-        },
+        // === SEMANTIC ===
+        success: '#7da668',
+        warning: '#d4a535',
+        error: '#b85c5c',
+        info: '#6a9ab8',
+        // === TEXT ===
         text: {
-            dark: {
-                primary: '#3a3027',
-                secondary: '#5a4d3d',
-                muted: '#8b7355',
-            },
-            light: {
-                primary: '#f5f1e8',
-                secondary: '#e8dcc4',
-                muted: '#d4c5a8',
-            },
-            accent: {
-                green: '#5a7a59',
-                blue: '#6a8fa8',
-            },
+            dark: '#2c241b',
+            medium: '#4a3f35',
+            light: '#f5f3ef',
+            gold: '#d4af37',
+            bronze: '#cd7f32',
         },
     },
 
