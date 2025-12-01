@@ -240,127 +240,125 @@ export const FantasySpellCreation: React.FC = () => {
 
 
     return (
-        <FantasyLayout activeTab="spellCreation" onTabChange={() => { }}>
-            <div className="h-full overflow-y-auto p-4 relative pb-20">
-                {/* Animated background particles */}
-                <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                    <div className="absolute w-96 h-96 bg-purple-500/10 rounded-full blur-3xl top-10 -left-20 animate-pulse" />
-                    <div className="absolute w-96 h-96 bg-blue-500/10 rounded-full blur-3xl bottom-10 -right-20 animate-pulse" style={{ animationDelay: '1s' }} />
-                </div>
-                <div className="max-w-7xl mx-auto relative z-10">
-
-                    <div className="flex justify-between items-center mb-6">
-                        <h1 className="text-3xl font-bold text-white drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]">🔮 Spell Creation</h1>
-                        <div className="flex items-center gap-4 bg-black/40 px-4 py-2 rounded-lg border border-white/10 backdrop-blur-md">
-                            <span className="text-sm uppercase tracking-wider text-gray-400 font-semibold">Balance</span>
-                            <span className={`text - 2xl font - bold font - mono drop - shadow - [0_0_8px_currentColor] ${balance === 0 ? 'text-emerald-400' : 'text-red-400'} `}>
-                                {balance > 0 ? '+' : ''}{balance.toFixed(2)}
-                            </span>
-                        </div>
-                    </div>
-                    <div className="flex flex-col md:flex-row items-stretch gap-4 mb-4">
-                        {/* Left Card: Cost & Balance (New Component) */}
-                        <div className="w-full md:w-5/12">
-                            <SpellIdentityCard
-                                spell={spell}
-                                updateField={updateField}
-                                targetBudget={targetBudget}
-                                setTargetBudget={setTargetBudget}
-                                targetStatOptions={Array.from(BUFFABLE_STATS)}
-                            />
-                        </div>
-
-                        {/* Right Card: Preview Spell */}
-                        <div className="w-full md:w-7/12 min-w-[300px]">
-                            <div className="backdrop-blur-md bg-cyan-900/20 border border-cyan-500/30 rounded-lg p-4 h-full shadow-[0_4px_16px_rgba(6,182,212,0.15)] overflow-y-auto">
-                                <div className="flex justify-between items-center text-lg font-bold text-cyan-100 mb-2 drop-shadow-[0_0_6px_rgba(6,182,212,0.6)] border-b border-cyan-500/20 pb-1">
-                                    <span>Preview Spell</span>
-                                    {spell.type === 'damage' && (
-                                        <span className="text-sm font-mono text-cyan-400">
-                                            {previewDamage(spell)}
-                                            <span className="text-xs text-cyan-300 ml-2">({spell.effect}% × {BASELINE_STATS.damage} × {spell.eco})</span>
-                                        </span>
-                                    )}
-                                    {(spell.type === 'buff' || spell.type === 'debuff') && (
-                                        <span className="text-sm font-mono text-cyan-400">
-                                            {spell.type === 'buff' ? '⬆️ Buff' : '⬇️ Debuff'} for {spell.eco || 1} turn{(spell.eco || 1) > 1 ? 's' : ''}
-                                        </span>
-                                    )}
-                                </div>
-
-                                {(spell.type === 'buff' || spell.type === 'debuff') && (
-                                    <div className="mt-2 p-2 bg-gray-800/50 rounded border border-gray-700">
-                                        <div className="flex items-center gap-2 text-sm">
-                                            <span className={spell.type === 'buff' ? 'text-green-400' : 'text-red-400'}>
-                                                {spell.type === 'buff' ? 'Increases' : 'Decreases'} {spell.targetStat || 'damage'}
-                                            </span>
-                                            <span className="text-gray-500">by</span>
-                                            <span className="font-bold text-white">{Math.abs(spell.effect)}%</span>
-                                            <span className="text-gray-500">for</span>
-                                            <span className="font-bold text-white">{spell.eco} turns</span>
-                                        </div>
-                                    </div>
-                                )}
-
-                                <ul className="text-xs text-cyan-50 grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-1">
-                                    {/* Always show Effect first */}
-                                    {spell.effect !== undefined && (
-                                        <li className="flex justify-between items-center hover:bg-cyan-500/10 p-0.5 rounded transition-colors border-b border-cyan-500/10">
-                                            <span className="font-medium text-cyan-300/70 capitalize truncate mr-2">
-                                                {spell.type === 'buff' || spell.type === 'debuff' ? 'Modification %' : 'Effect'}
-                                            </span>
-                                            <span className="font-mono text-cyan-300 font-bold drop-shadow-[0_0_4px_rgba(34,211,238,0.4)]">{spell.effect}</span>
-                                        </li>
-                                    )}
-                                    {Object.entries(spell)
-                                        .filter(([key, value]) => {
-                                            const defaultSpell = DEFAULT_SPELLS[0];
-                                            return key !== 'id' && key !== 'name' && key !== 'type' && key !== 'effect' && key !== 'targetStat' && value !== undefined && value !== (defaultSpell as any)[key] && typeof value !== 'object';
-                                        })
-                                        .map(([key, value]) => (
-                                            <li key={key} className="flex justify-between items-center hover:bg-cyan-500/10 p-0.5 rounded transition-colors border-b border-cyan-500/10">
-                                                <span className="font-medium text-cyan-300/70 capitalize truncate mr-2" title={key}>
-                                                    {key === 'eco' && (spell.type === 'buff' || spell.type === 'debuff') ? 'Duration (Turns)' : key.replace(/([A-Z])/g, ' $1').trim()}
-                                                </span>
-                                                <span className="font-mono text-cyan-300 font-bold drop-shadow-[0_0_4px_rgba(34,211,238,0.4)]">{String(value)}</span>
-                                            </li>
-                                        ))}
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Visual separator */}
-                    <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-8" />
-
-                    <StatsGrid
-                        statOrder={statOrder}
-                        getStatDescription={getStatDescription}
-                        isMalus={isMalus}
-                        collapsedStats={collapsedStats}
-                        toggleCollapse={toggleCollapse}
-                        getStatSteps={getStatSteps}
-                        updateStatStep={updateStatStep}
-                        addStatStep={addStatStep}
-                        removeStatStep={removeStatStep}
-                        selectedTicks={selectedTicks}
-                        onSelectTick={handleSelectTick}
-                        onDragStart={handleDragStart}
-                        onDragOver={handleDragOver}
-                        onDrop={handleDrop}
-                    />
-
-                    {/* Visual separator */}
-                    <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-8" />
-
-                    <SpellInfoForm spell={spell} updateField={updateField} />
-
-                    {/* Visual separator */}
-                    <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-8" />
-
-                    <ActionsBar onReset={handleReset} onSave={handleSave} onSaveDefault={handleSaveDefault} balance={balance} />
-                </div>
+        <div className="h-full overflow-y-auto p-4 relative pb-20">
+            {/* Animated background particles */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute w-96 h-96 bg-purple-500/10 rounded-full blur-3xl top-10 -left-20 animate-pulse" />
+                <div className="absolute w-96 h-96 bg-blue-500/10 rounded-full blur-3xl bottom-10 -right-20 animate-pulse" style={{ animationDelay: '1s' }} />
             </div>
-        </FantasyLayout>
+            <div className="max-w-7xl mx-auto relative z-10">
+
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-3xl font-bold text-white drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]">🔮 Spell Creation</h1>
+                    <div className="flex items-center gap-4 bg-black/40 px-4 py-2 rounded-lg border border-white/10 backdrop-blur-md">
+                        <span className="text-sm uppercase tracking-wider text-gray-400 font-semibold">Balance</span>
+                        <span className={`text - 2xl font - bold font - mono drop - shadow - [0_0_8px_currentColor] ${balance === 0 ? 'text-emerald-400' : 'text-red-400'} `}>
+                            {balance > 0 ? '+' : ''}{balance.toFixed(2)}
+                        </span>
+                    </div>
+                </div>
+                <div className="flex flex-col md:flex-row items-stretch gap-4 mb-4">
+                    {/* Left Card: Cost & Balance (New Component) */}
+                    <div className="w-full md:w-5/12">
+                        <SpellIdentityCard
+                            spell={spell}
+                            updateField={updateField}
+                            targetBudget={targetBudget}
+                            setTargetBudget={setTargetBudget}
+                            targetStatOptions={Array.from(BUFFABLE_STATS)}
+                        />
+                    </div>
+
+                    {/* Right Card: Preview Spell */}
+                    <div className="w-full md:w-7/12 min-w-[300px]">
+                        <div className="backdrop-blur-md bg-cyan-900/20 border border-cyan-500/30 rounded-lg p-4 h-full shadow-[0_4px_16px_rgba(6,182,212,0.15)] overflow-y-auto">
+                            <div className="flex justify-between items-center text-lg font-bold text-cyan-100 mb-2 drop-shadow-[0_0_6px_rgba(6,182,212,0.6)] border-b border-cyan-500/20 pb-1">
+                                <span>Preview Spell</span>
+                                {spell.type === 'damage' && (
+                                    <span className="text-sm font-mono text-cyan-400">
+                                        {previewDamage(spell)}
+                                        <span className="text-xs text-cyan-300 ml-2">({spell.effect}% × {BASELINE_STATS.damage} × {spell.eco})</span>
+                                    </span>
+                                )}
+                                {(spell.type === 'buff' || spell.type === 'debuff') && (
+                                    <span className="text-sm font-mono text-cyan-400">
+                                        {spell.type === 'buff' ? '⬆️ Buff' : '⬇️ Debuff'} for {spell.eco || 1} turn{(spell.eco || 1) > 1 ? 's' : ''}
+                                    </span>
+                                )}
+                            </div>
+
+                            {(spell.type === 'buff' || spell.type === 'debuff') && (
+                                <div className="mt-2 p-2 bg-gray-800/50 rounded border border-gray-700">
+                                    <div className="flex items-center gap-2 text-sm">
+                                        <span className={spell.type === 'buff' ? 'text-green-400' : 'text-red-400'}>
+                                            {spell.type === 'buff' ? 'Increases' : 'Decreases'} {spell.targetStat || 'damage'}
+                                        </span>
+                                        <span className="text-gray-500">by</span>
+                                        <span className="font-bold text-white">{Math.abs(spell.effect)}%</span>
+                                        <span className="text-gray-500">for</span>
+                                        <span className="font-bold text-white">{spell.eco} turns</span>
+                                    </div>
+                                </div>
+                            )}
+
+                            <ul className="text-xs text-cyan-50 grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-1">
+                                {/* Always show Effect first */}
+                                {spell.effect !== undefined && (
+                                    <li className="flex justify-between items-center hover:bg-cyan-500/10 p-0.5 rounded transition-colors border-b border-cyan-500/10">
+                                        <span className="font-medium text-cyan-300/70 capitalize truncate mr-2">
+                                            {spell.type === 'buff' || spell.type === 'debuff' ? 'Modification %' : 'Effect'}
+                                        </span>
+                                        <span className="font-mono text-cyan-300 font-bold drop-shadow-[0_0_4px_rgba(34,211,238,0.4)]">{spell.effect}</span>
+                                    </li>
+                                )}
+                                {Object.entries(spell)
+                                    .filter(([key, value]) => {
+                                        const defaultSpell = DEFAULT_SPELLS[0];
+                                        return key !== 'id' && key !== 'name' && key !== 'type' && key !== 'effect' && key !== 'targetStat' && value !== undefined && value !== (defaultSpell as any)[key] && typeof value !== 'object';
+                                    })
+                                    .map(([key, value]) => (
+                                        <li key={key} className="flex justify-between items-center hover:bg-cyan-500/10 p-0.5 rounded transition-colors border-b border-cyan-500/10">
+                                            <span className="font-medium text-cyan-300/70 capitalize truncate mr-2" title={key}>
+                                                {key === 'eco' && (spell.type === 'buff' || spell.type === 'debuff') ? 'Duration (Turns)' : key.replace(/([A-Z])/g, ' $1').trim()}
+                                            </span>
+                                            <span className="font-mono text-cyan-300 font-bold drop-shadow-[0_0_4px_rgba(34,211,238,0.4)]">{String(value)}</span>
+                                        </li>
+                                    ))}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Visual separator */}
+                <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-8" />
+
+                <StatsGrid
+                    statOrder={statOrder}
+                    getStatDescription={getStatDescription}
+                    isMalus={isMalus}
+                    collapsedStats={collapsedStats}
+                    toggleCollapse={toggleCollapse}
+                    getStatSteps={getStatSteps}
+                    updateStatStep={updateStatStep}
+                    addStatStep={addStatStep}
+                    removeStatStep={removeStatStep}
+                    selectedTicks={selectedTicks}
+                    onSelectTick={handleSelectTick}
+                    onDragStart={handleDragStart}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
+                />
+
+                {/* Visual separator */}
+                <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-8" />
+
+                <SpellInfoForm spell={spell} updateField={updateField} />
+
+                {/* Visual separator */}
+                <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-8" />
+
+                <ActionsBar onReset={handleReset} onSave={handleSave} onSaveDefault={handleSaveDefault} balance={balance} />
+            </div>
+        </div>
     );
 }
