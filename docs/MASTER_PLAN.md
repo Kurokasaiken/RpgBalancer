@@ -100,6 +100,39 @@ Example:
 
 ---
 
+## 🎮 COMBAT SYSTEM & ENCOUNTER DESIGN
+
+**Status:** Design Complete  
+**Full Specification:** [COMBAT_SYSTEM_DESIGN.md](COMBAT_SYSTEM_DESIGN.md)
+
+### Quick Reference
+
+This project implements a roguelike combat system with:
+- **5 Core Archetypes** (Tank, DPS, Assassin, Support, Bruiser)
+- **Turn-based grid combat** (1v1 → 5v5 → 5vMany progression)
+- **Encounter Check System** (Elite fights with unique mechanics)
+- **Drop-based build variability** (adapt to random spell drops)
+
+**Key Design Principles:**
+1. **No Perfect Builds** - Players must adapt to available drops
+2. **Multiple Solutions** - Each encounter has 2-3 viable strategies
+3. **Situational Value** - "Bad" drops can become optimal in specific scenarios
+4. **Automated Testing** - All balance validated through 1000+ simulations
+
+**Implementation Phases:**
+- Phase 1: Core 1v1 (✅ Complete)
+- Phase 2: Advanced Spells & Resources (🔄 In Progress)
+- Phase 3: Grid & AI (📋 Planned)
+- Phase 4: Multi-Unit & Encounters (📋 Planned)
+- Phase 5: Drop System & Polish (📋 Planned)
+
+See full spec for archetype stats, encounter templates, and drop mechanics.
+
+---
+
+
+---
+
 ## 🗺️ DETAILED PLANS & TASKS
 
 ### ✅ **PHASE 1: Foundation Systems (Complete)**
