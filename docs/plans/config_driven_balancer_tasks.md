@@ -6,6 +6,37 @@
 
 ---
 
+## 🚨 PRIORITY FIX: Balancer UI Bugs (BLOCKING)
+
+> **Fix Plan:** [balancer_ui_fix_plan.md](balancer_ui_fix_plan.md)  
+> **Effort:** 4-6 ore  
+> **Status:** 🔥 CRITICO
+
+### Phase 0.1: Fix Critici (2h)
+- [ ] **Reset Stat funzionante** - collegare callback + reset mockValue
+- [ ] **Reset Card funzionante** - collegare onResetCard prop
+- [ ] **Reset Page funzionante** - usare resetToInitialConfig in ConfigToolbar
+- [ ] **Export debug** - verificare che exportConfig() ritorni JSON valido
+- [ ] **Import debug** - verificare che importConfig() aggiorni stato
+
+### Phase 0.2: UX Pulsanti (1.5h)
+- [ ] **Riordinare pulsanti card** - Elimina a sinistra, Occhio a destra
+- [ ] **Riordinare pulsanti stat** - Occhio a destra
+- [ ] **Stile elimina card** - aggiungere cerchio rosso (rounded-full bg-red-900/40)
+- [ ] **Dimensione lock** - ridurre a text-sm
+
+### Phase 0.3: Funzionalità Mancanti (2h)
+- [ ] **Lock funzionante** - aggiungere stato isLocked + toggle + disable inputs
+- [ ] **Hide stat funzionante** - collassa/espandi con stato isHidden
+- [ ] **Hide card funzionante** - collassa/espandi (riferimento: CardWrapper.tsx)
+- [ ] **Feedback visivo** - toast/alert su import/export/reset
+
+### Phase 0.4: Verifica Formule (0.5h)
+- [ ] **Test round-trip formule** - export → import → verify isDerived e formula
+- [ ] **Fix preservazione formule** - se necessario in BalancerConfigStore
+
+---
+
 ## Phase 1: Schema e Store (2-3h)
 
 ### 1.1 TypeScript Interfaces
@@ -276,13 +307,14 @@
 
 | Phase | Status | Completed | Total |
 |-------|--------|-----------|-------|
-| Phase 1: Schema e Store | ⬜ | 0 | 35 |
-| Phase 2: React Hook | ⬜ | 0 | 20 |
-| Phase 3: UI Components | ⬜ | 0 | 45 |
-| Phase 4: Integration | ⬜ | 0 | 15 |
+| **Phase 0: Priority Fix** | 🔥 | 0 | 15 |
+| Phase 1: Schema e Store | ✅ | 35 | 35 |
+| Phase 2: React Hook | ✅ | 20 | 20 |
+| Phase 3: UI Components | 🔄 | 30 | 45 |
+| Phase 4: Integration | 🔄 | 10 | 15 |
 | Phase 5: Testing | ⬜ | 0 | 25 |
-| **TOTAL** | ⬜ | **0** | **140** |
+| **TOTAL** | 🔄 | **95** | **155** |
 
 ---
 
-**Last Updated:** 2025-12-02
+**Last Updated:** 2025-12-03

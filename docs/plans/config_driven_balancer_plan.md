@@ -3,9 +3,25 @@
 > **Obiettivo:** Trasformare il Balancer in un sistema completamente configurabile da UI, dove card, stat, formule e preset sono definiti in JSON e modificabili dall'utente.
 
 **Creato:** 2025-12-02  
-**Stato:** 📋 In Planning  
+**Stato:** 🔄 In Progress (Phase 0: Priority Fix)  
 **Priorità:** Alta  
-**Effort stimato:** 12-16 ore
+**Effort stimato:** 12-16 ore + 4-6 ore fix
+
+---
+
+## ⚠️ PRIORITY FIX REQUIRED
+
+Prima di continuare con le fasi successive, è necessario risolvere i bug critici identificati:
+
+| Document | Purpose |
+|----------|---------|
+| **📋 Fix Plan** | [balancer_ui_fix_plan.md](balancer_ui_fix_plan.md) |
+
+**Problemi bloccanti:**
+- Reset (card/stat/pagina) non funziona
+- Pulsanti Lock, Hide non implementati
+- Import/Export da verificare
+- UX pulsanti da sistemare
 
 ---
 

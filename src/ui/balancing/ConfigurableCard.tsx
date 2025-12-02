@@ -7,6 +7,7 @@ interface Props {
   stats: Record<string, StatDefinition>;
   onEditStat: (statId: string, updates: Partial<StatDefinition>) => void;
   onDeleteStat: (statId: string) => void;
+  onResetStat?: (statId: string) => void;
   onAddStat?: () => void;
   newStatId?: string;
   onUpdateCard?: (updates: Partial<CardDefinition>) => void;
@@ -16,7 +17,7 @@ interface Props {
   dragListeners?: React.HTMLAttributes<HTMLButtonElement>;
 }
 
-export const ConfigurableCard: React.FC<Props> = ({ card, stats, onEditStat, onDeleteStat, onAddStat, newStatId, onUpdateCard, onDeleteCard, startHeaderInEdit, availableStats, dragListeners }) => {
+export const ConfigurableCard: React.FC<Props> = ({ card, stats, onEditStat, onDeleteStat, onResetStat, onAddStat, newStatId, onUpdateCard, onDeleteCard, startHeaderInEdit, availableStats, dragListeners }) => {
   const orderedStats = card.statIds.map((id) => stats[id]).filter(Boolean);
 
   const [isEditingHeader, setIsEditingHeader] = useState(!!startHeaderInEdit);
@@ -31,6 +32,8 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, onEditStat, onD
   ];
 
   const [showIconPicker, setShowIconPicker] = useState(false);
+  const displayIcon = icon || card.icon || '⚔️';
+  const dragHandleProps = !isEditingHeader && dragListeners ? dragListeners : undefined;
 
   useEffect(() => {
     if (!isEditingHeader) {
@@ -75,20 +78,23 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, onEditStat, onD
 
   return (
     <div
-      className={`rounded-2xl border border-[#384444] bg-gradient-to-br from-[#101e22] via-[#0c1a1c] to-[#050b0f] p-4 shadow-[0_20px_55px_rgba(0,0,0,0.6)] flex flex-col gap-4 transition-all ${
+      className={`rounded-2xl border border-[#384444] bg-gradient-to-br from-[#101e22] via-[#0c1a1c] to-[#050b0f] p-2.5 shadow-[0_16px_32px_rgba(0,0,0,0.55)] flex flex-col gap-2 transition-all ${
         isEditingHeader ? 'ring-2 ring-amber-400/40 border-amber-400/60' : 'hover:border-amber-400/40'
       }`}
     >
-      <div className="flex items-start gap-3 pb-3 border-b border-amber-400/20">
-        <button
-          type="button"
-          className="w-8 h-8 rounded-full border border-[#475758] text-[#aeb8b4] bg-[#0c1517]/80 cursor-grab active:cursor-grabbing hover:text-[#f6f3e4]"
-          title="Drag to reorder card"
-          {...dragListeners}
-        >
-          ⋮⋮
-        </button>
-        <div className="flex flex-1 items-center justify-between min-w-0 gap-3">
+      <div className="flex items-start gap-2 pb-1.5 border-b border-amber-400/15">
+        {dragHandleProps && (
+          <button
+            type="button"
+            className="mt-0.5 w-5 h-5 rounded text-[#c9a227] hover:text-[#e6c547] cursor-grab active:cursor-grabbing transition-colors flex items-center justify-center leading-none"
+            title="Trascina per riordinare"
+            {...dragHandleProps}
+          >
+            <span aria-hidden="true" className="text-base">⋮⋮</span>
+            <span className="sr-only">Trascina card</span>
+          </button>
+        )}
+        <div className="flex flex-1 items-center justify-between min-w-0 gap-2">
           <div className="flex items-center gap-2 min-w-0">
             {isEditingHeader ? (
               <div className="flex flex-col gap-2 w-full">
@@ -96,12 +102,11 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, onEditStat, onD
                   <div className="relative">
                     <button
                       type="button"
-                      className="flex items-center gap-1 rounded border border-[#475758] px-2 py-1 bg-[#0c1517]/90 hover:bg-[#121f22] text-[#f5f0dc]"
+                      className="flex items-center justify-center rounded border border-[#475758] px-2 py-1 bg-[#0c1517]/90 hover:bg-[#121f22] text-[#f5f0dc]"
                       onClick={() => setShowIconPicker((prev) => !prev)}
                       title="Scegli icona"
                     >
-                      <span className="text-lg">{icon || '🂠'}</span>
-                      <span className="text-[10px] uppercase tracking-[0.4em] text-[#96aaa6]">Icona</span>
+                      <span className="text-lg">{icon || '⚔️'}</span>
                     </button>
                     {showIconPicker && (
                       <div className="absolute z-20 mt-2 w-56 rounded-lg border border-[#475758] bg-gradient-to-br from-[#101e22] to-[#091113] p-3 shadow-[0_20px_45px_rgba(0,0,0,0.65)]">
@@ -159,39 +164,36 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, onEditStat, onD
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col w-full gap-2">
-                <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.3em] text-[#6da8a0]">
-                  <span>Observatory Card</span>
-                  <span className="text-[#c7b996] tracking-[0.4em]">registry</span>
+              <div className="flex items-center gap-2 min-w-0 group relative">
+                <span className="text-lg drop-shadow-[0_0_8px_rgba(0,0,0,0.55)]" aria-hidden="true">{displayIcon}</span>
+                <p className="text-base font-display text-[#f5f0dc] truncate cursor-help" style={displayStyle}>
+                  {card.title}
+                </p>
+                <div className="pointer-events-none absolute left-0 top-full mt-1 w-48 rounded-md bg-[#0c1517] border border-[#c7b996]/40 px-2 py-1 text-[10px] text-[#f6f3e4] opacity-0 transition-opacity duration-200 group-hover:opacity-100 z-10 whitespace-normal">
+                  {card.isCore ? `${card.title} · card di sistema` : `Configura ${card.title}`}
                 </div>
-                <div className="flex items-end justify-between gap-3">
-                  <p className="text-2xl font-display text-[#f5f0dc] flex items-center gap-2">
-                    {card.icon && <span className="text-2xl drop-shadow-[0_0_8px_rgba(0,0,0,0.45)]">{card.icon}</span>}
-                    <span className="truncate text-[#f5f0dc]" style={displayStyle}>{card.title}</span>
-                  </p>
-                  <div className="text-right text-[10px] text-[#9bb8b2] leading-tight">
-                    <p className="uppercase tracking-[0.4em] text-[#6da8a0]">Stats</p>
-                    <p className="text-lg font-display text-[#f5f0dc]">{orderedStats.length}</p>
-                  </div>
-                </div>
-                <div className="h-px bg-gradient-to-r from-transparent via-[#c9a227] to-transparent" />
-                <p className="text-[11px] text-[#aeb8b4]">Configura inline colori, icone e parametri di questa card e delle sue statistiche.</p>
               </div>
-            )}
-            {card.isCore && (
-              <span className="ml-1 text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-100 border border-emerald-500/40 tracking-[0.4em] uppercase">
-                core
-              </span>
             )}
           </div>
           <div className="flex items-center gap-1">
+            {!isEditingHeader && (
+              <button
+                type="button"
+                className="w-5 h-5 flex items-center justify-center text-[#c9a227] hover:text-[#e6c547] transition-colors"
+                title="Reset"
+                onClick={() => {}}
+              >
+                <span aria-hidden="true" className="text-sm">↺</span>
+                <span className="sr-only">Reset card</span>
+              </button>
+            )}
             {onUpdateCard && (
               <button
                 type="button"
-                className={`w-8 h-8 flex items-center justify-center rounded-full border text-xs transition-all ${
+                className={`w-5 h-5 flex items-center justify-center text-xs transition-all ${
                   isEditingHeader
-                    ? 'border-amber-400 text-amber-100 bg-amber-500/10 shadow-[0_0_14px_rgba(245,158,11,0.35)]'
-                    : 'border-[#475758] text-[#aeb8b4] bg-[#0c1517]/80 hover:text-amber-200'
+                    ? 'text-amber-100'
+                    : 'text-[#c9a227] hover:text-[#e6c547]'
                 }`}
                 title={isEditingHeader ? 'Salva card' : 'Modifica card'}
                 onClick={() => {
@@ -202,30 +204,41 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, onEditStat, onD
                   }
                 }}
               >
-                <span aria-hidden="true">{isEditingHeader ? '✔' : '✎'}</span>
+                <span aria-hidden="true" className="text-sm">{isEditingHeader ? '✔' : '✎'}</span>
                 <span className="sr-only">{isEditingHeader ? 'Salva card' : 'Modifica card'}</span>
               </button>
             )}
             {isEditingHeader && (
               <button
                 type="button"
-                className="w-8 h-8 flex items-center justify-center rounded-full border border-[#475758] text-[#aeb8b4] bg-[#0c1517]/80 hover:text-amber-200"
+                className="w-5 h-5 flex items-center justify-center text-[#c9a227] hover:text-[#e6c547] leading-none"
                 title="Annulla modifiche"
                 onClick={handleHeaderCancel}
               >
-                <span aria-hidden="true">✖</span>
+                <span aria-hidden="true" className="text-base">✖</span>
                 <span className="sr-only">Annulla modifiche</span>
+              </button>
+            )}
+            {!isEditingHeader && (
+              <button
+                type="button"
+                className="w-5 h-5 flex items-center justify-center text-[#c9a227] hover:text-[#e6c547] transition-colors"
+                title="Nascondi card"
+                onClick={() => {}}
+              >
+                <span aria-hidden="true" className="text-sm">👁</span>
+                <span className="sr-only">Nascondi card</span>
               </button>
             )}
             {isEditingHeader && onDeleteCard && !card.isCore && (
               <div className="relative">
                 <button
                   type="button"
-                  className="w-8 h-8 flex items-center justify-center rounded-full bg-red-900/30 text-red-100 border border-red-500/70 hover:bg-red-800/60"
+                  className="w-5 h-5 flex items-center justify-center text-red-300 hover:text-red-100 leading-none"
                   title="Elimina card"
                   onClick={() => setShowDeleteConfirm((prev) => !prev)}
                 >
-                  🗑
+                  <span aria-hidden="true" className="text-base">🗑</span>
                 </button>
                 {showDeleteConfirm && (
                   <div className="absolute right-0 top-full mt-1 w-52 rounded-xl border border-red-500/40 bg-gradient-to-br from-[#1b0202] to-[#360808] p-3 text-[11px] text-[#f5f0dc] shadow-[0_18px_40px_rgba(0,0,0,0.65)] z-20">
@@ -256,7 +269,7 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, onEditStat, onD
           </div>
         </div>
       </div>
-      <div className="space-y-3">
+      <div className="space-y-2">
         {orderedStats.length === 0 && (
           <p className="text-[11px] text-[#aeb8b4] italic">No stats in this card yet.</p>
         )}
@@ -266,6 +279,7 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, onEditStat, onD
             stat={stat}
             onUpdate={(updates) => onEditStat(stat.id, updates)}
             onDelete={() => onDeleteStat(stat.id)}
+            onReset={onResetStat ? () => onResetStat(stat.id) : undefined}
             startInEdit={stat.id === newStatId}
             availableStats={availableStats}
             canDelete={!stat.isCore}

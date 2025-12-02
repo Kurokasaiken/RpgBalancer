@@ -3,6 +3,36 @@
 @import "./styles/color-palette.css";
 
 @layer utilities {
+  /* Bronze Victorian Slider */
+  .slider-bronze {
+    -webkit-appearance: none;
+    appearance: none;
+    background: linear-gradient(to right, #a0826d 0%, #a0826d 50%, #1a1410 50%, #1a1410 100%);
+    outline: none;
+  }
+  
+  .slider-bronze::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #d4a574, #8b6f47);
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.2);
+    border: 1px solid #6b5a47;
+  }
+  
+  .slider-bronze::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #d4a574, #8b6f47);
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.2);
+    border: 1px solid #6b5a47;
+  }
+
   /* Mobile Optimizations */
   /* Safe area insets for notched devices */
   .safe-area-inset-bottom {

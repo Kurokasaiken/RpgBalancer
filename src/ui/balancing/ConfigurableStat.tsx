@@ -2,16 +2,44 @@ import React, { useEffect, useState } from 'react';
 import type { StatDefinition } from '../../balancing/config/types';
 import { FormulaEditor } from './FormulaEditor';
 
+const statGlyphMap: Record<string, string> = {
+  hp: '❤',
+  damage: '⚔️',
+  htk: '♜',
+  txc: '🎯',
+  evasion: '🌀',
+  hitChance: '％',
+  attacksPerKo: '⚖️',
+  critChance: '✦',
+  critMult: '✪',
+  critTxCBonus: '➕',
+  failChance: '⚠️',
+  failMult: '⭘',
+  failTxCMalus: '➖',
+  ward: '🛡️',
+  armor: '⛨',
+  resistance: '🜃',
+  armorPen: '⛏️',
+  penPercent: '⤓',
+  effectiveDamage: '🔥',
+  lifesteal: '🌿',
+  regen: '💧',
+  ttk: '⏳',
+  edpt: '📈',
+  earlyImpact: '⚡',
+};
+
 interface Props {
   stat: StatDefinition;
   onUpdate: (updates: Partial<StatDefinition>) => void;
   onDelete: () => void;
+  onReset?: () => void;
   startInEdit?: boolean;
   availableStats: string[];
   canDelete?: boolean;
 }
 
-export const ConfigurableStat: React.FC<Props> = ({ stat, onUpdate, onDelete, startInEdit, availableStats, canDelete = false }) => {
+export const ConfigurableStat: React.FC<Props> = ({ stat, onUpdate, onDelete, onReset, startInEdit, availableStats, canDelete = false }) => {
   const [isConfigMode, setIsConfigMode] = useState(!!startInEdit);
   const [label, setLabel] = useState(stat.label);
   const [description, setDescription] = useState(stat.description ?? '');
@@ -23,6 +51,8 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, onUpdate, onDelete, st
   const [formula, setFormula] = useState(stat.formula || '');
   const [mockValue, setMockValue] = useState(stat.defaultValue ?? stat.min);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const glyph = statGlyphMap[stat.id] ?? '◆';
+  const sliderProgress = stat.max === stat.min ? 100 : Math.max(0, Math.min(100, ((mockValue - stat.min) / (stat.max - stat.min)) * 100));
 
   useEffect(() => {
     if (!isConfigMode) {
@@ -67,55 +97,92 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, onUpdate, onDelete, st
   // === PLAY VIEW (default) ===
   if (!isConfigMode) {
     return (
-      <div className="flex items-center justify-between text-xs py-3 px-3 rounded-xl border border-[#3b4a4a] bg-gradient-to-br from-[#0c181b]/90 to-[#060b0d]/80 gap-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+      <div className="flex items-center justify-between text-xs py-2 px-3 rounded-xl border border-[#3b4a4a] bg-gradient-to-br from-[#0c181b]/90 to-[#060b0d]/80 gap-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
         <div className="flex flex-col flex-1 min-w-0">
-          <div className="flex items-center gap-1">
-            <span className="font-medium text-[#f6f3e4] truncate">{stat.label}</span>
-            <span className="text-[10px] text-[#8aa0a1]">({stat.type === 'percentage' ? '%' : 'value'})</span>
-            {stat.description && (
-              <span className="text-[9px] uppercase tracking-[0.4em] text-amber-300" title={stat.description}>
-                ⓘ
-              </span>
-            )}
+          <div className="flex items-center gap-1.5">
+            <span className="text-base text-amber-200 leading-none flex-shrink-0" aria-hidden="true">{glyph}</span>
+            <div className="relative group flex-1 min-w-0">
+              <span className="font-medium text-[#f6f3e4] truncate cursor-help leading-none">{stat.label}</span>
+              {stat.description && (
+                <div className="pointer-events-none absolute left-0 top-full mt-1 w-48 rounded-md bg-[#0c1517] border border-[#c7b996]/40 px-2 py-1 text-[10px] text-[#f6f3e4] opacity-0 transition-opacity duration-200 group-hover:opacity-100 z-10">
+                  {stat.description}
+                </div>
+              )}
+            </div>
           </div>
-          <div className="mt-1 flex items-center gap-2">
+          <div className="mt-1.5 flex items-center gap-1.5">
             <button
               type="button"
-              className="w-7 h-7 flex items-center justify-center rounded-full border border-[#475758] text-[#aeb8b4] bg-[#0c1517]/70 hover:text-amber-200"
+              className="w-6 h-6 flex items-center justify-center rounded border border-[#9d7d5c] text-[#c9a227] bg-[#1a1410]/70 hover:bg-[#2a2015] transition-colors"
               onClick={() => setMockValue((v) => Math.max(stat.min, v - stat.step))}
+              aria-label="Decrement"
             >
-              -
+              −
             </button>
             <input
               type="range"
-              className="flex-1 accent-amber-400 bg-transparent"
+              className="flex-1 h-2 rounded-full appearance-none cursor-pointer slider-bronze"
               min={stat.min}
               max={stat.max}
               step={stat.step}
               value={mockValue}
               onChange={(e) => setMockValue(Number(e.target.value))}
+              style={{
+                background: `linear-gradient(to right, #a0826d 0%, #a0826d ${sliderProgress}%, #1a1410 ${sliderProgress}%, #1a1410 100%)`,
+              }}
             />
             <button
               type="button"
-              className="w-7 h-7 flex items-center justify-center rounded-full border border-[#475758] text-[#aeb8b4] bg-[#0c1517]/70 hover:text-amber-200"
+              className="w-6 h-6 flex items-center justify-center rounded border border-[#9d7d5c] text-[#c9a227] bg-[#1a1410]/70 hover:bg-[#2a2015] transition-colors"
               onClick={() => setMockValue((v) => Math.min(stat.max, v + stat.step))}
+              aria-label="Increment"
             >
               +
             </button>
-            <span className="w-12 text-right text-[11px] text-[#f5f0dc] font-mono">
+            <span className="w-10 text-right text-[10px] text-[#f5f0dc] font-mono">
               {mockValue}
             </span>
           </div>
         </div>
-        <button
-          type="button"
-          className="ml-2 w-8 h-8 flex items-center justify-center rounded-full border border-[#475758] text-[#aeb8b4] bg-[#0c1517]/70 hover:text-amber-200"
-          title="Modifica stat"
-          onClick={() => setIsConfigMode(true)}
-        >
-          <span aria-hidden="true">✎</span>
-          <span className="sr-only">Modifica statistica</span>
-        </button>
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            className="flex items-center justify-center text-[#c9a227] hover:text-[#e6c547] transition-colors leading-none"
+            title="Lock"
+            onClick={() => {}}
+          >
+            <span aria-hidden="true" className="text-base">🔐</span>
+            <span className="sr-only">Lock</span>
+          </button>
+          <button
+            type="button"
+            className="flex items-center justify-center text-[#c9a227] hover:text-[#e6c547] transition-colors leading-none"
+            title="Reset"
+            onClick={onReset}
+            disabled={!onReset}
+          >
+            <span aria-hidden="true" className="text-base">↺</span>
+            <span className="sr-only">Reset</span>
+          </button>
+          <button
+            type="button"
+            className="flex items-center justify-center text-[#c9a227] hover:text-[#e6c547] transition-colors leading-none"
+            title="Nascondi"
+            onClick={() => {}}
+          >
+            <span aria-hidden="true" className="text-base">👁</span>
+            <span className="sr-only">Nascondi</span>
+          </button>
+          <button
+            type="button"
+            className="flex items-center justify-center text-[#c9a227] hover:text-[#e6c547] transition-colors leading-none"
+            title="Modifica stat"
+            onClick={() => setIsConfigMode(true)}
+          >
+            <span aria-hidden="true" className="text-base">✎</span>
+            <span className="sr-only">Modifica statistica</span>
+          </button>
+        </div>
       </div>
     );
   }

@@ -323,9 +323,37 @@ Expand combat system from 1v1 to full tactical grid-based multi-unit combat:
 
 ## 🎯 CURRENT FOCUS
 
+### 🚨 **PRIORITY FIX: Balancer UI Bugs (BLOCKING)**
+
+**Status:** 🔥 CRITICO - Blocca usabilità  
+**Priority:** Massima  
+**Effort:** 4-6 ore
+
+| Document | Purpose |
+|----------|---------|
+| **📋 Fix Plan** | [plans/balancer_ui_fix_plan.md](plans/balancer_ui_fix_plan.md) |
+
+**Problemi da risolvere:**
+1. ❌ Reset non funziona (card, stat, pagina)
+2. ❌ Pulsante Elimina: posizione sbagliata, manca cerchio rosso
+3. ❌ Pulsante Occhio: non è il più a destra
+4. ❌ Icona Lock: stato visivo non chiaro (aperto/chiuso)
+5. ❌ Pulsanti Lock, Hide, Reset: non fanno nulla
+6. ❌ Icona Lock troppo grande
+7. ❌ Import formule: diventano valori secchi
+8. ❌ Import/Export: non sembrano funzionare
+
+**Fasi:**
+1. Fix Critici (Reset, Export/Import) - 2h
+2. UX Pulsanti (riordino, stili) - 1.5h
+3. Funzionalità Mancanti (Lock, Hide) - 2h
+4. Verifica Formule (round-trip test) - 0.5h
+
+---
+
 ### 🔥 **PHASE 10: Config-Driven Balancer (ACTIVE)**
 
-**Status:** 📋 In Planning → Implementation  
+**Status:** 📋 In Progress (dopo fix UI)  
 **Priority:** Alta  
 **Effort:** 12-16 ore
 
@@ -431,4 +459,4 @@ Questa sezione definisce la direzione strategica; i dettagli di ciò che è già
 ---
 
 **Next Review:** End of Week 8 (2025-12-16)  
-**Last Updated:** 2025-11-30 21:23
+**Last Updated:** 2025-12-03 00:00

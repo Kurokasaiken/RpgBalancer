@@ -13,6 +13,7 @@ interface SortableCardProps {
   onClickAddStat: (card: CardDefinition) => void;
   onEditStat: (statId: string, updates: Partial<StatDefinition>) => void;
   onDeleteStat: (statId: string) => void;
+  onResetStat?: (statId: string) => void;
   newStatId?: string;
   onUpdateCard: (updates: Partial<CardDefinition>) => void;
   onDeleteCard: () => void;
@@ -26,6 +27,7 @@ const SortableCard: React.FC<SortableCardProps> = ({
   onClickAddStat,
   onEditStat,
   onDeleteStat,
+  onResetStat,
   newStatId,
   onUpdateCard,
   onDeleteCard,
@@ -46,6 +48,7 @@ const SortableCard: React.FC<SortableCardProps> = ({
         stats={stats}
         onEditStat={onEditStat}
         onDeleteStat={onDeleteStat}
+        onResetStat={onResetStat}
         newStatId={newStatId}
         onUpdateCard={onUpdateCard}
         onDeleteCard={onDeleteCard}
@@ -55,17 +58,17 @@ const SortableCard: React.FC<SortableCardProps> = ({
       />
       <button
         type="button"
-        className="mt-2 w-full text-[11px] px-3 py-2 rounded-xl border border-dashed border-amber-400/60 text-amber-200 hover:bg-amber-500/10 tracking-[0.3em] uppercase"
+        className="mt-1 w-full text-[10px] px-2 py-1.5 rounded-lg border border-dashed border-amber-400/60 text-amber-200 hover:bg-amber-500/10 tracking-[0.3em] uppercase transition-colors"
         onClick={() => onClickAddStat(card)}
       >
-        ＋ Add Stat
+        ＋ Stat
       </button>
     </div>
   );
 };
 
 export const BalancerNew: React.FC = () => {
-  const { config, reorderCards, updateStat, deleteStat, addCard, addStat, updateCard, deleteCard } = useBalancerConfig();
+  const { config, reorderCards, updateStat, deleteStat, addCard, addStat, updateCard, deleteCard, resetStatToInitial, resetCardToInitial, resetToInitialConfig } = useBalancerConfig();
 
   const [lastCreatedStatId, setLastCreatedStatId] = useState<string | null>(null);
   const [lastCreatedCardId, setLastCreatedCardId] = useState<string | null>(null);
@@ -116,41 +119,25 @@ export const BalancerNew: React.FC = () => {
   };
 
   return (
-    <div className="min-h-full bg-gradient-to-br from-[#050509] via-[#0f1a1d] to-[#132427] text-[#f0efe4] p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
-        <header className="rounded-2xl border border-[#3b4b4d] bg-[#0c1517]/80 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.7)]">
-          <p className="text-xs uppercase tracking-[0.6em] text-[#8db3a5]">Gilded Observatory</p>
-          <div className="flex flex-wrap items-end justify-between gap-4 mt-2">
-            <div>
-              <h1 className="text-4xl font-display text-[#f6f3e4]">Balancer · New</h1>
-              <p className="text-sm text-[#cfdfd8] mt-2 max-w-2xl">
-                Editor completo per card e stat con inline editing, drag & drop, salvataggio JSON e import/export. Ogni card eredita lo stile
-                "Orbital Budget" direttamente dal playground.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={handleAddCard}
-              className="px-4 py-2 rounded-full border border-amber-400/60 text-amber-200 text-xs tracking-[0.4em] uppercase hover:bg-amber-500/10"
-            >
-              ＋ Nuova Card
-            </button>
-          </div>
+    <div className="min-h-full bg-gradient-to-br from-[#050509] via-[#0f1a1d] to-[#132427] text-[#f0efe4] p-4">
+      <div className="max-w-6xl mx-auto space-y-3">
+        <header className="flex items-center justify-between">
+          <h1 className="text-3xl font-display text-[#f6f3e4]">Balancer</h1>
+          <button
+            type="button"
+            onClick={handleAddCard}
+            className="px-4 py-2 rounded-full border border-amber-400/60 text-amber-200 text-xs tracking-[0.4em] uppercase hover:bg-amber-500/10 transition-colors"
+          >
+            ＋ Nuova Card
+          </button>
         </header>
 
         <ConfigToolbar />
 
-        <div className="rounded-2xl border border-[#384444] bg-[#0d181b]/80 p-5 shadow-[0_15px_45px_rgba(0,0,0,0.55)]">
-          <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.4em] text-[#6da8a0]">Card Registry</p>
-              <p className="text-sm text-[#aeb8b4]">{cards.length} card configurabili · {Object.keys(config.stats).length} stats totali</p>
-            </div>
-          </div>
-
+        <div className="rounded-2xl border border-[#384444] bg-[#0d181b]/80 p-4 shadow-[0_15px_45px_rgba(0,0,0,0.55)]">
           <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={cards.map((c) => c.id)} strategy={verticalListSortingStrategy}>
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                 {cards.map((card) => (
                   <SortableCard
                     key={card.id}
@@ -160,6 +147,9 @@ export const BalancerNew: React.FC = () => {
                     onEditStat={(statId, updates) => updateStat(statId, updates)}
                     onDeleteStat={(statId) => {
                       deleteStat(statId);
+                    }}
+                    onResetStat={(statId) => {
+                      resetStatToInitial(statId);
                     }}
                     newStatId={lastCreatedStatId ?? undefined}
                     onUpdateCard={(updates) => {

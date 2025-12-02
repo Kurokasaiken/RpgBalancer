@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import type {
   BalancerConfig,
   BalancerPreset,
@@ -15,6 +15,8 @@ export interface ValidationResult {
   success: boolean;
   error?: string;
 }
+
+const deepClone = <T,>(value: T): T => JSON.parse(JSON.stringify(value));
 
 export interface UseBalancerConfigReturn {
   // State
@@ -47,10 +49,20 @@ export interface UseBalancerConfigReturn {
   exportConfig: () => string;
   importConfig: (json: string) => ValidationResult;
   resetConfig: () => void;
+  resetToInitialConfig: () => void;
+  resetCardToInitial: (cardId: string) => ValidationResult;
+  resetStatToInitial: (statId: string) => ValidationResult;
 }
 
 export function useBalancerConfig(): UseBalancerConfigReturn {
-  const [config, setConfig] = useState<BalancerConfig>(() => BalancerConfigStore.load());
+  const initialConfigRef = useRef<BalancerConfig | null>(null);
+  const [config, setConfig] = useState<BalancerConfig>(() => {
+    const loaded = BalancerConfigStore.load();
+    if (!initialConfigRef.current) {
+      initialConfigRef.current = deepClone(loaded);
+    }
+    return loaded;
+  });
   const [history, setHistory] = useState<ConfigSnapshot[]>(() => BalancerConfigStore.getHistory());
 
   const refreshState = useCallback(() => {
@@ -334,6 +346,63 @@ export function useBalancerConfig(): UseBalancerConfigReturn {
     refreshState();
   }, [refreshState]);
 
+  const resetToInitialConfig = useCallback(() => {
+    if (!initialConfigRef.current) return;
+    BalancerConfigStore.save(deepClone(initialConfigRef.current), 'Reset to initial snapshot');
+    refreshState();
+  }, [refreshState]);
+
+  const resetStatToInitial = useCallback(
+    (statId: string): ValidationResult => {
+      const initialStat = initialConfigRef.current?.stats[statId];
+      if (!initialStat) {
+        return { success: false, error: `Stat "${statId}" not in initial snapshot` };
+      }
+
+      const next: BalancerConfig = {
+        ...config,
+        stats: {
+          ...config.stats,
+          [statId]: deepClone(initialStat),
+        },
+      };
+
+      saveConfig(next, `Reset stat: ${initialStat.label}`);
+      return { success: true };
+    },
+    [config, saveConfig],
+  );
+
+  const resetCardToInitial = useCallback(
+    (cardId: string): ValidationResult => {
+      const initialCard = initialConfigRef.current?.cards[cardId];
+      if (!initialCard) {
+        return { success: false, error: `Card "${cardId}" not in initial snapshot` };
+      }
+
+      const updatedStats: Record<string, StatDefinition> = { ...config.stats };
+      initialCard.statIds.forEach((statId) => {
+        const initialStat = initialConfigRef.current?.stats[statId];
+        if (initialStat) {
+          updatedStats[statId] = deepClone(initialStat);
+        }
+      });
+
+      const next: BalancerConfig = {
+        ...config,
+        cards: {
+          ...config.cards,
+          [cardId]: deepClone(initialCard),
+        },
+        stats: updatedStats,
+      };
+
+      saveConfig(next, `Reset card: ${initialCard.title}`);
+      return { success: true };
+    },
+    [config, saveConfig],
+  );
+
   const activePreset = config.presets[config.activePresetId];
 
   return {
@@ -354,5 +423,8 @@ export function useBalancerConfig(): UseBalancerConfigReturn {
     exportConfig,
     importConfig,
     resetConfig,
+    resetToInitialConfig,
+    resetCardToInitial,
+    resetStatToInitial,
   };
 }
