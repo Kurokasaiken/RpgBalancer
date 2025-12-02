@@ -2,9 +2,9 @@
 
 > **Navigator + Governance** - Single source of truth for project organization
 
-**Last Updated:** 2025-11-30  
-**Total Tasks:** 600+ (across dedicated task files)  
-**Current Phase:** Phase 2.3: 1v1 Balancing Module (Balance Tuning Complete)
+**Last Updated:** 2025-12-02  
+**Total Tasks:** 740+ (across dedicated task files)  
+**Current Phase:** Phase 10: Config-Driven Balancer (Active)
 
 ---
 
@@ -81,21 +81,22 @@ Example:
 ## 📊 OVERALL PROGRESS
 
 ```
-┌─────────────────────────────────────────────────────┐
-│ PHASE                    STATUS      TASKS          │
-├─────────────────────────────────────────────────────┤
-│ Phase 1: Foundation      ✅ DONE    ~160 tasks     │
-│ Phase 2: Archetypes      🔄 ACTIVE  ~200 tasks     │
-│ Phase 3: Scenario UI     📋 TODO    ~50 tasks      │
-│ Phase 4: Atomic UI       ✅ DONE    ~60 tasks      │
-│ Phase 5: Universal       ⏸️ PAUSED  ~40 tasks      │
-│ Phase 6: Logic Sep.      📋 TODO    ~30 tasks      │
-│ Phase 7: Persistence     ✅ DONE    ~25 tasks      │
-│ Phase 8: Fantasy UI      ✅ DONE    ~50 tasks      │
-│ Phase 9: Combat Exp.     ✅ DONE    ~100 tasks     │
-├─────────────────────────────────────────────────────┤
-│ TOTAL PROGRESS: ████████████████░░░░ 80%           │
-└─────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│ PHASE                     STATUS      TASKS          │
+├──────────────────────────────────────────────────────┤
+│ Phase 1: Foundation       ✅ DONE    ~160 tasks     │
+│ Phase 2: Archetypes       🔄 ACTIVE  ~200 tasks     │
+│ Phase 3: Scenario UI      📋 TODO    ~50 tasks      │
+│ Phase 4: Atomic UI        ✅ DONE    ~60 tasks      │
+│ Phase 5: Universal        ⏸️ PAUSED  ~40 tasks      │
+│ Phase 6: Logic Sep.       📋 TODO    ~30 tasks      │
+│ Phase 7: Persistence      ✅ DONE    ~25 tasks      │
+│ Phase 8: Fantasy UI       ✅ DONE    ~50 tasks      │
+│ Phase 9: Combat Exp.      ✅ DONE    ~100 tasks     │
+│ Phase 10: Config Balancer 🔥 ACTIVE  ~140 tasks     │
+├──────────────────────────────────────────────────────┤
+│ TOTAL PROGRESS: ███████████████░░░░░ 75%            │
+└──────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -134,61 +135,6 @@ See full spec for archetype stats, encounter templates, and drop mechanics.
 ---
 
 ## 🗺️ DETAILED PLANS & TASKS
-
-### ✅ **PHASE 1: Foundation Systems (Complete)**
-
-**Status:** 100% Done  
-**Report:** [reports/walkthrough.md](reports/walkthrough.md)  
-**Tasks Completed:** ~160 (including improvements)
-
-<details><summary><b>View Summary</b></summary>
-
-- ✅ Core system (stats, combat, modules)
-- ✅ Weight calibration (damage=5.0, armor=5.0, etc.)
-- ✅ SpellCostModule + UI integration
-- ✅ Test suite (82 tests passing)
-- ✅ Critical bug fixes + recalibration
-- ✅ **Spell Creation UI refinements**
-- ✅ **Node.js v20 upgrade** (.nvmrc created)
-- ✅ **Development Guidelines** (MUST READ before coding)
-- ✅ **Codebase audit** (Single Source of Truth violations)
-
-### 3.1 Command Line Runner
-- [x] Create `src/balancing/simulation/cli.ts` <!-- id: 53 -->
-- [x] Add argument parsing (entity configs, iterations) <!-- id: 54 -->
-- [x] Add progress display (console output) <!-- id: 55 -->
-- [x] Add results summary display <!-- id: 56 -->
-- [x] Add export to file option (Console Table) <!-- id: 57 -->
-
-### 3.2 Integration
-- [x] Add npm script `npm run simulate` (renamed to `calibrate`) <!-- id: 58 -->
-- [x] Document CLI usage in README (Walkthrough) <!-- id: 59 -->
-
-</details>
-
----
-
-### 🔄 **PHASE 4: Atomic Evolution (Complete)**
-
-**Status:** 100% Done (Foundation for Universal Creators)
-
-| Document | Purpose |
-|----------|------------|
-| **📋 Plan** | [plans/atomic_evolution_plan.md](plans/atomic_evolution_plan.md) |
-| **✅ Tasks** | [plans/atomic_evolution_tasks.md](plans/atomic_evolution_tasks.md) |
-
-**Overview:**
-- **Atomic Design** implementation (Atoms, Molecules, Organisms)
-- **Glassmorphism** UI standardization
-- **Refactoring** of monolithic components (`EnhancedStatSlider`, `SpellIdentityCard`)
-- **Error Boundaries** for robustness
-
-**Key Deliverables:**
-- `src/ui/atoms/` library (`GlassCard`, `GlassButton`, `GlassInput`, `GlassSlider`)
-- Refactored `SpellCreation` UI
-- `ErrorBoundary` implementation
-
----
 
 ### 🔄 **PHASE 2: Archetype Balancing System (Active)**
 
@@ -329,76 +275,6 @@ See full spec for archetype stats, encounter templates, and drop mechanics.
 
 ---
 
-### ✅ **PHASE 8: Fantasy UI Redesign (Complete)**
-
-**Status:** 100% Done
-**Report:** [phase8_walkthrough.md](../../.gemini/antigravity/brain/41fb7f12-d062-4270-aae4-b1bb5d18a77f/phase8_walkthrough.md)
-
-**Decision Date:** 2025-11-30
-
-| Document | Purpose |
-|----------|---------|
-| **📋 Spec** | [Session 886ac1dc: fantasy_ui_final_spec.md](../../.gemini/antigravity/brain/886ac1dc-4b8b-4d7e-82fe-5f57bf201bde/fantasy_ui_final_spec.md) |
-| **🎨 Options** | [Session 886ac1dc: ui_visual_options.md](../../.gemini/antigravity/brain/886ac1dc-4b8b-4d7e-82fe-5f57bf201bde/ui_visual_options.md) |
-
-**Approved Specifications:**
-
-#### Visual Style
-- **Art Style:** 2D Vector Art
-- **Theme:** Medieval Fantasy (Tavern/Library aesthetic)
-- **Mood:** Relaxing, adventurous, serene
-
-#### Color Palette (Custom "Enchanted Forest")
-- **Primary:** Sage Green (#b8c5b0), Forest Green (#7fa67e), Mint (#c8dfc7)
-- **Secondary:** Sky Blue (#a8c7d7), Ocean Blue (#8cb4c9) - from Palette B
-- **Tertiary:** Marble White (#ebe7df) - from Palette B
-- **Materials:** Parchment (#f5f1e8), Wood Dark (#4a3f35), Wood Light (#8b7355), Leather (#6b4e3d), Bronze (#cd7f32)
-
-#### Typography
-- **Display:** Cinzel (medieval serif)
-- **Body:** Crimson Text (readable serif)
-- **UI/Numbers:** Lato (clarity)
-- **Base Size:** 18px (up from 14-16px)
-- **Line Height:** 1.8 (up from 1.5)
-
-#### Spacing & Layout
-- **Card Padding:** 48px (2x from 24px)
-- **Card Gaps:** 32px (2x from 16px)
-- **Reduced Info Density:** 5-7 elements per card (from 10-15)
-- **Navigation:** Sidebar book-spine style (max 5-6 visible tabs)
-
-#### Components to Create
-1. **Atomic:**
-   - FantasyCard (replaces GlassCard)
-   - FantasyButton (wood + leather)
-   - FantasyInput (parchment bg)
-   - FantasySlider (wood track, bronze thumb)
-   - FantasySelect (parchment dropdown)
-
-2. **Molecules:**
-   - FantasyNavigation (sidebar)
-   - FantasyModal (ornate frame)
-   - FantasyTooltip (scroll style)
-
-3. **Pages:** Redesign all with new components
-
-**Implementation Plan:**
-- **Phase 8.1:** Foundation (CSS variables, theme system, fonts) - 2-3h
-- **Phase 8.2:** Atomic components - 4-5h
-- **Phase 8.3:** Assets (SVG frames, textures) - 2-3h
-- **Phase 8.4:** Molecules - 3-4h
-- **Phase 8.5:** Page redesign - 6-8h
-  - ⚠️ **REQUIRES UX RESEARCH** before starting:
-    - Information presentation best practices
-    - Fantasy RPG UI navigation patterns
-    - Data density optimization
-    - User flow analysis
-- **Phase 8.6:** Polish & testing - 2-3h
-
-**Total Estimate:** 19-26 hours
-
----
-
 ### 🔄 **PHASE 9: Combat System Expansion (Planned)**
 
 **Status:** 0% (Design Complete)
@@ -447,19 +323,77 @@ Expand combat system from 1v1 to full tactical grid-based multi-unit combat:
 
 ## 🎯 CURRENT FOCUS
 
-### This Week: Phase 6 - 1v1 Combat Polish
+### 🔥 **PHASE 10: Config-Driven Balancer (ACTIVE)**
 
-**Status:** Planned
-**Goal:** Finalize the 1v1 combat experience before moving to advanced scenarios.
+**Status:** 📋 In Planning → Implementation  
+**Priority:** Alta  
+**Effort:** 12-16 ore
 
-**Next Tasks:**
-1. Implement Mana System
-2. Add Cooldown mechanics
-3. Refine Status Effects (visuals)
+| Document | Purpose |
+|----------|---------|
+| **📋 Plan** | [plans/config_driven_balancer_plan.md](plans/config_driven_balancer_plan.md) |
+| **✅ Tasks** | [plans/config_driven_balancer_tasks.md](plans/config_driven_balancer_tasks.md) |
 
-**Deferred:**
-- Phase 3 (Scenario UI) - After polish
-- Phase 5 (Universal Creators) - Future
+**Obiettivo:** Trasformare il Balancer in un sistema completamente configurabile da UI:
+
+- **Card** (moduli di combattimento) creabili, rinominabili, riordinabili, eliminabili da UI
+- **Stat** aggiungibili dentro le card con nome, peso, min/max/step, valore default
+- **Formule derivate** creabili/editabili con validazione real-time (solo stat esistenti)
+- **Core** (hp, damage, htk) sempre presente, non eliminabile, ma pesi/range editabili
+- **Persistenza** in localStorage; ultimo salvataggio = default al reload
+- **Preset** gestibili (switch, crea, duplica, elimina)
+- **History/Undo** (ultimi 10 stati)
+- **Drag & drop** card con handle dedicato (⋮⋮)
+- **Validazione real-time** con feedback visivo (bordo rosso se errore)
+
+**Fasi:**
+1. Schema e Store (Zod + localStorage + history)
+2. React Hook (`useBalancerConfig`)
+3. UI Editor Components (CardEditor, StatEditor, FormulaEditor drawers)
+4. Integrazione FantasyBalancer
+5. Testing e Polish
+
+**Tech Stack:**
+- Zod per validazione schema
+- @dnd-kit per drag & drop
+- Drawer laterale per editor
+- Tema Gilded Observatory
+
+---
+
+### Future Direction (After Config-Driven Balancer)
+
+The next evolution of the project is organized around six macro-goals:
+
+1. **Config-Driven Spell Creator**  
+   - Applicare lo stesso pattern del Balancer allo Spell Creator.
+   - Stat, formule, preset configurabili da UI.
+
+2. **UI Optimization Page-by-Page (Core First)**  
+   - Rifinire Balancer e Spell Creator (Tier 1), poi le altre pagine.  
+   - Interventi solo visivi/UX separati da cambi strutturali.
+
+3. **Page Curation (Keep / Archive)**  
+   - Classificare tutte le pagine per importanza (Core / Support / Demo).  
+   - Tenere solo le superfici davvero utili; spostare mock vecchi in `docs/archive/`.
+
+4. **Reusable Gilded UI Components**  
+   - Creare una libreria di componenti estetici riciclabili (button, card, input, slider, stat row).  
+   - Copiare tutte le funzionalità dai componenti legacy senza modificarle, poi applicare il nuovo stile.  
+   - Ogni componente rifatto ha una propria pagina di test dedicata.
+
+5. **JSON-Driven Non-Regression for Balancer & Spell Creator**  
+   - Spostare preset e expected values in JSON; test di non-regressione leggono da lì.  
+   - Ogni modifica a Balancer/Spell Creator o ai loro componenti core deve far girare questi test.  
+   - Stessa logica applicata ai componenti interni chiave.
+
+6. **Updated Philosophy & Guidelines**  
+   - Allineare `PROJECT_PHILOSOPHY.md` e `DEVELOPMENT_GUIDELINES.md` con:  
+     - approccio **config-first** (formule/layout da config, non da UI),  
+     - UI come vista sulle config/balancing modules,  
+     - tema **Gilded Observatory** e token di colore centralizzati.
+
+Questa sezione definisce la direzione strategica; i dettagli di ciò che è già stato fatto restano in `IMPLEMENTED_PLAN.md`.
 
 ---
 
@@ -484,6 +418,7 @@ Expand combat system from 1v1 to full tactical grid-based multi-unit combat:
 - **"What's next?"** → [Current Focus](#current-focus)
 - **"Full Checklist?"** → [plans/atomic_evolution_tasks.md](plans/atomic_evolution_tasks.md)
 - **"How does it work?"** → [design/architecture.md](design/architecture.md)
+- **"Cosa esiste davvero ora?"** → [IMPLEMENTED_PLAN.md](IMPLEMENTED_PLAN.md)
 
 ---
 

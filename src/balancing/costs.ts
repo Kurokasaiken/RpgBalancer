@@ -1,4 +1,5 @@
 import type { StatBlock } from './types';
+import { BalancerConfigStore } from './config/BalancerConfigStore';
 
 export const STAT_COSTS: Record<string, number> = {
     hp: 1,
@@ -18,23 +19,40 @@ export const STAT_COSTS: Record<string, number> = {
     penPercent: 5
 };
 
+const getStatWeight = (statId: string): number => {
+    try {
+        const config = BalancerConfigStore.load();
+        const fromConfig = config.stats[statId]?.weight;
+        if (typeof fromConfig === 'number') {
+            // Active preset override, if present
+            const preset = config.presets[config.activePresetId];
+            const override = preset?.weights?.[statId];
+            return typeof override === 'number' ? override : fromConfig;
+        }
+    } catch {
+        // Fallback to legacy behaviour
+    }
+
+    return STAT_COSTS[statId] ?? 1;
+};
+
 export const calculateStatBlockCost = (stats: StatBlock): number => {
     let cost = 0;
 
-    cost += stats.hp * (STAT_COSTS.hp || 1);
-    cost += stats.damage * (STAT_COSTS.damage || 1);
-    cost += stats.txc * (STAT_COSTS.txc || 1);
-    cost += stats.evasion * (STAT_COSTS.evasion || 1);
+    cost += stats.hp * getStatWeight('hp');
+    cost += stats.damage * getStatWeight('damage');
+    cost += stats.txc * getStatWeight('txc');
+    cost += stats.evasion * getStatWeight('evasion');
 
-    cost += stats.critChance * (STAT_COSTS.critChance || 1);
+    cost += stats.critChance * getStatWeight('critChance');
     // Base crit mult is usually 2.0, so we pay for the excess
-    cost += Math.max(0, stats.critMult - 2.0) * 10 * (STAT_COSTS.critMult || 1);
-    cost += stats.critTxCBonus * (STAT_COSTS.critTxCBonus || 1);
+    cost += Math.max(0, stats.critMult - 2.0) * 10 * getStatWeight('critMult');
+    cost += stats.critTxCBonus * getStatWeight('critTxCBonus');
 
-    cost += stats.armor * (STAT_COSTS.armor || 1);
-    cost += stats.resistance * (STAT_COSTS.resistance || 1);
-    cost += stats.armorPen * (STAT_COSTS.armorPen || 1);
-    cost += stats.penPercent * (STAT_COSTS.penPercent || 1);
+    cost += stats.armor * getStatWeight('armor');
+    cost += stats.resistance * getStatWeight('resistance');
+    cost += stats.armorPen * getStatWeight('armorPen');
+    cost += stats.penPercent * getStatWeight('penPercent');
 
     return Math.round(cost);
 };

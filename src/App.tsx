@@ -18,6 +18,7 @@ import { FantasyBalancer } from './ui/fantasy/FantasyBalancer';
 import { FantasyComponentShowcase } from './ui/atoms/FantasyComponentShowcase';
 import { ArcaneTechGlass } from './ui/fantasy/mockups/ArcaneTechGlass';
 import { GildedObservatory } from './ui/fantasy/mockups/GildedObservatory';
+import { GildedCardShowcase } from './ui/fantasy/mockups/GildedCardShowcase';
 import { ObsidianSanctum } from './ui/fantasy/mockups/ObsidianSanctum';
 import { AuroraWorkshop } from './ui/fantasy/mockups/AuroraWorkshop';
 import { AetherBrassLab } from './ui/fantasy/mockups/AetherBrassLab';
@@ -26,6 +27,8 @@ import { MidnightMeridian } from './ui/fantasy/mockups/MidnightMeridian';
 import { SeraphimArchive } from './ui/fantasy/mockups/SeraphimArchive';
 import { VerdantAlloyDeck } from './ui/fantasy/mockups/VerdantAlloyDeck';
 import { CompactDemo } from './ui/pages/CompactDemo';
+import { BalancerConfigPlayground } from './ui/balancing/BalancerConfigPlayground';
+import { BalancerNew } from './ui/balancing/BalancerNew';
 
 type Tab =
   | 'balancer'
@@ -51,10 +54,13 @@ type Tab =
   | 'mockMidnightMeridian'
   | 'mockSeraphimArchive'
   | 'mockVerdantAlloy'
+  | 'mockGildedCards'
+  | 'mockBalancerConfig'
+  | 'balancerNew'
   | 'compactDemo';
 
 function App() {
-  const [activeTab, setActiveTab] = useState<Tab>('balancer');
+  const [activeTab, setActiveTab] = useState<Tab>('mockBalancerConfig');
 
   // Listen for spell creation navigation from SpellLibrary
   useEffect(() => {
@@ -143,6 +149,21 @@ function App() {
       {activeTab === 'mockGildedObservatory' && (
         <ErrorBoundary componentName="Gilded Observatory">
           <GildedObservatory />
+        </ErrorBoundary>
+      )}
+      {activeTab === 'mockGildedCards' && (
+        <ErrorBoundary componentName="Gilded Card Showcase">
+          <GildedCardShowcase />
+        </ErrorBoundary>
+      )}
+      {activeTab === 'mockBalancerConfig' && (
+        <ErrorBoundary componentName="Balancer Config Playground">
+          <BalancerConfigPlayground />
+        </ErrorBoundary>
+      )}
+      {activeTab === 'balancerNew' && (
+        <ErrorBoundary componentName="Balancer New">
+          <BalancerNew />
         </ErrorBoundary>
       )}
       {activeTab === 'mockObsidianSanctum' && (

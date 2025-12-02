@@ -115,26 +115,81 @@ User adjusts until Balance ≈ 0, then saves.
 
 ## UI/UX Guidelines
 
-### Glassmorphism Aesthetic
+### Gilded Observatory Aesthetic (Current Canon)
 ```css
-backdrop-filter: blur(12px);
-background: rgba(255, 255, 255, 0.05);
-border: 1px solid rgba(255, 255, 255, 0.1);
-box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+/* High-level visual intent, actual tokens live in the CSS/theme system */
+background: radial-gradient(circle at top, #1f2933 0%, #020617 55%, #000000 100%);
+border-color: rgba(245, 245, 244, 0.06);
+color: #f5f5f4; /* Ivory text */
+box-shadow: 0 18px 45px rgba(0, 0, 0, 0.75);
 ```
 
-### Color System
-- **Cyan/Blue** (`#06b6d4`): Identity, Definition, Static Info
-- **Purple** (`#a855f7`): Configuration, Dynamic, Interactive
-- **Green** (`#34d399`): Success, Balanced
-- **Red** (`#f87171`): Error, Unbalanced
-- **Amber** (`#fbbf24`): Warning, Malus
+This project now treats the **Gilded Observatory** theme as the reference UI canon. All new UI work MUST:
+
+- **Inherit from theme tokens** (Tailwind config, `fantasy-theme.css`, `color-palette.css`) instead of hardcoded hex values.
+- Use **compact, information-dense layouts** by default, but remain touch-friendly on mobile.
+- Keep visual hierarchy clear: cards, headers, and primary actions should stand out even in dense screens.
+
+### Color System (Conceptual Roles)
+- **Obsidian / Deep Space**: Backgrounds, large surfaces, modal backdrops.
+- **Ivory / Warm Light**: Primary text, key labels, headings.
+- **Teal / Arcane Accents**: Sliders, interactive controls, hover/active states.
+- **Gold / Gilded Lines**: Section dividers, highlights, "premium" actions.
+- **Error / Success / Warning**: Still exist, but must be routed through the centralized color palette.
+
+> Implementation detail: the **authoritative mapping** between these roles and actual CSS tokens is maintained in the theme files and Tailwind config, not in components.
 
 ### Interaction Patterns
-- **Horizontal Sliders:** Primary selection mechanism
-- **Eye Icon:** Collapse/expand (right-aligned)
-- **Drag Handle:** Header area (cursor: move)
-- **Toast Notifications:** Success feedback (no alerts!)
+- **Horizontal Sliders:** Primary selection mechanism for weighted stats.
+- **Tooltip-First Formulas:** Formulas live in docs and tooltips; UI shows human labels and results, not raw math in the main layout.
+- **Drag Handle in Header:** Reordering and layout manipulation is initiated from card headers or dedicated handles, not from random surfaces.
+- **Toast Notifications:** Success and error feedback use a unified toast system (no `alert()`), consistent with MASTER_PLAN guidelines.
+
+For how this UI/UX direction links to the rest of the roadmap:
+- See `docs/MASTER_PLAN.md` → **Future Direction**.
+- See `docs/IMPLEMENTED_PLAN.md` for what is already in production vs. mock.
+
+## Config-Driven Architecture (Phase 10+)
+
+### Principio Fondamentale
+**Niente hardcoded per layout, card, stat, formule.** Tutto è definito in JSON/config e modificabile da UI.
+
+### Schema-First Development
+1. **Schema JSON** definisce struttura (stat, card, formule)
+2. **Zod** valida lo schema a runtime
+3. **UI** legge lo schema e genera componenti dinamicamente
+4. **Persistence** salva/carica lo schema + valori in localStorage
+
+### Balancer Config-Driven
+```typescript
+// Esempio: stat definita in config, non hardcoded
+const statDefinition: StatDefinition = {
+  id: 'critChance',
+  label: 'Critical Chance',
+  type: 'percentage',
+  min: 0, max: 100, step: 1,
+  defaultValue: 5,
+  weight: 4.0,
+  isCore: false,
+  isDerived: false,
+};
+```
+
+### Formula Engine
+Le formule derivate (es. `htk = hp / damage`) sono:
+- **Editabili da UI** con validazione real-time
+- **Validate** contro stat esistenti (no variabili sconosciute)
+- **Estensibili** per aggiungere funzioni in futuro
+
+### Core vs Custom
+- **Core** (hp, damage, htk): sempre presenti, non eliminabili, ma pesi/range editabili
+- **Custom**: tutto il resto è creabile/eliminabile da UI
+
+Per dettagli implementativi:
+- See `docs/plans/config_driven_balancer_plan.md`
+- See `docs/plans/config_driven_balancer_tasks.md`
+
+---
 
 ## Technology Stack
 
@@ -143,8 +198,10 @@ box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 - **TypeScript** for type safety
 - **Tailwind CSS** for utilities
 - **localStorage** for persistence
+- **Zod** for schema validation
 
 ### Planned
+- **@dnd-kit** for drag & drop
 - **CSS Modules** for complex component styles
 - **Sonner** for toast notifications
 - **Custom Hooks** for shared logic

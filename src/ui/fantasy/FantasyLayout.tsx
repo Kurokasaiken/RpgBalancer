@@ -39,7 +39,10 @@ const NAV_SECTIONS = [
     {
         title: 'Mockups',
         items: [
+            { id: 'mockBalancerConfig', label: 'Balancer Config Playground', icon: '⚙️' },
+            { id: 'balancerNew', label: 'Balancer New', icon: '🜚' },
             { id: 'mockGildedObservatory', label: 'Gilded Observatory', icon: '🜂' },
+            { id: 'mockGildedCards', label: 'Gilded Card Showcase', icon: '🂠' },
             { id: 'mockObsidianSanctum', label: 'Obsidian Sanctum', icon: '🜃' },
             { id: 'mockAuroraWorkshop', label: 'Aurora Workshop', icon: '✺' },
             { id: 'mockArcaneTech', label: 'Arcane Tech Glass', icon: '💠' },

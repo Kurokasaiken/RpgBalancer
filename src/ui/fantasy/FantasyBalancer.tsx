@@ -13,11 +13,13 @@ import { BalanceConfigManager } from '../../balancing/BalanceConfigManager';
 import { getActivePresetId, setActivePresetId } from '../../balancing/presetStorage';
 import { PresetSelector } from '../balancing/PresetSelector';
 import { WeightEditor } from '../balancing/WeightEditor';
+import { useBalancerConfig } from '../../balancing/hooks/useBalancerConfig';
 
 
 const STORAGE_KEY = 'balancer_state';
 
 export const FantasyBalancer: React.FC = () => {
+    const { config } = useBalancerConfig();
     const [stats, setStats] = useState<StatBlock>(() => {
         const saved = localStorage.getItem(STORAGE_KEY);
         let initialStats = DEFAULT_STATS;
@@ -75,6 +77,22 @@ export const FantasyBalancer: React.FC = () => {
         setLockedParam('none');
     };
 
+    const getCoreRange = (id: keyof StatBlock) => {
+        const def = config.stats[id as string];
+        if (def) {
+            return {
+                min: def.min,
+                max: def.max,
+                step: def.step,
+            };
+        }
+        // Fallback to legacy literals
+        if (id === 'hp') return { min: 10, max: 1000, step: 10 };
+        if (id === 'damage') return { min: 1, max: 200, step: 1 };
+        if (id === 'htk') return { min: 1, max: 20, step: 0.1 };
+        return { min: 0, max: 100, step: 1 };
+    };
+
     const handlePresetChange = (id: string) => {
         BalanceConfigManager.setPreset(id);
         setActivePresetIdState(id);
@@ -89,16 +107,18 @@ export const FantasyBalancer: React.FC = () => {
     };
 
     return (
-        <div className="h-full overflow-y-auto p-4 relative pb-20">
+        <div className="h-full overflow-y-auto p-4 relative pb-20 fantasy-theme-bg fantasy-theme-text">
             {/* Animated background particles */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl top-10 -left-20 animate-pulse" />
                 <div className="absolute w-96 h-96 bg-teal-500/10 rounded-full blur-3xl bottom-10 -right-20 animate-pulse" style={{ animationDelay: '1s' }} />
             </div>
             <div className="max-w-7xl mx-auto relative z-10">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <div className="fantasy-theme-card fantasy-theme-border rounded-lg px-4 py-3 mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h2 className="text-3xl font-bold text-white drop-shadow-[0_0_8px_rgba(96,165,250,0.6)]">⚖️ Game Balancing</h2>
+                        <h2 className="text-3xl font-bold text-fantasy-gold">
+                            ⚖️ Game Balancing
+                        </h2>
                         <div className="mt-2">
                             <PresetSelector
                                 activePresetId={activePresetId}
@@ -110,7 +130,7 @@ export const FantasyBalancer: React.FC = () => {
                     <div className="flex gap-2">
                         <button
                             onClick={handleResetAll}
-                            className="px-4 py-2 rounded bg-white/10 border border-white/20 text-white hover:bg-white/15 hover:shadow-[0_0_12px_rgba(255,255,255,0.3)] transition-all font-medium"
+                            className="px-4 py-2 rounded border border-white/20 text-sm font-medium bg-white/5 hover:bg-white/10 transition-colors"
                             title="Reset Everything"
                         >
                             ↺ Reset All
@@ -125,7 +145,7 @@ export const FantasyBalancer: React.FC = () => {
                                 a.download = `balancer-${Date.now()}.json`;
                                 a.click();
                             }}
-                            className="px-4 py-2 rounded bg-white/10 border border-white/20 text-white hover:bg-white/15 hover:shadow-[0_0_12px_rgba(255,255,255,0.3)] transition-all"
+                            className="px-4 py-2 rounded border border-white/20 text-sm bg-white/5 hover:bg-white/10 transition-colors"
                             title="Export Settings"
                         >
                             💾 Export
@@ -149,25 +169,40 @@ export const FantasyBalancer: React.FC = () => {
                         onReset={() => handleResetCard(['hp', 'damage', 'htk'])}
                     >
                         <div className="space-y-2">
-                            <SmartInput
-                                paramId="hp" value={stats.hp} onChange={(v) => handleParamChange('hp', v)}
-                                onReset={() => handleResetParam('hp')}
-                                lockedParam={lockedParam} onLockToggle={handleLockToggle}
-                                min={10} max={1000} step={10}
-                            />
-                            <SmartInput
-                                paramId="damage" value={stats.damage} onChange={(v) => handleParamChange('damage', v)}
-                                onReset={() => handleResetParam('damage')}
-                                lockedParam={lockedParam} onLockToggle={handleLockToggle}
-                                min={1} max={200}
-                            />
-                            <SmartInput
-                                paramId="htk" value={stats.htk} onChange={(v) => handleParamChange('htk', v)}
-                                onReset={() => handleResetParam('htk')}
-                                lockedParam={lockedParam} onLockToggle={handleLockToggle}
-                                min={1} max={20} step={0.1}
-                                bgColor="bg-orange-500/10"
-                            />
+                            {(() => {
+                                const r = getCoreRange('hp');
+                                return (
+                                    <SmartInput
+                                        paramId="hp" value={stats.hp} onChange={(v) => handleParamChange('hp', v)}
+                                        onReset={() => handleResetParam('hp')}
+                                        lockedParam={lockedParam} onLockToggle={handleLockToggle}
+                                        min={r.min} max={r.max} step={r.step}
+                                    />
+                                );
+                            })()}
+                            {(() => {
+                                const r = getCoreRange('damage');
+                                return (
+                                    <SmartInput
+                                        paramId="damage" value={stats.damage} onChange={(v) => handleParamChange('damage', v)}
+                                        onReset={() => handleResetParam('damage')}
+                                        lockedParam={lockedParam} onLockToggle={handleLockToggle}
+                                        min={r.min} max={r.max}
+                                    />
+                                );
+                            })()}
+                            {(() => {
+                                const r = getCoreRange('htk');
+                                return (
+                                    <SmartInput
+                                        paramId="htk" value={stats.htk} onChange={(v) => handleParamChange('htk', v)}
+                                        onReset={() => handleResetParam('htk')}
+                                        lockedParam={lockedParam} onLockToggle={handleLockToggle}
+                                        min={r.min} max={r.max} step={r.step}
+                                        bgColor="bg-orange-500/10"
+                                    />
+                                );
+                            })()}
                         </div>
                     </CardWrapper>
 
@@ -269,10 +304,10 @@ export const FantasyBalancer: React.FC = () => {
                 {/* Visual separator */}
                 <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent my-8" />
 
-                <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-lg p-4 shadow-[0_4px_16px_rgba(0,0,0,0.3)] text-sm text-gray-300 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                    <span><strong className="text-white">Lock:</strong> {lockedParam}</span>
-                    <span className="text-yellow-400 font-bold drop-shadow-[0_0_6px_rgba(250,204,21,0.6)]">Points: {calculateStatBlockCost(stats)}</span>
-                    <span className="text-emerald-400 drop-shadow-[0_0_6px_rgba(52,211,153,0.6)]">✓ Auto-saved</span>
+                <div className="fantasy-theme-card fantasy-theme-border rounded-lg p-4 text-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <span><strong className="text-fantasy-gold">Lock:</strong> {lockedParam}</span>
+                    <span className="text-fantasy-gold font-bold">Points: {calculateStatBlockCost(stats)}</span>
+                    <span className="text-fantasy-nature">✓ Auto-saved</span>
                 </div>
             </div>
 
