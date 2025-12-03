@@ -210,7 +210,12 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, onUpdate, onDelete, on
               onReset ? 'text-[#c9a227] hover:text-[#e6c547]' : 'text-[#4b4f4f] cursor-not-allowed'
             }`}
             title="Reset"
-            onClick={onReset}
+            onClick={() => {
+              if (onReset) {
+                onReset();
+                setMockValue(stat.defaultValue);
+              }
+            }}
             disabled={!onReset}
           >
             <span aria-hidden="true" className="text-sm">↺</span>

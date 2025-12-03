@@ -201,71 +201,6 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, onEditStat, onD
             )}
           </div>
           <div className="flex items-center gap-1">
-            {!isEditingHeader && (
-              <button
-                type="button"
-                className={`w-5 h-5 flex items-center justify-center rounded transition-colors leading-none ${
-                  onResetStat ? 'text-[#c9a227] hover:text-[#e6c547]' : 'text-[#4b4f4f] cursor-not-allowed'
-                }`}
-                title="Reset"
-                onClick={() => {
-                  if (!onResetStat) return;
-                  // Reset di tutte le stat della card alle versioni iniziali
-                  orderedStats.forEach((stat) => {
-                    if (stat) {
-                      onResetStat(stat.id);
-                    }
-                  });
-                }}
-                disabled={!onResetStat}
-              >
-                <span aria-hidden="true" className="text-sm">↺</span>
-                <span className="sr-only">Reset card</span>
-              </button>
-            )}
-            {onUpdateCard && (
-              <button
-                type="button"
-                className={`w-5 h-5 flex items-center justify-center rounded transition-all leading-none ${
-                  isEditingHeader
-                    ? 'text-amber-100'
-                    : 'text-[#c9a227] hover:text-[#e6c547]'
-                }`}
-                title={isEditingHeader ? 'Salva card' : 'Modifica card'}
-                onClick={() => {
-                  if (isEditingHeader) {
-                    handleHeaderSave();
-                  } else {
-                    setIsEditingHeader(true);
-                  }
-                }}
-              >
-                <span aria-hidden="true" className="text-sm">{isEditingHeader ? '✔' : '✎'}</span>
-                <span className="sr-only">{isEditingHeader ? 'Salva card' : 'Modifica card'}</span>
-              </button>
-            )}
-            {isEditingHeader && (
-              <button
-                type="button"
-                className="w-5 h-5 flex items-center justify-center rounded text-[#c9a227] hover:text-[#e6c547] leading-none"
-                title="Annulla modifiche"
-                onClick={handleHeaderCancel}
-              >
-                <span aria-hidden="true" className="text-sm">✖</span>
-                <span className="sr-only">Annulla modifiche</span>
-              </button>
-            )}
-            {!isEditingHeader && (
-              <button
-                type="button"
-                className="w-5 h-5 flex items-center justify-center rounded text-[#c9a227] hover:text-[#e6c547] transition-colors leading-none"
-                title="Nascondi card"
-                onClick={() => onUpdateCard?.({ isHidden: true })}
-              >
-                <span aria-hidden="true" className="text-sm">👁</span>
-                <span className="sr-only">Nascondi card</span>
-              </button>
-            )}
             {isEditingHeader && onDeleteCard && !card.isCore && (
               <div className="relative">
                 <button
@@ -301,6 +236,49 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, onEditStat, onD
                   </div>
                 )}
               </div>
+            )}
+            {isEditingHeader && (
+              <button
+                type="button"
+                className="w-5 h-5 flex items-center justify-center rounded text-[#c9a227] hover:text-[#e6c547] leading-none"
+                title="Annulla modifiche"
+                onClick={handleHeaderCancel}
+              >
+                <span aria-hidden="true" className="text-sm">✖</span>
+                <span className="sr-only">Annulla modifiche</span>
+              </button>
+            )}
+            {onUpdateCard && (
+              <button
+                type="button"
+                className={`w-5 h-5 flex items-center justify-center rounded transition-all leading-none ${
+                  isEditingHeader
+                    ? 'text-amber-100'
+                    : 'text-[#c9a227] hover:text-[#e6c547]'
+                }`}
+                title={isEditingHeader ? 'Salva card' : 'Modifica card'}
+                onClick={() => {
+                  if (isEditingHeader) {
+                    handleHeaderSave();
+                  } else {
+                    setIsEditingHeader(true);
+                  }
+                }}
+              >
+                <span aria-hidden="true" className="text-sm">{isEditingHeader ? '✔' : '✎'}</span>
+                <span className="sr-only">{isEditingHeader ? 'Salva card' : 'Modifica card'}</span>
+              </button>
+            )}
+            {!isEditingHeader && (
+              <button
+                type="button"
+                className="w-5 h-5 flex items-center justify-center rounded text-[#c9a227] hover:text-[#e6c547] transition-colors leading-none"
+                title="Nascondi card"
+                onClick={() => onUpdateCard?.({ isHidden: true })}
+              >
+                <span aria-hidden="true" className="text-sm">👁</span>
+                <span className="sr-only">Nascondi card</span>
+              </button>
             )}
           </div>
         </div>
