@@ -209,7 +209,7 @@ export const BalancerNew: React.FC = () => {
           </div>
         )}
 
-        <div className="rounded-2xl border border-indigo-500/30 bg-slate-900/60 backdrop-blur-md p-4 shadow-[0_18px_45px_rgba(15,23,42,0.9)]">
+        <div className="rounded-2xl border border-indigo-500/30 bg-slate-900/60 backdrop-blur-md p-4 shadow-[0_18px_45px_rgba(15,23,42,0.9)] relative overflow-hidden min-h-[600px]">
           <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={cards.map((c) => c.id)} strategy={verticalListSortingStrategy}>
               <div className="grid gap-2.5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">

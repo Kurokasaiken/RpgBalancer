@@ -1,8 +1,40 @@
-import React, { useEffect, useState, type ComponentType } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { StatDefinition } from '../../balancing/config/types';
 import { FormulaEditor } from './FormulaEditor';
 import { executeFormula } from '../../balancing/config/FormulaEngine';
-import { Flame, Shield, Sword, Heart, Target, Sparkles } from 'lucide-react';
+import { 
+  Swords, Shield, Heart, Zap, Flame, Droplets, Snowflake, Wind, Skull, 
+  Crosshair, Hourglass, Crown, Gem, Scroll, Wand2, Axe, Hammer, Feather, 
+  Sun, Moon, Star, Ghost, BookOpen, Eye, Lock, Unlock, RotateCcw, Edit2, 
+  Trash2, Check, X, Plus, Minus 
+} from 'lucide-react';
+import type { ElementType } from 'react';
+
+const lucideStatIcons: Record<string, ElementType> = {
+  swords: Swords,
+  shield: Shield,
+  heart: Heart,
+  zap: Zap,
+  flame: Flame,
+  droplets: Droplets,
+  snowflake: Snowflake,
+  wind: Wind,
+  skull: Skull,
+  crosshair: Crosshair,
+  hourglass: Hourglass,
+  crown: Crown,
+  gem: Gem,
+  scroll: Scroll,
+  wand: Wand2,
+  axe: Axe,
+  hammer: Hammer,
+  feather: Feather,
+  sun: Sun,
+  moon: Moon,
+  star: Star,
+  ghost: Ghost,
+  book: BookOpen,
+};
 
 const statGlyphMap: Record<string, string> = {
   hp: '❤',
@@ -31,15 +63,6 @@ const statGlyphMap: Record<string, string> = {
   earlyImpact: '⚡',
 };
 
-const lucideIconMap: Record<string, ComponentType<{ className?: string }>> = {
-  flame: Flame,
-  shield: Shield,
-  sword: Sword,
-  heart: Heart,
-  target: Target,
-  sparkles: Sparkles,
-};
-
 interface Props {
   stat: StatDefinition;
   simValue: number;
@@ -63,12 +86,12 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
   const [weight, setWeight] = useState(stat.weight);
   const [isDerived, setIsDerived] = useState(stat.isDerived);
   const [formula, setFormula] = useState(stat.formula || '');
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [iconId, setIconId] = useState<string>(stat.icon ?? '');
   const [showIconPicker, setShowIconPicker] = useState(false);
-
-  const EffectiveIcon = stat.icon ? lucideIconMap[stat.icon] : undefined;
-  const glyph = statGlyphMap[stat.id] ?? '◆';
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  
+  const LucideIcon = stat.icon ? lucideStatIcons[stat.icon] : undefined;
+  const fallbackGlyph = statGlyphMap[stat.id] ?? '◆';
   
   // For derived stats, calculate value from formula; otherwise use simValue
   const displayValue = stat.isDerived && stat.formula 
@@ -88,7 +111,6 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
       setIsDerived(stat.isDerived);
       setFormula(stat.formula || '');
       setIconId(stat.icon ?? '');
-      setShowIconPicker(false);
     }
   }, [stat, isConfigMode]);
 
@@ -105,6 +127,9 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
     if ((description || undefined) !== stat.description) {
       updates.description = description.trim() ? description.trim() : undefined;
     }
+    if ((iconId || undefined) !== (stat.icon || undefined)) {
+      updates.icon = iconId || undefined;
+    }
     if (isDerived !== stat.isDerived) updates.isDerived = isDerived;
     if (isDerived) {
       if (formula !== (stat.formula || '')) {
@@ -112,9 +137,6 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
       }
     } else if (stat.isDerived) {
       updates.formula = undefined;
-    }
-    if ((iconId || undefined) !== (stat.icon || undefined)) {
-      updates.icon = iconId || undefined;
     }
     if (Object.keys(updates).length > 0) {
       onUpdate(updates);
@@ -139,12 +161,16 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
       return (
         <div className="flex items-center justify-between text-xs py-2 px-3 rounded-xl border border-slate-700/70 bg-slate-900/70 backdrop-blur-sm gap-2 opacity-70">
           <div className="flex items-center gap-1.5 min-w-0">
-            <span
-              className="text-sm text-amber-400 leading-none flex-shrink-0 h-4 flex items-center justify-center"
-              aria-hidden="true"
-            >
-              {glyph}
-            </span>
+            {LucideIcon ? (
+              <LucideIcon className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
+            ) : (
+              <span
+                className="text-sm text-amber-400 leading-none flex-shrink-0 h-4 flex items-center justify-center"
+                aria-hidden="true"
+              >
+                {fallbackGlyph}
+              </span>
+            )}
             <span className="text-[11px] text-[#aeb8b4] truncate leading-none">{stat.label}</span>
           </div>
           <button
@@ -153,7 +179,7 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
             title="Mostra stat"
             onClick={handleToggleHidden}
           >
-            <span aria-hidden="true" className="text-sm">👁</span>
+            <Eye className="w-3.5 h-3.5" />
             <span className="sr-only">Mostra statistica</span>
           </button>
         </div>
@@ -164,14 +190,14 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
         <div className="flex flex-col flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
             <div className="flex items-center gap-1.5 min-w-0 flex-1">
-              {EffectiveIcon ? (
-                <EffectiveIcon className="w-4 h-4 text-indigo-200" aria-hidden />
+              {LucideIcon ? (
+                <LucideIcon className="w-3.5 h-3.5 text-amber-200 flex-shrink-0" />
               ) : (
                 <span
                   className="text-sm text-amber-200 leading-none flex-shrink-0 h-4 flex items-center justify-center"
                   aria-hidden="true"
                 >
-                  {glyph}
+                  {fallbackGlyph}
                 </span>
               )}
               <div className="relative group flex-1 min-w-0">
@@ -194,7 +220,7 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
                 title={isLocked ? 'Sblocca stat' : 'Blocca stat'}
                 onClick={handleToggleLock}
               >
-                <span aria-hidden="true" className="text-[11px]">{isLocked ? '🔒' : '🔓'}</span>
+                {isLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
                 <span className="sr-only">{isLocked ? 'Sblocca' : 'Blocca'}</span>
               </button>
               <button
@@ -211,7 +237,7 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
                 }}
                 disabled={!onReset}
               >
-                <span aria-hidden="true" className="text-[11px]">↺</span>
+                <RotateCcw className="w-3 h-3" />
                 <span className="sr-only">Reset</span>
               </button>
               <button
@@ -220,7 +246,7 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
                 title="Modifica stat"
                 onClick={() => setIsConfigMode(true)}
               >
-                <span aria-hidden="true" className="text-[11px]">✎</span>
+                <Edit2 className="w-3 h-3" />
                 <span className="sr-only">Modifica statistica</span>
               </button>
               <button
@@ -229,7 +255,7 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
                 title={isHidden ? 'Mostra stat' : 'Nascondi stat'}
                 onClick={handleToggleHidden}
               >
-                <span aria-hidden="true" className="text-[11px]">👁</span>
+                <Eye className="w-3 h-3" />
                 <span className="sr-only">Nascondi</span>
               </button>
             </div>
@@ -248,7 +274,7 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
               }}
               aria-label="Decrement"
             >
-              −
+              <Minus className="w-3 h-3" />
             </button>
             <input
               type="range"
@@ -279,7 +305,7 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
               }}
               aria-label="Increment"
             >
-              +
+              <Plus className="w-3 h-3" />
             </button>
             <span className="w-10 text-right text-[10px] text-cyan-200 font-mono">
               {displayValue.toFixed(stat.step < 1 ? 1 : 0)}
@@ -294,41 +320,88 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
   return (
     <div className="flex flex-col text-xs py-3 px-3 rounded-xl border border-slate-700/70 bg-slate-900/75 backdrop-blur-sm gap-2 shadow-[0_10px_24px_rgba(15,23,42,0.85)]">
       <div className="flex items-start gap-2">
-        <input
-          className="flex-1 text-sm rounded bg-[#0c1517] border border-[#475758] px-3 py-1.5 text-[#f5f0dc] placeholder:text-[#556567]"
-          value={label}
-          onChange={(e) => setLabel(e.target.value)}
-          placeholder="Nome statistica"
-          autoFocus
-        />
-        <div className="flex items-center gap-1">
+        <div className="flex flex-col gap-1 flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowIconPicker((prev) => !prev)}
+              className="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded border border-slate-600 bg-slate-900/80 hover:border-indigo-400 hover:bg-slate-900/95 transition-colors"
+              title="Scegli icona"
+            >
+              {iconId && lucideStatIcons[iconId] ? (
+                React.createElement(lucideStatIcons[iconId], { className: 'w-4 h-4 text-indigo-200' })
+              ) : (
+                <span className="text-xs text-slate-400">∗</span>
+              )}
+            </button>
+            <input
+              className="flex-1 min-w-0 text-sm rounded bg-[#0c1517] border border-[#475758] px-3 py-1.5 text-[#f5f0dc] placeholder:text-[#556567]"
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              placeholder="Nome statistica"
+              autoFocus
+            />
+          </div>
+          
+          {showIconPicker && (
+            <div className="grid grid-cols-7 gap-1 max-h-32 overflow-y-auto rounded-lg border border-slate-700 bg-slate-900/95 p-2 shadow-[0_12px_30px_rgba(15,23,42,0.9)] z-10 relative">
+              <button
+                type="button"
+                onClick={() => { setIconId(''); setShowIconPicker(false); }}
+                className={`h-7 w-7 flex items-center justify-center rounded border text-slate-400 ${
+                  !iconId ? 'border-indigo-400 bg-indigo-500/30 text-indigo-200' : 'border-slate-700 hover:border-indigo-400 hover:bg-slate-800'
+                }`}
+                title="Nessuna icona"
+              >
+                <span className="text-xs">∅</span>
+              </button>
+              {Object.entries(lucideStatIcons).map(([id, Icon]) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => { setIconId(id); setShowIconPicker(false); }}
+                  className={`h-7 w-7 flex items-center justify-center rounded border text-slate-100 ${
+                    iconId === id
+                      ? 'border-indigo-400 bg-indigo-500/30'
+                      : 'border-slate-700 hover:border-indigo-400 hover:bg-slate-800'
+                  }`}
+                  title={id}
+                >
+                  <Icon className="w-4 h-4" />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center gap-1 flex-shrink-0">
           <button
             type="button"
-            className="w-6 h-6 flex items-center justify-center rounded border border-emerald-400 text-emerald-200 hover:bg-emerald-500/15 text-sm leading-none"
+            className="w-7 h-7 flex items-center justify-center rounded border border-emerald-400/50 text-emerald-200 hover:bg-emerald-500/15 text-sm leading-none transition-colors"
             title="Salva modifiche"
             onClick={handleSave}
           >
-            <span aria-hidden="true">✔</span>
+            <Check className="w-4 h-4" />
             <span className="sr-only">Salva modifiche</span>
           </button>
           <button
             type="button"
-            className="w-6 h-6 flex items-center justify-center rounded border border-[#475758] text-[#aeb8b4] hover:text-amber-200 text-sm leading-none"
+            className="w-7 h-7 flex items-center justify-center rounded border border-[#475758] text-[#aeb8b4] hover:text-amber-200 text-sm leading-none transition-colors"
             title="Annulla"
             onClick={() => setIsConfigMode(false)}
           >
-            <span aria-hidden="true">✖</span>
+            <X className="w-4 h-4" />
             <span className="sr-only">Annulla</span>
           </button>
           {canDelete && (
             <div className="relative">
               <button
                 type="button"
-                className="w-6 h-6 flex items-center justify-center rounded bg-red-900/40 text-red-200 border border-red-500/70 hover:bg-red-800/70 text-sm leading-none"
+                className="w-7 h-7 flex items-center justify-center rounded bg-red-900/30 text-red-300 border border-red-500/50 hover:bg-red-800/50 text-sm leading-none transition-colors"
                 title="Elimina statistica"
                 onClick={() => setShowDeleteConfirm((prev) => !prev)}
               >
-                <span aria-hidden="true">🗑</span>
+                <Trash2 className="w-4 h-4" />
               </button>
               {showDeleteConfirm && (
                 <div className="absolute right-0 top-full mt-1 w-48 rounded-xl border border-red-500/40 bg-[#060b0d]/95 p-3 text-[11px] text-[#f5f0dc] shadow-[0_12px_35px_rgba(0,0,0,0.7)] z-20">
@@ -358,65 +431,67 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
           )}
         </div>
       </div>
-      <div className="flex flex-col gap-2">
-        <label className="flex flex-col text-[10px] text-[#aeb8b4] gap-1">
-          <span>Descrizione (tooltip)</span>
-          <textarea
-            className="w-full rounded bg-[#0c1517] border border-[#475758] px-3 py-1.5 text-[11px] text-[#f5f0dc] resize-none placeholder:text-[#556567]"
-            rows={2}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Testo tooltip"
+
+      <label className="flex flex-col text-[10px] text-[#aeb8b4] gap-1">
+        <span>Descrizione (tooltip)</span>
+        <textarea
+          className="w-full rounded bg-[#0c1517] border border-[#475758] px-3 py-1.5 text-[11px] text-[#f5f0dc] resize-none placeholder:text-[#556567]"
+          rows={2}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Testo tooltip"
+        />
+      </label>
+
+      <div className="grid grid-cols-2 gap-2">
+        <label className="flex flex-col gap-0.5">
+          <span className="text-[10px] text-[#8aa0a1]">Min</span>
+          <input
+            type="number"
+            className="w-full rounded bg-[#0c1517] border border-[#475758] px-2 py-1 text-[11px] text-[#f5f0dc]"
+            value={min}
+            onChange={(e) => setMin(Number(e.target.value))}
           />
         </label>
-        <div className="flex flex-wrap items-center gap-2 text-[11px] text-[#f5f0dc]">
-          <label className="flex items-center gap-1">
-            <span className="text-[#8aa0a1]">Min</span>
-            <input
-              type="number"
-              className="w-16 rounded bg-[#0c1517] border border-[#475758] px-2 py-1 text-[11px] text-[#f5f0dc]"
-              value={min}
-              onChange={(e) => setMin(Number(e.target.value))}
-            />
-          </label>
-          <label className="flex items-center gap-1">
-            <span className="text-[#8aa0a1]">Max</span>
-            <input
-              type="number"
-              className="w-16 rounded bg-[#0c1517] border border-[#475758] px-2 py-1 text-[11px] text-[#f5f0dc]"
-              value={max}
-              onChange={(e) => setMax(Number(e.target.value))}
-            />
-          </label>
-          <label className="flex items-center gap-1">
-            <span className="text-[#8aa0a1]">Step</span>
-            <input
-              type="number"
-              className="w-16 rounded bg-[#0c1517] border border-[#475758] px-2 py-1 text-[11px] text-[#f5f0dc]"
-              value={step}
-              onChange={(e) => setStep(Number(e.target.value))}
-            />
-          </label>
-          <label className="flex items-center gap-1">
-            <span className="text-[#8aa0a1]">Weight</span>
-            <input
-              type="number"
-              className="w-16 rounded bg-[#0c1517] border border-[#475758] px-2 py-1 text-[11px] text-[#f5f0dc]"
-              value={weight}
-              onChange={(e) => setWeight(Number(e.target.value))}
-            />
-          </label>
-          <label className="flex items-center gap-1">
-            <input
-              type="checkbox"
-              className="w-3 h-3 rounded border-[#475758] bg-[#0c1517]"
-              checked={isDerived}
-              onChange={(e) => setIsDerived(e.target.checked)}
-            />
-            <span className="text-[#8aa0a1]">Derived</span>
-          </label>
-        </div>
+        <label className="flex flex-col gap-0.5">
+          <span className="text-[10px] text-[#8aa0a1]">Max</span>
+          <input
+            type="number"
+            className="w-full rounded bg-[#0c1517] border border-[#475758] px-2 py-1 text-[11px] text-[#f5f0dc]"
+            value={max}
+            onChange={(e) => setMax(Number(e.target.value))}
+          />
+        </label>
+        <label className="flex flex-col gap-0.5">
+          <span className="text-[10px] text-[#8aa0a1]">Step</span>
+          <input
+            type="number"
+            className="w-full rounded bg-[#0c1517] border border-[#475758] px-2 py-1 text-[11px] text-[#f5f0dc]"
+            value={step}
+            onChange={(e) => setStep(Number(e.target.value))}
+          />
+        </label>
+        <label className="flex flex-col gap-0.5">
+          <span className="text-[10px] text-[#8aa0a1]">Weight</span>
+          <input
+            type="number"
+            className="w-full rounded bg-[#0c1517] border border-[#475758] px-2 py-1 text-[11px] text-[#f5f0dc]"
+            value={weight}
+            onChange={(e) => setWeight(Number(e.target.value))}
+          />
+        </label>
       </div>
+
+      <label className="flex items-center gap-2 py-1">
+        <input
+          type="checkbox"
+          className="w-3.5 h-3.5 rounded border-[#475758] bg-[#0c1517] text-indigo-500 focus:ring-offset-0 focus:ring-1 focus:ring-indigo-500/50"
+          checked={isDerived}
+          onChange={(e) => setIsDerived(e.target.checked)}
+        />
+        <span className="text-[11px] text-[#aeb8b4]">Valore derivato da formula</span>
+      </label>
+
       {isDerived && (
         <div className="mt-1">
           <p className="text-[10px] uppercase tracking-[0.4em] text-amber-300 mb-1">Formula</p>

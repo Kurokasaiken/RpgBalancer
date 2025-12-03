@@ -106,13 +106,32 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, simValues, onSi
 
   return (
     <div
-      className={`rounded-2xl border border-indigo-500/40 bg-slate-900/60 backdrop-blur-md p-2.5 shadow-[0_18px_36px_rgba(15,23,42,0.9)] flex flex-col gap-2 transition-all ${
+      className={`rounded-2xl border border-indigo-500/40 p-2.5 shadow-[0_18px_36px_rgba(15,23,42,0.9)] flex flex-col gap-2 transition-all relative overflow-hidden ${
         isEditingHeader
           ? 'ring-2 ring-indigo-400/40 border-indigo-400/70 shadow-[0_0_25px_rgba(129,140,248,0.6)]'
           : 'hover:border-indigo-400/60 hover:shadow-[0_0_18px_rgba(129,140,248,0.45)]'
       }`}
     >
-      <div className="flex items-start gap-2 pb-1.5 border-b border-slate-700/60">
+      {/* Arcane Glass Background - CSS radial gradient + spin */}
+      <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-md -z-30" />
+      <div
+        className="absolute -top-16 -left-20 w-[160%] h-[160%] opacity-50 blur-xl -z-20 pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(circle at 0% 0%, rgba(129,140,248,0.9) 0, transparent 55%), radial-gradient(circle at 120% 120%, rgba(56,189,248,0.85) 0, transparent 60%)',
+          animation: 'spin 55s linear infinite',
+        }}
+      />
+      <div
+        className="absolute -bottom-12 -right-16 w-[150%] h-[150%] opacity-45 blur-2xl -z-10 pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(circle at 100% 0%, rgba(192,132,252,0.9) 0, transparent 55%), radial-gradient(circle at -10% 110%, rgba(56,189,248,0.7) 0, transparent 60%)',
+          animation: 'spin 75s linear infinite reverse',
+        }}
+      />
+
+      <div className="flex items-start gap-2 pb-1.5 border-b border-slate-700/60 relative z-10">
         {dragHandleProps && (
           <button
             type="button"
