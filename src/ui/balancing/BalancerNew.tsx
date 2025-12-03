@@ -6,6 +6,7 @@ import type { CardDefinition, StatDefinition } from '../../balancing/config/type
 import { useBalancerConfig } from '../../balancing/hooks/useBalancerConfig';
 import { ConfigurableCard } from './ConfigurableCard';
 import { ConfigToolbar } from './ConfigToolbar';
+import { Sparkles } from 'lucide-react';
 
 interface SortableCardProps {
   card: CardDefinition;
@@ -112,6 +113,8 @@ export const BalancerNew: React.FC = () => {
 
   const cards = Object.values(config.cards).sort((a, b) => a.order - b.order);
   const allStatIds = Object.keys(config.stats);
+  const visibleCards = cards.filter((card) => !card.isHidden);
+  const hiddenCards = cards.filter((card) => card.isHidden);
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
@@ -156,37 +159,25 @@ export const BalancerNew: React.FC = () => {
   };
 
   return (
-    <div className="min-h-full bg-gradient-to-br from-[#050509] via-[#0f1a1d] to-[#132427] text-[#f0efe4] p-4">
-      <div className="max-w-6xl mx-auto space-y-3">
+    <div className="relative min-h-full px-4 py-4 bg-[radial-gradient(circle_at_top,_#1f2937_0,_#020617_55%,_#000000_100%)] text-[#e2e8f0] overflow-hidden">
+      {/* Subtle animated glow/stars */}
+      <div className="pointer-events-none absolute inset-0 opacity-40">
+        <div className="absolute -top-32 -left-32 w-72 h-72 rounded-full bg-[radial-gradient(circle,_rgba(129,140,248,0.35)_0,transparent_60%)] blur-3xl animate-pulse" />
+        <div className="absolute bottom-[-6rem] right-[-4rem] w-80 h-80 rounded-full bg-[radial-gradient(circle,_rgba(56,189,248,0.3)_0,transparent_65%)] blur-3xl animate-[ping_12s_linear_infinite]" />
+      </div>
+
+      <div className="relative max-w-6xl mx-auto space-y-3">
         <header className="flex items-center justify-between gap-2">
-          <h1 className="text-3xl font-display text-[#f6f3e4]">Balancer</h1>
+          <div className="flex flex-col">
+            <h1 className="flex items-center gap-2 text-3xl font-semibold tracking-[0.3em] uppercase text-indigo-200 drop-shadow-[0_0_14px_rgba(129,140,248,0.9)]">
+              <Sparkles className="w-6 h-6 text-cyan-300 drop-shadow-[0_0_10px_rgba(56,189,248,0.8)]" />
+              <span>Balancer</span>
+            </h1>
+            <p className="mt-1 text-[10px] text-slate-400 uppercase tracking-[0.26em]">
+              Arcane Tech Glass · Config-Driven
+            </p>
+          </div>
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                if (resetConfirmPending) {
-                  resetToInitialConfig();
-                  // Reset simValues to defaults
-                  const newSimValues: Record<string, number> = {};
-                  Object.entries(config.stats).forEach(([id, stat]) => {
-                    newSimValues[id] = stat.defaultValue;
-                  });
-                  setSimValues(newSimValues);
-                  setResetConfirmPending(false);
-                } else {
-                  setResetConfirmPending(true);
-                  setTimeout(() => setResetConfirmPending(false), 3000);
-                }
-              }}
-              className={`px-3 py-2 rounded border text-xs tracking-[0.3em] uppercase transition-colors ${
-                resetConfirmPending 
-                  ? 'border-red-400 text-red-100 bg-red-500/20 animate-pulse' 
-                  : 'border-red-500/60 text-red-200 hover:bg-red-500/10'
-              }`}
-              title={resetConfirmPending ? 'Clicca di nuovo per confermare' : 'Reset all to initial state'}
-            >
-              {resetConfirmPending ? '⚠ Conferma Reset' : '↺ Reset All'}
-            </button>
             <button
               type="button"
               onClick={handleAddCard}
@@ -199,11 +190,30 @@ export const BalancerNew: React.FC = () => {
 
         <ConfigToolbar />
 
-        <div className="rounded-2xl border border-[#384444] bg-[#0d181b]/80 p-4 shadow-[0_15px_45px_rgba(0,0,0,0.55)]">
+        {/* Hidden cards row */}
+        {hiddenCards.length > 0 && (
+          <div className="mb-3 flex flex-wrap items-center gap-1.5 text-[10px]">
+            <span className="mr-2 uppercase tracking-[0.22em] text-slate-400">Cards nascoste</span>
+            {hiddenCards.map((card) => (
+              <button
+                key={card.id}
+                type="button"
+                onClick={() => updateCard(card.id, { isHidden: false })}
+                className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-slate-600/70 bg-slate-900/60 text-slate-200 hover:border-indigo-400/80 hover:text-indigo-100 hover:bg-slate-900/90 transition-colors"
+                title="Mostra card"
+              >
+                <span aria-hidden className="text-xs">{card.icon || '🂠'}</span>
+                <span className="text-[10px] tracking-[0.18em] uppercase truncate max-w-[7rem]">{card.title}</span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div className="rounded-2xl border border-indigo-500/30 bg-slate-900/60 backdrop-blur-md p-4 shadow-[0_18px_45px_rgba(15,23,42,0.9)]">
           <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={cards.map((c) => c.id)} strategy={verticalListSortingStrategy}>
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                {cards.map((card) => (
+              <div className="grid gap-2.5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
+                {visibleCards.map((card) => (
                   <SortableCard
                     key={card.id}
                     card={card}

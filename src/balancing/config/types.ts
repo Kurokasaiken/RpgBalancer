@@ -14,6 +14,7 @@ export interface StatDefinition {
   bgColor?: string;
   isLocked?: boolean;
   isHidden?: boolean;
+  icon?: string;
 }
 
 export interface CardDefinition {

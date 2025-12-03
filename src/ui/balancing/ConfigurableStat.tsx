@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, type ComponentType } from 'react';
 import type { StatDefinition } from '../../balancing/config/types';
 import { FormulaEditor } from './FormulaEditor';
 import { executeFormula } from '../../balancing/config/FormulaEngine';
+import { Flame, Shield, Sword, Heart, Target, Sparkles } from 'lucide-react';
 
 const statGlyphMap: Record<string, string> = {
   hp: '❤',
@@ -30,6 +31,15 @@ const statGlyphMap: Record<string, string> = {
   earlyImpact: '⚡',
 };
 
+const lucideIconMap: Record<string, ComponentType<{ className?: string }>> = {
+  flame: Flame,
+  shield: Shield,
+  sword: Sword,
+  heart: Heart,
+  target: Target,
+  sparkles: Sparkles,
+};
+
 interface Props {
   stat: StatDefinition;
   simValue: number;
@@ -54,6 +64,10 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
   const [isDerived, setIsDerived] = useState(stat.isDerived);
   const [formula, setFormula] = useState(stat.formula || '');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [iconId, setIconId] = useState<string>(stat.icon ?? '');
+  const [showIconPicker, setShowIconPicker] = useState(false);
+
+  const EffectiveIcon = stat.icon ? lucideIconMap[stat.icon] : undefined;
   const glyph = statGlyphMap[stat.id] ?? '◆';
   
   // For derived stats, calculate value from formula; otherwise use simValue
@@ -73,6 +87,8 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
       setWeight(stat.weight);
       setIsDerived(stat.isDerived);
       setFormula(stat.formula || '');
+      setIconId(stat.icon ?? '');
+      setShowIconPicker(false);
     }
   }, [stat, isConfigMode]);
 
@@ -97,6 +113,9 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
     } else if (stat.isDerived) {
       updates.formula = undefined;
     }
+    if ((iconId || undefined) !== (stat.icon || undefined)) {
+      updates.icon = iconId || undefined;
+    }
     if (Object.keys(updates).length > 0) {
       onUpdate(updates);
     }
@@ -118,10 +137,15 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
   if (!isConfigMode) {
     if (isHidden) {
       return (
-        <div className="flex items-center justify-between text-xs py-2 px-3 rounded-xl border border-[#3b4a4a] bg-gradient-to-br from-[#060b0d]/90 to-[#040708]/80 gap-2 opacity-70">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="text-base text-amber-400 leading-none" aria-hidden="true">{glyph}</span>
-            <span className="text-[#aeb8b4] truncate text-[11px]">{stat.label}</span>
+        <div className="flex items-center justify-between text-xs py-2 px-3 rounded-xl border border-slate-700/70 bg-slate-900/70 backdrop-blur-sm gap-2 opacity-70">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span
+              className="text-sm text-amber-400 leading-none flex-shrink-0 h-4 flex items-center justify-center"
+              aria-hidden="true"
+            >
+              {glyph}
+            </span>
+            <span className="text-[11px] text-[#aeb8b4] truncate leading-none">{stat.label}</span>
           </div>
           <button
             type="button"
@@ -136,33 +160,87 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
       );
     }
     return (
-      <div className="flex items-center justify-between text-xs py-2 px-3 rounded-xl border border-[#3b4a4a] bg-gradient-to-br from-[#0c181b]/90 to-[#060b0d]/80 gap-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+      <div className="flex items-center justify-between text-xs py-2 px-3 rounded-xl border border-slate-700/70 bg-slate-900/70 backdrop-blur-sm gap-1.5 shadow-[0_10px_24px_rgba(15,23,42,0.85)]">
         <div className="flex flex-col flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
-            <span
-              className="text-sm text-amber-200 leading-none flex-shrink-0 h-4 flex items-center justify-center"
-              aria-hidden="true"
-            >
-              {glyph}
-            </span>
-            <div className="relative group flex-1 min-w-0">
-              <span className="font-medium text-sm text-[#f6f3e4] truncate cursor-help leading-none">
-                {stat.label}
-              </span>
-              {stat.description && (
-                <div className="pointer-events-none absolute left-0 top-full mt-1 w-48 rounded-md bg-[#0c1517] border border-[#c7b996]/40 px-2 py-1 text-[10px] text-[#f6f3e4] opacity-0 transition-opacity duration-200 group-hover:opacity-100 z-10">
-                  {stat.description}
-                </div>
+            <div className="flex items-center gap-1.5 min-w-0 flex-1">
+              {EffectiveIcon ? (
+                <EffectiveIcon className="w-4 h-4 text-indigo-200" aria-hidden />
+              ) : (
+                <span
+                  className="text-sm text-amber-200 leading-none flex-shrink-0 h-4 flex items-center justify-center"
+                  aria-hidden="true"
+                >
+                  {glyph}
+                </span>
               )}
+              <div className="relative group flex-1 min-w-0">
+                <span className="font-medium text-[11px] tracking-[0.12em] uppercase text-slate-100 truncate cursor-help leading-none">
+                  {stat.label}
+                </span>
+                {stat.description && (
+                  <div className="pointer-events-none absolute left-0 top-full mt-1 w-48 rounded-md bg-[#0c1517] border border-[#c7b996]/40 px-2 py-1 text-[10px] text-[#f6f3e4] opacity-0 transition-opacity duration-200 group-hover:opacity-100 z-10">
+                    {stat.description}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center gap-1 flex-shrink-0 ml-1">
+              <button
+                type="button"
+                className={`w-5 h-5 flex items-center justify-center rounded transition-colors leading-none ${
+                  isLocked ? 'text-slate-500' : 'text-indigo-300 hover:text-indigo-100'
+                }`}
+                title={isLocked ? 'Sblocca stat' : 'Blocca stat'}
+                onClick={handleToggleLock}
+              >
+                <span aria-hidden="true" className="text-[11px]">{isLocked ? '🔒' : '🔓'}</span>
+                <span className="sr-only">{isLocked ? 'Sblocca' : 'Blocca'}</span>
+              </button>
+              <button
+                type="button"
+                className={`w-5 h-5 flex items-center justify-center rounded transition-colors leading-none ${
+                  onReset ? 'text-cyan-300 hover:text-cyan-100' : 'text-slate-600 cursor-not-allowed'
+                }`}
+                title="Reset"
+                onClick={() => {
+                  if (onReset) {
+                    onReset();
+                    onSimValueChange(stat.defaultValue);
+                  }
+                }}
+                disabled={!onReset}
+              >
+                <span aria-hidden="true" className="text-[11px]">↺</span>
+                <span className="sr-only">Reset</span>
+              </button>
+              <button
+                type="button"
+                className="w-5 h-5 flex items-center justify-center rounded text-indigo-300 hover:text-indigo-100 transition-colors leading-none"
+                title="Modifica stat"
+                onClick={() => setIsConfigMode(true)}
+              >
+                <span aria-hidden="true" className="text-[11px]">✎</span>
+                <span className="sr-only">Modifica statistica</span>
+              </button>
+              <button
+                type="button"
+                className="w-5 h-5 flex items-center justify-center rounded text-[#c9a227] hover:text-[#e6c547] transition-colors leading-none"
+                title={isHidden ? 'Mostra stat' : 'Nascondi stat'}
+                onClick={handleToggleHidden}
+              >
+                <span aria-hidden="true" className="text-[11px]">👁</span>
+                <span className="sr-only">Nascondi</span>
+              </button>
             </div>
           </div>
           <div className="mt-1.5 flex items-center gap-1.5">
             <button
               type="button"
-              className={`w-6 h-6 flex items-center justify-center rounded border bg-[#1a1410]/70 transition-colors ${
+              className={`w-6 h-6 flex items-center justify-center rounded border bg-slate-900/80 transition-colors ${
                 isLocked
-                  ? 'border-[#555555] text-[#555555] cursor-not-allowed'
-                  : 'border-[#9d7d5c] text-[#c9a227] hover:bg-[#2a2015]'
+                  ? 'border-slate-600 text-slate-600 cursor-not-allowed'
+                  : 'border-indigo-500/70 text-indigo-200 hover:bg-indigo-500/20'
               }`}
               onClick={() => {
                 if (isLocked || stat.isDerived) return;
@@ -174,7 +252,7 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
             </button>
             <input
               type="range"
-              className="flex-1 h-2 rounded-full appearance-none cursor-pointer slider-bronze"
+              className="flex-1 h-2 rounded-full appearance-none cursor-pointer"
               min={stat.min}
               max={stat.max}
               step={stat.step}
@@ -185,7 +263,7 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
               }}
               disabled={isLocked || stat.isDerived}
               style={{
-                background: `linear-gradient(to right, #a0826d 0%, #a0826d ${sliderProgress}%, #1a1410 ${sliderProgress}%, #1a1410 100%)`,
+                background: `linear-gradient(to right, #4f46e5 0%, #22d3ee ${sliderProgress}%, #020617 ${sliderProgress}%, #020617 100%)`,
               }}
             />
             <button
@@ -203,58 +281,10 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
             >
               +
             </button>
-            <span className="w-10 text-right text-[10px] text-[#f5f0dc] font-mono">
+            <span className="w-10 text-right text-[10px] text-cyan-200 font-mono">
               {displayValue.toFixed(stat.step < 1 ? 1 : 0)}
             </span>
           </div>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            className={`w-5 h-5 flex items-center justify-center rounded transition-colors leading-none ${
-              isLocked ? 'text-[#9d7d5c]' : 'text-[#c9a227] hover:text-[#e6c547]'
-            }`}
-            title={isLocked ? 'Sblocca stat' : 'Blocca stat'}
-            onClick={handleToggleLock}
-          >
-            <span aria-hidden="true" className="text-sm">{isLocked ? '🔒' : '🔓'}</span>
-            <span className="sr-only">{isLocked ? 'Sblocca' : 'Blocca'}</span>
-          </button>
-          <button
-            type="button"
-            className={`w-5 h-5 flex items-center justify-center rounded transition-colors leading-none ${
-              onReset ? 'text-[#c9a227] hover:text-[#e6c547]' : 'text-[#4b4f4f] cursor-not-allowed'
-            }`}
-            title="Reset"
-            onClick={() => {
-              if (onReset) {
-                onReset();
-                onSimValueChange(stat.defaultValue);
-              }
-            }}
-            disabled={!onReset}
-          >
-            <span aria-hidden="true" className="text-sm">↺</span>
-            <span className="sr-only">Reset</span>
-          </button>
-          <button
-            type="button"
-            className="w-5 h-5 flex items-center justify-center rounded text-[#c9a227] hover:text-[#e6c547] transition-colors leading-none"
-            title="Modifica stat"
-            onClick={() => setIsConfigMode(true)}
-          >
-            <span aria-hidden="true" className="text-sm">✎</span>
-            <span className="sr-only">Modifica statistica</span>
-          </button>
-          <button
-            type="button"
-            className="w-5 h-5 flex items-center justify-center rounded text-[#c9a227] hover:text-[#e6c547] transition-colors leading-none"
-            title={isHidden ? 'Mostra stat' : 'Nascondi stat'}
-            onClick={handleToggleHidden}
-          >
-            <span aria-hidden="true" className="text-sm">👁</span>
-            <span className="sr-only">Nascondi</span>
-          </button>
         </div>
       </div>
     );
@@ -262,7 +292,7 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
 
   // === CONFIG VIEW ===
   return (
-    <div className="flex flex-col text-xs py-3 px-3 rounded-xl border border-[#3b4a4a] bg-gradient-to-br from-[#0c181b]/90 to-[#060b0d]/80 gap-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+    <div className="flex flex-col text-xs py-3 px-3 rounded-xl border border-slate-700/70 bg-slate-900/75 backdrop-blur-sm gap-2 shadow-[0_10px_24px_rgba(15,23,42,0.85)]">
       <div className="flex items-start gap-2">
         <input
           className="flex-1 text-sm rounded bg-[#0c1517] border border-[#475758] px-3 py-1.5 text-[#f5f0dc] placeholder:text-[#556567]"

@@ -106,11 +106,13 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, simValues, onSi
 
   return (
     <div
-      className={`rounded-2xl border border-[#384444] bg-gradient-to-br from-[#101e22] via-[#0c1a1c] to-[#050b0f] p-2.5 shadow-[0_16px_32px_rgba(0,0,0,0.55)] flex flex-col gap-2 transition-all ${
-        isEditingHeader ? 'ring-2 ring-amber-400/40 border-amber-400/60' : 'hover:border-amber-400/40'
+      className={`rounded-2xl border border-indigo-500/40 bg-slate-900/60 backdrop-blur-md p-2.5 shadow-[0_18px_36px_rgba(15,23,42,0.9)] flex flex-col gap-2 transition-all ${
+        isEditingHeader
+          ? 'ring-2 ring-indigo-400/40 border-indigo-400/70 shadow-[0_0_25px_rgba(129,140,248,0.6)]'
+          : 'hover:border-indigo-400/60 hover:shadow-[0_0_18px_rgba(129,140,248,0.45)]'
       }`}
     >
-      <div className="flex items-start gap-2 pb-1.5 border-b border-amber-400/15">
+      <div className="flex items-start gap-2 pb-1.5 border-b border-slate-700/60">
         {dragHandleProps && (
           <button
             type="button"
@@ -192,9 +194,9 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, simValues, onSi
                 </div>
               </div>
             ) : (
-              <div className="flex items-center gap-2 min-w-0 group relative">
-                <span className="text-lg drop-shadow-[0_0_8px_rgba(0,0,0,0.55)]" aria-hidden="true">{displayIcon}</span>
-                <p className="text-base font-display text-[#f5f0dc] truncate cursor-help" style={displayStyle}>
+              <div className="flex items-center gap-1.5 min-w-0 group relative">
+                <span className="text-base text-indigo-200 drop-shadow-[0_0_10px_rgba(129,140,248,0.8)]" aria-hidden="true">{displayIcon}</span>
+                <p className="text-[11px] font-semibold tracking-[0.18em] uppercase text-slate-100 truncate cursor-help" style={displayStyle}>
                   {card.title}
                 </p>
                 <div className="pointer-events-none absolute left-0 top-full mt-1 w-48 rounded-md bg-[#0c1517] border border-[#c7b996]/40 px-2 py-1 text-[10px] text-[#f6f3e4] opacity-0 transition-opacity duration-200 group-hover:opacity-100 z-10 whitespace-normal">

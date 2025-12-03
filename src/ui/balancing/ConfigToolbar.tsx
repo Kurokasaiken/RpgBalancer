@@ -6,7 +6,6 @@ export const ConfigToolbar: React.FC = () => {
   const {
     undo,
     canUndo,
-    resetToInitialConfig,
     exportConfig,
     importConfig,
   } = useBalancerConfig();
@@ -64,53 +63,54 @@ export const ConfigToolbar: React.FC = () => {
 
   return (
     <>
-      <div className="flex flex-wrap items-center gap-2 mb-4 px-3 py-2 rounded-lg border border-slate-700 bg-slate-900/70 text-xs">
-        <button
-          type="button"
-          onClick={undo}
-          disabled={!canUndo}
-          className={`px-2 py-1 rounded border ${
-            canUndo
-              ? 'border-amber-400 text-amber-200 hover:bg-amber-500/10'
-              : 'border-slate-600 text-slate-500 cursor-not-allowed'
-          }`}
-        >
-          ↺ Undo
-        </button>
-        <button
-          type="button"
-          onClick={resetToInitialConfig}
-          className="px-2 py-1 rounded border border-red-500/60 text-red-200 hover:bg-red-500/10"
-        >
-          Reset Defaults
-        </button>
-        <span className="mx-2 h-4 w-px bg-slate-700" />
-        <button
-          type="button"
-          onClick={handleExport}
-          className="px-2 py-1 rounded border border-emerald-500/60 text-emerald-200 hover:bg-emerald-500/10"
-        >
-          ⭳ Export
-        </button>
-        <button
-          type="button"
-          onClick={handleImportClick}
-          className="px-2 py-1 rounded border border-cyan-500/60 text-cyan-200 hover:bg-cyan-500/10"
-        >
-          ⭱ Import
-        </button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="application/json"
-          className="hidden"
-          onChange={handleImportChange}
-        />
-        <span className="ml-auto text-[10px] text-slate-400 uppercase tracking-[0.2em]">
+      <div className="mb-4 rounded-2xl border border-[#384444] bg-gradient-to-r from-[#0b181b]/85 via-[#081013]/90 to-[#0b181b]/85 px-3 py-2 shadow-[0_10px_30px_rgba(0,0,0,0.6)] text-[10px] flex flex-wrap items-center gap-2">
+        {/* Left label */}
+        <span className="text-[9px] text-[#808a83] uppercase tracking-[0.22em]">
           Config-Driven Balancer · Editor
         </span>
+
+        {/* Right group: undo / export / import */}
+        <div className="ml-auto flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={undo}
+            disabled={!canUndo}
+            className={`inline-flex items-center gap-1 px-2 py-1 rounded-full border transition-colors ${
+              canUndo
+                ? 'border-amber-400/70 text-amber-200 hover:bg-amber-500/15'
+                : 'border-[#2b3434] text-[#4b5555] cursor-not-allowed'
+            }`}
+          >
+            <span aria-hidden className="text-xs">↺</span>
+            <span className="tracking-[0.18em] uppercase">Undo</span>
+          </button>
+          <button
+            type="button"
+            onClick={handleExport}
+            className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-emerald-500/70 text-emerald-200 hover:bg-emerald-500/15 transition-colors"
+          >
+            <span aria-hidden className="text-xs">⭳</span>
+            <span className="tracking-[0.18em] uppercase">Export</span>
+          </button>
+          <button
+            type="button"
+            onClick={handleImportClick}
+            className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-cyan-500/70 text-cyan-200 hover:bg-cyan-500/15 transition-colors"
+          >
+            <span aria-hidden className="text-xs">⭱</span>
+            <span className="tracking-[0.18em] uppercase">Import</span>
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/json"
+            className="hidden"
+            onChange={handleImportChange}
+          />
+        </div>
       </div>
       <ToastContainer toasts={toasts} onRemove={removeToast} />
     </>
   );
-};
+}
+;
