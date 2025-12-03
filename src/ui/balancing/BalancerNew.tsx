@@ -83,6 +83,7 @@ export const BalancerNew: React.FC = () => {
 
   const [lastCreatedStatId, setLastCreatedStatId] = useState<string | null>(null);
   const [lastCreatedCardId, setLastCreatedCardId] = useState<string | null>(null);
+  const [resetConfirmPending, setResetConfirmPending] = useState(false);
   
   // Simulation values - initialized from config defaults
   const [simValues, setSimValues] = useState<Record<string, number>>(() => {
@@ -165,14 +166,28 @@ export const BalancerNew: React.FC = () => {
             <button
               type="button"
               onClick={() => {
-                if (window.confirm('Resettare tutte le configurazioni ai valori di default?')) {
+                if (resetConfirmPending) {
                   resetToInitialConfig();
+                  // Reset simValues to defaults
+                  const newSimValues: Record<string, number> = {};
+                  Object.entries(config.stats).forEach(([id, stat]) => {
+                    newSimValues[id] = stat.defaultValue;
+                  });
+                  setSimValues(newSimValues);
+                  setResetConfirmPending(false);
+                } else {
+                  setResetConfirmPending(true);
+                  setTimeout(() => setResetConfirmPending(false), 3000);
                 }
               }}
-              className="px-3 py-2 rounded border border-red-500/60 text-red-200 text-xs tracking-[0.3em] uppercase hover:bg-red-500/10 transition-colors"
-              title="Reset all to initial state"
+              className={`px-3 py-2 rounded border text-xs tracking-[0.3em] uppercase transition-colors ${
+                resetConfirmPending 
+                  ? 'border-red-400 text-red-100 bg-red-500/20 animate-pulse' 
+                  : 'border-red-500/60 text-red-200 hover:bg-red-500/10'
+              }`}
+              title={resetConfirmPending ? 'Clicca di nuovo per confermare' : 'Reset all to initial state'}
             >
-              ↺ Reset All
+              {resetConfirmPending ? '⚠ Conferma Reset' : '↺ Reset All'}
             </button>
             <button
               type="button"
