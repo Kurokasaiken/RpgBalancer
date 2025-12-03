@@ -12,11 +12,15 @@ import React, { useState } from 'react';
 import { ArchetypeRegistry } from '../../../balancing/archetype/ArchetypeRegistry';
 import { DEFAULT_ARCHETYPES } from '../../../balancing/archetype/constants';
 import type { ArchetypeTemplate } from '../../../balancing/archetype/types';
-import { ArchetypeList } from './ArchetypeList';
 import { ArchetypeBuilder } from './ArchetypeBuilder';
 import { ArchetypeDetail } from './ArchetypeDetail';
-import { GlassButton } from '../../../ui/atoms/GlassButton';
-import { GlassCard } from '../../../ui/atoms/GlassCard';
+import {
+    gildedPageBg,
+    gildedSurface,
+    gildedCard,
+    gildedLabel,
+    gildedDivider
+} from './gildedTheme';
 
 type ViewMode = 'list' | 'builder' | 'detail';
 
@@ -79,17 +83,28 @@ export const ArchetypeManager: React.FC = () => {
         reader.readAsText(file);
     };
 
+    const actionButton =
+        'rounded-2xl border border-[#3b4b4d] px-4 py-2 text-sm font-semibold text-[#f0efe4] hover:border-[#c9a227]/60 hover:text-[#c9a227] transition-colors';
+
+    const subtleButton =
+        'rounded-2xl border border-transparent px-4 py-2 text-sm text-[#aeb8b4] hover:text-[#f0efe4] hover:border-[#3b4b4d] transition-colors';
+
     // Render based on view mode
     switch (viewMode) {
         case 'builder':
             return (
-                <div>
-                    <div className="p-6">
-                        <GlassButton onClick={() => setViewMode('list')} variant="ghost">
-                            ← Back to List
-                        </GlassButton>
+                <div className={`${gildedPageBg} min-h-screen`}>
+                    <div className="max-w-6xl mx-auto py-6">
+                        <button
+                            onClick={() => setViewMode('list')}
+                            className={`${subtleButton} inline-flex items-center gap-2`}
+                        >
+                            ← Torna alla lista
+                        </button>
+                        <div className="mt-6">
+                            <ArchetypeBuilder />
+                        </div>
                     </div>
-                    <ArchetypeBuilder />
                 </div>
             );
 
@@ -103,85 +118,87 @@ export const ArchetypeManager: React.FC = () => {
                     onClose={() => setViewMode('list')}
                 />
             ) : (
-                <div className="p-6">
-                    <GlassCard>
-                        <p>Archetype not found</p>
-                        <GlassButton onClick={() => setViewMode('list')}>
-                            Back to List
-                        </GlassButton>
-                    </GlassCard>
+                <div className={`${gildedPageBg} min-h-screen`}>
+                    <div className="max-w-4xl mx-auto py-10">
+                        <div className={`${gildedSurface} text-center space-y-4`}>
+                            <p className="text-[#f6f3e4] text-lg">Archetipo non trovato</p>
+                            <button onClick={() => setViewMode('list')} className={actionButton}>
+                                Torna alla lista
+                            </button>
+                        </div>
+                    </div>
                 </div>
             );
 
         case 'list':
         default:
             return (
-                <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-950 p-6">
-                    <div className="max-w-7xl mx-auto">
-                        <GlassCard variant="neon" className="mb-6">
-                            <div className="flex justify-between items-center">
-                                <div>
-                                    <h1 className="text-3xl font-bold text-cyan-100 mb-2">Archetype Manager</h1>
-                                    <p className="text-gray-400">{registry.count} archetypes loaded</p>
-                                </div>
-
-                                <div className="flex gap-3">
-                                    <GlassButton onClick={() => setViewMode('builder')} variant="primary">
-                                        + Create New
-                                    </GlassButton>
-                                    <GlassButton onClick={handleExportAll} variant="secondary">
-                                        Export All
-                                    </GlassButton>
-                                    <label>
-                                        <GlassButton variant="secondary" as="span">
-                                            Import
-                                        </GlassButton>
-                                        <input
-                                            type="file"
-                                            accept=".json"
-                                            onChange={handleImport}
-                                            className="hidden"
-                                        />
-                                    </label>
-                                </div>
+                <div className={`${gildedPageBg} min-h-screen`}>
+                    <div className="max-w-6xl mx-auto space-y-8">
+                        <header className={`${gildedSurface} flex flex-col gap-6 md:flex-row md:items-center md:justify-between`}>
+                            <div>
+                                <p className={gildedLabel}>Archetype Registry</p>
+                                <h1 className="text-4xl font-display text-[#f6f3e4] mt-3">Archetype Manager</h1>
+                                <p className="text-sm text-[#aeb8b4] mt-2">
+                                    {registry.count} archetipi caricati · CRUD completo + export JSON
+                                </p>
                             </div>
-                        </GlassCard>
+                            <div className="flex flex-wrap gap-3">
+                                <button onClick={() => setViewMode('builder')} className={`${actionButton} bg-[#c9a227]/10`}>
+                                    + Nuovo Archetipo
+                                </button>
+                                <button onClick={handleExportAll} className={actionButton}>
+                                    Export JSON
+                                </button>
+                                <label className={`${actionButton} cursor-pointer`}>Import
+                                    <input
+                                        type="file"
+                                        accept=".json"
+                                        onChange={handleImport}
+                                        className="hidden"
+                                    />
+                                </label>
+                            </div>
+                        </header>
 
-                        {/* Pass handleViewArchetype to ArchetypeList */}
-                        <div className="space-y-6">
+                        <div className={`${gildedCard} text-sm text-[#aeb8b4]`}>Seleziona un archetipo per aprire il dettaglio.</div>
+
+                        <div className="space-y-5">
                             {registry.listAll().map(archetype => (
-                                <GlassCard
+                                <div
                                     key={archetype.id}
-                                    interactive
+                                    className={`${gildedCard} cursor-pointer transition-all hover:border-[#c9a227]/40`}
                                     onClick={() => handleViewArchetype(archetype)}
-                                    className="cursor-pointer hover:border-cyan-500/30"
                                 >
-                                    <div className="flex justify-between items-start">
+                                    <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                                         <div>
                                             <div className="flex items-center gap-3 mb-2">
-                                                <h3 className="text-xl font-bold text-cyan-100">{archetype.name}</h3>
-                                                <span className="px-2 py-1 rounded text-xs font-medium bg-cyan-500/20 text-cyan-400">
-                                                    {archetype.category}
+                                                <h3 className="text-2xl font-display text-[#f6f3e4]">{archetype.name}</h3>
+                                                <span className="rounded-full border border-[#475758] bg-[#0e1719]/70 px-3 py-1 text-xs uppercase tracking-widest text-[#8db3a5]">
+                                                    {archetype.categoryId}
                                                 </span>
                                             </div>
-                                            <p className="text-sm text-gray-400">{archetype.description}</p>
+                                            <p className="text-sm text-[#aeb8b4] max-w-2xl">{archetype.description}</p>
                                         </div>
-                                        <GlassButton
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleViewArchetype(archetype);
-                                            }}
-                                            variant="ghost"
-                                            size="sm"
-                                        >
-                                            View →
-                                        </GlassButton>
+                                        <button className={subtleButton} onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleViewArchetype(archetype);
+                                        }}>
+                                            Apri scheda →
+                                        </button>
                                     </div>
-                                </GlassCard>
+                                    <div className={`${gildedDivider} mt-5`} />
+                                    <div className="mt-4 flex flex-wrap gap-4 text-xs text-[#8db3a5]">
+                                        <span>Budget: {archetype.minBudget}–{archetype.maxBudget} HP</span>
+                                        <span>Versione: {archetype.version}</span>
+                                        <span>Tags: {archetype.tags?.slice(0, 3).join(', ') || 'n/a'}</span>
+                                    </div>
+                                </div>
                             ))}
                         </div>
                     </div>
                 </div>
             );
     }
-};
+}
+;

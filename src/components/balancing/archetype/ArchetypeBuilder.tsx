@@ -9,18 +9,26 @@
  */
 
 import React, { useState } from 'react';
-import type { ArchetypeCategory, StatAllocation } from '../../../balancing/archetype/types';
+import type { ArchetypeCategory } from '../../../balancing/archetype/types';
+import type { StatBlock } from '../../../balancing/types';
 import { ArchetypeBuilder as Builder } from '../../../balancing/archetype/ArchetypeBuilder';
 import { NORMALIZED_WEIGHTS } from '../../../balancing/statWeights';
-import { GlassCard } from '../../../ui/atoms/GlassCard';
-import { GlassButton } from '../../../ui/atoms/GlassButton';
-import { GlassInput } from '../../../ui/atoms/GlassInput';
-import { GlassSlider } from '../../../ui/atoms/GlassSlider';
 import { ArchetypePreview } from './ArchetypePreview';
+import {
+    gildedPageBg,
+    gildedSurface,
+    gildedCard,
+    gildedInput,
+    gildedTextarea,
+    gildedDivider,
+    gildedLabel
+} from './gildedTheme';
 
 const CATEGORIES: ArchetypeCategory[] = ['Tank', 'DPS', 'Assassin', 'Bruiser', 'Support', 'Hybrid'];
 
-const DEFAULT_ALLOCATION: StatAllocation = {
+type Allocation = Record<string, number>;
+
+const DEFAULT_ALLOCATION: Allocation = {
     damage: 20,
     hp: 20,
     armor: 10,
@@ -40,12 +48,12 @@ const DEFAULT_ALLOCATION: StatAllocation = {
 export const ArchetypeBuilder: React.FC = () => {
     const [category, setCategory] = useState<ArchetypeCategory>('Hybrid');
     const [budget, setBudget] = useState<number>(50);
-    const [allocation, setAllocation] = useState<StatAllocation>(DEFAULT_ALLOCATION);
+    const [allocation, setAllocation] = useState<Allocation>(DEFAULT_ALLOCATION);
     const [archetypeName, setArchetypeName] = useState<string>('Custom Archetype');
     const [description, setDescription] = useState<string>('');
 
     // Calculate stats in real-time
-    const statBlock = React.useMemo(() => {
+    const statBlock = React.useMemo<StatBlock | null>(() => {
         try {
             return Builder.calculateStatValues(allocation, budget, NORMALIZED_WEIGHTS);
         } catch {
@@ -54,10 +62,10 @@ export const ArchetypeBuilder: React.FC = () => {
     }, [allocation, budget]);
 
     // Validation
-    const allocationSum = Object.values(allocation).reduce((a, b) => a + b, 0);
+    const allocationSum = Object.values(allocation).reduce<number>((a, b) => a + b, 0);
     const isValid = Math.abs(allocationSum - 100) < 0.01;
 
-    const handleAllocationChange = (stat: keyof StatAllocation, value: number) => {
+    const handleAllocationChange = (stat: keyof Allocation, value: number) => {
         setAllocation(prev => ({ ...prev, [stat]: value }));
     };
 
@@ -80,136 +88,161 @@ export const ArchetypeBuilder: React.FC = () => {
         alert(`Archetype "${archetypeName}" saved!`);
     };
 
+    const primaryButton =
+        'inline-flex flex-1 items-center justify-center rounded-2xl border border-[#c9a227]/50 bg-[#c9a227]/10 px-4 py-3 text-sm font-semibold text-[#f6f3e4] hover:bg-[#c9a227]/20 transition-all disabled:opacity-40';
+
+    const secondaryButton =
+        'inline-flex items-center justify-center rounded-2xl border border-[#3b4b4d] px-4 py-3 text-sm font-semibold text-[#f6f3e4] hover:border-[#c9a227]/60 hover:text-[#c9a227] transition-all';
+
+    const categoryButton = (isActive: boolean) =>
+        `rounded-2xl px-3 py-2 text-sm font-semibold tracking-wide transition-all ${
+            isActive
+                ? 'bg-[#c9a227]/20 border border-[#c9a227]/60 text-[#f6f3e4]'
+                : 'border border-transparent text-[#8db3a5] hover:border-[#3b4b4d] hover:text-[#f6f3e4]'
+        }`;
+
+    const sliderTrack = 'w-full h-2 rounded-full bg-[#1b282b] appearance-none cursor-pointer';
     return (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-950 p-6">
-            <div className="max-w-7xl mx-auto">
-                {/* Header */}
-                <GlassCard variant="neon" className="mb-6">
-                    <h1 className="text-3xl font-bold text-cyan-100 mb-2">Archetype Builder</h1>
-                    <p className="text-gray-400">Design custom character archetypes by distributing stats</p>
-                </GlassCard>
+        <div className={`${gildedPageBg}`}>
+            <div className="max-w-6xl mx-auto space-y-8">
+                <section className={`${gildedSurface}`}>
+                    <p className={gildedLabel}>Builder</p>
+                    <h1 className="text-4xl font-display text-[#f6f3e4] mt-3">Archetype Forge</h1>
+                    <p className="text-sm text-[#aeb8b4] mt-2">
+                        Distribuisci il budget e visualizza in tempo reale lo StatBlock risultante. Tutte le modifiche saranno salvate nel catalogo JSON.
+                    </p>
+                </section>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Left: Configuration */}
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                     <div className="space-y-6">
-                        {/* Identity */}
-                        <GlassCard variant="default">
-                            <h2 className="text-xl font-bold text-cyan-100 mb-4">Identity</h2>
-
+                        <div className={gildedCard}>
+                            <h2 className="text-2xl font-display text-[#f6f3e4] mb-4">Identità</h2>
                             <div className="space-y-4">
-                                <GlassInput
-                                    label="Name"
-                                    value={archetypeName}
-                                    onChange={(e) => setArchetypeName(e.target.value)}
-                                    placeholder="Enter archetype name"
-                                />
+                                <div>
+                                    <label className={gildedLabel}>Nome</label>
+                                    <input
+                                        value={archetypeName}
+                                        onChange={(e) => setArchetypeName(e.target.value)}
+                                        placeholder="Es. Obsidian Vanguard"
+                                        className={`${gildedInput} mt-2`}
+                                    />
+                                </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-2">Description</label>
+                                    <label className={gildedLabel}>Descrizione</label>
                                     <textarea
                                         value={description}
                                         onChange={(e) => setDescription(e.target.value)}
                                         rows={3}
-                                        className="w-full bg-black/20 border border-cyan-500/30 rounded px-3 py-2 text-cyan-50 focus:outline-none focus:border-cyan-400"
+                                        placeholder="Descrivi ruolo, forza e punti deboli"
+                                        className={`${gildedTextarea} mt-2`}
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-2">Category</label>
-                                    <div className="grid grid-cols-3 gap-2">
+                                    <label className={gildedLabel}>Categoria</label>
+                                    <div className="mt-3 grid grid-cols-3 gap-2">
                                         {CATEGORIES.map(cat => (
-                                            <GlassButton
+                                            <button
                                                 key={cat}
                                                 onClick={() => setCategory(cat)}
-                                                variant={category === cat ? 'primary' : 'ghost'}
-                                                size="sm"
+                                                type="button"
+                                                className={categoryButton(category === cat)}
                                             >
                                                 {cat}
-                                            </GlassButton>
+                                            </button>
                                         ))}
                                     </div>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <div className="flex justify-between text-sm text-gray-300">
-                                        <span>Budget: {budget} HP</span>
+                                <div>
+                                    <div className="flex justify-between text-xs text-[#8db3a5]">
+                                        <span className="uppercase tracking-[0.3em]">Budget</span>
+                                        <span>{budget} HP</span>
                                     </div>
-                                    <GlassSlider
-                                        min={10}
-                                        max={100}
-                                        step={5}
-                                        value={budget}
-                                        onChange={(val) => setBudget(val)}
-                                    />
-                                    <div className="flex justify-between text-xs text-gray-500">
+                                    <div className="mt-2">
+                                        <input
+                                            type="range"
+                                            min={10}
+                                            max={100}
+                                            step={5}
+                                            value={budget}
+                                            onChange={(e) => setBudget(Number(e.target.value))}
+                                            className={sliderTrack}
+                                            style={{
+                                                background: `linear-gradient(to right, #c9a227 0%, #c9a227 ${((budget - 10) / 90) * 100}%, #1b282b ${((budget - 10) / 90) * 100}%, #1b282b 100%)`
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="flex justify-between text-[10px] text-[#6b7a78] mt-1">
                                         <span>10 HP</span>
                                         <span>100 HP</span>
                                     </div>
                                 </div>
                             </div>
-                        </GlassCard>
+                        </div>
 
-                        {/* Stat Allocation */}
-                        <GlassCard variant="default">
-                            <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-bold text-cyan-100">Stat Allocation</h2>
-                                <div className={`text-sm font-mono ${isValid ? 'text-green-400' : 'text-red-400'}`}>
+                        <div className={gildedCard}>
+                            <div className="flex items-center justify-between mb-4">
+                                <div>
+                                    <p className={gildedLabel}>Allocazione Stat</p>
+                                    <h2 className="text-xl font-display text-[#f6f3e4]">Distribuisci 100%</h2>
+                                </div>
+                                <div className={`text-sm font-mono ${isValid ? 'text-[#8db3a5]' : 'text-[#f58c8c]'}`}>
                                     {allocationSum.toFixed(1)}% / 100%
                                 </div>
                             </div>
-
-                            <div className="space-y-3 max-h-96 overflow-y-auto">
-                                {(Object.keys(allocation) as (keyof StatAllocation)[]).map(stat => (
-                                    <div key={stat} className="flex items-center gap-3">
-                                        <label className="w-24 text-sm text-gray-300 capitalize">{stat}</label>
-                                        <input
-                                            type="range"
-                                            min="0"
-                                            max="100"
-                                            step="1"
-                                            value={allocation[stat]}
-                                            onChange={(e) => handleAllocationChange(stat, Number(e.target.value))}
-                                            className="flex-1"
-                                        />
-                                        <input
-                                            type="number"
-                                            value={allocation[stat]}
-                                            onChange={(e) => handleAllocationChange(stat, Number(e.target.value))}
-                                            className="w-16 bg-black/20 border border-cyan-500/30 rounded px-2 py-1 text-cyan-50 text-sm text-right"
-                                        />
-                                        <span className="text-xs text-gray-500">%</span>
-                                    </div>
-                                ))}
+                            <div className={`${gildedDivider} mb-4`} />
+                            <div className="max-h-96 space-y-3 overflow-y-auto pr-1">
+                                {Object.keys(allocation).map(statKey => {
+                                    const stat = statKey as keyof Allocation;
+                                    return (
+                                        <div key={stat} className="rounded-xl border border-[#2c3737] bg-[#0c1517]/60 p-3">
+                                            <div className="flex items-center justify-between text-xs text-[#aeb8b4]">
+                                                <span className="uppercase tracking-[0.2em]">{stat}</span>
+                                                <span className="font-mono text-[#f6f3e4]">{allocation[stat]}%</span>
+                                            </div>
+                                            <div className="mt-2 flex items-center gap-3">
+                                                <input
+                                                    type="range"
+                                                    min="0"
+                                                    max="100"
+                                                    step="1"
+                                                    value={allocation[stat]}
+                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                                        handleAllocationChange(stat, Number(e.target.value))
+                                                    }
+                                                    className={sliderTrack}
+                                                    style={{
+                                                        background: `linear-gradient(to right, #8db3a5 0%, #8db3a5 ${allocation[stat]}%, #1b282b ${allocation[stat]}%, #1b282b 100%)`
+                                                    }}
+                                                />
+                                                <input
+                                                    type="number"
+                                                    value={allocation[stat]}
+                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                                        handleAllocationChange(stat, Number(e.target.value))
+                                                    }
+                                                    className="w-16 rounded-2xl border border-[#3b4b4d] bg-[#0c1517]/70 px-2 py-1 text-right text-sm font-mono text-[#f6f3e4]"
+                                                />
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
-                        </GlassCard>
+                        </div>
 
-                        {/* Actions */}
-                        <div className="flex gap-3">
-                            <GlassButton
-                                onClick={handleSave}
-                                disabled={!isValid}
-                                variant="primary"
-                                className="flex-1"
-                            >
-                                Save Archetype
-                            </GlassButton>
-                            <GlassButton
-                                onClick={() => setAllocation(DEFAULT_ALLOCATION)}
-                                variant="secondary"
-                            >
+                        <div className="flex flex-col gap-3 sm:flex-row">
+                            <button onClick={handleSave} className={primaryButton} disabled={!isValid}>
+                                Salva Archetipo
+                            </button>
+                            <button onClick={() => setAllocation(DEFAULT_ALLOCATION)} className={secondaryButton}>
                                 Reset
-                            </GlassButton>
+                            </button>
                         </div>
                     </div>
 
-                    {/* Right: Preview */}
-                    <div>
-                        <ArchetypePreview
-                            statBlock={statBlock}
-                            budget={budget}
-                            isValid={isValid}
-                        />
-                    </div>
+                    <ArchetypePreview statBlock={statBlock} budget={budget} isValid={isValid} />
                 </div>
             </div>
         </div>

@@ -29,6 +29,10 @@ Creare un sistema di bilanciamento **archetype-driven** che:
 - **Persistenza JSON**: l'intero catalogo archetipi/varianti viene salvato in un file JSON (`data/archetypes.json`, stesso modello adottato per il New Balancer) e caricato all'avvio, con salvataggio automatico dopo ogni modifica.
 - **Ordine di lavoro confermato**: procedere nelle sotto-fasi 2.1 → 2.2 → 2.3, mantenendo il piano esistente.
 - **Priorità UI**: il restyle completo della pagina e dei componenti deve rispettare il tema **Gilded Observatory** (palette, tipografia e densità da `tailwind.config.js`, `FantasyLayout`, `DensityContext`).
+- **Character Creator**: la pagina di creazione personaggi deve includere salvataggio/caricamento locale (lista personaggi salvati, selezione, override), con dropdown per archetipi e varianti alimentati dal catalogo JSON del balancer.
+- **Stat inheritance**: tutte le stat mostrante nel creator derivano dinamicamente dai valori di partenza definiti dal balancer (caricati dal JSON) e ricalcolati tramite i servizi di balancing esistenti.
+- **Tag authoring**: l'utente deve poter aggiungere nuovi tag sia a livello di archetipo che di variante direttamente dalla UI.
+- **Requisito addizionale ("ri…")**: tenere uno spazio nel backlog per un secondo requisito richiesto dall'utente (descrizione in arrivo) così da integrarlo senza ristrutturare la fase.
 
 Questi requisiti si applicano trasversalmente a tutte le fasi descritte sotto.
 
