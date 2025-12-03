@@ -5,9 +5,12 @@ import { ConfigurableStat } from './ConfigurableStat';
 interface Props {
   card: CardDefinition;
   stats: Record<string, StatDefinition>;
+  simValues: Record<string, number>;
+  onSimValueChange: (statId: string, value: number) => void;
   onEditStat: (statId: string, updates: Partial<StatDefinition>) => void;
   onDeleteStat: (statId: string) => void;
   onResetStat?: (statId: string) => void;
+  onResetCard?: () => void;
   onAddStat?: () => void;
   newStatId?: string;
   onUpdateCard?: (updates: Partial<CardDefinition>) => void;
@@ -17,7 +20,7 @@ interface Props {
   dragListeners?: React.HTMLAttributes<HTMLButtonElement>;
 }
 
-export const ConfigurableCard: React.FC<Props> = ({ card, stats, onEditStat, onDeleteStat, onResetStat, onAddStat, newStatId, onUpdateCard, onDeleteCard, startHeaderInEdit, availableStats, dragListeners }) => {
+export const ConfigurableCard: React.FC<Props> = ({ card, stats, simValues, onSimValueChange, onEditStat, onDeleteStat, onResetStat, onResetCard, onAddStat, newStatId, onUpdateCard, onDeleteCard, startHeaderInEdit, availableStats, dragListeners }) => {
   const orderedStats = card.statIds.map((id) => stats[id]).filter(Boolean);
 
   const [isEditingHeader, setIsEditingHeader] = useState(!!startHeaderInEdit);
@@ -201,6 +204,17 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, onEditStat, onD
             )}
           </div>
           <div className="flex items-center gap-1">
+            {!isEditingHeader && onResetCard && (
+              <button
+                type="button"
+                className="w-5 h-5 flex items-center justify-center rounded text-[#c9a227] hover:text-[#e6c547] transition-colors leading-none"
+                title="Reset card"
+                onClick={onResetCard}
+              >
+                <span aria-hidden="true" className="text-sm">↺</span>
+                <span className="sr-only">Reset card</span>
+              </button>
+            )}
             {isEditingHeader && onDeleteCard && !card.isCore && (
               <div className="relative">
                 <button
@@ -291,6 +305,9 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, onEditStat, onD
           <ConfigurableStat
             key={stat.id}
             stat={stat}
+            simValue={simValues[stat.id] ?? stat.defaultValue}
+            onSimValueChange={(value) => onSimValueChange(stat.id, value)}
+            allSimValues={simValues}
             onUpdate={(updates) => onEditStat(stat.id, updates)}
             onDelete={() => onDeleteStat(stat.id)}
             onReset={onResetStat ? () => onResetStat(stat.id) : undefined}

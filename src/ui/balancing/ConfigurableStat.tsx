@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import type { StatDefinition } from '../../balancing/config/types';
 import { FormulaEditor } from './FormulaEditor';
+import { executeFormula } from '../../balancing/config/FormulaEngine';
 
 const statGlyphMap: Record<string, string> = {
   hp: '❤',
@@ -31,6 +32,9 @@ const statGlyphMap: Record<string, string> = {
 
 interface Props {
   stat: StatDefinition;
+  simValue: number;
+  onSimValueChange: (value: number) => void;
+  allSimValues: Record<string, number>;
   onUpdate: (updates: Partial<StatDefinition>) => void;
   onDelete: () => void;
   onReset?: () => void;
@@ -39,7 +43,7 @@ interface Props {
   canDelete?: boolean;
 }
 
-export const ConfigurableStat: React.FC<Props> = ({ stat, onUpdate, onDelete, onReset, startInEdit, availableStats, canDelete = false }) => {
+export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueChange, allSimValues, onUpdate, onDelete, onReset, startInEdit, availableStats, canDelete = false }) => {
   const [isConfigMode, setIsConfigMode] = useState(!!startInEdit);
   const [label, setLabel] = useState(stat.label);
   const [description, setDescription] = useState(stat.description ?? '');
@@ -49,10 +53,15 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, onUpdate, onDelete, on
   const [weight, setWeight] = useState(stat.weight);
   const [isDerived, setIsDerived] = useState(stat.isDerived);
   const [formula, setFormula] = useState(stat.formula || '');
-  const [mockValue, setMockValue] = useState(stat.defaultValue ?? stat.min);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const glyph = statGlyphMap[stat.id] ?? '◆';
-  const sliderProgress = stat.max === stat.min ? 100 : Math.max(0, Math.min(100, ((mockValue - stat.min) / (stat.max - stat.min)) * 100));
+  
+  // For derived stats, calculate value from formula; otherwise use simValue
+  const displayValue = stat.isDerived && stat.formula 
+    ? executeFormula(stat.formula, allSimValues)
+    : simValue;
+  
+  const sliderProgress = stat.max === stat.min ? 100 : Math.max(0, Math.min(100, ((displayValue - stat.min) / (stat.max - stat.min)) * 100));
 
   useEffect(() => {
     if (!isConfigMode) {
@@ -149,8 +158,8 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, onUpdate, onDelete, on
                   : 'border-[#9d7d5c] text-[#c9a227] hover:bg-[#2a2015]'
               }`}
               onClick={() => {
-                if (isLocked) return;
-                setMockValue((v) => Math.max(stat.min, v - stat.step));
+                if (isLocked || stat.isDerived) return;
+                onSimValueChange(Math.max(stat.min, simValue - stat.step));
               }}
               aria-label="Decrement"
             >
@@ -162,12 +171,12 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, onUpdate, onDelete, on
               min={stat.min}
               max={stat.max}
               step={stat.step}
-              value={mockValue}
+              value={displayValue}
               onChange={(e) => {
-                if (isLocked) return;
-                setMockValue(Number(e.target.value));
+                if (isLocked || stat.isDerived) return;
+                onSimValueChange(Number(e.target.value));
               }}
-              disabled={isLocked}
+              disabled={isLocked || stat.isDerived}
               style={{
                 background: `linear-gradient(to right, #a0826d 0%, #a0826d ${sliderProgress}%, #1a1410 ${sliderProgress}%, #1a1410 100%)`,
               }}
@@ -180,15 +189,15 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, onUpdate, onDelete, on
                   : 'border-[#9d7d5c] text-[#c9a227] hover:bg-[#2a2015]'
               }`}
               onClick={() => {
-                if (isLocked) return;
-                setMockValue((v) => Math.min(stat.max, v + stat.step));
+                if (isLocked || stat.isDerived) return;
+                onSimValueChange(Math.min(stat.max, simValue + stat.step));
               }}
               aria-label="Increment"
             >
               +
             </button>
             <span className="w-10 text-right text-[10px] text-[#f5f0dc] font-mono">
-              {mockValue}
+              {displayValue.toFixed(stat.step < 1 ? 1 : 0)}
             </span>
           </div>
         </div>
@@ -213,7 +222,7 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, onUpdate, onDelete, on
             onClick={() => {
               if (onReset) {
                 onReset();
-                setMockValue(stat.defaultValue);
+                onSimValueChange(stat.defaultValue);
               }
             }}
             disabled={!onReset}
