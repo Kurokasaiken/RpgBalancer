@@ -1,10 +1,14 @@
 import type { BalancerConfig, ConfigSnapshot } from './types';
 import { BalancerConfigSchema } from './schemas';
 import { DEFAULT_CONFIG } from './defaultConfig';
+import BALANCER_DEFAULT_JSON from './balancer-default-config.json';
 
 const STORAGE_KEY = 'rpg_balancer_config';
 const HISTORY_KEY = 'rpg_balancer_config_history';
 const MAX_HISTORY = 10;
+
+// Use the JSON config as the new default
+const INITIAL_CONFIG: BalancerConfig = BALANCER_DEFAULT_JSON as unknown as BalancerConfig;
 
 export class BalancerConfigStore {
   private static config: BalancerConfig | null = null;
@@ -20,11 +24,16 @@ export class BalancerConfigStore {
         const validated = BalancerConfigSchema.parse(parsed);
         this.config = this.mergeWithDefaults(validated);
       } else {
-        this.config = { ...DEFAULT_CONFIG };
+        // Use the JSON config as initial default
+        this.config = { ...INITIAL_CONFIG };
+        // Save it to localStorage so it becomes the new default
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(this.config));
+        }
       }
     } catch (e) {
       console.warn('Failed to load balancer config, using defaults:', e);
-      this.config = { ...DEFAULT_CONFIG };
+      this.config = { ...INITIAL_CONFIG };
     }
 
     this.loadHistory();
