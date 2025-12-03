@@ -130,9 +130,9 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, onUpdate, onDelete, on
       <div className="flex items-center justify-between text-xs py-2 px-3 rounded-xl border border-[#3b4a4a] bg-gradient-to-br from-[#0c181b]/90 to-[#060b0d]/80 gap-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
         <div className="flex flex-col flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
-            <span className="text-base text-amber-200 leading-none flex-shrink-0" aria-hidden="true">{glyph}</span>
+            <span className="text-lg text-amber-200 leading-none flex-shrink-0 h-5 flex items-center justify-center" aria-hidden="true">{glyph}</span>
             <div className="relative group flex-1 min-w-0">
-              <span className="font-medium text-[#f6f3e4] truncate cursor-help leading-none">{stat.label}</span>
+              <span className="font-medium text-[#f6f3e4] truncate cursor-help leading-tight text-sm">{stat.label}</span>
               {stat.description && (
                 <div className="pointer-events-none absolute left-0 top-full mt-1 w-48 rounded-md bg-[#0c1517] border border-[#c7b996]/40 px-2 py-1 text-[10px] text-[#f6f3e4] opacity-0 transition-opacity duration-200 group-hover:opacity-100 z-10">
                   {stat.description}
@@ -201,7 +201,7 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, onUpdate, onDelete, on
             title={isLocked ? 'Sblocca stat' : 'Blocca stat'}
             onClick={handleToggleLock}
           >
-            <span aria-hidden="true" className="text-sm">🔐</span>
+            <span aria-hidden="true" className="text-sm">{isLocked ? '🔒' : '🔓'}</span>
             <span className="sr-only">{isLocked ? 'Sblocca' : 'Blocca'}</span>
           </button>
           <button
