@@ -94,17 +94,15 @@ export const BalancerNew: React.FC = () => {
     return initial;
   });
   
-  // Update simValues when config changes (e.g., after import)
+  // Keep simValues in sync with config: whenever config.stats changes
+  // (e.g., after import, reset card, reset stat), rebuild the simulation
+  // values from the current defaultValue of each stat.
   useEffect(() => {
-    setSimValues(prev => {
-      const updated = { ...prev };
-      Object.entries(config.stats).forEach(([id, stat]) => {
-        if (!(id in updated)) {
-          updated[id] = stat.defaultValue;
-        }
-      });
-      return updated;
+    const next: Record<string, number> = {};
+    Object.entries(config.stats).forEach(([id, stat]) => {
+      next[id] = stat.defaultValue;
     });
+    setSimValues(next);
   }, [config.stats]);
   
   // Handle simulation value change - this triggers formula recalculation

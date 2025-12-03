@@ -27,7 +27,6 @@ import { MidnightMeridian } from './ui/fantasy/mockups/MidnightMeridian';
 import { SeraphimArchive } from './ui/fantasy/mockups/SeraphimArchive';
 import { VerdantAlloyDeck } from './ui/fantasy/mockups/VerdantAlloyDeck';
 import { CompactDemo } from './ui/pages/CompactDemo';
-import { BalancerConfigPlayground } from './ui/balancing/BalancerConfigPlayground';
 import { BalancerNew } from './ui/balancing/BalancerNew';
 
 type Tab =
@@ -55,12 +54,11 @@ type Tab =
   | 'mockSeraphimArchive'
   | 'mockVerdantAlloy'
   | 'mockGildedCards'
-  | 'mockBalancerConfig'
   | 'balancerNew'
   | 'compactDemo';
 
 function App() {
-  const [activeTab, setActiveTab] = useState<Tab>('mockBalancerConfig');
+  const [activeTab, setActiveTab] = useState<Tab>('balancerNew');
 
   // Listen for spell creation navigation from SpellLibrary
   useEffect(() => {
@@ -154,11 +152,6 @@ function App() {
       {activeTab === 'mockGildedCards' && (
         <ErrorBoundary componentName="Gilded Card Showcase">
           <GildedCardShowcase />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'mockBalancerConfig' && (
-        <ErrorBoundary componentName="Balancer Config Playground">
-          <BalancerConfigPlayground />
         </ErrorBoundary>
       )}
       {activeTab === 'balancerNew' && (
