@@ -19,6 +19,7 @@ import { FantasyComponentShowcase } from './ui/atoms/FantasyComponentShowcase';
 import { ArcaneTechGlass } from './ui/fantasy/mockups/ArcaneTechGlass';
 import { GildedObservatory } from './ui/fantasy/mockups/GildedObservatory';
 import { GildedCardShowcase } from './ui/fantasy/mockups/GildedCardShowcase';
+import { SpellCreatorNewMockup } from './ui/spells/SpellCreatorNewMockup';
 import { ObsidianSanctum } from './ui/fantasy/mockups/ObsidianSanctum';
 import { AuroraWorkshop } from './ui/fantasy/mockups/AuroraWorkshop';
 import { AetherBrassLab } from './ui/fantasy/mockups/AetherBrassLab';
@@ -45,6 +46,7 @@ type Tab =
   | 'testing'
   | 'fantasyShowcase'
   | 'mockArcaneTech'
+  | 'mockSpellCreatorNew'
   | 'mockGildedObservatory'
   | 'mockObsidianSanctum'
   | 'mockAuroraWorkshop'
@@ -142,6 +144,11 @@ function App() {
       {activeTab === 'mockArcaneTech' && (
         <ErrorBoundary componentName="Arcane Tech Glass">
           <ArcaneTechGlass />
+        </ErrorBoundary>
+      )}
+      {activeTab === 'mockSpellCreatorNew' && (
+        <ErrorBoundary componentName="Spell Creator New Mockup">
+          <SpellCreatorNewMockup />
         </ErrorBoundary>
       )}
       {activeTab === 'mockGildedObservatory' && (
