@@ -94,8 +94,38 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, onUpdate, onDelete, on
     setIsConfigMode(false);
   };
 
+  const isLocked = !!stat.isLocked;
+  const isHidden = !!stat.isHidden;
+
+  const handleToggleLock = () => {
+    onUpdate({ isLocked: !isLocked });
+  };
+
+  const handleToggleHidden = () => {
+    onUpdate({ isHidden: !isHidden });
+  };
+
   // === PLAY VIEW (default) ===
   if (!isConfigMode) {
+    if (isHidden) {
+      return (
+        <div className="flex items-center justify-between text-xs py-2 px-3 rounded-xl border border-[#3b4a4a] bg-gradient-to-br from-[#060b0d]/90 to-[#040708]/80 gap-2 opacity-70">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-base text-amber-400 leading-none" aria-hidden="true">{glyph}</span>
+            <span className="text-[#aeb8b4] truncate text-[11px]">{stat.label}</span>
+          </div>
+          <button
+            type="button"
+            className="flex items-center justify-center text-[#c9a227] hover:text-[#e6c547] transition-colors leading-none"
+            title="Mostra stat"
+            onClick={handleToggleHidden}
+          >
+            <span aria-hidden="true" className="text-sm">👁</span>
+            <span className="sr-only">Mostra statistica</span>
+          </button>
+        </div>
+      );
+    }
     return (
       <div className="flex items-center justify-between text-xs py-2 px-3 rounded-xl border border-[#3b4a4a] bg-gradient-to-br from-[#0c181b]/90 to-[#060b0d]/80 gap-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
         <div className="flex flex-col flex-1 min-w-0">
@@ -113,8 +143,15 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, onUpdate, onDelete, on
           <div className="mt-1.5 flex items-center gap-1.5">
             <button
               type="button"
-              className="w-6 h-6 flex items-center justify-center rounded border border-[#9d7d5c] text-[#c9a227] bg-[#1a1410]/70 hover:bg-[#2a2015] transition-colors"
-              onClick={() => setMockValue((v) => Math.max(stat.min, v - stat.step))}
+              className={`w-6 h-6 flex items-center justify-center rounded border bg-[#1a1410]/70 transition-colors ${
+                isLocked
+                  ? 'border-[#555555] text-[#555555] cursor-not-allowed'
+                  : 'border-[#9d7d5c] text-[#c9a227] hover:bg-[#2a2015]'
+              }`}
+              onClick={() => {
+                if (isLocked) return;
+                setMockValue((v) => Math.max(stat.min, v - stat.step));
+              }}
               aria-label="Decrement"
             >
               −
@@ -126,15 +163,26 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, onUpdate, onDelete, on
               max={stat.max}
               step={stat.step}
               value={mockValue}
-              onChange={(e) => setMockValue(Number(e.target.value))}
+              onChange={(e) => {
+                if (isLocked) return;
+                setMockValue(Number(e.target.value));
+              }}
+              disabled={isLocked}
               style={{
                 background: `linear-gradient(to right, #a0826d 0%, #a0826d ${sliderProgress}%, #1a1410 ${sliderProgress}%, #1a1410 100%)`,
               }}
             />
             <button
               type="button"
-              className="w-6 h-6 flex items-center justify-center rounded border border-[#9d7d5c] text-[#c9a227] bg-[#1a1410]/70 hover:bg-[#2a2015] transition-colors"
-              onClick={() => setMockValue((v) => Math.min(stat.max, v + stat.step))}
+              className={`w-6 h-6 flex items-center justify-center rounded border bg-[#1a1410]/70 transition-colors ${
+                isLocked
+                  ? 'border-[#555555] text-[#555555] cursor-not-allowed'
+                  : 'border-[#9d7d5c] text-[#c9a227] hover:bg-[#2a2015]'
+              }`}
+              onClick={() => {
+                if (isLocked) return;
+                setMockValue((v) => Math.min(stat.max, v + stat.step));
+              }}
               aria-label="Increment"
             >
               +
@@ -147,12 +195,14 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, onUpdate, onDelete, on
         <div className="flex items-center gap-1.5">
           <button
             type="button"
-            className="flex items-center justify-center text-[#c9a227] hover:text-[#e6c547] transition-colors leading-none"
-            title="Lock"
-            onClick={() => {}}
+            className={`flex items-center justify-center transition-colors leading-none ${
+              isLocked ? 'text-[#9d7d5c]' : 'text-[#c9a227] hover:text-[#e6c547]'
+            }`}
+            title={isLocked ? 'Sblocca stat' : 'Blocca stat'}
+            onClick={handleToggleLock}
           >
             <span aria-hidden="true" className="text-base">🔐</span>
-            <span className="sr-only">Lock</span>
+            <span className="sr-only">{isLocked ? 'Sblocca' : 'Blocca'}</span>
           </button>
           <button
             type="button"
@@ -167,8 +217,8 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, onUpdate, onDelete, on
           <button
             type="button"
             className="flex items-center justify-center text-[#c9a227] hover:text-[#e6c547] transition-colors leading-none"
-            title="Nascondi"
-            onClick={() => {}}
+            title={isHidden ? 'Mostra stat' : 'Nascondi stat'}
+            onClick={handleToggleHidden}
           >
             <span aria-hidden="true" className="text-base">👁</span>
             <span className="sr-only">Nascondi</span>

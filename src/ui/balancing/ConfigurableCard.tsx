@@ -75,6 +75,31 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, onEditStat, onD
 
   const isCustomColor = color?.startsWith('#');
   const displayStyle = isCustomColor ? { color } : undefined;
+  const isHidden = !!card.isHidden;
+
+  if (isHidden && !isEditingHeader) {
+    return (
+      <div className="rounded-2xl border border-[#384444] bg-gradient-to-br from-[#050b0f] via-[#060b0d] to-[#050509] p-2.5 shadow-[0_10px_24px_rgba(0,0,0,0.6)] flex items-center justify-between gap-2 opacity-80">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-lg" aria-hidden="true">{displayIcon}</span>
+          <p className="text-sm font-display text-[#cfd5cf] truncate" style={displayStyle}>
+            {card.title}
+          </p>
+        </div>
+        {onUpdateCard && (
+          <button
+            type="button"
+            className="w-6 h-6 flex items-center justify-center text-[#c9a227] hover:text-[#e6c547] transition-colors"
+            title="Mostra card"
+            onClick={() => onUpdateCard({ isHidden: false })}
+          >
+            <span aria-hidden="true" className="text-sm">👁</span>
+            <span className="sr-only">Mostra card</span>
+          </button>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div
@@ -179,9 +204,20 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, onEditStat, onD
             {!isEditingHeader && (
               <button
                 type="button"
-                className="w-5 h-5 flex items-center justify-center text-[#c9a227] hover:text-[#e6c547] transition-colors"
+                className={`w-5 h-5 flex items-center justify-center transition-colors ${
+                  onResetStat ? 'text-[#c9a227] hover:text-[#e6c547]' : 'text-[#4b4f4f] cursor-not-allowed'
+                }`}
                 title="Reset"
-                onClick={() => {}}
+                onClick={() => {
+                  if (!onResetStat) return;
+                  // Reset di tutte le stat della card alle versioni iniziali
+                  orderedStats.forEach((stat) => {
+                    if (stat) {
+                      onResetStat(stat.id);
+                    }
+                  });
+                }}
+                disabled={!onResetStat}
               >
                 <span aria-hidden="true" className="text-sm">↺</span>
                 <span className="sr-only">Reset card</span>

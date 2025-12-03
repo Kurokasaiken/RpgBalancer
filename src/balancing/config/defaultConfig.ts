@@ -13,6 +13,8 @@ export const CORE_STATS: Record<string, StatDefinition> = {
     weight: 1.0,
     isCore: true,
     isDerived: false,
+    isLocked: false,
+    isHidden: false,
   },
   damage: {
     id: 'damage',
@@ -26,6 +28,8 @@ export const CORE_STATS: Record<string, StatDefinition> = {
     weight: 5.0,
     isCore: true,
     isDerived: false,
+    isLocked: false,
+    isHidden: false,
   },
   htk: {
     id: 'htk',
@@ -41,6 +45,8 @@ export const CORE_STATS: Record<string, StatDefinition> = {
     isDerived: true,
     formula: 'hp / damage',
     bgColor: 'bg-orange-500/10',
+    isLocked: false,
+    isHidden: false,
   },
 };
 
@@ -67,6 +73,8 @@ const ADDITIONAL_STATS: Record<string, StatDefinition> = {
     weight: 1,
     isCore: false,
     isDerived: false,
+    isLocked: false,
+    isHidden: false,
   },
   evasion: {
     id: 'evasion',
@@ -327,6 +335,8 @@ const ADDITIONAL_STATS: Record<string, StatDefinition> = {
     weight: 1,
     isCore: false,
     isDerived: false,
+    isLocked: false,
+    isHidden: false,
   },
 };
 
@@ -340,6 +350,8 @@ const DEFAULT_CARDS: Record<string, CardDefinition> = {
     statIds: ['txc', 'evasion', 'hitChance', 'attacksPerKo'],
     isCore: false,
     order: 1,
+    isLocked: false,
+    isHidden: false,
   },
   criticalEquilibrium: {
     id: 'criticalEquilibrium',
@@ -349,6 +361,8 @@ const DEFAULT_CARDS: Record<string, CardDefinition> = {
     statIds: ['critChance', 'critMult', 'critTxCBonus', 'failChance', 'failMult', 'failTxCMalus'],
     isCore: false,
     order: 2,
+    isLocked: false,
+    isHidden: false,
   },
   mitigationPen: {
     id: 'mitigationPen',
@@ -358,6 +372,8 @@ const DEFAULT_CARDS: Record<string, CardDefinition> = {
     statIds: ['ward', 'armor', 'resistance', 'armorPen', 'penPercent', 'effectiveDamage'],
     isCore: false,
     order: 3,
+    isLocked: false,
+    isHidden: false,
   },
   sustain: {
     id: 'sustain',
@@ -367,6 +383,8 @@ const DEFAULT_CARDS: Record<string, CardDefinition> = {
     statIds: ['lifesteal', 'regen'],
     isCore: false,
     order: 4,
+    isLocked: false,
+    isHidden: false,
   },
   combatMetrics: {
     id: 'combatMetrics',
@@ -376,6 +394,8 @@ const DEFAULT_CARDS: Record<string, CardDefinition> = {
     statIds: ['ttk', 'edpt', 'earlyImpact'],
     isCore: false,
     order: 5,
+    isLocked: false,
+    isHidden: false,
   },
 };
 

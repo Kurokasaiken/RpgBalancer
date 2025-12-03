@@ -5,7 +5,7 @@ export const ConfigToolbar: React.FC = () => {
   const {
     undo,
     canUndo,
-    resetConfig,
+    resetToInitialConfig,
     exportConfig,
     importConfig,
   } = useBalancerConfig();
@@ -18,7 +18,12 @@ export const ConfigToolbar: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `balancer-config-${Date.now()}.json`;
+
+    const now = new Date();
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}`;
+
+    a.download = `rpg-balancer-config-${timestamp}.json`;
     a.click();
   };
 
@@ -32,7 +37,13 @@ export const ConfigToolbar: React.FC = () => {
     const reader = new FileReader();
     reader.onload = () => {
       const text = reader.result as string;
-      importConfig(text);
+      const result = importConfig(text);
+      if (!result.success) {
+        // Feedback minimale per ora: log su console. I toast UI verranno gestiti nella Phase 0.3.
+        console.error('Failed to import balancer config:', result.error);
+      } else {
+        console.info('Balancer config imported successfully');
+      }
     };
     reader.readAsText(file);
     e.target.value = '';
@@ -54,7 +65,7 @@ export const ConfigToolbar: React.FC = () => {
       </button>
       <button
         type="button"
-        onClick={resetConfig}
+        onClick={resetToInitialConfig}
         className="px-2 py-1 rounded border border-red-500/60 text-red-200 hover:bg-red-500/10"
       >
         Reset Defaults

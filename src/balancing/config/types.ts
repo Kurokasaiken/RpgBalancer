@@ -12,6 +12,8 @@ export interface StatDefinition {
   isDerived: boolean;
   formula?: string;
   bgColor?: string;
+  isLocked?: boolean;
+  isHidden?: boolean;
 }
 
 export interface CardDefinition {
@@ -22,6 +24,8 @@ export interface CardDefinition {
   statIds: string[];
   isCore: boolean;
   order: number;
+   isLocked?: boolean;
+   isHidden?: boolean;
 }
 
 export interface BalancerPreset {

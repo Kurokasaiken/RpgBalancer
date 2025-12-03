@@ -17,6 +17,8 @@ export const StatDefinitionSchema = z.object({
   isDerived: z.boolean(),
   formula: z.string().optional(),
   bgColor: z.string().optional(),
+  isLocked: z.boolean().optional(),
+  isHidden: z.boolean().optional(),
 })
   .refine((d) => d.min <= d.max, { message: 'min must be <= max', path: ['min'] })
   .refine((d) => d.defaultValue >= d.min && d.defaultValue <= d.max, {
@@ -39,6 +41,8 @@ export const CardDefinitionSchema = z.object({
   statIds: z.array(z.string()),
   isCore: z.boolean(),
   order: z.number().int().min(0),
+  isLocked: z.boolean().optional(),
+  isHidden: z.boolean().optional(),
 });
 
 export const BalancerPresetSchema = z.object({
