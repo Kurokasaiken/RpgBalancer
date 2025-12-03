@@ -23,6 +23,17 @@ Creare un sistema di bilanciamento **archetype-driven** che:
 
 ---
 
+## 🆕 AGGIORNAMENTO (Dicembre 2025)
+
+- **Authoring completo**: l'utente deve poter creare, modificare ed eliminare archetipi e varianti da UI o tramite richieste dirette. Nessun template deve rimanere hardcoded.
+- **Persistenza JSON**: l'intero catalogo archetipi/varianti viene salvato in un file JSON (`data/archetypes.json`, stesso modello adottato per il New Balancer) e caricato all'avvio, con salvataggio automatico dopo ogni modifica.
+- **Ordine di lavoro confermato**: procedere nelle sotto-fasi 2.1 → 2.2 → 2.3, mantenendo il piano esistente.
+- **Priorità UI**: il restyle completo della pagina e dei componenti deve rispettare il tema **Gilded Observatory** (palette, tipografia e densità da `tailwind.config.js`, `FantasyLayout`, `DensityContext`).
+
+Questi requisiti si applicano trasversalmente a tutte le fasi descritte sotto.
+
+---
+
 ## 📋 ROADMAP COMPLETA
 
 ### **PHASE 1: Archetype Definition System**
@@ -50,6 +61,12 @@ Esempio Tank:
 - Tank_Shield → HP + ward/block invece di armor
 
 **Total:** ~6 archetipi × 4 varianti = **24 archetipi secondari**
+
+#### 1.3 Libreria JSON degli archetipi
+- Definire `data/archetypes.json` come unica fonte di verità per archetipi e varianti (inclusi metadati UI e tag).
+- Implementare loader/saver condiviso con il New Balancer (watch su file + debounce salvataggi per evitare corruzione).
+- Esporre API per CRUD da UI (create/update/delete) e per richieste manuali (es. "crea un nuovo Tank da 0").
+- Validare il JSON con Zod prima del bootstrap; errori bloccano il caricamento e vengono mostrati in UI con fallback sicuro.
 
 ---
 
@@ -296,6 +313,14 @@ Stesso processo di Phase 3-6 ma:
 - CSV (for Excel/Google Sheets)
 - Markdown (human-readable report)
 - PNG (charts/heatmaps)
+
+#### 8.3 Restyle Gilded Observatory (PRIORITÀ)
+- All componenti della pagina Archetype Balancer (builder, dashboard, editor) devono adottare il tema Gilded Observatory:
+  - Palette: obsidian background, slate borders, ivory text, accenti teal/oro.
+  - Font stack: Cinzel (display), Crimson Text (body), Lato (UI) con base 14px.
+  - Densità: usare `DensityContext` e componenti compact già esistenti.
+- Aggiornare layout, card, drawer e controlli (slider, input, grid) per riflettere il nuovo stile prima di qualsiasi rollout funzionale.
+- Verificare accessibilità (contrasto AA+) e coerenza con le pagine restylate del Balancer Config (Fase 10) per evitare discontinuità visiva.
 
 ---
 

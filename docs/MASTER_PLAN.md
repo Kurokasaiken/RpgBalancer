@@ -163,6 +163,8 @@ See full spec for archetype stats, encounter templates, and drop mechanics.
 | **✅ Tasks** | [plans/archetype_tasks.md](plans/archetype_tasks.md) |
 | **🎨 Design** | [design/archetype_system_v2.md](design/archetype_system_v2.md) |
 
+**Nota 2025-12:** Il piano è stato aggiornato con requisiti di authoring completo (CRUD via UI + richieste dirette), persistenza JSON (`data/archetypes.json`) e priorità assoluta per il restyle Gilded Observatory della pagina Archetype Balancer.
+
 **Overview:**
 - 16 base archetypes (Tank×5, DPS×4, Assassin×2, etc.)
 - TTK-based validation using simulation system
