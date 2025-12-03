@@ -224,20 +224,20 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, onUpdate, onDelete, on
           <button
             type="button"
             className="w-5 h-5 flex items-center justify-center rounded text-[#c9a227] hover:text-[#e6c547] transition-colors leading-none"
-            title={isHidden ? 'Mostra stat' : 'Nascondi stat'}
-            onClick={handleToggleHidden}
-          >
-            <span aria-hidden="true" className="text-sm">👁</span>
-            <span className="sr-only">Nascondi</span>
-          </button>
-          <button
-            type="button"
-            className="w-5 h-5 flex items-center justify-center rounded text-[#c9a227] hover:text-[#e6c547] transition-colors leading-none"
             title="Modifica stat"
             onClick={() => setIsConfigMode(true)}
           >
             <span aria-hidden="true" className="text-sm">✎</span>
             <span className="sr-only">Modifica statistica</span>
+          </button>
+          <button
+            type="button"
+            className="w-5 h-5 flex items-center justify-center rounded text-[#c9a227] hover:text-[#e6c547] transition-colors leading-none"
+            title={isHidden ? 'Mostra stat' : 'Nascondi stat'}
+            onClick={handleToggleHidden}
+          >
+            <span aria-hidden="true" className="text-sm">👁</span>
+            <span className="sr-only">Nascondi</span>
           </button>
         </div>
       </div>

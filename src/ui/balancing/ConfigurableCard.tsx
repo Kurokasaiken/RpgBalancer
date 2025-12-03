@@ -205,7 +205,7 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, onEditStat, onD
               <div className="relative">
                 <button
                   type="button"
-                  className="w-5 h-5 flex items-center justify-center rounded text-red-300 hover:text-red-100 leading-none"
+                  className="w-5 h-5 flex items-center justify-center rounded bg-red-900/40 border border-red-500/70 text-red-300 hover:text-red-100 hover:bg-red-800/70 leading-none transition-colors"
                   title="Elimina card"
                   onClick={() => setShowDeleteConfirm((prev) => !prev)}
                 >
