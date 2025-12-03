@@ -26,3 +26,5 @@ dist-ssr
 *.sw?
 src-tauri/target/
 RpgIdleMetaGame_Analysis/
+.vercel
+.env*.local

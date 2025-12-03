@@ -195,41 +195,43 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, onUpdate, onDelete, on
         <div className="flex items-center gap-1.5">
           <button
             type="button"
-            className={`flex items-center justify-center transition-colors leading-none ${
+            className={`w-5 h-5 flex items-center justify-center rounded transition-colors leading-none ${
               isLocked ? 'text-[#9d7d5c]' : 'text-[#c9a227] hover:text-[#e6c547]'
             }`}
             title={isLocked ? 'Sblocca stat' : 'Blocca stat'}
             onClick={handleToggleLock}
           >
-            <span aria-hidden="true" className="text-base">🔐</span>
+            <span aria-hidden="true" className="text-sm">🔐</span>
             <span className="sr-only">{isLocked ? 'Sblocca' : 'Blocca'}</span>
           </button>
           <button
             type="button"
-            className="flex items-center justify-center text-[#c9a227] hover:text-[#e6c547] transition-colors leading-none"
+            className={`w-5 h-5 flex items-center justify-center rounded transition-colors leading-none ${
+              onReset ? 'text-[#c9a227] hover:text-[#e6c547]' : 'text-[#4b4f4f] cursor-not-allowed'
+            }`}
             title="Reset"
             onClick={onReset}
             disabled={!onReset}
           >
-            <span aria-hidden="true" className="text-base">↺</span>
+            <span aria-hidden="true" className="text-sm">↺</span>
             <span className="sr-only">Reset</span>
           </button>
           <button
             type="button"
-            className="flex items-center justify-center text-[#c9a227] hover:text-[#e6c547] transition-colors leading-none"
+            className="w-5 h-5 flex items-center justify-center rounded text-[#c9a227] hover:text-[#e6c547] transition-colors leading-none"
             title={isHidden ? 'Mostra stat' : 'Nascondi stat'}
             onClick={handleToggleHidden}
           >
-            <span aria-hidden="true" className="text-base">👁</span>
+            <span aria-hidden="true" className="text-sm">👁</span>
             <span className="sr-only">Nascondi</span>
           </button>
           <button
             type="button"
-            className="flex items-center justify-center text-[#c9a227] hover:text-[#e6c547] transition-colors leading-none"
+            className="w-5 h-5 flex items-center justify-center rounded text-[#c9a227] hover:text-[#e6c547] transition-colors leading-none"
             title="Modifica stat"
             onClick={() => setIsConfigMode(true)}
           >
-            <span aria-hidden="true" className="text-base">✎</span>
+            <span aria-hidden="true" className="text-sm">✎</span>
             <span className="sr-only">Modifica statistica</span>
           </button>
         </div>
@@ -251,7 +253,7 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, onUpdate, onDelete, on
         <div className="flex items-center gap-1">
           <button
             type="button"
-            className="w-8 h-8 flex items-center justify-center rounded-full border border-emerald-400 text-emerald-200 hover:bg-emerald-500/15"
+            className="w-6 h-6 flex items-center justify-center rounded border border-emerald-400 text-emerald-200 hover:bg-emerald-500/15 text-sm leading-none"
             title="Salva modifiche"
             onClick={handleSave}
           >
@@ -260,7 +262,7 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, onUpdate, onDelete, on
           </button>
           <button
             type="button"
-            className="w-8 h-8 flex items-center justify-center rounded-full border border-[#475758] text-[#aeb8b4] hover:text-amber-200"
+            className="w-6 h-6 flex items-center justify-center rounded border border-[#475758] text-[#aeb8b4] hover:text-amber-200 text-sm leading-none"
             title="Annulla"
             onClick={() => setIsConfigMode(false)}
           >
@@ -271,11 +273,11 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, onUpdate, onDelete, on
             <div className="relative">
               <button
                 type="button"
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-red-900/40 text-red-200 border border-red-500/70 hover:bg-red-800/70"
+                className="w-6 h-6 flex items-center justify-center rounded bg-red-900/40 text-red-200 border border-red-500/70 hover:bg-red-800/70 text-sm leading-none"
                 title="Elimina statistica"
                 onClick={() => setShowDeleteConfirm((prev) => !prev)}
               >
-                🗑
+                <span aria-hidden="true">🗑</span>
               </button>
               {showDeleteConfirm && (
                 <div className="absolute right-0 top-full mt-1 w-48 rounded-xl border border-red-500/40 bg-[#060b0d]/95 p-3 text-[11px] text-[#f5f0dc] shadow-[0_12px_35px_rgba(0,0,0,0.7)] z-20">

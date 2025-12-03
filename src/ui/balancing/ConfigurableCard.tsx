@@ -204,7 +204,7 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, onEditStat, onD
             {!isEditingHeader && (
               <button
                 type="button"
-                className={`w-5 h-5 flex items-center justify-center transition-colors ${
+                className={`w-5 h-5 flex items-center justify-center rounded transition-colors leading-none ${
                   onResetStat ? 'text-[#c9a227] hover:text-[#e6c547]' : 'text-[#4b4f4f] cursor-not-allowed'
                 }`}
                 title="Reset"
@@ -226,7 +226,7 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, onEditStat, onD
             {onUpdateCard && (
               <button
                 type="button"
-                className={`w-5 h-5 flex items-center justify-center text-xs transition-all ${
+                className={`w-5 h-5 flex items-center justify-center rounded transition-all leading-none ${
                   isEditingHeader
                     ? 'text-amber-100'
                     : 'text-[#c9a227] hover:text-[#e6c547]'
@@ -247,20 +247,20 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, onEditStat, onD
             {isEditingHeader && (
               <button
                 type="button"
-                className="w-5 h-5 flex items-center justify-center text-[#c9a227] hover:text-[#e6c547] leading-none"
+                className="w-5 h-5 flex items-center justify-center rounded text-[#c9a227] hover:text-[#e6c547] leading-none"
                 title="Annulla modifiche"
                 onClick={handleHeaderCancel}
               >
-                <span aria-hidden="true" className="text-base">✖</span>
+                <span aria-hidden="true" className="text-sm">✖</span>
                 <span className="sr-only">Annulla modifiche</span>
               </button>
             )}
             {!isEditingHeader && (
               <button
                 type="button"
-                className="w-5 h-5 flex items-center justify-center text-[#c9a227] hover:text-[#e6c547] transition-colors"
+                className="w-5 h-5 flex items-center justify-center rounded text-[#c9a227] hover:text-[#e6c547] transition-colors leading-none"
                 title="Nascondi card"
-                onClick={() => {}}
+                onClick={() => onUpdateCard?.({ isHidden: true })}
               >
                 <span aria-hidden="true" className="text-sm">👁</span>
                 <span className="sr-only">Nascondi card</span>
@@ -270,11 +270,11 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, onEditStat, onD
               <div className="relative">
                 <button
                   type="button"
-                  className="w-5 h-5 flex items-center justify-center text-red-300 hover:text-red-100 leading-none"
+                  className="w-5 h-5 flex items-center justify-center rounded text-red-300 hover:text-red-100 leading-none"
                   title="Elimina card"
                   onClick={() => setShowDeleteConfirm((prev) => !prev)}
                 >
-                  <span aria-hidden="true" className="text-base">🗑</span>
+                  <span aria-hidden="true" className="text-sm">🗑</span>
                 </button>
                 {showDeleteConfirm && (
                   <div className="absolute right-0 top-full mt-1 w-52 rounded-xl border border-red-500/40 bg-gradient-to-br from-[#1b0202] to-[#360808] p-3 text-[11px] text-[#f5f0dc] shadow-[0_18px_40px_rgba(0,0,0,0.65)] z-20">

@@ -68,7 +68,7 @@ const SortableCard: React.FC<SortableCardProps> = ({
 };
 
 export const BalancerNew: React.FC = () => {
-  const { config, reorderCards, updateStat, deleteStat, addCard, addStat, updateCard, deleteCard, resetStatToInitial, resetCardToInitial, resetToInitialConfig } = useBalancerConfig();
+  const { config, reorderCards, updateStat, deleteStat, addCard, addStat, updateCard, deleteCard, resetStatToInitial, resetToInitialConfig } = useBalancerConfig();
 
   const [lastCreatedStatId, setLastCreatedStatId] = useState<string | null>(null);
   const [lastCreatedCardId, setLastCreatedCardId] = useState<string | null>(null);
@@ -121,15 +121,29 @@ export const BalancerNew: React.FC = () => {
   return (
     <div className="min-h-full bg-gradient-to-br from-[#050509] via-[#0f1a1d] to-[#132427] text-[#f0efe4] p-4">
       <div className="max-w-6xl mx-auto space-y-3">
-        <header className="flex items-center justify-between">
+        <header className="flex items-center justify-between gap-2">
           <h1 className="text-3xl font-display text-[#f6f3e4]">Balancer</h1>
-          <button
-            type="button"
-            onClick={handleAddCard}
-            className="px-4 py-2 rounded-full border border-amber-400/60 text-amber-200 text-xs tracking-[0.4em] uppercase hover:bg-amber-500/10 transition-colors"
-          >
-            ＋ Nuova Card
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                if (window.confirm('Resettare tutte le configurazioni ai valori di default?')) {
+                  resetToInitialConfig();
+                }
+              }}
+              className="px-3 py-2 rounded border border-red-500/60 text-red-200 text-xs tracking-[0.3em] uppercase hover:bg-red-500/10 transition-colors"
+              title="Reset all to initial state"
+            >
+              ↺ Reset All
+            </button>
+            <button
+              type="button"
+              onClick={handleAddCard}
+              className="px-4 py-2 rounded-full border border-amber-400/60 text-amber-200 text-xs tracking-[0.4em] uppercase hover:bg-amber-500/10 transition-colors"
+            >
+              ＋ Nuova Card
+            </button>
+          </div>
         </header>
 
         <ConfigToolbar />
