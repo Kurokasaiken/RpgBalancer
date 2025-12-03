@@ -105,20 +105,38 @@ export class BalancerConfigStore {
   }
 
   private static mergeWithDefaults(config: BalancerConfig): BalancerConfig {
+    // Deep merge stats to preserve all properties including formulas
+    const mergedStats: Record<string, any> = { ...DEFAULT_CONFIG.stats };
+    Object.entries(config.stats).forEach(([id, stat]) => {
+      mergedStats[id] = {
+        ...(DEFAULT_CONFIG.stats[id] || {}),
+        ...stat,
+      };
+    });
+
+    // Deep merge cards
+    const mergedCards: Record<string, any> = { ...DEFAULT_CONFIG.cards };
+    Object.entries(config.cards).forEach(([id, card]) => {
+      mergedCards[id] = {
+        ...(DEFAULT_CONFIG.cards[id] || {}),
+        ...card,
+      };
+    });
+
+    // Deep merge presets
+    const mergedPresets: Record<string, any> = { ...DEFAULT_CONFIG.presets };
+    Object.entries(config.presets).forEach(([id, preset]) => {
+      mergedPresets[id] = {
+        ...(DEFAULT_CONFIG.presets[id] || {}),
+        ...preset,
+      };
+    });
+
     return {
       ...config,
-      stats: {
-        ...DEFAULT_CONFIG.stats,
-        ...config.stats,
-      },
-      cards: {
-        ...DEFAULT_CONFIG.cards,
-        ...config.cards,
-      },
-      presets: {
-        ...DEFAULT_CONFIG.presets,
-        ...config.presets,
-      },
+      stats: mergedStats,
+      cards: mergedCards,
+      presets: mergedPresets,
     };
   }
 
