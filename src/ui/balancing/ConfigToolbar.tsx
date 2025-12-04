@@ -2,6 +2,8 @@ import React, { useRef } from 'react';
 import { useBalancerConfig } from '../../balancing/hooks/useBalancerConfig';
 import { ToastContainer, useToast } from './Toast';
 
+const SIM_VALUES_KEY = 'balancer_sim_values';
+
 export const ConfigToolbar: React.FC = () => {
   const {
     undo,
@@ -15,7 +17,16 @@ export const ConfigToolbar: React.FC = () => {
 
   const handleExport = () => {
     try {
-      const json = exportConfig();
+      // Export both config and simValues
+      const configJson = exportConfig();
+      const config = JSON.parse(configJson);
+      const simValues = localStorage.getItem(SIM_VALUES_KEY);
+      const exportData = {
+        ...config,
+        _simValues: simValues ? JSON.parse(simValues) : {},
+      };
+      const json = JSON.stringify(exportData, null, 2);
+      
       const blob = new Blob([json], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -44,12 +55,31 @@ export const ConfigToolbar: React.FC = () => {
     reader.onload = () => {
       try {
         const text = reader.result as string;
-        const result = importConfig(text);
+        const parsed = JSON.parse(text);
+        
+        // Extract simValues if present
+        const { _simValues, ...configData } = parsed;
+        
+        // Import config (without _simValues)
+        const result = importConfig(JSON.stringify(configData));
         if (!result.success) {
           showToast(`Errore import: ${result.error}`, 'error');
-        } else {
-          showToast('Configurazione importata con successo', 'success');
+          return;
         }
+        
+        // Import simValues if present
+        if (_simValues && typeof _simValues === 'object') {
+          localStorage.setItem(SIM_VALUES_KEY, JSON.stringify(_simValues));
+          // Trigger a storage event so BalancerNew picks up the change
+          window.dispatchEvent(new StorageEvent('storage', {
+            key: SIM_VALUES_KEY,
+            newValue: JSON.stringify(_simValues),
+          }));
+        }
+        
+        showToast('Configurazione importata con successo', 'success');
+        // Force page reload to ensure simValues are picked up
+        window.location.reload();
       } catch (err) {
         showToast(`Errore durante import: ${(err as Error).message}`, 'error');
       }

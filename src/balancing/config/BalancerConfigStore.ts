@@ -10,15 +10,38 @@ const MAX_HISTORY = 10;
 // Use the JSON config as the new default
 const INITIAL_CONFIG: BalancerConfig = BALANCER_DEFAULT_JSON as unknown as BalancerConfig;
 
+// Track the last known localStorage state to detect external changes
+let lastStorageState: string | null = null;
+
 export class BalancerConfigStore {
   private static config: BalancerConfig | null = null;
   private static history: ConfigSnapshot[] = [];
 
+  /**
+   * Check if localStorage has been modified externally (e.g., from another tab)
+   */
+  private static hasExternalChange(): boolean {
+    if (typeof localStorage === 'undefined') return false;
+    const current = localStorage.getItem(STORAGE_KEY);
+    if (current !== lastStorageState) {
+      lastStorageState = current;
+      return true;
+    }
+    return false;
+  }
+
   static load(): BalancerConfig {
+    // Always check for external changes (from other tabs/windows)
+    if (this.hasExternalChange()) {
+      this.config = null; // Invalidate cache
+    }
+
     if (this.config) return this.config;
 
     try {
       const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null;
+      lastStorageState = raw;
+      
       if (raw) {
         const parsed = JSON.parse(raw);
         const validated = BalancerConfigSchema.parse(parsed);
@@ -29,11 +52,17 @@ export class BalancerConfigStore {
         // Save it to localStorage so it becomes the new default
         if (typeof localStorage !== 'undefined') {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(this.config));
+          lastStorageState = JSON.stringify(this.config);
         }
       }
     } catch (e) {
       console.warn('Failed to load balancer config, using defaults:', e);
+      // Fall back to INITIAL_CONFIG and persist it so subsequent loads and exports are valid
       this.config = { ...INITIAL_CONFIG };
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(this.config));
+        lastStorageState = JSON.stringify(this.config);
+      }
     }
 
     this.loadHistory();
@@ -50,7 +79,9 @@ export class BalancerConfigStore {
     this.config = config;
 
     if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+      const serialized = JSON.stringify(config);
+      localStorage.setItem(STORAGE_KEY, serialized);
+      lastStorageState = serialized;
     }
   }
 
@@ -105,7 +136,9 @@ export class BalancerConfigStore {
     this.config = JSON.parse(JSON.stringify(previous.config));
 
     if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.config));
+      const serialized = JSON.stringify(this.config);
+      localStorage.setItem(STORAGE_KEY, serialized);
+      lastStorageState = serialized;
       this.history.shift();
       localStorage.setItem(HISTORY_KEY, JSON.stringify(this.history));
     }
@@ -114,31 +147,43 @@ export class BalancerConfigStore {
   }
 
   private static mergeWithDefaults(config: BalancerConfig): BalancerConfig {
-    // Deep merge stats to preserve all properties including formulas
-    const mergedStats: Record<string, any> = { ...DEFAULT_CONFIG.stats };
+    // Deep merge stats: preserve imported values, add missing defaults
+    const mergedStats: Record<string, any> = {};
+    
+    // First, add all defaults
+    Object.entries(DEFAULT_CONFIG.stats).forEach(([id, stat]) => {
+      mergedStats[id] = { ...stat };
+    });
+    
+    // Then, override with imported values (preserving them completely)
     Object.entries(config.stats).forEach(([id, stat]) => {
-      mergedStats[id] = {
-        ...(DEFAULT_CONFIG.stats[id] || {}),
-        ...stat,
-      };
+      mergedStats[id] = { ...stat };
     });
 
-    // Deep merge cards
-    const mergedCards: Record<string, any> = { ...DEFAULT_CONFIG.cards };
+    // Deep merge cards: preserve imported values, add missing defaults
+    const mergedCards: Record<string, any> = {};
+    
+    // First, add all defaults
+    Object.entries(DEFAULT_CONFIG.cards).forEach(([id, card]) => {
+      mergedCards[id] = { ...card };
+    });
+    
+    // Then, override with imported values (preserving them completely)
     Object.entries(config.cards).forEach(([id, card]) => {
-      mergedCards[id] = {
-        ...(DEFAULT_CONFIG.cards[id] || {}),
-        ...card,
-      };
+      mergedCards[id] = { ...card };
     });
 
-    // Deep merge presets
-    const mergedPresets: Record<string, any> = { ...DEFAULT_CONFIG.presets };
+    // Deep merge presets: preserve imported values, add missing defaults
+    const mergedPresets: Record<string, any> = {};
+    
+    // First, add all defaults
+    Object.entries(DEFAULT_CONFIG.presets).forEach(([id, preset]) => {
+      mergedPresets[id] = { ...preset };
+    });
+    
+    // Then, override with imported values (preserving them completely)
     Object.entries(config.presets).forEach(([id, preset]) => {
-      mergedPresets[id] = {
-        ...(DEFAULT_CONFIG.presets[id] || {}),
-        ...preset,
-      };
+      mergedPresets[id] = { ...preset };
     });
 
     return {
@@ -153,7 +198,9 @@ export class BalancerConfigStore {
     this.addToHistory('Reset to defaults');
     this.config = { ...DEFAULT_CONFIG };
     if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.config));
+      const serialized = JSON.stringify(this.config);
+      localStorage.setItem(STORAGE_KEY, serialized);
+      lastStorageState = serialized;
     }
     return this.config;
   }
@@ -170,3 +217,4 @@ export class BalancerConfigStore {
     return merged;
   }
 }
+

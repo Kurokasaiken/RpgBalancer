@@ -94,6 +94,7 @@ Example:
 │ Phase 8: Fantasy UI       ✅ DONE    ~50 tasks      │
 │ Phase 9: Combat Exp.      ✅ DONE    ~100 tasks     │
 │ Phase 10: Config Balancer 🔥 ACTIVE  ~140 tasks     │
+│ Phase 10.5: Stat Testing  🔥 NEXT    ~80 tasks      │
 ├──────────────────────────────────────────────────────┤
 │ TOTAL PROGRESS: ███████████████░░░░░ 75%            │
 └──────────────────────────────────────────────────────┘
@@ -204,7 +205,44 @@ See full spec for archetype stats, encounter templates, and drop mechanics.
 
 ---
 
-### 📋 **PHASE 5: Universal Creators (Future)**
+### 🔥 **PHASE 10.5: Stat Stress Testing & Marginal Utility (PRIORITY)**
+
+**Status:** 🔥 NEXT (Ready to Start)
+
+| Document | Purpose |
+|----------|---------|
+| **📋 Plan** | [plans/stat_stress_testing_plan.md](plans/stat_stress_testing_plan.md) |
+| **✅ Tasks** | [plans/stat_stress_testing_tasks.md](plans/stat_stress_testing_tasks.md) (to be created) |
+
+**Overview:**
+Dynamic stress-testing system for validating stat weights and identifying synergies:
+
+**Key Features:**
+- **Single-Stat Archetipi:** Generate archetipi with +25 points in ONE stat (weighted by current weight)
+- **Pair-Stat Archetipi:** Test ALL stat combinations (C(n,2) pairs)
+- **Marginal Utility Scoring:** Empirical value of each stat via 10k simulations
+- **Synergy Heatmap:** Identify OP/weak stat combinations
+- **Dynamic Generation:** Read stats from Balancer config, zero hardcoding
+- **Interesting Presentation:** Table + heatmap + radar charts
+
+**Deliverables:**
+- `StressTestArchetypeGenerator.ts` - Dynamic archetype creation
+- `MarginalUtilityCalculator.ts` - Simulation & metrics
+- UI Components: `MarginalUtilityTable`, `SynergyHeatmap`, `StatProfileRadar`
+- `StressTestDashboard.tsx` - Interactive results page
+- `useStressTesting()` hook - Integration with Balancer
+
+**Success Criteria:**
+- ✅ All stats tested individually (no hardcoding)
+- ✅ All stat pairs tested (C(n,2) combinations)
+- ✅ Marginal utility scores calculated via simulation
+- ✅ Synergy heatmap identifies OP/weak combinations
+- ✅ Deterministic (LCG seeded, reproducible)
+- ✅ Results exported for analysis
+
+**Timeline:** 3-4 days (after Phase 10 completion)
+
+---
 
 **Status:** 10% (Paused)
 

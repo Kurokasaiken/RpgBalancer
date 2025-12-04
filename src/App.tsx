@@ -29,9 +29,12 @@ import { SeraphimArchive } from './ui/fantasy/mockups/SeraphimArchive';
 import { VerdantAlloyDeck } from './ui/fantasy/mockups/VerdantAlloyDeck';
 import { CompactDemo } from './ui/pages/CompactDemo';
 import { BalancerNew } from './ui/balancing/BalancerNew';
+import { StatStressTestingPage } from './ui/testing/StatStressTestingPage';
 
 type Tab =
   | 'balancer'
+  | 'balancerLegacy'
+  | 'balancerStats'
   | 'archetypes'
   | 'archetypeBuilder'
   | 'archetypeFantasy'
@@ -56,11 +59,10 @@ type Tab =
   | 'mockSeraphimArchive'
   | 'mockVerdantAlloy'
   | 'mockGildedCards'
-  | 'balancerNew'
   | 'compactDemo';
 
 function App() {
-  const [activeTab, setActiveTab] = useState<Tab>('balancerNew');
+  const [activeTab, setActiveTab] = useState<Tab>('balancer');
 
   // Listen for spell creation navigation from SpellLibrary
   useEffect(() => {
@@ -74,6 +76,11 @@ function App() {
       {activeTab === 'balancer' && (
         <ErrorBoundary componentName="Balancer">
           <FantasyBalancer />
+        </ErrorBoundary>
+      )}
+      {activeTab === 'balancerLegacy' && (
+        <ErrorBoundary componentName="Config-Driven Balancer (WIP)">
+          <BalancerNew />
         </ErrorBoundary>
       )}
       {activeTab === 'testing' && (
@@ -136,6 +143,11 @@ function App() {
           <AutoBalancerWrapper />
         </ErrorBoundary>
       )}
+      {activeTab === 'balancerStats' && (
+        <ErrorBoundary componentName="Stat Stress Testing">
+          <StatStressTestingPage />
+        </ErrorBoundary>
+      )}
       {activeTab === 'fantasyShowcase' && (
         <ErrorBoundary componentName="Fantasy Showcase">
           <FantasyComponentShowcase />
@@ -159,11 +171,6 @@ function App() {
       {activeTab === 'mockGildedCards' && (
         <ErrorBoundary componentName="Gilded Card Showcase">
           <GildedCardShowcase />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'balancerNew' && (
-        <ErrorBoundary componentName="Balancer New">
-          <BalancerNew />
         </ErrorBoundary>
       )}
       {activeTab === 'mockObsidianSanctum' && (

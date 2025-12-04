@@ -16,7 +16,7 @@ interface Props {
   onUpdateCard?: (updates: Partial<CardDefinition>) => void;
   onDeleteCard?: () => void;
   startHeaderInEdit?: boolean;
-  availableStats: string[];
+  availableStats: { id: string; label: string }[];
   dragListeners?: React.HTMLAttributes<HTMLButtonElement>;
 }
 
@@ -317,7 +317,7 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, simValues, onSi
             )}
           </div>
         </div>
-      </div>
+      )}
       <div className="space-y-2">
         {orderedStats.length === 0 && (
           <p className="text-[11px] text-[#aeb8b4] italic">No stats in this card yet.</p>

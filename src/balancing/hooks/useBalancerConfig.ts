@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type {
   BalancerConfig,
   BalancerPreset,
@@ -70,6 +70,20 @@ export function useBalancerConfig(): UseBalancerConfigReturn {
     setHistory(BalancerConfigStore.getHistory());
   }, []);
 
+  // Listen for localStorage changes (from other tabs/windows or import)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      refreshState();
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', handleStorageChange);
+      return () => {
+        window.removeEventListener('storage', handleStorageChange);
+      };
+    }
+  }, [refreshState]);
+
   const saveConfig = useCallback(
     (next: BalancerConfig, description: string) => {
       BalancerConfigStore.save(next, description);
@@ -90,6 +104,15 @@ export function useBalancerConfig(): UseBalancerConfigReturn {
 
       if (config.stats[fullStat.id]) {
         return { success: false, error: `Stat ID "${fullStat.id}" already exists` };
+      }
+
+      // Enforce unique labels (case-insensitive, trimmed)
+      const newLabel = fullStat.label.trim().toLowerCase();
+      const existingWithLabel = Object.values(config.stats).find(
+        (s) => s.label.trim().toLowerCase() === newLabel,
+      );
+      if (existingWithLabel) {
+        return { success: false, error: `Stat label "${fullStat.label}" is already used` };
       }
 
       const card = config.cards[cardId];
@@ -134,6 +157,15 @@ export function useBalancerConfig(): UseBalancerConfigReturn {
       const result = StatDefinitionSchema.safeParse(merged);
       if (!result.success) {
         return { success: false, error: result.error.issues[0]?.message };
+      }
+
+      // Enforce unique labels (case-insensitive, trimmed) across all other stats
+      const mergedLabel = merged.label.trim().toLowerCase();
+      const labelConflict = Object.values(config.stats).some(
+        (s) => s.id !== statId && s.label.trim().toLowerCase() === mergedLabel,
+      );
+      if (labelConflict) {
+        return { success: false, error: `Stat label "${merged.label}" is already used` };
       }
 
       if (merged.isDerived && merged.formula) {

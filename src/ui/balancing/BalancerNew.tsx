@@ -22,7 +22,7 @@ interface SortableCardProps {
   onUpdateCard: (updates: Partial<CardDefinition>) => void;
   onDeleteCard: () => void;
   startHeaderInEdit?: boolean;
-  availableStats: string[];
+  availableStats: { id: string; label: string }[];
 }
 
 const SortableCard: React.FC<SortableCardProps> = ({
@@ -86,8 +86,26 @@ export const BalancerNew: React.FC = () => {
   const [lastCreatedCardId, setLastCreatedCardId] = useState<string | null>(null);
   const [resetConfirmPending, setResetConfirmPending] = useState(false);
   
-  // Simulation values - initialized from config defaults
+  const SIM_VALUES_KEY = 'balancer_sim_values';
+  
+  // Simulation values - initialized from localStorage or config defaults
   const [simValues, setSimValues] = useState<Record<string, number>>(() => {
+    // Try to load from localStorage first
+    const saved = localStorage.getItem(SIM_VALUES_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        // Merge with config defaults for any new stats
+        const merged: Record<string, number> = {};
+        Object.entries(config.stats).forEach(([id, stat]) => {
+          merged[id] = typeof parsed[id] === 'number' ? parsed[id] : stat.defaultValue;
+        });
+        return merged;
+      } catch {
+        // Fall through to defaults
+      }
+    }
+    // Initialize from config defaults
     const initial: Record<string, number> = {};
     Object.entries(config.stats).forEach(([id, stat]) => {
       initial[id] = stat.defaultValue;
@@ -95,15 +113,43 @@ export const BalancerNew: React.FC = () => {
     return initial;
   });
   
-  // Keep simValues in sync with config: whenever config.stats changes
-  // (e.g., after import, reset card, reset stat), rebuild the simulation
-  // values from the current defaultValue of each stat.
+  // Save simValues to localStorage whenever they change
   useEffect(() => {
-    const next: Record<string, number> = {};
-    Object.entries(config.stats).forEach(([id, stat]) => {
-      next[id] = stat.defaultValue;
+    localStorage.setItem(SIM_VALUES_KEY, JSON.stringify(simValues));
+  }, [simValues]);
+  
+  // When config.stats changes (new stat added, stat deleted), update simValues
+  // but ONLY for new stats - preserve existing values
+  useEffect(() => {
+    setSimValues(prev => {
+      const next: Record<string, number> = {};
+      Object.entries(config.stats).forEach(([id, stat]) => {
+        // Preserve existing value if present, otherwise use defaultValue
+        next[id] = typeof prev[id] === 'number' ? prev[id] : stat.defaultValue;
+      });
+      return next;
     });
-    setSimValues(next);
+  }, [config.stats]);
+  
+  // Listen for storage changes (from import or other tabs)
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === SIM_VALUES_KEY && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          const merged: Record<string, number> = {};
+          Object.entries(config.stats).forEach(([id, stat]) => {
+            merged[id] = typeof parsed[id] === 'number' ? parsed[id] : stat.defaultValue;
+          });
+          setSimValues(merged);
+        } catch {
+          // Ignore parse errors
+        }
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, [config.stats]);
   
   // Handle simulation value change - this triggers formula recalculation
@@ -111,8 +157,26 @@ export const BalancerNew: React.FC = () => {
     setSimValues(prev => ({ ...prev, [statId]: value }));
   }, []);
 
+  // Reset all configuration and simulation values back to the initial snapshot
+  const handleResetAll = () => {
+    if (!resetConfirmPending) {
+      setResetConfirmPending(true);
+      // Small window to confirm reset without blocking UI
+      setTimeout(() => {
+        setResetConfirmPending(false);
+      }, 2000);
+      return;
+    }
+
+    setResetConfirmPending(false);
+    // Clear simValues so that the next config snapshot repopulates them from defaults
+    setSimValues({});
+    // Reset config to the initial snapshot stored by useBalancerConfig
+    resetToInitialConfig();
+  };
+
   const cards = Object.values(config.cards).sort((a, b) => a.order - b.order);
-  const allStatIds = Object.keys(config.stats);
+  const allStatInfos = Object.values(config.stats).map((stat) => ({ id: stat.id, label: stat.label }));
   const visibleCards = cards.filter((card) => !card.isHidden);
   const hiddenCards = cards.filter((card) => card.isHidden);
 
@@ -180,6 +244,18 @@ export const BalancerNew: React.FC = () => {
           <div className="flex items-center gap-2">
             <button
               type="button"
+              onClick={handleResetAll}
+              className={`px-3 py-1.5 rounded-full border text-xs tracking-[0.35em] uppercase transition-colors ${
+                resetConfirmPending
+                  ? 'border-red-400/80 text-red-100 bg-red-500/20'
+                  : 'border-red-500/60 text-red-200 hover:bg-red-500/10'
+              }`}
+              title={resetConfirmPending ? 'Clicca di nuovo per confermare il reset completo' : 'Resetta tutto ai valori iniziali'}
+            >
+              ↺ Reset All
+            </button>
+            <button
+              type="button"
               onClick={handleAddCard}
               className="px-4 py-2 rounded-full border border-amber-400/60 text-amber-200 text-xs tracking-[0.4em] uppercase hover:bg-amber-500/10 transition-colors"
             >
@@ -210,7 +286,7 @@ export const BalancerNew: React.FC = () => {
         )}
 
         <div className="rounded-2xl border border-indigo-500/30 bg-slate-900/60 backdrop-blur-md p-4 shadow-[0_18px_45px_rgba(15,23,42,0.9)] relative overflow-hidden min-h-[600px]">
-          <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                    <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={cards.map((c) => c.id)} strategy={verticalListSortingStrategy}>
               <div className="grid gap-2.5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
                 {visibleCards.map((card) => (
@@ -239,7 +315,7 @@ export const BalancerNew: React.FC = () => {
                       deleteCard(card.id);
                     }}
                     startHeaderInEdit={card.id === lastCreatedCardId}
-                    availableStats={allStatIds}
+                    availableStats={allStatInfos}
                   />
                 ))}
                 <button

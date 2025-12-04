@@ -1,6 +1,6 @@
 import { mean, median, min, max } from 'simple-statistics';
 import { CombatSimulator } from './CombatSimulator';
-import type { SimulationConfig, SimulationResults, CombatResult } from './types';
+import type { SimulationConfig, SimulationResults, CombatResult, RNG } from './types';
 
 /**
  * Monte Carlo Simulation - Batch Combat Runner
@@ -50,13 +50,16 @@ export class MonteCarloSimulation {
         const efficiency1Array: number[] = [];
         const efficiency2Array: number[] = [];
 
+        // Simple RNG for this batch (for now use Math.random-based RNG)
+        const rng: RNG = () => Math.random();
+
         // Run simulations
         for (let i = 0; i < iterations; i++) {
             // Optional: enable detailed logging for sample combats
             const enableLogging = i < logSampleSize;
             const combatConfig = { ...combat, enableDetailedLogging: enableLogging };
 
-            const result = CombatSimulator.simulate(combatConfig);
+            const result = CombatSimulator.simulate(combatConfig, rng);
 
             // Store sample combats
             if (enableLogging) {

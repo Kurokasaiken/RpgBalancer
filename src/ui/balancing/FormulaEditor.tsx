@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { suggestCompletions, validateFormula } from '../../balancing/config/FormulaEngine';
+import { validateFormula } from '../../balancing/config/FormulaEngine';
 
 interface Props {
   value: string;
   onChange: (formula: string) => void;
-  availableStats: string[];
+  availableStats: { id: string; label: string }[];
 }
 
 const OPERATOR_TOKENS = ['+', '-', '*', '/', '(', ')'];
@@ -20,7 +20,9 @@ export const FormulaEditor: React.FC<Props> = ({ value, onChange, availableStats
       setError('Formula cannot be empty');
       return;
     }
-    const result = validateFormula(value, availableStats);
+    // validateFormula lavora su ID delle stats, non sugli oggetti UI
+    const statIds = availableStats.map((s) => s.id);
+    const result = validateFormula(value, statIds);
     setError(result.valid ? undefined : result.error);
   }, [value, availableStats]);
 
@@ -30,7 +32,16 @@ export const FormulaEditor: React.FC<Props> = ({ value, onChange, availableStats
     const match = beforeCursor.match(/[a-zA-Z_][a-zA-Z0-9_]*$/);
     const currentWord = match ? match[0] : '';
     const start = match ? safeCursor - currentWord.length : safeCursor;
-    const list = currentWord ? suggestCompletions(currentWord, availableStats) : [];
+    const needle = currentWord.toLowerCase();
+    const list = availableStats
+      .filter((s) => {
+        if (!needle) return true;
+        return (
+          s.label.trim().toLowerCase().includes(needle) ||
+          s.id.toLowerCase().startsWith(needle)
+        );
+      })
+      .slice(0, 8);
     return {
       suggestions: list.slice(0, 8),
       matchStart: start,
@@ -69,7 +80,7 @@ export const FormulaEditor: React.FC<Props> = ({ value, onChange, availableStats
     });
   };
 
-  const insertSuggestion = (suggestion: string) => insertToken(suggestion, true);
+  const insertSuggestion = (suggestionId: string) => insertToken(suggestionId, true);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (!suggestions.length) return;
@@ -81,7 +92,7 @@ export const FormulaEditor: React.FC<Props> = ({ value, onChange, availableStats
       setActiveSuggestion((prev) => (prev - 1 + suggestions.length) % suggestions.length);
     } else if (event.key === 'Tab') {
       event.preventDefault();
-      insertSuggestion(suggestions[activeSuggestion]);
+      insertSuggestion(suggestions[activeSuggestion].id);
     }
   };
 
@@ -124,7 +135,7 @@ export const FormulaEditor: React.FC<Props> = ({ value, onChange, availableStats
           <div className="flex flex-wrap gap-1">
             {suggestions.map((suggestion, index) => (
               <button
-                key={suggestion}
+                key={suggestion.id}
                 type="button"
                 className={`px-2 py-0.5 rounded border ${
                   index === activeSuggestion
@@ -134,10 +145,10 @@ export const FormulaEditor: React.FC<Props> = ({ value, onChange, availableStats
                 onMouseEnter={() => setActiveSuggestion(index)}
                 onMouseDown={(e) => {
                   e.preventDefault();
-                  insertSuggestion(suggestion);
+                  insertSuggestion(suggestion.id);
                 }}
               >
-                {suggestion}
+                {suggestion.label}
               </button>
             ))}
           </div>
@@ -151,7 +162,7 @@ export const FormulaEditor: React.FC<Props> = ({ value, onChange, availableStats
       )}
       <div className="text-[10px] text-slate-500 mt-1">
         <span className="font-semibold text-slate-300">Stats disponibili:</span>{' '}
-        {availableStats.join(', ') || 'nessuna'}
+        {availableStats.map((s) => s.label).join(', ') || 'nessuna'}
       </div>
     </div>
   );

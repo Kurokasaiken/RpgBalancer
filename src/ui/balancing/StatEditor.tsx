@@ -119,7 +119,7 @@ export const StatEditor: React.FC<Props> = ({ isOpen, onClose, card, editingStat
     onClose();
   };
 
-  const availableStats = Object.keys(config.stats);
+  const availableStats = Object.values(config.stats).map((s) => ({ id: s.id, label: s.label }));
 
   return (
     <div className="fixed inset-0 z-40 flex justify-end bg-black/60">

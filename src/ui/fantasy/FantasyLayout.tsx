@@ -22,6 +22,8 @@ const NAV_SECTIONS = [
         title: 'Core',
         items: [
             { id: 'balancer', label: 'Balance', icon: '⚖️' },
+            { id: 'balancerLegacy', label: 'Balance New (WIP)', icon: '🔧' },
+            { id: 'balancerStats', label: 'Stat Testing', icon: '📊' },
             { id: 'spellCreation', label: 'Spell Creation', icon: '✨' },
             { id: 'archetypes', label: 'Archetypes', icon: '🎭' },
             { id: 'archetypeBuilder', label: 'Builder', icon: '🏗️' },
@@ -39,7 +41,6 @@ const NAV_SECTIONS = [
     {
         title: 'Mockups',
         items: [
-            { id: 'balancerNew', label: 'Balancer New', icon: '🜚' },
             { id: 'mockSpellCreatorNew', label: 'Spell Creator New', icon: '✨' },
             { id: 'mockGildedObservatory', label: 'Gilded Observatory', icon: '🜂' },
             { id: 'mockGildedCards', label: 'Gilded Card Showcase', icon: '🂠' },
@@ -57,7 +58,6 @@ const NAV_SECTIONS = [
         title: 'System',
         items: [
             { id: 'compactDemo', label: 'Compact UI Demo', icon: '📐' },
-            { id: 'balancer', label: 'Legacy Balancer', icon: '⚖️' },
             { id: 'fantasyShowcase', label: 'Showcase', icon: '🎨' },
         ]
     }

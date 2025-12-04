@@ -72,11 +72,13 @@ interface Props {
   onDelete: () => void;
   onReset?: () => void;
   startInEdit?: boolean;
-  availableStats: string[];
+  availableStats: { id: string; label: string }[];
   canDelete?: boolean;
+  dependentStats?: string[]; // Stats that depend on this one (for highlight)
+  isDependencyHighlighted?: boolean; // Whether this stat is highlighted as a dependency
 }
 
-export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueChange, allSimValues, onUpdate, onDelete, onReset, startInEdit, availableStats, canDelete = false }) => {
+export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueChange, allSimValues, onUpdate, onDelete, onReset, startInEdit, availableStats, canDelete = false, isDependencyHighlighted }) => {
   const [isConfigMode, setIsConfigMode] = useState(!!startInEdit);
   const [label, setLabel] = useState(stat.label);
   const [description, setDescription] = useState(stat.description ?? '');
@@ -90,11 +92,15 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   
+  const isLocked = !!stat.isLocked;
+  const isHidden = !!stat.isHidden;
+  
   const LucideIcon = stat.icon ? lucideStatIcons[stat.icon] : undefined;
   const fallbackGlyph = statGlyphMap[stat.id] ?? '◆';
   
   // For derived stats, calculate value from formula; otherwise use simValue
-  const displayValue = stat.isDerived && stat.formula 
+  // If locked, use simValue (frozen value); if not locked and derived, calculate from formula
+  const displayValue = stat.isDerived && stat.formula && !isLocked
     ? executeFormula(stat.formula, allSimValues)
     : simValue;
   
@@ -144,9 +150,6 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
     setIsConfigMode(false);
   };
 
-  const isLocked = !!stat.isLocked;
-  const isHidden = !!stat.isHidden;
-
   const handleToggleLock = () => {
     onUpdate({ isLocked: !isLocked });
   };
@@ -186,7 +189,11 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
       );
     }
     return (
-      <div className="flex items-center justify-between text-xs py-2 px-3 rounded-xl border border-slate-700/70 bg-slate-900/70 backdrop-blur-sm gap-1.5 shadow-[0_10px_24px_rgba(15,23,42,0.85)]">
+      <div className={`flex items-center justify-between text-xs py-2 px-3 rounded-xl border backdrop-blur-sm gap-1.5 shadow-[0_10px_24px_rgba(15,23,42,0.85)] ${
+        isDependencyHighlighted
+          ? 'border-amber-400/60 bg-amber-950/40'
+          : 'border-slate-700/70 bg-slate-900/70'
+      }`}>
         <div className="flex flex-col flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
             <div className="flex items-center gap-1.5 min-w-0 flex-1">
@@ -269,7 +276,7 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
                   : 'border-indigo-500/70 text-indigo-200 hover:bg-indigo-500/20'
               }`}
               onClick={() => {
-                if (isLocked || stat.isDerived) return;
+                if (isLocked) return;
                 onSimValueChange(Math.max(stat.min, simValue - stat.step));
               }}
               aria-label="Decrement"
@@ -284,10 +291,10 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
               step={stat.step}
               value={displayValue}
               onChange={(e) => {
-                if (isLocked || stat.isDerived) return;
+                if (isLocked) return;
                 onSimValueChange(Number(e.target.value));
               }}
-              disabled={isLocked || stat.isDerived}
+              disabled={isLocked}
               style={{
                 background: `linear-gradient(to right, #4f46e5 0%, #22d3ee ${sliderProgress}%, #020617 ${sliderProgress}%, #020617 100%)`,
               }}
@@ -300,7 +307,7 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
                   : 'border-[#9d7d5c] text-[#c9a227] hover:bg-[#2a2015]'
               }`}
               onClick={() => {
-                if (isLocked || stat.isDerived) return;
+                if (isLocked) return;
                 onSimValueChange(Math.min(stat.max, simValue + stat.step));
               }}
               aria-label="Increment"
@@ -448,36 +455,40 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
           <span className="text-[10px] text-[#8aa0a1]">Min</span>
           <input
             type="number"
-            className="w-full rounded bg-[#0c1517] border border-[#475758] px-2 py-1 text-[11px] text-[#f5f0dc]"
+            className="w-full rounded bg-[#0c1517] border border-[#475758] px-2 py-1 text-[11px] text-[#f5f0dc] disabled:opacity-50 disabled:cursor-not-allowed"
             value={min}
             onChange={(e) => setMin(Number(e.target.value))}
+            disabled={isDerived}
           />
         </label>
         <label className="flex flex-col gap-0.5">
           <span className="text-[10px] text-[#8aa0a1]">Max</span>
           <input
             type="number"
-            className="w-full rounded bg-[#0c1517] border border-[#475758] px-2 py-1 text-[11px] text-[#f5f0dc]"
+            className="w-full rounded bg-[#0c1517] border border-[#475758] px-2 py-1 text-[11px] text-[#f5f0dc] disabled:opacity-50 disabled:cursor-not-allowed"
             value={max}
             onChange={(e) => setMax(Number(e.target.value))}
+            disabled={isDerived}
           />
         </label>
         <label className="flex flex-col gap-0.5">
           <span className="text-[10px] text-[#8aa0a1]">Step</span>
           <input
             type="number"
-            className="w-full rounded bg-[#0c1517] border border-[#475758] px-2 py-1 text-[11px] text-[#f5f0dc]"
+            className="w-full rounded bg-[#0c1517] border border-[#475758] px-2 py-1 text-[11px] text-[#f5f0dc] disabled:opacity-50 disabled:cursor-not-allowed"
             value={step}
             onChange={(e) => setStep(Number(e.target.value))}
+            disabled={isDerived}
           />
         </label>
         <label className="flex flex-col gap-0.5">
           <span className="text-[10px] text-[#8aa0a1]">Weight</span>
           <input
             type="number"
-            className="w-full rounded bg-[#0c1517] border border-[#475758] px-2 py-1 text-[11px] text-[#f5f0dc]"
+            className="w-full rounded bg-[#0c1517] border border-[#475758] px-2 py-1 text-[11px] text-[#f5f0dc] disabled:opacity-50 disabled:cursor-not-allowed"
             value={weight}
             onChange={(e) => setWeight(Number(e.target.value))}
+            disabled={isDerived}
           />
         </label>
       </div>
