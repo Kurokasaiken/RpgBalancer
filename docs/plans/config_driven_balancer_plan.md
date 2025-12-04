@@ -3,9 +3,15 @@
 > **Obiettivo:** Trasformare il Balancer in un sistema completamente configurabile da UI, dove card, stat, formule e preset sono definiti in JSON e modificabili dall'utente.
 
 **Creato:** 2025-12-02  
-**Stato:** 🔄 In Progress (Phase 0: Priority Fix)  
+**Stato:** 🔄 In Progress (Phase 0: Priority Fix su BalancerNew)  
 **Priorità:** Alta  
 **Effort stimato:** 12-16 ore + 4-6 ore fix
+
+**Runtime status (Dic 2025)**
+
+- La tab **Balance** nell'app usa ancora il **FantasyBalancer legacy** come balancer principale (stabile).
+- Il nuovo **Config-Driven Balancer** (`BalancerNew`) è esposto come tab separata *"Balance New (WIP)"*.
+- Tutti i fix di **Phase 0: Priority Fix** si riferiscono in modo specifico a `BalancerNew` (reset, lock/hide, import/export, formule, drag & drop) per portarlo in parità di comportamento con il balancer legacy prima di sostituirlo nella tab principale.
 
 ---
 

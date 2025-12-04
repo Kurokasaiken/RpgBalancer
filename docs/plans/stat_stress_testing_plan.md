@@ -490,6 +490,16 @@ export function useRoundRobinTesting() {
 // After run: show efficiency table + NxN heatmap + radar
 // Tier selector: 25 / 50 / 75
 // Iterations selector: 500 / 1000 / 2000
+
+// NEW (Dec 2025):
+// - After results are available, show a clear table of current stat WEIGHTS
+//   (config.stats[statId].weight) alongside the efficiency metrics.
+// - Each weight must be editable in-place from this page.
+// - Edits must propagate back through the shared config/store
+//   (useBalancerConfig / BalancerConfigStore), so that:
+//   - future stress-test runs use the updated weights
+//   - any other system depending on weights (e.g. archetype generation)
+//     sees the new values immediately.
 ```
 
 ---
