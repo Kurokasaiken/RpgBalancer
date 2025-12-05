@@ -3,7 +3,7 @@ import { BASELINE_STATS } from '../baseline';
 import type { StatsArchetype } from './StressTestArchetypeGenerator';
 import type { MarginalUtilityMetrics, PairSynergyMetrics } from './metrics';
 import { MonteCarloSimulation } from '../simulation/MonteCarloSimulation';
-import type { SimulationConfig } from '../simulation/types';
+import type { SimulationConfig, RNG } from '../simulation/types';
 
 /**
  * MarginalUtilityCalculator
@@ -28,6 +28,7 @@ export class MarginalUtilityCalculator {
   async calculateStatUtility(
     statsArchetype: StatsArchetype,
     iterations: number,
+    rng?: RNG,
   ): Promise<MarginalUtilityMetrics> {
     if (statsArchetype.type !== 'single-stat') {
       throw new Error('calculateStatUtility expects a single-stat StatsArchetype');
@@ -52,6 +53,7 @@ export class MarginalUtilityCalculator {
         },
         turnLimit: 100,
       },
+      rng,
     };
 
     const results = MonteCarloSimulation.run(simConfig);
@@ -99,6 +101,7 @@ export class MarginalUtilityCalculator {
     pairArchetype: StatsArchetype,
     singleMetrics: Map<string, MarginalUtilityMetrics>,
     iterations: number,
+    rng?: RNG,
   ): Promise<PairSynergyMetrics> {
     if (pairArchetype.type !== 'pair-stat') {
       throw new Error('calculatePairSynergy expects a pair-stat StatsArchetype');
@@ -123,6 +126,7 @@ export class MarginalUtilityCalculator {
         },
         turnLimit: 100,
       },
+      rng,
     };
 
     const results = MonteCarloSimulation.run(simConfig);

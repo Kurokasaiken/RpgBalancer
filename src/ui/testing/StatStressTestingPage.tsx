@@ -329,7 +329,16 @@ export const StatStressTestingPage: React.FC = () => {
                   )}
                 </h2>
                 {selectedTier !== null && currentResults.matchups.length > 0 ? (
-                  <SynergyHeatmap synergies={convertToSynergy(currentResults.matchups)} />
+                  <>
+                    <SynergyHeatmap
+                      synergies={convertToSynergy(currentResults.matchups)}
+                      getLabel={getStatLabel}
+                    />
+                    <div className="mt-2 text-[9px] text-slate-500">
+                      Red = pair performs far above neutral expectation (&gt;115%), amber = moderately
+                      above (~105–115%), grey ≈ neutral (~95–105%), blue = below expectation (&lt;95%).
+                    </div>
+                  </>
                 ) : (
                   <div className="text-[10px] text-slate-500 bg-slate-900/40 border border-slate-700/40 rounded-lg p-4 text-center">
                     {selectedTier === null

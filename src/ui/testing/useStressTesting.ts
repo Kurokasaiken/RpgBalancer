@@ -13,6 +13,7 @@ interface UseStressTestingState {
 
 export function useStressTesting() {
   const { config } = useBalancerConfig();
+  const STRESS_TEST_SEED = 987654;
   const [state, setState] = useState<UseStressTestingState>({
     singleStats: [],
     pairStats: [],
@@ -20,15 +21,18 @@ export function useStressTesting() {
     hasRun: false,
   });
 
-  const runTests = useCallback(async (iterations: number = 5000) => {
-    setState((prev) => ({ ...prev, isRunning: true, error: undefined }));
-    try {
-      const results = await runStatStressTestsForConfig(config, iterations);
-      setState({ ...results, isRunning: false, hasRun: true });
-    } catch (e) {
-      setState((prev) => ({ ...prev, isRunning: false, error: (e as Error).message }));
-    }
-  }, [config]);
+  const runTests = useCallback(
+    async (iterations: number = 5000) => {
+      setState((prev) => ({ ...prev, isRunning: true, error: undefined }));
+      try {
+        const results = await runStatStressTestsForConfig(config, iterations, STRESS_TEST_SEED);
+        setState({ ...results, isRunning: false, hasRun: true });
+      } catch (e) {
+        setState((prev) => ({ ...prev, isRunning: false, error: (e as Error).message }));
+      }
+    },
+    [config],
+  );
 
   return {
     singleStats: state.singleStats,

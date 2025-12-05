@@ -2,10 +2,19 @@ import type { BalancerConfig } from '../config/types';
 import type { MarginalUtilityMetrics, PairSynergyMetrics } from './metrics';
 import { StatsArchetypeGenerator } from './StressTestArchetypeGenerator';
 import { MarginalUtilityCalculator } from './MarginalUtilityCalculator';
+import type { RNG } from '../simulation/types';
 
 export interface StatStressTestResults {
   singleStats: MarginalUtilityMetrics[];
   pairStats: PairSynergyMetrics[];
+}
+
+function createSeededRNG(seed: number): RNG {
+  let state = seed >>> 0;
+  return () => {
+    state = (1664525 * state + 1013904223) >>> 0;
+    return state / 0xffffffff;
+  };
 }
 
 /**
@@ -16,9 +25,12 @@ export interface StatStressTestResults {
 export async function runStatStressTestsForConfig(
   config: BalancerConfig,
   iterations: number = 5000,
+  seed?: number,
 ): Promise<StatStressTestResults> {
   const generator = new StatsArchetypeGenerator(config);
   const calculator = new MarginalUtilityCalculator();
+
+  const rng = seed !== undefined ? createSeededRNG(seed) : undefined;
 
   const pointTiers = [25, 50, 75];
 
@@ -28,7 +40,7 @@ export async function runStatStressTestsForConfig(
   const singleStats: MarginalUtilityMetrics[] = [];
 
   for (const sa of singleArchetypes) {
-    const metrics = await calculator.calculateStatUtility(sa, iterations);
+    const metrics = await calculator.calculateStatUtility(sa, iterations, rng);
     singleStats.push(metrics);
   }
 
@@ -51,7 +63,7 @@ export async function runStatStressTestsForConfig(
     map.set(statA, mA);
     map.set(statB, mB);
 
-    const synergy = await calculator.calculatePairSynergy(pa, map, iterations);
+    const synergy = await calculator.calculatePairSynergy(pa, map, iterations, rng);
     pairStats.push(synergy);
   }
 

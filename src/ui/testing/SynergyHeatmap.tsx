@@ -3,9 +3,10 @@ import type { PairSynergyMetrics } from '../../balancing/testing/metrics';
 
 interface SynergyHeatmapProps {
   synergies: PairSynergyMetrics[];
+  getLabel?: (statId: string) => string;
 }
 
-export const SynergyHeatmap: React.FC<SynergyHeatmapProps> = ({ synergies }) => {
+export const SynergyHeatmap: React.FC<SynergyHeatmapProps> = ({ synergies, getLabel }) => {
   const statSet = new Set<string>();
   synergies.forEach((s) => {
     statSet.add(s.statA);
@@ -46,23 +47,34 @@ export const SynergyHeatmap: React.FC<SynergyHeatmapProps> = ({ synergies }) => 
         <thead>
           <tr>
             <th className="px-2 py-1" />
-            {stats.map((s) => (
-              <th key={s} className="px-2 py-1 text-center text-[10px] uppercase tracking-[0.18em] text-indigo-200">
-                {s}
-              </th>
-            ))}
+            {stats.map((s) => {
+              const label = getLabel ? getLabel(s) : s;
+              return (
+                <th
+                  key={s}
+                  className="px-2 py-1 text-center text-[10px] uppercase tracking-[0.18em] text-indigo-200"
+                  title={label}
+                >
+                  {label}
+                </th>
+              );
+            })}
           </tr>
         </thead>
         <tbody>
           {stats.map((row) => (
             <tr key={row}>
-              <th className="px-2 py-1 text-right text-[10px] uppercase tracking-[0.18em] text-indigo-200">{row}</th>
+              <th className="px-2 py-1 text-right text-[10px] uppercase tracking-[0.18em] text-indigo-200">
+                {getLabel ? getLabel(row) : row}
+              </th>
               {stats.map((col) => {
                 const syn = matrix[row][col];
                 const ratio = syn?.synergyRatio;
                 const pct = ratio ? (ratio * 100).toFixed(0) : '';
+                const labelRow = getLabel ? getLabel(row) : row;
+                const labelCol = getLabel ? getLabel(col) : col;
                 const title = syn
-                  ? `${row} + ${col} @ +${syn.pointsPerStat}: ${pct}% of expected ( ${syn.assessment} )`
+                  ? `${labelRow} + ${labelCol} @ +${syn.pointsPerStat}: ${pct}% of expected ( ${syn.assessment} )`
                   : '';
                 return (
                   <td
