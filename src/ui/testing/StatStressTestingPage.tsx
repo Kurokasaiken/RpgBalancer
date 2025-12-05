@@ -1,8 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { useRoundRobinTesting } from './useRoundRobinTesting';
 import { useBalancerConfig } from '../../balancing/hooks/useBalancerConfig';
 import { StatEfficiencyTable } from './StatEfficiencyTable';
 import { MatchupHeatmap } from './MatchupHeatmap';
+import { EfficiencyRadar } from './EfficiencyRadar';
 import { MarginalUtilityTable } from './MarginalUtilityTable';
 import { SynergyHeatmap } from './SynergyHeatmap';
 import type { MarginalUtilityMetrics, PairSynergyMetrics } from '../../balancing/testing/metrics';
@@ -62,13 +63,23 @@ export const StatStressTestingPage: React.FC = () => {
     runAllTiers,
     setSelectedTier,
   } = useRoundRobinTesting();
-  const { config } = useBalancerConfig();
+  const { config, updateStat } = useBalancerConfig();
+
+  const [iterations, setIterations] = useState<number>(1000);
 
   const visibleStats = useMemo(() => {
     return Object.values(config.stats)
       .filter((s) => !s.isDerived && !s.formula && !s.isHidden)
       .sort((a, b) => a.id.localeCompare(b.id));
   }, [config.stats]);
+
+  const getStatLabel = useCallback(
+    (statId: string) => {
+      const stat = visibleStats.find((s) => s.id === statId);
+      return stat?.label ?? statId;
+    },
+    [visibleStats]
+  );
 
   const statIds = useMemo(() => {
     return currentResults?.efficiencies.map((e) => e.statId) ?? [];
@@ -95,11 +106,24 @@ export const StatStressTestingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex flex-col items-end gap-2 min-w-[200px]">
+          <div className="flex flex-col items-end gap-2 min-w-[220px]">
+            <div className="flex items-center gap-2 text-[10px] text-slate-400">
+              <span className="uppercase tracking-[0.24em]">Iterations</span>
+              <select
+                value={iterations}
+                onChange={(e) => setIterations(Number(e.target.value) || 1000)}
+                className="bg-slate-900/80 border border-slate-700/70 rounded px-2 py-0.5 text-[10px] text-slate-100 focus:outline-none focus:ring-1 focus:ring-cyan-400/80"
+              >
+                <option value={500}>500</option>
+                <option value={1000}>1000</option>
+                <option value={2000}>2000</option>
+              </select>
+            </div>
+
             {/* Run All Tiers button */}
             <button
               type="button"
-              onClick={() => runAllTiers()}
+              onClick={() => runAllTiers(iterations)}
               disabled={isRunning}
               className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border border-cyan-400/70 text-cyan-200 text-[10px] tracking-[0.32em] uppercase bg-slate-900/60 transition-colors transition-transform disabled:cursor-not-allowed disabled:opacity-60 ${
                 isRunning
@@ -190,7 +214,44 @@ export const StatStressTestingPage: React.FC = () => {
                   Stat Efficiency Ranking{' '}
                   {selectedTier === null ? '(Aggregated)' : `(Tier +${selectedTier})`}
                 </h2>
-                <StatEfficiencyTable efficiencies={currentResults.efficiencies} />
+
+                {/* Live, editable view of stat weights from BalancerConfig */}
+                <div className="text-[10px] text-slate-300/80 bg-slate-950/60 border border-slate-700/60 rounded-lg px-3 py-2">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="uppercase tracking-[0.22em] text-slate-400/90">
+                      Stat Weights (Live)
+                    </span>
+                    <span className="text-[9px] text-slate-500">
+                      Editable · updates Balancer config
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-x-3 gap-y-0.5">
+                    <span className="text-slate-500">Label</span>
+                    <span className="text-slate-500">Weight</span>
+                    {visibleStats.map((s) => (
+                      <React.Fragment key={s.id}>
+                        <span className="truncate">{s.label}</span>
+                        <input
+                          type="number"
+                          min={0}
+                          step={0.01}
+                          value={s.weight}
+                          onChange={(e) => {
+                            const next = Number(e.target.value);
+                            if (Number.isNaN(next)) return;
+                            updateStat(s.id, { weight: next });
+                          }}
+                          className="w-full bg-slate-900/60 border border-slate-700/60 rounded px-1 py-0.5 text-[10px] font-mono text-slate-100 focus:outline-none focus:ring-1 focus:ring-cyan-400/80"
+                        />
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </div>
+
+                <StatEfficiencyTable
+                  efficiencies={currentResults.efficiencies}
+                  getLabel={getStatLabel}
+                />
               </section>
 
               <section className="space-y-2">
@@ -204,7 +265,16 @@ export const StatStressTestingPage: React.FC = () => {
                   )}
                 </h2>
                 {selectedTier !== null && currentResults.matchups.length > 0 ? (
-                  <MatchupHeatmap matchups={currentResults.matchups} statIds={statIds} />
+                  <>
+                    <MatchupHeatmap
+                      matchups={currentResults.matchups}
+                      statIds={statIds}
+                      getLabel={getStatLabel}
+                    />
+                    <div className="mt-2 text-[9px] text-slate-500">
+                      Green = row stat wins often (&gt;55%), grey ≈ balanced (~50%), red = loses often (&lt;45%).
+                    </div>
+                  </>
                 ) : (
                   <div className="text-[10px] text-slate-500 bg-slate-900/40 border border-slate-700/40 rounded-lg p-4 text-center">
                     {selectedTier === null
@@ -214,6 +284,20 @@ export const StatStressTestingPage: React.FC = () => {
                 )}
               </section>
             </div>
+
+            <section className="mt-6">
+              <h2
+                className="text-xs font-semibold uppercase tracking-[0.22em] text-indigo-200/80 mb-2"
+                title="Profilo visivo della forza relativa delle stat: il poligono mostra quanto ogni stat si discosta dal picco del tier selezionato (o dal profilo aggregato)."
+              >
+                Efficiency Radar{' '}
+                {selectedTier === null ? '(Aggregated)' : `(Tier +${selectedTier})`}
+              </h2>
+              <EfficiencyRadar
+                efficiencies={currentResults.efficiencies}
+                getLabel={getStatLabel}
+              />
+            </section>
 
             {/* Legacy Views */}
             <div className="grid gap-4 lg:grid-cols-2 items-start mt-6 pt-6 border-t border-slate-700/40">

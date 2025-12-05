@@ -4,6 +4,7 @@ import type { MatchupResult } from '../../balancing/testing/RoundRobinRunner';
 interface MatchupHeatmapProps {
   matchups: MatchupResult[];
   statIds: string[];
+  getLabel?: (statId: string) => string;
 }
 
 function getColor(winRate: number): string {
@@ -19,6 +20,7 @@ function getColor(winRate: number): string {
 export const MatchupHeatmap: React.FC<MatchupHeatmapProps> = ({
   matchups,
   statIds,
+  getLabel,
 }) => {
   // Build NxN matrix
   const matrix = useMemo(() => {
@@ -53,40 +55,47 @@ export const MatchupHeatmap: React.FC<MatchupHeatmapProps> = ({
         <thead>
           <tr>
             <th className="px-1 py-1 text-slate-500 text-[8px]">vs</th>
-            {statIds.map((s) => (
-              <th
-                key={s}
-                className="px-1 py-1 text-indigo-200 font-semibold text-center min-w-[32px]"
-                title={s}
-              >
-                {s.slice(0, 4)}
-              </th>
-            ))}
+            {statIds.map((s) => {
+              const label = getLabel ? getLabel(s) : s;
+              return (
+                <th
+                  key={s}
+                  className="px-1 py-1 text-indigo-200 font-semibold text-center min-w-[32px]"
+                  title={label}
+                >
+                  {label.slice(0, 4)}
+                </th>
+              );
+            })}
           </tr>
         </thead>
         <tbody>
-          {statIds.map((statA) => (
-            <tr key={statA}>
-              <th className="px-1 py-1 text-indigo-200 font-semibold text-right">
-                {statA.slice(0, 4)}
-              </th>
-              {statIds.map((statB) => {
-                const winRate = matrix[statA]?.[statB] ?? 0.5;
-                const isSelf = statA === statB;
-                return (
-                  <td
-                    key={`${statA}-${statB}`}
-                    className={`px-1 py-1 text-center min-w-[32px] ${
-                      isSelf ? 'bg-slate-800' : getColor(winRate)
-                    } text-white cursor-help`}
-                    title={`${statA} vs ${statB}: ${(winRate * 100).toFixed(0)}%`}
-                  >
-                    {isSelf ? '—' : (winRate * 100).toFixed(0)}
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
+          {statIds.map((statA) => {
+            const labelA = getLabel ? getLabel(statA) : statA;
+            return (
+              <tr key={statA}>
+                <th className="px-1 py-1 text-indigo-200 font-semibold text-right">
+                  {labelA.slice(0, 4)}
+                </th>
+                {statIds.map((statB) => {
+                  const winRate = matrix[statA]?.[statB] ?? 0.5;
+                  const isSelf = statA === statB;
+                  const labelB = getLabel ? getLabel(statB) : statB;
+                  return (
+                    <td
+                      key={`${statA}-${statB}`}
+                      className={`px-1 py-1 text-center min-w-[32px] ${
+                        isSelf ? 'bg-slate-800' : getColor(winRate)
+                      } text-white cursor-help`}
+                      title={`${labelA} vs ${labelB}: ${(winRate * 100).toFixed(0)}%`}
+                    >
+                      {isSelf ? '—' : (winRate * 100).toFixed(0)}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

@@ -33,6 +33,30 @@ const EMPTY_ALLOCATION: StatAllocation = {
     block: 0, armorPen: 0, penPercent: 0
 };
 
+const ARCH_PREFIX = 'arch:';
+const VAR_PREFIX = 'var:';
+
+function getTaggedValue(tags: string[], prefix: string): string {
+    const tag = tags.find(t => t.startsWith(prefix));
+    return tag ? tag.slice(prefix.length) : '';
+}
+
+function setTaggedValue(tags: string[], prefix: string, raw: string): string[] {
+    const value = raw.trim();
+    const other = tags.filter(t => !t.startsWith(prefix));
+    if (!value) return other;
+    const normalized = value.toLowerCase().replace(/\s+/g, '-');
+    return [...other, `${prefix}${normalized}`];
+}
+
+function getArchetypeTag(tags: string[]): string {
+    return getTaggedValue(tags, ARCH_PREFIX);
+}
+
+function getVariantTag(tags: string[]): string {
+    return getTaggedValue(tags, VAR_PREFIX);
+}
+
 export const ArchetypeBuilderComponent: React.FC = () => {
     // Template state
     const [template, setTemplate] = useState<ArchetypeTemplate>({
@@ -200,6 +224,24 @@ export const ArchetypeBuilderComponent: React.FC = () => {
                                     value={template.category}
                                     onChange={(e) => setTemplate(prev => ({ ...prev, category: e.target.value as ArchetypeCategory }))}
                                     options={CATEGORIES.map(c => ({ value: c, label: c }))}
+                                />
+
+                                <GlassInput
+                                    label="Archetype Tag (arch:*)"
+                                    value={getArchetypeTag(template.tags)}
+                                    onChange={(e) => setTemplate(prev => ({
+                                        ...prev,
+                                        tags: setTaggedValue(prev.tags, ARCH_PREFIX, e.target.value),
+                                    }))}
+                                />
+
+                                <GlassInput
+                                    label="Variant Tag (var:*)"
+                                    value={getVariantTag(template.tags)}
+                                    onChange={(e) => setTemplate(prev => ({
+                                        ...prev,
+                                        tags: setTaggedValue(prev.tags, VAR_PREFIX, e.target.value),
+                                    }))}
                                 />
 
                                 <div className="grid grid-cols-2 gap-3">

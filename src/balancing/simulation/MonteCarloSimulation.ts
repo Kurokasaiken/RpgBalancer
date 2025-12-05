@@ -25,7 +25,7 @@ export class MonteCarloSimulation {
         config: SimulationConfig,
         onProgress?: (progress: number) => void
     ): SimulationResults {
-        const { combat, iterations, logSampleSize = 10 } = config;
+        const { combat, iterations, logSampleSize = 10, rng: externalRng } = config;
         const results: CombatResult[] = [];
 
         // Track turn counts for distribution
@@ -50,8 +50,8 @@ export class MonteCarloSimulation {
         const efficiency1Array: number[] = [];
         const efficiency2Array: number[] = [];
 
-        // Simple RNG for this batch (for now use Math.random-based RNG)
-        const rng: RNG = () => Math.random();
+        // RNG for this batch - can be overridden for deterministic runs
+        const rng: RNG = externalRng ?? (() => Math.random());
 
         // Run simulations
         for (let i = 0; i < iterations; i++) {

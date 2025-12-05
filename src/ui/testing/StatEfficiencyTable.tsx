@@ -3,6 +3,7 @@ import type { StatEfficiency } from '../../balancing/testing/RoundRobinRunner';
 
 interface StatEfficiencyTableProps {
   efficiencies: StatEfficiency[];
+  getLabel?: (statId: string) => string;
 }
 
 const assessmentColors: Record<string, string> = {
@@ -15,6 +16,7 @@ const assessmentColors: Record<string, string> = {
 
 export const StatEfficiencyTable: React.FC<StatEfficiencyTableProps> = ({
   efficiencies,
+  getLabel,
 }) => {
   if (efficiencies.length === 0) {
     return (
@@ -54,7 +56,7 @@ export const StatEfficiencyTable: React.FC<StatEfficiencyTableProps> = ({
             >
               <td className="px-3 py-2 text-slate-500 font-mono">#{eff.rank}</td>
               <td className="px-3 py-2 font-semibold text-indigo-300">
-                {eff.statId}
+                {getLabel ? getLabel(eff.statId) : eff.statId}
               </td>
               <td className="px-3 py-2 text-right font-mono text-cyan-200">
                 {(eff.efficiency * 100).toFixed(1)}%

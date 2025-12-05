@@ -3,9 +3,10 @@ import type { StatEfficiency } from '../../balancing/testing/RoundRobinRunner';
 
 interface EfficiencyRadarProps {
   efficiencies: StatEfficiency[];
+  getLabel?: (statId: string) => string;
 }
 
-export const EfficiencyRadar: React.FC<EfficiencyRadarProps> = ({ efficiencies }) => {
+export const EfficiencyRadar: React.FC<EfficiencyRadarProps> = ({ efficiencies, getLabel }) => {
   if (!efficiencies.length) return null;
 
   const maxEff = Math.max(...efficiencies.map((e) => e.efficiency));
@@ -84,6 +85,7 @@ export const EfficiencyRadar: React.FC<EfficiencyRadarProps> = ({ efficiencies }
         {/* Labels */}
         {data.map((d, i) => {
           const { x, y } = getCoords(i, 1.12);
+          const label = getLabel ? getLabel(d.stat) : d.stat;
           return (
             <text
               key={d.stat}
@@ -92,7 +94,7 @@ export const EfficiencyRadar: React.FC<EfficiencyRadarProps> = ({ efficiencies }
               textAnchor="middle"
               className="text-[9px] fill-indigo-200 font-semibold uppercase tracking-[0.16em]"
             >
-              {d.stat}
+              {label}
             </text>
           );
         })}

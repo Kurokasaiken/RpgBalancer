@@ -16,13 +16,14 @@ import {
 export async function runRoundRobinTests(
   config: BalancerConfig,
   tier: number = 25,
-  iterations: number = 10000
+  iterations: number = 10000,
+  seed?: number
 ): Promise<RoundRobinResults> {
   const generator = new StatsArchetypeGenerator(config);
   const archetypes = generator.generateSingleStatArchetypes([tier]);
 
   const runner = new RoundRobinRunner(config);
-  const results = await runner.runRoundRobin(archetypes, iterations);
+  const results = await runner.runRoundRobin(archetypes, iterations, seed);
 
   return results;
 }
@@ -35,11 +36,12 @@ export async function runRoundRobinTests(
  */
 export async function runAllTiersRoundRobin(
   config: BalancerConfig,
-  iterations: number = 10000
+  iterations: number = 10000,
+  seed?: number
 ): Promise<AggregatedRoundRobinResults> {
   const generator = new StatsArchetypeGenerator(config);
   const runner = new RoundRobinRunner(config);
-  const results = await runner.runAllTiers(generator, [25, 50, 75, 100], iterations);
+  const results = await runner.runAllTiers(generator, [25, 50, 75, 100], iterations, seed);
 
   return results;
 }

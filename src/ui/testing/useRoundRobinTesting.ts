@@ -20,6 +20,7 @@ interface UseRoundRobinTestingState {
 
 export function useRoundRobinTesting() {
   const { config } = useBalancerConfig();
+  const ROUND_ROBIN_SEED = 123456;
   const [state, setState] = useState<UseRoundRobinTestingState>({
     aggregatedResults: null,
     selectedTier: null,
@@ -37,7 +38,7 @@ export function useRoundRobinTesting() {
       await new Promise(resolve => setTimeout(resolve, 0));
       
       try {
-        const results = await runAllTiersRoundRobin(config, iterations);
+        const results = await runAllTiersRoundRobin(config, iterations, ROUND_ROBIN_SEED);
         setState({
           aggregatedResults: results,
           selectedTier: null, // Show aggregated by default
@@ -65,7 +66,7 @@ export function useRoundRobinTesting() {
       await new Promise(resolve => setTimeout(resolve, 0));
       
       try {
-        const results = await runRoundRobinTests(config, tier, iterations);
+        const results = await runRoundRobinTests(config, tier, iterations, ROUND_ROBIN_SEED);
         // Store as aggregated with single tier
         setState({
           aggregatedResults: {

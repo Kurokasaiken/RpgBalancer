@@ -1,11 +1,10 @@
 // Updated App navigation to include Spell Editor and Spell Library
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { SpellLibrary } from './ui/spell/SpellLibrary';
 import { FantasySpellCreation } from './ui/fantasy/FantasySpellCreation';
 import { IdleArena } from './ui/idle/IdleArena';
 import { CharacterManager } from './ui/idle/CharacterManager';
 import { FantasyGridArena } from './ui/fantasy/FantasyGridArena';
-import { TestingLab } from './ui/testing/TestingLab';
 import { ErrorBoundary } from './ui/organisms/ErrorBoundary';
 import { ArchetypeManager } from './components/balancing/archetype/ArchetypeManager';
 import { ArchetypeBuilderComponent } from './ui/balancing/archetype/ArchetypeBuilderComponent';
@@ -28,8 +27,17 @@ import { MidnightMeridian } from './ui/fantasy/mockups/MidnightMeridian';
 import { SeraphimArchive } from './ui/fantasy/mockups/SeraphimArchive';
 import { VerdantAlloyDeck } from './ui/fantasy/mockups/VerdantAlloyDeck';
 import { CompactDemo } from './ui/pages/CompactDemo';
-import { BalancerNew } from './ui/balancing/BalancerNew';
-import { StatStressTestingPage } from './ui/testing/StatStressTestingPage';
+
+// Lazy-loaded heavy tools (named exports wrapped as default)
+const BalancerNew = lazy(() =>
+  import('./ui/balancing/BalancerNew').then((m) => ({ default: m.BalancerNew }))
+);
+const TestingLab = lazy(() =>
+  import('./ui/testing/TestingLab').then((m) => ({ default: m.TestingLab }))
+);
+const StatStressTestingPage = lazy(() =>
+  import('./ui/testing/StatStressTestingPage').then((m) => ({ default: m.StatStressTestingPage }))
+);
 
 type Tab =
   | 'balancer'
@@ -80,12 +88,16 @@ function App() {
       )}
       {activeTab === 'balancerLegacy' && (
         <ErrorBoundary componentName="Config-Driven Balancer (WIP)">
-          <BalancerNew />
+          <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Balancer…</div>}>
+            <BalancerNew />
+          </Suspense>
         </ErrorBoundary>
       )}
       {activeTab === 'testing' && (
         <ErrorBoundary componentName="Testing Lab">
-          <TestingLab />
+          <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Testing Lab…</div>}>
+            <TestingLab />
+          </Suspense>
         </ErrorBoundary>
       )}
       {activeTab === 'idleArena' && (
@@ -145,7 +157,9 @@ function App() {
       )}
       {activeTab === 'balancerStats' && (
         <ErrorBoundary componentName="Stat Stress Testing">
-          <StatStressTestingPage />
+          <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Stat Stress Testing…</div>}>
+            <StatStressTestingPage />
+          </Suspense>
         </ErrorBoundary>
       )}
       {activeTab === 'fantasyShowcase' && (

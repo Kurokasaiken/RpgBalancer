@@ -2,6 +2,7 @@ import type { BalancerConfig } from '../config/types';
 import type { StatsArchetype } from './StressTestArchetypeGenerator';
 import { MonteCarloSimulation } from '../simulation/MonteCarloSimulation';
 import type { StatBlock } from '../types';
+import type { RNG } from '../simulation/types';
 
 /**
  * Result of a single matchup between two mono-stat archetypes.
@@ -78,14 +79,30 @@ export class RoundRobinRunner {
   constructor(_config: BalancerConfig) {}
 
   /**
+   * Create a simple seedable RNG (LCG-based) for deterministic simulations.
+   */
+  private createSeededRNG(seed: number): RNG {
+    let state = seed >>> 0;
+    return () => {
+      // Numerical Recipes LCG parameters
+      state = (1664525 * state + 1013904223) >>> 0;
+      return state / 0xffffffff;
+    };
+  }
+
+  /**
    * Run full round-robin for a set of archetypes (all same tier).
    */
   async runRoundRobin(
     archetypes: StatsArchetype[],
-    iterations: number = 1000
+    iterations: number = 1000,
+    seed?: number
   ): Promise<RoundRobinResults> {
     const matchups: MatchupResult[] = [];
     const tier = archetypes[0]?.pointsPerStat ?? 25;
+
+    const baseSeed = (seed ?? Date.now()) >>> 0;
+    const rng = this.createSeededRNG(baseSeed);
 
     // For each unique pair (i, j) where i < j
     for (let i = 0; i < archetypes.length; i++) {
@@ -101,6 +118,7 @@ export class RoundRobinRunner {
             turnLimit: 100,
           },
           iterations,
+          rng,
         });
 
         matchups.push({
@@ -204,13 +222,15 @@ export class RoundRobinRunner {
   async runAllTiers(
     generator: import('./StressTestArchetypeGenerator').StatsArchetypeGenerator,
     tiers: number[] = [25, 50, 75, 100],
-    iterations: number = 1000
+    iterations: number = 1000,
+    seed?: number
   ): Promise<AggregatedRoundRobinResults> {
     const byTier: Record<number, RoundRobinResults> = {};
 
     for (const tier of tiers) {
       const archetypes = generator.generateSingleStatArchetypes([tier]);
-      const results = await this.runRoundRobin(archetypes, iterations);
+      const tierSeed = seed !== undefined ? seed + tier * 1000 : undefined;
+      const results = await this.runRoundRobin(archetypes, iterations, tierSeed);
       byTier[tier] = results;
       
       // Yield control to browser to allow UI updates between tiers

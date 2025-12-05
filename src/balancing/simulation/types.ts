@@ -127,6 +127,9 @@ export interface SimulationConfig {
 
     /** Number of sample combat logs to save (default: 10) */
     logSampleSize?: number;
+
+    /** Optional RNG override for deterministic simulations */
+    rng?: RNG;
 }
 
 /**
