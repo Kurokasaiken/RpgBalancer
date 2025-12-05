@@ -51,12 +51,12 @@ export const CompactCard: React.FC<CompactCardProps> = ({
                         {icon && <span className="text-lg flex-shrink-0 text-gold">{icon}</span>}
                         <div className="min-w-0">
                             {title && (
-                                <p className={`font-display font-semibold ${text.cardTitle} text-ivory-bright truncate`}>
+                                <p className={`font-display font-semibold ${text.heading} text-ivory-bright truncate`}>
                                     {title}
                                 </p>
                             )}
                             {subtitle && (
-                                <p className={`text-xs ${text.cardSubtitle} text-teal-muted uppercase tracking-[0.2em] truncate`}>
+                                <p className={`${text.small} text-teal-muted uppercase tracking-[0.2em] truncate`}>
                                     {subtitle}
                                 </p>
                             )}

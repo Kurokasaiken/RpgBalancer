@@ -1,5 +1,4 @@
 import type { Position, GridState, GridCombatCharacter } from './combatTypes';
-import { RangeCalculator } from './RangeCalculator';
 
 export interface AoEDamageResult {
     targets: GridCombatCharacter[];
@@ -83,6 +82,7 @@ export const AoEModule = {
      * Formula: Single-target damage × 0.65 per target
      */
     calculateAoEDamage(baseDamage: number, targetCount: number): number {
-        return baseDamage * 0.65;
+        // Single-target damage × 0.65 per target
+        return baseDamage * 0.65 * targetCount;
     }
 };

@@ -9,7 +9,7 @@
  */
 
 import React, { useState } from 'react';
-import type { ArchetypeCategory } from '../../../balancing/archetype/types';
+import type { ArchetypeCategory, StatAllocation } from '../../../balancing/archetype/types';
 import type { StatBlock } from '../../../balancing/types';
 import { ArchetypeBuilder as Builder } from '../../../balancing/archetype/ArchetypeBuilder';
 import { NORMALIZED_WEIGHTS } from '../../../balancing/statWeights';
@@ -26,9 +26,9 @@ import {
 
 const CATEGORIES: ArchetypeCategory[] = ['Tank', 'DPS', 'Assassin', 'Bruiser', 'Support', 'Hybrid'];
 
-type Allocation = Record<string, number>;
+type Allocation = StatAllocation;
 
-const DEFAULT_ALLOCATION: Allocation = {
+const DEFAULT_ALLOCATION: StatAllocation = {
     damage: 20,
     hp: 20,
     armor: 10,

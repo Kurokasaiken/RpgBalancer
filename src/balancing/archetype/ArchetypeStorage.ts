@@ -1,4 +1,4 @@
-import { ArchetypeTemplate } from './types';
+import type { ArchetypeTemplate } from './types';
 
 export interface ArchetypeCategoryDef {
     id: string;

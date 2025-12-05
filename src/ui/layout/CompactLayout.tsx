@@ -26,7 +26,7 @@ export const CompactLayout: React.FC<CompactLayoutProps> = ({
 }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-    const { density, toggleDensity, text } = useDensity();
+    const { density, toggleDensity } = useDensity();
 
     const sidebarWidth = isSidebarCollapsed ? 'w-14' : 'w-52';
 

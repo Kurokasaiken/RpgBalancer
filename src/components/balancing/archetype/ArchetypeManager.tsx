@@ -175,7 +175,7 @@ export const ArchetypeManager: React.FC = () => {
                                             <div className="flex items-center gap-3 mb-2">
                                                 <h3 className="text-2xl font-display text-[#f6f3e4]">{archetype.name}</h3>
                                                 <span className="rounded-full border border-[#475758] bg-[#0e1719]/70 px-3 py-1 text-xs uppercase tracking-widest text-[#8db3a5]">
-                                                    {archetype.categoryId}
+                                                    {archetype.category}
                                                 </span>
                                             </div>
                                             <p className="text-sm text-[#aeb8b4] max-w-2xl">{archetype.description}</p>

@@ -50,7 +50,7 @@ export function simulateExpectedTTK(
     // Calculate turn limit if not provided
     if (turnLimit === undefined) {
         // Estimate expected TTK first
-        const estimatedTTK = estimateTTK(attacker, defender, config);
+        const estimatedTTK = estimateTTK(attacker, defender);
         turnLimit = config.turnLimitPolicy(estimatedTTK);
     }
 
@@ -59,8 +59,8 @@ export function simulateExpectedTTK(
     let hpDef = defender.hp;
 
     // Calculate EDPT for both sides
-    const edptAttToDef = MathEngine.calcEDPT(attacker, defender, config);
-    const edptDefToAtt = MathEngine.calcEDPT(defender, attacker, config);
+    const edptAttToDef = MathEngine.calcEDPT(attacker, defender);
+    const edptDefToAtt = MathEngine.calcEDPT(defender, attacker);
 
     let turns = 0;
 
@@ -134,11 +134,10 @@ export function simulateExpectedTTK(
  */
 function estimateTTK(
     attacker: StatBlock,
-    defender: StatBlock,
-    config: BalancerConfig1v1
+    defender: StatBlock
 ): number {
-    const edptAttToDef = MathEngine.calcEDPT(attacker, defender, config);
-    const edptDefToAtt = MathEngine.calcEDPT(defender, attacker, config);
+    const edptAttToDef = MathEngine.calcEDPT(attacker, defender);
+    const edptDefToAtt = MathEngine.calcEDPT(defender, attacker);
 
     if (edptAttToDef <= 0 && edptDefToAtt <= 0) {
         // Neither can damage the other

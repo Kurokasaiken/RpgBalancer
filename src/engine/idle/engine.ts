@@ -1,7 +1,6 @@
 // src/engine/idle/engine.ts
 
 import type { Combatant, CombatState, CombatLogEntry, ActiveEffect } from "./types";
-import type { Spell } from "../../balancing/spellTypes";
 import { calculateDamage } from '../combat/damageCalculator';
 import { evaluateTurn } from './ai';
 
@@ -167,7 +166,8 @@ export function executeAction(state: CombatState): CombatState {
 
         const damageResult = calculateDamage(
             combatant.entity.statBlock,
-            target.entity.statBlock
+            target.entity.statBlock,
+            Math.random
         );
 
         if (!damageResult.isHit) {

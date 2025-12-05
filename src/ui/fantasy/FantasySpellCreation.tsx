@@ -6,7 +6,6 @@ import { SpellInfoForm } from '../spell/components/SpellInfoForm';
 import { StatsGrid } from '../spell/components/StatsGrid';
 import { ActionsBar } from '../spell/components/ActionsBar';
 import { SpellIdentityCard } from '../spell/components/SpellIdentityCard';
-import { FantasyLayout } from './FantasyLayout';
 import type { Spell } from '../../balancing/spellTypes';
 import { createEmptySpell } from '../../balancing/spellTypes';
 import { DEFAULT_SPELLS } from '../../balancing/defaultSpells';

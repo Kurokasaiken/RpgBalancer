@@ -45,7 +45,7 @@ export function runSimulation(entityA: Entity, entityB: Entity, iterations: numb
         // Run battle until finished
         // Optimization: We could have a "fastResolve" that doesn't generate logs
         while (!state.isFinished) {
-            state = resolveCombatRound(state);
+            state = resolveCombatRound(state, () => Math.random());
 
             // CRITICAL: Check for HP <= 0 immediately after round
             // This ensures combat stops even if isFinished flag isn't set

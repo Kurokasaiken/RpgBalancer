@@ -22,13 +22,34 @@ export interface ArchetypeCategoryDef {
 export type ArchetypeCategory = string;
 
 /**
+ * Stat Allocation - percentage of budget assigned to each core stat
+ * Sum of all fields should be approximately 100.
+ */
+export interface StatAllocation {
+    hp: number;
+    damage: number;
+    armor: number;
+    resistance: number;
+    txc: number;
+    evasion: number;
+    critChance: number;
+    critMult: number;
+    lifesteal: number;
+    regen: number;
+    ward: number;
+    block: number;
+    armorPen: number;
+    penPercent: number;
+}
+
+/**
  * Archetype Template - The "blueprint" for creating instances
  */
 export interface ArchetypeTemplate {
     id: string;
     name: string;
     description: string;
-    categoryId: string; // ID of the ArchetypeCategoryDef
+    category: string; // Archetype category/role label (e.g., "Tank")
     isSystem?: boolean; // If true, cannot be deleted
 
 

@@ -112,7 +112,7 @@ export const SpellCostModule = {
                 value: baseEffect / 100,
                 mode: 'multiplicative',
                 duration: spell.duration || 3, // Default 3 turns
-                stackMode: 'none'
+                stackable: false
             };
 
             const buffValue = BuffModule.calculateBuffPower(mockBuff, statWeights);

@@ -1,4 +1,4 @@
-import { TTKResult, TTKValidation } from './types';
+import type { TTKResult, TTKValidation } from './types';
 
 export class TTKReportGenerator {
 

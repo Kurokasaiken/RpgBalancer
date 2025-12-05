@@ -11,6 +11,14 @@ import type { StatBlock } from '../types';
 import type { ArchetypeTemplate, StatAllocation, ArchetypeInstance } from './types';
 import { BalanceConfigManager } from '../BalanceConfigManager';
 
+// Validation error class
+export class ValidationError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'ValidationError';
+    }
+}
+
 export const ArchetypeBuilder = {
     /**
      * Build a StatBlock from an archetype template at a given budget

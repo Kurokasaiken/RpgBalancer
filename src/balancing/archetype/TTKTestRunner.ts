@@ -1,9 +1,9 @@
-import { ArchetypeTemplate, TTKResult } from './types';
+import type { ArchetypeTemplate, TTKResult } from './types';
 import { ArchetypeBuilder } from './ArchetypeBuilder';
 import { BalanceConfigManager } from '../BalanceConfigManager';
 import { Entity } from '../../engine/core/entity';
-import { resolveCombatRound } from '../../engine/combat/logic'; // Check export location
-import { CombatState } from '../../engine/combat/state';
+import { resolveCombatRound } from '../../engine/combat/logic';
+import { createCombatState } from '../../engine/combat/state';
 
 // Re-exporting createCombatState from logic if it's not there, or importing from state
 // Based on previous view, createCombatState is in state.ts, resolveCombatRound is in logic.ts
@@ -144,7 +144,7 @@ export class TTKTestRunner {
 
         // Run Loop
         while (!state.isFinished && state.turn < maxRounds) {
-            state = resolveCombatRound(state);
+            state = resolveCombatRound(state, Math.random);
         }
 
         let winner: 'A' | 'B' | 'Draw' = 'Draw';
@@ -155,5 +155,3 @@ export class TTKTestRunner {
     }
 }
 
-// Helper imports for the file content
-import { createCombatState } from '../../engine/combat/state';

@@ -1,4 +1,4 @@
-import { ArchetypeTemplate, TTKResult } from './types';
+import type { ArchetypeTemplate, TTKResult } from './types';
 import { TTKTestRunner } from './TTKTestRunner';
 
 export class BatchTestRunner {

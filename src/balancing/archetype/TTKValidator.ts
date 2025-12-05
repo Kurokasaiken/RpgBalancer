@@ -1,4 +1,4 @@
-import { TTKResult, TTKTarget, TTKValidation } from './types';
+import type { TTKResult, TTKTarget, TTKValidation } from './types';
 
 export class TTKValidator {
 
@@ -30,7 +30,6 @@ export class TTKValidator {
         let winnerMismatch = false;
         if (target.expectedWinner !== 'Either') {
             const actualWinner = result.winRate.A > result.winRate.B ? 'A' : 'B';
-            const winRate = result.winRate[actualWinner];
 
             // If win rate is close to 50%, it's a draw/either
             const isDraw = Math.abs(result.winRate.A - 0.5) < 0.1; // 40-60% split
@@ -55,9 +54,6 @@ export class TTKValidator {
                 roundsDeviationPercent,
                 winnerMismatch
             },
-            roundsDeviation,
-            roundsDeviationPercent,
-            winnerMismatch,
             warnings,
             errors
         };

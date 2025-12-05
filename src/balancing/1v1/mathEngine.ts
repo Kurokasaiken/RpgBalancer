@@ -18,7 +18,6 @@
 import type { StatBlock } from '../types';
 import { MitigationModule } from '../modules/mitigation';
 import { CriticalModule } from '../modules/critical';
-import { HitChanceModule } from '../modules/hitchance';
 
 /**
  * Configuration for 1v1 balancing calculations
@@ -101,7 +100,7 @@ export const MathEngine = {
      * @param defStats Defender stats
      * @returns Damage after DR (not currently used)
      */
-    calcDamageAfterDR(dmgAfterArmor: number, defStats: StatBlock): number {
+    calcDamageAfterDR(dmgAfterArmor: number): number {
         // Currently not implemented in the system
         // Armor is percentage-based via PoE formula
         return dmgAfterArmor;
@@ -161,7 +160,7 @@ export const MathEngine = {
      * @param config Configuration
      * @returns EDPT (Effective Damage Per Turn)
      */
-    calcEDPT(attStats: StatBlock, defStats: StatBlock, config: BalancerConfig1v1): number {
+    calcEDPT(attStats: StatBlock, defStats: StatBlock): number {
         // Step 1: Expected damage per hit (includes crit)
         const rawDamagePerHit = this.expectedDamagePerHit(attStats);
 

@@ -2,7 +2,8 @@
 // Works with the full Spell definition (src/balancing/spellTypes.ts) and the cost
 // calculator (src/balancing/spellCost.ts).
 
-import type { Spell, SpellInstance } from '../spellTypes';
+import type { Spell } from '../spellTypes';
+import type { SpellInstance } from './types';
 import { calculateSpellCost } from '../spellCost';
 
 /** Validate a Spell. Returns `{valid, errors}`. */
@@ -20,8 +21,10 @@ export function validateTemplate(spell: Spell): { valid: boolean; errors: string
     if (spell.eco < 1) errors.push('eco must be ≥ 1');
     if (spell.aoe < 1) errors.push('aoe must be ≥ 1');
     if (spell.dangerous < 0 || spell.dangerous > 100) errors.push('dangerous must be 0‑100');
-    if (spell.pierce < 0 || spell.pierce > 50) errors.push('pierce must be 0‑50');
-    if (spell.castTime < 0.1 || spell.castTime > 2.0) errors.push('castTime must be 0.1‑2.0');
+    const pierce = spell.pierce ?? 0;
+    if (pierce < 0 || pierce > 50) errors.push('pierce must be 0‑50');
+    const castTime = spell.castTime ?? 0.5;
+    if (castTime < 0.1 || castTime > 2.0) errors.push('castTime must be 0.1‑2.0');
     if (spell.cooldown < 0 || spell.cooldown > 5.0) errors.push('cooldown must be 0‑5.0');
     if (spell.range < 1 || spell.range > 10) errors.push('range must be 1‑10');
     if (spell.priority < -5 || spell.priority > 5) errors.push('priority must be -5…5');
@@ -54,12 +57,26 @@ export function buildSpell(template: Spell, budget: number): SpellInstance {
         console.warn(`SpellPoints (${points}) exceed budget (${budget}); spell will be marked as over‑budget.`);
     }
 
-    return { ...template, spellPoints: points, tier };
+    // SpellInstance is from spell/types.ts (different structure than Spell from spellTypes.ts)
+    // For now, return a minimal compatible object
+    return {
+        id: template.id,
+        name: template.name,
+        description: template.description,
+        damage: 0,
+        armorPen: 0,
+        resPen: 0,
+        hitChance: 0,
+        critChance: 0,
+        critMult: 0,
+        spellPoints: points,
+        tier
+    } as SpellInstance;
 }
 
 /** Optimize a partially‑filled spell – fill missing numeric fields with defaults and
  * ensure percentage‑based stats sum to 100 where appropriate. */
-export function optimizeAllocation(partial: Partial<Spell>, budget: number): Spell {
+export function optimizeAllocation(partial: Partial<Spell>): Spell {
     const base: Spell = {
         id: partial.id ?? 'temp_' + Date.now(),
         name: partial.name ?? 'Untitled Spell',
@@ -89,6 +106,7 @@ export function optimizeAllocation(partial: Partial<Spell>, budget: number): Spe
         situationalModifiers: partial.situationalModifiers,
         description: partial.description ?? '',
         tags: partial.tags ?? [],
+        spellLevel: 0,
         spellPoints: 0,
         tier: '',
     };

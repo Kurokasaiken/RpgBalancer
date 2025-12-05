@@ -26,7 +26,6 @@ export interface EHPResult {
 export class EHPCalculator {
     // Default enemy damage profile for balancing
     private readonly DEFAULT_PHYSICAL_HIT = 20; // Average physical damage per hit
-    private readonly DEFAULT_MAGICAL_HIT = 20; // Average magical damage per hit
     private readonly DEFAULT_ENEMY_ACCURACY = 50; // Enemy accuracy rating
 
     /**
@@ -34,7 +33,6 @@ export class EHPCalculator {
      */
     calculateEHP(stats: StatBlock, enemyDamage?: { physical?: number; magical?: number; accuracy?: number }): EHPResult {
         const physHit = enemyDamage?.physical ?? this.DEFAULT_PHYSICAL_HIT;
-        const magHit = enemyDamage?.magical ?? this.DEFAULT_MAGICAL_HIT;
         const accuracy = enemyDamage?.accuracy ?? this.DEFAULT_ENEMY_ACCURACY;
 
         const baseHP = stats.hp;

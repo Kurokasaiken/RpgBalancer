@@ -1,7 +1,7 @@
 // src/engine/idle/__tests__/combatEngine.test.ts
 
 import { describe, test, expect, beforeEach } from 'vitest';
-import { startCombat, processUpkeep, determineIntent, executeAction } from '../engine';
+import { startCombat, processUpkeep, executeAction } from '../engine';
 import type { Combatant, CombatState } from '../types';
 import { Entity } from '../../core/entity';
 import { createEmptySpell } from '../../../balancing/spellTypes';
@@ -146,7 +146,7 @@ describe('Idle Combat Engine', () => {
         state.turnOrder = [hero.id, deadEnemy.id];
         state.currentTurnIndex = 0;
 
-        const nextState = executeAction(state); // Hero skips
+        executeAction(state); // Hero skips
 
         // Next turn should be enemy (who is dead, so skip?) 
         // Actually nextTurn checks win condition immediately

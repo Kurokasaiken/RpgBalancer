@@ -17,7 +17,7 @@ import { GlassSelect } from '../../atoms/GlassSelect';
 import { GlassSlider } from '../../atoms/GlassSlider';
 
 // Stat names for allocation
-const STAT_NAMES: (keyof StatAllocation)[] = [
+const STAT_NAMES: (keyof StatAllocation & string)[] = [
     'hp', 'damage', 'armor', 'resistance', 'txc', 'evasion',
     'critChance', 'critMult', 'lifesteal', 'regen', 'ward',
     'block', 'armorPen', 'penPercent'
@@ -52,7 +52,10 @@ export const ArchetypeBuilderComponent: React.FC = () => {
     const [tagInput, setTagInput] = useState('');
 
     // Calculate total allocation
-    const totalAllocation = STAT_NAMES.reduce((sum, stat) => sum + template.allocation[stat], 0);
+    const totalAllocation: number = STAT_NAMES.reduce<number>(
+        (sum, stat) => sum + template.allocation[stat],
+        0
+    );
     const allocationValid = Math.abs(totalAllocation - 100) < 0.01;
 
     // Update allocation for a stat

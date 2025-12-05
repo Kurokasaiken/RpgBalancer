@@ -104,4 +104,31 @@ export class ArchetypeRegistry {
     get count(): number {
         return this.templates.size;
     }
+
+    /**
+     * Get all unique tags across all archetypes
+     */
+    getAllTags(): string[] {
+        const tagSet = new Set<string>();
+        this.listAll().forEach(t => {
+            t.tags.forEach(tag => tagSet.add(tag));
+        });
+        return Array.from(tagSet).sort();
+    }
+}
+
+// Export convenience functions for backwards compatibility
+export function listArchetypes(): ArchetypeTemplate[] {
+    const registry = new ArchetypeRegistry();
+    return registry.listAll();
+}
+
+export function filterByCategory(category: string): ArchetypeTemplate[] {
+    const registry = new ArchetypeRegistry();
+    return registry.filterByCategory(category);
+}
+
+export function getAllTags(): string[] {
+    const registry = new ArchetypeRegistry();
+    return registry.getAllTags();
 }

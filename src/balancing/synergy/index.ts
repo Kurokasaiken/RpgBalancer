@@ -1,6 +1,6 @@
 // Placeholder for SynergyAnalyzer
 export class SynergyAnalyzer {
-    analyze(stats: any) {
+    analyze() {
         return [];
     }
 }

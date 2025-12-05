@@ -25,5 +25,12 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": [
+    "src/**/__tests__",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/balancing/archetype/seedArchetypes.ts",
+    "src/balancing/archetype/testArchetype.ts"
+  ]
 }

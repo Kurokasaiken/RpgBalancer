@@ -13,13 +13,11 @@
  * @see src/balancing/1v1/swi.ts
  */
 
-import type { StatBlock } from '../types';
 import type { BalancerConfig1v1 } from './mathEngine';
 import { DEFAULT_1V1_CONFIG } from './mathEngine';
 import { runMonteCarlo } from './montecarlo';
 import { computeAllSWIForMatchup } from './swi';
 import type { Archetype, MatrixRunResult, MatchupResult } from './types';
-import { loadArchetypes } from './io';
 import { CombatSimulator } from '../simulation/CombatSimulator';
 import { SeededRNG } from './montecarlo'; // SeededRNG is defined in montecarlo.ts
 
@@ -281,7 +279,7 @@ export function runMatrixCombat(config: MatrixRunnerConfig) {
                 entity2,
                 turnLimit,
                 enableDetailedLogging
-            }, rng);
+            }, () => rng.next());
             results.push(result);
         }
     }

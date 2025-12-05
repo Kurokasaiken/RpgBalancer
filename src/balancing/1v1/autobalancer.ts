@@ -19,11 +19,7 @@
  * @see src/balancing/1v1/swi.ts
  */
 
-import type { StatBlock } from '../types';
-import type { Archetype, MatrixRunResult, MatchupResult } from './types';
-import type { BalancerConfig1v1 } from './mathEngine';
-import { DEFAULT_1V1_CONFIG } from './mathEngine';
-import { calculateBalanceScore, findMostImbalanced } from './matrixRunner';
+import type { Archetype, MatrixRunResult } from './types';
 
 /**
  * Auto-balance configuration

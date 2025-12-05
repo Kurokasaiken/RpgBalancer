@@ -24,7 +24,7 @@ describe('Combat System', () => {
         expect(state.turn).toBe(0);
         expect(state.isFinished).toBe(false);
 
-        state = resolveCombatRound(state);
+        state = resolveCombatRound(state, () => 0.5);
 
         expect(state.turn).toBe(1);
         expect(state.log.length).toBeGreaterThan(0);
@@ -44,7 +44,7 @@ describe('Combat System', () => {
         });
 
         let state = createCombatState([strong], [weak]);
-        state = resolveCombatRound(state);
+        state = resolveCombatRound(state, () => 0.5);
 
         expect(state.isFinished).toBe(true);
         expect(state.winner).toBe('teamA');

@@ -35,7 +35,7 @@ export const MobileOptimizedLayout: React.FC<MobileOptimizedLayoutProps> = ({
 }) => {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
-    const { density, toggleDensity, text } = useDensity();
+    const { density, toggleDensity } = useDensity();
 
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth < 768);

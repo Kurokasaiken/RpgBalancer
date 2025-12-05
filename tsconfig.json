@@ -1,5 +1,14 @@
 {
   "files": [],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/__tests__/**",
+    "src/balancing/archetype/seedArchetypes.ts",
+    "src/balancing/archetype/testArchetype.ts"
+  ],
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }

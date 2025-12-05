@@ -68,6 +68,8 @@ export function evaluateTurn(combatant: Combatant, state: CombatState): Intent {
  */
 function scoreAction(source: Combatant, spell: Spell, target: Combatant, state: CombatState): number {
     let score = 0;
+    // Currently unused but kept for future context-aware scoring
+    void state;
 
     // --- Role-Based Logic ---
 
@@ -124,7 +126,8 @@ function scoreAction(source: Combatant, spell: Spell, target: Combatant, state: 
 
     // RANDOM: Just do whatever (fallback)
     else {
-        score += rng() * 50;
+        // Use Math.random as simple entropy source
+        score += Math.random() * 50;
     }
 
     // --- Universal Logic ---

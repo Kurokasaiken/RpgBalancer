@@ -309,7 +309,7 @@ export async function runMonteCarloParallel(
     nSim: number,
     seed: number,
     config: BalancerConfig1v1 = DEFAULT_1V1_CONFIG,
-    concurrency: number = 4
+    _concurrency: number = 4 // Reserved for future parallel execution
 ): Promise<MonteCarloResult> {
     // TODO: Implement worker-based parallelization
     // For now, just run sequentially

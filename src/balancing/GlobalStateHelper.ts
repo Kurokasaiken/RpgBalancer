@@ -33,7 +33,8 @@ export class GlobalStateHelper {
      */
     static getBaseStat(stat: keyof StatBlock): number {
         const stats = this.getBalancerStats();
-        return stats[stat] || 0;
+        const value = stats[stat];
+        return typeof value === 'number' ? value : 0;
     }
 
     /**

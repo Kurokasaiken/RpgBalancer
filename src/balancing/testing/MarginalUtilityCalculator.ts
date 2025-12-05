@@ -13,7 +13,11 @@ import type { SimulationConfig } from '../simulation/types';
  * marginal utility and synergy metrics.
  */
 export class MarginalUtilityCalculator {
-  constructor(private readonly baseline: StatBlock = BASELINE_STATS) {}
+  private readonly baseline: StatBlock;
+
+  constructor(baseline: StatBlock = BASELINE_STATS) {
+    this.baseline = baseline;
+  }
 
   /**
    * Calculate marginal utility for a single-stat statsArchetype.
@@ -34,8 +38,18 @@ export class MarginalUtilityCalculator {
     const simConfig: SimulationConfig = {
       iterations,
       combat: {
-        entity1: { name: 'baseline', hp: this.baseline.hp, damage: this.baseline.damage, ...this.baseline },
-        entity2: { name: 'statsArchetype', hp: statsArchetype.stats.hp, damage: statsArchetype.stats.damage, ...statsArchetype.stats },
+        entity1: {
+          name: 'baseline',
+          ...this.baseline,
+          attack: this.baseline.damage,
+          defense: (this.baseline as any).armor ?? 0,
+        },
+        entity2: {
+          name: 'statsArchetype',
+          ...statsArchetype.stats,
+          attack: statsArchetype.stats.damage,
+          defense: (statsArchetype.stats as any).armor ?? 0,
+        },
         turnLimit: 100,
       },
     };
@@ -95,8 +109,18 @@ export class MarginalUtilityCalculator {
     const simConfig: SimulationConfig = {
       iterations,
       combat: {
-        entity1: { name: 'baseline', hp: this.baseline.hp, damage: this.baseline.damage, ...this.baseline },
-        entity2: { name: 'pairStats', hp: pairArchetype.stats.hp, damage: pairArchetype.stats.damage, ...pairArchetype.stats },
+        entity1: {
+          name: 'baseline',
+          ...this.baseline,
+          attack: this.baseline.damage,
+          defense: (this.baseline as any).armor ?? 0,
+        },
+        entity2: {
+          name: 'pairStats',
+          ...pairArchetype.stats,
+          attack: pairArchetype.stats.damage,
+          defense: (pairArchetype.stats as any).armor ?? 0,
+        },
         turnLimit: 100,
       },
     };

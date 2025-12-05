@@ -32,16 +32,12 @@ export function loadCharacters(): SavedCharacter[] {
 
     try {
         const parsed = JSON.parse(stored) as SavedCharacter[];
-        // Migrate/Merge with defaults to ensure new fields (like sustain) exist
+        // Migrate/Merge with defaults to ensure new fields exist
         return parsed.map(char => ({
             ...char,
             statBlock: {
                 ...DEFAULT_STATS,
                 ...char.statBlock,
-                activeModules: {
-                    ...DEFAULT_STATS.activeModules,
-                    ...(char.statBlock?.activeModules || {})
-                }
             }
         }));
     } catch {

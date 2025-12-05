@@ -20,7 +20,6 @@ export const CombatMetricsCard: React.FC<CombatMetricsCardProps> = ({
     lockedParam,
     onParamChange,
     onLockToggle,
-    onResetParam
 }) => {
     const [simResult, setSimResult] = useState<{ winRate: number, avgTurns: number } | null>(null);
     const [isSimulating, setIsSimulating] = useState(false);

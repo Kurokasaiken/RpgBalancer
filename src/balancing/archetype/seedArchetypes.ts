@@ -17,7 +17,7 @@ const BASE_ARCHETYPES: ArchetypeTemplate[] = [
         category: 'tank',
         variant: 'HighHP',
         description: 'Massive health pool focused tank',
-        statAllocation: {
+        allocation: {
             hp: 70,
             armor: 20,
             resistance: 10,
@@ -33,7 +33,7 @@ const BASE_ARCHETYPES: ArchetypeTemplate[] = [
         category: 'tank',
         variant: 'Armor',
         description: 'Heavy armor mitigation specialist',
-        statAllocation: {
+        allocation: {
             armor: 50,
             hp: 30,
             resistance: 20,
@@ -49,7 +49,7 @@ const BASE_ARCHETYPES: ArchetypeTemplate[] = [
         category: 'tank',
         variant: 'Evasion',
         description: 'Dodges attacks with high evasion',
-        statAllocation: {
+        allocation: {
             evasion: 40,
             hp: 40,
             armor: 20,
@@ -65,7 +65,7 @@ const BASE_ARCHETYPES: ArchetypeTemplate[] = [
         category: 'tank',
         variant: 'Support',
         description: 'Self-sustaining tank with healing',
-        statAllocation: {
+        allocation: {
             hp: 40,
             regen: 30,
             lifesteal: 20,
@@ -82,7 +82,7 @@ const BASE_ARCHETYPES: ArchetypeTemplate[] = [
         category: 'tank',
         variant: 'Shield',
         description: 'Shield-based damage absorption',
-        statAllocation: {
+        allocation: {
             hp: 40,
             ward: 30,
             energyShield: 20,
@@ -103,7 +103,7 @@ const BASE_ARCHETYPES: ArchetypeTemplate[] = [
         category: 'dps',
         variant: 'Pure',
         description: 'Maximum raw damage output',
-        statAllocation: {
+        allocation: {
             damage: 70,
             hitChance: 20,
             hp: 10,
@@ -119,7 +119,7 @@ const BASE_ARCHETYPES: ArchetypeTemplate[] = [
         category: 'dps',
         variant: 'Crit',
         description: 'Critical strike specialist',
-        statAllocation: {
+        allocation: {
             damage: 40,
             critChance: 30,
             critMult: 20,
@@ -136,7 +136,7 @@ const BASE_ARCHETYPES: ArchetypeTemplate[] = [
         category: 'dps',
         variant: 'Penetration',
         description: 'Armor and resistance penetration',
-        statAllocation: {
+        allocation: {
             damage: 50,
             armorPen: 25,
             penPercent: 15,
@@ -153,7 +153,7 @@ const BASE_ARCHETYPES: ArchetypeTemplate[] = [
         category: 'dps',
         variant: 'Accurate',
         description: 'High accuracy and consistent damage',
-        statAllocation: {
+        allocation: {
             damage: 50,
             hitChance: 40,
             critTxCBonus: 10,
@@ -173,7 +173,7 @@ const BASE_ARCHETYPES: ArchetypeTemplate[] = [
         category: 'assassin',
         variant: 'OneShotKing',
         description: 'Maximum burst damage in one hit',
-        statAllocation: {
+        allocation: {
             damage: 35,
             critChance: 30,
             critMult: 30,
@@ -190,7 +190,7 @@ const BASE_ARCHETYPES: ArchetypeTemplate[] = [
         category: 'assassin',
         variant: 'Evasive',
         description: 'High damage with hit-and-run evasion',
-        statAllocation: {
+        allocation: {
             damage: 40,
             critChance: 25,
             evasion: 25,
@@ -211,7 +211,7 @@ const BASE_ARCHETYPES: ArchetypeTemplate[] = [
         category: 'bruiser',
         variant: 'Balanced',
         description: 'Equal parts offense and defense',
-        statAllocation: {
+        allocation: {
             damage: 30,
             hp: 30,
             armor: 20,
@@ -228,7 +228,7 @@ const BASE_ARCHETYPES: ArchetypeTemplate[] = [
         category: 'bruiser',
         variant: 'Sustain',
         description: 'Outlasts enemies with healing',
-        statAllocation: {
+        allocation: {
             damage: 35,
             lifesteal: 30,
             regen: 20,
@@ -245,7 +245,7 @@ const BASE_ARCHETYPES: ArchetypeTemplate[] = [
         category: 'bruiser',
         variant: 'Duelist',
         description: 'Specialized for 1v1 combat',
-        statAllocation: {
+        allocation: {
             damage: 40,
             hp: 25,
             critChance: 20,
@@ -266,7 +266,7 @@ const BASE_ARCHETYPES: ArchetypeTemplate[] = [
         category: 'support',
         variant: 'Healer',
         description: 'Regeneration and healing over time',
-        statAllocation: {
+        allocation: {
             regen: 50,
             hp: 30,
             resistance: 20,
@@ -282,7 +282,7 @@ const BASE_ARCHETYPES: ArchetypeTemplate[] = [
         category: 'support',
         variant: 'Shielder',
         description: 'Protective shields and barriers',
-        statAllocation: {
+        allocation: {
             ward: 40,
             energyShield: 30,
             hp: 20,

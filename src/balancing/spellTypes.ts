@@ -21,8 +21,8 @@ export interface Spell {
   eco: number; // >=1
   /** Number of targets hit (AoE) */
   aoe: number; // >=1
-  /** Hit chance modifier (renamed from dangerous) */
-  precision: number; // -50 – 50
+  /** Hit chance modifier (renamed from dangerous). Optional for legacy data. */
+  precision?: number; // -50 – 50
   /** Damage on miss/save (renamed from pierce) */
   dangerous: number; // 0 – 50 (step 5)
   /** Cooldown in seconds */
@@ -39,7 +39,18 @@ export interface Spell {
   critMult?: number;
   lifesteal?: number;
   regen?: number;
-
+  /** Legacy pierce field (used by SpellBuilder) */
+  pierce?: number;
+  /** Cast time in seconds */
+  castTime?: number;
+  /** Whether this spell triggers twice per cast */
+  doubleSpell?: boolean;
+  /** Legendary flag */
+  legendary?: boolean;
+  /** Optional per-stat modifications for buff/debuff spells */
+  statModifications?: Record<string, number>;
+  /** Duration in turns for buff/debuff effects */
+  duration?: number;
 
   // ========== PHASE 9: MULTI-UNIT COMBAT ==========
   aoeShape?: 'circle' | 'cone' | 'line' | null; // AoE type
@@ -67,12 +78,24 @@ export interface Spell {
   customFields?: Record<string, any>;
   /** Calculated cost (spell level) – should be 0 for normal spells */
   spellLevel: number;
+  /** Calculated spell points used in some UIs */
+  spellPoints?: number;
+  /** Tier label used by some UIs */
+  tier?: string;
   /** Description of the spell */
   description?: string;
   /** Tags for categorization */
   tags?: string[];
   /** Target stat for buff/debuff spells */
   targetStat?: string;
+  /** Maximum number of stacks */
+  maxStacks?: number;
+  /** Number of charges */
+  charges?: number;
+  /** Channeling time in seconds */
+  channel?: number;
+  /** Reflection percentage for damage return mechanics */
+  reflection?: number;
 }
 
 /** Definition of a customizable slot (gem‑like) */

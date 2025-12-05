@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { DEFAULT_STATS } from '../../balancing/types';
 import { loadSpells } from '../../balancing/spellStorage';
-import type { Spell } from '../../balancing/spellTypes';
 
 export const SpellBalancingLab: React.FC = () => {
     const spells = loadSpells();

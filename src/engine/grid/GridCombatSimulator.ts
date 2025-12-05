@@ -27,7 +27,7 @@ export class GridCombatSimulator {
             state.turn++;
 
             // Process start of turn effects (DoTs, buffs, etc.)
-            this.processStartOfTurn(state, rng);
+            this.processStartOfTurn(state);
 
             // Generate initiative order for this turn
             this.rollInitiative(state, rng);
@@ -135,7 +135,7 @@ export class GridCombatSimulator {
         state.turnQueue = rolls.map(r => r.characterId);
     }
 
-    private static processStartOfTurn(state: GridCombatState, rng: RNG): void {
+    private static processStartOfTurn(state: GridCombatState): void {
         // Process status effect durations
         for (const character of state.characters) {
             if (character.currentHp <= 0) continue;

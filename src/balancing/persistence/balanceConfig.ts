@@ -3,8 +3,6 @@
  * Defines the complete structure of a balance configuration.
  */
 
-import type { StatBlock } from '../types';
-
 export interface BalanceConfig {
     version: string; // Semantic version (e.g., "1.0.0")
 

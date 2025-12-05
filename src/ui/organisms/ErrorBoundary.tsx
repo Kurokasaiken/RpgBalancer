@@ -1,4 +1,4 @@
-import React, { Component, type ErrorInfo, type ReactNode } from 'react';
+import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { GlassCard } from '../atoms/GlassCard';
 import { GlassButton } from '../atoms/GlassButton';
 

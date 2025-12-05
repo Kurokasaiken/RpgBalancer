@@ -194,7 +194,7 @@ export const STAT_WEIGHTS = NORMALIZED_WEIGHTS;
 /**
  * Get weight for a stat
  */
-export function getStatWeight(stat: string, value?: number): number {
+export function getStatWeight(stat: string): number {
     const entry = CORE_STAT_WEIGHTS[stat];
     if (entry) return entry.avgRatio;
 
@@ -223,6 +223,7 @@ export function calculateItemPower(stats: Partial<Record<string, number>>): numb
     let totalPower = 0;
 
     for (const [stat, value] of Object.entries(stats)) {
+        if (typeof value !== 'number') continue;
         const weight = getStatWeight(stat);
         totalPower += value * weight;
     }

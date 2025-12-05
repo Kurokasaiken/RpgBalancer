@@ -98,7 +98,7 @@ export function saveTTKTargets(targets: TTKTarget[]): void {
 export function upsertTTKTarget(target: TTKTarget): void {
     const targets = loadTTKTargets();
     const index = targets.findIndex(
-        t => t.archetypeA === target.archetypeA && t.archetypeB === target.archetypeB
+        t => t.matchup.archetypeA === target.matchup.archetypeA && t.matchup.archetypeB === target.matchup.archetypeB
     );
 
     if (index >= 0) {
@@ -112,7 +112,7 @@ export function upsertTTKTarget(target: TTKTarget): void {
 
 export function deleteTTKTarget(archetypeA: string, archetypeB: string): void {
     const targets = loadTTKTargets().filter(
-        t => !(t.archetypeA === archetypeA && t.archetypeB === archetypeB)
+        t => !(t.matchup.archetypeA === archetypeA && t.matchup.archetypeB === archetypeB)
     );
     saveTTKTargets(targets);
 }
@@ -184,11 +184,7 @@ export function saveBalanceConfig(config: BalanceConfiguration): void {
 function getDefaultBalanceConfig(): BalanceConfiguration {
     return {
         ttkTargets: [],
-        counters: {},
         budgetTiers: getDefaultBudgetTiers(),
-        winRateTolerance: 10,
-        roundsTolerancePercent: 20,
-        maxSimulationRounds: 50,
     };
 }
 

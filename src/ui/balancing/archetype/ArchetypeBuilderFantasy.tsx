@@ -13,7 +13,7 @@ import { ArchetypeRegistry } from '../../../balancing/archetype/ArchetypeRegistr
 import { FantasyCard, FantasyButton, FantasyInput, FantasySlider, FantasySelect } from '../../atoms/index.fantasy';
 
 // Stat names for allocation
-const STAT_NAMES: (keyof StatAllocation)[] = [
+const STAT_NAMES: (keyof StatAllocation & string)[] = [
     'hp', 'damage', 'armor', 'resistance', 'txc', 'evasion',
     'critChance', 'critMult', 'lifesteal', 'regen', 'ward',
     'block', 'armorPen', 'penPercent'
@@ -48,7 +48,10 @@ export const ArchetypeBuilderFantasy: React.FC = () => {
     const [tagInput, setTagInput] = useState('');
 
     // Calculate total allocation
-    const totalAllocation = STAT_NAMES.reduce((sum, stat) => sum + template.allocation[stat], 0);
+    const totalAllocation: number = STAT_NAMES.reduce(
+        (sum, stat) => sum + template.allocation[stat],
+        0
+    );
     const allocationValid = Math.abs(totalAllocation - 100) < 0.01;
 
     // Update allocation for a stat
@@ -157,7 +160,7 @@ export const ArchetypeBuilderFantasy: React.FC = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Left: Metadata */}
                     <div className="lg:col-span-1 space-y-6">
-                        <FantasyCard variant="ornate" padding="lg">
+                        <FantasyCard variant="gold" ornate padding="lg">
                             <div className="fantasy-ribbon text-xl">
                                 Template Details
                             </div>
@@ -292,7 +295,7 @@ export const ArchetypeBuilderFantasy: React.FC = () => {
 
                     {/* Middle/Right: Stat Allocations */}
                     <div className="lg:col-span-2">
-                        <FantasyCard variant="ornate" padding="lg">
+                        <FantasyCard variant="parchment" ornate padding="lg">
                             <div className="flex justify-between items-center mb-6">
                                 <div className="fantasy-ribbon text-2xl px-12">
                                     Stat Distribution
@@ -330,7 +333,7 @@ export const ArchetypeBuilderFantasy: React.FC = () => {
                             )}
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {STAT_NAMES.map((stat: keyof StatAllocation) => (
+                                {STAT_NAMES.map((stat) => (
                                     <FantasySlider
                                         key={stat}
                                         label={stat.replace(/([A-Z])/g, ' $1').trim()}

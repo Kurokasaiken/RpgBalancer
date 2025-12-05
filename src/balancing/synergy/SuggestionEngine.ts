@@ -1,5 +1,7 @@
-import { StatBlock, DEFAULT_STATS } from '../types';
-import { DynamicWeightCalculator, StatWeightResult } from './DynamicWeightCalculator';
+import type { StatBlock } from '../types';
+import { DEFAULT_STATS } from '../types';
+import { DynamicWeightCalculator } from './DynamicWeightCalculator';
+import type { StatWeightResult } from './DynamicWeightCalculator';
 import { STAT_WEIGHTS } from '../statWeights';
 
 export interface Suggestion {

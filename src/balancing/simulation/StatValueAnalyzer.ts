@@ -2,7 +2,6 @@ import { mean, standardDeviation } from 'simple-statistics';
 import { MonteCarloSimulation } from './MonteCarloSimulation';
 import { BASELINE_STATS } from '../baseline';
 import type { StatBlock } from '../types';
-import type { SimulationConfig } from './types';
 
 export interface CalibrationResult {
     stat: string;

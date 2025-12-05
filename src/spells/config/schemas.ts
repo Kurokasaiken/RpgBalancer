@@ -92,7 +92,7 @@ export const SpellPresetSchema = z.object({
   id: idSchema,
   name: nonEmptyString,
   description: z.string().optional(),
-  spellOverrides: z.record(z.string(), z.record(z.any())),
+  spellOverrides: z.record(z.string(), z.record(z.string(), z.any())),
 });
 
 export type SpellPresetInput = z.infer<typeof SpellPresetSchema>;

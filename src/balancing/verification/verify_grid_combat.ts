@@ -1,5 +1,5 @@
 import { GridCombatSimulator } from '../../engine/grid/GridCombatSimulator.ts';
-import { GridState, GridCombatCharacter } from '../../engine/grid/combatTypes.ts';
+import type { GridState, GridCombatCharacter } from '../../engine/grid/combatTypes.ts';
 import { DEFAULT_STATS } from '../../balancing/types.ts';
 import { createEmptySpell } from '../../balancing/spellTypes.ts';
 

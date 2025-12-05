@@ -7,7 +7,7 @@ interface EntityEditorProps {
     onDelete: (id: string) => void;
 }
 
-export const EntityEditor: React.FC<EntityEditorProps> = ({ entities, onSave, onDelete }) => {
+export const EntityEditor: React.FC<EntityEditorProps> = ({ entities, onDelete }) => {
     return (
         <div className="p-4 bg-gray-800 rounded-lg">
             <h2 className="text-xl font-bold text-white mb-4">Entity Editor</h2>

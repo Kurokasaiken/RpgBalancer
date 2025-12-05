@@ -13,7 +13,7 @@
  */
 
 import React, { useState } from 'react';
-import type { StatAdjustment, AutoBalanceSession } from '../../../balancing/1v1/autobalancer';
+import type { StatAdjustment } from '../../../balancing/1v1/autobalancer';
 import { proposeAdjustments, applyAdjustments, DEFAULT_AUTO_BALANCE_CONFIG } from '../../../balancing/1v1/autobalancer';
 import type { Archetype, MatrixRunResult } from '../../../balancing/1v1/types';
 

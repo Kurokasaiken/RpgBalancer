@@ -5,7 +5,6 @@
 
 import { ConfigManager } from '../persistence/ConfigManager';
 import { getDefaultBalanceConfig } from '../persistence/balanceConfig';
-import type { BalanceConfig } from '../persistence/balanceConfig';
 
 console.log('--- Verifying Persistence System ---\n');
 
