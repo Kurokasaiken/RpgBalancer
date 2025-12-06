@@ -1,9 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { DndContext, closestCenter } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { CardDefinition, StatDefinition } from '../../balancing/config/types';
 import { useBalancerConfig } from '../../balancing/hooks/useBalancerConfig';
+import { solveConfigChange } from '../../balancing/config/ConfigSolver';
+import type { StatBlock } from '../../balancing/types';
+import { DEFAULT_STATS } from '../../balancing/types';
+import { simulateExpectedTTK } from '../../balancing/1v1/simulator';
+import { MathEngine } from '../../balancing/1v1/mathEngine';
 import { ConfigurableCard } from './ConfigurableCard';
 import { ConfigToolbar } from './ConfigToolbar';
 import { Sparkles } from 'lucide-react';
@@ -23,6 +28,8 @@ interface SortableCardProps {
   onDeleteCard: () => void;
   startHeaderInEdit?: boolean;
   availableStats: { id: string; label: string }[];
+  dependencyHighlights?: Record<string, boolean>;
+  errorHighlights?: Record<string, boolean>;
 }
 
 const SortableCard: React.FC<SortableCardProps> = ({
@@ -40,6 +47,8 @@ const SortableCard: React.FC<SortableCardProps> = ({
   onDeleteCard,
   startHeaderInEdit,
   availableStats,
+  dependencyHighlights,
+  errorHighlights,
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: card.id });
 
@@ -65,6 +74,8 @@ const SortableCard: React.FC<SortableCardProps> = ({
         startHeaderInEdit={startHeaderInEdit}
         availableStats={availableStats}
         dragListeners={listeners}
+        dependencyHighlights={dependencyHighlights}
+        errorHighlights={errorHighlights}
       />
       {!card.isHidden && (
         <button
@@ -79,12 +90,28 @@ const SortableCard: React.FC<SortableCardProps> = ({
   );
 };
 
+// Build a StatBlock for the 1v1 math engine from the current simValues.
+// Uses DEFAULT_STATS as a safe baseline and overrides only known fields.
+function buildStatBlockFromSimValues(simValues: Record<string, number>): StatBlock {
+  const base: StatBlock = { ...DEFAULT_STATS };
+  Object.entries(simValues).forEach(([id, value]) => {
+    if (typeof value === 'number' && Object.prototype.hasOwnProperty.call(base, id)) {
+      (base as any)[id] = value;
+    }
+  });
+  return base;
+}
+
 export const BalancerNew: React.FC = () => {
   const { config, reorderCards, updateStat, deleteStat, addCard, addStat, updateCard, deleteCard, resetStatToInitial, resetCardToInitial, resetToInitialConfig } = useBalancerConfig();
 
   const [lastCreatedStatId, setLastCreatedStatId] = useState<string | null>(null);
   const [lastCreatedCardId, setLastCreatedCardId] = useState<string | null>(null);
   const [resetConfirmPending, setResetConfirmPending] = useState(false);
+  const [dependencyHighlights, setDependencyHighlights] = useState<Record<string, boolean>>({});
+  const [errorHighlights, setErrorHighlights] = useState<Record<string, boolean>>({});
+  const cascadeTimeoutsRef = useRef<Record<string, number>>({});
+  const errorTimeoutsRef = useRef<Record<string, number>>({});
   
   const SIM_VALUES_KEY = 'balancer_sim_values';
   
@@ -152,10 +179,66 @@ export const BalancerNew: React.FC = () => {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, [config.stats]);
   
-  // Handle simulation value change - this triggers formula recalculation
-  const handleSimValueChange = useCallback((statId: string, value: number) => {
-    setSimValues(prev => ({ ...prev, [statId]: value }));
-  }, []);
+  // Handle simulation value change - this triggers config-driven formula solving
+  const handleSimValueChange = useCallback(
+    (statId: string, value: number) => {
+      setSimValues((prev) => {
+        const result = solveConfigChange(config, prev, statId, value);
+
+        if (result.error) {
+          const ids = [result.error.statId, ...result.error.blockingStats];
+
+          setErrorHighlights((prevErr) => {
+            const next = { ...prevErr };
+            ids.forEach((id) => {
+              next[id] = true;
+            });
+            return next;
+          });
+
+          ids.forEach((id) => {
+            const existing = errorTimeoutsRef.current[id];
+            if (existing) window.clearTimeout(existing);
+            errorTimeoutsRef.current[id] = window.setTimeout(() => {
+              setErrorHighlights((curr) => {
+                const next = { ...curr };
+                delete next[id];
+                return next;
+              });
+            }, 800);
+          });
+
+          // Do not apply invalid change
+          return prev;
+        }
+
+        if (result.changed.length > 0) {
+          setDependencyHighlights((prevDeps) => {
+            const next = { ...prevDeps };
+            result.changed.forEach((id) => {
+              next[id] = true;
+            });
+            return next;
+          });
+
+          result.changed.forEach((id) => {
+            const existing = cascadeTimeoutsRef.current[id];
+            if (existing) window.clearTimeout(existing);
+            cascadeTimeoutsRef.current[id] = window.setTimeout(() => {
+              setDependencyHighlights((curr) => {
+                const next = { ...curr };
+                delete next[id];
+                return next;
+              });
+            }, 500);
+          });
+        }
+
+        return result.values;
+      });
+    },
+    [config],
+  );
 
   // Reset all configuration and simulation values back to the initial snapshot
   const handleResetAll = () => {
@@ -179,6 +262,19 @@ export const BalancerNew: React.FC = () => {
   const allStatInfos = Object.values(config.stats).map((stat) => ({ id: stat.id, label: stat.label }));
   const visibleCards = cards.filter((card) => !card.isHidden);
   const hiddenCards = cards.filter((card) => card.isHidden);
+
+  // Deterministic 1v1 equal-fight metrics (Self vs Self), updated in real time
+  const equalFightMetrics = useMemo(() => {
+    try {
+      const statBlock = buildStatBlockFromSimValues(simValues);
+      const edpt = MathEngine.calcEDPT(statBlock, statBlock);
+      const sim = simulateExpectedTTK(statBlock, statBlock);
+      const earlyImpact = edpt * 3;
+      return { edpt, ttk: sim.turns, earlyImpact };
+    } catch {
+      return null;
+    }
+  }, [simValues]);
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
@@ -266,6 +362,29 @@ export const BalancerNew: React.FC = () => {
 
         <ConfigToolbar />
 
+        {equalFightMetrics && (
+          <div className="mt-3 rounded-xl border border-cyan-500/40 bg-slate-900/70 px-4 py-3 flex flex-wrap items-center gap-4 text-[10px] uppercase tracking-[0.22em]">
+            <div className="flex flex-col min-w-[120px]">
+              <span className="text-slate-400">1v1 Equal (Self vs Self)</span>
+              <span className="font-mono text-cyan-300 text-xs">
+                {equalFightMetrics.ttk.toFixed(2)} turns
+              </span>
+            </div>
+            <div className="flex flex-col min-w-[120px]">
+              <span className="text-slate-400">EDPT vs Self</span>
+              <span className="font-mono text-emerald-300 text-xs">
+                {equalFightMetrics.edpt.toFixed(2)}
+              </span>
+            </div>
+            <div className="flex flex-col min-w-[140px]">
+              <span className="text-slate-400">Early Impact (3T)</span>
+              <span className="font-mono text-amber-300 text-xs">
+                {equalFightMetrics.earlyImpact.toFixed(2)}
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* Hidden cards row */}
         {hiddenCards.length > 0 && (
           <div className="mb-3 flex flex-wrap items-center gap-1.5 text-[10px]">
@@ -316,6 +435,8 @@ export const BalancerNew: React.FC = () => {
                     }}
                     startHeaderInEdit={card.id === lastCreatedCardId}
                     availableStats={allStatInfos}
+                    dependencyHighlights={dependencyHighlights}
+                    errorHighlights={errorHighlights}
                   />
                 ))}
                 <button

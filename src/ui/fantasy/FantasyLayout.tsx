@@ -25,6 +25,7 @@ const NAV_SECTIONS = [
             { id: 'balancerLegacy', label: 'Balance New (WIP)', icon: '🔧' },
             { id: 'balancerStats', label: 'Stat Testing', icon: '📊' },
             { id: 'spellCreation', label: 'Spell Creation', icon: '✨' },
+            { id: 'spellCreationNew', label: 'Spell Creation (New)', icon: '✨' },
             { id: 'archetypes', label: 'Archetypes', icon: '🎭' },
             { id: 'archetypeBuilder', label: 'Builder', icon: '🏗️' },
             { id: 'matchupMatrix', label: 'War Room', icon: '🗺️' },

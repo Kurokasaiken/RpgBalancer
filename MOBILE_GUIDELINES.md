@@ -32,9 +32,11 @@ Ogni componente deve rispettare:
 - [ ] Scroll verticale OK su mobile, evitare scroll orizzontale
 
 ### Typography
-- [ ] **Font size minimo**: 16px (1rem) per body text
-- [ ] **Line height**: min 1.5 per leggibilità mobile
+- [ ] **Font size minimo**: 16px (1rem) per testo lungo/lettura
+- [ ] **UI densa (tool come Balancer)**: etichette/valori possono usare 14px (0.875rem) con alto contrasto
+- [ ] **Line height**: min 1.4–1.5 per leggibilità mobile
 - [ ] Contrasto colori: min 4.5:1 (WCAG AA)
+- [ ] Dettagli su scala tipografica e densità in [docs/plans/responsive_ui_plan.md](docs/plans/responsive_ui_plan.md)
 
 ### Interactions
 - [ ] **Gesture Support**:
@@ -240,6 +242,16 @@ const isMobile = useMediaQuery('(max-width: 768px)');
 
 ---
 
-**Ultimo Aggiornamento**: 2025-11-23  
-**Autore**: Antigravity Agent  
+---
+
+## Mobile + Desktop Workflow (Sintesi)
+
+- Ogni nuova pagina UI:
+  - [ ] Deve essere progettata in modalità **mobile-first**, poi arricchita per desktop.
+  - [ ] Deve avere una review estetica esplicita in DevTools (almeno iPhone 14 Pro + Desktop ~1440px).
+  - [ ] Deve seguire il piano in [docs/plans/responsive_ui_plan.md](docs/plans/responsive_ui_plan.md).
+- La **prima pagina target** per questo workflow è **BalancerNew**.
+
+**Ultimo Aggiornamento**: 2025-12-06  
+**Autore**: Antigravity Agent + Cascade  
 **Status**: Living Document (aggiorna con nuove best practices)

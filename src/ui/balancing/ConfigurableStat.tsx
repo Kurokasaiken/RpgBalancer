@@ -76,9 +76,10 @@ interface Props {
   canDelete?: boolean;
   dependentStats?: string[]; // Stats that depend on this one (for highlight)
   isDependencyHighlighted?: boolean; // Whether this stat is highlighted as a dependency
+  hasError?: boolean; // Whether this stat is highlighted as an error constraint
 }
 
-export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueChange, allSimValues, onUpdate, onDelete, onReset, startInEdit, availableStats, canDelete = false, isDependencyHighlighted }) => {
+export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueChange, allSimValues, onUpdate, onDelete, onReset, startInEdit, availableStats, canDelete = false, isDependencyHighlighted, hasError }) => {
   const [isConfigMode, setIsConfigMode] = useState(!!startInEdit);
   const [label, setLabel] = useState(stat.label);
   const [description, setDescription] = useState(stat.description ?? '');
@@ -103,6 +104,9 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
   const displayValue = stat.isDerived && stat.formula && !isLocked
     ? executeFormula(stat.formula, allSimValues)
     : simValue;
+  // Interactive controls are disabled only when the stat is locked; derived stats remain editable
+  // so that their changes can be propagated via the generic config solver.
+  const isInteractive = !isLocked;
   
   const sliderProgress = stat.max === stat.min ? 100 : Math.max(0, Math.min(100, ((displayValue - stat.min) / (stat.max - stat.min)) * 100));
 
@@ -190,9 +194,11 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
     }
     return (
       <div className={`flex items-center justify-between text-xs py-2 px-3 rounded-xl border backdrop-blur-sm gap-1.5 shadow-[0_10px_24px_rgba(15,23,42,0.85)] ${
-        isDependencyHighlighted
-          ? 'border-amber-400/60 bg-amber-950/40'
-          : 'border-slate-700/70 bg-slate-900/70'
+        hasError
+          ? 'border-red-500/80 bg-red-950/60'
+          : isDependencyHighlighted
+            ? 'border-amber-400/60 bg-amber-950/40'
+            : 'border-slate-700/70 bg-slate-900/70'
       }`}>
         <div className="flex flex-col flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
@@ -239,7 +245,9 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
                 onClick={() => {
                   if (onReset) {
                     onReset();
-                    onSimValueChange(stat.defaultValue);
+                    if (!stat.isDerived) {
+                      onSimValueChange(stat.defaultValue);
+                    }
                   }
                 }}
                 disabled={!onReset}
@@ -271,12 +279,12 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
             <button
               type="button"
               className={`w-6 h-6 flex items-center justify-center rounded border bg-slate-900/80 transition-colors ${
-                isLocked
+                !isInteractive
                   ? 'border-slate-600 text-slate-600 cursor-not-allowed'
                   : 'border-indigo-500/70 text-indigo-200 hover:bg-indigo-500/20'
               }`}
               onClick={() => {
-                if (isLocked) return;
+                if (!isInteractive) return;
                 onSimValueChange(Math.max(stat.min, simValue - stat.step));
               }}
               aria-label="Decrement"
@@ -291,10 +299,10 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
               step={stat.step}
               value={displayValue}
               onChange={(e) => {
-                if (isLocked) return;
+                if (!isInteractive) return;
                 onSimValueChange(Number(e.target.value));
               }}
-              disabled={isLocked}
+              disabled={!isInteractive}
               style={{
                 background: `linear-gradient(to right, #4f46e5 0%, #22d3ee ${sliderProgress}%, #020617 ${sliderProgress}%, #020617 100%)`,
               }}
@@ -302,12 +310,12 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
             <button
               type="button"
               className={`w-6 h-6 flex items-center justify-center rounded border bg-[#1a1410]/70 transition-colors ${
-                isLocked
+                !isInteractive
                   ? 'border-[#555555] text-[#555555] cursor-not-allowed'
                   : 'border-[#9d7d5c] text-[#c9a227] hover:bg-[#2a2015]'
               }`}
               onClick={() => {
-                if (isLocked) return;
+                if (!isInteractive) return;
                 onSimValueChange(Math.min(stat.max, simValue + stat.step));
               }}
               aria-label="Increment"

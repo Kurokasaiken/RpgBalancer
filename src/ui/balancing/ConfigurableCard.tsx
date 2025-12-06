@@ -18,9 +18,11 @@ interface Props {
   startHeaderInEdit?: boolean;
   availableStats: { id: string; label: string }[];
   dragListeners?: React.HTMLAttributes<HTMLButtonElement>;
+  dependencyHighlights?: Record<string, boolean>;
+  errorHighlights?: Record<string, boolean>;
 }
 
-export const ConfigurableCard: React.FC<Props> = ({ card, stats, simValues, onSimValueChange, onEditStat, onDeleteStat, onResetStat, onResetCard, onAddStat, newStatId, onUpdateCard, onDeleteCard, startHeaderInEdit, availableStats, dragListeners }) => {
+export const ConfigurableCard: React.FC<Props> = ({ card, stats, simValues, onSimValueChange, onEditStat, onDeleteStat, onResetStat, onResetCard, onAddStat, newStatId, onUpdateCard, onDeleteCard, startHeaderInEdit, availableStats, dragListeners, dependencyHighlights, errorHighlights }) => {
   const orderedStats = card.statIds.map((id) => stats[id]).filter(Boolean);
 
   const [isEditingHeader, setIsEditingHeader] = useState(!!startHeaderInEdit);
@@ -335,6 +337,8 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, simValues, onSi
             startInEdit={stat.id === newStatId}
             availableStats={availableStats}
             canDelete={!stat.isCore}
+            isDependencyHighlighted={!!dependencyHighlights?.[stat.id]}
+            hasError={!!errorHighlights?.[stat.id]}
           />
         ))}
         {onAddStat && (

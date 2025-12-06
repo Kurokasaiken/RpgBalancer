@@ -19,6 +19,7 @@ import { ArcaneTechGlass } from './ui/fantasy/mockups/ArcaneTechGlass';
 import { GildedObservatory } from './ui/fantasy/mockups/GildedObservatory';
 import { GildedCardShowcase } from './ui/fantasy/mockups/GildedCardShowcase';
 import { SpellCreatorNewMockup } from './ui/spells/SpellCreatorNewMockup';
+import { SpellCreatorNew } from './ui/spells/SpellCreatorNew';
 import { ObsidianSanctum } from './ui/fantasy/mockups/ObsidianSanctum';
 import { AuroraWorkshop } from './ui/fantasy/mockups/AuroraWorkshop';
 import { AetherBrassLab } from './ui/fantasy/mockups/AetherBrassLab';
@@ -51,6 +52,7 @@ type Tab =
   | 'characterCreator'
   | 'spellLibrary'
   | 'spellCreation'
+  | 'spellCreationNew'
   | 'characterManager'
   | 'gridArena'
   | 'idleArena'
@@ -118,6 +120,11 @@ function App() {
       {activeTab === 'spellCreation' && (
         <ErrorBoundary componentName="Spell Creation">
           <FantasySpellCreation />
+        </ErrorBoundary>
+      )}
+      {activeTab === 'spellCreationNew' && (
+        <ErrorBoundary componentName="Spell Creation (New UI)">
+          <SpellCreatorNew />
         </ErrorBoundary>
       )}
       {activeTab === 'characterManager' && (

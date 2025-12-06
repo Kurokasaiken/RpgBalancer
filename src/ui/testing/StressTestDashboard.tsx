@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import type { MarginalUtilityMetrics, PairSynergyMetrics } from '../../balancing/testing/metrics';
 import { MarginalUtilityTable } from './MarginalUtilityTable';
 import { SynergyHeatmap } from './SynergyHeatmap';
 import { StatProfileRadar } from './StatProfileRadar';
+import { useBalancerConfig } from '../../balancing/hooks/useBalancerConfig';
 
 interface StressTestDashboardProps {
   singleStats: MarginalUtilityMetrics[];
@@ -17,6 +18,22 @@ export const StressTestDashboard: React.FC<StressTestDashboardProps> = ({
   onRunTests,
   isRunning = false,
 }) => {
+  const { config } = useBalancerConfig();
+
+  const visibleStats = useMemo(() => {
+    return Object.values(config.stats)
+      .filter((s) => !s.isDerived && !s.formula && !s.isHidden)
+      .sort((a, b) => a.id.localeCompare(b.id));
+  }, [config.stats]);
+
+  const getStatLabel = useCallback(
+    (statId: string) => {
+      const stat = visibleStats.find((s) => s.id === statId);
+      return stat?.label ?? statId;
+    },
+    [visibleStats],
+  );
+
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top,_#1f2937_0,_#020617_55%,_#000000_100%)] text-slate-200 px-4 py-6">
       <div className="max-w-6xl mx-auto space-y-4 relative">
@@ -70,7 +87,11 @@ export const StressTestDashboard: React.FC<StressTestDashboardProps> = ({
           <h2 className="text-xs font-semibold uppercase tracking-[0.22em] text-indigo-200/80">
             Pair Synergy Heatmap (Top Tier)
           </h2>
-          <SynergyHeatmap synergies={pairStats} />
+          <SynergyHeatmap synergies={pairStats} getLabel={getStatLabel} />
+          <div className="mt-1 text-[9px] text-slate-500">
+            Red = pair performs far above neutral expectation (&gt;115%), amber = moderately above
+            (~105–115%), grey ≈ neutral (~95–105%), blue = below expectation (&lt;95%).
+          </div>
         </section>
       </div>
     </div>

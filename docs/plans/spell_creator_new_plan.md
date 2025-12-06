@@ -5,6 +5,56 @@ Creare una nuova versione dello Spell Creator con:
 1. **Config-Driven Architecture** (come BalancerNew)
 2. **Tema Arcane Tech Glass** (nuovo tema visivo)
 3. **Copia in Mockups** per reference
+4. **Parità comportamentale** con lo Spell Creator attuale (stessa logica, stessi nomi, stessi risultati a parità di input)
+
+Questo documento funge da **implementation/migration plan**: definisce architettura, fasi e strategia di migrazione dallo Spell Creator legacy alla nuova UI, mantenendo lo stesso comportamento osservabile.
+
+---
+
+## Migrazione & Parità Comportamentale
+
+### Principi
+
+- **Single Source of Truth di dominio inalterata**
+  - Rimangono autoritativi i moduli esistenti:
+    - `spellTypes.ts`, `defaultSpells.ts`
+    - `spellBalancingConfig.ts` (pesi, baseline, BUFFABLE_STATS)
+    - `spellStatDefinitions.ts`
+    - `spellStorage.ts`
+  - Lo Spell Creator New *riusa* questi moduli invece di ridefinire logiche o costi.
+
+- **Parità logica 1:1 con SpellCreation/FantasySpellCreation**
+  - Stesso calcolo di:
+    - `spellLevel` via `calculateSpellBudget(...)`,
+    - `balance = Σ(weights) - targetBudget`,
+    - preview damage `effect% × BASELINE_STATS.damage × eco`,
+    - gestione buff/debuff (`Modification %`, `Duration (Turns)`, `targetStat`).
+  - Stessa semantica per:
+    - drag & drop dell'ordine delle stat,
+    - collapsed stats (`collapsedStats` + persistenza),
+    - multi-tick slider {`value`, `weight`} per ogni stat.
+
+- **Migrazione sicura e graduale**
+  - Fase 1: SpellCreatorNew vive in tab separata (es. "Spell Creator New"), legacy ancora accessibile.
+  - Fase 2: Parità verificata con test automatici + QA manuale.
+  - Fase 3: Promozione a creator principale e progressivo deprecamento del legacy (senza rimuoverlo finché non ci sono più casi d'uso).
+
+### Strategia di migrazione
+
+1. **Allineare il modello dati**
+   - Definire `SpellDefinition`/`SpellConfig` in modo che mappino direttamente o tramite semplice adattatore agli attuali `Spell` e configurazioni di balancing.
+
+2. **Creare SpellCreatorNew usando le stesse funzioni di dominio**
+   - Nessuna nuova formula di costo o simulazione dentro la UI;
+   - Tutto passa ancora da `calculateSpellBudget`, `getBaselineSpell`, `SPELL_CONFIG`, ecc.
+
+3. **Golden Master / equivalence testing**
+   - Definire un set di input (configurazioni di spell) e confrontare:
+     - output legacy vs SpellCreatorNew (livello di costo, balance, output salvato).
+   - I test vivono in `src/balancing/__tests__/SpellCreationTests.test.ts` o file dedicato.
+
+4. **UI swap controllato**
+   - Quando la parità è dimostrata, aggiornare `App.tsx` per rendere SpellCreatorNew la vista di default, mantenendo una via di accesso allo Spell Creator legacy per debug/regressioni finché non stabilizzato.
 
 ---
 
@@ -255,18 +305,38 @@ className="bg-[linear-gradient(rgba(99,102,241,0.03)_1px,transparent_1px),linear
 ### Fase 6: Integrazione e Testing (2h)
 
 #### 6.1 Integrazione con App.tsx
-- Aggiungere tab "Spell Creator New"
-- Route handling
+- Aggiungere tab "Spell Creator New" (accanto allo Spell Creator attuale).
+- Mantenere accessibile il creator legacy finché non è dimostrata la parità.
 
-#### 6.2 Testing
-- Test formule
-- Test import/export
-- Test reset
-- Test drag & drop
+#### 6.2 Testing & Regression (alto livello)
+
+- **Unit/Domain Tests**
+  - Estendere `src/balancing/__tests__/SpellCreationTests.test.ts` per coprire:
+    - equivalenza di costo (`calculateSpellBudget`) per vari scenari,
+    - coerenza di pesi/disabilitazioni (`SPELL_CONFIG.weights`).
+
+- **Component/Hook Tests (React)**
+  - Nuovi test per `useSpellConfig` e `SpellCreatorNew` che verifichino:
+    - inizializzazione stato (spell vuoto, statOrder di default, balance = 0),
+    - aggiornamenti da slider/tick → update di `Spell` e ricalcolo di cost/balance,
+    - comportamento di `Save`, `Save Default`, `Reset` identico al legacy.
+
+- **Golden Master / Equivalence Tests**
+  - Definire un set di spells di test (esempi da `SPELL_CREATOR.md`).
+  - Per ogni spell:
+    - calcolare costo/balance con la pipeline legacy,
+    - calcolare costo/balance con la pipeline SpellCreatorNew,
+    - asserire uguaglianza (entro la stessa precisione). 
+
+- **UI/E2E Tests (Playwright)**
+  - Scenari end-to-end su mobile + desktop per:
+    - creazione di spell d'esempio (Basic Attack, High-Crit, Shield Wall),
+    - drag & drop, collapse, salvataggio, reset,
+    - coerenza delle etichette e del preview buff/debuff.
 
 #### 6.3 Mockup Copy
-- Copiare SpellCreatorNew in `src/ui/mockups/SpellCreatorMockup.tsx`
-- Versione statica per reference
+- Copiare SpellCreatorNew in `src/ui/mockups/SpellCreatorMockup.tsx`.
+- Versione statica per reference visivo (tema Arcane Tech Glass) non collegata alla logica di dominio.
 
 ---
 

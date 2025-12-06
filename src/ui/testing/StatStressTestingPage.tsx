@@ -8,6 +8,7 @@ import { MarginalUtilityTable } from './MarginalUtilityTable';
 import { SynergyHeatmap } from './SynergyHeatmap';
 import type { MarginalUtilityMetrics, PairSynergyMetrics } from '../../balancing/testing/metrics';
 import type { StatEfficiency, MatchupResult } from '../../balancing/testing/RoundRobinRunner';
+import { computeStatWeightSuggestions } from '../../balancing/stats/StatWeightAdvisor';
 
 const TIERS = [25, 50, 75, 100] as const;
 
@@ -54,6 +55,7 @@ function convertToSynergy(matchups: MatchupResult[]): PairSynergyMetrics[] {
 }
 
 export const StatStressTestingPage: React.FC = () => {
+  const { config, updateStat } = useBalancerConfig();
   const {
     aggregatedResults,
     currentResults,
@@ -62,8 +64,7 @@ export const StatStressTestingPage: React.FC = () => {
     error,
     runAllTiers,
     setSelectedTier,
-  } = useRoundRobinTesting();
-  const { config, updateStat } = useBalancerConfig();
+  } = useRoundRobinTesting(config);
 
   const [iterations, setIterations] = useState<number>(1000);
 
@@ -84,6 +85,32 @@ export const StatStressTestingPage: React.FC = () => {
   const statIds = useMemo(() => {
     return currentResults?.efficiencies.map((e) => e.statId) ?? [];
   }, [currentResults]);
+
+  const weightSuggestions = useMemo(
+    () =>
+      currentResults
+        ? computeStatWeightSuggestions(config, currentResults.efficiencies)
+        : [],
+    [config, currentResults],
+  );
+
+  const applySuggestion = useCallback(
+    (statId: string) => {
+      const suggestion = weightSuggestions.find((s) => s.statId === statId);
+      if (!suggestion) return;
+      if (!Number.isFinite(suggestion.suggestedWeight)) return;
+      if (suggestion.suggestedWeight === suggestion.currentWeight) return;
+      updateStat(statId, { weight: suggestion.suggestedWeight });
+    },
+    [updateStat, weightSuggestions],
+  );
+
+  const applyAllSuggestions = useCallback(() => {
+    weightSuggestions.forEach((s) => {
+      if (s.suggestedWeight === s.currentWeight) return;
+      updateStat(s.statId, { weight: s.suggestedWeight });
+    });
+  }, [updateStat, weightSuggestions]);
 
   const hasResults = aggregatedResults !== null;
 
@@ -247,6 +274,66 @@ export const StatStressTestingPage: React.FC = () => {
                     ))}
                   </div>
                 </div>
+
+                {currentResults && weightSuggestions.length > 0 && (
+                  <div className="mt-3 text-[10px] text-slate-300/80 bg-slate-950/60 border border-cyan-700/60 rounded-lg px-3 py-2">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="uppercase tracking-[0.22em] text-cyan-300/90">
+                        Stat Weight Suggestions
+                      </span>
+                      <button
+                        type="button"
+                        onClick={applyAllSuggestions}
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-cyan-400/70 text-cyan-200 text-[9px] tracking-[0.26em] uppercase bg-slate-900/60 hover:bg-cyan-500/10"
+                      >
+                        Apply All
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,0.8fr)_minmax(0,1.5fr)_auto] gap-x-3 gap-y-0.5 items-center">
+                      <span className="text-slate-500">Stat</span>
+                      <span className="text-slate-500">Current</span>
+                      <span className="text-slate-500">Suggested</span>
+                      <span className="text-slate-500">Δ%</span>
+                      <span className="text-slate-500">Reason</span>
+                      <span className="text-slate-500 text-center">Action</span>
+                      {weightSuggestions.map((s) => (
+                        <React.Fragment key={s.statId}>
+                          <span className="truncate text-indigo-200 uppercase tracking-[0.18em]">
+                            {getStatLabel(s.statId)}
+                          </span>
+                          <span className="font-mono text-slate-300/90">
+                            {s.currentWeight.toFixed(2)}
+                          </span>
+                          <span className="font-mono text-slate-100">
+                            {s.suggestedWeight.toFixed(2)}
+                          </span>
+                          <span
+                            className={`font-mono ${
+                              s.deltaPercent > 0
+                                ? 'text-emerald-300'
+                                : s.deltaPercent < 0
+                                ? 'text-rose-300'
+                                : 'text-slate-300'
+                            }`}
+                          >
+                            {s.deltaPercent === 0 ? '0.0' : s.deltaPercent.toFixed(1)}%
+                          </span>
+                          <span className="truncate text-slate-400" title={s.reason}>
+                            {s.reason}
+                          </span>
+                          <button
+                            type="button"
+                            disabled={s.suggestedWeight === s.currentWeight}
+                            onClick={() => applySuggestion(s.statId)}
+                            className="ml-1 px-2 py-0.5 rounded-full border border-slate-600/80 text-[9px] uppercase tracking-[0.18em] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-800/70"
+                          >
+                            Apply
+                          </button>
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 <StatEfficiencyTable
                   efficiencies={currentResults.efficiencies}

@@ -205,7 +205,7 @@ See full spec for archetype stats, encounter templates, and drop mechanics.
 
 ---
 
-### 🔥 **PHASE 10.5: Stat Stress Testing & Marginal Utility (PRIORITY)**
+### 🔥 **PHASE 10.5: Stat Stress Testing, Marginal Utility & Auto Stat Balancer (PRIORITY)**
 
 **Status:** 🔥 NEXT (Ready to Start)
 
@@ -215,22 +215,28 @@ See full spec for archetype stats, encounter templates, and drop mechanics.
 | **✅ Tasks** | [plans/stat_stress_testing_tasks.md](plans/stat_stress_testing_tasks.md) (to be created) |
 
 **Overview:**
-Dynamic stress-testing system for validating stat weights and identifying synergies:
+Dynamic stress-testing system for validating stat weights and identifying synergies, extended with an **Auto Stat Balancer** that can propose and (optionally) apply weight adjustments directly on the live Balancer config.
 
 **Key Features:**
-- **Single-Stat Archetipi:** Generate archetipi with +25 points in ONE stat (weighted by current weight)
+- **Single-Stat Archetipi:** Generate archetipi with +N points in ONE stat (weighted by current weight)
 - **Pair-Stat Archetipi:** Test ALL stat combinations (C(n,2) pairs)
-- **Marginal Utility Scoring:** Empirical value of each stat via 10k simulations
+- **Marginal Utility Scoring:** Empirical value of each stat via Monte Carlo simulations
 - **Synergy Heatmap:** Identify OP/weak stat combinations
 - **Dynamic Generation:** Read stats from Balancer config, zero hardcoding
 - **Interesting Presentation:** Table + heatmap + radar charts
+- **Inline Weight Suggestions:** For each stat, show suggested weight adjustments based on Round-Robin efficiency (e.g. "OP" → nerf, "weak" → buff), wired to `useBalancerConfig`.
+- **Auto Stat Balancer Sessions:** Optional multi-iteration loop that runs Round-Robin, updates weights within safe bounds, and records each iteration as a session step.
+- **Balance History:** Dedicated history of stat-balance runs/sessions (weights + key metrics) with the ability to inspect and compare past runs.
 
 **Deliverables:**
 - `StressTestArchetypeGenerator.ts` - Dynamic archetype creation
-- `MarginalUtilityCalculator.ts` - Simulation & metrics
-- UI Components: `MarginalUtilityTable`, `SynergyHeatmap`, `StatProfileRadar`
-- `StressTestDashboard.tsx` - Interactive results page
-- `useStressTesting()` hook - Integration with Balancer
+- `RoundRobinRunner.ts` + helpers - Round-Robin NxN stat efficiency engine
+- `metrics.ts` - Marginal utility, synergy metrics & factor tables
+- UI Components: `StatStressTestingPage`, `StatEfficiencyTable`, `MatchupHeatmap`, `EfficiencyRadar`, `MarginalUtilityTable`, `SynergyHeatmap`, `StatProfileRadar`
+- `useRoundRobinTesting()` hook - Integration with Balancer config
+- `StatWeightAdvisor` service - Suggest stat weight adjustments from Round-Robin results
+- `AutoStatBalancer` engine - Optional multi-iteration auto-balance pipeline on `BalancerConfig.stats[*].weight`
+- `StatBalanceHistoryStore` - History of stat-balance runs & sessions (weights + metrics)
 
 **Success Criteria:**
 - ✅ All stats tested individually (no hardcoding)
@@ -436,10 +442,12 @@ The next evolution of the project is organized around six macro-goals:
 1. **Config-Driven Spell Creator**  
    - Applicare lo stesso pattern del Balancer allo Spell Creator.
    - Stat, formule, preset configurabili da UI.
+   - Piano di implementazione e migrazione: [plans/spell_creator_new_plan.md](plans/spell_creator_new_plan.md).
 
 2. **UI Optimization Page-by-Page (Core First)**  
    - Rifinire Balancer e Spell Creator (Tier 1), poi le altre pagine.  
    - Interventi solo visivi/UX separati da cambi strutturali.
+   - Piano dettagliato in [plans/responsive_ui_plan.md](plans/responsive_ui_plan.md), con **BalancerNew** come prima pagina target mobile+desktop.
 
 3. **Page Curation (Keep / Archive)**  
    - Classificare tutte le pagine per importanza (Core / Support / Demo).  

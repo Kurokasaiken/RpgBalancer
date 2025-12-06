@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { useBalancerConfig } from '../../balancing/hooks/useBalancerConfig';
+import type { BalancerConfig } from '../../balancing/config/types';
 import {
   runRoundRobinTests,
   runAllTiersRoundRobin,
@@ -18,8 +18,7 @@ interface UseRoundRobinTestingState {
   error?: string;
 }
 
-export function useRoundRobinTesting() {
-  const { config } = useBalancerConfig();
+export function useRoundRobinTesting(config: BalancerConfig) {
   const ROUND_ROBIN_SEED = 123456;
   const [state, setState] = useState<UseRoundRobinTestingState>({
     aggregatedResults: null,

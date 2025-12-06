@@ -283,7 +283,7 @@ interface StatEfficiencyMetrics {
 
 ---
 
-## 🎨 PHASE 3: Presentation Layer
+## 🎨 PHASE 3: Presentation Layer (✅ Core Implemented)
 
 ### 3.1 Stat Efficiency Table
 
@@ -442,7 +442,7 @@ interface EfficiencyRadarProps {
 
 ---
 
-## 🔄 PHASE 4: Integration
+## 🔄 PHASE 4: Integration (✅ Round-Robin + Balancer Config Wiring)
 
 ### 4.1 Hook for Round-Robin Testing
 
@@ -478,10 +478,11 @@ export function useRoundRobinTesting() {
 - Stats come from `useBalancerConfig()` (live from Balancer tab)
 - Weights come from `config.stats[statId].weight`
 - Changes in Balancer tab reflect immediately in Stat Testing
+- The **Stat Stress Testing** page now exposes a live, editable view of all non-derived stat weights, wired directly to `updateStat` on the shared `BalancerConfig`.
 
 ---
 
-## 📈 PHASE 5: Dashboard Page
+## 📈 PHASE 5: Dashboard Page (✅ First Iteration Shipped)
 
 ```typescript
 // File: src/ui/testing/StatStressTestingPage.tsx
@@ -542,21 +543,188 @@ export function useRoundRobinTesting() {
 - Filter: no derived, no formula, no hidden
 - Generate mono-stat archetypes at multiple tiers
 
-### Step 2: Round-Robin Runner (TODO)
+### Step 2: Round-Robin Runner (✅ Implemented)
 - For each pair (statA, statB): run Monte Carlo
 - Collect NxN matchup results
 - Calculate per-stat efficiency
 
-### Step 3: UI Components (TODO)
+### Step 3: UI Components (✅ First Pass Implemented)
 - StatEfficiencyTable: ranked list with assessment
 - MatchupHeatmap: NxN win rate matrix
 - EfficiencyRadar: visual balance indicator
 
-### Step 4: Integration (TODO)
-- Connect to live BalancerConfig
-- Tier selector
-- Iteration count selector
-- Progress indicator for long runs
+### Step 4: Integration (✅ Config-Driven, Multi-Tier)
+- Connected to live BalancerConfig via `useBalancerConfig`
+- Tier selector (25 / 50 / 75 / 100) and iteration selector (500 / 1000 / 2000)
+- Basic loading state and progress indication for long runs
+
+---
+
+## 🧭 PHASE 9: Auto Stat Balancer & History (Design)
+
+> Goal: extend the existing stat stress testing system into a **config-driven Auto Stat Balancer** that can iteratively adjust `BalancerConfig.stats[*].weight` based on Round-Robin results, while keeping a structured history of runs and sessions.
+
+### 9.1 High-Level Objectives
+
+1. **Stat-Centric AutoBalance**
+   - Use empirical Round-Robin efficiency scores (Section 2) as the primary signal to adjust stat weights.
+   - Keep `BalancerConfig` as the **single source of truth** for all weights (no parallel tables, no hardcoding).
+
+2. **Inline Weight Suggestions**
+   - On the Stat Stress Testing UI, show **per-stat suggestions** (from a pure TS service) alongside the live weight inputs.
+   - Suggestions must be **explainable** ("HP efficiency 0.62 > 0.55 → nerf weight by ~10%") and bounded (per-iteration caps).
+
+3. **History of Runs & Sessions**
+   - Persist a dedicated `StatBalanceRun` history separate from the generic BalancerConfig history snapshots.
+   - Each run stores: timestamp, tiers/iterations, a balance score, and a compact snapshot of efficiency metrics.
+   - Group runs into `StatBalanceSession` when using AutoBalance (Section 9.4).
+
+4. **Recursive AutoBalance Loop**
+   - Implement an offline/authoring-only loop that:
+     1. Reads current `BalancerConfig` weights.
+     2. Runs Round-Robin tests for the configured tiers.
+     3. Produces adjusted weights via a deterministic rule set.
+     4. Persists both the new config and the run metrics as a session iteration.
+   - Stop criteria: all stats in a target band (e.g. 0.45–0.55) and/or max iteration count.
+
+5. **Historical Comparison Views**
+   - Allow comparing multiple runs side-by-side (weights, efficiency scores, heatmaps) to understand the trajectory of changes.
+   - Keep the UI read-only for historical data; edits happen only on the **current** BalancerConfig.
+
+---
+
+### 9.2 Domain Model (Stat AutoBalance)
+
+New domain types (pure TS, no React):
+
+- `StatBalanceRun`
+  - `id: string`
+  - `timestamp: number`
+  - `configVersion: string`
+  - `weights: Record<string, number>` (snapshot of non-derived stat weights)
+  - `tiers: number[]` (e.g. [25, 50, 75, 100])
+  - `iterationsPerTier: number`
+  - `balanceScore: number` (aggregate metric, e.g. mean |efficiency-0.5|)
+  - `summary: { overpowered: string[]; underpowered: string[] }`
+
+- `StatBalanceSession`
+  - `sessionId: string`
+  - `startTime: number`
+  - `endTime?: number`
+  - `runs: StatBalanceRun[]`
+  - `strategy: 'manual' | 'auto'`
+
+These types live under `src/balancing/testing` (or an adjacent `stats` subfolder) and are **UI-agnostic**.
+
+---
+
+### 9.3 Stat Weight Advisor (Suggestions Engine)
+
+**Purpose:** Given a snapshot of Round-Robin stat efficiencies and the current `BalancerConfig`, propose **bounded weight adjustments** per stat.
+
+Design sketch:
+
+- File: `src/balancing/stats/StatWeightAdvisor.ts`
+- Input:
+  - `config: BalancerConfig`
+  - `efficiencies: StatEfficiency[]` (from RoundRobinRunner, Section 2)
+  - parameters: `targetBand = [0.45, 0.55]`, `maxDeltaPerIteration`, etc. (config-driven)
+- Output (per stat):
+  - `currentWeight: number`
+  - `suggestedWeight: number`
+  - `delta: number`
+  - `reason: string`
+
+Rules (example, tunable via config):
+
+- If `efficiency > targetMax` → stat is too strong → **decrease** weight.
+- If `efficiency < targetMin` → stat is too weak → **increase** weight.
+- Clamp `|delta| / currentWeight <= maxRelativeDelta` (e.g. 10% per iteration).
+- For derived/hidden stats: **no suggestions**.
+
+The advisor is a **pure function**, testable via Vitest, and does not touch React or localStorage directly.
+
+---
+
+### 9.4 AutoBalance Session Engine
+
+**Purpose:** Run multiple advisor iterations in a row, each time re-running Round-Robin on the updated config, to converge towards a balanced band.
+
+Design sketch:
+
+- File: `src/balancing/stats/AutoStatBalancer.ts`
+- Core API:
+  - `runSession(config: BalancerConfig, options): StatBalanceSession`
+    - internally:
+      1. For `i` in `[1..maxIterations]`:
+         - run Round-Robin tests (using `RoundRobinRunner`),
+         - compute `StatWeightAdvisor` suggestions,
+         - apply suggestions to get `nextConfig`,
+         - record a `StatBalanceRun`,
+         - stop if all stats within target band.
+      2. Return `StatBalanceSession` with all runs.
+
+**Important:**
+
+- The engine **returns** the resulting config + session, but **does not** persist anything by itself.
+- Persistence is delegated to a dedicated store (Section 9.5) or to the caller (UI, CLI, etc.).
+
+---
+
+### 9.5 History Store (StatBalanceHistoryStore)
+
+**Purpose:** Persist and query `StatBalanceRun` and `StatBalanceSession` data separately from BalancerConfig snapshots.
+
+Design sketch:
+
+- File: `src/balancing/stats/StatBalanceHistoryStore.ts`
+- Backed by localStorage (or the same storage layer used by BalancerConfig), keys separated from `rpg_balancer_config`.
+- API examples:
+  - `addRun(run: StatBalanceRun): void`
+  - `addSession(session: StatBalanceSession): void`
+  - `listRuns(): StatBalanceRun[]`
+  - `listSessions(): StatBalanceSession[]`
+  - `getSession(id: string): StatBalanceSession | undefined`
+  - `clear(): void`
+
+No UI code here; only data access and validation.
+
+---
+
+### 9.6 UI Integration (Stat Stress Testing Page)
+
+Key UX requirements for the **StatStressTestingPage**:
+
+1. **Inline Suggestions Panel**
+   - Extend the existing “Stat Weights (Live)” card with an additional column for **suggested weights** and a short reason.
+   - Per-row controls:
+     - “Apply” button → applies suggestion for that single stat via `updateStat`.
+   - Global controls:
+     - “Apply All Safe Suggestions” → applies only suggestions with small deltas (within a configured threshold).
+
+2. **AutoBalance Trigger (Optional, Phase 2)**
+   - Add an “AutoBalance Session” CTA:
+     - opens a modal / drawer with options (max iterations, tiers, thresholds),
+     - triggers `AutoStatBalancer.runSession`,
+     - once completed, offers to apply the final weights to `BalancerConfig`.
+
+3. **History & Comparison (Read-Only)**
+   - A secondary view/tab that lists historical `StatBalanceRun` and `StatBalanceSession`:
+     - click on a run → show its efficiency table, radar and heatmap (read-only snapshot).
+     - multi-select → compare 2-3 runs side-by-side (weights + key metrics).
+
+These UI additions must remain **config-driven** (no hardcoded stat lists) and reuse existing components wherever possible.
+
+---
+
+### 9.7 Testing & Determinism
+
+- All new services (`StatWeightAdvisor`, `AutoStatBalancer`, `StatBalanceHistoryStore`) must be covered by Vitest.
+- Round-Robin invocations inside AutoBalance must:
+  - use deterministic RNG seeds,
+  - explicitly specify iterations per tier.
+- Target: given the same starting `BalancerConfig` and options, the AutoBalance session should be reproducible.
+
 
 ---
 
