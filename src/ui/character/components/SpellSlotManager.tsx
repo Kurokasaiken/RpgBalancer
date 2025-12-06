@@ -105,7 +105,7 @@ export const SpellSlotManager: React.FC<SpellSlotManagerProps> = ({
                             >
                                 {availableSpells.map(s => (
                                     <option key={s.id} value={s.id} className="bg-gray-800">
-                                        {s.name} {s.spellLevel ? `(Lv${s.spellLevel})` : ''}
+                                        {s.name}
                                     </option>
                                 ))}
                             </select>
@@ -118,11 +118,7 @@ export const SpellSlotManager: React.FC<SpellSlotManagerProps> = ({
                                     ⚡ {spell.effect}
                                 </span>
                             )}
-                            {spell.spellLevel && (
-                                <span className="text-cyan-400">
-                                    Lv{spell.spellLevel}
-                                </span>
-                            )}
+                            {/* Spell level removed: spells are now characterized by their stats, not a saved level. */}
                         </div>
 
                         {/* Remove button */}

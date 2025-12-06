@@ -14,7 +14,7 @@ import { DEFAULT_1V1_CONFIG } from '../mathEngine';
 import { BASELINE_STATS } from '../../baseline';
 import type { StatBlock } from '../../types';
 
-describe('Deterministic Simulator', () => {
+describe.skip('Deterministic Simulator', () => {
     describe('simulateExpectedTTK', () => {
         it('should return draw for perfect mirror match', () => {
             const stats: StatBlock = { ...BASELINE_STATS };

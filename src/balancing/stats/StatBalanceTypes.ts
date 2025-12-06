@@ -1,3 +1,5 @@
+import type { StatEfficiency } from '../testing/RoundRobinRunner';
+
 export interface StatBalanceRun {
   id: string;
   timestamp: number;
@@ -6,6 +8,7 @@ export interface StatBalanceRun {
   weights: Record<string, number>;
   tiers: number[];
   iterationsPerTier: number;
+  efficiencies?: StatEfficiency[];
   /** Aggregate balance metric, e.g. mean |efficiency-0.5| across stats */
   balanceScore: number;
   summary: {

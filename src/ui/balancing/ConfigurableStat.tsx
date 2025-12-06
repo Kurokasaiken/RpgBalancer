@@ -77,9 +77,10 @@ interface Props {
   dependentStats?: string[]; // Stats that depend on this one (for highlight)
   isDependencyHighlighted?: boolean; // Whether this stat is highlighted as a dependency
   hasError?: boolean; // Whether this stat is highlighted as an error constraint
+  dragHandleProps?: React.HTMLAttributes<HTMLButtonElement>;
 }
 
-export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueChange, allSimValues, onUpdate, onDelete, onReset, startInEdit, availableStats, canDelete = false, isDependencyHighlighted, hasError }) => {
+export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueChange, allSimValues, onUpdate, onDelete, onReset, startInEdit, availableStats, canDelete = false, isDependencyHighlighted, hasError, dragHandleProps }) => {
   const [isConfigMode, setIsConfigMode] = useState(!!startInEdit);
   const [label, setLabel] = useState(stat.label);
   const [description, setDescription] = useState(stat.description ?? '');
@@ -109,6 +110,8 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
   const isInteractive = !isLocked;
   
   const sliderProgress = stat.max === stat.min ? 100 : Math.max(0, Math.min(100, ((displayValue - stat.min) / (stat.max - stat.min)) * 100));
+
+  const showDragHandle = !!dragHandleProps && !isConfigMode;
 
   useEffect(() => {
     if (!isConfigMode) {
@@ -203,11 +206,29 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
         <div className="flex flex-col flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
             <div className="flex items-center gap-1.5 min-w-0 flex-1">
-              {LucideIcon ? (
-                <LucideIcon className="w-3.5 h-3.5 text-amber-200 flex-shrink-0" />
+              {showDragHandle ? (
+                <button
+                  type="button"
+                  className="w-4 h-4 flex items-center justify-center rounded text-amber-200 cursor-grab active:cursor-grabbing shrink-0"
+                  title="Trascina per riordinare"
+                  {...dragHandleProps}
+                >
+                  {LucideIcon ? (
+                    <LucideIcon className="w-3.5 h-3.5" />
+                  ) : (
+                    <span
+                      className="text-sm leading-none h-4 flex items-center justify-center"
+                      aria-hidden="true"
+                    >
+                      {fallbackGlyph}
+                    </span>
+                  )}
+                </button>
+              ) : LucideIcon ? (
+                <LucideIcon className="w-3.5 h-3.5 text-amber-200 shrink-0" />
               ) : (
                 <span
-                  className="text-sm text-amber-200 leading-none flex-shrink-0 h-4 flex items-center justify-center"
+                  className="text-sm text-amber-200 leading-none shrink-0 h-4 flex items-center justify-center"
                   aria-hidden="true"
                 >
                   {fallbackGlyph}
@@ -322,9 +343,25 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
             >
               <Plus className="w-3 h-3" />
             </button>
-            <span className="w-10 text-right text-[10px] text-cyan-200 font-mono">
-              {displayValue.toFixed(stat.step < 1 ? 1 : 0)}
-            </span>
+            <input
+              type="number"
+              className={`w-14 px-1 py-0.5 rounded border text-[10px] font-mono text-right bg-slate-950/90 focus:outline-none focus:ring-1 focus:ring-cyan-400/70 ${
+                !isInteractive
+                  ? 'border-slate-700 text-slate-500 cursor-not-allowed opacity-70'
+                  : 'border-slate-600 text-cyan-200'
+              }`}
+              value={Number.isFinite(displayValue) ? displayValue : ''}
+              onChange={(e) => {
+                if (!isInteractive) return;
+                const next = Number(e.target.value);
+                if (!Number.isFinite(next)) return;
+                onSimValueChange(next);
+              }}
+              step={stat.step}
+              min={stat.min}
+              max={stat.max}
+              disabled={!isInteractive}
+            />
           </div>
         </div>
       </div>

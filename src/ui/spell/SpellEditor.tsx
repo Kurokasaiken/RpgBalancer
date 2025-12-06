@@ -47,8 +47,8 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
 
     const handleSave = () => {
         if (!editedSpell) return;
-        const finalSpell = { ...editedSpell, spellLevel: Math.round(budget) };
-        upsertSpell(finalSpell);
+        // Persist the edited spell as-is; spellLevel is no longer part of the saved entity.
+        upsertSpell(editedSpell);
         onClose();
     };
 

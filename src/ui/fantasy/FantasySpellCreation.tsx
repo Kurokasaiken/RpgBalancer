@@ -184,7 +184,7 @@ export const FantasySpellCreation: React.FC = () => {
                 (minimalSpell as any)[key] = value;
             }
         });
-        const finalSpell = { ...minimalSpell, spellLevel: Math.round(cost) } as Spell;
+        const finalSpell = minimalSpell as Spell;
         upsertSpell(finalSpell);
         toast.success('Spell saved successfully!', {
             description: `"${finalSpell.name}" has been added to your library`

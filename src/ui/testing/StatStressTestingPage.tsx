@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { useRoundRobinTesting } from './useRoundRobinTesting';
 import { useBalancerConfig } from '../../balancing/hooks/useBalancerConfig';
 import { StatEfficiencyTable } from './StatEfficiencyTable';
@@ -9,8 +9,15 @@ import { SynergyHeatmap } from './SynergyHeatmap';
 import type { MarginalUtilityMetrics, PairSynergyMetrics } from '../../balancing/testing/metrics';
 import type { StatEfficiency, MatchupResult } from '../../balancing/testing/RoundRobinRunner';
 import { computeStatWeightSuggestions } from '../../balancing/stats/StatWeightAdvisor';
+import { runAndStoreAutoBalanceSession } from '../../balancing/stats/AutoStatBalanceService';
+import { StatBalanceHistoryStore } from '../../balancing/stats/StatBalanceHistoryStore';
+import type { StatBalanceRun, StatBalanceSession } from '../../balancing/stats/StatBalanceTypes';
 
 const TIERS = [25, 50, 75, 100] as const;
+const FAST_ITERATIONS = 2000;
+const FULL_ITERATIONS = 10000;
+
+type IterationMode = 'fast' | 'full';
 
 /**
  * Convert StatEfficiency (from Round-Robin) to MarginalUtilityMetrics (legacy format)
@@ -66,7 +73,64 @@ export const StatStressTestingPage: React.FC = () => {
     setSelectedTier,
   } = useRoundRobinTesting(config);
 
-  const [iterations, setIterations] = useState<number>(1000);
+  const [iterationMode, setIterationMode] = useState<IterationMode>('full');
+  const iterations = iterationMode === 'fast' ? FAST_ITERATIONS : FULL_ITERATIONS;
+  const [isAutoBalancing, setIsAutoBalancing] = useState<boolean>(false);
+  const [autoBalanceError, setAutoBalanceError] = useState<string | undefined>();
+  const [historyRuns, setHistoryRuns] = useState<StatBalanceRun[]>([]);
+  const [historySessions, setHistorySessions] = useState<StatBalanceSession[]>([]);
+  const [selectedHistoryRunId, setSelectedHistoryRunId] = useState<string | null>(null);
+  const [selectedSessionFilterId, setSelectedSessionFilterId] = useState<string | 'all'>('all');
+  const [selectedComparisonRunIds, setSelectedComparisonRunIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    const runs = StatBalanceHistoryStore.listRuns();
+    const sessions = StatBalanceHistoryStore.listSessions();
+    setHistoryRuns(runs);
+    setHistorySessions(sessions);
+  }, []);
+
+  useEffect(() => {
+    if (!isAutoBalancing) {
+      const runs = StatBalanceHistoryStore.listRuns();
+      const sessions = StatBalanceHistoryStore.listSessions();
+      setHistoryRuns(runs);
+      setHistorySessions(sessions);
+    }
+  }, [isAutoBalancing]);
+
+  const filteredHistoryRuns = useMemo(() => {
+    if (selectedSessionFilterId === 'all') return historyRuns;
+    const session = historySessions.find((s) => s.sessionId === selectedSessionFilterId);
+    if (!session) return historyRuns;
+    const allowed = new Set(session.runs.map((r) => r.id));
+    return historyRuns.filter((r) => allowed.has(r.id));
+  }, [historyRuns, historySessions, selectedSessionFilterId]);
+
+  const selectedHistoryRun = useMemo(
+    () => historyRuns.find((r) => r.id === selectedHistoryRunId) ?? null,
+    [historyRuns, selectedHistoryRunId],
+  );
+
+  const comparisonRuns = useMemo(
+    () => filteredHistoryRuns.filter((r) => selectedComparisonRunIds.includes(r.id)),
+    [filteredHistoryRuns, selectedComparisonRunIds],
+  );
+
+  const toggleCompareRun = useCallback(
+    (runId: string) => {
+      setSelectedComparisonRunIds((prev) => {
+        if (prev.includes(runId)) {
+          return prev.filter((id) => id !== runId);
+        }
+        if (prev.length >= 3) {
+          return [...prev.slice(1), runId];
+        }
+        return [...prev, runId];
+      });
+    },
+    [setSelectedComparisonRunIds],
+  );
 
   const visibleStats = useMemo(() => {
     return Object.values(config.stats)
@@ -112,6 +176,34 @@ export const StatStressTestingPage: React.FC = () => {
     });
   }, [updateStat, weightSuggestions]);
 
+  const handleRunAutoBalance = useCallback(async () => {
+    if (isAutoBalancing) return;
+    setAutoBalanceError(undefined);
+    setIsAutoBalancing(true);
+    try {
+      const { finalConfig } = await runAndStoreAutoBalanceSession(config, {
+        iterationsPerTier: iterations,
+      });
+
+      // Apply final weights to live BalancerConfig via updateStat (config-driven, no direct store usage)
+      Object.values(finalConfig.stats)
+        .filter((s) => !s.isDerived && !s.formula && !s.isHidden)
+        .forEach((stat) => {
+          const live = config.stats[stat.id];
+          if (!live) return;
+          if (live.weight === stat.weight) return;
+          updateStat(stat.id, { weight: stat.weight });
+        });
+
+      // Re-run round-robin to show the new balanced state
+      await runAllTiers(iterations);
+    } catch (e) {
+      setAutoBalanceError((e as Error).message ?? 'Auto-balance session failed');
+    } finally {
+      setIsAutoBalancing(false);
+    }
+  }, [config, iterations, runAllTiers, updateStat, isAutoBalancing]);
+
   const hasResults = aggregatedResults !== null;
 
   return (
@@ -133,42 +225,74 @@ export const StatStressTestingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex flex-col items-end gap-2 min-w-[220px]">
+          <div className="flex flex-col items-end gap-2 min-w-[260px]">
             <div className="flex items-center gap-2 text-[10px] text-slate-400">
-              <span className="uppercase tracking-[0.24em]">Iterations</span>
-              <select
-                value={iterations}
-                onChange={(e) => setIterations(Number(e.target.value) || 1000)}
-                className="bg-slate-900/80 border border-slate-700/70 rounded px-2 py-0.5 text-[10px] text-slate-100 focus:outline-none focus:ring-1 focus:ring-cyan-400/80"
-              >
-                <option value={500}>500</option>
-                <option value={1000}>1000</option>
-                <option value={2000}>2000</option>
-              </select>
+              <span className="uppercase tracking-[0.24em]">Mode</span>
+              <div className="inline-flex rounded-full bg-slate-900/80 border border-slate-700/70 overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setIterationMode('fast')}
+                  className={`px-3 py-0.5 text-[9px] uppercase tracking-[0.22em] ${
+                    iterationMode === 'fast'
+                      ? 'bg-cyan-500/20 text-cyan-200'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  Fast
+                  <span className="ml-1 text-[8px] text-slate-500">(2k)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIterationMode('full')}
+                  className={`px-3 py-0.5 text-[9px] uppercase tracking-[0.22em] border-l border-slate-700/70 ${
+                    iterationMode === 'full'
+                      ? 'bg-indigo-500/20 text-indigo-200'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  Full
+                  <span className="ml-1 text-[8px] text-slate-500">(10k)</span>
+                </button>
+              </div>
             </div>
 
-            {/* Run All Tiers button */}
-            <button
-              type="button"
-              onClick={() => runAllTiers(iterations)}
-              disabled={isRunning}
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border border-cyan-400/70 text-cyan-200 text-[10px] tracking-[0.32em] uppercase bg-slate-900/60 transition-colors transition-transform disabled:cursor-not-allowed disabled:opacity-60 ${
-                isRunning
-                  ? 'shadow-[0_0_22px_rgba(34,211,238,0.8)] animate-pulse'
-                  : 'hover:bg-cyan-500/10 hover:-translate-y-[1px]'
-              }`}
-            >
-              {isRunning && (
-                <span className="inline-block w-4 h-4 border-[2px] border-cyan-300/80 border-t-transparent rounded-full animate-spin" />
-              )}
-              <span>{isRunning ? 'Running All Tiers…' : 'Run All Tiers'}</span>
-            </button>
+            <div className="flex gap-2">
+              {/* Run All Tiers button */}
+              <button
+                type="button"
+                onClick={() => runAllTiers(iterations)}
+                disabled={isRunning || isAutoBalancing}
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border border-cyan-400/70 text-cyan-200 text-[10px] tracking-[0.32em] uppercase bg-slate-900/60 transition-colors transition-transform disabled:cursor-not-allowed disabled:opacity-60 ${
+                  isRunning
+                    ? 'shadow-[0_0_22px_rgba(34,211,238,0.8)] animate-pulse'
+                    : 'hover:bg-cyan-500/10 hover:-translate-y-[1px]'
+                }`}
+              >
+                {isRunning && (
+                  <span className="inline-block w-4 h-4 border-[2px] border-cyan-300/80 border-t-transparent rounded-full animate-spin" />
+                )}
+                <span>{isRunning ? 'Running All Tiers…' : 'Run All Tiers'}</span>
+              </button>
+
+              {/* Auto-Balance Session trigger */}
+              <button
+                type="button"
+                onClick={handleRunAutoBalance}
+                disabled={isRunning || isAutoBalancing}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-amber-400/80 text-amber-200 text-[10px] tracking-[0.32em] uppercase bg-slate-900/60 hover:bg-amber-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isAutoBalancing && (
+                  <span className="inline-block w-4 h-4 border-[2px] border-amber-300/80 border-t-transparent rounded-full animate-spin" />
+                )}
+                <span>{isAutoBalancing ? 'Auto-Balancing…' : 'Run Auto-Balance'}</span>
+              </button>
+            </div>
           </div>
         </header>
 
-        {error && (
+        {(error || autoBalanceError) && (
           <div className="text-xs text-rose-300 bg-rose-950/40 border border-rose-500/40 rounded-lg px-3 py-2">
-            {error}
+            {error || autoBalanceError}
           </div>
         )}
 
@@ -436,6 +560,235 @@ export const StatStressTestingPage: React.FC = () => {
               </section>
             </div>
           </>
+        )}
+
+        {(historySessions.length > 0 || historyRuns.length > 0) && (
+          <section className="mt-6 pt-4 border-t border-slate-700/40 space-y-3">
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.22em] text-indigo-200/80">
+                Balance History
+              </h2>
+              {historySessions.length > 0 && (
+                <div className="flex items-center gap-1 text-[9px] text-slate-400">
+                  <span className="uppercase tracking-[0.2em]">Session</span>
+                  <select
+                    value={selectedSessionFilterId}
+                    onChange={(e) =>
+                      setSelectedSessionFilterId((e.target.value || 'all') as string | 'all')
+                    }
+                    className="bg-slate-900/70 border border-slate-700/70 rounded px-2 py-0.5 text-[9px] text-slate-200 focus:outline-none focus:ring-1 focus:ring-cyan-400/70"
+                  >
+                    <option value="all">All</option>
+                    {historySessions.map((s) => {
+                      const label =
+                        s.sessionId.length > 18
+                          ? `${s.sessionId.slice(0, 10)}…${s.sessionId.slice(-4)}`
+                          : s.sessionId;
+                      return (
+                        <option key={s.sessionId} value={s.sessionId}>
+                          {label}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+              )}
+            </div>
+
+            {historySessions.length > 0 && (
+              <div className="text-[10px] text-slate-300/80 bg-slate-950/60 border border-slate-700/60 rounded-lg px-3 py-2">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="uppercase tracking-[0.2em] text-slate-400/90">
+                    Recent Sessions
+                  </span>
+                  <span className="text-[9px] text-slate-500">{historySessions.length} stored</span>
+                </div>
+                <div className="grid grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,0.8fr)] gap-x-3 gap-y-0.5">
+                  <span className="text-slate-500">Session</span>
+                  <span className="text-slate-500">Time</span>
+                  <span className="text-slate-500">Runs</span>
+                  <span className="text-slate-500">Last Score</span>
+                  {historySessions.slice(0, 5).map((s) => {
+                    const lastRun = s.runs[s.runs.length - 1];
+                    const label =
+                      s.sessionId.length > 18
+                        ? `${s.sessionId.slice(0, 10)}…${s.sessionId.slice(-4)}`
+                        : s.sessionId;
+                    return (
+                      <React.Fragment key={s.sessionId}>
+                        <span className="truncate text-slate-200">{label}</span>
+                        <span className="text-slate-400">
+                          {new Date(s.startTime).toLocaleString()}
+                        </span>
+                        <span className="text-slate-300 font-mono">{s.runs.length}</span>
+                        <span className="text-slate-300 font-mono">
+                          {lastRun ? lastRun.balanceScore.toFixed(3) : '—'}
+                        </span>
+                      </React.Fragment>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {historyRuns.length > 0 && (
+              <div className="text-[10px] text-slate-300/80 bg-slate-950/60 border border-slate-700/60 rounded-lg px-3 py-2">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="uppercase tracking-[0.2em] text-slate-400/90">
+                    Recent Runs
+                  </span>
+                  <span className="text-[9px] text-slate-500">{filteredHistoryRuns.length} stored</span>
+                </div>
+                <div className="grid grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,0.8fr)_auto] gap-x-3 gap-y-0.5">
+                  <span className="text-slate-500">Run</span>
+                  <span className="text-slate-500">Time</span>
+                  <span className="text-slate-500">Score</span>
+                  <span className="text-slate-500">OP / Weak</span>
+                  <span className="text-slate-500 text-center">Compare</span>
+                  {filteredHistoryRuns.slice(0, 8).map((r) => {
+                    const label =
+                      r.id.length > 18 ? `${r.id.slice(0, 10)}…${r.id.slice(-4)}` : r.id;
+                    return (
+                      <React.Fragment key={r.id}>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedHistoryRunId(r.id)}
+                          className={`truncate text-left ${
+                            selectedHistoryRunId === r.id ? 'text-cyan-200' : 'text-slate-200'
+                          }`}
+                        >
+                          {label}
+                        </button>
+                        <span className="text-slate-400">
+                          {new Date(r.timestamp).toLocaleString()}
+                        </span>
+                        <span className="font-mono text-slate-300">
+                          {r.balanceScore.toFixed(3)}
+                        </span>
+                        <span className="font-mono text-slate-300">
+                          {r.summary.overpowered.length}/{r.summary.underpowered.length}
+                        </span>
+                        <span className="flex items-center justify-center">
+                          <input
+                            type="checkbox"
+                            checked={selectedComparisonRunIds.includes(r.id)}
+                            onChange={() => toggleCompareRun(r.id)}
+                            className="h-3 w-3 accent-cyan-400"
+                          />
+                        </span>
+                      </React.Fragment>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </section>
+        )}
+
+        {selectedHistoryRun && (
+          <section className="mt-4 space-y-2">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.22em] text-indigo-200/80">
+              Run Snapshot
+            </h2>
+            <div className="text-[10px] text-slate-300/80 bg-slate-950/60 border border-slate-700/60 rounded-lg px-3 py-2">
+              <div className="flex items-center justify-between mb-1">
+                <span className="uppercase tracking-[0.2em] text-slate-400/90">
+                  {selectedHistoryRun.id.length > 18
+                    ? `${selectedHistoryRun.id.slice(0, 10)}…${selectedHistoryRun.id.slice(-4)}`
+                    : selectedHistoryRun.id}
+                </span>
+                <span className="text-[9px] text-slate-500">
+                  {new Date(selectedHistoryRun.timestamp).toLocaleString()} · v
+                  {selectedHistoryRun.configVersion}
+                </span>
+              </div>
+              <div className="grid grid-cols-[minmax(0,1.4fr)_minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,1.2fr)] gap-x-3 gap-y-0.5">
+                <span className="text-slate-500">Balance Score</span>
+                <span className="text-slate-500">Iterations</span>
+                <span className="text-slate-500">Runs in Session</span>
+                <span className="text-slate-500">Tiers</span>
+                <span className="font-mono text-slate-300">
+                  {selectedHistoryRun.balanceScore.toFixed(3)}
+                </span>
+                <span className="font-mono text-slate-300">
+                  {selectedHistoryRun.iterationsPerTier}
+                </span>
+                <span className="font-mono text-slate-300">
+                  {
+                    historySessions.find((s) =>
+                      s.runs.some((r) => r.id === selectedHistoryRun.id),
+                    )?.runs.length ?? 1
+                  }
+                </span>
+                <span className="text-slate-300">
+                  {selectedHistoryRun.tiers.join(', ')}
+                </span>
+              </div>
+            </div>
+
+            {selectedHistoryRun.efficiencies && selectedHistoryRun.efficiencies.length > 0 ? (
+              <div className="text-[10px] text-slate-300/80 bg-slate-950/60 border border-slate-700/60 rounded-lg px-3 py-2">
+                <StatEfficiencyTable
+                  efficiencies={selectedHistoryRun.efficiencies}
+                  getLabel={getStatLabel}
+                />
+              </div>
+            ) : (
+              <div className="text-[10px] text-slate-500 bg-slate-900/40 border border-slate-700/40 rounded-lg p-3 text-center">
+                No stored efficiency snapshot for this run.
+              </div>
+            )}
+          </section>
+        )}
+
+        {comparisonRuns.length >= 2 && (
+          <section className="mt-4 space-y-2">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.22em] text-indigo-200/80">
+              Run Comparison
+            </h2>
+            <div className="text-[10px] text-slate-300/80 bg-slate-950/60 border border-slate-700/60 rounded-lg px-3 py-2">
+              <div className="text-[9px] text-slate-500 mb-1">
+                Showing {comparisonRuns.length} runs (max 3) side-by-side.
+              </div>
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                {comparisonRuns.map((run) => (
+                  <div
+                    key={run.id}
+                    className="bg-slate-950/80 border border-slate-700/70 rounded-lg px-2 py-2 space-y-1"
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="uppercase tracking-[0.18em] text-slate-300 truncate">
+                        {run.id.length > 18
+                          ? `${run.id.slice(0, 10)}…${run.id.slice(-4)}`
+                          : run.id}
+                      </span>
+                      <span className="text-[9px] text-slate-500">
+                        {new Date(run.timestamp).toLocaleTimeString()}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-[minmax(0,1.2fr)_minmax(0,0.9fr)_minmax(0,1.1fr)] gap-x-2 gap-y-0.5 mb-1">
+                      <span className="text-slate-500">Score</span>
+                      <span className="text-slate-500">Iterations</span>
+                      <span className="text-slate-500">Tiers</span>
+                      <span className="font-mono text-slate-300">{run.balanceScore.toFixed(3)}</span>
+                      <span className="font-mono text-slate-300">{run.iterationsPerTier}</span>
+                      <span className="text-slate-300">{run.tiers.join(', ')}</span>
+                    </div>
+                    {run.efficiencies && run.efficiencies.length > 0 ? (
+                      <StatEfficiencyTable
+                        efficiencies={run.efficiencies}
+                        getLabel={getStatLabel}
+                      />
+                    ) : (
+                      <div className="text-[9px] text-slate-500 text-center py-2">
+                        No efficiency snapshot stored for this run.
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
         )}
 
         {aggregatedResults && (

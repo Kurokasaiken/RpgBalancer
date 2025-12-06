@@ -435,6 +435,22 @@ Expand combat system from 1v1 to full tactical grid-based multi-unit combat:
 
 ---
 
+### Testing & QA Infrastructure (Cross-Phase)
+
+**Status:** 0% (Planned)
+
+| Document | Purpose |
+|----------|---------|
+| ** Plan** | [plans/testing_infrastructure_plan.md](plans/testing_infrastructure_plan.md) |
+| ** Tasks** | [plans/testing_infrastructure_tasks.md](plans/testing_infrastructure_tasks.md) |
+
+**Overview:**
+- Unified testing layers (lint, config healthcheck, domain/simulation, UI components, Playwright E2E).
+- Single entry points via npm scripts (`test:all`, `test:all:quick`).
+- Config-first validation of BalancerConfig, solver behavior, and key UI surfaces (BalancerNew, Stat Stress Testing).
+
+---
+
 ### Future Direction (After Config-Driven Balancer)
 
 The next evolution of the project is organized around six macro-goals:

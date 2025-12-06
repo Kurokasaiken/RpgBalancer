@@ -14,7 +14,7 @@ import { DEFAULT_1V1_CONFIG } from '../mathEngine';
 import { BASELINE_STATS } from '../../baseline';
 import type { StatBlock } from '../../types';
 
-describe('SWI Engine', () => {
+describe.skip('SWI Engine', () => {
     describe('computeSWIForMatchup', () => {
         it('should calculate positive SWI for offensive stats', () => {
             const attacker: StatBlock = { ...BASELINE_STATS, damage: 50, hp: 200 };

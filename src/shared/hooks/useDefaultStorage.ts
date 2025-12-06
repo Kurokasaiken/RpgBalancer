@@ -6,6 +6,8 @@
 import { useState } from 'react';
 import type { Spell } from '../../balancing/spellTypes';
 import { createEmptySpell } from '../../balancing/spellTypes';
+import { DEFAULT_SPELLS } from '../../balancing/defaultSpells';
+import { DEFAULT_SPELL_STAT_ORDER } from '../../balancing/spell/spellSliderConfig';
 
 interface DefaultConfig {
     spell: Spell;
@@ -15,11 +17,7 @@ interface DefaultConfig {
     selectedTicks: Record<string, number>;
 }
 
-const DEFAULT_STAT_ORDER = [
-    'effect', 'eco', 'dangerous', // core
-    'scale', 'precision', // advanced
-    'aoe', 'cooldown', 'range', 'priority', 'manaCost' // optional
-];
+const DEFAULT_STAT_ORDER = [...DEFAULT_SPELL_STAT_ORDER];
 
 export const useDefaultStorage = () => {
     // Load default configuration once
@@ -40,8 +38,11 @@ export const useDefaultStorage = () => {
             console.error('Failed to load default config:', error);
         }
 
+        const template: Spell = (DEFAULT_SPELLS[0] as Spell) ?? createEmptySpell();
+        const baseline: Spell = { ...template, id: crypto.randomUUID() };
+
         return {
-            spell: createEmptySpell(),
+            spell: baseline,
             statOrder: DEFAULT_STAT_ORDER,
             collapsedStats: [],
             statSteps: {},

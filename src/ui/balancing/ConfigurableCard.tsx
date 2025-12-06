@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import type { CardDefinition, StatDefinition } from '../../balancing/config/types';
 import { ConfigurableStat } from './ConfigurableStat';
+import { DndContext, closestCenter, type DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface Props {
   card: CardDefinition;
@@ -21,6 +24,62 @@ interface Props {
   dependencyHighlights?: Record<string, boolean>;
   errorHighlights?: Record<string, boolean>;
 }
+
+interface SortableStatProps {
+  stat: StatDefinition;
+  simValues: Record<string, number>;
+  onSimValueChange: (statId: string, value: number) => void;
+  onEditStat: (updates: Partial<StatDefinition>) => void;
+  onDeleteStat: () => void;
+  onResetStat?: () => void;
+  newStatId?: string;
+  availableStats: { id: string; label: string }[];
+  canDelete: boolean;
+  isDependencyHighlighted?: boolean;
+  hasError?: boolean;
+}
+
+const SortableStat: React.FC<SortableStatProps> = ({
+  stat,
+  simValues,
+  onSimValueChange,
+  onEditStat,
+  onDeleteStat,
+  onResetStat,
+  newStatId,
+  availableStats,
+  canDelete,
+  isDependencyHighlighted,
+  hasError,
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: stat.id });
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 10 : undefined,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      <ConfigurableStat
+        stat={stat}
+        simValue={simValues[stat.id] ?? stat.defaultValue}
+        onSimValueChange={(value) => onSimValueChange(stat.id, value)}
+        allSimValues={simValues}
+        onUpdate={onEditStat}
+        onDelete={onDeleteStat}
+        onReset={onResetStat}
+        startInEdit={stat.id === newStatId}
+        availableStats={availableStats}
+        canDelete={canDelete}
+        isDependencyHighlighted={isDependencyHighlighted}
+        hasError={hasError}
+        dragHandleProps={{ ...attributes, ...listeners }}
+      />
+    </div>
+  );
+};
 
 export const ConfigurableCard: React.FC<Props> = ({ card, stats, simValues, onSimValueChange, onEditStat, onDeleteStat, onResetStat, onResetCard, onAddStat, newStatId, onUpdateCard, onDeleteCard, startHeaderInEdit, availableStats, dragListeners, dependencyHighlights, errorHighlights }) => {
   const orderedStats = card.statIds.map((id) => stats[id]).filter(Boolean);
@@ -81,6 +140,18 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, simValues, onSi
   const isCustomColor = color?.startsWith('#');
   const displayStyle = isCustomColor ? { color } : undefined;
   const isHidden = !!card.isHidden;
+
+  const handleStatDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = card.statIds.indexOf(active.id as string);
+    const newIndex = card.statIds.indexOf(over.id as string);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const newStatIds = arrayMove(card.statIds, oldIndex, newIndex);
+    onUpdateCard?.({ statIds: newStatIds });
+  };
 
   if (isHidden && !isEditingHeader) {
     return (
@@ -324,23 +395,28 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, simValues, onSi
         {orderedStats.length === 0 && (
           <p className="text-[11px] text-[#aeb8b4] italic">No stats in this card yet.</p>
         )}
-        {orderedStats.map((stat) => (
-          <ConfigurableStat
-            key={stat.id}
-            stat={stat}
-            simValue={simValues[stat.id] ?? stat.defaultValue}
-            onSimValueChange={(value) => onSimValueChange(stat.id, value)}
-            allSimValues={simValues}
-            onUpdate={(updates) => onEditStat(stat.id, updates)}
-            onDelete={() => onDeleteStat(stat.id)}
-            onReset={onResetStat ? () => onResetStat(stat.id) : undefined}
-            startInEdit={stat.id === newStatId}
-            availableStats={availableStats}
-            canDelete={!stat.isCore}
-            isDependencyHighlighted={!!dependencyHighlights?.[stat.id]}
-            hasError={!!errorHighlights?.[stat.id]}
-          />
-        ))}
+        <DndContext collisionDetection={closestCenter} onDragEnd={handleStatDragEnd}>
+          <SortableContext items={orderedStats.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+            <div className="grid gap-2 grid-cols-1 md:grid-cols-2">
+              {orderedStats.map((stat) => (
+                <SortableStat
+                  key={stat.id}
+                  stat={stat}
+                  simValues={simValues}
+                  onSimValueChange={onSimValueChange}
+                  onEditStat={(updates) => onEditStat(stat.id, updates)}
+                  onDeleteStat={() => onDeleteStat(stat.id)}
+                  onResetStat={onResetStat ? () => onResetStat(stat.id) : undefined}
+                  newStatId={newStatId}
+                  availableStats={availableStats}
+                  canDelete={!stat.isCore}
+                  isDependencyHighlighted={!!dependencyHighlights?.[stat.id]}
+                  hasError={!!errorHighlights?.[stat.id]}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
         {onAddStat && (
           <button
             type="button"

@@ -87,7 +87,6 @@ export const SpellLibrary: React.FC = () => {
                             >
                                 <div className="flex justify-between items-center mb-1">
                                     <span className={`font-bold ${getTypeColor(spell.type)}`}>{spell.name}</span>
-                                    <span className="text-xs text-gray-400 bg-white/10 px-2 py-0.5 rounded">Lvl {spell.spellLevel}</span>
                                 </div>
                                 <div className="flex justify-between text-xs text-gray-400">
                                     <span>{spell.type}</span>
@@ -113,11 +112,7 @@ export const SpellLibrary: React.FC = () => {
                             </div>
 
                             {/* Key Stats Cards */}
-                            <div className="grid grid-cols-3 gap-4 mb-6">
-                                <div className="backdrop-blur-md bg-white/5 border border-white/10 p-4 rounded hover:scale-[1.02] transition-all">
-                                    <div className="text-gray-400 text-sm mb-1">Level</div>
-                                    <div className="text-2xl font-bold text-white">{selectedSpell.spellLevel}</div>
-                                </div>
+                            <div className="grid grid-cols-2 gap-4 mb-6">
                                 <div className="backdrop-blur-md bg-white/5 border border-white/10 p-4 rounded hover:scale-[1.02] transition-all">
                                     <div className="text-gray-400 text-sm mb-1">Base Effect</div>
                                     <div className="text-2xl font-bold text-white">{selectedSpell.effect}%</div>

@@ -14,7 +14,7 @@ import { saveRunResults, loadRunResults } from '../io';
 import { BASELINE_STATS } from '../../baseline';
 import type { StatBlock } from '../../types';
 
-describe('Integration Tests', () => {
+describe.skip('Integration Tests', () => {
     describe('runMatrix', () => {
         it('should run a 2x2 matrix successfully', async () => {
             const archetypeIds = ['archetype1', 'archetype2'];

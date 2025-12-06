@@ -12,9 +12,19 @@ export default defineConfig({
         trace: 'on-first-retry',
     },
     projects: [
+        // Desktop baseline
         {
-            name: 'chromium',
+            name: 'Desktop Chrome',
             use: { ...devices['Desktop Chrome'] },
+        },
+        // Mobile devices (for responsive checks, including SpellCreatorNew mobile)
+        {
+            name: 'Mobile Safari',
+            use: { ...devices['iPhone 14 Pro'] },
+        },
+        {
+            name: 'Mobile Chrome',
+            use: { ...devices['Pixel 7'] },
         },
     ],
     webServer: {
