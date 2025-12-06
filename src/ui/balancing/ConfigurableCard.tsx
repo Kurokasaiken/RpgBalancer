@@ -141,6 +141,9 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, simValues, onSi
   const displayStyle = isCustomColor ? { color } : undefined;
   const isHidden = !!card.isHidden;
 
+  const hasManyStats = orderedStats.length >= 4;
+  const statsGridClassName = hasManyStats ? 'grid gap-2 grid-cols-1 md:grid-cols-2' : 'grid gap-2 grid-cols-1';
+
   const handleStatDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
@@ -397,7 +400,7 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, simValues, onSi
         )}
         <DndContext collisionDetection={closestCenter} onDragEnd={handleStatDragEnd}>
           <SortableContext items={orderedStats.map((s) => s.id)} strategy={verticalListSortingStrategy}>
-            <div className="grid gap-2 grid-cols-1 md:grid-cols-2">
+            <div className={statsGridClassName}>
               {orderedStats.map((stat) => (
                 <SortableStat
                   key={stat.id}

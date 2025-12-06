@@ -2,6 +2,7 @@ import type { BalancerConfig, StatDefinition } from '../config/types';
 import type { StatBlock } from '../types';
 import { DEFAULT_STATS } from '../types';
 import { getStatWeight } from '../statWeights';
+import { getStatCurveFactor } from '../statCurves';
 
 export type StatsArchetypeType = 'single-stat' | 'pair-stat';
 
@@ -84,9 +85,11 @@ export class StatsArchetypeGenerator {
       const def = this.config.stats[statId];
       if (!def) continue;
 
-      const weight = def.weight ?? getStatWeight(statId);
-      const delta = weight * pointsPerStat;
+      const baseWeight = def.weight ?? getStatWeight(statId);
       const current = (stats as any)[statId] ?? 0;
+      const curveFactor = getStatCurveFactor(statId, current);
+      const effectiveWeight = curveFactor !== 0 ? baseWeight / curveFactor : baseWeight;
+      const delta = effectiveWeight * pointsPerStat;
       (stats as any)[statId] = current + delta;
     }
 
@@ -111,11 +114,12 @@ export class StatsArchetypeGenerator {
         const def = this.config.stats[statId];
         if (!def) continue;
 
-        const weight = def.weight ?? getStatWeight(statId);
-        const extraDelta = weight * pointsPerStat; // extra allocation on top of equal baseline
-
         const stats = cloneStatBlock(tierBaseline);
         const currentValue = (stats as any)[statId] ?? 0;
+        const baseWeight = def.weight ?? getStatWeight(statId);
+        const curveFactor = getStatCurveFactor(statId, currentValue);
+        const effectiveWeight = curveFactor !== 0 ? baseWeight / curveFactor : baseWeight;
+        const extraDelta = effectiveWeight * pointsPerStat; // extra allocation on top of equal baseline
         (stats as any)[statId] = currentValue + extraDelta;
 
         result.push({
@@ -125,8 +129,8 @@ export class StatsArchetypeGenerator {
           stats,
           testedStats: [statId],
           pointsPerStat,
-          weights: { [statId]: weight },
-          description: `Baseline + ${extraDelta.toFixed(2)} (${weight.toFixed(2)} hp/pt × ${pointsPerStat} pt) on ${def.label}`,
+          weights: { [statId]: baseWeight },
+          description: `Baseline + ${extraDelta.toFixed(2)} (${baseWeight.toFixed(2)} hp/pt × ${pointsPerStat} pt, curve ×${curveFactor.toFixed(2)}) on ${def.label}`,
         });
       }
     }
@@ -158,16 +162,18 @@ export class StatsArchetypeGenerator {
           const defB = this.config.stats[b];
           if (!defA || !defB) continue;
 
-          const weightA = defA.weight ?? getStatWeight(a);
-          const weightB = defB.weight ?? getStatWeight(b);
-
-          const extraDeltaA = weightA * pointsPerStat;
-          const extraDeltaB = weightB * pointsPerStat;
-
           const stats = cloneStatBlock(tierBaseline);
 
           const currentA = (stats as any)[a] ?? 0;
           const currentB = (stats as any)[b] ?? 0;
+          const baseWeightA = defA.weight ?? getStatWeight(a);
+          const baseWeightB = defB.weight ?? getStatWeight(b);
+          const factorA = getStatCurveFactor(a, currentA);
+          const factorB = getStatCurveFactor(b, currentB);
+          const effectiveWeightA = factorA !== 0 ? baseWeightA / factorA : baseWeightA;
+          const effectiveWeightB = factorB !== 0 ? baseWeightB / factorB : baseWeightB;
+          const extraDeltaA = effectiveWeightA * pointsPerStat;
+          const extraDeltaB = effectiveWeightB * pointsPerStat;
 
           (stats as any)[a] = currentA + extraDeltaA;
           (stats as any)[b] = currentB + extraDeltaB;
@@ -179,8 +185,8 @@ export class StatsArchetypeGenerator {
             stats,
             testedStats: [a, b],
             pointsPerStat,
-            weights: { [a]: weightA, [b]: weightB },
-            description: `Baseline + ${extraDeltaA.toFixed(2)} on ${defA.label}, + ${extraDeltaB.toFixed(2)} on ${defB.label}`,
+            weights: { [a]: baseWeightA, [b]: baseWeightB },
+            description: `Baseline + ${extraDeltaA.toFixed(2)} on ${defA.label} (w=${baseWeightA.toFixed(2)}, curve ×${factorA.toFixed(2)}), + ${extraDeltaB.toFixed(2)} on ${defB.label} (w=${baseWeightB.toFixed(2)}, curve ×${factorB.toFixed(2)})`,
           });
         }
       }

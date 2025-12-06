@@ -47,19 +47,23 @@ export const EnhancedStatSlider: React.FC<EnhancedStatSliderProps> = ({
           onDragStart={(e) => onDragStart?.(e, field)}
           onDragOver={onDragOver}
           onDrop={(e) => onDrop?.(e, field)}
-          className="flex justify-between items-center p-3 cursor-grab active:cursor-grabbing bg-white/5 border-b border-white/10"
+          className="spell-stat-header flex justify-between items-center px-2.5 py-1.5 cursor-grab active:cursor-grabbing"
         >
-          <div className="flex items-center gap-2">
-            <span className="text-gray-500">☰</span>
-            <span className="font-bold text-blue-200 capitalize">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] text-slate-500">☰</span>
+            <span className="spell-stat-title text-[11px] font-semibold uppercase text-indigo-100/90 truncate">
               {label || field}
             </span>
-            {isMalus && <span className="text-yellow-400 text-xs" title="Malus">⚠️</span>}
+            {isMalus && (
+              <span className="text-[10px] text-amber-300" title="Malus">
+                ⚠️
+              </span>
+            )}
           </div>
           <button
             type="button"
             onClick={onToggleCollapse}
-            className="text-gray-400 hover:text-white transition-colors w-5 h-5 flex items-center justify-center"
+            className="text-slate-400 hover:text-slate-100 transition-colors w-4 h-4 flex items-center justify-center"
             title={collapsed ? "Show" : "Hide"}
           >
             {collapsed ? (
@@ -132,7 +136,7 @@ export const EnhancedStatSlider: React.FC<EnhancedStatSliderProps> = ({
                 <div className="w-4" />
 
                 {/* Background track spanning across all positions */}
-                <div className="absolute left-[calc(0.5rem+28px)] right-[calc(2.5rem+28px)] top-1/2 -translate-y-1/2 h-2 bg-gradient-to-r from-purple-900/40 via-blue-900/40 to-purple-900/40 rounded-full shadow-inner pointer-events-none" />
+                <div className="absolute left-9 right-[calc(2.5rem+28px)] top-1/2 -translate-y-1/2 h-2 bg-linear-to-r from-purple-900/40 via-blue-900/40 to-purple-900/40 rounded-full shadow-inner pointer-events-none" />
 
                 {/* Invisible full-width range input */}
                 <input

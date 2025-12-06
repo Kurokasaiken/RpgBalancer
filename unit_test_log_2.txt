@@ -1,0 +1,1546 @@
+
+> progetti-personali@0.0.0 test:unit
+> vitest run
+
+
+[1m[46m RUN [49m[22m [36mv4.0.14 [39m[90m/Users/faustoboni/projects/progetti personali[39m
+
+ [31m❯[39m src/balancing/__tests__/spellCost.test.ts [2m([22m[2m4 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[32m 10[2mms[22m[39m
+[31m     [31m×[31m default spell has cost 0 and is balanced[39m[32m 5[2mms[22m[39m
+     [32m✓[39m increase effect by 50% adds cost[32m 0[2mms[22m[39m
+[31m     [31m×[31m doubleSpell flag subtracts 1 point[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m combined adjustments can reach zero[39m[32m 2[2mms[22m[39m
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mArmor Diminishing Returns[2m > [22m[2mshould show decreasing marginal value as armor increases
+[22m[39m
+Armor Curve
+Testing armor at values: 10, 30, 50, 100, 200
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mArmor Diminishing Returns[2m > [22m[2mshould show decreasing marginal value as armor increases
+[22m[39m  @10 armor: marginal value = 0.38 HP
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mArmor Diminishing Returns[2m > [22m[2mshould show decreasing marginal value as armor increases
+[22m[39m  @30 armor: marginal value = 0.38 HP
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mArmor Diminishing Returns[2m > [22m[2mshould show decreasing marginal value as armor increases
+[22m[39m  @50 armor: marginal value = 0.38 HP
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mArmor Diminishing Returns[2m > [22m[2mshould show decreasing marginal value as armor increases
+[22m[39m  @100 armor: marginal value = 0.38 HP
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mArmor Diminishing Returns[2m > [22m[2mshould show decreasing marginal value as armor increases
+[22m[39m  @200 armor: marginal value = 0.38 HP
+  Trend: ⚠️ Non-diminishing
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mEvasion Diminishing Returns[2m > [22m[2mshould approach asymptote near cap (95%)
+[22m[39m
+Evasion Curve (approaching cap)
+Testing evasion at values: 10, 30, 50, 70, 90
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mEvasion Diminishing Returns[2m > [22m[2mshould approach asymptote near cap (95%)
+[22m[39m  @10 evasion: marginal value = 3.00 HP
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mEvasion Diminishing Returns[2m > [22m[2mshould approach asymptote near cap (95%)
+[22m[39m  @30 evasion: marginal value = 3.00 HP
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mEvasion Diminishing Returns[2m > [22m[2mshould approach asymptote near cap (95%)
+[22m[39m  @50 evasion: marginal value = 3.00 HP
+
+ [31m❯[39m src/balancing/__tests__/SpellValidation.test.ts [2m([22m[2m7 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 12[2mms[22m[39m
+     [32m✓[39m should have spells loaded[32m 1[2mms[22m[39m
+     [32m✓[39m all spells should be balanced within tolerance[32m 0[2mms[22m[39m
+[31m     [31m×[31m no spell should have legendary field[39m[32m 8[2mms[22m[39m
+     [32m✓[39m all spell powers should be positive[32m 1[2mms[22m[39m
+     [32m✓[39m mana costs should be reasonable (1-200)[32m 0[2mms[22m[39m
+       [32m✓[39m should have variety of spell types[32m 0[2mms[22m[39m
+       [32m✓[39m CC spells should have higher mana costs[32m 0[2mms[22m[39m
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mEvasion Diminishing Returns[2m > [22m[2mshould approach asymptote near cap (95%)
+[22m[39m  @70 evasion: marginal value = 3.00 HP
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mEvasion Diminishing Returns[2m > [22m[2mshould approach asymptote near cap (95%)
+[22m[39m  @90 evasion: marginal value = 3.00 HP
+  Trend: ⚠️ Non-diminishing
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mCrit Chance Diminishing Returns[2m > [22m[2mshould show drop-off near cap (100%)
+[22m[39m
+Crit Chance Curve
+Testing critChance at values: 10, 30, 50, 75, 95
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mCrit Chance Diminishing Returns[2m > [22m[2mshould show drop-off near cap (100%)
+[22m[39m  @10 critChance: marginal value = 0.00 HP
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mCrit Chance Diminishing Returns[2m > [22m[2mshould show drop-off near cap (100%)
+[22m[39m  @30 critChance: marginal value = 0.00 HP
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mCrit Chance Diminishing Returns[2m > [22m[2mshould show drop-off near cap (100%)
+[22m[39m  @50 critChance: marginal value = 0.00 HP
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mCrit Chance Diminishing Returns[2m > [22m[2mshould show drop-off near cap (100%)
+[22m[39m  @75 critChance: marginal value = 0.00 HP
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mCrit Chance Diminishing Returns[2m > [22m[2mshould show drop-off near cap (100%)
+[22m[39m  @95 critChance: marginal value = 0.00 HP
+  Trend: ⚠️ Non-diminishing
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mDamage Linearity (Control Test)[2m > [22m[2mshould remain relatively linear
+[22m[39m
+Damage Curve (should be linear)
+Testing damage at values: 20, 40, 60, 80, 100
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mDamage Linearity (Control Test)[2m > [22m[2mshould remain relatively linear
+[22m[39m  @20 damage: marginal value = 0.00 HP
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mDamage Linearity (Control Test)[2m > [22m[2mshould remain relatively linear
+[22m[39m  @40 damage: marginal value = 0.00 HP
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mDamage Linearity (Control Test)[2m > [22m[2mshould remain relatively linear
+[22m[39m  @60 damage: marginal value = 0.00 HP
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mDamage Linearity (Control Test)[2m > [22m[2mshould remain relatively linear
+[22m[39m  @80 damage: marginal value = 0.00 HP
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mDamage Linearity (Control Test)[2m > [22m[2mshould remain relatively linear
+[22m[39m  @100 damage: marginal value = 0.00 HP
+  Trend: ⚠️ Non-diminishing
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mHP vs Damage Comparison[2m > [22m[2mshould show HP is more stable than defensive stats
+[22m[39m
+HP Curve
+Testing hp at values: 100, 200, 300, 400, 500
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mHP vs Damage Comparison[2m > [22m[2mshould show HP is more stable than defensive stats
+[22m[39m  @100 hp: marginal value = 1.00 HP
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mHP vs Damage Comparison[2m > [22m[2mshould show HP is more stable than defensive stats
+[22m[39m  @200 hp: marginal value = 1.00 HP
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mHP vs Damage Comparison[2m > [22m[2mshould show HP is more stable than defensive stats
+[22m[39m  @300 hp: marginal value = 1.00 HP
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mHP vs Damage Comparison[2m > [22m[2mshould show HP is more stable than defensive stats
+[22m[39m  @400 hp: marginal value = 1.00 HP
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mHP vs Damage Comparison[2m > [22m[2mshould show HP is more stable than defensive stats
+[22m[39m  @500 hp: marginal value = 1.00 HP
+  Trend: ⚠️ Non-diminishing
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mHP vs Damage Comparison[2m > [22m[2mshould show HP is more stable than defensive stats
+[22m[39m
+Armor Curve
+Testing armor at values: 10, 30, 50, 100, 200
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mHP vs Damage Comparison[2m > [22m[2mshould show HP is more stable than defensive stats
+[22m[39m  @10 armor: marginal value = 0.38 HP
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mHP vs Damage Comparison[2m > [22m[2mshould show HP is more stable than defensive stats
+[22m[39m  @30 armor: marginal value = 0.38 HP
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mHP vs Damage Comparison[2m > [22m[2mshould show HP is more stable than defensive stats
+[22m[39m  @50 armor: marginal value = 0.38 HP
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mHP vs Damage Comparison[2m > [22m[2mshould show HP is more stable than defensive stats
+[22m[39m  @100 armor: marginal value = 0.38 HP
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mHP vs Damage Comparison[2m > [22m[2mshould show HP is more stable than defensive stats
+[22m[39m  @200 armor: marginal value = 0.38 HP
+  Trend: ⚠️ Non-diminishing
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mPractical Breakpoints[2m > [22m[2mshould identify sweet spots for armor investment
+[22m[39m
+Armor Breakpoints:
+  @0 armor: 0.38 HP/point
+  @20 armor: 0.38 HP/point
+  @50 armor: 0.38 HP/point
+  @100 armor: 0.38 HP/point
+
+[90mstdout[2m | src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22m[2mDiminishing Returns[2m > [22m[2mPractical Breakpoints[2m > [22m[2mshould identify efficient crit investment range
+[22m[39m
+Crit Chance Breakpoints:
+  @10% crit: 0.00 HP/point
+  @30% crit: 0.00 HP/point
+  @50% crit: 0.00 HP/point
+  @75% crit: 0.00 HP/point
+
+ [31m❯[39m src/balancing/__tests__/DiminishingReturns.test.ts [2m([22m[2m10 tests[22m[2m | [22m[31m10 failed[39m[2m)[22m[32m 21[2mms[22m[39m
+[31m       [31m×[31m should show decreasing marginal value as armor increases[39m[32m 10[2mms[22m[39m
+[31m       [31m×[31m should have steep drop-off at high values[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should approach asymptote near cap (95%)[39m[32m 2[2mms[22m[39m
+[31m       [31m×[31m should show drop-off near cap (100%)[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should remain relatively linear[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should show HP is more stable than defensive stats[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should identify sweet spots for armor investment[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should identify efficient crit investment range[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should handle 0 values gracefully[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should saturate defensive stats at extreme values[39m[32m 1[2mms[22m[39m
+[90mstdout[2m | src/balancing/__tests__/DebugBattle.test.ts[2m > [22m[2mDebug Battle[2m > [22m[2mshould log a full battle between Damage vs HP builds
+[22m[39m--- BATTLE START ---
+Attacker: HP 150, Dmg 35
+Defender: HP 450, Dmg 25
+
+ [32m✓[39m src/balancing/__tests__/SpellCreationTests.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [31m❯[39m src/balancing/__tests__/DebugBattle.test.ts [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 12[2mms[22m[39m
+[31m     [31m×[31m should log a full battle between Damage vs HP builds[39m[32m 9[2mms[22m[39m
+ [31m❯[39m src/balancing/__tests__/BuffShieldIntegration.test.ts [2m([22m[2m6 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[32m 12[2mms[22m[39m
+[31m       [31m×[31m should apply damage buff to attacker[39m[32m 6[2mms[22m[39m
+[31m       [31m×[31m should apply armor debuff to defender[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should absorb damage with shields before HP damage[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should deplete shield and overflow to HP[39m[32m 0[2mms[22m[39m
+[31m       [31m×[31m should apply DoT damage at turn start[39m[32m 1[2mms[22m[39m
+[31m       [31m×[31m should handle complex interactions correctly[39m[32m 0[2mms[22m[39m
+[90mstdout[2m | src/balancing/__tests__/CrossStatCostParity.test.ts[2m > [22m[2mCross-Stat Cost Parity[2m > [22m[2mPrimary Stat Parity[2m > [22m[2mshould balance damage vs hp
+[22m[39m  damage (+10) vs HP (+50): 48.6% winrate
+
+[90mstdout[2m | src/balancing/__tests__/CrossStatCostParity.test.ts[2m > [22m[2mCross-Stat Cost Parity[2m > [22m[2mPrimary Stat Parity[2m > [22m[2mshould balance armor vs hp
+[22m[39m  armor (+10) vs HP (+50): 31.7% winrate
+
+[90mstdout[2m | src/balancing/__tests__/ArchetypeBalance.test.ts[2m > [22m[2mArchetype Balance[2m > [22m[2mRound-Robin at Budget 100[2m > [22m[2mshould balance Tank vs DPS
+[22m[39mTank vs DPS (budget: 100)
+  tank: 8.5% winrate
+  glass_cannon: 91.5% winrate
+  Avg Turns: 9.5
+  Expected: 50% ± 10% → ❌ FAIL
+
+[90mstdout[2m | src/balancing/__tests__/CrossStatCostParity.test.ts[2m > [22m[2mCross-Stat Cost Parity[2m > [22m[2mPrimary Stat Parity[2m > [22m[2mshould balance lifesteal vs hp
+[22m[39m  lifesteal (+0.5) vs HP (+50): 31.0% winrate
+
+[90mstdout[2m | src/balancing/__tests__/ArchetypeBalance.test.ts[2m > [22m[2mArchetype Balance[2m > [22m[2mRound-Robin at Budget 100[2m > [22m[2mshould balance Tank vs Balanced
+[22m[39mTank vs Balanced (budget: 100)
+  tank: 0.1% winrate
+  balanced: 99.9% winrate
+  Avg Turns: 14.9
+  Expected: 50% ± 10% → ❌ FAIL
+
+[90mstdout[2m | src/balancing/__tests__/CrossStatCostParity.test.ts[2m > [22m[2mCross-Stat Cost Parity[2m > [22m[2mPrimary Stat Parity[2m > [22m[2mshould balance regen vs hp
+[22m[39m  regen (+2) vs HP (+40): 30.8% winrate
+
+[90mstdout[2m | src/balancing/__tests__/ArchetypeBalance.test.ts[2m > [22m[2mArchetype Balance[2m > [22m[2mRound-Robin at Budget 100[2m > [22m[2mshould balance DPS vs Balanced
+[22m[39mDPS vs Balanced (budget: 100)
+  glass_cannon: 18.4% winrate
+  balanced: 81.6% winrate
+  Avg Turns: 4.7
+  Expected: 50% ± 10% → ❌ FAIL
+
+[90mstdout[2m | src/balancing/__tests__/CrossStatCostParity.test.ts[2m > [22m[2mCross-Stat Cost Parity[2m > [22m[2mComplex Parity (3-stat budget)[2m > [22m[2mshould balance mixed offensive vs defensive builds
+[22m[39m  Mixed (Dmg/Armor) vs HP: 26.8% winrate
+
+[90mstdout[2m | src/balancing/__tests__/CrossStatCostParity.test.ts[2m > [22m[2mCross-Stat Cost Parity[2m > [22m[2mComplex Parity (3-stat budget)[2m > [22m[2mshould balance burst vs sustain builds
+[22m[39m  Burst (Dmg) vs Sustain (LS): 70.4% winrate
+
+ [31m❯[39m src/balancing/__tests__/CrossStatCostParity.test.ts [2m([22m[2m6 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[33m 699[2mms[22m[39m
+       [32m✓[39m should balance damage vs hp[32m 88[2mms[22m[39m
+[31m       [31m×[31m should balance armor vs hp[39m[32m 118[2mms[22m[39m
+       [32m✓[39m should balance lifesteal vs hp[32m 123[2mms[22m[39m
+       [32m✓[39m should balance regen vs hp[32m 132[2mms[22m[39m
+[31m       [31m×[31m should balance mixed offensive vs defensive builds[39m[32m 128[2mms[22m[39m
+       [32m✓[39m should balance burst vs sustain builds[32m 106[2mms[22m[39m
+[90mstdout[2m | src/balancing/__tests__/ArchetypeBalance.test.ts[2m > [22m[2mArchetype Balance[2m > [22m[2mRound-Robin at Budget 100[2m > [22m[2mshould balance Tank vs Evasive
+[22m[39mTank vs Evasive (budget: 100)
+  tank: 6.6% winrate
+  evasive: 93.4% winrate
+  Avg Turns: 23.4
+  Expected: 50% ± 10% → ❌ FAIL
+
+[90mstdout[2m | src/balancing/__tests__/ArchetypeBalance.test.ts[2m > [22m[2mArchetype Balance[2m > [22m[2mRound-Robin at Budget 100[2m > [22m[2mshould balance DPS vs Evasive
+[22m[39mDPS vs Evasive (budget: 100)
+  glass_cannon: 43.2% winrate
+  evasive: 56.8% winrate
+  Avg Turns: 6.1
+  Expected: 50% ± 10% → ✅ PASS
+
+[90mstdout[2m | src/balancing/__tests__/ArchetypeBalance.test.ts[2m > [22m[2mArchetype Balance[2m > [22m[2mRound-Robin at Budget 100[2m > [22m[2mshould balance Balanced vs Evasive
+[22m[39mBalanced vs Evasive (budget: 100)
+  balanced: 77.4% winrate
+  evasive: 22.6% winrate
+  Avg Turns: 10.5
+  Expected: 50% ± 10% → ❌ FAIL
+
+[90mstdout[2m | src/balancing/__tests__/ArchetypeBalance.test.ts[2m > [22m[2mArchetype Balance[2m > [22m[2mScaling Consistency[2m > [22m[2mshould maintain balance at budget 50
+[22m[39mTank vs DPS @ 50 (budget: 50)
+  tank: 11.7% winrate
+  glass_cannon: 88.3% winrate
+  Avg Turns: 10.2
+  Expected: 50% ± 10% → ❌ FAIL
+
+ [31m❯[39m tests/determinism/rng-guard.test.ts [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 15[2mms[22m[39m
+[31m     [31m×[31m should fail if Math.random(), crypto.random, or Date.now() appear in simulation code[39m[32m 13[2mms[22m[39m
+[90mstdout[2m | src/balancing/__tests__/ArchetypeBalance.test.ts[2m > [22m[2mArchetype Balance[2m > [22m[2mScaling Consistency[2m > [22m[2mshould maintain balance at budget 100
+[22m[39mTank vs DPS @ 100 (budget: 100)
+  tank: 7.0% winrate
+  glass_cannon: 93.0% winrate
+  Avg Turns: 9.3
+  Expected: 50% ± 10% → ❌ FAIL
+
+[90mstdout[2m | src/balancing/__tests__/ArchetypeBalance.test.ts[2m > [22m[2mArchetype Balance[2m > [22m[2mScaling Consistency[2m > [22m[2mshould maintain balance at budget 150
+[22m[39mTank vs DPS @ 150 (budget: 150)
+  tank: 10.6% winrate
+  glass_cannon: 89.4% winrate
+  Avg Turns: 8.6
+  Expected: 50% ± 10% → ❌ FAIL
+
+[90mstdout[2m | src/balancing/__tests__/ArchetypeBalance.test.ts[2m > [22m[2mArchetype Balance[2m > [22m[2mScaling Consistency[2m > [22m[2mshould maintain balance at budget 200
+[22m[39mTank vs DPS @ 200 (budget: 200)
+  tank: 17.0% winrate
+  glass_cannon: 83.0% winrate
+  Avg Turns: 6.4
+  Expected: 50% ± 10% → ❌ FAIL
+
+[90mstdout[2m | src/balancing/__tests__/ArchetypeBalance.test.ts[2m > [22m[2mArchetype Balance[2m > [22m[2mSpecialization Value[2m > [22m[2mTank should have advantage in sustained combat (vs Balanced)
+[22m[39mTank Specialization (budget: 100)
+  tank: 0.2% winrate
+  balanced: 99.8% winrate
+  Avg Turns: 15.1
+  Expected: 50% ± 10% → ❌ FAIL
+
+[90mstdout[2m | src/balancing/__tests__/ArchetypeBalance.test.ts[2m > [22m[2mArchetype Balance[2m > [22m[2mSpecialization Value[2m > [22m[2mDPS should have advantage in burst damage (vs Balanced)
+[22m[39mDPS Specialization (budget: 100)
+  glass_cannon: 18.9% winrate
+  balanced: 81.1% winrate
+  Avg Turns: 4.7
+  Expected: 50% ± 10% → ❌ FAIL
+
+[90mstdout[2m | src/balancing/__tests__/ArchetypeBalance.test.ts[2m > [22m[2mArchetype Balance[2m > [22m[2mSpecialization Value[2m > [22m[2mEvasive should have advantage vs low-accuracy builds
+[22m[39mEvasive vs Low-TxC Tank:
+  Evasive: 93.0%
+  Tank: 7.0%
+
+[90mstdout[2m | src/balancing/__tests__/ArchetypeBalance.test.ts[2m > [22m[2mArchetype Balance[2m > [22m[2mNo Dominant Archetype (Meta Check)[2m > [22m[2mNo archetype should win >70% against all others
+[22m[39mbalanced: 85.7% avg winrate
+tank: 4.2% avg winrate
+glass_cannon: 51.7% avg winrate
+evasive: 58.4% avg winrate
+
+ [31m❯[39m src/balancing/__tests__/ArchetypeBalance.test.ts [2m([22m[2m14 tests[22m[2m | [22m[31m12 failed[39m[2m)[22m[33m 1799[2mms[22m[39m
+[31m       [31m×[31m should balance Tank vs DPS[39m[32m 191[2mms[22m[39m
+[31m       [31m×[31m should balance Tank vs Balanced[39m[32m 208[2mms[22m[39m
+[31m       [31m×[31m should balance DPS vs Balanced[39m[32m 71[2mms[22m[39m
+[31m       [31m×[31m should balance Tank vs Evasive[39m[32m 247[2mms[22m[39m
+       [32m✓[39m should balance DPS vs Evasive[32m 35[2mms[22m[39m
+[31m       [31m×[31m should balance Balanced vs Evasive[39m[32m 61[2mms[22m[39m
+[31m       [31m×[31m should maintain balance at budget 50[39m[32m 58[2mms[22m[39m
+[31m       [31m×[31m should maintain balance at budget 100[39m[32m 46[2mms[22m[39m
+[31m       [31m×[31m should maintain balance at budget 150[39m[32m 46[2mms[22m[39m
+[31m       [31m×[31m should maintain balance at budget 200[39m[32m 32[2mms[22m[39m
+[31m       [31m×[31m Tank should have advantage in sustained combat (vs Balanced)[39m[32m 77[2mms[22m[39m
+[31m       [31m×[31m DPS should have advantage in burst damage (vs Balanced)[39m[32m 25[2mms[22m[39m
+       [32m✓[39m Evasive should have advantage vs low-accuracy builds[32m 143[2mms[22m[39m
+[31m       [31m×[31m No archetype should win >70% against all others[39m[33m 557[2mms[22m[39m
+[90mstdout[2m | comparative_analysis.test.ts[2m > [22m[2mComparative Balance Analysis[2m > [22m[2mshould compare Standard vs Tank Meta
+[22m[39m
+
+🚀 Starting Simulation for Preset: STANDARD...
+
+ [32m✓[39m src/balancing/archetype/__tests__/BatchTestRunner.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 93[2mms[22m[39m
+ [31m❯[39m src/shared/testing/StorageIntegration.test.ts [2m([22m[2m9 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 3245[2mms[22m[39m
+       [32m✓[39m should pass all storage tests for localStorage[32m 7[2mms[22m[39m
+       [32m✓[39m should handle complex nested structures[32m 3[2mms[22m[39m
+       [32m✓[39m should handle arrays of objects[32m 1[2mms[22m[39m
+       [33m[2m✓[22m[39m should handle async storage operations [33m 2853[2mms[22m[39m
+       [32m✓[39m should detect save failures[32m 1[2mms[22m[39m
+       [32m✓[39m should detect load failures[32m 0[2mms[22m[39m
+       [33m[2m✓[22m[39m should handle large datasets efficiently [33m 310[2mms[22m[39m
+[31m       [31m×[31m should handle multiple storage keys[39m[32m 41[2mms[22m[39m
+       [32m✓[39m should run multiple storage tests in sequence[32m 26[2mms[22m[39m
+[90mstdout[2m | analysis_run.test.ts[2m > [22m[2mBalance Analysis Run[2m > [22m[2mshould generate full balance report
+[22m[39m🚀 Starting Balance Analysis Simulation...
+Testing 16 archetypes against each other...
+
+ [32m✓[39m src/shared/testing/StorageTestFramework.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 71[2mms[22m[39m
+[90mstdout[2m | src/balancing/__tests__/WeightCalibration.test.ts[2m > [22m[2mAutomated Weight Calibration[2m > [22m[2mSustain Stats[2m > [22m[2mshould auto-calibrate lifesteal weight
+[22m[39m
+🔬 Calibrating Lifesteal (0.5% → ? HP)...
+  [1/20] weight=505.00, HP=252.5, winrate=0.0%
+  [2/20] weight=257.50, HP=128.8, winrate=2.1%
+  [3/20] weight=133.75, HP=66.9, winrate=17.2%
+  [4/20] weight=71.88, HP=35.9, winrate=31.5%
+  [5/20] weight=40.94, HP=20.5, winrate=50.1%
+  ✅ Converged! Optimal weight: 40.94 HP per unit
+
+📊 RESULT: 1% lifesteal = 81.9 HP
+   (0.5% lifesteal = 40.9 HP)
+
+
+ [32m✓[39m src/ui/balancing/BalancerNew.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 125[2mms[22m[39m
+ [32m✓[39m src/balancing/archetype/__tests__/TTKTestRunner.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 121[2mms[22m[39m
+ [32m✓[39m src/balancing/__tests__/RoundRobinRunner.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 1422[2mms[22m[39m
+     [33m[2m✓[22m[39m is deterministic for a fixed seed and config [33m 364[2mms[22m[39m
+     [33m[2m✓[22m[39m aggregates efficiencies across tiers and is seed-stable [33m 890[2mms[22m[39m
+[90mstdout[2m | analysis_run.test.ts[2m > [22m[2mBalance Analysis Run[2m > [22m[2mshould generate full balance report
+[22m[39mProgress: 50/256 matchups simulated
+
+ [32m✓[39m src/balancing/archetype/__tests__/ArchetypeRegistry.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+[90mstdout[2m | comparative_analysis.test.ts[2m > [22m[2mComparative Balance Analysis[2m > [22m[2mshould compare Standard vs Tank Meta
+[22m[39m[standard] Tank vs DPS:
+  Winner: DPS (100.0%)
+  Avg Rounds: 9.14
+
+[90mstdout[2m | comparative_analysis.test.ts[2m > [22m[2mComparative Balance Analysis[2m > [22m[2mshould compare Standard vs Tank Meta
+[22m[39m
+
+🚀 Starting Simulation for Preset: TANK_META...
+
+[90mstdout[2m | analysis_run.test.ts[2m > [22m[2mBalance Analysis Run[2m > [22m[2mshould generate full balance report
+[22m[39mProgress: 100/256 matchups simulated
+
+ [32m✓[39m src/balancing/modules/__tests__/initiative.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+ [32m✓[39m src/balancing/simulation/__tests__/MonteCarloSimulation.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 33[2mms[22m[39m
+ [32m✓[39m src/balancing/statusEffects/__tests__/StatusEffectManager.test.ts [2m([22m[2m20 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m src/balancing/simulation/__tests__/CombatSimulator.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+[90mstdout[2m | analysis_run.test.ts[2m > [22m[2mBalance Analysis Run[2m > [22m[2mshould generate full balance report
+[22m[39mProgress: 150/256 matchups simulated
+
+ [32m✓[39m src/balancing/archetype/__tests__/ArchetypeTypes.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 67[2mms[22m[39m
+ [32m✓[39m tests/regression/regression.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 31[2mms[22m[39m
+[90mstdout[2m | analysis_run.test.ts[2m > [22m[2mBalance Analysis Run[2m > [22m[2mshould generate full balance report
+[22m[39mProgress: 200/256 matchups simulated
+
+[90mstderr[2m | src/balancing/persistence/__tests__/ConfigManager.test.ts[2m > [22m[2mConfigManager[2m > [22m[2mshould reject invalid JSON on import
+[22m[39mFailed to import config: SyntaxError: Expected property name or '}' in JSON at position 2
+    at JSON.parse (<anonymous>)
+    at Function.importConfig [90m(/Users/faustoboni/projects/progetti personali/[39msrc/balancing/persistence/ConfigManager.ts:51:48[90m)[39m
+    at [90m/Users/faustoboni/projects/progetti personali/[39msrc/balancing/persistence/__tests__/ConfigManager.test.ts:65:39
+    at [90mfile:///Users/faustoboni/projects/progetti%20personali/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///Users/faustoboni/projects/progetti%20personali/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:919:26
+    at [90mfile:///Users/faustoboni/projects/progetti%20personali/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1244:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///Users/faustoboni/projects/progetti%20personali/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1210:10[90m)[39m
+    at [90mfile:///Users/faustoboni/projects/progetti%20personali/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1654:37
+    at Traces.$ [90m(file:///Users/faustoboni/projects/progetti%20personali/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.U4xDYhzZ.js:115:27[90m)[39m
+
+[90mstderr[2m | src/balancing/persistence/__tests__/ConfigManager.test.ts[2m > [22m[2mConfigManager[2m > [22m[2mshould reject config with missing fields
+[22m[39mInvalid config structure
+
+ [32m✓[39m src/balancing/persistence/__tests__/ConfigManager.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m src/balancing/__tests__/SpellBalance.test.ts [2m([22m[2m18 tests[22m[2m | [22m[33m1 skipped[39m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m src/balancing/config/__tests__/ConfigSolver_htk.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+ [32m✓[39m src/balancing/__tests__/DotStacking.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+[90mstdout[2m | src/balancing/__tests__/AsymptoticCaps.test.ts[2m > [22m[2mAsymptotic Caps[2m > [22m[2mDiminishing Returns Visualization[2m > [22m[2mshould demonstrate diminishing returns curve
+[22m[39m
+Crit Chance Diminishing Returns:
+Input → Effective (% of cap reached)
+20% → 26.9% (28.3% of cap)
+50% → 53.7% (56.5% of cap)
+95% → 75.5% (79.5% of cap)
+150% → 87.2% (91.8% of cap)
+200% → 91.6% (96.4% of cap)
+
+ [32m✓[39m src/balancing/__tests__/AsymptoticCaps.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m src/balancing/archetype/__tests__/TTKValidator.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+[90mstdout[2m | analysis_run.test.ts[2m > [22m[2mBalance Analysis Run[2m > [22m[2mshould generate full balance report
+[22m[39mProgress: 250/256 matchups simulated
+
+[90mstdout[2m | analysis_run.test.ts[2m > [22m[2mBalance Analysis Run[2m > [22m[2mshould generate full balance report
+[22m[39m
+
+================ BALANCE REPORT ================
+
+# TTK Balance Report
+Generated: 2025-12-06
+
+## Summary
+- Total Matchups: 256
+- Valid: 167 (65.2%)
+- Invalid: 89 (34.8%)
+
+## Critical Issues
+- **tank_juggernaut vs tank_juggernaut @ 50 HP**: Rounds too high: 39.6 > 15
+  - TTK: 39.6 (Target: 8)
+- **tank_juggernaut vs tank_warden @ 50 HP**: Rounds too high: 43.3 > 15
+  - TTK: 43.3 (Target: 8)
+- **tank_juggernaut vs tank_fortress @ 50 HP**: Rounds too high: 28.9 > 15
+  - TTK: 28.9 (Target: 8)
+- **tank_juggernaut vs tank_regenerator @ 50 HP**: Rounds too high: 44.2 > 15
+  - TTK: 44.2 (Target: 8)
+- **tank_juggernaut vs tank_shieldbearer @ 50 HP**: Rounds too high: 36.9 > 15
+  - TTK: 36.9 (Target: 8)
+- **tank_juggernaut vs assassin_phantom @ 50 HP**: Rounds too high: 20.8 > 15
+  - TTK: 20.8 (Target: 8)
+- **tank_juggernaut vs support_healer @ 50 HP**: Rounds too high: 43.9 > 15
+  - TTK: 43.9 (Target: 8)
+- **tank_juggernaut vs support_bulwark @ 50 HP**: Rounds too high: 41.0 > 15
+  - TTK: 41.0 (Target: 8)
+- **tank_juggernaut vs hybrid_allrounder @ 50 HP**: Rounds too high: 19.9 > 15
+  - TTK: 19.9 (Target: 8)
+- **tank_warden vs tank_juggernaut @ 50 HP**: Rounds too high: 44.1 > 15
+  - TTK: 44.1 (Target: 8)
+- **tank_warden vs tank_warden @ 50 HP**: Rounds too high: 60.6 > 15
+  - TTK: 60.6 (Target: 8)
+- **tank_warden vs tank_fortress @ 50 HP**: Rounds too high: 29.7 > 15
+  - TTK: 29.7 (Target: 8)
+- **tank_warden vs tank_regenerator @ 50 HP**: Rounds too high: 64.0 > 15
+  - TTK: 64.0 (Target: 8)
+- **tank_warden vs tank_shieldbearer @ 50 HP**: Rounds too high: 38.9 > 15
+  - TTK: 38.9 (Target: 8)
+- **tank_warden vs dps_duelist @ 50 HP**: Rounds too high: 17.9 > 15
+  - TTK: 17.9 (Target: 8)
+- **tank_warden vs bruiser_warrior @ 50 HP**: Rounds too high: 17.8 > 15
+  - TTK: 17.8 (Target: 8)
+- **tank_warden vs bruiser_brawler @ 50 HP**: Rounds too high: 18.5 > 15
+  - TTK: 18.5 (Target: 8)
+- **tank_warden vs support_healer @ 50 HP**: Rounds too high: 64.1 > 15
+  - TTK: 64.1 (Target: 8)
+- **tank_warden vs support_bulwark @ 50 HP**: Rounds too high: 44.5 > 15
+  - TTK: 44.5 (Target: 8)
+- **tank_warden vs hybrid_allrounder @ 50 HP**: Rounds too high: 23.9 > 15
+  - TTK: 23.9 (Target: 8)
+- **tank_fortress vs tank_juggernaut @ 50 HP**: Rounds too high: 28.7 > 15
+  - TTK: 28.7 (Target: 8)
+- **tank_fortress vs tank_warden @ 50 HP**: Rounds too high: 29.4 > 15
+  - TTK: 29.4 (Target: 8)
+- **tank_fortress vs tank_fortress @ 50 HP**: Rounds too high: 26.1 > 15
+  - TTK: 26.1 (Target: 8)
+- **tank_fortress vs tank_regenerator @ 50 HP**: Rounds too high: 29.9 > 15
+  - TTK: 29.9 (Target: 8)
+- **tank_fortress vs tank_shieldbearer @ 50 HP**: Rounds too high: 28.2 > 15
+  - TTK: 28.2 (Target: 8)
+- **tank_fortress vs assassin_phantom @ 50 HP**: Rounds too high: 15.6 > 15
+  - TTK: 15.6 (Target: 8)
+- **tank_fortress vs support_healer @ 50 HP**: Rounds too high: 29.3 > 15
+  - TTK: 29.3 (Target: 8)
+- **tank_fortress vs support_bulwark @ 50 HP**: Rounds too high: 29.6 > 15
+  - TTK: 29.6 (Target: 8)
+- **tank_regenerator vs tank_juggernaut @ 50 HP**: Rounds too high: 43.1 > 15
+  - TTK: 43.1 (Target: 8)
+- **tank_regenerator vs tank_warden @ 50 HP**: Rounds too high: 65.3 > 15
+  - TTK: 65.3 (Target: 8)
+- **tank_regenerator vs tank_fortress @ 50 HP**: Rounds too high: 28.8 > 15
+  - TTK: 28.8 (Target: 8)
+- **tank_regenerator vs tank_regenerator @ 50 HP**: Rounds too high: 91.1 > 15
+  - TTK: 91.1 (Target: 8)
+- **tank_regenerator vs tank_shieldbearer @ 50 HP**: Rounds too high: 39.4 > 15
+  - TTK: 39.4 (Target: 8)
+- **tank_regenerator vs dps_duelist @ 50 HP**: Rounds too high: 15.5 > 15
+  - TTK: 15.5 (Target: 8)
+- **tank_regenerator vs support_healer @ 50 HP**: Rounds too high: 95.3 > 15
+  - TTK: 95.3 (Target: 8)
+- **tank_regenerator vs support_bulwark @ 50 HP**: Rounds too high: 46.0 > 15
+  - TTK: 46.0 (Target: 8)
+- **tank_regenerator vs hybrid_allrounder @ 50 HP**: Rounds too high: 22.3 > 15
+  - TTK: 22.3 (Target: 8)
+- **tank_shieldbearer vs tank_juggernaut @ 50 HP**: Rounds too high: 36.7 > 15
+  - TTK: 36.7 (Target: 8)
+- **tank_shieldbearer vs tank_warden @ 50 HP**: Rounds too high: 38.9 > 15
+  - TTK: 38.9 (Target: 8)
+- **tank_shieldbearer vs tank_fortress @ 50 HP**: Rounds too high: 29.1 > 15
+  - TTK: 29.1 (Target: 8)
+- **tank_shieldbearer vs tank_regenerator @ 50 HP**: Rounds too high: 40.1 > 15
+  - TTK: 40.1 (Target: 8)
+- **tank_shieldbearer vs tank_shieldbearer @ 50 HP**: Rounds too high: 35.3 > 15
+  - TTK: 35.3 (Target: 8)
+- **tank_shieldbearer vs assassin_phantom @ 50 HP**: Rounds too high: 16.3 > 15
+  - TTK: 16.3 (Target: 8)
+- **tank_shieldbearer vs support_healer @ 50 HP**: Rounds too high: 40.1 > 15
+  - TTK: 40.1 (Target: 8)
+- **tank_shieldbearer vs support_bulwark @ 50 HP**: Rounds too high: 37.9 > 15
+  - TTK: 37.9 (Target: 8)
+- **tank_shieldbearer vs hybrid_allrounder @ 50 HP**: Rounds too high: 17.1 > 15
+  - TTK: 17.1 (Target: 8)
+- **dps_berserker vs dps_berserker @ 50 HP**: Rounds too low: 2.9 < 4
+  - TTK: 2.9 (Target: 8)
+- **dps_berserker vs assassin_shadow @ 50 HP**: Rounds too low: 3.4 < 4
+  - TTK: 3.4 (Target: 8)
+- **dps_duelist vs tank_warden @ 50 HP**: Rounds too high: 16.5 > 15
+  - TTK: 16.5 (Target: 8)
+- **dps_duelist vs support_healer @ 50 HP**: Rounds too high: 19.4 > 15
+  - TTK: 19.4 (Target: 8)
+- **assassin_shadow vs dps_berserker @ 50 HP**: Rounds too low: 3.7 < 4
+  - TTK: 3.7 (Target: 8)
+- **assassin_shadow vs support_healer @ 50 HP**: Rounds too high: 17.0 > 15
+  - TTK: 17.0 (Target: 8)
+- **assassin_phantom vs tank_juggernaut @ 50 HP**: Rounds too high: 20.5 > 15
+  - TTK: 20.5 (Target: 8)
+- **assassin_phantom vs tank_fortress @ 50 HP**: Rounds too high: 15.1 > 15
+  - TTK: 15.1 (Target: 8)
+- **assassin_phantom vs tank_shieldbearer @ 50 HP**: Rounds too high: 16.8 > 15
+  - TTK: 16.8 (Target: 8)
+- **assassin_phantom vs support_healer @ 50 HP**: Rounds too high: 25.7 > 15
+  - TTK: 25.7 (Target: 8)
+- **assassin_phantom vs support_bulwark @ 50 HP**: Rounds too high: 19.8 > 15
+  - TTK: 19.8 (Target: 8)
+- **bruiser_warrior vs tank_warden @ 50 HP**: Rounds too high: 17.5 > 15
+  - TTK: 17.5 (Target: 8)
+- **bruiser_warrior vs support_healer @ 50 HP**: Rounds too high: 20.7 > 15
+  - TTK: 20.7 (Target: 8)
+- **bruiser_brawler vs tank_warden @ 50 HP**: Rounds too high: 17.9 > 15
+  - TTK: 17.9 (Target: 8)
+- **bruiser_brawler vs support_healer @ 50 HP**: Rounds too high: 20.8 > 15
+  - TTK: 20.8 (Target: 8)
+- **support_healer vs tank_juggernaut @ 50 HP**: Rounds too high: 44.5 > 15
+  - TTK: 44.5 (Target: 8)
+- **support_healer vs tank_warden @ 50 HP**: Rounds too high: 64.4 > 15
+  - TTK: 64.4 (Target: 8)
+- **support_healer vs tank_fortress @ 50 HP**: Rounds too high: 30.0 > 15
+  - TTK: 30.0 (Target: 8)
+- **support_healer vs tank_regenerator @ 50 HP**: Rounds too high: 94.8 > 15
+  - TTK: 94.8 (Target: 8)
+- **support_healer vs tank_shieldbearer @ 50 HP**: Rounds too high: 39.3 > 15
+  - TTK: 39.3 (Target: 8)
+- **support_healer vs dps_duelist @ 50 HP**: Rounds too high: 19.8 > 15
+  - TTK: 19.8 (Target: 8)
+- **support_healer vs assassin_shadow @ 50 HP**: Rounds too high: 16.7 > 15
+  - TTK: 16.7 (Target: 8)
+- **support_healer vs assassin_phantom @ 50 HP**: Rounds too high: 26.0 > 15
+  - TTK: 26.0 (Target: 8)
+- **support_healer vs bruiser_warrior @ 50 HP**: Rounds too high: 20.0 > 15
+  - TTK: 20.0 (Target: 8)
+- **support_healer vs bruiser_brawler @ 50 HP**: Rounds too high: 20.3 > 15
+  - TTK: 20.3 (Target: 8)
+- **support_healer vs support_healer @ 50 HP**: Rounds too high: 100.0 > 15
+  - TTK: 100.0 (Target: 8)
+- **support_healer vs support_bulwark @ 50 HP**: Rounds too high: 46.1 > 15
+  - TTK: 46.1 (Target: 8)
+- **support_healer vs hybrid_allrounder @ 50 HP**: Rounds too high: 26.4 > 15
+  - TTK: 26.4 (Target: 8)
+- **support_bulwark vs tank_juggernaut @ 50 HP**: Rounds too high: 41.5 > 15
+  - TTK: 41.5 (Target: 8)
+- **support_bulwark vs tank_warden @ 50 HP**: Rounds too high: 45.9 > 15
+  - TTK: 45.9 (Target: 8)
+- **support_bulwark vs tank_fortress @ 50 HP**: Rounds too high: 29.5 > 15
+  - TTK: 29.5 (Target: 8)
+- **support_bulwark vs tank_regenerator @ 50 HP**: Rounds too high: 45.9 > 15
+  - TTK: 45.9 (Target: 8)
+- **support_bulwark vs tank_shieldbearer @ 50 HP**: Rounds too high: 36.9 > 15
+  - TTK: 36.9 (Target: 8)
+- **support_bulwark vs assassin_phantom @ 50 HP**: Rounds too high: 19.3 > 15
+  - TTK: 19.3 (Target: 8)
+- **support_bulwark vs support_healer @ 50 HP**: Rounds too high: 47.4 > 15
+  - TTK: 47.4 (Target: 8)
+- **support_bulwark vs support_bulwark @ 50 HP**: Rounds too high: 41.3 > 15
+  - TTK: 41.3 (Target: 8)
+- **support_bulwark vs hybrid_allrounder @ 50 HP**: Rounds too high: 19.1 > 15
+  - TTK: 19.1 (Target: 8)
+- **hybrid_allrounder vs tank_juggernaut @ 50 HP**: Rounds too high: 19.7 > 15
+  - TTK: 19.7 (Target: 8)
+- **hybrid_allrounder vs tank_warden @ 50 HP**: Rounds too high: 24.8 > 15
+  - TTK: 24.8 (Target: 8)
+- **hybrid_allrounder vs tank_regenerator @ 50 HP**: Rounds too high: 21.9 > 15
+  - TTK: 21.9 (Target: 8)
+- **hybrid_allrounder vs tank_shieldbearer @ 50 HP**: Rounds too high: 17.6 > 15
+  - TTK: 17.6 (Target: 8)
+- **hybrid_allrounder vs support_healer @ 50 HP**: Rounds too high: 26.2 > 15
+  - TTK: 26.2 (Target: 8)
+- **hybrid_allrounder vs support_bulwark @ 50 HP**: Rounds too high: 18.9 > 15
+  - TTK: 18.9 (Target: 8)
+
+## Warnings
+- tank_juggernaut vs dps_marksman @ 50: Rounds deviation: 2.8 (Tolerance: ±2)
+- tank_juggernaut vs dps_duelist @ 50: Rounds deviation: 5.4 (Tolerance: ±2)
+- tank_juggernaut vs dps_armorbreaker @ 50: Rounds deviation: 3.2 (Tolerance: ±2)
+- tank_juggernaut vs assassin_shadow @ 50: Rounds deviation: 5.2 (Tolerance: ±2)
+- tank_juggernaut vs bruiser_warrior @ 50: Rounds deviation: 5.7 (Tolerance: ±2)
+- tank_juggernaut vs bruiser_brawler @ 50: Rounds deviation: 5.1 (Tolerance: ±2)
+- tank_warden vs dps_marksman @ 50: Rounds deviation: 3.1 (Tolerance: ±2)
+- tank_warden vs dps_armorbreaker @ 50: Rounds deviation: 3.3 (Tolerance: ±2)
+- tank_warden vs assassin_shadow @ 50: Rounds deviation: 2.1 (Tolerance: ±2)
+- tank_warden vs assassin_phantom @ 50: Rounds deviation: 6.0 (Tolerance: ±2)
+- tank_fortress vs dps_berserker @ 50: Rounds deviation: -2.7 (Tolerance: ±2)
+- tank_fortress vs hybrid_allrounder @ 50: Rounds deviation: 6.8 (Tolerance: ±2)
+- tank_regenerator vs assassin_phantom @ 50: Rounds deviation: 6.4 (Tolerance: ±2)
+- tank_regenerator vs bruiser_warrior @ 50: Rounds deviation: 6.3 (Tolerance: ±2)
+- tank_regenerator vs bruiser_brawler @ 50: Rounds deviation: 6.7 (Tolerance: ±2)
+- tank_shieldbearer vs dps_duelist @ 50: Rounds deviation: 3.7 (Tolerance: ±2)
+- tank_shieldbearer vs assassin_shadow @ 50: Rounds deviation: 3.0 (Tolerance: ±2)
+- tank_shieldbearer vs bruiser_warrior @ 50: Rounds deviation: 3.5 (Tolerance: ±2)
+- tank_shieldbearer vs bruiser_brawler @ 50: Rounds deviation: 3.2 (Tolerance: ±2)
+- dps_berserker vs tank_fortress @ 50: Rounds deviation: -2.6 (Tolerance: ±2)
+- dps_berserker vs dps_marksman @ 50: Rounds deviation: -3.6 (Tolerance: ±2)
+- dps_berserker vs dps_duelist @ 50: Rounds deviation: -3.7 (Tolerance: ±2)
+- dps_berserker vs dps_armorbreaker @ 50: Rounds deviation: -3.9 (Tolerance: ±2)
+- dps_berserker vs assassin_phantom @ 50: Rounds deviation: -2.8 (Tolerance: ±2)
+- dps_berserker vs bruiser_warrior @ 50: Rounds deviation: -2.8 (Tolerance: ±2)
+- dps_berserker vs hybrid_allrounder @ 50: Rounds deviation: -3.0 (Tolerance: ±2)
+- dps_marksman vs tank_juggernaut @ 50: Rounds deviation: 2.3 (Tolerance: ±2)
+- dps_marksman vs tank_warden @ 50: Rounds deviation: 2.9 (Tolerance: ±2)
+- dps_marksman vs dps_berserker @ 50: Rounds deviation: -3.7 (Tolerance: ±2)
+- dps_marksman vs dps_marksman @ 50: Rounds deviation: -2.4 (Tolerance: ±2)
+- dps_marksman vs assassin_shadow @ 50: Rounds deviation: -2.9 (Tolerance: ±2)
+- dps_marksman vs support_healer @ 50: Rounds deviation: 3.9 (Tolerance: ±2)
+- dps_marksman vs hybrid_allrounder @ 50: Rounds deviation: -2.7 (Tolerance: ±2)
+- dps_duelist vs tank_juggernaut @ 50: Rounds deviation: 5.3 (Tolerance: ±2)
+- dps_duelist vs tank_regenerator @ 50: Rounds deviation: 6.5 (Tolerance: ±2)
+- dps_duelist vs tank_shieldbearer @ 50: Rounds deviation: 3.1 (Tolerance: ±2)
+- dps_duelist vs dps_berserker @ 50: Rounds deviation: -3.7 (Tolerance: ±2)
+- dps_duelist vs dps_marksman @ 50: Rounds deviation: -2.2 (Tolerance: ±2)
+- dps_duelist vs assassin_shadow @ 50: Rounds deviation: -2.2 (Tolerance: ±2)
+- dps_duelist vs support_bulwark @ 50: Rounds deviation: 5.1 (Tolerance: ±2)
+- dps_armorbreaker vs tank_juggernaut @ 50: Rounds deviation: 2.9 (Tolerance: ±2)
+- dps_armorbreaker vs tank_warden @ 50: Rounds deviation: 3.2 (Tolerance: ±2)
+- dps_armorbreaker vs dps_berserker @ 50: Rounds deviation: -3.7 (Tolerance: ±2)
+- dps_armorbreaker vs dps_marksman @ 50: Rounds deviation: -2.2 (Tolerance: ±2)
+- dps_armorbreaker vs assassin_shadow @ 50: Rounds deviation: -2.7 (Tolerance: ±2)
+- dps_armorbreaker vs support_healer @ 50: Rounds deviation: 4.8 (Tolerance: ±2)
+- dps_armorbreaker vs hybrid_allrounder @ 50: Rounds deviation: -2.4 (Tolerance: ±2)
+- assassin_shadow vs tank_juggernaut @ 50: Rounds deviation: 5.3 (Tolerance: ±2)
+- assassin_shadow vs tank_warden @ 50: Rounds deviation: 2.1 (Tolerance: ±2)
+- assassin_shadow vs tank_shieldbearer @ 50: Rounds deviation: 3.1 (Tolerance: ±2)
+- assassin_shadow vs dps_marksman @ 50: Rounds deviation: -2.7 (Tolerance: ±2)
+- assassin_shadow vs dps_duelist @ 50: Rounds deviation: -2.6 (Tolerance: ±2)
+- assassin_shadow vs dps_armorbreaker @ 50: Rounds deviation: -3.0 (Tolerance: ±2)
+- assassin_shadow vs support_bulwark @ 50: Rounds deviation: 4.9 (Tolerance: ±2)
+- assassin_phantom vs tank_warden @ 50: Rounds deviation: 6.4 (Tolerance: ±2)
+- assassin_phantom vs tank_regenerator @ 50: Rounds deviation: 6.1 (Tolerance: ±2)
+- assassin_phantom vs dps_berserker @ 50: Rounds deviation: -2.9 (Tolerance: ±2)
+- assassin_phantom vs hybrid_allrounder @ 50: Rounds deviation: 3.0 (Tolerance: ±2)
+- bruiser_warrior vs tank_juggernaut @ 50: Rounds deviation: 5.7 (Tolerance: ±2)
+- bruiser_warrior vs tank_regenerator @ 50: Rounds deviation: 6.7 (Tolerance: ±2)
+- bruiser_warrior vs tank_shieldbearer @ 50: Rounds deviation: 3.2 (Tolerance: ±2)
+- bruiser_warrior vs dps_berserker @ 50: Rounds deviation: -2.8 (Tolerance: ±2)
+- bruiser_warrior vs support_bulwark @ 50: Rounds deviation: 5.2 (Tolerance: ±2)
+- bruiser_brawler vs tank_juggernaut @ 50: Rounds deviation: 5.8 (Tolerance: ±2)
+- bruiser_brawler vs tank_fortress @ 50: Rounds deviation: 2.1 (Tolerance: ±2)
+- bruiser_brawler vs tank_regenerator @ 50: Rounds deviation: 6.7 (Tolerance: ±2)
+- bruiser_brawler vs tank_shieldbearer @ 50: Rounds deviation: 3.2 (Tolerance: ±2)
+- bruiser_brawler vs support_bulwark @ 50: Rounds deviation: 5.2 (Tolerance: ±2)
+- support_healer vs dps_marksman @ 50: Rounds deviation: 4.5 (Tolerance: ±2)
+- support_healer vs dps_armorbreaker @ 50: Rounds deviation: 4.8 (Tolerance: ±2)
+- support_bulwark vs dps_duelist @ 50: Rounds deviation: 4.7 (Tolerance: ±2)
+- support_bulwark vs assassin_shadow @ 50: Rounds deviation: 4.8 (Tolerance: ±2)
+- support_bulwark vs bruiser_warrior @ 50: Rounds deviation: 5.4 (Tolerance: ±2)
+- support_bulwark vs bruiser_brawler @ 50: Rounds deviation: 5.3 (Tolerance: ±2)
+- hybrid_allrounder vs tank_fortress @ 50: Rounds deviation: 6.9 (Tolerance: ±2)
+- hybrid_allrounder vs dps_berserker @ 50: Rounds deviation: -2.8 (Tolerance: ±2)
+- hybrid_allrounder vs dps_marksman @ 50: Rounds deviation: -2.8 (Tolerance: ±2)
+- hybrid_allrounder vs dps_armorbreaker @ 50: Rounds deviation: -2.3 (Tolerance: ±2)
+- hybrid_allrounder vs assassin_phantom @ 50: Rounds deviation: 2.6 (Tolerance: ±2)
+
+
+
+================================================
+
+
+🔍 Deep Dive: Tank vs DPS
+Winner: DPS (97.0%)
+Avg Rounds: 9.13
+
+ [32m✓[39m analysis_run.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 5356[2mms[22m[39m
+     [33m[2m✓[22m[39m should generate full balance report [33m 5355[2mms[22m[39m
+[90mstdout[2m | src/balancing/__tests__/WeightCalibration.test.ts[2m > [22m[2mAutomated Weight Calibration[2m > [22m[2mSustain Stats[2m > [22m[2mshould auto-calibrate regen weight
+[22m[39m
+🔬 Calibrating Regen (2 HP/turn → ? HP)...
+  [1/20] weight=2505.00, HP=5010.0, winrate=0.0%
+  [2/20] weight=1257.50, HP=2515.0, winrate=0.0%
+  [3/20] weight=633.75, HP=1267.5, winrate=0.0%
+  [4/20] weight=321.88, HP=643.8, winrate=0.0%
+  [5/20] weight=165.94, HP=331.9, winrate=0.0%
+  [6/20] weight=87.97, HP=175.9, winrate=0.4%
+  [7/20] weight=48.98, HP=98.0, winrate=10.0%
+  [8/20] weight=29.49, HP=59.0, winrate=18.0%
+  [9/20] weight=19.75, HP=39.5, winrate=31.1%
+  [10/20] weight=14.87, HP=29.7, winrate=31.5%
+  [11/20] weight=12.44, HP=24.9, winrate=49.4%
+  ✅ Converged! Optimal weight: 12.44 HP per unit
+
+📊 RESULT: 1 regen/turn = 6.2 HP total value
+   (2 regen = 12.4 HP)
+
+
+ [32m✓[39m src/balancing/__tests__/StatBalanceHistoryStore.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+[90mstdout[2m | comparative_analysis.test.ts[2m > [22m[2mComparative Balance Analysis[2m > [22m[2mshould compare Standard vs Tank Meta
+[22m[39m[tank_meta] Tank vs DPS:
+  Winner: DPS (98.0%)
+  Avg Rounds: 12.46
+
+ [32m✓[39m src/balancing/archetype/__tests__/ArchetypeBuilder.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+[90mstdout[2m | comparative_analysis.test.ts[2m > [22m[2mComparative Balance Analysis[2m > [22m[2mshould compare Standard vs Tank Meta
+[22m[39m
+
+🚀 Starting Simulation for Preset: HIGH_LETHALITY...
+
+ [32m✓[39m src/engine/idle/__tests__/combatEngine.test.ts [2m([22m[2m5 tests[22m[2m | [22m[33m2 skipped[39m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m src/balancing/__tests__/EHPCalculator.test.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m src/balancing/1v1/__tests__/autobalancer.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 25[2mms[22m[39m
+[90mstdout[2m | src/balancing/__tests__/WeightCalibration.test.ts[2m > [22m[2mAutomated Weight Calibration[2m > [22m[2mOffensive Stats (Validation)[2m > [22m[2mshould validate damage weight is ~3.0 HP
+[22m[39m
+🔬 Validating Damage weight...
+  [1/20] weight=15.50, HP=155.0, winrate=7.3%
+  [2/20] weight=8.25, HP=82.5, winrate=31.1%
+  [3/20] weight=4.63, HP=46.3, winrate=49.0%
+  ✅ Converged! Optimal weight: 4.63 HP per unit
+
+📊 RESULT: 1 damage = 4.63 HP
+
+
+ [32m✓[39m src/engine/combat/buffs.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m src/engine/combat/__tests__/damageCalculator.configApplyBeforeCrit.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m src/balancing/persistence/__tests__/BalanceConfigStore.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m src/balancing/modules/__tests__/spellcost.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+[90mstdout[2m | comparative_analysis.test.ts[2m > [22m[2mComparative Balance Analysis[2m > [22m[2mshould compare Standard vs Tank Meta
+[22m[39m[high_lethality] Tank vs DPS:
+  Winner: DPS (100.0%)
+  Avg Rounds: 5.28
+
+ [32m✓[39m comparative_analysis.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 7491[2mms[22m[39m
+     [33m[2m✓[22m[39m should compare Standard vs Tank Meta [33m 7489[2mms[22m[39m
+[90mstdout[2m | src/balancing/simulation/__tests__/StatValueAnalyzer.test.ts[2m > [22m[2mStatValueAnalyzer[2m > [22m[2mshould calibrate a stat correctly
+[22m[39m🔬 Calibrating damage (+10)...
+
+ [32m✓[39m src/balancing/simulation/__tests__/StatValueAnalyzer.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 8[2mms[22m[39m
+[90mstdout[2m | src/balancing/__tests__/SpellAnalysis.test.ts[2m > [22m[2mSpell Analysis Report[2m > [22m[2mshould analyze all spells and show rebalancing recommendations
+[22m[39m
+╔════════════════════════════════════════════════════════════════╗
+║           SPELL REBALANCING ANALYSIS REPORT                   ║
+╚════════════════════════════════════════════════════════════════╝
+
+📊 SUMMARY:
+   Total Spells: 3
+   ✅ Balanced: 0 (0.0%)
+   ⬆️  Need Cost Increase: 3
+   ⬇️  Need Cost Decrease: 0
+
+🔥 TOP 10 BIGGEST CHANGES NEEDED:
+
+1. ❌ Stun Blast                (cc     )
+   ⬆️ Mana:   0 → 6   (+6)
+   💪 Power: 7.5 HP-equivalent
+   📦 Breakdown: Direct=0.0 DoT=0.0 AoE×1.0
+
+2. ❌ Basic Attack              (damage )
+   ⬆️ Mana:   0 → 3   (+3)
+   💪 Power: 5.0 HP-equivalent
+   📦 Breakdown: Direct=5.0 DoT=0.0 AoE×1.0
+
+3. ❌ Healing Light             (heal   )
+   ⬆️ Mana:   0 → 1   (+1)
+   💪 Power: 0.8 HP-equivalent
+   📦 Breakdown: Direct=0.8 DoT=0.0 AoE×1.0
+
+⚠️  SPECIAL ATTENTION NEEDED:
+
+❗ Stun Blast (cc)
+   Current: 0 mana, Recommended: 6 mana
+   Power: 7.5 HP-eq, Change: 0%
+
+📝 SUGGESTED UPDATES FOR spells.json:
+
+   Update these spell mana costs:
+
+   "Stun Blast": manaCost 0 → 6
+   "Basic Attack": manaCost 0 → 3
+   "Healing Light": manaCost 0 → 1
+
+╚════════════════════════════════════════════════════════════════╝
+
+Full analysis data available in test output.
+
+ [32m✓[39m src/balancing/__tests__/SpellAnalysis.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 9[2mms[22m[39m
+[90mstdout[2m | src/balancing/__tests__/WeightCalibration.test.ts[2m > [22m[2mAutomated Weight Calibration[2m > [22m[2mDefensive Stats (Validation)[2m > [22m[2mshould validate armor weight is ~1.8 HP
+[22m[39m
+🔬 Validating Armor weight...
+  [1/20] weight=15.25, HP=152.5, winrate=0.8%
+  [2/20] weight=7.88, HP=78.8, winrate=9.0%
+  [3/20] weight=4.19, HP=41.9, winrate=31.9%
+  [4/20] weight=2.34, HP=23.4, winrate=50.3%
+  ✅ Converged! Optimal weight: 2.34 HP per unit
+
+📊 RESULT: 1 armor = 2.34 HP
+
+
+ [32m✓[39m src/balancing/config/__tests__/BalancerConfigHealth.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m src/balancing/__tests__/StatWeightAdvisor.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m src/engine/combat/combat.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m src/balancing/archetype/__tests__/TTKReportGenerator.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m src/balancing/modules/__tests__/hitchance.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [2m[90m↓[39m[22m src/balancing/__tests__/CombatTestFramework.test.ts [2m([22m[2m8 tests[22m[2m | [22m[33m8 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m src/balancing/__tests__/DynamicWeights.test.ts [2m([22m[2m3 tests[22m[2m | [22m[33m3 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m src/balancing/1v1/__tests__/mathEngine.test.ts [2m([22m[2m19 tests[22m[2m | [22m[33m19 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m src/balancing/1v1/__tests__/integration.test.ts [2m([22m[2m10 tests[22m[2m | [22m[33m10 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m src/balancing/1v1/__tests__/simulator.test.ts [2m([22m[2m12 tests[22m[2m | [22m[33m12 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m src/balancing/1v1/__tests__/swi.test.ts [2m([22m[2m14 tests[22m[2m | [22m[33m14 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m src/balancing/simulation/__tests__/verify_matrix_reproducibility.test.ts [2m([22m[2m1 test[22m[2m | [22m[33m1 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m src/balancing/testing/__tests__/StatsArchetypeGenerator.test.ts [2m([22m[2m4 tests[22m[2m | [22m[33m4 skipped[39m[2m)[22m
+[90mstdout[2m | src/balancing/__tests__/BaselineCalibration.test.ts
+[22m[39m============================================================
+BASELINE CALIBRATION - DEFAULT_STATS
+============================================================
+
+Current DEFAULT_STATS:
+{
+  "hp": 150,
+  "damage": 25,
+  "txc": 25,
+  "evasion": 0,
+  "agility": 50,
+  "hitChance": 0,
+  "effectiveDamage": 0,
+  "attacksPerKo": 0,
+  "htk": 0,
+  "edpt": 0,
+  "ttk": 0,
+  "earlyImpact": 0,
+  "critChance": 5,
+  "critMult": 2,
+  "critTxCBonus": 20,
+  "failChance": 0,
+  "failMult": 0,
+  "failTxCMalus": 20,
+  "armor": 0,
+  "resistance": 0,
+  "armorPen": 0,
+  "penPercent": 0,
+  "lifesteal": 0,
+  "regen": 0,
+  "ward": 0,
+  "block": 0,
+  "energyShield": 0,
+  "thorns": 0,
+  "cooldownReduction": 0,
+  "castSpeed": 0,
+  "movementSpeed": 100,
+  "configFlatFirst": true,
+  "configApplyBeforeCrit": false
+}
+
+------------------------------------------------------------
+Running 10,000 simulations (DEFAULT_STATS vs DEFAULT_STATS)...
+------------------------------------------------------------
+
+✅ Completed in 874ms (seed=1765037059269)
+
+RESULTS:
+────────────────────────────────────────────────────────────
+Winrate A:     49.340%
+Winrate B:     50.660%
+Deviation:     0.660% from 50.0%
+Median TTK:    7.00 turns
+Draws:         0
+────────────────────────────────────────────────────────────
+
+🎉 DEFAULT_STATS IS BALANCED! ✅
+   Within ±1% tolerance
+
+📝 Saving as BASELINE_STATS...
+✅ Baseline validated and ready for use
+
+
+ [32m✓[39m src/balancing/__tests__/BaselineCalibration.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 4[2mms[22m[39m
+[90mstdout[2m | src/balancing/__tests__/WeightCalibration.test.ts[2m > [22m[2mWeight Calibration Batch Runner[2m > [22m[2mshould calibrate all primary stats
+[22m[39m
+
+═══════════════════════════════════════════════
+     BATCH WEIGHT CALIBRATION REPORT
+═══════════════════════════════════════════════
+
+
+📊 Calibrating damage...
+   ✅ damage: 0.46 HP per unit
+
+📊 Calibrating armor...
+   ✅ armor: 0.19 HP per unit
+
+📊 Calibrating lifesteal...
+   ✅ lifesteal: 81.88 HP per unit
+
+📊 Calibrating regen...
+   ✅ regen: 6.22 HP per unit
+
+
+═══════════════════════════════════════════════
+               FINAL WEIGHTS
+═══════════════════════════════════════════════
+  damage       = 0.46 HP/unit
+  armor        = 0.19 HP/unit
+  lifesteal    = 81.88 HP/unit
+  regen        = 6.22 HP/unit
+═══════════════════════════════════════════════
+
+
+
+ [32m✓[39m src/balancing/__tests__/WeightCalibration.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 11527[2mms[22m[39m
+       [33m[2m✓[22m[39m should auto-calibrate lifesteal weight [33m 1864[2mms[22m[39m
+       [33m[2m✓[22m[39m should auto-calibrate regen weight [33m 4402[2mms[22m[39m
+       [33m[2m✓[22m[39m should validate damage weight is ~3.0 HP [33m 709[2mms[22m[39m
+       [33m[2m✓[22m[39m should validate armor weight is ~1.8 HP [33m 1109[2mms[22m[39m
+     [33m[2m✓[22m[39m should calibrate all primary stats [33m 3440[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 5 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/spellCreator.mobile.spec.ts[2m [ tests/spellCreator.mobile.spec.ts ][22m
+[31m[1mError[22m: Playwright Test did not expect test.describe() to be called here.
+Most common reasons include:
+- You are calling test.describe() in a configuration file.
+- You are calling test.describe() in a file that is imported by the configuration file.
+- You have two different versions of @playwright/test. This usually happens
+  when one of the dependencies in your package.json depends on @playwright/test.[39m
+[90m [2m❯[22m TestTypeImpl._currentSuite node_modules/playwright/lib/common/testType.js:[2m75:13[22m[39m
+[90m [2m❯[22m TestTypeImpl._describe node_modules/playwright/lib/common/testType.js:[2m115:24[22m[39m
+[90m [2m❯[22m Function.describe node_modules/playwright/lib/transform/transform.js:[2m275:12[22m[39m
+[36m [2m❯[22m tests/spellCreator.mobile.spec.ts:[2m6:6[22m[39m
+    [90m  4| [39m[90m// Aligned with MOBILE_GUIDELINES and responsive_ui_plan[39m
+    [90m  5| [39m
+    [90m  6| [39mtest[33m.[39m[34mdescribe[39m([32m'Spell Creator New - Mobile layout'[39m[33m,[39m () [33m=>[39m {
+    [90m   | [39m     [31m^[39m
+    [90m  7| [39m  test[33m.[39m[34mbeforeEach[39m([35masync[39m ({ page }) [33m=>[39m {
+    [90m  8| [39m    [90m// Force a mobile-like viewport even if project is desktop[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/ui.spec.ts[2m [ tests/ui.spec.ts ][22m
+[31m[1mError[22m: Playwright Test did not expect test.describe() to be called here.
+Most common reasons include:
+- You are calling test.describe() in a configuration file.
+- You are calling test.describe() in a file that is imported by the configuration file.
+- You have two different versions of @playwright/test. This usually happens
+  when one of the dependencies in your package.json depends on @playwright/test.[39m
+[90m [2m❯[22m TestTypeImpl._currentSuite node_modules/playwright/lib/common/testType.js:[2m75:13[22m[39m
+[90m [2m❯[22m TestTypeImpl._describe node_modules/playwright/lib/common/testType.js:[2m115:24[22m[39m
+[90m [2m❯[22m Function.describe node_modules/playwright/lib/transform/transform.js:[2m275:12[22m[39m
+[36m [2m❯[22m tests/ui.spec.ts:[2m3:6[22m[39m
+    [90m  1| [39m[35mimport[39m { test[33m,[39m expect } [35mfrom[39m [32m'@playwright/test'[39m[33m;[39m
+    [90m  2| [39m
+    [90m  3| [39mtest[33m.[39m[34mdescribe[39m([32m'UI Verification Suite'[39m[33m,[39m () [33m=>[39m {
+    [90m   | [39m     [31m^[39m
+    [90m  4| [39m
+    [90m  5| [39m    test[33m.[39m[34mbeforeEach[39m([35masync[39m ({ page }) [33m=>[39m {
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/AutoStatBalancer.test.ts[2m [ src/balancing/__tests__/AutoStatBalancer.test.ts ][22m
+[31m[1mError[22m: [vitest] There was an error when mocking a module. If you are using "vi.mock" factory, make sure there are no top level variables inside, since this call is hoisted to top of the file. Read more: https://vitest.dev/api/vi.html#vi-mock[39m
+[36m [2m❯[22m src/balancing/stats/AutoStatBalancer.ts:[2m2:1[22m[39m
+    [90m  1| [39m[35mimport[39m type { [33mBalancerConfig[39m[33m,[39m [33mStatDefinition[39m } [35mfrom[39m [32m'../config/types'[39m[33m;[39m
+    [90m  2| [39m[35mimport[39m { runAllTiersRoundRobin } [35mfrom[39m [32m'../testing/runRoundRobinTests'[39m[33m;[39m
+    [90m   | [39m[31m^[39m
+    [90m  3| [39mimport type { AggregatedRoundRobinResults } from '../testing/RoundRobi…
+    [90m  4| [39m[35mimport[39m type { [33mStatEfficiency[39m } [35mfrom[39m [32m'../testing/RoundRobinRunner'[39m[33m;[39m
+
+[31m[1mCaused by: ReferenceError[22m: Cannot access 'runAllTiersRoundRobin' before initialization[39m
+[36m [2m❯[22m src/balancing/__tests__/AutoStatBalancer.test.ts:[2m11:5[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/ui/balancing/BalancerNew.formula.test.ts[2m [ src/ui/balancing/BalancerNew.formula.test.ts ][22m
+[31m[1mError[22m: No test suite found in file /Users/faustoboni/projects/progetti personali/src/ui/balancing/BalancerNew.formula.test.ts[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/balancing/archetype/__tests__/ArchetypeBuilder.integration.test.tsx[2m [ src/components/balancing/archetype/__tests__/ArchetypeBuilder.integration.test.tsx ][22m
+[31m[1mError[22m: Failed to resolve import "@testing-library/react" from "src/components/balancing/archetype/__tests__/ArchetypeBuilder.integration.test.tsx". Does the file exist?[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36m/Users/faustoboni/projects/progetti personali/src/components/balancing/archetype/__tests__/ArchetypeBuilder.integration.test.tsx[39m:6:42
+[33m  1  |  import { jsxDEV } from "react/jsx-dev-runtime";
+  2  |  import { describe, it, expect } from "vitest";
+  3  |  import { render, screen, fireEvent } from "@testing-library/react";
+     |                                             ^
+  4  |  import { ArchetypeBuilder } from "../ArchetypeBuilder";
+  5  |  describe("ArchetypeBuilder Integration", () => {[39m
+[90m [2m❯[22m TransformPluginContext._formatLog ../progetti%20personali/node_modules/vite/dist/node/chunks/config.js:[2m29647:43[22m[39m
+[90m [2m❯[22m TransformPluginContext.error ../progetti%20personali/node_modules/vite/dist/node/chunks/config.js:[2m29644:14[22m[39m
+[90m [2m❯[22m normalizeUrl ../progetti%20personali/node_modules/vite/dist/node/chunks/config.js:[2m27767:18[22m[39m
+[90m [2m❯[22m ../progetti%20personali/node_modules/vite/dist/node/chunks/config.js:[2m27825:32[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform ../progetti%20personali/node_modules/vite/dist/node/chunks/config.js:[2m27793:4[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform ../progetti%20personali/node_modules/vite/dist/node/chunks/config.js:[2m29445:14[22m[39m
+[90m [2m❯[22m loadAndTransform ../progetti%20personali/node_modules/vite/dist/node/chunks/config.js:[2m23316:26[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/42]⎯[22m[39m
+
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 37 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/determinism/rng-guard.test.ts[2m > [22mRNG Guard – no uncontrolled randomness allowed[2m > [22mshould fail if Math.random(), crypto.random, or Date.now() appear in simulation code
+[31m[1mError[22m: ENOENT: no such file or directory, scandir '/Users/faustoboni/projects/progetti personali/src/simulation'[39m
+[36m [2m❯[22m listFilesRecursively tests/determinism/rng-guard.test.ts:[2m23:16[22m[39m
+    [90m 21| [39m[35mfunction[39m [34mlistFilesRecursively[39m(dirPath[33m:[39m string)[33m:[39m string[] {
+    [90m 22| [39m  [35mlet[39m results[33m:[39m string[] [33m=[39m [][33m;[39m
+    [90m 23| [39m  [35mconst[39m list [33m=[39m [34mreaddirSync[39m(dirPath)[33m;[39m
+    [90m   | [39m               [31m^[39m
+    [90m 24| [39m
+    [90m 25| [39m  list[33m.[39m[34mforEach[39m((file) [33m=>[39m {
+[90m [2m❯[22m tests/determinism/rng-guard.test.ts:[2m47:14[22m[39m
+[90m [2m❯[22m tests/determinism/rng-guard.test.ts:[2m45:37[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/ArchetypeBalance.test.ts[2m > [22mArchetype Balance[2m > [22mRound-Robin at Budget 100[2m > [22mshould balance Tank vs DPS
+[31m[1mAssertionError[22m: expected 0.085 to be greater than or equal to 0.3[39m
+[36m [2m❯[22m src/balancing/__tests__/ArchetypeBalance.test.ts:[2m65:30[22m[39m
+    [90m 63| [39m            // Tank should have slight advantage (defense > offense in…
+    [90m 64| [39m            [90m// But not dominate[39m
+    [90m 65| [39m            expect(winRateA).toBeGreaterThanOrEqual(0.3); // Tank wins…
+    [90m   | [39m                             [31m^[39m
+    [90m 66| [39m            expect(winRateA).toBeLessThanOrEqual(0.7);    // But not m…
+    [90m 67| [39m        })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/ArchetypeBalance.test.ts[2m > [22mArchetype Balance[2m > [22mRound-Robin at Budget 100[2m > [22mshould balance Tank vs Balanced
+[31m[1mAssertionError[22m: expected 0.001 to be greater than or equal to 0.4[39m
+[36m [2m❯[22m src/balancing/__tests__/ArchetypeBalance.test.ts:[2m72:30[22m[39m
+    [90m 70| [39m            const { winRateA } = testMatchup('tank', 'balanced', BUDGE…
+    [90m 71| [39m
+    [90m 72| [39m            [34mexpect[39m(winRateA)[33m.[39m[34mtoBeGreaterThanOrEqual[39m([34m0.5[39m [33m-[39m [33mTOLERANCE[39m)[33m;[39m
+    [90m   | [39m                             [31m^[39m
+    [90m 73| [39m            [34mexpect[39m(winRateA)[33m.[39m[34mtoBeLessThanOrEqual[39m([34m0.5[39m [33m+[39m [33mTOLERANCE[39m)[33m;[39m
+    [90m 74| [39m        })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/ArchetypeBalance.test.ts[2m > [22mArchetype Balance[2m > [22mRound-Robin at Budget 100[2m > [22mshould balance DPS vs Balanced
+[31m[1mAssertionError[22m: expected 0.184 to be greater than or equal to 0.4[39m
+[36m [2m❯[22m src/balancing/__tests__/ArchetypeBalance.test.ts:[2m79:30[22m[39m
+    [90m 77| [39m            const { winRateA } = testMatchup('glass_cannon', 'balanced…
+    [90m 78| [39m
+    [90m 79| [39m            [34mexpect[39m(winRateA)[33m.[39m[34mtoBeGreaterThanOrEqual[39m([34m0.5[39m [33m-[39m [33mTOLERANCE[39m)[33m;[39m
+    [90m   | [39m                             [31m^[39m
+    [90m 80| [39m            [34mexpect[39m(winRateA)[33m.[39m[34mtoBeLessThanOrEqual[39m([34m0.5[39m [33m+[39m [33mTOLERANCE[39m)[33m;[39m
+    [90m 81| [39m        })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/ArchetypeBalance.test.ts[2m > [22mArchetype Balance[2m > [22mRound-Robin at Budget 100[2m > [22mshould balance Tank vs Evasive
+[31m[1mAssertionError[22m: expected 0.066 to be greater than or equal to 0.4[39m
+[36m [2m❯[22m src/balancing/__tests__/ArchetypeBalance.test.ts:[2m86:30[22m[39m
+    [90m 84| [39m            const { winRateA } = testMatchup('tank', 'evasive', BUDGET…
+    [90m 85| [39m
+    [90m 86| [39m            [34mexpect[39m(winRateA)[33m.[39m[34mtoBeGreaterThanOrEqual[39m([34m0.5[39m [33m-[39m [33mTOLERANCE[39m)[33m;[39m
+    [90m   | [39m                             [31m^[39m
+    [90m 87| [39m            [34mexpect[39m(winRateA)[33m.[39m[34mtoBeLessThanOrEqual[39m([34m0.5[39m [33m+[39m [33mTOLERANCE[39m)[33m;[39m
+    [90m 88| [39m        })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/ArchetypeBalance.test.ts[2m > [22mArchetype Balance[2m > [22mRound-Robin at Budget 100[2m > [22mshould balance Balanced vs Evasive
+[31m[1mAssertionError[22m: expected 0.774 to be less than or equal to 0.6[39m
+[36m [2m❯[22m src/balancing/__tests__/ArchetypeBalance.test.ts:[2m101:30[22m[39m
+    [90m 99| [39m
+    [90m100| [39m            [34mexpect[39m(winRateA)[33m.[39m[34mtoBeGreaterThanOrEqual[39m([34m0.5[39m [33m-[39m [33mTOLERANCE[39m)[33m;[39m
+    [90m101| [39m            [34mexpect[39m(winRateA)[33m.[39m[34mtoBeLessThanOrEqual[39m([34m0.5[39m [33m+[39m [33mTOLERANCE[39m)[33m;[39m
+    [90m   | [39m                             [31m^[39m
+    [90m102| [39m        })[33m;[39m
+    [90m103| [39m    })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/ArchetypeBalance.test.ts[2m > [22mArchetype Balance[2m > [22mScaling Consistency[2m > [22mshould maintain balance at budget 50
+[31m[1mAssertionError[22m: expected 0.117 to be greater than or equal to 0.3[39m
+[36m [2m❯[22m src/balancing/__tests__/ArchetypeBalance.test.ts:[2m114:34[22m[39m
+    [90m112| [39m
+    [90m113| [39m                [90m// Should stay within reasonable bounds[39m
+    [90m114| [39m                [34mexpect[39m(winRateA)[33m.[39m[34mtoBeGreaterThanOrEqual[39m([34m0.3[39m)[33m;[39m
+    [90m   | [39m                                 [31m^[39m
+    [90m115| [39m                [34mexpect[39m(winRateA)[33m.[39m[34mtoBeLessThanOrEqual[39m([34m0.7[39m)[33m;[39m
+    [90m116| [39m            })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/ArchetypeBalance.test.ts[2m > [22mArchetype Balance[2m > [22mScaling Consistency[2m > [22mshould maintain balance at budget 100
+[31m[1mAssertionError[22m: expected 0.07 to be greater than or equal to 0.3[39m
+[36m [2m❯[22m src/balancing/__tests__/ArchetypeBalance.test.ts:[2m114:34[22m[39m
+    [90m112| [39m
+    [90m113| [39m                [90m// Should stay within reasonable bounds[39m
+    [90m114| [39m                [34mexpect[39m(winRateA)[33m.[39m[34mtoBeGreaterThanOrEqual[39m([34m0.3[39m)[33m;[39m
+    [90m   | [39m                                 [31m^[39m
+    [90m115| [39m                [34mexpect[39m(winRateA)[33m.[39m[34mtoBeLessThanOrEqual[39m([34m0.7[39m)[33m;[39m
+    [90m116| [39m            })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/ArchetypeBalance.test.ts[2m > [22mArchetype Balance[2m > [22mScaling Consistency[2m > [22mshould maintain balance at budget 150
+[31m[1mAssertionError[22m: expected 0.106 to be greater than or equal to 0.3[39m
+[36m [2m❯[22m src/balancing/__tests__/ArchetypeBalance.test.ts:[2m114:34[22m[39m
+    [90m112| [39m
+    [90m113| [39m                [90m// Should stay within reasonable bounds[39m
+    [90m114| [39m                [34mexpect[39m(winRateA)[33m.[39m[34mtoBeGreaterThanOrEqual[39m([34m0.3[39m)[33m;[39m
+    [90m   | [39m                                 [31m^[39m
+    [90m115| [39m                [34mexpect[39m(winRateA)[33m.[39m[34mtoBeLessThanOrEqual[39m([34m0.7[39m)[33m;[39m
+    [90m116| [39m            })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/ArchetypeBalance.test.ts[2m > [22mArchetype Balance[2m > [22mScaling Consistency[2m > [22mshould maintain balance at budget 200
+[31m[1mAssertionError[22m: expected 0.17 to be greater than or equal to 0.3[39m
+[36m [2m❯[22m src/balancing/__tests__/ArchetypeBalance.test.ts:[2m114:34[22m[39m
+    [90m112| [39m
+    [90m113| [39m                [90m// Should stay within reasonable bounds[39m
+    [90m114| [39m                [34mexpect[39m(winRateA)[33m.[39m[34mtoBeGreaterThanOrEqual[39m([34m0.3[39m)[33m;[39m
+    [90m   | [39m                                 [31m^[39m
+    [90m115| [39m                [34mexpect[39m(winRateA)[33m.[39m[34mtoBeLessThanOrEqual[39m([34m0.7[39m)[33m;[39m
+    [90m116| [39m            })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/ArchetypeBalance.test.ts[2m > [22mArchetype Balance[2m > [22mSpecialization Value[2m > [22mTank should have advantage in sustained combat (vs Balanced)
+[31m[1mAssertionError[22m: expected 0.002 to be greater than or equal to 0.45[39m
+[36m [2m❯[22m src/balancing/__tests__/ArchetypeBalance.test.ts:[2m128:30[22m[39m
+    [90m126| [39m            [90m// Tank should win slightly more often (but not dominate)[39m
+    [90m127| [39m            // If balanced, that's OK. If tank loses, stat weights are…
+    [90m128| [39m            expect(winRateA).toBeGreaterThanOrEqual(0.45); // At least…
+    [90m   | [39m                             [31m^[39m
+    [90m129| [39m        })[33m;[39m
+    [90m130| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/ArchetypeBalance.test.ts[2m > [22mArchetype Balance[2m > [22mSpecialization Value[2m > [22mDPS should have advantage in burst damage (vs Balanced)
+[31m[1mAssertionError[22m: expected 0.189 to be greater than or equal to 0.45[39m
+[36m [2m❯[22m src/balancing/__tests__/ArchetypeBalance.test.ts:[2m135:30[22m[39m
+    [90m133| [39m
+    [90m134| [39m            // DPS should win slightly more (kills before taking damag…
+    [90m135| [39m            [34mexpect[39m(winRateA)[33m.[39m[34mtoBeGreaterThanOrEqual[39m([34m0.45[39m)[33m;[39m
+    [90m   | [39m                             [31m^[39m
+    [90m136| [39m        })[33m;[39m
+    [90m137| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/ArchetypeBalance.test.ts[2m > [22mArchetype Balance[2m > [22mNo Dominant Archetype (Meta Check)[2m > [22mNo archetype should win >70% against all others
+[31m[1mAssertionError[22m: expected 0.8570000000000001 to be less than or equal to 0.7[39m
+[36m [2m❯[22m src/balancing/__tests__/ArchetypeBalance.test.ts:[2m195:43[22m[39m
+    [90m193| [39m            archetypes[33m.[39m[34mforEach[39m(arch [33m=>[39m {
+    [90m194| [39m                [34mexpect[39m(avgWinrates[arch])[33m.[39m[34mtoBeGreaterThanOrEqual[39m([34m0.3[39m)[33m;[39m
+    [90m195| [39m                [34mexpect[39m(avgWinrates[arch])[33m.[39m[34mtoBeLessThanOrEqual[39m([34m0.7[39m)[33m;[39m
+    [90m   | [39m                                          [31m^[39m
+    [90m196| [39m            })[33m;[39m
+    [90m197| [39m        })[33m;[39m
+[90m [2m❯[22m src/balancing/__tests__/ArchetypeBalance.test.ts:[2m193:24[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/BuffShieldIntegration.test.ts[2m > [22mDoT/Buff/Shield Integration[2m > [22mBuff Stat Modifiers[2m > [22mshould apply damage buff to attacker
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'findIndex')[39m
+[36m [2m❯[22m Object.addBuff src/balancing/modules/buffs.ts:[2m92:41[22m[39m
+    [90m 90| [39m        [35mif[39m ([33m![39mnewBuff[33m.[39mstackable) {
+    [90m 91| [39m            [90m// Non-stackable: check if same buff exists (by id)[39m
+    [90m 92| [39m            const existingIndex = buffs.findIndex(b => b.id === newBuf…
+    [90m   | [39m                                        [31m^[39m
+    [90m 93| [39m
+    [90m 94| [39m            [35mif[39m (existingIndex [33m!==[39m [33m-[39m[34m1[39m) {
+[90m [2m❯[22m src/balancing/__tests__/BuffShieldIntegration.test.ts:[2m62:52[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/BuffShieldIntegration.test.ts[2m > [22mDoT/Buff/Shield Integration[2m > [22mBuff Stat Modifiers[2m > [22mshould apply armor debuff to defender
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'findIndex')[39m
+[36m [2m❯[22m Object.addBuff src/balancing/modules/buffs.ts:[2m92:41[22m[39m
+    [90m 90| [39m        [35mif[39m ([33m![39mnewBuff[33m.[39mstackable) {
+    [90m 91| [39m            [90m// Non-stackable: check if same buff exists (by id)[39m
+    [90m 92| [39m            const existingIndex = buffs.findIndex(b => b.id === newBuf…
+    [90m   | [39m                                        [31m^[39m
+    [90m 93| [39m
+    [90m 94| [39m            [35mif[39m (existingIndex [33m!==[39m [33m-[39m[34m1[39m) {
+[90m [2m❯[22m src/balancing/__tests__/BuffShieldIntegration.test.ts:[2m108:52[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[20/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/BuffShieldIntegration.test.ts[2m > [22mDoT/Buff/Shield Integration[2m > [22mShield Absorption[2m > [22mshould absorb damage with shields before HP damage
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'findIndex')[39m
+[36m [2m❯[22m Object.addBuff src/balancing/modules/buffs.ts:[2m92:41[22m[39m
+    [90m 90| [39m        [35mif[39m ([33m![39mnewBuff[33m.[39mstackable) {
+    [90m 91| [39m            [90m// Non-stackable: check if same buff exists (by id)[39m
+    [90m 92| [39m            const existingIndex = buffs.findIndex(b => b.id === newBuf…
+    [90m   | [39m                                        [31m^[39m
+    [90m 93| [39m
+    [90m 94| [39m            [35mif[39m (existingIndex [33m!==[39m [33m-[39m[34m1[39m) {
+[90m [2m❯[22m src/balancing/__tests__/BuffShieldIntegration.test.ts:[2m155:52[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[21/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/BuffShieldIntegration.test.ts[2m > [22mDoT/Buff/Shield Integration[2m > [22mShield Absorption[2m > [22mshould deplete shield and overflow to HP
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'findIndex')[39m
+[36m [2m❯[22m Object.addBuff src/balancing/modules/buffs.ts:[2m92:41[22m[39m
+    [90m 90| [39m        [35mif[39m ([33m![39mnewBuff[33m.[39mstackable) {
+    [90m 91| [39m            [90m// Non-stackable: check if same buff exists (by id)[39m
+    [90m 92| [39m            const existingIndex = buffs.findIndex(b => b.id === newBuf…
+    [90m   | [39m                                        [31m^[39m
+    [90m 93| [39m
+    [90m 94| [39m            [35mif[39m (existingIndex [33m!==[39m [33m-[39m[34m1[39m) {
+[90m [2m❯[22m src/balancing/__tests__/BuffShieldIntegration.test.ts:[2m203:52[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/BuffShieldIntegration.test.ts[2m > [22mDoT/Buff/Shield Integration[2m > [22mDoT Ticks[2m > [22mshould apply DoT damage at turn start
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'findIndex')[39m
+[36m [2m❯[22m Object.addEffect src/balancing/modules/dot.ts:[2m125:39[22m[39m
+    [90m123| [39m        [90m// MODES: 'increment', 'increment_refresh', 'increment_capped'[39m
+    [90m124| [39m        [90m// All use single instance with stacking[39m
+    [90m125| [39m        [35mconst[39m existingIndex [33m=[39m effects[33m.[39m[34mfindIndex[39m(
+    [90m   | [39m                                      [31m^[39m
+    [90m126| [39m            e [33m=>[39m e[33m.[39msource [33m===[39m newEffect[33m.[39msource [33m&&[39m e[33m.[39mid [33m===[39m newEffect[33m.[39mid
+    [90m127| [39m        )[33m;[39m
+[90m [2m❯[22m src/balancing/__tests__/BuffShieldIntegration.test.ts:[2m242:42[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[23/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/BuffShieldIntegration.test.ts[2m > [22mDoT/Buff/Shield Integration[2m > [22mFull Scenario: Buff + Shield + DoT[2m > [22mshould handle complex interactions correctly
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'findIndex')[39m
+[36m [2m❯[22m Object.addBuff src/balancing/modules/buffs.ts:[2m92:41[22m[39m
+    [90m 90| [39m        [35mif[39m ([33m![39mnewBuff[33m.[39mstackable) {
+    [90m 91| [39m            [90m// Non-stackable: check if same buff exists (by id)[39m
+    [90m 92| [39m            const existingIndex = buffs.findIndex(b => b.id === newBuf…
+    [90m   | [39m                                        [31m^[39m
+    [90m 93| [39m
+    [90m 94| [39m            [35mif[39m (existingIndex [33m!==[39m [33m-[39m[34m1[39m) {
+[90m [2m❯[22m src/balancing/__tests__/BuffShieldIntegration.test.ts:[2m283:48[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[24/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/CrossStatCostParity.test.ts[2m > [22mCross-Stat Cost Parity[2m > [22mPrimary Stat Parity[2m > [22mshould balance armor vs hp
+[31m[1mAssertionError[22m: expected 0.317 to be greater than or equal to 0.38[39m
+[36m [2m❯[22m src/balancing/__tests__/CrossStatCostParity.test.ts:[2m60:37[22m[39m
+    [90m 58| [39m        [34mit[39m([32m'should balance armor vs hp'[39m[33m,[39m () [33m=>[39m {
+    [90m 59| [39m            [35mconst[39m result [33m=[39m [34mrunParityTest[39m([32m'armor'[39m[33m,[39m [34m10[39m[33m,[39m [34m50[39m)[33m;[39m
+    [90m 60| [39m            expect(result.winRateA).toBeGreaterThanOrEqual(0.5 - TOLER…
+    [90m   | [39m                                    [31m^[39m
+    [90m 61| [39m            expect(result.winRateA).toBeLessThanOrEqual(0.5 + TOLERANC…
+    [90m 62| [39m        })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[25/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/CrossStatCostParity.test.ts[2m > [22mCross-Stat Cost Parity[2m > [22mComplex Parity (3-stat budget)[2m > [22mshould balance mixed offensive vs defensive builds
+[31m[1mAssertionError[22m: expected 0.268 to be greater than or equal to 0.35[39m
+[36m [2m❯[22m src/balancing/__tests__/CrossStatCostParity.test.ts:[2m102:30[22m[39m
+    [90m100| [39m            console.log(`  Mixed (Dmg/Armor) vs HP: ${(winRateA * 100)…
+    [90m101| [39m            // Note: Mixed builds have higher variance due to multiple…
+    [90m102| [39m            [34mexpect[39m(winRateA)[33m.[39m[34mtoBeGreaterThanOrEqual[39m([34m0.5[39m [33m-[39m [34m0.15[39m)[33m;[39m
+    [90m   | [39m                             [31m^[39m
+    [90m103| [39m            [34mexpect[39m(winRateA)[33m.[39m[34mtoBeLessThanOrEqual[39m([34m0.5[39m [33m+[39m [34m0.15[39m)[33m;[39m
+    [90m104| [39m        })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[26/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/DebugBattle.test.ts[2m > [22mDebug Battle[2m > [22mshould log a full battle between Damage vs HP builds
+[31m[1mTypeError[22m: rng is not a function[39m
+[36m [2m❯[22m src/balancing/modules/initiative.ts:[2m90:30[22m[39m
+    [90m 88| [39m    )[33m:[39m [33mInitiativeRoll[39m[] {
+    [90m 89| [39m        [35mreturn[39m characters[33m.[39m[34mmap[39m(char [33m=>[39m {
+    [90m 90| [39m            [35mconst[39m variance [33m=[39m [34mrng[39m()[33m;[39m
+    [90m   | [39m                             [31m^[39m
+    [90m 91| [39m            const totalInitiative = this.calculateInitiative(char.agil…
+    [90m 92| [39m
+[90m [2m❯[22m Object.generateDetailedRolls src/balancing/modules/initiative.ts:[2m89:27[22m[39m
+[90m [2m❯[22m resolveCombatRound src/engine/combat/logic.ts:[2m103:46[22m[39m
+[90m [2m❯[22m src/balancing/__tests__/DebugBattle.test.ts:[2m36:21[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[27/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22mDiminishing Returns[2m > [22mArmor Diminishing Returns[2m > [22mshould show decreasing marginal value as armor increases
+[31m[1mAssertionError[22m: expected false to be true // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- true[39m
+[31m+ false[39m
+
+[36m [2m❯[22m src/balancing/__tests__/DiminishingReturns.test.ts:[2m83:34[22m[39m
+    [90m 81| [39m
+    [90m 82| [39m            [90m// Armor should clearly diminish[39m
+    [90m 83| [39m            [34mexpect[39m(isDecreasing)[33m.[39m[34mtoBe[39m([35mtrue[39m)[33m;[39m
+    [90m   | [39m                                 [31m^[39m
+    [90m 84| [39m
+    [90m 85| [39m            [90m// Value at 200 armor should be <50% of value at 10 armor[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[28/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22mDiminishing Returns[2m > [22mArmor Diminishing Returns[2m > [22mshould have steep drop-off at high values
+[31m[1mAssertionError[22m: expected 0.375 to be less than 0.26249999999999996[39m
+[36m [2m❯[22m src/balancing/__tests__/DiminishingReturns.test.ts:[2m94:31[22m[39m
+    [90m 92| [39m
+    [90m 93| [39m            [90m// At 3x the armor, value should be <70% of original[39m
+    [90m 94| [39m            [34mexpect[39m(highArmor)[33m.[39m[34mtoBeLessThan[39m(lowArmor [33m*[39m [34m0.7[39m)[33m;[39m
+    [90m   | [39m                              [31m^[39m
+    [90m 95| [39m        })[33m;[39m
+    [90m 96| [39m    })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[29/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22mDiminishing Returns[2m > [22mEvasion Diminishing Returns[2m > [22mshould approach asymptote near cap (95%)
+[31m[1mAssertionError[22m: expected false to be true // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- true[39m
+[31m+ false[39m
+
+[36m [2m❯[22m src/balancing/__tests__/DiminishingReturns.test.ts:[2m106:34[22m[39m
+    [90m104| [39m            )[33m;[39m
+    [90m105| [39m
+    [90m106| [39m            [34mexpect[39m(isDecreasing)[33m.[39m[34mtoBe[39m([35mtrue[39m)[33m;[39m
+    [90m   | [39m                                 [31m^[39m
+    [90m107| [39m
+    [90m108| [39m            // At 90 evasion (near cap), marginal value should be very…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[30/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22mDiminishing Returns[2m > [22mCrit Chance Diminishing Returns[2m > [22mshould show drop-off near cap (100%)
+[31m[1mAssertionError[22m: expected 0 to be less than 0[39m
+[36m [2m❯[22m src/balancing/__tests__/DiminishingReturns.test.ts:[2m122:39[22m[39m
+    [90m120| [39m
+    [90m121| [39m            [90m// At 95% crit, adding more should be nearly worthless[39m
+    [90m122| [39m            expect(marginalValues[4]).toBeLessThan(marginalValues[0] *…
+    [90m   | [39m                                      [31m^[39m
+    [90m123| [39m        })[33m;[39m
+    [90m124| [39m    })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[31/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22mDiminishing Returns[2m > [22mDamage Linearity (Control Test)[2m > [22mshould remain relatively linear
+[31m[1mAssertionError[22m: expected 0 to be greater than 0[39m
+[36m [2m❯[22m src/balancing/__tests__/DiminishingReturns.test.ts:[2m136:39[22m[39m
+    [90m134| [39m            [90m// Damage should NOT diminish heavily[39m
+    [90m135| [39m            // Even at 100 damage, marginal value should be >70% of ba…
+    [90m136| [39m            expect(marginalValues[4]).toBeGreaterThan(marginalValues[0…
+    [90m   | [39m                                      [31m^[39m
+    [90m137| [39m        })[33m;[39m
+    [90m138| [39m    })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[32/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22mDiminishing Returns[2m > [22mHP vs Damage Comparison[2m > [22mshould show HP is more stable than defensive stats
+[31m[1mAssertionError[22m: expected 1 to be less than 1[39m
+[36m [2m❯[22m src/balancing/__tests__/DiminishingReturns.test.ts:[2m158:32[22m[39m
+    [90m156| [39m            const armorVariance = Math.max(...armorCurve.marginalValue…
+    [90m157| [39m
+    [90m158| [39m            [34mexpect[39m(hpVariance)[33m.[39m[34mtoBeLessThan[39m(armorVariance)[33m;[39m
+    [90m   | [39m                               [31m^[39m
+    [90m159| [39m        })[33m;[39m
+    [90m160| [39m    })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[33/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22mDiminishing Returns[2m > [22mPractical Breakpoints[2m > [22mshould identify sweet spots for armor investment
+[31m[1mAssertionError[22m: expected 0.375 to be greater than 0.375[39m
+[36m [2m❯[22m src/balancing/__tests__/DiminishingReturns.test.ts:[2m177:29[22m[39m
+    [90m175| [39m
+    [90m176| [39m            [90m// First 20 armor should be most valuable[39m
+    [90m177| [39m            [34mexpect[39m(armor20)[33m.[39m[34mtoBeGreaterThan[39m(armor50)[33m;[39m
+    [90m   | [39m                            [31m^[39m
+    [90m178| [39m            [34mexpect[39m(armor50)[33m.[39m[34mtoBeGreaterThan[39m(armor100)[33m;[39m
+    [90m179| [39m        })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[34/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22mDiminishing Returns[2m > [22mPractical Breakpoints[2m > [22mshould identify efficient crit investment range
+[31m[1mAssertionError[22m: expected 0 to be greater than 0[39m
+[36m [2m❯[22m src/balancing/__tests__/DiminishingReturns.test.ts:[2m195:28[22m[39m
+    [90m193| [39m            [90m// Sweet spot: 10-50% crit[39m
+    [90m194| [39m            [90m// Above 50%, marginal value should drop significantly[39m
+    [90m195| [39m            [34mexpect[39m(crit10)[33m.[39m[34mtoBeGreaterThan[39m(crit75 [33m*[39m [34m1.5[39m)[33m;[39m
+    [90m   | [39m                           [31m^[39m
+    [90m196| [39m        })[33m;[39m
+    [90m197| [39m    })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[35/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22mDiminishing Returns[2m > [22mExtreme Values (Saturation Test)[2m > [22mshould handle 0 values gracefully
+[31m[1mAssertionError[22m: expected 0 to be greater than 0[39m
+[36m [2m❯[22m src/balancing/__tests__/DiminishingReturns.test.ts:[2m206:32[22m[39m
+    [90m204| [39m            [90m// Should not crash and should return reasonable values[39m
+    [90m205| [39m            [34mexpect[39m(zeroArmor)[33m.[39m[34mtoBeGreaterThan[39m([34m0[39m)[33m;[39m
+    [90m206| [39m            [34mexpect[39m(zeroDamage)[33m.[39m[34mtoBeGreaterThan[39m([34m0[39m)[33m;[39m
+    [90m   | [39m                               [31m^[39m
+    [90m207| [39m        })[33m;[39m
+    [90m208| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[36/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/DiminishingReturns.test.ts[2m > [22mDiminishing Returns[2m > [22mExtreme Values (Saturation Test)[2m > [22mshould saturate defensive stats at extreme values
+[31m[1mAssertionError[22m: expected 0.37500000000005684 to be less than 0.037500000000000006[39m
+[36m [2m❯[22m src/balancing/__tests__/DiminishingReturns.test.ts:[2m214:34[22m[39m
+    [90m212| [39m
+    [90m213| [39m            [90m// Extreme armor should have VERY low marginal value[39m
+    [90m214| [39m            [34mexpect[39m(extremeArmor)[33m.[39m[34mtoBeLessThan[39m(normalArmor [33m*[39m [34m0.1[39m)[33m;[39m
+    [90m   | [39m                                 [31m^[39m
+    [90m215| [39m        })[33m;[39m
+    [90m216| [39m    })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[37/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/SpellValidation.test.ts[2m > [22mSpell Validation[2m > [22mno spell should have legendary field
+[31m[1mAssertionError[22m: expected 1 to be +0 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 0[39m
+[31m+ 1[39m
+
+[36m [2m❯[22m src/balancing/__tests__/SpellValidation.test.ts:[2m47:37[22m[39m
+    [90m 45| [39m    [34mit[39m([32m'no spell should have legendary field'[39m[33m,[39m () [33m=>[39m {
+    [90m 46| [39m        [35mconst[39m hasLegendary [33m=[39m spells[33m.[39m[34mfilter[39m(s [33m=>[39m [32m'legendary'[39m [35min[39m s)[33m;[39m
+    [90m 47| [39m        [34mexpect[39m(hasLegendary[33m.[39mlength)[33m.[39m[34mtoBe[39m([34m0[39m)[33m;[39m
+    [90m   | [39m                                    [31m^[39m
+    [90m 48| [39m    })[33m;[39m
+    [90m 49| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[38/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/spellCost.test.ts[2m > [22mcalculateSpellCost[2m > [22mdefault spell has cost 0 and is balanced
+[31m[1mAssertionError[22m: expected -10 to be +0 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 0[39m
+[31m+ -10[39m
+
+[36m [2m❯[22m src/balancing/__tests__/spellCost.test.ts:[2m8:43[22m[39m
+    [90m  6| [39m    [34mtest[39m([32m'default spell has cost 0 and is balanced'[39m[33m,[39m () [33m=>[39m {
+    [90m  7| [39m        [35mconst[39m spell [33m=[39m [34mcreateEmptySpell[39m()[33m;[39m
+    [90m  8| [39m        [34mexpect[39m([34mcalculateSpellCost[39m(spell))[33m.[39m[34mtoBe[39m([34m0[39m)[33m;[39m
+    [90m   | [39m                                          [31m^[39m
+    [90m  9| [39m        [34mexpect[39m([34misSpellBalanced[39m(spell))[33m.[39m[34mtoBe[39m([35mtrue[39m)[33m;[39m
+    [90m 10| [39m    })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[39/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/spellCost.test.ts[2m > [22mcalculateSpellCost[2m > [22mdoubleSpell flag subtracts 1 point
+[31m[1mAssertionError[22m: expected -10 to be -1 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- -1[39m
+[31m+ -10[39m
+
+[36m [2m❯[22m src/balancing/__tests__/spellCost.test.ts:[2m21:43[22m[39m
+    [90m 19| [39m    [34mtest[39m([32m'doubleSpell flag subtracts 1 point'[39m[33m,[39m () [33m=>[39m {
+    [90m 20| [39m        [35mconst[39m spell [33m=[39m { [33m...[39m[34mcreateEmptySpell[39m()[33m,[39m doubleSpell[33m:[39m [35mtrue[39m }[33m;[39m
+    [90m 21| [39m        [34mexpect[39m([34mcalculateSpellCost[39m(spell))[33m.[39m[34mtoBe[39m([33m-[39m[34m1[39m)[33m;[39m
+    [90m   | [39m                                          [31m^[39m
+    [90m 22| [39m        [34mexpect[39m([34misSpellBalanced[39m(spell))[33m.[39m[34mtoBe[39m([35mfalse[39m)[33m;[39m
+    [90m 23| [39m    })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[40/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/balancing/__tests__/spellCost.test.ts[2m > [22mcalculateSpellCost[2m > [22mcombined adjustments can reach zero
+[31m[1mAssertionError[22m: expected 6 to be 4 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 4[39m
+[31m+ 6[39m
+
+[36m [2m❯[22m src/balancing/__tests__/spellCost.test.ts:[2m35:43[22m[39m
+    [90m 33| [39m        }[33m;[39m
+    [90m 34| [39m        [90m// total: 5 -1 +1 +1 -2 = 4[39m
+    [90m 35| [39m        [34mexpect[39m([34mcalculateSpellCost[39m(spell))[33m.[39m[34mtoBe[39m([34m4[39m)[33m;[39m
+    [90m   | [39m                                          [31m^[39m
+    [90m 36| [39m        [90m// adjust scale to -4 to bring to zero[39m
+    [90m 37| [39m        [35mconst[39m balanced [33m=[39m { [33m...[39mspell[33m,[39m scale[33m:[39m [33m-[39m[34m4[39m }[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[41/42]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/shared/testing/StorageIntegration.test.ts[2m > [22mStorage Integration Tests[2m > [22mMultiple Storage Keys[2m > [22mshould handle multiple storage keys
+[31m[1mAssertionError[22m: expected 90 to be 100 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 100[39m
+[31m+ 90[39m
+
+[36m [2m❯[22m src/shared/testing/StorageIntegration.test.ts:[2m400:35[22m[39m
+    [90m398| [39m      [35mconst[39m results [33m=[39m [35mawait[39m tester[33m.[39m[34mrunFullTest[39m(testData)[33m;[39m
+    [90m399| [39m
+    [90m400| [39m      [34mexpect[39m(results[33m.[39msuccessRate)[33m.[39m[34mtoBe[39m([34m100[39m)[33m;[39m
+    [90m   | [39m                                  [31m^[39m
+    [90m401| [39m      [34mexpect[39m(results[33m.[39mpassedCount)[33m.[39m[34mtoBe[39m([34m10[39m)[33m;[39m
+    [90m402| [39m    })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[42/42]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m14 failed[39m[22m[2m | [22m[1m[32m39 passed[39m[22m[2m | [22m[33m8 skipped[39m[90m (61)[39m
+[2m      Tests [22m [1m[31m37 failed[39m[22m[2m | [22m[1m[32m294 passed[39m[22m[2m | [22m[33m74 skipped[39m[90m (405)[39m
+[2m   Start at [22m 17:04:06
+[2m   Duration [22m 14.90s[2m (transform 2.46s, setup 661ms, import 5.57s, tests 32.49s, environment 56.34s)[22m
+

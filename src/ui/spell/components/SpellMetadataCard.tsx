@@ -3,7 +3,7 @@ import type { Spell } from '../../../balancing/spellTypes';
 
 interface SpellMetadataCardProps {
     spell: Spell;
-    updateField: (field: keyof Spell, value: any) => void;
+    updateField: <K extends keyof Spell>(field: K, value: Spell[K]) => void;
 }
 
 export const SpellMetadataCard: React.FC<SpellMetadataCardProps> = ({ spell, updateField }) => {
@@ -43,7 +43,7 @@ export const SpellMetadataCard: React.FC<SpellMetadataCardProps> = ({ spell, upd
                     <label className="text-xs uppercase tracking-wider text-gray-400 font-semibold">Scaling Stat</label>
                     <select
                         value={spell.scalingStat || ''}
-                        onChange={e => updateField('scalingStat', e.target.value || undefined)}
+                        onChange={e => updateField('scalingStat', (e.target.value || undefined) as Spell['scalingStat'])}
                         className="w-full bg-black/20 text-white px-3 py-2 rounded border border-white/10 text-sm focus:border-purple-400 focus:shadow-[0_0_8px_rgba(168,85,247,0.5)] outline-none transition-all appearance-none"
                     >
                         <option value="">None</option>
@@ -61,7 +61,7 @@ export const SpellMetadataCard: React.FC<SpellMetadataCardProps> = ({ spell, upd
                         <label className="text-xs uppercase tracking-wider text-gray-400 font-semibold">CC Effect</label>
                         <select
                             value={spell.ccEffect || ''}
-                            onChange={e => updateField('ccEffect', e.target.value || undefined)}
+                            onChange={e => updateField('ccEffect', (e.target.value || undefined) as Spell['ccEffect'])}
                             className="w-full bg-black/20 text-white px-3 py-2 rounded border border-white/10 text-sm focus:border-purple-400 focus:shadow-[0_0_8px_rgba(168,85,247,0.5)] outline-none transition-all appearance-none"
                         >
                             <option value="">None</option>

@@ -60,6 +60,13 @@ export class MarginalUtilityCalculator {
 
     const winRate = results.summary.winRates.entity2;
     const avgTurns = results.combatStatistics.averageTurns;
+    const drawRate = results.summary.winRates.draws;
+
+    const baselineDpt = results.damageMetrics.entity1.average;
+    const archetypeDpt = results.damageMetrics.entity2.average;
+    const dptRatio = baselineDpt > 0 ? archetypeDpt / baselineDpt : 1;
+
+    const deltaWinRate = winRate - 0.5;
 
     // hpEfficiency.entityX = average(damageDealt / hpLost)
     // We can approximate HP trade by comparing these two efficiencies.
@@ -87,6 +94,9 @@ export class MarginalUtilityCalculator {
       type: statsArchetype.type,
       winRate,
       avgTurns,
+      deltaWinRate,
+      dptRatio,
+      drawRate,
       hpTradeEfficiency,
       utilityScore,
       confidence,

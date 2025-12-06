@@ -52,13 +52,17 @@ const SortableCard: React.FC<SortableCardProps> = ({
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: card.id });
 
+  const hasManyStats = card.statIds.length >= 4;
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   } as React.CSSProperties;
 
+  const className = hasManyStats ? 'sm:col-span-2 md:col-span-2 lg:col-span-2 2xl:col-span-2' : '';
+
   return (
-    <div ref={setNodeRef} style={style} {...attributes}>
+    <div ref={setNodeRef} style={style} {...attributes} className={className}>
       <ConfigurableCard
         card={card}
         stats={stats}
@@ -319,14 +323,14 @@ export const BalancerNew: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-full px-4 py-4 bg-[radial-gradient(circle_at_top,_#1f2937_0,_#020617_55%,_#000000_100%)] text-[#e2e8f0] overflow-hidden">
+    <div className="observatory-page">
       {/* Subtle animated glow/stars */}
-      <div className="pointer-events-none absolute inset-0 opacity-40">
-        <div className="absolute -top-32 -left-32 w-72 h-72 rounded-full bg-[radial-gradient(circle,_rgba(129,140,248,0.35)_0,transparent_60%)] blur-3xl animate-pulse" />
-        <div className="absolute bottom-[-6rem] right-[-4rem] w-80 h-80 rounded-full bg-[radial-gradient(circle,_rgba(56,189,248,0.3)_0,transparent_65%)] blur-3xl animate-[ping_12s_linear_infinite]" />
+      <div className="observatory-bg-orbits">
+        <div className="observatory-bg-orbit-left" />
+        <div className="observatory-bg-orbit-right" />
       </div>
 
-      <div className="relative max-w-6xl mx-auto space-y-3">
+      <div className="observatory-shell space-y-3">
         <header className="flex items-center justify-between gap-2">
           <div className="flex flex-col">
             <h1 className="flex items-center gap-2 text-3xl font-semibold tracking-[0.3em] uppercase text-indigo-200 drop-shadow-[0_0_14px_rgba(129,140,248,0.9)]">
@@ -404,7 +408,7 @@ export const BalancerNew: React.FC = () => {
           </div>
         )}
 
-        <div className="rounded-2xl border border-indigo-500/30 bg-slate-900/60 backdrop-blur-md p-4 shadow-[0_18px_45px_rgba(15,23,42,0.9)] relative overflow-hidden min-h-[600px]">
+        <div className="observatory-panel min-h-[600px]">
                     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={cards.map((c) => c.id)} strategy={verticalListSortingStrategy}>
               <div className="grid gap-2.5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">

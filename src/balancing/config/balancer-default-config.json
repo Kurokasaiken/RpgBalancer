@@ -78,10 +78,25 @@
       "isLocked": false,
       "isHidden": false
     },
+    "baseHitChance": {
+      "id": "baseHitChance",
+      "label": "Base % to Hit",
+      "description": "Baseline hit chance when TxC equals Evasion",
+      "type": "percentage",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "defaultValue": 50,
+      "weight": 0,
+      "isCore": false,
+      "isDerived": false,
+      "isLocked": false,
+      "isHidden": false
+    },
     "hitChance": {
       "id": "hitChance",
       "label": "Hit Chance %",
-      "description": "Final chance to hit: txc + 50 - evasion",
+      "description": "Final chance to hit including baseline chance",
       "type": "percentage",
       "min": 0,
       "max": 100,
@@ -90,7 +105,7 @@
       "weight": 1,
       "isCore": false,
       "isDerived": true,
-      "formula": "txc + 50 - evasion",
+      "formula": "txc - evasion + baseHitChance",
       "isLocked": false,
       "isHidden": false
     },
@@ -390,7 +405,7 @@
       "title": "Accuracy",
       "color": "text-cyan-300",
       "icon": "🎯",
-      "statIds": ["txc", "evasion", "hitChance", "attacksPerKo"],
+      "statIds": ["txc", "evasion", "baseHitChance", "hitChance", "attacksPerKo"],
       "isCore": false,
       "order": 1,
       "isHidden": false

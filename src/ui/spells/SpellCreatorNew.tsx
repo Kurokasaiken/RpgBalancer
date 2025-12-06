@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from 'sonner';
+import { Sparkles } from 'lucide-react';
 import { SpellInfoForm } from '../spell/components/SpellInfoForm';
 import { StatsGrid } from '../spell/components/StatsGrid';
 import { ActionsBar } from '../spell/components/ActionsBar';
@@ -226,18 +227,18 @@ export const SpellCreatorNew: React.FC = () => {
   };
 
   return (
-    <div className="h-full overflow-y-auto bg-[radial-gradient(circle_at_top,#020617_0,#020617_55%,#000000_100%)] p-4 relative text-slate-100">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.08)_1px,transparent_1px)] bg-size-[22px_22px] opacity-40" />
-        <div className="absolute w-80 h-80 bg-cyan-500/15 rounded-full blur-3xl -top-10 -left-20" />
-        <div className="absolute w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl bottom-0 -right-16" />
+    <div className="observatory-page overflow-y-auto">
+      <div className="observatory-bg-orbits">
+        <div className="observatory-bg-orbit-left" />
+        <div className="observatory-bg-orbit-right" />
       </div>
 
-      <div className="max-w-7xl mx-auto relative z-10">
+      <div className="observatory-shell relative z-10">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl md:text-3xl font-semibold tracking-[0.25em] uppercase text-indigo-200 drop-shadow-[0_0_12px_rgba(129,140,248,0.8)]">
-              Spell Creator
+            <h1 className="flex items-center gap-2 text-2xl md:text-3xl font-semibold tracking-[0.25em] uppercase text-indigo-200 drop-shadow-[0_0_12px_rgba(129,140,248,0.8)]">
+              <Sparkles className="w-6 h-6 text-cyan-300 drop-shadow-[0_0_10px_rgba(56,189,248,0.8)]" />
+              <span>Spell Creator</span>
             </h1>
             <p className="mt-1 text-[10px] md:text-xs text-slate-400 uppercase tracking-[0.25em]">
               Arcane Tech Glass · Config-Driven
@@ -259,7 +260,7 @@ export const SpellCreatorNew: React.FC = () => {
         </div>
 
         <div className="flex flex-col md:flex-row items-stretch gap-4 mb-4">
-          <div className="w-full md:w-5/12">
+          <div className="w-full md:w-1/2">
             {configSpells.length > 0 && (
               <div className="mb-3 bg-slate-900/70 border border-indigo-500/40 rounded-2xl px-3 py-2 text-[10px] uppercase tracking-[0.18em] text-slate-400">
                 <div className="flex items-center justify-between mb-1">
@@ -315,11 +316,14 @@ export const SpellCreatorNew: React.FC = () => {
             />
           </div>
 
-          <div className="w-full md:w-7/12 min-w-[300px]">
-            <div className="backdrop-blur-md bg-slate-900/70 border border-cyan-500/40 rounded-2xl p-4 h-full shadow-[0_0_24px_rgba(34,211,238,0.35)] overflow-y-auto">
-              <div className="flex justify-between items-center text-lg font-bold text-cyan-100 mb-2 border-b border-cyan-500/30 pb-1">
-                <span>Preview Spell</span>
-                <span className="text-sm font-mono text-cyan-400">
+          <div className="w-full md:w-1/2 min-w-[300px]">
+            <div className="observatory-panel observatory-panel-ambient h-full overflow-y-auto flex flex-col">
+              <div className="spell-stat-header flex justify-between items-center px-2.5 py-1.5 mb-2 rounded-[0.7rem]">
+                <span className="spell-stat-title text-[11px] font-semibold uppercase text-cyan-100 truncate">
+                  <Sparkles className="w-4 h-4 text-cyan-300 drop-shadow-[0_0_8px_rgba(56,189,248,0.8)]" />
+                  Preview Spell
+                </span>
+                <span className="text-[11px] font-mono text-cyan-400 text-right">
                   {preview.primaryText}
                   {preview.secondaryText && (
                     <span className="text-xs text-cyan-300 ml-2">{preview.secondaryText}</span>
@@ -361,26 +365,31 @@ export const SpellCreatorNew: React.FC = () => {
               </div>
 
               {(spell.type === 'buff' || spell.type === 'debuff') && (
-                <div className="mt-2 p-2 bg-slate-900/70 rounded border border-cyan-500/30">
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className={spell.type === 'buff' ? 'text-emerald-400' : 'text-red-400'}>
-                      {spell.type === 'buff' ? 'Increases' : 'Decreases'} {spell.targetStat || 'damage'}
+                <div className="mt-2">
+                  <div className="spell-stat-row text-[11px]">
+                    <span className="spell-stat-label">
+                      {spell.type === 'buff' ? 'Buff' : 'Debuff'} Summary
                     </span>
-                    <span className="text-slate-500">by</span>
-                    <span className="font-bold text-slate-50">{Math.abs(spell.effect)}%</span>
-                    <span className="text-slate-500">for</span>
-                    <span className="font-bold text-slate-50">{spell.eco} turns</span>
+                    <span className="flex items-center gap-1 text-[11px]">
+                      <span className={spell.type === 'buff' ? 'text-emerald-300' : 'text-red-300'}>
+                        {spell.type === 'buff' ? 'Increases' : 'Decreases'} {spell.targetStat || 'damage'}
+                      </span>
+                      <span className="text-slate-400">by</span>
+                      <span className="spell-stat-value">{Math.abs(spell.effect)}%</span>
+                      <span className="text-slate-400">for</span>
+                      <span className="spell-stat-value">{spell.eco} turns</span>
+                    </span>
                   </div>
                 </div>
               )}
 
               <ul className="mt-3 text-xs text-cyan-50 grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-1">
                 {spell.effect !== undefined && (
-                  <li className="flex justify-between items-center hover:bg-cyan-500/10 p-0.5 rounded transition-colors border-b border-cyan-500/10">
-                    <span className="font-medium text-cyan-300/70 capitalize truncate mr-2">
+                  <li className="spell-stat-row">
+                    <span className="spell-stat-label">
                       {spell.type === 'buff' || spell.type === 'debuff' ? 'Modification %' : 'Effect'}
                     </span>
-                    <span className="font-mono text-cyan-300 font-bold drop-shadow-[0_0_4px_rgba(34,211,238,0.4)]">
+                    <span className="spell-stat-value">
                       {spell.effect}
                     </span>
                   </li>
@@ -419,30 +428,32 @@ export const SpellCreatorNew: React.FC = () => {
           </div>
         </div>
 
-        <div className="h-px bg-linear-to-r from-transparent via-slate-300/40 to-transparent my-8" />
+        <div className="h-px bg-linear-to-r from-transparent via-slate-300/40 to-transparent my-4" />
 
-        <StatsGrid
-          statOrder={statOrder}
-          getStatDescription={getStatDescription}
-          isMalus={isMalus}
-          collapsedStats={collapsedStats}
-          toggleCollapse={toggleCollapse}
-          getStatSteps={getStatSteps}
-          updateStatStep={updateStatStep}
-          addStatStep={addStatStep}
-          removeStatStep={removeStatStep}
-          selectedTicks={selectedTicks}
-          onSelectTick={handleSelectTick}
-          onDragStart={handleDragStart}
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
-        />
+        <div className="mt-4">
+          <StatsGrid
+            statOrder={statOrder}
+            getStatDescription={getStatDescription}
+            isMalus={isMalus}
+            collapsedStats={collapsedStats}
+            toggleCollapse={toggleCollapse}
+            getStatSteps={getStatSteps}
+            updateStatStep={updateStatStep}
+            addStatStep={addStatStep}
+            removeStatStep={removeStatStep}
+            selectedTicks={selectedTicks}
+            onSelectTick={handleSelectTick}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+          />
+        </div>
 
-        <div className="h-px bg-linear-to-r from-transparent via-slate-300/40 to-transparent my-8" />
+        <div className="h-px bg-linear-to-r from-transparent via-slate-300/40 to-transparent my-4" />
 
         <SpellInfoForm spell={spell} updateField={updateField} />
 
-        <div className="h-px bg-linear-to-r from-transparent via-slate-300/40 to-transparent my-8" />
+        <div className="h-px bg-linear-to-r from-transparent via-slate-300/40 to-transparent my-4" />
 
         <ActionsBar onReset={handleReset} onSave={handleSave} onSaveDefault={handleSaveDefault} balance={balance} />
       </div>

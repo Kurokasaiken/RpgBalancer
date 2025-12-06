@@ -17,14 +17,16 @@ export const SpellLibrary: React.FC = () => {
     };
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         refresh();
     }, []);
 
     useEffect(() => {
-        if (spells.length > 0 && !selectedSpell) {
-            setSelectedSpell(spells[0]);
+        if (spells.length > 0) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setSelectedSpell(prev => prev || spells[0]);
         }
-    }, [spells, selectedSpell]);
+    }, [spells]);
 
     const handleDelete = (id: string) => {
         deleteSpell(id);

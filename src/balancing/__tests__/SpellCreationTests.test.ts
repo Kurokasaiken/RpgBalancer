@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { createEmptySpell } from '../spellTypes';
-import { calculateSpellBudget, SPELL_CONFIG } from '../spellBalancingConfig';
+import { calculateSpellBudget, SPELL_CONFIG, getStatWeight } from '../spellBalancingConfig';
 
 
 describe('Spell Creation Module', () => {
@@ -35,8 +35,9 @@ describe('Spell Creation Module', () => {
         // Modify effect from baseline (0) by +200
         spell.effect = 200;
         const cost = calculateSpellBudget(spell);
-        // 200 * 0.01 (weight) = 2.0
-        expect(cost).toBeCloseTo(2.0);
+        // 200 * weight
+        const expectedCost = 200 * getStatWeight('effect');
+        expect(cost).toBeCloseTo(expectedCost);
     });
 
 

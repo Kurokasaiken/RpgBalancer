@@ -76,7 +76,7 @@ function App() {
 
   // Listen for spell creation navigation from SpellLibrary
   useEffect(() => {
-    const handleNavigate = () => setActiveTab('spellCreation');
+    const handleNavigate = () => setActiveTab('spellCreationNew');
     window.addEventListener('navigate-spell-creation', handleNavigate as EventListener);
     return () => window.removeEventListener('navigate-spell-creation', handleNavigate as EventListener);
   }, []);
@@ -85,14 +85,14 @@ function App() {
     <FantasyLayout activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab as Tab)}>
       {activeTab === 'balancer' && (
         <ErrorBoundary componentName="Balancer">
-          <FantasyBalancer />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'balancerLegacy' && (
-        <ErrorBoundary componentName="Config-Driven Balancer (WIP)">
           <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Balancer…</div>}>
             <BalancerNew />
           </Suspense>
+        </ErrorBoundary>
+      )}
+      {activeTab === 'balancerLegacy' && (
+        <ErrorBoundary componentName="Legacy Balancer">
+          <FantasyBalancer />
         </ErrorBoundary>
       )}
       {activeTab === 'testing' && (
@@ -118,12 +118,12 @@ function App() {
         </ErrorBoundary>
       )}
       {activeTab === 'spellCreation' && (
-        <ErrorBoundary componentName="Spell Creation">
+        <ErrorBoundary componentName="Spell Creation (Legacy)">
           <FantasySpellCreation />
         </ErrorBoundary>
       )}
       {activeTab === 'spellCreationNew' && (
-        <ErrorBoundary componentName="Spell Creation (New UI)">
+        <ErrorBoundary componentName="Spell Creation">
           <SpellCreatorNew />
         </ErrorBoundary>
       )}

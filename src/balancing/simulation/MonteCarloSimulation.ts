@@ -86,11 +86,32 @@ export class MonteCarloSimulation {
             overkill1Array.push(result.overkill.entity1);
             overkill2Array.push(result.overkill.entity2);
 
-            // Calculate HP efficiency (damage dealt / HP lost)
+            // Track HP efficiency (damage dealt / HP lost)
             const hpLost1 = combat.entity1.hp - result.hpRemaining.entity1;
             const hpLost2 = combat.entity2.hp - result.hpRemaining.entity2;
-            efficiency1Array.push(hpLost1 > 0 ? result.damageDealt.entity1 / hpLost1 : 0);
-            efficiency2Array.push(hpLost2 > 0 ? result.damageDealt.entity2 / hpLost2 : 0);
+
+            // Previous behaviour: hpLost == 0 => efficiency 0.
+            // This incorrectly penalised "perfect wins" (no HP lost, damage dealt > 0),
+            // making very strong builds (e.g. high Damage oneshots) look weak in
+            // marginal utility analysis.
+            //
+            // New behaviour:
+            // - If hpLost > 0 => use damageDealt / hpLost as before.
+            // - If hpLost == 0 and damageDealt > 0 => treat as capped maximum efficiency.
+            //   We cap at 100.0 to avoid Infinity skew; MarginalUtilityCalculator will
+            //   still clamp hpTradeEfficiency to a reasonable band.
+            // - If both hpLost == 0 and damageDealt == 0 (true stalemate) => efficiency 0.
+
+            const eff1 = hpLost1 > 0
+                ? result.damageDealt.entity1 / hpLost1
+                : (result.damageDealt.entity1 > 0 ? 100.0 : 0);
+
+            const eff2 = hpLost2 > 0
+                ? result.damageDealt.entity2 / hpLost2
+                : (result.damageDealt.entity2 > 0 ? 100.0 : 0);
+
+            efficiency1Array.push(eff1);
+            efficiency2Array.push(eff2);
 
             // Report progress
             if (onProgress && (i + 1) % 1000 === 0) {

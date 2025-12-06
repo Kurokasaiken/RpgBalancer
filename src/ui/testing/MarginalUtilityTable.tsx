@@ -16,6 +16,8 @@ export const MarginalUtilityTable: React.FC<MarginalUtilityTableProps> = ({ metr
             <th className="px-4 py-2 text-left font-semibold text-indigo-200">Stat</th>
             <th className="px-2 py-2 text-right font-semibold text-indigo-200">Tier</th>
             <th className="px-2 py-2 text-right font-semibold text-cyan-200">Win%</th>
+            <th className="px-2 py-2 text-right font-semibold text-cyan-200">ΔWin%</th>
+            <th className="px-2 py-2 text-right font-semibold text-cyan-200">DPT×</th>
             <th className="px-2 py-2 text-right font-semibold text-cyan-200">Turns</th>
             <th className="px-2 py-2 text-right font-semibold text-cyan-200">HP Trade</th>
             <th className="px-2 py-2 text-right font-semibold text-amber-200">Utility</th>
@@ -25,10 +27,14 @@ export const MarginalUtilityTable: React.FC<MarginalUtilityTableProps> = ({ metr
         <tbody>
           {sorted.map((m) => {
             const winPct = (m.winRate * 100).toFixed(1);
+            const deltaWinPct = (m.deltaWinRate * 100).toFixed(1);
+            const dptRatio = m.dptRatio.toFixed(2);
             const tradePct = (m.hpTradeEfficiency * 100).toFixed(1);
             const utility = m.utilityScore.toFixed(2);
 
             const winClass = m.winRate > 0.55 ? 'text-emerald-300' : m.winRate < 0.45 ? 'text-rose-300' : 'text-slate-200';
+            const deltaClass = m.deltaWinRate > 0.1 ? 'text-emerald-300' : m.deltaWinRate < -0.1 ? 'text-rose-300' : 'text-slate-400';
+            const dptClass = m.dptRatio > 1.05 ? 'text-emerald-300' : m.dptRatio < 0.95 ? 'text-rose-300' : 'text-slate-200';
             const utilityClass = m.utilityScore > 1.1 ? 'text-amber-300' : m.utilityScore < 0.9 ? 'text-rose-300' : 'text-slate-200';
 
             return (
@@ -39,6 +45,12 @@ export const MarginalUtilityTable: React.FC<MarginalUtilityTableProps> = ({ metr
                 <td className="px-2 py-1.5 text-right text-slate-300">+{m.pointsPerStat}</td>
                 <td className="px-2 py-1.5 text-right font-semibold">
                   <span className={winClass}>{winPct}%</span>
+                </td>
+                <td className="px-2 py-1.5 text-right font-semibold">
+                  <span className={deltaClass}>{deltaWinPct}%</span>
+                </td>
+                <td className="px-2 py-1.5 text-right font-semibold">
+                  <span className={dptClass}>{dptRatio}×</span>
                 </td>
                 <td className="px-2 py-1.5 text-right text-slate-300">{m.avgTurns.toFixed(2)}</td>
                 <td className="px-2 py-1.5 text-right text-slate-300">{tradePct}%</td>

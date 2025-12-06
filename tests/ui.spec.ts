@@ -8,15 +8,14 @@ test.describe('UI Verification Suite', () => {
         await page.waitForLoadState('networkidle');
     });
 
-    test('App Loads: Grid Arena Tab is Default', async ({ page }) => {
-        // Verify Grid Arena loads by default (as per App.tsx default tab)
-        await expect(page.locator('text=Turn 1')).toBeVisible();
-        await expect(page.locator('text=Combat started')).toBeVisible();
+    test('App Loads: Balancer Tab is Default', async ({ page }) => {
+        // Verify Balancer (config-driven) loads by default
+        await expect(page.locator('h1:has-text("Balancer")').first()).toBeVisible();
     });
 
     test('Spell Library: Navigation and Create Spell', async ({ page }) => {
-        // Navigate to Spell Library
-        await page.locator('button:has-text("Spell Library")').click();
+        // Navigate to Spell Library (now labelled "Grimoire" in nav)
+        await page.locator('button:has-text("Grimoire")').click();
         await expect(page.locator('h2:has-text("Spell Library")')).toBeVisible();
 
         // Click New Spell button
@@ -31,8 +30,8 @@ test.describe('UI Verification Suite', () => {
     });
 
     test('Grid Arena: Entities and Interaction', async ({ page }) => {
-        // Grid Arena should be default tab, but click anyway for safety
-        await page.locator('button:has-text("⚔️ Grid Arena")').click();
+        // Navigate to Grid Arena (labelled "Battlefield" in nav)
+        await page.locator('button:has-text("Battlefield")').click();
 
         // Verify Turn indicator
         await expect(page.locator('text=Turn 1')).toBeVisible();
@@ -46,41 +45,26 @@ test.describe('UI Verification Suite', () => {
         await expect(page.locator('text=Combat started')).toBeVisible();
     });
 
-    test('Stat Weigher: Full Analysis Flow', async ({ page }) => {
-        // Navigate to Arena Lab
-        await page.locator('button:has-text("Arena Lab")').click();
+    test('Stat Testing: Stat Stress Testing page loads', async ({ page }) => {
+        // Navigate to Stat Testing (Stat Stress Testing page)
+        await page.locator('button:has-text("Stat Testing")').click();
         await page.waitForTimeout(500);
 
-        // Click Balance sub-tab (with emoji)
-        await page.locator('button:has-text("⚖️ Balance")').click();
-        await page.waitForTimeout(500);
+        // Verify we are on the Stat Efficiency Testing page
+        await expect(page.locator('h1:has-text("Stat Efficiency Testing")')).toBeVisible();
 
-        // Click Stat Weighting
-        await page.locator('button:has-text("⚖️ Stat Weighting")').click();
-        await page.waitForTimeout(500);
-
-        // Verify we're on Stat Weigher
-        await expect(page.locator('h3:has-text("Stat Weight Calculator")')).toBeVisible();
-
-        // Click Run Analysis
-        await page.locator('button:has-text("Run Analysis")').click();
-
-        // Wait for results table (this takes time due to simulations)
-        await expect(page.locator('table')).toBeVisible({ timeout: 30000 });
-
-        // Verify results show data
-        await expect(page.locator('text=HP Equivalent')).toBeVisible();
-        await expect(page.locator('text=+1 critChance')).toBeVisible();
+        // Key controls should be present
+        await expect(page.locator('button:has-text("Run All Tiers")')).toBeVisible();
+        await expect(page.locator('button:has-text("Run Auto-Balance")')).toBeVisible();
     });
 
     test('Balancer Tab: Loads Correctly', async ({ page }) => {
         await page.locator('button:has-text("Balancer")').click();
         await page.waitForTimeout(500);
 
-        // Verify main balancer heading and key elements
-        await expect(page.locator('h2:has-text("Game Balancing")')).toBeVisible();
-        await expect(page.locator('text=Critical Hits').first()).toBeVisible();
-        await expect(page.locator('text=Mitigation').first()).toBeVisible();
+        // Verify main balancer heading and tagline from BalancerNew
+        await expect(page.locator('h1:has-text("Balancer")').first()).toBeVisible();
+        await expect(page.locator('text=Arcane Tech Glass · Config-Driven').first()).toBeVisible();
     });
 
 });

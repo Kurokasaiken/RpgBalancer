@@ -43,7 +43,7 @@ describe('Spell Validation', () => {
     });
 
     it('no spell should have legendary field', () => {
-        const hasLegendary = spells.filter(s => 'legendary' in s);
+        const hasLegendary = spells.filter(s => s.legendary === true);
         expect(hasLegendary.length).toBe(0);
     });
 

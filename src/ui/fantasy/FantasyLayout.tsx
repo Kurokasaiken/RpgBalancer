@@ -9,9 +9,9 @@ interface FantasyLayoutProps {
 
 // Bottom nav items for mobile (max 5 for thumb zone)
 const BOTTOM_NAV = [
-    { id: 'balancer', label: 'Balance', icon: '⚖️' },
+    { id: 'balancer', label: 'Balancer', icon: '⚖️' },
     { id: 'archetypes', label: 'Archetypes', icon: '🎭' },
-    { id: 'spellCreation', label: 'Spells', icon: '✨' },
+    { id: 'spellCreationNew', label: 'Spells', icon: '✨' },
     { id: 'gridArena', label: 'Arena', icon: '⚔️' },
     { id: 'more', label: 'More', icon: '☰' },
 ];
@@ -21,11 +21,9 @@ const NAV_SECTIONS = [
     {
         title: 'Core',
         items: [
-            { id: 'balancer', label: 'Balance', icon: '⚖️' },
-            { id: 'balancerLegacy', label: 'Balance New (WIP)', icon: '🔧' },
+            { id: 'balancer', label: 'Balancer', icon: '⚖️' },
             { id: 'balancerStats', label: 'Stat Testing', icon: '📊' },
-            { id: 'spellCreation', label: 'Spell Creation', icon: '✨' },
-            { id: 'spellCreationNew', label: 'Spell Creation (New)', icon: '✨' },
+            { id: 'spellCreationNew', label: 'Spell Creation', icon: '✨' },
             { id: 'archetypes', label: 'Archetypes', icon: '🎭' },
             { id: 'archetypeBuilder', label: 'Builder', icon: '🏗️' },
             { id: 'matchupMatrix', label: 'War Room', icon: '🗺️' },
@@ -86,7 +84,7 @@ export const FantasyLayout: React.FC<FantasyLayoutProps> = ({ children, activeTa
     };
 
     return (
-        <div className="flex h-screen w-full overflow-hidden bg-gradient-to-br from-obsidian-darkest via-obsidian-dark to-obsidian">
+        <div className="flex h-screen w-full overflow-hidden bg-linear-to-br from-obsidian-darkest via-obsidian-dark to-obsidian">
             {/* Desktop Sidebar */}
             {!isMobile && (
                 <aside className="w-56 flex flex-col bg-obsidian-light/80 border-r border-slate-darkest">

@@ -4,6 +4,7 @@ import crypto from 'crypto';
 
 // Polyfill for Node 16
 if (!globalThis.crypto) {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   globalThis.crypto = crypto.webcrypto;
 }

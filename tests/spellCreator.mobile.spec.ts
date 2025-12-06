@@ -12,12 +12,8 @@ test.describe('Spell Creator New - Mobile layout', () => {
   });
 
   test('mobile layout: no horizontal overflow and primary actions are touch-friendly', async ({ page }) => {
-    // Navigate to Spell Creator New using mobile navigation
-    // 1) Tap bottom nav "More" to open the drawer
-    await page.getByRole('button', { name: 'More' }).click();
-
-    // 2) In the drawer, select "Spell Creation (New)"
-    await page.getByRole('button', { name: 'Spell Creation (New)' }).click();
+    // Navigate to Spell Creator New using bottom nav "Spells"
+    await page.getByRole('button', { name: 'Spells' }).click();
 
     // Sanity check: header visible
     await expect(page.getByText('Spell Creator')).toBeVisible();

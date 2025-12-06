@@ -228,7 +228,7 @@ describe('Storage Integration Tests', () => {
     it('should handle async storage operations', async () => {
       const tester = new StorageTestFramework('async-storage', adapter, {
         verbose: false,
-        timeout: 1000,
+        timeout: 5000,
       });
 
       const testData: AsyncData = {

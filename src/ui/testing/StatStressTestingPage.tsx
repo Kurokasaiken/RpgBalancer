@@ -62,7 +62,7 @@ function convertToSynergy(matchups: MatchupResult[]): PairSynergyMetrics[] {
 }
 
 export const StatStressTestingPage: React.FC = () => {
-  const { config, updateStat } = useBalancerConfig();
+  const { config, updateStat, activePreset } = useBalancerConfig();
   const {
     aggregatedResults,
     currentResults,
@@ -82,6 +82,7 @@ export const StatStressTestingPage: React.FC = () => {
   const [selectedHistoryRunId, setSelectedHistoryRunId] = useState<string | null>(null);
   const [selectedSessionFilterId, setSelectedSessionFilterId] = useState<string | 'all'>('all');
   const [selectedComparisonRunIds, setSelectedComparisonRunIds] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState<'live' | 'history'>('live');
 
   useEffect(() => {
     const runs = StatBalanceHistoryStore.listRuns();
@@ -132,6 +133,53 @@ export const StatStressTestingPage: React.FC = () => {
     [setSelectedComparisonRunIds],
   );
 
+  const handleClearHistory = useCallback(() => {
+    StatBalanceHistoryStore.clear();
+    setHistoryRuns([]);
+    setHistorySessions([]);
+    setSelectedHistoryRunId(null);
+    setSelectedSessionFilterId('all');
+    setSelectedComparisonRunIds([]);
+  }, []);
+
+  const handleDeleteSession = useCallback(
+    (sessionId: string) => {
+      StatBalanceHistoryStore.deleteSession(sessionId);
+      const runs = StatBalanceHistoryStore.listRuns();
+      const sessions = StatBalanceHistoryStore.listSessions();
+      setHistoryRuns(runs);
+      setHistorySessions(sessions);
+
+      if (selectedSessionFilterId === sessionId) {
+        setSelectedSessionFilterId('all');
+      }
+
+      setSelectedComparisonRunIds((prev) => prev.filter((id) => runs.some((r) => r.id === id)));
+
+      if (selectedHistoryRunId && !runs.some((r) => r.id === selectedHistoryRunId)) {
+        setSelectedHistoryRunId(null);
+      }
+    },
+    [selectedHistoryRunId, selectedSessionFilterId],
+  );
+
+  const handleDeleteRun = useCallback(
+    (runId: string) => {
+      StatBalanceHistoryStore.deleteRun(runId);
+      const runs = StatBalanceHistoryStore.listRuns();
+      const sessions = StatBalanceHistoryStore.listSessions();
+      setHistoryRuns(runs);
+      setHistorySessions(sessions);
+
+      if (selectedHistoryRunId === runId) {
+        setSelectedHistoryRunId(null);
+      }
+
+      setSelectedComparisonRunIds((prev) => prev.filter((id) => id !== runId));
+    },
+    [selectedHistoryRunId],
+  );
+
   const visibleStats = useMemo(() => {
     return Object.values(config.stats)
       .filter((s) => !s.isDerived && !s.formula && !s.isHidden)
@@ -175,6 +223,19 @@ export const StatStressTestingPage: React.FC = () => {
       updateStat(s.statId, { weight: s.suggestedWeight });
     });
   }, [updateStat, weightSuggestions]);
+
+  const handleResetWeightsToPreset = useCallback(() => {
+    if (!activePreset) return;
+
+    Object.values(config.stats)
+      .filter((s) => !s.isDerived && !s.formula && !s.isHidden)
+      .forEach((stat) => {
+        const presetWeight = activePreset.weights[stat.id];
+        if (typeof presetWeight !== 'number') return;
+        if (presetWeight === stat.weight) return;
+        updateStat(stat.id, { weight: presetWeight });
+      });
+  }, [activePreset, config.stats, updateStat]);
 
   const handleRunAutoBalance = useCallback(async () => {
     if (isAutoBalancing) return;
@@ -257,6 +318,15 @@ export const StatStressTestingPage: React.FC = () => {
             </div>
 
             <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={handleResetWeightsToPreset}
+                disabled={isRunning || isAutoBalancing || !activePreset}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-slate-500/70 text-slate-200 text-[10px] tracking-[0.32em] uppercase bg-slate-900/60 hover:bg-slate-700/60 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Reset Weights
+              </button>
+
               {/* Run All Tiers button */}
               <button
                 type="button"
@@ -296,8 +366,34 @@ export const StatStressTestingPage: React.FC = () => {
           </div>
         )}
 
+        {/* Local tabs: Live testing vs History */}
+        <div className="mt-4 flex gap-2 border-b border-slate-800/60 text-[10px] uppercase tracking-[0.2em]">
+          <button
+            type="button"
+            onClick={() => setActiveTab('live')}
+            className={`px-3 py-1.5 rounded-t transition-colors ${
+              activeTab === 'live'
+                ? 'bg-slate-900 text-indigo-200 border-b-2 border-indigo-400'
+                : 'bg-slate-900/40 text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            Live Testing
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('history')}
+            className={`px-3 py-1.5 rounded-t transition-colors ${
+              activeTab === 'history'
+                ? 'bg-slate-900 text-indigo-200 border-b-2 border-indigo-400'
+                : 'bg-slate-900/40 text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            History
+          </button>
+        </div>
+
         {/* Live view of stats from current BalancerConfig (shown only before first run) */}
-        {!hasResults && (
+        {activeTab === 'live' && !hasResults && (
           <div className="text-[10px] text-slate-300/80 bg-slate-950/60 border border-slate-700/60 rounded-lg px-3 py-2">
             <div className="flex items-center justify-between mb-1">
               <span className="uppercase tracking-[0.22em] text-slate-400/90">
@@ -323,7 +419,7 @@ export const StatStressTestingPage: React.FC = () => {
         )}
 
         {/* Tier Tabs */}
-        {hasResults && (
+        {activeTab === 'live' && hasResults && (
           <div className="flex gap-1 border-b border-slate-700/60 pb-1">
             <button
               type="button"
@@ -354,7 +450,7 @@ export const StatStressTestingPage: React.FC = () => {
         )}
 
         {/* Results */}
-        {currentResults && (
+        {activeTab === 'live' && currentResults && (
           <>
             <div className="grid gap-4 lg:grid-cols-2 items-start">
               <section className="space-y-2">
@@ -562,37 +658,46 @@ export const StatStressTestingPage: React.FC = () => {
           </>
         )}
 
-        {(historySessions.length > 0 || historyRuns.length > 0) && (
+        {activeTab === 'history' && (historySessions.length > 0 || historyRuns.length > 0) && (
           <section className="mt-6 pt-4 border-t border-slate-700/40 space-y-3">
             <div className="flex items-center justify-between gap-2">
               <h2 className="text-xs font-semibold uppercase tracking-[0.22em] text-indigo-200/80">
                 Balance History
               </h2>
-              {historySessions.length > 0 && (
-                <div className="flex items-center gap-1 text-[9px] text-slate-400">
-                  <span className="uppercase tracking-[0.2em]">Session</span>
-                  <select
-                    value={selectedSessionFilterId}
-                    onChange={(e) =>
-                      setSelectedSessionFilterId((e.target.value || 'all') as string | 'all')
-                    }
-                    className="bg-slate-900/70 border border-slate-700/70 rounded px-2 py-0.5 text-[9px] text-slate-200 focus:outline-none focus:ring-1 focus:ring-cyan-400/70"
-                  >
-                    <option value="all">All</option>
-                    {historySessions.map((s) => {
-                      const label =
-                        s.sessionId.length > 18
-                          ? `${s.sessionId.slice(0, 10)}…${s.sessionId.slice(-4)}`
-                          : s.sessionId;
-                      return (
-                        <option key={s.sessionId} value={s.sessionId}>
-                          {label}
-                        </option>
-                      );
-                    })}
-                  </select>
-                </div>
-              )}
+              <div className="flex items-center gap-2">
+                {historySessions.length > 0 && (
+                  <div className="flex items-center gap-1 text-[9px] text-slate-400">
+                    <span className="uppercase tracking-[0.2em]">Session</span>
+                    <select
+                      value={selectedSessionFilterId}
+                      onChange={(e) =>
+                        setSelectedSessionFilterId((e.target.value || 'all') as string | 'all')
+                      }
+                      className="bg-slate-900/70 border border-slate-700/70 rounded px-2 py-0.5 text-[9px] text-slate-200 focus:outline-none focus:ring-1 focus:ring-cyan-400/70"
+                    >
+                      <option value="all">All</option>
+                      {historySessions.map((s) => {
+                        const label =
+                          s.sessionId.length > 18
+                            ? `${s.sessionId.slice(0, 10)}…${s.sessionId.slice(-4)}`
+                            : s.sessionId;
+                        return (
+                          <option key={s.sessionId} value={s.sessionId}>
+                            {label}
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={handleClearHistory}
+                  className="px-2 py-1 rounded-full border border-rose-500/70 text-[9px] uppercase tracking-[0.2em] text-rose-200 bg-rose-950/40 hover:bg-rose-600/20"
+                >
+                  Clear All
+                </button>
+              </div>
             </div>
 
             {historySessions.length > 0 && (
@@ -603,11 +708,12 @@ export const StatStressTestingPage: React.FC = () => {
                   </span>
                   <span className="text-[9px] text-slate-500">{historySessions.length} stored</span>
                 </div>
-                <div className="grid grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,0.8fr)] gap-x-3 gap-y-0.5">
+                <div className="grid grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,0.8fr)_auto] gap-x-3 gap-y-0.5">
                   <span className="text-slate-500">Session</span>
                   <span className="text-slate-500">Time</span>
                   <span className="text-slate-500">Runs</span>
                   <span className="text-slate-500">Last Score</span>
+                  <span className="text-slate-500 text-center">Delete</span>
                   {historySessions.slice(0, 5).map((s) => {
                     const lastRun = s.runs[s.runs.length - 1];
                     const label =
@@ -624,6 +730,16 @@ export const StatStressTestingPage: React.FC = () => {
                         <span className="text-slate-300 font-mono">
                           {lastRun ? lastRun.balanceScore.toFixed(3) : '—'}
                         </span>
+                        <span className="flex items-center justify-center">
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteSession(s.sessionId)}
+                            className="px-1.5 py-0.5 rounded-full border border-slate-700/80 text-[9px] text-slate-300 hover:border-rose-400/80 hover:text-rose-200"
+                            title="Delete session and its runs"
+                          >
+                            ✕
+                          </button>
+                        </span>
                       </React.Fragment>
                     );
                   })}
@@ -639,12 +755,13 @@ export const StatStressTestingPage: React.FC = () => {
                   </span>
                   <span className="text-[9px] text-slate-500">{filteredHistoryRuns.length} stored</span>
                 </div>
-                <div className="grid grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,0.8fr)_auto] gap-x-3 gap-y-0.5">
+                <div className="grid grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,0.8fr)_auto_auto] gap-x-3 gap-y-0.5">
                   <span className="text-slate-500">Run</span>
                   <span className="text-slate-500">Time</span>
                   <span className="text-slate-500">Score</span>
                   <span className="text-slate-500">OP / Weak</span>
                   <span className="text-slate-500 text-center">Compare</span>
+                  <span className="text-slate-500 text-center">Delete</span>
                   {filteredHistoryRuns.slice(0, 8).map((r) => {
                     const label =
                       r.id.length > 18 ? `${r.id.slice(0, 10)}…${r.id.slice(-4)}` : r.id;
@@ -676,6 +793,16 @@ export const StatStressTestingPage: React.FC = () => {
                             className="h-3 w-3 accent-cyan-400"
                           />
                         </span>
+                        <span className="flex items-center justify-center">
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteRun(r.id)}
+                            className="px-1.5 py-0.5 rounded-full border border-slate-700/80 text-[9px] text-slate-300 hover:border-rose-400/80 hover:text-rose-200"
+                            title="Delete this run"
+                          >
+                            ✕
+                          </button>
+                        </span>
                       </React.Fragment>
                     );
                   })}
@@ -685,7 +812,7 @@ export const StatStressTestingPage: React.FC = () => {
           </section>
         )}
 
-        {selectedHistoryRun && (
+        {activeTab === 'history' && selectedHistoryRun && (
           <section className="mt-4 space-y-2">
             <h2 className="text-xs font-semibold uppercase tracking-[0.22em] text-indigo-200/80">
               Run Snapshot
@@ -738,10 +865,19 @@ export const StatStressTestingPage: React.FC = () => {
                 No stored efficiency snapshot for this run.
               </div>
             )}
+
+            {selectedHistoryRun.efficiencies && selectedHistoryRun.efficiencies.length > 0 && (
+              <div className="mt-3">
+                <EfficiencyRadar
+                  efficiencies={selectedHistoryRun.efficiencies}
+                  getLabel={getStatLabel}
+                />
+              </div>
+            )}
           </section>
         )}
 
-        {comparisonRuns.length >= 2 && (
+        {activeTab === 'history' && comparisonRuns.length >= 2 && (
           <section className="mt-4 space-y-2">
             <h2 className="text-xs font-semibold uppercase tracking-[0.22em] text-indigo-200/80">
               Run Comparison
@@ -791,7 +927,7 @@ export const StatStressTestingPage: React.FC = () => {
           </section>
         )}
 
-        {aggregatedResults && (
+        {activeTab === 'live' && aggregatedResults && (
           <div className="text-[9px] text-slate-500 text-center">
             {aggregatedResults.tiers.length} tiers · {aggregatedResults.iterations} iterations
             each · {new Date(aggregatedResults.timestamp).toLocaleTimeString()}

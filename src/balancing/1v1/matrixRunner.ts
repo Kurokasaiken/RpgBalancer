@@ -44,12 +44,12 @@ export async function runMatrix(
 ): Promise<MatrixRunResult> {
     const {
         fast = false,
-        seed = Date.now(),
+        seed = 12345,
         onProgress,
         config = DEFAULT_1V1_CONFIG,
     } = options;
 
-    const startTime = Date.now();
+    const startTime = performance.now();
 
     // Load archetypes from testArchetypes registry
     const { getArchetype } = await import('./testArchetypes');
@@ -156,7 +156,7 @@ export async function runMatrix(
         }
     }
 
-    const totalRuntime = Date.now() - startTime;
+    const totalRuntime = performance.now() - startTime;
 
     // Create run metadata
     const runId = `run-${new Date().toISOString().replace(/[:.]/g, '-')}`;
@@ -257,7 +257,7 @@ export function findMostImbalanced(
  */
 
 export interface MatrixRunnerConfig {
-    archetypes: any[];
+    archetypes: Archetype[];
     turnLimit?: number;
     seed?: number;
     enableDetailedLogging?: boolean;
@@ -275,8 +275,18 @@ export function runMatrixCombat(config: MatrixRunnerConfig) {
     for (const entity1 of archetypes) {
         for (const entity2 of archetypes) {
             const result = CombatSimulator.simulate({
-                entity1,
-                entity2,
+                entity1: { 
+                    ...entity1.stats, 
+                    name: entity1.name || entity1.id,
+                    attack: entity1.stats.damage,
+                    defense: entity1.stats.armor 
+                },
+                entity2: { 
+                    ...entity2.stats, 
+                    name: entity2.name || entity2.id,
+                    attack: entity2.stats.damage,
+                    defense: entity2.stats.armor
+                },
                 turnLimit,
                 enableDetailedLogging
             }, () => rng.next());

@@ -14,6 +14,9 @@ export interface MarginalUtilityMetrics {
   // Core outcome vs baseline
   winRate: number;       // 0–1, entity2 (statsArchetype) win rate
   avgTurns: number;      // average number of turns per combat
+  deltaWinRate: number;
+  dptRatio: number;
+  drawRate: number;
 
   // HP trade expressed in percentage terms
   // Positive = statsArchetype usually ends with more %HP than baseline
