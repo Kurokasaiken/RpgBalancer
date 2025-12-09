@@ -106,6 +106,21 @@ The 0.00 weight for TxC is a critical bug.
 The current file contains "Empirical" weights (Damage=1.0) that contradict our fresh findings (Damage=0.5).
 *   **Action:** Update `statWeights.ts` with the *actual* values found today (Damage 0.5, Armor 0.4) to reflect the *current* reality of the engine.
 
+### 3.b Single Source of Truth for Weights (Dec 2025)
+
+Following the Config-Driven Balancer work (Phase 10), weights are now **owned by** the BalancerConfig:
+
+* Canonical values live in `DEFAULT_CONFIG.stats[statId].weight` under `src/balancing/config/defaultConfig.ts`.
+* `NORMALIZED_WEIGHTS` and `STAT_WEIGHTS` in `src/balancing/statWeights.ts` now **read from** `DEFAULT_CONFIG` for all stats that exist in the config (hp, damage, txc, evasion, armor, resistance, armorPen, penPercent, lifesteal, regen, critChance, critMult, ward, etc.).
+* Legacy consumers (SpellCost, BalanceConfigManager, ArchetypeBuilder presets) still import `NORMALIZED_WEIGHTS`, but the numeric values are no longer independent—they mirror the BalancerConfig defaults.
+* The AutoStatBalancer and StatWeightAdvisor already operate directly on `config.stats[statId].weight` and should be considered the primary way to evolve weights.
+
+**Implication:** when we say "update stat weights" we now mean:
+
+1. Change `DEFAULT_CONFIG.stats[statId].weight` (or via the Balancer UI when wired).
+2. Let `statWeights.ts`/`NORMALIZED_WEIGHTS` pick up those changes automatically.
+3. Avoid introducing new hard-coded weight tables outside of the config.
+
 ### 4. Adopt "Standard Baselines"
 Define 3 baselines for calibration:
 *   **Early Game:** 100 HP, 25 Dmg (Current)

@@ -96,6 +96,7 @@ Example:
 │ Phase 10: Config Balancer 🔥 ACTIVE  ~140 tasks     │
 │ Phase 10.5: Stat Testing  🔥 NEXT    ~80 tasks      │
 │ Phase 11: Tactical Miss.  📋 TODO    ~100 tasks     │
+│ Phase 12: Idle Village    📋 TODO    ~120 tasks     │
 ├──────────────────────────────────────────────────────┤
 │ TOTAL PROGRESS: ███████████████░░░░░ 75%            │
 └──────────────────────────────────────────────────────┘
@@ -480,7 +481,12 @@ The next evolution of the project is organized around six macro-goals:
    - Ogni modifica a Balancer/Spell Creator o ai loro componenti core deve far girare questi test.  
    - Stessa logica applicata ai componenti interni chiave.
 
-6. **Updated Philosophy & Guidelines**  
+6. **Idle Village Autobattler (Phase 12)**  
+   - Meta-gioco idle senza progressione offline: villaggio con lavori, quest e combattimenti auto basati sul combat engine esistente.  
+   - Worker placement config-driven: jobs, edifici, quest e rischi definiti in `src/balancing/config/*`.  
+   - Loop high risk / high reward: injury & death fin dall'inizio, personaggi forti davvero preziosi.
+
+7. **Updated Philosophy & Guidelines**  
    - Allineare `PROJECT_PHILOSOPHY.md` e `DEVELOPMENT_GUIDELINES.md` con:  
      - approccio **config-first** (formule/layout da config, non da UI),  
      - UI come vista sulle config/balancing modules,  

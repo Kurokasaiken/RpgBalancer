@@ -4,7 +4,7 @@
 
 import type { Spell } from '../spellTypes';
 import type { SpellInstance } from './types';
-import { calculateSpellCost } from '../spellCost';
+import { SpellCostModule } from '../modules/spellcost';
 
 /** Validate a Spell. Returns `{valid, errors}`. */
 export function validateTemplate(spell: Spell): { valid: boolean; errors: string[] } {
@@ -49,7 +49,7 @@ export function buildSpell(template: Spell, budget: number): SpellInstance {
         throw new Error('Invalid spell template: ' + errors.join('; '));
     }
 
-    const points = calculateSpellCost(template);
+    const points = SpellCostModule.calculateSpellPoints(template);
     // Tier determination – simple placeholder (real implementation can read budget_tiers.json)
     const tier = '';
 

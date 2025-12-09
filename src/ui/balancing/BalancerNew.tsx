@@ -117,6 +117,7 @@ export const BalancerNew: React.FC = () => {
   const [lastCreatedStatId, setLastCreatedStatId] = useState<string | null>(null);
   const [lastCreatedCardId, setLastCreatedCardId] = useState<string | null>(null);
   const [resetConfirmPending, setResetConfirmPending] = useState(false);
+  const [showScenarioLab, setShowScenarioLab] = useState(false);
   const [dependencyHighlights, setDependencyHighlights] = useState<Record<string, boolean>>({});
   const [errorHighlights, setErrorHighlights] = useState<Record<string, boolean>>({});
   const cascadeTimeoutsRef = useRef<Record<string, number>>({});
@@ -550,6 +551,13 @@ export const BalancerNew: React.FC = () => {
             >
               ＋ Nuova Card
             </button>
+            <button
+              type="button"
+              onClick={() => setShowScenarioLab((prev) => !prev)}
+              className="px-4 py-2 rounded-full border border-cyan-400/60 text-cyan-200 text-xs tracking-[0.35em] uppercase hover:bg-cyan-500/10 transition-colors"
+            >
+              Scenario Lab
+            </button>
           </div>
         </header>
 
@@ -578,6 +586,8 @@ export const BalancerNew: React.FC = () => {
           </div>
         )}
 
+        {showScenarioLab && (
+          <>
         <div className="mt-4 rounded-xl border border-indigo-500/40 bg-slate-900/70 px-4 py-3">
           <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-baseline gap-2">
@@ -764,6 +774,9 @@ export const BalancerNew: React.FC = () => {
               )}
             </div>
           </div>
+        )}
+
+          </>
         )}
 
         {/* Hidden cards row */}

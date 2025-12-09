@@ -153,7 +153,7 @@ export const FantasySpellCreation: React.FC = () => {
         return weights;
     };
 
-    const cost = calculateSpellBudget(spell, getCustomWeights(), getUserBaseline());
+    calculateSpellBudget(spell, getCustomWeights(), getUserBaseline());
 
     // Calcolo danno preview: effect% × damageBase × eco
     const previewDamage = (spell: Spell) => {

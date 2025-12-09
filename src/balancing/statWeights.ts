@@ -1,3 +1,4 @@
+import { DEFAULT_CONFIG } from './config/defaultConfig';
 /**
  * Stat Weights Database - Phase 2
  * Generated from Monte Carlo simulations (batch mode)
@@ -144,49 +145,49 @@ export const CORE_STAT_WEIGHTS: Record<string, StatWeight> = {
  * Useful for item/gear stat comparison
  */
 export const NORMALIZED_WEIGHTS = {
-    hp: 1.0,
+    hp: DEFAULT_CONFIG.stats.hp?.weight ?? 1.0,
     // --- OFFENSIVE STATS ---
     // 1 Damage = 5.0 HP (Tuned Week 5 - reduced from 5.5)
-    damage: 5.0,
+    damage: DEFAULT_CONFIG.stats.damage?.weight ?? 5.0,
 
-    // 1% Attack Speed = 3.0
+    // 1% Attack Speed = 3.0 (not yet config-driven)
     attackSpeed: 3.0,
 
     // 1% Crit Chance = 4.0
-    critChance: 4.0,
-    critMult: 10.0,
+    critChance: DEFAULT_CONFIG.stats.critChance?.weight ?? 4.0,
+    critMult: DEFAULT_CONFIG.stats.critMult?.weight ?? 10.0,
 
     // 1 TxC = 2.0 HP
-    txc: 2.0,
+    txc: DEFAULT_CONFIG.stats.txc?.weight ?? 2.0,
 
     // 1 Armor Pen = 1.5 HP
-    armorPen: 1.5,
+    armorPen: DEFAULT_CONFIG.stats.armorPen?.weight ?? 1.5,
 
     // 1% Pen Percent = 80.0 HP
-    penPercent: 80.0,
+    penPercent: DEFAULT_CONFIG.stats.penPercent?.weight ?? 80.0,
 
     // --- DEFENSIVE STATS ---
     // 1 Armor = 5.0 HP (Tuned Week 5 - boosted from 4.5)
-    armor: 5.0,
+    armor: DEFAULT_CONFIG.stats.armor?.weight ?? 5.0,
 
     // 1% Resistance = 5.0
-    resistance: 5.0,
+    resistance: DEFAULT_CONFIG.stats.resistance?.weight ?? 5.0,
 
     // 1 Evasion = 4.0
-    evasion: 4.0,
+    evasion: DEFAULT_CONFIG.stats.evasion?.weight ?? 4.0,
 
-    // 1% Block = 80.0 HP
+    // 1% Block = 80.0 HP (not yet config-driven)
     block: 80.0,
 
     // --- SUSTAIN STATS ---
     // 1% Lifesteal = 100.0 HP
-    lifesteal: 100.0,
+    lifesteal: DEFAULT_CONFIG.stats.lifesteal?.weight ?? 100.0,
 
     // 1 Regen/Turn = 20.0 HP (Reverted to 20.0 - optimal for short fights)
-    regen: 20.0, // percentage-based
+    regen: DEFAULT_CONFIG.stats.regen?.weight ?? 20.0, // percentage-based
 
     // 1 Ward = 1.5 HP
-    ward: 1.5,
+    ward: DEFAULT_CONFIG.stats.ward?.weight ?? 1.5,
 };
 
 export const STAT_WEIGHTS = NORMALIZED_WEIGHTS;

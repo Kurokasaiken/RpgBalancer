@@ -67,13 +67,13 @@ test.describe('UI Verification Suite', () => {
         await expect(page.locator('text=Arcane Tech Glass · Config-Driven').first()).toBeVisible();
     });
 
-    test('Tactical Debug: page loads and grid renders', async ({ page }) => {
-        // Navigate to Tactical Debug (under System section)
-        await page.locator('button:has-text("Tactical Debug")').click();
+    test('Tactical Lab: debug grid renders', async ({ page }) => {
+        // Navigate to Tactical Lab (under System section)
+        await page.locator('button:has-text("Tactical Lab")').click();
         await page.waitForTimeout(500);
 
-        // Verify Tactical Debug heading and grid are visible
-        await expect(page.locator('text=Tactical Debug').first()).toBeVisible();
+        // Verify Tactical Lab heading and tactical debug grid are visible
+        await expect(page.locator('text=Tactical Lab').first()).toBeVisible();
         await expect(page.locator('[data-testid="tactical-debug-grid"]').first()).toBeVisible();
     });
 

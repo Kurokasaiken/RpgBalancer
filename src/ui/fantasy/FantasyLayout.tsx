@@ -59,7 +59,7 @@ const NAV_SECTIONS = [
         items: [
             { id: 'compactDemo', label: 'Compact UI Demo', icon: '📐' },
             { id: 'fantasyShowcase', label: 'Showcase', icon: '🎨' },
-            { id: 'tacticalDebug', label: 'Tactical Debug', icon: '🎨' },
+            { id: 'tacticalLab', label: 'Tactical Lab', icon: '⚔️' },
         ]
     }
 ];

@@ -20,19 +20,34 @@ const FULL_ITERATIONS = 10000;
 type IterationMode = 'fast' | 'full';
 
 /**
- * Convert StatEfficiency (from Round-Robin) to MarginalUtilityMetrics (legacy format)
+ * Convert StatEfficiency (from Round-Robin) to MarginalUtilityMetrics (legacy format).
+ *
+ * We do not have full combat metrics here, so some fields are derived with
+ * sane defaults:
+ * - deltaWinRate: deviation from 0.5 baseline
+ * - dptRatio: fixed to 1.0 (not available from StatEfficiency)
+ * - drawRate: estimated from draws / totalMatchups
  */
 function convertToMarginalUtility(efficiencies: StatEfficiency[]): MarginalUtilityMetrics[] {
-  return efficiencies.map((eff) => ({
-    statId: eff.statId,
-    pointsPerStat: eff.pointsPerStat,
-    type: 'single-stat' as const,
-    winRate: eff.efficiency,
-    avgTurns: 0, // Not available in StatEfficiency
-    hpTradeEfficiency: 0, // Not available
-    utilityScore: eff.efficiency,
-    confidence: 0.8, // Default confidence
-  }));
+  return efficiencies.map((eff) => {
+    const totalMatchups = eff.wins + eff.losses + eff.draws;
+    const drawRate = totalMatchups > 0 ? eff.draws / totalMatchups : 0;
+    const deltaWinRate = eff.efficiency - 0.5;
+
+    return {
+      statId: eff.statId,
+      pointsPerStat: eff.pointsPerStat,
+      type: 'single-stat',
+      winRate: eff.efficiency,
+      avgTurns: 0, // Not available in StatEfficiency
+      deltaWinRate,
+      dptRatio: 1, // Not available at this layer
+      drawRate,
+      hpTradeEfficiency: 0, // Not available
+      utilityScore: eff.efficiency,
+      confidence: 0.8, // Default confidence
+    };
+  });
 }
 
 /**

@@ -28,7 +28,7 @@ import { MidnightMeridian } from './ui/fantasy/mockups/MidnightMeridian';
 import { SeraphimArchive } from './ui/fantasy/mockups/SeraphimArchive';
 import { VerdantAlloyDeck } from './ui/fantasy/mockups/VerdantAlloyDeck';
 import { CompactDemo } from './ui/pages/CompactDemo';
-import { TacticalDebugPage } from './ui/tactical/TacticalDebugPage';
+import { TacticalLab } from './ui/tactical/TacticalLab';
 
 // Lazy-loaded heavy tools (named exports wrapped as default)
 const BalancerNew = lazy(() =>
@@ -75,7 +75,7 @@ type Tab =
   | 'mockVerdantAlloy'
   | 'mockGildedCards'
   | 'compactDemo'
-  | 'tacticalDebug';
+  | 'tacticalLab';
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('balancer');
@@ -247,9 +247,9 @@ function App() {
           <CompactDemo />
         </ErrorBoundary>
       )}
-      {activeTab === 'tacticalDebug' && (
-        <ErrorBoundary componentName="Tactical Debug">
-          <TacticalDebugPage />
+      {activeTab === 'tacticalLab' && (
+        <ErrorBoundary componentName="Tactical Lab">
+          <TacticalLab />
         </ErrorBoundary>
       )}
     </FantasyLayout>
