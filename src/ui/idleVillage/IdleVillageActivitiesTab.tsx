@@ -65,34 +65,36 @@ export default function IdleVillageActivitiesTab() {
       </button>
       <div className="space-y-2">
         {activities.map((activity) => (
-          <div key={activity.id} className="bg-slate/20 border border-slate rounded p-3">
-            <div className="flex justify-between items-start">
-              <div className="flex-1">
-                <div className="font-bold">{activity.label}</div>
-                <div className="text-sm text-teal">ID: {activity.id}</div>
-                <div className="text-xs text-teal">Tags: {activity.tags.join(', ') || 'none'}</div>
-                <div className="text-xs text-teal">Slot Tags: {activity.slotTags.join(', ') || 'none'}</div>
-                <div className="text-xs text-teal">Engine: {activity.resolutionEngineId}</div>
+          <div key={activity.id} className="default-card flex flex-col gap-2">
+            <div className="flex justify-between items-start border-b border-slate-700/60 pb-1.5">
+              <div className="flex-1 min-w-0">
+                <div className="text-[11px] font-semibold tracking-[0.18em] uppercase text-slate-100 truncate">
+                  {activity.label}
+                </div>
+                <div className="text-[10px] text-teal mt-0.5">ID: {activity.id}</div>
+                <div className="text-[10px] text-teal">Tags: {activity.tags.join(', ') || 'none'}</div>
+                <div className="text-[10px] text-teal">Slot Tags: {activity.slotTags.join(', ') || 'none'}</div>
+                <div className="text-[10px] text-teal">Engine: {activity.resolutionEngineId}</div>
                 {typeof activity.level === 'number' && (
-                  <div className="text-xs text-teal">Level: {activity.level}</div>
+                  <div className="text-[10px] text-teal">Level: {activity.level}</div>
                 )}
                 {typeof activity.dangerRating === 'number' && (
-                  <div className="text-xs text-red-400">Danger: {activity.dangerRating}</div>
+                  <div className="text-[10px] text-red-400">Danger: {activity.dangerRating}</div>
                 )}
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-1">
                 <button
                   onClick={() => {
                     setEditingId(activity.id);
                     setFormData(activity);
                   }}
-                  className="bg-teal text-obsidian px-2 py-1 rounded text-sm hover:bg-teal/80"
+                  className="bg-teal text-obsidian px-2 py-1 rounded-full text-[10px] font-semibold tracking-[0.16em] uppercase hover:bg-teal/80"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => handleDelete(activity.id)}
-                  className="bg-red-600 text-ivory px-2 py-1 rounded text-sm hover:bg-red-700"
+                  className="bg-red-600 text-ivory px-2 py-1 rounded-full text-[10px] font-semibold tracking-[0.16em] uppercase hover:bg-red-700"
                 >
                   Delete
                 </button>
@@ -105,7 +107,7 @@ export default function IdleVillageActivitiesTab() {
       {/* Simple Edit Modal */}
       {editingId && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-slate border border-gold rounded p-6 w-96 max-h-screen overflow-y-auto">
+          <div className="default-card w-96 max-h-screen overflow-y-auto p-6">
             <h3 className="text-lg font-cinzel mb-4">Edit Activity</h3>
             <div className="space-y-3">
               <div>

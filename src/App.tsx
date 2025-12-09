@@ -14,11 +14,8 @@ import { AutoBalancerWrapper } from './ui/balancing/autobalancer/AutoBalancerWra
 import { CharacterCreator } from './ui/character/CharacterCreator';
 import { FantasyLayout } from './ui/fantasy/FantasyLayout';
 import { FantasyBalancer } from './ui/fantasy/FantasyBalancer';
-import { FantasyComponentShowcase } from './ui/atoms/FantasyComponentShowcase';
 import { ArcaneTechGlass } from './ui/fantasy/mockups/ArcaneTechGlass';
 import { GildedObservatory } from './ui/fantasy/mockups/GildedObservatory';
-import { GildedCardShowcase } from './ui/fantasy/mockups/GildedCardShowcase';
-import { SpellCreatorNewMockup } from './ui/spells/SpellCreatorNewMockup';
 import { SpellCreatorNew } from './ui/spells/SpellCreatorNew';
 import { ObsidianSanctum } from './ui/fantasy/mockups/ObsidianSanctum';
 import { AuroraWorkshop } from './ui/fantasy/mockups/AuroraWorkshop';
@@ -27,7 +24,6 @@ import { QuantumScriptorium } from './ui/fantasy/mockups/QuantumScriptorium';
 import { MidnightMeridian } from './ui/fantasy/mockups/MidnightMeridian';
 import { SeraphimArchive } from './ui/fantasy/mockups/SeraphimArchive';
 import { VerdantAlloyDeck } from './ui/fantasy/mockups/VerdantAlloyDeck';
-import { CompactDemo } from './ui/pages/CompactDemo';
 import { TacticalLab } from './ui/tactical/TacticalLab';
 import IdleVillagePage from './ui/idleVillage/IdleVillagePage';
 import IdleVillageConfigRoute from './pages/idle-village-config';
@@ -64,9 +60,7 @@ type Tab =
   | 'gridArena'
   | 'idleArena'
   | 'testing'
-  | 'fantasyShowcase'
   | 'mockArcaneTech'
-  | 'mockSpellCreatorNew'
   | 'mockGildedObservatory'
   | 'mockObsidianSanctum'
   | 'mockAuroraWorkshop'
@@ -75,8 +69,6 @@ type Tab =
   | 'mockMidnightMeridian'
   | 'mockSeraphimArchive'
   | 'mockVerdantAlloy'
-  | 'mockGildedCards'
-  | 'compactDemo'
   | 'tacticalLab'
   | 'idleVillage'
   | 'idleVillageConfig';
@@ -196,29 +188,14 @@ function App() {
           <IdleVillageConfigRoute />
         </ErrorBoundary>
       )}
-      {activeTab === 'fantasyShowcase' && (
-        <ErrorBoundary componentName="Fantasy Showcase">
-          <FantasyComponentShowcase />
-        </ErrorBoundary>
-      )}
       {activeTab === 'mockArcaneTech' && (
         <ErrorBoundary componentName="Arcane Tech Glass">
           <ArcaneTechGlass />
         </ErrorBoundary>
       )}
-      {activeTab === 'mockSpellCreatorNew' && (
-        <ErrorBoundary componentName="Spell Creator New Mockup">
-          <SpellCreatorNewMockup />
-        </ErrorBoundary>
-      )}
       {activeTab === 'mockGildedObservatory' && (
         <ErrorBoundary componentName="Gilded Observatory">
           <GildedObservatory />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'mockGildedCards' && (
-        <ErrorBoundary componentName="Gilded Card Showcase">
-          <GildedCardShowcase />
         </ErrorBoundary>
       )}
       {activeTab === 'mockObsidianSanctum' && (
@@ -254,11 +231,6 @@ function App() {
       {activeTab === 'mockVerdantAlloy' && (
         <ErrorBoundary componentName="Verdant Alloy Deck">
           <VerdantAlloyDeck />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'compactDemo' && (
-        <ErrorBoundary componentName="Compact UI Demo">
-          <CompactDemo />
         </ErrorBoundary>
       )}
       {activeTab === 'tacticalLab' && (

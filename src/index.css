@@ -86,6 +86,21 @@
     }
   }
 
+  @keyframes default-card-orbit {
+    0% {
+      transform: rotate(0deg) scale(1);
+      opacity: 0.6;
+    }
+    50% {
+      transform: rotate(180deg) scale(1.03);
+      opacity: 0.9;
+    }
+    100% {
+      transform: rotate(360deg) scale(1);
+      opacity: 0.6;
+    }
+  }
+
   .animate-slide-up {
     animation: slide-up 0.3s ease-out;
   }
@@ -184,6 +199,55 @@
     padding: 1rem;
     box-shadow: 0 18px 45px rgba(15, 23, 42, 0.9);
     position: relative;
+    overflow: hidden;
+  }
+
+  /* Default Balancer-style card shell: use this as the project-wide default card look */
+  .default-card {
+    position: relative;
+    border-radius: 1rem; /* approximates rounded-2xl */
+    border: 1px solid rgba(129, 140, 248, 0.4);
+    padding: 0.625rem; /* 2.5 spacing unit (10px) */
+    box-shadow: 0 18px 36px rgba(15, 23, 42, 0.9);
+    overflow: hidden;
+    background-color: transparent;
+  }
+
+  .default-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: -30;
+  }
+
+  .default-card::after {
+    content: '';
+    position: absolute;
+    inset: -40%;
+    opacity: 0.5;
+    filter: blur(24px);
+    pointer-events: none;
+    z-index: -20;
+    background:
+      radial-gradient(circle at 0% 0%, rgba(129, 140, 248, 0.9) 0, transparent 55%),
+      radial-gradient(circle at 120% 120%, rgba(56, 189, 248, 0.85) 0, transparent 60%);
+    animation: default-card-orbit 60s linear infinite;
+  }
+
+  /* Default frame for main content area (used by FantasyLayout) */
+  .observatory-main-frame {
+    position: relative;
+    max-width: 72rem;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 1rem;
+    border: 1px solid rgba(129, 140, 248, 0.35);
+    background-color: rgba(15, 23, 42, 0.85);
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.9);
+    padding: 0.75rem;
     overflow: hidden;
   }
 
@@ -292,6 +356,59 @@
     font-weight: 600;
     color: rgba(125, 211, 252, 1);
     text-shadow: 0 0 6px rgba(34, 211, 238, 0.6);
+  }
+
+  .observatory-nav-frame {
+    position: relative;
+    border-radius: 0.9rem;
+    border: 1px solid rgba(148, 163, 253, 0.5);
+    background:
+      radial-gradient(circle at 0% 0%, rgba(129, 140, 248, 0.18) 0, transparent 60%),
+      radial-gradient(circle at 120% 120%, rgba(56, 189, 248, 0.14) 0, transparent 65%),
+      linear-gradient(to bottom, rgba(15, 23, 42, 0.96), rgba(2, 6, 23, 0.96));
+    box-shadow:
+      0 0 0 1px rgba(15, 23, 42, 0.9),
+      0 18px 40px rgba(0, 0, 0, 0.65);
+    padding: 0.35rem 0.25rem 0.4rem;
+    overflow: hidden;
+  }
+
+  .observatory-nav-frame::before {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border-radius: 0.75rem;
+    border: 1px dashed rgba(148, 163, 253, 0.3);
+    pointer-events: none;
+  }
+
+  .observatory-nav-orb {
+    position: absolute;
+    inset-inline: 30%;
+    top: -28px;
+    height: 52px;
+    border-radius: 9999px;
+    background:
+      radial-gradient(circle at 50% 100%, rgba(201, 162, 39, 0.45) 0, transparent 60%),
+      radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.35) 0, transparent 65%);
+    opacity: 0.8;
+    filter: blur(2px);
+    pointer-events: none;
+  }
+
+  .observatory-main-frame {
+    position: relative;
+    border-radius: 1rem;
+    border: 1px solid rgba(148, 163, 253, 0.5);
+    background:
+      radial-gradient(circle at 0% 0%, rgba(129, 140, 248, 0.16) 0, transparent 55%),
+      radial-gradient(circle at 120% 120%, rgba(56, 189, 248, 0.14) 0, transparent 60%),
+      linear-gradient(to bottom right, rgba(15, 23, 42, 0.96), rgba(2, 6, 23, 0.98));
+    box-shadow:
+      0 0 0 1px rgba(15, 23, 42, 0.95),
+      0 22px 45px rgba(0, 0, 0, 0.7);
+    padding: 1rem;
+    min-height: 100%;
   }
 }
 

@@ -48,9 +48,7 @@ const NAV_SECTIONS = [
     {
         title: 'Mockups',
         items: [
-            { id: 'mockSpellCreatorNew', label: 'Spell Creator New', icon: '✨' },
             { id: 'mockGildedObservatory', label: 'Gilded Observatory', icon: '🜂' },
-            { id: 'mockGildedCards', label: 'Gilded Card Showcase', icon: '🂠' },
             { id: 'mockObsidianSanctum', label: 'Obsidian Sanctum', icon: '🜃' },
             { id: 'mockAuroraWorkshop', label: 'Aurora Workshop', icon: '✺' },
             { id: 'mockArcaneTech', label: 'Arcane Tech Glass', icon: '💠' },
@@ -64,8 +62,6 @@ const NAV_SECTIONS = [
     {
         title: 'System',
         items: [
-            { id: 'compactDemo', label: 'Compact UI Demo', icon: '📐' },
-            { id: 'fantasyShowcase', label: 'Showcase', icon: '🎨' },
             { id: 'tacticalLab', label: 'Tactical Lab', icon: '⚔️' },
         ]
     }
@@ -96,51 +92,49 @@ export const FantasyLayout: React.FC<FantasyLayoutProps> = ({ children, activeTa
         <div className="flex h-screen w-full overflow-hidden bg-linear-to-br from-obsidian-darkest via-obsidian-dark to-obsidian">
             {/* Desktop Sidebar */}
             {!isMobile && (
-                <aside className="w-56 flex flex-col bg-obsidian-light/80 border-r border-slate-darkest">
+                <aside className="w-56 flex flex-col bg-linear-to-b from-obsidian-darkest/95 via-obsidian-dark/90 to-obsidian-light/90 shadow-fantasy-soft">
                     {/* Header */}
-                    <div className="p-4 border-b border-slate-darkest">
-                        <h1 className="text-lg font-display text-gold">RPG Balancer</h1>
-                        <p className="text-2xs text-teal-muted mt-1">Gilded Observatory</p>
-                    </div>
+                    <div className="h-3" />
                     
                     {/* Nav Sections */}
-                    <nav className="flex-1 overflow-y-auto py-2 scrollbar-hide">
-                        {NAV_SECTIONS.map((section) => (
-                            <div key={section.title} className="mb-2">
-                                <p className="px-4 py-2 text-2xs uppercase tracking-widest text-teal-muted">
-                                    {section.title}
-                                </p>
-                                {section.items.map((item) => (
-                                    <button
-                                        key={item.id}
-                                        onClick={() => onTabChange(item.id)}
-                                        className={`
-                                            w-full flex items-center gap-3 px-4 py-2.5 text-left
-                                            transition-all duration-150
-                                            ${activeTab === item.id
-                                                ? 'bg-gold/15 text-gold border-l-2 border-gold'
-                                                : 'text-ivory-dark hover:bg-slate-darkest/50 hover:text-ivory border-l-2 border-transparent'
-                                            }
-                                        `}
-                                    >
-                                        <span className="text-base">{item.icon}</span>
-                                        <span className="text-sm truncate">{item.label}</span>
-                                    </button>
+                    <nav className="flex-1 overflow-y-auto py-3 scrollbar-hide">
+                        <div className="mx-3 observatory-nav-frame">
+                            <div className="observatory-nav-orb" aria-hidden="true" />
+                            <div className="py-2">
+                                {NAV_SECTIONS.map((section) => (
+                                    <div key={section.title} className="mb-2 last:mb-1">
+                                        <p className="px-3 pb-1">
+                                            <span className="flex items-center gap-2 text-[8px] text-teal-muted/40">
+                                                <span className="h-px flex-1 bg-slate-800/60" />
+                                                <span className="w-1.5 h-1.5 rounded-full bg-gold/70 shadow-glow-gold" />
+                                                <span className="h-px flex-1 bg-slate-800/60" />
+                                            </span>
+                                        </p>
+                                        {section.items.map((item) => (
+                                            <button
+                                                key={item.id}
+                                                onClick={() => onTabChange(item.id)}
+                                                className={`
+                                                    w-full flex items-center gap-3 px-4 py-2.5 text-left rounded-xl
+                                                    transition-all duration-fast relative overflow-hidden
+                                                    ${activeTab === item.id
+                                                        ? 'bg-linear-to-r from-gold/20 via-gold/10 to-transparent text-gold'
+                                                        : 'text-ivory-muted hover:bg-obsidian-dark/70 hover:text-ivory hover:border-gold/40 hover:shadow-fantasy-soft'
+                                                    }
+                                                `}
+                                            >
+                                                <span className="text-base">{item.icon}</span>
+                                                <span className="text-sm truncate">{item.label}</span>
+                                            </button>
+                                        ))}
+                                    </div>
                                 ))}
                             </div>
-                        ))}
+                        </div>
                     </nav>
 
                     {/* Footer */}
-                    <div className="p-3 border-t border-slate-darkest">
-                        <button
-                            onClick={toggleDensity}
-                            className="w-full flex items-center gap-2 px-3 py-2 rounded text-xs text-teal-muted hover:bg-slate-darkest/50 transition-colors"
-                        >
-                            <span>{density === 'compact' ? '▪' : '▫'}</span>
-                            <span className="capitalize">{density} mode</span>
-                        </button>
-                    </div>
+                    <div className="p-3" />
                 </aside>
             )}
 
@@ -149,7 +143,12 @@ export const FantasyLayout: React.FC<FantasyLayoutProps> = ({ children, activeTa
                 {/* Mobile Header */}
                 {isMobile && (
                     <header className="flex items-center justify-between px-4 py-3 bg-obsidian-light/90 border-b border-slate-darkest">
-                        <h1 className="text-base font-display text-gold truncate">RPG Balancer</h1>
+                        <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-full border border-gold/70 bg-obsidian-darkest/90 flex items-center justify-center shadow-glow-gold">
+                                <span className="text-gold text-lg">✶</span>
+                                <span className="sr-only">Main navigation</span>
+                            </div>
+                        </div>
                         <button
                             onClick={toggleDensity}
                             className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-darkest/50 text-teal text-sm"
@@ -161,8 +160,10 @@ export const FantasyLayout: React.FC<FantasyLayoutProps> = ({ children, activeTa
 
                 {/* Content */}
                 <div className={`flex-1 overflow-y-auto scroll-smooth ${isMobile ? 'pb-20' : ''}`}>
-                    <div className="p-4 md:p-6 max-w-7xl mx-auto">
-                        {children}
+                    <div className="p-3 md:p-4">
+                        <div className="observatory-main-frame">
+                            {children}
+                        </div>
                     </div>
                 </div>
             </main>
@@ -207,8 +208,12 @@ export const FantasyLayout: React.FC<FantasyLayoutProps> = ({ children, activeTa
                         <div className="overflow-y-auto max-h-[calc(75vh-60px)] pb-safe scrollbar-hide">
                             {NAV_SECTIONS.map((section) => (
                                 <div key={section.title} className="mb-2">
-                                    <p className="px-5 py-2 text-2xs uppercase tracking-widest text-teal-muted">
-                                        {section.title}
+                                    <p className="px-5 pt-2 pb-1">
+                                        <span className="flex items-center gap-2 text-[8px] text-teal-muted/40">
+                                            <span className="h-px flex-1 bg-slate-700/60" />
+                                            <span className="w-1.5 h-1.5 rounded-full bg-gold/70 shadow-glow-gold" />
+                                            <span className="h-px flex-1 bg-slate-700/60" />
+                                        </span>
                                     </p>
                                     <div className="px-3">
                                         {section.items.map((item) => (

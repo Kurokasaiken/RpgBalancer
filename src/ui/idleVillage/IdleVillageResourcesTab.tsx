@@ -60,35 +60,39 @@ export default function IdleVillageResourcesTab() {
       </button>
       <div className="space-y-2">
         {resources.map((resource) => (
-          <div key={resource.id} className="bg-slate/20 border border-slate rounded p-3">
-            <div className="flex justify-between items-start">
-              <div className="flex-1">
-                <div className="font-bold">{resource.label}</div>
-                <div className="text-sm text-teal">ID: {resource.id}</div>
-                {resource.description && (
-                  <div className="text-xs text-slate-300">{resource.description}</div>
-                )}
-                {resource.colorClass && (
-                  <div className="text-xs text-slate-400">Color: {resource.colorClass}</div>
-                )}
+          <div key={resource.id} className="default-card flex flex-col gap-2">
+            <div className="flex justify-between items-start border-b border-slate-700/60 pb-1.5">
+              <div className="flex-1 min-w-0">
+                <div className="text-[11px] font-semibold tracking-[0.18em] uppercase text-slate-100 truncate">
+                  {resource.label}
+                </div>
+                <div className="text-[10px] text-teal mt-0.5">ID: {resource.id}</div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-1">
                 <button
                   onClick={() => {
                     setEditingId(resource.id);
                     setFormData(resource);
                   }}
-                  className="bg-teal text-obsidian px-2 py-1 rounded text-sm hover:bg-teal/80"
+                  className="bg-teal text-obsidian px-2 py-1 rounded-full text-[10px] font-semibold tracking-[0.16em] uppercase hover:bg-teal/80"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => handleDelete(resource.id)}
-                  className="bg-red-600 text-ivory px-2 py-1 rounded text-sm hover:bg-red-700"
+                  className="bg-red-600 text-ivory px-2 py-1 rounded-full text-[10px] font-semibold tracking-[0.16em] uppercase hover:bg-red-700"
                 >
                   Delete
                 </button>
               </div>
+            </div>
+            <div className="space-y-1 text-[10px] text-slate-300">
+              {resource.description && (
+                <div>{resource.description}</div>
+              )}
+              {resource.colorClass && (
+                <div className="text-slate-400">Color: {resource.colorClass}</div>
+              )}
             </div>
           </div>
         ))}
@@ -97,7 +101,7 @@ export default function IdleVillageResourcesTab() {
       {/* Edit Modal */}
       {editingId && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-slate border border-gold rounded p-6 w-96 max-h-screen overflow-y-auto">
+          <div className="default-card w-96 max-h-screen overflow-y-auto p-6">
             <h3 className="text-lg font-cinzel mb-4">Edit Resource</h3>
             <div className="space-y-3 text-sm">
               <div>

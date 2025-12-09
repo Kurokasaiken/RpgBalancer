@@ -521,21 +521,21 @@ export const BalancerNew: React.FC = () => {
       </div>
 
       <div className="observatory-shell space-y-3">
-        <header className="flex items-center justify-between gap-2">
+        <header className="flex items-center justify-between gap-2 flex-wrap">
           <div className="flex flex-col">
-            <h1 className="flex items-center gap-2 text-3xl font-semibold tracking-[0.3em] uppercase text-indigo-200 drop-shadow-[0_0_14px_rgba(129,140,248,0.9)]">
-              <Sparkles className="w-6 h-6 text-cyan-300 drop-shadow-[0_0_10px_rgba(56,189,248,0.8)]" />
+            <h1 className="flex items-center gap-2 text-2xl md:text-3xl font-semibold tracking-[0.22em] md:tracking-[0.3em] uppercase text-indigo-200 drop-shadow-[0_0_14px_rgba(129,140,248,0.9)]">
+              <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-cyan-300 drop-shadow-[0_0_10px_rgba(56,189,248,0.8)]" />
               <span>Balancer</span>
             </h1>
-            <p className="mt-1 text-[10px] text-slate-400 uppercase tracking-[0.26em]">
+            <p className="mt-0.5 md:mt-1 text-[9px] md:text-[10px] text-slate-400 uppercase tracking-[0.2em] md:tracking-[0.26em]">
               Arcane Tech Glass · Config-Driven
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 md:gap-2 mt-2 md:mt-0">
             <button
               type="button"
               onClick={handleResetAll}
-              className={`px-3 py-1.5 rounded-full border text-xs tracking-[0.35em] uppercase transition-colors ${
+              className={`px-2.5 md:px-3 py-1 md:py-1.5 rounded-full border text-[10px] tracking-[0.3em] uppercase transition-colors ${
                 resetConfirmPending
                   ? 'border-red-400/80 text-red-100 bg-red-500/20'
                   : 'border-red-500/60 text-red-200 hover:bg-red-500/10'
@@ -547,14 +547,14 @@ export const BalancerNew: React.FC = () => {
             <button
               type="button"
               onClick={handleAddCard}
-              className="px-4 py-2 rounded-full border border-amber-400/60 text-amber-200 text-xs tracking-[0.4em] uppercase hover:bg-amber-500/10 transition-colors"
+              className="px-3 md:px-4 py-1.5 md:py-2 rounded-full border border-amber-400/60 text-amber-200 text-[10px] tracking-[0.35em] uppercase hover:bg-amber-500/10 transition-colors"
             >
               ＋ Nuova Card
             </button>
             <button
               type="button"
               onClick={() => setShowScenarioLab((prev) => !prev)}
-              className="px-4 py-2 rounded-full border border-cyan-400/60 text-cyan-200 text-xs tracking-[0.35em] uppercase hover:bg-cyan-500/10 transition-colors"
+              className="px-3 md:px-4 py-1.5 md:py-2 rounded-full border border-cyan-400/60 text-cyan-200 text-[10px] tracking-[0.3em] uppercase hover:bg-cyan-500/10 transition-colors"
             >
               Scenario Lab
             </button>
@@ -564,22 +564,22 @@ export const BalancerNew: React.FC = () => {
         <ConfigToolbar />
 
         {equalFightMetrics && (
-          <div className="mt-3 rounded-xl border border-cyan-500/40 bg-slate-900/70 px-4 py-3 flex flex-wrap items-center gap-4 text-[10px] uppercase tracking-[0.22em]">
+          <div className="mt-3 rounded-xl border border-cyan-500/40 bg-slate-900/70 px-3 md:px-4 py-2.5 md:py-3 flex flex-wrap items-center gap-3 md:gap-4 text-[9px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.22em]">
             <div className="flex flex-col min-w-[120px]">
               <span className="text-slate-400">1v1 Equal (Self vs Self)</span>
-              <span className="font-mono text-cyan-300 text-xs">
+              <span className="font-mono text-cyan-300 text-[11px] md:text-xs">
                 {equalFightMetrics.ttk.toFixed(2)} turns
               </span>
             </div>
             <div className="flex flex-col min-w-[120px]">
               <span className="text-slate-400">EDPT vs Self</span>
-              <span className="font-mono text-emerald-300 text-xs">
+              <span className="font-mono text-emerald-300 text-[11px] md:text-xs">
                 {equalFightMetrics.edpt.toFixed(2)}
               </span>
             </div>
             <div className="flex flex-col min-w-[140px]">
               <span className="text-slate-400">Early Impact (3T)</span>
-              <span className="font-mono text-amber-300 text-xs">
+              <span className="font-mono text-amber-300 text-[11px] md:text-xs">
                 {equalFightMetrics.earlyImpact.toFixed(2)}
               </span>
             </div>
@@ -588,10 +588,10 @@ export const BalancerNew: React.FC = () => {
 
         {showScenarioLab && (
           <>
-        <div className="mt-4 rounded-xl border border-indigo-500/40 bg-slate-900/70 px-4 py-3">
+        <div className="mt-4 rounded-xl border border-indigo-500/40 bg-slate-900/70 px-3 md:px-4 py-2.5 md:py-3">
           <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-baseline gap-2">
-              <h3 className="text-[10px] font-semibold uppercase tracking-[0.24em] text-indigo-300">
+              <h3 className="text-[9px] md:text-[10px] font-semibold uppercase tracking-[0.2em] md:tracking-[0.24em] text-indigo-300">
                 Scenario Simulation (vs Baseline)
               </h3>
               <select
@@ -608,7 +608,7 @@ export const BalancerNew: React.FC = () => {
                 )}
               </select>
             </div>
-            <div className="flex items-center gap-2 text-[10px]">
+            <div className="flex items-center gap-2 text-[9px] md:text-[10px]">
               <label className="flex items-center gap-1 text-slate-300">
                 <span className="uppercase tracking-[0.2em]">Iter</span>
                 <input
@@ -618,14 +618,14 @@ export const BalancerNew: React.FC = () => {
                   step={50}
                   value={scenarioIterations}
                   onChange={(e) => setScenarioIterations(Number(e.target.value) || 50)}
-                  className="w-20 rounded border border-slate-700 bg-slate-950 px-2 py-0.5 text-[10px] text-slate-100 outline-none focus:border-indigo-400"
+                  className="w-20 rounded border border-slate-700 bg-slate-950 px-2 py-0.5 text-[9px] md:text-[10px] text-slate-100 outline-none focus:border-indigo-400"
                 />
               </label>
               <button
                 type="button"
                 onClick={handleRunScenarioSimulation}
                 disabled={isScenarioSimRunning}
-                className="rounded-full border border-indigo-500/80 px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-indigo-100 hover:bg-indigo-500/10 disabled:opacity-50"
+                className="rounded-full border border-indigo-500/80 px-2.5 md:px-3 py-1 text-[9px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.22em] text-indigo-100 hover:bg-indigo-500/10 disabled:opacity-50"
               >
                 {isScenarioSimRunning ? 'Running...' : 'Run Sim'}
               </button>
@@ -633,7 +633,7 @@ export const BalancerNew: React.FC = () => {
           </div>
 
           {scenarioSimResult && (
-            <div className="grid gap-3 text-[10px] sm:grid-cols-3">
+            <div className="grid gap-2.5 text-[9px] md:text-[10px] sm:grid-cols-3">
               <div className="flex flex-col">
                 <span className="text-slate-400 uppercase tracking-[0.2em]">Winrate</span>
                 <span className="mt-0.5 font-mono text-emerald-300">
@@ -678,15 +678,15 @@ export const BalancerNew: React.FC = () => {
 
         <div className="mt-4 space-y-2">
           <div className="flex items-baseline justify-between gap-2">
-            <h2 className="text-xs font-semibold uppercase tracking-[0.26em] text-cyan-300">
+            <h2 className="text-[11px] md:text-xs font-semibold uppercase tracking-[0.22em] md:tracking-[0.26em] text-cyan-300">
               🎯 Configurazione Scenari
             </h2>
             <div className="flex items-center gap-2">
-              <span className="text-[9px] uppercase tracking-[0.2em] text-slate-500">
+              <span className="text-[8px] md:text-[9px] uppercase tracking-[0.18em] md:tracking-[0.2em] text-slate-500">
                 Duel · Boss · Swarm · 5v5
               </span>
               <select
-                className="rounded-full border border-cyan-500/60 bg-slate-950 px-2 py-0.5 text-[9px] uppercase tracking-[0.2em] text-cyan-200 hover:border-cyan-400/80"
+                className="rounded-full border border-cyan-500/60 bg-slate-950 px-2 py-0.5 text-[8px] md:text-[9px] uppercase tracking-[0.18em] md:tracking-[0.2em] text-cyan-200 hover:border-cyan-400/80"
                 value={selectedEliteId}
                 onChange={(e) => {
                   const value = e.target.value as EliteScenarioId | '';
@@ -708,7 +708,7 @@ export const BalancerNew: React.FC = () => {
               <button
                 type="button"
                 onClick={handleExportScenarios}
-                className="rounded-full border border-cyan-500/60 px-2 py-0.5 text-[9px] uppercase tracking-[0.2em] text-cyan-200 hover:bg-cyan-500/10"
+                className="rounded-full border border-cyan-500/60 px-2 py-0.5 text-[8px] md:text-[9px] uppercase tracking-[0.18em] md:tracking-[0.2em] text-cyan-200 hover:bg-cyan-500/10"
               >
                 Export
               </button>
@@ -750,14 +750,14 @@ export const BalancerNew: React.FC = () => {
                 Basato sul build corrente
               </span>
             </div>
-            <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid gap-2 xs:grid-cols-2 xl:grid-cols-4">
               {(Object.entries(scenarioConfigs) as Array<[ScenarioType, ScenarioConfig]>).map(
                 ([type, scenario]) => {
                   const power = scenarioPowerMap[type] ?? 0;
                   return (
                     <div
                       key={type}
-                      className="rounded-lg border border-amber-500/30 bg-slate-950/70 px-3 py-2 text-[10px]"
+                      className="rounded-lg border border-amber-500/30 bg-slate-950/70 px-2.5 md:px-3 py-1.5 md:py-2 text-[9px] md:text-[10px]"
                     >
                       <div className="mb-1 flex items-center justify-between gap-2">
                         <span className="flex items-center gap-1 truncate text-amber-100">

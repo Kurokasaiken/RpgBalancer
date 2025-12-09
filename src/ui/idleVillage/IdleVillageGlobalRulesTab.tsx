@@ -5,6 +5,7 @@
  */
 
 import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
+import { DefaultSection } from '@/ui/components/DefaultUI';
 
 export default function IdleVillageGlobalRulesTab() {
   const { config, updateConfig } = useIdleVillageConfig();
@@ -35,8 +36,7 @@ export default function IdleVillageGlobalRulesTab() {
       <h2 className="text-lg sm:text-xl font-cinzel tracking-[0.18em] uppercase text-ivory/90">Global Rules</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <section className="bg-slate/20 border border-slate rounded p-3">
-          <h3 className="font-cinzel text-lg mb-2">Fatigue</h3>
+        <DefaultSection title="Fatigue">
           <div className="space-y-2 text-sm">
             <div>
               <label className="block font-bold mb-1">Max Fatigue Before Exhausted</label>
@@ -84,10 +84,9 @@ export default function IdleVillageGlobalRulesTab() {
               />
             </div>
           </div>
-        </section>
+        </DefaultSection>
 
-        <section className="bg-slate/20 border border-slate rounded p-3">
-          <h3 className="font-cinzel text-lg mb-2">Injury & Quests</h3>
+        <DefaultSection title="Injury &amp; Quests">
           <div className="space-y-2 text-sm">
             <div>
               <label className="block font-bold mb-1">Base Light Injury Chance At Max Fatigue</label>
@@ -131,7 +130,7 @@ export default function IdleVillageGlobalRulesTab() {
               />
             </div>
           </div>
-        </section>
+        </DefaultSection>
       </div>
     </div>
   );
