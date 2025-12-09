@@ -15,6 +15,11 @@ export interface AutoStatBalancerOptions {
   seed?: number;
   sessionId?: string;
   advisorOptions?: Partial<StatWeightAdvisorOptions>;
+  /**
+   * Optional callback invoked after each auto-balance iteration.
+   * Consumers can use this to display progress (e.g. progress bars or logs).
+   */
+  onIterationProgress?: (run: StatBalanceRun, iteration: number, maxIterations: number) => void;
 }
 
 export interface AutoStatBalancerResult {
@@ -125,6 +130,10 @@ export async function runAutoBalanceSession(
     const runId = `${sessionId}-iter-${iteration + 1}`;
     const run = buildRun(runId, aggregated, currentConfig, advisorOpts);
     runs.push(run);
+
+    if (resolved.onIterationProgress) {
+      resolved.onIterationProgress(run, iteration + 1, resolved.maxIterations);
+    }
 
     if (allZeroDelta) {
       break;

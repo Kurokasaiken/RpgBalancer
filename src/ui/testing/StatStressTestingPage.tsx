@@ -90,8 +90,16 @@ export const StatStressTestingPage: React.FC = () => {
 
   const [iterationMode, setIterationMode] = useState<IterationMode>('full');
   const iterations = iterationMode === 'fast' ? FAST_ITERATIONS : FULL_ITERATIONS;
+  const [autoMaxIterations, setAutoMaxIterations] = useState<number>(5);
+  const [autoIterationsPerTier, setAutoIterationsPerTier] = useState<number>(iterations);
+  const [advisorTargetMin, setAdvisorTargetMin] = useState<number>(0.45);
+  const [advisorTargetMax, setAdvisorTargetMax] = useState<number>(0.55);
+  const [advisorMaxRelativeDelta, setAdvisorMaxRelativeDelta] = useState<number>(0.15);
+  const [advisorMinEfficiencyDeviation, setAdvisorMinEfficiencyDeviation] = useState<number>(0.02);
   const [isAutoBalancing, setIsAutoBalancing] = useState<boolean>(false);
   const [autoBalanceError, setAutoBalanceError] = useState<string | undefined>();
+  const [autoBalanceIterationsDone, setAutoBalanceIterationsDone] = useState<number>(0);
+  const [autoBalanceLastRunId, setAutoBalanceLastRunId] = useState<string | null>(null);
   const [historyRuns, setHistoryRuns] = useState<StatBalanceRun[]>([]);
   const [historySessions, setHistorySessions] = useState<StatBalanceSession[]>([]);
   const [selectedHistoryRunId, setSelectedHistoryRunId] = useState<string | null>(null);
@@ -216,9 +224,21 @@ export const StatStressTestingPage: React.FC = () => {
   const weightSuggestions = useMemo(
     () =>
       currentResults
-        ? computeStatWeightSuggestions(config, currentResults.efficiencies)
+        ? computeStatWeightSuggestions(config, currentResults.efficiencies, {
+            targetMin: advisorTargetMin,
+            targetMax: advisorTargetMax,
+            maxRelativeDelta: advisorMaxRelativeDelta,
+            minEfficiencyDeviation: advisorMinEfficiencyDeviation,
+          })
         : [],
-    [config, currentResults],
+    [
+      config,
+      currentResults,
+      advisorTargetMin,
+      advisorTargetMax,
+      advisorMaxRelativeDelta,
+      advisorMinEfficiencyDeviation,
+    ],
   );
 
   const applySuggestion = useCallback(
@@ -255,10 +275,23 @@ export const StatStressTestingPage: React.FC = () => {
   const handleRunAutoBalance = useCallback(async () => {
     if (isAutoBalancing) return;
     setAutoBalanceError(undefined);
+    setAutoBalanceIterationsDone(0);
+    setAutoBalanceLastRunId(null);
     setIsAutoBalancing(true);
     try {
       const { finalConfig } = await runAndStoreAutoBalanceSession(config, {
-        iterationsPerTier: iterations,
+        iterationsPerTier: autoIterationsPerTier,
+        maxIterations: autoMaxIterations,
+        advisorOptions: {
+          targetMin: advisorTargetMin,
+          targetMax: advisorTargetMax,
+          maxRelativeDelta: advisorMaxRelativeDelta,
+          minEfficiencyDeviation: advisorMinEfficiencyDeviation,
+        },
+        onIterationProgress: (run, iteration) => {
+          setAutoBalanceIterationsDone(iteration);
+          setAutoBalanceLastRunId(run.id);
+        },
       });
 
       // Apply final weights to live BalancerConfig via updateStat (config-driven, no direct store usage)
@@ -278,7 +311,19 @@ export const StatStressTestingPage: React.FC = () => {
     } finally {
       setIsAutoBalancing(false);
     }
-  }, [config, iterations, runAllTiers, updateStat, isAutoBalancing]);
+  }, [
+    config,
+    iterations,
+    runAllTiers,
+    updateStat,
+    isAutoBalancing,
+    autoIterationsPerTier,
+    autoMaxIterations,
+    advisorTargetMin,
+    advisorTargetMax,
+    advisorMaxRelativeDelta,
+    advisorMinEfficiencyDeviation,
+  ]);
 
   const hasResults = aggregatedResults !== null;
 
@@ -332,6 +377,99 @@ export const StatStressTestingPage: React.FC = () => {
               </div>
             </div>
 
+            <div className="w-full text-[9px] text-slate-300 bg-slate-950/70 border border-slate-700/70 rounded-lg px-3 py-2 space-y-1">
+              <div className="flex items-center justify-between mb-1">
+                <span className="uppercase tracking-[0.22em] text-slate-400/90">Auto-Balance Params</span>
+                <span className="text-[8px] text-slate-500">Iter, band, aggressiveness</span>
+              </div>
+              <div className="grid grid-cols-[minmax(0,1.6fr)_minmax(0,1.4fr)] gap-x-3 gap-y-1">
+                <span className="text-slate-500">Max iterations</span>
+                <input
+                  type="number"
+                  min={1}
+                  step={1}
+                  value={autoMaxIterations}
+                  onChange={(e) => {
+                    const next = Number(e.target.value);
+                    if (Number.isNaN(next)) return;
+                    setAutoMaxIterations(Math.max(1, Math.floor(next)));
+                  }}
+                  className="w-full bg-slate-900/60 border border-slate-700/60 rounded px-1 py-0.5 text-[10px] font-mono text-slate-100 focus:outline-none focus:ring-1 focus:ring-amber-400/80"
+                />
+                <span className="text-slate-500">Iterations / tier</span>
+                <input
+                  type="number"
+                  min={100}
+                  step={100}
+                  value={autoIterationsPerTier}
+                  onChange={(e) => {
+                    const next = Number(e.target.value);
+                    if (Number.isNaN(next)) return;
+                    setAutoIterationsPerTier(Math.max(1, Math.floor(next)));
+                  }}
+                  className="w-full bg-slate-900/60 border border-slate-700/60 rounded px-1 py-0.5 text-[10px] font-mono text-slate-100 focus:outline-none focus:ring-1 focus:ring-amber-400/80"
+                />
+                <span className="text-slate-500">Target band (min / max)</span>
+                <div className="flex items-center gap-1">
+                  <input
+                    type="number"
+                    min={0}
+                    max={1}
+                    step={0.01}
+                    value={advisorTargetMin}
+                    onChange={(e) => {
+                      const next = Number(e.target.value);
+                      if (Number.isNaN(next)) return;
+                      setAdvisorTargetMin(next);
+                    }}
+                    className="w-full bg-slate-900/60 border border-slate-700/60 rounded px-1 py-0.5 text-[10px] font-mono text-slate-100 focus:outline-none focus:ring-1 focus:ring-amber-400/80"
+                  />
+                  <span className="text-slate-500">–</span>
+                  <input
+                    type="number"
+                    min={0}
+                    max={1}
+                    step={0.01}
+                    value={advisorTargetMax}
+                    onChange={(e) => {
+                      const next = Number(e.target.value);
+                      if (Number.isNaN(next)) return;
+                      setAdvisorTargetMax(next);
+                    }}
+                    className="w-full bg-slate-900/60 border border-slate-700/60 rounded px-1 py-0.5 text-[10px] font-mono text-slate-100 focus:outline-none focus:ring-1 focus:ring-amber-400/80"
+                  />
+                </div>
+                <span className="text-slate-500">Max  weight (rel.)</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={advisorMaxRelativeDelta}
+                  onChange={(e) => {
+                    const next = Number(e.target.value);
+                    if (Number.isNaN(next)) return;
+                    setAdvisorMaxRelativeDelta(Math.max(0, next));
+                  }}
+                  className="w-full bg-slate-900/60 border border-slate-700/60 rounded px-1 py-0.5 text-[10px] font-mono text-slate-100 focus:outline-none focus:ring-1 focus:ring-amber-400/80"
+                />
+                <span className="text-slate-500">Min eff. deviation</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={0.5}
+                  step={0.005}
+                  value={advisorMinEfficiencyDeviation}
+                  onChange={(e) => {
+                    const next = Number(e.target.value);
+                    if (Number.isNaN(next)) return;
+                    setAdvisorMinEfficiencyDeviation(Math.max(0, next));
+                  }}
+                  className="w-full bg-slate-900/60 border border-slate-700/60 rounded px-1 py-0.5 text-[10px] font-mono text-slate-100 focus:outline-none focus:ring-1 focus:ring-amber-400/80"
+                />
+              </div>
+            </div>
+
             <div className="flex gap-2">
               <button
                 type="button"
@@ -372,6 +510,46 @@ export const StatStressTestingPage: React.FC = () => {
                 <span>{isAutoBalancing ? 'Auto-Balancing…' : 'Run Auto-Balance'}</span>
               </button>
             </div>
+
+            {(isAutoBalancing || autoBalanceIterationsDone > 0) && (
+              <div className="w-full mt-1 text-[9px] text-slate-400">
+                <div className="flex items-center justify-between mb-0.5">
+                  <span>
+                    Auto-balance {isAutoBalancing ? 'running' : 'last run'}: {autoBalanceIterationsDone}
+                    /{autoMaxIterations} iterations
+                  </span>
+                  <span className="font-mono text-slate-300">
+                    {Math.min(
+                      100,
+                      Math.round(
+                        (autoBalanceIterationsDone / Math.max(1, autoMaxIterations)) * 100,
+                      ),
+                    )}
+                    %
+                  </span>
+                </div>
+                <div className="w-full h-1.5 bg-slate-800/80 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full ${
+                      isAutoBalancing ? 'bg-amber-400' : 'bg-emerald-400'
+                    }`}
+                    style={{
+                      width: `${Math.min(
+                        100,
+                        (autoBalanceIterationsDone / Math.max(1, autoMaxIterations)) * 100,
+                      )}%`,
+                    }}
+                  />
+                </div>
+                {autoBalanceLastRunId && !isAutoBalancing && (
+                  <div className="mt-0.5 text-[8px] text-slate-500">
+                    Last session: {autoBalanceLastRunId.length > 18
+                      ? `${autoBalanceLastRunId.slice(0, 10)}…${autoBalanceLastRunId.slice(-4)}`
+                      : autoBalanceLastRunId}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </header>
 

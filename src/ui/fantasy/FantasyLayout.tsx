@@ -39,6 +39,13 @@ const NAV_SECTIONS = [
         ]
     },
     {
+        title: 'Idle Village',
+        items: [
+            { id: 'idleVillage', label: 'Idle Village', icon: '🏡' },
+            { id: 'idleVillageConfig', label: 'Idle Village Config', icon: '⚙️' },
+        ]
+    },
+    {
         title: 'Mockups',
         items: [
             { id: 'mockSpellCreatorNew', label: 'Spell Creator New', icon: '✨' },

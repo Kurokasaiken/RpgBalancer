@@ -22,6 +22,7 @@ export async function runAndStoreAutoBalanceSession(
     seed: options?.seed ?? 123456,
     sessionId: options?.sessionId,
     advisorOptions: options?.advisorOptions,
+    onIterationProgress: options?.onIterationProgress,
     persistRuns: options?.persistRuns ?? true,
     persistSession: options?.persistSession ?? true,
   };

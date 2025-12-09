@@ -100,27 +100,31 @@ export class StatsArchetypeGenerator {
    * Generate archetypes that stress ONE stat at a time.
    *
    * For each stat and for each tier in pointTiers:
-   * - Starts from BASELINE_STATS
-   * - Adds (getStatWeight(statId) * tier) to that stat
+   * - Starts from PURE BASELINE (no scaled allocation)
+   * - Adds (getStatWeight(statId) * tier) ONLY to the tested stat
+   *
+   * This ensures a fair comparison: "what happens if I invest N points in stat A vs stat B?"
+   * Both archetypes start from the same baseline and differ only in the tested stat.
    */
   generateSingleStatArchetypes(pointTiers: number[] = [25, 50, 75]): StatsArchetype[] {
     const result: StatsArchetype[] = [];
 
-    for (const pointsPerStat of pointTiers) {
-      // Baseline where every stat has pointsPerStat allocated
-      const tierBaseline = this.buildScaledBaseline(pointsPerStat);
+    // Use pure baseline (no scaled allocation) for fair comparison
+    const pureBaseline = buildBaseFromConfig(this.config);
 
+    for (const pointsPerStat of pointTiers) {
       for (const statId of this.nonDerivedStatIds) {
         const def = this.config.stats[statId];
         if (!def) continue;
 
-        const stats = cloneStatBlock(tierBaseline);
+        // Clone pure baseline - all archetypes start from the same point
+        const stats = cloneStatBlock(pureBaseline);
         const currentValue = (stats as any)[statId] ?? 0;
         const baseWeight = def.weight ?? getStatWeight(statId);
         const curveFactor = getStatCurveFactor(statId, currentValue);
         const effectiveWeight = curveFactor !== 0 ? baseWeight / curveFactor : baseWeight;
-        const extraDelta = effectiveWeight * pointsPerStat; // extra allocation on top of equal baseline
-        (stats as any)[statId] = currentValue + extraDelta;
+        const delta = effectiveWeight * pointsPerStat;
+        (stats as any)[statId] = currentValue + delta;
 
         result.push({
           id: `stress-${statId}-${pointsPerStat}`,
@@ -130,7 +134,7 @@ export class StatsArchetypeGenerator {
           testedStats: [statId],
           pointsPerStat,
           weights: { [statId]: baseWeight },
-          description: `Baseline + ${extraDelta.toFixed(2)} (${baseWeight.toFixed(2)} hp/pt × ${pointsPerStat} pt, curve ×${curveFactor.toFixed(2)}) on ${def.label}`,
+          description: `Pure baseline + ${delta.toFixed(2)} (${baseWeight.toFixed(2)} hp/pt × ${pointsPerStat} pt, curve ×${curveFactor.toFixed(2)}) on ${def.label}`,
         });
       }
     }

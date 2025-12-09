@@ -29,6 +29,8 @@ import { SeraphimArchive } from './ui/fantasy/mockups/SeraphimArchive';
 import { VerdantAlloyDeck } from './ui/fantasy/mockups/VerdantAlloyDeck';
 import { CompactDemo } from './ui/pages/CompactDemo';
 import { TacticalLab } from './ui/tactical/TacticalLab';
+import IdleVillagePage from './ui/idleVillage/IdleVillagePage';
+import IdleVillageConfigRoute from './pages/idle-village-config';
 
 // Lazy-loaded heavy tools (named exports wrapped as default)
 const BalancerNew = lazy(() =>
@@ -75,7 +77,9 @@ type Tab =
   | 'mockVerdantAlloy'
   | 'mockGildedCards'
   | 'compactDemo'
-  | 'tacticalLab';
+  | 'tacticalLab'
+  | 'idleVillage'
+  | 'idleVillageConfig';
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('balancer');
@@ -180,6 +184,16 @@ function App() {
           <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Stat Stress Testing…</div>}>
             <StatStressTestingPage />
           </Suspense>
+        </ErrorBoundary>
+      )}
+      {activeTab === 'idleVillage' && (
+        <ErrorBoundary componentName="Idle Village">
+          <IdleVillagePage />
+        </ErrorBoundary>
+      )}
+      {activeTab === 'idleVillageConfig' && (
+        <ErrorBoundary componentName="Idle Village Config">
+          <IdleVillageConfigRoute />
         </ErrorBoundary>
       )}
       {activeTab === 'fantasyShowcase' && (
