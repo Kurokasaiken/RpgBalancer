@@ -14,7 +14,7 @@
     "test:lint": "npm run lint",
     "test:all": "npm run test:lint && npm run test:unit && npm run test:e2e",
     "test:all:quick": "npm run test:lint && npm run test:unit",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright test --reporter=list",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "docs": "typedoc",

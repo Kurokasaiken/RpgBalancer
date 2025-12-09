@@ -185,6 +185,10 @@ function getDefaultBalanceConfig(): BalanceConfiguration {
     return {
         ttkTargets: [],
         budgetTiers: getDefaultBudgetTiers(),
+        counterMatrix: {},
+        winRateTolerance: 10,
+        roundsTolerancePercent: 20,
+        maxSimulationRounds: 50,
     };
 }
 

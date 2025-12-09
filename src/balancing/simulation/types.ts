@@ -1,3 +1,5 @@
+import type { Spell } from '../spellTypes';
+
 /**
  * Type definitions for Combat Simulation system
  */
@@ -11,8 +13,9 @@ export interface EntityStats {
     hp: number;
     attack: number;
     defense: number;
+    spells?: Spell[];
     // Add other relevant stats as needed
-    [key: string]: any; // Allow flexibility for additional stats
+    [key: string]: number | string | boolean | Spell[] | undefined; // Allow flexibility for additional primitive stats
 }
 
 /**
@@ -88,6 +91,12 @@ export interface CombatResult {
     };
 }
 
+export interface SuddenDeathConfig {
+    startTurn: number;
+    damageMultiplierPerTurn: number;
+    maxDamageMultiplier?: number;
+}
+
 /**
  * Configuration for a combat simulation
  */
@@ -103,6 +112,8 @@ export interface CombatConfig {
 
     /** Whether to log detailed turn-by-turn data */
     enableDetailedLogging?: boolean;
+
+    suddenDeath?: SuddenDeathConfig;
 }
 
 /**

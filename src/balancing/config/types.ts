@@ -52,3 +52,69 @@ export interface ConfigSnapshot {
   config: BalancerConfig;
   description: string;
 }
+
+export type TacticalActionKind =
+  | 'move'
+  | 'attack'
+  | 'overwatch'
+  | 'hunker'
+  | 'interact'
+  | 'ability';
+
+export interface TacticalActionConfig {
+  id: string;
+  kind: TacticalActionKind;
+  label: string;
+  description?: string;
+  baseApCost: number;
+  minRange?: number;
+  maxRange?: number;
+  requiresLineOfSight?: boolean;
+  endsTurn?: boolean;
+}
+
+export type TacticalObjectiveType =
+  | 'eliminateAllEnemies'
+  | 'extractUnit'
+  | 'survive'
+  | 'reachArea';
+
+export interface TacticalObjectiveConfig {
+  id: string;
+  type: TacticalObjectiveType;
+  description: string;
+  isPrimary: boolean;
+}
+
+export interface TacticalSquadMemberConfig {
+  id: string; // Archetype ID, character ID, o simile
+  spawnX?: number;
+  spawnY?: number;
+  roleHint?: string;
+}
+
+export interface TacticalSquadConfig {
+  id: string;
+  label: string;
+  team: 'player' | 'enemy';
+  members: TacticalSquadMemberConfig[];
+}
+
+export type TacticalMissionKind =
+  | 'engagement'
+  | 'assassination'
+  | 'defense'
+  | 'escort'
+  | 'survival';
+
+export interface TacticalMissionConfig {
+  id: string;
+  name: string;
+  kind: TacticalMissionKind;
+  description?: string;
+  mapId: string;
+  squads: TacticalSquadConfig[];
+  objectives: TacticalObjectiveConfig[];
+  turnLimit?: number;
+  allowReinforcements?: boolean;
+}

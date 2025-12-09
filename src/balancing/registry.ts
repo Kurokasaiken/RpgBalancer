@@ -1,3 +1,5 @@
+import { BALANCING_CONFIG } from './balancingConfig';
+
 export interface ParameterDefinition {
     id: string;
     name: string;
@@ -14,7 +16,7 @@ export interface ConstantDefinition {
 
 export const CONSTANTS = {
     BASE_HIT_CHANCE: {
-        value: 50,
+        value: BALANCING_CONFIG.BASE_HIT_CHANCE,
         name: "Probabilità Base",
         description: "La probabilità di colpire di base prima di applicare TxC ed Evasione."
     },

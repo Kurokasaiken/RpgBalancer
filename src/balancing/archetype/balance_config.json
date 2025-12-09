@@ -1,6 +1,88 @@
 {
     "ttkTargets": [],
-    "counters": {},
+    "counterMatrix": {
+        "tank_juggernaut": {
+            "dps_berserker": "Strong",
+            "dps_marksman": "Strong",
+            "dps_armorbreaker": "Weak",
+            "assassin_shadow": "Weak"
+        },
+        "tank_warden": {
+            "dps_berserker": "Strong",
+            "dps_duelist": "Even",
+            "bruiser_warrior": "Even"
+        },
+        "tank_fortress": {
+            "dps_berserker": "Strong",
+            "dps_armorbreaker": "Weak"
+        },
+        "tank_regenerator": {
+            "dps_berserker": "Strong",
+            "assassin_shadow": "Weak"
+        },
+        "tank_shieldbearer": {
+            "dps_berserker": "Strong",
+            "dps_armorbreaker": "Weak"
+        },
+
+        "dps_berserker": {
+            "support_healer": "Strong",
+            "support_bulwark": "Strong",
+            "tank_juggernaut": "Weak",
+            "tank_warden": "Weak"
+        },
+        "dps_marksman": {
+            "support_healer": "Strong",
+            "support_bulwark": "Strong",
+            "assassin_phantom": "Weak"
+        },
+        "dps_duelist": {
+            "bruiser_warrior": "Even",
+            "bruiser_brawler": "Even"
+        },
+        "dps_armorbreaker": {
+            "tank_juggernaut": "Strong",
+            "tank_fortress": "Strong",
+            "tank_shieldbearer": "Strong"
+        },
+
+        "assassin_shadow": {
+            "dps_berserker": "Strong",
+            "support_healer": "Strong",
+            "support_bulwark": "Strong",
+            "tank_fortress": "Weak"
+        },
+        "assassin_phantom": {
+            "dps_marksman": "Strong",
+            "support_healer": "Strong",
+            "support_bulwark": "Strong",
+            "tank_regenerator": "Weak"
+        },
+
+        "bruiser_warrior": {
+            "dps_berserker": "Even",
+            "tank_warden": "Even",
+            "hybrid_allrounder": "Even"
+        },
+        "bruiser_brawler": {
+            "dps_berserker": "Strong",
+            "tank_regenerator": "Even"
+        },
+
+        "support_healer": {
+            "bruiser_brawler": "Strong",
+            "assassin_shadow": "Weak"
+        },
+        "support_bulwark": {
+            "tank_shieldbearer": "Even",
+            "dps_berserker": "Weak"
+        },
+
+        "hybrid_allrounder": {
+            "dps_berserker": "Even",
+            "tank_regenerator": "Even"
+        }
+    },
     "budgetTiers": [
         {
             "name": "Early Game",

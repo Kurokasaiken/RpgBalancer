@@ -41,16 +41,31 @@ export class CombatSimulator {
      * @returns Combat result with winner, turns, damage stats, HP remaining, etc.
      */
     simulate(config: CombatConfig): CombatResult {
-        const { entity1, entity2, turnLimit, enableDetailedLogging = false } = config;
+        const { entity1, entity2, turnLimit, enableDetailedLogging = false, suddenDeath } = config;
 
         // Convert EntityStats to StatBlock format
         const statBlock1 = this.entityToStatBlock(entity1);
         const statBlock2 = this.entityToStatBlock(entity2);
 
+        const baseDamage1 = statBlock1.damage;
+        const baseDamage2 = statBlock2.damage;
+
+        const suddenDeathRules = suddenDeath && suddenDeath.startTurn > 0 && suddenDeath.damageMultiplierPerTurn > 0
+            ? suddenDeath
+            : undefined;
+
         // Create Entity instances using fromStatBlock factory
         // This bypasses Attributes system and uses pure StatBlock
         const fighter1 = Entity.fromStatBlock('entity1', entity1.name || 'Entity 1', statBlock1);
         const fighter2 = Entity.fromStatBlock('entity2', entity2.name || 'Entity 2', statBlock2);
+
+        // Apply equipped spells from combat config, if any
+        if (entity1.spells && entity1.spells.length > 0) {
+            fighter1.spells = [...entity1.spells];
+        }
+        if (entity2.spells && entity2.spells.length > 0) {
+            fighter2.spells = [...entity2.spells];
+        }
 
         // Create combat state using EXISTING combat system
         let state = createCombatState([fighter1], [fighter2]);
@@ -63,6 +78,23 @@ export class CombatSimulator {
 
         // Run combat loop using EXISTING engine
         while (!state.isFinished && state.turn < turnLimit) {
+            if (suddenDeathRules && fighter1.statBlock && fighter2.statBlock) {
+                const upcomingTurn = state.turn + 1;
+                let damageMultiplier = 1;
+
+                if (upcomingTurn >= suddenDeathRules.startTurn) {
+                    const turnsPast = upcomingTurn - suddenDeathRules.startTurn + 1;
+                    damageMultiplier = 1 + suddenDeathRules.damageMultiplierPerTurn * turnsPast;
+
+                    if (typeof suddenDeathRules.maxDamageMultiplier === 'number') {
+                        damageMultiplier = Math.min(damageMultiplier, suddenDeathRules.maxDamageMultiplier);
+                    }
+                }
+
+                fighter1.statBlock.damage = baseDamage1 * damageMultiplier;
+                fighter2.statBlock.damage = baseDamage2 * damageMultiplier;
+            }
+
             // Track HP before turn
             const hpBefore1 = fighter1.currentHp;
             const hpBefore2 = fighter2.currentHp;
@@ -78,16 +110,6 @@ export class CombatSimulator {
             // Track cumulative damage (damage dealt TO opponent)
             totalDamage2 += damageTaken1; // Entity2 dealt damage to Entity1
             totalDamage1 += damageTaken2; // Entity1 dealt damage to Entity2
-        }
-
-        // Determine winner
-        let winner: 'entity1' | 'entity2' | 'draw';
-        if (state.winner === 'teamA') {
-            winner = 'entity1';
-        } else if (state.winner === 'teamB') {
-            winner = 'entity2';
-        } else {
-            winner = 'draw';
         }
 
         // Calculate overkill (damage dealt after opponent reached 0 HP)
@@ -106,6 +128,35 @@ export class CombatSimulator {
         // Entity2's overkill = damage dealt to entity1 beyond its HP
         if (hp1 === 0 && totalDamage2 > initialHP1) {
             overkill2 = totalDamage2 - initialHP1;
+        }
+
+        // Determine winner
+        // Default mapping from engine result
+        let winner: 'entity1' | 'entity2' | 'draw';
+        if (state.winner === 'teamA') {
+            winner = 'entity1';
+        } else if (state.winner === 'teamB') {
+            winner = 'entity2';
+        } else {
+            winner = 'draw';
+        }
+
+        // If we reached the turn limit without a decisive winner, resolve the tie
+        // in favour of the side with higher remaining HP (or damage dealt).
+        const timedOut = !state.isFinished && state.turn >= turnLimit;
+        if (timedOut && winner === 'draw') {
+            if (hp1 > hp2) {
+                winner = 'entity1';
+            } else if (hp2 > hp1) {
+                winner = 'entity2';
+            } else if (totalDamage1 > totalDamage2) {
+                winner = 'entity1';
+            } else if (totalDamage2 > totalDamage1) {
+                winner = 'entity2';
+            } else {
+                // Perfect tie on both HP and damage: extremely rare, keep as draw
+                winner = 'draw';
+            }
         }
 
         // Extract turn-by-turn log if requested

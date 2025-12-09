@@ -12,6 +12,11 @@ import { MathEngine } from '../../balancing/1v1/mathEngine';
 import { ConfigurableCard } from './ConfigurableCard';
 import { ConfigToolbar } from './ConfigToolbar';
 import { Sparkles } from 'lucide-react';
+import { ScenarioCard } from './scenario/ScenarioCard';
+import { SCENARIO_CONFIGS, type ScenarioConfig, type ScenarioType } from '../../balancing/contextWeights';
+import { getScenarioPowerMapForStatBlockWithConfigs } from '../../balancing/expectedValue';
+import { runScenarioMatchupWithOverride, type ScenarioMatchupResult } from '../../balancing/scenario/ScenarioSimulationRunner';
+import { ELITE_SCENARIOS, type EliteScenarioId } from '../../balancing/scenario/eliteScenarios';
 
 interface SortableCardProps {
   card: CardDefinition;
@@ -118,6 +123,7 @@ export const BalancerNew: React.FC = () => {
   const errorTimeoutsRef = useRef<Record<string, number>>({});
   
   const SIM_VALUES_KEY = 'balancer_sim_values';
+  const SCENARIO_CONFIGS_KEY = 'balancer_scenario_configs_v1';
   
   // Simulation values - initialized from localStorage or config defaults
   const [simValues, setSimValues] = useState<Record<string, number>>(() => {
@@ -267,6 +273,180 @@ export const BalancerNew: React.FC = () => {
   const visibleCards = cards.filter((card) => !card.isHidden);
   const hiddenCards = cards.filter((card) => card.isHidden);
 
+  const [scenarioConfigs, setScenarioConfigs] = useState<Record<ScenarioType, ScenarioConfig>>(() => {
+    try {
+      const saved = localStorage.getItem(SCENARIO_CONFIGS_KEY);
+      if (!saved) {
+        return SCENARIO_CONFIGS;
+      }
+      const parsed = JSON.parse(saved) as Partial<Record<ScenarioType, Partial<ScenarioConfig>>>;
+      const merged: Record<ScenarioType, ScenarioConfig> = { ...SCENARIO_CONFIGS } as Record<ScenarioType, ScenarioConfig>;
+      (Object.keys(SCENARIO_CONFIGS) as ScenarioType[]).forEach((type) => {
+        const override = parsed[type];
+        if (override) {
+          merged[type] = { ...SCENARIO_CONFIGS[type], ...override };
+        }
+      });
+      return merged;
+    } catch {
+      return SCENARIO_CONFIGS;
+    }
+  });
+
+  const handleScenarioConfigChange = useCallback(
+    (type: ScenarioType, updates: Partial<ScenarioConfig>) => {
+      setScenarioConfigs((prev) => ({
+        ...prev,
+        [type]: { ...prev[type], ...updates },
+      }));
+    },
+    [],
+  );
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(SCENARIO_CONFIGS_KEY, JSON.stringify(scenarioConfigs));
+    } catch {
+    }
+  }, [scenarioConfigs]);
+
+  useEffect(() => {
+    const handleScenarioStorageChange = (e: StorageEvent) => {
+      if (e.key !== SCENARIO_CONFIGS_KEY || !e.newValue) {
+        return;
+      }
+      try {
+        const parsed = JSON.parse(e.newValue) as Partial<Record<ScenarioType, Partial<ScenarioConfig>>>;
+        setScenarioConfigs((prev) => {
+          const next: Record<ScenarioType, ScenarioConfig> = { ...prev } as Record<ScenarioType, ScenarioConfig>;
+          (Object.keys(SCENARIO_CONFIGS) as ScenarioType[]).forEach((type) => {
+            const override = parsed[type];
+            if (override) {
+              next[type] = { ...SCENARIO_CONFIGS[type], ...override };
+            }
+          });
+          return next;
+        });
+      } catch {
+      }
+    };
+
+    window.addEventListener('storage', handleScenarioStorageChange);
+    return () => window.removeEventListener('storage', handleScenarioStorageChange);
+  }, []);
+
+  const scenarioTypeList = Object.keys(SCENARIO_CONFIGS) as ScenarioType[];
+  const [selectedScenarioType, setSelectedScenarioType] = useState<ScenarioType>(
+    scenarioTypeList[0] ?? 'duel_1v1',
+  );
+  const [scenarioIterations, setScenarioIterations] = useState<number>(500);
+  const [isScenarioSimRunning, setIsScenarioSimRunning] = useState(false);
+  const [scenarioSimResult, setScenarioSimResult] = useState<ScenarioMatchupResult | null>(null);
+  const [selectedEliteId, setSelectedEliteId] = useState<EliteScenarioId | ''>('');
+
+  const handleExportScenarios = useCallback(() => {
+    try {
+      const data = JSON.stringify(scenarioConfigs, null, 2);
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `balancer-scenarios-${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+    }
+  }, [scenarioConfigs]);
+
+  const handleImportScenarios = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files && event.target.files[0];
+    if (!file) {
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const text = typeof reader.result === 'string' ? reader.result : '';
+        if (!text) {
+          return;
+        }
+        const parsed = JSON.parse(text) as Partial<Record<ScenarioType, Partial<ScenarioConfig>>>;
+        setScenarioConfigs((prev) => {
+          const next: Record<ScenarioType, ScenarioConfig> = { ...prev } as Record<ScenarioType, ScenarioConfig>;
+          (Object.keys(SCENARIO_CONFIGS) as ScenarioType[]).forEach((type) => {
+            const override = parsed[type];
+            if (override) {
+              next[type] = { ...SCENARIO_CONFIGS[type], ...override };
+            }
+          });
+          return next;
+        });
+      } catch {
+      }
+    };
+
+    reader.readAsText(file);
+    event.target.value = '';
+  }, []);
+
+  const handleApplyElitePreset = useCallback(
+    (eliteId: EliteScenarioId) => {
+      const preset = ELITE_SCENARIOS[eliteId];
+      if (!preset) {
+        return;
+      }
+
+      const baseType = preset.baseScenarioType;
+      const overrides = preset.scenarioOverrides;
+      if (!overrides) {
+        return;
+      }
+
+      setScenarioConfigs((prev) => {
+        const current = prev[baseType] ?? SCENARIO_CONFIGS[baseType];
+        const mergedEffectiveness = {
+          ...current.statEffectiveness,
+          ...(overrides.statEffectiveness ?? {}),
+        };
+
+        return {
+          ...prev,
+          [baseType]: {
+            ...current,
+            ...overrides,
+            statEffectiveness: mergedEffectiveness,
+          },
+        };
+      });
+    },
+    [],
+  );
+
+  const handleRunScenarioSimulation = useCallback(() => {
+    try {
+      setIsScenarioSimRunning(true);
+      const attacker = buildStatBlockFromSimValues(simValues);
+      const defender = DEFAULT_STATS;
+      const scenario = scenarioConfigs[selectedScenarioType];
+      const result = runScenarioMatchupWithOverride({
+        scenarioType: selectedScenarioType,
+        iterations: scenarioIterations,
+        attacker,
+        defender,
+        attackerName: 'Build',
+        defenderName: 'Baseline',
+        logSampleSize: 10,
+        scenarioOverride: scenario,
+      });
+      setScenarioSimResult(result);
+    } catch {
+      setScenarioSimResult(null);
+    } finally {
+      setIsScenarioSimRunning(false);
+    }
+  }, [simValues, scenarioConfigs, selectedScenarioType, scenarioIterations]);
+
   // Deterministic 1v1 equal-fight metrics (Self vs Self), updated in real time
   const equalFightMetrics = useMemo(() => {
     try {
@@ -279,6 +459,15 @@ export const BalancerNew: React.FC = () => {
       return null;
     }
   }, [simValues]);
+
+  const scenarioPowerMap = useMemo(() => {
+    try {
+      const statBlock = buildStatBlockFromSimValues(simValues);
+      return getScenarioPowerMapForStatBlockWithConfigs(statBlock, scenarioConfigs);
+    } catch {
+      return null;
+    }
+  }, [simValues, scenarioConfigs]);
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
@@ -389,6 +578,194 @@ export const BalancerNew: React.FC = () => {
           </div>
         )}
 
+        <div className="mt-4 rounded-xl border border-indigo-500/40 bg-slate-900/70 px-4 py-3">
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-baseline gap-2">
+              <h3 className="text-[10px] font-semibold uppercase tracking-[0.24em] text-indigo-300">
+                Scenario Simulation (vs Baseline)
+              </h3>
+              <select
+                className="rounded-full border border-indigo-500/60 bg-slate-950 px-2 py-0.5 text-[9px] uppercase tracking-[0.2em] text-indigo-200 hover:border-indigo-400/80"
+                value={selectedScenarioType}
+                onChange={(e) => setSelectedScenarioType(e.target.value as ScenarioType)}
+              >
+                {(Object.entries(scenarioConfigs) as Array<[ScenarioType, ScenarioConfig]>).map(
+                  ([type, scenario]) => (
+                    <option key={type} value={type}>
+                      {scenario.icon} {scenario.name}
+                    </option>
+                  ),
+                )}
+              </select>
+            </div>
+            <div className="flex items-center gap-2 text-[10px]">
+              <label className="flex items-center gap-1 text-slate-300">
+                <span className="uppercase tracking-[0.2em]">Iter</span>
+                <input
+                  type="number"
+                  min={50}
+                  max={5000}
+                  step={50}
+                  value={scenarioIterations}
+                  onChange={(e) => setScenarioIterations(Number(e.target.value) || 50)}
+                  className="w-20 rounded border border-slate-700 bg-slate-950 px-2 py-0.5 text-[10px] text-slate-100 outline-none focus:border-indigo-400"
+                />
+              </label>
+              <button
+                type="button"
+                onClick={handleRunScenarioSimulation}
+                disabled={isScenarioSimRunning}
+                className="rounded-full border border-indigo-500/80 px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-indigo-100 hover:bg-indigo-500/10 disabled:opacity-50"
+              >
+                {isScenarioSimRunning ? 'Running...' : 'Run Sim'}
+              </button>
+            </div>
+          </div>
+
+          {scenarioSimResult && (
+            <div className="grid gap-3 text-[10px] sm:grid-cols-3">
+              <div className="flex flex-col">
+                <span className="text-slate-400 uppercase tracking-[0.2em]">Winrate</span>
+                <span className="mt-0.5 font-mono text-emerald-300">
+                  Build: {(scenarioSimResult.summary.winRates.entity1 * 100).toFixed(1)}%
+                </span>
+                <span className="font-mono text-rose-300">
+                  Baseline: {(scenarioSimResult.summary.winRates.entity2 * 100).toFixed(1)}%
+                </span>
+                <span className="font-mono text-slate-400">
+                  Draws: {(scenarioSimResult.summary.winRates.draws * 100).toFixed(1)}%
+                </span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-slate-400 uppercase tracking-[0.2em]">TTK (Turns)</span>
+                <span className="mt-0.5 font-mono text-cyan-300">
+                  Avg: {scenarioSimResult.combatStatistics.averageTurns.toFixed(1)}
+                </span>
+                <span className="font-mono text-slate-200">
+                  Median: {scenarioSimResult.combatStatistics.medianTurns.toFixed(1)}
+                </span>
+                <span className="font-mono text-slate-400">
+                  Range: {scenarioSimResult.combatStatistics.minTurns.toFixed(0)}-
+                  {scenarioSimResult.combatStatistics.maxTurns.toFixed(0)}
+                </span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-slate-400 uppercase tracking-[0.2em]">Damage/Overkill</span>
+                <span className="mt-0.5 font-mono text-amber-300">
+                  DPT Build: {scenarioSimResult.damageMetrics.entity1.average.toFixed(1)}
+                </span>
+                <span className="font-mono text-amber-200">
+                  DPT Base: {scenarioSimResult.damageMetrics.entity2.average.toFixed(1)}
+                </span>
+                <span className="font-mono text-slate-400">
+                  Overkill Avg: {scenarioSimResult.damageMetrics.averageOverkill.entity1.toFixed(1)} /
+                  {scenarioSimResult.damageMetrics.averageOverkill.entity2.toFixed(1)}
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="mt-4 space-y-2">
+          <div className="flex items-baseline justify-between gap-2">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.26em] text-cyan-300">
+              🎯 Configurazione Scenari
+            </h2>
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] uppercase tracking-[0.2em] text-slate-500">
+                Duel · Boss · Swarm · 5v5
+              </span>
+              <select
+                className="rounded-full border border-cyan-500/60 bg-slate-950 px-2 py-0.5 text-[9px] uppercase tracking-[0.2em] text-cyan-200 hover:border-cyan-400/80"
+                value={selectedEliteId}
+                onChange={(e) => {
+                  const value = e.target.value as EliteScenarioId | '';
+                  setSelectedEliteId(value);
+                  if (value) {
+                    handleApplyElitePreset(value);
+                  }
+                }}
+              >
+                <option value="">Elite Preset</option>
+                {(Object.values(ELITE_SCENARIOS) as typeof ELITE_SCENARIOS[keyof typeof ELITE_SCENARIOS][]).map(
+                  (elite) => (
+                    <option key={elite.id} value={elite.id}>
+                      {elite.name}
+                    </option>
+                  ),
+                )}
+              </select>
+              <button
+                type="button"
+                onClick={handleExportScenarios}
+                className="rounded-full border border-cyan-500/60 px-2 py-0.5 text-[9px] uppercase tracking-[0.2em] text-cyan-200 hover:bg-cyan-500/10"
+              >
+                Export
+              </button>
+              <label className="cursor-pointer rounded-full border border-cyan-500/60 px-2 py-0.5 text-[9px] uppercase tracking-[0.2em] text-cyan-200 hover:bg-cyan-500/10">
+                Import
+                <input
+                  type="file"
+                  accept="application/json"
+                  className="hidden"
+                  onChange={handleImportScenarios}
+                />
+              </label>
+            </div>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+            {(Object.values(scenarioConfigs) as ScenarioConfig[]).map((scenario) => (
+              <ScenarioCard
+                key={scenario.type}
+                config={scenario}
+                onConfigChange={handleScenarioConfigChange}
+                onReset={() =>
+                  setScenarioConfigs((prev) => ({
+                    ...prev,
+                    [scenario.type]: SCENARIO_CONFIGS[scenario.type],
+                  }))
+                }
+              />
+            ))}
+          </div>
+        </div>
+
+        {scenarioPowerMap && (
+          <div className="mt-3 rounded-xl border border-amber-500/40 bg-slate-900/70 px-4 py-3">
+            <div className="mb-2 flex items-baseline justify-between">
+              <h3 className="text-[10px] font-semibold uppercase tracking-[0.24em] text-amber-300">
+                Scenario Power (HP eq)
+              </h3>
+              <span className="text-[9px] uppercase tracking-[0.18em] text-slate-500">
+                Basato sul build corrente
+              </span>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+              {(Object.entries(scenarioConfigs) as Array<[ScenarioType, ScenarioConfig]>).map(
+                ([type, scenario]) => {
+                  const power = scenarioPowerMap[type] ?? 0;
+                  return (
+                    <div
+                      key={type}
+                      className="rounded-lg border border-amber-500/30 bg-slate-950/70 px-3 py-2 text-[10px]"
+                    >
+                      <div className="mb-1 flex items-center justify-between gap-2">
+                        <span className="flex items-center gap-1 truncate text-amber-100">
+                          <span aria-hidden>{scenario.icon}</span>
+                          <span className="truncate">{scenario.name}</span>
+                        </span>
+                        <span className="font-mono text-emerald-300">
+                          {power.toFixed(1)}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                },
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Hidden cards row */}
         {hiddenCards.length > 0 && (
           <div className="mb-3 flex flex-wrap items-center gap-1.5 text-[10px]">
@@ -402,7 +779,7 @@ export const BalancerNew: React.FC = () => {
                 title="Mostra card"
               >
                 <span aria-hidden className="text-xs">{card.icon || '🂠'}</span>
-                <span className="text-[10px] tracking-[0.18em] uppercase truncate max-w-[7rem]">{card.title}</span>
+                <span className="text-[10px] tracking-[0.18em] uppercase truncate max-w-28">{card.title}</span>
               </button>
             ))}
           </div>

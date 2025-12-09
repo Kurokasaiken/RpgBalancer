@@ -27,6 +27,7 @@ const NAV_SECTIONS = [
             { id: 'archetypes', label: 'Archetypes', icon: '🎭' },
             { id: 'archetypeBuilder', label: 'Builder', icon: '🏗️' },
             { id: 'matchupMatrix', label: 'War Room', icon: '🗺️' },
+            { id: 'archetypeTesting', label: '1v1 Archetypes', icon: '⚔️' },
         ]
     },
     {
@@ -58,6 +59,7 @@ const NAV_SECTIONS = [
         items: [
             { id: 'compactDemo', label: 'Compact UI Demo', icon: '📐' },
             { id: 'fantasyShowcase', label: 'Showcase', icon: '🎨' },
+            { id: 'tacticalDebug', label: 'Tactical Debug', icon: '🎨' },
         ]
     }
 ];

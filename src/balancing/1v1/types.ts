@@ -4,6 +4,7 @@
 
 import type { StatBlock } from '../types';
 import type { BalancePreset } from '../BalanceConfigManager';
+import type { Spell } from '../spellTypes';
 
 /**
  * Archetype definition for 1v1 balancing
@@ -15,6 +16,10 @@ export interface Archetype {
     role: string; // "Tank", "DPS", "Assassin", etc.
     description: string;
     stats: StatBlock; // Inherits from balancing/types.ts
+    /** Optional equipped spells used in combat simulations */
+    spells?: Spell[];
+    /** Optional list of spell IDs to resolve from spell storage/config */
+    spellIds?: string[];
     meta: {
         createdBy: string;
         createdAt: string;

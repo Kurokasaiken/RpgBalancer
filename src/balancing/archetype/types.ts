@@ -164,6 +164,11 @@ export interface BalanceConfiguration {
 
     // Counter Matrix (optional - defines strength relationships)
     counterMatrix?: Record<string, Record<string, 'Strong' | 'Weak' | 'Even'>>;
+
+    // Global tolerance settings (percent values, e.g. 10 = 10%)
+    winRateTolerance?: number;
+    roundsTolerancePercent?: number;
+    maxSimulationRounds?: number;
 }
 
 /**

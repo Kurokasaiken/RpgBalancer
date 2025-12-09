@@ -67,4 +67,14 @@ test.describe('UI Verification Suite', () => {
         await expect(page.locator('text=Arcane Tech Glass · Config-Driven').first()).toBeVisible();
     });
 
+    test('Tactical Debug: page loads and grid renders', async ({ page }) => {
+        // Navigate to Tactical Debug (under System section)
+        await page.locator('button:has-text("Tactical Debug")').click();
+        await page.waitForTimeout(500);
+
+        // Verify Tactical Debug heading and grid are visible
+        await expect(page.locator('text=Tactical Debug').first()).toBeVisible();
+        await expect(page.locator('[data-testid="tactical-debug-grid"]').first()).toBeVisible();
+    });
+
 });

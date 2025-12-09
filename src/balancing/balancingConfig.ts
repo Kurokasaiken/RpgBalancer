@@ -2,10 +2,13 @@
  * Global Balancing Configuration
  * Single source of truth for combat constants and baselines.
  */
+import { DEFAULT_CONFIG } from './config/defaultConfig';
+
+const BASE_HIT_CHANCE_DEFAULT = DEFAULT_CONFIG.stats.baseHitChance?.defaultValue ?? 50;
 
 export const BALANCING_CONFIG = {
     // Combat Mechanics
-    BASE_HIT_CHANCE: 50, // Base chance when TxC == Evasion
+    BASE_HIT_CHANCE: BASE_HIT_CHANCE_DEFAULT, // Base chance when TxC == Evasion
     MIN_HIT_CHANCE: 1,   // Always 1% chance to hit
     MAX_HIT_CHANCE: 100, // Always 100% chance to hit (unless capped elsewhere)
 

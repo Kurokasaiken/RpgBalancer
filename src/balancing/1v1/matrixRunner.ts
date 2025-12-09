@@ -20,6 +20,9 @@ import { computeAllSWIForMatchup } from './swi';
 import type { Archetype, MatrixRunResult, MatchupResult } from './types';
 import { CombatSimulator } from '../simulation/CombatSimulator';
 import { SeededRNG } from './montecarlo'; // SeededRNG is defined in montecarlo.ts
+import type { Spell } from '../spellTypes';
+import { DEFAULT_SPELLS } from '../defaultSpells';
+import { loadSpells } from '../spellStorage';
 
 /**
  * Options for running a matrix
@@ -263,6 +266,57 @@ export interface MatrixRunnerConfig {
     enableDetailedLogging?: boolean;
 }
 
+/**
+ * Build the spell pool available to archetypes for combat simulations.
+ * Combines built-in default spells with any user-defined spells from storage.
+ */
+function buildSpellPool(): Spell[] {
+    const pool = new Map<string, Spell>();
+
+    // Default spells (from config/json)
+    for (const spell of DEFAULT_SPELLS) {
+        pool.set(spell.id, spell);
+    }
+
+    // User-defined spells from local storage (if available)
+    for (const spell of loadSpells()) {
+        pool.set(spell.id, spell);
+    }
+
+    return Array.from(pool.values());
+}
+
+/**
+ * Resolve the list of spells to use for a given archetype.
+ * Priority:
+ * 1) Archetype.spells (direct list)
+ * 2) Archetype.spellIds resolved against the global spell pool
+ */
+function resolveArchetypeSpells(archetype: Archetype, spellPool: Spell[]): Spell[] | undefined {
+    if (archetype.spells && archetype.spells.length > 0) {
+        return archetype.spells;
+    }
+
+    if (!archetype.spellIds || archetype.spellIds.length === 0) {
+        return undefined;
+    }
+
+    const byId = new Map<string, Spell>();
+    for (const spell of spellPool) {
+        byId.set(spell.id, spell);
+    }
+
+    const resolved: Spell[] = [];
+    for (const id of archetype.spellIds) {
+        const spell = byId.get(id);
+        if (spell) {
+            resolved.push(spell);
+        }
+    }
+
+    return resolved.length > 0 ? resolved : undefined;
+}
+
 export function runMatrixCombat(config: MatrixRunnerConfig) {
     const {
         archetypes,
@@ -271,21 +325,26 @@ export function runMatrixCombat(config: MatrixRunnerConfig) {
         enableDetailedLogging = false
     } = config;
     const rng = new SeededRNG(seed);
+    const spellPool = buildSpellPool();
     const results = [];
     for (const entity1 of archetypes) {
         for (const entity2 of archetypes) {
+            const spells1 = resolveArchetypeSpells(entity1, spellPool);
+            const spells2 = resolveArchetypeSpells(entity2, spellPool);
             const result = CombatSimulator.simulate({
                 entity1: { 
                     ...entity1.stats, 
                     name: entity1.name || entity1.id,
                     attack: entity1.stats.damage,
-                    defense: entity1.stats.armor 
+                    defense: entity1.stats.armor,
+                    ...(spells1 ? { spells: spells1 } : {}),
                 },
                 entity2: { 
                     ...entity2.stats, 
                     name: entity2.name || entity2.id,
                     attack: entity2.stats.damage,
-                    defense: entity2.stats.armor
+                    defense: entity2.stats.armor,
+                    ...(spells2 ? { spells: spells2 } : {}),
                 },
                 turnLimit,
                 enableDetailedLogging

@@ -9,6 +9,7 @@ import React, { useState, useEffect } from 'react';
 import { MatchupMatrix } from './MatchupMatrix';
 import type { MatrixRunResult } from '../../../balancing/1v1/types';
 import { runMatrix } from '../../../balancing/1v1/matrixRunner';
+import { getAllArchetypeIds } from '../../../balancing/1v1/testArchetypes';
 import { GlassCard } from '../../atoms/GlassCard';
 import { GlassButton } from '../../atoms/GlassButton';
 
@@ -23,8 +24,7 @@ export const MatchupMatrixWrapper: React.FC = () => {
         setError(null);
 
         try {
-            // Use test archetypes
-            const archetypeIds = ['Tank', 'DPS', 'Assassin', 'Bruiser', 'Evasive', 'Sustain'];
+            const archetypeIds = getAllArchetypeIds();
 
             const result = await runMatrix(archetypeIds, {
                 fast: true, // Use fast mode for UI

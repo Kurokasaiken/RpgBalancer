@@ -28,6 +28,7 @@ import { MidnightMeridian } from './ui/fantasy/mockups/MidnightMeridian';
 import { SeraphimArchive } from './ui/fantasy/mockups/SeraphimArchive';
 import { VerdantAlloyDeck } from './ui/fantasy/mockups/VerdantAlloyDeck';
 import { CompactDemo } from './ui/pages/CompactDemo';
+import { TacticalDebugPage } from './ui/tactical/TacticalDebugPage';
 
 // Lazy-loaded heavy tools (named exports wrapped as default)
 const BalancerNew = lazy(() =>
@@ -39,6 +40,9 @@ const TestingLab = lazy(() =>
 const StatStressTestingPage = lazy(() =>
   import('./ui/testing/StatStressTestingPage').then((m) => ({ default: m.StatStressTestingPage }))
 );
+const ArchetypeTestingLab = lazy(() =>
+  import('./ui/balancing/ArchetypeTestingLab').then((m) => ({ default: m.ArchetypeTestingLab }))
+);
 
 type Tab =
   | 'balancer'
@@ -48,6 +52,7 @@ type Tab =
   | 'archetypeBuilder'
   | 'archetypeFantasy'
   | 'matchupMatrix'
+  | 'archetypeTesting'
   | 'autoBalancer'
   | 'characterCreator'
   | 'spellLibrary'
@@ -69,7 +74,8 @@ type Tab =
   | 'mockSeraphimArchive'
   | 'mockVerdantAlloy'
   | 'mockGildedCards'
-  | 'compactDemo';
+  | 'compactDemo'
+  | 'tacticalDebug';
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('balancer');
@@ -157,6 +163,13 @@ function App() {
           <MatchupMatrixWrapper />
         </ErrorBoundary>
       )}
+      {activeTab === 'archetypeTesting' && (
+        <ErrorBoundary componentName="Archetype 1v1 Testing">
+          <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Archetype 1v1 Testing…</div>}>
+            <ArchetypeTestingLab />
+          </Suspense>
+        </ErrorBoundary>
+      )}
       {activeTab === 'autoBalancer' && (
         <ErrorBoundary componentName="Auto-Balancer">
           <AutoBalancerWrapper />
@@ -232,6 +245,11 @@ function App() {
       {activeTab === 'compactDemo' && (
         <ErrorBoundary componentName="Compact UI Demo">
           <CompactDemo />
+        </ErrorBoundary>
+      )}
+      {activeTab === 'tacticalDebug' && (
+        <ErrorBoundary componentName="Tactical Debug">
+          <TacticalDebugPage />
         </ErrorBoundary>
       )}
     </FantasyLayout>
