@@ -35,7 +35,7 @@ export default function IdleVillageGlobalRulesTab() {
     <div className="space-y-4">
       <h2 className="text-lg sm:text-xl font-cinzel tracking-[0.18em] uppercase text-ivory/90">Global Rules</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <DefaultSection title="Fatigue">
           <div className="space-y-2 text-sm">
             <div>
@@ -80,6 +80,33 @@ export default function IdleVillageGlobalRulesTab() {
                 type="number"
                 value={rules.fatigueRedThreshold}
                 onChange={(e) => handleNumberChange('fatigueRedThreshold')(e.target.value)}
+                className="w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory"
+              />
+            </div>
+          </div>
+        </DefaultSection>
+
+        <DefaultSection title="Food Economy">
+          <div className="space-y-2 text-sm">
+            <div>
+              <label className="block font-bold mb-1">Food Consumption Per Resident Per Day</label>
+              <input
+                type="number"
+                min={0}
+                step={0.1}
+                value={rules.foodConsumptionPerResidentPerDay}
+                onChange={(e) => handleNumberChange('foodConsumptionPerResidentPerDay')(e.target.value)}
+                className="w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory"
+              />
+            </div>
+            <div>
+              <label className="block font-bold mb-1">Base Food Price (Gold per Unit)</label>
+              <input
+                type="number"
+                min={0}
+                step={1}
+                value={rules.baseFoodPriceInGold}
+                onChange={(e) => handleNumberChange('baseFoodPriceInGold')(e.target.value)}
                 className="w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory"
               />
             </div>

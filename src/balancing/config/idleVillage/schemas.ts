@@ -90,6 +90,8 @@ export const GlobalRulesSchema = z.object({
   fatigueRedThreshold: z.number(),
   baseLightInjuryChanceAtMaxFatigue: z.number(),
   dangerInjuryMultiplierPerPoint: z.number(),
+  foodConsumptionPerResidentPerDay: z.number(),
+  baseFoodPriceInGold: z.number(),
   questXpFormula: z.string().min(1),
   maxActiveQuests: z.number().int().min(0),
   defaultRandomSeed: z.number().optional(),

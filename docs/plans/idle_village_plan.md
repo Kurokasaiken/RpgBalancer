@@ -1,8 +1,13 @@
-# Phase 12: Idle Village Autobattler – Implementation Plan
+# Phase 12: Idle Incremental RPG – Idle Village – Implementation Plan
 
 **Status:** Planning  
 **Type:** Idle Meta-Game / Village + Quest + Worker Placement  
 **Depends On:** Phase 9 (Combat Expansion), Phase 10 (Config-Driven Balancer), Phase 10.5 (Stat Stress Testing), Phase 11 (Tactical Missions – per filosofia e riuso engine)
+
+**Product Context:**  
+Phase 12 realizza la **Phase One** del prodotto *Idle Incremental RPG – Idle Village*. Per high concept, player fantasy, meta-progression tra run e obiettivi di prodotto vedi:  
+- [../GAME_VISION_IDLE_INCREMENTAL.md](../GAME_VISION_IDLE_INCREMENTAL.md)  
+Questo file si concentra invece su architettura e sotto-sistemi tecnici (Time & Activity Engine, Jobs, Quest, Injury, Economy, UI prototipale) necessari a rendere giocabile il loop descritto nel documento di visione.
 
 ---
 

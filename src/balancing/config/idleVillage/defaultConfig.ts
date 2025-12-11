@@ -6,24 +6,181 @@ import type { IdleVillageConfig } from './types';
 
 export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
   version: '1.0.0',
-  resources: {},
-  activities: {},
-  mapSlots: {},
-  buildings: {},
-  founders: {},
-  variance: {
-    difficultyCategories: {},
-    rewardCategories: {},
+
+  // Core economic resources for the village meta-game. All values are editable
+  // from the Idle Village config UI; these are just safe starting presets for
+  // the first playable scenario.
+  resources: {
+    gold: {
+      id: 'gold',
+      label: 'Gold',
+      description: 'Coins used for wages, equipment and basic upgrades.',
+      icon: '◆',
+      colorClass: 'text-amber-300',
+      isCore: true,
+    },
+    food: {
+      id: 'food',
+      label: 'Food',
+      description: 'Daily upkeep for all residents in the village.',
+      icon: '♨',
+      colorClass: 'text-emerald-300',
+      isCore: true,
+    },
+    materials: {
+      id: 'materials',
+      label: 'Materials',
+      description: 'Abstract building materials for construction and upgrades.',
+      icon: '⬤',
+      colorClass: 'text-slate-200',
+      isCore: true,
+    },
+    xp: {
+      id: 'xp',
+      label: 'XP',
+      description: 'Experience gained from combat and risky jobs.',
+      icon: '✦',
+      colorClass: 'text-violet-300',
+      isCore: true,
+    },
   },
+
+  // Minimal starting activities: two simple jobs that can be scheduled from
+  // the Idle Village page to exercise the time, job and injury engines.
+  activities: {
+    job_city_rats: {
+      id: 'job_city_rats',
+      label: 'Clear Rats in City',
+      description: 'Hunt rats in the city sewers for a small but steady income.',
+      tags: ['job', 'combat', 'city'],
+      slotTags: ['village', 'job_site'],
+      resolutionEngineId: 'job',
+      level: 1,
+      dangerRating: 1,
+      durationFormula: '1',
+      // Simple deterministic rewards; fully configurable from the Activities tab.
+      rewards: [
+        { resourceId: 'gold', amountFormula: '5' },
+        { resourceId: 'xp', amountFormula: '2' },
+      ],
+      metadata: {
+        // Allow this job to auto-repeat in the main Idle Village UI.
+        supportsAutoRepeat: true,
+        // Default map slot; still overridable via Activities/Map config.
+        mapSlotId: 'village_square',
+        // Mark this as a continuous job: while assigned, it pays out once per time segment.
+        continuousJob: true,
+      },
+    },
+    job_explore_outskirts: {
+      id: 'job_explore_outskirts',
+      label: 'Explore the Outskirts',
+      description: 'Scout the outskirts for threats and opportunities.',
+      tags: ['job', 'explore'],
+      slotTags: ['world', 'job_site'],
+      resolutionEngineId: 'job',
+      level: 1,
+      dangerRating: 2,
+      durationFormula: '5',
+      rewards: [
+        { resourceId: 'xp', amountFormula: '3' },
+        { resourceId: 'materials', amountFormula: '1' },
+      ],
+      metadata: {
+        supportsAutoRepeat: false,
+        mapSlotId: 'village_gate',
+      },
+    },
+  },
+
+  // Simple logical map layout with two generic slots: one inside the village
+  // and one just outside the walls. Coordinates are purely logical and the UI
+  // is responsible for normalising them.
+  mapSlots: {
+    village_square: {
+      id: 'village_square',
+      label: 'Village Square',
+      description: 'Central hub for simple city jobs.',
+      x: 0,
+      y: 0,
+      slotTags: ['village', 'job_site'],
+      isInitiallyUnlocked: true,
+    },
+    village_gate: {
+      id: 'village_gate',
+      label: 'Village Gate',
+      description: 'Edge of the village, entry point to the outskirts.',
+      x: 8,
+      y: 3,
+      slotTags: ['world', 'job_site'],
+      isInitiallyUnlocked: true,
+    },
+  },
+
+  // Starting buildings are currently informational; future engines can read
+  // their bonuses. They are still fully editable from the Buildings tab.
+  buildings: {
+    founder_house: {
+      id: 'founder_house',
+      label: "Founder’s House",
+      description: 'Basic housing for the founder and first residents.',
+      tags: ['house', 'village'],
+      isInitiallyBuilt: true,
+    },
+    city_sewers: {
+      id: 'city_sewers',
+      label: 'City Sewers',
+      description: 'Access point to the rat-infested sewers beneath the village.',
+      tags: ['job_site', 'combat', 'village'],
+      isInitiallyBuilt: true,
+    },
+    village_wall_gate: {
+      id: 'village_wall_gate',
+      label: 'Village Gate',
+      description: 'Where residents leave the safety of the walls to explore.',
+      tags: ['job_site', 'world'],
+      isInitiallyBuilt: true,
+    },
+  },
+
+  // Founder presets are intentionally left empty for now; a future step will
+  // wire these to ArchetypeRegistry / character creator presets.
+  founders: {},
+
+  // Neutral variance config so that QuestResolver can opt into categories
+  // later without forcing any randomness on the first jobs.
+  variance: {
+    difficultyCategories: {
+      normal: {
+        id: 'normal',
+        label: 'Normal Difficulty',
+        minMultiplier: 1,
+        maxMultiplier: 1,
+        weight: 1,
+      },
+    },
+    rewardCategories: {
+      normal: {
+        id: 'normal',
+        label: 'Normal Reward',
+        minMultiplier: 1,
+        maxMultiplier: 1,
+        weight: 1,
+      },
+    },
+  },
+
   globalRules: {
     // These numbers are safe placeholders and should be tuned via config/UI.
     maxFatigueBeforeExhausted: 100,
     fatigueRecoveryPerDay: 50,
-    dayLengthInTimeUnits: 100,
+    dayLengthInTimeUnits: 5,
     fatigueYellowThreshold: 33,
     fatigueRedThreshold: 66,
     baseLightInjuryChanceAtMaxFatigue: 0.3,
     dangerInjuryMultiplierPerPoint: 0.1,
+    foodConsumptionPerResidentPerDay: 1,
+    baseFoodPriceInGold: 25,
     // Simple base formula, expected to be overridden from the config UI.
     questXpFormula: 'level * 10',
     maxActiveQuests: 5,

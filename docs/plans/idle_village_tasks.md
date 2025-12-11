@@ -1,4 +1,4 @@
-# Phase 12: Idle Village Autobattler – Task Checklist
+# Phase 12: Idle Incremental RPG – Idle Village – Task Checklist
 
 > Derived from `idle_village_plan.md`. Design changes → update the plan first.
 

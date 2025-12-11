@@ -102,6 +102,24 @@ function getActivity(config: IdleVillageConfig, activityId: string): ActivityDef
   return config.activities[activityId];
 }
 
+function evaluateActivityDuration(activityDef: ActivityDefinition): VillageTimeUnit {
+  // For the vertical slice, support simple numeric duration formulas (e.g. "3").
+  // More complex expressions will be delegated to the shared FormulaEngine later.
+  const formula = activityDef.durationFormula;
+  if (!formula) {
+    return 1;
+  }
+
+  const trimmed = formula.trim();
+  const numeric = Number(trimmed);
+  if (Number.isFinite(numeric) && numeric > 0) {
+    return numeric as VillageTimeUnit;
+  }
+
+  // Fallback to a minimal non-zero duration so activities visibly progress.
+  return 1;
+}
+
 /**
  * Basic check to see if characters can be assigned to a new activity.
  * Does not perform any cost/resource validation yet (that belongs to higher-level resolvers).
@@ -136,9 +154,7 @@ export function scheduleActivity(
       ? input.startTime
       : state.currentTime;
 
-  // For now, treat duration as 0 if no formula is defined – real duration
-  // will be computed by the specific resolver modules using config/formulas.
-  const baseDuration = 0;
+  const baseDuration = evaluateActivityDuration(activityDef);
   const endTime = startTime + baseDuration;
 
   const id = `act_${Date.now()}_${Math.floor(Math.random() * 1_000_000)}`;
@@ -201,6 +217,7 @@ export function advanceTime(
 
   const updatedActivities: Record<string, ScheduledActivity> = { ...state.activities };
   const updatedResidents: Record<string, ResidentState> = { ...state.residents };
+  const updatedResources: VillageResources = { ...state.resources };
   const newEvents: VillageEvent[] = [];
   const completedActivityIds: string[] = [];
 
@@ -251,7 +268,12 @@ export function advanceTime(
   });
 
   // Process passive fatigue recovery for available/exhausted residents
-  const { fatigueRecoveryPerDay, dayLengthInTimeUnits, maxFatigueBeforeExhausted } = _deps.config.globalRules;
+  const {
+    fatigueRecoveryPerDay,
+    dayLengthInTimeUnits,
+    maxFatigueBeforeExhausted,
+    foodConsumptionPerResidentPerDay,
+  } = _deps.config.globalRules;
   const recoveryRatePerUnit = fatigueRecoveryPerDay / dayLengthInTimeUnits;
   const recoveryAmount = Math.floor(recoveryRatePerUnit * advanceBy);
 
@@ -294,11 +316,31 @@ export function advanceTime(
     }
   });
 
+  // Daily food consumption: for each in-game day boundary crossed, consume
+  // food per non-dead resident. This keeps the pressure similar to Punch Club's
+  // early-game loop, but fully config-driven.
+  if (dayLengthInTimeUnits > 0 && foodConsumptionPerResidentPerDay > 0) {
+    const previousDayIndex = Math.floor(state.currentTime / dayLengthInTimeUnits);
+    const newDayIndex = Math.floor(targetTime / dayLengthInTimeUnits);
+    const daysElapsed = newDayIndex - previousDayIndex;
+
+    if (daysElapsed > 0) {
+      const livingResidents = Object.values(updatedResidents).filter((r) => r.status !== 'dead').length;
+      if (livingResidents > 0) {
+        const totalConsumption = foodConsumptionPerResidentPerDay * livingResidents * daysElapsed;
+        const currentFood = updatedResources.food ?? 0;
+        const nextFood = currentFood - totalConsumption;
+        updatedResources.food = nextFood < 0 ? 0 : nextFood;
+      }
+    }
+  }
+
   const nextState: VillageState = {
     ...state,
     currentTime: targetTime,
     activities: updatedActivities,
     residents: updatedResidents,
+    resources: updatedResources,
     eventLog: [...state.eventLog, ...newEvents],
   };
 

@@ -299,7 +299,7 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
           <div className="mt-1.5 flex items-center gap-1.5">
             <button
               type="button"
-              className={`w-6 h-6 flex items-center justify-center rounded border bg-slate-900/80 transition-colors ${
+              className={`w-5 h-5 flex items-center justify-center rounded border bg-slate-900/80 transition-colors ${
                 !isInteractive
                   ? 'border-slate-600 text-slate-600 cursor-not-allowed'
                   : 'border-indigo-500/70 text-indigo-200 hover:bg-indigo-500/20'
@@ -312,56 +312,60 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
             >
               <Minus className="w-3 h-3" />
             </button>
-            <input
-              type="range"
-              className="flex-1 h-2 rounded-full appearance-none cursor-pointer"
-              min={stat.min}
-              max={stat.max}
-              step={stat.step}
-              value={displayValue}
-              onChange={(e) => {
-                if (!isInteractive) return;
-                onSimValueChange(Number(e.target.value));
-              }}
-              disabled={!isInteractive}
-              style={{
-                background: `linear-gradient(to right, #4f46e5 0%, #22d3ee ${sliderProgress}%, #020617 ${sliderProgress}%, #020617 100%)`,
-              }}
-            />
-            <button
-              type="button"
-              className={`w-6 h-6 flex items-center justify-center rounded border bg-[#1a1410]/70 transition-colors ${
-                !isInteractive
-                  ? 'border-[#555555] text-[#555555] cursor-not-allowed'
-                  : 'border-[#9d7d5c] text-[#c9a227] hover:bg-[#2a2015]'
-              }`}
-              onClick={() => {
-                if (!isInteractive) return;
-                onSimValueChange(Math.min(stat.max, simValue + stat.step));
-              }}
-              aria-label="Increment"
-            >
-              <Plus className="w-3 h-3" />
-            </button>
-            <input
-              type="number"
-              className={`w-14 px-1 py-0.5 rounded border text-[10px] font-mono text-right bg-slate-950/90 focus:outline-none focus:ring-1 focus:ring-cyan-400/70 ${
-                !isInteractive
-                  ? 'border-slate-700 text-slate-500 cursor-not-allowed opacity-70'
-                  : 'border-slate-600 text-cyan-200'
-              }`}
-              value={Number.isFinite(displayValue) ? displayValue : ''}
-              onChange={(e) => {
-                if (!isInteractive) return;
-                const next = Number(e.target.value);
-                if (!Number.isFinite(next)) return;
-                onSimValueChange(next);
-              }}
-              step={stat.step}
-              min={stat.min}
-              max={stat.max}
-              disabled={!isInteractive}
-            />
+            <div className="flex-1 min-w-0 flex justify-center">
+              <input
+                type="range"
+                className="w-[90%] h-2 rounded-full appearance-none cursor-pointer"
+                min={stat.min}
+                max={stat.max}
+                step={stat.step}
+                value={displayValue}
+                onChange={(e) => {
+                  if (!isInteractive) return;
+                  onSimValueChange(Number(e.target.value));
+                }}
+                disabled={!isInteractive}
+                style={{
+                  background: `linear-gradient(to right, #4f46e5 0%, #22d3ee ${sliderProgress}%, #020617 ${sliderProgress}%, #020617 100%)`,
+                }}
+              />
+            </div>
+            <div className="flex items-center gap-1.5">
+              <input
+                type="number"
+                className={`w-12 px-1 py-0.5 rounded border text-[10px] font-mono text-center bg-slate-950/90 focus:outline-none focus:ring-1 focus:ring-cyan-400/70 ${
+                  !isInteractive
+                    ? 'border-slate-700 text-slate-500 cursor-not-allowed opacity-70'
+                    : 'border-slate-600 text-cyan-200'
+                }`}
+                value={Number.isFinite(displayValue) ? displayValue : ''}
+                onChange={(e) => {
+                  if (!isInteractive) return;
+                  const next = Number(e.target.value);
+                  if (!Number.isFinite(next)) return;
+                  onSimValueChange(next);
+                }}
+                step={stat.step}
+                min={stat.min}
+                max={stat.max}
+                disabled={!isInteractive}
+              />
+              <button
+                type="button"
+                className={`w-5 h-5 flex items-center justify-center rounded border bg-[#1a1410]/70 transition-colors ${
+                  !isInteractive
+                    ? 'border-[#555555] text-[#555555] cursor-not-allowed'
+                    : 'border-[#9d7d5c] text-[#c9a227] hover:bg-[#2a2015]'
+                }`}
+                onClick={() => {
+                  if (!isInteractive) return;
+                  onSimValueChange(Math.min(stat.max, simValue + stat.step));
+                }}
+                aria-label="Increment"
+              >
+                <Plus className="w-3 h-3" />
+              </button>
+            </div>
           </div>
         </div>
       </div>

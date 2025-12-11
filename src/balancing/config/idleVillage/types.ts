@@ -158,6 +158,12 @@ export interface GlobalRules {
   fatigueYellowThreshold: number;
   fatigueRedThreshold: number;
 
+  // Food economy
+  /** How many units of food each non-dead resident consumes per in-game day */
+  foodConsumptionPerResidentPerDay: number;
+  /** Baseline price of 1 unit of food in gold (for early-game balancing) */
+  baseFoodPriceInGold: number;
+
   // Injury
   baseLightInjuryChanceAtMaxFatigue: number;
   dangerInjuryMultiplierPerPoint: number;

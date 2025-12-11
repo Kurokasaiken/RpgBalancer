@@ -4,9 +4,10 @@
  * (tags, slotTags, resolutionEngineId, level, dangerRating).
  */
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
 import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
+import idleVillageMap from '@/assets/ui/idleVillage/idle-village-map.jpg';
 
 type ActivityFormState = Partial<ActivityDefinition>;
 
@@ -17,6 +18,31 @@ export default function IdleVillageActivitiesTab() {
 
   const activities = Object.values(config.activities ?? {});
   const resources = Object.values(config.resources ?? {});
+  const mapSlots = Object.values(config.mapSlots ?? {});
+
+  const mapSlotLayout = useMemo(
+    () => {
+      if (mapSlots.length === 0) return [] as { slot: (typeof mapSlots)[number]; left: number; top: number }[];
+
+      const xs = mapSlots.map((s) => s.x);
+      const ys = mapSlots.map((s) => s.y);
+      const minX = Math.min(...xs);
+      const maxX = Math.max(...xs);
+      const minY = Math.min(...ys);
+      const maxY = Math.max(...ys);
+      const spanX = maxX - minX || 1;
+      const spanY = maxY - minY || 1;
+
+      return mapSlots.map((slot) => {
+        const normX = (slot.x - minX) / spanX;
+        const normY = (slot.y - minY) / spanY;
+        const left = 6 + normX * 88;
+        const top = 12 + normY * 76;
+        return { slot, left, top };
+      });
+    },
+    [mapSlots],
+  );
 
   const handleCreate = () => {
     const newId = `activity_${Date.now()}`;
@@ -187,6 +213,87 @@ export default function IdleVillageActivitiesTab() {
                   className="w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory"
                 />
               </div>
+              {mapSlots.length > 0 && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <label className="block text-sm font-bold">Map placement (optional)</label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const currentMeta = (formData.metadata ?? {}) as Record<string, unknown>;
+                        const rest = { ...currentMeta } as { mapSlotId?: string } & Record<string, unknown>;
+                        delete rest.mapSlotId;
+                        const nextMeta = Object.keys(rest).length > 0 ? rest : undefined;
+                        setFormData({
+                          ...formData,
+                          metadata: nextMeta,
+                        });
+                      }}
+                      className="px-2 py-0.5 rounded-full bg-slate text-ivory text-[11px] hover:bg-slate/80"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                  <div className="relative w-full rounded-lg overflow-hidden border border-slate-700 bg-black/60 aspect-video">
+                    <div
+                      className="absolute inset-0"
+                      style={{
+                        backgroundImage: `url(${idleVillageMap})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        backgroundRepeat: 'no-repeat',
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-black/45" aria-hidden="true" />
+                    <div className="absolute inset-0">
+                      {mapSlotLayout.map(({ slot, left, top }) => {
+                        const currentMeta = (formData.metadata ?? {}) as { mapSlotId?: string } | undefined;
+                        const currentMapSlotId = currentMeta?.mapSlotId;
+                        const isSelected = currentMapSlotId === slot.id;
+                        const isVillage = slot.slotTags?.includes('village');
+                        const isWorld = slot.slotTags?.includes('world');
+
+                        return (
+                          <button
+                            key={slot.id}
+                            type="button"
+                            onClick={() => {
+                              const baseMeta = (formData.metadata ?? {}) as Record<string, unknown>;
+                              const nextMeta = {
+                                ...baseMeta,
+                                mapSlotId: slot.id,
+                              };
+                              setFormData({
+                                ...formData,
+                                metadata: nextMeta,
+                              });
+                            }}
+                            className={`absolute -translate-x-1/2 -translate-y-full flex flex-col items-center gap-0.5 focus:outline-none ${
+                              isSelected ? 'scale-105 drop-shadow-[0_0_10px_rgba(250,250,210,0.9)]' : 'opacity-90 hover:opacity-100'
+                            }`}
+                            style={{ left: `${left}%`, top: `${top}%` }}
+                          >
+                            <div
+                              className={`w-7 h-7 rounded-full border shadow-md flex items-center justify-center text-[11px] ${
+                                isVillage
+                                  ? 'bg-emerald-500/70 border-emerald-300'
+                                  : isWorld
+                                    ? 'bg-indigo-500/70 border-indigo-300'
+                                    : 'bg-slate-700/80 border-slate-300'
+                              }`}
+                            >
+                              {slot.label.slice(0, 2).toUpperCase()}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-slate-300">
+                    Click a marker to pin this activity to a specific map slot. If none is selected, slotTags-only rules apply.
+                  </p>
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-bold mb-1">Rewards</label>
                 {resources.length === 0 && (
