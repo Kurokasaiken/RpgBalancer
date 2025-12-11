@@ -47,6 +47,11 @@ export class IdleVillageConfigStore {
 
     if (typeof window !== 'undefined' && window.localStorage) {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+      try {
+        window.dispatchEvent(new CustomEvent('idleVillageConfigUpdated'));
+      } catch {
+        // Swallow errors from CustomEvent in non-browser environments.
+      }
     }
   }
 

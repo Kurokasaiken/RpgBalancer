@@ -25,7 +25,10 @@ Obiettivo della Phase 12 è costruire la **prima versione completa e giocabile**
   - Devi spendere risorse per **proteggerli** e ridurre il rischio di morte.
   - I personaggi feriti possono ancora lavorare nei building (spingendo a costruire edifici migliori che valorizzano i pg di alto livello anche se non possono più andare in quest in sicurezza).
 
-Niente progressione **offline idle** per questa fase (né garantita per il prodotto finale): il gioco avanza solo mentre è aperto.
+- Nessuna progressione **offline idle** per questa fase (né garantita per il prodotto finale): il gioco avanza solo mentre è aperto.
+
+Per la definizione dettagliata dei **primi 30–60 minuti** di esperienza (FTUE) e della vertical slice pensata per demo web/Steam vedi anche:  
+[`idle_village_ftue_plan.md`](idle_village_ftue_plan.md).
 
 ---
 
@@ -177,7 +180,7 @@ Niente progressione **offline idle** per questa fase (né garantita per il prodo
 - **Espansioni minime V1:**
   - Upgrade casa (più cap persone).
   - Sblocco di almeno 1 nuovo job site + relativo job.
-- Tutto definito in config (`villageMapConfig.ts`), inclusa la posizione su mappa (coordinate logiche) per consentire una UI drag & drop coerente.
+- Tutto definito in config (`IdleVillageConfig.mapSlots` sotto `src/balancing/config/idleVillage/*`), inclusa la posizione su mappa (coordinate logiche su griglia 0–10). La UI prototipale offre un semplice editor nel tab **Idle Village / Activities** che permette di cliccare sulla mappa per riposizionare gli slot e scegliere un'icona per ciascun `mapSlot`.
 
 ### 12.8 – Economy, Food & Maintenance
 
@@ -209,6 +212,41 @@ Niente progressione **offline idle** per questa fase (né garantita per il prodo
 - **Estetica:**
   - Tema Gilded Observatory (palette, tipografia, densità compatta).
   - Nessuna logica di bilanciamento o formule dentro i componenti React.
+
+#### 12.9.a – Implementazione v0.1 (IdleVillagePage)
+
+Per la vertical slice v0.1 è già presente una **UI prototipale** in `src/ui/idleVillage/IdleVillagePage.tsx` con le seguenti caratteristiche:
+
+- **Mappa + mapSlots:**
+  - I `mapSlots` definiti in `IdleVillageConfig` vengono proiettati sopra un background mappa tramite coordinate logiche (griglia 0–10, convertite in percentuali con margini 8/12/80/55).
+  - Ogni slot è rappresentato da un piccolo token edificio (sagoma scura con bordo chiaro) con icona configurabile (`icon` + `colorClass`).
+  - Nel tab **Activities** è presente un editor di layout che consente di:
+    - selezionare uno `mapSlot`;
+    - cliccare sulla mappa per aggiornarne `x/y`;
+    - scegliere l'icona tramite un icon picker stile Balancer.
+
+- **Pannello "Jobs & Quests in progress":**
+  - Reso collassabile tramite un'icona Occhio (riuso di `DefaultSection.actions`).
+  - Ogni attività attiva (`ScheduledActivity`) è mostrata come **verb card** (`VerbCard`) con:
+    - label attività;
+    - tipo (Job / Quest / Activity);
+    - residenti assegnati;
+    - hint sulle risorse reward;
+    - eventuale deadline (per quest con `questDeadlineInDays`);
+    - **anello di progresso** attorno alla card basato su `startTime/endTime/currentTime`.
+
+- **Market & risorse iniziali:**
+  - Un job di tipo Market (config-first) apre un semplice modal per scambiare gold ↔ food usando una funzione pura `MarketEngine.buyFoodWithGold`.
+  - Le risorse iniziali vengono lette da `globalRules.startingResources` e le risorse con valore 0 non vengono mostrate in UI.
+
+**TODO UI per fasi successive:**
+
+- Estendere il componente `VerbCard` e il verb system per supportare:
+  - stati `idle/completed`;
+  - azione esplicita di "Collect" output;
+  - verbs speciali dedicati (Time, Injury, Market avanzato).
+- Introdurre training job visibile come verb dedicato.
+- Introdurre una prima visualizzazione/spawn loop di quest attorno al villaggio coerente con i `mapSlots`.
 
 ### 12.10 – Testing & Simulation Strategy
 
@@ -255,3 +293,10 @@ Niente progressione **offline idle** per questa fase (né garantita per il prodo
 - ✅ Injury & death funzionano secondo il modello high risk/high reward, con informazione chiara nella UI.
 - ✅ I personaggi feriti sono ancora utili come lavoratori, specialmente in building avanzati.
 - ✅ Il sistema di test (unit + simulation + E2E base) copre i casi chiave senza regressioni su combat/archetypes/balancer.
+
+**Success criteria demo/publishing (V1 Idle Village):**
+
+- La vertical slice dei primi 60 minuti segue il piano FTUE e permette almeno un ciclo run → meta → nuova run.
+- Dopo il raggiungimento di questa slice:
+  - è ragionevole pubblicare una **demo web/itch.io** per primi tester;
+  - si può iniziare a preparare asset (testi, screenshot, clip) per pagina Steam e candidarsi a un futuro Steam Next Fest.

@@ -14,6 +14,8 @@ import type { VillageState, ResidentState, ScheduledActivity } from '@/engine/ga
 import { tickIdleVillage } from '@/engine/game/idleVillage/IdleVillageEngine';
 import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
 import { DefaultSection } from '@/ui/components/DefaultUI';
+import { buyFoodWithGold } from '@/engine/game/idleVillage/MarketEngine';
+import VerbCard from '@/ui/idleVillage/VerbCard';
 
 // Minimal deterministic RNG for reproducible testing
 const simpleRng = (() => {
@@ -111,32 +113,28 @@ function MapSlotMarker({ slot, left, top, isSelected, hasJobs, hasQuests, jobLab
       className={`group absolute -translate-x-1/2 -translate-y-full flex flex-col items-center gap-1 pointer-events-auto focus:outline-none ${emphasisClass}`}
       style={{ left: `${left}%`, top: `${top}%` }}
     >
-      <div
-        className="relative flex items-center justify-center w-9 h-9 rounded-full bg-black/80 border border-gold/70 shadow-lg"
-      >
-        <span className="absolute inset-0 rounded-full bg-gold/20 blur-[6px] opacity-70" aria-hidden />
-        <div className="relative flex items-center justify-center gap-0.5 text-xs">
-          {hasCustomIcon ? (
-            <span className={`text-base ${markerTextColor}`} aria-hidden>
-              {slot.icon}
-            </span>
-          ) : (
-            <>
-              {hasQuests && (
-                <ScrollText className="w-4 h-4 text-amber-200" />
-              )}
-              {hasJobs && (
-                <Briefcase className="w-4 h-4 text-teal-200" />
-              )}
-              {!hasQuests && !hasJobs && (
-                <MapPin className="w-4 h-4 text-slate-200" />
-              )}
-            </>
-          )}
+      <div className="relative w-9 h-9">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-7 h-7 bg-black/90 border border-white/85 rounded-[3px] shadow-[0_0_10px_rgba(0,0,0,0.9)] flex items-center justify-center gap-0.5 text-xs">
+            {hasCustomIcon ? (
+              <span className={`text-sm ${markerTextColor}`} aria-hidden>
+                {slot.icon}
+              </span>
+            ) : (
+              <>
+                {hasQuests && (
+                  <ScrollText className="w-3 h-3 text-amber-200" />
+                )}
+                {hasJobs && (
+                  <Briefcase className="w-3 h-3 text-teal-200" />
+                )}
+                {!hasQuests && !hasJobs && (
+                  <MapPin className="w-3 h-3 text-slate-200" />
+                )}
+              </>
+            )}
+          </div>
         </div>
-      </div>
-      <div className="px-2 py-0.5 rounded-full bg-black/80 border border-slate-700 text-[9px] uppercase tracking-[0.16em] text-slate-100 max-w-[140px] truncate">
-        {slot.label}
       </div>
       {/* Hover tooltip with basic location + activity info (desktop focus; mobile can rely on click/select) */}
       <div className="pointer-events-none absolute -top-14 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
@@ -222,6 +220,8 @@ export default function IdleVillagePage() {
   const [resourceDeltas, setResourceDeltas] = useState<Record<string, number>>({});
   const resourceDeltaTimeoutRef = useRef<number | null>(null);
   const [showJobsAndQuests, setShowJobsAndQuests] = useState(true);
+  const [showMarketModal, setShowMarketModal] = useState(false);
+  const [marketUnits, setMarketUnits] = useState(0);
 
   // Schedule an activity (drag&drop simulation via button for now)
   const handleSchedule = useCallback(
@@ -319,6 +319,7 @@ export default function IdleVillagePage() {
   const advanceTimeBy = useCallback(
     (delta: number) => {
       if (!config) return;
+      let shouldOpenMarket = false;
       setVillageState((prev) => {
         const result = tickIdleVillage({ config, rng: simpleRng }, prev, delta);
         let nextState = result.state;
@@ -327,6 +328,11 @@ export default function IdleVillagePage() {
           for (const job of result.completedJobs) {
             const activity = config.activities[job.activityId] as ActivityDefinition | undefined;
             if (!activity) continue;
+
+            const jobMeta = (activity.metadata ?? {}) as { marketJob?: boolean } | undefined;
+            if (jobMeta?.marketJob) {
+              shouldOpenMarket = true;
+            }
 
             const metadata = (activity.metadata ?? {}) as { supportsAutoRepeat?: boolean; continuousJob?: boolean };
             const isContinuous = !!metadata.continuousJob;
@@ -377,6 +383,9 @@ export default function IdleVillagePage() {
 
         return nextState;
       });
+      if (shouldOpenMarket) {
+        setShowMarketModal(true);
+      }
     },
     [config],
   );
@@ -480,20 +489,11 @@ export default function IdleVillagePage() {
 
   const mapSlotLayout = useMemo(() => {
     if (mapSlots.length === 0) return [] as { slot: (typeof mapSlots)[number]; left: number; top: number }[];
-
-    const xs = mapSlots.map((s) => s.x);
-    const ys = mapSlots.map((s) => s.y);
-    const minX = Math.min(...xs);
-    const maxX = Math.max(...xs);
-    const minY = Math.min(...ys);
-    const maxY = Math.max(...ys);
-    const spanX = maxX - minX || 1;
-    const spanY = maxY - minY || 1;
-
     return mapSlots.map((slot) => {
-      const normX = (slot.x - minX) / spanX;
-      const normY = (slot.y - minY) / spanY;
-      // Keep markers within a comfortable frame over the map background and away from the bottom jobs panel
+      // x/y are treated as logical coordinates on a 0-10 grid and converted to percentages.
+      const normX = slot.x / 10;
+      const normY = slot.y / 10;
+      // Keep markers within a comfortable frame over the map background and away from the bottom jobs panel.
       const left = 8 + normX * 80;
       const top = 12 + normY * 55;
       return { slot, left, top };
@@ -553,6 +553,21 @@ export default function IdleVillagePage() {
   const currentDayNumber = currentDayIndex + 1;
   const currentSegmentIndex = dayLength > 0 ? currentTime % dayLength : 0;
   const isNightSegment = dayLength > 0 && currentSegmentIndex === dayLength - 1;
+
+  const goldAmount = villageState.resources.gold ?? 0;
+  const foodAmount = villageState.resources.food ?? 0;
+  const foodPrice = config.globalRules.baseFoodPriceInGold;
+  const maxAffordableFood = foodPrice > 0 ? Math.floor(goldAmount / foodPrice) : 0;
+
+  useEffect(() => {
+    if (showMarketModal) {
+      if (maxAffordableFood <= 0) {
+        setMarketUnits(0);
+      } else if (marketUnits <= 0 || marketUnits > maxAffordableFood) {
+        setMarketUnits(Math.min(5, maxAffordableFood));
+      }
+    }
+  }, [showMarketModal, maxAffordableFood, marketUnits]);
 
   return (
     <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
@@ -719,105 +734,69 @@ export default function IdleVillagePage() {
                         <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1 text-[10px]">
                           {activeActivities.length > 0 ? (
                             activeActivities.map((scheduled) => {
-                          const def = config.activities[scheduled.activityId] as ActivityDefinition | undefined;
-                          const assignedNames = scheduled.characterIds.map(
-                            (cid) => villageState.residents[cid]?.id ?? cid,
-                          );
-                          const rewardsLabel =
-                            def?.rewards && def.rewards.length > 0
-                              ? def.rewards.map((d) => getResourceLabel(d.resourceId)).join(', ')
-                              : null;
+                              const def = config.activities[scheduled.activityId] as ActivityDefinition | undefined;
+                              const assignedNames = scheduled.characterIds.map(
+                                (cid) => villageState.residents[cid]?.id ?? cid,
+                              );
+                              const rewardsLabel =
+                                def?.rewards && def.rewards.length > 0
+                                  ? def.rewards.map((d) => getResourceLabel(d.resourceId)).join(', ')
+                                  : null;
 
-                          const duration = Math.max(1, scheduled.endTime - scheduled.startTime || 1);
-                          const elapsed = Math.max(0, villageState.currentTime - scheduled.startTime);
-                          const clamped = Math.min(1, elapsed / duration);
+                              const duration = Math.max(1, scheduled.endTime - scheduled.startTime || 1);
+                              const elapsed = Math.max(0, villageState.currentTime - scheduled.startTime);
+                              const clamped = Math.min(1, elapsed / duration);
 
-                          const meta = (def?.metadata ?? {}) as { questDeadlineInDays?: number };
-                          const questDeadlineDays = typeof meta.questDeadlineInDays === 'number'
-                            ? meta.questDeadlineInDays
-                            : undefined;
-                          let deadlineLabel: string | null = null;
-                          if (typeof questDeadlineDays === 'number' && questDeadlineDays > 0) {
-                            const totalDayLength = dayLength || 5;
-                            const deadlineTime = scheduled.startTime + questDeadlineDays * totalDayLength;
-                            const remainingUnits = Math.max(0, deadlineTime - currentTime);
-                            if (remainingUnits <= 0) {
-                              deadlineLabel = 'Expired';
-                            } else {
-                              const remainingDays = Math.floor(remainingUnits / totalDayLength);
-                              if (remainingDays >= 1) {
-                                deadlineLabel = `${remainingDays}d left`;
-                              } else {
-                                deadlineLabel = `${remainingUnits}u left`;
+                              const meta = (def?.metadata ?? {}) as { questDeadlineInDays?: number };
+                              const questDeadlineDays = typeof meta.questDeadlineInDays === 'number'
+                                ? meta.questDeadlineInDays
+                                : undefined;
+                              let deadlineLabel: string | null = null;
+                              if (typeof questDeadlineDays === 'number' && questDeadlineDays > 0) {
+                                const totalDayLength = dayLength || 5;
+                                const deadlineTime = scheduled.startTime + questDeadlineDays * totalDayLength;
+                                const remainingUnits = Math.max(0, deadlineTime - currentTime);
+                                if (remainingUnits <= 0) {
+                                  deadlineLabel = 'Expired';
+                                } else {
+                                  const remainingDays = Math.floor(remainingUnits / totalDayLength);
+                                  if (remainingDays >= 1) {
+                                    deadlineLabel = `${remainingDays}d left`;
+                                  } else {
+                                    deadlineLabel = `${remainingUnits}u left`;
+                                  }
+                                }
                               }
-                            }
-                          }
 
-                          const isQuest = !!def?.tags?.includes('quest');
-                          const isJob = !!def?.tags?.includes('job');
-                          const kindLabel = isQuest ? 'Quest' : isJob ? 'Job' : 'Activity';
+                              const isQuest = !!def?.tags?.includes('quest');
+                              const isJob = !!def?.tags?.includes('job');
+                              const kindLabel = isQuest ? 'Quest' : isJob ? 'Job' : 'Activity';
 
-                          return (
-                            <div
-                              key={scheduled.id}
-                              className="rounded bg-obsidian/80 border border-slate-700 px-2 py-1"
-                            >
-                              <div className="flex items-center justify-between gap-2">
-                                <div className="min-w-0">
-                                  <div className="text-[10px] font-semibold tracking-[0.14em] uppercase text-slate-100 truncate">
-                                    {def?.label ?? scheduled.activityId}
-                                  </div>
-                                  <div className="mt-0.5 flex flex-wrap gap-1">
-                                    {assignedNames.map((name) => (
-                                      <span
-                                        key={name}
-                                        className="px-1 py-0.5 rounded-full bg-obsidian/80 text-[9px] uppercase tracking-[0.14em] text-slate-200 border border-slate-600"
-                                      >
-                                        {name}
-                                      </span>
-                                    ))}
-                                  </div>
-                                </div>
-                                <div className="flex flex-col items-end gap-0.5">
-                                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-slate-900/80 border border-slate-600/80 text-[8px] uppercase tracking-[0.16em] text-slate-100">
-                                    {isQuest ? (
-                                      <ScrollText className="w-3 h-3 text-amber-300" />
-                                    ) : isJob ? (
-                                      <Briefcase className="w-3 h-3 text-teal-300" />
-                                    ) : (
-                                      <MapPin className="w-3 h-3 text-slate-300" />
-                                    )}
-                                    <span>{kindLabel}</span>
-                                  </span>
-                                  <span className="text-[9px] uppercase tracking-[0.14em] text-slate-300">
-                                    {scheduled.status}
-                                  </span>
-                                </div>
-                              </div>
-                              {rewardsLabel && (
-                                <div className="mt-0.5 text-[9px] text-teal-200 truncate">
-                                  {rewardsLabel}
-                                </div>
-                              )}
-                              {deadlineLabel && (
-                                <div className="mt-0.5 text-[9px] text-amber-300 truncate">
-                                  Deadline:
-                                  {' '}
-                                  {deadlineLabel}
-                                </div>
-                              )}
-                              <div className="mt-1 h-1 w-full bg-slate-900 rounded-full overflow-hidden">
-                                <div
-                                  className="h-1 bg-teal-400"
-                                  style={{ width: `${Math.max(5, Math.min(100, clamped * 100))}%` }}
+                              const icon = isQuest
+                                ? <ScrollText className="w-3.5 h-3.5 text-amber-300" />
+                                : isJob
+                                  ? <Briefcase className="w-3.5 h-3.5 text-teal-300" />
+                                  : <MapPin className="w-3.5 h-3.5 text-slate-200" />;
+
+                              return (
+                                <VerbCard
+                                  key={scheduled.id}
+                                  label={def?.label ?? scheduled.activityId}
+                                  icon={icon}
+                                  kindLabel={kindLabel}
+                                  assignees={assignedNames}
+                                  rewardsLabel={rewardsLabel}
+                                  deadlineLabel={deadlineLabel}
+                                  progressFraction={clamped}
+                                  state="running"
+                                  isQuest={isQuest}
+                                  isJob={isJob}
                                 />
-                              </div>
-                            </div>
-                          );
-                        })
-                      ) : (
-                        <p className="text-[10px] text-slate-400">No active events.</p>
-                      )}
+                              );
+                            })
+                          ) : (
+                            <p className="text-[10px] text-slate-400">No active events.</p>
+                          )}
                         </div>
                       </>
                     )}
@@ -842,6 +821,90 @@ export default function IdleVillagePage() {
           </div>
         </section>
       </div>
+
+      {showMarketModal && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/60">
+          <div className="default-card w-80 max-w-sm p-4 space-y-3">
+            <div className="flex items-center justify-between gap-2 border-b border-slate-700/70 pb-2">
+              <h3 className="text-sm font-cinzel tracking-[0.2em] uppercase text-ivory">Village Market</h3>
+              <button
+                type="button"
+                className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-200 hover:bg-slate-700"
+                onClick={() => setShowMarketModal(false)}
+              >
+                Close
+              </button>
+            </div>
+            <p className="text-[11px] text-slate-300">
+              Trade gold for food at the base price configured in Idle Village rules.
+            </p>
+            <div className="text-[11px] space-y-1.5">
+              <div className="flex justify-between">
+                <span className="text-slate-300">Gold</span>
+                <span className="font-mono text-amber-200">{goldAmount}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-300">Food</span>
+                <span className="font-mono text-emerald-200">{foodAmount}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-300">Price per Food</span>
+                <span className="font-mono text-slate-100">{foodPrice}</span>
+              </div>
+            </div>
+            <div className="space-y-1.5 text-[11px]">
+              <label className="flex items-center justify-between gap-2">
+                <span className="text-slate-300">Units to buy</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={Math.max(0, maxAffordableFood)}
+                  value={marketUnits}
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    const parsed = raw === '' ? 0 : Number(raw);
+                    if (!Number.isFinite(parsed) || parsed < 0) return;
+                    setMarketUnits(parsed);
+                  }}
+                  className="w-20 px-2 py-0.5 bg-obsidian border border-slate rounded text-ivory text-[10px] font-mono text-right"
+                />
+              </label>
+              <div className="flex justify-between text-[10px] text-slate-400">
+                <span>Max affordable</span>
+                <span className="font-mono">{maxAffordableFood}</span>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 pt-1">
+              <button
+                type="button"
+                className="px-3 py-1 rounded-full bg-slate-800 text-slate-200 text-[11px] hover:bg-slate-700"
+                onClick={() => setShowMarketModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="px-3 py-1 rounded-full bg-emerald-500 text-obsidian text-[11px] font-semibold tracking-[0.16em] uppercase disabled:opacity-40 disabled:cursor-not-allowed hover:bg-emerald-400"
+                disabled={marketUnits <= 0 || maxAffordableFood <= 0}
+                onClick={() => {
+                  const cappedUnits = Math.min(Math.floor(marketUnits), maxAffordableFood);
+                  if (cappedUnits <= 0) return;
+                  setVillageState((prev) => {
+                    const result = buyFoodWithGold(config, prev.resources, { units: cappedUnits });
+                    return {
+                      ...prev,
+                      resources: result.resources,
+                    };
+                  });
+                  setShowMarketModal(false);
+                }}
+              >
+                Buy
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <DragOverlay>
         {activeResidentId && villageState.residents[activeResidentId] ? (

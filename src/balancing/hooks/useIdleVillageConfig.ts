@@ -66,8 +66,10 @@ export function useIdleVillageConfig(): UseIdleVillageConfigReturn {
 
     if (typeof window !== 'undefined') {
       window.addEventListener('storage', handleStorageChange);
+      window.addEventListener('idleVillageConfigUpdated', handleStorageChange as EventListener);
       return () => {
         window.removeEventListener('storage', handleStorageChange);
+        window.removeEventListener('idleVillageConfigUpdated', handleStorageChange as EventListener);
       };
     }
   }, [refreshState]);

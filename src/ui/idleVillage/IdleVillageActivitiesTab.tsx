@@ -4,45 +4,88 @@
  * (tags, slotTags, resolutionEngineId, level, dangerRating).
  */
 
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
-import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
+import type { ActivityDefinition, MapSlotDefinition } from '@/balancing/config/idleVillage/types';
 import idleVillageMap from '@/assets/ui/idleVillage/idle-village-map.jpg';
 
 type ActivityFormState = Partial<ActivityDefinition>;
+
+const mapSlotIconLibrary = [
+  '🂠', '⚔️', '🛡️', '✨', '🔥', '❄️', '🌊', '🌿', '💀', '🐉', '🦊', '🪽', '🧠', '⚙️', '🜂', '🜄', '🜃', '🜁', '🜚', '🔮',
+  '🪄', '🎲', '🏹', '⚒️', '⚗️', '📜', '🏰', '🪙', '💎', '🌀', '🌙', '⭐', '🪬', '🩸', '🦂', '🐺', '👁️', '🪐', '⚡', '🌑',
+];
 
 export default function IdleVillageActivitiesTab() {
   const { config, updateConfig } = useIdleVillageConfig();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<ActivityFormState>({});
 
+  const [selectedMapSlotId, setSelectedMapSlotId] = useState<string | null>(null);
+  const [showMapSlotIconPicker, setShowMapSlotIconPicker] = useState(false);
+  const mapContainerRef = useRef<HTMLDivElement | null>(null);
+
   const activities = Object.values(config.activities ?? {});
   const resources = Object.values(config.resources ?? {});
   const mapSlots = Object.values(config.mapSlots ?? {});
 
+  useEffect(() => {
+    if (!selectedMapSlotId && mapSlots.length > 0) {
+      setSelectedMapSlotId(mapSlots[0].id);
+    }
+  }, [mapSlots, selectedMapSlotId]);
+
   const mapSlotLayout = useMemo(
     () => {
       if (mapSlots.length === 0) return [] as { slot: (typeof mapSlots)[number]; left: number; top: number }[];
-
-      const xs = mapSlots.map((s) => s.x);
-      const ys = mapSlots.map((s) => s.y);
-      const minX = Math.min(...xs);
-      const maxX = Math.max(...xs);
-      const minY = Math.min(...ys);
-      const maxY = Math.max(...ys);
-      const spanX = maxX - minX || 1;
-      const spanY = maxY - minY || 1;
-
       return mapSlots.map((slot) => {
-        const normX = (slot.x - minX) / spanX;
-        const normY = (slot.y - minY) / spanY;
-        const left = 6 + normX * 88;
-        const top = 12 + normY * 76;
+        const normX = slot.x / 10;
+        const normY = slot.y / 10;
+        const left = 8 + normX * 80;
+        const top = 12 + normY * 55;
         return { slot, left, top };
       });
     },
     [mapSlots],
   );
+
+  const selectedMapSlot: MapSlotDefinition | null = useMemo(() => {
+    if (mapSlots.length === 0) return null;
+    if (!selectedMapSlotId) return (mapSlots[0] as MapSlotDefinition) ?? null;
+    return (mapSlots.find((s) => s.id === selectedMapSlotId) as MapSlotDefinition | undefined) ?? null;
+  }, [mapSlots, selectedMapSlotId]);
+
+  const handleUpdateMapSlot = (id: string, updates: Partial<MapSlotDefinition>) => {
+    const existing = (config.mapSlots ?? {})[id];
+    if (!existing) return;
+
+    updateConfig({
+      mapSlots: {
+        ...config.mapSlots,
+        [id]: { ...existing, ...updates },
+      },
+    });
+  };
+
+  const handleMapBackgroundClick: React.MouseEventHandler<HTMLDivElement> = (event) => {
+    if (!selectedMapSlot) return;
+    if (!mapContainerRef.current) return;
+
+    const rect = mapContainerRef.current.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
+
+    const relX = (event.clientX - rect.left) / rect.width;
+    const relY = (event.clientY - rect.top) / rect.height;
+    if (!Number.isFinite(relX) || !Number.isFinite(relY)) return;
+
+    const clampedX = Math.max(0, Math.min(1, relX));
+    const clampedY = Math.max(0, Math.min(1, relY));
+
+    const logicalX = clampedX * 10;
+    const logicalY = clampedY * 10;
+
+    handleUpdateMapSlot(selectedMapSlot.id, { x: logicalX, y: logicalY });
+  };
 
   const handleCreate = () => {
     const newId = `activity_${Date.now()}`;
@@ -89,6 +132,141 @@ export default function IdleVillageActivitiesTab() {
       >
         + New Activity
       </button>
+      {mapSlots.length > 0 && (
+        <div className="default-card flex flex-col gap-3 p-3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div>
+              <div className="text-[11px] font-semibold tracking-[0.18em] uppercase text-slate-100">
+                Map Slots Layout
+              </div>
+              <p className="text-[10px] text-slate-300 mt-0.5">
+                Click on the map to move the selected marker. Use the icon picker to change its glyph.
+              </p>
+            </div>
+            {selectedMapSlot && (
+              <div className="text-[10px] text-slate-300 text-right">
+                <div className="truncate">
+                  Selected: <span className="font-semibold text-ivory">{selectedMapSlot.label}</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div
+            ref={mapContainerRef}
+            onClick={handleMapBackgroundClick}
+            className="relative w-full rounded-lg overflow-hidden border border-slate-700 bg-black/60 aspect-video cursor-crosshair"
+          >
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: `url(${idleVillageMap})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+              }}
+            />
+            <div className="absolute inset-0 bg-black/45" aria-hidden="true" />
+            <div className="absolute inset-0">
+              {mapSlotLayout.map(({ slot, left, top }) => {
+                const isSelected = selectedMapSlot?.id === slot.id;
+                const isVillage = slot.slotTags?.includes('village');
+                const isWorld = slot.slotTags?.includes('world');
+
+                return (
+                  <button
+                    key={slot.id}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedMapSlotId(slot.id);
+                    }}
+                    className={`group absolute -translate-x-1/2 -translate-y-full flex flex-col items-center gap-0.5 focus:outline-none ${
+                      isSelected
+                        ? 'scale-105 drop-shadow-[0_0_10px_rgba(250,250,210,0.9)]'
+                        : 'opacity-90 hover:opacity-100'
+                    }`}
+                    style={{ left: `${left}%`, top: `${top}%` }}
+                  >
+                    <div
+                      className={`w-7 h-7 rounded-sm border shadow-md flex items-center justify-center text-[12px] bg-black/80 ${
+                        isVillage
+                          ? 'border-emerald-200'
+                          : isWorld
+                            ? 'border-indigo-200'
+                            : 'border-slate-200'
+                      }`}
+                    >
+                      <span aria-hidden className="text-base">
+                        {slot.icon || slot.label.slice(0, 2).toUpperCase()}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {selectedMapSlot && (
+            <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-200">
+              <div className="flex items-center gap-2">
+                <span className="uppercase tracking-[0.18em] text-slate-400">Icon</span>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setShowMapSlotIconPicker((prev) => !prev)}
+                    className="flex items-center justify-center rounded border border-slate-600 px-2 py-1 bg-slate-950/90 hover:bg-slate-900 text-slate-100 text-sm"
+                    title="Scegli icona"
+                  >
+                    <span className="text-lg" aria-hidden>{selectedMapSlot.icon || '⚑'}</span>
+                  </button>
+                  {showMapSlotIconPicker && (
+                    <div className="absolute z-20 mt-2 w-56 rounded-lg border border-slate-600 bg-slate-950/95 p-3 shadow-[0_20px_45px_rgba(0,0,0,0.65)]">
+                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-300 mb-1">Seleziona icona</p>
+                      <div className="grid grid-cols-6 gap-1 max-h-40 overflow-y-auto">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            handleUpdateMapSlot(selectedMapSlot.id, { icon: undefined });
+                            setShowMapSlotIconPicker(false);
+                          }}
+                          className={`h-8 w-8 flex items-center justify-center rounded border text-xs ${
+                            !selectedMapSlot.icon
+                              ? 'border-amber-400 bg-amber-500/20 text-amber-100'
+                              : 'border-slate-600 bg-slate-900 text-slate-300 hover:border-amber-400/60'
+                          }`}
+                        >
+                          ∅
+                        </button>
+                        {mapSlotIconLibrary.map((symbol) => (
+                          <button
+                            key={symbol}
+                            type="button"
+                            onClick={() => {
+                              handleUpdateMapSlot(selectedMapSlot.id, { icon: symbol });
+                              setShowMapSlotIconPicker(false);
+                            }}
+                            className={`h-8 w-8 flex items-center justify-center rounded border text-base ${
+                              selectedMapSlot.icon === symbol
+                                ? 'border-amber-400 bg-amber-500/20 text-amber-100'
+                                : 'border-slate-600 bg-slate-900 text-slate-100 hover:border-amber-400/60'
+                            }`}
+                          >
+                            {symbol}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <p className="text-[10px] text-slate-400">
+                Click on the map above to change this slot&apos;s position.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
       <div className="space-y-2">
         {activities.map((activity) => (
           <div key={activity.id} className="default-card flex flex-col gap-2">

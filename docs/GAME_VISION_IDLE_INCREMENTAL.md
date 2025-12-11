@@ -371,3 +371,55 @@ Queste domande **non bloccano** Phase One, ma vanno considerate nel momento in c
 
 - **Task Checklist:**  
   [plans/idle_village_tasks.md](plans/idle_village_tasks.md) – elenco eseguibile delle attività per realizzare questa visione a livello di codice.
+
+---
+
+## 11. Stato Implementazione Phase 12 – Vertical Slice v0.1
+
+Questa sezione traccia lo stato attuale (vertical slice v0.1) rispetto alla visione.
+
+### 11.1 Feature già presenti
+
+- **Config-First Idle Village:**
+  - `IdleVillageConfig` sotto `src/balancing/config/idleVillage/*` contiene risorse, activities, buildings, `mapSlots`, regole globali (`globalRules`).
+  - Esiste uno store dedicato (`IdleVillageConfigStore`) e un hook React (`useIdleVillageConfig`) con history/undo e import/export.
+
+- **Risorse & start state:**
+  - Start resources configurabili via `globalRules.startingResources`; la UI mostra solo le risorse con valore iniziale > 0.
+  - Semplice economia food: `baseFoodPriceInGold` e consumo cibo per resident definiti in `globalRules`.
+
+- **Mappa Villaggio & mapSlots:**
+  - I `mapSlots` logici (griglia 0–10) sono definiti in config e proiettati sopra una mappa background.
+  - Un editor nel tab **Idle Village / Activities** permette di selezionare slot, cliccare sulla mappa per spostarli e scegliere un'icona (emoji) per ciascuno.
+
+- **Market (proto):**
+  - Job di tipo Market definito in `activities` (tag `job`, metadata `marketJob`).
+  - Quando un job Market completa, la UI apre un modal che consente di comprare cibo in cambio di gold usando la funzione pura `MarketEngine.buyFoodWithGold`.
+
+- **UI stile Cultist (proto):**
+  - `IdleVillagePage.tsx` fornisce una schermata unica con:
+    - lista residenti trascinabili;
+    - mappa con token edificio droppabili per assegnare jobs;
+    - pannello "Jobs & Quests in progress" collassabile.
+  - Ogni attività attiva è visualizzata come **verb card** (`VerbCard`) con:
+    - etichetta attività + tipo (Job/Quest/Activity);
+    - residenti assegnati;
+    - hint reward;
+    - eventuale deadline;
+    - **progress ring** attorno alla card, aggiornato in base al `TimeEngine`.
+
+### 11.2 Elementi ancora mancanti per una Phase One completa
+
+- **Verbs avanzati e stati completi:**
+  - Estendere `VerbCard`/verb system con stati `idle/completed`, azione di "Collect" e verbs specializzati (Time, Injury, Market evoluto).
+
+- **Training & Job XP:**
+  - Introdurre un training job config-driven che collega XP/allenamento al Balancer (stat & formule esistenti).
+
+- **Quest loop & spawn:**
+  - Implementare un generatore minimo di quest (tag `quest`) che spawna attorno ai `mapSlots` world/village e le rende visibili come verb card.
+
+- **Testing dedicato:**
+  - Test di engine per TimeEngine/JobResolver/MarketEngine in ottica Idle Village (vedi `idle_village_plan.md` sezione 12.10), più integrazione di questi nel framework di regression esistente.
+
+Questi punti sono tracciati nei piani (`idle_village_plan.md`) e nella checklist (`idle_village_tasks.md`) per accompagnare l'evoluzione da vertical slice a Phase One completa.
