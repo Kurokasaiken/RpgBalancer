@@ -91,6 +91,24 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
         mapSlotId: 'village_gate',
       },
     },
+    job_visit_market: {
+      id: 'job_visit_market',
+      label: 'Visit Market',
+      description: 'Spend some time at the market to open trading opportunities.',
+      tags: ['job', 'market'],
+      slotTags: ['village', 'job_site', 'shop'],
+      resolutionEngineId: 'job',
+      level: 1,
+      dangerRating: 0,
+      durationFormula: '1',
+      // No direct rewards; buying food is handled by the Market UI using
+      // baseFoodPriceInGold from globalRules.
+      rewards: [],
+      metadata: {
+        mapSlotId: 'village_market',
+        marketJob: true,
+      },
+    },
   },
 
   // Simple logical map layout with two generic slots: one inside the village
@@ -105,6 +123,8 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
       y: 0,
       slotTags: ['village', 'job_site'],
       isInitiallyUnlocked: true,
+      icon: '\u2605',
+      colorClass: 'text-amber-200',
     },
     village_gate: {
       id: 'village_gate',
@@ -114,6 +134,19 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
       y: 3,
       slotTags: ['world', 'job_site'],
       isInitiallyUnlocked: true,
+      icon: '\u21E8',
+      colorClass: 'text-sky-200',
+    },
+    village_market: {
+      id: 'village_market',
+      label: 'Market',
+      description: 'A small trading stall inside the village walls.',
+      x: 4,
+      y: 1,
+      slotTags: ['village', 'job_site', 'shop'],
+      isInitiallyUnlocked: true,
+      icon: '\u25CE',
+      colorClass: 'text-emerald-200',
     },
   },
 
@@ -140,6 +173,33 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
       description: 'Where residents leave the safety of the walls to explore.',
       tags: ['job_site', 'world'],
       isInitiallyBuilt: true,
+    },
+    village_market: {
+      id: 'village_market',
+      label: 'Village Market',
+      description: 'Basic trading post used to buy food and goods.',
+      tags: ['shop', 'village'],
+      isInitiallyBuilt: true,
+      level: 1,
+      maxLevel: 3,
+      upgrades: [
+        {
+          level: 2,
+          costs: {
+            gold: 50,
+            materials: 5,
+          },
+          notes: 'Unlocks better stall space and more efficient trading.',
+        },
+        {
+          level: 3,
+          costs: {
+            gold: 120,
+            materials: 15,
+          },
+          notes: 'Full market square with multiple stalls and improved prices.',
+        },
+      ],
     },
   },
 
@@ -181,6 +241,10 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
     dangerInjuryMultiplierPerPoint: 0.1,
     foodConsumptionPerResidentPerDay: 1,
     baseFoodPriceInGold: 25,
+    startingResources: {
+      gold: 0,
+      food: 2,
+    },
     // Simple base formula, expected to be overridden from the config UI.
     questXpFormula: 'level * 10',
     maxActiveQuests: 5,

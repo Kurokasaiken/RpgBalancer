@@ -71,6 +71,8 @@ export const MapSlotDefinitionSchema = z.object({
   slotTags: z.array(z.string()).default([]),
   isInitiallyUnlocked: z.boolean(),
   unlockConditionIds: z.array(z.string()).optional(),
+  icon: z.string().optional(),
+  colorClass: z.string().optional(),
 });
 
 export const FounderPresetSchema = z.object({
@@ -92,6 +94,7 @@ export const GlobalRulesSchema = z.object({
   dangerInjuryMultiplierPerPoint: z.number(),
   foodConsumptionPerResidentPerDay: z.number(),
   baseFoodPriceInGold: z.number(),
+  startingResources: z.record(z.string(), z.number()).optional(),
   questXpFormula: z.string().min(1),
   maxActiveQuests: z.number().int().min(0),
   defaultRandomSeed: z.number().optional(),

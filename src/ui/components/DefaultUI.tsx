@@ -31,21 +31,29 @@ interface DefaultSectionProps {
   hint?: string;
   children: React.ReactNode;
   className?: string;
+  actions?: React.ReactNode;
 }
 
-export const DefaultSection: React.FC<DefaultSectionProps> = ({ title, hint, children, className }) => {
+export const DefaultSection: React.FC<DefaultSectionProps> = ({ title, hint, children, className, actions }) => {
   const rootClass = ['default-card space-y-2', className].filter(Boolean).join(' ');
 
   return (
     <section className={rootClass}>
       <div className="flex items-baseline justify-between gap-2 border-b border-slate-700/60 pb-1.5">
-        <h2 className="text-[11px] md:text-xs font-semibold uppercase tracking-[0.22em] md:tracking-[0.26em] text-cyan-300">
-          {title}
-        </h2>
-        {hint && (
-          <span className="text-[8px] md:text-[9px] uppercase tracking-[0.16em] md:tracking-[0.18em] text-slate-500">
-            {hint}
-          </span>
+        <div className="flex items-baseline gap-2 min-w-0">
+          <h2 className="text-[11px] md:text-xs font-semibold uppercase tracking-[0.22em] md:tracking-[0.26em] text-cyan-300 truncate">
+            {title}
+          </h2>
+          {hint && (
+            <span className="text-[8px] md:text-[9px] uppercase tracking-[0.16em] md:tracking-[0.18em] text-slate-500">
+              {hint}
+            </span>
+          )}
+        </div>
+        {actions && (
+          <div className="flex items-center gap-1 shrink-0">
+            {actions}
+          </div>
         )}
       </div>
       <div className="text-[10px] md:text-xs text-slate-300">{children}</div>

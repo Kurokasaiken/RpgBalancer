@@ -11,6 +11,13 @@ export const BuildingDefinitionSchema = z.object({
     jobRewardMultiplier: z.number().optional(),
     questInjuryChanceReduction: z.number().optional(),
   }).optional(),
+  level: z.number().int().min(1).optional(),
+  maxLevel: z.number().int().min(1).optional(),
+  upgrades: z.array(z.object({
+    level: z.number().int().min(1),
+    costs: z.record(z.string(), z.number()).optional(),
+    notes: z.string().optional(),
+  })).optional(),
   icon: z.string().optional(),
   colorClass: z.string().optional(),
 });

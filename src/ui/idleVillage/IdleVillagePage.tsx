@@ -6,7 +6,7 @@
 
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { DndContext, DragOverlay, useDraggable, useDroppable, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core';
-import { Briefcase, MapPin, ScrollText, Pause, Play } from 'lucide-react';
+import { Briefcase, MapPin, ScrollText, Pause, Play, Eye } from 'lucide-react';
 import idleVillageMap from '@/assets/ui/idleVillage/idle-village-map.jpg';
 import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
 import { createInitialVillageState, scheduleActivity } from '@/engine/game/idleVillage/TimeEngine';
@@ -78,7 +78,7 @@ function ResidentCard({ resident, getFatigueColor }: ResidentCardProps) {
 }
 
 interface MapSlotMarkerProps {
-  slot: { id: string; label: string; slotTags: string[] };
+  slot: { id: string; label: string; slotTags: string[]; icon?: string; colorClass?: string };
   left: number;
   top: number;
   isSelected: boolean;
@@ -99,6 +99,9 @@ function MapSlotMarker({ slot, left, top, isSelected, hasJobs, hasQuests, jobLab
     ? 'scale-105 drop-shadow-[0_0_12px_rgba(250,250,210,0.9)]'
     : 'opacity-90 hover:opacity-100';
 
+  const hasCustomIcon = typeof slot.icon === 'string' && slot.icon.trim().length > 0;
+  const markerTextColor = slot.colorClass ?? 'text-slate-200';
+
   return (
     <button
       ref={setNodeRef}
@@ -113,14 +116,22 @@ function MapSlotMarker({ slot, left, top, isSelected, hasJobs, hasQuests, jobLab
       >
         <span className="absolute inset-0 rounded-full bg-gold/20 blur-[6px] opacity-70" aria-hidden />
         <div className="relative flex items-center justify-center gap-0.5 text-xs">
-          {hasQuests && (
-            <ScrollText className="w-4 h-4 text-amber-200" />
-          )}
-          {hasJobs && (
-            <Briefcase className="w-4 h-4 text-teal-200" />
-          )}
-          {!hasQuests && !hasJobs && (
-            <MapPin className="w-4 h-4 text-slate-200" />
+          {hasCustomIcon ? (
+            <span className={`text-base ${markerTextColor}`} aria-hidden>
+              {slot.icon}
+            </span>
+          ) : (
+            <>
+              {hasQuests && (
+                <ScrollText className="w-4 h-4 text-amber-200" />
+              )}
+              {hasJobs && (
+                <Briefcase className="w-4 h-4 text-teal-200" />
+              )}
+              {!hasQuests && !hasJobs && (
+                <MapPin className="w-4 h-4 text-slate-200" />
+              )}
+            </>
           )}
         </div>
       </div>
@@ -194,7 +205,14 @@ function DayCycleRing({ totalSegments, filledSegments, isNight }: DayCycleRingPr
 export default function IdleVillagePage() {
   const { config } = useIdleVillageConfig();
   const [villageState, setVillageState] = useState<VillageState>(() => {
-    const base = createInitialVillageState({ gold: 100, food: 50 });
+    const starting = config.globalRules.startingResources ?? {};
+    const initialResources: Record<string, number> = {};
+    Object.entries(starting).forEach(([id, value]) => {
+      if (typeof value === 'number' && value > 0) {
+        initialResources[id] = value;
+      }
+    });
+    const base = createInitialVillageState(initialResources);
     base.residents[stubResident.id] = stubResident;
     return base;
   });
@@ -203,6 +221,7 @@ export default function IdleVillagePage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [resourceDeltas, setResourceDeltas] = useState<Record<string, number>>({});
   const resourceDeltaTimeoutRef = useRef<number | null>(null);
+  const [showJobsAndQuests, setShowJobsAndQuests] = useState(true);
 
   // Schedule an activity (drag&drop simulation via button for now)
   const handleSchedule = useCallback(
@@ -437,13 +456,25 @@ export default function IdleVillagePage() {
   }, [config]);
 
   const mapSlots = useMemo(() => {
-    if (!config) return [] as { id: string; x: number; y: number; slotTags: string[]; label: string }[];
+    if (!config) {
+      return [] as {
+        id: string;
+        x: number;
+        y: number;
+        slotTags: string[];
+        label: string;
+        icon?: string;
+        colorClass?: string;
+      }[];
+    }
     return Object.values(config.mapSlots ?? {}) as {
       id: string;
       x: number;
       y: number;
       slotTags: string[];
       label: string;
+      icon?: string;
+      colorClass?: string;
     }[];
   }, [config]);
 
@@ -539,8 +570,49 @@ export default function IdleVillagePage() {
           />
           <div className="absolute inset-0 bg-obsidian/45" aria-hidden="true" />
 
+          {/* Map slot markers (jobs/quests) layered over the map */}
+          <div className="absolute inset-0 z-10 pointer-events-none">
+            {mapSlotLayout.map(({ slot, left, top }) => {
+              const jobsForSlot = activities.filter((activity) => {
+                if (!activity.tags?.includes('job')) return false;
+                const meta = (activity.metadata ?? {}) as { mapSlotId?: string } | undefined;
+                if (meta?.mapSlotId && meta.mapSlotId !== slot.id) return false;
+                if (!activity.slotTags || activity.slotTags.length === 0) return false;
+                return activity.slotTags.some((tag) => slot.slotTags.includes(tag));
+              });
+
+              const questsForSlot = activities.filter((activity) => {
+                if (!activity.tags?.includes('quest')) return false;
+                const meta = (activity.metadata ?? {}) as { mapSlotId?: string } | undefined;
+                if (meta?.mapSlotId && meta.mapSlotId !== slot.id) return false;
+                if (!activity.slotTags || activity.slotTags.length === 0) return false;
+                return activity.slotTags.some((tag) => slot.slotTags.includes(tag));
+              });
+
+              const hasJobs = jobsForSlot.length > 0;
+              const hasQuests = questsForSlot.length > 0;
+              const jobLabels = jobsForSlot.map((a) => a.label);
+              const questLabels = questsForSlot.map((a) => a.label);
+
+              return (
+                <MapSlotMarker
+                  key={slot.id}
+                  slot={slot}
+                  left={left}
+                  top={top}
+                  isSelected={selectedSlotId === slot.id}
+                  hasJobs={hasJobs}
+                  hasQuests={hasQuests}
+                  jobLabels={jobLabels}
+                  questLabels={questLabels}
+                  onClick={() => setSelectedSlotId(slot.id)}
+                />
+              );
+            })}
+          </div>
+
           {/* Foreground content stacked on top of the map */}
-          <div className="relative z-10 flex flex-col h-full">
+          <div className="relative z-20 flex flex-col h-full">
             {/* Top overlay: time/resources + events row, residents below */}
             <div className="p-4">
               <div className="flex flex-col lg:flex-row justify-between items-start gap-3">
@@ -618,20 +690,35 @@ export default function IdleVillagePage() {
 
                 {/* Events panel (aligned to the right of the bar) */}
                 <div className="mt-3 lg:mt-0 w-full lg:w-1/2 max-w-md">
-                  <DefaultSection title="Jobs & Quests in progress">
-                    <div className="mb-1 flex flex-wrap items-center gap-2 text-[9px] uppercase tracking-[0.16em] text-slate-300">
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-slate-900/80 border border-slate-700">
-                        <Briefcase className="w-3 h-3 text-teal-300" />
-                        <span>Jobs: {activeJobsCount}</span>
-                      </span>
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-slate-900/80 border border-slate-700">
-                        <ScrollText className="w-3 h-3 text-amber-300" />
-                        <span>Quests: {activeQuestsCount}</span>
-                      </span>
-                    </div>
-                    <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1 text-[10px]">
-                      {activeActivities.length > 0 ? (
-                        activeActivities.map((scheduled) => {
+                  <DefaultSection
+                    title="Jobs & Quests in progress"
+                    actions={(
+                      <button
+                        type="button"
+                        className="flex items-center justify-center w-4 h-4 rounded text-slate-400 hover:text-amber-200"
+                        title={showJobsAndQuests ? 'Nascondi lista' : 'Mostra lista'}
+                        onClick={() => setShowJobsAndQuests((prev) => !prev)}
+                      >
+                        <Eye className="w-3 h-3" />
+                        <span className="sr-only">Toggle Jobs and Quests visibility</span>
+                      </button>
+                    )}
+                  >
+                    {showJobsAndQuests && (
+                      <>
+                        <div className="mb-1 flex flex-wrap items-center gap-2 text-[9px] uppercase tracking-[0.16em] text-slate-300">
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-slate-900/80 border border-slate-700">
+                            <Briefcase className="w-3 h-3 text-teal-300" />
+                            <span>Jobs: {activeJobsCount}</span>
+                          </span>
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-slate-900/80 border border-slate-700">
+                            <ScrollText className="w-3 h-3 text-amber-300" />
+                            <span>Quests: {activeQuestsCount}</span>
+                          </span>
+                        </div>
+                        <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1 text-[10px]">
+                          {activeActivities.length > 0 ? (
+                            activeActivities.map((scheduled) => {
                           const def = config.activities[scheduled.activityId] as ActivityDefinition | undefined;
                           const assignedNames = scheduled.characterIds.map(
                             (cid) => villageState.residents[cid]?.id ?? cid,
@@ -731,7 +818,9 @@ export default function IdleVillagePage() {
                       ) : (
                         <p className="text-[10px] text-slate-400">No active events.</p>
                       )}
-                    </div>
+                        </div>
+                      </>
+                    )}
                   </DefaultSection>
                 </div>
               </div>

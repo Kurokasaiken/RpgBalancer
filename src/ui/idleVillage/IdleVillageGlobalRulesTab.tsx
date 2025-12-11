@@ -10,6 +10,7 @@ import { DefaultSection } from '@/ui/components/DefaultUI';
 export default function IdleVillageGlobalRulesTab() {
   const { config, updateConfig } = useIdleVillageConfig();
   const rules = config.globalRules;
+  const resources = Object.values(config.resources ?? {});
 
   const handleNumberChange = (key: keyof typeof rules) => (value: string) => {
     const parsed = value === '' ? NaN : Number(value);
@@ -18,6 +19,27 @@ export default function IdleVillageGlobalRulesTab() {
       globalRules: {
         ...rules,
         [key]: parsed,
+      },
+    });
+  };
+
+  const handleStartingResourceChange = (resourceId: string, value: string) => {
+    const parsed = value === '' ? 0 : Number(value);
+    if (Number.isNaN(parsed) || parsed < 0) return;
+
+    const current = rules.startingResources ?? {};
+    const next: Record<string, number> = { ...current };
+
+    if (parsed <= 0) {
+      delete next[resourceId];
+    } else {
+      next[resourceId] = parsed;
+    }
+
+    updateConfig({
+      globalRules: {
+        ...rules,
+        startingResources: Object.keys(next).length > 0 ? next : undefined,
       },
     });
   };
@@ -83,6 +105,34 @@ export default function IdleVillageGlobalRulesTab() {
                 className="w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory"
               />
             </div>
+            {resources.length > 0 && (
+              <div className="mt-3 pt-2 border-t border-slate-700/70 space-y-1.5 text-xs">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-300">
+                  Starting Resources
+                </div>
+                <div className="space-y-1">
+                  {resources.map((res) => {
+                    const current = rules.startingResources?.[res.id] ?? 0;
+                    return (
+                      <div key={res.id} className="flex items-center justify-between gap-2">
+                        <span className="text-[10px] text-slate-300 truncate">
+                          {res.label}
+                          <span className="ml-1 text-slate-500">({res.id})</span>
+                        </span>
+                        <input
+                          type="number"
+                          min={0}
+                          step={1}
+                          value={current}
+                          onChange={(e) => handleStartingResourceChange(res.id, e.target.value)}
+                          className="w-20 px-2 py-0.5 bg-obsidian border border-slate rounded text-ivory text-[10px] font-mono text-right"
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </DefaultSection>
 

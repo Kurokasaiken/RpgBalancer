@@ -127,6 +127,11 @@ export interface MapSlotDefinition {
 
   /** Generic condition IDs (interpreted by higher-level engines) */
   unlockConditionIds?: string[];
+
+  /** Optional UI icon/glyph for the map marker (e.g. "⛏", "⚒") */
+  icon?: string;
+  /** Tailwind color class for the marker label/outline */
+  colorClass?: string;
 }
 
 export interface FounderPreset {
@@ -163,6 +168,13 @@ export interface GlobalRules {
   foodConsumptionPerResidentPerDay: number;
   /** Baseline price of 1 unit of food in gold (for early-game balancing) */
   baseFoodPriceInGold: number;
+
+  /**
+   * Optional starting resources for a new Idle Village run.
+   * Keys are resource IDs and values are starting quantities.
+   * If omitted, the engine starts with an empty resource map.
+   */
+  startingResources?: Record<string, number>;
 
   // Injury
   baseLightInjuryChanceAtMaxFatigue: number;
