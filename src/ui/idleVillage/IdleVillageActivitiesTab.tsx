@@ -391,6 +391,332 @@ export default function IdleVillageActivitiesTab() {
                   className="w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory"
                 />
               </div>
+              {(() => {
+                const currentMeta = (formData.metadata ?? {}) as {
+                  injuryChanceDisplay?: number;
+                  deathChanceDisplay?: number;
+                };
+
+                const handleMetaNumberChange = (
+                  key: 'injuryChanceDisplay' | 'deathChanceDisplay',
+                  minValue: number,
+                ) =>
+                  (raw: string) => {
+                    const baseMeta = (formData.metadata ?? {}) as Record<string, unknown>;
+                    const nextMeta = { ...baseMeta } as {
+                      injuryChanceDisplay?: number;
+                      deathChanceDisplay?: number;
+                    } & Record<string, unknown>;
+
+                    if (raw === '') {
+                      delete nextMeta[key];
+                    } else {
+                      const parsed = Number(raw);
+                      if (Number.isFinite(parsed) && parsed >= minValue) {
+                        nextMeta[key] = parsed;
+                      }
+                    }
+
+                    const finalMeta = Object.keys(nextMeta).length > 0 ? nextMeta : undefined;
+                    setFormData({
+                      ...formData,
+                      metadata: finalMeta,
+                    });
+                  };
+
+                return (
+                  <div className="grid grid-cols-2 gap-2 text-[11px] mt-1">
+                    <div>
+                      <label className="block font-semibold mb-0.5">
+                        Injury Chance % (UI)
+                      </label>
+                      <input
+                        type="number"
+                        min={0}
+                        max={100}
+                        value={
+                          typeof currentMeta.injuryChanceDisplay === 'number'
+                            ? currentMeta.injuryChanceDisplay
+                            : ''
+                        }
+                        onChange={(e) => handleMetaNumberChange('injuryChanceDisplay', 0)(e.target.value)}
+                        className="w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-semibold mb-0.5">
+                        Death Chance % (UI)
+                      </label>
+                      <input
+                        type="number"
+                        min={0}
+                        max={100}
+                        value={
+                          typeof currentMeta.deathChanceDisplay === 'number'
+                            ? currentMeta.deathChanceDisplay
+                            : ''
+                        }
+                        onChange={(e) => handleMetaNumberChange('deathChanceDisplay', 0)(e.target.value)}
+                        className="w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory"
+                      />
+                    </div>
+                  </div>
+                );
+              })()}
+              {Array.isArray(formData.tags) && formData.tags.includes('quest') && (
+                <div className="mt-2 pt-2 border-t border-slate-700/70 space-y-2">
+                  {(() => {
+                    const currentMeta = (formData.metadata ?? {}) as {
+                      questSpawnEnabled?: boolean;
+                      questSpawnWeight?: number;
+                      questMinDay?: number;
+                      questMaxDay?: number;
+                      questMaxConcurrent?: number;
+                      questAllowedSlotTags?: string[];
+                    };
+
+                    const rawSlotTags = Array.isArray(currentMeta.questAllowedSlotTags)
+                      ? currentMeta.questAllowedSlotTags
+                      : [];
+                    const slotTagsValue = rawSlotTags.join(', ');
+
+                    return (
+                      <>
+                        <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-300">
+                          Quest Spawning
+                        </div>
+                        <label className="flex items-center gap-2 text-[11px] text-slate-200">
+                          <input
+                            type="checkbox"
+                            checked={currentMeta.questSpawnEnabled === true}
+                            onChange={(e) => {
+                              const baseMeta = (formData.metadata ?? {}) as Record<string, unknown>;
+                              const nextMeta = { ...baseMeta } as {
+                                questSpawnEnabled?: boolean;
+                              } & Record<string, unknown>;
+                              if (e.target.checked) {
+                                nextMeta.questSpawnEnabled = true;
+                              } else {
+                                delete nextMeta.questSpawnEnabled;
+                              }
+                              const finalMeta = Object.keys(nextMeta).length > 0 ? nextMeta : undefined;
+                              setFormData({
+                                ...formData,
+                                metadata: finalMeta,
+                              });
+                            }}
+                          />
+                          <span>Enable quest spawning for this activity</span>
+                        </label>
+                        <div className="grid grid-cols-2 gap-2 text-[11px]">
+                          <div>
+                            <label className="block font-semibold mb-0.5">Spawn Weight</label>
+                            <input
+                              type="number"
+                              min={1}
+                              value={
+                                typeof currentMeta.questSpawnWeight === 'number'
+                                  ? currentMeta.questSpawnWeight
+                                  : ''
+                              }
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                const baseMeta = (formData.metadata ?? {}) as Record<string, unknown>;
+                                const nextMeta = { ...baseMeta } as {
+                                  questSpawnWeight?: number;
+                                } & Record<string, unknown>;
+                                if (value === '') {
+                                  delete nextMeta.questSpawnWeight;
+                                } else {
+                                  const parsed = Number(value);
+                                  if (Number.isFinite(parsed) && parsed > 0) {
+                                    nextMeta.questSpawnWeight = parsed;
+                                  }
+                                }
+                                const finalMeta = Object.keys(nextMeta).length > 0 ? nextMeta : undefined;
+                                setFormData({
+                                  ...formData,
+                                  metadata: finalMeta,
+                                });
+                              }}
+                              className="w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory"
+                            />
+                          </div>
+                          <div>
+                            <label className="block font-semibold mb-0.5">Max Concurrent Offers</label>
+                            <input
+                              type="number"
+                              min={0}
+                              value={
+                                typeof currentMeta.questMaxConcurrent === 'number'
+                                  ? currentMeta.questMaxConcurrent
+                                  : ''
+                              }
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                const baseMeta = (formData.metadata ?? {}) as Record<string, unknown>;
+                                const nextMeta = { ...baseMeta } as {
+                                  questMaxConcurrent?: number;
+                                } & Record<string, unknown>;
+                                if (value === '') {
+                                  delete nextMeta.questMaxConcurrent;
+                                } else {
+                                  const parsed = Number(value);
+                                  if (Number.isFinite(parsed) && parsed >= 0) {
+                                    nextMeta.questMaxConcurrent = parsed;
+                                  }
+                                }
+                                const finalMeta = Object.keys(nextMeta).length > 0 ? nextMeta : undefined;
+                                setFormData({
+                                  ...formData,
+                                  metadata: finalMeta,
+                                });
+                              }}
+                              className="w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory"
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 text-[11px]">
+                          <div>
+                            <label className="block font-semibold mb-0.5">Min Day</label>
+                            <input
+                              type="number"
+                              min={1}
+                              value={
+                                typeof currentMeta.questMinDay === 'number'
+                                  ? currentMeta.questMinDay
+                                  : ''
+                              }
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                const baseMeta = (formData.metadata ?? {}) as Record<string, unknown>;
+                                const nextMeta = { ...baseMeta } as {
+                                  questMinDay?: number;
+                                } & Record<string, unknown>;
+                                if (value === '') {
+                                  delete nextMeta.questMinDay;
+                                } else {
+                                  const parsed = Number(value);
+                                  if (Number.isFinite(parsed) && parsed >= 1) {
+                                    nextMeta.questMinDay = parsed;
+                                  }
+                                }
+                                const finalMeta = Object.keys(nextMeta).length > 0 ? nextMeta : undefined;
+                                setFormData({
+                                  ...formData,
+                                  metadata: finalMeta,
+                                });
+                              }}
+                              className="w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory"
+                            />
+                          </div>
+                          <div>
+                            <label className="block font-semibold mb-0.5">Max Day</label>
+                            <input
+                              type="number"
+                              min={1}
+                              value={
+                                typeof currentMeta.questMaxDay === 'number'
+                                  ? currentMeta.questMaxDay
+                                  : ''
+                              }
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                const baseMeta = (formData.metadata ?? {}) as Record<string, unknown>;
+                                const nextMeta = { ...baseMeta } as {
+                                  questMaxDay?: number;
+                                } & Record<string, unknown>;
+                                if (value === '') {
+                                  delete nextMeta.questMaxDay;
+                                } else {
+                                  const parsed = Number(value);
+                                  if (Number.isFinite(parsed) && parsed >= 1) {
+                                    nextMeta.questMaxDay = parsed;
+                                  }
+                                }
+                                const finalMeta = Object.keys(nextMeta).length > 0 ? nextMeta : undefined;
+                                setFormData({
+                                  ...formData,
+                                  metadata: finalMeta,
+                                });
+                              }}
+                              className="w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block font-semibold mb-0.5 text-[11px]">Allowed Slot Tags Override</label>
+                          <input
+                            type="text"
+                            placeholder="comma-separated (optional)"
+                            value={slotTagsValue}
+                            onChange={(e) => {
+                              const raw = e.target.value;
+                              const baseMeta = (formData.metadata ?? {}) as Record<string, unknown>;
+                              const nextMeta = { ...baseMeta } as {
+                                questAllowedSlotTags?: string[];
+                              } & Record<string, unknown>;
+                              const parts = raw
+                                .split(',')
+                                .map((s) => s.trim())
+                                .filter((s) => s.length > 0);
+                              if (parts.length === 0) {
+                                delete nextMeta.questAllowedSlotTags;
+                              } else {
+                                nextMeta.questAllowedSlotTags = parts;
+                              }
+                              const finalMeta = Object.keys(nextMeta).length > 0 ? nextMeta : undefined;
+                              setFormData({
+                                ...formData,
+                                metadata: finalMeta,
+                              });
+                            }}
+                            className="w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory text-[11px]"
+                          />
+                          <p className="mt-0.5 text-[10px] text-slate-400">
+                            If empty, the activity's own slot tags are used.
+                          </p>
+                        </div>
+                      </>
+                    );
+                  })()}
+                </div>
+              )}
+              <div>
+                <label className="block text-sm font-bold mb-1">Verb Tone (UI, optional)</label>
+                {(() => {
+                  const currentMeta = (formData.metadata ?? {}) as { verbToneId?: string } | undefined;
+                  const currentTone = currentMeta?.verbToneId ?? '';
+                  return (
+                    <select
+                      className="w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory text-xs"
+                      value={currentTone}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const baseMeta = (formData.metadata ?? {}) as Record<string, unknown>;
+                        const nextMeta = { ...baseMeta } as { verbToneId?: string } & Record<string, unknown>;
+                        if (!value) {
+                          delete nextMeta.verbToneId;
+                        } else {
+                          nextMeta.verbToneId = value;
+                        }
+                        const finalMeta = Object.keys(nextMeta).length > 0 ? nextMeta : undefined;
+                        setFormData({
+                          ...formData,
+                          metadata: finalMeta,
+                        });
+                      }}
+                    >
+                      <option value="">Auto (from tags)</option>
+                      <option value="job">Job (work / income)</option>
+                      <option value="quest">Quest (opportunities)</option>
+                      <option value="danger">Danger (injury / threats)</option>
+                      <option value="system">System (time / hunger / market)</option>
+                      <option value="neutral">Neutral (misc)</option>
+                    </select>
+                  );
+                })()}
+              </div>
               {mapSlots.length > 0 && (
                 <div className="space-y-2">
                   <div className="flex items-center justify-between gap-2">

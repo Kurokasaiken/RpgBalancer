@@ -97,6 +97,18 @@ export const GlobalRulesSchema = z.object({
   startingResources: z.record(z.string(), z.number()).optional(),
   questXpFormula: z.string().min(1),
   maxActiveQuests: z.number().int().min(0),
+  questSpawnEveryNDays: z.number().int().min(1),
+  maxGlobalQuestOffers: z.number().int().min(0),
+  maxQuestOffersPerSlot: z.number().int().min(0),
+  verbToneColors: z
+    .object({
+      neutral: z.string().optional(),
+      job: z.string().optional(),
+      quest: z.string().optional(),
+      danger: z.string().optional(),
+      system: z.string().optional(),
+    })
+    .optional(),
   defaultRandomSeed: z.number().optional(),
 });
 

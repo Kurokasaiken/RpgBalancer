@@ -12,6 +12,14 @@ export default function IdleVillageGlobalRulesTab() {
   const rules = config.globalRules;
   const resources = Object.values(config.resources ?? {});
 
+  const DEFAULT_VERB_TONE_COLORS: Record<'neutral' | 'job' | 'quest' | 'danger' | 'system', string> = {
+    neutral: '#94A3B8',
+    job: '#3B82F6',
+    quest: '#34D399',
+    danger: '#F87171',
+    system: '#38BDF8',
+  };
+
   const handleNumberChange = (key: keyof typeof rules) => (value: string) => {
     const parsed = value === '' ? NaN : Number(value);
     if (Number.isNaN(parsed)) return;
@@ -49,6 +57,33 @@ export default function IdleVillageGlobalRulesTab() {
       globalRules: {
         ...rules,
         [key]: value,
+      },
+    });
+  };
+
+  const handleVerbToneColorChange = (tone: 'neutral' | 'job' | 'quest' | 'danger' | 'system') => (value: string) => {
+    const current = rules.verbToneColors ?? {};
+    const next = {
+      ...current,
+      [tone]: value,
+    };
+    updateConfig({
+      globalRules: {
+        ...rules,
+        verbToneColors: next,
+      },
+    });
+  };
+
+  const handleVerbToneColorReset = (tone: 'neutral' | 'job' | 'quest' | 'danger' | 'system') => () => {
+    const current = rules.verbToneColors ?? {};
+    if (!current[tone]) return;
+    const next = { ...current } as Record<string, string>;
+    delete next[tone];
+    updateConfig({
+      globalRules: {
+        ...rules,
+        verbToneColors: Object.keys(next).length > 0 ? next : undefined,
       },
     });
   };
@@ -206,6 +241,85 @@ export default function IdleVillageGlobalRulesTab() {
                 className="w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory"
               />
             </div>
+            <div className="mt-3 pt-2 border-t border-slate-700/70 space-y-1.5 text-xs">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-300">
+                Quest Spawning
+              </div>
+              <div className="space-y-1.5">
+                <div>
+                  <label className="block font-semibold mb-0.5 text-[11px]">Spawn Every N Days</label>
+                  <input
+                    type="number"
+                    min={1}
+                    value={rules.questSpawnEveryNDays}
+                    onChange={(e) => handleNumberChange('questSpawnEveryNDays')(e.target.value)}
+                    className="w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory text-[11px]"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block font-semibold mb-0.5 text-[11px]">Max Global Offers</label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={rules.maxGlobalQuestOffers}
+                      onChange={(e) => handleNumberChange('maxGlobalQuestOffers')(e.target.value)}
+                      className="w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory text-[11px]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-semibold mb-0.5 text-[11px]">Max Offers Per Slot</label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={rules.maxQuestOffersPerSlot}
+                      onChange={(e) => handleNumberChange('maxQuestOffersPerSlot')(e.target.value)}
+                      className="w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory text-[11px]"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </DefaultSection>
+
+        <DefaultSection title="Verb Colors">
+          <div className="space-y-2 text-sm">
+            <p className="text-[10px] text-slate-400">
+              Configure ring colors for Cultist-style verbs. These values override the built-in palette.
+            </p>
+            {([
+              { tone: 'job' as const, label: 'Job (work / income)' },
+              { tone: 'quest' as const, label: 'Quest (opportunities)' },
+              { tone: 'danger' as const, label: 'Danger (injury / threats)' },
+              { tone: 'system' as const, label: 'System (time / hunger / market)' },
+              { tone: 'neutral' as const, label: 'Neutral (misc verbs)' },
+            ]).map(({ tone, label }) => {
+              const current = rules.verbToneColors?.[tone] ?? DEFAULT_VERB_TONE_COLORS[tone];
+              const hasOverride = Boolean(rules.verbToneColors?.[tone]);
+              return (
+                <div key={tone} className="flex items-center justify-between gap-2">
+                  <span className="text-[10px] text-slate-300 truncate">{label}</span>
+                  <div className="flex items-center gap-1">
+                    <input
+                      type="color"
+                      value={current}
+                      onChange={(e) => handleVerbToneColorChange(tone)(e.target.value)}
+                      className="w-8 h-5 rounded border border-slate-600 bg-slate-900 p-0"
+                    />
+                    {hasOverride && (
+                      <button
+                        type="button"
+                        onClick={handleVerbToneColorReset(tone)}
+                        className="px-1.5 py-0.5 rounded-full border border-slate-600 text-[9px] text-slate-300 hover:border-slate-400 hover:text-slate-100"
+                      >
+                        Reset
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </DefaultSection>
       </div>

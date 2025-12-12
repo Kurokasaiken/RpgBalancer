@@ -1,4 +1,4 @@
-# Idle Incremental RPG – Idle Village
+# Idle Incremental RPG – Game Vision
 
 **Status:** Vision Document (Phase One – Product Direction)  
 **Related Docs:**
@@ -18,7 +18,7 @@ Un *Idle Incremental RPG* in cui gestisci un piccolo villaggio di combattenti e 
 - **Cultist Simulator** – worker placement a carte+timer, attività rappresentate come slot/"verbs" con token che girano.
 - **They Are Billions** – ondate periodiche che testano la tua preparazione, progressiva escalation di difficoltà.
 
-**Scope per Phase One (Phase 12 – Idle Village):**
+**Scope per Phase One (Phase 12 – Idle Incremental RPG):**
 - Combat **solo 1v1** (riuso engine esistente).
 - Nessun input durante il combattimento: decisioni **pre-fight**.
 - Spell usate solo in combat (per ora).  
@@ -33,7 +33,7 @@ Un *Idle Incremental RPG* in cui gestisci un piccolo villaggio di combattenti e 
 - **Longevità:** gioco pensato per essere giocato per **mesi**, con loop che restano interessanti grazie a meta-progression e escalation di richieste (quest, raid, waves).
 - **Depth first:** non è un semplice clicker: riutilizza il combat/balancing engine complesso del progetto, ma lo incapsula in un meta-gioco accessibile.
 - **Config-First:** tutte le definizioni di jobs, quest, ondate, edifici, risorse, difficoltà vivono sotto `src/balancing/config/idleVillage/*`.
-- **Phase One chiara:** Idle Village è la **prima incarnazione di prodotto** dell'ecosistema RPG Balancer.
+- **Phase One chiara:** Idle Incremental RPG è la **prima incarnazione di prodotto** dell'ecosistema RPG Balancer.
 
 ### 2.2 Piattaforme Target
 
@@ -314,7 +314,7 @@ Il giocatore è il **mentore/stratega** di un villaggio di combattenti in un mon
 
 - Tutte le scelte di bilanciamento per Idle Incremental RPG devono:
   - vivere in `IdleVillageConfig` (jobs, quest, mapSlots, globalRules, variance, resources, founders, buildings),
-  - essere manipolabili idealmente da un **tab di configurazione Idle Village** (non ancora definito in dettaglio in questo doc, ma previsto in `idle_village_plan.md`).
+  - essere manipolabili idealmente da un **tab di configurazione Idle Incremental RPG** (non ancora definito in dettaglio in questo doc, ma previsto in `idle_village_plan.md`).
 
 - L'UI:
   - legge `config` e `VillageState`,
@@ -331,7 +331,7 @@ Il giocatore è il **mentore/stratega** di un villaggio di combattenti in un mon
   - aiuta a tarare i valori delle stat prima che vengano usate intensivamente nell'Idle game.
 
 - **Phase 11 (Tactical Missions):**
-  - fornisce concetti per missioni/quest più complesse; Idle Village può riusare concetti di missioni ma con risoluzione 1v1 e layer grid-based rimandato.
+  - fornisce concetti per missioni/quest più complesse; l'Idle Incremental RPG può riusare concetti di missioni ma con risoluzione 1v1 e layer grid-based rimandato.
 
 ---
 
@@ -351,7 +351,7 @@ Queste aree restano da definire meglio in piani successivi o doc specifici:
    - Puoi "ritirarti" volontariamente e chiudere la run prima del collasso? Con quali bonus/penalità?
 
 4. **Party-based combat**  
-   - Quando e come introdurre 2v2, 3v3, 5v5 in Idle Village (Phase successiva).  
+   - Quando e come introdurre 2v2, 3v3, 5v5 nell'Idle Incremental RPG (Phase successiva).  
    - Quanto riuso diretto dal sistema Phase 9 (Combat System Expansion).
 
 5. **Narrazione**  
@@ -364,7 +364,7 @@ Queste domande **non bloccano** Phase One, ma vanno considerate nel momento in c
 ## 10. Collegamenti
 
 - **Master Plan:**  
-  [MASTER_PLAN.md](MASTER_PLAN.md) – questa visione è referenziata nella sezione *Future Direction* come "Idle Incremental RPG – Idle Village (Phase 12, Product Phase One)".
+  [MASTER_PLAN.md](MASTER_PLAN.md) – questa visione è referenziata nella sezione *Future Direction* come "Idle Incremental RPG (Phase 12, Product Phase One)".
 
 - **Implementation Plan:**  
   [plans/idle_village_plan.md](plans/idle_village_plan.md) – dettaglia sub-fasi tecniche (TimeEngine, JobResolver, QuestResolver, InjuryEngine, UI, testing).
@@ -380,7 +380,7 @@ Questa sezione traccia lo stato attuale (vertical slice v0.1) rispetto alla visi
 
 ### 11.1 Feature già presenti
 
-- **Config-First Idle Village:**
+- **Config-First Idle Incremental RPG:**
   - `IdleVillageConfig` sotto `src/balancing/config/idleVillage/*` contiene risorse, activities, buildings, `mapSlots`, regole globali (`globalRules`).
   - Esiste uno store dedicato (`IdleVillageConfigStore`) e un hook React (`useIdleVillageConfig`) con history/undo e import/export.
 
@@ -390,7 +390,7 @@ Questa sezione traccia lo stato attuale (vertical slice v0.1) rispetto alla visi
 
 - **Mappa Villaggio & mapSlots:**
   - I `mapSlots` logici (griglia 0–10) sono definiti in config e proiettati sopra una mappa background.
-  - Un editor nel tab **Idle Village / Activities** permette di selezionare slot, cliccare sulla mappa per spostarli e scegliere un'icona (emoji) per ciascuno.
+  - Un editor nel tab **Idle Incremental RPG / Activities** permette di selezionare slot, cliccare sulla mappa per spostarli e scegliere un'icona (emoji) per ciascuno.
 
 - **Market (proto):**
   - Job di tipo Market definito in `activities` (tag `job`, metadata `marketJob`).
@@ -420,6 +420,6 @@ Questa sezione traccia lo stato attuale (vertical slice v0.1) rispetto alla visi
   - Implementare un generatore minimo di quest (tag `quest`) che spawna attorno ai `mapSlots` world/village e le rende visibili come verb card.
 
 - **Testing dedicato:**
-  - Test di engine per TimeEngine/JobResolver/MarketEngine in ottica Idle Village (vedi `idle_village_plan.md` sezione 12.10), più integrazione di questi nel framework di regression esistente.
+  - Test di engine per TimeEngine/JobResolver/MarketEngine in ottica Idle Incremental RPG (vedi `idle_village_plan.md` sezione 12.10), più integrazione di questi nel framework di regression esistente.
 
 Questi punti sono tracciati nei piani (`idle_village_plan.md`) e nella checklist (`idle_village_tasks.md`) per accompagnare l'evoluzione da vertical slice a Phase One completa.

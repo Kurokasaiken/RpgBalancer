@@ -185,6 +185,7 @@ const ADDITIONAL_STATS: Record<string, StatDefinition> = {
     weight: 1,
     isCore: false,
     isDerived: false,
+    isPenalty: true,
   },
   failMult: {
     id: 'failMult',
@@ -198,6 +199,7 @@ const ADDITIONAL_STATS: Record<string, StatDefinition> = {
     weight: 1,
     isCore: false,
     isDerived: false,
+    isPenalty: true,
   },
   failTxCMalus: {
     id: 'failTxCMalus',

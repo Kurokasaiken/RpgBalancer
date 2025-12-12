@@ -96,7 +96,7 @@ Example:
 │ Phase 10: Config Balancer 🔥 ACTIVE  ~140 tasks     │
 │ Phase 10.5: Stat Testing  🔥 NEXT    ~80 tasks      │
 │ Phase 11: Tactical Miss.  📋 TODO    ~100 tasks     │
-│ Phase 12: Idle Village    📋 TODO    ~120 tasks     │
+│ Phase 12: Idle Incremental RPG    📋 TODO    ~120 tasks     │
 ├──────────────────────────────────────────────────────┤
 │ TOTAL PROGRESS: ███████████████░░░░░ 75%            │
 └──────────────────────────────────────────────────────┘
@@ -481,14 +481,15 @@ The next evolution of the project is organized around six macro-goals:
    - Ogni modifica a Balancer/Spell Creator o ai loro componenti core deve far girare questi test.  
    - Stessa logica applicata ai componenti interni chiave.
 
-6. **Idle Incremental RPG – Idle Village (Phase 12, Product Phase One)**  
+6. **Idle Incremental RPG (Phase 12, Product Phase One)**  
    - Prodotto principale Phase One: meta-gioco idle/incremental giocabile sul lungo periodo (mesi), senza progressione offline in V1: il tempo avanza solo mentre il gioco è aperto.  
    - Focus su un founder "raro" (≈1% rispetto alla popolazione) e su un villaggio di lavoratori più scarsi: morte del protagonista e collasso del villaggio sono eventi normali che innescano nuove run.  
    - Meta-progression persistente tramite edifici/upgrade non distruttibili che migliorano lo start delle run successive (più risorse iniziali, spell/equip di partenza, possibilità di eredi che ripartono da zero con piccoli bonus).  
    - Core loop: allenare/mandare in combattimento il founder (jobs di combattimento tipo "ratti in città", early explore) mentre i lavoratori producono risorse tramite jobs e quest rischiose; prepararsi a ondate periodiche stile "They Are Billions" in cui tutti i personaggi disponibili difendono il villaggio.  
    - Mid/late game: sblocco di quest e raid che richiedono party ampi (prima 5, poi fino a ~20 personaggi equipaggiati), mantenendo al centro il combat/Entity system esistente e il worker placement config-driven (jobs, edifici, quest, rischi definiti in `src/balancing/config/*`).  
    - Vision & design document: [GAME_VISION_IDLE_INCREMENTAL.md](GAME_VISION_IDLE_INCREMENTAL.md).  
-   - **FTUE & Vertical Slice:** primi 30–60 minuti pianificati in [plans/idle_village_ftue_plan.md](plans/idle_village_ftue_plan.md); la vertical slice deve permettere almeno un ciclo completo run → meta → nuova run.
+   - **FTUE & Vertical Slice:** primi 30–60 minuti pianificati in [plans/idle_village_ftue_plan.md](plans/idle_village_ftue_plan.md); la vertical slice deve permettere almeno un ciclo completo run → meta → nuova run.  
+   - **Art Style & Visual Direction:** linee guida per stile grafico, palette e pipeline in [plans/idle_village_art_style_plan.md](plans/idle_village_art_style_plan.md).
 
 7. **Updated Philosophy & Guidelines**  
    - Allineare `PROJECT_PHILOSOPHY.md` e `DEVELOPMENT_GUIDELINES.md` con:  
@@ -498,7 +499,7 @@ The next evolution of the project is organized around six macro-goals:
 
 Questa sezione definisce la direzione strategica; i dettagli di ciò che è già stato fatto restano in `IMPLEMENTED_PLAN.md`.
 
-**Milestones publishing/marketing (Idle Village):**
+**Milestones publishing/marketing (Idle Incremental RPG):**
 
 - Dopo la prima versione stabile del loop base (Phase 12.1–12.5):
   - Creare pagina **itch.io** con build web e descrizione minimale (no marketing pesante, solo test/feedback).

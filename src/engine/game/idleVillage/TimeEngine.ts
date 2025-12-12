@@ -38,6 +38,17 @@ export interface ResidentState {
   injuryRecoveryTime?: VillageTimeUnit;
 }
 
+export interface QuestOffer {
+  id: string;
+  /** ID of the quest ActivityDefinition this offer refers to */
+  activityId: string;
+  /** Map slot where this quest is currently offered */
+  slotId: string;
+  createdAtTime: VillageTimeUnit;
+  /** Optional expiration time for the offer (in VillageTimeUnits) */
+  expiresAtTime?: VillageTimeUnit;
+}
+
 export interface VillageEvent {
   time: VillageTimeUnit;
   type:
@@ -46,7 +57,8 @@ export interface VillageEvent {
     | 'activity_completed'
     | 'activity_cancelled'
     | 'fatigue_changed'
-    | 'injury_applied';
+    | 'injury_applied'
+    | 'food_consumed_daily';
   payload: Record<string, unknown>;
 }
 
@@ -56,6 +68,8 @@ export interface VillageState {
   residents: Record<string, ResidentState>;
   activities: Record<string, ScheduledActivity>;
   eventLog: VillageEvent[];
+  /** Config-driven quest offers available to be accepted/scheduled by the player */
+  questOffers: Record<string, QuestOffer>;
 }
 
 export interface ScheduleActivityInput {
@@ -92,6 +106,7 @@ export function createInitialVillageState(initialResources: VillageResources = {
     residents: {},
     activities: {},
     eventLog: [],
+    questOffers: {},
   };
 }
 
@@ -330,19 +345,204 @@ export function advanceTime(
         const totalConsumption = foodConsumptionPerResidentPerDay * livingResidents * daysElapsed;
         const currentFood = updatedResources.food ?? 0;
         const nextFood = currentFood - totalConsumption;
-        updatedResources.food = nextFood < 0 ? 0 : nextFood;
+        const clampedNextFood = nextFood < 0 ? 0 : nextFood;
+        updatedResources.food = clampedNextFood;
+
+        newEvents.push({
+          time: targetTime,
+          type: 'food_consumed_daily',
+          payload: {
+            daysElapsed,
+            livingResidents,
+            amount: totalConsumption,
+            previousFood: currentFood,
+            newFood: clampedNextFood,
+          },
+        });
       }
     }
   }
 
-  const nextState: VillageState = {
+  const baseNextState: VillageState = {
     ...state,
     currentTime: targetTime,
     activities: updatedActivities,
     residents: updatedResidents,
     resources: updatedResources,
     eventLog: [...state.eventLog, ...newEvents],
+    questOffers: state.questOffers ?? {},
   };
 
-  return { state: nextState, completedActivityIds };
+  const finalState = spawnQuestOffersIfNeeded(_deps, baseNextState, state.currentTime, targetTime);
+
+  return { state: finalState, completedActivityIds };
+}
+
+function spawnQuestOffersIfNeeded(
+  deps: TimeEngineDeps,
+  state: VillageState,
+  previousTime: VillageTimeUnit,
+  targetTime: VillageTimeUnit,
+): VillageState {
+  const { config, rng } = deps;
+  const {
+    globalRules: {
+      dayLengthInTimeUnits,
+      questSpawnEveryNDays,
+      maxGlobalQuestOffers,
+      maxQuestOffersPerSlot,
+    },
+  } = config;
+
+  if (!dayLengthInTimeUnits || dayLengthInTimeUnits <= 0) return state;
+  if (!questSpawnEveryNDays || questSpawnEveryNDays <= 0) return state;
+  if (maxGlobalQuestOffers <= 0) return state;
+  if (maxQuestOffersPerSlot <= 0) return state;
+
+  const previousDayIndex = Math.floor(previousTime / dayLengthInTimeUnits);
+  const newDayIndex = Math.floor(targetTime / dayLengthInTimeUnits);
+  if (newDayIndex <= previousDayIndex) {
+    // No new in-game day has started; do not spawn new offers.
+    return state;
+  }
+
+  const dayNumber = newDayIndex + 1; // 1-based day counter for config readability
+  if (dayNumber % questSpawnEveryNDays !== 0) {
+    return state;
+  }
+
+  const existingOffers = state.questOffers ?? {};
+  const existingCount = Object.keys(existingOffers).length;
+  if (existingCount >= maxGlobalQuestOffers) {
+    return state;
+  }
+
+  const activities = Object.values(config.activities ?? {});
+  if (activities.length === 0) {
+    return state;
+  }
+
+  const allSlots = Object.values(config.mapSlots ?? {});
+  if (allSlots.length === 0) {
+    return state;
+  }
+
+  const offersBySlot = new Map<string, number>();
+  Object.values(existingOffers).forEach((offer) => {
+    const current = offersBySlot.get(offer.slotId) ?? 0;
+    offersBySlot.set(offer.slotId, current + 1);
+  });
+
+  type QuestSpawnMeta = {
+    questSpawnEnabled?: unknown;
+    questSpawnWeight?: unknown;
+    questMinDay?: unknown;
+    questMaxDay?: unknown;
+    questMaxConcurrent?: unknown;
+    questAllowedSlotTags?: unknown;
+  };
+
+  const questCandidates: { activity: ActivityDefinition; weight: number; allowedSlotTags: string[] }[] = [];
+
+  for (const activity of activities) {
+    if (!activity.tags?.includes('quest')) continue;
+
+    const meta = (activity.metadata ?? {}) as QuestSpawnMeta;
+    const enabled = meta.questSpawnEnabled === true;
+    if (!enabled) continue;
+
+    const minDay = typeof meta.questMinDay === 'number' && meta.questMinDay > 0
+      ? meta.questMinDay
+      : undefined;
+    if (typeof minDay === 'number' && dayNumber < minDay) continue;
+
+    const maxDay = typeof meta.questMaxDay === 'number' && meta.questMaxDay > 0
+      ? meta.questMaxDay
+      : undefined;
+    if (typeof maxDay === 'number' && dayNumber > maxDay) continue;
+
+    const perQuestMaxConcurrent =
+      typeof meta.questMaxConcurrent === 'number' && meta.questMaxConcurrent >= 0
+        ? meta.questMaxConcurrent
+        : undefined;
+    if (typeof perQuestMaxConcurrent === 'number') {
+      const concurrentCount = Object.values(existingOffers).filter(
+        (offer) => offer.activityId === activity.id,
+      ).length;
+      if (concurrentCount >= perQuestMaxConcurrent) continue;
+    }
+
+    let allowedSlotTags: string[] = [];
+    if (Array.isArray(meta.questAllowedSlotTags)) {
+      allowedSlotTags = meta.questAllowedSlotTags.filter(
+        (t): t is string => typeof t === 'string' && t.trim().length > 0,
+      );
+    }
+    if (allowedSlotTags.length === 0) {
+      allowedSlotTags = activity.slotTags ?? [];
+    }
+    if (allowedSlotTags.length === 0) continue;
+
+    const weight =
+      typeof meta.questSpawnWeight === 'number' && meta.questSpawnWeight > 0
+        ? meta.questSpawnWeight
+        : 1;
+
+    questCandidates.push({ activity, weight, allowedSlotTags });
+  }
+
+  if (questCandidates.length === 0) {
+    return state;
+  }
+
+  const totalWeight = questCandidates.reduce((sum, c) => sum + c.weight, 0);
+  if (totalWeight <= 0) {
+    return state;
+  }
+
+  let roll = rng() * totalWeight;
+  let chosen: { activity: ActivityDefinition; weight: number; allowedSlotTags: string[] } | null = null;
+  for (const candidate of questCandidates) {
+    if (roll < candidate.weight) {
+      chosen = candidate;
+      break;
+    }
+    roll -= candidate.weight;
+  }
+  if (!chosen) {
+    chosen = questCandidates[questCandidates.length - 1];
+  }
+
+  const eligibleSlots = allSlots.filter((slot) => {
+    if (!slot.isInitiallyUnlocked) return false;
+    if (!Array.isArray(slot.slotTags) || slot.slotTags.length === 0) return false;
+    const matchesTag = slot.slotTags.some((tag) => chosen!.allowedSlotTags.includes(tag));
+    if (!matchesTag) return false;
+    const countForSlot = offersBySlot.get(slot.id) ?? 0;
+    if (countForSlot >= maxQuestOffersPerSlot) return false;
+    return true;
+  });
+
+  if (eligibleSlots.length === 0) {
+    return state;
+  }
+
+  const slotIndex = Math.floor(rng() * eligibleSlots.length);
+  const selectedSlot = eligibleSlots[Math.max(0, Math.min(eligibleSlots.length - 1, slotIndex))];
+
+  const newId = `quest_offer_${targetTime}_${Math.floor(rng() * 1_000_000)}`;
+  const nextOffers: Record<string, QuestOffer> = {
+    ...existingOffers,
+    [newId]: {
+      id: newId,
+      activityId: chosen.activity.id,
+      slotId: selectedSlot.id,
+      createdAtTime: targetTime,
+    },
+  };
+
+  return {
+    ...state,
+    questOffers: nextOffers,
+  };
 }

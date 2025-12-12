@@ -1,11 +1,11 @@
-# Phase 12: Idle Incremental RPG – Idle Village – Implementation Plan
+# Phase 12: Idle Incremental RPG – Implementation Plan
 
 **Status:** Planning  
 **Type:** Idle Meta-Game / Village + Quest + Worker Placement  
 **Depends On:** Phase 9 (Combat Expansion), Phase 10 (Config-Driven Balancer), Phase 10.5 (Stat Stress Testing), Phase 11 (Tactical Missions – per filosofia e riuso engine)
 
 **Product Context:**  
-Phase 12 realizza la **Phase One** del prodotto *Idle Incremental RPG – Idle Village*. Per high concept, player fantasy, meta-progression tra run e obiettivi di prodotto vedi:  
+Phase 12 realizza la **Phase One** del prodotto *Idle Incremental RPG*. Per high concept, player fantasy, meta-progression tra run e obiettivi di prodotto vedi:  
 - [../GAME_VISION_IDLE_INCREMENTAL.md](../GAME_VISION_IDLE_INCREMENTAL.md)  
 Questo file si concentra invece su architettura e sotto-sistemi tecnici (Time & Activity Engine, Jobs, Quest, Injury, Economy, UI prototipale) necessari a rendere giocabile il loop descritto nel documento di visione.
 
@@ -29,6 +29,9 @@ Obiettivo della Phase 12 è costruire la **prima versione completa e giocabile**
 
 Per la definizione dettagliata dei **primi 30–60 minuti** di esperienza (FTUE) e della vertical slice pensata per demo web/Steam vedi anche:  
 [`idle_village_ftue_plan.md`](idle_village_ftue_plan.md).
+
+Per stile visivo, palette e coerenza con il tema **Gilded Observatory**, vedere anche:  
+[`idle_village_art_style_plan.md`](idle_village_art_style_plan.md).
 
 ---
 
@@ -78,7 +81,7 @@ Per la definizione dettagliata dei **primi 30–60 minuti** di esperienza (FTUE)
 
 ### 12.2 – Characters & Roster Integration
 
-**Obiettivo:** integrare l'Idle Village con il sistema di personaggi esistente.
+**Obiettivo:** integrare il meta-gioco dell'Idle Incremental RPG (villaggio) con il sistema di personaggi esistente.
 
 - **Domain:**
   - `Resident`: wrapper su `SavedCharacter`/`Entity` con status: `available | away | injured | exhausted | dead`.
@@ -131,7 +134,7 @@ Per la definizione dettagliata dei **primi 30–60 minuti** di esperienza (FTUE)
   - Il risultato è che puoi avere, ad esempio, una quest "Facile lv 2" ma "Ben pagata", con indicatori visivi coerenti.
 - **Procedural Quest Generation:**
   - Nome, tipo di missione, mix di reward (gold, spell, equip, risorse, consumables, ecc.) e categorie di difficoltà/pagamento sono generati randomicamente usando **tabelle/weights in config**, non logica hardcoded.
-  - La pagina di configurazione Idle Village permette di aggiungere/rimuovere tipi di missione, loot table e categorie di variance senza toccare il codice.
+  - La pagina di configurazione dell'Idle Incremental RPG (tab *Idle Village Config*) permette di aggiungere/rimuovere tipi di missione, loot table e categorie di variance senza toccare il codice.
 - **Spawn system:**
   - Generatore di quest attive attorno al villaggio, con seed RNG e limiti su numero massimo contemporaneo.
   - All'inizio compaiono solo quest **vicine al villaggio** e di `level` relativamente basso; quest di livello/più lontane richiedono edifici di **esplorazione** o altri prerequisiti definiti in config.
@@ -180,7 +183,7 @@ Per la definizione dettagliata dei **primi 30–60 minuti** di esperienza (FTUE)
 - **Espansioni minime V1:**
   - Upgrade casa (più cap persone).
   - Sblocco di almeno 1 nuovo job site + relativo job.
-- Tutto definito in config (`IdleVillageConfig.mapSlots` sotto `src/balancing/config/idleVillage/*`), inclusa la posizione su mappa (coordinate logiche su griglia 0–10). La UI prototipale offre un semplice editor nel tab **Idle Village / Activities** che permette di cliccare sulla mappa per riposizionare gli slot e scegliere un'icona per ciascun `mapSlot`.
+- Tutto definito in config (`IdleVillageConfig.mapSlots` sotto `src/balancing/config/idleVillage/*`), inclusa la posizione su mappa (coordinate logiche su griglia 0–10). La UI prototipale offre un semplice editor nel tab **Idle Incremental RPG / Activities** che permette di cliccare sulla mappa per riposizionare gli slot e scegliere un'icona per ciascun `mapSlot`.
 
 ### 12.8 – Economy, Food & Maintenance
 
@@ -196,7 +199,7 @@ Per la definizione dettagliata dei **primi 30–60 minuti** di esperienza (FTUE)
     - si applicano malus (più fatica, più injury);
     - ma non necessariamente morte immediata (configurabile).
 
-### 12.9 – UI/UX – Idle Village Screen
+### 12.9 – UI/UX – Village Meta Screen
 
 **Obiettivo:** creare una schermata principale per il meta-gioco in stile Gilded Observatory.
 
@@ -281,7 +284,7 @@ Per la vertical slice v0.1 è già presente una **UI prototipale** in `src/ui/id
 
 - Nessuna progressione offline (catch-up basato su timestamp) in questa fase.
 - Nessuna campagna narrativa completa; focus sulla struttura sistemica.
-- Nessun editor UI avanzato oltre il **tab di configurazione Idle Village** (che già permette CRUD completo di quest/lavori/edifici tramite config). Niente map editor grafico o tool di scripting complessi in questa fase.
+- Nessun editor UI avanzato oltre il **tab di configurazione Idle Incremental RPG** (che già permette CRUD completo di quest/lavori/edifici tramite config). Niente map editor grafico o tool di scripting complessi in questa fase.
 - Nessun sistema complesso di giorni/settimane: solo regola di fatica semplice (stanco fino al “giorno successivo” modellato via soglia di tempo).
 
 ---

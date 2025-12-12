@@ -1,4 +1,4 @@
-# Phase 12: Idle Incremental RPG – Idle Village – Task Checklist
+# Phase 12: Idle Incremental RPG – Task Checklist
 
 > Derived from `idle_village_plan.md`. Design changes → update the plan first.
 
@@ -17,7 +17,7 @@
 ## 12.2 – Characters & Roster Integration
 
 - [ ] Define `Resident` and related types (status, home assignment)
-- [ ] Integrate `SavedCharacter`/`Entity` into Idle Village domain
+- [ ] Integrate `SavedCharacter`/`Entity` into idle incremental RPG village domain
 - [ ] Implement founder generation based on archetype + difficulty
 - [ ] Implement recruitment flow (cost in gold + housing cap)
 - [ ] Implement food upkeep per character (config-driven)

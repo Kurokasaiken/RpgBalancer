@@ -24,6 +24,7 @@ export const StatEditor: React.FC<Props> = ({ isOpen, onClose, card, editingStat
   const [weight, setWeight] = useState(1);
   const [isDerived, setIsDerived] = useState(false);
   const [formula, setFormula] = useState('');
+  const [isPenalty, setIsPenalty] = useState(false);
   const [error, setError] = useState<string | undefined>();
 
   useEffect(() => {
@@ -40,6 +41,7 @@ export const StatEditor: React.FC<Props> = ({ isOpen, onClose, card, editingStat
       setWeight(editingStat.weight);
       setIsDerived(editingStat.isDerived);
       setFormula(editingStat.formula || '');
+      setIsPenalty(!!editingStat.isPenalty);
     } else {
       setId('');
       setLabel('');
@@ -52,6 +54,7 @@ export const StatEditor: React.FC<Props> = ({ isOpen, onClose, card, editingStat
       setWeight(1);
       setIsDerived(false);
       setFormula('');
+      setIsPenalty(false);
     }
     setError(undefined);
   }, [editingStat, isOpen]);
@@ -84,6 +87,7 @@ export const StatEditor: React.FC<Props> = ({ isOpen, onClose, card, editingStat
         weight,
         isDerived,
         formula: isDerived ? formula : undefined,
+        isPenalty: isPenalty || undefined,
       });
       if (!res.success) {
         setError(res.error);
@@ -111,6 +115,7 @@ export const StatEditor: React.FC<Props> = ({ isOpen, onClose, card, editingStat
       isDerived,
       formula: isDerived ? formula : undefined,
       bgColor: undefined,
+      isPenalty: isPenalty || undefined,
     });
     if (!res.success) {
       setError(res.error);
@@ -242,6 +247,16 @@ export const StatEditor: React.FC<Props> = ({ isOpen, onClose, card, editingStat
             onChange={(e) => setIsDerived(e.target.checked)}
           />
           <span>Derived stat (calcolata da formula)</span>
+        </label>
+
+        <label className="flex items-center gap-2 text-xs text-slate-200 mt-1">
+          <input
+            type="checkbox"
+            className="w-3 h-3 rounded border-slate-600 bg-slate-900"
+            checked={isPenalty}
+            onChange={(e) => setIsPenalty(e.target.checked)}
+          />
+          <span>Penalty stat (valori più alti sono peggiori)</span>
         </label>
 
         {isDerived && (

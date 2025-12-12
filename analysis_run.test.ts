@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import { BatchTestRunner } from './src/balancing/archetype/BatchTestRunner';
 import { TTKReportGenerator } from './src/balancing/archetype/TTKReportGenerator';
 import { TTKValidator } from './src/balancing/archetype/TTKValidator';
@@ -22,6 +23,9 @@ describe('Balance Analysis Run', () => {
             }
         );
 
+        const expectedMatchups = DEFAULT_ARCHETYPES.length * DEFAULT_ARCHETYPES.length;
+        expect(results.length).toBe(expectedMatchups);
+
         // Generate Targets dynamically for validation (generic targets)
         // In a real scenario, these would come from config
         const targets: TTKTarget[] = results.map(r => ({
@@ -36,10 +40,13 @@ describe('Balance Analysis Run', () => {
 
         // Validate
         const validations = TTKValidator.validateAll(results, targets);
+        expect(validations.length).toBe(results.length);
 
         // Generate Report
         const report = TTKReportGenerator.generateMarkdownReport(validations);
         const csv = TTKReportGenerator.generateCSV(results);
+        expect(report.length).toBeGreaterThan(0);
+        expect(csv.split('\n').length).toBeGreaterThan(1);
 
         console.log('\n\n================ BALANCE REPORT ================\n');
         console.log(report);
@@ -50,6 +57,8 @@ describe('Balance Analysis Run', () => {
             r.matchup.archetypeA.includes('tank') &&
             r.matchup.archetypeB.includes('dps')
         );
+
+        expect(tankVsDps).toBeDefined();
 
         if (tankVsDps) {
             console.log('\n🔍 Deep Dive: Tank vs DPS');

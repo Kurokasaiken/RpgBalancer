@@ -41,6 +41,9 @@ const StatStressTestingPage = lazy(() =>
 const ArchetypeTestingLab = lazy(() =>
   import('./ui/balancing/ArchetypeTestingLab').then((m) => ({ default: m.ArchetypeTestingLab }))
 );
+const SkillCheckPreviewPage = lazy(() =>
+  import('./ui/testing/SkillCheckPreviewPage').then((m) => ({ default: m.SkillCheckPreviewPage }))
+);
 
 type Tab =
   | 'balancer'
@@ -71,7 +74,8 @@ type Tab =
   | 'mockVerdantAlloy'
   | 'tacticalLab'
   | 'idleVillage'
-  | 'idleVillageConfig';
+  | 'idleVillageConfig'
+  | 'skillCheckPreview';
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('balancer');
@@ -175,6 +179,13 @@ function App() {
         <ErrorBoundary componentName="Stat Stress Testing">
           <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Stat Stress Testing…</div>}>
             <StatStressTestingPage />
+          </Suspense>
+        </ErrorBoundary>
+      )}
+      {activeTab === 'skillCheckPreview' && (
+        <ErrorBoundary componentName="Skill Check Preview Lab">
+          <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Skill Check Preview…</div>}>
+            <SkillCheckPreviewPage />
           </Suspense>
         </ErrorBoundary>
       )}

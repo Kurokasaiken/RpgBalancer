@@ -3,6 +3,8 @@ import { generateStatBlock, type Archetype } from '../generator';
 import { Entity } from '../../engine/core/entity';
 import { createEmptyAttributes } from '../../engine/core/stats';
 import { runSimulation } from '../../engine/simulation/runner';
+import { calculateStatBlockCost } from '../costs';
+import { ONE_V_ONE_TEST_CONFIG } from '../testing/BalanceTestConfig';
 
 /**
  * Archetype Balance Tests
@@ -13,7 +15,8 @@ import { runSimulation } from '../../engine/simulation/runner';
 
 describe('Archetype Balance', () => {
     const SIMULATIONS = 1000;
-    const TOLERANCE = 0.1; // ±10% winrate tolerance (40-60% is balanced)
+    const CONFIG = ONE_V_ONE_TEST_CONFIG;
+    const TOLERANCE = CONFIG.winrateTolerance; // ±10% winrate tolerance (40-60% is balanced)
 
     /**
      * Helper: Create entity from archetype
@@ -40,6 +43,15 @@ describe('Archetype Balance', () => {
         const entityA = createArchetypeEntity(archetypeA, budget);
         const entityB = createArchetypeEntity(archetypeB, budget);
 
+        // Ensure that for a given budget the generated builds have comparable
+        // HP-equivalent cost under the current BalancerConfig weights.
+        const costA = calculateStatBlockCost(generateStatBlock(archetypeA, budget));
+        const costB = calculateStatBlockCost(generateStatBlock(archetypeB, budget));
+        const avgCost = (costA + costB) / 2;
+        const costDiffRatio = Math.abs(costA - costB) / avgCost;
+
+        expect(costDiffRatio).toBeLessThanOrEqual(CONFIG.costDiffMaxRatio);
+
         const result = runSimulation(entityA, entityB, SIMULATIONS);
         const winRateA = result.winsA / result.totalBattles;
 
@@ -55,15 +67,15 @@ describe('Archetype Balance', () => {
     }
 
     describe('Round-Robin at Budget 100', () => {
-        const BUDGET = 100;
+        const BUDGET = CONFIG.primaryBudget;
 
         it('should balance Tank vs DPS', () => {
-            const { winRateA, isBalanced } = testMatchup('tank', 'glass_cannon', BUDGET, 'Tank vs DPS');
+            const { winRateA } = testMatchup('tank', 'glass_cannon', BUDGET, 'Tank vs DPS');
 
             // Tank should have slight advantage (defense > offense in long fights)
             // But not dominate
-            expect(winRateA).toBeGreaterThanOrEqual(0.3); // Tank wins at least 30%
-            expect(winRateA).toBeLessThanOrEqual(0.7);    // But not more than 70%
+            expect(winRateA).toBeGreaterThanOrEqual(CONFIG.looseWinrateBounds.min); // Tank wins at least min
+            expect(winRateA).toBeLessThanOrEqual(CONFIG.looseWinrateBounds.max);    // But not more than max
         });
 
         it('should balance Tank vs Balanced', () => {
@@ -103,7 +115,7 @@ describe('Archetype Balance', () => {
     });
 
     describe('Scaling Consistency', () => {
-        const budgets = [50, 100, 150, 200];
+        const budgets = CONFIG.budgets;
 
         budgets.forEach(budget => {
             it(`should maintain balance at budget ${budget}`, () => {
@@ -111,8 +123,8 @@ describe('Archetype Balance', () => {
                 const { winRateA } = testMatchup('tank', 'glass_cannon', budget, `Tank vs DPS @ ${budget}`);
 
                 // Should stay within reasonable bounds
-                expect(winRateA).toBeGreaterThanOrEqual(0.3);
-                expect(winRateA).toBeLessThanOrEqual(0.7);
+                expect(winRateA).toBeGreaterThanOrEqual(CONFIG.looseWinrateBounds.min);
+                expect(winRateA).toBeLessThanOrEqual(CONFIG.looseWinrateBounds.max);
             });
         });
     });
@@ -121,18 +133,18 @@ describe('Archetype Balance', () => {
         const BUDGET = 100;
 
         it('Tank should have advantage in sustained combat (vs Balanced)', () => {
-            const { winRateA, isBalanced } = testMatchup('tank', 'balanced', BUDGET, 'Tank Specialization');
+            const { winRateA } = testMatchup('tank', 'balanced', BUDGET, 'Tank Specialization');
 
             // Tank should win slightly more often (but not dominate)
             // If balanced, that's OK. If tank loses, stat weights are wrong.
-            expect(winRateA).toBeGreaterThanOrEqual(0.45); // At least competitive
+            expect(winRateA).toBeGreaterThanOrEqual(CONFIG.specializationMinWinrate); // At least competitive
         });
 
         it('DPS should have advantage in burst damage (vs Balanced)', () => {
             const { winRateA } = testMatchup('glass_cannon', 'balanced', BUDGET, 'DPS Specialization');
 
             // DPS should win slightly more (kills before taking damage)
-            expect(winRateA).toBeGreaterThanOrEqual(0.45);
+            expect(winRateA).toBeGreaterThanOrEqual(CONFIG.specializationMinWinrate);
         });
 
         it('Evasive should have advantage vs low-accuracy builds', () => {
@@ -148,7 +160,7 @@ describe('Archetype Balance', () => {
             console.log(`  Tank: ${((1 - winRateEvasive) * 100).toFixed(1)}%`);
 
             // Evasive should have edge against low-accuracy opponents
-            expect(winRateEvasive).toBeGreaterThanOrEqual(0.4);
+            expect(winRateEvasive).toBeGreaterThanOrEqual(CONFIG.evasiveMinWinrate);
         });
     });
 
@@ -156,7 +168,7 @@ describe('Archetype Balance', () => {
         const BUDGET = 100;
 
         it('No archetype should win >70% against all others', () => {
-            const archetypes: Archetype[] = ['balanced', 'tank', 'glass_cannon', 'evasive'];
+            const archetypes: Archetype[] = CONFIG.archetypes;
             const results: Record<string, number[]> = {};
 
             // Initialize results
@@ -189,10 +201,10 @@ describe('Archetype Balance', () => {
                 console.log(`${arch}: ${(avg * 100).toFixed(1)}% avg winrate`);
             });
 
-            // No archetype should dominate (>70%) or be weak (<30%)
+            // No archetype should dominate or be weak beyond configured bounds
             archetypes.forEach(arch => {
-                expect(avgWinrates[arch]).toBeGreaterThanOrEqual(0.3);
-                expect(avgWinrates[arch]).toBeLessThanOrEqual(0.7);
+                expect(avgWinrates[arch]).toBeGreaterThanOrEqual(CONFIG.metaAvgBounds.min);
+                expect(avgWinrates[arch]).toBeLessThanOrEqual(CONFIG.metaAvgBounds.max);
             });
         });
     });

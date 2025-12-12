@@ -19,6 +19,7 @@ export const StatDefinitionSchema = z.object({
   bgColor: z.string().optional(),
   isLocked: z.boolean().optional(),
   isHidden: z.boolean().optional(),
+  isPenalty: z.boolean().optional(),
 })
   .refine((d) => d.min <= d.max, { message: 'min must be <= max', path: ['min'] })
   .refine((d) => d.defaultValue >= d.min && d.defaultValue <= d.max, {

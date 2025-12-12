@@ -45,8 +45,8 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
     },
   },
 
-  // Minimal starting activities: two simple jobs that can be scheduled from
-  // the Idle Village page to exercise the time, job and injury engines.
+  // Minimal starting activities: core jobs + an early quest to exercise
+  // the time, job, quest and injury engines.
   activities: {
     job_city_rats: {
       id: 'job_city_rats',
@@ -91,6 +91,53 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
         mapSlotId: 'village_gate',
       },
     },
+    job_training_basics: {
+      id: 'job_training_basics',
+      label: 'Basic Training',
+      description: 'Light drills and exercises to improve fundamentals.',
+      tags: ['job', 'training'],
+      slotTags: ['village', 'job_site'],
+      resolutionEngineId: 'job',
+      level: 1,
+      dangerRating: 0,
+      durationFormula: '2',
+      rewards: [
+        { resourceId: 'xp', amountFormula: '4' },
+      ],
+      metadata: {
+        supportsAutoRepeat: true,
+        mapSlotId: 'village_square',
+        trainingProgramId: 'basic_combat',
+      },
+    },
+    quest_city_rats: {
+      id: 'quest_city_rats',
+      label: 'Cull Rats in Sewers',
+      description: 'A riskier extermination quest in the city sewers: better XP, but chance of injury.',
+      tags: ['quest', 'combat', 'city'],
+      slotTags: ['city', 'job_site'],
+      resolutionEngineId: 'quest_combat',
+      level: 1,
+      dangerRating: 2,
+      durationFormula: '3',
+      // Quest rewards are explicit XP resource; QuestResolver also reports xpAwarded.
+      rewards: [
+        { resourceId: 'xp', amountFormula: '6' },
+      ],
+      metadata: {
+        mapSlotId: 'village_square',
+        verbToneId: 'danger',
+        // Enable quest spawning for the vertical slice.
+        questSpawnEnabled: true,
+        questSpawnWeight: 3,
+        questMinDay: 1,
+        questMaxConcurrent: 2,
+        questAllowedSlotTags: ['city'],
+        // UI-only display hints for FTUE: not used by engines yet.
+        injuryChanceDisplay: 35,
+        deathChanceDisplay: 5,
+      },
+    },
     job_visit_market: {
       id: 'job_visit_market',
       label: 'Visit Market',
@@ -121,9 +168,9 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
       description: 'Central hub for simple city jobs.',
       x: 0,
       y: 0,
-      slotTags: ['village', 'job_site'],
+      slotTags: ['village', 'job_site', 'city'],
       isInitiallyUnlocked: true,
-      icon: '\u2605',
+      icon: '★',
       colorClass: 'text-amber-200',
     },
     village_gate: {
@@ -248,5 +295,17 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
     // Simple base formula, expected to be overridden from the config UI.
     questXpFormula: 'level * 10',
     maxActiveQuests: 5,
+    // Minimal quest spawning defaults for the vertical slice.
+    // One spawn check per day, up to a small number of offers.
+    questSpawnEveryNDays: 1,
+    maxGlobalQuestOffers: 4,
+    maxQuestOffersPerSlot: 2,
+    verbToneColors: {
+      neutral: '#94A3B8',
+      job: '#3B82F6',
+      quest: '#34D399',
+      danger: '#F87171',
+      system: '#38BDF8',
+    },
   },
 };

@@ -15,6 +15,7 @@ export interface StatDefinition {
   isLocked?: boolean;
   isHidden?: boolean;
   icon?: string;
+  isPenalty?: boolean;
 }
 
 export interface CardDefinition {

@@ -110,6 +110,14 @@ export interface ActivityVarianceConfig {
   rewardCategories: Record<string, ActivityRollCategory>;
 }
 
+export interface VerbToneColors {
+  neutral?: string;
+  job?: string;
+  quest?: string;
+  danger?: string;
+  system?: string;
+}
+
 export interface MapSlotDefinition {
   id: string;
   label: string;
@@ -185,6 +193,17 @@ export interface GlobalRules {
 
   // Limits/constraints
   maxActiveQuests: number;
+
+  // Quest spawning (config-driven)
+  /** How often the quest spawner runs, in in-game days (>= 1). */
+  questSpawnEveryNDays: number;
+  /** Maximum number of quest offers that can be present globally at once. */
+  maxGlobalQuestOffers: number;
+  /** Maximum number of quest offers that can target the same map slot. */
+  maxQuestOffersPerSlot: number;
+
+  // Optional UI theme overrides for VerbCard ring colors (CSS color values).
+  verbToneColors?: VerbToneColors;
 
   // Optional seed for deterministic generation (when desired)
   defaultRandomSeed?: number;

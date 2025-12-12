@@ -1,4 +1,4 @@
-# Idle Village – Profit Levers
+# Idle Incremental RPG – Profit Levers
 
 **Status:** Draft v0.1  
 **Scope:** Leve che possono aumentare ricavi / LTV senza compromettere la credibilità del gioco.
@@ -243,7 +243,7 @@ Legenda impatto/costo/ rischio: basso / medio / alto.
 
 ### F5 – Merchandise
 
-- **Idea:** artbook digitale, OST, wallpaper pack, eventuali gadget fisici a tema Idle Village.
+- **Idea:** artbook digitale, OST, wallpaper pack, eventuali gadget fisici a tema Idle Incremental RPG.
 - **Impatto atteso:**
   - Buono sul lungo periodo quando esiste già una fanbase forte.
 - **Rischi:**

@@ -3,6 +3,7 @@ import { describe, it, expect } from 'vitest';
 import { Entity } from '../../engine/core/entity';
 import { runSimulation } from '../../engine/simulation/runner';
 import { DEFAULT_STATS, type StatBlock } from '../types';
+import { NORMALIZED_WEIGHTS } from '../statWeights';
 import { createTestRNG } from './TestRNG';
 
 /**
@@ -19,6 +20,7 @@ import { createTestRNG } from './TestRNG';
 describe('Cross-Stat Cost Parity', () => {
     const SIMULATIONS = 1000;
     const TOLERANCE = 0.12; // ±12% winrate tolerance (38-62% is balanced, accounting for variance)
+    const W = NORMALIZED_WEIGHTS;
 
     function createTestEntity(name: string, statOverrides: Partial<StatBlock>): Entity {
         const stats = { ...DEFAULT_STATS, ...statOverrides };
@@ -32,7 +34,8 @@ describe('Cross-Stat Cost Parity', () => {
         statAmount: number,
         hpEquivalent: number
     ) {
-        const entityA = createTestEntity('Stat_Entity', { [statName]: DEFAULT_STATS[statName as keyof typeof DEFAULT_STATS] + statAmount });
+        const baseValue = DEFAULT_STATS[statName as keyof typeof DEFAULT_STATS] as number;
+        const entityA = createTestEntity('Stat_Entity', { [statName]: baseValue + statAmount } as Partial<StatBlock>);
         const entityB = createTestEntity('HP_Entity', { hp: DEFAULT_STATS.hp + hpEquivalent });
 
         const result = runSimulation(entityA, entityB, SIMULATIONS);
@@ -47,7 +50,9 @@ describe('Cross-Stat Cost Parity', () => {
         // Weight: 1 dmg = 5.0 HP
         // +10 dmg = +50 HP
         it('should balance damage vs hp', () => {
-            const result = runParityTest('damage', 10, 50);
+            const statAmount = 10;
+            const hpEquivalent = statAmount * W.damage;
+            const result = runParityTest('damage', statAmount, hpEquivalent);
             expect(result.winRateA).toBeGreaterThanOrEqual(0.5 - TOLERANCE);
             expect(result.winRateA).toBeLessThanOrEqual(0.5 + TOLERANCE);
         });
@@ -56,7 +61,9 @@ describe('Cross-Stat Cost Parity', () => {
         // Weight: 1 armor = 5.0 HP
         // +10 armor = +50 HP
         it('should balance armor vs hp', () => {
-            const result = runParityTest('armor', 10, 50);
+            const statAmount = 10;
+            const hpEquivalent = statAmount * W.armor;
+            const result = runParityTest('armor', statAmount, hpEquivalent);
             expect(result.winRateA).toBeGreaterThanOrEqual(0.5 - TOLERANCE);
             expect(result.winRateA).toBeLessThanOrEqual(0.5 + TOLERANCE);
         });
@@ -66,7 +73,9 @@ describe('Cross-Stat Cost Parity', () => {
         // +0.5% lifesteal = +50 HP
         // Note: Lifesteal is weak in short 1v1s vs high HP. Widen tolerance.
         it('should balance lifesteal vs hp', () => {
-            const result = runParityTest('lifesteal', 0.5, 50);
+            const statAmount = 0.5;
+            const hpEquivalent = statAmount * W.lifesteal;
+            const result = runParityTest('lifesteal', statAmount, hpEquivalent);
             expect(result.winRateA).toBeGreaterThanOrEqual(0.5 - 0.20); // Allow down to 30%
             expect(result.winRateA).toBeLessThanOrEqual(0.5 + 0.20);
         });
@@ -75,7 +84,9 @@ describe('Cross-Stat Cost Parity', () => {
         // Weight: 1 regen = 20 HP
         // +2 regen = +40 HP
         it('should balance regen vs hp', () => {
-            const result = runParityTest('regen', 2, 40);
+            const statAmount = 2;
+            const hpEquivalent = statAmount * W.regen;
+            const result = runParityTest('regen', statAmount, hpEquivalent);
             expect(result.winRateA).toBeGreaterThanOrEqual(0.5 - 0.20); // Allow down to 30%
             expect(result.winRateA).toBeLessThanOrEqual(0.5 + 0.20);
         });
@@ -91,7 +102,7 @@ describe('Cross-Stat Cost Parity', () => {
 
             // Build B: +45 HP
             const hpBuild = createTestEntity('HP', {
-                hp: DEFAULT_STATS.hp + 45
+                hp: DEFAULT_STATS.hp + (5 * W.damage + 4 * W.armor)
             });
 
             const result = runSimulation(mixedBuild, hpBuild, SIMULATIONS);

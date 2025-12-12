@@ -44,6 +44,7 @@ export async function testLocalStorageJSON<T>(
 
 import type { BalancerConfig } from '../../balancing/config/types';
 import { BalancerConfigStore } from '../../balancing/config/BalancerConfigStore';
+import { DEFAULT_CONFIG } from '../../balancing/config/defaultConfig';
 
 export async function testBalancerConfigStore(testConfig: BalancerConfig) {
   const adapter: StorageAdapter<BalancerConfig> = {
@@ -262,8 +263,8 @@ export async function runAllStorageTests(
 
   if (config.testBalancer) {
     console.log('Testing Balancer Config Store...');
-    // Would need actual test data
-    // results.push(await testBalancerConfigStore(testConfig));
+    const balancerResult = await testBalancerConfigStore(DEFAULT_CONFIG);
+    results.push(balancerResult);
   }
 
   if (config.testSpells) {
