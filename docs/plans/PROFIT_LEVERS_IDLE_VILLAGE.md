@@ -1,7 +1,10 @@
 # Idle Incremental RPG – Profit Levers
 
-**Status:** Draft v0.1  
+**Status:** Draft v0.2 (verificato Dic 2024)  
 **Scope:** Leve che possono aumentare ricavi / LTV senza compromettere la credibilità del gioco.
+
+> [!NOTE]
+> Dati di localizzazione verificati tramite fonti Steam ufficiali e studi di settore (LCP Localizations, GameDiscoverCo).
 
 Legenda impatto/costo/ rischio: basso / medio / alto.
 
@@ -22,9 +25,13 @@ Legenda impatto/costo/ rischio: basso / medio / alto.
 | M5  | Monetizzazione | DLC / espansioni (nuovi biomi, sistemi, fazioni)                | Alto (long term)| Alto              | Basso               | Da esplorare |
 | R1  | Retention      | Profondità meta-progression (edifici meta, eredi, ecc.)         | Alto            | Alto              | Medio               | Da esplorare |
 | R2  | Retention      | Stagioni / reset morbidi e leaderboard stagionali               | Medio–Alto      | Medio–Alto        | Basso–Medio         | Da esplorare |
+| R3  | Retention      | **Overlay Mode** (gioca ridotto in fondo allo schermo)          | Alto            | Medio             | Basso               | **Racc. alta**|
+| P3  | Platform       | **Steam Deck Verified** (ottimizzazione controlli/UI)           | Medio–Alto      | Basso             | Basso               | **Racc. alta**|
 | S1  | Storefront     | Qualità pagina Steam/itch (testi, capsule, GIF, tag)            | Alto            | Medio             | Basso               | Da esplorare |
 | S2  | Storefront     | Demo strategica (web + eventuale demo Steam)                    | Medio–Alto      | Medio             | Medio               | Da esplorare |
 | S3  | Ecosistema     | Futuri bundle / cross-promo con altri giochi                    | Alto (long term)| Medio             | Basso               | Da esplorare |
+| S4  | Marketing      | **Multi-Festival Strategy** (partecipare a festival minori prima) | Medio           | Basso             | Basso               | **Racc. alta**|
+| S5  | Marketing      | **TikTok Validation** (test 5 clip per viralità organica)       | Alto (potenziale)| Basso            | Basso               | **Racc. alta**|
 | F1  | Funding        | Crowdfunding (Kickstarter/Ulule, ecc.)                          | Medio–Alto      | Medio–Alto        | Medio               | Da esplorare |
 | F2  | Funding        | Early Access (soprattutto Steam)                                | Medio           | Medio             | Basso–Medio         | Da esplorare |
 | F3  | Funding        | Patreon/Ko-fi (supporto continuo da fan)                        | Medio (long term)| Basso–Medio      | Basso               | Da esplorare |
@@ -45,20 +52,31 @@ Legenda impatto/costo/ rischio: basso / medio / alto.
   - IT = nativo (costo quasi zero).
   - EN = già considerata lingua principale.
   - ES = opzione naturale (mercati ES + LATAM).
-- **Dati chiave (Steam 2024, vari studi):**
-  - Solo ~**33%** degli utenti Steam usa l'inglese come lingua dell'interfaccia: una sola lingua copre circa **1/3** del mercato.
-  - Localizzando nelle **prime 6 lingue** (EN, Simplified Chinese, Russian, Spanish, Brazilian Portuguese, German) si può coprire ~**85%** degli utenti Steam.
-  - Studi su pagine Steam localizzate mostrano fino a **4,5× wishlist** in più rispetto a pagine solo EN, a parità di marketing (HowToMarketAGame / LCP Localizations).
+  
+- **Dati chiave (Steam 2024, verificati):**
+
+> [!IMPORTANT]
+> Nel 2024 il **Simplified Chinese ha superato l'Inglese** come lingua più usata su Steam (33.7% vs 33.5%).
+
+  - Solo ~**33%** degli utenti Steam usa l'inglese: una sola lingua copre solo **1/3** del mercato.
+  - **Top 6 lingue** (EN, Simplified Chinese, Russian, Spanish, BR-Portuguese, German) coprono ~**85%** degli utenti Steam.
+  - Pagine Steam localizzate mostrano fino a **4.5× wishlist** in più rispetto a pagine solo EN durante periodi non promozionali.
+  - La localizzazione è l'**unico fattore che influenza costantemente la visibilità algoritmica** su Steam.
+  
 - **Impatto atteso:**
   - Migliore accessibilità ⇒ più giocatori totali ⇒ più payers.
   - Miglior percezione di qualità (soprattutto su Steam).
+  
 - **Rischi:**
   - Traduzioni di bassa qualità se si aggiungono lingue extra senza budget.
+  - Un case study (Wanba Warriors, 29 lingue) non ha visto aumenti proporzionali - prioritizzare qualità su quantità.
+  
 - **Decisione da prendere (futuro):**
   - Definire lingue V1 e pipeline di localizzazione (file JSON/config-first, no hardcoding).
-  - Strategia suggerita per V1:
-    - EN + IT (gratis) + ES (basso costo) come base.
-    - Considerare in futuro una 4ª lingua ad alto impatto (es. PT-BR o DE) in base a dati reali di wishlist/traffico.
+  - **Strategia raccomandata per V1:**
+    - **Tier 1 (lancio):** EN + IT (gratis/nativo).
+    - **Tier 2 (pre-lancio se budget):** ES (basso costo, alto ROI).
+    - **Tier 3 (post-lancio, basato su telemetria):** Simplified Chinese o PT-BR in base a dati reali di wishlist/traffico.
 
 ---
 

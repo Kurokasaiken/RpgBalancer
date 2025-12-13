@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import type { StatDefinition } from '../../balancing/config/types';
 import { FormulaEditor } from './FormulaEditor';
 import { executeFormula } from '../../balancing/config/FormulaEngine';
-import { 
-  Swords, Shield, Heart, Zap, Flame, Droplets, Snowflake, Wind, Skull, 
-  Crosshair, Hourglass, Crown, Gem, Scroll, Wand2, Axe, Hammer, Feather, 
-  Sun, Moon, Star, Ghost, BookOpen, Eye, Lock, Unlock, RotateCcw, Edit2, 
-  Trash2, Check, X, Plus, Minus 
+import {
+  Swords, Shield, Heart, Zap, Flame, Droplets, Snowflake, Wind, Skull,
+  Crosshair, Hourglass, Crown, Gem, Scroll, Wand2, Axe, Hammer, Feather,
+  Sun, Moon, Star, Ghost, BookOpen, Eye, Lock, Unlock, RotateCcw, Edit2,
+  Trash2, Check, X, Plus, Minus
 } from 'lucide-react';
 import type { ElementType } from 'react';
 
@@ -93,13 +93,13 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
   const [iconId, setIconId] = useState<string>(stat.icon ?? '');
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  
+
   const isLocked = !!stat.isLocked;
   const isHidden = !!stat.isHidden;
-  
+
   const LucideIcon = stat.icon ? lucideStatIcons[stat.icon] : undefined;
   const fallbackGlyph = statGlyphMap[stat.id] ?? '◆';
-  
+
   // For derived stats, calculate value from formula; otherwise use simValue
   // If locked, use simValue (frozen value); if not locked and derived, calculate from formula
   const displayValue = stat.isDerived && stat.formula && !isLocked
@@ -108,7 +108,7 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
   // Interactive controls are disabled only when the stat is locked; derived stats remain editable
   // so that their changes can be propagated via the generic config solver.
   const isInteractive = !isLocked;
-  
+
   const sliderProgress = stat.max === stat.min ? 100 : Math.max(0, Math.min(100, ((displayValue - stat.min) / (stat.max - stat.min)) * 100));
 
   const showDragHandle = !!dragHandleProps && !isConfigMode;
@@ -196,16 +196,17 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
       );
     }
     return (
-      <div className={`flex items-center justify-between text-xs py-2 px-3 rounded-xl border backdrop-blur-sm gap-1.5 shadow-[0_10px_24px_rgba(15,23,42,0.85)] ${
-        hasError
+      <div className={`flex items-center justify-between text-xs py-2 px-3 rounded-xl border backdrop-blur-sm gap-1.5 shadow-[0_10px_24px_rgba(15,23,42,0.85)] transition-all ${hasError
           ? 'border-red-500/80 bg-red-950/60'
           : isDependencyHighlighted
             ? 'border-amber-400/60 bg-amber-950/40'
-            : 'border-slate-700/70 bg-slate-900/70'
-      }`}>
+            : isLocked
+              ? 'border-slate-800 bg-slate-950/40'
+              : 'border-slate-700/70 bg-slate-900/70'
+        }`}>
         <div className="flex flex-col flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
-            <div className="flex items-center gap-1.5 min-w-0 flex-1">
+            <div className={`flex items-center gap-1.5 min-w-0 flex-1 ${isLocked ? 'opacity-60' : ''}`}>
               {showDragHandle ? (
                 <button
                   type="button"
@@ -245,12 +246,13 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
                 )}
               </div>
             </div>
+
+            {/* Actions: Lock, Reset, Edit, Hide */}
             <div className="flex items-center gap-1 flex-shrink-0 ml-1">
               <button
                 type="button"
-                className={`w-5 h-5 flex items-center justify-center rounded transition-colors leading-none ${
-                  isLocked ? 'text-slate-500' : 'text-indigo-300 hover:text-indigo-100'
-                }`}
+                className={`w-5 h-5 flex items-center justify-center rounded transition-colors leading-none ${isLocked ? 'text-rose-400 bg-rose-500/10' : 'text-slate-500 hover:text-indigo-200'
+                  }`}
                 title={isLocked ? 'Sblocca stat' : 'Blocca stat'}
                 onClick={handleToggleLock}
               >
@@ -259,9 +261,8 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
               </button>
               <button
                 type="button"
-                className={`w-5 h-5 flex items-center justify-center rounded transition-colors leading-none ${
-                  onReset ? 'text-cyan-300 hover:text-cyan-100' : 'text-slate-600 cursor-not-allowed'
-                }`}
+                className={`w-5 h-5 flex items-center justify-center rounded transition-colors leading-none ${onReset ? 'text-cyan-300 hover:text-cyan-100' : 'text-slate-600 cursor-not-allowed'
+                  }`}
                 title="Reset"
                 onClick={() => {
                   if (onReset) {
@@ -271,7 +272,7 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
                     }
                   }
                 }}
-                disabled={!onReset}
+                disabled={!onReset || isLocked}
               >
                 <RotateCcw className="w-3 h-3" />
                 <span className="sr-only">Reset</span>
@@ -296,26 +297,27 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
               </button>
             </div>
           </div>
+
           <div className="mt-1.5 flex items-center gap-1.5">
             <button
               type="button"
-              className={`w-5 h-5 flex items-center justify-center rounded border bg-slate-900/80 transition-colors ${
-                !isInteractive
-                  ? 'border-slate-600 text-slate-600 cursor-not-allowed'
+              className={`w-5 h-5 flex items-center justify-center rounded border bg-slate-900/80 transition-colors ${!isInteractive
+                  ? 'border-slate-800 text-slate-700 cursor-not-allowed'
                   : 'border-indigo-500/70 text-indigo-200 hover:bg-indigo-500/20'
-              }`}
+                }`}
               onClick={() => {
                 if (!isInteractive) return;
                 onSimValueChange(Math.max(stat.min, simValue - stat.step));
               }}
               aria-label="Decrement"
+              disabled={!isInteractive}
             >
               <Minus className="w-3 h-3" />
             </button>
             <div className="flex-1 min-w-0 flex justify-center">
               <input
                 type="range"
-                className="w-[90%] h-2 rounded-full appearance-none cursor-pointer"
+                className={`w-[90%] h-2 rounded-full appearance-none ${isInteractive ? 'cursor-pointer' : 'cursor-default'}`}
                 min={stat.min}
                 max={stat.max}
                 step={stat.step}
@@ -326,18 +328,19 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
                 }}
                 disabled={!isInteractive}
                 style={{
-                  background: `linear-gradient(to right, #4f46e5 0%, #22d3ee ${sliderProgress}%, #020617 ${sliderProgress}%, #020617 100%)`,
+                  background: isLocked
+                    ? `linear-gradient(to right, #334155 0%, #334155 ${sliderProgress}%, #0f172a ${sliderProgress}%, #0f172a 100%)`
+                    : `linear-gradient(to right, #4f46e5 0%, #22d3ee ${sliderProgress}%, #020617 ${sliderProgress}%, #020617 100%)`,
                 }}
               />
             </div>
             <div className="flex items-center gap-1.5">
               <input
                 type="number"
-                className={`w-12 px-1 py-0.5 rounded border text-[10px] font-mono text-center bg-slate-950/90 focus:outline-none focus:ring-1 focus:ring-cyan-400/70 ${
-                  !isInteractive
-                    ? 'border-slate-700 text-slate-500 cursor-not-allowed opacity-70'
+                className={`w-12 px-1 py-0.5 rounded border text-[10px] font-mono text-center bg-slate-950/90 focus:outline-none focus:ring-1 focus:ring-cyan-400/70 ${!isInteractive
+                    ? 'border-slate-800 text-slate-500 cursor-not-allowed opacity-50'
                     : 'border-slate-600 text-cyan-200'
-                }`}
+                  }`}
                 value={Number.isFinite(displayValue) ? displayValue : ''}
                 onChange={(e) => {
                   if (!isInteractive) return;
@@ -352,16 +355,16 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
               />
               <button
                 type="button"
-                className={`w-5 h-5 flex items-center justify-center rounded border bg-[#1a1410]/70 transition-colors ${
-                  !isInteractive
-                    ? 'border-[#555555] text-[#555555] cursor-not-allowed'
+                className={`w-5 h-5 flex items-center justify-center rounded border bg-[#1a1410]/70 transition-colors ${!isInteractive
+                    ? 'border-slate-800 text-slate-700 cursor-not-allowed'
                     : 'border-[#9d7d5c] text-[#c9a227] hover:bg-[#2a2015]'
-                }`}
+                  }`}
                 onClick={() => {
                   if (!isInteractive) return;
                   onSimValueChange(Math.min(stat.max, simValue + stat.step));
                 }}
                 aria-label="Increment"
+                disabled={!isInteractive}
               >
                 <Plus className="w-3 h-3" />
               </button>
@@ -398,15 +401,14 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
               autoFocus
             />
           </div>
-          
+
           {showIconPicker && (
             <div className="grid grid-cols-7 gap-1 max-h-32 overflow-y-auto rounded-lg border border-slate-700 bg-slate-900/95 p-2 shadow-[0_12px_30px_rgba(15,23,42,0.9)] z-10 relative">
               <button
                 type="button"
                 onClick={() => { setIconId(''); setShowIconPicker(false); }}
-                className={`h-7 w-7 flex items-center justify-center rounded border text-slate-400 ${
-                  !iconId ? 'border-indigo-400 bg-indigo-500/30 text-indigo-200' : 'border-slate-700 hover:border-indigo-400 hover:bg-slate-800'
-                }`}
+                className={`h-7 w-7 flex items-center justify-center rounded border text-slate-400 ${!iconId ? 'border-indigo-400 bg-indigo-500/30 text-indigo-200' : 'border-slate-700 hover:border-indigo-400 hover:bg-slate-800'
+                  }`}
                 title="Nessuna icona"
               >
                 <span className="text-xs">∅</span>
@@ -416,11 +418,10 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
                   key={id}
                   type="button"
                   onClick={() => { setIconId(id); setShowIconPicker(false); }}
-                  className={`h-7 w-7 flex items-center justify-center rounded border text-slate-100 ${
-                    iconId === id
+                  className={`h-7 w-7 flex items-center justify-center rounded border text-slate-100 ${iconId === id
                       ? 'border-indigo-400 bg-indigo-500/30'
                       : 'border-slate-700 hover:border-indigo-400 hover:bg-slate-800'
-                  }`}
+                    }`}
                   title={id}
                 >
                   <Icon className="w-4 h-4" />

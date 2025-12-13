@@ -182,11 +182,10 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, simValues, onSi
 
   return (
     <div
-      className={`default-card flex flex-col gap-2 transition-all ${
-        isEditingHeader
+      className={`default-card flex flex-col gap-2 transition-all ${isEditingHeader
           ? 'ring-2 ring-indigo-400/40 border-indigo-400/70 shadow-[0_0_25px_rgba(129,140,248,0.6)]'
           : 'hover:border-indigo-400/60 hover:shadow-[0_0_18px_rgba(129,140,248,0.45)]'
-      }`}
+        }`}
     >
 
       <div className="flex items-start gap-2 pb-1.5 border-b border-slate-700/60 relative z-10">
@@ -202,110 +201,21 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, simValues, onSi
           </button>
         )}
         <div className="flex flex-1 items-center justify-between min-w-0 gap-2">
-          <div className="flex items-center gap-2 min-w-0">
-            {isEditingHeader ? (
-              <div className="flex flex-col gap-2 w-full">
-                <div className="flex flex-wrap gap-2 items-center">
-                  <div className="relative">
-                    <button
-                      type="button"
-                      className="flex items-center justify-center rounded border border-[#475758] px-2 py-1 bg-[#0c1517]/90 hover:bg-[#121f22] text-[#f5f0dc]"
-                      onClick={() => setShowIconPicker((prev) => !prev)}
-                      title="Scegli icona"
-                    >
-                      <span className="text-lg">{icon || '⚔️'}</span>
-                    </button>
-                    {showIconPicker && (
-                      <div className="absolute z-20 mt-2 w-56 rounded-lg border border-[#475758] bg-gradient-to-br from-[#101e22] to-[#091113] p-3 shadow-[0_20px_45px_rgba(0,0,0,0.65)]">
-                        <p className="text-[10px] uppercase tracking-[0.3em] text-[#aeb8b4] mb-1">Seleziona icona</p>
-                        <div className="grid grid-cols-6 gap-1 max-h-40 overflow-y-auto">
-                          {iconLibrary.map((symbol) => (
-                            <button
-                              key={symbol}
-                              type="button"
-                              onClick={() => {
-                                setIcon(symbol);
-                                setShowIconPicker(false);
-                              }}
-                              className={`h-8 w-8 flex items-center justify-center rounded border text-base ${
-                                icon === symbol
-                                  ? 'border-amber-400 bg-amber-500/20 text-amber-100'
-                                  : 'border-[#384444] bg-[#0f1a1d] text-[#f5f0dc] hover:border-amber-400/60'
-                              }`}
-                            >
-                              {symbol}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <input
-                    className="flex-1 min-w-[140px] text-sm rounded bg-[#0c1517] border border-[#475758] px-3 py-1.5 text-[#f5f0dc] placeholder:text-[#5a6f72]"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Nome card"
-                    autoFocus={startHeaderInEdit}
-                  />
-                </div>
-                <div className="flex flex-wrap items-center gap-2 text-[10px] text-[#aeb8b4]">
-                  <label className="flex items-center gap-1">
-                    <span>HEX</span>
-                    <input
-                      type="text"
-                      className="w-24 rounded bg-[#0c1517] border border-[#475758] px-2 py-1 text-[11px] text-[#f5f0dc] placeholder:text-[#5a6f72]"
-                      placeholder="#c9a227"
-                      value={isCustomColor ? color : ''}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        setColor(value.startsWith('#') ? value : `#${value.replace('#', '')}`);
-                      }}
-                    />
-                  </label>
-                  <input
-                    type="color"
-                    className="w-10 h-10 rounded border border-[#475758] bg-transparent"
-                    value={isCustomColor ? color : '#c9a227'}
-                    onChange={(e) => setColor(e.target.value)}
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center gap-1.5 min-w-0 group relative">
-                <span className="text-base text-indigo-200 drop-shadow-[0_0_10px_rgba(129,140,248,0.8)]" aria-hidden="true">{displayIcon}</span>
-                <p className="text-[11px] font-semibold tracking-[0.18em] uppercase text-slate-100 truncate cursor-help" style={displayStyle}>
-                  {card.title}
-                </p>
-                <div className="pointer-events-none absolute left-0 top-full mt-1 w-48 rounded-md bg-[#0c1517] border border-[#c7b996]/40 px-2 py-1 text-[10px] text-[#f6f3e4] opacity-0 transition-opacity duration-200 group-hover:opacity-100 z-10 whitespace-normal">
-                  {card.isCore ? `${card.title} · card di sistema` : `Configura ${card.title}`}
-                </div>
-              </div>
-            )}
-          </div>
+
+          {/* LEFT: Delete Button (Only in Edit Mode) */}
           <div className="flex items-center gap-1">
-            {!isEditingHeader && onResetCard && (
-              <button
-                type="button"
-                className="w-5 h-5 flex items-center justify-center rounded text-[#c9a227] hover:text-[#e6c547] transition-colors leading-none"
-                title="Reset card"
-                onClick={onResetCard}
-              >
-                <span aria-hidden="true" className="text-sm">↺</span>
-                <span className="sr-only">Reset card</span>
-              </button>
-            )}
             {isEditingHeader && onDeleteCard && !card.isCore && (
               <div className="relative">
                 <button
                   type="button"
-                  className="w-5 h-5 flex items-center justify-center rounded bg-red-900/40 border border-red-500/70 text-red-300 hover:text-red-100 hover:bg-red-800/70 leading-none transition-colors"
+                  className="w-5 h-5 flex items-center justify-center rounded-full bg-red-900/40 border border-red-500/70 text-red-300 hover:text-red-100 hover:bg-red-800/70 leading-none transition-colors"
                   title="Elimina card"
                   onClick={() => setShowDeleteConfirm((prev) => !prev)}
                 >
-                  <span aria-hidden="true" className="text-sm">🗑</span>
+                  <span aria-hidden="true" className="text-xs">🗑</span>
                 </button>
                 {showDeleteConfirm && (
-                  <div className="absolute right-0 top-full mt-1 w-52 rounded-xl border border-red-500/40 bg-gradient-to-br from-[#1b0202] to-[#360808] p-3 text-[11px] text-[#f5f0dc] shadow-[0_18px_40px_rgba(0,0,0,0.65)] z-20">
+                  <div className="absolute left-0 top-full mt-1 w-52 rounded-xl border border-red-500/40 bg-gradient-to-br from-[#1b0202] to-[#360808] p-3 text-[11px] text-[#f5f0dc] shadow-[0_18px_40px_rgba(0,0,0,0.65)] z-20">
                     <p className="font-semibold text-red-200 mb-2 tracking-[0.2em] uppercase">Eliminare questa card?</p>
                     <div className="flex justify-end gap-2">
                       <button
@@ -330,6 +240,111 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, simValues, onSi
                 )}
               </div>
             )}
+            <div className="flex items-center gap-2 min-w-0">
+              {isEditingHeader ? (
+                <div className="flex flex-col gap-2 w-full">
+                  <div className="flex flex-wrap gap-2 items-center">
+                    <div className="relative">
+                      <button
+                        type="button"
+                        className="flex items-center justify-center rounded border border-[#475758] px-2 py-1 bg-[#0c1517]/90 hover:bg-[#121f22] text-[#f5f0dc]"
+                        onClick={() => setShowIconPicker((prev) => !prev)}
+                        title="Scegli icona"
+                      >
+                        <span className="text-lg">{icon || '⚔️'}</span>
+                      </button>
+                      {showIconPicker && (
+                        <div className="absolute z-20 mt-2 w-56 rounded-lg border border-[#475758] bg-gradient-to-br from-[#101e22] to-[#091113] p-3 shadow-[0_20px_45px_rgba(0,0,0,0.65)]">
+                          <p className="text-[10px] uppercase tracking-[0.3em] text-[#aeb8b4] mb-1">Seleziona icona</p>
+                          <div className="grid grid-cols-6 gap-1 max-h-40 overflow-y-auto">
+                            {iconLibrary.map((symbol) => (
+                              <button
+                                key={symbol}
+                                type="button"
+                                onClick={() => {
+                                  setIcon(symbol);
+                                  setShowIconPicker(false);
+                                }}
+                                className={`h-8 w-8 flex items-center justify-center rounded border text-base ${icon === symbol
+                                    ? 'border-amber-400 bg-amber-500/20 text-amber-100'
+                                    : 'border-[#384444] bg-[#0f1a1d] text-[#f5f0dc] hover:border-amber-400/60'
+                                  }`}
+                              >
+                                {symbol}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <input
+                      className="flex-1 min-w-[140px] text-sm rounded bg-[#0c1517] border border-[#475758] px-3 py-1.5 text-[#f5f0dc] placeholder:text-[#5a6f72]"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      placeholder="Nome card"
+                      autoFocus={startHeaderInEdit}
+                    />
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 text-[10px] text-[#aeb8b4]">
+                    <label className="flex items-center gap-1">
+                      <span>HEX</span>
+                      <input
+                        type="text"
+                        className="w-24 rounded bg-[#0c1517] border border-[#475758] px-2 py-1 text-[11px] text-[#f5f0dc] placeholder:text-[#5a6f72]"
+                        placeholder="#c9a227"
+                        value={isCustomColor ? color : ''}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setColor(value.startsWith('#') ? value : `#${value.replace('#', '')}`);
+                        }}
+                      />
+                    </label>
+                    <input
+                      type="color"
+                      className="w-10 h-10 rounded border border-[#475758] bg-transparent"
+                      value={isCustomColor ? color : '#c9a227'}
+                      onChange={(e) => setColor(e.target.value)}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1.5 min-w-0 group relative pl-1">
+                  <span className="text-base text-indigo-200 drop-shadow-[0_0_10px_rgba(129,140,248,0.8)]" aria-hidden="true">{displayIcon}</span>
+                  <p className="text-[11px] font-semibold tracking-[0.18em] uppercase text-slate-100 truncate cursor-help" style={displayStyle}>
+                    {card.title}
+                  </p>
+                  <div className="pointer-events-none absolute left-0 top-full mt-1 w-48 rounded-md bg-[#0c1517] border border-[#c7b996]/40 px-2 py-1 text-[10px] text-[#f6f3e4] opacity-0 transition-opacity duration-200 group-hover:opacity-100 z-10 whitespace-normal">
+                    {card.isCore ? `${card.title} · card di sistema` : `Configura ${card.title}`}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+
+          {/* RIGHT: Actions */}
+          <div className="flex items-center gap-1">
+            {!isEditingHeader && onResetCard && (
+              <button
+                type="button"
+                className="w-5 h-5 flex items-center justify-center rounded text-[#c9a227] hover:text-[#e6c547] transition-colors leading-none"
+                title="Reset card"
+                onClick={() => {
+                  if (onResetCard) onResetCard();
+                  // Force update SIM values for all non-derived stats
+                  card.statIds.forEach((statId) => {
+                    const s = stats[statId];
+                    if (s && !s.isDerived) {
+                      onSimValueChange(statId, s.defaultValue);
+                    }
+                  });
+                }}
+              >
+                <span aria-hidden="true" className="text-sm">↺</span>
+                <span className="sr-only">Reset card</span>
+              </button>
+            )}
+
             {isEditingHeader && (
               <button
                 type="button"
@@ -344,11 +359,10 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, simValues, onSi
             {onUpdateCard && (
               <button
                 type="button"
-                className={`w-5 h-5 flex items-center justify-center rounded transition-all leading-none ${
-                  isEditingHeader
+                className={`w-5 h-5 flex items-center justify-center rounded transition-all leading-none ${isEditingHeader
                     ? 'text-amber-100'
                     : 'text-[#c9a227] hover:text-[#e6c547]'
-                }`}
+                  }`}
                 title={isEditingHeader ? 'Salva card' : 'Modifica card'}
                 onClick={() => {
                   if (isEditingHeader) {

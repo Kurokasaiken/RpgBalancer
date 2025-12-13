@@ -28,4 +28,7 @@ export const BALANCING_CONFIG = {
     BASELINE_DAMAGE: 25,
     BASELINE_ARMOR: 0,
     BASELINE_TXC: 25,
+
+    // Skill Check Tuning
+    SKILL_CHECK_PARITY_TARGET: 60, // Target Win% when Hero Skill == Quest Difficulty
 } as const;

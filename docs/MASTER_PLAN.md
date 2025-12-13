@@ -453,6 +453,30 @@ Expand combat system from 1v1 to full tactical grid-based multi-unit combat:
 
 ---
 
+### 📋 **PHASE 11: Tactical Missions (Narrative Quest System)**
+
+**Status:** 0% (Concept Defined)  
+**Concept:** "Darkest Dungeon Curios" meets "Idle Expedition".
+
+**User Vision:**
+Sistema di quest "D&D-style" a fasi multiple, puramente testuale/narrativo con reward variabili.
+*Structure:* Intro Narrativa → Skill Check/Combattimento → Scelta → Skill Check/Combattimento → Outro + Reward.
+
+**Core Mechanics:**
+1.  **Quest Phases:** Ogni missione è una sequenza di Nodi (3-5 step).
+2.  **Stat Checks:** I nodi non-combat richiedono check su stat specifiche (es. `Stamina` per scalare, `Wisdom` per decifrare).
+3.  **Risk/Reward:** Successo = loot migliore/buff per il nodo successivo. Fallimento = danno/debuff/minor loot.
+4.  **Narrative Flavor:** Testi brevi saporiti ("You find a glowing altar...") invece di cutscene costose.
+5.  **Partial Success:** Il reward finale dipende dal numero di "Successi" accumulati nelle fasi.
+
+**Deliverables:**
+- [ ] `QuestEngine`: Gestore di macchine a stati per le quest (Node sequence).
+- [ ] `SkillCheckSystem`: Calcolatore probabilità basato su stat entità vs difficoltà nodo.
+- [ ] `QuestUI`: Interfaccia stile "libro/pergamena" con log testuale e scelte.
+- [ ] `QuestData`: Struttura JSON per definire quest, nodi, testi e reward (Config-Driven).
+
+---
+
 ### Future Direction (After Config-Driven Balancer)
 
 The next evolution of the project is organized around six macro-goals:
@@ -490,6 +514,59 @@ The next evolution of the project is organized around six macro-goals:
    - Vision & design document: [GAME_VISION_IDLE_INCREMENTAL.md](GAME_VISION_IDLE_INCREMENTAL.md).  
    - **FTUE & Vertical Slice:** primi 30–60 minuti pianificati in [plans/idle_village_ftue_plan.md](plans/idle_village_ftue_plan.md); la vertical slice deve permettere almeno un ciclo completo run → meta → nuova run.  
    - **Art Style & Visual Direction:** linee guida per stile grafico, palette e pipeline in [plans/idle_village_art_style_plan.md](plans/idle_village_art_style_plan.md).
+
+---
+
+### 🔴 **PHASE 12.0: Offline Progress Decision (CRITICAL PRE-LAUNCH)**
+
+**Status:** 📋 TODO (Blocking per posizionamento marketing)  
+**Priority:** Alta - Influenza naming, Steam tags, e aspettative giocatori
+
+> [!CAUTION]
+> La ricerca di mercato (Dic 2024) indica che **la mancanza di offline progress è un deal-breaker** per la maggioranza dei giocatori che cercano "idle games" su Steam. Frasi comuni in negative reviews: "not a idle game", "when you close it you don't make any progress".
+
+**Impatto stimato sulle probabilità di revenue Year 1:**
+
+| Scenario | Senza Offline Progress | Con Offline Progress (base) |
+|----------|------------------------|------------------------------|
+| 🔴 Perso soldi (<€3k) | **~20%** | **~12%** |
+| 🟠 Sopravvissuto (€3-10k) | ~40% | ~38% |
+| 🟡 Decente (€10-25k) | ~25% | ~30% |
+| 🟢 Successo (€25-50k) | ~12% | ~15% |
+| 🔵 Hit (€50k+) | ~3% | ~5% |
+
+**Delta chiave:** Il rischio di "perso soldi" scende da 20% a ~12% implementando anche solo un basic offline progress. Il rischio combinato di stare sotto €10k scende da 60% a ~50%.
+
+#### Opzioni di Design
+
+| Opzione | Descrizione | Pro | Contro | Effort |
+|---------|-------------|-----|--------|--------|
+| **A. Full Offline** | Risorse prodotte mentre app chiusa, cap a ~24h | Allineato aspettative "idle" | Complessità calcolo retroattivo, abuse potential | 2-3 settimane |
+| **B. Limited Offline** | Solo alcune risorse (gold base, no XP combat), cap 4-8h | Bilanciamento più facile, monetizzabile (time warp) | Può sembrare "mezzo idle" | 1-2 settimane |
+| **C. Battery Saver Only** | Nessun offline, ma modalità low-power per running in background | Minimo effort | NON risolve aspettative "idle", rischio review negative | 2-3 giorni |
+| **D. Rebranding** | Rimuovere "Idle" dal titolo/tags, posizionarsi come "Management Sim" | Evita aspettative sbagliate | Perde nicchia idle, più competizione con management games | 0 (solo decisione) |
+
+#### Decisione Raccomandata
+
+**Option B (Limited Offline)** come compromesso:
+- Implementa offline progress per risorse base (gold, materiali production)
+- **NO** offline progress per combattimento/XP (mantiene engagement attivo per core loop)
+- Cap a 4-8 ore (incentiva check-in regolari)
+- Monetizza "Time Warp" per saltare ore di produzione
+
+#### Deliverables
+
+- [ ] **Decision Document:** Scelta formale tra opzioni A/B/C/D
+- [ ] **Design Spec:** Se A/B, documento tecnico con formule di accumulo offline
+- [ ] **UI Mockup:** Come comunicare il progresso offline al rientro
+- [ ] **Steam Page Copy:** Testo che chiarisca le aspettative (se C/D)
+- [ ] **Implementazione** (se A/B): `OfflineProgressCalculator.ts`, integrazione con save/load
+
+#### Timeline
+
+- Decision: 1-2 giorni (playtesting mentale + revisione design pillars)
+- Implementation (se B): 1-2 settimane
+- Testing: 2-3 giorni
 
 7. **Updated Philosophy & Guidelines**  
    - Allineare `PROJECT_PHILOSOPHY.md` e `DEVELOPMENT_GUIDELINES.md` con:  

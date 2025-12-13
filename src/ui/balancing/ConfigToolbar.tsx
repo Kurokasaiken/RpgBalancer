@@ -26,7 +26,7 @@ export const ConfigToolbar: React.FC = () => {
         _simValues: simValues ? JSON.parse(simValues) : {},
       };
       const json = JSON.stringify(exportData, null, 2);
-      
+
       const blob = new Blob([json], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -56,29 +56,31 @@ export const ConfigToolbar: React.FC = () => {
       try {
         const text = reader.result as string;
         const parsed = JSON.parse(text);
-        
+
         // Extract simValues if present
         const { _simValues, ...configData } = parsed;
-        
+
         // Import config (without _simValues)
         const result = importConfig(JSON.stringify(configData));
         if (!result.success) {
           showToast(`Errore import: ${result.error}`, 'error');
           return;
         }
-        
-        // Import simValues if present
+
+        // Handle simValues:
+        // If present in file, use them.
+        // If NOT present, CLEAR the local storage so BalancerNew resets to config defaults.
+        // This is crucial to prevent stale values from overriding new formulas or defaults.
         if (_simValues && typeof _simValues === 'object') {
           localStorage.setItem(SIM_VALUES_KEY, JSON.stringify(_simValues));
-          // Trigger a storage event so BalancerNew picks up the change
-          window.dispatchEvent(new StorageEvent('storage', {
-            key: SIM_VALUES_KEY,
-            newValue: JSON.stringify(_simValues),
-          }));
+        } else {
+          localStorage.removeItem(SIM_VALUES_KEY);
         }
-        
+
         showToast('Configurazione importata con successo', 'success');
-        // Force page reload to ensure simValues are picked up
+
+        // Force page reload to ensure simValues are picked up correctly
+        // (BalancerNew initializes state from localStorage on mount)
         window.location.reload();
       } catch (err) {
         showToast(`Errore durante import: ${(err as Error).message}`, 'error');
@@ -105,11 +107,10 @@ export const ConfigToolbar: React.FC = () => {
             type="button"
             onClick={undo}
             disabled={!canUndo}
-            className={`inline-flex items-center gap-1 px-2 py-1 rounded-full border transition-colors ${
-              canUndo
+            className={`inline-flex items-center gap-1 px-2 py-1 rounded-full border transition-colors ${canUndo
                 ? 'border-amber-400/70 text-amber-200 hover:bg-amber-500/15'
                 : 'border-[#2b3434] text-[#4b5555] cursor-not-allowed'
-            }`}
+              }`}
           >
             <span aria-hidden className="text-xs">↺</span>
             <span className="tracking-[0.18em] uppercase">Undo</span>
@@ -143,4 +144,4 @@ export const ConfigToolbar: React.FC = () => {
     </>
   );
 }
-;
+  ;
