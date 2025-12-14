@@ -10,11 +10,13 @@ const VERB_TONE_ACTIVE_COLORS: Record<VerbTone, string> = {
   system: 'rgba(56,189,248,1)',
 };
 
+type DropState = 'idle' | 'valid' | 'invalid';
+
 interface VerbCardProps {
-  label: string;
+  label?: string;
   icon: React.ReactNode;
   kindLabel?: string | null;
-  assignees: string[];
+  assignees?: string[];
   rewardsLabel?: string | null;
   deadlineLabel?: string | null;
   riskLabel?: string | null;
@@ -23,13 +25,18 @@ interface VerbCardProps {
   isQuest?: boolean;
   isJob?: boolean;
   pulseOnMount?: boolean;
-  primaryActionLabel?: string;
-  onPrimaryAction?: () => void;
-  primaryActionDisabled?: boolean;
   toneColors?: Partial<Record<VerbTone, string>>;
   tone?: VerbTone;
-  onSelect?: () => void;
+  tooltip?: string;
+  isRejecting?: boolean;
   isInteractive?: boolean;
+  onClick?: () => void;
+  onSelect?: () => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
+  slotRequirementLabel?: string;
+  assignedLabel?: string | null;
+  dropState?: DropState;
 }
 
 const clamp01 = (value: number) => {
@@ -39,7 +46,7 @@ const clamp01 = (value: number) => {
   return value;
 };
 
-const VerbCard: React.FC<VerbCardProps> = ({
+export default function VerbCard({
   label,
   icon,
   kindLabel,
@@ -52,113 +59,116 @@ const VerbCard: React.FC<VerbCardProps> = ({
   isQuest,
   isJob,
   pulseOnMount,
-  primaryActionLabel,
-  onPrimaryAction,
-  primaryActionDisabled,
   toneColors,
   tone,
-  onSelect,
+  tooltip,
+  isRejecting,
   isInteractive,
-}) => {
+  onClick,
+  onSelect,
+  onMouseEnter,
+  onMouseLeave,
+  slotRequirementLabel,
+  assignedLabel,
+  dropState = 'idle',
+}: VerbCardProps) {
   const clamped = clamp01(progressFraction);
   const progressDegrees = clamped * 360;
-
   const resolvedTone: VerbTone = tone || (isQuest ? 'quest' : isJob ? 'job' : 'neutral');
-
-  const baseTrackColor = 'rgba(15,23,42,1)';
+  const baseTrackColor = 'rgba(15,23,42,0.6)';
   const activeColor = (toneColors && toneColors[resolvedTone]) || VERB_TONE_ACTIVE_COLORS[resolvedTone];
+  const ringBackground = `conic-gradient(${activeColor} 0deg ${progressDegrees}deg, ${baseTrackColor} ${progressDegrees}deg 360deg)`;
 
-  const backgroundImage = `conic-gradient(${activeColor} 0deg ${progressDegrees}deg, ${baseTrackColor} ${progressDegrees}deg 360deg)`;
-
-  const stateOpacity = state === 'idle' ? 'opacity-80' : state === 'completed' ? 'opacity-100' : 'opacity-95';
+  const stateOpacity = state === 'idle' ? 'opacity-85' : state === 'completed' ? 'opacity-100' : 'opacity-95';
   const pulseClass = pulseOnMount ? 'animate-[pulse_0.7s_ease-out_1]' : '';
+  const handleSelect = () => {
+    if (!isInteractive) return;
+    onClick?.();
+    onSelect?.();
+  };
 
-  const showPrimaryAction = !!primaryActionLabel && typeof onPrimaryAction === 'function';
+  const interactiveProps =
+    isInteractive && onClick
+      ? {
+          role: 'button' as const,
+          tabIndex: 0,
+          onClick: handleSelect,
+          onKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              handleSelect();
+            }
+          },
+        }
+      : {};
 
-  const interactiveProps = isInteractive && onSelect
-    ? {
-        role: 'button' as const,
-        tabIndex: 0,
-        onClick: onSelect,
-        onKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            onSelect();
-          }
-        },
-      }
-    : {};
+  const metaChunks = [
+    label,
+    kindLabel ? `Type: ${kindLabel}` : null,
+    slotRequirementLabel ? `Req: ${slotRequirementLabel}` : null,
+    assignedLabel ? `Assigned: ${assignedLabel}` : null,
+    riskLabel ? `Risk: ${riskLabel}` : null,
+    rewardsLabel ? `Rewards: ${rewardsLabel}` : null,
+    assignees && assignees.length ? `Members: ${assignees.join(', ')}` : null,
+  ].filter(Boolean) as string[];
+
+  const ariaLabel = metaChunks.length ? metaChunks.join(' · ') : undefined;
+
+  const dropHighlight =
+    dropState === 'valid'
+      ? 'ring-2 ring-emerald-300/80'
+      : dropState === 'invalid' || isRejecting
+        ? 'ring-2 ring-rose-400/80'
+        : '';
 
   return (
     <div
-      className={`rounded-lg p-px shadow-[0_10px_24px_rgba(15,23,42,0.9)] ${stateOpacity} ${pulseClass} ${isInteractive ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/80' : ''}`}
-      style={{ backgroundImage }}
+      className={[
+        'group inline-flex flex-col items-center select-none',
+        'rounded-full border border-transparent p-1 transition-all duration-200',
+        stateOpacity,
+        pulseClass,
+        isInteractive ? 'cursor-pointer' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      aria-label={ariaLabel}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       {...interactiveProps}
     >
-      <div className="rounded-[7px] bg-obsidian/95 border border-slate-800 px-2.5 py-1.5 flex flex-col gap-1.5">
-        <div className="flex items-start justify-between gap-2 min-w-0">
-          <div className="flex items-center gap-1.5 min-w-0">
-            <div className="w-6 h-6 rounded bg-black/80 border border-slate-600 flex items-center justify-center text-xs shrink-0">
-              {icon}
-            </div>
-            <div className="flex flex-col min-w-0">
-              <div className="text-[10px] font-semibold tracking-[0.16em] uppercase text-slate-100 truncate">
-                {label}
-              </div>
-              <div className="flex flex-wrap items-center gap-1 text-[9px] text-slate-400">
-                {kindLabel && (
-                  <span className="uppercase tracking-[0.18em] text-slate-400">
-                    {kindLabel}
-                  </span>
-                )}
-                {deadlineLabel && (
-                  <span className="text-xs text-amber-300">
-                    {deadlineLabel}
-                  </span>
-                )}
-                {riskLabel && (
-                  <span className="text-[9px] text-rose-300">
-                    {riskLabel}
-                  </span>
-                )}
-              </div>
-            </div>
+      {ariaLabel && <span className="sr-only">{ariaLabel}</span>}
+      <div
+        className={[
+          'relative p-1 rounded-full transition-all duration-200 shadow-[0_18px_45px_rgba(0,0,0,0.6)]',
+          dropHighlight,
+        ]
+          .filter(Boolean)
+          .join(' ')}
+        style={{ backgroundImage: ringBackground }}
+      >
+        <div
+          className={[
+            'flex h-24 w-24 flex-col items-center justify-center rounded-full border border-slate-900 bg-obsidian/95 text-ivory transition-all duration-200',
+            state === 'running' ? 'shadow-[0_0_20px_rgba(45,212,191,0.35)]' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
+        >
+          <span className="text-3xl drop-shadow-[0_0_12px_rgba(255,255,255,0.35)]">{icon}</span>
+          {deadlineLabel && (
+            <div className="mt-1 text-[11px] font-mono text-amber-200">{deadlineLabel}</div>
+          )}
+          <div className="text-[9px] uppercase tracking-[0.3em] text-slate-400">
+            {state === 'running' ? 'Running' : state === 'completed' ? 'Complete' : 'Idle'}
           </div>
-          <div className="flex flex-col items-end gap-0.5 text-[9px] text-slate-300 shrink-0">
-            {assignees.length > 0 && (
-              <div className="flex flex-wrap justify-end gap-0.5 max-w-[120px]">
-                {assignees.map((name) => (
-                  <span
-                    key={name}
-                    className="px-1 py-px rounded-full bg-slate-900/90 border border-slate-700 text-[9px] leading-tight truncate"
-                  >
-                    {name}
-                  </span>
-                ))}
-              </div>
-            )}
-            {rewardsLabel && (
-              <div className="text-[9px] text-emerald-300 truncate max-w-[120px]">
-                {rewardsLabel}
-              </div>
-            )}
-          </div>
+          {tooltip && (
+            <div className="pointer-events-none absolute -bottom-8 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full border border-slate-700 bg-slate-900 px-2 py-0.5 text-[9px] uppercase tracking-[0.25em] text-slate-200 opacity-0 transition group-hover:opacity-100">
+              {tooltip}
+            </div>
+          )}
         </div>
-        {showPrimaryAction && (
-          <div className="mt-1 flex justify-end">
-            <button
-              type="button"
-              onClick={onPrimaryAction}
-              disabled={primaryActionDisabled}
-              className="px-2 py-0.5 rounded-full border border-emerald-400/70 bg-emerald-500/10 text-[9px] uppercase tracking-[0.16em] text-emerald-200 hover:bg-emerald-500/20 disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              {primaryActionLabel}
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
-};
-
-export default VerbCard;
+}

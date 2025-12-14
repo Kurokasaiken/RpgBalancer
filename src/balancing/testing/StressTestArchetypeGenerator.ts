@@ -57,6 +57,23 @@ function isDerivedOrFormula(stat: StatDefinition): boolean {
 }
 
 /**
+ * Shared helper: determines whether a stat should be part of stress testing drivers.
+ */
+export function isStressTestCandidate(stat: StatDefinition): boolean {
+  const derivedOrFormula = isDerivedOrFormula(stat);
+  if (derivedOrFormula) return false;
+  if (stat.isHidden) return false;
+
+  const baseFlag = stat.baseStat ?? (!stat.isDerived && !stat.isPenalty);
+  if (!baseFlag) return false;
+
+  const detrimental = stat.isDetrimental ?? !!stat.isPenalty;
+  if (detrimental) return false;
+
+  return true;
+}
+
+/**
  * Generator for dynamic statsArchetype configurations based on the current BalancerConfig.
  *
  * - Reads stats from BalancerConfig (no hardcoding)
@@ -70,7 +87,7 @@ export class StatsArchetypeGenerator {
   constructor(config: BalancerConfig) {
     this.config = config;
     this.nonDerivedStatIds = Object.values(config.stats)
-      .filter((s) => !isDerivedOrFormula(s) && !s.isHidden)
+      .filter(isStressTestCandidate)
       .map((s) => s.id);
   }
 

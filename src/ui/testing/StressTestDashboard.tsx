@@ -4,6 +4,7 @@ import { MarginalUtilityTable } from './MarginalUtilityTable';
 import { SynergyHeatmap } from './SynergyHeatmap';
 import { StatProfileRadar } from './StatProfileRadar';
 import { useBalancerConfig } from '../../balancing/hooks/useBalancerConfig';
+import { isStressTestCandidate } from '../../balancing/testing/StressTestArchetypeGenerator';
 
 interface StressTestDashboardProps {
   singleStats: MarginalUtilityMetrics[];
@@ -22,7 +23,7 @@ export const StressTestDashboard: React.FC<StressTestDashboardProps> = ({
 
   const visibleStats = useMemo(() => {
     return Object.values(config.stats)
-      .filter((s) => !s.isDerived && !s.formula && !s.isHidden)
+      .filter((stat) => isStressTestCandidate(stat))
       .sort((a, b) => a.id.localeCompare(b.id));
   }, [config.stats]);
 

@@ -1,4 +1,5 @@
 import type { BalancerConfig, StatDefinition } from '../config/types';
+import { isStressTestCandidate } from '../testing/StressTestArchetypeGenerator';
 
 export type StatVector = Record<string, number>;
 
@@ -42,7 +43,7 @@ export interface StatStressReport {
 
 function getDriverStats(config: BalancerConfig): StatDefinition[] {
   return Object.values(config.stats)
-    .filter((s) => !s.isDerived && !s.isPenalty)
+    .filter(isStressTestCandidate)
     .sort((a, b) => a.id.localeCompare(b.id));
 }
 

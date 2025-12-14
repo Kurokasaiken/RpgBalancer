@@ -65,6 +65,13 @@ Derived stats (`isDerived === true`) vengono sempre trattate come `baseStat: fal
 Entrambi contengono i flag aggiornati; il `BalancerConfigStore` applica `mergeWithDefaults + applyStatFlagDefaults` per garantire che qualsiasi import/export mantenga la semantica.  
 Se servono modifiche senza passare dalla UI, editare **entrambi** i file sopra (o almeno il JSON) per evitare divergenze tra il reset iniziale e il salvataggio locale.
 
+#### Flag & Testing Pipeline
+
+- **Skill Check Lab** usa solo le stat con `baseStat: true` e `isDetrimental: false` per costruire i poligoni e le simulazioni (anche nelle viste alternative).
+- **Stat Stress Testing / Round-Robin** importa l’elenco dei driver tramite `isStressTestCandidate`, quindi ignora automaticamente stats derivate, di equip o contrarie alle quest.  
+  (Generator: `StatsArchetypeGenerator`, Harness CLI/UI: `StatStressHarness`, Dashboard UI: `StressTestDashboard`).
+- Se una nuova stat deve entrare nei test, assicurarsi che `baseStat=true` e non sia marcata `isDetrimental`. Stats equip-only o penalità rimangono comunque disponibili nel Balancer ma non vengono allenate nei tool di testing.
+
 ### 2. Baseline Stats
 The "Standard Enemy" used for all calculations:
 ```typescript
