@@ -93,6 +93,9 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
   const [iconId, setIconId] = useState<string>(stat.icon ?? '');
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isPenalty, setIsPenalty] = useState(!!stat.isPenalty);
+  const [baseStat, setBaseStat] = useState(stat.baseStat ?? true);
+  const [isDetrimental, setIsDetrimental] = useState(stat.isDetrimental ?? false);
 
   const isLocked = !!stat.isLocked;
   const isHidden = !!stat.isHidden;
@@ -124,6 +127,9 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
       setIsDerived(stat.isDerived);
       setFormula(stat.formula || '');
       setIconId(stat.icon ?? '');
+      setIsPenalty(!!stat.isPenalty);
+      setBaseStat(stat.baseStat ?? true);
+      setIsDetrimental(stat.isDetrimental ?? false);
     }
   }, [stat, isConfigMode]);
 
@@ -151,6 +157,15 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
     } else if (stat.isDerived) {
       updates.formula = undefined;
     }
+    if ((isPenalty || undefined) !== (stat.isPenalty || undefined)) {
+      updates.isPenalty = isPenalty || undefined;
+    }
+    if ((baseStat ?? undefined) !== (stat.baseStat ?? undefined)) {
+      updates.baseStat = baseStat;
+    }
+    if ((isDetrimental ?? undefined) !== (stat.isDetrimental ?? undefined)) {
+      updates.isDetrimental = isDetrimental;
+    }
     if (Object.keys(updates).length > 0) {
       onUpdate(updates);
     }
@@ -172,10 +187,10 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
         <div className="flex items-center justify-between text-xs py-2 px-3 rounded-xl border border-slate-700/70 bg-slate-900/70 backdrop-blur-sm gap-2 opacity-70">
           <div className="flex items-center gap-1.5 min-w-0">
             {LucideIcon ? (
-              <LucideIcon className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
+              <LucideIcon className="w-3.5 h-3.5 text-amber-400 shrink-0" />
             ) : (
               <span
-                className="text-sm text-amber-400 leading-none flex-shrink-0 h-4 flex items-center justify-center"
+                className="text-sm text-amber-400 leading-none shrink-0 h-4 flex items-center justify-center"
                 aria-hidden="true"
               >
                 {fallbackGlyph}
@@ -244,11 +259,25 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
                     {stat.description}
                   </div>
                 )}
+                {(!stat.baseStat || stat.isDetrimental) && (
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    {!stat.baseStat && (
+                      <span className="inline-flex items-center rounded-full border border-amber-400/60 bg-amber-500/10 px-2 py-0.5 text-[9px] tracking-[0.18em] uppercase text-amber-200">
+                        Off Base Kit
+                      </span>
+                    )}
+                    {stat.isDetrimental && (
+                      <span className="inline-flex items-center rounded-full border border-rose-500/60 bg-rose-500/10 px-2 py-0.5 text-[9px] tracking-[0.18em] uppercase text-rose-200">
+                        Hero Only
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Actions: Lock, Reset, Edit, Hide */}
-            <div className="flex items-center gap-1 flex-shrink-0 ml-1">
+            <div className="flex items-center gap-1 shrink-0 ml-1">
               <button
                 type="button"
                 className={`w-5 h-5 flex items-center justify-center rounded transition-colors leading-none ${isLocked ? 'text-rose-400 bg-rose-500/10' : 'text-slate-500 hover:text-indigo-200'
@@ -379,12 +408,12 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
   return (
     <div className="flex flex-col text-xs py-3 px-3 rounded-xl border border-slate-700/70 bg-slate-900/75 backdrop-blur-sm gap-2 shadow-[0_10px_24px_rgba(15,23,42,0.85)]">
       <div className="flex items-start gap-2">
-        <div className="flex flex-col gap-1 flex-1 min-w-0">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-1 flex-1 min-w-0">
+            <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => setShowIconPicker((prev) => !prev)}
-              className="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded border border-slate-600 bg-slate-900/80 hover:border-indigo-400 hover:bg-slate-900/95 transition-colors"
+                className="w-8 h-8 shrink-0 flex items-center justify-center rounded border border-slate-600 bg-slate-900/80 hover:border-indigo-400 hover:bg-slate-900/95 transition-colors"
               title="Scegli icona"
             >
               {iconId && lucideStatIcons[iconId] ? (
@@ -431,7 +460,7 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
           )}
         </div>
 
-        <div className="flex items-center gap-1 flex-shrink-0">
+        <div className="flex items-center gap-1 shrink-0">
           <button
             type="button"
             className="w-7 h-7 flex items-center justify-center rounded border border-emerald-400/50 text-emerald-200 hover:bg-emerald-500/15 text-sm leading-none transition-colors"
@@ -543,15 +572,48 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
         </label>
       </div>
 
-      <label className="flex items-center gap-2 py-1">
+      <label className="flex items-center gap-2 text-xs text-slate-200 mt-1">
         <input
           type="checkbox"
-          className="w-3.5 h-3.5 rounded border-[#475758] bg-[#0c1517] text-indigo-500 focus:ring-offset-0 focus:ring-1 focus:ring-indigo-500/50"
-          checked={isDerived}
-          onChange={(e) => setIsDerived(e.target.checked)}
+          className="w-3 h-3 rounded border-slate-600 bg-slate-900"
+          checked={isPenalty}
+          onChange={(e) => {
+            const checked = e.target.checked;
+            setIsPenalty(checked);
+            if (checked && baseStat) {
+              setBaseStat(false);
+            }
+          }}
         />
-        <span className="text-[11px] text-[#aeb8b4]">Valore derivato da formula</span>
+        <span>Penalty stat (valori più alti sono peggiori)</span>
       </label>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px] text-slate-200 mt-2">
+        <label className="flex items-center gap-2 rounded-lg border border-slate-700/80 bg-slate-900/60 px-3 py-2">
+          <input
+            type="checkbox"
+            className="w-3.5 h-3.5 rounded border-slate-500 bg-slate-950"
+            checked={baseStat}
+            onChange={(e) => setBaseStat(e.target.checked)}
+          />
+          <div className="flex flex-col leading-tight">
+            <span className="uppercase tracking-[0.18em] text-[10px] text-amber-200">Base Stat</span>
+            <span className="text-[10px] text-slate-400">Usata per crescita/quest umane</span>
+          </div>
+        </label>
+        <label className="flex items-center gap-2 rounded-lg border border-slate-700/80 bg-slate-900/60 px-3 py-2">
+          <input
+            type="checkbox"
+            className="w-3.5 h-3.5 rounded border-slate-500 bg-slate-950"
+            checked={isDetrimental}
+            onChange={(e) => setIsDetrimental(e.target.checked)}
+          />
+          <div className="flex flex-col leading-tight">
+            <span className="uppercase tracking-[0.18em] text-[10px] text-rose-200">Hero Only</span>
+            <span className="text-[10px] text-slate-400">Flag per stats detrimentali</span>
+          </div>
+        </label>
+      </div>
 
       {isDerived && (
         <div className="mt-1">

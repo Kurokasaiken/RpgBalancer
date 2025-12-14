@@ -28,6 +28,8 @@ interface VerbCardProps {
   primaryActionDisabled?: boolean;
   toneColors?: Partial<Record<VerbTone, string>>;
   tone?: VerbTone;
+  onSelect?: () => void;
+  isInteractive?: boolean;
 }
 
 const clamp01 = (value: number) => {
@@ -55,6 +57,8 @@ const VerbCard: React.FC<VerbCardProps> = ({
   primaryActionDisabled,
   toneColors,
   tone,
+  onSelect,
+  isInteractive,
 }) => {
   const clamped = clamp01(progressFraction);
   const progressDegrees = clamped * 360;
@@ -71,10 +75,25 @@ const VerbCard: React.FC<VerbCardProps> = ({
 
   const showPrimaryAction = !!primaryActionLabel && typeof onPrimaryAction === 'function';
 
+  const interactiveProps = isInteractive && onSelect
+    ? {
+        role: 'button' as const,
+        tabIndex: 0,
+        onClick: onSelect,
+        onKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            onSelect();
+          }
+        },
+      }
+    : {};
+
   return (
     <div
-      className={`rounded-lg p-px shadow-[0_10px_24px_rgba(15,23,42,0.9)] ${stateOpacity} ${pulseClass}`}
+      className={`rounded-lg p-px shadow-[0_10px_24px_rgba(15,23,42,0.9)] ${stateOpacity} ${pulseClass} ${isInteractive ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/80' : ''}`}
       style={{ backgroundImage }}
+      {...interactiveProps}
     >
       <div className="rounded-[7px] bg-obsidian/95 border border-slate-800 px-2.5 py-1.5 flex flex-col gap-1.5">
         <div className="flex items-start justify-between gap-2 min-w-0">

@@ -16,10 +16,11 @@ export const StatDefinitionSchema = z.object({
   isCore: z.boolean(),
   isDerived: z.boolean(),
   formula: z.string().optional(),
-  bgColor: z.string().optional(),
   isLocked: z.boolean().optional(),
   isHidden: z.boolean().optional(),
   isPenalty: z.boolean().optional(),
+  baseStat: z.boolean().optional(),
+  isDetrimental: z.boolean().optional(),
 })
   .refine((d) => d.min <= d.max, { message: 'min must be <= max', path: ['min'] })
   .refine((d) => d.defaultValue >= d.min && d.defaultValue <= d.max, {

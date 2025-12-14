@@ -16,6 +16,10 @@ export interface StatDefinition {
   isHidden?: boolean;
   icon?: string;
   isPenalty?: boolean;
+  /** Whether this stat is part of the human base stat kit used for growth/quests */
+  baseStat?: boolean;
+  /** Marks stats that should only benefit heroes (detrimental in quests) */
+  isDetrimental?: boolean;
 }
 
 export interface CardDefinition {

@@ -4,8 +4,7 @@
  * Manages user-created presets with localStorage persistence
  */
 
-import type { BalancePreset } from './BalanceConfigManager';
-import { BALANCE_PRESETS } from './BalanceConfigManager';
+import { BALANCE_PRESETS, type BalancePreset } from './balancePresets';
 import { NORMALIZED_WEIGHTS } from './statWeights';
 
 const STORAGE_KEY = 'rpg_balancer_user_presets';

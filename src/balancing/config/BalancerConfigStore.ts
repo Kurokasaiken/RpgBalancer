@@ -1,4 +1,4 @@
-import type { BalancerConfig, ConfigSnapshot } from './types';
+import type { BalancerConfig, ConfigSnapshot, StatDefinition } from './types';
 import { BalancerConfigSchema } from './schemas';
 import { DEFAULT_CONFIG } from './defaultConfig';
 import BALANCER_DEFAULT_JSON from './balancer-default-config.json';
@@ -146,9 +146,19 @@ export class BalancerConfigStore {
     return this.config;
   }
 
+  private static applyStatFlagDefaults(stat: StatDefinition): StatDefinition {
+    const baseStat = stat.baseStat ?? (!stat.isDerived && !stat.isPenalty);
+    const isDetrimental = stat.isDetrimental ?? !!stat.isPenalty;
+    return {
+      ...stat,
+      baseStat,
+      isDetrimental,
+    };
+  }
+
   private static mergeWithDefaults(config: BalancerConfig): BalancerConfig {
     // Deep merge stats: preserve imported values, add missing defaults
-    const mergedStats: Record<string, any> = {};
+    const mergedStats: Record<string, StatDefinition> = {};
     
     // First, add all defaults
     Object.entries(DEFAULT_CONFIG.stats).forEach(([id, stat]) => {
@@ -160,8 +170,12 @@ export class BalancerConfigStore {
       mergedStats[id] = { ...stat };
     });
 
+    Object.entries(mergedStats).forEach(([id, stat]) => {
+      mergedStats[id] = this.applyStatFlagDefaults(stat as StatDefinition);
+    });
+
     // Deep merge cards: preserve imported values, add missing defaults
-    const mergedCards: Record<string, any> = {};
+    const mergedCards: Record<string, typeof DEFAULT_CONFIG.cards[keyof typeof DEFAULT_CONFIG.cards]> = {};
     
     // First, add all defaults
     Object.entries(DEFAULT_CONFIG.cards).forEach(([id, card]) => {
@@ -174,7 +188,7 @@ export class BalancerConfigStore {
     });
 
     // Deep merge presets: preserve imported values, add missing defaults
-    const mergedPresets: Record<string, any> = {};
+    const mergedPresets: Record<string, typeof DEFAULT_CONFIG.presets[keyof typeof DEFAULT_CONFIG.presets]> = {};
     
     // First, add all defaults
     Object.entries(DEFAULT_CONFIG.presets).forEach(([id, preset]) => {

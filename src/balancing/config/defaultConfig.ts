@@ -15,6 +15,7 @@ export const CORE_STATS: Record<string, StatDefinition> = {
     isDerived: false,
     isLocked: false,
     isHidden: false,
+    baseStat: true,
   },
   damage: {
     id: 'damage',
@@ -50,6 +51,19 @@ export const CORE_STATS: Record<string, StatDefinition> = {
   },
 };
 
+function applyFlagDefaults(stats: Record<string, StatDefinition>): void {
+  Object.values(stats).forEach((stat) => {
+    if (stat.baseStat === undefined) {
+      stat.baseStat = !stat.isDerived && !stat.isPenalty;
+    }
+    if (stat.isDetrimental === undefined) {
+      stat.isDetrimental = !!stat.isPenalty;
+    }
+  });
+}
+
+applyFlagDefaults(CORE_STATS);
+
 export const CORE_CARD: CardDefinition = {
   id: 'core',
   title: 'Core Profile',
@@ -75,6 +89,7 @@ const ADDITIONAL_STATS: Record<string, StatDefinition> = {
     isDerived: false,
     isLocked: false,
     isHidden: false,
+    baseStat: true,
   },
   evasion: {
     id: 'evasion',
@@ -88,6 +103,7 @@ const ADDITIONAL_STATS: Record<string, StatDefinition> = {
     weight: 4.0,
     isCore: false,
     isDerived: false,
+    baseStat: true,
   },
   baseHitChance: {
     id: 'baseHitChance',
@@ -146,6 +162,7 @@ const ADDITIONAL_STATS: Record<string, StatDefinition> = {
     weight: 4.0,
     isCore: false,
     isDerived: false,
+    baseStat: true,
   },
   critMult: {
     id: 'critMult',
@@ -159,6 +176,7 @@ const ADDITIONAL_STATS: Record<string, StatDefinition> = {
     weight: 10.0,
     isCore: false,
     isDerived: false,
+    baseStat: true,
   },
   critTxCBonus: {
     id: 'critTxCBonus',
@@ -172,6 +190,7 @@ const ADDITIONAL_STATS: Record<string, StatDefinition> = {
     weight: 1,
     isCore: false,
     isDerived: false,
+    baseStat: true,
   },
   failChance: {
     id: 'failChance',
@@ -186,6 +205,8 @@ const ADDITIONAL_STATS: Record<string, StatDefinition> = {
     isCore: false,
     isDerived: false,
     isPenalty: true,
+    baseStat: false,
+    isDetrimental: true,
   },
   failMult: {
     id: 'failMult',
@@ -200,6 +221,8 @@ const ADDITIONAL_STATS: Record<string, StatDefinition> = {
     isCore: false,
     isDerived: false,
     isPenalty: true,
+    baseStat: false,
+    isDetrimental: true,
   },
   failTxCMalus: {
     id: 'failTxCMalus',
@@ -213,6 +236,9 @@ const ADDITIONAL_STATS: Record<string, StatDefinition> = {
     weight: 1,
     isCore: false,
     isDerived: false,
+    isPenalty: true,
+    baseStat: false,
+    isDetrimental: true,
   },
   ward: {
     id: 'ward',
@@ -226,6 +252,7 @@ const ADDITIONAL_STATS: Record<string, StatDefinition> = {
     weight: 1.5,
     isCore: false,
     isDerived: false,
+    baseStat: false,
   },
   armor: {
     id: 'armor',
@@ -239,6 +266,7 @@ const ADDITIONAL_STATS: Record<string, StatDefinition> = {
     weight: 5.0,
     isCore: false,
     isDerived: false,
+    baseStat: false,
   },
   resistance: {
     id: 'resistance',
@@ -252,6 +280,7 @@ const ADDITIONAL_STATS: Record<string, StatDefinition> = {
     weight: 5.0,
     isCore: false,
     isDerived: false,
+    baseStat: false,
   },
   armorPen: {
     id: 'armorPen',
@@ -265,6 +294,7 @@ const ADDITIONAL_STATS: Record<string, StatDefinition> = {
     weight: 1.5,
     isCore: false,
     isDerived: false,
+    baseStat: false,
   },
   penPercent: {
     id: 'penPercent',
@@ -278,6 +308,7 @@ const ADDITIONAL_STATS: Record<string, StatDefinition> = {
     weight: 1,
     isCore: false,
     isDerived: false,
+    baseStat: false,
   },
   effectiveDamage: {
     id: 'effectiveDamage',
@@ -306,6 +337,7 @@ const ADDITIONAL_STATS: Record<string, StatDefinition> = {
     weight: 100.0,
     isCore: false,
     isDerived: false,
+    baseStat: false,
   },
   regen: {
     id: 'regen',
@@ -319,6 +351,7 @@ const ADDITIONAL_STATS: Record<string, StatDefinition> = {
     weight: 20.0,
     isCore: false,
     isDerived: false,
+    baseStat: false,
   },
   ttk: {
     id: 'ttk',
@@ -366,6 +399,8 @@ const ADDITIONAL_STATS: Record<string, StatDefinition> = {
     isHidden: true,
   },
 };
+
+applyFlagDefaults(ADDITIONAL_STATS);
 
 const DEFAULT_CARDS: Record<string, CardDefinition> = {
   core: CORE_CARD,

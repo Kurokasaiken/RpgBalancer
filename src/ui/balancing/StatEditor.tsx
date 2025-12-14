@@ -25,6 +25,8 @@ export const StatEditor: React.FC<Props> = ({ isOpen, onClose, card, editingStat
   const [isDerived, setIsDerived] = useState(false);
   const [formula, setFormula] = useState('');
   const [isPenalty, setIsPenalty] = useState(false);
+  const [baseStat, setBaseStat] = useState(true);
+  const [isDetrimental, setIsDetrimental] = useState(false);
   const [error, setError] = useState<string | undefined>();
 
   useEffect(() => {
@@ -42,6 +44,8 @@ export const StatEditor: React.FC<Props> = ({ isOpen, onClose, card, editingStat
       setIsDerived(editingStat.isDerived);
       setFormula(editingStat.formula || '');
       setIsPenalty(!!editingStat.isPenalty);
+      setBaseStat(editingStat.baseStat ?? (!editingStat.isDerived && !editingStat.isPenalty));
+      setIsDetrimental(editingStat.isDetrimental ?? !!editingStat.isPenalty);
     } else {
       setId('');
       setLabel('');
@@ -55,6 +59,8 @@ export const StatEditor: React.FC<Props> = ({ isOpen, onClose, card, editingStat
       setIsDerived(false);
       setFormula('');
       setIsPenalty(false);
+      setBaseStat(true);
+      setIsDetrimental(false);
     }
     setError(undefined);
   }, [editingStat, isOpen]);
@@ -88,6 +94,8 @@ export const StatEditor: React.FC<Props> = ({ isOpen, onClose, card, editingStat
         isDerived,
         formula: isDerived ? formula : undefined,
         isPenalty: isPenalty || undefined,
+        baseStat,
+        isDetrimental,
       });
       if (!res.success) {
         setError(res.error);
@@ -116,6 +124,8 @@ export const StatEditor: React.FC<Props> = ({ isOpen, onClose, card, editingStat
       formula: isDerived ? formula : undefined,
       bgColor: undefined,
       isPenalty: isPenalty || undefined,
+      baseStat,
+      isDetrimental,
     });
     if (!res.success) {
       setError(res.error);

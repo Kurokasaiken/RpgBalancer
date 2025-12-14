@@ -24,18 +24,11 @@ const NAV_SECTIONS = [
             { id: 'balancer', label: 'Balancer', icon: '⚖️' },
             { id: 'balancerStats', label: 'Stat Testing', icon: '📊' },
             { id: 'spellCreationNew', label: 'Spell Creation', icon: '✨' },
-            { id: 'archetypes', label: 'Archetypes', icon: '🎭' },
-            { id: 'archetypeBuilder', label: 'Builder', icon: '🏗️' },
-            { id: 'matchupMatrix', label: 'War Room', icon: '🗺️' },
-            { id: 'archetypeTesting', label: '1v1 Archetypes', icon: '⚔️' },
         ]
     },
     {
         title: 'Content',
         items: [
-            { id: 'spellLibrary', label: 'Grimoire', icon: '📚' },
-            { id: 'gridArena', label: 'Battlefield', icon: '⚔️' },
-            { id: 'characterCreator', label: 'Heroes', icon: '👤' },
         ]
     },
     {
@@ -43,7 +36,16 @@ const NAV_SECTIONS = [
         items: [
             { id: 'idleVillage', label: 'Idle Village', icon: '🏡' },
             { id: 'idleVillageConfig', label: 'Idle Village Config', icon: '⚙️' },
+            { id: 'verbDetailSandbox', label: 'Verb Detail Sandbox', icon: '🜂' },
             { id: 'skillCheckPreview', label: 'Skill Check Lab', icon: '🎯' },
+            { id: 'archetypes', label: 'Archetypes', icon: '🎭' },
+            { id: 'matchupMatrix', label: 'War Room', icon: '🗺️' },
+            { id: 'archetypeTesting', label: '1v1 Archetypes', icon: '⚔️' },
+            { id: 'gridArena', label: 'Battlefield', icon: '⚔️' },
+            { id: 'characterCreator', label: 'Heroes', icon: '👤' },
+            { id: 'archetypeBuilder', label: 'Builder', icon: '🏗️' },
+            { id: 'spellLibrary', label: 'Grimoire', icon: '📚' },
+            { id: 'characterManager', label: 'Roster', icon: '🗂️' },
         ]
     },
     {

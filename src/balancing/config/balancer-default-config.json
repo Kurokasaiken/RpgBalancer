@@ -14,7 +14,8 @@
       "isCore": true,
       "isDerived": false,
       "isLocked": false,
-      "isHidden": false
+      "isHidden": false,
+      "baseStat": true
     },
     "damage": {
       "id": "damage",
@@ -29,7 +30,8 @@
       "isCore": true,
       "isDerived": false,
       "isLocked": false,
-      "isHidden": false
+      "isHidden": false,
+      "baseStat": true
     },
     "htk": {
       "id": "htk",
@@ -61,7 +63,8 @@
       "isCore": false,
       "isDerived": false,
       "isLocked": false,
-      "isHidden": false
+      "isHidden": false,
+      "baseStat": true
     },
     "evasion": {
       "id": "evasion",
@@ -74,7 +77,8 @@
       "defaultValue": 0,
       "weight": 4,
       "isCore": false,
-      "isDerived": false
+      "isDerived": false,
+      "baseStat": true
     },
     "baseHitChance": {
       "id": "baseHitChance",
@@ -89,7 +93,8 @@
       "isCore": false,
       "isDerived": false,
       "isLocked": false,
-      "isHidden": false
+      "isHidden": false,
+      "baseStat": true
     },
     "hitChance": {
       "id": "hitChance",
@@ -132,7 +137,8 @@
       "defaultValue": 5,
       "weight": 4,
       "isCore": false,
-      "isDerived": false
+      "isDerived": false,
+      "baseStat": true
     },
     "critMult": {
       "id": "critMult",
@@ -145,7 +151,8 @@
       "defaultValue": 2,
       "weight": 10,
       "isCore": false,
-      "isDerived": false
+      "isDerived": false,
+      "baseStat": true
     },
     "critTxCBonus": {
       "id": "critTxCBonus",
@@ -158,7 +165,8 @@
       "defaultValue": 20,
       "weight": 1,
       "isCore": false,
-      "isDerived": false
+      "isDerived": false,
+      "baseStat": true
     },
     "failChance": {
       "id": "failChance",
@@ -171,7 +179,10 @@
       "defaultValue": 0,
       "weight": 1,
       "isCore": false,
-      "isDerived": false
+      "isDerived": false,
+      "isPenalty": true,
+      "baseStat": false,
+      "isDetrimental": true
     },
     "failMult": {
       "id": "failMult",
@@ -184,7 +195,10 @@
       "defaultValue": 0,
       "weight": 1,
       "isCore": false,
-      "isDerived": false
+      "isDerived": false,
+      "isPenalty": true,
+      "baseStat": false,
+      "isDetrimental": true
     },
     "failTxCMalus": {
       "id": "failTxCMalus",
@@ -197,7 +211,10 @@
       "defaultValue": 20,
       "weight": 1,
       "isCore": false,
-      "isDerived": false
+      "isDerived": false,
+      "isPenalty": true,
+      "baseStat": false,
+      "isDetrimental": true
     },
     "ward": {
       "id": "ward",
@@ -210,7 +227,8 @@
       "defaultValue": 0,
       "weight": 1.5,
       "isCore": false,
-      "isDerived": false
+      "isDerived": false,
+      "baseStat": false
     },
     "armor": {
       "id": "armor",
@@ -223,7 +241,8 @@
       "defaultValue": 0,
       "weight": 5,
       "isCore": false,
-      "isDerived": false
+      "isDerived": false,
+      "baseStat": false
     },
     "resistance": {
       "id": "resistance",
@@ -236,7 +255,8 @@
       "defaultValue": 0,
       "weight": 5,
       "isCore": false,
-      "isDerived": false
+      "isDerived": false,
+      "baseStat": false
     },
     "armorPen": {
       "id": "armorPen",
@@ -249,7 +269,8 @@
       "defaultValue": 0,
       "weight": 1.5,
       "isCore": false,
-      "isDerived": false
+      "isDerived": false,
+      "baseStat": false
     },
     "penPercent": {
       "id": "penPercent",
@@ -262,7 +283,8 @@
       "defaultValue": 0,
       "weight": 1,
       "isCore": false,
-      "isDerived": false
+      "isDerived": false,
+      "baseStat": false
     },
     "effectiveDamage": {
       "id": "effectiveDamage",
@@ -290,7 +312,8 @@
       "defaultValue": 0,
       "weight": 100,
       "isCore": false,
-      "isDerived": false
+      "isDerived": false,
+      "baseStat": false
     },
     "regen": {
       "id": "regen",
@@ -303,8 +326,10 @@
       "defaultValue": 0,
       "weight": 20,
       "isCore": false,
-      "isDerived": false
-    },
+      "isDerived": false,
+      "baseStat": false
+    }
+,
     "ttk": {
       "id": "ttk",
       "label": "TTK",

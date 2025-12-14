@@ -1,9 +1,12 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useBalancerConfig } from '@/balancing/hooks/useBalancerConfig';
 
 interface StatRow {
+  id: string;
   name: string;
   questValue: number;
   heroValue: number;
+  isDetrimental: boolean;
 }
 
 type OutcomeZone = 'safe' | 'injury' | 'death';
@@ -19,13 +22,20 @@ interface Point {
   y: number;
 }
 
-const MAX_STATS = 6;
-const MIN_STATS = 1;
+
 
 const CANVAS_SIZE = 360;
 const CENTER_X = CANVAS_SIZE / 2;
 const CENTER_Y = CANVAS_SIZE / 2;
 const RADIUS = 120;
+const QUEST_MIN_BASE_RATIO = 0.6;
+
+const MINI_RADAR_SIZE = 220;
+const MINI_RADAR_RADIUS = 90;
+const MINI_RADAR_CENTER: Point = {
+  x: MINI_RADAR_SIZE / 2,
+  y: MINI_RADAR_SIZE / 2,
+};
 
 interface PinballOptions {
   shotPower: number;
@@ -37,13 +47,16 @@ interface PolygonOptions {
   baseRatio: number;    // 0-0.5: minimum radius as fraction of RADIUS
   valleyDepth: number;  // 0-0.5: how deep valleys go between peaks
   curveTension: number; // 0-1: smoothness of curves (0=sharp, 1=very smooth)
+  triangleWidth?: number; // 0-1: shared base width for triangle segments
   numPoints?: number;   // Fixed number of points (default 5)
+  shapeType?: 'hero' | 'quest'; // 'quest' uses special difficulty envelopes (Rectangle, Convex)
 }
 
 const DEFAULT_POLYGON_OPTIONS: PolygonOptions = {
   baseRatio: 0.2,
   valleyDepth: 0.85,    // Default VERY sharp (Triangle/Needle look)
   curveTension: 0.15,
+  triangleWidth: 0.35,
   numPoints: 5,
 };
 
@@ -139,20 +152,16 @@ function getTrianglePoints(index: number, total: number, widthFactor: number) {
   const dx = Math.cos(perpAngle) * halfWidth;
   const dy = Math.sin(perpAngle) * halfWidth;
 
-  // Base is centered at (CENTER_X, CENTER_Y)
-  // CW side (Right of tip) vs CCW side (Left of tip)
-  // If Tip is Up, CW is Right.
-
   return {
     tip,
-    baseCCW: { // "Left"
+    baseCCW: {
       x: CENTER_X - dx,
       y: CENTER_Y - dy,
     },
-    baseCW: { // "Right"
+    baseCW: {
       x: CENTER_X + dx,
       y: CENTER_Y + dy,
-    }
+    },
   };
 }
 
@@ -165,7 +174,11 @@ function buildTriangle(
   activeIndex: number,
   options: PolygonOptions
 ): Point[] {
-  const pts = getTrianglePoints(activeIndex, stats.length, options.baseRatio);
+  const width = Math.max(
+    0.01,
+    Math.min(1, options.triangleWidth ?? options.baseRatio ?? DEFAULT_POLYGON_OPTIONS.triangleWidth ?? 0.35),
+  );
+  const pts = getTrianglePoints(activeIndex, stats.length, width);
   return [pts.tip, pts.baseCW, pts.baseCCW];
 }
 
@@ -175,38 +188,82 @@ function buildTriangle(
  * - 2-3 Active Stats: Stitched Triangles (Fan/Bowtie/Polygon)
  * - 4-5 Active Stats: Sheriff Star
  */
+function buildQuestConvexPolygon(
+  stats: StatRow[],
+  key: keyof StatRow,
+  options: PolygonOptions,
+): Point[] {
+  const numPoints = options.numPoints ?? stats.length;
+  const baseRatio = Math.max(QUEST_MIN_BASE_RATIO, options.baseRatio ?? 0);
+  const minRadius = RADIUS * baseRatio;
+  const points: Point[] = [];
+
+  for (let i = 0; i < numPoints; i++) {
+    const stat = stats[i];
+    const raw = stat ? Number(stat[key]) : 0;
+    const clamped = Number.isFinite(raw) ? Math.max(0, Math.min(100, raw)) : 0;
+    const radius = minRadius + (clamped / 100) * (RADIUS - minRadius);
+    const angle = -Math.PI / 2 + (i * 2 * Math.PI) / numPoints;
+    points.push({
+      x: CENTER_X + radius * Math.cos(angle),
+      y: CENTER_Y + radius * Math.sin(angle),
+    });
+  }
+
+  return points;
+}
+
 function buildAdaptivePolygon(
   stats: StatRow[],
   key: keyof StatRow,
   options: PolygonOptions
 ): Point[] {
+  const triangleWidth = Math.max(
+    0.01,
+    Math.min(1, options.triangleWidth ?? options.baseRatio ?? DEFAULT_POLYGON_OPTIONS.triangleWidth ?? 0.35),
+  );
   // Count active stats (value > 0)
   const activeStats = stats.map((s, i) => ({ val: Number(s[key]), index: i }))
     .filter(s => s.val > 0);
 
   const count = activeStats.length;
+  const isQuest = options.shapeType === 'quest';
+
+  if (count === 0) {
+    return [];
+  }
+
+  if (isQuest) {
+    if (count === 1) {
+      const tri = getTrianglePoints(activeStats[0].index, stats.length, triangleWidth);
+      return [tri.tip, tri.baseCW, tri.baseCCW];
+    }
+
+    // 2+ active stats -> Convex polygon without valleys
+    return buildQuestConvexPolygon(stats, key, options);
+  }
 
   if (count === 1) {
-    // SINGLE STAT MODE -> TRIANGLE
+    // SINGLE STAT HERO -> TRIANGLE
     return buildTriangle(stats, activeStats[0].index, options);
   }
 
   if (count === 2 || count === 3) {
     // 2-3 STATS -> STITCHED GEOMETRY
-    // Connect Tip -> CW Base -> Next CCW Base -> Next Tip...
+    // Ensure the stitched area never creates empty regions between stats
     const points: Point[] = [];
     const total = stats.length;
+    const center: Point = { x: CENTER_X, y: CENTER_Y };
 
     activeStats.forEach((stat, i) => {
       const nextStat = activeStats[(i + 1) % count];
 
-      const currentTri = getTrianglePoints(stat.index, total, options.baseRatio);
-      const nextTri = getTrianglePoints(nextStat.index, total, options.baseRatio);
+      const currentTri = getTrianglePoints(stat.index, total, triangleWidth);
+      const nextTri = getTrianglePoints(nextStat.index, total, triangleWidth);
 
       points.push(currentTri.tip);
       points.push(currentTri.baseCW);
-      // The line segment from currentTri.baseCW to nextTri.baseCCW forms the connection
-      // (Straight line, Touch, or Rhombus side)
+      points.push(center);
       points.push(nextTri.baseCCW);
     });
 
@@ -288,6 +345,36 @@ function clampPercentage(value: number, min = 0, max = 100): number {
   return Math.max(min, Math.min(max, value));
 }
 
+function buildMiniRadarPolygon(
+  stats: StatRow[],
+  key: keyof StatRow,
+  radius: number,
+  center: Point,
+): Point[] {
+  const total = Math.max(1, stats.length);
+  return stats.map((stat, index) => {
+    const raw = Number(stat[key]);
+    const value = clampPercentage(raw);
+    const angle = -Math.PI / 2 + (index * 2 * Math.PI) / total;
+    const dist = (value / 100) * radius;
+    return {
+      x: center.x + dist * Math.cos(angle),
+      y: center.y + dist * Math.sin(angle),
+    };
+  });
+}
+
+function computeAverageActive(stats: StatRow[], key: keyof StatRow): number {
+  const active = stats.filter((stat) => Number(stat[key]) > 0);
+  if (!active.length) return 0;
+  const total = active.reduce((sum, stat) => sum + clampPercentage(Number(stat[key])), 0);
+  return total / active.length;
+}
+
+function computeSum(stats: StatRow[], key: keyof StatRow): number {
+  return stats.reduce((sum, stat) => sum + Math.max(0, Number(stat[key]) || 0), 0);
+}
+
 function getQuestEdges(points: Point[]): { a: Point; b: Point }[] {
   if (points.length < 2) return [];
   return points.map((point, index) => ({
@@ -355,6 +442,31 @@ function createSeededRng(seed: number): () => number {
   };
 }
 
+function shuffleWithRng<T>(items: T[], rng: () => number): T[] {
+  const arr = [...items];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function samplePointInsidePolygon(polygon: Point[], maxAttempts = 200): Point {
+  if (polygon.length < 3) return { x: CENTER_X, y: CENTER_Y };
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    const u = Math.random();
+    const r = Math.sqrt(u) * RADIUS;
+    const angle = Math.random() * Math.PI * 2;
+    const x = CENTER_X + r * Math.cos(angle);
+    const y = CENTER_Y + r * Math.sin(angle);
+    const candidate = { x, y };
+    if (pointInPolygon(candidate, polygon)) {
+      return candidate;
+    }
+  }
+  return { x: CENTER_X, y: CENTER_Y };
+}
+
 function simulatePinballPath(target: Point, polygon: Point[], options: PinballOptions): Point[] {
   const path: Point[] = [];
   if (polygon.length < 3) {
@@ -386,7 +498,7 @@ function simulatePinballPath(target: Point, polygon: Point[], options: PinballOp
   path.push({ ...pos });
 
   for (let step = 0; step < maxSteps; step += 1) {
-    const speed = Math.hypot(vel.x, vel.y);
+
 
     // ── EXPONENTIAL BRAKING ──
     // Fast for 1s (60 steps), then progressive braking
@@ -488,13 +600,39 @@ function simulatePinballPath(target: Point, polygon: Point[], options: PinballOp
 }
 
 export const SkillCheckPreviewPage: React.FC = () => {
-  const [stats, setStats] = useState<StatRow[]>([
-    { name: 'Combat', questValue: 70, heroValue: 60 },
-    { name: 'Vigor', questValue: 0, heroValue: 55 },
-    { name: 'Agility', questValue: 0, heroValue: 50 },
-    { name: 'Intellect', questValue: 0, heroValue: 65 },
-    { name: 'Presence', questValue: 0, heroValue: 45 },
-  ]);
+  const { config } = useBalancerConfig();
+  const baseStatsPool = useMemo(() => {
+    return Object.values(config.stats ?? {}).filter(
+      (stat) => stat.baseStat && !stat.isDerived && !stat.isHidden,
+    );
+  }, [config.stats]);
+
+  const initialStats = useMemo<StatRow[]>(() => {
+    if (!baseStatsPool.length) return [];
+    const seedSource = JSON.stringify(baseStatsPool.map((stat) => stat.id).sort());
+    const rng = createSeededRng(hashString(seedSource));
+    const shuffled = shuffleWithRng(baseStatsPool, rng);
+    return shuffled.slice(0, 5).map((stat, index) => {
+      const defaultValue = index === 0 ? 60 : 0;
+      return {
+        id: stat.id,
+        name: stat.label,
+        questValue: defaultValue,
+        heroValue: defaultValue,
+        isDetrimental: !!stat.isDetrimental,
+      };
+    });
+  }, [baseStatsPool]);
+
+  const [stats, setStats] = useState<StatRow[]>([]);
+
+  useEffect(() => {
+    if (!initialStats.length) return undefined;
+    const frame = requestAnimationFrame(() => {
+      setStats(initialStats);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [initialStats]);
   const [injuryPct, setInjuryPct] = useState(10);
   const [deathPct, setDeathPct] = useState(5);
   const [shotPower, setShotPower] = useState(0.8); // 0..1 slider
@@ -504,6 +642,30 @@ export const SkillCheckPreviewPage: React.FC = () => {
   const [ballPosition, setBallPosition] = useState<Point | null>(null);
   const [heroStrokeProgress, setHeroStrokeProgress] = useState(1);
   const [timer, setTimer] = useState<string>("0.00s");
+  const [viewMode, setViewMode] = useState<'classic' | 'alt'>('classic');
+  const profileKey = useMemo(
+    () =>
+      JSON.stringify({
+        stats: stats.map((stat) => ({
+          id: stat.id,
+          quest: stat.questValue,
+          hero: stat.heroValue,
+          detrimental: stat.isDetrimental,
+        })),
+        injuryPct,
+        deathPct,
+      }),
+    [stats, injuryPct, deathPct],
+  );
+  const [altRollInfo, setAltRollInfo] = useState<{
+    profileKey: string;
+    value: number | null;
+    zone: OutcomeZone;
+    result: OutcomeResult;
+  }>({ profileKey: '', value: null, zone: 'safe', result: 'fail' });
+  const [altRollAnimKey, setAltRollAnimKey] = useState(0);
+  const [altBallProgress, setAltBallProgress] = useState(0);
+  const altBallFrameRef = useRef<number | null>(null);
 
   // ─── Polygon Tuning State ───────────────────────────────────────────────
   const [valleyDepth, setValleyDepth] = useState(0.5);  // 0-1: Unified control
@@ -521,13 +683,75 @@ export const SkillCheckPreviewPage: React.FC = () => {
     return clampPercentage(100 - total);
   }, [injuryPct, deathPct]);
 
+  const questAverage = useMemo(() => computeAverageActive(stats, 'questValue'), [stats]);
+  const heroAverage = useMemo(() => computeAverageActive(stats, 'heroValue'), [stats]);
+  const heroTotal = useMemo(() => computeSum(stats, 'heroValue'), [stats]);
+  const miniQuestPoints = useMemo(
+    () => buildMiniRadarPolygon(stats, 'questValue', MINI_RADAR_RADIUS, MINI_RADAR_CENTER),
+    [stats],
+  );
+  const miniHeroPoints = useMemo(
+    () => buildMiniRadarPolygon(stats, 'heroValue', MINI_RADAR_RADIUS, MINI_RADAR_CENTER),
+    [stats],
+  );
+  const miniQuestAttr = useMemo(() => polygonToPointsAttr(miniQuestPoints), [miniQuestPoints]);
+  const miniHeroAttr = useMemo(() => polygonToPointsAttr(miniHeroPoints), [miniHeroPoints]);
+  const heroDelta = useMemo(() => heroAverage - questAverage, [heroAverage, questAverage]);
+  const contributions = useMemo(() => {
+    const heroValues = stats.map((stat) => clampPercentage(stat.heroValue));
+    const maxHeroStat = heroValues.length ? Math.max(...heroValues) : 100;
+    return stats.map((stat, idx) => {
+      const heroVal = clampPercentage(stat.heroValue);
+      const questVal = clampPercentage(stat.questValue);
+      return {
+        id: stat.id || `stat-${idx}`,
+        name: stat.name,
+        heroVal,
+        questVal,
+        heroShare: heroTotal ? heroVal / heroTotal : 0,
+        heroRel: maxHeroStat ? heroVal / maxHeroStat : 0,
+      };
+    });
+  }, [stats, heroTotal]);
+  const previewRoll = useMemo(() => {
+    if (!stats.length) return 0;
+    const payload = stats.map((stat) => [stat.id, stat.questValue, stat.heroValue]);
+    const rng = createSeededRng(
+      hashString(
+        JSON.stringify({
+          payload,
+          injuryPct,
+          deathPct,
+        }),
+      ),
+    );
+    return Math.round(rng() * 100);
+  }, [stats, injuryPct, deathPct]);
+  const rollZone = useMemo<OutcomeZone>(() => {
+    const injuryThreshold = safePct + injuryPct;
+    if (previewRoll <= safePct) return 'safe';
+    if (previewRoll <= injuryThreshold) return 'injury';
+    return 'death';
+  }, [previewRoll, safePct, injuryPct]);
+  const resolvedAltRoll = useMemo(() => {
+    if (altRollInfo.profileKey === profileKey) {
+      return altRollInfo;
+    }
+    return {
+      profileKey,
+      value: null,
+      zone: 'safe' as OutcomeZone,
+      result: 'fail' as OutcomeResult,
+    };
+  }, [altRollInfo, profileKey]);
   // Use star polygon with valleys instead of simple polygon
   const questPolygon = useMemo(() => {
     return buildAdaptivePolygon(stats, 'questValue', {
       baseRatio: (1 - valleyDepth), // Inverse: Low Valley = High Width/Radius
       valleyDepth,
       curveTension,
-      numPoints: 5,
+      numPoints: stats.length,
+      shapeType: 'quest',
     });
   }, [stats, valleyDepth, curveTension]);
 
@@ -540,7 +764,8 @@ export const SkillCheckPreviewPage: React.FC = () => {
       baseRatio: (1 - heroValley), // Also affects width logic (thinner base)
       valleyDepth: heroValley,
       curveTension,
-      numPoints: 5,
+      numPoints: stats.length,
+      shapeType: 'hero',
     });
   }, [stats, valleyDepth, heroPrecision, curveTension]);
 
@@ -549,10 +774,7 @@ export const SkillCheckPreviewPage: React.FC = () => {
   // ... (rest of logic) ...
 
   const questPolygonAttr = useMemo(() => polygonToPointsAttr(questPolygon), [questPolygon]);
-  const heroPolygonAttr = useMemo(() => polygonToPointsAttr(heroPolygon), [heroPolygon]);
 
-  // Simple path (for fills and physics)
-  const questPathD = useMemo(() => polygonToPathD(questPolygon), [questPolygon]);
   const heroPathD = useMemo(() => polygonToPathD(heroPolygon), [heroPolygon]);
 
   // Smooth path (for visual strokes when curveTension > 0)
@@ -680,9 +902,91 @@ export const SkillCheckPreviewPage: React.FC = () => {
     if (ballAnimFrameRef.current !== null) {
       cancelAnimationFrame(ballAnimFrameRef.current);
     }
+    if (altBallFrameRef.current !== null) {
+      cancelAnimationFrame(altBallFrameRef.current);
+    }
   }, []);
 
-  // Removed handleStatCountChange
+  useEffect(() => {
+    const hasValue = resolvedAltRoll.value !== null && resolvedAltRoll.value !== undefined;
+    if (altBallFrameRef.current !== null) {
+      cancelAnimationFrame(altBallFrameRef.current);
+    }
+    if (!hasValue) {
+      altBallFrameRef.current = requestAnimationFrame(() => {
+        setAltBallProgress(0);
+        altBallFrameRef.current = null;
+      });
+      return () => {
+        if (altBallFrameRef.current !== null) {
+          cancelAnimationFrame(altBallFrameRef.current);
+        }
+      };
+    }
+    const target = clampPercentage(resolvedAltRoll.value ?? 0) / 100;
+    const duration = 1000;
+    let startTime: number | null = null;
+
+    const animate = (timestamp: number) => {
+      if (startTime === null) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const tRaw = Math.min(1, elapsed / duration);
+      const t = tRaw * tRaw * (3 - 2 * tRaw);
+      setAltBallProgress(target * t);
+      if (tRaw < 1) {
+        altBallFrameRef.current = requestAnimationFrame(animate);
+      } else {
+        altBallFrameRef.current = null;
+      }
+    };
+
+    altBallFrameRef.current = requestAnimationFrame((ts) => {
+      startTime = ts;
+      setAltBallProgress(0);
+      animate(ts);
+    });
+
+    return () => {
+      if (altBallFrameRef.current !== null) {
+        cancelAnimationFrame(altBallFrameRef.current);
+      }
+    };
+  }, [resolvedAltRoll, altRollAnimKey, setAltBallProgress]);
+
+  const runAltSimulation = useCallback(() => {
+    if (questPolygon.length < 3 || heroPolygon.length < 3) return;
+    const chosen = samplePointInsidePolygon(questPolygon);
+    const dx = chosen.x - CENTER_X;
+    const dy = chosen.y - CENTER_Y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    let zone: OutcomeZone = 'safe';
+    if (distance > radii.deathInnerRadius) {
+      zone = 'death';
+    } else if (distance > radii.injuryInnerRadius) {
+      zone = 'injury';
+    }
+
+    const success = pointInPolygon(chosen, heroPolygon);
+    const result: OutcomeResult = success ? 'success' : 'fail';
+    const rollPercent = clampPercentage((distance / Math.max(1, radii.deathOuterRadius || RADIUS)) * 100);
+
+    setAltRollInfo({
+      profileKey,
+      value: rollPercent,
+      zone,
+      result,
+    });
+    setAltRollAnimKey((prev) => prev + 1);
+  }, [heroPolygon, questPolygon, radii, profileKey]);
+
+  useEffect(() => {
+    if (viewMode !== 'alt') return;
+    const frame = requestAnimationFrame(() => {
+      runAltSimulation();
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [viewMode, runAltSimulation]);
 
   const handleStatChange = (index: number, field: keyof StatRow, raw: string) => {
     setStats((prev) => {
@@ -695,7 +999,13 @@ export const SkillCheckPreviewPage: React.FC = () => {
       }
       const parsed = raw === '' ? 0 : Number(raw);
       const clamped = clampPercentage(parsed);
-      next[index] = { ...current, [field]: clamped } as StatRow;
+      if (field === 'questValue') {
+        next[index] = { ...current, questValue: clamped, heroValue: clamped };
+      } else if (field === 'heroValue') {
+        next[index] = { ...current, heroValue: clamped };
+      } else {
+        next[index] = { ...current, [field]: clamped } as StatRow;
+      }
       return next;
     });
   };
@@ -740,6 +1050,14 @@ export const SkillCheckPreviewPage: React.FC = () => {
     const label = `Roll: ${result.toUpperCase()} + ${zone.toUpperCase()}`;
 
     setLastOutcome({ zone, result });
+    const rollPercent = clampPercentage((distance / Math.max(1, radii.deathOuterRadius || RADIUS)) * 100);
+    setAltRollInfo({
+      profileKey,
+      value: rollPercent,
+      zone,
+      result,
+    });
+    setAltRollAnimKey((prev) => prev + 1);
     setLog((prev) => [label, ...prev].slice(0, 12));
 
     // Animate ball with pinball-style trajectory simulated via simple physics in Q.
@@ -863,6 +1181,25 @@ export const SkillCheckPreviewPage: React.FC = () => {
         Giocattolo per visualizzare lo skill check stile Dispatch. Configura numero di stat, profilo quest/PG,
         percentuali di injury/death e lancia una pallina che rimbalza dentro l&apos;area della quest.
       </p>
+      <div className="flex flex-wrap gap-2 mb-4">
+        <span className="text-[10px] uppercase tracking-[0.24em] text-slate-500 pt-1">View</span>
+        <div className="bg-slate-900/70 border border-slate-800 rounded-full p-1 flex gap-1">
+          {(['classic', 'alt'] as const).map((mode) => (
+            <button
+              key={mode}
+              type="button"
+              onClick={() => setViewMode(mode)}
+              className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-[0.16em] transition-all ${
+                viewMode === mode
+                  ? 'bg-emerald-400/20 text-emerald-200 border border-emerald-400/50 shadow-[0_0_10px_rgba(16,185,129,0.25)]'
+                  : 'text-slate-400 hover:text-slate-100'
+              }`}
+            >
+              {mode === 'classic' ? 'Dispatch Polygon' : 'Alt Visuals'}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* ─── LEFT COLUMN: CONTROLS ─── */}
@@ -1037,7 +1374,7 @@ export const SkillCheckPreviewPage: React.FC = () => {
 
           <div className="pt-2 flex justify-between items-center">
 
-            <div className="flex items-center">
+            <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={handleThrow}
@@ -1045,7 +1382,6 @@ export const SkillCheckPreviewPage: React.FC = () => {
               >
                 Lancia pallina
               </button>
-
             </div>
           </div>
 
@@ -1056,139 +1392,343 @@ export const SkillCheckPreviewPage: React.FC = () => {
         {/* ─── RIGHT COLUMN: PREVIEW ─── */}
         <div className="default-card p-3 space-y-3 flex flex-col items-center justify-center">
           <div className="w-full flex items-center justify-between mb-2">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-300">Visuale Skill Check</span>
-            {/* Mini legend or status could go here */}
+            <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-300">
+              {viewMode === 'classic' ? 'Visuale Skill Check' : 'Alt Visuals'}
+            </span>
           </div>
+          {viewMode === 'classic' ? (
+            <>
+              <div className="relative">
+                <svg width={CANVAS_SIZE} height={CANVAS_SIZE} className="bg-slate-950/80 rounded-xl border border-slate-800 shadow-2xl">
+                  <defs>
+                    <clipPath id="quest-clip">
+                      <polygon points={questPolygonAttr} />
+                    </clipPath>
+                  </defs>
 
-          <div className="relative">
-            <svg width={CANVAS_SIZE} height={CANVAS_SIZE} className="bg-slate-950/80 rounded-xl border border-slate-800 shadow-2xl">
-              <defs>
-                <clipPath id="quest-clip">
-                  <polygon points={questPolygonAttr} />
-                </clipPath>
-              </defs>
+                  {/* Axes/Grid */}
+                  <line x1={CENTER_X} y1={0} x2={CENTER_X} y2={CANVAS_SIZE} stroke="rgba(148,163,184,0.1)" strokeWidth={1} />
+                  <line x1={0} y1={CENTER_Y} x2={CANVAS_SIZE} y2={CENTER_Y} stroke="rgba(148,163,184,0.1)" strokeWidth={1} />
 
-              {/* Axes/Grid */}
-              <line x1={CENTER_X} y1={0} x2={CENTER_X} y2={CANVAS_SIZE} stroke="rgba(148,163,184,0.1)" strokeWidth={1} />
-              <line x1={0} y1={CENTER_Y} x2={CANVAS_SIZE} y2={CENTER_Y} stroke="rgba(148,163,184,0.1)" strokeWidth={1} />
+                  {/* Fixed Background Axes (Radial Lines) */}
+                  {stats.map((_, idx) => {
+                    const angle = -Math.PI / 2 + (idx * 2 * Math.PI) / stats.length;
+                    const x2 = CENTER_X + RADIUS * Math.cos(angle);
+                    const y2 = CENTER_Y + RADIUS * Math.sin(angle);
+                    return (
+                      <line
+                        key={`axis-bg-${idx}`}
+                        x1={CENTER_X}
+                        y1={CENTER_Y}
+                        x2={x2}
+                        y2={y2}
+                        stroke="rgba(148,163,184,0.15)"
+                        strokeWidth={1}
+                        strokeDasharray="4 4"
+                      />
+                    );
+                  })}
 
+                  {/* Rings clipped to Q */}
+                  <g clipPath="url(#quest-clip)">
+                    {/* Injury ring */}
+                    <circle
+                      cx={CENTER_X}
+                      cy={CENTER_Y}
+                      r={Math.max(0, RADIUS * ((safePct + injuryPct) / 100))}
+                      className="fill-none stroke-yellow-500/30"
+                      strokeWidth={1}
+                      strokeDasharray="4 2"
+                    />
+                    {/* Safe ring */}
+                    <circle
+                      cx={CENTER_X}
+                      cy={CENTER_Y}
+                      r={Math.max(0, RADIUS * (safePct / 100))}
+                      className="fill-none stroke-emerald-500/30"
+                      strokeWidth={1}
+                      strokeDasharray="4 2"
+                    />
+                  </g>
 
-              {/* Fixed Background Axes (Radial Lines) */}
-              {stats.map((_, idx) => {
-                const angle = -Math.PI / 2 + (idx * 2 * Math.PI) / stats.length;
-                const x2 = CENTER_X + RADIUS * Math.cos(angle);
-                const y2 = CENTER_Y + RADIUS * Math.sin(angle);
-                return (
-                  <line
-                    key={`axis-bg-${idx}`}
-                    x1={CENTER_X}
-                    y1={CENTER_Y}
-                    x2={x2}
-                    y2={y2}
-                    stroke="rgba(148,163,184,0.15)"
-                    strokeWidth={1}
-                    strokeDasharray="4 4"
+                  {/* Quest polygon (transparent fill) */}
+                  <polygon points={questPolygonAttr} fill="rgba(56,189,248,0.08)" stroke="none" />
+
+                  {/* Quest Polygon Stroke */}
+                  <path
+                    d={questSmoothPathD}
+                    fill="none"
+                    stroke="rgb(34, 211, 238)"
+                    strokeWidth="2"
+                    className="drop-shadow-[0_0_8px_rgba(34,211,238,0.6)]"
                   />
-                );
-              })}
 
-              {/* Rings clipped to Q */}
-              <g clipPath="url(#quest-clip)">
-                {/* Injury ring */}
-                <circle
-                  cx={CENTER_X}
-                  cy={CENTER_Y}
-                  r={Math.max(0, RADIUS * ((safePct + injuryPct) / 100))}
-                  className="fill-none stroke-yellow-500/30"
-                  strokeWidth={1}
-                  strokeDasharray="4 2"
-                />
-                {/* Safe ring */}
-                <circle
-                  cx={CENTER_X}
-                  cy={CENTER_Y}
-                  r={Math.max(0, RADIUS * (safePct / 100))}
-                  className="fill-none stroke-emerald-500/30"
-                  strokeWidth={1}
-                  strokeDasharray="4 2"
-                />
-              </g>
+                  {/* Hero polygon Stroke (No Fill) */}
+                  <path
+                    d={heroSmoothPathD}
+                    fill="none"
+                    stroke="rgba(52,211,153,0.95)"
+                    strokeWidth={1.5}
+                    pathLength={1}
+                    strokeDasharray={1}
+                    strokeDashoffset={1 - heroStrokeProgress}
+                  />
 
-              {/* Quest polygon (transparent fill) */}
-              <polygon points={questPolygonAttr} fill="rgba(56,189,248,0.08)" stroke="none" />
-              {/* ... defs, axes ... */}
+                  {/* Fixed Stat Labels */}
+                  {stats.map((stat, idx) => {
+                    const angle = -Math.PI / 2 + (idx * 2 * Math.PI) / stats.length;
+                    const distFactor = 1.15;
+                    const labelX = CENTER_X + RADIUS * Math.cos(angle) * distFactor;
+                    const labelY = CENTER_Y + RADIUS * Math.sin(angle) * distFactor;
+                    const isActive = stat.questValue > 0;
 
+                    return (
+                      <text
+                        key={`lbl-${idx}`}
+                        x={labelX}
+                        y={labelY}
+                        className={`text-[9px] font-bold ${isActive ? 'fill-slate-200' : 'fill-slate-600'}`}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                      >
+                        {stat.name}
+                      </text>
+                    );
+                  })}
 
-              {/* ... Rings, Polygons, Ball ... */}
+                  {/* Ball */}
+                  {ballPosition && (
+                    <circle
+                      cx={ballPosition.x}
+                      cy={ballPosition.y}
+                      r={5}
+                      fill="#f97316"
+                      stroke="#fde68a"
+                      strokeWidth={1}
+                      className="drop-shadow-[0_0_5px_rgba(249,115,22,0.8)]"
+                    />
+                  )}
+                </svg>
+              </div>
 
+              <div className="w-full text-center mt-2 p-2 bg-slate-900/50 rounded border border-slate-800">
+                <div className="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Risultato</div>
+                <div className="flex justify-between items-center px-4">
+                  <div className="text-sm font-bold text-slate-100">{outcomeLabel || '-'}</div>
+                  <div className="font-mono text-xs text-cyan-400">{timer}</div>
+                </div>
+              </div>
 
-              {/* Quest Polygon Stroke */}
-              <path
-                d={questSmoothPathD}
-                fill="none"
-                stroke="rgb(34, 211, 238)"
-                strokeWidth="2"
-                className="drop-shadow-[0_0_8px_rgba(34,211,238,0.6)]"
-              />
-
-              {/* Hero polygon Stroke (No Fill) */}
-              <path
-                d={heroSmoothPathD}
-                fill="none"
-                stroke="rgba(52,211,153,0.95)"
-                strokeWidth={1.5}
-                pathLength={1}
-                strokeDasharray={1}
-                strokeDashoffset={1 - heroStrokeProgress}
-              />
-
-              {/* Fixed Stat Labels */}
-              {stats.map((stat, idx) => {
-                const angle = -Math.PI / 2 + (idx * 2 * Math.PI) / stats.length;
-                const distFactor = 1.15;
-                const labelX = CENTER_X + RADIUS * Math.cos(angle) * distFactor;
-                const labelY = CENTER_Y + RADIUS * Math.sin(angle) * distFactor;
-                const isActive = stat.questValue > 0;
-
-                return (
-                  <text
-                    key={`lbl-${idx}`}
-                    x={labelX}
-                    y={labelY}
-                    className={`text-[9px] font-bold ${isActive ? 'fill-slate-200' : 'fill-slate-600'}`}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                  >
-                    {stat.name}
-                  </text>
-                );
-              })}
-
-              {/* Ball */}
-              {ballPosition && (
-                <circle cx={ballPosition.x} cy={ballPosition.y} r={5} fill="#f97316" stroke="#fde68a" strokeWidth={1} className="drop-shadow-[0_0_5px_rgba(249,115,22,0.8)]" />
+              {/* Log */}
+              {log.length > 0 && (
+                <div className="w-full text-[10px] text-slate-500 font-mono bg-black/20 p-2 rounded max-h-20 overflow-y-auto">
+                  {log.map((entry, idx) => (
+                    <div key={idx} className="mb-0.5 border-b border-slate-800/30 pb-0.5 last:border-0">
+                      {entry}
+                    </div>
+                  ))}
+                </div>
               )}
-            </svg>
-          </div >
+            </>
+          ) : (
+            <div className="w-full space-y-3">
+              {/* Dual Radar */}
+              <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3 shadow-inner space-y-2">
+                <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.2em] text-slate-400">
+                  <span>Dual Radar Overlay</span>
+                  <span className="text-emerald-300 font-mono">{heroDelta >= 0 ? '+' : ''}{heroDelta.toFixed(1)}%</span>
+                </div>
+                <svg width={MINI_RADAR_SIZE} height={MINI_RADAR_SIZE} className="mx-auto">
+                  {[0, 25, 50, 75, 100].map((pct) => (
+                    <circle
+                      key={pct}
+                      cx={MINI_RADAR_CENTER.x}
+                      cy={MINI_RADAR_CENTER.y}
+                      r={(pct / 100) * MINI_RADAR_RADIUS}
+                      className="fill-none stroke-slate-700"
+                      strokeDasharray="4 3"
+                      strokeWidth={0.5}
+                    />
+                  ))}
+                  {stats.map((_, idx) => {
+                    const angle = -Math.PI / 2 + (idx * 2 * Math.PI) / Math.max(1, stats.length);
+                    const x2 = MINI_RADAR_CENTER.x + MINI_RADAR_RADIUS * Math.cos(angle);
+                    const y2 = MINI_RADAR_CENTER.y + MINI_RADAR_RADIUS * Math.sin(angle);
+                    return (
+                      <line
+                        key={`mini-axis-${idx}`}
+                        x1={MINI_RADAR_CENTER.x}
+                        y1={MINI_RADAR_CENTER.y}
+                        x2={x2}
+                        y2={y2}
+                        className="stroke-slate-700/60"
+                        strokeWidth={0.5}
+                      />
+                    );
+                  })}
+                  <polygon points={miniQuestAttr} className="fill-cyan-400/10 stroke-cyan-300/70" strokeWidth={1.5} />
+                  <polygon points={miniHeroAttr} className="fill-emerald-400/10 stroke-emerald-300/80" strokeWidth={1.5} />
+                </svg>
+              </div>
 
-          <div className="w-full text-center mt-2 p-2 bg-slate-900/50 rounded border border-slate-800">
-            <div className="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Risultato</div>
-            <div className="flex justify-between items-center px-4">
-              <div className="text-sm font-bold text-slate-100">{outcomeLabel || '-'}</div>
-              <div className="font-mono text-xs text-cyan-400">{timer}</div>
-            </div>
-          </div>
-
-          {/* Log */}
-          {
-            log.length > 0 && (
-              <div className="w-full text-[10px] text-slate-500 font-mono bg-black/20 p-2 rounded max-h-20 overflow-y-auto">
-                {log.map((entry, idx) => (
-                  <div key={idx} className="mb-0.5 border-b border-slate-800/30 pb-0.5 last:border-0">{entry}</div>
+              {/* Dual Gauges */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {[
+                  { label: 'Quest Difficulty', value: questAverage, accent: 'from-cyan-400/60 to-cyan-500/20' },
+                  { label: 'Hero Readiness', value: heroAverage, accent: 'from-emerald-400/60 to-emerald-500/20' },
+                ].map((gauge) => (
+                  <div key={gauge.label} className="bg-slate-950/70 border border-slate-800 rounded-xl p-3">
+                    <div className="text-[10px] uppercase tracking-[0.2em] text-slate-400 mb-1">{gauge.label}</div>
+                    <div className="h-32 bg-slate-900/70 rounded-lg relative overflow-hidden">
+                      <div className="absolute inset-x-3 bottom-3 top-3 flex flex-col justify-end">
+                        <div className="flex-1 bg-slate-800/60 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full bg-linear-to-t ${gauge.accent}`}
+                            style={{ height: `${clampPercentage(gauge.value)}%` }}
+                          />
+                        </div>
+                      </div>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-2xl font-semibold text-slate-200">{clampPercentage(gauge.value).toFixed(0)}%</span>
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
-            )
-          }
+
+              {/* Dual Ring + Risk Stripe */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3 flex flex-col items-center gap-2">
+                  <div className="text-[10px] uppercase tracking-[0.2em] text-slate-400">Dual Arc</div>
+                  {(() => {
+                    const donutRadius = 60;
+                    const circumference = 2 * Math.PI * donutRadius;
+                    const questDash = (clampPercentage(questAverage) / 100) * circumference;
+                    const heroDash = (clampPercentage(heroAverage) / 100) * circumference;
+                    return (
+                      <svg width={160} height={160} className="-rotate-90">
+                        <circle
+                          cx={80}
+                          cy={80}
+                          r={donutRadius}
+                          className="fill-none stroke-slate-800"
+                          strokeWidth={10}
+                        />
+                        <circle
+                          cx={80}
+                          cy={80}
+                          r={donutRadius}
+                          className="fill-none stroke-cyan-300"
+                          strokeWidth={6}
+                          strokeDasharray={`${questDash} ${circumference - questDash}`}
+                          strokeLinecap="round"
+                        />
+                        <circle
+                          cx={80}
+                          cy={80}
+                          r={donutRadius - 10}
+                          className="fill-none stroke-emerald-300"
+                          strokeWidth={6}
+                          strokeDasharray={`${heroDash} ${circumference - heroDash}`}
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    );
+                  })()}
+                  <div className="text-center">
+                    <div className="text-sm font-semibold text-slate-100">
+                      Δ {heroDelta >= 0 ? '+' : ''}{heroDelta.toFixed(1)}%
+                    </div>
+                    <div className="text-[10px] text-slate-500 uppercase tracking-[0.2em]">Hero vs Quest</div>
+                  </div>
+                </div>
+
+                <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400">Risk Stripe</span>
+                    <div className="text-right">
+                      <div className="text-[10px] font-mono text-slate-400">Sim roll: {resolvedAltRoll.value?.toFixed(1) ?? '—'}%</div>
+                      <div className="text-[10px] font-mono text-slate-500">Preview: {previewRoll}%</div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={runAltSimulation}
+                    className="w-full text-[10px] uppercase tracking-[0.2em] text-emerald-200 border border-emerald-500/40 rounded-full py-1 bg-emerald-500/10 hover:bg-emerald-500/20 transition"
+                  >
+                    Simula nuovo roll
+                  </button>
+                  <div className="h-36 relative rounded-xl overflow-hidden border border-slate-800">
+                    <div className="absolute inset-0 flex flex-col">
+                      <div className="flex-1" style={{ flexBasis: `${safePct}%`, background: 'rgba(16,185,129,0.2)' }} />
+                      <div className="flex-1" style={{ flexBasis: `${injuryPct}%`, background: 'rgba(234,179,8,0.25)' }} />
+                      <div className="flex-1" style={{ flexBasis: `${deathPct}%`, background: 'rgba(248,113,113,0.25)' }} />
+                    </div>
+                    <div
+                      className="absolute inset-x-3"
+                      style={{ bottom: `${previewRoll}%` }}
+                    >
+                      <div className="h-0.5 w-full bg-cyan-300/50" />
+                    </div>
+                    {resolvedAltRoll.value !== null && (
+                      <div
+                        className="absolute left-0 right-0 mx-auto w-full flex items-center justify-center"
+                        style={{ bottom: `${altBallProgress * 100}%` }}
+                      >
+                        <div className="w-4 h-4 rounded-full bg-amber-300 border border-amber-100 shadow-[0_0_10px_rgba(251,191,36,0.6)]" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-[11px] text-center uppercase tracking-[0.2em]">
+                    Preview: <span className="text-amber-300">{rollZone.toUpperCase()}</span>
+                    {resolvedAltRoll.value !== null && (
+                      <>
+                        {' '}• Last roll:{' '}
+                        <span
+                          className={
+                            resolvedAltRoll.result === 'success' ? 'text-emerald-300' : 'text-rose-300'
+                          }
+                        >
+                          {resolvedAltRoll.result.toUpperCase()}
+                        </span>{' '}
+                        +{' '}
+                        <span
+                          className={
+                            resolvedAltRoll.zone === 'safe'
+                              ? 'text-emerald-300'
+                              : resolvedAltRoll.zone === 'injury'
+                              ? 'text-amber-300'
+                              : 'text-rose-300'
+                          }
+                        >
+                          {resolvedAltRoll.zone.toUpperCase()}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Contribution List */}
+              <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3">
+                <div className="text-[10px] uppercase tracking-[0.2em] text-slate-400 mb-2">Stat Contributions</div>
+                <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                  {contributions.map((entry) => (
+                    <div key={entry.id} className="flex items-center gap-2">
+                      <div className="w-20 text-[10px] uppercase tracking-widest text-slate-300">{entry.name}</div>
+                      <div className="flex-1 h-3 bg-slate-800/70 rounded">
+                        <div
+                          className="h-full rounded bg-linear-to-r from-emerald-500/70 to-emerald-300/60"
+                          style={{ width: `${entry.heroRel * 100}%` }}
+                        />
+                      </div>
+                      <div className="w-16 text-right text-[10px] font-mono text-slate-400">{entry.heroVal.toFixed(0)}%</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

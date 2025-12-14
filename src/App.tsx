@@ -44,6 +44,9 @@ const ArchetypeTestingLab = lazy(() =>
 const SkillCheckPreviewPage = lazy(() =>
   import('./ui/testing/SkillCheckPreviewPage').then((m) => ({ default: m.SkillCheckPreviewPage }))
 );
+const VerbDetailSandbox = lazy(() =>
+  import('./ui/testing/VerbDetailSandbox').then((m) => ({ default: m.default }))
+);
 
 type Tab =
   | 'balancer'
@@ -75,7 +78,8 @@ type Tab =
   | 'tacticalLab'
   | 'idleVillage'
   | 'idleVillageConfig'
-  | 'skillCheckPreview';
+  | 'skillCheckPreview'
+  | 'verbDetailSandbox';
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('balancer');
@@ -197,6 +201,13 @@ function App() {
       {activeTab === 'idleVillageConfig' && (
         <ErrorBoundary componentName="Idle Village Config">
           <IdleVillageConfigRoute />
+        </ErrorBoundary>
+      )}
+      {activeTab === 'verbDetailSandbox' && (
+        <ErrorBoundary componentName="Verb Detail Sandbox">
+          <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Verb Detail Sandbox…</div>}>
+            <VerbDetailSandbox />
+          </Suspense>
         </ErrorBoundary>
       )}
       {activeTab === 'mockArcaneTech' && (

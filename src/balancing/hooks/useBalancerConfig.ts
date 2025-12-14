@@ -95,7 +95,15 @@ export function useBalancerConfig(): UseBalancerConfigReturn {
   // === STAT CRUD ===
   const addStat = useCallback(
     (cardId: string, stat: Omit<StatDefinition, 'isCore'>): ValidationResult => {
-      const fullStat: StatDefinition = { ...stat, isCore: false };
+      const autoBaseStat =
+        stat.baseStat ?? (!stat.isDerived && !stat.isPenalty);
+      const autoDetrimental = stat.isDetrimental ?? !!stat.isPenalty;
+      const fullStat: StatDefinition = {
+        ...stat,
+        isCore: false,
+        baseStat: autoBaseStat,
+        isDetrimental: autoDetrimental,
+      };
 
       const result = StatDefinitionSchema.safeParse(fullStat);
       if (!result.success) {

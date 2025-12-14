@@ -37,7 +37,35 @@ All weights are empirically validated through Monte Carlo simulations:
 
 ## Core Concepts
 
-### 1. Baseline Stats
+### 1. Base Stat Kit (Human Growth + Quests)
+
+The **Base Stat Kit** identifies which stats belong to the default human template.  
+These stats are:
+- available when generating or growing human characters,
+- exposed to quest/skill-check pools (e.g., Skill Check Lab),
+- exported/imported via the `baseStat` flag in balancing config.
+
+Designers can toggle the `baseStat` flag per stat in the Balancer UI. Any stat without the flag is ignored when building human kits or quest radar charts.
+
+#### Flag Reference
+
+| Flag | Meaning | Typical Stats | Notes |
+|------|---------|---------------|-------|
+| `baseStat: true` | Human growth/quest pool | `hp`, `damage`, `txc`, `evasion`, `baseHitChance`, `critChance`, `critMult`, `critTxCBonus` | Level-up + quest checks use solo queste stat. |
+| `baseStat: false` (equip/bonus) | Solo da equip, talenti, o razze speciali | `ward`, `armor`, `resistance`, `armorPen`, `penPercent`, `lifesteal`, `regen` | Non entrano nelle quest umane; restano editabili per bozze razziali. |
+| `isDetrimental: true` (“Hero Only”) | Benefici per l’eroe ma dannosi nelle quest | `failChance`, `failMult`, `failTxCMalus` (tutte anche `isPenalty`) | Filtrate dal kit umano; visibili solo nelle build giocatore. |
+
+Derived stats (`isDerived === true`) vengono sempre trattate come `baseStat: false`, indipendentemente dal flag manuale.
+
+#### Single Source of Truth
+
+- **TypeScript defaults**: `src/balancing/config/defaultConfig.ts`  
+- **JSON di bootstrap/import**: `src/balancing/config/balancer-default-config.json`
+
+Entrambi contengono i flag aggiornati; il `BalancerConfigStore` applica `mergeWithDefaults + applyStatFlagDefaults` per garantire che qualsiasi import/export mantenga la semantica.  
+Se servono modifiche senza passare dalla UI, editare **entrambi** i file sopra (o almeno il JSON) per evitare divergenze tra il reset iniziale e il salvataggio locale.
+
+### 2. Baseline Stats
 The "Standard Enemy" used for all calculations:
 ```typescript
 BASELINE_STATS = {
@@ -50,13 +78,13 @@ BASELINE_STATS = {
 }
 ```
 
-### 2. Derived Stats
+### 3. Derived Stats
 Stats that are CALCULATED from other stats, not directly set:
 -   `hitChance` = `TxC + 50 - Evasion` (clamped 1-100%)
 -   `effectiveDamage` = Damage after mitigation
 -   `attacksPerKo` = `HTK / (HitChance/100)`
 
-### 3. Configuration Flags
+### 4. Configuration Flags
 Combat behavior can be customized via flags:
 -   `configFlatFirst`: Apply Armor before or after Resistance?
 -   `configApplyBeforeCrit`: Apply Mitigation before or after Crit?

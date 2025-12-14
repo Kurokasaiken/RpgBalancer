@@ -20,6 +20,7 @@ When in doubt:
 - Check **IMPLEMENTED_PLAN.md** to see what exists.
 - Check **MASTER_PLAN.md** to see what is planned.
 - Align with **PROJECT_PHILOSOPHY.md** before writing new code.
+- **Se qualcosa non è chiaro, chiedi subito chiarimenti all'utente / designer di riferimento** prima di procedere.
 
 ---
 

@@ -133,6 +133,29 @@ Per evitare di hardcodare la prima ora dentro l'engine o la UI, la timeline FTUE
 - **Teaser di sistemi futuri:**
   - elementi presenti nella config (es. district avanzati, eventi di stagione) marcati come locked/late-game, solo mostrati come icona/tooltip.
 
+### 3.2 Modello di Presentazione: Icone sulla Mappa + Tooltips
+
+Per aderire allo stile \"Cultist Simulator\" desiderato:
+
+- **VerbCard come icone mappa:**
+  - ogni job/quest/evento è rappresentato da un'icona posizionata sulla mappa/tableau;
+  - le icone sono veri e propri slot di drop: trascini il token del personaggio sull'icona per schedulare l'attività.
+- **Progress bar integrata nell'icona:**
+  - il frame/contorno dell'icona funge da barra di avanzamento (ring che si riempie mentre l'attività procede);
+  - lo stato (idle → in corso → completato) è leggibile senza aprire pannelli.
+- **Stati iconici configurabili:**
+  - `ready`, `busy`, `locked`, `cooldown`, `danger` devono essere togglati via config (es. quest disponibili solo ogni X minuti, job bloccati finché non costruisci un building);
+  - injury/death/rischio modificano l'icona del personaggio o applicano badge/overlay direttamente sui token.
+- **Tooltips obbligatori su ogni icona:**
+  - hover/click su job/quest mostra un tooltip con: reward (oro/risorse/XP), costi, durata, rischio injury/death, requisiti (equip, stat minime), disponibilità (es. \"torna tra 3 min\");
+  - i tooltip dei personaggi mostrano stat, status (fatigue, injury) e bonus da equip;
+  - tutti i testi pescano da config (niente copy hardcodato nel componente).
+- **Feedback minimo senza animazioni complesse:**
+  - completamento = glow/colore sull'icona;
+  - fallimento/injury = bordo che lampeggia rosso + icona cerotto/teschio.
+
+Questa presentazione evita la UI \"lista di VerbCard\" e rende la prima ora più leggibile/veloce, pur restando 100% config-driven.
+
 ---
 
 ## 4. Demo Strategy (Itch.io & Steam Next Fest)
