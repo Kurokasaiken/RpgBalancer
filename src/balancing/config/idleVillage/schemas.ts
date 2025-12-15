@@ -112,6 +112,25 @@ export const GlobalRulesSchema = z.object({
   defaultRandomSeed: z.number().optional(),
 });
 
+export const OverlayWidgetSchema = z.object({
+  id: z.string().min(1),
+  enabled: z.boolean(),
+  order: z.number().int().min(0),
+  config: z.record(z.string(), z.unknown()).optional(),
+});
+
+export const OverlaySettingsSchema = z.object({
+  enabled: z.boolean(),
+  defaultPosition: z.enum(['top-left', 'top-right', 'bottom-left', 'bottom-right']),
+  defaultSize: z.enum(['compact', 'medium', 'wide']),
+  defaultZoom: z.number().min(0.5).max(2.0),
+  alwaysOnTop: z.boolean(),
+  transparency: z.boolean(),
+  enabledWidgets: z.array(OverlayWidgetSchema),
+  autoHideTimeoutSeconds: z.number().int().min(0),
+  showSystemTrayIcon: z.boolean(),
+});
+
 export const IdleVillageConfigSchema = z.object({
   version: z.string().min(1),
   resources: z.record(z.string(), ResourceDefinitionSchema),
@@ -121,6 +140,7 @@ export const IdleVillageConfigSchema = z.object({
   founders: z.record(z.string(), FounderPresetSchema),
   variance: ActivityVarianceConfigSchema,
   globalRules: GlobalRulesSchema,
+  overlaySettings: OverlaySettingsSchema,
 });
 
 export type IdleVillageConfigSchemaType = z.infer<typeof IdleVillageConfigSchema>;

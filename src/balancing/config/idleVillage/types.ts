@@ -209,6 +209,42 @@ export interface GlobalRules {
   defaultRandomSeed?: number;
 }
 
+export interface OverlaySettings {
+  /** Whether overlay mode is enabled */
+  enabled: boolean;
+  
+  /** Default overlay position on screen */
+  defaultPosition: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+  
+  /** Default overlay size preset */
+  defaultSize: 'compact' | 'medium' | 'wide';
+  
+  /** Default zoom level (0.5 to 2.0) */
+  defaultZoom: number;
+  
+  /** Whether overlay is always-on-top by default */
+  alwaysOnTop: boolean;
+  
+  /** Whether overlay has transparency by default */
+  transparency: boolean;
+  
+  /** Which widgets are shown by default in overlay */
+  enabledWidgets: OverlayWidget[];
+  
+  /** Auto-hide timeout in seconds (0 = never auto-hide) */
+  autoHideTimeoutSeconds: number;
+  
+  /** Whether to show system tray icon */
+  showSystemTrayIcon: boolean;
+}
+
+export interface OverlayWidget {
+  id: string;
+  enabled: boolean;
+  order: number;
+  config?: Record<string, unknown>;
+}
+
 export interface IdleVillageConfig {
   version: string;
   resources: Record<string, ResourceDefinition>;
@@ -218,6 +254,7 @@ export interface IdleVillageConfig {
   founders: Record<string, FounderPreset>;
   variance: ActivityVarianceConfig;
   globalRules: GlobalRules;
+  overlaySettings: OverlaySettings;
 }
 
 export interface IdleVillageConfigSnapshot {

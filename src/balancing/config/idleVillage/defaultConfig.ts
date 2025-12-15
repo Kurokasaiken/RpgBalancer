@@ -308,4 +308,21 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
       system: '#38BDF8',
     },
   },
+
+  overlaySettings: {
+    enabled: true,
+    defaultPosition: 'top-right',
+    defaultSize: 'medium',
+    defaultZoom: 1.0,
+    alwaysOnTop: true,
+    transparency: false,
+    enabledWidgets: [
+      { id: 'resources', enabled: true, order: 0 },
+      { id: 'activities', enabled: true, order: 1 },
+      { id: 'time', enabled: true, order: 2 },
+      { id: 'villagers', enabled: true, order: 3 },
+    ],
+    autoHideTimeoutSeconds: 0,
+    showSystemTrayIcon: true,
+  },
 };
