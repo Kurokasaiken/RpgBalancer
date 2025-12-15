@@ -36,7 +36,7 @@ const mockResidents: ResidentState[] = [
   { id: 'Worker-B', status: 'injured', fatigue: 70 },
 ];
 
-const residentAspects: Record<string, string[]> = {
+const residentStatTags: Record<string, string[]> = {
   Founder: ['reason', 'lantern', 'discipline'],
   'Scout-A': ['moth', 'edge', 'passion'],
   'Worker-B': ['forge', 'strength'],
@@ -46,16 +46,16 @@ const SLOT_BLUEPRINT: VerbSlotState[] = [
   {
     id: 'slot_leader',
     label: 'Leader',
-    aspectHint: 'Needs Reason / Lantern',
-    requiredAspect: 'reason',
+    statHint: 'Needs Reason / Lantern',
+    requiredStatId: 'reason',
     required: true,
     assignedResidentId: null,
   },
   {
     id: 'slot_support',
     label: 'Support',
-    aspectHint: 'Prefers Passion / Moth',
-    requiredAspect: 'moth',
+    statHint: 'Prefers Passion / Moth',
+    requiredStatId: 'moth',
     required: false,
     assignedResidentId: null,
   },
@@ -204,8 +204,8 @@ export default function VerbDetailSandbox() {
         return;
       }
 
-      const aspects = residentAspects[residentId] ?? [];
-      if (targetSlot.requiredAspect && !aspects.includes(targetSlot.requiredAspect)) {
+      const statTags = residentStatTags[residentId] ?? [];
+      if (targetSlot.requiredStatId && !statTags.includes(targetSlot.requiredStatId)) {
         setDropFeedback('invalid');
         return;
       }

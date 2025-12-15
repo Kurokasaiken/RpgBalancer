@@ -21,7 +21,16 @@
 
 ## 🟡 Important (Do Soon)
 
+### Skill Check Preview – Alt Visuals Cleanup
+
+- [ ] Replace the remaining `ALT_VISUAL_CARDS` grid with `ALT_VISUAL_SKINS`, leveraging the new `buildSkinGeometry` helper for card rendering.
+- [ ] Rewrite `renderAltVisualSvg` to consume `AltVisualSkin` data instead of the obsolete `AltVisualMeta/renderType` paths; remove the legacy render-type switch once complete.
+- [ ] Reintroduce `altBallFrameRef` (or drop the unused animation effect) and fix the `useEffect`/`useMemo` dependency lists (`altRollInfo`, `altRollAnimKey`, `deltaEntries`, `questAverage`, `heroAverage`) so ESLint is satisfied.
+- [ ] Implement the requested proportional risk stripes: yellow (injury) and red (death) vertical bands clipped to the quest polygon with heights tied to the configured percentages.
+- [ ] Remove the unused helpers (`computeAverage`, `computePolygonArea`, etc.) once the new renderer uses them or relocate them to a shared module.
+
 3. **WeightBasedCreator Abstraction**
+
    - Generic component for ALL entity creators
    - Foundation for Item/Character creators
    - **Time:** 6-8 hours

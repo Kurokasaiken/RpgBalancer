@@ -11,9 +11,9 @@ export interface VerbDetailAssignment {
 export interface VerbSlotState {
   id: string;
   label: string;
-  aspectHint?: string;
+  statHint?: string;
   required?: boolean;
-  requiredAspect?: string;
+  requiredStatId?: string;
   assignedResidentId?: string | null;
 }
 
@@ -155,7 +155,7 @@ export default function VerbDetailCard({
                       {slot.required && <span className="text-amber-300 text-[10px] uppercase tracking-[0.2em]">Required</span>}
                     </div>
                     <div className="text-[10px] uppercase tracking-[0.25em] text-slate-500">
-                      {slot.aspectHint ?? 'Any Aspect'}
+                      {slot.statHint ?? 'Any Stat'}
                     </div>
                     <div
                       className={`mt-2 flex h-16 items-center justify-center rounded-lg border text-sm font-medium ${

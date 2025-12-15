@@ -7,6 +7,7 @@ import type {
   ActivityDefinition,
   IdleVillageConfig,
 } from '../../../balancing/config/idleVillage/types';
+import type { StatBlock } from '../../../balancing/types';
 
 export type VillageTimeUnit = number;
 
@@ -36,6 +37,21 @@ export interface ResidentState {
   fatigue: number;
   /** If injured, time when the resident becomes available again. */
   injuryRecoveryTime?: VillageTimeUnit;
+  /**
+   * Optional reference to a stat preset coming from the Balancer config/presets.
+   * Enables config-first linkage between Idle Village residents and Balancer archetypes.
+   */
+  statProfileId?: string;
+  /**
+   * Snapshot of the resident's stats (partial to avoid forcing every field).
+   * Populated via Balancer exports to avoid recomputing during Idle Village runtime.
+   */
+  statSnapshot?: Partial<StatBlock>;
+  /**
+   * Cached tags/labels that describe the resident's strongest stats (e.g. ['reason','lantern']).
+   * Used by assignment UIs to match slot requirements without recalculating against the full StatBlock.
+   */
+  statTags?: string[];
 }
 
 export interface QuestOffer {

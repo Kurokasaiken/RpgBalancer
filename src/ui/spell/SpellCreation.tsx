@@ -20,6 +20,9 @@ import { upsertSpell } from '../../balancing/spellStorage';
 import { useDefaultStorage } from '../../shared/hooks/useDefaultStorage';
 import { ALL_SPELL_STATS } from '../../balancing/spellStatDefinitions';
 
+type StatStep = { value: number; weight: number };
+type StatStepsRecord = Record<string, StatStep[]>;
+
 export const SpellCreation: React.FC = () => {
     // Use custom hooks for state management
     const {
@@ -89,11 +92,24 @@ export const SpellCreation: React.FC = () => {
     };
 
     // Stat step management
-    const getStatSteps = (field: string) => statSteps[field] || [{ value: (spell as any)[field] || 0, weight: 1 }];
+    const getSpellNumericValue = (field: string): number => {
+        const value = spell[field as keyof Spell];
+        return typeof value === 'number' ? value : 0;
+    };
+
+    const getDefaultSteps = (field: string): StatStep[] => [{
+        value: getSpellNumericValue(field),
+        weight: 1,
+    }];
+
+    const ensureStatSteps = (record: StatStepsRecord, field: string): StatStep[] =>
+        record[field] ?? getDefaultSteps(field);
+
+    const getStatSteps = (field: string): StatStep[] => ensureStatSteps(statSteps, field);
 
     const updateStatStep = (field: string, idx: number, step: { value: number; weight: number }) => {
         setStatSteps(prev => {
-            const steps = [...(prev[field] || [{ value: (spell as any)[field] || 0, weight: 1 }])];
+            const steps = [...ensureStatSteps(prev, field)];
             steps[idx] = step;
             return { ...prev, [field]: steps };
         });
@@ -105,7 +121,7 @@ export const SpellCreation: React.FC = () => {
 
     const handleSelectTick = (field: string, idx: number) => {
         setSelectedTicks(prev => ({ ...prev, [field]: idx }));
-        const steps = statSteps[field] || [{ value: (spell as any)[field] || 0, weight: 1 }];
+        const steps = ensureStatSteps(statSteps, field);
         if (steps[idx]) {
             updateField(field as keyof Spell, steps[idx].value);
         }
@@ -113,7 +129,7 @@ export const SpellCreation: React.FC = () => {
 
     const addStatStep = (field: string, idx: number) => {
         setStatSteps(prev => {
-            const steps = [...(prev[field] || [{ value: (spell as any)[field] || 0, weight: 1 }])];
+            const steps = [...ensureStatSteps(prev, field)];
             steps.splice(idx + 1, 0, { value: 0, weight: 1 });
             return { ...prev, [field]: steps };
         });
@@ -121,7 +137,7 @@ export const SpellCreation: React.FC = () => {
 
     const removeStatStep = (field: string, idx: number) => {
         setStatSteps(prev => {
-            const steps = [...(prev[field] || [{ value: (spell as any)[field] || 0, weight: 1 }])];
+            const steps = [...ensureStatSteps(prev, field)];
             if (steps.length > 3) steps.splice(idx, 1);
             return { ...prev, [field]: steps };
         });
@@ -134,7 +150,9 @@ export const SpellCreation: React.FC = () => {
             if (savedBaseline) {
                 return JSON.parse(savedBaseline);
             }
-        } catch { }
+        } catch (error) {
+            console.warn('Failed to read userSpellBaseline:', error);
+        }
         return getBaselineSpell();
     };
 
@@ -162,7 +180,7 @@ export const SpellCreation: React.FC = () => {
         return (effectPercent * damageBase * spell.eco).toFixed(1);
     };
 
-    const updateField = (field: keyof Spell, value: any) => {
+    const updateField = <K extends keyof Spell>(field: K, value: Spell[K]) => {
         setSpell(prev => ({ ...prev, [field]: value }));
     };
 
@@ -174,14 +192,18 @@ export const SpellCreation: React.FC = () => {
         // Get the default spell (basic attack) for comparison
         const defaultSpell = DEFAULT_SPELLS[0];
         // Build a minimal spell object keeping only fields that differ from defaults
-        const minimalSpell: Partial<Spell> = { id: spell.id, name: spell.name, type: spell.type };
+        const minimalSpell: Partial<Record<keyof Spell, Spell[keyof Spell]>> = {
+            id: spell.id,
+            name: spell.name,
+            type: spell.type,
+        };
         (Object.keys(spell) as (keyof Spell)[]).forEach((key) => {
             if (key === 'id' || key === 'name' || key === 'type') return; // always keep these
 
             const value = spell[key];
-            const defaultValue = (defaultSpell as any)[key];
+            const defaultValue = defaultSpell[key];
             if (value !== undefined && value !== defaultValue) {
-                (minimalSpell as any)[key] = value;
+                minimalSpell[key] = value;
             }
         });
         const finalSpell = minimalSpell as Spell;
@@ -312,8 +334,16 @@ export const SpellCreation: React.FC = () => {
                                 )}
                                 {Object.entries(spell)
                                     .filter(([key, value]) => {
-                                        const defaultSpell = DEFAULT_SPELLS[0];
-                                        return key !== 'id' && key !== 'name' && key !== 'type' && key !== 'effect' && key !== 'targetStat' && value !== undefined && value !== (defaultSpell as any)[key] && typeof value !== 'object';
+                                        const typedKey = key as keyof Spell;
+                                        const defaultValue = DEFAULT_SPELLS[0][typedKey];
+                                        return typedKey !== 'id'
+                                            && typedKey !== 'name'
+                                            && typedKey !== 'type'
+                                            && typedKey !== 'effect'
+                                            && typedKey !== 'targetStat'
+                                            && value !== undefined
+                                            && value !== defaultValue
+                                            && typeof value !== 'object';
                                     })
                                     .map(([key, value]) => (
                                         <li key={key} className="flex justify-between items-center hover:bg-cyan-500/10 p-0.5 rounded transition-colors border-b border-cyan-500/10">

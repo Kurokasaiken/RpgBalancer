@@ -142,8 +142,19 @@ export function OverlayModeProvider({ children, initialSettings }: OverlayModePr
     }, []),
 
     resetToDefaults: useCallback(() => {
-      setState(defaultState);
-    }, [defaultState]),
+      setState(prev => ({
+        ...prev,
+        isActive: false,
+        position: initialSettings?.defaultPosition ?? 'top-right',
+        size: initialSettings?.defaultSize ?? 'medium',
+        zoom: initialSettings?.defaultZoom ?? 1.0,
+        alwaysOnTop: initialSettings?.alwaysOnTop ?? true,
+        transparency: initialSettings?.transparency ?? false,
+        widgets: initialSettings?.enabledWidgets ?? [],
+        autoHideTimeoutSeconds: initialSettings?.autoHideTimeoutSeconds ?? 0,
+        showSystemTrayIcon: initialSettings?.showSystemTrayIcon ?? true,
+      }));
+    }, [initialSettings]),
   };
 
   return (
@@ -153,6 +164,7 @@ export function OverlayModeProvider({ children, initialSettings }: OverlayModePr
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useOverlayMode(): { state: OverlayState; actions: OverlayActions } {
   const context = useContext(OverlayModeContext);
   if (!context) {

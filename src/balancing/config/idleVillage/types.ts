@@ -24,6 +24,27 @@ export interface ResourceDeltaDefinition {
   amountFormula: string;
 }
 
+export interface StatRequirement {
+  /**
+   * Resident must possess all of these stat tags.
+   * Example: ["discipline","lantern"].
+   */
+  allOf?: string[];
+  /**
+   * Resident must match at least one of these tags.
+   * Example: ["edge","moth"].
+   */
+  anyOf?: string[];
+  /**
+   * Resident must not include any of these tags.
+   */
+  noneOf?: string[];
+  /**
+   * Optional human-readable label for UI hinting.
+   */
+  label?: string;
+}
+
 /**
  * Generic activity definition. Covers jobs, quests, training, shop actions, etc.
  * Semantic meaning is derived from tags + resolutionEngineId, not from enums.

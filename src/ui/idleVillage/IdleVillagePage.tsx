@@ -40,6 +40,29 @@ const HUNGER_FX_KEYFRAMES = `
     opacity: 0;
   }
 }
+@keyframes verbResourceEject {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(72px, -48px, 0) scale(0.65);
+    opacity: 0;
+  }
+}
+@keyframes verbResourceAttract {
+  0% {
+    transform: translate3d(-56px, 48px, 0) scale(0.6);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 1;
+  }
+}
 `;
 
 // Stub resident for testing

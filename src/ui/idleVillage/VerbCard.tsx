@@ -159,9 +159,6 @@ export default function VerbCard({
           {deadlineLabel && (
             <div className="mt-1 text-[11px] font-mono text-amber-200">{deadlineLabel}</div>
           )}
-          <div className="text-[9px] uppercase tracking-[0.3em] text-slate-400">
-            {state === 'running' ? 'Running' : state === 'completed' ? 'Complete' : 'Idle'}
-          </div>
           {tooltip && (
             <div className="pointer-events-none absolute -bottom-8 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full border border-slate-700 bg-slate-900 px-2 py-0.5 text-[9px] uppercase tracking-[0.25em] text-slate-200 opacity-0 transition group-hover:opacity-100">
               {tooltip}

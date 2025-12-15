@@ -22,20 +22,240 @@ interface Point {
   y: number;
 }
 
-
-
-const CANVAS_SIZE = 360;
+const CANVAS_SIZE = 300;
 const CENTER_X = CANVAS_SIZE / 2;
 const CENTER_Y = CANVAS_SIZE / 2;
 const RADIUS = 120;
-const QUEST_MIN_BASE_RATIO = 0.6;
+const ALT_CARD_WIDTH = 240;
+const ALT_CARD_HEIGHT = 220;
+const ALT_CARD_CENTER = { x: ALT_CARD_WIDTH / 2, y: ALT_CARD_HEIGHT / 2 };
+const ALT_CARD_SCALE = (Math.min(ALT_CARD_WIDTH, ALT_CARD_HEIGHT) * 0.42) / RADIUS;
 
-const MINI_RADAR_SIZE = 220;
-const MINI_RADAR_RADIUS = 90;
-const MINI_RADAR_CENTER: Point = {
-  x: MINI_RADAR_SIZE / 2,
-  y: MINI_RADAR_SIZE / 2,
-};
+type AltStructure = 'solo' | 'dual' | 'triple' | 'quattro' | 'epic';
+
+interface AltVisualSkin {
+  id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  structure: AltStructure;
+  statCount: number;
+  accent: string;
+  style: 'triangle' | 'flame' | 'drop' | 'column' | 'diamond' | 'lens' | 'petal' | 'bridge' | 'soft-triangle' | 'triskel' | 'tri-flower' | 'poker' | 'wind-rose' | 'elastic' | 'pentagon' | 'star' | 'pentaflower';
+}
+
+const ALT_VISUAL_SKINS: AltVisualSkin[] = [
+  {
+    id: 'solo-triangle',
+    title: 'Linea Triangolo',
+    subtitle: '1 Stat · Prova lineare',
+    description: 'Triangolo verticale che cresce con il valore.',
+    structure: 'solo',
+    statCount: 1,
+    accent: 'from-cyan-400/30 to-blue-500/20',
+    style: 'triangle',
+  },
+  {
+    id: 'solo-flame',
+    title: 'Fiamma Radiale',
+    subtitle: '1 Stat · Skin fiamma',
+    description: 'Colpo di calore che pulsa verso l’alto.',
+    structure: 'solo',
+    statCount: 1,
+    accent: 'from-amber-400/30 to-rose-500/20',
+    style: 'flame',
+  },
+  {
+    id: 'solo-drop',
+    title: 'Goccia Prisma',
+    subtitle: '1 Stat · Skin goccia',
+    description: 'Forma simmetrica ancorata alla base.',
+    structure: 'solo',
+    statCount: 1,
+    accent: 'from-sky-400/30 to-emerald-400/20',
+    style: 'drop',
+  },
+  {
+    id: 'solo-column',
+    title: 'Colonna Dorica',
+    subtitle: '1 Stat · Skin colonna',
+    description: 'Colonna geometrica che si estende in altezza.',
+    structure: 'solo',
+    statCount: 1,
+    accent: 'from-slate-200/20 to-slate-600/20',
+    style: 'column',
+  },
+  {
+    id: 'dual-diamond',
+    title: 'Rombo Equilibrio',
+    subtitle: '2 Stat · Equilibrio',
+    description: 'Rombo che visualizza immediatamente lo sbilancio.',
+    structure: 'dual',
+    statCount: 2,
+    accent: 'from-emerald-400/30 to-cyan-500/20',
+    style: 'diamond',
+  },
+  {
+    id: 'dual-lens',
+    title: 'Lente Binaria',
+    subtitle: '2 Stat · Intersezione',
+    description: 'Intersezione morbida di due archi contrapposti.',
+    structure: 'dual',
+    statCount: 2,
+    accent: 'from-indigo-400/30 to-fuchsia-400/20',
+    style: 'lens',
+  },
+  {
+    id: 'dual-petal',
+    title: 'Petali Gemelli',
+    subtitle: '2 Stat · Petali',
+    description: 'Petali contrapposti che indicano la direzione di forza.',
+    structure: 'dual',
+    statCount: 2,
+    accent: 'from-rose-400/30 to-amber-400/20',
+    style: 'petal',
+  },
+  {
+    id: 'dual-bridge',
+    title: 'Ponte Instabile',
+    subtitle: '2 Stat · Ponte',
+    description: 'Deck centrale che mostra la tenuta del ponte.',
+    structure: 'dual',
+    statCount: 2,
+    accent: 'from-slate-400/30 to-slate-700/20',
+    style: 'bridge',
+  },
+  {
+    id: 'triple-soft',
+    title: 'Triangolo Morbido',
+    subtitle: '3 Stat · Superficie continua',
+    description: 'Triangolo smussato per prove di controllo.',
+    structure: 'triple',
+    statCount: 3,
+    accent: 'from-cyan-400/30 to-emerald-400/20',
+    style: 'soft-triangle',
+  },
+  {
+    id: 'triple-triskel',
+    title: 'Triskel Vector',
+    subtitle: '3 Stat · Triskel',
+    description: 'Tre bracci che convergono sul centro.',
+    structure: 'triple',
+    statCount: 3,
+    accent: 'from-violet-400/30 to-purple-400/20',
+    style: 'triskel',
+  },
+  {
+    id: 'triple-flower',
+    title: 'Fiore a 3 Petali',
+    subtitle: '3 Stat · Fiore',
+    description: 'Petali arrotondati che mostrano armonie o gap.',
+    structure: 'triple',
+    statCount: 3,
+    accent: 'from-rose-400/30 to-sky-400/20',
+    style: 'tri-flower',
+  },
+  {
+    id: 'quattro-flower',
+    title: 'Fiore Poker',
+    subtitle: '4 Stat · Petali',
+    description: 'Fiore ispirato ai semi del poker.',
+    structure: 'quattro',
+    statCount: 4,
+    accent: 'from-teal-400/30 to-cyan-500/20',
+    style: 'poker',
+  },
+  {
+    id: 'quattro-rose',
+    title: 'Rosa dei Venti',
+    subtitle: '4 Stat · Bussola',
+    description: 'Braccia cardinali protese verso l’esterno.',
+    structure: 'quattro',
+    statCount: 4,
+    accent: 'from-blue-400/30 to-indigo-400/20',
+    style: 'wind-rose',
+  },
+  {
+    id: 'quattro-elastic',
+    title: 'Quadrato Elastico',
+    subtitle: '4 Stat · Contenitore',
+    description: 'Quadrato che si deforma lungo gli assi.',
+    structure: 'quattro',
+    statCount: 4,
+    accent: 'from-amber-400/30 to-rose-400/20',
+    style: 'elastic',
+  },
+  {
+    id: 'epic-pentagon',
+    title: 'Pentagono Epico',
+    subtitle: '5 Stat · Poligono',
+    description: 'Poligono regolare per prove epiche.',
+    structure: 'epic',
+    statCount: 5,
+    accent: 'from-cyan-400/30 to-blue-500/20',
+    style: 'pentagon',
+  },
+  {
+    id: 'epic-star',
+    title: 'Stella a 5 punte',
+    subtitle: '5 Stat · Stella',
+    description: 'Sheriff star con punte appuntite.',
+    structure: 'epic',
+    statCount: 5,
+    accent: 'from-emerald-400/30 to-lime-400/20',
+    style: 'star',
+  },
+  {
+    id: 'epic-pentaflower',
+    title: 'Pentafoglio',
+    subtitle: '5 Stat · Fiore',
+    description: 'Cinque petali armonici con nucleo centrale.',
+    structure: 'epic',
+    statCount: 5,
+    accent: 'from-fuchsia-400/30 to-purple-500/20',
+    style: 'pentaflower',
+  },
+];
+
+interface SkinGeometry {
+  questBase: Point[];
+  heroBase: Point[];
+  questCard: Point[];
+  heroCard: Point[];
+  projectToCard: (point: Point) => Point;
+  selectedStats: StatRow[];
+}
+
+function buildSkinGeometry(skin: AltVisualSkin, stats: StatRow[]): SkinGeometry | null {
+  const selectedStats = selectStatsForSkin(stats, skin.statCount);
+  if (!selectedStats.length) {
+    return null;
+  }
+
+  const questValues = selectedStats.map((stat) => normalizeValue(stat.questValue));
+  const heroValues = selectedStats.map((stat) => normalizeValue(stat.heroValue));
+
+  const questBase = buildSkinPolygon(skin.structure, questValues);
+  const heroBase = buildSkinPolygon(skin.structure, heroValues);
+
+  if (questBase.length < 3 || heroBase.length < 3) {
+    return null;
+  }
+
+  const projectToCard = (point: Point): Point => ({
+    x: ALT_CARD_CENTER.x + (point.x - CENTER_X) * ALT_CARD_SCALE,
+    y: ALT_CARD_CENTER.y + (point.y - CENTER_Y) * ALT_CARD_SCALE,
+  });
+
+  return {
+    questBase,
+    heroBase,
+    questCard: questBase.map(projectToCard),
+    heroCard: heroBase.map(projectToCard),
+    projectToCard,
+    selectedStats,
+  };
+}
 
 interface PinballOptions {
   shotPower: number;
@@ -194,7 +414,7 @@ function buildQuestConvexPolygon(
   options: PolygonOptions,
 ): Point[] {
   const numPoints = options.numPoints ?? stats.length;
-  const baseRatio = Math.max(QUEST_MIN_BASE_RATIO, options.baseRatio ?? 0);
+  const baseRatio = Math.max(0.1, options.baseRatio ?? 0);
   const minRadius = RADIUS * baseRatio;
   const points: Point[] = [];
 
@@ -322,6 +542,161 @@ function polygonToSmoothPathD(points: Point[], tension: number = 0.3): string {
   return parts.join(' ');
 }
 
+function buildMiniPolygonPoints(values: number[], radius: number, center: Point): Point[] {
+  if (!values.length) return [];
+  const total = values.length;
+  return values.map((value, index) => {
+    const angle = -Math.PI / 2 + (index * 2 * Math.PI) / total;
+    const dist = (clampPercentage(value) / 100) * radius;
+    return {
+      x: center.x + dist * Math.cos(angle),
+      y: center.y + dist * Math.sin(angle),
+    };
+  });
+}
+
+function computeAverage(values: number[]): number {
+  const filtered = values.filter((value) => Number.isFinite(value) && value > 0);
+  if (!filtered.length) return 0;
+  const total = filtered.reduce((sum, value) => sum + value, 0);
+  return total / filtered.length;
+}
+
+function buildSuperellipsePath(
+  cx: number,
+  cy: number,
+  rx: number,
+  ry: number,
+  exponent: number,
+  segments = 64,
+): string {
+  if (rx <= 0 || ry <= 0) return '';
+  const parts: string[] = [];
+  for (let i = 0; i <= segments; i += 1) {
+    const theta = (i / segments) * Math.PI * 2;
+    const cos = Math.cos(theta);
+    const sin = Math.sin(theta);
+    const signX = Math.sign(cos) || 1;
+    const signY = Math.sign(sin) || 1;
+    const absCos = Math.abs(cos);
+    const absSin = Math.abs(sin);
+    const x = cx + signX * Math.pow(absCos, 2 / exponent) * rx;
+    const y = cy + signY * Math.pow(absSin, 2 / exponent) * ry;
+    parts.push(`${i === 0 ? 'M' : 'L'} ${x} ${y}`);
+  }
+  parts.push('Z');
+  return parts.join(' ');
+}
+
+function selectStatsForSkin(stats: StatRow[], count: number): StatRow[] {
+  const sorted = [...stats].sort(
+    (a, b) => clampPercentage(b.questValue) - clampPercentage(a.questValue),
+  );
+  if (!sorted.length) return [];
+  const slice = sorted.slice(0, Math.min(count, sorted.length));
+  if (slice.length < count) {
+    const last = slice.slice(-1)[0] ?? sorted[0];
+    while (slice.length < count) {
+      slice.push(last);
+    }
+  }
+  return slice;
+}
+
+function normalizeValue(value: number, fallback = 0): number {
+  const clamped = clampPercentage(value);
+  return Number.isFinite(clamped) ? clamped / 100 : fallback;
+}
+
+function buildSoloPolygon(value: number): Point[] {
+  const heightRatio = Math.max(0.05, value);
+  const topY = CENTER_Y - heightRatio * (RADIUS * 0.95);
+  const baseY = CENTER_Y + RADIUS * 0.65;
+  const halfWidth = 45;
+  return [
+    { x: CENTER_X, y: topY },
+    { x: CENTER_X + halfWidth, y: baseY },
+    { x: CENTER_X - halfWidth, y: baseY },
+  ];
+}
+
+function buildDualPolygon(values: number[]): Point[] {
+  const v = Math.max(0.05, values[0] ?? 0);
+  const h = Math.max(0.05, values[1] ?? values[0] ?? 0);
+  const vertical = v * (RADIUS * 0.9);
+  const horizontal = h * (RADIUS * 0.9);
+  return [
+    { x: CENTER_X, y: CENTER_Y - vertical },
+    { x: CENTER_X + horizontal, y: CENTER_Y },
+    { x: CENTER_X, y: CENTER_Y + vertical },
+    { x: CENTER_X - horizontal, y: CENTER_Y },
+  ];
+}
+
+function buildRadialPolygon(values: number[], sides: number, offset = -Math.PI / 2): Point[] {
+  if (sides < 3) sides = 3;
+  const points: Point[] = [];
+  for (let i = 0; i < sides; i += 1) {
+    const idx = i % values.length;
+    const value = Math.max(0.05, values[idx] ?? 0);
+    const radius = (0.25 + value * 0.75) * RADIUS;
+    const angle = offset + (i * 2 * Math.PI) / sides;
+    points.push({
+      x: CENTER_X + radius * Math.cos(angle),
+      y: CENTER_Y + radius * Math.sin(angle),
+    });
+  }
+  return points;
+}
+
+function buildEpicPolygon(values: number[]): Point[] {
+  const peaks = 5;
+  const points: Point[] = [];
+  for (let i = 0; i < peaks; i += 1) {
+    const idx = i % values.length;
+    const value = Math.max(0.05, values[idx] ?? 0);
+    const angle = -Math.PI / 2 + (i * 2 * Math.PI) / peaks;
+    const radius = (0.35 + value * 0.65) * RADIUS;
+    points.push({
+      x: CENTER_X + radius * Math.cos(angle),
+      y: CENTER_Y + radius * Math.sin(angle),
+    });
+    const valleyRadius = radius * 0.45;
+    const valleyAngle = angle + Math.PI / peaks;
+    points.push({
+      x: CENTER_X + valleyRadius * Math.cos(valleyAngle),
+      y: CENTER_Y + valleyRadius * Math.sin(valleyAngle),
+    });
+  }
+  return points;
+}
+
+function buildSkinPolygon(structure: AltStructure, values: number[]): Point[] {
+  switch (structure) {
+    case 'solo':
+      return buildSoloPolygon(values[0] ?? 0);
+    case 'dual':
+      return buildDualPolygon(values);
+    case 'triple':
+      return buildRadialPolygon(values, 3);
+    case 'quattro':
+      return buildRadialPolygon(values, 4);
+    case 'epic':
+      return buildEpicPolygon(values);
+    default:
+      return buildRadialPolygon(values, Math.max(3, values.length));
+  }
+}
+
+function computePolygonArea(points: Point[]): number {
+  if (points.length < 3) return 0;
+  let area = 0;
+  for (let i = 0; i < points.length; i += 1) {
+    const j = (i + 1) % points.length;
+    area += points[i].x * points[j].y - points[j].x * points[i].y;
+  }
+  return Math.abs(area) / 2;
+}
 
 function pointInPolygon(point: Point, polygon: Point[]): boolean {
   if (polygon.length < 3) return false;
@@ -343,36 +718,6 @@ function pointInPolygon(point: Point, polygon: Point[]): boolean {
 function clampPercentage(value: number, min = 0, max = 100): number {
   if (!Number.isFinite(value)) return min;
   return Math.max(min, Math.min(max, value));
-}
-
-function buildMiniRadarPolygon(
-  stats: StatRow[],
-  key: keyof StatRow,
-  radius: number,
-  center: Point,
-): Point[] {
-  const total = Math.max(1, stats.length);
-  return stats.map((stat, index) => {
-    const raw = Number(stat[key]);
-    const value = clampPercentage(raw);
-    const angle = -Math.PI / 2 + (index * 2 * Math.PI) / total;
-    const dist = (value / 100) * radius;
-    return {
-      x: center.x + dist * Math.cos(angle),
-      y: center.y + dist * Math.sin(angle),
-    };
-  });
-}
-
-function computeAverageActive(stats: StatRow[], key: keyof StatRow): number {
-  const active = stats.filter((stat) => Number(stat[key]) > 0);
-  if (!active.length) return 0;
-  const total = active.reduce((sum, stat) => sum + clampPercentage(Number(stat[key])), 0);
-  return total / active.length;
-}
-
-function computeSum(stats: StatRow[], key: keyof StatRow): number {
-  return stats.reduce((sum, stat) => sum + Math.max(0, Number(stat[key]) || 0), 0);
 }
 
 function getQuestEdges(points: Point[]): { a: Point; b: Point }[] {
@@ -640,7 +985,6 @@ export const SkillCheckPreviewPage: React.FC = () => {
   const [lastOutcome, setLastOutcome] = useState<LastOutcome | null>(null);
   const [log, setLog] = useState<string[]>([]);
   const [ballPosition, setBallPosition] = useState<Point | null>(null);
-  const [heroStrokeProgress, setHeroStrokeProgress] = useState(1);
   const [timer, setTimer] = useState<string>("0.00s");
   const [viewMode, setViewMode] = useState<'classic' | 'alt'>('classic');
   const profileKey = useMemo(
@@ -657,16 +1001,6 @@ export const SkillCheckPreviewPage: React.FC = () => {
       }),
     [stats, injuryPct, deathPct],
   );
-  const [altRollInfo, setAltRollInfo] = useState<{
-    profileKey: string;
-    value: number | null;
-    zone: OutcomeZone;
-    result: OutcomeResult;
-  }>({ profileKey: '', value: null, zone: 'safe', result: 'fail' });
-  const [altRollAnimKey, setAltRollAnimKey] = useState(0);
-  const [altBallProgress, setAltBallProgress] = useState(0);
-  const altBallFrameRef = useRef<number | null>(null);
-
   // ─── Polygon Tuning State ───────────────────────────────────────────────
   const [valleyDepth, setValleyDepth] = useState(0.5);  // 0-1: Unified control
   const [curveTension, setCurveTension] = useState(0.3); // 0-1: curve smoothness
@@ -674,65 +1008,17 @@ export const SkillCheckPreviewPage: React.FC = () => {
 
   // ─── Monte Carlo / Ghost State ──────────────────────────────────────────
   const ballAnimFrameRef = useRef<number | null>(null);
-
-  // New derived state for UI
+    // New derived state for UI
   const activeCount = stats.filter(s => s.questValue > 0).length;
+
+  const questValues = useMemo(() => stats.map((stat) => clampPercentage(stat.questValue)), [stats]);
+  const heroValues = useMemo(() => stats.map((stat) => clampPercentage(stat.heroValue)), [stats]);
 
   const safePct = useMemo(() => {
     const total = clampPercentage(injuryPct) + clampPercentage(deathPct);
     return clampPercentage(100 - total);
   }, [injuryPct, deathPct]);
 
-  const questAverage = useMemo(() => computeAverageActive(stats, 'questValue'), [stats]);
-  const heroAverage = useMemo(() => computeAverageActive(stats, 'heroValue'), [stats]);
-  const heroTotal = useMemo(() => computeSum(stats, 'heroValue'), [stats]);
-  const miniQuestPoints = useMemo(
-    () => buildMiniRadarPolygon(stats, 'questValue', MINI_RADAR_RADIUS, MINI_RADAR_CENTER),
-    [stats],
-  );
-  const miniHeroPoints = useMemo(
-    () => buildMiniRadarPolygon(stats, 'heroValue', MINI_RADAR_RADIUS, MINI_RADAR_CENTER),
-    [stats],
-  );
-  const miniQuestAttr = useMemo(() => polygonToPointsAttr(miniQuestPoints), [miniQuestPoints]);
-  const miniHeroAttr = useMemo(() => polygonToPointsAttr(miniHeroPoints), [miniHeroPoints]);
-  const heroDelta = useMemo(() => heroAverage - questAverage, [heroAverage, questAverage]);
-  const contributions = useMemo(() => {
-    const heroValues = stats.map((stat) => clampPercentage(stat.heroValue));
-    const maxHeroStat = heroValues.length ? Math.max(...heroValues) : 100;
-    return stats.map((stat, idx) => {
-      const heroVal = clampPercentage(stat.heroValue);
-      const questVal = clampPercentage(stat.questValue);
-      return {
-        id: stat.id || `stat-${idx}`,
-        name: stat.name,
-        heroVal,
-        questVal,
-        heroShare: heroTotal ? heroVal / heroTotal : 0,
-        heroRel: maxHeroStat ? heroVal / maxHeroStat : 0,
-      };
-    });
-  }, [stats, heroTotal]);
-  const previewRoll = useMemo(() => {
-    if (!stats.length) return 0;
-    const payload = stats.map((stat) => [stat.id, stat.questValue, stat.heroValue]);
-    const rng = createSeededRng(
-      hashString(
-        JSON.stringify({
-          payload,
-          injuryPct,
-          deathPct,
-        }),
-      ),
-    );
-    return Math.round(rng() * 100);
-  }, [stats, injuryPct, deathPct]);
-  const rollZone = useMemo<OutcomeZone>(() => {
-    const injuryThreshold = safePct + injuryPct;
-    if (previewRoll <= safePct) return 'safe';
-    if (previewRoll <= injuryThreshold) return 'injury';
-    return 'death';
-  }, [previewRoll, safePct, injuryPct]);
   const resolvedAltRoll = useMemo(() => {
     if (altRollInfo.profileKey === profileKey) {
       return altRollInfo;
@@ -742,6 +1028,7 @@ export const SkillCheckPreviewPage: React.FC = () => {
       value: null,
       zone: 'safe' as OutcomeZone,
       result: 'fail' as OutcomeResult,
+      visualId: null,
     };
   }, [altRollInfo, profileKey]);
   // Use star polygon with valleys instead of simple polygon
@@ -877,8 +1164,6 @@ export const SkillCheckPreviewPage: React.FC = () => {
       if (startTime === null) startTime = timestamp;
       const elapsed = timestamp - startTime;
       const tRaw = Math.min(1, elapsed / duration);
-      const t = tRaw * tRaw * (3 - 2 * tRaw);
-      setHeroStrokeProgress(t);
       if (tRaw < 1) {
         frame = requestAnimationFrame(animate);
       }
@@ -886,7 +1171,6 @@ export const SkillCheckPreviewPage: React.FC = () => {
 
     frame = requestAnimationFrame((ts) => {
       startTime = ts;
-      setHeroStrokeProgress(0);
       animate(ts);
     });
 
@@ -908,13 +1192,12 @@ export const SkillCheckPreviewPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const hasValue = resolvedAltRoll.value !== null && resolvedAltRoll.value !== undefined;
+    const hasValue = resolvedAltRoll.value !== null;
     if (altBallFrameRef.current !== null) {
       cancelAnimationFrame(altBallFrameRef.current);
     }
     if (!hasValue) {
       altBallFrameRef.current = requestAnimationFrame(() => {
-        setAltBallProgress(0);
         altBallFrameRef.current = null;
       });
       return () => {
@@ -923,7 +1206,6 @@ export const SkillCheckPreviewPage: React.FC = () => {
         }
       };
     }
-    const target = clampPercentage(resolvedAltRoll.value ?? 0) / 100;
     const duration = 1000;
     let startTime: number | null = null;
 
@@ -931,8 +1213,6 @@ export const SkillCheckPreviewPage: React.FC = () => {
       if (startTime === null) startTime = timestamp;
       const elapsed = timestamp - startTime;
       const tRaw = Math.min(1, elapsed / duration);
-      const t = tRaw * tRaw * (3 - 2 * tRaw);
-      setAltBallProgress(target * t);
       if (tRaw < 1) {
         altBallFrameRef.current = requestAnimationFrame(animate);
       } else {
@@ -942,7 +1222,6 @@ export const SkillCheckPreviewPage: React.FC = () => {
 
     altBallFrameRef.current = requestAnimationFrame((ts) => {
       startTime = ts;
-      setAltBallProgress(0);
       animate(ts);
     });
 
@@ -951,9 +1230,9 @@ export const SkillCheckPreviewPage: React.FC = () => {
         cancelAnimationFrame(altBallFrameRef.current);
       }
     };
-  }, [resolvedAltRoll, altRollAnimKey, setAltBallProgress]);
+  }, [resolvedAltRoll, altRollAnimKey]);
 
-  const runAltSimulation = useCallback(() => {
+  const runAltSimulation = useCallback((visualId: string | null = null) => {
     if (questPolygon.length < 3 || heroPolygon.length < 3) return;
     const chosen = samplePointInsidePolygon(questPolygon);
     const dx = chosen.x - CENTER_X;
@@ -976,17 +1255,179 @@ export const SkillCheckPreviewPage: React.FC = () => {
       value: rollPercent,
       zone,
       result,
+      visualId,
     });
     setAltRollAnimKey((prev) => prev + 1);
   }, [heroPolygon, questPolygon, radii, profileKey]);
 
-  useEffect(() => {
+    useEffect(() => {
     if (viewMode !== 'alt') return;
     const frame = requestAnimationFrame(() => {
-      runAltSimulation();
+      const defaultVisual = ALT_VISUAL_SKINS[0]?.id ?? null;
+      runAltSimulation(defaultVisual);
     });
     return () => cancelAnimationFrame(frame);
   }, [viewMode, runAltSimulation]);
+
+  const renderAltVisualSvg = useCallback(
+    (meta: AltVisualMeta) => {
+      const width = ALT_CARD_WIDTH;
+      const height = ALT_CARD_HEIGHT;
+      const cx = width / 2;
+      const cy = height / 2;
+      const baseRadius = Math.min(width, height) * 0.35;
+      const questMini = buildMiniPolygonPoints(questValues, baseRadius, { x: cx, y: cy });
+      const heroMini = buildMiniPolygonPoints(heroValues, baseRadius, { x: cx, y: cy });
+      const questAttr = polygonToPointsAttr(questMini);
+      const heroAttr = polygonToPointsAttr(heroMini);
+
+      switch (meta.renderType) {
+        case 'radar':
+          return (
+            <svg width={width} height={height} className="text-slate-500">
+              {[0.25, 0.5, 0.75, 1].map((ratio) => (
+                <circle
+                  key={ratio}
+                  cx={cx}
+                  cy={cy}
+                  r={baseRadius * ratio}
+                  className="fill-none stroke-slate-700/40"
+                  strokeDasharray="4 4"
+                  strokeWidth={0.8}
+                />
+              ))}
+              {stats.map((_, idx) => {
+                const angle = -Math.PI / 2 + (idx * 2 * Math.PI) / Math.max(1, stats.length);
+                const x2 = cx + baseRadius * Math.cos(angle);
+                const y2 = cy + baseRadius * Math.sin(angle);
+                return (
+                  <line
+                    key={`axis-${idx}`}
+                    x1={cx}
+                    y1={cy}
+                    x2={x2}
+                    y2={y2}
+                    className="stroke-slate-700/40"
+                    strokeWidth={0.8}
+                  />
+                );
+              })}
+              <polygon points={questAttr} className="fill-cyan-400/12 stroke-cyan-300/70" strokeWidth={1.5} />
+              <polygon points={heroAttr} className="fill-emerald-400/10 stroke-emerald-300/90" strokeWidth={1.2} />
+            </svg>
+          );
+        case 'orbit': {
+          const orbitRadius = Math.min(width, height) * 0.42;
+          return (
+            <svg width={width} height={height}>
+              <circle cx={cx} cy={cy} r={orbitRadius} className="fill-none stroke-slate-700/50" strokeDasharray="4 2" />
+              {stats.map((stat, idx) => {
+                const angle = -Math.PI / 2 + (idx * 2 * Math.PI) / Math.max(1, stats.length);
+                const questRadius = orbitRadius * (clampPercentage(stat.questValue) / 100);
+                const heroRadius = orbitRadius * (clampPercentage(stat.heroValue) / 100);
+                const questX = cx + questRadius * Math.cos(angle);
+                const questY = cy + questRadius * Math.sin(angle);
+                const heroX = cx + heroRadius * Math.cos(angle);
+                const heroY = cy + heroRadius * Math.sin(angle);
+                return (
+                  <g key={stat.id}>
+                    <line x1={cx} y1={cy} x2={heroX} y2={heroY} className="stroke-emerald-300/70" strokeWidth={1} />
+                    <circle cx={questX} cy={questY} r={3} className="fill-cyan-200/80" />
+                    <circle cx={heroX} cy={heroY} r={2} className="fill-emerald-200" />
+                  </g>
+                );
+              })}
+            </svg>
+          );
+        }
+        case 'stripe': {
+          const totalHeight = height * 0.8;
+          const safeHeight = (safePct / 100) * totalHeight;
+          const injuryHeight = (injuryPct / 100) * totalHeight;
+          const deathHeight = totalHeight - safeHeight - injuryHeight;
+          return (
+            <svg width={width} height={height}>
+              <rect x={width / 3} y={(height - totalHeight) / 2} width={width / 3} height={safeHeight} className="fill-emerald-500/30" />
+              <rect
+                x={width / 3}
+                y={(height - totalHeight) / 2 + safeHeight}
+                width={width / 3}
+                height={injuryHeight}
+                className="fill-amber-400/35"
+              />
+              <rect
+                x={width / 3}
+                y={(height - totalHeight) / 2 + safeHeight + injuryHeight}
+                width={width / 3}
+                height={deathHeight}
+                className="fill-rose-500/35"
+              />
+              <line x1={width / 3} y1={cy} x2={(2 * width) / 3} y2={cy} className="stroke-slate-800" strokeWidth={1} />
+            </svg>
+          );
+        }
+        case 'bars':
+          return (
+            <svg width={width} height={height}>
+              {deltaEntries.slice(0, 5).map((entry, idx) => {
+                const barY = 20 + idx * 25;
+                const scale = (entry.delta / 100) * (width / 2 - 20);
+                return (
+                  <g key={entry.id}>
+                    <line x1={width / 2} y1={barY} x2={width / 2} y2={barY} className="stroke-slate-700" />
+                    <rect
+                      x={width / 2}
+                      y={barY - 6}
+                      width={scale}
+                      height={12}
+                      className={entry.delta >= 0 ? 'fill-emerald-400/70' : 'fill-rose-400/70'}
+                    />
+                    <text x={width / 2 + scale + Math.sign(scale || 1) * 4} y={barY + 3} className="text-[8px] fill-slate-200">
+                      {entry.name}
+                    </text>
+                  </g>
+                );
+              })}
+            </svg>
+          );
+        case 'superellipse': {
+          const rx = (questAverage / 100) * (width * 0.4);
+          const ry = (heroAverage / 100) * (height * 0.4);
+          const exponent = 2 + (Math.abs(questAverage - heroAverage) / 100) * 3;
+          const path = buildSuperellipsePath(cx, cy, rx, ry, exponent);
+          return (
+            <svg width={width} height={height}>
+              <path d={path} className="fill-cyan-400/15 stroke-cyan-300/60" strokeWidth={2} />
+              <circle cx={cx} cy={cy} r={2} className="fill-slate-100" />
+            </svg>
+          );
+        }
+        case 'vectors':
+          return (
+            <svg width={width} height={height}>
+              {stats.map((stat, idx) => {
+                const angle = -Math.PI / 2 + (idx * 2 * Math.PI) / Math.max(1, stats.length);
+                const questRadius = baseRadius * (clampPercentage(stat.questValue) / 100);
+                const heroRadius = baseRadius * (clampPercentage(stat.heroValue) / 100);
+                const questX = cx + questRadius * Math.cos(angle);
+                const questY = cy + questRadius * Math.sin(angle);
+                const heroX = cx + heroRadius * Math.cos(angle);
+                const heroY = cy + heroRadius * Math.sin(angle);
+                return (
+                  <g key={`vec-${stat.id}`}>
+                    <line x1={cx} y1={cy} x2={questX} y2={questY} className="stroke-cyan-200/60" strokeWidth={1} />
+                    <line x1={questX} y1={questY} x2={heroX} y2={heroY} className="stroke-emerald-300/80" strokeWidth={1.5} />
+                  </g>
+                );
+              })}
+            </svg>
+          );
+        default:
+          return <svg width={width} height={height} />;
+      }
+    },
+    [questValues, heroValues, stats, safePct, injuryPct, deltaEntries, questAverage, heroAverage],
+  );
 
   const handleStatChange = (index: number, field: keyof StatRow, raw: string) => {
     setStats((prev) => {
@@ -1056,6 +1497,7 @@ export const SkillCheckPreviewPage: React.FC = () => {
       value: rollPercent,
       zone,
       result,
+      visualId: resolvedAltRoll.visualId,
     });
     setAltRollAnimKey((prev) => prev + 1);
     setLog((prev) => [label, ...prev].slice(0, 12));
@@ -1471,12 +1913,12 @@ export const SkillCheckPreviewPage: React.FC = () => {
                     strokeWidth={1.5}
                     pathLength={1}
                     strokeDasharray={1}
-                    strokeDashoffset={1 - heroStrokeProgress}
+                    strokeDashoffset={0}
                   />
 
                   {/* Fixed Stat Labels */}
                   {stats.map((stat, idx) => {
-                    const angle = -Math.PI / 2 + (idx * 2 * Math.PI) / stats.length;
+                    const angle = -Math.PI / 2 + (idx * 2 * Math.PI) / Math.max(1, stats.length);
                     const distFactor = 1.15;
                     const labelX = CENTER_X + RADIUS * Math.cos(angle) * distFactor;
                     const labelY = CENTER_Y + RADIUS * Math.sin(angle) * distFactor;
@@ -1531,201 +1973,94 @@ export const SkillCheckPreviewPage: React.FC = () => {
               )}
             </>
           ) : (
-            <div className="w-full space-y-3">
-              {/* Dual Radar */}
-              <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3 shadow-inner space-y-2">
-                <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.2em] text-slate-400">
-                  <span>Dual Radar Overlay</span>
-                  <span className="text-emerald-300 font-mono">{heroDelta >= 0 ? '+' : ''}{heroDelta.toFixed(1)}%</span>
-                </div>
-                <svg width={MINI_RADAR_SIZE} height={MINI_RADAR_SIZE} className="mx-auto">
-                  {[0, 25, 50, 75, 100].map((pct) => (
-                    <circle
-                      key={pct}
-                      cx={MINI_RADAR_CENTER.x}
-                      cy={MINI_RADAR_CENTER.y}
-                      r={(pct / 100) * MINI_RADAR_RADIUS}
-                      className="fill-none stroke-slate-700"
-                      strokeDasharray="4 3"
-                      strokeWidth={0.5}
-                    />
-                  ))}
-                  {stats.map((_, idx) => {
-                    const angle = -Math.PI / 2 + (idx * 2 * Math.PI) / Math.max(1, stats.length);
-                    const x2 = MINI_RADAR_CENTER.x + MINI_RADAR_RADIUS * Math.cos(angle);
-                    const y2 = MINI_RADAR_CENTER.y + MINI_RADAR_RADIUS * Math.sin(angle);
-                    return (
-                      <line
-                        key={`mini-axis-${idx}`}
-                        x1={MINI_RADAR_CENTER.x}
-                        y1={MINI_RADAR_CENTER.y}
-                        x2={x2}
-                        y2={y2}
-                        className="stroke-slate-700/60"
-                        strokeWidth={0.5}
-                      />
-                    );
-                  })}
-                  <polygon points={miniQuestAttr} className="fill-cyan-400/10 stroke-cyan-300/70" strokeWidth={1.5} />
-                  <polygon points={miniHeroAttr} className="fill-emerald-400/10 stroke-emerald-300/80" strokeWidth={1.5} />
-                </svg>
-              </div>
-
-              {/* Dual Gauges */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {[
-                  { label: 'Quest Difficulty', value: questAverage, accent: 'from-cyan-400/60 to-cyan-500/20' },
-                  { label: 'Hero Readiness', value: heroAverage, accent: 'from-emerald-400/60 to-emerald-500/20' },
-                ].map((gauge) => (
-                  <div key={gauge.label} className="bg-slate-950/70 border border-slate-800 rounded-xl p-3">
-                    <div className="text-[10px] uppercase tracking-[0.2em] text-slate-400 mb-1">{gauge.label}</div>
-                    <div className="h-32 bg-slate-900/70 rounded-lg relative overflow-hidden">
-                      <div className="absolute inset-x-3 bottom-3 top-3 flex flex-col justify-end">
-                        <div className="flex-1 bg-slate-800/60 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full bg-linear-to-t ${gauge.accent}`}
-                            style={{ height: `${clampPercentage(gauge.value)}%` }}
-                          />
-                        </div>
-                      </div>
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-2xl font-semibold text-slate-200">{clampPercentage(gauge.value).toFixed(0)}%</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Dual Ring + Risk Stripe */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3 flex flex-col items-center gap-2">
-                  <div className="text-[10px] uppercase tracking-[0.2em] text-slate-400">Dual Arc</div>
-                  {(() => {
-                    const donutRadius = 60;
-                    const circumference = 2 * Math.PI * donutRadius;
-                    const questDash = (clampPercentage(questAverage) / 100) * circumference;
-                    const heroDash = (clampPercentage(heroAverage) / 100) * circumference;
-                    return (
-                      <svg width={160} height={160} className="-rotate-90">
-                        <circle
-                          cx={80}
-                          cy={80}
-                          r={donutRadius}
-                          className="fill-none stroke-slate-800"
-                          strokeWidth={10}
-                        />
-                        <circle
-                          cx={80}
-                          cy={80}
-                          r={donutRadius}
-                          className="fill-none stroke-cyan-300"
-                          strokeWidth={6}
-                          strokeDasharray={`${questDash} ${circumference - questDash}`}
-                          strokeLinecap="round"
-                        />
-                        <circle
-                          cx={80}
-                          cy={80}
-                          r={donutRadius - 10}
-                          className="fill-none stroke-emerald-300"
-                          strokeWidth={6}
-                          strokeDasharray={`${heroDash} ${circumference - heroDash}`}
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                    );
-                  })()}
-                  <div className="text-center">
-                    <div className="text-sm font-semibold text-slate-100">
-                      Δ {heroDelta >= 0 ? '+' : ''}{heroDelta.toFixed(1)}%
-                    </div>
-                    <div className="text-[10px] text-slate-500 uppercase tracking-[0.2em]">Hero vs Quest</div>
+            <div className="flex flex-col gap-4">
+              <div className="default-card p-3 flex flex-wrap gap-3 items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase tracking-[0.2em] text-slate-400">Ultimo roll esperimento</div>
+                  <div className="text-sm font-semibold text-slate-100">
+                    {resolvedAltRoll.value !== null ? `${resolvedAltRoll.value.toFixed(1)}%` : '—'}
                   </div>
                 </div>
-
-                <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400">Risk Stripe</span>
-                    <div className="text-right">
-                      <div className="text-[10px] font-mono text-slate-400">Sim roll: {resolvedAltRoll.value?.toFixed(1) ?? '—'}%</div>
-                      <div className="text-[10px] font-mono text-slate-500">Preview: {previewRoll}%</div>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={runAltSimulation}
-                    className="w-full text-[10px] uppercase tracking-[0.2em] text-emerald-200 border border-emerald-500/40 rounded-full py-1 bg-emerald-500/10 hover:bg-emerald-500/20 transition"
-                  >
-                    Simula nuovo roll
-                  </button>
-                  <div className="h-36 relative rounded-xl overflow-hidden border border-slate-800">
-                    <div className="absolute inset-0 flex flex-col">
-                      <div className="flex-1" style={{ flexBasis: `${safePct}%`, background: 'rgba(16,185,129,0.2)' }} />
-                      <div className="flex-1" style={{ flexBasis: `${injuryPct}%`, background: 'rgba(234,179,8,0.25)' }} />
-                      <div className="flex-1" style={{ flexBasis: `${deathPct}%`, background: 'rgba(248,113,113,0.25)' }} />
-                    </div>
-                    <div
-                      className="absolute inset-x-3"
-                      style={{ bottom: `${previewRoll}%` }}
-                    >
-                      <div className="h-0.5 w-full bg-cyan-300/50" />
-                    </div>
-                    {resolvedAltRoll.value !== null && (
-                      <div
-                        className="absolute left-0 right-0 mx-auto w-full flex items-center justify-center"
-                        style={{ bottom: `${altBallProgress * 100}%` }}
+                <div className="text-[11px] text-slate-400">
+                  {resolvedAltRoll.value !== null ? (
+                    <>
+                      <span className={resolvedAltRoll.result === 'success' ? 'text-emerald-300 font-semibold' : 'text-rose-300 font-semibold'}>
+                        {resolvedAltRoll.result.toUpperCase()}
+                      </span>
+                      {' • '}
+                      <span
+                        className={
+                          resolvedAltRoll.zone === 'safe'
+                            ? 'text-emerald-300 font-semibold'
+                            : resolvedAltRoll.zone === 'injury'
+                            ? 'text-amber-300 font-semibold'
+                            : 'text-rose-400 font-semibold'
+                        }
                       >
-                        <div className="w-4 h-4 rounded-full bg-amber-300 border border-amber-100 shadow-[0_0_10px_rgba(251,191,36,0.6)]" />
-                      </div>
-                    )}
-                  </div>
-                  <div className="text-[11px] text-center uppercase tracking-[0.2em]">
-                    Preview: <span className="text-amber-300">{rollZone.toUpperCase()}</span>
-                    {resolvedAltRoll.value !== null && (
-                      <>
-                        {' '}• Last roll:{' '}
-                        <span
-                          className={
-                            resolvedAltRoll.result === 'success' ? 'text-emerald-300' : 'text-rose-300'
-                          }
-                        >
-                          {resolvedAltRoll.result.toUpperCase()}
-                        </span>{' '}
-                        +{' '}
-                        <span
-                          className={
-                            resolvedAltRoll.zone === 'safe'
-                              ? 'text-emerald-300'
-                              : resolvedAltRoll.zone === 'injury'
-                              ? 'text-amber-300'
-                              : 'text-rose-300'
-                          }
-                        >
-                          {resolvedAltRoll.zone.toUpperCase()}
-                        </span>
-                      </>
-                    )}
-                  </div>
+                        {resolvedAltRoll.zone.toUpperCase()}
+                      </span>
+                    </>
+                  ) : (
+                    'Lancia una variante per vedere il risultato.'
+                  )}
                 </div>
+                <button
+                  type="button"
+                  className="px-4 py-2 rounded-full text-[10px] uppercase tracking-[0.2em] border border-emerald-500/40 text-emerald-200 bg-emerald-500/10 hover:bg-emerald-500/20 transition"
+                  onClick={() => runAltSimulation(resolvedAltRoll.visualId ?? ALT_VISUAL_SKINS[0]?.id ?? null)}
+                  disabled={ALT_VISUAL_SKINS.length === 0}
+                >
+                  Rilancia variante attiva
+                </button>
               </div>
 
-              {/* Contribution List */}
-              <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3">
-                <div className="text-[10px] uppercase tracking-[0.2em] text-slate-400 mb-2">Stat Contributions</div>
-                <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
-                  {contributions.map((entry) => (
-                    <div key={entry.id} className="flex items-center gap-2">
-                      <div className="w-20 text-[10px] uppercase tracking-widest text-slate-300">{entry.name}</div>
-                      <div className="flex-1 h-3 bg-slate-800/70 rounded">
-                        <div
-                          className="h-full rounded bg-linear-to-r from-emerald-500/70 to-emerald-300/60"
-                          style={{ width: `${entry.heroRel * 100}%` }}
-                        />
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                {ALT_VISUAL_CARDS.map((card) => {
+                  const isActive = resolvedAltRoll.visualId === card.id;
+                  return (
+                    <div
+                      key={card.id}
+                      className={`bg-slate-950/80 border rounded-2xl p-3 flex flex-col gap-3 transition ${
+                        isActive ? 'border-emerald-400/60 shadow-[0_0_12px_rgba(16,185,129,0.35)]' : 'border-slate-800'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <div className="text-[10px] uppercase tracking-[0.24em] text-slate-300">{card.title}</div>
+                          <div className="text-[11px] text-slate-500">{card.subtitle}</div>
+                        </div>
+                        {resolvedAltRoll.value !== null && isActive && (
+                          <div className="text-right">
+                            <div className="text-sm font-semibold text-emerald-300">{resolvedAltRoll.value.toFixed(1)}%</div>
+                            <div className="text-[10px] uppercase tracking-[0.16em]">
+                              {resolvedAltRoll.zone.toUpperCase()}
+                            </div>
+                          </div>
+                        )}
                       </div>
-                      <div className="w-16 text-right text-[10px] font-mono text-slate-400">{entry.heroVal.toFixed(0)}%</div>
+                      <p className="text-[11px] text-slate-400 leading-snug">{card.description}</p>
+                      <div className="bg-slate-900/60 border border-slate-800 rounded-xl flex items-center justify-center py-3">
+                        {renderAltVisualSvg(card)}
+                      </div>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[10px] uppercase tracking-[0.2em] text-slate-500">
+                          {isActive ? 'Attivo' : 'In standby'}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => runAltSimulation(card.id)}
+                          className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-[0.16em] transition ${
+                            isActive
+                              ? 'bg-emerald-400/20 text-emerald-100 border border-emerald-400/40'
+                              : 'bg-slate-800/60 text-slate-200 border border-slate-700 hover:bg-slate-800'
+                          }`}
+                        >
+                          Lancia
+                        </button>
+                      </div>
                     </div>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
             </div>
           )}
