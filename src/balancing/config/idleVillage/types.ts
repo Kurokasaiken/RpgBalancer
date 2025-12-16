@@ -189,6 +189,11 @@ export interface GlobalRules {
   maxFatigueBeforeExhausted: number;
   fatigueRecoveryPerDay: number;
   dayLengthInTimeUnits: number;
+  /**
+   * Optional conversion factor for UI timers (seconds shown in VerbCard timers).
+   * Defaults to 60 seconds per village time unit if omitted.
+   */
+  secondsPerTimeUnit?: number;
   fatigueYellowThreshold: number;
   fatigueRedThreshold: number;
 

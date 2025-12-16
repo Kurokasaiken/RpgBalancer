@@ -1,4 +1,4 @@
-import React from 'react';
+import type { DragEvent } from 'react';
 import { EnhancedStatSlider } from './EnhancedStatSlider';
 
 interface StatsGridProps {
@@ -13,13 +13,13 @@ interface StatsGridProps {
   removeStatStep: (field: string, idx: number) => void;
   selectedTicks: Record<string, number>;
   onSelectTick: (field: string, idx: number) => void;
-  onDragStart: (e: React.DragEvent, field: string) => void;
-  onDragOver: (e: React.DragEvent) => void;
-  onDrop: (e: React.DragEvent, field: string) => void;
+  onDragStart: (e: DragEvent<HTMLDivElement>, field: string) => void;
+  onDragOver: (e: DragEvent<HTMLDivElement>) => void;
+  onDrop: (e: DragEvent<HTMLDivElement>, field: string) => void;
   getStatLabel?: (field: string) => string;
 }
 
-export const StatsGrid: React.FC<StatsGridProps> = ({
+export const StatsGrid = ({
   statOrder,
   getStatDescription,
   isMalus,
@@ -35,7 +35,7 @@ export const StatsGrid: React.FC<StatsGridProps> = ({
   onDragOver,
   onDrop,
   getStatLabel
-}) => {
+}: StatsGridProps) => {
   return (
     <div className="flex flex-wrap gap-4 mb-4">
       {statOrder.map(field => (

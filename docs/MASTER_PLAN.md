@@ -259,8 +259,8 @@ Dynamic stress-testing system for validating stat weights and identifying synerg
 
 **Key Tasks:**
 - ✅ Create `WeightBasedCreator` template
-- [ ] Implement `ItemCreator`
-- [ ] Implement `CharacterCreator`
+- ✅ Implement `ItemCreator`
+- ✅ Implement `CharacterCreator`
 
 ---
 
@@ -435,6 +435,18 @@ Expand combat system from 1v1 to full tactical grid-based multi-unit combat:
 - Drawer laterale per editor
 - Tema Gilded Observatory
 
+### 🧩 **EnhancedStatSlider Refactor (Atomic Evolution Phase 2)**
+
+**Status:** 🔥 CRITICAL – Blocking Spell Creator UX  
+**Plan:** [plans/atomic_evolution_plan.md](plans/atomic_evolution_plan.md#phase-2-component-restructuring)  
+
+**Implementation Points:**
+1. **Break Down EnhancedStatSlider** → Orchestrator + `StatSliderHeader`, `StatSliderTrack`, `StatSliderTick`, and `useStatSlider` hook (target ≤60 lines per file).  
+2. **Extract CSS Modules** → Move inline/Tailwind overrides into `EnhancedStatSlider/styles.module.css` to keep theme tokens centralized.  
+3. **Add Regression Tests** → Cover tick selection/add/remove and malus rendering to stabilize future iterations.
+
+**Next Action:** Implement Point 1 (component split) before styling/tests.
+
 ---
 
 ### Testing & QA Infrastructure (Cross-Phase)
@@ -514,6 +526,7 @@ The next evolution of the project is organized around six macro-goals:
    - Vision & design document: [GAME_VISION_IDLE_INCREMENTAL.md](GAME_VISION_IDLE_INCREMENTAL.md).  
    - **FTUE & Vertical Slice:** primi 30–60 minuti pianificati in [plans/idle_village_ftue_plan.md](plans/idle_village_ftue_plan.md); la vertical slice deve permettere almeno un ciclo completo run → meta → nuova run.  
    - **Art Style & Visual Direction:** linee guida per stile grafico, palette e pipeline in [plans/idle_village_art_style_plan.md](plans/idle_village_art_style_plan.md).
+   - **VerbCard Refactor (UI Focus):** plan in [plans/idle_village_verbcard_refactor_plan.md](plans/idle_village_verbcard_refactor_plan.md) con tasklist dedicata in [plans/idle_village_tasks.md](plans/idle_village_tasks.md) → unifica i VerbCard su mappa/HUD e prepara il refactor dei marker.
 
 ---
 

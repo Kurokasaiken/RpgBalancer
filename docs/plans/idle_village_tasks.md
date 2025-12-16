@@ -96,6 +96,19 @@
 
 ---
 
+## Idle Village VerbCard Refactor (UI Focus)
+
+- [ ] Align Idle Village UI with the new VerbCard system (`docs/plans/idle_village_verbcard_refactor_plan.md`)
+- [ ] Implement `ScheduledVerbSummary` helper pipeline (variants, tone, risk, deadlines, timers)
+- [ ] Introduce `MapSlotVerbCluster` to replace legacy `MapSlotMarker` on the map
+- [ ] Render quest/job offers as VerbCards within map clusters, preserving dnd-kit drop states
+- [ ] Replace the “Jobs & Quests in progress” panel with compact text-based summaries driven by scheduled verbs
+- [ ] Ensure hunger/injury/system verbs reuse the same summary data for consistency
+- [ ] Update quest offer UI (map + HUD) with risk badges, tone colors, and Accept CTA
+- [ ] Add Vitest coverage for helper logic and Playwright smoke test for drag/drop + quest offer accept flows
+
+---
+
 ## Meta
 
 - [ ] Link this file and `idle_village_plan.md` from `MASTER_PLAN.md`

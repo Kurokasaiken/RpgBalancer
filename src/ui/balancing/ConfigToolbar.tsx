@@ -10,6 +10,7 @@ export const ConfigToolbar: React.FC = () => {
     canUndo,
     exportConfig,
     importConfig,
+    resetToInitialConfig,
   } = useBalancerConfig();
 
   const { showToast, toasts, removeToast } = useToast();
@@ -93,15 +94,40 @@ export const ConfigToolbar: React.FC = () => {
     e.target.value = '';
   };
 
+  const [resetConfirmPending, setResetConfirmPending] = React.useState(false);
+
+  const handleResetAll = () => {
+    if (!resetConfirmPending) {
+      setResetConfirmPending(true);
+      showToast('Clicca di nuovo per confermare reset completo', 'info');
+      // Small window to confirm reset without blocking UI
+      setTimeout(() => {
+        setResetConfirmPending(false);
+      }, 3000);
+      return;
+    }
+
+    setResetConfirmPending(false);
+    try {
+      // Clear simValues so that the next config snapshot repopulates them from defaults
+      localStorage.removeItem(SIM_VALUES_KEY);
+      // Reset config to the initial snapshot stored by useBalancerConfig
+      resetToInitialConfig();
+      showToast('Configurazione resettata ai valori iniziali', 'success');
+    } catch (e) {
+      showToast(`Errore durante reset: ${(e as Error).message}`, 'error');
+    }
+  };
+
   return (
     <>
-      <div className="mb-4 rounded-2xl border border-[#384444] bg-gradient-to-r from-[#0b181b]/85 via-[#081013]/90 to-[#0b181b]/85 px-3 py-2 shadow-[0_10px_30px_rgba(0,0,0,0.6)] text-[10px] flex flex-wrap items-center gap-2">
+      <div className="mb-4 rounded-2xl border border-[#384444] bg-linear-to-r from-[#0b181b]/85 via-[#081013]/90 to-[#0b181b]/85 px-3 py-2 shadow-[0_10px_30px_rgba(0,0,0,0.6)] text-[10px] flex flex-wrap items-center gap-2">
         {/* Left label */}
         <span className="text-[9px] text-[#808a83] uppercase tracking-[0.22em]">
           Config-Driven Balancer · Editor
         </span>
 
-        {/* Right group: undo / export / import */}
+        {/* Right group: undo / reset / export / import */}
         <div className="ml-auto flex items-center gap-1.5">
           <button
             type="button"
@@ -114,6 +140,17 @@ export const ConfigToolbar: React.FC = () => {
           >
             <span aria-hidden className="text-xs">↺</span>
             <span className="tracking-[0.18em] uppercase">Undo</span>
+          </button>
+          <button
+            type="button"
+            onClick={handleResetAll}
+            className={`inline-flex items-center gap-1 px-2 py-1 rounded-full border transition-colors ${resetConfirmPending
+                ? 'border-red-500/70 text-red-200 bg-red-500/10 animate-pulse'
+                : 'border-rose-500/70 text-rose-200 hover:bg-rose-500/15'
+              }`}
+          >
+            <span aria-hidden className="text-xs">⚠</span>
+            <span className="tracking-[0.18em] uppercase">{resetConfirmPending ? 'Conferma' : 'Reset'}</span>
           </button>
           <button
             type="button"

@@ -15,7 +15,7 @@ import { tickIdleVillage } from '@/engine/game/idleVillage/IdleVillageEngine';
 import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
 import { DefaultSection } from '@/ui/components/DefaultUI';
 import { buyFoodWithGold } from '@/engine/game/idleVillage/MarketEngine';
-import VerbCard, { type VerbTone } from '@/ui/idleVillage/VerbCard';
+import VerbCard, { type ProgressStyle, type VerbTone, type VerbVisualVariant } from '@/ui/idleVillage/VerbCard';
 
 // Minimal deterministic RNG for reproducible testing
 const simpleRng = (() => {
@@ -25,6 +25,18 @@ const simpleRng = (() => {
     return seed / 233280;
   };
 })();
+
+const DEFAULT_SECONDS_PER_TIME_UNIT = 60;
+
+const clamp01 = (value: number) => Math.max(0, Math.min(1, value));
+
+const formatSecondsLabel = (seconds?: number | null) => {
+  if (seconds === undefined || seconds === null || !Number.isFinite(seconds)) return '—';
+  const clamped = Math.max(0, Math.round(seconds));
+  const mins = Math.floor(clamped / 60);
+  const secs = clamped % 60;
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+};
 
 const HUNGER_FX_KEYFRAMES = `
 @keyframes idleVillageHungerFlight {
@@ -186,7 +198,6 @@ function MapSlotMarker({ slot, left, top, isSelected, hasJobs, hasQuests, jobLab
           </div>
         </div>
       </div>
-      {/* Hover tooltip with basic location + activity info (desktop focus; mobile can rely on click/select) */}
       <div className="pointer-events-none absolute -top-14 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
         <div className="rounded bg-black/90 border border-slate-700 px-2 py-1 max-w-xs text-[9px] text-slate-100 text-left shadow-lg">
           <div className="font-semibold uppercase tracking-[0.16em] truncate">{slot.label}</div>
@@ -205,6 +216,249 @@ function MapSlotMarker({ slot, left, top, isSelected, hasJobs, hasQuests, jobLab
         </div>
       </div>
     </button>
+  );
+}
+
+interface ScheduledVerbSummary {
+  key: string;
+  scheduled: ScheduledActivity;
+  slotId: string;
+  label: string;
+  kindLabel: string;
+  isQuest: boolean;
+  isJob: boolean;
+  icon: ReactNode;
+  visualVariant: VerbVisualVariant;
+  progressStyle: ProgressStyle;
+  progressFraction: number;
+  elapsedSeconds: number;
+  totalDurationSeconds: number;
+  remainingSeconds: number;
+  injuryPercentage: number;
+  deathPercentage: number;
+  assignedCount: number;
+  totalSlots: number;
+  rewardLabel: string | null;
+  tone: VerbTone;
+  deadlineLabel: string | null;
+}
+
+function deriveVisualVariant(activity: ActivityDefinition): VerbVisualVariant {
+  if (activity.tags?.includes('quest')) return 'amethyst';
+  if (activity.tags?.includes('danger') || activity.tags?.includes('combat')) return 'ember';
+  if (activity.tags?.includes('job')) return 'jade';
+  if (activity.tags?.includes('training')) return 'azure';
+  return 'solar';
+}
+
+function deriveProgressStyle(activity: ActivityDefinition): ProgressStyle {
+  if (activity.tags?.includes('quest')) return 'halo';
+  if (activity.tags?.includes('job')) return 'border';
+  return 'ribbon';
+}
+
+function deriveTone(activity: ActivityDefinition): VerbTone {
+  const tone = ((activity.metadata ?? {}) as { verbToneId?: VerbTone }).verbToneId;
+  if (tone) return tone;
+  if (activity.tags?.includes('quest')) return 'quest';
+  if (activity.tags?.includes('job')) return 'job';
+  if (activity.tags?.includes('danger') || activity.tags?.includes('combat')) return 'danger';
+  return 'neutral';
+}
+
+function deriveIcon(activity: ActivityDefinition, slotIcon?: string): ReactNode {
+  const metaIcon = ((activity.metadata ?? {}) as { icon?: string }).icon;
+  if (metaIcon) return metaIcon;
+  if (slotIcon && slotIcon.trim().length > 0) return slotIcon;
+  if (activity.tags?.includes('quest')) return '📜';
+  if (activity.tags?.includes('job')) return '⚒️';
+  if (activity.tags?.includes('training')) return '📘';
+  if (activity.tags?.includes('combat')) return '⚔️';
+  return '◇';
+}
+
+function deriveRisk(activity: ActivityDefinition) {
+  const meta = (activity.metadata ?? {}) as { injuryChanceDisplay?: number; deathChanceDisplay?: number };
+  return {
+    injury: typeof meta?.injuryChanceDisplay === 'number' ? meta.injuryChanceDisplay : 0,
+    death: typeof meta?.deathChanceDisplay === 'number' ? meta.deathChanceDisplay : 0,
+  };
+}
+
+function deriveDeadlineLabel(params: {
+  activity: ActivityDefinition;
+  scheduled: ScheduledActivity;
+  currentTime: number;
+  dayLength: number;
+}): string | null {
+  const meta = (params.activity.metadata ?? {}) as { questDeadlineInDays?: number };
+  const questDeadlineDays = meta?.questDeadlineInDays;
+  if (!questDeadlineDays || questDeadlineDays <= 0) return null;
+  const totalDayLength = params.dayLength || 5;
+  const deadlineTime = params.scheduled.startTime + questDeadlineDays * totalDayLength;
+  const remainingUnits = Math.max(0, deadlineTime - params.currentTime);
+  if (remainingUnits <= 0) return 'Expired';
+  const remainingDays = Math.floor(remainingUnits / totalDayLength);
+  if (remainingDays >= 1) return `${remainingDays}d left`;
+  return `${remainingUnits}u left`;
+}
+
+function buildScheduledVerbSummary(params: {
+  scheduled: ScheduledActivity;
+  activity: ActivityDefinition;
+  slotIcon?: string;
+  resourceLabeler: (id: string) => string;
+  currentTime: number;
+  secondsPerTimeUnit: number;
+  dayLength: number;
+}): ScheduledVerbSummary {
+  const durationUnits = Math.max(1, params.scheduled.endTime - params.scheduled.startTime || 1);
+  const elapsedUnits = Math.max(
+    0,
+    Math.min(durationUnits, params.currentTime - params.scheduled.startTime),
+  );
+  const progressFraction = clamp01(elapsedUnits / durationUnits);
+  const elapsedSeconds = elapsedUnits * params.secondsPerTimeUnit;
+  const totalDurationSeconds = durationUnits * params.secondsPerTimeUnit;
+  const remainingSeconds = Math.max(0, totalDurationSeconds - elapsedSeconds);
+
+  const { injury, death } = deriveRisk(params.activity);
+  const isQuest = params.activity.tags?.includes('quest') ?? false;
+  const isJob = params.activity.tags?.includes('job') ?? false;
+  const rewardsLabel =
+    params.activity.rewards && params.activity.rewards.length > 0
+      ? params.activity.rewards.map((delta) => params.resourceLabeler(delta.resourceId)).join(', ')
+      : null;
+  const assignedCount = params.scheduled.characterIds.length;
+  const totalSlots =
+    ((params.activity.metadata ?? {}) as { maxCrewSize?: number })?.maxCrewSize ??
+    Math.max(1, assignedCount);
+
+  return {
+    key: params.scheduled.id,
+    scheduled: params.scheduled,
+    slotId: params.scheduled.slotId,
+    label: params.activity.label ?? params.scheduled.activityId,
+    kindLabel: isQuest ? 'Quest' : isJob ? 'Job' : 'Activity',
+    isQuest,
+    isJob,
+    icon: deriveIcon(params.activity, params.slotIcon),
+    visualVariant: deriveVisualVariant(params.activity),
+    progressStyle: deriveProgressStyle(params.activity),
+    progressFraction,
+    elapsedSeconds,
+    totalDurationSeconds,
+    remainingSeconds,
+    injuryPercentage: injury,
+    deathPercentage: death,
+    assignedCount,
+    totalSlots,
+    rewardLabel: rewardsLabel,
+    tone: deriveTone(params.activity),
+    deadlineLabel: deriveDeadlineLabel({
+      activity: params.activity,
+      scheduled: params.scheduled,
+      currentTime: params.currentTime,
+      dayLength: params.dayLength,
+    }),
+  };
+}
+
+interface MapSlotVerbClusterProps {
+  slot: { id: string; label: string; icon?: string };
+  left: number;
+  top: number;
+  verbs: ScheduledVerbSummary[];
+  questOfferCards: {
+    id: string;
+    icon: ReactNode;
+    visualVariant: VerbVisualVariant;
+    progressStyle: ProgressStyle;
+    injuryPercentage: number;
+    deathPercentage: number;
+  }[];
+  onSelect: () => void;
+  isSelected: boolean;
+}
+
+function MapSlotVerbCluster({ slot, left, top, verbs, questOfferCards, onSelect, isSelected }: MapSlotVerbClusterProps) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: `slot-${slot.id}`,
+    data: { type: 'mapSlot', slotId: slot.id },
+  });
+
+  const dropState = isOver ? 'valid' : 'idle';
+  const hasContent = verbs.length > 0 || questOfferCards.length > 0;
+
+  return (
+    <div
+      ref={setNodeRef}
+      className="absolute -translate-x-1/2 -translate-y-full flex flex-col items-center gap-2 pointer-events-auto"
+      style={{ left: `${left}%`, top: `${top}%` }}
+    >
+      <button
+        type="button"
+        onClick={onSelect}
+        className={[
+          'rounded-3xl border border-slate-900/70 bg-black/40 px-3 py-2 transition-all duration-200',
+          isSelected || isOver ? 'ring-2 ring-amber-300/60 shadow-[0_0_25px_rgba(251,191,36,0.35)]' : 'ring-1 ring-slate-900/50',
+        ]
+          .filter(Boolean)
+          .join(' ')}
+      >
+        <div className="flex flex-col items-center gap-2">
+          {(hasContent
+            ? verbs.map((verb) => (
+                <VerbCard
+                  key={verb.key}
+                  icon={verb.icon}
+                  progressFraction={verb.progressFraction}
+                  elapsedSeconds={verb.elapsedSeconds}
+                  totalDuration={verb.totalDurationSeconds}
+                  injuryPercentage={verb.injuryPercentage}
+                  deathPercentage={verb.deathPercentage}
+                  assignedCount={verb.assignedCount}
+                  totalSlots={verb.totalSlots}
+                  isInteractive
+                  dropState={dropState}
+                  onClick={onSelect}
+                  visualVariant={verb.visualVariant}
+                  progressStyle={verb.progressStyle}
+                  className="scale-[0.62] origin-top"
+                />
+              ))
+            : [
+                <div
+                  key="placeholder"
+                  className="flex flex-col items-center justify-center text-xs uppercase tracking-[0.2em] text-slate-300 px-4 py-3"
+                >
+                  <span className="text-base">{slot.icon ?? '⌀'}</span>
+                  <span>{slot.label}</span>
+                </div>,
+              ])}
+          {questOfferCards.map((offer) => (
+            <VerbCard
+              key={offer.id}
+              icon={offer.icon}
+              progressFraction={0}
+              elapsedSeconds={0}
+              totalDuration={60}
+              injuryPercentage={offer.injuryPercentage}
+              deathPercentage={offer.deathPercentage}
+              assignedCount={0}
+              totalSlots={1}
+              isInteractive
+              dropState={dropState}
+              onClick={onSelect}
+              visualVariant={offer.visualVariant}
+              progressStyle={offer.progressStyle}
+              className="scale-[0.62] origin-top"
+            />
+          ))}
+        </div>
+      </button>
+      <div className="text-[10px] uppercase tracking-[0.2em] text-amber-100 drop-shadow">{slot.label}</div>
+    </div>
   );
 }
 

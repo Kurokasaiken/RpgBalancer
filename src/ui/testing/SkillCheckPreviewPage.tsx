@@ -1,26 +1,16 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useBalancerConfig } from '@/balancing/hooks/useBalancerConfig';
-
-interface StatRow {
-  id: string;
-  name: string;
-  questValue: number;
-  heroValue: number;
-  isDetrimental: boolean;
-}
-
-type OutcomeZone = 'safe' | 'injury' | 'death';
-type OutcomeResult = 'success' | 'fail';
-
-interface LastOutcome {
-  zone: OutcomeZone;
-  result: OutcomeResult;
-}
-
-interface Point {
-  x: number;
-  y: number;
-}
+import { RiskVisualization } from './RiskVisualization';
+import type {
+  OutcomeZone,
+  OutcomeResult,
+  AltCardState,
+  StatRow,
+  LastOutcome,
+  Point,
+  SkinGeometry,
+  AltVisualSkin,
+} from './types';
 
 const CANVAS_SIZE = 300;
 const CENTER_X = CANVAS_SIZE / 2;
@@ -31,33 +21,29 @@ const ALT_CARD_HEIGHT = 220;
 const ALT_CARD_CENTER = { x: ALT_CARD_WIDTH / 2, y: ALT_CARD_HEIGHT / 2 };
 const ALT_CARD_SCALE = (Math.min(ALT_CARD_WIDTH, ALT_CARD_HEIGHT) * 0.42) / RADIUS;
 
-type AltStructure = 'solo' | 'dual' | 'triple' | 'quattro' | 'epic';
-
-interface SkinGeometry {
-  questBase: Point[];
-  heroBase: Point[];
-  questCard: Point[];
-  heroCard: Point[];
-  questCardAttr: string;
-  questCardPath: string;
-  questCardSmoothPath: string;
-  heroCardPath: string;
-  heroCardSmoothPath: string;
-  projectToCard: (point: Point) => Point;
-  selectedStats: StatRow[];
-  maxRadius: number;
-}
-
-interface AltVisualSkin {
-  id: string;
-  title: string;
-  subtitle: string;
-  description: string;
-  structure: AltStructure;
-  statCount: number;
-  accent: string;
-  style: 'triangle' | 'flame' | 'drop' | 'column' | 'diamond' | 'lens' | 'petal' | 'bridge' | 'soft-triangle' | 'triskel' | 'tri-flower' | 'poker' | 'wind-rose' | 'elastic' | 'pentagon' | 'star' | 'pentaflower';
-}
+const POKER_PRESET_BASE_POINTS: { x: number; y: number }[] = [
+  { x: 0, y: -1 },
+  { x: 0.28, y: -0.95 },
+  { x: 0.5, y: -0.75 },
+  { x: 0.58, y: -0.45 },
+  { x: 0.78, y: -0.18 },
+  { x: 0.85, y: 0.08 },
+  { x: 0.72, y: 0.32 },
+  { x: 0.52, y: 0.46 },
+  { x: 0.32, y: 0.55 },
+  { x: 0.24, y: 0.82 },
+  { x: 0.2, y: 1.0 },
+  { x: -0.2, y: 1.0 },
+  { x: -0.24, y: 0.82 },
+  { x: -0.32, y: 0.55 },
+  { x: -0.52, y: 0.46 },
+  { x: -0.72, y: 0.32 },
+  { x: -0.85, y: 0.08 },
+  { x: -0.78, y: -0.18 },
+  { x: -0.58, y: -0.45 },
+  { x: -0.5, y: -0.75 },
+  { x: -0.28, y: -0.95 },
+];
 
 const ALT_VISUAL_SKINS: AltVisualSkin[] = [
   {
@@ -172,13 +158,43 @@ const ALT_VISUAL_SKINS: AltVisualSkin[] = [
   },
   {
     id: 'quattro-flower',
-    title: 'Fiore Poker',
-    subtitle: '4 Stat · Petali',
-    description: 'Fiore ispirato ai semi del poker.',
+    title: 'Poker · Classic Cross',
+    subtitle: '4 Stat · Classico',
+    description: 'Croce geometrica ispirata al seme ♣️ tradizionale.',
     structure: 'quattro',
     statCount: 4,
     accent: 'from-teal-400/30 to-cyan-500/20',
     style: 'poker',
+  },
+  {
+    id: 'quattro-poker-clover',
+    title: 'Poker · Clover',
+    subtitle: '4 Stat · Quadrifoglio',
+    description: 'Quadrifoglio morbido con stelo centrale.',
+    structure: 'quattro',
+    statCount: 4,
+    accent: 'from-emerald-400/30 to-emerald-500/20',
+    style: 'poker-clover',
+  },
+  {
+    id: 'quattro-poker-club',
+    title: 'Poker · Club Glyph',
+    subtitle: '4 Stat · Trifoglio',
+    description: 'Trifoglio bombato con lobo superiore dominante.',
+    structure: 'quattro',
+    statCount: 4,
+    accent: 'from-lime-400/30 to-teal-500/20',
+    style: 'poker-club',
+  },
+  {
+    id: 'quattro-poker-preset',
+    title: 'Poker · Preset SVG',
+    subtitle: '4 Stat · Profilo disegnato',
+    description: 'Profilo importato da preset per confronto rapido.',
+    structure: 'quattro',
+    statCount: 4,
+    accent: 'from-slate-200/30 to-slate-500/20',
+    style: 'poker-preset',
   },
   {
     id: 'quattro-rose',
@@ -230,340 +246,69 @@ const ALT_VISUAL_SKINS: AltVisualSkin[] = [
     accent: 'from-fuchsia-400/30 to-purple-500/20',
     style: 'pentaflower',
   },
+  {
+    id: 'preview-param-rose',
+    title: 'Preview · Rosa Parametrica',
+    subtitle: 'Demo veloce',
+    description: 'Rose curve dinamiche basate su parametri configurabili.',
+    structure: 'epic',
+    statCount: 5,
+    accent: 'from-rose-400/30 via-amber-400/30 to-emerald-400/20',
+    style: 'param-rose',
+  },
+  {
+    id: 'preview-ribbon-bezier',
+    title: 'Preview · Ribbon Bezier',
+    subtitle: 'Demo veloce',
+    description: 'Nastri Bezier che intrecciano i vettori delle stats.',
+    structure: 'epic',
+    statCount: 5,
+    accent: 'from-indigo-400/30 via-cyan-400/30 to-violet-400/20',
+    style: 'ribbon-bezier',
+  },
+  {
+    id: 'preview-overlay-combo',
+    title: 'Preview · Overlay SVG',
+    subtitle: 'Demo veloce',
+    description: 'Overlay multilayer con clipPath e blend per geometrie ibride.',
+    structure: 'epic',
+    statCount: 5,
+    accent: 'from-slate-300/30 via-slate-600/20 to-slate-900/10',
+    style: 'overlay-combo',
+  },
 ];
 
-const DEFAULT_ALT_VISUAL_ID = ALT_VISUAL_SKINS[0]?.id ?? null;
-
-function buildSkinGeometry(skin: AltVisualSkin, stats: StatRow[]): SkinGeometry | null {
-  const selectedStats = selectStatsForSkin(stats, skin.statCount);
-  if (!selectedStats.length) {
-    return null;
-  }
-
-  const questValues = selectedStats.map((stat) => normalizeValue(stat.questValue));
-  const heroValues = selectedStats.map((stat) => normalizeValue(stat.heroValue));
-
-  const questBase = buildSkinPolygon(skin.structure, questValues);
-  const heroBase = buildSkinPolygon(skin.structure, heroValues);
-
-  if (questBase.length < 3 || heroBase.length < 3) {
-    return null;
-  }
-
-  const projectToCard = (point: Point): Point => ({
-    x: ALT_CARD_CENTER.x + (point.x - CENTER_X) * ALT_CARD_SCALE,
-    y: ALT_CARD_CENTER.y + (point.y - CENTER_Y) * ALT_CARD_SCALE,
-  });
-
+function createAltCardState(id: string, profileKey: string): AltCardState {
   return {
-    questBase,
-    heroBase,
-    questCard: questBase.map(projectToCard),
-    heroCard: heroBase.map(projectToCard),
-    questCardAttr: polygonToPointsAttr(questBase.map(projectToCard)),
-    questCardPath: polygonToPathD(questBase.map(projectToCard)),
-    questCardSmoothPath: polygonToSmoothPathD(questBase.map(projectToCard), 0.25),
-    heroCardPath: polygonToPathD(heroBase.map(projectToCard)),
-    heroCardSmoothPath: polygonToSmoothPathD(heroBase.map(projectToCard), 0.35),
-    projectToCard,
-    selectedStats,
-    maxRadius: questBase.reduce(
-      (max, point) => Math.max(max, Math.hypot(point.x - CENTER_X, point.y - CENTER_Y)),
-      0,
-    ),
+    id,
+    profileKey,
+    phase: 'idle',
+    result: null,
+    zone: null,
+    value: null,
+    ballPosition: null,
+    path: [],
+    pathIndex: 0,
+    lastUpdated: Date.now()
   };
 }
 
-interface PinballOptions {
-  shotPower: number;
-  spinBias: number;
-}
-
-// ─── Star Polygon Options ─────────────────────────────────────────────────
-interface PolygonOptions {
-  baseRatio: number;    // 0-0.5: minimum radius as fraction of RADIUS
-  valleyDepth: number;  // 0-0.5: how deep valleys go between peaks
-  curveTension: number; // 0-1: smoothness of curves (0=sharp, 1=very smooth)
-  triangleWidth?: number; // 0-1: shared base width for triangle segments
-  numPoints?: number;   // Fixed number of points (default 5)
-  shapeType?: 'hero' | 'quest'; // 'quest' uses special difficulty envelopes (Rectangle, Convex)
-}
-
-const DEFAULT_POLYGON_OPTIONS: PolygonOptions = {
-  baseRatio: 0.2,
-  valleyDepth: 0.85,    // Default VERY sharp (Triangle/Needle look)
-  curveTension: 0.15,
-  triangleWidth: 0.35,
-  numPoints: 5,
+const createAltCardStateMap = (profileKey: string): Record<string, AltCardState> => {
+  return ALT_VISUAL_SKINS.reduce<Record<string, AltCardState>>((acc, skin) => {
+    acc[skin.id] = createAltCardState(skin.id, profileKey);
+    return acc;
+  }, {});
 };
 
-/**
- * Build a fixed N-point star polygon (Sheriff Star style).
- * - Always 5 peaks.
- * - Inactive peaks (value 0) retreat to the inner valley radius.
- * - Active peaks extend from valley radius to max radius.
- * - Valley Depth 100% creates a very thin, sharp star.
- */
-function buildStarPolygon(
-  stats: StatRow[],
-  key: keyof StatRow,
-  options: PolygonOptions = DEFAULT_POLYGON_OPTIONS,
-): Point[] {
-  const { valleyDepth, numPoints = 5 } = options;
-  const points: Point[] = [];
-
-  // Angle step
-  const peakAngleStep = (2 * Math.PI) / numPoints;
-
-  // Refined Valley Radius Calculation
-  // 0% slider => Full Radius (Circle-like)
-  // 100% slider => 0 Radius (Center point)
-  const valleyRadius = RADIUS * (1.0 - valleyDepth);
-
-  for (let i = 0; i < numPoints; i++) {
-    // ── Peak point ──
-    let value = 0;
-    if (i < stats.length) {
-      const stat = stats[i];
-      const raw = Number(stat[key]);
-      value = Number.isFinite(raw) ? Math.max(0, Math.min(100, raw)) : 0;
-    }
-
-    // Peak Radius
-    // If value is 0, peak is physically AT the valley radius.
-    const peakRadius = valleyRadius + (value / 100) * (RADIUS - valleyRadius);
-
-    const peakAngle = -Math.PI / 2 + i * peakAngleStep;
-
-    points.push({
-      x: CENTER_X + peakRadius * Math.cos(peakAngle),
-      y: CENTER_Y + peakRadius * Math.sin(peakAngle),
-    });
-
-    // ── Valley point ──
-    // Valley is always at valleyRadius for consistent star shape
-    // (Fixed valley radius makes a more consistent "Sheriff" star.)
-
-    const valleyAngle = peakAngle + peakAngleStep / 2;
-
-    points.push({
-      x: CENTER_X + valleyRadius * Math.cos(valleyAngle),
-      y: CENTER_Y + valleyRadius * Math.sin(valleyAngle),
-    });
-  }
-
-  return points;
+// Utility functions
+function clampPercentage(value: number, min = 0, max = 100): number {
+  if (!Number.isFinite(value)) return min;
+  return Math.max(min, Math.min(max, value));
 }
 
-// Legacy buildPolygonPoints removed - using buildStarPolygon instead
-
-/**
- * Builds points for a single stat triangle (Tip, BaseCCW, BaseCW)
- * New Logic: Base is anchored at CENTER (0,0) and expands perpendicularly.
- * @param index - stat index
- * @param total - total stats
- * @param widthFactor - 0..1 from slider. 1.0 = +/- 50px width? Or 100?
- *                      User said "If 1, then 1 pixel left/right".
- *                      Let's map slider 0..100 -> 0..100 pixels half-width.
- */
-function getTrianglePoints(index: number, total: number, widthFactor: number) {
-  const angleStep = (2 * Math.PI) / total;
-  const tipAngle = -Math.PI / 2 + index * angleStep;
-
-  const tipRadius = RADIUS * 0.95;
-
-  // Slider is 0-100. widthFactor is 0..1.
-  // User: "If 1 (slider?), 1 pixel left/right".
-  // Let's assume max width (slider=100) is reasonable, e.g. 100px half-width.
-  const halfWidth = widthFactor * 100; // 0 to 100px
-
-  const tip: Point = {
-    x: CENTER_X + tipRadius * Math.cos(tipAngle),
-    y: CENTER_Y + tipRadius * Math.sin(tipAngle),
-  };
-
-  // Perpendicular angle for base expansion
-  // If Tip is UP (-90deg), Perp is Right (0deg)
-  const perpAngle = tipAngle + Math.PI / 2;
-
-  const dx = Math.cos(perpAngle) * halfWidth;
-  const dy = Math.sin(perpAngle) * halfWidth;
-
-  return {
-    tip,
-    baseCCW: {
-      x: CENTER_X - dx,
-      y: CENTER_Y - dy,
-    },
-    baseCW: {
-      x: CENTER_X + dx,
-      y: CENTER_Y + dy,
-    },
-  };
-}
-
-/**
- * Build a pure Triangle polygon for single-stat cases.
- * Uses getTrianglePoints for consistency.
- */
-function buildTriangle(
-  stats: StatRow[],
-  activeIndex: number,
-  options: PolygonOptions
-): Point[] {
-  const width = Math.max(
-    0.01,
-    Math.min(1, options.triangleWidth ?? options.baseRatio ?? DEFAULT_POLYGON_OPTIONS.triangleWidth ?? 0.35),
-  );
-  const pts = getTrianglePoints(activeIndex, stats.length, width);
-  return [pts.tip, pts.baseCW, pts.baseCCW];
-}
-
-/**
- * Validates active stats and chooses the best shape.
- * - 1 Active Stat: Triangle
- * - 2-3 Active Stats: Stitched Triangles (Fan/Bowtie/Polygon)
- * - 4-5 Active Stats: Sheriff Star
- */
-function buildQuestConvexPolygon(
-  stats: StatRow[],
-  key: keyof StatRow,
-  options: PolygonOptions,
-): Point[] {
-  const numPoints = options.numPoints ?? stats.length;
-  const baseRatio = Math.max(0.1, options.baseRatio ?? 0);
-  const minRadius = RADIUS * baseRatio;
-  const points: Point[] = [];
-
-  for (let i = 0; i < numPoints; i++) {
-    const stat = stats[i];
-    const raw = stat ? Number(stat[key]) : 0;
-    const clamped = Number.isFinite(raw) ? Math.max(0, Math.min(100, raw)) : 0;
-    const radius = minRadius + (clamped / 100) * (RADIUS - minRadius);
-    const angle = -Math.PI / 2 + (i * 2 * Math.PI) / numPoints;
-    points.push({
-      x: CENTER_X + radius * Math.cos(angle),
-      y: CENTER_Y + radius * Math.sin(angle),
-    });
-  }
-
-  return points;
-}
-
-function buildAdaptivePolygon(
-  stats: StatRow[],
-  key: keyof StatRow,
-  options: PolygonOptions
-): Point[] {
-  const triangleWidth = Math.max(
-    0.01,
-    Math.min(1, options.triangleWidth ?? options.baseRatio ?? DEFAULT_POLYGON_OPTIONS.triangleWidth ?? 0.35),
-  );
-  // Count active stats (value > 0)
-  const activeStats = stats.map((s, i) => ({ val: Number(s[key]), index: i }))
-    .filter(s => s.val > 0);
-
-  const count = activeStats.length;
-  const isQuest = options.shapeType === 'quest';
-
-  if (count === 0) {
-    return [];
-  }
-
-  if (isQuest) {
-    if (count === 1) {
-      const tri = getTrianglePoints(activeStats[0].index, stats.length, triangleWidth);
-      return [tri.tip, tri.baseCW, tri.baseCCW];
-    }
-
-    // 2+ active stats -> Convex polygon without valleys
-    return buildQuestConvexPolygon(stats, key, options);
-  }
-
-  if (count === 1) {
-    // SINGLE STAT HERO -> TRIANGLE
-    return buildTriangle(stats, activeStats[0].index, options);
-  }
-
-  if (count === 2 || count === 3) {
-    // 2-3 STATS -> STITCHED GEOMETRY
-    // Ensure the stitched area never creates empty regions between stats
-    const points: Point[] = [];
-    const total = stats.length;
-    const center: Point = { x: CENTER_X, y: CENTER_Y };
-
-    activeStats.forEach((stat, i) => {
-      const nextStat = activeStats[(i + 1) % count];
-
-      const currentTri = getTrianglePoints(stat.index, total, triangleWidth);
-      const nextTri = getTrianglePoints(nextStat.index, total, triangleWidth);
-
-      points.push(currentTri.tip);
-      points.push(currentTri.baseCW);
-      points.push(center);
-      points.push(nextTri.baseCCW);
-    });
-
-    return points;
-  }
-
-  // DEFAULT MODE (4-5 Stats) -> STAR
-  return buildStarPolygon(stats, key, options);
-}
-
-
-
-function polygonToPointsAttr(points: Point[]): string {
-  if (points.length === 0) return '';
-  return points.map((p) => `${p.x},${p.y}`).join(' ');
-}
-
-function polygonToPathD(points: Point[]): string {
-  if (points.length === 0) return '';
-  const [first, ...rest] = points;
-  const segments = rest.map((p) => `L ${p.x} ${p.y}`).join(' ');
-  return `M ${first.x} ${first.y} ${segments} Z`;
-}
-
-/**
- * Convert polygon points to smooth SVG path using quadratic Bézier curves.
- * @param points - Array of polygon vertices
- * @param tension - 0 = straight lines, 1 = very smooth curves
- */
-function polygonToSmoothPathD(points: Point[], tension: number = 0.3): string {
-  if (points.length < 3) return polygonToPathD(points);
-  if (tension <= 0) return polygonToPathD(points);
-
-  const n = points.length;
-  const parts: string[] = [];
-
-  // Start at first point
-  parts.push(`M ${points[0].x} ${points[0].y}`);
-
-  for (let i = 0; i < n; i++) {
-    const current = points[i];
-    const next = points[(i + 1) % n];
-
-    // Control point: interpolate between midpoint and current point based on tension
-    const midX = (current.x + next.x) / 2;
-    const midY = (current.y + next.y) / 2;
-
-    // Use quadratic bezier with control point pulled toward the current point
-    const cpX = current.x + (midX - current.x) * (1 - tension);
-    const cpY = current.y + (midY - current.y) * (1 - tension);
-
-    // Draw quadratic curve to next point via control point
-    parts.push(`Q ${cpX} ${cpY} ${next.x} ${next.y}`);
-  }
-
-  return parts.join(' ');
-}
-
-function computeAverage(values: number[]): number {
-  const filtered = values.filter((value) => Number.isFinite(value) && value > 0);
-  if (!filtered.length) return 0;
-  const total = filtered.reduce((sum, value) => sum + value, 0);
-  return total / filtered.length;
+function normalizeValue(value: number, fallback = 0): number {
+  const clamped = clampPercentage(value);
+  return Number.isFinite(clamped) ? clamped / 100 : fallback;
 }
 
 function selectStatsForSkin(stats: StatRow[], count: number): StatRow[] {
@@ -581,19 +326,403 @@ function selectStatsForSkin(stats: StatRow[], count: number): StatRow[] {
   return slice;
 }
 
-function normalizeValue(value: number, fallback = 0): number {
-  const clamped = clampPercentage(value);
-  return Number.isFinite(clamped) ? clamped / 100 : fallback;
+// Geometry functions
+function polygonToPointsAttr(points: Point[]): string {
+  if (points.length === 0) return '';
+  return points.map((p) => `${p.x},${p.y}`).join(' ');
 }
 
-function buildSoloPolygon(value: number): Point[] {
+function polygonToPathD(points: Point[]): string {
+  if (points.length === 0) return '';
+  const [first, ...rest] = points;
+  const segments = rest.map((p) => `L ${p.x} ${p.y}`).join(' ');
+  return `M ${first.x} ${first.y} ${segments} Z`;
+}
+
+function polygonToSmoothPathD(points: Point[], tension: number = 0.3): string {
+  if (points.length < 3) return polygonToPathD(points);
+  if (tension <= 0) return polygonToPathD(points);
+
+  const n = points.length;
+  const parts: string[] = [];
+
+  parts.push(`M ${points[0].x} ${points[0].y}`);
+
+  for (let i = 0; i < n; i++) {
+    const current = points[i];
+    const next = points[(i + 1) % n];
+
+    const midX = (current.x + next.x) / 2;
+    const midY = (current.y + next.y) / 2;
+
+    const cpX = current.x + (midX - current.x) * (1 - tension);
+    const cpY = current.y + (midY - current.y) * (1 - tension);
+
+    parts.push(`Q ${cpX} ${cpY} ${next.x} ${next.y}`);
+  }
+
+  return parts.join(' ');
+}
+
+const projectPointToAltCard = (point: Point): Point => ({
+  x: ALT_CARD_CENTER.x + (point.x - CENTER_X) * ALT_CARD_SCALE,
+  y: ALT_CARD_CENTER.y + (point.y - CENTER_Y) * ALT_CARD_SCALE,
+});
+
+function buildSkinGeometry(skin: AltVisualSkin, stats: StatRow[]): SkinGeometry | null {
+  const selectedStats = selectStatsForSkin(stats, skin.statCount);
+  if (!selectedStats.length) {
+    return null;
+  }
+
+  const questValues = selectedStats.map((stat) => normalizeValue(stat.questValue));
+  const heroValues = selectedStats.map((stat) => normalizeValue(stat.heroValue));
+
+  const questBase = buildSkinPolygon(skin, questValues);
+  const heroBase = buildSkinPolygon(skin, heroValues);
+
+  if (questBase.length < 3 || heroBase.length < 3) {
+    return null;
+  }
+
+  return {
+    questBase,
+    heroBase,
+    questCard: questBase.map(projectPointToAltCard),
+    heroCard: heroBase.map(projectPointToAltCard),
+    questCardAttr: polygonToPointsAttr(questBase.map(projectPointToAltCard)),
+    questCardPath: polygonToPathD(questBase.map(projectPointToAltCard)),
+    questCardSmoothPath: polygonToSmoothPathD(questBase.map(projectPointToAltCard), 0.25),
+    heroCardPath: polygonToPathD(heroBase.map(projectPointToAltCard)),
+    heroCardSmoothPath: polygonToSmoothPathD(heroBase.map(projectPointToAltCard), 0.35),
+    projectToCard: projectPointToAltCard,
+    selectedStats,
+    maxRadius: questBase.reduce(
+      (max, point) => Math.max(max, Math.hypot(point.x - CENTER_X, point.y - CENTER_Y)),
+      0,
+    ),
+  };
+}
+
+type ShapeBuilder = (values: number[], skin?: AltVisualSkin) => Point[];
+
+const styleBuilders: Partial<Record<AltVisualSkin['style'], ShapeBuilder>> = {
+  triangle: (values) => buildTriangleSpire(values[0] ?? 0),
+  flame: (values) => buildFlamePolygon(values[0] ?? 0),
+  drop: (values) => buildDropPolygon(values[0] ?? 0),
+  column: (values) => buildColumnPolygon(values[0] ?? 0),
+  diamond: (values) => buildDiamondPolygon(values),
+  lens: (values) => buildLensPolygon(values),
+  petal: (values) => buildPetalPolygon(values),
+  bridge: (values) => buildBridgePolygon(values),
+  'soft-triangle': (values) => buildSoftTrianglePolygon(values),
+  triskel: (values) => buildTriskelPolygon(values),
+  'tri-flower': (values) => buildRosePolygon(values, 3, { wobble: 0.15, stepsMultiplier: 6 }),
+  poker: (values) => buildCrossPolygon(values),
+  'poker-clover': (values) => buildPokerCloverPolygon(values),
+  'poker-club': (values) => buildPokerClubPolygon(values),
+  'poker-preset': (values) => buildPokerPresetPolygon(values),
+  'wind-rose': (values) => buildRosePolygon(values, 4, { wobble: 0.12, stepsMultiplier: 6 }),
+  elastic: (values) => buildElasticPolygon(values),
+  pentagon: (values) => buildRadialPolygon(values, 5),
+  star: (values) => buildStarPolygon(values),
+  pentaflower: (values) => buildRosePolygon(values, 5, { wobble: 0.18, stepsMultiplier: 5 }),
+  'param-rose': (values, skin) =>
+    buildParamRosePreviewPolygon(values, (skin?.statCount ?? values.length) || 5),
+  'ribbon-bezier': (values) => buildRibbonBezierPolygon(values),
+  'overlay-combo': (values) => buildOverlayComboPolygon(values),
+};
+
+function buildSkinPolygon(skin: AltVisualSkin, values: number[]): Point[] {
+  const builder = styleBuilders[skin.style];
+  if (builder) {
+    return builder(values, skin);
+  }
+  switch (skin.structure) {
+    case 'solo':
+      return buildTriangleSpire(values[0] ?? 0);
+    case 'dual':
+      return buildDualPolygon(values);
+    case 'triple':
+      return buildRadialPolygon(values, 3);
+    case 'quattro':
+      return buildRadialPolygon(values, 4);
+    case 'epic':
+      return buildEpicPolygon(values);
+    default:
+      return buildRadialPolygon(values, Math.max(3, values.length));
+  }
+}
+
+/*********************
+ * Classic Quest Logic
+ *********************/
+
+function buildSingleStatTriangle(
+  totalCount: number,
+  entry: { index: number; value: number },
+  baseRatio: number,
+): Point[] {
+  const angleStep = (2 * Math.PI) / Math.max(1, totalCount);
+  const angle = -Math.PI / 2 + entry.index * angleStep;
+  const minRadius = RADIUS * baseRatio;
+  const tipRadius = minRadius + entry.value * (RADIUS - minRadius);
+  const baseRadius = Math.max(minRadius * 0.75, tipRadius * 0.35);
+  const tip: Point = {
+    x: CENTER_X + tipRadius * Math.cos(angle),
+    y: CENTER_Y + tipRadius * Math.sin(angle),
+  };
+  const baseCenter = {
+    x: CENTER_X + baseRadius * Math.cos(angle),
+    y: CENTER_Y + baseRadius * Math.sin(angle),
+  };
+  const perpAngle = angle + Math.PI / 2;
+  const halfWidth = 24 + entry.value * 30;
+  const baseRight: Point = {
+    x: baseCenter.x + Math.cos(perpAngle) * halfWidth,
+    y: baseCenter.y + Math.sin(perpAngle) * halfWidth,
+  };
+  const baseLeft: Point = {
+    x: baseCenter.x - Math.cos(perpAngle) * halfWidth,
+    y: baseCenter.y - Math.sin(perpAngle) * halfWidth,
+  };
+  return [tip, baseRight, { x: CENTER_X, y: CENTER_Y }, baseLeft];
+}
+
+function buildStatWedge(
+  totalCount: number,
+  entry: { index: number; value: number },
+  baseRatio: number,
+) {
+  const angleStep = (2 * Math.PI) / Math.max(1, totalCount);
+  const angle = -Math.PI / 2 + entry.index * angleStep;
+  const minRadius = RADIUS * baseRatio;
+  const tipRadius = minRadius + entry.value * (RADIUS - minRadius);
+  const baseRadius = Math.max(minRadius * 0.8, tipRadius * 0.45);
+  const tip: Point = {
+    x: CENTER_X + tipRadius * Math.cos(angle),
+    y: CENTER_Y + tipRadius * Math.sin(angle),
+  };
+  const baseCenter = {
+    x: CENTER_X + baseRadius * Math.cos(angle),
+    y: CENTER_Y + baseRadius * Math.sin(angle),
+  };
+  const perpAngle = angle + Math.PI / 2;
+  const halfWidth = 18 + entry.value * 26;
+  const baseRight: Point = {
+    x: baseCenter.x + Math.cos(perpAngle) * halfWidth,
+    y: baseCenter.y + Math.sin(perpAngle) * halfWidth,
+  };
+  const baseLeft: Point = {
+    x: baseCenter.x - Math.cos(perpAngle) * halfWidth,
+    y: baseCenter.y - Math.sin(perpAngle) * halfWidth,
+  };
+  return { tip, baseLeft, baseRight };
+}
+
+const clampValue = (value: number, min = 0.05): number => Math.max(min, value);
+
+interface ClassicPolygonOptions {
+  baseRatio?: number;
+  valleyDepth?: number;
+  triangleWidth?: number;
+  numPoints?: number;
+  shapeType?: 'hero' | 'quest';
+}
+
+const DEFAULT_CLASSIC_POLYGON_OPTIONS: ClassicPolygonOptions = {
+  baseRatio: 0.25,
+  valleyDepth: 0.6,
+  triangleWidth: 0.35,
+  numPoints: 5,
+};
+
+const CLASSIC_CURVE_TENSION = 0.3;
+const CLASSIC_VALLEY_DEPTH = 0.5;
+const CLASSIC_HERO_PRECISION = 0.2;
+const CLASSIC_TRIANGLE_WIDTH = 0.35;
+
+function getClassicTrianglePoints(index: number, total: number, widthFactor: number) {
+  const angleStep = (2 * Math.PI) / Math.max(1, total);
+  const tipAngle = -Math.PI / 2 + index * angleStep;
+  const tipRadius = RADIUS * 0.95;
+  const halfWidth = widthFactor * 90;
+  const tip: Point = {
+    x: CENTER_X + tipRadius * Math.cos(tipAngle),
+    y: CENTER_Y + tipRadius * Math.sin(tipAngle),
+  };
+  const perpAngle = tipAngle + Math.PI / 2;
+  const dx = Math.cos(perpAngle) * halfWidth;
+  const dy = Math.sin(perpAngle) * halfWidth;
+  return {
+    tip,
+    baseCW: {
+      x: CENTER_X + dx,
+      y: CENTER_Y + dy,
+    },
+    baseCCW: {
+      x: CENTER_X - dx,
+      y: CENTER_Y - dy,
+    },
+  };
+}
+
+function buildClassicTriangle(
+  stats: StatRow[],
+  activeIndex: number,
+  options: ClassicPolygonOptions,
+): Point[] {
+  const triangleWidth = Math.max(
+    0.01,
+    Math.min(1, options.triangleWidth ?? DEFAULT_CLASSIC_POLYGON_OPTIONS.triangleWidth ?? 0.35),
+  );
+  const pts = getClassicTrianglePoints(activeIndex, stats.length, triangleWidth);
+  return [pts.tip, pts.baseCW, pts.baseCCW];
+}
+
+function buildClassicQuestPolygon(
+  stats: StatRow[],
+  key: keyof StatRow,
+  options: ClassicPolygonOptions,
+): Point[] {
+  const numPoints = options.numPoints ?? stats.length;
+  const baseRatio = Math.max(0.05, options.baseRatio ?? DEFAULT_CLASSIC_POLYGON_OPTIONS.baseRatio ?? 0.25);
+  const minRadius = RADIUS * baseRatio;
+  const points: Point[] = [];
+  for (let i = 0; i < Math.max(1, numPoints); i += 1) {
+    const stat = stats[i];
+    const raw = stat ? Number(stat[key]) : 0;
+    const clamped = Number.isFinite(raw) ? Math.max(0, Math.min(100, raw)) : 0;
+    const radius = minRadius + (clamped / 100) * (RADIUS - minRadius);
+    const angle = -Math.PI / 2 + (i * 2 * Math.PI) / Math.max(1, numPoints);
+    points.push({
+      x: CENTER_X + radius * Math.cos(angle),
+      y: CENTER_Y + radius * Math.sin(angle),
+    });
+  }
+  return points;
+}
+
+function buildClassicStarPolygon(
+  stats: StatRow[],
+  key: keyof StatRow,
+  options: ClassicPolygonOptions = {},
+): Point[] {
+  const numPoints = Math.max(3, options.numPoints ?? stats.length);
+  const valleyDepth = Math.max(0, Math.min(1, options.valleyDepth ?? DEFAULT_CLASSIC_POLYGON_OPTIONS.valleyDepth ?? 0.6));
+  const valleyRadius = RADIUS * (1 - valleyDepth);
+  const peakAngleStep = (2 * Math.PI) / numPoints;
+  const points: Point[] = [];
+  for (let i = 0; i < numPoints; i += 1) {
+    const stat = stats[i];
+    const raw = stat ? Number(stat[key]) : 0;
+    const value = Number.isFinite(raw) ? Math.max(0, Math.min(100, raw)) : 0;
+    const peakRadius = valleyRadius + (value / 100) * (RADIUS - valleyRadius);
+    const peakAngle = -Math.PI / 2 + i * peakAngleStep;
+    points.push({
+      x: CENTER_X + peakRadius * Math.cos(peakAngle),
+      y: CENTER_Y + peakRadius * Math.sin(peakAngle),
+    });
+    const valleyAngle = peakAngle + peakAngleStep / 2;
+    points.push({
+      x: CENTER_X + valleyRadius * Math.cos(valleyAngle),
+      y: CENTER_Y + valleyRadius * Math.sin(valleyAngle),
+    });
+  }
+  return points;
+}
+
+function buildClassicStitchedPolygon(
+  stats: StatRow[],
+  key: keyof StatRow,
+  options: ClassicPolygonOptions,
+): Point[] {
+  const triangleWidth = Math.max(
+    0.01,
+    Math.min(1, options.triangleWidth ?? DEFAULT_CLASSIC_POLYGON_OPTIONS.triangleWidth ?? 0.35),
+  );
+  const center: Point = { x: CENTER_X, y: CENTER_Y };
+  const activeStats = stats
+    .map((s, index) => ({ value: Number(s[key]) || 0, index }))
+    .filter((entry) => entry.value > 0);
+  const points: Point[] = [];
+  activeStats.forEach((entry, idx) => {
+    const current = getClassicTrianglePoints(entry.index, stats.length, triangleWidth);
+    const nextEntry = activeStats[(idx + 1) % activeStats.length];
+    const next = getClassicTrianglePoints(nextEntry.index, stats.length, triangleWidth);
+    points.push(current.tip);
+    points.push(current.baseCW);
+    points.push(center);
+    points.push(next.baseCCW);
+  });
+  return points;
+}
+
+function buildClassicAdaptivePolygon(
+  stats: StatRow[],
+  selector: keyof StatRow,
+  options: ClassicPolygonOptions,
+): Point[] {
+  const total = stats.length;
+  if (total === 0) return [];
+
+  const baseRatio = Math.max(
+    0.05,
+    options.baseRatio ?? DEFAULT_CLASSIC_POLYGON_OPTIONS.baseRatio ?? 0.25,
+  );
+
+  const entries = stats.map((stat, index) => ({
+    index,
+    value: normalizeValue(stat[selector] as number),
+  }));
+
+  const activeEntries = entries.filter((entry) => entry.value > 0);
+  if (activeEntries.length === 0) {
+    return [];
+  }
+
+  const buildFan = () => {
+    const center: Point = { x: CENTER_X, y: CENTER_Y };
+    const points: Point[] = [];
+    activeEntries.forEach((entry) => {
+      const wedge = buildStatWedge(total, entry, baseRatio);
+      points.push(wedge.tip, wedge.baseRight, center, wedge.baseLeft);
+    });
+    return points;
+  };
+
+  if (activeEntries.length === 1) {
+    return buildSingleStatTriangle(total, activeEntries[0], baseRatio);
+  }
+
+  if (options.shapeType === 'quest') {
+    if (activeEntries.length <= 3) {
+      return buildFan();
+    }
+    return buildClassicQuestPolygon(stats, selector, {
+      ...options,
+      baseRatio,
+    });
+  }
+
+  if (activeEntries.length <= 3) {
+    return buildFan();
+  }
+
+  return buildClassicStarPolygon(stats, selector, {
+    ...options,
+  });
+}
+
+function buildTriangleSpire(value: number): Point[] {
   const heightRatio = Math.max(0.05, value);
   const topY = CENTER_Y - heightRatio * (RADIUS * 0.95);
   const baseY = CENTER_Y + RADIUS * 0.65;
-  const halfWidth = 45;
+  const halfWidth = 30 + value * 40;
   return [
     { x: CENTER_X, y: topY },
     { x: CENTER_X + halfWidth, y: baseY },
+    { x: CENTER_X, y: baseY - halfWidth * 0.25 },
     { x: CENTER_X - halfWidth, y: baseY },
   ];
 }
@@ -627,6 +756,360 @@ function buildRadialPolygon(values: number[], sides: number, offset = -Math.PI /
   return points;
 }
 
+function buildParamRosePreviewPolygon(values: number[], petals: number): Point[] {
+  return buildRosePolygon(values, Math.max(3, petals), {
+    wobble: 0.22,
+    inner: 0.18,
+    outer: 0.65,
+    stepsMultiplier: 14,
+  });
+}
+
+function cubicBezierPoint(p0: Point, p1: Point, p2: Point, p3: Point, t: number): Point {
+  const mt = 1 - t;
+  const mt2 = mt * mt;
+  const t2 = t * t;
+  return {
+    x: mt2 * mt * p0.x + 3 * mt2 * t * p1.x + 3 * mt * t2 * p2.x + t2 * t * p3.x,
+    y: mt2 * mt * p0.y + 3 * mt2 * t * p1.y + 3 * mt * t2 * p2.y + t2 * t * p3.y,
+  };
+}
+
+function cubicBezierTangent(p0: Point, p1: Point, p2: Point, p3: Point, t: number): { x: number; y: number } {
+  const mt = 1 - t;
+  return {
+    x:
+      3 * mt * mt * (p1.x - p0.x) +
+      6 * mt * t * (p2.x - p1.x) +
+      3 * t * t * (p3.x - p2.x),
+    y:
+      3 * mt * mt * (p1.y - p0.y) +
+      6 * mt * t * (p2.y - p1.y) +
+      3 * t * t * (p3.y - p2.y),
+  };
+}
+
+function buildRibbonBezierPolygon(values: number[]): Point[] {
+  const intensity = clampValue(values[0] ?? 0.5);
+  const curvature = clampValue(values[1] ?? values[0] ?? 0.4);
+  const ribbonWidth = 25 + intensity * 35;
+  const start: Point = { x: CENTER_X - RADIUS * 0.75, y: CENTER_Y + RADIUS * 0.4 };
+  const end: Point = { x: CENTER_X + RADIUS * 0.75, y: CENTER_Y - RADIUS * 0.4 };
+  const control1: Point = {
+    x: CENTER_X - RADIUS * 0.2,
+    y: CENTER_Y - (0.1 + curvature * 0.6) * RADIUS,
+  };
+  const control2: Point = {
+    x: CENTER_X + RADIUS * 0.15,
+    y: CENTER_Y + (0.05 + curvature * 0.55) * RADIUS,
+  };
+  const steps = 36;
+  const top: Point[] = [];
+  const bottom: Point[] = [];
+  for (let i = 0; i <= steps; i += 1) {
+    const t = i / steps;
+    const point = cubicBezierPoint(start, control1, control2, end, t);
+    const tangent = cubicBezierTangent(start, control1, control2, end, t);
+    const len = Math.hypot(tangent.x, tangent.y) || 1;
+    const normal = { x: -tangent.y / len, y: tangent.x / len };
+    const widthMod = 0.5 + Math.sin(Math.PI * t * 2) * 0.2;
+    const offset = ribbonWidth * widthMod;
+    top.push({
+      x: point.x + normal.x * offset,
+      y: point.y + normal.y * offset,
+    });
+    bottom.push({
+      x: point.x - normal.x * offset,
+      y: point.y - normal.y * offset,
+    });
+  }
+  return [...top, ...bottom.reverse()];
+}
+
+function buildOverlayComboPolygon(values: number[]): Point[] {
+  const base = buildRosePolygon(values, Math.max(4, values.length), {
+    wobble: 0.16,
+    inner: 0.22,
+    outer: 0.58,
+    stepsMultiplier: 10,
+  });
+  return base.map((point, index) => {
+    const radius = Math.hypot(point.x - CENTER_X, point.y - CENTER_Y);
+    const angle = Math.atan2(point.y - CENTER_Y, point.x - CENTER_X);
+    const modulation = index % 2 === 0 ? 1.08 : 0.92;
+    const adjustedRadius = radius * modulation;
+    return {
+      x: CENTER_X + adjustedRadius * Math.cos(angle),
+      y: CENTER_Y + adjustedRadius * Math.sin(angle),
+    };
+  });
+}
+
+function buildPokerCloverPolygon(values: number[]): Point[] {
+  const base = buildRosePolygon(values, 4, {
+    wobble: 0.08,
+    inner: 0.3,
+    outer: 0.5,
+    stepsMultiplier: 9,
+  });
+  const stemWidth = 16;
+  const stemLength = RADIUS * 0.4;
+  const stemTop = CENTER_Y + RADIUS * 0.45;
+  const stemPoints: Point[] = [
+    { x: CENTER_X + stemWidth, y: stemTop },
+    { x: CENTER_X + stemWidth * 0.65, y: stemTop + stemLength },
+    { x: CENTER_X - stemWidth * 0.65, y: stemTop + stemLength },
+    { x: CENTER_X - stemWidth, y: stemTop },
+  ];
+  return [...base, ...stemPoints];
+}
+
+function arcPoints(cx: number, cy: number, radius: number, startAngle: number, endAngle: number, steps: number): Point[] {
+  const points: Point[] = [];
+  for (let i = 0; i <= steps; i += 1) {
+    const t = i / steps;
+    const angle = startAngle + (endAngle - startAngle) * t;
+    points.push({
+      x: cx + radius * Math.cos(angle),
+      y: cy + radius * Math.sin(angle),
+    });
+  }
+  return points;
+}
+
+function buildPokerClubPolygon(values: number[]): Point[] {
+  const intensity = clampValue(values[0] ?? 0.6);
+  const radius = (0.32 + intensity * 0.4) * RADIUS;
+  const topCenter = { x: CENTER_X, y: CENTER_Y - radius * 0.65 };
+  const rightCenter = { x: CENTER_X + radius * 0.85, y: CENTER_Y + radius * 0.05 };
+  const leftCenter = { x: CENTER_X - radius * 0.85, y: CENTER_Y + radius * 0.05 };
+  const bottomCenter = { x: CENTER_X, y: CENTER_Y + radius * 0.9 };
+  const stemWidth = radius * 0.35;
+  const stemLength = radius * 0.9;
+
+  const path = [
+    ...arcPoints(topCenter.x, topCenter.y, radius * 0.85, -Math.PI / 2, Math.PI / 2, 14),
+    ...arcPoints(rightCenter.x, rightCenter.y, radius, -Math.PI / 2, Math.PI / 2, 16),
+    ...arcPoints(bottomCenter.x, bottomCenter.y, radius * 0.85, 0, Math.PI, 16),
+    ...arcPoints(leftCenter.x, leftCenter.y, radius, Math.PI / 2, (3 * Math.PI) / 2, 16),
+    ...arcPoints(topCenter.x, topCenter.y, radius * 0.85, Math.PI / 2, (3 * Math.PI) / 2, 14),
+  ];
+
+  return [
+    ...path,
+    { x: CENTER_X + stemWidth, y: CENTER_Y + radius * 1.5 },
+    { x: CENTER_X + stemWidth * 0.5, y: CENTER_Y + radius * 1.5 + stemLength },
+    { x: CENTER_X - stemWidth * 0.5, y: CENTER_Y + radius * 1.5 + stemLength },
+    { x: CENTER_X - stemWidth, y: CENTER_Y + radius * 1.5 },
+  ];
+}
+
+function buildPokerPresetPolygon(values: number[]): Point[] {
+  const intensity = clampValue(values[0] ?? 0.5);
+  const scale = (0.35 + intensity * 0.45) * RADIUS;
+  return POKER_PRESET_BASE_POINTS.map((point) => ({
+    x: CENTER_X + point.x * scale,
+    y: CENTER_Y + point.y * scale,
+  }));
+}
+
+function buildFlamePolygon(value: number): Point[] {
+  const intensity = clampValue(value);
+  const height = (0.5 + intensity * 0.45) * RADIUS;
+  const baseY = CENTER_Y + RADIUS * 0.55;
+  const tipY = CENTER_Y - height;
+  const waistY = (tipY + baseY) / 2;
+  const flare = 30 + intensity * 40;
+  return [
+    { x: CENTER_X, y: tipY },
+    { x: CENTER_X + flare * 0.35, y: tipY + height * 0.25 },
+    { x: CENTER_X + flare, y: waistY },
+    { x: CENTER_X + flare * 0.65, y: baseY },
+    { x: CENTER_X, y: baseY + flare * 0.3 },
+    { x: CENTER_X - flare * 0.65, y: baseY },
+    { x: CENTER_X - flare, y: waistY },
+    { x: CENTER_X - flare * 0.35, y: tipY + height * 0.25 },
+  ];
+}
+
+function buildDropPolygon(value: number): Point[] {
+  const intensity = clampValue(value);
+  const height = (0.55 + intensity * 0.35) * RADIUS;
+  const width = 25 + intensity * 35;
+  const tipY = CENTER_Y - height;
+  const baseY = CENTER_Y + RADIUS * 0.6;
+  const controlY = (tipY + baseY) / 2;
+  return [
+    { x: CENTER_X, y: tipY },
+    { x: CENTER_X + width * 0.7, y: controlY },
+    { x: CENTER_X + width, y: baseY },
+    { x: CENTER_X, y: baseY + width * 0.5 },
+    { x: CENTER_X - width, y: baseY },
+    { x: CENTER_X - width * 0.7, y: controlY },
+  ];
+}
+
+function buildColumnPolygon(value: number): Point[] {
+  const intensity = clampValue(value);
+  const height = (0.4 + intensity * 0.6) * RADIUS;
+  const width = 35 + intensity * 20;
+  const topY = CENTER_Y - height;
+  const baseY = CENTER_Y + RADIUS * 0.5;
+  return [
+    { x: CENTER_X - width, y: baseY },
+    { x: CENTER_X - width, y: topY + width * 0.3 },
+    { x: CENTER_X - width * 0.5, y: topY },
+    { x: CENTER_X + width * 0.5, y: topY },
+    { x: CENTER_X + width, y: topY + width * 0.3 },
+    { x: CENTER_X + width, y: baseY },
+    { x: CENTER_X + width * 0.4, y: baseY + width * 0.4 },
+    { x: CENTER_X - width * 0.4, y: baseY + width * 0.4 },
+  ];
+}
+
+function buildDiamondPolygon(values: number[]): Point[] {
+  const major = clampValue(values[0] ?? 0);
+  const minor = clampValue(values[1] ?? values[0] ?? 0);
+  const vertical = (0.3 + major * 0.6) * RADIUS;
+  const horizontal = (0.2 + minor * 0.5) * RADIUS;
+  return [
+    { x: CENTER_X, y: CENTER_Y - vertical },
+    { x: CENTER_X + horizontal, y: CENTER_Y },
+    { x: CENTER_X, y: CENTER_Y + vertical },
+    { x: CENTER_X - horizontal, y: CENTER_Y },
+  ];
+}
+
+function buildLensPolygon(values: number[]): Point[] {
+  const width = (0.35 + clampValue(values[0] ?? 0) * 0.4) * RADIUS;
+  const height = (0.15 + clampValue(values[1] ?? values[0] ?? 0) * 0.35) * RADIUS;
+  const steps = 18;
+  const points: Point[] = [];
+  for (let i = 0; i <= steps; i += 1) {
+    const theta = Math.PI * (i / steps);
+    points.push({
+      x: CENTER_X + width * Math.cos(theta),
+      y: CENTER_Y - height * Math.sin(theta),
+    });
+  }
+  for (let i = steps; i >= 0; i -= 1) {
+    const theta = Math.PI * (i / steps);
+    points.push({
+      x: CENTER_X + width * Math.cos(theta),
+      y: CENTER_Y + height * Math.sin(theta),
+    });
+  }
+  return points;
+}
+
+function buildPetalPolygon(values: number[]): Point[] {
+  return buildRosePolygon(values, 2, { wobble: 0.2, stepsMultiplier: 6 });
+}
+
+function buildBridgePolygon(values: number[]): Point[] {
+  const width = (0.4 + clampValue(values[0] ?? 0) * 0.4) * RADIUS;
+  const height = (0.15 + clampValue(values[1] ?? values[0] ?? 0) * 0.4) * RADIUS;
+  const baseY = CENTER_Y + RADIUS * 0.5;
+  const steps = 12;
+  const arcPoints: Point[] = [];
+  for (let i = 0; i <= steps; i += 1) {
+    const theta = Math.PI * (i / steps);
+    arcPoints.push({
+      x: CENTER_X - width + (Math.cos(theta) + 1) * width,
+      y: baseY - Math.sin(theta) * height,
+    });
+  }
+  return [
+    { x: CENTER_X - width, y: baseY },
+    { x: CENTER_X - width, y: baseY + height * 0.35 },
+    { x: CENTER_X + width, y: baseY + height * 0.35 },
+    { x: CENTER_X + width, y: baseY },
+    ...arcPoints.reverse(),
+  ];
+}
+
+function buildSoftTrianglePolygon(values: number[]): Point[] {
+  return buildRadialPolygon(values, 3).flatMap((point, idx, arr) => {
+    const next = arr[(idx + 1) % arr.length];
+    const mid = {
+      x: (point.x + next.x) / 2 + 0.12 * (CENTER_X - (point.x + next.x) / 2),
+      y: (point.y + next.y) / 2 + 0.12 * (CENTER_Y - (point.y + next.y) / 2),
+    };
+    return [point, mid];
+  });
+}
+
+function buildTriskelPolygon(values: number[]): Point[] {
+  return buildRosePolygon(values, 3, { wobble: 0.1, phase: Math.PI / 3, stepsMultiplier: 5 });
+}
+
+function buildCrossPolygon(values: number[]): Point[] {
+  const v = clampValue(values[0] ?? 0);
+  const h = clampValue(values[1] ?? values[0] ?? 0);
+  const armLong = (0.25 + v * 0.55) * RADIUS;
+  const armShort = (0.15 + h * 0.4) * RADIUS;
+  const thickness = 25 + v * 20;
+  return [
+    { x: CENTER_X - thickness, y: CENTER_Y - armLong },
+    { x: CENTER_X + thickness, y: CENTER_Y - armLong },
+    { x: CENTER_X + thickness, y: CENTER_Y - thickness },
+    { x: CENTER_X + armShort, y: CENTER_Y - thickness },
+    { x: CENTER_X + armShort, y: CENTER_Y + thickness },
+    { x: CENTER_X + thickness, y: CENTER_Y + thickness },
+    { x: CENTER_X + thickness, y: CENTER_Y + armLong },
+    { x: CENTER_X - thickness, y: CENTER_Y + armLong },
+    { x: CENTER_X - thickness, y: CENTER_Y + thickness },
+    { x: CENTER_X - armShort, y: CENTER_Y + thickness },
+    { x: CENTER_X - armShort, y: CENTER_Y - thickness },
+    { x: CENTER_X - thickness, y: CENTER_Y - thickness },
+  ];
+}
+
+function buildRosePolygon(
+  values: number[],
+  petals: number,
+  options: { wobble?: number; phase?: number; inner?: number; outer?: number; stepsMultiplier?: number } = {},
+): Point[] {
+  const steps = Math.max(12, Math.round((options.stepsMultiplier ?? 8) * petals));
+  const wobble = options.wobble ?? 0.08;
+  const inner = options.inner ?? 0.25;
+  const outer = options.outer ?? 0.6;
+  const points: Point[] = [];
+  for (let i = 0; i < steps; i += 1) {
+    const t = i / steps;
+    const theta = -Math.PI / 2 + t * Math.PI * 2;
+    const baseIndex = Math.floor(t * values.length) % values.length;
+    const baseValue = clampValue(values[baseIndex] ?? values[0] ?? 0);
+    const modulation = Math.sin(petals * theta + (options.phase ?? 0)) * wobble;
+    const radius = Math.max(0.05, inner + baseValue * outer + modulation) * RADIUS;
+    points.push({
+      x: CENTER_X + radius * Math.cos(theta),
+      y: CENTER_Y + radius * Math.sin(theta),
+    });
+  }
+  return points;
+}
+
+function buildElasticPolygon(values: number[]): Point[] {
+  return buildRosePolygon(values, values.length, { wobble: 0.05, stepsMultiplier: 10, inner: 0.3, outer: 0.5 });
+}
+
+function buildStarPolygon(values: number[]): Point[] {
+  const baseValue = clampValue(values[0] ?? 0);
+  const outerRadius = (0.35 + baseValue * 0.55) * RADIUS;
+  const innerRadius = outerRadius * 0.45;
+  const points: Point[] = [];
+  for (let i = 0; i < 10; i += 1) {
+    const angle = -Math.PI / 2 + (i * Math.PI) / 5;
+    const radius = i % 2 === 0 ? outerRadius : innerRadius;
+    points.push({
+      x: CENTER_X + radius * Math.cos(angle),
+      y: CENTER_Y + radius * Math.sin(angle),
+    });
+  }
+  return points;
+}
+
 function buildEpicPolygon(values: number[]): Point[] {
   const peaks = 5;
   const points: Point[] = [];
@@ -649,21 +1132,10 @@ function buildEpicPolygon(values: number[]): Point[] {
   return points;
 }
 
-function buildSkinPolygon(structure: AltStructure, values: number[]): Point[] {
-  switch (structure) {
-    case 'solo':
-      return buildSoloPolygon(values[0] ?? 0);
-    case 'dual':
-      return buildDualPolygon(values);
-    case 'triple':
-      return buildRadialPolygon(values, 3);
-    case 'quattro':
-      return buildRadialPolygon(values, 4);
-    case 'epic':
-      return buildEpicPolygon(values);
-    default:
-      return buildRadialPolygon(values, Math.max(3, values.length));
-  }
+// Pinball simulation
+interface PinballOptions {
+  shotPower: number;
+  spinBias: number;
 }
 
 function pointInPolygon(point: Point, polygon: Point[]): boolean {
@@ -683,11 +1155,6 @@ function pointInPolygon(point: Point, polygon: Point[]): boolean {
   return inside;
 }
 
-function clampPercentage(value: number, min = 0, max = 100): number {
-  if (!Number.isFinite(value)) return min;
-  return Math.max(min, Math.min(max, value));
-}
-
 function getQuestEdges(points: Point[]): { a: Point; b: Point }[] {
   if (points.length < 2) return [];
   return points.map((point, index) => ({
@@ -699,7 +1166,6 @@ function getQuestEdges(points: Point[]): { a: Point; b: Point }[] {
 function getInwardNormal(edge: { a: Point; b: Point }): { x: number; y: number } {
   const ex = edge.b.x - edge.a.x;
   const ey = edge.b.y - edge.a.y;
-  // For CCW polygons, outward normal is (ey, -ex). Inward is (-ey, ex).
   let nx = -ey;
   let ny = ex;
   const length = Math.hypot(nx, ny) || 1;
@@ -708,7 +1174,6 @@ function getInwardNormal(edge: { a: Point; b: Point }): { x: number; y: number }
   const centerVectorX = CENTER_X - edge.a.x;
   const centerVectorY = CENTER_Y - edge.a.y;
   if (nx * centerVectorX + ny * centerVectorY < 0) {
-    // Normal pointing outward, flip it.
     nx *= -1;
     ny *= -1;
   }
@@ -738,62 +1203,17 @@ function segmentsIntersect(
   return null;
 }
 
-function hashString(input: string): number {
-  let hash = 0;
-  for (let i = 0; i < input.length; i += 1) {
-    hash = (hash << 5) - hash + input.charCodeAt(i);
-    hash |= 0; // convert to 32bit int
-  }
-  return hash >>> 0;
-}
-
-function createSeededRng(seed: number): () => number {
-  let state = seed || 1;
-  return () => {
-    state = (1664525 * state + 1013904223) % 4294967296;
-    return state / 4294967296;
-  };
-}
-
-function shuffleWithRng<T>(items: T[], rng: () => number): T[] {
-  const arr = [...items];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
-function samplePointInsidePolygon(polygon: Point[], maxAttempts = 200): Point {
-  if (polygon.length < 3) return { x: CENTER_X, y: CENTER_Y };
-  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
-    const u = Math.random();
-    const r = Math.sqrt(u) * RADIUS;
-    const angle = Math.random() * Math.PI * 2;
-    const x = CENTER_X + r * Math.cos(angle);
-    const y = CENTER_Y + r * Math.sin(angle);
-    const candidate = { x, y };
-    if (pointInPolygon(candidate, polygon)) {
-      return candidate;
-    }
-  }
-  return { x: CENTER_X, y: CENTER_Y };
-}
-
 function simulatePinballPath(target: Point, polygon: Point[], options: PinballOptions): Point[] {
   const path: Point[] = [];
   if (polygon.length < 3) {
     return [target];
   }
   const edges = getQuestEdges(polygon);
-  // Physics Timing Tuning
-  // 180 steps @ 60fps ~= 3 seconds max duration
   const maxSteps = 180;
 
   const clampedShot = Math.max(0, Math.min(1, options.shotPower));
   const clampedSpin = Math.max(-1, Math.min(1, options.spinBias));
 
-  // Very High Energy Launch
   const baseSpeed = 30 + clampedShot * 40;
   const spinStrength = 0.02 * clampedSpin;
   const restitution = 0.92;
@@ -811,25 +1231,17 @@ function simulatePinballPath(target: Point, polygon: Point[], options: PinballOp
   path.push({ ...pos });
 
   for (let step = 0; step < maxSteps; step += 1) {
-
-
-    // ── EXPONENTIAL BRAKING ──
-    // Fast for 1s (60 steps), then progressive braking
     const progress = step / maxSteps;
     let friction = 0.995;
 
     if (progress > 0.3) {
-      // Brake phase starts earlier to ensure stop
-      const brake = (progress - 0.3) / 0.7; // 0..1
-      // Triple friction increase as requested (was 0.25)
+      const brake = (progress - 0.3) / 0.7;
       friction = 0.995 - (brake * brake * 0.75);
     }
 
-    // Apply friction
     vel.x *= friction;
     vel.y *= friction;
 
-    // Apply Spin
     if (spinStrength !== 0) {
       const spinForceX = -vel.y * spinStrength;
       const spinForceY = vel.x * spinStrength;
@@ -837,7 +1249,6 @@ function simulatePinballPath(target: Point, polygon: Point[], options: PinballOp
       vel.y += spinForceY;
     }
 
-    // Clamp speed
     const currentSpeed = Math.hypot(vel.x, vel.y);
     if (currentSpeed > maxSpeed) {
       const scale = maxSpeed / currentSpeed;
@@ -845,10 +1256,8 @@ function simulatePinballPath(target: Point, polygon: Point[], options: PinballOp
       vel.y *= scale;
     }
 
-    // Movement step
     const nextPos = { x: pos.x + vel.x, y: pos.y + vel.y };
 
-    // Collision detection
     let collided = false;
     let collisionPoint: Point | null = null;
     let collisionNormal: { x: number; y: number } | null = null;
@@ -864,7 +1273,6 @@ function simulatePinballPath(target: Point, polygon: Point[], options: PinballOp
     }
 
     if (collided && collisionPoint && collisionNormal) {
-      // Bounce response
       pos = {
         x: collisionPoint.x + collisionNormal.x * 0.8,
         y: collisionPoint.y + collisionNormal.y * 0.8,
@@ -876,15 +1284,12 @@ function simulatePinballPath(target: Point, polygon: Point[], options: PinballOp
         y: vel.y - (1 + restitution) * dot * collisionNormal.y,
       };
 
-      // Energy loss on wall
       vel.x *= 0.9;
       vel.y *= 0.9;
     } else {
-      // No collision, verify sticking to polygon
       pos = nextPos;
 
       if (!pointInPolygon(pos, polygon)) {
-        // Emergency snap to center if leaked
         const angle = Math.atan2(pos.y - CENTER_Y, pos.x - CENTER_X);
         const radius = Math.min(RADIUS, Math.hypot(pos.x - CENTER_X, pos.y - CENTER_Y));
         pos = {
@@ -898,13 +1303,11 @@ function simulatePinballPath(target: Point, polygon: Point[], options: PinballOp
 
     path.push({ ...pos });
 
-    // Stop condition
     if (currentSpeed < minSpeedThreshold) {
       break;
     }
   }
 
-  // Ensure last point is recorded
   if (path[path.length - 1] !== pos) {
     path.push(pos);
   }
@@ -912,6 +1315,7 @@ function simulatePinballPath(target: Point, polygon: Point[], options: PinballOp
   return path;
 }
 
+// Main component
 export const SkillCheckPreviewPage: React.FC = () => {
   const { config } = useBalancerConfig();
   const baseStatsPool = useMemo(() => {
@@ -926,62 +1330,38 @@ export const SkillCheckPreviewPage: React.FC = () => {
     const rng = createSeededRng(hashString(seedSource));
     const shuffled = shuffleWithRng(baseStatsPool, rng);
     return shuffled.slice(0, 5).map((stat, index) => {
-      const defaultValue = index === 0 ? 60 : 0;
+      const fallback = index === 0 ? 60 : 0;
+      const baseValue = typeof stat.defaultValue === 'number' ? stat.defaultValue : fallback;
+      const normalized = clampPercentage(baseValue);
       return {
         id: stat.id,
         name: stat.label,
-        questValue: defaultValue,
-        heroValue: defaultValue,
-        isDetrimental: !!stat.isDetrimental,
+        questValue: normalized,
+        heroValue: normalized,
+        isDetrimental: stat.isDetrimental || false,
       };
     });
   }, [baseStatsPool]);
 
-  const [stats, setStats] = useState<StatRow[]>([]);
-
-  useEffect(() => {
-    if (!initialStats.length) return undefined;
-    const frame = requestAnimationFrame(() => {
-      setStats(initialStats);
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [initialStats]);
-  const [injuryPct, setInjuryPct] = useState(10);
-  const [deathPct, setDeathPct] = useState(5);
-  const [shotPower, setShotPower] = useState(0.8); // 0..1 slider
-  const [spinBias, setSpinBias] = useState(0);
-  const [lastOutcome, setLastOutcome] = useState<LastOutcome | null>(null);
-  const [log, setLog] = useState<string[]>([]);
+  const [stats, setStats] = useState<StatRow[]>(initialStats);
+  const [injuryPct, setInjuryPct] = useState(30);
+  const [deathPct, setDeathPct] = useState(15);
+  const [shotPower, setShotPower] = useState(0.5);
+  const [spinBias, setSpinBias] = useState(0.0);
+  const [viewMode, setViewMode] = useState<'classic' | 'alt' | 'alt-v2'>('classic');
   const [ballPosition, setBallPosition] = useState<Point | null>(null);
-  const [timer, setTimer] = useState<string>("0.00s");
-  const [viewMode, setViewMode] = useState<'classic' | 'alt'>('classic');
-  const profileKey = useMemo(
-    () =>
-      JSON.stringify({
-        stats: stats.map((stat) => ({
-          id: stat.id,
-          quest: stat.questValue,
-          hero: stat.heroValue,
-          detrimental: stat.isDetrimental,
-        })),
-        injuryPct,
-        deathPct,
-      }),
-    [stats, injuryPct, deathPct],
-  );
-  // ─── Polygon Tuning State ───────────────────────────────────────────────
-  const [valleyDepth, setValleyDepth] = useState(0.5);  // 0-1: Unified control
-  const [curveTension, setCurveTension] = useState(0.3); // 0-1: curve smoothness
-  const [heroPrecision, setHeroPrecision] = useState(0.2); // 0-0.6: Makes hero shape sharper/thinner
+  const [lastOutcome, setLastOutcome] = useState<LastOutcome | null>(null);
+  const [timer, setTimer] = useState('0.0s');
+  const [log, setLog] = useState<string[]>([]);
 
-  // ─── Monte Carlo / Ghost State ──────────────────────────────────────────
   const ballAnimFrameRef = useRef<number | null>(null);
   const altCardAnimRefs = useRef<Record<string, number | null>>({});
-    // New derived state for UI
-  const activeCount = stats.filter(s => s.questValue > 0).length;
 
-  const questValues = useMemo(() => stats.map((stat) => clampPercentage(stat.questValue)), [stats]);
-  const heroValues = useMemo(() => stats.map((stat) => clampPercentage(stat.heroValue)), [stats]);
+  const [altCardStates, setAltCardStates] = useState<Record<string, AltCardState>>(() =>
+    createAltCardStateMap('default'),
+  );
+
+  const activeCount = stats.filter((s) => s.questValue > 0).length;
 
   const altSkinEntries = useMemo(
     () =>
@@ -992,65 +1372,250 @@ export const SkillCheckPreviewPage: React.FC = () => {
     [stats],
   );
 
-  const questAverage = useMemo(() => computeAverage(questValues), [questValues]);
-  const heroAverage = useMemo(() => computeAverage(heroValues), [heroValues]);
-  const deltaEntries = useMemo(
-    () =>
-      stats.map((stat, index) => ({
-        id: stat.id || `stat-${index}`,
-        name: stat.name || `Stat ${index + 1}`,
-        delta: clampPercentage(stat.heroValue) - clampPercentage(stat.questValue),
-      })),
-    [stats],
-  );
+  const geometryBySkinId = useMemo(() => {
+    const map = new Map<string, SkinGeometry>();
+    altSkinEntries.forEach((entry) => {
+      if (entry.geometry) {
+        map.set(entry.skin.id, entry.geometry);
+      }
+    });
+    return map;
+  }, [altSkinEntries]);
 
   const safePct = useMemo(() => {
     const total = clampPercentage(injuryPct) + clampPercentage(deathPct);
     return clampPercentage(100 - total);
   }, [injuryPct, deathPct]);
-  // Use star polygon with valleys instead of simple polygon
+
+  const profileKey = 'default';
+
+  const setAltCardState = useCallback(
+    (skinId: string, updater: (prev: AltCardState) => AltCardState) => {
+      setAltCardStates((prev) => {
+        const prevState = prev[skinId] ?? createAltCardState(skinId, profileKey);
+        const nextState = updater(prevState);
+        if (prevState === nextState) {
+          return prev;
+        }
+        return {
+          ...prev,
+          [skinId]: nextState,
+        };
+      });
+    },
+    [profileKey],
+  );
+
+  const handleLaunchClick = useCallback((skinId: string) => {
+    const geometry = geometryBySkinId.get(skinId);
+    if (!geometry) return;
+
+    const path = simulatePinballPath(
+      { x: ALT_CARD_CENTER.x, y: ALT_CARD_CENTER.y },
+      geometry.questCard,
+      { shotPower, spinBias }
+    );
+
+    setAltCardState(skinId, (prev) => ({
+      ...prev,
+      path,
+      pathIndex: 0,
+      phase: 'rolling',
+      ballPosition: path[0],
+      lastUpdated: Date.now(),
+      result: null,
+      zone: null
+    }));
+
+    let animationId: number;
+    const animate = () => {
+      setAltCardState(skinId, (prev) => {
+        if (prev.phase !== 'rolling') return prev;
+
+        const nextIndex = prev.pathIndex + 1;
+        if (nextIndex < prev.path.length) {
+          return {
+            ...prev,
+            pathIndex: nextIndex,
+            ballPosition: prev.path[nextIndex],
+            lastUpdated: Date.now()
+          };
+        } else {
+          // Animation finished, calculate outcome
+          const finalPos = prev.path[prev.path.length - 1];
+          if (!finalPos) return prev;
+
+          const dx = finalPos.x - ALT_CARD_CENTER.x;
+          const dy = finalPos.y - ALT_CARD_CENTER.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          let zone: OutcomeZone = 'safe';
+          if (distance > RADIUS * 0.8) {
+            zone = 'death';
+          } else if (distance > RADIUS * 0.5) {
+            zone = 'injury';
+          }
+
+          const success = pointInPolygon(finalPos, geometry.heroCard);
+          const result: OutcomeResult = success ? 'success' : 'fail';
+
+          return {
+            ...prev,
+            phase: 'settled',
+            zone,
+            result,
+            lastUpdated: Date.now()
+          };
+        }
+      });
+
+      const currentState = altCardStates[skinId];
+      if (currentState?.phase === 'rolling') {
+        animationId = requestAnimationFrame(animate);
+        altCardAnimRefs.current[skinId] = animationId;
+      }
+    };
+
+    animationId = requestAnimationFrame(animate);
+    altCardAnimRefs.current[skinId] = animationId;
+  }, [geometryBySkinId, shotPower, spinBias, setAltCardState, altCardStates]);
+
+  // Quest and Hero polygons
   const questPolygon = useMemo(() => {
-    return buildAdaptivePolygon(stats, 'questValue', {
-      baseRatio: (1 - valleyDepth), // Inverse: Low Valley = High Width/Radius
+    const valleyDepth = CLASSIC_VALLEY_DEPTH;
+    return buildClassicAdaptivePolygon(stats, 'questValue', {
+      baseRatio: 1 - valleyDepth,
       valleyDepth,
-      curveTension,
+      triangleWidth: CLASSIC_TRIANGLE_WIDTH,
       numPoints: stats.length,
       shapeType: 'quest',
     });
-  }, [stats, valleyDepth, curveTension]);
+  }, [stats]);
 
   const heroPolygon = useMemo(() => {
-    // Effective valley depth for hero is base + precision offset.
-    // Higher precision = Deeper valleys = Thinner star = Harder to hit between axes
-    const heroValley = Math.min(0.95, valleyDepth + heroPrecision * (1 - valleyDepth));
-
-    return buildAdaptivePolygon(stats, 'heroValue', {
-      baseRatio: (1 - heroValley), // Also affects width logic (thinner base)
+    const heroValley = Math.min(0.95, CLASSIC_VALLEY_DEPTH + CLASSIC_HERO_PRECISION * (1 - CLASSIC_VALLEY_DEPTH));
+    return buildClassicAdaptivePolygon(stats, 'heroValue', {
+      baseRatio: 1 - heroValley,
       valleyDepth: heroValley,
-      curveTension,
+      triangleWidth: CLASSIC_TRIANGLE_WIDTH,
       numPoints: stats.length,
       shapeType: 'hero',
     });
-  }, [stats, valleyDepth, heroPrecision, curveTension]);
-
-
-
-  // ... (rest of logic) ...
+  }, [stats]);
 
   const questPolygonAttr = useMemo(() => polygonToPointsAttr(questPolygon), [questPolygon]);
-
-  const heroPathD = useMemo(() => polygonToPathD(heroPolygon), [heroPolygon]);
-
-  // Smooth path (for visual strokes when curveTension > 0)
   const questSmoothPathD = useMemo(
-    () => polygonToSmoothPathD(questPolygon, curveTension),
-    [questPolygon, curveTension],
+    () => polygonToSmoothPathD(questPolygon, CLASSIC_CURVE_TENSION),
+    [questPolygon],
   );
   const heroSmoothPathD = useMemo(
-    () => polygonToSmoothPathD(heroPolygon, curveTension),
-    [heroPolygon, curveTension],
+    () => polygonToSmoothPathD(heroPolygon, CLASSIC_CURVE_TENSION),
+    [heroPolygon],
   );
 
+  const handleThrow = () => {
+    if (questPolygon.length < 3) return;
+
+    const maxAttempts = 200;
+    let chosen: Point | null = null;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+      const u = Math.random();
+      const r = Math.sqrt(u) * RADIUS;
+      const angle = Math.random() * Math.PI * 2;
+      const x = CENTER_X + r * Math.cos(angle);
+      const y = CENTER_Y + r * Math.sin(angle);
+      const candidate = { x, y };
+      if (pointInPolygon(candidate, questPolygon)) {
+        chosen = candidate;
+        break;
+      }
+    }
+
+    if (!chosen) {
+      chosen = { x: CENTER_X, y: CENTER_Y };
+    }
+
+    const dx = chosen.x - CENTER_X;
+    const dy = chosen.y - CENTER_Y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    let zone: OutcomeZone = 'safe';
+    if (distance > radii.deathInnerRadius) {
+      zone = 'death';
+    } else if (distance > radii.injuryInnerRadius) {
+      zone = 'injury';
+    }
+
+    const success = pointInPolygon(chosen, heroPolygon);
+    const result: OutcomeResult = success ? 'success' : 'fail';
+
+    const label = `Roll: ${result.toUpperCase()} + ${zone.toUpperCase()}`;
+
+    setLastOutcome({ zone, result });
+    setLog((prev) => [label, ...prev].slice(0, 12));
+
+    // Animate ball
+    if (ballAnimFrameRef.current !== null) {
+      cancelAnimationFrame(ballAnimFrameRef.current);
+      ballAnimFrameRef.current = null;
+    }
+
+    const path = simulatePinballPath(
+      { x: CENTER_X, y: CENTER_Y },
+      questPolygon,
+      { shotPower, spinBias }
+    );
+
+    const segmentDurations = path.slice(0, -1).map((_, idx) => {
+      const p = idx / (path.length - 1);
+      let extra = 0;
+      if (p > 0.5) {
+        const brakeP = (p - 0.5) / 0.5;
+        extra = brakeP * brakeP * 55;
+      }
+      return 20 + extra;
+    });
+
+    let segmentIndex = 0;
+    let segmentStartTime: number | null = null;
+    let animationStartTime: number | null = null;
+
+    const animateBall = (timestamp: number) => {
+      if (animationStartTime === null) animationStartTime = timestamp;
+
+      const totalElapsed = timestamp - animationStartTime;
+      setTimer((totalElapsed / 1000).toFixed(2) + "s");
+
+      if (segmentIndex >= path.length - 1) {
+        ballAnimFrameRef.current = null;
+        return;
+      }
+
+      if (segmentStartTime === null) segmentStartTime = timestamp;
+      const localElapsed = timestamp - segmentStartTime;
+      const duration = segmentDurations[segmentIndex];
+      const tRaw = Math.min(1, localElapsed / duration);
+      const t = 1 - (1 - tRaw) * (1 - tRaw);
+
+      const from = path[segmentIndex];
+      const to = path[segmentIndex + 1];
+      const x = from.x + (to.x - from.x) * t;
+      const y = from.y + (to.y - from.y) * t;
+      setBallPosition({ x, y });
+
+      if (tRaw < 1) {
+        ballAnimFrameRef.current = requestAnimationFrame(animateBall);
+      } else {
+        segmentIndex += 1;
+        segmentStartTime = null;
+        ballAnimFrameRef.current = requestAnimationFrame(animateBall);
+      }
+    };
+
+    setBallPosition(path[0]);
+    ballAnimFrameRef.current = requestAnimationFrame(animateBall);
+  };
 
   const radii = useMemo(() => {
     if (questPolygon.length < 3) {
@@ -1127,48 +1692,6 @@ export const SkillCheckPreviewPage: React.FC = () => {
     };
   }, [questPolygon, safePct, injuryPct, deathPct, stats]);
 
-
-  useEffect(() => {
-    if (!heroPathD) {
-      return;
-    }
-
-    let frame: number | null = null;
-    const duration = 400;
-    let startTime: number | null = null;
-
-    const animate = (timestamp: number) => {
-      if (startTime === null) startTime = timestamp;
-      const elapsed = timestamp - startTime;
-      const tRaw = Math.min(1, elapsed / duration);
-      if (tRaw < 1) {
-        frame = requestAnimationFrame(animate);
-      }
-    };
-
-    frame = requestAnimationFrame((ts) => {
-      startTime = ts;
-      animate(ts);
-    });
-
-    return () => {
-      if (frame !== null) {
-        cancelAnimationFrame(frame);
-      }
-    };
-  }, [heroPathD]);
-
-  useEffect(() => () => {
-    // Cleanup ball animation on unmount
-    if (ballAnimFrameRef.current !== null) {
-      cancelAnimationFrame(ballAnimFrameRef.current);
-    }
-    if (altBallFrameRef.current !== null) {
-      cancelAnimationFrame(altBallFrameRef.current);
-    }
-  }, []);
-
-
   const handleStatChange = (index: number, field: keyof StatRow, raw: string) => {
     setStats((prev) => {
       const next = [...prev];
@@ -1191,160 +1714,6 @@ export const SkillCheckPreviewPage: React.FC = () => {
     });
   };
 
-  const handleThrow = () => {
-    if (questPolygon.length < 3) return;
-
-    const maxAttempts = 200;
-    let chosen: Point | null = null;
-
-    for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
-      const u = Math.random();
-      const r = Math.sqrt(u) * RADIUS;
-      const angle = Math.random() * Math.PI * 2;
-      const x = CENTER_X + r * Math.cos(angle);
-      const y = CENTER_Y + r * Math.sin(angle);
-      const candidate = { x, y };
-      if (pointInPolygon(candidate, questPolygon)) {
-        chosen = candidate;
-        break;
-      }
-    }
-
-    if (!chosen) {
-      chosen = { x: CENTER_X, y: CENTER_Y };
-    }
-
-    const dx = chosen.x - CENTER_X;
-    const dy = chosen.y - CENTER_Y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-
-    let zone: OutcomeZone = 'safe';
-    if (distance > radii.deathInnerRadius) {
-      zone = 'death';
-    } else if (distance > radii.injuryInnerRadius) {
-      zone = 'injury';
-    }
-
-    const success = pointInPolygon(chosen, heroPolygon);
-    const result: OutcomeResult = success ? 'success' : 'fail';
-
-    const label = `Roll: ${result.toUpperCase()} + ${zone.toUpperCase()}`;
-
-    setLastOutcome({ zone, result });
-    const rollPercent = clampPercentage((distance / Math.max(1, radii.deathOuterRadius || RADIUS)) * 100);
-    setAltRollInfo({
-      profileKey,
-      value: rollPercent,
-      zone,
-      result,
-      visualId: resolvedAltRoll.visualId,
-    });
-    setAltRollAnimKey((prev) => prev + 1);
-    setLog((prev) => [label, ...prev].slice(0, 12));
-
-    // Animate ball with pinball-style trajectory simulated via simple physics in Q.
-    if (ballAnimFrameRef.current !== null) {
-      cancelAnimationFrame(ballAnimFrameRef.current);
-      ballAnimFrameRef.current = null;
-    }
-
-    // 1. Calculate path
-    const path = simulatePinballPath(
-      { x: CENTER_X, y: CENTER_Y }, // Not really used as target for now? target arg is unused in physics?
-      questPolygon,
-      { shotPower, spinBias }
-    );
-
-    // Debug Logging for Verification
-    console.log("--- DEBUG: Handle Throw ---");
-    console.log("Physics Path Steps:", path.length);
-    console.log("Estimated Duration (60fps):", (path.length / 60).toFixed(2) + "s");
-    console.log("Polygon Points:", questPolygon.length);
-    if (questPolygon.length > 0) {
-      console.log("Poly P0:", questPolygon[0]);
-      console.log("Poly P1:", questPolygon[1]);
-    }
-
-    // 2. Animate
-    const segmentCount = path.length - 1;
-    if (segmentCount <= 0) {
-      setBallPosition(chosen);
-      return;
-    }
-
-    // Tuning for ~5s total duration.
-    // "Slow down substantially after 2 seconds".
-    // 180 steps total.
-    // Phase 1 (Fast): First ~50% (90 steps).
-    //    90 steps * 20ms = 1800ms (~1.8s). Close to 2s.
-    // Phase 2 (Braking): Remaining ~50% (90 steps).
-    //    We want this to take ~3.2s.
-    //    Avg duration needed = 3200 / 90 = ~35ms.
-    //    Base is 20ms. Mean Extra needed = 15ms.
-    //    Quadratic ramp means Mean Extra = Peak Extra / 3.
-    //    Peak Extra = 15 * 3 = 45ms.
-    //    Let's use 50ms to be safe and "substantial".
-
-    const baseDuration = 20; // ms per segment
-
-    const segmentDurations = path.slice(0, -1).map((_, idx) => {
-      const p = idx / segmentCount;
-
-      let extra = 0;
-      // Start braking halfway through
-      if (p > 0.5) {
-        const brakeP = (p - 0.5) / 0.5; // 0..1 in braking zone
-        extra = brakeP * brakeP * 55;   // Max extra 55ms
-      }
-
-      return baseDuration + extra;
-    });
-
-    // Calculate expected total for debug
-    const totalDuration = segmentDurations.reduce((a, b) => a + b, 0);
-    console.log("Estimated Animation Duration:", (totalDuration / 1000).toFixed(2) + "s");
-
-    let segmentIndex = 0;
-    let segmentStartTime: number | null = null;
-    let animationStartTime: number | null = null;
-
-    const animateBall = (timestamp: number) => {
-      if (animationStartTime === null) animationStartTime = timestamp;
-
-      // Update Timer
-      const totalElapsed = timestamp - animationStartTime;
-      setTimer((totalElapsed / 1000).toFixed(2) + "s");
-
-      if (segmentIndex >= segmentCount) {
-        ballAnimFrameRef.current = null;
-        return;
-      }
-
-      if (segmentStartTime === null) segmentStartTime = timestamp;
-      const localElapsed = timestamp - segmentStartTime;
-      const duration = segmentDurations[segmentIndex];
-      const tRaw = Math.min(1, localElapsed / duration);
-      const t = 1 - (1 - tRaw) * (1 - tRaw); // easeOutQuad for micro-segment interaction
-
-      const from = path[segmentIndex];
-      const to = path[segmentIndex + 1];
-      const x = from.x + (to.x - from.x) * t;
-      const y = from.y + (to.y - from.y) * t;
-      setBallPosition({ x, y });
-
-      if (tRaw < 1) {
-        ballAnimFrameRef.current = requestAnimationFrame(animateBall);
-      } else {
-        segmentIndex += 1;
-        segmentStartTime = null;
-        ballAnimFrameRef.current = requestAnimationFrame(animateBall);
-      }
-    };
-
-    setBallPosition(path[0]);
-    ballAnimFrameRef.current = requestAnimationFrame(animateBall);
-  };
-
   const outcomeLabel = useMemo(() => {
     if (!lastOutcome) return 'Nessun tiro effettuato.';
     const { result, zone } = lastOutcome;
@@ -1356,6 +1725,33 @@ export const SkillCheckPreviewPage: React.FC = () => {
     return `${resultLabel} + ${zoneLabel}`;
   }, [lastOutcome]);
 
+  // Utility functions
+  function hashString(input: string): number {
+    let hash = 0;
+    for (let i = 0; i < input.length; i += 1) {
+      hash = (hash << 5) - hash + input.charCodeAt(i);
+      hash |= 0;
+    }
+    return hash >>> 0;
+  }
+
+  function createSeededRng(seed: number): () => number {
+    let state = seed || 1;
+    return () => {
+      state = (1664525 * state + 1013904223) % 4294967296;
+      return state / 4294967296;
+    };
+  }
+
+  function shuffleWithRng<T>(items: T[], rng: () => number): T[] {
+    const arr = [...items];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
   return (
     <div className="p-3 md:p-4 text-ivory">
       <h1 className="text-lg md:text-xl font-cinzel tracking-[0.2em] uppercase mb-2">Skill Check Preview Lab</h1>
@@ -1366,7 +1762,7 @@ export const SkillCheckPreviewPage: React.FC = () => {
       <div className="flex flex-wrap gap-2 mb-4">
         <span className="text-[10px] uppercase tracking-[0.24em] text-slate-500 pt-1">View</span>
         <div className="bg-slate-900/70 border border-slate-800 rounded-full p-1 flex gap-1">
-          {(['classic', 'alt'] as const).map((mode) => (
+          {(['classic', 'alt-v2'] as const).map((mode) => (
             <button
               key={mode}
               type="button"
@@ -1377,435 +1773,413 @@ export const SkillCheckPreviewPage: React.FC = () => {
                   : 'text-slate-400 hover:text-slate-100'
               }`}
             >
-              {mode === 'classic' ? 'Dispatch Polygon' : 'Alt Visuals'}
+              {mode === 'classic' ? 'Dispatch Polygon' : 'Alt Visuals v2'}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* ─── LEFT COLUMN: CONTROLS ─── */}
-        <div className="default-card p-3 space-y-4">
-
-          {/* Stats Config (Checkboxes) */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="font-bold text-slate-200 text-xs uppercase tracking-wide">Active Stats ({activeCount})</h3>
-            </div>
-            <div className="space-y-1.5 max-h-60 overflow-y-auto pr-1 bg-slate-900/50 p-2 rounded border border-slate-800/50">
-              {stats.map((stat, index) => {
-                const isActive = stat.questValue > 0;
-                return (
-                  <div key={index} className="flex items-center gap-2 p-1.5 bg-slate-800/80 rounded border border-slate-700/50">
-                    <input
-                      type="checkbox"
-                      checked={isActive}
-                      onChange={(e) => {
-                        const newValue = e.target.checked ? 60 : 0;
-                        handleStatChange(index, 'questValue', String(newValue));
-                      }}
-                      className="cursor-pointer"
-                    />
-                    <div className="flex-1">
-                      <input
-                        type="text"
-                        value={stat.name}
-                        onChange={(e) => handleStatChange(index, 'name', e.target.value)}
-                        className="w-full bg-transparent text-[11px] font-semibold text-cyan-300 focus:outline-none"
-                      />
-                    </div>
-                    {/* Value Input (only if active) */}
-                    <div className="w-12 text-right transition-opacity {isActive ? 'opacity-100' : 'opacity-30'}">
-                      <input
-                        type="number"
-                        min={0}
-                        max={100}
-                        value={stat.questValue}
-                        disabled={!isActive}
-                        onChange={(e) => handleStatChange(index, 'questValue', e.target.value)}
-                        className="w-full bg-transparent text-right text-[11px] text-emerald-400 focus:outline-none"
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Global Settings (Injury/Death) */}
-          <div className="grid grid-cols-3 gap-2 text-[11px]">
+      {viewMode === 'classic' ? (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* ─── LEFT COLUMN: CONTROLS ─── */}
+          <div className="default-card p-3 space-y-4">
+            {/* Stats Config (Checkboxes) */}
             <div>
-              <label className="block font-semibold mb-0.5 text-slate-400">Injury %</label>
-              <input
-                type="number"
-                min={0}
-                max={100}
-                value={injuryPct}
-                onChange={(e) => setInjuryPct(clampPercentage(Number(e.target.value) || 0))}
-                className="w-full px-2 py-0.5 bg-obsidian border border-slate rounded text-ivory text-[11px]"
-              />
-            </div>
-            <div>
-              <label className="block font-semibold mb-0.5 text-slate-400">Death %</label>
-              <input
-                type="number"
-                min={0}
-                max={100}
-                value={deathPct}
-                onChange={(e) => setDeathPct(clampPercentage(Number(e.target.value) || 0))}
-                className="w-full px-2 py-0.5 bg-obsidian border border-slate rounded text-ivory text-[11px]"
-              />
-            </div>
-            <div>
-              <label className="block font-semibold mb-0.5 text-slate-400">Safe %</label>
-              <div className="px-2 py-0.5 bg-slate-900 border border-slate rounded text-emerald-300 text-[11px] h-[26px] flex items-center">
-                {safePct}%
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-bold text-slate-200 text-xs uppercase tracking-wide">Active Stats ({activeCount})</h3>
               </div>
-            </div>
-          </div>
-
-          {/* Physics Tuning */}
-          <div className="grid grid-cols-2 gap-2 text-[11px] border-t border-slate-800 pt-3">
-            <div>
-              <div className="flex items-center justify-between mb-0.5">
-                <span className="font-semibold uppercase tracking-[0.12em] text-slate-300">Shot Power</span>
-                <span className="text-slate-400">{Math.round(shotPower * 100)}%</span>
-              </div>
-              <input
-                type="range"
-                min={0}
-                max={100}
-                value={Math.round(shotPower * 100)}
-                onChange={(e) => setShotPower(Number(e.target.value) / 100)}
-                className="w-full accent-emerald-500"
-              />
-            </div>
-            <div>
-              <div className="flex items-center justify-between mb-0.5">
-                <span className="font-semibold uppercase tracking-[0.12em] text-slate-300">Spin Bias</span>
-                <span className="text-slate-400">{spinBias >= 0 ? '+' : ''}{spinBias.toFixed(2)}</span>
-              </div>
-              <input
-                type="range"
-                min={-100}
-                max={100}
-                value={Math.round(spinBias * 100)}
-                onChange={(e) => setSpinBias(Number(e.target.value) / 100)}
-                className="w-full accent-emerald-500"
-              />
-            </div>
-          </div>
-
-          {/* Polygon Tuning Section */}
-          <div className="text-[11px] mt-3 border-t border-cyan-800/40 pt-3">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-cyan-400 mb-2">⭐ Polygon Shape</div>
-            <div className="grid grid-cols-3 gap-2">
-              <div>
-                <div className="flex items-center justify-between mb-0.5">
-                  <span className="font-semibold text-slate-300">Forma</span>
-                  <span className="text-slate-400">{Math.round(valleyDepth * 100)}%</span>
-                </div>
-                <input
-                  type="range"
-                  min={0}
-                  max={100}
-                  value={Math.round(valleyDepth * 100)}
-                  onChange={(e) => setValleyDepth(Number(e.target.value) / 100)}
-                  className="w-full accent-cyan-500"
-                />
-                <div className="text-[9px] text-slate-500 mt-0.5">Tutti i poligoni</div>
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-0.5">
-                  <span className="font-semibold text-emerald-300">Precisione</span>
-                  <span className="text-slate-400">+{Math.round(heroPrecision * 100)}%</span>
-                </div>
-                <input
-                  type="range"
-                  min={0}
-                  max={100}
-                  value={Math.round(heroPrecision * 100)}
-                  onChange={(e) => setHeroPrecision(Number(e.target.value) / 100)}
-                  className="w-full accent-emerald-500"
-                />
-                <div className="text-[9px] text-slate-500 mt-0.5">Stringe l'Eroe</div>
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-0.5">
-                  <span className="font-semibold text-slate-300">Curve</span>
-                  <span className="text-slate-400">{Math.round(curveTension * 100)}%</span>
-                </div>
-                <input
-                  type="range"
-                  min={0}
-                  max={100}
-                  value={Math.round(curveTension * 100)}
-                  onChange={(e) => setCurveTension(Number(e.target.value) / 100)}
-                  className="w-full accent-cyan-500"
-                />
-                <div className="text-[9px] text-slate-500 mt-0.5">Arrotondamento</div>
-              </div>
-            </div>
-          </div>
-
-
-
-          {/* ... controls ... */}
-
-          <div className="pt-2 flex justify-between items-center">
-
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={handleThrow}
-                className="px-4 py-2 rounded-full border border-emerald-400/70 bg-emerald-500/10 text-[11px] uppercase tracking-[0.16em] text-emerald-200 hover:bg-emerald-500/20 active:scale-95 transition-all"
-              >
-                Lancia pallina
-              </button>
-            </div>
-          </div>
-
-
-          {/* Ghost Stats Panel */}
-        </div>
-
-        {/* ─── RIGHT COLUMN: PREVIEW ─── */}
-        <div className="default-card p-3 space-y-3 flex flex-col items-center justify-center">
-          <div className="w-full flex items-center justify-between mb-2">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-300">
-              {viewMode === 'classic' ? 'Visuale Skill Check' : 'Alt Visuals'}
-            </span>
-          </div>
-          {viewMode === 'classic' ? (
-            <>
-              <div className="relative">
-                <svg width={CANVAS_SIZE} height={CANVAS_SIZE} className="bg-slate-950/80 rounded-xl border border-slate-800 shadow-2xl">
-                  <defs>
-                    <clipPath id="quest-clip">
-                      <polygon points={questPolygonAttr} />
-                    </clipPath>
-                  </defs>
-
-                  {/* Axes/Grid */}
-                  <line x1={CENTER_X} y1={0} x2={CENTER_X} y2={CANVAS_SIZE} stroke="rgba(148,163,184,0.1)" strokeWidth={1} />
-                  <line x1={0} y1={CENTER_Y} x2={CANVAS_SIZE} y2={CENTER_Y} stroke="rgba(148,163,184,0.1)" strokeWidth={1} />
-
-                  {/* Fixed Background Axes (Radial Lines) */}
-                  {stats.map((_, idx) => {
-                    const angle = -Math.PI / 2 + (idx * 2 * Math.PI) / stats.length;
-                    const x2 = CENTER_X + RADIUS * Math.cos(angle);
-                    const y2 = CENTER_Y + RADIUS * Math.sin(angle);
-                    return (
-                      <line
-                        key={`axis-bg-${idx}`}
-                        x1={CENTER_X}
-                        y1={CENTER_Y}
-                        x2={x2}
-                        y2={y2}
-                        stroke="rgba(148,163,184,0.15)"
-                        strokeWidth={1}
-                        strokeDasharray="4 4"
-                      />
-                    );
-                  })}
-
-                  {/* Rings clipped to Q */}
-                  <g clipPath="url(#quest-clip)">
-                    {/* Injury ring */}
-                    <circle
-                      cx={CENTER_X}
-                      cy={CENTER_Y}
-                      r={Math.max(0, RADIUS * ((safePct + injuryPct) / 100))}
-                      className="fill-none stroke-yellow-500/30"
-                      strokeWidth={1}
-                      strokeDasharray="4 2"
-                    />
-                    {/* Safe ring */}
-                    <circle
-                      cx={CENTER_X}
-                      cy={CENTER_Y}
-                      r={Math.max(0, RADIUS * (safePct / 100))}
-                      className="fill-none stroke-emerald-500/30"
-                      strokeWidth={1}
-                      strokeDasharray="4 2"
-                    />
-                  </g>
-
-                  {/* Quest polygon (transparent fill) */}
-                  <polygon points={questPolygonAttr} fill="rgba(56,189,248,0.08)" stroke="none" />
-
-                  {/* Quest Polygon Stroke */}
-                  <path
-                    d={questSmoothPathD}
-                    fill="none"
-                    stroke="rgb(34, 211, 238)"
-                    strokeWidth="2"
-                    className="drop-shadow-[0_0_8px_rgba(34,211,238,0.6)]"
-                  />
-
-                  {/* Hero polygon Stroke (No Fill) */}
-                  <path
-                    d={heroSmoothPathD}
-                    fill="none"
-                    stroke="rgba(52,211,153,0.95)"
-                    strokeWidth={1.5}
-                    pathLength={1}
-                    strokeDasharray={1}
-                    strokeDashoffset={0}
-                  />
-
-                  {/* Fixed Stat Labels */}
-                  {stats.map((stat, idx) => {
-                    const angle = -Math.PI / 2 + (idx * 2 * Math.PI) / Math.max(1, stats.length);
-                    const distFactor = 1.15;
-                    const labelX = CENTER_X + RADIUS * Math.cos(angle) * distFactor;
-                    const labelY = CENTER_Y + RADIUS * Math.sin(angle) * distFactor;
-                    const isActive = stat.questValue > 0;
-
-                    return (
-                      <text
-                        key={`lbl-${idx}`}
-                        x={labelX}
-                        y={labelY}
-                        className={`text-[9px] font-bold ${isActive ? 'fill-slate-200' : 'fill-slate-600'}`}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                      >
-                        {stat.name}
-                      </text>
-                    );
-                  })}
-
-                  {/* Ball */}
-                  {ballPosition && (
-                    <circle
-                      cx={ballPosition.x}
-                      cy={ballPosition.y}
-                      r={5}
-                      fill="#f97316"
-                      stroke="#fde68a"
-                      strokeWidth={1}
-                      className="drop-shadow-[0_0_5px_rgba(249,115,22,0.8)]"
-                    />
-                  )}
-                </svg>
-              </div>
-
-              <div className="w-full text-center mt-2 p-2 bg-slate-900/50 rounded border border-slate-800">
-                <div className="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Risultato</div>
-                <div className="flex justify-between items-center px-4">
-                  <div className="text-sm font-bold text-slate-100">{outcomeLabel || '-'}</div>
-                  <div className="font-mono text-xs text-cyan-400">{timer}</div>
-                </div>
-              </div>
-
-              {/* Log */}
-              {log.length > 0 && (
-                <div className="w-full text-[10px] text-slate-500 font-mono bg-black/20 p-2 rounded max-h-20 overflow-y-auto">
-                  {log.map((entry, idx) => (
-                    <div key={idx} className="mb-0.5 border-b border-slate-800/30 pb-0.5 last:border-0">
-                      {entry}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="flex flex-col gap-4">
-              <div className="default-card p-3 flex flex-wrap gap-3 items-center justify-between">
-                <div>
-                  <div className="text-[10px] uppercase tracking-[0.2em] text-slate-400">Ultimo roll esperimento</div>
-                  <div className="text-sm font-semibold text-slate-100">
-                    {resolvedAltRoll.value !== null ? `${resolvedAltRoll.value.toFixed(1)}%` : '—'}
-                  </div>
-                </div>
-                <div className="text-[11px] text-slate-400">
-                  {resolvedAltRoll.value !== null ? (
-                    <>
-                      <span className={resolvedAltRoll.result === 'success' ? 'text-emerald-300 font-semibold' : 'text-rose-300 font-semibold'}>
-                        {resolvedAltRoll.result.toUpperCase()}
-                      </span>
-                      {' • '}
-                      <span
-                        className={
-                          resolvedAltRoll.zone === 'safe'
-                            ? 'text-emerald-300 font-semibold'
-                            : resolvedAltRoll.zone === 'injury'
-                            ? 'text-amber-300 font-semibold'
-                            : 'text-rose-400 font-semibold'
-                        }
-                      >
-                        {resolvedAltRoll.zone.toUpperCase()}
-                      </span>
-                    </>
-                  ) : (
-                    'Lancia una variante per vedere il risultato.'
-                  )}
-                </div>
-                <button
-                  type="button"
-                  className="px-4 py-2 rounded-full text-[10px] uppercase tracking-[0.2em] border border-emerald-500/40 text-emerald-200 bg-emerald-500/10 hover:bg-emerald-500/20 transition"
-                  onClick={() => runAltSimulation(resolvedAltRoll.visualId ?? ALT_VISUAL_SKINS[0]?.id ?? null)}
-                  disabled={ALT_VISUAL_SKINS.length === 0}
-                >
-                  Rilancia variante attiva
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-                {ALT_VISUAL_CARDS.map((card) => {
-                  const isActive = resolvedAltRoll.visualId === card.id;
+              <div className="space-y-1.5 max-h-60 overflow-y-auto pr-1 bg-slate-900/50 p-2 rounded border border-slate-800/50">
+                {stats.map((stat, index) => {
+                  const isActive = stat.questValue > 0;
                   return (
-                    <div
-                      key={card.id}
-                      className={`bg-slate-950/80 border rounded-2xl p-3 flex flex-col gap-3 transition ${
-                        isActive ? 'border-emerald-400/60 shadow-[0_0_12px_rgba(16,185,129,0.35)]' : 'border-slate-800'
-                      }`}
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <div className="text-[10px] uppercase tracking-[0.24em] text-slate-300">{card.title}</div>
-                          <div className="text-[11px] text-slate-500">{card.subtitle}</div>
-                        </div>
-                        {resolvedAltRoll.value !== null && isActive && (
-                          <div className="text-right">
-                            <div className="text-sm font-semibold text-emerald-300">{resolvedAltRoll.value.toFixed(1)}%</div>
-                            <div className="text-[10px] uppercase tracking-[0.16em]">
-                              {resolvedAltRoll.zone.toUpperCase()}
-                            </div>
-                          </div>
-                        )}
+                    <div key={index} className="flex items-center gap-2 p-1.5 bg-slate-800/80 rounded border border-slate-700/50">
+                      <input
+                        type="checkbox"
+                        checked={isActive}
+                        onChange={(e) => {
+                          const newValue = e.target.checked ? 60 : 0;
+                          handleStatChange(index, 'questValue', String(newValue));
+                        }}
+                        className="cursor-pointer"
+                      />
+                      <div className="flex-1">
+                        <input
+                          type="text"
+                          value={stat.name}
+                          onChange={(e) => handleStatChange(index, 'name', e.target.value)}
+                          className="w-full bg-transparent text-[11px] font-semibold text-cyan-300 focus:outline-none"
+                        />
                       </div>
-                      <p className="text-[11px] text-slate-400 leading-snug">{card.description}</p>
-                      <div className="bg-slate-900/60 border border-slate-800 rounded-xl flex items-center justify-center py-3">
-                        {renderAltVisualSvg(card)}
-                      </div>
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-[10px] uppercase tracking-[0.2em] text-slate-500">
-                          {isActive ? 'Attivo' : 'In standby'}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => runAltSimulation(card.id)}
-                          className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-[0.16em] transition ${
-                            isActive
-                              ? 'bg-emerald-400/20 text-emerald-100 border border-emerald-400/40'
-                              : 'bg-slate-800/60 text-slate-200 border border-slate-700 hover:bg-slate-800'
-                          }`}
-                        >
-                          Lancia
-                        </button>
+                      <div className="w-12 text-right transition-opacity {isActive ? 'opacity-100' : 'opacity-30'}">
+                        <input
+                          type="number"
+                          min={0}
+                          max={100}
+                          value={stat.questValue}
+                          disabled={!isActive}
+                          onChange={(e) => handleStatChange(index, 'questValue', e.target.value)}
+                          className="w-full bg-transparent text-right text-[11px] text-emerald-400 focus:outline-none"
+                        />
                       </div>
                     </div>
                   );
                 })}
               </div>
             </div>
-          )}
+
+            {/* Global Settings (Injury/Death) */}
+            <div className="grid grid-cols-3 gap-2 text-[11px]">
+              <div>
+                <label className="block font-semibold mb-0.5 text-slate-400">Injury %</label>
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={injuryPct}
+                  onChange={(e) => setInjuryPct(clampPercentage(Number(e.target.value) || 0))}
+                  className="w-full px-2 py-0.5 bg-obsidian border border-slate rounded text-ivory text-[11px]"
+                />
+              </div>
+              <div>
+                <label className="block font-semibold mb-0.5 text-slate-400">Death %</label>
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={deathPct}
+                  onChange={(e) => setDeathPct(clampPercentage(Number(e.target.value) || 0))}
+                  className="w-full px-2 py-0.5 bg-obsidian border border-slate rounded text-ivory text-[11px]"
+                />
+              </div>
+              <div>
+                <label className="block font-semibold mb-0.5 text-slate-400">Safe %</label>
+                <div className="px-2 py-0.5 bg-slate-900 border border-slate rounded text-emerald-300 text-[11px] h-[26px] flex items-center">
+                  {safePct}%
+                </div>
+              </div>
+            </div>
+
+            {/* Physics Tuning */}
+            <div className="grid grid-cols-2 gap-2 text-[11px] border-t border-slate-800 pt-3">
+              <div>
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="font-semibold uppercase tracking-[0.12em] text-slate-300">Shot Power</span>
+                  <span className="text-slate-400">{Math.round(shotPower * 100)}%</span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={Math.round(shotPower * 100)}
+                  onChange={(e) => setShotPower(Number(e.target.value) / 100)}
+                  className="w-full accent-emerald-500"
+                />
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="font-semibold uppercase tracking-[0.12em] text-slate-300">Spin Bias</span>
+                  <span className="text-slate-400">{spinBias >= 0 ? '+' : ''}{spinBias.toFixed(2)}</span>
+                </div>
+                <input
+                  type="range"
+                  min={-100}
+                  max={100}
+                  value={Math.round(spinBias * 100)}
+                  onChange={(e) => setSpinBias(Number(e.target.value) / 100)}
+                  className="w-full accent-emerald-500"
+                />
+              </div>
+            </div>
+
+            <div className="pt-2 flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleThrow}
+                  className="px-4 py-2 rounded-full border border-emerald-400/70 bg-emerald-500/10 text-[11px] uppercase tracking-[0.16em] text-emerald-200 hover:bg-emerald-500/20 active:scale-95 transition-all"
+                >
+                  Lancia pallina
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* ─── RIGHT COLUMN: PREVIEW ─── */}
+          <div className="default-card p-3 space-y-3 flex flex-col items-center justify-center">
+            <div className="w-full flex items-center justify-between mb-2">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-300">
+                Visuale Skill Check
+              </span>
+            </div>
+
+            <div className="relative">
+              <svg width={CANVAS_SIZE} height={CANVAS_SIZE} className="bg-slate-950/80 rounded-xl border border-slate-800 shadow-2xl">
+                <defs>
+                  <clipPath id="quest-clip">
+                    <polygon points={questPolygonAttr} />
+                  </clipPath>
+                </defs>
+
+                {/* Axes/Grid */}
+                <line x1={CENTER_X} y1={0} x2={CENTER_X} y2={CANVAS_SIZE} stroke="rgba(148,163,184,0.1)" strokeWidth={1} />
+                <line x1={0} y1={CENTER_Y} x2={CANVAS_SIZE} y2={CENTER_Y} stroke="rgba(148,163,184,0.1)" strokeWidth={1} />
+
+                {/* Fixed Background Axes (Radial Lines) */}
+                {stats.map((_, idx) => {
+                  const angle = -Math.PI / 2 + (idx * 2 * Math.PI) / stats.length;
+                  const x2 = CENTER_X + RADIUS * Math.cos(angle);
+                  const y2 = CENTER_Y + RADIUS * Math.sin(angle);
+                  return (
+                    <line
+                      key={`axis-bg-${idx}`}
+                      x1={CENTER_X}
+                      y1={CENTER_Y}
+                      x2={x2}
+                      y2={y2}
+                      stroke="rgba(148,163,184,0.15)"
+                      strokeWidth={1}
+                      strokeDasharray="4 4"
+                    />
+                  );
+                })}
+
+                {/* Rings clipped to Q */}
+                <g clipPath="url(#quest-clip)">
+                  {/* Injury ring */}
+                  <circle
+                    cx={CENTER_X}
+                    cy={CENTER_Y}
+                    r={Math.max(0, RADIUS * ((safePct + injuryPct) / 100))}
+                    className="fill-none stroke-yellow-500/30"
+                    strokeWidth={1}
+                    strokeDasharray="4 2"
+                  />
+                  {/* Safe ring */}
+                  <circle
+                    cx={CENTER_X}
+                    cy={CENTER_Y}
+                    r={Math.max(0, RADIUS * (safePct / 100))}
+                    className="fill-none stroke-emerald-500/30"
+                    strokeWidth={1}
+                    strokeDasharray="4 2"
+                  />
+                </g>
+
+                {/* Quest polygon (transparent fill) */}
+                <polygon points={questPolygonAttr} fill="rgba(56,189,248,0.08)" stroke="none" />
+
+                {/* Quest Polygon Stroke */}
+                <path
+                  d={questSmoothPathD}
+                  fill="none"
+                  stroke="rgb(34, 211, 238)"
+                  strokeWidth="2"
+                  className="drop-shadow-[0_0_8px_rgba(34,211,238,0.6)]"
+                />
+
+                {/* Hero polygon Stroke (No Fill) */}
+                <path
+                  d={heroSmoothPathD}
+                  fill="none"
+                  stroke="rgba(52,211,153,0.95)"
+                  strokeWidth={1.5}
+                  pathLength={1}
+                  strokeDasharray={1}
+                  strokeDashoffset={0}
+                />
+
+                {/* Fixed Stat Labels */}
+                {stats.map((stat, idx) => {
+                  const angle = -Math.PI / 2 + (idx * 2 * Math.PI) / Math.max(1, stats.length);
+                  const distFactor = 1.15;
+                  const labelX = CENTER_X + RADIUS * Math.cos(angle) * distFactor;
+                  const labelY = CENTER_Y + RADIUS * Math.sin(angle) * distFactor;
+                  const isActive = stat.questValue > 0;
+
+                  return (
+                    <text
+                      key={`lbl-${idx}`}
+                      x={labelX}
+                      y={labelY}
+                      className={`text-[9px] font-bold ${isActive ? 'fill-slate-200' : 'fill-slate-600'}`}
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                    >
+                      {stat.name}
+                    </text>
+                  );
+                })}
+
+                {/* Ball */}
+                {ballPosition && (
+                  <circle
+                    cx={ballPosition.x}
+                    cy={ballPosition.y}
+                    r={5}
+                    fill="#f97316"
+                    stroke="#fde68a"
+                    strokeWidth={1}
+                    className="drop-shadow-[0_0_5px_rgba(249,115,22,0.8)]"
+                  />
+                )}
+              </svg>
+            </div>
+
+            <div className="w-full text-center mt-2 p-2 bg-slate-900/50 rounded border border-slate-800">
+              <div className="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Risultato</div>
+              <div className="flex justify-between items-center px-4">
+                <div className="text-sm font-bold text-slate-100">{outcomeLabel || '-'}</div>
+                <div className="font-mono text-xs text-cyan-400">{timer}</div>
+              </div>
+            </div>
+
+            {/* Log */}
+            {log.length > 0 && (
+              <div className="w-full text-[10px] text-slate-500 font-mono bg-black/20 p-2 rounded max-h-20 overflow-y-auto">
+                {log.map((entry, idx) => (
+                  <div key={idx} className="mb-0.5 border-b border-slate-800/30 pb-0.5 last:border-0">
+                    {entry}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="space-y-4">
+          <div className="default-card p-3 space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">Alt Visuals v2 · Parametri</h3>
+                <p className="text-[10px] text-slate-400">Scegli le percentuali di rischio e il comportamento della pallina.</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 text-[11px]">
+              <div>
+                <label className="block font-semibold mb-0.5 text-slate-400">Injury %</label>
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={injuryPct}
+                  onChange={(e) => setInjuryPct(clampPercentage(Number(e.target.value) || 0))}
+                  className="w-full px-2 py-0.5 bg-obsidian border border-slate rounded text-ivory text-[11px]"
+                />
+              </div>
+              <div>
+                <label className="block font-semibold mb-0.5 text-slate-400">Death %</label>
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={deathPct}
+                  onChange={(e) => setDeathPct(clampPercentage(Number(e.target.value) || 0))}
+                  className="w-full px-2 py-0.5 bg-obsidian border border-slate rounded text-ivory text-[11px]"
+                />
+              </div>
+              <div>
+                <label className="block font-semibold mb-0.5 text-slate-400">Safe %</label>
+                <div className="px-2 py-0.5 bg-slate-900 border border-slate rounded text-emerald-300 text-[11px] h-[26px] flex items-center">
+                  {safePct}%
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px] border-t border-slate-800 pt-3">
+              <div>
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="font-semibold uppercase tracking-[0.12em] text-slate-300">Shot Power</span>
+                  <span className="text-slate-400">{Math.round(shotPower * 100)}%</span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={Math.round(shotPower * 100)}
+                  onChange={(e) => setShotPower(Number(e.target.value) / 100)}
+                  className="w-full accent-emerald-500"
+                />
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="font-semibold uppercase tracking-[0.12em] text-slate-300">Spin Bias</span>
+                  <span className="text-slate-400">{spinBias >= 0 ? '+' : ''}{spinBias.toFixed(2)}</span>
+                </div>
+                <input
+                  type="range"
+                  min={-100}
+                  max={100}
+                  value={Math.round(spinBias * 100)}
+                  onChange={(e) => setSpinBias(Number(e.target.value) / 100)}
+                  className="w-full accent-emerald-500"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md-grid-cols-2 xl:grid-cols-3 gap-4">
+            {ALT_VISUAL_SKINS.map((skin) => {
+              const geometry = geometryBySkinId.get(skin.id);
+              const cardState = altCardStates[skin.id];
+
+              return (
+                <div
+                  key={skin.id}
+                  className="bg-slate-900/80 border border-slate-700/50 rounded-xl p-4 flex flex-col gap-3"
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="text-sm font-medium text-slate-200">{skin.title}</h3>
+                      <p className="text-xs text-slate-400">{skin.subtitle}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleLaunchClick(skin.id)}
+                      disabled={cardState?.phase === 'rolling'}
+                      className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                        cardState?.phase === 'rolling'
+                          ? 'bg-slate-600/60 text-slate-300 cursor-not-allowed'
+                          : 'bg-emerald-600/80 hover:bg-emerald-500/90 text-white'
+                      }`}
+                    >
+                      {cardState?.phase === 'rolling' ? 'Lanciando...' : 'Lancia'}
+                    </button>
+                  </div>
+
+                  <div className="relative">
+                    {geometry ? (
+                      <RiskVisualization
+                        width={ALT_CARD_WIDTH}
+                        height={ALT_CARD_HEIGHT}
+                        injuryPct={injuryPct}
+                        deathPct={deathPct}
+                        questCardAttr={geometry.questCardAttr}
+                        heroCardPath={geometry.heroCardSmoothPath}
+                        ballPosition={cardState?.ballPosition}
+                      />
+                    ) : (
+                      <div className="h-48 flex items-center justify-center text-slate-500">
+                        Geometry not available
+                      </div>
+                    )}
+                  </div>
+
+                  {cardState?.phase === 'settled' && cardState.result && (
+                    <div className={`text-center py-1.5 px-3 rounded-md text-sm font-medium ${
+                      cardState.result === 'success'
+                        ? 'bg-emerald-900/50 text-emerald-200 border border-emerald-800/50'
+                        : 'bg-rose-900/50 text-rose-200 border border-rose-800/50'
+                    }`}>
+                      {cardState.result === 'success' ? 'SUCCESSO' : 'FALLIMENTO'}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

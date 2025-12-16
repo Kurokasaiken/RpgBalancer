@@ -513,7 +513,7 @@ export const BalancerNew: React.FC = () => {
   };
 
   return (
-    <div className="observatory-page">
+    <div className="observatory-page" data-testid="app-loaded">
       {/* Subtle animated glow/stars */}
       <div className="observatory-bg-orbits">
         <div className="observatory-bg-orbit-left" />

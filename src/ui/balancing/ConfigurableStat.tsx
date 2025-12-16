@@ -82,20 +82,20 @@ interface Props {
 
 export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueChange, allSimValues, onUpdate, onDelete, onReset, startInEdit, availableStats, canDelete = false, isDependencyHighlighted, hasError, dragHandleProps }) => {
   const [isConfigMode, setIsConfigMode] = useState(!!startInEdit);
-  const [label, setLabel] = useState(stat.label);
-  const [description, setDescription] = useState(stat.description ?? '');
-  const [min, setMin] = useState(stat.min);
-  const [max, setMax] = useState(stat.max);
-  const [step, setStep] = useState(stat.step);
-  const [weight, setWeight] = useState(stat.weight);
-  const [isDerived, setIsDerived] = useState(stat.isDerived);
-  const [formula, setFormula] = useState(stat.formula || '');
-  const [iconId, setIconId] = useState<string>(stat.icon ?? '');
+  const [label, setLabel] = useState(() => stat.label);
+  const [description, setDescription] = useState(() => stat.description ?? '');
+  const [min, setMin] = useState(() => stat.min);
+  const [max, setMax] = useState(() => stat.max);
+  const [step, setStep] = useState(() => stat.step);
+  const [weight, setWeight] = useState(() => stat.weight);
+  const [isDerived, setIsDerived] = useState(() => stat.isDerived);
+  const [formula, setFormula] = useState(() => stat.formula || '');
+  const [iconId, setIconId] = useState(() => stat.icon ?? '');
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [isPenalty, setIsPenalty] = useState(!!stat.isPenalty);
-  const [baseStat, setBaseStat] = useState(stat.baseStat ?? true);
-  const [isDetrimental, setIsDetrimental] = useState(stat.isDetrimental ?? false);
+  const [isPenalty, setIsPenalty] = useState(() => !!stat.isPenalty);
+  const [baseStat, setBaseStat] = useState(() => stat.baseStat ?? true);
+  const [isDetrimental, setIsDetrimental] = useState(() => stat.isDetrimental ?? false);
 
   const isLocked = !!stat.isLocked;
   const isHidden = !!stat.isHidden;
@@ -259,7 +259,8 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
                     {stat.description}
                   </div>
                 )}
-                {(!stat.baseStat || stat.isDetrimental) && (
+                {/* Labels shown only in edit mode */}
+                {isConfigMode && (!stat.baseStat || stat.isDetrimental) && (
                   <div className="mt-1 flex flex-wrap gap-1">
                     {!stat.baseStat && (
                       <span className="inline-flex items-center rounded-full border border-amber-400/60 bg-amber-500/10 px-2 py-0.5 text-[9px] tracking-[0.18em] uppercase text-amber-200">
@@ -296,9 +297,7 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
                 onClick={() => {
                   if (onReset) {
                     onReset();
-                    if (!stat.isDerived) {
-                      onSimValueChange(stat.defaultValue);
-                    }
+                    // Note: simValue is not automatically reset - user can manually adjust if needed
                   }
                 }}
                 disabled={!onReset || isLocked}
