@@ -33,6 +33,21 @@ const ALT_CARD_SCALE = (Math.min(ALT_CARD_WIDTH, ALT_CARD_HEIGHT) * 0.42) / RADI
 
 type AltStructure = 'solo' | 'dual' | 'triple' | 'quattro' | 'epic';
 
+interface SkinGeometry {
+  questBase: Point[];
+  heroBase: Point[];
+  questCard: Point[];
+  heroCard: Point[];
+  questCardAttr: string;
+  questCardPath: string;
+  questCardSmoothPath: string;
+  heroCardPath: string;
+  heroCardSmoothPath: string;
+  projectToCard: (point: Point) => Point;
+  selectedStats: StatRow[];
+  maxRadius: number;
+}
+
 interface AltVisualSkin {
   id: string;
   title: string;
@@ -217,14 +232,7 @@ const ALT_VISUAL_SKINS: AltVisualSkin[] = [
   },
 ];
 
-interface SkinGeometry {
-  questBase: Point[];
-  heroBase: Point[];
-  questCard: Point[];
-  heroCard: Point[];
-  projectToCard: (point: Point) => Point;
-  selectedStats: StatRow[];
-}
+const DEFAULT_ALT_VISUAL_ID = ALT_VISUAL_SKINS[0]?.id ?? null;
 
 function buildSkinGeometry(skin: AltVisualSkin, stats: StatRow[]): SkinGeometry | null {
   const selectedStats = selectStatsForSkin(stats, skin.statCount);
@@ -252,8 +260,17 @@ function buildSkinGeometry(skin: AltVisualSkin, stats: StatRow[]): SkinGeometry 
     heroBase,
     questCard: questBase.map(projectToCard),
     heroCard: heroBase.map(projectToCard),
+    questCardAttr: polygonToPointsAttr(questBase.map(projectToCard)),
+    questCardPath: polygonToPathD(questBase.map(projectToCard)),
+    questCardSmoothPath: polygonToSmoothPathD(questBase.map(projectToCard), 0.25),
+    heroCardPath: polygonToPathD(heroBase.map(projectToCard)),
+    heroCardSmoothPath: polygonToSmoothPathD(heroBase.map(projectToCard), 0.35),
     projectToCard,
     selectedStats,
+    maxRadius: questBase.reduce(
+      (max, point) => Math.max(max, Math.hypot(point.x - CENTER_X, point.y - CENTER_Y)),
+      0,
+    ),
   };
 }
 
@@ -542,50 +559,11 @@ function polygonToSmoothPathD(points: Point[], tension: number = 0.3): string {
   return parts.join(' ');
 }
 
-function buildMiniPolygonPoints(values: number[], radius: number, center: Point): Point[] {
-  if (!values.length) return [];
-  const total = values.length;
-  return values.map((value, index) => {
-    const angle = -Math.PI / 2 + (index * 2 * Math.PI) / total;
-    const dist = (clampPercentage(value) / 100) * radius;
-    return {
-      x: center.x + dist * Math.cos(angle),
-      y: center.y + dist * Math.sin(angle),
-    };
-  });
-}
-
 function computeAverage(values: number[]): number {
   const filtered = values.filter((value) => Number.isFinite(value) && value > 0);
   if (!filtered.length) return 0;
   const total = filtered.reduce((sum, value) => sum + value, 0);
   return total / filtered.length;
-}
-
-function buildSuperellipsePath(
-  cx: number,
-  cy: number,
-  rx: number,
-  ry: number,
-  exponent: number,
-  segments = 64,
-): string {
-  if (rx <= 0 || ry <= 0) return '';
-  const parts: string[] = [];
-  for (let i = 0; i <= segments; i += 1) {
-    const theta = (i / segments) * Math.PI * 2;
-    const cos = Math.cos(theta);
-    const sin = Math.sin(theta);
-    const signX = Math.sign(cos) || 1;
-    const signY = Math.sign(sin) || 1;
-    const absCos = Math.abs(cos);
-    const absSin = Math.abs(sin);
-    const x = cx + signX * Math.pow(absCos, 2 / exponent) * rx;
-    const y = cy + signY * Math.pow(absSin, 2 / exponent) * ry;
-    parts.push(`${i === 0 ? 'M' : 'L'} ${x} ${y}`);
-  }
-  parts.push('Z');
-  return parts.join(' ');
 }
 
 function selectStatsForSkin(stats: StatRow[], count: number): StatRow[] {
@@ -686,16 +664,6 @@ function buildSkinPolygon(structure: AltStructure, values: number[]): Point[] {
     default:
       return buildRadialPolygon(values, Math.max(3, values.length));
   }
-}
-
-function computePolygonArea(points: Point[]): number {
-  if (points.length < 3) return 0;
-  let area = 0;
-  for (let i = 0; i < points.length; i += 1) {
-    const j = (i + 1) % points.length;
-    area += points[i].x * points[j].y - points[j].x * points[i].y;
-  }
-  return Math.abs(area) / 2;
 }
 
 function pointInPolygon(point: Point, polygon: Point[]): boolean {
@@ -1008,29 +976,38 @@ export const SkillCheckPreviewPage: React.FC = () => {
 
   // ─── Monte Carlo / Ghost State ──────────────────────────────────────────
   const ballAnimFrameRef = useRef<number | null>(null);
+  const altCardAnimRefs = useRef<Record<string, number | null>>({});
     // New derived state for UI
   const activeCount = stats.filter(s => s.questValue > 0).length;
 
   const questValues = useMemo(() => stats.map((stat) => clampPercentage(stat.questValue)), [stats]);
   const heroValues = useMemo(() => stats.map((stat) => clampPercentage(stat.heroValue)), [stats]);
 
+  const altSkinEntries = useMemo(
+    () =>
+      ALT_VISUAL_SKINS.map((skin) => ({
+        skin,
+        geometry: buildSkinGeometry(skin, stats),
+      })),
+    [stats],
+  );
+
+  const questAverage = useMemo(() => computeAverage(questValues), [questValues]);
+  const heroAverage = useMemo(() => computeAverage(heroValues), [heroValues]);
+  const deltaEntries = useMemo(
+    () =>
+      stats.map((stat, index) => ({
+        id: stat.id || `stat-${index}`,
+        name: stat.name || `Stat ${index + 1}`,
+        delta: clampPercentage(stat.heroValue) - clampPercentage(stat.questValue),
+      })),
+    [stats],
+  );
+
   const safePct = useMemo(() => {
     const total = clampPercentage(injuryPct) + clampPercentage(deathPct);
     return clampPercentage(100 - total);
   }, [injuryPct, deathPct]);
-
-  const resolvedAltRoll = useMemo(() => {
-    if (altRollInfo.profileKey === profileKey) {
-      return altRollInfo;
-    }
-    return {
-      profileKey,
-      value: null,
-      zone: 'safe' as OutcomeZone,
-      result: 'fail' as OutcomeResult,
-      visualId: null,
-    };
-  }, [altRollInfo, profileKey]);
   // Use star polygon with valleys instead of simple polygon
   const questPolygon = useMemo(() => {
     return buildAdaptivePolygon(stats, 'questValue', {
@@ -1191,243 +1168,6 @@ export const SkillCheckPreviewPage: React.FC = () => {
     }
   }, []);
 
-  useEffect(() => {
-    const hasValue = resolvedAltRoll.value !== null;
-    if (altBallFrameRef.current !== null) {
-      cancelAnimationFrame(altBallFrameRef.current);
-    }
-    if (!hasValue) {
-      altBallFrameRef.current = requestAnimationFrame(() => {
-        altBallFrameRef.current = null;
-      });
-      return () => {
-        if (altBallFrameRef.current !== null) {
-          cancelAnimationFrame(altBallFrameRef.current);
-        }
-      };
-    }
-    const duration = 1000;
-    let startTime: number | null = null;
-
-    const animate = (timestamp: number) => {
-      if (startTime === null) startTime = timestamp;
-      const elapsed = timestamp - startTime;
-      const tRaw = Math.min(1, elapsed / duration);
-      if (tRaw < 1) {
-        altBallFrameRef.current = requestAnimationFrame(animate);
-      } else {
-        altBallFrameRef.current = null;
-      }
-    };
-
-    altBallFrameRef.current = requestAnimationFrame((ts) => {
-      startTime = ts;
-      animate(ts);
-    });
-
-    return () => {
-      if (altBallFrameRef.current !== null) {
-        cancelAnimationFrame(altBallFrameRef.current);
-      }
-    };
-  }, [resolvedAltRoll, altRollAnimKey]);
-
-  const runAltSimulation = useCallback((visualId: string | null = null) => {
-    if (questPolygon.length < 3 || heroPolygon.length < 3) return;
-    const chosen = samplePointInsidePolygon(questPolygon);
-    const dx = chosen.x - CENTER_X;
-    const dy = chosen.y - CENTER_Y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-
-    let zone: OutcomeZone = 'safe';
-    if (distance > radii.deathInnerRadius) {
-      zone = 'death';
-    } else if (distance > radii.injuryInnerRadius) {
-      zone = 'injury';
-    }
-
-    const success = pointInPolygon(chosen, heroPolygon);
-    const result: OutcomeResult = success ? 'success' : 'fail';
-    const rollPercent = clampPercentage((distance / Math.max(1, radii.deathOuterRadius || RADIUS)) * 100);
-
-    setAltRollInfo({
-      profileKey,
-      value: rollPercent,
-      zone,
-      result,
-      visualId,
-    });
-    setAltRollAnimKey((prev) => prev + 1);
-  }, [heroPolygon, questPolygon, radii, profileKey]);
-
-    useEffect(() => {
-    if (viewMode !== 'alt') return;
-    const frame = requestAnimationFrame(() => {
-      const defaultVisual = ALT_VISUAL_SKINS[0]?.id ?? null;
-      runAltSimulation(defaultVisual);
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [viewMode, runAltSimulation]);
-
-  const renderAltVisualSvg = useCallback(
-    (meta: AltVisualMeta) => {
-      const width = ALT_CARD_WIDTH;
-      const height = ALT_CARD_HEIGHT;
-      const cx = width / 2;
-      const cy = height / 2;
-      const baseRadius = Math.min(width, height) * 0.35;
-      const questMini = buildMiniPolygonPoints(questValues, baseRadius, { x: cx, y: cy });
-      const heroMini = buildMiniPolygonPoints(heroValues, baseRadius, { x: cx, y: cy });
-      const questAttr = polygonToPointsAttr(questMini);
-      const heroAttr = polygonToPointsAttr(heroMini);
-
-      switch (meta.renderType) {
-        case 'radar':
-          return (
-            <svg width={width} height={height} className="text-slate-500">
-              {[0.25, 0.5, 0.75, 1].map((ratio) => (
-                <circle
-                  key={ratio}
-                  cx={cx}
-                  cy={cy}
-                  r={baseRadius * ratio}
-                  className="fill-none stroke-slate-700/40"
-                  strokeDasharray="4 4"
-                  strokeWidth={0.8}
-                />
-              ))}
-              {stats.map((_, idx) => {
-                const angle = -Math.PI / 2 + (idx * 2 * Math.PI) / Math.max(1, stats.length);
-                const x2 = cx + baseRadius * Math.cos(angle);
-                const y2 = cy + baseRadius * Math.sin(angle);
-                return (
-                  <line
-                    key={`axis-${idx}`}
-                    x1={cx}
-                    y1={cy}
-                    x2={x2}
-                    y2={y2}
-                    className="stroke-slate-700/40"
-                    strokeWidth={0.8}
-                  />
-                );
-              })}
-              <polygon points={questAttr} className="fill-cyan-400/12 stroke-cyan-300/70" strokeWidth={1.5} />
-              <polygon points={heroAttr} className="fill-emerald-400/10 stroke-emerald-300/90" strokeWidth={1.2} />
-            </svg>
-          );
-        case 'orbit': {
-          const orbitRadius = Math.min(width, height) * 0.42;
-          return (
-            <svg width={width} height={height}>
-              <circle cx={cx} cy={cy} r={orbitRadius} className="fill-none stroke-slate-700/50" strokeDasharray="4 2" />
-              {stats.map((stat, idx) => {
-                const angle = -Math.PI / 2 + (idx * 2 * Math.PI) / Math.max(1, stats.length);
-                const questRadius = orbitRadius * (clampPercentage(stat.questValue) / 100);
-                const heroRadius = orbitRadius * (clampPercentage(stat.heroValue) / 100);
-                const questX = cx + questRadius * Math.cos(angle);
-                const questY = cy + questRadius * Math.sin(angle);
-                const heroX = cx + heroRadius * Math.cos(angle);
-                const heroY = cy + heroRadius * Math.sin(angle);
-                return (
-                  <g key={stat.id}>
-                    <line x1={cx} y1={cy} x2={heroX} y2={heroY} className="stroke-emerald-300/70" strokeWidth={1} />
-                    <circle cx={questX} cy={questY} r={3} className="fill-cyan-200/80" />
-                    <circle cx={heroX} cy={heroY} r={2} className="fill-emerald-200" />
-                  </g>
-                );
-              })}
-            </svg>
-          );
-        }
-        case 'stripe': {
-          const totalHeight = height * 0.8;
-          const safeHeight = (safePct / 100) * totalHeight;
-          const injuryHeight = (injuryPct / 100) * totalHeight;
-          const deathHeight = totalHeight - safeHeight - injuryHeight;
-          return (
-            <svg width={width} height={height}>
-              <rect x={width / 3} y={(height - totalHeight) / 2} width={width / 3} height={safeHeight} className="fill-emerald-500/30" />
-              <rect
-                x={width / 3}
-                y={(height - totalHeight) / 2 + safeHeight}
-                width={width / 3}
-                height={injuryHeight}
-                className="fill-amber-400/35"
-              />
-              <rect
-                x={width / 3}
-                y={(height - totalHeight) / 2 + safeHeight + injuryHeight}
-                width={width / 3}
-                height={deathHeight}
-                className="fill-rose-500/35"
-              />
-              <line x1={width / 3} y1={cy} x2={(2 * width) / 3} y2={cy} className="stroke-slate-800" strokeWidth={1} />
-            </svg>
-          );
-        }
-        case 'bars':
-          return (
-            <svg width={width} height={height}>
-              {deltaEntries.slice(0, 5).map((entry, idx) => {
-                const barY = 20 + idx * 25;
-                const scale = (entry.delta / 100) * (width / 2 - 20);
-                return (
-                  <g key={entry.id}>
-                    <line x1={width / 2} y1={barY} x2={width / 2} y2={barY} className="stroke-slate-700" />
-                    <rect
-                      x={width / 2}
-                      y={barY - 6}
-                      width={scale}
-                      height={12}
-                      className={entry.delta >= 0 ? 'fill-emerald-400/70' : 'fill-rose-400/70'}
-                    />
-                    <text x={width / 2 + scale + Math.sign(scale || 1) * 4} y={barY + 3} className="text-[8px] fill-slate-200">
-                      {entry.name}
-                    </text>
-                  </g>
-                );
-              })}
-            </svg>
-          );
-        case 'superellipse': {
-          const rx = (questAverage / 100) * (width * 0.4);
-          const ry = (heroAverage / 100) * (height * 0.4);
-          const exponent = 2 + (Math.abs(questAverage - heroAverage) / 100) * 3;
-          const path = buildSuperellipsePath(cx, cy, rx, ry, exponent);
-          return (
-            <svg width={width} height={height}>
-              <path d={path} className="fill-cyan-400/15 stroke-cyan-300/60" strokeWidth={2} />
-              <circle cx={cx} cy={cy} r={2} className="fill-slate-100" />
-            </svg>
-          );
-        }
-        case 'vectors':
-          return (
-            <svg width={width} height={height}>
-              {stats.map((stat, idx) => {
-                const angle = -Math.PI / 2 + (idx * 2 * Math.PI) / Math.max(1, stats.length);
-                const questRadius = baseRadius * (clampPercentage(stat.questValue) / 100);
-                const heroRadius = baseRadius * (clampPercentage(stat.heroValue) / 100);
-                const questX = cx + questRadius * Math.cos(angle);
-                const questY = cy + questRadius * Math.sin(angle);
-                const heroX = cx + heroRadius * Math.cos(angle);
-                const heroY = cy + heroRadius * Math.sin(angle);
-                return (
-                  <g key={`vec-${stat.id}`}>
-                    <line x1={cx} y1={cy} x2={questX} y2={questY} className="stroke-cyan-200/60" strokeWidth={1} />
-                    <line x1={questX} y1={questY} x2={heroX} y2={heroY} className="stroke-emerald-300/80" strokeWidth={1.5} />
-                  </g>
-                );
-              })}
-            </svg>
-          );
-        default:
-          return <svg width={width} height={height} />;
-      }
-    },
-    [questValues, heroValues, stats, safePct, injuryPct, deltaEntries, questAverage, heroAverage],
-  );
 
   const handleStatChange = (index: number, field: keyof StatRow, raw: string) => {
     setStats((prev) => {

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { ActivityDefinition, ResourceDeltaDefinition } from '@/balancing/config/idleVillage/types';
+import type { ActivityDefinition, ResourceDeltaDefinition, StatRequirement } from '@/balancing/config/idleVillage/types';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 
 export interface VerbDetailAssignment {
@@ -12,6 +12,8 @@ export interface VerbSlotState {
   id: string;
   label: string;
   statHint?: string;
+  requirement?: StatRequirement;
+  requirementLabel?: string;
   required?: boolean;
   requiredStatId?: string;
   assignedResidentId?: string | null;
@@ -36,7 +38,6 @@ export interface VerbDetailCardProps {
   durationSeconds?: number;
   elapsedSeconds?: number;
   isActive?: boolean;
-  mockWarning?: string;
   onStart?: () => void;
   onClose?: () => void;
   onSlotClick?: (slotId: string) => void;
@@ -74,7 +75,6 @@ export default function VerbDetailCard({
   durationSeconds,
   elapsedSeconds = 0,
   isActive,
-  mockWarning,
   onStart,
   onClose,
   onSlotClick,
@@ -155,7 +155,7 @@ export default function VerbDetailCard({
                       {slot.required && <span className="text-amber-300 text-[10px] uppercase tracking-[0.2em]">Required</span>}
                     </div>
                     <div className="text-[10px] uppercase tracking-[0.25em] text-slate-500">
-                      {slot.statHint ?? 'Any Stat'}
+                      {slot.statHint ?? slot.requirementLabel ?? slot.requirement?.label ?? 'Any Stat'}
                     </div>
                     <div
                       className={`mt-2 flex h-16 items-center justify-center rounded-lg border text-sm font-medium ${
@@ -178,7 +178,7 @@ export default function VerbDetailCard({
 
         <div className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="space-y-3">
-            <div className="text-[10px] uppercase tracking-[0.25em] text-slate-400">Reward Preview (mock)</div>
+            <div className="text-[10px] uppercase tracking-[0.25em] text-slate-400">Rewards</div>
             {preview.rewards.length ? (
               <div className="flex flex-wrap gap-2">
                 {preview.rewards.map((reward) => (
@@ -193,13 +193,7 @@ export default function VerbDetailCard({
               </div>
             ) : (
               <div className="rounded border border-slate-800 px-3 py-2 text-slate-500">
-                No explicit rewards configured in config.
-              </div>
-            )}
-
-            {mockWarning && (
-              <div className="rounded border border-amber-400/50 bg-amber-500/10 px-3 py-2 text-[10px] text-amber-100">
-                {mockWarning}
+                No rewards configured.
               </div>
             )}
           </div>
@@ -241,6 +235,7 @@ export default function VerbDetailCard({
                         ? 'border-slate-800 text-slate-500 cursor-not-allowed'
                         : 'border-slate-600 text-slate-100 hover:border-emerald-400/60',
                   ].join(' ')}
+                  aria-label={`Resident ${resident.id}, status ${resident.status}${isSelected ? ', selected' : ''}`}
                 >
                   <span className="font-semibold">{resident.id}</span>
                   <span className="ml-1 text-[9px] uppercase tracking-[0.18em] text-slate-400">{resident.status}</span>
@@ -250,7 +245,7 @@ export default function VerbDetailCard({
             {!assignments.length && <div className="text-[10px] text-slate-500">No residents available.</div>}
           </div>
           <div className="rounded border border-dashed border-slate-700 bg-slate-900/40 px-3 py-2 text-[10px] text-slate-400">
-            Drag from the staging pool to each slot. Drag-and-drop wiring will replace this placeholder once the SkillCheck engine ships.
+            Drag from the staging pool to each slot.
           </div>
         </div>
 

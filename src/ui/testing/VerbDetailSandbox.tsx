@@ -1,65 +1,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DndContext, type DragEndEvent, useDraggable, useDroppable } from '@dnd-kit/core';
-import type { ActivityDefinition, ResourceDeltaDefinition } from '@/balancing/config/idleVillage/types';
+import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
+import { VERB_SANDBOX_PRESET } from '@/balancing/config/idleVillage/presets/verbSandboxPreset';
+import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
+import { evaluateStatRequirement } from '@/engine/game/idleVillage/statMatching';
 import VerbCard from '@/ui/idleVillage/VerbCard';
 import VerbDetailCard, {
   type VerbDetailPreview,
   type VerbDetailAssignment,
   type VerbSlotState,
 } from '@/ui/idleVillage/VerbDetailCard';
-
-const mockRewards: ResourceDeltaDefinition[] = [
-  { resourceId: 'gold', amountFormula: '+8' },
-  { resourceId: 'xp', amountFormula: '+5' },
-];
-
-const mockActivity: ActivityDefinition = {
-  id: 'quest_city_rats',
-  label: 'Cull Rats in Sewers',
-  description: 'Short expedition beneath the city to clear nests and recover bounties.',
-  tags: ['quest', 'combat', 'city'],
-  slotTags: ['city'],
-  resolutionEngineId: 'quest_combat',
-  level: 1,
-  dangerRating: 2,
-  metadata: {
-    questSpawnEnabled: true,
-    injuryChanceDisplay: 35,
-    deathChanceDisplay: 5,
-  },
-};
-
-const mockResidents: ResidentState[] = [
-  { id: 'Founder', status: 'available', fatigue: 10 },
-  { id: 'Scout-A', status: 'available', fatigue: 25 },
-  { id: 'Worker-B', status: 'injured', fatigue: 70 },
-];
-
-const residentStatTags: Record<string, string[]> = {
-  Founder: ['reason', 'lantern', 'discipline'],
-  'Scout-A': ['moth', 'edge', 'passion'],
-  'Worker-B': ['forge', 'strength'],
-};
-
-const SLOT_BLUEPRINT: VerbSlotState[] = [
-  {
-    id: 'slot_leader',
-    label: 'Leader',
-    statHint: 'Needs Reason / Lantern',
-    requiredStatId: 'reason',
-    required: true,
-    assignedResidentId: null,
-  },
-  {
-    id: 'slot_support',
-    label: 'Support',
-    statHint: 'Prefers Passion / Moth',
-    requiredStatId: 'moth',
-    required: false,
-    assignedResidentId: null,
-  },
-];
 
 const VERB_DURATION_SECONDS = 48;
 type DropState = 'idle' | 'valid' | 'invalid';
@@ -94,8 +45,33 @@ function DraggableResidentToken({ resident }: { resident: ResidentState }) {
 }
 
 export default function VerbDetailSandbox() {
-  const [selectedIds, setSelectedIds] = useState<string[]>(['Founder']);
-  const [slots, setSlots] = useState<VerbSlotState[]>(SLOT_BLUEPRINT);
+  const { config } = useIdleVillageConfig();
+  const residentPool = useMemo<ResidentState[]>(() => {
+    return VERB_SANDBOX_PRESET.residents.map((preset) => ({
+      id: preset.id,
+      status: preset.status,
+      fatigue: preset.fatigue,
+      statTags: preset.statTags,
+    }));
+  }, []);
+  const initialSlots = useMemo<VerbSlotState[]>(
+    () =>
+      VERB_SANDBOX_PRESET.slots.map((slot) => ({
+        id: slot.id,
+        label: slot.label,
+        required: slot.required,
+        statHint: slot.hint,
+        requirement: slot.requirement,
+        requirementLabel: slot.requirement?.label,
+        assignedResidentId: null,
+      })),
+    [],
+  );
+  const [selectedIds, setSelectedIds] = useState<string[]>(() => {
+    const firstAvailable = residentPool.find((resident) => resident.status === 'available');
+    return firstAvailable ? [firstAvailable.id] : [];
+  });
+  const [slots, setSlots] = useState<VerbSlotState[]>(initialSlots);
   const [isActive, setIsActive] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -117,17 +93,25 @@ export default function VerbDetailSandbox() {
     return () => clearInterval(timer);
   }, [isActive]);
 
+  const sandboxActivity: ActivityDefinition | undefined = config.activities[VERB_SANDBOX_PRESET.activityId];
+  const activitySlotLabel = useMemo(() => {
+    if (!sandboxActivity) return VERB_SANDBOX_PRESET.slotLabel ?? 'Unknown Slot';
+    const meta = (sandboxActivity.metadata ?? {}) as { mapSlotId?: string };
+    if (meta?.mapSlotId && config.mapSlots[meta.mapSlotId]) {
+      return config.mapSlots[meta.mapSlotId].label;
+    }
+    return VERB_SANDBOX_PRESET.slotLabel ?? 'Village Slot';
+  }, [config.mapSlots, sandboxActivity]);
   const preview: VerbDetailPreview = useMemo(() => {
-    const assigned = slots.filter((slot) => slot.assignedResidentId).length || 1;
+    const meta = (sandboxActivity?.metadata ?? {}) as { injuryChanceDisplay?: number; deathChanceDisplay?: number };
     return {
-      rewards: mockRewards,
-      injuryPercentage: 30 + assigned * 3,
-      deathPercentage: 5 + Math.max(0, assigned - 1),
-      note: 'Mock preview until SkillCheckEngine is wired',
+      rewards: sandboxActivity?.rewards ?? [],
+      injuryPercentage: meta?.injuryChanceDisplay ?? 0,
+      deathPercentage: meta?.deathChanceDisplay ?? 0,
     };
-  }, [slots]);
+  }, [sandboxActivity]);
 
-  const assignments: VerbDetailAssignment[] = mockResidents.map((resident) => ({
+  const assignments: VerbDetailAssignment[] = residentPool.map((resident) => ({
     resident,
     isSelected: selectedIds.includes(resident.id),
     onToggle: (residentId: string) => {
@@ -204,8 +188,14 @@ export default function VerbDetailSandbox() {
         return;
       }
 
-      const statTags = residentStatTags[residentId] ?? [];
-      if (targetSlot.requiredStatId && !statTags.includes(targetSlot.requiredStatId)) {
+      const resident = residentPool.find((r) => r.id === residentId);
+      if (!resident) {
+        setDropFeedback('invalid');
+        return;
+      }
+
+      const match = evaluateStatRequirement(resident, targetSlot.requirement);
+      if (!match.matches) {
         setDropFeedback('invalid');
         return;
       }
@@ -230,7 +220,7 @@ export default function VerbDetailSandbox() {
         startVerbRun();
       }
     },
-    [findAutoSlotId, isActive, setDropFeedback, slots, startVerbRun],
+    [findAutoSlotId, isActive, residentPool, setDropFeedback, slots, startVerbRun],
   );
 
   const handleDragEnd = useCallback(
@@ -300,7 +290,7 @@ export default function VerbDetailSandbox() {
           <div className="text-center space-y-2">
             <p className="text-[12px] uppercase tracking-[0.3em] text-slate-400">Verb Detail Sandbox</p>
             <p className="text-[11px] text-slate-500">
-              Trascina i residenti sui requisiti del verb, osserva la card compatta e la vista esplosa aggiornarsi in parallelo.
+              Drag residents to slots; observe real-time VerbCard/VerbDetailCard updates.
             </p>
           </div>
 
@@ -308,23 +298,24 @@ export default function VerbDetailSandbox() {
             <div className="space-y-5 rounded-2xl border border-slate-800/60 bg-slate-950/70 p-4">
               <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-slate-500">
                 <span>Verb Window</span>
-                <span className="text-slate-400">{mockActivity.tags?.join(' · ')}</span>
+                <span className="text-slate-400">{sandboxActivity?.tags?.join(' · ')}</span>
               </div>
 
               <div ref={setCardDropRef}>
                 <VerbCard
-                  label={mockActivity.label}
+                  label={sandboxActivity?.label ?? 'Unknown Verb'}
                   icon="⚔️"
-                  kindLabel="Quest"
+                  kindLabel={sandboxActivity?.tags?.includes('quest') ? 'Quest' : sandboxActivity?.tags?.[0] ?? 'Verb'}
                   assignees={assignedNames}
                   rewardsLabel={rewardsLabel}
                   deadlineLabel={`${isActive ? remainingSeconds : VERB_DURATION_SECONDS}s`}
                   riskLabel={`${preview.injuryPercentage}% / ${preview.deathPercentage}%`}
                   progressFraction={progressFraction}
                   state={isActive ? 'running' : 'idle'}
-                  isQuest
-                  tone="quest"
-                  tooltip="Cull rats in the sewers"
+                  isQuest={sandboxActivity?.tags?.includes('quest')}
+                  isJob={sandboxActivity?.tags?.includes('job')}
+                  tone={sandboxActivity?.tags?.includes('quest') ? 'quest' : sandboxActivity?.tags?.includes('danger') ? 'danger' : undefined}
+                  tooltip={sandboxActivity?.description}
                   slotRequirementLabel={slotRequirementLabel}
                   assignedLabel={assignedLabel}
                   dropState={cardDropState}
@@ -334,13 +325,13 @@ export default function VerbDetailSandbox() {
               </div>
 
               <p className="text-[10px] text-slate-500">
-                Trascina un residente sulla card per iniziare automaticamente. Se non soddisfa i requisiti, la card lo rifiuterà.
+                Drag a resident onto the card to auto-start. Invalid drops are rejected.
               </p>
 
               <div className="space-y-2">
                 <div className="text-[10px] uppercase tracking-[0.25em] text-slate-400">Resident tokens</div>
                 <div className="flex flex-wrap gap-2">
-                  {mockResidents.map((resident) => (
+                  {residentPool.map((resident) => (
                     <DraggableResidentToken key={resident.id} resident={resident} />
                   ))}
                 </div>
@@ -349,18 +340,17 @@ export default function VerbDetailSandbox() {
 
             {shouldShowDetail ? (
               <VerbDetailCard
-                title={mockActivity.label}
-                subtitle="Quest Offer · Exploded view"
-                activity={mockActivity}
-                description={mockActivity.description}
-                slotLabel="Village Square"
+                title={sandboxActivity?.label ?? 'Verb Detail'}
+                subtitle="Verb Detail · Exploded view"
+                activity={sandboxActivity ?? ({} as ActivityDefinition)}
+                description={sandboxActivity?.description}
+                slotLabel={activitySlotLabel}
                 preview={preview}
                 assignments={assignments}
                 slots={slots}
                 durationSeconds={VERB_DURATION_SECONDS}
                 elapsedSeconds={elapsedSeconds}
                 isActive={isActive}
-                mockWarning="Preview + DnD sono mock: sostituire con SkillCheckEngine e drag reale."
                 onStart={handleManualStart}
                 onClose={() => setIsDetailOpen(false)}
                 onSlotClick={handleSlotClear}
@@ -368,7 +358,7 @@ export default function VerbDetailSandbox() {
               />
             ) : (
               <div className="rounded-2xl border border-dashed border-slate-800/70 bg-slate-950/50 p-6 text-center text-[11px] text-slate-500">
-                Clicca la Verb Card, usa il tooltip o trascina un residente sopra la card per aprire il dettaglio.
+                Click the Verb Card, hover, or drag a resident to open details.
               </div>
             )}
           </div>
