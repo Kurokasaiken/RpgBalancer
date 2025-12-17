@@ -6,16 +6,30 @@
 
 import { useState, useCallback, useMemo, useEffect, useRef, type ReactNode } from 'react';
 import { DndContext, DragOverlay, useDraggable, useDroppable, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core';
-import { Briefcase, MapPin, ScrollText, Pause, Play, Eye } from 'lucide-react';
+import { Pause, Play, Eye, Briefcase, MapPin as MapPinIcon, ScrollText } from 'lucide-react';
 import idleVillageMap from '@/assets/ui/idleVillage/idle-village-map.jpg';
 import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
 import { createInitialVillageState, scheduleActivity } from '@/engine/game/idleVillage/TimeEngine';
-import type { VillageState, ResidentState, ScheduledActivity, VillageEvent } from '@/engine/game/idleVillage/TimeEngine';
+import type { VillageState, ResidentState, ScheduledActivity, VillageEvent, QuestOffer } from '@/engine/game/idleVillage/TimeEngine';
 import { tickIdleVillage } from '@/engine/game/idleVillage/IdleVillageEngine';
-import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
+import type { ActivityDefinition, VerbToneColors } from '@/balancing/config/idleVillage/types';
 import { DefaultSection } from '@/ui/components/DefaultUI';
 import { buyFoodWithGold } from '@/engine/game/idleVillage/MarketEngine';
 import VerbCard, { type ProgressStyle, type VerbTone, type VerbVisualVariant } from '@/ui/idleVillage/VerbCard';
+import {
+  DEFAULT_SECONDS_PER_TIME_UNIT,
+  buildCompletedVerbSummary,
+  buildQuestOfferSummary,
+  buildScheduledVerbSummary,
+  type VerbSummary,
+} from '@/ui/idleVillage/verbSummaries';
+import {
+  DEFAULT_SECONDS_PER_TIME_UNIT,
+  buildCompletedVerbSummary,
+  buildQuestOfferSummary,
+  buildScheduledVerbSummary,
+  type VerbSummary,
+} from '@/ui/idleVillage/verbSummaries';
 
 // Minimal deterministic RNG for reproducible testing
 const simpleRng = (() => {
@@ -26,17 +40,7 @@ const simpleRng = (() => {
   };
 })();
 
-const DEFAULT_SECONDS_PER_TIME_UNIT = 60;
-
 const clamp01 = (value: number) => Math.max(0, Math.min(1, value));
-
-const formatSecondsLabel = (seconds?: number | null) => {
-  if (seconds === undefined || seconds === null || !Number.isFinite(seconds)) return '—';
-  const clamped = Math.max(0, Math.round(seconds));
-  const mins = Math.floor(clamped / 60);
-  const secs = clamped % 60;
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
-};
 
 const HUNGER_FX_KEYFRAMES = `
 @keyframes idleVillageHungerFlight {
@@ -219,9 +223,13 @@ function MapSlotMarker({ slot, left, top, isSelected, hasJobs, hasQuests, jobLab
   );
 }
 
-interface ScheduledVerbSummary {
+type VerbSummarySource = 'scheduled' | 'questOffer' | 'system' | 'completed';
+
+interface VerbSummary {
   key: string;
-  scheduled: ScheduledActivity;
+  source: VerbSummarySource;
+  scheduled?: ScheduledActivity;
+  offer?: QuestOffer;
   slotId: string;
   label: string;
   kindLabel: string;
@@ -311,7 +319,7 @@ function buildScheduledVerbSummary(params: {
   currentTime: number;
   secondsPerTimeUnit: number;
   dayLength: number;
-}): ScheduledVerbSummary {
+}): VerbSummary {
   const durationUnits = Math.max(1, params.scheduled.endTime - params.scheduled.startTime || 1);
   const elapsedUnits = Math.max(
     0,
@@ -336,6 +344,7 @@ function buildScheduledVerbSummary(params: {
 
   return {
     key: params.scheduled.id,
+    source: 'scheduled',
     scheduled: params.scheduled,
     slotId: params.scheduled.slotId,
     label: params.activity.label ?? params.scheduled.activityId,
@@ -364,31 +373,81 @@ function buildScheduledVerbSummary(params: {
   };
 }
 
+function buildQuestOfferSummary(params: {
+  offer: QuestOffer;
+  activity: ActivityDefinition;
+  slotIcon?: string;
+  resourceLabeler: (id: string) => string;
+  currentTime: number;
+  secondsPerTimeUnit: number;
+  dayLength: number;
+}): VerbSummary {
+  const { injury, death } = deriveRisk(params.activity);
+  const rewardLabel =
+    params.activity.rewards && params.activity.rewards.length > 0
+      ? params.activity.rewards.map((delta) => params.resourceLabeler(delta.resourceId)).join(', ')
+      : null;
+
+  let deadlineLabel: string | null = null;
+  let remainingSeconds = 0;
+  if (typeof params.offer.expiresAtTime === 'number') {
+    const remainingUnits = Math.max(0, params.offer.expiresAtTime - params.currentTime);
+    remainingSeconds = remainingUnits * params.secondsPerTimeUnit;
+    if (remainingUnits > 0) {
+      if (remainingUnits >= params.dayLength) {
+        deadlineLabel = `${Math.floor(remainingUnits / params.dayLength)}d to expire`;
+      } else {
+        deadlineLabel = `${remainingUnits}u to expire`;
+      }
+    } else {
+      deadlineLabel = 'Expired';
+    }
+  }
+
+  return {
+    key: params.offer.id,
+    source: 'questOffer',
+    offer: params.offer,
+    slotId: params.offer.slotId,
+    label: params.activity.label ?? params.offer.activityId,
+    kindLabel: 'Quest Offer',
+    isQuest: params.activity.tags?.includes('quest') ?? false,
+    isJob: false,
+    icon: deriveIcon(params.activity, params.slotIcon),
+    visualVariant: deriveVisualVariant(params.activity),
+    progressStyle: deriveProgressStyle(params.activity),
+    progressFraction: 0,
+    elapsedSeconds: 0,
+    totalDurationSeconds: 0,
+    remainingSeconds,
+    injuryPercentage: injury,
+    deathPercentage: death,
+    assignedCount: 0,
+    totalSlots: ((params.activity.metadata ?? {}) as { maxCrewSize?: number })?.maxCrewSize ?? 1,
+    rewardLabel,
+    tone: deriveTone(params.activity),
+    deadlineLabel,
+  };
+}
+
 interface MapSlotVerbClusterProps {
   slot: { id: string; label: string; icon?: string };
   left: number;
   top: number;
-  verbs: ScheduledVerbSummary[];
-  questOfferCards: {
-    id: string;
-    icon: ReactNode;
-    visualVariant: VerbVisualVariant;
-    progressStyle: ProgressStyle;
-    injuryPercentage: number;
-    deathPercentage: number;
-  }[];
+  verbs: VerbSummary[];
+  questOffers: VerbSummary[];
   onSelect: () => void;
   isSelected: boolean;
 }
 
-function MapSlotVerbCluster({ slot, left, top, verbs, questOfferCards, onSelect, isSelected }: MapSlotVerbClusterProps) {
+function MapSlotVerbCluster({ slot, left, top, verbs, questOffers, onSelect, isSelected }: MapSlotVerbClusterProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: `slot-${slot.id}`,
     data: { type: 'mapSlot', slotId: slot.id },
   });
 
   const dropState = isOver ? 'valid' : 'idle';
-  const hasContent = verbs.length > 0 || questOfferCards.length > 0;
+  const hasContent = verbs.length > 0 || questOffers.length > 0;
 
   return (
     <div
@@ -991,6 +1050,76 @@ export default function IdleVillagePage() {
 
   const questOffers = useMemo(() => Object.values(villageState.questOffers ?? {}), [villageState.questOffers]);
 
+  const secondsPerTimeUnit = config?.globalRules.secondsPerTimeUnit ?? 60;
+  const dayLengthSetting = config?.globalRules.dayLengthInTimeUnits || 5;
+
+  const getResourceLabel = useCallback(
+    (resourceId: string) => {
+      if (!config) return resourceId;
+      const def = config.resources?.[resourceId];
+      return def?.label ?? resourceId;
+    },
+    [config],
+  );
+
+  const scheduledVerbSummaries = useMemo(() => {
+    if (!config) return [] as VerbSummary[];
+    return activeActivities
+      .map((scheduled) => {
+        const activity = config.activities[scheduled.activityId] as ActivityDefinition | undefined;
+        if (!activity) return null;
+        const slotIcon = config.mapSlots?.[scheduled.slotId]?.icon;
+        return buildScheduledVerbSummary({
+          scheduled,
+          activity,
+          slotIcon,
+          resourceLabeler: getResourceLabel,
+          currentTime: villageState.currentTime,
+          secondsPerTimeUnit,
+          dayLength: dayLengthSetting,
+        });
+      })
+      .filter(Boolean) as VerbSummary[];
+  }, [config, activeActivities, getResourceLabel, villageState.currentTime, secondsPerTimeUnit, dayLengthSetting]);
+
+  const questOfferSummaries = useMemo(() => {
+    if (!config) return [] as VerbSummary[];
+    return questOffers
+      .map((offer) => {
+        const activity = config.activities[offer.activityId] as ActivityDefinition | undefined;
+        if (!activity) return null;
+        const slotIcon = config.mapSlots?.[offer.slotId]?.icon;
+        return buildQuestOfferSummary({
+          offer,
+          activity,
+          slotIcon,
+          resourceLabeler: getResourceLabel,
+          currentTime: villageState.currentTime,
+          secondsPerTimeUnit,
+          dayLength: dayLengthSetting,
+        });
+      })
+      .filter(Boolean) as VerbSummary[];
+  }, [config, questOffers, getResourceLabel, villageState.currentTime, secondsPerTimeUnit, dayLengthSetting]);
+
+  const verbsBySlot = useMemo(() => {
+    const grouped: Record<string, VerbSummary[]> = {};
+    scheduledVerbSummaries.forEach((summary) => {
+      if (!grouped[summary.slotId]) grouped[summary.slotId] = [];
+      grouped[summary.slotId].push(summary);
+    });
+    return grouped;
+  }, [scheduledVerbSummaries]);
+
+  const questOffersBySlot = useMemo(() => {
+    const grouped: Record<string, VerbSummary[]> = {};
+    questOfferSummaries.forEach((summary) => {
+      if (!grouped[summary.slotId]) grouped[summary.slotId] = [];
+      grouped[summary.slotId].push(summary);
+    });
+    return grouped;
+  }, [questOfferSummaries]);
+
   const activeActivities = useMemo(() => {
     const all = Object.values(villageState.activities) as ScheduledActivity[];
     return all
@@ -1048,11 +1177,6 @@ export default function IdleVillagePage() {
   const resourceDefinitions = config.resources ?? {};
 
   const verbToneColors = config.globalRules.verbToneColors;
-
-  const getResourceLabel = (resourceId: string) => {
-    const def = resourceDefinitions[resourceId];
-    return def?.label ?? resourceId;
-  };
 
   // Day/night segmentation based on config-global day length
   const dayLength = config.globalRules.dayLengthInTimeUnits || 5;

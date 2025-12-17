@@ -14,6 +14,15 @@
 
 Prima di scrivere **qualsiasi** codice o implementation plan, verificare:
 
+### 🎨 Default UI Theme (obbligatorio)
+
+- Il tema di riferimento per qualsiasi nuova UI è **Gilded Observatory**, lo stesso usato su BalancerNew.
+- Layout e superfici devono usare le utility definite in:
+  - `src/index.css` → classi `observatory-page`, `observatory-shell`, `default-card`, `observatory-main-frame`.
+  - `src/styles/color-palette.css` → token globali (variabili `--obsidian-*`, `--ivory-*`, `--gold`, ecc.).
+- Se servono wrapper/componenti riutilizzabili, partire da `src/components/balancing/archetype/gildedTheme.ts` oppure dai componenti già themed (`GildedCardWrapper`, `GildedSmartInput`, ecc.).
+- Non introdurre nuovi temi o palette senza aggiornare questo documento e i token condivisi.
+
 ### ✅ 1. Identificare le Entità Coinvolte
 - [ ] Quali entità vengono usate? (Entity, Spell, StatBlock, etc.)
 - [ ] Quali stat/proprietà vengono manipolate?

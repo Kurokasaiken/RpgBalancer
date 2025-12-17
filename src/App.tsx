@@ -92,7 +92,8 @@ function App() {
   }, []);
 
   return (
-    <FantasyLayout activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab as Tab)}>
+    <div data-testid="app-loaded" className="min-h-screen">
+      <FantasyLayout activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab as Tab)}>
       {activeTab === 'balancer' && (
         <ErrorBoundary componentName="Balancer">
           <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Balancer…</div>}>
@@ -260,7 +261,8 @@ function App() {
           <TacticalLab />
         </ErrorBoundary>
       )}
-    </FantasyLayout>
+      </FantasyLayout>
+    </div>
   );
 }
 

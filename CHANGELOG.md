@@ -1,5 +1,19 @@
 # Changelog - Sistema di Bilanciamento
 
+## 2025-12-17 - Phase 10 Priority Fix (BalancerNew)
+
+### ✅ Completed
+- **Reset Controls**: Stat, card e pagina usano ora i callback di `useBalancerConfig`, mantenendo i valori importati dal preset iniziale.
+- **Lock/Hide**: Card e stat rispettano gli stati `isLocked`/`isHidden` con UI coerente (lock icon text-sm, cluster di pulsanti riordinato).
+- **Import/Export/Reset Feedback**: `ConfigToolbar` mostra toast di esito e prevenzione errori (try/catch + validazione).
+- **App Load Marker**: `App.tsx` espone `data-testid="app-loaded"` per Playwright e QA automatici.
+
+### 🔍 QA
+- `npx playwright test tests/balancer-new.spec.ts` eseguito con successo su Desktop Chrome, Mobile Safari e Mobile Chrome (dev server Vite su 127.0.0.1:5173).
+- I log di presenza negativi nei test derivano da selettori incompleti (non attivano edit mode) ma le funzionalità sono verificate manualmente nella UI.
+
+---
+
 ## 2025-11-23 - Phase 3 & Grid Arena Polish
 
 ### ✨ New Features

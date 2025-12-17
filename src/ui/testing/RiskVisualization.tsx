@@ -1,4 +1,3 @@
-import React from 'react';
 import type { Point } from './types';
 
 interface RiskVisualizationProps {

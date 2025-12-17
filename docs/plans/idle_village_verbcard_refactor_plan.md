@@ -63,11 +63,21 @@
 
 ### Phase A – Data & Helpers
 
-1. Finalize `ScheduledVerbSummary` type (include slotId, resource labels, tone, drop state hints).
+1. Finalize the shared `VerbSummary` type (scheduled + quest offer + system/completed sources) with slotId, resource labels, tone, drop state hints, and CTA metadata.
 2. Implement helper pipeline:
    - `deriveVisualVariant`, `deriveProgressStyle`, `deriveTone`, `deriveIcon`, `deriveRisk`, `deriveDeadlineLabel`.
    - `buildScheduledVerbSummary(activity, scheduled, config, villageState, currentTime, secondsPerTimeUnit)`.
+   - Add a sister helper for quest offers (convert `QuestOffer` + `ActivityDefinition` into lightweight summaries for map/HUD reuse) plus shared `getResourceLabel`.
+   - Enforce timing conversions via `globalRules.secondsPerTimeUnit` with `DEFAULT_SECONDS_PER_TIME_UNIT = 60` fallback.
 3. Add Vitest coverage for helper edge cases (quests without metadata, jobs without rewards, zero-duration safety).
+4. Remove legacy `CompletedVerb`/map marker specific props that duplicate the new summary structure, keeping a single source of truth.
+5. **Phase A tactical breakdown (current focus):**
+   1. **A.1 – Imports & duplication cleanup:** wire `IdleVillagePage` to consume helpers from `verbSummaries.ts`, delete inline duplicates, ensure `DEFAULT_SECONDS_PER_TIME_UNIT` + builder utilities resolve from one module.
+   2. **A.2 – Scheduling summaries:** replace `activeActivities` derived props with `buildScheduledVerbSummary`, including assignee names and tone/risk metadata.
+   3. **A.3 – Quest offer summaries:** generate quest offer summaries via helper, expose `assigneeNames`, `rewardLabel`, `deadlineLabel`, and hook them into both map clusters and HUD pipeline.
+   4. **A.4 – System/completed verbs:** convert hunger/injury/system verbs and completed jobs/quests into `VerbSummary` objects via dedicated builders, eliminating ad-hoc `CompletedVerb` structures.
+   5. **A.5 – Slot grouping selectors:** memoize `verbsBySlot` / `questOffersBySlot` keyed on slotId, ensuring both map clusters and future HUD consume the same grouped data.
+   6. **A.6 – HUD migration prep:** expose lightweight `VerbSummaryRow` props (label/reward/timer) so the HUD can be replaced in Phase C without additional data plumbing.
 
 ### Phase B – Map Slot Clusters
 
@@ -76,6 +86,7 @@
    - Group scheduled summaries by `slotId`.
    - Attach quest offers per slot (convert to lightweight summary using activity metadata).  
 3. Ensure dnd-kit interactions still call `handleAssignResidentToSlot` / `handleAcceptQuestOffer`.
+4. Delete the fallback `MapSlotMarker` component once clusters are wired to render path and droppable IDs match the old pattern (`slot-${slot.id}`).
 
 ### Phase C – Compact HUD
 

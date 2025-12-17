@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useBalancerConfig } from '@/balancing/hooks/useBalancerConfig';
 import { RiskVisualization } from './RiskVisualization';
 import type {
@@ -293,6 +293,117 @@ function createAltCardState(id: string, profileKey: string): AltCardState {
   };
 }
 
+interface RadiiSnapshot {
+  safeRadius: number;
+  injuryInnerRadius: number;
+  injuryOuterRadius: number;
+  deathInnerRadius: number;
+  deathOuterRadius: number;
+}
+
+const EMPTY_RADII: RadiiSnapshot = {
+  safeRadius: 0,
+  injuryInnerRadius: 0,
+  injuryOuterRadius: 0,
+  deathInnerRadius: 0,
+  deathOuterRadius: 0,
+};
+
+function computeRadiiSnapshot(
+  questPolygon: Point[],
+  stats: StatRow[],
+  safePct: number,
+  injuryPct: number,
+  deathPct: number,
+): RadiiSnapshot {
+  if (questPolygon.length < 3) {
+    return EMPTY_RADII;
+  }
+
+  const safeBase = clampPercentage(safePct, 0, 100);
+  const injuryBase = clampPercentage(injuryPct, 0, 100);
+  const deathBase = clampPercentage(deathPct, 0, 100);
+  let total = safeBase + injuryBase + deathBase;
+  if (total <= 0) total = 1;
+  const safeFraction = safeBase / total;
+  const injuryFraction = injuryBase / total;
+
+  const rngSeedSource = JSON.stringify({ stats, injuryPct, deathPct });
+  const rng = createSeededRng(hashString(rngSeedSource));
+
+  const sampleDistances: number[] = [];
+  const sampleCount = 800;
+  let attempts = 0;
+  const maxAttempts = sampleCount * 10;
+
+  while (sampleDistances.length < sampleCount && attempts < maxAttempts) {
+    attempts += 1;
+    const u = rng();
+    const r = Math.sqrt(u) * RADIUS;
+    const angle = rng() * Math.PI * 2;
+    const x = CENTER_X + r * Math.cos(angle);
+    const y = CENTER_Y + r * Math.sin(angle);
+    const p = { x, y };
+    if (pointInPolygon(p, questPolygon)) {
+      const dx = x - CENTER_X;
+      const dy = y - CENTER_Y;
+      sampleDistances.push(Math.sqrt(dx * dx + dy * dy));
+    }
+  }
+
+  if (sampleDistances.length === 0) {
+    return EMPTY_RADII;
+  }
+
+  sampleDistances.sort((a, b) => a - b);
+  const n = sampleDistances.length;
+
+  const safeIndex = Math.max(0, Math.min(n - 1, Math.floor(n * safeFraction) - 1));
+  const injuryIndex = Math.max(
+    safeIndex,
+    Math.min(n - 1, Math.floor(n * (safeFraction + injuryFraction)) - 1),
+  );
+  const maxIndex = n - 1;
+
+  const safeRadius = sampleDistances[safeIndex];
+  const injuryOuterRadius = sampleDistances[injuryIndex];
+  const deathOuterRadius = sampleDistances[maxIndex];
+
+  return {
+    safeRadius,
+    injuryInnerRadius: safeRadius,
+    injuryOuterRadius,
+    deathInnerRadius: injuryOuterRadius,
+    deathOuterRadius,
+  };
+}
+
+function hashString(input: string): number {
+  let hash = 0;
+  for (let i = 0; i < input.length; i += 1) {
+    hash = (hash << 5) - hash + input.charCodeAt(i);
+    hash |= 0;
+  }
+  return hash >>> 0;
+}
+
+function createSeededRng(seed: number): () => number {
+  let state = seed || 1;
+  return () => {
+    state = (1664525 * state + 1013904223) % 4294967296;
+    return state / 4294967296;
+  };
+}
+
+function shuffleWithRng<T>(items: T[], rng: () => number): T[] {
+  const arr = [...items];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 const createAltCardStateMap = (profileKey: string): Record<string, AltCardState> => {
   return ALT_VISUAL_SKINS.reduce<Record<string, AltCardState>>((acc, skin) => {
     acc[skin.id] = createAltCardState(skin.id, profileKey);
@@ -542,44 +653,6 @@ const CLASSIC_VALLEY_DEPTH = 0.5;
 const CLASSIC_HERO_PRECISION = 0.2;
 const CLASSIC_TRIANGLE_WIDTH = 0.35;
 
-function getClassicTrianglePoints(index: number, total: number, widthFactor: number) {
-  const angleStep = (2 * Math.PI) / Math.max(1, total);
-  const tipAngle = -Math.PI / 2 + index * angleStep;
-  const tipRadius = RADIUS * 0.95;
-  const halfWidth = widthFactor * 90;
-  const tip: Point = {
-    x: CENTER_X + tipRadius * Math.cos(tipAngle),
-    y: CENTER_Y + tipRadius * Math.sin(tipAngle),
-  };
-  const perpAngle = tipAngle + Math.PI / 2;
-  const dx = Math.cos(perpAngle) * halfWidth;
-  const dy = Math.sin(perpAngle) * halfWidth;
-  return {
-    tip,
-    baseCW: {
-      x: CENTER_X + dx,
-      y: CENTER_Y + dy,
-    },
-    baseCCW: {
-      x: CENTER_X - dx,
-      y: CENTER_Y - dy,
-    },
-  };
-}
-
-function buildClassicTriangle(
-  stats: StatRow[],
-  activeIndex: number,
-  options: ClassicPolygonOptions,
-): Point[] {
-  const triangleWidth = Math.max(
-    0.01,
-    Math.min(1, options.triangleWidth ?? DEFAULT_CLASSIC_POLYGON_OPTIONS.triangleWidth ?? 0.35),
-  );
-  const pts = getClassicTrianglePoints(activeIndex, stats.length, triangleWidth);
-  return [pts.tip, pts.baseCW, pts.baseCCW];
-}
-
 function buildClassicQuestPolygon(
   stats: StatRow[],
   key: keyof StatRow,
@@ -629,32 +702,6 @@ function buildClassicStarPolygon(
       y: CENTER_Y + valleyRadius * Math.sin(valleyAngle),
     });
   }
-  return points;
-}
-
-function buildClassicStitchedPolygon(
-  stats: StatRow[],
-  key: keyof StatRow,
-  options: ClassicPolygonOptions,
-): Point[] {
-  const triangleWidth = Math.max(
-    0.01,
-    Math.min(1, options.triangleWidth ?? DEFAULT_CLASSIC_POLYGON_OPTIONS.triangleWidth ?? 0.35),
-  );
-  const center: Point = { x: CENTER_X, y: CENTER_Y };
-  const activeStats = stats
-    .map((s, index) => ({ value: Number(s[key]) || 0, index }))
-    .filter((entry) => entry.value > 0);
-  const points: Point[] = [];
-  activeStats.forEach((entry, idx) => {
-    const current = getClassicTrianglePoints(entry.index, stats.length, triangleWidth);
-    const nextEntry = activeStats[(idx + 1) % activeStats.length];
-    const next = getClassicTrianglePoints(nextEntry.index, stats.length, triangleWidth);
-    points.push(current.tip);
-    points.push(current.baseCW);
-    points.push(center);
-    points.push(next.baseCCW);
-  });
   return points;
 }
 
@@ -1318,13 +1365,15 @@ function simulatePinballPath(target: Point, polygon: Point[], options: PinballOp
 // Main component
 export const SkillCheckPreviewPage: React.FC = () => {
   const { config } = useBalancerConfig();
-  const baseStatsPool = useMemo(() => {
-    return Object.values(config.stats ?? {}).filter(
-      (stat) => stat.baseStat && !stat.isDerived && !stat.isHidden,
-    );
-  }, [config.stats]);
+  const baseStatsPool = useMemo(
+    () =>
+      Object.values(config.stats ?? {}).filter(
+        (stat) => stat.baseStat && !stat.isDerived && !stat.isHidden,
+      ),
+    [config.stats],
+  );
 
-  const initialStats = useMemo<StatRow[]>(() => {
+  const buildInitialStats = useCallback(() => {
     if (!baseStatsPool.length) return [];
     const seedSource = JSON.stringify(baseStatsPool.map((stat) => stat.id).sort());
     const rng = createSeededRng(hashString(seedSource));
@@ -1343,7 +1392,11 @@ export const SkillCheckPreviewPage: React.FC = () => {
     });
   }, [baseStatsPool]);
 
-  const [stats, setStats] = useState<StatRow[]>(initialStats);
+  const [stats, setStats] = useState<StatRow[]>(() => buildInitialStats());
+
+  useEffect(() => {
+    setStats(buildInitialStats());
+  }, [buildInitialStats]);
   const [injuryPct, setInjuryPct] = useState(30);
   const [deathPct, setDeathPct] = useState(15);
   const [shotPower, setShotPower] = useState(0.5);
@@ -1617,80 +1670,10 @@ export const SkillCheckPreviewPage: React.FC = () => {
     ballAnimFrameRef.current = requestAnimationFrame(animateBall);
   };
 
-  const radii = useMemo(() => {
-    if (questPolygon.length < 3) {
-      return {
-        safeRadius: 0,
-        injuryInnerRadius: 0,
-        injuryOuterRadius: 0,
-        deathInnerRadius: 0,
-        deathOuterRadius: 0,
-      };
-    }
-
-    const safeBase = clampPercentage(safePct, 0, 100);
-    const injuryBase = clampPercentage(injuryPct, 0, 100);
-    const deathBase = clampPercentage(deathPct, 0, 100);
-    let total = safeBase + injuryBase + deathBase;
-    if (total <= 0) total = 1;
-    const safeFraction = safeBase / total;
-    const injuryFraction = injuryBase / total;
-
-    const rngSeedSource = JSON.stringify({ stats, injuryPct, deathPct });
-    const rng = createSeededRng(hashString(rngSeedSource));
-
-    const sampleDistances: number[] = [];
-    const sampleCount = 800;
-    let attempts = 0;
-    const maxAttempts = sampleCount * 10;
-
-    while (sampleDistances.length < sampleCount && attempts < maxAttempts) {
-      attempts += 1;
-      const u = rng();
-      const r = Math.sqrt(u) * RADIUS;
-      const angle = rng() * Math.PI * 2;
-      const x = CENTER_X + r * Math.cos(angle);
-      const y = CENTER_Y + r * Math.sin(angle);
-      const p = { x, y };
-      if (pointInPolygon(p, questPolygon)) {
-        const dx = x - CENTER_X;
-        const dy = y - CENTER_Y;
-        sampleDistances.push(Math.sqrt(dx * dx + dy * dy));
-      }
-    }
-
-    if (sampleDistances.length === 0) {
-      return {
-        safeRadius: 0,
-        injuryInnerRadius: 0,
-        injuryOuterRadius: 0,
-        deathInnerRadius: 0,
-        deathOuterRadius: 0,
-      };
-    }
-
-    sampleDistances.sort((a, b) => a - b);
-    const n = sampleDistances.length;
-
-    const safeIndex = Math.max(0, Math.min(n - 1, Math.floor(n * safeFraction) - 1));
-    const injuryIndex = Math.max(
-      safeIndex,
-      Math.min(n - 1, Math.floor(n * (safeFraction + injuryFraction)) - 1),
-    );
-    const maxIndex = n - 1;
-
-    const safeRadius = sampleDistances[safeIndex];
-    const injuryOuterRadius = sampleDistances[injuryIndex];
-    const deathOuterRadius = sampleDistances[maxIndex];
-
-    return {
-      safeRadius,
-      injuryInnerRadius: safeRadius,
-      injuryOuterRadius,
-      deathInnerRadius: injuryOuterRadius,
-      deathOuterRadius,
-    };
-  }, [questPolygon, safePct, injuryPct, deathPct, stats]);
+  const radii = useMemo(
+    () => computeRadiiSnapshot(questPolygon, stats, safePct, injuryPct, deathPct),
+    [questPolygon, stats, safePct, injuryPct, deathPct],
+  );
 
   const handleStatChange = (index: number, field: keyof StatRow, raw: string) => {
     setStats((prev) => {
@@ -1724,33 +1707,6 @@ export const SkillCheckPreviewPage: React.FC = () => {
     if (zone === 'death') zoneLabel = 'DEATH';
     return `${resultLabel} + ${zoneLabel}`;
   }, [lastOutcome]);
-
-  // Utility functions
-  function hashString(input: string): number {
-    let hash = 0;
-    for (let i = 0; i < input.length; i += 1) {
-      hash = (hash << 5) - hash + input.charCodeAt(i);
-      hash |= 0;
-    }
-    return hash >>> 0;
-  }
-
-  function createSeededRng(seed: number): () => number {
-    let state = seed || 1;
-    return () => {
-      state = (1664525 * state + 1013904223) % 4294967296;
-      return state / 4294967296;
-    };
-  }
-
-  function shuffleWithRng<T>(items: T[], rng: () => number): T[] {
-    const arr = [...items];
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(rng() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    return arr;
-  }
 
   return (
     <div className="p-3 md:p-4 text-ivory">
