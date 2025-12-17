@@ -5,6 +5,7 @@
 
 import type {
   ActivityDefinition,
+  FounderPreset,
   IdleVillageConfig,
 } from '../../../balancing/config/idleVillage/types';
 import type { StatBlock } from '../../../balancing/types';
@@ -22,6 +23,62 @@ export interface ScheduledActivity {
   startTime: VillageTimeUnit;
   endTime: VillageTimeUnit;
   status: VillageActivityStatus;
+}
+
+export function buildResidentFromFounder(preset: FounderPreset): ResidentState {
+  return {
+    id: `founder-${preset.id}`,
+    status: 'available',
+    fatigue: 0,
+    statProfileId: preset.archetypeId,
+    statTags: [preset.difficultyTag],
+  };
+}
+
+export interface CreateVillageStateOptions {
+  /**
+   * Overrides for starting resources (after config defaults are applied).
+   * Useful in tests or when continuing from a saved snapshot.
+   */
+  initialResourcesOverride?: VillageResources;
+  /** Optional founder preset to spawn automatically. */
+  founderPreset?: FounderPreset | null;
+}
+
+function normalizeStartingResources(config: IdleVillageConfig, overrides?: VillageResources): VillageResources {
+  const normalized: VillageResources = {};
+  const starting = config.globalRules.startingResources ?? {};
+  Object.entries(starting).forEach(([resourceId, value]) => {
+    if (typeof value === 'number' && value > 0) {
+      normalized[resourceId] = value;
+    }
+  });
+
+  if (overrides) {
+    Object.entries(overrides).forEach(([resourceId, value]) => {
+      if (typeof value === 'number' && value >= 0) {
+        normalized[resourceId] = value;
+      }
+    });
+  }
+
+  return normalized;
+}
+
+export function createVillageStateFromConfig(options: { config: IdleVillageConfig } & CreateVillageStateOptions): VillageState {
+  const { config, initialResourcesOverride, founderPreset } = options;
+  const initialResources = normalizeStartingResources(config, initialResourcesOverride);
+  const state = createInitialVillageState(initialResources);
+
+  if (founderPreset) {
+    const founderResident = buildResidentFromFounder(founderPreset);
+    state.residents = {
+      ...state.residents,
+      [founderResident.id]: founderResident,
+    };
+  }
+
+  return state;
 }
 
 export interface VillageResources {

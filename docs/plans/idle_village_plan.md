@@ -248,6 +248,7 @@ Per la vertical slice v0.1 è già presente una **UI prototipale** in `src/ui/id
   - stati `idle/completed`;
   - azione esplicita di "Collect" output;
   - verbs speciali dedicati (Time, Injury, Market avanzato).
+- Reintrodurre la mappa usando **VerbCard** compatte al posto dei token statici: ogni slot della mappa deve mostrare jobs, quest e verb di manutenzione (food upkeep, injury ward, ecc.) come card config-driven, con le stesse visual del nuovo componente (timer, risk stripes, assignee badge). La sezione di riepilogo globale in alto a destra deve ridursi a una singola riga in stile "stat row" del Balancer, mostrando solo i count chiave (jobs, quest, upkeep, eventi critici).
 - Introdurre training job visibile come verb dedicato.
 - Introdurre una prima visualizzazione/spawn loop di quest attorno al villaggio coerente con i `mapSlots`.
 

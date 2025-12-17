@@ -78,9 +78,25 @@ interface Props {
   isDependencyHighlighted?: boolean; // Whether this stat is highlighted as a dependency
   hasError?: boolean; // Whether this stat is highlighted as an error constraint
   dragHandleProps?: React.HTMLAttributes<HTMLButtonElement>;
+  onRequestStatEditor?: (statId?: string) => void;
 }
 
-export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueChange, allSimValues, onUpdate, onDelete, onReset, startInEdit, availableStats, canDelete = false, isDependencyHighlighted, hasError, dragHandleProps }) => {
+export const ConfigurableStat: React.FC<Props> = ({
+  stat,
+  simValue,
+  onSimValueChange,
+  allSimValues,
+  onUpdate,
+  onDelete,
+  onReset,
+  startInEdit,
+  availableStats,
+  canDelete = false,
+  isDependencyHighlighted,
+  hasError,
+  dragHandleProps,
+  onRequestStatEditor
+}) => {
   const [isConfigMode, setIsConfigMode] = useState(!!startInEdit);
   const [label, setLabel] = useState(() => stat.label);
   const [description, setDescription] = useState(() => stat.description ?? '');
@@ -309,7 +325,13 @@ export const ConfigurableStat: React.FC<Props> = ({ stat, simValue, onSimValueCh
                 type="button"
                 className="w-5 h-5 flex items-center justify-center rounded text-indigo-300 hover:text-indigo-100 transition-colors leading-none"
                 title="Modifica stat"
-                onClick={() => setIsConfigMode(true)}
+                onClick={() => {
+                  if (onRequestStatEditor) {
+                    onRequestStatEditor(stat.id);
+                  } else {
+                    setIsConfigMode(true);
+                  }
+                }}
               >
                 <Edit2 className="w-3 h-3" />
                 <span className="sr-only">Modifica statistica</span>

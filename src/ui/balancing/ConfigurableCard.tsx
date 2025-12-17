@@ -15,6 +15,8 @@ interface Props {
   onResetStat?: (statId: string) => void;
   onResetCard?: () => void;
   onAddStat?: () => void;
+  onOpenStatEditor?: (statId?: string) => void;
+  onOpenCardEditor?: () => void;
   newStatId?: string;
   onUpdateCard?: (updates: Partial<CardDefinition>) => void;
   onDeleteCard?: () => void;
@@ -81,7 +83,27 @@ const SortableStat: React.FC<SortableStatProps> = ({
   );
 };
 
-export const ConfigurableCard: React.FC<Props> = ({ card, stats, simValues, onSimValueChange, onEditStat, onDeleteStat, onResetStat, onResetCard, onAddStat, newStatId, onUpdateCard, onDeleteCard, startHeaderInEdit, availableStats, dragListeners, dependencyHighlights, errorHighlights }) => {
+export const ConfigurableCard: React.FC<Props> = ({
+  card,
+  stats,
+  simValues,
+  onSimValueChange,
+  onEditStat,
+  onDeleteStat,
+  onResetStat,
+  onResetCard,
+  onAddStat,
+  onOpenStatEditor,
+  onOpenCardEditor,
+  newStatId,
+  onUpdateCard,
+  onDeleteCard,
+  startHeaderInEdit,
+  availableStats,
+  dragListeners,
+  dependencyHighlights,
+  errorHighlights
+}) => {
   const orderedStats = card.statIds.map((id) => stats[id]).filter(Boolean);
 
   const [isEditingHeader, setIsEditingHeader] = useState(!!startHeaderInEdit);
@@ -327,8 +349,8 @@ export const ConfigurableCard: React.FC<Props> = ({ card, stats, simValues, onSi
             {!isEditingHeader && onResetCard && (
               <button
                 type="button"
-                className="w-5 h-5 flex items-center justify-center rounded text-[#c9a227] hover:text-[#e6c547] transition-colors leading-none"
-                title="Reset card"
+                className="w-5 h-5 flex items-center justify-center rounded text-indigo-300 hover:text-indigo-100 transition-colors leading-none"
+                title="Modifica stat"
                 onClick={() => {
                   if (onResetCard) onResetCard();
                   // Force update SIM values for all non-derived stats

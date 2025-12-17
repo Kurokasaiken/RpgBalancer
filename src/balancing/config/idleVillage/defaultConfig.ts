@@ -250,9 +250,34 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
     },
   },
 
-  // Founder presets are intentionally left empty for now; a future step will
-  // wire these to ArchetypeRegistry / character creator presets.
-  founders: {},
+  // Founder presets define starting characters per difficulty. Engines will resolve
+  // these archetype references and apply the adjustment formulas during run creation.
+  founders: {
+    founder_easy: {
+      id: 'founder_easy',
+      label: 'Hopeful Founder',
+      description: 'Optimistic leader with surplus stats. Recommended for story/FTUE.',
+      archetypeId: 'hybrid_allrounder',
+      difficultyTag: 'easy',
+      statAdjustmentFormula: 'value * 1.1',
+    },
+    founder_standard: {
+      id: 'founder_standard',
+      label: 'Seasoned Captain',
+      description: 'Balanced veteran with stable stats.',
+      archetypeId: 'tank_warden',
+      difficultyTag: 'standard',
+      statAdjustmentFormula: 'value',
+    },
+    founder_hard: {
+      id: 'founder_hard',
+      label: 'Weary Survivor',
+      description: 'Resource-starved founder for high difficulty runs.',
+      archetypeId: 'dps_berserker',
+      difficultyTag: 'hard',
+      statAdjustmentFormula: 'value * 0.85',
+    },
+  },
 
   // Neutral variance config so that QuestResolver can opt into categories
   // later without forcing any randomness on the first jobs.

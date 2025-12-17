@@ -168,6 +168,17 @@ export class IdleVillageConfigStore {
       globalRules: {
         ...DEFAULT_IDLE_VILLAGE_CONFIG.globalRules,
         ...config.globalRules,
+        injuryTiers: {
+          ...(DEFAULT_IDLE_VILLAGE_CONFIG.globalRules.injuryTiers ?? {}),
+          ...(config.globalRules?.injuryTiers ?? {}),
+        },
+        deathRules:
+          DEFAULT_IDLE_VILLAGE_CONFIG.globalRules.deathRules || config.globalRules?.deathRules
+            ? {
+                ...(DEFAULT_IDLE_VILLAGE_CONFIG.globalRules.deathRules ?? {}),
+                ...(config.globalRules?.deathRules ?? {}),
+              }
+            : undefined,
       },
     };
   }

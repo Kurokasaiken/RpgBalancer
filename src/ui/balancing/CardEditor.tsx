@@ -6,6 +6,7 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   editingCard?: CardDefinition;
+  onSaveComplete?: (cardId: string) => void;
 }
 
 const COLOR_OPTIONS = [
@@ -19,7 +20,7 @@ const COLOR_OPTIONS = [
 
 const ICON_OPTIONS = ['⚔️', '🛡️', '✨', '🧪', '🂠', '📊', '🌟', '🔥'];
 
-export const CardEditor: React.FC<Props> = ({ isOpen, onClose, editingCard }) => {
+export const CardEditor: React.FC<Props> = ({ isOpen, onClose, editingCard, onSaveComplete }) => {
   const { addCard, updateCard, deleteCard } = useBalancerConfig();
 
   const [id, setId] = useState('');
@@ -57,6 +58,7 @@ export const CardEditor: React.FC<Props> = ({ isOpen, onClose, editingCard }) =>
         setError(res.error);
         return;
       }
+      onSaveComplete?.(editingCard.id);
       onClose();
       return;
     }
@@ -71,6 +73,7 @@ export const CardEditor: React.FC<Props> = ({ isOpen, onClose, editingCard }) =>
       setError(res.error);
       return;
     }
+    onSaveComplete?.(id);
     onClose();
   };
 

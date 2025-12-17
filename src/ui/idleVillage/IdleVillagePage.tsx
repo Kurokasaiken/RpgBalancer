@@ -4,16 +4,28 @@
  * Uses the Gilded Observatory theme and follows config-first principles.
  */
 
-import { useState, useCallback, useMemo, useEffect, useRef, type ReactNode } from 'react';
+import {
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+  useRef,
+  type ReactNode,
+  type ChangeEvent,
+} from 'react';
 import { DndContext, DragOverlay, useDraggable, useDroppable, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core';
-import { Pause, Play, Eye, Briefcase, MapPin as MapPinIcon, ScrollText } from 'lucide-react';
+import { Pause, Play, Briefcase, ScrollText } from 'lucide-react';
 import idleVillageMap from '@/assets/ui/idleVillage/idle-village-map.jpg';
 import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
-import { createInitialVillageState, scheduleActivity } from '@/engine/game/idleVillage/TimeEngine';
-import type { VillageState, ResidentState, ScheduledActivity, VillageEvent, QuestOffer } from '@/engine/game/idleVillage/TimeEngine';
+import { createVillageStateFromConfig, scheduleActivity } from '@/engine/game/idleVillage/TimeEngine';
+import type {
+  VillageState,
+  ResidentState,
+  ScheduledActivity,
+  VillageEvent,
+} from '@/engine/game/idleVillage/TimeEngine';
 import { tickIdleVillage } from '@/engine/game/idleVillage/IdleVillageEngine';
-import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
-import { DefaultSection } from '@/ui/components/DefaultUI';
+import type { ActivityDefinition, FounderPreset } from '@/balancing/config/idleVillage/types';
 import { buyFoodWithGold } from '@/engine/game/idleVillage/MarketEngine';
 import VerbCard, { type VerbTone } from '@/ui/idleVillage/VerbCard';
 import {
@@ -73,8 +85,48 @@ const HUNGER_FX_KEYFRAMES = `
 }
 `;
 
-// Stub resident for testing
-const stubResident: ResidentState = { id: 'resident-1', status: 'available', fatigue: 0 };
+const DEFAULT_VERB_TONE_COLORS: Record<VerbTone, string> = {
+  neutral: '#94A3B8',
+  job: '#3B82F6',
+  quest: '#34D399',
+  danger: '#F87171',
+  system: '#38BDF8',
+};
+
+const FOUNDER_STORAGE_KEY = 'idleVillagePreferredFounderId';
+
+function getStoredFounderId(): string | null {
+  if (typeof window === 'undefined' || !window.localStorage) return null;
+  try {
+    return window.localStorage.getItem(FOUNDER_STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function setStoredFounderId(founderId: string | null) {
+  if (typeof window === 'undefined' || !window.localStorage) return;
+  try {
+    if (founderId) {
+      window.localStorage.setItem(FOUNDER_STORAGE_KEY, founderId);
+    } else {
+      window.localStorage.removeItem(FOUNDER_STORAGE_KEY);
+    }
+  } catch {
+    // Ignore storage errors for now
+  }
+}
+
+function pickFounderPreset(
+  config: ReturnType<typeof useIdleVillageConfig>['config'],
+  preferredId?: string,
+): FounderPreset | null {
+  const founders = config?.founders ?? {};
+  const founderValues = Object.values(founders);
+  if (preferredId && founders[preferredId]) return founders[preferredId];
+  const standard = founderValues.find((preset) => preset.difficultyTag === 'standard');
+  return standard ?? founderValues[0] ?? null;
+}
 
 interface ResidentCardProps {
   resident: ResidentState;
@@ -126,6 +178,66 @@ function ResidentCard({ resident, getFatigueColor }: ResidentCardProps) {
   );
 }
 
+interface SummaryTokenEntry extends SummaryTokenProps {
+  key: string;
+}
+
+interface SummaryTokenProps {
+  label: string;
+  icon?: ReactNode;
+  tone?: VerbTone;
+  subtitle?: string | null;
+  meta?: string | null;
+  toneColorMap?: Partial<Record<VerbTone, string>>;
+  actionLabel?: string;
+  onAction?: () => void;
+}
+
+function SummaryToken({
+  label,
+  icon,
+  tone = 'neutral',
+  subtitle,
+  meta,
+  toneColorMap,
+  actionLabel,
+  onAction,
+}: SummaryTokenProps) {
+  const toneColor = toneColorMap?.[tone] ?? DEFAULT_VERB_TONE_COLORS[tone];
+
+  return (
+    <div
+      className="inline-flex items-center gap-2 rounded-2xl border px-3 py-1 bg-slate-950/75 text-[10px] uppercase tracking-[0.16em]"
+      style={{ borderColor: toneColor }}
+    >
+      {icon && (
+        <span aria-hidden className="text-xs" style={{ color: toneColor }}>
+          {icon}
+        </span>
+      )}
+      <div className="flex flex-col leading-tight">
+        <span className="font-semibold text-ivory">{label}</span>
+        {(subtitle || meta) && (
+          <span className="text-[9px] text-slate-300 normal-case tracking-normal">
+            {subtitle}
+            {subtitle && meta ? ' · ' : ''}
+            {meta && <span className="font-mono text-slate-200">{meta}</span>}
+          </span>
+        )}
+      </div>
+      {actionLabel && onAction && (
+        <button
+          type="button"
+          onClick={onAction}
+          className="ml-1 rounded-full border border-amber-400/60 px-2 py-0.5 text-[9px] text-amber-200 hover:bg-amber-400/20"
+        >
+          {actionLabel}
+        </button>
+      )}
+    </div>
+  );
+}
+
 interface MapSlotVerbClusterProps {
   slot: { id: string; label: string; icon?: string };
   left: number;
@@ -144,6 +256,25 @@ function MapSlotVerbCluster({ slot, left, top, verbs, questOffers, onSelect, isS
 
   const dropState = isOver ? 'valid' : 'idle';
   const hasContent = verbs.length > 0 || questOffers.length > 0;
+  const renderSummaryCard = (summary: VerbSummary) => (
+    <VerbCard
+      key={summary.key}
+      icon={summary.icon}
+      progressFraction={summary.progressFraction}
+      elapsedSeconds={summary.elapsedSeconds}
+      totalDuration={summary.totalDurationSeconds}
+      injuryPercentage={summary.injuryPercentage}
+      deathPercentage={summary.deathPercentage}
+      assignedCount={summary.assignedCount}
+      totalSlots={summary.totalSlots}
+      isInteractive
+      dropState={dropState}
+      onClick={onSelect}
+      visualVariant={summary.visualVariant}
+      progressStyle={summary.progressStyle}
+      className="scale-[0.62] origin-top"
+    />
+  );
 
   return (
     <div
@@ -164,23 +295,7 @@ function MapSlotVerbCluster({ slot, left, top, verbs, questOffers, onSelect, isS
         <div className="flex flex-col items-center gap-2">
           {(hasContent
             ? verbs.map((verb) => (
-                <VerbCard
-                  key={verb.key}
-                  icon={verb.icon}
-                  progressFraction={verb.progressFraction}
-                  elapsedSeconds={verb.elapsedSeconds}
-                  totalDuration={verb.totalDurationSeconds}
-                  injuryPercentage={verb.injuryPercentage}
-                  deathPercentage={verb.deathPercentage}
-                  assignedCount={verb.assignedCount}
-                  totalSlots={verb.totalSlots}
-                  isInteractive
-                  dropState={dropState}
-                  onClick={onSelect}
-                  visualVariant={verb.visualVariant}
-                  progressStyle={verb.progressStyle}
-                  className="scale-[0.62] origin-top"
-                />
+                renderSummaryCard(verb)
               ))
             : [
                 <div
@@ -191,25 +306,7 @@ function MapSlotVerbCluster({ slot, left, top, verbs, questOffers, onSelect, isS
                   <span>{slot.label}</span>
                 </div>,
               ])}
-          {questOffers.map((offer) => (
-            <VerbCard
-              key={offer.key}
-              icon={offer.icon}
-              progressFraction={offer.progressFraction}
-              elapsedSeconds={offer.elapsedSeconds}
-              totalDuration={offer.totalDurationSeconds}
-              injuryPercentage={offer.injuryPercentage}
-              deathPercentage={offer.deathPercentage}
-              assignedCount={offer.assignedCount}
-              totalSlots={offer.totalSlots}
-              isInteractive
-              dropState={dropState}
-              onClick={onSelect}
-              visualVariant={offer.visualVariant}
-              progressStyle={offer.progressStyle}
-              className="scale-[0.62] origin-top"
-            />
-          ))}
+          {questOffers.map((offer) => renderSummaryCard(offer))}
         </div>
       </button>
       <div className="text-[10px] uppercase tracking-[0.2em] text-amber-100 drop-shadow">{slot.label}</div>
@@ -261,18 +358,35 @@ function DayCycleRing({ totalSegments, filledSegments, isNight }: DayCycleRingPr
 
 export default function IdleVillagePage() {
   const { config } = useIdleVillageConfig();
-  const [villageState, setVillageState] = useState<VillageState>(() => {
-    const starting = config.globalRules.startingResources ?? {};
-    const initialResources: Record<string, number> = {};
-    Object.entries(starting).forEach(([id, value]) => {
-      if (typeof value === 'number' && value > 0) {
-        initialResources[id] = value;
-      }
-    });
-    const base = createInitialVillageState(initialResources);
-    base.residents[stubResident.id] = stubResident;
-    return base;
-  });
+  const [preferredFounderId, setPreferredFounderId] = useState<string | null>(() => getStoredFounderId());
+
+  const founderOptions = useMemo(() => Object.values(config?.founders ?? {}), [config?.founders]);
+
+  useEffect(() => {
+    if (!config) return;
+    if (preferredFounderId && !config.founders?.[preferredFounderId]) {
+      setPreferredFounderId(null);
+      setStoredFounderId(null);
+    }
+  }, [config, preferredFounderId]);
+
+  const selectedFounder = useMemo(
+    () => pickFounderPreset(config, preferredFounderId ?? undefined),
+    [config, preferredFounderId],
+  );
+
+  const [villageState, setVillageState] = useState<VillageState>(() =>
+    createVillageStateFromConfig({ config, founderPreset: selectedFounder }),
+  );
+  const lastFounderIdRef = useRef<string | null>(selectedFounder?.id ?? null);
+
+  useEffect(() => {
+    if (!config) return;
+    const newFounderId = selectedFounder?.id ?? null;
+    if (lastFounderIdRef.current === newFounderId) return;
+    lastFounderIdRef.current = newFounderId;
+    setVillageState(createVillageStateFromConfig({ config, founderPreset: selectedFounder }));
+  }, [config, selectedFounder]);
   const [activeResidentId, setActiveResidentId] = useState<string | null>(null);
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -286,8 +400,28 @@ export default function IdleVillagePage() {
   const [lastInjuryEventId, setLastInjuryEventId] = useState<number | null>(null);
   const [completedVerbs, setCompletedVerbs] = useState<VerbSummary[]>([]);
 
+  const handleFounderChange = useCallback(
+    (event: ChangeEvent<HTMLSelectElement>) => {
+      const nextId = event.target.value || null;
+      setPreferredFounderId(nextId);
+      setStoredFounderId(nextId);
+    },
+    [],
+  );
+
   const secondsPerTimeUnit = config?.globalRules.secondsPerTimeUnit ?? DEFAULT_SECONDS_PER_TIME_UNIT;
   const dayLengthSetting = config?.globalRules.dayLengthInTimeUnits || 5;
+
+  const verbToneColors = useMemo<Record<VerbTone, string>>(() => {
+    const overrides = config.globalRules.verbToneColors ?? {};
+    return {
+      neutral: overrides.neutral ?? DEFAULT_VERB_TONE_COLORS.neutral,
+      job: overrides.job ?? DEFAULT_VERB_TONE_COLORS.job,
+      quest: overrides.quest ?? DEFAULT_VERB_TONE_COLORS.quest,
+      danger: overrides.danger ?? DEFAULT_VERB_TONE_COLORS.danger,
+      system: overrides.system ?? DEFAULT_VERB_TONE_COLORS.system,
+    };
+  }, [config.globalRules.verbToneColors]);
 
   const getResourceLabel = useCallback(
     (resourceId: string) => {
@@ -395,7 +529,7 @@ export default function IdleVillagePage() {
     (delta: number) => {
       if (!config) return;
       let shouldOpenMarket = false;
-      const newlyCompletedVerbs: CompletedVerb[] = [];
+      const newlyCompletedVerbs: VerbSummary[] = [];
       setVillageState((prev) => {
         const result = tickIdleVillage({ config, rng: simpleRng }, prev, delta);
         let nextState = result.state;
@@ -420,28 +554,15 @@ export default function IdleVillagePage() {
                 (cid) => nextState.residents[cid]?.id ?? cid,
               );
 
-              const rewardsLabel = job.rewards && job.rewards.length > 0
-                ? job.rewards
-                    .map((r) => {
-                      const resDef = config.resources?.[r.resourceId];
-                      return resDef?.label ?? r.resourceId;
-                    })
-                    .join(', ')
-                : null;
-
-              const metaForTone = (activity.metadata ?? {}) as { verbToneId?: string } | undefined;
-              const tone = metaForTone?.verbToneId as VerbTone | undefined;
-
-              newlyCompletedVerbs.push({
-                id: `job-${job.scheduledId}`,
-                label: activity.label ?? job.activityId,
-                kindLabel: 'Job',
-                isQuest: false,
-                isJob: true,
-                assignees: assignedNames,
-                rewardsLabel,
-                tone,
+              const completedSummary = buildCompletedVerbSummary({
+                scheduled,
+                activity,
+                rewards: job.rewards ?? [],
+                resourceLabeler: getResourceLabel,
+                secondsPerTimeUnit,
+                assigneeNames: assignedNames,
               });
+              newlyCompletedVerbs.push(completedSummary);
 
               if (isAutoOn) {
                 const schedResult = scheduleActivity(
@@ -471,28 +592,15 @@ export default function IdleVillagePage() {
               (cid) => nextState.residents[cid]?.id ?? cid,
             );
 
-            const rewardsLabel = quest.rewards && quest.rewards.length > 0
-              ? quest.rewards
-                  .map((r) => {
-                    const resDef = config.resources?.[r.resourceId];
-                    return resDef?.label ?? r.resourceId;
-                  })
-                  .join(', ')
-              : null;
-
-            const metaForTone = (activity.metadata ?? {}) as { verbToneId?: string } | undefined;
-            const tone = metaForTone?.verbToneId as VerbTone | undefined;
-
-            newlyCompletedVerbs.push({
-              id: `quest-${quest.scheduledId}`,
-              label: activity.label ?? quest.activityId,
-              kindLabel: 'Quest',
-              isQuest: true,
-              isJob: false,
-              assignees: assignedNames,
-              rewardsLabel,
-              tone,
+            const completedSummary = buildCompletedVerbSummary({
+              scheduled,
+              activity,
+              rewards: quest.rewards ?? [],
+              resourceLabeler: getResourceLabel,
+              secondsPerTimeUnit,
+              assigneeNames: assignedNames,
             });
+            newlyCompletedVerbs.push(completedSummary);
           }
         }
 
@@ -557,7 +665,7 @@ export default function IdleVillagePage() {
         setCompletedVerbs((prev) => [...prev, ...newlyCompletedVerbs]);
       }
     },
-    [config],
+    [config, getResourceLabel, secondsPerTimeUnit],
   );
 
   // Real-time ticking when playing
@@ -602,8 +710,8 @@ export default function IdleVillagePage() {
     };
   }, [hungerFx]);
 
-  const handleCollectVerb = useCallback((id: string) => {
-    setCompletedVerbs((prev) => prev.filter((v) => v.id !== id));
+  const handleCollectVerb = useCallback((key: string) => {
+    setCompletedVerbs((prev) => prev.filter((v) => v.key !== key));
   }, []);
 
   interface QuestOfferDropTargetProps {
@@ -715,11 +823,6 @@ export default function IdleVillagePage() {
   );
 
   // Simple activity list from config (used for per-location descriptions)
-  const activities = useMemo(() => {
-    if (!config) return [] as ActivityDefinition[];
-    return Object.values(config.activities) as ActivityDefinition[];
-  }, [config]);
-
   const mapSlots = useMemo(() => {
     if (!config) {
       return [] as {
@@ -758,6 +861,16 @@ export default function IdleVillagePage() {
 
   const questOffers = useMemo(() => Object.values(villageState.questOffers ?? {}), [villageState.questOffers]);
 
+  const activeActivities = useMemo(() => {
+    const all = Object.values(villageState.activities) as ScheduledActivity[];
+    return all
+      .filter((activity) => activity.status === 'pending' || activity.status === 'running')
+      .sort((a, b) => {
+        if (a.endTime === b.endTime) return a.startTime - b.startTime;
+        return a.endTime - b.endTime;
+      });
+  }, [villageState.activities]);
+
   const scheduledVerbSummaries = useMemo(() => {
     if (!config) return [] as VerbSummary[];
     return activeActivities
@@ -780,7 +893,15 @@ export default function IdleVillagePage() {
         });
       })
       .filter(Boolean) as VerbSummary[];
-  }, [config, activeActivities, getResourceLabel, villageState.currentTime, secondsPerTimeUnit, dayLengthSetting]);
+  }, [
+    config,
+    activeActivities,
+    getResourceLabel,
+    villageState.currentTime,
+    villageState.residents,
+    secondsPerTimeUnit,
+    dayLengthSetting,
+  ]);
 
   const questOfferSummaries = useMemo(() => {
     if (!config) return [] as VerbSummary[];
@@ -822,21 +943,123 @@ export default function IdleVillagePage() {
     return grouped;
   }, [questOfferSummaries]);
 
-  const activeJobsCount = useMemo(() => {
-    if (!config) return 0;
-    return activeActivities.filter((scheduled) => {
-      const def = config.activities[scheduled.activityId] as ActivityDefinition | undefined;
-      return def?.tags?.includes('job');
-    }).length;
-  }, [activeActivities, config]);
+  const activeJobsCount = useMemo(
+    () => scheduledVerbSummaries.filter((summary) => summary.isJob).length,
+    [scheduledVerbSummaries],
+  );
 
-  const activeQuestsCount = useMemo(() => {
-    if (!config) return 0;
-    return activeActivities.filter((scheduled) => {
-      const def = config.activities[scheduled.activityId] as ActivityDefinition | undefined;
-      return def?.tags?.includes('quest');
-    }).length;
-  }, [activeActivities, config]);
+  const activeQuestsCount = useMemo(
+    () => scheduledVerbSummaries.filter((summary) => summary.isQuest).length,
+    [scheduledVerbSummaries],
+  );
+  const livingResidentsCount = useMemo(
+    () => Object.values(villageState.residents).filter((r) => r.status !== 'dead').length,
+    [villageState.residents],
+  );
+  const injuredResidents = useMemo(
+    () => Object.values(villageState.residents).filter((r) => r.status === 'injured'),
+    [villageState.residents],
+  );
+  const systemVerbSummaries = useMemo(() => {
+    if (!config) return [] as VerbSummary[];
+    const durationUnits = dayLengthSetting || 1;
+    const cycleSeconds = Math.max(1, durationUnits) * secondsPerTimeUnit;
+
+    const { injuryProgressFraction, injuryDeadlineLabel } = (() => {
+      if (injuredResidents.length === 0) return { injuryProgressFraction: 0, injuryDeadlineLabel: null as string | null };
+      const soonest = injuredResidents.reduce((best, resident) => {
+        if (typeof resident.injuryRecoveryTime !== 'number') return best;
+        if (!best || (typeof best.injuryRecoveryTime === 'number' && resident.injuryRecoveryTime < best.injuryRecoveryTime)) {
+          return resident;
+        }
+        return best;
+      }, null as ResidentState | null);
+
+      if (!soonest || typeof soonest.injuryRecoveryTime !== 'number') {
+        return { injuryProgressFraction: 0, injuryDeadlineLabel: null };
+      }
+
+      const recoveryTime = soonest.injuryRecoveryTime;
+      const approxStart = recoveryTime - durationUnits;
+      const elapsed = villageState.currentTime - approxStart;
+      const progress = Math.max(0, Math.min(1, elapsed / durationUnits));
+
+      const remaining = Math.max(0, recoveryTime - villageState.currentTime);
+      let deadline: string | null = null;
+      if (remaining > 0) {
+        if (remaining >= durationUnits) {
+          const days = Math.floor(remaining / durationUnits);
+          deadline = `${days}d to recover`;
+        } else {
+          deadline = `${remaining}u to recover`;
+        }
+      } else {
+        deadline = 'Recovering soon';
+      }
+
+      return { injuryProgressFraction: progress, injuryDeadlineLabel: deadline };
+    })();
+
+    const foodPerResidentPerDay = config.globalRules.foodConsumptionPerResidentPerDay;
+    const dailyFoodUpkeep = livingResidentsCount * foodPerResidentPerDay;
+    const hungerProgressFraction =
+      dayLengthSetting > 0 ? (villageState.currentTime % dayLengthSetting) / dayLengthSetting : 0;
+
+    const summaries: VerbSummary[] = [];
+
+    if (foodPerResidentPerDay > 0 && livingResidentsCount > 0) {
+      const hungerIcon = config.resources?.food?.icon ? (
+        <span aria-hidden className="text-xs">{config.resources.food.icon}</span>
+      ) : (
+        <span aria-hidden className="text-xs">🍖</span>
+      );
+      summaries.push(
+        buildSystemVerbSummary({
+          key: lastHungerEventId ? `system-hunger-${lastHungerEventId}` : 'system-hunger',
+          label: `${getResourceLabel('food')} Hunger`,
+          icon: hungerIcon,
+          kindLabel: 'Upkeep',
+          tone: 'system',
+          progressFraction: hungerProgressFraction,
+          elapsedSeconds: hungerProgressFraction * cycleSeconds,
+          totalDurationSeconds: cycleSeconds,
+          rewardLabel: dailyFoodUpkeep > 0 ? `-${dailyFoodUpkeep} / day` : null,
+          deadlineLabel: null,
+          notes: livingResidentsCount > 0 ? `Feeding ${livingResidentsCount} workers` : null,
+        }),
+      );
+    }
+
+    if (injuredResidents.length > 0) {
+      summaries.push(
+        buildSystemVerbSummary({
+          key: lastInjuryEventId ? `system-injury-${lastInjuryEventId}` : 'system-injury',
+          label: 'Injury Ward',
+          icon: <span aria-hidden className="text-xs">🩹</span>,
+          kindLabel: 'Care',
+          tone: 'danger',
+          progressFraction: injuryProgressFraction,
+          elapsedSeconds: injuryProgressFraction * cycleSeconds,
+          totalDurationSeconds: cycleSeconds,
+          rewardLabel: null,
+          deadlineLabel: injuryDeadlineLabel,
+          notes: injuredResidents.map((resident) => resident.id).join(', ') || null,
+        }),
+      );
+    }
+
+    return summaries;
+  }, [
+    config,
+    dayLengthSetting,
+    secondsPerTimeUnit,
+    villageState.currentTime,
+    livingResidentsCount,
+    injuredResidents,
+    lastHungerEventId,
+    lastInjuryEventId,
+    getResourceLabel,
+  ]);
 
   const goldAmount = villageState.resources.gold ?? 0;
   const foodAmount = villageState.resources.food ?? 0;
@@ -868,55 +1091,15 @@ export default function IdleVillagePage() {
 
   const resourceDefinitions = config.resources ?? {};
 
-  const verbToneColors = config.globalRules.verbToneColors;
-
   // Day/night segmentation based on config-global day length
-  const dayLength = config.globalRules.dayLengthInTimeUnits || 5;
+  const dayLength = dayLengthSetting;
   const currentTime = villageState.currentTime;
   const currentDayIndex = dayLength > 0 ? Math.floor(currentTime / dayLength) : 0;
   const currentDayNumber = currentDayIndex + 1;
   const currentSegmentIndex = dayLength > 0 ? currentTime % dayLength : 0;
   const isNightSegment = dayLength > 0 && currentSegmentIndex === dayLength - 1;
 
-  // Hunger / daily food upkeep verb support
-  const livingResidentsCount = Object.values(villageState.residents).filter((r) => r.status !== 'dead').length;
-  const foodPerResidentPerDay = config.globalRules.foodConsumptionPerResidentPerDay;
-  const dailyFoodUpkeep = livingResidentsCount * foodPerResidentPerDay;
-  const hungerProgressFraction = dayLength > 0 ? (currentTime % dayLength) / dayLength : 0;
-
-  // Injury / recovery verb support
-  const injuredResidents = Object.values(villageState.residents).filter((r) => r.status === 'injured');
-  let injuryProgressFraction = 0;
-  let injuryDeadlineLabel: string | null = null;
-  if (injuredResidents.length > 0) {
-    const durationUnits = dayLength || 1;
-    const soonest = injuredResidents.reduce((best, r) => {
-      if (typeof r.injuryRecoveryTime !== 'number') return best;
-      if (!best || (typeof best.injuryRecoveryTime === 'number' && r.injuryRecoveryTime < best.injuryRecoveryTime)) {
-        return r;
-      }
-      return best;
-    }, null as ResidentState | null);
-
-    if (soonest && typeof soonest.injuryRecoveryTime === 'number') {
-      const recoveryTime = soonest.injuryRecoveryTime;
-      const approxStart = recoveryTime - durationUnits;
-      const elapsed = currentTime - approxStart;
-      injuryProgressFraction = Math.max(0, Math.min(1, elapsed / durationUnits));
-
-      const remaining = Math.max(0, recoveryTime - currentTime);
-      if (remaining > 0) {
-        if (remaining >= durationUnits) {
-          const days = Math.floor(remaining / durationUnits);
-          injuryDeadlineLabel = `${days}d to recover`;
-        } else {
-          injuryDeadlineLabel = `${remaining}u to recover`;
-        }
-      } else {
-        injuryDeadlineLabel = 'Recovering soon';
-      }
-    }
-  }
+  // Hunger / daily food upkeep verb support (data already computed above)
 
   return (
     <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
@@ -993,6 +1176,22 @@ export default function IdleVillagePage() {
                     </div>
                   </div>
                   <span className="mx-1 h-3 w-px bg-slate-600/80" aria-hidden="true" />
+                  {founderOptions.length > 0 && (
+                    <label className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.18em] text-slate-300">
+                      Founder
+                      <select
+                        value={preferredFounderId ?? selectedFounder?.id ?? ''}
+                        onChange={handleFounderChange}
+                        className="bg-slate-900/90 border border-slate-700 text-ivory px-1 py-0.5 rounded text-[10px] tracking-[0.12em]"
+                      >
+                        {founderOptions.map((founder) => (
+                          <option key={founder.id} value={founder.id}>
+                            {founder.label} ({founder.difficultyTag})
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  )}
                   <div className="flex flex-wrap items-center gap-1.5 max-w-xs relative">
                     {Object.entries(villageState.resources).map(([id, value]) => {
                       const def = resourceDefinitions[id];
@@ -1075,114 +1274,29 @@ export default function IdleVillagePage() {
                             <span>Quests: {activeQuestsCount}</span>
                           </span>
                         </div>
-                        {foodPerResidentPerDay > 0 && livingResidentsCount > 0 && (
-                          <div className="mb-1.5">
-                            <VerbCard
-                              key={lastHungerEventId ? `hunger-${lastHungerEventId}` : 'hunger-base'}
-                              label={`${getResourceLabel('food')} Hunger`}
-                              icon={resourceDefinitions.food?.icon ? (
-                                <span aria-hidden className="text-xs">
-                                  {resourceDefinitions.food.icon}
-                                </span>
-                              ) : (
-                                <span aria-hidden className="text-xs">🍖</span>
-                              )}
-                              kindLabel="Time"
-                              assignees={[]}
-                              rewardsLabel={
-                                dailyFoodUpkeep > 0
-                                  ? `-${dailyFoodUpkeep} per day`
-                                  : undefined
-                              }
-                              deadlineLabel={null}
-                              progressFraction={hungerProgressFraction}
-                              state="running"
-                              isQuest={false}
-                              isJob={false}
-                              pulseOnMount={!!lastHungerEventId}
-                              toneColors={verbToneColors}
-                              tone="system"
-                            />
-                          </div>
-                        )}
-                        {injuredResidents.length > 0 && (
-                          <div className="mb-1.5">
-                            <VerbCard
-                              key={lastInjuryEventId ? `injury-${lastInjuryEventId}` : 'injury-base'}
-                              label="Injury Ward"
-                              icon={<span aria-hidden className="text-xs">🩹</span>}
-                              kindLabel="Injury"
-                              assignees={injuredResidents.map((r) => r.id)}
-                              rewardsLabel={null}
-                              deadlineLabel={injuryDeadlineLabel}
-                              progressFraction={injuryProgressFraction}
-                              state="running"
-                              isQuest={false}
-                              isJob={false}
-                              pulseOnMount={!!lastInjuryEventId}
-                              toneColors={verbToneColors}
-                              tone="danger"
-                            />
+                        {systemVerbSummaries.length > 0 && (
+                          <div className="mb-1.5 space-y-1">
+                            {systemVerbSummaries.map((summary) => (
+                              <VerbSummaryRow
+                                key={summary.key}
+                                summary={summary}
+                                toneColorMap={verbToneColors}
+                              />
+                            ))}
                           </div>
                         )}
                         {questOffers.length > 0 && (
                           <div className="mb-1.5 space-y-1">
-                            {questOffers.map((offer) => {
-                              const def = config.activities[offer.activityId] as ActivityDefinition | undefined;
-                              if (!def) return null;
-
-                              const metaTone = (def.metadata ?? {}) as { verbToneId?: string } | undefined;
-                              const tone = metaTone?.verbToneId as VerbTone | undefined;
-
-                              const riskMeta = (def.metadata ?? {}) as {
-                                injuryChanceDisplay?: number;
-                                deathChanceDisplay?: number;
-                              } | undefined;
-                              let riskLabel: string | null = null;
-                              const injuryPct =
-                                typeof riskMeta?.injuryChanceDisplay === 'number'
-                                  ? riskMeta.injuryChanceDisplay
-                                  : undefined;
-                              const deathPct =
-                                typeof riskMeta?.deathChanceDisplay === 'number'
-                                  ? riskMeta.deathChanceDisplay
-                                  : undefined;
-                              const riskParts: string[] = [];
-                              if (typeof injuryPct === 'number' && injuryPct > 0) {
-                                riskParts.push(`Injury: ${injuryPct}%`);
-                              }
-                              if (typeof deathPct === 'number' && deathPct > 0) {
-                                riskParts.push(`Death: ${deathPct}%`);
-                              }
-                              if (riskParts.length > 0) {
-                                riskLabel = riskParts.join(' \u00b7 ');
-                              }
-
-                              const rewardsLabel =
-                                def.rewards && def.rewards.length > 0
-                                  ? def.rewards.map((d) => getResourceLabel(d.resourceId)).join(', ')
-                                  : null;
-
-                              const icon = <ScrollText className="w-3.5 h-3.5 text-amber-300" />;
-
+                            {questOfferSummaries.map((summary) => {
+                              const offerId = summary.offer?.id;
+                              if (!offerId) return null;
                               return (
-                                <QuestOfferDropTarget key={offer.id} offerId={offer.id}>
-                                  <VerbCard
-                                    label={def.label}
-                                    icon={icon}
-                                    kindLabel="Quest Offer"
-                                    assignees={[]}
-                                    rewardsLabel={rewardsLabel}
-                                    deadlineLabel={null}
-                                    riskLabel={riskLabel}
-                                    progressFraction={0}
-                                    state="idle"
-                                    isQuest
-                                    isJob={false}
-                                    tone={tone ?? 'quest'}
-                                    toneColors={verbToneColors}
+                                <QuestOfferDropTarget key={summary.key} offerId={offerId}>
+                                  <VerbSummaryRow
+                                    summary={summary}
                                     primaryActionLabel="Accept"
-                                    onPrimaryAction={() => handleAcceptQuestOffer(offer.id)}
+                                    onPrimaryAction={() => handleAcceptQuestOffer(offerId)}
+                                    toneColorMap={verbToneColors}
                                   />
                                 </QuestOfferDropTarget>
                               );
@@ -1191,129 +1305,26 @@ export default function IdleVillagePage() {
                         )}
                         {completedVerbs.length > 0 && (
                           <div className="mb-1.5 space-y-1">
-                            {completedVerbs.map((verb) => {
-                              const icon = verb.isQuest
-                                ? <ScrollText className="w-3.5 h-3.5 text-amber-300" />
-                                : verb.isJob
-                                  ? <Briefcase className="w-3.5 h-3.5 text-teal-300" />
-                                  : <MapPin className="w-3.5 h-3.5 text-slate-200" />;
-
-                              return (
-                                <VerbCard
-                                  key={verb.id}
-                                  label={verb.label}
-                                  icon={icon}
-                                  kindLabel={verb.kindLabel}
-                                  assignees={verb.assignees}
-                                  rewardsLabel={verb.rewardsLabel}
-                                  deadlineLabel={null}
-                                  progressFraction={1}
-                                  state="completed"
-                                  isQuest={verb.isQuest}
-                                  isJob={verb.isJob}
-                                  pulseOnMount
-                                  tone={verb.tone}
-                                  toneColors={verbToneColors}
-                                  primaryActionLabel="Collect"
-                                  onPrimaryAction={() => handleCollectVerb(verb.id)}
-                                />
-                              );
-                            })}
+                            {completedVerbs.map((verb) => (
+                              <VerbSummaryRow
+                                key={verb.key}
+                                summary={verb}
+                                primaryActionLabel="Collect"
+                                onPrimaryAction={() => handleCollectVerb(verb.key)}
+                                toneColorMap={verbToneColors}
+                              />
+                            ))}
                           </div>
                         )}
                         <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1 text-[10px]">
-                          {activeActivities.length > 0 ? (
-                            activeActivities.map((scheduled) => {
-                              const def = config.activities[scheduled.activityId] as ActivityDefinition | undefined;
-                              const assignedNames = scheduled.characterIds.map(
-                                (cid) => villageState.residents[cid]?.id ?? cid,
-                              );
-                              const rewardsLabel =
-                                def?.rewards && def.rewards.length > 0
-                                  ? def.rewards.map((d) => getResourceLabel(d.resourceId)).join(', ')
-                                  : null;
-
-                              const duration = Math.max(1, scheduled.endTime - scheduled.startTime || 1);
-                              const elapsed = Math.max(0, villageState.currentTime - scheduled.startTime);
-                              const clamped = Math.min(1, elapsed / duration);
-
-                              const meta = (def?.metadata ?? {}) as { questDeadlineInDays?: number };
-                              const questDeadlineDays = typeof meta.questDeadlineInDays === 'number'
-                                ? meta.questDeadlineInDays
-                                : undefined;
-                              let deadlineLabel: string | null = null;
-                              if (typeof questDeadlineDays === 'number' && questDeadlineDays > 0) {
-                                const totalDayLength = dayLength || 5;
-                                const deadlineTime = scheduled.startTime + questDeadlineDays * totalDayLength;
-                                const remainingUnits = Math.max(0, deadlineTime - currentTime);
-                                if (remainingUnits <= 0) {
-                                  deadlineLabel = 'Expired';
-                                } else {
-                                  const remainingDays = Math.floor(remainingUnits / totalDayLength);
-                                  if (remainingDays >= 1) {
-                                    deadlineLabel = `${remainingDays}d left`;
-                                  } else {
-                                    deadlineLabel = `${remainingUnits}u left`;
-                                  }
-                                }
-                              }
-
-                              const isQuest = !!def?.tags?.includes('quest');
-                              const isJob = !!def?.tags?.includes('job');
-                              const kindLabel = isQuest ? 'Quest' : isJob ? 'Job' : 'Activity';
-
-                              const metaTone = (def?.metadata ?? {}) as { verbToneId?: string } | undefined;
-                              const tone = metaTone?.verbToneId as VerbTone | undefined;
-
-                              const riskMeta = (def?.metadata ?? {}) as {
-                                injuryChanceDisplay?: number;
-                                deathChanceDisplay?: number;
-                              } | undefined;
-                              let riskLabel: string | null = null;
-                              const injuryPct =
-                                typeof riskMeta?.injuryChanceDisplay === 'number'
-                                  ? riskMeta.injuryChanceDisplay
-                                  : undefined;
-                              const deathPct =
-                                typeof riskMeta?.deathChanceDisplay === 'number'
-                                  ? riskMeta.deathChanceDisplay
-                                  : undefined;
-                              const riskParts: string[] = [];
-                              if (typeof injuryPct === 'number' && injuryPct > 0) {
-                                riskParts.push(`Injury: ${injuryPct}%`);
-                              }
-                              if (typeof deathPct === 'number' && deathPct > 0) {
-                                riskParts.push(`Death: ${deathPct}%`);
-                              }
-                              if (riskParts.length > 0) {
-                                riskLabel = riskParts.join('  b7 ');
-                              }
-
-                              const icon = isQuest
-                                ? <ScrollText className="w-3.5 h-3.5 text-amber-300" />
-                                : isJob
-                                  ? <Briefcase className="w-3.5 h-3.5 text-teal-300" />
-                                  : <MapPin className="w-3.5 h-3.5 text-slate-200" />;
-
-                              return (
-                                <VerbCard
-                                  key={scheduled.id}
-                                  label={def?.label ?? scheduled.activityId}
-                                  icon={icon}
-                                  kindLabel={kindLabel}
-                                  assignees={assignedNames}
-                                  rewardsLabel={rewardsLabel}
-                                  deadlineLabel={deadlineLabel}
-                                  riskLabel={riskLabel}
-                                  progressFraction={clamped}
-                                  state="running"
-                                  isQuest={isQuest}
-                                  isJob={isJob}
-                                  tone={tone}
-                                  toneColors={verbToneColors}
-                                />
-                              );
-                            })
+                          {scheduledVerbSummaries.length > 0 ? (
+                            scheduledVerbSummaries.map((summary) => (
+                              <VerbSummaryRow
+                                key={summary.key}
+                                summary={summary}
+                                toneColorMap={verbToneColors}
+                              />
+                            ))
                           ) : (
                             <p className="text-[10px] text-slate-400">No active events.</p>
                           )}
