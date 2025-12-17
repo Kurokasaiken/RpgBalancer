@@ -62,6 +62,25 @@ export const ActivityVarianceConfigSchema = z.object({
   rewardCategories: z.record(z.string(), ActivityRollCategorySchema),
 });
 
+export const InjuryTierDefinitionSchema = z.object({
+  id: z.string().min(1),
+  label: z.string().min(1),
+  description: z.string().optional(),
+  recoveryTimeInDays: z.number().int().min(1),
+  jobEfficiencyMultiplier: z.number().optional(),
+  questEligibility: z.enum(['full', 'limited', 'none']).optional(),
+  fatigueGainMultiplier: z.number().optional(),
+  colorClass: z.string().optional(),
+});
+
+export const DeathRulesSchema = z.object({
+  baseDeathChanceAtMaxDanger: z.number().min(0),
+  dangerDeathMultiplierPerPoint: z.number().min(0),
+  injuryTierMultipliers: z.record(z.string(), z.number().min(0)).optional(),
+  questOutcomeAdjustments: z.record(z.string(), z.number()).optional(),
+  starvationDeathChancePerDay: z.number().min(0).max(1).optional(),
+});
+
 export const MapSlotDefinitionSchema = z.object({
   id: z.string().min(1),
   label: z.string().min(1),
@@ -88,10 +107,13 @@ export const GlobalRulesSchema = z.object({
   maxFatigueBeforeExhausted: z.number(),
   fatigueRecoveryPerDay: z.number(),
   dayLengthInTimeUnits: z.number(),
+  secondsPerTimeUnit: z.number().optional(),
   fatigueYellowThreshold: z.number(),
   fatigueRedThreshold: z.number(),
   baseLightInjuryChanceAtMaxFatigue: z.number(),
   dangerInjuryMultiplierPerPoint: z.number(),
+  injuryTiers: z.record(z.string(), InjuryTierDefinitionSchema),
+  deathRules: DeathRulesSchema.optional(),
   foodConsumptionPerResidentPerDay: z.number(),
   baseFoodPriceInGold: z.number(),
   startingResources: z.record(z.string(), z.number()).optional(),

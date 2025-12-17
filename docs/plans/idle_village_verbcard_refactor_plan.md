@@ -1,6 +1,6 @@
 # Idle Village VerbCard Refactor – Implementation Plan
 
-**Status:** Planning  
+**Status:** Planning → Phase A execution  
 **Scope:** Refactor the Idle Village UI (vertical slice) to adopt the new `VerbCard` system, modernize map interactions, and streamline jobs/quests display while preserving the config-first architecture.
 
 ---
@@ -71,13 +71,13 @@
    - Enforce timing conversions via `globalRules.secondsPerTimeUnit` with `DEFAULT_SECONDS_PER_TIME_UNIT = 60` fallback.
 3. Add Vitest coverage for helper edge cases (quests without metadata, jobs without rewards, zero-duration safety).
 4. Remove legacy `CompletedVerb`/map marker specific props that duplicate the new summary structure, keeping a single source of truth.
-5. **Phase A tactical breakdown (current focus):**
-   1. **A.1 – Imports & duplication cleanup:** wire `IdleVillagePage` to consume helpers from `verbSummaries.ts`, delete inline duplicates, ensure `DEFAULT_SECONDS_PER_TIME_UNIT` + builder utilities resolve from one module.
-   2. **A.2 – Scheduling summaries:** replace `activeActivities` derived props with `buildScheduledVerbSummary`, including assignee names and tone/risk metadata.
-   3. **A.3 – Quest offer summaries:** generate quest offer summaries via helper, expose `assigneeNames`, `rewardLabel`, `deadlineLabel`, and hook them into both map clusters and HUD pipeline.
-   4. **A.4 – System/completed verbs:** convert hunger/injury/system verbs and completed jobs/quests into `VerbSummary` objects via dedicated builders, eliminating ad-hoc `CompletedVerb` structures.
-   5. **A.5 – Slot grouping selectors:** memoize `verbsBySlot` / `questOffersBySlot` keyed on slotId, ensuring both map clusters and future HUD consume the same grouped data.
-   6. **A.6 – HUD migration prep:** expose lightweight `VerbSummaryRow` props (label/reward/timer) so the HUD can be replaced in Phase C without additional data plumbing.
+5. **Phase A tactical breakdown (current focus, updated 2025‑12‑17):**
+   1. **A.1 – Imports & duplication cleanup *(in progress)*:** wire `IdleVillagePage` to consume helpers from `verbSummaries.ts`, delete inline duplicates, ensure `DEFAULT_SECONDS_PER_TIME_UNIT` + builder utilities resolve from one module.
+   2. **A.2 – Scheduling summaries *(blocked on A.1)*:** replace `activeActivities` derived props with `buildScheduledVerbSummary`, including assignee names and tone/risk metadata.
+   3. **A.3 – Quest offer summaries *(pending)*:** generate quest offer summaries via helper, expose `assigneeNames`, `rewardLabel`, `deadlineLabel`, and hook them into both map clusters and HUD pipeline.
+   4. **A.4 – System/completed verbs *(pending)*:** convert hunger/injury/system verbs and completed jobs/quests into `VerbSummary` objects via dedicated builders, eliminating ad-hoc `CompletedVerb` structures.
+   5. **A.5 – Slot grouping selectors *(pending)*:** memoize `verbsBySlot` / `questOffersBySlot` keyed on slotId, ensuring both map clusters and future HUD consume the same grouped data.
+   6. **A.6 – HUD migration prep *(pending)*:** expose lightweight `VerbSummaryRow` props (label/reward/timer) so the HUD can be replaced in Phase C without additional data plumbing.
 
 ### Phase B – Map Slot Clusters
 

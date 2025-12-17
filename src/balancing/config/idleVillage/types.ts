@@ -131,6 +131,38 @@ export interface ActivityVarianceConfig {
   rewardCategories: Record<string, ActivityRollCategory>;
 }
 
+export interface InjuryTierDefinition {
+  id: string;
+  label: string;
+  description?: string;
+  /** Days required before this injury naturally recovers (integer time units / day) */
+  recoveryTimeInDays: number;
+  /** Optional multiplier applied to job payouts while the resident is injured */
+  jobEfficiencyMultiplier?: number;
+  /** Whether the resident can join quests while in this tier */
+  questEligibility?: 'full' | 'limited' | 'none';
+  /** Optional multiplier applied to fatigue accumulation */
+  fatigueGainMultiplier?: number;
+  /** Optional Tailwind class for UI indicators */
+  colorClass?: string;
+}
+
+export interface DeathRules {
+  /** Base probability of death at maximum danger before modifiers */
+  baseDeathChanceAtMaxDanger: number;
+  /** Additional death chance per point of activity danger */
+  dangerDeathMultiplierPerPoint: number;
+  /** Multipliers applied per injury tier id (light/moderate/severe, etc.) */
+  injuryTierMultipliers?: Record<string, number>;
+  /**
+   * Optional adjustments keyed by quest outcome (e.g. success/partial/fail/deadly),
+   * where the value is an additive modifier applied to the final death chance.
+   */
+  questOutcomeAdjustments?: Record<string, number>;
+  /** Chance per in-game day that starving residents die */
+  starvationDeathChancePerDay?: number;
+}
+
 export interface VerbToneColors {
   neutral?: string;
   job?: string;
@@ -197,6 +229,17 @@ export interface GlobalRules {
   fatigueYellowThreshold: number;
   fatigueRedThreshold: number;
 
+  // Injury
+  baseLightInjuryChanceAtMaxFatigue: number;
+  dangerInjuryMultiplierPerPoint: number;
+  /**
+   * Injury severity tiers available in the simulation.
+   * These drive UI hints and engine-side recovery windows.
+   */
+  injuryTiers: Record<string, InjuryTierDefinition>;
+  /** Optional configuration for hard-death calculations */
+  deathRules?: DeathRules;
+
   // Food economy
   /** How many units of food each non-dead resident consumes per in-game day */
   foodConsumptionPerResidentPerDay: number;
@@ -209,10 +252,6 @@ export interface GlobalRules {
    * If omitted, the engine starts with an empty resource map.
    */
   startingResources?: Record<string, number>;
-
-  // Injury
-  baseLightInjuryChanceAtMaxFatigue: number;
-  dangerInjuryMultiplierPerPoint: number;
 
   // Quest XP: expression using at least `level`
   questXpFormula: string;
