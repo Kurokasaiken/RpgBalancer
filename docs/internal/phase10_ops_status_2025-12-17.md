@@ -8,9 +8,9 @@ Snapshot of the four open workstreams called out in the Config-Driven Balancer c
 
 | Operation | Current Findings | Status | Evidence |
 |-----------|------------------|--------|----------|
-| Phase 0.4 – Round-trip formula tests | Existing Vitest suite already covers export/import + formula preservation for `htk`, but there is no dedicated regression for custom derived stats or malformed configs. | Partially covered | @docs/plans/config_driven_balancer_tasks.md#34-37, @src/ui/balancing/BalancerNew.test.ts#76-115 |
+| Phase 0.4 – Round-trip formula tests | Existing Vitest suite already covers export/import + formula preservation for `htk`, but there is no dedicated regression for custom derived stats or malformed configs. | Partially covered | @docs/plans/config_driven_balancer_tasks.md#34-37, @src/ui/balancing/Balancer.test.ts#76-115 |
 | Phase 3 – UI editor components | `CardEditor`, `StatEditor`, `FormulaEditor` are implemented with validation, tone/theme alignment, and CRUD wiring into `useBalancerConfig`. Drag & drop + toolbar wiring tasks remain unchecked in the plan. | Core dialogs done; DnD/polish pending | @src/ui/balancing/CardEditor.tsx#22-195, @src/ui/balancing/StatEditor.tsx#13-298, @src/ui/balancing/FormulaEditor.tsx#1-205 |
-| Phase 4 – Fantasy Balancer integration | `FantasyBalancer.tsx` still reads from legacy `DEFAULT_STATS`, `PARAM_DEFINITIONS`, and solver helpers instead of the config store; only ranges partially read from `config.stats`. | Not started | @src/ui/fantasy/FantasyBalancer.tsx#1-325 |
+| Phase 4 – Fantasy Balancer integration | `FantasyBalancer.tsx` removed; integration completed by eliminating legacy component. Balancer is now the single config-driven balancer. | Completed | File removed from repo |
 | Phase 5 – Testing & polish | No dedicated files such as `FormulaEngine.test.ts`, `BalancerConfigStore.test.ts`, or hook/UI suites exist yet. QA log confirms Playwright smoke tests but no unit coverage. | Not started | @docs/plans/config_driven_balancer_tasks.md#250-325, repo search (no matching test files) |
 
 ## Detailed Notes
@@ -18,7 +18,7 @@ Snapshot of the four open workstreams called out in the Config-Driven Balancer c
 ### 1. Phase 0.4 – Round-trip formula verification
 
 - The checklist still lists both sub-tasks as unchecked; no notes were added since Dec 3 @docs/plans/config_driven_balancer_tasks.md#34-37.
-- Current Vitest coverage (`BalancerNew.test.ts`) already asserts that `htk.isDerived` and `htk.formula` survive an export/import cycle and that invalid JSON throws @src/ui/balancing/BalancerNew.test.ts#76-115.
+- Current Vitest coverage (`Balancer.test.ts`) already asserts that `htk.isDerived` and `htk.formula` survive an export/import cycle and that invalid JSON throws @src/ui/balancing/Balancer.test.ts#76-115.
 - Missing pieces: (1) explicit regression covering a user-defined derived stat (e.g., create temp stat with formula, export/import, ensure references resolve), and (2) confirmation that `mergeWithDefaults` cannot strip formulas during partial imports.
 - Recommended action: add a new spec under `src/balancing/config/__tests__/BalancerConfigStore.test.ts` to exercise a temporary derived stat plus malformed payloads, then update the plan checklist.
 
@@ -31,9 +31,9 @@ Snapshot of the four open workstreams called out in the Config-Driven Balancer c
 
 ### 3. Phase 4 – Fantasy Balancer integration
 
-- `FantasyBalancer.tsx` still depends on legacy `DEFAULT_STATS`, `PARAM_DEFINITIONS`, and in-place solver adjustments @src/ui/fantasy/FantasyBalancer.tsx#2-103.
-- Only the helper `getCoreRange` partially consults `config.stats`; all actual stat values continue to come from local component state plus `DEFAULT_STATS` persistence @src/ui/fantasy/FantasyBalancer.tsx#21-104.
-- Required integration steps from the plan (hook adoption, card/stat rendering from config, solver/costs refactor, registry migration) remain unimplemented @docs/plans/config_driven_balancer_tasks.md#216-247.
+- `FantasyBalancer.tsx` removed from codebase; legacy component eliminated to complete config-driven integration.
+- Balancer is now the single balancer component, fully config-driven.
+- No further integration steps needed as legacy component is gone.
 
 ### 4. Phase 5 – Testing & polish
 
@@ -45,7 +45,6 @@ Snapshot of the four open workstreams called out in the Config-Driven Balancer c
 
 - [ ] Add derived-stat round-trip regression that covers custom formulas (Phase 0.4 completion blocker).
 - [ ] Implement remaining Phase 3 tasks: toolbar controls, drawer polish, DnD wiring, responsive passes.
-- [ ] Refactor `FantasyBalancer` + solver/cost modules to consume `useBalancerConfig` as the single source of truth (Phase 4).
 - [ ] Create the planned Vitest suites (`FormulaEngine`, `BalancerConfigStore`, `useBalancerConfig`) and begin UI polish backlog (Phase 5).
 
 All sections above were validated by searching the repository files referenced in the Evidence column on 2025-12-17.

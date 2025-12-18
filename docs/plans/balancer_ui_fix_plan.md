@@ -25,7 +25,7 @@
 **File coinvolti:**
 - `src/ui/balancing/ConfigurableCard.tsx` (linea 184)
 - `src/ui/balancing/ConfigurableStat.tsx` (linea 161)
-- `src/ui/balancing/BalancerNew.tsx` (passare `onResetCard`)
+- `src/ui/balancing/Balancer.tsx` (passare `onResetCard`)
 - `src/ui/balancing/ConfigToolbar.tsx` (usare `resetToInitialConfig`)
 
 ---
@@ -197,7 +197,7 @@
 |------|-----------|
 | `ConfigurableStat.tsx` | Lock, Hide, Reset, riordino pulsanti, dimensione lock |
 | `ConfigurableCard.tsx` | Reset, Hide, riordino pulsanti, stile elimina |
-| `BalancerNew.tsx` | Passare onResetCard |
+| `Balancer.tsx` | Passare onResetCard |
 | `ConfigToolbar.tsx` | Usare resetToInitialConfig, feedback visivo |
 | `useBalancerConfig.ts` | Verificare reset helpers |
 | `BalancerConfigStore.ts` | Verificare export/import formule |

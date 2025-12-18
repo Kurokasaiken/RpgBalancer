@@ -426,7 +426,7 @@ Expand combat system from 1v1 to full tactical grid-based multi-unit combat:
 1. Schema e Store (Zod + localStorage + history)
 2. React Hook (`useBalancerConfig`)
 3. UI Editor Components (CardEditor, StatEditor, FormulaEditor drawers)
-4. Integrazione FantasyBalancer
+4. Integrazione Balancer (completata)
 5. Testing e Polish
 
 **Tech Stack:**
@@ -461,7 +461,7 @@ Expand combat system from 1v1 to full tactical grid-based multi-unit combat:
 **Overview:**
 - Unified testing layers (lint, config healthcheck, domain/simulation, UI components, Playwright E2E).
 - Single entry points via npm scripts (`test:all`, `test:all:quick`).
-- Config-first validation of BalancerConfig, solver behavior, and key UI surfaces (BalancerNew, Stat Stress Testing).
+- Config-first validation of BalancerConfig, solver behavior, and key UI surfaces (Balancer, Stat Stress Testing).
 
 ---
 
@@ -501,7 +501,7 @@ The next evolution of the project is organized around six macro-goals:
 2. **UI Optimization Page-by-Page (Core First)**  
    - Rifinire Balancer e Spell Creator (Tier 1), poi le altre pagine.  
    - Interventi solo visivi/UX separati da cambi strutturali.
-   - Piano dettagliato in [plans/responsive_ui_plan.md](plans/responsive_ui_plan.md), con **BalancerNew** come prima pagina target mobile+desktop.
+   - Piano dettagliato in [plans/responsive_ui_plan.md](plans/responsive_ui_plan.md), con **Balancer** come prima pagina target mobile+desktop.
 
 3. **Page Curation (Keep / Archive)**  
    - Classificare tutte le pagine per importanza (Core / Support / Demo).  
@@ -526,13 +526,14 @@ The next evolution of the project is organized around six macro-goals:
    - Vision & design document: [GAME_VISION_IDLE_INCREMENTAL.md](GAME_VISION_IDLE_INCREMENTAL.md).  
    - **FTUE & Vertical Slice:** primi 30–60 minuti pianificati in [plans/idle_village_ftue_plan.md](plans/idle_village_ftue_plan.md); la vertical slice deve permettere almeno un ciclo completo run → meta → nuova run.  
    - **Art Style & Visual Direction:** linee guida per stile grafico, palette e pipeline in [plans/idle_village_art_style_plan.md](plans/idle_village_art_style_plan.md).
-   - **VerbCard Refactor (UI Focus):** plan in [plans/idle_village_verbcard_refactor_plan.md](plans/idle_village_verbcard_refactor_plan.md) con tasklist dedicata in [plans/idle_village_tasks.md](plans/idle_village_tasks.md) → unifica i VerbCard su mappa/HUD e prepara il refactor dei marker.
+   - **Idle Village VerbCard Refactor (UI Focus):** plan in [plans/idle_village_verbcard_refactor_plan.md](plans/idle_village_verbcard_refactor_plan.md) con tasklist dedicata in [plans/idle_village_tasks.md](plans/idle_village_tasks.md) → unifica i VerbCard su mappa/HUD e prepara il refactor dei marker.
+   - **Idle Village Map-Only Verb System:** nuovo piano dedicato in [plans/idle_village_map_only_plan.md](plans/idle_village_map_only_plan.md) per integrare verb passivi, job continui e quest expiry sulla pagina mappa, con checklist collegata in `idle_village_tasks.md`.
 
 ---
 
-### 🔴 **PHASE 12.0: Offline Progress Decision (CRITICAL PRE-LAUNCH)**
+### PHASE 12.0: Offline Progress Decision (CRITICAL PRE-LAUNCH)
 
-**Status:** 📋 TODO (Blocking per posizionamento marketing)  
+**Status:** TODO (Blocking per posizionamento marketing)  
 **Priority:** Alta - Influenza naming, Steam tags, e aspettative giocatori
 
 > [!CAUTION]

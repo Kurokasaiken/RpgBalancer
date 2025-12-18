@@ -3,15 +3,14 @@
 > **Obiettivo:** Trasformare il Balancer in un sistema completamente configurabile da UI, dove card, stat, formule e preset sono definiti in JSON e modificabili dall'utente.
 
 **Creato:** 2025-12-02  
-**Stato:** 🔄 In Progress (Phase 0: Priority Fix su BalancerNew)  
+**Stato:** ✅ Completed  
 **Priorità:** Alta  
 **Effort stimato:** 12-16 ore + 4-6 ore fix
 
 **Runtime status (Dic 2025)**
 
-- La tab **Balance** nell'app usa ancora il **FantasyBalancer legacy** come balancer principale (stabile).
-- Il nuovo **Config-Driven Balancer** (`BalancerNew`) è esposto come tab separata *"Balance New (WIP)"*.
-- Tutti i fix di **Phase 0: Priority Fix** si riferiscono in modo specifico a `BalancerNew` (reset, lock/hide, import/export, formule, drag & drop) per portarlo in parità di comportamento con il balancer legacy prima di sostituirlo nella tab principale.
+- Il **Config-Driven Balancer** (`Balancer`) è ora il balancer principale nell'app.
+- FantasyBalancer è stato rimosso, e Balancer rinominato a Balancer.
 
 ---
 
@@ -70,8 +69,8 @@ Prima di continuare con le fasi successive, è necessario risolvere i bug critic
 ┌─────────────────────────────────────────────────────────────────────┐
 │                           UI Layer                                   │
 │  ┌──────────────┐  ┌──────────────┐  ┌────────────────────────────┐ │
-│  │FantasyBalancer│  │ CardEditor   │  │ StatEditor / FormulaEditor │ │
-│  │   (main page) │  │  (drawer)    │  │        (drawer)            │ │
+│  │   Balancer   │  │ CardEditor   │  │ StatEditor / FormulaEditor │ │
+│  │   (main page)│  │  (drawer)    │  │        (drawer)            │ │
 │  └───────┬───────┘  └───────┬──────┘  └─────────────┬──────────────┘ │
 │          │                  │                       │                │
 │          ▼                  ▼                       ▼                │
@@ -98,7 +97,7 @@ Prima di continuare con le fasi successive, è necessario risolvere i bug critic
 │  │   - Preset CRUD                                                  ││
 │  │   - Export/Import JSON                                           ││
 │  └──────────────────────────────────────────────────────────────────┘│
-│  ┌──────────────────────────────────────────────────────────────────┐│
+```│  ┌──────────────────────────────────────────────────────────────────┐│
 │  │                 FormulaEngine.ts                                 ││
 │  │   - Parser per formule (operazioni base + estensibile)           ││
 │  │   - Validazione: solo stat esistenti                             ││
@@ -1028,7 +1027,7 @@ export function useBalancerConfig(): UseBalancerConfigReturn {
 ### 7.1 Component Tree
 
 ```
-FantasyBalancer.tsx (main page)
+Balancer.tsx (main page)
 ├── ConfigToolbar.tsx
 │   ├── PresetSelector (dropdown)
 │   ├── + Add Card (button → apre CardEditor)
@@ -1187,18 +1186,6 @@ Per il drag & drop delle card, useremo `@dnd-kit/core` (già standard React):
 - [ ] Validazione real-time con feedback visivo
 - [ ] Drag & drop card con handle dedicato
 - [ ] Conferma eliminazione
-
-### Fase 4: Integrazione FantasyBalancer (2-3h)
-**Files da modificare:**
-- `src/ui/fantasy/FantasyBalancer.tsx`
-- `src/balancing/solver.ts`
-- `src/balancing/costs.ts`
-
-**Deliverables:**
-- [ ] FantasyBalancer usa `useBalancerConfig()`
-- [ ] Card/stat renderizzate da config
-- [ ] Solver legge formule da config
-- [ ] Costs usa pesi da config
 
 ### Fase 5: Testing e Polish (2h)
 **Files da creare:**

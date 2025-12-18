@@ -171,6 +171,53 @@ export interface VerbToneColors {
   system?: string;
 }
 
+export interface PassiveEffectDefinition {
+  id: string;
+  label: string;
+  description?: string;
+  /**
+   * Optional icon rendered on VerbCard (e.g. emoji or unicode glyph).
+   */
+  icon?: string;
+  /**
+   * Optional verb tone identifier used by UI to pick ring colors.
+   */
+  verbToneId?: string;
+  /**
+   * Direct map slot where this passive verb should appear.
+   * If omitted, `slotTags` are used to match a slot dynamically.
+   */
+  slotId?: string;
+  /**
+   * Alternative to slotId; matches any map slot that declares one of these tags.
+   */
+  slotTags?: string[];
+  /**
+   * Time units between ticks (can be combined with frequencyFormula for dynamic cadence).
+   */
+  timeUnitsBetweenTicks?: number;
+  /**
+   * Optional formula evaluated at runtime to derive cadence or scaling factors.
+   */
+  frequencyFormula?: string;
+  /**
+   * Resource deltas applied whenever the passive triggers (consumption or production).
+   */
+  resourceDeltas?: ResourceDeltaDefinition[];
+  /**
+   * Optional requirements describing which residents/buildings unlock or boost the passive.
+   */
+  statRequirements?: StatRequirement;
+  /**
+   * Generic unlock conditions referenced by higher-level engines.
+   */
+  unlockConditionIds?: string[];
+  /**
+   * Additional domain-specific metadata (damage from starvation, buffs, etc.).
+   */
+  metadata?: Record<string, unknown>;
+}
+
 export interface MapSlotDefinition {
   id: string;
   label: string;
@@ -315,6 +362,7 @@ export interface IdleVillageConfig {
   resources: Record<string, ResourceDefinition>;
   activities: Record<string, ActivityDefinition>;
   mapSlots: Record<string, MapSlotDefinition>;
+  passiveEffects: Record<string, PassiveEffectDefinition>;
   buildings: Record<string, import('./buildings').BuildingDefinition>;
   founders: Record<string, FounderPreset>;
   variance: ActivityVarianceConfig;

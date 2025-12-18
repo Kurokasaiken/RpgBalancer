@@ -519,18 +519,31 @@ const IdleVillagePage: React.FC = () => {
             const supportsAuto = !!metadata.supportsAutoRepeat;
             const isAutoOn = isContinuous || supportsAuto;
             const scheduled = nextState.activities[job.scheduledId];
-            if (scheduled && isAutoOn) {
-              const schedResult = scheduleActivity(
-                { config, rng: simpleRng },
-                nextState,
-                {
-                  activityId: scheduled.activityId,
-                  characterIds: [...scheduled.characterIds],
-                  slotId: scheduled.slotId,
-                },
-              );
-              nextState = schedResult.state;
+            if (!scheduled || !isAutoOn || scheduled.characterIds.length === 0) {
+              continue;
             }
+
+            const fatigueThreshold = config.globalRules.maxFatigueBeforeExhausted;
+            const assigneesReady = scheduled.characterIds.every((cid) => {
+              const resident = nextState.residents[cid];
+              if (!resident) return false;
+              if (resident.status !== 'available') return false;
+              return resident.fatigue < fatigueThreshold;
+            });
+            if (!assigneesReady) {
+              continue;
+            }
+
+            const schedResult = scheduleActivity(
+              { config, rng: simpleRng },
+              nextState,
+              {
+                activityId: scheduled.activityId,
+                characterIds: [...scheduled.characterIds],
+                slotId: scheduled.slotId,
+              },
+            );
+            nextState = schedResult.state;
           }
         }
 
@@ -596,8 +609,20 @@ const IdleVillagePage: React.FC = () => {
           }
         }
 
+        const questOffers = nextState.questOffers ?? {};
+        const filteredEntries = Object.entries(questOffers).filter(([, offer]) => {
+          if (typeof offer.expiresAtTime !== 'number') return true;
+          return offer.expiresAtTime > nextState.currentTime;
+        });
+        if (filteredEntries.length !== Object.keys(questOffers).length) {
+          nextState = {
+            ...nextState,
+            questOffers: Object.fromEntries(filteredEntries),
+          };
+        }
+
         return nextState;
-      }, 'Advance time');
+      });
     },
     [config, updateState],
   );

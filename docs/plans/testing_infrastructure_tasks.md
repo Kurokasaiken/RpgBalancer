@@ -40,8 +40,8 @@
 
 ## PHASE T4: UI / Component Coverage
 
-- [ ] Add tests for `BalancerNew` component (jsdom + Vitest).
-- [ ] Test: BalancerNew renders with default config and shows equal-fight metrics bar without crashing.
+- [ ] Add tests for `Balancer` component (jsdom + Vitest).
+- [ ] Test: Balancer renders with default config and shows equal-fight metrics bar without crashing.
 - [ ] Test: changing a base stat via UI control triggers a call to the config-driven solver.
 - [ ] Test: derived stat fields are editable when unlocked and read-only when locked.
 - [ ] Add tests for `StatStressTestingPage` and related components.
@@ -52,8 +52,8 @@
 
 ## PHASE T5: Playwright E2E Flows
 
-- [ ] Create `tests/e2e/balancer-new.spec.ts` (or equivalent path) for BalancerNew flows.
-- [ ] E2E: open BalancerNew tab, verify core stats and equal-fight metrics render.
+- [ ] Create `tests/e2e/balancer-new.spec.ts` (or equivalent path) for Balancer flows.
+- [ ] E2E: open Balancer tab, verify core stats and equal-fight metrics render.
 - [ ] E2E: Scenario 1 – change base stat (e.g. hp) and verify dependent derived stat (e.g. htk) updates according to formula.
 - [ ] E2E: Scenario 2 – lock one input, edit derived stat, verify other input adjusts.
 - [ ] E2E: Scenario 3 – lock all inputs, attempt to edit derived stat, verify no change and error feedback.

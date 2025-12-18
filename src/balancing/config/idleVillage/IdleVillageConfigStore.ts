@@ -132,6 +132,18 @@ export class IdleVillageConfigStore {
   }
 
   private static mergeWithDefaults(config: IdleVillageConfig): IdleVillageConfig {
+    const mergedDeathRules = (() => {
+      const defaultDeathRules = DEFAULT_IDLE_VILLAGE_CONFIG.globalRules.deathRules;
+      const configDeathRules = config.globalRules?.deathRules;
+      if (!defaultDeathRules && !configDeathRules) {
+        return undefined;
+      }
+      return {
+        ...(defaultDeathRules ?? {}),
+        ...(configDeathRules ?? {}),
+      } as NonNullable<IdleVillageConfig['globalRules']['deathRules']>;
+    })();
+
     return {
       ...DEFAULT_IDLE_VILLAGE_CONFIG,
       ...config,
@@ -172,13 +184,7 @@ export class IdleVillageConfigStore {
           ...(DEFAULT_IDLE_VILLAGE_CONFIG.globalRules.injuryTiers ?? {}),
           ...(config.globalRules?.injuryTiers ?? {}),
         },
-        deathRules:
-          DEFAULT_IDLE_VILLAGE_CONFIG.globalRules.deathRules || config.globalRules?.deathRules
-            ? {
-                ...(DEFAULT_IDLE_VILLAGE_CONFIG.globalRules.deathRules ?? {}),
-                ...(config.globalRules?.deathRules ?? {}),
-              }
-            : undefined,
+        deathRules: mergedDeathRules,
       },
     };
   }

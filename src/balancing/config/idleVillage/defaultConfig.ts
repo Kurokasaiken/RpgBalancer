@@ -3,6 +3,7 @@
 // all domain content is authored via config/UI rather than hardcoded here.
 
 import type { IdleVillageConfig } from './types';
+import { DEFAULT_PASSIVE_EFFECTS } from './passiveEffects';
 
 export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
   version: '1.0.0',
@@ -199,6 +200,8 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
 
   // Starting buildings are currently informational; future engines can read
   // their bonuses. They are still fully editable from the Buildings tab.
+  passiveEffects: DEFAULT_PASSIVE_EFFECTS,
+
   buildings: {
     founder_house: {
       id: 'founder_house',

@@ -1,7 +1,6 @@
 // Updated App navigation to include Spell Editor and Spell Library
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { SpellLibrary } from './ui/spell/SpellLibrary';
-import { FantasySpellCreation } from './ui/fantasy/FantasySpellCreation';
 import { IdleArena } from './ui/idle/IdleArena';
 import { CharacterManager } from './ui/idle/CharacterManager';
 import { FantasyGridArena } from './ui/fantasy/FantasyGridArena';
@@ -13,7 +12,7 @@ import { MatchupMatrixWrapper } from './ui/balancing/matchup/MatchupMatrixWrappe
 import { AutoBalancerWrapper } from './ui/balancing/autobalancer/AutoBalancerWrapper';
 import { CharacterCreator } from './ui/character/CharacterCreator';
 import { FantasyLayout } from './ui/fantasy/FantasyLayout';
-import { FantasyBalancer } from './ui/fantasy/FantasyBalancer';
+import { FantasySpellCreation } from './ui/fantasy/FantasySpellCreation';
 import { ArcaneTechGlass } from './ui/fantasy/mockups/ArcaneTechGlass';
 import { GildedObservatory } from './ui/fantasy/mockups/GildedObservatory';
 import { SpellCreatorNew } from './ui/spells/SpellCreatorNew';
@@ -26,11 +25,12 @@ import { SeraphimArchive } from './ui/fantasy/mockups/SeraphimArchive';
 import { VerdantAlloyDeck } from './ui/fantasy/mockups/VerdantAlloyDeck';
 import { TacticalLab } from './ui/tactical/TacticalLab';
 import IdleVillagePage from './ui/idleVillage/IdleVillagePage';
+import IdleVillageMapPage from './ui/idleVillage/IdleVillageMapPage';
 import IdleVillageConfigRoute from './pages/idle-village-config';
 
 // Lazy-loaded heavy tools (named exports wrapped as default)
-const BalancerNew = lazy(() =>
-  import('./ui/balancing/BalancerNew').then((m) => ({ default: m.BalancerNew }))
+const Balancer = lazy(() =>
+  import('./ui/balancing/Balancer').then((m) => ({ default: m.Balancer }))
 );
 const TestingLab = lazy(() =>
   import('./ui/testing/TestingLab').then((m) => ({ default: m.TestingLab }))
@@ -50,7 +50,6 @@ const VerbDetailSandbox = lazy(() =>
 
 type Tab =
   | 'balancer'
-  | 'balancerLegacy'
   | 'balancerStats'
   | 'archetypes'
   | 'archetypeBuilder'
@@ -77,6 +76,7 @@ type Tab =
   | 'mockVerdantAlloy'
   | 'tacticalLab'
   | 'idleVillage'
+  | 'idleVillageMap'
   | 'idleVillageConfig'
   | 'skillCheckPreview'
   | 'verbDetailSandbox';
@@ -97,13 +97,8 @@ function App() {
       {activeTab === 'balancer' && (
         <ErrorBoundary componentName="Balancer">
           <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Balancer…</div>}>
-            <BalancerNew />
+            <Balancer />
           </Suspense>
-        </ErrorBoundary>
-      )}
-      {activeTab === 'balancerLegacy' && (
-        <ErrorBoundary componentName="Legacy Balancer">
-          <FantasyBalancer />
         </ErrorBoundary>
       )}
       {activeTab === 'testing' && (
@@ -197,6 +192,11 @@ function App() {
       {activeTab === 'idleVillage' && (
         <ErrorBoundary componentName="Idle Village">
           <IdleVillagePage />
+        </ErrorBoundary>
+      )}
+      {activeTab === 'idleVillageMap' && (
+        <ErrorBoundary componentName="Idle Village Map">
+          <IdleVillageMapPage />
         </ErrorBoundary>
       )}
       {activeTab === 'idleVillageConfig' && (

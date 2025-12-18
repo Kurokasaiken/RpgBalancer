@@ -1,6 +1,6 @@
 # Responsive UI (Mobile + Desktop) - Implementation Plan
 
-> **Obiettivo:** Allineare tutte le pagine dell'app (a partire da BalancerNew) a un'unica strategia responsive mobile+desktop, ottimizzata per il tema **Gilded Observatory**, alta densità informativa e buone performance su device mobili.
+> **Obiettivo:** Allineare tutte le pagine dell'app (a partire da Balancer) a un'unica strategia responsive mobile+desktop, ottimizzata per il tema **Gilded Observatory**, alta densità informativa e buone performance su device mobili.
 
 **Creato:** 2025-12-06  
 **Stato:** 📋 Planned (Phase R0)  
@@ -12,7 +12,7 @@
 ## 1. Contesto & Problema
 
 - Il progetto è pensato sia per **desktop** che per **mobile** (PWA / Tauri mobile).
-- La UI attuale è principalmente ragionata per desktop, con una resa mobile ancora **troppo grande / poco densa** in alcune schermate (es. BalancerNew).
+- La UI attuale è principalmente ragionata per desktop, con una resa mobile ancora **troppo grande / poco densa** in alcune schermate (es. Balancer).
 - Esistono già linee guida mobile (`MOBILE_GUIDELINES.md`), ma servono:
   - un **piano operativo** per gestire *insieme* mobile e desktop;
   - un **workflow ripetibile** per ogni nuova pagina/component;
@@ -131,7 +131,7 @@ Questo workflow è valido anche per l'AI: ogni volta che viene creata o modifica
 ### 4.2 Testing automatico (estendibile)
 
 - Estendere gradualmente i test Playwright esistenti per:
-  - screenshot regression principali per BalancerNew (mobile + desktop);
+  - screenshot regression principali per Balancer (mobile + desktop);
   - basic layout assertions (elementi fondamentali visibili / non tagliati).
 - In futuro: snapshot visuali per pagine core.
 
@@ -143,7 +143,7 @@ Questo workflow è valido anche per l'AI: ogni volta che viene creata o modifica
 - **Coerenza**
   - Stessa gerarchia visiva (titoli, sottotitoli, label) tra pagine core.
 - **Performance**
-  - Nessun lag evidente anche su device medi, con focus su BalancerNew.
+  - Nessun lag evidente anche su device medi, con focus su Balancer.
 
 ---
 
@@ -165,7 +165,7 @@ Questo workflow è valido anche per l'AI: ogni volta che viene creata o modifica
 ### 5.2 Phase R1 – Core Pages (Tier 1)
 
 Pagine prioritarie:
-1. **BalancerNew** (questa è la *prima pagina* su cui applicare le nuove regole):
+1. **Balancer** (questa è la *prima pagina* su cui applicare le nuove regole):
    - Revisione completa di:
      - layout mobile (stack card, toolbar, editors),
      - tipografia (font troppo grandi su mobile → scala più compatta),
@@ -174,7 +174,7 @@ Pagine prioritarie:
    - Applicare lo stesso set di regole al nuovo creator config-driven.
 
 Deliverables R1:
-- BalancerNew ottimizzato per mobile+desktop secondo queste linee guida.
+- Balancer ottimizzato per mobile+desktop secondo queste linee guida.
 - Eventuali aggiustamenti ai componenti condivisi (toolbar, card, editor) per supportare meglio la modalità compact.
 
 ### 5.3 Phase R2 – Altre pagine core

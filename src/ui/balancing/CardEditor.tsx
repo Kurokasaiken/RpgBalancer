@@ -6,7 +6,7 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   editingCard?: CardDefinition;
-  onSaveComplete?: (cardId: string) => void;
+  onSaveComplete?: (cardId: string, mode: 'create' | 'edit') => void;
 }
 
 const COLOR_OPTIONS = [
@@ -58,7 +58,7 @@ export const CardEditor: React.FC<Props> = ({ isOpen, onClose, editingCard, onSa
         setError(res.error);
         return;
       }
-      onSaveComplete?.(editingCard.id);
+      onSaveComplete?.(editingCard.id, 'edit');
       onClose();
       return;
     }
@@ -73,7 +73,7 @@ export const CardEditor: React.FC<Props> = ({ isOpen, onClose, editingCard, onSa
       setError(res.error);
       return;
     }
-    onSaveComplete?.(id);
+    onSaveComplete?.(id, 'create');
     onClose();
   };
 

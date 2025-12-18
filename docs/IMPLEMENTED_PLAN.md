@@ -205,7 +205,7 @@ Trasformare il Balancer in un sistema completamente configurabile da UI:
 | StatEditor Drawer | 📋 Plan |
 | FormulaEditor | 📋 Plan |
 | Drag & Drop (@dnd-kit) | 📋 Plan |
-| FantasyBalancer Integration | 📋 Plan |
+| Balancer Integration | ✅ Completed |
 
 ---
 

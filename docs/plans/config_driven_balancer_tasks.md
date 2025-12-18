@@ -205,7 +205,7 @@
 - [ ] Stilizzare con tema Gilded Observatory
 
 ### 3.8 Drag & Drop Setup
-- [ ] Configurare DndContext in FantasyBalancer
+- [ ] Configurare DndContext in Balancer
 - [ ] Configurare SortableContext per cards
 - [ ] Implementare handleDragEnd per reorder
 - [ ] Assicurare che solo DragHandle attivi drag
@@ -311,9 +311,9 @@
 | Phase 1: Schema e Store | ✅ | 35 | 35 |
 | Phase 2: React Hook | ✅ | 20 | 20 |
 | Phase 3: UI Components | 🔄 | 30 | 45 |
-| Phase 4: Integration | 🔄 | 10 | 15 |
+| Phase 4: Integration | ✅ | 15 | 15 |
 | Phase 5: Testing | ⬜ | 0 | 25 |
-| **TOTAL** | 🔄 | **110** | **155** |
+| **TOTAL** | 🔄 | **115** | **155** |
 
 ---
 

@@ -4,7 +4,7 @@
 **Status:** Draft – Implementation In Progress  
 **Related Phases:**
 - Phase 2 – Archetype Balancing (Combat simulation tests)
-- Phase 10 – Config-Driven Balancer (BalancerNew, config solver)
+- Phase 10 – Config-Driven Balancer (Balancer, config solver)
 - Phase 10.5 – Stat Stress Testing & Auto Stat Balancer
 
 ---
@@ -14,7 +14,7 @@
 Design and maintain a **unified testing infrastructure** that validates the RPG Balancer system end-to-end:
 
 1. **Config & Domain Integrity** – BalancerConfig, formulas, stat weights, simulation engines.  
-2. **UI/UX Surfaces** – BalancerNew, Stat Stress Testing tools, core Gilded Observatory pages.  
+2. **UI/UX Surfaces** – Balancer, Stat Stress Testing tools, core Gilded Observatory pages.  
 3. **E2E Behavior** – Real browser flows with config-driven logic (locks, derived stats, fight metrics, stress tests).  
 4. **Single Entry Point** – A small set of npm scripts (`test:all`, `test:all:quick`, etc.) that run the full suite.
 
@@ -57,7 +57,7 @@ Tests at this layer must:
 
 - **Goal:** Ensure the main UI surfaces correctly integrate with config and domain logic.
 - **Targets:**
-  - `BalancerNew` (config-driven solver integration, lock and derived stat behavior, equal-fight metrics bar).
+  - `Balancer` (config-driven solver integration, lock and derived stat behavior, equal-fight metrics bar).
   - `StatStressTestingPage` and related components (Round Robin configuration, mode selection, history display via `StatBalanceHistoryStore`).
 
 These tests verify **wiring and component behavior** without requiring a real browser.
@@ -66,7 +66,7 @@ These tests verify **wiring and component behavior** without requiring a real br
 
 - **Goal:** Validate real user flows in a real browser, including:
   - Page navigation & app startup.
-  - Interactive behavior for BalancerNew (locks, derived stats, 1v1 metrics).
+  - Interactive behavior for Balancer (locks, derived stats, 1v1 metrics).
   - Stat Stress Testing flows (fast/full modes, visible results, history updates).
 
 - **Tooling:** Playwright test project configured with a dev-server webServer (Vite) and dedicated E2E spec files.
@@ -95,11 +95,11 @@ This plan produces:
      - Error cases (conflicting locks, min/max constraints).
 
 4. **UI Component Tests:**
-   - Tests for BalancerNew and StatStressTesting UI, verifying rendering, props wiring, simple interactions.
+   - Tests for Balancer and StatStressTesting UI, verifying rendering, props wiring, simple interactions.
 
 5. **Playwright E2E Specs:**
    - Minimal but expressive suite that covers:
-     - BalancerNew derived stat & lock scenarios.
+     - Balancer derived stat & lock scenarios.
      - StatStressTestingPage stress-test run and history.
      - App startup & tab navigation smoke test.
 
@@ -128,13 +128,13 @@ This plan produces:
 
 ### Phase T4 – UI/Component Coverage
 
-- Write focused tests for BalancerNew and StatStressTesting UI.  
+- Write focused tests for Balancer and StatStressTesting UI.  
 - Ensure config-driven approach: components must read from hooks/config modules rather than hardcoded values.
 
 ### Phase T5 – Playwright E2E Flows
 
 - Create high-value E2E specs for:
-  - BalancerNew core flows (locks, derived stats, equal-fight metrics bar).  
+  - Balancer core flows (locks, derived stats, equal-fight metrics bar).  
   - StatStressTesting quick runs and history.  
   - App startup/navigation smoke.
 
@@ -154,7 +154,7 @@ This plan produces:
   This plan ensures the Stat Stress Testing UI and engines have proper automated coverage but does not redefine their balancing methodology.
 
 - **`plans/config_driven_balancer_plan.md` / `config_driven_balancer_tasks.md`**  
-  This plan provides the testing infrastructure to guard Config-Driven Balancer changes (especially BalancerNew and ConfigSolver). It does not own the feature design itself.
+  This plan provides the testing infrastructure to guard Config-Driven Balancer changes (especially Balancer and ConfigSolver). It does not own the feature design itself.
 
 ---
 

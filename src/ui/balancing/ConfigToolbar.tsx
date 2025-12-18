@@ -70,7 +70,7 @@ export const ConfigToolbar: React.FC = () => {
 
         // Handle simValues:
         // If present in file, use them.
-        // If NOT present, CLEAR the local storage so BalancerNew resets to config defaults.
+        // If NOT present, CLEAR the local storage so Balancer resets to config defaults.
         // This is crucial to prevent stale values from overriding new formulas or defaults.
         if (_simValues && typeof _simValues === 'object') {
           localStorage.setItem(SIM_VALUES_KEY, JSON.stringify(_simValues));
@@ -81,7 +81,7 @@ export const ConfigToolbar: React.FC = () => {
         showToast('Configurazione importata con successo', 'success');
 
         // Force page reload to ensure simValues are picked up correctly
-        // (BalancerNew initializes state from localStorage on mount)
+        // (Balancer initializes state from localStorage on mount)
         window.location.reload();
       } catch (err) {
         showToast(`Errore durante import: ${(err as Error).message}`, 'error');

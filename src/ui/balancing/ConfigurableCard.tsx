@@ -39,6 +39,7 @@ interface SortableStatProps {
   canDelete: boolean;
   isDependencyHighlighted?: boolean;
   hasError?: boolean;
+  onOpenStatEditor?: (statId: string) => void;
 }
 
 const SortableStat: React.FC<SortableStatProps> = ({
@@ -53,6 +54,7 @@ const SortableStat: React.FC<SortableStatProps> = ({
   canDelete,
   isDependencyHighlighted,
   hasError,
+  onOpenStatEditor,
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: stat.id });
 
@@ -78,6 +80,11 @@ const SortableStat: React.FC<SortableStatProps> = ({
         isDependencyHighlighted={isDependencyHighlighted}
         hasError={hasError}
         dragHandleProps={{ ...attributes, ...listeners }}
+        onRequestStatEditor={
+          onOpenStatEditor
+            ? () => onOpenStatEditor(stat.id)
+            : undefined
+        }
       />
     </div>
   );
@@ -102,7 +109,7 @@ export const ConfigurableCard: React.FC<Props> = ({
   availableStats,
   dragListeners,
   dependencyHighlights,
-  errorHighlights
+  errorHighlights,
 }) => {
   const orderedStats = card.statIds.map((id) => stats[id]).filter(Boolean);
 
@@ -378,6 +385,17 @@ export const ConfigurableCard: React.FC<Props> = ({
                 <span className="sr-only">Annulla modifiche</span>
               </button>
             )}
+            {onOpenCardEditor && !isEditingHeader && (
+              <button
+                type="button"
+                className="w-5 h-5 flex items-center justify-center rounded text-[#c9a227] hover:text-[#e6c547] transition-colors leading-none"
+                title="Apri editor card"
+                onClick={onOpenCardEditor}
+              >
+                <span aria-hidden="true" className="text-sm">⚙</span>
+                <span className="sr-only">Apri editor card</span>
+              </button>
+            )}
             {onUpdateCard && (
               <button
                 type="button"
@@ -419,22 +437,26 @@ export const ConfigurableCard: React.FC<Props> = ({
         <DndContext collisionDetection={closestCenter} onDragEnd={handleStatDragEnd}>
           <SortableContext items={orderedStats.map((s) => s.id)} strategy={verticalListSortingStrategy}>
             <div className={statsGridClassName}>
-              {orderedStats.map((stat) => (
-                <SortableStat
-                  key={stat.id}
-                  stat={stat}
-                  simValues={simValues}
-                  onSimValueChange={onSimValueChange}
-                  onEditStat={(updates) => onEditStat(stat.id, updates)}
-                  onDeleteStat={() => onDeleteStat(stat.id)}
-                  onResetStat={onResetStat ? () => onResetStat(stat.id) : undefined}
-                  newStatId={newStatId}
-                  availableStats={availableStats}
-                  canDelete={!stat.isCore}
-                  isDependencyHighlighted={!!dependencyHighlights?.[stat.id]}
-                  hasError={!!errorHighlights?.[stat.id]}
-                />
-              ))}
+              {orderedStats.map((stat) => {
+                const canDeleteStat = !stat.isCore && !stat.isLocked;
+                return (
+                  <SortableStat
+                    key={stat.id}
+                    stat={stat}
+                    simValues={simValues}
+                    onSimValueChange={onSimValueChange}
+                    onEditStat={(updates) => onEditStat(stat.id, updates)}
+                    onDeleteStat={() => onDeleteStat(stat.id)}
+                    onResetStat={onResetStat ? () => onResetStat(stat.id) : undefined}
+                    newStatId={newStatId}
+                    availableStats={availableStats}
+                    canDelete={canDeleteStat}
+                    isDependencyHighlighted={dependencyHighlights?.[stat.id]}
+                    hasError={errorHighlights?.[stat.id]}
+                    onOpenStatEditor={onOpenStatEditor}
+                  />
+                );
+              })}
             </div>
           </SortableContext>
         </DndContext>

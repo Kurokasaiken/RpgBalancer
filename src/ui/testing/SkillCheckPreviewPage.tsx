@@ -1,6 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useBalancerConfig } from '@/balancing/hooks/useBalancerConfig';
 import { RiskVisualization } from './RiskVisualization';
+import AltVisualsV3Canvas, {
+  DEFAULT_CANVAS_HEIGHT,
+  DEFAULT_CANVAS_WIDTH,
+  MAX_STAT_VALUE,
+  deriveAltVisualsV3Stats,
+} from './AltVisualsV3Canvas';
+import AltVisualsV4Constellation, {
+  DEFAULT_V4_CANVAS_HEIGHT,
+  DEFAULT_V4_CANVAS_WIDTH,
+} from './AltVisualsV4Constellation';
 import type {
   OutcomeZone,
   OutcomeResult,
@@ -1401,7 +1411,7 @@ export const SkillCheckPreviewPage: React.FC = () => {
   const [deathPct, setDeathPct] = useState(15);
   const [shotPower, setShotPower] = useState(0.5);
   const [spinBias, setSpinBias] = useState(0.0);
-  const [viewMode, setViewMode] = useState<'classic' | 'alt' | 'alt-v2'>('classic');
+  const [viewMode, setViewMode] = useState<'classic' | 'alt-v2' | 'alt-v3' | 'alt-v4'>('classic');
   const [ballPosition, setBallPosition] = useState<Point | null>(null);
   const [lastOutcome, setLastOutcome] = useState<LastOutcome | null>(null);
   const [timer, setTimer] = useState('0.0s');
@@ -1708,6 +1718,8 @@ export const SkillCheckPreviewPage: React.FC = () => {
     return `${resultLabel} + ${zoneLabel}`;
   }, [lastOutcome]);
 
+  const altVisualsV3Stats = useMemo(() => deriveAltVisualsV3Stats(stats), [stats]);
+
   return (
     <div className="p-3 md:p-4 text-ivory">
       <h1 className="text-lg md:text-xl font-cinzel tracking-[0.2em] uppercase mb-2">Skill Check Preview Lab</h1>
@@ -1718,7 +1730,7 @@ export const SkillCheckPreviewPage: React.FC = () => {
       <div className="flex flex-wrap gap-2 mb-4">
         <span className="text-[10px] uppercase tracking-[0.24em] text-slate-500 pt-1">View</span>
         <div className="bg-slate-900/70 border border-slate-800 rounded-full p-1 flex gap-1">
-          {(['classic', 'alt-v2'] as const).map((mode) => (
+          {(['classic', 'alt-v2', 'alt-v3', 'alt-v4'] as const).map((mode) => (
             <button
               key={mode}
               type="button"
@@ -1729,7 +1741,13 @@ export const SkillCheckPreviewPage: React.FC = () => {
                   : 'text-slate-400 hover:text-slate-100'
               }`}
             >
-              {mode === 'classic' ? 'Dispatch Polygon' : 'Alt Visuals v2'}
+              {mode === 'classic'
+                ? 'Dispatch Polygon'
+                : mode === 'alt-v2'
+                  ? 'Alt Visuals v2'
+                  : mode === 'alt-v3'
+                    ? 'Alt Visuals v3'
+                    : 'Alt Visuals v4'}
             </button>
           ))}
         </div>
@@ -1999,6 +2017,81 @@ export const SkillCheckPreviewPage: React.FC = () => {
                 ))}
               </div>
             )}
+          </div>
+        </div>
+      ) : viewMode === 'alt-v3' ? (
+        <div className="default-card p-6 space-y-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-[0.24em] text-amber-200">Alt Visuals v3 · Pinball Bloom</h3>
+              <p className="text-[11px] text-slate-300 max-w-xl">
+                Esperimento canvas: blob nemico dinamico, colonne che crescono e sfera che rimbalza contro la sagoma del player.
+                Le stats vengono lette automaticamente dal profilo corrente (fallback STR/DEX/INT se mancano dati).
+              </p>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[10px] text-slate-300">
+              <div className="bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-2">
+                <div className="uppercase tracking-[0.18em] text-slate-500">Stats</div>
+                <div className="text-lg font-mono text-emerald-300">{altVisualsV3Stats.length}</div>
+              </div>
+              <div className="bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-2">
+                <div className="uppercase tracking-[0.18em] text-slate-500">Canvas</div>
+                <div className="text-lg font-mono text-cyan-300">{`${DEFAULT_CANVAS_WIDTH}×${DEFAULT_CANVAS_HEIGHT}`}</div>
+              </div>
+              <div className="bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-2">
+                <div className="uppercase tracking-[0.18em] text-slate-500">Max Stat</div>
+                <div className="text-lg font-mono text-rose-300">{MAX_STAT_VALUE}</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-center">
+            <AltVisualsV3Canvas stats={stats} width={DEFAULT_CANVAS_WIDTH} height={DEFAULT_CANVAS_HEIGHT} />
+          </div>
+        </div>
+      ) : viewMode === 'alt-v4' ? (
+        <div className="default-card p-6 space-y-4">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-200">
+                Alt Visuals v4 · Constellation Weave
+              </h3>
+              <p className="text-[11px] text-slate-300 max-w-2xl">
+                Layer astratto che disegna la costellazione delle stats, con orbita dinamica che segue i valori medi
+                e bande concentriche legate a safe/injury/death. Funziona solo con dati del profilo corrente (fallback
+                STR/DEX/INT) per restare allineati al weight-based creator.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-[10px] text-slate-300">
+              <div className="bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-2">
+                <div className="uppercase tracking-[0.18em] text-slate-500">Stats attive</div>
+                <div className="text-lg font-mono text-cyan-300">{stats.filter((stat) => stat.questValue > 0).length}</div>
+              </div>
+              <div className="bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-2">
+                <div className="uppercase tracking-[0.18em] text-slate-500">Safe%</div>
+                <div className="text-lg font-mono text-emerald-300">
+                  {Math.max(0, 100 - injuryPct - deathPct)}%
+                </div>
+              </div>
+              <div className="bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-2">
+                <div className="uppercase tracking-[0.18em] text-slate-500">Injury%</div>
+                <div className="text-lg font-mono text-amber-300">{injuryPct}%</div>
+              </div>
+              <div className="bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-2">
+                <div className="uppercase tracking-[0.18em] text-slate-500">Death%</div>
+                <div className="text-lg font-mono text-rose-300">{deathPct}%</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-center">
+            <AltVisualsV4Constellation
+              stats={stats}
+              injuryPct={injuryPct}
+              deathPct={deathPct}
+              width={DEFAULT_V4_CANVAS_WIDTH}
+              height={DEFAULT_V4_CANVAS_HEIGHT}
+            />
           </div>
         </div>
       ) : (

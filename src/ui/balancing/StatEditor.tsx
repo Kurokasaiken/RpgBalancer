@@ -8,9 +8,10 @@ interface Props {
   onClose: () => void;
   card: CardDefinition | null;
   editingStat?: StatDefinition;
+  onSaveComplete?: (statId: string, cardId: string) => void;
 }
 
-export const StatEditor: React.FC<Props> = ({ isOpen, onClose, card, editingStat }) => {
+export const StatEditor: React.FC<Props> = ({ isOpen, onClose, card, editingStat, onSaveComplete }) => {
   const { addStat, updateStat, config } = useBalancerConfig();
 
   const [id, setId] = useState('');
@@ -101,6 +102,9 @@ export const StatEditor: React.FC<Props> = ({ isOpen, onClose, card, editingStat
         setError(res.error);
         return;
       }
+      if (card) {
+        onSaveComplete?.(editingStat.id, card.id);
+      }
       onClose();
       return;
     }
@@ -131,6 +135,7 @@ export const StatEditor: React.FC<Props> = ({ isOpen, onClose, card, editingStat
       setError(res.error);
       return;
     }
+    onSaveComplete?.(id, card.id);
     onClose();
   };
 

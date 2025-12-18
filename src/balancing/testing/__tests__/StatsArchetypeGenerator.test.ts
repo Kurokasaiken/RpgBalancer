@@ -1,44 +1,44 @@
+import { describe, expect, test } from 'vitest';
 import { DEFAULT_CONFIG } from '../../config/defaultConfig';
 import { BASELINE_STATS } from '../../baseline';
 import { getStatWeight } from '../../statWeights';
-import { StatsArchetypeGenerator } from '../StressTestArchetypeGenerator';
+import { StatsArchetypeGenerator, isStressTestCandidate } from '../StressTestArchetypeGenerator';
 
-// Helper: count non-derived, non-formula, non-hidden stats in default config
-const getNonDerivedStatIds = () =>
+// Helper: gather the exact set of stats the generator should consider
+const getCandidateStatIds = () =>
   Object.values(DEFAULT_CONFIG.stats)
-    .filter((s) => !s.isDerived && !s.formula && !s.isHidden)
+    .filter(isStressTestCandidate)
     .map((s) => s.id);
 
-describe.skip('StatsArchetypeGenerator', () => {
-  const nonDerivedIds = getNonDerivedStatIds();
+describe('StatsArchetypeGenerator', () => {
+  const tiers = [25, 50, 75];
+  const candidateIds = getCandidateStatIds();
   const generator = new StatsArchetypeGenerator(DEFAULT_CONFIG);
 
   test('generateSingleStatArchetypes creates statsArchetypes for each non-derived stat and tier', () => {
-    const tiers = [25, 50, 75];
     const singles = generator.generateSingleStatArchetypes(tiers);
 
     // n stats × 3 tiers
-    expect(singles.length).toBe(nonDerivedIds.length * tiers.length);
+    expect(singles.length).toBe(candidateIds.length * tiers.length);
 
     for (const a of singles) {
       expect(a.testedStats).toHaveLength(1);
-      expect(nonDerivedIds).toContain(a.testedStats[0]);
+      expect(candidateIds).toContain(a.testedStats[0]);
       expect(tiers).toContain(a.pointsPerStat);
     }
   });
 
   test('generatePairStatArchetypes creates C(n,2) combinations per tier', () => {
-    const tiers = [25, 50, 75];
     const pairs = generator.generatePairStatArchetypes(tiers);
-    const n = nonDerivedIds.length;
+    const n = candidateIds.length;
     const expectedPerTier = (n * (n - 1)) / 2;
     expect(pairs.length).toBe(expectedPerTier * tiers.length);
 
     for (const a of pairs) {
       expect(a.testedStats).toHaveLength(2);
       const [s1, s2] = a.testedStats;
-      expect(nonDerivedIds).toContain(s1);
-      expect(nonDerivedIds).toContain(s2);
+      expect(candidateIds).toContain(s1);
+      expect(candidateIds).toContain(s2);
       expect(s1).not.toBe(s2);
       expect(tiers).toContain(a.pointsPerStat);
     }
@@ -48,8 +48,8 @@ describe.skip('StatsArchetypeGenerator', () => {
     const snapshot = JSON.parse(JSON.stringify(BASELINE_STATS));
 
     // Run both generators
-    generator.generateSingleStatArchetypes(25);
-    generator.generatePairStatArchetypes(25);
+    generator.generateSingleStatArchetypes([25]);
+    generator.generatePairStatArchetypes([25]);
 
     expect(BASELINE_STATS).toEqual(snapshot);
   });
@@ -69,10 +69,70 @@ describe.skip('StatsArchetypeGenerator', () => {
 
       const weight = getStatWeight(statId);
       const expectedDelta = weight * pointsPerStat;
-      const baselineValue = (BASELINE_STATS as any)[statId] ?? 0;
+      const configStat = DEFAULT_CONFIG.stats[statId];
+      const baselineValue =
+        (configStat && 'defaultValue' in configStat ? configStat.defaultValue : undefined) ??
+        (BASELINE_STATS as any)[statId] ??
+        0;
       const actualValue = (archetype.stats as any)[statId];
 
       expect(actualValue).toBeCloseTo(baselineValue + expectedDelta, 5);
     }
+  });
+
+  test('excludes stats flagged via isStressTestCandidate in generators', () => {
+    const templateStat = DEFAULT_CONFIG.stats.hp;
+    expect(templateStat).toBeDefined();
+
+    const buildConfigWithFlag = (
+      mutator: (stat: typeof templateStat) => void,
+    ) => {
+      const config = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+      config.stats.testStress = {
+        ...templateStat,
+        id: 'testStress',
+        label: 'Test Stress Stat',
+      };
+      mutator(config.stats.testStress);
+      return config;
+    };
+
+    const assertIncluded = (config: typeof DEFAULT_CONFIG) => {
+      const gen = new StatsArchetypeGenerator(config);
+      const singles = gen.generateSingleStatArchetypes([25]);
+      expect(singles.some((a) => a.testedStats.includes('testStress'))).toBe(true);
+    };
+
+    const baseConfig = buildConfigWithFlag(() => {
+      // no-op – should be included
+    });
+    assertIncluded(baseConfig);
+
+    const runGate = (mutator: (stat: typeof templateStat) => void) => {
+      const config = buildConfigWithFlag(mutator);
+      const gen = new StatsArchetypeGenerator(config);
+      const singles = gen.generateSingleStatArchetypes([25]);
+      const pairs = gen.generatePairStatArchetypes([25]);
+
+      expect(singles.some((a) => a.testedStats.includes('testStress'))).toBe(false);
+      expect(pairs.some((a) => a.testedStats.includes('testStress'))).toBe(false);
+    };
+
+    runGate((stat) => {
+      stat.isHidden = true;
+    });
+    runGate((stat) => {
+      stat.baseStat = false;
+    });
+    runGate((stat) => {
+      stat.isPenalty = true;
+    });
+    runGate((stat) => {
+      stat.isDetrimental = true;
+    });
+    runGate((stat) => {
+      stat.isDerived = true;
+      stat.formula = 'hp + damage';
+    });
   });
 });

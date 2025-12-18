@@ -12,7 +12,7 @@
   - [x] Verificare che il click su ↺ ripristini il valore numerico corretto.
 - [x] **Reset Card Funzionante**
   - [x] In `ConfigurableCard.tsx`, collegare il pulsante ↺ alla prop `onResetCard`.
-  - [x] In `BalancerNew.tsx`, passare la funzione `resetCardToInitial` come `onResetCard`.
+  - [x] In `Balancer.tsx`, passare la funzione `resetCardToInitial` come `onResetCard`.
   - [x] **Fix Added:** Ensure `simValues` are also reset.
 - [x] **Reset Page Funzionante**
   - [x] In `ConfigToolbar.tsx`, collegare "Reset Defaults" a `resetToInitialConfig`.

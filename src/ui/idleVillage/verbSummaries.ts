@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
+import type { ActivityDefinition, MapSlotDefinition, PassiveEffectDefinition } from '@/balancing/config/idleVillage/types';
 import type { QuestOffer, ScheduledActivity } from '@/engine/game/idleVillage/TimeEngine';
 import type { ProgressStyle, VerbTone, VerbVisualVariant } from '@/ui/idleVillage/VerbCard';
 
@@ -7,7 +7,7 @@ export const DEFAULT_SECONDS_PER_TIME_UNIT = 60;
 
 const clamp01 = (value: number) => Math.max(0, Math.min(1, value));
 
-export type VerbSummarySource = 'scheduled' | 'questOffer' | 'system' | 'completed';
+export type VerbSummarySource = 'scheduled' | 'questOffer' | 'system' | 'completed' | 'passive';
 
 export interface VerbSummary {
   key: string;
@@ -36,6 +36,113 @@ export interface VerbSummary {
   scheduled?: ScheduledActivity;
   offer?: QuestOffer;
   notes?: string | null;
+}
+
+const toneToVariantMap: Record<VerbTone, VerbVisualVariant> = {
+  neutral: 'azure',
+  job: 'jade',
+  quest: 'amethyst',
+  danger: 'ember',
+  system: 'solar',
+};
+
+const toneToProgressStyleMap: Record<VerbTone, ProgressStyle> = {
+  neutral: 'ribbon',
+  job: 'border',
+  quest: 'halo',
+  danger: 'border',
+  system: 'ribbon',
+};
+
+const coerceVerbTone = (tone?: string | null): VerbTone => {
+  if (!tone) return 'system';
+  const allowed: VerbTone[] = ['neutral', 'job', 'quest', 'danger', 'system'];
+  return allowed.includes(tone as VerbTone) ? (tone as VerbTone) : 'system';
+};
+
+const resolvePassiveSlotId = (
+  effect: PassiveEffectDefinition,
+  mapSlots: Record<string, MapSlotDefinition>,
+): { slotId: string | null; slotIcon?: string } => {
+  if (effect.slotId && mapSlots[effect.slotId]) {
+    return { slotId: effect.slotId, slotIcon: mapSlots[effect.slotId]?.icon };
+  }
+  if (effect.slotTags && effect.slotTags.length > 0) {
+    const match = Object.values(mapSlots).find((slot) =>
+      slot.slotTags?.some((tag) => effect.slotTags?.includes(tag)),
+    );
+    if (match) {
+      return { slotId: match.id, slotIcon: match.icon };
+    }
+  }
+  return { slotId: null };
+};
+
+const parsePassiveIntervalUnits = (effect: PassiveEffectDefinition): number => {
+  if (typeof effect.timeUnitsBetweenTicks === 'number' && effect.timeUnitsBetweenTicks > 0) {
+    return effect.timeUnitsBetweenTicks;
+  }
+  const formula = effect.frequencyFormula?.trim();
+  if (formula) {
+    const numeric = Number(formula);
+    if (Number.isFinite(numeric) && numeric > 0) {
+      return numeric;
+    }
+  }
+  return 1;
+};
+
+export function buildPassiveEffectSummary(params: {
+  effect: PassiveEffectDefinition;
+  currentTime: number;
+  secondsPerTimeUnit: number;
+  mapSlots: Record<string, MapSlotDefinition>;
+  resourceLabeler: (id: string) => string;
+}): VerbSummary | null {
+  const { effect, currentTime, secondsPerTimeUnit, mapSlots, resourceLabeler } = params;
+  const { slotId, slotIcon } = resolvePassiveSlotId(effect, mapSlots);
+  if (!slotId) {
+    // Passive effects should always resolve to a slot; return null to avoid floating cards with no anchor.
+    return null;
+  }
+
+  const tone = coerceVerbTone(effect.verbToneId);
+  const visualVariant = toneToVariantMap[tone] ?? 'solar';
+  const progressStyle = toneToProgressStyleMap[tone] ?? 'ribbon';
+  const intervalUnits = Math.max(1, parsePassiveIntervalUnits(effect));
+  const elapsedUnits = currentTime % intervalUnits;
+  const progressFraction = clamp01(elapsedUnits / intervalUnits);
+  const elapsedSeconds = elapsedUnits * secondsPerTimeUnit;
+  const totalDurationSeconds = intervalUnits * secondsPerTimeUnit;
+  const remainingSeconds = Math.max(0, totalDurationSeconds - elapsedSeconds);
+  const rewardLabel = formatRewardLabel(effect.resourceDeltas, resourceLabeler);
+
+  return {
+    key: effect.id,
+    source: 'passive',
+    slotId,
+    label: effect.label ?? effect.id,
+    kindLabel: 'Passive Effect',
+    isQuest: false,
+    isJob: false,
+    icon: effect.icon ?? slotIcon ?? '◎',
+    visualVariant,
+    progressStyle,
+    progressFraction,
+    elapsedSeconds,
+    totalDurationSeconds,
+    remainingSeconds,
+    injuryPercentage: 0,
+    deathPercentage: 0,
+    assignedCount: 0,
+    totalSlots: 0,
+    rewardLabel,
+    tone,
+    deadlineLabel: null,
+    assigneeNames: [],
+    riskLabel: null,
+    notes: effect.description ?? null,
+  };
 }
 
 const deriveVisualVariant = (activity: ActivityDefinition): VerbVisualVariant => {
@@ -290,7 +397,7 @@ export function buildSystemVerbSummary(params: {
   deadlineLabel: string | null;
   notes?: string | null;
 }): VerbSummary {
-  const clampedProgress = clamp01(progressFraction);
+  const clampedProgress = clamp01(params.progressFraction);
 
   return {
     key: params.key,

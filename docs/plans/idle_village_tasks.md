@@ -107,6 +107,25 @@
 - [ ] Update quest offer UI (map + HUD) with risk badges, tone colors, and Accept CTA
 - [ ] Add Vitest coverage for helper logic and Playwright smoke test for drag/drop + quest offer accept flows
 
+## Idle Village Map-Only Page (Verb System)
+
+- [ ] Reference implementation plan: `docs/plans/idle_village_map_only_plan.md`
+- [ ] Wire shared time controls (play/pause/step) to `tickIdleVillage` so every VerbCard shares the same clock
+- [ ] Implement passive/system VerbCard selectors (hunger, upkeep) driven by config `globalRules`
+- [ ] Ensure continuous jobs auto-reschedule per activity metadata (`continuousJob`, `supportsAutoRepeat`, `autoRepeatDelayUnits`)
+- [ ] Surface quest offer deadlines/expiry on the map-only page and auto-remove expired offers
+- [ ] Add filters/overlay controls for passive/jobs/quests visibility on the map-only page
+- [ ] Expand tests (Vitest + Playwright) to cover passive verbs, continuous jobs, and quest expiry flows on the new page
+
+## Idle Village Passive Effects Tab
+
+- [ ] Create `src/balancing/config/idleVillage/passiveEffects.ts` with schema mirroring Jobs/Quests (id, label, description, icon, tone, slotId/slotTags, frequency formula, resource deltas, requirements, metadata)
+- [ ] Extend `IdleVillageConfig` types + Zod schemas to include `passiveEffects` collection
+- [ ] Build CRUD UI tab (Idle Village Config) for passive effects, reusing weight-based creator pattern
+- [ ] Expose hook/selectors that read passive effects and feed `buildSystemVerbSummary`
+- [ ] Ensure passive effects export/import via config snapshots and JSON editors
+- [ ] Add docs explaining passive config workflow (plan + README linkage)
+
 ---
 
 ## Meta

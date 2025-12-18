@@ -2,7 +2,7 @@
 
 ## Obiettivo
 Creare una nuova versione dello Spell Creator con:
-1. **Config-Driven Architecture** (come BalancerNew)
+1. **Config-Driven Architecture** (come Balancer)
 2. **Tema Arcane Tech Glass** (nuovo tema visivo)
 3. **Copia in Mockups** per reference
 4. **Parità comportamentale** con lo Spell Creator attuale (stessa logica, stessi nomi, stessi risultati a parità di input)
@@ -402,7 +402,7 @@ className="bg-[linear-gradient(rgba(99,102,241,0.03)_1px,transparent_1px),linear
 
 ## 📝 Note
 
-- Riutilizzare pattern da BalancerNew dove possibile
+- Riutilizzare pattern da Balancer dove possibile
 - FormulaEngine può essere condiviso o esteso
 - Toast system già esistente in `src/ui/balancing/Toast.tsx`
 - DndKit già configurato nel progetto

@@ -22,6 +22,24 @@ A powerful, web-based tool for designing, testing, and balancing RPG combat syst
 - **Entity Manager**: Create and save characters with custom stat blocks for testing.
 - **Idle Arena**: Watch AI‑controlled entities fight indefinitely to test long‑term balance.
 
+## 🗺️ Navigation & Layout
+
+The application uses the **FantasyLayout** sidebar (desktop) and a compact bottom bar (mobile). Current sections and entries are entirely config-driven:
+
+- **Core**
+  - `Balancer` – primary config-first balancing UI.
+  - `Stat Testing` – Monte Carlo dashboards for marginal utility & synergy heatmaps.
+  - `Spell Creation` – fantasy-themed spell editor wrapper.
+- **Idle Village**
+  - `Idle Village`, `Idle Village Config`, `Verb Detail Sandbox`, `Skill Check Lab`.
+  - Additional live tools: `Archetypes`, `War Room`, `1v1 Archetypes`, `Battlefield`, `Heroes`, `Builder`, `Grimoire`, `Roster`.
+- **Mockups**
+  - Showcase spaces such as `Gilded Observatory`, `Obsidian Sanctum`, `Aurora Workshop`, `Arcane Tech Glass`, `Aether Brass Lab`, `Quantum Scriptorium`, `Midnight Meridian`, `Seraphim Archive`, `Verdant Alloy`.
+- **System**
+  - `Tactical Lab` for experimental combat systems.
+
+On mobile, the thumb-zone nav exposes `Balancer`, `Archetypes`, `Spell Creation`, `Arena`, plus a `More` drawer that mirrors the sections above while preserving the Gilded Observatory theme.
+
 ## 🛠️ Tech Stack
 - **Frontend**: React 18, TypeScript, Vite
 - **Styling**: Tailwind CSS
