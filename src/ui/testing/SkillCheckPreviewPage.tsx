@@ -1,307 +1,39 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useBalancerConfig } from '@/balancing/hooks/useBalancerConfig';
 import { RiskVisualization } from './RiskVisualization';
-import AltVisualsV3Canvas, {
-  DEFAULT_CANVAS_HEIGHT,
-  DEFAULT_CANVAS_WIDTH,
-  MAX_STAT_VALUE,
-  deriveAltVisualsV3Stats,
-} from './AltVisualsV3Canvas';
-import AltVisualsV4Constellation, {
-  DEFAULT_V4_CANVAS_HEIGHT,
-  DEFAULT_V4_CANVAS_WIDTH,
-} from './AltVisualsV4Constellation';
-import type {
-  OutcomeZone,
-  OutcomeResult,
-  AltCardState,
-  StatRow,
-  LastOutcome,
-  Point,
-  SkinGeometry,
-  AltVisualSkin,
-} from './types';
+import AltVisualsV5Asterism from './AltVisualsV5Asterism';
+import AltVisualsV6Asterism from './AltVisualsV6Asterism';
+import AltVisualsV7PixiField from './AltVisualsV7PixiField';
+import type { OutcomeZone, OutcomeResult, StatRow, LastOutcome, Point } from './types';
 
 const CANVAS_SIZE = 300;
 const CENTER_X = CANVAS_SIZE / 2;
 const CENTER_Y = CANVAS_SIZE / 2;
 const RADIUS = 120;
-const ALT_CARD_WIDTH = 240;
-const ALT_CARD_HEIGHT = 220;
-const ALT_CARD_CENTER = { x: ALT_CARD_WIDTH / 2, y: ALT_CARD_HEIGHT / 2 };
-const ALT_CARD_SCALE = (Math.min(ALT_CARD_WIDTH, ALT_CARD_HEIGHT) * 0.42) / RADIUS;
+const ALT_VISUAL_ENTRIES = [
+  {
+    id: 'alt-v5',
+    label: 'Alt Visuals v5',
+    tagline: 'Anime Starfield · glow morbido',
+    Component: AltVisualsV5Asterism,
+  },
+  {
+    id: 'alt-v6',
+    label: 'Alt Visuals v6',
+    tagline: 'Starfield Duel · morph pentagono/stella',
+    Component: AltVisualsV6Asterism,
+  },
+  {
+    id: 'alt-v7',
+    label: 'Alt Visuals v7',
+    tagline: 'Pixi Goo Field · FX AAA',
+    Component: AltVisualsV7PixiField,
+  },
+] as const;
+type AltVisualId = (typeof ALT_VISUAL_ENTRIES)[number]['id'];
 
-const POKER_PRESET_BASE_POINTS: { x: number; y: number }[] = [
-  { x: 0, y: -1 },
-  { x: 0.28, y: -0.95 },
-  { x: 0.5, y: -0.75 },
-  { x: 0.58, y: -0.45 },
-  { x: 0.78, y: -0.18 },
-  { x: 0.85, y: 0.08 },
-  { x: 0.72, y: 0.32 },
-  { x: 0.52, y: 0.46 },
-  { x: 0.32, y: 0.55 },
-  { x: 0.24, y: 0.82 },
-  { x: 0.2, y: 1.0 },
-  { x: -0.2, y: 1.0 },
-  { x: -0.24, y: 0.82 },
-  { x: -0.32, y: 0.55 },
-  { x: -0.52, y: 0.46 },
-  { x: -0.72, y: 0.32 },
-  { x: -0.85, y: 0.08 },
-  { x: -0.78, y: -0.18 },
-  { x: -0.58, y: -0.45 },
-  { x: -0.5, y: -0.75 },
-  { x: -0.28, y: -0.95 },
-];
-
-const ALT_VISUAL_SKINS: AltVisualSkin[] = [
-  {
-    id: 'solo-triangle',
-    title: 'Linea Triangolo',
-    subtitle: '1 Stat · Prova lineare',
-    description: 'Triangolo verticale che cresce con il valore.',
-    structure: 'solo',
-    statCount: 1,
-    accent: 'from-cyan-400/30 to-blue-500/20',
-    style: 'triangle',
-  },
-  {
-    id: 'solo-flame',
-    title: 'Fiamma Radiale',
-    subtitle: '1 Stat · Skin fiamma',
-    description: 'Colpo di calore che pulsa verso l’alto.',
-    structure: 'solo',
-    statCount: 1,
-    accent: 'from-amber-400/30 to-rose-500/20',
-    style: 'flame',
-  },
-  {
-    id: 'solo-drop',
-    title: 'Goccia Prisma',
-    subtitle: '1 Stat · Skin goccia',
-    description: 'Forma simmetrica ancorata alla base.',
-    structure: 'solo',
-    statCount: 1,
-    accent: 'from-sky-400/30 to-emerald-400/20',
-    style: 'drop',
-  },
-  {
-    id: 'solo-column',
-    title: 'Colonna Dorica',
-    subtitle: '1 Stat · Skin colonna',
-    description: 'Colonna geometrica che si estende in altezza.',
-    structure: 'solo',
-    statCount: 1,
-    accent: 'from-slate-200/20 to-slate-600/20',
-    style: 'column',
-  },
-  {
-    id: 'dual-diamond',
-    title: 'Rombo Equilibrio',
-    subtitle: '2 Stat · Equilibrio',
-    description: 'Rombo che visualizza immediatamente lo sbilancio.',
-    structure: 'dual',
-    statCount: 2,
-    accent: 'from-emerald-400/30 to-cyan-500/20',
-    style: 'diamond',
-  },
-  {
-    id: 'dual-lens',
-    title: 'Lente Binaria',
-    subtitle: '2 Stat · Intersezione',
-    description: 'Intersezione morbida di due archi contrapposti.',
-    structure: 'dual',
-    statCount: 2,
-    accent: 'from-indigo-400/30 to-fuchsia-400/20',
-    style: 'lens',
-  },
-  {
-    id: 'dual-petal',
-    title: 'Petali Gemelli',
-    subtitle: '2 Stat · Petali',
-    description: 'Petali contrapposti che indicano la direzione di forza.',
-    structure: 'dual',
-    statCount: 2,
-    accent: 'from-rose-400/30 to-amber-400/20',
-    style: 'petal',
-  },
-  {
-    id: 'dual-bridge',
-    title: 'Ponte Instabile',
-    subtitle: '2 Stat · Ponte',
-    description: 'Deck centrale che mostra la tenuta del ponte.',
-    structure: 'dual',
-    statCount: 2,
-    accent: 'from-slate-400/30 to-slate-700/20',
-    style: 'bridge',
-  },
-  {
-    id: 'triple-soft',
-    title: 'Triangolo Morbido',
-    subtitle: '3 Stat · Superficie continua',
-    description: 'Triangolo smussato per prove di controllo.',
-    structure: 'triple',
-    statCount: 3,
-    accent: 'from-cyan-400/30 to-emerald-400/20',
-    style: 'soft-triangle',
-  },
-  {
-    id: 'triple-triskel',
-    title: 'Triskel Vector',
-    subtitle: '3 Stat · Triskel',
-    description: 'Tre bracci che convergono sul centro.',
-    structure: 'triple',
-    statCount: 3,
-    accent: 'from-violet-400/30 to-purple-400/20',
-    style: 'triskel',
-  },
-  {
-    id: 'triple-flower',
-    title: 'Fiore a 3 Petali',
-    subtitle: '3 Stat · Fiore',
-    description: 'Petali arrotondati che mostrano armonie o gap.',
-    structure: 'triple',
-    statCount: 3,
-    accent: 'from-rose-400/30 to-sky-400/20',
-    style: 'tri-flower',
-  },
-  {
-    id: 'quattro-flower',
-    title: 'Poker · Classic Cross',
-    subtitle: '4 Stat · Classico',
-    description: 'Croce geometrica ispirata al seme ♣️ tradizionale.',
-    structure: 'quattro',
-    statCount: 4,
-    accent: 'from-teal-400/30 to-cyan-500/20',
-    style: 'poker',
-  },
-  {
-    id: 'quattro-poker-clover',
-    title: 'Poker · Clover',
-    subtitle: '4 Stat · Quadrifoglio',
-    description: 'Quadrifoglio morbido con stelo centrale.',
-    structure: 'quattro',
-    statCount: 4,
-    accent: 'from-emerald-400/30 to-emerald-500/20',
-    style: 'poker-clover',
-  },
-  {
-    id: 'quattro-poker-club',
-    title: 'Poker · Club Glyph',
-    subtitle: '4 Stat · Trifoglio',
-    description: 'Trifoglio bombato con lobo superiore dominante.',
-    structure: 'quattro',
-    statCount: 4,
-    accent: 'from-lime-400/30 to-teal-500/20',
-    style: 'poker-club',
-  },
-  {
-    id: 'quattro-poker-preset',
-    title: 'Poker · Preset SVG',
-    subtitle: '4 Stat · Profilo disegnato',
-    description: 'Profilo importato da preset per confronto rapido.',
-    structure: 'quattro',
-    statCount: 4,
-    accent: 'from-slate-200/30 to-slate-500/20',
-    style: 'poker-preset',
-  },
-  {
-    id: 'quattro-rose',
-    title: 'Rosa dei Venti',
-    subtitle: '4 Stat · Bussola',
-    description: 'Braccia cardinali protese verso l’esterno.',
-    structure: 'quattro',
-    statCount: 4,
-    accent: 'from-blue-400/30 to-indigo-400/20',
-    style: 'wind-rose',
-  },
-  {
-    id: 'quattro-elastic',
-    title: 'Quadrato Elastico',
-    subtitle: '4 Stat · Contenitore',
-    description: 'Quadrato che si deforma lungo gli assi.',
-    structure: 'quattro',
-    statCount: 4,
-    accent: 'from-amber-400/30 to-rose-400/20',
-    style: 'elastic',
-  },
-  {
-    id: 'epic-pentagon',
-    title: 'Pentagono Epico',
-    subtitle: '5 Stat · Poligono',
-    description: 'Poligono regolare per prove epiche.',
-    structure: 'epic',
-    statCount: 5,
-    accent: 'from-cyan-400/30 to-blue-500/20',
-    style: 'pentagon',
-  },
-  {
-    id: 'epic-star',
-    title: 'Stella a 5 punte',
-    subtitle: '5 Stat · Stella',
-    description: 'Sheriff star con punte appuntite.',
-    structure: 'epic',
-    statCount: 5,
-    accent: 'from-emerald-400/30 to-lime-400/20',
-    style: 'star',
-  },
-  {
-    id: 'epic-pentaflower',
-    title: 'Pentafoglio',
-    subtitle: '5 Stat · Fiore',
-    description: 'Cinque petali armonici con nucleo centrale.',
-    structure: 'epic',
-    statCount: 5,
-    accent: 'from-fuchsia-400/30 to-purple-500/20',
-    style: 'pentaflower',
-  },
-  {
-    id: 'preview-param-rose',
-    title: 'Preview · Rosa Parametrica',
-    subtitle: 'Demo veloce',
-    description: 'Rose curve dinamiche basate su parametri configurabili.',
-    structure: 'epic',
-    statCount: 5,
-    accent: 'from-rose-400/30 via-amber-400/30 to-emerald-400/20',
-    style: 'param-rose',
-  },
-  {
-    id: 'preview-ribbon-bezier',
-    title: 'Preview · Ribbon Bezier',
-    subtitle: 'Demo veloce',
-    description: 'Nastri Bezier che intrecciano i vettori delle stats.',
-    structure: 'epic',
-    statCount: 5,
-    accent: 'from-indigo-400/30 via-cyan-400/30 to-violet-400/20',
-    style: 'ribbon-bezier',
-  },
-  {
-    id: 'preview-overlay-combo',
-    title: 'Preview · Overlay SVG',
-    subtitle: 'Demo veloce',
-    description: 'Overlay multilayer con clipPath e blend per geometrie ibride.',
-    structure: 'epic',
-    statCount: 5,
-    accent: 'from-slate-300/30 via-slate-600/20 to-slate-900/10',
-    style: 'overlay-combo',
-  },
-];
-
-function createAltCardState(id: string, profileKey: string): AltCardState {
-  return {
-    id,
-    profileKey,
-    phase: 'idle',
-    result: null,
-    zone: null,
-    value: null,
-    ballPosition: null,
-    path: [],
-    pathIndex: 0,
-    lastUpdated: Date.now()
-  };
-}
+const ALT_VIEW_MODE_STORAGE_KEY = 'skill-check-preview-alt-view';
+const VIEW_MODE_STORAGE_KEY = 'skill-check-preview-view-mode';
 
 interface RadiiSnapshot {
   safeRadius: number;
@@ -414,14 +146,6 @@ function shuffleWithRng<T>(items: T[], rng: () => number): T[] {
   return arr;
 }
 
-const createAltCardStateMap = (profileKey: string): Record<string, AltCardState> => {
-  return ALT_VISUAL_SKINS.reduce<Record<string, AltCardState>>((acc, skin) => {
-    acc[skin.id] = createAltCardState(skin.id, profileKey);
-    return acc;
-  }, {});
-};
-
-// Utility functions
 function clampPercentage(value: number, min = 0, max = 100): number {
   if (!Number.isFinite(value)) return min;
   return Math.max(min, Math.min(max, value));
@@ -432,22 +156,6 @@ function normalizeValue(value: number, fallback = 0): number {
   return Number.isFinite(clamped) ? clamped / 100 : fallback;
 }
 
-function selectStatsForSkin(stats: StatRow[], count: number): StatRow[] {
-  const sorted = [...stats].sort(
-    (a, b) => clampPercentage(b.questValue) - clampPercentage(a.questValue),
-  );
-  if (!sorted.length) return [];
-  const slice = sorted.slice(0, Math.min(count, sorted.length));
-  if (slice.length < count) {
-    const last = slice.slice(-1)[0] ?? sorted[0];
-    while (slice.length < count) {
-      slice.push(last);
-    }
-  }
-  return slice;
-}
-
-// Geometry functions
 function polygonToPointsAttr(points: Point[]): string {
   if (points.length === 0) return '';
   return points.map((p) => `${p.x},${p.y}`).join(' ');
@@ -484,100 +192,6 @@ function polygonToSmoothPathD(points: Point[], tension: number = 0.3): string {
 
   return parts.join(' ');
 }
-
-const projectPointToAltCard = (point: Point): Point => ({
-  x: ALT_CARD_CENTER.x + (point.x - CENTER_X) * ALT_CARD_SCALE,
-  y: ALT_CARD_CENTER.y + (point.y - CENTER_Y) * ALT_CARD_SCALE,
-});
-
-function buildSkinGeometry(skin: AltVisualSkin, stats: StatRow[]): SkinGeometry | null {
-  const selectedStats = selectStatsForSkin(stats, skin.statCount);
-  if (!selectedStats.length) {
-    return null;
-  }
-
-  const questValues = selectedStats.map((stat) => normalizeValue(stat.questValue));
-  const heroValues = selectedStats.map((stat) => normalizeValue(stat.heroValue));
-
-  const questBase = buildSkinPolygon(skin, questValues);
-  const heroBase = buildSkinPolygon(skin, heroValues);
-
-  if (questBase.length < 3 || heroBase.length < 3) {
-    return null;
-  }
-
-  return {
-    questBase,
-    heroBase,
-    questCard: questBase.map(projectPointToAltCard),
-    heroCard: heroBase.map(projectPointToAltCard),
-    questCardAttr: polygonToPointsAttr(questBase.map(projectPointToAltCard)),
-    questCardPath: polygonToPathD(questBase.map(projectPointToAltCard)),
-    questCardSmoothPath: polygonToSmoothPathD(questBase.map(projectPointToAltCard), 0.25),
-    heroCardPath: polygonToPathD(heroBase.map(projectPointToAltCard)),
-    heroCardSmoothPath: polygonToSmoothPathD(heroBase.map(projectPointToAltCard), 0.35),
-    projectToCard: projectPointToAltCard,
-    selectedStats,
-    maxRadius: questBase.reduce(
-      (max, point) => Math.max(max, Math.hypot(point.x - CENTER_X, point.y - CENTER_Y)),
-      0,
-    ),
-  };
-}
-
-type ShapeBuilder = (values: number[], skin?: AltVisualSkin) => Point[];
-
-const styleBuilders: Partial<Record<AltVisualSkin['style'], ShapeBuilder>> = {
-  triangle: (values) => buildTriangleSpire(values[0] ?? 0),
-  flame: (values) => buildFlamePolygon(values[0] ?? 0),
-  drop: (values) => buildDropPolygon(values[0] ?? 0),
-  column: (values) => buildColumnPolygon(values[0] ?? 0),
-  diamond: (values) => buildDiamondPolygon(values),
-  lens: (values) => buildLensPolygon(values),
-  petal: (values) => buildPetalPolygon(values),
-  bridge: (values) => buildBridgePolygon(values),
-  'soft-triangle': (values) => buildSoftTrianglePolygon(values),
-  triskel: (values) => buildTriskelPolygon(values),
-  'tri-flower': (values) => buildRosePolygon(values, 3, { wobble: 0.15, stepsMultiplier: 6 }),
-  poker: (values) => buildCrossPolygon(values),
-  'poker-clover': (values) => buildPokerCloverPolygon(values),
-  'poker-club': (values) => buildPokerClubPolygon(values),
-  'poker-preset': (values) => buildPokerPresetPolygon(values),
-  'wind-rose': (values) => buildRosePolygon(values, 4, { wobble: 0.12, stepsMultiplier: 6 }),
-  elastic: (values) => buildElasticPolygon(values),
-  pentagon: (values) => buildRadialPolygon(values, 5),
-  star: (values) => buildStarPolygon(values),
-  pentaflower: (values) => buildRosePolygon(values, 5, { wobble: 0.18, stepsMultiplier: 5 }),
-  'param-rose': (values, skin) =>
-    buildParamRosePreviewPolygon(values, (skin?.statCount ?? values.length) || 5),
-  'ribbon-bezier': (values) => buildRibbonBezierPolygon(values),
-  'overlay-combo': (values) => buildOverlayComboPolygon(values),
-};
-
-function buildSkinPolygon(skin: AltVisualSkin, values: number[]): Point[] {
-  const builder = styleBuilders[skin.style];
-  if (builder) {
-    return builder(values, skin);
-  }
-  switch (skin.structure) {
-    case 'solo':
-      return buildTriangleSpire(values[0] ?? 0);
-    case 'dual':
-      return buildDualPolygon(values);
-    case 'triple':
-      return buildRadialPolygon(values, 3);
-    case 'quattro':
-      return buildRadialPolygon(values, 4);
-    case 'epic':
-      return buildEpicPolygon(values);
-    default:
-      return buildRadialPolygon(values, Math.max(3, values.length));
-  }
-}
-
-/*********************
- * Classic Quest Logic
- *********************/
 
 function buildSingleStatTriangle(
   totalCount: number,
@@ -669,7 +283,10 @@ function buildClassicQuestPolygon(
   options: ClassicPolygonOptions,
 ): Point[] {
   const numPoints = options.numPoints ?? stats.length;
-  const baseRatio = Math.max(0.05, options.baseRatio ?? DEFAULT_CLASSIC_POLYGON_OPTIONS.baseRatio ?? 0.25);
+  const baseRatio = Math.max(
+    0.05,
+    options.baseRatio ?? DEFAULT_CLASSIC_POLYGON_OPTIONS.baseRatio ?? 0.25,
+  );
   const minRadius = RADIUS * baseRatio;
   const points: Point[] = [];
   for (let i = 0; i < Math.max(1, numPoints); i += 1) {
@@ -692,7 +309,10 @@ function buildClassicStarPolygon(
   options: ClassicPolygonOptions = {},
 ): Point[] {
   const numPoints = Math.max(3, options.numPoints ?? stats.length);
-  const valleyDepth = Math.max(0, Math.min(1, options.valleyDepth ?? DEFAULT_CLASSIC_POLYGON_OPTIONS.valleyDepth ?? 0.6));
+  const valleyDepth = Math.max(
+    0,
+    Math.min(1, options.valleyDepth ?? DEFAULT_CLASSIC_POLYGON_OPTIONS.valleyDepth ?? 0.6),
+  );
   const valleyRadius = RADIUS * (1 - valleyDepth);
   const peakAngleStep = (2 * Math.PI) / numPoints;
   const points: Point[] = [];
@@ -919,19 +539,6 @@ function buildPokerCloverPolygon(values: number[]): Point[] {
     { x: CENTER_X - stemWidth, y: stemTop },
   ];
   return [...base, ...stemPoints];
-}
-
-function arcPoints(cx: number, cy: number, radius: number, startAngle: number, endAngle: number, steps: number): Point[] {
-  const points: Point[] = [];
-  for (let i = 0; i <= steps; i += 1) {
-    const t = i / steps;
-    const angle = startAngle + (endAngle - startAngle) * t;
-    points.push({
-      x: cx + radius * Math.cos(angle),
-      y: cy + radius * Math.sin(angle),
-    });
-  }
-  return points;
 }
 
 function buildPokerClubPolygon(values: number[]): Point[] {
@@ -1411,7 +1018,21 @@ export const SkillCheckPreviewPage: React.FC = () => {
   const [deathPct, setDeathPct] = useState(15);
   const [shotPower, setShotPower] = useState(0.5);
   const [spinBias, setSpinBias] = useState(0.0);
-  const [viewMode, setViewMode] = useState<'classic' | 'alt-v2' | 'alt-v3' | 'alt-v4'>('classic');
+  const [viewMode, setViewMode] = useState<'classic' | 'alt-v6-plus'>(() => {
+    if (typeof window === 'undefined') {
+      return 'classic';
+    }
+    const stored = window.localStorage.getItem(VIEW_MODE_STORAGE_KEY);
+    return stored === 'alt-v6-plus' ? 'alt-v6-plus' : 'classic';
+  });
+  const [altViewMode, setAltViewMode] = useState<AltVisualId>(() => {
+    if (typeof window === 'undefined') {
+      return 'alt-v6';
+    }
+    const stored = window.localStorage.getItem(ALT_VIEW_MODE_STORAGE_KEY) as AltVisualId | null;
+    const valid = ALT_VISUAL_ENTRIES.find((entry) => entry.id === stored);
+    return valid?.id ?? 'alt-v6';
+  });
   const [ballPosition, setBallPosition] = useState<Point | null>(null);
   const [lastOutcome, setLastOutcome] = useState<LastOutcome | null>(null);
   const [timer, setTimer] = useState('0.0s');
@@ -1420,128 +1041,12 @@ export const SkillCheckPreviewPage: React.FC = () => {
   const ballAnimFrameRef = useRef<number | null>(null);
   const altCardAnimRefs = useRef<Record<string, number | null>>({});
 
-  const [altCardStates, setAltCardStates] = useState<Record<string, AltCardState>>(() =>
-    createAltCardStateMap('default'),
-  );
-
   const activeCount = stats.filter((s) => s.questValue > 0).length;
-
-  const altSkinEntries = useMemo(
-    () =>
-      ALT_VISUAL_SKINS.map((skin) => ({
-        skin,
-        geometry: buildSkinGeometry(skin, stats),
-      })),
-    [stats],
-  );
-
-  const geometryBySkinId = useMemo(() => {
-    const map = new Map<string, SkinGeometry>();
-    altSkinEntries.forEach((entry) => {
-      if (entry.geometry) {
-        map.set(entry.skin.id, entry.geometry);
-      }
-    });
-    return map;
-  }, [altSkinEntries]);
 
   const safePct = useMemo(() => {
     const total = clampPercentage(injuryPct) + clampPercentage(deathPct);
     return clampPercentage(100 - total);
   }, [injuryPct, deathPct]);
-
-  const profileKey = 'default';
-
-  const setAltCardState = useCallback(
-    (skinId: string, updater: (prev: AltCardState) => AltCardState) => {
-      setAltCardStates((prev) => {
-        const prevState = prev[skinId] ?? createAltCardState(skinId, profileKey);
-        const nextState = updater(prevState);
-        if (prevState === nextState) {
-          return prev;
-        }
-        return {
-          ...prev,
-          [skinId]: nextState,
-        };
-      });
-    },
-    [profileKey],
-  );
-
-  const handleLaunchClick = useCallback((skinId: string) => {
-    const geometry = geometryBySkinId.get(skinId);
-    if (!geometry) return;
-
-    const path = simulatePinballPath(
-      { x: ALT_CARD_CENTER.x, y: ALT_CARD_CENTER.y },
-      geometry.questCard,
-      { shotPower, spinBias }
-    );
-
-    setAltCardState(skinId, (prev) => ({
-      ...prev,
-      path,
-      pathIndex: 0,
-      phase: 'rolling',
-      ballPosition: path[0],
-      lastUpdated: Date.now(),
-      result: null,
-      zone: null
-    }));
-
-    let animationId: number;
-    const animate = () => {
-      setAltCardState(skinId, (prev) => {
-        if (prev.phase !== 'rolling') return prev;
-
-        const nextIndex = prev.pathIndex + 1;
-        if (nextIndex < prev.path.length) {
-          return {
-            ...prev,
-            pathIndex: nextIndex,
-            ballPosition: prev.path[nextIndex],
-            lastUpdated: Date.now()
-          };
-        } else {
-          // Animation finished, calculate outcome
-          const finalPos = prev.path[prev.path.length - 1];
-          if (!finalPos) return prev;
-
-          const dx = finalPos.x - ALT_CARD_CENTER.x;
-          const dy = finalPos.y - ALT_CARD_CENTER.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-
-          let zone: OutcomeZone = 'safe';
-          if (distance > RADIUS * 0.8) {
-            zone = 'death';
-          } else if (distance > RADIUS * 0.5) {
-            zone = 'injury';
-          }
-
-          const success = pointInPolygon(finalPos, geometry.heroCard);
-          const result: OutcomeResult = success ? 'success' : 'fail';
-
-          return {
-            ...prev,
-            phase: 'settled',
-            zone,
-            result,
-            lastUpdated: Date.now()
-          };
-        }
-      });
-
-      const currentState = altCardStates[skinId];
-      if (currentState?.phase === 'rolling') {
-        animationId = requestAnimationFrame(animate);
-        altCardAnimRefs.current[skinId] = animationId;
-      }
-    };
-
-    animationId = requestAnimationFrame(animate);
-    altCardAnimRefs.current[skinId] = animationId;
-  }, [geometryBySkinId, shotPower, spinBias, setAltCardState, altCardStates]);
 
   // Quest and Hero polygons
   const questPolygon = useMemo(() => {
@@ -1574,6 +1079,46 @@ export const SkillCheckPreviewPage: React.FC = () => {
   const heroSmoothPathD = useMemo(
     () => polygonToSmoothPathD(heroPolygon, CLASSIC_CURVE_TENSION),
     [heroPolygon],
+  );
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem(VIEW_MODE_STORAGE_KEY, viewMode);
+  }, [viewMode]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem(ALT_VIEW_MODE_STORAGE_KEY, altViewMode);
+  }, [altViewMode]);
+
+  const radii = useMemo(
+    () => computeRadiiSnapshot(questPolygon, stats, safePct, injuryPct, deathPct),
+    [questPolygon, stats, safePct, injuryPct, deathPct],
+  );
+
+  const handleStatChange = useCallback(
+    (index: number, field: keyof StatRow, raw: string) => {
+      setStats((prev) => {
+        const next = [...prev];
+        const current = next[index];
+        if (!current) return prev;
+        if (field === 'name') {
+          next[index] = { ...current, name: raw };
+          return next;
+        }
+        const parsed = raw === '' ? 0 : Number(raw);
+        const clamped = clampPercentage(parsed);
+        if (field === 'questValue') {
+          next[index] = { ...current, questValue: clamped, heroValue: clamped };
+        } else if (field === 'heroValue') {
+          next[index] = { ...current, heroValue: clamped };
+        } else {
+          next[index] = { ...current, [field]: clamped } as StatRow;
+        }
+        return next;
+      });
+    },
+    [],
   );
 
   const handleThrow = () => {
@@ -1680,17 +1225,6 @@ export const SkillCheckPreviewPage: React.FC = () => {
     ballAnimFrameRef.current = requestAnimationFrame(animateBall);
   };
 
-  const radii = useMemo(
-    () => computeRadiiSnapshot(questPolygon, stats, safePct, injuryPct, deathPct),
-    [questPolygon, stats, safePct, injuryPct, deathPct],
-  );
-
-  const handleStatChange = (index: number, field: keyof StatRow, raw: string) => {
-    setStats((prev) => {
-      const next = [...prev];
-      const current = next[index];
-      if (!current) return prev;
-      if (field === 'name') {
         next[index] = { ...current, name: raw };
         return next;
       }
@@ -1718,8 +1252,6 @@ export const SkillCheckPreviewPage: React.FC = () => {
     return `${resultLabel} + ${zoneLabel}`;
   }, [lastOutcome]);
 
-  const altVisualsV3Stats = useMemo(() => deriveAltVisualsV3Stats(stats), [stats]);
-
   return (
     <div className="p-3 md:p-4 text-ivory">
       <h1 className="text-lg md:text-xl font-cinzel tracking-[0.2em] uppercase mb-2">Skill Check Preview Lab</h1>
@@ -1730,7 +1262,7 @@ export const SkillCheckPreviewPage: React.FC = () => {
       <div className="flex flex-wrap gap-2 mb-4">
         <span className="text-[10px] uppercase tracking-[0.24em] text-slate-500 pt-1">View</span>
         <div className="bg-slate-900/70 border border-slate-800 rounded-full p-1 flex gap-1">
-          {(['classic', 'alt-v2', 'alt-v3', 'alt-v4'] as const).map((mode) => (
+          {(['classic', 'alt-v6-plus'] as const).map((mode) => (
             <button
               key={mode}
               type="button"
@@ -1741,13 +1273,7 @@ export const SkillCheckPreviewPage: React.FC = () => {
                   : 'text-slate-400 hover:text-slate-100'
               }`}
             >
-              {mode === 'classic'
-                ? 'Dispatch Polygon'
-                : mode === 'alt-v2'
-                  ? 'Alt Visuals v2'
-                  : mode === 'alt-v3'
-                    ? 'Alt Visuals v3'
-                    : 'Alt Visuals v4'}
+              {mode === 'classic' ? 'Dispatch Polygon' : 'Alt Visuals · Anime'}
             </button>
           ))}
         </div>
@@ -2019,48 +1545,34 @@ export const SkillCheckPreviewPage: React.FC = () => {
             )}
           </div>
         </div>
-      ) : viewMode === 'alt-v3' ? (
-        <div className="default-card p-6 space-y-4">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-            <div>
-              <h3 className="text-xs font-semibold uppercase tracking-[0.24em] text-amber-200">Alt Visuals v3 · Pinball Bloom</h3>
-              <p className="text-[11px] text-slate-300 max-w-xl">
-                Esperimento canvas: blob nemico dinamico, colonne che crescono e sfera che rimbalza contro la sagoma del player.
-                Le stats vengono lette automaticamente dal profilo corrente (fallback STR/DEX/INT se mancano dati).
-              </p>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[10px] text-slate-300">
-              <div className="bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-2">
-                <div className="uppercase tracking-[0.18em] text-slate-500">Stats</div>
-                <div className="text-lg font-mono text-emerald-300">{altVisualsV3Stats.length}</div>
+      ) : (
+        <div className="space-y-4">
+          <div className="default-card p-4 space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-200">
+                  Alt Visuals Anime · Modalità
+                </h3>
+                <p className="text-[11px] text-slate-400">
+                  Scegli la versione con glow FX che preferisci (stessa logica pinball, estetica diversa).
+                </p>
               </div>
-              <div className="bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-2">
-                <div className="uppercase tracking-[0.18em] text-slate-500">Canvas</div>
-                <div className="text-lg font-mono text-cyan-300">{`${DEFAULT_CANVAS_WIDTH}×${DEFAULT_CANVAS_HEIGHT}`}</div>
+              <div className="flex gap-2 bg-slate-900/70 border border-slate-800 rounded-full p-1">
+                {ALT_VISUAL_ENTRIES.map((entry) => (
+                  <button
+                    key={entry.id}
+                    type="button"
+                    onClick={() => setAltViewMode(entry.id)}
+                    className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-[0.16em] transition-all ${
+                      altViewMode === entry.id
+                        ? 'bg-cyan-400/20 text-cyan-100 border border-cyan-300/60 shadow-[0_0_12px_rgba(34,211,238,0.25)]'
+                        : 'text-slate-400 hover:text-slate-100'
+                    }`}
+                  >
+                    {entry.label}
+                  </button>
+                ))}
               </div>
-              <div className="bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-2">
-                <div className="uppercase tracking-[0.18em] text-slate-500">Max Stat</div>
-                <div className="text-lg font-mono text-rose-300">{MAX_STAT_VALUE}</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-center">
-            <AltVisualsV3Canvas stats={stats} width={DEFAULT_CANVAS_WIDTH} height={DEFAULT_CANVAS_HEIGHT} />
-          </div>
-        </div>
-      ) : viewMode === 'alt-v4' ? (
-        <div className="default-card p-6 space-y-4">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div>
-              <h3 className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-200">
-                Alt Visuals v4 · Constellation Weave
-              </h3>
-              <p className="text-[11px] text-slate-300 max-w-2xl">
-                Layer astratto che disegna la costellazione delle stats, con orbita dinamica che segue i valori medi
-                e bande concentriche legate a safe/injury/death. Funziona solo con dati del profilo corrente (fallback
-                STR/DEX/INT) per restare allineati al weight-based creator.
-              </p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-[10px] text-slate-300">
               <div className="bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-2">
@@ -2084,148 +1596,19 @@ export const SkillCheckPreviewPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex justify-center">
-            <AltVisualsV4Constellation
-              stats={stats}
-              injuryPct={injuryPct}
-              deathPct={deathPct}
-              width={DEFAULT_V4_CANVAS_WIDTH}
-              height={DEFAULT_V4_CANVAS_HEIGHT}
-            />
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          <div className="default-card p-3 space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">Alt Visuals v2 · Parametri</h3>
-                <p className="text-[10px] text-slate-400">Scegli le percentuali di rischio e il comportamento della pallina.</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-2 text-[11px]">
-              <div>
-                <label className="block font-semibold mb-0.5 text-slate-400">Injury %</label>
-                <input
-                  type="number"
-                  min={0}
-                  max={100}
-                  value={injuryPct}
-                  onChange={(e) => setInjuryPct(clampPercentage(Number(e.target.value) || 0))}
-                  className="w-full px-2 py-0.5 bg-obsidian border border-slate rounded text-ivory text-[11px]"
-                />
-              </div>
-              <div>
-                <label className="block font-semibold mb-0.5 text-slate-400">Death %</label>
-                <input
-                  type="number"
-                  min={0}
-                  max={100}
-                  value={deathPct}
-                  onChange={(e) => setDeathPct(clampPercentage(Number(e.target.value) || 0))}
-                  className="w-full px-2 py-0.5 bg-obsidian border border-slate rounded text-ivory text-[11px]"
-                />
-              </div>
-              <div>
-                <label className="block font-semibold mb-0.5 text-slate-400">Safe %</label>
-                <div className="px-2 py-0.5 bg-slate-900 border border-slate rounded text-emerald-300 text-[11px] h-[26px] flex items-center">
-                  {safePct}%
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px] border-t border-slate-800 pt-3">
-              <div>
-                <div className="flex items-center justify-between mb-0.5">
-                  <span className="font-semibold uppercase tracking-[0.12em] text-slate-300">Shot Power</span>
-                  <span className="text-slate-400">{Math.round(shotPower * 100)}%</span>
-                </div>
-                <input
-                  type="range"
-                  min={0}
-                  max={100}
-                  value={Math.round(shotPower * 100)}
-                  onChange={(e) => setShotPower(Number(e.target.value) / 100)}
-                  className="w-full accent-emerald-500"
-                />
-              </div>
-              <div>
-                <div className="flex items-center justify-between mb-0.5">
-                  <span className="font-semibold uppercase tracking-[0.12em] text-slate-300">Spin Bias</span>
-                  <span className="text-slate-400">{spinBias >= 0 ? '+' : ''}{spinBias.toFixed(2)}</span>
-                </div>
-                <input
-                  type="range"
-                  min={-100}
-                  max={100}
-                  value={Math.round(spinBias * 100)}
-                  onChange={(e) => setSpinBias(Number(e.target.value) / 100)}
-                  className="w-full accent-emerald-500"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md-grid-cols-2 xl:grid-cols-3 gap-4">
-            {ALT_VISUAL_SKINS.map((skin) => {
-              const geometry = geometryBySkinId.get(skin.id);
-              const cardState = altCardStates[skin.id];
-
+          <div className="default-card p-6 space-y-3">
+            {(() => {
+              const entry = ALT_VISUAL_ENTRIES.find((item) => item.id === altViewMode) ?? ALT_VISUAL_ENTRIES[0];
+              const VisualComponent = entry.Component;
               return (
-                <div
-                  key={skin.id}
-                  className="bg-slate-900/80 border border-slate-700/50 rounded-xl p-4 flex flex-col gap-3"
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="text-sm font-medium text-slate-200">{skin.title}</h3>
-                      <p className="text-xs text-slate-400">{skin.subtitle}</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleLaunchClick(skin.id)}
-                      disabled={cardState?.phase === 'rolling'}
-                      className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                        cardState?.phase === 'rolling'
-                          ? 'bg-slate-600/60 text-slate-300 cursor-not-allowed'
-                          : 'bg-emerald-600/80 hover:bg-emerald-500/90 text-white'
-                      }`}
-                    >
-                      {cardState?.phase === 'rolling' ? 'Lanciando...' : 'Lancia'}
-                    </button>
-                  </div>
-
-                  <div className="relative">
-                    {geometry ? (
-                      <RiskVisualization
-                        width={ALT_CARD_WIDTH}
-                        height={ALT_CARD_HEIGHT}
-                        injuryPct={injuryPct}
-                        deathPct={deathPct}
-                        questCardAttr={geometry.questCardAttr}
-                        heroCardPath={geometry.heroCardSmoothPath}
-                        ballPosition={cardState?.ballPosition}
-                      />
-                    ) : (
-                      <div className="h-48 flex items-center justify-center text-slate-500">
-                        Geometry not available
-                      </div>
-                    )}
-                  </div>
-
-                  {cardState?.phase === 'settled' && cardState.result && (
-                    <div className={`text-center py-1.5 px-3 rounded-md text-sm font-medium ${
-                      cardState.result === 'success'
-                        ? 'bg-emerald-900/50 text-emerald-200 border border-emerald-800/50'
-                        : 'bg-rose-900/50 text-rose-200 border border-rose-800/50'
-                    }`}>
-                      {cardState.result === 'success' ? 'SUCCESSO' : 'FALLIMENTO'}
-                    </div>
-                  )}
-                </div>
+                <>
+                  <p className="text-[11px] text-slate-400 text-center uppercase tracking-[0.18em]">
+                    {entry.tagline}
+                  </p>
+                  <VisualComponent stats={stats} />
+                </>
               );
-            })}
+            })()}
           </div>
         </div>
       )}

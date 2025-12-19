@@ -162,13 +162,17 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
   // Simple logical map layout with two generic slots: one inside the village
   // and one just outside the walls. Coordinates are purely logical and the UI
   // is responsible for normalising them.
+  mapLayout: {
+    pixelWidth: 1280,
+    pixelHeight: 720,
+  },
   mapSlots: {
     village_square: {
       id: 'village_square',
       label: 'Village Square',
       description: 'Central hub for simple city jobs.',
-      x: 0,
-      y: 0,
+      x: 420,
+      y: 460,
       slotTags: ['village', 'job_site', 'city'],
       isInitiallyUnlocked: true,
       icon: '★',
@@ -178,22 +182,22 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
       id: 'village_gate',
       label: 'Village Gate',
       description: 'Edge of the village, entry point to the outskirts.',
-      x: 8,
-      y: 3,
+      x: 1080,
+      y: 260,
       slotTags: ['world', 'job_site'],
       isInitiallyUnlocked: true,
-      icon: '\u21E8',
+      icon: '⇨',
       colorClass: 'text-sky-200',
     },
     village_market: {
       id: 'village_market',
       label: 'Market',
       description: 'A small trading stall inside the village walls.',
-      x: 4,
-      y: 1,
+      x: 760,
+      y: 380,
       slotTags: ['village', 'job_site', 'shop'],
       isInitiallyUnlocked: true,
-      icon: '\u25CE',
+      icon: '◎',
       colorClass: 'text-emerald-200',
     },
   },

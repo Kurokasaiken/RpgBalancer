@@ -17,13 +17,11 @@ export const SpellLibrary: React.FC = () => {
     };
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         refresh();
     }, []);
 
     useEffect(() => {
         if (spells.length > 0) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
             setSelectedSpell(prev => prev || spells[0]);
         }
     }, [spells]);

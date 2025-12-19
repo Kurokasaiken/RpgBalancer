@@ -1,9 +1,28 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+const resolveSlotForActivity = (
+  activity: ActivityDefinition,
+  mapSlotsRecord: Record<string, MapSlotDefinition>,
+): string | null => {
+  const meta = (activity.metadata ?? {}) as { mapSlotId?: string };
+  if (meta?.mapSlotId && mapSlotsRecord[meta.mapSlotId]) {
+    return meta.mapSlotId;
+  }
+  if (activity.slotTags?.length) {
+    const match = Object.values(mapSlotsRecord).find((slot) =>
+      slot.slotTags?.some((tag) => activity.slotTags?.includes(tag)),
+    );
+    if (match) return match.id;
+  }
+  return null;
+};
+
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import idleVillageMap from '@/assets/ui/idleVillage/idle-village-map.jpg';
+import { computeSlotPercentPosition, resolveMapLayout } from '@/ui/idleVillage/mapLayoutUtils';
 import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
 import {
   createVillageStateFromConfig,
   scheduleActivity,
+  type ResidentState,
   type ScheduledActivity,
   type VillageState,
 } from '@/engine/game/idleVillage/TimeEngine';
@@ -12,15 +31,21 @@ import type {
   ActivityDefinition,
   FounderPreset,
   IdleVillageConfig,
+  MapSlotDefinition,
 } from '@/balancing/config/idleVillage/types';
 import VerbCard from '@/ui/idleVillage/VerbCard';
 import {
   DEFAULT_SECONDS_PER_TIME_UNIT,
+  buildActivityBlueprintSummary,
   buildPassiveEffectSummary,
   buildQuestOfferSummary,
   buildScheduledVerbSummary,
   type VerbSummary,
 } from '@/ui/idleVillage/verbSummaries';
+import ResidentRoster from '@/ui/idleVillage/ResidentRoster';
+
+const DEFAULT_CARD_SCALE = 0.45;
+const RESIDENT_DRAG_MIME = 'application/x-idle-resident';
 
 const simpleRng = (() => {
   let seed = 12345;
@@ -30,47 +55,166 @@ const simpleRng = (() => {
   };
 })();
 
+const activityMatchesSlot = (activity: ActivityDefinition, slot: MapSlotDefinition): boolean => {
+  const meta = (activity.metadata ?? {}) as { mapSlotId?: string } | undefined;
+  if (meta?.mapSlotId && meta.mapSlotId === slot.id) {
+    return true;
+  }
+  if (!activity.slotTags?.length) return true;
+  if (!slot.slotTags?.length) return false;
+  return slot.slotTags.some((tag) => activity.slotTags?.includes(tag));
+};
+
+const validateAssignment = (params: {
+  resident: ResidentState;
+  slot: MapSlotDefinition;
+  activity: ActivityDefinition;
+  config: IdleVillageConfig;
+}):
+  | { ok: true }
+  | {
+      ok: false;
+      reason: string;
+    } => {
+  const { resident, slot, activity, config } = params;
+  if (resident.status !== 'available') {
+    return { ok: false, reason: `${resident.id} non è disponibile.` };
+  }
+
+  const meta = (activity.metadata ?? {}) as { mapSlotId?: string } | undefined;
+  const slotAllowed = activityMatchesSlot(activity, slot);
+  if (!slotAllowed) {
+    return {
+      ok: false,
+      reason: `${activity.label ?? activity.id} non è compatibile con ${slot.label}.`,
+    };
+  }
+
+  const { maxFatigueBeforeExhausted } = config.globalRules;
+  if (resident.fatigue >= maxFatigueBeforeExhausted) {
+    return {
+      ok: false,
+      reason: `${resident.id} è troppo stanco (${resident.fatigue}/${maxFatigueBeforeExhausted}).`,
+    };
+  }
+
+  if (!slot.isInitiallyUnlocked) {
+    return {
+      ok: false,
+      reason: `${slot.label} è bloccato e non accetta assegnazioni.`,
+    };
+  }
+
+  return { ok: true };
+};
+
 interface MapSlotVerbClusterProps {
-  slot: { id: string; label: string; icon?: string };
+  slotId: string;
   left: number;
   top: number;
   verbs: VerbSummary[];
+  cardScale: number;
+  isDropMode: boolean;
+  canAcceptDrop: boolean;
+  isHighlighted: boolean;
+  onDropResident: (slotId: string, residentId: string | null) => void;
 }
 
-function MapSlotVerbCluster({ slot, left, top, verbs }: MapSlotVerbClusterProps) {
+function MapSlotVerbCluster({
+  slotId,
+  left,
+  top,
+  verbs,
+  cardScale,
+  isDropMode,
+  canAcceptDrop,
+  isHighlighted,
+  onDropResident,
+}: MapSlotVerbClusterProps) {
+  const [isDragOver, setIsDragOver] = useState(false);
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    if (!isDropMode || !canAcceptDrop) return;
+    event.preventDefault();
+    if (!isDragOver) {
+      setIsDragOver(true);
+    }
+  };
+
+  const handleDragLeave = () => {
+    if (!isDropMode || !isDragOver) return;
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    if (!isDropMode || !canAcceptDrop) return;
+    event.preventDefault();
+    setIsDragOver(false);
+    const residentId =
+      event.dataTransfer.getData(RESIDENT_DRAG_MIME) || event.dataTransfer.getData('text/plain') || null;
+    onDropResident(slotId, residentId);
+  };
+
   return (
     <div
-      className="absolute -translate-x-1/2 -translate-y-full flex flex-col items-center gap-3 pointer-events-auto"
+      className={`absolute -translate-x-1/2 -translate-y-full flex flex-col items-center gap-2 pointer-events-auto transition-all duration-200 ${
+        isDropMode && canAcceptDrop ? 'drop-shadow-[0_4px_14px_rgba(251,191,36,0.25)]' : ''
+      } ${isDragOver ? 'scale-105' : ''} ${isHighlighted ? 'animate-pulse' : ''}`}
       style={{ left: `${left}%`, top: `${top}%` }}
+      onDragOver={handleDragOver}
+      onDragEnter={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      aria-dropeffect={isDropMode && canAcceptDrop ? 'copy' : undefined}
     >
-      <div className="rounded-3xl border border-slate-900/70 bg-black/40 px-3 py-2">
-        <div className="flex flex-col items-center gap-2">
-          {verbs.length === 0 ? (
-            <div className="flex flex-col items-center justify-center text-xs uppercase tracking-[0.2em] text-slate-300 px-4 py-3 min-h-44 min-w-28">
-              <span className="text-base">{slot.icon ?? '⌀'}</span>
-              <span>{slot.label}</span>
-            </div>
-          ) : (
-            verbs.map((verb) => (
-              <VerbCard
-                key={verb.key}
-                icon={verb.icon}
-                progressFraction={verb.progressFraction}
-                elapsedSeconds={verb.elapsedSeconds}
-                totalDuration={verb.totalDurationSeconds}
-                injuryPercentage={verb.injuryPercentage}
-                deathPercentage={verb.deathPercentage}
-                assignedCount={verb.assignedCount}
-                totalSlots={verb.totalSlots}
-                visualVariant={verb.visualVariant}
-                progressStyle={verb.progressStyle}
-                isInteractive={false}
-              />
-            ))
-          )}
-        </div>
+      <div className="relative flex flex-col items-center gap-2">
+        <div
+          className={`pointer-events-none absolute -inset-7 rounded-full blur-2xl transition-all duration-300 ${
+            isHighlighted ? 'opacity-70 bg-amber-200/40' : 'opacity-0'
+          }`}
+          aria-hidden
+        />
+        <div
+          className={`pointer-events-none absolute -inset-5 rounded-full blur-xl transition-all duration-200 ${
+            isDropMode && canAcceptDrop
+              ? isDragOver
+                ? 'opacity-80 scale-110 bg-amber-300/55'
+                : 'opacity-30 bg-amber-200/30'
+              : 'opacity-0'
+          }`}
+          aria-hidden
+        />
+        {isDropMode && (
+          <span
+            className={`text-[10px] uppercase tracking-[0.3em] drop-shadow-lg ${
+              canAcceptDrop ? 'text-amber-100' : 'text-slate-500'
+            }`}
+          >
+            {canAcceptDrop ? 'Drop Resident' : 'Slot non attivo'}
+          </span>
+        )}
+        {verbs.map((verb) => (
+          <div
+            key={verb.key}
+            className="origin-top relative"
+            style={{ transform: `scale(${cardScale})` }}
+          >
+            <VerbCard
+              icon={verb.icon}
+              progressFraction={verb.progressFraction}
+              elapsedSeconds={verb.elapsedSeconds}
+              totalDuration={verb.totalDurationSeconds}
+              injuryPercentage={verb.injuryPercentage}
+              deathPercentage={verb.deathPercentage}
+              assignedCount={verb.assignedCount}
+              totalSlots={verb.totalSlots}
+              visualVariant={verb.visualVariant}
+              progressStyle={verb.progressStyle}
+              isInteractive={false}
+            />
+          </div>
+        ))}
       </div>
-      <div className="text-[10px] uppercase tracking-[0.2em] text-amber-100 drop-shadow">{slot.label}</div>
     </div>
   );
 }
@@ -86,6 +230,13 @@ const IdleVillageMapPage: React.FC = () => {
   const defaultFounderPreset = useMemo(() => selectDefaultFounder(config), [config]);
   const [villageState, setVillageState] = useState<VillageState | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [cardScale, setCardScale] = useState(DEFAULT_CARD_SCALE);
+  const [isResidentDragActive, setIsResidentDragActive] = useState(false);
+  const [lastDropSlotId, setLastDropSlotId] = useState<string | null>(null);
+  const [draggingResidentId, setDraggingResidentId] = useState<string | null>(null);
+  const [assignmentFeedback, setAssignmentFeedback] = useState<string | null>(null);
+  const [highlightSlotId, setHighlightSlotId] = useState<string | null>(null);
+  const highlightTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!config) return;
@@ -179,16 +330,55 @@ const IdleVillageMapPage: React.FC = () => {
     return Object.values(config.mapSlots ?? {});
   }, [config]);
 
+  const mapLayout = useMemo(() => resolveMapLayout(config?.mapLayout), [config?.mapLayout]);
+
   const mapSlotLayout = useMemo(() => {
     if (mapSlots.length === 0) return [];
     return mapSlots.map((slot) => {
-      const normX = slot.x / 10;
-      const normY = slot.y / 10;
-      const left = 8 + normX * 80;
-      const top = 12 + normY * 55;
-      return { slot, left, top };
+      const { leftPercent, topPercent } = computeSlotPercentPosition(slot, mapLayout);
+      return { slot, left: leftPercent, top: topPercent };
     });
-  }, [mapSlots]);
+  }, [mapSlots, mapLayout]);
+
+  const availableResidents = useMemo(() => {
+    if (!villageState) return [] as ResidentState[];
+    return Object.values(villageState.residents ?? {}).filter((resident) => resident.status === 'available');
+  }, [villageState]);
+
+  const activitiesBySlot = useMemo(() => {
+    if (!config) return {} as Record<string, ActivityDefinition[]>;
+    const mapSlotsRecord = config.mapSlots ?? {};
+    const grouped: Record<string, ActivityDefinition[]> = {};
+    Object.values(config.activities ?? {}).forEach((activity) => {
+      const slotId = resolveSlotForActivity(activity, mapSlotsRecord);
+      if (!slotId) return;
+      if (!grouped[slotId]) grouped[slotId] = [];
+      grouped[slotId].push(activity);
+    });
+    return grouped;
+  }, [config]);
+
+  const canSlotAcceptDrop = useCallback(
+    (slotId: string) => {
+      return (activitiesBySlot[slotId]?.length ?? 0) > 0;
+    },
+    [activitiesBySlot],
+  );
+
+  useEffect(() => {
+    setIsResidentDragActive(false);
+    setDraggingResidentId(null);
+    setHighlightSlotId(null);
+  }, [mapLayout.pixelWidth, mapLayout.pixelHeight]);
+
+  useEffect(
+    () => () => {
+      if (highlightTimeoutRef.current !== null) {
+        window.clearTimeout(highlightTimeoutRef.current);
+      }
+    },
+    [],
+  );
 
   const secondsPerTimeUnit = config?.globalRules.secondsPerTimeUnit ?? DEFAULT_SECONDS_PER_TIME_UNIT;
   const dayLengthSetting = config?.globalRules.dayLengthInTimeUnits || 5;
@@ -284,6 +474,20 @@ const IdleVillageMapPage: React.FC = () => {
       .filter(Boolean) as VerbSummary[];
   }, [config, villageState, secondsPerTimeUnit, getResourceLabel]);
 
+  const activityBlueprintSummaries = useMemo(() => {
+    if (!config) return [] as VerbSummary[];
+    const mapSlotsRecord = config.mapSlots ?? {};
+    return Object.values(config.activities ?? {})
+      .map((activity) =>
+        buildActivityBlueprintSummary({
+          activity,
+          mapSlots: mapSlotsRecord,
+          resourceLabeler: getResourceLabel,
+        }),
+      )
+      .filter(Boolean) as VerbSummary[];
+  }, [config, getResourceLabel]);
+
   const verbsBySlot = useMemo(() => {
     const grouped: Record<string, VerbSummary[]> = {};
     const addSummary = (summary: VerbSummary) => {
@@ -293,8 +497,9 @@ const IdleVillageMapPage: React.FC = () => {
     };
     scheduledVerbSummaries.forEach(addSummary);
     passiveEffectSummaries.forEach(addSummary);
+    activityBlueprintSummaries.forEach(addSummary);
     return grouped;
-  }, [scheduledVerbSummaries, passiveEffectSummaries]);
+  }, [scheduledVerbSummaries, passiveEffectSummaries, activityBlueprintSummaries]);
 
   const questOffersBySlot = useMemo(() => {
     const grouped: Record<string, VerbSummary[]> = {};
@@ -306,9 +511,111 @@ const IdleVillageMapPage: React.FC = () => {
     return grouped;
   }, [questOfferSummaries]);
 
+  const handleResidentDragStart = useCallback(
+    (residentId: string) => (event: React.DragEvent<HTMLButtonElement>) => {
+      event.dataTransfer.setData(RESIDENT_DRAG_MIME, residentId);
+      event.dataTransfer.setData('text/plain', residentId);
+      event.dataTransfer.effectAllowed = 'copy';
+      setIsResidentDragActive(true);
+      setDraggingResidentId(residentId);
+      setAssignmentFeedback(null);
+    },
+    [],
+  );
+
+  const handleResidentDragEnd = useCallback(() => {
+    setIsResidentDragActive(false);
+    setDraggingResidentId(null);
+  }, []);
+
+  const handleDropResident = useCallback(
+    (slotId: string, residentId: string | null) => {
+      setIsResidentDragActive(false);
+      setDraggingResidentId(null);
+      setLastDropSlotId(slotId);
+      if (!residentId) {
+        setAssignmentFeedback('Seleziona un residente valido da trascinare.');
+        return;
+      }
+      setVillageState((prev) => {
+        if (!prev || !config) return prev;
+        const resident = prev.residents[residentId];
+        if (!resident) {
+          setAssignmentFeedback(`Residente ${residentId} non trovato.`);
+          return prev;
+        }
+
+        const slotDef = config.mapSlots?.[slotId];
+        if (!slotDef) {
+          setAssignmentFeedback(`Slot ${slotId} non definito in config.`);
+          return prev;
+        }
+
+        const candidateActivities = activitiesBySlot[slotId] ?? [];
+        if (candidateActivities.length === 0) {
+          setAssignmentFeedback('Nessuna activity compatibile per questo slot.');
+          return prev;
+        }
+
+        const selectedActivity =
+          candidateActivities.find((activity) => activityMatchesSlot(activity, slotDef)) ??
+          candidateActivities[0];
+
+        const validation = validateAssignment({
+          resident,
+          slot: slotDef,
+          activity: selectedActivity,
+          config,
+        });
+
+        if (!validation.ok) {
+          setAssignmentFeedback(validation.reason);
+          return prev;
+        }
+
+        const { state: nextState } = scheduleActivity(
+          { config, rng: simpleRng },
+          prev,
+          {
+            activityId: selectedActivity.id,
+            characterIds: [resident.id],
+            slotId,
+          },
+        );
+        setAssignmentFeedback(`${resident.id} assegnato a ${selectedActivity.label ?? selectedActivity.id}.`);
+        setHighlightSlotId(slotId);
+        if (highlightTimeoutRef.current !== null) {
+          window.clearTimeout(highlightTimeoutRef.current);
+        }
+        highlightTimeoutRef.current = window.setTimeout(() => {
+          setHighlightSlotId((current) => (current === slotId ? null : current));
+        }, 2200);
+        return nextState;
+      });
+    },
+    [activitiesBySlot, config],
+  );
+
   if (!config || !villageState) {
     return <div className="p-4 text-ivory">Loading Idle Village map...</div>;
   }
+
+  const dayNightSettings = config.globalRules.dayNightCycle;
+  const dayTimeUnits = Math.max(1, dayNightSettings?.dayTimeUnits ?? dayLengthSetting);
+  const nightTimeUnits = Math.max(
+    1,
+    dayNightSettings?.nightTimeUnits ?? Math.max(1, Math.round(dayLengthSetting / 2)),
+  );
+  const totalCycleUnits = dayTimeUnits + nightTimeUnits;
+  const currentCycleUnit = totalCycleUnits > 0 ? villageState.currentTime % totalCycleUnits : 0;
+  const cycleProgressFraction =
+    totalCycleUnits > 0 ? currentCycleUnit / totalCycleUnits : 0;
+  const isDayPhase = currentCycleUnit < dayTimeUnits;
+  const cycleElapsedSeconds = currentCycleUnit * secondsPerTimeUnit;
+  const cycleTotalSeconds = totalCycleUnits * secondsPerTimeUnit;
+  const cycleIcon = isPlaying ? (isDayPhase ? '☀️' : '🌙') : '❚❚';
+  const cycleVariant = isDayPhase ? 'solar' : 'amethyst';
+  const cyclePhaseLabel = isDayPhase ? 'Fase giorno' : 'Fase notte';
 
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top,#020617_0,#020617_55%,#000000_100%)] text-ivory flex items-center">
@@ -324,15 +631,66 @@ const IdleVillageMapPage: React.FC = () => {
         />
         <div className="absolute inset-0 bg-obsidian/45" aria-hidden="true" />
 
-        <div className="absolute top-4 left-4 z-20 inline-flex items-center gap-3 rounded-full bg-black/80 border border-gold/40 shadow-md px-3 py-1.5 text-[10px]">
-          <button
-            type="button"
-            onClick={() => setIsPlaying((prev) => !prev)}
-            className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-900/90 border border-slate-600 text-ivory hover:bg-slate-800"
-          >
-            {isPlaying ? '❚❚' : '►'}
-          </button>
-          <div className="text-[9px] text-slate-300">t={villageState.currentTime}</div>
+        <div className="absolute top-4 left-4 right-4 z-20 flex flex-col gap-3 max-w-5xl">
+          <div className="flex flex-row gap-3 items-start">
+            <div className="flex flex-col items-center gap-1">
+              <VerbCard
+                icon={cycleIcon}
+                progressFraction={cycleProgressFraction}
+                elapsedSeconds={cycleElapsedSeconds}
+                totalDuration={cycleTotalSeconds}
+                injuryPercentage={0}
+                deathPercentage={0}
+                assignedCount={isPlaying ? 1 : 0}
+                totalSlots={1}
+                visualVariant={cycleVariant}
+                progressStyle="border"
+                isInteractive
+                onClick={() => setIsPlaying((prev) => !prev)}
+              />
+              <div className="text-[9px] uppercase tracking-[0.2em] text-slate-200 text-center">
+                {cyclePhaseLabel}
+                <span className="ml-1 text-slate-400 lowercase">
+                  (t={villageState.currentTime})
+                </span>
+              </div>
+              <div className="text-[9px] text-slate-300">
+                {isPlaying ? 'Tap per mettere in pausa' : 'Tap per riprendere'}
+              </div>
+            </div>
+            <div className="flex flex-col gap-3 rounded-2xl bg-black/80 border border-gold/40 shadow-md px-4 py-3 text-[10px] min-w-52">
+              <label className="flex flex-col gap-1 uppercase tracking-[0.2em] text-slate-300">
+                Card Size ({Math.round(cardScale * 100)}%)
+                <input
+                  type="range"
+                  min="0.1"
+                  max="1.2"
+                  step="0.05"
+                  value={cardScale}
+                  onChange={(e) => setCardScale(Number(e.target.value))}
+                  className="accent-gold"
+                />
+              </label>
+              {lastDropSlotId && (
+                <span className="text-[10px] text-emerald-300">
+                  Ultimo drop: {config.mapSlots?.[lastDropSlotId]?.label ?? lastDropSlotId}
+                </span>
+              )}
+              {!isResidentDragActive && availableResidents.length === 0 && (
+                <span className="text-[10px] text-slate-400">
+                  Nessun residente libero: attendi il completamento di una card.
+                </span>
+              )}
+            </div>
+          </div>
+          <ResidentRoster
+            residents={availableResidents}
+            activeResidentId={draggingResidentId}
+            onDragStart={handleResidentDragStart}
+            onDragEnd={handleResidentDragEnd}
+            assignmentFeedback={assignmentFeedback}
+            maxFatigueBeforeExhausted={config.globalRules.maxFatigueBeforeExhausted}
+          />
         </div>
 
         <div className="absolute inset-0 z-10 pointer-events-none">
@@ -340,13 +698,21 @@ const IdleVillageMapPage: React.FC = () => {
             const slotVerbs = verbsBySlot[slot.id] ?? [];
             const slotOffers = questOffersBySlot[slot.id] ?? [];
             const combined = [...slotVerbs, ...slotOffers];
+            if (combined.length === 0) {
+              return null;
+            }
             return (
               <MapSlotVerbCluster
                 key={slot.id}
-                slot={{ id: slot.id, label: slot.label, icon: slot.icon }}
+                slotId={slot.id}
                 left={left}
                 top={top}
                 verbs={combined}
+                cardScale={cardScale}
+                isDropMode={isResidentDragActive}
+                canAcceptDrop={canSlotAcceptDrop(slot.id)}
+                isHighlighted={highlightSlotId === slot.id}
+                onDropResident={handleDropResident}
               />
             );
           })}

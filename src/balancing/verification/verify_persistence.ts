@@ -19,7 +19,7 @@ const localStorageMock = (() => {
     };
 })();
 
-// @ts-ignore
+// @ts-expect-error localStorage mock for Node.js verification script
 global.localStorage = localStorageMock;
 
 // Test 1: Save and Load

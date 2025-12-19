@@ -31,6 +31,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@tailwindcss/postcss": "^4.1.17",
     "lucide-react": "^0.555.0",
+    "pixi.js": "^8.14.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-is": "^19.2.0",

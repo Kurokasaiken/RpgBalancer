@@ -88,7 +88,7 @@ export function computeSWIForMatchup(
     }
 
     // Apply perturbation (+deltaPercent)
-    // @ts-ignore - we know it's a number
+    // @ts-expect-error - we know it's a number
     targetStats[statKey] = currentValue * (1 + deltaPercent);
 
     // Simulate with perturbed stats

@@ -24,7 +24,7 @@ const localStorageMock = (() => {
     };
 })();
 
-// @ts-ignore
+// @ts-expect-error localStorage mock for Vitest environment
 global.localStorage = localStorageMock;
 
 describe('ConfigManager', () => {

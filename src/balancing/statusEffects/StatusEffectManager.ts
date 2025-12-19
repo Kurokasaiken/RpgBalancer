@@ -169,7 +169,7 @@ export class StatusEffectManager {
                     break;
 
                 case 'buff':
-                case 'debuff':
+                case 'debuff': {
                     const modEffect = effect as StatModifierEffect;
                     // Accumulate stat changes
                     Object.entries(modEffect.statChanges).forEach(([stat, value]) => {
@@ -182,16 +182,19 @@ export class StatusEffectManager {
                         }
                     });
                     break;
+                }
 
-                case 'dot':
+                case 'dot': {
                     const dotEffect = effect as OverTimeEffect;
                     result.damageReceived += dotEffect.tickDamage;
                     break;
+                }
 
-                case 'hot':
+                case 'hot': {
                     const hotEffect = effect as OverTimeEffect;
                     result.healingReceived += hotEffect.tickDamage;
                     break;
+                }
 
                 case 'shield':
                     // Shield handled separately (absorbed damage)

@@ -81,6 +81,11 @@ export const DeathRulesSchema = z.object({
   starvationDeathChancePerDay: z.number().min(0).max(1).optional(),
 });
 
+export const MapLayoutDefinitionSchema = z.object({
+  pixelWidth: z.number().positive(),
+  pixelHeight: z.number().positive(),
+});
+
 export const MapSlotDefinitionSchema = z.object({
   id: z.string().min(1),
   label: z.string().min(1),
@@ -158,6 +163,7 @@ export const IdleVillageConfigSchema = z.object({
   resources: z.record(z.string(), ResourceDefinitionSchema),
   activities: z.record(z.string(), ActivityDefinitionSchema),
   mapSlots: z.record(z.string(), MapSlotDefinitionSchema),
+  mapLayout: MapLayoutDefinitionSchema.optional(),
   buildings: z.record(z.string(), BuildingDefinitionSchema),
   founders: z.record(z.string(), FounderPresetSchema),
   variance: ActivityVarianceConfigSchema,

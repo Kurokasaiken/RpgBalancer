@@ -51,7 +51,7 @@ class IOManager {
     private async saveJSON(path: string, data: any): Promise<void> {
         if (this.isBrowser) {
             // Browser: use localStorage
-            const key = `1v1_${path.replace(/[\/\.]/g, '_')}`;
+            const key = `1v1_${path.replace(/[/.]/g, '_')}`;
             localStorage.setItem(key, JSON.stringify(data));
         } else {
             // Node: use fs (would need to import fs)
@@ -67,7 +67,7 @@ class IOManager {
     private async loadJSON(path: string): Promise<any | null> {
         if (this.isBrowser) {
             // Browser: use localStorage
-            const key = `1v1_${path.replace(/[\/\.]/g, '_')}`;
+            const key = `1v1_${path.replace(/[/.]/g, '_')}`;
             const data = localStorage.getItem(key);
             return data ? JSON.parse(data) : null;
         } else {
@@ -83,7 +83,7 @@ class IOManager {
     private async listFiles(directory: string): Promise<string[]> {
         if (this.isBrowser) {
             // Browser: list matching localStorage keys
-            const prefix = `1v1_${directory.replace(/[\/\.]/g, '_')}`;
+            const prefix = `1v1_${directory.replace(/[/.]/g, '_')}`;
             const keys: string[] = [];
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);

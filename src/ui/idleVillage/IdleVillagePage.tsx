@@ -8,6 +8,7 @@ import React, { useState, useCallback, useMemo, useEffect, useRef, startTransiti
 import { DndContext, DragOverlay, useDraggable, useDroppable, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core';
 import { Pause, Play } from 'lucide-react';
 import idleVillageMap from '@/assets/ui/idleVillage/idle-village-map.jpg';
+import { computeSlotPercentPosition, resolveMapLayout } from '@/ui/idleVillage/mapLayoutUtils';
 import { useVillageStateStore } from './useVillageStateStore';
 import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
 import { ToastContainer, useToast } from '../balancing/Toast';
@@ -754,18 +755,15 @@ const IdleVillagePage: React.FC = () => {
     }[];
   }, [config]);
 
+  const mapLayout = useMemo(() => resolveMapLayout(config?.mapLayout), [config?.mapLayout]);
+
   const mapSlotLayout = useMemo(() => {
     if (mapSlots.length === 0) return [] as { slot: (typeof mapSlots)[number]; left: number; top: number }[];
     return mapSlots.map((slot) => {
-      // x/y are treated as logical coordinates on a 0-10 grid and converted to percentages.
-      const normX = slot.x / 10;
-      const normY = slot.y / 10;
-      // Keep markers within a comfortable frame over the map background and away from the bottom jobs panel.
-      const left = 8 + normX * 80;
-      const top = 12 + normY * 55;
-      return { slot, left, top };
+      const { leftPercent, topPercent } = computeSlotPercentPosition(slot, mapLayout);
+      return { slot, left: leftPercent, top: topPercent };
     });
-  }, [mapSlots]);
+  }, [mapSlots, mapLayout]);
 
   const questOffers = useMemo(() => Object.values(villageState.questOffers ?? {}), [villageState.questOffers]);
 

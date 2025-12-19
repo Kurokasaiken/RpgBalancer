@@ -159,6 +159,7 @@ export class IdleVillageConfigStore {
         ...DEFAULT_IDLE_VILLAGE_CONFIG.mapSlots,
         ...config.mapSlots,
       },
+      mapLayout: config.mapLayout ?? DEFAULT_IDLE_VILLAGE_CONFIG.mapLayout,
       buildings: {
         ...DEFAULT_IDLE_VILLAGE_CONFIG.buildings,
         ...config.buildings,

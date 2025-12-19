@@ -24,7 +24,7 @@ const localStorageMock = (() => {
     };
 })();
 
-// @ts-ignore
+// @ts-expect-error localStorage mock for Vitest environment
 global.localStorage = localStorageMock;
 
 describe('BalanceConfigStore', () => {
@@ -64,7 +64,7 @@ describe('BalanceConfigStore', () => {
         };
 
         BalanceConfigStore.save('global', config, 'Test save');
-        const loaded = BalanceConfigStore.load('global');
+        const loaded = BalanceConfigStore.load<BalanceConfig>('global');
 
         expect(loaded).not.toBeNull();
         expect(loaded?.weights.hp).toBe(1.0);

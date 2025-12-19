@@ -164,7 +164,6 @@ export function OverlayModeProvider({ children, initialSettings }: OverlayModePr
   );
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export function useOverlayMode(): { state: OverlayState; actions: OverlayActions } {
   const context = useContext(OverlayModeContext);
   if (!context) {

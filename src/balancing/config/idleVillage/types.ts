@@ -218,6 +218,11 @@ export interface PassiveEffectDefinition {
   metadata?: Record<string, unknown>;
 }
 
+export interface MapLayoutDefinition {
+  pixelWidth: number;
+  pixelHeight: number;
+}
+
 export interface MapSlotDefinition {
   id: string;
   label: string;
@@ -268,6 +273,10 @@ export interface GlobalRules {
   maxFatigueBeforeExhausted: number;
   fatigueRecoveryPerDay: number;
   dayLengthInTimeUnits: number;
+  dayNightCycle?: {
+    dayTimeUnits: number;
+    nightTimeUnits: number;
+  };
   /**
    * Optional conversion factor for UI timers (seconds shown in VerbCard timers).
    * Defaults to 60 seconds per village time unit if omitted.
@@ -362,6 +371,7 @@ export interface IdleVillageConfig {
   resources: Record<string, ResourceDefinition>;
   activities: Record<string, ActivityDefinition>;
   mapSlots: Record<string, MapSlotDefinition>;
+  mapLayout?: MapLayoutDefinition;
   passiveEffects: Record<string, PassiveEffectDefinition>;
   buildings: Record<string, import('./buildings').BuildingDefinition>;
   founders: Record<string, FounderPreset>;

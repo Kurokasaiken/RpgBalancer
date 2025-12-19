@@ -1,3 +1,22 @@
+const resolveActivitySlotId = (
+  activity: ActivityDefinition,
+  mapSlots: Record<string, MapSlotDefinition>,
+): { slotId: string | null; slotIcon?: string } => {
+  const meta = (activity.metadata ?? {}) as { mapSlotId?: string } | undefined;
+  if (meta?.mapSlotId && mapSlots[meta.mapSlotId]) {
+    return { slotId: meta.mapSlotId, slotIcon: mapSlots[meta.mapSlotId]?.icon };
+  }
+  if (activity.slotTags && activity.slotTags.length > 0) {
+    const match = Object.values(mapSlots).find((slot) =>
+      slot.slotTags?.some((tag) => activity.slotTags?.includes(tag)),
+    );
+    if (match) {
+      return { slotId: match.id, slotIcon: match.icon };
+    }
+  }
+  return { slotId: null };
+};
+
 import type { ReactNode } from 'react';
 import type { ActivityDefinition, MapSlotDefinition, PassiveEffectDefinition } from '@/balancing/config/idleVillage/types';
 import type { QuestOffer, ScheduledActivity } from '@/engine/game/idleVillage/TimeEngine';
@@ -7,7 +26,7 @@ export const DEFAULT_SECONDS_PER_TIME_UNIT = 60;
 
 const clamp01 = (value: number) => Math.max(0, Math.min(1, value));
 
-export type VerbSummarySource = 'scheduled' | 'questOffer' | 'system' | 'completed' | 'passive';
+export type VerbSummarySource = 'scheduled' | 'questOffer' | 'system' | 'completed' | 'passive' | 'blueprint';
 
 export interface VerbSummary {
   key: string;
@@ -36,6 +55,51 @@ export interface VerbSummary {
   scheduled?: ScheduledActivity;
   offer?: QuestOffer;
   notes?: string | null;
+}
+
+export function buildActivityBlueprintSummary(params: {
+  activity: ActivityDefinition;
+  mapSlots: Record<string, MapSlotDefinition>;
+  resourceLabeler: (id: string) => string;
+}): VerbSummary | null {
+  const { activity, mapSlots, resourceLabeler } = params;
+  const { slotId, slotIcon } = resolveActivitySlotId(activity, mapSlots);
+  if (!slotId) return null;
+
+  const tone = deriveTone(activity);
+  const isQuest = activity.tags?.includes('quest') ?? false;
+  const isJob = activity.tags?.includes('job') ?? false;
+  const rewardsLabel = formatRewardLabel(activity.rewards, resourceLabeler);
+  const { injury, death } = deriveRisk(activity);
+  const maxCrew =
+    ((activity.metadata ?? {}) as { maxCrewSize?: number })?.maxCrewSize ?? (activity.slotTags?.length ? activity.slotTags.length : 1);
+
+  return {
+    key: `activity_blueprint_${activity.id}`,
+    source: 'blueprint',
+    slotId,
+    label: activity.label ?? activity.id,
+    kindLabel: isQuest ? 'Quest' : isJob ? 'Job' : 'Activity',
+    isQuest,
+    isJob,
+    icon: deriveIcon(activity, slotIcon),
+    visualVariant: deriveVisualVariant(activity),
+    progressStyle: deriveProgressStyle(activity),
+    progressFraction: 0,
+    elapsedSeconds: 0,
+    totalDurationSeconds: 0,
+    remainingSeconds: 0,
+    injuryPercentage: injury,
+    deathPercentage: death,
+    assignedCount: 0,
+    totalSlots: maxCrew,
+    rewardLabel: rewardsLabel,
+    tone,
+    deadlineLabel: null,
+    assigneeNames: [],
+    riskLabel: createRiskLabel(injury, death),
+    notes: activity.description ?? null,
+  };
 }
 
 const toneToVariantMap: Record<VerbTone, VerbVisualVariant> = {

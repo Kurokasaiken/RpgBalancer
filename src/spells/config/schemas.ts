@@ -5,7 +5,7 @@ import { z } from 'zod';
 const idSchema = z
   .string()
   .min(1, 'ID obbligatorio')
-  .regex(/^[a-zA-Z0-9_\-]+$/, 'Usa solo lettere, numeri, _ e -');
+  .regex(/^[a-zA-Z0-9_-]+$/, 'Usa solo lettere, numeri, _ e -');
 
 const nonEmptyString = z.string().min(1, 'Campo obbligatorio');
 

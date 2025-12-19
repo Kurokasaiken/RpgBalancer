@@ -35,6 +35,7 @@ const NAV_SECTIONS = [
         title: 'Idle Village',
         items: [
             { id: 'idleVillage', label: 'Idle Village', icon: '🏡' },
+            { id: 'idleVillageMap', label: 'Idle Village Map (New)', icon: '🗺️' },
             { id: 'idleVillageConfig', label: 'Idle Village Config', icon: '⚙️' },
             { id: 'verbDetailSandbox', label: 'Verb Detail Sandbox', icon: '🜂' },
             { id: 'skillCheckPreview', label: 'Skill Check Lab', icon: '🎯' },

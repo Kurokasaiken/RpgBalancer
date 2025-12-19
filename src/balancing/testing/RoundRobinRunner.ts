@@ -75,7 +75,6 @@ function toEntityStats(stats: StatBlock, name: string) {
  * to produce an NxN matchup matrix and per-stat efficiency scores.
  */
 export class RoundRobinRunner {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   constructor(_config: BalancerConfig) {}
 
   /**
