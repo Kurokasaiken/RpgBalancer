@@ -3,6 +3,8 @@
 // No hardcoded job/quest kinds or enums – everything is tag/ID based
 // so new content can be added purely via config/UI.
 
+import type { AppNavTabId } from '@/shared/navigation/navConfig';
+
 export interface ResourceDefinition {
   id: string;
   label: string;
@@ -95,6 +97,11 @@ export interface ActivityDefinition {
 
   /** Optional base XP formula, typically a function of `level` */
   baseXpFormula?: string;
+  /**
+   * Optional stat requirement that every assigned resident must satisfy.
+   * Used by scheduling UIs to validate drops.
+   */
+  statRequirement?: StatRequirement;
 
   /**
    * Optional whitelists for variance categories.
@@ -266,6 +273,11 @@ export interface FounderPreset {
    * to make founders stronger/weaker per difficulty.
    */
   statAdjustmentFormula?: string;
+  /**
+   * Optional curated stat tags copied onto the spawned resident.
+   * Falls back to `[difficultyTag]` when omitted.
+   */
+  statTags?: string[];
 }
 
 export interface GlobalRules {
@@ -366,6 +378,10 @@ export interface OverlayWidget {
   config?: Record<string, unknown>;
 }
 
+export interface IdleVillageUiPreferences {
+  defaultAppTabId?: AppNavTabId;
+}
+
 export interface IdleVillageConfig {
   version: string;
   resources: Record<string, ResourceDefinition>;
@@ -378,6 +394,7 @@ export interface IdleVillageConfig {
   variance: ActivityVarianceConfig;
   globalRules: GlobalRules;
   overlaySettings: OverlaySettings;
+  uiPreferences?: IdleVillageUiPreferences;
 }
 
 export interface IdleVillageConfigSnapshot {
@@ -385,3 +402,4 @@ export interface IdleVillageConfigSnapshot {
   config: IdleVillageConfig;
   description: string;
 }
+

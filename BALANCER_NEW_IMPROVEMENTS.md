@@ -25,7 +25,7 @@
 - **Result**: Icons and titles now perfectly aligned
 
 ### 4. Import/Export Test Suite
-- **File**: `src/ui/balancing/BalancerNew.test.ts`
+- **File**: `src/ui/balancing/Balancer.test.ts`
 - **Tests**: 14 comprehensive tests covering:
   - Export as valid JSON
   - Formula preservation (isDerived + formula)
@@ -73,7 +73,7 @@
    - Connect button at line ~184
 
 3. **Verify Export/Import**
-   - Run: `npm run test -- BalancerNew.test.ts`
+   - Run: `npm run test -- Balancer.test.ts`
    - Check: Formulas preserved in round-trip
 
 #### Phase 2: UX Fixes (1.5h)
@@ -127,7 +127,7 @@
 |------|---------|--------|
 | `balancer-export.json` | Created with full config | ✅ |
 | `ConfigurableStat.tsx` | Lock icon + alignment | ✅ |
-| `BalancerNew.test.ts` | Created test suite | ✅ |
+| `Balancer.test.ts` | Created test suite | ✅ |
 | `ConfigurableCard.tsx` | Pending button reorder | ⏳ |
 | `types.ts` | Pending isLocked property | ⏳ |
 | `BalancerConfigStore.ts` | Verify formula preservation | ⏳ |
@@ -162,7 +162,7 @@ feat: Add Balancer export JSON and improve UI
 - Created balancer-export.json with all default config (formulas included)
 - Changed lock icon from 🔐 to 🔒/🔓 (locked/unlocked states)
 - Improved stat title alignment with icon
-- Added BalancerNew.test.ts with import/export test suite
+- Added Balancer.test.ts with import/export test suite
 ```
 
 ## 🎯 Success Criteria

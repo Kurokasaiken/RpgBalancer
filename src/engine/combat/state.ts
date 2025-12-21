@@ -1,10 +1,27 @@
 import { Entity } from '../core/entity';
 import type { AnyStatusEffect } from '../../balancing/statusEffects/StatusEffectManager';
 
+export type CombatLogEventType =
+    | 'info'
+    | 'attack'
+    | 'damage'
+    | 'heal'
+    | 'death'
+    | 'buff'
+    | 'debuff'
+    | 'dot'
+    | 'hot'
+    | 'stun'
+    | 'initiative'
+    | 'status';
+
 export interface CombatLogEntry {
     turn: number;
     message: string;
-    type: 'info' | 'attack' | 'damage' | 'heal' | 'death' | 'buff' | 'debuff' | 'dot' | 'hot' | 'stun';
+    type: CombatLogEventType;
+    actorId?: string;
+    targetId?: string;
+    payload?: Record<string, number | string | boolean>;
 }
 
 export interface CombatState {
@@ -26,6 +43,7 @@ export interface CombatState {
         crits: Map<string, number>;
         statusApplied: Map<string, number>;
         turnsStunned: Map<string, number>;
+        timelineFrames: Map<number, CombatLogEntry[]>;
     };
 }
 
@@ -40,7 +58,8 @@ export function createCombatState(teamA: Entity[], teamB: Entity[]): CombatState
         hits: new Map<string, number>(),
         crits: new Map<string, number>(),
         statusApplied: new Map<string, number>(),
-        turnsStunned: new Map<string, number>()
+        turnsStunned: new Map<string, number>(),
+        timelineFrames: new Map<number, CombatLogEntry[]>()
     };
 
     [...teamA, ...teamB].forEach(entity => {

@@ -1,8 +1,19 @@
 # Combat System & Encounter Design Specification
 
-**Version:** 2.0  
-**Last Updated:** 2025-12-01  
-**Status:** Design Complete, Implementation Planned
+**Auditor:** Gemini Antigravity  
+**Date:** 2025-11-23  
+**Next Review:** After test implementation
+
+---
+
+## 8. 1v1 Combat Viewer (Upcoming)
+
+- **Objective:** Provide an interactive page that replays deterministic duels (and future multi-unit skirmishes) using existing combat engine outputs.
+- **Data Flow:** `CombatSimulator` emits enriched `turnByTurnLog` + per-entity metrics that `useCombatPlayback` (new hook) will normalize into animation frames (@see `docs/plans/1v1_combat_viewer_plan.md`).
+- **Presentation:** Config-driven fighter sprites (idle/attack/hit states), timeline scrubber for turn/phase navigation, and split-pane telemetry (TTK, DPS, hit/crit %, status uptime).
+- **Extensibility:** Layout logic treats `teamA`/`teamB` as arrays from the start, unlocking >1 entity per side without refactors; targeting overlays and multi-target actions will reuse the same frame schema.
+- **Design Guardrails:** No hardcoded stats or sprites—pull everything from balancing config and archetype presets; animations only react to state transitions to keep simulation logic centralized.
+ Planned
 
 ---
 
@@ -452,6 +463,25 @@ interface Buff {
 - Players cannot choose drops, must adapt to what they find
 - Spell synergies discovered through experimentation
 - Some encounters become impossible with wrong drops → roguelike failure state
+
+---
+
+### 8.5 Combat Viewer Sprite Registry (Phase 6, Visual Mock)
+
+Added in Phase 6 to connect archetype templates to sprite metadata for the 1v1 combat viewer visual mockup.
+- **Purpose:** map archetype tags → vector sprite sets (`idle`, `windup`, `attack`, `hit`, `defeated`, `statusFx`) plus FX assets (trail, slash, shield, onHit).
+- **Palette Tokens:** align with Gilded Observatory colors (obsidian base, gilded rim, teal accent) to keep viewer visuals consistent with the rest of the UI ecosystem.
+- **Usage Contract:**
+  - Visual layers call `getCombatSpriteByTags(archetype.tags)` to resolve the default sprite set.
+  - Archetype templates can override sprite ids via future config fields; until then tag matching provides sensible defaults.
+  - Timeline animator reads `durationMs` from sprite entries to keep idle/attack loops in sync with `mapFrameToAnimations`.
+- **Next Steps:** wire sprite id references into archetype definitions and expose registry data through `useCombatPlayback` frames so the viewer can render LoL-style 2D vector avatars.
+
+#### 8.5.1 Archetype Sprite Persistence
+
+- `ArchetypeTemplate` now supports an optional `spriteId` field. When provided, this acts as a hard binding to a sprite entry in `COMBAT_SPRITE_REGISTRY`.
+- Sprite metadata flows from registry → archetype template → `EntityStats` → `Entity` instances → combat timeline snapshots. This ensures any UI layer (React, exporter, QA tooling) receives the same authoritative sprite id + palette without re-deriving it.
+- `resolveSpriteForArchetype` helper centralizes the fallback logic: explicit `spriteId` beats tag-based inference; tag matching reuses `getCombatSpriteByTags`.
 
 ---
 

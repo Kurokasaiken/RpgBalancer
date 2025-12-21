@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useBalancerConfig } from '@/balancing/hooks/useBalancerConfig';
-import { RiskVisualization } from './RiskVisualization';
+
 import AltVisualsV5Asterism from './AltVisualsV5Asterism';
 import AltVisualsV6Asterism from './AltVisualsV6Asterism';
 import AltVisualsV7PixiField from './AltVisualsV7PixiField';
@@ -255,7 +255,7 @@ function buildStatWedge(
   return { tip, baseLeft, baseRight };
 }
 
-const clampValue = (value: number, min = 0.05): number => Math.max(min, value);
+
 
 interface ClassicPolygonOptions {
   baseRatio?: number;
@@ -391,6 +391,7 @@ function buildClassicAdaptivePolygon(
   });
 }
 
+/*
 function buildTriangleSpire(value: number): Point[] {
   const heightRatio = Math.max(0.05, value);
   const topY = CENTER_Y - heightRatio * (RADIUS * 0.95);
@@ -795,6 +796,7 @@ function buildEpicPolygon(values: number[]): Point[] {
   }
   return points;
 }
+*/
 
 // Pinball simulation
 interface PinballOptions {
@@ -1027,11 +1029,11 @@ export const SkillCheckPreviewPage: React.FC = () => {
   });
   const [altViewMode, setAltViewMode] = useState<AltVisualId>(() => {
     if (typeof window === 'undefined') {
-      return 'alt-v6';
+      return 'alt-v7';
     }
     const stored = window.localStorage.getItem(ALT_VIEW_MODE_STORAGE_KEY) as AltVisualId | null;
     const valid = ALT_VISUAL_ENTRIES.find((entry) => entry.id === stored);
-    return valid?.id ?? 'alt-v6';
+    return valid?.id ?? 'alt-v7';
   });
   const [ballPosition, setBallPosition] = useState<Point | null>(null);
   const [lastOutcome, setLastOutcome] = useState<LastOutcome | null>(null);
@@ -1039,7 +1041,7 @@ export const SkillCheckPreviewPage: React.FC = () => {
   const [log, setLog] = useState<string[]>([]);
 
   const ballAnimFrameRef = useRef<number | null>(null);
-  const altCardAnimRefs = useRef<Record<string, number | null>>({});
+
 
   const activeCount = stats.filter((s) => s.questValue > 0).length;
 
@@ -1225,22 +1227,6 @@ export const SkillCheckPreviewPage: React.FC = () => {
     ballAnimFrameRef.current = requestAnimationFrame(animateBall);
   };
 
-        next[index] = { ...current, name: raw };
-        return next;
-      }
-      const parsed = raw === '' ? 0 : Number(raw);
-      const clamped = clampPercentage(parsed);
-      if (field === 'questValue') {
-        next[index] = { ...current, questValue: clamped, heroValue: clamped };
-      } else if (field === 'heroValue') {
-        next[index] = { ...current, heroValue: clamped };
-      } else {
-        next[index] = { ...current, [field]: clamped } as StatRow;
-      }
-      return next;
-    });
-  };
-
   const outcomeLabel = useMemo(() => {
     if (!lastOutcome) return 'Nessun tiro effettuato.';
     const { result, zone } = lastOutcome;
@@ -1267,11 +1253,10 @@ export const SkillCheckPreviewPage: React.FC = () => {
               key={mode}
               type="button"
               onClick={() => setViewMode(mode)}
-              className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-[0.16em] transition-all ${
-                viewMode === mode
-                  ? 'bg-emerald-400/20 text-emerald-200 border border-emerald-400/50 shadow-[0_0_10px_rgba(16,185,129,0.25)]'
-                  : 'text-slate-400 hover:text-slate-100'
-              }`}
+              className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-[0.16em] transition-all ${viewMode === mode
+                ? 'bg-emerald-400/20 text-emerald-200 border border-emerald-400/50 shadow-[0_0_10px_rgba(16,185,129,0.25)]'
+                : 'text-slate-400 hover:text-slate-100'
+                }`}
             >
               {mode === 'classic' ? 'Dispatch Polygon' : 'Alt Visuals · Anime'}
             </button>
@@ -1563,11 +1548,10 @@ export const SkillCheckPreviewPage: React.FC = () => {
                     key={entry.id}
                     type="button"
                     onClick={() => setAltViewMode(entry.id)}
-                    className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-[0.16em] transition-all ${
-                      altViewMode === entry.id
-                        ? 'bg-cyan-400/20 text-cyan-100 border border-cyan-300/60 shadow-[0_0_12px_rgba(34,211,238,0.25)]'
-                        : 'text-slate-400 hover:text-slate-100'
-                    }`}
+                    className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-[0.16em] transition-all ${altViewMode === entry.id
+                      ? 'bg-cyan-400/20 text-cyan-100 border border-cyan-300/60 shadow-[0_0_12px_rgba(34,211,238,0.25)]'
+                      : 'text-slate-400 hover:text-slate-100'
+                      }`}
                   >
                     {entry.label}
                   </button>

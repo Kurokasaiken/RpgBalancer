@@ -238,6 +238,41 @@
 
 ---
 
+## Phase 6: Visual Mock & Animation Layer (NEW)
+
+See [combat_viewer_visual_mock_plan.md](combat_viewer_visual_mock_plan.md) for full breakdown.
+
+### 6.1 Research & Moodboard
+- [ ] Compile LoL/TFT/Capybara reference board (`docs/moodboards/combat_viewer_visual/`)
+- [ ] Document palette + animation principles
+
+### 6.2 Sprite & FX Config
+- [x] Create `combatSprites.ts` registry with archetype-tag mapping
+- [x] Provide placeholder SVG assets for required states (`idle`, `attack`, etc.)
+- [x] Wire sprite ids into BalancerConfig/archetype templates + playback pipeline (actors now expose `spriteId` + palette)
+
+### 6.3 Timeline → Animation Mapping
+- [ ] Implement `mapFrameToAnimations`
+- [ ] Enrich combat log payloads (crit, dodge, shield flags) **(sprite metadata already present in frames for future animator)**
+- [ ] Add fixtures/tests for mapping determinism
+
+### 6.4 Arena Stage & Layout
+- [ ] Build `CombatStage` component + config-driven slot definitions
+- [ ] Implement vector background layers + dynamic lighting
+- [ ] Support >1 fighter per side using responsive grid
+
+### 6.5 Animator & HUD
+- [ ] Create `useCombatAnimator` hook and `CombatAvatar` component
+- [ ] Implement FX components (slash, shield, hit sparks)
+- [ ] Replace timeline controls with HUD/phase badges + damage heatmap
+
+### 6.6 QA & Export
+- [ ] Snapshot + visual regression tests for animator & stage
+- [ ] Add export buttons (SVG frame, JSON timeline)
+- [ ] Update COMBAT_SYSTEM_DESIGN + viewer docs with visual layer details
+
+---
+
 ## PROGRESS TRACKING
 
 **Already Complete:** 10 tasks ✅  

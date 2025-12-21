@@ -70,6 +70,96 @@ export default {
         warning: '#c9a227',
         error: '#a85c5c',
         info: '#8db3a5',
+
+        // === FANTASY CARD SYSTEM ===
+        // Card surface colors (glassmorphic)
+        card: {
+          base: 'rgba(4,6,13,0.85)',
+          elevated: 'rgba(10,15,28,0.9)',
+          border: 'rgba(255,255,255,0.08)',
+          'border-active': 'rgba(201,162,39,0.6)',
+          'border-valid': 'rgba(16,185,129,0.6)',
+          'border-invalid': 'rgba(239,68,68,0.6)',
+        },
+
+        // VerbCard variant color tokens
+        verb: {
+          // Azure variant (cyan/blue - default)
+          azure: {
+            glow: 'rgba(14,165,233,0.4)',
+            accent: 'rgba(129,140,248,0.35)',
+            ring: 'rgba(34,211,238,0.4)',
+            orb: '#091222',
+            'orb-via': '#050a12',
+            'orb-to': '#03060a',
+            icon: '#e0f2fe',
+            timer: '#a5f3fc',
+            halo: 'rgba(14,165,233,0.55)',
+            'halo-accent': 'rgba(129,140,248,0.55)',
+          },
+          // Ember variant (orange/red - danger/combat)
+          ember: {
+            glow: 'rgba(251,146,60,0.4)',
+            accent: 'rgba(244,63,94,0.35)',
+            ring: 'rgba(251,146,60,0.4)',
+            orb: '#1b0b05',
+            'orb-via': '#2b0b08',
+            'orb-to': '#140403',
+            icon: '#fde68a',
+            timer: '#fed7aa',
+            halo: 'rgba(251,146,60,0.55)',
+            'halo-accent': 'rgba(244,63,94,0.5)',
+          },
+          // Jade variant (green/teal - nature/healing)
+          jade: {
+            glow: 'rgba(16,185,129,0.4)',
+            accent: 'rgba(45,212,191,0.35)',
+            ring: 'rgba(52,211,153,0.4)',
+            orb: '#04140f',
+            'orb-via': '#03201a',
+            'orb-to': '#020a07',
+            icon: '#a7f3d0',
+            timer: '#99f6e4',
+            halo: 'rgba(16,185,129,0.55)',
+            'halo-accent': 'rgba(45,212,191,0.45)',
+          },
+          // Amethyst variant (purple/violet - arcane/magic)
+          amethyst: {
+            glow: 'rgba(167,139,250,0.35)',
+            accent: 'rgba(129,140,248,0.35)',
+            ring: 'rgba(192,132,252,0.4)',
+            orb: '#120320',
+            'orb-via': '#1d0c26',
+            'orb-to': '#08010f',
+            icon: '#e9d5ff',
+            timer: '#f5d0fe',
+            halo: 'rgba(167,139,250,0.55)',
+            'halo-accent': 'rgba(129,140,248,0.5)',
+          },
+          // Solar variant (gold/amber - special/quest)
+          solar: {
+            glow: 'rgba(250,204,21,0.35)',
+            accent: 'rgba(251,191,36,0.3)',
+            ring: 'rgba(253,224,71,0.4)',
+            orb: '#251803',
+            'orb-via': '#2d1a04',
+            'orb-to': '#120901',
+            icon: '#fef3c7',
+            timer: '#fde68a',
+            halo: 'rgba(251,191,36,0.55)',
+            'halo-accent': 'rgba(251,146,60,0.45)',
+          },
+        },
+
+        // SkillCheck zone colors
+        zone: {
+          safe: 'rgba(16,185,129,0.5)',
+          'safe-glow': 'rgba(52,211,153,0.3)',
+          injury: 'rgba(251,191,36,0.5)',
+          'injury-glow': 'rgba(253,224,71,0.3)',
+          death: 'rgba(239,68,68,0.5)',
+          'death-glow': 'rgba(248,113,113,0.3)',
+        },
       },
       fontFamily: {
         display: ['Cinzel', 'serif'],
@@ -158,6 +248,58 @@ export default {
         'fast': '150ms',
         'DEFAULT': '300ms',
         'slow': '500ms',
+      },
+      // Fantasy animations
+      animation: {
+        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'glow-breathe': 'glowBreathe 3s ease-in-out infinite',
+        'float': 'float 6s ease-in-out infinite',
+        'shimmer': 'shimmer 2.5s linear infinite',
+        'card-enter': 'cardEnter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+        'column-drop': 'columnDrop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)',
+        'shake': 'shake 0.3s ease-in-out',
+        'ring-pulse': 'ringPulse 2s ease-in-out infinite',
+      },
+      keyframes: {
+        glowBreathe: {
+          '0%, 100%': { opacity: '0.6', transform: 'scale(1)' },
+          '50%': { opacity: '1', transform: 'scale(1.05)' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-8px)' },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
+        cardEnter: {
+          '0%': { opacity: '0', transform: 'scale(0.9) translateY(10px)' },
+          '100%': { opacity: '1', transform: 'scale(1) translateY(0)' },
+        },
+        columnDrop: {
+          '0%': { opacity: '0', transform: 'translateY(-100px) scale(0.8)' },
+          '60%': { opacity: '1', transform: 'translateY(10px) scale(1.02)' },
+          '100%': { transform: 'translateY(0) scale(1)' },
+        },
+        shake: {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-2px)' },
+          '20%, 40%, 60%, 80%': { transform: 'translateX(2px)' },
+        },
+        ringPulse: {
+          '0%, 100%': { boxShadow: '0 0 0 0 rgba(201, 162, 39, 0.4)' },
+          '50%': { boxShadow: '0 0 0 8px rgba(201, 162, 39, 0)' },
+        },
+      },
+      // Enhanced background images for fantasy cards
+      backgroundImage: {
+        'card-texture': "url('/ui/fantasy/card-background.png')",
+        'card-border': "url('/ui/fantasy/card-border-gold.png')",
+        'card-glow': "url('/ui/fantasy/card-glow.png')",
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-conic': 'conic-gradient(var(--tw-gradient-stops))',
+        'shimmer-gold': 'linear-gradient(90deg, transparent 0%, rgba(201,162,39,0.3) 50%, transparent 100%)',
       },
     },
   },

@@ -399,6 +399,34 @@ Expand combat system from 1v1 to full tactical grid-based multi-unit combat:
 
 ---
 
+### 🗺️ **PHASE 12: Idle Incremental RPG (Vertical Slice Progress)**
+
+**Status:** 🔄 In Progress  
+**Latest Progress (2025-12-20):**
+
+- ✅ Resident roster drag/drop ready: `ResidentRoster` exposes drag handles, fatigue badges, and integrates with the new validation helpers.
+- ✅ Map slot drop validation & feedback: `IdleVillageMapPage` + `MapSlotVerbCluster` enforce slot compatibility, stat requirements, fatigue thresholds, and locked-slot rules with localized copy.
+- ✅ VerbCard refactor adopted on the map: scheduled jobs/quests and quest offers render via `buildScheduledVerbSummary`; drop halo/“Drop Resident” affordances polished.
+- ✅ Deterministic debug controls: `window.__idleVillageControls` (play/pause/advance/assign/getState/getConfig) surfaced for automated QA and Playwright flows.
+- ✅ Config-first mocks: `IdleVillageConfig` now ships sample `statRequirement` + founder `statTags` to exercise validation paths.
+
+**Next Steps:**
+1. Replace the legacy “Jobs & Quests in progress” HUD with compact summary rows that reuse `VerbSummary`.
+2. Surface passive/system verbs (hunger, upkeep) and quest deadlines on the map per `idle_village_map_only_plan.md`.
+3. Add Playwright regression (“assign → advance time → verify reward/resource deltas”) leveraging the debug controls.
+
+**Linked Plan:** [Idle Village VerbCard Refactor](plans/idle_village_verbcard_refactor_plan.md)  
+**Plan Status Snapshot:**  
+- Phase A (Data & Helpers): ✅ A.1/A.2 finished (helpers + scheduled summaries). Quest offer/system builders + grouped selectors still pending.  
+- Phase B (Map Slot Clusters): ✅ Implemented `MapSlotVerbCluster` with drop validation + slot highlights.  
+- Phase C (Compact HUD): ⏳ Not started — legacy HUD still present.  
+- Phase D (Quest Offer UX polish): ⏳ Pending (risk badges/CTA on HUD).  
+- Phase E (Testing & Docs): ⏳ Pending Vitest + Playwright updates.  
+
+Linked artifacts: `docs/plans/idle_village_tasks.md`, `docs/plans/idle_village_verbcard_refactor_plan.md`, `docs/plans/idle_village_map_only_plan.md`.
+
+---
+
 ### 🔥 **PHASE 10: Config-Driven Balancer (ACTIVE)**
 
 **Status:** 📋 In Progress (dopo fix UI)  

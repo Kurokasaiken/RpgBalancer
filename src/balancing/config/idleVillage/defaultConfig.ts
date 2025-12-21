@@ -59,6 +59,11 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
       level: 1,
       dangerRating: 1,
       durationFormula: '1',
+      statRequirement: {
+        label: 'Discipline + (Edge | Lantern)',
+        allOf: ['discipline'],
+        anyOf: ['edge', 'lantern'],
+      },
       // Simple deterministic rewards; fully configurable from the Activities tab.
       rewards: [
         { resourceId: 'gold', amountFormula: '5' },
@@ -83,6 +88,11 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
       level: 1,
       dangerRating: 2,
       durationFormula: '5',
+      statRequirement: {
+        label: 'Lantern Tracker',
+        allOf: ['lantern'],
+        noneOf: ['frailty'],
+      },
       rewards: [
         { resourceId: 'xp', amountFormula: '3' },
         { resourceId: 'materials', amountFormula: '1' },
@@ -102,6 +112,10 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
       level: 1,
       dangerRating: 0,
       durationFormula: '2',
+      statRequirement: {
+        label: 'Reason Focus',
+        allOf: ['reason'],
+      },
       rewards: [
         { resourceId: 'xp', amountFormula: '4' },
       ],
@@ -121,6 +135,11 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
       level: 1,
       dangerRating: 2,
       durationFormula: '3',
+      statRequirement: {
+        label: 'Edge Veteran',
+        allOf: ['edge'],
+        anyOf: ['discipline', 'moth'],
+      },
       // Quest rewards are explicit XP resource; QuestResolver also reports xpAwarded.
       rewards: [
         { resourceId: 'xp', amountFormula: '6' },
@@ -149,6 +168,10 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
       level: 1,
       dangerRating: 0,
       durationFormula: '1',
+      statRequirement: {
+        label: 'Lantern or Reason',
+        anyOf: ['lantern', 'reason'],
+      },
       // No direct rewards; buying food is handled by the Market UI using
       // baseFoodPriceInGold from globalRules.
       rewards: [],
@@ -267,6 +290,7 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
       archetypeId: 'hybrid_allrounder',
       difficultyTag: 'easy',
       statAdjustmentFormula: 'value * 1.1',
+      statTags: ['lantern', 'reason', 'discipline'],
     },
     founder_standard: {
       id: 'founder_standard',
@@ -275,6 +299,7 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
       archetypeId: 'tank_warden',
       difficultyTag: 'standard',
       statAdjustmentFormula: 'value',
+      statTags: ['edge', 'discipline'],
     },
     founder_hard: {
       id: 'founder_hard',
@@ -283,6 +308,7 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
       archetypeId: 'dps_berserker',
       difficultyTag: 'hard',
       statAdjustmentFormula: 'value * 0.85',
+      statTags: ['edge', 'moth'],
     },
   },
 
@@ -442,5 +468,8 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
     ],
     autoHideTimeoutSeconds: 0,
     showSystemTrayIcon: true,
+  },
+  uiPreferences: {
+    defaultAppTabId: 'skillCheckPreview',
   },
 };

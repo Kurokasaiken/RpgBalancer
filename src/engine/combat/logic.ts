@@ -1,4 +1,4 @@
-import type { CombatState } from './state';
+import type { CombatState, CombatLogEntry } from './state';
 import { HitChanceModule } from '../../balancing/modules/hitchance';
 import { MitigationModule } from '../../balancing/modules/mitigation';
 import { CriticalModule } from '../../balancing/modules/critical';
@@ -6,7 +6,7 @@ import { SustainModule } from '../../balancing/modules/sustain';
 import { StatusEffectManager, StatusEffectFactory } from '../../balancing/statusEffects/StatusEffectManager';
 import { InitiativeModule } from '../../balancing/modules/initiative';
 import type { EffectedCharacter } from '../../balancing/statusEffects/StatusEffectManager';
-import type { RNG } from '../../balancing/simulation/types';
+import type { RNG, CombatPhaseEvent } from '../../balancing/simulation/types';
 import { DEFAULT_STATS } from '../../balancing/types';
 
 // ... (inside resolveCombatRound)
@@ -18,9 +18,32 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
     if (state.isFinished) return state;
 
     const effectManager = new StatusEffectManager();
+    const pushLog = (entry: Omit<CombatLogEntry, 'turn'> & { turn?: number }) => {
+        const logEntry: CombatLogEntry = {
+            turn: entry.turn ?? state.turn,
+            ...entry
+        };
+        state.log.push(logEntry);
+
+        const turnBucket = state.metrics.timelineFrames.get(logEntry.turn) || [];
+        turnBucket.push(logEntry);
+        state.metrics.timelineFrames.set(logEntry.turn, turnBucket);
+    };
+
+    const phasePayload = (
+        phase: CombatPhaseEvent['phase'],
+        extra: Record<string, string | number | boolean> = {}
+    ) => ({
+        phase,
+        ...extra
+    });
 
     state.turn++;
-    state.log.push({ turn: state.turn, message: `--- Turn ${state.turn} ---`, type: 'info' });
+    pushLog({
+        message: `--- Turn ${state.turn} ---`,
+        type: 'info',
+        payload: phasePayload('prep', { event: 'turnStart' })
+    });
 
     // Collect all living entities
     const allEntities = [
@@ -41,10 +64,15 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
 
             if (actualHeal > 0) {
                 entity.currentHp += actualHeal;
-                state.log.push({
-                    turn: state.turn,
+                pushLog({
                     message: `${entity.name} regenerates ${actualHeal.toFixed(1)} HP (${entity.currentHp.toFixed(0)}/${entity.statBlock.hp})`,
-                    type: 'heal'
+                    type: 'heal',
+                    actorId: entity.id,
+                    payload: {
+                        amount: Number(actualHeal.toFixed(2)),
+                        source: 'regen',
+                        phase: 'prep'
+                    }
                 });
             }
         }
@@ -68,20 +96,28 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
         // Apply DoT damage
         if (result.damageReceived > 0) {
             entity.takeDamage(result.damageReceived);
-            state.log.push({
-                turn: state.turn,
+            pushLog({
                 message: `${entity.name} takes ${result.damageReceived.toFixed(1)} damage from effects`,
-                type: 'dot'
+                type: 'dot',
+                targetId: entity.id,
+                payload: {
+                    amount: Number(result.damageReceived.toFixed(2)),
+                    phase: 'prep'
+                }
             });
         }
 
         // Apply HoT healing
         if (result.healingReceived > 0) {
             entity.heal(result.healingReceived);
-            state.log.push({
-                turn: state.turn,
+            pushLog({
                 message: `${entity.name} heals ${result.healingReceived.toFixed(1)} HP from effects`,
-                type: 'hot'
+                type: 'hot',
+                actorId: entity.id,
+                payload: {
+                    amount: Number(result.healingReceived.toFixed(2)),
+                    phase: 'prep'
+                }
             });
         }
 
@@ -110,13 +146,13 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
     });
 
     // Log initiative rolls
-    state.log.push({
-        turn: state.turn,
+    pushLog({
         message: `Initiative Order: ${initiativeRolls.map(r => {
             const name = allEntities.find(e => e.entity.id === r.characterId)?.entity.name || r.characterId;
             return `${name} (${r.totalInitiative.toFixed(1)})`;
         }).join(', ')}`,
-        type: 'info'
+        type: 'initiative',
+        payload: phasePayload('initiative')
     });
 
     // Sort entities based on initiative rolls
@@ -136,7 +172,11 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
         if (livingEnemies.length === 0) {
             state.isFinished = true;
             state.winner = team === 'A' ? 'teamA' : 'teamB';
-            state.log.push({ turn: state.turn, message: `Team ${team} wins!`, type: 'info' });
+            pushLog({
+                message: `Team ${team} wins!`,
+                type: 'info',
+                payload: { winner: team }
+            });
             return state;
         }
 
@@ -145,7 +185,12 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
         const isStunned = currentEffects.some(e => e.type === 'stun');
 
         if (isStunned) {
-            state.log.push({ turn: state.turn, message: `${entity.name} is stunned and cannot act!`, type: 'info' });
+            pushLog({
+                message: `${entity.name} is stunned and cannot act!`,
+                type: 'stun',
+                actorId: entity.id,
+                payload: phasePayload('action', { effect: 'stun' })
+            });
             state.metrics.turnsStunned.set(entity.id, (state.metrics.turnsStunned.get(entity.id) || 0) + 1);
             continue;
         }
@@ -189,7 +234,6 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
                             : StatusEffectFactory.createDebuff(statChanges, spell.eco || 1, spell.name, entity.name);
 
                         // Apply to target (Debuff) or Self (Buff)
-                        // Usually buffs are self, debuffs are enemy.
                         const targetEntity = spell.type === 'buff' ? entity : target;
 
                         // We need to get the EffectedCharacter adapter for the target
@@ -202,15 +246,25 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
                         };
 
                         effectManager.applyEffect(targetAdapter, effect);
-                        state.metrics.statusApplied.set(entity.id, (state.metrics.statusApplied.get(entity.id) || 0) + 1);
+                        state.metrics.statusApplied.set(
+                            entity.id,
+                            (state.metrics.statusApplied.get(entity.id) || 0) + 1
+                        );
 
                         // Update state
                         state.entityEffects.set(targetEntity.id, targetAdapter.statusEffects);
 
-                        state.log.push({
-                            turn: state.turn,
-                            message: `${entity.name} casts ${spell.name} on ${targetEntity.name} (${spell.type === 'buff' ? 'Buff' : 'Debuff'} ${spell.targetStat} by ${spell.effect}%)`,
-                            type: spell.type
+                        pushLog({
+                            message: `${entity.name} casts ${spell.name} on ${targetEntity.name}`,
+                            type: spell.type,
+                            actorId: entity.id,
+                            targetId: targetEntity.id,
+                            payload: {
+                                spell: spell.name,
+                                stat: spell.targetStat || '',
+                                effect: spell.effect,
+                                phase: 'action'
+                            }
                         });
                     }
                 }
@@ -220,12 +274,9 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
         if (spellCast) continue; // Skip basic attack if spell was cast
 
         // Perform Attack
-
-        // Perform Attack
         let totalDamage = 0;
-        // The `isHit` variable is declared here and used later in the `if (isHit)` block.
-        // The `isHit` inside the `if (entity.statBlock && target.statBlock)` block is a separate, block-scoped variable.
-        const isHit = true; // Default to true for legacy
+        let attackLanded = true;
+        let isCritical = false;
 
         // --- STAT BLOCK LOGIC (Balancing Lab) ---
         if (entity.statBlock && target.statBlock) {
@@ -261,15 +312,23 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
             // 1. Hit Chance
             const hitChance = HitChanceModule.calculateHitChance(attackerStats.txc, defenderStats.evasion);
             const hitRoll = rng() * 100;
-            const isHit = hitRoll <= hitChance;
+            attackLanded = hitRoll <= hitChance;
 
             state.metrics.attacks.set(entity.id, (state.metrics.attacks.get(entity.id) || 0) + 1);
 
-            if (!isHit) {
-                state.log.push({
-                    turn: state.turn,
-                    message: `${entity.name} misses ${target.name} (Chance: ${hitChance.toFixed(0)}%, Roll: ${hitRoll.toFixed(0)})`,
-                    type: 'info'
+            if (!attackLanded) {
+                pushLog({
+                    message: `${entity.name} misses ${target.name}`,
+                    type: 'attack',
+                    actorId: entity.id,
+                    targetId: target.id,
+                    payload: {
+                        result: 'miss',
+                        chance: Number(hitChance.toFixed(2)),
+                        roll: Number(hitRoll.toFixed(2)),
+                        phase: 'action',
+                        crit: false
+                    }
                 });
                 // Continue to next entity instead of returning from function
                 continue;
@@ -278,7 +337,6 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
             // 2. Critical Hits
             // Logic always runs. If user wants "no crits", they should set chance to 0.
             // "Deactivated" module just means it's a fixed global rule, not dynamic.
-            let isCritical = false;
             let rawDamage = buffedDamage; // Use buffed damage!
 
             const critRoll = rng() * 100;
@@ -286,7 +344,12 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
 
             if (isCritical) {
                 rawDamage = CriticalModule.calculateCriticalDamage(buffedDamage, attackerStats.critMult);
-                state.log.push({ turn: state.turn, message: `${entity.name} CRITS!`, type: 'info' });
+                pushLog({
+                    message: `${entity.name} CRITS!`,
+                    type: 'info',
+                    actorId: entity.id,
+                    payload: phasePayload('action', { crit: true })
+                });
                 state.metrics.crits.set(entity.id, (state.metrics.crits.get(entity.id) || 0) + 1);
             }
 
@@ -302,9 +365,7 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
             );
 
             totalDamage = Math.round(finalDamage);
-        }
-        // --- LEGACY LOGIC (RPG Attributes) ---
-        else {
+        } else {
             // Calculate Damage
             // Base damage + Weapon damage + Random variance (0.9 - 1.1)
             const baseDmg = entity.derivedStats.attackPower;
@@ -323,7 +384,7 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
             totalDamage = Math.max(1, totalDamage - target.derivedStats.defense);
         }
 
-        if (isHit) {
+        if (attackLanded) {
             state.metrics.hits.set(entity.id, (state.metrics.hits.get(entity.id) || 0) + 1);
 
             // ========== SHIELDS: Absorb Damage First ==========
@@ -333,10 +394,9 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
 
             // Filter for shields
             const shields = targetEffectsList.filter(e => e.type === 'shield') as any[]; // Cast to any to access shieldAmount
+            let absorbedTotal = 0;
 
             if (shields.length > 0) {
-                let absorbedTotal = 0;
-
                 for (const shield of shields) {
                     if (damageToHp <= 0) break;
 
@@ -351,10 +411,14 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
                 state.entityEffects.set(target.id, activeEffects);
 
                 if (absorbedTotal > 0) {
-                    state.log.push({
-                        turn: state.turn,
+                    pushLog({
                         message: `${target.name}'s shield absorbs ${absorbedTotal.toFixed(0)} damage!`,
-                        type: 'info'
+                        type: 'info',
+                        actorId: target.id,
+                        payload: {
+                            shieldAbsorb: absorbedTotal,
+                            phase: 'action'
+                        }
                     });
                 }
             }
@@ -362,10 +426,19 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
             // Apply remaining damage to HP
             target.takeDamage(Math.floor(damageToHp));
 
-            state.log.push({
-                turn: state.turn,
-                message: `${entity.name} attacks ${target.name} for ${Math.floor(totalDamage)} damage. (${target.currentHp}/${target.derivedStats.maxHp} HP left)`,
-                type: 'attack'
+            pushLog({
+                message: `${entity.name} attacks ${target.name} for ${Math.floor(totalDamage)} damage.`,
+                type: 'attack',
+                actorId: entity.id,
+                targetId: target.id,
+                payload: {
+                    damage: totalDamage,
+                    hpRemaining: target.currentHp,
+                    result: 'hit',
+                    phase: 'action',
+                    crit: isCritical,
+                    shieldAbsorb: totalDamage - Math.floor(damageToHp)
+                }
             });
 
             // ========== SUSTAIN: Apply Lifesteal After Damage ==========
@@ -383,16 +456,27 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
 
                 if (actualHeal > 0) {
                     entity.currentHp += actualHeal;
-                    state.log.push({
-                        turn: state.turn,
-                        message: `${entity.name} lifesteals ${actualHeal.toFixed(1)} HP (${entity.currentHp.toFixed(0)}/${entity.statBlock.hp})`,
-                        type: 'heal'
+                    pushLog({
+                        message: `${entity.name} lifesteals ${actualHeal.toFixed(1)} HP`,
+                        type: 'heal',
+                        actorId: entity.id,
+                        payload: {
+                            amount: Number(actualHeal.toFixed(2)),
+                            source: 'lifesteal',
+                            phase: 'resolution'
+                        }
                     });
                 }
             }
 
             if (!target.isAlive()) {
-                state.log.push({ turn: state.turn, message: `${target.name} dies!`, type: 'death' });
+                pushLog({
+                    message: `${target.name} dies!`,
+                    type: 'death',
+                    actorId: entity.id,
+                    targetId: target.id,
+                    payload: phasePayload('resolution', { killer: entity.id })
+                });
             }
         }
     }
@@ -404,15 +488,27 @@ export function resolveCombatRound(state: CombatState, rng: RNG): CombatState {
     if (!teamAAlive && !teamBAlive) {
         state.isFinished = true;
         state.winner = 'draw';
-        state.log.push({ turn: state.turn, message: `Draw!`, type: 'info' });
+        pushLog({
+            message: `Draw!`,
+            type: 'info',
+            payload: { winner: 'draw' }
+        });
     } else if (!teamAAlive) {
         state.isFinished = true;
         state.winner = 'teamB';
-        state.log.push({ turn: state.turn, message: `Team B wins!`, type: 'info' });
+        pushLog({
+            message: `Team B wins!`,
+            type: 'info',
+            payload: { winner: 'teamB' }
+        });
     } else if (!teamBAlive) {
         state.isFinished = true;
         state.winner = 'teamA';
-        state.log.push({ turn: state.turn, message: `Team A wins!`, type: 'info' });
+        pushLog({
+            message: `Team A wins!`,
+            type: 'info',
+            payload: { winner: 'teamA' }
+        });
     }
 
     return state;

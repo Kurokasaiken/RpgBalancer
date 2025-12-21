@@ -1,6 +1,6 @@
 # Changelog - Sistema di Bilanciamento
 
-## 2025-12-17 - Phase 10 Priority Fix (BalancerNew)
+## 2025-12-17 - Phase 10 Priority Fix (Balancer)
 
 ### ✅ Completed
 - **Reset Controls**: Stat, card e pagina usano ora i callback di `useBalancerConfig`, mantenendo i valori importati dal preset iniziale.

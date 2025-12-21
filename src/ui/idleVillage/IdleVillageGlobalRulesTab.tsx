@@ -4,13 +4,17 @@
  * in a config-first way using IdleVillageConfig.globalRules.
  */
 
+import { useMemo } from 'react';
 import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
 import { DefaultSection } from '@/ui/components/DefaultUI';
+import { getUniqueNavItems, type AppNavTabId } from '@/shared/navigation/navConfig';
 
 export default function IdleVillageGlobalRulesTab() {
   const { config, updateConfig } = useIdleVillageConfig();
   const rules = config.globalRules;
   const resources = Object.values(config.resources ?? {});
+  const uiPrefs = config.uiPreferences ?? {};
+  const navItems = useMemo(() => getUniqueNavItems(), []);
 
   const DEFAULT_VERB_TONE_COLORS: Record<'neutral' | 'job' | 'quest' | 'danger' | 'system', string> = {
     neutral: '#94A3B8',
@@ -88,11 +92,53 @@ export default function IdleVillageGlobalRulesTab() {
     });
   };
 
+  const handleDefaultTabChange = (value: string) => {
+    if (!value) {
+      updateConfig({
+        uiPreferences: {
+          ...uiPrefs,
+          defaultAppTabId: undefined,
+        },
+      });
+      return;
+    }
+    const nextValue = value as AppNavTabId;
+    updateConfig({
+      uiPreferences: {
+        ...uiPrefs,
+        defaultAppTabId: nextValue,
+      },
+    });
+  };
+
   return (
     <div className="space-y-4">
       <h2 className="text-lg sm:text-xl font-cinzel tracking-[0.18em] uppercase text-ivory/90">Global Rules</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <DefaultSection title="Landing View">
+          <div className="space-y-2 text-sm">
+            <div>
+              <label className="block font-bold mb-1">Default App Tab</label>
+              <select
+                value={uiPrefs.defaultAppTabId ?? ''}
+                onChange={(e) => handleDefaultTabChange(e.target.value)}
+                className="w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory text-[13px]"
+              >
+                <option value="">(Use built-in default)</option>
+                {navItems.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 text-[11px] text-slate-400">
+                Seleziona quale tab dell’app si apre al caricamento. Il menu viene popolato dinamicamente dai tab esistenti
+                (nessun hardcoding).
+              </p>
+            </div>
+          </div>
+        </DefaultSection>
         <DefaultSection title="Fatigue">
           <div className="space-y-2 text-sm">
             <div>

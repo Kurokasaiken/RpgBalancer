@@ -78,8 +78,8 @@
 ## 12.9 – UI/UX – Idle Village Screen
 
 - [ ] Design Idle Village layout (left roster, center map, right activity/log)
-- [ ] Implement character roster UI with drag handles & status badges
-- [ ] Implement village map UI with droppable slots for jobs/quests
+- [x] Implement character roster UI with drag handles & status badges *(ResidentRoster component wired to drag handlers, 2025-12-20)*
+- [x] Implement village map UI with droppable slots for jobs/quests *(IdleVillageMapPage + MapSlotVerbCluster, drop validation & highlights, 2025-12-20)*
 - [ ] Implement quest detail panel (risk, reward, duration, death chance, quest level)
 - [ ] Implement activity queue & event log UI (Cultist Simulator-style cards/lanes for jobs/quests)
 - [ ] Implement visual indicators (green/yellow/red badges) for difficulty/reward categories driven from config
@@ -98,10 +98,10 @@
 
 ## Idle Village VerbCard Refactor (UI Focus)
 
-- [ ] Align Idle Village UI with the new VerbCard system (`docs/plans/idle_village_verbcard_refactor_plan.md`)
-- [ ] Implement `ScheduledVerbSummary` helper pipeline (variants, tone, risk, deadlines, timers)
-- [ ] Introduce `MapSlotVerbCluster` to replace legacy `MapSlotMarker` on the map
-- [ ] Render quest/job offers as VerbCards within map clusters, preserving dnd-kit drop states
+- [x] Align Idle Village UI with the new VerbCard system (`docs/plans/idle_village_verbcard_refactor_plan.md`)
+- [x] Implement `ScheduledVerbSummary` helper pipeline (variants, tone, risk, deadlines, timers)
+- [x] Introduce `MapSlotVerbCluster` to replace legacy `MapSlotMarker` on the map
+- [x] Render quest/job offers as VerbCards within map clusters, preserving dnd-kit drop states
 - [ ] Replace the “Jobs & Quests in progress” panel with compact text-based summaries driven by scheduled verbs
 - [ ] Ensure hunger/injury/system verbs reuse the same summary data for consistency
 - [ ] Update quest offer UI (map + HUD) with risk badges, tone colors, and Accept CTA

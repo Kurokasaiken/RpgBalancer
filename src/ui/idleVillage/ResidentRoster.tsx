@@ -67,6 +67,8 @@ function ResidentRoster({
               draggable
               onDragStart={onDragStart(resident.id)}
               onDragEnd={onDragEnd}
+              data-testid="resident-card"
+              data-resident-id={resident.id}
               className={`group flex flex-col items-center gap-1 px-2 py-1 rounded-xl border transition-all min-w-[72px] ${
                 dragState
                   ? 'border-amber-300 text-amber-100 bg-amber-500/15 shadow-[0_0_12px_rgba(251,191,36,0.35)]'
@@ -80,7 +82,7 @@ function ResidentRoster({
               >
                 {initial}
               </div>
-              <span className="text-[10px] font-semibold truncate max-w-[64px]">{formatLabel(resident)}</span>
+              <span className="text-[10px] font-semibold truncate max-w-16">{formatLabel(resident)}</span>
               <div className="w-full h-1.5 rounded-full bg-slate-700/70 overflow-hidden">
                 <div
                   className={`h-full ${fatigueTone} transition-all`}

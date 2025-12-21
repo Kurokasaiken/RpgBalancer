@@ -34,6 +34,13 @@ export default function IdleVillageActivitiesTab() {
   const resources = Object.values(config.resources ?? {});
   const mapSlots = Object.values(config.mapSlots ?? {});
   const mapLayout = resolveMapLayout(config.mapLayout);
+
+  const selectedMapSlot: MapSlotDefinition | null = useMemo(() => {
+    if (mapSlots.length === 0) return null;
+    if (!selectedMapSlotId) return (mapSlots[0] as MapSlotDefinition) ?? null;
+    return (mapSlots.find((s) => s.id === selectedMapSlotId) as MapSlotDefinition | undefined) ?? null;
+  }, [mapSlots, selectedMapSlotId]);
+
   const [layoutDraft, setLayoutDraft] = useState<MapLayoutDefinition>(mapLayout);
 
   useEffect(() => {
@@ -104,11 +111,7 @@ export default function IdleVillageActivitiesTab() {
     });
   }, [mapSlots, mapLayout]);
 
-  const selectedMapSlot: MapSlotDefinition | null = useMemo(() => {
-    if (mapSlots.length === 0) return null;
-    if (!selectedMapSlotId) return (mapSlots[0] as MapSlotDefinition) ?? null;
-    return (mapSlots.find((s) => s.id === selectedMapSlotId) as MapSlotDefinition | undefined) ?? null;
-  }, [mapSlots, selectedMapSlotId]);
+
 
   const handleUpdateMapLayout = (updates: Partial<MapLayoutDefinition>) => {
     const nextLayout: MapLayoutDefinition = {
@@ -304,34 +307,31 @@ export default function IdleVillageActivitiesTab() {
                       e.stopPropagation();
                       setSelectedMapSlotId(slot.id);
                     }}
-                    className={`group absolute -translate-x-1/2 -translate-y-full flex flex-col items-center gap-0.5 focus:outline-none ${
-                      isSelected
-                        ? 'scale-105 drop-shadow-[0_0_10px_rgba(250,250,210,0.9)]'
-                        : 'opacity-90 hover:opacity-100'
-                    }`}
+                    className={`group absolute -translate-x-1/2 -translate-y-full flex flex-col items-center gap-0.5 focus:outline-none ${isSelected
+                      ? 'scale-105 drop-shadow-[0_0_10px_rgba(250,250,210,0.9)]'
+                      : 'opacity-90 hover:opacity-100'
+                      }`}
                     style={{ left: `${left}%`, top: `${top}%` }}
                   >
                     <div
-                      className={`relative w-7 h-7 rounded-sm border shadow-md flex items-center justify-center text-[12px] bg-black/80 ${
-                        diag?.outOfBounds
-                          ? 'border-red-400'
-                          : diag && diag.overlaps.length > 0
-                            ? 'border-amber-300'
-                            : isVillage
-                              ? 'border-emerald-200'
-                              : isWorld
-                                ? 'border-indigo-200'
-                                : 'border-slate-200'
-                      }`}
+                      className={`relative w-7 h-7 rounded-sm border shadow-md flex items-center justify-center text-[12px] bg-black/80 ${diag?.outOfBounds
+                        ? 'border-red-400'
+                        : diag && diag.overlaps.length > 0
+                          ? 'border-amber-300'
+                          : isVillage
+                            ? 'border-emerald-200'
+                            : isWorld
+                              ? 'border-indigo-200'
+                              : 'border-slate-200'
+                        }`}
                     >
                       <span aria-hidden className="text-base">
                         {slot.icon || slot.label.slice(0, 2).toUpperCase()}
                       </span>
                       {(diag?.outOfBounds || (diag?.overlaps?.length ?? 0) > 0) && (
                         <span
-                          className={`absolute -top-2 -right-2 w-4 h-4 rounded-full text-[10px] font-semibold flex items-center justify-center ${
-                            diag?.outOfBounds ? 'bg-red-500 text-white' : 'bg-amber-400 text-obsidian'
-                          }`}
+                          className={`absolute -top-2 -right-2 w-4 h-4 rounded-full text-[10px] font-semibold flex items-center justify-center ${diag?.outOfBounds ? 'bg-red-500 text-white' : 'bg-amber-400 text-obsidian'
+                            }`}
                         >
                           !
                         </span>
@@ -417,11 +417,10 @@ export default function IdleVillageActivitiesTab() {
                         isInitiallyUnlocked: !selectedMapSlot.isInitiallyUnlocked,
                       })
                     }
-                    className={`rounded border px-2 py-1 text-sm ${
-                      selectedMapSlot.isInitiallyUnlocked
-                        ? 'border-emerald-400 text-emerald-200 bg-emerald-500/10'
-                        : 'border-slate-600 text-slate-300 bg-slate-900/60'
-                    }`}
+                    className={`rounded border px-2 py-1 text-sm ${selectedMapSlot.isInitiallyUnlocked
+                      ? 'border-emerald-400 text-emerald-200 bg-emerald-500/10'
+                      : 'border-slate-600 text-slate-300 bg-slate-900/60'
+                      }`}
                   >
                     {selectedMapSlot.isInitiallyUnlocked ? 'Sì' : 'No'}
                   </button>
@@ -449,11 +448,10 @@ export default function IdleVillageActivitiesTab() {
                               handleUpdateMapSlot(selectedMapSlot.id, { icon: undefined });
                               setShowMapSlotIconPicker(false);
                             }}
-                            className={`h-8 w-8 flex items-center justify-center rounded border text-xs ${
-                              !selectedMapSlot.icon
-                                ? 'border-amber-400 bg-amber-500/20 text-amber-100'
-                                : 'border-slate-600 bg-slate-900 text-slate-300 hover:border-amber-400/60'
-                            }`}
+                            className={`h-8 w-8 flex items-center justify-center rounded border text-xs ${!selectedMapSlot.icon
+                              ? 'border-amber-400 bg-amber-500/20 text-amber-100'
+                              : 'border-slate-600 bg-slate-900 text-slate-300 hover:border-amber-400/60'
+                              }`}
                           >
                             ∅
                           </button>
@@ -465,11 +463,10 @@ export default function IdleVillageActivitiesTab() {
                                 handleUpdateMapSlot(selectedMapSlot.id, { icon: symbol });
                                 setShowMapSlotIconPicker(false);
                               }}
-                              className={`h-8 w-8 flex items-center justify-center rounded border text-base ${
-                                selectedMapSlot.icon === symbol
-                                  ? 'border-amber-400 bg-amber-500/20 text-amber-100'
-                                  : 'border-slate-600 bg-slate-900 text-slate-100 hover:border-amber-400/60'
-                              }`}
+                              className={`h-8 w-8 flex items-center justify-center rounded border text-base ${selectedMapSlot.icon === symbol
+                                ? 'border-amber-400 bg-amber-500/20 text-amber-100'
+                                : 'border-slate-600 bg-slate-900 text-slate-100 hover:border-amber-400/60'
+                                }`}
                             >
                               {symbol}
                             </button>
@@ -1023,19 +1020,17 @@ export default function IdleVillageActivitiesTab() {
                                 metadata: nextMeta,
                               });
                             }}
-                            className={`absolute -translate-x-1/2 -translate-y-full flex flex-col items-center gap-0.5 focus:outline-none ${
-                              isSelected ? 'scale-105 drop-shadow-[0_0_10px_rgba(250,250,210,0.9)]' : 'opacity-90 hover:opacity-100'
-                            }`}
+                            className={`absolute -translate-x-1/2 -translate-y-full flex flex-col items-center gap-0.5 focus:outline-none ${isSelected ? 'scale-105 drop-shadow-[0_0_10px_rgba(250,250,210,0.9)]' : 'opacity-90 hover:opacity-100'
+                              }`}
                             style={{ left: `${left}%`, top: `${top}%` }}
                           >
                             <div
-                              className={`w-7 h-7 rounded-full border shadow-md flex items-center justify-center text-[11px] ${
-                                isVillage
-                                  ? 'bg-emerald-500/70 border-emerald-300'
-                                  : isWorld
-                                    ? 'bg-indigo-500/70 border-indigo-300'
-                                    : 'bg-slate-700/80 border-slate-300'
-                              }`}
+                              className={`w-7 h-7 rounded-full border shadow-md flex items-center justify-center text-[11px] ${isVillage
+                                ? 'bg-emerald-500/70 border-emerald-300'
+                                : isWorld
+                                  ? 'bg-indigo-500/70 border-indigo-300'
+                                  : 'bg-slate-700/80 border-slate-300'
+                                }`}
                             >
                               {slot.label.slice(0, 2).toUpperCase()}
                             </div>

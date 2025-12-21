@@ -64,6 +64,7 @@ export interface ArchetypeTemplate {
     tags: string[];     // e.g., ['melee', 'aggressive', 'defensive']
     author?: string;
     version: string;    // Semantic versioning for templates
+    spriteId?: string;  // Optional explicit sprite binding for visual mock
 }
 
 /**

@@ -328,7 +328,12 @@ export const FantasyGridArena: React.FC<GridArenaProps> = ({ playerEntity, enemy
                     <div className="flex justify-between items-center">
                         <h2 className="text-2xl font-bold text-amber-100 font-serif drop-shadow-md">Battle Arena</h2>
                         <div className="flex items-center gap-4 bg-black/40 px-4 py-2 rounded-lg border border-amber-900/50 backdrop-blur-md">
-                            <span className="text-amber-400 font-bold">Turn {combatState.turn}</span>
+                            <span
+                                className="text-amber-400 font-bold"
+                                data-testid="grid-turn-indicator"
+                            >
+                                Turn {combatState.turn}
+                            </span>
                             <div className="h-4 w-px bg-amber-900/50 mx-2" />
                             <div className="flex gap-2">
                                 <FantasyButton

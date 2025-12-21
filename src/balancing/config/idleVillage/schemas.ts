@@ -4,6 +4,7 @@
 
 import { z } from 'zod';
 import { BuildingDefinitionSchema } from './buildingSchemas';
+import { APP_NAV_TAB_IDS, type AppNavTabId } from '@/shared/navigation/navConfig';
 
 export const ResourceDefinitionSchema = z.object({
   id: z.string().min(1),
@@ -17,6 +18,13 @@ export const ResourceDefinitionSchema = z.object({
 export const ResourceDeltaDefinitionSchema = z.object({
   resourceId: z.string().min(1),
   amountFormula: z.string().min(1),
+});
+
+export const StatRequirementSchema = z.object({
+  allOf: z.array(z.string()).optional(),
+  anyOf: z.array(z.string()).optional(),
+  noneOf: z.array(z.string()).optional(),
+  label: z.string().optional(),
 });
 
 export const ActivityDefinitionSchema = z
@@ -35,10 +43,29 @@ export const ActivityDefinitionSchema = z
     costs: z.array(ResourceDeltaDefinitionSchema).optional(),
     rewards: z.array(ResourceDeltaDefinitionSchema).optional(),
     baseXpFormula: z.string().optional(),
+    statRequirement: StatRequirementSchema.optional(),
     allowedDifficultyCategoryIds: z.array(z.string()).optional(),
     allowedRewardCategoryIds: z.array(z.string()).optional(),
     metadata: z.record(z.string(), z.unknown()).optional(),
   });
+
+
+
+export const PassiveEffectDefinitionSchema = z.object({
+  id: z.string().min(1),
+  label: z.string().min(1),
+  description: z.string().optional(),
+  icon: z.string().optional(),
+  verbToneId: z.string().optional(),
+  slotId: z.string().optional(),
+  slotTags: z.array(z.string()).optional(),
+  timeUnitsBetweenTicks: z.number().optional(),
+  frequencyFormula: z.string().optional(),
+  resourceDeltas: z.array(ResourceDeltaDefinitionSchema).optional(),
+  statRequirements: StatRequirementSchema.optional(),
+  unlockConditionIds: z.array(z.string()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+});
 
 export const ActivityRollCategorySchema = z
   .object({
@@ -158,17 +185,32 @@ export const OverlaySettingsSchema = z.object({
   showSystemTrayIcon: z.boolean(),
 });
 
+
+
+const AppNavTabIdSchema = z.custom<AppNavTabId>(
+  (val) => typeof val === 'string' && (APP_NAV_TAB_IDS as readonly string[]).includes(val),
+  { message: 'Unknown app navigation tab id' }
+);
+
+export const IdleVillageUiPreferencesSchema = z.object({
+  defaultAppTabId: AppNavTabIdSchema.optional(),
+});
+
+
+
 export const IdleVillageConfigSchema = z.object({
   version: z.string().min(1),
   resources: z.record(z.string(), ResourceDefinitionSchema),
   activities: z.record(z.string(), ActivityDefinitionSchema),
   mapSlots: z.record(z.string(), MapSlotDefinitionSchema),
   mapLayout: MapLayoutDefinitionSchema.optional(),
+  passiveEffects: z.record(z.string(), PassiveEffectDefinitionSchema), // Added
   buildings: z.record(z.string(), BuildingDefinitionSchema),
   founders: z.record(z.string(), FounderPresetSchema),
   variance: ActivityVarianceConfigSchema,
   globalRules: GlobalRulesSchema,
   overlaySettings: OverlaySettingsSchema,
+  uiPreferences: IdleVillageUiPreferencesSchema.optional(),
 });
 
 export type IdleVillageConfigSchemaType = z.infer<typeof IdleVillageConfigSchema>;

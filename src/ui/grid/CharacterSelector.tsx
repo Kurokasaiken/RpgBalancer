@@ -52,7 +52,7 @@ export const CharacterSelector: React.FC<CharacterSelectorProps> = ({ onCharacte
 
     if (characters.length === 0) {
         return (
-            <div className="w-full h-full flex items-center justify-center p-4">
+            <div className="w-full h-full flex items-center justify-center p-4" data-testid="character-selector-empty">
                 <div className="max-w-2xl bg-gray-800/90 rounded-xl border-2 border-gray-700 p-8 text-center">
                     <h1 className="text-3xl font-bold text-white mb-4">⚠️ No Characters Found</h1>
                     <p className="text-gray-400 mb-6">

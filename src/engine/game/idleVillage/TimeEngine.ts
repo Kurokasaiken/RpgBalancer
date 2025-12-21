@@ -31,7 +31,7 @@ export function buildResidentFromFounder(preset: FounderPreset): ResidentState {
     status: 'available',
     fatigue: 0,
     statProfileId: preset.archetypeId,
-    statTags: [preset.difficultyTag],
+    statTags: preset.statTags && preset.statTags.length > 0 ? [...preset.statTags] : [preset.difficultyTag],
   };
 }
 

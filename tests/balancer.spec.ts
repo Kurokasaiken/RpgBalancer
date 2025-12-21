@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('BalancerNew Component Tests', () => {
+test.describe('Balancer Component Tests', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to the app
     await page.goto('http://localhost:5173');

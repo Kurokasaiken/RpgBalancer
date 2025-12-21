@@ -1,4 +1,6 @@
 import type { Spell } from '../spellTypes';
+import type { CombatLogEntry } from '../../engine/combat/state';
+import type { SpritePalette } from '../../shared/types/visual';
 
 /**
  * Type definitions for Combat Simulation system
@@ -14,8 +16,11 @@ export interface EntityStats {
     attack: number;
     defense: number;
     spells?: Spell[];
+    spriteId?: string;
+    spritePalette?: SpritePalette;
+    tags?: string[];
     // Add other relevant stats as needed
-    [key: string]: number | string | boolean | Spell[] | undefined; // Allow flexibility for additional primitive stats
+    [key: string]: number | string | boolean | Spell[] | SpritePalette | string[] | undefined;
 }
 
 /**
@@ -35,6 +40,76 @@ export interface TurnData {
     defender: 'entity1' | 'entity2';
     damageDealt: number;
     defenderHPRemaining: number;
+}
+
+export interface StatusEffectSummary {
+    id: string;
+    type: string;
+    remainingDuration?: number;
+    stacks?: number;
+    potency?: number;
+    shieldValue?: number;
+}
+
+export interface CombatActorSnapshot {
+    id: string;
+    name: string;
+    team: 'A' | 'B';
+    hp: number;
+    maxHp: number;
+    isAlive: boolean;
+    shieldValue: number;
+    statusEffects: StatusEffectSummary[];
+    state: 'idle' | 'attacking' | 'hit' | 'defeated';
+    spriteId?: string;
+    spritePalette?: SpritePalette;
+    tags?: string[];
+}
+
+export interface CombatTeamSnapshot {
+    teamId: 'A' | 'B';
+    members: CombatActorSnapshot[];
+}
+
+export interface CombatPhaseEvent {
+    phase: 'prep' | 'initiative' | 'action' | 'resolution';
+    events: CombatLogEntry[];
+}
+
+export interface CombatTimelineFrame {
+    turn: number;
+    startSnapshot: CombatTeamSnapshot[];
+    endSnapshot: CombatTeamSnapshot[];
+    hpDelta: Record<string, number>;
+    phases: CombatPhaseEvent[];
+}
+
+export type CombatAnimationEventType =
+    | 'spawn'
+    | 'idle'
+    | 'attack'
+    | 'miss'
+    | 'crit'
+    | 'shield'
+    | 'shake'
+    | 'heal'
+    | 'death'
+    | 'status';
+
+export interface CombatAnimationEvent {
+    id: string;
+    turn: number;
+    phase: CombatPhaseEvent['phase'];
+    type: CombatAnimationEventType;
+    actorId?: string;
+    targetId?: string;
+    durationMs: number;
+    metadata?: Record<string, number | string | boolean>;
+}
+
+export interface CombatAnimationScript {
+    turn: number;
+    events: CombatAnimationEvent[];
 }
 
 /**
@@ -89,6 +164,9 @@ export interface CombatResult {
         entity1: number;
         entity2: number;
     };
+
+    /** Detailed playback timeline (when logging enabled) */
+    timeline?: CombatTimelineFrame[];
 }
 
 export interface SuddenDeathConfig {

@@ -151,9 +151,9 @@ export class IdleVillageConfigStore {
         ...DEFAULT_IDLE_VILLAGE_CONFIG.resources,
         ...config.resources,
       },
-      activities: {
-        ...DEFAULT_IDLE_VILLAGE_CONFIG.activities,
-        ...config.activities,
+      passiveEffects: {
+        ...DEFAULT_IDLE_VILLAGE_CONFIG.passiveEffects,
+        ...config.passiveEffects,
       },
       mapSlots: {
         ...DEFAULT_IDLE_VILLAGE_CONFIG.mapSlots,
@@ -186,6 +186,10 @@ export class IdleVillageConfigStore {
           ...(config.globalRules?.injuryTiers ?? {}),
         },
         deathRules: mergedDeathRules,
+      },
+      uiPreferences: {
+        ...DEFAULT_IDLE_VILLAGE_CONFIG.uiPreferences,
+        ...(config.uiPreferences ?? {}),
       },
     };
   }

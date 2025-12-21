@@ -1,75 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useDensity } from '../../contexts/DensityContext';
+import {
+    BOTTOM_NAV,
+    NAV_SECTIONS,
+    type AppNavTabId,
+} from '@/shared/navigation/navConfig';
 
 interface FantasyLayoutProps {
     children: React.ReactNode;
-    activeTab: string;
-    onTabChange: (tab: string) => void;
+    activeTab: AppNavTabId;
+    onTabChange: (tab: AppNavTabId) => void;
 }
-
-// Bottom nav items for mobile (max 5 for thumb zone)
-const BOTTOM_NAV = [
-    { id: 'balancer', label: 'Balancer', icon: '⚖️' },
-    { id: 'archetypes', label: 'Archetypes', icon: '🎭' },
-    { id: 'spellCreationNew', label: 'Spells', icon: '✨' },
-    { id: 'gridArena', label: 'Arena', icon: '⚔️' },
-    { id: 'more', label: 'More', icon: '☰' },
-];
-
-// Full nav items for desktop sidebar
-const NAV_SECTIONS = [
-    {
-        title: 'Core',
-        items: [
-            { id: 'balancer', label: 'Balancer', icon: '⚖️' },
-            { id: 'balancerStats', label: 'Stat Testing', icon: '📊' },
-            { id: 'spellCreationNew', label: 'Spell Creation', icon: '✨' },
-        ]
-    },
-    {
-        title: 'Content',
-        items: [
-        ]
-    },
-    {
-        title: 'Idle Village',
-        items: [
-            { id: 'idleVillage', label: 'Idle Village', icon: '🏡' },
-            { id: 'idleVillageMap', label: 'Idle Village Map (New)', icon: '🗺️' },
-            { id: 'idleVillageConfig', label: 'Idle Village Config', icon: '⚙️' },
-            { id: 'verbDetailSandbox', label: 'Verb Detail Sandbox', icon: '🜂' },
-            { id: 'skillCheckPreview', label: 'Skill Check Lab', icon: '🎯' },
-            { id: 'archetypes', label: 'Archetypes', icon: '🎭' },
-            { id: 'matchupMatrix', label: 'War Room', icon: '🗺️' },
-            { id: 'archetypeTesting', label: '1v1 Archetypes', icon: '⚔️' },
-            { id: 'gridArena', label: 'Battlefield', icon: '⚔️' },
-            { id: 'characterCreator', label: 'Heroes', icon: '👤' },
-            { id: 'archetypeBuilder', label: 'Builder', icon: '🏗️' },
-            { id: 'spellLibrary', label: 'Grimoire', icon: '📚' },
-            { id: 'characterManager', label: 'Roster', icon: '🗂️' },
-        ]
-    },
-    {
-        title: 'Mockups',
-        items: [
-            { id: 'mockGildedObservatory', label: 'Gilded Observatory', icon: '🜂' },
-            { id: 'mockObsidianSanctum', label: 'Obsidian Sanctum', icon: '🜃' },
-            { id: 'mockAuroraWorkshop', label: 'Aurora Workshop', icon: '✺' },
-            { id: 'mockArcaneTech', label: 'Arcane Tech Glass', icon: '💠' },
-            { id: 'mockAetherBrass', label: 'Aether Brass Lab', icon: '⚗️' },
-            { id: 'mockQuantumScriptorium', label: 'Quantum Scriptorium', icon: '✒️' },
-            { id: 'mockMidnightMeridian', label: 'Midnight Meridian', icon: '✦' },
-            { id: 'mockSeraphimArchive', label: 'Seraphim Archive', icon: '✶' },
-            { id: 'mockVerdantAlloy', label: 'Verdant Alloy Deck', icon: '🌿' },
-        ]
-    },
-    {
-        title: 'System',
-        items: [
-            { id: 'tacticalLab', label: 'Tactical Lab', icon: '⚔️' },
-        ]
-    }
-];
 
 export const FantasyLayout: React.FC<FantasyLayoutProps> = ({ children, activeTab, onTabChange }) => {
     const [isMobile, setIsMobile] = useState(false);
@@ -83,7 +24,7 @@ export const FantasyLayout: React.FC<FantasyLayoutProps> = ({ children, activeTa
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    const handleNavClick = (id: string) => {
+    const handleNavClick = (id: AppNavTabId | 'more') => {
         if (id === 'more') {
             setIsDrawerOpen(true);
         } else {
@@ -117,6 +58,8 @@ export const FantasyLayout: React.FC<FantasyLayoutProps> = ({ children, activeTa
                                         {section.items.map((item) => (
                                             <button
                                                 key={item.id}
+                                                data-tab-id={item.id}
+                                                data-testid={`nav-btn-${item.id}`}
                                                 onClick={() => onTabChange(item.id)}
                                                 className={`
                                                     w-full flex items-center gap-3 px-4 py-2.5 text-left rounded-xl
@@ -181,6 +124,7 @@ export const FantasyLayout: React.FC<FantasyLayoutProps> = ({ children, activeTa
                             return (
                                 <button
                                     key={item.id}
+                                    data-testid={`nav-btn-${item.id}`}
                                     onClick={() => handleNavClick(item.id)}
                                     className={`
                                         flex flex-col items-center justify-center
@@ -223,6 +167,7 @@ export const FantasyLayout: React.FC<FantasyLayoutProps> = ({ children, activeTa
                                         {section.items.map((item) => (
                                             <button
                                                 key={item.id}
+                                                data-testid={`nav-btn-${item.id}`}
                                                 onClick={() => handleNavClick(item.id)}
                                                 className={`
                                                     w-full flex items-center gap-4 px-4 py-3.5 rounded-xl mb-1

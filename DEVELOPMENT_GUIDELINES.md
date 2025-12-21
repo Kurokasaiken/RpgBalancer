@@ -16,7 +16,7 @@ Prima di scrivere **qualsiasi** codice o implementation plan, verificare:
 
 ### 🎨 Default UI Theme (obbligatorio)
 
-- Il tema di riferimento per qualsiasi nuova UI è **Gilded Observatory**, lo stesso usato su BalancerNew.
+- Il tema di riferimento per qualsiasi nuova UI è **Gilded Observatory**, lo stesso usato sul Balancer.
 - Layout e superfici devono usare le utility definite in:
   - `src/index.css` → classi `observatory-page`, `observatory-shell`, `default-card`, `observatory-main-frame`.
   - `src/styles/color-palette.css` → token globali (variabili `--obsidian-*`, `--ivory-*`, `--gold`, ecc.).

@@ -14,6 +14,7 @@
 2. **implementation_plan.md** - Detailed implementation steps
 3. **archetype_balancing_plan.md** - Archetype system balancing
 4. **scenario_ui_plan.md** - Scenario UI implementation
+5. **combat_viewer_visual_mock_plan.md** - LoL-style visual layer for Combat Viewer (Phase 6 roadmap)
 
 **Session:** Establishing Development Guidelines  
 **Date:** 2025-11-25  

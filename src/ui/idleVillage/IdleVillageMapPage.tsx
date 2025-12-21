@@ -26,12 +26,14 @@ import {
   type ScheduledActivity,
   type VillageState,
 } from '@/engine/game/idleVillage/TimeEngine';
+import { evaluateStatRequirement } from '@/engine/game/idleVillage/statMatching';
 import { tickIdleVillage } from '@/engine/game/idleVillage/IdleVillageEngine';
 import type {
   ActivityDefinition,
   FounderPreset,
   IdleVillageConfig,
   MapSlotDefinition,
+  StatRequirement,
 } from '@/balancing/config/idleVillage/types';
 import VerbCard from '@/ui/idleVillage/VerbCard';
 import {
@@ -46,6 +48,22 @@ import ResidentRoster from '@/ui/idleVillage/ResidentRoster';
 
 const DEFAULT_CARD_SCALE = 0.45;
 const RESIDENT_DRAG_MIME = 'application/x-idle-resident';
+
+interface IdleVillageDebugControls {
+  play: () => void;
+  pause: () => void;
+  advance: (delta: number) => void;
+  assign: (slotId: string, residentId: string) => boolean;
+  getState: () => VillageState | null;
+  getConfig: () => IdleVillageConfig | null;
+  reset: () => VillageState | null;
+}
+
+declare global {
+  interface Window {
+    __idleVillageControls?: IdleVillageDebugControls;
+  }
+}
 
 const simpleRng = (() => {
   let seed = 12345;
@@ -65,6 +83,33 @@ const activityMatchesSlot = (activity: ActivityDefinition, slot: MapSlotDefiniti
   return slot.slotTags.some((tag) => activity.slotTags?.includes(tag));
 };
 
+const formatRequirementFailure = (params: {
+  requirement?: StatRequirement;
+  missingAllOf: string[];
+  anyOfMatched: boolean;
+  blockedBy: string[];
+}): string | null => {
+  const { requirement, missingAllOf, anyOfMatched, blockedBy } = params;
+  if (!requirement) return null;
+
+  const parts: string[] = [];
+  if (missingAllOf.length > 0) {
+    parts.push(`manca ${missingAllOf.join(', ')}`);
+  }
+  if (!anyOfMatched && (requirement.anyOf?.length ?? 0) > 0) {
+    parts.push(`serve uno tra ${requirement.anyOf?.join(', ')}`);
+  }
+  if (blockedBy.length > 0) {
+    parts.push(`vietato avere ${blockedBy.join(', ')}`);
+  }
+
+  const label = requirement.label ?? 'requisito';
+  if (parts.length === 0) {
+    return `${label} non soddisfatto.`;
+  }
+  return `${label} non soddisfatto: ${parts.join('; ')}.`;
+};
+
 const validateAssignment = (params: {
   resident: ResidentState;
   slot: MapSlotDefinition;
@@ -81,7 +126,6 @@ const validateAssignment = (params: {
     return { ok: false, reason: `${resident.id} non è disponibile.` };
   }
 
-  const meta = (activity.metadata ?? {}) as { mapSlotId?: string } | undefined;
   const slotAllowed = activityMatchesSlot(activity, slot);
   if (!slotAllowed) {
     return {
@@ -103,6 +147,22 @@ const validateAssignment = (params: {
       ok: false,
       reason: `${slot.label} è bloccato e non accetta assegnazioni.`,
     };
+  }
+
+  if (activity.statRequirement) {
+    const match = evaluateStatRequirement(resident, activity.statRequirement);
+    if (!match.matches) {
+      return {
+        ok: false,
+        reason:
+          formatRequirementFailure({
+            requirement: activity.statRequirement,
+            missingAllOf: match.missingAllOf,
+            anyOfMatched: match.anyOfMatched,
+            blockedBy: match.blockedBy,
+          }) ?? `${resident.id} non soddisfa i requisiti richiesti.`,
+      };
+    }
   }
 
   return { ok: true };
@@ -161,6 +221,7 @@ function MapSlotVerbCluster({
         isDropMode && canAcceptDrop ? 'drop-shadow-[0_4px_14px_rgba(251,191,36,0.25)]' : ''
       } ${isDragOver ? 'scale-105' : ''} ${isHighlighted ? 'animate-pulse' : ''}`}
       style={{ left: `${left}%`, top: `${top}%` }}
+      data-slot-id={slotId}
       onDragOver={handleDragOver}
       onDragEnter={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -238,10 +299,16 @@ const IdleVillageMapPage: React.FC = () => {
   const [highlightSlotId, setHighlightSlotId] = useState<string | null>(null);
   const highlightTimeoutRef = useRef<number | null>(null);
 
-  useEffect(() => {
-    if (!config) return;
-    setVillageState(createVillageStateFromConfig({ config, founderPreset: defaultFounderPreset }));
+  const bootstrapVillageState = useCallback(() => {
+    if (!config) return null;
+    const freshState = createVillageStateFromConfig({ config, founderPreset: defaultFounderPreset });
+    setVillageState(freshState);
+    return freshState;
   }, [config, defaultFounderPreset]);
+
+  useEffect(() => {
+    bootstrapVillageState();
+  }, [bootstrapVillageState]);
 
   const advanceTimeBy = useCallback(
     (delta: number) => {
@@ -357,6 +424,128 @@ const IdleVillageMapPage: React.FC = () => {
     });
     return grouped;
   }, [config]);
+
+  const assignResidentToSlot = useCallback(
+    (slotId: string, residentId: string | null, options?: { silent?: boolean; skipHighlight?: boolean }) => {
+      if (!config) {
+        if (!options?.silent) {
+          setAssignmentFeedback('Config non caricata, impossibile assegnare.');
+        }
+        return false;
+      }
+
+      if (!residentId) {
+        if (!options?.silent) {
+          setAssignmentFeedback('Seleziona un residente valido da trascinare.');
+        }
+        return false;
+      }
+
+      let success = false;
+      let feedbackMessage: string | null = null;
+
+      setVillageState((prev) => {
+        if (!prev) {
+          if (!options?.silent) {
+            feedbackMessage = 'Stato del villaggio non pronto.';
+          }
+          return prev;
+        }
+
+        const resident = prev.residents[residentId];
+        if (!resident) {
+          if (!options?.silent) {
+            feedbackMessage = `Residente ${residentId} non trovato.`;
+          }
+          return prev;
+        }
+
+        const slotDef = config.mapSlots?.[slotId];
+        if (!slotDef) {
+          if (!options?.silent) {
+            feedbackMessage = `Slot ${slotId} non definito in config.`;
+          }
+          return prev;
+        }
+
+        const candidateActivities = activitiesBySlot[slotId] ?? [];
+        if (candidateActivities.length === 0) {
+          if (!options?.silent) {
+            feedbackMessage = 'Nessuna activity compatibile per questo slot.';
+          }
+          return prev;
+        }
+
+        const selectedActivity =
+          candidateActivities.find((activity) => activityMatchesSlot(activity, slotDef)) ?? candidateActivities[0];
+
+        const validation = validateAssignment({
+          resident,
+          slot: slotDef,
+          activity: selectedActivity,
+          config,
+        });
+
+        if (!validation.ok) {
+          if (!options?.silent) {
+            feedbackMessage = validation.reason;
+          }
+          return prev;
+        }
+
+        const { state: nextState } = scheduleActivity(
+          { config, rng: simpleRng },
+          prev,
+          {
+            activityId: selectedActivity.id,
+            characterIds: [resident.id],
+            slotId,
+          },
+        );
+
+        success = true;
+        feedbackMessage = `${resident.id} assegnato a ${selectedActivity.label ?? selectedActivity.id}.`;
+        return nextState;
+      });
+
+      if (!options?.silent && feedbackMessage) {
+        setAssignmentFeedback(feedbackMessage);
+      }
+
+      if (success && !options?.skipHighlight) {
+        setHighlightSlotId(slotId);
+        if (highlightTimeoutRef.current !== null) {
+          window.clearTimeout(highlightTimeoutRef.current);
+        }
+        highlightTimeoutRef.current = window.setTimeout(() => {
+          setHighlightSlotId((current) => (current === slotId ? null : current));
+        }, 2200);
+      }
+
+      return success;
+    },
+    [activitiesBySlot, config],
+  );
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const controls = {
+      play: () => setIsPlaying(true),
+      pause: () => setIsPlaying(false),
+      advance: (delta: number) => advanceTimeBy(delta),
+      assign: (slotId: string, residentId: string) =>
+        assignResidentToSlot(slotId, residentId, { silent: true, skipHighlight: true }),
+      getState: () => villageState,
+      getConfig: () => config ?? null,
+      reset: () => bootstrapVillageState(),
+    };
+    window.__idleVillageControls = controls;
+    return () => {
+      if (window.__idleVillageControls === controls) {
+        delete window.__idleVillageControls;
+      }
+    };
+  }, [advanceTimeBy, assignResidentToSlot, bootstrapVillageState, config, villageState]);
 
   const canSlotAcceptDrop = useCallback(
     (slotId: string) => {
@@ -533,67 +722,9 @@ const IdleVillageMapPage: React.FC = () => {
       setIsResidentDragActive(false);
       setDraggingResidentId(null);
       setLastDropSlotId(slotId);
-      if (!residentId) {
-        setAssignmentFeedback('Seleziona un residente valido da trascinare.');
-        return;
-      }
-      setVillageState((prev) => {
-        if (!prev || !config) return prev;
-        const resident = prev.residents[residentId];
-        if (!resident) {
-          setAssignmentFeedback(`Residente ${residentId} non trovato.`);
-          return prev;
-        }
-
-        const slotDef = config.mapSlots?.[slotId];
-        if (!slotDef) {
-          setAssignmentFeedback(`Slot ${slotId} non definito in config.`);
-          return prev;
-        }
-
-        const candidateActivities = activitiesBySlot[slotId] ?? [];
-        if (candidateActivities.length === 0) {
-          setAssignmentFeedback('Nessuna activity compatibile per questo slot.');
-          return prev;
-        }
-
-        const selectedActivity =
-          candidateActivities.find((activity) => activityMatchesSlot(activity, slotDef)) ??
-          candidateActivities[0];
-
-        const validation = validateAssignment({
-          resident,
-          slot: slotDef,
-          activity: selectedActivity,
-          config,
-        });
-
-        if (!validation.ok) {
-          setAssignmentFeedback(validation.reason);
-          return prev;
-        }
-
-        const { state: nextState } = scheduleActivity(
-          { config, rng: simpleRng },
-          prev,
-          {
-            activityId: selectedActivity.id,
-            characterIds: [resident.id],
-            slotId,
-          },
-        );
-        setAssignmentFeedback(`${resident.id} assegnato a ${selectedActivity.label ?? selectedActivity.id}.`);
-        setHighlightSlotId(slotId);
-        if (highlightTimeoutRef.current !== null) {
-          window.clearTimeout(highlightTimeoutRef.current);
-        }
-        highlightTimeoutRef.current = window.setTimeout(() => {
-          setHighlightSlotId((current) => (current === slotId ? null : current));
-        }, 2200);
-        return nextState;
-      });
+      assignResidentToSlot(slotId, residentId ?? null);
     },
-    [activitiesBySlot, config],
+    [assignResidentToSlot],
   );
 
   if (!config || !villageState) {

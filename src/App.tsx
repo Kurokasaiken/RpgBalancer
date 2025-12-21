@@ -27,6 +27,13 @@ import { TacticalLab } from './ui/tactical/TacticalLab';
 import IdleVillagePage from './ui/idleVillage/IdleVillagePage';
 import IdleVillageMapPage from './ui/idleVillage/IdleVillageMapPage';
 import IdleVillageConfigRoute from './pages/idle-village-config';
+import { CombatViewerPage } from './ui/balancing/CombatViewerPage';
+import { IdleVillageConfigStore } from '@/balancing/config/idleVillage/IdleVillageConfigStore';
+import {
+  DEFAULT_LANDING_TAB_ID,
+  isValidNavTabId,
+  type AppNavTabId,
+} from '@/shared/navigation/navConfig';
 
 // Lazy-loaded heavy tools (named exports wrapped as default)
 const Balancer = lazy(() =>
@@ -48,41 +55,21 @@ const VerbDetailSandbox = lazy(() =>
   import('./ui/testing/VerbDetailSandbox').then((m) => ({ default: m.default }))
 );
 
-type Tab =
-  | 'balancer'
-  | 'balancerStats'
-  | 'archetypes'
-  | 'archetypeBuilder'
-  | 'archetypeFantasy'
-  | 'matchupMatrix'
-  | 'archetypeTesting'
-  | 'autoBalancer'
-  | 'characterCreator'
-  | 'spellLibrary'
-  | 'spellCreation'
-  | 'spellCreationNew'
-  | 'characterManager'
-  | 'gridArena'
-  | 'idleArena'
-  | 'testing'
-  | 'mockArcaneTech'
-  | 'mockGildedObservatory'
-  | 'mockObsidianSanctum'
-  | 'mockAuroraWorkshop'
-  | 'mockAetherBrass'
-  | 'mockQuantumScriptorium'
-  | 'mockMidnightMeridian'
-  | 'mockSeraphimArchive'
-  | 'mockVerdantAlloy'
-  | 'tacticalLab'
-  | 'idleVillage'
-  | 'idleVillageMap'
-  | 'idleVillageConfig'
-  | 'skillCheckPreview'
-  | 'verbDetailSandbox';
+const resolveInitialTab = (): AppNavTabId => {
+  try {
+    const config = IdleVillageConfigStore.load();
+    const preferred = config.uiPreferences?.defaultAppTabId;
+    if (preferred && isValidNavTabId(preferred)) {
+      return preferred;
+    }
+  } catch (error) {
+    console.warn('Failed to resolve Idle Village UI preference, falling back to default tab.', error);
+  }
+  return DEFAULT_LANDING_TAB_ID;
+};
 
 function App() {
-  const [activeTab, setActiveTab] = useState<Tab>('balancer');
+  const [activeTab, setActiveTab] = useState<AppNavTabId>(() => resolveInitialTab());
 
   // Listen for spell creation navigation from SpellLibrary
   useEffect(() => {
@@ -93,174 +80,179 @@ function App() {
 
   return (
     <div data-testid="app-loaded" className="min-h-screen">
-      <FantasyLayout activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab as Tab)}>
-      {activeTab === 'balancer' && (
-        <ErrorBoundary componentName="Balancer">
-          <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Balancer…</div>}>
-            <Balancer />
-          </Suspense>
-        </ErrorBoundary>
-      )}
-      {activeTab === 'testing' && (
-        <ErrorBoundary componentName="Testing Lab">
-          <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Testing Lab…</div>}>
-            <TestingLab />
-          </Suspense>
-        </ErrorBoundary>
-      )}
-      {activeTab === 'idleArena' && (
-        <ErrorBoundary componentName="Idle Arena">
-          <IdleArena />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'characterCreator' && (
-        <ErrorBoundary componentName="Character Creator">
-          <CharacterCreator />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'spellLibrary' && (
-        <ErrorBoundary componentName="Spell Library">
-          <SpellLibrary />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'spellCreation' && (
-        <ErrorBoundary componentName="Spell Creation (Legacy)">
-          <FantasySpellCreation />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'spellCreationNew' && (
-        <ErrorBoundary componentName="Spell Creation">
-          <SpellCreatorNew />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'characterManager' && (
-        <ErrorBoundary componentName="Character Manager">
-          <CharacterManager />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'gridArena' && (
-        <ErrorBoundary componentName="Grid Arena">
-          <FantasyGridArena />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'archetypes' && (
-        <ErrorBoundary componentName="Archetype Manager">
-          <ArchetypeManager />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'archetypeBuilder' && (
-        <ErrorBoundary componentName="Archetype Builder">
-          <ArchetypeBuilderComponent />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'archetypeFantasy' && (
-        <ErrorBoundary componentName="Archetype Forge">
-          <ArchetypeBuilderFantasy />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'matchupMatrix' && (
-        <ErrorBoundary componentName="Matchup Matrix">
-          <MatchupMatrixWrapper />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'archetypeTesting' && (
-        <ErrorBoundary componentName="Archetype 1v1 Testing">
-          <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Archetype 1v1 Testing…</div>}>
-            <ArchetypeTestingLab />
-          </Suspense>
-        </ErrorBoundary>
-      )}
-      {activeTab === 'autoBalancer' && (
-        <ErrorBoundary componentName="Auto-Balancer">
-          <AutoBalancerWrapper />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'balancerStats' && (
-        <ErrorBoundary componentName="Stat Stress Testing">
-          <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Stat Stress Testing…</div>}>
-            <StatStressTestingPage />
-          </Suspense>
-        </ErrorBoundary>
-      )}
-      {activeTab === 'skillCheckPreview' && (
-        <ErrorBoundary componentName="Skill Check Preview Lab">
-          <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Skill Check Preview…</div>}>
-            <SkillCheckPreviewPage />
-          </Suspense>
-        </ErrorBoundary>
-      )}
-      {activeTab === 'idleVillage' && (
-        <ErrorBoundary componentName="Idle Village">
-          <IdleVillagePage />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'idleVillageMap' && (
-        <ErrorBoundary componentName="Idle Village Map">
-          <IdleVillageMapPage />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'idleVillageConfig' && (
-        <ErrorBoundary componentName="Idle Village Config">
-          <IdleVillageConfigRoute />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'verbDetailSandbox' && (
-        <ErrorBoundary componentName="Verb Detail Sandbox">
-          <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Verb Detail Sandbox…</div>}>
-            <VerbDetailSandbox />
-          </Suspense>
-        </ErrorBoundary>
-      )}
-      {activeTab === 'mockArcaneTech' && (
-        <ErrorBoundary componentName="Arcane Tech Glass">
-          <ArcaneTechGlass />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'mockGildedObservatory' && (
-        <ErrorBoundary componentName="Gilded Observatory">
-          <GildedObservatory />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'mockObsidianSanctum' && (
-        <ErrorBoundary componentName="Obsidian Sanctum">
-          <ObsidianSanctum />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'mockAuroraWorkshop' && (
-        <ErrorBoundary componentName="Aurora Workshop">
-          <AuroraWorkshop />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'mockAetherBrass' && (
-        <ErrorBoundary componentName="Aether Brass Lab">
-          <AetherBrassLab />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'mockQuantumScriptorium' && (
-        <ErrorBoundary componentName="Quantum Scriptorium">
-          <QuantumScriptorium />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'mockMidnightMeridian' && (
-        <ErrorBoundary componentName="Midnight Meridian">
-          <MidnightMeridian />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'mockSeraphimArchive' && (
-        <ErrorBoundary componentName="Seraphim Archive">
-          <SeraphimArchive />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'mockVerdantAlloy' && (
-        <ErrorBoundary componentName="Verdant Alloy Deck">
-          <VerdantAlloyDeck />
-        </ErrorBoundary>
-      )}
-      {activeTab === 'tacticalLab' && (
-        <ErrorBoundary componentName="Tactical Lab">
-          <TacticalLab />
-        </ErrorBoundary>
-      )}
+      <FantasyLayout activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab)}>
+        {activeTab === 'balancer' && (
+          <ErrorBoundary componentName="Balancer">
+            <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Balancer…</div>}>
+              <Balancer />
+            </Suspense>
+          </ErrorBoundary>
+        )}
+        {activeTab === 'testing' && (
+          <ErrorBoundary componentName="Testing Lab">
+            <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Testing Lab…</div>}>
+              <TestingLab />
+            </Suspense>
+          </ErrorBoundary>
+        )}
+        {activeTab === 'idleArena' && (
+          <ErrorBoundary componentName="Idle Arena">
+            <IdleArena />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'combatViewer' && (
+          <ErrorBoundary componentName="Combat Viewer">
+            <CombatViewerPage />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'characterCreator' && (
+          <ErrorBoundary componentName="Character Creator">
+            <CharacterCreator />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'spellLibrary' && (
+          <ErrorBoundary componentName="Spell Library">
+            <SpellLibrary />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'spellCreationNew' && (
+          <ErrorBoundary componentName="Spell Creation (Legacy)">
+            <FantasySpellCreation />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'spellCreationNew' && (
+          <ErrorBoundary componentName="Spell Creation">
+            <SpellCreatorNew />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'characterManager' && (
+          <ErrorBoundary componentName="Character Manager">
+            <CharacterManager />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'gridArena' && (
+          <ErrorBoundary componentName="Grid Arena">
+            <FantasyGridArena />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'archetypes' && (
+          <ErrorBoundary componentName="Archetype Manager">
+            <ArchetypeManager />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'archetypeBuilder' && (
+          <ErrorBoundary componentName="Archetype Builder">
+            <ArchetypeBuilderComponent />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'archetypeFantasy' && (
+          <ErrorBoundary componentName="Archetype Forge">
+            <ArchetypeBuilderFantasy />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'matchupMatrix' && (
+          <ErrorBoundary componentName="Matchup Matrix">
+            <MatchupMatrixWrapper />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'archetypeTesting' && (
+          <ErrorBoundary componentName="Archetype 1v1 Testing">
+            <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Archetype 1v1 Testing…</div>}>
+              <ArchetypeTestingLab />
+            </Suspense>
+          </ErrorBoundary>
+        )}
+        {activeTab === 'autoBalancer' && (
+          <ErrorBoundary componentName="Auto-Balancer">
+            <AutoBalancerWrapper />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'balancerStats' && (
+          <ErrorBoundary componentName="Stat Stress Testing">
+            <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Stat Stress Testing…</div>}>
+              <StatStressTestingPage />
+            </Suspense>
+          </ErrorBoundary>
+        )}
+        {activeTab === 'skillCheckPreview' && (
+          <ErrorBoundary componentName="Skill Check Preview Lab">
+            <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Skill Check Preview…</div>}>
+              <SkillCheckPreviewPage />
+            </Suspense>
+          </ErrorBoundary>
+        )}
+        {activeTab === 'idleVillage' && (
+          <ErrorBoundary componentName="Idle Village">
+            <IdleVillagePage />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'idleVillageMap' && (
+          <ErrorBoundary componentName="Idle Village Map">
+            <IdleVillageMapPage />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'idleVillageConfig' && (
+          <ErrorBoundary componentName="Idle Village Config">
+            <IdleVillageConfigRoute />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'verbDetailSandbox' && (
+          <ErrorBoundary componentName="Verb Detail Sandbox">
+            <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Verb Detail Sandbox…</div>}>
+              <VerbDetailSandbox />
+            </Suspense>
+          </ErrorBoundary>
+        )}
+        {activeTab === 'mockArcaneTech' && (
+          <ErrorBoundary componentName="Arcane Tech Glass">
+            <ArcaneTechGlass />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'mockGildedObservatory' && (
+          <ErrorBoundary componentName="Gilded Observatory">
+            <GildedObservatory />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'mockObsidianSanctum' && (
+          <ErrorBoundary componentName="Obsidian Sanctum">
+            <ObsidianSanctum />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'mockAuroraWorkshop' && (
+          <ErrorBoundary componentName="Aurora Workshop">
+            <AuroraWorkshop />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'mockAetherBrass' && (
+          <ErrorBoundary componentName="Aether Brass Lab">
+            <AetherBrassLab />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'mockQuantumScriptorium' && (
+          <ErrorBoundary componentName="Quantum Scriptorium">
+            <QuantumScriptorium />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'mockMidnightMeridian' && (
+          <ErrorBoundary componentName="Midnight Meridian">
+            <MidnightMeridian />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'mockSeraphimArchive' && (
+          <ErrorBoundary componentName="Seraphim Archive">
+            <SeraphimArchive />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'mockVerdantAlloy' && (
+          <ErrorBoundary componentName="Verdant Alloy Deck">
+            <VerdantAlloyDeck />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'tacticalLab' && (
+          <ErrorBoundary componentName="Tactical Lab">
+            <TacticalLab />
+          </ErrorBoundary>
+        )}
       </FantasyLayout>
     </div>
   );

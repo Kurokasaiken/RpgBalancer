@@ -44,6 +44,7 @@ export function AltVisualsV7PixiField({ stats }: AltVisualsV7PixiFieldProps) {
         antialias: true,
         resolution: window.devicePixelRatio || 1,
         autoDensity: true,
+        resizeTo: container,
       });
       if (disposed) {
         app?.destroy(true, true);

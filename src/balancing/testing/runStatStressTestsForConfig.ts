@@ -19,7 +19,7 @@ function createSeededRNG(seed: number): RNG {
 
 /**
  * Run stat stress tests for a specific BalancerConfig (in-memory).
- * This lets the UI use the live config from BalancerNew without
+ * This lets the UI use the live config from the Balancer editor without
  * persisting/reloading from BalancerConfigStore.
  */
 export async function runStatStressTestsForConfig(

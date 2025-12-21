@@ -250,7 +250,7 @@ const isMobile = useMediaQuery('(max-width: 768px)');
   - [ ] Deve essere progettata in modalità **mobile-first**, poi arricchita per desktop.
   - [ ] Deve avere una review estetica esplicita in DevTools (almeno iPhone 14 Pro + Desktop ~1440px).
   - [ ] Deve seguire il piano in [docs/plans/responsive_ui_plan.md](docs/plans/responsive_ui_plan.md).
-- La **prima pagina target** per questo workflow è **BalancerNew**.
+- La **prima pagina target** per questo workflow è il **Balancer**.
 
 **Ultimo Aggiornamento**: 2025-12-06  
 **Autore**: Antigravity Agent + Cascade  

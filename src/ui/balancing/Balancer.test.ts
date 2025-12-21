@@ -1,14 +1,14 @@
 /**
- * Balancer New - Import/Export Tests
- * 
- * Tests for the BalancerNew component's import/export functionality
+ * Balancer - Import/Export Tests
+ *
+ * Tests for the Balancer component's import/export functionality
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { BalancerConfigStore } from '../../balancing/config/BalancerConfigStore';
 import type { BalancerConfig } from '../../balancing/config/types';
 
-describe('Balancer New - Import/Export', () => {
+describe('Balancer - Import/Export', () => {
   beforeEach(() => {
     localStorage.clear();
     BalancerConfigStore.reset();

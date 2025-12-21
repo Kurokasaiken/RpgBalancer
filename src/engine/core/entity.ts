@@ -3,6 +3,7 @@ import type { Attributes, DerivedStats } from './stats';
 import type { WeaponModule, ArmorModule, SkillModule } from '../modules/definitions';
 import type { StatBlock } from '../../balancing/types';
 import type { Spell } from '../../balancing/spellTypes';
+import type { SpritePalette } from '../../shared/types/visual';
 
 export class Entity {
     id: string;
@@ -32,6 +33,9 @@ export class Entity {
 
     // Optional StatBlock for Balancing Lab simulations
     statBlock?: StatBlock;
+    spriteId?: string;
+    spritePalette?: SpritePalette;
+    tags?: string[];
 
     constructor(id: string, name: string, baseAttributes: Attributes) {
         this.id = id;
