@@ -413,7 +413,7 @@ Expand combat system from 1v1 to full tactical grid-based multi-unit combat:
 **Next Steps:**
 1. Replace the legacy “Jobs & Quests in progress” HUD with compact summary rows that reuse `VerbSummary`.
 2. Surface passive/system verbs (hunger, upkeep) and quest deadlines on the map per `idle_village_map_only_plan.md`.
-3. Add Playwright regression (“assign → advance time → verify reward/resource deltas”) leveraging the debug controls.
+3. Finalize the Playwright regression (“assign → advance time → verify reward/resource deltas”) leveraging the debug controls — plan captured in `docs/plans/idle_village_drag_drop_e2e_plan.md` and partially implemented in `tests/ui.spec.ts`.
 
 **Linked Plan:** [Idle Village VerbCard Refactor](plans/idle_village_verbcard_refactor_plan.md)  
 **Plan Status Snapshot:**  
@@ -423,7 +423,7 @@ Expand combat system from 1v1 to full tactical grid-based multi-unit combat:
 - Phase D (Quest Offer UX polish): ⏳ Pending (risk badges/CTA on HUD).  
 - Phase E (Testing & Docs): ⏳ Pending Vitest + Playwright updates.  
 
-Linked artifacts: `docs/plans/idle_village_tasks.md`, `docs/plans/idle_village_verbcard_refactor_plan.md`, `docs/plans/idle_village_map_only_plan.md`.
+Linked artifacts: `docs/plans/idle_village_tasks.md`, `docs/plans/idle_village_verbcard_refactor_plan.md`, `docs/plans/idle_village_map_only_plan.md`, `docs/plans/idle_village_drag_drop_e2e_plan.md`.
 
 ---
 

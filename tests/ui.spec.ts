@@ -2,6 +2,10 @@ import { test, expect, type Page } from '@playwright/test';
 import type { IdleVillageConfig } from '../src/balancing/config/idleVillage/types';
 import type { VillageState } from '../src/engine/game/idleVillage/TimeEngine';
 
+interface IdleVillageResetOptions {
+    founderId?: string;
+}
+
 interface IdleVillageControls {
     play: () => void;
     pause: () => void;
@@ -9,7 +13,8 @@ interface IdleVillageControls {
     assign: (slotId: string, residentId: string) => boolean;
     getState: () => VillageState | null;
     getConfig: () => IdleVillageConfig | null;
-    reset: () => VillageState | null;
+    reset: (options?: IdleVillageResetOptions) => VillageState | null;
+    getAssignmentFeedback: () => string | null;
 }
 
 type WindowWithControls = Window & { __idleVillageControls?: IdleVillageControls };
@@ -140,16 +145,25 @@ test.describe('UI Verification Suite', () => {
                 if (!config) {
                     throw new Error('Idle Village config missing');
                 }
-                const job = config.activities?.job_city_rats;
-                if (job) {
-                    job.metadata = {
-                        ...(job.metadata ?? {}),
+                const cityRats = config.activities?.job_city_rats;
+                if (cityRats) {
+                    cityRats.metadata = {
+                        ...(cityRats.metadata ?? {}),
                         supportsAutoRepeat: false,
                         continuousJob: false,
                     };
-                    job.statRequirement = undefined;
+                    cityRats.statRequirement = undefined;
                 }
-                controls.reset();
+                const training = config.activities?.job_training_basics;
+                if (training) {
+                    training.metadata = {
+                        ...(training.metadata ?? {}),
+                        supportsAutoRepeat: false,
+                        continuousJob: false,
+                    };
+                    training.statRequirement = undefined;
+                }
+                controls.reset({ founderId: 'founder_easy' });
             });
 
             await page.waitForFunction(() => {
@@ -181,17 +195,12 @@ test.describe('UI Verification Suite', () => {
             if (!config) {
                 throw new Error('Idle Village config missing');
             }
-            const slotIds = Object.keys(config.mapSlots ?? {});
-            let chosenSlot: string | null = null;
-            for (const slotId of slotIds) {
-                if (controls.assign(slotId, availableResident.id)) {
-                    chosenSlot = slotId;
-                    break;
-                }
-            }
-            if (!chosenSlot) {
+            const targetSlotId = 'village_square';
+            const assigned = controls.assign(targetSlotId, availableResident.id);
+            const feedback = controls.getAssignmentFeedback ? controls.getAssignmentFeedback() : null;
+            if (!assigned) {
                 throw new Error(
-                    `Failed to assign resident to any slot. Resident status=${availableResident.status}. Slots=${slotIds.join(',')}`,
+                    `Failed to assign resident to slot "${targetSlotId}". Resident status=${availableResident.status}. Feedback=${feedback ?? 'n/a'}`,
                 );
             }
             return {
@@ -203,15 +212,55 @@ test.describe('UI Verification Suite', () => {
             };
         });
 
-        await page.evaluate(() => {
+        const debugAdvance = await page.evaluate(() => {
             const controls = (window as WindowWithControls).__idleVillageControls;
             if (!controls) {
                 throw new Error('Idle Village controls missing');
             }
-            controls.advance(2);
+            const before = controls.getState()?.currentTime ?? -1;
+            controls.advance(1);
+            const after = controls.getState()?.currentTime ?? -1;
+            return { before, after };
         });
+        console.log('DEBUG advance delta', debugAdvance);
 
-        const result = await page.evaluate((id) => {
+        const completionInfo = await page.evaluate((id) => {
+            const controls = (window as WindowWithControls).__idleVillageControls;
+            if (!controls) {
+                throw new Error('Idle Village controls missing');
+            }
+            const maxSteps = 10;
+            const snapshots: Array<{ step: number; currentTime: number; residentStatus: string | null }> = [];
+            let finalState: VillageState | null = null;
+            for (let i = 0; i < maxSteps; i += 1) {
+                controls.advance(1);
+                const state = controls.getState();
+                if (!state) {
+                    throw new Error('Village state not ready during advance loop');
+                }
+                finalState = state;
+                const resident = state.residents[id];
+                if (!resident) {
+                    throw new Error(`Resident ${id} missing after advance loop`);
+                }
+                snapshots.push({ step: i + 1, currentTime: state.currentTime, residentStatus: resident.status ?? null });
+                if (resident.status === 'available') {
+                    return { success: true, steps: i + 1, snapshots };
+                }
+            }
+            const finalStatus = finalState?.residents?.[id]?.status ?? 'unknown';
+            return {
+                success: false,
+                steps: maxSteps,
+                finalStatus,
+                finalTime: finalState?.currentTime ?? null,
+                snapshots,
+            };
+        }, residentId);
+        console.log('DEBUG completion info', completionInfo);
+        expect(completionInfo.success).toBe(true);
+
+        const debugState = await page.evaluate((id) => {
             const controls = (window as WindowWithControls).__idleVillageControls;
             if (!controls) {
                 throw new Error('Idle Village controls missing');
@@ -221,18 +270,30 @@ test.describe('UI Verification Suite', () => {
                 throw new Error('Village state not ready');
             }
             const resident = state.residents[id];
+            const activities = Object.values(state.activities ?? {}).map((activity) => ({
+                id: activity.id,
+                status: activity.status,
+                activityId: activity.activityId,
+                slotId: activity.slotId,
+                startTime: activity.startTime,
+                endTime: activity.endTime,
+              }));
             return {
-                status: resident?.status ?? null,
+                currentTime: state.currentTime,
+                residentStatus: resident?.status ?? null,
                 resources: {
                     gold: state.resources.gold ?? 0,
                     xp: state.resources.xp ?? 0,
                 },
+                activities,
             };
         }, residentId);
 
-        expect(result.status).toBe('available');
-        expect(result.resources.gold).toBeGreaterThan(baselineResources.gold);
-        expect(result.resources.xp).toBeGreaterThan(baselineResources.xp);
+        console.log('DEBUG final state', debugState);
+
+        expect(debugState.residentStatus).toBe('available');
+        expect(debugState.resources.gold).toBeGreaterThan(baselineResources.gold);
+        expect(debugState.resources.xp).toBeGreaterThan(baselineResources.xp);
         });
     });
 });

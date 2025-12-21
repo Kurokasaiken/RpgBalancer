@@ -3,6 +3,38 @@
 @import "./styles/color-palette.css";
 
 @layer utilities {
+  @keyframes marble-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-spin-slow {
+    animation: marble-spin 10s linear infinite;
+  }
+
+  .animate-spin-slower {
+    animation: marble-spin 14s linear infinite;
+  }
+
+  @keyframes marble-pulse {
+    0%, 100% {
+      opacity: 0.55;
+      transform: scale(0.98);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.03);
+    }
+  }
+
+  .animate-pulse-slow {
+    animation: marble-pulse 3s ease-in-out infinite;
+  }
+
   /* Bronze Victorian Slider */
   .slider-bronze {
     -webkit-appearance: none;

@@ -14,6 +14,7 @@ import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { evaluateStatRequirement } from '@/engine/game/idleVillage/statMatching';
 import VerbCard, { type VerbVisualVariant, type ProgressStyle } from '@/ui/idleVillage/VerbCard';
+import MarbleCard from '@/ui/fantasy/assets/marble-verb-card/MarbleCard';
 import VerbDetailCard, {
   type VerbDetailPreview,
   type VerbDetailAssignment,
@@ -579,6 +580,9 @@ export default function VerbDetailSandbox() {
                     <p className="text-[10px] uppercase tracking-[0.2em] text-slate-400 text-center">{label}</p>
                   </div>
                 ))}
+                <div className="flex flex-col items-center gap-2 rounded-2xl border border-slate-800/70 bg-slate-950/40 p-3">
+                  <MarbleCard title="" icon="🌀" progress={0.72} isActive />
+                </div>
               </div>
             </section>
 

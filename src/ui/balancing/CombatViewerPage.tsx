@@ -6,9 +6,16 @@ import type { StatBlock } from '../../balancing/types';
 import { DEFAULT_STATS } from '../../balancing/types';
 import type { CombatConfig, CombatTimelineFrame, CombatActorSnapshot, EntityStats } from '../../balancing/simulation/types';
 import { useCombatPlayback } from '../../balancing/hooks/useCombatPlayback';
+import { useCombatAnimator } from '../../balancing/hooks/useCombatAnimator';
+import type { ActorAnimatorState, ActiveFxInstance } from '../../balancing/hooks/useCombatAnimator';
 import { resolveSpriteForArchetype } from '../../balancing/config/combatSprites';
 import { CombatStage } from './CombatStage';
+import { CombatAvatar } from './CombatAvatar';
+import { CombatFxLayer } from './CombatFxLayer';
+import { CombatTimelineHud } from './CombatTimelineHud';
 import { DEFAULT_COMBAT_STAGE } from '../../balancing/config/combatStage';
+import type { CombatStageSlot } from '../../balancing/config/combatStage';
+import { useEasedValue } from '../../hooks/useEasedValue';
 import clsx from 'clsx';
 
 type FighterSide = 'A' | 'B';
@@ -279,6 +286,12 @@ type PlaybackArenaProps = {
 const PlaybackArena: React.FC<PlaybackArenaProps> = ({ playback, roster, templates }) => {
     const currentFrame = playback.currentFrame ?? playback.frames[0];
     const stageConfig = DEFAULT_COMBAT_STAGE;
+    const animator = useCombatAnimator({
+        frames: playback.frames,
+        frameIndex: playback.frameIndex,
+        isPlaying: playback.isPlaying,
+        speedMs: playback.speedMs
+    });
 
     const slotAssignments = useMemo(() => {
         const counters: Record<FighterSide, number> = { A: 0, B: 0 };
@@ -293,6 +306,18 @@ const PlaybackArena: React.FC<PlaybackArenaProps> = ({ playback, roster, templat
         return map;
     }, [roster]);
 
+    const actorSlotLookup = useMemo(() => {
+        const lookup = new Map<string, (typeof stageConfig)['slots'][number]>();
+        slotAssignments.forEach((actor, slotId) => {
+            if (!actor) return;
+            const slotConfig = stageConfig.slots.find(s => s.id === slotId);
+            if (slotConfig) {
+                lookup.set(actor.id, slotConfig);
+            }
+        });
+        return lookup;
+    }, [slotAssignments, stageConfig.slots]);
+
     const renderSlot = (slot: (typeof stageConfig)['slots'][number]) => {
         const actor = slotAssignments.get(slot.id);
         if (!actor) {
@@ -304,27 +329,100 @@ const PlaybackArena: React.FC<PlaybackArenaProps> = ({ playback, roster, templat
         }
 
         const palette = actor.spritePalette;
-        const gradientStyle = palette
-            ? {
-                  background: `linear-gradient(135deg, ${palette.primary}, ${palette.accent ?? palette.secondary})`
-              }
-            : undefined;
+        const actorState = animator.actorStates[actor.id];
+        const slotFx = animator.activeFx.filter(fx => fx.actorId === actor.id || fx.targetId === actor.id);
 
         return (
-            <div className="pointer-events-auto flex flex-col items-center gap-2 text-[11px]">
-                <div
-                    className="h-20 w-20 rounded-full border-2 border-white/20 shadow-lg shadow-black/70"
-                    style={gradientStyle}
-                />
-                <div className="rounded-full bg-slate-900/80 px-3 py-1 font-semibold text-slate-100 shadow-lg shadow-slate-900/60">
-                    {actor.name}
-                </div>
-                <div className="w-24 rounded-full border border-white/10 bg-slate-800/80">
+            <div className="pointer-events-auto flex flex-col items-center gap-3 text-[11px]">
+                <div className="relative rounded-3xl border border-white/15 bg-slate-950/70 px-4 pb-3 pt-4 shadow-[0_25px_45px_rgba(0,0,0,0.65)] backdrop-blur">
                     <div
-                        className={clsx('h-2 rounded-full transition-all duration-300', slot.team === 'A' ? 'bg-cyan-400' : 'bg-rose-400')}
-                        style={{ width: `${Math.max(0, Math.min(100, (actor.hp / actor.maxHp) * 100))}%` }}
+                        className="absolute inset-x-3 top-2 h-px opacity-60"
+                        style={{ background: palette?.accent ?? 'rgba(255,255,255,0.3)' }}
+                    />
+                    <CombatAvatar spriteId={actor.spriteId} actorState={actorState} className="mx-auto" size={140} />
+                    <div className="mt-3 text-center font-semibold text-slate-200">
+                        {actor.name}
+                    </div>
+                    {slotFx.length > 0 && (
+                        <div className="mt-2 flex flex-wrap justify-center gap-2 text-[9px] uppercase tracking-[0.3em] text-slate-300">
+                            {slotFx.map(fx => (
+                                <span
+                                    key={fx.id}
+                                    className={clsx(
+                                        'rounded-full px-2 py-1',
+                                        fx.type === 'crit' && 'bg-rose-500/20 text-rose-200 border border-rose-400/40',
+                                        fx.type === 'shield' && 'bg-cyan-500/15 text-cyan-200 border border-cyan-400/30',
+                                        fx.type === 'heal' && 'bg-emerald-500/15 text-emerald-200 border border-emerald-400/30',
+                                        fx.type === 'shake' && 'bg-amber-500/15 text-amber-200 border border-amber-400/30',
+                                        fx.type === 'status' && 'bg-violet-500/15 text-violet-200 border border-violet-400/30'
+                                    )}
+                                >
+                                    {fx.type.toUpperCase()}
+                                </span>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                <SlotHpMeter actor={actor} slot={slot} fx={slotFx} actorState={actorState} />
+            </div>
+        );
+    };
+
+    interface SlotHpMeterProps {
+        actor: CombatActorSnapshot;
+        slot: CombatStageSlot;
+        fx: ActiveFxInstance[];
+        actorState?: ActorAnimatorState;
+    }
+
+    const SlotHpMeter: React.FC<SlotHpMeterProps> = ({ actor, slot, fx }) => {
+        const easedHp = useEasedValue(actor.hp, { durationMs: 520 });
+        const maxHp = Math.max(actor.maxHp, 1);
+        const hpPercent = Math.max(0, Math.min(100, (easedHp / maxHp) * 100));
+
+        const latestFx = [...fx]
+            .sort((a, b) => b.expiresAt - a.expiresAt)
+            .find(instance => ['attack', 'crit', 'shake', 'heal', 'miss'].includes(instance.type));
+
+        const magnitude =
+            typeof latestFx?.metadata?.damage === 'number'
+                ? Number(latestFx.metadata.damage)
+                : typeof latestFx?.metadata?.hpLost === 'number'
+                    ? Number(latestFx.metadata.hpLost)
+                    : typeof latestFx?.metadata?.amount === 'number'
+                        ? Number(latestFx.metadata.amount)
+                        : undefined;
+
+        const isHeal = latestFx?.type === 'heal';
+        const accentBar = slot.team === 'A' ? 'from-cyan-400 to-cyan-300' : 'from-rose-400 to-rose-300';
+
+        return (
+            <div className="flex items-center gap-3 text-[10px] uppercase tracking-[0.3em] text-slate-400">
+                <span>HP</span>
+                <div className="relative h-3 w-28 overflow-hidden rounded-full border border-white/10 bg-slate-900/70">
+                    <div
+                        className={clsx(
+                            'absolute inset-y-0 left-0 rounded-full bg-linear-to-r transition-[width] duration-500',
+                            accentBar,
+                            latestFx && !isHeal && 'shadow-[0_0_18px_rgba(248,113,113,0.45)]',
+                            latestFx && isHeal && 'shadow-[0_0_18px_rgba(16,185,129,0.45)]'
+                        )}
+                        style={{ width: `${hpPercent}%` }}
                     />
                 </div>
+                <span className="text-[9px] tracking-normal text-slate-200">{Math.round(easedHp)}</span>
+                {typeof magnitude === 'number' && magnitude > 0 && (
+                    <span
+                        className={clsx(
+                            'text-[10px] font-bold tracking-normal',
+                            isHeal ? 'text-emerald-300' : 'text-rose-300'
+                        )}
+                    >
+                        {isHeal ? '+' : '-'}
+                        {Math.round(Math.abs(magnitude))}
+                    </span>
+                )}
             </div>
         );
     };
@@ -334,7 +432,7 @@ const PlaybackArena: React.FC<PlaybackArenaProps> = ({ playback, roster, templat
             <div className="border-b border-slate-800 bg-slate-950/60 px-4 py-3 flex items-center justify-between">
                 <div>
                     <p className="text-xs text-slate-500 uppercase tracking-wide">Turn {currentFrame?.turn ?? 0}</p>
-                    <p className="text-sm text-slate-300">Phase: {currentFrame?.phases?.[0]?.phase ?? 'waiting'}</p>
+                    <p className="text-sm text-slate-300">Phase: {animator.currentEvent?.phase ?? currentFrame?.phases?.[0]?.phase ?? 'waiting'}</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button
@@ -352,8 +450,13 @@ const PlaybackArena: React.FC<PlaybackArenaProps> = ({ playback, roster, templat
                 </div>
             </div>
 
-            <div className="p-6">
-                <CombatStage config={stageConfig} renderSlot={renderSlot}>
+            <div className="p-6 space-y-4">
+                <CombatTimelineHud events={animator.currentScript?.events ?? []} cursor={animator.eventCursor} />
+                <CombatStage
+                    config={stageConfig}
+                    renderSlot={renderSlot}
+                    overlay={<CombatFxLayer fx={animator.activeFx} slotLookup={actorSlotLookup} />}
+                >
                     <div className="rounded-full border border-white/10 bg-slate-900/70 px-4 py-2 text-xs uppercase tracking-[0.3em] text-slate-300">
                         {templates.A?.name ?? 'Team A'} vs {templates.B?.name ?? 'Team B'}
                     </div>

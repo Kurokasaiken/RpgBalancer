@@ -85,7 +85,7 @@
 - [ ] Implement visual indicators (green/yellow/red badges) for difficulty/reward categories driven from config
 - [ ] Add detailed tooltips explaining quest level, difficulty/reward categories and color semantics
 - [ ] Apply Gilded Observatory theme and responsive layout
-- [ ] Add basic Playwright E2E for main loop (job + simple quest)
+- [ ] Add basic Playwright E2E for main loop (job + simple quest) — *plan drafted in `docs/plans/idle_village_drag_drop_e2e_plan.md`; implementation underway in `tests/ui.spec.ts`.*
 
 ## 12.10 – Testing & Integration
 
@@ -132,3 +132,4 @@
 
 - [ ] Link this file and `idle_village_plan.md` from `MASTER_PLAN.md`
 - [ ] Keep tasks strictly actionable; move any design changes back into the plan
+- [x] Capture a dedicated drag/drop E2E test plan (`docs/plans/idle_village_drag_drop_e2e_plan.md`)

@@ -9,11 +9,12 @@ export interface CombatStageProps {
     config: CombatStageConfig;
     children?: React.ReactNode;
     renderSlot?: (slot: CombatStageSlot) => React.ReactNode;
+    overlay?: React.ReactNode;
 }
 
 const VIEWBOX = { width: 1200, height: 700 };
 
-export const CombatStage: React.FC<CombatStageProps> = ({ config, children, renderSlot }) => {
+export const CombatStage: React.FC<CombatStageProps> = ({ config, children, renderSlot, overlay }) => {
     const stageId = config.id;
     const renderSlotContent = renderSlot ?? defaultSlotRenderer;
 
@@ -33,7 +34,7 @@ export const CombatStage: React.FC<CombatStageProps> = ({ config, children, rend
             </svg>
 
             <div className="relative z-10 min-h-[420px]">
-                <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute inset-0 pointer-events-none z-10">
                     {config.slots.map(slot => (
                         <div
                             key={slot.id}
@@ -54,7 +55,13 @@ export const CombatStage: React.FC<CombatStageProps> = ({ config, children, rend
                     ))}
                 </div>
 
-                <div className="relative z-20 flex min-h-[420px] items-center justify-center">
+                {overlay && (
+                    <div className="absolute inset-0 z-20 pointer-events-none">
+                        {overlay}
+                    </div>
+                )}
+
+                <div className="relative z-30 flex min-h-[420px] items-center justify-center">
                     {children}
                 </div>
             </div>

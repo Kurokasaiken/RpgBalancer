@@ -30,6 +30,7 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@tailwindcss/postcss": "^4.1.17",
+    "framer-motion": "^11.0.3",
     "lucide-react": "^0.555.0",
     "pixi.js": "^8.14.3",
     "react": "^19.2.0",
@@ -42,6 +43,7 @@
     "zod": "^4.1.13"
   },
   "devDependencies": {
+    "@testing-library/react": "^16.1.0",
     "@eslint/js": "^9.39.1",
     "@playwright/test": "^1.56.1",
     "@tauri-apps/cli": "^2.9.4",

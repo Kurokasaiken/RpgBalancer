@@ -262,9 +262,10 @@ See [combat_viewer_visual_mock_plan.md](combat_viewer_visual_mock_plan.md) for f
 - [ ] Support >1 fighter per side using responsive grid
 
 ### 6.5 Animator & HUD
-- [ ] Create `useCombatAnimator` hook and `CombatAvatar` component
-- [ ] Implement FX components (slash, shield, hit sparks)
-- [ ] Replace timeline controls with HUD/phase badges + damage heatmap
+- [ ] Implement `useCombatAnimator` + `CombatAvatar` per [combat_animator_implementation.md](combat_animator_implementation.md#32-usecombatanimator-hook) (FSM-driven states, rAF ticker, deterministic queue)
+- [ ] Build FX layer (`SlashFx`, `ShieldPulse`, `ImpactFlash`, `DamageNumber`) following [section 3.4](combat_animator_implementation.md#34-fx--feedback-components)
+- [ ] Upgrade stage HUD per [section 3.5](combat_animator_implementation.md#35-stagehud-integration): timeline badges, easing HP bars, overlayed damage numbers
+- [ ] Add tests + tooling from [section 3.6](combat_animator_implementation.md#36-testing--tooling)
 
 ### 6.6 QA & Export
 - [ ] Snapshot + visual regression tests for animator & stage

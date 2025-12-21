@@ -49,6 +49,10 @@ import ResidentRoster from '@/ui/idleVillage/ResidentRoster';
 const DEFAULT_CARD_SCALE = 0.45;
 const RESIDENT_DRAG_MIME = 'application/x-idle-resident';
 
+interface IdleVillageResetOptions {
+  founderId?: string;
+}
+
 interface IdleVillageDebugControls {
   play: () => void;
   pause: () => void;
@@ -56,7 +60,8 @@ interface IdleVillageDebugControls {
   assign: (slotId: string, residentId: string) => boolean;
   getState: () => VillageState | null;
   getConfig: () => IdleVillageConfig | null;
-  reset: () => VillageState | null;
+  reset: (options?: IdleVillageResetOptions) => VillageState | null;
+  getAssignmentFeedback: () => string | null;
 }
 
 declare global {
@@ -290,6 +295,7 @@ const IdleVillageMapPage: React.FC = () => {
   const { config } = useIdleVillageConfig();
   const defaultFounderPreset = useMemo(() => selectDefaultFounder(config), [config]);
   const [villageState, setVillageState] = useState<VillageState | null>(null);
+  const villageStateRef = useRef<VillageState | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [cardScale, setCardScale] = useState(DEFAULT_CARD_SCALE);
   const [isResidentDragActive, setIsResidentDragActive] = useState(false);
@@ -298,13 +304,31 @@ const IdleVillageMapPage: React.FC = () => {
   const [assignmentFeedback, setAssignmentFeedback] = useState<string | null>(null);
   const [highlightSlotId, setHighlightSlotId] = useState<string | null>(null);
   const highlightTimeoutRef = useRef<number | null>(null);
+  const lastAssignmentFeedbackRef = useRef<string | null>(null);
 
-  const bootstrapVillageState = useCallback(() => {
+  const updateAssignmentFeedback = useCallback(
+    (message: string | null, options?: { silent?: boolean }) => {
+      lastAssignmentFeedbackRef.current = message;
+      if (!options?.silent) {
+        setAssignmentFeedback(message);
+      }
+    },
+    [],
+  );
+
+  const bootstrapVillageState = useCallback((options?: IdleVillageResetOptions) => {
     if (!config) return null;
-    const freshState = createVillageStateFromConfig({ config, founderPreset: defaultFounderPreset });
+    let founderPreset = defaultFounderPreset;
+    if (options?.founderId && config.founders?.[options.founderId]) {
+      founderPreset = config.founders[options.founderId];
+    }
+
+    const freshState = createVillageStateFromConfig({ config, founderPreset });
     setVillageState(freshState);
+    villageStateRef.current = freshState;
+    updateAssignmentFeedback(null);
     return freshState;
-  }, [config, defaultFounderPreset]);
+  }, [config, defaultFounderPreset, updateAssignmentFeedback]);
 
   useEffect(() => {
     bootstrapVillageState();
@@ -312,77 +336,82 @@ const IdleVillageMapPage: React.FC = () => {
 
   const advanceTimeBy = useCallback(
     (delta: number) => {
-      if (!config) return;
-      setVillageState((prev) => {
-        if (!prev) return prev;
-        const result = tickIdleVillage({ config, rng: simpleRng }, prev, delta);
-        let nextState = result.state;
+      if (!config || delta <= 0) return;
+      const prev = villageStateRef.current;
+      if (!prev) return;
 
-        if (result.completedJobs.length > 0) {
-          for (const job of result.completedJobs) {
-            const activity = config.activities[job.activityId] as ActivityDefinition | undefined;
-            if (!activity) continue;
+      const result = tickIdleVillage({ config, rng: simpleRng }, prev, delta);
+      let nextState = result.state;
 
-            const metadata = (activity.metadata ?? {}) as {
-              supportsAutoRepeat?: boolean;
-              continuousJob?: boolean;
-            };
-            const isContinuous = !!metadata.continuousJob;
-            const supportsAuto = !!metadata.supportsAutoRepeat;
-            const isAutoOn = isContinuous || supportsAuto;
-            const scheduled = nextState.activities[job.scheduledId];
-            if (!scheduled || !isAutoOn || scheduled.characterIds.length === 0) {
-              continue;
-            }
+      if (result.completedJobs.length > 0) {
+        for (const job of result.completedJobs) {
+          const activity = config.activities[job.activityId] as ActivityDefinition | undefined;
+          if (!activity) continue;
 
-            const { maxFatigueBeforeExhausted } = config.globalRules;
-            const assigneesReady = scheduled.characterIds.every((cid) => {
-              const resident = nextState.residents[cid];
-              if (!resident) return false;
-              if (resident.status !== 'available') return false;
-              return resident.fatigue < maxFatigueBeforeExhausted;
-            });
-
-            if (!assigneesReady) {
-              continue;
-            }
-
-            const schedResult = scheduleActivity(
-              { config, rng: simpleRng },
-              nextState,
-              {
-                activityId: scheduled.activityId,
-                characterIds: [...scheduled.characterIds],
-                slotId: scheduled.slotId,
-              },
-            );
-            nextState = schedResult.state;
-          }
-        }
-
-        if (result.completedQuests.length > 0) {
-          result.completedQuests.forEach(() => {
-            // No extra UI side-effects yet for completed quests.
-          });
-        }
-
-        const questOffers = nextState.questOffers ?? {};
-        const filteredEntries = Object.entries(questOffers).filter(([, offer]) => {
-          if (typeof offer.expiresAtTime !== 'number') return true;
-          return offer.expiresAtTime > nextState.currentTime;
-        });
-        if (filteredEntries.length !== Object.keys(questOffers).length) {
-          nextState = {
-            ...nextState,
-            questOffers: Object.fromEntries(filteredEntries),
+          const metadata = (activity.metadata ?? {}) as {
+            supportsAutoRepeat?: boolean;
+            continuousJob?: boolean;
           };
-        }
+          const isContinuous = !!metadata.continuousJob;
+          const supportsAuto = !!metadata.supportsAutoRepeat;
+          const isAutoOn = isContinuous || supportsAuto;
+          const scheduled = nextState.activities[job.scheduledId];
+          if (!scheduled || !isAutoOn || scheduled.characterIds.length === 0) {
+            continue;
+          }
 
-        return nextState;
+          const { maxFatigueBeforeExhausted } = config.globalRules;
+          const assigneesReady = scheduled.characterIds.every((cid) => {
+            const resident = nextState.residents[cid];
+            if (!resident) return false;
+            if (resident.status !== 'available') return false;
+            return resident.fatigue < maxFatigueBeforeExhausted;
+          });
+
+          if (!assigneesReady) {
+            continue;
+          }
+
+          const schedResult = scheduleActivity(
+            { config, rng: simpleRng },
+            nextState,
+            {
+              activityId: scheduled.activityId,
+              characterIds: [...scheduled.characterIds],
+              slotId: scheduled.slotId,
+            },
+          );
+          nextState = schedResult.state;
+        }
+      }
+
+      if (result.completedQuests.length > 0) {
+        result.completedQuests.forEach(() => {
+          // No extra UI side-effects yet for completed quests.
+        });
+      }
+
+      const questOffers = nextState.questOffers ?? {};
+      const filteredEntries = Object.entries(questOffers).filter(([, offer]) => {
+        if (typeof offer.expiresAtTime !== 'number') return true;
+        return offer.expiresAtTime > nextState.currentTime;
       });
+      if (filteredEntries.length !== Object.keys(questOffers).length) {
+        nextState = {
+          ...nextState,
+          questOffers: Object.fromEntries(filteredEntries),
+        };
+      }
+
+      villageStateRef.current = nextState;
+      setVillageState(nextState);
     },
     [config],
   );
+
+  useEffect(() => {
+    villageStateRef.current = villageState;
+  }, [villageState]);
 
   useEffect(() => {
     if (!isPlaying) return undefined;
@@ -428,91 +457,94 @@ const IdleVillageMapPage: React.FC = () => {
   const assignResidentToSlot = useCallback(
     (slotId: string, residentId: string | null, options?: { silent?: boolean; skipHighlight?: boolean }) => {
       if (!config) {
-        if (!options?.silent) {
-          setAssignmentFeedback('Config non caricata, impossibile assegnare.');
-        }
+        updateAssignmentFeedback('Config non caricata, impossibile assegnare.', { silent: options?.silent });
         return false;
       }
 
       if (!residentId) {
-        if (!options?.silent) {
-          setAssignmentFeedback('Seleziona un residente valido da trascinare.');
-        }
+        updateAssignmentFeedback('Seleziona un residente valido da trascinare.', { silent: options?.silent });
         return false;
       }
 
-      let success = false;
-      let feedbackMessage: string | null = null;
+      const prev = villageStateRef.current;
+      if (!prev) {
+        updateAssignmentFeedback('Stato del villaggio non pronto.', { silent: options?.silent });
+        return false;
+      }
 
-      setVillageState((prev) => {
-        if (!prev) {
-          if (!options?.silent) {
-            feedbackMessage = 'Stato del villaggio non pronto.';
-          }
-          return prev;
-        }
+      const resident = prev.residents[residentId];
+      if (!resident) {
+        updateAssignmentFeedback(`Residente ${residentId} non trovato.`, { silent: options?.silent });
+        return false;
+      }
 
-        const resident = prev.residents[residentId];
-        if (!resident) {
-          if (!options?.silent) {
-            feedbackMessage = `Residente ${residentId} non trovato.`;
-          }
-          return prev;
-        }
+      const slotDef = config.mapSlots?.[slotId];
+      if (!slotDef) {
+        updateAssignmentFeedback(`Slot ${slotId} non definito in config.`, { silent: options?.silent });
+        return false;
+      }
 
-        const slotDef = config.mapSlots?.[slotId];
-        if (!slotDef) {
-          if (!options?.silent) {
-            feedbackMessage = `Slot ${slotId} non definito in config.`;
-          }
-          return prev;
-        }
+      const candidateActivities = activitiesBySlot[slotId] ?? [];
+      if (candidateActivities.length === 0) {
+        updateAssignmentFeedback('Nessuna activity compatibile per questo slot.', { silent: options?.silent });
+        return false;
+      }
 
-        const candidateActivities = activitiesBySlot[slotId] ?? [];
-        if (candidateActivities.length === 0) {
-          if (!options?.silent) {
-            feedbackMessage = 'Nessuna activity compatibile per questo slot.';
-          }
-          return prev;
-        }
+      let selectedActivity: ActivityDefinition | null = null;
+      let lastFailureReason: string | null = null;
 
-        const selectedActivity =
-          candidateActivities.find((activity) => activityMatchesSlot(activity, slotDef)) ?? candidateActivities[0];
-
+      for (const activity of candidateActivities) {
         const validation = validateAssignment({
           resident,
           slot: slotDef,
-          activity: selectedActivity,
+          activity,
           config,
         });
 
-        if (!validation.ok) {
-          if (!options?.silent) {
-            feedbackMessage = validation.reason;
-          }
-          return prev;
+        if (validation.ok) {
+          selectedActivity = activity;
+          break;
         }
 
-        const { state: nextState } = scheduleActivity(
-          { config, rng: simpleRng },
-          prev,
-          {
-            activityId: selectedActivity.id,
-            characterIds: [resident.id],
-            slotId,
-          },
-        );
-
-        success = true;
-        feedbackMessage = `${resident.id} assegnato a ${selectedActivity.label ?? selectedActivity.id}.`;
-        return nextState;
-      });
-
-      if (!options?.silent && feedbackMessage) {
-        setAssignmentFeedback(feedbackMessage);
+        if (validation.reason) {
+          lastFailureReason = validation.reason;
+        }
       }
 
-      if (success && !options?.skipHighlight) {
+      if (!selectedActivity) {
+        updateAssignmentFeedback(lastFailureReason ?? 'Nessuna activity valida per questo slot.', {
+          silent: options?.silent,
+        });
+        return false;
+      }
+
+      const scheduleResult = scheduleActivity(
+        { config, rng: simpleRng },
+        prev,
+        {
+          activityId: selectedActivity.id,
+          characterIds: [resident.id],
+          slotId,
+        },
+      );
+
+      if (scheduleResult.error) {
+        const message =
+          scheduleResult.error === 'One or more characters are not available'
+            ? `${resident.id} non è disponibile.`
+            : `Errore di scheduling: ${scheduleResult.error}`;
+        updateAssignmentFeedback(message, { silent: options?.silent });
+        return false;
+      }
+
+      const nextState = scheduleResult.state;
+      villageStateRef.current = nextState;
+      setVillageState(nextState);
+
+      const successMessage = `${resident.id} assegnato a ${selectedActivity.label ?? selectedActivity.id}.`;
+      updateAssignmentFeedback(successMessage, { silent: options?.silent });
+
+      if (!options?.skipHighlight) {
         setHighlightSlotId(slotId);
         if (highlightTimeoutRef.current !== null) {
           window.clearTimeout(highlightTimeoutRef.current);
@@ -522,9 +554,9 @@ const IdleVillageMapPage: React.FC = () => {
         }, 2200);
       }
 
-      return success;
+      return true;
     },
-    [activitiesBySlot, config],
+    [activitiesBySlot, config, updateAssignmentFeedback],
   );
 
   useEffect(() => {
@@ -535,9 +567,10 @@ const IdleVillageMapPage: React.FC = () => {
       advance: (delta: number) => advanceTimeBy(delta),
       assign: (slotId: string, residentId: string) =>
         assignResidentToSlot(slotId, residentId, { silent: true, skipHighlight: true }),
-      getState: () => villageState,
+      getState: () => villageStateRef.current,
       getConfig: () => config ?? null,
-      reset: () => bootstrapVillageState(),
+      reset: (options?: IdleVillageResetOptions) => bootstrapVillageState(options),
+      getAssignmentFeedback: () => lastAssignmentFeedbackRef.current,
     };
     window.__idleVillageControls = controls;
     return () => {
