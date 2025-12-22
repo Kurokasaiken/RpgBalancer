@@ -9,20 +9,19 @@ const CANVAS_SIZE = 300;
 const CENTER_X = CANVAS_SIZE / 2;
 const CENTER_Y = CANVAS_SIZE / 2;
 const RADIUS = 120;
+type AltVisualComponent = React.ComponentType<{ stats: StatRow[]; controlsPortal?: HTMLElement | null }>;
 const ALT_VISUAL_ENTRIES = [
   {
     id: 'alt-v8',
     label: 'Alt Visuals v8',
-    tagline: 'Obsidian Meridian · colonne cinematiche',
     Component: AltVisualsV8ObsidianField,
   },
   {
     id: 'alt-v6',
     label: 'Alt Visuals v6',
-    tagline: 'Starfield Duel · morph pentagono/stella',
     Component: AltVisualsV6Asterism,
   },
-] as const;
+] satisfies readonly { id: string; label: string; Component: AltVisualComponent }[];
 type AltVisualId = (typeof ALT_VISUAL_ENTRIES)[number]['id'];
 
 const ALT_VIEW_MODE_STORAGE_KEY = 'skill-check-preview-alt-view';
@@ -1021,21 +1020,17 @@ export const SkillCheckPreviewPage: React.FC = () => {
     return stored === 'alt-v6-plus' ? 'alt-v6-plus' : 'classic';
   });
   const [altViewMode, setAltViewMode] = useState<AltVisualId>(() => {
-    if (typeof window === 'undefined') {
-      return 'alt-v8';
-    }
     const stored = window.localStorage.getItem(ALT_VIEW_MODE_STORAGE_KEY);
-    const normalized = stored === 'alt-v7' ? 'alt-v8' : (stored as AltVisualId | null);
-    const valid = ALT_VISUAL_ENTRIES.find((entry) => entry.id === normalized);
-    return valid?.id ?? 'alt-v8';
+    if (stored === 'alt-v6' || stored === 'alt-v8') return stored;
+    return 'alt-v8';
   });
+  const [altControlsPortalEl, setAltControlsPortalEl] = useState<HTMLDivElement | null>(null);
   const [ballPosition, setBallPosition] = useState<Point | null>(null);
   const [lastOutcome, setLastOutcome] = useState<LastOutcome | null>(null);
   const [timer, setTimer] = useState('0.0s');
   const [log, setLog] = useState<string[]>([]);
 
   const ballAnimFrameRef = useRef<number | null>(null);
-
 
   const activeCount = stats.filter((s) => s.questValue > 0).length;
 
@@ -1259,10 +1254,6 @@ export const SkillCheckPreviewPage: React.FC = () => {
   return (
     <div className="p-3 md:p-4 text-ivory">
       <h1 className="text-lg md:text-xl font-cinzel tracking-[0.2em] uppercase mb-2">Skill Check Preview Lab</h1>
-      <p className="text-[11px] text-slate-300 mb-3 max-w-2xl">
-        Giocattolo per visualizzare lo skill check stile Dispatch. Configura numero di stat, profilo quest/PG,
-        percentuali di injury/death e lancia una pallina che rimbalza dentro l&apos;area della quest.
-      </p>
       <div className="flex flex-wrap gap-2 mb-4">
         <span className="text-[10px] uppercase tracking-[0.24em] text-slate-500 pt-1">View</span>
         <div className="bg-slate-900/70 border border-slate-800 rounded-full p-1 flex gap-1">
@@ -1616,8 +1607,29 @@ export const SkillCheckPreviewPage: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="space-y-4">
-          <div className="default-card p-4 space-y-4">
+        <div className="grid gap-4 lg:grid-cols-[1fr_minmax(260px,320px)]">
+          <div
+            className="default-card p-6 space-y-3 flex flex-col"
+            style={{ backgroundColor: 'rgba(18, 20, 26, 0.86)' }}
+          >
+            {(() => {
+              const entry = ALT_VISUAL_ENTRIES.find((item) => item.id === altViewMode) ?? ALT_VISUAL_ENTRIES[0];
+              const VisualComponent = entry.Component;
+              return (
+                <div
+                  className="flex-1 flex items-center justify-center min-h-[360px] rounded-4xl"
+                  style={{ backgroundColor: 'rgba(8, 10, 15, 0.1)' }}
+                >
+                  <VisualComponent stats={stats} controlsPortal={altControlsPortalEl} />
+                </div>
+              );
+            })()}
+          </div>
+
+          <div
+            className="default-card p-4 space-y-4 h-min sticky top-16 self-start"
+            style={{ backgroundColor: 'rgba(24, 28, 36, 0.78)' }}
+          >
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h3 className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-200">
@@ -1632,7 +1644,7 @@ export const SkillCheckPreviewPage: React.FC = () => {
                   <button
                     key={entry.id}
                     type="button"
-                    onClick={() => setAltViewMode(entry.id)}
+                    onClick={() => setAltViewMode(entry.id as AltVisualId)}
                     className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-[0.16em] transition-all ${altViewMode === entry.id
                       ? 'bg-cyan-400/20 text-cyan-100 border border-cyan-300/60 shadow-[0_0_12px_rgba(34,211,238,0.25)]'
                       : 'text-slate-400 hover:text-slate-100'
@@ -1643,6 +1655,10 @@ export const SkillCheckPreviewPage: React.FC = () => {
                 ))}
               </div>
             </div>
+            <div
+              ref={setAltControlsPortalEl}
+              className="flex flex-wrap items-center gap-3 rounded-2xl border border-slate-800/80 bg-slate-950/40 px-3 py-3 min-h-[72px]"
+            />
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-[10px] text-slate-300">
               <div className="bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-2">
                 <div className="uppercase tracking-[0.18em] text-slate-500">Stats attive</div>
@@ -1663,21 +1679,6 @@ export const SkillCheckPreviewPage: React.FC = () => {
                 <div className="text-lg font-mono text-rose-300">{deathPct}%</div>
               </div>
             </div>
-          </div>
-
-          <div className="default-card p-6 space-y-3">
-            {(() => {
-              const entry = ALT_VISUAL_ENTRIES.find((item) => item.id === altViewMode) ?? ALT_VISUAL_ENTRIES[0];
-              const VisualComponent = entry.Component;
-              return (
-                <>
-                  <p className="text-[11px] text-slate-400 text-center uppercase tracking-[0.18em]">
-                    {entry.tagline}
-                  </p>
-                  <VisualComponent stats={stats} />
-                </>
-              );
-            })()}
           </div>
         </div>
       )}

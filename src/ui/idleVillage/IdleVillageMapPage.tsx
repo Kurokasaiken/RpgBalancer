@@ -35,9 +35,8 @@ import type {
   MapSlotDefinition,
   StatRequirement,
 } from '@/balancing/config/idleVillage/types';
-import { type MarbleCardTone } from '@/ui/fantasy/assets/marble-verb-card/MarbleCard';
+import MapMarker from '@/ui/idleVillage/MapMarker';
 import MarbleMedallionCard from '@/ui/fantasy/assets/marble-verb-card/MarbleMedallionCard';
-import type { VerbTone } from '@/ui/idleVillage/VerbCard';
 import {
   DEFAULT_SECONDS_PER_TIME_UNIT,
   buildActivityBlueprintSummary,
@@ -50,14 +49,6 @@ import ResidentRoster from '@/ui/idleVillage/ResidentRoster';
 
 const DEFAULT_CARD_SCALE = 0.45;
 const RESIDENT_DRAG_MIME = 'application/x-idle-resident';
-const TONE_MAP: Record<VerbTone, MarbleCardTone> = {
-  neutral: 'neutral',
-  job: 'job',
-  quest: 'quest',
-  danger: 'danger',
-  system: 'system',
-};
-
 const FX_KEYFRAMES = `
 @keyframes idleVillageResourceAttract {
   0% {
@@ -295,22 +286,24 @@ function MapSlotVerbCluster({
             {canAcceptDrop ? 'Drop Resident' : 'Slot non attivo'}
           </span>
         )}
-        {verbs.map((verb) => (
-          <div
-            key={verb.key}
-            className="origin-top relative"
-            style={{ transform: `scale(${cardScale})` }}
-          >
-            <VerbCardFX verb={verb} />
-            <MarbleMedallionCard
-              title={verb.label}
-              icon={verb.icon}
-              progress={verb.progressFraction}
-              isActive={verb.progressFraction > 0 && verb.progressFraction < 1}
-              tone={TONE_MAP[verb.tone] ?? 'neutral'}
-            />
-          </div>
-        ))}
+        {verbs.map((verb) => {
+          const isActive = verb.progressFraction > 0 && verb.progressFraction < 1;
+          const isFinished = verb.progressFraction >= 0.999 || verb.source === 'completed';
+          return (
+            <div
+              key={verb.key}
+              className="origin-top relative"
+              style={{ transform: `scale(${cardScale})` }}
+            >
+              <VerbCardFX verb={verb} />
+              <MapMarker
+                verb={verb}
+                isActive={isActive}
+                isFinished={isFinished}
+              />
+            </div>
+          );
+        })}
       </div>
     </div>
   );

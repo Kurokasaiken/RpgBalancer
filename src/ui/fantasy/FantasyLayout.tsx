@@ -34,59 +34,45 @@ export const FantasyLayout: React.FC<FantasyLayoutProps> = ({ children, activeTa
     };
 
     return (
-        <div className="flex h-screen w-full overflow-hidden bg-linear-to-br from-obsidian-darkest via-obsidian-dark to-obsidian">
-            {/* Desktop Sidebar */}
-            {!isMobile && (
-                <aside className="w-56 flex flex-col bg-linear-to-b from-obsidian-darkest/95 via-obsidian-dark/90 to-obsidian-light/90 shadow-fantasy-soft">
-                    {/* Header */}
-                    <div className="h-3" />
-                    
-                    {/* Nav Sections */}
-                    <nav className="flex-1 overflow-y-auto py-3 scrollbar-hide">
-                        <div className="mx-3 observatory-nav-frame">
+        <>
+            <div className="flex h-screen w-full overflow-hidden bg-linear-to-br from-obsidian-darkest via-obsidian-dark to-obsidian">
+                {/* Desktop Left Menu */}
+                {!isMobile && (
+                    <aside className="hidden lg:flex w-64 shrink-0 px-4 py-6">
+                        <div className="observatory-nav-frame w-full">
                             <div className="observatory-nav-orb" aria-hidden="true" />
-                            <div className="py-2">
+                            <nav className="flex flex-col gap-4">
                                 {NAV_SECTIONS.map((section) => (
-                                    <div key={section.title} className="mb-2 last:mb-1">
-                                        <p className="px-3 pb-1">
-                                            <span className="flex items-center gap-2 text-[8px] text-teal-muted/40">
-                                                <span className="h-px flex-1 bg-slate-800/60" />
-                                                <span className="w-1.5 h-1.5 rounded-full bg-gold/70 shadow-glow-gold" />
-                                                <span className="h-px flex-1 bg-slate-800/60" />
-                                            </span>
+                                    <div key={section.title}>
+                                        <p className="px-3 pb-1 text-[9px] uppercase tracking-[0.35em] text-slate-400/70">
+                                            {section.title}
                                         </p>
-                                        {section.items.map((item) => (
-                                            <button
-                                                key={item.id}
-                                                data-tab-id={item.id}
-                                                data-testid={`nav-btn-${item.id}`}
-                                                onClick={() => onTabChange(item.id)}
-                                                className={`
-                                                    w-full flex items-center gap-3 px-4 py-2.5 text-left rounded-xl
-                                                    transition-all duration-fast relative overflow-hidden
-                                                    ${activeTab === item.id
-                                                        ? 'bg-linear-to-r from-gold/20 via-gold/10 to-transparent text-gold'
-                                                        : 'text-ivory-muted hover:bg-obsidian-dark/70 hover:text-ivory hover:border-gold/40 hover:shadow-fantasy-soft'
-                                                    }
-                                                `}
-                                            >
-                                                <span className="text-base">{item.icon}</span>
-                                                <span className="text-sm truncate">{item.label}</span>
-                                            </button>
-                                        ))}
+                                        <div className="flex flex-col gap-1">
+                                            {section.items.map((item) => {
+                                                const isActive = activeTab === item.id;
+                                                return (
+                                                    <button
+                                                        key={item.id}
+                                                        data-tab-id={item.id}
+                                                        data-testid={`nav-btn-${item.id}`}
+                                                        onClick={() => onTabChange(item.id)}
+                                                        className={`observatory-nav-item ${isActive ? 'is-active' : ''}`}
+                                                    >
+                                                        <span className="text-lg">{item.icon}</span>
+                                                        <span className="truncate">{item.label}</span>
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
                                     </div>
                                 ))}
-                            </div>
+                            </nav>
                         </div>
-                    </nav>
+                    </aside>
+                )}
 
-                    {/* Footer */}
-                    <div className="p-3" />
-                </aside>
-            )}
-
-            {/* Main Content */}
-            <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+                {/* Main Content */}
+                <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
                 {/* Mobile Header */}
                 {isMobile && (
                     <header className="flex items-center justify-between px-4 py-3 bg-obsidian-light/90 border-b border-slate-darkest">
@@ -114,6 +100,8 @@ export const FantasyLayout: React.FC<FantasyLayoutProps> = ({ children, activeTa
                     </div>
                 </div>
             </main>
+
+            </div>
 
             {/* Mobile Bottom Navigation - THUMB ZONE */}
             {isMobile && (
@@ -189,6 +177,6 @@ export const FantasyLayout: React.FC<FantasyLayoutProps> = ({ children, activeTa
                     </div>
                 </>
             )}
-        </div>
+        </>
     );
 };

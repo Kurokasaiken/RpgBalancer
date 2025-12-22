@@ -15,6 +15,10 @@
     --bronze-glow: #ffbf00;
     --sienna-shadow: #3e2723;
     --emerald-deep: #0f2b1d;
+    --heroic-obsidian-source: gradient;
+    --heroic-obsidian-image: url('/assets/ui/obsidian-pool.png');
+    --heroic-sigil-source: gradient;
+    --heroic-sigil-image: url('/assets/ui/ancient-gold-star.png');
 
     /* Tipografia */
     --font-header: 'Cinzel', serif;
@@ -45,6 +49,75 @@
 }
 
 @layer components {
+  .map-pin-container {
+    @apply relative flex flex-col items-center;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.55));
+  }
+
+  .map-pin-disk {
+    @apply relative flex h-12 w-12 items-center justify-center rounded-full border-2;
+    border-color: var(--bronze-aged);
+    background-color: var(--bg-abyss);
+    box-shadow:
+      inset 0 0 12px rgba(0, 0, 0, 0.65),
+      0 0 18px rgba(0, 0, 0, 0.45);
+  }
+
+  .map-pin-disk::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    opacity: 0.8;
+  }
+
+  .map-pin-disk-active {
+    box-shadow:
+      inset 0 0 14px rgba(255, 191, 0, 0.3),
+      0 0 18px rgba(255, 191, 0, 0.45);
+  }
+
+  .map-pin-disk-icon {
+    @apply relative z-10 text-2xl text-amber-100;
+    text-shadow: 0 0 10px rgba(255, 191, 0, 0.4);
+  }
+
+  .map-pin-progress {
+    @apply absolute inset-0 rounded-full opacity-70;
+    background: conic-gradient(var(--bronze-aged) 0deg, rgba(255, 255, 255, 0.06) 0deg 360deg);
+  }
+
+  .map-pin-stem {
+    @apply mt-1 h-3 w-0.5 rounded-full;
+    background: linear-gradient(180deg, rgba(255, 191, 0, 0.45), rgba(140, 109, 63, 0.95));
+  }
+
+  .map-pin-point {
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 14px solid var(--bronze-aged);
+    filter: drop-shadow(0 0 12px rgba(255, 191, 0, 0.25));
+    transition: filter 200ms ease, transform 200ms ease;
+  }
+
+  .map-pin-point-active {
+    filter: drop-shadow(0 0 18px rgba(255, 191, 0, 0.65));
+    transform: translateY(-2px);
+  }
+
+  .map-pin-shadow {
+    @apply absolute left-1/2 mt-1 h-2 w-6 -translate-x-1/2 rounded-full bg-black/40 blur-[2px] opacity-50;
+  }
+
+  .pin-finished-ping {
+    @apply absolute inset-0 rounded-full border-2 opacity-75;
+    border-color: var(--bronze-glow);
+    animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+
   .heroic-card {
     @apply relative overflow-visible;
     border: 2px solid var(--bronze-aged);
@@ -93,7 +166,7 @@
 
   /* Stele laterale per il menu (Heroic Realism) */
   .heroic-side-menu {
-    @apply h-full bg-(--panel-basalt);
+    @apply h-full bg-(--panel-basalt) p-4;
     display: flex;
     flex-direction: column;
     border-left: 4px solid var(--bronze-aged);
@@ -102,6 +175,28 @@
       url('/assets/ui/bg.png');
     background-size: 480px;
     box-shadow: -12px 0 34px rgba(0, 0, 0, 0.85);
+  }
+
+  .heroic-menu-frame {
+    @apply relative rounded-2xl border-2 border-(--bronze-aged)/80 overflow-hidden shadow-[inset_0_0_30px_rgba(0,0,0,0.6)] backdrop-blur-sm;
+    background: url('/assets/ui/dirty-marble.png');
+    background-size: 340px;
+    padding: 2px;
+    isolation: isolate;
+  }
+
+  .heroic-menu-frame::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 6px double rgba(255, 255, 255, 0.08);
+    pointer-events: none;
+    mix-blend-mode: screen;
+  }
+
+  .heroic-menu-inner {
+    @apply rounded-2xl bg-(--panel-basalt)/95 overflow-hidden;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6);
   }
 
   .heroic-menu-item {
@@ -124,6 +219,81 @@
     background-size: cover;
     border-bottom: 2px solid var(--bronze-aged);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  }
+
+  .heroic-menu-section {
+    @apply border-b border-white/5 last:border-b-0;
+    background: radial-gradient(circle at top, rgba(255, 255, 255, 0.03), transparent);
+  }
+
+  .observatory-nav-frame {
+    position: relative;
+    border-radius: 0.9rem;
+    border: 1px solid rgba(148, 163, 253, 0.5);
+    background:
+      radial-gradient(circle at 0% 0%, rgba(129, 140, 248, 0.18) 0, transparent 60%),
+      radial-gradient(circle at 120% 120%, rgba(56, 189, 248, 0.14) 0, transparent 65%),
+      linear-gradient(to bottom, rgba(15, 23, 42, 0.96), rgba(2, 6, 23, 0.96));
+    box-shadow:
+      0 0 0 1px rgba(15, 23, 42, 0.9),
+      0 18px 40px rgba(0, 0, 0, 0.65);
+    padding: 0.5rem 0.4rem 0.6rem;
+    overflow: hidden;
+  }
+
+  .observatory-nav-frame::before {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border-radius: 0.75rem;
+    border: 1px dashed rgba(148, 163, 253, 0.25);
+    pointer-events: none;
+  }
+
+  .observatory-nav-orb {
+    position: absolute;
+    inset-inline: 28%;
+    top: -28px;
+    height: 52px;
+    border-radius: 9999px;
+    background:
+      radial-gradient(circle at 50% 100%, rgba(201, 162, 39, 0.45) 0, transparent 60%),
+      radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.35) 0, transparent 65%);
+    opacity: 0.8;
+    filter: blur(2px);
+    pointer-events: none;
+  }
+
+  .observatory-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    text-align: left;
+    padding: 0.6rem 0.95rem;
+    border-radius: 0.85rem;
+    border: 1px solid transparent;
+    color: rgba(226, 232, 240, 0.68);
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+    background: rgba(15, 23, 42, 0.35);
+  }
+
+  .observatory-nav-item:hover {
+    color: rgba(226, 232, 240, 0.92);
+    border-color: rgba(129, 140, 248, 0.4);
+    background: rgba(15, 23, 42, 0.65);
+  }
+
+  .observatory-nav-item.is-active {
+    border-color: rgba(148, 163, 253, 0.6);
+    color: #fef3c7;
+    background:
+      linear-gradient(120deg, rgba(79, 70, 229, 0.25), rgba(14, 165, 233, 0.15)),
+      rgba(15, 23, 42, 0.8);
+    box-shadow: 0 0 18px rgba(56, 189, 248, 0.18);
   }
 }
 

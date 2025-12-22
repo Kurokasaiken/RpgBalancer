@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { deriveAxisValues } from './altVisualsAxis';
 import type { StatRow } from './types';
 
@@ -10,6 +11,7 @@ const MIN_BASE_VALUE = 3;
 const PILLAR_DELAY = 15; // Faster sequence for cinematic feel
 
 const VISUAL_CONFIG = {
+  enableSparks: false,
   morphSpeed: 0.05,
   glowStrengthPentagon: 32,
   glowStrengthStar: 40,
@@ -33,17 +35,374 @@ const VISUAL_CONFIG = {
     pentagonGlow: 'rgba(20,20,30,0.85)',
     starFill: '#fdd97b',
     starGlow: 'rgba(255,215,126,0.75)',
-    particle: '#ff94f8',
-    particleSecondary: '#5de9ff',
+    starBronzeDark: '#4a2507',
+    starBronzeMid: '#b7741f',
+    starBronzeLight: '#ffd08a',
+    tarCore: '#1c2852',
+    tarMid: '#2f3f74',
+    tarEdge: '#7db7ff',
+    tarHalo: 'rgba(111, 193, 255, 0.65)',
+    tarHighlight: '#f9fbff',
+    particle: '#ffb347',
+    particleSecondary: '#ffe29a',
     enemyText: '#9387ff',
     playerText: '#8cf8d5',
     flash: 'rgba(255,255,255,0.8)',
-    enemyImpact: '#9c8dff',
-    enemyImpactGlow: 'rgba(156,141,255,0.7)',
-    playerImpact: '#ffe7a3',
-    playerImpactGlow: 'rgba(255,231,163,0.7)',
+    enemyImpact: '#4cd9ff',
+    enemyImpactGlow: 'rgba(76,217,255,0.65)',
+    playerImpact: '#ffd866',
+    playerImpactGlow: 'rgba(255,216,102,0.7)',
   },
 } as const;
+
+type MaterialMode = 'gradient' | 'image';
+
+interface MaterialSpec {
+  mode: MaterialMode;
+  image?: HTMLImageElement;
+}
+
+let ivoryVeinSourceCanvas: HTMLCanvasElement | null = null;
+
+function createTarPath(state: InternalState, center: { x: number; y: number }) {
+  const path = new Path2D();
+  const { tarPuddle, tentacles } = state;
+
+  if (!tarPuddle.morphing || tarPuddle.morphProgress === 0) {
+    path.arc(center.x, center.y, tarPuddle.radius, 0, Math.PI * 2);
+    return path;
+  }
+
+  const segments = 80;
+  for (let i = 0; i <= segments; i += 1) {
+    const angle = (i / segments) * Math.PI * 2 - Math.PI / 2;
+    const circleRadius = tarPuddle.radius;
+    let pentagonRadius = tarPuddle.radius;
+
+    for (let j = 0; j < AXES; j += 1) {
+      const vertexAngle = -Math.PI / 2 + j * ((2 * Math.PI) / AXES);
+      const nextVertexAngle = -Math.PI / 2 + ((j + 1) % AXES) * ((2 * Math.PI) / AXES);
+      let normalizedAngle = angle;
+      let normalizedNextVertex = nextVertexAngle;
+      if (j === AXES - 1) {
+        normalizedNextVertex = nextVertexAngle + Math.PI * 2;
+        if (angle < 0) normalizedAngle = angle + Math.PI * 2;
+      }
+      const angleInSegment =
+        (j < AXES - 1 && angle >= vertexAngle && angle <= nextVertexAngle) ||
+        (j === AXES - 1 && normalizedAngle >= vertexAngle && normalizedAngle <= normalizedNextVertex);
+      if (angleInSegment) {
+        const vertex1Dist = tentacles[j]?.length ?? circleRadius;
+        const vertex2Dist = tentacles[(j + 1) % AXES]?.length ?? circleRadius;
+        const t = (normalizedAngle - vertexAngle) / (normalizedNextVertex - vertexAngle || 1);
+        pentagonRadius = vertex1Dist + (vertex2Dist - vertex1Dist) * t;
+        break;
+      }
+    }
+
+    const radius = circleRadius + (pentagonRadius - circleRadius) * tarPuddle.morphProgress;
+    const x = center.x + Math.cos(angle) * radius;
+    const y = center.y + Math.sin(angle) * radius;
+    if (i === 0) path.moveTo(x, y);
+    else path.lineTo(x, y);
+  }
+  path.closePath();
+  return path;
+}
+
+function drawObsidianSpeculars(ctx: CanvasRenderingContext2D, center: { x: number; y: number }, radius: number, time: number) {
+  ctx.globalCompositeOperation = 'screen';
+  for (let i = 0; i < 4; i += 1) {
+    const phase = time * 0.15 + i * 0.8;
+    const angle = phase * Math.PI * 0.5;
+    const ellipseRadius = radius * (0.75 + 0.08 * Math.sin(phase));
+    const x = center.x + Math.cos(angle) * radius * 0.3;
+    const y = center.y + Math.sin(angle) * radius * 0.25;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+    const grad = ctx.createLinearGradient(-ellipseRadius, 0, ellipseRadius, 0);
+    grad.addColorStop(0, 'rgba(255,255,255,0)');
+    grad.addColorStop(0.5, 'rgba(255,255,255,0.35)');
+    grad.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(-ellipseRadius, -radius * 0.05, ellipseRadius * 2, radius * 0.1);
+    ctx.restore();
+  }
+  ctx.globalCompositeOperation = 'source-over';
+}
+
+function drawObsidianBubbles(ctx: CanvasRenderingContext2D, center: { x: number; y: number }, radius: number, time: number) {
+  for (let i = 0; i < 3; i += 1) {
+    const local = (time * 0.08 + i * 0.3) % 1;
+    const grow = local < 0.7 ? local / 0.7 : 1 - (local - 0.7) / 0.3;
+    const bubbleRadius = radius * 0.05 * grow;
+    const bubbleAngle = i * (Math.PI * 2) / 3 + time * 0.2;
+    const bubbleDistance = radius * 0.35;
+    const x = center.x + Math.cos(bubbleAngle) * bubbleDistance;
+    const y = center.y + Math.sin(bubbleAngle) * bubbleDistance;
+    ctx.beginPath();
+    ctx.arc(x, y, Math.max(1.5, bubbleRadius), 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,255,${0.15 * grow})`;
+    ctx.fill();
+  }
+}
+
+function drawTarRipple(ctx: CanvasRenderingContext2D, center: { x: number; y: number }, radius: number, time: number) {
+  const ripplePhase = (time * 0.35) % 1;
+  const rippleRadius = radius + ripplePhase * radius * 0.65;
+  const opacity = 0.6 * (1 - ripplePhase);
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(center.x, center.y, rippleRadius, 0, Math.PI * 2);
+  ctx.lineWidth = Math.max(4, radius * 0.08);
+  const ringGrad = ctx.createRadialGradient(center.x, center.y, rippleRadius * 0.8, center.x, center.y, rippleRadius);
+  ringGrad.addColorStop(0, `${VISUAL_CONFIG.colors.tarEdge}00`);
+  ringGrad.addColorStop(1, `${VISUAL_CONFIG.colors.tarEdge}`);
+  ctx.strokeStyle = ringGrad;
+  ctx.globalAlpha = opacity;
+  ctx.globalCompositeOperation = 'screen';
+  ctx.stroke();
+  ctx.restore();
+}
+
+function getTarFill(ctx: CanvasRenderingContext2D, center: { x: number; y: number }, radius: number) {
+  const grad = ctx.createRadialGradient(center.x, center.y, radius * 0.1, center.x, center.y, radius);
+  grad.addColorStop(0, `${VISUAL_CONFIG.colors.tarHighlight}33`);
+  grad.addColorStop(0.2, `${VISUAL_CONFIG.colors.tarHighlight}22`);
+  grad.addColorStop(0.45, VISUAL_CONFIG.colors.tarMid);
+  grad.addColorStop(0.8, VISUAL_CONFIG.colors.tarCore);
+  grad.addColorStop(1, 'rgba(3,4,10,0.9)');
+  return grad;
+}
+
+function applyBronzeTint(ctx: CanvasRenderingContext2D, starPath: Path2D, center: { x: number; y: number }, radius: number) {
+  const bronze = ctx.createLinearGradient(center.x - radius, center.y - radius, center.x + radius, center.y + radius);
+  bronze.addColorStop(0, VISUAL_CONFIG.colors.starBronzeDark);
+  bronze.addColorStop(0.45, VISUAL_CONFIG.colors.starBronzeMid);
+  bronze.addColorStop(1, VISUAL_CONFIG.colors.starBronzeLight);
+  ctx.globalCompositeOperation = 'color';
+  ctx.fillStyle = bronze;
+  ctx.fill(starPath);
+  ctx.globalCompositeOperation = 'source-over';
+}
+
+function easeOutBack(t: number) {
+  const c1 = 1.70158;
+  const c3 = c1 + 1;
+  return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+}
+
+
+function createStarPath(state: InternalState, center: { x: number; y: number }) {
+  const path = new Path2D();
+  const baseRadius = state.goldStar.radius;
+  const effectiveMorph = state.goldStar.morphing ? Math.max(0, Math.min(1, state.goldStar.morphProgress)) : 1;
+
+  for (let i = 0; i < AXES * 2; i += 1) {
+    const angle = -Math.PI / 2 + i * (Math.PI / AXES);
+    const isOuter = i % 2 === 0;
+    let targetRadius: number;
+
+    if (isOuter) {
+      const pillarIndex = Math.floor(i / 2);
+      targetRadius = state.playerPillars[pillarIndex]?.finalRadius ?? baseRadius;
+    } else {
+      const pillarIndex = Math.floor(i / 2);
+      const nextIndex = (pillarIndex + 1) % AXES;
+      const avg =
+        ((state.playerPillars[pillarIndex]?.finalRadius ?? baseRadius) +
+          (state.playerPillars[nextIndex]?.finalRadius ?? baseRadius)) /
+        2;
+      targetRadius = avg * 0.4;
+    }
+
+    const finalRadius = baseRadius + (targetRadius - baseRadius) * effectiveMorph;
+    const x = center.x + Math.cos(angle) * finalRadius;
+    const y = center.y + Math.sin(angle) * finalRadius;
+    if (i === 0) path.moveTo(x, y);
+    else path.lineTo(x, y);
+  }
+  path.closePath();
+  return path;
+}
+
+function getSigilFill(
+  ctx: CanvasRenderingContext2D,
+  center: { x: number; y: number },
+  radius: number,
+  spec: MaterialSpec,
+) {
+  if (spec.mode === 'image' && spec.image && spec.image.complete && spec.image.naturalWidth > 0) {
+    try {
+      const pattern = ctx.createPattern(spec.image, 'repeat');
+      if (pattern) return pattern;
+    } catch {
+      // ignore and fall through to gradient
+    }
+  }
+  const grad = ctx.createLinearGradient(center.x - radius, center.y - radius, center.x + radius, center.y + radius);
+  grad.addColorStop(0, '#3c220b');
+  grad.addColorStop(0.25, '#7b4b14');
+  grad.addColorStop(0.45, '#c28a32');
+  grad.addColorStop(0.65, '#f3cd6c');
+  grad.addColorStop(0.9, '#fff4cc');
+  grad.addColorStop(1, '#754719');
+  return grad;
+}
+
+function applySigilTexture(
+  ctx: CanvasRenderingContext2D,
+  center: { x: number; y: number },
+  radius: number,
+  bronzeGlow: string,
+) {
+  const hammered = ctx.createLinearGradient(center.x - radius, center.y, center.x + radius, center.y);
+  hammered.addColorStop(0, 'rgba(255,255,255,0.18)');
+  hammered.addColorStop(0.2, 'rgba(255,200,120,0.12)');
+  hammered.addColorStop(0.5, 'rgba(40,20,0,0.15)');
+  hammered.addColorStop(0.8, 'rgba(255,255,255,0.1)');
+  hammered.addColorStop(1, 'rgba(255,205,140,0.2)');
+  ctx.globalCompositeOperation = 'overlay';
+  ctx.fillStyle = hammered;
+  ctx.fillRect(center.x - radius, center.y - radius, radius * 2, radius * 2);
+
+  ctx.globalCompositeOperation = 'lighten';
+  const rimGrad = ctx.createRadialGradient(center.x, center.y, radius * 0.5, center.x, center.y, radius);
+  rimGrad.addColorStop(0.7, 'rgba(255,255,255,0)');
+  rimGrad.addColorStop(1, `${bronzeGlow}55`);
+  ctx.fillStyle = rimGrad;
+  ctx.fillRect(center.x - radius, center.y - radius, radius * 2, radius * 2);
+
+  ctx.globalCompositeOperation = 'source-over';
+}
+
+function getIvoryVeinSourceCanvas() {
+  if (typeof document === 'undefined') return null;
+  if (ivoryVeinSourceCanvas) return ivoryVeinSourceCanvas;
+  const canvas = document.createElement('canvas');
+  canvas.width = 64;
+  canvas.height = 64;
+  const veinCtx = canvas.getContext('2d');
+  if (!veinCtx) return null;
+  veinCtx.fillStyle = '#f0ead2';
+  veinCtx.fillRect(0, 0, 64, 64);
+  veinCtx.strokeStyle = 'rgba(180,160,120,0.75)';
+  veinCtx.lineWidth = 1.5;
+  for (let i = 0; i < 6; i += 1) {
+    veinCtx.beginPath();
+    const startX = Math.random() * 64;
+    veinCtx.moveTo(startX, 0);
+    veinCtx.bezierCurveTo(
+      Math.random() * 64,
+      16,
+      Math.random() * 64,
+      48,
+      Math.random() * 64,
+      64,
+    );
+    veinCtx.stroke();
+  }
+  ivoryVeinSourceCanvas = canvas;
+  return ivoryVeinSourceCanvas;
+}
+
+function applyIvoryVeins(
+  ctx: CanvasRenderingContext2D,
+  maskPath: Path2D,
+  px: number,
+  visualY: number,
+  w: number,
+  h: number,
+) {
+  ctx.save();
+  ctx.clip(maskPath);
+  const sourceCanvas = getIvoryVeinSourceCanvas();
+  if (sourceCanvas) {
+    const pattern = ctx.createPattern(sourceCanvas, 'repeat');
+    if (pattern) {
+      ctx.globalAlpha = 0.35;
+      ctx.fillStyle = pattern;
+      ctx.fillRect(px - w, visualY - h - 40, w * 2, h * 2);
+      ctx.globalAlpha = 1;
+    }
+  }
+  const sheenGrad = ctx.createLinearGradient(px - w / 2, visualY - h, px + w / 2, visualY);
+  sheenGrad.addColorStop(0, 'rgba(255,255,255,0.35)');
+  sheenGrad.addColorStop(0.5, 'rgba(255,255,255,0)');
+  sheenGrad.addColorStop(1, 'rgba(255,255,255,0.25)');
+  ctx.globalCompositeOperation = 'soft-light';
+  ctx.fillStyle = sheenGrad;
+  ctx.fillRect(px - w, visualY - h - 20, w * 2, h * 2);
+  ctx.restore();
+  ctx.globalCompositeOperation = 'source-over';
+}
+
+function applyOnyxSheen(
+  ctx: CanvasRenderingContext2D,
+  maskPath: Path2D,
+  px: number,
+  visualY: number,
+  w: number,
+  h: number,
+) {
+  ctx.save();
+  ctx.clip(maskPath);
+  const streakGrad = ctx.createLinearGradient(px - w, visualY - h, px + w, visualY);
+  streakGrad.addColorStop(0, 'rgba(255,255,255,0.05)');
+  streakGrad.addColorStop(0.4, 'rgba(120,140,200,0.08)');
+  streakGrad.addColorStop(0.6, 'rgba(10,12,20,0.2)');
+  streakGrad.addColorStop(1, 'rgba(255,255,255,0.04)');
+  ctx.globalCompositeOperation = 'screen';
+  ctx.fillStyle = streakGrad;
+  ctx.fillRect(px - w, visualY - h - 20, w * 2, h * 2);
+  ctx.restore();
+  ctx.globalCompositeOperation = 'source-over';
+}
+
+interface HeroicMaterials {
+  obsidian: MaterialSpec;
+  sigil: MaterialSpec;
+  bronzeGlow: string;
+}
+
+function extractCssUrl(value: string): string | null {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const match = trimmed.match(/url\((['"]?)(.*?)\1\)/i);
+  return match ? match[2] : trimmed;
+}
+
+function loadMaterialImage(url?: string | null): HTMLImageElement | undefined {
+  if (!url) return undefined;
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.src = url;
+  return img;
+}
+
+function resolveHeroicMaterials(): HeroicMaterials {
+  if (typeof window === 'undefined') {
+    return {
+      obsidian: { mode: 'gradient' },
+      sigil: { mode: 'gradient' },
+      bronzeGlow: VISUAL_CONFIG.colors.starGlow,
+    };
+  }
+  const root = getComputedStyle(document.documentElement);
+  const obsidianMode = (root.getPropertyValue('--heroic-obsidian-source').trim() || 'gradient') as MaterialMode;
+  const sigilMode = (root.getPropertyValue('--heroic-sigil-source').trim() || 'gradient') as MaterialMode;
+  const obsidianImage =
+    obsidianMode === 'image' ? loadMaterialImage(extractCssUrl(root.getPropertyValue('--heroic-obsidian-image'))) : undefined;
+  const sigilImage =
+    sigilMode === 'image' ? loadMaterialImage(extractCssUrl(root.getPropertyValue('--heroic-sigil-image'))) : undefined;
+  const bronzeGlow = root.getPropertyValue('--bronze-glow').trim() || VISUAL_CONFIG.colors.starGlow;
+  return {
+    obsidian: { mode: obsidianMode, image: obsidianImage },
+    sigil: { mode: sigilMode, image: sigilImage },
+    bronzeGlow,
+  };
+}
 
 // --- INTERFACCE (Invariate) ---
 interface MorphShapeState {
@@ -62,6 +421,7 @@ interface BallState {
   vx: number;
   vy: number;
   radius: number;
+  initialSpeed: number;
   speed: number;
   startTime: number;
   duration: number;
@@ -135,12 +495,14 @@ const FALLBACK_AXIS_VALUES = {
 // --- COMPONENTE REACT PRINCIPALE (Invariato) ---
 interface AltVisualsV8ObsidianFieldProps {
   stats: StatRow[];
+  controlsPortal?: HTMLElement | null;
 }
 
-export function AltVisualsV8ObsidianField({ stats }: AltVisualsV8ObsidianFieldProps) {
+export function AltVisualsV8ObsidianField({ stats, controlsPortal }: AltVisualsV8ObsidianFieldProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const checkboxRef = useRef<HTMLInputElement | null>(null);
   const debugPanelRef = useRef<HTMLDivElement | null>(null);
+  const autoStartRef = useRef(false);
   const [sceneRunId, setSceneRunId] = useState(0);
   const axisValues = useMemo(() => {
     const derived = deriveAxisValues(stats, FALLBACK_AXIS_VALUES.enemy, FALLBACK_AXIS_VALUES.player, AXES);
@@ -165,39 +527,38 @@ export function AltVisualsV8ObsidianField({ stats }: AltVisualsV8ObsidianFieldPr
     return cleanup;
   }, [axisValues, sceneRunId]);
 
+  useEffect(() => {
+    if (autoStartRef.current) return;
+    const hasValues = axisValues.enemy.some((value) => value > 0) || axisValues.player.some((value) => value > 0);
+    if (hasValues) {
+      autoStartRef.current = true;
+      setSceneRunId(1);
+    }
+  }, [axisValues]);
+
   const handleStartScene = () => {
     setSceneRunId((prev) => prev + 1);
   };
 
-  return (
-    <div className="space-y-4" data-testid="alt-visuals-v8">
-      <header className="text-center space-y-1">
-        <h3 className="text-xs font-semibold uppercase tracking-[0.24em] text-fuchsia-200">Alt Visuals v8 · Cinematic Monoliths</h3>
-        <p className="text-[11px] text-slate-300">
-          Monoliti Jet e Avorio, impatto sismico e flash per un feeling AAA.
-        </p>
-      </header>
-
-      <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+  const controlsNode = (
+    <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
         <button
           type="button"
           onClick={handleStartScene}
-          className="px-5 py-2 rounded-full border border-emerald-400/60 bg-emerald-500/10 text-[10px] uppercase tracking-[0.2em] text-emerald-100 hover:bg-emerald-500/20 active:scale-95 transition-all shadow-[0_0_20px_rgba(16,185,129,0.25)]"
+          className="px-5 py-2 rounded-full border border-emerald-400/60 bg-emerald-500/10 text-[10px] uppercase tracking-[0.2em] text-emerald-100 hover:bg-emerald-500/20 active:scale-95 transition-all shadow-[0_0_20px_rgba(16,185,129,0.25)] focus:outline-none focus:ring-2 focus:ring-emerald-400/80 focus:ring-offset-2 focus:ring-offset-slate-900"
         >
           {sceneRunId === 0 ? 'Avvia scena' : 'Riavvia scena'}
         </button>
         <label className="flex items-center gap-3 px-4 py-2 rounded-full border border-slate-800 bg-slate-900/60 text-[10px] uppercase tracking-[0.2em] text-cyan-200 hover:bg-slate-800 transition-colors cursor-pointer">
-          <input ref={checkboxRef} type="checkbox" className="size-4 accent-amber-400 rounded border border-slate-500 cursor-pointer" />
+          <input ref={checkboxRef} type="checkbox" className="size-4 accent-amber-400 rounded border border-slate-500 cursor-pointer focus:ring-2 focus:ring-amber-400/80 focus:ring-offset-2 focus:ring-offset-slate-900" />
           Stella Perfetta (Test Mode)
         </label>
-      </div>
+    </div>
+  );
 
-      {sceneRunId === 0 && (
-        <p className="text-center text-[11px] uppercase tracking-[0.2em] text-slate-400">
-          Premi &quot;Avvia scena&quot; per lanciare la simulazione
-        </p>
-      )}
-
+  return (
+    <div className="space-y-4" data-testid="alt-visuals-v8">
+      {controlsPortal ? createPortal(controlsNode, controlsPortal) : controlsNode}
       <div className="flex justify-center">
         <canvas
           ref={canvasRef}
@@ -207,10 +568,41 @@ export function AltVisualsV8ObsidianField({ stats }: AltVisualsV8ObsidianFieldPr
         />
       </div>
 
+      <header className="text-center space-y-1">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.24em] text-fuchsia-200">Alt Visuals v8 · Cinematic Monoliths</h3>
+        <p className="text-[11px] text-slate-300">
+          Monoliti Jet e Avorio, impatto sismico e flash per un feeling AAA.
+        </p>
+      </header>
+
+      {sceneRunId === 0 && (
+        <p className="text-center text-[11px] uppercase tracking-[0.2em] text-slate-400">
+          Premi &quot;Avvia scena&quot; per lanciare la simulazione
+        </p>
+      )}
+
       <div
         ref={debugPanelRef}
         className="flex flex-wrap justify-center gap-3 text-[10px] uppercase tracking-[0.18em] text-slate-500 opacity-60"
       />
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-[11px] text-slate-200">
+        {axisValues.enemy.map((enemyValue, index) => (
+          <div
+            key={`axis-${index}`}
+            className="bg-slate-900/70 border border-slate-800 rounded-2xl px-3 py-2 flex items-center justify-between shadow-inner shadow-black/30"
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-lg">{STAT_ICONS[index]}</span>
+              <span className="uppercase tracking-[0.24em] text-slate-400">Axis {index + 1}</span>
+            </div>
+            <div className="text-right font-mono">
+              <div className="text-cyan-300">Quest {enemyValue.toFixed(0)}%</div>
+              <div className="text-emerald-300">Hero {axisValues.player[index].toFixed(0)}%</div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -232,9 +624,7 @@ function initAltVisualsV8(
   ivoryImg.crossOrigin = 'anonymous';
   ivoryImg.src = 'https://dl.polyhaven.com/textures/rock_marble_01_4k_2023-06-25/rock_marble_01_diff_4k.jpg'; // Ivory marble texture CC0
 
-  const tarImg = new Image();
-  tarImg.crossOrigin = 'anonymous';
-  tarImg.src = 'https://opengameart.org/sites/default/files/asphalt_road.png'; // Asphalt texture CC0
+  const heroicMaterials = resolveHeroicMaterials();
 
   const internalState: InternalState = {
     usePerfectStar: false,
@@ -247,7 +637,8 @@ function initAltVisualsV8(
       vx: 0,
       vy: 0,
       radius: 8,
-      speed: 30, // Velocità iniziale aumentata per effetto pinball
+      initialSpeed: 60,
+      speed: 60, // Velocità iniziale aumentata per effetto pinball
       startTime: 0,
       duration: 5000,
       stopped: false,
@@ -304,11 +695,6 @@ function initAltVisualsV8(
     ctx.fillStyle = '#05060f'; // Manual clear with bg color
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Debug text
-    ctx.fillStyle = 'white';
-    ctx.font = 'bold 20px Arial';
-    ctx.fillText('Alt Visuals v8 Canvas - Animating', 10, 30);
-
     // Apply Shake
     const centerX = canvas.width / 2 + internalState.screenShake.offsetX;
     const centerY = canvas.height / 2 + internalState.screenShake.offsetY;
@@ -316,8 +702,8 @@ function initAltVisualsV8(
     ctx.translate(centerX - 320, centerY - 320); // Center adjustment
 
     drawGrid(ctx);
-    drawTarAnimation(ctx, internalState, tarImg);
-    drawGoldStar(ctx, internalState);
+    drawTarAnimation(ctx, internalState, heroicMaterials);
+    drawGoldStar(ctx, internalState, heroicMaterials);
     // drawPillars ora usa la nuova logica dei monoliti
     drawPillars(ctx, internalState, ivoryImg);
     drawBall(ctx, internalState);
@@ -367,7 +753,18 @@ function resetAnimation(state: InternalState) {
   state.screenShake = { active: false, trauma: 0, offsetX: 0, offsetY: 0 };
   state.flashOpacity = 0;
   state.ball = {
-    active: false, x: 320, y: 320, vx: 0, vy: 0, radius: 8, speed: 12, startTime: 0, duration: 5000, stopped: false, success: null,
+    active: false,
+    x: 320,
+    y: 320,
+    vx: 0,
+    vy: 0,
+    radius: 8,
+    initialSpeed: 60,
+    speed: 60,
+    startTime: 0,
+    duration: 5000,
+    stopped: false,
+    success: null,
   };
 }
 
@@ -428,9 +825,15 @@ function updatePillars(state: InternalState) {
         pillar.landed = true;
         pillar.velocity = 0;
         if (state.tentacles[i]) state.tentacles[i].growing = true;
-        // Impatto Jet
-        triggerShake(state, 0.4);
-        spawnParticleBurst(state, pillar.angle, pillar.finalRadius, VISUAL_CONFIG.colors.jetHighlight, VISUAL_CONFIG.colors.jetBase, 15);
+        // Impatto Jet (senza shake iniziale)
+        spawnParticleBurst(
+          state,
+          pillar.angle,
+          pillar.finalRadius,
+          VISUAL_CONFIG.colors.enemyImpact,
+          VISUAL_CONFIG.colors.enemyImpactGlow,
+          18,
+        );
       }
     }
   });
@@ -480,9 +883,14 @@ function updatePillars(state: InternalState) {
           pillar.currentHeight = 0;
           pillar.landed = true;
           pillar.velocity = 0;
-          // Impatto Avorio
-          triggerShake(state, 0.5);
-          spawnParticleBurst(state, pillar.angle, pillar.finalRadius, VISUAL_CONFIG.colors.ivoryHighlight, VISUAL_CONFIG.colors.ivoryShadow, 20);
+          spawnParticleBurst(
+            state,
+            pillar.angle,
+            pillar.finalRadius,
+            VISUAL_CONFIG.colors.playerImpact,
+            VISUAL_CONFIG.colors.playerImpactGlow,
+            24,
+          );
         }
       }
     });
@@ -509,7 +917,6 @@ function updateTarAnimation(state: InternalState) {
     state.tarPuddle.morphProgress += VISUAL_CONFIG.morphSpeed;
     if (state.tarPuddle.morphProgress > 1) {
       state.tarPuddle.morphProgress = 1;
-      triggerShake(state, 0.3);
     }
   }
 
@@ -533,7 +940,6 @@ function updateTarAnimation(state: InternalState) {
     if (state.goldStar.morphProgress > 1) {
       state.goldStar.morphProgress = 1;
       state.flashOpacity = 1;
-      triggerShake(state, 0.8);
     }
   }
 
@@ -549,7 +955,12 @@ function updateTarAnimation(state: InternalState) {
 function updateBall(state: InternalState) {
   if (!state.ball.active || state.ball.stopped) return;
 
-  if (Date.now() - state.ball.startTime > state.ball.duration) {
+  const elapsed = Date.now() - state.ball.startTime;
+  const progress = Math.min(elapsed / state.ball.duration, 1);
+  const dynamicFriction = 0.996 - progress * 0.04; // Più attrito verso la fine
+  const bounceDecay = 0.99 - progress * 0.02;
+
+  if (elapsed > state.ball.duration) {
     state.ball.stopped = true;
     state.ball.vx = 0;
     state.ball.vy = 0;
@@ -584,10 +995,9 @@ function updateBall(state: InternalState) {
     const dotProduct = state.ball.vx * bestNormal.x + state.ball.vy * bestNormal.y;
     state.ball.vx -= 2 * dotProduct * bestNormal.x;
     state.ball.vy -= 2 * dotProduct * bestNormal.y;
-    state.ball.vx *= 0.995; // Frizione ridotta per più rimbalzi
-    state.ball.vy *= 0.995;
+    state.ball.vx *= bounceDecay;
+    state.ball.vy *= bounceDecay;
 
-    triggerShake(state, 0.2);
     spawnParticleBurst(state, 0, 0, VISUAL_CONFIG.colors.particle, '#fff', 20, state.ball.x, state.ball.y); // Più particelle
 
   } else {
@@ -595,9 +1005,18 @@ function updateBall(state: InternalState) {
     state.ball.y = nextY;
   }
 
-  // Rallentamento costante per effetto pinball
-  state.ball.vx *= 0.995;
-  state.ball.vy *= 0.995;
+  // Rallentamento progressivo per effetto pinball
+  state.ball.vx *= dynamicFriction;
+  state.ball.vy *= dynamicFriction;
+
+  const currentSpeed = Math.hypot(state.ball.vx, state.ball.vy);
+  const targetSpeed = Math.max(4, state.ball.initialSpeed * (1 - progress * 0.85));
+  if (currentSpeed > targetSpeed) {
+    const scale = targetSpeed / currentSpeed;
+    state.ball.vx *= scale;
+    state.ball.vy *= scale;
+  }
+  state.ball.speed = Math.hypot(state.ball.vx, state.ball.vy);
 }
 
 // --- FUNZIONI DI DISEGNO (Modificate per il restyle grafico) ---
@@ -684,15 +1103,6 @@ function drawPillars(ctx: CanvasRenderingContext2D, state: InternalState, ivoryI
 
     ctx.save();
 
-    // Ombra a terra (si restringe mentre cade)
-    const shadowScale = Math.max(0.1, 1 - pillar.currentHeight / 450);
-    if (shadowScale > 0.1) {
-        ctx.fillStyle = 'rgba(0,0,0,0.5)';
-        ctx.beginPath();
-        ctx.ellipse(px, py, w * shadowScale * 1.2, (w / 2) * shadowScale * 1.2, 0, 0, Math.PI * 2);
-        ctx.fill();
-    }
-
     if (pillar.currentHeight > 0) {
          // Scia di caduta con gradiente
          ctx.beginPath();
@@ -721,30 +1131,49 @@ function drawPillars(ctx: CanvasRenderingContext2D, state: InternalState, ivoryI
     ctx.fill();
 
     // 2. Faccia Frontale (Colore Base - texture o gradiente)
-    if (isIvory && ivoryImg && ivoryImg.complete) {
-      const pattern = ctx.createPattern(ivoryImg, 'repeat');
-      if (pattern) {
-        ctx.fillStyle = pattern;
-      } else {
-        const frontalGrad = ctx.createLinearGradient(px - w/2, visualY - h, px + w/2, visualY);
-        frontalGrad.addColorStop(0, colors.highlight);
-        frontalGrad.addColorStop(0.5, colors.base);
-        frontalGrad.addColorStop(1, colors.shadow);
-        ctx.fillStyle = frontalGrad;
+    let frontFill: CanvasGradient | CanvasPattern | string;
+    if (isIvory && ivoryImg && ivoryImg.complete && ivoryImg.naturalWidth > 0) {
+      try {
+        const pattern = ctx.createPattern(ivoryImg, 'repeat');
+        if (pattern) {
+          frontFill = pattern;
+        } else {
+          const frontalGradFallback = ctx.createLinearGradient(px - w / 2, visualY - h, px + w / 2, visualY);
+          frontalGradFallback.addColorStop(0, colors.highlight);
+          frontalGradFallback.addColorStop(0.5, colors.base);
+          frontalGradFallback.addColorStop(1, colors.shadow);
+          frontFill = frontalGradFallback;
+        }
+      } catch {
+        const frontalGradFallback = ctx.createLinearGradient(px - w / 2, visualY - h, px + w / 2, visualY);
+        frontalGradFallback.addColorStop(0, colors.highlight);
+        frontalGradFallback.addColorStop(0.5, colors.base);
+        frontalGradFallback.addColorStop(1, colors.shadow);
+        frontFill = frontalGradFallback;
       }
     } else {
-      const frontalGrad = ctx.createLinearGradient(px - w/2, visualY - h, px + w/2, visualY);
+      const frontalGrad = ctx.createLinearGradient(px - w / 2, visualY - h, px + w / 2, visualY);
       frontalGrad.addColorStop(0, colors.highlight);
       frontalGrad.addColorStop(0.5, colors.base);
       frontalGrad.addColorStop(1, colors.shadow);
-      ctx.fillStyle = frontalGrad;
+      frontFill = frontalGrad;
     }
-    ctx.beginPath();
-    ctx.moveTo(px, visualY + 10);
-    ctx.lineTo(px + w / 2, visualY);
-    ctx.lineTo(px + w / 2, visualY - h);
-    ctx.lineTo(px, visualY - h + 10);
-    ctx.fill();
+
+    const frontFacePath = new Path2D();
+    frontFacePath.moveTo(px, visualY + 10);
+    frontFacePath.lineTo(px + w / 2, visualY);
+    frontFacePath.lineTo(px + w / 2, visualY - h);
+    frontFacePath.lineTo(px, visualY - h + 10);
+    frontFacePath.closePath();
+
+    ctx.fillStyle = frontFill ?? colors.base;
+    ctx.fill(frontFacePath);
+
+    if (isIvory) {
+      applyIvoryVeins(ctx, frontFacePath, px, visualY, w, h);
+    } else {
+      applyOnyxSheen(ctx, frontFacePath, px, visualY, w, h);
+    }
 
     // 3. Faccia Superiore (Luce - gradiente radiale per texture lucida)
     const topGrad = ctx.createRadialGradient(px, visualY - h - 5, 0, px, visualY - h - 5, w);
@@ -769,18 +1198,30 @@ function drawPillars(ctx: CanvasRenderingContext2D, state: InternalState, ivoryI
   };
 
   // Disegna Nemici (Jet)
-  state.enemyPillars.forEach(p => drawMonolith(p, {
-      base: VISUAL_CONFIG.colors.jetBase,
-      highlight: VISUAL_CONFIG.colors.jetHighlight,
-      shadow: VISUAL_CONFIG.colors.jetShadow
-  }));
+  state.enemyPillars.forEach((p) =>
+    drawMonolith(
+      p,
+      {
+        base: VISUAL_CONFIG.colors.jetBase,
+        highlight: VISUAL_CONFIG.colors.jetHighlight,
+        shadow: VISUAL_CONFIG.colors.jetShadow,
+      },
+      false,
+    ),
+  );
 
   // Disegna Giocatore (Avorio)
-  state.playerPillars.forEach(p => drawMonolith(p, {
-      base: VISUAL_CONFIG.colors.ivoryBase,
-      highlight: VISUAL_CONFIG.colors.ivoryHighlight,
-      shadow: VISUAL_CONFIG.colors.ivoryShadow
-  }));
+  state.playerPillars.forEach((p) =>
+    drawMonolith(
+      p,
+      {
+        base: VISUAL_CONFIG.colors.ivoryBase,
+        highlight: VISUAL_CONFIG.colors.ivoryHighlight,
+        shadow: VISUAL_CONFIG.colors.ivoryShadow,
+      },
+      true,
+    ),
+  );
 }
 
 
@@ -844,127 +1285,109 @@ function drawParticles(ctx: CanvasRenderingContext2D, state: InternalState) {
 }
 
 // --- DISEGNO CATRAME E STELLA (Invariati, usano i colori della config) ---
-function drawTarAnimation(ctx: CanvasRenderingContext2D, state: InternalState, tarImg?: HTMLImageElement) {
+function drawTarAnimation(ctx: CanvasRenderingContext2D, state: InternalState, materials: HeroicMaterials) {
   if (!state.tarPuddle.active || state.tarPuddle.radius <= 0) return;
 
+  const center = canvasCenter(state);
+  const radius = state.tarPuddle.radius;
+  const puddlePath = createTarPath(state, center);
+  const time = performance.now() * 0.001;
+
   ctx.save();
-
-  // Usa texture se caricata, altrimenti colore solido
-  if (tarImg && tarImg.complete) {
-    const pattern = ctx.createPattern(tarImg, 'repeat');
-    if (pattern) ctx.fillStyle = pattern;
-    else ctx.fillStyle = VISUAL_CONFIG.colors.pentagonFill;
-  } else {
-    ctx.fillStyle = VISUAL_CONFIG.colors.pentagonFill;
-  }
-
-  ctx.shadowColor = VISUAL_CONFIG.colors.pentagonGlow;
-  ctx.shadowBlur = VISUAL_CONFIG.glowStrengthPentagon;
-  ctx.beginPath();
-
-  if (!state.tarPuddle.morphing || state.tarPuddle.morphProgress === 0) {
-    ctx.arc(canvasCenter(state).x, canvasCenter(state).y, state.tarPuddle.radius, 0, Math.PI * 2);
-  } else {
-    const segments = 60;
-    for (let i = 0; i <= segments; i += 1) {
-      const angle = (i / segments) * Math.PI * 2 - Math.PI / 2;
-      const circleRadius = state.tarPuddle.radius;
-      let pentagonRadius = state.tarPuddle.radius;
-      for (let j = 0; j < AXES; j += 1) {
-        const vertexAngle = -Math.PI / 2 + j * ((2 * Math.PI) / AXES);
-        const nextVertexAngle = -Math.PI / 2 + ((j + 1) % AXES) * ((2 * Math.PI) / AXES);
-        let normalizedAngle = angle;
-        let normalizedNextVertex = nextVertexAngle;
-        if (j === AXES - 1) {
-          normalizedNextVertex = nextVertexAngle + Math.PI * 2;
-          if (angle < 0) normalizedAngle = angle + Math.PI * 2;
-        }
-        if (
-          (j < AXES - 1 && angle >= vertexAngle && angle <= nextVertexAngle) ||
-          (j === AXES - 1 && normalizedAngle >= vertexAngle && normalizedAngle <= normalizedNextVertex)
-        ) {
-          const vertex1Dist = state.tentacles[j]?.length ?? circleRadius;
-          const vertex2Dist = state.tentacles[(j + 1) % AXES]?.length ?? circleRadius;
-          const t = (normalizedAngle - vertexAngle) / (normalizedNextVertex - vertexAngle || 1);
-          pentagonRadius = vertex1Dist + (vertex2Dist - vertex1Dist) * t;
-          break;
-        }
-      }
-      const radius = circleRadius + (pentagonRadius - circleRadius) * state.tarPuddle.morphProgress;
-      const x = canvasCenter(state).x + Math.cos(angle) * radius;
-      const y = canvasCenter(state).y + Math.sin(angle) * radius;
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    }
-    ctx.closePath();
-  }
-
-  ctx.fill();
+  ctx.shadowColor = 'rgba(12,20,60,0.65)';
+  ctx.shadowBlur = radius * 0.65;
+  ctx.shadowOffsetY = radius * 0.15;
+  ctx.fillStyle = getTarFill(ctx, center, radius);
+  ctx.fill(puddlePath);
   ctx.restore();
 
-  // Aggiungi bolle per effetto ribollente
-  const time = performance.now();
-  for (let i = 0; i < 5; i += 1) {
-    const angle = (i / 5) * Math.PI * 2 + time * 0.001;
-    const r = state.tarPuddle.radius * 0.8;
-    const x = canvasCenter(state).x + Math.cos(angle) * r;
-    const y = canvasCenter(state).y + Math.sin(angle) * r;
-    ctx.beginPath();
-    ctx.arc(x, y, 3 + Math.sin(time * 0.01 + i) * 1, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(255,255,255,0.6)';
-    ctx.fill();
-  }
+  ctx.save();
+  ctx.clip(puddlePath);
+  drawObsidianSpeculars(ctx, center, radius, time);
+  drawObsidianBubbles(ctx, center, radius, time);
+  ctx.restore();
 
-  ctx.fillStyle = '#ffffff';
+  drawTarRipple(ctx, center, radius, time);
+
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  ctx.lineWidth = Math.max(6, radius * 0.12);
+  ctx.strokeStyle = VISUAL_CONFIG.colors.tarHalo;
+  ctx.stroke(puddlePath);
+  ctx.restore();
+
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.fillStyle = `${VISUAL_CONFIG.colors.tarEdge}aa`;
   ctx.beginPath();
-  ctx.arc(canvasCenter(state).x, canvasCenter(state).y, 3, 0, Math.PI * 2);
+  ctx.arc(center.x, center.y, radius * 0.12, 0, Math.PI * 2);
   ctx.fill();
+  ctx.fillStyle = `${VISUAL_CONFIG.colors.tarHighlight}bb`;
+  ctx.beginPath();
+  ctx.arc(center.x, center.y, radius * 0.06, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
 }
 
-function drawGoldStar(ctx: CanvasRenderingContext2D, state: InternalState) {
+function drawGoldStar(ctx: CanvasRenderingContext2D, state: InternalState, materials: HeroicMaterials) {
   if (!state.goldStar.active || state.goldStar.radius <= 0) return;
+  if (!state.goldStar.morphing && state.goldStar.morphProgress <= 0) return;
+
+  const center = canvasCenter(state);
+  const radius = state.goldStar.radius;
+  const starPath = createStarPath(state, center);
+  const starScale = easeOutBack(Math.max(0, Math.min(1, state.goldStar.morphProgress)));
 
   ctx.save();
-  ctx.fillStyle = VISUAL_CONFIG.colors.starFill;
-  ctx.shadowColor = VISUAL_CONFIG.colors.starGlow;
-  ctx.shadowBlur = VISUAL_CONFIG.glowStrengthStar;
-  ctx.beginPath();
-
-  if (!state.goldStar.morphing || state.goldStar.morphProgress === 0) {
-    ctx.arc(canvasCenter(state).x, canvasCenter(state).y, state.goldStar.radius, 0, Math.PI * 2);
-  } else {
-    for (let i = 0; i < AXES * 2; i += 1) {
-      const angle = -Math.PI / 2 + i * (Math.PI / AXES);
-      const isOuter = i % 2 === 0;
-      let radius: number;
-      if (isOuter) {
-        const pillarIndex = Math.floor(i / 2);
-        radius = state.playerPillars[pillarIndex]?.finalRadius ?? state.goldStar.radius;
-      } else {
-        const pillarIndex = Math.floor(i / 2);
-        const nextIndex = (pillarIndex + 1) % AXES;
-        const avg =
-          ((state.playerPillars[pillarIndex]?.finalRadius ?? state.goldStar.radius) +
-            (state.playerPillars[nextIndex]?.finalRadius ?? state.goldStar.radius)) /
-          2;
-        radius = avg * 0.4;
-      }
-      const finalRadius = state.goldStar.radius + (radius - state.goldStar.radius) * state.goldStar.morphProgress;
-      const x = canvasCenter(state).x + Math.cos(angle) * finalRadius;
-      const y = canvasCenter(state).y + Math.sin(angle) * finalRadius;
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    }
-    ctx.closePath();
-  }
-
-  ctx.fill();
+  ctx.translate(center.x, center.y);
+  ctx.scale(starScale, starScale);
+  ctx.translate(-center.x, -center.y);
+  const bronzeGlow = materials.bronzeGlow || VISUAL_CONFIG.colors.starGlow;
+  ctx.shadowColor = `${bronzeGlow}55`;
+  ctx.shadowBlur = radius * 0.85;
+  ctx.shadowOffsetY = 8;
+  ctx.fillStyle = getSigilFill(ctx, center, radius, materials.sigil);
+  ctx.fill(starPath);
+  applyBronzeTint(ctx, starPath, center, radius);
   ctx.restore();
 
-  ctx.fillStyle = '#ffffff';
-  ctx.beginPath();
-  ctx.arc(canvasCenter(state).x, canvasCenter(state).y, 3, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.save();
+  ctx.clip(starPath);
+  applySigilTexture(ctx, center, radius, bronzeGlow);
+  ctx.restore();
+
+  ctx.save();
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = 'rgba(40,23,10,0.9)';
+  ctx.stroke(starPath);
+  ctx.globalCompositeOperation = 'screen';
+  ctx.lineWidth = 1.2;
+  ctx.strokeStyle = 'rgba(255,255,255,0.45)';
+  ctx.stroke(starPath);
+  ctx.restore();
+
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  const sigilPulse = ctx.createRadialGradient(center.x, center.y, radius * 0.05, center.x, center.y, radius * 0.85);
+  sigilPulse.addColorStop(0, 'rgba(255, 255, 220, 0.45)');
+  sigilPulse.addColorStop(0.4, 'rgba(255, 230, 160, 0.15)');
+  sigilPulse.addColorStop(1, 'rgba(255, 255, 255, 0)');
+  ctx.fillStyle = sigilPulse;
+  ctx.fill(starPath);
+  ctx.restore();
+
+  ctx.save();
+  const parallaxX = (state.screenShake.offsetX || 0) * 0.2;
+  const parallaxY = (state.screenShake.offsetY || 0) * 0.2;
+  const emboss = ctx.createLinearGradient(center.x - radius, center.y - radius, center.x + radius + parallaxX, center.y + radius + parallaxY);
+  emboss.addColorStop(0, 'rgba(15, 8, 2, 0.65)');
+  emboss.addColorStop(0.35, 'rgba(255, 230, 160, 0)');
+  emboss.addColorStop(0.65, 'rgba(255, 248, 230, 0.15)');
+  emboss.addColorStop(1, 'rgba(30, 12, 5, 0.85)');
+  ctx.globalCompositeOperation = 'multiply';
+  ctx.fillStyle = emboss;
+  ctx.fill(starPath);
+  ctx.restore();
 }
 
 function getStarVertices(state: InternalState) {

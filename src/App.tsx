@@ -24,7 +24,6 @@ import { MidnightMeridian } from './ui/fantasy/mockups/MidnightMeridian';
 import { SeraphimArchive } from './ui/fantasy/mockups/SeraphimArchive';
 import { VerdantAlloyDeck } from './ui/fantasy/mockups/VerdantAlloyDeck';
 import { TacticalLab } from './ui/tactical/TacticalLab';
-import IdleVillagePage from './ui/idleVillage/IdleVillagePage';
 import IdleVillageMapPage from './ui/idleVillage/IdleVillageMapPage';
 import IdleVillageConfigRoute from './pages/idle-village-config';
 import { CombatViewerPage } from './ui/balancing/CombatViewerPage';
@@ -179,11 +178,6 @@ function App() {
             <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Skill Check Preview…</div>}>
               <SkillCheckPreviewPage />
             </Suspense>
-          </ErrorBoundary>
-        )}
-        {activeTab === 'idleVillage' && (
-          <ErrorBoundary componentName="Idle Village">
-            <IdleVillagePage />
           </ErrorBoundary>
         )}
         {activeTab === 'idleVillageMap' && (

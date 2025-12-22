@@ -25,7 +25,6 @@ export const APP_NAV_TAB_IDS = [
   'mockSeraphimArchive',
   'mockVerdantAlloy',
   'tacticalLab',
-  'idleVillage',
   'idleVillageMap',
   'idleVillageConfig',
   'skillCheckPreview',
@@ -74,7 +73,6 @@ const NAV_ITEM_MAP: Record<AppNavTabId, AppNavItem> = {
   mockSeraphimArchive: { id: 'mockSeraphimArchive', label: 'Seraphim Archive', icon: '✶' },
   mockVerdantAlloy: { id: 'mockVerdantAlloy', label: 'Verdant Alloy Deck', icon: '🌿' },
   tacticalLab: { id: 'tacticalLab', label: 'Tactical Lab', icon: '⚔️' },
-  idleVillage: { id: 'idleVillage', label: 'Idle Village', icon: '🏡' },
   idleVillageMap: { id: 'idleVillageMap', label: 'Idle Village Map (New)', icon: '🗺️' },
   idleVillageConfig: { id: 'idleVillageConfig', label: 'Idle Village Config', icon: '⚙️' },
   skillCheckPreview: { id: 'skillCheckPreview', label: 'Skill Check Lab', icon: '🎯' },
@@ -93,6 +91,7 @@ const NAV_SECTION_DEFS: { title: string; itemIds: AppNavTabId[] }[] = [
       'spellCreationNew',
       'combatViewer',
       'idleVillageMap',
+      'skillCheckPreview',
       'characterCreator',
       'characterManager',
       'gridArena',
@@ -102,7 +101,7 @@ const NAV_SECTION_DEFS: { title: string; itemIds: AppNavTabId[] }[] = [
   },
   {
     title: 'Idle Village',
-    itemIds: ['idleVillage', 'idleVillageConfig', 'verbDetailSandbox', 'skillCheckPreview'],
+    itemIds: ['idleVillageConfig', 'verbDetailSandbox'],
   },
   {
     title: 'Archetypes',

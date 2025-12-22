@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { deriveAxisValues } from './altVisualsAxis';
 import type { StatRow } from './types';
 
@@ -122,12 +123,14 @@ const FALLBACK_AXIS_VALUES = {
 
 interface AltVisualsV6AsterismProps {
   stats: StatRow[];
+  controlsPortal?: HTMLElement | null;
 }
 
-export function AltVisualsV6Asterism({ stats }: AltVisualsV6AsterismProps) {
+export function AltVisualsV6Asterism({ stats, controlsPortal }: AltVisualsV6AsterismProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const checkboxRef = useRef<HTMLInputElement | null>(null);
   const debugPanelRef = useRef<HTMLDivElement | null>(null);
+  const [sceneRunId, setSceneRunId] = useState(0);
   const axisValues = useMemo(
     () => deriveAxisValues(stats, FALLBACK_AXIS_VALUES.enemy, FALLBACK_AXIS_VALUES.player, AXES),
     [stats],
@@ -140,10 +143,31 @@ export function AltVisualsV6Asterism({ stats }: AltVisualsV6AsterismProps) {
 
     const cleanup = initAltVisualsV6(canvas, checkbox, debugPanelRef.current, axisValues);
     return cleanup;
-  }, [axisValues]);
+  }, [axisValues, sceneRunId]);
+
+  const handleRestart = () => {
+    setSceneRunId((prev) => prev + 1);
+  };
+
+  const controlsNode = (
+    <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+      <button
+        type="button"
+        onClick={handleRestart}
+        className="px-5 py-2 rounded-full border border-emerald-400/60 bg-emerald-500/10 text-[10px] uppercase tracking-[0.2em] text-emerald-100 hover:bg-emerald-500/20 active:scale-95 transition-all shadow-[0_0_20px_rgba(16,185,129,0.25)] focus:outline-none focus:ring-2 focus:ring-emerald-400/80 focus:ring-offset-2 focus:ring-offset-slate-900"
+      >
+        Riavvia scena
+      </button>
+      <label className="flex items-center gap-3 px-4 py-2 rounded-full border border-slate-800 bg-slate-900/60 text-[10px] uppercase tracking-[0.2em] text-cyan-200 hover:bg-slate-800 transition-colors cursor-pointer">
+        <input ref={checkboxRef} type="checkbox" className="size-4 accent-amber-400 rounded border border-slate-500 cursor-pointer" />
+        Stella Perfetta (Test Mode)
+      </label>
+    </div>
+  );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-testid="alt-visuals-v6">
+      {controlsPortal ? createPortal(controlsNode, controlsPortal) : controlsNode}
       <header className="text-center space-y-1">
         <h3 className="text-xs font-semibold uppercase tracking-[0.24em] text-fuchsia-200">Alt Visuals v6 · Cinematic Column Drop</h3>
         <p className="text-[11px] text-slate-300">
@@ -152,18 +176,11 @@ export function AltVisualsV6Asterism({ stats }: AltVisualsV6AsterismProps) {
       </header>
 
       <div className="flex justify-center">
-        <label className="flex items-center gap-3 px-4 py-2 rounded-full border border-slate-800 bg-slate-900/60 text-[10px] uppercase tracking-[0.2em] text-cyan-200 hover:bg-slate-800 transition-colors cursor-pointer">
-          <input ref={checkboxRef} type="checkbox" className="size-4 accent-amber-400 rounded border border-slate-500 cursor-pointer" />
-          Stella Perfetta (Test Mode)
-        </label>
-      </div>
-
-      <div className="flex justify-center">
         <canvas
           ref={canvasRef}
           width={640}
           height={640}
-          className="w-full max-w-[680px] rounded-[28px] border border-white/10 bg-gradient-to-br from-[#05060f] via-[#080a16] to-[#040508] shadow-[0_30px_90px_rgba(0,0,0,0.8),0_0_60px_rgba(79,232,178,0.15)]"
+          className="w-full max-w-[680px] rounded-[28px] border border-white/10 bg-linear-to-br from-[#05060f] via-[#080a16] to-[#040508] shadow-[0_30px_90px_rgba(0,0,0,0.8),0_0_60px_rgba(79,232,178,0.15)]"
         />
       </div>
 

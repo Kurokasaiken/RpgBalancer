@@ -15,6 +15,8 @@ import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { evaluateStatRequirement } from '@/engine/game/idleVillage/statMatching';
 import VerbCard, { type VerbVisualVariant, type ProgressStyle } from '@/ui/idleVillage/VerbCard';
 import MarbleCard from '@/ui/fantasy/assets/marble-verb-card/MarbleCard';
+import MapMarker from '@/ui/idleVillage/MapMarker';
+import type { VerbSummary } from '@/ui/idleVillage/verbSummaries';
 import VerbDetailCard, {
   type VerbDetailPreview,
   type VerbDetailAssignment,
@@ -35,6 +37,33 @@ const CARD_VARIANTS: {
   { icon: '🔮', variant: 'amethyst', progressStyle: 'ribbon', label: 'Amethyst · Ribbon' },
   { icon: '☀️', variant: 'solar', progressStyle: 'border', label: 'Solar · Border' },
 ];
+
+const SANDBOX_MARKER_VERB: VerbSummary = {
+  key: 'sandbox_marker_demo',
+  source: 'system',
+  slotId: 'sandbox_marker_slot',
+  label: 'Aquila Patrol',
+  kindLabel: 'Map Task',
+  isQuest: false,
+  isJob: true,
+  icon: '🜂',
+  visualVariant: 'solar',
+  progressStyle: 'border',
+  progressFraction: 0.35,
+  elapsedSeconds: 18,
+  totalDurationSeconds: 60,
+  remainingSeconds: 42,
+  injuryPercentage: 0,
+  deathPercentage: 0,
+  assignedCount: 1,
+  totalSlots: 3,
+  rewardLabel: null,
+  tone: 'system',
+  deadlineLabel: '3m',
+  assigneeNames: [],
+  riskLabel: null,
+  notes: null,
+};
 
 const RARITY_STYLE_MAP: Record<
   PremiumCardRarity,
@@ -580,24 +609,21 @@ export default function VerbDetailSandbox() {
                     <p className="text-[10px] uppercase tracking-[0.2em] text-slate-400 text-center">{label}</p>
                   </div>
                 ))}
-                <div className="flex flex-col items-center gap-2 rounded-2xl border border-slate-800/70 bg-slate-950/40 p-3">
-                  <MarbleCard title="" icon="🌀" progress={0.72} isActive />
+                <div className="flex flex-col gap-3 rounded-2xl border border-slate-800/70 bg-slate-950/40 p-4">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex justify-center">
+                      <MarbleCard title="" icon="🌀" progress={0.72} isActive />
+                    </div>
+                    <div className="flex justify-center sm:justify-end w-full">
+                      <div className="scale-150">
+                        <MapMarker verb={SANDBOX_MARKER_VERB} isActive />
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-slate-400 text-center">
+                    Marble Verb · Map Marker
+                  </p>
                 </div>
-              </div>
-            </section>
-
-            <section className="default-card flex flex-col gap-4">
-              <div className="flex flex-col gap-1 text-center sm:text-left">
-                <span className="text-[9px] uppercase tracking-[0.32em] text-slate-500">Hearthstone Skin</span>
-                <h2 className="text-sm font-semibold tracking-[0.18em] uppercase text-slate-100">
-                  Premium card preview
-                </h2>
-                <p className="text-[11px] text-slate-400">
-                  Bozza UI ad alta fedeltà per skin Hearthstone, utile per confrontare orb e cornici con le Verb reali.
-                </p>
-              </div>
-              <div className="flex justify-center">
-                <HearthstoneCardPremium />
               </div>
             </section>
 
