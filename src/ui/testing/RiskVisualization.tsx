@@ -28,13 +28,26 @@ export function RiskVisualization({
   const dangerY = height * (1 - safeDeathPct / 100);
 
   return (
-    <svg 
-      width={width} 
-      height={height} 
+    <svg
+      width={width}
+      height={height}
       className="rounded-xl border border-slate-800 bg-slate-950/60"
       viewBox={`0 0 ${width} ${height}`}
     >
       <defs>
+        <filter id="tar-goo">
+          <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" result="noise" />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="10" />
+          <feGaussianBlur stdDeviation="1" />
+        </filter>
+
+        <filter id="ivory-depth">
+          <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.5" />
+          <feComponentTransfer>
+            <feFuncR type="linear" slope="1.1" />
+          </feComponentTransfer>
+        </filter>
+
         {/* Gradiente per le aree di rischio */}
         <linearGradient id="riskGradient" x1="0%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stopColor="#10b981" stopOpacity="0.1" />

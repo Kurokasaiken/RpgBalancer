@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { deriveAxisValues } from './altVisualsAxis';
 import type { StatRow } from './types';
 
@@ -18,34 +18,22 @@ const VISUAL_CONFIG = {
   particleLifetime: 700,
   screenShakeIntensity: 5,
   colors: {
-    // --- NUOVA PALETTE MONOLITI ---
-    // JET (Nemico - Nero/Ossidiana)
-    jetBase: '#1f1f2b',       // Colore corpo principale
-    jetHighlight: '#6c6c88',  // Faccia superiore (luce)
-    jetShadow: '#0b0b10',     // Faccia laterale (ombra)
-    // AVORIO (Eroe - Bianco Crema)
-    ivoryBase: '#fdfbe7',     // Colore corpo principale
-    ivoryHighlight: '#ffffff',// Faccia superiore (luce pura)
-    ivoryShadow: '#e8e4c9',   // Faccia laterale (ombra crema)
-
-    // Altri colori esistenti
     pentagonFill: '#050505',
     pentagonGlow: 'rgba(20,20,30,0.85)',
     starFill: '#fdd97b',
     starGlow: 'rgba(255,215,126,0.75)',
+    enemyPillarFill: 'rgba(130,74,255,0.9)',
+    enemyPillarStroke: '#a57cff',
+    playerPillarFill: 'rgba(73,236,193,0.9)',
+    playerPillarStroke: '#4fe8b2',
     particle: '#ff94f8',
     particleSecondary: '#5de9ff',
     enemyText: '#9387ff',
     playerText: '#8cf8d5',
     flash: 'rgba(255,255,255,0.8)',
-    enemyImpact: '#9c8dff',
-    enemyImpactGlow: 'rgba(156,141,255,0.7)',
-    playerImpact: '#ffe7a3',
-    playerImpactGlow: 'rgba(255,231,163,0.7)',
   },
 } as const;
 
-// --- INTERFACCE (Invariate) ---
 interface MorphShapeState {
   active: boolean;
   radius: number;
@@ -71,8 +59,8 @@ interface BallState {
 
 interface PillarState {
   angle: number;
-  finalRadius: number;
-  currentHeight: number;
+  finalRadius: number; // Distance from center where it lands
+  currentHeight: number; // Vertical offset (starts high, ends 0)
   velocity: number;
   landed: boolean;
 }
@@ -96,7 +84,7 @@ interface Particle {
 
 interface ScreenShake {
   active: boolean;
-  trauma: number;
+  trauma: number; // 0 to 1
   offsetX: number;
   offsetY: number;
 }
@@ -132,78 +120,50 @@ const FALLBACK_AXIS_VALUES = {
   player: [60, 54, 58, 50, 59],
 } as const;
 
-// --- COMPONENTE REACT PRINCIPALE (Invariato) ---
-interface AltVisualsV8ObsidianFieldProps {
+interface AltVisualsV6AsterismProps {
   stats: StatRow[];
 }
 
-export function AltVisualsV8ObsidianField({ stats }: AltVisualsV8ObsidianFieldProps) {
+export function AltVisualsV6Asterism({ stats }: AltVisualsV6AsterismProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const checkboxRef = useRef<HTMLInputElement | null>(null);
   const debugPanelRef = useRef<HTMLDivElement | null>(null);
-  const [sceneRunId, setSceneRunId] = useState(0);
-  const axisValues = useMemo(() => {
-    const derived = deriveAxisValues(stats, FALLBACK_AXIS_VALUES.enemy, FALLBACK_AXIS_VALUES.player, AXES);
-    const totalMagnitude =
-      derived.enemy.reduce((sum, value) => sum + value, 0) + derived.player.reduce((sum, value) => sum + value, 0);
-    if (totalMagnitude <= 0) {
-      return {
-        enemy: [...FALLBACK_AXIS_VALUES.enemy],
-        player: [...FALLBACK_AXIS_VALUES.player],
-      };
-    }
-    return derived;
-  }, [stats]);
+  const axisValues = useMemo(
+    () => deriveAxisValues(stats, FALLBACK_AXIS_VALUES.enemy, FALLBACK_AXIS_VALUES.player, AXES),
+    [stats],
+  );
 
   useEffect(() => {
-    if (sceneRunId === 0) return;
     const canvas = canvasRef.current;
     const checkbox = checkboxRef.current;
     if (!canvas || !checkbox) return;
 
-    const cleanup = initAltVisualsV8(canvas, checkbox, debugPanelRef.current, axisValues);
+    const cleanup = initAltVisualsV6(canvas, checkbox, debugPanelRef.current, axisValues);
     return cleanup;
-  }, [axisValues, sceneRunId]);
-
-  const handleStartScene = () => {
-    setSceneRunId((prev) => prev + 1);
-  };
+  }, [axisValues]);
 
   return (
-    <div className="space-y-4" data-testid="alt-visuals-v8">
+    <div className="space-y-4">
       <header className="text-center space-y-1">
-        <h3 className="text-xs font-semibold uppercase tracking-[0.24em] text-fuchsia-200">Alt Visuals v8 · Cinematic Monoliths</h3>
+        <h3 className="text-xs font-semibold uppercase tracking-[0.24em] text-fuchsia-200">Alt Visuals v6 · Cinematic Column Drop</h3>
         <p className="text-[11px] text-slate-300">
-          Monoliti Jet e Avorio, impatto sismico e flash per un feeling AAA.
+          Colonne cadenti, impatto sismico e flash per un feeling AAA.
         </p>
       </header>
 
-      <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-        <button
-          type="button"
-          onClick={handleStartScene}
-          className="px-5 py-2 rounded-full border border-emerald-400/60 bg-emerald-500/10 text-[10px] uppercase tracking-[0.2em] text-emerald-100 hover:bg-emerald-500/20 active:scale-95 transition-all shadow-[0_0_20px_rgba(16,185,129,0.25)]"
-        >
-          {sceneRunId === 0 ? 'Avvia scena' : 'Riavvia scena'}
-        </button>
+      <div className="flex justify-center">
         <label className="flex items-center gap-3 px-4 py-2 rounded-full border border-slate-800 bg-slate-900/60 text-[10px] uppercase tracking-[0.2em] text-cyan-200 hover:bg-slate-800 transition-colors cursor-pointer">
           <input ref={checkboxRef} type="checkbox" className="size-4 accent-amber-400 rounded border border-slate-500 cursor-pointer" />
           Stella Perfetta (Test Mode)
         </label>
       </div>
 
-      {sceneRunId === 0 && (
-        <p className="text-center text-[11px] uppercase tracking-[0.2em] text-slate-400">
-          Premi &quot;Avvia scena&quot; per lanciare la simulazione
-        </p>
-      )}
-
       <div className="flex justify-center">
         <canvas
           ref={canvasRef}
           width={640}
           height={640}
-          className="w-full max-w-[680px] rounded-[28px] border border-white/10 bg-linear-to-br from-[#05060f] via-[#080a16] to-[#040508] shadow-[0_30px_90px_rgba(0,0,0,0.8),0_0_60px_rgba(79,232,178,0.15)]"
+          className="w-full max-w-[680px] rounded-[28px] border border-white/10 bg-gradient-to-br from-[#05060f] via-[#080a16] to-[#040508] shadow-[0_30px_90px_rgba(0,0,0,0.8),0_0_60px_rgba(79,232,178,0.15)]"
         />
       </div>
 
@@ -215,10 +175,9 @@ export function AltVisualsV8ObsidianField({ stats }: AltVisualsV8ObsidianFieldPr
   );
 }
 
-export default AltVisualsV8ObsidianField;
+export default AltVisualsV6Asterism;
 
-// --- FUNZIONE DI INIZIALIZZAZIONE (Logica invariata, cambiano solo le draw calls) ---
-function initAltVisualsV8(
+function initAltVisualsV6(
   canvas: HTMLCanvasElement,
   checkbox: HTMLInputElement,
   _debugPanel: HTMLDivElement | null | undefined,
@@ -226,15 +185,6 @@ function initAltVisualsV8(
 ) {
   const ctx = canvas.getContext('2d', { alpha: false });
   if (!ctx) return () => { };
-
-  // Carica texture per elementi
-  const ivoryImg = new Image();
-  ivoryImg.crossOrigin = 'anonymous';
-  ivoryImg.src = 'https://dl.polyhaven.com/textures/rock_marble_01_4k_2023-06-25/rock_marble_01_diff_4k.jpg'; // Ivory marble texture CC0
-
-  const tarImg = new Image();
-  tarImg.crossOrigin = 'anonymous';
-  tarImg.src = 'https://opengameart.org/sites/default/files/asphalt_road.png'; // Asphalt texture CC0
 
   const internalState: InternalState = {
     usePerfectStar: false,
@@ -247,7 +197,7 @@ function initAltVisualsV8(
       vx: 0,
       vy: 0,
       radius: 8,
-      speed: 30, // Velocità iniziale aumentata per effetto pinball
+      speed: 12,
       startTime: 0,
       duration: 5000,
       stopped: false,
@@ -304,28 +254,25 @@ function initAltVisualsV8(
     ctx.fillStyle = '#05060f'; // Manual clear with bg color
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Debug text
-    ctx.fillStyle = 'white';
-    ctx.font = 'bold 20px Arial';
-    ctx.fillText('Alt Visuals v8 Canvas - Animating', 10, 30);
-
     // Apply Shake
     const centerX = canvas.width / 2 + internalState.screenShake.offsetX;
     const centerY = canvas.height / 2 + internalState.screenShake.offsetY;
 
+    // Grid relative to shake
     ctx.translate(centerX - 320, centerY - 320); // Center adjustment
 
     drawGrid(ctx);
-    drawTarAnimation(ctx, internalState, tarImg);
+    drawTarAnimation(ctx, internalState);
     drawGoldStar(ctx, internalState);
-    // drawPillars ora usa la nuova logica dei monoliti
-    drawPillars(ctx, internalState, ivoryImg);
+    drawPillars(ctx, internalState);
     drawBall(ctx, internalState);
     drawParticles(ctx, internalState);
 
+    // Reset for UI (static elements)
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     drawStatLabels(ctx, internalState);
 
+    // Flash overlay
     if (internalState.flashOpacity > 0) {
       ctx.fillStyle = `rgba(255,255,255,${internalState.flashOpacity})`;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -342,7 +289,6 @@ function initAltVisualsV8(
   };
 }
 
-// --- FUNZIONI DI SUPPORTO LOGICO (Invariate) ---
 function resetAnimation(state: InternalState) {
   if (state.usePerfectStar) {
     const perfectValue = 70;
@@ -367,7 +313,17 @@ function resetAnimation(state: InternalState) {
   state.screenShake = { active: false, trauma: 0, offsetX: 0, offsetY: 0 };
   state.flashOpacity = 0;
   state.ball = {
-    active: false, x: 320, y: 320, vx: 0, vy: 0, radius: 8, speed: 12, startTime: 0, duration: 5000, stopped: false, success: null,
+    active: false,
+    x: 320,
+    y: 320,
+    vx: 0,
+    vy: 0,
+    radius: 8,
+    speed: 12,
+    startTime: 0,
+    duration: 5000,
+    stopped: false,
+    success: null,
   };
 }
 
@@ -381,10 +337,12 @@ function triggerShake(state: InternalState, intensity: number) {
 
 function updateScreenShake(state: InternalState) {
   if (state.screenShake.trauma > 0) {
-    state.screenShake.trauma -= 0.05;
+    state.screenShake.trauma -= 0.05; // Decay
     if (state.screenShake.trauma < 0) state.screenShake.trauma = 0;
-    const shakeMap = state.screenShake.trauma * state.screenShake.trauma;
+
+    const shakeMap = state.screenShake.trauma * state.screenShake.trauma; // Non-linear falloff
     const maxOffset = VISUAL_CONFIG.screenShakeIntensity * shakeMap * 10;
+
     state.screenShake.offsetX = (Math.random() * 2 - 1) * maxOffset;
     state.screenShake.offsetY = (Math.random() * 2 - 1) * maxOffset;
   } else {
@@ -396,7 +354,7 @@ function updateScreenShake(state: InternalState) {
 function updatePillars(state: InternalState) {
   // Spawn Enemy Pillars
   state.enemyPillarAnimationDelay += 1;
-  const PILLAR_START_HEIGHT = 450; // Altezza di caduta aumentata per più impatto
+  const PILLAR_START_HEIGHT = 400; // Drop height
 
   if (state.enemyPillarAnimationDelay % PILLAR_DELAY === 0 && state.currentEnemyPillarIndex < AXES) {
     const statValue = state.enemyStatValues[state.currentEnemyPillarIndex];
@@ -413,39 +371,44 @@ function updatePillars(state: InternalState) {
       landed: false
     });
 
-    state.tentacles.push({ angle, length: 0, targetLength: finalRadius, growing: false });
+    // Tentacles spawn but stay 0 until pillar lands
+    state.tentacles.push({ angle, length: 0, targetLength: finalRadius, growing: false }); // Wait for landing
     state.currentEnemyPillarIndex += 1;
   }
 
   // Animate Enemy Pillars Falling
   state.enemyPillars.forEach((pillar, i) => {
     if (!pillar.landed) {
-      pillar.velocity += 2;
+      pillar.velocity += 2; // Gravity
       pillar.currentHeight -= pillar.velocity;
 
       if (pillar.currentHeight <= 0) {
+        // Impact!
         pillar.currentHeight = 0;
         pillar.landed = true;
         pillar.velocity = 0;
+
+        // Start tentacle growth
         if (state.tentacles[i]) state.tentacles[i].growing = true;
-        // Impatto Jet
+
+        // FX
         triggerShake(state, 0.4);
-        spawnParticleBurst(state, pillar.angle, pillar.finalRadius, VISUAL_CONFIG.colors.jetHighlight, VISUAL_CONFIG.colors.jetBase, 15);
+        spawnParticleBurst(state, pillar.angle, pillar.finalRadius, VISUAL_CONFIG.colors.particle, VISUAL_CONFIG.colors.particleSecondary, 12);
       }
     }
   });
 
-  // Update Tentacles
+  // Update Tentacles (grow after impact)
   state.tentacles.forEach((tentacle) => {
     if (tentacle.growing && tentacle.length < tentacle.targetLength) {
-      tentacle.length += 15;
+      tentacle.length += 15; // Fast grow on impact
       if (tentacle.length >= tentacle.targetLength) {
         tentacle.length = tentacle.targetLength;
       }
     }
   });
 
-  // Start Player sequence
+  // Start Player sequence after Enemy sequence finishes morphing
   if (!state.playerAnimationStarted && state.tarPuddle.morphing && state.tarPuddle.morphProgress >= 1) {
     state.playerAnimationStarted = true;
   }
@@ -473,16 +436,16 @@ function updatePillars(state: InternalState) {
     // Animate Player Pillars Falling
     state.playerPillars.forEach((pillar) => {
       if (!pillar.landed) {
-        pillar.velocity += 2.5;
+        pillar.velocity += 2.5; // Heavier gravity for player
         pillar.currentHeight -= pillar.velocity;
 
         if (pillar.currentHeight <= 0) {
           pillar.currentHeight = 0;
           pillar.landed = true;
           pillar.velocity = 0;
-          // Impatto Avorio
-          triggerShake(state, 0.5);
-          spawnParticleBurst(state, pillar.angle, pillar.finalRadius, VISUAL_CONFIG.colors.ivoryHighlight, VISUAL_CONFIG.colors.ivoryShadow, 20);
+
+          triggerShake(state, 0.5); // Stronger shake
+          spawnParticleBurst(state, pillar.angle, pillar.finalRadius, VISUAL_CONFIG.colors.playerPillarStroke, VISUAL_CONFIG.colors.playerPillarFill, 16);
         }
       }
     });
@@ -509,7 +472,7 @@ function updateTarAnimation(state: InternalState) {
     state.tarPuddle.morphProgress += VISUAL_CONFIG.morphSpeed;
     if (state.tarPuddle.morphProgress > 1) {
       state.tarPuddle.morphProgress = 1;
-      triggerShake(state, 0.3);
+      triggerShake(state, 0.3); // Shake on morph complete
     }
   }
 
@@ -532,7 +495,7 @@ function updateTarAnimation(state: InternalState) {
     state.goldStar.morphProgress += VISUAL_CONFIG.morphSpeed;
     if (state.goldStar.morphProgress > 1) {
       state.goldStar.morphProgress = 1;
-      state.flashOpacity = 1;
+      state.flashOpacity = 1; // FLASH!
       triggerShake(state, 0.8);
     }
   }
@@ -555,7 +518,7 @@ function updateBall(state: InternalState) {
     state.ball.vy = 0;
     const starVertices = getStarVertices(state);
     state.ball.success = isPointInPolygon(state.ball.x, state.ball.y, starVertices);
-    triggerShake(state, 0.6);
+    triggerShake(state, 0.6); // Final result shake
     return;
   }
 
@@ -584,23 +547,18 @@ function updateBall(state: InternalState) {
     const dotProduct = state.ball.vx * bestNormal.x + state.ball.vy * bestNormal.y;
     state.ball.vx -= 2 * dotProduct * bestNormal.x;
     state.ball.vy -= 2 * dotProduct * bestNormal.y;
-    state.ball.vx *= 0.995; // Frizione ridotta per più rimbalzi
-    state.ball.vy *= 0.995;
+    state.ball.vx *= 0.98;
+    state.ball.vy *= 0.98;
 
+    // Impact effect
     triggerShake(state, 0.2);
-    spawnParticleBurst(state, 0, 0, VISUAL_CONFIG.colors.particle, '#fff', 20, state.ball.x, state.ball.y); // Più particelle
+    spawnParticleBurst(state, 0, 0, VISUAL_CONFIG.colors.particle, '#fff', 5, state.ball.x, state.ball.y);
 
   } else {
     state.ball.x = nextX;
     state.ball.y = nextY;
   }
-
-  // Rallentamento costante per effetto pinball
-  state.ball.vx *= 0.995;
-  state.ball.vy *= 0.995;
 }
-
-// --- FUNZIONI DI DISEGNO (Modificate per il restyle grafico) ---
 
 function drawGrid(ctx: CanvasRenderingContext2D) {
   const center = canvasCenter({} as InternalState);
@@ -643,12 +601,9 @@ function drawBall(ctx: CanvasRenderingContext2D, state: InternalState) {
   if (!state.ball.active && !state.ball.stopped) return;
 
   ctx.save();
-  // Gradiente radiale per effetto texture lucida
-  const ballGrad = ctx.createRadialGradient(state.ball.x, state.ball.y, 0, state.ball.x, state.ball.y, state.ball.radius);
-  ballGrad.addColorStop(0, '#ffffff'); // Centro bianco per highlight
-  ballGrad.addColorStop(0.7, VISUAL_CONFIG.colors.particleSecondary);
-  ballGrad.addColorStop(1, VISUAL_CONFIG.colors.particle); // Bordo più scuro
-  ctx.fillStyle = ballGrad;
+  ctx.shadowColor = VISUAL_CONFIG.colors.particleSecondary;
+  ctx.shadowBlur = 18;
+  ctx.fillStyle = VISUAL_CONFIG.colors.particleSecondary;
   ctx.strokeStyle = '#ffffff';
   ctx.lineWidth = 3;
   ctx.beginPath();
@@ -658,129 +613,65 @@ function drawBall(ctx: CanvasRenderingContext2D, state: InternalState) {
   ctx.restore();
 
   if (state.ball.stopped) {
-    // Usa il colore Avorio per il testo di successo per coerenza
-    ctx.fillStyle = state.ball.success ? VISUAL_CONFIG.colors.ivoryHighlight : VISUAL_CONFIG.colors.particle;
+    ctx.fillStyle = state.ball.success ? VISUAL_CONFIG.colors.playerPillarStroke : VISUAL_CONFIG.colors.particle;
     ctx.font = 'bold 26px "Space Grotesk", system-ui';
     ctx.textAlign = 'center';
     ctx.shadowColor = ctx.fillStyle;
     ctx.shadowBlur = 22;
-    ctx.fillText(state.ball.success ? 'SUCCESSO! ' : 'FALLITO ', canvasCenter(state).x, canvasCenter(state).y - 100);
+    ctx.fillText(state.ball.success ? 'SUCCESSO! ✓' : 'FALLITO ✗', canvasCenter(state).x, canvasCenter(state).y - 100);
   }
 }
 
-// --- NUOVA FUNZIONE DISEGNO MONOLITI ---
-function drawPillars(ctx: CanvasRenderingContext2D, state: InternalState, ivoryImg?: HTMLImageElement) {
+function drawPillars(ctx: CanvasRenderingContext2D, state: InternalState) {
   const center = canvasCenter(state);
 
-  // Helper per disegnare un singolo monolite 3D con gradienti per texture
-  const drawMonolith = (pillar: PillarState, colors: { base: string, highlight: string, shadow: string }, isIvory: boolean = false) => {
+  const drawColumn = (pillar: PillarState, colorFill: string, colorStroke: string) => {
     const dx = Math.cos(pillar.angle);
     const dy = Math.sin(pillar.angle);
     const px = center.x + dx * pillar.finalRadius;
     const py = center.y + dy * pillar.finalRadius;
+
+    // Calculate visual position with height offset
     const visualY = py - pillar.currentHeight;
-    const w = 24; // Larghezza monolite
-    const h = 60; // Altezza monolite
+    const isFalling = pillar.currentHeight > 0;
 
     ctx.save();
 
-    // Ombra a terra (si restringe mentre cade)
-    const shadowScale = Math.max(0.1, 1 - pillar.currentHeight / 450);
-    if (shadowScale > 0.1) {
-        ctx.fillStyle = 'rgba(0,0,0,0.5)';
-        ctx.beginPath();
-        ctx.ellipse(px, py, w * shadowScale * 1.2, (w / 2) * shadowScale * 1.2, 0, 0, Math.PI * 2);
-        ctx.fill();
+    // Shadow on ground
+    if (isFalling) {
+      ctx.fillStyle = 'rgba(0,0,0,0.5)';
+      ctx.beginPath();
+      ctx.ellipse(px, py, 12 * (1 - pillar.currentHeight / 500), 6 * (1 - pillar.currentHeight / 500), 0, 0, Math.PI * 2);
+      ctx.fill();
     }
 
-    if (pillar.currentHeight > 0) {
-         // Scia di caduta con gradiente
-         ctx.beginPath();
-         ctx.moveTo(px - w / 2, visualY - h + 10);
-         ctx.lineTo(px, visualY - h - 40);
-         ctx.lineTo(px + w / 2, visualY - h + 10);
-         const trailGrad = ctx.createLinearGradient(px, visualY - h, px, visualY - h - 50);
-         trailGrad.addColorStop(0, colors.base);
-         trailGrad.addColorStop(1, 'transparent');
-         ctx.fillStyle = trailGrad;
-         ctx.globalAlpha = 0.5;
-         ctx.fill();
-         ctx.globalAlpha = 1.0;
-    }
+    // Column Body
+    ctx.fillStyle = colorFill;
+    ctx.strokeStyle = colorStroke;
+    ctx.lineWidth = 2;
+    ctx.shadowColor = colorStroke;
+    ctx.shadowBlur = isFalling ? 20 : 12;
 
-    // 1. Faccia Laterale (Ombra - gradiente verticale)
-    const lateralGrad = ctx.createLinearGradient(px - w/2, visualY - h, px - w/2, visualY);
-    lateralGrad.addColorStop(0, colors.shadow);
-    lateralGrad.addColorStop(1, colors.base);
-    ctx.fillStyle = lateralGrad;
     ctx.beginPath();
-    ctx.moveTo(px, visualY + 10);
-    ctx.lineTo(px - w / 2, visualY);
-    ctx.lineTo(px - w / 2, visualY - h);
-    ctx.lineTo(px, visualY - h + 10);
+    ctx.arc(px, visualY, 12, 0, Math.PI * 2);
     ctx.fill();
-
-    // 2. Faccia Frontale (Colore Base - texture o gradiente)
-    if (isIvory && ivoryImg && ivoryImg.complete) {
-      const pattern = ctx.createPattern(ivoryImg, 'repeat');
-      if (pattern) {
-        ctx.fillStyle = pattern;
-      } else {
-        const frontalGrad = ctx.createLinearGradient(px - w/2, visualY - h, px + w/2, visualY);
-        frontalGrad.addColorStop(0, colors.highlight);
-        frontalGrad.addColorStop(0.5, colors.base);
-        frontalGrad.addColorStop(1, colors.shadow);
-        ctx.fillStyle = frontalGrad;
-      }
-    } else {
-      const frontalGrad = ctx.createLinearGradient(px - w/2, visualY - h, px + w/2, visualY);
-      frontalGrad.addColorStop(0, colors.highlight);
-      frontalGrad.addColorStop(0.5, colors.base);
-      frontalGrad.addColorStop(1, colors.shadow);
-      ctx.fillStyle = frontalGrad;
-    }
-    ctx.beginPath();
-    ctx.moveTo(px, visualY + 10);
-    ctx.lineTo(px + w / 2, visualY);
-    ctx.lineTo(px + w / 2, visualY - h);
-    ctx.lineTo(px, visualY - h + 10);
-    ctx.fill();
-
-    // 3. Faccia Superiore (Luce - gradiente radiale per texture lucida)
-    const topGrad = ctx.createRadialGradient(px, visualY - h - 5, 0, px, visualY - h - 5, w);
-    topGrad.addColorStop(0, colors.highlight);
-    topGrad.addColorStop(1, colors.base);
-    ctx.fillStyle = topGrad;
-    ctx.beginPath();
-    ctx.moveTo(px, visualY - h + 10);
-    ctx.lineTo(px - w / 2, visualY - h);
-    ctx.lineTo(px, visualY - h - 10);
-    ctx.lineTo(px + w / 2, visualY - h);
-    ctx.fill();
-
-    // Glow sottile sui bordi
-    ctx.shadowBlur = 10;
-    ctx.shadowColor = colors.highlight;
-    ctx.strokeStyle = colors.highlight;
-    ctx.lineWidth = 1;
     ctx.stroke();
+
+    // Trail
+    if (isFalling) {
+      ctx.beginPath();
+      ctx.moveTo(px - 8, visualY);
+      ctx.lineTo(px, visualY - 40);
+      ctx.lineTo(px + 8, visualY);
+      ctx.fillStyle = isFalling ? `rgba(255,255,255,0.2)` : 'transparent';
+      ctx.fill();
+    }
 
     ctx.restore();
   };
 
-  // Disegna Nemici (Jet)
-  state.enemyPillars.forEach(p => drawMonolith(p, {
-      base: VISUAL_CONFIG.colors.jetBase,
-      highlight: VISUAL_CONFIG.colors.jetHighlight,
-      shadow: VISUAL_CONFIG.colors.jetShadow
-  }));
-
-  // Disegna Giocatore (Avorio)
-  state.playerPillars.forEach(p => drawMonolith(p, {
-      base: VISUAL_CONFIG.colors.ivoryBase,
-      highlight: VISUAL_CONFIG.colors.ivoryHighlight,
-      shadow: VISUAL_CONFIG.colors.ivoryShadow
-  }));
+  state.enemyPillars.forEach(p => drawColumn(p, VISUAL_CONFIG.colors.enemyPillarFill, VISUAL_CONFIG.colors.enemyPillarStroke));
+  state.playerPillars.forEach(p => drawColumn(p, VISUAL_CONFIG.colors.playerPillarFill, VISUAL_CONFIG.colors.playerPillarStroke));
 }
 
 
@@ -816,9 +707,10 @@ function updateParticles(state: InternalState, delta: number) {
         burst.splice(j, 1);
         continue;
       }
+      // Physics
       particle.x += particle.vx;
       particle.y += particle.vy;
-      particle.vy += 0.1;
+      particle.vy += 0.1; // Gravity
       particle.radius *= 0.95;
     }
     if (burst.length === 0) {
@@ -843,21 +735,11 @@ function drawParticles(ctx: CanvasRenderingContext2D, state: InternalState) {
   });
 }
 
-// --- DISEGNO CATRAME E STELLA (Invariati, usano i colori della config) ---
-function drawTarAnimation(ctx: CanvasRenderingContext2D, state: InternalState, tarImg?: HTMLImageElement) {
+function drawTarAnimation(ctx: CanvasRenderingContext2D, state: InternalState) {
   if (!state.tarPuddle.active || state.tarPuddle.radius <= 0) return;
 
   ctx.save();
-
-  // Usa texture se caricata, altrimenti colore solido
-  if (tarImg && tarImg.complete) {
-    const pattern = ctx.createPattern(tarImg, 'repeat');
-    if (pattern) ctx.fillStyle = pattern;
-    else ctx.fillStyle = VISUAL_CONFIG.colors.pentagonFill;
-  } else {
-    ctx.fillStyle = VISUAL_CONFIG.colors.pentagonFill;
-  }
-
+  ctx.fillStyle = VISUAL_CONFIG.colors.pentagonFill;
   ctx.shadowColor = VISUAL_CONFIG.colors.pentagonGlow;
   ctx.shadowBlur = VISUAL_CONFIG.glowStrengthPentagon;
   ctx.beginPath();
@@ -865,6 +747,7 @@ function drawTarAnimation(ctx: CanvasRenderingContext2D, state: InternalState, t
   if (!state.tarPuddle.morphing || state.tarPuddle.morphProgress === 0) {
     ctx.arc(canvasCenter(state).x, canvasCenter(state).y, state.tarPuddle.radius, 0, Math.PI * 2);
   } else {
+    // Morph logic... (copied from original V6 just in case)
     const segments = 60;
     for (let i = 0; i <= segments; i += 1) {
       const angle = (i / segments) * Math.PI * 2 - Math.PI / 2;
@@ -902,19 +785,7 @@ function drawTarAnimation(ctx: CanvasRenderingContext2D, state: InternalState, t
   ctx.fill();
   ctx.restore();
 
-  // Aggiungi bolle per effetto ribollente
-  const time = performance.now();
-  for (let i = 0; i < 5; i += 1) {
-    const angle = (i / 5) * Math.PI * 2 + time * 0.001;
-    const r = state.tarPuddle.radius * 0.8;
-    const x = canvasCenter(state).x + Math.cos(angle) * r;
-    const y = canvasCenter(state).y + Math.sin(angle) * r;
-    ctx.beginPath();
-    ctx.arc(x, y, 3 + Math.sin(time * 0.01 + i) * 1, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(255,255,255,0.6)';
-    ctx.fill();
-  }
-
+  // Core
   ctx.fillStyle = '#ffffff';
   ctx.beginPath();
   ctx.arc(canvasCenter(state).x, canvasCenter(state).y, 3, 0, Math.PI * 2);
@@ -961,6 +832,7 @@ function drawGoldStar(ctx: CanvasRenderingContext2D, state: InternalState) {
   ctx.fill();
   ctx.restore();
 
+  // Core
   ctx.fillStyle = '#ffffff';
   ctx.beginPath();
   ctx.arc(canvasCenter(state).x, canvasCenter(state).y, 3, 0, Math.PI * 2);
@@ -1036,6 +908,7 @@ function drawStatLabels(ctx: CanvasRenderingContext2D, state: InternalState) {
     ctx.shadowColor = 'rgba(0,0,0,0.8)';
     ctx.shadowBlur = 4;
 
+    // Values
     const playerVal = Math.round(state.playerStatValues[i] ?? 0);
     const enemyVal = Math.round(state.enemyStatValues[i] ?? 0);
     ctx.fillText(`${playerVal} vs ${enemyVal}`, x, y + 20);

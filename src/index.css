@@ -93,18 +93,28 @@
 
   /* Stele laterale per il menu (Heroic Realism) */
   .heroic-side-menu {
-    @apply h-full border-l-4 border-(--bronze-aged) bg-(--panel-basalt);
+    @apply h-full bg-(--panel-basalt);
+    display: flex;
+    flex-direction: column;
+    border-left: 4px solid var(--bronze-aged);
     background-image:
       linear-gradient(rgba(18, 22, 20, 0.95), rgba(18, 22, 20, 0.95)),
       url('/assets/ui/bg.png');
     background-size: 480px;
-    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.8);
+    box-shadow: -12px 0 34px rgba(0, 0, 0, 0.85);
   }
 
   .heroic-menu-item {
-    @apply p-3 border-b border-white/5 text-(--marble-ivory) hover:bg-white/5 transition-all;
-    font-family: var(--font-body);
+    @apply p-3 border-b border-white/10 text-(--marble-ivory) transition-all;
+    font-family: 'Crimson Text', var(--font-body);
     cursor: pointer;
+    background: radial-gradient(circle at top, rgba(255, 255, 255, 0.04), transparent);
+    filter: brightness(0.95);
+  }
+
+  .heroic-menu-item:hover {
+    filter: brightness(1.08);
+    background: radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent);
   }
 
   .heroic-menu-title {

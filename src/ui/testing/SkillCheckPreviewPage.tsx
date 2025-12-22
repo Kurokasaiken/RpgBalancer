@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useBalancerConfig } from '@/balancing/hooks/useBalancerConfig';
 
-import AltVisualsV5Asterism from './AltVisualsV5Asterism';
 import AltVisualsV6Asterism from './AltVisualsV6Asterism';
 import AltVisualsV8ObsidianField from './AltVisualsV8ObsidianField';
 import type { OutcomeZone, OutcomeResult, StatRow, LastOutcome, Point } from './types';
@@ -12,22 +11,16 @@ const CENTER_Y = CANVAS_SIZE / 2;
 const RADIUS = 120;
 const ALT_VISUAL_ENTRIES = [
   {
-    id: 'alt-v5',
-    label: 'Alt Visuals v5',
-    tagline: 'Anime Starfield · glow morbido',
-    Component: AltVisualsV5Asterism,
+    id: 'alt-v8',
+    label: 'Alt Visuals v8',
+    tagline: 'Obsidian Meridian · colonne cinematiche',
+    Component: AltVisualsV8ObsidianField,
   },
   {
     id: 'alt-v6',
     label: 'Alt Visuals v6',
     tagline: 'Starfield Duel · morph pentagono/stella',
     Component: AltVisualsV6Asterism,
-  },
-  {
-    id: 'alt-v8',
-    label: 'Alt Visuals v8',
-    tagline: 'Obsidian Meridian · colonne cinematiche',
-    Component: AltVisualsV8ObsidianField,
   },
 ] as const;
 type AltVisualId = (typeof ALT_VISUAL_ENTRIES)[number]['id'];
@@ -1084,6 +1077,30 @@ export const SkillCheckPreviewPage: React.FC = () => {
     [heroPolygon],
   );
 
+  const heroPeakPoints = useMemo(() => heroPolygon.filter((_, idx) => idx % 2 === 0), [heroPolygon]);
+  const heroObelisks = useMemo(
+    () =>
+      heroPeakPoints.map((tip, index) => {
+        const angle = Math.atan2(tip.y - CENTER_Y, tip.x - CENTER_X);
+        const baseOffset = 18;
+        const baseX = tip.x - Math.cos(angle) * baseOffset;
+        const baseY = tip.y - Math.sin(angle) * baseOffset;
+        return {
+          key: `obelisk-${index}`,
+          transform: `translate(${baseX} ${baseY}) rotate(${(angle * 180) / Math.PI + 90})`,
+        };
+      }),
+    [heroPeakPoints],
+  );
+
+  const [starPulse, setStarPulse] = useState(false);
+
+  useEffect(() => {
+    setStarPulse(true);
+    const timeout = window.setTimeout(() => setStarPulse(false), 520);
+    return () => window.clearTimeout(timeout);
+  }, [heroSmoothPathD]);
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
     window.localStorage.setItem(VIEW_MODE_STORAGE_KEY, viewMode);
@@ -1404,6 +1421,53 @@ export const SkillCheckPreviewPage: React.FC = () => {
                   <clipPath id="quest-clip">
                     <polygon points={questPolygonAttr} />
                   </clipPath>
+                  <radialGradient id="tar-circle" cx="50%" cy="50%" r="65%">
+                    <stop offset="0%" stopColor="#07030a" />
+                    <stop offset="45%" stopColor="#120518" />
+                    <stop offset="100%" stopColor="#3b0a45" />
+                  </radialGradient>
+                  <filter id="tar-goo" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="6" in="SourceGraphic" result="blur" />
+                    <feColorMatrix
+                      in="blur"
+                      type="matrix"
+                      values="1 0 0 0 0  0 0.7 0 0 0  0 0 0.9 0 0  0 0 0 18 -7"
+                      result="goo"
+                    />
+                    <feBlend in="SourceGraphic" in2="goo" mode="normal" />
+                  </filter>
+                  <pattern id="ivory-crepe" width="32" height="32" patternUnits="userSpaceOnUse">
+                    <rect width="32" height="32" fill="var(--marble-ivory)" />
+                    <path
+                      d="M0 24 L12 18 L20 28 L32 20"
+                      stroke="#b6aa94"
+                      strokeWidth="1.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      opacity="0.35"
+                    />
+                    <path
+                      d="M4 4 L16 12 L28 6"
+                      stroke="#d5cdbf"
+                      strokeWidth="0.8"
+                      strokeLinecap="round"
+                      opacity="0.4"
+                    />
+                  </pattern>
+                  <filter id="ivory-depth" x="-30%" y="-30%" width="160%" height="160%">
+                    <feDropShadow dx="0" dy="4" stdDeviation="6" floodColor="#2a2015" floodOpacity="0.65" />
+                    <feDropShadow dx="0" dy="-2" stdDeviation="2" floodColor="#fff9f0" floodOpacity="0.35" />
+                  </filter>
+                  <linearGradient id="obelisk-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="var(--bronze-glow)" />
+                    <stop offset="55%" stopColor="var(--bronze-aged)" />
+                    <stop offset="100%" stopColor="var(--marble-ivory)" />
+                  </linearGradient>
+                  <radialGradient id="amber-core" cx="50%" cy="35%" r="70%">
+                    <stop offset="0%" stopColor="#ffe7a3" />
+                    <stop offset="45%" stopColor="#fcb142" />
+                    <stop offset="100%" stopColor="#a34707" />
+                  </radialGradient>
                 </defs>
 
                 {/* Axes/Grid */}
@@ -1451,28 +1515,48 @@ export const SkillCheckPreviewPage: React.FC = () => {
                   />
                 </g>
 
-                {/* Quest polygon (transparent fill) */}
-                <polygon points={questPolygonAttr} fill="rgba(56,189,248,0.08)" stroke="none" />
-
-                {/* Quest Polygon Stroke */}
+                {/* Tar Circle */}
                 <path
                   d={questSmoothPathD}
-                  fill="none"
-                  stroke="rgb(34, 211, 238)"
-                  strokeWidth="2"
-                  className="drop-shadow-[0_0_8px_rgba(34,211,238,0.6)]"
+                  fill="url(#tar-circle)"
+                  stroke="rgba(104,58,183,0.65)"
+                  strokeWidth={1.5}
+                  filter="url(#tar-goo)"
+                  opacity={0.92}
                 />
 
-                {/* Hero polygon Stroke (No Fill) */}
-                <path
-                  d={heroSmoothPathD}
-                  fill="none"
-                  stroke="rgba(52,211,153,0.95)"
-                  strokeWidth={1.5}
-                  pathLength={1}
-                  strokeDasharray={1}
-                  strokeDashoffset={0}
-                />
+                {/* Hero Ivory Star */}
+                <g
+                  style={{
+                    transformOrigin: `${CENTER_X}px ${CENTER_Y}px`,
+                    transition: 'transform 520ms cubic-bezier(0.4, 0, 0.2, 1)',
+                    transform: `translate(${CENTER_X}px, ${CENTER_Y}px) scale(${starPulse ? 1.035 : 1}) translate(${-CENTER_X}px, ${-CENTER_Y}px)`,
+                  }}
+                >
+                  <path
+                    d={heroSmoothPathD}
+                    fill="url(#ivory-crepe)"
+                    stroke="rgba(234, 225, 206, 0.8)"
+                    strokeWidth={2}
+                    filter="url(#ivory-depth)"
+                    opacity={0.95}
+                  />
+                  {heroObelisks.map((obelisk) => (
+                    <rect
+                      key={obelisk.key}
+                      width={8}
+                      height={32}
+                      x={-4}
+                      y={-32}
+                      rx={2}
+                      fill="url(#obelisk-gradient)"
+                      stroke="rgba(21,12,7,0.5)"
+                      strokeWidth={0.6}
+                      transform={obelisk.transform}
+                      opacity={0.95}
+                    />
+                  ))}
+                </g>
 
                 {/* Fixed Stat Labels */}
                 {stats.map((stat, idx) => {
@@ -1502,10 +1586,10 @@ export const SkillCheckPreviewPage: React.FC = () => {
                     cx={ballPosition.x}
                     cy={ballPosition.y}
                     r={5}
-                    fill="#f97316"
-                    stroke="#fde68a"
-                    strokeWidth={1}
-                    className="drop-shadow-[0_0_5px_rgba(249,115,22,0.8)]"
+                    fill="url(#amber-core)"
+                    stroke="#fef3c7"
+                    strokeWidth={0.8}
+                    filter="url(#ivory-depth)"
                   />
                 )}
               </svg>
