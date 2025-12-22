@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { deriveAxisValues } from './altVisualsAxis';
+import { deriveAxisValues, randomizeAxisValues } from './altVisualsAxis';
 import type { StatRow } from './types';
 
 const AXES = 5;
@@ -504,7 +504,7 @@ export function AltVisualsV8ObsidianField({ stats, controlsPortal }: AltVisualsV
   const debugPanelRef = useRef<HTMLDivElement | null>(null);
   const autoStartRef = useRef(false);
   const [sceneRunId, setSceneRunId] = useState(0);
-  const axisValues = useMemo(() => {
+  const baseAxisValues = useMemo(() => {
     const derived = deriveAxisValues(stats, FALLBACK_AXIS_VALUES.enemy, FALLBACK_AXIS_VALUES.player, AXES);
     const totalMagnitude =
       derived.enemy.reduce((sum, value) => sum + value, 0) + derived.player.reduce((sum, value) => sum + value, 0);
@@ -516,6 +516,10 @@ export function AltVisualsV8ObsidianField({ stats, controlsPortal }: AltVisualsV
     }
     return derived;
   }, [stats]);
+  const axisValues = useMemo(
+    () => randomizeAxisValues(baseAxisValues, { min: 25, max: 95, variance: 35 }),
+    [baseAxisValues, sceneRunId],
+  );
 
   useEffect(() => {
     if (sceneRunId === 0) return;
@@ -529,12 +533,13 @@ export function AltVisualsV8ObsidianField({ stats, controlsPortal }: AltVisualsV
 
   useEffect(() => {
     if (autoStartRef.current) return;
-    const hasValues = axisValues.enemy.some((value) => value > 0) || axisValues.player.some((value) => value > 0);
+    const hasValues =
+      baseAxisValues.enemy.some((value) => value > 0) || baseAxisValues.player.some((value) => value > 0);
     if (hasValues) {
       autoStartRef.current = true;
       setSceneRunId(1);
     }
-  }, [axisValues]);
+  }, [baseAxisValues]);
 
   const handleStartScene = () => {
     setSceneRunId((prev) => prev + 1);

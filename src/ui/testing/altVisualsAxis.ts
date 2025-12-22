@@ -59,6 +59,35 @@ export function deriveAxisMeta(
   return result;
 }
 
+export interface AxisRandomizationOptions {
+  min?: number;
+  max?: number;
+  variance?: number;
+}
+
+export function randomizeAxisValues(
+  base: AxisValues,
+  { min = 20, max = 95, variance = 30 }: AxisRandomizationOptions = {},
+): AxisValues {
+  const clampMin = clampValue(min);
+  const clampMax = clampValue(Math.max(min, max));
+  const getRandomBetween = (low: number, high: number) => {
+    const span = Math.max(1, high - low);
+    return Math.round(low + Math.random() * span);
+  };
+  const jitter = (value: number) => {
+    const localMin = Math.max(clampMin, value - variance);
+    const localMax = Math.min(clampMax, value + variance);
+    const effectiveMin = localMin < localMax ? localMin : clampMin;
+    const effectiveMax = localMin < localMax ? localMax : clampMax;
+    return getRandomBetween(effectiveMin, effectiveMax);
+  };
+  return {
+    enemy: base.enemy.map(jitter),
+    player: base.player.map(jitter),
+  };
+}
+
 function clampValue(value: number | undefined) {
   if (!Number.isFinite(value)) return 0;
   return Math.max(0, Math.min(100, Number(value)));

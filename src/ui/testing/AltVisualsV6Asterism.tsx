@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { deriveAxisValues } from './altVisualsAxis';
+import { deriveAxisValues, randomizeAxisValues } from './altVisualsAxis';
 import type { StatRow } from './types';
 
 const AXES = 5;
@@ -131,9 +131,13 @@ export function AltVisualsV6Asterism({ stats, controlsPortal }: AltVisualsV6Aste
   const checkboxRef = useRef<HTMLInputElement | null>(null);
   const debugPanelRef = useRef<HTMLDivElement | null>(null);
   const [sceneRunId, setSceneRunId] = useState(0);
-  const axisValues = useMemo(
+  const baseAxisValues = useMemo(
     () => deriveAxisValues(stats, FALLBACK_AXIS_VALUES.enemy, FALLBACK_AXIS_VALUES.player, AXES),
     [stats],
+  );
+  const axisValues = useMemo(
+    () => randomizeAxisValues(baseAxisValues, { min: 25, max: 95, variance: 35 }),
+    [baseAxisValues, sceneRunId],
   );
 
   useEffect(() => {
