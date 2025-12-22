@@ -64,6 +64,10 @@ test.describe('UI Verification Suite', () => {
         const altVisualsSection = page.getByTestId('alt-visuals-v8');
         await expect(altVisualsSection).toBeVisible();
 
+        // Click "Avvia scena" to start the animation
+        const startButton = altVisualsSection.getByRole('button', { name: /Avvia scena/i });
+        await startButton.click();
+
         await page.waitForFunction(() => {
             const section = document.querySelector('[data-testid="alt-visuals-v8"]');
             return !!section?.querySelector('canvas');

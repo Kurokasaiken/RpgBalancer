@@ -35,7 +35,8 @@ import type {
   MapSlotDefinition,
   StatRequirement,
 } from '@/balancing/config/idleVillage/types';
-import MarbleCard, { type MarbleCardTone } from '@/ui/fantasy/assets/marble-verb-card/MarbleCard';
+import { type MarbleCardTone } from '@/ui/fantasy/assets/marble-verb-card/MarbleCard';
+import MarbleMedallionCard from '@/ui/fantasy/assets/marble-verb-card/MarbleMedallionCard';
 import type { VerbTone } from '@/ui/idleVillage/VerbCard';
 import {
   DEFAULT_SECONDS_PER_TIME_UNIT,
@@ -301,7 +302,7 @@ function MapSlotVerbCluster({
             style={{ transform: `scale(${cardScale})` }}
           >
             <VerbCardFX verb={verb} />
-            <MarbleCard
+            <MarbleMedallionCard
               title={verb.label}
               icon={verb.icon}
               progress={verb.progressFraction}
@@ -902,7 +903,7 @@ const IdleVillageMapPage: React.FC = () => {
             <div className="flex flex-row gap-3 items-start">
               <div className="flex flex-col items-center gap-1">
                 <div className="origin-top" style={{ transform: 'scale(0.75)' }}>
-                  <MarbleCard
+                  <MarbleMedallionCard
                     title={cyclePhaseLabel}
                     icon={cycleIcon}
                     progress={cycleProgressFraction}

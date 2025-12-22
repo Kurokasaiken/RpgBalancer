@@ -1,760 +1,1014 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import * as PIXI from 'pixi.js';
-import { deriveAxisMeta, deriveAxisValues, type AxisValues } from './altVisualsAxis';
+import { deriveAxisValues } from './altVisualsAxis';
 import type { StatRow } from './types';
-import { ALT_VISUALS_V8_THEME, type AltVisualsV8TimelinePhase } from './altVisualsV8Theme';
-import {
-  fetchAltVisualsV8Manifest,
-  resolveAltVisualsV8Assets,
-  type AltVisualsV8ResolvedAssets,
-} from './altVisualsV8Manifest';
-import { useAltVisualsV8Quality, type AltVisualsV8Quality } from './useAltVisualsV8Quality';
 
-const FALLBACK_AXIS_VALUES = {
-  enemy: [65, 70, 58, 72, 60],
-  player: [70, 75, 68, 74, 66],
+const AXES = 5;
+const MAX_STAT = 100;
+const TICKS = 10;
+const RADIUS = 220;
+const MIN_BASE_VALUE = 3;
+const PILLAR_DELAY = 15; // Faster sequence for cinematic feel
+
+const VISUAL_CONFIG = {
+  morphSpeed: 0.05,
+  glowStrengthPentagon: 32,
+  glowStrengthStar: 40,
+  particleSize: 8,
+  particleCount: 24,
+  particleLifetime: 700,
+  screenShakeIntensity: 5,
+  colors: {
+    // --- NUOVA PALETTE MONOLITI ---
+    // JET (Nemico - Nero/Ossidiana)
+    jetBase: '#1a1a1d',       // Colore corpo principale
+    jetHighlight: '#3a3a40',  // Faccia superiore (luce)
+    jetShadow: '#0a0a0c',     // Faccia laterale (ombra)
+    // AVORIO (Eroe - Bianco Crema)
+    ivoryBase: '#fdfbe7',     // Colore corpo principale
+    ivoryHighlight: '#ffffff',// Faccia superiore (luce pura)
+    ivoryShadow: '#e8e4c9',   // Faccia laterale (ombra crema)
+
+    // Altri colori esistenti
+    pentagonFill: '#050505',
+    pentagonGlow: 'rgba(20,20,30,0.85)',
+    starFill: '#fdd97b',
+    starGlow: 'rgba(255,215,126,0.75)',
+    particle: '#ff94f8',
+    particleSecondary: '#5de9ff',
+    enemyText: '#9387ff',
+    playerText: '#8cf8d5',
+    flash: 'rgba(255,255,255,0.8)',
+  },
 } as const;
 
+// --- INTERFACCE (Invariate) ---
+interface MorphShapeState {
+  active: boolean;
+  radius: number;
+  maxRadius: number;
+  growing: boolean;
+  morphing: boolean;
+  morphProgress: number;
+}
+
+interface BallState {
+  active: boolean;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  radius: number;
+  speed: number;
+  startTime: number;
+  duration: number;
+  stopped: boolean;
+  success: boolean | null;
+}
+
+interface PillarState {
+  angle: number;
+  finalRadius: number;
+  currentHeight: number;
+  velocity: number;
+  landed: boolean;
+}
+
+interface TentacleState {
+  angle: number;
+  length: number;
+  targetLength: number;
+  growing: boolean;
+}
+
+interface Particle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  radius: number;
+  life: number;
+  color: string;
+}
+
+interface ScreenShake {
+  active: boolean;
+  trauma: number;
+  offsetX: number;
+  offsetY: number;
+}
+
+interface InternalState {
+  usePerfectStar: boolean;
+  tarPuddle: MorphShapeState;
+  goldStar: MorphShapeState;
+  ball: BallState;
+  baseEnemyValues: number[];
+  basePlayerValues: number[];
+  enemyStatValues: number[];
+  playerStatValues: number[];
+  enemyPillars: PillarState[];
+  playerPillars: PillarState[];
+  tentacles: TentacleState[];
+  particleBursts: Particle[][];
+  currentEnemyPillarIndex: number;
+  currentPlayerPillarIndex: number;
+  enemyPillarAnimationDelay: number;
+  playerPillarAnimationDelay: number;
+  playerAnimationStarted: boolean;
+  screenShake: ScreenShake;
+  flashOpacity: number;
+  animationFrameId: number | null;
+  lastTimestamp: number;
+}
+
+const STAT_ICONS = ['💪', '⚡', '🧠', '🛡️', '❤️'];
+
+const FALLBACK_AXIS_VALUES = {
+  enemy: [65, 58, 60, 55, 62],
+  player: [60, 54, 58, 50, 59],
+} as const;
+
+// --- COMPONENTE REACT PRINCIPALE (Invariato) ---
 interface AltVisualsV8ObsidianFieldProps {
   stats: StatRow[];
 }
 
 export function AltVisualsV8ObsidianField({ stats }: AltVisualsV8ObsidianFieldProps) {
-  const quality = useAltVisualsV8Quality();
-  const axisValues = useMemo<AxisValues>(
-    () => deriveAxisValues(stats, FALLBACK_AXIS_VALUES.enemy, FALLBACK_AXIS_VALUES.player, ALT_VISUALS_V8_THEME.axisCount),
-    [stats],
-  );
-  const axisMeta = useMemo(
-    () => deriveAxisMeta(stats, ALT_VISUALS_V8_THEME.axisMetaFallback, ALT_VISUALS_V8_THEME.axisCount),
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const checkboxRef = useRef<HTMLInputElement | null>(null);
+  const debugPanelRef = useRef<HTMLDivElement | null>(null);
+  const axisValues = useMemo(
+    () => deriveAxisValues(stats, FALLBACK_AXIS_VALUES.enemy, FALLBACK_AXIS_VALUES.player, AXES),
     [stats],
   );
 
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const [status, setStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [sceneState, setSceneState] = useState<'idle' | 'running'>('running');
 
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return undefined;
+    const canvas = canvasRef.current;
+    const checkbox = checkboxRef.current;
+    if (!canvas || !checkbox) return;
 
-    const theme = ALT_VISUALS_V8_THEME;
-    let disposed = false;
-    let teardownScene: (() => void) | undefined;
-    let app: PIXI.Application | null = new PIXI.Application();
-
-    container.replaceChildren();
-    setStatus('loading');
-    setErrorMessage(null);
-
-    const initTask = (async () => {
-      try {
-        await app!.init({
-          width: theme.layout.canvasSize,
-          height: theme.layout.canvasSize,
-          backgroundAlpha: 1,
-          background: hexToNumber('#05070f'),
-          antialias: true,
-          resolution: window.devicePixelRatio || 1,
-          autoDensity: true,
-          resizeTo: container,
-        });
-        if (disposed || !app) {
-          return;
-        }
-
-        const manifest = await fetchAltVisualsV8Manifest();
-        if (disposed || !app) {
-          return;
-        }
-        const resolvedAssets = resolveAltVisualsV8Assets(manifest);
-        const textures = await loadAltVisualsV8Textures(resolvedAssets);
-        if (disposed || !app) {
-          return;
-        }
-
-        container.appendChild(app.canvas);
-        teardownScene = buildObsidianScene({
-          app,
-          axisValues,
-          assets: resolvedAssets,
-          textures,
-          quality,
-        });
-        setStatus('ready');
-      } catch (error) {
-        console.error('[AltVisualsV8] Failed to init scene', error);
-        setStatus('error');
-        setErrorMessage(error instanceof Error ? error.message : 'Errore sconosciuto');
-      }
-    })();
-
-    return () => {
-      disposed = true;
-      if (teardownScene) {
-        teardownScene();
-      }
-      initTask.finally(() => {
-        if (app) {
-          app.destroy(true, true);
-          app = null;
-        }
-        container.replaceChildren();
-      });
-    };
-  }, [axisValues, quality]);
-
-  const theme = ALT_VISUALS_V8_THEME;
-  const averageEnemy = average(axisValues.enemy);
-  const averageHero = average(axisValues.player);
+    const cleanup = initAltVisualsV8(canvas, checkbox, debugPanelRef.current, axisValues);
+    return cleanup;
+  }, [axisValues]);
 
   return (
-    <section
-      data-testid="alt-visuals-v8"
-      className="relative w-full overflow-hidden rounded-4xl border border-white/5 bg-[#03030b] p-6 shadow-[0_40px_120px_rgba(1,2,8,0.65)]"
-    >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.1),transparent_55%),radial-gradient(circle_at_80%_0%,rgba(242,201,76,0.18),transparent_65%)] mix-blend-screen" />
-      <header className="relative mb-4 flex flex-col gap-1 text-shadow-glow-sm">
-        <p className="text-xs uppercase tracking-[0.32em] text-gilded-sand/80">Obsidian Meridian · v8</p>
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h3 className="text-2xl font-semibold text-white">Colonne cinematiche · tar bloom</h3>
-            <p className="text-sm text-white/70">contrastiamo il campo nemico con ascese dorate e goo dinamico.</p>
-          </div>
-          <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-right text-xs text-white/80">
-            <div>
-              Enemy mean: <span className="font-semibold text-white">{averageEnemy.toFixed(0)}</span>
-            </div>
-            <div>
-              Hero mean: <span className="font-semibold text-gilded-sand">{averageHero.toFixed(0)}</span>
-            </div>
-          </div>
-        </div>
+    <div className="space-y-4">
+      <header className="text-center space-y-1">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.24em] text-fuchsia-200">Alt Visuals v8 · Cinematic Monoliths</h3>
+        <p className="text-[11px] text-slate-300">
+          Monoliti Jet e Avorio, impatto sismico e flash per un feeling AAA.
+        </p>
       </header>
 
-      <div
-        ref={containerRef}
-        className="relative aspect-square w-full max-w-[720px] overflow-hidden rounded-3xl border border-white/5 bg-black"
-        style={{ minHeight: theme.layout.canvasSize / 1.5 }}
-      >
-        {status !== 'ready' && (
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/60 text-sm uppercase tracking-[0.2em] text-white/70">
-            {status === 'loading' && 'Caricamento assets · Obsidian Meridian'}
-            {status === 'error' && (
-              <span>
-                Errore: <span className="text-rose-200">{errorMessage ?? 'impossibile inizializzare PIΞ'}</span>
-              </span>
-            )}
-          </div>
-        )}
+      <div className="flex justify-center">
+        <label className="flex items-center gap-3 px-4 py-2 rounded-full border border-slate-800 bg-slate-900/60 text-[10px] uppercase tracking-[0.2em] text-cyan-200 hover:bg-slate-800 transition-colors cursor-pointer">
+          <input ref={checkboxRef} type="checkbox" className="size-4 accent-amber-400 rounded border border-slate-500 cursor-pointer" />
+          Stella Perfetta (Test Mode)
+        </label>
       </div>
 
-      <div className="relative mt-4 grid gap-4 text-xs text-white/80 md:grid-cols-2">
-        <div className="rounded-2xl border border-white/5 bg-white/5 p-3">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-white/60">Axis focus</p>
-          <ul className="mt-2 grid grid-cols-2 gap-2">
-            {axisMeta.map((meta) => (
-              <li
-                key={meta.name}
-                className="rounded-xl border border-white/5 bg-black/40 px-3 py-2 font-semibold text-white/80"
-              >
-                <span className="mr-2 text-gilded-sand">{meta.icon}</span>
-                {meta.name}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="rounded-2xl border border-white/5 bg-white/5 p-3">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-white/60">Qualità FX</p>
-          <div className="mt-2 flex items-center justify-between text-white">
-            <span className="text-lg font-semibold uppercase tracking-[0.3em]">{quality}</span>
-            <span className="text-xs text-white/70">
-              {quality === 'high'
-                ? 'FX completi (grain, particelle, bloom)'
-                : 'Modalità preview ottimizzata per hardware leggero'}
-            </span>
-          </div>
-        </div>
+      <div className="flex justify-center">
+        <canvas
+          ref={canvasRef}
+          width={640}
+          height={640}
+          className="w-full max-w-[680px] rounded-[28px] border border-white/10 bg-linear-to-br from-[#05060f] via-[#080a16] to-[#040508] shadow-[0_30px_90px_rgba(0,0,0,0.8),0_0_60px_rgba(79,232,178,0.15)]"
+        />
       </div>
-    </section>
+
+      <div
+        ref={debugPanelRef}
+        className="flex flex-wrap justify-center gap-3 text-[10px] uppercase tracking-[0.18em] text-slate-500 opacity-60"
+      />
+    </div>
   );
 }
 
 export default AltVisualsV8ObsidianField;
 
-interface AltVisualsV8TextureBundle {
-  enemyAlbedo: PIXI.Texture;
-  playerAlbedo: PIXI.Texture;
-  gooAlpha: PIXI.Texture;
-  particles: PIXI.Texture;
-  filmGrain: PIXI.Texture;
-  blueNoise?: PIXI.Texture;
-}
+// --- FUNZIONE DI INIZIALIZZAZIONE (Logica invariata, cambiano solo le draw calls) ---
+function initAltVisualsV8(
+  canvas: HTMLCanvasElement,
+  checkbox: HTMLInputElement,
+  _debugPanel: HTMLDivElement | null | undefined,
+  axisValues: { enemy: number[]; player: number[] },
+) {
+  const ctx = canvas.getContext('2d', { alpha: false });
+  if (!ctx) return () => { };
 
-async function loadAltVisualsV8Textures(assets: AltVisualsV8ResolvedAssets): Promise<AltVisualsV8TextureBundle> {
-  const requests: Record<string, string> = {};
-  if (assets.columns.enemy.maps.albedo) {
-    requests.enemyAlbedo = assets.columns.enemy.maps.albedo;
-  }
-  if (assets.columns.player.maps.albedo) {
-    requests.playerAlbedo = assets.columns.player.maps.albedo;
-  }
-  if (assets.goo.alpha) {
-    requests.gooAlpha = assets.goo.alpha;
-  }
-  if (assets.background.particles) {
-    requests.particles = assets.background.particles;
-  }
-  if (assets.background.filmGrain) {
-    requests.filmGrain = assets.background.filmGrain;
-  }
-  const blueNoiseKey = Object.keys(assets.blueNoise).sort((a, b) => Number(a) - Number(b))[0];
-  if (blueNoiseKey) {
-    requests.blueNoise = assets.blueNoise[blueNoiseKey];
-  }
+  // Carica texture per elementi
+  const ivoryImg = new Image();
+  ivoryImg.crossOrigin = 'anonymous';
+  ivoryImg.src = 'https://dl.polyhaven.com/textures/rock_marble_01_4k_2023-06-25/rock_marble_01_diff_4k.jpg'; // Ivory marble texture CC0
 
-  const loaded = Object.keys(requests).length > 0 ? await PIXI.Assets.load<Record<string, PIXI.Texture>>(requests) : {};
+  const tarImg = new Image();
+  tarImg.crossOrigin = 'anonymous';
+  tarImg.src = 'https://opengameart.org/sites/default/files/asphalt_road.png'; // Asphalt texture CC0
 
-  return {
-    enemyAlbedo: loaded.enemyAlbedo ?? PIXI.Texture.WHITE,
-    playerAlbedo: loaded.playerAlbedo ?? PIXI.Texture.WHITE,
-    gooAlpha: loaded.gooAlpha ?? PIXI.Texture.WHITE,
-    particles: loaded.particles ?? PIXI.Texture.WHITE,
-    filmGrain: loaded.filmGrain ?? PIXI.Texture.WHITE,
-    blueNoise: loaded.blueNoise,
+  const internalState: InternalState = {
+    usePerfectStar: false,
+    tarPuddle: { active: false, radius: 0, maxRadius: 30, growing: true, morphing: false, morphProgress: 0 },
+    goldStar: { active: false, radius: 0, maxRadius: 30, growing: true, morphing: false, morphProgress: 0 },
+    ball: {
+      active: false,
+      x: 320,
+      y: 320,
+      vx: 0,
+      vy: 0,
+      radius: 8,
+      speed: 30, // Velocità iniziale aumentata per effetto pinball
+      startTime: 0,
+      duration: 5000,
+      stopped: false,
+      success: null,
+    },
+    baseEnemyValues: [...axisValues.enemy],
+    basePlayerValues: [...axisValues.player],
+    enemyStatValues: [],
+    playerStatValues: [],
+    enemyPillars: [],
+    playerPillars: [],
+    tentacles: [],
+    particleBursts: [],
+    currentEnemyPillarIndex: 0,
+    currentPlayerPillarIndex: 0,
+    enemyPillarAnimationDelay: 0,
+    playerPillarAnimationDelay: 0,
+    playerAnimationStarted: false,
+    screenShake: { active: false, trauma: 0, offsetX: 0, offsetY: 0 },
+    flashOpacity: 0,
+    animationFrameId: null,
+    lastTimestamp: performance.now(),
   };
-}
 
-interface BuildSceneParams {
-  app: PIXI.Application;
-  axisValues: AxisValues;
-  assets: AltVisualsV8ResolvedAssets;
-  textures: AltVisualsV8TextureBundle;
-  quality: AltVisualsV8Quality;
-}
+  const handleCheckboxChange = (event: Event) => {
+    if (!(event.target instanceof HTMLInputElement)) return;
+    internalState.usePerfectStar = event.target.checked;
+    resetAnimation(internalState);
+  };
 
-function buildObsidianScene(params: BuildSceneParams) {
-  const { app, axisValues, textures, quality } = params;
-  const theme = ALT_VISUALS_V8_THEME;
+  checkbox.checked = false;
+  checkbox.addEventListener('change', handleCheckboxChange);
+  resetAnimation(internalState);
 
-  const stage = app.stage;
-  stage.removeChildren();
+  const drawLoop = () => {
+    const now = performance.now();
+    const delta = now - internalState.lastTimestamp;
+    internalState.lastTimestamp = now;
 
-  const backgroundLayer = new PIXI.Container();
-  const columnLayer = new PIXI.Container();
-  const puddleLayer = new PIXI.Container();
-  const starLayer = new PIXI.Container();
-  const fxLayer = new PIXI.Container();
+    // Logic updates
+    updateScreenShake(internalState);
+    updatePillars(internalState);
+    updateTarAnimation(internalState);
+    updateBall(internalState);
+    updateParticles(internalState, delta);
 
-  stage.addChild(backgroundLayer, columnLayer, puddleLayer, starLayer, fxLayer);
-
-  buildBackgroundLayer(backgroundLayer, textures, theme);
-
-  const columns = buildColumns(columnLayer, textures, axisValues, theme);
-  const puddle = buildPuddle(puddleLayer, textures, theme);
-  const core = buildObsidianCore(starLayer);
-  const star = buildHeroStar(starLayer);
-  const particles = buildParticles(fxLayer, textures, theme, quality);
-  const grain = buildFilmGrain(fxLayer, textures, theme, quality);
-
-  const phases: AltVisualsV8TimelinePhase[] = ['enemyColumns', 'puddleMorph', 'heroAscend', 'settle'];
-  const phaseDurations = theme.timings.phaseDurationsMs;
-  let phaseIndex = 0;
-  let phaseElapsed = 0;
-  let totalTime = 0;
-
-  const tickerHandler = (ticker: PIXI.Ticker) => {
-    const deltaMs = ticker.deltaMS;
-    phaseElapsed += deltaMs;
-    totalTime += deltaMs;
-    const currentPhase = phases[phaseIndex];
-    const currentDuration = phaseDurations[currentPhase];
-    if (phaseElapsed > currentDuration) {
-      phaseElapsed -= currentDuration;
-      phaseIndex += 1;
-      if (phaseIndex >= phases.length) {
-        phaseIndex = 0;
-        phaseElapsed = 0;
-        totalTime = 0;
-      }
+    if (internalState.flashOpacity > 0) {
+      internalState.flashOpacity -= 0.05;
+      if (internalState.flashOpacity < 0) internalState.flashOpacity = 0;
     }
-    const phaseProgress = Math.min(1, phaseElapsed / currentDuration);
 
-    updateColumns(columns, axisValues, theme, currentPhase, phaseProgress, totalTime);
-    updatePuddle(puddle, axisValues, theme, currentPhase, phaseProgress, totalTime, quality);
-    updateObsidianCore(core, theme, totalTime);
-    updateHeroStar(star, axisValues, theme, currentPhase, phaseProgress, quality, totalTime);
-    updateParticles(particles, theme, deltaMs);
-    updateFilmGrain(grain, theme, deltaMs);
+    // Drawing
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
+    ctx.fillStyle = '#05060f'; // Manual clear with bg color
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Debug text
+    ctx.fillStyle = 'white';
+    ctx.font = 'bold 20px Arial';
+    ctx.fillText('Alt Visuals v8 Canvas - Animating', 10, 30);
+
+    // Apply Shake
+    const centerX = canvas.width / 2 + internalState.screenShake.offsetX;
+    const centerY = canvas.height / 2 + internalState.screenShake.offsetY;
+
+    ctx.translate(centerX - 320, centerY - 320); // Center adjustment
+
+    drawGrid(ctx);
+    drawTarAnimation(ctx, internalState, tarImg);
+    drawGoldStar(ctx, internalState);
+    // drawPillars ora usa la nuova logica dei monoliti
+    drawPillars(ctx, internalState, ivoryImg);
+    drawBall(ctx, internalState);
+    drawParticles(ctx, internalState);
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    drawStatLabels(ctx, internalState);
+
+    if (internalState.flashOpacity > 0) {
+      ctx.fillStyle = `rgba(255,255,255,${internalState.flashOpacity})`;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    internalState.animationFrameId = requestAnimationFrame(drawLoop);
   };
 
-  app.ticker.add(tickerHandler);
+  drawLoop();
 
   return () => {
-    app.ticker.remove(tickerHandler);
-    [backgroundLayer, columnLayer, puddleLayer, starLayer, fxLayer].forEach((layer) => layer.destroy({ children: true }));
+    if (internalState.animationFrameId !== null) cancelAnimationFrame(internalState.animationFrameId);
+    checkbox.removeEventListener('change', handleCheckboxChange);
   };
 }
 
-interface ColumnVisual {
-  core: PIXI.Graphics;
-  enemySprite: PIXI.Sprite;
-  playerSprite: PIXI.Sprite;
-  glow: PIXI.Graphics;
-  aura: PIXI.Graphics;
-  wobbleSeed: number;
-  enemyHeight: number;
-  playerHeight: number;
-  x: number;
-}
-
-function buildColumns(
-  layer: PIXI.Container,
-  textures: AltVisualsV8TextureBundle,
-  axisValues: AxisValues,
-  theme: typeof ALT_VISUALS_V8_THEME,
-): ColumnVisual[] {
-  const { canvasSize, columnThickness } = theme.layout;
-  const spacing = canvasSize / (axisValues.enemy.length + 1);
-  const bottom = canvasSize - 40;
-
-  return axisValues.enemy.map((enemyValue, index) => {
-    const container = new PIXI.Container();
-    layer.addChild(container);
-
-    const x = spacing * (index + 1);
-    container.position.set(x, bottom);
-
-    const plate = new PIXI.Graphics();
-    plate.beginFill(hexToNumber(theme.palette.grid), 0.8);
-    plate.drawRoundedRect(-columnThickness * 0.65, 0, columnThickness * 1.3, 12, 6);
-    plate.endFill();
-    container.addChild(plate);
-
-    const core = new PIXI.Graphics();
-    core.alpha = 0.85;
-    container.addChild(core);
-
-    const enemySprite = new PIXI.Sprite(textures.enemyAlbedo);
-    enemySprite.anchor.set(0.5, 1);
-    enemySprite.width = columnThickness;
-    enemySprite.height = 0;
-    enemySprite.tint = mixColors(theme.palette.obsidian, theme.palette.etherBlue, 0.2);
-    enemySprite.alpha = 0.55;
-    container.addChild(enemySprite);
-
-    const playerSprite = new PIXI.Sprite(textures.playerAlbedo);
-    playerSprite.anchor.set(0.5, 1);
-    playerSprite.width = columnThickness * 0.92;
-    playerSprite.height = 0;
-    playerSprite.alpha = 0;
-    playerSprite.tint = hexToNumber(theme.palette.moltenGold);
-    playerSprite.blendMode = 'add';
-    container.addChild(playerSprite);
-
-    const glow = new PIXI.Graphics();
-    glow.alpha = 0.4;
-    container.addChild(glow);
-
-    const aura = new PIXI.Graphics();
-    aura.alpha = 0.15;
-    container.addChildAt(aura, 0);
-
-    return {
-      enemySprite,
-      playerSprite,
-      glow,
-      aura,
-      core,
-      wobbleSeed: index * 0.65,
-      enemyHeight: mapStatToHeight(enemyValue, theme.columns.heightRange),
-      playerHeight: mapStatToHeight(axisValues.player[index], theme.columns.heightRange) + theme.columns.playerLiftOffset,
-      x,
-    };
-  });
-}
-
-function updateColumns(
-  columns: ColumnVisual[],
-  axisValues: AxisValues,
-  theme: typeof ALT_VISUALS_V8_THEME,
-  phase: AltVisualsV8TimelinePhase,
-  phaseProgress: number,
-  totalTime: number,
-) {
-  const range = theme.columns.heightRange;
-  const baseLerp = phase === 'enemyColumns' ? easeExpoOut(phaseProgress) : 0.12;
-  const heroLerp = phase === 'heroAscend' || phase === 'settle' ? easeQuartOut(phaseProgress) : 0;
-
-  columns.forEach((column, index) => {
-    const enemyTarget = mapStatToHeight(axisValues.enemy[index], range);
-    column.enemyHeight = lerp(column.enemyHeight, enemyTarget, 0.08 + baseLerp * 0.6);
-    const wobble = Math.sin(totalTime * 0.0018 + column.wobbleSeed) * theme.columns.wobbleAmplitude;
-    column.enemySprite.height = Math.max(12, column.enemyHeight + wobble);
-
-    column.core.clear();
-    const gradientSteps = 8;
-    for (let step = 0; step < gradientSteps; step += 1) {
-      const t = step / (gradientSteps - 1);
-      const widthFactor = 0.35 + (1 - t) * 0.4;
-      const heightFactor = 0.5 + t * 0.45;
-      const color = mixColors(theme.palette.obsidian, theme.palette.moltenGold, t * 0.5);
-      column.core.beginFill(color, 0.35 + (1 - t) * 0.4);
-      column.core.drawRoundedRect(
-        (-theme.layout.columnThickness * widthFactor) / 2,
-        -column.enemySprite.height * heightFactor,
-        theme.layout.columnThickness * widthFactor,
-        column.enemySprite.height * heightFactor,
-        10,
-      );
-      column.core.endFill();
-    }
-
-    const heroTarget = mapStatToHeight(axisValues.player[index], range) + theme.columns.playerLiftOffset;
-    column.playerHeight = lerp(column.playerHeight, heroTarget, 0.04 + heroLerp * 0.5);
-    column.playerSprite.height = Math.max(0, column.playerHeight);
-    column.playerSprite.alpha = heroLerp * 0.9;
-
-    column.glow.clear();
-    if (heroLerp > 0.05) {
-      column.glow.beginFill(hexToNumber(theme.palette.moltenGold), 0.35 * heroLerp);
-      column.glow.drawEllipse(0, -column.playerSprite.height, theme.layout.columnThickness * 0.7, 22);
-      column.glow.endFill();
-    }
-
-    column.aura.clear();
-    column.aura.beginFill(hexToNumber(theme.palette.etherBlue), 0.12);
-    column.aura.drawRect(
-      -theme.layout.columnThickness * 0.9,
-      -column.enemySprite.height - 16,
-      theme.layout.columnThickness * 1.8,
-      column.enemySprite.height + 28,
-    );
-    column.aura.endFill();
-  });
-}
-
-function buildPuddle(
-  layer: PIXI.Container,
-  textures: AltVisualsV8TextureBundle,
-  theme: typeof ALT_VISUALS_V8_THEME,
-) {
-  const sprite = new PIXI.Sprite(textures.gooAlpha);
-  sprite.anchor.set(0.5);
-  sprite.position.set(theme.layout.canvasSize / 2, theme.layout.canvasSize - 50);
-  sprite.tint = mixColors(theme.palette.tar, theme.palette.moltenGold, 0.35);
-  sprite.alpha = 0.75;
-  sprite.blendMode = 'add';
-  layer.addChild(sprite);
-
-  const noiseSprite = textures.blueNoise
-    ? new PIXI.Sprite(textures.blueNoise)
-    : new PIXI.Sprite(PIXI.Texture.WHITE);
-  noiseSprite.anchor.set(0.5);
-  noiseSprite.alpha = 0.2;
-  noiseSprite.tint = hexToNumber(theme.palette.ember);
-  layer.addChild(noiseSprite);
-  noiseSprite.position.copyFrom(sprite.position);
-
-  return { sprite, noiseSprite };
-}
-
-interface ObsidianCore {
-  disc: PIXI.Graphics;
-  halo: PIXI.Graphics;
-}
-
-function buildObsidianCore(layer: PIXI.Container): ObsidianCore {
-  const disc = new PIXI.Graphics();
-  const halo = new PIXI.Graphics();
-  layer.addChild(disc, halo);
-  return { disc, halo };
-}
-
-function updateObsidianCore(core: ObsidianCore, theme: typeof ALT_VISUALS_V8_THEME, totalTime: number) {
-  const center = theme.layout.canvasSize / 2;
-  const baseRadius = theme.layout.baseRadius * 0.55;
-  const pulse = 1 + Math.sin(totalTime * 0.002) * 0.06;
-  const haloPulse = 1 + Math.sin(totalTime * 0.0013 + Math.PI / 4) * 0.12;
-
-  core.disc.clear();
-  const gradientSteps = 32;
-  for (let i = gradientSteps; i >= 0; i -= 1) {
-    const t = i / gradientSteps;
-    const radius = baseRadius * pulse * (0.35 + t * 0.65);
-    const color = mixColors(theme.palette.moltenGold, theme.palette.ember, t * 0.6);
-    core.disc.beginFill(color, 0.25 + t * 0.55);
-    core.disc.drawCircle(center, center + 60, radius);
-    core.disc.endFill();
+// --- FUNZIONI DI SUPPORTO LOGICO (Invariate) ---
+function resetAnimation(state: InternalState) {
+  if (state.usePerfectStar) {
+    const perfectValue = 70;
+    state.enemyStatValues = Array.from({ length: AXES }, () => perfectValue);
+    state.playerStatValues = Array.from({ length: AXES }, () => perfectValue);
+  } else {
+    state.enemyStatValues = [...state.baseEnemyValues];
+    state.playerStatValues = [...state.basePlayerValues];
   }
 
-  core.halo.clear();
-  core.halo.lineStyle(8, hexToNumber(theme.palette.etherBlue), 0.4);
-  core.halo.drawCircle(center, center + 60, baseRadius * haloPulse * 1.15);
-  core.halo.lineStyle(2, hexToNumber(theme.palette.moltenGold), 0.65);
-  core.halo.drawCircle(center, center + 60, baseRadius * haloPulse * 1.3);
+  state.tarPuddle = { active: false, radius: 0, maxRadius: 30, growing: true, morphing: false, morphProgress: 0 };
+  state.goldStar = { active: false, radius: 0, maxRadius: 30, growing: true, morphing: false, morphProgress: 0 };
+  state.enemyPillars = [];
+  state.playerPillars = [];
+  state.tentacles = [];
+  state.particleBursts = [];
+  state.currentEnemyPillarIndex = 0;
+  state.currentPlayerPillarIndex = 0;
+  state.enemyPillarAnimationDelay = 0;
+  state.playerPillarAnimationDelay = 0;
+  state.playerAnimationStarted = false;
+  state.screenShake = { active: false, trauma: 0, offsetX: 0, offsetY: 0 };
+  state.flashOpacity = 0;
+  state.ball = {
+    active: false, x: 320, y: 320, vx: 0, vy: 0, radius: 8, speed: 12, startTime: 0, duration: 5000, stopped: false, success: null,
+  };
 }
 
-function updatePuddle(
-  puddle: ReturnType<typeof buildPuddle>,
-  axisValues: AxisValues,
-  theme: typeof ALT_VISUALS_V8_THEME,
-  phase: AltVisualsV8TimelinePhase,
-  phaseProgress: number,
-  totalTime: number,
-  quality: AltVisualsV8Quality,
-) {
-  const radius = theme.puddle.radius;
-  const strength = Math.max(0, average(axisValues.enemy) - average(axisValues.player)) / 120;
-  const scaleBase = radius / (puddle.sprite.texture.width / 2 || radius);
-  const ripple = Math.sin(totalTime * 0.0025) * theme.puddle.displacementAmplitude * 0.01;
-  const morphBoost = phase === 'puddleMorph' ? phaseProgress * 0.15 : 0;
-  const heroBoost = phase === 'heroAscend' ? phaseProgress * 0.08 : 0;
-  const finalScale = scaleBase * (1 + ripple + morphBoost + heroBoost + strength * 0.25);
-  puddle.sprite.scale.set(finalScale);
-  puddle.sprite.alpha = 0.5 + phaseProgress * 0.25 + strength * 0.35;
+function canvasCenter(_state: InternalState) {
+  return { x: 320, y: 320 };
+}
 
-  if (puddle.noiseSprite) {
-    const noiseScale = finalScale * (quality === 'high' ? 1.1 : 0.9);
-    puddle.noiseSprite.scale.set(noiseScale);
-    puddle.noiseSprite.rotation = totalTime * 0.0002;
+function triggerShake(state: InternalState, intensity: number) {
+  state.screenShake.trauma = Math.min(1, state.screenShake.trauma + intensity);
+}
+
+function updateScreenShake(state: InternalState) {
+  if (state.screenShake.trauma > 0) {
+    state.screenShake.trauma -= 0.05;
+    if (state.screenShake.trauma < 0) state.screenShake.trauma = 0;
+    const shakeMap = state.screenShake.trauma * state.screenShake.trauma;
+    const maxOffset = VISUAL_CONFIG.screenShakeIntensity * shakeMap * 10;
+    state.screenShake.offsetX = (Math.random() * 2 - 1) * maxOffset;
+    state.screenShake.offsetY = (Math.random() * 2 - 1) * maxOffset;
+  } else {
+    state.screenShake.offsetX = 0;
+    state.screenShake.offsetY = 0;
   }
 }
 
-function buildHeroStar(layer: PIXI.Container) {
-  const graphics = new PIXI.Graphics();
-  graphics.alpha = 0;
-  layer.addChild(graphics);
-  return graphics;
+function updatePillars(state: InternalState) {
+  // Spawn Enemy Pillars
+  state.enemyPillarAnimationDelay += 1;
+  const PILLAR_START_HEIGHT = 450; // Altezza di caduta aumentata per più impatto
+
+  if (state.enemyPillarAnimationDelay % PILLAR_DELAY === 0 && state.currentEnemyPillarIndex < AXES) {
+    const statValue = state.enemyStatValues[state.currentEnemyPillarIndex];
+    const angle = -Math.PI / 2 + state.currentEnemyPillarIndex * ((2 * Math.PI) / AXES);
+    const effectiveValue = MIN_BASE_VALUE + statValue;
+    const progress = effectiveValue / (MAX_STAT + MIN_BASE_VALUE);
+    const finalRadius = RADIUS * progress;
+
+    state.enemyPillars.push({
+      angle,
+      finalRadius,
+      currentHeight: PILLAR_START_HEIGHT,
+      velocity: 0,
+      landed: false
+    });
+
+    state.tentacles.push({ angle, length: 0, targetLength: finalRadius, growing: false });
+    state.currentEnemyPillarIndex += 1;
+  }
+
+  // Animate Enemy Pillars Falling
+  state.enemyPillars.forEach((pillar, i) => {
+    if (!pillar.landed) {
+      pillar.velocity += 2;
+      pillar.currentHeight -= pillar.velocity;
+
+      if (pillar.currentHeight <= 0) {
+        pillar.currentHeight = 0;
+        pillar.landed = true;
+        pillar.velocity = 0;
+        if (state.tentacles[i]) state.tentacles[i].growing = true;
+        // Impatto Jet
+        triggerShake(state, 0.4);
+        spawnParticleBurst(state, pillar.angle, pillar.finalRadius, VISUAL_CONFIG.colors.jetHighlight, VISUAL_CONFIG.colors.jetBase, 15);
+      }
+    }
+  });
+
+  // Update Tentacles
+  state.tentacles.forEach((tentacle) => {
+    if (tentacle.growing && tentacle.length < tentacle.targetLength) {
+      tentacle.length += 15;
+      if (tentacle.length >= tentacle.targetLength) {
+        tentacle.length = tentacle.targetLength;
+      }
+    }
+  });
+
+  // Start Player sequence
+  if (!state.playerAnimationStarted && state.tarPuddle.morphing && state.tarPuddle.morphProgress >= 1) {
+    state.playerAnimationStarted = true;
+  }
+
+  // Spawn Player Pillars
+  if (state.playerAnimationStarted) {
+    state.playerPillarAnimationDelay += 1;
+    if (state.playerPillarAnimationDelay % PILLAR_DELAY === 0 && state.currentPlayerPillarIndex < AXES) {
+      const statValue = state.playerStatValues[state.currentPlayerPillarIndex];
+      const angle = -Math.PI / 2 + state.currentPlayerPillarIndex * ((2 * Math.PI) / AXES);
+      const effectiveValue = MIN_BASE_VALUE + statValue;
+      const progress = effectiveValue / (MAX_STAT + MIN_BASE_VALUE);
+      const finalRadius = RADIUS * progress;
+
+      state.playerPillars.push({
+        angle,
+        finalRadius,
+        currentHeight: PILLAR_START_HEIGHT,
+        velocity: 0,
+        landed: false
+      });
+      state.currentPlayerPillarIndex += 1;
+    }
+
+    // Animate Player Pillars Falling
+    state.playerPillars.forEach((pillar) => {
+      if (!pillar.landed) {
+        pillar.velocity += 2.5;
+        pillar.currentHeight -= pillar.velocity;
+
+        if (pillar.currentHeight <= 0) {
+          pillar.currentHeight = 0;
+          pillar.landed = true;
+          pillar.velocity = 0;
+          // Impatto Avorio
+          triggerShake(state, 0.5);
+          spawnParticleBurst(state, pillar.angle, pillar.finalRadius, VISUAL_CONFIG.colors.ivoryHighlight, VISUAL_CONFIG.colors.ivoryShadow, 20);
+        }
+      }
+    });
+  }
 }
 
-function updateHeroStar(
-  graphics: PIXI.Graphics,
-  axisValues: AxisValues,
-  theme: typeof ALT_VISUALS_V8_THEME,
-  phase: AltVisualsV8TimelinePhase,
-  phaseProgress: number,
-  quality: AltVisualsV8Quality,
-  totalTime: number,
-) {
-  const shouldRender = phase === 'heroAscend' || phase === 'settle';
-  if (!shouldRender && graphics.alpha < 0.08) {
-    graphics.alpha = Math.max(0, graphics.alpha - 0.035);
-    graphics.clear();
+function updateTarAnimation(state: InternalState) {
+  if (!state.tarPuddle.active && state.enemyPillarAnimationDelay > 30) {
+    state.tarPuddle.active = true;
+  }
+
+  if (state.tarPuddle.active && state.tarPuddle.growing && state.tarPuddle.radius < state.tarPuddle.maxRadius) {
+    state.tarPuddle.radius += 2;
+    if (state.tarPuddle.radius >= state.tarPuddle.maxRadius) {
+      state.tarPuddle.growing = false;
+    }
+  }
+
+  if (!state.tarPuddle.growing && state.tentacles.length === AXES && state.enemyPillars.every(p => p.landed) && state.tentacles.every(t => t.length >= t.targetLength)) {
+    state.tarPuddle.morphing = true;
+  }
+
+  if (state.tarPuddle.morphing && state.tarPuddle.morphProgress < 1) {
+    state.tarPuddle.morphProgress += VISUAL_CONFIG.morphSpeed;
+    if (state.tarPuddle.morphProgress > 1) {
+      state.tarPuddle.morphProgress = 1;
+      triggerShake(state, 0.3);
+    }
+  }
+
+  if (state.playerAnimationStarted && !state.goldStar.active) {
+    state.goldStar.active = true;
+  }
+
+  if (state.goldStar.active && state.goldStar.growing && state.goldStar.radius < state.goldStar.maxRadius) {
+    state.goldStar.radius += 2;
+    if (state.goldStar.radius >= state.goldStar.maxRadius) {
+      state.goldStar.growing = false;
+    }
+  }
+
+  if (state.goldStar.active && !state.goldStar.growing && state.playerPillars.length === AXES && state.playerPillars.every((p) => p.landed)) {
+    state.goldStar.morphing = true;
+  }
+
+  if (state.goldStar.morphing && state.goldStar.morphProgress < 1) {
+    state.goldStar.morphProgress += VISUAL_CONFIG.morphSpeed;
+    if (state.goldStar.morphProgress > 1) {
+      state.goldStar.morphProgress = 1;
+      state.flashOpacity = 1;
+      triggerShake(state, 0.8);
+    }
+  }
+
+  if (state.goldStar.morphing && state.goldStar.morphProgress >= 1 && !state.ball.active && !state.ball.stopped) {
+    state.ball.active = true;
+    state.ball.startTime = Date.now();
+    const randomAngle = Math.random() * Math.PI * 2;
+    state.ball.vx = Math.cos(randomAngle) * state.ball.speed;
+    state.ball.vy = Math.sin(randomAngle) * state.ball.speed;
+  }
+}
+
+function updateBall(state: InternalState) {
+  if (!state.ball.active || state.ball.stopped) return;
+
+  if (Date.now() - state.ball.startTime > state.ball.duration) {
+    state.ball.stopped = true;
+    state.ball.vx = 0;
+    state.ball.vy = 0;
+    const starVertices = getStarVertices(state);
+    state.ball.success = isPointInPolygon(state.ball.x, state.ball.y, starVertices);
+    triggerShake(state, 0.6);
     return;
   }
 
-  const progress = easeQuartOut(phaseProgress);
-  const canvasCenter = theme.layout.canvasSize / 2;
-  const radius = theme.layout.baseRadius * 0.75;
+  const nextX = state.ball.x + state.ball.vx;
+  const nextY = state.ball.y + state.ball.vy;
+  const pentagonVertices = getPentagonVertices(state);
+  const inside = isPointInPolygon(nextX, nextY, pentagonVertices);
 
-  graphics.clear();
-  graphics.beginFill(hexToNumber(theme.palette.moltenGold), 0.45 + progress * 0.4);
-  for (let i = 0; i < axisValues.player.length * 2; i += 1) {
-    const statIdx = Math.floor(i / 2);
-    const stat = axisValues.player[statIdx];
-    const inner = mapStatToHeight(stat, [radius * 0.2, radius * 0.6]);
-    const outer = mapStatToHeight(stat, [radius * 0.5, radius]) + progress * 20;
-    const isOuter = i % 2 === 0;
-    const angle = -Math.PI / 2 + (Math.PI * i) / axisValues.player.length;
-    const r = isOuter ? outer : inner;
-    const x = canvasCenter + Math.cos(angle) * r;
-    const y = canvasCenter + Math.sin(angle) * r;
-    if (i === 0) {
-      graphics.moveTo(x, y);
-    } else {
-      graphics.lineTo(x, y);
+  if (!inside) {
+    let minDist = Infinity;
+    let bestNormal = { x: 0, y: 0 };
+    pentagonVertices.forEach((vertex, index) => {
+      const nextVertex = pentagonVertices[(index + 1) % pentagonVertices.length];
+      const dx = nextVertex.x - vertex.x;
+      const dy = nextVertex.y - vertex.y;
+      const len = Math.hypot(dx, dy) || 1;
+      const nx = -dy / len;
+      const ny = dx / len;
+      const d = Math.abs((state.ball.x - vertex.x) * nx + (state.ball.y - vertex.y) * ny);
+      if (d < minDist) {
+        minDist = d;
+        bestNormal = { x: nx, y: ny };
+      }
+    });
+
+    const dotProduct = state.ball.vx * bestNormal.x + state.ball.vy * bestNormal.y;
+    state.ball.vx -= 2 * dotProduct * bestNormal.x;
+    state.ball.vy -= 2 * dotProduct * bestNormal.y;
+    state.ball.vx *= 0.995; // Frizione ridotta per più rimbalzi
+    state.ball.vy *= 0.995;
+
+    triggerShake(state, 0.2);
+    spawnParticleBurst(state, 0, 0, VISUAL_CONFIG.colors.particle, '#fff', 20, state.ball.x, state.ball.y); // Più particelle
+
+  } else {
+    state.ball.x = nextX;
+    state.ball.y = nextY;
+  }
+
+  // Rallentamento costante per effetto pinball
+  state.ball.vx *= 0.995;
+  state.ball.vy *= 0.995;
+}
+
+// --- FUNZIONI DI DISEGNO (Modificate per il restyle grafico) ---
+
+function drawGrid(ctx: CanvasRenderingContext2D) {
+  const center = canvasCenter({} as InternalState);
+  for (let i = 0; i < AXES; i += 1) {
+    const angle = -Math.PI / 2 + i * ((2 * Math.PI) / AXES);
+    const dx = Math.cos(angle);
+    const dy = Math.sin(angle);
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(center.x, center.y);
+    ctx.lineTo(center.x + dx * RADIUS, center.y + dy * RADIUS);
+    ctx.stroke();
+
+    for (let t = 1; t <= TICKS; t += 1) {
+      const r = (RADIUS / TICKS) * t;
+      const tx = center.x + dx * r;
+      const ty = center.y + dy * r;
+      const nx = -dy;
+      const ny = dx;
+
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(tx - nx * 6, ty - ny * 6);
+      ctx.lineTo(tx + nx * 6, ty + ny * 6);
+      ctx.stroke();
     }
-  }
-  graphics.closePath();
-  graphics.endFill();
-  graphics.alpha = progress;
-  graphics.rotation = Math.sin(totalTime * 0.0004) * 0.05;
 
-  if (quality === 'high' && graphics.filters?.length !== 1) {
-    graphics.filters = [new PIXI.BlurFilter(4)];
-  } else if (quality !== 'high') {
-    graphics.filters = undefined;
+    ctx.font = `600 24px 'Space Grotesk', system-ui`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillText(STAT_ICONS[i], center.x + dx * (RADIUS + 36), center.y + dy * (RADIUS + 36));
   }
 }
 
-interface Particle {
-  sprite: PIXI.Sprite;
-  speed: number;
-  drift: number;
+function drawBall(ctx: CanvasRenderingContext2D, state: InternalState) {
+  if (!state.ball.active && !state.ball.stopped) return;
+
+  ctx.save();
+  // Gradiente radiale per effetto texture lucida
+  const ballGrad = ctx.createRadialGradient(state.ball.x, state.ball.y, 0, state.ball.x, state.ball.y, state.ball.radius);
+  ballGrad.addColorStop(0, '#ffffff'); // Centro bianco per highlight
+  ballGrad.addColorStop(0.7, VISUAL_CONFIG.colors.particleSecondary);
+  ballGrad.addColorStop(1, VISUAL_CONFIG.colors.particle); // Bordo più scuro
+  ctx.fillStyle = ballGrad;
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(state.ball.x, state.ball.y, state.ball.radius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+
+  if (state.ball.stopped) {
+    // Usa il colore Avorio per il testo di successo per coerenza
+    ctx.fillStyle = state.ball.success ? VISUAL_CONFIG.colors.ivoryHighlight : VISUAL_CONFIG.colors.particle;
+    ctx.font = 'bold 26px "Space Grotesk", system-ui';
+    ctx.textAlign = 'center';
+    ctx.shadowColor = ctx.fillStyle;
+    ctx.shadowBlur = 22;
+    ctx.fillText(state.ball.success ? 'SUCCESSO! ' : 'FALLITO ', canvasCenter(state).x, canvasCenter(state).y - 100);
+  }
 }
 
-function buildParticles(
-  layer: PIXI.Container,
-  textures: AltVisualsV8TextureBundle,
-  theme: typeof ALT_VISUALS_V8_THEME,
-  quality: AltVisualsV8Quality,
-): Particle[] {
-  const count =
-    quality === 'high'
-      ? theme.fx.particleCount
-      : Math.max(8, Math.round(theme.fx.particleCount * 0.35));
+// --- NUOVA FUNZIONE DISEGNO MONOLITI ---
+function drawPillars(ctx: CanvasRenderingContext2D, state: InternalState, ivoryImg?: HTMLImageElement) {
+  const center = canvasCenter(state);
+
+  // Helper per disegnare un singolo monolite 3D con gradienti per texture
+  const drawMonolith = (pillar: PillarState, colors: { base: string, highlight: string, shadow: string }, isIvory: boolean = false) => {
+    const dx = Math.cos(pillar.angle);
+    const dy = Math.sin(pillar.angle);
+    const px = center.x + dx * pillar.finalRadius;
+    const py = center.y + dy * pillar.finalRadius;
+    const visualY = py - pillar.currentHeight;
+    const w = 24; // Larghezza monolite
+    const h = 60; // Altezza monolite
+
+    ctx.save();
+
+    // Ombra a terra (si restringe mentre cade)
+    const shadowScale = Math.max(0.1, 1 - pillar.currentHeight / 450);
+    if (shadowScale > 0.1) {
+        ctx.fillStyle = 'rgba(0,0,0,0.5)';
+        ctx.beginPath();
+        ctx.ellipse(px, py, w * shadowScale * 1.2, (w / 2) * shadowScale * 1.2, 0, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    if (pillar.currentHeight > 0) {
+         // Scia di caduta con gradiente
+         ctx.beginPath();
+         ctx.moveTo(px - w / 2, visualY - h + 10);
+         ctx.lineTo(px, visualY - h - 40);
+         ctx.lineTo(px + w / 2, visualY - h + 10);
+         const trailGrad = ctx.createLinearGradient(px, visualY - h, px, visualY - h - 50);
+         trailGrad.addColorStop(0, colors.base);
+         trailGrad.addColorStop(1, 'transparent');
+         ctx.fillStyle = trailGrad;
+         ctx.globalAlpha = 0.5;
+         ctx.fill();
+         ctx.globalAlpha = 1.0;
+    }
+
+    // 1. Faccia Laterale (Ombra - gradiente verticale)
+    const lateralGrad = ctx.createLinearGradient(px - w/2, visualY - h, px - w/2, visualY);
+    lateralGrad.addColorStop(0, colors.shadow);
+    lateralGrad.addColorStop(1, colors.base);
+    ctx.fillStyle = lateralGrad;
+    ctx.beginPath();
+    ctx.moveTo(px, visualY + 10);
+    ctx.lineTo(px - w / 2, visualY);
+    ctx.lineTo(px - w / 2, visualY - h);
+    ctx.lineTo(px, visualY - h + 10);
+    ctx.fill();
+
+    // 2. Faccia Frontale (Colore Base - texture o gradiente)
+    if (isIvory && ivoryImg && ivoryImg.complete) {
+      const pattern = ctx.createPattern(ivoryImg, 'repeat');
+      if (pattern) {
+        ctx.fillStyle = pattern;
+      } else {
+        const frontalGrad = ctx.createLinearGradient(px - w/2, visualY - h, px + w/2, visualY);
+        frontalGrad.addColorStop(0, colors.highlight);
+        frontalGrad.addColorStop(0.5, colors.base);
+        frontalGrad.addColorStop(1, colors.shadow);
+        ctx.fillStyle = frontalGrad;
+      }
+    } else {
+      const frontalGrad = ctx.createLinearGradient(px - w/2, visualY - h, px + w/2, visualY);
+      frontalGrad.addColorStop(0, colors.highlight);
+      frontalGrad.addColorStop(0.5, colors.base);
+      frontalGrad.addColorStop(1, colors.shadow);
+      ctx.fillStyle = frontalGrad;
+    }
+    ctx.beginPath();
+    ctx.moveTo(px, visualY + 10);
+    ctx.lineTo(px + w / 2, visualY);
+    ctx.lineTo(px + w / 2, visualY - h);
+    ctx.lineTo(px, visualY - h + 10);
+    ctx.fill();
+
+    // 3. Faccia Superiore (Luce - gradiente radiale per texture lucida)
+    const topGrad = ctx.createRadialGradient(px, visualY - h - 5, 0, px, visualY - h - 5, w);
+    topGrad.addColorStop(0, colors.highlight);
+    topGrad.addColorStop(1, colors.base);
+    ctx.fillStyle = topGrad;
+    ctx.beginPath();
+    ctx.moveTo(px, visualY - h + 10);
+    ctx.lineTo(px - w / 2, visualY - h);
+    ctx.lineTo(px, visualY - h - 10);
+    ctx.lineTo(px + w / 2, visualY - h);
+    ctx.fill();
+
+    // Glow sottile sui bordi
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = colors.highlight;
+    ctx.strokeStyle = colors.highlight;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.restore();
+  };
+
+  // Disegna Nemici (Jet)
+  state.enemyPillars.forEach(p => drawMonolith(p, {
+      base: VISUAL_CONFIG.colors.jetBase,
+      highlight: VISUAL_CONFIG.colors.jetHighlight,
+      shadow: VISUAL_CONFIG.colors.jetShadow
+  }));
+
+  // Disegna Giocatore (Avorio)
+  state.playerPillars.forEach(p => drawMonolith(p, {
+      base: VISUAL_CONFIG.colors.ivoryBase,
+      highlight: VISUAL_CONFIG.colors.ivoryHighlight,
+      shadow: VISUAL_CONFIG.colors.ivoryShadow
+  }));
+}
+
+
+function spawnParticleBurst(state: InternalState, angle: number, targetRadius: number, primary: string, secondary: string, count = 18, overrideX?: number, overrideY?: number) {
   const particles: Particle[] = [];
+  const center = canvasCenter(state);
+  const originX = overrideX ?? (center.x + Math.cos(angle) * targetRadius);
+  const originY = overrideY ?? (center.y + Math.sin(angle) * targetRadius);
+
   for (let i = 0; i < count; i += 1) {
-    const sprite = new PIXI.Sprite(textures.particles);
-    sprite.anchor.set(0.5);
-    sprite.alpha = 0.25 + Math.random() * 0.4;
-    sprite.scale.set(randomBetween(theme.fx.particleScaleRange[0], theme.fx.particleScaleRange[1]) * 0.4);
-    sprite.position.set(Math.random() * theme.layout.canvasSize, Math.random() * theme.layout.canvasSize);
-    sprite.blendMode = 'screen';
-    layer.addChild(sprite);
+    const theta = Math.random() * Math.PI * 2;
+    const speed = Math.random() * 4 + 1;
     particles.push({
-      sprite,
-      speed: randomBetween(theme.fx.particleSpeedRange[0], theme.fx.particleSpeedRange[1]),
-      drift: Math.random() * 0.4 - 0.2,
+      x: originX,
+      y: originY,
+      vx: Math.cos(theta) * speed,
+      vy: Math.sin(theta) * speed,
+      radius: Math.random() * (VISUAL_CONFIG.particleSize / 2) + 2,
+      life: VISUAL_CONFIG.particleLifetime,
+      color: Math.random() > 0.5 ? primary : secondary,
     });
   }
-  return particles;
+  state.particleBursts.push(particles);
 }
 
-function updateParticles(particles: Particle[], theme: typeof ALT_VISUALS_V8_THEME, deltaMs: number) {
-  particles.forEach((particle) => {
-    particle.sprite.y -= (particle.speed * deltaMs) / 1000;
-    particle.sprite.x += particle.drift * (deltaMs / 16);
-    if (particle.sprite.y < -50) {
-      particle.sprite.y = theme.layout.canvasSize + 50;
+function updateParticles(state: InternalState, delta: number) {
+  for (let i = state.particleBursts.length - 1; i >= 0; i -= 1) {
+    const burst = state.particleBursts[i];
+    for (let j = burst.length - 1; j >= 0; j -= 1) {
+      const particle = burst[j];
+      particle.life -= delta;
+      if (particle.life <= 0) {
+        burst.splice(j, 1);
+        continue;
+      }
+      particle.x += particle.vx;
+      particle.y += particle.vy;
+      particle.vy += 0.1;
+      particle.radius *= 0.95;
     }
-    if (particle.sprite.x > theme.layout.canvasSize + 50) {
-      particle.sprite.x = -50;
-    } else if (particle.sprite.x < -50) {
-      particle.sprite.x = theme.layout.canvasSize + 50;
+    if (burst.length === 0) {
+      state.particleBursts.splice(i, 1);
     }
+  }
+}
+
+function drawParticles(ctx: CanvasRenderingContext2D, state: InternalState) {
+  state.particleBursts.forEach((burst) => {
+    burst.forEach((particle) => {
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, particle.life / VISUAL_CONFIG.particleLifetime);
+      ctx.fillStyle = particle.color;
+      ctx.shadowColor = particle.color;
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    });
   });
 }
 
-function buildFilmGrain(
-  layer: PIXI.Container,
-  textures: AltVisualsV8TextureBundle,
-  theme: typeof ALT_VISUALS_V8_THEME,
-  quality: AltVisualsV8Quality,
-) {
-  if (quality !== 'high') {
-    return null;
-  }
-  const sprite = new PIXI.TilingSprite({
-    texture: textures.filmGrain,
-    width: theme.layout.canvasSize,
-    height: theme.layout.canvasSize,
-  });
-  sprite.alpha = theme.fx.grainOpacity;
-  sprite.blendMode = 'multiply';
-  layer.addChild(sprite);
-  return sprite;
-}
+// --- DISEGNO CATRAME E STELLA (Invariati, usano i colori della config) ---
+function drawTarAnimation(ctx: CanvasRenderingContext2D, state: InternalState, tarImg?: HTMLImageElement) {
+  if (!state.tarPuddle.active || state.tarPuddle.radius <= 0) return;
 
-function updateFilmGrain(grain: PIXI.TilingSprite | null, theme: typeof ALT_VISUALS_V8_THEME, deltaMs: number) {
-  if (!grain) return;
-  grain.tilePosition.x += theme.fx.grainScrollSpeed * deltaMs;
-  grain.tilePosition.y -= theme.fx.grainScrollSpeed * deltaMs;
-}
+  ctx.save();
 
-function buildBackgroundLayer(
-  layer: PIXI.Container,
-  textures: AltVisualsV8TextureBundle,
-  theme: typeof ALT_VISUALS_V8_THEME,
-) {
-  const base = new PIXI.Graphics();
-  base.beginFill(hexToNumber('#0f1530'));
-  base.drawRect(0, 0, theme.layout.canvasSize, theme.layout.canvasSize);
-  base.endFill();
-  layer.addChild(base);
-
-  const aurora = new PIXI.Graphics();
-  aurora.beginFill(hexToNumber(theme.palette.etherBlue), 0.22);
-  aurora.drawEllipse(
-    theme.layout.canvasSize * 0.38,
-    theme.layout.canvasSize * 0.08,
-    theme.layout.canvasSize * 0.6,
-    theme.layout.canvasSize * 0.28,
-  );
-  aurora.endFill();
-  aurora.beginFill(hexToNumber(theme.palette.moltenGold), theme.background.hdrContribution + 0.1);
-  aurora.drawEllipse(
-    theme.layout.canvasSize * 0.68,
-    theme.layout.canvasSize * 0.18,
-    theme.layout.canvasSize * 0.6,
-    theme.layout.canvasSize * 0.32,
-  );
-  aurora.endFill();
-  layer.addChild(aurora);
-
-  const vignette = new PIXI.Graphics();
-  vignette.beginFill(0x000000, theme.background.vignetteOpacity);
-  vignette.drawRect(0, 0, theme.layout.canvasSize, theme.layout.canvasSize);
-  vignette.endFill();
-  vignette.blendMode = 'multiply';
-  layer.addChild(vignette);
-
-  if (textures.enemyAlbedo) {
-    const textureOverlay = new PIXI.Sprite(textures.enemyAlbedo);
-    textureOverlay.alpha = 0.08;
-    textureOverlay.width = theme.layout.canvasSize;
-    textureOverlay.height = theme.layout.canvasSize;
-    textureOverlay.blendMode = 'overlay';
-    layer.addChild(textureOverlay);
+  // Usa texture se caricata, altrimenti colore solido
+  if (tarImg && tarImg.complete) {
+    const pattern = ctx.createPattern(tarImg, 'repeat');
+    if (pattern) ctx.fillStyle = pattern;
+    else ctx.fillStyle = VISUAL_CONFIG.colors.pentagonFill;
+  } else {
+    ctx.fillStyle = VISUAL_CONFIG.colors.pentagonFill;
   }
 
-  const grid = new PIXI.Graphics();
-  grid.lineStyle(1, hexToNumber(theme.palette.grid), 0.18);
-  const step = 80;
-  for (let x = 0; x <= theme.layout.canvasSize; x += step) {
-    grid.moveTo(x, 0);
-    grid.lineTo(x, theme.layout.canvasSize);
+  ctx.shadowColor = VISUAL_CONFIG.colors.pentagonGlow;
+  ctx.shadowBlur = VISUAL_CONFIG.glowStrengthPentagon;
+  ctx.beginPath();
+
+  if (!state.tarPuddle.morphing || state.tarPuddle.morphProgress === 0) {
+    ctx.arc(canvasCenter(state).x, canvasCenter(state).y, state.tarPuddle.radius, 0, Math.PI * 2);
+  } else {
+    const segments = 60;
+    for (let i = 0; i <= segments; i += 1) {
+      const angle = (i / segments) * Math.PI * 2 - Math.PI / 2;
+      const circleRadius = state.tarPuddle.radius;
+      let pentagonRadius = state.tarPuddle.radius;
+      for (let j = 0; j < AXES; j += 1) {
+        const vertexAngle = -Math.PI / 2 + j * ((2 * Math.PI) / AXES);
+        const nextVertexAngle = -Math.PI / 2 + ((j + 1) % AXES) * ((2 * Math.PI) / AXES);
+        let normalizedAngle = angle;
+        let normalizedNextVertex = nextVertexAngle;
+        if (j === AXES - 1) {
+          normalizedNextVertex = nextVertexAngle + Math.PI * 2;
+          if (angle < 0) normalizedAngle = angle + Math.PI * 2;
+        }
+        if (
+          (j < AXES - 1 && angle >= vertexAngle && angle <= nextVertexAngle) ||
+          (j === AXES - 1 && normalizedAngle >= vertexAngle && normalizedAngle <= normalizedNextVertex)
+        ) {
+          const vertex1Dist = state.tentacles[j]?.length ?? circleRadius;
+          const vertex2Dist = state.tentacles[(j + 1) % AXES]?.length ?? circleRadius;
+          const t = (normalizedAngle - vertexAngle) / (normalizedNextVertex - vertexAngle || 1);
+          pentagonRadius = vertex1Dist + (vertex2Dist - vertex1Dist) * t;
+          break;
+        }
+      }
+      const radius = circleRadius + (pentagonRadius - circleRadius) * state.tarPuddle.morphProgress;
+      const x = canvasCenter(state).x + Math.cos(angle) * radius;
+      const y = canvasCenter(state).y + Math.sin(angle) * radius;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
   }
-  for (let y = 0; y <= theme.layout.canvasSize; y += step) {
-    grid.moveTo(0, y);
-    grid.lineTo(theme.layout.canvasSize, y);
+
+  ctx.fill();
+  ctx.restore();
+
+  // Aggiungi bolle per effetto ribollente
+  const time = performance.now();
+  for (let i = 0; i < 5; i += 1) {
+    const angle = (i / 5) * Math.PI * 2 + time * 0.001;
+    const r = state.tarPuddle.radius * 0.8;
+    const x = canvasCenter(state).x + Math.cos(angle) * r;
+    const y = canvasCenter(state).y + Math.sin(angle) * r;
+    ctx.beginPath();
+    ctx.arc(x, y, 3 + Math.sin(time * 0.01 + i) * 1, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.fill();
   }
-  grid.blendMode = 'screen';
-  layer.addChild(grid);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.arc(canvasCenter(state).x, canvasCenter(state).y, 3, 0, Math.PI * 2);
+  ctx.fill();
 }
 
-function mapStatToHeight(value: number, range: [number, number]) {
-  const clamped = Math.max(0, Math.min(100, value));
-  return range[0] + ((range[1] - range[0]) * clamped) / 100;
+function drawGoldStar(ctx: CanvasRenderingContext2D, state: InternalState) {
+  if (!state.goldStar.active || state.goldStar.radius <= 0) return;
+
+  ctx.save();
+  ctx.fillStyle = VISUAL_CONFIG.colors.starFill;
+  ctx.shadowColor = VISUAL_CONFIG.colors.starGlow;
+  ctx.shadowBlur = VISUAL_CONFIG.glowStrengthStar;
+  ctx.beginPath();
+
+  if (!state.goldStar.morphing || state.goldStar.morphProgress === 0) {
+    ctx.arc(canvasCenter(state).x, canvasCenter(state).y, state.goldStar.radius, 0, Math.PI * 2);
+  } else {
+    for (let i = 0; i < AXES * 2; i += 1) {
+      const angle = -Math.PI / 2 + i * (Math.PI / AXES);
+      const isOuter = i % 2 === 0;
+      let radius: number;
+      if (isOuter) {
+        const pillarIndex = Math.floor(i / 2);
+        radius = state.playerPillars[pillarIndex]?.finalRadius ?? state.goldStar.radius;
+      } else {
+        const pillarIndex = Math.floor(i / 2);
+        const nextIndex = (pillarIndex + 1) % AXES;
+        const avg =
+          ((state.playerPillars[pillarIndex]?.finalRadius ?? state.goldStar.radius) +
+            (state.playerPillars[nextIndex]?.finalRadius ?? state.goldStar.radius)) /
+          2;
+        radius = avg * 0.4;
+      }
+      const finalRadius = state.goldStar.radius + (radius - state.goldStar.radius) * state.goldStar.morphProgress;
+      const x = canvasCenter(state).x + Math.cos(angle) * finalRadius;
+      const y = canvasCenter(state).y + Math.sin(angle) * finalRadius;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+  }
+
+  ctx.fill();
+  ctx.restore();
+
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.arc(canvasCenter(state).x, canvasCenter(state).y, 3, 0, Math.PI * 2);
+  ctx.fill();
 }
 
-function easeExpoOut(t: number) {
-  return t === 1 ? 1 : 1 - 2 ** (-10 * t);
+function getStarVertices(state: InternalState) {
+  const vertices = [];
+  for (let i = 0; i < AXES * 2; i += 1) {
+    const angle = -Math.PI / 2 + i * (Math.PI / AXES);
+    const isOuter = i % 2 === 0;
+    let radius: number;
+    if (isOuter) {
+      const pillarIndex = Math.floor(i / 2);
+      radius = state.playerPillars[pillarIndex]?.finalRadius ?? state.goldStar.radius;
+    } else {
+      const pillarIndex = Math.floor(i / 2);
+      const nextIndex = (pillarIndex + 1) % AXES;
+      const avg =
+        ((state.playerPillars[pillarIndex]?.finalRadius ?? state.goldStar.radius) +
+          (state.playerPillars[nextIndex]?.finalRadius ?? state.goldStar.radius)) /
+        2;
+      radius = avg * 0.4;
+    }
+    vertices.push({
+      x: canvasCenter(state).x + Math.cos(angle) * radius,
+      y: canvasCenter(state).y + Math.sin(angle) * radius,
+    });
+  }
+  return vertices;
 }
 
-function easeQuartOut(t: number) {
-  return 1 - (1 - t) ** 4;
+function getPentagonVertices(state: InternalState) {
+  const vertices = [];
+  for (let i = 0; i < AXES; i += 1) {
+    const angle = -Math.PI / 2 + i * ((2 * Math.PI) / AXES);
+    const dx = Math.cos(angle);
+    const dy = Math.sin(angle);
+    const dist = state.tentacles[i]?.length ?? 0;
+    vertices.push({
+      x: canvasCenter(state).x + dx * dist,
+      y: canvasCenter(state).y + dy * dist,
+    });
+  }
+  return vertices;
 }
 
-function lerp(start: number, end: number, alpha: number) {
-  return start + (end - start) * Math.min(1, Math.max(0, alpha));
+function isPointInPolygon(x: number, y: number, vertices: { x: number; y: number }[]) {
+  let inside = false;
+  for (let i = 0, j = vertices.length - 1; i < vertices.length; j = i, i += 1) {
+    const xi = vertices[i].x;
+    const yi = vertices[i].y;
+    const xj = vertices[j].x;
+    const yj = vertices[j].y;
+    const intersect = yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+    if (intersect) inside = !inside;
+  }
+  return inside;
 }
 
-function average(values: number[]) {
-  if (!values.length) return 0;
-  return values.reduce((sum, value) => sum + value, 0) / values.length;
-}
+function drawStatLabels(ctx: CanvasRenderingContext2D, state: InternalState) {
+  const center = canvasCenter(state);
+  for (let i = 0; i < AXES; i += 1) {
+    const angle = -Math.PI / 2 + i * ((2 * Math.PI) / AXES);
+    const labelRadius = RADIUS + 40;
+    const x = center.x + Math.cos(angle) * labelRadius;
+    const y = center.y + Math.sin(angle) * labelRadius;
 
-function hexToNumber(hexColor: string) {
-  return Number.parseInt(hexColor.replace('#', ''), 16);
-}
+    ctx.font = "bold 14px 'Space Grotesk', system-ui";
+    ctx.fillStyle = VISUAL_CONFIG.colors.playerText;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0,0,0,0.8)';
+    ctx.shadowBlur = 4;
 
-function randomBetween(min: number, max: number) {
-  return min + Math.random() * (max - min);
-}
-
-function mixColors(hexA: string, hexB: string, t: number) {
-  const colorA = hexToNumber(hexA);
-  const colorB = hexToNumber(hexB);
-  const ar = (colorA >> 16) & 0xff;
-  const ag = (colorA >> 8) & 0xff;
-  const ab = colorA & 0xff;
-  const br = (colorB >> 16) & 0xff;
-  const bg = (colorB >> 8) & 0xff;
-  const bb = colorB & 0xff;
-  const rr = Math.round(ar + (br - ar) * t);
-  const rg = Math.round(ag + (bg - ag) * t);
-  const rb = Math.round(ab + (bb - ab) * t);
-  return (rr << 16) | (rg << 8) | rb;
+    const playerVal = Math.round(state.playerStatValues[i] ?? 0);
+    const enemyVal = Math.round(state.enemyStatValues[i] ?? 0);
+    ctx.fillText(`${playerVal} vs ${enemyVal}`, x, y + 20);
+  }
 }

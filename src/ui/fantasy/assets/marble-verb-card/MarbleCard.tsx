@@ -4,14 +4,14 @@ import { motion } from 'framer-motion';
 import marbleBase from './base.png';
 import frameCirc from './frame_circ.png';
 import frameRect from './frame_rect.png';
+import { TONE_STYLES, clampProgressPercent, cardVariants, type MarbleCardTone } from './marbleCardTokens';
+export type { MarbleCardTone } from './marbleCardTokens';
 
 const ASSETS = {
   BASE: marbleBase,
   FRAME_CIRC: frameCirc,
   FRAME_RECT: frameRect,
 };
-
-export type MarbleCardTone = 'neutral' | 'job' | 'quest' | 'danger' | 'system' | 'day' | 'night';
 
 export interface MarbleCardProps {
   title: string;
@@ -21,96 +21,6 @@ export interface MarbleCardProps {
   tone?: MarbleCardTone;
   onClick?: () => void;
 }
-
-const TONE_STYLES: Record<
-  MarbleCardTone,
-  {
-    ringStart: string;
-    ringTrail: string;
-    iconColor: string;
-    iconBackground: string;
-    glow: string;
-  }
-> = {
-  neutral: {
-    ringStart: 'rgba(248, 196, 113, 0.95)',
-    ringTrail: 'rgba(15, 23, 42, 0.55)',
-    iconColor: '#fef3c7',
-    iconBackground: 'rgba(15, 23, 42, 0.85)',
-    glow: 'rgba(250, 204, 21, 0.4)',
-  },
-  job: {
-    ringStart: 'rgba(16, 185, 129, 0.95)',
-    ringTrail: 'rgba(3, 57, 44, 0.5)',
-    iconColor: '#d1fae5',
-    iconBackground: 'rgba(3, 57, 44, 0.8)',
-    glow: 'rgba(16, 185, 129, 0.35)',
-  },
-  quest: {
-    ringStart: 'rgba(167, 139, 250, 0.95)',
-    ringTrail: 'rgba(40, 24, 62, 0.55)',
-    iconColor: '#ede9fe',
-    iconBackground: 'rgba(40, 24, 62, 0.8)',
-    glow: 'rgba(167, 139, 250, 0.35)',
-  },
-  danger: {
-    ringStart: 'rgba(248, 113, 113, 0.95)',
-    ringTrail: 'rgba(60, 10, 10, 0.55)',
-    iconColor: '#fee2e2',
-    iconBackground: 'rgba(60, 10, 10, 0.85)',
-    glow: 'rgba(248, 113, 113, 0.45)',
-  },
-  system: {
-    ringStart: 'rgba(59, 130, 246, 0.95)',
-    ringTrail: 'rgba(8, 47, 73, 0.55)',
-    iconColor: '#dbeafe',
-    iconBackground: 'rgba(8, 47, 73, 0.85)',
-    glow: 'rgba(96, 165, 250, 0.45)',
-  },
-  day: {
-    ringStart: 'rgba(255, 214, 102, 0.95)',
-    ringTrail: 'rgba(109, 76, 16, 0.5)',
-    iconColor: '#fff9db',
-    iconBackground: 'rgba(133, 77, 14, 0.85)',
-    glow: 'rgba(255, 214, 102, 0.5)',
-  },
-  night: {
-    ringStart: 'rgba(96, 165, 250, 0.95)',
-    ringTrail: 'rgba(38, 22, 70, 0.55)',
-    iconColor: '#e0e7ff',
-    iconBackground: 'rgba(30, 27, 75, 0.85)',
-    glow: 'rgba(96, 165, 250, 0.45)',
-  },
-};
-
-const cardVariants = {
-  resting: {
-    scale: 1,
-    rotateX: 15,
-    rotateY: 0,
-    y: 0,
-    z: 0,
-    transition: { type: 'spring', stiffness: 280, damping: 32 },
-  },
-  hover: {
-    scale: 1.05,
-    rotateX: 0,
-    rotateY: 0,
-    y: -15,
-    z: 40,
-    transition: { type: 'spring', stiffness: 360, damping: 35 },
-  },
-  tap: {
-    scale: 1.02,
-    y: -5,
-    transition: { duration: 0.12 },
-  },
-};
-
-const clampProgressPercent = (value: number | undefined): number => {
-  if (value === undefined || !Number.isFinite(value)) return 0;
-  return Math.min(Math.max(value * 100, 0), 100);
-};
 
 const MarbleCard: React.FC<MarbleCardProps> = ({
   title,
@@ -141,8 +51,14 @@ const MarbleCard: React.FC<MarbleCardProps> = ({
     >
       {/* Layer 1: marble base */}
       <div
-        className="absolute inset-0 overflow-hidden rounded-[30px]"
-        style={{ transform: 'translateZ(0px)' }}
+        className="absolute overflow-hidden rounded-[30px]"
+        style={{
+          transform: 'translateZ(0px)',
+          top: '5%',
+          right: '5%',
+          bottom: '5%',
+          left: '5%',
+        }}
       >
         {/* Marble texture */}
         <img src={ASSETS.BASE} alt="Marble base" className="absolute inset-0 h-full w-full object-cover" />
@@ -150,17 +66,17 @@ const MarbleCard: React.FC<MarbleCardProps> = ({
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              'linear-gradient(135deg, rgba(255,253,246,0.9) 0%, rgba(248,230,190,0.55) 38%, rgba(255,245,214,0.25) 72%, rgba(255,255,255,0) 100%)',
+              'linear-gradient(135deg, rgba(255,248,235,0.78) 0%, rgba(245,216,168,0.45) 40%, rgba(230,190,130,0.2) 75%, rgba(255,255,255,0) 100%)',
           }}
         />
       </div>
 
       {/* Layer 2: content */}
-      <div className="relative z-20 flex h-full flex-col items-center p-6" style={{ transform: 'translateZ(10px)' }}>
+      <div className="relative z-20 flex h-full flex-col items-center px-4 pb-4 pt-5" style={{ transform: 'translateZ(13px)' }}>
         {/* Medallion */}
         <div
-          className="relative mt-6 flex h-36 w-36 items-center justify-center"
-          style={{ transform: 'translateY(35%) scale(0.85)' }}
+          className="relative mt-5 flex h-42 w-42 items-center justify-center"
+          style={{ transform: 'translateY(36%) scale(0.94)' }}
         >
           <svg
             className="pointer-events-none absolute -inset-5 z-0"
@@ -252,11 +168,8 @@ const MarbleCard: React.FC<MarbleCardProps> = ({
       <img
         src={ASSETS.FRAME_RECT}
         alt="Gold frame"
-        className="pointer-events-none absolute inset-0 z-40 h-full w-full select-none object-cover opacity-90"
-        style={{
-          transform: 'translateZ(2px)',
-          mixBlendMode: 'screen',
-        }}
+        className="pointer-events-none absolute inset-0 z-40 h-full w-full select-none object-cover opacity-95 mix-blend-hard-light"
+        style={{ transform: 'translateZ(2px)' }}
       />
     </motion.div>
   );
