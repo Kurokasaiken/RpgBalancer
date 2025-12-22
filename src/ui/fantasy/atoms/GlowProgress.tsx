@@ -9,7 +9,7 @@ export type ProgressVariant = 'azure' | 'ember' | 'jade' | 'amethyst' | 'solar' 
 export interface GlowProgressProps {
     progress: number; // 0 to 1
     variant?: ProgressVariant;
-    size?: 'sm' | 'md' | 'lg';
+    size?: 'sm' | 'verb' | 'md' | 'lg';
     showTrail?: boolean;
     className?: string;
     children?: React.ReactNode;
@@ -25,8 +25,9 @@ const VARIANT_COLORS: Record<ProgressVariant, { primary: string; secondary: stri
     gold: { primary: 'rgba(201,162,39,0.9)', secondary: 'rgba(253,224,71,0.6)' },
 };
 
-const SIZE_DIMENSIONS = {
+const SIZE_DIMENSIONS: Record<NonNullable<GlowProgressProps['size']>, { size: number; stroke: number }> = {
     sm: { size: 80, stroke: 4 },
+    verb: { size: 96, stroke: 4.5 },
     md: { size: 120, stroke: 5 },
     lg: { size: 160, stroke: 6 },
 };

@@ -35,7 +35,8 @@ import type {
   MapSlotDefinition,
   StatRequirement,
 } from '@/balancing/config/idleVillage/types';
-import VerbCard from '@/ui/idleVillage/VerbCard';
+import MarbleCard, { type MarbleCardTone } from '@/ui/fantasy/assets/marble-verb-card/MarbleCard';
+import type { VerbTone } from '@/ui/idleVillage/VerbCard';
 import {
   DEFAULT_SECONDS_PER_TIME_UNIT,
   buildActivityBlueprintSummary,
@@ -48,6 +49,40 @@ import ResidentRoster from '@/ui/idleVillage/ResidentRoster';
 
 const DEFAULT_CARD_SCALE = 0.45;
 const RESIDENT_DRAG_MIME = 'application/x-idle-resident';
+const TONE_MAP: Record<VerbTone, MarbleCardTone> = {
+  neutral: 'neutral',
+  job: 'job',
+  quest: 'quest',
+  danger: 'danger',
+  system: 'system',
+};
+
+const FX_KEYFRAMES = `
+@keyframes idleVillageResourceAttract {
+  0% {
+    transform: translate3d(-48px, 32px, 0) scale(0.4);
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes idleVillageResidentEject {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.95);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(56px, -58px, 0) scale(0.55);
+    opacity: 0;
+  }
+}
+`;
 
 interface IdleVillageResetOptions {
   founderId?: string;
@@ -265,23 +300,85 @@ function MapSlotVerbCluster({
             className="origin-top relative"
             style={{ transform: `scale(${cardScale})` }}
           >
-            <VerbCard
+            <VerbCardFX verb={verb} />
+            <MarbleCard
+              title={verb.label}
               icon={verb.icon}
-              progressFraction={verb.progressFraction}
-              elapsedSeconds={verb.elapsedSeconds}
-              totalDuration={verb.totalDurationSeconds}
-              injuryPercentage={verb.injuryPercentage}
-              deathPercentage={verb.deathPercentage}
-              assignedCount={verb.assignedCount}
-              totalSlots={verb.totalSlots}
-              visualVariant={verb.visualVariant}
-              progressStyle={verb.progressStyle}
-              isInteractive={false}
+              progress={verb.progressFraction}
+              isActive={verb.progressFraction > 0 && verb.progressFraction < 1}
+              tone={TONE_MAP[verb.tone] ?? 'neutral'}
             />
           </div>
         ))}
       </div>
     </div>
+  );
+}
+
+function VerbCardFX({ verb }: { verb: VerbSummary }) {
+  const showResourcePull = verb.source === 'passive' || verb.tone === 'system';
+  const showResidentEject =
+    verb.progressFraction >= 0.98 && (verb.isJob || verb.isQuest) && (verb.assignedCount ?? 0) > 0;
+
+  if (!showResourcePull && !showResidentEject) {
+    return null;
+  }
+
+  return (
+    <div className="pointer-events-none absolute inset-0 z-10">
+      {showResourcePull && <ResourceIntakeFX />}
+      {showResidentEject && <ResidentEjectFX count={Math.max(1, verb.assignedCount)} />}
+    </div>
+  );
+}
+
+function ResourceIntakeFX() {
+  const spokes = [-25, 12, 42];
+  return (
+    <>
+      {spokes.map((deg, idx) => (
+        <div
+          key={`resource-spoke-${deg}`}
+          className="absolute left-1/2 top-1/2"
+          style={{
+            transform: `translate(-50%, -50%) rotate(${deg}deg)`,
+          }}
+        >
+          <span
+            className="block h-3 w-3 rounded-full bg-sky-200/90 shadow-[0_0_12px_rgba(56,189,248,0.55)]"
+            style={{
+              animation: `idleVillageResourceAttract 1.6s ease-in-out ${idx * 0.2}s infinite`,
+            }}
+          />
+        </div>
+      ))}
+    </>
+  );
+}
+
+function ResidentEjectFX({ count }: { count: number }) {
+  const ejectors = Math.min(count, 3);
+  return (
+    <>
+      {Array.from({ length: ejectors }).map((_, idx) => (
+        <div
+          key={`resident-eject-${idx}`}
+          className="absolute left-1/2 top-1/2"
+          style={{
+            transform: `translate(-50%, -50%) rotate(${idx === 0 ? -18 : idx === 1 ? 12 : 28}deg)`,
+          }}
+        >
+          <span
+            className="block rounded-full border border-amber-200/70 bg-amber-100/90 px-1 text-[8px] font-semibold uppercase tracking-[0.2em] text-slate-900 shadow-[0_6px_12px_rgba(0,0,0,0.35)]"
+            style={{
+              animation: `idleVillageResidentEject 1.2s cubic-bezier(0.25, 0.9, 0.4, 1) ${idx * 0.15}s infinite`,
+            }}
+          >
+            ✦
+          </span>
+        </div>
+      ))}
+    </>
   );
 }
 
@@ -752,12 +849,13 @@ const IdleVillageMapPage: React.FC = () => {
 
   const handleDropResident = useCallback(
     (slotId: string, residentId: string | null) => {
+      const resolvedResidentId = residentId ?? draggingResidentId;
       setIsResidentDragActive(false);
       setDraggingResidentId(null);
       setLastDropSlotId(slotId);
-      assignResidentToSlot(slotId, residentId ?? null);
+      assignResidentToSlot(slotId, resolvedResidentId ?? null);
     },
-    [assignResidentToSlot],
+    [assignResidentToSlot, draggingResidentId],
   );
 
   if (!config || !villageState) {
@@ -775,115 +873,116 @@ const IdleVillageMapPage: React.FC = () => {
   const cycleProgressFraction =
     totalCycleUnits > 0 ? currentCycleUnit / totalCycleUnits : 0;
   const isDayPhase = currentCycleUnit < dayTimeUnits;
-  const cycleElapsedSeconds = currentCycleUnit * secondsPerTimeUnit;
-  const cycleTotalSeconds = totalCycleUnits * secondsPerTimeUnit;
   const cycleIcon = isPlaying ? (isDayPhase ? '☀️' : '🌙') : '❚❚';
-  const cycleVariant = isDayPhase ? 'solar' : 'amethyst';
   const cyclePhaseLabel = isDayPhase ? 'Fase giorno' : 'Fase notte';
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,#020617_0,#020617_55%,#000000_100%)] text-ivory flex items-center">
-      <section className="relative w-full aspect-video max-w-6xl mx-auto">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `url(${idleVillageMap})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-          }}
-        />
-        <div className="absolute inset-0 bg-obsidian/45" aria-hidden="true" />
-
-        <div className="absolute top-4 left-4 right-4 z-20 flex flex-col gap-3 max-w-5xl">
-          <div className="flex flex-row gap-3 items-start">
-            <div className="flex flex-col items-center gap-1">
-              <VerbCard
-                icon={cycleIcon}
-                progressFraction={cycleProgressFraction}
-                elapsedSeconds={cycleElapsedSeconds}
-                totalDuration={cycleTotalSeconds}
-                injuryPercentage={0}
-                deathPercentage={0}
-                assignedCount={isPlaying ? 1 : 0}
-                totalSlots={1}
-                visualVariant={cycleVariant}
-                progressStyle="border"
-                isInteractive
-                onClick={() => setIsPlaying((prev) => !prev)}
-              />
-              <div className="text-[9px] uppercase tracking-[0.2em] text-slate-200 text-center">
-                {cyclePhaseLabel}
-                <span className="ml-1 text-slate-400 lowercase">
-                  (t={villageState.currentTime})
-                </span>
-              </div>
-              <div className="text-[9px] text-slate-300">
-                {isPlaying ? 'Tap per mettere in pausa' : 'Tap per riprendere'}
-              </div>
-            </div>
-            <div className="flex flex-col gap-3 rounded-2xl bg-black/80 border border-gold/40 shadow-md px-4 py-3 text-[10px] min-w-52">
-              <label className="flex flex-col gap-1 uppercase tracking-[0.2em] text-slate-300">
-                Card Size ({Math.round(cardScale * 100)}%)
-                <input
-                  type="range"
-                  min="0.1"
-                  max="1.2"
-                  step="0.05"
-                  value={cardScale}
-                  onChange={(e) => setCardScale(Number(e.target.value))}
-                  className="accent-gold"
-                />
-              </label>
-              {lastDropSlotId && (
-                <span className="text-[10px] text-emerald-300">
-                  Ultimo drop: {config.mapSlots?.[lastDropSlotId]?.label ?? lastDropSlotId}
-                </span>
-              )}
-              {!isResidentDragActive && availableResidents.length === 0 && (
-                <span className="text-[10px] text-slate-400">
-                  Nessun residente libero: attendi il completamento di una card.
-                </span>
-              )}
-            </div>
-          </div>
-          <ResidentRoster
-            residents={availableResidents}
-            activeResidentId={draggingResidentId}
-            onDragStart={handleResidentDragStart}
-            onDragEnd={handleResidentDragEnd}
-            assignmentFeedback={assignmentFeedback}
-            maxFatigueBeforeExhausted={config.globalRules.maxFatigueBeforeExhausted}
+    <>
+      <style>{FX_KEYFRAMES}</style>
+      <div
+        className="min-h-screen bg-[radial-gradient(circle_at_top,#020617_0,#020617_55%,#000000_100%)] text-ivory flex items-center"
+        style={{ perspective: '2000px' }}
+      >
+        <section
+          className="relative w-full aspect-video max-w-6xl mx-auto"
+          style={{ transformStyle: 'preserve-3d' }}
+        >
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `url(${idleVillageMap})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+            }}
           />
-        </div>
+          <div className="absolute inset-0 bg-obsidian/45" aria-hidden="true" />
 
-        <div className="absolute inset-0 z-10 pointer-events-none">
-          {mapSlotLayout.map(({ slot, left, top }) => {
-            const slotVerbs = verbsBySlot[slot.id] ?? [];
-            const slotOffers = questOffersBySlot[slot.id] ?? [];
-            const combined = [...slotVerbs, ...slotOffers];
-            if (combined.length === 0) {
-              return null;
-            }
-            return (
-              <MapSlotVerbCluster
-                key={slot.id}
-                slotId={slot.id}
-                left={left}
-                top={top}
-                verbs={combined}
-                cardScale={cardScale}
-                isDropMode={isResidentDragActive}
-                canAcceptDrop={canSlotAcceptDrop(slot.id)}
-                isHighlighted={highlightSlotId === slot.id}
-                onDropResident={handleDropResident}
-              />
-            );
-          })}
-        </div>
-      </section>
-    </div>
+          <div className="absolute top-4 left-4 right-4 z-20 flex flex-col gap-3 max-w-5xl">
+            <div className="flex flex-row gap-3 items-start">
+              <div className="flex flex-col items-center gap-1">
+                <div className="origin-top" style={{ transform: 'scale(0.75)' }}>
+                  <MarbleCard
+                    title={cyclePhaseLabel}
+                    icon={cycleIcon}
+                    progress={cycleProgressFraction}
+                    isActive={isPlaying}
+                    tone={isDayPhase ? 'day' : 'night'}
+                    onClick={() => setIsPlaying((prev) => !prev)}
+                  />
+                </div>
+                <div className="text-[9px] uppercase tracking-[0.2em] text-slate-200 text-center">
+                  {cyclePhaseLabel}
+                  <span className="ml-1 text-slate-400 lowercase">
+                    (t={villageState.currentTime})
+                  </span>
+                </div>
+                <div className="text-[9px] text-slate-300">
+                  {isPlaying ? 'Tap per mettere in pausa' : 'Tap per riprendere'}
+                </div>
+              </div>
+              <div className="flex flex-col gap-3 rounded-2xl bg-black/80 border border-gold/40 shadow-md px-4 py-3 text-[10px] min-w-52">
+                <label className="flex flex-col gap-1 uppercase tracking-[0.2em] text-slate-300">
+                  Card Size ({Math.round(cardScale * 100)}%)
+                  <input
+                    type="range"
+                    min="0.1"
+                    max="1.2"
+                    step="0.05"
+                    value={cardScale}
+                    onChange={(e) => setCardScale(Number(e.target.value))}
+                    className="accent-gold"
+                  />
+                </label>
+                {lastDropSlotId && (
+                  <span className="text-[10px] text-emerald-300">
+                    Ultimo drop: {config.mapSlots?.[lastDropSlotId]?.label ?? lastDropSlotId}
+                  </span>
+                )}
+                {!isResidentDragActive && availableResidents.length === 0 && (
+                  <span className="text-[10px] text-slate-400">
+                    Nessun residente libero: attendi il completamento di una card.
+                  </span>
+                )}
+              </div>
+            </div>
+            <ResidentRoster
+              residents={availableResidents}
+              activeResidentId={draggingResidentId}
+              onDragStart={handleResidentDragStart}
+              onDragEnd={handleResidentDragEnd}
+              assignmentFeedback={assignmentFeedback}
+              maxFatigueBeforeExhausted={config.globalRules.maxFatigueBeforeExhausted}
+            />
+          </div>
+
+          <div className="absolute inset-0 z-10" style={{ transformStyle: 'preserve-3d' }}>
+            {mapSlotLayout.map(({ slot, left, top }) => {
+              const slotVerbs = verbsBySlot[slot.id] ?? [];
+              const slotOffers = questOffersBySlot[slot.id] ?? [];
+              const combined = [...slotVerbs, ...slotOffers];
+              if (combined.length === 0) {
+                return null;
+              }
+              return (
+                <MapSlotVerbCluster
+                  key={slot.id}
+                  slotId={slot.id}
+                  left={left}
+                  top={top}
+                  verbs={combined}
+                  cardScale={cardScale}
+                  isDropMode={isResidentDragActive}
+                  canAcceptDrop={canSlotAcceptDrop(slot.id)}
+                  isHighlighted={highlightSlotId === slot.id}
+                  onDropResident={handleDropResident}
+                />
+              );
+            })}
+          </div>
+        </section>
+      </div>
+    </>
   );
-};
-
+}
 export default IdleVillageMapPage;

@@ -1,13 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { getCombatSpriteById, type CombatSpriteState, type SpriteFrame } from '../../balancing/config/combatSprites';
 import type { ActorAnimatorState, ActorPose } from '../../balancing/hooks/useCombatAnimator';
+import type { SpritePalette } from '../../shared/types/visual';
 
 interface CombatAvatarProps {
     spriteId?: string;
+    paletteOverride?: SpritePalette;
     state?: CombatSpriteState;
     actorState?: ActorAnimatorState;
     size?: number;
     className?: string;
+    facing?: 'left' | 'right';
 }
 
 const poseToSpriteState = (pose: ActorPose): CombatSpriteState => {
@@ -30,13 +33,15 @@ const poseToSpriteState = (pose: ActorPose): CombatSpriteState => {
 
 export const CombatAvatar: React.FC<CombatAvatarProps> = ({
     spriteId,
+    paletteOverride,
     state = 'idle',
     actorState,
     size = 160,
-    className
+    className,
+    facing = 'right'
 }) => {
-    const resolvedSpriteId = actorState?.lastEvent?.actorId ? actorState?.actorId : spriteId;
-    const sprite = resolvedSpriteId ? getCombatSpriteById(resolvedSpriteId) : undefined;
+    const sprite = spriteId ? getCombatSpriteById(spriteId) : undefined;
+    const palette = paletteOverride ?? sprite?.palette;
     const spriteState: CombatSpriteState = actorState ? poseToSpriteState(actorState.pose) : state;
     const asset = sprite?.states[spriteState] ?? sprite?.states.idle;
     const fallbackStyle: React.CSSProperties = {
@@ -51,6 +56,11 @@ export const CombatAvatar: React.FC<CombatAvatarProps> = ({
     }, [asset]);
 
     const [frameIndex, setFrameIndex] = useState(0);
+    const shouldLoop = useMemo(() => {
+        if (!asset) return false;
+        if (typeof asset.loop === 'boolean') return asset.loop;
+        return spriteState === 'idle' || spriteState === 'statusFx';
+    }, [asset, spriteState]);
 
     useEffect(() => {
         setFrameIndex(0);
@@ -61,10 +71,19 @@ export const CombatAvatar: React.FC<CombatAvatarProps> = ({
         if (frames.length <= 1) return;
         const duration = frames[frameIndex]?.durationMs ?? asset?.durationMs ?? 200;
         const timeout = window.setTimeout(() => {
-            setFrameIndex(prev => (prev + 1) % frames.length);
+            setFrameIndex(prev => {
+                if (!shouldLoop && prev >= frames.length - 1) {
+                    return prev;
+                }
+                const next = prev + 1;
+                if (next >= frames.length) {
+                    return shouldLoop ? 0 : frames.length - 1;
+                }
+                return next;
+            });
         }, duration);
         return () => window.clearTimeout(timeout);
-    }, [frames, frameIndex, asset]);
+    }, [frames, frameIndex, asset, shouldLoop]);
 
     if (!sprite || !asset || frames.length === 0) {
         return (
@@ -81,17 +100,48 @@ export const CombatAvatar: React.FC<CombatAvatarProps> = ({
     const aspectRatio = asset.size.width / asset.size.height;
     const width = size;
     const height = size / aspectRatio;
+    const offset = asset.offset ?? { x: 0, y: 0 };
+    const adjustedOffset = {
+        x: facing === 'left' ? -offset.x : offset.x,
+        y: offset.y
+    };
+    const auraShadow = palette?.accent ?? 'rgba(201,162,39,0.35)';
+    const shouldMirror = facing === 'left';
 
     return (
-        <div className={className} style={{ width, height }}>
-            <img
-                src={currentFrame.assetId}
-                alt={sprite.label}
-                className="h-full w-full object-contain drop-shadow-[0_14px_30px_rgba(0,0,0,0.75)] transition-all duration-150"
-                style={{
-                    filter: actorState?.pose === 'hit' ? 'brightness(1.2)' : undefined
-                }}
-            />
+        <div
+            className={className}
+            style={{
+                width,
+                height,
+                filter: actorState?.pose === 'hit' ? 'brightness(1.05)' : undefined
+            }}
+        >
+            <div className="h-full w-full origin-center transition-all duration-150 flex items-center justify-center">
+                <div
+                    className="h-full w-full"
+                    style={{
+                        transform: shouldMirror ? 'scaleX(-1)' : undefined
+                    }}
+                >
+                    <div
+                        className="h-full w-full origin-center transition-all duration-150"
+                        style={{
+                            transform: `translate(${adjustedOffset.x}px, ${adjustedOffset.y}px)`,
+                            boxShadow: `0 18px 38px ${auraShadow}`,
+                            background: palette
+                                ? `radial-gradient(circle at 30% 20%, ${palette.accent}33, transparent 55%)`
+                                : undefined
+                        }}
+                    >
+                        <img
+                            src={currentFrame.assetId}
+                            alt={sprite.label}
+                            className="h-full w-full object-contain drop-shadow-[0_14px_30px_rgba(0,0,0,0.65)]"
+                        />
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };

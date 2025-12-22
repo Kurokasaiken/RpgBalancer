@@ -65,23 +65,50 @@ export const COMBAT_SPRITE_REGISTRY: CombatSpriteDefinition[] = [
         states: {
             idle: {
                 assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_idle_0.png',
+                frames: [
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_idle_0.png', durationMs: 140 },
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_idle_1.png', durationMs: 140 },
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_idle_2.png', durationMs: 140 },
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_idle_3.png', durationMs: 140 }
+                ],
+                loop: true,
                 size: { width: 512, height: 512 },
-                durationMs: 800
+                durationMs: 560,
+                offset: { x: 0, y: 8 }
             },
             windup: {
                 assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_run_0.png',
+                frames: [
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_run_0.png', durationMs: 90 },
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_run_1.png', durationMs: 90 }
+                ],
+                loop: false,
                 size: { width: 512, height: 512 },
-                durationMs: 280
+                durationMs: 180,
+                offset: { x: -6, y: 12 }
             },
             attack: {
                 assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_run_2.png',
+                frames: [
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_run_2.png', durationMs: 110 },
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_run_3.png', durationMs: 110 },
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_run_4.png', durationMs: 110 }
+                ],
+                loop: false,
                 size: { width: 512, height: 512 },
-                durationMs: 420
+                durationMs: 330,
+                offset: { x: -12, y: 18 }
             },
             hit: {
                 assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_run_3.png',
+                frames: [
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_run_3.png', durationMs: 120 },
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_run_2.png', durationMs: 120 }
+                ],
+                loop: false,
                 size: { width: 512, height: 512 },
-                durationMs: 200
+                durationMs: 240,
+                offset: { x: -4, y: 6 }
             },
             defeated: {
                 assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_death_2.png',
@@ -109,23 +136,51 @@ export const COMBAT_SPRITE_REGISTRY: CombatSpriteDefinition[] = [
         states: {
             idle: {
                 assetId: '/assets/characters/prototypes/fantasy_vector/knight_blade/character_idle_0.png',
+                frames: [
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_blade/character_idle_0.png', durationMs: 110 },
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_blade/character_idle_1.png', durationMs: 110 },
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_blade/character_idle_2.png', durationMs: 110 },
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_blade/character_idle_3.png', durationMs: 110 }
+                ],
+                loop: true,
                 size: { width: 512, height: 512 },
-                durationMs: 700
+                durationMs: 440,
+                offset: { x: 4, y: 6 }
             },
             windup: {
                 assetId: '/assets/characters/prototypes/fantasy_vector/knight_blade/character_sword_Attack_0.png',
+                frames: [
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_blade/character_sword_Attack_0.png', durationMs: 80 },
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_blade/character_sword_Attack_1.png', durationMs: 80 }
+                ],
+                loop: false,
                 size: { width: 512, height: 512 },
-                durationMs: 220
+                durationMs: 160,
+                offset: { x: 10, y: 12 }
             },
             attack: {
                 assetId: '/assets/characters/prototypes/fantasy_vector/knight_blade/character_sword_Attack_2.png',
+                frames: [
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_blade/character_sword_Attack_2.png', durationMs: 90 },
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_blade/character_sword_Attack_3.png', durationMs: 90 },
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_blade/character_sword_Attack_4.png', durationMs: 90 },
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_blade/character_sword_Attack_5.png', durationMs: 90 }
+                ],
+                loop: false,
                 size: { width: 512, height: 512 },
-                durationMs: 360
+                durationMs: 360,
+                offset: { x: 8, y: 20 }
             },
             hit: {
                 assetId: '/assets/characters/prototypes/fantasy_vector/knight_blade/character_sword_Attack_3.png',
+                frames: [
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_blade/character_sword_Attack_3.png', durationMs: 100 },
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_blade/character_sword_Attack_2.png', durationMs: 100 }
+                ],
+                loop: false,
                 size: { width: 512, height: 512 },
-                durationMs: 160
+                durationMs: 200,
+                offset: { x: 4, y: 6 }
             },
             defeated: {
                 assetId: '/assets/characters/prototypes/fantasy_vector/knight_blade/character_death_2.png',
@@ -153,23 +208,49 @@ export const COMBAT_SPRITE_REGISTRY: CombatSpriteDefinition[] = [
         states: {
             idle: {
                 assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_idle_2.png',
+                frames: [
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_idle_2.png', durationMs: 160 },
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_idle_3.png', durationMs: 160 },
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_idle_4.png', durationMs: 160 }
+                ],
+                loop: true,
                 size: { width: 512, height: 512 },
-                durationMs: 900
+                durationMs: 480,
+                offset: { x: 0, y: 4 }
             },
             windup: {
                 assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_idle_3.png',
+                frames: [
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_idle_3.png', durationMs: 90 },
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_idle_4.png', durationMs: 90 }
+                ],
+                loop: false,
                 size: { width: 512, height: 512 },
-                durationMs: 260
+                durationMs: 180,
+                offset: { x: -4, y: 10 }
             },
             attack: {
                 assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_run_1.png',
+                frames: [
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_run_1.png', durationMs: 120 },
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_run_2.png', durationMs: 120 },
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_run_3.png', durationMs: 120 }
+                ],
+                loop: false,
                 size: { width: 512, height: 512 },
-                durationMs: 480
+                durationMs: 360,
+                offset: { x: -6, y: 12 }
             },
             hit: {
                 assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_run_2.png',
+                frames: [
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_run_2.png', durationMs: 110 },
+                    { assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_run_1.png', durationMs: 110 }
+                ],
+                loop: false,
                 size: { width: 512, height: 512 },
-                durationMs: 220
+                durationMs: 220,
+                offset: { x: -2, y: 4 }
             },
             defeated: {
                 assetId: '/assets/characters/prototypes/fantasy_vector/knight_plain/character_death_0.png',

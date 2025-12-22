@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "updatedAt": "2025-12-21T20:17:00+01:00",
+  "columns": {
+    "enemy": {
+      "id": "Marble023",
+      "albedo": "columns/Marble023/Marble023_1K-JPG_Color.jpg",
+      "normal": "columns/Marble023/Marble023_1K-JPG_NormalGL.jpg",
+      "roughness": "columns/Marble023/Marble023_1K-JPG_Roughness.jpg",
+      "displacement": "columns/Marble023/Marble023_1K-JPG_Displacement.jpg"
+    },
+    "player": {
+      "id": "Marble01",
+      "albedo": "columns/Marble01/marble01_diff_2k.jpg",
+      "normal": "columns/Marble01/marble01_nor_dx_2k.jpg",
+      "roughness": "columns/Marble01/marble01_rough_2k.jpg",
+      "ao": "columns/Marble01/marble01_ao_2k.jpg"
+    }
+  },
+  "goo": {
+    "alpha": {
+      "file": "goo/liquid_stains_03_4k.png",
+      "format": "rgba-png",
+      "usage": "puddleMask"
+    },
+    "normal": {
+      "file": "goo/surface_imperfections_leaks_001_1k_NormalGL.png",
+      "format": "normal-gl",
+      "usage": "puddleNormal"
+    }
+  },
+  "background": {
+    "hdri": "background/hdris/studio_small_08_4k.hdr",
+    "particles": "background/particles/pexels-gold-dust-1146728.png",
+    "filmGrain": "background/grain/custom_film_grain_2048.png"
+  },
+  "blueNoise": {
+    "root": "background/noise/Data",
+    "tiles": {
+      "64": "background/noise/Data/64_64/LDR_RGBA_0.png",
+      "128": "background/noise/Data/128_128/LDR_RGBA_0.png",
+      "256": "background/noise/Data/256_256/LDR_RGBA_0.png",
+      "512": "background/noise/Data/512_512/LDR_RGBA_0.png",
+      "1024": "background/noise/Data/1024_1024/LDR_RGBA_0.png"
+    }
+  },
+  "metadata": {
+    "licenses": {
+      "columns.enemy": {
+        "source": "https://ambientcg.com/view?id=Marble023",
+        "author": "ambientCG",
+        "license": "CC0 1.0"
+      },
+      "columns.player": {
+        "source": "https://polyhaven.com/a/marble_01",
+        "author": "Poly Haven",
+        "license": "CC0 1.0"
+      },
+      "goo.alpha": {
+        "source": "https://www.cgbookcase.com/textures/liquid-stains-03",
+        "author": "cgbookcase",
+        "license": "CC0 1.0"
+      },
+      "goo.normal": {
+        "source": "https://3dtextures.me/2021/10/21/surface-imperfections-leaks-001/",
+        "author": "3DTextures.me",
+        "license": "CC0 1.0"
+      },
+      "background.hdri": {
+        "source": "https://polyhaven.com/a/studio_small_08",
+        "author": "Poly Haven",
+        "license": "CC0 1.0"
+      },
+      "background.particles": {
+        "source": "https://www.pexels.com/photo/gold-texture-1146728/",
+        "author": "Pexels / Felix Mittermeier",
+        "license": "Pexels License"
+      },
+      "background.filmGrain": {
+        "source": "Generated in-house",
+        "author": "RPG Balancer Team",
+        "license": "CC0 1.0"
+      },
+      "blueNoise": {
+        "source": "https://momentsingraphics.de/BlueNoise.html",
+        "author": "Moments in Graphics",
+        "license": "CC0 1.0"
+      }
+    }
+  }
+}

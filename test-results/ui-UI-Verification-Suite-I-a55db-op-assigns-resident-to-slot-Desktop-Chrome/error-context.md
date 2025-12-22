@@ -1,0 +1,205 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e4]:
+    - complementary [ref=e5]:
+      - navigation [ref=e7]:
+        - generic [ref=e9]:
+          - generic [ref=e10]:
+            - paragraph [ref=e11]
+            - button "⚖️ Balancer" [ref=e16]:
+              - generic [ref=e17]: ⚖️
+              - generic [ref=e18]: Balancer
+            - button "📊 Stat Testing" [ref=e19]:
+              - generic [ref=e20]: 📊
+              - generic [ref=e21]: Stat Testing
+            - button "✨ Spell Creation" [ref=e22]:
+              - generic [ref=e23]: ✨
+              - generic [ref=e24]: Spell Creation
+          - generic [ref=e25]:
+            - paragraph [ref=e26]
+            - button "📚 Spell Library" [ref=e31]:
+              - generic [ref=e32]: 📚
+              - generic [ref=e33]: Spell Library
+            - button "✨ Spell Creation" [ref=e34]:
+              - generic [ref=e35]: ✨
+              - generic [ref=e36]: Spell Creation
+            - button "⚔️ Combat Viewer" [ref=e37]:
+              - generic [ref=e38]: ⚔️
+              - generic [ref=e39]: Combat Viewer
+            - button "🗺️ Idle Village Map (New)" [ref=e40]:
+              - generic [ref=e41]: 🗺️
+              - generic [ref=e42]: Idle Village Map (New)
+            - button "👤 Character Creator" [ref=e43]:
+              - generic [ref=e44]: 👤
+              - generic [ref=e45]: Character Creator
+            - button "🗂️ Roster" [ref=e46]:
+              - generic [ref=e47]: 🗂️
+              - generic [ref=e48]: Roster
+            - button "⚔️ Grid Arena" [ref=e49]:
+              - generic [ref=e50]: ⚔️
+              - generic [ref=e51]: Grid Arena
+            - button "🏰 Idle Arena" [ref=e52]:
+              - generic [ref=e53]: 🏰
+              - generic [ref=e54]: Idle Arena
+            - button "🧪 Testing Lab" [ref=e55]:
+              - generic [ref=e56]: 🧪
+              - generic [ref=e57]: Testing Lab
+          - generic [ref=e58]:
+            - paragraph [ref=e59]
+            - button "🏡 Idle Village" [ref=e64]:
+              - generic [ref=e65]: 🏡
+              - generic [ref=e66]: Idle Village
+            - button "⚙️ Idle Village Config" [ref=e67]:
+              - generic [ref=e68]: ⚙️
+              - generic [ref=e69]: Idle Village Config
+            - button "🜂 Verb Detail Sandbox" [ref=e70]:
+              - generic [ref=e71]: 🜂
+              - generic [ref=e72]: Verb Detail Sandbox
+            - button "🎯 Skill Check Lab" [ref=e73]:
+              - generic [ref=e74]: 🎯
+              - generic [ref=e75]: Skill Check Lab
+          - generic [ref=e76]:
+            - paragraph [ref=e77]
+            - button "🎭 Archetypes" [ref=e82]:
+              - generic [ref=e83]: 🎭
+              - generic [ref=e84]: Archetypes
+            - button "🗺️ War Room" [ref=e85]:
+              - generic [ref=e86]: 🗺️
+              - generic [ref=e87]: War Room
+            - button "⚔️ 1v1 Archetypes" [ref=e88]:
+              - generic [ref=e89]: ⚔️
+              - generic [ref=e90]: 1v1 Archetypes
+            - button "🏗️ Archetype Builder" [ref=e91]:
+              - generic [ref=e92]: 🏗️
+              - generic [ref=e93]: Archetype Builder
+            - button "✦ Archetype Forge" [ref=e94]:
+              - generic [ref=e95]: ✦
+              - generic [ref=e96]: Archetype Forge
+            - button "⚙️ Auto-Balancer" [ref=e97]:
+              - generic [ref=e98]: ⚙️
+              - generic [ref=e99]: Auto-Balancer
+          - generic [ref=e100]:
+            - paragraph [ref=e101]
+            - button "🜂 Gilded Observatory" [ref=e106]:
+              - generic [ref=e107]: 🜂
+              - generic [ref=e108]: Gilded Observatory
+            - button "🜃 Obsidian Sanctum" [ref=e109]:
+              - generic [ref=e110]: 🜃
+              - generic [ref=e111]: Obsidian Sanctum
+            - button "✺ Aurora Workshop" [ref=e112]:
+              - generic [ref=e113]: ✺
+              - generic [ref=e114]: Aurora Workshop
+            - button "💠 Arcane Tech Glass" [ref=e115]:
+              - generic [ref=e116]: 💠
+              - generic [ref=e117]: Arcane Tech Glass
+            - button "⚗️ Aether Brass Lab" [ref=e118]:
+              - generic [ref=e119]: ⚗️
+              - generic [ref=e120]: Aether Brass Lab
+            - button "✒️ Quantum Scriptorium" [ref=e121]:
+              - generic [ref=e122]: ✒️
+              - generic [ref=e123]: Quantum Scriptorium
+            - button "✦ Midnight Meridian" [ref=e124]:
+              - generic [ref=e125]: ✦
+              - generic [ref=e126]: Midnight Meridian
+            - button "✶ Seraphim Archive" [ref=e127]:
+              - generic [ref=e128]: ✶
+              - generic [ref=e129]: Seraphim Archive
+            - button "🌿 Verdant Alloy Deck" [ref=e130]:
+              - generic [ref=e131]: 🌿
+              - generic [ref=e132]: Verdant Alloy Deck
+          - generic [ref=e133]:
+            - paragraph [ref=e134]
+            - button "⚔️ Tactical Lab" [ref=e139]:
+              - generic [ref=e140]: ⚔️
+              - generic [ref=e141]: Tactical Lab
+    - main [ref=e143]:
+      - generic [ref=e148]:
+        - generic [ref=e151]:
+          - generic [ref=e152]:
+            - generic [ref=e153]:
+              - generic [ref=e155]:
+                - img "Marble base" [ref=e157]
+                - generic [ref=e158]:
+                  - generic [ref=e159]:
+                    - img
+                    - generic [ref=e160]: ❚❚
+                    - img "Circular frame"
+                  - heading "Fase giorno" [level=3] [ref=e163]
+                - img "Gold frame"
+              - generic [ref=e164]:
+                - text: Fase giorno
+                - generic [ref=e165]: (t=0)
+              - generic [ref=e166]: Tap per riprendere
+            - generic [ref=e168]:
+              - text: Card Size (45%)
+              - slider "Card Size (45%)" [ref=e169]: "0.45"
+          - generic [ref=e170]:
+            - generic [ref=e171]:
+              - generic [ref=e172]: Residenti
+              - generic [ref=e173]: 1 pronti
+            - button "LA founder_easy Fat 0/100" [active] [ref=e175]:
+              - generic [ref=e176]: LA
+              - generic [ref=e177]: founder_easy
+              - generic [ref=e179]:
+                - text: Fat 0
+                - generic [ref=e180]: /100
+        - generic [ref=e181]:
+          - generic [ref=e183]:
+            - generic [ref=e185]:
+              - img "Marble base" [ref=e187]
+              - generic [ref=e188]:
+                - generic [ref=e189]:
+                  - img
+                  - generic [ref=e190]: 🍖
+                  - img "Circular frame"
+                - heading "Daily Food Upkeep" [level=3] [ref=e193]
+              - img "Gold frame"
+            - generic [ref=e195]:
+              - img "Marble base" [ref=e197]
+              - generic [ref=e198]:
+                - generic [ref=e199]:
+                  - img
+                  - generic [ref=e200]: ★
+                  - img "Circular frame"
+                - heading "Clear Rats in City" [level=3] [ref=e203]
+              - img "Gold frame"
+            - generic [ref=e205]:
+              - img "Marble base" [ref=e207]
+              - generic [ref=e208]:
+                - generic [ref=e209]:
+                  - img
+                  - generic [ref=e210]: ★
+                  - img "Circular frame"
+                - heading "Basic Training" [level=3] [ref=e213]
+              - img "Gold frame"
+            - generic [ref=e215]:
+              - img "Marble base" [ref=e217]
+              - generic [ref=e218]:
+                - generic [ref=e219]:
+                  - img
+                  - generic [ref=e220]: ★
+                  - img "Circular frame"
+                - heading "Cull Rats in Sewers" [level=3] [ref=e223]
+              - img "Gold frame"
+          - generic [ref=e227]:
+            - img "Marble base" [ref=e229]
+            - generic [ref=e230]:
+              - generic [ref=e231]:
+                - img
+                - generic [ref=e232]: ⇨
+                - img "Circular frame"
+              - heading "Explore the Outskirts" [level=3] [ref=e235]
+            - img "Gold frame"
+          - generic [ref=e239]:
+            - img "Marble base" [ref=e241]
+            - generic [ref=e242]:
+              - generic [ref=e243]:
+                - img
+                - generic [ref=e244]: ◎
+                - img "Circular frame"
+              - heading "Visit Market" [level=3] [ref=e247]
+            - img "Gold frame"
+  - region "Notifications alt+T"
+```

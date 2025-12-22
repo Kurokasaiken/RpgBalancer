@@ -9,7 +9,7 @@ export type OrbVariant = 'azure' | 'ember' | 'jade' | 'amethyst' | 'solar' | 'ne
 export interface OrbIconProps {
     icon: React.ReactNode;
     variant?: OrbVariant;
-    size?: 'sm' | 'md' | 'lg';
+    size?: 'sm' | 'verb' | 'md' | 'lg';
     isActive?: boolean;
     className?: string;
 }
@@ -59,8 +59,9 @@ const VARIANT_STYLES: Record<OrbVariant, {
     },
 };
 
-const SIZE_CLASSES = {
+const SIZE_CLASSES: Record<NonNullable<OrbIconProps['size']>, { outer: string; inner: string; icon: string }> = {
     sm: { outer: 'h-10 w-10', inner: 'h-8 w-8', icon: 'text-lg' },
+    verb: { outer: 'h-12 w-12', inner: 'h-10 w-10', icon: 'text-xl' },
     md: { outer: 'h-14 w-14', inner: 'h-12 w-12', icon: 'text-2xl' },
     lg: { outer: 'h-20 w-20', inner: 'h-16 w-16', icon: 'text-3xl' },
 };

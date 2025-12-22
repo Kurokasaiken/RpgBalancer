@@ -60,7 +60,7 @@ const FX_DURATION_MS: Partial<Record<CombatAnimationEventType, number>> = {
 
 const now = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
 
-function poseFromEvent(type: CombatAnimationEventType): ActorPose {
+function poseFromActorEvent(type: CombatAnimationEventType): ActorPose {
     switch (type) {
         case 'attack':
         case 'crit':
@@ -74,6 +74,22 @@ function poseFromEvent(type: CombatAnimationEventType): ActorPose {
             return 'status';
         case 'death':
             return 'defeated';
+        default:
+            return 'idle';
+    }
+}
+
+function poseFromTargetEvent(type: CombatAnimationEventType): ActorPose {
+    switch (type) {
+        case 'attack':
+        case 'crit':
+        case 'miss':
+        case 'shake':
+            return 'hit';
+        case 'heal':
+        case 'shield':
+        case 'status':
+            return 'status';
         default:
             return 'idle';
     }
@@ -108,19 +124,31 @@ export function useCombatAnimator({ frames, frameIndex, isPlaying, speedMs }: Us
 
     const applyEvent = useCallback((evt: CombatAnimationEvent) => {
         setCurrentEvent(evt);
-        const targetActorId = evt.actorId ?? evt.targetId;
-        if (targetActorId) {
-            setActorStates(prev => ({
-                ...prev,
-                [targetActorId]: {
-                    actorId: targetActorId,
-                    pose: poseFromEvent(evt.type),
+
+        setActorStates(prev => {
+            const next = { ...prev };
+            if (evt.actorId) {
+                next[evt.actorId] = {
+                    actorId: evt.actorId,
+                    pose: poseFromActorEvent(evt.type),
                     lastEvent: evt,
                     metadata: evt.metadata,
                     updatedAt: now()
-                }
-            }));
-        }
+                };
+            }
+
+            if (evt.targetId) {
+                next[evt.targetId] = {
+                    actorId: evt.targetId,
+                    pose: poseFromTargetEvent(evt.type),
+                    lastEvent: evt,
+                    metadata: evt.metadata,
+                    updatedAt: now()
+                };
+            }
+
+            return next;
+        });
 
         if (FX_EVENT_TYPES.includes(evt.type)) {
             const ttl = FX_DURATION_MS[evt.type] ?? evt.durationMs;

@@ -52,6 +52,25 @@ test.describe('UI Verification Suite', () => {
         await expect(page.locator('h1:has-text("Skill Check Preview Lab")').first()).toBeVisible();
     });
 
+    test('Skill Check: Alt Visuals v8 renders PIXI scene', async ({ page }) => {
+        await expect(page.locator('h1:has-text("Skill Check Preview Lab")').first()).toBeVisible();
+
+        const altModeButton = page.getByRole('button', { name: /Alt Visuals · Anime/i }).first();
+        await altModeButton.click();
+
+        const v8Button = page.getByRole('button', { name: /Alt Visuals v8/i }).first();
+        await v8Button.click();
+
+        const altVisualsSection = page.getByTestId('alt-visuals-v8');
+        await expect(altVisualsSection).toBeVisible();
+
+        await page.waitForFunction(() => {
+            const section = document.querySelector('[data-testid="alt-visuals-v8"]');
+            return !!section?.querySelector('canvas');
+        });
+        await expect(altVisualsSection.locator('canvas')).toBeVisible();
+    });
+
     test('Spell Library: Navigation and Create Spell', async ({ page }) => {
         await openNavTab(page, 'spellLibrary');
         await expect(page.locator('h2:has-text("Spell Library")')).toBeVisible();
@@ -176,6 +195,55 @@ test.describe('UI Verification Suite', () => {
             });
         });
 
+        test('drag and drop assigns resident to slot', async ({ page }) => {
+        const residentCard = page.locator('[data-testid="resident-card"]').first();
+        await residentCard.waitFor({ state: 'visible' });
+        const slotLocator = page.locator('[data-slot-id="village_square"]');
+        await slotLocator.waitFor({ state: 'visible' });
+
+        const draggedResidentId = await residentCard.getAttribute('data-resident-id');
+        if (!draggedResidentId) {
+            throw new Error('Resident card missing data-resident-id attribute');
+        }
+
+        await residentCard.dragTo(slotLocator, { force: true });
+
+        await page.waitForFunction((id) => {
+            const controls = (window as WindowWithControls).__idleVillageControls;
+            if (!controls) {
+                return false;
+            }
+            const state = controls.getState();
+            if (!state) return false;
+            const resident = state.residents[id];
+            if (!resident) return false;
+            return resident.status === 'away';
+        }, draggedResidentId, { timeout: 10000 });
+
+        const dragResult = await page.evaluate((id) => {
+            const controls = (window as WindowWithControls).__idleVillageControls;
+            if (!controls) {
+                throw new Error('Idle Village controls missing');
+            }
+            const state = controls.getState();
+            if (!state) {
+                throw new Error('Village state not ready');
+            }
+            const activities = Object.values(state.activities ?? {}).filter((activity) =>
+                activity.characterIds?.includes(id),
+            );
+            return {
+                residentStatus: state.residents[id]?.status ?? null,
+                activityCount: activities.length,
+                lastFeedback: controls.getAssignmentFeedback ? controls.getAssignmentFeedback() : null,
+            };
+        }, draggedResidentId);
+
+        expect(dragResult.residentStatus).toBe('away');
+        expect(dragResult.activityCount).toBeGreaterThan(0);
+        expect(dragResult.lastFeedback ?? '').toContain('assegnato');
+        });
+
         test('assignment yields rewards and frees resident', async ({ page }) => {
         const { residentId, baselineResources } = await page.evaluate(() => {
             const controls = (window as WindowWithControls).__idleVillageControls;
@@ -212,53 +280,35 @@ test.describe('UI Verification Suite', () => {
             };
         });
 
-        const debugAdvance = await page.evaluate(() => {
-            const controls = (window as WindowWithControls).__idleVillageControls;
-            if (!controls) {
-                throw new Error('Idle Village controls missing');
-            }
-            const before = controls.getState()?.currentTime ?? -1;
-            controls.advance(1);
-            const after = controls.getState()?.currentTime ?? -1;
-            return { before, after };
-        });
-        console.log('DEBUG advance delta', debugAdvance);
-
-        const completionInfo = await page.evaluate((id) => {
-            const controls = (window as WindowWithControls).__idleVillageControls;
-            if (!controls) {
-                throw new Error('Idle Village controls missing');
-            }
-            const maxSteps = 10;
-            const snapshots: Array<{ step: number; currentTime: number; residentStatus: string | null }> = [];
-            let finalState: VillageState | null = null;
-            for (let i = 0; i < maxSteps; i += 1) {
+        const maxSteps = 10;
+        let residentStatus: string | null = null;
+        for (let i = 0; i < maxSteps; i += 1) {
+            await page.evaluate(() => {
+                const controls = (window as WindowWithControls).__idleVillageControls;
+                if (!controls) {
+                    throw new Error('Idle Village controls missing');
+                }
                 controls.advance(1);
+            });
+
+            residentStatus = await page.evaluate((id) => {
+                const controls = (window as WindowWithControls).__idleVillageControls;
+                if (!controls) {
+                    throw new Error('Idle Village controls missing');
+                }
                 const state = controls.getState();
                 if (!state) {
                     throw new Error('Village state not ready during advance loop');
                 }
-                finalState = state;
-                const resident = state.residents[id];
-                if (!resident) {
-                    throw new Error(`Resident ${id} missing after advance loop`);
-                }
-                snapshots.push({ step: i + 1, currentTime: state.currentTime, residentStatus: resident.status ?? null });
-                if (resident.status === 'available') {
-                    return { success: true, steps: i + 1, snapshots };
-                }
+                return state.residents[id]?.status ?? null;
+            }, residentId);
+
+            if (residentStatus === 'available') {
+                break;
             }
-            const finalStatus = finalState?.residents?.[id]?.status ?? 'unknown';
-            return {
-                success: false,
-                steps: maxSteps,
-                finalStatus,
-                finalTime: finalState?.currentTime ?? null,
-                snapshots,
-            };
-        }, residentId);
-        console.log('DEBUG completion info', completionInfo);
-        expect(completionInfo.success).toBe(true);
+        }
+
+        expect(residentStatus).toBe('available');
 
         const debugState = await page.evaluate((id) => {
             const controls = (window as WindowWithControls).__idleVillageControls;
@@ -277,6 +327,7 @@ test.describe('UI Verification Suite', () => {
                 slotId: activity.slotId,
                 startTime: activity.startTime,
                 endTime: activity.endTime,
+                characterIds: [...(activity.characterIds ?? [])],
               }));
             return {
                 currentTime: state.currentTime,
@@ -291,7 +342,6 @@ test.describe('UI Verification Suite', () => {
 
         console.log('DEBUG final state', debugState);
 
-        expect(debugState.residentStatus).toBe('available');
         expect(debugState.resources.gold).toBeGreaterThan(baselineResources.gold);
         expect(debugState.resources.xp).toBeGreaterThan(baselineResources.xp);
         });

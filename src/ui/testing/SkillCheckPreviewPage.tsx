@@ -3,7 +3,7 @@ import { useBalancerConfig } from '@/balancing/hooks/useBalancerConfig';
 
 import AltVisualsV5Asterism from './AltVisualsV5Asterism';
 import AltVisualsV6Asterism from './AltVisualsV6Asterism';
-import AltVisualsV7PixiField from './AltVisualsV7PixiField';
+import AltVisualsV8ObsidianField from './AltVisualsV8ObsidianField';
 import type { OutcomeZone, OutcomeResult, StatRow, LastOutcome, Point } from './types';
 
 const CANVAS_SIZE = 300;
@@ -24,10 +24,10 @@ const ALT_VISUAL_ENTRIES = [
     Component: AltVisualsV6Asterism,
   },
   {
-    id: 'alt-v7',
-    label: 'Alt Visuals v7',
-    tagline: 'Pixi Goo Field · FX AAA',
-    Component: AltVisualsV7PixiField,
+    id: 'alt-v8',
+    label: 'Alt Visuals v8',
+    tagline: 'Obsidian Meridian · colonne cinematiche',
+    Component: AltVisualsV8ObsidianField,
   },
 ] as const;
 type AltVisualId = (typeof ALT_VISUAL_ENTRIES)[number]['id'];
@@ -1029,11 +1029,12 @@ export const SkillCheckPreviewPage: React.FC = () => {
   });
   const [altViewMode, setAltViewMode] = useState<AltVisualId>(() => {
     if (typeof window === 'undefined') {
-      return 'alt-v7';
+      return 'alt-v8';
     }
-    const stored = window.localStorage.getItem(ALT_VIEW_MODE_STORAGE_KEY) as AltVisualId | null;
-    const valid = ALT_VISUAL_ENTRIES.find((entry) => entry.id === stored);
-    return valid?.id ?? 'alt-v7';
+    const stored = window.localStorage.getItem(ALT_VIEW_MODE_STORAGE_KEY);
+    const normalized = stored === 'alt-v7' ? 'alt-v8' : (stored as AltVisualId | null);
+    const valid = ALT_VISUAL_ENTRIES.find((entry) => entry.id === normalized);
+    return valid?.id ?? 'alt-v8';
   });
   const [ballPosition, setBallPosition] = useState<Point | null>(null);
   const [lastOutcome, setLastOutcome] = useState<LastOutcome | null>(null);

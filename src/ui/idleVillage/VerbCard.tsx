@@ -115,12 +115,12 @@ const VerbCard = forwardRef<HTMLDivElement, VerbCardProps>(function VerbCard(
 
   const dropFrameClass =
     dropState === 'valid'
-      ? 'ring-2 ring-emerald-400/60 shadow-[0_0_22px_rgba(16,185,129,0.45)]'
+      ? 'ring-2 ring-emerald-400/70 drop-shadow-[0_0_26px_rgba(16,185,129,0.6)]'
       : dropState === 'invalid'
-        ? 'ring-2 ring-rose-500/60 shadow-[0_0_22px_rgba(244,63,94,0.45)]'
+        ? 'ring-2 ring-rose-500/70 drop-shadow-[0_0_26px_rgba(244,63,94,0.55)]'
         : isActive
-          ? 'ring-1 ring-amber-300/70 shadow-[0_0_18px_rgba(245,158,11,0.4)]'
-          : 'ring-1 ring-slate-900/70 shadow-[0_12px_28px_rgba(2,6,23,0.85)]';
+          ? 'drop-shadow-[0_0_22px_rgba(245,158,11,0.45)]'
+          : 'drop-shadow-[0_0_24px_rgba(5,8,18,0.75)]';
 
   const timerDisplay = formatTime(isActive ? remainingSeconds : totalDuration);
 
@@ -154,6 +154,7 @@ const VerbCard = forwardRef<HTMLDivElement, VerbCardProps>(function VerbCard(
       state={cardState}
       isInteractive={isInteractive}
       hasGlow={isActive || dropState !== 'idle'}
+      frameVariant="plain"
       className={[
         'relative flex h-48 w-32 flex-col items-center gap-2 overflow-hidden p-3',
         dropFrameClass,
@@ -195,7 +196,7 @@ const VerbCard = forwardRef<HTMLDivElement, VerbCardProps>(function VerbCard(
       )}
       {progressStyle === 'halo' && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <div className="relative h-28 w-28">
+          <div className="relative h-[8.4rem] w-[8.4rem]">
             <div className="absolute inset-1 rounded-full border border-slate-900/70" />
             <div
               className="absolute inset-2 rounded-full opacity-70 blur-[0.5px]"
@@ -216,16 +217,16 @@ const VerbCard = forwardRef<HTMLDivElement, VerbCardProps>(function VerbCard(
 
       {/* Orb + timer */}
       <div className="relative z-10 flex flex-1 items-center justify-center">
-        <GlowProgress progress={clampedProgress} variant={progressVariant} size="sm" showTrail>
-          <OrbIcon icon={icon} variant={orbVariant} size="sm" isActive={isActive} />
+        <GlowProgress progress={clampedProgress} variant={progressVariant} size="verb" showTrail>
+          <OrbIcon icon={icon} variant={orbVariant} size="verb" isActive={isActive} />
         </GlowProgress>
       </div>
 
       {/* Stats row */}
-      <div className="relative z-10 flex w-full items-center justify-between text-[11px] font-semibold uppercase tracking-[0.18em] text-ivory-dark">
-        <div className="flex flex-col text-[10px] leading-tight text-teal-light">
+      <div className="relative z-10 flex w-full items-center justify-between text-[11px] font-semibold uppercase tracking-[0.18em] text-ivory">
+        <div className="flex flex-col text-[10px] leading-tight text-ivory">
           <span className="font-bold text-xs text-ivory">{timerDisplay}</span>
-          <span className="text-[9px] text-ivory-muted">
+          <span className="text-[9px] text-ivory/80">
             {assignedCount}/{totalSlots}
           </span>
         </div>
