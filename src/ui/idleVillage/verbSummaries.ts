@@ -27,6 +27,7 @@ export const DEFAULT_SECONDS_PER_TIME_UNIT = 60;
 const clamp01 = (value: number) => Math.max(0, Math.min(1, value));
 
 export type VerbSummarySource = 'scheduled' | 'questOffer' | 'system' | 'completed' | 'passive' | 'blueprint';
+export type VerbAutoState = 'continuous' | 'auto-repeat';
 
 export interface VerbSummary {
   key: string;
@@ -55,6 +56,7 @@ export interface VerbSummary {
   scheduled?: ScheduledActivity;
   offer?: QuestOffer;
   notes?: string | null;
+  autoState?: VerbAutoState | null;
 }
 
 export function buildActivityBlueprintSummary(params: {
@@ -71,6 +73,7 @@ export function buildActivityBlueprintSummary(params: {
   const isJob = activity.tags?.includes('job') ?? false;
   const rewardsLabel = formatRewardLabel(activity.rewards, resourceLabeler);
   const { injury, death } = deriveRisk(activity);
+  const autoState = deriveAutoState(activity);
   const maxCrew =
     ((activity.metadata ?? {}) as { maxCrewSize?: number })?.maxCrewSize ?? (activity.slotTags?.length ? activity.slotTags.length : 1);
 
@@ -99,6 +102,7 @@ export function buildActivityBlueprintSummary(params: {
     assigneeNames: [],
     riskLabel: createRiskLabel(injury, death),
     notes: activity.description ?? null,
+    autoState,
   };
 }
 
@@ -206,6 +210,7 @@ export function buildPassiveEffectSummary(params: {
     assigneeNames: [],
     riskLabel: null,
     notes: effect.description ?? null,
+    autoState: null,
   };
 }
 
@@ -285,6 +290,13 @@ const createRiskLabel = (injuryPct: number, deathPct: number): string | null => 
   return parts.join(' · ');
 };
 
+const deriveAutoState = (activity: ActivityDefinition): VerbAutoState | null => {
+  const metadata = (activity.metadata ?? {}) as { supportsAutoRepeat?: boolean; continuousJob?: boolean };
+  if (metadata.continuousJob) return 'continuous';
+  if (metadata.supportsAutoRepeat) return 'auto-repeat';
+  return null;
+};
+
 export function buildScheduledVerbSummary(params: {
   scheduled: ScheduledActivity;
   activity: ActivityDefinition;
@@ -313,6 +325,8 @@ export function buildScheduledVerbSummary(params: {
   const totalSlots =
     ((params.activity.metadata ?? {}) as { maxCrewSize?: number })?.maxCrewSize ??
     Math.max(1, assignedCount);
+
+  const autoState = deriveAutoState(params.activity);
 
   return {
     key: params.scheduled.id,
@@ -344,6 +358,7 @@ export function buildScheduledVerbSummary(params: {
       dayLength: params.dayLength,
     }),
     assigneeNames: params.assigneeNames,
+    autoState,
   };
 }
 
@@ -400,6 +415,7 @@ export function buildQuestOfferSummary(params: {
     tone: deriveTone(params.activity),
     deadlineLabel,
     assigneeNames: [],
+    autoState: null,
   };
 }
 

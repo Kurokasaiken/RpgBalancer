@@ -4,6 +4,21 @@
 
 ---
 
+## 12.11 – Theater View & Trial of Fire
+
+> Implementation detail: `docs/plans/idle_village_trial_of_fire_plan.md`
+
+- [ ] Extend `ResidentState` with `survivalCount`, `isHero`, `isInjured` and wire hero promotion helpers
+- [ ] Extend `ActivityState` with `isAuto`, `snapshotDeathRisk`, and capture risk snapshot when scheduling
+- [ ] Implement `calculateSurvivalBonus` + Trial of Fire resolution inside `tickIdleVillage`
+- [ ] Add auto-rescheduling logic for `isAuto` activities (respecting fatigue/slots)
+- [ ] Build `RosterSidebar` with filters (All/Available/Heroes/Injured) and draggable hero tokens
+- [ ] Create `TheaterView` container (panorama header + medallion VerbCards) scoped to `mapSlotId`
+- [ ] Update `VerbCard` to surface Auto infinity icon, hero borders, and “collection ready” halo
+- [ ] Implement bloom expansion when dragging residents over closed slots to reveal TheaterView
+- [ ] Hook hero promotion + survival streak events to UI feedback (toasts/logs)
+- [ ] Add Vitest + Playwright coverage for Trial of Fire math, auto-loop scheduling, hero promotion, bloom UX
+
 ## 12.1 – Time & Activity Engine
 
 - [ ] Define domain types for time & activities (engine layer)

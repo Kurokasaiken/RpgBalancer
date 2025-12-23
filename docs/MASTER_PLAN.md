@@ -410,20 +410,20 @@ Expand combat system from 1v1 to full tactical grid-based multi-unit combat:
 - ✅ Deterministic debug controls: `window.__idleVillageControls` (play/pause/advance/assign/getState/getConfig) surfaced for automated QA and Playwright flows.
 - ✅ Config-first mocks: `IdleVillageConfig` now ships sample `statRequirement` + founder `statTags` to exercise validation paths.
 
-**Next Steps:**
-1. Replace the legacy “Jobs & Quests in progress” HUD with compact summary rows that reuse `VerbSummary`.
-2. Surface passive/system verbs (hunger, upkeep) and quest deadlines on the map per `idle_village_map_only_plan.md`.
-3. Finalize the Playwright regression (“assign → advance time → verify reward/resource deltas”) leveraging the debug controls — plan captured in `docs/plans/idle_village_drag_drop_e2e_plan.md` and partially implemented in `tests/ui.spec.ts`.
+**Next Steps (per Master Plan v2.0):**
+1. Implement Bloom Reveal + Theater View container so slots expose VerbCard medaglioni and roster drag tokens drop directly inside the theater panel.
+2. Wire RosterSidebar filters (Tutti/Eroi/Carne da Macello/Feriti) and hero promotion hooks (Trial of Fire survivals) into the UI.
+3. Surface passive/system verbs (hunger, upkeep) plus quest deadlines on the map using the unified VerbSummary pipeline, then finalize the deterministic Playwright regression (“assign → advance time → verify reward/resource deltas”) leveraging the debug controls described in `docs/plans/idle_village_drag_drop_e2e_plan.md`.
 
-**Linked Plan:** [Idle Village VerbCard Refactor](plans/idle_village_verbcard_refactor_plan.md)  
+**Canonical Plan:** [Idle Village “Gilded Heroism” Master Plan v2.0](plans/idle_village_map_only_plan.md)  
+**Supporting Plans:** [Idle Village VerbCard Refactor](plans/idle_village_verbcard_refactor_plan.md), [Idle Village Theater View & Trial of Fire](plans/idle_village_trial_of_fire_plan.md), [Idle Village Drag & Drop E2E](plans/idle_village_drag_drop_e2e_plan.md)  
 **Plan Status Snapshot:**  
-- Phase A (Data & Helpers): ✅ A.1/A.2 finished (helpers + scheduled summaries). Quest offer/system builders + grouped selectors still pending.  
-- Phase B (Map Slot Clusters): ✅ Implemented `MapSlotVerbCluster` with drop validation + slot highlights.  
-- Phase C (Compact HUD): ⏳ Not started — legacy HUD still present.  
-- Phase D (Quest Offer UX polish): ⏳ Pending (risk badges/CTA on HUD).  
-- Phase E (Testing & Docs): ⏳ Pending Vitest + Playwright updates.  
+- Master Plan v2.0: ✅ sections 1–6 aligned (vision, data model, Bloom/Trial of Fire, QA, cross-plan integration).  
+- VerbCard Refactor: Phase A/B ✅, Phases C–E pending (HUD swap, quest-offer polish, Vitest/Playwright).  
+- Theater View & Trial of Fire: Phase 0 (schema), Phase 1 (engine) ready to start; Phases 2–4 (UI/Bloom) pending.  
+- Drag & Drop E2E: plan finalized, suite partially implemented (needs bloom + hero cases once UI lands).
 
-Linked artifacts: `docs/plans/idle_village_tasks.md`, `docs/plans/idle_village_verbcard_refactor_plan.md`, `docs/plans/idle_village_map_only_plan.md`, `docs/plans/idle_village_drag_drop_e2e_plan.md`.
+Linked artifacts: `docs/plans/idle_village_tasks.md`, `docs/plans/idle_village_map_only_plan.md`, `docs/plans/idle_village_verbcard_refactor_plan.md`, `docs/plans/idle_village_trial_of_fire_plan.md`, `docs/plans/idle_village_drag_drop_e2e_plan.md`.
 
 ---
 
@@ -554,8 +554,9 @@ The next evolution of the project is organized around six macro-goals:
    - Vision & design document: [GAME_VISION_IDLE_INCREMENTAL.md](GAME_VISION_IDLE_INCREMENTAL.md).  
    - **FTUE & Vertical Slice:** primi 30–60 minuti pianificati in [plans/idle_village_ftue_plan.md](plans/idle_village_ftue_plan.md); la vertical slice deve permettere almeno un ciclo completo run → meta → nuova run.  
    - **Art Style & Visual Direction:** linee guida per stile grafico, palette e pipeline in [plans/idle_village_art_style_plan.md](plans/idle_village_art_style_plan.md).
-   - **Idle Village VerbCard Refactor (UI Focus):** plan in [plans/idle_village_verbcard_refactor_plan.md](plans/idle_village_verbcard_refactor_plan.md) con tasklist dedicata in [plans/idle_village_tasks.md](plans/idle_village_tasks.md) → unifica i VerbCard su mappa/HUD e prepara il refactor dei marker.
+   - **Idle Village VerbCard Refactor (UI Focus):** plan in [plans/idle_village_verbcard_refactor_plan.md](plans/idle_village_verbcard_refactor_plan.md) with tasklist dedicated in [plans/idle_village_tasks.md](plans/idle_village_tasks.md) → unifica i VerbCard su mappa/HUD e prepara il refactor dei marker.
    - **Idle Village Map-Only Verb System:** nuovo piano dedicato in [plans/idle_village_map_only_plan.md](plans/idle_village_map_only_plan.md) per integrare verb passivi, job continui e quest expiry sulla pagina mappa, con checklist collegata in `idle_village_tasks.md`.
+   - **Idle Village Theater View & Trial of Fire:** nuovo piano in [plans/idle_village_trial_of_fire_plan.md](plans/idle_village_trial_of_fire_plan.md) per introdurre heroism stats, auto-looping activities e il contenitore TheaterView; tasklist nella sezione 12.11 di `idle_village_tasks.md`.
 
 ---
 

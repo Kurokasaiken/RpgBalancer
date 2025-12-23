@@ -280,6 +280,22 @@ export interface FounderPreset {
   statTags?: string[];
 }
 
+export interface TrialOfFireRules {
+  /**
+   * Minimum death risk (0-1) required for a Trial of Fire survival to grant a stat bonus.
+   */
+  highRiskThreshold: number;
+  /**
+   * Percentage-based multiplier applied to each numeric stat in the resident snapshot
+   * when they survive a qualifying Trial of Fire. Example: 0.05 = +5%.
+   */
+  statBonusMultiplier: number;
+  /**
+   * Optional number of survivals required before the resident is flagged as hero.
+   */
+  heroSurvivalThreshold?: number;
+}
+
 export interface GlobalRules {
   // Fatigue / exhaustion
   maxFatigueBeforeExhausted: number;
@@ -340,6 +356,11 @@ export interface GlobalRules {
 
   // Optional seed for deterministic generation (when desired)
   defaultRandomSeed?: number;
+
+  /**
+   * Optional Trial of Fire configuration used when processing high-risk survivals.
+   */
+  trialOfFire?: TrialOfFireRules;
 }
 
 export interface OverlaySettings {

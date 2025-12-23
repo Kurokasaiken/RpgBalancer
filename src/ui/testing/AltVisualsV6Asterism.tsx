@@ -35,6 +35,9 @@ const VISUAL_CONFIG = {
   },
 } as const;
 
+const MOCK_STAT_RANGE = { min: 35, max: 80 } as const;
+const SUCCESS_PROB_CLAMP = { min: 5, max: 95 } as const;
+
 interface MorphShapeState {
   active: boolean;
   radius: number;
@@ -42,6 +45,18 @@ interface MorphShapeState {
   growing: boolean;
   morphing: boolean;
   morphProgress: number;
+}
+
+function tracePerfectStar(ctx: CanvasRenderingContext2D, center: { x: number; y: number }, radius: number) {
+  for (let i = 0; i < AXES * 2; i += 1) {
+    const angle = -Math.PI / 2 + i * (Math.PI / AXES);
+    const isOuter = i % 2 === 0;
+    const currentRadius = isOuter ? radius : radius * 0.4;
+    const x = center.x + Math.cos(angle) * currentRadius;
+    const y = center.y + Math.sin(angle) * currentRadius;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
 }
 
 interface BallState {
@@ -56,6 +71,10 @@ interface BallState {
   duration: number;
   stopped: boolean;
   success: boolean | null;
+  targetX: number;
+  targetY: number;
+  targetAssigned: boolean;
+  forcedOutcome: boolean | null;
 }
 
 interface PillarState {
@@ -112,6 +131,7 @@ interface InternalState {
   flashOpacity: number;
   animationFrameId: number | null;
   lastTimestamp: number;
+  successChance: number;
 }
 
 const STAT_ICONS = ['💪', '⚡', '🧠', '🛡️', '❤️'];
@@ -223,6 +243,10 @@ function initAltVisualsV6(
       duration: 5000,
       stopped: false,
       success: null,
+      targetX: 320,
+      targetY: 320,
+      targetAssigned: false,
+      forcedOutcome: null,
     },
     baseEnemyValues: [...axisValues.enemy],
     basePlayerValues: [...axisValues.player],
@@ -241,6 +265,7 @@ function initAltVisualsV6(
     flashOpacity: 0,
     animationFrameId: null,
     lastTimestamp: performance.now(),
+    successChance: 50,
   };
 
   const handleCheckboxChange = (event: Event) => {
@@ -291,7 +316,7 @@ function initAltVisualsV6(
 
     // Reset for UI (static elements)
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    drawStatLabels(ctx, internalState);
+    drawStatOverlay(ctx, internalState);
 
     // Flash overlay
     if (internalState.flashOpacity > 0) {
@@ -315,9 +340,13 @@ function resetAnimation(state: InternalState) {
     const perfectValue = 70;
     state.enemyStatValues = Array.from({ length: AXES }, () => perfectValue);
     state.playerStatValues = Array.from({ length: AXES }, () => perfectValue);
+    state.baseEnemyValues = [...state.enemyStatValues];
+    state.basePlayerValues = [...state.playerStatValues];
   } else {
-    state.enemyStatValues = [...state.baseEnemyValues];
-    state.playerStatValues = [...state.basePlayerValues];
+    state.enemyStatValues = generateMockStats();
+    state.playerStatValues = generateMockStats();
+    state.baseEnemyValues = [...state.enemyStatValues];
+    state.basePlayerValues = [...state.playerStatValues];
   }
 
   state.tarPuddle = { active: false, radius: 0, maxRadius: 30, growing: true, morphing: false, morphProgress: 0 };
@@ -345,7 +374,13 @@ function resetAnimation(state: InternalState) {
     duration: 5000,
     stopped: false,
     success: null,
+    targetX: 320,
+    targetY: 320,
+    targetAssigned: false,
+    forcedOutcome: null,
   };
+
+  state.successChance = calculateSuccessChance(state);
 }
 
 function canvasCenter(_state: InternalState) {
@@ -524,6 +559,8 @@ function updateTarAnimation(state: InternalState) {
   if (state.goldStar.morphing && state.goldStar.morphProgress >= 1 && !state.ball.active && !state.ball.stopped) {
     state.ball.active = true;
     state.ball.startTime = Date.now();
+    state.ball.forcedOutcome = rollForOutcome(state.successChance);
+    assignBallTarget(state);
     const randomAngle = Math.random() * Math.PI * 2;
     state.ball.vx = Math.cos(randomAngle) * state.ball.speed;
     state.ball.vy = Math.sin(randomAngle) * state.ball.speed;
@@ -537,8 +574,11 @@ function updateBall(state: InternalState) {
     state.ball.stopped = true;
     state.ball.vx = 0;
     state.ball.vy = 0;
-    const starVertices = getStarVertices(state);
-    state.ball.success = isPointInPolygon(state.ball.x, state.ball.y, starVertices);
+    if (state.ball.targetAssigned) {
+      state.ball.x = state.ball.targetX;
+      state.ball.y = state.ball.targetY;
+    }
+    state.ball.success = state.ball.forcedOutcome ?? null;
     triggerShake(state, 0.6); // Final result shake
     return;
   }
@@ -609,13 +649,34 @@ function drawGrid(ctx: CanvasRenderingContext2D) {
       ctx.lineTo(tx + nx * 6, ty + ny * 6);
       ctx.stroke();
     }
+  }
+}
+
+function drawStatOverlay(ctx: CanvasRenderingContext2D, state: InternalState) {
+  const center = canvasCenter(state);
+  for (let i = 0; i < AXES; i += 1) {
+    const angle = -Math.PI / 2 + i * ((2 * Math.PI) / AXES);
+    const labelRadius = RADIUS + 36;
+    const iconX = center.x + Math.cos(angle) * labelRadius;
+    const iconY = center.y + Math.sin(angle) * labelRadius;
 
     ctx.font = `600 24px 'Space Grotesk', system-ui`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = '#f8fafc';
-    ctx.fillText(STAT_ICONS[i], center.x + dx * (RADIUS + 36), center.y + dy * (RADIUS + 36));
+    ctx.fillText(STAT_ICONS[i], iconX, iconY);
+
+    const textY = iconY + 20;
+    const playerVal = Math.round(state.playerStatValues[i] ?? 0);
+    const enemyVal = Math.round(state.enemyStatValues[i] ?? 0);
+    ctx.font = `600 12px 'Space Grotesk', system-ui`;
+    ctx.fillStyle = VISUAL_CONFIG.colors.playerText;
+    ctx.fillText(`${playerVal} vs ${enemyVal}`, iconX, textY);
   }
+
+  ctx.font = `600 16px 'Space Grotesk', system-ui`;
+  ctx.fillStyle = '#cbd5f5';
+  ctx.fillText(`SUCCESSO STIMATO: ${state.successChance.toFixed(1)}%`, center.x, center.y + RADIUS + 70);
 }
 
 function drawBall(ctx: CanvasRenderingContext2D, state: InternalState) {
@@ -822,8 +883,10 @@ function drawGoldStar(ctx: CanvasRenderingContext2D, state: InternalState) {
   ctx.shadowBlur = VISUAL_CONFIG.glowStrengthStar;
   ctx.beginPath();
 
+  const center = canvasCenter(state);
   if (!state.goldStar.morphing || state.goldStar.morphProgress === 0) {
-    ctx.arc(canvasCenter(state).x, canvasCenter(state).y, state.goldStar.radius, 0, Math.PI * 2);
+    tracePerfectStar(ctx, center, state.goldStar.radius);
+    ctx.closePath();
   } else {
     for (let i = 0; i < AXES * 2; i += 1) {
       const angle = -Math.PI / 2 + i * (Math.PI / AXES);
@@ -842,8 +905,8 @@ function drawGoldStar(ctx: CanvasRenderingContext2D, state: InternalState) {
         radius = avg * 0.4;
       }
       const finalRadius = state.goldStar.radius + (radius - state.goldStar.radius) * state.goldStar.morphProgress;
-      const x = canvasCenter(state).x + Math.cos(angle) * finalRadius;
-      const y = canvasCenter(state).y + Math.sin(angle) * finalRadius;
+      const x = center.x + Math.cos(angle) * finalRadius;
+      const y = center.y + Math.sin(angle) * finalRadius;
       if (i === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     }
@@ -914,24 +977,71 @@ function isPointInPolygon(x: number, y: number, vertices: { x: number; y: number
   return inside;
 }
 
-function drawStatLabels(ctx: CanvasRenderingContext2D, state: InternalState) {
-  const center = canvasCenter(state);
-  for (let i = 0; i < AXES; i += 1) {
-    const angle = -Math.PI / 2 + i * ((2 * Math.PI) / AXES);
-    const labelRadius = RADIUS + 40;
-    const x = center.x + Math.cos(angle) * labelRadius;
-    const y = center.y + Math.sin(angle) * labelRadius;
+function generateMockStats() {
+  const range = MOCK_STAT_RANGE.max - MOCK_STAT_RANGE.min;
+  return Array.from({ length: AXES }, () => Math.round(MOCK_STAT_RANGE.min + Math.random() * range));
+}
 
-    ctx.font = "bold 14px 'Space Grotesk', system-ui";
-    ctx.fillStyle = VISUAL_CONFIG.colors.playerText;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.shadowColor = 'rgba(0,0,0,0.8)';
-    ctx.shadowBlur = 4;
+function calculateSuccessChance(state: InternalState) {
+  const playerSum = state.playerStatValues.reduce((sum, value) => sum + value, 0);
+  const enemySum = state.enemyStatValues.reduce((sum, value) => sum + value, 0);
+  const rawChance = 50 + (playerSum - enemySum);
+  return clamp(rawChance, SUCCESS_PROB_CLAMP.min, SUCCESS_PROB_CLAMP.max);
+}
 
-    // Values
-    const playerVal = Math.round(state.playerStatValues[i] ?? 0);
-    const enemyVal = Math.round(state.enemyStatValues[i] ?? 0);
-    ctx.fillText(`${playerVal} vs ${enemyVal}`, x, y + 20);
+function rollForOutcome(successChance: number) {
+  const roll = Math.random() * 100;
+  return roll <= successChance;
+}
+
+function assignBallTarget(state: InternalState) {
+  const starVertices = getStarVertices(state);
+  const pentagonVertices = getPentagonVertices(state);
+
+  if (state.ball.forcedOutcome === null) {
+    state.ball.targetAssigned = false;
+    return;
   }
+
+  const targetPoint = state.ball.forcedOutcome
+    ? randomPointInsidePolygon(starVertices) ?? { x: canvasCenter(state).x, y: canvasCenter(state).y }
+    : randomPointInsidePolygon(pentagonVertices, (x, y) => !isPointInPolygon(x, y, starVertices)) ??
+      { x: canvasCenter(state).x, y: canvasCenter(state).y };
+
+  state.ball.targetX = targetPoint.x;
+  state.ball.targetY = targetPoint.y;
+  state.ball.targetAssigned = true;
+}
+
+function randomPointInsidePolygon(
+  vertices: { x: number; y: number }[],
+  predicate: (x: number, y: number) => boolean = () => true,
+) {
+  const bounds = vertices.reduce(
+    (acc, vertex) => ({
+      minX: Math.min(acc.minX, vertex.x),
+      maxX: Math.max(acc.maxX, vertex.x),
+      minY: Math.min(acc.minY, vertex.y),
+      maxY: Math.max(acc.maxY, vertex.y),
+    }),
+    {
+      minX: Infinity,
+      maxX: -Infinity,
+      minY: Infinity,
+      maxY: -Infinity,
+    },
+  );
+
+  for (let attempt = 0; attempt < 200; attempt += 1) {
+    const x = bounds.minX + Math.random() * (bounds.maxX - bounds.minX || 1);
+    const y = bounds.minY + Math.random() * (bounds.maxY - bounds.minY || 1);
+    if (isPointInPolygon(x, y, vertices) && predicate(x, y)) {
+      return { x, y };
+    }
+  }
+  return null;
+}
+
+function clamp(value: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, value));
 }

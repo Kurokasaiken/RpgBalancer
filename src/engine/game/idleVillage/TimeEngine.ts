@@ -23,6 +23,16 @@ export interface ScheduledActivity {
   startTime: VillageTimeUnit;
   endTime: VillageTimeUnit;
   status: VillageActivityStatus;
+  /**
+   * Whether this activity should automatically reschedule itself once completed.
+   * Typically derived from activity metadata or explicit user toggles.
+   */
+  isAuto?: boolean;
+  /**
+   * Snapshot of the death risk perceived when the activity was scheduled.
+   * Used by Trial of Fire processing to determine survival bonuses.
+   */
+  snapshotDeathRisk?: number;
 }
 
 export function buildResidentFromFounder(preset: FounderPreset): ResidentState {
@@ -32,6 +42,9 @@ export function buildResidentFromFounder(preset: FounderPreset): ResidentState {
     fatigue: 0,
     statProfileId: preset.archetypeId,
     statTags: preset.statTags && preset.statTags.length > 0 ? [...preset.statTags] : [preset.difficultyTag],
+    survivalCount: 0,
+    isHero: false,
+    isInjured: false,
   };
 }
 
@@ -109,6 +122,18 @@ export interface ResidentState {
    * Used by assignment UIs to match slot requirements without recalculating against the full StatBlock.
    */
   statTags?: string[];
+  /**
+   * Number of consecutive survivals in high-risk activities (Trial of Fire mechanic).
+   */
+  survivalCount?: number;
+  /**
+   * Flag identifying whether this resident unlocked hero status via survivals.
+   */
+  isHero?: boolean;
+  /**
+   * Cached boolean to simplify UI checks for injury state.
+   */
+  isInjured?: boolean;
 }
 
 export interface QuestOffer {
