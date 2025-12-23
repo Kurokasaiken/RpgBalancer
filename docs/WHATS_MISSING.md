@@ -51,6 +51,13 @@
    - Complete entity creation suite
    - **Time:** 10-12 hours
 
+### Il Drago Art Direction Rollout
+
+- [ ] Creare i token materiali condivisi (`goldBevel`, `ivoryPlate`, `obsidianGlass`) dentro `src/styles/color-palette.css` e propagarli all’attuale tema Gilded Observatory.
+- [ ] Implementare i componenti riusabili previsti dal piano (`CommandMedallion`, `AstrolabeClock`, `HeroicVerbToken`) sotto `src/ui/components/heroicRealism/`.
+- [ ] Integrare i nuovi componenti nelle viste Idle Village (map markers, VerbCards sulla mappa, ciclo giorno/notte) leggendo i valori da config (`themeTokens` o store dedicato).
+- [ ] Aggiornare la documentazione visiva (moodboard + README) con screenshot dei nuovi componenti e checklist “Tavolo del Comando”.
+
 ---
 
 ## 🟢 Nice to Have (Future)

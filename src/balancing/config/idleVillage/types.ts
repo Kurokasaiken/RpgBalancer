@@ -252,6 +252,8 @@ export interface MapSlotDefinition {
   icon?: string;
   /** Tailwind color class for the marker label/outline */
   colorClass?: string;
+  /** Optional cinematic panorama shown in TheaterView (21:9 image URL) */
+  panoramaUrl?: string;
 }
 
 export interface FounderPreset {

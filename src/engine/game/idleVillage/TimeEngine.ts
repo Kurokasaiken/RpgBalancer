@@ -10,9 +10,26 @@ import type {
 } from '../../../balancing/config/idleVillage/types';
 import type { StatBlock } from '../../../balancing/types';
 
+const DEFAULT_RESIDENT_MAX_HP = 100;
+const DEFAULT_TRIAL_OF_FIRE_THRESHOLD = 0.25;
+
+function clamp01(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  if (value < 0) return 0;
+  if (value > 1) return 1;
+  return value;
+}
+
 export type VillageTimeUnit = number;
 
-export type VillageActivityStatus = 'pending' | 'running' | 'completed' | 'cancelled';
+export type ResidentStatus =
+  | 'available'
+  | 'away'
+  | 'exhausted'
+  | 'injured'
+  | 'dead';
+
+export type VillageActivityStatus = 'pending' | 'running' | 'completed' | 'cancelled' | 'failed';
 
 export interface ScheduledActivity {
   id: string;
@@ -27,24 +44,53 @@ export interface ScheduledActivity {
    * Whether this activity should automatically reschedule itself once completed.
    * Typically derived from activity metadata or explicit user toggles.
    */
-  isAuto?: boolean;
+  isAuto: boolean;
+  /**
+   * Whether this activity already resolved successfully at least once.
+   * Keeps UI/resolvers from reprocessing completion side-effects.
+   */
+  isCompleted: boolean;
   /**
    * Snapshot of the death risk perceived when the activity was scheduled.
    * Used by Trial of Fire processing to determine survival bonuses.
    */
-  snapshotDeathRisk?: number;
+  snapshotDeathRisk: number;
+}
+
+export interface TrialOfFireSurvivor {
+  characterId: string;
+  heroized: boolean;
+  bonusApplied: boolean;
+  hpRatio: number;
+}
+
+export interface TrialOfFireFallen {
+  characterId: string;
+  risk: number;
+  roll: number;
+}
+
+export interface ResolveActivityOutcomeResult {
+  scheduledId: string;
+  survivors: TrialOfFireSurvivor[];
+  fallen: TrialOfFireFallen[];
+  autoRescheduledId?: string | null;
 }
 
 export function buildResidentFromFounder(preset: FounderPreset): ResidentState {
+  const maxHp = DEFAULT_RESIDENT_MAX_HP;
   return {
     id: `founder-${preset.id}`,
     status: 'available',
     fatigue: 0,
     statProfileId: preset.archetypeId,
     statTags: preset.statTags && preset.statTags.length > 0 ? [...preset.statTags] : [preset.difficultyTag],
-    survivalCount: 0,
+    currentHp: maxHp,
+    maxHp,
     isHero: false,
     isInjured: false,
+    survivalCount: 0,
+    survivalScore: 0,
   };
 }
 
@@ -98,8 +144,6 @@ export interface VillageResources {
   [resourceId: string]: number;
 }
 
-export type ResidentStatus = 'available' | 'away' | 'exhausted' | 'injured' | 'dead';
-
 export interface ResidentState {
   id: string; // SavedCharacter / Entity ID
   homeId?: string; // building / house reference (string-based)
@@ -122,18 +166,16 @@ export interface ResidentState {
    * Used by assignment UIs to match slot requirements without recalculating against the full StatBlock.
    */
   statTags?: string[];
+  currentHp: number;
+  maxHp: number;
+  isHero: boolean;
+  isInjured: boolean;
+  survivalCount: number;
   /**
-   * Number of consecutive survivals in high-risk activities (Trial of Fire mechanic).
+   * Aggregate score tracking the quality of Trial of Fire survivals.
+   * Used for hero ranking and unlock thresholds.
    */
-  survivalCount?: number;
-  /**
-   * Flag identifying whether this resident unlocked hero status via survivals.
-   */
-  isHero?: boolean;
-  /**
-   * Cached boolean to simplify UI checks for injury state.
-   */
-  isInjured?: boolean;
+  survivalScore: number;
 }
 
 export interface QuestOffer {
@@ -156,7 +198,8 @@ export interface VillageEvent {
     | 'activity_cancelled'
     | 'fatigue_changed'
     | 'injury_applied'
-    | 'food_consumed_daily';
+    | 'food_consumed_daily'
+    | 'trial_of_fire';
   payload: Record<string, unknown>;
 }
 
@@ -176,6 +219,15 @@ export interface ScheduleActivityInput {
   slotId: string;
   // Optional explicit start time; defaults to state.currentTime
   startTime?: VillageTimeUnit;
+  /**
+   * Whether the activity should auto-reschedule after completion.
+   * Overrides metadata-derived defaults when provided.
+   */
+  isAuto?: boolean;
+  /**
+   * Snapshot of death risk captured at scheduling time for Trial of Fire tracking.
+   */
+  snapshotDeathRisk?: number;
 }
 
 export interface ScheduleActivityResult {
@@ -280,6 +332,9 @@ export function scheduleActivity(
     startTime,
     endTime,
     status: 'pending',
+    isAuto: Boolean(input.isAuto),
+    isCompleted: false,
+    snapshotDeathRisk: typeof input.snapshotDeathRisk === 'number' ? input.snapshotDeathRisk : 0,
   };
 
   const nextResidents: Record<string, ResidentState> = { ...state.residents };
@@ -474,6 +529,128 @@ export function advanceTime(
   const finalState = spawnQuestOffersIfNeeded(_deps, baseNextState, state.currentTime, targetTime);
 
   return { state: finalState, completedActivityIds };
+}
+
+function applyTrialOfFireStatBonus(statSnapshot: Partial<StatBlock> | undefined, risk: number): Partial<StatBlock> | undefined {
+  if (!statSnapshot) return statSnapshot;
+  const multiplier = 1 + clamp01(risk) * 0.05;
+  const nextSnapshot: Partial<StatBlock> = {};
+  (Object.keys(statSnapshot) as (keyof StatBlock)[]).forEach((key) => {
+    const value = statSnapshot[key];
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      nextSnapshot[key] = Number((value * multiplier).toFixed(3));
+    } else {
+      nextSnapshot[key] = value as StatBlock[typeof key];
+    }
+  });
+  return nextSnapshot;
+}
+
+export function resolveActivityOutcome(
+  deps: TimeEngineDeps,
+  state: VillageState,
+  scheduledId: string,
+): { state: VillageState; outcome: ResolveActivityOutcomeResult } {
+  const scheduled = state.activities[scheduledId];
+  if (!scheduled) {
+    return {
+      state,
+      outcome: {
+        scheduledId,
+        survivors: [],
+        fallen: [],
+        autoRescheduledId: null,
+      },
+    };
+  }
+
+  const risk = clamp01(scheduled.snapshotDeathRisk ?? 0);
+  const updatedResidents: Record<string, ResidentState> = { ...state.residents };
+  const survivors: TrialOfFireSurvivor[] = [];
+  const fallen: TrialOfFireFallen[] = [];
+
+  for (const characterId of scheduled.characterIds) {
+    const resident = updatedResidents[characterId];
+    if (!resident) {
+      continue;
+    }
+
+    const roll = deps.rng();
+    if (roll < risk) {
+      fallen.push({ characterId, risk, roll });
+      delete updatedResidents[characterId];
+      continue;
+    }
+
+    const heroized = risk > 0.3;
+    const hpRatio = resident.maxHp > 0 ? resident.currentHp / resident.maxHp : 0;
+    const nextSnapshot = applyTrialOfFireStatBonus(resident.statSnapshot, risk);
+
+    updatedResidents[characterId] = {
+      ...resident,
+      isHero: resident.isHero || heroized,
+      survivalCount: (resident.survivalCount ?? 0) + 1,
+      survivalScore: (resident.survivalScore ?? 0) + Math.round(risk * 100),
+      statSnapshot: nextSnapshot,
+    };
+
+    survivors.push({
+      characterId,
+      heroized,
+      bonusApplied: Boolean(nextSnapshot),
+      hpRatio,
+    });
+  }
+
+  const { [scheduledId]: _removed, ...remainingActivities } = state.activities;
+
+  const event: VillageEvent = {
+    time: state.currentTime,
+    type: 'trial_of_fire',
+    payload: {
+      scheduledId,
+      survivors: survivors.map((item) => item.characterId),
+      fallen: fallen.map((item) => item.characterId),
+      risk,
+    },
+  };
+
+  let nextState: VillageState = {
+    ...state,
+    residents: updatedResidents,
+    activities: remainingActivities,
+    eventLog: [...state.eventLog, event],
+  };
+
+  let autoRescheduledId: string | null = null;
+
+  if (
+    scheduled.isAuto &&
+    survivors.length > 0 &&
+    survivors.every((survivor) => survivor.hpRatio > DEFAULT_TRIAL_OF_FIRE_THRESHOLD)
+  ) {
+    const rescheduleInput: ScheduleActivityInput = {
+      activityId: scheduled.activityId,
+      characterIds: survivors.map((survivor) => survivor.characterId),
+      slotId: scheduled.slotId,
+      isAuto: true,
+      snapshotDeathRisk: scheduled.snapshotDeathRisk,
+    };
+
+    const rescheduleResult = scheduleActivity(deps, nextState, rescheduleInput);
+    nextState = rescheduleResult.state;
+    autoRescheduledId = rescheduleResult.scheduledActivity?.id ?? null;
+  }
+
+  return {
+    state: nextState,
+    outcome: {
+      scheduledId,
+      survivors,
+      fallen,
+      autoRescheduledId,
+    },
+  };
 }
 
 function spawnQuestOffersIfNeeded(

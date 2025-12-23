@@ -1,6 +1,6 @@
 # Implementation Plans Index - RPG Balancer Project
 
-**Total Plans Found:** 16 across 10 sessions  
+**Total Plans Found:** 17 across 10 sessions  
 **Location:** `/Users/faustoboni/.gemini/antigravity/brain/[session-id]/`
 
 ---
@@ -15,6 +15,7 @@
 3. **archetype_balancing_plan.md** - Archetype system balancing
 4. **scenario_ui_plan.md** - Scenario UI implementation
 5. **combat_viewer_visual_mock_plan.md** - LoL-style visual layer for Combat Viewer (Phase 6 roadmap)
+6. **il_drago_art_direction_plan.md** - Art direction “Realismo Eroico Classico” (material palette, markers, verb tokens, astrolabio) for the “Il Drago” initiative
 
 **Session:** Establishing Development Guidelines  
 **Date:** 2025-11-25  

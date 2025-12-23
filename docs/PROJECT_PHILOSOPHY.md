@@ -139,6 +139,13 @@ This project now treats the **Gilded Observatory** theme as the reference UI can
 
 > Implementation detail: the **authoritative mapping** between these roles and actual CSS tokens is maintained in the theme files and Tailwind config, not in components.
 
+### Cinematic Key-Art Direction
+To anchor future hero panels, splash art, and cinematic overlays in a consistent visual language, we adopt the following north-star brief:
+
+> A majestic ancient dragon perched on an overgrown marble ruin in a lush tropical jungle. The dragon has iridescent emerald and gold scales, inspired by the realism of Jeff Easley (AD&D). The lighting is bright tropical sunlight with deep, rich shadows. Style: Hand-painted digital art, oil painting brushstrokes, heroic realism. Color palette: Vivid turquoise, lime green, bright orange flowers, and polished bronze. High detail, epic scale, serious adventurous tone.
+
+This description should inform palette accents, lighting ratios, and compositional beats whenever we produce new illustrative assets or themed UI flourishes.
+
 ### Interaction Patterns
 - **Horizontal Sliders:** Primary selection mechanism for weighted stats.
 - **Tooltip-First Formulas:** Formulas live in docs and tooltips; UI shows human labels and results, not raw math in the main layout.

@@ -1,11 +1,64 @@
-# Idle Village Theater View & Trial of Fire – Implementation Plan
+# 🛡️ Master Plan: Idle Village - Trial of Fire & Theater View
 
 **Status:** Draft · **Owner:** Idle Village pod · **Last Updated:** 2025-12-23  
 **Scope:** Engine extensions for survival/hero systems + new Theater/roster UI containers on `IdleVillageMapPage`.
 
+## 1. Visione del Gameplay
+
+Un sistema di gestione coloniale dove la "carne da macello" (Rookies) automatizza l'economia, mentre il giocatore coltiva manualmente gli "Eroi" attraverso il rischio.
+
+## 2. Architettura dei Dati (Engine & State)
+
+### 2.1 ResidentState (L'Entità)
+
+- `isHero`: Sblocca bordi dorati e priorità.
+- `survivalCount`: Quante missioni pericolose ha completato.
+- `survivalScore`: Somma ponderata del rischio affrontato (per ranking).
+- `currentHp / maxHp`: Gestione ferite. Se HP < 25%, il residente è `isInjured`.
+
+### 2.2 Trial of Fire (Logica di Risoluzione)
+
+Il calcolo non avviene all'inizio, ma alla **risoluzione manuale** (Click to Collect):
+
+- **Formula Bonus:** `BonusStat = StatAttuale * (1 + (SnapshotDeathRisk * GlobalMultiplier))`.
+- **Hero Promotion:** Se `SnapshotDeathRisk > 30%` e il tiro di dado ha successo, il residente guadagna `isHero = true`.
+- **Ferite:** Se il tiro fallisce ma non è morte totale, `isInjured = true` e HP dimezzati.
+
+### 2.3 Automazione (Auto-Loop)
+
+- Se `isAuto` è attivo su un Job (non Quest): il motore riassegna il residente allo stesso slot appena finisce, a patto che abbia HP > 25% e Fatica < Max.
+
+## 3. Interfaccia Utente (UI Hierarchy)
+
+### 3.1 Roster Sinistro (L'Armeria)
+
+- **Layout:** Elenco verticale di card dettagliate.
+- **Dati:** Mostra barre HP (verde) e Fatica (gialla).
+- **Interazione:** Durante il drag, la card rimane "ghosted" nella lista, ma il cursore trasporta un **Orb circolare (Token-Faccia)**.
+
+### 3.2 HUD Destro (Monitoraggio & Risoluzione)
+
+- **Status:** Mostra card compatte per ogni `ScheduledActivity` in corso.
+- **Risoluzione:** Se l'attività è una Quest e il timer è finito, la card pulsa. Il click triggera il `resolveActivityOutcome`.
+
+### 3.3 Theater View (Il Luogo)
+
+- **Trigger:** Cliccando su un luogo o trascinandoci sopra un residente.
+- **Componente:** Card 21:9 con panorama in alto. Sotto, una fila di `VerbCard` (Medaglioni) circolari.
+- **Priority Glow:** Il marker sulla mappa chiusa mostra l'halo dell'attività più urgente (scadenza o fine lavoro).
+
+## 4. Roadmap di Implementazione
+
+1. **Fase 0:** Allineamento tipi (ResidentState, ScheduledActivity).
+2. **Fase 1:** Refactoring `ResidentRoster` (Sidebar sinistra + Drag Token).
+3. **Fase 2:** Integrazione `TheaterView` e rimozione codice inline in `IdleVillageMapPage`.
+4. **Fase 3:** Logica `onResolve` nell'HUD destro con calcolo Trial of Fire.
+
 ---
 
-## 1. Objectives
+## 5. Technical Execution (detailed)
+
+### 5.1 Objectives
 
 1. **Extend the data layer** so that survival streaks, hero flags, and auto activities are first-class fields on `ResidentState`/`ActivityState` and tick deterministically through `tickIdleVillage`.
 2. **Model Trial of Fire risk scaling** via `calculateSurvivalBonus(deathRisk: number)` and persist snapshot risk on activities to resolve end-of-run bonuses.

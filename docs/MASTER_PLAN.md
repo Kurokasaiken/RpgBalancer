@@ -143,6 +143,19 @@ See full spec for archetype stats, encounter templates, and drop mechanics.
 
 **Status:** 70% (In Progress)
 
+### 🎨 **Art Direction – “Il Drago” (New)**
+
+| Document | Purpose |
+|----------|---------|
+| **📋 Plan** | [plans/il_drago_art_direction_plan.md](plans/il_drago_art_direction_plan.md) |
+
+**Overview:**
+- Definisce la direzione artistica “Realismo Eroico Classico” per il progetto “Il Drago”, con focus su materiali (oro, avorio, acciaio, ossidiana) e componenti tattici (map markers stile Skyrim, VerbTokens metallici, astrolabio giorno/notte).
+- Specifica tipografia (Cinzel + Crimson Text), pipeline AI per asset e lista di elementi da evitare (no gothic/horror, no flat UI).
+- Fornisce roadmap di implementazione: moodboard/token set → component library → integrazione UI → QA/documentazione.
+
+**Status:** Draft v0.1 – in attesa di estensione verso token condivisi (`themeTokens`) e componenti riusabili.
+
 #### **2.1: Combat Simulation Testing (In Progress)**
 
 | Document | Purpose |
@@ -557,6 +570,7 @@ The next evolution of the project is organized around six macro-goals:
    - **Idle Village VerbCard Refactor (UI Focus):** plan in [plans/idle_village_verbcard_refactor_plan.md](plans/idle_village_verbcard_refactor_plan.md) with tasklist dedicated in [plans/idle_village_tasks.md](plans/idle_village_tasks.md) → unifica i VerbCard su mappa/HUD e prepara il refactor dei marker.
    - **Idle Village Map-Only Verb System:** nuovo piano dedicato in [plans/idle_village_map_only_plan.md](plans/idle_village_map_only_plan.md) per integrare verb passivi, job continui e quest expiry sulla pagina mappa, con checklist collegata in `idle_village_tasks.md`.
    - **Idle Village Theater View & Trial of Fire:** nuovo piano in [plans/idle_village_trial_of_fire_plan.md](plans/idle_village_trial_of_fire_plan.md) per introdurre heroism stats, auto-looping activities e il contenitore TheaterView; tasklist nella sezione 12.11 di `idle_village_tasks.md`.
+   - **Idle Village Trial of Fire Runtime Config:** piano operativo in [plans/trial_of_fire_runtime_plan.md](plans/trial_of_fire_runtime_plan.md) che copre il modulo `villageConfig`, la pagina designer `/debug/balancer/village`, e il refactor di `resolveActivityOutcome`; tasklist aggiornata in `idle_village_tasks.md` (Phase 12.12).
 
 ---
 

@@ -35,6 +35,11 @@ const VISUAL_CONFIG = {
   },
 } as const;
 
+const CHAOS_PHASE_DURATION_MS = 1100;
+const GUIDANCE_PHASE_DURATION_MS = 2200;
+const FINAL_EASE_DURATION_MS = 800;
+const BALL_TOTAL_DURATION_MS = CHAOS_PHASE_DURATION_MS + GUIDANCE_PHASE_DURATION_MS + FINAL_EASE_DURATION_MS;
+
 const MOCK_STAT_RANGE = { min: 35, max: 80 } as const;
 const SUCCESS_PROB_CLAMP = { min: 5, max: 95 } as const;
 
@@ -74,7 +79,14 @@ interface BallState {
   targetX: number;
   targetY: number;
   targetAssigned: boolean;
+  guidanceDelay: number;
+  targetArrivalTime: number;
   forcedOutcome: boolean | null;
+}
+
+interface AltVisualsController {
+  cleanup: () => void;
+  rerollDice: () => void;
 }
 
 interface PillarState {
@@ -132,6 +144,7 @@ interface InternalState {
   animationFrameId: number | null;
   lastTimestamp: number;
   successChance: number;
+  successRoll: number | null;
 }
 
 const STAT_ICONS = ['💪', '⚡', '🧠', '🛡️', '❤️'];
@@ -151,6 +164,7 @@ export function AltVisualsV6Asterism({ stats, controlsPortal }: AltVisualsV6Aste
   const checkboxRef = useRef<HTMLInputElement | null>(null);
   const debugPanelRef = useRef<HTMLDivElement | null>(null);
   const [sceneRunId, setSceneRunId] = useState(0);
+  const rerollRef = useRef<(() => void) | null>(null);
   const baseAxisValues = useMemo(
     () => deriveAxisValues(stats, FALLBACK_AXIS_VALUES.enemy, FALLBACK_AXIS_VALUES.player, AXES),
     [stats],
@@ -165,12 +179,20 @@ export function AltVisualsV6Asterism({ stats, controlsPortal }: AltVisualsV6Aste
     const checkbox = checkboxRef.current;
     if (!canvas || !checkbox) return;
 
-    const cleanup = initAltVisualsV6(canvas, checkbox, debugPanelRef.current, axisValues);
-    return cleanup;
+    const controller = initAltVisualsV6(canvas, checkbox, debugPanelRef.current, axisValues);
+    rerollRef.current = controller.rerollDice;
+    return () => {
+      rerollRef.current = null;
+      controller.cleanup();
+    };
   }, [axisValues, sceneRunId]);
 
   const handleRestart = () => {
     setSceneRunId((prev) => prev + 1);
+  };
+
+  const handleReroll = () => {
+    rerollRef.current?.();
   };
 
   const controlsNode = (
@@ -181,6 +203,13 @@ export function AltVisualsV6Asterism({ stats, controlsPortal }: AltVisualsV6Aste
         className="px-5 py-2 rounded-full border border-emerald-400/60 bg-emerald-500/10 text-[10px] uppercase tracking-[0.2em] text-emerald-100 hover:bg-emerald-500/20 active:scale-95 transition-all shadow-[0_0_20px_rgba(16,185,129,0.25)] focus:outline-none focus:ring-2 focus:ring-emerald-400/80 focus:ring-offset-2 focus:ring-offset-slate-900"
       >
         Riavvia scena
+      </button>
+      <button
+        type="button"
+        onClick={handleReroll}
+        className="px-5 py-2 rounded-full border border-amber-400/60 bg-amber-500/10 text-[10px] uppercase tracking-[0.2em] text-amber-100 hover:bg-amber-500/20 active:scale-95 transition-all shadow-[0_0_20px_rgba(251,191,36,0.25)] focus:outline-none focus:ring-2 focus:ring-amber-400/80 focus:ring-offset-2 focus:ring-offset-slate-900"
+      >
+        Ritira dado
       </button>
       <label className="flex items-center gap-3 px-4 py-2 rounded-full border border-slate-800 bg-slate-900/60 text-[10px] uppercase tracking-[0.2em] text-cyan-200 hover:bg-slate-800 transition-colors cursor-pointer">
         <input ref={checkboxRef} type="checkbox" className="size-4 accent-amber-400 rounded border border-slate-500 cursor-pointer" />
@@ -223,9 +252,13 @@ function initAltVisualsV6(
   checkbox: HTMLInputElement,
   _debugPanel: HTMLDivElement | null | undefined,
   axisValues: { enemy: number[]; player: number[] },
-) {
+) : AltVisualsController {
   const ctx = canvas.getContext('2d', { alpha: false });
-  if (!ctx) return () => { };
+  if (!ctx)
+    return {
+      cleanup: () => { },
+      rerollDice: () => { },
+    };
 
   const internalState: InternalState = {
     usePerfectStar: false,
@@ -246,6 +279,8 @@ function initAltVisualsV6(
       targetX: 320,
       targetY: 320,
       targetAssigned: false,
+      guidanceDelay: 0,
+      targetArrivalTime: 0,
       forcedOutcome: null,
     },
     baseEnemyValues: [...axisValues.enemy],
@@ -266,6 +301,7 @@ function initAltVisualsV6(
     animationFrameId: null,
     lastTimestamp: performance.now(),
     successChance: 50,
+    successRoll: null,
   };
 
   const handleCheckboxChange = (event: Event) => {
@@ -329,10 +365,21 @@ function initAltVisualsV6(
 
   drawLoop();
 
-  return () => {
+  const rerollDice = () => {
+    if (!internalState.goldStar.active || internalState.goldStar.morphProgress < 1) return;
+    internalState.ball.active = false;
+    internalState.ball.stopped = false;
+    internalState.ball.success = null;
+    internalState.ball.targetAssigned = false;
+    startBallLaunch(internalState, { skipReadinessCheck: true });
+  };
+
+  const cleanup = () => {
     if (internalState.animationFrameId !== null) cancelAnimationFrame(internalState.animationFrameId);
     checkbox.removeEventListener('change', handleCheckboxChange);
   };
+
+  return { cleanup, rerollDice };
 }
 
 function resetAnimation(state: InternalState) {
@@ -369,18 +416,21 @@ function resetAnimation(state: InternalState) {
     vx: 0,
     vy: 0,
     radius: 8,
-    speed: 12,
+    speed: 16,
     startTime: 0,
-    duration: 5000,
+    duration: BALL_TOTAL_DURATION_MS,
     stopped: false,
     success: null,
     targetX: 320,
     targetY: 320,
     targetAssigned: false,
+    guidanceDelay: 0,
+    targetArrivalTime: 0,
     forcedOutcome: null,
   };
 
   state.successChance = calculateSuccessChance(state);
+  state.successRoll = null;
 }
 
 function canvasCenter(_state: InternalState) {
@@ -556,31 +606,68 @@ function updateTarAnimation(state: InternalState) {
     }
   }
 
-  if (state.goldStar.morphing && state.goldStar.morphProgress >= 1 && !state.ball.active && !state.ball.stopped) {
-    state.ball.active = true;
-    state.ball.startTime = Date.now();
-    state.ball.forcedOutcome = rollForOutcome(state.successChance);
-    assignBallTarget(state);
-    const randomAngle = Math.random() * Math.PI * 2;
-    state.ball.vx = Math.cos(randomAngle) * state.ball.speed;
-    state.ball.vy = Math.sin(randomAngle) * state.ball.speed;
+  if (!state.ball.active && !state.ball.stopped) {
+    startBallLaunch(state);
   }
 }
 
 function updateBall(state: InternalState) {
   if (!state.ball.active || state.ball.stopped) return;
 
-  if (Date.now() - state.ball.startTime > state.ball.duration) {
+  const now = Date.now();
+  const elapsed = now - state.ball.startTime;
+  const timeRemaining = state.ball.duration - elapsed;
+
+  if (timeRemaining <= 0) {
     state.ball.stopped = true;
     state.ball.vx = 0;
     state.ball.vy = 0;
-    if (state.ball.targetAssigned) {
-      state.ball.x = state.ball.targetX;
-      state.ball.y = state.ball.targetY;
+    const starVertices = getStarVertices(state);
+    state.ball.success = isPointInPolygon(state.ball.x, state.ball.y, starVertices);
+    if (state.ball.forcedOutcome !== null) {
+      state.ball.success = state.ball.forcedOutcome;
     }
-    state.ball.success = state.ball.forcedOutcome ?? null;
     triggerShake(state, 0.6); // Final result shake
     return;
+  }
+
+  if (elapsed < state.ball.guidanceDelay) {
+    state.ball.vx *= 1.01;
+    state.ball.vy *= 1.01;
+    state.ball.vx += (Math.random() - 0.5) * 0.9;
+    state.ball.vy += (Math.random() - 0.5) * 0.9;
+  } else {
+    const slowdown = 0.99 - Math.min((elapsed - state.ball.guidanceDelay) / GUIDANCE_PHASE_DURATION_MS, 0.02);
+    state.ball.vx *= slowdown;
+    state.ball.vy *= slowdown;
+  }
+
+  const guidanceStart = state.ball.guidanceDelay;
+  const easePhaseStart = state.ball.targetArrivalTime - FINAL_EASE_DURATION_MS - state.ball.startTime;
+
+  if (state.ball.targetAssigned && elapsed >= guidanceStart) {
+    const dx = state.ball.targetX - state.ball.x;
+    const dy = state.ball.targetY - state.ball.y;
+    const distance = Math.hypot(dx, dy) || 1;
+    const desiredVx = (dx / distance) * Math.max(6, state.ball.speed * 0.6);
+    const desiredVy = (dy / distance) * Math.max(6, state.ball.speed * 0.6);
+    const guidanceWindow = Math.max(1, easePhaseStart - guidanceStart);
+    const steerFactor = 0.04 + Math.min((elapsed - guidanceStart) / guidanceWindow, 1) * 0.08;
+    state.ball.vx += (desiredVx - state.ball.vx) * steerFactor;
+    state.ball.vy += (desiredVy - state.ball.vy) * steerFactor;
+  }
+
+  if (state.ball.targetAssigned && elapsed >= easePhaseStart) {
+    const easeProgress = clamp((elapsed - easePhaseStart) / FINAL_EASE_DURATION_MS, 0, 1);
+    const easeStrength = 0.15 + easeProgress * 0.8;
+    state.ball.x += (state.ball.targetX - state.ball.x) * easeStrength;
+    state.ball.y += (state.ball.targetY - state.ball.y) * easeStrength;
+    if (easeProgress >= 1) {
+      state.ball.x = state.ball.targetX;
+      state.ball.y = state.ball.targetY;
+      state.ball.vx = 0;
+      state.ball.vy = 0;
+    }
   }
 
   const nextX = state.ball.x + state.ball.vx;
@@ -676,7 +763,16 @@ function drawStatOverlay(ctx: CanvasRenderingContext2D, state: InternalState) {
 
   ctx.font = `600 16px 'Space Grotesk', system-ui`;
   ctx.fillStyle = '#cbd5f5';
+  ctx.textAlign = 'center';
   ctx.fillText(`SUCCESSO STIMATO: ${state.successChance.toFixed(1)}%`, center.x, center.y + RADIUS + 70);
+
+  const rollValue = state.successRoll === null ? '--' : state.successRoll.toFixed(1);
+  const resolvedOutcome = state.ball.success ?? state.ball.forcedOutcome;
+  const outcomeLabel =
+    resolvedOutcome === null ? 'IN CORSO' : resolvedOutcome ? 'SUCCESSO' : 'FALLIMENTO';
+  ctx.font = `600 14px 'Space Grotesk', system-ui`;
+  ctx.fillStyle = '#94a3ff';
+  ctx.fillText(`ROLL: ${rollValue} → ${outcomeLabel}`, center.x, center.y + RADIUS + 92);
 }
 
 function drawBall(ctx: CanvasRenderingContext2D, state: InternalState) {
@@ -867,11 +963,6 @@ function drawTarAnimation(ctx: CanvasRenderingContext2D, state: InternalState) {
   ctx.fill();
   ctx.restore();
 
-  // Core
-  ctx.fillStyle = '#ffffff';
-  ctx.beginPath();
-  ctx.arc(canvasCenter(state).x, canvasCenter(state).y, 3, 0, Math.PI * 2);
-  ctx.fill();
 }
 
 function drawGoldStar(ctx: CanvasRenderingContext2D, state: InternalState) {
@@ -915,12 +1006,6 @@ function drawGoldStar(ctx: CanvasRenderingContext2D, state: InternalState) {
 
   ctx.fill();
   ctx.restore();
-
-  // Core
-  ctx.fillStyle = '#ffffff';
-  ctx.beginPath();
-  ctx.arc(canvasCenter(state).x, canvasCenter(state).y, 3, 0, Math.PI * 2);
-  ctx.fill();
 }
 
 function getStarVertices(state: InternalState) {
@@ -989,9 +1074,10 @@ function calculateSuccessChance(state: InternalState) {
   return clamp(rawChance, SUCCESS_PROB_CLAMP.min, SUCCESS_PROB_CLAMP.max);
 }
 
-function rollForOutcome(successChance: number) {
+function rollForOutcome(state: InternalState) {
   const roll = Math.random() * 100;
-  return roll <= successChance;
+  state.successRoll = roll;
+  return roll <= state.successChance;
 }
 
 function assignBallTarget(state: InternalState) {
@@ -1011,6 +1097,37 @@ function assignBallTarget(state: InternalState) {
   state.ball.targetX = targetPoint.x;
   state.ball.targetY = targetPoint.y;
   state.ball.targetAssigned = true;
+}
+
+function startBallLaunch(state: InternalState, options: { skipReadinessCheck?: boolean } = {}) {
+  if (!options.skipReadinessCheck) {
+    const goldReady = state.goldStar.active && state.goldStar.morphProgress >= 1;
+    const playerReady = state.playerPillars.length === AXES && state.playerPillars.every((p) => p.landed);
+    if (!goldReady || !playerReady) {
+      return;
+    }
+  }
+
+  state.ball.active = true;
+  state.ball.stopped = false;
+  state.ball.success = null;
+  state.ball.targetAssigned = false;
+  state.ball.startTime = Date.now();
+  state.ball.duration = BALL_TOTAL_DURATION_MS;
+  state.ball.guidanceDelay = CHAOS_PHASE_DURATION_MS;
+  state.ball.targetArrivalTime = state.ball.startTime + BALL_TOTAL_DURATION_MS;
+  state.ball.x = canvasCenter(state).x;
+  state.ball.y = canvasCenter(state).y;
+
+  state.successChance = calculateSuccessChance(state);
+  const forcedSuccess = rollForOutcome(state);
+  state.ball.forcedOutcome = forcedSuccess;
+  assignBallTarget(state);
+
+  const launchAngle = Math.random() * Math.PI * 2;
+  const launchSpeed = state.ball.speed * 1.4;
+  state.ball.vx = Math.cos(launchAngle) * launchSpeed;
+  state.ball.vy = Math.sin(launchAngle) * launchSpeed;
 }
 
 function randomPointInsidePolygon(

@@ -143,6 +143,22 @@
 
 ---
 
+## Phase 12.12: Trial of Fire & Theater View (Sistematico)
+
+- [ ] **Config Runtime:** Creare `src/balancing/config/idleVillage/villageConfig.ts` con sezioni heroism/statBonuses/survival/automation/softCap (vedi `trial_of_fire_runtime_plan.md`).
+- [ ] **Designer Tools:** Costruire `/debug/balancer/village` con slider e anteprime live che scrivono su `IdleVillageConfigStore`.
+- [ ] **Engine Wiring:** Refactor `resolveActivityOutcome` e auto-loop (`tickIdleVillage`) per leggere esclusivamente dal nuovo config.
+- [ ] **UX Risk Display:** Aggiornare VerbCard/TheaterView per mostrare bande rischio (giallo/rosso) basate su `snapshotDeathRisk` aggiornato in tempo reale.
+- [ ] **Testing:** Coprire i nuovi helper con Vitest + scenario Playwright che modifica slider e verifica l’effetto su Trial of Fire.
+- [ ] **Engine:** Implementare `calculateSurvivalBonus` basato sul rischio al tick finale.
+- [ ] **UI Roster:** Trasformare `ResidentRoster` in Sidebar sinistra con barre HP/Fatica reali.
+- [ ] **UI Map:** Rimuovere `MapSlotVerbCluster` inline e usare il nuovo file esterno.
+- [ ] **UI Theater:** Attivare `TheaterView` con panorama cinematografico al click sui luoghi.
+- [ ] **Logic:** Integrare `onResolve` manuale nell'HUD destro per le Quest.
+- [ ] **Automation:** Testare il loop `isAuto` per i job di produzione.
+
+---
+
 ## Meta
 
 - [ ] Link this file and `idle_village_plan.md` from `MASTER_PLAN.md`

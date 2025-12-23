@@ -25,6 +25,7 @@ import {
   type ResidentState,
   type ScheduledActivity,
   type VillageState,
+  type VillageEvent,
 } from '@/engine/game/idleVillage/TimeEngine';
 import { evaluateStatRequirement } from '@/engine/game/idleVillage/statMatching';
 import { tickIdleVillage } from '@/engine/game/idleVillage/IdleVillageEngine';
@@ -34,8 +35,8 @@ import type {
   IdleVillageConfig,
   MapSlotDefinition,
   StatRequirement,
+  TrialOfFireRules,
 } from '@/balancing/config/idleVillage/types';
-import MapMarker from '@/ui/idleVillage/MapMarker';
 import MarbleMedallionCard from '@/ui/fantasy/assets/marble-verb-card/MarbleMedallionCard';
 import {
   DEFAULT_SECONDS_PER_TIME_UNIT,
@@ -46,9 +47,12 @@ import {
   type VerbSummary,
 } from '@/ui/idleVillage/verbSummaries';
 import ResidentRoster from '@/ui/idleVillage/ResidentRoster';
+import MapSlotVerbCluster from '@/ui/idleVillage/components/MapSlotVerbCluster';
+import TheaterView from '@/ui/idleVillage/components/TheaterView';
+import { RESIDENT_DRAG_MIME } from '@/ui/idleVillage/constants';
+import ActiveActivityHUD from '@/ui/idleVillage/ActiveActivityHUD';
 
 const DEFAULT_CARD_SCALE = 0.45;
-const RESIDENT_DRAG_MIME = 'application/x-idle-resident';
 const FX_KEYFRAMES = `
 @keyframes idleVillageResourceAttract {
   0% {
@@ -104,6 +108,23 @@ const simpleRng = (() => {
     return seed / 233280;
   };
 })();
+
+const clamp01 = (value: number): number => {
+  if (!Number.isFinite(value)) return 0;
+  if (value < 0) return 0;
+  if (value > 1) return 1;
+  return value;
+};
+
+const deriveDeathRisk = (activity?: ActivityDefinition): number => {
+  if (!activity) return 0;
+  const meta = (activity.metadata ?? {}) as { trialOfFireRisk?: number; deathChanceDisplay?: number };
+  let risk = typeof meta.trialOfFireRisk === 'number' ? meta.trialOfFireRisk : typeof meta.deathChanceDisplay === 'number' ? meta.deathChanceDisplay : 0;
+  if (risk > 1) {
+    risk = risk / 100;
+  }
+  return clamp01(risk);
+};
 
 const activityMatchesSlot = (activity: ActivityDefinition, slot: MapSlotDefinition): boolean => {
   const meta = (activity.metadata ?? {}) as { mapSlotId?: string } | undefined;
@@ -200,187 +221,24 @@ const validateAssignment = (params: {
   return { ok: true };
 };
 
-interface MapSlotVerbClusterProps {
-  slotId: string;
-  left: number;
-  top: number;
-  verbs: VerbSummary[];
-  cardScale: number;
-  isDropMode: boolean;
-  canAcceptDrop: boolean;
-  isHighlighted: boolean;
-  onDropResident: (slotId: string, residentId: string | null) => void;
-}
-
-function MapSlotVerbCluster({
-  slotId,
-  left,
-  top,
-  verbs,
-  cardScale,
-  isDropMode,
-  canAcceptDrop,
-  isHighlighted,
-  onDropResident,
-}: MapSlotVerbClusterProps) {
-  const [isDragOver, setIsDragOver] = useState(false);
-
-  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    if (!isDropMode || !canAcceptDrop) return;
-    event.preventDefault();
-    if (!isDragOver) {
-      setIsDragOver(true);
-    }
-  };
-
-  const handleDragLeave = () => {
-    if (!isDropMode || !isDragOver) return;
-    setIsDragOver(false);
-  };
-
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    if (!isDropMode || !canAcceptDrop) return;
-    event.preventDefault();
-    setIsDragOver(false);
-    const residentId =
-      event.dataTransfer.getData(RESIDENT_DRAG_MIME) || event.dataTransfer.getData('text/plain') || null;
-    onDropResident(slotId, residentId);
-  };
-
-  return (
-    <div
-      className={`absolute -translate-x-1/2 -translate-y-full flex flex-col items-center gap-2 pointer-events-auto transition-all duration-200 ${
-        isDropMode && canAcceptDrop ? 'drop-shadow-[0_4px_14px_rgba(251,191,36,0.25)]' : ''
-      } ${isDragOver ? 'scale-105' : ''} ${isHighlighted ? 'animate-pulse' : ''}`}
-      style={{ left: `${left}%`, top: `${top}%` }}
-      data-slot-id={slotId}
-      onDragOver={handleDragOver}
-      onDragEnter={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-      aria-dropeffect={isDropMode && canAcceptDrop ? 'copy' : undefined}
-    >
-      <div className="relative flex flex-col items-center gap-2">
-        <div
-          className={`pointer-events-none absolute -inset-7 rounded-full blur-2xl transition-all duration-300 ${
-            isHighlighted ? 'opacity-70 bg-amber-200/40' : 'opacity-0'
-          }`}
-          aria-hidden
-        />
-        <div
-          className={`pointer-events-none absolute -inset-5 rounded-full blur-xl transition-all duration-200 ${
-            isDropMode && canAcceptDrop
-              ? isDragOver
-                ? 'opacity-80 scale-110 bg-amber-300/55'
-                : 'opacity-30 bg-amber-200/30'
-              : 'opacity-0'
-          }`}
-          aria-hidden
-        />
-        {isDropMode && (
-          <span
-            className={`text-[10px] uppercase tracking-[0.3em] drop-shadow-lg ${
-              canAcceptDrop ? 'text-amber-100' : 'text-slate-500'
-            }`}
-          >
-            {canAcceptDrop ? 'Drop Resident' : 'Slot non attivo'}
-          </span>
-        )}
-        {verbs.map((verb) => {
-          const isActive = verb.progressFraction > 0 && verb.progressFraction < 1;
-          const isFinished = verb.progressFraction >= 0.999 || verb.source === 'completed';
-          return (
-            <div
-              key={verb.key}
-              className="origin-top relative"
-              style={{ transform: `scale(${cardScale})` }}
-            >
-              <VerbCardFX verb={verb} />
-              <MapMarker
-                verb={verb}
-                isActive={isActive}
-                isFinished={isFinished}
-              />
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function VerbCardFX({ verb }: { verb: VerbSummary }) {
-  const showResourcePull = verb.source === 'passive' || verb.tone === 'system';
-  const showResidentEject =
-    verb.progressFraction >= 0.98 && (verb.isJob || verb.isQuest) && (verb.assignedCount ?? 0) > 0;
-
-  if (!showResourcePull && !showResidentEject) {
-    return null;
-  }
-
-  return (
-    <div className="pointer-events-none absolute inset-0 z-10">
-      {showResourcePull && <ResourceIntakeFX />}
-      {showResidentEject && <ResidentEjectFX count={Math.max(1, verb.assignedCount)} />}
-    </div>
-  );
-}
-
-function ResourceIntakeFX() {
-  const spokes = [-25, 12, 42];
-  return (
-    <>
-      {spokes.map((deg, idx) => (
-        <div
-          key={`resource-spoke-${deg}`}
-          className="absolute left-1/2 top-1/2"
-          style={{
-            transform: `translate(-50%, -50%) rotate(${deg}deg)`,
-          }}
-        >
-          <span
-            className="block h-3 w-3 rounded-full bg-sky-200/90 shadow-[0_0_12px_rgba(56,189,248,0.55)]"
-            style={{
-              animation: `idleVillageResourceAttract 1.6s ease-in-out ${idx * 0.2}s infinite`,
-            }}
-          />
-        </div>
-      ))}
-    </>
-  );
-}
-
-function ResidentEjectFX({ count }: { count: number }) {
-  const ejectors = Math.min(count, 3);
-  return (
-    <>
-      {Array.from({ length: ejectors }).map((_, idx) => (
-        <div
-          key={`resident-eject-${idx}`}
-          className="absolute left-1/2 top-1/2"
-          style={{
-            transform: `translate(-50%, -50%) rotate(${idx === 0 ? -18 : idx === 1 ? 12 : 28}deg)`,
-          }}
-        >
-          <span
-            className="block rounded-full border border-amber-200/70 bg-amber-100/90 px-1 text-[8px] font-semibold uppercase tracking-[0.2em] text-slate-900 shadow-[0_6px_12px_rgba(0,0,0,0.35)]"
-            style={{
-              animation: `idleVillageResidentEject 1.2s cubic-bezier(0.25, 0.9, 0.4, 1) ${idx * 0.15}s infinite`,
-            }}
-          >
-            ✦
-          </span>
-        </div>
-      ))}
-    </>
-  );
-}
-
 function selectDefaultFounder(config?: IdleVillageConfig | null): FounderPreset | null {
   if (!config) return null;
   const founders = config.founders ?? {};
   return founders.founder_standard ?? Object.values(founders)[0] ?? null;
 }
+
+const pickPriorityVerb = (verbs: VerbSummary[]): VerbSummary | null => {
+  if (!verbs.length) return null;
+  const sorted = [...verbs].sort((a, b) => {
+    const aRemaining = Number.isFinite(a.remainingSeconds) ? a.remainingSeconds : Number.MAX_SAFE_INTEGER;
+    const bRemaining = Number.isFinite(b.remainingSeconds) ? b.remainingSeconds : Number.MAX_SAFE_INTEGER;
+    if (aRemaining === bRemaining) {
+      return (b.deadlineLabel ? 1 : 0) - (a.deadlineLabel ? 1 : 0);
+    }
+    return aRemaining - bRemaining;
+  });
+  return sorted[0] ?? null;
+};
 
 const IdleVillageMapPage: React.FC = () => {
   const { config } = useIdleVillageConfig();
@@ -394,6 +252,7 @@ const IdleVillageMapPage: React.FC = () => {
   const [draggingResidentId, setDraggingResidentId] = useState<string | null>(null);
   const [assignmentFeedback, setAssignmentFeedback] = useState<string | null>(null);
   const [highlightSlotId, setHighlightSlotId] = useState<string | null>(null);
+  const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
   const highlightTimeoutRef = useRef<number | null>(null);
   const lastAssignmentFeedbackRef = useRef<string | null>(null);
 
@@ -609,6 +468,12 @@ const IdleVillageMapPage: React.FC = () => {
         return false;
       }
 
+      const activityMetadata = (selectedActivity.metadata ?? {}) as {
+        supportsAutoRepeat?: boolean;
+        continuousJob?: boolean;
+      };
+      const shouldAuto = Boolean(activityMetadata.supportsAutoRepeat || activityMetadata.continuousJob);
+
       const scheduleResult = scheduleActivity(
         { config, rng: simpleRng },
         prev,
@@ -616,6 +481,8 @@ const IdleVillageMapPage: React.FC = () => {
           activityId: selectedActivity.id,
           characterIds: [resident.id],
           slotId,
+          isAuto: shouldAuto,
+          snapshotDeathRisk: deriveDeathRisk(selectedActivity),
         },
       );
 
@@ -678,42 +545,19 @@ const IdleVillageMapPage: React.FC = () => {
     [activitiesBySlot],
   );
 
-  useEffect(() => {
-    setIsResidentDragActive(false);
-    setDraggingResidentId(null);
-    setHighlightSlotId(null);
-  }, [mapLayout.pixelWidth, mapLayout.pixelHeight]);
-
-  useEffect(
-    () => () => {
-      if (highlightTimeoutRef.current !== null) {
-        window.clearTimeout(highlightTimeoutRef.current);
-      }
-    },
-    [],
-  );
-
-  const secondsPerTimeUnit = config?.globalRules.secondsPerTimeUnit ?? DEFAULT_SECONDS_PER_TIME_UNIT;
-  const dayLengthSetting = config?.globalRules.dayLengthInTimeUnits || 5;
-
-  const getResourceLabel = useCallback(
-    (resourceId: string) => {
-      const def = config?.resources?.[resourceId];
-      return def?.label ?? resourceId;
-    },
-    [config],
-  );
+  const scheduledActivities = useMemo(() => {
+    if (!villageState) return [] as ScheduledActivity[];
+    return Object.values(villageState.activities ?? {}) as ScheduledActivity[];
+  }, [villageState]);
 
   const activeActivities = useMemo(() => {
-    if (!villageState) return [] as ScheduledActivity[];
-    const all = Object.values(villageState.activities) as ScheduledActivity[];
-    return all
+    return scheduledActivities
       .filter((activity) => activity.status === 'pending' || activity.status === 'running')
       .sort((a, b) => {
         if (a.endTime === b.endTime) return a.startTime - b.startTime;
         return a.endTime - b.endTime;
       });
-  }, [villageState]);
+  }, [scheduledActivities]);
 
   const scheduledVerbSummaries = useMemo(() => {
     if (!config || !villageState) return [] as VerbSummary[];
@@ -737,14 +581,7 @@ const IdleVillageMapPage: React.FC = () => {
         });
       })
       .filter(Boolean) as VerbSummary[];
-  }, [
-    config,
-    villageState,
-    activeActivities,
-    getResourceLabel,
-    secondsPerTimeUnit,
-    dayLengthSetting,
-  ]);
+  }, [config, villageState, activeActivities, getResourceLabel, secondsPerTimeUnit, dayLengthSetting]);
 
   const questOffers = useMemo(
     () => Object.values(villageState?.questOffers ?? {}),
@@ -824,6 +661,63 @@ const IdleVillageMapPage: React.FC = () => {
     return grouped;
   }, [questOfferSummaries]);
 
+  const combinedVerbsForSlot = useCallback(
+    (slotId: string) => {
+      const slotVerbs = verbsBySlot[slotId] ?? [];
+      const slotOffers = questOffersBySlot[slotId] ?? [];
+      return [...slotVerbs, ...slotOffers];
+    },
+    [verbsBySlot, questOffersBySlot],
+  );
+
+  const selectedSlotVerbs = useMemo(() => {
+    if (!selectedSlotId) return [] as VerbSummary[];
+    return combinedVerbsForSlot(selectedSlotId);
+  }, [selectedSlotId, combinedVerbsForSlot]);
+
+  useEffect(() => {
+    if (!selectedSlotId) return;
+    if (selectedSlotVerbs.length === 0) {
+      setSelectedSlotId(null);
+    }
+  }, [selectedSlotId, selectedSlotVerbs.length]);
+
+  const handleCloseTheater = useCallback(() => {
+    setSelectedSlotId(null);
+  }, []);
+
+  const handleFocusSlot = useCallback((slotId: string) => {
+    setSelectedSlotId(slotId);
+  }, []);
+
+  const selectedSlotDefinition = selectedSlotId ? config?.mapSlots?.[selectedSlotId] ?? null : null;
+
+  useEffect(() => {
+    setIsResidentDragActive(false);
+    setDraggingResidentId(null);
+    setHighlightSlotId(null);
+  }, [mapLayout.pixelWidth, mapLayout.pixelHeight]);
+
+  useEffect(
+    () => () => {
+      if (highlightTimeoutRef.current !== null) {
+        window.clearTimeout(highlightTimeoutRef.current);
+      }
+    },
+    [],
+  );
+
+  const secondsPerTimeUnit = config?.globalRules.secondsPerTimeUnit ?? DEFAULT_SECONDS_PER_TIME_UNIT;
+  const dayLengthSetting = config?.globalRules.dayLengthInTimeUnits || 5;
+
+  const getResourceLabel = useCallback(
+    (resourceId: string) => {
+      const def = config?.resources?.[resourceId];
+      return def?.label ?? resourceId;
+    },
+    [config],
+  );
+
   const handleResidentDragStart = useCallback(
     (residentId: string) => (event: React.DragEvent<HTMLButtonElement>) => {
       event.dataTransfer.setData(RESIDENT_DRAG_MIME, residentId);
@@ -850,6 +744,155 @@ const IdleVillageMapPage: React.FC = () => {
       assignResidentToSlot(slotId, resolvedResidentId ?? null);
     },
     [assignResidentToSlot, draggingResidentId],
+  );
+
+  const handleResolveActivity = useCallback(
+    (scheduledId: string) => {
+      if (!config) return;
+
+      const fallenIds: string[] = [];
+      const heroizedIds: string[] = [];
+
+      setVillageState((prev) => {
+        if (!prev) return prev;
+        const scheduled = prev.activities[scheduledId];
+        if (!scheduled || scheduled.status !== 'completed') return prev;
+        const activity = config.activities[scheduled.activityId];
+        if (!activity) return prev;
+
+        const nextResidents: Record<string, ResidentState> = { ...prev.residents };
+        const nextActivities: Record<string, ScheduledActivity> = { ...prev.activities };
+        delete nextActivities[scheduledId];
+
+        const events: VillageEvent[] = [];
+        const trialRules: TrialOfFireRules | undefined = config.globalRules.trialOfFire;
+        const statBonusMultiplier = trialRules?.statBonusMultiplier ?? 0;
+        const heroSurvivalThreshold = trialRules?.heroSurvivalThreshold ?? null;
+
+        const resolvedRisk =
+          typeof scheduled.snapshotDeathRisk === 'number' && scheduled.snapshotDeathRisk > 0
+            ? clamp01(scheduled.snapshotDeathRisk)
+            : deriveDeathRisk(activity);
+
+        for (const cid of scheduled.characterIds) {
+          const resident = nextResidents[cid];
+          if (!resident) continue;
+
+          if (resolvedRisk > 0 && simpleRng() < resolvedRisk) {
+            fallenIds.push(resident.id);
+            events.push({
+              time: prev.currentTime,
+              type: 'trial_of_fire',
+              payload: {
+                scheduledId,
+                activityId: scheduled.activityId,
+                residentId: resident.id,
+                outcome: 'death',
+                risk: resolvedRisk,
+              },
+            });
+            delete nextResidents[cid];
+            continue;
+          }
+
+          const survivalCount = (resident.survivalCount ?? 0) + 1;
+          let updatedSnapshot = resident.statSnapshot;
+          if (updatedSnapshot && statBonusMultiplier > 0 && resolvedRisk > 0) {
+            const multiplier = 1 + resolvedRisk * statBonusMultiplier;
+            updatedSnapshot = Object.fromEntries(
+              Object.entries(updatedSnapshot).map(([key, value]) =>
+                typeof value === 'number' ? [key, value * multiplier] : [key, value],
+              ),
+            );
+          }
+
+          const becameHero =
+            !resident.isHero &&
+            (resolvedRisk > 0.3 || (heroSurvivalThreshold !== null && survivalCount >= heroSurvivalThreshold));
+
+          if (becameHero) {
+            heroizedIds.push(resident.id);
+          }
+
+          const updatedResident: ResidentState = {
+            ...resident,
+            survivalCount,
+            isHero: resident.isHero || becameHero,
+            survivalScore: (resident.survivalScore ?? 0) + resolvedRisk * 100,
+          };
+
+          if (updatedSnapshot) {
+            updatedResident.statSnapshot = updatedSnapshot;
+          }
+
+          nextResidents[cid] = updatedResident;
+
+          events.push({
+            time: prev.currentTime,
+            type: 'trial_of_fire',
+            payload: {
+              scheduledId,
+              activityId: scheduled.activityId,
+              residentId: resident.id,
+              outcome: 'survived',
+              risk: resolvedRisk,
+              becameHero,
+            },
+          });
+        }
+
+        const survivingIds = scheduled.characterIds.filter((cid) => Boolean(nextResidents[cid]));
+        const nextEventLog = events.length > 0 ? [...prev.eventLog, ...events] : prev.eventLog;
+
+        let nextState: VillageState = {
+          ...prev,
+          residents: nextResidents,
+          activities: nextActivities,
+          eventLog: nextEventLog,
+        };
+
+        const survivorsReady =
+          scheduled.isAuto &&
+          survivingIds.length === scheduled.characterIds.length &&
+          survivingIds.every((cid) => {
+            const resident = nextResidents[cid];
+            if (!resident) return false;
+            if (resident.status !== 'available') return false;
+            if (resident.fatigue >= config.globalRules.maxFatigueBeforeExhausted) return false;
+            if (typeof resident.currentHp === 'number' && resident.currentHp <= 0) return false;
+            return true;
+          });
+
+        if (survivorsReady) {
+          const autoResult = scheduleActivity(
+            { config, rng: simpleRng },
+            nextState,
+            {
+              activityId: scheduled.activityId,
+              characterIds: [...survivingIds],
+              slotId: scheduled.slotId,
+              isAuto: true,
+              snapshotDeathRisk: resolvedRisk,
+            },
+          );
+
+          if (!autoResult.error && autoResult.state) {
+            nextState = autoResult.state;
+          }
+        }
+
+        return nextState;
+      });
+
+      if (fallenIds.length > 0) {
+        setAssignmentFeedback(`Morte: ${fallenIds.join(', ')}`);
+      } else if (heroizedIds.length > 0) {
+        setAssignmentFeedback(`Eroe promosso: ${heroizedIds.join(', ')}`);
+      } else {
+        setAssignmentFeedback('Attività risolta');
+      }
+    },
+    [config, setAssignmentFeedback],
   );
 
   if (!config || !villageState) {
@@ -891,6 +934,20 @@ const IdleVillageMapPage: React.FC = () => {
             }}
           />
           <div className="absolute inset-0 bg-obsidian/45" aria-hidden="true" />
+
+          <div className="pointer-events-none absolute inset-y-6 right-6 z-30 flex max-h-full items-start justify-end">
+            <ActiveActivityHUD
+              activities={scheduledActivities}
+              config={config}
+              currentTime={villageState.currentTime}
+              secondsPerTimeUnit={secondsPerTimeUnit}
+              dayLength={dayLengthSetting}
+              residents={villageState.residents}
+              getResourceLabel={getResourceLabel}
+              onResolve={handleResolveActivity}
+              className="pointer-events-auto"
+            />
+          </div>
 
           <div className="absolute top-4 left-4 right-4 z-20 flex flex-col gap-3 max-w-5xl">
             <div className="flex flex-row gap-3 items-start">
@@ -950,18 +1007,27 @@ const IdleVillageMapPage: React.FC = () => {
             />
           </div>
 
+          {selectedSlotId && selectedSlotDefinition && selectedSlotVerbs.length > 0 && (
+            <TheaterView
+              slotLabel={selectedSlotDefinition.label ?? selectedSlotId}
+              slotIcon={selectedSlotDefinition.icon}
+              panoramaUrl={undefined}
+              verbs={selectedSlotVerbs}
+              onClose={handleCloseTheater}
+            />
+          )}
+
           <div className="absolute inset-0 z-10" style={{ transformStyle: 'preserve-3d' }}>
             {mapSlotLayout.map(({ slot, left, top }) => {
-              const slotVerbs = verbsBySlot[slot.id] ?? [];
-              const slotOffers = questOffersBySlot[slot.id] ?? [];
-              const combined = [...slotVerbs, ...slotOffers];
+              const combined = combinedVerbsForSlot(slot.id);
               if (combined.length === 0) {
                 return null;
               }
+              const priorityVerb = pickPriorityVerb(combined);
               return (
                 <MapSlotVerbCluster
                   key={slot.id}
-                  slotId={slot.id}
+                  slot={slot}
                   left={left}
                   top={top}
                   verbs={combined}
@@ -969,7 +1035,10 @@ const IdleVillageMapPage: React.FC = () => {
                   isDropMode={isResidentDragActive}
                   canAcceptDrop={canSlotAcceptDrop(slot.id)}
                   isHighlighted={highlightSlotId === slot.id}
+                  isOpen={selectedSlotId === slot.id}
+                  priorityVerb={priorityVerb}
                   onDropResident={handleDropResident}
+                  onFocusSlot={handleFocusSlot}
                 />
               );
             })}
