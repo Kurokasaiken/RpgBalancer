@@ -1,5 +1,4 @@
 import type { AxisMetaEntry } from './altVisualsAxis';
-import { getAltVisualsV8ManifestUrl } from './altVisualsV8Manifest';
 
 export type AltVisualsV8TimelinePhase = 'enemyColumns' | 'puddleMorph' | 'heroAscend' | 'settle';
 
@@ -86,9 +85,11 @@ export const ALT_VISUALS_V8_AXIS_META: readonly AxisMetaEntry[] = [
   { name: 'Resolve', icon: '◉' },
 ] as const;
 
+const ALT_VISUALS_V8_MANIFEST_URL = '/assets/alt-visuals/v8/manifest.json';
+
 export const ALT_VISUALS_V8_THEME: AltVisualsV8Theme = {
   id: 'alt-v8',
-  manifestUrl: getAltVisualsV8ManifestUrl(),
+  manifestUrl: ALT_VISUALS_V8_MANIFEST_URL,
   axisCount: 5,
   axisMetaFallback: ALT_VISUALS_V8_AXIS_META,
   palette: {

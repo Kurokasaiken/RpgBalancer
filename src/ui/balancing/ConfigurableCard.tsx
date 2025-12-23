@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import type { CardDefinition, StatDefinition } from '../../balancing/config/types';
 import { ConfigurableStat } from './ConfigurableStat';
-import { DndContext, closestCenter, type DragEndEvent } from '@dnd-kit/core';
+import { DndContext, closestCenter } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
@@ -16,7 +16,7 @@ interface Props {
   onResetCard?: () => void;
   onAddStat?: () => void;
   onOpenStatEditor?: (statId?: string) => void;
-  onOpenCardEditor?: (statId?: string) => void;
+  onOpenCardEditor?: () => void;
   newStatId?: string;
   onUpdateCard?: (updates: Partial<CardDefinition>) => void;
   onDeleteCard?: () => void;
@@ -27,7 +27,22 @@ interface Props {
   errorHighlights?: Record<string, boolean>;
 }
 
-const SortableStat: React.FC<any> = ({
+interface SortableStatProps {
+  stat: StatDefinition;
+  simValues: Record<string, number>;
+  onSimValueChange: (statId: string, value: number) => void;
+  onEditStat: (statId: string, updates: Partial<StatDefinition>) => void;
+  onDeleteStat: (statId: string) => void;
+  onResetStat?: (statId: string) => void;
+  newStatId?: string;
+  availableStats: { id: string; label: string }[];
+  canDelete: boolean;
+  isDependencyHighlighted?: boolean;
+  hasError?: boolean;
+  onOpenStatEditor?: (statId?: string) => void;
+}
+
+const SortableStat: React.FC<SortableStatProps> = ({
   stat,
   simValues,
   onSimValueChange,
@@ -56,9 +71,9 @@ const SortableStat: React.FC<any> = ({
         simValue={simValues[stat.id] ?? stat.defaultValue}
         onSimValueChange={(value) => onSimValueChange(stat.id, value)}
         allSimValues={simValues}
-        onUpdate={onEditStat}
-        onDelete={onDeleteStat}
-        onReset={onResetStat}
+        onUpdate={(updates) => onEditStat(stat.id, updates)}
+        onDelete={() => onDeleteStat(stat.id)}
+        onReset={onResetStat ? () => onResetStat(stat.id) : undefined}
         startInEdit={stat.id === newStatId}
         availableStats={availableStats}
         canDelete={canDelete}
@@ -95,36 +110,39 @@ export const ConfigurableCard: React.FC<Props> = ({
   const orderedStats = card.statIds.map((id) => stats[id]).filter(Boolean);
   const [isEditingHeader, setIsEditingHeader] = useState(!!startHeaderInEdit);
   const [title, setTitle] = useState(card.title);
-  const [color, setColor] = useState(card.color);
-  const [icon, setIcon] = useState(card.icon || '');
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showIconPicker, setShowIconPicker] = useState(false);
-
-  const iconLibrary = ['⚔️', '🛡️', '✨', '🔥', '❄️', '🌊', '🌿', '💀', '🐉', '🔮', '🏹', '⚒️', '📜', '🏰', '🪙', '💎'];
-  const displayIcon = icon || card.icon || '⚔️';
+  const displayIcon = card.icon || '⚔️';
   const dragHandleProps = !isEditingHeader && dragListeners ? dragListeners : undefined;
 
   const handleHeaderSave = () => {
     if (!onUpdateCard) { setIsEditingHeader(false); return; }
     const updates: Partial<CardDefinition> = {};
     if (title.trim() !== card.title) updates.title = title.trim();
-    if (color !== card.color) updates.color = color;
-    if (icon !== (card.icon || '')) updates.icon = icon || undefined;
     if (Object.keys(updates).length > 0) onUpdateCard(updates);
     setIsEditingHeader(false);
+  };
+
+  const handleResetCard = () => {
+    if (!onResetCard) return;
+    onResetCard();
+  };
+
+  const handleDeleteCard = () => {
+    if (!onDeleteCard) return;
+    const confirmDelete = window.confirm(`Eliminare la card "${card.title}"?`);
+    if (confirmDelete) onDeleteCard();
   };
 
   const statsGridClassName = orderedStats.length >= 4 ? 'grid gap-2 grid-cols-1 md:grid-cols-2' : 'grid gap-2 grid-cols-1';
 
   return (
     <div className={`heroic-card flex flex-col gap-2 transition-all ${
-      isEditingHeader ? 'ring-2 ring-[var(--bronze-glow)]/50' : ''
+      isEditingHeader ? 'ring-2 ring-(--bronze-glow)/50' : ''
     }`}>
       
       {/* Header in Marmo (heroic-header) */}
       <div className="heroic-header flex items-start gap-2 relative z-10">
         {dragHandleProps && (
-          <button type="button" className="mt-0.5 text-[var(--sienna-shadow)] opacity-70 hover:opacity-100 cursor-grab active:cursor-grabbing" {...dragHandleProps}>
+          <button type="button" className="mt-0.5 text-(--sienna-shadow) opacity-70 hover:opacity-100 cursor-grab active:cursor-grabbing" {...dragHandleProps}>
             <span className="text-lg">⋮⋮</span>
           </button>
         )}
@@ -133,7 +151,7 @@ export const ConfigurableCard: React.FC<Props> = ({
           <div className="flex items-center gap-2 min-w-0">
             {isEditingHeader ? (
               <input 
-                className="bg-black/20 border-b border-[var(--bronze-aged)] font-heroic text-sm px-2 py-1 outline-none"
+                className="bg-black/20 border-b border-(--bronze-aged) font-heroic text-sm px-2 py-1 outline-none"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
@@ -156,17 +174,31 @@ export const ConfigurableCard: React.FC<Props> = ({
             >
               {isEditingHeader ? '✔' : '✎'}
             </button>
-            {!isEditingHeader && onUpdateCard && (
-              <button type="button" className="btn-heroic p-1 text-xs" onClick={() => onUpdateCard({ isHidden: true })}>
-                👁
-              </button>
+            {!isEditingHeader && (
+              <>
+                {onResetCard && (
+                  <button type="button" className="btn-heroic p-1 text-xs" onClick={handleResetCard} title="Reset card">
+                    ↺
+                  </button>
+                )}
+                {onOpenCardEditor && (
+                  <button type="button" className="btn-heroic p-1 text-xs" onClick={onOpenCardEditor} title="Apri editor card">
+                    ✹
+                  </button>
+                )}
+                {onDeleteCard && (
+                  <button type="button" className="btn-heroic p-1 text-xs text-rose-200 hover:text-rose-50" onClick={handleDeleteCard} title="Elimina card">
+                    ✖
+                  </button>
+                )}
+              </>
             )}
           </div>
         </div>
       </div>
 
       {/* Area Contenuto (Basalto) */}
-      <div className="p-3 space-y-2 bg-[var(--panel-basalt)]/50">
+      <div className="p-3 space-y-2 bg-(--panel-basalt)/50">
         <DndContext collisionDetection={closestCenter} onDragEnd={(e) => {
            const { active, over } = e;
            if (over && active.id !== over.id) {
@@ -183,8 +215,10 @@ export const ConfigurableCard: React.FC<Props> = ({
                   stat={stat}
                   simValues={simValues}
                   onSimValueChange={onSimValueChange}
-                  onEditStat={(u: any) => onEditStat(stat.id, u)}
-                  onDeleteStat={() => onDeleteStat(stat.id)}
+                  onEditStat={(id, updates) => onEditStat(id, updates)}
+                  onDeleteStat={(id) => onDeleteStat(id)}
+                  onResetStat={onResetStat}
+                  newStatId={newStatId}
                   availableStats={availableStats}
                   canDelete={!stat.isCore}
                   isDependencyHighlighted={dependencyHighlights?.[stat.id]}
@@ -197,7 +231,7 @@ export const ConfigurableCard: React.FC<Props> = ({
         </DndContext>
 
         {onAddStat && (
-          <button type="button" onClick={onAddStat} className="w-full py-2 border border-dashed border-[var(--bronze-aged)] text-[var(--bronze-aged)] font-heroic text-[10px] uppercase tracking-widest hover:bg-[var(--bronze-glow)]/5">
+          <button type="button" onClick={onAddStat} className="w-full py-2 border border-dashed border-(--bronze-aged) text-(--bronze-aged) font-heroic text-[10px] uppercase tracking-widest hover:bg-(--bronze-glow)/5">
             ＋ Aggiungi Stat
           </button>
         )}

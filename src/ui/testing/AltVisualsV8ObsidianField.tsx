@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { deriveAxisValues, randomizeAxisValues } from './altVisualsAxis';
 import type { StatRow } from './types';
@@ -707,7 +707,7 @@ function initAltVisualsV8(
     ctx.translate(centerX - 320, centerY - 320); // Center adjustment
 
     drawGrid(ctx);
-    drawTarAnimation(ctx, internalState, heroicMaterials);
+    drawTarAnimation(ctx, internalState);
     drawGoldStar(ctx, internalState, heroicMaterials);
     // drawPillars ora usa la nuova logica dei monoliti
     drawPillars(ctx, internalState, ivoryImg);
@@ -1290,7 +1290,7 @@ function drawParticles(ctx: CanvasRenderingContext2D, state: InternalState) {
 }
 
 // --- DISEGNO CATRAME E STELLA (Invariati, usano i colori della config) ---
-function drawTarAnimation(ctx: CanvasRenderingContext2D, state: InternalState, materials: HeroicMaterials) {
+function drawTarAnimation(ctx: CanvasRenderingContext2D, state: InternalState) {
   if (!state.tarPuddle.active || state.tarPuddle.radius <= 0) return;
 
   const center = canvasCenter(state);
