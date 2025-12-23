@@ -18,6 +18,19 @@ const VISUAL_CONFIG = {
   particleCount: 24,
   particleLifetime: 700,
   screenShakeIntensity: 5,
+  ballTargetOffsets: {
+    successInset: 14,
+    failureOutset: 18,
+  },
+  ballPath: {
+    chaosDamping: 0.985,
+    chaosImpulse: 1.2,
+    residualNoise: 0.24,
+    followStrengthRange: [0.035, 0.12] as const,
+    bezierDeviation: 0.22,
+    maxSpeedMultiplier: 1.25,
+    globalDrag: 0.994,
+  },
   colors: {
     pentagonFill: '#050505',
     pentagonGlow: 'rgba(20,20,30,0.85)',
@@ -52,6 +65,30 @@ interface MorphShapeState {
   morphProgress: number;
 }
 
+function randomPointOnPolygonEdges(vertices: { x: number; y: number }[]) {
+  if (vertices.length === 0) return null;
+  const edgeIndex = Math.floor(Math.random() * vertices.length);
+  const start = vertices[edgeIndex];
+  const end = vertices[(edgeIndex + 1) % vertices.length];
+  const t = Math.random();
+  return {
+    x: start.x + (end.x - start.x) * t,
+    y: start.y + (end.y - start.y) * t,
+  };
+}
+
+function movePointTowardCenter(point: { x: number; y: number }, center: { x: number; y: number }, distance: number) {
+  const dx = point.x - center.x;
+  const dy = point.y - center.y;
+  const len = Math.hypot(dx, dy) || 1;
+  const nx = dx / len;
+  const ny = dy / len;
+  return {
+    x: point.x - nx * distance,
+    y: point.y - ny * distance,
+  };
+}
+
 function tracePerfectStar(ctx: CanvasRenderingContext2D, center: { x: number; y: number }, radius: number) {
   for (let i = 0; i < AXES * 2; i += 1) {
     const angle = -Math.PI / 2 + i * (Math.PI / AXES);
@@ -82,6 +119,14 @@ interface BallState {
   guidanceDelay: number;
   targetArrivalTime: number;
   forcedOutcome: boolean | null;
+  curveInitialized: boolean;
+  curveDuration: number;
+  curveStartX: number;
+  curveStartY: number;
+  curveControl1X: number;
+  curveControl1Y: number;
+  curveControl2X: number;
+  curveControl2Y: number;
 }
 
 interface AltVisualsController {
@@ -282,6 +327,14 @@ function initAltVisualsV6(
       guidanceDelay: 0,
       targetArrivalTime: 0,
       forcedOutcome: null,
+      curveInitialized: false,
+      curveDuration: 0,
+      curveStartX: 320,
+      curveStartY: 320,
+      curveControl1X: 320,
+      curveControl1Y: 320,
+      curveControl2X: 320,
+      curveControl2Y: 320,
     },
     baseEnemyValues: [...axisValues.enemy],
     basePlayerValues: [...axisValues.player],
@@ -632,37 +685,29 @@ function updateBall(state: InternalState) {
   }
 
   if (elapsed < state.ball.guidanceDelay) {
-    state.ball.vx *= 1.01;
-    state.ball.vy *= 1.01;
-    state.ball.vx += (Math.random() - 0.5) * 0.9;
-    state.ball.vy += (Math.random() - 0.5) * 0.9;
+    state.ball.vx = (state.ball.vx + (Math.random() - 0.5) * VISUAL_CONFIG.ballPath.chaosImpulse) * VISUAL_CONFIG.ballPath.chaosDamping;
+    state.ball.vy = (state.ball.vy + (Math.random() - 0.5) * VISUAL_CONFIG.ballPath.chaosImpulse) * VISUAL_CONFIG.ballPath.chaosDamping;
   } else {
-    const slowdown = 0.99 - Math.min((elapsed - state.ball.guidanceDelay) / GUIDANCE_PHASE_DURATION_MS, 0.02);
-    state.ball.vx *= slowdown;
-    state.ball.vy *= slowdown;
+    state.ball.vx *= VISUAL_CONFIG.ballPath.globalDrag;
+    state.ball.vy *= VISUAL_CONFIG.ballPath.globalDrag;
   }
 
   const guidanceStart = state.ball.guidanceDelay;
-  const easePhaseStart = state.ball.targetArrivalTime - FINAL_EASE_DURATION_MS - state.ball.startTime;
 
   if (state.ball.targetAssigned && elapsed >= guidanceStart) {
-    const dx = state.ball.targetX - state.ball.x;
-    const dy = state.ball.targetY - state.ball.y;
-    const distance = Math.hypot(dx, dy) || 1;
-    const desiredVx = (dx / distance) * Math.max(6, state.ball.speed * 0.6);
-    const desiredVy = (dy / distance) * Math.max(6, state.ball.speed * 0.6);
-    const guidanceWindow = Math.max(1, easePhaseStart - guidanceStart);
-    const steerFactor = 0.04 + Math.min((elapsed - guidanceStart) / guidanceWindow, 1) * 0.08;
-    state.ball.vx += (desiredVx - state.ball.vx) * steerFactor;
-    state.ball.vy += (desiredVy - state.ball.vy) * steerFactor;
-  }
+    initializeBallCurve(state);
+    const guidanceElapsed = elapsed - guidanceStart;
+    const t = clamp(guidanceElapsed / Math.max(1, state.ball.curveDuration), 0, 1);
+    const curvePoint = sampleBallCurve(state, t);
+    const followStrength = lerp(VISUAL_CONFIG.ballPath.followStrengthRange[0], VISUAL_CONFIG.ballPath.followStrengthRange[1], easeInOutCubic(t));
+    state.ball.vx += (curvePoint.x - state.ball.x) * followStrength;
+    state.ball.vy += (curvePoint.y - state.ball.y) * followStrength;
 
-  if (state.ball.targetAssigned && elapsed >= easePhaseStart) {
-    const easeProgress = clamp((elapsed - easePhaseStart) / FINAL_EASE_DURATION_MS, 0, 1);
-    const easeStrength = 0.15 + easeProgress * 0.8;
-    state.ball.x += (state.ball.targetX - state.ball.x) * easeStrength;
-    state.ball.y += (state.ball.targetY - state.ball.y) * easeStrength;
-    if (easeProgress >= 1) {
+    // Residual jitter so it never feels locked-on
+    state.ball.vx += (Math.random() - 0.5) * VISUAL_CONFIG.ballPath.residualNoise * (1 - t);
+    state.ball.vy += (Math.random() - 0.5) * VISUAL_CONFIG.ballPath.residualNoise * (1 - t);
+
+    if (t >= 1) {
       state.ball.x = state.ball.targetX;
       state.ball.y = state.ball.targetY;
       state.ball.vx = 0;
@@ -1083,19 +1128,34 @@ function rollForOutcome(state: InternalState) {
 function assignBallTarget(state: InternalState) {
   const starVertices = getStarVertices(state);
   const pentagonVertices = getPentagonVertices(state);
+  const center = canvasCenter(state);
 
   if (state.ball.forcedOutcome === null) {
     state.ball.targetAssigned = false;
     return;
   }
 
-  const targetPoint = state.ball.forcedOutcome
-    ? randomPointInsidePolygon(starVertices) ?? { x: canvasCenter(state).x, y: canvasCenter(state).y }
-    : randomPointInsidePolygon(pentagonVertices, (x, y) => !isPointInPolygon(x, y, starVertices)) ??
-      { x: canvasCenter(state).x, y: canvasCenter(state).y };
+  if (state.ball.forcedOutcome) {
+    const edgePoint = randomPointOnPolygonEdges(starVertices) ?? center;
+    const inset = VISUAL_CONFIG.ballTargetOffsets.successInset;
+    const targetPoint = movePointTowardCenter(edgePoint, center, inset);
+    state.ball.targetX = targetPoint.x;
+    state.ball.targetY = targetPoint.y;
+  } else {
+    const edgePoint = randomPointOnPolygonEdges(starVertices) ?? randomPointOnPolygonEdges(pentagonVertices) ?? center;
+    const outset = VISUAL_CONFIG.ballTargetOffsets.failureOutset;
+    let targetPoint = movePointTowardCenter(edgePoint, center, -outset);
 
-  state.ball.targetX = targetPoint.x;
-  state.ball.targetY = targetPoint.y;
+    if (!isPointInPolygon(targetPoint.x, targetPoint.y, pentagonVertices) || isPointInPolygon(targetPoint.x, targetPoint.y, starVertices)) {
+      targetPoint =
+        randomPointInsidePolygon(pentagonVertices, (x, y) => !isPointInPolygon(x, y, starVertices)) ??
+        movePointTowardCenter(edgePoint, center, 0);
+    }
+
+    state.ball.targetX = targetPoint.x;
+    state.ball.targetY = targetPoint.y;
+  }
+
   state.ball.targetAssigned = true;
 }
 
@@ -1118,6 +1178,14 @@ function startBallLaunch(state: InternalState, options: { skipReadinessCheck?: b
   state.ball.targetArrivalTime = state.ball.startTime + BALL_TOTAL_DURATION_MS;
   state.ball.x = canvasCenter(state).x;
   state.ball.y = canvasCenter(state).y;
+  state.ball.curveInitialized = false;
+  state.ball.curveDuration = GUIDANCE_PHASE_DURATION_MS;
+  state.ball.curveStartX = state.ball.x;
+  state.ball.curveStartY = state.ball.y;
+  state.ball.curveControl1X = state.ball.x;
+  state.ball.curveControl1Y = state.ball.y;
+  state.ball.curveControl2X = state.ball.x;
+  state.ball.curveControl2Y = state.ball.y;
 
   state.successChance = calculateSuccessChance(state);
   const forcedSuccess = rollForOutcome(state);
@@ -1128,6 +1196,66 @@ function startBallLaunch(state: InternalState, options: { skipReadinessCheck?: b
   const launchSpeed = state.ball.speed * 1.4;
   state.ball.vx = Math.cos(launchAngle) * launchSpeed;
   state.ball.vy = Math.sin(launchAngle) * launchSpeed;
+}
+
+function initializeBallCurve(state: InternalState) {
+  if (!state.ball.targetAssigned || state.ball.curveInitialized) return;
+
+  state.ball.curveStartX = state.ball.x;
+  state.ball.curveStartY = state.ball.y;
+  const toTarget = {
+    x: state.ball.targetX - state.ball.curveStartX,
+    y: state.ball.targetY - state.ball.curveStartY,
+  };
+  const distance = Math.hypot(toTarget.x, toTarget.y) || 1;
+  const approachDir = {
+    x: toTarget.x / distance,
+    y: toTarget.y / distance,
+  };
+  const currentSpeed = Math.hypot(state.ball.vx, state.ball.vy) || state.ball.speed;
+  const velocityDir = {
+    x: state.ball.vx / (currentSpeed || 1),
+    y: state.ball.vy / (currentSpeed || 1),
+  };
+
+  const deviation = distance * VISUAL_CONFIG.ballPath.bezierDeviation;
+  const orthX = -approachDir.y;
+  const orthY = approachDir.x;
+  const wobble = (scale = 1) => (Math.random() - 0.5) * deviation * scale;
+
+  const control1Distance = Math.min(distance * 0.45, currentSpeed * 14);
+  state.ball.curveControl1X = state.ball.curveStartX + velocityDir.x * control1Distance + orthX * wobble(0.4);
+  state.ball.curveControl1Y = state.ball.curveStartY + velocityDir.y * control1Distance + orthY * wobble(0.4);
+
+  const control2Distance = distance * 0.65;
+  state.ball.curveControl2X = state.ball.targetX - approachDir.x * control2Distance + orthX * wobble(0.7);
+  state.ball.curveControl2Y = state.ball.targetY - approachDir.y * control2Distance + orthY * wobble(0.7);
+  state.ball.curveDuration = state.ball.targetArrivalTime - (state.ball.startTime + state.ball.guidanceDelay);
+  state.ball.curveInitialized = true;
+}
+
+function sampleBallCurve(state: InternalState, t: number) {
+  const x = cubicBezier(state.ball.curveStartX, state.ball.curveControl1X, state.ball.curveControl2X, state.ball.targetX, t);
+  const y = cubicBezier(state.ball.curveStartY, state.ball.curveControl1Y, state.ball.curveControl2Y, state.ball.targetY, t);
+  return { x, y };
+}
+
+function cubicBezier(p0: number, p1: number, p2: number, p3: number, t: number) {
+  const oneMinusT = 1 - t;
+  return (
+    oneMinusT ** 3 * p0 +
+    3 * oneMinusT ** 2 * t * p1 +
+    3 * oneMinusT * t ** 2 * p2 +
+    t ** 3 * p3
+  );
+}
+
+function easeInOutCubic(t: number) {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+function lerp(a: number, b: number, t: number) {
+  return a + (b - a) * t;
 }
 
 function randomPointInsidePolygon(

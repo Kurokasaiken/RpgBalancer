@@ -77,7 +77,7 @@ export function buildActivityBlueprintSummary(params: {
   const maxCrew =
     ((activity.metadata ?? {}) as { maxCrewSize?: number })?.maxCrewSize ?? (activity.slotTags?.length ? activity.slotTags.length : 1);
 
-  return {
+  const summary: VerbSummary = {
     key: `activity_blueprint_${activity.id}`,
     source: 'blueprint',
     slotId,
@@ -103,7 +103,9 @@ export function buildActivityBlueprintSummary(params: {
     riskLabel: createRiskLabel(injury, death),
     notes: activity.description ?? null,
     autoState,
-  };
+    };
+
+  return summary;
 }
 
 const toneToVariantMap: Record<VerbTone, VerbVisualVariant> = {
@@ -318,6 +320,11 @@ export function buildScheduledVerbSummary(params: {
   const remainingSeconds = Math.max(0, totalDurationSeconds - elapsedSeconds);
 
   const { injury, death } = deriveRisk(params.activity);
+  const snapshotDeathPercent =
+    typeof params.scheduled.snapshotDeathRisk === 'number'
+      ? clamp01(params.scheduled.snapshotDeathRisk) * 100
+      : null;
+  const deathPercentage = snapshotDeathPercent ?? death;
   const isQuest = params.activity.tags?.includes('quest') ?? false;
   const isJob = params.activity.tags?.includes('job') ?? false;
   const rewardsLabel = formatRewardLabel(params.activity.rewards, params.resourceLabeler);

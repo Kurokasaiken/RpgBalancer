@@ -24,7 +24,6 @@ import {
   createVillageStateFromConfig,
   scheduleActivity,
   resolveActivityOutcome,
-  type ResolveActivityOutcomeResult,
   type ResidentState,
   type ScheduledActivity,
   type VillageState,
@@ -50,36 +49,8 @@ import {
 import ResidentRoster from '@/ui/idleVillage/ResidentRoster';
 import MapSlotVerbCluster from '@/ui/idleVillage/components/MapSlotVerbCluster';
 import TheaterView from '@/ui/idleVillage/components/TheaterView';
-import { RESIDENT_DRAG_MIME } from '@/ui/idleVillage/constants';
+import MapLocationSlot from '@/ui/idleVillage/components/MapLocationSlot';
 import ActiveActivityHUD from '@/ui/idleVillage/ActiveActivityHUD';
-
-const DEFAULT_CARD_SCALE = 0.45;
-const FX_KEYFRAMES = `
-@keyframes idleVillageResourceAttract {
-  0% {
-    transform: translate3d(-48px, 32px, 0) scale(0.4);
-    opacity: 0;
-  }
-  35% {
-    opacity: 1;
-  }
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
-    opacity: 0;
-  }
-}
-
-@keyframes idleVillageResidentEject {
-  0% {
-    transform: translate3d(0, 0, 0) scale(0.95);
-    opacity: 1;
-  }
-  100% {
-    transform: translate3d(56px, -58px, 0) scale(0.55);
-    opacity: 0;
-  }
-}
-`;
 
 interface IdleVillageResetOptions {
   founderId?: string;
@@ -242,7 +213,7 @@ const IdleVillageMapPage: React.FC = () => {
   const villageStateRef = useRef<VillageState | null>(null);
   const { showToast, toasts, removeToast } = useToast();
   const [isPlaying, setIsPlaying] = useState(false);
-  const [cardScale, setCardScale] = useState(DEFAULT_CARD_SCALE);
+  const [cardScale, setCardScale] = useState(0.9);
   const [isResidentDragActive, setIsResidentDragActive] = useState(false);
   const [lastDropSlotId, setLastDropSlotId] = useState<string | null>(null);
   const [draggingResidentId, setDraggingResidentId] = useState<string | null>(null);
@@ -737,7 +708,7 @@ const IdleVillageMapPage: React.FC = () => {
   const handleResidentDragStart = useCallback(
     (residentId: string) => (event: React.DragEvent<HTMLButtonElement>) => {
       console.log('Drag iniziato:', residentId);
-      event.dataTransfer.setData(RESIDENT_DRAG_MIME, residentId);
+      event.dataTransfer.setData('text/resident-id', residentId);
       event.dataTransfer.setData('text/plain', residentId);
       event.dataTransfer.effectAllowed = 'copy';
       setIsResidentDragActive(true);
@@ -752,8 +723,32 @@ const IdleVillageMapPage: React.FC = () => {
     setDraggingResidentId(null);
   }, []);
 
+  const compatibleSlotIds = useMemo(() => {
+    if (!draggingResidentId || !villageState || !config) return new Set<string>();
+    const resident = villageState.residents[draggingResidentId];
+    if (!resident) return new Set<string>();
+    const slotsRecord = config.mapSlots ?? {};
+    const result = new Set<string>();
+    Object.entries(slotsRecord).forEach(([slotId, slotDef]) => {
+      const candidateActivities = activitiesBySlot[slotId] ?? [];
+      const canAssign = candidateActivities.some((activity) =>
+        validateAssignment({
+          resident,
+          slot: slotDef,
+          activity,
+          config,
+        }).ok,
+      );
+      if (canAssign) {
+        result.add(slotId);
+      }
+    });
+    return result;
+  }, [activitiesBySlot, config, draggingResidentId, villageState]);
+
   const handleDropResident = useCallback(
-    (slotId: string, residentId: string | null) => {
+    (slotId: string | null, residentId: string | null) => {
+      if (!slotId) return;
       const resolvedResidentId = residentId ?? draggingResidentId;
       setIsResidentDragActive(false);
       setDraggingResidentId(null);
@@ -766,17 +761,14 @@ const IdleVillageMapPage: React.FC = () => {
   const handleResolveActivity = useCallback(
     (scheduledId: string) => {
       if (!config) return;
+      const prev = villageStateRef.current;
+      if (!prev) return;
 
-      let outcome: ResolveActivityOutcomeResult | null = null;
+      const resolution = resolveActivityOutcome({ config, rng: simpleRng }, prev, scheduledId);
+      villageStateRef.current = resolution.state;
+      setVillageState(resolution.state);
 
-      setVillageState((prev) => {
-        if (!prev) return prev;
-        const resolution = resolveActivityOutcome({ config, rng: simpleRng }, prev, scheduledId);
-        outcome = resolution.outcome;
-        villageStateRef.current = resolution.state;
-        return resolution.state;
-      });
-
+      const outcome = resolution.outcome;
       if (!outcome) {
         return;
       }
@@ -825,7 +817,6 @@ const IdleVillageMapPage: React.FC = () => {
 
   return (
     <>
-      <style>{FX_KEYFRAMES}</style>
       <div
         className="min-h-screen bg-[radial-gradient(circle_at_top,#020617_0,#020617_55%,#000000_100%)] text-ivory flex items-center"
         style={{ perspective: '2000px' }}
@@ -859,7 +850,7 @@ const IdleVillageMapPage: React.FC = () => {
             />
           </div>
 
-          <div className="absolute top-4 left-4 right-4 z-20 flex flex-col gap-3 max-w-5xl">
+          <div className="absolute top-4 left-4 right-4 z-10 flex flex-col gap-3 max-w-5xl pointer-events-auto">
             <div className="flex flex-row gap-3 items-start">
               <div className="flex flex-col items-center gap-1">
                 <div className="origin-top" style={{ transform: 'scale(0.75)' }}>
@@ -917,41 +908,65 @@ const IdleVillageMapPage: React.FC = () => {
             />
           </div>
 
-          {selectedSlotId && selectedSlotDefinition && (
-            <TheaterView
-              slotLabel={selectedSlotDefinition.label ?? selectedSlotId}
-              slotIcon={selectedSlotDefinition.icon}
-              panoramaUrl={undefined}
-              verbs={selectedSlotVerbs}
-              onClose={handleCloseTheater}
-            />
-          )}
-
-          <div className="absolute inset-0 z-10" style={{ transformStyle: 'preserve-3d' }}>
+          <div className="absolute inset-0 z-10 pointer-events-none" style={{ transformStyle: 'preserve-3d' }}>
             {mapSlotLayout.map(({ slot, left, top }) => {
               const combined = combinedVerbsForSlot(slot.id);
-              const priorityVerb = pickPriorityVerb(combined);
+              const canAcceptDrop = canSlotAcceptDrop(slot.id);
+              const isActiveDropTarget = Boolean(draggingResidentId && compatibleSlotIds.has(slot.id));
+
+              if (combined.length <= 2) {
+                return (
+                  <MapSlotVerbCluster
+                    key={slot.id}
+                    slot={slot}
+                    left={left}
+                    top={top}
+                    verbs={combined}
+                    cardScale={cardScale}
+                    isDropMode={isResidentDragActive}
+                    canAcceptDrop={canAcceptDrop}
+                    isActiveDropTarget={isActiveDropTarget}
+                    isHighlighted={highlightSlotId === slot.id}
+                    isSelected={selectedSlotId === slot.id}
+                    onDropResident={handleDropResident}
+                    onSelectSlot={handleFocusSlot}
+                  />
+                );
+              }
+
               return (
-                <MapSlotVerbCluster
+                <MapLocationSlot
                   key={slot.id}
                   slot={slot}
                   left={left}
                   top={top}
                   verbs={combined}
-                  cardScale={cardScale}
+                  isSelected={selectedSlotId === slot.id}
                   isDropMode={isResidentDragActive}
-                  canAcceptDrop={canSlotAcceptDrop(slot.id)}
+                  isActiveDropTarget={isActiveDropTarget}
                   isHighlighted={highlightSlotId === slot.id}
-                  isOpen={selectedSlotId === slot.id}
-                  priorityVerb={priorityVerb}
+                  canAcceptDrop={canAcceptDrop}
+                  onSelect={handleFocusSlot}
                   onDropResident={handleDropResident}
-                  onFocusSlot={handleFocusSlot}
                 />
               );
             })}
           </div>
         </section>
       </div>
+      {selectedSlotId && selectedSlotDefinition && (
+        <TheaterView
+          slotLabel={selectedSlotDefinition.label ?? selectedSlotId}
+          slotIcon={selectedSlotDefinition.icon}
+          panoramaUrl={undefined}
+          verbs={selectedSlotVerbs}
+          onClose={handleCloseTheater}
+          acceptResidentDrop={Boolean(
+            isResidentDragActive && draggingResidentId && compatibleSlotIds.has(selectedSlotId),
+          )}
+          onResidentDrop={(residentId) => handleDropResident(selectedSlotId, residentId)}
+        />
+      )}
       <ToastContainer toasts={toasts} onRemove={removeToast} />
     </>
   );

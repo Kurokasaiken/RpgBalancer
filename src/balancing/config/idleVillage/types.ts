@@ -4,6 +4,7 @@
 // so new content can be added purely via config/UI.
 
 import type { AppNavTabId } from '@/shared/navigation/navConfig';
+import type { StatBlock } from '@/balancing/types';
 
 export interface ResourceDefinition {
   id: string;
@@ -280,6 +281,15 @@ export interface FounderPreset {
    * Falls back to `[difficultyTag]` when omitted.
    */
   statTags?: string[];
+  /**
+   * Optional stat snapshot applied directly to the resident on spawn.
+   * Enables config-first hero definitions without external archetype exports.
+   */
+  statSnapshot?: Partial<StatBlock>;
+  /**
+   * Whether the resident should start flagged as a hero (for FTUE showcases).
+   */
+  isHero?: boolean;
 }
 
 export interface TrialOfFireRules {

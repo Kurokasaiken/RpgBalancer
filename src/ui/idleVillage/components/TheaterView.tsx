@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { VerbSummary } from '@/ui/idleVillage/verbSummaries';
-import { GlowProgress, type ProgressVariant } from '@/ui/fantasy/atoms/GlowProgress';
-import { OrbIcon, type OrbVariant } from '@/ui/fantasy/atoms/OrbIcon';
 import MarbleMedallionCard from '@/ui/fantasy/assets/marble-verb-card/MarbleMedallionCard';
-import type { VerbTone } from '@/ui/idleVillage/VerbCard';
+import VerbCard from '@/ui/idleVillage/VerbCard';
 import { RESIDENT_DRAG_MIME } from '@/ui/idleVillage/constants';
 
 export interface TheaterViewProps {
@@ -15,19 +13,6 @@ export interface TheaterViewProps {
   acceptResidentDrop?: boolean;
   onResidentDrop?: (residentId: string | null) => void;
 }
-
-type TheaterVisual = {
-  progress: ProgressVariant;
-  orb: OrbVariant;
-};
-
-const TONE_VISUALS: Record<VerbTone, TheaterVisual> = {
-  neutral: { progress: 'gold', orb: 'neutral' },
-  job: { progress: 'jade', orb: 'jade' },
-  quest: { progress: 'amethyst', orb: 'amethyst' },
-  danger: { progress: 'ember', orb: 'ember' },
-  system: { progress: 'solar', orb: 'solar' },
-};
 
 const TheaterView: React.FC<TheaterViewProps> = ({
   slotLabel,
@@ -122,29 +107,28 @@ const TheaterView: React.FC<TheaterViewProps> = ({
       </header>
 
       <div className="flex flex-nowrap gap-4 overflow-x-auto px-6 py-5">
-        {verbs.map((verb) => {
-          const progress = Math.max(0, Math.min(1, verb.progressFraction));
-          const visuals = TONE_VISUALS[verb.tone] ?? TONE_VISUALS.neutral;
-          const isActive = progress > 0 && progress < 1;
-          return (
-            <div key={verb.key} className="flex w-24 flex-col items-center gap-2 text-center text-[10px] uppercase tracking-[0.35em] text-ivory/70">
-              <div className="relative flex h-24 w-24 items-center justify-center">
-                <GlowProgress progress={progress} variant={visuals.progress} size="verb" showTrail>
-                  <OrbIcon icon={verb.icon ?? '✦'} variant={visuals.orb} size="verb" isActive={isActive} />
-                </GlowProgress>
-                {verb.deadlineLabel && (
-                  <div className="absolute -bottom-2 rounded-full bg-black/80 px-1.5 py-0.5 text-[9px] text-amber-100">
-                    {verb.deadlineLabel}
-                  </div>
-                )}
-              </div>
-              <div className="flex flex-col gap-0.5">
-                <span className="text-[9px] font-bold text-ivory">{verb.label}</span>
-                <span className="text-[9px] text-ivory/60">{verb.kindLabel}</span>
-              </div>
+        {verbs.map((verb) => (
+          <div key={verb.key} className="flex flex-col items-center gap-2 text-center text-[10px] uppercase tracking-[0.25em] text-ivory/80">
+            <VerbCard
+              icon={verb.icon ?? '◎'}
+              progressFraction={verb.progressFraction}
+              elapsedSeconds={verb.elapsedSeconds}
+              totalDuration={verb.totalDurationSeconds || verb.remainingSeconds || 0}
+              injuryPercentage={verb.injuryPercentage}
+              deathPercentage={verb.deathPercentage}
+              assignedCount={verb.assignedCount}
+              totalSlots={verb.totalSlots}
+              visualVariant={verb.visualVariant}
+              progressStyle={verb.progressStyle}
+              className="w-32"
+            />
+            <div className="space-y-0.5">
+              <div className="text-[9px] font-semibold text-ivory">{verb.label}</div>
+              <div className="text-[9px] text-ivory/60">{verb.kindLabel}</div>
+              {verb.deadlineLabel && <div className="text-[9px] text-amber-200">{verb.deadlineLabel}</div>}
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
     </div>
   );

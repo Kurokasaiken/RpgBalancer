@@ -28,6 +28,9 @@ function getResidentPortrait(resident: ResidentState): string | undefined {
 }
 
 function formatLabel(resident: ResidentState) {
+  if (resident.displayName && resident.displayName.trim().length > 0) {
+    return resident.displayName;
+  }
   if (resident.id.startsWith('founder-')) {
     return resident.id.replace('founder-', '');
   }
@@ -160,6 +163,7 @@ function ResidentRoster({
       const preview = createDragPreview(resident, label);
       dragPreviewRef.current = preview;
       event.dataTransfer.setDragImage(preview, 24, 24);
+      event.dataTransfer.setData('text/resident-id', resident.id);
       onDragStart(resident.id)(event);
     };
 

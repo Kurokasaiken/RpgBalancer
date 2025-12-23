@@ -97,6 +97,7 @@ export function buildResidentFromFounder(
       : 0;
   return {
     id: `founder-${preset.id}`,
+    displayName: preset.label ?? preset.id,
     status: 'available',
     fatigue: startingFatigue,
     statProfileId: preset.archetypeId,
@@ -172,6 +173,7 @@ export interface VillageResources {
 
 export interface ResidentState {
   id: string; // SavedCharacter / Entity ID
+  displayName?: string;
   homeId?: string; // building / house reference (string-based)
   status: ResidentStatus;
   fatigue: number;
