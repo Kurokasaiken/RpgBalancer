@@ -860,6 +860,6 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
     showSystemTrayIcon: true,
   },
   uiPreferences: {
-    defaultAppTabId: 'skillCheckPreview',
+    defaultAppTabId: 'villageSandbox',
   },
 };

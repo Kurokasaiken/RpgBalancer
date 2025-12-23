@@ -24,12 +24,10 @@ const VISUAL_CONFIG = {
   },
   ballPath: {
     chaosDamping: 0.985,
-    chaosImpulse: 1.2,
-    residualNoise: 0.24,
-    followStrengthRange: [0.035, 0.12] as const,
-    bezierDeviation: 0.22,
-    maxSpeedMultiplier: 1.25,
+    chaosImpulse: 1.05,
+    residualNoise: 0.18,
     globalDrag: 0.994,
+    pinballFriction: 0.985,
   },
   colors: {
     pentagonFill: '#050505',
@@ -119,14 +117,11 @@ interface BallState {
   guidanceDelay: number;
   targetArrivalTime: number;
   forcedOutcome: boolean | null;
-  curveInitialized: boolean;
-  curveDuration: number;
-  curveStartX: number;
-  curveStartY: number;
-  curveControl1X: number;
-  curveControl1Y: number;
-  curveControl2X: number;
-  curveControl2Y: number;
+  guidanceActive: boolean;
+  guidanceDuration: number;
+  guidanceStartX: number;
+  guidanceStartY: number;
+  hasSettled: boolean;
 }
 
 interface AltVisualsController {
@@ -327,14 +322,11 @@ function initAltVisualsV6(
       guidanceDelay: 0,
       targetArrivalTime: 0,
       forcedOutcome: null,
-      curveInitialized: false,
-      curveDuration: 0,
-      curveStartX: 320,
-      curveStartY: 320,
-      curveControl1X: 320,
-      curveControl1Y: 320,
-      curveControl2X: 320,
-      curveControl2Y: 320,
+      guidanceActive: false,
+      guidanceDuration: 0,
+      guidanceStartX: 320,
+      guidanceStartY: 320,
+      hasSettled: false,
     },
     baseEnemyValues: [...axisValues.enemy],
     basePlayerValues: [...axisValues.player],
@@ -480,6 +472,10 @@ function resetAnimation(state: InternalState) {
     guidanceDelay: 0,
     targetArrivalTime: 0,
     forcedOutcome: null,
+    guidanceActive: false,
+    guidanceDuration: 0,
+    guidanceStartX: 320,
+    guidanceStartY: 320,
   };
 
   state.successChance = calculateSuccessChance(state);
@@ -695,23 +691,54 @@ function updateBall(state: InternalState) {
   const guidanceStart = state.ball.guidanceDelay;
 
   if (state.ball.targetAssigned && elapsed >= guidanceStart) {
-    initializeBallCurve(state);
-    const guidanceElapsed = elapsed - guidanceStart;
-    const t = clamp(guidanceElapsed / Math.max(1, state.ball.curveDuration), 0, 1);
-    const curvePoint = sampleBallCurve(state, t);
-    const followStrength = lerp(VISUAL_CONFIG.ballPath.followStrengthRange[0], VISUAL_CONFIG.ballPath.followStrengthRange[1], easeInOutCubic(t));
-    state.ball.vx += (curvePoint.x - state.ball.x) * followStrength;
-    state.ball.vy += (curvePoint.y - state.ball.y) * followStrength;
+    if (!state.ball.guidanceActive) {
+      state.ball.guidanceActive = true;
+      state.ball.guidanceStartX = state.ball.x;
+      state.ball.guidanceStartY = state.ball.y;
+      state.ball.guidanceDuration = state.ball.targetArrivalTime - (state.ball.startTime + state.ball.guidanceDelay);
+      spawnParticleBurst(
+        state,
+        Math.random() * Math.PI * 2,
+        40,
+        VISUAL_CONFIG.colors.playerPillarStroke,
+        VISUAL_CONFIG.colors.particleSecondary,
+        8,
+        state.ball.x,
+        state.ball.y,
+      );
+      triggerShake(state, 0.25);
+    }
 
-    // Residual jitter so it never feels locked-on
-    state.ball.vx += (Math.random() - 0.5) * VISUAL_CONFIG.ballPath.residualNoise * (1 - t);
-    state.ball.vy += (Math.random() - 0.5) * VISUAL_CONFIG.ballPath.residualNoise * (1 - t);
+    const starVertices = getStarVertices(state);
+    const insideStar = isPointInPolygon(state.ball.x, state.ball.y, starVertices);
+    const shouldBeInsideStar = state.ball.forcedOutcome === true;
+    const currentSpeed = Math.hypot(state.ball.vx, state.ball.vy);
 
-    if (t >= 1) {
-      state.ball.x = state.ball.targetX;
-      state.ball.y = state.ball.targetY;
-      state.ball.vx = 0;
-      state.ball.vy = 0;
+    if (insideStar !== shouldBeInsideStar) {
+      if (currentSpeed < 10) {
+        state.ball.vx *= 1.02;
+        state.ball.vy *= 1.02;
+      }
+      if (currentSpeed > 12) {
+        state.ball.vx *= VISUAL_CONFIG.ballPath.pinballFriction;
+        state.ball.vy *= VISUAL_CONFIG.ballPath.pinballFriction;
+      }
+    } else {
+      const brakeForce = 0.92;
+      state.ball.vx *= brakeForce;
+      state.ball.vy *= brakeForce;
+      if (Math.hypot(state.ball.vx, state.ball.vy) < 0.2) {
+        state.ball.vx = 0;
+        state.ball.vy = 0;
+      }
+    }
+
+    if (state.ball.vx === 0 && state.ball.vy === 0 && !state.ball.hasSettled) {
+      state.ball.hasSettled = true;
+      state.ball.stopped = true;
+      state.ball.success = shouldBeInsideStar;
+      triggerShake(state, 0.4);
+      return;
     }
   }
 
@@ -1178,14 +1205,11 @@ function startBallLaunch(state: InternalState, options: { skipReadinessCheck?: b
   state.ball.targetArrivalTime = state.ball.startTime + BALL_TOTAL_DURATION_MS;
   state.ball.x = canvasCenter(state).x;
   state.ball.y = canvasCenter(state).y;
-  state.ball.curveInitialized = false;
-  state.ball.curveDuration = GUIDANCE_PHASE_DURATION_MS;
-  state.ball.curveStartX = state.ball.x;
-  state.ball.curveStartY = state.ball.y;
-  state.ball.curveControl1X = state.ball.x;
-  state.ball.curveControl1Y = state.ball.y;
-  state.ball.curveControl2X = state.ball.x;
-  state.ball.curveControl2Y = state.ball.y;
+  state.ball.guidanceActive = false;
+  state.ball.guidanceDuration = GUIDANCE_PHASE_DURATION_MS;
+  state.ball.guidanceStartX = state.ball.x;
+  state.ball.guidanceStartY = state.ball.y;
+  state.ball.hasSettled = false;
 
   state.successChance = calculateSuccessChance(state);
   const forcedSuccess = rollForOutcome(state);
@@ -1196,62 +1220,6 @@ function startBallLaunch(state: InternalState, options: { skipReadinessCheck?: b
   const launchSpeed = state.ball.speed * 1.4;
   state.ball.vx = Math.cos(launchAngle) * launchSpeed;
   state.ball.vy = Math.sin(launchAngle) * launchSpeed;
-}
-
-function initializeBallCurve(state: InternalState) {
-  if (!state.ball.targetAssigned || state.ball.curveInitialized) return;
-
-  state.ball.curveStartX = state.ball.x;
-  state.ball.curveStartY = state.ball.y;
-  const toTarget = {
-    x: state.ball.targetX - state.ball.curveStartX,
-    y: state.ball.targetY - state.ball.curveStartY,
-  };
-  const distance = Math.hypot(toTarget.x, toTarget.y) || 1;
-  const approachDir = {
-    x: toTarget.x / distance,
-    y: toTarget.y / distance,
-  };
-  const currentSpeed = Math.hypot(state.ball.vx, state.ball.vy) || state.ball.speed;
-  const velocityDir = {
-    x: state.ball.vx / (currentSpeed || 1),
-    y: state.ball.vy / (currentSpeed || 1),
-  };
-
-  const deviation = distance * VISUAL_CONFIG.ballPath.bezierDeviation;
-  const orthX = -approachDir.y;
-  const orthY = approachDir.x;
-  const wobble = (scale = 1) => (Math.random() - 0.5) * deviation * scale;
-
-  const control1Distance = Math.min(distance * 0.45, currentSpeed * 14);
-  state.ball.curveControl1X = state.ball.curveStartX + velocityDir.x * control1Distance + orthX * wobble(0.4);
-  state.ball.curveControl1Y = state.ball.curveStartY + velocityDir.y * control1Distance + orthY * wobble(0.4);
-
-  const control2Distance = distance * 0.65;
-  state.ball.curveControl2X = state.ball.targetX - approachDir.x * control2Distance + orthX * wobble(0.7);
-  state.ball.curveControl2Y = state.ball.targetY - approachDir.y * control2Distance + orthY * wobble(0.7);
-  state.ball.curveDuration = state.ball.targetArrivalTime - (state.ball.startTime + state.ball.guidanceDelay);
-  state.ball.curveInitialized = true;
-}
-
-function sampleBallCurve(state: InternalState, t: number) {
-  const x = cubicBezier(state.ball.curveStartX, state.ball.curveControl1X, state.ball.curveControl2X, state.ball.targetX, t);
-  const y = cubicBezier(state.ball.curveStartY, state.ball.curveControl1Y, state.ball.curveControl2Y, state.ball.targetY, t);
-  return { x, y };
-}
-
-function cubicBezier(p0: number, p1: number, p2: number, p3: number, t: number) {
-  const oneMinusT = 1 - t;
-  return (
-    oneMinusT ** 3 * p0 +
-    3 * oneMinusT ** 2 * t * p1 +
-    3 * oneMinusT * t ** 2 * p2 +
-    t ** 3 * p3
-  );
-}
-
-function easeInOutCubic(t: number) {
-  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
 function lerp(a: number, b: number, t: number) {

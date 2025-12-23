@@ -6,6 +6,8 @@ interface ResidentRosterProps {
   activeResidentId: string | null;
   onDragStart: (residentId: string) => (event: React.DragEvent<HTMLButtonElement>) => void;
   onDragEnd: () => void;
+  onDragIntent?: (residentId: string) => void;
+  onDragIntentEnd?: (residentId: string) => void;
   assignmentFeedback: string | null;
   maxFatigueBeforeExhausted: number;
 }
@@ -42,6 +44,8 @@ function ResidentRoster({
   activeResidentId,
   onDragStart,
   onDragEnd,
+  onDragIntent,
+  onDragIntentEnd,
   assignmentFeedback,
   maxFatigueBeforeExhausted,
 }: ResidentRosterProps) {
@@ -164,18 +168,40 @@ function ResidentRoster({
       dragPreviewRef.current = preview;
       event.dataTransfer.setDragImage(preview, 24, 24);
       event.dataTransfer.setData('text/resident-id', resident.id);
+      event.dataTransfer.setData('text/plain', resident.id);
+      onDragIntent?.(resident.id); // ensure drag mode on desktop mouse-drag without pointerdown firing first
       onDragStart(resident.id)(event);
     };
 
-  const handleDragEndInternal = () => {
-    if (dragPreviewRef.current) {
-      if (dragPreviewRef.current.parentNode) {
-        dragPreviewRef.current.parentNode.removeChild(dragPreviewRef.current);
+  const handlePointerDown =
+    (resident: ResidentState, isBlocked: boolean) =>
+    (event: React.PointerEvent<HTMLButtonElement>) => {
+      if (isBlocked || !onDragIntent) return;
+      if (event.pointerType === 'mouse' && event.button !== 0) return;
+      onDragIntent(resident.id);
+    };
+
+  const handlePointerUp =
+    (resident: ResidentState, isBlocked: boolean) =>
+    () => {
+      if (isBlocked || !onDragIntentEnd) return;
+      onDragIntentEnd(resident.id);
+    };
+
+  const handleDragEndInternal =
+    (residentId: string) => (event: React.DragEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+      if (dragPreviewRef.current) {
+        if (dragPreviewRef.current.parentNode) {
+          dragPreviewRef.current.parentNode.removeChild(dragPreviewRef.current);
+        }
+        dragPreviewRef.current = null;
       }
-      dragPreviewRef.current = null;
-    }
-    onDragEnd();
-  };
+      onDragEnd();
+      if (onDragIntentEnd) {
+        onDragIntentEnd(residentId);
+      }
+    };
 
   const handleMouseEnter = (resident: ResidentState) => {
     setPopoverResidentId(resident.id);
@@ -257,7 +283,10 @@ function ResidentRoster({
               type="button"
               draggable
               onDragStart={handleDragStart(resident, initial, isBlocked)}
-              onDragEnd={handleDragEndInternal}
+              onDragEnd={handleDragEndInternal(resident.id)}
+              onPointerDown={handlePointerDown(resident, isBlocked)}
+              onPointerUp={handlePointerUp(resident, isBlocked)}
+              onPointerCancel={handlePointerUp(resident, isBlocked)}
               onMouseEnter={() => handleMouseEnter(resident)}
               onMouseLeave={handleMouseLeave}
               data-testid="resident-card"

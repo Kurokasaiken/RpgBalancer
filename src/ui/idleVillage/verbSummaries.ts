@@ -32,6 +32,7 @@ export type VerbAutoState = 'continuous' | 'auto-repeat';
 export interface VerbSummary {
   key: string;
   source: VerbSummarySource;
+  activityId?: string;
   slotId: string | null;
   label: string;
   kindLabel: string;
@@ -80,6 +81,7 @@ export function buildActivityBlueprintSummary(params: {
   const summary: VerbSummary = {
     key: `activity_blueprint_${activity.id}`,
     source: 'blueprint',
+    activityId: activity.id,
     slotId,
     label: activity.label ?? activity.id,
     kindLabel: isQuest ? 'Quest' : isJob ? 'Job' : 'Activity',
@@ -190,6 +192,7 @@ export function buildPassiveEffectSummary(params: {
   return {
     key: effect.id,
     source: 'passive',
+    activityId: undefined,
     slotId,
     label: effect.label ?? effect.id,
     kindLabel: 'Passive Effect',
@@ -338,6 +341,7 @@ export function buildScheduledVerbSummary(params: {
   return {
     key: params.scheduled.id,
     source: 'scheduled',
+    activityId: params.scheduled.activityId,
     scheduled: params.scheduled,
     slotId: params.scheduled.slotId ?? null,
     label: params.activity.label ?? params.scheduled.activityId,
@@ -400,7 +404,7 @@ export function buildQuestOfferSummary(params: {
   return {
     key: params.offer.id,
     source: 'questOffer',
-    offer: params.offer,
+    activityId: params.activity.id,
     slotId: params.offer.slotId ?? null,
     label: params.activity.label ?? params.offer.activityId,
     kindLabel: 'Quest Offer',
