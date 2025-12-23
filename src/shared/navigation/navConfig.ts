@@ -27,6 +27,7 @@ export const APP_NAV_TAB_IDS = [
   'tacticalLab',
   'idleVillageMap',
   'idleVillageConfig',
+  'villageSandbox',
   'skillCheckPreview',
   'verbDetailSandbox',
 ] as const;
@@ -72,11 +73,12 @@ const NAV_ITEM_MAP: Record<AppNavTabId, AppNavItem> = {
   mockMidnightMeridian: { id: 'mockMidnightMeridian', label: 'Midnight Meridian', icon: '✦' },
   mockSeraphimArchive: { id: 'mockSeraphimArchive', label: 'Seraphim Archive', icon: '✶' },
   mockVerdantAlloy: { id: 'mockVerdantAlloy', label: 'Verdant Alloy Deck', icon: '🌿' },
-  tacticalLab: { id: 'tacticalLab', label: 'Tactical Lab', icon: '⚔️' },
-  idleVillageMap: { id: 'idleVillageMap', label: 'Idle Village Map (New)', icon: '🗺️' },
-  idleVillageConfig: { id: 'idleVillageConfig', label: 'Idle Village Config', icon: '⚙️' },
-  skillCheckPreview: { id: 'skillCheckPreview', label: 'Skill Check Lab', icon: '🎯' },
-  verbDetailSandbox: { id: 'verbDetailSandbox', label: 'Verb Detail Sandbox', icon: '🜂' },
+  tacticalLab: { id: 'tacticalLab', label: 'Tactical Lab', icon: '🎯' },
+  idleVillageMap: { id: 'idleVillageMap', label: 'Idle Village', icon: '🏘️' },
+  idleVillageConfig: { id: 'idleVillageConfig', label: 'Village Config', icon: '⚙️' },
+  villageSandbox: { id: 'villageSandbox', label: 'Village Sandbox', icon: '🏗️' },
+  skillCheckPreview: { id: 'skillCheckPreview', label: 'Skill Check', icon: '🎯' },
+  verbDetailSandbox: { id: 'verbDetailSandbox', label: 'Verb Detail', icon: '📝' },
 };
 
 const NAV_SECTION_DEFS: { title: string; itemIds: AppNavTabId[] }[] = [
@@ -101,7 +103,7 @@ const NAV_SECTION_DEFS: { title: string; itemIds: AppNavTabId[] }[] = [
   },
   {
     title: 'Idle Village',
-    itemIds: ['idleVillageConfig', 'verbDetailSandbox'],
+    itemIds: ['idleVillageConfig', 'villageSandbox', 'verbDetailSandbox'],
   },
   {
     title: 'Archetypes',
@@ -140,7 +142,7 @@ export const BOTTOM_NAV: MobileNavItem[] = [
   { id: 'more', label: 'More', icon: '☰' },
 ];
 
-export const DEFAULT_LANDING_TAB_ID: AppNavTabId = 'skillCheckPreview';
+export const DEFAULT_LANDING_TAB_ID: AppNavTabId = 'villageSandbox';
 
 export function getUniqueNavItems(): AppNavItem[] {
   return APP_NAV_TAB_IDS.map((id) => NAV_ITEM_MAP[id]);

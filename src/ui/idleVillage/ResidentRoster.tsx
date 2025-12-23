@@ -46,8 +46,8 @@ function ResidentRoster({
   const [heroFlashIds, setHeroFlashIds] = useState<string[]>([]);
   const heroStatusRef = useRef<Record<string, boolean>>({});
   const heroFlashTimeouts = useRef<Record<string, number>>({});
+  const dragPreviewRef = useRef<HTMLDivElement | null>(null);
   const [popoverResidentId, setPopoverResidentId] = useState<string | null>(null);
-  const hoverTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     const newlyHeroic: string[] = [];
@@ -79,6 +79,14 @@ function ResidentRoster({
     },
     [],
   );
+
+  const hpPercentage = (resident: ResidentState) => {
+    if (resident.maxHp <= 0) return 0;
+    return Math.max(0, Math.min(100, Math.round((resident.currentHp / resident.maxHp) * 100)));
+  };
+
+  const fatiguePercentage = (fatigue: number) =>
+    Math.min(100, Math.round((fatigue / Math.max(1, maxFatigueBeforeExhausted)) * 100));
 
   const filteredResidents = useMemo(() => {
     return residents.filter((resident) => {
@@ -123,14 +131,6 @@ function ResidentRoster({
     });
   }, [filteredResidents]);
 
-  const hpPercentage = (resident: ResidentState) => {
-    if (resident.maxHp <= 0) return 0;
-    return Math.max(0, Math.min(100, Math.round((resident.currentHp / resident.maxHp) * 100)));
-  };
-
-  const fatiguePercentage = (fatigue: number) =>
-    Math.min(100, Math.round((fatigue / Math.max(1, maxFatigueBeforeExhausted)) * 100));
-
   const createDragPreview = (resident: ResidentState, label: string) => {
     const portraitUrl = getResidentPortrait(resident);
     const preview = document.createElement('div');
@@ -151,30 +151,33 @@ function ResidentRoster({
   };
 
   const handleDragStart =
-    (resident: ResidentState, label: string) => (event: React.DragEvent<HTMLButtonElement>) => {
+    (resident: ResidentState, label: string, isBlocked: boolean) =>
+    (event: React.DragEvent<HTMLButtonElement>) => {
+      if (isBlocked) {
+        event.preventDefault();
+        return;
+      }
       const preview = createDragPreview(resident, label);
+      dragPreviewRef.current = preview;
       event.dataTransfer.setDragImage(preview, 24, 24);
-      requestAnimationFrame(() => {
-        if (preview.parentNode) {
-          preview.parentNode.removeChild(preview);
-        }
-      });
       onDragStart(resident.id)(event);
     };
 
-  const handleMouseEnter = (resident: ResidentState) => {
-    if (hoverTimeoutRef.current) {
-      window.clearTimeout(hoverTimeoutRef.current);
+  const handleDragEndInternal = () => {
+    if (dragPreviewRef.current) {
+      if (dragPreviewRef.current.parentNode) {
+        dragPreviewRef.current.parentNode.removeChild(dragPreviewRef.current);
+      }
+      dragPreviewRef.current = null;
     }
-    hoverTimeoutRef.current = window.setTimeout(() => {
-      setPopoverResidentId(resident.id);
-    }, 400);
+    onDragEnd();
+  };
+
+  const handleMouseEnter = (resident: ResidentState) => {
+    setPopoverResidentId(resident.id);
   };
 
   const handleMouseLeave = () => {
-    if (hoverTimeoutRef.current) {
-      window.clearTimeout(hoverTimeoutRef.current);
-    }
     setPopoverResidentId(null);
   };
 
@@ -248,9 +251,9 @@ function ResidentRoster({
             <button
               key={resident.id}
               type="button"
-              draggable={!isBlocked}
-              onDragStart={isBlocked ? undefined : handleDragStart(resident, initial)}
-              onDragEnd={onDragEnd}
+              draggable
+              onDragStart={handleDragStart(resident, initial, isBlocked)}
+              onDragEnd={handleDragEndInternal}
               onMouseEnter={() => handleMouseEnter(resident)}
               onMouseLeave={handleMouseLeave}
               data-testid="resident-card"
@@ -327,7 +330,7 @@ function ResidentRoster({
               </div>
 
               {popoverResidentId === resident.id && (
-                <div className="pointer-events-none absolute left-full top-1/2 z-10 ml-3 min-w-40 -translate-y-1/2 rounded-xl border border-slate-700 bg-slate-950/95 px-3 py-2 text-[10px] text-slate-100 shadow-xl">
+                <div className="pointer-events-none absolute left-full top-1/2 z-50 ml-3 min-w-40 -translate-y-1/2 rounded-xl border border-slate-700 bg-slate-950/95 px-3 py-2 text-[10px] text-slate-100 shadow-xl">
                   <div className="mb-1 text-[11px] font-semibold text-amber-200">{formatLabel(resident)}</div>
                   <div className="flex justify-between text-slate-400">
                     <span>Missions</span>
@@ -337,18 +340,17 @@ function ResidentRoster({
                     <span>Score</span>
                     <span>{resident.survivalScore ?? 0}</span>
                   </div>
-                  {resident.statSnapshot && (
-                    <div className="mt-2 space-y-0.5">
-                      {Object.entries(resident.statSnapshot)
-                        .slice(0, 4)
-                        .map(([statKey, statValue]) => (
-                          <div key={statKey} className="flex justify-between text-slate-400">
-                            <span>{statKey}</span>
-                            <span>{typeof statValue === 'number' ? statValue : String(statValue)}</span>
-                          </div>
-                        ))}
-                    </div>
-                  )}
+                  <div className="mt-2 space-y-0.5">
+                    {(resident.statSnapshot && Object.entries(resident.statSnapshot).length > 0
+                      ? Object.entries(resident.statSnapshot).slice(0, 4)
+                      : [['Stat', '?'] as [string, unknown]]) // fallback
+                      .map(([statKey, statValue]) => (
+                        <div key={statKey} className="flex justify-between text-slate-400">
+                          <span>{statKey}</span>
+                          <span>{typeof statValue === 'number' ? statValue : String(statValue)}</span>
+                        </div>
+                      ))}
+                  </div>
                 </div>
               )}
             </button>

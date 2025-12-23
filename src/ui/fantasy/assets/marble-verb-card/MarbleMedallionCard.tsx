@@ -57,6 +57,7 @@ const MarbleMedallionCard: React.FC<MarbleMedallionCardProps> = ({
               strokeWidth="14"
               strokeLinecap="round"
               opacity={0.35}
+              transform="rotate(-90 110 110)"
             />
             <circle
               cx="110"
@@ -69,6 +70,7 @@ const MarbleMedallionCard: React.FC<MarbleMedallionCardProps> = ({
               strokeDashoffset={ringDashoffset}
               strokeLinecap="round"
               style={{ transition: 'stroke-dashoffset 0.6s ease, stroke 0.6s ease' }}
+              transform="rotate(-90 110 110)"
             />
           </svg>
 

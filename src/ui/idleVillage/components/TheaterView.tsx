@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { VerbSummary } from '@/ui/idleVillage/verbSummaries';
 import { GlowProgress, type ProgressVariant } from '@/ui/fantasy/atoms/GlowProgress';
 import { OrbIcon, type OrbVariant } from '@/ui/fantasy/atoms/OrbIcon';
@@ -39,6 +39,11 @@ const TheaterView: React.FC<TheaterViewProps> = ({
   onResidentDrop,
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     if (!acceptResidentDrop || !onResidentDrop) return;
@@ -66,7 +71,8 @@ const TheaterView: React.FC<TheaterViewProps> = ({
   return (
     <div
       className={[
-        'absolute left-1/2 top-6 z-40 w-[82%] -translate-x-1/2 rounded-3xl border border-gold/30 bg-black/85 shadow-[0_20px_120px_rgba(0,0,0,0.65)] backdrop-blur-lg transition-border',
+        'absolute left-1/2 top-6 z-40 w-[82%] -translate-x-1/2 rounded-3xl border border-gold/30 bg-black/85 shadow-[0_20px_120px_rgba(0,0,0,0.65)] backdrop-blur-lg transition-all duration-700 ease-out',
+        isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4',
         acceptResidentDrop && isDragOver ? 'border-emerald-300/70 shadow-[0_0_60px_rgba(16,185,129,0.45)]' : '',
       ]
         .filter(Boolean)
@@ -115,26 +121,26 @@ const TheaterView: React.FC<TheaterViewProps> = ({
         </div>
       </header>
 
-      <div className="flex flex-nowrap gap-6 overflow-x-auto px-6 py-5">
+      <div className="flex flex-nowrap gap-4 overflow-x-auto px-6 py-5">
         {verbs.map((verb) => {
           const progress = Math.max(0, Math.min(1, verb.progressFraction));
           const visuals = TONE_VISUALS[verb.tone] ?? TONE_VISUALS.neutral;
           const isActive = progress > 0 && progress < 1;
           return (
-            <div key={verb.key} className="flex w-32 flex-col items-center gap-3 text-center text-[11px] uppercase tracking-[0.2em] text-ivory/70">
-              <div className="relative flex h-32 w-32 items-center justify-center">
+            <div key={verb.key} className="flex w-24 flex-col items-center gap-2 text-center text-[10px] uppercase tracking-[0.35em] text-ivory/70">
+              <div className="relative flex h-24 w-24 items-center justify-center">
                 <GlowProgress progress={progress} variant={visuals.progress} size="verb" showTrail>
                   <OrbIcon icon={verb.icon ?? '✦'} variant={visuals.orb} size="verb" isActive={isActive} />
                 </GlowProgress>
                 {verb.deadlineLabel && (
-                  <div className="absolute -bottom-3 rounded-full bg-black/80 px-2 py-0.5 text-[10px] text-amber-100">
+                  <div className="absolute -bottom-2 rounded-full bg-black/80 px-1.5 py-0.5 text-[9px] text-amber-100">
                     {verb.deadlineLabel}
                   </div>
                 )}
               </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-xs font-bold text-ivory">{verb.label}</span>
-                <span className="text-[10px] text-ivory/60">{verb.kindLabel}</span>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[9px] font-bold text-ivory">{verb.label}</span>
+                <span className="text-[9px] text-ivory/60">{verb.kindLabel}</span>
               </div>
             </div>
           );

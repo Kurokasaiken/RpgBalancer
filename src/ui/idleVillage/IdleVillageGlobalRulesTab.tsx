@@ -111,6 +111,73 @@ export default function IdleVillageGlobalRulesTab() {
     });
   };
 
+  const handleDayNightChange = (key: 'dayTimeUnits' | 'nightTimeUnits') => (raw: string) => {
+    if (raw === '') return;
+    const parsed = Number(raw);
+    if (!Number.isFinite(parsed) || parsed <= 0) return;
+    const current = rules.dayNightCycle ?? {
+      dayTimeUnits: rules.dayLengthInTimeUnits,
+      nightTimeUnits: rules.dayLengthInTimeUnits,
+    };
+    const nextCycle = {
+      ...current,
+      [key]: parsed,
+    };
+    updateConfig({
+      globalRules: {
+        ...rules,
+        dayNightCycle: nextCycle,
+      },
+    });
+  };
+
+  const handleTrialOfFireChange = (
+    key: 'highRiskThreshold' | 'statBonusMultiplier' | 'heroSurvivalThreshold' | 'hpRecoveryPercent',
+  ) => (raw: string) => {
+    const current = rules.trialOfFire ?? {
+      highRiskThreshold: 0.25,
+      statBonusMultiplier: 0.05,
+    };
+    if (raw === '' && key !== 'highRiskThreshold' && key !== 'statBonusMultiplier') {
+      const next = { ...current };
+      delete (next as Record<string, unknown>)[key];
+      updateConfig({
+        globalRules: {
+          ...rules,
+          trialOfFire: next,
+        },
+      });
+      return;
+    }
+    const parsed = Number(raw);
+    if (!Number.isFinite(parsed)) return;
+    let nextValue = parsed;
+    if (key === 'highRiskThreshold' || key === 'hpRecoveryPercent') {
+      nextValue = Math.min(1, Math.max(0, parsed));
+    }
+    if (key === 'heroSurvivalThreshold' && nextValue < 0) {
+      nextValue = 0;
+    }
+    const next = {
+      ...current,
+      [key]: nextValue,
+    };
+    updateConfig({
+      globalRules: {
+        ...rules,
+        trialOfFire: next,
+      },
+    });
+  };
+
+  const dayNight = rules.dayNightCycle ?? {
+    dayTimeUnits: rules.dayLengthInTimeUnits,
+    nightTimeUnits: rules.dayLengthInTimeUnits,
+  };
+  const trialRules = rules.trialOfFire;
+  const hpRecoveryPercentDisplay =
+    typeof trialRules?.hpRecoveryPercent === 'number' ? Math.round(trialRules.hpRecoveryPercent * 100 * 100) / 100 : '';
+
   return (
     <div className="space-y-4">
       <h2 className="text-lg sm:text-xl font-cinzel tracking-[0.18em] uppercase text-ivory/90">Global Rules</h2>
@@ -167,6 +234,30 @@ export default function IdleVillageGlobalRulesTab() {
                 onChange={(e) => handleNumberChange('dayLengthInTimeUnits')(e.target.value)}
                 className="w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory"
               />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <label className="block font-bold mb-1">
+                Day Phase Length
+                <input
+                  type="number"
+                  min={1}
+                  value={dayNight.dayTimeUnits}
+                  onChange={(e) => handleDayNightChange('dayTimeUnits')(e.target.value)}
+                  className="mt-1 w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory"
+                />
+                <span className="block text-[11px] text-slate-400">Time units of daylight per cycle</span>
+              </label>
+              <label className="block font-bold mb-1">
+                Night Phase Length
+                <input
+                  type="number"
+                  min={1}
+                  value={dayNight.nightTimeUnits}
+                  onChange={(e) => handleDayNightChange('nightTimeUnits')(e.target.value)}
+                  className="mt-1 w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory"
+                />
+                <span className="block text-[11px] text-slate-400">Time units of night per cycle</span>
+              </label>
             </div>
             <div>
               <label className="block font-bold mb-1">Fatigue Yellow Threshold</label>
@@ -240,6 +331,77 @@ export default function IdleVillageGlobalRulesTab() {
                 onChange={(e) => handleNumberChange('baseFoodPriceInGold')(e.target.value)}
                 className="w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory"
               />
+            </div>
+          </div>
+        </DefaultSection>
+
+        <DefaultSection title="Trial of Fire">
+          <div className="space-y-3 text-sm">
+            <p className="text-[11px] text-slate-400">
+              Soglie e bonus per la sopravvivenza ad alto rischio. Questi valori influenzano direttamente il TimeEngine e
+              la promozione a eroe.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <label className="flex flex-col gap-1">
+                <span className="font-bold">High-Risk Threshold (0-1)</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={trialRules?.highRiskThreshold ?? 0.25}
+                  onChange={(e) => handleTrialOfFireChange('highRiskThreshold')(e.target.value)}
+                  className="w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory"
+                />
+              </label>
+              <label className="flex flex-col gap-1">
+                <span className="font-bold">Stat Bonus Multiplier</span>
+                <input
+                  type="number"
+                  min={0}
+                  step={0.01}
+                  value={trialRules?.statBonusMultiplier ?? 0.05}
+                  onChange={(e) => handleTrialOfFireChange('statBonusMultiplier')(e.target.value)}
+                  className="w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory"
+                />
+              </label>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <label className="flex flex-col gap-1">
+                <span className="font-bold">Hero Survival Threshold (optional)</span>
+                <input
+                  type="number"
+                  min={0}
+                  step={1}
+                  value={trialRules?.heroSurvivalThreshold ?? ''}
+                  onChange={(e) => handleTrialOfFireChange('heroSurvivalThreshold')(e.target.value)}
+                  className="w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory"
+                  placeholder="e.g. 3 survivals"
+                />
+              </label>
+              <label className="flex flex-col gap-1">
+                <span className="font-bold">HP Recovery per Survival (%)</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={hpRecoveryPercentDisplay}
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    if (raw === '') {
+                      handleTrialOfFireChange('hpRecoveryPercent')('');
+                      return;
+                    }
+                    const parsed = Number(raw);
+                    if (!Number.isFinite(parsed)) return;
+                    handleTrialOfFireChange('hpRecoveryPercent')((parsed / 100).toString());
+                  }}
+                  className="w-full px-2 py-1 bg-obsidian border border-slate rounded text-ivory"
+                  placeholder="0-100"
+                />
+                <span className="text-[11px] text-slate-400">Percentuale di max HP ripristinata dopo la sopravvivenza</span>
+              </label>
             </div>
           </div>
         </DefaultSection>

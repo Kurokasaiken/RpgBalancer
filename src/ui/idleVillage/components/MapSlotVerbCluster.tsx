@@ -45,10 +45,13 @@ const MapSlotVerbCluster: React.FC<MapSlotVerbClusterProps> = ({
 
   const stackCount = Math.max(0, verbs.length - (displayVerb ? 1 : 0));
   const bloomActive = isOpen || (isDropMode && canAcceptDrop && isDragOver);
+  const repelActive = isDropMode && !canAcceptDrop && isDragOver;
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    if (!isDropMode || !canAcceptDrop) return;
-    event.preventDefault();
+    if (!isDropMode) return;
+    if (canAcceptDrop) {
+      event.preventDefault();
+    }
     if (!isDragOver) {
       setIsDragOver(true);
     }
@@ -76,7 +79,8 @@ const MapSlotVerbCluster: React.FC<MapSlotVerbClusterProps> = ({
     <div
       className={[
         'absolute -translate-x-1/2 -translate-y-full flex flex-col items-center gap-2 pointer-events-auto transition-all duration-300',
-        bloomActive ? 'scale-110 drop-shadow-[0_0_45px_rgba(251,191,36,0.55)]' : 'scale-100',
+        bloomActive ? 'scale-110 drop-shadow-[0_0_60px_rgba(251,191,36,0.75)] ring-4 ring-amber-300/50' : 'scale-100',
+        repelActive ? 'animate-pulse scale-95 ring-2 ring-red-500/70 drop-shadow-[0_0_30px_rgba(239,68,68,0.5)]' : '',
         isHighlighted ? 'animate-pulse' : '',
       ]
         .filter(Boolean)

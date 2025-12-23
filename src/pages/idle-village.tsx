@@ -1,10 +1,10 @@
 /**
- * Route/page entry for Idle Village prototype.
- * Imports and renders IdleVillagePage.
+ * Route/page entry for the Idle Village cinematic map experience.
+ * Uses the new IdleVillageMapPage (drag & drop on map slots, Theater view, etc).
  */
 
-import IdleVillagePage from '@/ui/idleVillage/IdleVillagePage';
+import IdleVillageMapPage from '@/ui/idleVillage/IdleVillageMapPage';
 
 export default function IdleVillageRoute() {
-  return <IdleVillagePage />;
+  return <IdleVillageMapPage />;
 }

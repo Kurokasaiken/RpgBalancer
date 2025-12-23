@@ -1,7 +1,19 @@
 # “Il Drago” – Documento di Direzione Artistica
 
-**Status:** Draft v0.1  
+**Status:** Draft v0.2  
 **Ambito:** Linee guida di art direction per il progetto “Il Drago”, focalizzate sullo stile **Realismo Eroico Classico (Noble Heroic Realism)** e allineate con i principi config-first del RPG Balancer.
+
+---
+
+## 0. Missione Creativa – “Libertà, Gloria e Trionfo Solare”
+
+- **Manifesto:** antitesi del Dark Fantasy; luce tropicale, cromie sature e materiali nobili che raccontano la vittoria.
+- **Direzione per le razze:**
+  - **Umani (Eroi/Bruiser)** – anatomia monumentale nello stile *Huang Guangjian*, proporzioni atletiche autentiche.
+  - **Razze Superiori (Elfi, Angeli, Androidi)** – resa iridescente e luminosa stile *Ruan Jia*, quasi “creature di luce”.
+  - **Natura e Mostri** – energia narrativa à la *Justin Gerard / Jesper Ejsing*: giungle dense, creature vive e serie.
+- **Rendering:** pennellate stratificate stile *Jaime Jones*. Ombre sature di turchese/smeraldo, highlights solari. La “Sorgente di Verità” rimane il prompt originale del Drago.
+- **Stack creativo di riferimento:** React + Vite + Tailwind CSS v4, SVG per i token, Framer Motion per animazioni “pesanti”, LaTeX unicamente per formule tecniche.
 
 ---
 
@@ -35,7 +47,26 @@
 
 ## 3. Elementi Iconici della UI
 
-### 3.1 Map Markers (Skyrim Map-style Tactical Pins)
+### 3.1 HeroMarker (Bruiser umano) – Nuovo componente base
+
+- **Forma:** medaglione ellittico (5:3) in bronzo brunito con doppio bevel; stiletto centrale in acciaio lucido che perfora la mappa e proietta ombra obliqua.
+- **Iconografia:** bassorilievo del Bruiser (stile Huang Guangjian) con incisioni radiali; background in avorio satinato con pattern geometrici.
+- **Materiali:** bronzo (#8f5a2c→#d6a35f), acciaio (#cdd6df), avorio (#f2ebdb) e gemma smeraldo per lo stato eroico.
+- **Animazioni:** Framer Motion per pulsazione dell’anello luminoso, micro-oscillazione verticale dello stiletto, drop shadow dinamica.
+- **API prevista (`HeroMarker`):**
+
+  ```ts
+  type HeroMarkerProps = {
+    label: string;
+    state: 'idle' | 'engaged' | 'exhausted';
+    orientation?: 'north' | 'south' | 'east' | 'west';
+    glowIntensity?: number;
+  };
+  ```
+
+- **Config-first:** palette e proporzioni derivano da `themeTokens.ilDrago.heroMarker`; silhouette vettoriali caricate via asset config.
+
+### 3.2 Map Markers (Skyrim Map-style Tactical Pins)
 
 Dettagli principali:
 
@@ -44,7 +75,7 @@ Dettagli principali:
 - **Materiali:** Oro satinato per i pin principali, argento/brunito per pin secondari; base in avorio con incisioni.
 - **Interazione:** Lo stato selezionato accende un alone ambrato (energia solare) e amplia l’ombra per simulare pressione verso il basso.
 
-### 3.2 VerbCards / VerbTokens
+### 3.3 VerbCards / VerbTokens
 
 Dettagli principali:
 
@@ -52,7 +83,7 @@ Dettagli principali:
 - **Scalabilità:** La micro versione funziona come gettone sulla mappa; la versione espansa mantiene la stessa gerarchia (anello esterno = stato, nucleo = icona tattica).
 - **Stati:** Idle (acciaio brunito), attivo (oro vivo + luce pulsante), blocco/fatica (ossidiana con incisioni rosse sottili).
 
-### 3.3 Ciclo Giorno/Notte (Astrolabio)
+### 3.4 Ciclo Giorno/Notte (Astrolabio)
 
 Dettagli principali:
 

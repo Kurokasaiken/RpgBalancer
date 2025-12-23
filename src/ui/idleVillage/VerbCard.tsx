@@ -124,6 +124,10 @@ const VerbCard = forwardRef<HTMLDivElement, VerbCardProps>(function VerbCard(
 
   const timerDisplay = formatTime(isActive ? remainingSeconds : totalDuration);
 
+  const progressDegrees = clampedProgress * 360;
+  const haloStartDeg = -90; // start from top (12 o'clock)
+  const haloHighlightStartDeg = haloStartDeg + Math.max(progressDegrees - 40, 0);
+
   const cardVariant = CARD_VARIANT_MAP[visualVariant] ?? 'default';
   const orbVariant = ORB_VARIANT_MAP[visualVariant] ?? 'neutral';
   const progressVariant = PROGRESS_VARIANT_MAP[visualVariant] ?? 'gold';
@@ -201,13 +205,13 @@ const VerbCard = forwardRef<HTMLDivElement, VerbCardProps>(function VerbCard(
             <div
               className="absolute inset-2 rounded-full opacity-70 blur-[0.5px]"
               style={{
-                background: `conic-gradient(var(--glow-${visualVariant}, rgba(251,191,36,0.55)) 0deg ${clampedProgress * 360}deg, rgba(4,6,16,0.35) ${clampedProgress * 360}deg 360deg)`,
+                background: `conic-gradient(from ${haloStartDeg}deg, var(--glow-${visualVariant}, rgba(251,191,36,0.55)) 0deg ${progressDegrees}deg, rgba(4,6,16,0.35) ${progressDegrees}deg 360deg)`,
               }}
             />
             <div
               className="absolute inset-3 rounded-full mix-blend-screen opacity-70"
               style={{
-                background: `conic-gradient(from ${Math.max(clampedProgress * 360 - 40, 0)}deg, rgba(255,255,255,0.4), transparent 120deg)`,
+                background: `conic-gradient(from ${haloHighlightStartDeg}deg, rgba(255,255,255,0.4), transparent 120deg)`,
               }}
             />
             <div className="absolute inset-[10px] rounded-full border border-slate-900/60 border-dashed opacity-40 animate-[spin_14s_linear_infinite]" />

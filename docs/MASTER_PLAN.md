@@ -148,13 +148,15 @@ See full spec for archetype stats, encounter templates, and drop mechanics.
 | Document | Purpose |
 |----------|---------|
 | **📋 Plan** | [plans/il_drago_art_direction_plan.md](plans/il_drago_art_direction_plan.md) |
+| **🖼️ Moodboard** | [moodboards/combat_viewer_visual/README.md](../docs/moodboards/combat_viewer_visual/README.md) |
 
 **Overview:**
-- Definisce la direzione artistica “Realismo Eroico Classico” per il progetto “Il Drago”, con focus su materiali (oro, avorio, acciaio, ossidiana) e componenti tattici (map markers stile Skyrim, VerbTokens metallici, astrolabio giorno/notte).
-- Specifica tipografia (Cinzel + Crimson Text), pipeline AI per asset e lista di elementi da evitare (no gothic/horror, no flat UI).
-- Fornisce roadmap di implementazione: moodboard/token set → component library → integrazione UI → QA/documentazione.
+- Missione creativa “Libertà, Gloria e Trionfo Solare”: antitesi del Dark Fantasy con saturazione tropicale e materiali nobili.
+- Direzione gerarchica per razze/biomi (Huang Guangjian, Ruan Jia, Justin Gerard/Jesper Ejsing) e tecnica di rendering stile Jaime Jones.
+- Specifica componenti chiave (`HeroMarker`, map markers, VerbTokens, Astrolabe) con API/config-first via `themeTokens.ilDrago`.
+- Stack confermato: React + Vite + Tailwind v4, SVG configurati, Framer Motion per animazioni “pesanti”, LaTeX solo per formule tecniche.
 
-**Status:** Draft v0.1 – in attesa di estensione verso token condivisi (`themeTokens`) e componenti riusabili.
+**Status:** Draft v0.2 – HeroMarker definito e moodboard aggiornato; prossimi step: introdurre token `goldBevel/ivoryPlate/obsidianGlass` e libreria componenti `heroicRealism`.
 
 #### **2.1: Combat Simulation Testing (In Progress)**
 

@@ -19,23 +19,24 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import idleVillageMap from '@/assets/ui/idleVillage/idle-village-map.jpg';
 import { computeSlotPercentPosition, resolveMapLayout } from '@/ui/idleVillage/mapLayoutUtils';
 import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
+import { seedDemoResidents, selectDefaultFounder } from '@/engine/game/idleVillage/seedDemoResidents';
 import {
   createVillageStateFromConfig,
   scheduleActivity,
+  resolveActivityOutcome,
+  type ResolveActivityOutcomeResult,
   type ResidentState,
   type ScheduledActivity,
   type VillageState,
-  type VillageEvent,
 } from '@/engine/game/idleVillage/TimeEngine';
 import { evaluateStatRequirement } from '@/engine/game/idleVillage/statMatching';
 import { tickIdleVillage } from '@/engine/game/idleVillage/IdleVillageEngine';
+import { useToast, ToastContainer } from '@/ui/balancing/Toast';
 import type {
   ActivityDefinition,
-  FounderPreset,
   IdleVillageConfig,
   MapSlotDefinition,
   StatRequirement,
-  TrialOfFireRules,
 } from '@/balancing/config/idleVillage/types';
 import MarbleMedallionCard from '@/ui/fantasy/assets/marble-verb-card/MarbleMedallionCard';
 import {
@@ -221,12 +222,6 @@ const validateAssignment = (params: {
   return { ok: true };
 };
 
-function selectDefaultFounder(config?: IdleVillageConfig | null): FounderPreset | null {
-  if (!config) return null;
-  const founders = config.founders ?? {};
-  return founders.founder_standard ?? Object.values(founders)[0] ?? null;
-}
-
 const pickPriorityVerb = (verbs: VerbSummary[]): VerbSummary | null => {
   if (!verbs.length) return null;
   const sorted = [...verbs].sort((a, b) => {
@@ -245,6 +240,7 @@ const IdleVillageMapPage: React.FC = () => {
   const defaultFounderPreset = useMemo(() => selectDefaultFounder(config), [config]);
   const [villageState, setVillageState] = useState<VillageState | null>(null);
   const villageStateRef = useRef<VillageState | null>(null);
+  const { showToast, toasts, removeToast } = useToast();
   const [isPlaying, setIsPlaying] = useState(false);
   const [cardScale, setCardScale] = useState(DEFAULT_CARD_SCALE);
   const [isResidentDragActive, setIsResidentDragActive] = useState(false);
@@ -273,7 +269,7 @@ const IdleVillageMapPage: React.FC = () => {
       founderPreset = config.founders[options.founderId];
     }
 
-    const freshState = createVillageStateFromConfig({ config, founderPreset });
+    const freshState = seedDemoResidents(createVillageStateFromConfig({ config, founderPreset }), config);
     setVillageState(freshState);
     villageStateRef.current = freshState;
     updateAssignmentFeedback(null);
@@ -376,6 +372,13 @@ const IdleVillageMapPage: React.FC = () => {
     return Object.values(config.mapSlots ?? {});
   }, [config]);
 
+  useEffect(() => {
+    if (!config) return;
+    if (import.meta.env?.DEV) {
+      console.debug('[IdleVillageMap] Map slots ready', Object.keys(config.mapSlots ?? {}));
+    }
+  }, [config]);
+
   const mapLayout = useMemo(() => resolveMapLayout(config?.mapLayout), [config?.mapLayout]);
 
   const mapSlotLayout = useMemo(() => {
@@ -389,6 +392,11 @@ const IdleVillageMapPage: React.FC = () => {
   const availableResidents = useMemo(() => {
     if (!villageState) return [] as ResidentState[];
     return Object.values(villageState.residents ?? {}).filter((resident) => resident.status === 'available');
+  }, [villageState]);
+
+  useEffect(() => {
+    if (!villageState || !import.meta.env?.DEV) return;
+    console.debug('[IdleVillageMap] Available residents snapshot', Object.values(villageState.residents ?? {}));
   }, [villageState]);
 
   const activitiesBySlot = useMemo(() => {
@@ -435,6 +443,13 @@ const IdleVillageMapPage: React.FC = () => {
       }
 
       const candidateActivities = activitiesBySlot[slotId] ?? [];
+      if (import.meta.env?.DEV) {
+        console.debug('[IdleVillageMap] Drop attempt', {
+          slotId,
+          residentId,
+          candidateCount: candidateActivities.length,
+        });
+      }
       if (candidateActivities.length === 0) {
         updateAssignmentFeedback('Nessuna activity compatibile per questo slot.', { silent: options?.silent });
         return false;
@@ -558,6 +573,17 @@ const IdleVillageMapPage: React.FC = () => {
         return a.endTime - b.endTime;
       });
   }, [scheduledActivities]);
+
+  const secondsPerTimeUnit = config?.globalRules.secondsPerTimeUnit ?? DEFAULT_SECONDS_PER_TIME_UNIT;
+  const dayLengthSetting = config?.globalRules.dayLengthInTimeUnits || 5;
+
+  const getResourceLabel = useCallback(
+    (resourceId: string) => {
+      const def = config?.resources?.[resourceId];
+      return def?.label ?? resourceId;
+    },
+    [config],
+  );
 
   const scheduledVerbSummaries = useMemo(() => {
     if (!config || !villageState) return [] as VerbSummary[];
@@ -687,6 +713,7 @@ const IdleVillageMapPage: React.FC = () => {
   }, []);
 
   const handleFocusSlot = useCallback((slotId: string) => {
+    console.log('Slot cliccato:', slotId);
     setSelectedSlotId(slotId);
   }, []);
 
@@ -707,19 +734,9 @@ const IdleVillageMapPage: React.FC = () => {
     [],
   );
 
-  const secondsPerTimeUnit = config?.globalRules.secondsPerTimeUnit ?? DEFAULT_SECONDS_PER_TIME_UNIT;
-  const dayLengthSetting = config?.globalRules.dayLengthInTimeUnits || 5;
-
-  const getResourceLabel = useCallback(
-    (resourceId: string) => {
-      const def = config?.resources?.[resourceId];
-      return def?.label ?? resourceId;
-    },
-    [config],
-  );
-
   const handleResidentDragStart = useCallback(
     (residentId: string) => (event: React.DragEvent<HTMLButtonElement>) => {
+      console.log('Drag iniziato:', residentId);
       event.dataTransfer.setData(RESIDENT_DRAG_MIME, residentId);
       event.dataTransfer.setData('text/plain', residentId);
       event.dataTransfer.effectAllowed = 'copy';
@@ -750,149 +767,42 @@ const IdleVillageMapPage: React.FC = () => {
     (scheduledId: string) => {
       if (!config) return;
 
-      const fallenIds: string[] = [];
-      const heroizedIds: string[] = [];
+      let outcome: ResolveActivityOutcomeResult | null = null;
 
       setVillageState((prev) => {
         if (!prev) return prev;
-        const scheduled = prev.activities[scheduledId];
-        if (!scheduled || scheduled.status !== 'completed') return prev;
-        const activity = config.activities[scheduled.activityId];
-        if (!activity) return prev;
-
-        const nextResidents: Record<string, ResidentState> = { ...prev.residents };
-        const nextActivities: Record<string, ScheduledActivity> = { ...prev.activities };
-        delete nextActivities[scheduledId];
-
-        const events: VillageEvent[] = [];
-        const trialRules: TrialOfFireRules | undefined = config.globalRules.trialOfFire;
-        const statBonusMultiplier = trialRules?.statBonusMultiplier ?? 0;
-        const heroSurvivalThreshold = trialRules?.heroSurvivalThreshold ?? null;
-
-        const resolvedRisk =
-          typeof scheduled.snapshotDeathRisk === 'number' && scheduled.snapshotDeathRisk > 0
-            ? clamp01(scheduled.snapshotDeathRisk)
-            : deriveDeathRisk(activity);
-
-        for (const cid of scheduled.characterIds) {
-          const resident = nextResidents[cid];
-          if (!resident) continue;
-
-          if (resolvedRisk > 0 && simpleRng() < resolvedRisk) {
-            fallenIds.push(resident.id);
-            events.push({
-              time: prev.currentTime,
-              type: 'trial_of_fire',
-              payload: {
-                scheduledId,
-                activityId: scheduled.activityId,
-                residentId: resident.id,
-                outcome: 'death',
-                risk: resolvedRisk,
-              },
-            });
-            delete nextResidents[cid];
-            continue;
-          }
-
-          const survivalCount = (resident.survivalCount ?? 0) + 1;
-          let updatedSnapshot = resident.statSnapshot;
-          if (updatedSnapshot && statBonusMultiplier > 0 && resolvedRisk > 0) {
-            const multiplier = 1 + resolvedRisk * statBonusMultiplier;
-            updatedSnapshot = Object.fromEntries(
-              Object.entries(updatedSnapshot).map(([key, value]) =>
-                typeof value === 'number' ? [key, value * multiplier] : [key, value],
-              ),
-            );
-          }
-
-          const becameHero =
-            !resident.isHero &&
-            (resolvedRisk > 0.3 || (heroSurvivalThreshold !== null && survivalCount >= heroSurvivalThreshold));
-
-          if (becameHero) {
-            heroizedIds.push(resident.id);
-          }
-
-          const updatedResident: ResidentState = {
-            ...resident,
-            survivalCount,
-            isHero: resident.isHero || becameHero,
-            survivalScore: (resident.survivalScore ?? 0) + resolvedRisk * 100,
-          };
-
-          if (updatedSnapshot) {
-            updatedResident.statSnapshot = updatedSnapshot;
-          }
-
-          nextResidents[cid] = updatedResident;
-
-          events.push({
-            time: prev.currentTime,
-            type: 'trial_of_fire',
-            payload: {
-              scheduledId,
-              activityId: scheduled.activityId,
-              residentId: resident.id,
-              outcome: 'survived',
-              risk: resolvedRisk,
-              becameHero,
-            },
-          });
-        }
-
-        const survivingIds = scheduled.characterIds.filter((cid) => Boolean(nextResidents[cid]));
-        const nextEventLog = events.length > 0 ? [...prev.eventLog, ...events] : prev.eventLog;
-
-        let nextState: VillageState = {
-          ...prev,
-          residents: nextResidents,
-          activities: nextActivities,
-          eventLog: nextEventLog,
-        };
-
-        const survivorsReady =
-          scheduled.isAuto &&
-          survivingIds.length === scheduled.characterIds.length &&
-          survivingIds.every((cid) => {
-            const resident = nextResidents[cid];
-            if (!resident) return false;
-            if (resident.status !== 'available') return false;
-            if (resident.fatigue >= config.globalRules.maxFatigueBeforeExhausted) return false;
-            if (typeof resident.currentHp === 'number' && resident.currentHp <= 0) return false;
-            return true;
-          });
-
-        if (survivorsReady) {
-          const autoResult = scheduleActivity(
-            { config, rng: simpleRng },
-            nextState,
-            {
-              activityId: scheduled.activityId,
-              characterIds: [...survivingIds],
-              slotId: scheduled.slotId,
-              isAuto: true,
-              snapshotDeathRisk: resolvedRisk,
-            },
-          );
-
-          if (!autoResult.error && autoResult.state) {
-            nextState = autoResult.state;
-          }
-        }
-
-        return nextState;
+        const resolution = resolveActivityOutcome({ config, rng: simpleRng }, prev, scheduledId);
+        outcome = resolution.outcome;
+        villageStateRef.current = resolution.state;
+        return resolution.state;
       });
 
-      if (fallenIds.length > 0) {
-        setAssignmentFeedback(`Morte: ${fallenIds.join(', ')}`);
-      } else if (heroizedIds.length > 0) {
-        setAssignmentFeedback(`Eroe promosso: ${heroizedIds.join(', ')}`);
-      } else {
-        setAssignmentFeedback('Attività risolta');
+      if (!outcome) {
+        return;
       }
+
+      const fallenIds = outcome.fallen.map((entry) => entry.characterId);
+      const heroizedIds = outcome.heroizedIds;
+
+      if (fallenIds.length > 0) {
+        const message = `Caduti: ${fallenIds.join(', ')}`;
+        setAssignmentFeedback(message);
+        showToast(message, 'error');
+        return;
+      }
+
+      if (heroizedIds.length > 0) {
+        const message = `Nuovi eroi: ${heroizedIds.join(', ')}`;
+        setAssignmentFeedback(message);
+        showToast(message, 'success');
+        return;
+      }
+
+      const neutralMessage = outcome.autoRescheduledId ? 'Attività riavviata automaticamente' : 'Attività risolta';
+      setAssignmentFeedback(neutralMessage);
+      showToast(neutralMessage, 'info');
     },
-    [config, setAssignmentFeedback],
+    [config, setAssignmentFeedback, showToast],
   );
 
   if (!config || !villageState) {
@@ -1007,7 +917,7 @@ const IdleVillageMapPage: React.FC = () => {
             />
           </div>
 
-          {selectedSlotId && selectedSlotDefinition && selectedSlotVerbs.length > 0 && (
+          {selectedSlotId && selectedSlotDefinition && (
             <TheaterView
               slotLabel={selectedSlotDefinition.label ?? selectedSlotId}
               slotIcon={selectedSlotDefinition.icon}
@@ -1020,9 +930,6 @@ const IdleVillageMapPage: React.FC = () => {
           <div className="absolute inset-0 z-10" style={{ transformStyle: 'preserve-3d' }}>
             {mapSlotLayout.map(({ slot, left, top }) => {
               const combined = combinedVerbsForSlot(slot.id);
-              if (combined.length === 0) {
-                return null;
-              }
               const priorityVerb = pickPriorityVerb(combined);
               return (
                 <MapSlotVerbCluster
@@ -1045,6 +952,7 @@ const IdleVillageMapPage: React.FC = () => {
           </div>
         </section>
       </div>
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </>
   );
 }

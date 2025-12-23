@@ -296,6 +296,10 @@ export interface TrialOfFireRules {
    * Optional number of survivals required before the resident is flagged as hero.
    */
   heroSurvivalThreshold?: number;
+  /**
+   * Percentage (0-1) of max HP restored after a successful Trial of Fire survival.
+   */
+  hpRecoveryPercent?: number;
 }
 
 export interface GlobalRules {

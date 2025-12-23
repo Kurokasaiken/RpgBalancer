@@ -7,11 +7,15 @@ import type {
   ActivityDefinition,
   FounderPreset,
   IdleVillageConfig,
+  TrialOfFireRules,
 } from '../../../balancing/config/idleVillage/types';
 import type { StatBlock } from '../../../balancing/types';
 
 const DEFAULT_RESIDENT_MAX_HP = 100;
 const DEFAULT_TRIAL_OF_FIRE_THRESHOLD = 0.25;
+const IS_DEV_ENV =
+  (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production') ||
+  (typeof window !== 'undefined' && (window as { __DEV__?: boolean }).__DEV__);
 
 function clamp01(value: number): number {
   if (!Number.isFinite(value)) return 0;
@@ -74,15 +78,27 @@ export interface ResolveActivityOutcomeResult {
   scheduledId: string;
   survivors: TrialOfFireSurvivor[];
   fallen: TrialOfFireFallen[];
+  heroizedIds: string[];
   autoRescheduledId?: string | null;
 }
 
-export function buildResidentFromFounder(preset: FounderPreset): ResidentState {
+export interface BuildResidentFromFounderOptions {
+  startingFatigue?: number;
+}
+
+export function buildResidentFromFounder(
+  preset: FounderPreset,
+  options?: BuildResidentFromFounderOptions,
+): ResidentState {
   const maxHp = DEFAULT_RESIDENT_MAX_HP;
+  const startingFatigue =
+    typeof options?.startingFatigue === 'number' && Number.isFinite(options.startingFatigue)
+      ? options.startingFatigue
+      : 0;
   return {
     id: `founder-${preset.id}`,
     status: 'available',
-    fatigue: 0,
+    fatigue: startingFatigue,
     statProfileId: preset.archetypeId,
     statTags: preset.statTags && preset.statTags.length > 0 ? [...preset.statTags] : [preset.difficultyTag],
     currentHp: maxHp,
@@ -130,11 +146,21 @@ export function createVillageStateFromConfig(options: { config: IdleVillageConfi
   const state = createInitialVillageState(initialResources);
 
   if (founderPreset) {
-    const founderResident = buildResidentFromFounder(founderPreset);
+    const founderResident = buildResidentFromFounder(founderPreset, {
+      startingFatigue: config.globalRules.maxFatigueBeforeExhausted,
+    });
     state.residents = {
       ...state.residents,
       [founderResident.id]: founderResident,
     };
+  }
+
+  if (IS_DEV_ENV) {
+    const residentCount = Object.keys(state.residents).length;
+    console.debug('[TimeEngine] createVillageStateFromConfig', {
+      residentCount,
+      founderPreset: founderPreset?.id ?? null,
+    });
   }
 
   return state;
@@ -307,10 +333,16 @@ export function scheduleActivity(
   const { config } = deps;
   const activityDef = getActivity(config, input.activityId);
   if (!activityDef) {
+    if (IS_DEV_ENV) {
+      console.warn('[TimeEngine] scheduleActivity missing activity', input.activityId);
+    }
     return { state, error: `Activity "${input.activityId}" not found in config` };
   }
 
   if (!canScheduleActivity(state, input)) {
+    if (IS_DEV_ENV) {
+      console.warn('[TimeEngine] scheduleActivity failed availability check', input);
+    }
     return { state, error: 'One or more characters are not available' };
   }
 
@@ -368,11 +400,19 @@ export function scheduleActivity(
     eventLog: [...state.eventLog, event],
   };
 
+  if (IS_DEV_ENV) {
+    console.debug('[TimeEngine] scheduleActivity success', {
+      scheduledId: scheduled.id,
+      slotId: scheduled.slotId,
+      characterIds: scheduled.characterIds,
+    });
+  }
+
   return { state: nextState, scheduledActivity: scheduled };
 }
 
 export function advanceTime(
-  _deps: TimeEngineDeps,
+  deps: TimeEngineDeps,
   state: VillageState,
   delta: VillageTimeUnit,
 ): AdvanceTimeResult {
@@ -402,6 +442,7 @@ export function advanceTime(
 
     if (activity.status === 'running' && activity.endTime <= targetTime) {
       activity.status = 'completed';
+      activity.isCompleted = true;
       completedActivityIds.push(activity.id);
       newEvents.push({
         time: activity.endTime,
@@ -441,7 +482,7 @@ export function advanceTime(
     dayLengthInTimeUnits,
     maxFatigueBeforeExhausted,
     foodConsumptionPerResidentPerDay,
-  } = _deps.config.globalRules;
+  } = deps.config.globalRules;
   const recoveryRatePerUnit = fatigueRecoveryPerDay / dayLengthInTimeUnits;
   const recoveryAmount = Math.floor(recoveryRatePerUnit * advanceBy);
 
@@ -526,24 +567,37 @@ export function advanceTime(
     questOffers: state.questOffers ?? {},
   };
 
-  const finalState = spawnQuestOffersIfNeeded(_deps, baseNextState, state.currentTime, targetTime);
+  const finalState = spawnQuestOffersIfNeeded(deps, baseNextState, state.currentTime, targetTime);
 
   return { state: finalState, completedActivityIds };
 }
 
-function applyTrialOfFireStatBonus(statSnapshot: Partial<StatBlock> | undefined, risk: number): Partial<StatBlock> | undefined {
-  if (!statSnapshot) return statSnapshot;
-  const multiplier = 1 + clamp01(risk) * 0.05;
-  const nextSnapshot: Partial<StatBlock> = {};
-  (Object.keys(statSnapshot) as (keyof StatBlock)[]).forEach((key) => {
-    const value = statSnapshot[key];
+function applyTrialOfFireStatBonus(
+  statSnapshot: Partial<StatBlock> | undefined,
+  risk: number,
+  trialRules?: TrialOfFireRules,
+): { snapshot: Partial<StatBlock> | undefined; bonusApplied: boolean } {
+  if (!statSnapshot) {
+    return { snapshot: statSnapshot, bonusApplied: false };
+  }
+
+  const highRiskThreshold = clamp01(trialRules?.highRiskThreshold ?? DEFAULT_TRIAL_OF_FIRE_THRESHOLD);
+  const statBonusMultiplier = trialRules?.statBonusMultiplier ?? 0;
+  if (statBonusMultiplier <= 0 || risk < highRiskThreshold) {
+    return { snapshot: statSnapshot, bonusApplied: false };
+  }
+
+  const multiplier = 1 + clamp01(risk) * statBonusMultiplier;
+  const workingSnapshot: Record<string, unknown> = {};
+  Object.keys(statSnapshot).forEach((key) => {
+    const value = (statSnapshot as Record<string, unknown>)[key];
     if (typeof value === 'number' && Number.isFinite(value)) {
-      nextSnapshot[key] = Number((value * multiplier).toFixed(3));
+      workingSnapshot[key] = Number((value * multiplier).toFixed(3));
     } else {
-      nextSnapshot[key] = value as StatBlock[typeof key];
+      workingSnapshot[key] = value;
     }
   });
-  return nextSnapshot;
+  return { snapshot: workingSnapshot as Partial<StatBlock>, bonusApplied: true };
 }
 
 export function resolveActivityOutcome(
@@ -552,22 +606,29 @@ export function resolveActivityOutcome(
   scheduledId: string,
 ): { state: VillageState; outcome: ResolveActivityOutcomeResult } {
   const scheduled = state.activities[scheduledId];
-  if (!scheduled) {
+  if (!scheduled || scheduled.status !== 'completed') {
     return {
       state,
       outcome: {
         scheduledId,
         survivors: [],
         fallen: [],
+        heroizedIds: [],
         autoRescheduledId: null,
       },
     };
   }
 
   const risk = clamp01(scheduled.snapshotDeathRisk ?? 0);
+  const trialRules = deps.config.globalRules.trialOfFire;
+  const heroRiskThreshold = clamp01(trialRules?.highRiskThreshold ?? DEFAULT_TRIAL_OF_FIRE_THRESHOLD);
+  const heroSurvivalThreshold =
+    typeof trialRules?.heroSurvivalThreshold === 'number' ? trialRules.heroSurvivalThreshold : null;
   const updatedResidents: Record<string, ResidentState> = { ...state.residents };
   const survivors: TrialOfFireSurvivor[] = [];
   const fallen: TrialOfFireFallen[] = [];
+  const heroizedIds: string[] = [];
+  const hpRecoveryPercent = clamp01(trialRules?.hpRecoveryPercent ?? 0);
 
   for (const characterId of scheduled.characterIds) {
     const resident = updatedResidents[characterId];
@@ -582,22 +643,37 @@ export function resolveActivityOutcome(
       continue;
     }
 
-    const heroized = risk > 0.3;
+    const { snapshot: nextSnapshot, bonusApplied } = applyTrialOfFireStatBonus(
+      resident.statSnapshot,
+      risk,
+      trialRules,
+    );
+    const survivalCount = (resident.survivalCount ?? 0) + 1;
+    const qualifiesByRisk = risk >= heroRiskThreshold;
+    const qualifiesByCount = heroSurvivalThreshold !== null && survivalCount >= heroSurvivalThreshold;
+    const heroized = !resident.isHero && (qualifiesByRisk || qualifiesByCount);
     const hpRatio = resident.maxHp > 0 ? resident.currentHp / resident.maxHp : 0;
-    const nextSnapshot = applyTrialOfFireStatBonus(resident.statSnapshot, risk);
+
+    const recoveredHp =
+      hpRecoveryPercent > 0 ? Math.min(resident.maxHp, resident.currentHp + resident.maxHp * hpRecoveryPercent) : resident.currentHp;
 
     updatedResidents[characterId] = {
       ...resident,
       isHero: resident.isHero || heroized,
-      survivalCount: (resident.survivalCount ?? 0) + 1,
+      survivalCount,
       survivalScore: (resident.survivalScore ?? 0) + Math.round(risk * 100),
       statSnapshot: nextSnapshot,
+      currentHp: recoveredHp,
     };
+
+    if (heroized) {
+      heroizedIds.push(characterId);
+    }
 
     survivors.push({
       characterId,
       heroized,
-      bonusApplied: Boolean(nextSnapshot),
+      bonusApplied,
       hpRatio,
     });
   }
@@ -648,9 +724,25 @@ export function resolveActivityOutcome(
       scheduledId,
       survivors,
       fallen,
+      heroizedIds,
       autoRescheduledId,
     },
   };
+}
+
+export function resolveActivities(
+  deps: TimeEngineDeps,
+  state: VillageState,
+  scheduledIds: string[],
+): { state: VillageState; outcomes: ResolveActivityOutcomeResult[] } {
+  let nextState = state;
+  const outcomes: ResolveActivityOutcomeResult[] = [];
+  for (const scheduledId of scheduledIds) {
+    const resolution = resolveActivityOutcome(deps, nextState, scheduledId);
+    nextState = resolution.state;
+    outcomes.push(resolution.outcome);
+  }
+  return { state: nextState, outcomes };
 }
 
 function spawnQuestOffersIfNeeded(

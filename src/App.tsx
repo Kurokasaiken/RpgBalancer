@@ -44,6 +44,7 @@ const TestingLab = lazy(() =>
 const StatStressTestingPage = lazy(() =>
   import('./ui/testing/StatStressTestingPage').then((m) => ({ default: m.StatStressTestingPage }))
 );
+const VillageSandbox = lazy(() => import('./ui/idleVillage/VillageSandbox'));
 const ArchetypeTestingLab = lazy(() =>
   import('./ui/balancing/ArchetypeTestingLab').then((m) => ({ default: m.ArchetypeTestingLab }))
 );
@@ -194,6 +195,13 @@ function App() {
           <ErrorBoundary componentName="Verb Detail Sandbox">
             <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Verb Detail Sandbox…</div>}>
               <VerbDetailSandbox />
+            </Suspense>
+          </ErrorBoundary>
+        )}
+        {activeTab === 'villageSandbox' && (
+          <ErrorBoundary componentName="Village Sandbox">
+            <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Village Sandbox…</div>}>
+              <VillageSandbox />
             </Suspense>
           </ErrorBoundary>
         )}
