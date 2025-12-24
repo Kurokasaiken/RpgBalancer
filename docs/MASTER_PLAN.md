@@ -395,16 +395,47 @@ Expand combat system from 1v1 to full tactical grid-based multi-unit combat:
 
 | Document | Purpose |
 |----------|---------|
-| **📋 Report** | [docs/reports/safe-audit-2025-12-24.md](../docs/reports/safe-audit-2025-12-24.md) |
+| ** Report** | [docs/reports/safe-audit-2025-12-24.md](../docs/reports/safe-audit-2025-12-24.md) |
 
 **Highlights:**
-- Orphaned mockups/legacy Gilded components spostati in `_OLD_DEPRECATED/…`.
-- Idle Village fallback residents + VerbDetail sandbox ora generano `ResidentState` validi.
+- Architettura SAFE confermata
+- Asset obsoleti spostati in `/archive`
+- Build di Vite/Playwright ripristinata senza regressioni
+
+### **Skill Check Preview Lab Refactor (24 Dec 2025)**
+
+**Status:** PLANNING  
+**Scope:** Skill Check Preview Lab UI + V6 integration
+
+| Document | Purpose |
+| --- | --- |
+| ** Plan** | [plans/skill_check_preview_lab_plan.md](plans/skill_check_preview_lab_plan.md) |
+| ** Tasks** | [plans/skill_check_preview_lab_tasks.md](plans/skill_check_preview_lab_tasks.md) |
+
+**Key Objectives:**
+- Eliminare la tab “Alt Visuals” e usare AltVisuals V6 come unica visualizzazione del Dispatch Polygon.
+- Sostituire i controlli legacy (Shot Power, Spin Bias, Lancia pallina) con “Riavvia scena” e “Ritira dado”.
+- Implementare la logica di cardinalità per distribuire le icone stat (derivate dal balancer) sui 5 punti cardinali.
+- Garantire compliance alle regole config-first + JSDoc e aggiornare i test UI.
+
+**Ownership:** Testing Tools / Balancer UI Team (Skill Check Preview stream)
+
+---
+
+## **PRIORITY ALERTS**
+VerbDetail sandbox ora generano `ResidentState` validi.
 - AltVisuals V6 ripristinato con schema axisMeta + `hasSettled`.
 - Build `npm run build` pulita (warn asset size solo informativi).
 
 **Problemi da risolvere:**
-1. ❌ Reset non funziona (card, stat, pagina)
+1. Reset non funziona (card, stat, pagina)
+2. Pulsante Elimina: posizione sbagliata, manca cerchio rosso
+3. Pulsante Occhio: non è il più a destra
+4. Icona Lock: stato visivo non chiaro (aperto/chiuso)
+5. Pulsanti Lock, Hide, Reset: non fanno nulla
+6. Icona Lock troppo grande
+7. Import formule: diventano valori secchi
+8. Import/Export: non sembrano funzionare
 2. ❌ Pulsante Elimina: posizione sbagliata, manca cerchio rosso
 3. ❌ Pulsante Occhio: non è il più a destra
 4. ❌ Icona Lock: stato visivo non chiaro (aperto/chiuso)

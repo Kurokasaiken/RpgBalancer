@@ -1,5 +1,8 @@
 import { z } from 'zod';
 
+/**
+ * Canonical schema describing how Idle Village building definitions are validated.
+ */
 export const BuildingDefinitionSchema = z.object({
   id: z.string().min(1),
   label: z.string().min(1),

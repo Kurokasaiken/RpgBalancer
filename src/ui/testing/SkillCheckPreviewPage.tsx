@@ -1,31 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useBalancerConfig } from '@/balancing/hooks/useBalancerConfig';
-
+import type { StatDefinition } from '@/balancing/config/types';
+import { getStatGlyph } from '@/ui/shared/statIconUtils';
 import AltVisualsV6Asterism from './AltVisualsV6Asterism';
-import AltVisualsV8ObsidianField from './AltVisualsV8ObsidianField';
-import type { OutcomeZone, OutcomeResult, StatRow, LastOutcome, Point } from './types';
+import type { AxisMetaEntry } from './altVisualsAxis';
+import type { StatRow } from './types';
 
 const CANVAS_SIZE = 300;
 const CENTER_X = CANVAS_SIZE / 2;
 const CENTER_Y = CANVAS_SIZE / 2;
 const RADIUS = 120;
-type AltVisualComponent = React.ComponentType<{ stats: StatRow[]; controlsPortal?: HTMLElement | null }>;
-const ALT_VISUAL_ENTRIES = [
-  {
-    id: 'alt-v8',
-    label: 'Alt Visuals v8',
-    Component: AltVisualsV8ObsidianField,
-  },
-  {
-    id: 'alt-v6',
-    label: 'Alt Visuals v6',
-    Component: AltVisualsV6Asterism,
-  },
-] satisfies readonly { id: string; label: string; Component: AltVisualComponent }[];
-type AltVisualId = (typeof ALT_VISUAL_ENTRIES)[number]['id'];
-
-const ALT_VIEW_MODE_STORAGE_KEY = 'skill-check-preview-alt-view';
-const VIEW_MODE_STORAGE_KEY = 'skill-check-preview-view-mode';
 
 interface RadiiSnapshot {
   safeRadius: number;
@@ -1012,19 +996,6 @@ export const SkillCheckPreviewPage: React.FC = () => {
   const [deathPct, setDeathPct] = useState(15);
   const [shotPower, setShotPower] = useState(0.5);
   const [spinBias, setSpinBias] = useState(0.0);
-  const [viewMode, setViewMode] = useState<'classic' | 'alt-v6-plus'>(() => {
-    if (typeof window === 'undefined') {
-      return 'classic';
-    }
-    const stored = window.localStorage.getItem(VIEW_MODE_STORAGE_KEY);
-    return stored === 'alt-v6-plus' ? 'alt-v6-plus' : 'classic';
-  });
-  const [altViewMode, setAltViewMode] = useState<AltVisualId>(() => {
-    const stored = window.localStorage.getItem(ALT_VIEW_MODE_STORAGE_KEY);
-    if (stored === 'alt-v6' || stored === 'alt-v8') return stored;
-    return 'alt-v8';
-  });
-  const [altControlsPortalEl, setAltControlsPortalEl] = useState<HTMLDivElement | null>(null);
   const [ballPosition, setBallPosition] = useState<Point | null>(null);
   const [lastOutcome, setLastOutcome] = useState<LastOutcome | null>(null);
   const [timer, setTimer] = useState('0.0s');
@@ -1095,16 +1066,6 @@ export const SkillCheckPreviewPage: React.FC = () => {
     const timeout = window.setTimeout(() => setStarPulse(false), 520);
     return () => window.clearTimeout(timeout);
   }, [heroSmoothPathD]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    window.localStorage.setItem(VIEW_MODE_STORAGE_KEY, viewMode);
-  }, [viewMode]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    window.localStorage.setItem(ALT_VIEW_MODE_STORAGE_KEY, altViewMode);
-  }, [altViewMode]);
 
   const radii = useMemo(
     () => computeRadiiSnapshot(questPolygon, stats, safePct, injuryPct, deathPct),
@@ -1254,27 +1215,7 @@ export const SkillCheckPreviewPage: React.FC = () => {
   return (
     <div className="p-3 md:p-4 text-ivory">
       <h1 className="text-lg md:text-xl font-cinzel tracking-[0.2em] uppercase mb-2">Skill Check Preview Lab</h1>
-      <div className="flex flex-wrap gap-2 mb-4">
-        <span className="text-[10px] uppercase tracking-[0.24em] text-slate-500 pt-1">View</span>
-        <div className="bg-slate-900/70 border border-slate-800 rounded-full p-1 flex gap-1">
-          {(['classic', 'alt-v6-plus'] as const).map((mode) => (
-            <button
-              key={mode}
-              type="button"
-              onClick={() => setViewMode(mode)}
-              className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-[0.16em] transition-all ${viewMode === mode
-                ? 'bg-emerald-400/20 text-emerald-200 border border-emerald-400/50 shadow-[0_0_10px_rgba(16,185,129,0.25)]'
-                : 'text-slate-400 hover:text-slate-100'
-                }`}
-            >
-              {mode === 'classic' ? 'Dispatch Polygon' : 'Alt Visuals · Anime'}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {viewMode === 'classic' ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* ─── LEFT COLUMN: CONTROLS ─── */}
           <div className="default-card p-3 space-y-4">
             {/* Stats Config (Checkboxes) */}
@@ -1605,83 +1546,7 @@ export const SkillCheckPreviewPage: React.FC = () => {
               </div>
             )}
           </div>
-        </div>
-      ) : (
-        <div className="grid gap-4 lg:grid-cols-[1fr_minmax(260px,320px)]">
-          <div
-            className="default-card p-6 space-y-3 flex flex-col"
-            style={{ backgroundColor: 'rgba(18, 20, 26, 0.86)' }}
-          >
-            {(() => {
-              const entry = ALT_VISUAL_ENTRIES.find((item) => item.id === altViewMode) ?? ALT_VISUAL_ENTRIES[0];
-              const VisualComponent = entry.Component;
-              return (
-                <div
-                  className="flex-1 flex items-center justify-center min-h-[360px] rounded-4xl"
-                  style={{ backgroundColor: 'rgba(8, 10, 15, 0.1)' }}
-                >
-                  <VisualComponent stats={stats} controlsPortal={altControlsPortalEl} />
-                </div>
-              );
-            })()}
-          </div>
-
-          <div
-            className="default-card p-4 space-y-4 h-min sticky top-16 self-start"
-            style={{ backgroundColor: 'rgba(24, 28, 36, 0.78)' }}
-          >
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <h3 className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-200">
-                  Alt Visuals Anime · Modalità
-                </h3>
-                <p className="text-[11px] text-slate-400">
-                  Scegli la versione con glow FX che preferisci (stessa logica pinball, estetica diversa).
-                </p>
-              </div>
-              <div className="flex gap-2 bg-slate-900/70 border border-slate-800 rounded-full p-1">
-                {ALT_VISUAL_ENTRIES.map((entry) => (
-                  <button
-                    key={entry.id}
-                    type="button"
-                    onClick={() => setAltViewMode(entry.id as AltVisualId)}
-                    className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-[0.16em] transition-all ${altViewMode === entry.id
-                      ? 'bg-cyan-400/20 text-cyan-100 border border-cyan-300/60 shadow-[0_0_12px_rgba(34,211,238,0.25)]'
-                      : 'text-slate-400 hover:text-slate-100'
-                      }`}
-                  >
-                    {entry.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div
-              ref={setAltControlsPortalEl}
-              className="flex flex-wrap items-center gap-3 rounded-2xl border border-slate-800/80 bg-slate-950/40 px-3 py-3 min-h-[72px]"
-            />
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-[10px] text-slate-300">
-              <div className="bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-2">
-                <div className="uppercase tracking-[0.18em] text-slate-500">Stats attive</div>
-                <div className="text-lg font-mono text-cyan-300">{stats.filter((stat) => stat.questValue > 0).length}</div>
-              </div>
-              <div className="bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-2">
-                <div className="uppercase tracking-[0.18em] text-slate-500">Safe%</div>
-                <div className="text-lg font-mono text-emerald-300">
-                  {Math.max(0, 100 - injuryPct - deathPct)}%
-                </div>
-              </div>
-              <div className="bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-2">
-                <div className="uppercase tracking-[0.18em] text-slate-500">Injury%</div>
-                <div className="text-lg font-mono text-amber-300">{injuryPct}%</div>
-              </div>
-              <div className="bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-2">
-                <div className="uppercase tracking-[0.18em] text-slate-500">Death%</div>
-                <div className="text-lg font-mono text-rose-300">{deathPct}%</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 };

@@ -1,5 +1,8 @@
 import { useRef } from 'react';
 
+/**
+ * Visual card props representing a drag-enabled resident in Idle Village.
+ */
 export interface WorkerCardProps {
   id: string;
   name: string;
@@ -11,6 +14,9 @@ export interface WorkerCardProps {
   isHovering?: boolean;
 }
 
+/**
+ * Resident card with drag previews, HP/fatigue bars, and hover states.
+ */
 const WorkerCard: React.FC<WorkerCardProps> = ({
   id,
   name,
@@ -23,6 +29,9 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
 }) => {
   const dragPreviewRef = useRef<HTMLDivElement | null>(null);
 
+  /**
+   * Removes the temporary drag preview element from the DOM.
+   */
   const cleanupPreview = () => {
     if (dragPreviewRef.current) {
       document.body.removeChild(dragPreviewRef.current);
@@ -30,6 +39,9 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
     }
   };
 
+  /**
+   * Initializes drag metadata and renders the custom drag image preview.
+   */
   const handleDragStart = (event: React.DragEvent<HTMLDivElement>) => {
     event.stopPropagation();
     event.dataTransfer.setData('text/resident-id', id);
@@ -45,6 +57,9 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
     onDragStateChange?.(id, true);
   };
 
+  /**
+   * Resets drag preview and notifies listeners that dragging ended.
+   */
   const handleDragEnd = () => {
     cleanupPreview();
     onDragStateChange?.(id, false);
@@ -59,6 +74,9 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
       onMouseEnter={() => onHoverChange?.(id, true)}
       onMouseLeave={() => onHoverChange?.(id, false)}
       onDragEnd={handleDragEnd}
+      data-testid="worker-card"
+      data-worker-id={id}
+      data-worker-name={name}
       className={[
         'relative w-full max-w-sm cursor-pointer overflow-hidden rounded-2xl border border-slate-800/70 bg-slate-950/90 p-4 shadow-[0_18px_35px_rgba(0,0,0,0.55)] transition',
         'bg-[radial-gradient(circle_at_top,#101826_0%,#05070d_70%)]',

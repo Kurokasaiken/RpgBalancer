@@ -1,11 +1,17 @@
 import type { ReactNode } from 'react';
 
+/**
+ * Props for the decorative location preview card used in Idle Village.
+ */
 export interface LocationCardProps {
   title: string;
   description: string;
   iconRow?: ReactNode;
 }
 
+/**
+ * Stylized card that showcases an Idle Village location with optional icon rows.
+ */
 const LocationCard: React.FC<LocationCardProps> = ({ title, description, iconRow }) => {
   return (
     <div className="flex flex-col gap-3 rounded-3xl border border-amber-400/30 bg-slate-950/80 p-4 shadow-[0_15px_45px_rgba(0,0,0,0.55)]">

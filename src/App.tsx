@@ -1,5 +1,5 @@
 // Updated App navigation to include Spell Editor and Spell Library
-import { useState, useEffect, lazy, Suspense } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { SpellLibrary } from './ui/spell/SpellLibrary';
 import { IdleArena } from './ui/idle/IdleArena';
 import { CharacterManager } from './ui/idle/CharacterManager';
@@ -18,7 +18,7 @@ import { TacticalLab } from './ui/tactical/TacticalLab';
 import IdleVillageMapPage from './ui/idleVillage/IdleVillageMapPage';
 import IdleVillageConfigRoute from './pages/idle-village-config';
 import { CombatViewerPage } from './ui/balancing/CombatViewerPage';
-import { IdleVillageConfigStore } from '@/balancing/config/idleVillage/IdleVillageConfigStore';
+import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
 import {
   DEFAULT_LANDING_TAB_ID,
   isValidNavTabId,
@@ -46,21 +46,10 @@ const VerbDetailSandbox = lazy(() =>
   import('./ui/testing/VerbDetailSandbox').then((m) => ({ default: m.default }))
 );
 
-const resolveInitialTab = (): AppNavTabId => {
-  try {
-    const config = IdleVillageConfigStore.load();
-    const preferred = config.uiPreferences?.defaultAppTabId;
-    if (preferred && isValidNavTabId(preferred)) {
-      return preferred;
-    }
-  } catch (error) {
-    console.warn('Failed to resolve Idle Village UI preference, falling back to default tab.', error);
-  }
-  return DEFAULT_LANDING_TAB_ID;
-};
-
 function App() {
-  const [activeTab, setActiveTab] = useState<AppNavTabId>(() => resolveInitialTab());
+  const [activeTab, setActiveTab] = useState<AppNavTabId>(DEFAULT_LANDING_TAB_ID);
+  const { config, initialized, isInitializing, initializeConfig } = useIdleVillageConfig();
+  const hasAppliedPreferenceRef = useRef(false);
 
   // Listen for spell creation navigation from SpellLibrary
   useEffect(() => {
@@ -68,6 +57,25 @@ function App() {
     window.addEventListener('navigate-spell-creation', handleNavigate as EventListener);
     return () => window.removeEventListener('navigate-spell-creation', handleNavigate as EventListener);
   }, []);
+
+  useEffect(() => {
+    void initializeConfig();
+  }, [initializeConfig]);
+
+  useEffect(() => {
+    if (hasAppliedPreferenceRef.current) return;
+    if (!initialized || isInitializing) return;
+    const preferred = config.uiPreferences?.defaultAppTabId;
+    if (preferred && isValidNavTabId(preferred)) {
+      setActiveTab(preferred);
+    }
+    hasAppliedPreferenceRef.current = true;
+  }, [config.uiPreferences, initialized, isInitializing]);
+
+  const idleVillageReady = initialized && !isInitializing;
+  const idleVillageLoadingFallback = (
+    <div className="p-4 text-xs text-slate-300">Loading Idle Village configuration…</div>
+  );
 
   return (
     <div data-testid="app-loaded" className="min-h-screen">
@@ -174,12 +182,12 @@ function App() {
         )}
         {activeTab === 'idleVillageMap' && (
           <ErrorBoundary componentName="Idle Village Map">
-            <IdleVillageMapPage />
+            {idleVillageReady ? <IdleVillageMapPage /> : idleVillageLoadingFallback}
           </ErrorBoundary>
         )}
         {activeTab === 'idleVillageConfig' && (
           <ErrorBoundary componentName="Idle Village Config">
-            <IdleVillageConfigRoute />
+            {idleVillageReady ? <IdleVillageConfigRoute /> : idleVillageLoadingFallback}
           </ErrorBoundary>
         )}
         {activeTab === 'verbDetailSandbox' && (
@@ -191,9 +199,13 @@ function App() {
         )}
         {activeTab === 'villageSandbox' && (
           <ErrorBoundary componentName="Village Sandbox">
-            <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Village Sandbox…</div>}>
-              <VillageSandbox />
-            </Suspense>
+            {idleVillageReady ? (
+              <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Village Sandbox…</div>}>
+                <VillageSandbox />
+              </Suspense>
+            ) : (
+              idleVillageLoadingFallback
+            )}
           </ErrorBoundary>
         )}
         {activeTab === 'tacticalLab' && (

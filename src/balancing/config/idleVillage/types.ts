@@ -6,6 +6,9 @@
 import type { AppNavTabId } from '@/shared/navigation/navConfig';
 import type { StatBlock } from '@/balancing/types';
 
+/**
+ * Config-driven description of a resource that Idle Village systems can exchange.
+ */
 export interface ResourceDefinition {
   id: string;
   label: string;
@@ -17,6 +20,9 @@ export interface ResourceDefinition {
   isCore?: boolean;
 }
 
+/**
+ * Formula-based delta applied to a specific resource when resolving activities.
+ */
 export interface ResourceDeltaDefinition {
   /** ID of the resource being modified (must match a ResourceDefinition.id) */
   resourceId: string;
@@ -27,6 +33,9 @@ export interface ResourceDeltaDefinition {
   amountFormula: string;
 }
 
+/**
+ * Constraints describing which resident stat tags are required/prohibited.
+ */
 export interface StatRequirement {
   /**
    * Resident must possess all of these stat tags.
@@ -54,6 +63,9 @@ export interface StatRequirement {
  */
 export type ActivityMaxSlots = number | 'infinite';
 
+/**
+ * Per-slot multipliers applied to residents occupying an activity slot.
+ */
 export interface ActivitySlotModifier {
   /**
    * Multiplier applied to fatigue accumulation for residents occupying this slot.
@@ -71,6 +83,9 @@ export interface ActivitySlotModifier {
 
 export type ActivitySlotModifierMap = Record<number, ActivitySlotModifier>;
 
+/**
+ * Declarative definition of jobs, quests, trainings, purchases, etc.
+ */
 export interface ActivityDefinition {
   id: string;
   label: string;
@@ -144,6 +159,9 @@ export interface ActivityDefinition {
   slotModifiers?: ActivitySlotModifierMap;
 }
 
+/**
+ * Named range representing difficulty or reward multipliers for variance rolls.
+ */
 export interface ActivityRollCategory {
   id: string;
   label: string;
@@ -161,6 +179,9 @@ export interface ActivityRollCategory {
   weight: number;
 }
 
+/**
+ * Bundled configuration describing difficulty/reward randomization buckets.
+ */
 export interface ActivityVarianceConfig {
   /** Difficulty scaling categories (e.g. under-tuned, normal, overtuned) */
   difficultyCategories: Record<string, ActivityRollCategory>;
@@ -168,6 +189,9 @@ export interface ActivityVarianceConfig {
   rewardCategories: Record<string, ActivityRollCategory>;
 }
 
+/**
+ * Config describing a resident injury tier and its gameplay multipliers.
+ */
 export interface InjuryTierDefinition {
   id: string;
   label: string;
@@ -184,6 +208,9 @@ export interface InjuryTierDefinition {
   colorClass?: string;
 }
 
+/**
+ * Global death rate config used by quest resolution when computing mortality.
+ */
 export interface DeathRules {
   /** Base probability of death at maximum danger before modifiers */
   baseDeathChanceAtMaxDanger: number;

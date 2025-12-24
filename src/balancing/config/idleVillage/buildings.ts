@@ -7,6 +7,9 @@
  * without hardcoding anything.
  */
 
+/**
+ * Describes a single upgrade tier for an Idle Village building.
+ */
 export interface BuildingLevelDefinition {
   /** Target level for this upgrade tier (e.g. 2, 3, 4...) */
   level: number;
@@ -16,6 +19,9 @@ export interface BuildingLevelDefinition {
   notes?: string;
 }
 
+/**
+ * Full building metadata editable from config/UI for Idle Village scenarios.
+ */
 export interface BuildingDefinition {
   id: string;
   label: string;

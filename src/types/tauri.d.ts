@@ -6,3 +6,12 @@ declare module '@tauri-apps/api/fs' {
 declare module '@tauri-apps/api/path' {
   export function resolveResource(path: string): Promise<string>;
 }
+
+declare global {
+  interface Window {
+    __TAURI__?: Record<string, unknown>;
+    __TAURI_IPC__?: unknown;
+  }
+}
+
+export {};

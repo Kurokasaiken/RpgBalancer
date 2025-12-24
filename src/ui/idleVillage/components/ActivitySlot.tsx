@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { Sparkles } from 'lucide-react';
 
+/**
+ * Props for the draggable/droppable activity slot nodes on the village map.
+ */
 export interface ActivitySlotProps {
   slotId: string;
   iconName: string;
@@ -10,19 +13,31 @@ export interface ActivitySlotProps {
   onInspect?: (slotId: string) => void;
 }
 
+/**
+ * Circular drop target showing available activities and assigned residents.
+ */
 const ActivitySlot: React.FC<ActivitySlotProps> = ({ slotId, iconName, label, assignedWorkerName, onWorkerDrop, onInspect }) => {
   const [isOver, setIsOver] = useState(false);
 
+  /**
+   * Marks the slot as active when a resident is dragged over it.
+   */
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'copy';
     if (!isOver) setIsOver(true);
   };
 
+  /**
+   * Clears visual highlight when a dragged resident leaves the slot.
+   */
   const handleDragLeave = () => {
     setIsOver(false);
   };
 
+  /**
+   * Accepts the dropped resident id and notifies listeners about assignment.
+   */
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     const workerId = event.dataTransfer.getData('text/resident-id') || event.dataTransfer.getData('text/plain') || null;
