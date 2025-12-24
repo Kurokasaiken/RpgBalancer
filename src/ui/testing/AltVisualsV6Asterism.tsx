@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { deriveAxisValues, deriveAxisMeta, randomizeAxisValues } from './altVisualsAxis';
-import type { AxisMetaEntry } from './altVisualsAxis';
+import { DEFAULT_AXIS_VALUES, deriveAxisMeta, deriveAxisValues } from './altVisualsAxis';
+import type { AxisMetaEntry, AxisValues } from './altVisualsAxis';
 import type { StatRow } from './types';
 
 const AXES = 5;
@@ -209,16 +209,13 @@ const FALLBACK_AXIS_META: AxisMetaEntry[] = [
   { name: 'Vita', icon: '❤️' },
 ] as const;
 
-const FALLBACK_AXIS_VALUES = {
-  enemy: [65, 58, 60, 55, 62],
-  player: [60, 54, 58, 50, 59],
-} as const;
-
 interface AltVisualsV6AsterismProps {
   stats: StatRow[];
   controlsPortal?: HTMLElement | null;
   axisMeta?: AxisMetaEntry[];
   enablePerfectStarToggle?: boolean;
+  axisValues?: AxisValues;
+  preserveAxisValues?: boolean;
 }
 
 export function AltVisualsV6Asterism({
@@ -226,43 +223,46 @@ export function AltVisualsV6Asterism({
   controlsPortal,
   axisMeta,
   enablePerfectStarToggle = true,
+  axisValues,
+  preserveAxisValues,
 }: AltVisualsV6AsterismProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const checkboxRef = useRef<HTMLInputElement | null>(null);
   const debugPanelRef = useRef<HTMLDivElement | null>(null);
   const [sceneRunId, setSceneRunId] = useState(0);
   const rerollRef = useRef<(() => void) | null>(null);
-  const baseAxisValues = useMemo(
-    () => deriveAxisValues(stats, FALLBACK_AXIS_VALUES.enemy, FALLBACK_AXIS_VALUES.player, AXES),
-    [stats],
-  );
-  const axisValues = useMemo(
-    () => randomizeAxisValues(baseAxisValues, { min: 25, max: 95, variance: 35 }),
-    [baseAxisValues, sceneRunId],
-  );
+  const resolvedAxisValues = useMemo(() => {
+    if (axisValues) return axisValues;
+    return deriveAxisValues(stats, DEFAULT_AXIS_VALUES.enemy, DEFAULT_AXIS_VALUES.player, AXES);
+  }, [axisValues, stats]);
   const resolvedAxisMeta = useMemo(
     () => (axisMeta && axisMeta.length ? axisMeta : deriveAxisMeta(stats, FALLBACK_AXIS_META, AXES)),
     [axisMeta, stats],
   );
+  const shouldPreserveAxisValues = useMemo(() => {
+    if (typeof preserveAxisValues === 'boolean') return preserveAxisValues;
+    return !!axisValues;
+  }, [preserveAxisValues, axisValues]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const checkbox = checkboxRef.current;
-    if (!canvas || !checkbox) return;
+    const checkbox = enablePerfectStarToggle ? checkboxRef.current : null;
+    if (!canvas) return;
 
     const controller = initAltVisualsV6(
       canvas,
-      enablePerfectStarToggle ? checkbox : null,
+      checkbox,
       debugPanelRef.current,
-      axisValues,
+      resolvedAxisValues,
       resolvedAxisMeta,
+      shouldPreserveAxisValues,
     );
     rerollRef.current = controller.rerollDice;
     return () => {
       rerollRef.current = null;
       controller.cleanup();
     };
-  }, [axisValues, resolvedAxisMeta, sceneRunId, enablePerfectStarToggle]);
+  }, [resolvedAxisValues, resolvedAxisMeta, sceneRunId, enablePerfectStarToggle, shouldPreserveAxisValues]);
 
   const handleRestart = () => {
     setSceneRunId((prev) => prev + 1);
@@ -332,6 +332,7 @@ function initAltVisualsV6(
   _debugPanel: HTMLDivElement | null | undefined,
   axisValues: { enemy: number[]; player: number[] },
   axisMeta: AxisMetaEntry[],
+  preserveAxisValues: boolean,
 ): AltVisualsController {
   const ctx = canvas.getContext('2d', { alpha: false });
   if (!ctx)
@@ -389,6 +390,8 @@ function initAltVisualsV6(
     successChance: 50,
     successRoll: null,
   };
+  const stateWithFlag = internalState as InternalState & { preserveAxisValues: boolean };
+  (stateWithFlag as any).preserveAxisValues = preserveAxisValues;
 
   const handleCheckboxChange = (event: Event) => {
     if (!(event.target instanceof HTMLInputElement)) return;
@@ -474,7 +477,7 @@ function initAltVisualsV6(
   return { cleanup, rerollDice };
 }
 
-function resetAnimation(state: InternalState) {
+function resetAnimation(state: InternalState & { preserveAxisValues?: boolean }) {
   if (state.usePerfectStar) {
     const perfectValue = 70;
     state.enemyStatValues = Array.from({ length: AXES }, () => perfectValue);
@@ -482,10 +485,15 @@ function resetAnimation(state: InternalState) {
     state.baseEnemyValues = [...state.enemyStatValues];
     state.basePlayerValues = [...state.playerStatValues];
   } else {
-    state.enemyStatValues = generateMockStats();
-    state.playerStatValues = generateMockStats();
-    state.baseEnemyValues = [...state.enemyStatValues];
-    state.basePlayerValues = [...state.playerStatValues];
+    if (state.preserveAxisValues) {
+      state.enemyStatValues = [...state.baseEnemyValues];
+      state.playerStatValues = [...state.basePlayerValues];
+    } else {
+      state.enemyStatValues = generateMockStats();
+      state.playerStatValues = generateMockStats();
+      state.baseEnemyValues = [...state.enemyStatValues];
+      state.basePlayerValues = [...state.playerStatValues];
+    }
   }
 
   state.tarPuddle = { active: false, radius: 0, maxRadius: 30, growing: true, morphing: false, morphProgress: 0 };

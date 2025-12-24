@@ -1,7 +1,13 @@
 import type { TTKResult, TTKValidation } from './types';
 
+/**
+ * Generates reports from TTK validation and simulation results.
+ */
 export class TTKReportGenerator {
 
+    /**
+     * Generates a Markdown report from TTK validations.
+     */
     public static generateMarkdownReport(validations: TTKValidation[]): string {
         const total = validations.length;
         const valid = validations.filter(v => v.isValid).length;

@@ -2,6 +2,9 @@ import { BALANCING_CONFIG } from '../balancingConfig';
 import { HitChanceModule } from './hitchance';
 import { MitigationModule } from './mitigation';
 
+/**
+ * Calculated metrics from a combat prediction simulation.
+ */
 export interface CombatMetrics {
     ttk: number;      // Turns to Kill Enemy
     ttd: number;      // Turns to Die (Survive)
@@ -10,6 +13,9 @@ export interface CombatMetrics {
     dtps: number;     // Damage Taken Per Turn (Incoming Net)
 }
 
+/**
+ * Input stats for a player entity in combat prediction.
+ */
 export interface PlayerStats {
     hp: number;
     damage: number;
@@ -26,6 +32,11 @@ export interface PlayerStats {
     configApplyBeforeCrit?: boolean;
 }
 
+/**
+ * Combat Predictor Module - Combat simulation and metrics
+ * 
+ * Provides combat prediction against standard baseline enemies.
+ */
 export const CombatPredictor = {
     /**
      * Calculate combat metrics against a Standard Baseline Enemy

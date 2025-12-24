@@ -4,7 +4,7 @@
  * Uses the Gilded Observatory theme and follows config-first principles.
  */
 
-import React, { useState, useCallback, useMemo, useEffect, useRef, startTransition } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { DndContext, DragOverlay, useDraggable, useDroppable, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core';
 import { Pause, Play } from 'lucide-react';
 import idleVillageMap from '@/assets/ui/idleVillage/idle-village-map.jpg';
@@ -12,11 +12,7 @@ import { computeSlotPercentPosition, resolveMapLayout } from '@/ui/idleVillage/m
 import { useVillageStateStore } from './useVillageStateStore';
 import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
 import { ToastContainer, useToast } from '../balancing/Toast';
-import {
-  createVillageStateFromConfig,
-  scheduleActivity,
-  buildResidentFromFounder,
-} from '@/engine/game/idleVillage/TimeEngine';
+import { createVillageStateFromConfig, scheduleActivity } from '@/engine/game/idleVillage/TimeEngine';
 import type {
   VillageState,
   ResidentState,
@@ -24,8 +20,9 @@ import type {
   VillageEvent,
 } from '@/engine/game/idleVillage/TimeEngine';
 import { tickIdleVillage } from '@/engine/game/idleVillage/IdleVillageEngine';
-import type { ActivityDefinition, FounderPreset, IdleVillageConfig } from '@/balancing/config/idleVillage/types';
+import type { ActivityDefinition, IdleVillageConfig } from '@/balancing/config/idleVillage/types';
 import { buyFoodWithGold } from '@/engine/game/idleVillage/MarketEngine';
+import { loadResidentsFromCharacterManager } from '@/engine/game/idleVillage/characterImport';
 import VerbCard from '@/ui/idleVillage/VerbCard';
 import {
   DEFAULT_SECONDS_PER_TIME_UNIT,
@@ -221,12 +218,6 @@ function MapSlotVerbCluster({ slot, left, top, verbs, questOffers, onSelect, isS
   );
 }
 
-function selectDefaultFounder(config?: IdleVillageConfig | null): FounderPreset | null {
-  if (!config) return null;
-  const founders = config.founders ?? {};
-  return founders.founder_standard ?? Object.values(founders)[0] ?? null;
-}
-
 interface DayCycleRingProps {
   totalSegments: number;
   filledSegments: number;
@@ -271,9 +262,9 @@ function DayCycleRing({ totalSegments, filledSegments, isNight }: DayCycleRingPr
 
 const IdleVillagePage: React.FC = () => {
   const { config } = useIdleVillageConfig();
-  const defaultFounderPreset = useMemo(() => selectDefaultFounder(config), [config]);
+  const initialResidents = useMemo(() => loadResidentsFromCharacterManager(), []);
   const { state: villageState, updateState, undo, canUndo, exportState, importState, resetState } = useVillageStateStore(() =>
-    createVillageStateFromConfig({ config, founderPreset: defaultFounderPreset }),
+    createVillageStateFromConfig({ config, initialResidents }),
   );
 
   const { showToast, toasts, removeToast } = useToast();
@@ -337,7 +328,14 @@ const IdleVillagePage: React.FC = () => {
 
     setResetConfirmPending(false);
     try {
-      resetState(() => createVillageStateFromConfig({ config, founderPreset: defaultFounderPreset }), 'Reset state');
+      resetState(
+        () =>
+          createVillageStateFromConfig({
+            config,
+            initialResidents: loadResidentsFromCharacterManager(),
+          }),
+        'Reset state',
+      );
       showToast('Village state reset to initial', 'success');
     } catch (e) {
       showToast(`Reset error: ${(e as Error).message}`, 'error');
@@ -358,47 +356,6 @@ const IdleVillagePage: React.FC = () => {
   const [marketUnits, setMarketUnits] = useState(0);
   const [hungerFx, setHungerFx] = useState<{ amount: number; id: number } | null>(null);
   const residentCount = useMemo(() => Object.keys(villageState.residents).length, [villageState.residents]);
-
-  // Ensure at least one resident is available for drag assignments.
-  useEffect(() => {
-    if (!config) return;
-    if (residentCount > 0) return;
-    startTransition(() => {
-      updateState((prev) => {
-        if (Object.keys(prev.residents).length > 0) return prev;
-        if (defaultFounderPreset) {
-          const founderResident = buildResidentFromFounder(defaultFounderPreset);
-          return {
-            ...prev,
-            residents: {
-              ...prev.residents,
-              [founderResident.id]: founderResident,
-            },
-          };
-        }
-        const fallbackResident: ResidentState = {
-          id: 'resident_alpha',
-          displayName: 'Resident Alpha',
-          status: 'available',
-          fatigue: 0,
-          statTags: ['generalist'],
-          currentHp: 100,
-          maxHp: 100,
-          isHero: false,
-          isInjured: false,
-          survivalCount: 0,
-          survivalScore: 0,
-        };
-        return {
-          ...prev,
-          residents: {
-            ...prev.residents,
-            [fallbackResident.id]: fallbackResident,
-          },
-        };
-      }, 'Ensure resident availability');
-    });
-  }, [config, defaultFounderPreset, residentCount]);
 
   const secondsPerTimeUnit = config?.globalRules.secondsPerTimeUnit ?? DEFAULT_SECONDS_PER_TIME_UNIT;
   const dayLengthSetting = config?.globalRules.dayLengthInTimeUnits || 5;
@@ -800,7 +757,7 @@ const IdleVillagePage: React.FC = () => {
           slotIcon,
           resourceLabeler: getResourceLabel,
           currentTime: villageState.currentTime,
-          secondsPerTimeUnit,
+a          secondsPerTimeUnit,
           dayLength: dayLengthSetting,
           assigneeNames,
         });

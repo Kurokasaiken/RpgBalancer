@@ -17,6 +17,9 @@ export type StackMode =
     | 'increment_refresh' // League: increment stacks + refresh duration (strong)
     | 'increment_capped'; // League: increment + refresh but with max cap
 
+/**
+ * Represents a periodic damage or healing effect.
+ */
 export interface PeriodicEffect {
     id: string;                    // Unique identifier
     type: 'damage' | 'heal';

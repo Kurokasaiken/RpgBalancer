@@ -4,6 +4,22 @@ import type { StatBlock } from '../../balancing/types';
 import { DEFAULT_STATS } from '../../balancing/types';
 
 const STORAGE_KEY = 'idle_combat_characters';
+const STORAGE_UPDATED_EVENT = 'characterStorageUpdated';
+
+const hasWindow = () => typeof window !== 'undefined';
+
+function emitCharacterStorageUpdated(): void {
+  if (!hasWindow()) return;
+  try {
+    window.dispatchEvent(new CustomEvent(STORAGE_UPDATED_EVENT));
+  } catch {
+    // Ignore CustomEvent failures in non-browser runtimes.
+  }
+}
+
+export function getCharacterStorageEventName(): string {
+  return STORAGE_UPDATED_EVENT;
+}
 
 export interface SavedCharacter {
     id: string;
@@ -24,6 +40,7 @@ export function saveCharacter(character: SavedCharacter): void {
     }
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(characters));
+    emitCharacterStorageUpdated();
 }
 
 export function loadCharacters(): SavedCharacter[] {
@@ -48,6 +65,7 @@ export function loadCharacters(): SavedCharacter[] {
 export function deleteCharacter(id: string): void {
     const characters = loadCharacters().filter(c => c.id !== id);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(characters));
+    emitCharacterStorageUpdated();
 }
 
 export function getCharacter(id: string): SavedCharacter | null {

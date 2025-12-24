@@ -10,6 +10,11 @@ export interface AxisMetaEntry {
   icon: string;
 }
 
+export const DEFAULT_AXIS_VALUES = {
+  enemy: [65, 58, 60, 55, 62],
+  player: [60, 54, 58, 50, 59],
+} as const;
+
 export function deriveAxisValues(
   stats: StatRow[],
   fallbackEnemy: readonly number[],

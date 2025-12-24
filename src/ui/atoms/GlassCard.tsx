@@ -1,5 +1,8 @@
 import React from 'react';
 
+/**
+ * Props for the GlassCard component.
+ */
 interface GlassCardProps {
     children: React.ReactNode;
     className?: string;

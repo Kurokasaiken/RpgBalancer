@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 
+/**
+ * Props for the Tooltip component.
+ */
 interface TooltipProps {
     content: string;
     children: React.ReactNode;

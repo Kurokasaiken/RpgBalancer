@@ -9,6 +9,9 @@ import { ArchetypeRegistry } from '../../../balancing/archetype/ArchetypeRegistr
 import { DEFAULT_ARCHETYPES } from '../../../balancing/archetype/constants';
 import type { ArchetypeTemplate, ArchetypeCategory } from '../../../balancing/archetype/types';
 
+/**
+ * View modes for the archetype list display.
+ */
 type ViewMode = 'grid' | 'list';
 
 export const ArchetypeList: React.FC = () => {
@@ -38,7 +41,7 @@ export const ArchetypeList: React.FC = () => {
     }, [registry, categoryFilter, searchQuery]);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-950 p-6">
+        <div className="min-h-screen bg-linear-to-br from-indigo-950 via-purple-950 to-slate-950 p-6">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-lg p-6 mb-6">

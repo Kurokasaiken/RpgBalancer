@@ -1,15 +1,19 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
+import WorkerDragToken from '@/ui/idleVillage/components/WorkerDragToken';
+import { formatResidentLabel } from '@/ui/idleVillage/residentName';
 
 interface ResidentRosterProps {
   residents: ResidentState[];
   activeResidentId: string | null;
-  onDragStart: (residentId: string) => (event: React.DragEvent<HTMLButtonElement>) => void;
+  onDragStart: (residentId: string) => (event: React.DragEvent<HTMLElement>) => void;
   onDragEnd: () => void;
   onDragIntent?: (residentId: string) => void;
   onDragIntentEnd?: (residentId: string) => void;
   assignmentFeedback: string | null;
   maxFatigueBeforeExhausted: number;
+  className?: string;
+  listClassName?: string;
 }
 
 type RosterFilter = 'all' | 'heroes' | 'injured';
@@ -19,7 +23,6 @@ function getResidentPortrait(resident: ResidentState): string | undefined {
   if (typeof directPortrait === 'string' && directPortrait.length > 0) {
     return directPortrait;
   }
-
   if (resident.statSnapshot && typeof resident.statSnapshot === 'object') {
     const snapshotPortrait = (resident.statSnapshot as Record<string, unknown>).portraitUrl;
     if (typeof snapshotPortrait === 'string' && snapshotPortrait.length > 0) {
@@ -29,15 +32,7 @@ function getResidentPortrait(resident: ResidentState): string | undefined {
   return undefined;
 }
 
-function formatLabel(resident: ResidentState) {
-  if (resident.displayName && resident.displayName.trim().length > 0) {
-    return resident.displayName;
-  }
-  if (resident.id.startsWith('founder-')) {
-    return resident.id.replace('founder-', '');
-  }
-  return resident.id;
-}
+const formatLabel = (resident: ResidentState) => formatResidentLabel(resident);
 
 function ResidentRoster({
   residents,
@@ -48,6 +43,8 @@ function ResidentRoster({
   onDragIntentEnd,
   assignmentFeedback,
   maxFatigueBeforeExhausted,
+  className,
+  listClassName,
 }: ResidentRosterProps) {
   const [filter, setFilter] = useState<RosterFilter>('all');
   const [heroFlashIds, setHeroFlashIds] = useState<string[]>([]);
@@ -159,7 +156,7 @@ function ResidentRoster({
 
   const handleDragStart =
     (resident: ResidentState, label: string, isBlocked: boolean) =>
-    (event: React.DragEvent<HTMLButtonElement>) => {
+    (event: React.DragEvent<HTMLElement>) => {
       if (isBlocked) {
         event.preventDefault();
         return;
@@ -175,7 +172,7 @@ function ResidentRoster({
 
   const handlePointerDown =
     (resident: ResidentState, isBlocked: boolean) =>
-    (event: React.PointerEvent<HTMLButtonElement>) => {
+    (event: React.PointerEvent<HTMLElement>) => {
       if (isBlocked || !onDragIntent) return;
       if (event.pointerType === 'mouse' && event.button !== 0) return;
       onDragIntent(resident.id);
@@ -189,7 +186,7 @@ function ResidentRoster({
     };
 
   const handleDragEndInternal =
-    (residentId: string) => (event: React.DragEvent<HTMLButtonElement>) => {
+    (residentId: string) => (event: React.DragEvent<HTMLElement>) => {
       event.preventDefault();
       if (dragPreviewRef.current) {
         if (dragPreviewRef.current.parentNode) {
@@ -217,8 +214,22 @@ function ResidentRoster({
       filter === value ? 'bg-amber-400/20 text-amber-200 border border-amber-300/50' : 'text-slate-400 border border-slate-700 hover:text-amber-100',
     ].join(' ');
 
+  const MAX_VISIBLE_ROWS = 5;
+  const ESTIMATED_ROW_HEIGHT = 112;
+  const shouldEnableScroll = sortedResidents.length > MAX_VISIBLE_ROWS;
+  const computedListStyle = shouldEnableScroll
+    ? { maxHeight: `${MAX_VISIBLE_ROWS * ESTIMATED_ROW_HEIGHT}px`, overflowY: 'auto' as const }
+    : undefined;
+
   return (
-    <div className="flex w-72 min-h-[60vh] flex-col gap-4 self-start rounded-2xl border border-gold/40 bg-black/85 px-4 py-4 text-[11px] shadow-lg backdrop-blur">
+    <div
+      className={[
+        'flex flex-col gap-4 self-start rounded-2xl border border-gold/40 bg-black/85 px-4 py-4 text-[11px] shadow-lg backdrop-blur',
+        className ?? 'w-72',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    >
       <div className="flex items-baseline justify-between">
         <span className="text-[10px] uppercase tracking-[0.25em] text-slate-300">Residenti</span>
         <span className="text-[11px] text-slate-400">{sortedResidents.length || '—'} pronti</span>
@@ -248,7 +259,16 @@ function ResidentRoster({
         </button>
       </div>
 
-      <div className="flex max-h-[60vh] flex-col gap-2 overflow-y-auto pr-1">
+      <div
+        className={[
+          'flex flex-col gap-2 pr-1',
+          shouldEnableScroll ? 'overflow-y-auto' : '',
+          listClassName ?? '',
+        ]
+          .filter(Boolean)
+          .join(' ')}
+        style={computedListStyle}
+      >
         {sortedResidents.length === 0 && (
           <div className="text-[10px] italic text-slate-500">Nessun residente disponibile</div>
         )}
@@ -256,7 +276,6 @@ function ResidentRoster({
           const dragState = activeResidentId === resident.id;
           const fatiguePercent = fatiguePercentage(resident.fatigue);
           const hpPercent = hpPercentage(resident);
-          const portraitUrl = getResidentPortrait(resident);
           const initial =
             resident.statTags?.[0]?.slice(0, 2).toUpperCase() ??
             resident.id
@@ -271,97 +290,47 @@ function ResidentRoster({
           const isBlocked =
             resident.isInjured || resident.status === 'injured' || resident.status === 'exhausted' || hpPercent <= 25;
           const heroFlashActive = heroFlashIds.includes(resident.id);
-          const injuredBadge = resident.isInjured ? (
-            <span className="ml-2 text-[10px]" role="img" aria-label="Injured">
-              🩹
-            </span>
-          ) : null;
+          const subtitle = resident.isHero ? 'Eroe attivo' : resident.isInjured ? 'Ferito' : undefined;
 
           return (
-            <button
+            <div
               key={resident.id}
-              type="button"
-              draggable
-              onDragStart={handleDragStart(resident, initial, isBlocked)}
-              onDragEnd={handleDragEndInternal(resident.id)}
-              onPointerDown={handlePointerDown(resident, isBlocked)}
-              onPointerUp={handlePointerUp(resident, isBlocked)}
-              onPointerCancel={handlePointerUp(resident, isBlocked)}
-              onMouseEnter={() => handleMouseEnter(resident)}
-              onMouseLeave={handleMouseLeave}
               data-testid="resident-card"
               data-resident-id={resident.id}
-              className={[
-                'group relative flex w-full items-center gap-3 rounded-xl border bg-slate-950/70 px-3 py-3 transition-all',
-                heroBorder,
-                dragState
-                  ? 'opacity-0 pointer-events-none scale-95'
-                  : 'opacity-100 hover:border-amber-300/70 hover:bg-slate-900/70',
-                isBlocked ? 'cursor-not-allowed grayscale opacity-70' : 'cursor-grab',
-              ]
-                .filter(Boolean)
-                .join(' ')}
+              onMouseEnter={() => handleMouseEnter(resident)}
+              onMouseLeave={handleMouseLeave}
+              className="group relative"
             >
               {heroFlashActive && (
                 <span className="pointer-events-none absolute inset-0 rounded-xl border border-amber-200/70 opacity-60 animate-ping" />
               )}
               {isBlocked && (
-                <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-xl bg-black/60 text-[10px] text-amber-200">
+                <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-black/60 text-[10px] text-amber-200">
                   Recupero necessario
                 </div>
               )}
-              <div
+              <WorkerDragToken
+                workerId={resident.id}
+                label={formatLabel(resident)}
+                subtitle={subtitle}
+                hp={hpPercent}
+                fatigue={fatiguePercent}
+                isDragging={dragState}
+                disabled={isBlocked}
                 className={[
-                  'relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border text-[12px] font-semibold tracking-wide',
-                  resident.isHero ? 'border-amber-200 text-amber-100' : 'border-slate-600 text-slate-100',
-                ].join(' ')}
-              >
-                {portraitUrl ? (
-                  <img src={portraitUrl} alt={formatLabel(resident)} className="h-full w-full object-cover" draggable={false} />
-                ) : (
-                  <span>{initial}</span>
-                )}
-                {resident.isHero && (
-                  <span className="absolute -bottom-1 -right-1 rounded-full bg-black/80 px-1 text-[9px] text-amber-200" aria-label="Hero">
-                    ⚜︎
-                  </span>
-                )}
-              </div>
-
-              <div className="flex flex-1 flex-col gap-1 text-left">
-                <div className="flex items-center text-[11px] font-semibold text-ivory">
-                  <span className="truncate">{formatLabel(resident)}</span>
-                  {injuredBadge}
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center justify-between text-[9px] text-slate-400">
-                    <span>HP</span>
-                    <span>
-                      {resident.currentHp}/{resident.maxHp}
-                    </span>
-                  </div>
-                  <div className="h-1.5 w-full rounded-full bg-slate-800/80">
-                    <div
-                      className="h-full rounded-full bg-green-400 transition-all"
-                      style={{ width: `${hpPercent}%` }}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between text-[9px] text-slate-400">
-                    <span>Fatigue</span>
-                    <span>
-                      {resident.fatigue}/{maxFatigueBeforeExhausted}
-                    </span>
-                  </div>
-                  <div className="h-1.5 w-full rounded-full bg-slate-800/80">
-                    <div
-                      className="h-full rounded-full bg-amber-300 transition-all"
-                      style={{ width: `${fatiguePercent}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-
+                  'w-full border bg-slate-950/80',
+                  heroBorder,
+                  dragState ? 'pointer-events-none' : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+                onDragStateChange={() => undefined}
+                onDragStart={handleDragStart(resident, initial, isBlocked)}
+                onDragEnd={handleDragEndInternal(resident.id)}
+                onPointerDown={handlePointerDown(resident, isBlocked)}
+                onPointerUp={handlePointerUp(resident, isBlocked)}
+                onPointerCancel={handlePointerUp(resident, isBlocked)}
+              />
               {popoverResidentId === resident.id && (
                 <div className="pointer-events-none absolute left-full top-1/2 z-50 ml-3 min-w-40 -translate-y-1/2 rounded-xl border border-slate-700 bg-slate-950/95 px-3 py-2 text-[10px] text-slate-100 shadow-xl">
                   <div className="mb-1 text-[11px] font-semibold text-amber-200">{formatLabel(resident)}</div>
@@ -386,7 +355,7 @@ function ResidentRoster({
                   </div>
                 </div>
               )}
-            </button>
+            </div>
           );
         })}
       </div>

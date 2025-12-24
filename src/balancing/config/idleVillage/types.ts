@@ -313,41 +313,6 @@ export interface MapSlotDefinition {
   panoramaUrl?: string;
 }
 
-export interface FounderPreset {
-  id: string;
-  label: string;
-  description?: string;
-
-  /**
-   * Reference to an archetype / character template defined elsewhere
-   * (e.g. in archetype config or character creator presets).
-   */
-  archetypeId: string;
-
-  /** Difficulty tag (e.g. "easy", "normal", "hard") – fully config-driven. */
-  difficultyTag: string;
-
-  /**
-   * Optional formula applied on top of the base archetype stats
-   * to make founders stronger/weaker per difficulty.
-   */
-  statAdjustmentFormula?: string;
-  /**
-   * Optional curated stat tags copied onto the spawned resident.
-   * Falls back to `[difficultyTag]` when omitted.
-   */
-  statTags?: string[];
-  /**
-   * Optional stat snapshot applied directly to the resident on spawn.
-   * Enables config-first hero definitions without external archetype exports.
-   */
-  statSnapshot?: Partial<StatBlock>;
-  /**
-   * Whether the resident should start flagged as a hero (for FTUE showcases).
-   */
-  isHero?: boolean;
-}
-
 export interface TrialOfFireRules {
   /**
    * Minimum death risk (0-1) required for a Trial of Fire survival to grant a stat bonus.
@@ -483,7 +448,6 @@ export interface IdleVillageConfig {
   mapLayout?: MapLayoutDefinition;
   passiveEffects: Record<string, PassiveEffectDefinition>;
   buildings: Record<string, import('./buildings').BuildingDefinition>;
-  founders: Record<string, FounderPreset>;
   variance: ActivityVarianceConfig;
   globalRules: GlobalRules;
   overlaySettings: OverlaySettings;

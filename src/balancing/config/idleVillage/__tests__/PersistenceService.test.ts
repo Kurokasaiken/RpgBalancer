@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import '@/types/tauri';
 import { loadFinalConfigFromDisk, persistConfigToDisk, isTauriRuntime } from '../PersistenceService';
 import { DEFAULT_IDLE_VILLAGE_CONFIG } from '../defaultConfig';
+import { __mockFsStore } from '../../../test/mocks/tauriFsMock';
 
 type TauriFlags = {
   __TAURI__?: Record<string, unknown>;
@@ -75,65 +75,44 @@ afterEach(() => {
 });
 
 describe('PersistenceService', () => {
-  it('falls back to defaults and writes file when JSON is missing', async () => {
-    const fsModule = await import('@tauri-apps/api/fs');
-    const writeSpy = vi.spyOn(fsModule, 'writeTextFile');
-
+  it('loads real dynamicConfig.json and merges overrides', async () => {
     const config = await loadFinalConfigFromDisk();
-
-    expect(config).toEqual(DEFAULT_IDLE_VILLAGE_CONFIG);
-    expect(writeSpy).toHaveBeenCalledTimes(1);
-    const serialized = writeSpy.mock.calls[0][1] as string;
-    expect(JSON.parse(serialized)).toEqual(DEFAULT_IDLE_VILLAGE_CONFIG);
+    expect(config.version).toBe('1.0.1');
+    expect(config.resources.gold.label).toBe('Guild Ducats');
+    expect(config.activities.job_city_rats.dangerRating).toBe(2);
+    expect(config.activities.job_city_rats.metadata?.mapSlotId).toBe('village_gate');
+    expect(config.globalRules.baseFoodPriceInGold).toBe(3);
   });
 
-  it('merges defaults with dynamic overrides', async () => {
-    const { writeTextFile } = await import('@tauri-apps/api/fs');
-    const pathModule = await import('@tauri-apps/api/path');
-    const targetPath = await pathModule.resolveResource('../src/data/dynamicConfig.json');
-    const merged = {
-      version: 'custom-version',
-      activities: {
-        job_city_rats: {
-          label: 'Rat Party',
-        },
-      },
-    };
-    await writeTextFile(targetPath, JSON.stringify(merged));
-
-    const config = await loadFinalConfigFromDisk();
-
-    expect(config.version).toBe('custom-version');
-    expect(config.activities.job_city_rats.label).toBe('Rat Party');
-    expect(config.activities.job_city_rats.slotTags).toEqual(
-      DEFAULT_IDLE_VILLAGE_CONFIG.activities.job_city_rats.slotTags,
-    );
-  });
-
-  it('persistConfigToDisk writes the provided config', async () => {
-    const { writeTextFile, readTextFile } = await import('@tauri-apps/api/fs');
+  it('persists config snapshots via writeTextFile mock store', async () => {
     const nextConfig = {
       ...DEFAULT_IDLE_VILLAGE_CONFIG,
       version: 'persisted',
+      uiPreferences: { defaultAppTabId: 'idleVillageConfig' },
     };
-
-    await persistConfigToDisk(nextConfig);
-
-    expect(writeTextFile).toHaveBeenCalledTimes(1);
     const pathModule = await import('@tauri-apps/api/path');
     const targetPath = await pathModule.resolveResource('../src/data/dynamicConfig.json');
-    const raw = await readTextFile(targetPath);
-    expect(JSON.parse(raw)).toEqual(nextConfig);
+
+    await persistConfigToDisk(nextConfig);
+    expect(__mockFsStore.get(targetPath)).toEqual(JSON.stringify(nextConfig, null, 2));
+  });
+
+  it('falls back to defaults when disk read fails validation', async () => {
+    const fsModule = await import('@tauri-apps/api/fs');
+    const readSpy = vi.spyOn(fsModule, 'readTextFile').mockRejectedValueOnce(new Error('fs failure'));
+    const config = await loadFinalConfigFromDisk();
+    expect(readSpy).toHaveBeenCalled();
+    expect(config).toEqual(DEFAULT_IDLE_VILLAGE_CONFIG);
   });
 
   it('detects non-tauri runtime and returns defaults without writing', async () => {
     disableTauriRuntime();
+    const fsModule = await import('@tauri-apps/api/fs');
+    const writeSpy = vi.spyOn(fsModule, 'writeTextFile');
 
-    const { writeTextFile } = await import('@tauri-apps/api/fs');
     const config = await loadFinalConfigFromDisk();
-
     expect(isTauriRuntime()).toBe(false);
     expect(config).toEqual(DEFAULT_IDLE_VILLAGE_CONFIG);
-    expect(writeTextFile).not.toHaveBeenCalled();
+    expect(writeSpy).not.toHaveBeenCalled();
   });
 });

@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import type { CardDefinition } from '../../balancing/config/types';
 import { useBalancerConfig } from '../../balancing/hooks/useBalancerConfig';
 
+/**
+ * Props for the CardEditor component.
+ */
 interface Props {
   isOpen: boolean;
   onClose: () => void;

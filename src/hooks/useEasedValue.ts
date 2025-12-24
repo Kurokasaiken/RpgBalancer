@@ -4,6 +4,9 @@ type EasingFn = (t: number) => number;
 
 const easeOutCubic: EasingFn = t => 1 - (1 - t) * (1 - t) * (1 - t);
 
+/**
+ * Options for configuring the easing behavior of useEasedValue hook.
+ */
 interface UseEasedValueOptions {
     durationMs?: number;
     easingFn?: EasingFn;

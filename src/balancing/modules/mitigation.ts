@@ -1,9 +1,8 @@
 export const MitigationModule = {
     /**
-     * Calculate Effective Damage After Mitigation
-     * NOW USING PATH OF EXILE FORMULA FOR ARMOR
-     */
-    calculateEffectiveDamage: (
+ * Calculates effective damage after applying armor and resistance mitigation.
+ */
+calculateEffectiveDamage: (
         rawDamage: number,
         armor: number,
         resistance: number,
@@ -41,9 +40,10 @@ export const MitigationModule = {
         return Math.max(1, damage);
     },
 
-    // Helper to calculate average damage considering crit/fail and mitigation
-    // This is complex because mitigation might apply BEFORE or AFTER crit.
-    calculateAverageEffectiveDamage: (
+    /**
+ * Calculates average effective damage considering critical hits, failures, and mitigation order.
+ */
+calculateAverageEffectiveDamage: (
         baseDamage: number,
         critChance: number,
         critMult: number,

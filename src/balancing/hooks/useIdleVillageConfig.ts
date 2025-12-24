@@ -32,35 +32,19 @@ export interface UseIdleVillageConfigReturn {
 }
 
 export function useIdleVillageConfig(): UseIdleVillageConfigReturn {
-  const {
-    config,
-    history,
-    initialized,
-    isInitializing,
-    error,
-    initializeConfig,
-    saveConfig: saveConfigImpl,
-    updateConfig: updateConfigImpl,
-    undo,
-    exportConfig,
-    importConfig,
-    resetConfig: resetConfigImpl,
-    resetToInitialConfig: resetToInitialConfigImpl,
-  } = useIdleVillageConfigStore((state) => ({
-    config: state.config,
-    history: state.history,
-    initialized: state.initialized,
-    isInitializing: state.isInitializing,
-    error: state.error,
-    initializeConfig: state.initializeConfig,
-    saveConfig: state.saveConfig,
-    updateConfig: state.updateConfig,
-    undo: state.undo,
-    exportConfig: state.exportConfig,
-    importConfig: state.importConfig,
-    resetConfig: state.resetConfig,
-    resetToInitialConfig: state.resetToInitialConfig,
-  }));
+  const config = useIdleVillageConfigStore((state) => state.config);
+  const history = useIdleVillageConfigStore((state) => state.history);
+  const initialized = useIdleVillageConfigStore((state) => state.initialized);
+  const isInitializing = useIdleVillageConfigStore((state) => state.isInitializing);
+  const error = useIdleVillageConfigStore((state) => state.error);
+  const initializeConfig = useIdleVillageConfigStore((state) => state.initializeConfig);
+  const saveConfigImpl = useIdleVillageConfigStore((state) => state.saveConfig);
+  const updateConfigImpl = useIdleVillageConfigStore((state) => state.updateConfig);
+  const undo = useIdleVillageConfigStore((state) => state.undo);
+  const exportConfig = useIdleVillageConfigStore((state) => state.exportConfig);
+  const importConfig = useIdleVillageConfigStore((state) => state.importConfig);
+  const resetConfigImpl = useIdleVillageConfigStore((state) => state.resetConfig);
+  const resetToInitialConfigImpl = useIdleVillageConfigStore((state) => state.resetToInitialConfig);
 
   const canUndo = history.length > 0;
 

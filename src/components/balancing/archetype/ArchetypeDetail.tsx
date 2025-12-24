@@ -16,6 +16,9 @@ import { GlassButton } from '../../../ui/atoms/GlassButton';
 import { StatAllocationPie } from './StatAllocationPie';
 import { ArchetypeBalanceCard } from './ArchetypeBalanceCard';
 
+/**
+ * Props for the ArchetypeDetail component.
+ */
 interface ArchetypeDetailProps {
     archetype: ArchetypeTemplate;
     onEdit: () => void;
@@ -39,7 +42,7 @@ export const ArchetypeDetail: React.FC<ArchetypeDetailProps> = ({
     }));
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-950 p-6">
+        <div className="min-h-screen bg-linear-to-br from-indigo-950 via-purple-950 to-slate-950 p-6">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <GlassCard variant="neon" className="mb-6">

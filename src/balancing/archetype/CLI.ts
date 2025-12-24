@@ -9,6 +9,9 @@ import { TTKTestRunner } from './TTKTestRunner';
 const args = process.argv.slice(2);
 const command = args[0];
 
+/**
+ * Main entry point for the CLI tool.
+ */
 async function main() {
     if (!command) {
         printHelp();
@@ -38,6 +41,9 @@ async function main() {
     }
 }
 
+/**
+ * Prints help information to the console.
+ */
 function printHelp() {
     console.log(`
 RPG Balancer CLI
@@ -56,6 +62,9 @@ Examples:
     `);
 }
 
+/**
+ * Lists available balance presets.
+ */
 function listPresets() {
     console.log('\nAvailable Presets:');
     // We need to access the presets from the manager, but they are private or we need a getter
@@ -67,6 +76,10 @@ function listPresets() {
     console.log('- high_lethality');
 }
 
+/**
+ * Runs a full balance simulation for a given preset.
+ * @param presetId The ID of the preset to run the simulation for (default: 'standard').
+ */
 async function runBalance(presetId: string = 'standard') {
     console.log(`\n🚀 Running Balance Simulation for preset: ${presetId}...`);
     BalanceConfigManager.setPreset(presetId);
@@ -104,6 +117,9 @@ async function runBalance(presetId: string = 'standard') {
     console.log(`Global Average TTK: ${avgTTK.toFixed(2)} rounds`);
 }
 
+/**
+ * Compares two balance presets by running simulations.
+ */
 async function comparePresets(presetA: string, presetB: string) {
     if (!presetA || !presetB) {
         console.error('Please provide two presets to compare.');
@@ -143,6 +159,9 @@ async function comparePresets(presetA: string, presetB: string) {
     console.log(`Tank Win Rate      | ${(tankA * 100).toFixed(1)}%`.padEnd(19) + ` | ${(tankB * 100).toFixed(1)}%`.padEnd(17) + ` | ${((tankB - tankA) * 100).toFixed(1)}%`);
 }
 
+/**
+ * Analyzes a specific matchup between two archetypes.
+ */
 async function analyzeMatchup(archAId: string, archBId: string, budgetStr: string = '50') {
     if (!archAId || !archBId) {
         console.error('Please provide two archetype IDs.');

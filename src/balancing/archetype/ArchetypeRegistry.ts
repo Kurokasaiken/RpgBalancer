@@ -118,16 +118,25 @@ export class ArchetypeRegistry {
 }
 
 // Export convenience functions for backwards compatibility
+/**
+ * Convenience function to list all archetypes (backwards compatibility).
+ */
 export function listArchetypes(): ArchetypeTemplate[] {
     const registry = new ArchetypeRegistry();
     return registry.listAll();
 }
 
+/**
+ * Convenience function to filter archetypes by category.
+ */
 export function filterByCategory(category: string): ArchetypeTemplate[] {
     const registry = new ArchetypeRegistry();
     return registry.filterByCategory(category);
 }
 
+/**
+ * Convenience function to get all unique tags across archetypes.
+ */
 export function getAllTags(): string[] {
     const registry = new ArchetypeRegistry();
     return registry.getAllTags();

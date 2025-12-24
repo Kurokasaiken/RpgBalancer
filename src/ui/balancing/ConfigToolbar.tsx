@@ -4,6 +4,9 @@ import { ToastContainer, useToast } from './Toast';
 
 const SIM_VALUES_KEY = 'balancer_sim_values';
 
+/**
+ * Toolbar component for configuration management with import/export and undo functionality.
+ */
 export const ConfigToolbar: React.FC = () => {
   const {
     undo,

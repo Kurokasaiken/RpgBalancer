@@ -1,1 +1,61 @@
-{}
+{
+  "version": "1.0.1",
+  "resources": {
+    "gold": {
+      "label": "Guild Ducats",
+      "description": "Standardized coinage minted by the Ember Guild.",
+      "colorClass": "text-amber-200"
+    },
+    "food": {
+      "label": "Provision Rations",
+      "description": "Condensed rations for long expeditions.",
+      "icon": "🍞"
+    }
+  },
+  "activities": {
+    "job_city_rats": {
+      "dangerRating": 2,
+      "rewards": [
+        { "resourceId": "gold", "amountFormula": "6" },
+        { "resourceId": "xp", "amountFormula": "3" }
+      ],
+      "metadata": {
+        "supportsAutoRepeat": false,
+        "mapSlotId": "village_gate"
+      }
+    },
+    "job_archivista_frammenti": {
+      "metadata": {
+        "supportsAutoRepeat": false,
+        "icon": "📘"
+      }
+    },
+    "quest_city_rats": {
+      "metadata": {
+        "injuryChanceDisplay": 28,
+        "deathChanceDisplay": 3
+      }
+    }
+  },
+  "mapSlots": {
+    "village_square": {
+      "label": "Gilded Square",
+      "maxResidents": 6,
+      "tags": ["village", "job_site"]
+    },
+    "village_gate": {
+      "label": "Storm Gate",
+      "maxResidents": 4
+    }
+  },
+  "globalRules": {
+    "baseFoodPriceInGold": 3,
+    "dailyFoodConsumptionPerResident": 1.5,
+    "deathRules": {
+      "baseDeathChanceAtMaxDanger": 0.22
+    }
+  },
+  "uiPreferences": {
+    "defaultAppTabId": "idleVillageMap"
+  }
+}

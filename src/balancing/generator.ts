@@ -3,6 +3,9 @@ import { STAT_COSTS } from './costs';
 
 export type Archetype = 'balanced' | 'tank' | 'glass_cannon' | 'evasive';
 
+/**
+ * Generates a stat block for a given archetype and budget points.
+ */
 export const generateStatBlock = (archetype: Archetype, points: number): StatBlock => {
     const stats: StatBlock = { ...DEFAULT_STATS };
 

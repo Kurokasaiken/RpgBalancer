@@ -32,7 +32,8 @@
     /* Path mapping */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/test/*": ["./src/test/*"]
     }
   },
   "include": ["src"],

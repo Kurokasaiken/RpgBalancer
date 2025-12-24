@@ -1,8 +1,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 
+/**
+ * Density modes for UI layout and spacing.
+ */
 type DensityMode = 'compact' | 'comfortable';
 
+/**
+ * Context type for density management throughout the application.
+ */
 interface DensityContextType {
     density: DensityMode;
     setDensity: (mode: DensityMode) => void;
@@ -65,6 +71,9 @@ interface DensityProviderProps {
     children: ReactNode;
 }
 
+/**
+ * Provider component for density context, managing UI density settings.
+ */
 export const DensityProvider: React.FC<DensityProviderProps> = ({ children }) => {
     const [density, setDensityState] = useState<DensityMode>(() => {
         if (typeof window !== 'undefined') {
@@ -113,7 +122,9 @@ export const useDensity = (): DensityContextType => {
     return context;
 };
 
-// Hook for responsive density (auto-compact on mobile)
+/**
+ * Hook for responsive density management, automatically switching to compact on mobile.
+ */
 export const useResponsiveDensity = (): DensityContextType => {
     const context = useDensity();
     const [isMobile, setIsMobile] = useState(false);

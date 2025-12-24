@@ -1,9 +1,24 @@
 import React from 'react';
 
+/**
+ * Props for the DefaultPageHeader component.
+ */
 interface DefaultPageHeaderProps {
+  /**
+   * The title of the page header.
+   */
   title: string;
+  /**
+   * The subtitle of the page header.
+   */
   subtitle?: string;
+  /**
+   * The icon to display in the page header.
+   */
   icon?: React.ReactNode;
+  /**
+   * The actions to display in the page header.
+   */
   actions?: React.ReactNode;
 }
 

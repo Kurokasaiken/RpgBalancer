@@ -6,8 +6,14 @@ import { MitigationModule } from './modules/mitigation';
 import { CombatMetrics } from './metrics/CombatMetrics';
 
 
+/**
+ * Core solver for balancing calculations, handling both forward and reverse solving of stat relationships.
+ */
 export class BalancingSolver {
-    static solve(
+    /**
+ * Solves for stat changes, handling both base stat changes and derived stat adjustments with locking.
+ */
+static solve(
         currentStats: StatBlock,
         changedParam: keyof StatBlock,
         newValue: number,

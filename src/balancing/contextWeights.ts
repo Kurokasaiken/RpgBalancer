@@ -1,5 +1,8 @@
 import type { StatBlock } from './types';
 
+/**
+ * Available scenario types for context-specific balancing.
+ */
 export const SCENARIO_TYPES = {
   DUEL_1V1: 'duel_1v1',
   TEAMFIGHT_5V5: 'teamfight_5v5',
@@ -7,10 +10,19 @@ export const SCENARIO_TYPES = {
   BOSS_1V1_LONG: 'boss_1v1_long',
 } as const;
 
+/**
+ * Union type of all scenario identifiers.
+ */
 export type ScenarioType = (typeof SCENARIO_TYPES)[keyof typeof SCENARIO_TYPES];
 
+/**
+ * Keys that can be used as stat identifiers in scenarios.
+ */
 export type ScenarioStatKey = keyof StatBlock;
 
+/**
+ * Configuration for a specific combat scenario with stat multipliers.
+ */
 export interface ScenarioConfig {
   type: ScenarioType;
   name: string;
@@ -29,6 +41,9 @@ export interface ScenarioConfig {
   relevantStats: ScenarioStatKey[];
 }
 
+/**
+ * Predefined configurations for different combat scenarios.
+ */
 export const SCENARIO_CONFIGS: Record<ScenarioType, ScenarioConfig> = {
   [SCENARIO_TYPES.DUEL_1V1]: {
     type: SCENARIO_TYPES.DUEL_1V1,

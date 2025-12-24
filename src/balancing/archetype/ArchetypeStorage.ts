@@ -1,5 +1,8 @@
 import type { ArchetypeTemplate } from './types';
 
+/**
+ * Definition for an archetype category.
+ */
 export interface ArchetypeCategoryDef {
     id: string;
     name: string;
@@ -19,11 +22,17 @@ const DEFAULT_CATEGORIES: ArchetypeCategoryDef[] = [
     { id: 'Hybrid', name: 'Hybrid', description: 'Mixed capabilities', color: '#eab308' },
 ];
 
+/**
+ * Singleton class for persisting archetypes and categories to localStorage.
+ */
 export class ArchetypeStorage {
     private static instance: ArchetypeStorage;
 
     private constructor() { }
 
+    /**
+     * Returns the singleton instance of ArchetypeStorage.
+     */
     static getInstance(): ArchetypeStorage {
         if (!ArchetypeStorage.instance) {
             ArchetypeStorage.instance = new ArchetypeStorage();
@@ -33,6 +42,9 @@ export class ArchetypeStorage {
 
     // --- Archetypes ---
 
+    /**
+     * Saves or updates an archetype template.
+     */
     saveArchetype(archetype: ArchetypeTemplate): void {
         const archetypes = this.getAllArchetypes();
         const index = archetypes.findIndex(a => a.id === archetype.id);
@@ -46,16 +58,25 @@ export class ArchetypeStorage {
         this.persistArchetypes(archetypes);
     }
 
+    /**
+     * Deletes an archetype template by ID.
+     */
     deleteArchetype(id: string): void {
         const archetypes = this.getAllArchetypes();
         const filtered = archetypes.filter(a => a.id !== id);
         this.persistArchetypes(filtered);
     }
 
+    /**
+     * Retrieves an archetype template by ID.
+     */
     getArchetype(id: string): ArchetypeTemplate | undefined {
         return this.getAllArchetypes().find(a => a.id === id);
     }
 
+    /**
+     * Retrieves all stored archetype templates.
+     */
     getAllArchetypes(): ArchetypeTemplate[] {
         try {
             const data = localStorage.getItem(STORAGE_KEY);
@@ -66,6 +87,9 @@ export class ArchetypeStorage {
         }
     }
 
+    /**
+     * Persists the archetype array to localStorage.
+     */
     private persistArchetypes(archetypes: ArchetypeTemplate[]): void {
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(archetypes));
@@ -76,6 +100,9 @@ export class ArchetypeStorage {
 
     // --- Categories ---
 
+    /**
+     * Saves or updates a category definition.
+     */
     saveCategory(category: ArchetypeCategoryDef): void {
         const categories = this.getAllCategories();
         const index = categories.findIndex(c => c.id === category.id);
@@ -89,6 +116,9 @@ export class ArchetypeStorage {
         this.persistCategories(categories);
     }
 
+    /**
+     * Deletes a category definition by ID.
+     */
     deleteCategory(id: string): void {
         const categories = this.getAllCategories();
         // Prevent deleting default categories if needed, or handle logic in UI
@@ -96,6 +126,9 @@ export class ArchetypeStorage {
         this.persistCategories(filtered);
     }
 
+    /**
+     * Retrieves all stored category definitions.
+     */
     getAllCategories(): ArchetypeCategoryDef[] {
         try {
             const data = localStorage.getItem(CATEGORIES_KEY);
@@ -111,6 +144,9 @@ export class ArchetypeStorage {
         }
     }
 
+    /**
+     * Persists the category array to localStorage.
+     */
     private persistCategories(categories: ArchetypeCategoryDef[]): void {
         try {
             localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
@@ -121,6 +157,9 @@ export class ArchetypeStorage {
 
     // --- Import/Export ---
 
+    /**
+     * Exports all archetypes and categories as JSON string.
+     */
     exportAll(): string {
         const data = {
             archetypes: this.getAllArchetypes(),
@@ -131,6 +170,9 @@ export class ArchetypeStorage {
         return JSON.stringify(data, null, 2);
     }
 
+    /**
+     * Imports archetypes and categories from JSON string.
+     */
     importAll(json: string): { success: boolean, message: string } {
         try {
             const data = JSON.parse(json);

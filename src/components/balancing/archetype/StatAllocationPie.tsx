@@ -9,6 +9,9 @@ import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import type { StatAllocation } from '../../../balancing/archetype/types';
 
+/**
+ * Props for the StatAllocationPie component.
+ */
 interface StatAllocationPieProps {
     allocation: StatAllocation;
 }

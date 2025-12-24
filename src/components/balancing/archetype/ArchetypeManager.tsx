@@ -22,6 +22,9 @@ import {
     gildedDivider
 } from './gildedTheme';
 
+/**
+ * View modes for the archetype manager navigation.
+ */
 type ViewMode = 'list' | 'builder' | 'detail';
 
 export const ArchetypeManager: React.FC = () => {

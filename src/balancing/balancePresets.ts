@@ -9,6 +9,9 @@ export interface BalancePreset {
   targets?: TTKTarget[]; // Optional overrides for targets
 }
 
+/**
+ * Built-in balance presets with different weight configurations for various playstyles.
+ */
 export const BALANCE_PRESETS: Record<string, BalancePreset> = {
   standard: {
     id: 'standard',

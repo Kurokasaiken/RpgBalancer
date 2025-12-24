@@ -190,6 +190,9 @@ export const NORMALIZED_WEIGHTS = {
     ward: DEFAULT_CONFIG.stats.ward?.weight ?? 1.5,
 };
 
+/**
+ * Alias for normalized weights, used for backward compatibility.
+ */
 export const STAT_WEIGHTS = NORMALIZED_WEIGHTS;
 
 /**

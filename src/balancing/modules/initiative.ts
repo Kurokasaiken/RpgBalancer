@@ -9,6 +9,9 @@ import type { RNG } from '../simulation/types';
  * @module InitiativeModule
  */
 
+/**
+ * Represents the result of an initiative roll for a character.
+ */
 export interface InitiativeRoll {
     characterId: string;
     baseAgility: number;

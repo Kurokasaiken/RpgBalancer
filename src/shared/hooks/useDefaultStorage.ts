@@ -9,6 +9,9 @@ import { createEmptySpell } from '../../balancing/spellTypes';
 import { DEFAULT_SPELLS } from '../../balancing/defaultSpells';
 import { DEFAULT_SPELL_STAT_ORDER } from '../../balancing/spell/spellSliderConfig';
 
+/**
+ * Configuration object for default spell settings stored in localStorage.
+ */
 interface DefaultConfig {
     spell: Spell;
     statOrder: string[];

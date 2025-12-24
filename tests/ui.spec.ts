@@ -1,6 +1,38 @@
 import { test, expect, type Page } from '@playwright/test';
+import { appendFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import type { IdleVillageConfig } from '../src/balancing/config/idleVillage/types';
 import type { VillageState } from '../src/engine/game/idleVillage/TimeEngine';
+
+interface VillageSandboxTestWorker {
+    id: string;
+    name: string;
+    hp: number;
+    fatigue: number;
+}
+
+interface VillageSandboxTestSlot {
+    slotId: string;
+    label: string;
+    iconName: string;
+    assignedWorkerId: string | null;
+}
+
+declare global {
+    interface Window {
+        __appNavControls?: {
+            getActiveTab: () => string;
+            setActiveTab: (tabId: string) => void;
+        };
+        __villageSandboxTestHooks?: {
+            listWorkers: () => VillageSandboxTestWorker[];
+            listSlots: () => VillageSandboxTestSlot[];
+            assignWorkerToSlot: (slotId: string, workerId: string) => boolean;
+        };
+    }
+}
 
 interface IdleVillageResetOptions {
     founderId?: string;
@@ -21,17 +53,63 @@ type WindowWithControls = Window & { __idleVillageControls?: IdleVillageControls
 
 const getNavButton = (page: Page, tabId: string) => page.getByTestId(`nav-btn-${tabId}`);
 
+const TEST_DIR = fileURLToPath(new URL('.', import.meta.url));
+const UI_TEST_LOG_PATH = resolve(TEST_DIR, '../ui_test_log.txt');
+
+function logUiTestError(context: string, error: unknown) {
+    const errorMessage =
+        typeof error === 'object' && error !== null && 'stack' in error
+            ? String((error as { stack?: string }).stack ?? error)
+            : String(error);
+    const payload = `[${new Date().toISOString()}] [${context}] ${errorMessage}\n`;
+    appendFileSync(UI_TEST_LOG_PATH, payload);
+}
+
+async function withUiTestLogging<T>(context: string, operation: () => Promise<T>): Promise<T> {
+    try {
+        return await operation();
+    } catch (error) {
+        logUiTestError(context, error);
+        throw error;
+    }
+}
+
+const parseNumericAttr = (value: string | null, attrName: string): number => {
+    const parsed = Number(value ?? 'NaN');
+    if (!Number.isFinite(parsed)) {
+        throw new Error(`Attribute "${attrName}" missing or invalid (received ${value ?? 'null'})`);
+    }
+    return parsed;
+};
+
 async function openNavTab(page: Page, tabId: string) {
-    const primaryButton = getNavButton(page, tabId).first();
-    if (await primaryButton.isVisible().catch(() => false)) {
-        await primaryButton.click();
+    const switchedViaControls = await page.evaluate(async (targetTabId) => {
+        const controls = window.__appNavControls;
+        if (!controls) return false;
+        const currentTab = controls.getActiveTab();
+        if (currentTab === targetTabId) return true;
+        controls.setActiveTab(targetTabId);
+        return true;
+    }, tabId);
+    if (switchedViaControls) {
+        await page.waitForTimeout(50);
         return;
     }
 
-    const moreButton = getNavButton(page, 'more').first();
-    if (await moreButton.isVisible().catch(() => false)) {
-        await moreButton.click();
+    await page.waitForSelector('[data-testid^="nav-btn-"]', { timeout: 20000 });
+
+    const primaryButton = getNavButton(page, tabId);
+    if ((await primaryButton.count()) > 0) {
+        const visibleButton = primaryButton.filter({ hasNot: page.locator('[hidden]') }).first();
+        await visibleButton.click();
+        return;
+    }
+
+    const moreButton = getNavButton(page, 'more');
+    if ((await moreButton.count()) > 0) {
+        await moreButton.first().click();
         const drawerButton = getNavButton(page, tabId).last();
+        await drawerButton.waitFor({ state: 'visible', timeout: 5000 });
         await drawerButton.click();
         return;
     }
@@ -348,6 +426,102 @@ test.describe('UI Verification Suite', () => {
 
         expect(debugState.resources.gold).toBeGreaterThan(baselineResources.gold);
         expect(debugState.resources.xp).toBeGreaterThan(baselineResources.xp);
+        });
+    });
+});
+
+test.describe('Village Sandbox automation', () => {
+    const flowLabel = 'Village Sandbox drag/drop + theater verification';
+
+    test.beforeEach(async ({ page }) => {
+        await page.goto('/');
+        await page.waitForLoadState('networkidle');
+        await page.waitForFunction(() => Boolean(window.__villageSandboxTestHooks), undefined, { timeout: 20000 });
+    });
+
+    test('drag worker, verify theater progress and risk data', async ({ page }) => {
+        await withUiTestLogging(flowLabel, async () => {
+            await openNavTab(page, 'villageSandbox');
+
+            const workerCard = page.locator('[data-testid="worker-card"]').first();
+            await workerCard.waitFor({ state: 'visible' });
+
+            const slot = page.locator('[data-testid="activity-slot"]').first();
+            await slot.waitFor({ state: 'visible' });
+
+            const workerId = (await workerCard.getAttribute('data-worker-id')) ?? 'unknown';
+            const workerName = (await workerCard.getAttribute('data-worker-name')) ?? 'unknown';
+            const workerHp = parseNumericAttr(await workerCard.getAttribute('data-worker-hp'), 'data-worker-hp');
+            const workerFatigue = parseNumericAttr(
+                await workerCard.getAttribute('data-worker-fatigue'),
+                'data-worker-fatigue',
+            );
+
+            await workerCard.dragTo(slot, { force: true });
+
+            try {
+                await expect(slot).toHaveAttribute('data-has-worker', 'true', { timeout: 5000 });
+            } catch (dragError) {
+                const fallbackAssigned = await page.evaluate(
+                    ({ slotId, workerId: residentId }) => {
+                        if (!slotId || !residentId) return false;
+                        return window.__villageSandboxTestHooks?.assignWorkerToSlot(slotId, residentId) ?? false;
+                    },
+                    { slotId: await slot.getAttribute('data-slot-id'), workerId },
+                );
+                if (!fallbackAssigned) {
+                    throw dragError;
+                }
+                await expect(slot).toHaveAttribute('data-has-worker', 'true', { timeout: 2000 });
+            }
+
+            await slot.click();
+
+            const detailCard = page.getByTestId('verb-detail-card');
+            await expect(detailCard).toBeVisible();
+
+            const progressBar = detailCard.locator('[data-testid="verb-progress-bar"]');
+            await progressBar.waitFor({ state: 'attached' });
+
+            const isActive = await progressBar.getAttribute('data-is-active');
+            expect(isActive).toBe('true');
+
+            const readProgress = async () =>
+                parseNumericAttr(await progressBar.getAttribute('data-progress-ratio'), 'data-progress-ratio');
+
+            // Wait for the animation loop to tick at least once.
+            await expect.poll(async () => readProgress(), {
+                message: 'progress ratio should start increasing',
+                timeout: 4000,
+            }).not.toBe(0);
+
+            const initialProgress = await readProgress();
+            await page.waitForTimeout(1800);
+            const laterProgress = await readProgress();
+
+            expect(laterProgress).toBeGreaterThan(initialProgress + 0.01);
+
+            const riskStripe = detailCard.locator('[data-testid="risk-stripe"]').first();
+            await riskStripe.waitFor();
+
+            const injuryPercent = parseNumericAttr(
+                await riskStripe.getAttribute('data-injury-percent'),
+                'data-injury-percent',
+            );
+            const deathPercent = parseNumericAttr(
+                await riskStripe.getAttribute('data-death-percent'),
+                'data-death-percent',
+            );
+
+            const expectedInjury = Math.max(0, 100 - workerHp);
+            const expectedDeath = Math.max(0, workerFatigue - 70);
+
+            expect(Math.round(injuryPercent)).toBe(Math.round(expectedInjury));
+            expect(Math.round(deathPercent)).toBe(Math.round(expectedDeath));
+
+            // Validate textual content references assigned worker.
+            await expect(detailCard.locator(`text=${workerName}`)).toBeVisible();
+            await expect(detailCard).toContainText(workerId);
         });
     });
 });

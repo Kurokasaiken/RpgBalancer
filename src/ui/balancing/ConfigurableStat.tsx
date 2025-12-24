@@ -16,6 +16,9 @@ import {
 } from 'lucide-react';
 import { getStatGlyph, lucideStatIcons } from '../shared/statIconUtils';
 
+/**
+ * Props for the ConfigurableStat component.
+ */
 interface Props {
   stat: StatDefinition;
   simValue: number;

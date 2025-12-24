@@ -1,8 +1,14 @@
 import type { ArchetypeTemplate, BalanceConfiguration } from './types';
 import { ArchetypeMatchupService } from './ArchetypeMatchupService';
 
+/**
+ * Represents the counterpick relationship between two archetypes.
+ */
 export type CounterRelation = 'Strong' | 'Weak' | 'Even';
 
+/**
+ * Options for validating counterpick matrix against simulation results.
+ */
 export interface CounterMatrixValidationOptions {
   archetypes: ArchetypeTemplate[];
   balanceConfig: BalanceConfiguration;
@@ -10,6 +16,9 @@ export interface CounterMatrixValidationOptions {
   budgetTierName?: string;
 }
 
+/**
+ * Result of validating a counterpick relationship.
+ */
 export interface CounterpickValidationResult {
   attackerId: string;
   defenderId: string;
@@ -21,7 +30,13 @@ export interface CounterpickValidationResult {
   passed: boolean;
 }
 
+/**
+ * Validates counterpick matrix relationships through simulation.
+ */
 export class CounterpickValidator {
+  /**
+   * Validates the counterpick matrix by running simulations for each relationship.
+   */
   static validate(options: CounterMatrixValidationOptions): CounterpickValidationResult[] {
     const { archetypes, balanceConfig } = options;
     const iterations = options.iterations ?? 2000;

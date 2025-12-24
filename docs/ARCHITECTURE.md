@@ -89,7 +89,103 @@ SpellCreationFeature/
    └─ damageFormulas.ts         ← NEW
 ```
 
-## Data Flow
+## Data Flow Between Zustand Store, TimeEngine, and Tauri File System
+
+### Overview
+
+The RPG Balancer uses a layered architecture with clear separation of concerns for the Idle Village meta-game:
+- **UI Layer**: React components using Zustand stores
+- **Domain Layer**: Pure business logic (TimeEngine, Balancing modules)
+- **Persistence Layer**: Tauri File System integration
+
+### 1. Zustand Stores
+
+Zustand stores manage application state and provide React hooks for UI components.
+
+#### IdleVillageConfigStore
+- **Purpose**: Manages Idle Village configuration with validation, history, and persistence
+- **Key Features**:
+  - Config validation using Zod schemas
+  - Undo/redo with 10-snapshot history
+  - Debounced persistence to disk (1s delay)
+  - Lazy initialization from disk or defaults
+- **Data Flow**:
+  - Loads config from `PersistenceService.loadFinalConfigFromDisk()`
+  - Saves config via `PersistenceService.persistConfigToDisk()` with debounce
+  - Provides hooks: `useIdleVillageConfigStore()`
+
+#### VillageStateStore
+- **Purpose**: Manages runtime Idle Village game state
+- **Data Flow**:
+  - Integrates with TimeEngine for state mutations
+  - Persists game saves (if implemented)
+
+### 2. TimeEngine
+
+The TimeEngine is a pure domain module handling all time-based logic for the Idle Village meta-game.
+
+#### Key Responsibilities
+- **Activity Scheduling**: Queue and manage activities with start/end times
+- **Time Advancement**: Progress simulation time, process completed activities
+- **Trial of Fire**: Handle survival mechanics and stat bonuses
+- **Resource Management**: Track food consumption, fatigue recovery
+- **Quest System**: Generate and manage quest offers
+
+#### Data Flow
+```
+UI Action → Zustand Store → TimeEngine Function → Updated State → UI Re-render
+```
+
+- **Input**: `TimeEngineDeps` (config, rng) + current `VillageState`
+- **Output**: Updated `VillageState` + side effects (events)
+- **Pure Functions**: All operations are deterministic given inputs
+
+### 3. Tauri File System
+
+Tauri provides secure file system access for persistence.
+
+#### PersistenceService
+- **loadFinalConfigFromDisk()**: Loads config from app data directory
+- **persistConfigToDisk()**: Saves config to JSON file
+- **File Location**: Platform-specific app data directory
+
+#### Data Flow
+```
+Zustand Store → PersistenceService → Tauri FS API → Disk
+Disk → Tauri FS API → PersistenceService → Zustand Store
+```
+
+### Integration Points
+
+#### Config-First Architecture
+- All domain logic reads from `IdleVillageConfig` (loaded from Zustand store)
+- TimeEngine receives config via `TimeEngineDeps`
+- Changes to config trigger re-evaluation of domain logic
+
+#### State Management
+- **Static Config**: Managed by `IdleVillageConfigStore`, persisted to disk
+- **Runtime State**: Managed by `VillageStateStore`, may be persisted separately
+- **Separation**: Config changes don't affect running game state
+
+#### Validation & Safety
+- Zod schemas validate all config mutations
+- TimeEngine uses defensive programming (clamp01, finite checks)
+- Persistence includes error handling and fallbacks
+
+#### Example Flow: Scheduling an Activity
+
+1. **User Interaction**: Player assigns residents to a quest slot
+2. **UI Layer**: Component calls `scheduleActivity()` from Zustand store
+3. **Domain Layer**: TimeEngine validates characters, calculates duration, updates state
+4. **Persistence**: If config changed, debounced save to disk
+5. **UI Update**: Store state change triggers re-render
+
+#### Key Files
+
+- `src/engine/game/idleVillage/TimeEngine.ts` - Core time logic
+- `src/balancing/config/idleVillage/IdleVillageConfigStore.ts` - Config store
+- `src/balancing/config/idleVillage/PersistenceService.ts` - FS integration
+- `src/ui/idleVillage/useVillageStateStore.ts` - Runtime state store
 
 ### Balance Calculation Flow
 ```mermaid

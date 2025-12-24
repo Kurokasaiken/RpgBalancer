@@ -1,4 +1,7 @@
 // Character icon data with SVG and emoji
+/**
+ * Represents a character icon with visual and descriptive properties.
+ */
 export interface CharacterIcon {
     id: string;
     name: string;

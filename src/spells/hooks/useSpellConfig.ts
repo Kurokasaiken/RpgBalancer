@@ -9,6 +9,9 @@ import type {
 import { SpellConfigStore } from '../config/SpellConfigStore';
 import { SpellDefinitionSchema, SpellCardSchema } from '../config/schemas';
 
+/**
+ * Result of a validation operation.
+ */
 export interface ValidationResult {
   success: boolean;
   error?: string;
@@ -16,6 +19,9 @@ export interface ValidationResult {
 
 const deepClone = <T,>(value: T): T => JSON.parse(JSON.stringify(value));
 
+/**
+ * Return type for the useSpellConfig hook.
+ */
 export interface UseSpellConfigReturn {
   config: SpellConfig;
   history: SpellConfigSnapshot[];

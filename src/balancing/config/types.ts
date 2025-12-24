@@ -1,3 +1,6 @@
+/**
+ * Defines a stat in the balancer system, including its properties and constraints.
+ */
 export interface StatDefinition {
   id: string;
   label: string;
@@ -22,6 +25,9 @@ export interface StatDefinition {
   isDetrimental?: boolean;
 }
 
+/**
+ * Defines a card in the balancer system, grouping related stats.
+ */
 export interface CardDefinition {
   id: string;
   title: string;
@@ -34,6 +40,9 @@ export interface CardDefinition {
    isHidden?: boolean;
 }
 
+/**
+ * Represents a preset configuration for the balancer, including weights and metadata.
+ */
 export interface BalancerPreset {
   id: string;
   name: string;
@@ -44,6 +53,9 @@ export interface BalancerPreset {
   modifiedAt: string;
 }
 
+/**
+ * The complete configuration for the balancer system, including stats, cards, and presets.
+ */
 export interface BalancerConfig {
   version: string;
   stats: Record<string, StatDefinition>;
@@ -52,12 +64,18 @@ export interface BalancerConfig {
   activePresetId: string;
 }
 
+/**
+ * A snapshot of the balancer configuration at a specific point in time.
+ */
 export interface ConfigSnapshot {
   timestamp: number;
   config: BalancerConfig;
   description: string;
 }
 
+/**
+ * Defines the kinds of tactical actions available in the game.
+ */
 export type TacticalActionKind =
   | 'move'
   | 'attack'
@@ -66,6 +84,9 @@ export type TacticalActionKind =
   | 'interact'
   | 'ability';
 
+/**
+ * Configuration for a tactical action, defining its properties and costs.
+ */
 export interface TacticalActionConfig {
   id: string;
   kind: TacticalActionKind;
@@ -78,12 +99,18 @@ export interface TacticalActionConfig {
   endsTurn?: boolean;
 }
 
+/**
+ * Defines the types of tactical objectives available in missions.
+ */
 export type TacticalObjectiveType =
   | 'eliminateAllEnemies'
   | 'extractUnit'
   | 'survive'
   | 'reachArea';
 
+/**
+ * Configuration for a tactical objective in a mission.
+ */
 export interface TacticalObjectiveConfig {
   id: string;
   type: TacticalObjectiveType;
@@ -91,6 +118,9 @@ export interface TacticalObjectiveConfig {
   isPrimary: boolean;
 }
 
+/**
+ * Configuration for a squad member in a tactical mission.
+ */
 export interface TacticalSquadMemberConfig {
   id: string; // Archetype ID, character ID, o simile
   spawnX?: number;
@@ -98,6 +128,9 @@ export interface TacticalSquadMemberConfig {
   roleHint?: string;
 }
 
+/**
+ * Configuration for a squad in a tactical mission.
+ */
 export interface TacticalSquadConfig {
   id: string;
   label: string;
@@ -105,6 +138,9 @@ export interface TacticalSquadConfig {
   members: TacticalSquadMemberConfig[];
 }
 
+/**
+ * Defines the kinds of tactical missions available.
+ */
 export type TacticalMissionKind =
   | 'engagement'
   | 'assassination'
@@ -112,6 +148,9 @@ export type TacticalMissionKind =
   | 'escort'
   | 'survival';
 
+/**
+ * Configuration for a tactical mission, including squads, objectives, and settings.
+ */
 export interface TacticalMissionConfig {
   id: string;
   name: string;

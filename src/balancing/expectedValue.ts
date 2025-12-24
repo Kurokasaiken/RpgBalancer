@@ -9,10 +9,16 @@ import {
 
 export type NumericStatMap = Partial<Record<string, number>>;
 
+/**
+ * Retrieves the configuration for a specific scenario type.
+ */
 export function getScenarioConfig(scenarioType: ScenarioType): ScenarioConfig {
   return SCENARIO_CONFIGS[scenarioType];
 }
 
+/**
+ * Applies scenario-specific stat multipliers to a stat map.
+ */
 export function applyScenarioMultipliers(
   stats: NumericStatMap,
   scenarioType: ScenarioType,
@@ -29,6 +35,9 @@ export function applyScenarioMultipliers(
   return result;
 }
 
+/**
+ * Applies scenario-specific stat multipliers using a provided config.
+ */
 export function applyScenarioMultipliersWithConfig(
   stats: NumericStatMap,
   scenario: ScenarioConfig,
@@ -44,6 +53,9 @@ export function applyScenarioMultipliersWithConfig(
   return result;
 }
 
+/**
+ * Calculates item power for a stat map adjusted by a scenario config.
+ */
 export function calculateScenarioItemPowerWithConfig(
   stats: NumericStatMap,
   scenario: ScenarioConfig,
@@ -52,6 +64,9 @@ export function calculateScenarioItemPowerWithConfig(
   return calculateItemPower(adjustedStats);
 }
 
+/**
+ * Calculates power map across scenarios for a stat block using provided configs.
+ */
 export function getScenarioPowerMapForStatBlockWithConfigs(
   stats: StatBlock,
   configs: Record<ScenarioType, ScenarioConfig>,
@@ -76,6 +91,9 @@ export function getScenarioPowerMapForStatBlockWithConfigs(
   return result;
 }
 
+/**
+ * Calculates item power for a stat map in a specific scenario.
+ */
 export function calculateScenarioItemPower(
   stats: NumericStatMap,
   scenarioType: ScenarioType,
@@ -84,6 +102,9 @@ export function calculateScenarioItemPower(
   return calculateItemPower(adjustedStats);
 }
 
+/**
+ * Calculates scenario power for a full stat block in a specific scenario.
+ */
 export function calculateScenarioPowerForStatBlock(
   stats: StatBlock,
   scenarioType: ScenarioType,
@@ -100,6 +121,9 @@ export function calculateScenarioPowerForStatBlock(
   return calculateScenarioItemPower(numericStats, scenarioType);
 }
 
+/**
+ * Calculates power map across all scenarios for a stat block.
+ */
 export function getScenarioPowerMapForStatBlock(
   stats: StatBlock,
 ): Record<ScenarioType, number> {

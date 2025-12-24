@@ -1,5 +1,8 @@
 import React from 'react';
 
+/**
+ * Props for the GlassButton component.
+ */
 interface GlassButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
     size?: 'sm' | 'md' | 'lg' | 'icon';

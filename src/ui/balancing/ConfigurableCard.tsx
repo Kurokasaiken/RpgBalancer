@@ -5,25 +5,93 @@ import { DndContext, closestCenter } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
+/**
+ * Props for the ConfigurableCard component.
+ */
 interface Props {
+  /**
+   * The card definition.
+   */
   card: CardDefinition;
+  /**
+   * A record of stat definitions.
+   */
   stats: Record<string, StatDefinition>;
+  /**
+   * A record of simulation values.
+   */
   simValues: Record<string, number>;
+  /**
+   * A callback function to update the simulation value of a stat.
+   * @param statId The ID of the stat.
+   * @param value The new simulation value.
+   */
   onSimValueChange: (statId: string, value: number) => void;
+  /**
+   * A callback function to edit a stat.
+   * @param statId The ID of the stat.
+   * @param updates The updates to apply to the stat.
+   */
   onEditStat: (statId: string, updates: Partial<StatDefinition>) => void;
+  /**
+   * A callback function to delete a stat.
+   * @param statId The ID of the stat.
+   */
   onDeleteStat: (statId: string) => void;
+  /**
+   * An optional callback function to reset a stat.
+   * @param statId The ID of the stat.
+   */
   onResetStat?: (statId: string) => void;
+  /**
+   * An optional callback function to reset the card.
+   */
   onResetCard?: () => void;
+  /**
+   * An optional callback function to add a new stat.
+   */
   onAddStat?: () => void;
+  /**
+   * An optional callback function to open the stat editor.
+   * @param statId The ID of the stat to edit, or undefined to create a new stat.
+   */
   onOpenStatEditor?: (statId?: string) => void;
+  /**
+   * An optional callback function to open the card editor.
+   */
   onOpenCardEditor?: () => void;
+  /**
+   * The ID of the newly added stat, or undefined if no stat has been added.
+   */
   newStatId?: string;
+  /**
+   * An optional callback function to update the card.
+   * @param updates The updates to apply to the card.
+   */
   onUpdateCard?: (updates: Partial<CardDefinition>) => void;
+  /**
+   * An optional callback function to delete the card.
+   */
   onDeleteCard?: () => void;
+  /**
+   * Whether the header is in edit mode initially.
+   */
   startHeaderInEdit?: boolean;
+  /**
+   * A list of available stats.
+   */
   availableStats: { id: string; label: string }[];
+  /**
+   * Optional drag listeners for the card.
+   */
   dragListeners?: React.HTMLAttributes<HTMLButtonElement>;
+  /**
+   * A record of dependency highlights.
+   */
   dependencyHighlights?: Record<string, boolean>;
+  /**
+   * A record of error highlights.
+   */
   errorHighlights?: Record<string, boolean>;
 }
 

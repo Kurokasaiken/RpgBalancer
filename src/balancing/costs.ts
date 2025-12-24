@@ -19,6 +19,9 @@ export const STAT_COSTS: Record<string, number> = {
     penPercent: 5
 };
 
+/**
+ * Retrieves the effective weight for a stat, preferring config overrides over defaults.
+ */
 const getStatWeight = (statId: string): number => {
     try {
         const config = BalancerConfigStore.load();
@@ -36,6 +39,9 @@ const getStatWeight = (statId: string): number => {
     return STAT_COSTS[statId] ?? 1;
 };
 
+/**
+ * Calculates the total budget cost for a stat block based on configured weights.
+ */
 export const calculateStatBlockCost = (stats: StatBlock): number => {
     let cost = 0;
 

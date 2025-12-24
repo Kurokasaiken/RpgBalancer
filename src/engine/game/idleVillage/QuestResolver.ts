@@ -33,6 +33,9 @@ export interface QuestResolutionResult {
   }[];
 }
 
+/**
+ * Evaluates a simple integer reward formula for deterministic payouts.
+ */
 function evaluateRewardAmount(delta: ResourceDeltaDefinition): number {
   const raw = (delta as ResourceDeltaDefinition).amountFormula?.toString().trim?.() ?? '';
   if (!raw) return 0;

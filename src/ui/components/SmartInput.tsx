@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { PARAM_DEFINITIONS } from '../../balancing/registry';
 import type { LockedParameter } from '../../balancing/types';
 
+/**
+ * Props for the SmartInput component.
+ */
 interface SmartInputProps {
     paramId: string;
     value: number;

@@ -1,5 +1,8 @@
 import { BALANCING_CONFIG } from './balancingConfig';
 
+/**
+ * Definition for a configurable parameter used in balancing formulas.
+ */
 export interface ParameterDefinition {
     id: string;
     name: string;
@@ -8,12 +11,18 @@ export interface ParameterDefinition {
     formulas: string[]; // IDs of formulas where this param is used
 }
 
+/**
+ * Definition for a constant value used in balancing.
+ */
 export interface ConstantDefinition {
     value: number;
     name: string;
     description: string;
 }
 
+/**
+ * Global constants used across the balancing system.
+ */
 export const CONSTANTS = {
     BASE_HIT_CHANCE: {
         value: BALANCING_CONFIG.BASE_HIT_CHANCE,
@@ -22,6 +31,9 @@ export const CONSTANTS = {
     },
 };
 
+/**
+ * Registry of all parameter definitions for the balancing system.
+ */
 export const PARAM_DEFINITIONS: Record<string, ParameterDefinition> = {
     // CORE
     hp: {

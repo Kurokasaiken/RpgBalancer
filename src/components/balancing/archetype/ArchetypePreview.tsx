@@ -7,6 +7,9 @@
 import React from 'react';
 import type { StatBlock } from '../../../balancing/types';
 
+/**
+ * Props for the ArchetypePreview component.
+ */
 interface ArchetypePreviewProps {
     statBlock: StatBlock | null;
     budget: number;
@@ -91,7 +94,7 @@ export const ArchetypePreview: React.FC<ArchetypePreviewProps> = ({
             </div>
 
             {/* Power Level Indicator */}
-            <div className="bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-lg p-4 mb-4">
+            <div className="bg-linear-to-r from-cyan-500/20 to-purple-500/20 rounded-lg p-4 mb-4">
                 <div className="text-center">
                     <div className="text-sm text-gray-400 mb-1">Estimated Power Level</div>
                     <div className="text-3xl font-bold text-cyan-100">

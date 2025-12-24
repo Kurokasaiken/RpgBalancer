@@ -1,6 +1,9 @@
 import React, { useRef, useEffect, useState } from 'react';
 import styles from './GlassSlider.module.css';
 
+/**
+ * Props for the GlassSlider component.
+ */
 interface GlassSliderProps {
     value: number;
     min?: number;

@@ -9,6 +9,9 @@ import { BalanceConfigManager } from '../../balancing/BalanceConfigManager';
 import { deleteUserPreset } from '../../balancing/presetStorage';
 import { toast } from 'sonner';
 
+/**
+ * Props for the PresetSelector component.
+ */
 interface PresetSelectorProps {
     activePresetId: string;
     onPresetChange: (id: string) => void;

@@ -1,7 +1,14 @@
 import { CONSTANTS } from '../registry';
 
+/**
+ * Critical Module - Critical hit and failure calculations
+ * 
+ * Handles calculations for critical hits, failures, and their impact on hit chance and damage.
+ */
 export const CriticalModule = {
-    // Calculates the effective hit chance considering Crit Bonus and Fail Malus
+    /**
+     * Calculates the effective hit chance considering Crit Bonus and Fail Malus.
+     */
     calculateEffectiveHitChance: (
         txc: number,
         evasion: number,
@@ -36,7 +43,9 @@ export const CriticalModule = {
         return effectiveChance;
     },
 
-    // Calculates the average damage multiplier
+    /**
+     * Calculates the average damage multiplier.
+     */
     calculateAverageDamageMultiplier: (
         critChance: number,
         critMult: number,
@@ -50,7 +59,9 @@ export const CriticalModule = {
         return (pCrit * critMult) + (pFail * failMult) + (pNormal * 1.0);
     },
 
-    // Calculates Attacks Per KO using the full logic
+    /**
+     * Calculates Attacks Per KO using the full logic.
+     */
     calculateAttacksPerKo: (
         htkPure: number,
         effectiveHitChance: number,
@@ -64,7 +75,9 @@ export const CriticalModule = {
         return htkPure / denominator;
     },
 
-    // Calculates actual critical damage for a single hit
+    /**
+     * Calculates actual critical damage for a single hit.
+     */
     calculateCriticalDamage: (baseDamage: number, multiplier: number): number => {
         return Math.floor(baseDamage * multiplier);
     }

@@ -7,9 +7,18 @@
  * Used for: Stat boosts, shields, status effects, etc.
  */
 
+/**
+ * Types of buffs that can be applied to entities.
+ */
 export type BuffType = 'stat_modifier' | 'shield' | 'status';
+/**
+ * How stat modifiers are applied to base values.
+ */
 export type ModifierMode = 'additive' | 'multiplicative';
 
+/**
+ * Represents a temporary modifier applied to an entity.
+ */
 export interface Buff {
     id: string;                    // Unique identifier
     source: string;                // Ability/spell name

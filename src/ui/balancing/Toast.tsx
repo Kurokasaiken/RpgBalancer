@@ -2,10 +2,25 @@ import React, { useEffect, useState } from 'react';
 
 export type ToastType = 'success' | 'error' | 'info';
 
+/**
+ * Props for the Toast component.
+ */
 interface ToastProps {
+  /**
+   * The message to be displayed in the toast.
+   */
   message: string;
+  /**
+   * The type of toast (success, error, or info).
+   */
   type: ToastType;
+  /**
+   * The duration of the toast in milliseconds (optional).
+   */
   duration?: number;
+  /**
+   * The callback function to be called when the toast is closed.
+   */
   onClose: () => void;
 }
 

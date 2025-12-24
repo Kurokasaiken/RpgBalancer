@@ -1,0 +1,195 @@
+[2025-12-24T12:47:18.089Z] [Village Sandbox drag/drop + theater verification] Error: Navigation button for tab "villageSandbox" not found in current layout.
+    at openNavTab (file:///Users/faustoboni/projects/progetti%20personali/tests/ui.spec.ts:72:11)
+    at file:///Users/faustoboni/projects/progetti%20personali/tests/ui.spec.ts:393:13
+    at withUiTestLogging (file:///Users/faustoboni/projects/progetti%20personali/tests/ui.spec.ts:42:16)
+    at file:///Users/faustoboni/projects/progetti%20personali/tests/ui.spec.ts:392:9
+    at /Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/workerMain.js:322:9
+    at /Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/testInfo.js:311:11
+    at TimeoutManager.withRunnable (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/timeoutManager.js:67:14)
+    at TestInfoImpl._runWithTimeout (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/testInfo.js:309:7)
+    at /Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/workerMain.js:320:7
+    at WorkerMain._runTest (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/workerMain.js:295:5)
+    at WorkerMain.runTestGroup (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/workerMain.js:199:11)
+    at process.<anonymous> (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/common/process.js:65:22)
+[2025-12-24T12:47:18.089Z] [Village Sandbox drag/drop + theater verification] Error: Navigation button for tab "villageSandbox" not found in current layout.
+    at openNavTab (file:///Users/faustoboni/projects/progetti%20personali/tests/ui.spec.ts:72:11)
+    at file:///Users/faustoboni/projects/progetti%20personali/tests/ui.spec.ts:393:13
+    at withUiTestLogging (file:///Users/faustoboni/projects/progetti%20personali/tests/ui.spec.ts:42:16)
+    at file:///Users/faustoboni/projects/progetti%20personali/tests/ui.spec.ts:392:9
+    at /Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/workerMain.js:322:9
+    at /Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/testInfo.js:311:11
+    at TimeoutManager.withRunnable (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/timeoutManager.js:67:14)
+    at TestInfoImpl._runWithTimeout (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/testInfo.js:309:7)
+    at /Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/workerMain.js:320:7
+    at WorkerMain._runTest (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/workerMain.js:295:5)
+    at WorkerMain.runTestGroup (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/workerMain.js:199:11)
+    at process.<anonymous> (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/common/process.js:65:22)
+[2025-12-24T12:47:20.646Z] [Village Sandbox drag/drop + theater verification] Error: Navigation button for tab "villageSandbox" not found in current layout.
+    at openNavTab (file:///Users/faustoboni/projects/progetti%20personali/tests/ui.spec.ts:72:11)
+    at file:///Users/faustoboni/projects/progetti%20personali/tests/ui.spec.ts:393:13
+    at withUiTestLogging (file:///Users/faustoboni/projects/progetti%20personali/tests/ui.spec.ts:42:16)
+    at file:///Users/faustoboni/projects/progetti%20personali/tests/ui.spec.ts:392:9
+    at /Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/workerMain.js:322:9
+    at /Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/testInfo.js:311:11
+    at TimeoutManager.withRunnable (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/timeoutManager.js:67:14)
+    at TestInfoImpl._runWithTimeout (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/testInfo.js:309:7)
+    at /Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/workerMain.js:320:7
+    at WorkerMain._runTest (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/workerMain.js:295:5)
+    at WorkerMain.runTestGroup (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/workerMain.js:199:11)
+    at process.<anonymous> (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/common/process.js:65:22)
+[2025-12-24T12:50:06.026Z] [Village Sandbox drag/drop + theater verification] Error: Navigation button for tab "villageSandbox" not found in current layout.
+    at openNavTab (file:///Users/faustoboni/projects/progetti%20personali/tests/ui.spec.ts:73:11)
+    at file:///Users/faustoboni/projects/progetti%20personali/tests/ui.spec.ts:394:13
+    at withUiTestLogging (file:///Users/faustoboni/projects/progetti%20personali/tests/ui.spec.ts:42:16)
+    at file:///Users/faustoboni/projects/progetti%20personali/tests/ui.spec.ts:393:9
+    at /Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/workerMain.js:322:9
+    at /Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/testInfo.js:311:11
+    at TimeoutManager.withRunnable (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/timeoutManager.js:67:14)
+    at TestInfoImpl._runWithTimeout (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/testInfo.js:309:7)
+    at /Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/workerMain.js:320:7
+    at WorkerMain._runTest (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/workerMain.js:295:5)
+    at WorkerMain.runTestGroup (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/workerMain.js:199:11)
+    at process.<anonymous> (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/common/process.js:65:22)
+[2025-12-24T12:50:06.030Z] [Village Sandbox drag/drop + theater verification] Error: Navigation button for tab "villageSandbox" not found in current layout.
+    at openNavTab (file:///Users/faustoboni/projects/progetti%20personali/tests/ui.spec.ts:73:11)
+    at file:///Users/faustoboni/projects/progetti%20personali/tests/ui.spec.ts:394:13
+    at withUiTestLogging (file:///Users/faustoboni/projects/progetti%20personali/tests/ui.spec.ts:42:16)
+    at file:///Users/faustoboni/projects/progetti%20personali/tests/ui.spec.ts:393:9
+    at /Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/workerMain.js:322:9
+    at /Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/testInfo.js:311:11
+    at TimeoutManager.withRunnable (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/timeoutManager.js:67:14)
+    at TestInfoImpl._runWithTimeout (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/testInfo.js:309:7)
+    at /Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/workerMain.js:320:7
+    at WorkerMain._runTest (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/workerMain.js:295:5)
+    at WorkerMain.runTestGroup (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/workerMain.js:199:11)
+    at process.<anonymous> (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/common/process.js:65:22)
+[2025-12-24T12:50:06.775Z] [Village Sandbox drag/drop + theater verification] Error: Navigation button for tab "villageSandbox" not found in current layout.
+    at openNavTab (file:///Users/faustoboni/projects/progetti%20personali/tests/ui.spec.ts:73:11)
+    at file:///Users/faustoboni/projects/progetti%20personali/tests/ui.spec.ts:394:13
+    at withUiTestLogging (file:///Users/faustoboni/projects/progetti%20personali/tests/ui.spec.ts:42:16)
+    at file:///Users/faustoboni/projects/progetti%20personali/tests/ui.spec.ts:393:9
+    at /Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/workerMain.js:322:9
+    at /Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/testInfo.js:311:11
+    at TimeoutManager.withRunnable (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/timeoutManager.js:67:14)
+    at TestInfoImpl._runWithTimeout (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/testInfo.js:309:7)
+    at /Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/workerMain.js:320:7
+    at WorkerMain._runTest (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/workerMain.js:295:5)
+    at WorkerMain.runTestGroup (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/worker/workerMain.js:199:11)
+    at process.<anonymous> (/Users/faustoboni/projects/progetti personali/node_modules/playwright/lib/common/process.js:65:22)
+[2025-12-24T12:50:58.565Z] [Village Sandbox drag/drop + theater verification] page.waitForSelector: Timeout 8000ms exceeded.
+Call log:
+[2m  - waiting for locator('[data-testid^="nav-btn-"]') to be visible[22m
+
+    at openNavTab (/Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:58:16)
+    at operation (/Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:397:19)
+    at withUiTestLogging (/Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:42:22)
+    at /Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:396:15
+[2025-12-24T12:50:58.565Z] [Village Sandbox drag/drop + theater verification] page.waitForSelector: Timeout 8000ms exceeded.
+Call log:
+[2m  - waiting for locator('[data-testid^="nav-btn-"]') to be visible[22m
+
+    at openNavTab (/Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:58:16)
+    at operation (/Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:397:19)
+    at withUiTestLogging (/Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:42:22)
+    at /Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:396:15
+[2025-12-24T12:50:58.943Z] [Village Sandbox drag/drop + theater verification] page.waitForSelector: Timeout 8000ms exceeded.
+Call log:
+[2m  - waiting for locator('[data-testid^="nav-btn-"]') to be visible[22m
+
+    at openNavTab (/Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:58:16)
+    at operation (/Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:397:19)
+    at withUiTestLogging (/Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:42:22)
+    at /Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:396:15
+[2025-12-24T12:53:59.847Z] [Village Sandbox drag/drop + theater verification] page.waitForSelector: Timeout 20000ms exceeded.
+Call log:
+[2m  - waiting for locator('[data-testid^="nav-btn-"]') to be visible[22m
+
+    at openNavTab (/Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:58:16)
+    at operation (/Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:397:19)
+    at withUiTestLogging (/Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:42:22)
+    at /Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:396:15
+[2025-12-24T12:53:59.847Z] [Village Sandbox drag/drop + theater verification] page.waitForSelector: Timeout 20000ms exceeded.
+Call log:
+[2m  - waiting for locator('[data-testid^="nav-btn-"]') to be visible[22m
+
+    at openNavTab (/Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:58:16)
+    at operation (/Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:397:19)
+    at withUiTestLogging (/Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:42:22)
+    at /Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:396:15
+[2025-12-24T12:53:59.975Z] [Village Sandbox drag/drop + theater verification] page.waitForSelector: Timeout 20000ms exceeded.
+Call log:
+[2m  - waiting for locator('[data-testid^="nav-btn-"]') to be visible[22m
+
+    at openNavTab (/Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:58:16)
+    at operation (/Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:397:19)
+    at withUiTestLogging (/Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:42:22)
+    at /Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:396:15
+[2025-12-24T13:02:02.740Z] [Village Sandbox drag/drop + theater verification] Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveAttribute[2m([22m[32mexpected[39m[2m)[22m failed
+
+Locator:  locator('[data-testid="activity-slot"]').first()
+Expected: [32m"[7mtru[27me"[39m
+Received: [31m"[7mfals[27me"[39m
+Timeout:  5000ms
+
+Call log:
+[2m  - Expect "toHaveAttribute" with timeout 5000ms[22m
+[2m  - waiting for locator('[data-testid="activity-slot"]').first()[22m
+[2m    9 × locator resolved to <div data-has-worker="false" data-testid="activity-slot" data-slot-id="village_square" data-slot-label="Village Square" aria-label="Activity slot village_square" class="relative h-28 w-28 rounded-full border border-slate-700/80 bg-slate-900 drop-shadow-xl transition-all duration-200 ring-2 ring-amber-500/30 shadow-[0_0_30px_rgba(201,162,39,0.35)]">…</div>[22m
+[2m      - unexpected value "false"[22m
+
+    at /Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:442:32
+    at withUiTestLogging (/Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:51:16)
+    at /Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:423:9
+[2025-12-24T13:04:34.390Z] [Village Sandbox drag/drop + theater verification] locator.waitFor: Test timeout of 30000ms exceeded.
+Call log:
+[2m  - waiting for getByTestId('verb-detail-card').locator('[data-testid="verb-progress-bar"]') to be visible[22m
+[2m    3 × locator resolved to hidden <div data-is-active="true" data-progress-ratio="0" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.0011" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.0028" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.0045" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.0128" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.0211" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.0295" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.0378" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.0461" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.055" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.0634" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.0717" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.08" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.0883" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.0967" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.105" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.1134" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.1217" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.13" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.1389" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.1473" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.1556" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.1639" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.1723" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.1806" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.1889" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.1972" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.2056" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.2145" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.2228" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.2311" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.2395" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.2478" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.2561" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.2645" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.2733" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.2817" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.29" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.2984" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.3067" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.315" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.3233" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.3317" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.3406" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.3489" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+[2m    - locator resolved to hidden <div data-is-active="true" data-progress-ratio="0.3572" data-testid="verb-progress-bar" class="h-full transition-all duration-300 bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500"></div>[22m
+
+    at /Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:484:31
+    at withUiTestLogging (/Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:70:16)
+    at /Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:443:9

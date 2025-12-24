@@ -2,6 +2,7 @@ import type { BalancerConfig, ConfigSnapshot, StatDefinition } from './types';
 import { BalancerConfigSchema } from './schemas';
 import { DEFAULT_CONFIG } from './defaultConfig';
 import BALANCER_DEFAULT_JSON from './balancer-default-config.json';
+import { saveData, loadData } from '@/shared/persistence/PersistenceService';
 
 const STORAGE_KEY = 'rpg_balancer_config';
 const HISTORY_KEY = 'rpg_balancer_config_history';
@@ -30,59 +31,34 @@ export class BalancerConfigStore {
     return false;
   }
 
-  static load(): BalancerConfig {
-    // Always check for external changes (from other tabs/windows)
-    if (this.hasExternalChange()) {
-      this.config = null; // Invalidate cache
-    }
-
+  static async load(): Promise<BalancerConfig> {
     if (this.config) return this.config;
 
     try {
-      const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null;
-      lastStorageState = raw;
-      
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        const validated = BalancerConfigSchema.parse(parsed);
-        this.config = this.mergeWithDefaults(validated);
-      } else {
-        // Use the JSON config as initial default
-        this.config = { ...INITIAL_CONFIG };
-        // Save it to localStorage so it becomes the new default
-        if (typeof localStorage !== 'undefined') {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(this.config));
-          lastStorageState = JSON.stringify(this.config);
-        }
-      }
+      const loaded = await loadData<BalancerConfig>(STORAGE_KEY, INITIAL_CONFIG);
+      const validated = BalancerConfigSchema.parse(loaded);
+      this.config = this.mergeWithDefaults(validated);
     } catch (e) {
       console.warn('Failed to load balancer config, using defaults:', e);
-      // Fall back to INITIAL_CONFIG and persist it so subsequent loads and exports are valid
       this.config = { ...INITIAL_CONFIG };
-      if (typeof localStorage !== 'undefined') {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(this.config));
-        lastStorageState = JSON.stringify(this.config);
-      }
+      // Save the defaults so future loads work
+      await this.save(this.config, 'Initialize defaults');
     }
 
-    this.loadHistory();
+    await this.loadHistory();
     return this.config;
   }
 
-  static save(config: BalancerConfig, description: string = 'Manual save'): void {
+  static async save(config: BalancerConfig, description: string = 'Manual save'): Promise<void> {
     const result = BalancerConfigSchema.safeParse(config);
     if (!result.success) {
       throw new Error(`Invalid balancer config: ${result.error.message}`);
     }
 
-    this.addToHistory(description);
+    await this.addToHistory(description);
     this.config = config;
 
-    if (typeof localStorage !== 'undefined') {
-      const serialized = JSON.stringify(config);
-      localStorage.setItem(STORAGE_KEY, serialized);
-      lastStorageState = serialized;
-    }
+    await saveData(STORAGE_KEY, config);
   }
 
   private static addToHistory(description: string): void {

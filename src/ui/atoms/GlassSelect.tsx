@@ -1,6 +1,9 @@
 import React from 'react';
 import styles from './GlassSelect.module.css';
 
+/**
+ * Props for the GlassSelect component.
+ */
 interface GlassSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
     label?: string;
     error?: string;

@@ -1,6 +1,9 @@
 import React from 'react';
 import styles from './GlassInput.module.css';
 
+/**
+ * Props for the GlassInput component.
+ */
 interface GlassInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
     label?: string;
     error?: string;

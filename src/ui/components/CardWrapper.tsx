@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 
+/**
+ * Props for the CardWrapper component.
+ */
 interface CardWrapperProps {
     title: string;
     color: string;

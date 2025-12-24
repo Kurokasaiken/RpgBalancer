@@ -1,21 +1,14 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
 import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
-import { selectDefaultFounder } from '@/engine/game/idleVillage/seedDemoResidents';
 import { createVillageStateFromConfig, type ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { useVillageStateStore } from '@/ui/idleVillage/useVillageStateStore';
+import { loadResidentsFromCharacterManager } from '@/engine/game/idleVillage/characterImport';
 import LocationCard from '@/ui/idleVillage/components/LocationCard';
 import ActivitySlot from '@/ui/idleVillage/components/ActivitySlot';
-import WorkerCard from '@/ui/idleVillage/components/WorkerCard';
 import VerbDetailCard, { type VerbDetailAssignment, type VerbSlotState } from '@/ui/idleVillage/VerbDetailCard';
+import ResidentRoster from '@/ui/idleVillage/ResidentRoster';
 import { formatResidentLabel } from '@/ui/idleVillage/residentName';
-
-type Worker = {
-  id: string;
-  name: string;
-  hp: number;
-  fatigue: number;
-};
 
 type ActivitySlotData = {
   slotId: string;
@@ -26,32 +19,16 @@ type ActivitySlotData = {
 
 const VillageSandbox = () => {
   const { config } = useIdleVillageConfig();
-  const defaultFounderPreset = useMemo(() => selectDefaultFounder(config), [config]);
+  const initialResidents = useMemo(() => loadResidentsFromCharacterManager(), []);
   const { state: villageState } = useVillageStateStore(() =>
-    createVillageStateFromConfig({ config, founderPreset: defaultFounderPreset }),
+    createVillageStateFromConfig({ config, initialResidents }),
   );
 
   const mapSlots = useMemo(() => Object.values(config.mapSlots ?? {}), [config.mapSlots]);
+  const residents = useMemo<ResidentState[]>(() => Object.values(villageState.residents ?? {}), [villageState.residents]);
 
-  const workers = useMemo<Worker[]>(() => {
-    const residents = Object.values(villageState.residents ?? {});
-    if (!residents.length) {
-      return [
-        { id: 'worker-1', name: 'Fondatore', hp: 92, fatigue: 18 },
-        { id: 'worker-2', name: 'Taglialegna', hp: 74, fatigue: 42 },
-        { id: 'worker-3', name: 'Cacciatore', hp: 65, fatigue: 27 },
-      ];
-    }
-    return residents.map((resident) => ({
-      id: resident.id,
-      name: formatResidentLabel(resident),
-      hp: resident.maxHp > 0 ? Math.round(Math.max(0, Math.min(100, (resident.currentHp / resident.maxHp) * 100))) : 0,
-      fatigue: Math.round(Math.max(0, Math.min(100, resident.fatigue ?? 0))),
-    }));
-  }, [villageState.residents]);
-
-  const [hoveredWorkerId, setHoveredWorkerId] = useState<string | null>(null);
-  const [draggingWorkerId, setDraggingWorkerId] = useState<string | null>(null);
+  const [draggingResidentId, setDraggingResidentId] = useState<string | null>(null);
+  const [assignmentFeedback, setAssignmentFeedback] = useState<string | null>(null);
   const [detailSlotId, setDetailSlotId] = useState<string | null>(null);
 
   const [slots, setSlots] = useState<ActivitySlotData[]>(() =>
@@ -79,22 +56,34 @@ const VillageSandbox = () => {
     );
   }, [mapSlots]);
 
-  const handleWorkerDrop = (slotId: string, workerId: string | null) => {
-    if (!workerId) return;
-    setSlots((prev) =>
-      prev.map((slot) => {
-        if (slot.slotId === slotId) {
-          return { ...slot, assignedWorkerId: workerId };
-        }
-        if (slot.assignedWorkerId === workerId) {
-          return { ...slot, assignedWorkerId: null };
-        }
-        return slot;
-      }),
-    );
-  };
+  const handleWorkerDrop = useCallback(
+    (slotId: string, residentId: string | null) => {
+      if (!residentId) return;
+      setSlots((prev) =>
+        prev.map((slot) => {
+          if (slot.slotId === slotId) {
+            return { ...slot, assignedWorkerId: residentId };
+          }
+          if (slot.assignedWorkerId === residentId) {
+            return { ...slot, assignedWorkerId: null };
+          }
+          return slot;
+        }),
+      );
+      setDraggingResidentId(null);
+      const slotLabel = config.mapSlots?.[slotId]?.label ?? slotId;
+      const resident = villageState.residents?.[residentId];
+      const residentLabel = resident ? formatResidentLabel(resident) : residentId;
+      setAssignmentFeedback(`${residentLabel} assegnato a ${slotLabel}.`);
+    },
+    [config.mapSlots, villageState.residents],
+  );
 
-  const resolveWorkerName = (workerId: string | null) => workers.find((worker) => worker.id === workerId)?.name ?? null;
+  const resolveWorkerName = (residentId: string | null) => {
+    if (!residentId) return null;
+    const resident = villageState.residents?.[residentId];
+    return resident ? formatResidentLabel(resident) : residentId;
+  };
 
   const selectedSlot = useMemo(() => slots.find((slot) => slot.slotId === detailSlotId) ?? null, [slots, detailSlotId]);
 
@@ -131,62 +120,50 @@ const VillageSandbox = () => {
     [slots, config.mapSlots],
   );
 
-  const workerToResident = (worker: Worker): ResidentState => ({
-    id: worker.id,
-    displayName: worker.name,
-    status: 'available',
-    fatigue: worker.fatigue,
-    statTags: [],
-    currentHp: Math.round((worker.hp / 100) * 100),
-    maxHp: 100,
-    isHero: false,
-    isInjured: false,
-    survivalCount: 0,
-    survivalScore: 0,
-    homeId: undefined,
-    injuryRecoveryTime: undefined,
-    statProfileId: undefined,
-    statSnapshot: {},
-  });
-
   const detailAssignments = useMemo<VerbDetailAssignment[]>(
     () =>
-      workers.map((worker) => ({
-        resident: workerToResident(worker),
-        isSelected: selectedSlot?.assignedWorkerId === worker.id,
+      residents.map((resident) => ({
+        resident,
+        isSelected: selectedSlot?.assignedWorkerId === resident.id,
         onToggle: () => {
           if (!selectedSlot) return;
-          handleWorkerDrop(selectedSlot.slotId, worker.id);
+          handleWorkerDrop(selectedSlot.slotId, resident.id);
           setDetailSlotId(selectedSlot.slotId);
         },
       })),
-    [workers, selectedSlot],
+    [residents, selectedSlot, handleWorkerDrop],
   );
 
   const detailPreview = useMemo(() => {
     if (!selectedSlot) return null;
-    const assignedWorker = workers.find((worker) => worker.id === selectedSlot.assignedWorkerId) ?? null;
+    const assignedResident = residents.find((resident) => resident.id === selectedSlot.assignedWorkerId) ?? null;
+    const hpPercent =
+      assignedResident && assignedResident.maxHp > 0
+        ? Math.max(0, Math.min(100, Math.round((assignedResident.currentHp / assignedResident.maxHp) * 100)))
+        : 0;
+    const fatigueValue = assignedResident?.fatigue ?? 0;
     return {
       rewards: [],
-      injuryPercentage: assignedWorker ? Math.max(0, 100 - assignedWorker.hp) : 10,
-      deathPercentage: assignedWorker ? Math.max(0, assignedWorker.fatigue - 70) : 0,
-      note: assignedWorker ? `${assignedWorker.name} in ricognizione.` : 'Nessun lavoratore assegnato.',
+      injuryPercentage: assignedResident ? Math.max(0, 100 - hpPercent) : 10,
+      deathPercentage: assignedResident ? Math.max(0, fatigueValue - 70) : 0,
+      note: assignedResident ? `${formatResidentLabel(assignedResident)} in ricognizione.` : 'Nessun residente assegnato.',
     };
-  }, [selectedSlot, workers]);
+  }, [selectedSlot, residents]);
 
-  const handleHoverChange = (workerId: string, isHovering: boolean) => {
-    setHoveredWorkerId((prev) => {
-      if (isHovering) return workerId;
-      return prev === workerId ? null : prev;
-    });
-  };
+  const handleResidentDragStart = useCallback(
+    (residentId: string) => (event: React.DragEvent<HTMLButtonElement>) => {
+      event.dataTransfer.setData('text/resident-id', residentId);
+      event.dataTransfer.setData('text/plain', residentId);
+      event.dataTransfer.effectAllowed = 'copy';
+      setDraggingResidentId(residentId);
+      setAssignmentFeedback(null);
+    },
+    [],
+  );
 
-  const handleDragStateChange = (workerId: string, isDragging: boolean) => {
-    setDraggingWorkerId((prev) => {
-      if (isDragging) return workerId;
-      return prev === workerId ? null : prev;
-    });
-  };
+  const handleResidentDragEnd = useCallback(() => {
+    setDraggingResidentId(null);
+  }, []);
 
   return (
     <div className="mx-auto max-w-5xl space-y-10 p-6 text-ivory">
@@ -200,19 +177,15 @@ const VillageSandbox = () => {
 
       <section className="flex flex-col gap-8 lg:flex-row">
         <div className="space-y-4 lg:w-1/3">
-          <h2 className="text-xs uppercase tracking-[0.35em] text-slate-400">Lavoratori</h2>
-          <div className="flex flex-col gap-4">
-            {workers.map((worker) => (
-              <WorkerCard
-                key={worker.id}
-                {...worker}
-                onHoverChange={handleHoverChange}
-                onDragStateChange={handleDragStateChange}
-                isGhosted={draggingWorkerId === worker.id}
-                isHovering={hoveredWorkerId === worker.id}
-              />
-            ))}
-          </div>
+          <h2 className="text-xs uppercase tracking-[0.35em] text-slate-400">Residenti</h2>
+          <ResidentRoster
+            residents={residents}
+            activeResidentId={draggingResidentId}
+            onDragStart={handleResidentDragStart}
+            onDragEnd={handleResidentDragEnd}
+            assignmentFeedback={assignmentFeedback}
+            maxFatigueBeforeExhausted={config.globalRules.maxFatigueBeforeExhausted ?? 100}
+          />
         </div>
 
         <div className="space-y-4 flex-1">

@@ -3,29 +3,89 @@ import type { StatBlock, LockedParameter } from '../../balancing/types';
 import { SmartInput } from './SmartInput';
 import { CardWrapper } from './CardWrapper';
 
+/**
+ * Configuration for a parameter card section.
+ */
 interface ParamCardConfig {
+    /**
+     * The title of the parameter card.
+     */
     title: string;
+    /**
+     * The color of the parameter card.
+     */
     color: string;
+    /**
+     * The sections of the parameter card.
+     */
     sections: {
+        /**
+         * The title of the section.
+         */
         title: string;
+        /**
+         * The parameters of the section.
+         */
         params: {
+            /**
+             * The ID of the parameter.
+             */
             id: keyof StatBlock;
+            /**
+             * The minimum value of the parameter.
+             */
             min: number;
+            /**
+             * The maximum value of the parameter.
+             */
             max: number;
+            /**
+             * The step value of the parameter.
+             */
             step?: number;
+            /**
+             * Whether the parameter is a percentage.
+             */
             isPercentage?: boolean;
+            /**
+             * Whether the parameter is read-only.
+             */
             readOnly?: boolean;
         }[];
     }[];
+    /**
+     * The preview component of the parameter card.
+     */
     previewComponent?: React.ReactNode;
 }
 
+/**
+ * Props for the GenericParamCard component.
+ */
 interface GenericParamCardProps {
+    /**
+     * The configuration of the parameter card.
+     */
     config: ParamCardConfig;
+    /**
+     * The stats of the parameter card.
+     */
     stats: StatBlock;
+    /**
+     * The locked parameter of the parameter card.
+     */
     lockedParam: LockedParameter;
+    /**
+     * The callback function for when a parameter changes.
+     */
     onParamChange: (param: keyof StatBlock, value: number) => void;
+    /**
+     * The callback function for when the lock toggle is clicked.
+     */
     onLockToggle: (param: LockedParameter) => void;
+    /**
+     * The callback function for when a parameter is reset.
+     */
     onResetParam: (paramId: string) => void;
     onResetCard: () => void;
 }

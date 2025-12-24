@@ -19,7 +19,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import idleVillageMap from '@/assets/ui/idleVillage/idle-village-map.jpg';
 import { computeSlotPercentPosition, resolveMapLayout } from '@/ui/idleVillage/mapLayoutUtils';
 import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
-import { seedDemoResidents, selectDefaultFounder } from '@/engine/game/idleVillage/seedDemoResidents';
 import {
   createVillageStateFromConfig,
   scheduleActivity,
@@ -31,12 +30,8 @@ import {
 import { evaluateStatRequirement } from '@/engine/game/idleVillage/statMatching';
 import { tickIdleVillage } from '@/engine/game/idleVillage/IdleVillageEngine';
 import { useToast, ToastContainer } from '@/ui/balancing/Toast';
-import type {
-  ActivityDefinition,
-  IdleVillageConfig,
-  MapSlotDefinition,
-  StatRequirement,
-} from '@/balancing/config/idleVillage/types';
+import type { ActivityDefinition, IdleVillageConfig, MapSlotDefinition, StatRequirement } from '@/balancing/config/idleVillage/types';
+import { loadResidentsFromCharacterManager } from '@/engine/game/idleVillage/characterImport';
 import MarbleMedallionCard from '@/ui/fantasy/assets/marble-verb-card/MarbleMedallionCard';
 import {
   DEFAULT_SECONDS_PER_TIME_UNIT,
@@ -51,10 +46,6 @@ import MapSlotVerbCluster from '@/ui/idleVillage/components/MapSlotVerbCluster';
 import TheaterView from '@/ui/idleVillage/components/TheaterView';
 import MapLocationSlot from '@/ui/idleVillage/components/MapLocationSlot';
 import ActiveActivityHUD from '@/ui/idleVillage/ActiveActivityHUD';
-
-interface IdleVillageResetOptions {
-  founderId?: string;
-}
 
 interface IdleVillageDebugControls {
   play: () => void;
@@ -195,7 +186,6 @@ const validateAssignment = (params: {
 
 const IdleVillageMapPage: React.FC = () => {
   const { config } = useIdleVillageConfig();
-  const defaultFounderPreset = useMemo(() => selectDefaultFounder(config), [config]);
   const [villageState, setVillageState] = useState<VillageState | null>(null);
   const villageStateRef = useRef<VillageState | null>(null);
   const { showToast, toasts, removeToast } = useToast();
@@ -220,19 +210,15 @@ const IdleVillageMapPage: React.FC = () => {
     [],
   );
 
-  const bootstrapVillageState = useCallback((options?: IdleVillageResetOptions) => {
+  const bootstrapVillageState = useCallback(() => {
     if (!config) return null;
-    let founderPreset = defaultFounderPreset;
-    if (options?.founderId && config.founders?.[options.founderId]) {
-      founderPreset = config.founders[options.founderId];
-    }
-
-    const freshState = seedDemoResidents(createVillageStateFromConfig({ config, founderPreset }), config);
+    const initialResidents = loadResidentsFromCharacterManager();
+    const freshState = createVillageStateFromConfig({ config, initialResidents });
     setVillageState(freshState);
     villageStateRef.current = freshState;
     updateAssignmentFeedback(null);
     return freshState;
-  }, [config, defaultFounderPreset, updateAssignmentFeedback]);
+  }, [config, updateAssignmentFeedback]);
 
   useEffect(() => {
     bootstrapVillageState();

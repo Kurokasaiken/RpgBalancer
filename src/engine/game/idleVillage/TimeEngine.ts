@@ -3,12 +3,7 @@
 // Pure domain module: no React, no UI, no direct storage access.
 // All domain values come from IdleVillageConfig (config-first philosophy).
 
-import type {
-  ActivityDefinition,
-  FounderPreset,
-  IdleVillageConfig,
-  TrialOfFireRules,
-} from '../../../balancing/config/idleVillage/types';
+import type { ActivityDefinition, IdleVillageConfig, TrialOfFireRules } from '../../../balancing/config/idleVillage/types';
 import type { StatBlock } from '../../../balancing/types';
 
 const DEFAULT_RESIDENT_MAX_HP = 100;
@@ -82,43 +77,17 @@ export interface ResolveActivityOutcomeResult {
   autoRescheduledId?: string | null;
 }
 
-export interface BuildResidentFromFounderOptions {
-  startingFatigue?: number;
-}
-
-export function buildResidentFromFounder(
-  preset: FounderPreset,
-  options?: BuildResidentFromFounderOptions,
-): ResidentState {
-  const maxHp = DEFAULT_RESIDENT_MAX_HP;
-  const startingFatigue =
-    typeof options?.startingFatigue === 'number' && Number.isFinite(options.startingFatigue)
-      ? options.startingFatigue
-      : 0;
-  return {
-    id: `founder-${preset.id}`,
-    displayName: preset.label ?? preset.id,
-    status: 'available',
-    fatigue: startingFatigue,
-    statProfileId: preset.archetypeId,
-    statTags: preset.statTags && preset.statTags.length > 0 ? [...preset.statTags] : [preset.difficultyTag],
-    currentHp: maxHp,
-    maxHp,
-    isHero: false,
-    isInjured: false,
-    survivalCount: 0,
-    survivalScore: 0,
-  };
-}
-
 export interface CreateVillageStateOptions {
   /**
    * Overrides for starting resources (after config defaults are applied).
    * Useful in tests or when continuing from a saved snapshot.
    */
   initialResourcesOverride?: VillageResources;
-  /** Optional founder preset to spawn automatically. */
-  founderPreset?: FounderPreset | null;
+  /**
+   * Optional residents to seed immediately after state creation.
+   * Used by Character Manager integration to import saved characters.
+   */
+  initialResidents?: ResidentState[];
 }
 
 function normalizeStartingResources(config: IdleVillageConfig, overrides?: VillageResources): VillageResources {
@@ -142,25 +111,51 @@ function normalizeStartingResources(config: IdleVillageConfig, overrides?: Villa
 }
 
 export function createVillageStateFromConfig(options: { config: IdleVillageConfig } & CreateVillageStateOptions): VillageState {
-  const { config, initialResourcesOverride, founderPreset } = options;
+  const { config, initialResourcesOverride, initialResidents } = options;
   const initialResources = normalizeStartingResources(config, initialResourcesOverride);
   const state = createInitialVillageState(initialResources);
+  const fatigueCap =
+    typeof config.globalRules?.maxFatigueBeforeExhausted === 'number'
+      ? Math.max(0, config.globalRules.maxFatigueBeforeExhausted)
+      : 0;
 
-  if (founderPreset) {
-    const founderResident = buildResidentFromFounder(founderPreset, {
-      startingFatigue: config.globalRules.maxFatigueBeforeExhausted,
+  if (initialResidents?.length) {
+    const residentRecord: Record<string, ResidentState> = { ...state.residents };
+    initialResidents.forEach((resident) => {
+      if (!resident?.id) return;
+      const maxHp =
+        typeof resident.maxHp === 'number' && Number.isFinite(resident.maxHp) && resident.maxHp > 0
+          ? resident.maxHp
+          : DEFAULT_RESIDENT_MAX_HP;
+      const currentHp =
+        typeof resident.currentHp === 'number' && Number.isFinite(resident.currentHp)
+          ? Math.max(0, Math.min(maxHp, resident.currentHp))
+          : maxHp;
+      const normalizedFatigue =
+        typeof resident.fatigue === 'number' && Number.isFinite(resident.fatigue)
+          ? Math.max(0, Math.min(fatigueCap, resident.fatigue))
+          : fatigueCap;
+      residentRecord[resident.id] = {
+        ...resident,
+        maxHp,
+        currentHp,
+        fatigue: normalizedFatigue,
+        statTags: resident.statTags ? [...resident.statTags] : [],
+        statSnapshot: resident.statSnapshot ? { ...resident.statSnapshot } : undefined,
+        status: resident.status ?? 'available',
+        isHero: Boolean(resident.isHero),
+        isInjured: Boolean(resident.isInjured),
+        survivalCount: resident.survivalCount ?? 0,
+        survivalScore: resident.survivalScore ?? 0,
+      };
     });
-    state.residents = {
-      ...state.residents,
-      [founderResident.id]: founderResident,
-    };
+    state.residents = residentRecord;
   }
 
   if (IS_DEV_ENV) {
     const residentCount = Object.keys(state.residents).length;
     console.debug('[TimeEngine] createVillageStateFromConfig', {
       residentCount,
-      founderPreset: founderPreset?.id ?? null,
     });
   }
 
@@ -897,7 +892,7 @@ function spawnQuestOffersIfNeeded(
   }
 
   const slotIndex = Math.floor(rng() * eligibleSlots.length);
-  const selectedSlot = eligibleSlots[Math.max(0, Math.min(eligibleSlots.length - 1, slotIndex))];
+  const selectedSlot = eligibleSlots[slotIndex];
 
   const newId = `quest_offer_${targetTime}_${Math.floor(rng() * 1_000_000)}`;
   const nextOffers: Record<string, QuestOffer> = {

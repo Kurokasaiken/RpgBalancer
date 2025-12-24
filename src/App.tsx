@@ -25,6 +25,17 @@ import {
   type AppNavTabId,
 } from '@/shared/navigation/navConfig';
 
+interface AppNavControls {
+  getActiveTab: () => AppNavTabId;
+  setActiveTab: (tabId: AppNavTabId) => void;
+}
+
+declare global {
+  interface Window {
+    __appNavControls?: AppNavControls;
+  }
+}
+
 // Lazy-loaded heavy tools (named exports wrapped as default)
 const Balancer = lazy(() =>
   import('./ui/balancing/Balancer').then((m) => ({ default: m.Balancer }))
@@ -39,9 +50,7 @@ const VillageSandbox = lazy(() => import('./ui/idleVillage/VillageSandbox'));
 const ArchetypeTestingLab = lazy(() =>
   import('./ui/balancing/ArchetypeTestingLab').then((m) => ({ default: m.ArchetypeTestingLab }))
 );
-const SkillCheckPreviewPage = lazy(() =>
-  import('./ui/testing/SkillCheckPreviewPage').then((m) => ({ default: m.SkillCheckPreviewPage }))
-);
+const SkillCheckPreviewPage = lazy(() => import('./ui/testing/SkillCheckPreviewPage'));
 const VerbDetailSandbox = lazy(() =>
   import('./ui/testing/VerbDetailSandbox').then((m) => ({ default: m.default }))
 );
@@ -76,6 +85,23 @@ function App() {
   const idleVillageLoadingFallback = (
     <div className="p-4 text-xs text-slate-300">Loading Idle Village configuration…</div>
   );
+
+  useEffect(() => {
+    const controls: AppNavControls = {
+      getActiveTab: () => activeTab,
+      setActiveTab: (tabId: AppNavTabId) => {
+        if (isValidNavTabId(tabId)) {
+          setActiveTab(tabId);
+        }
+      },
+    };
+    window.__appNavControls = controls;
+    return () => {
+      if (window.__appNavControls === controls) {
+        delete window.__appNavControls;
+      }
+    };
+  }, [activeTab]);
 
   return (
     <div data-testid="app-loaded" className="min-h-screen">

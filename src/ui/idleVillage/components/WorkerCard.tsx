@@ -1,21 +1,25 @@
-import { useRef } from 'react';
-
 /**
- * Visual card props representing a drag-enabled resident in Idle Village.
+ * Visual card props representing a resident overview card in Idle Village.
  */
 export interface WorkerCardProps {
+  /** Unique resident identifier */
   id: string;
+  /** Resident display name */
   name: string;
+  /** Current HP percentage */
   hp: number;
+  /** Current fatigue percentage */
   fatigue: number;
+  /** Optional hover callback for highlight effects */
   onHoverChange?: (workerId: string, isHovering: boolean) => void;
-  onDragStateChange?: (workerId: string, isDragging: boolean) => void;
-  isGhosted?: boolean;
+  /** When true, the card renders in compact circular mode (during drag). */
+  isDragging?: boolean;
+  /** Whether the cursor is over the card */
   isHovering?: boolean;
 }
 
 /**
- * Resident card with drag previews, HP/fatigue bars, and hover states.
+ * Resident info card with HP/fatigue bars that collapses into a circular badge while its drag token is active.
  */
 const WorkerCard: React.FC<WorkerCardProps> = ({
   id,
@@ -23,65 +27,39 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
   hp,
   fatigue,
   onHoverChange,
-  onDragStateChange,
-  isGhosted = false,
+  isDragging = false,
   isHovering = false,
 }) => {
-  const dragPreviewRef = useRef<HTMLDivElement | null>(null);
-
-  /**
-   * Removes the temporary drag preview element from the DOM.
-   */
-  const cleanupPreview = () => {
-    if (dragPreviewRef.current) {
-      document.body.removeChild(dragPreviewRef.current);
-      dragPreviewRef.current = null;
-    }
-  };
-
-  /**
-   * Initializes drag metadata and renders the custom drag image preview.
-   */
-  const handleDragStart = (event: React.DragEvent<HTMLDivElement>) => {
-    event.stopPropagation();
-    event.dataTransfer.setData('text/resident-id', id);
-    event.dataTransfer.setData('text/plain', id);
-    event.dataTransfer.effectAllowed = 'move';
-    const preview = document.createElement('div');
-    preview.className =
-      'flex h-12 w-12 items-center justify-center rounded-full border border-amber-300/80 bg-slate-950 text-xs font-semibold uppercase tracking-[0.2em] text-amber-100 shadow-[0_0_25px_rgba(251,191,36,0.55)]';
-    preview.textContent = name.charAt(0) || id.charAt(0);
-    document.body.appendChild(preview);
-    dragPreviewRef.current = preview;
-    event.dataTransfer.setDragImage(preview, 24, 24);
-    onDragStateChange?.(id, true);
-  };
-
-  /**
-   * Resets drag preview and notifies listeners that dragging ended.
-   */
-  const handleDragEnd = () => {
-    cleanupPreview();
-    onDragStateChange?.(id, false);
-  };
-
   const isExhausted = fatigue > 90;
+
+  if (isDragging) {
+    return (
+      <div
+        data-testid="worker-card"
+        data-worker-id={id}
+        data-worker-name={name}
+        data-worker-hp={hp}
+        data-worker-fatigue={fatigue}
+        className="flex h-20 w-20 items-center justify-center rounded-full border border-amber-200/60 bg-slate-950/80 text-2xl font-semibold text-amber-200 shadow-[0_0_35px_rgba(251,191,36,0.45)]"
+      >
+        {name.charAt(0) || id.charAt(0)}
+      </div>
+    );
+  }
 
   return (
     <div
-      draggable
-      onDragStart={handleDragStart}
       onMouseEnter={() => onHoverChange?.(id, true)}
       onMouseLeave={() => onHoverChange?.(id, false)}
-      onDragEnd={handleDragEnd}
       data-testid="worker-card"
       data-worker-id={id}
       data-worker-name={name}
+      data-worker-hp={hp}
+      data-worker-fatigue={fatigue}
       className={[
         'relative w-full max-w-sm cursor-pointer overflow-hidden rounded-2xl border border-slate-800/70 bg-slate-950/90 p-4 shadow-[0_18px_35px_rgba(0,0,0,0.55)] transition',
         'bg-[radial-gradient(circle_at_top,#101826_0%,#05070d_70%)]',
         isExhausted ? 'grayscale-[0.45] opacity-85' : 'hover:border-emerald-300/70 hover:shadow-[0_25px_45px_rgba(34,197,94,0.2)]',
-        isGhosted ? 'opacity-30 pointer-events-none' : '',
         isHovering ? 'ring-4 ring-amber-300/70 shadow-[0_0_80px_rgba(251,191,36,0.45)]' : '',
       ]
         .filter(Boolean)

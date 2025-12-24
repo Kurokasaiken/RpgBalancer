@@ -2,23 +2,11 @@ import merge from 'lodash.merge';
 import { DEFAULT_IDLE_VILLAGE_CONFIG } from './defaultConfig';
 import { IdleVillageConfigSchema } from './schemas';
 import type { IdleVillageConfig } from './types';
-
-declare global {
-  interface Window {
-    __TAURI__?: unknown;
-    __TAURI_IPC__?: unknown;
-  }
-}
+import { isTauriRuntime } from '@/shared/persistence/runtime';
 
 const DYNAMIC_CONFIG_RELATIVE_PATH = '../src/data/dynamicConfig.json';
 
 let cachedDynamicConfigPath: string | null = null;
-
-/**
- * Determines whether the current runtime exposes the Tauri bridge APIs.
- */
-export const isTauriRuntime = (): boolean =>
-  typeof window !== 'undefined' && (Boolean(window.__TAURI__) || Boolean(window.__TAURI_IPC__));
 
 /**
  * Resolves the absolute file system path for the dynamic Idle Village configuration file.
@@ -36,8 +24,8 @@ async function resolveDynamicConfigPath(): Promise<string> {
 async function readDynamicConfigFile(): Promise<string | null> {
   if (!isTauriRuntime()) return null;
   try {
-    const { readTextFile } = await import('@tauri-apps/api/fs');
     const path = await resolveDynamicConfigPath();
+    const { readTextFile } = await import('@tauri-apps/plugin-fs');
     return await readTextFile(path);
   } catch (error) {
     console.warn('[PersistenceService] Unable to read dynamic config file.', error);
@@ -51,7 +39,7 @@ async function readDynamicConfigFile(): Promise<string | null> {
 async function writeRawDynamicConfig(payload: string): Promise<void> {
   if (!isTauriRuntime()) return;
   try {
-    const { writeTextFile } = await import('@tauri-apps/api/fs');
+    const { writeTextFile } = await import('@tauri-apps/plugin-fs');
     const path = await resolveDynamicConfigPath();
     await writeTextFile(path, payload);
   } catch (error) {

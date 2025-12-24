@@ -1,27 +1,44 @@
 import { BALANCING_CONFIG } from '../balancingConfig';
 
+/**
+ * HitChance Module - Hit chance and accuracy calculations
+ * 
+ * Provides calculations for hit chance, efficiency, and consistency metrics.
+ */
 export const HitChanceModule = {
-    calculateHitChance: (txc: number, evasion: number): number => {
+    /**
+ * Calculates hit chance based on TxC and evasion.
+ */
+calculateHitChance: (txc: number, evasion: number): number => {
         // Formula: TxC + BASE - Evasione
         const chance = txc + BALANCING_CONFIG.BASE_HIT_CHANCE - evasion;
         // Clamp between MIN and MAX
         return Math.max(BALANCING_CONFIG.MIN_HIT_CHANCE, Math.min(BALANCING_CONFIG.MAX_HIT_CHANCE, chance));
     },
 
-    calculateAttacksPerKo: (htkPure: number, hitChance: number): number => {
+    /**
+ * Calculates attacks per KO based on HTK and hit chance.
+ */
+calculateAttacksPerKo: (htkPure: number, hitChance: number): number => {
         // Formula: HTK_Pure / (HitChance / 100)
         if (hitChance <= 0) return 999;
         return htkPure / (hitChance / 100);
     },
 
     // Inverse calculations for locks
-    calculateEvasionForChance: (txc: number, targetChance: number): number => {
+    /**
+ * Calculates evasion required to achieve a specific hit chance.
+ */
+calculateEvasionForChance: (txc: number, targetChance: number): number => {
         // Chance = TxC + BASE - Ev
         // Ev = TxC + BASE - Chance
         return txc + BALANCING_CONFIG.BASE_HIT_CHANCE - targetChance;
     },
 
-    calculateTxcForChance: (evasion: number, targetChance: number): number => {
+    /**
+ * Calculates TxC required to achieve a specific hit chance.
+ */
+calculateTxcForChance: (evasion: number, targetChance: number): number => {
         // Chance = TxC + BASE - Ev
         // TxC = Chance - BASE + Ev
         return targetChance - BALANCING_CONFIG.BASE_HIT_CHANCE + evasion;
@@ -29,24 +46,34 @@ export const HitChanceModule = {
 
     // --- Derived Stats (Efficiency & Consistency) ---
 
-    // Efficiency = HitChance (0-100)
-    calculateEfficiency: (txc: number, evasion: number): number => {
+    /**
+ * Calculates efficiency as the hit chance.
+ */
+calculateEfficiency: (txc: number, evasion: number): number => {
         return HitChanceModule.calculateHitChance(txc, evasion);
     },
 
-    calculateTxcFromEfficiency: (efficiency: number, evasion: number): number => {
+    /**
+ * Calculates TxC required to achieve a specific efficiency.
+ */
+calculateTxcFromEfficiency: (efficiency: number, evasion: number): number => {
         // Efficiency is just HitChance
         return HitChanceModule.calculateTxcForChance(evasion, efficiency);
     },
 
-    // Consistency = (HitChance/100)^HTK
-    calculateConsistency: (txc: number, htk: number, evasion: number): number => {
+    /**
+ * Calculates consistency as the probability of hitting every attack in HTK turns.
+ */
+calculateConsistency: (txc: number, htk: number, evasion: number): number => {
         const hitChance = HitChanceModule.calculateHitChance(txc, evasion);
         if (hitChance <= 0) return 0;
         return Math.pow(hitChance / 100, htk) * 100; // Return as percentage (0-100)
     },
 
-    calculateTxcFromConsistency: (consistency: number, htk: number, evasion: number): number => {
+    /**
+ * Calculates TxC required to achieve a specific consistency.
+ */
+calculateTxcFromConsistency: (consistency: number, htk: number, evasion: number): number => {
         // Consistency = (Chance/100)^HTK
         // (Consistency/100) = (Chance/100)^HTK
         // (Chance/100) = (Consistency/100)^(1/HTK)

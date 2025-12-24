@@ -3,54 +3,7 @@
 // all domain content is authored via config/UI rather than hardcoded here.
 
 import type { IdleVillageConfig } from './types';
-import type { StatBlock } from '@/balancing/types';
 import { DEFAULT_PASSIVE_EFFECTS } from './passiveEffects';
-
-type NumericStatKey = Exclude<keyof StatBlock, 'configFlatFirst' | 'configApplyBeforeCrit'>;
-
-const ZEROED_STAT_SNAPSHOT: StatBlock = {
-  hp: 0,
-  damage: 0,
-  txc: 0,
-  evasion: 0,
-  agility: 0,
-  hitChance: 0,
-  effectiveDamage: 0,
-  attacksPerKo: 0,
-  htk: 0,
-  edpt: 0,
-  ttk: 0,
-  earlyImpact: 0,
-  critChance: 0,
-  critMult: 0,
-  critTxCBonus: 0,
-  failChance: 0,
-  failMult: 0,
-  failTxCMalus: 0,
-  armor: 0,
-  resistance: 0,
-  armorPen: 0,
-  penPercent: 0,
-  lifesteal: 0,
-  regen: 0,
-  ward: 0,
-  block: 0,
-  energyShield: 0,
-  thorns: 0,
-  cooldownReduction: 0,
-  castSpeed: 0,
-  movementSpeed: 0,
-  configFlatFirst: false,
-  configApplyBeforeCrit: false,
-};
-
-const createSnapshot = (boostedStats: NumericStatKey[]): Partial<StatBlock> => {
-  const snapshot: Partial<StatBlock> = { ...ZEROED_STAT_SNAPSHOT };
-  boostedStats.forEach((stat) => {
-    snapshot[stat] = 25;
-  });
-  return snapshot;
-};
 
 export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
   version: '1.0.0',
@@ -663,51 +616,6 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
           notes: 'Full market square with multiple stalls and improved prices.',
         },
       ],
-    },
-  },
-
-  // Founder presets define starting characters per difficulty. Engines will resolve
-  // these archetype references and apply the adjustment formulas during run creation.
-  founders: {
-    founder_sunblade: {
-      id: 'founder_sunblade',
-      label: 'Sir Ardan Sunblade',
-      description: 'Veteran vigil-knight who keeps the ember banners alight.',
-      archetypeId: 'trial_vindicator',
-      difficultyTag: 'legend',
-      statTags: ['edge', 'lantern', 'discipline'],
-      statSnapshot: createSnapshot(['hp', 'damage', 'armor']),
-      isHero: true,
-    },
-    founder_penumbral: {
-      id: 'founder_penumbral',
-      label: 'Lyss Penumbria',
-      description: 'Shadow cartomancer who scouts the Trial corridors.',
-      archetypeId: 'trial_stalker',
-      difficultyTag: 'skirmisher',
-      statTags: ['moth', 'edge', 'lantern'],
-      statSnapshot: createSnapshot(['txc', 'evasion', 'agility']),
-      isHero: false,
-    },
-    founder_starseer: {
-      id: 'founder_starseer',
-      label: 'Celeste Asteria',
-      description: 'Starborne duelist who bends constellations into blades.',
-      archetypeId: 'trial_constellation',
-      difficultyTag: 'heroic',
-      statTags: ['lantern', 'reason', 'edge'],
-      statSnapshot: createSnapshot(['critChance', 'critMult', 'penPercent']),
-      isHero: true,
-    },
-    founder_fluxmender: {
-      id: 'founder_fluxmender',
-      label: 'Ilyon Fluxmender',
-      description: 'Ward-smith tending the shimmering shields atop the walls.',
-      archetypeId: 'trial_integrator',
-      difficultyTag: 'support',
-      statTags: ['heart', 'forge', 'reason'],
-      statSnapshot: createSnapshot(['ward', 'regen', 'energyShield']),
-      isHero: false,
     },
   },
 

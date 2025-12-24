@@ -94,7 +94,12 @@ export default function VerbDetailCard({
   }, [durationSeconds, elapsedSeconds, isActive]);
 
   return (
-    <div className="w-full max-w-3xl rounded-2xl border border-amber-400/40 bg-slate-950/95 text-ivory shadow-[0_40px_90px_rgba(0,0,0,0.8)]">
+    <div
+      className="w-full max-w-3xl rounded-2xl border border-amber-400/40 bg-slate-950/95 text-ivory shadow-[0_40px_90px_rgba(0,0,0,0.8)]"
+      data-testid="verb-detail-card"
+      data-activity-id={activity.id}
+      data-slot-label={slotLabel ?? 'Slot Sandbox'}
+    >
       <div className="space-y-3 border-b border-amber-400/30 px-6 py-4">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
@@ -115,12 +120,19 @@ export default function VerbDetailCard({
           )}
         </div>
         {durationSeconds && (
-          <div className="relative h-2 overflow-hidden rounded-full bg-slate-900">
+          <div
+            className="relative h-2 overflow-hidden rounded-full bg-slate-900"
+            data-testid="verb-progress-track"
+            data-duration-seconds={durationSeconds}
+          >
             <div
               className={`h-full transition-all duration-300 ${
                 isActive ? 'bg-linear-to-r from-emerald-500 via-amber-400 to-rose-500' : 'bg-slate-700'
               }`}
               style={{ width: `${isActive ? progressRatio * 100 : 0}%` }}
+              data-testid="verb-progress-bar"
+              data-progress-ratio={Number(progressRatio.toFixed(4))}
+              data-is-active={isActive ? 'true' : 'false'}
             />
             {isActive && (
               <div className="absolute inset-y-0 right-3 flex items-center text-[10px] font-mono text-slate-200">
@@ -201,7 +213,12 @@ export default function VerbDetailCard({
           <div className="space-y-3">
             <div className="text-[10px] uppercase tracking-[0.25em] text-slate-400">Risk Stripe</div>
             <div className="flex items-center gap-3">
-              <div className="flex h-28 w-10 flex-col overflow-hidden rounded-sm border border-slate-800">
+              <div
+                className="flex h-28 w-10 flex-col overflow-hidden rounded-sm border border-slate-800"
+                data-testid="risk-stripe"
+                data-injury-percent={clampPercent(preview.injuryPercentage)}
+                data-death-percent={clampPercent(preview.deathPercentage)}
+              >
                 <div className="bg-rose-600" style={{ height: `${riskHeights.death}%` }} />
                 <div className="bg-amber-400" style={{ height: `${riskHeights.injuryOnly}%` }} />
                 <div className="flex-1 bg-emerald-700/40" />

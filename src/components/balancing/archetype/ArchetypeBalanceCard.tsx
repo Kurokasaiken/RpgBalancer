@@ -5,6 +5,9 @@ import { CombatMetrics } from '../../../balancing/metrics/CombatMetrics';
 import { NORMALIZED_WEIGHTS } from '../../../balancing/statWeights';
 import { GlassCard } from '../../../ui/atoms/GlassCard';
 
+/**
+ * Props for the ArchetypeBalanceCard component.
+ */
 interface ArchetypeBalanceCardProps {
     archetype: ArchetypeTemplate;
     budget?: number;

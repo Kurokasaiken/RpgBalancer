@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { validateFormula } from '../../balancing/config/FormulaEngine';
 
+/**
+ * Props for the FormulaEditor component.
+ */
 interface Props {
   value: string;
   onChange: (formula: string) => void;

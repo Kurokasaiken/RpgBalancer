@@ -3,6 +3,9 @@ import type { StatDefinition, CardDefinition } from '../../balancing/config/type
 import { useBalancerConfig } from '../../balancing/hooks/useBalancerConfig';
 import { FormulaEditor } from './FormulaEditor';
 
+/**
+ * Props for the StatEditor component.
+ */
 interface Props {
   isOpen: boolean;
   onClose: () => void;

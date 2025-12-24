@@ -13,7 +13,7 @@ import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
 import { ToastContainer, useToast } from '@/ui/balancing/Toast';
 import { createVillageStateFromConfig } from '@/engine/game/idleVillage/TimeEngine';
 import { VillageStateStore } from '@/engine/game/idleVillage/VillageStateStore';
-import { seedDemoResidents, selectDefaultFounder } from '@/engine/game/idleVillage/seedDemoResidents';
+import { loadResidentsFromCharacterManager } from '@/engine/game/idleVillage/characterImport';
 
 export default function IdleVillageConfigRoute() {
   const [activeTab, setActiveTab] = useState<'buildings' | 'activities' | 'resources' | 'passive' | 'rules'>('buildings');
@@ -30,11 +30,12 @@ export default function IdleVillageConfigRoute() {
       if (!result.success) {
         throw new Error(result.error ?? 'Salvataggio configurazione fallito');
       }
-      const founderPreset = selectDefaultFounder(config);
-      const seededState = seedDemoResidents(
-        createVillageStateFromConfig({ config, founderPreset }),
-        config,
-      );
+      const initialResidents = loadResidentsFromCharacterManager();
+      if (initialResidents.length === 0) {
+        showToast('Nessun personaggio salvato – crea personaggi nel Character Manager.', 'error');
+        return;
+      }
+      const seededState = createVillageStateFromConfig({ config, initialResidents });
       VillageStateStore.reset(() => seededState, 'Inizializza villaggio di test');
       showToast('Villaggio di test inizializzato con 3 residenti full HP', 'success');
     } catch (error) {

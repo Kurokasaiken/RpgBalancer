@@ -134,15 +134,6 @@ export const MapSlotDefinitionSchema = z.object({
   colorClass: z.string().optional(),
 });
 
-export const FounderPresetSchema = z.object({
-  id: z.string().min(1),
-  label: z.string().min(1),
-  description: z.string().optional(),
-  archetypeId: z.string().min(1),
-  difficultyTag: z.string().min(1),
-  statAdjustmentFormula: z.string().optional(),
-});
-
 export const GlobalRulesSchema = z.object({
   maxFatigueBeforeExhausted: z.number(),
   fatigueRecoveryPerDay: z.number(),
@@ -214,7 +205,6 @@ export const IdleVillageConfigSchema = z.object({
   mapLayout: MapLayoutDefinitionSchema.optional(),
   passiveEffects: z.record(z.string(), PassiveEffectDefinitionSchema), // Added
   buildings: z.record(z.string(), BuildingDefinitionSchema),
-  founders: z.record(z.string(), FounderPresetSchema),
   variance: ActivityVarianceConfigSchema,
   globalRules: GlobalRulesSchema,
   overlaySettings: OverlaySettingsSchema,

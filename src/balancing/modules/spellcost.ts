@@ -13,6 +13,9 @@ import { DotModule } from './dot';
 import { BuffModule, type Buff } from './buffs';
 import { NORMALIZED_WEIGHTS } from '../statWeights';
 
+/**
+ * Breakdown of a spell's power into different components.
+ */
 export interface SpellPowerBreakdown {
     directDamage: number;
     directHeal: number;
@@ -28,6 +31,9 @@ export interface SpellPowerBreakdown {
 
 /**
  * Spell Tier Boundaries (in Spell Points)
+ */
+/**
+ * Defines the boundaries and metadata for spell tiers.
  */
 export const SPELL_TIERS = {
     COMMON: { min: 0, max: 20, name: 'Common', color: '#9CA3AF', icon: '⚪' },
