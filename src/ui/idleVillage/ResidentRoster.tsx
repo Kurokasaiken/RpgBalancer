@@ -51,7 +51,7 @@ function ResidentRoster({
   const heroStatusRef = useRef<Record<string, boolean>>({});
   const heroFlashTimeouts = useRef<Record<string, number>>({});
   const dragPreviewRef = useRef<HTMLDivElement | null>(null);
-  const [popoverResidentId, setPopoverResidentId] = useState<string | null>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const newlyHeroic: string[] = [];
@@ -166,46 +166,38 @@ function ResidentRoster({
       event.dataTransfer.setDragImage(preview, 24, 24);
       event.dataTransfer.setData('text/resident-id', resident.id);
       event.dataTransfer.setData('text/plain', resident.id);
+      if (listRef.current) {
+        listRef.current.style.pointerEvents = 'none';
+      }
       onDragIntent?.(resident.id); // ensure drag mode on desktop mouse-drag without pointerdown firing first
       onDragStart(resident.id)(event);
     };
 
-  const handlePointerDown =
-    (resident: ResidentState, isBlocked: boolean) =>
-    (event: React.PointerEvent<HTMLElement>) => {
-      if (isBlocked || !onDragIntent) return;
-      if (event.pointerType === 'mouse' && event.button !== 0) return;
-      onDragIntent(resident.id);
-    };
-
-  const handlePointerUp =
-    (resident: ResidentState, isBlocked: boolean) =>
-    () => {
-      if (isBlocked || !onDragIntentEnd) return;
-      onDragIntentEnd(resident.id);
-    };
-
-  const handleDragEndInternal =
-    (residentId: string) => (event: React.DragEvent<HTMLElement>) => {
-      event.preventDefault();
-      if (dragPreviewRef.current) {
-        if (dragPreviewRef.current.parentNode) {
-          dragPreviewRef.current.parentNode.removeChild(dragPreviewRef.current);
-        }
-        dragPreviewRef.current = null;
-      }
-      onDragEnd();
-      if (onDragIntentEnd) {
-        onDragIntentEnd(residentId);
-      }
-    };
-
-  const handleMouseEnter = (resident: ResidentState) => {
-    setPopoverResidentId(resident.id);
+  const handlePointerDown = (resident: ResidentState, isBlocked: boolean) => (event: React.PointerEvent<HTMLElement>) => {
+    if (isBlocked || !onDragIntent) return;
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+    onDragIntent(resident.id);
   };
 
-  const handleMouseLeave = () => {
-    setPopoverResidentId(null);
+  const handlePointerUp = (resident: ResidentState, isBlocked: boolean) => () => {
+    if (isBlocked || !onDragIntentEnd) return;
+    onDragIntentEnd(resident.id);
+  };
+
+  const handleDragEndInternal = (residentId: string) => (_event: React.DragEvent<HTMLElement>) => {
+    if (listRef.current) {
+      listRef.current.style.pointerEvents = '';
+    }
+    if (dragPreviewRef.current) {
+      if (dragPreviewRef.current.parentNode) {
+        dragPreviewRef.current.parentNode.removeChild(dragPreviewRef.current);
+      }
+      dragPreviewRef.current = null;
+    }
+    onDragEnd();
+    if (onDragIntentEnd) {
+      onDragIntentEnd(residentId);
+    }
   };
 
   const filterButtonClasses = (value: RosterFilter) =>
@@ -213,13 +205,6 @@ function ResidentRoster({
       'px-2 py-1 rounded-full text-[10px] uppercase tracking-[0.18em] transition-colors',
       filter === value ? 'bg-amber-400/20 text-amber-200 border border-amber-300/50' : 'text-slate-400 border border-slate-700 hover:text-amber-100',
     ].join(' ');
-
-  const MAX_VISIBLE_ROWS = 5;
-  const ESTIMATED_ROW_HEIGHT = 112;
-  const shouldEnableScroll = sortedResidents.length > MAX_VISIBLE_ROWS;
-  const computedListStyle = shouldEnableScroll
-    ? { maxHeight: `${MAX_VISIBLE_ROWS * ESTIMATED_ROW_HEIGHT}px`, overflowY: 'auto' as const }
-    : undefined;
 
   return (
     <div
@@ -262,12 +247,11 @@ function ResidentRoster({
       <div
         className={[
           'flex flex-col gap-2 pr-1',
-          shouldEnableScroll ? 'overflow-y-auto' : '',
           listClassName ?? '',
         ]
           .filter(Boolean)
           .join(' ')}
-        style={computedListStyle}
+        ref={listRef}
       >
         {sortedResidents.length === 0 && (
           <div className="text-[10px] italic text-slate-500">Nessun residente disponibile</div>
@@ -297,8 +281,6 @@ function ResidentRoster({
               key={resident.id}
               data-testid="resident-card"
               data-resident-id={resident.id}
-              onMouseEnter={() => handleMouseEnter(resident)}
-              onMouseLeave={handleMouseLeave}
               className="group relative"
             >
               {heroFlashActive && (
@@ -331,30 +313,6 @@ function ResidentRoster({
                 onPointerUp={handlePointerUp(resident, isBlocked)}
                 onPointerCancel={handlePointerUp(resident, isBlocked)}
               />
-              {popoverResidentId === resident.id && (
-                <div className="pointer-events-none absolute left-full top-1/2 z-50 ml-3 min-w-40 -translate-y-1/2 rounded-xl border border-slate-700 bg-slate-950/95 px-3 py-2 text-[10px] text-slate-100 shadow-xl">
-                  <div className="mb-1 text-[11px] font-semibold text-amber-200">{formatLabel(resident)}</div>
-                  <div className="flex justify-between text-slate-400">
-                    <span>Missions</span>
-                    <span>{resident.survivalCount ?? 0}</span>
-                  </div>
-                  <div className="flex justify-between text-slate-400">
-                    <span>Score</span>
-                    <span>{resident.survivalScore ?? 0}</span>
-                  </div>
-                  <div className="mt-2 space-y-0.5">
-                    {(resident.statSnapshot && Object.entries(resident.statSnapshot).length > 0
-                      ? Object.entries(resident.statSnapshot).slice(0, 4)
-                      : [['Stat', '?'] as [string, unknown]]) // fallback
-                      .map(([statKey, statValue]) => (
-                        <div key={statKey} className="flex justify-between text-slate-400">
-                          <span>{statKey}</span>
-                          <span>{typeof statValue === 'number' ? statValue : String(statValue)}</span>
-                        </div>
-                      ))}
-                  </div>
-                </div>
-              )}
             </div>
           );
         })}

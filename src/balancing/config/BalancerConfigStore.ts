@@ -11,9 +11,6 @@ const MAX_HISTORY = 10;
 // Use the JSON config as the new default
 const INITIAL_CONFIG: BalancerConfig = BALANCER_DEFAULT_JSON as unknown as BalancerConfig;
 
-// Track the last known localStorage state to detect external changes
-let lastStorageState: string | null = null;
-
 export class BalancerConfigStore {
   private static config: BalancerConfig | null = null;
   private static history: ConfigSnapshot[] = [];
@@ -61,7 +58,7 @@ export class BalancerConfigStore {
     await saveData(STORAGE_KEY, config);
   }
 
-  private static addToHistory(description: string): void {
+  private static async addToHistory(description: string): Promise<void> {
     if (!this.config) return;
 
     const snapshot: ConfigSnapshot = {
@@ -75,19 +72,12 @@ export class BalancerConfigStore {
       this.history = this.history.slice(0, MAX_HISTORY);
     }
 
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(HISTORY_KEY, JSON.stringify(this.history));
-    }
+    await saveData(HISTORY_KEY, this.history);
   }
 
-  private static loadHistory(): void {
-    if (typeof localStorage === 'undefined') {
-      this.history = [];
-      return;
-    }
+  private static async loadHistory(): Promise<void> {
     try {
-      const raw = localStorage.getItem(HISTORY_KEY);
-      this.history = raw ? (JSON.parse(raw) as ConfigSnapshot[]) : [];
+      this.history = await loadData<ConfigSnapshot[]>(HISTORY_KEY, []);
     } catch (e) {
       console.warn('Failed to load balancer config history:', e);
       this.history = [];
@@ -98,26 +88,22 @@ export class BalancerConfigStore {
     return [...this.history];
   }
 
-  static restore(timestamp: number): BalancerConfig | null {
+  static async restore(timestamp: number): Promise<BalancerConfig | null> {
     const snapshot = this.history.find((s) => s.timestamp === timestamp);
     if (!snapshot) return null;
-    this.save(snapshot.config, `Restored from ${new Date(timestamp).toISOString()}`);
+    await this.save(snapshot.config, `Restored from ${new Date(timestamp).toISOString()}`);
     return this.config;
   }
 
-  static undo(): BalancerConfig | null {
+  static async undo(): Promise<BalancerConfig | null> {
     if (this.history.length === 0) return null;
 
     const previous = this.history[0];
     this.config = JSON.parse(JSON.stringify(previous.config));
 
-    if (typeof localStorage !== 'undefined') {
-      const serialized = JSON.stringify(this.config);
-      localStorage.setItem(STORAGE_KEY, serialized);
-      lastStorageState = serialized;
-      this.history.shift();
-      localStorage.setItem(HISTORY_KEY, JSON.stringify(this.history));
-    }
+    this.history.shift();
+    await saveData(HISTORY_KEY, this.history);
+    await saveData(STORAGE_KEY, this.config);
 
     return this.config;
   }
@@ -184,26 +170,23 @@ export class BalancerConfigStore {
     };
   }
 
-  static reset(): BalancerConfig {
-    this.addToHistory('Reset to defaults');
+  static async reset(): Promise<BalancerConfig> {
+    await this.addToHistory('Reset to defaults');
     this.config = { ...DEFAULT_CONFIG };
-    if (typeof localStorage !== 'undefined') {
-      const serialized = JSON.stringify(this.config);
-      localStorage.setItem(STORAGE_KEY, serialized);
-      lastStorageState = serialized;
-    }
+    await saveData(STORAGE_KEY, this.config);
     return this.config;
   }
 
-  static export(): string {
-    return JSON.stringify(this.load(), null, 2);
+  static async export(): Promise<string> {
+    const config = await this.load();
+    return JSON.stringify(config, null, 2);
   }
 
-  static import(json: string): BalancerConfig {
+  static async import(json: string): Promise<BalancerConfig> {
     const parsed = JSON.parse(json);
     const validated = BalancerConfigSchema.parse(parsed);
     const merged = this.mergeWithDefaults(validated);
-    this.save(merged, 'Imported configuration');
+    await this.save(merged, 'Imported configuration');
     return merged;
   }
 }

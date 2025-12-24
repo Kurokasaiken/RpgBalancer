@@ -41,7 +41,7 @@ export const FantasyLayout: React.FC<FantasyLayoutProps> = ({ children, activeTa
                     <aside className="hidden lg:flex w-64 shrink-0 px-4 py-6">
                         <div className="observatory-nav-frame w-full">
                             <div className="observatory-nav-orb" aria-hidden="true" />
-                            <nav className="flex flex-col gap-4">
+                            <nav className="observatory-nav-scroll flex flex-col gap-4">
                                 {NAV_SECTIONS.map((section) => (
                                     <div key={section.title}>
                                         <p className="px-3 pb-1 text-[9px] uppercase tracking-[0.35em] text-slate-400/70">

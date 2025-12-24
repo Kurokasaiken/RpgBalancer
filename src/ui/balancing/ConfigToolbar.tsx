@@ -19,10 +19,10 @@ export const ConfigToolbar: React.FC = () => {
   const { showToast, toasts, removeToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleExport = () => {
+  const handleExport = async () => {
     try {
       // Export both config and simValues
-      const configJson = exportConfig();
+      const configJson = await exportConfig();
       const config = JSON.parse(configJson);
       const simValues = localStorage.getItem(SIM_VALUES_KEY);
       const exportData = {
@@ -52,11 +52,11 @@ export const ConfigToolbar: React.FC = () => {
     fileInputRef.current?.click();
   };
 
-  const handleImportChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImportChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = async () => {
       try {
         const text = reader.result as string;
         const parsed = JSON.parse(text);
@@ -65,7 +65,7 @@ export const ConfigToolbar: React.FC = () => {
         const { _simValues, ...configData } = parsed;
 
         // Import config (without _simValues)
-        const result = importConfig(JSON.stringify(configData));
+        const result = await importConfig(JSON.stringify(configData));
         if (!result.success) {
           showToast(`Errore import: ${result.error}`, 'error');
           return;
@@ -99,7 +99,7 @@ export const ConfigToolbar: React.FC = () => {
 
   const [resetConfirmPending, setResetConfirmPending] = React.useState(false);
 
-  const handleResetAll = () => {
+  const handleResetAll = async () => {
     if (!resetConfirmPending) {
       setResetConfirmPending(true);
       showToast('Clicca di nuovo per confermare reset completo', 'info');
@@ -115,7 +115,7 @@ export const ConfigToolbar: React.FC = () => {
       // Clear simValues so that the next config snapshot repopulates them from defaults
       localStorage.removeItem(SIM_VALUES_KEY);
       // Reset config to the initial snapshot stored by useBalancerConfig
-      resetToInitialConfig();
+      await resetToInitialConfig();
       showToast('Configurazione resettata ai valori iniziali', 'success');
     } catch (e) {
       showToast(`Errore durante reset: ${(e as Error).message}`, 'error');

@@ -107,21 +107,38 @@ export const StatStressTestingPage: React.FC = () => {
   const [selectedComparisonRunIds, setSelectedComparisonRunIds] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<'live' | 'history'>('live');
 
-  useEffect(() => {
-    const runs = StatBalanceHistoryStore.listRuns();
-    const sessions = StatBalanceHistoryStore.listSessions();
-    setHistoryRuns(runs);
-    setHistorySessions(sessions);
+  const refreshHistory = useCallback(() => {
+    let cancelled = false;
+
+    const loadHistory = async (): Promise<void> => {
+      try {
+        const [runs, sessions] = await Promise.all([
+          StatBalanceHistoryStore.listRuns(),
+          StatBalanceHistoryStore.listSessions(),
+        ]);
+        if (!cancelled) {
+          setHistoryRuns(runs);
+          setHistorySessions(sessions);
+        }
+      } catch (err) {
+        console.error('Failed to load stat balance history', err);
+      }
+    };
+
+    void loadHistory();
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  useEffect(() => refreshHistory(), [refreshHistory]);
 
   useEffect(() => {
     if (!isAutoBalancing) {
-      const runs = StatBalanceHistoryStore.listRuns();
-      const sessions = StatBalanceHistoryStore.listSessions();
-      setHistoryRuns(runs);
-      setHistorySessions(sessions);
+      return refreshHistory();
     }
-  }, [isAutoBalancing]);
+    return undefined;
+  }, [isAutoBalancing, refreshHistory]);
 
   const filteredHistoryRuns = useMemo(() => {
     if (selectedSessionFilterId === 'all') return historyRuns;

@@ -30,11 +30,13 @@ export async function runAndStoreAutoBalanceSession(
   const { finalConfig, session } = await runAutoBalanceSession(initialConfig, resolved);
 
   if (resolved.persistRuns) {
-    session.runs.forEach((run) => StatBalanceHistoryStore.addRun(run));
+    for (const run of session.runs) {
+      await StatBalanceHistoryStore.addRun(run);
+    }
   }
 
   if (resolved.persistSession) {
-    StatBalanceHistoryStore.addSession(session);
+    await StatBalanceHistoryStore.addSession(session);
   }
 
   return { finalConfig, session };

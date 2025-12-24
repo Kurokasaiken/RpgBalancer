@@ -11,51 +11,52 @@ export class BalanceConfigManager {
     /**
      * Initialize and load active preset from storage
      */
-    static initialize() {
+    static async initialize(): Promise<void> {
         // Try to load from new persistence store first
-        const persistedWeights = BalanceConfigStore.load<Record<string, number>>('weights');
+        const persistedWeights = await BalanceConfigStore.load<Record<string, number>>('weights');
 
         if (persistedWeights) {
             // If we have persisted weights, we might be in a "custom" state
             // For now, we'll just load the active preset ID and see if it matches
-            this.currentPreset = getActivePreset();
+            this.currentPreset = await getActivePreset();
 
             // If the persisted weights differ from the preset, we should probably respect persistence
             // But for this phase, let's keep it simple: Persistence Store backs up the "user_custom" presets
         } else {
-            this.currentPreset = getActivePreset();
+            this.currentPreset = await getActivePreset();
         }
     }
 
-    static get activePreset(): BalancePreset {
+    static async getActivePreset(): Promise<BalancePreset> {
         if (!this.currentPreset) {
-            this.initialize();
+            await this.initialize();
         }
         return this.currentPreset!;
     }
 
-    static setPreset(id: string) {
-        const allPresets = loadAllPresets();
+    static async setPreset(id: string): Promise<void> {
+        const allPresets = await loadAllPresets();
         if (allPresets[id]) {
             this.currentPreset = allPresets[id];
-            setActivePresetId(id);
+            await setActivePresetId(id);
 
             // Persist this change
-            BalanceConfigStore.save('weights', this.currentPreset.weights, `Switched to preset: ${this.currentPreset.name}`);
+            await BalanceConfigStore.save('weights', this.currentPreset.weights, `Switched to preset: ${this.currentPreset.name}`);
         } else {
             console.warn(`Preset ${id} not found, keeping ${this.currentPreset?.id || 'standard'}`);
         }
     }
 
-    static getWeights(): Record<string, number> {
-        return this.activePreset.weights;
+    static async getWeights(): Promise<Record<string, number>> {
+        const preset = await this.getActivePreset();
+        return preset.weights;
     }
 
     /**
      * Get all available presets (built-in + user)
      */
-    static getAllPresets(): Record<string, BalancePreset> {
-        return loadAllPresets();
+    static async getAllPresets(): Promise<Record<string, BalancePreset>> {
+        return await loadAllPresets();
     }
 
     /**
@@ -68,12 +69,14 @@ export class BalanceConfigManager {
     /**
      * Save current weights as a new snapshot
      */
-    static saveCurrentState(description: string) {
+    static async saveCurrentState(description: string): Promise<void> {
         if (this.currentPreset) {
-            BalanceConfigStore.save('weights', this.currentPreset.weights, description);
+            await BalanceConfigStore.save('weights', this.currentPreset.weights, description);
         }
     }
 }
 
-// Auto-initialize on module load
-BalanceConfigManager.initialize();
+// Auto-initialize on module load (async)
+BalanceConfigManager.initialize().catch((error) => {
+    console.warn('Failed to initialize BalanceConfigManager:', error);
+});

@@ -530,6 +530,23 @@ Linked artifacts: `docs/plans/idle_village_tasks.md`, `docs/plans/idle_village_m
 
 ---
 
+### 🔄 **Async Persistence System Migration (COMPLETED)**
+
+**Status:** ✅ COMPLETED (2025-12-24)  
+**Scope:** Complete migration from synchronous localStorage to async PersistenceService.ts
+
+**What was done:**
+- ✅ Created `PersistenceService.ts` with Tauri FS support and localStorage fallback
+- ✅ Migrated all storage classes: `BalancerConfigStore`, `spellStorage`, `presetStorage`, `useDefaultStorage`, `createJsonConfigStore`, `VillageStateStore`, `characterPersistence`, `ArchetypeStorage`, `StatBalanceHistoryStore`, `SpellConfigStore`, `BalanceConfigManager`, `AutoStatBalanceService`
+- ✅ Made all storage operations async with proper error handling
+- ✅ Mobile-ready fallback (localStorage when Tauri not available)
+- ✅ Created and ran verification script - all tests passed ✅
+- ✅ Deleted verification script per protocol
+
+**Impact:** All state changes now use async persistence, enabling future Tauri mobile deployment and ensuring data integrity across browser tabs.
+
+---
+
 ### Testing & QA Infrastructure (Cross-Phase)
 
 **Status:** 0% (Planned)

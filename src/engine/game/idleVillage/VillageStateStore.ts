@@ -13,13 +13,6 @@ export interface VillageStateSnapshot {
 
 const deepClone = <T,>(value: T): T => JSON.parse(JSON.stringify(value));
 
-const getLocalStorage = () => {
-  if (typeof window === 'undefined' || !window.localStorage) {
-    return null;
-  }
-  return window.localStorage;
-};
-
 function emitUpdateEvent() {
   if (typeof window === 'undefined') return;
   try {
@@ -27,6 +20,11 @@ function emitUpdateEvent() {
   } catch {
     // Ignore CustomEvent failures in non-browser environments.
   }
+}
+
+function getLocalStorage() {
+  if (typeof window === 'undefined') return null;
+  return window.localStorage;
 }
 
 export class VillageStateStore {
@@ -42,6 +40,10 @@ export class VillageStateStore {
       if (raw) {
         try {
           this.state = JSON.parse(raw) as VillageState;
+          // Discard persisted state if it has no residents
+          if (!this.state.residents || Object.keys(this.state.residents).length === 0) {
+            this.state = null;
+          }
         } catch (error) {
           console.warn('Failed to parse IdleVillage state snapshot, recreating:', error);
           this.state = null;
@@ -53,7 +55,7 @@ export class VillageStateStore {
       if (!initialFactory) {
         throw new Error('VillageStateStore.load requires an initial factory when no snapshot is stored');
       }
-      this.state = deepClone(initialFactory());
+      this.state = initialFactory();
       this.persistState(this.state);
     }
 
@@ -79,10 +81,9 @@ export class VillageStateStore {
     return JSON.stringify(this.load(), null, 2);
   }
 
-  static import(json: string, description = 'Imported state'): VillageState {
+  static import(json: string, description = 'Imported state'): void {
     const parsed = JSON.parse(json) as VillageState;
     this.save(parsed, description);
-    return parsed;
   }
 
   static reset(initialFactory: () => VillageState, description = 'Reset state'): VillageState {

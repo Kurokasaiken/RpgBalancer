@@ -6,7 +6,53 @@
 
 @layer base {
   :root {
-    /* Palette "Drago AD&D" */
+    /* Config-first theme tokens (Frontier defaults) */
+    --font-header: 'Cinzel', serif;
+    --font-body: 'Crimson Text', serif;
+    --surface-base: #050706;
+    --surface-panel: #0a0f0d;
+    --panel-border: #3b2a1b;
+    --panel-surface: rgba(8, 12, 18, 0.8);
+    --panel-sheen: radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.04), transparent 60%);
+    --text-primary: #f0efe4;
+    --text-secondary: #f8e38a;
+    --text-muted: #a2b6bf;
+    --accent-color: #c9a227;
+    --accent-strong: #ffd369;
+    --card-border-color: #8c6d3f;
+    --card-shadow-color: rgba(0, 0, 0, 0.65);
+    --card-surface: #05070d;
+    --card-surface-radial: radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 70%);
+    --card-highlight: rgba(255, 191, 0, 0.08);
+    --halo-color: rgba(251, 191, 36, 0.45);
+    --halo-strength: 1;
+    --slot-border: rgba(255, 255, 255, 0.08);
+    --slot-surface: rgba(6, 11, 16, 0.95);
+    --slot-ring-idle: rgba(201, 162, 39, 0.35);
+    --slot-ring-active: rgba(34, 197, 94, 0.7);
+    --slot-ring-hover: rgba(251, 191, 36, 0.85);
+    --slot-glow-idle: rgba(201, 162, 39, 0.3);
+    --slot-glow-active: rgba(34, 197, 94, 0.45);
+    --slot-glow-hover: rgba(251, 191, 36, 0.55);
+    --slot-icon-color: #fceabb;
+    --slot-worker-badge-bg: #05070d;
+    --slot-worker-badge-border: rgba(255, 191, 36, 0.6);
+    --slot-worker-badge-text: #fef3c7;
+    --slot-label-color: rgba(255, 255, 255, 0.75);
+    --slot-helper-color: rgba(255, 255, 255, 0.55);
+    --hp-bar-track: rgba(34, 197, 94, 0.15);
+    --hp-bar-start: #6ee7b7;
+    --hp-bar-end: #10b981;
+    --fatigue-bar-track: rgba(251, 191, 36, 0.15);
+    --fatigue-bar-start: #fbbf24;
+    --fatigue-bar-end: #fb923c;
+    --button-bg: rgba(12, 20, 28, 0.9);
+    --button-border: rgba(201, 162, 39, 0.4);
+    --button-text: #f0efe4;
+    --body-bg-overlay: linear-gradient(rgba(5, 7, 6, 0.88), rgba(5, 7, 6, 0.88));
+    --body-bg-texture: url('/assets/ui/bg.png');
+
+    /* Legacy palette (still referenced by older components) */
     --bg-abyss: #050706;
     --bg-obsidian: #0a0f0d;
     --panel-basalt: #121614;
@@ -19,19 +65,16 @@
     --heroic-obsidian-image: url('/assets/ui/obsidian-pool.png');
     --heroic-sigil-source: gradient;
     --heroic-sigil-image: url('/assets/ui/ancient-gold-star.png');
-
-    /* Tipografia */
-    --font-header: 'Cinzel', serif;
-    --font-body: 'Crimson Text', serif;
   }
 
   body {
-    @apply bg-[var(--bg-obsidian)] text-[var(--marble-ivory)] antialiased;
-    font-family: var(--font-body);
-    background-color: var(--bg-abyss);
+    @apply antialiased;
+    color: var(--text-primary);
+    font-family: var(--font-body, 'Crimson Text', serif);
+    background-color: var(--surface-base, #050706);
     background-image:
-      linear-gradient(rgba(5, 7, 6, 0.85), rgba(5, 7, 6, 0.85)),
-      url('/assets/ui/bg.png');
+      var(--body-bg-overlay, linear-gradient(rgba(5, 7, 6, 0.85), rgba(5, 7, 6, 0.85))),
+      var(--body-bg-texture, url('/assets/ui/bg.png'));
     background-attachment: fixed;
     background-size: cover;
     background-repeat: no-repeat;
@@ -248,6 +291,33 @@
     border-radius: 0.75rem;
     border: 1px dashed rgba(148, 163, 253, 0.25);
     pointer-events: none;
+  }
+
+  .observatory-nav-scroll {
+    max-height: calc(100vh - 72px);
+    overflow-y: auto;
+    padding-right: 0.35rem;
+    margin-right: -0.2rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(148, 163, 253, 0.35) transparent;
+    touch-action: pan-y;
+  }
+
+  .observatory-nav-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .observatory-nav-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .observatory-nav-scroll::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(148, 163, 253, 0.45), rgba(14, 165, 233, 0.35));
+    border-radius: 999px;
+  }
+
+  .observatory-nav-scroll::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(148, 163, 253, 0.7), rgba(14, 165, 233, 0.55));
   }
 
   .observatory-nav-orb {

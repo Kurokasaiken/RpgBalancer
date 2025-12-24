@@ -1,17 +1,95 @@
 // src/ui/idle/CharacterManager.tsx - Using StatBlock
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { CharacterBuilder } from './CharacterBuilder';
 import type { Combatant } from '../../engine/idle/types';
-import { saveCharacter, loadCharacters, deleteCharacter, type SavedCharacter } from '../../engine/idle/characterStorage';
+import {
+    saveCharacter,
+    loadCharacters,
+    deleteCharacter,
+    type SavedCharacter,
+} from '../../engine/idle/characterStorage';
+import {
+    readCharacterSnapshot,
+    writeCharacterSnapshot,
+    getCharacterStorageEventName,
+} from '../../engine/idle/characterPersistence';
 
 export const CharacterManager: React.FC = () => {
     const [characters, setCharacters] = useState<SavedCharacter[]>([]);
     const [selectedCharacter, setSelectedCharacter] = useState<SavedCharacter | null>(null);
+    const [snapshotText, setSnapshotText] = useState<string>('[]');
+    const [snapshotStatus, setSnapshotStatus] = useState<string | null>(null);
+    const [snapshotError, setSnapshotError] = useState<string | null>(null);
+    const [isSnapshotLoading, setSnapshotLoading] = useState<boolean>(false);
 
     useEffect(() => {
         setCharacters(loadCharacters());
     }, []);
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const eventName = getCharacterStorageEventName();
+        const handleUpdate = () => setCharacters(loadCharacters());
+        window.addEventListener(eventName, handleUpdate);
+        return () => window.removeEventListener(eventName, handleUpdate);
+    }, []);
+
+    /**
+     * Refreshes the JSON snapshot stored via PersistenceService.
+     */
+    const refreshSnapshot = useCallback(async () => {
+        setSnapshotLoading(true);
+        setSnapshotStatus(null);
+        setSnapshotError(null);
+        try {
+            const json = await readCharacterSnapshot();
+            setSnapshotText(json ?? '[]');
+            setSnapshotStatus('Snapshot aggiornata.');
+        } catch (error) {
+            console.error('Impossibile leggere il roster:', error);
+            setSnapshotError('Errore nella lettura del roster salvato.');
+        } finally {
+            setSnapshotLoading(false);
+        }
+    }, []);
+
+    /**
+     * Imports the snapshot currently in the editor textarea.
+     */
+    const handleSnapshotImport = useCallback(async () => {
+        setSnapshotStatus(null);
+        setSnapshotError(null);
+        try {
+            const payload = snapshotText?.trim() || '[]';
+            JSON.parse(payload);
+            await writeCharacterSnapshot(payload);
+            setCharacters(loadCharacters());
+            setSnapshotStatus('Roster importato correttamente.');
+        } catch (error) {
+            console.error('Errore durante l\'import del roster:', error);
+            setSnapshotError('JSON non valido o impossibile salvare il roster.');
+        }
+    }, [snapshotText]);
+
+    /**
+     * Copies the current snapshot JSON to the clipboard.
+     */
+    const handleSnapshotCopy = useCallback(async () => {
+        setSnapshotStatus(null);
+        setSnapshotError(null);
+        try {
+            await navigator.clipboard.writeText(snapshotText);
+            setSnapshotStatus('Snapshot copiata negli appunti.');
+        } catch (error) {
+            console.error('Impossibile copiare negli appunti:', error);
+            setSnapshotError('Non riesco a copiare negli appunti.');
+        }
+    }, [snapshotText]);
+
+    useEffect(() => {
+        void refreshSnapshot();
+    }, [refreshSnapshot]);
 
     const handleSaveCharacter = (combatant: Combatant) => {
         const savedChar: SavedCharacter = {
@@ -178,6 +256,48 @@ export const CharacterManager: React.FC = () => {
                                 })}
                             </div>
                         )}
+
+                        <div className="mt-6 border-t border-white/10 pt-4">
+                            <div className="flex items-center justify-between mb-3">
+                                <h3 className="text-lg font-semibold text-white">📦 Snapshot Roster</h3>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => void refreshSnapshot()}
+                                        className="px-3 py-1 bg-white/10 border border-white/20 text-white rounded text-sm hover:bg-white/15 transition"
+                                        disabled={isSnapshotLoading}
+                                    >
+                                        {isSnapshotLoading ? 'Aggiornamento…' : 'Ricarica JSON'}
+                                    </button>
+                                    <button
+                                        onClick={() => void handleSnapshotCopy()}
+                                        className="px-3 py-1 bg-white/10 border border-white/20 text-white rounded text-sm hover:bg-white/15 transition"
+                                    >
+                                        Copia
+                                    </button>
+                                    <button
+                                        onClick={() => void handleSnapshotImport()}
+                                        className="px-3 py-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded text-sm hover:shadow-[0_0_12px_rgba(16,185,129,0.5)] transition"
+                                    >
+                                        Importa
+                                    </button>
+                                </div>
+                            </div>
+                            <p className="text-xs text-gray-400 mb-2">
+                                Modifica il JSON per aggiornare HP / Fatigue dei personaggi o sostituire il roster. Le modifiche sono validate
+                                prima dell&apos;import.
+                            </p>
+                            <textarea
+                                className="w-full h-48 bg-black/20 border border-white/10 rounded p-3 text-xs font-mono text-white focus:outline-none focus:border-purple-400/60"
+                                value={snapshotText}
+                                onChange={(event) => setSnapshotText(event.target.value)}
+                            />
+                            {snapshotStatus && (
+                                <div className="mt-2 text-xs text-emerald-300">{snapshotStatus}</div>
+                            )}
+                            {snapshotError && (
+                                <div className="mt-2 text-xs text-red-300">{snapshotError}</div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

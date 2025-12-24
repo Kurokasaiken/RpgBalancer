@@ -21,6 +21,7 @@ export const APP_NAV_TAB_IDS = [
   'villageSandbox',
   'skillCheckPreview',
   'verbDetailSandbox',
+  'moodboard',
 ] as const;
 
 export type AppNavTabId = (typeof APP_NAV_TAB_IDS)[number];
@@ -61,6 +62,7 @@ const NAV_ITEM_MAP: Record<AppNavTabId, AppNavItem> = {
   villageSandbox: { id: 'villageSandbox', label: 'Village Sandbox', icon: '🏗️' },
   skillCheckPreview: { id: 'skillCheckPreview', label: 'Skill Check', icon: '🎯' },
   verbDetailSandbox: { id: 'verbDetailSandbox', label: 'Verb Detail', icon: '📝' },
+  moodboard: { id: 'moodboard', label: 'Moodboard', icon: '🖼️' },
 };
 
 const NAV_SECTION_DEFS: { title: string; itemIds: AppNavTabId[] }[] = [
@@ -71,6 +73,7 @@ const NAV_SECTION_DEFS: { title: string; itemIds: AppNavTabId[] }[] = [
   {
     title: 'Content',
     itemIds: [
+      'moodboard',
       'spellLibrary',
       'spellCreationNew',
       'combatViewer',

@@ -2,6 +2,9 @@ import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { GlassCard } from '../atoms/GlassCard';
 import { GlassButton } from '../atoms/GlassButton';
 
+const SHOW_STACK_DEFAULT =
+    typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.DEV;
+
 interface Props {
     children: ReactNode;
     fallback?: ReactNode;
@@ -40,9 +43,21 @@ export class ErrorBoundary extends Component<Props, State> {
                         <p className="text-gray-300 mb-2">
                             An error occurred in <strong>{this.props.componentName || 'this component'}</strong>.
                         </p>
-                        <p className="text-sm text-red-300/70 font-mono bg-black/20 p-2 rounded mb-6 overflow-auto max-h-32">
-                            {this.state.error?.message}
-                        </p>
+                        <div className="text-sm text-red-300/70 font-mono bg-black/20 p-2 rounded mb-6 overflow-auto max-h-48 text-left space-y-2">
+                            <p className="whitespace-pre-wrap break-words" data-testid="error-message">
+                                {this.state.error?.message}
+                            </p>
+                            {this.state.error?.stack && (
+                                <details
+                                    className="text-xs text-red-200/70"
+                                    open={SHOW_STACK_DEFAULT}
+                                    data-testid="error-stack"
+                                >
+                                    <summary className="cursor-pointer text-red-100/80">Stack trace</summary>
+                                    <pre className="mt-2 whitespace-pre-wrap break-words">{this.state.error.stack}</pre>
+                                </details>
+                            )}
+                        </div>
                         <GlassButton
                             variant="secondary"
                             onClick={() => this.setState({ hasError: false, error: null })}

@@ -54,6 +54,9 @@ const SkillCheckPreviewPage = lazy(() => import('./ui/testing/SkillCheckPreviewP
 const VerbDetailSandbox = lazy(() =>
   import('./ui/testing/VerbDetailSandbox').then((m) => ({ default: m.default }))
 );
+const MoodboardPage = lazy(() =>
+  import('./ui/moodboard/MoodboardPage').then((m) => ({ default: m.MoodboardPage }))
+);
 
 function App() {
   const [activeTab, setActiveTab] = useState<AppNavTabId>(DEFAULT_LANDING_TAB_ID);
@@ -220,6 +223,13 @@ function App() {
           <ErrorBoundary componentName="Verb Detail Sandbox">
             <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Verb Detail Sandbox…</div>}>
               <VerbDetailSandbox />
+            </Suspense>
+          </ErrorBoundary>
+        )}
+        {activeTab === 'moodboard' && (
+          <ErrorBoundary componentName="Moodboard">
+            <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Moodboard…</div>}>
+              <MoodboardPage />
             </Suspense>
           </ErrorBoundary>
         )}

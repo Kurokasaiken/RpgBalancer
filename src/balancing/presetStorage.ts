@@ -1,11 +1,12 @@
 /**
  * Preset Storage - User-defined weight presets
  * 
- * Manages user-created presets with localStorage persistence
+ * Manages user-created presets with async PersistenceService
  */
 
 import { BALANCE_PRESETS, type BalancePreset } from './balancePresets';
 import { NORMALIZED_WEIGHTS } from './statWeights';
+import { saveData, loadData } from '@/shared/persistence/PersistenceService';
 
 const STORAGE_KEY = 'rpg_balancer_user_presets';
 const ACTIVE_PRESET_KEY = 'rpg_balancer_active_preset';
@@ -19,8 +20,8 @@ export interface UserPreset extends BalancePreset {
 /**
  * Load all presets (built-in + user-created)
  */
-export function loadAllPresets(): Record<string, BalancePreset> {
-    const userPresets = loadUserPresets();
+export async function loadAllPresets(): Promise<Record<string, BalancePreset>> {
+    const userPresets = await loadUserPresets();
     return {
         ...BALANCE_PRESETS,
         ...userPresets
@@ -28,18 +29,19 @@ export function loadAllPresets(): Record<string, BalancePreset> {
 }
 
 /**
- * Load only user-created presets from localStorage
+ * Load only user-created presets from storage
  */
-export function loadUserPresets(): Record<string, UserPreset> {
+export async function loadUserPresets(): Promise<Record<string, UserPreset>> {
     try {
-        const data = localStorage.getItem(STORAGE_KEY);
-        if (!data) return {};
-
-        const parsed = JSON.parse(data);
+        const parsed = await loadData<Record<string, UserPreset>>(STORAGE_KEY, {});
         // Convert date strings back to Date objects
         Object.keys(parsed).forEach(key => {
-            parsed[key].createdAt = new Date(parsed[key].createdAt);
-            parsed[key].modifiedAt = new Date(parsed[key].modifiedAt);
+            if (parsed[key].createdAt) {
+                parsed[key].createdAt = new Date(parsed[key].createdAt);
+            }
+            if (parsed[key].modifiedAt) {
+                parsed[key].modifiedAt = new Date(parsed[key].modifiedAt);
+            }
         });
 
         return parsed;
@@ -50,11 +52,11 @@ export function loadUserPresets(): Record<string, UserPreset> {
 }
 
 /**
- * Save user presets to localStorage
+ * Save user presets to storage
  */
-function saveUserPresets(presets: Record<string, UserPreset>): void {
+async function saveUserPresets(presets: Record<string, UserPreset>): Promise<void> {
     try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(presets));
+        await saveData(STORAGE_KEY, presets);
     } catch (error) {
         console.error('Error saving user presets:', error);
         throw error;
@@ -64,11 +66,11 @@ function saveUserPresets(presets: Record<string, UserPreset>): void {
 /**
  * Create a new user preset
  */
-export function createUserPreset(
+export async function createUserPreset(
     name: string,
     description: string,
     weights: Record<string, number>
-): UserPreset {
+): Promise<UserPreset> {
     const id = `user_${Date.now()}_${name.toLowerCase().replace(/\s+/g, '_')}`;
 
     const preset: UserPreset = {
@@ -81,9 +83,9 @@ export function createUserPreset(
         modifiedAt: new Date()
     };
 
-    const userPresets = loadUserPresets();
+    const userPresets = await loadUserPresets();
     userPresets[id] = preset;
-    saveUserPresets(userPresets);
+    await saveUserPresets(userPresets);
 
     return preset;
 }
@@ -91,11 +93,11 @@ export function createUserPreset(
 /**
  * Update an existing user preset
  */
-export function updateUserPreset(
+export async function updateUserPreset(
     id: string,
     updates: Partial<Omit<UserPreset, 'id' | 'isUserCreated' | 'createdAt'>>
-): void {
-    const userPresets = loadUserPresets();
+): Promise<void> {
+    const userPresets = await loadUserPresets();
 
     if (!userPresets[id]) {
         throw new Error(`Preset ${id} not found or is not a user preset`);
@@ -107,48 +109,53 @@ export function updateUserPreset(
         modifiedAt: new Date()
     };
 
-    saveUserPresets(userPresets);
+    await saveUserPresets(userPresets);
 }
 
 /**
  * Delete a user preset
  */
-export function deleteUserPreset(id: string): void {
-    const userPresets = loadUserPresets();
+export async function deleteUserPreset(id: string): Promise<void> {
+    const userPresets = await loadUserPresets();
 
     if (!userPresets[id]) {
         throw new Error(`Preset ${id} not found or is not a user preset`);
     }
 
     delete userPresets[id];
-    saveUserPresets(userPresets);
+    await saveUserPresets(userPresets);
 
     // If deleted preset was active, switch to standard
-    if (getActivePresetId() === id) {
-        setActivePresetId('standard');
+    if (await getActivePresetId() === id) {
+        await setActivePresetId('standard');
     }
 }
 
 /**
  * Get active preset ID
  */
-export function getActivePresetId(): string {
-    return localStorage.getItem(ACTIVE_PRESET_KEY) || 'standard';
+export async function getActivePresetId(): Promise<string> {
+    try {
+        const id = await loadData<string>(ACTIVE_PRESET_KEY, 'standard');
+        return id || 'standard';
+    } catch {
+        return 'standard';
+    }
 }
 
 /**
  * Set active preset ID
  */
-export function setActivePresetId(id: string): void {
-    localStorage.setItem(ACTIVE_PRESET_KEY, id);
+export async function setActivePresetId(id: string): Promise<void> {
+    await saveData(ACTIVE_PRESET_KEY, id);
 }
 
 /**
  * Get active preset
  */
-export function getActivePreset(): BalancePreset {
-    const id = getActivePresetId();
-    const allPresets = loadAllPresets();
+export async function getActivePreset(): Promise<BalancePreset> {
+    const id = await getActivePresetId();
+    const allPresets = await loadAllPresets();
     return allPresets[id] || allPresets['standard'];
 }
 
@@ -162,7 +169,7 @@ export function exportPresetJSON(preset: BalancePreset): string {
 /**
  * Import preset from JSON string
  */
-export function importPresetJSON(json: string): UserPreset {
+export async function importPresetJSON(json: string): Promise<UserPreset> {
     try {
         const parsed = JSON.parse(json);
 
@@ -172,7 +179,7 @@ export function importPresetJSON(json: string): UserPreset {
         }
 
         // Create as new user preset
-        return createUserPreset(
+        return await createUserPreset(
             parsed.name,
             parsed.description || 'Imported preset',
             parsed.weights
@@ -186,34 +193,34 @@ export function importPresetJSON(json: string): UserPreset {
 /**
  * Export all user presets to JSON
  */
-export function exportAllPresetsJSON(): string {
-    const userPresets = loadUserPresets();
+export async function exportAllPresetsJSON(): Promise<string> {
+    const userPresets = await loadUserPresets();
     return JSON.stringify(Object.values(userPresets), null, 2);
 }
 
 /**
  * Create a preset from current weights
  */
-export function createPresetFromWeights(
+export async function createPresetFromWeights(
     name: string,
     description: string,
     weights: Record<string, number>
-): UserPreset {
-    return createUserPreset(name, description, weights);
+): Promise<UserPreset> {
+    return await createUserPreset(name, description, weights);
 }
 
 /**
  * Duplicate an existing preset
  */
-export function duplicatePreset(sourceId: string, newName: string): UserPreset {
-    const allPresets = loadAllPresets();
+export async function duplicatePreset(sourceId: string, newName: string): Promise<UserPreset> {
+    const allPresets = await loadAllPresets();
     const source = allPresets[sourceId];
 
     if (!source) {
         throw new Error(`Preset ${sourceId} not found`);
     }
 
-    return createUserPreset(
+    return await createUserPreset(
         newName,
         `Copy of ${source.name}`,
         { ...source.weights }
@@ -223,11 +230,11 @@ export function duplicatePreset(sourceId: string, newName: string): UserPreset {
 /**
  * Calculate diff between two presets
  */
-export function calculatePresetDiff(
+export async function calculatePresetDiff(
     preset1Id: string,
     preset2Id: string
-): Record<string, { old: number; new: number; diff: number; diffPercent: number }> {
-    const allPresets = loadAllPresets();
+): Promise<Record<string, { old: number; new: number; diff: number; diffPercent: number }>> {
+    const allPresets = await loadAllPresets();
     const preset1 = allPresets[preset1Id];
     const preset2 = allPresets[preset2Id];
 

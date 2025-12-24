@@ -1,6 +1,7 @@
 import type { SpellConfig, SpellConfigSnapshot } from './types';
 import { SpellConfigSchema } from './schemas';
 import { DEFAULT_SPELL_CONFIG } from './defaultSpellConfig';
+import { saveData, loadData } from '@/shared/persistence/PersistenceService';
 
 const STORAGE_KEY = 'rpg_spell_config';
 const HISTORY_KEY = 'rpg_spell_config_history';
@@ -18,16 +19,15 @@ export class SpellConfigStore {
   private static history: SpellConfigSnapshot[] = [];
 
   /**
-   * Load config from localStorage or fall back to defaults.
+   * Load config from storage or fall back to defaults.
    */
-  static load(): SpellConfig {
+  static async load(): Promise<SpellConfig> {
     if (this.config) return this.config;
 
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        const validated = SpellConfigSchema.parse(parsed);
+      const loaded = await loadData<SpellConfig>(STORAGE_KEY, null);
+      if (loaded) {
+        const validated = SpellConfigSchema.parse(loaded);
         this.config = validated;
       } else {
         this.config = { ...DEFAULT_SPELL_CONFIG };
@@ -37,23 +37,23 @@ export class SpellConfigStore {
       this.config = { ...DEFAULT_SPELL_CONFIG };
     }
 
-    this.loadHistory();
+    await this.loadHistory();
     return this.config;
   }
 
   /**
    * Save config and push previous state to history.
    */
-  static save(config: SpellConfig, label: string = 'Manual save'): void {
+  static async save(config: SpellConfig, label: string = 'Manual save'): Promise<void> {
     const result = SpellConfigSchema.safeParse(config);
     if (!result.success) {
       throw new Error(`Invalid spell config: ${result.error.message}`);
     }
 
-    this.addToHistory(label);
+    await this.addToHistory(label);
 
     this.config = config;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+    await saveData(STORAGE_KEY, config);
   }
 
   /**
@@ -66,52 +66,52 @@ export class SpellConfigStore {
   /**
    * Undo: restore the most recent snapshot from history.
    */
-  static undo(): SpellConfig | null {
+  static async undo(): Promise<SpellConfig | null> {
     if (this.history.length === 0) return null;
 
     const [latest, ...rest] = this.history;
     this.history = rest;
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(this.history));
+    await saveData(HISTORY_KEY, this.history);
 
     this.config = latest.config;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.config));
+    await saveData(STORAGE_KEY, this.config);
     return this.config;
   }
 
   /**
    * Reset configuration to defaults and push previous state to history.
    */
-  static reset(label: string = 'Reset to defaults'): SpellConfig {
-    this.addToHistory(label);
+  static async reset(label: string = 'Reset to defaults'): Promise<SpellConfig> {
+    await this.addToHistory(label);
     this.config = { ...DEFAULT_SPELL_CONFIG };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.config));
+    await saveData(STORAGE_KEY, this.config);
     return this.config;
   }
 
   /**
    * Export current config as formatted JSON string.
    */
-  static export(): string {
-    const config = this.load();
+  static async export(): Promise<string> {
+    const config = await this.load();
     return JSON.stringify(config, null, 2);
   }
 
   /**
    * Import config from JSON string, validate and save.
    */
-  static import(json: string, label: string = 'Imported configuration'): SpellConfig {
+  static async import(json: string, label: string = 'Imported configuration'): Promise<SpellConfig> {
     const parsed = JSON.parse(json);
     const validated = SpellConfigSchema.parse(parsed);
-    this.save(validated, label);
+    await this.save(validated, label);
     return validated;
   }
 
   // --- Internal helpers ---
 
-  private static addToHistory(label: string): void {
+  private static async addToHistory(label: string): Promise<void> {
     if (!this.config) {
       // Ensure config is initialized before snapshotting
-      this.load();
+      await this.load();
     }
     if (!this.config) return;
 
@@ -126,18 +126,12 @@ export class SpellConfigStore {
       this.history = this.history.slice(0, MAX_HISTORY);
     }
 
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(this.history));
+    await saveData(HISTORY_KEY, this.history);
   }
 
-  private static loadHistory(): void {
+  private static async loadHistory(): Promise<void> {
     try {
-      const raw = localStorage.getItem(HISTORY_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as SpellConfigSnapshot[];
-        this.history = Array.isArray(parsed) ? parsed : [];
-      } else {
-        this.history = [];
-      }
+      this.history = await loadData<SpellConfigSnapshot[]>(HISTORY_KEY, []);
     } catch (error) {
       console.warn('Failed to load spell config history:', error);
       this.history = [];

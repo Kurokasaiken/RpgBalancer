@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
-import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
+import type { ActivityDefinition, MapSlotDefinition } from '@/balancing/config/idleVillage/types';
 import { createVillageStateFromConfig, type ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { useVillageStateStore } from '@/ui/idleVillage/useVillageStateStore';
 import { loadResidentsFromCharacterManager } from '@/engine/game/idleVillage/characterImport';
@@ -8,24 +7,84 @@ import LocationCard from '@/ui/idleVillage/components/LocationCard';
 import ActivitySlot from '@/ui/idleVillage/components/ActivitySlot';
 import VerbDetailCard, { type VerbDetailAssignment, type VerbSlotState } from '@/ui/idleVillage/VerbDetailCard';
 import ResidentRoster from '@/ui/idleVillage/ResidentRoster';
+import WorkerDragToken from '@/ui/idleVillage/components/WorkerDragToken';
 import { formatResidentLabel } from '@/ui/idleVillage/residentName';
+import { useThemeSwitcher } from '@/hooks/useThemeSwitcher';
+import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
 
-type ActivitySlotData = {
+interface ActivitySlotData {
   slotId: string;
   label: string;
   iconName: string;
   assignedWorkerId: string | null;
-};
+}
 
 const VillageSandbox = () => {
+  const { activePreset, presets, setPreset, randomizeTheme, resetRandomization, isRandomized } = useThemeSwitcher();
   const { config } = useIdleVillageConfig();
-  const initialResidents = useMemo(() => loadResidentsFromCharacterManager(), []);
-  const { state: villageState } = useVillageStateStore(() =>
+  const initialResidents = useMemo(() => {
+    const residents = loadResidentsFromCharacterManager();
+    if (residents.length === 0) {
+      // Fallback: create a default resident
+      residents.push({
+        id: 'default-founder',
+        displayName: 'Founder',
+        currentHp: 100,
+        maxHp: 100,
+        fatigue: 0,
+        status: 'available',
+        isHero: false,
+        isInjured: false,
+        statSnapshot: { hp: 100, damage: 10, agility: 10 },
+        statTags: ['founder'],
+        survivalCount: 0,
+        survivalScore: 0,
+      });
+    }
+    return residents;
+  }, []);
+  const { state: villageState, resetState } = useVillageStateStore(() =>
     createVillageStateFromConfig({ config, initialResidents }),
   );
 
-  const mapSlots = useMemo(() => Object.values(config.mapSlots ?? {}), [config.mapSlots]);
+  const mapSlots = useMemo(() => Object.values(config.mapSlots ?? {}) as MapSlotDefinition[], [config.mapSlots]);
   const residents = useMemo<ResidentState[]>(() => Object.values(villageState.residents ?? {}), [villageState.residents]);
+
+  const refreshResidentsFromCharacterManager = useCallback(() => {
+    const latestResidents = loadResidentsFromCharacterManager();
+    if (latestResidents.length === 0) return;
+    resetState(
+      () =>
+        createVillageStateFromConfig({
+          config,
+          initialResidents: latestResidents,
+        }),
+      'VillageSandbox resident refresh',
+    );
+  }, [config, resetState]);
+
+  useEffect(() => {
+    if (residents.length === 0) {
+      const latest = loadResidentsFromCharacterManager();
+      if (latest.length > 0) {
+        resetState(
+          () =>
+            createVillageStateFromConfig({
+              config,
+              initialResidents: latest,
+            }),
+          'VillageSandbox auto-import residents',
+        );
+      }
+      return;
+    }
+    const hasLegacyFounderNames = residents.some(
+      (resident) => !resident.displayName && resident.id?.startsWith('founder-'),
+    );
+    if (hasLegacyFounderNames) {
+      refreshResidentsFromCharacterManager();
+    }
+  }, [residents, refreshResidentsFromCharacterManager, config, resetState]);
 
   const [draggingResidentId, setDraggingResidentId] = useState<string | null>(null);
   const [assignmentFeedback, setAssignmentFeedback] = useState<string | null>(null);
@@ -151,7 +210,7 @@ const VillageSandbox = () => {
   }, [selectedSlot, residents]);
 
   const handleResidentDragStart = useCallback(
-    (residentId: string) => (event: React.DragEvent<HTMLButtonElement>) => {
+    (residentId: string) => (event: React.DragEvent<HTMLElement>) => {
       event.dataTransfer.setData('text/resident-id', residentId);
       event.dataTransfer.setData('text/plain', residentId);
       event.dataTransfer.effectAllowed = 'copy';
@@ -167,6 +226,76 @@ const VillageSandbox = () => {
 
   return (
     <div className="mx-auto max-w-5xl space-y-10 p-6 text-ivory">
+      <section
+        className="rounded-2xl border p-4 shadow-xl backdrop-blur-sm"
+        style={{
+          borderColor: 'var(--panel-border)',
+          background: `linear-gradient(120deg, rgba(255,255,255,0.02), transparent), var(--panel-surface)`,
+          boxShadow: `0 30px 60px var(--card-shadow-color)`,
+        }}
+      >
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p
+              className="text-[10px] uppercase tracking-[0.5em]"
+              style={{ color: 'var(--slot-helper-color, rgba(255,255,255,0.55))' }}
+            >
+              Style Laboratory
+            </p>
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+              {activePreset.label}
+              {isRandomized ? ' + Chaos Mix' : ''} · {activePreset.description}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {presets.map((preset) => {
+              const isPresetActive = activePreset.id === preset.id && !isRandomized;
+              return (
+                <button
+                  key={preset.id}
+                  type="button"
+                  onClick={() => setPreset(preset.id)}
+                  className="rounded-full px-4 py-1 text-[11px] uppercase tracking-[0.3em] transition-colors"
+                  style={{
+                    border: `1px solid ${isPresetActive ? 'var(--accent-color)' : 'var(--panel-border)'}`,
+                    background: isPresetActive ? 'var(--card-highlight)' : 'transparent',
+                    color: isPresetActive ? 'var(--text-primary)' : 'var(--text-muted)',
+                    boxShadow: isPresetActive ? `0 0 20px var(--halo-color)` : 'none',
+                  }}
+                >
+                  {preset.label}
+                </button>
+              );
+            })}
+            <button
+              type="button"
+              onClick={randomizeTheme}
+              className="rounded-full px-4 py-1 text-[11px] uppercase tracking-[0.3em] transition-colors"
+              style={{
+                border: '1px solid var(--accent-strong)',
+                background: 'var(--card-highlight)',
+                color: 'var(--text-primary)',
+              }}
+            >
+              Randomize
+            </button>
+            {isRandomized && (
+              <button
+                type="button"
+                onClick={resetRandomization}
+                className="rounded-full px-4 py-1 text-[11px] uppercase tracking-[0.3em] transition-colors"
+                style={{
+                  border: '1px dashed var(--panel-border)',
+                  color: 'var(--text-muted)',
+                }}
+              >
+                Reset
+              </button>
+            )}
+          </div>
+        </div>
+      </section>
+
       <header className="space-y-2">
         <p className="text-xs uppercase tracking-[0.4em] text-amber-200/70">Village Sandbox</p>
         <h1 className="text-3xl font-semibold tracking-widest">Frontier — Atomic Layer</h1>
@@ -224,6 +353,22 @@ const VillageSandbox = () => {
           </div>
         </div>
       </section>
+
+      <div className="space-y-4 mt-8">
+        <h2 className="text-xs uppercase tracking-[0.35em] text-slate-400">Test Drag Token (Isolated)</h2>
+        <WorkerDragToken
+          workerId="test-resident"
+          label="Test Resident"
+          subtitle="Isolated test for drag"
+          hp={90}
+          fatigue={10}
+          isDragging={false}
+          disabled={false}
+          onDragStateChange={(id: string, dragging: boolean) => console.log('Test drag state:', id, dragging)}
+          onDragStart={(_event: React.DragEvent<HTMLDivElement>) => console.log('Test drag start')}
+          onDragEnd={(_event: React.DragEvent<HTMLDivElement>) => console.log('Test drag end')}
+        />
+      </div>
 
       {detailSlotId && detailActivity && detailPreview && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">

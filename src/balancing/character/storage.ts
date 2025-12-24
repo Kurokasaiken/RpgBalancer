@@ -1,23 +1,20 @@
 /**
- * Character Storage - Browser-based persistence
- * 
- * Similar to spellStorage.ts, provides localStorage-based
- * persistence for player-created characters.
+ * Character Storage - Async PersistenceService-based persistence
+ *
+ * Provides async persistence for player-created characters.
  */
 
 import type { Character } from './types';
+import { saveData, loadData } from '@/shared/persistence/PersistenceService';
 
 const STORAGE_KEY = 'rpg_balancer_characters';
 
 /**
- * Load all characters from localStorage
+ * Load all characters from storage
  */
-export function loadCharacters(): Character[] {
+export async function loadCharacters(): Promise<Character[]> {
     try {
-        const data = localStorage.getItem(STORAGE_KEY);
-        if (!data) return [];
-
-        const parsed = JSON.parse(data);
+        const parsed = await loadData<Character[]>(STORAGE_KEY, []);
         // Convert date strings back to Date objects
         return parsed.map((char: any) => ({
             ...char,
@@ -31,11 +28,11 @@ export function loadCharacters(): Character[] {
 }
 
 /**
- * Save all characters to localStorage
+ * Save all characters to storage
  */
-function saveCharacters(characters: Character[]): void {
+async function saveCharacters(characters: Character[]): Promise<void> {
     try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(characters));
+        await saveData(STORAGE_KEY, characters);
     } catch (error) {
         console.error('Error saving characters:', error);
         throw error;
@@ -45,8 +42,8 @@ function saveCharacters(characters: Character[]): void {
 /**
  * Save or update a character
  */
-export function upsertCharacter(character: Character): void {
-    const characters = loadCharacters();
+export async function upsertCharacter(character: Character): Promise<void> {
+    const characters = await loadCharacters();
     const index = characters.findIndex(c => c.id === character.id);
 
     // Update modifiedAt timestamp
@@ -58,22 +55,23 @@ export function upsertCharacter(character: Character): void {
         characters.push(character);
     }
 
-    saveCharacters(characters);
+    await saveCharacters(characters);
 }
 
 /**
  * Delete a character by ID
  */
-export function deleteCharacter(id: string): void {
-    const characters = loadCharacters().filter(c => c.id !== id);
-    saveCharacters(characters);
+export async function deleteCharacter(id: string): Promise<void> {
+    const characters = (await loadCharacters()).filter(c => c.id !== id);
+    await saveCharacters(characters);
 }
 
 /**
  * Get a single character by ID
  */
-export function getCharacter(id: string): Character | undefined {
-    return loadCharacters().find(c => c.id === id);
+export async function getCharacter(id: string): Promise<Character | undefined> {
+    const characters = await loadCharacters();
+    return characters.find(c => c.id === id);
 }
 
 /**
@@ -110,15 +108,15 @@ export function importCharacterJSON(json: string): Character {
 /**
  * Export all characters to JSON
  */
-export function exportAllCharactersJSON(): string {
-    const characters = loadCharacters();
+export async function exportAllCharactersJSON(): Promise<string> {
+    const characters = await loadCharacters();
     return JSON.stringify(characters, null, 2);
 }
 
 /**
  * Import multiple characters from JSON
  */
-export function importAllCharactersJSON(json: string): void {
+export async function importAllCharactersJSON(json: string): Promise<void> {
     try {
         const parsed = JSON.parse(json);
         if (!Array.isArray(parsed)) {
@@ -131,7 +129,7 @@ export function importAllCharactersJSON(json: string): void {
             modifiedAt: new Date(char.modifiedAt || Date.now())
         }));
 
-        saveCharacters(characters);
+        await saveCharacters(characters);
     } catch (error) {
         console.error('Error importing characters:', error);
         throw new Error('Failed to import characters: ' + (error as Error).message);
@@ -141,23 +139,25 @@ export function importAllCharactersJSON(json: string): void {
 /**
  * Clear all characters (use with caution!)
  */
-export function clearAllCharacters(): void {
-    localStorage.removeItem(STORAGE_KEY);
+export async function clearAllCharacters(): Promise<void> {
+    await saveData(STORAGE_KEY, []);
 }
 
 /**
  * Get character count
  */
-export function getCharacterCount(): number {
-    return loadCharacters().length;
+export async function getCharacterCount(): Promise<number> {
+    const characters = await loadCharacters();
+    return characters.length;
 }
 
 /**
  * Search characters by name
  */
-export function searchCharactersByName(query: string): Character[] {
+export async function searchCharactersByName(query: string): Promise<Character[]> {
     const lowerQuery = query.toLowerCase();
-    return loadCharacters().filter(c =>
+    const characters = await loadCharacters();
+    return characters.filter(c =>
         c.name.toLowerCase().includes(lowerQuery)
     );
 }
@@ -165,15 +165,17 @@ export function searchCharactersByName(query: string): Character[] {
 /**
  * Filter characters by archetype
  */
-export function filterCharactersByArchetype(archetype: string): Character[] {
-    return loadCharacters().filter(c => c.archetype === archetype);
+export async function filterCharactersByArchetype(archetype: string): Promise<Character[]> {
+    const characters = await loadCharacters();
+    return characters.filter(c => c.archetype === archetype);
 }
 
 /**
  * Filter characters by tags
  */
-export function filterCharactersByTags(tags: string[]): Character[] {
-    return loadCharacters().filter(c =>
+export async function filterCharactersByTags(tags: string[]): Promise<Character[]> {
+    const characters = await loadCharacters();
+    return characters.filter(c =>
         c.tags && c.tags.some(tag => tags.includes(tag))
     );
 }

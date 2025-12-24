@@ -1,8 +1,9 @@
 // src/shared/storage/createJsonConfigStore.ts
-// Generic helper to persist JSON configs inside localStorage
+// Generic helper to persist JSON configs using async PersistenceService
 // with optional history tracking and schema validation.
 
 import type { ZodType } from 'zod';
+import { saveData, loadData } from '../persistence/PersistenceService';
 
 export interface JsonConfigSnapshot<T> {
   timestamp: number;
@@ -11,13 +12,13 @@ export interface JsonConfigSnapshot<T> {
 }
 
 export interface JsonConfigStore<T> {
-  load(): T;
-  save(config: T, description?: string): void;
-  reset(description?: string): T;
-  getHistory(): JsonConfigSnapshot<T>[];
-  undo(): T | null;
-  export(): string;
-  import(json: string, description?: string): T;
+  load(): Promise<T>;
+  save(config: T, description?: string): Promise<void>;
+  reset(description?: string): Promise<T>;
+  getHistory(): Promise<JsonConfigSnapshot<T>[]>;
+  undo(): Promise<T | null>;
+  export(): Promise<string>;
+  import(json: string, description?: string): Promise<T>;
 }
 
 export interface JsonConfigStoreOptions<T> {
@@ -31,16 +32,6 @@ export interface JsonConfigStoreOptions<T> {
 }
 
 const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value));
-
-const getLocalStorage = (): Storage | null => {
-  if (typeof window !== 'undefined' && window.localStorage) {
-    return window.localStorage;
-  }
-  if (typeof localStorage !== 'undefined') {
-    return localStorage;
-  }
-  return null;
-};
 
 export function createJsonConfigStore<T>(options: JsonConfigStoreOptions<T>): JsonConfigStore<T> {
   const {
@@ -65,13 +56,11 @@ export function createJsonConfigStore<T>(options: JsonConfigStoreOptions<T>): Js
     }
   };
 
-  const persistHistory = () => {
-    const storage = getLocalStorage();
-    if (!storage) return;
-    storage.setItem(historyKey, JSON.stringify(history));
+  const persistHistory = async () => {
+    await saveData(historyKey, history);
   };
 
-  const addToHistory = (description: string) => {
+  const addToHistory = async (description: string) => {
     if (!cachedConfig) return;
     const snapshot: JsonConfigSnapshot<T> = {
       timestamp: Date.now(),
@@ -82,44 +71,32 @@ export function createJsonConfigStore<T>(options: JsonConfigStoreOptions<T>): Js
     if (history.length > maxHistory) {
       history = history.slice(0, maxHistory);
     }
-    persistHistory();
+    await persistHistory();
   };
 
-  const loadHistory = () => {
-    const storage = getLocalStorage();
-    if (!storage) {
-      history = [];
-      return;
-    }
+  const loadHistory = async () => {
     try {
-      const raw = storage.getItem(historyKey);
-      history = raw ? (JSON.parse(raw) as JsonConfigSnapshot<T>[]) : [];
+      history = await loadData<JsonConfigSnapshot<T>[]>(historyKey, []);
     } catch {
       history = [];
     }
   };
 
-  const readFromStorage = (): T => {
-    const storage = getLocalStorage();
-    if (!storage) {
-      return clone(defaultValue);
-    }
-
+  const readFromStorage = async (): Promise<T> => {
     try {
-      const raw = storage.getItem(storageKey);
-      if (!raw) {
+      const parsed = await loadData<T>(storageKey, null);
+      if (parsed === null) {
         const fallback = clone(defaultValue);
-        storage.setItem(storageKey, JSON.stringify(fallback));
+        await saveData(storageKey, fallback);
         return fallback;
       }
-      const parsed = JSON.parse(raw);
       const validated = schema.parse(parsed);
       return mergeWithDefaults ? mergeWithDefaults(validated) : validated;
     } catch (error) {
       console.warn(`Failed to load config for key ${storageKey}, using defaults:`, error);
       const fallback = clone(defaultValue);
       try {
-        storage.setItem(storageKey, JSON.stringify(fallback));
+        await saveData(storageKey, fallback);
       } catch {
         // Ignore write errors
       }
@@ -127,65 +104,63 @@ export function createJsonConfigStore<T>(options: JsonConfigStoreOptions<T>): Js
     }
   };
 
-  const writeToStorage = (config: T) => {
-    const storage = getLocalStorage();
-    if (!storage) return;
-    storage.setItem(storageKey, JSON.stringify(config));
+  const writeToStorage = async (config: T) => {
+    await saveData(storageKey, config);
   };
 
-  const ensureLoaded = (): T => {
+  const ensureLoaded = async (): Promise<T> => {
     if (!cachedConfig) {
-      cachedConfig = readFromStorage();
-      loadHistory();
+      cachedConfig = await readFromStorage();
+      await loadHistory();
     }
     return cachedConfig;
   };
 
   return {
-    load(): T {
-      return ensureLoaded();
+    async load(): Promise<T> {
+      return await ensureLoaded();
     },
-    save(config: T, description = 'Manual save'): void {
+    async save(config: T, description = 'Manual save'): Promise<void> {
       const result = schema.safeParse(config);
       if (!result.success) {
         throw new Error(`Invalid config: ${result.error.message}`);
       }
-      addToHistory(description);
+      await addToHistory(description);
       cachedConfig = mergeWithDefaults ? mergeWithDefaults(result.data) : result.data;
-      writeToStorage(cachedConfig);
+      await writeToStorage(cachedConfig);
       dispatchUpdateEvent();
     },
-    reset(description = 'Reset to defaults'): T {
-      addToHistory(description);
+    async reset(description = 'Reset to defaults'): Promise<T> {
+      await addToHistory(description);
       cachedConfig = clone(defaultValue);
-      writeToStorage(cachedConfig);
+      await writeToStorage(cachedConfig);
       dispatchUpdateEvent();
       return cachedConfig;
     },
-    getHistory(): JsonConfigSnapshot<T>[] {
-      ensureLoaded();
+    async getHistory(): Promise<JsonConfigSnapshot<T>[]> {
+      await ensureLoaded();
       return [...history];
     },
-    undo(): T | null {
-      ensureLoaded();
+    async undo(): Promise<T | null> {
+      await ensureLoaded();
       if (history.length === 0) return null;
       const previous = history.shift();
       if (!previous) return null;
       cachedConfig = clone(previous.config) as T;
-      writeToStorage(cachedConfig);
-      persistHistory();
+      await writeToStorage(cachedConfig);
+      await persistHistory();
       dispatchUpdateEvent();
       return cachedConfig;
     },
-    export(): string {
-      const config = ensureLoaded();
+    async export(): Promise<string> {
+      const config = await ensureLoaded();
       return JSON.stringify(config, null, 2);
     },
-    import(json: string, description = 'Imported configuration'): T {
+    async import(json: string, description = 'Imported configuration'): Promise<T> {
       const parsed = JSON.parse(json);
       const validated = schema.parse(parsed);
       const merged = mergeWithDefaults ? mergeWithDefaults(validated) : validated;
-      this.save(merged, description);
+      await this.save(merged, description);
       return merged;
     },
   };

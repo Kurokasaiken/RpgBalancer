@@ -32,6 +32,13 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
 }) => {
   const isExhausted = fatigue > 90;
 
+  const cardStyle: React.CSSProperties = {
+    borderColor: 'var(--card-border-color)',
+    background: `var(--card-surface-radial), var(--card-surface)`,
+    boxShadow: isHovering ? '0 0 80px var(--halo-color)' : '0 18px 35px var(--card-shadow-color)',
+    color: 'var(--text-primary)',
+  };
+
   if (isDragging) {
     return (
       <div
@@ -40,7 +47,13 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
         data-worker-name={name}
         data-worker-hp={hp}
         data-worker-fatigue={fatigue}
-        className="flex h-20 w-20 items-center justify-center rounded-full border border-amber-200/60 bg-slate-950/80 text-2xl font-semibold text-amber-200 shadow-[0_0_35px_rgba(251,191,36,0.45)]"
+        className="flex h-20 w-20 items-center justify-center rounded-full border text-2xl font-semibold shadow-[0_0_35px_rgba(251,191,36,0.45)]"
+        style={{
+          borderColor: 'var(--accent-color)',
+          background: 'var(--card-surface)',
+          color: 'var(--accent-strong)',
+          boxShadow: `0 0 35px var(--halo-color)`,
+        }}
       >
         {name.charAt(0) || id.charAt(0)}
       </div>
@@ -57,39 +70,68 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
       data-worker-hp={hp}
       data-worker-fatigue={fatigue}
       className={[
-        'relative w-full max-w-sm cursor-pointer overflow-hidden rounded-2xl border border-slate-800/70 bg-slate-950/90 p-4 shadow-[0_18px_35px_rgba(0,0,0,0.55)] transition',
-        'bg-[radial-gradient(circle_at_top,#101826_0%,#05070d_70%)]',
-        isExhausted ? 'grayscale-[0.45] opacity-85' : 'hover:border-emerald-300/70 hover:shadow-[0_25px_45px_rgba(34,197,94,0.2)]',
-        isHovering ? 'ring-4 ring-amber-300/70 shadow-[0_0_80px_rgba(251,191,36,0.45)]' : '',
+        'relative w-full max-w-sm cursor-pointer overflow-hidden rounded-2xl border p-4 transition',
+        isExhausted ? 'grayscale-[0.45] opacity-85' : '',
+        isHovering ? 'ring-4 shadow-xl' : '',
       ]
         .filter(Boolean)
         .join(' ')}
+      style={{
+        ...cardStyle,
+        borderColor: isHovering ? 'var(--accent-color)' : 'var(--card-border-color)',
+        boxShadow: isExhausted ? '0 12px 24px rgba(0,0,0,0.35)' : cardStyle.boxShadow,
+      }}
     >
       {isHovering && (
-        <div className="pointer-events-none absolute inset-0 bg-amber-200/10 blur-2xl transition-opacity duration-300" />
+        <div
+          className="pointer-events-none absolute inset-0 blur-2xl transition-opacity duration-300"
+          style={{ background: 'var(--card-highlight)' }}
+        />
       )}
       <div className="space-y-3">
-        <div className="flex items-center justify-between text-xs uppercase tracking-[0.35em] text-slate-400">
-          <span className="text-sm font-semibold text-ivory">{name}</span>
-          <span className="text-[9px] text-slate-500">{isExhausted ? 'ESAUSTO' : 'PRONTO'}</span>
+        <div className="flex items-center justify-between text-xs uppercase tracking-[0.35em]" style={{ color: 'var(--text-muted)' }}>
+          <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+            {name}
+          </span>
+          <span className="text-[9px]" style={{ color: isExhausted ? 'var(--fatigue-bar-end)' : 'var(--hp-bar-end)' }}>
+            {isExhausted ? 'ESAUSTO' : 'PRONTO'}
+          </span>
         </div>
         <div className="space-y-3">
           <div>
-            <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.35em] text-emerald-200/70">
+            <div
+              className="flex items-center justify-between text-[10px] uppercase tracking-[0.35em]"
+              style={{ color: 'var(--hp-bar-end)' }}
+            >
               <span>HP</span>
               <span>{hp}%</span>
             </div>
-            <div className="h-1.5 w-full rounded-full bg-slate-800/80">
-              <div className="h-full rounded-full bg-linear-to-r from-emerald-300 to-emerald-500 transition-all" style={{ width: `${hp}%` }} />
+            <div className="h-1.5 w-full rounded-full" style={{ background: 'var(--hp-bar-track)' }}>
+              <div
+                className="h-full rounded-full transition-all"
+                style={{
+                  width: `${hp}%`,
+                  background: `linear-gradient(90deg, var(--hp-bar-start), var(--hp-bar-end))`,
+                }}
+              />
             </div>
           </div>
           <div>
-            <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.35em] text-amber-200/80">
+            <div
+              className="flex items-center justify-between text-[10px] uppercase tracking-[0.35em]"
+              style={{ color: 'var(--fatigue-bar-end)' }}
+            >
               <span>FATICA</span>
               <span>{fatigue}%</span>
             </div>
-            <div className="h-1.5 w-full rounded-full bg-slate-800/80">
-              <div className="h-full rounded-full bg-linear-to-r from-amber-300 via-amber-400 to-orange-400 transition-all" style={{ width: `${fatigue}%` }} />
+            <div className="h-1.5 w-full rounded-full" style={{ background: 'var(--fatigue-bar-track)' }}>
+              <div
+                className="h-full rounded-full transition-all"
+                style={{
+                  width: `${fatigue}%`,
+                  background: `linear-gradient(90deg, var(--fatigue-bar-start), var(--fatigue-bar-end))`,
+                }}
+              />
             </div>
           </div>
         </div>

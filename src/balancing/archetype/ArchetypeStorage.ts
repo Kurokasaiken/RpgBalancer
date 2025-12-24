@@ -1,4 +1,5 @@
 import type { ArchetypeTemplate } from './types';
+import { saveData, loadData } from '@/shared/persistence/PersistenceService';
 
 /**
  * Definition for an archetype category.
@@ -23,7 +24,7 @@ const DEFAULT_CATEGORIES: ArchetypeCategoryDef[] = [
 ];
 
 /**
- * Singleton class for persisting archetypes and categories to localStorage.
+ * Singleton class for persisting archetypes and categories using async PersistenceService.
  */
 export class ArchetypeStorage {
     private static instance: ArchetypeStorage;
@@ -45,8 +46,8 @@ export class ArchetypeStorage {
     /**
      * Saves or updates an archetype template.
      */
-    saveArchetype(archetype: ArchetypeTemplate): void {
-        const archetypes = this.getAllArchetypes();
+    async saveArchetype(archetype: ArchetypeTemplate): Promise<void> {
+        const archetypes = await this.getAllArchetypes();
         const index = archetypes.findIndex(a => a.id === archetype.id);
 
         if (index >= 0) {
@@ -55,32 +56,32 @@ export class ArchetypeStorage {
             archetypes.push(archetype);
         }
 
-        this.persistArchetypes(archetypes);
+        await this.persistArchetypes(archetypes);
     }
 
     /**
      * Deletes an archetype template by ID.
      */
-    deleteArchetype(id: string): void {
-        const archetypes = this.getAllArchetypes();
+    async deleteArchetype(id: string): Promise<void> {
+        const archetypes = await this.getAllArchetypes();
         const filtered = archetypes.filter(a => a.id !== id);
-        this.persistArchetypes(filtered);
+        await this.persistArchetypes(filtered);
     }
 
     /**
      * Retrieves an archetype template by ID.
      */
-    getArchetype(id: string): ArchetypeTemplate | undefined {
-        return this.getAllArchetypes().find(a => a.id === id);
+    async getArchetype(id: string): Promise<ArchetypeTemplate | undefined> {
+        const archetypes = await this.getAllArchetypes();
+        return archetypes.find(a => a.id === id);
     }
 
     /**
      * Retrieves all stored archetype templates.
      */
-    getAllArchetypes(): ArchetypeTemplate[] {
+    async getAllArchetypes(): Promise<ArchetypeTemplate[]> {
         try {
-            const data = localStorage.getItem(STORAGE_KEY);
-            return data ? JSON.parse(data) : [];
+            return await loadData<ArchetypeTemplate[]>(STORAGE_KEY, []);
         } catch (e) {
             console.error('Failed to load archetypes', e);
             return [];
@@ -88,11 +89,11 @@ export class ArchetypeStorage {
     }
 
     /**
-     * Persists the archetype array to localStorage.
+     * Persists the archetype array.
      */
-    private persistArchetypes(archetypes: ArchetypeTemplate[]): void {
+    private async persistArchetypes(archetypes: ArchetypeTemplate[]): Promise<void> {
         try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(archetypes));
+            await saveData(STORAGE_KEY, archetypes);
         } catch (e) {
             console.error('Failed to save archetypes', e);
         }
@@ -103,8 +104,8 @@ export class ArchetypeStorage {
     /**
      * Saves or updates a category definition.
      */
-    saveCategory(category: ArchetypeCategoryDef): void {
-        const categories = this.getAllCategories();
+    async saveCategory(category: ArchetypeCategoryDef): Promise<void> {
+        const categories = await this.getAllCategories();
         const index = categories.findIndex(c => c.id === category.id);
 
         if (index >= 0) {
@@ -113,31 +114,31 @@ export class ArchetypeStorage {
             categories.push(category);
         }
 
-        this.persistCategories(categories);
+        await this.persistCategories(categories);
     }
 
     /**
      * Deletes a category definition by ID.
      */
-    deleteCategory(id: string): void {
-        const categories = this.getAllCategories();
+    async deleteCategory(id: string): Promise<void> {
+        const categories = await this.getAllCategories();
         // Prevent deleting default categories if needed, or handle logic in UI
         const filtered = categories.filter(c => c.id !== id);
-        this.persistCategories(filtered);
+        await this.persistCategories(filtered);
     }
 
     /**
      * Retrieves all stored category definitions.
      */
-    getAllCategories(): ArchetypeCategoryDef[] {
+    async getAllCategories(): Promise<ArchetypeCategoryDef[]> {
         try {
-            const data = localStorage.getItem(CATEGORIES_KEY);
+            const data = await loadData<ArchetypeCategoryDef[]>(CATEGORIES_KEY, null);
             if (!data) {
                 // Initialize defaults if empty
-                this.persistCategories(DEFAULT_CATEGORIES);
+                await this.persistCategories(DEFAULT_CATEGORIES);
                 return DEFAULT_CATEGORIES;
             }
-            return JSON.parse(data);
+            return data;
         } catch (e) {
             console.error('Failed to load categories', e);
             return DEFAULT_CATEGORIES;
@@ -145,11 +146,11 @@ export class ArchetypeStorage {
     }
 
     /**
-     * Persists the category array to localStorage.
+     * Persists the category array.
      */
-    private persistCategories(categories: ArchetypeCategoryDef[]): void {
+    private async persistCategories(categories: ArchetypeCategoryDef[]): Promise<void> {
         try {
-            localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
+            await saveData(CATEGORIES_KEY, categories);
         } catch (e) {
             console.error('Failed to save categories', e);
         }
@@ -160,10 +161,10 @@ export class ArchetypeStorage {
     /**
      * Exports all archetypes and categories as JSON string.
      */
-    exportAll(): string {
+    async exportAll(): Promise<string> {
         const data = {
-            archetypes: this.getAllArchetypes(),
-            categories: this.getAllCategories(),
+            archetypes: await this.getAllArchetypes(),
+            categories: await this.getAllCategories(),
             version: '1.0',
             exportedAt: new Date().toISOString()
         };
@@ -173,7 +174,7 @@ export class ArchetypeStorage {
     /**
      * Imports archetypes and categories from JSON string.
      */
-    importAll(json: string): { success: boolean, message: string } {
+    async importAll(json: string): Promise<{ success: boolean, message: string }> {
         try {
             const data = JSON.parse(json);
             if (!data.archetypes || !Array.isArray(data.archetypes)) {
@@ -181,7 +182,7 @@ export class ArchetypeStorage {
             }
 
             // Merge strategy: Overwrite existing IDs, add new ones
-            const currentArchetypes = this.getAllArchetypes();
+            const currentArchetypes = await this.getAllArchetypes();
             const newArchetypes = data.archetypes as ArchetypeTemplate[];
 
             newArchetypes.forEach(newArch => {
@@ -192,11 +193,11 @@ export class ArchetypeStorage {
                     currentArchetypes.push(newArch);
                 }
             });
-            this.persistArchetypes(currentArchetypes);
+            await this.persistArchetypes(currentArchetypes);
 
             // Merge Categories
             if (data.categories && Array.isArray(data.categories)) {
-                const currentCategories = this.getAllCategories();
+                const currentCategories = await this.getAllCategories();
                 const newCategories = data.categories as ArchetypeCategoryDef[];
 
                 newCategories.forEach(newCat => {
@@ -207,7 +208,7 @@ export class ArchetypeStorage {
                         currentCategories.push(newCat);
                     }
                 });
-                this.persistCategories(currentCategories);
+                await this.persistCategories(currentCategories);
             }
 
             return { success: true, message: `Imported ${newArchetypes.length} archetypes successfully.` };

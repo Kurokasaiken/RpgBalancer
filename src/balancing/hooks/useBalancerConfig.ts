@@ -10,6 +10,7 @@ import { BalancerConfigStore } from '../config/BalancerConfigStore';
 import { StatDefinitionSchema, CardDefinitionSchema } from '../config/schemas';
 import { isCoreCard, isCoreStat } from '../config/defaultConfig';
 import { validateFormula } from '../config/FormulaEngine';
+import BALANCER_DEFAULT_JSON from '../config/balancer-default-config.json';
 
 export interface ValidationResult {
   success: boolean;
@@ -42,31 +43,26 @@ export interface UseBalancerConfigReturn {
   validateStatFormula: (formula: string) => ReturnType<typeof validateFormula>;
 
   // History
-  undo: () => void;
+  undo: () => Promise<void>;
   canUndo: boolean;
 
   // Export/Import
-  exportConfig: () => string;
-  importConfig: (json: string) => ValidationResult;
-  resetConfig: () => void;
-  resetToInitialConfig: () => void;
-  resetCardToInitial: (cardId: string) => ValidationResult;
-  resetStatToInitial: (statId: string) => ValidationResult;
+  exportConfig: () => Promise<string>;
+  importConfig: (json: string) => Promise<ValidationResult>;
+  resetConfig: () => Promise<void>;
+  resetToInitialConfig: () => Promise<void>;
+  resetCardToInitial: (cardId: string) => Promise<ValidationResult>;
+  resetStatToInitial: (statId: string) => Promise<ValidationResult>;
 }
 
 export function useBalancerConfig(): UseBalancerConfigReturn {
   const initialConfigRef = useRef<BalancerConfig | null>(null);
-  const [config, setConfig] = useState<BalancerConfig>(() => {
-    const loaded = BalancerConfigStore.load();
-    if (!initialConfigRef.current) {
-      initialConfigRef.current = deepClone(loaded);
-    }
-    return loaded;
-  });
+  const [config, setConfig] = useState<BalancerConfig>(BALANCER_DEFAULT_JSON as unknown as BalancerConfig);
   const [history, setHistory] = useState<ConfigSnapshot[]>(() => BalancerConfigStore.getHistory());
 
-  const refreshState = useCallback(() => {
-    setConfig(BalancerConfigStore.load());
+  const refreshState = useCallback(async () => {
+    const loaded = await BalancerConfigStore.load();
+    setConfig(loaded);
     setHistory(BalancerConfigStore.getHistory());
   }, []);
 
@@ -84,10 +80,22 @@ export function useBalancerConfig(): UseBalancerConfigReturn {
     }
   }, [refreshState]);
 
+  // Load config on mount
+  useEffect(() => {
+    (async () => {
+      const loaded = await BalancerConfigStore.load();
+      setConfig(loaded);
+      if (!initialConfigRef.current) {
+        initialConfigRef.current = deepClone(loaded);
+      }
+      setHistory(BalancerConfigStore.getHistory());
+    })();
+  }, []);
+
   const saveConfig = useCallback(
-    (next: BalancerConfig, description: string) => {
-      BalancerConfigStore.save(next, description);
-      refreshState();
+    async (next: BalancerConfig, description: string) => {
+      await BalancerConfigStore.save(next, description);
+      await refreshState();
     },
     [refreshState],
   );
@@ -361,9 +369,9 @@ export function useBalancerConfig(): UseBalancerConfigReturn {
   );
 
   // === HISTORY ===
-  const undo = useCallback(() => {
-    BalancerConfigStore.undo();
-    refreshState();
+  const undo = useCallback(async () => {
+    await BalancerConfigStore.undo();
+    await refreshState();
   }, [refreshState]);
 
   const canUndo = history.length > 0;
@@ -371,29 +379,29 @@ export function useBalancerConfig(): UseBalancerConfigReturn {
   // === EXPORT / IMPORT / RESET ===
   const exportConfig = useCallback(() => BalancerConfigStore.export(), []);
 
-  const importConfig = useCallback((json: string): ValidationResult => {
+  const importConfig = useCallback(async (json: string): Promise<ValidationResult> => {
     try {
-      BalancerConfigStore.import(json);
-      refreshState();
+      await BalancerConfigStore.import(json);
+      await refreshState();
       return { success: true };
     } catch (e) {
       return { success: false, error: (e as Error).message };
     }
   }, [refreshState]);
 
-  const resetConfig = useCallback(() => {
-    BalancerConfigStore.reset();
-    refreshState();
+  const resetConfig = useCallback(async () => {
+    await BalancerConfigStore.reset();
+    await refreshState();
   }, [refreshState]);
 
-  const resetToInitialConfig = useCallback(() => {
+  const resetToInitialConfig = useCallback(async () => {
     if (!initialConfigRef.current) return;
-    BalancerConfigStore.save(deepClone(initialConfigRef.current), 'Reset to initial snapshot');
-    refreshState();
+    await BalancerConfigStore.save(deepClone(initialConfigRef.current), 'Reset to initial snapshot');
+    await refreshState();
   }, [refreshState]);
 
   const resetStatToInitial = useCallback(
-    (statId: string): ValidationResult => {
+    async (statId: string): Promise<ValidationResult> => {
       const initialStat = initialConfigRef.current?.stats[statId];
       if (!initialStat) {
         return { success: false, error: `Stat "${statId}" not in initial snapshot` };
@@ -407,14 +415,14 @@ export function useBalancerConfig(): UseBalancerConfigReturn {
         },
       };
 
-      saveConfig(next, `Reset stat: ${initialStat.label}`);
+      await saveConfig(next, `Reset stat: ${initialStat.label}`);
       return { success: true };
     },
     [config, saveConfig],
   );
 
   const resetCardToInitial = useCallback(
-    (cardId: string): ValidationResult => {
+    async (cardId: string): Promise<ValidationResult> => {
       const initialCard = initialConfigRef.current?.cards[cardId];
       if (!initialCard) {
         return { success: false, error: `Card "${cardId}" not in initial snapshot` };
@@ -437,7 +445,7 @@ export function useBalancerConfig(): UseBalancerConfigReturn {
         stats: updatedStats,
       };
 
-      saveConfig(next, `Reset card: ${initialCard.title}`);
+      await saveConfig(next, `Reset card: ${initialCard.title}`);
       return { success: true };
     },
     [config, saveConfig],
