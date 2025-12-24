@@ -199,7 +199,7 @@ function MapSlotVerbCluster({ slot, left, top, verbs, questOffers, onSelect, isS
               )}
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center text-xs uppercase tracking-[0.2em] text-slate-300 px-4 py-3 min-h-[176px] min-w-[112px]">
+            <div className="flex flex-col items-center justify-center text-xs uppercase tracking-[0.2em] text-slate-300 px-4 py-3 min-h-44 min-w-28">
               <span className="text-base">{slot.icon ?? '⌀'}</span>
               <span>{slot.label}</span>
             </div>
@@ -377,9 +377,16 @@ const IdleVillagePage: React.FC = () => {
         }
         const fallbackResident: ResidentState = {
           id: 'resident_alpha',
+          displayName: 'Resident Alpha',
           status: 'available',
           fatigue: 0,
           statTags: ['generalist'],
+          currentHp: 100,
+          maxHp: 100,
+          isHero: false,
+          isInjured: false,
+          survivalCount: 0,
+          survivalScore: 0,
         };
         return {
           ...prev,

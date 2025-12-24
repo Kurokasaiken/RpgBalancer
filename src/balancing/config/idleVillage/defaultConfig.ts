@@ -134,6 +134,7 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
       level: 1,
       dangerRating: 1,
       durationFormula: '1',
+      maxSlots: 'infinite',
       statRequirement: {
         label: 'Discipline + (Edge | Lantern)',
         allOf: ['discipline'],
@@ -163,6 +164,7 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
       level: 1,
       dangerRating: 2,
       durationFormula: '5',
+      maxSlots: 'infinite',
       statRequirement: {
         label: 'Lantern Tracker',
         allOf: ['lantern'],
@@ -187,6 +189,7 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
       level: 1,
       dangerRating: 0,
       durationFormula: '2',
+      maxSlots: 'infinite',
       statRequirement: {
         label: 'Reason Focus',
         allOf: ['reason'],
@@ -210,6 +213,7 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
       level: 1,
       dangerRating: 2,
       durationFormula: '3',
+      maxSlots: 'infinite',
       statRequirement: {
         label: 'Edge Veteran',
         allOf: ['edge'],
@@ -243,6 +247,7 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
       level: 1,
       dangerRating: 0,
       durationFormula: '1',
+      maxSlots: 'infinite',
       statRequirement: {
         label: 'Lantern or Reason',
         anyOf: ['lantern', 'reason'],
@@ -265,6 +270,11 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
       level: 2,
       dangerRating: 1,
       durationFormula: '3',
+      maxSlots: 2,
+      slotModifiers: {
+        0: { yieldMult: 1 },
+        1: { yieldMult: 1.15, fatigueMult: 1.05 },
+      },
       statRequirement: {
         label: 'Discipline & Lantern',
         allOf: ['discipline'],
@@ -278,7 +288,6 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
         supportsAutoRepeat: true,
         mapSlotId: 'village_square',
         icon: '🌾',
-        maxCrewSize: 2,
         injuryChanceDisplay: 6,
         deathChanceDisplay: 2,
       },

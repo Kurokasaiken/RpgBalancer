@@ -30,7 +30,10 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@tailwindcss/postcss": "^4.1.17",
+    "@tauri-apps/api": "^2.9.1",
+    "@types/lodash.merge": "^4.6.9",
     "framer-motion": "^11.0.3",
+    "lodash.merge": "^4.6.2",
     "lucide-react": "^0.555.0",
     "pixi.js": "^8.14.3",
     "react": "^19.2.0",
@@ -40,7 +43,8 @@
     "simple-statistics": "^7.8.8",
     "sonner": "^2.0.7",
     "tailwindcss": "^4.1.17",
-    "zod": "^4.1.13"
+    "zod": "^4.1.13",
+    "zustand": "^5.0.9"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

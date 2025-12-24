@@ -1,196 +1,211 @@
-// src/balancing/config/idleVillage/IdleVillageConfigStore.ts
-// Local-storage backed store for IdleVillageConfig, mirroring BalancerConfigStore
-// but scoped to the Idle Village meta-game.
-
-import type { IdleVillageConfig, IdleVillageConfigSnapshot } from './types';
+import { create } from 'zustand';
 import { IdleVillageConfigSchema } from './schemas';
 import { DEFAULT_IDLE_VILLAGE_CONFIG } from './defaultConfig';
+import { loadFinalConfigFromDisk, persistConfigToDisk } from './PersistenceService';
+import type { IdleVillageConfig, IdleVillageConfigSnapshot } from './types';
 
-const STORAGE_KEY = 'idle_village_config';
-const HISTORY_KEY = 'idle_village_config_history';
-const MAX_HISTORY = 10;
+/** Maximum amount of historical snapshots retained for undo. */
+const HISTORY_LIMIT = 10;
+/** Debounce delay (ms) before persisting a config change to disk. */
+const SAVE_DEBOUNCE_MS = 1000;
 
-export class IdleVillageConfigStore {
-  private static config: IdleVillageConfig | null = null;
-  private static history: IdleVillageConfigSnapshot[] = [];
+/**
+ * Deep-clones a plain JSON-serializable value through stringify/parse.
+ */
+const clone = <T,>(value: T): T => JSON.parse(JSON.stringify(value));
 
-  static load(): IdleVillageConfig {
-    if (this.config) return this.config;
+let pendingPersist: IdleVillageConfig | null = null;
+let persistTimer: ReturnType<typeof setTimeout> | null = null;
 
-    try {
-      const raw = typeof window !== 'undefined' ? window.localStorage.getItem(STORAGE_KEY) : null;
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        const validated = IdleVillageConfigSchema.parse(parsed);
-        this.config = this.mergeWithDefaults(validated);
-      } else {
-        this.config = { ...DEFAULT_IDLE_VILLAGE_CONFIG };
-      }
-    } catch (e) {
-      // Fallback to defaults if anything goes wrong
-      console.warn('Failed to load IdleVillageConfig, using defaults:', e);
-      this.config = { ...DEFAULT_IDLE_VILLAGE_CONFIG };
-    }
-
-    this.loadHistory();
-    return this.config;
+/**
+ * Schedules an async write of the provided config, applying debounce semantics.
+ */
+const enqueuePersist = (config: IdleVillageConfig) => {
+  pendingPersist = clone(config);
+  if (persistTimer) {
+    clearTimeout(persistTimer);
   }
+  persistTimer = setTimeout(() => {
+    const payload = pendingPersist;
+    pendingPersist = null;
+    persistTimer = null;
+    if (!payload) return;
+    void persistConfigToDisk(payload).catch((error) => {
+      console.warn('[IdleVillageConfigStore] Failed to persist config:', error);
+    });
+  }, SAVE_DEBOUNCE_MS);
+};
 
-  static save(config: IdleVillageConfig, description = 'Manual save'): void {
-    const result = IdleVillageConfigSchema.safeParse(config);
-    if (!result.success) {
-      throw new Error(`Invalid IdleVillageConfig: ${result.error.message}`);
-    }
-
-    this.addToHistory(description);
-    this.config = config;
-
-    if (typeof window !== 'undefined' && window.localStorage) {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
-      try {
-        window.dispatchEvent(new CustomEvent('idleVillageConfigUpdated'));
-      } catch {
-        // Swallow errors from CustomEvent in non-browser environments.
-      }
-    }
-  }
-
-  private static addToHistory(description: string): void {
-    if (!this.config) return;
-
-    const snapshot: IdleVillageConfigSnapshot = {
-      timestamp: Date.now(),
-      config: JSON.parse(JSON.stringify(this.config)),
-      description,
-    };
-
-    this.history.unshift(snapshot);
-    if (this.history.length > MAX_HISTORY) {
-      this.history = this.history.slice(0, MAX_HISTORY);
-    }
-
-    if (typeof window !== 'undefined' && window.localStorage) {
-      window.localStorage.setItem(HISTORY_KEY, JSON.stringify(this.history));
-    }
-  }
-
-  private static loadHistory(): void {
-    if (typeof window === 'undefined' || !window.localStorage) {
-      this.history = [];
-      return;
-    }
-
-    try {
-      const raw = window.localStorage.getItem(HISTORY_KEY);
-      this.history = raw ? JSON.parse(raw) : [];
-    } catch (e) {
-      console.warn('Failed to load IdleVillageConfig history:', e);
-      this.history = [];
-    }
-  }
-
-  static getHistory(): IdleVillageConfigSnapshot[] {
-    return [...this.history];
-  }
-
-  static undo(): IdleVillageConfig | null {
-    if (this.history.length === 0) return null;
-
-    const previous = this.history[0];
-    this.config = JSON.parse(JSON.stringify(previous.config));
-
-    if (typeof window !== 'undefined' && window.localStorage) {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(this.config));
-      this.history.shift();
-      window.localStorage.setItem(HISTORY_KEY, JSON.stringify(this.history));
-    }
-
-    return this.config;
-  }
-
-  static reset(): IdleVillageConfig {
-    this.addToHistory('Reset IdleVillageConfig to defaults');
-    this.config = { ...DEFAULT_IDLE_VILLAGE_CONFIG };
-
-    if (typeof window !== 'undefined' && window.localStorage) {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(this.config));
-    }
-
-    return this.config;
-  }
-
-  static export(): string {
-    return JSON.stringify(this.load(), null, 2);
-  }
-
-  static import(json: string): IdleVillageConfig {
-    const parsed = JSON.parse(json);
-    const validated = IdleVillageConfigSchema.parse(parsed);
-    const merged = this.mergeWithDefaults(validated);
-    this.save(merged, 'Imported IdleVillageConfig');
-    return merged;
-  }
-
-  private static mergeWithDefaults(config: IdleVillageConfig): IdleVillageConfig {
-    const mergedDeathRules = (() => {
-      const defaultDeathRules = DEFAULT_IDLE_VILLAGE_CONFIG.globalRules.deathRules;
-      const configDeathRules = config.globalRules?.deathRules;
-      if (!defaultDeathRules && !configDeathRules) {
-        return undefined;
-      }
-      return {
-        ...(defaultDeathRules ?? {}),
-        ...(configDeathRules ?? {}),
-      } as NonNullable<IdleVillageConfig['globalRules']['deathRules']>;
-    })();
-
-    return {
-      ...DEFAULT_IDLE_VILLAGE_CONFIG,
-      ...config,
-      resources: {
-        ...DEFAULT_IDLE_VILLAGE_CONFIG.resources,
-        ...config.resources,
-      },
-      passiveEffects: {
-        ...DEFAULT_IDLE_VILLAGE_CONFIG.passiveEffects,
-        ...config.passiveEffects,
-      },
-      mapSlots: {
-        ...DEFAULT_IDLE_VILLAGE_CONFIG.mapSlots,
-        ...config.mapSlots,
-      },
-      mapLayout: config.mapLayout ?? DEFAULT_IDLE_VILLAGE_CONFIG.mapLayout,
-      buildings: {
-        ...DEFAULT_IDLE_VILLAGE_CONFIG.buildings,
-        ...config.buildings,
-      },
-      founders: {
-        ...DEFAULT_IDLE_VILLAGE_CONFIG.founders,
-        ...config.founders,
-      },
-      variance: {
-        difficultyCategories: {
-          ...DEFAULT_IDLE_VILLAGE_CONFIG.variance.difficultyCategories,
-          ...(config.variance?.difficultyCategories ?? {}),
-        },
-        rewardCategories: {
-          ...DEFAULT_IDLE_VILLAGE_CONFIG.variance.rewardCategories,
-          ...(config.variance?.rewardCategories ?? {}),
-        },
-      },
-      globalRules: {
-        ...DEFAULT_IDLE_VILLAGE_CONFIG.globalRules,
-        ...config.globalRules,
-        injuryTiers: {
-          ...(DEFAULT_IDLE_VILLAGE_CONFIG.globalRules.injuryTiers ?? {}),
-          ...(config.globalRules?.injuryTiers ?? {}),
-        },
-        deathRules: mergedDeathRules,
-      },
-      uiPreferences: {
-        ...DEFAULT_IDLE_VILLAGE_CONFIG.uiPreferences,
-        ...(config.uiPreferences ?? {}),
-      },
-    };
-  }
+/**
+ * Result object returned by config mutations when validation occurs.
+ */
+export interface IdleVillageValidationResult {
+  success: boolean;
+  error?: string;
 }
+
+/**
+ * Zustand store shape for the Idle Village configuration editor.
+ */
+interface IdleVillageConfigStoreState {
+  config: IdleVillageConfig;
+  history: IdleVillageConfigSnapshot[];
+  initialized: boolean;
+  isInitializing: boolean;
+  initialConfig?: IdleVillageConfig;
+  error?: string;
+  initializeConfig: () => Promise<void>;
+  saveConfig: (next: IdleVillageConfig, description: string) => IdleVillageValidationResult;
+  updateConfig: (updates: Partial<IdleVillageConfig>) => IdleVillageValidationResult;
+  importConfig: (json: string, description?: string) => IdleVillageValidationResult;
+  exportConfig: () => string;
+  resetConfig: () => IdleVillageValidationResult;
+  resetToInitialConfig: () => IdleVillageValidationResult;
+  undo: () => void;
+}
+
+/**
+ * Captures the current config snapshot and pushes it onto the history stack.
+ */
+const pushHistory = (
+  state: IdleVillageConfigStoreState,
+  description: string,
+): IdleVillageConfigSnapshot[] => {
+  const snapshot: IdleVillageConfigSnapshot = {
+    timestamp: Date.now(),
+    config: clone(state.config),
+    description,
+  };
+  return [snapshot, ...state.history].slice(0, HISTORY_LIMIT);
+};
+
+/**
+ * Parses and validates the given config via the Zod schema, throwing on error.
+ */
+const validateConfig = (config: IdleVillageConfig) => {
+  const result = IdleVillageConfigSchema.safeParse(config);
+  if (!result.success) {
+    throw new Error(result.error.message);
+  }
+  return result.data;
+};
+
+/**
+ * Primary Zustand hook powering the Idle Village config UI/editor flows.
+ */
+export const useIdleVillageConfigStore = create<IdleVillageConfigStoreState>((set, get) => ({
+  config: clone(DEFAULT_IDLE_VILLAGE_CONFIG),
+  history: [],
+  initialized: false,
+  isInitializing: false,
+  error: undefined,
+
+  /**
+   * Lazily loads the config from disk (or defaults) and seeds the store state.
+   */
+  async initializeConfig() {
+    const { initialized, isInitializing } = get();
+    if (initialized || isInitializing) return;
+    set({ isInitializing: true, error: undefined });
+    try {
+      const loaded = await loadFinalConfigFromDisk();
+      set({
+        config: clone(loaded),
+        history: [],
+        initialized: true,
+        isInitializing: false,
+        initialConfig: clone(loaded),
+      });
+    } catch (error) {
+      console.warn('[IdleVillageConfigStore] Failed to load config from disk, using defaults.', error);
+      const fallback = clone(DEFAULT_IDLE_VILLAGE_CONFIG);
+      set({
+        config: fallback,
+        history: [],
+        initialized: true,
+        isInitializing: false,
+        initialConfig: fallback,
+        error: (error as Error)?.message ?? 'Unable to load config from disk',
+      });
+    }
+  },
+
+  /**
+   * Validates and persists the provided config snapshot, recording history.
+   */
+  saveConfig(next, description) {
+    try {
+      const validated = validateConfig(next);
+      set((state) => ({
+        config: clone(validated),
+        history: pushHistory(state, description),
+      }));
+      enqueuePersist(validated);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: (error as Error).message };
+    }
+  },
+
+  /**
+   * Shallow-merges partial updates into the current config via saveConfig.
+   */
+  updateConfig(updates) {
+    const { config } = get();
+    const merged = { ...config, ...updates } as IdleVillageConfig;
+    return get().saveConfig(merged, 'UI update');
+  },
+
+  /**
+   * Imports a JSON string payload and attempts to persist it as the new config.
+   */
+  importConfig(json, description = 'Imported IdleVillageConfig') {
+    try {
+      const parsed = JSON.parse(json) as IdleVillageConfig;
+      return get().saveConfig(parsed, description);
+    } catch (error) {
+      return { success: false, error: (error as Error).message };
+    }
+  },
+
+  /**
+   * Serializes the current config for clipboard/export operations.
+   */
+  exportConfig() {
+    return JSON.stringify(get().config, null, 2);
+  },
+
+  /**
+   * Restores the config to DEFAULT_IDLE_VILLAGE_CONFIG and updates snapshots.
+   */
+  resetConfig() {
+    const defaults = clone(DEFAULT_IDLE_VILLAGE_CONFIG);
+    const result = get().saveConfig(defaults, 'Reset IdleVillageConfig to defaults');
+    if (result.success) {
+      set({ initialConfig: clone(defaults) });
+    }
+    return result;
+  },
+
+  /**
+   * Restores the config to the first loaded snapshot captured on initialization.
+   */
+  resetToInitialConfig() {
+    const { initialConfig } = get();
+    if (!initialConfig) {
+      return { success: false, error: 'Initial config snapshot not available.' };
+    }
+    return get().saveConfig(clone(initialConfig), 'Reset IdleVillageConfig to initial snapshot');
+  },
+
+  /**
+   * Reverts the config to the most recent history entry and persists it.
+   */
+  undo() {
+    const { history } = get();
+    if (history.length === 0) return;
+    const [previous, ...rest] = history;
+    set({ config: clone(previous.config), history: rest });
+    enqueuePersist(previous.config);
+  },
+}));

@@ -74,6 +74,7 @@ export function buildActivityBlueprintSummary(params: {
   const isJob = activity.tags?.includes('job') ?? false;
   const rewardsLabel = formatRewardLabel(activity.rewards, resourceLabeler);
   const { injury, death } = deriveRisk(activity);
+  const deathPercentage = death;
   const autoState = deriveAutoState(activity);
   const maxCrew =
     ((activity.metadata ?? {}) as { maxCrewSize?: number })?.maxCrewSize ?? (activity.slotTags?.length ? activity.slotTags.length : 1);
@@ -95,14 +96,14 @@ export function buildActivityBlueprintSummary(params: {
     totalDurationSeconds: 0,
     remainingSeconds: 0,
     injuryPercentage: injury,
-    deathPercentage: death,
+    deathPercentage,
     assignedCount: 0,
     totalSlots: maxCrew,
     rewardLabel: rewardsLabel,
     tone,
     deadlineLabel: null,
     assigneeNames: [],
-    riskLabel: createRiskLabel(injury, death),
+    riskLabel: createRiskLabel(injury, deathPercentage),
     notes: activity.description ?? null,
     autoState,
     };
@@ -356,7 +357,7 @@ export function buildScheduledVerbSummary(params: {
     totalDurationSeconds,
     remainingSeconds,
     injuryPercentage: injury,
-    deathPercentage: death,
+    deathPercentage,
     assignedCount,
     totalSlots,
     rewardLabel: rewardsLabel,

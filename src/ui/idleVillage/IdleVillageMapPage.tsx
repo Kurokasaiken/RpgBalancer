@@ -193,19 +193,6 @@ const validateAssignment = (params: {
   return { ok: true };
 };
 
-const pickPriorityVerb = (verbs: VerbSummary[]): VerbSummary | null => {
-  if (!verbs.length) return null;
-  const sorted = [...verbs].sort((a, b) => {
-    const aRemaining = Number.isFinite(a.remainingSeconds) ? a.remainingSeconds : Number.MAX_SAFE_INTEGER;
-    const bRemaining = Number.isFinite(b.remainingSeconds) ? b.remainingSeconds : Number.MAX_SAFE_INTEGER;
-    if (aRemaining === bRemaining) {
-      return (b.deadlineLabel ? 1 : 0) - (a.deadlineLabel ? 1 : 0);
-    }
-    return aRemaining - bRemaining;
-  });
-  return sorted[0] ?? null;
-};
-
 const IdleVillageMapPage: React.FC = () => {
   const { config } = useIdleVillageConfig();
   const defaultFounderPreset = useMemo(() => selectDefaultFounder(config), [config]);

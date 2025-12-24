@@ -159,6 +159,23 @@
 
 ---
 
+## Phase 12.E – Atomic Sandbox (Village Sandbox Refactor)
+
+> Implementation detail: `docs/plans/idle_village_atomic_sandbox_plan.md`
+
+- [ ] **Config knobs:** Estendere `IdleVillageConfig` (types + Zod + defaultConfig) con hero threshold, risk multiplier `k`, HP/Fatica recovery rates e density thresholds.
+- [ ] **UI wiring:** Aggiornare `IdleVillageGlobalRulesTab.tsx` per esporre i nuovi controlli con copy contestuale e parsing/clamp condiviso.
+- [ ] **Engine math:** Allineare `TimeEngine.ts` (`applyTrialOfFireStatBonus`, `resolveActivityOutcome`, `tickIdleVillage`) alla formula `Stat_new = Stat_old * (1 + risk × k)` + recovery config-driven.
+- [ ] **SandboxEngine:** Creare servizio/hook sotto `src/ui/idleVillage/engine/` che bootstrappa `createVillageStateFromConfig`, gestisce `tickIdleVillage`, e fornisce percentuali/testi al layer UI.
+- [ ] **UI harness:** Rifattorizzare `VillageSandbox.tsx`, `WorkerCard.tsx`, `ActivitySlot.tsx`, `VerbDetailCard` usage per leggere unicamente i dati derivati dal SandboxEngine (niente mock locali).
+- [ ] **Density & bloom:** Introdurre hook/componenti per clustering (VerbCard inline vs Medaglione), bloom compatibile solo quando il worker soddisfa requirement/fatica.
+- [ ] **DnD hardening:** Consolidare MIME (`RESIDENT_DRAG_MIME` → `text/resident-id`), rimuovere `pointer-events-none` superflui, auditare z-index tra mappa/Theater.
+- [ ] **Theater overlay:** Assicurare che il modal fisso filtri verbs per `slotId`, mostri bande rischio giallo/rosso e richiami i drop handler condivisi.
+- [ ] **Testing:** Aggiungere test Vitest (hero threshold, recovery, density) + Playwright scenario (drag compatibile → bloom → Theater → resolve reale).
+- [ ] **Docs:** Aggiornare `MASTER_PLAN.md` e questo checklist ogni volta che la milestone avanza.
+
+---
+
 ## Meta
 
 - [ ] Link this file and `idle_village_plan.md` from `MASTER_PLAN.md`

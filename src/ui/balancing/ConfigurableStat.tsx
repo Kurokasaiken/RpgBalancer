@@ -3,65 +3,18 @@ import type { StatDefinition } from '../../balancing/config/types';
 import { FormulaEditor } from './FormulaEditor';
 import { executeFormula } from '../../balancing/config/FormulaEngine';
 import {
-  Swords, Shield, Heart, Zap, Flame, Droplets, Snowflake, Wind, Skull,
-  Crosshair, Hourglass, Crown, Gem, Scroll, Wand2, Axe, Hammer, Feather,
-  Sun, Moon, Star, Ghost, BookOpen, Eye, Lock, Unlock, RotateCcw, Edit2,
-  Trash2, Check, X, Plus, Minus
+  Eye,
+  Lock,
+  Unlock,
+  RotateCcw,
+  Edit2,
+  Trash2,
+  Check,
+  X,
+  Plus,
+  Minus,
 } from 'lucide-react';
-import type { ElementType } from 'react';
-
-const lucideStatIcons: Record<string, ElementType> = {
-  swords: Swords,
-  shield: Shield,
-  heart: Heart,
-  zap: Zap,
-  flame: Flame,
-  droplets: Droplets,
-  snowflake: Snowflake,
-  wind: Wind,
-  skull: Skull,
-  crosshair: Crosshair,
-  hourglass: Hourglass,
-  crown: Crown,
-  gem: Gem,
-  scroll: Scroll,
-  wand: Wand2,
-  axe: Axe,
-  hammer: Hammer,
-  feather: Feather,
-  sun: Sun,
-  moon: Moon,
-  star: Star,
-  ghost: Ghost,
-  book: BookOpen,
-};
-
-const statGlyphMap: Record<string, string> = {
-  hp: '❤',
-  damage: '⚔️',
-  htk: '♜',
-  txc: '🎯',
-  evasion: '🌀',
-  hitChance: '％',
-  attacksPerKo: '⚖️',
-  critChance: '✦',
-  critMult: '✪',
-  critTxCBonus: '➕',
-  failChance: '⚠️',
-  failMult: '⭘',
-  failTxCMalus: '➖',
-  ward: '🛡️',
-  armor: '⛨',
-  resistance: '🜃',
-  armorPen: '⛏️',
-  penPercent: '⤓',
-  effectiveDamage: '🔥',
-  lifesteal: '🌿',
-  regen: '💧',
-  ttk: '⏳',
-  edpt: '📈',
-  earlyImpact: '⚡',
-};
+import { getStatGlyph, lucideStatIcons } from '../shared/statIconUtils';
 
 interface Props {
   stat: StatDefinition;
@@ -117,7 +70,7 @@ export const ConfigurableStat: React.FC<Props> = ({
   const isHidden = !!stat.isHidden;
 
   const LucideIcon = stat.icon ? lucideStatIcons[stat.icon] : undefined;
-  const fallbackGlyph = statGlyphMap[stat.id] ?? '◆';
+  const fallbackGlyph = getStatGlyph(stat.id);
 
   // For derived stats, calculate value from formula; otherwise use simValue
   // If locked, use simValue (frozen value); if not locked and derived, calculate from formula

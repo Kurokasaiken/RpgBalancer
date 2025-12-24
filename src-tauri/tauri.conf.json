@@ -43,5 +43,33 @@
         "security": {
             "csp": null
         }
+    },
+    "plugins": {
+        "core": {
+            "fs": {
+                "scope": [
+                    "$RESOURCE/**",
+                    "$APPDATA/**",
+                    "$APP/**",
+                    "$HOME/**",
+                    "$CWD/**"
+                ],
+                "readTextFile": true,
+                "writeTextFile": true
+            },
+            "path": {
+                "scope": [
+                    "$RESOURCE/**",
+                    "$APPDATA/**",
+                    "$APP/**",
+                    "$HOME/**",
+                    "$CWD/**"
+                ],
+                "resolve": true,
+                "resolveDirectory": true,
+                "join": true,
+                "normalize": true
+            }
+        }
     }
 }

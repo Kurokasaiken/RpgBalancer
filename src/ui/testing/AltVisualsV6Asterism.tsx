@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { deriveAxisValues, randomizeAxisValues } from './altVisualsAxis';
+import { deriveAxisValues, deriveAxisMeta, randomizeAxisValues } from './altVisualsAxis';
+import type { AxisMetaEntry } from './altVisualsAxis';
 import type { StatRow } from './types';
 
 const AXES = 5;
@@ -30,6 +31,7 @@ const VISUAL_CONFIG = {
     pinballFriction: 0.985,
   },
   colors: {
+    background: '#3a3c42',
     pentagonFill: '#050505',
     pentagonGlow: 'rgba(20,20,30,0.85)',
     starFill: '#fdd97b',
@@ -43,6 +45,17 @@ const VISUAL_CONFIG = {
     enemyText: '#9387ff',
     playerText: '#8cf8d5',
     flash: 'rgba(255,255,255,0.8)',
+    obeliskEnemy: {
+      base: '#1f1f2b',
+      highlight: '#6c6c88',
+      shadow: '#0b0b10',
+    },
+    obeliskPlayer: {
+      base: '#fdfbe7',
+      highlight: '#ffffff',
+      shadow: '#e8e4c9',
+    },
+    obeliskEdgeGlow: '#ffd08a',
   },
 } as const;
 
@@ -166,6 +179,7 @@ interface InternalState {
   tarPuddle: MorphShapeState;
   goldStar: MorphShapeState;
   ball: BallState;
+  axisMeta: AxisMetaEntry[];
   baseEnemyValues: number[];
   basePlayerValues: number[];
   enemyStatValues: number[];
@@ -187,7 +201,13 @@ interface InternalState {
   successRoll: number | null;
 }
 
-const STAT_ICONS = ['💪', '⚡', '🧠', '🛡️', '❤️'];
+const FALLBACK_AXIS_META: AxisMetaEntry[] = [
+  { name: 'Forza', icon: '💪' },
+  { name: 'Velocità', icon: '⚡' },
+  { name: 'Intelletto', icon: '🧠' },
+  { name: 'Difesa', icon: '🛡️' },
+  { name: 'Vita', icon: '❤️' },
+] as const;
 
 const FALLBACK_AXIS_VALUES = {
   enemy: [65, 58, 60, 55, 62],
@@ -197,9 +217,16 @@ const FALLBACK_AXIS_VALUES = {
 interface AltVisualsV6AsterismProps {
   stats: StatRow[];
   controlsPortal?: HTMLElement | null;
+  axisMeta?: AxisMetaEntry[];
+  enablePerfectStarToggle?: boolean;
 }
 
-export function AltVisualsV6Asterism({ stats, controlsPortal }: AltVisualsV6AsterismProps) {
+export function AltVisualsV6Asterism({
+  stats,
+  controlsPortal,
+  axisMeta,
+  enablePerfectStarToggle = true,
+}: AltVisualsV6AsterismProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const checkboxRef = useRef<HTMLInputElement | null>(null);
   const debugPanelRef = useRef<HTMLDivElement | null>(null);
@@ -213,19 +240,29 @@ export function AltVisualsV6Asterism({ stats, controlsPortal }: AltVisualsV6Aste
     () => randomizeAxisValues(baseAxisValues, { min: 25, max: 95, variance: 35 }),
     [baseAxisValues, sceneRunId],
   );
+  const resolvedAxisMeta = useMemo(
+    () => (axisMeta && axisMeta.length ? axisMeta : deriveAxisMeta(stats, FALLBACK_AXIS_META, AXES)),
+    [axisMeta, stats],
+  );
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const checkbox = checkboxRef.current;
     if (!canvas || !checkbox) return;
 
-    const controller = initAltVisualsV6(canvas, checkbox, debugPanelRef.current, axisValues);
+    const controller = initAltVisualsV6(
+      canvas,
+      enablePerfectStarToggle ? checkbox : null,
+      debugPanelRef.current,
+      axisValues,
+      resolvedAxisMeta,
+    );
     rerollRef.current = controller.rerollDice;
     return () => {
       rerollRef.current = null;
       controller.cleanup();
     };
-  }, [axisValues, sceneRunId]);
+  }, [axisValues, resolvedAxisMeta, sceneRunId, enablePerfectStarToggle]);
 
   const handleRestart = () => {
     setSceneRunId((prev) => prev + 1);
@@ -251,10 +288,12 @@ export function AltVisualsV6Asterism({ stats, controlsPortal }: AltVisualsV6Aste
       >
         Ritira dado
       </button>
-      <label className="flex items-center gap-3 px-4 py-2 rounded-full border border-slate-800 bg-slate-900/60 text-[10px] uppercase tracking-[0.2em] text-cyan-200 hover:bg-slate-800 transition-colors cursor-pointer">
-        <input ref={checkboxRef} type="checkbox" className="size-4 accent-amber-400 rounded border border-slate-500 cursor-pointer" />
-        Stella Perfetta (Test Mode)
-      </label>
+      {enablePerfectStarToggle && (
+        <label className="flex items-center gap-3 px-4 py-2 rounded-full border border-slate-800 bg-slate-900/60 text-[10px] uppercase tracking-[0.2em] text-cyan-200 hover:bg-slate-800 transition-colors cursor-pointer">
+          <input ref={checkboxRef} type="checkbox" className="size-4 accent-amber-400 rounded border border-slate-500 cursor-pointer" />
+          Stella Perfetta (Test Mode)
+        </label>
+      )}
     </div>
   );
 
@@ -289,10 +328,11 @@ export default AltVisualsV6Asterism;
 
 function initAltVisualsV6(
   canvas: HTMLCanvasElement,
-  checkbox: HTMLInputElement,
+  checkbox: HTMLInputElement | null,
   _debugPanel: HTMLDivElement | null | undefined,
   axisValues: { enemy: number[]; player: number[] },
-) : AltVisualsController {
+  axisMeta: AxisMetaEntry[],
+): AltVisualsController {
   const ctx = canvas.getContext('2d', { alpha: false });
   if (!ctx)
     return {
@@ -328,6 +368,7 @@ function initAltVisualsV6(
       guidanceStartY: 320,
       hasSettled: false,
     },
+    axisMeta,
     baseEnemyValues: [...axisValues.enemy],
     basePlayerValues: [...axisValues.player],
     enemyStatValues: [],
@@ -355,8 +396,12 @@ function initAltVisualsV6(
     resetAnimation(internalState);
   };
 
-  checkbox.checked = false;
-  checkbox.addEventListener('change', handleCheckboxChange);
+  if (checkbox) {
+    checkbox.checked = false;
+    checkbox.addEventListener('change', handleCheckboxChange);
+  } else {
+    internalState.usePerfectStar = false;
+  }
   resetAnimation(internalState);
 
   const drawLoop = () => {
@@ -378,7 +423,7 @@ function initAltVisualsV6(
 
     // Drawing
     ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
-    ctx.fillStyle = '#05060f'; // Manual clear with bg color
+    ctx.fillStyle = VISUAL_CONFIG.colors.background; // Manual clear with bg color
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Apply Shake
@@ -421,7 +466,9 @@ function initAltVisualsV6(
 
   const cleanup = () => {
     if (internalState.animationFrameId !== null) cancelAnimationFrame(internalState.animationFrameId);
-    checkbox.removeEventListener('change', handleCheckboxChange);
+    if (checkbox) {
+      checkbox.removeEventListener('change', handleCheckboxChange);
+    }
   };
 
   return { cleanup, rerollDice };
@@ -476,6 +523,7 @@ function resetAnimation(state: InternalState) {
     guidanceDuration: 0,
     guidanceStartX: 320,
     guidanceStartY: 320,
+    hasSettled: false,
   };
 
   state.successChance = calculateSuccessChance(state);
@@ -818,12 +866,13 @@ function drawStatOverlay(ctx: CanvasRenderingContext2D, state: InternalState) {
     const labelRadius = RADIUS + 36;
     const iconX = center.x + Math.cos(angle) * labelRadius;
     const iconY = center.y + Math.sin(angle) * labelRadius;
-
+    const axisEntry = state.axisMeta[i] ?? FALLBACK_AXIS_META[i % FALLBACK_AXIS_META.length];
+    const axisIcon = axisEntry?.icon ?? '◆';
     ctx.font = `600 24px 'Space Grotesk', system-ui`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = '#f8fafc';
-    ctx.fillText(STAT_ICONS[i], iconX, iconY);
+    ctx.fillText(axisIcon, iconX, iconY);
 
     const textY = iconY + 20;
     const playerVal = Math.round(state.playerStatValues[i] ?? 0);
@@ -863,11 +912,12 @@ function drawBall(ctx: CanvasRenderingContext2D, state: InternalState) {
   ctx.restore();
 
   if (state.ball.stopped) {
-    ctx.fillStyle = state.ball.success ? VISUAL_CONFIG.colors.playerPillarStroke : VISUAL_CONFIG.colors.particle;
+    const endColor = state.ball.success ? VISUAL_CONFIG.colors.obeliskEdgeGlow : '#ff6b6b';
+    ctx.fillStyle = endColor;
     ctx.font = 'bold 26px "Space Grotesk", system-ui';
     ctx.textAlign = 'center';
-    ctx.shadowColor = ctx.fillStyle;
-    ctx.shadowBlur = 22;
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
     ctx.fillText(state.ball.success ? 'SUCCESSO! ✓' : 'FALLITO ✗', canvasCenter(state).x, canvasCenter(state).y - 100);
   }
 }
@@ -875,53 +925,113 @@ function drawBall(ctx: CanvasRenderingContext2D, state: InternalState) {
 function drawPillars(ctx: CanvasRenderingContext2D, state: InternalState) {
   const center = canvasCenter(state);
 
-  const drawColumn = (pillar: PillarState, colorFill: string, colorStroke: string) => {
+  const drawObelisk = (
+    pillar: PillarState,
+    palette: { base: string; highlight: string; shadow: string },
+    glowColor: string,
+  ) => {
     const dx = Math.cos(pillar.angle);
     const dy = Math.sin(pillar.angle);
     const px = center.x + dx * pillar.finalRadius;
     const py = center.y + dy * pillar.finalRadius;
-
-    // Calculate visual position with height offset
     const visualY = py - pillar.currentHeight;
     const isFalling = pillar.currentHeight > 0;
+    const width = 24 + pillar.finalRadius * 0.02;
+    const height = 60 + pillar.finalRadius * 0.04;
 
     ctx.save();
 
-    // Shadow on ground
-    if (isFalling) {
-      ctx.fillStyle = 'rgba(0,0,0,0.5)';
-      ctx.beginPath();
-      ctx.ellipse(px, py, 12 * (1 - pillar.currentHeight / 500), 6 * (1 - pillar.currentHeight / 500), 0, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // Column Body
-    ctx.fillStyle = colorFill;
-    ctx.strokeStyle = colorStroke;
-    ctx.lineWidth = 2;
-    ctx.shadowColor = colorStroke;
-    ctx.shadowBlur = isFalling ? 20 : 12;
-
+    // Ground shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
     ctx.beginPath();
-    ctx.arc(px, visualY, 12, 0, Math.PI * 2);
+    ctx.ellipse(px, py, width * 0.55, width * 0.25, 0, 0, Math.PI * 2);
     ctx.fill();
-    ctx.stroke();
 
-    // Trail
+    // Falling trail
     if (isFalling) {
+      const trailGradient = ctx.createLinearGradient(px, visualY - height, px, visualY);
+      trailGradient.addColorStop(0, `${glowColor}55`);
+      trailGradient.addColorStop(1, 'transparent');
+      ctx.fillStyle = trailGradient;
       ctx.beginPath();
-      ctx.moveTo(px - 8, visualY);
-      ctx.lineTo(px, visualY - 40);
-      ctx.lineTo(px + 8, visualY);
-      ctx.fillStyle = isFalling ? `rgba(255,255,255,0.2)` : 'transparent';
+      ctx.moveTo(px - width * 0.35, visualY - height * 0.4);
+      ctx.lineTo(px, visualY - height - 50);
+      ctx.lineTo(px + width * 0.35, visualY - height * 0.4);
+      ctx.closePath();
+      ctx.globalAlpha = 0.5;
       ctx.fill();
+      ctx.globalAlpha = 1;
     }
+
+    // Side face (shadow)
+    const sidePath = new Path2D();
+    sidePath.moveTo(px, visualY + 12);
+    sidePath.lineTo(px - width * 0.5, visualY);
+    sidePath.lineTo(px - width * 0.5, visualY - height);
+    sidePath.lineTo(px, visualY - height + 12);
+    sidePath.closePath();
+    const sideGradient = ctx.createLinearGradient(px - width * 0.5, visualY - height, px - width * 0.5, visualY);
+    sideGradient.addColorStop(0, palette.shadow);
+    sideGradient.addColorStop(1, palette.base);
+    ctx.fillStyle = sideGradient;
+    ctx.fill(sidePath);
+
+    // Front face
+    const frontPath = new Path2D();
+    frontPath.moveTo(px, visualY + 12);
+    frontPath.lineTo(px + width * 0.5, visualY);
+    frontPath.lineTo(px + width * 0.5, visualY - height);
+    frontPath.lineTo(px, visualY - height + 12);
+    frontPath.closePath();
+    const frontGradient = ctx.createLinearGradient(px - width * 0.5, visualY - height, px + width * 0.5, visualY);
+    frontGradient.addColorStop(0, palette.highlight);
+    frontGradient.addColorStop(0.5, palette.base);
+    frontGradient.addColorStop(1, palette.shadow);
+    ctx.fillStyle = frontGradient;
+    ctx.fill(frontPath);
+
+    // Top facet
+    const topGradient = ctx.createRadialGradient(px, visualY - height - 6, 0, px, visualY - height - 6, width);
+    topGradient.addColorStop(0, palette.highlight);
+    topGradient.addColorStop(1, palette.base);
+    ctx.fillStyle = topGradient;
+    ctx.beginPath();
+    ctx.moveTo(px, visualY - height + 12);
+    ctx.lineTo(px - width * 0.5, visualY - height);
+    ctx.lineTo(px, visualY - height - 12);
+    ctx.lineTo(px + width * 0.5, visualY - height);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.shadowColor = glowColor;
+    ctx.shadowBlur = isFalling ? 16 : 8;
+    ctx.strokeStyle = glowColor;
+    ctx.lineWidth = 1;
+    ctx.stroke(frontPath);
 
     ctx.restore();
   };
 
-  state.enemyPillars.forEach(p => drawColumn(p, VISUAL_CONFIG.colors.enemyPillarFill, VISUAL_CONFIG.colors.enemyPillarStroke));
-  state.playerPillars.forEach(p => drawColumn(p, VISUAL_CONFIG.colors.playerPillarFill, VISUAL_CONFIG.colors.playerPillarStroke));
+  const combinedPillars = [
+    ...state.enemyPillars.map((pillar) => ({
+      pillar,
+      palette: VISUAL_CONFIG.colors.obeliskEnemy,
+      glow: VISUAL_CONFIG.colors.obeliskEdgeGlow,
+    })),
+    ...state.playerPillars.map((pillar) => ({
+      pillar,
+      palette: VISUAL_CONFIG.colors.obeliskPlayer,
+      glow: VISUAL_CONFIG.colors.obeliskEdgeGlow,
+    })),
+  ];
+
+  combinedPillars
+    .sort((a, b) => {
+      const visualYA = center.y + Math.sin(a.pillar.angle) * a.pillar.finalRadius - a.pillar.currentHeight;
+      const visualYB = center.y + Math.sin(b.pillar.angle) * b.pillar.finalRadius - b.pillar.currentHeight;
+      return visualYA - visualYB;
+    })
+    .forEach(({ pillar, palette, glow }) => drawObelisk(pillar, palette, glow));
 }
 
 
@@ -1220,10 +1330,6 @@ function startBallLaunch(state: InternalState, options: { skipReadinessCheck?: b
   const launchSpeed = state.ball.speed * 1.4;
   state.ball.vx = Math.cos(launchAngle) * launchSpeed;
   state.ball.vy = Math.sin(launchAngle) * launchSpeed;
-}
-
-function lerp(a: number, b: number, t: number) {
-  return a + (b - a) * t;
 }
 
 function randomPointInsidePolygon(

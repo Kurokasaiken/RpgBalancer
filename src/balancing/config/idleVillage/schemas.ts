@@ -27,6 +27,12 @@ export const StatRequirementSchema = z.object({
   label: z.string().optional(),
 });
 
+const SlotModifierSchema = z.object({
+  fatigueMult: z.number().optional(),
+  riskMult: z.number().optional(),
+  yieldMult: z.number().optional(),
+});
+
 export const ActivityDefinitionSchema = z
   .object({
     id: z.string().min(1),
@@ -47,6 +53,8 @@ export const ActivityDefinitionSchema = z
     allowedDifficultyCategoryIds: z.array(z.string()).optional(),
     allowedRewardCategoryIds: z.array(z.string()).optional(),
     metadata: z.record(z.string(), z.unknown()).optional(),
+    maxSlots: z.union([z.number().int().min(1), z.literal('infinite')]).optional(),
+    slotModifiers: z.record(z.string(), SlotModifierSchema).optional(),
   });
 
 

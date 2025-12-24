@@ -52,6 +52,25 @@ export interface StatRequirement {
  * Generic activity definition. Covers jobs, quests, training, shop actions, etc.
  * Semantic meaning is derived from tags + resolutionEngineId, not from enums.
  */
+export type ActivityMaxSlots = number | 'infinite';
+
+export interface ActivitySlotModifier {
+  /**
+   * Multiplier applied to fatigue accumulation for residents occupying this slot.
+   */
+  fatigueMult?: number;
+  /**
+   * Multiplier applied to injury/risk calculations for this slot.
+   */
+  riskMult?: number;
+  /**
+   * Multiplier applied to resource yields for this slot.
+   */
+  yieldMult?: number;
+}
+
+export type ActivitySlotModifierMap = Record<number, ActivitySlotModifier>;
+
 export interface ActivityDefinition {
   id: string;
   label: string;
@@ -113,6 +132,16 @@ export interface ActivityDefinition {
 
   /** Open extension point for domain-specific data */
   metadata?: Record<string, unknown>;
+  /**
+   * Maximum concurrent residents that can occupy this activity.
+   * Use 'infinite' to preserve the legacy "no limit" behavior.
+   */
+  maxSlots?: ActivityMaxSlots;
+  /**
+   * Optional per-slot modifiers applied when residents occupy a specific slot index.
+   * Keys are zero-based slot indexes.
+   */
+  slotModifiers?: ActivitySlotModifierMap;
 }
 
 export interface ActivityRollCategory {

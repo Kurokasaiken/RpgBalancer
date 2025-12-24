@@ -96,7 +96,9 @@ Example:
 │ Phase 10: Config Balancer 🔥 ACTIVE  ~140 tasks     │
 │ Phase 10.5: Stat Testing  🔥 NEXT    ~80 tasks      │
 │ Phase 11: Tactical Miss.  📋 TODO    ~100 tasks     │
-│ Phase 12: Idle Incremental RPG    📋 TODO    ~120 tasks     │
+│- **Phase 12: Idle Incremental RPG – Implementation Plan** (`docs/plans/idle_village_plan.md`)
+- **Phase 12.E: Atomic Sandbox Refactor** (`docs/plans/idle_village_atomic_sandbox_plan.md`, tasks in `docs/plans/idle_village_tasks.md#phase-12e`)
+ │
 ├──────────────────────────────────────────────────────┤
 │ TOTAL PROGRESS: ███████████████░░░░░ 75%            │
 └──────────────────────────────────────────────────────┘
@@ -386,15 +388,20 @@ Expand combat system from 1v1 to full tactical grid-based multi-unit combat:
 
 ## 🎯 CURRENT FOCUS
 
-### 🚨 **PRIORITY FIX: Balancer UI Bugs (BLOCKING)**
+### 🧹 **SAFE Cleanup Audit (24 Dec 2025)**
 
-**Status:** 🔥 CRITICO - Blocca usabilità  
-**Priority:** Massima  
-**Effort:** 4-6 ore
+**Status:** ✅ COMPLETED  
+**Scope:** Phases 1-3 (Audit + Asset relocation + Build fix)
 
 | Document | Purpose |
 |----------|---------|
-| **📋 Fix Plan** | [plans/balancer_ui_fix_plan.md](plans/balancer_ui_fix_plan.md) |
+| **📋 Report** | [docs/reports/safe-audit-2025-12-24.md](../docs/reports/safe-audit-2025-12-24.md) |
+
+**Highlights:**
+- Orphaned mockups/legacy Gilded components spostati in `_OLD_DEPRECATED/…`.
+- Idle Village fallback residents + VerbDetail sandbox ora generano `ResidentState` validi.
+- AltVisuals V6 ripristinato con schema axisMeta + `hasSettled`.
+- Build `npm run build` pulita (warn asset size solo informativi).
 
 **Problemi da risolvere:**
 1. ❌ Reset non funziona (card, stat, pagina)

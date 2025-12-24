@@ -100,9 +100,16 @@ export default function VerbDetailSandbox() {
   const residentPool = useMemo<ResidentState[]>(() => {
     return VERB_SANDBOX_PRESET.residents.map((preset) => ({
       id: preset.id,
+      displayName: preset.id,
       status: preset.status,
       fatigue: preset.fatigue,
       statTags: preset.statTags,
+      currentHp: 100,
+      maxHp: 100,
+      isHero: false,
+      isInjured: false,
+      survivalCount: 0,
+      survivalScore: 0,
     }));
   }, []);
   const initialSlots = useMemo<VerbSlotState[]>(

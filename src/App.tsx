@@ -13,16 +13,7 @@ import { AutoBalancerWrapper } from './ui/balancing/autobalancer/AutoBalancerWra
 import { CharacterCreator } from './ui/character/CharacterCreator';
 import { FantasyLayout } from './ui/fantasy/FantasyLayout';
 import { FantasySpellCreation } from './ui/fantasy/FantasySpellCreation';
-import { ArcaneTechGlass } from './ui/fantasy/mockups/ArcaneTechGlass';
-import { GildedObservatory } from './ui/fantasy/mockups/GildedObservatory';
 import { SpellCreatorNew } from './ui/spells/SpellCreatorNew';
-import { ObsidianSanctum } from './ui/fantasy/mockups/ObsidianSanctum';
-import { AuroraWorkshop } from './ui/fantasy/mockups/AuroraWorkshop';
-import { AetherBrassLab } from './ui/fantasy/mockups/AetherBrassLab';
-import { QuantumScriptorium } from './ui/fantasy/mockups/QuantumScriptorium';
-import { MidnightMeridian } from './ui/fantasy/mockups/MidnightMeridian';
-import { SeraphimArchive } from './ui/fantasy/mockups/SeraphimArchive';
-import { VerdantAlloyDeck } from './ui/fantasy/mockups/VerdantAlloyDeck';
 import { TacticalLab } from './ui/tactical/TacticalLab';
 import IdleVillageMapPage from './ui/idleVillage/IdleVillageMapPage';
 import IdleVillageConfigRoute from './pages/idle-village-config';
@@ -203,51 +194,6 @@ function App() {
             <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Village Sandbox…</div>}>
               <VillageSandbox />
             </Suspense>
-          </ErrorBoundary>
-        )}
-        {activeTab === 'mockArcaneTech' && (
-          <ErrorBoundary componentName="Arcane Tech Glass">
-            <ArcaneTechGlass />
-          </ErrorBoundary>
-        )}
-        {activeTab === 'mockGildedObservatory' && (
-          <ErrorBoundary componentName="Gilded Observatory">
-            <GildedObservatory />
-          </ErrorBoundary>
-        )}
-        {activeTab === 'mockObsidianSanctum' && (
-          <ErrorBoundary componentName="Obsidian Sanctum">
-            <ObsidianSanctum />
-          </ErrorBoundary>
-        )}
-        {activeTab === 'mockAuroraWorkshop' && (
-          <ErrorBoundary componentName="Aurora Workshop">
-            <AuroraWorkshop />
-          </ErrorBoundary>
-        )}
-        {activeTab === 'mockAetherBrass' && (
-          <ErrorBoundary componentName="Aether Brass Lab">
-            <AetherBrassLab />
-          </ErrorBoundary>
-        )}
-        {activeTab === 'mockQuantumScriptorium' && (
-          <ErrorBoundary componentName="Quantum Scriptorium">
-            <QuantumScriptorium />
-          </ErrorBoundary>
-        )}
-        {activeTab === 'mockMidnightMeridian' && (
-          <ErrorBoundary componentName="Midnight Meridian">
-            <MidnightMeridian />
-          </ErrorBoundary>
-        )}
-        {activeTab === 'mockSeraphimArchive' && (
-          <ErrorBoundary componentName="Seraphim Archive">
-            <SeraphimArchive />
-          </ErrorBoundary>
-        )}
-        {activeTab === 'mockVerdantAlloy' && (
-          <ErrorBoundary componentName="Verdant Alloy Deck">
-            <VerdantAlloyDeck />
           </ErrorBoundary>
         )}
         {activeTab === 'tacticalLab' && (
