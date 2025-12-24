@@ -47,6 +47,7 @@ const StatStressTestingPage = lazy(() =>
   import('./ui/testing/StatStressTestingPage').then((m) => ({ default: m.StatStressTestingPage }))
 );
 const VillageSandbox = lazy(() => import('./ui/idleVillage/VillageSandbox'));
+const QuestChronicleSandbox = lazy(() => import('./ui/idleVillage/QuestChronicleSandbox'));
 const ArchetypeTestingLab = lazy(() =>
   import('./ui/balancing/ArchetypeTestingLab').then((m) => ({ default: m.ArchetypeTestingLab }))
 );
@@ -247,6 +248,17 @@ function App() {
         {activeTab === 'tacticalLab' && (
           <ErrorBoundary componentName="Tactical Lab">
             <TacticalLab />
+          </ErrorBoundary>
+        )}
+        {activeTab === 'questChronicleSandbox' && (
+          <ErrorBoundary componentName="Quest Chronicle Sandbox">
+            {idleVillageReady ? (
+              <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Quest Chronicle Sandbox…</div>}>
+                <QuestChronicleSandbox />
+              </Suspense>
+            ) : (
+              idleVillageLoadingFallback
+            )}
           </ErrorBoundary>
         )}
       </FantasyLayout>

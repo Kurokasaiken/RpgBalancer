@@ -19,6 +19,7 @@ export const APP_NAV_TAB_IDS = [
   'idleVillageMap',
   'idleVillageConfig',
   'villageSandbox',
+  'questChronicleSandbox',
   'skillCheckPreview',
   'verbDetailSandbox',
   'moodboard',
@@ -60,6 +61,7 @@ const NAV_ITEM_MAP: Record<AppNavTabId, AppNavItem> = {
   idleVillageMap: { id: 'idleVillageMap', label: 'Idle Village', icon: '🏘️' },
   idleVillageConfig: { id: 'idleVillageConfig', label: 'Village Config', icon: '⚙️' },
   villageSandbox: { id: 'villageSandbox', label: 'Village Sandbox', icon: '🏗️' },
+  questChronicleSandbox: { id: 'questChronicleSandbox', label: 'Quest Chronicle', icon: '📜' },
   skillCheckPreview: { id: 'skillCheckPreview', label: 'Skill Check', icon: '🎯' },
   verbDetailSandbox: { id: 'verbDetailSandbox', label: 'Verb Detail', icon: '📝' },
   moodboard: { id: 'moodboard', label: 'Moodboard', icon: '🖼️' },
@@ -88,7 +90,7 @@ const NAV_SECTION_DEFS: { title: string; itemIds: AppNavTabId[] }[] = [
   },
   {
     title: 'Idle Village',
-    itemIds: ['idleVillageConfig', 'villageSandbox', 'verbDetailSandbox'],
+    itemIds: ['idleVillageConfig', 'villageSandbox', 'questChronicleSandbox', 'verbDetailSandbox'],
   },
   {
     title: 'Archetypes',

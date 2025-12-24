@@ -1,0 +1,119 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - main [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e8]:
+          - generic [ref=e9]: ✶
+          - generic [ref=e10]: Main navigation
+        - button "▪" [ref=e11]
+      - generic [ref=e15]:
+        - generic [ref=e17]:
+          - generic [ref=e18]:
+            - paragraph [ref=e19]: Style Laboratory
+            - paragraph [ref=e20]: Frontier · Bronze frontier palette inspired by the Gilded Observatory baseline.
+          - generic [ref=e21]:
+            - button "Frontier" [ref=e22]
+            - button "Obsidian" [ref=e23]
+            - button "Ethereal" [ref=e24]
+            - button "Randomize" [ref=e25]
+        - generic [ref=e26]:
+          - generic [ref=e27]:
+            - paragraph [ref=e28]: Village Sandbox
+            - heading "Frontier — Atomic Layer" [level=1] [ref=e29]
+            - paragraph [ref=e30]: Trascina i lavoratori negli slot attività per vedere le barre reagire e il cerchio Halo evidenziare il drop.
+          - generic [ref=e31]:
+            - button "Reset Sandbox" [ref=e32]:
+              - generic [ref=e33]: ⚠
+              - text: Reset Sandbox
+            - button "Reset Fatigue" [ref=e34]:
+              - generic [ref=e35]: ☽
+              - text: Reset Fatigue
+        - generic [ref=e36]:
+          - generic [ref=e37]:
+            - heading "Residenti" [level=2] [ref=e38]
+            - generic [ref=e39]:
+              - generic [ref=e40]:
+                - generic [ref=e41]: Residenti
+                - generic [ref=e42]: 1 pronti
+              - generic [ref=e43]:
+                - button "Tutti" [ref=e44]
+                - button "Eroi" [ref=e45]
+                - button "Feriti" [ref=e46]
+              - generic [ref=e49]:
+                - generic [ref=e50]:
+                  - generic [ref=e51]: Founder
+                  - generic [ref=e52]: F
+                - generic [ref=e53]:
+                  - generic [ref=e55]:
+                    - generic [ref=e56]: HP
+                    - generic [ref=e57]: 100%
+                  - generic [ref=e61]:
+                    - generic [ref=e62]: FATICA
+                    - generic [ref=e63]: 100%
+          - generic [ref=e66]:
+            - heading "Attività" [level=2] [ref=e67]
+            - generic [ref=e69]:
+              - generic [ref=e70]:
+                - generic [ref=e71]:
+                  - generic "Activity slot village_square" [ref=e72]:
+                    - generic [ref=e75]: ★
+                  - generic [ref=e76]:
+                    - generic [ref=e77]: Village Square
+                    - generic [ref=e78]: Trascina un lavoratore
+                - generic [ref=e79]:
+                  - generic "Activity slot village_gate" [ref=e80]:
+                    - generic [ref=e83]: ⇨
+                  - generic [ref=e84]:
+                    - generic [ref=e85]: Village Gate
+                    - generic [ref=e86]: Trascina un lavoratore
+                - generic [ref=e87]:
+                  - generic "Activity slot village_market" [ref=e88]:
+                    - generic [ref=e91]: ◎
+                  - generic [ref=e92]:
+                    - generic [ref=e93]: Market
+                    - generic [ref=e94]: Trascina un lavoratore
+              - generic [ref=e95]:
+                - generic [ref=e96]: Luogo attivo
+                - button "🌲 🌳 🌲 Foresta · Raccolta Bacche Trascina un lavoratore per avviare la spedizione e apri la vista panoramica per controllare più VerbCard." [ref=e97]:
+                  - generic [ref=e100]:
+                    - generic [ref=e101]: 🌲
+                    - generic [ref=e102]: 🌳
+                    - generic [ref=e103]: 🌲
+                  - generic [ref=e104]: Foresta · Raccolta Bacche
+                  - paragraph [ref=e105]: Trascina un lavoratore per avviare la spedizione e apri la vista panoramica per controllare più VerbCard.
+        - generic [ref=e106]:
+          - heading "Test Drag Token (Isolated)" [level=2] [ref=e107]
+          - generic [ref=e108]:
+            - generic [ref=e109]:
+              - generic [ref=e110]: Test Resident
+              - generic [ref=e111]: T
+            - generic [ref=e112]: Isolated test for drag
+            - generic [ref=e113]:
+              - generic [ref=e115]:
+                - generic [ref=e116]: HP
+                - generic [ref=e117]: 90%
+              - generic [ref=e121]:
+                - generic [ref=e122]: FATICA
+                - generic [ref=e123]: 10%
+    - navigation [ref=e126]:
+      - generic [ref=e127]:
+        - button "⚖️ Balancer" [ref=e128]:
+          - generic [ref=e129]: ⚖️
+          - generic [ref=e130]: Balancer
+        - button "🎭 Archetypes" [ref=e131]:
+          - generic [ref=e132]: 🎭
+          - generic [ref=e133]: Archetypes
+        - button "✨ Spell Creation" [ref=e134]:
+          - generic [ref=e135]: ✨
+          - generic [ref=e136]: Spell Creation
+        - button "⚔️ Grid Arena" [ref=e137]:
+          - generic [ref=e138]: ⚔️
+          - generic [ref=e139]: Grid Arena
+        - button "☰ More" [ref=e140]:
+          - generic [ref=e141]: ☰
+          - generic [ref=e142]: More
+  - region "Notifications alt+T"
+```

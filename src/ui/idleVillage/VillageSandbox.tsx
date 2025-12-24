@@ -321,6 +321,7 @@ const VillageSandbox = () => {
                 Reset
               </button>
             )}
+
           </div>
         </div>
       </section>

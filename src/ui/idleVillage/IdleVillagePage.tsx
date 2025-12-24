@@ -99,9 +99,9 @@ function ResidentCard({ resident, getFatigueColor }: ResidentCardProps) {
     : undefined;
 
   const cardClasses = [
-    'default-card flex flex-col gap-0.5 cursor-grab active:cursor-grabbing transition-opacity px-1.5 py-1 max-w-[160px]',
+    'default-card flex flex-col gap-0.5 transition-opacity px-1.5 py-1 max-w-[160px] cursor-grab active:cursor-grabbing touch-none',
     !isAvailable ? 'opacity-40 cursor-not-allowed' : '',
-    isDragging ? 'opacity-0 pointer-events-none' : '',
+    isDragging ? 'opacity-50' : '',
   ]
     .filter(Boolean)
     .join(' ');
@@ -110,9 +110,9 @@ function ResidentCard({ resident, getFatigueColor }: ResidentCardProps) {
     <div
       ref={setNodeRef}
       style={style}
+      className={cardClasses}
       {...attributes}
       {...listeners}
-      className={cardClasses}
     >
       <div className="text-[10px] font-semibold tracking-[0.16em] uppercase text-slate-200">
         {resident.id}
@@ -269,10 +269,21 @@ const IdleVillagePage: React.FC = () => {
 
   const { showToast, toasts, removeToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [activeResidentId, setActiveResidentId] = useState<string | null>(null);
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
   const [resetConfirmPending, setResetConfirmPending] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const extractResidentId = useCallback((active: any | null | undefined) => {
+    if (!active) return null;
+    const dataResidentId = active.data?.current?.residentId;
+    if (typeof dataResidentId === 'string' && dataResidentId.length > 0) {
+      return dataResidentId;
+    }
+    if (typeof active.id === 'string' && active.id.startsWith('resident-')) {
+      const extracted = active.id.slice('resident-'.length);
+      return extracted.length > 0 ? extracted : null;
+    }
+    return null;
+  }, []);
 
   const handleExport = () => {
     try {
@@ -687,25 +698,26 @@ const IdleVillagePage: React.FC = () => {
     [config, updateState],
   );
 
-  const handleDragStart = useCallback((event: DragStartEvent) => {
-    const { active } = event;
-    const activeType = active.data.current?.type;
-    const residentId = active.data.current?.residentId as string | undefined;
+  const handleDragStart = useCallback(
+    (event: DragStartEvent) => {
+      const { active } = event;
+      const activeType = active.data.current?.type;
+      const residentId = extractResidentId(active);
 
-    if (activeType === 'resident' && residentId) {
-      setActiveResidentId(residentId);
-    }
-  }, []);
+      console.log('[DragStart]', { activeType, residentId, activeId: active.id });
+    },
+    [extractResidentId],
+  );
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event;
-      setActiveResidentId(null);
+      console.log('[DragEnd] Active:', active.id, 'Over:', over?.id);
       if (!over) return;
 
       const activeType = active.data.current?.type;
       const overType = over.data.current?.type;
-      const residentId = active.data.current?.residentId as string | undefined;
+      const residentId = extractResidentId(active) ?? undefined;
 
       if (activeType === 'resident' && residentId) {
         if (overType === 'mapSlot') {
@@ -726,7 +738,7 @@ const IdleVillagePage: React.FC = () => {
         }
       }
     },
-    [handleAssignResidentToSlot, handleSchedule, handleAcceptQuestOffer],
+    [extractResidentId, handleAssignResidentToSlot, handleSchedule, handleAcceptQuestOffer],
   );
 
   // Simple activity list from config (used for per-location descriptions)
@@ -1188,13 +1200,7 @@ const IdleVillagePage: React.FC = () => {
       )}
 
       <DragOverlay>
-        {activeResidentId && villageState.residents[activeResidentId] ? (
-          <div className="flex items-center justify-center">
-            <div className="w-8 h-8 rounded-full bg-slate-900 border border-gold/70 shadow-lg flex items-center justify-center text-[10px] font-semibold tracking-[0.16em] uppercase text-slate-100">
-              {villageState.residents[activeResidentId].id.slice(0, 2)}
-            </div>
-          </div>
-        ) : null}
+        {/* Drag overlay for residents will be added when needed */}
       </DragOverlay>
       <input
         ref={fileInputRef}
