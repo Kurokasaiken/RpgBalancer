@@ -212,7 +212,7 @@ const IdleVillageMapPage: React.FC = () => {
 
   const bootstrapVillageState = useCallback(() => {
     if (!config) return null;
-    const initialResidents = loadResidentsFromCharacterManager();
+    const initialResidents = loadResidentsFromCharacterManager({ config });
     const freshState = createVillageStateFromConfig({ config, initialResidents });
     setVillageState(freshState);
     villageStateRef.current = freshState;

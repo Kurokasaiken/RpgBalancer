@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ActivityDefinition, MapSlotDefinition } from '@/balancing/config/idleVillage/types';
-import { createVillageStateFromConfig, type ResidentState } from '@/engine/game/idleVillage/TimeEngine';
+import { createVillageStateFromConfig, getStartingResidentFatigue, type ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { useVillageStateStore } from '@/ui/idleVillage/useVillageStateStore';
 import { loadResidentsFromCharacterManager } from '@/engine/game/idleVillage/characterImport';
 import LocationCard from '@/ui/idleVillage/components/LocationCard';
@@ -23,15 +23,16 @@ const VillageSandbox = () => {
   const { activePreset, presets, setPreset, randomizeTheme, resetRandomization, isRandomized } = useThemeSwitcher();
   const { config } = useIdleVillageConfig();
   const initialResidents = useMemo(() => {
-    const residents = loadResidentsFromCharacterManager();
+    const residents = loadResidentsFromCharacterManager({ config });
     if (residents.length === 0) {
       // Fallback: create a default resident
+      const fallbackFatigue = getStartingResidentFatigue(config);
       residents.push({
         id: 'default-founder',
         displayName: 'Founder',
         currentHp: 100,
         maxHp: 100,
-        fatigue: 0,
+        fatigue: fallbackFatigue,
         status: 'available',
         isHero: false,
         isInjured: false,
@@ -42,7 +43,7 @@ const VillageSandbox = () => {
       });
     }
     return residents;
-  }, []);
+  }, [config]);
   const { state: villageState, resetState } = useVillageStateStore(() =>
     createVillageStateFromConfig({ config, initialResidents }),
   );
@@ -51,7 +52,7 @@ const VillageSandbox = () => {
   const residents = useMemo<ResidentState[]>(() => Object.values(villageState.residents ?? {}), [villageState.residents]);
 
   const refreshResidentsFromCharacterManager = useCallback(() => {
-    const latestResidents = loadResidentsFromCharacterManager();
+    const latestResidents = loadResidentsFromCharacterManager({ config });
     if (latestResidents.length === 0) return;
     resetState(
       () =>
@@ -65,7 +66,7 @@ const VillageSandbox = () => {
 
   useEffect(() => {
     if (residents.length === 0) {
-      const latest = loadResidentsFromCharacterManager();
+      const latest = loadResidentsFromCharacterManager({ config });
       if (latest.length > 0) {
         resetState(
           () =>
@@ -224,6 +225,34 @@ const VillageSandbox = () => {
     setDraggingResidentId(null);
   }, []);
 
+  const handleResetSandboxState = useCallback(() => {
+    resetState(
+      () =>
+        createVillageStateFromConfig({
+          config,
+          initialResidents: loadResidentsFromCharacterManager({ config }),
+        }),
+      'VillageSandbox manual reset',
+    );
+  }, [config, resetState]);
+
+  const handleResetSandboxFatigue = useCallback(() => {
+    const targetFatigue = getStartingResidentFatigue(config);
+    resetState(
+      () => {
+        const nextResidents: Record<string, ResidentState> = {};
+        Object.entries(villageState.residents ?? {}).forEach(([id, resident]) => {
+          nextResidents[id] = { ...resident, fatigue: targetFatigue };
+        });
+        return {
+          ...villageState,
+          residents: nextResidents,
+        };
+      },
+      'VillageSandbox reset fatigue',
+    );
+  }, [config, resetState, villageState]);
+
   return (
     <div className="mx-auto max-w-5xl space-y-10 p-6 text-ivory">
       <section
@@ -296,12 +325,32 @@ const VillageSandbox = () => {
         </div>
       </section>
 
-      <header className="space-y-2">
-        <p className="text-xs uppercase tracking-[0.4em] text-amber-200/70">Village Sandbox</p>
-        <h1 className="text-3xl font-semibold tracking-widest">Frontier — Atomic Layer</h1>
-        <p className="text-sm text-slate-300">
-          Trascina i lavoratori negli slot attività per vedere le barre reagire e il cerchio Halo evidenziare il drop.
-        </p>
+      <header className="space-y-3">
+        <div>
+          <p className="text-xs uppercase tracking-[0.4em] text-amber-200/70">Village Sandbox</p>
+          <h1 className="text-3xl font-semibold tracking-widest">Frontier — Atomic Layer</h1>
+          <p className="text-sm text-slate-300">
+            Trascina i lavoratori negli slot attività per vedere le barre reagire e il cerchio Halo evidenziare il drop.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={handleResetSandboxState}
+            className="inline-flex items-center gap-2 rounded-full border border-rose-400/70 bg-rose-500/15 px-4 py-1.5 text-[11px] uppercase tracking-[0.3em] text-rose-100 shadow-[0_0_18px_rgba(244,63,94,0.25)] transition-colors hover:bg-rose-500/25"
+          >
+            <span aria-hidden>⚠</span>
+            Reset Sandbox
+          </button>
+          <button
+            type="button"
+            onClick={handleResetSandboxFatigue}
+            className="inline-flex items-center gap-2 rounded-full border border-amber-300/80 bg-black/40 px-4 py-1.5 text-[11px] uppercase tracking-[0.3em] text-amber-100 shadow-[0_0_18px_rgba(251,191,36,0.25)] transition-colors hover:bg-amber-500/20"
+          >
+            <span aria-hidden>☽</span>
+            Reset Fatigue
+          </button>
+        </div>
       </header>
 
       <section className="flex flex-col gap-8 lg:flex-row">

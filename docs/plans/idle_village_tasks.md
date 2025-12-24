@@ -19,6 +19,18 @@
 - [ ] Hook hero promotion + survival streak events to UI feedback (toasts/logs)
 - [ ] Add Vitest + Playwright coverage for Trial of Fire math, auto-loop scheduling, hero promotion, bloom UX
 
+## 12.13 – Quest Blueprint & Quest Chronicle
+
+> Implementation detail: `docs/plans/quest_chronicle_plan.md`
+
+- [ ] Extend `IdleVillageConfig` types/Zod schema with `QuestBlueprint` + `QuestPhase` definitions (phases, type, requirements, icon, narrative).
+- [ ] Update Activities authoring UI to edit quest phases and migrate sample quest (`quest_city_rats`) to the blueprint format.
+- [ ] Implement `QuestManager` + quest state stored on `ScheduledActivity` (`currentPhaseIndex`, `phaseResults`, `status`).
+- [ ] Teach `TimeEngine`/`IdleVillageEngine` to pause quests per phase and handshake with Trial/Combat/Work modules via callbacks.
+- [ ] Build `QuestChronicle` UI component (stepper, halo for active, success/fail badges) and integrate above quest map slots + Theater link.
+- [ ] Add Visual Lab quest sandbox with 3-phase blueprint (Exploration → Combat → Recupero bottino) and debug controls to fast-forward phases.
+- [ ] Add Vitest (QuestManager progression) + Playwright (QuestChronicle visual updates + Theater deep link) coverage.
+
 ## 12.1 – Time & Activity Engine
 
 - [ ] Define domain types for time & activities (engine layer)

@@ -30,7 +30,7 @@ export default function IdleVillageConfigRoute() {
       if (!result.success) {
         throw new Error(result.error ?? 'Salvataggio configurazione fallito');
       }
-      const initialResidents = loadResidentsFromCharacterManager();
+      const initialResidents = loadResidentsFromCharacterManager({ config });
       if (initialResidents.length === 0) {
         showToast('Nessun personaggio salvato – crea personaggi nel Character Manager.', 'error');
         return;

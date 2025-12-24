@@ -1,4 +1,5 @@
-import type { ResidentState } from './TimeEngine';
+import type { IdleVillageConfig } from '@/balancing/config/idleVillage/types';
+import { getStartingResidentFatigue, type ResidentState } from './TimeEngine';
 import type { SavedCharacter } from '@/engine/idle/characterStorage';
 import { loadCharacters } from '@/engine/idle/characterStorage';
 
@@ -18,14 +19,23 @@ function deriveStatTags(character: SavedCharacter): string[] {
   return Array.from(tags);
 }
 
-export function savedCharacterToResident(character: SavedCharacter): ResidentState {
+interface SavedCharacterToResidentOptions {
+  defaultFatigue?: number;
+}
+
+export function savedCharacterToResident(
+  character: SavedCharacter,
+  options?: SavedCharacterToResidentOptions,
+): ResidentState {
   const statBlock = character.statBlock ?? {};
   const hpValue = typeof statBlock.hp === 'number' && Number.isFinite(statBlock.hp) ? statBlock.hp : FALLBACK_MAX_HP;
+  const defaultFatigue =
+    typeof options?.defaultFatigue === 'number' && Number.isFinite(options.defaultFatigue) ? options.defaultFatigue : 0;
   return {
     id: character.id,
     displayName: character.name,
     status: 'available',
-    fatigue: 0,
+    fatigue: defaultFatigue,
     statProfileId: character.aiBehavior,
     statTags: deriveStatTags(character),
     statSnapshot: { ...statBlock },
@@ -38,6 +48,14 @@ export function savedCharacterToResident(character: SavedCharacter): ResidentSta
   };
 }
 
-export function loadResidentsFromCharacterManager(): ResidentState[] {
-  return loadCharacters().map(savedCharacterToResident);
+interface LoadResidentsOptions {
+  config?: IdleVillageConfig;
+}
+
+export function loadResidentsFromCharacterManager(options?: LoadResidentsOptions): ResidentState[] {
+  const defaultFatigue =
+    options?.config && options.config.globalRules
+      ? getStartingResidentFatigue(options.config)
+      : undefined;
+  return loadCharacters().map((character) => savedCharacterToResident(character, { defaultFatigue }));
 }

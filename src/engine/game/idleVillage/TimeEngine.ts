@@ -110,6 +110,24 @@ function normalizeStartingResources(config: IdleVillageConfig, overrides?: Villa
   return normalized;
 }
 
+/**
+ * Resolves the initial fatigue to apply when seeding residents into a new village state.
+ * Falls back to the exhaustion cap when no explicit starting value is provided.
+ */
+export function getStartingResidentFatigue(config: IdleVillageConfig, fatigueCapOverride?: number): number {
+  const fatigueCap =
+    typeof fatigueCapOverride === 'number'
+      ? fatigueCapOverride
+      : typeof config.globalRules?.maxFatigueBeforeExhausted === 'number'
+        ? Math.max(0, config.globalRules.maxFatigueBeforeExhausted)
+        : 0;
+  const starting = config.globalRules.startingResidentFatigue;
+  if (typeof starting === 'number' && Number.isFinite(starting)) {
+    return Math.max(0, Math.min(fatigueCap, starting));
+  }
+  return fatigueCap;
+}
+
 export function createVillageStateFromConfig(options: { config: IdleVillageConfig } & CreateVillageStateOptions): VillageState {
   const { config, initialResourcesOverride, initialResidents } = options;
   const initialResources = normalizeStartingResources(config, initialResourcesOverride);
@@ -118,6 +136,7 @@ export function createVillageStateFromConfig(options: { config: IdleVillageConfi
     typeof config.globalRules?.maxFatigueBeforeExhausted === 'number'
       ? Math.max(0, config.globalRules.maxFatigueBeforeExhausted)
       : 0;
+  const defaultStartingFatigue = getStartingResidentFatigue(config, fatigueCap);
 
   if (initialResidents?.length) {
     const residentRecord: Record<string, ResidentState> = { ...state.residents };
@@ -134,7 +153,7 @@ export function createVillageStateFromConfig(options: { config: IdleVillageConfi
       const normalizedFatigue =
         typeof resident.fatigue === 'number' && Number.isFinite(resident.fatigue)
           ? Math.max(0, Math.min(fatigueCap, resident.fatigue))
-          : fatigueCap;
+          : defaultStartingFatigue;
       residentRecord[resident.id] = {
         ...resident,
         maxHp,

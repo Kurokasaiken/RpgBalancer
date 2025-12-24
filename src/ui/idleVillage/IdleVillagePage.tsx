@@ -4,7 +4,7 @@
  * Uses the Gilded Observatory theme and follows config-first principles.
  */
 
-import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, useRef, startTransition } from 'react';
 import { DndContext, DragOverlay, useDraggable, useDroppable, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core';
 import { Pause, Play } from 'lucide-react';
 import idleVillageMap from '@/assets/ui/idleVillage/idle-village-map.jpg';
@@ -12,7 +12,7 @@ import { computeSlotPercentPosition, resolveMapLayout } from '@/ui/idleVillage/m
 import { useVillageStateStore } from './useVillageStateStore';
 import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
 import { ToastContainer, useToast } from '../balancing/Toast';
-import { createVillageStateFromConfig, scheduleActivity } from '@/engine/game/idleVillage/TimeEngine';
+import { createVillageStateFromConfig, getStartingResidentFatigue, scheduleActivity } from '@/engine/game/idleVillage/TimeEngine';
 import type {
   VillageState,
   ResidentState,
@@ -20,7 +20,7 @@ import type {
   VillageEvent,
 } from '@/engine/game/idleVillage/TimeEngine';
 import { tickIdleVillage } from '@/engine/game/idleVillage/IdleVillageEngine';
-import type { ActivityDefinition, IdleVillageConfig } from '@/balancing/config/idleVillage/types';
+import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
 import { buyFoodWithGold } from '@/engine/game/idleVillage/MarketEngine';
 import { loadResidentsFromCharacterManager } from '@/engine/game/idleVillage/characterImport';
 import VerbCard from '@/ui/idleVillage/VerbCard';
@@ -262,7 +262,7 @@ function DayCycleRing({ totalSegments, filledSegments, isNight }: DayCycleRingPr
 
 const IdleVillagePage: React.FC = () => {
   const { config } = useIdleVillageConfig();
-  const initialResidents = useMemo(() => loadResidentsFromCharacterManager(), []);
+  const initialResidents = useMemo(() => loadResidentsFromCharacterManager({ config }), [config]);
   const { state: villageState, updateState, undo, canUndo, exportState, importState, resetState } = useVillageStateStore(() =>
     createVillageStateFromConfig({ config, initialResidents }),
   );
@@ -332,7 +332,7 @@ const IdleVillagePage: React.FC = () => {
         () =>
           createVillageStateFromConfig({
             config,
-            initialResidents: loadResidentsFromCharacterManager(),
+            initialResidents: loadResidentsFromCharacterManager({ config }),
           }),
         'Reset state',
       );
@@ -356,6 +356,40 @@ const IdleVillagePage: React.FC = () => {
   const [marketUnits, setMarketUnits] = useState(0);
   const [hungerFx, setHungerFx] = useState<{ amount: number; id: number } | null>(null);
   const residentCount = useMemo(() => Object.keys(villageState.residents).length, [villageState.residents]);
+
+  const handleResetResidentFatigue = useCallback(() => {
+    if (!config) return;
+    if (residentCount === 0) {
+      showToast('Nessun residente disponibile da aggiornare.', 'info');
+      return;
+    }
+    const targetFatigue = getStartingResidentFatigue(config);
+    let changedCount = 0;
+    updateState((prev) => {
+      const currentResidents = prev.residents ?? {};
+      const nextResidents: typeof currentResidents = {};
+      Object.entries(currentResidents).forEach(([id, resident]) => {
+        if (resident.fatigue !== targetFatigue) {
+          changedCount += 1;
+          nextResidents[id] = { ...resident, fatigue: targetFatigue };
+        } else {
+          nextResidents[id] = resident;
+        }
+      });
+      if (changedCount === 0) {
+        return prev;
+      }
+      return {
+        ...prev,
+        residents: nextResidents,
+      };
+    }, 'Reset resident fatigue');
+    if (changedCount === 0) {
+      showToast('La fatica era già al valore iniziale per tutti i residenti.', 'info');
+    } else {
+      showToast(`Fatica impostata a ${targetFatigue} per ${changedCount} residenti.`, 'success');
+    }
+  }, [config, residentCount, updateState, showToast]);
 
   const secondsPerTimeUnit = config?.globalRules.secondsPerTimeUnit ?? DEFAULT_SECONDS_PER_TIME_UNIT;
   const dayLengthSetting = config?.globalRules.dayLengthInTimeUnits || 5;
@@ -757,7 +791,7 @@ const IdleVillagePage: React.FC = () => {
           slotIcon,
           resourceLabeler: getResourceLabel,
           currentTime: villageState.currentTime,
-a          secondsPerTimeUnit,
+          secondsPerTimeUnit,
           dayLength: dayLengthSetting,
           assigneeNames,
         });
@@ -996,46 +1030,59 @@ a          secondsPerTimeUnit,
                       </div>
                     )}
                   </div>
-                  <div className="flex items-center gap-1.5 text-[10px]">
-                    <button
-                      type="button"
-                      onClick={handleUndo}
-                      disabled={!canUndo}
-                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full border transition-colors ${canUndo
-                          ? 'border-amber-400/70 text-amber-200 hover:bg-amber-500/15'
-                          : 'border-[#2b3434] text-[#4b5555] cursor-not-allowed'
+                  <div className="flex flex-col gap-1 text-[10px]">
+                    <span className="uppercase tracking-[0.28em] text-amber-200/80">Village Controls</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      <button
+                        type="button"
+                        onClick={handleUndo}
+                        disabled={!canUndo}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold tracking-[0.24em] transition-all shadow-lg ${
+                          canUndo
+                            ? 'border-amber-300/80 text-amber-100 bg-black/60 hover:bg-amber-500/20'
+                            : 'border-slate-800 text-slate-600 bg-black/30 cursor-not-allowed'
                         }`}
-                    >
-                      <span aria-hidden className="text-xs">↺</span>
-                      <span className="tracking-[0.18em] uppercase">Undo</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleResetAll}
-                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full border transition-colors ${resetConfirmPending
-                          ? 'border-red-500/70 text-red-200 bg-red-500/10 animate-pulse'
-                          : 'border-rose-500/70 text-rose-200 hover:bg-rose-500/15'
+                      >
+                        <span aria-hidden>↺</span>
+                        Undo
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleResetAll}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold tracking-[0.24em] transition-all shadow-lg ${
+                          resetConfirmPending
+                            ? 'border-red-400 text-red-100 bg-red-500/10 animate-pulse'
+                            : 'border-red-400 text-red-100 bg-black/60 hover:bg-red-500/15'
                         }`}
-                    >
-                      <span aria-hidden className="text-xs">⚠</span>
-                      <span className="tracking-[0.18em] uppercase">{resetConfirmPending ? 'Confirm' : 'Reset'}</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleExport}
-                      className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-emerald-500/70 text-emerald-200 hover:bg-emerald-500/15 transition-colors"
-                    >
-                      <span aria-hidden className="text-xs">⭳</span>
-                      <span className="tracking-[0.18em] uppercase">Export</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleImportClick}
-                      className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-cyan-500/70 text-cyan-200 hover:bg-cyan-500/15 transition-colors"
-                    >
-                      <span aria-hidden className="text-xs">⭱</span>
-                      <span className="tracking-[0.18em] uppercase">Import</span>
-                    </button>
+                      >
+                        <span aria-hidden>⚠</span>
+                        {resetConfirmPending ? 'Confirm Reset' : 'Reset State'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleResetResidentFatigue}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-300 text-amber-100 bg-black/60 hover:bg-amber-500/15 text-xs font-semibold tracking-[0.24em] shadow-lg"
+                      >
+                        <span aria-hidden>☽</span>
+                        Reset Fatigue
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleExport}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-emerald-300 text-emerald-100 bg-black/60 hover:bg-emerald-500/15 text-xs font-semibold tracking-[0.24em] shadow-lg"
+                      >
+                        <span aria-hidden>⭳</span>
+                        Export
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleImportClick}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-cyan-300 text-cyan-100 bg-black/60 hover:bg-cyan-500/15 text-xs font-semibold tracking-[0.24em] shadow-lg"
+                      >
+                        <span aria-hidden>⭱</span>
+                        Import
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

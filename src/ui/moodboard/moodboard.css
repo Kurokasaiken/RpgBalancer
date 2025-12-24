@@ -1,0 +1,336 @@
+.moodboard-shell {
+  min-height: calc(100vh - 4rem);
+  padding: clamp(1.5rem, 3vw, 3.5rem);
+  background-color: var(--mood-background, #050509);
+  background-image: var(--mood-background-overlay, none);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: var(--mood-text-primary, #f8fafc);
+  font-family: var(--font-body, 'Crimson Text', serif);
+  transition: background 0.5s ease, color 0.35s ease;
+}
+
+.moodboard-shell__grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin: 0 auto;
+  max-width: 1200px;
+}
+
+.moodboard-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  flex: 1 1 auto;
+}
+
+.moodboard-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 1024px) {
+  .moodboard-shell__grid {
+    flex-direction: row;
+  }
+
+  .moodboard-main {
+    flex: 1 1 auto;
+  }
+
+  .moodboard-sidebar {
+    width: 360px;
+    flex-shrink: 0;
+  }
+}
+
+.moodboard-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+}
+
+.moodboard-kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.35em;
+  font-size: 0.68rem;
+  color: var(--mood-text-muted, rgba(226, 232, 240, 0.65));
+}
+
+.moodboard-title {
+  font-family: var(--font-header, 'Cinzel', serif);
+  font-size: clamp(1.75rem, 3vw, 2.6rem);
+  color: var(--mood-text-primary, #f7f4ea);
+  margin: 0.2rem 0;
+}
+
+.moodboard-subcopy {
+  font-size: 0.85rem;
+  color: var(--mood-text-muted, rgba(226, 232, 240, 0.65));
+  max-width: 28rem;
+}
+
+.moodboard-style-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.moodboard-style-pill {
+  border: 1px solid var(--mood-control-border, rgba(255, 255, 255, 0.2));
+  background: var(--mood-control-bg, rgba(5, 9, 14, 0.75));
+  color: var(--mood-control-text, #f7f4ea);
+  text-transform: uppercase;
+  letter-spacing: 0.35em;
+  font-size: 0.65rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.moodboard-style-pill:hover {
+  background: var(--mood-control-hover-bg, rgba(255, 255, 255, 0.08));
+}
+
+.moodboard-style-pill.is-active {
+  border-color: var(--mood-control-active-border, var(--mood-accent, #c9a227));
+  background: var(--mood-control-active-bg, rgba(201, 162, 39, 0.18));
+  color: var(--mood-control-active-text, #ffffff);
+  box-shadow: 0 0 30px var(--mood-accent-glow, rgba(201, 162, 39, 0.4));
+}
+
+.moodboard-panel {
+  border: 1px solid var(--mood-panel-border, rgba(255, 255, 255, 0.12));
+  background: var(--mood-panel-surface, rgba(4, 7, 12, 0.9));
+  border-radius: var(--mood-panel-radius, 32px);
+  padding: 1.5rem;
+  box-shadow: var(--mood-panel-shadow, 0 25px 50px rgba(0, 0, 0, 0.45));
+  backdrop-filter: blur(16px);
+}
+
+.moodboard-panel--dashed {
+  border-style: dashed;
+  border-color: var(--mood-chip-border, rgba(255, 255, 255, 0.2));
+  background: var(--mood-component-surface, rgba(6, 9, 15, 0.65));
+}
+
+.moodboard-panel__row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+}
+
+.moodboard-panel__kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.5em;
+  font-size: 0.62rem;
+  color: var(--mood-text-muted, rgba(226, 232, 240, 0.65));
+}
+
+.moodboard-panel__subtitle {
+  font-size: 0.95rem;
+  color: var(--mood-text-secondary, #f8d97c);
+}
+
+.moodboard-chip {
+  border: 1px solid var(--mood-chip-border, rgba(255, 255, 255, 0.3));
+  background: var(--mood-chip-bg, rgba(3, 6, 9, 0.4));
+  color: var(--mood-chip-text, #f0efe4);
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+}
+
+.moodboard-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--mood-frame-radius, 32px);
+  border: 1px solid var(--mood-frame-border, rgba(255, 255, 255, 0.08));
+  box-shadow: var(--mood-frame-shadow, 0 30px 60px rgba(5, 5, 9, 0.55));
+  background: var(--mood-frame-surface, rgba(4, 6, 16, 0.9));
+}
+
+.moodboard-frame::before {
+  content: '';
+  position: absolute;
+  inset: -16px;
+  border-radius: inherit;
+  background: var(--mood-frame-aura, radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent 65%));
+  filter: blur(24px);
+  opacity: 0.85;
+  z-index: 0;
+}
+
+.moodboard-frame__inner {
+  position: relative;
+  border-radius: inherit;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.moodboard-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  transition: opacity 0.6s ease;
+}
+
+.moodboard-frame__fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--mood-text-muted, rgba(226, 232, 240, 0.65));
+  gap: 0.35rem;
+  padding: 2rem;
+}
+
+.moodboard-frame-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: var(--mood-text-muted, rgba(226, 232, 240, 0.7));
+  margin-top: 1rem;
+}
+
+.moodboard-button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.moodboard-button {
+  border: 1px solid var(--mood-control-border, rgba(255, 255, 255, 0.15));
+  background: var(--mood-control-bg, rgba(5, 9, 14, 0.75));
+  color: var(--mood-control-text, #f7f4ea);
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.moodboard-button:hover {
+  transform: translateY(-1px);
+  background: var(--mood-control-hover-bg, rgba(255, 255, 255, 0.08));
+}
+
+.moodboard-component-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.moodboard-component-card {
+  border: 1px solid var(--mood-component-border, rgba(255, 255, 255, 0.1));
+  background: var(--mood-component-surface, rgba(2, 6, 12, 0.75));
+  border-radius: var(--mood-component-radius, 24px);
+  padding: 1rem;
+  box-shadow: var(--mood-component-shadow, 0 20px 35px rgba(0, 0, 0, 0.55));
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.moodboard-component-card__title {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: var(--mood-text-muted, rgba(226, 232, 240, 0.65));
+}
+
+.moodboard-component-card__copy {
+  font-size: 0.85rem;
+  color: var(--mood-component-muted, rgba(226, 232, 240, 0.6));
+}
+
+.moodboard-component-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.moodboard-info-card {
+  border: 1px solid var(--mood-info-border, rgba(255, 255, 255, 0.07));
+  background: var(--mood-info-surface, rgba(4, 7, 12, 0.9));
+  border-radius: var(--mood-panel-radius, 32px);
+  padding: 1.25rem;
+  box-shadow: var(--mood-info-shadow, 0 25px 50px rgba(0, 0, 0, 0.35));
+}
+
+.moodboard-tip-card {
+  border: 1px dashed var(--mood-chip-border, rgba(255, 255, 255, 0.2));
+  border-radius: var(--mood-panel-radius, 32px);
+  padding: 1.25rem;
+  background: var(--mood-component-surface, rgba(6, 9, 15, 0.65));
+  color: var(--mood-text-muted, rgba(226, 232, 240, 0.7));
+  font-size: 0.85rem;
+}
+
+.moodboard-accent-text {
+  color: var(--mood-text-secondary, #f8d97c);
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+}
+
+.moodboard-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--mood-text-muted, rgba(226, 232, 240, 0.7));
+}
+
+.moodboard-random-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.moodboard-random-button {
+  border: 1px solid var(--mood-control-border, rgba(255, 255, 255, 0.2));
+  background: var(--mood-control-bg, rgba(5, 9, 14, 0.75));
+  color: var(--mood-control-text, #f7f4ea);
+  border-radius: 999px;
+  padding: 0.4rem 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: 0.65rem;
+}
+
+.moodboard-random-button.is-danger {
+  border-style: dashed;
+  opacity: 0.75;
+}
+
+.moodboard-section-title {
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4em;
+  color: var(--mood-text-secondary, #f8d97c);
+}
+
+.moodboard-section-copy {
+  font-size: 0.9rem;
+  color: var(--mood-component-muted, rgba(226, 232, 240, 0.7));
+}

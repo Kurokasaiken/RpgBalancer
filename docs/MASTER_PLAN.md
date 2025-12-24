@@ -467,6 +467,7 @@ VerbDetail sandbox ora generano `ResidentState` validi.
 1. Implement Bloom Reveal + Theater View container so slots expose VerbCard medaglioni and roster drag tokens drop directly inside the theater panel.
 2. Wire RosterSidebar filters (Tutti/Eroi/Carne da Macello/Feriti) and hero promotion hooks (Trial of Fire survivals) into the UI.
 3. Surface passive/system verbs (hunger, upkeep) plus quest deadlines on the map using the unified VerbSummary pipeline, then finalize the deterministic Playwright regression (“assign → advance time → verify reward/resource deltas”) leveraging the debug controls described in `docs/plans/idle_village_drag_drop_e2e_plan.md`.
+4. Stand up Quest Blueprint + Quest Chronicle system (`docs/plans/quest_chronicle_plan.md`): config schema for multi-phase quests, QuestManager/TimeEngine bridge, QuestChronicle UI, and sandbox quest for verification.
 
 **Canonical Plan:** [Idle Village “Gilded Heroism” Master Plan v2.0](plans/idle_village_map_only_plan.md)  
 **Supporting Plans:** [Idle Village VerbCard Refactor](plans/idle_village_verbcard_refactor_plan.md), [Idle Village Theater View & Trial of Fire](plans/idle_village_trial_of_fire_plan.md), [Idle Village Drag & Drop E2E](plans/idle_village_drag_drop_e2e_plan.md)  

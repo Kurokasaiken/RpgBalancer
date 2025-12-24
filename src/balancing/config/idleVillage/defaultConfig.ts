@@ -516,7 +516,129 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
         questAllowedSlotTags: ['world'],
         maxCrewSize: 4,
         injuryChanceDisplay: 82,
-        deathChanceDisplay: 60,
+        deathChanceDisplay: 55,
+      },
+    },
+    quest_frontier_patrol: {
+      id: 'quest_frontier_patrol',
+      label: 'Ricognizione Frontiera',
+      description: 'Scorta i cartografi lungo il margine delle rovine per recuperare reliquie leggere.',
+      tags: ['quest', 'explore'],
+      slotTags: ['world', 'job_site'],
+      resolutionEngineId: 'quest_combat',
+      level: 2,
+      dangerRating: 3,
+      durationFormula: '3',
+      statRequirement: {
+        label: 'Lantern Scout',
+        allOf: ['lantern'],
+        anyOf: ['edge', 'moth'],
+      },
+      rewards: [
+        { resourceId: 'xp', amountFormula: '4' },
+        { resourceId: 'materials', amountFormula: '2' },
+      ],
+      metadata: {
+        icon: '🗺️',
+        questSpawnEnabled: false,
+        mapSlotId: 'village_gate',
+        injuryChanceDisplay: 18,
+        deathChanceDisplay: 4,
+      },
+    },
+  },
+
+  questBlueprints: {
+    quest_city_rats_blueprint: {
+      id: 'quest_city_rats_blueprint',
+      label: 'Cull Rats – Sequenza Narrativa',
+      activityId: 'quest_city_rats',
+      summary: 'Tre battute successive per liberare i tunnel dai ratti e purificare le bocche di scarico.',
+      slotId: 'village_square',
+      icon: '🐀',
+      phases: [
+        {
+          id: 'scout_tunnels',
+          type: 'WORK',
+          label: 'Ispeziona i Tunnel',
+          icon: '🕯️',
+          narrative: 'Lanterniere e ausiliari segnano i nodi infestati prima dell’incursione principale.',
+          requirements: {
+            statRequirement: {
+              label: 'Lantern Scout',
+              allOf: ['lantern'],
+            },
+          },
+        },
+        {
+          id: 'crush_brood',
+          type: 'COMBAT',
+          label: 'Spezza il Nido',
+          icon: '⚔️',
+          narrative: 'Squadre leggere eliminano il nucleo della covata e riportano campioni contaminati.',
+          requirements: {
+            encounterId: 'city_rats_pack',
+            recommendedPower: 2,
+          },
+        },
+        {
+          id: 'purge_vents',
+          type: 'WORK',
+          label: 'Sigilla le Bocche',
+          icon: '🧪',
+          narrative: 'Gli alchimisti bruciano i residui e rafforzano i sigilli superiori.',
+          requirements: {
+            requiredResources: [{ resourceId: 'materials', amountFormula: '1' }],
+          },
+        },
+      ],
+    },
+    quest_frontier_showcase: {
+      id: 'quest_frontier_showcase',
+      label: 'Quest di Prova — Frontiera',
+      activityId: 'quest_frontier_patrol',
+      summary: 'Dimostrazione multi-fase per la Village Sandbox: esplorazione, combattimento, recupero bottino.',
+      slotId: 'village_gate',
+      icon: '🏕️',
+      phases: [
+        {
+          id: 'explore_perimeter',
+          type: 'WORK',
+          label: 'Perlustra il perimetro',
+          icon: '🧭',
+          narrative: 'Gli scout mappano i varchi delle mura e registrano i segnali di fumo.',
+          requirements: {
+            statRequirement: {
+              label: 'Scout Lucido',
+              allOf: ['lantern'],
+              anyOf: ['edge'],
+            },
+          },
+        },
+        {
+          id: 'skirmish_wolves',
+          type: 'COMBAT',
+          label: 'Ingaggia i Lupi',
+          icon: '🐺',
+          narrative: 'La pattuglia fronteggia il branco che assedia i raccoglitori.',
+          requirements: {
+            encounterId: 'frontier_wolves',
+            recommendedPower: 3,
+          },
+        },
+        {
+          id: 'recover_cache',
+          type: 'WORK',
+          label: 'Recupero Bottino',
+          icon: '🎒',
+          narrative: 'I cartografi sigillano la cache e trasportano i reperti verso il villaggio.',
+          requirements: {
+            requiredResources: [{ resourceId: 'materials', amountFormula: '2' }],
+          },
+        },
+      ],
+      metadata: {
+        theatreCopy: 'Mostra dedicata per il Village Sandbox: usa questa blueprint per illustrare la Quest Chronicle.',
       },
     },
   },
@@ -681,6 +803,7 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
   globalRules: {
     // These numbers are safe placeholders and should be tuned via config/UI.
     maxFatigueBeforeExhausted: 100,
+    startingResidentFatigue: 100,
     fatigueRecoveryPerDay: 50,
     dayLengthInTimeUnits: 5,
     secondsPerTimeUnit: 60,

@@ -4,8 +4,6 @@
 // so new content can be added purely via config/UI.
 
 import type { AppNavTabId } from '@/shared/navigation/navConfig';
-import type { StatBlock } from '@/balancing/types';
-
 /**
  * Config-driven description of a resource that Idle Village systems can exchange.
  */
@@ -157,6 +155,82 @@ export interface ActivityDefinition {
    * Keys are zero-based slot indexes.
    */
   slotModifiers?: ActivitySlotModifierMap;
+}
+
+/** Type of phase a quest node can execute, aligned with engine modules. */
+export type QuestPhaseType = 'TRIAL' | 'COMBAT' | 'WORK';
+
+/** Requirement payload interpreted by the Trial engine. */
+export interface TrialPhaseRequirement {
+  skillCheckId?: string;
+  difficultyLabel?: string;
+  requiredStatTags?: string[];
+}
+
+/** Requirement payload interpreted by the Combat engine. */
+export interface CombatPhaseRequirement {
+  encounterId?: string;
+  enemyPresetIds?: string[];
+  arenaId?: string;
+  recommendedPower?: number;
+}
+
+/** Requirement payload interpreted by the Work/Job engine. */
+export interface WorkPhaseRequirement {
+  requiredResources?: ResourceDeltaDefinition[];
+  statRequirement?: StatRequirement;
+  durationMultiplier?: number;
+}
+
+/** Union of supported requirement payloads for quest phases. */
+export type QuestPhaseRequirement =
+  | TrialPhaseRequirement
+  | CombatPhaseRequirement
+  | WorkPhaseRequirement
+  | Record<string, unknown>;
+
+/** Declarative description of a single quest phase. */
+export interface QuestPhase {
+  id: string;
+  type: QuestPhaseType;
+  label: string;
+  icon?: string;
+  description?: string;
+  narrative?: string;
+  requirements?: QuestPhaseRequirement;
+}
+
+/** Blueprint describing a complete multi-phase quest. */
+export interface QuestBlueprint {
+  id: string;
+  label: string;
+  /** Activity definition this blueprint references for scheduling metadata. */
+  activityId: string;
+  summary?: string;
+  slotId?: string;
+  slotTags?: string[];
+  icon?: string;
+  phases: QuestPhase[];
+  metadata?: Record<string, unknown>;
+}
+
+/** Runtime quest status flag tracked per scheduled quest. */
+export type QuestStatus = 'available' | 'in_progress' | 'completed' | 'failed';
+
+/** Result metadata recorded for each quest phase execution. */
+export interface QuestPhaseResult {
+  phaseId: string;
+  result: 'success' | 'failure';
+  timestamp?: number;
+  notes?: string;
+}
+
+/** Runtime record of quest progression stored on scheduled activities. */
+export interface QuestState {
+  blueprintId: string;
+  currentPhaseIndex: number;
+  status: QuestStatus;
+  phaseResults: QuestPhaseResult[];
 }
 
 /**
@@ -336,6 +410,11 @@ export interface TrialOfFireRules {
 export interface GlobalRules {
   // Fatigue / exhaustion
   maxFatigueBeforeExhausted: number;
+  /**
+   * Initial fatigue applied to residents when they are seeded into a new run.
+   * This value is clamped between 0 and maxFatigueBeforeExhausted.
+   */
+  startingResidentFatigue?: number;
   fatigueRecoveryPerDay: number;
   dayLengthInTimeUnits: number;
   dayNightCycle?: {
@@ -444,6 +523,11 @@ export interface IdleVillageConfig {
   version: string;
   resources: Record<string, ResourceDefinition>;
   activities: Record<string, ActivityDefinition>;
+  /**
+   * Optional collection of quest blueprints that reference activities/slots.
+   * Keeps multi-phase quest authoring config-first.
+   */
+  questBlueprints?: Record<string, QuestBlueprint>;
   mapSlots: Record<string, MapSlotDefinition>;
   mapLayout?: MapLayoutDefinition;
   passiveEffects: Record<string, PassiveEffectDefinition>;

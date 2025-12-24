@@ -57,6 +57,54 @@ export const ActivityDefinitionSchema = z
     slotModifiers: z.record(z.string(), SlotModifierSchema).optional(),
   });
 
+const TrialPhaseRequirementSchema = z.object({
+  skillCheckId: z.string().min(1).optional(),
+  difficultyLabel: z.string().optional(),
+  requiredStatTags: z.array(z.string()).optional(),
+});
+
+const CombatPhaseRequirementSchema = z.object({
+  encounterId: z.string().min(1).optional(),
+  enemyPresetIds: z.array(z.string()).optional(),
+  arenaId: z.string().optional(),
+  recommendedPower: z.number().min(0).optional(),
+});
+
+const WorkPhaseRequirementSchema = z.object({
+  requiredResources: z.array(ResourceDeltaDefinitionSchema).optional(),
+  statRequirement: StatRequirementSchema.optional(),
+  durationMultiplier: z.number().min(0).optional(),
+});
+
+const QuestPhaseRequirementSchema = z.union([
+  TrialPhaseRequirementSchema,
+  CombatPhaseRequirementSchema,
+  WorkPhaseRequirementSchema,
+  z.record(z.string(), z.unknown()),
+]);
+
+const QuestPhaseSchema = z.object({
+  id: z.string().min(1),
+  type: z.enum(['TRIAL', 'COMBAT', 'WORK']),
+  label: z.string().min(1),
+  icon: z.string().optional(),
+  description: z.string().optional(),
+  narrative: z.string().optional(),
+  requirements: QuestPhaseRequirementSchema.optional(),
+});
+
+export const QuestBlueprintSchema = z.object({
+  id: z.string().min(1),
+  label: z.string().min(1),
+  activityId: z.string().min(1),
+  summary: z.string().optional(),
+  slotId: z.string().optional(),
+  slotTags: z.array(z.string()).optional(),
+  icon: z.string().optional(),
+  phases: z.array(QuestPhaseSchema).min(1),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+});
+
 
 
 export const PassiveEffectDefinitionSchema = z.object({
@@ -136,6 +184,7 @@ export const MapSlotDefinitionSchema = z.object({
 
 export const GlobalRulesSchema = z.object({
   maxFatigueBeforeExhausted: z.number(),
+  startingResidentFatigue: z.number().optional(),
   fatigueRecoveryPerDay: z.number(),
   dayLengthInTimeUnits: z.number(),
   secondsPerTimeUnit: z.number().optional(),
@@ -201,6 +250,7 @@ export const IdleVillageConfigSchema = z.object({
   version: z.string().min(1),
   resources: z.record(z.string(), ResourceDefinitionSchema),
   activities: z.record(z.string(), ActivityDefinitionSchema),
+  questBlueprints: z.record(z.string(), QuestBlueprintSchema).optional(),
   mapSlots: z.record(z.string(), MapSlotDefinitionSchema),
   mapLayout: MapLayoutDefinitionSchema.optional(),
   passiveEffects: z.record(z.string(), PassiveEffectDefinitionSchema), // Added
