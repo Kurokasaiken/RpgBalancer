@@ -7,7 +7,7 @@ import LocationCard from '@/ui/idleVillage/components/LocationCard';
 import ActivitySlot from '@/ui/idleVillage/components/ActivitySlot';
 import VerbDetailCard, { type VerbDetailAssignment, type VerbSlotState } from '@/ui/idleVillage/VerbDetailCard';
 import ResidentRoster from '@/ui/idleVillage/ResidentRoster';
-import WorkerDragToken from '@/ui/idleVillage/components/WorkerDragToken';
+import DragTestContainer from '@/ui/idleVillage/components/DragTestContainer';
 import TheaterView from '@/ui/idleVillage/components/TheaterView';
 import { formatResidentLabel } from '@/ui/idleVillage/residentName';
 import { useThemeSwitcher } from '@/hooks/useThemeSwitcher';
@@ -167,7 +167,41 @@ const VillageSandbox = () => {
       const residentLabel = resident ? formatResidentLabel(resident) : residentId;
       setAssignmentFeedback(`${residentLabel} assegnato a ${activityLabel}.`);
     },
-    [config.activities, villageState.residents],
+    [config.activities, villageState.residents, formatResidentLabel, setAssignmentFeedback]
+  );
+
+  const canSlotAcceptDrop = useCallback(
+    (slotId: string): boolean => {
+      // If no resident is being dragged, can't accept drop
+      if (!draggingResidentId) {
+        console.log('No dragging resident');
+        return false;
+      }
+      
+      // Find the resident being dragged
+      const draggedResident = residents.find(r => r.id === draggingResidentId);
+      if (!draggedResident) {
+        console.log('Dragged resident not found:', draggingResidentId);
+        return false;
+      }
+      
+      // Check if resident is exhausted or injured
+      if (draggedResident.status === 'exhausted' || draggedResident.isInjured) {
+        console.log('Resident exhausted/injured:', draggedResident.status, draggedResident.isInjured);
+        return false;
+      }
+      
+      // Check if slot is already occupied by someone else
+      const currentAssignment = assignments[slotId];
+      if (currentAssignment && currentAssignment !== draggingResidentId) {
+        console.log('Slot occupied by someone else:', currentAssignment);
+        return false;
+      }
+      
+      console.log('Slot can accept drop:', slotId);
+      return true;
+    },
+    [draggingResidentId, residents, assignments]
   );
 
   const resolveWorkerName = (residentId: string | null) => {
@@ -454,6 +488,7 @@ const VillageSandbox = () => {
                     iconName={slot.iconName}
                     label={slot.mapSlotLabel ? `${slot.label} · ${slot.mapSlotLabel}` : slot.label}
                     assignedWorkerName={resolveWorkerName(slot.assignedWorkerId)}
+                    canAcceptDrop={canSlotAcceptDrop(slot.slotId)}
                     onWorkerDrop={(workerId) => handleWorkerDrop(slot.slotId, workerId)}
                     onInspect={(slotId) => setDetailSlotId(slotId)}
                   />
@@ -481,28 +516,20 @@ const VillageSandbox = () => {
       </section>
 
       <div className="space-y-4 mt-8">
-        <h2 className="text-xs uppercase tracking-[0.35em] text-slate-400">Test Drag Token (Isolated)</h2>
-        <WorkerDragToken
-          workerId="test-resident"
-          label="Test Resident"
-          subtitle="Isolated test for drag"
-          hp={90}
-          fatigue={10}
-          isDragging={draggingResidentId === "test-resident"}
-          disabled={false}
-          onDragStateChange={(id: string, dragging: boolean) => {
-            console.log('Test drag state:', id, dragging);
-            setDraggingResidentId(dragging ? id : null);
+        <h2 className="text-xs uppercase tracking-[0.35em] text-slate-400">Drag Test Container</h2>
+        <DragTestContainer
+          residents={residents}
+          onDragStart={(residentId) => {
+            console.log('VillageSandbox drag start:', residentId);
+            setDraggingResidentId(residentId);
           }}
-          onDragStart={(event) => {
-            console.log('Test drag start');
-            event.dataTransfer.setData('text/resident-id', 'test-resident');
-            event.dataTransfer.effectAllowed = 'move';
-            setDraggingResidentId('test-resident');
-          }}
-         onDragEnd={() => {
-            console.log('Test drag end');
+          onDragEnd={(residentId) => {
+            console.log('VillageSandbox drag end:', residentId);
             setDraggingResidentId(null);
+          }}
+          onDragStateChange={(residentId, isDragging) => {
+            console.log('VillageSandbox drag state:', residentId, isDragging);
+            setDraggingResidentId(isDragging ? residentId : null);
           }}
         />
       </div>
@@ -510,7 +537,7 @@ const VillageSandbox = () => {
       {detailSlotId && detailActivity && detailPreview && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div className="absolute inset-0 bg-black/70" onClick={() => setDetailSlotId(null)} />
-          <div className="relative z-10 max-h-[90vh] w-full max-w-3xl overflow-y-auto">
+          <div className="relative z-10 max-h-[90vh] w-full max-w-xl overflow-y-auto">
             <VerbDetailCard
               title={detailActivity.label ?? detailActivity.id}
               subtitle="Dettaglio Attività"
@@ -533,7 +560,6 @@ const VillageSandbox = () => {
         <TheaterView
           slotLabel={theaterSlot.label}
           slotIcon={theaterSlot.iconName}
-          panoramaUrl={null}
           verbs={theaterVerbs}
           onClose={handleCloseTheater}
         />

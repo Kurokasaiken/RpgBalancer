@@ -1,28 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import type { VerbSummary } from '@/ui/idleVillage/verbSummaries';
-import MarbleMedallionCard from '@/ui/fantasy/assets/marble-verb-card/MarbleMedallionCard';
-import VerbCard from '@/ui/idleVillage/VerbCard';
+import ActivitySlot from '@/ui/idleVillage/components/ActivitySlot';
 import { RESIDENT_DRAG_MIME } from '@/ui/idleVillage/constants';
+import theaterPlaceholder from '@/assets/ui/idleVillage/theater-placeholder.jpg';
 
+/**
+ * Props for the compact theater-style overlay that previews the currently selected slot.
+ */
 export interface TheaterViewProps {
   slotLabel: string;
   slotIcon?: string;
-  panoramaUrl?: string | null;
   verbs: VerbSummary[];
   onClose: () => void;
   acceptResidentDrop?: boolean;
   onResidentDrop?: (residentId: string | null) => void;
 }
 
+/**
+ * Compact overlay showing a set of ActivitySlot previews for the inspected location.
+ */
 const TheaterView: React.FC<TheaterViewProps> = ({
   slotLabel,
   slotIcon,
-  panoramaUrl,
   verbs,
   onClose,
   acceptResidentDrop = false,
   onResidentDrop,
 }) => {
+  const THEATER_HEIGHT = '50vh';
+  const PANORAMA_RATIO = 0.6; // reduced by 15%
+  const ACTIVITY_RATIO = 1 - PANORAMA_RATIO;
+  const ACTIVITY_SCALE = 0.6; // reduced by 25%
+  const panoramaHeight = `calc(${THEATER_HEIGHT} * ${PANORAMA_RATIO})`;
+  const activitiesHeight = `calc(${THEATER_HEIGHT} * ${ACTIVITY_RATIO})`;
   const [isDragOver, setIsDragOver] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -61,80 +71,82 @@ const TheaterView: React.FC<TheaterViewProps> = ({
       />
       <div
         className={[
-          'absolute left-1/2 top-6 z-40 w-[82%] -translate-x-1/2 rounded-3xl obsidian-panel transition-all duration-700 ease-out',
+          'absolute left-1/2 top-10 z-40 w-1/2 max-w-4xl -translate-x-1/2 rounded-3xl obsidian-panel transition-all duration-500 ease-out',
           isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4',
-          acceptResidentDrop && isDragOver ? 'ring-2 ring-emerald-300/70 shadow-[0_0_60px_rgba(16,185,129,0.45)]' : '',
+          acceptResidentDrop && isDragOver ? 'ring-2 ring-emerald-300/70 shadow-[0_0_40px_rgba(16,185,129,0.45)]' : '',
         ]
           .filter(Boolean)
           .join(' ')}
+        style={{ height: THEATER_HEIGHT }}
         onDragOver={handleDragOver}
         onDragEnter={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         aria-dropeffect={acceptResidentDrop ? 'copy' : undefined}
       >
-      {acceptResidentDrop && (
-        <div
-          className={[
-            'pointer-events-none absolute inset-0 rounded-3xl border-2 border-dashed transition-colors duration-200',
-            isDragOver ? 'border-emerald-300/80' : 'border-transparent',
-          ].join(' ')}
-        />
-      )}
-      <header className="relative overflow-hidden rounded-t-3xl bronze-corners">
-        {panoramaUrl ? (
-          <img
-            src={panoramaUrl}
-            alt={slotLabel}
-            className="h-48 w-full object-cover"
-            style={{ aspectRatio: '21 / 9' }}
+        {acceptResidentDrop && (
+          <div
+            className={[
+              'pointer-events-none absolute inset-0 rounded-3xl border-2 border-dashed transition-colors duration-200',
+              isDragOver ? 'border-emerald-300/80' : 'border-transparent',
+            ].join(' ')}
           />
-        ) : (
-          <div className="h-48 w-full bg-linear-to-r from-slate-900 via-slate-800 to-slate-900" />
         )}
-        <div className="absolute inset-0 bg-linear-to-r from-black/75 via-black/55 to-black/65" />
-        <div className="absolute inset-0 flex items-end justify-between px-6 pb-4">
-          <div className="flex items-center gap-3">
-            <MarbleMedallionCard title={slotLabel} icon={slotIcon ?? '◎'} tone="neutral" progress={0} isActive={false} />
-            <div className="space-y-1 text-sm uppercase tracking-[0.35em] text-amber-200">
-              <div className="text-lg font-semibold tracking-[0.2em]">Theater View</div>
-              <div className="text-xs text-amber-100/70">Bloom Reveal attivo</div>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-full border border-amber-200/60 bg-[rgba(5,8,15,0.7)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.4em] text-amber-100 hover:bg-amber-100/10"
+        <div className="flex h-full flex-col gap-4 px-6 py-4">
+          <div
+            className="relative w-full overflow-hidden rounded-2xl border border-amber-200/30 shadow-[0_25px_45px_rgba(0,0,0,0.45)]"
+            style={{ flex: `0 0 ${panoramaHeight}` }}
           >
-            Chiudi
-          </button>
-        </div>
-      </header>
-
-      <div className="flex flex-nowrap gap-4 overflow-x-auto px-6 py-5">
-        {verbs.map((verb) => (
-          <div key={verb.key} className="flex flex-col items-center gap-2 text-center text-[10px] uppercase tracking-[0.25em] text-ivory/80">
-            <VerbCard
-              icon={verb.icon ?? '◎'}
-              progressFraction={verb.progressFraction}
-              elapsedSeconds={verb.elapsedSeconds}
-              totalDuration={verb.totalDurationSeconds || verb.remainingSeconds || 0}
-              injuryPercentage={verb.injuryPercentage}
-              deathPercentage={verb.deathPercentage}
-              assignedCount={verb.assignedCount}
-              totalSlots={verb.totalSlots}
-              visualVariant={verb.visualVariant}
-              progressStyle={verb.progressStyle}
-              className="w-32"
+            <img
+              src={theaterPlaceholder}
+              alt="Northern frontier panorama"
+              className="h-full w-full object-cover"
+              loading="lazy"
             />
-            <div className="space-y-0.5">
-              <div className="text-[9px] font-semibold text-ivory">{verb.label}</div>
-              <div className="text-[9px] text-ivory/60">{verb.kindLabel}</div>
-              {verb.deadlineLabel && <div className="text-[9px] text-amber-200">{verb.deadlineLabel}</div>}
+            <div className="absolute inset-0 bg-linear-to-b from-black/65 via-black/20 to-transparent" />
+            <div className="absolute top-4 left-0 right-0 flex items-center justify-between px-5">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.45em] text-amber-200/70">Panorama</p>
+                <p className="text-lg font-semibold tracking-[0.2em] text-amber-50">
+                  {slotIcon ?? '◎'} {slotLabel}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-full border border-amber-200/80 bg-black/40 px-4 py-1 text-[10px] font-semibold uppercase tracking-[0.35em] text-amber-100 transition hover:bg-amber-100/10"
+              >
+                Chiudi
+              </button>
             </div>
           </div>
-        ))}
-      </div>
+          <div
+            className="flex flex-1 items-end justify-between gap-4 overflow-x-auto pb-2"
+            style={{ height: activitiesHeight, flex: `0 0 ${activitiesHeight}` }}
+          >
+            {verbs.map((verb) => (
+              <div
+                key={verb.key}
+                className="flex flex-1 items-end justify-center h-full"
+                style={{ height: '100%' }}
+              >
+                <div
+                  className="origin-bottom"
+                  style={{ transform: `scale(${ACTIVITY_SCALE})`, transformOrigin: 'bottom center' }}
+                >
+                  <ActivitySlot
+                    slotId={verb.key}
+                    iconName={typeof verb.icon === 'string' ? (verb.icon as string) : slotIcon ?? '◎'}
+                    label={verb.label}
+                    assignedWorkerName={verb.assigneeNames?.[0]}
+                    onWorkerDrop={() => {}}
+                    onInspect={() => {}}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </>
   );

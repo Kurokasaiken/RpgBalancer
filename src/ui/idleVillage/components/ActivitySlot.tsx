@@ -9,6 +9,7 @@ export interface ActivitySlotProps {
   iconName: string;
   label: string;
   assignedWorkerName?: string | null;
+  canAcceptDrop?: boolean;
   onWorkerDrop: (workerId: string | null) => void;
   onInspect?: (slotId: string) => void;
 }
@@ -16,7 +17,7 @@ export interface ActivitySlotProps {
 /**
  * Circular drop target showing available activities and assigned residents.
  */
-const ActivitySlot: React.FC<ActivitySlotProps> = ({ slotId, iconName, label, assignedWorkerName, onWorkerDrop, onInspect }) => {
+const ActivitySlot: React.FC<ActivitySlotProps> = ({ slotId, iconName, label, assignedWorkerName, canAcceptDrop = true, onWorkerDrop, onInspect }) => {
   const [isOver, setIsOver] = useState(false);
 
   /**
@@ -40,6 +41,13 @@ const ActivitySlot: React.FC<ActivitySlotProps> = ({ slotId, iconName, label, as
    */
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
+    
+    // Check if drop is allowed
+    if (!canAcceptDrop) {
+      setIsOver(false);
+      return;
+    }
+    
     const workerId = event.dataTransfer.getData('text/resident-id') || event.dataTransfer.getData('text/plain') || null;
     onWorkerDrop(workerId);
     setIsOver(false);
@@ -47,18 +55,26 @@ const ActivitySlot: React.FC<ActivitySlotProps> = ({ slotId, iconName, label, as
 
   const workerInitial = assignedWorkerName?.charAt(0) ?? null;
   const hasWorker = Boolean(assignedWorkerName);
+  
+  // Bloom mode - show on all valid slots during drag, enhanced when hovering
+  const bloomActive = canAcceptDrop || hasWorker;
+  const isHoveringValid = isOver && canAcceptDrop;
+  
+  const baseClasses = [
+    'relative h-28 w-28 rounded-full border transition-all duration-200',
+    isHoveringValid
+      ? 'ring-4 ring-white/90 drop-shadow-[0_0_80px_rgba(255,255,255,0.8)] scale-110 border-white/50'
+      : bloomActive
+        ? 'ring-4 ring-yellow-400/80 drop-shadow-[0_0_60px_rgba(251,204,21,0.7)] scale-105 border-yellow-400/60'
+        : 'shadow-cobalt scale-100',
+  ].join(' ');
 
   const baseShadow = hasWorker ? '0 0 55px var(--color-cobalt-glow)' : '0 0 35px var(--color-bronze-light)';
   const slotStyle: CSSProperties = {
     borderColor: 'var(--color-bronze-light)',
     background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.08), rgba(13,15,18,0.95))',
-    boxShadow: baseShadow,
+    boxShadow: bloomActive ? undefined : baseShadow, // Let ring/drop-shadow handle bloom when active
   };
-
-  if (isOver) {
-    slotStyle.boxShadow = '0 0 75px var(--color-risk-injury)';
-    slotStyle.transform = 'scale(1.08)';
-  }
 
   return (
     <div className="flex flex-col items-center gap-3 text-center">
@@ -68,7 +84,7 @@ const ActivitySlot: React.FC<ActivitySlotProps> = ({ slotId, iconName, label, as
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={() => onInspect?.(slotId)}
-        className="relative h-28 w-28 rounded-full border shadow-cobalt transition-transform duration-200"
+        className={baseClasses}
         style={slotStyle}
         aria-label={`Activity slot ${label ?? slotId}`}
       >
@@ -91,6 +107,9 @@ const ActivitySlot: React.FC<ActivitySlotProps> = ({ slotId, iconName, label, as
             {workerInitial}
           </div>
         )}
+      </div>
+      <div className="text-xs text-slate-400 max-w-28 truncate">
+        {label}
       </div>
     </div>
   );
