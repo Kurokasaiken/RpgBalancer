@@ -35,8 +35,9 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
   const cardStyle: React.CSSProperties = {
     borderColor: 'var(--card-border-color)',
     background: `var(--card-surface-radial), var(--card-surface)`,
-    boxShadow: isHovering ? '0 0 80px var(--halo-color)' : '0 18px 35px var(--card-shadow-color)',
+    boxShadow: isHovering ? '0 0 80px var(--halo-color)' : '0 24px 45px rgba(0, 5, 15, 0.75)',
     color: 'var(--text-primary)',
+    backgroundBlendMode: 'overlay',
   };
 
   if (isDragging) {
@@ -47,7 +48,7 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
         data-worker-name={name}
         data-worker-hp={hp}
         data-worker-fatigue={fatigue}
-        className="flex h-20 w-20 items-center justify-center rounded-full border text-2xl font-semibold shadow-[0_0_35px_rgba(251,191,36,0.45)]"
+        className="flex h-20 w-20 items-center justify-center rounded-full border text-2xl font-semibold shadow-[0_0_35px_rgba(251,191,36,0.45)] shadow-cobalt"
         style={{
           borderColor: 'var(--accent-color)',
           background: 'var(--card-surface)',
@@ -71,7 +72,7 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
       data-worker-fatigue={fatigue}
       className={[
         'relative w-full max-w-sm cursor-pointer overflow-hidden rounded-2xl border p-4 transition',
-        isExhausted ? 'grayscale-[0.45] opacity-85' : '',
+        isExhausted ? 'grayscale-[0.25] opacity-90 before:absolute before:inset-0 before:bg-linear-to-br before:from-black/40 before:to-transparent before:pointer-events-none' : '',
         isHovering ? 'ring-4 shadow-xl' : '',
       ]
         .filter(Boolean)
@@ -84,13 +85,13 @@ const WorkerCard: React.FC<WorkerCardProps> = ({
     >
       {isHovering && (
         <div
-          className="pointer-events-none absolute inset-0 blur-2xl transition-opacity duration-300"
+          className="pointer-events-none absolute inset-0 blur-3xl transition-opacity duration-300 shadow-cobalt"
           style={{ background: 'var(--card-highlight)' }}
         />
       )}
       <div className="space-y-3">
         <div className="flex items-center justify-between text-xs uppercase tracking-[0.35em]" style={{ color: 'var(--text-muted)' }}>
-          <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+          <span className="text-sm font-semibold quest-title-bronze" style={{ color: 'var(--text-primary)' }}>
             {name}
           </span>
           <span className="text-[9px]" style={{ color: isExhausted ? 'var(--fatigue-bar-end)' : 'var(--hp-bar-end)' }}>

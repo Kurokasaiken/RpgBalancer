@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { Sparkles } from 'lucide-react';
 
 /**
@@ -48,6 +48,18 @@ const ActivitySlot: React.FC<ActivitySlotProps> = ({ slotId, iconName, label, as
   const workerInitial = assignedWorkerName?.charAt(0) ?? null;
   const hasWorker = Boolean(assignedWorkerName);
 
+  const baseShadow = hasWorker ? '0 0 55px var(--color-cobalt-glow)' : '0 0 35px var(--color-bronze-light)';
+  const slotStyle: CSSProperties = {
+    borderColor: 'var(--color-bronze-light)',
+    background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.08), rgba(13,15,18,0.95))',
+    boxShadow: baseShadow,
+  };
+
+  if (isOver) {
+    slotStyle.boxShadow = '0 0 75px var(--color-risk-injury)';
+    slotStyle.transform = 'scale(1.08)';
+  }
+
   return (
     <div className="flex flex-col items-center gap-3 text-center">
       <div
@@ -56,19 +68,18 @@ const ActivitySlot: React.FC<ActivitySlotProps> = ({ slotId, iconName, label, as
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={() => onInspect?.(slotId)}
-        className={[
-          'relative h-28 w-28 rounded-full border border-slate-700/80 bg-slate-900 drop-shadow-xl transition-all duration-200',
-          hasWorker
-            ? 'ring-2 ring-emerald-400/70 shadow-[0_0_45px_rgba(16,185,129,0.45)]'
-            : 'ring-2 ring-amber-500/30 shadow-[0_0_30px_rgba(201,162,39,0.35)]',
-          isOver ? 'ring-amber-300 scale-110 animate-pulse shadow-[0_0_60px_rgba(251,191,36,0.55)]' : '',
-        ]
-          .filter(Boolean)
-          .join(' ')}
-        aria-label={`Activity slot ${slotId}`}
+        className="relative h-28 w-28 rounded-full border shadow-cobalt transition-transform duration-200"
+        style={slotStyle}
+        aria-label={`Activity slot ${label ?? slotId}`}
       >
-        <div className="absolute inset-1 rounded-full border border-slate-700/60" />
-        <div className="absolute inset-4 flex items-center justify-center rounded-full bg-slate-950/90 text-3xl text-amber-200">
+        <div
+          className="absolute inset-1 rounded-full border"
+          style={{ borderColor: 'rgba(255, 215, 0, 0.15)' }}
+        />
+        <div
+          className="absolute inset-4 flex items-center justify-center rounded-full text-3xl text-amber-200 shadow-inner shadow-black/70"
+          style={{ background: 'var(--panel-surface)' }}
+        >
           {iconName ? (
             <span aria-hidden>{iconName}</span>
           ) : (
@@ -76,16 +87,10 @@ const ActivitySlot: React.FC<ActivitySlotProps> = ({ slotId, iconName, label, as
           )}
         </div>
         {workerInitial && (
-          <div className="absolute -right-1 -top-1 rounded-full border border-amber-300/70 bg-slate-950 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-200 shadow-[0_0_18px_rgba(251,191,36,0.55)]">
+          <div className="gem-oil absolute -right-1 -top-1 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-50">
             {workerInitial}
           </div>
         )}
-      </div>
-      <div className="space-y-1">
-        <div className="text-[11px] uppercase tracking-[0.35em] text-slate-300">{label}</div>
-        <div className="text-[10px] uppercase tracking-[0.3em] text-amber-200">
-          {assignedWorkerName ? assignedWorkerName : 'Trascina un lavoratore'}
-        </div>
       </div>
     </div>
   );

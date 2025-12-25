@@ -45,9 +45,9 @@ const randomGradient = () =>
 
 const loadStoredPresetId = (): ThemePresetId => {
   if (typeof window === 'undefined') return DEFAULT_THEME_ID;
-  const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+  const stored = window.localStorage.getItem(THEME_STORAGE_KEY) as ThemePresetId | null;
   if (!stored) return DEFAULT_THEME_ID;
-  if (stored === 'obsidian' || stored === 'ethereal' || stored === 'frontier') return stored;
+  if (stored in themePresetMap) return stored;
   return DEFAULT_THEME_ID;
 };
 

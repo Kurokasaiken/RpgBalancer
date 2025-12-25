@@ -54,20 +54,25 @@ const TheaterView: React.FC<TheaterViewProps> = ({
   };
 
   return (
-    <div
-      className={[
-        'absolute left-1/2 top-6 z-40 w-[82%] -translate-x-1/2 rounded-3xl border border-gold/30 bg-black/85 shadow-[0_20px_120px_rgba(0,0,0,0.65)] backdrop-blur-lg transition-all duration-700 ease-out',
-        isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4',
-        acceptResidentDrop && isDragOver ? 'border-emerald-300/70 shadow-[0_0_60px_rgba(16,185,129,0.45)]' : '',
-      ]
-        .filter(Boolean)
-        .join(' ')}
-      onDragOver={handleDragOver}
-      onDragEnter={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-      aria-dropeffect={acceptResidentDrop ? 'copy' : undefined}
-    >
+    <>
+      <div
+        className="pointer-events-none fixed inset-0 z-30 bg-[radial-gradient(circle,transparent_40%,rgba(0,0,0,0.85)_120%)] transition-opacity duration-500"
+        style={{ opacity: isMounted ? 1 : 0 }}
+      />
+      <div
+        className={[
+          'absolute left-1/2 top-6 z-40 w-[82%] -translate-x-1/2 rounded-3xl obsidian-panel transition-all duration-700 ease-out',
+          isMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4',
+          acceptResidentDrop && isDragOver ? 'ring-2 ring-emerald-300/70 shadow-[0_0_60px_rgba(16,185,129,0.45)]' : '',
+        ]
+          .filter(Boolean)
+          .join(' ')}
+        onDragOver={handleDragOver}
+        onDragEnter={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        aria-dropeffect={acceptResidentDrop ? 'copy' : undefined}
+      >
       {acceptResidentDrop && (
         <div
           className={[
@@ -76,7 +81,7 @@ const TheaterView: React.FC<TheaterViewProps> = ({
           ].join(' ')}
         />
       )}
-      <header className="relative overflow-hidden rounded-t-3xl">
+      <header className="relative overflow-hidden rounded-t-3xl bronze-corners">
         {panoramaUrl ? (
           <img
             src={panoramaUrl}
@@ -99,7 +104,7 @@ const TheaterView: React.FC<TheaterViewProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full border border-amber-200/60 bg-black/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.4em] text-amber-100 hover:bg-amber-100/10"
+            className="rounded-full border border-amber-200/60 bg-[rgba(5,8,15,0.7)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.4em] text-amber-100 hover:bg-amber-100/10"
           >
             Chiudi
           </button>
@@ -130,8 +135,10 @@ const TheaterView: React.FC<TheaterViewProps> = ({
           </div>
         ))}
       </div>
-    </div>
+      </div>
+    </>
   );
-};
+}
+;
 
 export default TheaterView;

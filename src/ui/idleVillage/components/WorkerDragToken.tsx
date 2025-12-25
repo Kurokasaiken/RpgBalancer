@@ -54,16 +54,46 @@ const WorkerDragToken: React.FC<WorkerDragTokenProps> = ({
     event.dataTransfer.setData('text/plain', workerId);
     event.dataTransfer.effectAllowed = 'move';
 
-    const preview = document.createElement('div');
-    preview.className =
-      'flex h-12 w-12 items-center justify-center rounded-full border border-amber-300/80 bg-slate-900 text-base font-semibold uppercase tracking-[0.2em] text-amber-100 shadow-[0_0_25px_rgba(251,191,36,0.55)]';
-    preview.textContent = label.charAt(0) || workerId.charAt(0);
-    document.body.appendChild(preview);
-    dragPreviewRef.current = preview;
-    event.dataTransfer.setDragImage(preview, 20, 20);
+    // Create canvas drag preview for perfect circle
+    const canvas = document.createElement('canvas');
+    canvas.width = 48;
+    canvas.height = 48;
+    const ctx = canvas.getContext('2d');
+    
+    if (ctx) {
+      // Draw circle background
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.95)'; // slate-900 with transparency
+      ctx.beginPath();
+      ctx.arc(24, 24, 22, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Draw border
+      ctx.strokeStyle = 'rgba(251, 191, 36, 0.8)'; // amber-300
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(24, 24, 22, 0, Math.PI * 2);
+      ctx.stroke();
+      
+      // Draw shadow
+      ctx.shadowColor = 'rgba(251, 191, 36, 0.55)';
+      ctx.shadowBlur = 25;
+      ctx.beginPath();
+      ctx.arc(24, 24, 22, 0, Math.PI * 2);
+      ctx.stroke();
+      
+      // Draw text
+      ctx.fillStyle = '#fef3c7'; // amber-100
+      ctx.font = 'bold 16px system-ui';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText((label.charAt(0) || workerId.charAt(0)).toUpperCase(), 24, 24);
+      
+      // Set drag image
+      event.dataTransfer.setDragImage(canvas, 24, 24);
+    }
 
-    onDragStart?.(event);
     onDragStateChange?.(workerId, true);
+    onDragStart?.(event);
   };
 
   const handleDragEnd = (event: React.DragEvent<HTMLDivElement>) => {

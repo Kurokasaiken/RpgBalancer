@@ -61,9 +61,9 @@ export default function IdleVillageConfigRoute() {
             type="button"
             onClick={handleInitializeTestVillage}
             disabled={isInitializingVillage}
-            className="inline-flex items-center justify-center rounded-full border border-gold px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.2em] transition-colors disabled:opacity-60 disabled:cursor-not-allowed bg-gold text-obsidian hover:bg-gold/90"
+            className="oil-slick-button disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {isInitializingVillage ? 'Inizializzo…' : 'Inizializza Villaggio di Test'}
+            <span>{isInitializingVillage ? 'Inizializzo…' : 'Inizializza Villaggio di Test'}</span>
           </button>
         </header>
 

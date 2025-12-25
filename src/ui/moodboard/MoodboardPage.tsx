@@ -7,7 +7,7 @@ import LocationCard from '@/ui/idleVillage/components/LocationCard';
 import VerbCard from '@/ui/idleVillage/VerbCard';
 import { FantasyCard } from '@/ui/fantasy/atoms/FantasyCard';
 import { useThemeSwitcher } from '@/hooks/useThemeSwitcher';
-import { MOODBOARD_STYLES } from './moodboardStyles';
+import type { ThemePreset } from '@/data/themePresets';
 import './moodboard.css';
 
 interface MoodImage {
@@ -37,6 +37,107 @@ const MOOD_IMAGES: MoodImage[] = Object.entries(moodImageModules)
   .sort((a, b) => a.id.localeCompare(b.id));
 
 const FALLBACK_ASPECT_RATIO = 16 / 9;
+const DEFAULT_AUTO_ADVANCE_MS = 7000;
+
+const MOODBOARD_TOKEN_MAP: {
+  moodVar: string;
+  themeVar?: string;
+  compute?: (preset: ThemePreset) => string;
+  fallback: string;
+}[] = [
+  { moodVar: 'mood-background', themeVar: 'surface-base', fallback: '#050509' },
+  { moodVar: 'mood-background-overlay', themeVar: 'body-bg-overlay', fallback: 'linear-gradient(135deg, rgba(5,5,9,0.95), rgba(4,7,14,0.85))' },
+  { moodVar: 'mood-text-primary', themeVar: 'text-primary', fallback: '#f7f4ea' },
+  { moodVar: 'mood-text-secondary', themeVar: 'text-secondary', fallback: '#f8d97c' },
+  { moodVar: 'mood-text-muted', themeVar: 'text-muted', fallback: 'rgba(226,232,240,0.72)' },
+  { moodVar: 'mood-accent', themeVar: 'accent-color', fallback: '#c9a227' },
+  { moodVar: 'mood-accent-glow', themeVar: 'halo-color', fallback: 'rgba(201,162,39,0.4)' },
+  { moodVar: 'mood-control-border', themeVar: 'button-border', fallback: 'rgba(201,162,39,0.4)' },
+  { moodVar: 'mood-control-bg', themeVar: 'button-bg', fallback: 'rgba(5,9,14,0.75)' },
+  { moodVar: 'mood-control-hover-bg', themeVar: 'card-highlight', fallback: 'rgba(255,255,255,0.08)' },
+  { moodVar: 'mood-control-text', themeVar: 'button-text', fallback: '#f7f4ea' },
+  { moodVar: 'mood-control-active-border', themeVar: 'accent-strong', fallback: '#ffd369' },
+  { moodVar: 'mood-control-active-bg', themeVar: 'card-highlight', fallback: 'rgba(201,162,39,0.18)' },
+  { moodVar: 'mood-control-active-text', themeVar: 'text-primary', fallback: '#ffffff' },
+  { moodVar: 'mood-panel-border', themeVar: 'panel-border', fallback: 'rgba(201,162,39,0.35)' },
+  { moodVar: 'mood-panel-surface', themeVar: 'panel-surface', fallback: 'rgba(5,7,13,0.82)' },
+  {
+    moodVar: 'mood-panel-shadow',
+    compute: (preset) => `0 30px 60px ${preset.tokens['card-shadow-color'] ?? 'rgba(5,5,9,0.55)'}`,
+    fallback: '0 30px 60px rgba(5,5,9,0.55)',
+  },
+  { moodVar: 'mood-panel-radius', fallback: '32px' },
+  { moodVar: 'mood-chip-border', themeVar: 'slot-border', fallback: 'rgba(255,255,255,0.3)' },
+  { moodVar: 'mood-chip-bg', themeVar: 'slot-surface', fallback: 'rgba(3,6,9,0.45)' },
+  { moodVar: 'mood-chip-text', themeVar: 'slot-icon-color', fallback: '#f0efe4' },
+  { moodVar: 'mood-frame-radius', fallback: '36px' },
+  { moodVar: 'mood-frame-border', themeVar: 'panel-border', fallback: 'rgba(255,255,255,0.08)' },
+  {
+    moodVar: 'mood-frame-shadow',
+    compute: (preset) => `0 35px 70px ${preset.tokens['card-shadow-color'] ?? 'rgba(5,5,9,0.65)'}`,
+    fallback: '0 35px 70px rgba(5,5,9,0.65)',
+  },
+  { moodVar: 'mood-frame-surface', themeVar: 'card-surface', fallback: 'rgba(5,7,12,0.9)' },
+  { moodVar: 'mood-frame-aura', themeVar: 'card-highlight', fallback: 'rgba(201,162,39,0.35)' },
+  { moodVar: 'mood-component-border', themeVar: 'slot-border', fallback: 'rgba(255,255,255,0.12)' },
+  { moodVar: 'mood-component-surface', themeVar: 'card-surface', fallback: 'rgba(5,8,14,0.78)' },
+  {
+    moodVar: 'mood-component-shadow',
+    compute: (preset) => `0 25px 45px ${preset.tokens['card-shadow-color'] ?? 'rgba(0,0,0,0.55)'}`,
+    fallback: '0 25px 45px rgba(0,0,0,0.55)',
+  },
+  { moodVar: 'mood-component-radius', fallback: '28px' },
+  { moodVar: 'mood-component-muted', themeVar: 'slot-helper-color', fallback: 'rgba(226,232,240,0.65)' },
+  { moodVar: 'mood-info-border', themeVar: 'panel-border', fallback: 'rgba(255,255,255,0.16)' },
+  { moodVar: 'mood-info-surface', themeVar: 'panel-surface', fallback: 'rgba(4,7,12,0.92)' },
+  {
+    moodVar: 'mood-info-shadow',
+    compute: (preset) => `0 30px 55px ${preset.tokens['card-shadow-color'] ?? 'rgba(0,0,0,0.45)'}`,
+    fallback: '0 30px 55px rgba(0,0,0,0.45)',
+  },
+];
+
+const buildMoodboardTokens = (preset: ThemePreset): CSSProperties => {
+  const tokens: Record<string, string> = {};
+  MOODBOARD_TOKEN_MAP.forEach(({ moodVar, themeVar, compute, fallback }) => {
+    const value = compute
+      ? compute(preset)
+      : themeVar
+        ? preset.tokens[themeVar] ?? fallback
+        : fallback;
+    tokens[`--${moodVar}`] = value ?? fallback;
+  });
+  return tokens as CSSProperties;
+};
+
+const presetBadges: Partial<Record<ThemePreset['id'], React.ReactNode>> = {
+  epicFrontier: (
+    <span className="inline-flex items-center gap-1 rounded-full border border-(--color-bronze-light,#ffd700) px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-(--color-bronze-light,#ffd700)">
+      ✦ Epic Frontier
+    </span>
+  ),
+  frontier: (
+    <span className="inline-flex items-center gap-1 rounded-full border border-amber-300/60 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-amber-200">
+      ★ Frontier
+    </span>
+  ),
+  vellumLight: (
+    <span className="inline-flex items-center gap-1 rounded-full border border-[#d9c394] px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-[#a0782a]">
+      ☼ Vellum
+    </span>
+  ),
+};
+
+const getAutoAdvanceMs = (presetId: string): number => {
+  switch (presetId) {
+    case 'vellumLight':
+      return 9000;
+    case 'obsidian':
+      return 5500;
+    default:
+      return DEFAULT_AUTO_ADVANCE_MS;
+  }
+};
 
 /**
  * MoodboardPage renders a dynamic slideshow sourced from any image files placed under src/assets/mood.
@@ -45,22 +146,11 @@ const FALLBACK_ASPECT_RATIO = 16 / 9;
 export function MoodboardPage() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
-  const [activeStyleId, setActiveStyleId] = useState(MOODBOARD_STYLES[0]?.id ?? 'gilded-observatory');
   const [aspectRatio, setAspectRatio] = useState(FALLBACK_ASPECT_RATIO);
   const { activePreset, presets, setPreset, randomizeTheme, resetRandomization, isRandomized } = useThemeSwitcher();
 
-  const stylePreset = useMemo(() => {
-    return MOODBOARD_STYLES.find((style) => style.id === activeStyleId) ?? MOODBOARD_STYLES[0];
-  }, [activeStyleId]);
-
-  const shellStyle = useMemo<CSSProperties>(() => {
-    if (!stylePreset) return {};
-    const tokenStyles = Object.entries(stylePreset.tokens).reduce<Record<string, string>>((acc, [token, value]) => {
-      acc[`--${token}`] = value;
-      return acc;
-    }, {});
-    return tokenStyles as CSSProperties;
-  }, [stylePreset]);
+  const shellStyle = useMemo<CSSProperties>(() => buildMoodboardTokens(activePreset), [activePreset]);
+  const autoAdvanceMs = useMemo(() => getAutoAdvanceMs(activePreset.id), [activePreset.id]);
 
   const images = useMemo(() => MOOD_IMAGES, []);
 
@@ -110,14 +200,12 @@ export function MoodboardPage() {
   );
 
   useEffect(() => {
-    if (!hasImages || !stylePreset) return;
-    if (!isPlaying) return;
-
+    if (!hasImages || !isPlaying) return undefined;
     const timer = window.setInterval(() => {
       goToOffset(1);
-    }, stylePreset.autoAdvanceMs);
+    }, autoAdvanceMs);
     return () => window.clearInterval(timer);
-  }, [goToOffset, hasImages, isPlaying, stylePreset]);
+  }, [autoAdvanceMs, goToOffset, hasImages, isPlaying]);
 
   const handleImageLoaded = useCallback((event: SyntheticEvent<HTMLImageElement>) => {
     const { naturalWidth, naturalHeight } = event.currentTarget;
@@ -152,16 +240,32 @@ export function MoodboardPage() {
               </p>
             </div>
             <div className="moodboard-style-switcher">
-              {MOODBOARD_STYLES.map((style) => (
-                <button
-                  key={style.id}
-                  type="button"
-                  onClick={() => setActiveStyleId(style.id)}
-                  className={`moodboard-style-pill ${style.id === stylePreset?.id ? 'is-active' : ''}`}
-                >
-                  {style.label}
-                </button>
-              ))}
+              {presets.map((preset) => {
+                const isActive = activePreset.id === preset.id && !isRandomized;
+                return (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    onClick={() => setPreset(preset.id)}
+                    className={`moodboard-style-pill ${isActive ? 'is-active' : ''}`}
+                  >
+                    {preset.label}
+                  </button>
+                );
+              })}
+              <GlassButton
+                variant="secondary"
+                size="sm"
+                onClick={randomizeTheme}
+                className="uppercase tracking-[0.3em]"
+              >
+                Randomize
+              </GlassButton>
+              {isRandomized && (
+                <GlassButton variant="ghost" size="sm" onClick={resetRandomization} className="uppercase tracking-[0.3em]">
+                  Reset
+                </GlassButton>
+              )}
             </div>
           </header>
 
@@ -335,14 +439,14 @@ export function MoodboardPage() {
         <aside className="moodboard-sidebar">
           <div className="moodboard-info-card">
             <div className="flex items-center justify-between gap-3 text-xs uppercase tracking-[0.35em]">
-              <span className="moodboard-accent-text">{stylePreset?.label}</span>
-              {stylePreset?.badge}
+              <span className="moodboard-accent-text">{activePreset.label}</span>
+              {presetBadges[activePreset.id]}
             </div>
-            <p className="mt-3 text-sm">{stylePreset?.description}</p>
+            <p className="mt-3 text-sm">{activePreset.description}</p>
             <ul className="moodboard-list">
               <li>• {images.length} asset caricati dinamicamente</li>
               <li>• Frame adattivo {aspectRatio.toFixed(2)}:1</li>
-              <li>• Auto-play: {Math.round((stylePreset?.autoAdvanceMs ?? 0) / 1000)}s</li>
+              <li>• Auto-play: {Math.round(autoAdvanceMs / 1000)}s</li>
               <li>• Comandi tastiera: ← →</li>
             </ul>
           </div>

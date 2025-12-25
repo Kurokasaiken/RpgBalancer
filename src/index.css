@@ -6,50 +6,50 @@
 
 @layer base {
   :root {
-    /* Config-first theme tokens (Frontier defaults) */
+    /* Config-first theme tokens (Epic Frontier defaults) */
     --font-header: 'Cinzel', serif;
     --font-body: 'Crimson Text', serif;
-    --surface-base: #050706;
-    --surface-panel: #0a0f0d;
-    --panel-border: #3b2a1b;
-    --panel-surface: rgba(8, 12, 18, 0.8);
-    --panel-sheen: radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.04), transparent 60%);
-    --text-primary: #f0efe4;
-    --text-secondary: #f8e38a;
-    --text-muted: #a2b6bf;
-    --accent-color: #c9a227;
-    --accent-strong: #ffd369;
-    --card-border-color: #8c6d3f;
-    --card-shadow-color: rgba(0, 0, 0, 0.65);
-    --card-surface: #05070d;
-    --card-surface-radial: radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 70%);
-    --card-highlight: rgba(255, 191, 0, 0.08);
-    --halo-color: rgba(251, 191, 36, 0.45);
-    --halo-strength: 1;
-    --slot-border: rgba(255, 255, 255, 0.08);
-    --slot-surface: rgba(6, 11, 16, 0.95);
-    --slot-ring-idle: rgba(201, 162, 39, 0.35);
-    --slot-ring-active: rgba(34, 197, 94, 0.7);
-    --slot-ring-hover: rgba(251, 191, 36, 0.85);
-    --slot-glow-idle: rgba(201, 162, 39, 0.3);
-    --slot-glow-active: rgba(34, 197, 94, 0.45);
-    --slot-glow-hover: rgba(251, 191, 36, 0.55);
-    --slot-icon-color: #fceabb;
-    --slot-worker-badge-bg: #05070d;
-    --slot-worker-badge-border: rgba(255, 191, 36, 0.6);
-    --slot-worker-badge-text: #fef3c7;
+    --surface-base: #0d0f12;
+    --surface-panel: rgba(11, 13, 18, 0.95);
+    --panel-border: #8b6a2f;
+    --panel-surface: rgba(5, 6, 9, 0.92);
+    --panel-sheen: radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.12), transparent 65%);
+    --text-primary: #f7f2d8;
+    --text-secondary: #ffd700;
+    --text-muted: #9ca8c2;
+    --accent-color: #d4af37;
+    --accent-strong: #ffd700;
+    --card-border-color: #8b4513;
+    --card-shadow-color: rgba(0, 15, 35, 0.8);
+    --card-surface: #10131a;
+    --card-surface-radial: radial-gradient(circle at top, rgba(255, 255, 255, 0.07), transparent 70%);
+    --card-highlight: rgba(212, 175, 55, 0.12);
+    --halo-color: rgba(255, 215, 0, 0.45);
+    --halo-strength: 1.2;
+    --slot-border: rgba(212, 175, 55, 0.35);
+    --slot-surface: rgba(6, 9, 14, 0.95);
+    --slot-ring-idle: linear-gradient(120deg, rgba(255, 215, 0, 0.6), rgba(139, 69, 19, 0.8));
+    --slot-ring-active: linear-gradient(120deg, rgba(253, 224, 71, 0.85), rgba(217, 119, 6, 0.75));
+    --slot-ring-hover: linear-gradient(120deg, rgba(255, 255, 255, 0.85), rgba(212, 175, 55, 0.9));
+    --slot-glow-idle: rgba(9, 51, 89, 0.55);
+    --slot-glow-active: rgba(0, 70, 120, 0.65);
+    --slot-glow-hover: rgba(255, 215, 0, 0.55);
+    --slot-icon-color: #ffd700;
+    --slot-worker-badge-bg: #0d0f12;
+    --slot-worker-badge-border: rgba(255, 215, 0, 0.65);
+    --slot-worker-badge-text: #fef9c3;
     --slot-label-color: rgba(255, 255, 255, 0.75);
     --slot-helper-color: rgba(255, 255, 255, 0.55);
-    --hp-bar-track: rgba(34, 197, 94, 0.15);
-    --hp-bar-start: #6ee7b7;
-    --hp-bar-end: #10b981;
-    --fatigue-bar-track: rgba(251, 191, 36, 0.15);
-    --fatigue-bar-start: #fbbf24;
-    --fatigue-bar-end: #fb923c;
-    --button-bg: rgba(12, 20, 28, 0.9);
-    --button-border: rgba(201, 162, 39, 0.4);
-    --button-text: #f0efe4;
-    --body-bg-overlay: linear-gradient(rgba(5, 7, 6, 0.88), rgba(5, 7, 6, 0.88));
+    --hp-bar-track: rgba(0, 70, 120, 0.3);
+    --hp-bar-start: #4ade80;
+    --hp-bar-end: #0ea5e9;
+    --fatigue-bar-track: rgba(212, 175, 55, 0.2);
+    --fatigue-bar-start: #ffd700;
+    --fatigue-bar-end: #f97316;
+    --button-bg: rgba(8, 10, 15, 0.9);
+    --button-border: rgba(255, 215, 0, 0.45);
+    --button-text: #f7f2d8;
+    --body-bg-overlay: linear-gradient(rgba(4, 6, 10, 0.95), rgba(4, 6, 10, 0.95));
     --body-bg-texture: url('/assets/ui/bg.png');
 
     /* Legacy palette (still referenced by older components) */
@@ -365,6 +365,120 @@
       rgba(15, 23, 42, 0.8);
     box-shadow: 0 0 18px rgba(56, 189, 248, 0.18);
   }
+
+  .oil-slick-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.85rem 1.6rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-bronze-light, #ffd700);
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.35em;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: radial-gradient(circle at 20% 20%, rgba(255, 0, 255, 0.35), transparent 45%),
+      radial-gradient(circle at 80% 30%, rgba(0, 255, 255, 0.35), transparent 50%),
+      radial-gradient(circle at 50% 80%, rgba(0, 0, 255, 0.35), transparent 45%),
+      rgba(5, 6, 12, 0.95);
+    box-shadow:
+      inset 0 0 18px rgba(255, 255, 255, 0.08),
+      0 12px 35px rgba(0, 0, 0, 0.65);
+    overflow: hidden;
+  }
+
+  .oil-slick-button::after {
+    content: '';
+    position: absolute;
+    inset: -150%;
+    background: radial-gradient(circle, rgba(255, 0, 255, 0.45), rgba(0, 255, 255, 0.35), rgba(0, 0, 255, 0.45));
+    filter: blur(30px);
+    opacity: 0.7;
+    animation: oil-flow 10s linear infinite;
+  }
+
+  .oil-slick-button > span {
+    position: relative;
+    z-index: 1;
+  }
+
+  .shadow-cobalt {
+    box-shadow:
+      0 0 20px var(--color-cobalt-glow, rgba(0, 70, 120, 0.5)),
+      0 20px 60px rgba(0, 0, 0, 0.65);
+  }
+
+  .obsidian-panel {
+    background: var(--color-obsidian-alpha, rgba(13, 15, 18, 0.45));
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 1.5rem;
+    backdrop-filter: blur(var(--glass-blur, 24px));
+    padding: 1.5rem;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  }
+
+  .bronze-corners {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .bronze-corners::before,
+  .bronze-corners::after {
+    content: '';
+    position: absolute;
+    width: 42px;
+    height: 42px;
+    border-top: 4px solid var(--color-bronze-light, #ffd700);
+    border-left: 4px solid var(--color-bronze-dark, #8b4513);
+    border-top-left-radius: 12px;
+    pointer-events: none;
+    opacity: 0.85;
+  }
+
+  .bronze-corners::before {
+    top: 0.75rem;
+    left: 0.75rem;
+  }
+
+  .bronze-corners::after {
+    bottom: 0.75rem;
+    right: 0.75rem;
+    transform: rotate(180deg);
+  }
+
+  .quest-heroic-card {
+    border-radius: 1.25rem;
+    border: 1px solid rgba(255, 215, 0, 0.35);
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.04), transparent 65%),
+      rgba(5, 6, 12, 0.9);
+    box-shadow:
+      inset 0 0 60px rgba(0, 0, 0, 0.65),
+      0 30px 120px rgba(0, 0, 0, 0.65);
+  }
+
+  .quest-title-bronze {
+    background-image: linear-gradient(120deg, var(--color-bronze-light, #ffd700), var(--color-bronze-mid, #d4af37));
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
+  .gem-oil {
+    background: radial-gradient(circle at 20% 20%, rgba(255, 0, 255, 0.6), rgba(0, 255, 255, 0.2));
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow:
+      inset 0 0 12px rgba(255, 255, 255, 0.15),
+      0 0 25px rgba(0, 70, 120, 0.35);
+    transition: filter 250ms ease, transform 250ms ease;
+  }
+
+  .gem-oil.is-active {
+    filter: drop-shadow(0 0 18px rgba(0, 70, 120, 0.75));
+    transform: scale(1.05);
+  }
 }
 
 .heroic-card,
@@ -388,5 +502,17 @@
 
   .pittorico-shadow {
     filter: drop-shadow(0 4px 6px rgba(62, 39, 35, 0.8));
+  }
+
+  @keyframes oil-flow {
+    0% {
+      transform: rotate(0deg) scale(1);
+    }
+    50% {
+      transform: rotate(180deg) scale(1.05);
+    }
+    100% {
+      transform: rotate(360deg) scale(1);
+    }
   }
 }

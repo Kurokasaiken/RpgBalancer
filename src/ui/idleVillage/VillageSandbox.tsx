@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { ActivityDefinition, MapSlotDefinition } from '@/balancing/config/idleVillage/types';
+import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
 import { createVillageStateFromConfig, getStartingResidentFatigue, type ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { useVillageStateStore } from '@/ui/idleVillage/useVillageStateStore';
 import { loadResidentsFromCharacterManager } from '@/engine/game/idleVillage/characterImport';
@@ -8,16 +8,40 @@ import ActivitySlot from '@/ui/idleVillage/components/ActivitySlot';
 import VerbDetailCard, { type VerbDetailAssignment, type VerbSlotState } from '@/ui/idleVillage/VerbDetailCard';
 import ResidentRoster from '@/ui/idleVillage/ResidentRoster';
 import WorkerDragToken from '@/ui/idleVillage/components/WorkerDragToken';
+import TheaterView from '@/ui/idleVillage/components/TheaterView';
 import { formatResidentLabel } from '@/ui/idleVillage/residentName';
 import { useThemeSwitcher } from '@/hooks/useThemeSwitcher';
 import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
+import type { VerbSummary } from '@/ui/idleVillage/verbSummaries';
 
 interface ActivitySlotData {
   slotId: string;
   label: string;
   iconName: string;
   assignedWorkerId: string | null;
+  activity: ActivityDefinition;
+  mapSlotLabel?: string;
 }
+
+type SandboxVerbTone = 'neutral' | 'job' | 'quest' | 'danger' | 'system';
+
+const deriveVerbTone = (activity: ActivityDefinition): SandboxVerbTone => {
+  if (activity.tags?.includes('quest')) return 'quest';
+  if (activity.tags?.includes('job')) return 'job';
+  if (activity.tags?.includes('danger')) return 'danger';
+  if (activity.tags?.includes('system')) return 'system';
+  return 'neutral';
+};
+
+const formatRewardLabel = (activity: ActivityDefinition): string | null => {
+  if (!activity.rewards || activity.rewards.length === 0) return null;
+  return activity.rewards
+    .map((reward) => {
+      const amount = reward.amountFormula ?? '';
+      return [amount, reward.resourceId].filter(Boolean).join(' ');
+    })
+    .join(', ');
+};
 
 const VillageSandbox = () => {
   const { activePreset, presets, setPreset, randomizeTheme, resetRandomization, isRandomized } = useThemeSwitcher();
@@ -48,7 +72,11 @@ const VillageSandbox = () => {
     createVillageStateFromConfig({ config, initialResidents }),
   );
 
-  const mapSlots = useMemo(() => Object.values(config.mapSlots ?? {}) as MapSlotDefinition[], [config.mapSlots]);
+  const activities = useMemo<ActivityDefinition[]>(() => Object.values(config.activities ?? {}), [config.activities]);
+  const showcaseActivities = useMemo<ActivityDefinition[]>(() => {
+    const sorted = [...activities].sort((a, b) => (a.label ?? a.id).localeCompare(b.label ?? b.id));
+    return sorted.slice(0, 3);
+  }, [activities]);
   const residents = useMemo<ResidentState[]>(() => Object.values(villageState.residents ?? {}), [villageState.residents]);
 
   const refreshResidentsFromCharacterManager = useCallback(() => {
@@ -90,53 +118,56 @@ const VillageSandbox = () => {
   const [draggingResidentId, setDraggingResidentId] = useState<string | null>(null);
   const [assignmentFeedback, setAssignmentFeedback] = useState<string | null>(null);
   const [detailSlotId, setDetailSlotId] = useState<string | null>(null);
-
-  const [slots, setSlots] = useState<ActivitySlotData[]>(() =>
-    mapSlots.map((slot) => ({
-      slotId: slot.id,
-      label: slot.label,
-      iconName: slot.icon ?? '☆',
-      assignedWorkerId: null,
-    })),
-  );
+  const [assignments, setAssignments] = useState<Record<string, string | null>>({});
+  const [isTheaterOpen, setIsTheaterOpen] = useState(false);
+  const [theaterSlotId, setTheaterSlotId] = useState<string | null>(null);
 
   useEffect(() => {
-    setSlots((prev) =>
-      mapSlots.map((slot) => {
-        const existing = prev.find((item) => item.slotId === slot.id);
-        return (
-          existing ?? {
-            slotId: slot.id,
-            label: slot.label,
-            iconName: slot.icon ?? '☆',
-            assignedWorkerId: null,
-          }
-        );
-      }),
-    );
-  }, [mapSlots]);
+    setAssignments((prev) => {
+      const next: Record<string, string | null> = {};
+      showcaseActivities.forEach((activity) => {
+        next[activity.id] = prev[activity.id] ?? null;
+      });
+      return next;
+    });
+  }, [showcaseActivities]);
+
+  const slots = useMemo<ActivitySlotData[]>(() => {
+    return showcaseActivities.map((activity) => {
+      const meta = (activity.metadata ?? {}) as { icon?: string; mapSlotId?: string } | undefined;
+      const mapSlot = meta?.mapSlotId ? config.mapSlots?.[meta.mapSlotId] : undefined;
+      const derivedIcon = meta?.icon ?? mapSlot?.icon ?? '☆';
+      return {
+        slotId: activity.id,
+        label: activity.label ?? activity.id,
+        iconName: derivedIcon,
+        assignedWorkerId: assignments[activity.id] ?? null,
+        activity,
+        mapSlotLabel: mapSlot?.label,
+      };
+    });
+  }, [showcaseActivities, assignments, config.mapSlots]);
 
   const handleWorkerDrop = useCallback(
-    (slotId: string, residentId: string | null) => {
+    (activityId: string, residentId: string | null) => {
       if (!residentId) return;
-      setSlots((prev) =>
-        prev.map((slot) => {
-          if (slot.slotId === slotId) {
-            return { ...slot, assignedWorkerId: residentId };
+      setAssignments((prev) => {
+        const next = { ...prev };
+        Object.keys(next).forEach((key) => {
+          if (next[key] === residentId) {
+            next[key] = null;
           }
-          if (slot.assignedWorkerId === residentId) {
-            return { ...slot, assignedWorkerId: null };
-          }
-          return slot;
-        }),
-      );
+        });
+        next[activityId] = residentId;
+        return next;
+      });
       setDraggingResidentId(null);
-      const slotLabel = config.mapSlots?.[slotId]?.label ?? slotId;
+      const activityLabel = config.activities?.[activityId]?.label ?? activityId;
       const resident = villageState.residents?.[residentId];
       const residentLabel = resident ? formatResidentLabel(resident) : residentId;
-      setAssignmentFeedback(`${residentLabel} assegnato a ${slotLabel}.`);
+      setAssignmentFeedback(`${residentLabel} assegnato a ${activityLabel}.`);
     },
-    [config.mapSlots, villageState.residents],
+    [config.activities, villageState.residents],
   );
 
   const resolveWorkerName = (residentId: string | null) => {
@@ -147,37 +178,19 @@ const VillageSandbox = () => {
 
   const selectedSlot = useMemo(() => slots.find((slot) => slot.slotId === detailSlotId) ?? null, [slots, detailSlotId]);
 
-  const detailActivity = useMemo<ActivityDefinition | null>(() => {
-    if (!selectedSlot) return null;
-    return {
-      id: selectedSlot.slotId,
-      label: selectedSlot.label,
-      description: 'Panoramica completa della carta attività selezionata.',
-      tags: ['job'],
-      slotTags: ['sandbox'],
-      resolutionEngineId: 'sandbox_demo',
-      dangerRating: 1,
-      durationFormula: '60',
-      metadata: {},
-      costs: [],
-      rewards: [],
-    };
-  }, [selectedSlot]);
+  const detailActivity = selectedSlot?.activity ?? null;
 
   const detailSlots = useMemo<VerbSlotState[]>(
     () =>
-      slots.map((slot) => {
-        const slotDefinition = config.mapSlots?.[slot.slotId];
-        return {
-          id: slot.slotId,
-          label: slotDefinition?.label ?? slot.label,
-          statHint: slotDefinition?.description,
-          requirementLabel: slotDefinition?.description,
-          assignedResidentId: slot.assignedWorkerId,
-          required: Boolean(slotDefinition?.slotTags?.includes('required')),
-        };
-      }),
-    [slots, config.mapSlots],
+      slots.map((slot) => ({
+        id: slot.slotId,
+        label: slot.label,
+        statHint: slot.activity.statRequirement?.label ?? slot.activity.description,
+        requirementLabel: slot.activity.statRequirement?.label ?? slot.activity.description,
+        assignedResidentId: slot.assignedWorkerId,
+        required: Boolean(slot.activity.slotTags?.includes('required')),
+      })),
+    [slots],
   );
 
   const detailAssignments = useMemo<VerbDetailAssignment[]>(
@@ -202,13 +215,16 @@ const VillageSandbox = () => {
         ? Math.max(0, Math.min(100, Math.round((assignedResident.currentHp / assignedResident.maxHp) * 100)))
         : 0;
     const fatigueValue = assignedResident?.fatigue ?? 0;
+    const dangerPercent = Math.min(100, (detailActivity?.dangerRating ?? 1) * 15);
     return {
-      rewards: [],
-      injuryPercentage: assignedResident ? Math.max(0, 100 - hpPercent) : 10,
-      deathPercentage: assignedResident ? Math.max(0, fatigueValue - 70) : 0,
-      note: assignedResident ? `${formatResidentLabel(assignedResident)} in ricognizione.` : 'Nessun residente assegnato.',
+      rewards: detailActivity?.rewards ?? [],
+      injuryPercentage: assignedResident ? Math.max(0, 100 - hpPercent) : dangerPercent,
+      deathPercentage: assignedResident ? Math.max(0, fatigueValue - 70) : Math.round(dangerPercent / 2),
+      note: assignedResident
+        ? `${formatResidentLabel(assignedResident)} assegnato a ${selectedSlot.label}.`
+        : 'Nessun residente assegnato.',
     };
-  }, [selectedSlot, residents]);
+  }, [selectedSlot, residents, detailActivity]);
 
   const handleResidentDragStart = useCallback(
     (residentId: string) => (event: React.DragEvent<HTMLElement>) => {
@@ -224,6 +240,65 @@ const VillageSandbox = () => {
   const handleResidentDragEnd = useCallback(() => {
     setDraggingResidentId(null);
   }, []);
+
+  const theaterSlot = useMemo(
+    () => slots.find((slot) => slot.slotId === theaterSlotId) ?? null,
+    [slots, theaterSlotId],
+  );
+
+  const theaterVerbs = useMemo<VerbSummary[]>(() => {
+    if (!theaterSlot) return [];
+    const assignedName = resolveWorkerName(theaterSlot.assignedWorkerId);
+    const tone = deriveVerbTone(theaterSlot.activity);
+    const injuryPercentage = Math.min(100, (theaterSlot.activity.dangerRating ?? 1) * 15);
+    const deathPercentage = Math.round(injuryPercentage / 2);
+    const totalSlots =
+      typeof theaterSlot.activity.maxSlots === 'number'
+        ? theaterSlot.activity.maxSlots
+        : theaterSlot.activity.maxSlots === 'infinite'
+          ? 4
+          : 1;
+
+    const summary: VerbSummary = {
+      key: `sandbox_theater_${theaterSlot.slotId}`,
+      source: 'system',
+      activityId: theaterSlot.slotId,
+      slotId: theaterSlot.slotId,
+      label: theaterSlot.activity.label ?? theaterSlot.slotId,
+      kindLabel: tone === 'job' ? 'Job' : tone === 'quest' ? 'Quest' : 'Activity',
+      isQuest: tone === 'quest',
+      isJob: tone === 'job',
+      icon: theaterSlot.iconName,
+      visualVariant: 'azure',
+      progressStyle: 'ribbon',
+      progressFraction: 0,
+      elapsedSeconds: 0,
+      totalDurationSeconds: Number(theaterSlot.activity.durationFormula ?? 0),
+      remainingSeconds: 0,
+      injuryPercentage,
+      deathPercentage,
+      assignedCount: theaterSlot.assignedWorkerId ? 1 : 0,
+      totalSlots,
+      rewardLabel: formatRewardLabel(theaterSlot.activity),
+      tone,
+      deadlineLabel: null,
+      assigneeNames: assignedName ? [assignedName] : [],
+      notes: theaterSlot.activity.description ?? null,
+    };
+
+    return [summary];
+  }, [theaterSlot, resolveWorkerName]);
+
+  const handleCloseTheater = useCallback(() => {
+    setIsTheaterOpen(false);
+  }, []);
+
+  const handleLocationInspect = useCallback(() => {
+    const targetSlot = slots[0];
+    if (!targetSlot) return;
+    setTheaterSlotId(targetSlot.slotId);
+    setIsTheaterOpen(true);
+  }, [slots]);
 
   const handleResetSandboxState = useCallback(() => {
     resetState(
@@ -377,7 +452,7 @@ const VillageSandbox = () => {
                     key={slot.slotId}
                     slotId={slot.slotId}
                     iconName={slot.iconName}
-                    label={slot.label}
+                    label={slot.mapSlotLabel ? `${slot.label} · ${slot.mapSlotLabel}` : slot.label}
                     assignedWorkerName={resolveWorkerName(slot.assignedWorkerId)}
                     onWorkerDrop={(workerId) => handleWorkerDrop(slot.slotId, workerId)}
                     onInspect={(slotId) => setDetailSlotId(slotId)}
@@ -397,6 +472,7 @@ const VillageSandbox = () => {
                       <span>🌲</span>
                     </div>
                   }
+                  onInspect={handleLocationInspect}
                 />
               </div>
             </div>
@@ -412,11 +488,22 @@ const VillageSandbox = () => {
           subtitle="Isolated test for drag"
           hp={90}
           fatigue={10}
-          isDragging={false}
+          isDragging={draggingResidentId === "test-resident"}
           disabled={false}
-          onDragStateChange={(id: string, dragging: boolean) => console.log('Test drag state:', id, dragging)}
-          onDragStart={(_event: React.DragEvent<HTMLDivElement>) => console.log('Test drag start')}
-          onDragEnd={(_event: React.DragEvent<HTMLDivElement>) => console.log('Test drag end')}
+          onDragStateChange={(id: string, dragging: boolean) => {
+            console.log('Test drag state:', id, dragging);
+            setDraggingResidentId(dragging ? id : null);
+          }}
+          onDragStart={(event) => {
+            console.log('Test drag start');
+            event.dataTransfer.setData('text/resident-id', 'test-resident');
+            event.dataTransfer.effectAllowed = 'move';
+            setDraggingResidentId('test-resident');
+          }}
+         onDragEnd={() => {
+            console.log('Test drag end');
+            setDraggingResidentId(null);
+          }}
         />
       </div>
 
@@ -425,10 +512,10 @@ const VillageSandbox = () => {
           <div className="absolute inset-0 bg-black/70" onClick={() => setDetailSlotId(null)} />
           <div className="relative z-10 max-h-[90vh] w-full max-w-3xl overflow-y-auto">
             <VerbDetailCard
-              title={detailActivity.label}
+              title={detailActivity.label ?? detailActivity.id}
               subtitle="Dettaglio Attività"
               activity={detailActivity}
-              description="Scheda dinamica collegata al worker selezionato."
+              description={detailActivity.description ?? 'Scheda dinamica collegata al worker selezionato.'}
               preview={detailPreview}
               assignments={detailAssignments}
               slots={detailSlots}
@@ -441,6 +528,15 @@ const VillageSandbox = () => {
             />
           </div>
         </div>
+      )}
+      {isTheaterOpen && theaterSlot && (
+        <TheaterView
+          slotLabel={theaterSlot.label}
+          slotIcon={theaterSlot.iconName}
+          panoramaUrl={null}
+          verbs={theaterVerbs}
+          onClose={handleCloseTheater}
+        />
       )}
     </div>
   );
