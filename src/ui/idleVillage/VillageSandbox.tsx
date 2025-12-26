@@ -6,9 +6,10 @@ import { loadResidentsFromCharacterManager } from '@/engine/game/idleVillage/cha
 import LocationCard from '@/ui/idleVillage/components/LocationCard';
 import ActivitySlot from '@/ui/idleVillage/components/ActivitySlot';
 import VerbDetailCard, { type VerbDetailAssignment, type VerbSlotState } from '@/ui/idleVillage/VerbDetailCard';
-import ResidentRoster from '@/ui/idleVillage/ResidentRoster';
+import ResidentRoster from '@/ui/idleVillage/ResidentRosterDnd';
 import DragTestContainer from '@/ui/idleVillage/components/DragTestContainer';
 import TheaterView from '@/ui/idleVillage/components/TheaterView';
+import { DragProvider } from '@/ui/idleVillage/components/DragContext';
 import { formatResidentLabel } from '@/ui/idleVillage/residentName';
 import { useThemeSwitcher } from '@/hooks/useThemeSwitcher';
 import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
@@ -113,7 +114,21 @@ const VillageSandbox = () => {
     if (hasLegacyFounderNames) {
       refreshResidentsFromCharacterManager();
     }
-  }, [residents, refreshResidentsFromCharacterManager, config, resetState]);
+  }, [config, residents.length, resetState, refreshResidentsFromCharacterManager]);
+
+  useEffect(() => {
+    const latestResidents = loadResidentsFromCharacterManager({ config });
+    if (latestResidents.length > residents.length) {
+      resetState(
+        () =>
+          createVillageStateFromConfig({
+            config,
+            initialResidents: latestResidents,
+          }),
+        'VillageSandbox sync residents',
+      );
+    }
+  }, [config, residents.length, resetState]);
 
   const [draggingResidentId, setDraggingResidentId] = useState<string | null>(null);
   const [assignmentFeedback, setAssignmentFeedback] = useState<string | null>(null);
@@ -327,6 +342,27 @@ const VillageSandbox = () => {
     setIsTheaterOpen(false);
   }, []);
 
+  const handleLocationResidentDrop = useCallback((residentId: string) => {
+    console.log('Resident dropped on location:', residentId);
+    // Apri la TheaterView quando un residente viene trascinato sulla location
+    const targetSlot = slots[0];
+    if (targetSlot) {
+      setTheaterSlotId(targetSlot.slotId);
+      setIsTheaterOpen(true);
+    }
+  }, [slots]);
+
+
+  useEffect(() => {
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && isTheaterOpen) {
+        handleCloseTheater();
+      }
+    };
+
+    document.addEventListener("keydown", handleEsc);
+    return () => document.removeEventListener("keydown", handleEsc);
+  }, [isTheaterOpen, handleCloseTheater]);
   const handleLocationInspect = useCallback(() => {
     const targetSlot = slots[0];
     if (!targetSlot) return;
@@ -363,7 +399,8 @@ const VillageSandbox = () => {
   }, [config, resetState, villageState]);
 
   return (
-    <div className="mx-auto max-w-5xl space-y-10 p-6 text-ivory">
+    <DragProvider>
+      <div className="mx-auto max-w-5xl space-y-10 p-6 text-ivory">
       <section
         className="rounded-2xl border p-4 shadow-xl backdrop-blur-sm"
         style={{
@@ -466,13 +503,20 @@ const VillageSandbox = () => {
       <section className="flex flex-col gap-8 lg:flex-row">
         <div className="space-y-4 lg:w-1/3">
           <h2 className="text-xs uppercase tracking-[0.35em] text-slate-400">Residenti</h2>
-          <ResidentRoster
+          <DragTestContainer
             residents={residents}
-            activeResidentId={draggingResidentId}
-            onDragStart={handleResidentDragStart}
-            onDragEnd={handleResidentDragEnd}
-            assignmentFeedback={assignmentFeedback}
-            maxFatigueBeforeExhausted={config.globalRules.maxFatigueBeforeExhausted ?? 100}
+            onDragStart={(residentId) => {
+              console.log('VillageSandbox drag start:', residentId);
+              setDraggingResidentId(residentId);
+            }}
+            onDragEnd={(residentId) => {
+              console.log('VillageSandbox drag end:', residentId);
+              setDraggingResidentId(null);
+            }}
+            onDragStateChange={(residentId, isDragging) => {
+              console.log('VillageSandbox drag state:', residentId, isDragging);
+              setDraggingResidentId(isDragging ? residentId : null);
+            }}
           />
         </div>
 
@@ -500,6 +544,7 @@ const VillageSandbox = () => {
                 <LocationCard
                   title="Foresta · Raccolta Bacche"
                   description="Trascina un lavoratore per avviare la spedizione e apri la vista panoramica per controllare più VerbCard."
+                  onInspect={handleLocationInspect}
                   iconRow={
                     <div className="flex items-center gap-3 text-emerald-200 text-4xl">
                       <span>🌲</span>
@@ -507,7 +552,7 @@ const VillageSandbox = () => {
                       <span>🌲</span>
                     </div>
                   }
-                  onInspect={handleLocationInspect}
+                  onResidentDrop={handleLocationResidentDrop}
                 />
               </div>
             </div>
@@ -515,25 +560,7 @@ const VillageSandbox = () => {
         </div>
       </section>
 
-      <div className="space-y-4 mt-8">
-        <h2 className="text-xs uppercase tracking-[0.35em] text-slate-400">Drag Test Container</h2>
-        <DragTestContainer
-          residents={residents}
-          onDragStart={(residentId) => {
-            console.log('VillageSandbox drag start:', residentId);
-            setDraggingResidentId(residentId);
-          }}
-          onDragEnd={(residentId) => {
-            console.log('VillageSandbox drag end:', residentId);
-            setDraggingResidentId(null);
-          }}
-          onDragStateChange={(residentId, isDragging) => {
-            console.log('VillageSandbox drag state:', residentId, isDragging);
-            setDraggingResidentId(isDragging ? residentId : null);
-          }}
-        />
-      </div>
-
+      
       {detailSlotId && detailActivity && detailPreview && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div className="absolute inset-0 bg-black/70" onClick={() => setDetailSlotId(null)} />
@@ -565,6 +592,7 @@ const VillageSandbox = () => {
         />
       )}
     </div>
+    </DragProvider>
   );
 };
 

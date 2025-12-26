@@ -73,7 +73,6 @@
     font-family: var(--font-body, 'Crimson Text', serif);
     background-color: var(--surface-base, #050706);
     background-image:
-      var(--body-bg-overlay, linear-gradient(rgba(5, 7, 6, 0.85), rgba(5, 7, 6, 0.85))),
       var(--body-bg-texture, url('/assets/ui/bg.png'));
     background-attachment: fixed;
     background-size: cover;

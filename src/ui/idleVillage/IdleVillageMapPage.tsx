@@ -807,8 +807,7 @@ const IdleVillageMapPage: React.FC = () => {
               backgroundRepeat: 'no-repeat',
             }}
           />
-          <div className="absolute inset-0 bg-obsidian/45" aria-hidden="true" />
-
+          
           <div className="pointer-events-none absolute inset-y-6 right-6 z-30 flex max-h-full items-start justify-end">
             <ActiveActivityHUD
               activities={scheduledActivities}

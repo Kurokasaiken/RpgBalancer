@@ -57,9 +57,9 @@ const DragTestContainer = ({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-xs uppercase tracking-[0.35em] text-slate-400">
+    <div className="space-y-3 rounded-lg border border-slate-700/50 bg-slate-900/20 backdrop-blur-sm p-3 shadow-lg max-w-sm">
+      <div className="flex items-center justify-between gap-2">
+        <h3 className="text-xs uppercase tracking-[0.35em] text-slate-400 whitespace-nowrap">
           Residenti ({filteredResidents.length}/{residents.length})
         </h3>
         
@@ -89,7 +89,7 @@ const DragTestContainer = ({
         </div>
       </div>
 
-      <div className="space-y-2 max-h-96 overflow-y-auto">
+      <div className="space-y-2 max-h-48 overflow-y-auto scroll-smooth hover:scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-transparent">
         {filteredResidents.length === 0 ? (
           <div className="text-slate-500 text-sm italic text-center py-8">
             Nessun residente corrisponde ai filtri selezionati

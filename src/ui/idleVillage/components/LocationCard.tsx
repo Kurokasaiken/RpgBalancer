@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, MouseEvent, ReactNode } from 'react';
+import type { ButtonHTMLAttributes, MouseEvent, ReactNode, DragEvent } from 'react';
 
 /**
  * Props for the decorative location preview card used in Idle Village.
@@ -8,6 +8,7 @@ export interface LocationCardProps extends ButtonHTMLAttributes<HTMLButtonElemen
   description: string;
   iconRow?: ReactNode;
   onInspect?: () => void;
+  onResidentDrop?: (residentId: string) => void;
 }
 
 /**
@@ -18,6 +19,7 @@ const LocationCard: React.FC<LocationCardProps> = ({
   description,
   iconRow,
   onInspect,
+  onResidentDrop,
   onClick,
   ...buttonProps
 }) => {
@@ -26,10 +28,27 @@ const LocationCard: React.FC<LocationCardProps> = ({
     onInspect?.();
   };
 
+  const handleDragOver = (event: DragEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    console.log("LocationCard dragOver detected");    event.dataTransfer.dropEffect = 'copy';
+  };
+
+  const handleDrop = (event: DragEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    const residentId = event.dataTransfer.getData('text/resident-id') || event.dataTransfer.getData('text/plain');
+    console.log("LocationCard drop - residentId:", residentId);
+    if (residentId && onResidentDrop) {
+      onResidentDrop(residentId);
+    }
+    onInspect?.();
+  };
+
   return (
     <button
       type="button"
       onClick={handleClick}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
       className={[
         'rounded-3xl border bg-transparent p-1 shadow-[0_15px_45px_rgba(0,0,0,0.55)] transition',
         onInspect ? 'hover:shadow-[0_25px_55px_rgba(34,197,94,0.25)] focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200/60' : '',
