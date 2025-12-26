@@ -1,5 +1,5 @@
 // Updated App navigation to include Spell Editor and Spell Library
-import { useEffect, useRef, useState, lazy, Suspense } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { SpellLibrary } from './ui/spell/SpellLibrary';
 import { IdleArena } from './ui/idle/IdleArena';
 import { CharacterManager } from './ui/idle/CharacterManager';
@@ -11,13 +11,13 @@ import { ArchetypeBuilderFantasy } from './ui/balancing/archetype/ArchetypeBuild
 import { MatchupMatrixWrapper } from './ui/balancing/matchup/MatchupMatrixWrapper';
 import { AutoBalancerWrapper } from './ui/balancing/autobalancer/AutoBalancerWrapper';
 import { CharacterCreator } from './ui/character/CharacterCreator';
+import { FantasyLayout } from './ui/fantasy/FantasyLayout';
 import { FantasySpellCreation } from './ui/fantasy/FantasySpellCreation';
 import { SpellCreatorNew } from './ui/spells/SpellCreatorNew';
 import { TacticalLab } from './ui/tactical/TacticalLab';
 import IdleVillageMapPage from './ui/idleVillage/IdleVillageMapPage';
 import IdleVillageConfigRoute from './pages/idle-village-config';
 import { CombatViewerPage } from './ui/balancing/CombatViewerPage';
-import { VillageNavigationShell } from './ui/layout/VillageNavigationShell';
 import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
 import {
   DEFAULT_LANDING_TAB_ID,
@@ -87,7 +87,7 @@ function App() {
 
   const idleVillageReady = initialized && !isInitializing;
   const idleVillageLoadingFallback = (
-    <div className="p-4 text-xs text-ivory">Loading Idle Village configuration…</div>
+    <div className="p-4 text-xs text-slate-300">Loading Idle Village configuration…</div>
   );
 
   useEffect(() => {
@@ -108,8 +108,8 @@ function App() {
   }, [activeTab]);
 
   return (
-    <div data-testid="app-loaded" className="min-h-screen bg-[var(--surface-base)]">
-      <VillageNavigationShell activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab)}>
+    <div data-testid="app-loaded" className="min-h-screen">
+      <FantasyLayout activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab)}>
         {activeTab === 'balancer' && (
           <ErrorBoundary componentName="Balancer">
             <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Balancer…</div>}>
@@ -261,7 +261,7 @@ function App() {
             )}
           </ErrorBoundary>
         )}
-      </VillageNavigationShell>
+      </FantasyLayout>
     </div>
   );
 }

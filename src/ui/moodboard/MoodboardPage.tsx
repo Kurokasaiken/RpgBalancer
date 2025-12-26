@@ -5,9 +5,9 @@ import WorkerCard from '@/ui/idleVillage/components/WorkerCard';
 import ActivitySlot from '@/ui/idleVillage/components/ActivitySlot';
 import LocationCard from '@/ui/idleVillage/components/LocationCard';
 import VerbCard from '@/ui/idleVillage/VerbCard';
-import { FantasyCard } from '@/ui/fantasy/atoms/FantasyCard';
 import { useThemeSwitcher } from '@/hooks/useThemeSwitcher';
 import type { ThemePreset } from '@/data/themePresets';
+import { MOODBOARD_STYLES, type MoodboardStyle } from './moodboardStyles';
 import './moodboard.css';
 
 interface MoodImage {
@@ -38,6 +38,10 @@ const MOOD_IMAGES: MoodImage[] = Object.entries(moodImageModules)
 
 const FALLBACK_ASPECT_RATIO = 16 / 9;
 const DEFAULT_AUTO_ADVANCE_MS = 7000;
+const STYLE_LAB_LABEL = 'Style Laboratory';
+const STYLE_LAB_DESCRIPTION =
+  'Laboratorio cromatico Gilded Observatory: tutti i token provengono dal preset config-first ufficiale.';
+const DEFAULT_MOOD_STYLE_ID = MOODBOARD_STYLES[0]?.id ?? 'gilded-observatory';
 
 const MOODBOARD_TOKEN_MAP: {
   moodVar: string;
@@ -110,24 +114,6 @@ const buildMoodboardTokens = (preset: ThemePreset): CSSProperties => {
   return tokens as CSSProperties;
 };
 
-const presetBadges: Partial<Record<ThemePreset['id'], React.ReactNode>> = {
-  epicFrontier: (
-    <span className="inline-flex items-center gap-1 rounded-full border border-(--color-bronze-light,#ffd700) px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-(--color-bronze-light,#ffd700)">
-      ✦ Epic Frontier
-    </span>
-  ),
-  frontier: (
-    <span className="inline-flex items-center gap-1 rounded-full border border-amber-300/60 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-amber-200">
-      ★ Frontier
-    </span>
-  ),
-  vellumLight: (
-    <span className="inline-flex items-center gap-1 rounded-full border border-[#d9c394] px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-[#a0782a]">
-      ☼ Vellum
-    </span>
-  ),
-};
-
 const getAutoAdvanceMs = (presetId: string): number => {
   switch (presetId) {
     case 'vellumLight':
@@ -147,10 +133,22 @@ export function MoodboardPage() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [aspectRatio, setAspectRatio] = useState(FALLBACK_ASPECT_RATIO);
-  const { activePreset, presets, setPreset, randomizeTheme, resetRandomization, isRandomized } = useThemeSwitcher();
-
-  const shellStyle = useMemo<CSSProperties>(() => buildMoodboardTokens(activePreset), [activePreset]);
-  const autoAdvanceMs = useMemo(() => getAutoAdvanceMs(activePreset.id), [activePreset.id]);
+  const { activePreset, randomizeTheme, resetRandomization, isRandomized } = useThemeSwitcher();
+  const [selectedMoodStyleId, setSelectedMoodStyleId] = useState<string>(DEFAULT_MOOD_STYLE_ID);
+  const moodboardStyles = useMemo<MoodboardStyle[]>(() => MOODBOARD_STYLES, []);
+  const activeMoodStyle = useMemo<MoodboardStyle | null>(() => {
+    if (moodboardStyles.length === 0) return null;
+    return moodboardStyles.find((style) => style.id === selectedMoodStyleId) ?? moodboardStyles[0];
+  }, [moodboardStyles, selectedMoodStyleId]);
+  const fallbackShellTokens = useMemo<CSSProperties>(() => buildMoodboardTokens(activePreset), [activePreset]);
+  const shellStyle = useMemo<CSSProperties>(() => {
+    if (!activeMoodStyle) return fallbackShellTokens;
+    return { ...fallbackShellTokens, ...activeMoodStyle.tokens };
+  }, [activeMoodStyle, fallbackShellTokens]);
+  const autoAdvanceMs = useMemo(
+    () => activeMoodStyle?.autoAdvanceMs ?? getAutoAdvanceMs(activePreset.id),
+    [activeMoodStyle, activePreset.id],
+  );
 
   const images = useMemo(() => MOOD_IMAGES, []);
 
@@ -240,25 +238,20 @@ export function MoodboardPage() {
               </p>
             </div>
             <div className="moodboard-style-switcher">
-              {presets.map((preset) => {
-                const isActive = activePreset.id === preset.id && !isRandomized;
+              {moodboardStyles.map((style) => {
+                const isActiveStyle = style.id === activeMoodStyle?.id;
                 return (
                   <button
-                    key={preset.id}
+                    key={style.id}
                     type="button"
-                    onClick={() => setPreset(preset.id)}
-                    className={`moodboard-style-pill ${isActive ? 'is-active' : ''}`}
+                    className={`moodboard-style-pill ${isActiveStyle ? 'is-active' : ''}`}
+                    onClick={() => setSelectedMoodStyleId(style.id)}
                   >
-                    {preset.label}
+                    {style.label}
                   </button>
                 );
               })}
-              <GlassButton
-                variant="secondary"
-                size="sm"
-                onClick={randomizeTheme}
-                className="uppercase tracking-[0.3em]"
-              >
+              <GlassButton variant="secondary" size="sm" onClick={randomizeTheme} className="uppercase tracking-[0.3em]">
                 Randomize
               </GlassButton>
               {isRandomized && (
@@ -272,35 +265,13 @@ export function MoodboardPage() {
           <section className="moodboard-panel">
             <div className="moodboard-panel__row">
               <div>
-                <p className="moodboard-panel__kicker">Style Laboratory</p>
+                <p className="moodboard-panel__kicker">{STYLE_LAB_LABEL}</p>
                 <p className="moodboard-panel__subtitle">
-                  {activePreset.label}
-                  {isRandomized ? ' + Chaos Mix' : ''} · {activePreset.description}
+                  {activeMoodStyle?.description ?? STYLE_LAB_DESCRIPTION}
+                  {isRandomized ? ' · Chaos Mix attivo' : ''}
                 </p>
               </div>
-              <div className="moodboard-button-group">
-                {presets.map((preset) => {
-                  const isPresetActive = activePreset.id === preset.id && !isRandomized;
-                  return (
-                    <button
-                      key={preset.id}
-                      type="button"
-                      onClick={() => setPreset(preset.id)}
-                      className={`moodboard-button ${isPresetActive ? 'is-active' : ''}`}
-                    >
-                      {preset.label}
-                    </button>
-                  );
-                })}
-                <button type="button" onClick={randomizeTheme} className="moodboard-button">
-                  Randomize
-                </button>
-                {isRandomized && (
-                  <button type="button" onClick={resetRandomization} className="moodboard-button moodboard-button--ghost">
-                    Reset
-                  </button>
-                )}
-              </div>
+              {activeMoodStyle?.badge && <div className="moodboard-style-badge">{activeMoodStyle.badge}</div>}
             </div>
           </section>
 
@@ -414,35 +385,47 @@ export function MoodboardPage() {
               </div>
 
               <div className="moodboard-component-card">
-                <p className="moodboard-component-card__title">FantasyCard + GlassButtons</p>
-                <p className="moodboard-component-card__copy">Componenti fantasy riutilizzati per stressare i token.</p>
-                <FantasyCard
-                  title="Carta Missione"
-                  action={<span className="text-[11px] uppercase tracking-[0.3em] text-(--mood-text-secondary)">Live</span>}
-                >
-                  <p className="mb-3 text-sm">Conferma che gli stili legnosi non rompano l&apos;atmosfera corrente.</p>
-                  <div className="flex flex-wrap gap-2">
-                    <GlassButton size="sm">Brief</GlassButton>
-                    <GlassButton size="sm" variant="secondary">
-                      Mood Pack
-                    </GlassButton>
-                    <GlassButton size="sm" variant="ghost">
-                      Export
-                    </GlassButton>
+                <p className="moodboard-component-card__title">Observatory Card</p>
+                <p className="moodboard-component-card__copy">
+                  Shell default-card alimentato dai token attivi, senza dipendenze fantasy.
+                </p>
+                <div className="moodboard-component-stack">
+                  <div className="default-card moodboard-demo-card">
+                    <div className="moodboard-demo-card__header">
+                      <div>
+                        <p className="moodboard-demo-card__eyebrow">Mission Brief</p>
+                        <h4 className="moodboard-demo-card__title">Carta Missione</h4>
+                      </div>
+                      <span className="moodboard-demo-card__badge">LIVE</span>
+                    </div>
+                    <p className="moodboard-demo-card__body">
+                      Conferma che gli stili legnosi non rompano l&apos;atmosfera corrente.
+                    </p>
+                    <div className="moodboard-demo-card__footer">
+                      <GlassButton size="sm">Brief</GlassButton>
+                      <GlassButton size="sm" variant="secondary">
+                        Mood Pack
+                      </GlassButton>
+                      <GlassButton size="sm" variant="ghost">
+                        Export
+                      </GlassButton>
+                    </div>
                   </div>
-                </FantasyCard>
+                </div>
               </div>
             </div>
           </section>
         </div>
 
         <aside className="moodboard-sidebar">
-          <div className="moodboard-info-card">
+            <div className="moodboard-info-card">
             <div className="flex items-center justify-between gap-3 text-xs uppercase tracking-[0.35em]">
-              <span className="moodboard-accent-text">{activePreset.label}</span>
-              {presetBadges[activePreset.id]}
+              <span className="moodboard-accent-text">{STYLE_LAB_LABEL}</span>
             </div>
-            <p className="mt-3 text-sm">{activePreset.description}</p>
+            <p className="mt-3 text-sm">
+              {STYLE_LAB_DESCRIPTION}
+              {isRandomized ? ' · Variabile' : ''}
+            </p>
             <ul className="moodboard-list">
               <li>• {images.length} asset caricati dinamicamente</li>
               <li>• Frame adattivo {aspectRatio.toFixed(2)}:1</li>

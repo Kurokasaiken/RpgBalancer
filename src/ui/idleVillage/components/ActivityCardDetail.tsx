@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
-import { Sparkles, X, Play } from 'lucide-react';
+import { X, Play } from 'lucide-react';
 import type { ActivityDefinition, ResourceDeltaDefinition } from '@/balancing/config/idleVillage/types';
 import type { VerbDetailPreview, VerbSlotState } from '@/ui/idleVillage/VerbDetailCard';
 import type { DropState } from './ActivitySlot';
 import { useThemeSwitcher } from '@/hooks/useThemeSwitcher';
+import ResidentSlotRack from '@/ui/idleVillage/slots/ResidentSlotRack';
+import type { ResidentSlotViewModel } from '@/ui/idleVillage/slots/useResidentSlotController';
+import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 
 export type MetricTone = 'neutral' | 'positive' | 'warning' | 'danger';
 
@@ -69,7 +72,7 @@ const mapStatLabelToIcon = (label?: string | null): string => {
   return label.trim().charAt(0) || '☆';
 };
 
-const getSlotBadgeContent = (slot: VerbSlotState) => {
+const getSlotBadgeContent = (slot: { statHint?: string | null; requirementLabel?: string | null; requirement?: VerbSlotState['requirement'] }) => {
   const statLabel = slot.statHint ?? slot.requirementLabel ?? slot.requirement?.label ?? 'Stat';
   return {
     text: '+10',
@@ -131,8 +134,8 @@ const ActivityCardDetail: React.FC<ActivityCardDetailProps> = ({
   const riskInjuryOnly = Math.max(0, clampPercent(preview.injuryPercentage) - riskDeath);
   const riskTooltip = `Injury ${clampPercent(preview.injuryPercentage)}% · Death ${riskDeath}%`;
   const hasInfiniteSlots = activity.maxSlots === 'infinite';
-  const shouldShowInfinityPlaceholder = hasInfiniteSlots && assignments.length > 0;
   const hasSlotOverflow = assignments.length > 4;
+  const slotOverflowMode = hasSlotOverflow ? 'scroll' : 'wrap';
   const resolvedDurationSeconds =
     Number.isFinite(durationSeconds ?? NaN) && (durationSeconds ?? 0) > 0 ? (durationSeconds as number) : 0;
   const elapsed = Math.max(0, elapsedSeconds ?? 0);
@@ -286,72 +289,14 @@ const ActivityCardDetail: React.FC<ActivityCardDetailProps> = ({
               </button>
             </div>
 
-            <div className="space-y-2.5">
-              <div
-                className={[
-                  'flex gap-3',
-                  hasSlotOverflow ? 'flex-nowrap overflow-x-auto pb-2 pr-1 [-webkit-overflow-scrolling:touch]' : 'flex-wrap',
-                ].join(' ')}
-              >
-                {assignments.map(({ slot, residentName, dropState }) => {
-                  const badge = getSlotBadgeContent(slot);
-                  const isAssigned = Boolean(slot.assignedResidentId);
-                  return (
-                    <div key={slot.id} className="flex flex-col items-center gap-1 text-center">
-                      <div
-                        onDragOver={handleSlotDragOver}
-                        onDrop={handleSlotDrop(slot.id)}
-                        className={[
-                          'relative flex h-14 w-14 items-center justify-center rounded-full border text-[10px] font-semibold uppercase transition-colors',
-                          dropState === 'valid'
-                            ? 'border-emerald-300 bg-emerald-500/20 text-emerald-50 shadow-[0_0_18px_rgba(16,185,129,0.35)]'
-                            : dropState === 'invalid'
-                              ? 'opacity-35 border-white/20 text-slate-400 cursor-not-allowed'
-                              : slot.assignedResidentId
-                                ? 'border-white/30 bg-white/10 text-amber-50'
-                                : 'border-dashed border-white/20 text-slate-400',
-                        ].join(' ')}
-                        title={slot.statHint ?? slot.requirementLabel ?? 'Any stat'}
-                      >
-                        {isAssigned ? (
-                          <span>{getInitials(residentName ?? slot.assignedResidentId)}</span>
-                        ) : (
-                          <span className="flex items-center gap-1 text-[10px]">
-                            <span>{badge.text}</span>
-                            <span className="text-[10px]">{badge.icon}</span>
-                          </span>
-                        )}
-                        {slot.assignedResidentId && (
-                          <button
-                            type="button"
-                            onClick={() => handleClearSlot(slot.id)}
-                            className="absolute -top-1 -right-1 rounded-full border border-white/30 bg-black/70 px-1 text-[9px] leading-none text-slate-100 hover:border-rose-300"
-                            aria-label={`Rimuovi ${residentName ?? slot.assignedResidentId}`}
-                          >
-                            ×
-                          </button>
-                        )}
-                      </div>
-                      {dropState === 'invalid' && (
-                        <p className="text-[8px] uppercase tracking-[0.12em] text-rose-300">Incompatibile</p>
-                      )}
-                    </div>
-                  );
-                })}
-
-                {shouldShowInfinityPlaceholder && (
-                  <div className="flex flex-col items-center gap-1 text-center">
-                    <div
-                      className="flex h-14 w-14 items-center justify-center rounded-full border border-dashed border-white/20 text-[18px] text-slate-400"
-                      title="Slot infinito disponibile"
-                    >
-                      <Sparkles className="h-4 w-4" />
-                    </div>
-                    <p className="text-[8px] uppercase tracking-[0.18em] text-slate-500">∞ Slot</p>
-                  </div>
-                )}
-              </div>
-            </div>
+            <ResidentSlotRack
+              slots={slotViewModels}
+              variant="detail"
+              overflow={slotOverflowMode}
+              onSlotDrop={handleRackDrop}
+              onSlotClear={handleRackClear}
+              resolveDisplayInfo={resolveDisplayInfo}
+            />
 
             {(metrics.length > 0 || rewards.length > 0) && (
               <div className="flex flex-col gap-3 md:flex-row md:items-stretch">

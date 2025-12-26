@@ -309,7 +309,7 @@ function getActivity(config: IdleVillageConfig, activityId: string): ActivityDef
   return config.activities[activityId];
 }
 
-function evaluateActivityDuration(activityDef: ActivityDefinition): VillageTimeUnit {
+export function evaluateActivityDuration(activityDef: ActivityDefinition): VillageTimeUnit {
   // For the vertical slice, support simple numeric duration formulas (e.g. "3").
   // More complex expressions will be delegated to the shared FormulaEngine later.
   const formula = activityDef.durationFormula;

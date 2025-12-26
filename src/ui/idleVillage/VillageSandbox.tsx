@@ -1,6 +1,11 @@
 import { useMemo, useState, useEffect, useCallback } from 'react';
 import type { ActivityDefinition, ResourceDeltaDefinition } from '@/balancing/config/idleVillage/types';
-import { createVillageStateFromConfig, getStartingResidentFatigue, type ResidentState } from '@/engine/game/idleVillage/TimeEngine';
+import {
+  createVillageStateFromConfig,
+  evaluateActivityDuration,
+  getStartingResidentFatigue,
+  type ResidentState,
+} from '@/engine/game/idleVillage/TimeEngine';
 import { useVillageStateStore } from '@/ui/idleVillage/useVillageStateStore';
 import { loadResidentsFromCharacterManager } from '@/engine/game/idleVillage/characterImport';
 import LocationCard from '@/ui/idleVillage/components/LocationCard';

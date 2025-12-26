@@ -34,6 +34,7 @@ export interface UseActivitySchedulerProps {
   onActivityComplete?: (result: ActivityResolutionResult) => void;
   onResourcesChange?: (resources: VillageResources, changes: ResourceDeltaDefinition[]) => void;
   onResidentStateChange?: (residentId: string, newState: Partial<VillageState['residents'][string]>) => void;
+  onStateUpdate?: (state: VillageState) => void;
 }
 
 /**
@@ -46,6 +47,7 @@ export const useActivityScheduler = ({
   onActivityComplete,
   onResourcesChange,
   onResidentStateChange,
+  onStateUpdate,
 }: UseActivitySchedulerProps) => {
   const [villageState, setVillageState] = useState<VillageState>(initialVillageState);
   const [scheduledActivities, setScheduledActivities] = useState<Map<string, ScheduledActivityState>>(new Map());
@@ -269,6 +271,7 @@ export const useActivityScheduler = ({
 
         // Update village state with resolution results
         setVillageState(resolutionResult.state);
+        onStateUpdate?.(resolutionResult.state);
         onResourcesChange?.(resolutionResult.state.resources, []);
 
         // Remove completed activities
