@@ -30,6 +30,8 @@ export interface ActivitySlotCardProps {
   onClick?: () => void;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
+  onHoverChange?: (slotId: string, isHovering: boolean) => void;
+  onDropComplete?: (slotId: string, workerId: string | null) => void;
 }
 
 const clamp01 = (value: number) => Math.max(0, Math.min(1, Number.isFinite(value) ? value : 0));
@@ -71,6 +73,7 @@ const ActivitySlotCard: React.FC<ActivitySlotCardProps> = ({
   onMouseLeave,
 }) => {
   const [isOver, setIsOver] = useState(false);
+  const [draggingResidentId, setDraggingResidentId] = useState<string | null>(null);
   
   const clampedProgress = clamp01(progressFraction);
   const remainingSeconds = Math.max(0, totalDuration - elapsedSeconds);
@@ -89,12 +92,19 @@ const ActivitySlotCard: React.FC<ActivitySlotCardProps> = ({
   const variantColors = VARIANT_COLORS[visualVariant] ?? VARIANT_COLORS.azure;
 
   /**
-   * Marks the slot as active when a resident is dragged over it.
+   * Sets visual highlight when a dragged resident enters the slot.
    */
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
-    event.dataTransfer.dropEffect = 'copy';
-    if (!isOver) setIsOver(true);
+    // Worker tokens declare effectAllowed='move', so we must mirror it here
+    event.dataTransfer.dropEffect = 'move';
+    setIsOver(true);
+    
+    // Capture the dragging resident ID
+    const residentId = event.dataTransfer.getData('text/resident-id') || event.dataTransfer.getData('text/plain') || null;
+    if (residentId) {
+      setDraggingResidentId(residentId);
+    }
   };
 
   /**
@@ -108,17 +118,24 @@ const ActivitySlotCard: React.FC<ActivitySlotCardProps> = ({
    * Accepts the dropped resident id and notifies listeners about assignment.
    */
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    console.log('ActivitySlot handleDrop called');
     event.preventDefault();
     
-    // Check if drop is allowed
-    if (!canAcceptDrop) {
+    // Use the stored dragging resident ID first, fallback to dataTransfer
+    const workerId = draggingResidentId || event.dataTransfer.getData('text/resident-id') || event.dataTransfer.getData('text/plain') || null;
+    console.log('Dropped workerId:', workerId);
+    
+    if (!workerId) {
+      console.log('No worker ID found');
       setIsOver(false);
+      setDraggingResidentId(null);
       return;
     }
     
-    const workerId = event.dataTransfer.getData('text/resident-id') || event.dataTransfer.getData('text/plain') || null;
+    console.log('Calling onWorkerDrop with:', workerId);
     onWorkerDrop(workerId);
     setIsOver(false);
+    setDraggingResidentId(null);
   };
 
   const handleClick = () => {
@@ -149,7 +166,7 @@ const ActivitySlotCard: React.FC<ActivitySlotCardProps> = ({
     dropState === 'valid'
       ? 'ring-4 ring-emerald-400/90 drop-shadow-[0_0_60px_rgba(16,185,129,0.8)] scale-110 border-emerald-400/60'
       : dropState === 'invalid'
-        ? 'ring-4 ring-rose-500/90 drop-shadow-[0_0_60px_rgba(244,63,94,0.8)] scale-110 border-rose-500/60'
+        ? 'opacity-35 border-white/15 cursor-not-allowed'
         : isHoveringValid
           ? 'ring-4 ring-white/90 drop-shadow-[0_0_80px_rgba(255,255,255,0.8)] scale-110 border-white/50'
           : bloomActive
@@ -165,12 +182,14 @@ const ActivitySlotCard: React.FC<ActivitySlotCardProps> = ({
   };
 
   return (
-    <div className="flex items-center justify-center">
+    <div
+      className="flex items-center justify-center relative"
+      onDragOver={handleDragOver}
+      onDragEnter={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
       <div
-        onDragOver={handleDragOver}
-        onDragEnter={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
         className={baseClasses}
         style={slotStyle}
         onMouseEnter={onMouseEnter}

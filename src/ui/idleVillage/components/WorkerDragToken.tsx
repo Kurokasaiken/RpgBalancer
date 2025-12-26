@@ -14,12 +14,15 @@ export interface WorkerDragTokenProps {
   disabled?: boolean;
   className?: string;
   horizontal?: boolean; // New prop for horizontal bar mode
+  statusLabel?: string;
+  isInteractive?: boolean;
   onDragStateChange?: (workerId: string, isDragging: boolean) => void;
   onDragStart?: (event: React.DragEvent<HTMLDivElement>) => void;
   onDragEnd?: (event: React.DragEvent<HTMLDivElement>) => void;
   onPointerDown?: (event: React.PointerEvent<HTMLDivElement>) => void;
   onPointerUp?: (event: React.PointerEvent<HTMLDivElement>) => void;
   onPointerCancel?: (event: React.PointerEvent<HTMLDivElement>) => void;
+  onSelect?: (workerId: string) => void;
 }
 
 /**
@@ -36,14 +39,20 @@ const WorkerDragToken: React.FC<WorkerDragTokenProps> = ({
   disabled = false,
   className,
   horizontal = false,
+  statusLabel,
+  isInteractive = true,
   onDragStateChange,
   onDragStart,
   onDragEnd,
   onPointerDown,
   onPointerUp,
   onPointerCancel,
+  onSelect,
 }) => {
   const dragPreviewRef = useRef<HTMLDivElement | null>(null);
+  const didDragRef = useRef(false);
+  const isUnavailable = disabled || !isInteractive;
+  const computedStatusLabel = statusLabel ?? (isUnavailable ? 'Unavailable' : 'Available');
 
   const cleanupPreview = () => {
     if (dragPreviewRef.current) {
@@ -53,6 +62,10 @@ const WorkerDragToken: React.FC<WorkerDragTokenProps> = ({
   };
 
   const handleDragStart = (event: React.DragEvent<HTMLDivElement>) => {
+    if (isUnavailable) {
+      event.preventDefault();
+      return;
+    }
     event.stopPropagation();
     event.dataTransfer.setData('text/resident-id', workerId);
     event.dataTransfer.setData('text/plain', workerId);
@@ -99,61 +112,87 @@ const WorkerDragToken: React.FC<WorkerDragTokenProps> = ({
       }
     }, 100);
 
+    didDragRef.current = true;
     onDragStateChange?.(workerId, true);
     onDragStart?.(event);
   };
 
   const handleDragEnd = (event: React.DragEvent<HTMLDivElement>) => {
     cleanupPreview();
-    if (disabled) return;
+    if (isUnavailable) return;
+    didDragRef.current = false;
     onDragEnd?.(event);
     onDragStateChange?.(workerId, false);
   };
 
+  const handlePointerDownInternal = (event: React.PointerEvent<HTMLDivElement>) => {
+    didDragRef.current = false;
+    onPointerDown?.(event);
+  };
+
+  const handlePointerUpInternal = (event: React.PointerEvent<HTMLDivElement>) => {
+    onPointerUp?.(event);
+    if (!didDragRef.current) {
+      onSelect?.(workerId);
+    }
+    didDragRef.current = false;
+  };
+
+  const handlePointerCancelInternal = (event: React.PointerEvent<HTMLDivElement>) => {
+    didDragRef.current = false;
+    onPointerCancel?.(event);
+  };
+
   const constrainedHp = Math.max(0, Math.min(100, hp));
   const constrainedFatigue = Math.max(0, Math.min(100, fatigue));
+  const baseTokenClasses = horizontal
+    ? 'flex items-center gap-3 rounded-[18px] border border-white/15 bg-[rgba(8,12,18,0.65)] px-3 py-2 text-left text-xs text-amber-100 shadow-[0_12px_26px_rgba(0,0,0,0.45)] backdrop-blur-md transition-all max-w-sm'
+    : 'flex flex-col gap-2 rounded-[22px] border border-white/15 bg-[rgba(6,10,18,0.7)] px-4 py-3 text-left text-xs text-amber-100 shadow-[0_18px_30px_rgba(0,0,0,0.5)] backdrop-blur-md transition-all';
 
   return (
     <div
-      draggable={!disabled}
+      draggable={!isUnavailable}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       data-testid="worker-drag-token"
       data-worker-id={workerId}
       className={[
-        horizontal 
-          ? 'flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900/50 px-2 py-1.5 text-left text-xs text-amber-100 transition-all max-w-xs'
-          : 'flex flex-col gap-2 rounded-xl border border-slate-800 bg-slate-950/85 px-4 py-3 text-left text-xs text-amber-100 shadow-[0_10px_25px_rgba(0,0,0,0.45)] transition',
-        disabled ? 'cursor-not-allowed opacity-60 grayscale' : 'cursor-grab active:cursor-grabbing active:scale-95 hover:border-emerald-400/70',
+        baseTokenClasses,
+        isUnavailable ? 'cursor-not-allowed opacity-35 grayscale' : 'cursor-grab active:cursor-grabbing active:scale-95 hover:border-emerald-300/70',
         isDragging ? 'opacity-40' : '',
         className ?? '',
       ]
         .filter(Boolean)
         .join(' ')}
-      onPointerDown={onPointerDown}
-      onPointerUp={onPointerUp}
-      onPointerCancel={onPointerCancel}
+      onPointerDown={handlePointerDownInternal}
+      onPointerUp={handlePointerUpInternal}
+      onPointerCancel={handlePointerCancelInternal}
     >
       {horizontal ? (
         // Horizontal bar mode
         <>
-          <div className="flex h-6 w-6 items-center justify-center rounded-full border border-amber-300/80 bg-slate-900 text-xs font-semibold uppercase tracking-[0.3em] shrink-0">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-amber-200/70 bg-[rgba(18,12,0,0.65)] text-[11px] font-semibold uppercase tracking-[0.3em] shadow-inner shadow-amber-900/40">
             {label.charAt(0) || workerId.charAt(0)}
           </div>
           
-          <div className="flex-1 min-w-0 space-y-0.5">
+          <div className="min-w-0 flex-1 space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-slate-300 truncate font-medium text-[10px]">{label}</span>
-              <span className="text-[9px] text-slate-500 capitalize">
-                {disabled ? 'injured' : 'available'}
+              <span className="truncate text-[11px] font-semibold tracking-[0.08em] text-ivory">{label}</span>
+              <span
+                className={[
+                  'rounded-full px-1.5 py-0.5 text-[7.5px] tracking-[0.18em] uppercase',
+                  isUnavailable ? 'border border-rose-300/70 text-rose-100/80 bg-rose-900/20' : 'border border-emerald-200/70 text-emerald-100/80 bg-emerald-900/20',
+                ].join(' ')}
+              >
+                {computedStatusLabel}
               </span>
             </div>
             
             <div className="flex items-center gap-1.5">
               <span className="text-[9px] text-slate-500 w-3">HP</span>
-              <div className="flex-1 h-1 bg-slate-800 rounded-full overflow-hidden">
+              <div className="flex-1 h-1 rounded-full bg-white/10">
                 <div 
-                  className="h-full bg-emerald-500 transition-all"
+                  className="h-full rounded-full bg-gradient-to-r from-emerald-300 to-emerald-500 transition-all"
                   style={{ width: `${constrainedHp}%` }}
                 />
               </div>
@@ -164,9 +203,9 @@ const WorkerDragToken: React.FC<WorkerDragTokenProps> = ({
             
             <div className="flex items-center gap-1.5">
               <span className="text-[9px] text-slate-500 w-3">F</span>
-              <div className="flex-1 h-1 bg-slate-800 rounded-full overflow-hidden">
+              <div className="flex-1 h-1 rounded-full bg-white/10">
                 <div 
-                  className="h-full bg-amber-500 transition-all"
+                  className="h-full rounded-full bg-gradient-to-r from-amber-300 to-amber-500 transition-all"
                   style={{ width: `${constrainedFatigue}%` }}
                 />
               </div>

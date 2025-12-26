@@ -38,35 +38,72 @@ export const FantasyLayout: React.FC<FantasyLayoutProps> = ({ children, activeTa
             <div className="flex h-screen w-full overflow-hidden bg-linear-to-br from-obsidian-darkest via-obsidian-dark to-obsidian">
                 {/* Desktop Left Menu */}
                 {!isMobile && (
-                    <aside className="hidden lg:flex w-64 shrink-0 px-4 py-6">
-                        <div className="observatory-nav-frame w-full">
-                            <div className="observatory-nav-orb" aria-hidden="true" />
-                            <nav className="observatory-nav-scroll flex flex-col gap-4">
-                                {NAV_SECTIONS.map((section) => (
-                                    <div key={section.title}>
-                                        <p className="px-3 pb-1 text-[9px] uppercase tracking-[0.35em] text-slate-400/70">
-                                            {section.title}
-                                        </p>
-                                        <div className="flex flex-col gap-1">
-                                            {section.items.map((item) => {
-                                                const isActive = activeTab === item.id;
-                                                return (
-                                                    <button
-                                                        key={item.id}
-                                                        data-tab-id={item.id}
-                                                        data-testid={`nav-btn-${item.id}`}
-                                                        onClick={() => onTabChange(item.id)}
-                                                        className={`observatory-nav-item ${isActive ? 'is-active' : ''}`}
-                                                    >
-                                                        <span className="text-lg">{item.icon}</span>
-                                                        <span className="truncate">{item.label}</span>
-                                                    </button>
-                                                );
-                                            })}
+                    <aside className="hidden lg:flex w-72 shrink-0 px-4 py-6">
+                        <div
+                            className="relative w-full overflow-hidden rounded-[26px] border px-4 py-5 shadow-[0_30px_65px_rgba(0,0,0,0.65)]"
+                            style={{
+                                borderColor: 'var(--panel-border)',
+                                background: 'radial-gradient(circle at 15% 0%, rgba(255,255,255,0.08), rgba(4,7,14,0.95))',
+                                boxShadow: `0 30px 60px var(--card-shadow-color)`,
+                            }}
+                        >
+                            <div
+                                className="pointer-events-none absolute inset-0 opacity-25"
+                                style={{ background: 'var(--card-surface-radial, radial-gradient(circle at 25% 0%, rgba(255,255,255,0.18), transparent 55%))' }}
+                            />
+                            <div className="relative z-10 flex h-full flex-col gap-5">
+                                <nav className="flex-1 flex flex-col gap-5 overflow-y-auto pr-1">
+                                    {NAV_SECTIONS.map((section) => (
+                                        <div key={section.title} className="space-y-2">
+                                            <p className="px-2 text-[9px] uppercase tracking-[0.35em] text-slate-400/70">
+                                                {section.title}
+                                            </p>
+                                            <div className="flex flex-col gap-2">
+                                                {section.items.map((item) => {
+                                                    const isActive = activeTab === item.id;
+                                                    return (
+                                                        <button
+                                                            key={item.id}
+                                                            data-tab-id={item.id}
+                                                            data-testid={`nav-btn-${item.id}`}
+                                                            onClick={() => onTabChange(item.id)}
+                                                            className={[
+                                                                'flex items-center gap-3 rounded-[18px] border px-3 py-2 text-left text-[10px] uppercase tracking-[0.28em] transition-all',
+                                                                isActive
+                                                                    ? 'text-amber-100 shadow-[0_0_25px_rgba(251,191,36,0.35)]'
+                                                                    : 'text-slate-200/85 hover:text-ivory hover:shadow-[0_0_25px_rgba(52,211,153,0.25)]',
+                                                            ].join(' ')}
+                                                            style={{
+                                                                borderColor: isActive ? 'rgba(251,191,36,0.65)' : 'rgba(255,255,255,0.12)',
+                                                                background: isActive
+                                                                    ? 'linear-gradient(120deg, rgba(251,191,36,0.2), rgba(17,10,0,0.85))'
+                                                                    : 'linear-gradient(120deg, rgba(5,7,12,0.85), rgba(2,4,6,0.92))',
+                                                            }}
+                                                        >
+                                                            <span className="text-lg">{item.icon}</span>
+                                                            <span className="truncate">{item.label}</span>
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
-                            </nav>
+                                    ))}
+                                </nav>
+                                <div
+                                    className="rounded-[18px] border border-white/10 px-4 py-3 text-[9px] uppercase tracking-[0.35em] text-slate-200/80 shadow-[0_12px_30px_rgba(0,0,0,0.5)]"
+                                    style={{
+                                        background:
+                                            'linear-gradient(120deg, rgba(5,8,14,0.65), rgba(10,12,20,0.8))',
+                                        backdropFilter: 'blur(12px)',
+                                        WebkitBackdropFilter: 'blur(12px)',
+                                    }}
+                                >
+                                    <p className="text-amber-200/70">Navigator Tips</p>
+                                    <p className="text-[8px] text-slate-400/80 tracking-[0.3em] mt-1">
+                                        Usa SPACE per mettere in pausa o riprendere il ciclo del Villaggio.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </aside>
                 )}

@@ -5,7 +5,6 @@ import WorkerDragToken from './WorkerDragToken';
 
 interface FilterOptions {
   status: 'all' | 'available' | 'away' | 'exhausted' | 'injured' | 'dead';
-  hasTags: boolean;
   minHp: number;
   maxFatigue: number;
 }
@@ -15,26 +14,28 @@ interface DragTestContainerProps {
   onDragStart?: (residentId: string) => void;
   onDragEnd?: (residentId: string) => void;
   onDragStateChange?: (residentId: string, isDragging: boolean) => void;
+  onCountsChange?: (counts: { filtered: number; total: number }) => void;
+  onResidentSelect?: (residentId: string) => void;
 }
 
-const DragTestContainer = ({ 
-  residents, 
-  onDragStart, 
-  onDragEnd, 
-  onDragStateChange 
+const DragTestContainer = ({
+  residents,
+  onDragStart,
+  onDragEnd,
+  onDragStateChange,
+  onCountsChange,
+  onResidentSelect,
 }: DragTestContainerProps) => {
   const [draggingResidentId, setDraggingResidentId] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterOptions>({
     status: 'all',
-    hasTags: false,
     minHp: 0,
     maxFatigue: 100,
   });
 
   const filteredResidents = useMemo(() => {
-    return residents.filter(resident => {
+    return residents.filter((resident) => {
       if (filters.status !== 'all' && resident.status !== filters.status) return false;
-      if (filters.hasTags && (!resident.statTags || resident.statTags.length === 0)) return false;
       if (resident.currentHp < filters.minHp) return false;
       if (resident.fatigue > filters.maxFatigue) return false;
       return true;
@@ -56,75 +57,108 @@ const DragTestContainer = ({
     onDragStateChange?.(residentId, isDragging);
   };
 
+  /**
+   * Returns a user-facing status label for the provided resident.
+   */
+  const describeStatus = (resident: ResidentState): string => {
+    if (resident.isInjured) return 'Injured';
+    switch (resident.status) {
+      case 'available':
+        return 'Available';
+      case 'working':
+        return 'Working';
+      case 'away':
+        return 'Away';
+      case 'exhausted':
+        return 'Exhausted';
+      case 'injured':
+        return 'Injured';
+      case 'dead':
+        return 'Fallen';
+      default:
+        return resident.status;
+    }
+  };
+
+  /**
+   * Determines if the resident can currently be assigned/dragged.
+   */
+  const isResidentInteractive = (resident: ResidentState): boolean =>
+    !resident.isInjured && resident.status === 'available';
+
   return (
-    <div className="space-y-3 rounded-lg border border-slate-700/50 bg-slate-900/20 backdrop-blur-sm p-3 shadow-lg max-w-sm">
-      <div className="flex items-center justify-between gap-2">
-        <h3 className="text-xs uppercase tracking-[0.35em] text-slate-400 whitespace-nowrap">
-          Residenti ({filteredResidents.length}/{residents.length})
-        </h3>
-        
-        <div className="flex flex-wrap gap-2">
-          <select
-            value={filters.status}
-            onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value as any }))}
-            className="text-xs px-2 py-1 rounded border border-slate-700 bg-slate-900 text-slate-300"
+    <section className="relative overflow-hidden rounded-[26px] border border-[color:var(--panel-border)] bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,0.08),rgba(5,9,18,0.92))] p-4 shadow-[0_25px_45px_rgba(0,0,0,0.55)]">
+      <div
+        className="pointer-events-none absolute inset-0 opacity-35"
+        style={{
+          background: 'var(--card-surface-radial, radial-gradient(circle at 30% 0%, rgba(255,255,255,0.2), transparent 55%))',
+        }}
+      />
+      <div className="relative z-10 space-y-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2 text-[9px] uppercase tracking-[0.45em] text-amber-200/70">
+            <span>Roster</span>
+            <span className="text-amber-100">{`${filteredResidents.length}/${residents.length}`}</span>
+          </div>
+          <label
+            className="ml-auto flex items-center gap-1.5 rounded-full border border-white/15 px-2 py-0.5 text-[9px] uppercase tracking-[0.18em] text-slate-200 shadow-[0_8px_18px_rgba(0,0,0,0.35)]"
+            style={{
+              background:
+                'linear-gradient(135deg, rgba(12,16,24,0.78), rgba(5,8,14,0.85)), var(--panel-sheen, rgba(255,255,255,0.06))',
+              backdropFilter: 'blur(10px)',
+            }}
           >
-            <option value="all">Tutti</option>
-            <option value="available">Disponibili</option>
-            <option value="away">Assenti</option>
-            <option value="exhausted">Esausti</option>
-            <option value="injured">Feriti</option>
-            <option value="dead">Morti</option>
-          </select>
-          
-          <label className="flex items-center gap-1 text-xs text-slate-400">
-            <input
-              type="checkbox"
-              checked={filters.hasTags}
-              onChange={(e) => setFilters(prev => ({ ...prev, hasTags: e.target.checked }))}
-              className="rounded"
-            />
-            Con tag
+            <span>Status</span>
+            <select
+              value={filters.status}
+              onChange={(e) => setFilters((prev) => ({ ...prev, status: e.target.value as FilterOptions['status'] }))}
+              className="bg-transparent text-[9px] uppercase tracking-[0.15em] focus:outline-none"
+            >
+              <option value="all">All</option>
+              <option value="available">Available</option>
+              <option value="away">Away</option>
+              <option value="exhausted">Exhausted</option>
+              <option value="injured">Injured</option>
+              <option value="dead">Fallen</option>
+            </select>
           </label>
         </div>
-      </div>
 
-      <div className="space-y-2 max-h-48 overflow-y-auto scroll-smooth hover:scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-transparent">
-        {filteredResidents.length === 0 ? (
-          <div className="text-slate-500 text-sm italic text-center py-8">
-            Nessun residente corrisponde ai filtri selezionati
-          </div>
-        ) : (
-          filteredResidents.map((resident) => (
-            <WorkerDragToken
-              key={resident.id}
-              workerId={resident.id}
-              label={formatResidentLabel(resident)}
-              subtitle=""
-              hp={resident.currentHp}
-              fatigue={resident.fatigue}
-              maxHp={resident.maxHp}
-              isDragging={draggingResidentId === resident.id}
-              disabled={resident.status === 'exhausted' || resident.isInjured}
-              horizontal={true}
-              onDragStateChange={handleDragStateChange}
-              onDragStart={(event) => {
-                event.dataTransfer.setData('text/resident-id', resident.id);
-                event.dataTransfer.effectAllowed = 'move';
-                handleDragStart(resident.id);
-              }}
-              onDragEnd={() => handleDragEnd(resident.id)}
-            />
-          ))
-        )}
-      </div>
-      
-      {draggingResidentId && (
-        <div className="text-xs text-amber-400 bg-amber-950/30 px-3 py-2 rounded border border-amber-800/50">
-          Trascinando: {formatResidentLabel(residents.find(r => r.id === draggingResidentId)!)}
+        <div className="space-y-2 max-h-48 overflow-y-auto scroll-smooth hover:scrollbar-thin scrollbar-thumb-amber-400/60 scrollbar-track-transparent">
+          {filteredResidents.length === 0 ? (
+            <div className="py-8 text-center text-sm italic text-slate-400">
+              Nessun residente corrisponde ai filtri selezionati
+            </div>
+          ) : (
+            filteredResidents.map((resident) => (
+              <WorkerDragToken
+                key={resident.id}
+                workerId={resident.id}
+                label={formatResidentLabel(resident)}
+                subtitle=""
+                hp={resident.currentHp}
+                fatigue={resident.fatigue}
+                maxHp={resident.maxHp}
+                isDragging={draggingResidentId === resident.id}
+                disabled={!isResidentInteractive(resident)}
+                isInteractive={isResidentInteractive(resident)}
+                statusLabel={describeStatus(resident)}
+                horizontal={true}
+                onDragStateChange={handleDragStateChange}
+                onDragStart={(event) => {
+                  event.dataTransfer.setData('text/resident-id', resident.id);
+                  event.dataTransfer.effectAllowed = 'move';
+                  handleDragStart(resident.id);
+                }}
+                onDragEnd={() => handleDragEnd(resident.id)}
+                onSelect={onResidentSelect}
+              />
+            ))
+          )}
         </div>
-      )}
-    </div>
+
+      </div>
+    </section>
   );
 };
 

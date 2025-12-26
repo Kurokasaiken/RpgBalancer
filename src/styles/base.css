@@ -1,0 +1,84 @@
+@layer base {
+  :root {
+    /* Config-first theme tokens (Epic Frontier defaults) */
+    --font-header: 'Cinzel', serif;
+    --font-body: 'Crimson Text', serif;
+    --surface-base: #0d0f12;
+    --surface-panel: rgba(11, 13, 18, 0.95);
+    --panel-border: #8b6a2f;
+    --panel-surface: rgba(5, 6, 9, 0.92);
+    --panel-sheen: radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.12), transparent 65%);
+    --text-primary: #f7f2d8;
+    --text-secondary: #ffd700;
+    --text-muted: #9ca8c2;
+    --accent-color: #d4af37;
+    --accent-strong: #ffd700;
+    --card-border-color: #8b4513;
+    --card-shadow-color: rgba(0, 15, 35, 0.8);
+    --card-surface: #10131a;
+    --card-surface-radial: radial-gradient(circle at top, rgba(255, 255, 255, 0.07), transparent 70%);
+    --card-highlight: rgba(212, 175, 55, 0.12);
+    --halo-color: rgba(255, 215, 0, 0.45);
+    --halo-strength: 1.2;
+    --slot-border: rgba(212, 175, 55, 0.35);
+    --slot-surface: rgba(6, 9, 14, 0.95);
+    --slot-ring-idle: linear-gradient(120deg, rgba(255, 215, 0, 0.6), rgba(139, 69, 19, 0.8));
+    --slot-ring-active: linear-gradient(120deg, rgba(253, 224, 71, 0.85), rgba(217, 119, 6, 0.75));
+    --slot-ring-hover: linear-gradient(120deg, rgba(255, 255, 255, 0.85), rgba(212, 175, 55, 0.9));
+    --slot-glow-idle: rgba(9, 51, 89, 0.55);
+    --slot-glow-active: rgba(0, 70, 120, 0.65);
+    --slot-glow-hover: rgba(255, 215, 0, 0.55);
+    --slot-icon-color: #ffd700;
+    --slot-worker-badge-bg: #0d0f12;
+    --slot-worker-badge-border: rgba(255, 215, 0, 0.65);
+    --slot-worker-badge-text: #fef9c3;
+    --slot-label-color: rgba(255, 255, 255, 0.75);
+    --slot-helper-color: rgba(255, 255, 255, 0.55);
+    --hp-bar-track: rgba(0, 70, 120, 0.3);
+    --hp-bar-start: #4ade80;
+    --hp-bar-end: #0ea5e9;
+    --fatigue-bar-track: rgba(212, 175, 55, 0.2);
+    --fatigue-bar-start: #ffd700;
+    --fatigue-bar-end: #f97316;
+    --button-bg: rgba(8, 10, 15, 0.9);
+    --button-border: rgba(255, 215, 0, 0.45);
+    --button-text: #f7f2d8;
+    --body-bg-overlay: linear-gradient(rgba(4, 6, 10, 0.95), rgba(4, 6, 10, 0.95));
+    --body-bg-texture: url('/assets/ui/bg.png');
+
+    /* Legacy palette (still referenced by older components) */
+    --bg-abyss: #050706;
+    --bg-obsidian: #0a0f0d;
+    --panel-basalt: #121614;
+    --marble-ivory: #e2ddd3;
+    --bronze-aged: #8c6d3f;
+    --bronze-glow: #ffbf00;
+    --sienna-shadow: #3e2723;
+    --emerald-deep: #0f2b1d;
+    --heroic-obsidian-source: gradient;
+    --heroic-obsidian-image: url('/assets/ui/obsidian-pool.png');
+    --heroic-sigil-source: gradient;
+    --heroic-sigil-image: url('/assets/ui/ancient-gold-star.png');
+  }
+
+  body {
+    @apply antialiased;
+    color: var(--text-primary);
+    font-family: var(--font-body, 'Crimson Text', serif);
+    background-color: var(--surface-base, #050706);
+    background-image: var(--body-bg-texture, url('/assets/ui/bg.png'));
+    background-attachment: fixed;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  h1, h2, h3, .font-epic {
+    font-family: var(--font-header);
+    @apply tracking-[0.3em] uppercase;
+  }
+
+  .font-body {
+    font-family: var(--font-body);
+  }
+}

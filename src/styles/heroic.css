@@ -1,0 +1,119 @@
+@layer components {
+  .heroic-card {
+    @apply relative overflow-visible;
+    border: 2px solid var(--bronze-aged);
+    background-color: var(--panel-basalt);
+    box-shadow:
+      inset 0 0 40px rgba(0, 0, 0, 0.8),
+      0 15px 35px rgba(0, 0, 0, 0.7);
+    background-image: url('/assets/ui/oil-grain-overlay.png');
+    background-blend-mode: overlay;
+  }
+
+  .heroic-header {
+    @apply flex items-center justify-between;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 2px solid var(--bronze-aged);
+    color: var(--sienna-shadow);
+    font-family: var(--font-header);
+    background: url('/assets/ui/dirty-marble-header.webp');
+    background-size: cover;
+  }
+
+  .btn-heroic {
+    @apply relative px-4 py-2 transition-all active:scale-95 uppercase tracking-[0.2em];
+    font-family: var(--font-header);
+    color: var(--marble-ivory);
+    background: linear-gradient(to bottom, #b08d57, #8c6d3f);
+    border: 1px solid var(--sienna-shadow);
+    box-shadow: inset 0 2px 5px rgba(255, 191, 0, 0.3), 0 4px 8px rgba(0, 0, 0, 0.5);
+  }
+
+  .btn-heroic:hover {
+    @apply brightness-110;
+    box-shadow: 0 0 15px var(--bronze-glow);
+  }
+
+  .heroic-panel {
+    @apply relative p-6 border border-(--bronze-aged) bg-(--panel-basalt) shadow-2xl;
+    box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
+  }
+
+  .heroic-stat-row {
+    @apply flex items-center justify-between p-2 border-l-2 border-(--bronze-aged) bg-black/20 hover:bg-white/5 transition-colors;
+  }
+
+  .heroic-side-menu {
+    @apply h-full bg-(--panel-basalt) p-4;
+    display: flex;
+    flex-direction: column;
+    border-left: 4px solid var(--bronze-aged);
+    background-image:
+      linear-gradient(rgba(18, 22, 20, 0.95), rgba(18, 22, 20, 0.95)),
+      url('/assets/ui/bg.png');
+    background-size: 480px;
+    box-shadow: -12px 0 34px rgba(0, 0, 0, 0.85);
+  }
+
+  .heroic-menu-frame {
+    @apply relative rounded-2xl border-2 border-(--bronze-aged)/80 overflow-hidden shadow-[inset_0_0_30px_rgba(0,0,0,0.6)] backdrop-blur-sm;
+    background: url('/assets/ui/dirty-marble.png');
+    background-size: 340px;
+    padding: 2px;
+    isolation: isolate;
+  }
+
+  .heroic-menu-frame::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 6px double rgba(255, 255, 255, 0.08);
+    pointer-events: none;
+    mix-blend-mode: screen;
+  }
+
+  .heroic-menu-inner {
+    @apply rounded-2xl bg-(--panel-basalt)/95 overflow-hidden;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6);
+  }
+
+  .heroic-menu-item {
+    @apply p-3 border-b border-white/10 text-(--marble-ivory) transition-all;
+    font-family: 'Crimson Text', var(--font-body);
+    cursor: pointer;
+    background: radial-gradient(circle at top, rgba(255, 255, 255, 0.04), transparent);
+    filter: brightness(0.95);
+  }
+
+  .heroic-menu-item:hover {
+    filter: brightness(1.08);
+    background: radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent);
+  }
+
+  .heroic-menu-title {
+    @apply p-4 text-center text-(--sienna-shadow) uppercase tracking-widest;
+    font-family: var(--font-header);
+    background: url('/assets/ui/dirty-marble.png');
+    background-size: cover;
+    border-bottom: 2px solid var(--bronze-aged);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  }
+
+  .heroic-menu-section {
+    @apply border-b border-white/5 last:border-b-0;
+    background: radial-gradient(circle at top, rgba(255, 255, 255, 0.03), transparent);
+  }
+}
+
+.heroic-card,
+.heroic-panel {
+  position: relative;
+}
+
+.heroic-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border: 1px solid rgba(255, 191, 0, 0.05);
+}

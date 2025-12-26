@@ -58,6 +58,41 @@ const clampPercent = (value: number): number => {
   return Math.max(0, Math.min(100, value));
 };
 
+const mapStatLabelToIcon = (label?: string | null): string => {
+  if (!label) return '☆';
+  const normalized = label.trim().toLowerCase();
+  if (normalized.includes('hp') || normalized.includes('vita')) return '❤';
+  if (normalized.includes('dmg') || normalized.includes('danno')) return '⚔';
+  if (normalized.includes('def')) return '🛡';
+  if (normalized.includes('agi') || normalized.includes('spd')) return '➶';
+  if (normalized.includes('mag') || normalized.includes('mana')) return '✷';
+  return label.trim().charAt(0) || '☆';
+};
+
+const getSlotBadgeContent = (slot: VerbSlotState) => {
+  const statLabel = slot.statHint ?? slot.requirementLabel ?? slot.requirement?.label ?? 'Stat';
+  return {
+    text: '+10',
+    icon: mapStatLabelToIcon(statLabel),
+  };
+};
+
+const getInitials = (label?: string | null): string => {
+  if (!label) return '+';
+  const words = label.trim().split(/\s+/);
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return (words[0][0] + words[words.length - 1][0]).toUpperCase();
+};
+
+const DRAG_EXEMPT_TAGS = new Set(['BUTTON', 'A', 'INPUT', 'TEXTAREA', 'SELECT', 'LABEL']);
+
+const isDragExemptTarget = (target: EventTarget | null): boolean => {
+  if (!(target instanceof HTMLElement)) return false;
+  if (DRAG_EXEMPT_TAGS.has(target.tagName)) return true;
+  if (target.closest('[data-drag-exempt="true"]')) return true;
+  return false;
+};
+
 const formatTime = (seconds?: number): string => {
   if (!Number.isFinite(seconds ?? NaN)) return '--';
   const clamped = Math.max(0, Math.round(seconds ?? 0));
@@ -69,7 +104,7 @@ const formatTime = (seconds?: number): string => {
 
 /**
  * Floating card detail inspired by the Style Laboratory moodboard.
- * Behaves like a Magic card on a table: draggable, drop targets, halo progress.
+ * Behaves come una carta sul tavolo: draggable, drop targets, metriche compatte.
  */
 const ActivityCardDetail: React.FC<ActivityCardDetailProps> = ({
   activity,
@@ -92,15 +127,18 @@ const ActivityCardDetail: React.FC<ActivityCardDetailProps> = ({
   const [isDragging, setIsDragging] = useState(false);
   const dragOriginRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const pointerOriginRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
-
-  const remainingSeconds = Math.max(0, (durationSeconds ?? 0) - elapsedSeconds);
-  const progressRatio = durationSeconds ? clamp01(elapsedSeconds / durationSeconds) : 0;
-  const progressDegrees = progressRatio * 360;
-  const haloStartDeg = -90;
-  const haloHighlightStartDeg = haloStartDeg + Math.max(progressDegrees - 40, 0);
-
   const riskDeath = clampPercent(preview.deathPercentage);
   const riskInjuryOnly = Math.max(0, clampPercent(preview.injuryPercentage) - riskDeath);
+  const riskTooltip = `Injury ${clampPercent(preview.injuryPercentage)}% · Death ${riskDeath}%`;
+  const hasInfiniteSlots = activity.maxSlots === 'infinite';
+  const shouldShowInfinityPlaceholder = hasInfiniteSlots && assignments.length > 0;
+  const hasSlotOverflow = assignments.length > 4;
+  const resolvedDurationSeconds =
+    Number.isFinite(durationSeconds ?? NaN) && (durationSeconds ?? 0) > 0 ? (durationSeconds as number) : 0;
+  const elapsed = Math.max(0, elapsedSeconds ?? 0);
+  const progressRatio = resolvedDurationSeconds > 0 ? clamp01(elapsed / resolvedDurationSeconds) : 0;
+  const remainingSeconds =
+    resolvedDurationSeconds > 0 ? Math.max(0, resolvedDurationSeconds - elapsed) : undefined;
 
   const cardFrameStyle: CSSProperties = useMemo(() => {
     const tokens = activePreset.tokens;
@@ -149,7 +187,11 @@ const ActivityCardDetail: React.FC<ActivityCardDetailProps> = ({
     };
   }, [isDragging]);
 
-  const startDrag = (event: React.PointerEvent<HTMLDivElement>) => {
+  const handlePointerDown = (event: React.PointerEvent<HTMLElement>) => {
+    if (event.button !== 0) return;
+    if (isDragExemptTarget(event.target)) return;
+    // Avoid dragging when selecting text (modifier keys)
+    if (event.metaKey || event.altKey || event.ctrlKey || event.shiftKey) return;
     event.preventDefault();
     pointerOriginRef.current = { x: event.clientX, y: event.clientY };
     dragOriginRef.current = { ...position };
@@ -200,33 +242,16 @@ const ActivityCardDetail: React.FC<ActivityCardDetailProps> = ({
         aria-label={`Scheda ${activity.label}`}
         className="relative overflow-hidden rounded-[20px] border px-3.5 py-3.5 backdrop-blur-lg text-[11px] leading-snug"
         style={cardFrameStyle}
+        onPointerDown={handlePointerDown}
       >
         <div className="absolute inset-0 opacity-40" style={auraStyle} aria-hidden />
         <div className="relative z-10 flex flex-col gap-3">
           <header className="flex items-start justify-between gap-2.5">
             <div className="flex-1 space-y-0.5">
-              <p className="text-[9px] uppercase tracking-[0.28em] text-slate-500">Activity Detail</p>
-              <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full border border-amber-400/40 text-lg">
-                  <span aria-hidden>{activityIcon}</span>
-                </div>
-                <div>
-                  <h2 className="font-semibold text-base leading-tight">{activity.label}</h2>
-                  <p className="text-[9px] uppercase tracking-[0.15em] text-amber-200/80">
-                    {assignmentTitle ?? 'Slot'}
-                  </p>
-                </div>
-              </div>
+              <h2 className="text-sm font-semibold leading-tight tracking-wide">{activity.label}</h2>
+              <p className="text-[9px] uppercase tracking-[0.15em] text-amber-200/80">{assignmentTitle ?? 'Slot'}</p>
             </div>
-            <div className="flex items-center gap-1.5">
-              <button
-                type="button"
-                onPointerDown={startDrag}
-                className="rounded-full border border-white/10 bg-white/5 px-2 py-1 text-[9px] uppercase tracking-[0.2em] text-slate-200 hover:border-amber-300/40"
-                aria-label="Trascina la card"
-              >
-                ⋮⋮
-              </button>
+            <div className="flex items-center gap-1.5" data-drag-exempt="true">
               <button
                 type="button"
                 onClick={onClose}
@@ -239,165 +264,149 @@ const ActivityCardDetail: React.FC<ActivityCardDetailProps> = ({
           </header>
 
           <section className="flex flex-col gap-3">
-            <div className="grid grid-cols-[82px_minmax(0,1fr)] gap-3">
-              <div className="relative mx-auto flex h-24 w-24 items-center justify-center">
-                <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                  <div className="relative h-24 w-24">
-                    <div className="absolute inset-0.5 rounded-full border border-white/10" />
-                    <div
-                      className="absolute inset-1 rounded-full opacity-80 blur-[0.4px]"
-                      style={{
-                        background: `conic-gradient(from ${haloStartDeg}deg, var(--halo-color, rgba(251,191,36,0.65)) 0deg ${progressDegrees}deg, rgba(6,8,16,0.6) ${progressDegrees}deg 360deg)`,
-                      }}
-                    />
-                    <div
-                      className="absolute inset-2 rounded-full mix-blend-screen opacity-70"
-                      style={{
-                        background: `conic-gradient(from ${haloHighlightStartDeg}deg, rgba(255,255,255,0.4), transparent 140deg)`,
-                      }}
-                    />
-                    <div className="absolute inset-[10px] rounded-full border border-dashed border-white/10 opacity-60 animate-[spin_18s_linear_infinite]" />
-                  </div>
-                </div>
-                <div
-                  className="relative z-10 flex h-16 w-16 items-center justify-center rounded-full text-2xl text-amber-200 shadow-inner shadow-black/70"
-                  style={{ background: 'var(--panel-surface, rgba(8,10,15,0.95))' }}
-                >
-                  {activityIcon ? <span aria-hidden>{activityIcon}</span> : <Sparkles className="h-5 w-5" />}
-                </div>
-              </div>
-              <div className="flex flex-col gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex-1 rounded-lg border border-white/10 bg-black/15 px-3 py-2">
                 <div className="flex items-center justify-between text-[9px] uppercase tracking-[0.18em] text-slate-400">
                   <span>Progress</span>
                   <span>{(progressRatio * 100).toFixed(0)}%</span>
                 </div>
-                <div className="rounded-lg border border-white/10 bg-black/20 px-3 py-1.5">
-                  <p className="text-[10px] uppercase tracking-[0.15em] text-slate-400">Time</p>
-                  <p className="font-mono text-[12px] text-amber-200">
-                    {formatTime(remainingSeconds)} · Tot {formatTime(durationSeconds)}
-                  </p>
+                <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] font-mono text-amber-200">
+                  <span>{formatTime(remainingSeconds)} rimanenti</span>
+                  <span className="text-slate-400">/ {formatTime(durationSeconds)}</span>
                 </div>
-                <button
-                  type="button"
-                  onClick={onStart}
-                  disabled={isStartDisabled}
-                  className="inline-flex items-center justify-center gap-1 rounded-full border border-emerald-400/70 bg-emerald-500/15 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-emerald-50 transition hover:bg-emerald-500/30 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  <Play className="h-3 w-3" />
-                  Start
-                </button>
               </div>
+              <button
+                type="button"
+                onClick={onStart}
+                disabled={isStartDisabled}
+                className="inline-flex items-center justify-center gap-1 rounded-full border border-emerald-400/70 bg-emerald-500/15 px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] text-emerald-50 transition hover:bg-emerald-500/30 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <Play className="h-3 w-3" />
+                Start
+              </button>
             </div>
 
             <div className="space-y-2.5">
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-[9px] uppercase tracking-[0.2em] text-slate-400">
-                  <span>Slot</span>
-                  <span>{draggingResidentId ? 'Droppa residente compatibile' : 'Trascina dal roster'}</span>
-                </div>
-                <div className="space-y-2.5">
-                  {assignments.map(({ slot, residentName, dropState }) => (
-                    <div
-                      key={slot.id}
-                      onDragOver={handleSlotDragOver}
-                      onDrop={handleSlotDrop(slot.id)}
-                      className={[
-                        'rounded-lg border px-2.5 py-2 transition-colors backdrop-blur-sm',
-                        dropState === 'valid'
-                          ? 'border-emerald-400/70 bg-emerald-500/10 shadow-[0_0_30px_rgba(16,185,129,0.45)]'
-                          : dropState === 'invalid'
-                              ? 'border-rose-400/80 bg-rose-500/10 shadow-[0_0_30px_rgba(244,63,94,0.35)]'
-                              : residentName
-                                ? 'border-white/20 bg-white/5'
-                                : 'border-dashed border-white/15 bg-black/20 text-slate-300'
-                      ].join(' ')}
-                    >
-                      <div className="flex items-center justify-between text-[9px] uppercase tracking-[0.18em] text-slate-400">
-                        <span>{slot.label}</span>
-                        {slot.required && <span className="text-rose-200">Required</span>}
-                      </div>
-                      <div className="mt-1 text-[11px] font-semibold text-slate-200">
-                        {residentName ?? 'Slot libero'}
-                      </div>
-                      <div className="mt-1 flex items-center gap-2 text-[9px] uppercase tracking-[0.15em]">
-                        <span className="text-slate-500">{slot.statHint ?? 'Nessun requisito'}</span>
-                        {residentName && (
+              <div
+                className={[
+                  'flex gap-3',
+                  hasSlotOverflow ? 'flex-nowrap overflow-x-auto pb-2 pr-1 [-webkit-overflow-scrolling:touch]' : 'flex-wrap',
+                ].join(' ')}
+              >
+                {assignments.map(({ slot, residentName, dropState }) => {
+                  const badge = getSlotBadgeContent(slot);
+                  const isAssigned = Boolean(slot.assignedResidentId);
+                  return (
+                    <div key={slot.id} className="flex flex-col items-center gap-1 text-center">
+                      <div
+                        onDragOver={handleSlotDragOver}
+                        onDrop={handleSlotDrop(slot.id)}
+                        className={[
+                          'relative flex h-14 w-14 items-center justify-center rounded-full border text-[10px] font-semibold uppercase transition-colors',
+                          dropState === 'valid'
+                            ? 'border-emerald-300 bg-emerald-500/20 text-emerald-50 shadow-[0_0_18px_rgba(16,185,129,0.35)]'
+                            : dropState === 'invalid'
+                              ? 'opacity-35 border-white/20 text-slate-400 cursor-not-allowed'
+                              : slot.assignedResidentId
+                                ? 'border-white/30 bg-white/10 text-amber-50'
+                                : 'border-dashed border-white/20 text-slate-400',
+                        ].join(' ')}
+                        title={slot.statHint ?? slot.requirementLabel ?? 'Any stat'}
+                      >
+                        {isAssigned ? (
+                          <span>{getInitials(residentName ?? slot.assignedResidentId)}</span>
+                        ) : (
+                          <span className="flex items-center gap-1 text-[10px]">
+                            <span>{badge.text}</span>
+                            <span className="text-[10px]">{badge.icon}</span>
+                          </span>
+                        )}
+                        {slot.assignedResidentId && (
                           <button
                             type="button"
                             onClick={() => handleClearSlot(slot.id)}
-                            className="rounded-full border border-white/20 px-2 py-0.5 text-[8px] tracking-[0.2em] text-slate-200 hover:border-rose-300 hover:text-rose-200"
+                            className="absolute -top-1 -right-1 rounded-full border border-white/30 bg-black/70 px-1 text-[9px] leading-none text-slate-100 hover:border-rose-300"
+                            aria-label={`Rimuovi ${residentName ?? slot.assignedResidentId}`}
                           >
-                            Rimuovi
+                            ×
                           </button>
                         )}
                       </div>
+                      {dropState === 'invalid' && (
+                        <p className="text-[8px] uppercase tracking-[0.12em] text-rose-300">Incompatibile</p>
+                      )}
                     </div>
-                  ))}
-                </div>
-              </div>
-              <div
-                className="relative z-10 flex h-16 w-16 items-center justify-center rounded-full text-2xl text-amber-200 shadow-inner shadow-black/70"
-                style={{ background: 'var(--panel-surface, rgba(8,10,15,0.95))' }}
-              >
-                {activityIcon ? <span aria-hidden>{activityIcon}</span> : <Sparkles className="h-5 w-5" />}
-              </div>
-              <div className="text-[9px] uppercase tracking-[0.18em] text-slate-400">Risk</div>
-              <div className="flex items-center gap-3">
-                <div className="flex h-20 w-6 flex-col overflow-hidden rounded-full border border-white/10">
-                  <div className="bg-rose-500" style={{ height: `${riskDeath}%` }} />
-                  <div className="bg-amber-400" style={{ height: `${riskInjuryOnly}%` }} />
-                  <div className="flex-1 bg-emerald-500/20" />
-                </div>
-                <div className="space-y-0.5 text-[9px] uppercase tracking-[0.15em]">
-                  <p className="text-amber-200">Injury {clampPercent(preview.injuryPercentage)}%</p>
-                  <p className="text-rose-200">Death {riskDeath}%</p>
-                  {preview.note && (
-                    <p className="text-[10px] normal-case text-slate-300 tracking-normal">{preview.note}</p>
-                  )}
-                </div>
-              </div>
+                  );
+                })}
 
-              {metrics.length > 0 && (
-                <div className="space-y-1.5">
-                  <div className="text-[9px] uppercase tracking-[0.18em] text-slate-400">Metrics</div>
-                  <div className="grid gap-1.5 sm:grid-cols-2">
-                    {metrics.map((metric) => (
-                      <div
-                        key={metric.id}
-                        className="rounded-lg border border-white/10 bg-black/25 px-2.5 py-1.5 text-left"
-                      >
-                        <p className="text-[8px] uppercase tracking-[0.15em] text-slate-500">{metric.label}</p>
-                        <p className={`text-[11px] font-semibold ${meterToneClass(metric.tone)}`}>{metric.value}</p>
-                        {metric.helperText && (
-                          <p className="text-[9px] text-slate-500 leading-tight">{metric.helperText}</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="space-y-1.5">
-                <div className="text-[9px] uppercase tracking-[0.18em] text-slate-400">Rewards</div>
-                {rewards.length > 0 ? (
-                  <div className="flex flex-wrap gap-1.5">
-                    {rewards.map((reward) => (
-                      <span
-                        key={`${reward.resourceId}-${reward.amountFormula}`}
-                        className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[9px]"
-                      >
-                        <span className="text-amber-200 font-semibold">{reward.resourceId}</span>{' '}
-                        <span className="font-mono text-slate-200 text-[10px]">{reward.amountFormula}</span>
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-[9px] text-slate-400">
-                    Nessuna ricompensa configurata.
+                {shouldShowInfinityPlaceholder && (
+                  <div className="flex flex-col items-center gap-1 text-center">
+                    <div
+                      className="flex h-14 w-14 items-center justify-center rounded-full border border-dashed border-white/20 text-[18px] text-slate-400"
+                      title="Slot infinito disponibile"
+                    >
+                      <Sparkles className="h-4 w-4" />
+                    </div>
+                    <p className="text-[8px] uppercase tracking-[0.18em] text-slate-500">∞ Slot</p>
                   </div>
                 )}
               </div>
             </div>
+
+            {(metrics.length > 0 || rewards.length > 0) && (
+              <div className="flex flex-col gap-3 md:flex-row md:items-stretch">
+                <div className="flex-1 space-y-1.5">
+                  {metrics.length > 0 && (
+                    <div className="grid gap-1.5 sm:grid-cols-2">
+                      {metrics.map((metric) => (
+                        <div
+                          key={metric.id}
+                          className="rounded-lg border border-white/10 bg-black/25 px-2.5 py-1.5 text-left"
+                        >
+                          <p className="text-[8px] uppercase tracking-[0.15em] text-slate-500">
+                            {metric.label === 'Engine' ? 'Type' : metric.label}
+                          </p>
+                          <p className={`text-[11px] font-semibold ${meterToneClass(metric.tone)}`}>{metric.value}</p>
+                          {metric.helperText && (
+                            <p className="text-[9px] leading-tight text-slate-500">{metric.helperText}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <div className="space-y-1.5">
+                    {rewards.length > 0 ? (
+                      <div className="flex flex-wrap gap-1.5">
+                        {rewards.map((reward) => (
+                          <span
+                            key={`${reward.resourceId}-${reward.amountFormula}`}
+                            className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[9px]"
+                          >
+                            <span className="font-semibold text-amber-200">{reward.resourceId}</span>{' '}
+                            <span className="text-[10px] font-mono text-slate-200">{reward.amountFormula}</span>
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-[9px] text-slate-400">
+                        Nessuna ricompensa configurata.
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div
+                  className="flex items-center gap-3 md:flex-col md:items-start md:justify-center"
+                  title={riskTooltip}
+                >
+                  <div className="text-[9px] uppercase tracking-[0.18em] text-slate-400">Risk</div>
+                  <div className="flex h-20 w-6 flex-col overflow-hidden rounded-full border border-white/10">
+                    <div className="bg-rose-500" style={{ height: `${riskDeath}%` }} />
+                    <div className="bg-amber-400" style={{ height: `${riskInjuryOnly}%` }} />
+                    <div className="flex-1 bg-emerald-500/20" />
+                  </div>
+                </div>
+              </div>
+            )}
           </section>
         </div>
       </article>
