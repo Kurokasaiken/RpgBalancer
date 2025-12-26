@@ -111,7 +111,7 @@ export function buildActivityBlueprintSummary(params: {
   return summary;
 }
 
-const toneToVariantMap: Record<VerbTone, VerbVisualVariant> = {
+export const toneToVariantMap: Record<VerbTone, VerbVisualVariant> = {
   neutral: 'azure',
   job: 'jade',
   quest: 'amethyst',
@@ -119,7 +119,7 @@ const toneToVariantMap: Record<VerbTone, VerbVisualVariant> = {
   system: 'solar',
 };
 
-const toneToProgressStyleMap: Record<VerbTone, ProgressStyle> = {
+export const toneToProgressStyleMap: Record<VerbTone, ProgressStyle> = {
   neutral: 'ribbon',
   job: 'border',
   quest: 'halo',
@@ -220,7 +220,7 @@ export function buildPassiveEffectSummary(params: {
   };
 }
 
-const deriveVisualVariant = (activity: ActivityDefinition): VerbVisualVariant => {
+export const deriveVisualVariant = (activity: ActivityDefinition): VerbVisualVariant => {
   if (activity.tags?.includes('quest')) return 'amethyst';
   if (activity.tags?.includes('danger') || activity.tags?.includes('combat')) return 'ember';
   if (activity.tags?.includes('job')) return 'jade';
@@ -228,13 +228,13 @@ const deriveVisualVariant = (activity: ActivityDefinition): VerbVisualVariant =>
   return 'solar';
 };
 
-const deriveProgressStyle = (activity: ActivityDefinition): ProgressStyle => {
+export const deriveProgressStyle = (activity: ActivityDefinition): ProgressStyle => {
   if (activity.tags?.includes('quest')) return 'halo';
   if (activity.tags?.includes('job')) return 'border';
   return 'ribbon';
 };
 
-const deriveTone = (activity: ActivityDefinition): VerbTone => {
+export const deriveTone = (activity: ActivityDefinition): VerbTone => {
   const tone = ((activity.metadata ?? {}) as { verbToneId?: VerbTone }).verbToneId;
   if (tone) return tone;
   if (activity.tags?.includes('quest')) return 'quest';
@@ -254,7 +254,7 @@ const deriveIcon = (activity: ActivityDefinition, slotIcon?: string): ReactNode 
   return '◇';
 };
 
-const deriveRisk = (activity: ActivityDefinition) => {
+export const deriveRisk = (activity: ActivityDefinition) => {
   const meta = (activity.metadata ?? {}) as { injuryChanceDisplay?: number; deathChanceDisplay?: number };
   return {
     injury: typeof meta?.injuryChanceDisplay === 'number' ? meta.injuryChanceDisplay : 0,

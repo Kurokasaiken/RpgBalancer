@@ -122,6 +122,7 @@ export const useActivityScheduler = ({
 
     // Start global timer if not running
     if (!isRunning) {
+      lastTickRef.current = Date.now();
       setIsRunning(true);
     }
 
@@ -283,6 +284,7 @@ export const useActivityScheduler = ({
   // Global timer effect
   useEffect(() => {
     if (isRunning) {
+      lastTickRef.current = Date.now();
       intervalRef.current = setInterval(tick, 100); // Update every 100ms for smooth progress
     } else {
       if (intervalRef.current) {
@@ -362,6 +364,23 @@ export const useActivityScheduler = ({
     return true;
   }, [villageState.residents, scheduledActivities, config.activities]);
 
+  const pauseTimer = useCallback(() => {
+    setIsRunning(false);
+  }, []);
+
+  const resumeTimer = useCallback(() => {
+    lastTickRef.current = Date.now();
+    setIsRunning(true);
+  }, []);
+
+  const resetScheduler = useCallback((nextState: VillageState) => {
+    setVillageState(nextState);
+    setScheduledActivities(new Map());
+    setGlobalTime(0);
+    setIsRunning(false);
+    lastTickRef.current = Date.now();
+  }, []);
+
   return {
     // State
     villageState,
@@ -376,7 +395,8 @@ export const useActivityScheduler = ({
     canAssignResident,
     
     // Timer control
-    pauseTimer: () => setIsRunning(false),
-    resumeTimer: () => setIsRunning(true),
+    pauseTimer,
+    resumeTimer,
+    resetScheduler,
   };
 };

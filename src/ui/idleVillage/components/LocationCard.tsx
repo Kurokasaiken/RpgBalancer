@@ -5,6 +5,44 @@ import theaterPlaceholder from '@/assets/ui/idleVillage/panorama-hotspring.jpg';
 /**
  * Props for the decorative location preview card used in Idle Village.
  */
+/**
+ * Lightweight summary of the activity to showcase inside the location card.
+ */
+export interface LocationFeaturedActivity {
+  /**
+   * Unique slot identifier for the activity showcased.
+   */
+  slotId: string;
+  /**
+   * Icon, emoji or glyph representing the featured activity.
+   */
+  icon?: ReactNode;
+  /**
+   * Display label for the activity.
+   */
+  label: string;
+  /**
+   * Optional short label communicating the current state (e.g. ETA or status).
+   */
+  metaLabel?: string;
+  /**
+   * Optional highlight tone used to select accent colors.
+   */
+  tone?: 'neutral' | 'job' | 'quest' | 'danger' | 'system';
+  /**
+   * Resident names currently associated with the featured activity.
+   */
+  assignedNames?: string[];
+  /**
+   * Normalized progress value between 0 and 1.
+   */
+  progressFraction: number;
+  /**
+   * Textual representation of the progress (percentage, ETA, etc).
+   */
+  progressLabel?: string;
+}
+
 export interface LocationCardProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   title: string;
   description: string;
@@ -14,6 +52,10 @@ export interface LocationCardProps extends ButtonHTMLAttributes<HTMLButtonElemen
   onDragIntent?: (residentId: string | null) => void;
   dropState?: DropState;
   backgroundImageSrc?: string;
+  /**
+   * Optional featured activity preview rendered inside the card.
+   */
+  featuredActivity?: LocationFeaturedActivity | null;
 }
 
 /**
@@ -28,6 +70,7 @@ const LocationCard: React.FC<LocationCardProps> = ({
   onDragIntent,
   dropState = 'idle',
   backgroundImageSrc,
+  featuredActivity,
   onClick,
   ...buttonProps
 }) => {
@@ -63,6 +106,17 @@ const LocationCard: React.FC<LocationCardProps> = ({
     onInspect?.();
     onDragIntent?.(null);
   };
+
+  const progressPercent = featuredActivity ? Math.min(100, Math.max(0, featuredActivity.progressFraction * 100)) : 0;
+  const toneAccent = featuredActivity?.tone ?? 'neutral';
+  const accentByTone: Record<typeof toneAccent, { glow: string; fill: string }> = {
+    neutral: { glow: 'rgba(255,255,255,0.18)', fill: 'linear-gradient(90deg, rgba(255,255,255,0.55), rgba(148,197,255,0.45))' },
+    job: { glow: 'rgba(80,200,120,0.45)', fill: 'linear-gradient(90deg, rgba(137,247,97,0.7), rgba(46,204,113,0.6))' },
+    quest: { glow: 'rgba(255,195,113,0.4)', fill: 'linear-gradient(90deg, rgba(255,196,115,0.85), rgba(255,153,102,0.7))' },
+    danger: { glow: 'rgba(255,100,100,0.45)', fill: 'linear-gradient(90deg, rgba(255,138,138,0.85), rgba(255,92,92,0.7))' },
+    system: { glow: 'rgba(126,190,255,0.4)', fill: 'linear-gradient(90deg, rgba(126,190,255,0.85), rgba(74,144,226,0.7))' },
+  };
+  const accent = accentByTone[toneAccent] ?? accentByTone.neutral;
 
   return (
     <button
@@ -106,7 +160,47 @@ const LocationCard: React.FC<LocationCardProps> = ({
           <span className="sr-only">{`${title} – ${description}`}</span>
         </div>
 
-        {/* Minimal garnish only; user requested no labels/buttons */}
+        {featuredActivity && (
+          <div className="mt-3 rounded-[22px] border border-white/12 bg-black/35 px-3 py-3 text-[11px] uppercase tracking-[0.3em] text-slate-200 shadow-[0_18px_38px_rgba(0,0,0,0.55)]">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-[10px] tracking-[0.35em]">
+                <span className="text-lg">{featuredActivity.icon ?? '◎'}</span>
+                <span className="text-slate-100">{featuredActivity.label}</span>
+              </div>
+              {featuredActivity.metaLabel && (
+                <span className="text-[9px] text-amber-100/70">{featuredActivity.metaLabel}</span>
+              )}
+            </div>
+            <div className="mt-2 flex items-center gap-2">
+              <div className="h-2.5 flex-1 rounded-full bg-white/10">
+                <div
+                  className="h-full rounded-full shadow-[0_0_15px_currentColor]"
+                  style={{
+                    width: `${progressPercent}%`,
+                    background: accent.fill,
+                    boxShadow: `0 0 22px ${accent.glow}`,
+                  }}
+                  aria-hidden="true"
+                />
+              </div>
+              {featuredActivity.progressLabel && (
+                <span className="text-[9px] text-amber-200/80">{featuredActivity.progressLabel}</span>
+              )}
+            </div>
+            {featuredActivity.assignedNames && featuredActivity.assignedNames.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1 text-[10px] tracking-[0.2em] text-slate-100">
+                {featuredActivity.assignedNames.map((name) => (
+                  <span
+                    key={`${featuredActivity.slotId}-${name}`}
+                    className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[9px]"
+                  >
+                    {name}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </button>
   );

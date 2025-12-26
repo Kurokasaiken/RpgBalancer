@@ -74,22 +74,21 @@ const ActivitySlotCard: React.FC<ActivitySlotCardProps> = ({
 }) => {
   const [isOver, setIsOver] = useState(false);
   const [draggingResidentId, setDraggingResidentId] = useState<string | null>(null);
-  
+
   const clampedProgress = clamp01(progressFraction);
   const remainingSeconds = Math.max(0, totalDuration - elapsedSeconds);
   const isActive = elapsedSeconds > 0 && remainingSeconds > 0;
   const workerInitial = assignedWorkerName?.charAt(0) ?? null;
   const hasWorker = Boolean(assignedWorkerName);
-  
-  // Bloom mode - show on all valid slots during drag, enhanced when hovering
-  const bloomActive = canAcceptDrop || hasWorker;
+
   const isHoveringValid = isOver && canAcceptDrop;
-  
-  // Progress calculation for halo
+
   const progressDegrees = clampedProgress * 360;
-  const haloStartDeg = -90; // start from top (12 o'clock)
-  const haloHighlightStartDeg = haloStartDeg + Math.max(progressDegrees - 40, 0);
+  const haloStartDeg = 0; // align start with base orientation
   const variantColors = VARIANT_COLORS[visualVariant] ?? VARIANT_COLORS.azure;
+  const haloStyle: CSSProperties = {
+    background: `conic-gradient(from ${haloStartDeg}deg, ${variantColors.primary} 0deg ${progressDegrees}deg, rgba(6,8,14,0.15) ${progressDegrees}deg 360deg)`,
+  };
 
   /**
    * Sets visual highlight when a dragged resident enters the slot.
@@ -152,34 +151,27 @@ const ActivitySlotCard: React.FC<ActivitySlotCardProps> = ({
         tabIndex: 0,
         onClick: handleClick,
         'aria-pressed': isActive,
-        'aria-label': `${isActive ? 'In progress' : 'Ready'}. ${assignedWorkerName ? `Assigned to ${assignedWorkerName}` : 'Unassigned'}. ` +
-          `${isActive ? `${formatTime(remainingSeconds)} remaining` : `Duration: ${formatTime(totalDuration)}`}`.trim(),
+        'aria-label': `${isActive ? 'In progress' : 'Ready'}. ${
+          assignedWorkerName ? `Assigned to ${assignedWorkerName}` : 'Unassigned'
+        }. ${isActive ? `${formatTime(remainingSeconds)} remaining` : `Duration: ${formatTime(totalDuration)}`}`.trim(),
       }
     : {
         onClick: handleClick,
-        'aria-label': `Activity slot ${label ?? slotId}. ${assignedWorkerName ? `Assigned to ${assignedWorkerName}` : 'Unassigned'}. ` +
-          `${isActive ? `${formatTime(remainingSeconds)} remaining` : `Duration: ${formatTime(totalDuration)}`}`.trim(),
+        'aria-label': `Activity slot ${label ?? slotId}. ${
+          assignedWorkerName ? `Assigned to ${assignedWorkerName}` : 'Unassigned'
+        }. ${isActive ? `${formatTime(remainingSeconds)} remaining` : `Duration: ${formatTime(totalDuration)}`}`.trim(),
       };
-  
-  const baseClasses = [
-    'relative h-28 w-28 rounded-full border transition-all duration-200 cursor-pointer',
-    dropState === 'valid'
-      ? 'ring-4 ring-emerald-400/90 drop-shadow-[0_0_60px_rgba(16,185,129,0.8)] scale-110 border-emerald-400/60'
-      : dropState === 'invalid'
-        ? 'opacity-35 border-white/15 cursor-not-allowed'
-        : isHoveringValid
-          ? 'ring-4 ring-white/90 drop-shadow-[0_0_80px_rgba(255,255,255,0.8)] scale-110 border-white/50'
-          : bloomActive
-            ? 'ring-4 ring-yellow-400/80 drop-shadow-[0_0_60px_rgba(251,204,21,0.7)] scale-105 border-yellow-400/60'
-            : 'shadow-cobalt scale-100',
-  ].join(' ');
 
-  const baseShadow = hasWorker ? '0 0 55px var(--color-cobalt-glow)' : '0 0 35px var(--color-bronze-light)';
-  const slotStyle: CSSProperties = {
-    borderColor: 'var(--color-bronze-light)',
-    background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.08), rgba(13,15,18,0.95))',
-    boxShadow: bloomActive ? undefined : baseShadow, // Let ring/drop-shadow handle bloom when active
-  };
+  const frameClasses = [
+    'relative h-28 w-28 cursor-pointer transition-transform duration-200',
+    dropState === 'valid'
+      ? 'scale-110 drop-shadow-[0_0_35px_rgba(16,185,129,0.5)]'
+      : dropState === 'invalid'
+        ? 'opacity-40 cursor-not-allowed'
+        : isHoveringValid || hasWorker
+          ? 'scale-105 drop-shadow-[0_0_28px_rgba(250,204,21,0.35)]'
+          : 'drop-shadow-[0_0_22px_rgba(5,8,18,0.55)]',
+  ].join(' ');
 
   return (
     <div
@@ -190,59 +182,34 @@ const ActivitySlotCard: React.FC<ActivitySlotCardProps> = ({
       onDrop={handleDrop}
     >
       <div
-        className={baseClasses}
-        style={slotStyle}
+        className={frameClasses}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
         {...interactiveProps}
       >
-        <div className="absolute inset-1 rounded-full border" style={{ borderColor: 'rgba(255, 215, 0, 0.15)' }} />
+        <div className="absolute inset-0 rounded-full border border-slate-900/60 opacity-30" />
+        <div className="absolute inset-0 rounded-full" style={haloStyle} />
+        <div className="absolute inset-1 rounded-full bg-[rgba(5,7,12,0.9)] backdrop-blur-[2px]" />
 
-        {/* Halo + icon container */}
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <div className="relative h-[6.5rem] w-[6.5rem]">
-            {/* Halo progress indicator - always visible */}
-            <div className="absolute inset-0">
-              <div className="absolute inset-1 rounded-full border border-slate-900/70" />
-              <div
-                className="absolute inset-2 rounded-full opacity-70 blur-[0.5px]"
-                style={{
-                  background: `conic-gradient(from ${haloStartDeg}deg, ${variantColors.primary} 0deg ${progressDegrees}deg, rgba(4,6,16,0.35) ${progressDegrees}deg 360deg)`,
-                }}
-              />
-              <div
-                className="absolute inset-3 rounded-full mix-blend-screen opacity-70"
-                style={{
-                  background: `conic-gradient(from ${haloHighlightStartDeg}deg, rgba(255,255,255,0.4), transparent 120deg)`,
-                }}
-              />
-              <div className="absolute inset-[10px] rounded-full border border-slate-900/60 border-dashed opacity-40 animate-[spin_14s_linear_infinite]" />
-            </div>
-          </div>
-        </div>
-
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="relative z-10 flex h-full w-full items-center justify-center">
           <div
-            className="relative z-10 flex h-[4.8rem] w-[4.8rem] flex-col items-center justify-center rounded-full text-amber-200 shadow-inner shadow-black/70"
-            style={{ background: 'var(--panel-surface)' }}
+            className="flex h-[4.5rem] w-[4.5rem] flex-col items-center justify-center rounded-full text-amber-200 shadow-inner shadow-black/70 border border-white/5 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.08),rgba(8,12,20,0.95))]"
           >
             <div className="text-3xl leading-none">
               {iconName ? <span aria-hidden>{iconName}</span> : <Sparkles className="h-6 w-6 text-amber-200" />}
             </div>
-            <div className="mt-1 text-[9px] uppercase tracking-[0.35em] text-amber-100/85 font-mono">
+            <div className="mt-1 text-[9px] uppercase tracking-[0.35em] text-amber-100/80 font-mono">
               {formatTime(isActive ? remainingSeconds : totalDuration)}
             </div>
           </div>
         </div>
 
-        {/* Worker indicator */}
         {workerInitial && (
-          <div className="gem-oil absolute -right-1 -top-1 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-50 z-20">
+          <div className="absolute -right-1 -top-1 z-20 rounded-full bg-black/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-50 border border-white/20">
             {workerInitial}
           </div>
         )}
 
-        {/* Screen-reader only timetable info */}
         <span className="sr-only">
           {assignedWorkerName ? `Assigned to ${assignedWorkerName}. ` : 'Unassigned. '}
           {isActive ? `${formatTime(remainingSeconds)} remaining.` : `Duration ${formatTime(totalDuration)}.`}

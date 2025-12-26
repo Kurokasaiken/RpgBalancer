@@ -1,23 +1,30 @@
 import { useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
 import { createVillageStateFromConfig, getStartingResidentFatigue, type ResidentState } from '@/engine/game/idleVillage/TimeEngine';
+import { tickIdleVillage } from '@/engine/game/idleVillage/IdleVillageEngine';
 import { useVillageStateStore } from '@/ui/idleVillage/useVillageStateStore';
 import { loadResidentsFromCharacterManager } from '@/engine/game/idleVillage/characterImport';
 import LocationCard from '@/ui/idleVillage/components/LocationCard';
-import ActivitySlotCard, { type DropState } from '@/ui/idleVillage/components/ActivitySlot';
+import ActivitySlotCard, { type DropState, type VerbVisualVariant } from '@/ui/idleVillage/components/ActivitySlot';
 import type { VerbSlotState } from '@/ui/idleVillage/VerbDetailCard';
-import ActivityCardDetail from '@/ui/idleVillage/components/ActivityCardDetail';
+import ActivityCardDetail, {
+  type ActivityCardSlotAssignment,
+} from '@/ui/idleVillage/components/ActivityCardDetail';
 import ResidentRoster from '@/ui/idleVillage/ResidentRosterDnd';
 import DragTestContainer from '@/ui/idleVillage/components/DragTestContainer';
-import WorkerCard from '@/ui/idleVillage/components/WorkerCard';
+import ResidentDetailCard from '@/ui/idleVillage/components/ResidentDetailCard';
 import TheaterView from '@/ui/idleVillage/components/TheaterView';
 import { DragProvider, useDragContext } from '@/ui/idleVillage/components/DragContext';
 import { formatResidentLabel } from '@/ui/idleVillage/residentName';
 import { useThemeSwitcher } from '@/hooks/useThemeSwitcher';
 import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
 import type { VerbSummary } from '@/ui/idleVillage/verbSummaries';
+import {
+  DEFAULT_SECONDS_PER_TIME_UNIT,
+  deriveRisk,
+  deriveVisualVariant,
+} from '@/ui/idleVillage/verbSummaries';
 import { useActivityScheduler, type ActivityResolutionResult } from '@/ui/idleVillage/hooks/useActivityScheduler';
-import { DEFAULT_SECONDS_PER_TIME_UNIT } from '@/ui/idleVillage/verbSummaries';
 
 interface ActivitySlotData {
   slotId: string;
@@ -26,6 +33,7 @@ interface ActivitySlotData {
   assignedWorkerId: string | null;
   activity: ActivityDefinition;
   mapSlotLabel?: string;
+  visualVariant: VerbVisualVariant;
 }
 
 type SandboxVerbTone = 'neutral' | 'job' | 'quest' | 'danger' | 'system';
@@ -48,6 +56,14 @@ const formatRewardLabel = (activity: ActivityDefinition): string | null => {
     .join(', ');
 };
 
+const simpleRng = (() => {
+  let seed = 13371337;
+  return () => {
+    seed = (seed * 9301 + 49297) % 233280;
+    return seed / 233280;
+  };
+})();
+
 const VillageSandboxContent = () => {
   const { activePreset, presets, setPreset, randomizeTheme, resetRandomization, isRandomized } = useThemeSwitcher();
   const { config } = useIdleVillageConfig();
@@ -57,8 +73,8 @@ const VillageSandboxContent = () => {
   const [detailPanelSlotIds, setDetailPanelSlotIds] = useState<string[]>([]);
   const [isTheaterOpen, setIsTheaterOpen] = useState(false);
   const [theaterSlotId, setTheaterSlotId] = useState<string | null>(null);
+  const [theaterPreviewIds, setTheaterPreviewIds] = useState<string[]>([]);
   const [rosterCounts, setRosterCounts] = useState<{ filtered: number; total: number }>({ filtered: 0, total: 0 });
-  const [detailAssignments, setDetailAssignments] = useState<Record<string, string | null>>({});
   const [isCyclePlaying, setIsCyclePlaying] = useState(false);
   const [selectedResidentId, setSelectedResidentId] = useState<string | null>(null);
 
@@ -84,9 +100,14 @@ const VillageSandboxContent = () => {
     }
     return residents;
   }, [config]);
-  const { state: villageState, resetState } = useVillageStateStore(() =>
+  const { state: villageState, resetState, updateState } = useVillageStateStore(() =>
     createVillageStateFromConfig({ config, initialResidents }),
   );
+  const updateStateRef = useRef(updateState);
+
+  useEffect(() => {
+    updateStateRef.current = updateState;
+  }, [updateState]);
 
   // Activity completion handler
   const handleActivityComplete = useCallback((result: ActivityResolutionResult) => {
@@ -184,12 +205,10 @@ const VillageSandboxContent = () => {
   const dayTimeUnits = Math.max(1, dayNightSettings.dayTimeUnits ?? dayLengthSetting);
   const nightTimeUnits = Math.max(1, dayNightSettings.nightTimeUnits ?? dayLengthSetting);
   const totalCycleUnits = dayTimeUnits + nightTimeUnits;
-  const currentTimeUnits = schedulerVillageState?.currentTime ?? villageState.currentTime ?? 0;
-  const initialCycleUnit = totalCycleUnits > 0 ? currentTimeUnits % totalCycleUnits : 0;
-  const [cycleTimeUnits, setCycleTimeUnits] = useState(initialCycleUnit);
-  const cycleTickRef = useRef<number | null>(null);
-  const cycleProgressFraction = totalCycleUnits > 0 ? cycleTimeUnits / totalCycleUnits : 0;
-  const isDayPhase = cycleTimeUnits < dayTimeUnits;
+  const currentTimeUnits = villageState.currentTime ?? 0;
+  const currentCycleUnit = totalCycleUnits > 0 ? currentTimeUnits % totalCycleUnits : 0;
+  const cycleProgressFraction = totalCycleUnits > 0 ? currentCycleUnit / totalCycleUnits : 0;
+  const isDayPhase = currentCycleUnit < dayTimeUnits;
   const cyclePhaseLabel = isDayPhase ? 'Fase giorno' : 'Fase notte';
   const cyclePhaseIcon = isDayPhase ? '☀️' : '🌙';
   const cycleVariant: VerbVisualVariant = isDayPhase ? 'solar' : 'amethyst';
@@ -261,7 +280,7 @@ const VillageSandboxContent = () => {
     const dayNightSlot: ActivitySlotData = {
       slotId: 'day-night-cycle',
       label: `${cyclePhaseLabel} · ${isCyclePlaying ? 'In esecuzione' : 'In pausa'}`,
-      iconName: cyclePhaseIcon,
+      iconName: isCyclePlaying ? cyclePhaseIcon : '⏸️',
       assignedWorkerId: null,
       activity: {
         id: 'day-night-cycle',
@@ -286,6 +305,7 @@ const VillageSandboxContent = () => {
         assignedWorkerId: assignments[activity.id] ?? null,
         activity,
         mapSlotLabel: mapSlot?.label,
+        visualVariant: deriveVisualVariant(activity),
       };
     });
     return [dayNightSlot, ...activitySlots];
@@ -300,42 +320,24 @@ const VillageSandboxContent = () => {
   ]);
 
   useEffect(() => {
-    if (isCyclePlaying) return;
-    setCycleTimeUnits(initialCycleUnit);
-  }, [initialCycleUnit, isCyclePlaying]);
-
-  useEffect(() => {
-    if (!isCyclePlaying || totalCycleUnits <= 0 || secondsPerTimeUnit <= 0) {
-      cycleTickRef.current = null;
-      return;
-    }
-    let frameId: number;
-    const tick = (timestamp: number) => {
-      if (cycleTickRef.current == null) {
-        cycleTickRef.current = timestamp;
-      }
-      const deltaSeconds = (timestamp - cycleTickRef.current) / 1000;
-      cycleTickRef.current = timestamp;
-      if (deltaSeconds > 0) {
-        const deltaUnits = deltaSeconds / secondsPerTimeUnit;
-        setCycleTimeUnits((prev) => (prev + deltaUnits) % totalCycleUnits);
-      }
-      frameId = requestAnimationFrame(tick);
-    };
-    frameId = requestAnimationFrame(tick);
-    return () => {
-      if (frameId) cancelAnimationFrame(frameId);
-      cycleTickRef.current = null;
-    };
-  }, [isCyclePlaying, secondsPerTimeUnit, totalCycleUnits]);
-
-  useEffect(() => {
     if (isCyclePlaying) {
       activityScheduler.resumeTimer();
     } else {
       activityScheduler.pauseTimer();
     }
   }, [isCyclePlaying, activityScheduler]);
+
+  useEffect(() => {
+    if (!isCyclePlaying || !config) return undefined;
+    const tickMs = 1000;
+    const id = window.setInterval(() => {
+      updateStateRef.current?.(
+        (prev) => tickIdleVillage({ config, rng: simpleRng }, prev, 1).state,
+        'Sandbox tick',
+      );
+    }, tickMs);
+    return () => window.clearInterval(id);
+  }, [config, isCyclePlaying]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -447,22 +449,24 @@ const VillageSandboxContent = () => {
     return resident ? formatResidentLabel(resident) : residentId;
   };
 
-  const theaterSlot = useMemo(
-    () => slots.find((slot) => slot.slotId === theaterSlotId) ?? null,
-    [slots, theaterSlotId],
-  );
+  const theaterPreviewSlots = useMemo<ActivitySlotData[]>(() => {
+    return theaterPreviewIds
+      .map((slotId) => slots.find((slot) => slot.slotId === slotId) ?? null)
+      .filter((slot): slot is ActivitySlotData => Boolean(slot));
+  }, [theaterPreviewIds, slots]);
+  const theaterPrimarySlot = theaterPreviewSlots[0] ?? null;
 
   const detailSlotAssignments = useMemo<ActivityCardSlotAssignment[]>(() => {
-    if (!theaterSlot) return [];
+    if (!theaterPrimarySlot) return [];
 
-    const slotAssignment = slots.find((slot) => slot.slotId === theaterSlot.slotId);
-    const assignedResidentId = assignments[theaterSlot.slotId] ?? slotAssignment?.assignedWorkerId ?? null;
+    const slotAssignment = slots.find((slot) => slot.slotId === theaterPrimarySlot.slotId);
+    const assignedResidentId = assignments[theaterPrimarySlot.slotId] ?? slotAssignment?.assignedWorkerId ?? null;
     const residentName = assignedResidentId ? formatResidentLabel(villageState.residents[assignedResidentId]) : null;
 
     return [
       {
         slot: {
-          id: theaterSlot.slotId,
+          id: theaterPrimarySlot.slotId,
           assignedResidentId,
           residentName,
           requirementLabel: 'Generalist',
@@ -473,12 +477,12 @@ const VillageSandboxContent = () => {
         dropState:
           draggingResidentId == null
             ? 'idle'
-            : activityScheduler.canAssignResident(draggingResidentId, theaterSlot.slotId)
+            : activityScheduler.canAssignResident(draggingResidentId, theaterPrimarySlot.slotId)
               ? 'valid'
               : 'invalid',
       },
     ];
-  }, [activityScheduler, assignments, draggingResidentId, slots, theaterSlot, villageState.residents]);
+  }, [activityScheduler, assignments, draggingResidentId, slots, theaterPrimarySlot, villageState.residents]);
 
   const detailContexts = useMemo(() => {
     return detailPanelSlotIds
@@ -534,47 +538,46 @@ const VillageSandboxContent = () => {
   }, []);
 
   const theaterVerbs = useMemo<VerbSummary[]>(() => {
-    if (!theaterSlot) return [];
-    const assignedName = resolveWorkerName(theaterSlot.assignedWorkerId);
-    const tone = deriveVerbTone(theaterSlot.activity);
-    const injuryPercentage = Math.min(100, (theaterSlot.activity.dangerRating ?? 1) * 15);
-    const deathPercentage = Math.round(injuryPercentage / 2);
-    const totalSlots =
-      typeof theaterSlot.activity.maxSlots === 'number'
-        ? theaterSlot.activity.maxSlots
-        : theaterSlot.activity.maxSlots === 'infinite'
-          ? 4
-          : 1;
+    return theaterPreviewSlots.map((slot) => {
+      const assignedName = resolveWorkerName(slot.assignedWorkerId);
+      const tone = deriveVerbTone(slot.activity);
+      const injuryPercentage = Math.min(100, (slot.activity.dangerRating ?? 1) * 15);
+      const deathPercentage = Math.round(injuryPercentage / 2);
+      const totalSlots =
+        typeof slot.activity.maxSlots === 'number'
+          ? slot.activity.maxSlots
+          : slot.activity.maxSlots === 'infinite'
+            ? 4
+            : 1;
 
-    const summary: VerbSummary = {
-      key: `sandbox_theater_${theaterSlot.slotId}`,
-      source: 'system',
-      activityId: theaterSlot.slotId,
-      slotId: theaterSlot.slotId,
-      label: theaterSlot.activity.label ?? theaterSlot.slotId,
-      kindLabel: tone === 'job' ? 'Job' : tone === 'quest' ? 'Quest' : 'Activity',
-      isQuest: tone === 'quest',
-      isJob: tone === 'job',
-      icon: theaterSlot.iconName,
-      visualVariant: 'azure',
-      progressStyle: 'ribbon',
-      progressFraction: 0,
-      elapsedSeconds: 0,
-      totalDurationSeconds: Number(theaterSlot.activity.durationFormula ?? 0),
-      remainingSeconds: 0,
-      injuryPercentage,
-      deathPercentage,
-      assignedCount: theaterSlot.assignedWorkerId ? 1 : 0,
-      totalSlots,
-      rewardLabel: formatRewardLabel(theaterSlot.activity),
-      tone,
-      deadlineLabel: null,
-      assigneeNames: assignedName ? [assignedName] : [],
-      notes: theaterSlot.activity.description ?? null,
-    };
-
-    return [summary];
-  }, [theaterSlot, resolveWorkerName]);
+      return {
+        key: `sandbox_theater_${slot.slotId}`,
+        source: 'system',
+        activityId: slot.slotId,
+        slotId: slot.slotId,
+        label: slot.activity.label ?? slot.slotId,
+        kindLabel: tone === 'job' ? 'Job' : tone === 'quest' ? 'Quest' : 'Activity',
+        isQuest: tone === 'quest',
+        isJob: tone === 'job',
+        icon: slot.iconName,
+        visualVariant: 'azure',
+        progressStyle: 'ribbon',
+        progressFraction: 0,
+        elapsedSeconds: 0,
+        totalDurationSeconds: Number(slot.activity.durationFormula ?? 0),
+        remainingSeconds: 0,
+        injuryPercentage,
+        deathPercentage,
+        assignedCount: slot.assignedWorkerId ? 1 : 0,
+        totalSlots,
+        rewardLabel: formatRewardLabel(slot.activity),
+        tone,
+        deadlineLabel: null,
+        assigneeNames: assignedName ? [assignedName] : [],
+        notes: slot.activity.description ?? null,
+      };
+    });
+  }, [theaterPreviewSlots, resolveWorkerName]);
 
   const handleCloseTheater = useCallback(() => {
     setIsTheaterOpen(false);
@@ -632,16 +635,94 @@ const VillageSandboxContent = () => {
       const acceptingSlot = slots.find((slot) => activityScheduler.canAssignResident(residentId, slot.slotId));
       return acceptingSlot?.slotId ?? null;
     },
-    [slots, activityScheduler],
+    [slots],
+  );
+
+  /**
+   * Returns the first non-day/night slot id, if present.
+   */
+  const findFirstPlayableSlotId = useCallback(() => {
+    return slots.find((slot) => slot.slotId !== 'day-night-cycle')?.slotId ?? null;
+  }, [slots]);
+
+  /**
+   * Builds the list of theater previews for the inspected location.
+   * All slots sharing the same mapSlotId as the primary slot are included (always excluding the day/night card).
+   * If fewer than three slots match, we pull additional ones deterministically to keep the view populated.
+   */
+  const selectTheaterPreviewIds = useCallback(
+    (primarySlotId?: string | null): string[] => {
+      const playableSlots = slots.filter((slot) => slot.slotId !== 'day-night-cycle');
+      if (playableSlots.length === 0) return [];
+
+      const selected: ActivitySlotData[] = [];
+      const selectSlot = (slot: ActivitySlotData | undefined | null) => {
+        if (!slot) return;
+        if (selected.some((entry) => entry.slotId === slot.slotId)) return;
+        selected.push(slot);
+      };
+
+      const primarySlot =
+        (primarySlotId ? playableSlots.find((slot) => slot.slotId === primarySlotId) : playableSlots[0]) ?? null;
+      if (primarySlot) {
+        selectSlot(primarySlot);
+      }
+
+      const targetMapSlotId = primarySlot
+        ? ((primarySlot.activity.metadata ?? {}) as { mapSlotId?: string }).mapSlotId
+        : undefined;
+
+      if (targetMapSlotId) {
+        playableSlots.forEach((slot) => {
+          const slotMapSlotId = ((slot.activity.metadata ?? {}) as { mapSlotId?: string }).mapSlotId;
+          if (slotMapSlotId === targetMapSlotId) {
+            selectSlot(slot);
+          }
+        });
+      }
+
+      const remainingPool = playableSlots.filter(
+        (slot) => !selected.some((entry) => entry.slotId === slot.slotId),
+      );
+
+      while (selected.length < 3 && remainingPool.length > 0) {
+        const randomIndex = Math.floor(simpleRng() * remainingPool.length);
+        const [picked] = remainingPool.splice(randomIndex, 1);
+        selectSlot(picked);
+      }
+
+      return selected.map((slot) => slot.slotId);
+    },
+    [slots],
+  );
+
+  const locationSlots = useMemo<ActivitySlotData[]>(() => {
+    const playable = slots.filter((slot) => slot.slotId !== 'day-night-cycle');
+    if (playable.length >= 3) return playable.slice(0, 3);
+    return playable;
+  }, [slots]);
+  const locationSlotIds = useMemo(() => locationSlots.map((slot) => slot.slotId), [locationSlots]);
+
+  const openTheaterWithSlotIds = useCallback(
+    (slotIds: string[]) => {
+      const previewSlots = slotIds
+        .map((id) => slots.find((slot) => slot.slotId === id) ?? null)
+        .filter((slot): slot is ActivitySlotData => Boolean(slot) && slot.slotId !== 'day-night-cycle');
+      if (previewSlots.length === 0) return;
+      setTheaterSlotId(previewSlots[0].slotId);
+      setTheaterPreviewIds(previewSlots.map((slot) => slot.slotId));
+      setIsTheaterOpen(true);
+    },
+    [slots],
   );
 
   const openTheaterForSlot = useCallback(
     (slotId: string | null) => {
-      if (!slotId) return;
-      setTheaterSlotId(slotId);
-      setIsTheaterOpen(true);
+      const normalizedSlotId = slotId && slotId !== 'day-night-cycle' ? slotId : undefined;
+      const previews = selectTheaterPreviewIds(normalizedSlotId);
+      openTheaterWithSlotIds(previews);
     },
-    [],
+    [selectTheaterPreviewIds, openTheaterWithSlotIds],
   );
 
   const handleLocationResidentDrop = useCallback(
@@ -682,21 +763,21 @@ const VillageSandboxContent = () => {
   }, [isTheaterOpen, handleCloseTheater]);
 
   const handleLocationInspect = useCallback(() => {
-    const targetSlot = slots[0];
-    if (!targetSlot) return;
-    openTheaterForSlot(targetSlot.slotId);
-  }, [slots, openTheaterForSlot]);
+    if (locationSlotIds.length === 0) return;
+    openTheaterWithSlotIds(locationSlotIds);
+  }, [locationSlotIds, openTheaterWithSlotIds]);
 
   const handleLocationDragIntent = useCallback(
     (residentId: string | null) => {
-      if (!residentId) return;
-      const targetSlotId = findAcceptingSlotId(residentId) ?? slots[0]?.slotId ?? null;
-      if (!targetSlotId) return;
-      if (!isTheaterOpen || theaterSlotId !== targetSlotId) {
-        openTheaterForSlot(targetSlotId);
+      if (!residentId || locationSlotIds.length === 0) return;
+      const isSamePreview =
+        theaterPreviewIds.length === locationSlotIds.length &&
+        locationSlotIds.every((id, index) => theaterPreviewIds[index] === id);
+      if (!isTheaterOpen || !isSamePreview) {
+        openTheaterWithSlotIds(locationSlotIds);
       }
     },
-    [findAcceptingSlotId, slots, theaterSlotId, isTheaterOpen, openTheaterForSlot],
+    [locationSlotIds, theaterPreviewIds, isTheaterOpen, openTheaterWithSlotIds],
   );
 
   const handleResetSandboxState = useCallback(() => {
@@ -843,56 +924,6 @@ const VillageSandboxContent = () => {
             </div>
           )}
 
-          {selectedResident && (
-            <section className="relative overflow-hidden rounded-[26px] border border-[color:var(--panel-border)] bg-[radial-gradient(circle_at_10%_0%,rgba(255,255,255,0.12),rgba(4,7,14,0.95))] p-4 shadow-[0_25px_45px_rgba(0,0,0,0.55)]">
-              <div className="pointer-events-none absolute inset-0 opacity-30" style={{ background: 'var(--card-surface-radial)' }} />
-              <div className="relative z-10 space-y-3">
-                <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.4em] text-amber-200/80">
-                  <span>Dettaglio residente</span>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedResidentId(null)}
-                    className="rounded-full border border-white/20 px-3 py-0.5 text-[9px] uppercase tracking-[0.3em] text-slate-200 hover:border-rose-300 hover:text-rose-200"
-                  >
-                    chiudi
-                  </button>
-                </div>
-                <WorkerCard
-                  id={selectedResident.id}
-                  name={formatResidentLabel(selectedResident)}
-                  hp={selectedResident.maxHp > 0 ? Math.round((selectedResident.currentHp / selectedResident.maxHp) * 100) : 0}
-                  fatigue={Math.round(selectedResident.fatigue)}
-                  isDragging={false}
-                  isHovering
-                />
-                <div className="grid grid-cols-2 gap-2 text-[10px] uppercase tracking-[0.3em] text-slate-300">
-                  <div className="rounded-[16px] border border-white/10 bg-black/30 px-3 py-2">
-                    <p className="text-[8px] text-slate-500">Stato</p>
-                    <p className="text-[11px] text-amber-100">
-                      {selectedResident.isInjured ? 'Ferito' : selectedResident.status}
-                    </p>
-                  </div>
-                  <div className="rounded-[16px] border border-white/10 bg-black/30 px-3 py-2">
-                    <p className="text-[8px] text-slate-500">Tag</p>
-                    <p className="text-[11px] text-emerald-100">
-                      {selectedResident.statTags?.length ? selectedResident.statTags.join(', ') : '—'}
-                    </p>
-                  </div>
-                  <div className="rounded-[16px] border border-white/10 bg-black/30 px-3 py-2">
-                    <p className="text-[8px] text-slate-500">HP</p>
-                    <p className="text-[11px] text-emerald-100">
-                      {selectedResident.currentHp}/{selectedResident.maxHp}
-                    </p>
-                  </div>
-                  <div className="rounded-[16px] border border-white/10 bg-black/30 px-3 py-2">
-                    <p className="text-[8px] text-slate-500">Fatigue</p>
-                    <p className="text-[11px] text-amber-100">{Math.round(selectedResident.fatigue)}</p>
-                  </div>
-                </div>
-              </div>
-            </section>
-          )}
-
           <section className="relative overflow-hidden rounded-[26px] border border-[color:var(--panel-border)] bg-[radial-gradient(circle_at_15%_0%,rgba(255,255,255,0.12),rgba(4,7,14,0.9))] p-4 shadow-[0_25px_45px_rgba(0,0,0,0.55)]">
             <div className="pointer-events-none absolute inset-0 opacity-30" style={{ background: 'var(--card-surface-radial, radial-gradient(circle at 20% 0%, rgba(255,255,255,0.25), transparent 60%))' }} />
             <div className="relative z-10 space-y-3">
@@ -991,10 +1022,21 @@ const VillageSandboxContent = () => {
         </div>
       </section>
 
+      {selectedResident && (
+        <div
+          className="pointer-events-none fixed inset-0 z-40 flex items-center justify-center px-4 py-8 sm:px-6"
+          aria-live="polite"
+        >
+          <div className="pointer-events-auto w-full max-w-2xl">
+            <ResidentDetailCard resident={selectedResident} onClose={() => setSelectedResidentId(null)} />
+          </div>
+        </div>
+      )}
+
       {detailContexts.length > 0 && (
         <div
           className={[
-            'pointer-events-none fixed inset-0 z-40 flex items-center justify-center px-4 py-8 sm:px-6',
+            'pointer-events-none fixed inset-0 z-30 flex items-center justify-center px-4 py-8 sm:px-6',
             isTheaterOpen ? 'lg:justify-start lg:pl-16' : 'lg:justify-center',
           ].join(' ')}
           style={{ pointerEvents: 'none' }}
@@ -1029,10 +1071,10 @@ const VillageSandboxContent = () => {
           </div>
         </div>
       )}
-      {isTheaterOpen && theaterSlot && (
+      {isTheaterOpen && theaterPrimarySlot && theaterVerbs.length > 0 && (
         <TheaterView
-          slotLabel={theaterSlot.label}
-          slotIcon={theaterSlot.iconName}
+          slotLabel={theaterPrimarySlot.label}
+          slotIcon={theaterPrimarySlot.iconName}
           verbs={theaterVerbs}
           onClose={handleCloseTheater}
           acceptResidentDrop={!!draggingResidentId}
