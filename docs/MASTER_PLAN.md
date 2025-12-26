@@ -98,6 +98,7 @@ Example:
 │ Phase 11: Tactical Miss.  📋 TODO    ~100 tasks     │
 │- **Phase 12: Idle Incremental RPG – Implementation Plan** (`docs/plans/idle_village_plan.md`)
 - **Phase 12.E: Atomic Sandbox Refactor** (`docs/plans/idle_village_atomic_sandbox_plan.md`, tasks in `docs/plans/idle_village_tasks.md#phase-12e`)
+- **Idle Village Resident Slot Expansion Plan** (`docs/plans/idle_village_resident_slot_plan.md`)
  │
 ├──────────────────────────────────────────────────────┤
 │ TOTAL PROGRESS: ███████████████░░░░░ 75%            │

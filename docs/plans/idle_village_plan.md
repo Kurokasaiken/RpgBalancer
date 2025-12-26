@@ -262,6 +262,12 @@ Per la vertical slice v0.1 è già presente una **UI prototipale** in `src/ui/id
 - Introdurre training job visibile come verb dedicato.
 - Introdurre una prima visualizzazione/spawn loop di quest attorno al villaggio coerente con i `mapSlots`.
 
+#### 12.9.b – Resident Slot Expansion & Theater Parity
+
+- Riferimento dettagliato: [`docs/plans/idle_village_resident_slot_plan.md`](idle_village_resident_slot_plan.md).
+- Obiettivo: riutilizzare un unico controller/component per gli slot residenti (map tile, TheaterView, VerbDetailCard) con bloom, drag/drop e crescita infinita.
+- Deliverable chiave: `ResidentSlotController`, `ResidentSlotRack`, aggiornamento di TheaterView/VerbDetailCard/ActivityCardDetail per usare questi componenti, supporto scrollabile quando gli slot superano la larghezza disponibile.
+
 ### 12.10 – Testing & Simulation Strategy
 
 **Obiettivo:** garantire che il nuovo loop sia verificabile e non rompa i sistemi esistenti.
