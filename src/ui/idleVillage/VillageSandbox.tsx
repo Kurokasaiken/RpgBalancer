@@ -892,11 +892,11 @@ const VillageSandboxContent = () => {
         </div>
         <button
           type="button"
-          onClick={handleResetSandboxFatigue}
+          onClick={handleResetSandboxState}
           className="inline-flex items-center gap-2 rounded-full border border-amber-300/80 bg-black/40 px-4 py-1.5 text-[11px] uppercase tracking-[0.3em] text-amber-100 shadow-[0_0_18px_rgba(251,191,36,0.25)] transition-colors hover:bg-amber-500/20"
         >
           <span aria-hidden>☽</span>
-          Reset Fatigue
+          Reset Page
         </button>
       </header>
 
