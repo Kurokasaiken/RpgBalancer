@@ -66,6 +66,16 @@ Per stile visivo, palette e coerenza con il tema **Gilded Observatory**, vedere 
 
 **Obiettivo:** modellare un sistema di **tempo globale** e una coda di **attività programmate**.
 
+- **Snapshot implementazione (2025-12-26):**
+  - `tickIdleVillage` (`src/engine/game/idleVillage/IdleVillageEngine.ts`) coordina `advanceTime`, `resolveJob`, `resolveQuest` e `applyFatigueInjuryForActivity`, restituendo gli array di job/quest completate per la UI configurabile @src/engine/game/idleVillage/IdleVillageEngine.ts#1-94.
+  - `advanceTime` (`TimeEngine.ts`) legge tutti i parametri da `config.globalRules` (es. `fatigueRecoveryPerDay`, `dayLengthInTimeUnits`, `foodConsumptionPerResidentPerDay`) per gestire progressi attività, ritorno dei residenti, recupero fatica, consumo cibo e spawn quest. Non esistono numeri magici fuori da config @src/engine/game/idleVillage/TimeEngine.ts#430-590.
+  - La UI (`IdleVillageMapPage`) usa `tickIdleVillage` ogni secondo reale per simulare il villaggio live, auto-ripianificando i job configurati come `continuousJob`/`supportsAutoRepeat` e sbloccando i residenti completati @src/ui/idleVillage/IdleVillageMapPage.tsx#213-300.
+  - Il Village Sandbox “pulito” deve riutilizzare gli stessi moduli: oggi `VillageSandbox.tsx` replica parte di questa logica e va rifattorizzato per consumare un engine condiviso (vedi Phase 12.E – Atomic Sandbox).
+- **Gap principali emersi dall’audit:**
+  1. `TimeEngine` usa ancora un `fatigueGain` temporaneo = 10 quando un’attività termina; serve portare il valore in config/metadata attività per rispettare il weight-based creator pattern @src/engine/game/idleVillage/TimeEngine.ts#470-490.
+  2. Non esiste ancora un servizio “tick runner” riusabile fra Idle Village Map e VillageSandbox: la logica di schedulazione/loop vive nella UI e dev’essere spostata in `SandboxEngine` (richiamato in Phase 12.E).
+  3. Trial of Fire / hero bonus sono implementati solo parzialmente (`resolveActivityOutcome` ha test e logica, ma non è ancora integrato nel loop principale del Sandbox pulito). Va completato secondo il task 12.11/12.12.
+
 - **Domain Types (engine layer):**
   - `IdleTimeUnit` (tick astratto configurabile).
   - `ActivityKind`: `job | quest_non_combat | quest_combat | training | shop`.

@@ -781,15 +781,17 @@ const VillageSandboxContent = () => {
   );
 
   const handleResetSandboxState = useCallback(() => {
-    resetState(
-      () =>
-        createVillageStateFromConfig({
-          config,
-          initialResidents: loadResidentsFromCharacterManager({ config }),
-        }),
-      'VillageSandbox manual reset',
-    );
-  }, [config, resetState]);
+    const latestResidents = loadResidentsFromCharacterManager({ config });
+    const nextState = createVillageStateFromConfig({ config, initialResidents: latestResidents });
+    resetState(() => nextState, 'VillageSandbox manual reset');
+    activityScheduler.resetScheduler(nextState);
+    setAssignments({});
+    setSelectedResidentId(null);
+    setDetailPanelSlotIds([]);
+    setIsTheaterOpen(false);
+    setTheaterSlotId(null);
+    setTheaterPreviewIds([]);
+  }, [config, resetState, activityScheduler]);
 
   const handleResetSandboxFatigue = useCallback(() => {
     const targetFatigue = getStartingResidentFatigue(config);
