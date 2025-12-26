@@ -204,10 +204,15 @@ const ActivitySlotCard: React.FC<ActivitySlotCardProps> = ({
 
         <div className="absolute inset-0 flex items-center justify-center">
           <div
-            className="relative z-10 flex h-[4.8rem] w-[4.8rem] items-center justify-center rounded-full text-3xl text-amber-200 shadow-inner shadow-black/70"
+            className="relative z-10 flex h-[4.8rem] w-[4.8rem] flex-col items-center justify-center rounded-full text-amber-200 shadow-inner shadow-black/70"
             style={{ background: 'var(--panel-surface)' }}
           >
-            {iconName ? <span aria-hidden>{iconName}</span> : <Sparkles className="h-6 w-6 text-amber-200" />}
+            <div className="text-3xl leading-none">
+              {iconName ? <span aria-hidden>{iconName}</span> : <Sparkles className="h-6 w-6 text-amber-200" />}
+            </div>
+            <div className="mt-1 text-[9px] uppercase tracking-[0.35em] text-amber-100/85 font-mono">
+              {formatTime(isActive ? remainingSeconds : totalDuration)}
+            </div>
           </div>
         </div>
 

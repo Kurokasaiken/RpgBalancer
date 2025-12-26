@@ -1,15 +1,16 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
 import { createVillageStateFromConfig, getStartingResidentFatigue, type ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { useVillageStateStore } from '@/ui/idleVillage/useVillageStateStore';
 import { loadResidentsFromCharacterManager } from '@/engine/game/idleVillage/characterImport';
 import LocationCard from '@/ui/idleVillage/components/LocationCard';
 import ActivitySlot from '@/ui/idleVillage/components/ActivitySlot';
-import VerbDetailCard, { type VerbDetailAssignment, type VerbSlotState } from '@/ui/idleVillage/VerbDetailCard';
+import type { VerbSlotState } from '@/ui/idleVillage/VerbDetailCard';
+import ActivityCardDetail from '@/ui/idleVillage/components/ActivityCardDetail';
 import ResidentRoster from '@/ui/idleVillage/ResidentRosterDnd';
 import DragTestContainer from '@/ui/idleVillage/components/DragTestContainer';
 import TheaterView from '@/ui/idleVillage/components/TheaterView';
-import { DragProvider } from '@/ui/idleVillage/components/DragContext';
+import { DragProvider, useDragContext } from '@/ui/idleVillage/components/DragContext';
 import { formatResidentLabel } from '@/ui/idleVillage/residentName';
 import { useThemeSwitcher } from '@/hooks/useThemeSwitcher';
 import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
@@ -44,9 +45,10 @@ const formatRewardLabel = (activity: ActivityDefinition): string | null => {
     .join(', ');
 };
 
-const VillageSandbox = () => {
+const VillageSandboxContent = () => {
   const { activePreset, presets, setPreset, randomizeTheme, resetRandomization, isRandomized } = useThemeSwitcher();
   const { config } = useIdleVillageConfig();
+  const { activeId: draggingResidentId, setActiveId } = useDragContext();
   const initialResidents = useMemo(() => {
     const residents = loadResidentsFromCharacterManager({ config });
     if (residents.length === 0) {
@@ -93,6 +95,12 @@ const VillageSandbox = () => {
     );
   }, [config, resetState]);
 
+  const [assignments, setAssignments] = useState<Record<string, string | null>>({});
+  const [detailSlotId, setDetailSlotId] = useState<string | null>(null);
+  const [isTheaterOpen, setIsTheaterOpen] = useState(false);
+  const [theaterSlotId, setTheaterSlotId] = useState<string | null>(null);
+  const [assignmentFeedback, setAssignmentFeedback] = useState<string | null>(null);
+
   useEffect(() => {
     if (residents.length === 0) {
       const latest = loadResidentsFromCharacterManager({ config });
@@ -130,12 +138,6 @@ const VillageSandbox = () => {
     }
   }, [config, residents.length, resetState]);
 
-  const [draggingResidentId, setDraggingResidentId] = useState<string | null>(null);
-  const [assignmentFeedback, setAssignmentFeedback] = useState<string | null>(null);
-  const [detailSlotId, setDetailSlotId] = useState<string | null>(null);
-  const [assignments, setAssignments] = useState<Record<string, string | null>>({});
-  const [isTheaterOpen, setIsTheaterOpen] = useState(false);
-  const [theaterSlotId, setTheaterSlotId] = useState<string | null>(null);
 
   useEffect(() => {
     setAssignments((prev) => {
@@ -165,9 +167,12 @@ const VillageSandbox = () => {
 
   const handleWorkerDrop = useCallback(
     (activityId: string, residentId: string | null) => {
-      if (!residentId) return;
       setAssignments((prev) => {
         const next = { ...prev };
+        if (!residentId) {
+          next[activityId] = null;
+          return next;
+        }
         Object.keys(next).forEach((key) => {
           if (next[key] === residentId) {
             next[key] = null;
@@ -176,13 +181,17 @@ const VillageSandbox = () => {
         next[activityId] = residentId;
         return next;
       });
-      setDraggingResidentId(null);
+      setActiveId(null);
+      if (!residentId) {
+        setAssignmentFeedback(`Slot ${activityId} liberato.`);
+        return;
+      }
       const activityLabel = config.activities?.[activityId]?.label ?? activityId;
       const resident = villageState.residents?.[residentId];
       const residentLabel = resident ? formatResidentLabel(resident) : residentId;
       setAssignmentFeedback(`${residentLabel} assegnato a ${activityLabel}.`);
     },
-    [config.activities, villageState.residents, formatResidentLabel, setAssignmentFeedback]
+    [config.activities, villageState.residents],
   );
 
   const canSlotAcceptDrop = useCallback(
@@ -242,20 +251,6 @@ const VillageSandbox = () => {
     [slots],
   );
 
-  const detailAssignments = useMemo<VerbDetailAssignment[]>(
-    () =>
-      residents.map((resident) => ({
-        resident,
-        isSelected: selectedSlot?.assignedWorkerId === resident.id,
-        onToggle: () => {
-          if (!selectedSlot) return;
-          handleWorkerDrop(selectedSlot.slotId, resident.id);
-          setDetailSlotId(selectedSlot.slotId);
-        },
-      })),
-    [residents, selectedSlot, handleWorkerDrop],
-  );
-
   const detailPreview = useMemo(() => {
     if (!selectedSlot) return null;
     const assignedResident = residents.find((resident) => resident.id === selectedSlot.assignedWorkerId) ?? null;
@@ -275,19 +270,80 @@ const VillageSandbox = () => {
     };
   }, [selectedSlot, residents, detailActivity]);
 
+  const detailSlotAssignments = useMemo(
+    () =>
+      detailSlots.map((slot) => ({
+        slot,
+        residentName: resolveWorkerName(slot.assignedResidentId ?? null),
+        dropState: draggingResidentId
+          ? canSlotAcceptDrop(slot.id)
+            ? 'valid'
+            : 'invalid'
+          : 'idle',
+      })),
+    [detailSlots, resolveWorkerName, draggingResidentId, canSlotAcceptDrop],
+  );
+
+  const detailMetrics = useMemo(() => {
+    if (!detailActivity) return [];
+    return [
+      {
+        id: 'danger',
+        label: 'Danger',
+        value: String(detailActivity.dangerRating ?? '—'),
+        tone: (detailActivity.dangerRating ?? 0) >= 5 ? 'danger' : 'warning',
+      },
+      {
+        id: 'level',
+        label: 'Recommended Level',
+        value: detailActivity.level ? `Lv ${detailActivity.level}` : 'Unknown',
+        tone: 'neutral',
+      },
+      {
+        id: 'engine',
+        label: 'Engine',
+        value: detailActivity.resolutionEngineId,
+        tone: 'neutral',
+      },
+      {
+        id: 'slots',
+        label: 'Slots',
+        value:
+          typeof detailActivity.maxSlots === 'number'
+            ? `${detailActivity.maxSlots}`
+            : detailActivity.maxSlots ?? '—',
+        tone: 'neutral',
+      },
+    ];
+  }, [detailActivity]);
+
+  const detailDurationSeconds = detailActivity ? 90 : undefined;
+  const detailStartDisabled = useMemo(
+    () =>
+      detailSlotAssignments.some(
+        ({ slot }) => slot.required && !slot.assignedResidentId,
+      ),
+    [detailSlotAssignments],
+  );
+
+  const handleDetailStart = useCallback(() => {
+    if (!detailActivity) return;
+    setAssignmentFeedback(`Start ${detailActivity.label ?? detailActivity.id} (simulato)`);
+  }, [detailActivity, setAssignmentFeedback]);
+
   const handleResidentDragStart = useCallback(
     (residentId: string) => (event: React.DragEvent<HTMLElement>) => {
       event.dataTransfer.setData('text/resident-id', residentId);
       event.dataTransfer.setData('text/plain', residentId);
       event.dataTransfer.effectAllowed = 'copy';
-      setDraggingResidentId(residentId);
+      setActiveId(residentId);
       setAssignmentFeedback(null);
     },
     [],
   );
 
   const handleResidentDragEnd = useCallback(() => {
-    setDraggingResidentId(null);
+    setActiveId(null);
   }, []);
 
   const theaterSlot = useMemo(
@@ -399,8 +455,7 @@ const VillageSandbox = () => {
   }, [config, resetState, villageState]);
 
   return (
-    <DragProvider>
-      <div className="mx-auto max-w-5xl space-y-10 p-6 text-ivory">
+    <div className="mx-auto max-w-5xl space-y-10 p-6 text-ivory">
       <section
         className="rounded-2xl border p-4 shadow-xl backdrop-blur-sm"
         style={{
@@ -507,15 +562,15 @@ const VillageSandbox = () => {
             residents={residents}
             onDragStart={(residentId) => {
               console.log('VillageSandbox drag start:', residentId);
-              setDraggingResidentId(residentId);
+              setActiveId(residentId);
             }}
             onDragEnd={(residentId) => {
               console.log('VillageSandbox drag end:', residentId);
-              setDraggingResidentId(null);
+              setActiveId(null);
             }}
             onDragStateChange={(residentId, isDragging) => {
               console.log('VillageSandbox drag state:', residentId, isDragging);
-              setDraggingResidentId(isDragging ? residentId : null);
+              setActiveId(isDragging ? residentId : null);
             }}
           />
         </div>
@@ -539,6 +594,7 @@ const VillageSandbox = () => {
                 ))}
               </div>
 
+                  isDraggingActive={!!draggingResidentId}
               <div className="space-y-3 lg:w-72">
                 <div className="text-xs uppercase tracking-[0.35em] text-slate-400">Luogo attivo</div>
                 <LocationCard
@@ -560,25 +616,24 @@ const VillageSandbox = () => {
         </div>
       </section>
 
-      
       {detailSlotId && detailActivity && detailPreview && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          <div className="absolute inset-0 bg-black/70" onClick={() => setDetailSlotId(null)} />
-          <div className="relative z-10 max-h-[90vh] w-full max-w-xl overflow-y-auto">
-            <VerbDetailCard
-              title={detailActivity.label ?? detailActivity.id}
-              subtitle="Dettaglio Attività"
+        <div className="pointer-events-none fixed inset-0 z-40">
+          <div className="pointer-events-auto absolute bottom-6 right-6 max-w-[420px]">
+            <ActivityCardDetail
               activity={detailActivity}
-              description={detailActivity.description ?? 'Scheda dinamica collegata al worker selezionato.'}
+              slotLabel={detailSlots.find((slot) => slot.id === detailSlotId)?.label}
               preview={detailPreview}
-              assignments={detailAssignments}
-              slots={detailSlots}
-              slotLabel={detailSlots[0]?.label ?? 'Slot Sandbox'}
-              durationSeconds={60}
+              assignments={detailSlotAssignments}
+              rewards={detailActivity.rewards}
+              metrics={detailMetrics}
+              durationSeconds={detailDurationSeconds}
               elapsedSeconds={0}
-              isActive={false}
+              onStart={handleDetailStart}
               onClose={() => setDetailSlotId(null)}
-              startDisabled
+              onDropResident={(slotId, residentId) => handleWorkerDrop(slotId, residentId)}
+              onRemoveResident={(slotId) => handleWorkerDrop(slotId, null)}
+              isStartDisabled={detailStartDisabled}
+              draggingResidentId={draggingResidentId}
             />
           </div>
         </div>
@@ -589,9 +644,21 @@ const VillageSandbox = () => {
           slotIcon={theaterSlot.iconName}
           verbs={theaterVerbs}
           onClose={handleCloseTheater}
+          acceptResidentDrop={!!draggingResidentId}
+          onResidentDrop={(residentId) => {
+            console.log('Resident dropped in TheaterView:', residentId);
+            // Qui puoi gestire l'assegnazione del residente all'attività
+          }}
         />
       )}
-    </div>
+  </div>
+  );
+};
+
+const VillageSandbox = () => {
+  return (
+    <DragProvider>
+      <VillageSandboxContent />
     </DragProvider>
   );
 };

@@ -9,6 +9,7 @@ export interface LocationCardProps extends ButtonHTMLAttributes<HTMLButtonElemen
   iconRow?: ReactNode;
   onInspect?: () => void;
   onResidentDrop?: (residentId: string) => void;
+  isDraggingActive?: boolean;
 }
 
 /**
@@ -20,6 +21,7 @@ const LocationCard: React.FC<LocationCardProps> = ({
   iconRow,
   onInspect,
   onResidentDrop,
+  isDraggingActive = false,
   onClick,
   ...buttonProps
 }) => {
@@ -30,7 +32,6 @@ const LocationCard: React.FC<LocationCardProps> = ({
 
   const handleDragOver = (event: DragEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    console.log("LocationCard dragOver detected");    event.dataTransfer.dropEffect = 'copy';
   };
 
   const handleDrop = (event: DragEvent<HTMLButtonElement>) => {
@@ -38,7 +39,6 @@ const LocationCard: React.FC<LocationCardProps> = ({
     const residentId = event.dataTransfer.getData('text/resident-id') || event.dataTransfer.getData('text/plain');
     console.log("LocationCard drop - residentId:", residentId);
     if (residentId && onResidentDrop) {
-      onResidentDrop(residentId);
     }
     onInspect?.();
   };
@@ -51,11 +51,19 @@ const LocationCard: React.FC<LocationCardProps> = ({
       onDrop={handleDrop}
       className={[
         'rounded-3xl border bg-transparent p-1 shadow-[0_15px_45px_rgba(0,0,0,0.55)] transition',
-        onInspect ? 'hover:shadow-[0_25px_55px_rgba(34,197,94,0.25)] focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200/60' : '',
+        isDraggingActive 
+          ? 'ring-4 ring-yellow-400/80 drop-shadow-[0_0_60px_rgba(251,204,21,0.7)] scale-105 border-yellow-400/60' 
+          : '',
+        onInspect && !isDraggingActive ? 'hover:shadow-[0_25px_55px_rgba(34,197,94,0.25)] focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200/60' : '',
       ]
         .filter(Boolean)
         .join(' ')}
-      style={{ borderColor: 'var(--color-bronze-light, rgba(201,162,39,0.6))' }}
+      style={{ 
+        borderColor: 'var(--color-bronze-light, rgba(201,162,39,0.6))',
+        background: isDraggingActive 
+          ? 'radial-gradient(circle at 30% 30%, rgba(251,204,21,0.15), var(--panel-surface))'
+          : 'var(--panel-surface)'
+      }}
       aria-label={title}
       {...buttonProps}
     >
