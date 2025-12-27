@@ -5,6 +5,8 @@ import {
   evaluateActivityDuration,
   getStartingResidentFatigue,
   type ResidentState,
+  type VillageResources,
+  type VillageState,
 } from '@/engine/game/idleVillage/TimeEngine';
 import { useVillageStateStore } from '@/ui/idleVillage/useVillageStateStore';
 import { loadResidentsFromCharacterManager } from '@/engine/game/idleVillage/characterImport';
@@ -30,6 +32,8 @@ import {
   deriveVisualVariant,
 } from '@/ui/idleVillage/verbSummaries';
 import { useActivityScheduler, type ActivityResolutionResult } from '@/ui/idleVillage/hooks/useActivityScheduler';
+import ResidentSlotRack from '@/ui/idleVillage/slots/ResidentSlotRack';
+import { useResidentSlotController } from '@/ui/idleVillage/slots/useResidentSlotController';
 
 interface ActivitySlotData {
   slotId: string;
@@ -42,6 +46,56 @@ interface ActivitySlotData {
 }
 
 type SandboxVerbTone = 'neutral' | 'job' | 'quest' | 'danger' | 'system';
+type DetailContext = { slotId: string; props: VerbDetailCardProps };
+
+const SLOT_DELIMITER = '-slot-';
+const getPrimarySlotId = (activityId: string) => activityId;
+const extractActivityIdFromSlot = (slotId: string) => {
+  const index = slotId.indexOf(SLOT_DELIMITER);
+  return index === -1 ? slotId : slotId.slice(0, index);
+};
+const syncPrimarySlot = (assignments: Record<string, string | null>, activityId: string) => {
+  const primarySlotId = getPrimarySlotId(activityId);
+  const firstAssigned = Object.entries(assignments).find(
+    ([slotId, residentId]) => residentId && extractActivityIdFromSlot(slotId) === activityId,
+  );
+  assignments[primarySlotId] = firstAssigned ? firstAssigned[1] : null;
+};
+const applySlotAssignment = (
+  assignments: Record<string, string | null>,
+  slotId: string,
+  residentId: string | null,
+) => {
+  const next = { ...assignments };
+  if (residentId) {
+    Object.entries(next).forEach(([existingSlot, current]) => {
+      if (existingSlot !== slotId && current === residentId) {
+        next[existingSlot] = null;
+      }
+    });
+    next[slotId] = residentId;
+  } else {
+    next[slotId] = null;
+  }
+  syncPrimarySlot(next, extractActivityIdFromSlot(slotId));
+  return next;
+};
+const deriveAssignmentsForActivity = (
+  assignments: Record<string, string | null>,
+  activityId: string,
+): Record<string, string | null> => {
+  const primarySlotId = getPrimarySlotId(activityId);
+  const entries = Object.entries(assignments).filter(
+    ([slotId]) => extractActivityIdFromSlot(slotId) === activityId,
+  );
+  if (entries.length === 0) {
+    return { [primarySlotId]: assignments[primarySlotId] ?? null };
+  }
+  return entries.reduce<Record<string, string | null>>((acc, [slotId, residentId]) => {
+    acc[slotId] = residentId ?? null;
+    return acc;
+  }, {});
+};
 
 const deriveVerbTone = (activity: ActivityDefinition): SandboxVerbTone => {
   if (activity.tags?.includes('quest')) return 'quest';
@@ -93,7 +147,7 @@ const VillageSandboxContent = () => {
   const { config } = useIdleVillageConfig();
   const { activeId: draggingResidentId, setActiveId } = useDragContext();
   const [assignmentFeedback, setAssignmentFeedback] = useState<string | null>(null);
-  const [assignments, setAssignments] = useState<Record<string, string | null>>({});
+  const [slotAssignments, setSlotAssignments] = useState<Record<string, string | null>>({});
   const [lastRewards, setLastRewards] = useState<ResourceDeltaDefinition[] | null>(null);
   const [detailPanelSlotIds, setDetailPanelSlotIds] = useState<string[]>([]);
   const [isTheaterOpen, setIsTheaterOpen] = useState(false);
@@ -159,12 +213,12 @@ const VillageSandboxContent = () => {
       }
       setAssignmentFeedback(feedbackMessage);
 
-      setAssignments((prev) => {
-        const next = { ...prev };
-        if (next[result.activityId] === result.residentId) {
-          next[result.activityId] = null;
+      setSlotAssignments((prev) => {
+        const slotId = getPrimarySlotId(result.activityId);
+        if (prev[slotId] !== result.residentId) {
+          return prev;
         }
-        return next;
+        return { ...prev, [slotId]: null };
       });
     },
     [villageState.residents, config.activities, config.resources],
@@ -208,10 +262,8 @@ const VillageSandboxContent = () => {
       switch (resident.status) {
         case 'available':
           return 0;
-        case 'working':
-          return 1;
         case 'away':
-          return 2;
+          return 1;
         case 'exhausted':
           return 4;
         default:
@@ -299,12 +351,24 @@ const VillageSandboxContent = () => {
 
 
   useEffect(() => {
-    setAssignments((prev) => {
-      const next: Record<string, string | null> = {};
+    setSlotAssignments((prev) => {
+      let changed = false;
+      const next: Record<string, string | null> = { ...prev };
       showcaseActivities.forEach((activity) => {
-        next[activity.id] = prev[activity.id] ?? null;
+        const primarySlotId = getPrimarySlotId(activity.id);
+        if (next[primarySlotId] === undefined) {
+          next[primarySlotId] = prev[activity.id] ?? null;
+          changed = true;
+        }
+        if (next[activity.id] !== undefined) {
+          if (next[primarySlotId] == null && next[activity.id] != null) {
+            next[primarySlotId] = next[activity.id];
+          }
+          delete next[activity.id];
+          changed = true;
+        }
       });
-      return next;
+      return changed ? next : prev;
     });
   }, [showcaseActivities]);
 
@@ -325,6 +389,7 @@ const VillageSandboxContent = () => {
         metadata: {},
         rewards: [],
       },
+      visualVariant: cycleVariant,
     };
     const activitySlots = showcaseActivities.map((activity) => {
       const meta = (activity.metadata ?? {}) as { icon?: string; mapSlotId?: string } | undefined;
@@ -334,7 +399,7 @@ const VillageSandboxContent = () => {
         slotId: activity.id,
         label: activity.label ?? activity.id,
         iconName: derivedIcon,
-        assignedWorkerId: assignments[activity.id] ?? null,
+        assignedWorkerId: slotAssignments[activity.id] ?? null,
         activity,
         mapSlotLabel: mapSlot?.label,
         visualVariant: deriveVisualVariant(activity),
@@ -343,7 +408,7 @@ const VillageSandboxContent = () => {
     return [dayNightSlot, ...activitySlots];
   }, [
     showcaseActivities,
-    assignments,
+    slotAssignments,
     config.mapSlots,
     cyclePhaseLabel,
     cyclePhaseIcon,
@@ -403,7 +468,12 @@ const VillageSandboxContent = () => {
         return false;
       }
       const slotAssignment = slots.find((slot) => slot.slotId === theaterPrimarySlot.slotId);
-      const assignedResidentId = residentOverride ?? assignments[theaterPrimarySlot.slotId] ?? slotAssignment?.assignedWorkerId ?? null;
+      const assignedResidentId =
+        residentOverride ?? slotAssignments[theaterPrimarySlot.slotId] ?? slotAssignment?.assignedWorkerId ?? null;
+      if (!assignedResidentId) {
+        setAssignmentFeedback('Assegna un residente prima di iniziare l’attività.');
+        return false;
+      }
       const residentName = assignedResidentId ? formatResidentLabel(sandboxState.residents[assignedResidentId]) : null;
       if (!residentName) {
         setAssignmentFeedback('Assegna un residente prima di iniziare l’attività.');
@@ -419,7 +489,7 @@ const VillageSandboxContent = () => {
       setAssignmentFeedback(`Impossibile iniziare ${activity?.label ?? slotId}.`);
       return false;
     },
-    [assignments, slots, config.activities, activityScheduler, theaterPrimarySlot, sandboxState.residents],
+    [slotAssignments, slots, config.activities, activityScheduler, theaterPrimarySlot, sandboxState.residents, config.globalRules.secondsPerTimeUnit],
   );
 
   const handleWorkerDrop = useCallback(
@@ -428,7 +498,7 @@ const VillageSandboxContent = () => {
       const activity = config.activities?.[activityId];
 
       if (!residentId) {
-        setAssignments((prev) => {
+        setSlotAssignments((prev) => {
           const next = { ...prev };
           next[activityId] = null;
           return next;
@@ -442,14 +512,12 @@ const VillageSandboxContent = () => {
         return;
       }
 
-      setAssignments((prev) => {
-        const next = { ...prev };
-        Object.keys(next).forEach((key) => {
-          if (next[key] === residentId) {
-            next[key] = null;
-          }
+      setSlotAssignments((prev) => {
+        const next: Record<string, string | null> = {};
+        Object.entries(prev).forEach(([slotId, current]) => {
+          next[slotId] = current === residentId ? null : current;
         });
-        next[activityId] = residentId;
+        next[getPrimarySlotId(activityId)] = residentId;
         return next;
       });
 
@@ -486,7 +554,7 @@ const VillageSandboxContent = () => {
         if (!selectedSlot) return null;
         const activity = config.activities?.[slotId];
         if (!activity) return null;
-        const assignedResidentId = assignments[slotId] ?? selectedSlot.assignedWorkerId ?? null;
+        const assignedResidentId = slotAssignments[slotId] ?? selectedSlot.assignedWorkerId ?? null;
         const risk = deriveRisk(activity);
         const durationUnits = evaluateActivityDuration(activity);
         const durationSeconds = durationUnits * secondsPerTimeUnit;
@@ -508,7 +576,7 @@ const VillageSandboxContent = () => {
           required: index === 0,
           assignedResidentId: index === 0 ? assignedResidentId : null,
         }));
-        const detailAssignments: VerbDetailAssignment[] = residents.map((resident) => ({
+            const detailAssignments: VerbDetailAssignment[] = residents.map((resident) => ({
           resident,
           isSelected: resident.id === assignedResidentId,
           onToggle: (residentId: string) => {
@@ -549,14 +617,12 @@ const VillageSandboxContent = () => {
           },
         };
       })
-      .filter((context): context is { slotId: string; props: React.ComponentProps<typeof VerbDetailCard> } =>
-        Boolean(context),
-      );
+      .filter((context): context is DetailContext => context !== null);
   }, [
     detailPanelSlotIds,
     slots,
     config.activities,
-    assignments,
+    slotAssignments,
     residents,
     secondsPerTimeUnit,
     activityScheduler,
@@ -757,7 +823,10 @@ const VillageSandboxContent = () => {
     (slotIds: string[]) => {
       const previewSlots = slotIds
         .map((id) => slots.find((slot) => slot.slotId === id) ?? null)
-        .filter((slot): slot is ActivitySlotData => Boolean(slot) && slot.slotId !== 'day-night-cycle');
+        .filter((slot): slot is ActivitySlotData => {
+          if (!slot) return false;
+          return slot.slotId !== 'day-night-cycle';
+        });
       if (previewSlots.length === 0) return;
       setTheaterSlotId(previewSlots[0].slotId);
       setTheaterPreviewIds(previewSlots.map((slot) => slot.slotId));
@@ -835,7 +904,7 @@ const VillageSandboxContent = () => {
     const nextState = createVillageStateFromConfig({ config, initialResidents: latestResidents });
     resetState(() => nextState, 'VillageSandbox manual reset');
     activityScheduler.resetScheduler(nextState);
-    setAssignments({});
+    setSlotAssignments({});
     setSelectedResidentId(null);
     setDetailPanelSlotIds([]);
     setIsTheaterOpen(false);

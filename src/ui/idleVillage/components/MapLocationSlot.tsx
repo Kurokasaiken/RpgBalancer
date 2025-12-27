@@ -39,9 +39,12 @@ const MapLocationSlot: React.FC<MapLocationSlotProps> = ({
   const handleDragOver = (event: React.DragEvent<HTMLButtonElement>) => {
     if (!isDropMode) return;
     event.preventDefault();
-    event.dataTransfer.dropEffect = isActiveDropTarget ? 'copy' : 'none';
+    event.dataTransfer.dropEffect = 'none';
     if (!isDragOver) {
       setIsDragOver(true);
+    }
+    if (!isSelected) {
+      onSelect(slot.id);
     }
   };
 
@@ -53,11 +56,8 @@ const MapLocationSlot: React.FC<MapLocationSlotProps> = ({
   const handleDrop = (event: React.DragEvent<HTMLButtonElement>) => {
     if (!isDropMode) return;
     event.preventDefault();
+    event.dataTransfer.dropEffect = 'none';
     setIsDragOver(false);
-    const residentId = event.dataTransfer.getData('text/resident-id') || event.dataTransfer.getData('text/plain') || null;
-    if (isActiveDropTarget && canAcceptDrop) {
-      onDropResident(slot.id, residentId);
-    }
   };
 
   const handleSelect = () => {

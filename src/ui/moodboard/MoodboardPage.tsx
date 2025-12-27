@@ -7,7 +7,7 @@ import LocationCard from '@/ui/idleVillage/components/LocationCard';
 import VerbCard from '@/ui/idleVillage/VerbCard';
 import { useThemeSwitcher } from '@/hooks/useThemeSwitcher';
 import type { ThemePreset } from '@/data/themePresets';
-import { MOODBOARD_STYLES, type MoodboardStyle } from './moodboardStyles';
+import StyleLaboratoryPanel from '@/ui/styleLab/StyleLaboratoryPanel';
 import './moodboard.css';
 
 interface MoodImage {
@@ -38,11 +38,6 @@ const MOOD_IMAGES: MoodImage[] = Object.entries(moodImageModules)
 
 const FALLBACK_ASPECT_RATIO = 16 / 9;
 const DEFAULT_AUTO_ADVANCE_MS = 7000;
-const STYLE_LAB_LABEL = 'Style Laboratory';
-const STYLE_LAB_DESCRIPTION =
-  'Laboratorio cromatico Gilded Observatory: tutti i token provengono dal preset config-first ufficiale.';
-const DEFAULT_MOOD_STYLE_ID = MOODBOARD_STYLES[0]?.id ?? 'gilded-observatory';
-
 const MOODBOARD_TOKEN_MAP: {
   moodVar: string;
   themeVar?: string;
@@ -133,22 +128,9 @@ export function MoodboardPage() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [aspectRatio, setAspectRatio] = useState(FALLBACK_ASPECT_RATIO);
-  const { activePreset, randomizeTheme, resetRandomization, isRandomized } = useThemeSwitcher();
-  const [selectedMoodStyleId, setSelectedMoodStyleId] = useState<string>(DEFAULT_MOOD_STYLE_ID);
-  const moodboardStyles = useMemo<MoodboardStyle[]>(() => MOODBOARD_STYLES, []);
-  const activeMoodStyle = useMemo<MoodboardStyle | null>(() => {
-    if (moodboardStyles.length === 0) return null;
-    return moodboardStyles.find((style) => style.id === selectedMoodStyleId) ?? moodboardStyles[0];
-  }, [moodboardStyles, selectedMoodStyleId]);
-  const fallbackShellTokens = useMemo<CSSProperties>(() => buildMoodboardTokens(activePreset), [activePreset]);
-  const shellStyle = useMemo<CSSProperties>(() => {
-    if (!activeMoodStyle) return fallbackShellTokens;
-    return { ...fallbackShellTokens, ...activeMoodStyle.tokens };
-  }, [activeMoodStyle, fallbackShellTokens]);
-  const autoAdvanceMs = useMemo(
-    () => activeMoodStyle?.autoAdvanceMs ?? getAutoAdvanceMs(activePreset.id),
-    [activeMoodStyle, activePreset.id],
-  );
+  const { activePreset, presets, setPreset, randomizeTheme, resetRandomization, isRandomized } = useThemeSwitcher();
+  const shellStyle = useMemo<CSSProperties>(() => buildMoodboardTokens(activePreset), [activePreset]);
+  const autoAdvanceMs = useMemo(() => getAutoAdvanceMs(activePreset.id), [activePreset.id]);
 
   const images = useMemo(() => MOOD_IMAGES, []);
 
@@ -237,43 +219,18 @@ export function MoodboardPage() {
                 nello slideshow immediatamente.
               </p>
             </div>
-            <div className="moodboard-style-switcher">
-              {moodboardStyles.map((style) => {
-                const isActiveStyle = style.id === activeMoodStyle?.id;
-                return (
-                  <button
-                    key={style.id}
-                    type="button"
-                    className={`moodboard-style-pill ${isActiveStyle ? 'is-active' : ''}`}
-                    onClick={() => setSelectedMoodStyleId(style.id)}
-                  >
-                    {style.label}
-                  </button>
-                );
-              })}
-              <GlassButton variant="secondary" size="sm" onClick={randomizeTheme} className="uppercase tracking-[0.3em]">
-                Randomize
-              </GlassButton>
-              {isRandomized && (
-                <GlassButton variant="ghost" size="sm" onClick={resetRandomization} className="uppercase tracking-[0.3em]">
-                  Reset
-                </GlassButton>
-              )}
-            </div>
           </header>
 
-          <section className="moodboard-panel">
-            <div className="moodboard-panel__row">
-              <div>
-                <p className="moodboard-panel__kicker">{STYLE_LAB_LABEL}</p>
-                <p className="moodboard-panel__subtitle">
-                  {activeMoodStyle?.description ?? STYLE_LAB_DESCRIPTION}
-                  {isRandomized ? ' · Chaos Mix attivo' : ''}
-                </p>
-              </div>
-              {activeMoodStyle?.badge && <div className="moodboard-style-badge">{activeMoodStyle.badge}</div>}
-            </div>
-          </section>
+          <StyleLaboratoryPanel
+            activePreset={activePreset}
+            presets={presets}
+            isRandomized={isRandomized}
+            onSelectPreset={setPreset}
+            onRandomize={randomizeTheme}
+            onResetRandomization={resetRandomization}
+            className="moodboard-style-panel"
+            kickerLabel="Style Laboratory"
+          />
 
           <section className="relative">
             <div className="moodboard-frame">
@@ -418,13 +375,15 @@ export function MoodboardPage() {
         </div>
 
         <aside className="moodboard-sidebar">
-            <div className="moodboard-info-card">
+          <div className="moodboard-info-card">
             <div className="flex items-center justify-between gap-3 text-xs uppercase tracking-[0.35em]">
-              <span className="moodboard-accent-text">{STYLE_LAB_LABEL}</span>
+              <span className="moodboard-accent-text">Style Laboratory</span>
+              <span className="text-[10px] uppercase tracking-[0.4em] text-slate-400">
+                {isRandomized ? 'Chaos Mix' : 'Preset'}
+              </span>
             </div>
             <p className="mt-3 text-sm">
-              {STYLE_LAB_DESCRIPTION}
-              {isRandomized ? ' · Variabile' : ''}
+              {activePreset.label} · {activePreset.description}
             </p>
             <ul className="moodboard-list">
               <li>• {images.length} asset caricati dinamicamente</li>

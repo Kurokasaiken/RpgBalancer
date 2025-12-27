@@ -98,12 +98,6 @@ const LocationCard: React.FC<LocationCardProps> = ({
 
   const handleDrop = (event: DragEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    if (dropState === 'invalid') return;
-    const residentId = extractResidentId(event);
-    if (residentId && onResidentDrop) {
-      onResidentDrop(residentId);
-    }
-    onInspect?.();
     onDragIntent?.(null);
   };
 

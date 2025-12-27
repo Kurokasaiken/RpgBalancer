@@ -1,15 +1,23 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { IdleVillageConfig, ResourceDeltaDefinition } from '@/balancing/config/idleVillage/types';
-import type { VillageState, ScheduledActivity, VillageResources, ResolveActivityOutcomeResult } from '@/engine/game/idleVillage/TimeEngine';
-import { createVillageStateFromConfig, advanceTime, resolveActivities } from '@/engine/game/idleVillage/TimeEngine';
+import type {
+  VillageState,
+  ScheduledActivity,
+  VillageResources,
+  ResolveActivityOutcomeResult,
+} from '@/engine/game/idleVillage/TimeEngine';
+import { advanceTime, resolveActivities, type VillageTimeUnit } from '@/engine/game/idleVillage/TimeEngine';
 import { resolveJob } from '@/engine/game/idleVillage/JobResolver';
 import { resolveQuest } from '@/engine/game/idleVillage/QuestResolver';
+
+const DEFAULT_SECONDS_PER_TIME_UNIT = 1;
 
 /**
  * Activity scheduler hook for managing running activities and global timer.
  * Handles countdown, progress tracking, and resolution completion.
  */
 export interface ScheduledActivityState {
+  scheduledId: string;
   activityId: string;
   residentId: string;
   startTime: number; // timestamp in ms
@@ -95,6 +103,7 @@ export const useActivityScheduler = ({
     const scheduledId = `${activityId}_${residentId}_${Date.now()}`;
     
     const newScheduled: ScheduledActivityState = {
+      scheduledId,
       activityId,
       residentId,
       startTime: Date.now(),
@@ -109,7 +118,7 @@ export const useActivityScheduler = ({
     // Update resident status to working
     const updatedResident = {
       ...resident,
-      status: 'working' as const,
+      status: 'away' as const,
     };
     
     setVillageState(prev => ({
@@ -120,7 +129,7 @@ export const useActivityScheduler = ({
       },
     }));
 
-    onResidentStateChange?.(residentId, { status: 'working' });
+    onResidentStateChange?.(residentId, { status: 'away' });
 
     // Start global timer if not running
     if (!isRunning) {
@@ -178,6 +187,9 @@ export const useActivityScheduler = ({
 
     setGlobalTime(prev => prev + deltaTime);
 
+    let workingState = villageState;
+    let workingResources = workingState.resources;
+
     setScheduledActivities(prev => {
       const next = new Map(prev);
       const completedActivities: ScheduledActivityState[] = [];
@@ -189,16 +201,18 @@ export const useActivityScheduler = ({
         const newElapsed = scheduled.elapsed + deltaTime;
         const newProgress = Math.min(1, newElapsed / scheduled.duration);
 
-        const updatedScheduled = {
+        const nextStatus: ScheduledActivityState['status'] = newProgress >= 1 ? 'completed' : 'running';
+
+        const updatedScheduled: ScheduledActivityState = {
           ...scheduled,
           elapsed: newElapsed,
           progress: newProgress,
-          status: newProgress >= 1 ? 'completed' : 'running' as const,
+          status: nextStatus,
         };
 
         next.set(scheduledId, updatedScheduled);
 
-        if (updatedScheduled.status === 'completed') {
+        if (nextStatus === 'completed') {
           completedActivities.push(updatedScheduled);
         }
       }
@@ -207,51 +221,50 @@ export const useActivityScheduler = ({
       if (completedActivities.length > 0) {
         // Create scheduled activities for TimeEngine
         const timeEngineScheduled: ScheduledActivity[] = completedActivities.map(comp => ({
-          id: comp.activityId,
+          id: comp.scheduledId,
           activityId: comp.activityId,
           characterIds: [comp.residentId],
-          startTime: globalTime,
-          duration: comp.duration,
-          status: 'completed' as const,
-          completionTime: globalTime + comp.elapsed,
+          slotId: comp.activityId,
+          startTime: globalTime as VillageTimeUnit,
+          endTime: (globalTime + comp.duration) as VillageTimeUnit,
+          status: 'completed',
+          isAuto: false,
+          isCompleted: true,
+          snapshotDeathRisk: 0,
         }));
 
         // Resolve activities using TimeEngine
         const resolutionResult = resolveActivities(
           { config, rng },
-          villageState,
+          workingState,
           timeEngineScheduled.map(s => s.id)
         );
+        workingState = resolutionResult.state;
+        workingResources = workingState.resources;
 
         // Process each resolution
         completedActivities.forEach((completed, index) => {
           const outcome = resolutionResult.outcomes[index];
           const activity = config.activities[completed.activityId];
-          
+
           // Calculate resource changes
           let resourceChanges: ResourceDeltaDefinition[] = [];
-          let updatedResources = villageState.resources;
+          let updatedResources = workingState.resources;
 
           if (activity.tags?.includes('job')) {
-            const jobResult = resolveJob(
-              { config, rng },
-              resolutionResult.state,
-              timeEngineScheduled[index]
-            );
+            const jobResult = resolveJob({ config, rng }, workingState, timeEngineScheduled[index]);
+            workingState = { ...workingState, resources: jobResult.updatedResources };
             resourceChanges = jobResult.events[0]?.payload.rewards ?? [];
             updatedResources = jobResult.updatedResources;
           } else if (activity.tags?.includes('quest')) {
-            const questResult = resolveQuest(
-              { config, rng },
-              resolutionResult.state,
-              timeEngineScheduled[index]
-            );
+            const questResult = resolveQuest({ config, rng }, workingState, timeEngineScheduled[index]);
+            workingState = { ...workingState, resources: questResult.updatedResources };
             resourceChanges = questResult.events[0]?.payload.rewards ?? [];
             updatedResources = questResult.updatedResources;
           }
 
           // Update resident state based on outcome
-          const updatedResident = resolutionResult.state.residents[completed.residentId];
+          const updatedResident = workingState.residents[completed.residentId];
           if (updatedResident) {
             onResidentStateChange?.(completed.residentId, updatedResident);
           }
@@ -269,20 +282,28 @@ export const useActivityScheduler = ({
           onActivityComplete?.(result);
         });
 
-        // Update village state with resolution results
-        setVillageState(resolutionResult.state);
-        onStateUpdate?.(resolutionResult.state);
-        onResourcesChange?.(resolutionResult.state.resources, []);
-
         // Remove completed activities
         completedActivities.forEach(comp => {
-          next.delete(`${comp.activityId}_${comp.residentId}_${comp.startTime}`);
+          next.delete(comp.scheduledId);
         });
       }
 
       return next;
     });
-  }, [globalTime, villageState, config, rng, onActivityComplete, onResourcesChange, onResidentStateChange]);
+
+    // If nothing was running, advance base time so the day/night cycle moves
+    if (scheduledActivities.size === 0) {
+      const secondsPerTimeUnit = config.globalRules.secondsPerTimeUnit ?? DEFAULT_SECONDS_PER_TIME_UNIT;
+      const deltaTimeUnits = deltaTime / secondsPerTimeUnit;
+      const timeAdvance = advanceTime({ config, rng }, villageState, deltaTimeUnits);
+      workingState = timeAdvance.state;
+      workingResources = workingState.resources;
+    }
+
+    setVillageState(workingState);
+    onStateUpdate?.(workingState);
+    onResourcesChange?.(workingResources, []);
+  }, [globalTime, villageState, config, rng, onActivityComplete, onResourcesChange, onResidentStateChange, onStateUpdate]);
 
   // Global timer effect
   useEffect(() => {
@@ -302,16 +323,6 @@ export const useActivityScheduler = ({
       }
     };
   }, [isRunning, tick]);
-
-  // Stop timer when no activities are running
-  useEffect(() => {
-    const hasRunningActivities = Array.from(scheduledActivities.values())
-      .some(scheduled => scheduled.status === 'running');
-    
-    if (!hasRunningActivities && isRunning) {
-      setIsRunning(false);
-    }
-  }, [scheduledActivities, isRunning]);
 
   /**
    * Get activity state for a specific slot.

@@ -1,6 +1,9 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import type { ActivityDefinition, ResourceDeltaDefinition, StatRequirement } from '@/balancing/config/idleVillage/types';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
+import type { DropState } from '@/ui/idleVillage/components/ActivitySlot';
+import ResidentSlotRack from '@/ui/idleVillage/slots/ResidentSlotRack';
+import type { ResidentSlotViewModel } from '@/ui/idleVillage/slots/useResidentSlotController';
 
 export interface VerbDetailAssignment {
   resident: ResidentState;
@@ -41,6 +44,9 @@ export interface VerbDetailCardProps {
   onStart?: () => void;
   onClose?: () => void;
   onSlotClick?: (slotId: string) => void;
+  onSlotAssign?: (slotId: string, residentId: string | null) => void;
+  onSlotClear?: (slotId: string) => void;
+  slotDropStates?: Record<string, DropState>;
   startDisabled?: boolean;
 }
 
@@ -78,6 +84,9 @@ export default function VerbDetailCard({
   onStart,
   onClose,
   onSlotClick,
+  onSlotAssign,
+  onSlotClear,
+  slotDropStates,
   startDisabled,
 }: VerbDetailCardProps) {
   const riskHeights = useMemo(() => {
@@ -92,6 +101,58 @@ export default function VerbDetailCard({
     if (!durationSeconds || !isActive) return 0;
     return clampRatio(elapsedSeconds / durationSeconds);
   }, [durationSeconds, elapsedSeconds, isActive]);
+
+  const buildResidentStub = useCallback((id: string): ResidentState => {
+    return {
+      id,
+      status: 'available',
+      fatigue: 0,
+      currentHp: 100,
+      maxHp: 100,
+      isHero: false,
+      isInjured: false,
+      survivalCount: 0,
+      survivalScore: 0,
+    };
+  }, []);
+
+  const slotViewModels = useMemo<ResidentSlotViewModel[]>(() => {
+    return slots.map((slot, index) => ({
+      id: slot.id,
+      index,
+      label: slot.label,
+      statHint: slot.statHint ?? slot.requirementLabel ?? slot.requirement?.label,
+      required: slot.required,
+      assignedResidentId: slot.assignedResidentId ?? null,
+      assignedResident: slot.assignedResidentId ? buildResidentStub(slot.assignedResidentId) : undefined,
+      requirement: slot.requirement,
+      modifiers: undefined,
+      isPlaceholder: false,
+      dropState: slotDropStates?.[slot.id] ?? 'idle',
+    }));
+  }, [slots, slotDropStates, buildResidentStub]);
+
+  const handleSlotDrop = useCallback(
+    (slotId: string, residentId: string | null) => {
+      if (onSlotAssign) {
+        onSlotAssign(slotId, residentId);
+        return;
+      }
+      onSlotClick?.(slotId);
+    },
+    [onSlotAssign, onSlotClick],
+  );
+
+  const handleSlotClear = useCallback(
+    (slotId: string) => {
+      if (onSlotClear) {
+        onSlotClear(slotId);
+        return;
+      }
+      onSlotClick?.(slotId);
+    },
+    [onSlotClear, onSlotClick],
+  );
 
   return (
     <div
@@ -146,45 +207,19 @@ export default function VerbDetailCard({
       <div className="space-y-6 px-6 py-6 text-[12px]">
         {description && <p className="text-slate-200">{description}</p>}
 
-        {slots.length > 0 && (
+        {slotViewModels.length > 0 && (
           <div className="space-y-3">
             <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-slate-400">
               <span>Slot Requirements</span>
               <span>Drag cards/residents into each slot</span>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {slots.map((slot) => {
-                const assignedLabel = slot.assignedResidentId ?? 'Empty';
-                return (
-                  <button
-                    key={slot.id}
-                    type="button"
-                    onClick={() => onSlotClick?.(slot.id)}
-                    className="group rounded-xl border border-dashed border-slate-700 bg-slate-950/70 px-3 py-3 text-left transition hover:border-amber-400/70"
-                  >
-                    <div className="flex items-center justify-between text-[11px] font-semibold text-slate-200">
-                      <span>{slot.label}</span>
-                      {slot.required && <span className="text-amber-300 text-[10px] uppercase tracking-[0.2em]">Required</span>}
-                    </div>
-                    <div className="text-[10px] uppercase tracking-[0.25em] text-slate-500">
-                      {slot.statHint ?? slot.requirementLabel ?? slot.requirement?.label ?? 'Any Stat'}
-                    </div>
-                    <div
-                      className={`mt-2 flex h-16 items-center justify-center rounded-lg border text-sm font-medium ${
-                        slot.assignedResidentId
-                          ? 'border-emerald-500/60 bg-emerald-500/10 text-emerald-100'
-                          : 'border-slate-800 bg-slate-900/40 text-slate-500 group-hover:text-slate-200'
-                      }`}
-                    >
-                      {assignedLabel}
-                    </div>
-                    <p className="mt-2 text-[10px] text-slate-500">
-                      {slot.assignedResidentId ? 'Tap to replace or clear.' : 'Drop a compatible resident to satisfy this slot.'}
-                    </p>
-                  </button>
-                );
-              })}
-            </div>
+            <ResidentSlotRack
+              slots={slotViewModels}
+              variant="detail"
+              overflow={slotViewModels.length > 4 ? 'scroll' : 'wrap'}
+              onSlotDrop={handleSlotDrop}
+              onSlotClear={handleSlotClear}
+            />
           </div>
         )}
 
