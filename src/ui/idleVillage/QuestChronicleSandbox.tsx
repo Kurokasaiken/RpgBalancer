@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import QuestChronicle from '@/ui/idleVillage/components/QuestChronicle';
 import VerbCard from '@/ui/idleVillage/VerbCard';
+import CombatCardDetail from '@/ui/idleVillage/components/CombatCardDetail';
 import {
   applyPhaseResult,
   buildQuestChroniclePhases,
@@ -8,7 +9,7 @@ import {
   revertPhase,
 } from '@/ui/idleVillage/questChronicleHelpers';
 import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
-import type { QuestState, QuestPhase } from '@/balancing/config/idleVillage/types';
+import type { QuestState, QuestPhase, QuestPhaseResult } from '@/balancing/config/idleVillage/types';
 
 const VISUAL_VARIANT_BY_PHASE: Record<QuestPhase['type'], 'amethyst' | 'ember' | 'jade'> = {
   TRIAL: 'amethyst',
@@ -23,6 +24,21 @@ const QuestChronicleSandbox = () => {
   const [questState, setQuestState] = useState<QuestState | null>(() =>
     questBlueprint ? createInitialQuestState(questBlueprint) : null,
   );
+
+  const [showCombatCard, setShowCombatCard] = useState(false);
+
+  const handleCombatComplete = useCallback((result: QuestPhaseResult) => {
+    if (!questBlueprint || !questState) return;
+    const newState = applyPhaseResult({ state: questState, blueprint: questBlueprint, result: result.result });
+    setQuestState(newState);
+    setShowCombatCard(false);
+  }, [questBlueprint, questState]);
+
+  const handleCombatStart = useCallback(async (): Promise<'success' | 'failure'> => {
+    // Simulate combat logic - for now, random outcome
+    await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate combat time
+    return Math.random() > 0.3 ? 'success' : 'failure'; // 70% success rate
+  }, []);
 
   useEffect(() => {
     if (!questBlueprint) {
@@ -109,8 +125,12 @@ const QuestChronicleSandbox = () => {
             phases={chronicle.phases}
             currentPhaseIndex={chronicle.activeIndex}
             onOpenTheater={() => {
-              const message = activePhase ? `Apri il Teatro per ${activePhase.label}` : 'Apre Teatro (mock)';
-              console.info(message);
+              if (activePhase?.type === 'COMBAT') {
+                setShowCombatCard(true);
+              } else {
+                const message = activePhase ? `Apri il Teatro per ${activePhase.label}` : 'Apre Teatro (mock)';
+                console.info(message);
+              }
             }}
           />
           <div className="flex flex-1 flex-col gap-4">
@@ -219,6 +239,16 @@ const QuestChronicleSandbox = () => {
           </div>
         </div>
       </section>
+
+      {showCombatCard && activePhase && (
+        <CombatCardDetail
+          questLabel={questBlueprint.label}
+          phase={activePhase}
+          onStartCombat={handleCombatStart}
+          onCombatComplete={handleCombatComplete}
+          onClose={() => setShowCombatCard(false)}
+        />
+      )}
     </div>
   );
 };

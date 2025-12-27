@@ -1,12 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { X, Play } from 'lucide-react';
 import type { ActivityDefinition, ResourceDeltaDefinition } from '@/balancing/config/idleVillage/types';
-import type { VerbDetailPreview, VerbSlotState } from '@/ui/idleVillage/VerbDetailCard';
-import type { DropState } from './ActivitySlot';
+import type { VerbDetailPreview } from '@/ui/idleVillage/VerbDetailCard';
 import { useThemeSwitcher } from '@/hooks/useThemeSwitcher';
 import ResidentSlotRack, { type ResidentSlotRackProps } from '@/ui/idleVillage/slots/ResidentSlotRack';
-import type { ResidentSlotViewModel } from '@/ui/idleVillage/slots/useResidentSlotController';
-import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
+import type { ResidentSlotViewModel, SlotOverflowPolicy } from '@/ui/idleVillage/slots/useResidentSlotController';
 
 export type MetricTone = 'neutral' | 'positive' | 'warning' | 'danger';
 
@@ -23,20 +21,11 @@ export interface ActivityCardMetric {
   helperText?: string;
 }
 
-export interface ActivityCardSlotAssignment {
-  /** Slot metadata derived from config. */
-  slot: VerbSlotState;
-  /** Friendly resident label (already formatted). */
-  residentName?: string | null;
-  /** Drop validation state while dragging. */
-  dropState?: DropState;
-}
-
 export interface ActivityCardDetailProps {
   activity: ActivityDefinition;
   slotLabel?: string;
   preview: VerbDetailPreview;
-  assignments: ActivityCardSlotAssignment[];
+  slotViewModels: ResidentSlotViewModel[];
   rewards?: ResourceDeltaDefinition[];
   metrics?: ActivityCardMetric[];
   durationSeconds?: number;
@@ -45,6 +34,8 @@ export interface ActivityCardDetailProps {
   onClose?: () => void;
   onDropResident?: (slotId: string, residentId: string | null) => void;
   onRemoveResident?: (slotId: string) => void;
+  slotOverflowMode?: SlotOverflowPolicy;
+  resolveSlotDisplayInfo?: ResidentSlotRackProps['resolveDisplayInfo'];
   isStartDisabled?: boolean;
   draggingResidentId?: string | null;
 }
@@ -70,21 +61,6 @@ const mapStatLabelToIcon = (label?: string | null): string => {
   if (normalized.includes('agi') || normalized.includes('spd')) return '➶';
   if (normalized.includes('mag') || normalized.includes('mana')) return '✷';
   return label.trim().charAt(0) || '☆';
-};
-
-const getSlotBadgeContent = (slot: { statHint?: string | null; requirementLabel?: string | null; requirement?: VerbSlotState['requirement'] }) => {
-  const statLabel = slot.statHint ?? slot.requirementLabel ?? slot.requirement?.label ?? 'Stat';
-  return {
-    text: '+10',
-    icon: mapStatLabelToIcon(statLabel),
-  };
-};
-
-const getInitials = (label?: string | null): string => {
-  if (!label) return '+';
-  const words = label.trim().split(/\s+/);
-  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
-  return (words[0][0] + words[words.length - 1][0]).toUpperCase();
 };
 
 const DRAG_EXEMPT_TAGS = new Set(['BUTTON', 'A', 'INPUT', 'TEXTAREA', 'SELECT', 'LABEL']);
@@ -113,7 +89,7 @@ const ActivityCardDetail: React.FC<ActivityCardDetailProps> = ({
   activity,
   slotLabel,
   preview,
-  assignments,
+  slotViewModels,
   rewards = [],
   metrics = [],
   durationSeconds,
@@ -122,6 +98,8 @@ const ActivityCardDetail: React.FC<ActivityCardDetailProps> = ({
   onClose,
   onDropResident,
   onRemoveResident,
+  slotOverflowMode,
+  resolveSlotDisplayInfo,
   isStartDisabled = false,
   draggingResidentId,
 }) => {
@@ -133,9 +111,8 @@ const ActivityCardDetail: React.FC<ActivityCardDetailProps> = ({
   const riskDeath = clampPercent(preview.deathPercentage);
   const riskInjuryOnly = Math.max(0, clampPercent(preview.injuryPercentage) - riskDeath);
   const riskTooltip = `Injury ${clampPercent(preview.injuryPercentage)}% · Death ${riskDeath}%`;
-  const hasInfiniteSlots = activity.maxSlots === 'infinite';
-  const hasSlotOverflow = assignments.length > 4;
-  const slotOverflowMode = hasSlotOverflow ? 'scroll' : 'wrap';
+  const hasSlotOverflow = slotViewModels.length > 4;
+  const resolvedSlotOverflow = slotOverflowMode ?? (hasSlotOverflow ? 'scroll' : 'wrap');
   const resolvedDurationSeconds =
     Number.isFinite(durationSeconds ?? NaN) && (durationSeconds ?? 0) > 0 ? (durationSeconds as number) : 0;
   const elapsed = Math.max(0, elapsedSeconds ?? 0);
@@ -228,48 +205,20 @@ const ActivityCardDetail: React.FC<ActivityCardDetailProps> = ({
     }
   };
 
-  const slotViewModels = useMemo<ResidentSlotViewModel[]>(
-    () =>
-      assignments.map((assignment, index) => ({
-        id: assignment.slot.id ?? `detail-slot-${index}`,
-        index,
-        label: assignment.slot.label ?? `Slot ${index + 1}`,
-        statHint: assignment.slot.statHint,
-        required: assignment.slot.required,
-        assignedResidentId: assignment.slot.assignedResidentId ?? null,
-        assignedResident: assignment.residentName
-          ? ({
-              id: assignment.slot.assignedResidentId ?? `resident-${index}`,
-              displayName: assignment.residentName,
-              status: 'available',
-              fatigue: 0,
-              currentHp: 0,
-              maxHp: 0,
-              statTags: [],
-              statSnapshot: {},
-              isHero: false,
-              isInjured: false,
-              survivalCount: 0,
-              survivalScore: 0,
-            } as ResidentState)
-          : undefined,
-        requirement: assignment.slot.requirement,
-        modifiers: undefined,
-        isPlaceholder: assignment.slot.assignedResidentId == null,
-        dropState: assignment.dropState ?? 'idle',
-      })),
-    [assignments],
-  );
-
   const assignmentTitle = slotLabel ?? activity.label;
-  
+
   const resolveDisplayInfo = useCallback<NonNullable<ResidentSlotRackProps['resolveDisplayInfo']>>(
-    (slot) => ({
-      icon: getSlotBadgeContent(slot).icon,
-      label: slot.label,
-    }),
+    (slot) => {
+      const statLabel = slot.statHint ?? slot.requirement?.label ?? 'Stat';
+      return {
+        icon: mapStatLabelToIcon(statLabel),
+        label: slot.label,
+      };
+    },
     [],
   );
+
+  const slotDisplayResolver = resolveSlotDisplayInfo ?? resolveDisplayInfo;
 
   return (
     <div
@@ -331,10 +280,11 @@ const ActivityCardDetail: React.FC<ActivityCardDetailProps> = ({
                 <ResidentSlotRack
                   slots={slotViewModels}
                   variant="detail"
-                  overflow={slotOverflowMode}
+                  overflow={resolvedSlotOverflow}
                   onSlotDrop={handleRackDrop}
                   onSlotClear={handleRackClear}
-                  resolveDisplayInfo={resolveDisplayInfo}
+                  resolveDisplayInfo={slotDisplayResolver}
+                  draggingResidentId={draggingResidentId}
                 />
                 {metrics.length > 0 && (
                   <div className="grid gap-1.5 sm:grid-cols-2">

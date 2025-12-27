@@ -82,6 +82,21 @@ export interface ActivitySlotModifier {
 export type ActivitySlotModifierMap = Record<number, ActivitySlotModifier>;
 
 /**
+ * Configurable fatigue costs for an activity.
+ */
+export interface ActivityFatigueProfile {
+  /**
+   * Base fatigue gain applied to each resident when the activity completes.
+   */
+  baseGain?: number;
+  /**
+   * Optional fatigue gain applied per time unit to support very long jobs.
+   * (Reserved for future use; currently unused by the engine.)
+   */
+  perTimeUnitGain?: number;
+}
+
+/**
  * Declarative definition of jobs, quests, trainings, purchases, etc.
  */
 export interface ActivityDefinition {
@@ -142,6 +157,11 @@ export interface ActivityDefinition {
    */
   allowedDifficultyCategoryIds?: string[];
   allowedRewardCategoryIds?: string[];
+
+  /**
+   * Config-driven fatigue profile that overrides the global default values.
+   */
+  fatigueProfile?: ActivityFatigueProfile;
 
   /** Open extension point for domain-specific data */
   metadata?: Record<string, unknown>;
@@ -410,6 +430,10 @@ export interface TrialOfFireRules {
 export interface GlobalRules {
   // Fatigue / exhaustion
   maxFatigueBeforeExhausted: number;
+  /**
+   * Fallback fatigue gain applied to activities that do not define their own profile.
+   */
+  defaultActivityFatigueGain: number;
   /**
    * Initial fatigue applied to residents when they are seeded into a new run.
    * This value is clamped between 0 and maxFatigueBeforeExhausted.

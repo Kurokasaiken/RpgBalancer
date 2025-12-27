@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { MapSlotDefinition } from '@/balancing/config/idleVillage/types';
 import type { VerbSummary } from '@/ui/idleVillage/verbSummaries';
+import { RESIDENT_DRAG_MIME } from '@/ui/idleVillage/constants';
 
 export interface MapLocationSlotProps {
   slot: MapSlotDefinition;
@@ -14,6 +15,9 @@ export interface MapLocationSlotProps {
   canAcceptDrop: boolean;
   onSelect: (slotId: string) => void;
   onDropResident: (slotId: string, residentId: string | null) => void;
+  onSelectVerb?: (slotId: string, verb: VerbSummary | null) => void;
+  onHoverIntent?: (slotId: string) => void;
+  onHoverLeave?: () => void;
 }
 
 const MapLocationSlot: React.FC<MapLocationSlotProps> = ({
@@ -28,6 +32,9 @@ const MapLocationSlot: React.FC<MapLocationSlotProps> = ({
   canAcceptDrop,
   onSelect,
   onDropResident,
+  onSelectVerb,
+  onHoverIntent,
+  onHoverLeave,
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
 
@@ -39,7 +46,7 @@ const MapLocationSlot: React.FC<MapLocationSlotProps> = ({
   const handleDragOver = (event: React.DragEvent<HTMLButtonElement>) => {
     if (!isDropMode) return;
     event.preventDefault();
-    event.dataTransfer.dropEffect = 'none';
+    event.dataTransfer.dropEffect = canAcceptDrop ? 'copy' : 'none';
     if (!isDragOver) {
       setIsDragOver(true);
     }
@@ -56,12 +63,19 @@ const MapLocationSlot: React.FC<MapLocationSlotProps> = ({
   const handleDrop = (event: React.DragEvent<HTMLButtonElement>) => {
     if (!isDropMode) return;
     event.preventDefault();
-    event.dataTransfer.dropEffect = 'none';
+    event.dataTransfer.dropEffect = canAcceptDrop ? 'copy' : 'none';
     setIsDragOver(false);
+    if (!canAcceptDrop) {
+      return;
+    }
+    const residentId =
+      event.dataTransfer.getData(RESIDENT_DRAG_MIME) || event.dataTransfer.getData('text/plain') || null;
+    onDropResident(slot.id, residentId);
   };
 
   const handleSelect = () => {
     onSelect(slot.id);
+    onSelectVerb?.(slot.id, verbs[0] ?? null);
   };
 
   return (
@@ -87,6 +101,8 @@ const MapLocationSlot: React.FC<MapLocationSlotProps> = ({
           ].join(' ')}
           style={{ backgroundColor: crestColor }}
           onClick={handleSelect}
+          onMouseEnter={() => onHoverIntent?.(slot.id)}
+          onMouseLeave={onHoverLeave}
           onDragOver={handleDragOver}
           onDragEnter={handleDragOver}
           onDragLeave={handleDragLeave}

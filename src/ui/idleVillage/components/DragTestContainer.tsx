@@ -17,6 +17,8 @@ interface DragTestContainerProps {
   onDragStateChange?: (residentId: string, isDragging: boolean) => void;
   onCountsChange?: (counts: { filtered: number; total: number }) => void;
   onResidentSelect?: (residentId: string) => void;
+  /** When false (night phase), disable all resident dragging */
+  isDayPhase?: boolean;
 }
 
 const DragTestContainer = ({
@@ -26,6 +28,7 @@ const DragTestContainer = ({
   onDragStateChange,
   onCountsChange,
   onResidentSelect,
+  isDayPhase = true,
 }: DragTestContainerProps) => {
   const [draggingResidentId, setDraggingResidentId] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterOptions>({
@@ -84,9 +87,10 @@ const DragTestContainer = ({
 
   /**
    * Determines if the resident can currently be assigned/dragged.
+   * Returns false during night phase (isDayPhase === false).
    */
   const isResidentInteractive = (resident: ResidentState): boolean =>
-    !resident.isInjured && resident.status === 'available';
+    isDayPhase && !resident.isInjured && resident.status === 'available';
 
   const formatThreshold = (label: string, value: number, unit: '%' | '') => (
     <label className="flex flex-col gap-1 text-[10px] uppercase tracking-[0.25em] text-slate-300">

@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import type { MapSlotDefinition } from '@/balancing/config/idleVillage/types';
 import type { VerbSummary } from '@/ui/idleVillage/verbSummaries';
 import VerbCard, { type DropState } from '@/ui/idleVillage/VerbCard';
+import { RESIDENT_DRAG_MIME } from '@/ui/idleVillage/constants';
 
 export interface MapSlotVerbClusterProps {
   slot: MapSlotDefinition;
@@ -16,6 +17,7 @@ export interface MapSlotVerbClusterProps {
   isSelected: boolean;
   onDropResident: (slotId: string, residentId: string | null) => void;
   onSelectSlot: (slotId: string) => void;
+  onSelectVerb?: (slotId: string, verb: VerbSummary) => void;
 }
 
 const MapSlotVerbCluster: React.FC<MapSlotVerbClusterProps> = ({
@@ -31,6 +33,7 @@ const MapSlotVerbCluster: React.FC<MapSlotVerbClusterProps> = ({
   isSelected,
   onDropResident,
   onSelectSlot,
+  onSelectVerb,
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
 
@@ -46,6 +49,9 @@ const MapSlotVerbCluster: React.FC<MapSlotVerbClusterProps> = ({
     if (!isDragOver) {
       setIsDragOver(true);
     }
+    if (!isSelected) {
+      onSelectSlot(slot.id);
+    }
   };
 
   const handleDragLeave = () => {
@@ -57,14 +63,18 @@ const MapSlotVerbCluster: React.FC<MapSlotVerbClusterProps> = ({
     if (!isDropMode) return;
     event.preventDefault();
     setIsDragOver(false);
-    const residentId = event.dataTransfer.getData('text/resident-id') || event.dataTransfer.getData('text/plain') || null;
+    const residentId =
+      event.dataTransfer.getData(RESIDENT_DRAG_MIME) || event.dataTransfer.getData('text/plain') || null;
     if (canAcceptDrop) {
       onDropResident(slot.id, residentId);
     }
   };
 
-  const handleSelect = () => {
+  const handleSelect = (verb?: VerbSummary) => {
     onSelectSlot(slot.id);
+    if (verb) {
+      onSelectVerb?.(slot.id, verb);
+    }
   };
 
   return (
@@ -90,7 +100,7 @@ const MapSlotVerbCluster: React.FC<MapSlotVerbClusterProps> = ({
           <button
             type="button"
             className="rounded-full border border-slate-600/60 bg-slate-900/60 px-4 py-2 text-xs uppercase tracking-[0.3em] text-slate-200"
-            onClick={handleSelect}
+            onClick={() => handleSelect()}
           >
             {slot.label}
           </button>
@@ -108,7 +118,7 @@ const MapSlotVerbCluster: React.FC<MapSlotVerbClusterProps> = ({
               totalSlots={verb.totalSlots}
               dropState={dropState}
               isInteractive
-              onClick={handleSelect}
+              onClick={() => handleSelect(verb)}
               className="w-32"
               visualVariant={verb.visualVariant}
               progressStyle={verb.progressStyle}

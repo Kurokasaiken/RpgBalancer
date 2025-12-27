@@ -64,6 +64,13 @@ Per stile visivo, palette e coerenza con il tema **Gilded Observatory**, vedere 
 
 ### 12.1 – Time & Activity Engine
 
+**Implementation status (2025-12-27): _Parziale_**
+
+- ✅ `tickIdleVillage`, `advanceTime`, `resolveJob/Quest`, `applyFatigueInjuryForActivity` funzionano e vengono usati da `IdleVillageMapPage`.
+- ⚠️ `advanceTime` applica ancora un `fatigueGain = 10` hardcoded al termine di ogni attività: serve spostare il valore nei metadata attività/config.
+- ⚠️ Il loop di ticking è ancora gestito dalla UI (`IdleVillageMapPage`, `VillageSandbox`) invece che da un servizio condiviso (`SandboxEngine`).
+- ⚠️ La Trial of Fire è implementata in `resolveActivityOutcome`, ma il Village Sandbox non invoca ancora quell’API (usa uno scheduler locale).
+
 **Obiettivo:** modellare un sistema di **tempo globale** e una coda di **attività programmate**.
 
 - **Snapshot implementazione (2025-12-26):**
@@ -91,6 +98,12 @@ Per stile visivo, palette e coerenza con il tema **Gilded Observatory**, vedere 
 
 ### 12.2 – Characters & Roster Integration
 
+**Implementation status: _Parziale_**
+
+- ✅ Import residenti da Character Manager tramite `loadResidentsFromCharacterManager`; fallback founder in VillageSandbox.
+- ⚠️ Mancano recruitment flow, housing cap e costi cibo in UI.
+- ⚠️ Nessuna visualizzazione assegnamenti casa/status oltre agli stati base.
+
 **Obiettivo:** integrare il meta-gioco dell'Idle Incremental RPG (villaggio) con il sistema di personaggi esistente.
 
 - **Domain:**
@@ -104,6 +117,12 @@ Per stile visivo, palette e coerenza con il tema **Gilded Observatory**, vedere 
   - Ogni personaggio aumenta il **costo di mantenimento in cibo**.
 
 ### 12.3 – Jobs & Worker Placement
+
+**Implementation status: _Parziale_**
+
+- ✅ Jobs configurati in `defaultConfig.ts` (slot, duration, reward, stat requirement).
+- ⚠️ `resolveJob` applica solo reward deterministici; non usa slot modifiers, stat scaling, fatigue config-driven.
+- ⚠️ Worker placement UI (IdleVillageMapPage, VillageSandbox) non condivide ancora controller unico né applica crew limit/fatica dinamica ovunque.
 
 **Obiettivo:** definire un sistema jobs config-driven e un modellino di worker placement.
 
@@ -125,6 +144,12 @@ Per stile visivo, palette e coerenza con il tema **Gilded Observatory**, vedere 
     - applica fatica e piccoli rischi (molto sotto rispetto alle quest).
 
 ### 12.4 – Quest System (Dispatch-Style)
+
+**Implementation status: _Parziale_**
+
+- ✅ Config quest + spawn loop (`spawnQuestOffersIfNeeded`) presenti.
+- ⚠️ Mancano calcolo `EffectivePower`, distribuzione outcome multipla, categorie variance dinamiche (oggi si usa la prima categoria hardcoded).
+- ⚠️ Nessun bridge con idle combat engine; la UI mostra risk basati su metadata statici.
 
 **Obiettivo:** sistema di quest che valuta il match tra **party** e **requisiti** con esiti multipli.
 
@@ -151,6 +176,11 @@ Per stile visivo, palette e coerenza con il tema **Gilded Observatory**, vedere 
 
 ### 12.5 – Combat Integration (Idle Autobattler)
 
+**Implementation status: _Da implementare_**
+
+- ⛔ Nessun adapter che costruisce party/nemici e lancia l’idle combat loop.
+- ⛔ `resolveQuest` non legge outcome del combat engine.
+
 **Obiettivo:** risolvere le quest combat usando il combat engine idle.
 
 - Per quest con tag `combat`:
@@ -162,6 +192,13 @@ Per stile visivo, palette e coerenza con il tema **Gilded Observatory**, vedere 
   - Risultato combat sovrascrive/setta un outcome minimo della quest: una sconfitta non può mai diventare `success`, una vittoria non può essere `deadly`.
 
 ### 12.6 – Injury & Death System
+
+**Implementation status: _Parziale_**
+
+- ✅ Trial of Fire + heroization, HP recovery, auto-resched esistono in `TimeEngine`.
+- ⚠️ Livelli di injury (light/moderate/severe) e malus non sono ancora definiti in config/UI.
+- ⚠️ I residenti feriti possono ancora lavorare ma senza bonus/malus di building dedicati.
+- ⚠️ Risk stripes della UI usano metadata statici.
 
 **Obiettivo:** definire injury & death coerenti con il tema high risk/high reward.
 
@@ -182,6 +219,12 @@ Per stile visivo, palette e coerenza con il tema **Gilded Observatory**, vedere 
 
 ### 12.7 – Village Map & Expansion
 
+**Implementation status: _Parziale_**
+
+- ✅ IdleVillageMapPage v0.1 proietta `mapSlots` e permette editing nel tab Activities.
+- ⚠️ VillageSandbox non mostra ancora map medaglioni/density né mini ActivityCard su mappa.
+- ⚠️ Non esistono upgrade/espansioni giocabili: config definisce slot ma non c’è loop per sbloccarli.
+
 **Obiettivo:** rappresentare il villaggio su una mappa compatta e supportare una prima forma di espansione.
 
 - **Mappa iniziale:**
@@ -197,6 +240,12 @@ Per stile visivo, palette e coerenza con il tema **Gilded Observatory**, vedere 
 
 ### 12.8 – Economy, Food & Maintenance
 
+**Implementation status: _Parziale_**
+
+- ✅ Food resource e consumo giornaliero in `advanceTime`.
+- ⚠️ Nessuna penalità/malus per fame oltre a riduzione risorse.
+- ⚠️ Mancano sistemi materiali/upgrade/costi maintenance nella UI e loop.
+
 **Obiettivo:** introdurre un'economia semplice ma significativa.
 
 - **Risorse primarie V1:**
@@ -210,6 +259,13 @@ Per stile visivo, palette e coerenza con il tema **Gilded Observatory**, vedere 
     - ma non necessariamente morte immediata (configurabile).
 
 ### 12.9 – UI/UX – Village Meta Screen
+
+**Implementation status: _Parziale_**
+
+- ✅ IdleVillagePage legacy e nuova `VillageSandbox` mostrano roster, ActivityCard, Theater overlay stub.
+- ⚠️ Tick/resolve loop duplicato nella UI; manca `SandboxEngine`.
+- ⚠️ Risk stripes, drag/drop MIME unificato, density/bloom, card minimap non completati (richiesti dalle sotto-sezioni 12.9.b e plan resident slots).
+- ⚠️ The Active HUD non legge ancora i veri output engine (solo stub).
 
 **Obiettivo:** creare una schermata principale per il meta-gioco in stile Gilded Observatory.
 
@@ -226,9 +282,9 @@ Per stile visivo, palette e coerenza con il tema **Gilded Observatory**, vedere 
   - Tema Gilded Observatory (palette, tipografia, densità compatta).
   - Nessuna logica di bilanciamento o formule dentro i componenti React.
 
-#### 12.9.a – Implementazione v0.1 (IdleVillagePage)
+#### 12.9.a – Implementazione legacy v0.1 (IdleVillagePage)
 
-Per la vertical slice v0.1 è già presente una **UI prototipale** in `src/ui/idleVillage/IdleVillagePage.tsx` con le seguenti caratteristiche:
+Per la vertical slice v0.1 è già presente una **UI prototipale legacy** in `src/ui/idleVillage/IdleVillagePage.tsx`. Rimane nel repo come riferimento storico, ma tutte le nuove superfici devono puntare al `VillageSandbox` e ai relativi ActivitySlot/ActivityCard. Caratteristiche attuali (legacy):
 
 - **Mappa + mapSlots:**
   - I `mapSlots` definiti in `IdleVillageConfig` vengono proiettati sopra un background mappa tramite coordinate logiche (griglia 0–10, convertite in percentuali con margini 8/12/80/55).
@@ -240,7 +296,7 @@ Per la vertical slice v0.1 è già presente una **UI prototipale** in `src/ui/id
 
 - **Pannello "Jobs & Quests in progress":**
   - Reso collassabile tramite un'icona Occhio (riuso di `DefaultSection.actions`).
-  - Ogni attività attiva (`ScheduledActivity`) è mostrata come **verb card** (`VerbCard`) con:
+  - Ogni attività attiva (`ScheduledActivity`) è mostrata come **ActivityCard** (`ActivityCardDetail` / `ActivitySlot` pipeline) con:
     - label attività;
     - tipo (Job / Quest / Activity);
     - residenti assegnati;
@@ -252,14 +308,14 @@ Per la vertical slice v0.1 è già presente una **UI prototipale** in `src/ui/id
   - Un job di tipo Market (config-first) apre un semplice modal per scambiare gold ↔ food usando una funzione pura `MarketEngine.buyFoodWithGold`.
   - Le risorse iniziali vengono lette da `globalRules.startingResources` e le risorse con valore 0 non vengono mostrate in UI.
 
-**TODO UI per fasi successive:**
+**TODO UI per fasi successive (Village Sandbox):**
 
-- Estendere il componente `VerbCard` e il verb system per supportare:
+- Estendere il sistema ActivityCard/ActivitySlot per supportare:
   - stati `idle/completed`;
   - azione esplicita di "Collect" output;
-  - verbs speciali dedicati (Time, Injury, Market avanzato).
-- Reintrodurre la mappa usando **VerbCard** compatte al posto dei token statici: ogni slot della mappa deve mostrare jobs, quest e verb di manutenzione (food upkeep, injury ward, ecc.) come card config-driven, con le stesse visual del nuovo componente (timer, risk stripes, assignee badge). La sezione di riepilogo globale in alto a destra deve ridursi a una singola riga in stile "stat row" del Balancer, mostrando solo i count chiave (jobs, quest, upkeep, eventi critici).
-- Introdurre training job visibile come verb dedicato.
+  - attività speciali dedicate (Time, Injury, Market avanzato) modellate come ActivityCard configurabili.
+- Reintrodurre la mappa usando **ActivityCard** compatte al posto dei token statici: ogni slot della mappa deve mostrare jobs, quest e attività di manutenzione (food upkeep, injury ward, ecc.) come card config-driven, con le stesse visual del nuovo componente (timer, risk stripes, assignee badge). La sezione di riepilogo globale in alto a destra deve ridursi a una singola riga in stile "stat row" del Balancer, mostrando solo i count chiave (jobs, quest, upkeep, eventi critici).
+- Introdurre training job visibile come ActivityCard dedicata.
 - Introdurre una prima visualizzazione/spawn loop di quest attorno al villaggio coerente con i `mapSlots`.
 
 #### 12.9.b – Resident Slot Expansion & Theater Parity
@@ -269,6 +325,11 @@ Per la vertical slice v0.1 è già presente una **UI prototipale** in `src/ui/id
 - Deliverable chiave: `ResidentSlotController`, `ResidentSlotRack`, aggiornamento di TheaterView/VerbDetailCard/ActivityCardDetail per usare questi componenti, supporto scrollabile quando gli slot superano la larghezza disponibile.
 
 ### 12.10 – Testing & Simulation Strategy
+
+**Implementation status: _Da implementare_**
+
+- ⛔ Nessuna suite dedicata (`tests/idleVillage/*` assente).
+- ⛔ Mancano test unit per `advanceTime`, `resolveJob/Quest`, Trial of Fire e simulazioni multi-run.
 
 **Obiettivo:** garantire che il nuovo loop sia verificabile e non rompa i sistemi esistenti.
 

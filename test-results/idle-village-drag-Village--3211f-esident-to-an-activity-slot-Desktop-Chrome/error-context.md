@@ -1,0 +1,206 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e4]:
+    - complementary [ref=e5]:
+      - generic [ref=e7]:
+        - navigation [ref=e8]:
+          - generic [ref=e9]:
+            - paragraph [ref=e10]: Core
+            - generic [ref=e11]:
+              - button "⚖️ Balancer" [ref=e12]:
+                - generic [ref=e13]: ⚖️
+                - generic [ref=e14]: Balancer
+              - button "📊 Stat Testing" [ref=e15]:
+                - generic [ref=e16]: 📊
+                - generic [ref=e17]: Stat Testing
+              - button "✨ Spell Creation" [ref=e18]:
+                - generic [ref=e19]: ✨
+                - generic [ref=e20]: Spell Creation
+          - generic [ref=e21]:
+            - paragraph [ref=e22]: Content
+            - generic [ref=e23]:
+              - button "🖼️ Moodboard" [ref=e24]:
+                - generic [ref=e25]: 🖼️
+                - generic [ref=e26]: Moodboard
+              - button "📚 Spell Library" [ref=e27]:
+                - generic [ref=e28]: 📚
+                - generic [ref=e29]: Spell Library
+              - button "✨ Spell Creation" [ref=e30]:
+                - generic [ref=e31]: ✨
+                - generic [ref=e32]: Spell Creation
+              - button "⚔️ Combat Viewer" [ref=e33]:
+                - generic [ref=e34]: ⚔️
+                - generic [ref=e35]: Combat Viewer
+              - button "🏘️ Idle Village" [ref=e36]:
+                - generic [ref=e37]: 🏘️
+                - generic [ref=e38]: Idle Village
+              - button "🎯 Skill Check" [ref=e39]:
+                - generic [ref=e40]: 🎯
+                - generic [ref=e41]: Skill Check
+              - button "👤 Character Creator" [ref=e42]:
+                - generic [ref=e43]: 👤
+                - generic [ref=e44]: Character Creator
+              - button "🗂️ Roster" [ref=e45]:
+                - generic [ref=e46]: 🗂️
+                - generic [ref=e47]: Roster
+              - button "⚔️ Grid Arena" [ref=e48]:
+                - generic [ref=e49]: ⚔️
+                - generic [ref=e50]: Grid Arena
+              - button "🏰 Idle Arena" [ref=e51]:
+                - generic [ref=e52]: 🏰
+                - generic [ref=e53]: Idle Arena
+              - button "🧪 Testing Lab" [ref=e54]:
+                - generic [ref=e55]: 🧪
+                - generic [ref=e56]: Testing Lab
+          - generic [ref=e57]:
+            - paragraph [ref=e58]: Idle Village
+            - generic [ref=e59]:
+              - button "⚙️ Village Config" [ref=e60]:
+                - generic [ref=e61]: ⚙️
+                - generic [ref=e62]: Village Config
+              - button "🏗️ Village Sandbox" [ref=e63]:
+                - generic [ref=e64]: 🏗️
+                - generic [ref=e65]: Village Sandbox
+              - button "📜 Quest Chronicle" [ref=e66]:
+                - generic [ref=e67]: 📜
+                - generic [ref=e68]: Quest Chronicle
+              - button "📝 Verb Detail" [ref=e69]:
+                - generic [ref=e70]: 📝
+                - generic [ref=e71]: Verb Detail
+          - generic [ref=e72]:
+            - paragraph [ref=e73]: Archetypes
+            - generic [ref=e74]:
+              - button "🎭 Archetypes" [ref=e75]:
+                - generic [ref=e76]: 🎭
+                - generic [ref=e77]: Archetypes
+              - button "🗺️ War Room" [ref=e78]:
+                - generic [ref=e79]: 🗺️
+                - generic [ref=e80]: War Room
+              - button "⚔️ 1v1 Archetypes" [ref=e81]:
+                - generic [ref=e82]: ⚔️
+                - generic [ref=e83]: 1v1 Archetypes
+              - button "🏗️ Archetype Builder" [ref=e84]:
+                - generic [ref=e85]: 🏗️
+                - generic [ref=e86]: Archetype Builder
+              - button "✦ Archetype Forge" [ref=e87]:
+                - generic [ref=e88]: ✦
+                - generic [ref=e89]: Archetype Forge
+              - button "⚙️ Auto-Balancer" [ref=e90]:
+                - generic [ref=e91]: ⚙️
+                - generic [ref=e92]: Auto-Balancer
+          - generic [ref=e93]:
+            - paragraph [ref=e94]: System
+            - button "🎯 Tactical Lab" [ref=e96]:
+              - generic [ref=e97]: 🎯
+              - generic [ref=e98]: Tactical Lab
+        - generic [ref=e99]:
+          - paragraph [ref=e100]: Navigator Tips
+          - paragraph [ref=e101]: Usa SPACE per mettere in pausa o riprendere il ciclo del Villaggio.
+    - main [ref=e102]:
+      - generic [ref=e106]:
+        - generic [ref=e108]:
+          - generic [ref=e109]:
+            - paragraph [ref=e110]: Style Laboratory
+            - paragraph [ref=e111]: Epic Frontier · Basalto e bronzo con bagliori cobalto per l’estetica Epic Frontier.
+          - generic [ref=e112]:
+            - button "Epic Frontier" [ref=e113]
+            - button "Frontier" [ref=e114]
+            - button "Obsidian" [ref=e115]
+            - button "Ethereal" [ref=e116]
+            - button "Vellum Light" [ref=e117]
+            - button "Randomize" [ref=e118]
+        - generic [ref=e119]:
+          - generic [ref=e120]:
+            - paragraph [ref=e121]: Village Sandbox
+            - paragraph [ref=e122]: Trascina i lavoratori negli slot attività per vedere le barre reagire e il cerchio Halo evidenziare il drop.
+          - button "Reset Page" [ref=e123]:
+            - generic [ref=e124]: ☽
+            - text: Reset Page
+        - generic [ref=e125]:
+          - generic [ref=e126]:
+            - generic [ref=e128]:
+              - generic [ref=e129]:
+                - generic [ref=e130]:
+                  - generic [ref=e131]: Roster
+                  - generic [ref=e132]: 1/1
+                - generic [ref=e133]:
+                  - generic [ref=e134]:
+                    - generic [ref=e135]: Stat
+                    - combobox "Filtra residenti per status" [ref=e136]:
+                      - option "All" [selected]
+                      - option "Available"
+                      - option "Away"
+                      - option "Exhausted"
+                      - option "Injured"
+                      - option "Fallen"
+                  - button "Nascondi roster" [ref=e137]:
+                    - img [ref=e138]
+              - generic [ref=e144]:
+                - generic [ref=e145]: F
+                - generic [ref=e146]:
+                  - generic [ref=e147]:
+                    - generic [ref=e148]: Founder
+                    - generic [ref=e149]: Available
+                  - generic [ref=e150]:
+                    - generic [ref=e151]: HP
+                    - generic [ref=e154]: 100/100
+                  - generic [ref=e155]:
+                    - generic [ref=e156]: F
+                    - generic [ref=e159]: 100%
+            - generic [ref=e161]:
+              - generic [ref=e162]:
+                - generic [ref=e163]: Resources
+                - generic [ref=e164]: Eco Pulse
+              - generic [ref=e165]:
+                - generic [ref=e166]:
+                  - paragraph [ref=e167]: Food
+                  - paragraph [ref=e168]: "2"
+                - generic [ref=e169]:
+                  - paragraph [ref=e170]: Wood
+                  - paragraph [ref=e171]: "0"
+                - generic [ref=e172]:
+                  - paragraph [ref=e173]: Stone
+                  - paragraph [ref=e174]: "0"
+          - generic [ref=e175]:
+            - heading "Attività" [level=2] [ref=e176]
+            - generic [ref=e178]:
+              - generic [ref=e179]:
+                - 'button "Ready. Unassigned. Duration: 10:00" [ref=e181] [cursor=pointer]':
+                  - generic [ref=e186]:
+                    - generic [ref=e187]: ⏸️
+                    - generic [ref=e188]: 10:00
+                  - generic [ref=e189]: Unassigned. Duration 10:00.
+                - 'button "Ready. Unassigned. Duration: 2:00" [ref=e191] [cursor=pointer]':
+                  - generic [ref=e196]:
+                    - generic [ref=e197]: 🧩
+                    - generic [ref=e198]: 2:00
+                  - generic [ref=e199]: Unassigned. Duration 2:00.
+                - 'button "Ready. Unassigned. Duration: 4:00" [ref=e201] [cursor=pointer]':
+                  - generic [ref=e206]:
+                    - generic [ref=e207]: 🔥
+                    - generic [ref=e208]: 4:00
+                  - generic [ref=e209]: Unassigned. Duration 4:00.
+                - 'button "Ready. Unassigned. Duration: 2:00" [ref=e211] [cursor=pointer]':
+                  - generic [ref=e216]:
+                    - generic [ref=e217]: ★
+                    - generic [ref=e218]: 2:00
+                  - generic [ref=e219]: Unassigned. Duration 2:00.
+                - 'button "Ready. Unassigned. Duration: 3:00" [ref=e221] [cursor=pointer]':
+                  - generic [ref=e226]:
+                    - generic [ref=e227]: ⚔️
+                    - generic [ref=e228]: 3:00
+                  - generic [ref=e229]: Unassigned. Duration 3:00.
+              - generic [ref=e230]:
+                - generic [ref=e231]: Luogo attivo
+                - button "Foresta · Raccolta Bacche" [ref=e232]:
+                  - generic:
+                    - generic:
+                      - img
+                      - generic: Foresta · Raccolta Bacche – Trascina un lavoratore per avviare la spedizione e apri la vista panoramica per controllare più VerbCard.
+                - generic [ref=e233]:
+                  - heading "Active Activities" [level=3] [ref=e234]
+                  - generic [ref=e235]: Nessuna attività in corso
+  - region "Notifications alt+T"
+```

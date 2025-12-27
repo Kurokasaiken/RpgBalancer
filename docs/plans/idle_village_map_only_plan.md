@@ -30,10 +30,10 @@ Il sistema gestisce la densità informativa tramite **Rivelazione Progressiva**:
 
 | Livello | Componente | Scopo | Visualizzazione |
 | --- | --- | --- | --- |
-| 0 | GlobalMap Page | Navigazione e ciclo giorno/notte | Mappa con icone distanziate |
-| 1 | MarkerMapSlot (chiuso) | Alert e urgenza | Unico halo colorato (priorità alla scadenza più vicina) |
-| 2 | ContextTheater View | Gestione del luogo | Panorama 21:9 + fila orizzontale di VerbCard (medaglioni) |
-| 3 | FocusVerb Detail (Dossier) | Micro-management | Card esplosa con slot, requisiti e Risk Stripe dettagliata |
+| 0 | GlobalMap Page | Navigazione e ciclo giorno/notte | Mappa con ActivitySlot mini-card distribuite |
+| 1 | MapSlotActivityCluster (chiuso) | Alert e urgenza | Unico halo colorato (priorità alla scadenza più vicina) |
+| 2 | ContextTheater View | Gestione del luogo | Panorama 21:9 + fila orizzontale di ActivityCard medaglioni |
+| 3 | FocusActivity Detail (Dossier) | Micro-management | ActivityCardDetail esplosa con slot, requisiti e Risk Stripe dettagliata |
 
 ## 4. Meccaniche Core: Specifiche Tecniche
 
@@ -98,9 +98,9 @@ Questa sezione consolida i piani precedenti: quando emergono conflitti, prevalgo
 - Le estensioni di `ResidentState`, `ScheduledActivity` e le regole Trial of Fire/auto-loop sono recepite integralmente: `survivalCount`, `isHero`, `snapshotDeathRisk`, `isAuto`, curve `calculateSurvivalBonus`, auto-scheduling con check fatica @docs/plans/idle_village_trial_of_fire_plan.md#26-167.
 - RosterSidebar + TheaterView sono gli shell principali per visualizzare hero halos, filtri `[Tutti, Eroi, Carne da Macello, Feriti]` e CTA di raccolta/auto-loop.
 
-### 6.5 VerbCard, Map Editor e Map Rebuild
+### 6.5 ActivityCard, Map Editor e Map Rebuild
 
-- Il refactor VerbCard garantisce single source of truth (`VerbSummary`, `MapSlotVerbCluster`, HUD compatto) e resta la pipeline dati per qualsiasi visualizzazione @docs/plans/idle_village_verbcard_refactor_plan.md#8-135.
+- Il refactor ActivityCard garantisce single source of truth (`ScheduledActivitySummary`, `MapSlotActivityCluster`, HUD compatto) e resta la pipeline dati per qualsiasi visualizzazione @docs/plans/village_sandbox_activitycard_refactor_plan.md#8-135.
 - Il Map Editor plan rimane la guida per editing layout/tag direttamente dal tab Activities, assicurando pixel-normalized coordinates e validazioni condivise @docs/plans/idle_village_map_editor_plan.md#1-83.
 - Il Map Rebuild plan (map-only shell) viene superato dal Theater/Bloom focus; tuttavia, i guard-rail “config-first” e “nessuna logica HUD duplicata” restano validi come baseline per refactoring @docs/plans/idle_village_map_rebuild_plan.md#1-62.
 

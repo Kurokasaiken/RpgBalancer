@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useCallback } from 'react';
+import { useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import type { ActivityDefinition, ResourceDeltaDefinition } from '@/balancing/config/idleVillage/types';
 import {
   createVillageStateFromConfig,
@@ -11,15 +11,9 @@ import {
 import { useVillageStateStore } from '@/ui/idleVillage/useVillageStateStore';
 import { loadResidentsFromCharacterManager } from '@/engine/game/idleVillage/characterImport';
 import LocationCard from '@/ui/idleVillage/components/LocationCard';
-import ActivitySlotCard, {
-  type ActivitySlotCardProps,
-  type DropState,
-  type VerbVisualVariant,
-} from '@/ui/idleVillage/components/ActivitySlot';
-import ActivityCardDetail, {
-  type ActivityCardMetric,
-  type ActivityCardSlotAssignment,
-} from '@/ui/idleVillage/components/ActivityCardDetail';
+import ActivitySlotCard, { type ActivitySlotCardProps, type DropState } from '@/ui/idleVillage/components/ActivitySlot';
+import ActivityCardDetail, { type ActivityCardMetric } from '@/ui/idleVillage/components/ActivityCardDetail';
+import QuestDetailPanel from '@/ui/idleVillage/components/QuestDetailPanel';
 import ResidentRoster from '@/ui/idleVillage/ResidentRosterDnd';
 import DragTestContainer from '@/ui/idleVillage/components/DragTestContainer';
 import ResidentDetailCard from '@/ui/idleVillage/components/ResidentDetailCard';
@@ -30,6 +24,7 @@ import { formatResidentLabel } from '@/ui/idleVillage/residentName';
 import { useThemeSwitcher } from '@/hooks/useThemeSwitcher';
 import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
 import type { VerbSummary } from '@/ui/idleVillage/verbSummaries';
+import type { VerbVisualVariant } from '@/ui/idleVillage/VerbCard';
 import {
   DEFAULT_SECONDS_PER_TIME_UNIT,
   deriveRisk,
@@ -57,6 +52,7 @@ interface DetailContext {
   slotId: string;
   slot: ActivitySlotData;
   activity: ActivityDefinition;
+  summary?: VerbSummary | null;
 }
 
 type ActivitySchedulerBridge = {
@@ -100,6 +96,8 @@ const deriveAssignmentsForActivity = (
     return acc;
   }, {});
 };
+
+const isQuestActivity = (activity: ActivityDefinition) => activity.tags?.includes('quest') ?? false;
 
 const DetailPanelCard: React.FC<DetailPanelCardProps> = ({
   slotId,
@@ -158,22 +156,6 @@ const DetailPanelCard: React.FC<DetailPanelCardProps> = ({
 
   const slotProgress = controller.getSlotProgress(slotId);
 
-  const assignments = useMemo<ActivityCardSlotAssignment[]>(() => {
-    return controller.slots.map((slotModel) => ({
-      slot: {
-        id: slotModel.id,
-        label: slotModel.label,
-        statHint: slotModel.statHint,
-        requirement: slotModel.requirement,
-        requirementLabel: slotModel.requirement?.label ?? activity.statRequirement?.label,
-        required: slotModel.required,
-        assignedResidentId: slotModel.assignedResidentId,
-      },
-      residentName: slotModel.assignedResident ? formatResidentLabel(slotModel.assignedResident) : null,
-      dropState: slotModel.dropState,
-    }));
-  }, [controller.slots, activity.statRequirement]);
-
   const handleDropResident = useCallback(
     (targetSlotId: string, residentId: string | null) => {
       onWorkerDrop(extractActivityIdFromSlot(targetSlotId), residentId, { autoStart: false });
@@ -201,7 +183,7 @@ const DetailPanelCard: React.FC<DetailPanelCardProps> = ({
         injuryPercentage: risk.injury,
         deathPercentage: risk.death,
       }}
-      assignments={assignments}
+      slotViewModels={controller.slots}
       rewards={activity.rewards ?? []}
       metrics={metrics}
       durationSeconds={durationSeconds}
@@ -222,6 +204,53 @@ const deriveVerbTone = (activity: ActivityDefinition): SandboxVerbTone => {
   if (activity.tags?.includes('danger')) return 'danger';
   if (activity.tags?.includes('system')) return 'system';
   return 'neutral';
+};
+
+const buildSandboxQuestSummary = (params: {
+  slot: ActivitySlotData;
+  activity: ActivityDefinition;
+  assignedName: string | null;
+  progressFraction: number;
+  elapsedSeconds: number;
+  totalDurationSeconds: number;
+}): VerbSummary => {
+  const { slot, activity, assignedName, progressFraction, elapsedSeconds, totalDurationSeconds } = params;
+  const tone = deriveVerbTone(activity);
+  const injuryPercentage = Math.min(100, (activity.dangerRating ?? 1) * 15);
+  const deathPercentage = Math.round(injuryPercentage / 2);
+  const remainingSeconds = Math.max(0, totalDurationSeconds - elapsedSeconds);
+
+  return {
+    key: `sandbox_quest_${slot.slotId}`,
+    source: 'system',
+    activityId: activity.id,
+    slotId: slot.slotId,
+    label: activity.label ?? slot.slotId,
+    kindLabel: tone === 'quest' ? 'Quest' : tone === 'danger' ? 'Encounter' : 'Activity',
+    isQuest: tone === 'quest',
+    isJob: tone === 'job',
+    icon: slot.iconName,
+    visualVariant: slot.visualVariant,
+    progressStyle: 'halo',
+    progressFraction,
+    elapsedSeconds,
+    totalDurationSeconds,
+    remainingSeconds,
+    injuryPercentage,
+    deathPercentage,
+    assignedCount: slot.assignedWorkerId ? 1 : 0,
+    totalSlots:
+      typeof activity.maxSlots === 'number'
+        ? activity.maxSlots
+        : activity.maxSlots === 'infinite'
+          ? 4
+          : 1,
+    rewardLabel: formatRewardLabel(activity),
+    tone,
+    deadlineLabel: null,
+    assigneeNames: assignedName ? [assignedName] : [],
+    autoState: null,
+  };
 };
 
 const formatRewardLabel = (activity: ActivityDefinition): string | null => {
@@ -266,6 +295,7 @@ const VillageSandboxContent = () => {
   const [isTheaterOpen, setIsTheaterOpen] = useState(false);
   const [theaterSlotId, setTheaterSlotId] = useState<string | null>(null);
   const [theaterPreviewIds, setTheaterPreviewIds] = useState<string[]>([]);
+  const [theaterCloseTimeout, setTheaterCloseTimeout] = useState<NodeJS.Timeout | null>(null);
   const [rosterCounts, setRosterCounts] = useState<{ filtered: number; total: number }>({ filtered: 0, total: 0 });
   const [isCyclePlaying, setIsCyclePlaying] = useState(false);
   const [selectedResidentId, setSelectedResidentId] = useState<string | null>(null);
@@ -351,10 +381,27 @@ const VillageSandboxContent = () => {
     // This can be used for additional UI updates
   }, []);
 
-  // Initialize activity scheduler
+  // Pre-calculate day/night phase from villageState for scheduler initialization
+  const secondsPerTimeUnit = config.globalRules.secondsPerTimeUnit ?? DEFAULT_SECONDS_PER_TIME_UNIT;
+  const dayLengthSetting = config.globalRules.dayLengthInTimeUnits || 5;
+  const dayNightSettings = config.globalRules.dayNightCycle ?? {
+    dayTimeUnits: dayLengthSetting,
+    nightTimeUnits: dayLengthSetting,
+  };
+  const dayTimeUnits = Math.max(1, dayNightSettings.dayTimeUnits ?? dayLengthSetting);
+  const nightTimeUnits = Math.max(1, dayNightSettings.nightTimeUnits ?? dayLengthSetting);
+  const totalCycleUnits = dayTimeUnits + nightTimeUnits;
+
+  // Compute preliminary phase from villageState (before scheduler)
+  const preliminaryCurrentTimeUnits = villageState.currentTime ?? 0;
+  const preliminaryCycleUnit = totalCycleUnits > 0 ? preliminaryCurrentTimeUnits % totalCycleUnits : 0;
+  const preliminaryIsDayPhase = preliminaryCycleUnit < dayTimeUnits;
+
+  // Initialize activity scheduler with preliminary phase
   const activityScheduler = useActivityScheduler({
     config,
     initialVillageState: villageState,
+    isDayPhase: preliminaryIsDayPhase,
     onActivityComplete: handleActivityComplete,
     onResourcesChange: handleResourcesChange,
     onResidentStateChange: handleResidentStateChange,
@@ -367,6 +414,17 @@ const VillageSandboxContent = () => {
     const sorted = [...activities].sort((a, b) => (a.label ?? a.id).localeCompare(b.label ?? b.id));
     return sorted.slice(0, 3);
   }, [activities]);
+  const questShowcaseActivity = useMemo<ActivityDefinition | null>(() => {
+    return activities.find((activity) => activity.tags?.includes('quest')) ?? null;
+  }, [activities]);
+  const managedActivities = useMemo<ActivityDefinition[]>(() => {
+    const map = new Map<string, ActivityDefinition>();
+    showcaseActivities.forEach((activity) => map.set(activity.id, activity));
+    if (questShowcaseActivity) {
+      map.set(questShowcaseActivity.id, questShowcaseActivity);
+    }
+    return Array.from(map.values());
+  }, [showcaseActivities, questShowcaseActivity]);
   const residents = useMemo<ResidentState[]>(() => {
     const source = sandboxState.residents ?? {};
     const entries = Object.values(source).filter((resident) => resident.status !== 'dead');
@@ -393,15 +451,8 @@ const VillageSandboxContent = () => {
     () => residents.find((resident) => resident.id === selectedResidentId) ?? null,
     [residents, selectedResidentId],
   );
-  const secondsPerTimeUnit = config.globalRules.secondsPerTimeUnit ?? DEFAULT_SECONDS_PER_TIME_UNIT;
-  const dayLengthSetting = config.globalRules.dayLengthInTimeUnits || 5;
-  const dayNightSettings = config.globalRules.dayNightCycle ?? {
-    dayTimeUnits: dayLengthSetting,
-    nightTimeUnits: dayLengthSetting,
-  };
-  const dayTimeUnits = Math.max(1, dayNightSettings.dayTimeUnits ?? dayLengthSetting);
-  const nightTimeUnits = Math.max(1, dayNightSettings.nightTimeUnits ?? dayLengthSetting);
-  const totalCycleUnits = dayTimeUnits + nightTimeUnits;
+
+  // Day/night cycle calculations using latest sandboxState
   const currentTimeUnits = sandboxState.currentTime ?? 0;
   const currentCycleUnit = totalCycleUnits > 0 ? currentTimeUnits % totalCycleUnits : 0;
   const cycleProgressFraction = totalCycleUnits > 0 ? currentCycleUnit / totalCycleUnits : 0;
@@ -467,7 +518,7 @@ const VillageSandboxContent = () => {
     setSlotAssignments((prev) => {
       let changed = false;
       const next: Record<string, string | null> = { ...prev };
-      showcaseActivities.forEach((activity) => {
+      managedActivities.forEach((activity) => {
         const primarySlotId = getPrimarySlotId(activity.id);
         if (next[primarySlotId] === undefined) {
           next[primarySlotId] = prev[activity.id] ?? null;
@@ -483,7 +534,7 @@ const VillageSandboxContent = () => {
       });
       return changed ? next : prev;
     });
-  }, [showcaseActivities]);
+  }, [managedActivities]);
 
   const slots = useMemo<ActivitySlotData[]>(() => {
     const dayNightSlot: ActivitySlotData = {
@@ -504,10 +555,11 @@ const VillageSandboxContent = () => {
       },
       visualVariant: cycleVariant,
     };
-    const activitySlots = showcaseActivities.map((activity) => {
+    const activitySlots = managedActivities.map((activity) => {
       const meta = (activity.metadata ?? {}) as { icon?: string; mapSlotId?: string } | undefined;
       const mapSlot = meta?.mapSlotId ? config.mapSlots?.[meta.mapSlotId] : undefined;
-      const derivedIcon = meta?.icon ?? mapSlot?.icon ?? '☆';
+      const derivedIcon =
+        activity.id === questShowcaseActivity?.id ? '⚔️' : meta?.icon ?? mapSlot?.icon ?? '☆';
       return {
         slotId: activity.id,
         label: activity.label ?? activity.id,
@@ -520,7 +572,8 @@ const VillageSandboxContent = () => {
     });
     return [dayNightSlot, ...activitySlots];
   }, [
-    showcaseActivities,
+    managedActivities,
+    questShowcaseActivity?.id,
     slotAssignments,
     config.mapSlots,
     cyclePhaseLabel,
@@ -660,15 +713,16 @@ const VillageSandboxContent = () => {
   );
 
 
-  const resolveWorkerName = (residentId: string | null) => {
-    if (!residentId) return null;
-    const resident = sandboxState.residents?.[residentId];
-    return resident ? formatResidentLabel(resident) : residentId;
-  };
+  const resolveWorkerName = useCallback(
+    (residentId: string | null) => {
+      if (!residentId) return null;
+      const resident = sandboxState.residents?.[residentId];
+      return resident ? formatResidentLabel(resident) : residentId;
+    },
+    [sandboxState.residents],
+  );
 
-  const residentsById = useMemo(() => {
-    return sandboxState.residents ?? {};
-  }, [sandboxState.residents]);
+  const residentsById = useMemo(() => sandboxState.residents ?? {}, [sandboxState.residents]);
 
   const slotDropStates = useMemo<Record<string, DropState>>(() => {
     if (!draggingResidentId) return {};
@@ -678,52 +732,57 @@ const VillageSandboxContent = () => {
     }, {});
   }, [draggingResidentId, slots, activityScheduler]);
 
-  const locationDropState: DropState = useMemo(() => {
-    if (!draggingResidentId) return 'idle';
-    const anyValid = Object.values(slotDropStates).some((state) => state === 'valid');
-    return anyValid ? 'valid' : 'invalid';
-  }, [draggingResidentId, slotDropStates]);
-
-  const canSlotAcceptDrop = useCallback(
-    (slotId: string): boolean => {
-      if (!draggingResidentId) return false;
-      return activityScheduler.canAssignResident(draggingResidentId, slotId);
-    },
-    [draggingResidentId, activityScheduler]
-  );
-
-
   const detailContexts = useMemo<DetailContext[]>(() => {
+    if (detailPanelSlotIds.length === 0) return [];
+
     return detailPanelSlotIds
-      .map((slotId) => {
-        const selectedSlot = slots.find((slot) => slot.slotId === slotId);
+      .map((panelSlotId) => {
+        const selectedSlot = slots.find((slot) => slot.slotId === panelSlotId);
         if (!selectedSlot) return null;
-        const activity = config.activities?.[extractActivityIdFromSlot(slotId)] ?? config.activities?.[slotId];
+
+        const activity =
+          config.activities?.[extractActivityIdFromSlot(panelSlotId)] ?? config.activities?.[panelSlotId];
         if (!activity) return null;
 
-        return {
-          slotId,
+        const assignedName = resolveWorkerName(selectedSlot.assignedWorkerId);
+        const activityState =
+          selectedSlot.assignedWorkerId != null
+            ? activityScheduler.getActivityState(selectedSlot.slotId, selectedSlot.assignedWorkerId)
+            : null;
+        const progressFraction = activityState?.progress ?? 0;
+        const elapsedSeconds = activityState?.elapsed ?? 0;
+        const totalDurationSeconds =
+          activityState?.duration ??
+          Math.max(1, Math.round(evaluateActivityDuration(activity) * secondsPerTimeUnit));
+
+        const summary = isQuestActivity(activity)
+          ? buildSandboxQuestSummary({
+            slot: selectedSlot,
+            activity,
+            assignedName,
+            progressFraction,
+            elapsedSeconds,
+            totalDurationSeconds,
+          })
+          : null;
+
+        const context: DetailContext = {
+          slotId: panelSlotId,
           slot: selectedSlot,
           activity,
+          summary,
         };
+        return context;
       })
       .filter((context): context is DetailContext => context !== null);
-  }, [detailPanelSlotIds, slots, config.activities]);
-
-  const handleResidentDragStart = useCallback(
-    (residentId: string) => (event: React.DragEvent<HTMLElement>) => {
-      event.dataTransfer.setData('text/resident-id', residentId);
-      event.dataTransfer.setData('text/plain', residentId);
-      event.dataTransfer.effectAllowed = 'copy';
-      setActiveId(residentId);
-      setAssignmentFeedback(null);
-    },
-    [],
-  );
-
-  const handleResidentDragEnd = useCallback(() => {
-    setActiveId(null);
-  }, []);
+  }, [
+    detailPanelSlotIds,
+    slots,
+    config.activities,
+    activityScheduler,
+    secondsPerTimeUnit,
+    resolveWorkerName,
+  ]);
 
   const theaterVerbs = useMemo<VerbSummary[]>(() => {
     return theaterPreviewSlots.map((slot) => {
@@ -766,6 +825,14 @@ const VillageSandboxContent = () => {
       };
     });
   }, [theaterPreviewSlots, resolveWorkerName]);
+
+  const canSlotAcceptDrop = useCallback(
+    (slotId: string): boolean => {
+      if (!draggingResidentId) return false;
+      return activityScheduler.canAssignResident(draggingResidentId, slotId);
+    },
+    [draggingResidentId, activityScheduler]
+  );
 
   const theaterSlotCards = useMemo<ActivitySlotCardProps[]>(() => {
     return theaterPreviewSlots.map((slot) => {
@@ -820,6 +887,13 @@ const VillageSandboxContent = () => {
       setSelectedResidentId(null);
     }
   }, [residents, selectedResidentId]);
+
+  useEffect(() => {
+    if (!isDayPhase && isTheaterOpen) {
+      handleCloseTheater();
+      setAssignmentFeedback('Notte in corso. Riposo.');
+    }
+  }, [isDayPhase, isTheaterOpen, handleCloseTheater]);
 
   const styleLabStatRows = useMemo(
     () => [
@@ -933,6 +1007,8 @@ const VillageSandboxContent = () => {
 
   const openTheaterWithSlotIds = useCallback(
     (slotIds: string[]) => {
+      if (!isDayPhase) return;
+
       const previewSlots = slotIds
         .map((id) => slots.find((slot) => slot.slotId === id) ?? null)
         .filter((slot): slot is ActivitySlotData => {
@@ -944,7 +1020,7 @@ const VillageSandboxContent = () => {
       setTheaterPreviewIds(previewSlots.map((slot) => slot.slotId));
       setIsTheaterOpen(true);
     },
-    [slots],
+    [slots, isDayPhase],
   );
 
   const openTheaterForSlot = useCallback(
@@ -956,17 +1032,6 @@ const VillageSandboxContent = () => {
     [selectTheaterPreviewIds, openTheaterWithSlotIds],
   );
 
-  const handleLocationResidentDrop = useCallback(
-    (residentId: string) => {
-      const targetSlotId = findAcceptingSlotId(residentId);
-      if (!targetSlotId) {
-        setAssignmentFeedback('Nessuna attività compatibile in questo luogo.');
-        return;
-      }
-      openTheaterForSlot(targetSlotId);
-    },
-    [findAcceptingSlotId, openTheaterForSlot],
-  );
 
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
@@ -984,14 +1049,96 @@ const VillageSandboxContent = () => {
     openTheaterWithSlotIds(locationSlotIds);
   }, [locationSlotIds, openTheaterWithSlotIds]);
 
+  const detailOpenTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleSlotResidentDragEnter = useCallback(
+    (slotId: string, residentId: string | null) => {
+      // If a detail panel is already open for this slot, do nothing
+      if (detailPanelSlotIds.includes(slotId)) return;
+
+      // Start the open timer
+      if (detailOpenTimerRef.current) clearTimeout(detailOpenTimerRef.current);
+      detailOpenTimerRef.current = setTimeout(() => {
+        openDetailPanel(slotId);
+        detailOpenTimerRef.current = null;
+      }, 600); // 600ms hover threshold
+    },
+    [detailPanelSlotIds, openDetailPanel],
+  );
+
+  const handleSlotResidentDragLeave = useCallback(() => {
+    // Cancel any pending open timer
+    if (detailOpenTimerRef.current) {
+      clearTimeout(detailOpenTimerRef.current);
+      detailOpenTimerRef.current = null;
+    }
+  }, []);
+
+  const theaterOpenTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   const handleLocationDragIntent = useCallback(
     (residentId: string | null) => {
-      console.log('handleLocationDragIntent called with residentId:', residentId, 'locationSlotIds:', locationSlotIds);
-      if (!residentId || locationSlotIds.length === 0) return;
-      // Always open TheaterView when dragging over location, even if already open
-      openTheaterWithSlotIds(locationSlotIds);
+      // Intent logging or other side effects can remain immediate if needed
+      // console.log('handleLocationDragIntent called with residentId:', residentId, 'locationSlotIds:', locationSlotIds);
     },
-    [locationSlotIds, openTheaterWithSlotIds],
+    [],
+  );
+
+  const handleLocationResidentDragEnter = useCallback(
+    (residentId: string | null) => {
+      if (!residentId || locationSlotIds.length === 0) return;
+
+      // Clear any pending close timer to prevent flickering
+      if (theaterCloseTimeout) {
+        clearTimeout(theaterCloseTimeout);
+        setTheaterCloseTimeout(null);
+      }
+
+      // If already open, do nothing
+      if (isTheaterOpen) return;
+
+      // Start the open timer
+      if (theaterOpenTimerRef.current) clearTimeout(theaterOpenTimerRef.current);
+      theaterOpenTimerRef.current = setTimeout(() => {
+        setIsTheaterOpen(true);
+        openTheaterWithSlotIds(locationSlotIds);
+        theaterOpenTimerRef.current = null;
+      }, 600); // 600ms hover threshold
+    },
+    [theaterCloseTimeout, isTheaterOpen, locationSlotIds, openTheaterWithSlotIds],
+  );
+
+  const handleLocationResidentDragLeave = useCallback(() => {
+    // Cancel any pending open timer
+    if (theaterOpenTimerRef.current) {
+      clearTimeout(theaterOpenTimerRef.current);
+      theaterOpenTimerRef.current = null;
+    }
+
+    // Resume standard close behavior
+    if (theaterCloseTimeout) clearTimeout(theaterCloseTimeout);
+    setTheaterCloseTimeout(setTimeout(() => setIsTheaterOpen(false), 200));
+  }, [theaterCloseTimeout]);
+
+  const handleLocationResidentDrop = useCallback(
+    (residentId: string) => {
+      // Cancel any pending open timer immediately
+      if (theaterOpenTimerRef.current) {
+        clearTimeout(theaterOpenTimerRef.current);
+        theaterOpenTimerRef.current = null;
+      }
+
+      const targetSlotId = findAcceptingSlotId(residentId);
+      if (!targetSlotId) {
+        setAssignmentFeedback('Nessuna attività compatibile in questo luogo.');
+        setIsTheaterOpen(false);
+        return;
+      }
+      // Assign to the slot
+      handleWorkerDrop(targetSlotId, residentId);
+      setIsTheaterOpen(false);
+    },
+    [findAcceptingSlotId, handleWorkerDrop, setIsTheaterOpen],
   );
 
   const handleResetSandboxState = useCallback(() => {
@@ -1006,6 +1153,13 @@ const VillageSandboxContent = () => {
     setTheaterSlotId(null);
     setTheaterPreviewIds([]);
   }, [config, resetState, activityScheduler]);
+
+  const locationDropState: DropState = useMemo(() => {
+    if (!draggingResidentId) return 'idle';
+    return locationSlotIds.some((id) => activityScheduler.canAssignResident(draggingResidentId, id))
+      ? 'valid'
+      : 'invalid';
+  }, [draggingResidentId, locationSlotIds, activityScheduler]);
 
   return (
     <div className="mx-auto max-w-5xl space-y-10 p-6 text-ivory">
@@ -1115,6 +1269,7 @@ const VillageSandboxContent = () => {
               setActiveId(isDragging ? residentId : null);
             }}
             onResidentSelect={handleResidentSelect}
+            isDayPhase={isDayPhase}
           />
 
           {assignmentFeedback && (
@@ -1162,7 +1317,10 @@ const VillageSandboxContent = () => {
                       : null;
                   const progressFraction = isDayNightCard ? cycleProgressFraction : activityState?.progress ?? 0;
                   const elapsedSeconds = isDayNightCard ? cycleElapsedSeconds : activityState?.elapsed ?? 0;
-                  const totalDuration = isDayNightCard ? totalCycleSeconds : activityState?.duration ?? 90;
+                  const activityDuration = (!isDayNightCard && slot.activity)
+                    ? Math.round(evaluateActivityDuration(slot.activity) * secondsPerTimeUnit)
+                    : 90;
+                  const totalDuration = isDayNightCard ? totalCycleSeconds : activityState?.duration ?? activityDuration;
                   const slotDropState: DropState =
                     isDayNightCard || draggingResidentId == null
                       ? 'idle'
@@ -1184,7 +1342,7 @@ const VillageSandboxContent = () => {
                       canAcceptDrop={!isDayNightCard && canSlotAcceptDrop(slot.slotId)}
                       dropState={slotDropState}
                       onWorkerDrop={
-                        isDayNightCard ? () => {} : (workerId) => handleWorkerDrop(slot.slotId, workerId)
+                        isDayNightCard ? () => { } : (workerId) => handleWorkerDrop(slot.slotId, workerId)
                       }
                       onInspect={isDayNightCard ? undefined : openDetailPanel}
                       onClick={isDayNightCard ? () => setIsCyclePlaying((prev) => !prev) : undefined}
@@ -1192,7 +1350,10 @@ const VillageSandboxContent = () => {
                       elapsedSeconds={elapsedSeconds}
                       totalDuration={totalDuration}
                       isInteractive={isDayNightCard ? true : !isDayNightCard}
-                      visualVariant={isDayNightCard ? cycleVariant : 'azure'}
+                      visualVariant={isDayNightCard ? cycleVariant : (slot.visualVariant ?? 'azure')}
+                      isLockedByPhase={!isDayPhase && !isDayNightCard}
+                      onResidentDragEnter={!isDayNightCard ? handleSlotResidentDragEnter : undefined}
+                      onResidentDragLeave={!isDayNightCard ? handleSlotResidentDragLeave : undefined}
                     />
                   );
                 })}
@@ -1212,10 +1373,11 @@ const VillageSandboxContent = () => {
                     </div>
                   }
                   onDragIntent={handleLocationDragIntent}
-                  onResidentDragEnter={handleLocationDragIntent}
-                  onResidentDragLeave={() => {}}
+                  onResidentDragEnter={handleLocationResidentDragEnter}
+                  onResidentDragLeave={handleLocationResidentDragLeave}
                   onResidentDrop={handleLocationResidentDrop}
                   dropState={locationDropState}
+                  isLockedByPhase={!isDayPhase}
                 />
                 <ActiveHUD
                   activeSlots={activeSlots}
@@ -1292,7 +1454,7 @@ const VillageSandboxContent = () => {
           }}
         />
       )}
-  </div>
+    </div>
   );
 };
 

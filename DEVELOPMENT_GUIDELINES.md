@@ -145,6 +145,26 @@ const effectiveHP = EHPCalculator.calculateEHP(defender.stats);
 
 ## 🧪 Validazione e Testing
 
+### Default Refactoring Workflow (obbligatorio per VillageSandbox e nuovi componenti)
+
+1. **Test prima di tutto:** prima di modificare il codice, scrivi o aggiorna test black-box (Playwright, React Testing Library, ecc.) che verificano il comportamento visibile/contratti del componente.
+2. **Lint guardrails:** se durante il refactor emergono problemi ripetitivi (stato inutilizzato, commenti zombie, ecc.), aggiungi o rafforza le regole di lint/CI che li intercettano automaticamente.
+3. **Pulizia e responsabilità chiare:** rimuovi codice morto, separa lo stato gonfio e sposta utility/fetch/hook fuori dal componente principale. Spezza il componente in unità più piccole o custom hook prima di aggiungere nuova logica.
+
+Nessun refactor può partire se questi tre passi non sono previsti nel piano di lavoro.
+
+### Standard Playwright per test UI
+
+Tutti i nuovi test UI devono:
+
+- Usare **locator semantici** (`getByRole`, `getByLabel`, `getByText` o `data-testid` solo se inevitabile) concentrandosi su cosa vede l’utente.
+- Eseguire ogni test in un **browser context isolato** (niente state sharing tra test). Se serve login, usare `test.beforeEach` o progetti di setup.
+- **Mockare le dipendenze esterne** con `page.route` per mantenere gli scenari deterministici e controllare le risposte di rete.
+- Usare **web-first assertions** (`await expect(locator).toBeVisible()`, `toHaveText`, `toHaveScreenshot`) invece di controlli manuali.
+- Salvare **trace/screenshot** (`--trace on`, `await expect(page).toHaveScreenshot()`) per investigare regressioni visive (HUD, drag/drop, animazioni).
+
+Cypress resta ammesso solo per suite legacy; ogni nuovo scenario Playwright deve seguire le regole sopra.
+
 ### Prima di Committare
 Ogni implementazione deve:
 

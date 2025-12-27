@@ -30,8 +30,9 @@ The application uses the **FantasyLayout** sidebar (desktop) and a compact botto
   - `Balancer` – primary config-first balancing UI.
   - `Stat Testing` – Monte Carlo dashboards for marginal utility & synergy heatmaps.
   - `Spell Creation` – fantasy-themed spell editor wrapper.
-- **Idle Village**
-  - `Idle Village`, `Idle Village Config`, `Verb Detail Sandbox`, `Skill Check Lab`.
+- **Village Sandbox**
+  - `Village Sandbox`, `Idle Village Config`, `Activity Detail Sandbox`, `Skill Check Lab`.  
+    _Legacy note:_ the old “Idle Village” page is retained only for historical reference; all new work must target the Village Sandbox components (ActivityCard, ActivitySlot, TheaterView, ActiveHUD).
   - Additional live tools: `Archetypes`, `War Room`, `1v1 Archetypes`, `Battlefield`, `Heroes`, `Builder`, `Grimoire`, `Roster`.
 - **Mockups**
   - Showcase spaces such as `Gilded Observatory`, `Obsidian Sanctum`, `Aurora Workshop`, `Arcane Tech Glass`, `Aether Brass Lab`, `Quantum Scriptorium`, `Midnight Meridian`, `Seraphim Archive`, `Verdant Alloy`.

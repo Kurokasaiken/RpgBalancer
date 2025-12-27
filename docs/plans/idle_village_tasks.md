@@ -1,10 +1,11 @@
 # Phase 12: Idle Incremental RPG – Task Checklist
 
+> **Village Sandbox terminology update (Dec 2025):** This checklist now targets the rebuilt **Village Sandbox** experience (formerly the Idle Village page). Use the ActivityCard/ActivityCardDetail + ActivitySlot naming used inside Village Sandbox; legacy VerbCard references are deprecated.  
 > Derived from `idle_village_plan.md`. Design changes → update the plan first.
 
 ---
 
-## 12.11 – Theater View & Trial of Fire
+## 12.11 – Theater View & Activity Cards
 
 > Implementation detail: `docs/plans/idle_village_trial_of_fire_plan.md`
 
@@ -13,8 +14,8 @@
 - [ ] Implement `calculateSurvivalBonus` + Trial of Fire resolution inside `tickIdleVillage`
 - [ ] Add auto-rescheduling logic for `isAuto` activities (respecting fatigue/slots)
 - [ ] Build `RosterSidebar` with filters (All/Available/Heroes/Injured) and draggable hero tokens
-- [ ] Create `TheaterView` container (panorama header + medallion VerbCards) scoped to `mapSlotId`
-- [ ] Update `VerbCard` to surface Auto infinity icon, hero borders, and “collection ready” halo
+- [ ] Create `TheaterView` container (panorama header + ActivityCard medallions) scoped to `mapSlotId`
+- [ ] Update ActivityCard visuals to surface Auto infinity icon, hero borders, and “collection ready” halo
 - [ ] Implement bloom expansion when dragging residents over closed slots to reveal TheaterView
 - [ ] Hook hero promotion + survival streak events to UI feedback (toasts/logs)
 - [ ] Add Vitest + Playwright coverage for Trial of Fire math, auto-loop scheduling, hero promotion, bloom UX
@@ -118,42 +119,40 @@
 
 - [ ] Add Vitest suites for Idle Village domain (time, jobs, quests, injury, economy)
 - [ ] Add simulation tests with JSON outputs for non-regression
-- [ ] Integrate Idle Village tests into existing `npm test` flows
+- [x] Integrate Idle Village tests into existing `npm test` flows
 - [ ] Verify no regressions on combat/archetypes/balancer suites
 
 ---
 
-## Idle Village VerbCard Refactor (UI Focus)
+## Village Sandbox ActivityCard Refactor (UI Focus)
 
-- [x] Align Idle Village UI with the new VerbCard system (`docs/plans/idle_village_verbcard_refactor_plan.md`)
+- [x] Align Village Sandbox UI with the ActivityCard system (`docs/plans/idle_village_verbcard_refactor_plan.md`)
 - [x] Implement `ScheduledVerbSummary` helper pipeline (variants, tone, risk, deadlines, timers)
-- [x] Introduce `MapSlotVerbCluster` to replace legacy `MapSlotMarker` on the map
-- [x] Render quest/job offers as VerbCards within map clusters, preserving dnd-kit drop states
+- [x] Introduce `MapSlotActivityCluster` to replace legacy `MapSlotMarker` on the map
+- [x] Render quest/job offers as ActivityCards within map clusters, preserving dnd-kit drop states
 - [ ] Replace the “Jobs & Quests in progress” panel with compact text-based summaries driven by scheduled verbs
-- [ ] Ensure hunger/injury/system verbs reuse the same summary data for consistency
+- [ ] Ensure hunger/injury/system activities reuse the same summary data for consistency
 - [ ] Update quest offer UI (map + HUD) with risk badges, tone colors, and Accept CTA
 - [ ] Add Vitest coverage for helper logic and Playwright smoke test for drag/drop + quest offer accept flows
 
-## Idle Village Map-Only Page (Verb System)
+## Village Sandbox Map-Only Page (Activity System)
 
 - [ ] Reference implementation plan: `docs/plans/idle_village_map_only_plan.md`
-- [ ] Wire shared time controls (play/pause/step) to `tickIdleVillage` so every VerbCard shares the same clock
-- [ ] Implement passive/system VerbCard selectors (hunger, upkeep) driven by config `globalRules`
+- [ ] Wire shared time controls (play/pause/step) to `tickIdleVillage` so every ActivityCard shares the same clock
+- [ ] Implement passive/system ActivityCard selectors (hunger, upkeep) driven by config `globalRules`
 - [ ] Ensure continuous jobs auto-reschedule per activity metadata (`continuousJob`, `supportsAutoRepeat`, `autoRepeatDelayUnits`)
 - [ ] Surface quest offer deadlines/expiry on the map-only page and auto-remove expired offers
 - [ ] Add filters/overlay controls for passive/jobs/quests visibility on the map-only page
 - [ ] Expand tests (Vitest + Playwright) to cover passive verbs, continuous jobs, and quest expiry flows on the new page
 
-## Idle Village Passive Effects Tab
+## Village Sandbox Passive Effects Tab
 
 - [ ] Create `src/balancing/config/idleVillage/passiveEffects.ts` with schema mirroring Jobs/Quests (id, label, description, icon, tone, slotId/slotTags, frequency formula, resource deltas, requirements, metadata)
 - [ ] Extend `IdleVillageConfig` types + Zod schemas to include `passiveEffects` collection
 - [ ] Build CRUD UI tab (Idle Village Config) for passive effects, reusing weight-based creator pattern
-- [ ] Expose hook/selectors that read passive effects and feed `buildSystemVerbSummary`
+- [ ] Expose hook/selectors that read passive effects and feed `buildSystemActivitySummary`
 - [ ] Ensure passive effects export/import via config snapshots and JSON editors
 - [ ] Add docs explaining passive config workflow (plan + README linkage)
-
----
 
 ## Phase 12.12: Trial of Fire & Theater View (Sistematico)
 
@@ -179,8 +178,8 @@
 - [ ] **UI wiring:** Aggiornare `IdleVillageGlobalRulesTab.tsx` per esporre i nuovi controlli con copy contestuale e parsing/clamp condiviso.
 - [ ] **Engine math:** Allineare `TimeEngine.ts` (`applyTrialOfFireStatBonus`, `resolveActivityOutcome`, `tickIdleVillage`) alla formula `Stat_new = Stat_old * (1 + risk × k)` + recovery config-driven.
 - [ ] **SandboxEngine:** Creare servizio/hook sotto `src/ui/idleVillage/engine/` che bootstrappa `createVillageStateFromConfig`, gestisce `tickIdleVillage`, e fornisce percentuali/testi al layer UI.
-- [ ] **UI harness:** Rifattorizzare `VillageSandbox.tsx`, `WorkerCard.tsx`, `ActivitySlot.tsx`, `VerbDetailCard` usage per leggere unicamente i dati derivati dal SandboxEngine (niente mock locali).
-- [ ] **Density & bloom:** Introdurre hook/componenti per clustering (VerbCard inline vs Medaglione), bloom compatibile solo quando il worker soddisfa requirement/fatica.
+- [ ] **UI harness:** Rifattorizzare `VillageSandbox.tsx`, `WorkerCard.tsx`, `ActivitySlot.tsx`, `ActivityCardDetail` usage per leggere unicamente i dati derivati dal SandboxEngine (niente mock locali).
+- [ ] **Density & bloom:** Introdurre hook/componenti per clustering (ActivityCard inline vs Medaglione), bloom compatibile solo quando il worker soddisfa requirement/fatica.
 - [ ] **DnD hardening:** Consolidare MIME (`RESIDENT_DRAG_MIME` → `text/resident-id`), rimuovere `pointer-events-none` superflui, auditare z-index tra mappa/Theater.
 - [ ] **Theater overlay:** Assicurare che il modal fisso filtri verbs per `slotId`, mostri bande rischio giallo/rosso e richiami i drop handler condivisi.
 - [ ] **Testing:** Aggiungere test Vitest (hero threshold, recovery, density) + Playwright scenario (drag compatibile → bloom → Theater → resolve reale).

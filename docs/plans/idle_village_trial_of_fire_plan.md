@@ -1,7 +1,7 @@
-# 🛡️ Master Plan: Idle Village - Trial of Fire & Theater View
+# 🛡️ Master Plan: Village Sandbox (Idle Village legacy) – Trial of Fire & Theater View
 
-**Status:** Draft · **Owner:** Idle Village pod · **Last Updated:** 2025-12-23  
-**Scope:** Engine extensions for survival/hero systems + new Theater/roster UI containers on `IdleVillageMapPage`.
+**Status:** Draft · **Owner:** Village Sandbox pod · **Last Updated:** 2025-12-23  
+**Scope:** Engine extensions for survival/hero systems + new Theater/roster UI containers on the canonical `VillageSandbox` (legacy `IdleVillagePage` kept solo per reference).
 
 ## 1. Visione del Gameplay
 

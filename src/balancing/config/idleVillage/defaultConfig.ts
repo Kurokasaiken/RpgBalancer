@@ -803,6 +803,7 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
   globalRules: {
     // These numbers are safe placeholders and should be tuned via config/UI.
     maxFatigueBeforeExhausted: 100,
+    defaultActivityFatigueGain: 10,
     startingResidentFatigue: 100,
     fatigueRecoveryPerDay: 50,
     dayLengthInTimeUnits: 5,

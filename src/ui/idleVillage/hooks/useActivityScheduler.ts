@@ -39,6 +39,8 @@ export interface ActivityResolutionResult {
 export interface UseActivitySchedulerProps {
   config: IdleVillageConfig;
   initialVillageState: VillageState;
+  /** When false, blocks new activity starts and resident assignments (night phase). */
+  isDayPhase?: boolean;
   onActivityComplete?: (result: ActivityResolutionResult) => void;
   onResourcesChange?: (resources: VillageResources, changes: ResourceDeltaDefinition[]) => void;
   onResidentStateChange?: (residentId: string, newState: Partial<VillageState['residents'][string]>) => void;
@@ -52,6 +54,7 @@ export interface UseActivitySchedulerProps {
 export const useActivityScheduler = ({
   config,
   initialVillageState,
+  isDayPhase = true,
   onActivityComplete,
   onResourcesChange,
   onResidentStateChange,
@@ -78,6 +81,12 @@ export const useActivityScheduler = ({
     residentId: string,
     duration?: number
   ) => {
+    // Block new activities during night phase
+    if (!isDayPhase) {
+      console.warn('Cannot start activity during night phase');
+      return false;
+    }
+
     const activity = config.activities[activityId];
     if (!activity) {
       console.error(`Activity ${activityId} not found`);
@@ -93,7 +102,7 @@ export const useActivityScheduler = ({
     // Check if resident is already working
     const isAlreadyWorking = Array.from(scheduledActivities.values())
       .some(scheduled => scheduled.residentId === residentId && scheduled.status === 'running');
-    
+
     if (isAlreadyWorking) {
       console.warn(`Resident ${residentId} is already working`);
       return false;
@@ -101,7 +110,7 @@ export const useActivityScheduler = ({
 
     const activityDuration = duration ?? (Number(activity.durationFormula) || 90);
     const scheduledId = `${activityId}_${residentId}_${Date.now()}`;
-    
+
     const newScheduled: ScheduledActivityState = {
       scheduledId,
       activityId,
@@ -114,13 +123,13 @@ export const useActivityScheduler = ({
     };
 
     setScheduledActivities(prev => new Map(prev).set(scheduledId, newScheduled));
-    
+
     // Update resident status to working
     const updatedResident = {
       ...resident,
       status: 'away' as const,
     };
-    
+
     setVillageState(prev => ({
       ...prev,
       residents: {
@@ -156,7 +165,7 @@ export const useActivityScheduler = ({
         ...resident,
         status: 'available' as const,
       };
-      
+
       setVillageState(prev => ({
         ...prev,
         residents: {
@@ -340,11 +349,17 @@ export const useActivityScheduler = ({
    * Check if a resident can be assigned to an activity.
    */
   const canAssignResident = useCallback((residentId: string, activityId: string) => {
-    console.log('canAssignResident check:', { residentId, activityId });
-    
+    console.log('canAssignResident check:', { residentId, activityId, isDayPhase });
+
+    // Block assignments during night phase
+    if (!isDayPhase) {
+      console.log('Cannot assign resident during night phase');
+      return false;
+    }
+
     const resident = villageState.residents[residentId];
     console.log('Resident found:', resident);
-    
+
     if (!resident) {
       console.log('Resident not found');
       return false;
@@ -359,7 +374,7 @@ export const useActivityScheduler = ({
     // Check if resident is already working
     const isAlreadyWorking = Array.from(scheduledActivities.values())
       .some(scheduled => scheduled.residentId === residentId && scheduled.status === 'running');
-    
+
     if (isAlreadyWorking) {
       console.log('Resident already working');
       return false;
@@ -368,7 +383,7 @@ export const useActivityScheduler = ({
     // Check activity requirements
     const activity = config.activities[activityId];
     console.log('Activity found:', activity);
-    
+
     if (!activity) {
       console.log('Activity not found');
       return false;
@@ -401,13 +416,13 @@ export const useActivityScheduler = ({
     scheduledActivities,
     globalTime,
     isRunning,
-    
+
     // Actions
     startActivity,
     cancelActivity,
     getActivityState,
     canAssignResident,
-    
+
     // Timer control
     pauseTimer,
     resumeTimer,

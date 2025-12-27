@@ -58,6 +58,8 @@ export interface LocationCardProps extends ButtonHTMLAttributes<HTMLButtonElemen
    * Optional featured activity preview rendered inside the card.
    */
   featuredActivity?: LocationFeaturedActivity | null;
+  /** When true, location is locked (night phase) - blocks interactions */
+  isLockedByPhase?: boolean;
 }
 
 /**
@@ -75,10 +77,12 @@ const LocationCard: React.FC<LocationCardProps> = ({
   dropState = 'idle',
   backgroundImageSrc,
   featuredActivity,
+  isLockedByPhase = false,
   onClick,
   ...buttonProps
 }) => {
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+    if (isLockedByPhase) return;
     onClick?.(event);
     onInspect?.();
   };
@@ -88,14 +92,15 @@ const LocationCard: React.FC<LocationCardProps> = ({
 
   const handleDragOver = (event: DragEvent<HTMLButtonElement>) => {
     event.preventDefault();
+    if (isLockedByPhase) return;
     const residentId = extractResidentId(event);
     console.log('LocationCard handleDragOver with residentId:', residentId);
     onDragIntent?.(residentId);
-    onResidentDragEnter?.(residentId);
   };
 
   const handleDragEnter = (event: DragEvent<HTMLButtonElement>) => {
     event.preventDefault();
+    if (isLockedByPhase) return;
     const residentId = extractResidentId(event);
     console.log('LocationCard handleDragEnter with residentId:', residentId);
     onDragIntent?.(residentId);
@@ -138,7 +143,7 @@ const LocationCard: React.FC<LocationCardProps> = ({
         dropState === 'valid'
           ? 'border-amber-300/80 shadow-[0_0_70px_rgba(236,197,94,0.45)] ring-4 ring-amber-200/50'
           : dropState === 'invalid'
-            ? 'border-white/20 opacity-40 pointer-events-none'
+            ? 'border-white/10 opacity-60'
             : 'border-[color:var(--panel-border)] shadow-[0_22px_55px_rgba(0,0,0,0.55)] hover:border-emerald-200/60',
       ]
         .filter(Boolean)
@@ -149,7 +154,7 @@ const LocationCard: React.FC<LocationCardProps> = ({
       aria-label={title}
       {...buttonProps}
     >
-      <div className="relative flex w-full flex-col rounded-[24px] bg-[radial-gradient(circle_at_25%_10%,rgba(88,142,122,0.25),rgba(2,4,6,0.92))] px-2 py-2 text-left text-ivory">
+      <div className="pointer-events-none relative flex w-full flex-col rounded-[24px] bg-[radial-gradient(circle_at_25%_10%,rgba(88,142,122,0.25),rgba(2,4,6,0.92))] px-2 py-2 text-left text-ivory">
         <div className="relative aspect-[2.1/1] w-full overflow-hidden rounded-[26px] border border-white/8 bg-[rgba(9,12,17,0.9)]">
           <img
             src={backgroundImageSrc ?? theaterPlaceholder}
@@ -204,6 +209,14 @@ const LocationCard: React.FC<LocationCardProps> = ({
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {/* Night phase lock overlay */}
+        {isLockedByPhase && (
+          <div className="absolute inset-0 z-30 flex flex-col items-center justify-center rounded-[24px] bg-slate-900/70 backdrop-blur-sm">
+            <span className="text-3xl" aria-hidden>🌙</span>
+            <span className="mt-2 text-[10px] uppercase tracking-[0.4em] text-slate-300">Notte - Riposo</span>
           </div>
         )}
       </div>

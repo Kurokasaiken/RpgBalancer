@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useBalancerConfig } from '@/balancing/hooks/useBalancerConfig';
-import AltVisualsV6Asterism from './AltVisualsV6Asterism';
+// Legacy Alt Visual kept only for reference – avoids unused import warning
+import type { AltVisualsV6AsterismProps } from './AltVisualsV6Asterism';
 import type { Point, StatRow, OutcomeZone, OutcomeResult, LastOutcome } from './types';
 
-const DEFAULT_ACTIVE_VALUE = 60;
+const DEFAULT_ACTIVE_VALUE: AltVisualsV6AsterismProps['initialActiveValue'] = 60;
 const CANVAS_SIZE = 300;
 const CENTER_X = CANVAS_SIZE / 2;
 const CENTER_Y = CANVAS_SIZE / 2;

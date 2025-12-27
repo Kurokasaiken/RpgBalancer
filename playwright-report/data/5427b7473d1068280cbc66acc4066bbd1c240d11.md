@@ -1,0 +1,133 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - main [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e8]:
+          - generic [ref=e9]: ✶
+          - generic [ref=e10]: Main navigation
+        - button "▪" [ref=e11]
+      - generic [ref=e15]:
+        - generic [ref=e17]:
+          - generic [ref=e18]:
+            - paragraph [ref=e19]: Style Laboratory
+            - paragraph [ref=e20]: Epic Frontier · Basalto e bronzo con bagliori cobalto per l’estetica Epic Frontier.
+          - generic [ref=e21]:
+            - button "Epic Frontier" [ref=e22]
+            - button "Frontier" [ref=e23]
+            - button "Obsidian" [ref=e24]
+            - button "Ethereal" [ref=e25]
+            - button "Vellum Light" [ref=e26]
+            - button "Randomize" [ref=e27]
+        - generic [ref=e28]:
+          - generic [ref=e29]:
+            - paragraph [ref=e30]: Village Sandbox
+            - paragraph [ref=e31]: Trascina i lavoratori negli slot attività per vedere le barre reagire e il cerchio Halo evidenziare il drop.
+          - button "Reset Page" [ref=e32]:
+            - generic [ref=e33]: ☽
+            - text: Reset Page
+        - generic [ref=e34]:
+          - generic [ref=e35]:
+            - generic [ref=e37]:
+              - generic [ref=e38]:
+                - generic [ref=e39]:
+                  - generic [ref=e40]: Roster
+                  - generic [ref=e41]: 1/1
+                - generic [ref=e42]:
+                  - generic [ref=e43]:
+                    - generic [ref=e44]: Stat
+                    - combobox "Filtra residenti per status" [ref=e45]:
+                      - option "All" [selected]
+                      - option "Available"
+                      - option "Away"
+                      - option "Exhausted"
+                      - option "Injured"
+                      - option "Fallen"
+                  - button "Nascondi roster" [ref=e46]:
+                    - img [ref=e47]
+              - generic [ref=e53]:
+                - generic [ref=e54]: F
+                - generic [ref=e55]:
+                  - generic [ref=e56]:
+                    - generic [ref=e57]: Founder
+                    - generic [ref=e58]: Available
+                  - generic [ref=e59]:
+                    - generic [ref=e60]: HP
+                    - generic [ref=e63]: 100/100
+                  - generic [ref=e64]:
+                    - generic [ref=e65]: F
+                    - generic [ref=e68]: 100%
+            - generic [ref=e70]:
+              - generic [ref=e71]:
+                - generic [ref=e72]: Resources
+                - generic [ref=e73]: Eco Pulse
+              - generic [ref=e74]:
+                - generic [ref=e75]:
+                  - paragraph [ref=e76]: Food
+                  - paragraph [ref=e77]: "2"
+                - generic [ref=e78]:
+                  - paragraph [ref=e79]: Wood
+                  - paragraph [ref=e80]: "0"
+                - generic [ref=e81]:
+                  - paragraph [ref=e82]: Stone
+                  - paragraph [ref=e83]: "0"
+          - generic [ref=e84]:
+            - heading "Attività" [level=2] [ref=e85]
+            - generic [ref=e87]:
+              - generic [ref=e88]:
+                - 'button "Ready. Unassigned. Duration: 10:00" [ref=e90] [cursor=pointer]':
+                  - generic [ref=e95]:
+                    - generic [ref=e96]: ⏸️
+                    - generic [ref=e97]: 10:00
+                  - generic [ref=e98]: Unassigned. Duration 10:00.
+                - 'button "Ready. Unassigned. Duration: 2:00" [ref=e100] [cursor=pointer]':
+                  - generic [ref=e105]:
+                    - generic [ref=e106]: 🧩
+                    - generic [ref=e107]: 2:00
+                  - generic [ref=e108]: Unassigned. Duration 2:00.
+                - 'button "Ready. Unassigned. Duration: 4:00" [ref=e110] [cursor=pointer]':
+                  - generic [ref=e115]:
+                    - generic [ref=e116]: 🔥
+                    - generic [ref=e117]: 4:00
+                  - generic [ref=e118]: Unassigned. Duration 4:00.
+                - 'button "Ready. Unassigned. Duration: 2:00" [ref=e120] [cursor=pointer]':
+                  - generic [ref=e125]:
+                    - generic [ref=e126]: ★
+                    - generic [ref=e127]: 2:00
+                  - generic [ref=e128]: Unassigned. Duration 2:00.
+                - 'button "Ready. Unassigned. Duration: 3:00" [ref=e130] [cursor=pointer]':
+                  - generic [ref=e135]:
+                    - generic [ref=e136]: ⚔️
+                    - generic [ref=e137]: 3:00
+                  - generic [ref=e138]: Unassigned. Duration 3:00.
+              - generic [ref=e139]:
+                - generic [ref=e140]: Luogo attivo
+                - button "Foresta · Raccolta Bacche" [ref=e141]:
+                  - generic:
+                    - generic:
+                      - img
+                      - generic: Foresta · Raccolta Bacche – Trascina un lavoratore per avviare la spedizione e apri la vista panoramica per controllare più VerbCard.
+                - generic [ref=e142]:
+                  - heading "Active Activities" [level=3] [ref=e143]
+                  - generic [ref=e144]: Nessuna attività in corso
+    - navigation [ref=e145]:
+      - generic [ref=e146]:
+        - button "⚖️ Balancer" [ref=e147]:
+          - generic [ref=e148]: ⚖️
+          - generic [ref=e149]: Balancer
+        - button "🎭 Archetypes" [ref=e150]:
+          - generic [ref=e151]: 🎭
+          - generic [ref=e152]: Archetypes
+        - button "✨ Spell Creation" [ref=e153]:
+          - generic [ref=e154]: ✨
+          - generic [ref=e155]: Spell Creation
+        - button "⚔️ Grid Arena" [ref=e156]:
+          - generic [ref=e157]: ⚔️
+          - generic [ref=e158]: Grid Arena
+        - button "☰ More" [ref=e159]:
+          - generic [ref=e160]: ☰
+          - generic [ref=e161]: More
+  - region "Notifications alt+T"
+```

@@ -1,25 +1,25 @@
-# Idle Village VerbCard Refactor – Implementation Plan
+# Village Sandbox ActivityCard Refactor – Implementation Plan
 
 **Status:** Planning → Phase A execution  
-**Scope:** Refactor the Idle Village UI (vertical slice) to adopt the new `VerbCard` system, modernize map interactions, and streamline jobs/quests display while preserving the config-first architecture.
+**Scope:** Refactor the Village Sandbox UI (vertical slice) to adopt the ActivityCard/ActivitySlot system, modernize map interactions, and streamline jobs/quests display while preserving the config-first architecture.
 
 ---
 
 ## 1. Objectives
 
-1. **Unify Verb Rendering**  
-   - Replace ad-hoc map markers and legacy verb props with the new `VerbCard` API (`icon`, `progressFraction`, `elapsedSeconds`, `totalDuration`, `injuryPercentage`, `deathPercentage`, `assignedCount`, `totalSlots`, `visualVariant`, `progressStyle`).
+1. **Unify Activity Rendering**  
+   - Replace ad-hoc map markers and legacy VerbCard props with the new ActivityCard detail data pipeline (`icon`, `progressFraction`, `elapsedSeconds`, `totalDuration`, `injuryPercentage`, `deathPercentage`, `assignedCount`, `totalSlots`, `visualVariant`, `progressStyle`).
    - Ensure timers derive from `globalRules.secondsPerTimeUnit` (default 60s) to avoid hardcoded conversions.
 
 2. **Map Experience**  
-   - Each `mapSlot` (config-driven) should render a **Verb cluster** showing scheduled jobs/quests and outstanding quest offers, using drag-friendly `VerbCard`s scaled for the map.
+   - Each `mapSlot` (config-driven) should render a **Activity cluster** showing scheduled jobs/quests and outstanding quest offers, using drag-friendly ActivityCard miniatures scaled for the map.
    - Droppable states (`dropState` = `idle | valid | invalid`) must reflect dnd-kit feedback when hovering a resident/offer.
 
-3. **Compact Activity HUD**  
-   - The “Jobs & Quests in progress” panel should become a **text-first summary** (name + reward + timer badge) to keep the map readable. The summary pulls from the same scheduled verb data structure to avoid duplication.
+3. **Compact Active HUD**  
+   - The “Jobs & Quests in progress” panel should become a **text-first summary** (name + reward + timer badge) to keep the map readable. The summary pulls from the same scheduled activity data structure to avoid duplication.
 
 4. **Quest/Job Offers**  
-   - Offers displayed on map slots must share tone colors, risk indicators, and call-to-action (“Accept”) buttons, backed by existing metadata (`verbToneId`, `risk` fields).
+   - Offers displayed on map slots must share tone colors, risk indicators, and call-to-action (“Accept”) buttons, backed by existing metadata (`activityToneId`, `risk` fields).
 
 5. **Diagnostics & Tests**  
    - Maintain deterministic RNG for reproducible UI tests. Expand Vitest coverage for the new selectors/helpers that build `ScheduledVerbSummary`.

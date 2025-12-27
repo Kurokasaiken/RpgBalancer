@@ -1,7 +1,9 @@
-import { useState, type CSSProperties } from 'react';
+import React, { useState } from 'react';
+import type { CSSProperties } from 'react';
+import clsx from 'clsx';
 import { Sparkles } from 'lucide-react';
-
-export type VerbVisualVariant = 'azure' | 'ember' | 'jade' | 'amethyst' | 'solar';
+import { RESIDENT_DRAG_MIME } from '@/ui/idleVillage/constants';
+import type { VerbVisualVariant } from '@/ui/idleVillage/VerbCard';
 export type DropState = 'idle' | 'valid' | 'invalid';
 
 /**
@@ -12,18 +14,20 @@ export interface ActivitySlotCardProps {
   iconName: string;
   label: string;
   assignedWorkerName?: string | null;
-  
+
   // Progress & Timer
   progressFraction: number; // 0 to 1
   elapsedSeconds: number;   // For timer display
   totalDuration: number;    // Total duration in seconds
-  
+
   // Interaction
   isInteractive?: boolean;
   dropState?: DropState;
   canAcceptDrop?: boolean;
   visualVariant?: VerbVisualVariant;
-  
+  /** When true, slot is locked (e.g. night phase) - shows overlay and blocks interaction */
+  isLockedByPhase?: boolean;
+
   // Callbacks
   onWorkerDrop: (workerId: string | null) => void;
   onInspect?: (slotId: string) => void;
@@ -66,6 +70,7 @@ const ActivitySlotCard: React.FC<ActivitySlotCardProps> = ({
   dropState = 'idle',
   canAcceptDrop = true,
   visualVariant = 'azure',
+  isLockedByPhase = false,
   onWorkerDrop,
   onInspect,
   onClick,
@@ -81,7 +86,7 @@ const ActivitySlotCard: React.FC<ActivitySlotCardProps> = ({
   const workerInitial = assignedWorkerName?.charAt(0) ?? null;
   const hasWorker = Boolean(assignedWorkerName);
 
-  const isHoveringValid = isOver && canAcceptDrop;
+  const isHoveringValid = isOver && canAcceptDrop && !isLockedByPhase;
 
   const progressDegrees = clampedProgress * 360;
   const haloStartDeg = 0; // align start with base orientation
@@ -98,7 +103,7 @@ const ActivitySlotCard: React.FC<ActivitySlotCardProps> = ({
     // Worker tokens declare effectAllowed='move', so we must mirror it here
     event.dataTransfer.dropEffect = 'move';
     setIsOver(true);
-    
+
     // Capture the dragging resident ID
     const residentId = event.dataTransfer.getData('text/resident-id') || event.dataTransfer.getData('text/plain') || null;
     if (residentId) {
@@ -119,18 +124,30 @@ const ActivitySlotCard: React.FC<ActivitySlotCardProps> = ({
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     console.log('ActivitySlot handleDrop called');
     event.preventDefault();
-    
+
+    // Block drops during night phase
+    if (isLockedByPhase) {
+      console.log('Slot locked by phase, drop blocked');
+      setIsOver(false);
+      setDraggingResidentId(null);
+      return;
+    }
+
     // Use the stored dragging resident ID first, fallback to dataTransfer
-    const workerId = draggingResidentId || event.dataTransfer.getData('text/resident-id') || event.dataTransfer.getData('text/plain') || null;
+    const workerId =
+      draggingResidentId ||
+      event.dataTransfer.getData(RESIDENT_DRAG_MIME) ||
+      event.dataTransfer.getData('text/plain') ||
+      null;
     console.log('Dropped workerId:', workerId);
-    
+
     if (!workerId) {
       console.log('No worker ID found');
       setIsOver(false);
       setDraggingResidentId(null);
       return;
     }
-    
+
     console.log('Calling onWorkerDrop with:', workerId);
     onWorkerDrop(workerId);
     setIsOver(false);
@@ -147,26 +164,25 @@ const ActivitySlotCard: React.FC<ActivitySlotCardProps> = ({
 
   const interactiveProps = isInteractive
     ? {
-        role: 'button',
-        tabIndex: 0,
-        onClick: handleClick,
-        'aria-pressed': isActive,
-        'aria-label': `${isActive ? 'In progress' : 'Ready'}. ${
-          assignedWorkerName ? `Assigned to ${assignedWorkerName}` : 'Unassigned'
+      role: 'button',
+      tabIndex: 0,
+      onClick: handleClick,
+      'aria-pressed': isActive,
+      'aria-label': `${isActive ? 'In progress' : 'Ready'}. ${assignedWorkerName ? `Assigned to ${assignedWorkerName}` : 'Unassigned'
         }. ${isActive ? `${formatTime(remainingSeconds)} remaining` : `Duration: ${formatTime(totalDuration)}`}`.trim(),
-      }
+    }
     : {
-        onClick: handleClick,
-        'aria-label': `Activity slot ${label ?? slotId}. ${
-          assignedWorkerName ? `Assigned to ${assignedWorkerName}` : 'Unassigned'
+      onClick: handleClick,
+      'aria-label': `Activity slot ${label ?? slotId}. ${assignedWorkerName ? `Assigned to ${assignedWorkerName}` : 'Unassigned'
         }. ${isActive ? `${formatTime(remainingSeconds)} remaining` : `Duration: ${formatTime(totalDuration)}`}`.trim(),
-      };
+    };
 
   const frameClasses = [
-    'relative h-28 w-28 cursor-pointer transition-transform duration-200',
-    dropState === 'valid'
+    'relative h-28 w-28 transition-transform duration-200',
+    isLockedByPhase ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
+    dropState === 'valid' && !isLockedByPhase
       ? 'scale-110 drop-shadow-[0_0_35px_rgba(16,185,129,0.5)]'
-      : dropState === 'invalid'
+      : dropState === 'invalid' || isLockedByPhase
         ? 'opacity-40 cursor-not-allowed'
         : isHoveringValid || hasWorker
           ? 'scale-105 drop-shadow-[0_0_28px_rgba(250,204,21,0.35)]'
@@ -187,18 +203,24 @@ const ActivitySlotCard: React.FC<ActivitySlotCardProps> = ({
         onMouseLeave={onMouseLeave}
         {...interactiveProps}
       >
-        <div className="absolute inset-0 rounded-full border border-slate-900/60 opacity-30" />
+        <div className="absolute inset-0 rounded-full border border-slate-600/60 opacity-30" />
         <div className="absolute inset-0 rounded-full" style={haloStyle} />
-        <div className="absolute inset-1 rounded-full bg-[rgba(5,7,12,0.9)] backdrop-blur-[2px]" />
+        <div className="absolute inset-1 rounded-full bg-black/90 backdrop-blur-md" />
 
         <div className="relative z-10 flex h-full w-full items-center justify-center">
           <div
-            className="flex h-[4.5rem] w-[4.5rem] flex-col items-center justify-center rounded-full text-amber-200 shadow-inner shadow-black/70 border border-white/5 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.08),rgba(8,12,20,0.95))]"
+            className={clsx(
+              'relative flex h-18 w-18 cursor-pointer select-none flex-col items-center justify-center rounded-2xl border border-slate-600/60 bg-black/80 text-xs text-amber-100 transition-all duration-200',
+              dropState === 'valid' && 'ring-2 ring-green-400/70 bg-green-950/40',
+              dropState === 'invalid' && 'ring-2 ring-red-400/70 bg-red-950/40',
+              isOver && 'ring-4 ring-amber-300/60 scale-105',
+              'hover:ring-2 hover:ring-amber-300/40',
+            )}
           >
             <div className="text-3xl leading-none">
               {iconName ? <span aria-hidden>{iconName}</span> : <Sparkles className="h-6 w-6 text-amber-200" />}
             </div>
-            <div className="mt-1 text-[9px] uppercase tracking-[0.35em] text-amber-100/80 font-mono">
+            <div className="mt-1 text-xs uppercase tracking-[0.35em] text-amber-100/80 font-mono">
               {formatTime(isActive ? remainingSeconds : totalDuration)}
             </div>
           </div>
@@ -211,9 +233,17 @@ const ActivitySlotCard: React.FC<ActivitySlotCardProps> = ({
         )}
 
         <span className="sr-only">
+          {isLockedByPhase ? 'Slot locked (night phase). ' : ''}
           {assignedWorkerName ? `Assigned to ${assignedWorkerName}. ` : 'Unassigned. '}
           {isActive ? `${formatTime(remainingSeconds)} remaining.` : `Duration ${formatTime(totalDuration)}.`}
         </span>
+
+        {/* Night phase lock overlay */}
+        {isLockedByPhase && (
+          <div className="absolute inset-0 z-30 flex items-center justify-center rounded-full bg-slate-900/60 backdrop-blur-sm">
+            <span className="text-2xl" aria-hidden>🔒</span>
+          </div>
+        )}
       </div>
     </div>
   );

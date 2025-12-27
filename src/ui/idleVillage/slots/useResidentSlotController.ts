@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useEffect } from 'react';
 import type { ActivityDefinition, ActivitySlotModifier, StatRequirement } from '@/balancing/config/idleVillage/types';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { evaluateStatRequirement } from '@/engine/game/idleVillage/statMatching';
@@ -11,10 +11,24 @@ export interface ResidentSlotBlueprint {
   label?: string;
   statHint?: string;
   requirement?: StatRequirement;
+  /**
+   * Whether this slot must be filled before the activity can start.
+   * Controllers will surface a warning if required slots remain empty.
+   */
   required?: boolean;
   requirementLabel?: string;
   modifiers?: ActivitySlotModifier;
 }
+
+/** Warning surfaced by the slot controller when invariants are not satisfied. */
+export interface ResidentSlotWarning {
+  type: 'REQUIRED_SLOTS_MISSING';
+  slotIds: string[];
+  message: string;
+}
+
+/** Preferred layout policy for slot racks consuming the controller. */
+export type SlotOverflowPolicy = 'wrap' | 'scroll';
 
 /** View-model for a resident slot after merging assignments and runtime state. */
 export interface ResidentSlotViewModel {
@@ -62,6 +76,11 @@ export interface UseResidentSlotControllerOptions {
   };
   onAssign?: (slotId: string, residentId: string) => void;
   onClear?: (slotId: string) => void;
+  /**
+   * Optional callback invoked whenever critical warnings change
+   * (e.g. required slots still empty). Useful for disabling Start buttons.
+   */
+  onWarningsChange?: (warnings: ResidentSlotWarning[]) => void;
 }
 
 /** API exposed by the resident slot controller hook. */
@@ -70,6 +89,7 @@ export interface ResidentSlotController {
   assignResidentToSlot: (residentId: string, slotId?: string) => ResidentSlotAssignResult;
   clearSlot: (slotId: string) => void;
   getSlotProgress: (slotId: string) => SlotProgressData | null;
+  warnings: ResidentSlotWarning[];
 }
 
 const DEFAULT_SLOT_LABEL_PREFIX = 'Slot';
@@ -80,6 +100,7 @@ const buildDefaultBlueprint = (
   index: number,
   requirement?: StatRequirement,
   modifiers?: ActivitySlotModifier,
+  required = false,
   isVirtual = false,
 ): ResidentSlotBlueprint & { index: number; isVirtual: boolean } => ({
   id: `${activityId}-slot-${index}`,
@@ -87,7 +108,7 @@ const buildDefaultBlueprint = (
   requirement,
   modifiers,
   index,
-  required: requirement?.required,
+  required,
   isVirtual,
 });
 
@@ -97,7 +118,11 @@ const resolveSlotModifier = (
   slotIndex: number,
 ): ActivitySlotModifier | undefined => {
   if (!modifiers) return undefined;
-  return modifiers[slotIndex] ?? modifiers[String(slotIndex)];
+  const numericMatch = (modifiers as Record<number, ActivitySlotModifier | undefined>)[slotIndex];
+  if (numericMatch) {
+    return numericMatch;
+  }
+  return (modifiers as Record<string, ActivitySlotModifier | undefined>)[String(slotIndex)];
 };
 
 /** Returns the list of slot blueprints after merging config, assignments and infinite-slot placeholders. */
@@ -133,6 +158,7 @@ const deriveSlotBlueprints = (
           nextIndex,
           activity.statRequirement,
           resolveSlotModifier(activity.slotModifiers, nextIndex),
+          false,
         ),
       );
     }
@@ -149,6 +175,7 @@ const deriveSlotBlueprints = (
           i,
           activity.statRequirement,
           resolveSlotModifier(activity.slotModifiers, i),
+          false,
         ),
       );
     }
@@ -156,17 +183,22 @@ const deriveSlotBlueprints = (
 
   const needsVirtual = activity.maxSlots === 'infinite';
   if (needsVirtual) {
-    const virtualIndex = slots.length;
-    slots = [
-      ...slots,
-      buildDefaultBlueprint(
-        activity.id,
-        virtualIndex,
-        activity.statRequirement,
-        resolveSlotModifier(activity.slotModifiers, virtualIndex),
-        true,
-      ),
-    ];
+    const assignedCount = Object.values(assignments).filter((id) => id !== null).length;
+    const virtualCount = assignedCount + 1;
+    const currentVirtualCount = slots.filter((slot) => slot.isVirtual).length;
+    for (let i = 0; i < virtualCount - currentVirtualCount; i += 1) {
+      const virtualIndex = slots.length + i;
+      slots.push(
+        buildDefaultBlueprint(
+          activity.id,
+          virtualIndex,
+          activity.statRequirement,
+          resolveSlotModifier(activity.slotModifiers, virtualIndex),
+          false,
+          true,
+        ),
+      );
+    }
   }
 
   return slots;
@@ -205,6 +237,7 @@ export const useResidentSlotController = ({
   scheduler,
   onAssign,
   onClear,
+  onWarningsChange,
 }: UseResidentSlotControllerOptions): ResidentSlotController => {
   const slotViewModels = useMemo(() => {
     const rawSlots = deriveSlotBlueprints(activity, slotBlueprints, assignments);
@@ -248,6 +281,28 @@ export const useResidentSlotController = ({
     });
   }, [activity, assignments, hoveredResidentId, residents, scheduler, slotBlueprints]);
 
+  const warnings = useMemo<ResidentSlotWarning[]>(() => {
+    const missingRequired = slotViewModels.filter((slot) => slot.required && !slot.assignedResidentId);
+    if (missingRequired.length === 0) {
+      return [];
+    }
+    return [
+      {
+        type: 'REQUIRED_SLOTS_MISSING',
+        slotIds: missingRequired.map((slot) => slot.id),
+        message:
+          missingRequired.length === 1
+            ? `${missingRequired[0].label} is required before starting this activity.`
+            : `${missingRequired.length} required slots are still empty.`,
+      },
+    ];
+  }, [slotViewModels]);
+
+  useEffect(() => {
+    if (!onWarningsChange) return;
+    onWarningsChange(warnings);
+  }, [onWarningsChange, warnings]);
+
   const assignResidentToSlot = useCallback<ResidentSlotController['assignResidentToSlot']>(
     (residentId, slotId) => {
       const resident = residents[residentId];
@@ -257,7 +312,8 @@ export const useResidentSlotController = ({
 
       const targetSlot = slotId
         ? slotViewModels.find((slot) => slot.id === slotId)
-        : slotViewModels.find((slot) => !slot.assignedResidentId || slot.isPlaceholder);
+        : slotViewModels.find((slot) => slot.required && !slot.assignedResidentId) ??
+          slotViewModels.find((slot) => !slot.assignedResidentId || slot.isPlaceholder);
 
       if (!targetSlot) {
         return { success: false, reason: 'NO_SLOT_AVAILABLE' };
@@ -313,5 +369,6 @@ export const useResidentSlotController = ({
     assignResidentToSlot,
     clearSlot,
     getSlotProgress,
+    warnings,
   };
 };

@@ -33,6 +33,11 @@ const SlotModifierSchema = z.object({
   yieldMult: z.number().optional(),
 });
 
+const ActivityFatigueProfileSchema = z.object({
+  baseGain: z.number().optional(),
+  perTimeUnitGain: z.number().optional(),
+});
+
 export const ActivityDefinitionSchema = z
   .object({
     id: z.string().min(1),
@@ -55,6 +60,7 @@ export const ActivityDefinitionSchema = z
     metadata: z.record(z.string(), z.unknown()).optional(),
     maxSlots: z.union([z.number().int().min(1), z.literal('infinite')]).optional(),
     slotModifiers: z.record(z.string(), SlotModifierSchema).optional(),
+    fatigueProfile: ActivityFatigueProfileSchema.optional(),
   });
 
 const TrialPhaseRequirementSchema = z.object({
@@ -184,6 +190,7 @@ export const MapSlotDefinitionSchema = z.object({
 
 export const GlobalRulesSchema = z.object({
   maxFatigueBeforeExhausted: z.number(),
+  defaultActivityFatigueGain: z.number(),
   startingResidentFatigue: z.number().optional(),
   fatigueRecoveryPerDay: z.number(),
   dayLengthInTimeUnits: z.number(),

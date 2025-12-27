@@ -15,6 +15,10 @@ const resolveSlotForActivity = (
   return null;
 };
 
+type IdleVillageResetOptions = {
+  founderId?: string;
+};
+
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import idleVillageMap from '@/assets/ui/idleVillage/idle-village-map.jpg';
 import { computeSlotPercentPosition, resolveMapLayout } from '@/ui/idleVillage/mapLayoutUtils';
@@ -46,6 +50,8 @@ import MapSlotVerbCluster from '@/ui/idleVillage/components/MapSlotVerbCluster';
 import TheaterView from '@/ui/idleVillage/components/TheaterView';
 import MapLocationSlot from '@/ui/idleVillage/components/MapLocationSlot';
 import ActiveActivityHUD from '@/ui/idleVillage/ActiveActivityHUD';
+import QuestDetailPanel from '@/ui/idleVillage/components/QuestDetailPanel';
+import type { DropState } from '@/ui/idleVillage/components/ActivitySlot';
 
 interface IdleVillageDebugControls {
   play: () => void;
@@ -197,7 +203,10 @@ const IdleVillageMapPage: React.FC = () => {
   const [assignmentFeedback, setAssignmentFeedback] = useState<string | null>(null);
   const [highlightSlotId, setHighlightSlotId] = useState<string | null>(null);
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
+  const [selectedVerbKey, setSelectedVerbKey] = useState<string | null>(null);
+  const [hoveredLocationId, setHoveredLocationId] = useState<string | null>(null);
   const highlightTimeoutRef = useRef<number | null>(null);
+  const hoverTimeoutRef = useRef<number | null>(null);
   const lastAssignmentFeedbackRef = useRef<string | null>(null);
 
   const updateAssignmentFeedback = useCallback(
@@ -210,7 +219,7 @@ const IdleVillageMapPage: React.FC = () => {
     [],
   );
 
-  const bootstrapVillageState = useCallback(() => {
+  const bootstrapVillageState = useCallback((_options?: IdleVillageResetOptions) => {
     if (!config) return null;
     const initialResidents = loadResidentsFromCharacterManager({ config });
     const freshState = createVillageStateFromConfig({ config, initialResidents });
@@ -645,23 +654,105 @@ const IdleVillageMapPage: React.FC = () => {
     return combinedVerbsForSlot(selectedSlotId);
   }, [selectedSlotId, combinedVerbsForSlot]);
 
+  const allVerbSummariesMap = useMemo(() => {
+    const map = new Map<string, VerbSummary>();
+    scheduledVerbSummaries.forEach((summary) => map.set(summary.key, summary));
+    questOfferSummaries.forEach((summary) => map.set(summary.key, summary));
+    passiveEffectSummaries.forEach((summary) => map.set(summary.key, summary));
+    activityBlueprintSummaries.forEach((summary) => map.set(summary.key, summary));
+    return map;
+  }, [scheduledVerbSummaries, questOfferSummaries, passiveEffectSummaries, activityBlueprintSummaries]);
+
+  const selectedVerbSummary = useMemo(() => {
+    if (selectedVerbKey && allVerbSummariesMap.has(selectedVerbKey)) {
+      return allVerbSummariesMap.get(selectedVerbKey)!;
+    }
+    if (selectedSlotVerbs.length > 0) {
+      return selectedSlotVerbs[0];
+    }
+    return null;
+  }, [selectedVerbKey, allVerbSummariesMap, selectedSlotVerbs]);
+
+  const selectedActivityDefinition = useMemo(() => {
+    if (!selectedVerbSummary?.activityId || !config?.activities) {
+      return null;
+    }
+    return (config.activities[selectedVerbSummary.activityId] as ActivityDefinition | undefined) ?? null;
+  }, [selectedVerbSummary?.activityId, config?.activities]);
+
   useEffect(() => {
-    if (!selectedSlotId) return;
+    if (!selectedSlotId) {
+      setSelectedVerbKey(null);
+      return;
+    }
     if (selectedSlotVerbs.length === 0) {
       setSelectedSlotId(null);
+      setSelectedVerbKey(null);
+      return;
     }
-  }, [selectedSlotId, selectedSlotVerbs.length]);
+    if (selectedVerbKey && selectedSlotVerbs.some((verb) => verb.key === selectedVerbKey)) {
+      return;
+    }
+    setSelectedVerbKey(selectedSlotVerbs[0].key);
+  }, [selectedSlotId, selectedSlotVerbs, selectedVerbKey]);
 
   const handleCloseTheater = useCallback(() => {
     setSelectedSlotId(null);
+    setSelectedVerbKey(null);
   }, []);
 
-  const handleFocusSlot = useCallback((slotId: string) => {
-    console.log('Slot cliccato:', slotId);
+  const handleLocationHoverIntent = useCallback((id: string) => {
+    if (hoverTimeoutRef.current) {
+      window.clearTimeout(hoverTimeoutRef.current);
+    }
+    hoverTimeoutRef.current = window.setTimeout(() => {
+      setHoveredLocationId(id);
+      console.log('Hovered location:', id); // telemetry
+    }, 500);
+  }, []);
+
+  const handleLocationHoverLeave = useCallback(() => {
+    if (hoverTimeoutRef.current) {
+      window.clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    setHoveredLocationId(null);
+  }, []);
+
+  const handleSelectVerb = useCallback((slotId: string, verb: VerbSummary | null) => {
     setSelectedSlotId(slotId);
+    setSelectedVerbKey(verb?.key ?? null);
+  }, []);
+
+  const handleFocusSlot = useCallback(
+    (slotId: string) => {
+      setSelectedSlotId(slotId);
+      const verbs = combinedVerbsForSlot(slotId);
+      if (verbs.length > 0) {
+        setSelectedVerbKey((current) => (current && verbs.some((verb) => verb.key === current) ? current : verbs[0].key));
+      } else {
+        setSelectedVerbKey(null);
+      }
+    },
+    [combinedVerbsForSlot],
+  );
+
+  const handleHudSelectSummary = useCallback((summary: VerbSummary) => {
+    if (!summary) return;
+    if (summary.slotId) {
+      setSelectedSlotId(summary.slotId);
+    }
+    setSelectedVerbKey(summary.key);
   }, []);
 
   const selectedSlotDefinition = selectedSlotId ? config?.mapSlots?.[selectedSlotId] ?? null : null;
+
+  const hoveredSlotDefinition = hoveredLocationId ? config?.mapSlots?.[hoveredLocationId] ?? null : null;
+
+  const hoveredSlotVerbs = useMemo(() => {
+    if (!hoveredLocationId) return [] as VerbSummary[];
+    return combinedVerbsForSlot(hoveredLocationId);
+  }, [hoveredLocationId, combinedVerbsForSlot]);
 
   useEffect(() => {
     setIsResidentDragActive(false);
@@ -679,7 +770,7 @@ const IdleVillageMapPage: React.FC = () => {
   );
 
   const handleResidentDragStart = useCallback(
-    (residentId: string) => (event: React.DragEvent<HTMLButtonElement>) => {
+    (residentId: string) => (event: React.DragEvent<HTMLElement>) => {
       console.log('Drag iniziato:', residentId);
       event.dataTransfer.setData('text/resident-id', residentId);
       event.dataTransfer.setData('text/plain', residentId);
@@ -719,6 +810,34 @@ const IdleVillageMapPage: React.FC = () => {
     return result;
   }, [activitiesBySlot, config, draggingResidentId, villageState]);
 
+  const selectedSlotDropStates = useMemo<Record<string, DropState>>(() => {
+    if (!draggingResidentId) return {};
+    const states: Record<string, DropState> = {};
+    selectedSlotVerbs.forEach((verb) => {
+      const key = verb.slotId ?? verb.key;
+      if (!verb.slotId) {
+        states[key] = 'invalid';
+        return;
+      }
+      states[key] = compatibleSlotIds.has(verb.slotId) ? 'valid' : 'invalid';
+    });
+    return states;
+  }, [draggingResidentId, selectedSlotVerbs, compatibleSlotIds]);
+
+  const hoveredSlotDropStates = useMemo<Record<string, DropState>>(() => {
+    if (!draggingResidentId) return {};
+    const states: Record<string, DropState> = {};
+    hoveredSlotVerbs.forEach((verb) => {
+      const key = verb.slotId ?? verb.key;
+      if (!verb.slotId) {
+        states[key] = 'invalid';
+        return;
+      }
+      states[key] = compatibleSlotIds.has(verb.slotId) ? 'valid' : 'invalid';
+    });
+    return states;
+  }, [draggingResidentId, hoveredSlotVerbs, compatibleSlotIds]);
+
   const handleDropResident = useCallback(
     (slotId: string | null, residentId: string | null) => {
       if (!slotId) return;
@@ -729,6 +848,15 @@ const IdleVillageMapPage: React.FC = () => {
       assignResidentToSlot(slotId, resolvedResidentId ?? null);
     },
     [assignResidentToSlot, draggingResidentId],
+  );
+
+  const handleTheaterVerbDrop = useCallback(
+    (verb: VerbSummary, residentId: string | null) => {
+      const targetSlot = verb.slotId ?? selectedSlotId;
+      if (!targetSlot) return;
+      handleDropResident(targetSlot, residentId);
+    },
+    [handleDropResident, selectedSlotId],
   );
 
   const handleResolveActivity = useCallback(
@@ -802,13 +930,8 @@ const IdleVillageMapPage: React.FC = () => {
             className="absolute inset-0"
             style={{
               backgroundImage: `url(${idleVillageMap})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
             }}
-          />
-          
-          <div className="pointer-events-none absolute inset-y-6 right-6 z-30 flex max-h-full items-start justify-end">
+          >
             <ActiveActivityHUD
               activities={scheduledActivities}
               config={config}
@@ -819,23 +942,25 @@ const IdleVillageMapPage: React.FC = () => {
               getResourceLabel={getResourceLabel}
               onResolve={handleResolveActivity}
               className="pointer-events-auto"
+              selectedSummaryId={selectedVerbKey}
+              onSelectSummary={handleHudSelectSummary}
             />
-          </div>
-
-          <div className="absolute top-4 left-4 right-4 z-10 flex flex-col gap-3 max-w-5xl pointer-events-auto">
-            <div className="flex flex-row gap-3 items-start">
-              <div className="flex flex-col items-center gap-1">
-                <div className="origin-top" style={{ transform: 'scale(0.75)' }}>
-                  <MarbleMedallionCard
-                    title={cyclePhaseLabel}
-                    icon={cycleIcon}
-                    progress={cycleProgressFraction}
-                    isActive={isPlaying}
-                    tone={isDayPhase ? 'day' : 'night'}
-                    onClick={() => setIsPlaying((prev) => !prev)}
-                  />
-                </div>
-                <div className="text-[9px] uppercase tracking-[0.2em] text-slate-200 text-center">
+            <div className="pointer-events-auto w-72 max-w-full flex flex-col gap-4">
+              <QuestDetailPanel
+                summary={selectedVerbSummary}
+                activity={selectedActivityDefinition ?? undefined}
+                config={config ?? null}
+              />
+              <div className="rounded-2xl bg-black/70 border border-white/10 px-4 py-3 text-center flex flex-col items-center gap-1">
+                <MarbleMedallionCard
+                  title={cyclePhaseLabel}
+                  icon={cycleIcon}
+                  progress={cycleProgressFraction}
+                  isActive={isPlaying}
+                  tone={isDayPhase ? 'day' : 'night'}
+                  onClick={() => setIsPlaying((prev) => !prev)}
+                />
+                <div className="text-[9px] uppercase tracking-[0.2em] text-slate-200">
                   {cyclePhaseLabel}
                   <span className="ml-1 text-slate-400 lowercase">
                     (t={villageState.currentTime})
@@ -902,6 +1027,7 @@ const IdleVillageMapPage: React.FC = () => {
                     isSelected={selectedSlotId === slot.id}
                     onDropResident={handleDropResident}
                     onSelectSlot={handleFocusSlot}
+                    onSelectVerb={handleSelectVerb}
                   />
                 );
               }
@@ -920,25 +1046,30 @@ const IdleVillageMapPage: React.FC = () => {
                   canAcceptDrop={canAcceptDrop}
                   onSelect={handleFocusSlot}
                   onDropResident={handleDropResident}
+                  onSelectVerb={handleSelectVerb}
+                  onHoverIntent={handleLocationHoverIntent}
+                  onHoverLeave={handleLocationHoverLeave}
                 />
               );
             })}
           </div>
         </section>
       </div>
-      {selectedSlotId && selectedSlotDefinition && (
+      {(selectedSlotId && selectedSlotDefinition) || (hoveredLocationId && hoveredSlotDefinition) ? (
         <TheaterView
-          slotLabel={selectedSlotDefinition.label ?? selectedSlotId}
-          slotIcon={selectedSlotDefinition.icon}
-          panoramaUrl={undefined}
-          verbs={selectedSlotVerbs}
+          slotLabel={selectedSlotDefinition?.label ?? hoveredSlotDefinition?.label ?? hoveredLocationId ?? ''}
+          slotIcon={selectedSlotDefinition?.icon ?? hoveredSlotDefinition?.icon}
+          verbs={selectedSlotVerbs.length > 0 ? selectedSlotVerbs : hoveredSlotVerbs}
           onClose={handleCloseTheater}
           acceptResidentDrop={Boolean(
-            isResidentDragActive && draggingResidentId && compatibleSlotIds.has(selectedSlotId),
+            isResidentDragActive && draggingResidentId && compatibleSlotIds.has(selectedSlotId ?? hoveredLocationId ?? ''),
           )}
-          onResidentDrop={(residentId) => handleDropResident(selectedSlotId, residentId)}
+          onResidentDrop={(residentId) => handleDropResident(selectedSlotId ?? hoveredLocationId ?? null, residentId)}
+          onAssignResident={(slotId, residentId) => handleDropResident(slotId, residentId)}
+          slotDropStates={selectedSlotDropStates || hoveredSlotDropStates}
+          onVerbDrop={handleTheaterVerbDrop}
         />
-      )}
+      ) : null}
       <ToastContainer toasts={toasts} onRemove={removeToast} />
     </>
   );

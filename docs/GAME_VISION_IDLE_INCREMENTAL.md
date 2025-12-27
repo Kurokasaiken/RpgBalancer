@@ -396,12 +396,12 @@ Questa sezione traccia lo stato attuale (vertical slice v0.1) rispetto alla visi
   - Job di tipo Market definito in `activities` (tag `job`, metadata `marketJob`).
   - Quando un job Market completa, la UI apre un modal che consente di comprare cibo in cambio di gold usando la funzione pura `MarketEngine.buyFoodWithGold`.
 
-- **UI stile Cultist (proto):**
-  - `IdleVillagePage.tsx` fornisce una schermata unica con:
-    - lista residenti trascinabili;
-    - mappa con token edificio droppabili per assegnare jobs;
-    - pannello "Jobs & Quests in progress" collassabile.
-  - Ogni attività attiva è visualizzata come **verb card** (`VerbCard`) con:
+- **UI stile Cultist (proto, legacy):**
+  - `IdleVillagePage.tsx` (legacy) fornisce una schermata unica; la nuova superficie di riferimento è `VillageSandbox`, che sostituisce i token statici con ActivityCard/ActivitySlot mini-card config-driven.
+  - lista residenti trascinabili;
+  - mappa con ActivitySlot mini-card droppabili per assegnare jobs;
+  - pannello "Jobs & Quests in progress" collassabile.
+  - Ogni attività attiva è visualizzata come **ActivityCard** (`ActivityCardDetail` / `ActivitySlot`) con:
     - etichetta attività + tipo (Job/Quest/Activity);
     - residenti assegnati;
     - hint reward;
@@ -410,14 +410,14 @@ Questa sezione traccia lo stato attuale (vertical slice v0.1) rispetto alla visi
 
 ### 11.2 Elementi ancora mancanti per una Phase One completa
 
-- **Verbs avanzati e stati completi:**
-  - Estendere `VerbCard`/verb system con stati `idle/completed`, azione di "Collect" e verbs specializzati (Time, Injury, Market evoluto).
+- **ActivityCard avanzate e stati completi:**
+  - Estendere l'ActivityCard pipeline con stati `idle/completed`, azione di "Collect" e attività specializzate (Time, Injury, Market evoluto).
 
 - **Training & Job XP:**
   - Introdurre un training job config-driven che collega XP/allenamento al Balancer (stat & formule esistenti).
 
 - **Quest loop & spawn:**
-  - Implementare un generatore minimo di quest (tag `quest`) che spawna attorno ai `mapSlots` world/village e le rende visibili come verb card.
+  - Implementare un generatore minimo di quest (tag `quest`) che spawna attorno ai `mapSlots` world/village e le rende visibili come ActivityCard sulla mappa.
 
 - **Testing dedicato:**
   - Test di engine per TimeEngine/JobResolver/MarketEngine in ottica Idle Incremental RPG (vedi `idle_village_plan.md` sezione 12.10), più integrazione di questi nel framework di regression esistente.

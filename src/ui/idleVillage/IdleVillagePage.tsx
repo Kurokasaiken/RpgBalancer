@@ -7,9 +7,6 @@
 import React, { useState, useCallback, useMemo, useEffect, useRef, startTransition } from 'react';
 import { DndContext, DragOverlay, useDraggable, useDroppable, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core';
 import { Pause, Play } from 'lucide-react';
-import idleVillageMap from '@/assets/ui/idleVillage/idle-village-map.jpg';
-import { computeSlotPercentPosition, resolveMapLayout } from '@/ui/idleVillage/mapLayoutUtils';
-import { useVillageStateStore } from './useVillageStateStore';
 import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
 import { ToastContainer, useToast } from '../balancing/Toast';
 import { createVillageStateFromConfig, getStartingResidentFatigue, scheduleActivity } from '@/engine/game/idleVillage/TimeEngine';
