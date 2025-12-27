@@ -167,7 +167,7 @@ const TheaterView: React.FC<TheaterViewProps> = ({
               style={{ minHeight: panoramaHeight }}
               loading="lazy"
             />
-            <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-black/45 via-black/10 to-transparent" />
+            <div className="absolute inset-0 rounded-2xl border border-amber-100/20 bg-linear-to-t from-black/55 via-black/12 to-transparent shadow-inner shadow-black/40" />
             <div className="pointer-events-none absolute top-4 left-4 right-4 z-20">
               <div className="flex items-center justify-between rounded-2xl border border-white/15 bg-[rgba(6,9,14,0.25)] px-4 py-2 shadow-[0_12px_20px_rgba(0,0,0,0.35)] backdrop-blur">
                 <div>
@@ -191,7 +191,7 @@ const TheaterView: React.FC<TheaterViewProps> = ({
             className="relative flex flex-none items-center"
             style={{ height: activitiesHeight, flex: `0 0 ${activitiesHeight}` }}
           >
-            <div className="absolute inset-0 rounded-2xl border border-amber-100/20 bg-gradient-to-t from-black/55 via-black/12 to-transparent shadow-inner shadow-black/40" />
+            <div className="fixed inset-0 z-999 max-w-136 mx-auto bg-black/80 backdrop-blur-sm rounded-2xl border border-amber-100/30 shadow-2xl p-6" />
             <div className="relative z-20 mx-auto flex w-full max-w-3xl items-center justify-center gap-6 overflow-x-auto px-5 py-2">
               {slotCards && slotCards.length > 0
                 ? slotCards.map((card) => (
@@ -223,6 +223,9 @@ const TheaterView: React.FC<TheaterViewProps> = ({
                           dropState={slotDropStates?.[verb.key] ?? 'idle'}
                           onWorkerDrop={(workerId) => onAssignResident?.(verb.key, workerId)}
                           onInspect={() => {}}
+                          progressFraction={verb.progressFraction ?? 0}
+                          elapsedSeconds={verb.elapsedSeconds ?? 0}
+                          totalDuration={verb.totalDurationSeconds ?? 0}
                         />
                       </div>
                     </div>

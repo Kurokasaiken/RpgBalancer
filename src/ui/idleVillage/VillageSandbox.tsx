@@ -11,9 +11,12 @@ import {
 import { useVillageStateStore } from '@/ui/idleVillage/useVillageStateStore';
 import { loadResidentsFromCharacterManager } from '@/engine/game/idleVillage/characterImport';
 import LocationCard from '@/ui/idleVillage/components/LocationCard';
-import ActivitySlotCard, { type DropState, type VerbVisualVariant } from '@/ui/idleVillage/components/ActivitySlot';
+import ActivitySlotCard, {
+  type ActivitySlotCardProps,
+  type DropState,
+  type VerbVisualVariant,
+} from '@/ui/idleVillage/components/ActivitySlot';
 import ActivityCardDetail, {
-  type ActivityCardDetailProps,
   type ActivityCardMetric,
   type ActivityCardSlotAssignment,
 } from '@/ui/idleVillage/components/ActivityCardDetail';
@@ -21,6 +24,7 @@ import ResidentRoster from '@/ui/idleVillage/ResidentRosterDnd';
 import DragTestContainer from '@/ui/idleVillage/components/DragTestContainer';
 import ResidentDetailCard from '@/ui/idleVillage/components/ResidentDetailCard';
 import TheaterView from '@/ui/idleVillage/components/TheaterView';
+import ActiveHUD from '@/ui/idleVillage/components/ActiveHUD';
 import { DragProvider, useDragContext } from '@/ui/idleVillage/components/DragContext';
 import { formatResidentLabel } from '@/ui/idleVillage/residentName';
 import { useThemeSwitcher } from '@/hooks/useThemeSwitcher';
@@ -31,10 +35,14 @@ import {
   deriveRisk,
   deriveVisualVariant,
 } from '@/ui/idleVillage/verbSummaries';
-import { useActivityScheduler, type ActivityResolutionResult } from '@/ui/idleVillage/hooks/useActivityScheduler';
+import {
+  useActivityScheduler,
+  type ActivityResolutionResult,
+  type ScheduledActivityState,
+} from '@/ui/idleVillage/hooks/useActivityScheduler';
 import { useResidentSlotController } from '@/ui/idleVillage/slots/useResidentSlotController';
 
-interface ActivitySlotData {
+export interface ActivitySlotData {
   slotId: string;
   label: string;
   iconName: string;
@@ -51,37 +59,30 @@ interface DetailContext {
   activity: ActivityDefinition;
 }
 
+type ActivitySchedulerBridge = {
+  canAssignResident: (residentId: string, activityId: string) => boolean;
+  getActivityState: (activityId: string, residentId: string) => ScheduledActivityState | null;
+};
+
+interface DetailPanelCardProps {
+  slotId: string;
+  slot: ActivitySlotData;
+  activity: ActivityDefinition;
+  slotAssignments: Record<string, string | null>;
+  residents: Record<string, ResidentState>;
+  secondsPerTimeUnit: number;
+  draggingResidentId: string | null;
+  scheduler: ActivitySchedulerBridge;
+  onWorkerDrop: (activityId: string, residentId: string | null, options?: { autoStart?: boolean }) => void;
+  onStart: (slotId: string) => boolean | void;
+  onClose: (slotId: string) => void;
+}
+
 const SLOT_DELIMITER = '-slot-';
 const getPrimarySlotId = (activityId: string) => activityId;
 const extractActivityIdFromSlot = (slotId: string) => {
   const index = slotId.indexOf(SLOT_DELIMITER);
   return index === -1 ? slotId : slotId.slice(0, index);
-};
-const syncPrimarySlot = (assignments: Record<string, string | null>, activityId: string) => {
-  const primarySlotId = getPrimarySlotId(activityId);
-  const firstAssigned = Object.entries(assignments).find(
-    ([slotId, residentId]) => residentId && extractActivityIdFromSlot(slotId) === activityId,
-  );
-  assignments[primarySlotId] = firstAssigned ? firstAssigned[1] : null;
-};
-const applySlotAssignment = (
-  assignments: Record<string, string | null>,
-  slotId: string,
-  residentId: string | null,
-) => {
-  const next = { ...assignments };
-  if (residentId) {
-    Object.entries(next).forEach(([existingSlot, current]) => {
-      if (existingSlot !== slotId && current === residentId) {
-        next[existingSlot] = null;
-      }
-    });
-    next[slotId] = residentId;
-  } else {
-    next[slotId] = null;
-  }
-  syncPrimarySlot(next, extractActivityIdFromSlot(slotId));
-  return next;
 };
 const deriveAssignmentsForActivity = (
   assignments: Record<string, string | null>,
@@ -98,6 +99,121 @@ const deriveAssignmentsForActivity = (
     acc[slotId] = residentId ?? null;
     return acc;
   }, {});
+};
+
+const DetailPanelCard: React.FC<DetailPanelCardProps> = ({
+  slotId,
+  slot,
+  activity,
+  slotAssignments,
+  residents,
+  secondsPerTimeUnit,
+  draggingResidentId,
+  scheduler,
+  onWorkerDrop,
+  onStart,
+  onClose,
+}) => {
+  const activityAssignments = useMemo(
+    () => deriveAssignmentsForActivity(slotAssignments, activity.id),
+    [slotAssignments, activity.id],
+  );
+
+  const controller = useResidentSlotController({
+    activity,
+    assignments: activityAssignments,
+    residents,
+    hoveredResidentId: draggingResidentId,
+    scheduler,
+    onAssign: (resolvedSlotId, residentId) => {
+      onWorkerDrop(extractActivityIdFromSlot(resolvedSlotId), residentId, { autoStart: false });
+    },
+    onClear: (resolvedSlotId) => {
+      onWorkerDrop(extractActivityIdFromSlot(resolvedSlotId), null, { autoStart: false });
+    },
+  });
+
+  const risk = useMemo(() => deriveRisk(activity), [activity]);
+  const metrics = useMemo<ActivityCardMetric[]>(() => {
+    return [
+      {
+        id: 'engine',
+        label: 'Engine',
+        value: activity.resolutionEngineId ?? '—',
+        tone: 'neutral',
+      },
+      {
+        id: 'danger',
+        label: 'Danger',
+        value: String(activity.dangerRating ?? '—'),
+        tone: activity.dangerRating && activity.dangerRating > 2 ? 'warning' : 'neutral',
+      },
+    ];
+  }, [activity]);
+
+  const durationSeconds = useMemo(() => {
+    const durationUnits = evaluateActivityDuration(activity);
+    return durationUnits * secondsPerTimeUnit;
+  }, [activity, secondsPerTimeUnit]);
+
+  const slotProgress = controller.getSlotProgress(slotId);
+
+  const assignments = useMemo<ActivityCardSlotAssignment[]>(() => {
+    return controller.slots.map((slotModel) => ({
+      slot: {
+        id: slotModel.id,
+        label: slotModel.label,
+        statHint: slotModel.statHint,
+        requirement: slotModel.requirement,
+        requirementLabel: slotModel.requirement?.label ?? activity.statRequirement?.label,
+        required: slotModel.required,
+        assignedResidentId: slotModel.assignedResidentId,
+      },
+      residentName: slotModel.assignedResident ? formatResidentLabel(slotModel.assignedResident) : null,
+      dropState: slotModel.dropState,
+    }));
+  }, [controller.slots, activity.statRequirement]);
+
+  const handleDropResident = useCallback(
+    (targetSlotId: string, residentId: string | null) => {
+      onWorkerDrop(extractActivityIdFromSlot(targetSlotId), residentId, { autoStart: false });
+    },
+    [onWorkerDrop],
+  );
+
+  const handleRemoveResident = useCallback(
+    (targetSlotId: string) => {
+      onWorkerDrop(extractActivityIdFromSlot(targetSlotId), null, { autoStart: false });
+    },
+    [onWorkerDrop],
+  );
+
+  const handleStart = useCallback(() => onStart(slotId), [onStart, slotId]);
+  const handleClose = useCallback(() => onClose(slotId), [onClose, slotId]);
+  const isStartDisabled = !controller.slots.some((slotModel) => slotModel.assignedResidentId);
+
+  return (
+    <ActivityCardDetail
+      activity={activity}
+      slotLabel={slot.label ?? activity.label ?? slotId}
+      preview={{
+        rewards: activity.rewards ?? [],
+        injuryPercentage: risk.injury,
+        deathPercentage: risk.death,
+      }}
+      assignments={assignments}
+      rewards={activity.rewards ?? []}
+      metrics={metrics}
+      durationSeconds={durationSeconds}
+      elapsedSeconds={slotProgress?.elapsedSeconds ?? 0}
+      onStart={handleStart}
+      onClose={handleClose}
+      onDropResident={handleDropResident}
+      onRemoveResident={handleRemoveResident}
+      isStartDisabled={isStartDisabled}
+      draggingResidentId={draggingResidentId}
+    />
+  );
 };
 
 const deriveVerbTone = (activity: ActivityDefinition): SandboxVerbTone => {
@@ -413,6 +529,19 @@ const VillageSandboxContent = () => {
     isCyclePlaying,
   ]);
 
+  const activeSlots = useMemo(() => {
+    return slots
+      .map(slot => {
+        if (slot.slotId === 'day-night-cycle') return null;
+        if (!slot.assignedWorkerId) return null;
+        const state = activityScheduler.getActivityState(slot.slotId, slot.assignedWorkerId);
+        if (!state || state.progress <= 0) return null;
+        return { slot, state };
+      })
+      .filter((entry): entry is { slot: ActivitySlotData; state: ScheduledActivityState } => entry !== null);
+  }, [slots, activityScheduler]);
+
+
   useEffect(() => {
     if (isCyclePlaying) {
       activityScheduler.resumeTimer();
@@ -530,13 +659,6 @@ const VillageSandboxContent = () => {
     [activityScheduler, config.activities, startSlotActivity, villageState.residents, setActiveId],
   );
 
-  const canSlotAcceptDrop = useCallback(
-    (slotId: string): boolean => {
-      if (!draggingResidentId) return false;
-      return activityScheduler.canAssignResident(draggingResidentId, slotId);
-    },
-    [draggingResidentId, activityScheduler]
-  );
 
   const resolveWorkerName = (residentId: string | null) => {
     if (!residentId) return null;
@@ -548,12 +670,35 @@ const VillageSandboxContent = () => {
     return sandboxState.residents ?? {};
   }, [sandboxState.residents]);
 
+  const slotDropStates = useMemo<Record<string, DropState>>(() => {
+    if (!draggingResidentId) return {};
+    return slots.reduce<Record<string, DropState>>((acc, slot) => {
+      acc[slot.slotId] = activityScheduler.canAssignResident(draggingResidentId, slot.slotId) ? 'valid' : 'invalid';
+      return acc;
+    }, {});
+  }, [draggingResidentId, slots, activityScheduler]);
+
+  const locationDropState: DropState = useMemo(() => {
+    if (!draggingResidentId) return 'idle';
+    const anyValid = Object.values(slotDropStates).some((state) => state === 'valid');
+    return anyValid ? 'valid' : 'invalid';
+  }, [draggingResidentId, slotDropStates]);
+
+  const canSlotAcceptDrop = useCallback(
+    (slotId: string): boolean => {
+      if (!draggingResidentId) return false;
+      return activityScheduler.canAssignResident(draggingResidentId, slotId);
+    },
+    [draggingResidentId, activityScheduler]
+  );
+
+
   const detailContexts = useMemo<DetailContext[]>(() => {
     return detailPanelSlotIds
       .map((slotId) => {
         const selectedSlot = slots.find((slot) => slot.slotId === slotId);
         if (!selectedSlot) return null;
-        const activity = config.activities?.[slotId];
+        const activity = config.activities?.[extractActivityIdFromSlot(slotId)] ?? config.activities?.[slotId];
         if (!activity) return null;
 
         return {
@@ -564,13 +709,6 @@ const VillageSandboxContent = () => {
       })
       .filter((context): context is DetailContext => context !== null);
   }, [detailPanelSlotIds, slots, config.activities]);
-
-  const handleDetailStart = useCallback(
-    (slotId: string) => {
-      startSlotActivity(slotId);
-    },
-    [startSlotActivity],
-  );
 
   const handleResidentDragStart = useCallback(
     (residentId: string) => (event: React.DragEvent<HTMLElement>) => {
@@ -628,6 +766,46 @@ const VillageSandboxContent = () => {
       };
     });
   }, [theaterPreviewSlots, resolveWorkerName]);
+
+  const theaterSlotCards = useMemo<ActivitySlotCardProps[]>(() => {
+    return theaterPreviewSlots.map((slot) => {
+      const assignedName = resolveWorkerName(slot.assignedWorkerId);
+      const activityState =
+        slot.assignedWorkerId != null
+          ? activityScheduler.getActivityState(slot.slotId, slot.assignedWorkerId)
+          : null;
+      const progressFraction = activityState?.progress ?? 0;
+      const elapsedSeconds = activityState?.elapsed ?? 0;
+      const durationSeconds =
+        activityState?.duration ??
+        Math.max(1, Math.round(evaluateActivityDuration(slot.activity) * secondsPerTimeUnit));
+
+      return {
+        slotId: slot.slotId,
+        iconName: slot.iconName,
+        label: slot.mapSlotLabel ? `${slot.label} · ${slot.mapSlotLabel}` : slot.label,
+        assignedWorkerName: assignedName,
+        canAcceptDrop: canSlotAcceptDrop(slot.slotId),
+        dropState: slotDropStates[slot.slotId] ?? 'idle',
+        onWorkerDrop: (workerId) => handleWorkerDrop(slot.slotId, workerId),
+        onInspect: openDetailPanel,
+        progressFraction,
+        elapsedSeconds,
+        totalDuration: durationSeconds,
+        isInteractive: true,
+        visualVariant: slot.visualVariant,
+      };
+    });
+  }, [
+    theaterPreviewSlots,
+    resolveWorkerName,
+    activityScheduler,
+    secondsPerTimeUnit,
+    canSlotAcceptDrop,
+    slotDropStates,
+    handleWorkerDrop,
+    openDetailPanel,
+  ]);
 
   const handleCloseTheater = useCallback(() => {
     setIsTheaterOpen(false);
@@ -790,20 +968,6 @@ const VillageSandboxContent = () => {
     [findAcceptingSlotId, openTheaterForSlot],
   );
 
-  const slotDropStates = useMemo<Record<string, DropState>>(() => {
-    if (!draggingResidentId) return {};
-    return slots.reduce<Record<string, DropState>>((acc, slot) => {
-      acc[slot.slotId] = activityScheduler.canAssignResident(draggingResidentId, slot.slotId) ? 'valid' : 'invalid';
-      return acc;
-    }, {});
-  }, [draggingResidentId, slots, activityScheduler]);
-
-  const locationDropState: DropState = useMemo(() => {
-    if (!draggingResidentId) return 'idle';
-    const anyValid = Object.values(slotDropStates).some((state) => state === 'valid');
-    return anyValid ? 'valid' : 'invalid';
-  }, [draggingResidentId, slotDropStates]);
-
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && isTheaterOpen) {
@@ -822,15 +986,12 @@ const VillageSandboxContent = () => {
 
   const handleLocationDragIntent = useCallback(
     (residentId: string | null) => {
+      console.log('handleLocationDragIntent called with residentId:', residentId, 'locationSlotIds:', locationSlotIds);
       if (!residentId || locationSlotIds.length === 0) return;
-      const isSamePreview =
-        theaterPreviewIds.length === locationSlotIds.length &&
-        locationSlotIds.every((id, index) => theaterPreviewIds[index] === id);
-      if (!isTheaterOpen || !isSamePreview) {
-        openTheaterWithSlotIds(locationSlotIds);
-      }
+      // Always open TheaterView when dragging over location, even if already open
+      openTheaterWithSlotIds(locationSlotIds);
     },
-    [locationSlotIds, theaterPreviewIds, isTheaterOpen, openTheaterWithSlotIds],
+    [locationSlotIds, openTheaterWithSlotIds],
   );
 
   const handleResetSandboxState = useCallback(() => {
@@ -845,23 +1006,6 @@ const VillageSandboxContent = () => {
     setTheaterSlotId(null);
     setTheaterPreviewIds([]);
   }, [config, resetState, activityScheduler]);
-
-  const handleResetSandboxFatigue = useCallback(() => {
-    const targetFatigue = getStartingResidentFatigue(config);
-    resetState(
-      () => {
-        const nextResidents: Record<string, ResidentState> = {};
-        Object.entries(villageState.residents ?? {}).forEach(([id, resident]) => {
-          nextResidents[id] = { ...resident, fatigue: targetFatigue };
-        });
-        return {
-          ...villageState,
-          residents: nextResidents,
-        };
-      },
-      'VillageSandbox reset fatigue',
-    );
-  }, [config, resetState, villageState]);
 
   return (
     <div className="mx-auto max-w-5xl space-y-10 p-6 text-ivory">
@@ -1068,8 +1212,14 @@ const VillageSandboxContent = () => {
                     </div>
                   }
                   onDragIntent={handleLocationDragIntent}
+                  onResidentDragEnter={handleLocationDragIntent}
+                  onResidentDragLeave={() => {}}
                   onResidentDrop={handleLocationResidentDrop}
                   dropState={locationDropState}
+                />
+                <ActiveHUD
+                  activeSlots={activeSlots}
+                  secondsPerTimeUnit={secondsPerTimeUnit}
                 />
               </div>
             </div>
@@ -1114,7 +1264,10 @@ const VillageSandboxContent = () => {
                     residents={residentsById}
                     secondsPerTimeUnit={secondsPerTimeUnit}
                     draggingResidentId={draggingResidentId}
-                    scheduler={activityScheduler}
+                    scheduler={{
+                      canAssignResident: activityScheduler.canAssignResident,
+                      getActivityState: activityScheduler.getActivityState,
+                    }}
                     onWorkerDrop={handleWorkerDrop}
                     onStart={startSlotActivity}
                     onClose={closeDetailPanel}
@@ -1130,11 +1283,12 @@ const VillageSandboxContent = () => {
           slotLabel={theaterPrimarySlot.label}
           slotIcon={theaterPrimarySlot.iconName}
           verbs={theaterVerbs}
+          slotCards={theaterSlotCards}
           onClose={handleCloseTheater}
           acceptResidentDrop={!!draggingResidentId}
           onResidentDrop={(residentId) => {
             console.log('Resident dropped in TheaterView:', residentId);
-            // Qui puoi gestire l'assegnazione del residente all'attività
+            // TODO: bridge resident drop to board slots once ActiveHUD integration is finalized
           }}
         />
       )}

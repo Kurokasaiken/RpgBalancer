@@ -50,6 +50,8 @@ export interface LocationCardProps extends ButtonHTMLAttributes<HTMLButtonElemen
   onInspect?: () => void;
   onResidentDrop?: (residentId: string) => void;
   onDragIntent?: (residentId: string | null) => void;
+  onResidentDragEnter?: (residentId: string | null) => void;
+  onResidentDragLeave?: () => void;
   dropState?: DropState;
   backgroundImageSrc?: string;
   /**
@@ -68,6 +70,8 @@ const LocationCard: React.FC<LocationCardProps> = ({
   onInspect,
   onResidentDrop,
   onDragIntent,
+  onResidentDragEnter,
+  onResidentDragLeave,
   dropState = 'idle',
   backgroundImageSrc,
   featuredActivity,
@@ -84,16 +88,23 @@ const LocationCard: React.FC<LocationCardProps> = ({
 
   const handleDragOver = (event: DragEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    onDragIntent?.(extractResidentId(event));
+    const residentId = extractResidentId(event);
+    console.log('LocationCard handleDragOver with residentId:', residentId);
+    onDragIntent?.(residentId);
+    onResidentDragEnter?.(residentId);
   };
 
   const handleDragEnter = (event: DragEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    onDragIntent?.(extractResidentId(event));
+    const residentId = extractResidentId(event);
+    console.log('LocationCard handleDragEnter with residentId:', residentId);
+    onDragIntent?.(residentId);
+    onResidentDragEnter?.(residentId);
   };
 
   const handleDragLeave = () => {
     onDragIntent?.(null);
+    onResidentDragLeave?.();
   };
 
   const handleDrop = (event: DragEvent<HTMLButtonElement>) => {

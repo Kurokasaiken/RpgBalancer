@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { X, Play } from 'lucide-react';
 import type { ActivityDefinition, ResourceDeltaDefinition } from '@/balancing/config/idleVillage/types';
 import type { VerbDetailPreview, VerbSlotState } from '@/ui/idleVillage/VerbDetailCard';
 import type { DropState } from './ActivitySlot';
 import { useThemeSwitcher } from '@/hooks/useThemeSwitcher';
-import ResidentSlotRack from '@/ui/idleVillage/slots/ResidentSlotRack';
+import ResidentSlotRack, { type ResidentSlotRackProps } from '@/ui/idleVillage/slots/ResidentSlotRack';
 import type { ResidentSlotViewModel } from '@/ui/idleVillage/slots/useResidentSlotController';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 
@@ -201,6 +201,20 @@ const ActivityCardDetail: React.FC<ActivityCardDetailProps> = ({
     setIsDragging(true);
   };
 
+  const handleRackDrop = useCallback<NonNullable<ResidentSlotRackProps['onSlotDrop']>>(
+    (slotId: string, residentId: string | null) => {
+      onDropResident?.(slotId, residentId ?? null);
+    },
+    [onDropResident],
+  );
+
+  const handleRackClear = useCallback<NonNullable<ResidentSlotRackProps['onSlotClear']>>(
+    (slotId) => {
+      onRemoveResident?.(slotId);
+    },
+    [onRemoveResident],
+  );
+
   const meterToneClass = (tone?: MetricTone) => {
     switch (tone) {
       case 'positive':
@@ -214,25 +228,48 @@ const ActivityCardDetail: React.FC<ActivityCardDetailProps> = ({
     }
   };
 
-  const handleSlotDrop = (slotId: string) => (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    const residentId =
-      event.dataTransfer.getData('text/resident-id') || event.dataTransfer.getData('text/plain') || null;
-    onDropResident?.(slotId, residentId);
-  };
-
-  const handleSlotDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = 'copy';
-  };
-
-  const handleClearSlot = (slotId: string) => {
-    onRemoveResident?.(slotId);
-  };
+  const slotViewModels = useMemo<ResidentSlotViewModel[]>(
+    () =>
+      assignments.map((assignment, index) => ({
+        id: assignment.slot.id ?? `detail-slot-${index}`,
+        index,
+        label: assignment.slot.label ?? `Slot ${index + 1}`,
+        statHint: assignment.slot.statHint,
+        required: assignment.slot.required,
+        assignedResidentId: assignment.slot.assignedResidentId ?? null,
+        assignedResident: assignment.residentName
+          ? ({
+              id: assignment.slot.assignedResidentId ?? `resident-${index}`,
+              displayName: assignment.residentName,
+              status: 'available',
+              fatigue: 0,
+              currentHp: 0,
+              maxHp: 0,
+              statTags: [],
+              statSnapshot: {},
+              isHero: false,
+              isInjured: false,
+              survivalCount: 0,
+              survivalScore: 0,
+            } as ResidentState)
+          : undefined,
+        requirement: assignment.slot.requirement,
+        modifiers: undefined,
+        isPlaceholder: assignment.slot.assignedResidentId == null,
+        dropState: assignment.dropState ?? 'idle',
+      })),
+    [assignments],
+  );
 
   const assignmentTitle = slotLabel ?? activity.label;
-  const activityIcon =
-    ((activity.metadata as { icon?: string } | undefined)?.icon as string | undefined) ?? activity.tags?.[0] ?? '◎';
+  
+  const resolveDisplayInfo = useCallback<NonNullable<ResidentSlotRackProps['resolveDisplayInfo']>>(
+    (slot) => ({
+      icon: getSlotBadgeContent(slot).icon,
+      label: slot.label,
+    }),
+    [],
+  );
 
   return (
     <div
@@ -289,69 +326,66 @@ const ActivityCardDetail: React.FC<ActivityCardDetailProps> = ({
               </button>
             </div>
 
-            <ResidentSlotRack
-              slots={slotViewModels}
-              variant="detail"
-              overflow={slotOverflowMode}
-              onSlotDrop={handleRackDrop}
-              onSlotClear={handleRackClear}
-              resolveDisplayInfo={resolveDisplayInfo}
-            />
-
-            {(metrics.length > 0 || rewards.length > 0) && (
-              <div className="flex flex-col gap-3 md:flex-row md:items-stretch">
-                <div className="flex-1 space-y-1.5">
-                  {metrics.length > 0 && (
-                    <div className="grid gap-1.5 sm:grid-cols-2">
-                      {metrics.map((metric) => (
-                        <div
-                          key={metric.id}
-                          className="rounded-lg border border-white/10 bg-black/25 px-2.5 py-1.5 text-left"
+            <div className="flex flex-col gap-3 md:flex-row md:items-stretch">
+              <div className="flex-1 space-y-1.5">
+                <ResidentSlotRack
+                  slots={slotViewModels}
+                  variant="detail"
+                  overflow={slotOverflowMode}
+                  onSlotDrop={handleRackDrop}
+                  onSlotClear={handleRackClear}
+                  resolveDisplayInfo={resolveDisplayInfo}
+                />
+                {metrics.length > 0 && (
+                  <div className="grid gap-1.5 sm:grid-cols-2">
+                    {metrics.map((metric) => (
+                      <div
+                        key={metric.id}
+                        className="rounded-lg border border-white/10 bg-black/25 px-2.5 py-1.5 text-left"
+                      >
+                        <p className="text-[8px] uppercase tracking-[0.15em] text-slate-500">
+                          {metric.label === 'Engine' ? 'Type' : metric.label}
+                        </p>
+                        <p className={`text-[11px] font-semibold ${meterToneClass(metric.tone)}`}>{metric.value}</p>
+                        {metric.helperText && (
+                          <p className="text-[9px] leading-tight text-slate-500">{metric.helperText}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="space-y-1.5">
+                  {rewards.length > 0 ? (
+                    <div className="flex flex-wrap gap-1.5">
+                      {rewards.map((reward) => (
+                        <span
+                          key={`${reward.resourceId}-${reward.amountFormula}`}
+                          className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[9px]"
                         >
-                          <p className="text-[8px] uppercase tracking-[0.15em] text-slate-500">
-                            {metric.label === 'Engine' ? 'Type' : metric.label}
-                          </p>
-                          <p className={`text-[11px] font-semibold ${meterToneClass(metric.tone)}`}>{metric.value}</p>
-                          {metric.helperText && (
-                            <p className="text-[9px] leading-tight text-slate-500">{metric.helperText}</p>
-                          )}
-                        </div>
+                          <span className="font-semibold text-amber-200">{reward.resourceId}</span>{' '}
+                          <span className="text-[10px] font-mono text-slate-200">{reward.amountFormula}</span>
+                        </span>
                       ))}
                     </div>
+                  ) : (
+                    <div className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-[9px] text-slate-400">
+                      Nessuna ricompensa configurata.
+                    </div>
                   )}
-                  <div className="space-y-1.5">
-                    {rewards.length > 0 ? (
-                      <div className="flex flex-wrap gap-1.5">
-                        {rewards.map((reward) => (
-                          <span
-                            key={`${reward.resourceId}-${reward.amountFormula}`}
-                            className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[9px]"
-                          >
-                            <span className="font-semibold text-amber-200">{reward.resourceId}</span>{' '}
-                            <span className="text-[10px] font-mono text-slate-200">{reward.amountFormula}</span>
-                          </span>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-[9px] text-slate-400">
-                        Nessuna ricompensa configurata.
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div
-                  className="flex items-center gap-3 md:flex-col md:items-start md:justify-center"
-                  title={riskTooltip}
-                >
-                  <div className="text-[9px] uppercase tracking-[0.18em] text-slate-400">Risk</div>
-                  <div className="flex h-20 w-6 flex-col overflow-hidden rounded-full border border-white/10">
-                    <div className="bg-rose-500" style={{ height: `${riskDeath}%` }} />
-                    <div className="bg-amber-400" style={{ height: `${riskInjuryOnly}%` }} />
-                    <div className="flex-1 bg-emerald-500/20" />
-                  </div>
                 </div>
               </div>
-            )}
+              <div
+                className="flex items-center gap-3 md:flex-col md:items-start md:justify-start"
+                title={riskTooltip}
+              >
+                <div className="text-[9px] uppercase tracking-[0.18em] text-slate-400">Risk</div>
+                <div className="flex h-20 w-6 flex-col overflow-hidden rounded-full border border-white/10">
+                  <div className="bg-rose-500" style={{ height: `${riskDeath}%` }} />
+                  <div className="bg-amber-400" style={{ height: `${riskInjuryOnly}%` }} />
+                  <div className="flex-1 bg-emerald-500/20" />
+                </div>
+              </div>
+            </div>
           </section>
         </div>
       </article>

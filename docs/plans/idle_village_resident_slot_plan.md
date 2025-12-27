@@ -90,6 +90,14 @@ Gaps: duplicate slot UIs, no shared slot manager, Theater lacks full parity, Ver
 2. **Playwright:** scenario covering: drag resident into Theater slot, open VerbDetailCard, drop resident, verify placeholder creation and scroll behavior once slots > 6.
 3. **Docs:** update `idle_village_plan.md` + `idle_village_tasks.md` + `MASTER_PLAN.md` referencing this plan.
 
+### Phase G – Interaction & Timing Parity
+1. **Theater/Board Symmetry:** Consume the controller outputs inside `VillageSandbox` and `TheaterView`, so every ActivitySlot instance reads `progressFraction`, `elapsedSeconds`, and `totalDuration` from the scheduler/engine instead of local timers.  
+2. **Detail Panel Validation:** Wire `assignResidentToSlot` results directly to `handleWorkerDrop`, ensuring Verb detail slots only accept residents that satisfy stat requirements, fatigue thresholds, and crew limits surfaced by the controller.  
+3. **Hover-to-Inspect Delay:** Introduce a shared hover manager (500–1000 ms hold) that opens `ActivityCardDetail` when a resident hovers an ActivitySlot without dropping; cancel the timer on drag-leave/ drop to avoid accidental openings.  
+4. **Halo & Timer Source of Truth:** Route halo/timer props through `useActivityScheduler.getActivityState` so pausing the global timer freezes progress visuals everywhere (board, Theater, HUD, detail).  
+5. **Auto-Run Safeguards:** When assignments change via board, Theater, or detail, notify the scheduler to restart activities only if the global timer is playing; paused states should queue the new assignment without advancing progress.  
+6. **UX Telemetry:** Emit events for hover-open, assignment validation failures, and timer state changes so HUD/notifications can explain why a resident was rejected or why an activity stayed paused.
+
 ---
 
 ## 5. Risks & Mitigations
