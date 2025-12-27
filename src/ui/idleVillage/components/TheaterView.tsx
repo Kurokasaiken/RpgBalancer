@@ -123,13 +123,15 @@ const TheaterView: React.FC<TheaterViewProps> = ({
 
   return (
     <>
+      {/* Sfondo esterno più morbido */}
       <div
-        className="pointer-events-none fixed inset-0 z-30 bg-[radial-gradient(circle,transparent_40%,rgba(0,0,0,0.85)_120%)] transition-opacity duration-500"
+        className="pointer-events-none fixed inset-0 z-30 bg-[radial-gradient(circle,transparent_50%,rgba(0,0,0,0.6)_120%)] transition-opacity duration-500"
         style={{ opacity: isMounted ? 1 : 0 }}
       />
+      
       <div
         className={[
-          'absolute left-1/2 top-8 z-[999] w-[85%] max-w-[34rem] rounded-3xl obsidian-panel transition-all duration-500 ease-out',
+          'absolute left-1/2 top-8 z-[999] w-[85%] max-w-[34rem] rounded-3xl obsidian-panel transition-all duration-500 ease-out border border-white/10', // Aggiunto un leggero bordo
           isMounted ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95',
         ]
           .filter(Boolean)
@@ -138,23 +140,16 @@ const TheaterView: React.FC<TheaterViewProps> = ({
           minHeight: THEATER_HEIGHT,
           transform: `translate(-50%, 0) translate(${position.x}px, ${position.y}px)`,
           cursor: isDragging ? 'grabbing' : undefined,
+          backgroundColor: 'rgba(20, 20, 25, 0.95)' // Assicurati che il pannello non sia nero puro
         }}
         onDragOver={handleDragOver}
         onDragEnter={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        aria-dropeffect={acceptResidentDrop ? 'copy' : undefined}
         onPointerDown={handlePointerDown}
       >
-        {acceptResidentDrop && (
-          <div
-            className={[
-              'pointer-events-none absolute inset-0 rounded-3xl border-2 border-dashed transition-colors duration-200',
-              isDragOver ? 'border-emerald-300/80' : 'border-transparent',
-            ].join(' ')}
-          />
-        )}
         <div className="flex h-full flex-col gap-3 px-4 py-3">
+          {/* PANORAMA AREA */}
           <div
             className={`relative z-0 w-full overflow-hidden rounded-[28px] shadow-[0_18px_35px_rgba(0,0,0,0.45)] ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
             data-theater-drag-handle="true"
@@ -162,14 +157,16 @@ const TheaterView: React.FC<TheaterViewProps> = ({
           >
             <img
               src={theaterPlaceholder}
-              alt="Northern frontier panorama"
+              alt="Panorama"
               className="h-full w-full object-cover"
               style={{ minHeight: panoramaHeight }}
-              loading="lazy"
             />
-            <div className="absolute inset-0 rounded-2xl border border-amber-100/20 bg-linear-to-t from-black/55 via-black/12 to-transparent shadow-inner shadow-black/40" />
+            {/* Overlay immagine alleggerito */}
+            <div className="absolute inset-0 rounded-2xl border border-amber-100/10 bg-linear-to-t from-black/30 via-transparent to-transparent shadow-inner shadow-black/20" />
+            
+            {/* Header Info */}
             <div className="pointer-events-none absolute top-4 left-4 right-4 z-20">
-              <div className="flex items-center justify-between rounded-2xl border border-white/15 bg-[rgba(6,9,14,0.25)] px-4 py-2 shadow-[0_12px_20px_rgba(0,0,0,0.35)] backdrop-blur">
+              <div className="flex items-center justify-between rounded-2xl border border-white/15 bg-black/30 px-4 py-2 backdrop-blur-md">
                 <div>
                   <p className="text-[10px] uppercase tracking-[0.45em] text-amber-200/70">Panorama</p>
                   <p className="text-lg font-semibold tracking-[0.2em] text-amber-50">
@@ -179,41 +176,31 @@ const TheaterView: React.FC<TheaterViewProps> = ({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="pointer-events-auto flex h-8 w-8 items-center justify-center rounded-full border border-white/30 bg-black/50 text-slate-100 transition hover:border-rose-300 hover:text-rose-200"
-                  aria-label="Chiudi TheaterView"
+                  className="pointer-events-auto flex h-8 w-8 items-center justify-center rounded-full border border-white/30 bg-black/50 text-slate-100 hover:bg-rose-900/40 transition"
                 >
                   <X className="h-3 w-3" />
                 </button>
               </div>
             </div>
           </div>
+
+          {/* ACTIVITIES AREA - Rimosso il div fisso nero */}
           <div
-            className="relative flex flex-none items-center"
+            className="relative flex flex-none items-center justify-center"
             style={{ height: activitiesHeight, flex: `0 0 ${activitiesHeight}` }}
           >
-            <div className="fixed inset-0 z-999 max-w-136 mx-auto bg-black/80 backdrop-blur-sm rounded-2xl border border-amber-100/30 shadow-2xl p-6" />
-            <div className="relative z-20 mx-auto flex w-full max-w-3xl items-center justify-center gap-6 overflow-x-auto px-5 py-2">
+            <div className="relative z-20 flex w-full items-center justify-center gap-6 px-5 py-2">
               {slotCards && slotCards.length > 0
                 ? slotCards.map((card) => (
-                    <div key={card.slotId} className="flex flex-1 items-end justify-center" style={{ height: '100%' }}>
-                      <div
-                        className="origin-center"
-                        style={{ transform: `scale(${ACTIVITY_SCALE})`, transformOrigin: 'center center' }}
-                      >
+                    <div key={card.slotId} className="flex items-center justify-center">
+                      <div style={{ transform: `scale(${ACTIVITY_SCALE})`, transformOrigin: 'center' }}>
                         <ActivitySlot {...card} />
                       </div>
                     </div>
                   ))
                 : verbs.map((verb) => (
-                    <div
-                      key={verb.key}
-                      className="flex flex-1 items-end justify-center"
-                      style={{ height: '100%' }}
-                    >
-                      <div
-                        className="origin-center"
-                        style={{ transform: `scale(${ACTIVITY_SCALE})`, transformOrigin: 'center center' }}
-                      >
+                    <div key={verb.key} className="flex items-center justify-center">
+                      <div style={{ transform: `scale(${ACTIVITY_SCALE})`, transformOrigin: 'center' }}>
                         <ActivitySlot
                           slotId={verb.key}
                           iconName={typeof verb.icon === 'string' ? (verb.icon as string) : slotIcon ?? '◎'}
@@ -226,6 +213,8 @@ const TheaterView: React.FC<TheaterViewProps> = ({
                           progressFraction={verb.progressFraction ?? 0}
                           elapsedSeconds={verb.elapsedSeconds ?? 0}
                           totalDuration={verb.totalDurationSeconds ?? 0}
+                          isInteractive={true}
+                          visualVariant={'azure'}
                         />
                       </div>
                     </div>
