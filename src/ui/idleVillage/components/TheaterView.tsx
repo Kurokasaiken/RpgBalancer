@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import type { VerbSummary } from '@/ui/idleVillage/verbSummaries';
-import ActivitySlot, { type DropState } from '@/ui/idleVillage/components/ActivitySlot';
+import ActivitySlot, { type ActivitySlotCardProps, type DropState } from '@/ui/idleVillage/components/ActivitySlot';
 import { RESIDENT_DRAG_MIME } from '@/ui/idleVillage/constants';
 import theaterPlaceholder from '@/assets/ui/idleVillage/panorama-hotspring.jpg';
 
@@ -17,6 +17,7 @@ export interface TheaterViewProps {
   onResidentDrop?: (residentId: string | null) => void;
   onAssignResident?: (slotId: string, residentId: string | null) => void;
   slotDropStates?: Record<string, DropState>;
+  slotCards?: ActivitySlotCardProps[];
 }
 
 /**
@@ -31,6 +32,7 @@ const TheaterView: React.FC<TheaterViewProps> = ({
   onResidentDrop,
   onAssignResident,
   slotDropStates,
+  slotCards,
 }) => {
   const THEATER_HEIGHT = '34vh';
   const ACTIVITY_SLOT_BASE_PX = 112; // Tailwind h-28
@@ -191,29 +193,40 @@ const TheaterView: React.FC<TheaterViewProps> = ({
           >
             <div className="absolute inset-0 rounded-2xl border border-amber-100/20 bg-gradient-to-t from-black/55 via-black/12 to-transparent shadow-inner shadow-black/40" />
             <div className="relative z-20 mx-auto flex w-full max-w-3xl items-center justify-center gap-6 overflow-x-auto px-5 py-2">
-              {verbs.map((verb) => (
-                <div
-                  key={verb.key}
-                  className="flex flex-1 items-end justify-center"
-                  style={{ height: '100%' }}
-                >
-                  <div
-                    className="origin-center"
-                    style={{ transform: `scale(${ACTIVITY_SCALE})`, transformOrigin: 'center center' }}
-                  >
-                    <ActivitySlot
-                      slotId={verb.key}
-                      iconName={typeof verb.icon === 'string' ? (verb.icon as string) : slotIcon ?? '◎'}
-                      label={verb.label}
-                      assignedWorkerName={verb.assigneeNames?.[0]}
-                      canAcceptDrop={(slotDropStates?.[verb.key] ?? 'idle') !== 'invalid'}
-                      dropState={slotDropStates?.[verb.key] ?? 'idle'}
-                      onWorkerDrop={(workerId) => onAssignResident?.(verb.key, workerId)}
-                      onInspect={() => {}}
-                    />
-                  </div>
-                </div>
-              ))}
+              {slotCards && slotCards.length > 0
+                ? slotCards.map((card) => (
+                    <div key={card.slotId} className="flex flex-1 items-end justify-center" style={{ height: '100%' }}>
+                      <div
+                        className="origin-center"
+                        style={{ transform: `scale(${ACTIVITY_SCALE})`, transformOrigin: 'center center' }}
+                      >
+                        <ActivitySlot {...card} />
+                      </div>
+                    </div>
+                  ))
+                : verbs.map((verb) => (
+                    <div
+                      key={verb.key}
+                      className="flex flex-1 items-end justify-center"
+                      style={{ height: '100%' }}
+                    >
+                      <div
+                        className="origin-center"
+                        style={{ transform: `scale(${ACTIVITY_SCALE})`, transformOrigin: 'center center' }}
+                      >
+                        <ActivitySlot
+                          slotId={verb.key}
+                          iconName={typeof verb.icon === 'string' ? (verb.icon as string) : slotIcon ?? '◎'}
+                          label={verb.label}
+                          assignedWorkerName={verb.assigneeNames?.[0]}
+                          canAcceptDrop={(slotDropStates?.[verb.key] ?? 'idle') !== 'invalid'}
+                          dropState={slotDropStates?.[verb.key] ?? 'idle'}
+                          onWorkerDrop={(workerId) => onAssignResident?.(verb.key, workerId)}
+                          onInspect={() => {}}
+                        />
+                      </div>
+                    </div>
+                  ))}
             </div>
           </div>
         </div>

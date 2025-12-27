@@ -12,11 +12,11 @@ import { useVillageStateStore } from '@/ui/idleVillage/useVillageStateStore';
 import { loadResidentsFromCharacterManager } from '@/engine/game/idleVillage/characterImport';
 import LocationCard from '@/ui/idleVillage/components/LocationCard';
 import ActivitySlotCard, { type DropState, type VerbVisualVariant } from '@/ui/idleVillage/components/ActivitySlot';
-import VerbDetailCard, {
-  type VerbDetailAssignment,
-  type VerbDetailCardProps,
-  type VerbSlotState,
-} from '@/ui/idleVillage/VerbDetailCard';
+import ActivityCardDetail, {
+  type ActivityCardDetailProps,
+  type ActivityCardMetric,
+  type ActivityCardSlotAssignment,
+} from '@/ui/idleVillage/components/ActivityCardDetail';
 import ResidentRoster from '@/ui/idleVillage/ResidentRosterDnd';
 import DragTestContainer from '@/ui/idleVillage/components/DragTestContainer';
 import ResidentDetailCard from '@/ui/idleVillage/components/ResidentDetailCard';
@@ -32,7 +32,6 @@ import {
   deriveVisualVariant,
 } from '@/ui/idleVillage/verbSummaries';
 import { useActivityScheduler, type ActivityResolutionResult } from '@/ui/idleVillage/hooks/useActivityScheduler';
-import ResidentSlotRack from '@/ui/idleVillage/slots/ResidentSlotRack';
 import { useResidentSlotController } from '@/ui/idleVillage/slots/useResidentSlotController';
 
 interface ActivitySlotData {
@@ -46,7 +45,11 @@ interface ActivitySlotData {
 }
 
 type SandboxVerbTone = 'neutral' | 'job' | 'quest' | 'danger' | 'system';
-type DetailContext = { slotId: string; props: VerbDetailCardProps };
+interface DetailContext {
+  slotId: string;
+  slot: ActivitySlotData;
+  activity: ActivityDefinition;
+}
 
 const SLOT_DELIMITER = '-slot-';
 const getPrimarySlotId = (activityId: string) => activityId;
@@ -113,12 +116,6 @@ const formatRewardLabel = (activity: ActivityDefinition): string | null => {
       return [amount, reward.resourceId].filter(Boolean).join(' ');
     })
     .join(', ');
-};
-
-const resolveSlotCount = (activity: ActivityDefinition): number => {
-  if (activity.maxSlots === 'infinite') return 4;
-  if (typeof activity.maxSlots === 'number' && activity.maxSlots > 0) return activity.maxSlots;
-  return 1;
 };
 
 const simpleRng = (() => {
@@ -547,89 +544,26 @@ const VillageSandboxContent = () => {
     return resident ? formatResidentLabel(resident) : residentId;
   };
 
-  const detailContexts = useMemo(() => {
+  const residentsById = useMemo(() => {
+    return sandboxState.residents ?? {};
+  }, [sandboxState.residents]);
+
+  const detailContexts = useMemo<DetailContext[]>(() => {
     return detailPanelSlotIds
       .map((slotId) => {
         const selectedSlot = slots.find((slot) => slot.slotId === slotId);
         if (!selectedSlot) return null;
         const activity = config.activities?.[slotId];
         if (!activity) return null;
-        const assignedResidentId = slotAssignments[slotId] ?? selectedSlot.assignedWorkerId ?? null;
-        const risk = deriveRisk(activity);
-        const durationUnits = evaluateActivityDuration(activity);
-        const durationSeconds = durationUnits * secondsPerTimeUnit;
-        const activityState =
-          assignedResidentId != null ? activityScheduler.getActivityState(slotId, assignedResidentId) : null;
-        const elapsedSeconds = activityState?.elapsed ?? 0;
-        const isActive = Boolean(activityState && activityState.progress > 0);
-        const slotCount = resolveSlotCount(activity);
-        const requirementLabel = activity.statRequirement?.label ?? 'Generalist';
-        const slotStates: VerbSlotState[] = Array.from({ length: slotCount }).map((_, index) => ({
-          id: `${slotId}-slot-${index}`,
-          label:
-            slotCount > 1
-              ? `${selectedSlot.label ?? activity.label ?? slotId} · Slot ${index + 1}`
-              : selectedSlot.label ?? activity.label ?? slotId,
-          statHint: requirementLabel,
-          requirement: activity.statRequirement,
-          requirementLabel,
-          required: index === 0,
-          assignedResidentId: index === 0 ? assignedResidentId : null,
-        }));
-            const detailAssignments: VerbDetailAssignment[] = residents.map((resident) => ({
-          resident,
-          isSelected: resident.id === assignedResidentId,
-          onToggle: (residentId: string) => {
-            if (residentId === assignedResidentId) {
-              handleWorkerDrop(slotId, null, { autoStart: false });
-            } else {
-              handleWorkerDrop(slotId, residentId, { autoStart: false });
-            }
-          },
-        }));
 
         return {
           slotId,
-          props: {
-            title: activity.label ?? slotId,
-            subtitle: selectedSlot.label ?? slotId,
-            activity,
-            description: activity.description,
-            preview: {
-              rewards: activity.rewards ?? [],
-              injuryPercentage: risk.injury,
-              deathPercentage: risk.death,
-            },
-            assignments: detailAssignments,
-            slotLabel: selectedSlot.label ?? activity.label ?? slotId,
-            slots: slotStates,
-            durationSeconds,
-            elapsedSeconds,
-            isActive,
-            onStart: () => startSlotActivity(slotId),
-            onClose: () => closeDetailPanel(slotId),
-            onSlotClick: () => {
-              if (assignedResidentId) {
-                handleWorkerDrop(slotId, null, { autoStart: false });
-              }
-            },
-            startDisabled: !assignedResidentId,
-          },
+          slot: selectedSlot,
+          activity,
         };
       })
       .filter((context): context is DetailContext => context !== null);
-  }, [
-    detailPanelSlotIds,
-    slots,
-    config.activities,
-    slotAssignments,
-    residents,
-    secondsPerTimeUnit,
-    activityScheduler,
-    handleWorkerDrop,
-    startSlotActivity,
-    closeDetailPanel,
-  ]);
+  }, [detailPanelSlotIds, slots, config.activities]);
 
   const handleDetailStart = useCallback(
     (slotId: string) => {
@@ -1172,7 +1106,19 @@ const VillageSandboxContent = () => {
             {detailContexts.map((context) => (
               <div key={context.slotId} className="pointer-events-none flex w-full max-w-[420px] justify-center">
                 <div className="pointer-events-auto">
-                  <VerbDetailCard {...context.props} />
+                  <DetailPanelCard
+                    slotId={context.slotId}
+                    slot={context.slot}
+                    activity={context.activity}
+                    slotAssignments={slotAssignments}
+                    residents={residentsById}
+                    secondsPerTimeUnit={secondsPerTimeUnit}
+                    draggingResidentId={draggingResidentId}
+                    scheduler={activityScheduler}
+                    onWorkerDrop={handleWorkerDrop}
+                    onStart={startSlotActivity}
+                    onClose={closeDetailPanel}
+                  />
                 </div>
               </div>
             ))}
