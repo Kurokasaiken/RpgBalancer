@@ -1,0 +1,143 @@
+{
+  "name": "Physics Lab Audio Assets",
+  "version": "1.0.0",
+  "description": "Audio assets for Physics Lab micro-app with Game Feel Bible compliant sound palette",
+  "soundPacks": {
+    "gilded": {
+      "name": "Gilded Observatory",
+      "description": "Warm, rich sounds with golden undertones for the Gilded Observatory theme",
+      "events": {
+        "button_press": {
+          "file": "gilded/button-press.mp3",
+          "description": "Soft, weighted button press with subtle metallic resonance",
+          "duration": 0.15,
+          "gameFeelBible": "Chapter 8 - Tactile feedback with weight"
+        },
+        "drag_start": {
+          "file": "gilded/drag-start.mp3", 
+          "description": "Gentle lift sound with air displacement",
+          "duration": 0.2,
+          "gameFeelBible": "Chapter 9 - Cursor avatar state transition"
+        },
+        "slot_snap": {
+          "file": "gilded/slot-snap.mp3",
+          "description": "Satisfying snap with golden shimmer",
+          "duration": 0.25,
+          "gameFeelBible": "Chapter 8 - Completion feedback burst"
+        },
+        "float_text_spawn": {
+          "file": "gilded/float-text-spawn.mp3",
+          "description": "Ethereal chime with upward motion",
+          "duration": 0.3,
+          "gameFeelBible": "Chapter 10 - Living shader notification"
+        },
+        "preset_change": {
+          "file": "gilded/preset-change.mp3",
+          "description": "Sweeping transition with orchestral undertone",
+          "duration": 0.4,
+          "gameFeelBible": "Chapter 9 - State change confirmation"
+        },
+        "spam_test": {
+          "file": "gilded/spam-test.mp3",
+          "description": "Quick tap for stress testing",
+          "duration": 0.1,
+          "gameFeelBible": "Chapter 8 - Rapid feedback validation"
+        }
+      }
+    },
+    "obsidian": {
+      "name": "Obsidian Vault",
+      "description": "Deep, resonant sounds with cool, stone-like qualities for the Obsidian theme",
+      "events": {
+        "button_press": {
+          "file": "obsidian/button-press.mp3",
+          "description": "Solid stone click with deep resonance",
+          "duration": 0.12,
+          "gameFeelBible": "Chapter 8 - Dense material feedback"
+        },
+        "drag_start": {
+          "file": "obsidian/drag-start.mp3",
+          "description": "Heavy lift with gravitas",
+          "duration": 0.18,
+          "gameFeelBible": "Chapter 9 - Weighted cursor movement"
+        },
+        "slot_snap": {
+          "file": "obsidian/slot-snap.mp3",
+          "description": "Crystalline snap with cool overtones",
+          "duration": 0.22,
+          "gameFeelBible": "Chapter 8 - Precision placement"
+        },
+        "float_text_spawn": {
+          "file": "obsidian/float-text-spawn.mp3",
+          "description": "Mystical chime with dark crystal resonance",
+          "duration": 0.28,
+          "gameFeelBible": "Chapter 10 - Arcane manifestation"
+        },
+        "preset_change": {
+          "file": "obsidian/preset-change.mp3",
+          "description": "Deep rumble with crystalline clarity",
+          "duration": 0.35,
+          "gameFeelBible": "Chapter 9 - Transmutation effect"
+        },
+        "spam_test": {
+          "file": "obsidian/spam-test.mp3",
+          "description": "Quick stone tap",
+          "duration": 0.08,
+          "gameFeelBible": "Chapter 8 - Rapid validation"
+        }
+      }
+    },
+    "blizzard": {
+      "name": "Blizzard Rift",
+      "description": "Sharp, icy sounds with crystalline clarity for the Blizzard theme",
+      "events": {
+        "button_press": {
+          "file": "blizzard/button-press.mp3",
+          "description": "Ice crystal click with sharp clarity",
+          "duration": 0.1,
+          "gameFeelBible": "Chapter 8 - Crisp tactile feedback"
+        },
+        "drag_start": {
+          "file": "blizzard/drag-start.mp3",
+          "description": "Frosty lift with wind displacement",
+          "duration": 0.15,
+          "gameFeelBible": "Chapter 9 - Light cursor avatar"
+        },
+        "slot_snap": {
+          "file": "blizzard/slot-snap.mp3",
+          "description": "Ice crack with crystalline shatter",
+          "duration": 0.2,
+          "gameFeelBible": "Chapter 8 - Sharp completion feedback"
+        },
+        "float_text_spawn": {
+          "file": "blizzard/float-text-spawn.mp3",
+          "description": "Icy chime with frost particles",
+          "duration": 0.25,
+          "gameFeelBible": "Chapter 10 - Frozen shader effect"
+        },
+        "preset_change": {
+          "file": "blizzard/preset-change.mp3",
+          "description": "Wind sweep with ice crystals",
+          "duration": 0.3,
+          "gameFeelBible": "Chapter 9 - Blizzard transition"
+        },
+        "spam_test": {
+          "file": "blizzard/spam-test.mp3",
+          "description": "Quick ice tap",
+          "duration": 0.06,
+          "gameFeelBible": "Chapter 8 - Rapid crystalline feedback"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "created": "2026-02-19",
+    "author": "Cascade",
+    "gameFeelBibleReference": "Chapters 8-10 - Tactile feedback, cursor avatars, and living shaders",
+    "audioFormat": "MP3",
+    "sampleRate": 44100,
+    "bitDepth": 16,
+    "targetLoudness": -14,
+    "notes": "All sounds designed to complement the Game Feel Bible's emphasis on weight, materiality, and responsive feedback"
+  }
+}

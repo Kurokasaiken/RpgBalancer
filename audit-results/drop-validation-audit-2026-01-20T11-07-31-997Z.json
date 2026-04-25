@@ -1,0 +1,228 @@
+{
+  "id": "audit_1768907251993",
+  "name": "Quick Drop Validation Audit",
+  "description": "Fast audit for CI/CD pipelines with essential checks only",
+  "startTime": 1768907251993,
+  "endTime": 1768907251995,
+  "duration": 2,
+  "config": {
+    "name": "Quick Drop Validation Audit",
+    "description": "Fast audit for CI/CD pipelines with essential checks only",
+    "scope": {
+      "contexts": [
+        "global-audit"
+      ],
+      "ruleTypes": [
+        "stat_tags",
+        "crew_limits"
+      ],
+      "severities": [
+        "error",
+        "critical"
+      ],
+      "tags": [
+        "ci-cd",
+        "quick-audit"
+      ]
+    },
+    "settings": {
+      "dryRun": false,
+      "verbose": true,
+      "progressReporting": true,
+      "maxExecutionTime": 30000,
+      "batchSize": 10,
+      "parallelProcessing": false,
+      "maxConcurrentOps": 1
+    },
+    "output": {
+      "includeDetailedResults": true,
+      "includeSummary": true,
+      "includeRuleDetails": true,
+      "includeContextInfo": true,
+      "includeMetadata": true,
+      "format": "json",
+      "createTimestampedFilename": true
+    },
+    "telemetry": {
+      "enabled": true,
+      "trackAuditEvents": true,
+      "trackValidationResults": true,
+      "trackRuleViolations": true,
+      "trackComplianceMetrics": true
+    },
+    "compliance": {
+      "enabled": true,
+      "standards": [
+        "ks-030-drop-validation",
+        "idle-village-compliance"
+      ],
+      "requiredRuleCoverage": 0.5,
+      "maxFailuresPerSeverity": {
+        "info": 5,
+        "warning": 3,
+        "error": 2,
+        "critical": 1
+      },
+      "complianceThreshold": 0.7,
+      "enableAutoFix": true,
+      "autoFixStrategies": {
+        "stat_tags": "Update resident stat tags to match requirements",
+        "fatigue_threshold": "Adjust fatigue thresholds based on resident stats",
+        "crew_limits": "Optimize crew capacity assignments",
+        "activity_requirements": "Review activity-specific requirements",
+        "location_constraints": "Check location-specific constraints",
+        "time_restrictions": "Validate time-based restrictions",
+        "resource_limits": "Monitor resource usage limits",
+        "custom_rule": "Review custom rule implementations"
+      }
+    },
+    "rules": [
+      {
+        "id": "stat_tags_validation",
+        "name": "Stat Tags Validation",
+        "type": "stat_tags",
+        "description": "Validates resident stat tags",
+        "severity": "error",
+        "enabled": true,
+        "parameters": {
+          "requiredTags": [
+            "strength",
+            "agility"
+          ]
+        }
+      },
+      {
+        "id": "fatigue_threshold_validation",
+        "name": "Fatigue Threshold Validation",
+        "type": "fatigue_threshold",
+        "description": "Validates fatigue threshold",
+        "severity": "warning",
+        "enabled": true,
+        "parameters": {
+          "maxFatigue": 0.8
+        }
+      },
+      {
+        "id": "crew_limits_validation",
+        "name": "Crew Limits Validation",
+        "type": "crew_limits",
+        "description": "Validates crew capacity limits",
+        "severity": "error",
+        "enabled": true,
+        "parameters": {
+          "maxCrewSize": 5
+        }
+      }
+    ]
+  },
+  "contextResults": {
+    "test-context": {
+      "contextId": "test-context",
+      "contextName": "Test Context",
+      "totalRules": 3,
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "timeouts": 0,
+      "averageDuration": 0,
+      "complianceScore": 1
+    }
+  },
+  "ruleResults": {
+    "stat_tags_validation": {
+      "ruleId": "stat_tags_validation",
+      "ruleName": "Stat Tags Validation",
+      "ruleType": "stat_tags",
+      "totalExecutions": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "timeouts": 0,
+      "averageDuration": 2,
+      "averageScore": 1,
+      "contexts": [
+        "test-context"
+      ],
+      "violations": []
+    },
+    "fatigue_threshold_validation": {
+      "ruleId": "fatigue_threshold_validation",
+      "ruleName": "Fatigue Threshold Validation",
+      "ruleType": "fatigue_threshold",
+      "totalExecutions": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "timeouts": 0,
+      "averageDuration": 0,
+      "averageScore": 1,
+      "contexts": [
+        "test-context"
+      ],
+      "violations": []
+    },
+    "crew_limits_validation": {
+      "ruleId": "crew_limits_validation",
+      "ruleName": "Crew Limits Validation",
+      "ruleType": "crew_limits",
+      "totalExecutions": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "timeouts": 0,
+      "averageDuration": 0,
+      "averageScore": 1,
+      "contexts": [
+        "test-context"
+      ],
+      "violations": []
+    }
+  },
+  "summary": {
+    "totalContexts": 1,
+    "totalRules": 3,
+    "totalValidations": 3,
+    "passedValidations": 3,
+    "failedValidations": 0,
+    "skippedValidations": 0,
+    "errorValidations": 0,
+    "timeoutValidations": 0,
+    "complianceScore": 1,
+    "averageExecutionTime": 0,
+    "totalExecutionTime": 0,
+    "successRate": 1,
+    "performance": {
+      "averageExecutionTime": 0,
+      "peakMemoryUsage": 0,
+      "peakCpuUsage": 0
+    }
+  },
+  "violationsBySeverity": {
+    "info": {
+      "count": 0,
+      "ruleIds": [],
+      "contextIds": []
+    },
+    "warning": {
+      "count": 0,
+      "ruleIds": [],
+      "contextIds": []
+    },
+    "error": {
+      "count": 0,
+      "ruleIds": [],
+      "contextIds": []
+    },
+    "critical": {
+      "count": 0,
+      "ruleIds": [],
+      "contextIds": []
+    }
+  },
+  "violationsByType": {},
+  "violationsByContext": {}
+}

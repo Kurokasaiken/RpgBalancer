@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drag Debug Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .test-card {
+            width: 150px;
+            height: 80px;
+            background: #333;
+            border: 2px solid #666;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px;
+            cursor: grab;
+            user-select: none;
+        }
+        .test-card:active {
+            cursor: grabbing;
+        }
+        .drop-zone {
+            width: 200px;
+            height: 100px;
+            background: #444;
+            border: 2px dashed #888;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px;
+        }
+        .drop-zone.drag-over {
+            background: #555;
+            border-color: #0f0;
+        }
+        .console-output {
+            background: #000;
+            border: 1px solid #666;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 20px 0;
+            height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .log-entry {
+            margin: 2px 0;
+            padding: 2px 4px;
+        }
+        .log-pointer { color: #0f0; }
+        .log-drag { color: #ff0; }
+        .log-drop { color: #0ff; }
+        .log-error { color: #f00; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Drag & Drop Debug Test</h1>
+    
+    <div class="test-card" draggable="true" id="testCard">
+        Test Card
+    </div>
+    
+    <div class="drop-zone" id="dropZone">
+        Drop Zone
+    </div>
+    
+    <div class="console-output" id="console"></div>
+    
+    <script>
+        const consoleEl = document.getElementById('console');
+        
+        function log(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            consoleEl.appendChild(entry);
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+
+            // Mirror every entry to the browser console so automated scripts (Playwright)
+            // can capture event telemetry without scraping DOM nodes.
+            console.log(`[DragDebug][${type}] ${message}`);
+        }
+        
+        const testCard = document.getElementById('testCard');
+        const dropZone = document.getElementById('dropZone');
+        
+        // Test card events
+        testCard.addEventListener('pointerdown', (e) => {
+            log(`🔍 POINTER DOWN: clientX=${e.clientX}, clientY=${e.clientY}, target=${e.target.tagName}`, 'pointer');
+        });
+        
+        testCard.addEventListener('dragstart', (e) => {
+            log(`🔍 DRAG START: clientX=${e.clientX}, clientY=${e.clientY}`, 'drag');
+            
+            // Create a custom drag image
+            const canvas = document.createElement('canvas');
+            canvas.width = 72;
+            canvas.height = 72;
+            const ctx = canvas.getContext('2d');
+            
+            // Draw a simple circle
+            ctx.fillStyle = '#ff6b6b';
+            ctx.beginPath();
+            ctx.arc(36, 36, 30, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Set drag image with center offset
+            e.dataTransfer.setDragImage(canvas, 36, 36);
+            log(`🔍 SET DRAG IMAGE: size=72x72, offset=36,36`, 'drag');
+        });
+        
+        testCard.addEventListener('dragend', (e) => {
+            log(`🔍 DRAG END`, 'drag');
+        });
+        
+        // Drop zone events
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+        
+        dropZone.addEventListener('dragleave', (e) => {
+            dropZone.classList.remove('drag-over');
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            log(`🔍 DROP: clientX=${e.clientX}, clientY=${e.clientY}`, 'drop');
+        });
+        
+        log('Test initialized - try dragging the test card!', 'info');
+    </script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+{
+  "name": "RPG Balancer - Idle Village Sandbox",
+  "short_name": "RPG Balancer",
+  "description": "Config-driven RPG balancing system with Idle Village sandbox",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#f2c94c",
+  "background_color": "#0b0b12",
+  "lang": "en",
+  "categories": ["games", "simulation", "productivity"],
+  "icons": [
+    {
+      "src": "/assets/icons/app/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icons/app/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icons/app/maskable-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/assets/icons/app/maskable-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/assets/screenshots/rpg-balancer-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Idle Village sandbox mobile interface"
+    },
+    {
+      "src": "/assets/screenshots/punch-club-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "RPG Balancer assignment loop"
+    }
+  ]
+}

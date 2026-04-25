@@ -1,0 +1,231 @@
+{
+  "_version": "1.0",
+  "_component": "POIDetail",
+  "_description": "Fantasy commander game — Dark Luxury aesthetic, Blizzard old-school physical object approach",
+
+  "palette": {
+    "body_base":          "#0c0a08",
+    "body_note":          "nero caldo — opposto di temperatura al rack",
+    "rack_base":          "#1e2d48",
+    "rack_note":          "blu mezzanotte — stacca per luminosità e temperatura",
+    "bronze_mid":         "#3a2008",
+    "bronze_light":       "rgba(255,252,210,.80)",
+    "bronze_dark":        "rgba(0,0,0,.96)",
+    "bronze_left":        "rgba(210,158,38,.40)",
+    "bronze_right":       "rgba(8,4,0,.80)",
+    "title_color":        "#ffd84a",
+    "title_note":         "Diablo III gold — luminoso, leggibile, dominante",
+    "stat_value":         "#e8b040",
+    "danger_value":       "#e04818",
+    "subtitle":           "rgba(192,158,78,.55)",
+    "label":              "rgba(168,128,52,.62)",
+    "description":        "rgba(200,168,105,.58)",
+    "rack_highlight_top": "rgba(148,172,220,.20)",
+    "rack_vignette":      "rgba(8,12,24,.42)",
+    "ornament_gem":       "rgba(192,140,34,.48)",
+    "ornament_line":      "rgba(175,125,30,.20)",
+    "table_veil":         "rgba(4,3,2,.45)"
+  },
+
+  "typography": {
+    "title": {
+      "family": "Cinzel",
+      "weight": 700,
+      "size": "24px",
+      "letterSpacing": ".03em",
+      "color": "#ffd84a",
+      "textShadow": "0 1px 0 rgba(255,225,100,.50), 0 2px 0 rgba(30,10,0,.95), 0 4px 10px rgba(0,0,0,.92), 0 0 20px rgba(230,160,15,.32)"
+    },
+    "subtitle": {
+      "family": "EB Garamond",
+      "style": "italic",
+      "size": "12px",
+      "color": "rgba(192,158,78,.55)"
+    },
+    "statLabel": {
+      "family": "Cinzel",
+      "size": "6.5px",
+      "letterSpacing": ".26em",
+      "textTransform": "uppercase",
+      "color": "rgba(168,128,52,.62)"
+    },
+    "statValue": {
+      "family": "Cinzel",
+      "weight": 700,
+      "size": "16px",
+      "color": "#e8b040",
+      "textShadow": "0 -1px 0 rgba(255,238,155,.36), 0 1px 0 rgba(232,182,48,.46), 0 2px 0 rgba(135,78,5,.40), 0 3px 0 rgba(32,10,0,.72), 0 3px 4px rgba(0,0,0,.88), 0 0 7px rgba(205,148,16,.30)"
+    },
+    "statValueDanger": {
+      "color": "#e04818",
+      "textShadow": "0 -1px 0 rgba(255,158,95,.26), 0 1px 0 rgba(220,78,26,.40), 0 2px 0 rgba(105,16,2,.48), 0 3px 0 rgba(32,4,0,.78), 0 3px 4px rgba(0,0,0,.90), 0 0 7px rgba(205,52,10,.40)"
+    },
+    "rackLabel": {
+      "family": "Cinzel",
+      "size": "6.5px",
+      "letterSpacing": ".28em",
+      "textTransform": "uppercase",
+      "color": "rgba(158,120,46,.46)"
+    },
+    "description": {
+      "family": "EB Garamond",
+      "style": "italic",
+      "size": "13px",
+      "lineHeight": "1.58",
+      "color": "rgba(200,168,105,.58)"
+    },
+    "button": {
+      "family": "Cinzel",
+      "weight": 700,
+      "size": "8.5px",
+      "letterSpacing": ".28em",
+      "textTransform": "uppercase",
+      "color": "rgba(180,130,45,.72)",
+      "textShadow_note": "incised effect — shadow chiara sopra simula bordo superiore incisione",
+      "textShadow": "0 -1px 0 rgba(255,230,130,.55), 0 1px 0 rgba(15,6,0,.95), 0 1px 4px rgba(0,0,0,.88)"
+    }
+  },
+
+  "dimensions": {
+    "modalWidth":       "380px",
+    "edgeThickness":    "7px",
+    "edgeDepth":        "8px",
+    "borderWidth":      "3px",
+    "cornerSize":       "26px",
+    "rivetSize":        "16px",
+    "slotSize":         "68px",
+    "slotSizeStandalone": "80px",
+    "rackPadding":      "16px 18px"
+  },
+
+  "shadows": {
+    "modalDropShadow": [
+      "drop-shadow(0 3px 0 rgba(0,0,0,1))",
+      "drop-shadow(0 8px 18px rgba(0,0,0,.96))",
+      "drop-shadow(0 28px 55px rgba(0,0,0,.82))",
+      "drop-shadow(0 18px 40px rgba(80,45,8,.22))"
+    ],
+    "modalDropShadow_note": "quattro layer: contatto duro / peso medio / diffusa / alone ambra",
+    "rackAO": [
+      "0 0 0 1px rgba(0,0,0,1)",
+      "0 1px 0 rgba(0,0,0,1)",
+      "0 2px 6px rgba(0,0,0,.96)",
+      "0 4px 16px rgba(0,0,0,.82)",
+      "0 8px 24px rgba(0,0,0,.55)"
+    ],
+    "rackInset": [
+      "inset 0 8px 22px rgba(0,0,0,.88)",
+      "inset 0 4px 10px rgba(0,0,0,.72)",
+      "inset 0 -4px 10px rgba(0,0,0,.60)",
+      "inset 6px 0 14px rgba(0,0,0,.65)",
+      "inset -6px 0 14px rgba(0,0,0,.65)"
+    ],
+    "bronzeFrame": {
+      "insetTop":    "inset 0 3px 0 rgba(255,255,205,.88)",
+      "insetTop2":   "inset 0 5px 0 rgba(235,175,42,.30)",
+      "insetBottom": "inset 0 -3px 0 rgba(0,0,0,.98)",
+      "insetLeft":   "inset 3px 0 0 rgba(225,165,40,.48)",
+      "insetRight":  "inset -3px 0 0 rgba(5,2,0,.88)",
+      "outerGlow":   "0 0 18px rgba(120,72,12,.22)"
+    }
+  },
+
+  "textures": {
+    "body": {
+      "method": "CSS background-image gradient",
+      "base": "#0c0a08",
+      "layers": [
+        "radial-gradient vignette — bordi scuri",
+        "linear-gradient direzionale 155deg"
+      ]
+    },
+    "rack": {
+      "method": "SVG inline nel DOM — feDiffuseLighting su fractalNoise",
+      "method_note": "NON usare SVG data URI nel CSS background-image — browser support parziale",
+      "base": "#1e2d48",
+      "filter": {
+        "type": "feDiffuseLighting",
+        "lighting-color": "#5878b0",
+        "surfaceScale": 1.5,
+        "diffuseConstant": 0.65,
+        "azimuth": 215,
+        "elevation": 48,
+        "turbulence": {
+          "type": "fractalNoise",
+          "baseFrequency": "0.65 0.55",
+          "numOctaves": 5,
+          "seed": 12
+        },
+        "colorMatrix": ".12 0 0 0 .002  0 .16 0 0 .003  0 0 .28 0 .008  0 0 0 1 0"
+      },
+      "blendOpacity": 0.48
+    }
+  },
+
+  "slots": {
+    "size": 68,
+    "R_outer_ratio":    0.352,
+    "R_inner_ratio":    0.132,
+    "R_medallion_ratio": 0.252,
+    "BORE_ratio":       0.042,
+    "bore_note":        "BORE = size * 0.042 — parete interna visibile tra bezel e cavità",
+    "cavityFill":       "radialGradient cav-fill — nero profondo con vena ambra",
+    "bezel": {
+      "zones": 3,
+      "shadow":   "rgba(0,0,0,.90) stroke offset",
+      "mid":      "rgba(122,76,16,.76) stroke",
+      "specular": "rgba(255,250,202,.68) dasharray 14% arc",
+      "shimmer":  "rgba(255,255,238,.18) dasharray 2.8% arc"
+    },
+    "emptySlotAnimation": {
+      "glowColor": "rgba(62,108,195,.35)",
+      "glowDuration": "2.8s",
+      "plusOpacity": "0.55 → 0.85 → 0.55",
+      "plusDuration": "2.8s"
+    },
+    "medallion": {
+      "fill":    "radialGradient med-fill — oro → marrone → nero",
+      "rim":     "radialGradient med-rim — bronzo sul bordo",
+      "specular":"radialGradient med-spec — highlight 30% 24%",
+      "crossIcon": "rgba(14,7,1,.82) con highlight rgba(255,220,100,.16)"
+    }
+  },
+
+  "animation": {
+    "dropIn": {
+      "duration": "200ms",
+      "easing":   "ease-out",
+      "keyframes": {
+        "0%":   "opacity:0, translateY(-10px) scale(.994), brightness(.6)",
+        "60%":  "opacity:1, translateY(2px) scale(1.001)",
+        "100%": "opacity:1, translateY(0) scale(1)"
+      }
+    }
+  },
+
+  "bronzePhilosophy": {
+    "note": "Tre zone nette — nessun gradiente morbido",
+    "zone1_shadow":   "quasi nero rgba(0,0,0,.90) — in ombra totale",
+    "zone2_mid":      "bronzo medio rgba(122,76,16,.76) — corpo del metallo",
+    "zone3_specular": "bianco quasi puro rgba(255,250,202,.68) — cattura luce zenitale",
+    "rule": "contrasto violento tra ombra e specular — non gradiente — questo vende il metallo duro e lucido"
+  },
+
+  "materialHierarchy": {
+    "level1": "Tavolo basalto — bg.png reale",
+    "level2": "Mappa pergamena — map.jpg reale",
+    "level3": "POI Detail body — #0c0a08 nero caldo scuro",
+    "level4": "SlotRack tray — #1e2d48 blu mezzanotte freddo",
+    "level5": "Frame bronzo — mediatore tra i materiali",
+    "level6": "Slot cavità — obsidian + bronzo",
+    "mediator_note": "Il bronzo è il mediatore visivo tra tutti i livelli — caldo, neutro, riflettente"
+  },
+
+  "antiPatterns": {
+    "no_svg_filter_in_css_background": "I browser ignorano spesso feDiffuseLighting/feSpecularLighting nelle SVG data URI nel CSS. Usare SVG inline nel DOM.",
+    "no_8_layer_text_shadow": "Più di 3-4 layer di text-shadow creano smear e perdita di leggibilità. Max 3 layer: contatto duro + diffusa + glow stretto.",
+    "no_wide_glow": "Glow > 20px blur su testo = sfocatura. Max 12-16px.",
+    "no_flat_rect_button": "Il bottone deve avere spessore fisico, testo inciso, rivetti laterali.",
+    "no_same_value_materials": "Body e rack devono differire sia per luminosità che per temperatura colore."
+  }
+}

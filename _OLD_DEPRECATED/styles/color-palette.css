@@ -1,0 +1,92 @@
+:root {
+    /* === Gilded Observatory Core Tokens === */
+    --obsidian-darkest: #050509;
+    --obsidian-dark: #0f1a1d;
+    --obsidian: #132427;
+    --obsidian-light: #0c1517;
+
+    --slate-darkest: #2c3737;
+    --slate-dark: #384444;
+    --slate: #3b4b4d;
+    --slate-light: #3e4d4d;
+    --slate-border: #475758;
+
+    --ivory: #f0efe4;
+    --ivory-bright: #f6f3e4;
+    --ivory-warm: #f5f0dc;
+    --ivory-muted: #f3eddb;
+
+    --teal: #8db3a5;
+    --teal-light: #9fb3af;
+    --teal-muted: #96aaa6;
+    --teal-soft: #aeb8b4;
+    --teal-dim: #6da8a0;
+
+    --gold: #c9a227;
+    --gold-bright: #f1d69c;
+    --gold-warm: #d9bf7d;
+    --gold-dark: #a7894f;
+
+    --success: var(--teal);
+    --warning: var(--gold);
+    --error: #a85c5c;
+    --info: var(--teal-light);
+
+    /* === Background & Surface Layers === */
+    --bg-main: linear-gradient(to bottom right, var(--obsidian-darkest), var(--obsidian));
+    --bg-card: linear-gradient(135deg, var(--obsidian-darkest), rgba(0, 0, 0, 0.25));
+    --bg-panel: rgba(12, 21, 23, 0.8);
+    --bg-overlay: rgba(0, 0, 0, 0.35);
+
+    /* === Text & Borders === */
+    --text-primary: var(--ivory);
+    --text-secondary: var(--ivory-warm);
+    --text-muted: var(--teal-soft);
+    --border-strong: var(--slate);
+    --border-subtle: rgba(255, 255, 255, 0.15);
+
+    /* === Spreadable Utility Tokens === */
+    --shadow-soft: 0 12px 25px rgba(0, 0, 0, 0.55);
+    --shadow-glow-gold: 0 0 25px rgba(201, 162, 39, 0.35);
+    --shadow-glow-teal: 0 0 25px rgba(141, 179, 165, 0.35);
+
+    /* Legacy aliases so existing `.fantasy-*` classes pick up new tokens */
+    --fantasy-bg-wood-dark: var(--obsidian-darkest);
+    --fantasy-bg-wood-light: var(--obsidian);
+    --fantasy-bg-paper: var(--obsidian-light);
+    --fantasy-text-light: var(--ivory);
+    --fantasy-text-bronze: var(--gold);
+    --fantasy-text-ink: var(--ivory);
+    --fantasy-success: var(--success);
+    --fantasy-warning: var(--warning);
+    --fantasy-error: var(--error);
+    --fantasy-info: var(--info);
+    --fantasy-primary: var(--teal);
+    --fantasy-primary-dark: var(--teal-dim);
+    --fantasy-primary-light: var(--teal-light);
+    --fantasy-secondary: var(--slate);
+    --fantasy-secondary-dark: var(--slate-dark);
+    --shadow-fantasy-card: var(--shadow-soft);
+    --shadow-fantasy-inset: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    --shadow-fantasy-float: 0 12px 32px rgba(0, 0, 0, 0.4);
+    --glow-fantasy-gold: var(--shadow-glow-gold);
+    --glow-fantasy-magic: var(--shadow-glow-teal);
+}
+
+.fantasy-theme-bg {
+    background: var(--bg-main);
+}
+
+.fantasy-theme-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-soft);
+}
+
+.fantasy-theme-text {
+    color: var(--text-primary);
+}
+
+.fantasy-theme-border {
+    border-color: var(--border-strong);
+}

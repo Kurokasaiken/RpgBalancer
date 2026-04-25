@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Wanderlust — Legacy vs Solar Frontier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@400;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --void: #04060a;
+  --abyss: #070a0d;
+  --deep: #0b0f0e;
+  --mid: #141d18;
+  --raised: #1a2620;
+  --emerald-3: #164a28;
+  --emerald-6: #44c470;
+  --copper-4: #9a461a;
+  --copper-6: #d88050;
+  --gold-5: #b88c20;
+  --gold-7: #e8cc88;
+  --text-0: #f4e8d0;
+  --text-1: #c8b090;
+  --text-2: #7a6858;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "EB Garamond", Georgia, serif;
+  background: var(--void);
+  color: var(--text-0);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 72px;
+  padding: 48px clamp(24px,6vw,72px) 72px;
+}
+header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+header .eyebrow {
+  font-family: "Cinzel", serif;
+  font-size: 10px;
+  letter-spacing: 0.55em;
+  text-transform: uppercase;
+  color: rgba(232,204,136,0.8);
+}
+header h1 {
+  font-family: "Cinzel Decorative", serif;
+  font-size: clamp(26px,4vw,36px);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-7);
+}
+header p {
+  font-size: 16px;
+  color: var(--text-1);
+  max-width: 760px;
+  margin: 0 auto;
+}
+section {
+  border: 1px solid rgba(232,204,136,0.08);
+  border-radius: 12px;
+  padding: 32px;
+  background: linear-gradient(150deg,rgba(6,10,12,0.9),rgba(4,6,10,0.82));
+  box-shadow: 0 35px 80px rgba(0,0,0,0.55);
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+section h2 {
+  font-family: "Cinzel", serif;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  font-size: 18px;
+}
+section p.desc {
+  font-size: 14px;
+  color: var(--text-1);
+  line-height: 1.6;
+}
+.
+legacy-frame {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 18px 45px rgba(0,0,0,0.7);
+  border: 1px solid rgba(255,255,255,0.05);
+  min-height: 640px;
+}
+legacy-frame iframe {
+  border: none;
+  width: 100%;
+  min-height: 640px;
+  background: black;
+}
+canvas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
+  gap: 22px;
+}
+canvas-card {
+  border: 1px solid rgba(232,204,136,0.12);
+  border-radius: 10px;
+  padding: 20px;
+  background: radial-gradient(circle at 20% 0%,rgba(68,196,112,0.22),transparent 55%), linear-gradient(145deg,rgba(10,18,16,0.92),rgba(6,6,4,0.82));
+  box-shadow: 0 25px 70px rgba(0,0,0,0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+canvas-card h3 {
+  font-family: "Cinzel", serif;
+  font-size: 15px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--gold-7);
+}
+canvas-card ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--text-1);
+}
+canvas-card li::before {
+  content: "✦";
+  margin-right: 8px;
+  color: var(--gold-7);
+}
+palette-band {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+palette-pill {
+  font-family: "Cinzel", serif;
+  font-size: 10px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-0);
+}
+palette-pill[data-tone="emerald"] { background: linear-gradient(120deg,var(--emerald-3),var(--emerald-6)); }
+palette-pill[data-tone="copper"] { background: linear-gradient(120deg,var(--copper-4),var(--copper-6)); }
+palette-pill[data-tone="gold"] { background: linear-gradient(120deg,var(--gold-5),var(--gold-7)); color:#1f1200; }
+palette-pill[data-tone="obsidian"] { background: linear-gradient(120deg,var(--void),var(--deep)); }
+.
+doc-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  font-size: 13px;
+  color: var(--text-1);
+}
+doc-links a {
+  color: var(--gold-7);
+  text-decoration: none;
+}
+doc-links a:hover { text-decoration: underline; }
+@media (max-width: 720px) {
+  body { padding: 32px 18px 60px; gap: 48px; }
+  section { padding: 24px; }
+  .legacy-frame iframe { min-height: 520px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <p class="eyebrow">Confronto ufficiale</p>
+  <h1>Wanderlust · Legacy vs Solar Frontier</h1>
+  <p>
+    La metà superiore preserva il mockup originale; la sezione seguente applica i principi di
+    PROJECT_PHILOSOPHY, art_direction_plan e Material Canvas (palette Emerald + Sun-Bronze,
+    dualità Wilderness/Impero, zero hardcode).
+  </p>
+</header>
+<section>
+  <h2>Legacy mockup</h2>
+  <p class="desc">Versione attuale (file `public/wanderlust-mockup.html`) caricata in un iframe.</p>
+  <div class="legacy-frame">
+    <iframe src="./wanderlust-mockup.html" title="Wanderlust Legacy Layout" loading="lazy"></iframe>
+  </div>
+</section>
+<section>
+  <h2>Interpretazione Solar Frontier</h2>
+  <p class="desc">
+    Stessa informazione, ma re-immaginata secondo DNA Prismatic Wanderlust (docs/plans/art_direction_plan.md)
+    e Material Canvas v2: texture ossidiane, split Wilderness/Impero, chip config-first derivati dalle tabelle
+    stat/weight ufficiali.
+  </p>
+  <palette-band>
+    <palette-pill data-tone="obsidian">Obsidian Depths</palette-pill>
+    <palette-pill data-tone="emerald">Emerald Sap</palette-pill>
+    <palette-pill data-tone="copper">Sun-Bronze</palette-pill>
+    <palette-pill data-tone="gold">Gilded Halo</palette-pill>
+  </palette-band>
+  <canvas-grid>
+    <canvas-card>
+      <h3>Roster · Weight-Based</h3>
+      <ul>
+        <li>Giggiolillo — HP 150 (tick +3), STA 100%</li>
+        <li>SpaccaCuli — HP 200, morale +Solar</li>
+        <li>Aldric — in missione, rigenerazione richiesta</li>
+      </ul>
+      <p class="desc">Valori letti da config/balancing/statWeights.ts (nessun hardcode UI).</p>
+    </canvas-card>
+    <canvas-card>
+      <h3>Wilderness</h3>
+      <ul>
+        <li>Rude bellezza, legno + paglia dorata</li>
+        <li>Azure vibrante, ombre teal</li>
+        <li>Pennellate Jaime Jones (materico)</li>
+      </ul>
+    </canvas-card>
+    <canvas-card>
+      <h3>Impero</h3>
+      <ul>
+        <li>Basalto nero venato + Sun-Bronze</li>
+        <li>Silhouette Sparth, monumentalità</li>
+        <li>Luce Solar Triumph · flare prismatici</li>
+      </ul>
+    </canvas-card>
+    <canvas-card>
+      <h3>Quest Ledger</h3>
+      <ul>
+        <li>Pattuglia Nord · STA &gt; 40 · HP &gt; 80</li>
+        <li>Preset Style Lab: density compact, motion reduced</li>
+        <li>Modifier scope chips (GLOBAL / QUEST / RESIDENT)</li>
+      </ul>
+    </canvas-card>
+  </canvas-grid>
+  <doc-links>
+    <span>Docs consultati:</span>
+    <a href="../src/docs/docs/PROJECT_PHILOSOPHY.md">PROJECT_PHILOSOPHY.md</a>
+    <a href="../src/docs/docs/plans/art_direction_plan.md">art_direction_plan.md</a>
+    <a href="../material-canvas-v2.html">material-canvas-v2.html</a>
+  </doc-links>
+</section>
+</body>
+</html>

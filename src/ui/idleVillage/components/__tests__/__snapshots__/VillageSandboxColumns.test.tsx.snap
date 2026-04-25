@@ -1,0 +1,49 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`VillageSandboxColumns > renders board layout by default 1`] = `
+<section
+  class="grid gap-4 lg:grid-cols-3"
+  data-testid="village-sandbox-columns-board"
+>
+  <div
+    class="lg:col-span-2 space-y-4"
+    data-testid="village-sandbox-left-column"
+  >
+    <div>
+      Left
+    </div>
+  </div>
+  <div
+    class="default-card min-h-80"
+    data-testid="village-sandbox-right-column"
+  >
+    <div>
+      Right
+    </div>
+  </div>
+</section>
+`;
+
+exports[`VillageSandboxColumns > renders stacked layout 1`] = `
+<section
+  class="flex flex-col gap-2"
+  data-testid="village-sandbox-columns-stacked"
+>
+  <div
+    class="order-first space-y-4"
+    data-testid="village-sandbox-left-column"
+  >
+    <div>
+      Left
+    </div>
+  </div>
+  <div
+    class="order-last default-card min-h-80"
+    data-testid="village-sandbox-right-column"
+  >
+    <div>
+      Right
+    </div>
+  </div>
+</section>
+`;

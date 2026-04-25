@@ -1,0 +1,281 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "session": {
+    "sessionId": "playtest_PT-001_2026-01-23T21:00:00Z",
+    "testerId": "PT-001",
+    "deviceType": "iPhone 14 Pro",
+    "browserType": "Safari 17.2",
+    "viewportWidth": 390,
+    "viewportHeight": 844,
+    "sessionStartTime": "2026-01-23T21:00:00.000Z",
+    "sessionEndTime": "2026-01-23T21:25:00.000Z",
+    "testScenario": "FTUE",
+    "testerExperience": "beginner",
+    "previousSessions": 0
+  },
+  "metrics": {
+    "core": {
+      "cycleDurationMs": 58000,
+      "tapsPerCycle": 14,
+      "goldGainRate": 12,
+      "foodGainRate": 2.5,
+      "pickerCloseRate": 98.5,
+      "assignmentLatencyMs": 420
+    },
+    "ftue": {
+      "tutorialCompletionRate": 100,
+      "tutorialDurationMs": 240000,
+      "stepSkipRate": 0,
+      "tutorialAbandonmentRate": 0,
+      "postTutorialRetention": 100
+    },
+    "performance": {
+      "coldStartTimeMs": 2800,
+      "frameRate": 32,
+      "memoryUsageMB": 85,
+      "touchResponseMs": 95
+    },
+    "uxQuality": {
+      "errorRate": 3.5,
+      "confusionEvents": 2,
+      "hapticFeedbackSuccess": 100,
+      "visualFeedbackClarity": 92
+    }
+  },
+  "events": [
+    {
+      "eventType": "session_start",
+      "sessionId": "playtest_PT-001_2026-01-23T21:00:00Z",
+      "timestamp": 1706040000000,
+      "data": {
+        "device": "iPhone 14 Pro",
+        "browser": "Safari 17.2",
+        "viewport": "390x844"
+      }
+    },
+    {
+      "eventType": "tutorial_start",
+      "sessionId": "playtest_PT-001_2026-01-23T21:00:00Z",
+      "timestamp": 1706040005000,
+      "data": {
+        "tutorialId": "surge_resource_tutorial",
+        "version": "1.0.0"
+      }
+    },
+    {
+      "eventType": "tutorial_step_complete",
+      "sessionId": "playtest_PT-001_2026-01-23T21:00:00Z",
+      "timestamp": 1706040030000,
+      "data": {
+        "stepIndex": 0,
+        "stepId": "welcome",
+        "durationMs": 25000,
+        "skipped": false
+      }
+    },
+    {
+      "eventType": "tutorial_step_complete",
+      "sessionId": "playtest_PT-001_2026-01-23T21:00:00Z",
+      "timestamp": 1706040060000,
+      "data": {
+        "stepIndex": 1,
+        "stepId": "surge_intro",
+        "durationMs": 30000,
+        "skipped": false
+      }
+    },
+    {
+      "eventType": "tutorial_step_complete",
+      "sessionId": "playtest_PT-001_2026-01-23T21:00:00Z",
+      "timestamp": 1706040095000,
+      "data": {
+        "stepIndex": 2,
+        "stepId": "surge_mechanics",
+        "durationMs": 35000,
+        "skipped": false
+      }
+    },
+    {
+      "eventType": "tutorial_step_complete",
+      "sessionId": "playtest_PT-001_2026-01-23T21:00:00Z",
+      "timestamp": 1706040135000,
+      "data": {
+        "stepIndex": 3,
+        "stepId": "surge_usage",
+        "durationMs": 40000,
+        "skipped": false
+      }
+    },
+    {
+      "eventType": "tutorial_step_complete",
+      "sessionId": "playtest_PT-001_2026-01-23T21:00:00Z",
+      "timestamp": 1706040180000,
+      "data": {
+        "stepIndex": 4,
+        "stepId": "surge_strategy",
+        "durationMs": 45000,
+        "skipped": false
+      }
+    },
+    {
+      "eventType": "tutorial_step_complete",
+      "sessionId": "playtest_PT-001_2026-01-23T21:00:00Z",
+      "timestamp": 1706040245000,
+      "data": {
+        "stepIndex": 5,
+        "stepId": "completion",
+        "durationMs": 65000,
+        "skipped": false
+      }
+    },
+    {
+      "eventType": "tutorial_complete",
+      "sessionId": "playtest_PT-001_2026-01-23T21:00:00Z",
+      "timestamp": 1706040245000,
+      "data": {
+        "totalDurationMs": 240000,
+        "stepsCompleted": 6,
+        "stepsSkipped": 0,
+        "completionRate": 100
+      }
+    },
+    {
+      "eventType": "gym_shift_start",
+      "sessionId": "playtest_PT-001_2026-01-23T21:00:00Z",
+      "timestamp": 1706040260000,
+      "data": {
+        "activityId": "gym-shift-001",
+        "residentId": "resident-001",
+        "assignmentLatencyMs": 420
+      }
+    },
+    {
+      "eventType": "picker_open",
+      "sessionId": "playtest_PT-001_2026-01-23T21:00:00Z",
+      "timestamp": 1706040260000,
+      "data": {
+        "slotId": "gym-shift-slot",
+        "compatibleResidents": 3
+      }
+    },
+    {
+      "eventType": "picker_assign",
+      "sessionId": "playtest_PT-001_2026-01-23T21:00:00Z",
+      "timestamp": 1706040260420,
+      "data": {
+        "residentId": "resident-001",
+        "slotId": "gym-shift-slot",
+        "latencyMs": 420
+      }
+    },
+    {
+      "eventType": "picker_close",
+      "sessionId": "playtest_PT-001_2026-01-23T21:00:00Z",
+      "timestamp": 1706040260500,
+      "data": {
+        "assigned": true,
+        "totalDurationMs": 500
+      }
+    },
+    {
+      "eventType": "resource_change",
+      "sessionId": "playtest_PT-001_2026-01-23T21:00:00Z",
+      "timestamp": 1706040318000,
+      "data": {
+        "resourceType": "gold",
+        "delta": 12,
+        "newValue": 112,
+        "source": "gym_shift_complete"
+      }
+    },
+    {
+      "eventType": "gym_shift_complete",
+      "sessionId": "playtest_PT-001_2026-01-23T21:00:00Z",
+      "timestamp": 1706040318000,
+      "data": {
+        "activityId": "gym-shift-001",
+        "durationMs": 58000,
+        "goldEarned": 12,
+        "fatigueGained": 15
+      }
+    },
+    {
+      "eventType": "rest_start",
+      "sessionId": "playtest_PT-001_2026-01-23T21:00:00Z",
+      "timestamp": 1706040325000,
+      "data": {
+        "residentId": "resident-001",
+        "currentFatigue": 15
+      }
+    },
+    {
+      "eventType": "resource_change",
+      "sessionId": "playtest_PT-001_2026-01-23T21:00:00Z",
+      "timestamp": 1706040340000,
+      "data": {
+        "resourceType": "food",
+        "delta": -0.5,
+        "newValue": 9.5,
+        "source": "rest_consumption"
+      }
+    },
+    {
+      "eventType": "rest_complete",
+      "sessionId": "playtest_PT-001_2026-01-23T21:00:00Z",
+      "timestamp": 1706040355000,
+      "data": {
+        "residentId": "resident-001",
+        "durationMs": 30000,
+        "fatigueRecovered": 15,
+        "foodConsumed": 0.5
+      }
+    },
+    {
+      "eventType": "cycle_complete",
+      "sessionId": "playtest_PT-001_2026-01-23T21:00:00Z",
+      "timestamp": 1706040355000,
+      "data": {
+        "cycleNumber": 1,
+        "totalDurationMs": 95000,
+        "tapsUsed": 14,
+        "goldGained": 12,
+        "foodGained": 2.5,
+        "netGold": 12,
+        "netFood": 2
+      }
+    },
+    {
+      "eventType": "confusion_event",
+      "sessionId": "playtest_PT-001_2026-01-23T21:00:00Z",
+      "timestamp": 1706040380000,
+      "data": {
+        "eventType": "hesitation",
+        "context": "picker_selection",
+        "durationMs": 3000,
+        "resolved": true
+      }
+    },
+    {
+      "eventType": "confusion_event",
+      "sessionId": "playtest_PT-001_2026-01-23T21:00:00Z",
+      "timestamp": 1706040420000,
+      "data": {
+        "eventType": "backtracking",
+        "context": "activity_assignment",
+        "durationMs": 2000,
+        "resolved": true
+      }
+    },
+    {
+      "eventType": "session_end",
+      "sessionId": "playtest_PT-001_2026-01-23T21:00:00Z",
+      "timestamp": 1706041500000,
+      "data": {
+        "totalDurationMs": 1500000,
+        "cyclesCompleted": 3,
+        "tutorialCompleted": true,
+        "successCriteriaMet": true
+      }
+    }
+  ]
+}

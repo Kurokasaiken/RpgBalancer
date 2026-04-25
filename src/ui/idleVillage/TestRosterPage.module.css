@@ -1,0 +1,110 @@
+/* TestRosterPage Styles - WL-STY-006 Surface Integration */
+
+/* Shake animation for occupied slots */
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-2px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(2px);
+  }
+}
+
+.shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* Wanderlust pillar toggle styles */
+.wanderlust-pillar-toggle {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wanderlust-pillar-toggle button {
+  transition: all 0.2s ease-in-out;
+}
+
+.wanderlust-pillar-toggle button:hover {
+  transform: translateY(-1px);
+}
+
+/* ActionHalo demo section */
+.action-halo-demo {
+  background: linear-gradient(135deg, rgba(10, 4, 2, 0.1) 0%, rgba(26, 12, 6, 0.2) 100%);
+  border: 1px solid rgba(192, 112, 40, 0.2);
+}
+
+/* ActionCardBase preview styling */
+.action-card-base-preview {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.action-card-base-preview:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Telemetry logging styles */
+.telemetry-badge {
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+  font-family: monospace;
+  font-size: 10px;
+  padding: 2px 4px;
+  border-radius: 2px;
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.telemetry-badge.visible {
+  opacity: 1;
+}
+
+/* Visual regression helpers */
+[data-wanderlust-pillar="wilderness"] {
+  --wanderlust-accent: rgba(58, 215, 80, 0.8);
+  --wanderlust-glow: rgba(168, 200, 168, 0.4);
+}
+
+[data-wanderlust-pillar="empire"] {
+  --wanderlust-accent: rgba(216, 144, 64, 0.8);
+  --wanderlust-glow: rgba(255, 238, 148, 0.4);
+}
+
+/* Playwright test helpers */
+[data-testid^="action-halo-demo"] {
+  /* Ensure consistent sizing for visual tests */
+  min-width: 48px;
+  min-height: 48px;
+}
+
+[data-testid^="action-card-base-"] {
+  /* Ensure consistent layout for visual tests */
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .action-halo-demo {
+    padding: 4px;
+  }
+  
+  .action-halo-demo .action-halo {
+    transform: scale(0.9);
+  }
+  
+  .wanderlust-pillar-toggle {
+    flex-direction: column;
+    gap: 1px;
+  }
+}

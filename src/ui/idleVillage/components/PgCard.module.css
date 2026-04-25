@@ -1,0 +1,21 @@
+@keyframes bounce-spring {
+  0% {
+    transform: translateX(0) translateY(0) scale(1);
+  }
+  30% {
+    transform: translateX(-12px) translateY(-6px) scale(0.96);
+  }
+  60% {
+    transform: translateX(6px) translateY(3px) scale(1.02);
+  }
+  85% {
+    transform: translateX(-3px) translateY(-1px) scale(0.99);
+  }
+  100% {
+    transform: translateX(0) translateY(0) scale(1);
+  }
+}
+
+.animate-bounce-spring {
+  animation: bounce-spring 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}

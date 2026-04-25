@@ -1,0 +1,2002 @@
+[
+  {
+    "timestamp": 1768803005288,
+    "sessionId": "session-31",
+    "eventType": "injury",
+    "residentId": "resident-50",
+    "residentLevel": 14,
+    "activityType": "rest",
+    "locationType": "forest",
+    "riskFactors": {
+      "fatigue": 0.8831720650196075,
+      "hunger": 0.7072738409042358,
+      "health": 0.8792741894721985,
+      "morale": 0.7915354728698731
+    },
+    "outcome": {
+      "severity": 0.3701933860778809,
+      "duration": 80,
+      "recoveryTime": 104
+    }
+  },
+  {
+    "timestamp": 1768809509695,
+    "sessionId": "session-24",
+    "eventType": "injury",
+    "residentId": "resident-40",
+    "residentLevel": 18,
+    "activityType": "social",
+    "locationType": "forest",
+    "riskFactors": {
+      "fatigue": 0.4703874886035919,
+      "hunger": 0.7313331365585327,
+      "health": 0.55620938539505,
+      "morale": 0.42345380783081055
+    },
+    "outcome": {
+      "severity": 0.3946043968200684,
+      "duration": 92,
+      "recoveryTime": 437
+    }
+  },
+  {
+    "timestamp": 1768823385759,
+    "sessionId": "session-43",
+    "eventType": "death",
+    "residentId": "resident-9",
+    "residentLevel": 4,
+    "activityType": "explore",
+    "locationType": "village",
+    "riskFactors": {
+      "fatigue": 0.5044973492622375,
+      "hunger": 0.9729743003845215,
+      "health": 0.6272741794586181,
+      "morale": 0.8028057098388672
+    },
+    "outcome": {
+      "severity": 0.2802410125732422,
+      "duration": 44,
+      "recoveryTime": 438
+    }
+  },
+  {
+    "timestamp": 1768788854466,
+    "sessionId": "session-31",
+    "eventType": "injury",
+    "residentId": "resident-43",
+    "residentLevel": 15,
+    "activityType": "work",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.09212517738342285,
+      "hunger": 0.6909420788288116,
+      "health": 0.579713761806488,
+      "morale": 0.7597283363342286
+    },
+    "outcome": {
+      "severity": 0.303313159942627,
+      "duration": 39,
+      "recoveryTime": 206
+    }
+  },
+  {
+    "timestamp": 1768823478889,
+    "sessionId": "session-95",
+    "eventType": "injury",
+    "residentId": "resident-2",
+    "residentLevel": 6,
+    "activityType": "work",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.0054931640625,
+      "hunger": 0.2862606309354305,
+      "health": 0.4964003562927246,
+      "morale": 0.5342369079589844
+    },
+    "outcome": {
+      "severity": 0.27440567016601564,
+      "duration": 81,
+      "recoveryTime": 245
+    }
+  },
+  {
+    "timestamp": 1768813106552,
+    "sessionId": "session-85",
+    "eventType": "injury",
+    "residentId": "resident-35",
+    "residentLevel": 1,
+    "activityType": "rest",
+    "locationType": "village",
+    "riskFactors": {
+      "fatigue": 0.5108655691146851,
+      "hunger": 0.6636618375778198,
+      "health": 0.5042906403541565,
+      "morale": 0.5904318809509277
+    },
+    "outcome": {
+      "severity": 0.8633784294128418,
+      "duration": 21,
+      "recoveryTime": 264
+    }
+  },
+  {
+    "timestamp": 1768781309589,
+    "sessionId": "session-61",
+    "eventType": "injury",
+    "residentId": "resident-32",
+    "residentLevel": 13,
+    "activityType": "explore",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.6855700016021729,
+      "hunger": 0.28267788887023926,
+      "health": 0.8549113988876342,
+      "morale": 0.9963251113891602
+    },
+    "outcome": {
+      "severity": 0.4942659378051758,
+      "duration": 20,
+      "recoveryTime": 289
+    }
+  },
+  {
+    "timestamp": 1768801463154,
+    "sessionId": "session-87",
+    "eventType": "injury",
+    "residentId": "resident-35",
+    "residentLevel": 2,
+    "activityType": "social",
+    "locationType": "forest",
+    "riskFactors": {
+      "fatigue": 0.24323561787605286,
+      "hunger": 0.4532245993614197,
+      "health": 0.8630447208881378,
+      "morale": 0.44781036376953126
+    },
+    "outcome": {
+      "severity": 0.788677978515625,
+      "duration": 24,
+      "recoveryTime": 405
+    }
+  },
+  {
+    "timestamp": 1768824275488,
+    "sessionId": "session-44",
+    "eventType": "injury",
+    "residentId": "resident-17",
+    "residentLevel": 15,
+    "activityType": "social",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.9973047971725464,
+      "hunger": 0.5915436744689941,
+      "health": 0.9019006252288817,
+      "morale": 0.4458362579345703
+    },
+    "outcome": {
+      "severity": 0.10455513000488281,
+      "duration": 26,
+      "recoveryTime": 269
+    }
+  },
+  {
+    "timestamp": 1768803709566,
+    "sessionId": "session-69",
+    "eventType": "injury",
+    "residentId": "resident-25",
+    "residentLevel": 14,
+    "activityType": "social",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.1303858757019043,
+      "hunger": 0.5697322189807892,
+      "health": 0.44908944368362425,
+      "morale": 0.7410884141921998
+    },
+    "outcome": {
+      "severity": 0.45397129058837893,
+      "duration": 33,
+      "recoveryTime": 346
+    }
+  },
+  {
+    "timestamp": 1768828891487,
+    "sessionId": "session-38",
+    "eventType": "injury",
+    "residentId": "resident-17",
+    "residentLevel": 3,
+    "activityType": "rest",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.7005950212478638,
+      "hunger": 0.5181223154067993,
+      "health": 0.8782750010490417,
+      "morale": 0.8400143623352052
+    },
+    "outcome": {
+      "severity": 0.3558571815490723,
+      "duration": 48,
+      "recoveryTime": 245
+    }
+  },
+  {
+    "timestamp": 1768847871794,
+    "sessionId": "session-89",
+    "eventType": "injury",
+    "residentId": "resident-1",
+    "residentLevel": 13,
+    "activityType": "explore",
+    "locationType": "forest",
+    "riskFactors": {
+      "fatigue": 0.13086417317390442,
+      "hunger": 0.12172931432723999,
+      "health": 0.3864583998918533,
+      "morale": 0.8159663200378418
+    },
+    "outcome": {
+      "severity": 0.6683119773864746,
+      "duration": 71,
+      "recoveryTime": 184
+    }
+  },
+  {
+    "timestamp": 1768840718726,
+    "sessionId": "session-48",
+    "eventType": "death",
+    "residentId": "resident-16",
+    "residentLevel": 2,
+    "activityType": "social",
+    "locationType": "village",
+    "riskFactors": {
+      "fatigue": 0.9834009408950806,
+      "hunger": 0.22507095336914062,
+      "health": 0.47467558085918427,
+      "morale": 0.6655360221862794
+    },
+    "outcome": {
+      "severity": 0.8792220115661621,
+      "duration": 26,
+      "recoveryTime": 369
+    }
+  },
+  {
+    "timestamp": 1768833254741,
+    "sessionId": "session-82",
+    "eventType": "injury",
+    "residentId": "resident-27",
+    "residentLevel": 15,
+    "activityType": "rest",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.683535099029541,
+      "hunger": 0.27168893814086914,
+      "health": 0.39542174339294434,
+      "morale": 0.8155384302139284
+    },
+    "outcome": {
+      "severity": 0.12444295883178712,
+      "duration": 13,
+      "recoveryTime": 252
+    }
+  },
+  {
+    "timestamp": 1768819604325,
+    "sessionId": "session-37",
+    "eventType": "injury",
+    "residentId": "resident-32",
+    "residentLevel": 12,
+    "activityType": "explore",
+    "locationType": "village",
+    "riskFactors": {
+      "fatigue": 0.43357276916503906,
+      "hunger": 0.5904922485351562,
+      "health": 0.5190156936645507,
+      "morale": 0.9463836669921875
+    },
+    "outcome": {
+      "severity": 0.8448867797851562,
+      "duration": 62,
+      "recoveryTime": 207
+    }
+  },
+  {
+    "timestamp": 1768783113785,
+    "sessionId": "session-28",
+    "eventType": "injury",
+    "residentId": "resident-21",
+    "residentLevel": 8,
+    "activityType": "social",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.032128334045410156,
+      "hunger": 0.41556838154792786,
+      "health": 0.5646845459938049,
+      "morale": 0.33722448348999023
+    },
+    "outcome": {
+      "severity": 0.8184596300125122,
+      "duration": 30,
+      "recoveryTime": 478
+    }
+  },
+  {
+    "timestamp": 1768797605582,
+    "sessionId": "session-100",
+    "eventType": "injury",
+    "residentId": "resident-24",
+    "residentLevel": 14,
+    "activityType": "social",
+    "locationType": "village",
+    "riskFactors": {
+      "fatigue": 0.7832472324371338,
+      "hunger": 0.5984413623809814,
+      "health": 0.7381917715072631,
+      "morale": 0.6478006362915039
+    },
+    "outcome": {
+      "severity": 0.16837940216064454,
+      "duration": 92,
+      "recoveryTime": 375
+    }
+  },
+  {
+    "timestamp": 1768857438510,
+    "sessionId": "session-66",
+    "eventType": "injury",
+    "residentId": "resident-42",
+    "residentLevel": 15,
+    "activityType": "social",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.8872076272964478,
+      "hunger": 0.2019139528274536,
+      "health": 0.38631816804409025,
+      "morale": 0.37957653999328617
+    },
+    "outcome": {
+      "severity": 0.8269480466842651,
+      "duration": 80,
+      "recoveryTime": 142
+    }
+  },
+  {
+    "timestamp": 1768831687047,
+    "sessionId": "session-86",
+    "eventType": "injury",
+    "residentId": "resident-35",
+    "residentLevel": 15,
+    "activityType": "work",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.823196291923523,
+      "hunger": 0.7650836706161499,
+      "health": 0.4578399777412414,
+      "morale": 0.3233424425125122
+    },
+    "outcome": {
+      "severity": 0.16809792518615724,
+      "duration": 25,
+      "recoveryTime": 179
+    }
+  },
+  {
+    "timestamp": 1768818292701,
+    "sessionId": "session-50",
+    "eventType": "injury",
+    "residentId": "resident-17",
+    "residentLevel": 13,
+    "activityType": "social",
+    "locationType": "forest",
+    "riskFactors": {
+      "fatigue": 0.041904598474502563,
+      "hunger": 0.25222307443618774,
+      "health": 0.8467760741710662,
+      "morale": 0.5988872528076172
+    },
+    "outcome": {
+      "severity": 0.6093791961669922,
+      "duration": 58,
+      "recoveryTime": 66
+    }
+  },
+  {
+    "timestamp": 1768789686339,
+    "sessionId": "session-44",
+    "eventType": "injury",
+    "residentId": "resident-32",
+    "residentLevel": 7,
+    "activityType": "work",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.5523388385772705,
+      "hunger": 0.7756178379058838,
+      "health": 0.5961611509323119,
+      "morale": 0.23492145538330078
+    },
+    "outcome": {
+      "severity": 0.8930643320083619,
+      "duration": 80,
+      "recoveryTime": 402
+    }
+  },
+  {
+    "timestamp": 1768839340185,
+    "sessionId": "session-20",
+    "eventType": "injury",
+    "residentId": "resident-47",
+    "residentLevel": 9,
+    "activityType": "explore",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.6743121147155762,
+      "hunger": 0.47683286666870117,
+      "health": 0.7801788806915283,
+      "morale": 0.623019027709961
+    },
+    "outcome": {
+      "severity": 0.503023910522461,
+      "duration": 71,
+      "recoveryTime": 362
+    }
+  },
+  {
+    "timestamp": 1768834775716,
+    "sessionId": "session-27",
+    "eventType": "injury",
+    "residentId": "resident-9",
+    "residentLevel": 18,
+    "activityType": "explore",
+    "locationType": "village",
+    "riskFactors": {
+      "fatigue": 0.0043337345123291016,
+      "hunger": 0.1021435521543026,
+      "health": 0.9865118846297263,
+      "morale": 0.8429580688476563
+    },
+    "outcome": {
+      "severity": 0.56915283203125,
+      "duration": 98,
+      "recoveryTime": 399
+    }
+  },
+  {
+    "timestamp": 1768797292246,
+    "sessionId": "session-84",
+    "eventType": "death",
+    "residentId": "resident-33",
+    "residentLevel": 14,
+    "activityType": "work",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.3557504415512085,
+      "hunger": 0.6672457456588745,
+      "health": 0.6471764206886291,
+      "morale": 0.9250739097595215
+    },
+    "outcome": {
+      "severity": 0.4713908195495605,
+      "duration": 4,
+      "recoveryTime": 339
+    }
+  },
+  {
+    "timestamp": 1768849289638,
+    "sessionId": "session-16",
+    "eventType": "death",
+    "residentId": "resident-21",
+    "residentLevel": 9,
+    "activityType": "work",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.4388536214828491,
+      "hunger": 0.6297892332077026,
+      "health": 0.987096083164215,
+      "morale": 0.8302894592285157
+    },
+    "outcome": {
+      "severity": 0.7214775085449219,
+      "duration": 38,
+      "recoveryTime": 118
+    }
+  },
+  {
+    "timestamp": 1768796990091,
+    "sessionId": "session-6",
+    "eventType": "injury",
+    "residentId": "resident-43",
+    "residentLevel": 9,
+    "activityType": "social",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.26310789585113525,
+      "hunger": 0.1516057252883911,
+      "health": 0.3595191568136215,
+      "morale": 0.6724354267120362
+    },
+    "outcome": {
+      "severity": 0.5548166275024414,
+      "duration": 67,
+      "recoveryTime": 48
+    }
+  },
+  {
+    "timestamp": 1768835654338,
+    "sessionId": "session-27",
+    "eventType": "injury",
+    "residentId": "resident-10",
+    "residentLevel": 3,
+    "activityType": "explore",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.10478639602661133,
+      "hunger": 0.4839787781238556,
+      "health": 0.9413069844245909,
+      "morale": 0.24287748336791992
+    },
+    "outcome": {
+      "severity": 0.6637381792068482,
+      "duration": 68,
+      "recoveryTime": 212
+    }
+  },
+  {
+    "timestamp": 1768858470816,
+    "sessionId": "session-14",
+    "eventType": "injury",
+    "residentId": "resident-35",
+    "residentLevel": 17,
+    "activityType": "rest",
+    "locationType": "forest",
+    "riskFactors": {
+      "fatigue": 0.48150792717933655,
+      "hunger": 0.23075342178344727,
+      "health": 0.841768428683281,
+      "morale": 0.21337118148803713
+    },
+    "outcome": {
+      "severity": 0.3157153338193893,
+      "duration": 32,
+      "recoveryTime": 197
+    }
+  },
+  {
+    "timestamp": 1768823067583,
+    "sessionId": "session-43",
+    "eventType": "injury",
+    "residentId": "resident-3",
+    "residentLevel": 18,
+    "activityType": "work",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.9370816946029663,
+      "hunger": 0.8048132658004761,
+      "health": 0.43234773874282834,
+      "morale": 0.25027687549591066
+    },
+    "outcome": {
+      "severity": 0.28070893287658694,
+      "duration": 93,
+      "recoveryTime": 394
+    }
+  },
+  {
+    "timestamp": 1768829074286,
+    "sessionId": "session-97",
+    "eventType": "injury",
+    "residentId": "resident-5",
+    "residentLevel": 8,
+    "activityType": "rest",
+    "locationType": "village",
+    "riskFactors": {
+      "fatigue": 0.45153915882110596,
+      "hunger": 0.47357237339019775,
+      "health": 0.7528448939323424,
+      "morale": 0.6282879829406738
+    },
+    "outcome": {
+      "severity": 0.12533807754516602,
+      "duration": 57,
+      "recoveryTime": 441
+    }
+  },
+  {
+    "timestamp": 1768794215401,
+    "sessionId": "session-88",
+    "eventType": "injury",
+    "residentId": "resident-24",
+    "residentLevel": 3,
+    "activityType": "rest",
+    "locationType": "village",
+    "riskFactors": {
+      "fatigue": 0.4714120626449585,
+      "hunger": 0.8056124448776245,
+      "health": 0.6389305710792541,
+      "morale": 0.5228766441345215
+    },
+    "outcome": {
+      "severity": 0.7568888664245605,
+      "duration": 97,
+      "recoveryTime": 249
+    }
+  },
+  {
+    "timestamp": 1768826038011,
+    "sessionId": "session-44",
+    "eventType": "death",
+    "residentId": "resident-28",
+    "residentLevel": 19,
+    "activityType": "social",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.12439382076263428,
+      "hunger": 0.5953702032566071,
+      "health": 0.7986941576004027,
+      "morale": 0.433692741394043
+    },
+    "outcome": {
+      "severity": 0.47417354583740234,
+      "duration": 14,
+      "recoveryTime": 423
+    }
+  },
+  {
+    "timestamp": 1768835846420,
+    "sessionId": "session-7",
+    "eventType": "injury",
+    "residentId": "resident-42",
+    "residentLevel": 4,
+    "activityType": "work",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.29851436614990234,
+      "hunger": 0.8979349136352539,
+      "health": 0.44998674392700194,
+      "morale": 0.9672706842422485
+    },
+    "outcome": {
+      "severity": 0.40290708541870124,
+      "duration": 23,
+      "recoveryTime": 220
+    }
+  },
+  {
+    "timestamp": 1768841806547,
+    "sessionId": "session-40",
+    "eventType": "injury",
+    "residentId": "resident-24",
+    "residentLevel": 15,
+    "activityType": "rest",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.9275895357131958,
+      "hunger": 0.7619892358779907,
+      "health": 0.522088611125946,
+      "morale": 0.7924138069152833
+    },
+    "outcome": {
+      "severity": 0.1795060157775879,
+      "duration": 60,
+      "recoveryTime": 137
+    }
+  },
+  {
+    "timestamp": 1768821331169,
+    "sessionId": "session-4",
+    "eventType": "death",
+    "residentId": "resident-26",
+    "residentLevel": 16,
+    "activityType": "social",
+    "locationType": "village",
+    "riskFactors": {
+      "fatigue": 0.7413023710250854,
+      "hunger": 0.5808337926864624,
+      "health": 0.3284805417060852,
+      "morale": 0.9526026964187622
+    },
+    "outcome": {
+      "severity": 0.22621555328369142,
+      "duration": 1,
+      "recoveryTime": 194
+    }
+  },
+  {
+    "timestamp": 1768826377684,
+    "sessionId": "session-11",
+    "eventType": "injury",
+    "residentId": "resident-24",
+    "residentLevel": 12,
+    "activityType": "social",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.005411028861999512,
+      "hunger": 0.8403572104871273,
+      "health": 0.3127572178840637,
+      "morale": 0.6786914080381394
+    },
+    "outcome": {
+      "severity": 0.12060689926147461,
+      "duration": 36,
+      "recoveryTime": 176
+    }
+  },
+  {
+    "timestamp": 1768853533097,
+    "sessionId": "session-14",
+    "eventType": "injury",
+    "residentId": "resident-49",
+    "residentLevel": 12,
+    "activityType": "social",
+    "locationType": "village",
+    "riskFactors": {
+      "fatigue": 0.8769228458404541,
+      "hunger": 0.07373166084289551,
+      "health": 0.8455173462629317,
+      "morale": 0.5578206062316895
+    },
+    "outcome": {
+      "severity": 0.4518158912658692,
+      "duration": 31,
+      "recoveryTime": 399
+    }
+  },
+  {
+    "timestamp": 1768780986560,
+    "sessionId": "session-32",
+    "eventType": "injury",
+    "residentId": "resident-10",
+    "residentLevel": 13,
+    "activityType": "explore",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.026050090789794922,
+      "hunger": 0.320178534835577,
+      "health": 0.5189799785614013,
+      "morale": 0.8768955230712892
+    },
+    "outcome": {
+      "severity": 0.28142127990722654,
+      "duration": 19,
+      "recoveryTime": 288
+    }
+  },
+  {
+    "timestamp": 1768790232328,
+    "sessionId": "session-84",
+    "eventType": "injury",
+    "residentId": "resident-42",
+    "residentLevel": 3,
+    "activityType": "social",
+    "locationType": "forest",
+    "riskFactors": {
+      "fatigue": 0.664621502161026,
+      "hunger": 0.7894983291625977,
+      "health": 0.39307222366333006,
+      "morale": 0.6554725885391235
+    },
+    "outcome": {
+      "severity": 0.43253965377807624,
+      "duration": 89,
+      "recoveryTime": 310
+    }
+  },
+  {
+    "timestamp": 1768840738295,
+    "sessionId": "session-87",
+    "eventType": "injury",
+    "residentId": "resident-46",
+    "residentLevel": 14,
+    "activityType": "social",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.020629167556762695,
+      "hunger": 0.8905527852475643,
+      "health": 0.9985328435897827,
+      "morale": 0.8108911514282227
+    },
+    "outcome": {
+      "severity": 0.3366518020629883,
+      "duration": 17,
+      "recoveryTime": 87
+    }
+  },
+  {
+    "timestamp": 1768842641774,
+    "sessionId": "session-35",
+    "eventType": "death",
+    "residentId": "resident-18",
+    "residentLevel": 15,
+    "activityType": "work",
+    "locationType": "village",
+    "riskFactors": {
+      "fatigue": 0.6293225288391113,
+      "hunger": 0.5959172248840332,
+      "health": 0.5923408031463623,
+      "morale": 0.5514957427978515
+    },
+    "outcome": {
+      "severity": 0.43003273010253906,
+      "duration": 28,
+      "recoveryTime": 136
+    }
+  },
+  {
+    "timestamp": 1768778716685,
+    "sessionId": "session-73",
+    "eventType": "injury",
+    "residentId": "resident-6",
+    "residentLevel": 14,
+    "activityType": "social",
+    "locationType": "village",
+    "riskFactors": {
+      "fatigue": 0.714445948600769,
+      "hunger": 0.009440779685974121,
+      "health": 0.5157151523977518,
+      "morale": 0.5981959342956543
+    },
+    "outcome": {
+      "severity": 0.8922774314880372,
+      "duration": 90,
+      "recoveryTime": 411
+    }
+  },
+  {
+    "timestamp": 1768844672393,
+    "sessionId": "session-67",
+    "eventType": "injury",
+    "residentId": "resident-25",
+    "residentLevel": 20,
+    "activityType": "social",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.011998653411865234,
+      "hunger": 0.9594702981412411,
+      "health": 0.3864923000335693,
+      "morale": 0.7281849145889283
+    },
+    "outcome": {
+      "severity": 0.7279097557067872,
+      "duration": 89,
+      "recoveryTime": 331
+    }
+  },
+  {
+    "timestamp": 1768828938855,
+    "sessionId": "session-30",
+    "eventType": "death",
+    "residentId": "resident-32",
+    "residentLevel": 15,
+    "activityType": "rest",
+    "locationType": "forest",
+    "riskFactors": {
+      "fatigue": 0.3450707495212555,
+      "hunger": 0.7002875804901123,
+      "health": 0.9685064554214478,
+      "morale": 0.7011251449584961
+    },
+    "outcome": {
+      "severity": 0.41453990936279295,
+      "duration": 43,
+      "recoveryTime": 448
+    }
+  },
+  {
+    "timestamp": 1768781975814,
+    "sessionId": "session-74",
+    "eventType": "injury",
+    "residentId": "resident-9",
+    "residentLevel": 20,
+    "activityType": "rest",
+    "locationType": "village",
+    "riskFactors": {
+      "fatigue": 0.4950897693634033,
+      "hunger": 0.13605523109436035,
+      "health": 0.7722413033246993,
+      "morale": 0.9285473823547363
+    },
+    "outcome": {
+      "severity": 0.8333001136779785,
+      "duration": 26,
+      "recoveryTime": 393
+    }
+  },
+  {
+    "timestamp": 1768794886106,
+    "sessionId": "session-7",
+    "eventType": "injury",
+    "residentId": "resident-30",
+    "residentLevel": 13,
+    "activityType": "explore",
+    "locationType": "forest",
+    "riskFactors": {
+      "fatigue": 0.5249533951282501,
+      "hunger": 0.43853843212127686,
+      "health": 0.554962694644928,
+      "morale": 0.3679564476013184
+    },
+    "outcome": {
+      "severity": 0.5241030931472779,
+      "duration": 93,
+      "recoveryTime": 36
+    }
+  },
+  {
+    "timestamp": 1768799759038,
+    "sessionId": "session-85",
+    "eventType": "injury",
+    "residentId": "resident-33",
+    "residentLevel": 19,
+    "activityType": "social",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.32095956802368164,
+      "hunger": 0.34275293350219727,
+      "health": 0.5717061519622803,
+      "morale": 0.48647651672363285
+    },
+    "outcome": {
+      "severity": 0.4390308380126954,
+      "duration": 85,
+      "recoveryTime": 66
+    }
+  },
+  {
+    "timestamp": 1768779840419,
+    "sessionId": "session-24",
+    "eventType": "death",
+    "residentId": "resident-38",
+    "residentLevel": 11,
+    "activityType": "social",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.9665682315826416,
+      "hunger": 0.884141206741333,
+      "health": 0.5602344274520874,
+      "morale": 0.3911188125610352
+    },
+    "outcome": {
+      "severity": 0.1674043893814087,
+      "duration": 8,
+      "recoveryTime": 76
+    }
+  },
+  {
+    "timestamp": 1768791220737,
+    "sessionId": "session-30",
+    "eventType": "injury",
+    "residentId": "resident-19",
+    "residentLevel": 14,
+    "activityType": "explore",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.5939332246780396,
+      "hunger": 0.9442325830459595,
+      "health": 0.45186537504196167,
+      "morale": 0.7102299928665161
+    },
+    "outcome": {
+      "severity": 0.48444633483886723,
+      "duration": 23,
+      "recoveryTime": 22
+    }
+  },
+  {
+    "timestamp": 1768775834716,
+    "sessionId": "session-72",
+    "eventType": "injury",
+    "residentId": "resident-21",
+    "residentLevel": 19,
+    "activityType": "social",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.7290990352630615,
+      "hunger": 0.5275866985321045,
+      "health": 0.9225815057754516,
+      "morale": 0.74659481048584
+    },
+    "outcome": {
+      "severity": 0.7090147018432618,
+      "duration": 90,
+      "recoveryTime": 15
+    }
+  },
+  {
+    "timestamp": 1768859438819,
+    "sessionId": "session-48",
+    "eventType": "injury",
+    "residentId": "resident-2",
+    "residentLevel": 11,
+    "activityType": "work",
+    "locationType": "forest",
+    "riskFactors": {
+      "fatigue": 0.7980658411979675,
+      "hunger": 0.2757120132446289,
+      "health": 0.8915669441223144,
+      "morale": 0.28804702758789064
+    },
+    "outcome": {
+      "severity": 0.5201774835586548,
+      "duration": 40,
+      "recoveryTime": 90
+    }
+  },
+  {
+    "timestamp": 1768825249588,
+    "sessionId": "session-72",
+    "eventType": "injury",
+    "residentId": "resident-12",
+    "residentLevel": 10,
+    "activityType": "explore",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.6825945377349854,
+      "hunger": 0.5442898273468018,
+      "health": 0.422933554649353,
+      "morale": 0.4029779672622681
+    },
+    "outcome": {
+      "severity": 0.5730282783508301,
+      "duration": 60,
+      "recoveryTime": 248
+    }
+  },
+  {
+    "timestamp": 1768832372131,
+    "sessionId": "session-28",
+    "eventType": "injury",
+    "residentId": "resident-30",
+    "residentLevel": 18,
+    "activityType": "work",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.9365959167480469,
+      "hunger": 0.5362262725830078,
+      "health": 0.695416259765625,
+      "morale": 0.28257293701171876
+    },
+    "outcome": {
+      "severity": 0.5168609857559204,
+      "duration": 4,
+      "recoveryTime": 459
+    }
+  },
+  {
+    "timestamp": 1768852988171,
+    "sessionId": "session-28",
+    "eventType": "injury",
+    "residentId": "resident-44",
+    "residentLevel": 1,
+    "activityType": "explore",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.06012582778930664,
+      "hunger": 0.5837502777576447,
+      "health": 0.8449856877326964,
+      "morale": 0.33696470260620115
+    },
+    "outcome": {
+      "severity": 0.6528388261795044,
+      "duration": 90,
+      "recoveryTime": 64
+    }
+  },
+  {
+    "timestamp": 1768819250116,
+    "sessionId": "session-60",
+    "eventType": "injury",
+    "residentId": "resident-30",
+    "residentLevel": 11,
+    "activityType": "social",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.13528549671173096,
+      "hunger": 0.04879823327064514,
+      "health": 0.5402602136135101,
+      "morale": 0.8736788272857667
+    },
+    "outcome": {
+      "severity": 0.2435699462890625,
+      "duration": 57,
+      "recoveryTime": 364
+    }
+  },
+  {
+    "timestamp": 1768801548909,
+    "sessionId": "session-66",
+    "eventType": "injury",
+    "residentId": "resident-45",
+    "residentLevel": 11,
+    "activityType": "work",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.12153124809265137,
+      "hunger": 0.014123708009719849,
+      "health": 0.37326214648783207,
+      "morale": 0.5779999136924744
+    },
+    "outcome": {
+      "severity": 0.26833429336547854,
+      "duration": 74,
+      "recoveryTime": 10
+    }
+  },
+  {
+    "timestamp": 1768858562872,
+    "sessionId": "session-7",
+    "eventType": "injury",
+    "residentId": "resident-29",
+    "residentLevel": 9,
+    "activityType": "rest",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.4973146915435791,
+      "hunger": 0.6808178424835205,
+      "health": 0.4740054845809936,
+      "morale": 0.2557062149047852
+    },
+    "outcome": {
+      "severity": 0.6886812448501587,
+      "duration": 18,
+      "recoveryTime": 157
+    }
+  },
+  {
+    "timestamp": 1768850029340,
+    "sessionId": "session-80",
+    "eventType": "death",
+    "residentId": "resident-14",
+    "residentLevel": 2,
+    "activityType": "work",
+    "locationType": "village",
+    "riskFactors": {
+      "fatigue": 0.8946582078933716,
+      "hunger": 0.4747205972671509,
+      "health": 0.43986843824386596,
+      "morale": 0.5388013124465942
+    },
+    "outcome": {
+      "severity": 0.6108295440673828,
+      "duration": 85,
+      "recoveryTime": 208
+    }
+  },
+  {
+    "timestamp": 1768777281816,
+    "sessionId": "session-40",
+    "eventType": "injury",
+    "residentId": "resident-14",
+    "residentLevel": 3,
+    "activityType": "explore",
+    "locationType": "village",
+    "riskFactors": {
+      "fatigue": 0.046335577964782715,
+      "hunger": 0.6700295507907867,
+      "health": 0.928698468208313,
+      "morale": 0.4011716842651367
+    },
+    "outcome": {
+      "severity": 0.5489095687866211,
+      "duration": 98,
+      "recoveryTime": 202
+    }
+  },
+  {
+    "timestamp": 1768834477087,
+    "sessionId": "session-75",
+    "eventType": "injury",
+    "residentId": "resident-30",
+    "residentLevel": 8,
+    "activityType": "rest",
+    "locationType": "forest",
+    "riskFactors": {
+      "fatigue": 0.6640240252017975,
+      "hunger": 0.8564534187316895,
+      "health": 0.44195551872253414,
+      "morale": 0.3396610498428345
+    },
+    "outcome": {
+      "severity": 0.1342772960662842,
+      "duration": 46,
+      "recoveryTime": 158
+    }
+  },
+  {
+    "timestamp": 1768778821093,
+    "sessionId": "session-79",
+    "eventType": "death",
+    "residentId": "resident-17",
+    "residentLevel": 4,
+    "activityType": "work",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.9571413993835449,
+      "hunger": 0.8403811454772949,
+      "health": 0.7513344287872314,
+      "morale": 0.38294944763183597
+    },
+    "outcome": {
+      "severity": 0.6260647058486939,
+      "duration": 46,
+      "recoveryTime": 376
+    }
+  },
+  {
+    "timestamp": 1768800320857,
+    "sessionId": "session-2",
+    "eventType": "injury",
+    "residentId": "resident-41",
+    "residentLevel": 12,
+    "activityType": "explore",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.2861064672470093,
+      "hunger": 0.30017364025115967,
+      "health": 0.41501423120498654,
+      "morale": 0.23047020435333254
+    },
+    "outcome": {
+      "severity": 0.7221724033355713,
+      "duration": 13,
+      "recoveryTime": 382
+    }
+  },
+  {
+    "timestamp": 1768802442344,
+    "sessionId": "session-92",
+    "eventType": "injury",
+    "residentId": "resident-20",
+    "residentLevel": 1,
+    "activityType": "work",
+    "locationType": "forest",
+    "riskFactors": {
+      "fatigue": 0.17713460326194763,
+      "hunger": 0.1165916919708252,
+      "health": 0.671108815073967,
+      "morale": 0.5291569709777832
+    },
+    "outcome": {
+      "severity": 0.37201089859008796,
+      "duration": 76,
+      "recoveryTime": 147
+    }
+  },
+  {
+    "timestamp": 1768802520807,
+    "sessionId": "session-60",
+    "eventType": "injury",
+    "residentId": "resident-4",
+    "residentLevel": 6,
+    "activityType": "rest",
+    "locationType": "forest",
+    "riskFactors": {
+      "fatigue": 0.8809037506580353,
+      "hunger": 0.2288264036178589,
+      "health": 0.8955853313207627,
+      "morale": 0.2123903274536133
+    },
+    "outcome": {
+      "severity": 0.1356088846921921,
+      "duration": 90,
+      "recoveryTime": 329
+    }
+  },
+  {
+    "timestamp": 1768823271341,
+    "sessionId": "session-26",
+    "eventType": "death",
+    "residentId": "resident-40",
+    "residentLevel": 20,
+    "activityType": "social",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.9069080352783203,
+      "hunger": 0.7426300048828125,
+      "health": 0.8478296279907227,
+      "morale": 0.8290802001953126
+    },
+    "outcome": {
+      "severity": 0.14318389892578126,
+      "duration": 51,
+      "recoveryTime": 143
+    }
+  },
+  {
+    "timestamp": 1768806901613,
+    "sessionId": "session-9",
+    "eventType": "injury",
+    "residentId": "resident-14",
+    "residentLevel": 19,
+    "activityType": "work",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.6204320192337036,
+      "hunger": 0.7105308771133423,
+      "health": 0.9564603686332702,
+      "morale": 0.9144429206848146
+    },
+    "outcome": {
+      "severity": 0.35802316665649414,
+      "duration": 47,
+      "recoveryTime": 195
+    }
+  },
+  {
+    "timestamp": 1768806121741,
+    "sessionId": "session-59",
+    "eventType": "death",
+    "residentId": "resident-41",
+    "residentLevel": 9,
+    "activityType": "work",
+    "locationType": "village",
+    "riskFactors": {
+      "fatigue": 0.6382107734680176,
+      "hunger": 0.04520463943481445,
+      "health": 0.8327361792325974,
+      "morale": 0.3671172142028809
+    },
+    "outcome": {
+      "severity": 0.8748141527175903,
+      "duration": 96,
+      "recoveryTime": 317
+    }
+  },
+  {
+    "timestamp": 1768853696748,
+    "sessionId": "session-82",
+    "eventType": "death",
+    "residentId": "resident-5",
+    "residentLevel": 11,
+    "activityType": "rest",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.3713526725769043,
+      "hunger": 0.4601130485534668,
+      "health": 0.6515270709991454,
+      "morale": 0.2888668060302735
+    },
+    "outcome": {
+      "severity": 0.12886927127838135,
+      "duration": 21,
+      "recoveryTime": 487
+    }
+  },
+  {
+    "timestamp": 1768843116945,
+    "sessionId": "session-63",
+    "eventType": "injury",
+    "residentId": "resident-34",
+    "residentLevel": 13,
+    "activityType": "explore",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.6612961292266846,
+      "hunger": 0.0611422061920166,
+      "health": 0.7520806282758712,
+      "morale": 0.7389782905578615
+    },
+    "outcome": {
+      "severity": 0.45464410781860354,
+      "duration": 41,
+      "recoveryTime": 458
+    }
+  },
+  {
+    "timestamp": 1768804928708,
+    "sessionId": "session-44",
+    "eventType": "injury",
+    "residentId": "resident-3",
+    "residentLevel": 5,
+    "activityType": "explore",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.4683046340942383,
+      "hunger": 0.027144432067871094,
+      "health": 0.7226378623396158,
+      "morale": 0.2068359375
+    },
+    "outcome": {
+      "severity": 0.5451217859983445,
+      "duration": 92,
+      "recoveryTime": 424
+    }
+  },
+  {
+    "timestamp": 1768817392365,
+    "sessionId": "session-24",
+    "eventType": "injury",
+    "residentId": "resident-43",
+    "residentLevel": 14,
+    "activityType": "rest",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.4046672582626343,
+      "hunger": 0.6451748609542847,
+      "health": 0.827669870853424,
+      "morale": 0.6730727195739746
+    },
+    "outcome": {
+      "severity": 0.5434954643249512,
+      "duration": 47,
+      "recoveryTime": 47
+    }
+  },
+  {
+    "timestamp": 1768779799107,
+    "sessionId": "session-36",
+    "eventType": "injury",
+    "residentId": "resident-48",
+    "residentLevel": 12,
+    "activityType": "work",
+    "locationType": "village",
+    "riskFactors": {
+      "fatigue": 0.7854537963867188,
+      "hunger": 0.5558757781982422,
+      "health": 0.6976032257080078,
+      "morale": 0.4628189086914063
+    },
+    "outcome": {
+      "severity": 0.515234375,
+      "duration": 83,
+      "recoveryTime": 311
+    }
+  },
+  {
+    "timestamp": 1768791540243,
+    "sessionId": "session-45",
+    "eventType": "injury",
+    "residentId": "resident-39",
+    "residentLevel": 6,
+    "activityType": "explore",
+    "locationType": "forest",
+    "riskFactors": {
+      "fatigue": 0.367710143327713,
+      "hunger": 0.9032720327377319,
+      "health": 0.6557623982429504,
+      "morale": 0.38155546188354494
+    },
+    "outcome": {
+      "severity": 0.10151283740997315,
+      "duration": 94,
+      "recoveryTime": 173
+    }
+  },
+  {
+    "timestamp": 1768857060398,
+    "sessionId": "session-85",
+    "eventType": "injury",
+    "residentId": "resident-42",
+    "residentLevel": 19,
+    "activityType": "explore",
+    "locationType": "forest",
+    "riskFactors": {
+      "fatigue": 0.5449838936328888,
+      "hunger": 0.9033569097518921,
+      "health": 0.7111154675483704,
+      "morale": 0.7656382560729982
+    },
+    "outcome": {
+      "severity": 0.43177175521850586,
+      "duration": 19,
+      "recoveryTime": 430
+    }
+  },
+  {
+    "timestamp": 1768820386544,
+    "sessionId": "session-64",
+    "eventType": "injury",
+    "residentId": "resident-13",
+    "residentLevel": 3,
+    "activityType": "work",
+    "locationType": "forest",
+    "riskFactors": {
+      "fatigue": 0.8344788253307343,
+      "hunger": 0.3821631669998169,
+      "health": 0.903249204158783,
+      "morale": 0.22667245864868166
+    },
+    "outcome": {
+      "severity": 0.8404568910598755,
+      "duration": 44,
+      "recoveryTime": 205
+    }
+  },
+  {
+    "timestamp": 1768859361718,
+    "sessionId": "session-53",
+    "eventType": "injury",
+    "residentId": "resident-19",
+    "residentLevel": 2,
+    "activityType": "work",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.9623239040374756,
+      "hunger": 0.7332770824432373,
+      "health": 0.4996679544448852,
+      "morale": 0.734743309020996
+    },
+    "outcome": {
+      "severity": 0.16641979217529296,
+      "duration": 55,
+      "recoveryTime": 430
+    }
+  },
+  {
+    "timestamp": 1768834952778,
+    "sessionId": "session-79",
+    "eventType": "injury",
+    "residentId": "resident-4",
+    "residentLevel": 10,
+    "activityType": "work",
+    "locationType": "forest",
+    "riskFactors": {
+      "fatigue": 0.22342771291732788,
+      "hunger": 0.35976049304008484,
+      "health": 0.7329190373420715,
+      "morale": 0.9516619682312013
+    },
+    "outcome": {
+      "severity": 0.32984075546264646,
+      "duration": 97,
+      "recoveryTime": 473
+    }
+  },
+  {
+    "timestamp": 1768781994796,
+    "sessionId": "session-44",
+    "eventType": "injury",
+    "residentId": "resident-38",
+    "residentLevel": 9,
+    "activityType": "rest",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.5102270841598511,
+      "hunger": 0.7822993993759155,
+      "health": 0.5559703946113586,
+      "morale": 0.3397761344909668
+    },
+    "outcome": {
+      "severity": 0.19795677661895753,
+      "duration": 44,
+      "recoveryTime": 363
+    }
+  },
+  {
+    "timestamp": 1768834240236,
+    "sessionId": "session-73",
+    "eventType": "death",
+    "residentId": "resident-3",
+    "residentLevel": 13,
+    "activityType": "explore",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.8677936792373657,
+      "hunger": 0.5530787706375122,
+      "health": 0.3590511679649353,
+      "morale": 0.5249894380569458
+    },
+    "outcome": {
+      "severity": 0.25982742309570317,
+      "duration": 45,
+      "recoveryTime": 329
+    }
+  },
+  {
+    "timestamp": 1768776444627,
+    "sessionId": "session-58",
+    "eventType": "injury",
+    "residentId": "resident-16",
+    "residentLevel": 10,
+    "activityType": "explore",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.793209433555603,
+      "hunger": 0.4064282178878784,
+      "health": 0.6062228798866272,
+      "morale": 0.3402297019958496
+    },
+    "outcome": {
+      "severity": 0.45423157215118415,
+      "duration": 17,
+      "recoveryTime": 435
+    }
+  },
+  {
+    "timestamp": 1768779612088,
+    "sessionId": "session-8",
+    "eventType": "injury",
+    "residentId": "resident-45",
+    "residentLevel": 19,
+    "activityType": "explore",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.8107218742370605,
+      "hunger": 0.675574779510498,
+      "health": 0.5291477680206298,
+      "morale": 0.2782772064208985
+    },
+    "outcome": {
+      "severity": 0.32147791385650637,
+      "duration": 97,
+      "recoveryTime": 123
+    }
+  },
+  {
+    "timestamp": 1768852520965,
+    "sessionId": "session-53",
+    "eventType": "injury",
+    "residentId": "resident-16",
+    "residentLevel": 19,
+    "activityType": "rest",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.3554633855819702,
+      "hunger": 0.029023051261901855,
+      "health": 0.6667516533285379,
+      "morale": 0.402286434173584
+    },
+    "outcome": {
+      "severity": 0.8672434806823731,
+      "duration": 95,
+      "recoveryTime": 376
+    }
+  },
+  {
+    "timestamp": 1768812963511,
+    "sessionId": "session-9",
+    "eventType": "injury",
+    "residentId": "resident-4",
+    "residentLevel": 2,
+    "activityType": "work",
+    "locationType": "village",
+    "riskFactors": {
+      "fatigue": 0.7675925493240356,
+      "hunger": 0.1274935007095337,
+      "health": 0.7699761480093001,
+      "morale": 0.21673507690429689
+    },
+    "outcome": {
+      "severity": 0.5901436060667038,
+      "duration": 92,
+      "recoveryTime": 405
+    }
+  },
+  {
+    "timestamp": 1768805608951,
+    "sessionId": "session-1",
+    "eventType": "injury",
+    "residentId": "resident-21",
+    "residentLevel": 19,
+    "activityType": "rest",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.28974437713623047,
+      "hunger": 0.32286548614501953,
+      "health": 0.33175973892211913,
+      "morale": 0.6317512750625611
+    },
+    "outcome": {
+      "severity": 0.5797289848327637,
+      "duration": 29,
+      "recoveryTime": 461
+    }
+  },
+  {
+    "timestamp": 1768844043752,
+    "sessionId": "session-27",
+    "eventType": "injury",
+    "residentId": "resident-24",
+    "residentLevel": 14,
+    "activityType": "work",
+    "locationType": "forest",
+    "riskFactors": {
+      "fatigue": 0.5691973567008972,
+      "hunger": 0.5331487655639648,
+      "health": 0.7569403648376465,
+      "morale": 0.2619529724121094
+    },
+    "outcome": {
+      "severity": 0.8298317193984985,
+      "duration": 81,
+      "recoveryTime": 165
+    }
+  },
+  {
+    "timestamp": 1768805109839,
+    "sessionId": "session-1",
+    "eventType": "injury",
+    "residentId": "resident-12",
+    "residentLevel": 18,
+    "activityType": "work",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.9697484970092773,
+      "hunger": 0.2655801773071289,
+      "health": 0.5997578620910644,
+      "morale": 0.6869728088378906
+    },
+    "outcome": {
+      "severity": 0.15308761596679688,
+      "duration": 93,
+      "recoveryTime": 134
+    }
+  },
+  {
+    "timestamp": 1768797325627,
+    "sessionId": "session-66",
+    "eventType": "death",
+    "residentId": "resident-48",
+    "residentLevel": 4,
+    "activityType": "explore",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.7108862400054932,
+      "hunger": 0.3067963123321533,
+      "health": 0.8378228902816771,
+      "morale": 0.6980539321899415
+    },
+    "outcome": {
+      "severity": 0.703801155090332,
+      "duration": 49,
+      "recoveryTime": 116
+    }
+  },
+  {
+    "timestamp": 1768820151668,
+    "sessionId": "session-4",
+    "eventType": "death",
+    "residentId": "resident-46",
+    "residentLevel": 14,
+    "activityType": "explore",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.1621227264404297,
+      "hunger": 0.18798449635505676,
+      "health": 0.6860204756259918,
+      "morale": 0.9262136459350587
+    },
+    "outcome": {
+      "severity": 0.7163740158081054,
+      "duration": 84,
+      "recoveryTime": 203
+    }
+  },
+  {
+    "timestamp": 1768792360201,
+    "sessionId": "session-19",
+    "eventType": "injury",
+    "residentId": "resident-3",
+    "residentLevel": 1,
+    "activityType": "social",
+    "locationType": "forest",
+    "riskFactors": {
+      "fatigue": 0.5466262400150299,
+      "hunger": 0.17362022399902344,
+      "health": 0.31627008616924285,
+      "morale": 0.22883104979991914
+    },
+    "outcome": {
+      "severity": 0.6835695624351501,
+      "duration": 84,
+      "recoveryTime": 116
+    }
+  },
+  {
+    "timestamp": 1768782136435,
+    "sessionId": "session-79",
+    "eventType": "injury",
+    "residentId": "resident-40",
+    "residentLevel": 3,
+    "activityType": "work",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.016163229942321777,
+      "hunger": 0.6497983001172543,
+      "health": 0.5481367707252502,
+      "morale": 0.24615697860717775
+    },
+    "outcome": {
+      "severity": 0.8561640977859497,
+      "duration": 4,
+      "recoveryTime": 245
+    }
+  },
+  {
+    "timestamp": 1768843506953,
+    "sessionId": "session-4",
+    "eventType": "death",
+    "residentId": "resident-44",
+    "residentLevel": 14,
+    "activityType": "rest",
+    "locationType": "village",
+    "riskFactors": {
+      "fatigue": 0.4397084712982178,
+      "hunger": 0.43323397636413574,
+      "health": 0.698859429359436,
+      "morale": 0.21159114837646487
+    },
+    "outcome": {
+      "severity": 0.2404905527830124,
+      "duration": 47,
+      "recoveryTime": 183
+    }
+  },
+  {
+    "timestamp": 1768849008868,
+    "sessionId": "session-21",
+    "eventType": "injury",
+    "residentId": "resident-25",
+    "residentLevel": 4,
+    "activityType": "explore",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.13952171802520752,
+      "hunger": 0.8494135439395905,
+      "health": 0.3327747821807861,
+      "morale": 0.8720638513565064
+    },
+    "outcome": {
+      "severity": 0.8853232383728028,
+      "duration": 25,
+      "recoveryTime": 415
+    }
+  },
+  {
+    "timestamp": 1768833884835,
+    "sessionId": "session-78",
+    "eventType": "injury",
+    "residentId": "resident-2",
+    "residentLevel": 16,
+    "activityType": "social",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.896709680557251,
+      "hunger": 0.8340122699737549,
+      "health": 0.6031699895858764,
+      "morale": 0.35372562408447267
+    },
+    "outcome": {
+      "severity": 0.2243593454360962,
+      "duration": 94,
+      "recoveryTime": 427
+    }
+  },
+  {
+    "timestamp": 1768796963562,
+    "sessionId": "session-9",
+    "eventType": "death",
+    "residentId": "resident-19",
+    "residentLevel": 6,
+    "activityType": "social",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.7348103523254395,
+      "hunger": 0.9749493598937988,
+      "health": 0.8220630168914795,
+      "morale": 0.7605075836181641
+    },
+    "outcome": {
+      "severity": 0.36076087951660163,
+      "duration": 31,
+      "recoveryTime": 475
+    }
+  },
+  {
+    "timestamp": 1768849330321,
+    "sessionId": "session-55",
+    "eventType": "injury",
+    "residentId": "resident-23",
+    "residentLevel": 9,
+    "activityType": "explore",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.10884213447570801,
+      "hunger": 0.6922896206378937,
+      "health": 0.5304315924644469,
+      "morale": 0.6733124732971192
+    },
+    "outcome": {
+      "severity": 0.4320309638977051,
+      "duration": 10,
+      "recoveryTime": 320
+    }
+  },
+  {
+    "timestamp": 1768824748439,
+    "sessionId": "session-58",
+    "eventType": "injury",
+    "residentId": "resident-6",
+    "residentLevel": 9,
+    "activityType": "explore",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.9614599943161011,
+      "hunger": 0.18543660640716553,
+      "health": 0.40596431195735927,
+      "morale": 0.738155221939087
+    },
+    "outcome": {
+      "severity": 0.4861454010009766,
+      "duration": 99,
+      "recoveryTime": 183
+    }
+  },
+  {
+    "timestamp": 1768849238695,
+    "sessionId": "session-84",
+    "eventType": "injury",
+    "residentId": "resident-10",
+    "residentLevel": 19,
+    "activityType": "work",
+    "locationType": "village",
+    "riskFactors": {
+      "fatigue": 0.8906568288803101,
+      "hunger": 0.7327841520309448,
+      "health": 0.34238573312759396,
+      "morale": 0.8592063188552856
+    },
+    "outcome": {
+      "severity": 0.1571432113647461,
+      "duration": 12,
+      "recoveryTime": 311
+    }
+  },
+  {
+    "timestamp": 1768799597356,
+    "sessionId": "session-38",
+    "eventType": "injury",
+    "residentId": "resident-10",
+    "residentLevel": 20,
+    "activityType": "work",
+    "locationType": "river",
+    "riskFactors": {
+      "fatigue": 0.6905835866928101,
+      "hunger": 0.8623007535934448,
+      "health": 0.555752432346344,
+      "morale": 0.5886008262634277
+    },
+    "outcome": {
+      "severity": 0.1012934684753418,
+      "duration": 73,
+      "recoveryTime": 127
+    }
+  },
+  {
+    "timestamp": 1768791976072,
+    "sessionId": "session-4",
+    "eventType": "injury",
+    "residentId": "resident-34",
+    "residentLevel": 18,
+    "activityType": "explore",
+    "locationType": "village",
+    "riskFactors": {
+      "fatigue": 0.5817478895187378,
+      "hunger": 0.8305085897445679,
+      "health": 0.9206109166145324,
+      "morale": 0.7686450004577636
+    },
+    "outcome": {
+      "severity": 0.698178768157959,
+      "duration": 38,
+      "recoveryTime": 248
+    }
+  },
+  {
+    "timestamp": 1768799160824,
+    "sessionId": "session-2",
+    "eventType": "injury",
+    "residentId": "resident-35",
+    "residentLevel": 16,
+    "activityType": "rest",
+    "locationType": "mine",
+    "riskFactors": {
+      "fatigue": 0.6665924787521362,
+      "hunger": 0.5053266286849976,
+      "health": 0.6208483815193175,
+      "morale": 0.47445402145385746
+    },
+    "outcome": {
+      "severity": 0.8258933067321778,
+      "duration": 78,
+      "recoveryTime": 388
+    }
+  }
+]

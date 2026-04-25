@@ -1,0 +1,286 @@
+/*
+ * wanderlustTokens.css
+ *
+ * Override di gilded-observatory.css per il preset Wanderlust.
+ * Applica la classe .preset-wanderlust al root o al container
+ * dello Style Lab per attivare questi token senza toccare il default.
+ *
+ * Filosofia:
+ *   - Nero profondo con sottotono caldo (mai freddo/blu)
+ *   - Accenti bronzo/ambra estratti dal background pittorico
+ *   - Testo warm-white, mai bianco puro
+ *   - Border-radius massimo 2px (mai pillole)
+ *   - Rim light caldo sui bordi superiori
+ */
+
+.preset-wanderlust {
+  /* =========================================
+     DEPTH & SURFACE — nero caldo, non freddo
+     ========================================= */
+
+  --void:    #000000;
+  --abyss:   #060604;
+  --deep:    #0a0906;
+  --base:    #0e0c08;
+  --surface: #131008;
+
+  --raised:    #181410;
+  --highlight: #201c14;
+
+  /* =========================================
+     IRON → WARM IRON (ferro brunito caldo)
+     ========================================= */
+
+  --iron-dk:  #0c0a06;
+  --iron-md:  #1a1610;
+  --iron-rim: #282018;
+  --iron-lg:  #342c1e;
+
+  --iron-gradient: linear-gradient(162deg, var(--iron-rim) 0%, var(--iron-md) 50%, var(--iron-dk) 100%);
+  --iron-inset: inset 0 2px 0 rgba(255,220,120,.05), inset 0 -2px 0 rgba(0,0,0,.92);
+
+  /* =========================================
+     GOLD — oro araldico (invariato, già corretto)
+     ========================================= */
+
+  /* Mantenuto da gilded-observatory — già perfetto */
+
+  /* =========================================
+     TEXT — warm white, mai freddo
+     ========================================= */
+
+  --t0: #060604;
+  --t1: #f0e8d5;
+  --t2: #c0a878;
+  --t3: #6e5838;
+  --t4: #faf0dc;
+
+  /* =========================================
+     ACCENT & GLOW — bronzo/ambra (palette attiva)
+     ========================================= */
+
+  --acc-primary:       #c07028;
+  --acc-primary-light: #d89040;
+  --acc-primary-dark:  #6a3c10;
+
+  --acc-glow:        rgba(192,112,40,.50);
+  --acc-glow-strong: rgba(192,112,40,.72);
+  --acc-glow-subtle: rgba(192,112,40,.22);
+
+  --glow-amber:   rgba(216,144,64,.45);
+  --glow-emerald: rgba(44,116,66,.42);
+  --glow-rose:    rgba(138,56,56,.40);
+  --glow-blue:    rgba(44,80,116,.38);
+
+  /* =========================================
+     SURFACE MATERIALS — pannelli reali
+     ========================================= */
+
+  --panel-bg:     rgba(9,8,6,.94);
+  --panel-border: rgba(255,255,255,.055);
+  --panel-rim:    rgba(255,200,80,.10);
+
+  --card-bg:     rgba(13,11,8,.96);
+  --card-border: rgba(255,255,255,.04);
+
+  --slot-bg: radial-gradient(circle at 38% 32%, #111 0%, #080808 60%, #040404 100%);
+  --slot-border: rgba(255,255,255,.07);
+  --slot-inset: inset 4px 5px 14px rgba(0,0,0,1), inset 0 0 28px rgba(0,0,0,.9);
+
+  /* =========================================
+     SHADOWS — ombre calde (mai blu)
+     ========================================= */
+
+  --shadow-deep:    0 24px 64px rgba(0,0,0,.98), 0 6px 18px rgba(0,0,0,1);
+  --shadow-medium:  0 16px 40px rgba(0,0,0,.80), 0 4px 10px rgba(0,0,0,.9);
+  --shadow-shallow: 0 8px 24px rgba(0,0,0,.92), 0 2px 6px rgba(0,0,0,1);
+
+  --shadow-gold:        0 0 44px var(--acc-glow), 0 0 20px rgba(192,112,40,.15);
+  --shadow-gold-strong: 0 0 60px var(--acc-glow-strong), 0 0 30px rgba(192,112,40,.22);
+
+  /* =========================================
+     TYPOGRAPHY — Cinzel + EB Garamond
+     ========================================= */
+
+  --font-display: 'Cinzel', serif;
+  --font-body:    'EB Garamond', Georgia, serif;
+  --font-ui:      'Cinzel', serif;
+
+  /* =========================================
+     BORDERS & RADIUS — mai pillole
+     ========================================= */
+
+  --radius-sm:   2px;
+  --radius-md:   3px;
+  --radius-lg:   4px;
+  --radius-xl:   6px;
+  --radius-full: 50%;
+
+  /* =========================================
+     NOISE OVERLAY — materiale fisico
+     ========================================= */
+
+  --noise-opacity: 0.038;
+  --noise-url: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.45'/%3E%3C/svg%3E");
+
+  /* =========================================
+     ANIMATIONS — più peso/inerzia
+     ========================================= */
+
+  --transition-fast:   180ms cubic-bezier(.34,1.56,.64,1);
+  --transition-normal: 280ms cubic-bezier(.34,1.56,.64,1);
+  --transition-slow:   420ms cubic-bezier(.22,1,.36,1);
+
+  /* =========================================
+     PHYSICS — preset narrativo default
+     ========================================= */
+
+  --spring-stiffness-soft:   160;
+  --spring-stiffness-medium: 280;
+  --spring-stiffness-hard:   380;
+
+  --spring-damping-low:    10;
+  --spring-damping-medium: 22;
+  --spring-damping-high:   38;
+
+  --mass-light:  0.6;
+  --mass-medium: 1.4;
+  --mass-heavy:  5.0;
+}
+
+.preset-wanderlust .wl-panel {
+  position: relative;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-deep);
+}
+
+.preset-wanderlust .wl-panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 8%;
+  right: 8%;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    var(--acc-primary-dark),
+    var(--acc-primary-light),
+    var(--acc-primary-dark),
+    transparent);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.preset-wanderlust .wl-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--noise-url);
+  background-size: 200px 200px;
+  mix-blend-mode: overlay;
+  opacity: var(--noise-opacity);
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 0;
+}
+
+.preset-wanderlust .wl-panel-corner::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  border-top: 1px solid var(--acc-primary-dark);
+  border-left: 1px solid var(--acc-primary-dark);
+  border-radius: var(--radius-md) 0 0 0;
+  pointer-events: none;
+}
+
+.preset-wanderlust .wl-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-ui);
+  font-size: 6px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  border: 1px solid;
+  clip-path: polygon(5px 0%, 100% 0%, calc(100% - 5px) 100%, 0% 100%);
+}
+
+.preset-wanderlust .wl-badge-free {
+  color: var(--acc-primary-light);
+  border-color: var(--acc-primary-dark);
+  background: rgba(0,0,0,.4);
+}
+
+.preset-wanderlust .wl-badge-busy {
+  color: var(--t3);
+  border-color: rgba(255,255,255,.07);
+  background: rgba(0,0,0,.4);
+}
+
+.preset-wanderlust .wl-badge-quest {
+  color: #4aaa58;
+  border-color: rgba(58,130,72,.4);
+  background: rgba(0,0,0,.4);
+}
+
+.preset-wanderlust .wl-gem {
+  width: 5px;
+  height: 5px;
+  flex-shrink: 0;
+  background: radial-gradient(circle at 35% 30%, var(--acc-primary-light), var(--acc-primary));
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  box-shadow: 0 0 6px var(--acc-glow);
+  animation: wl-gem-breathe 2.5s ease-in-out infinite;
+}
+
+@keyframes wl-gem-breathe {
+  0%,
+  100% {
+    opacity: 0.65;
+    box-shadow: 0 0 5px var(--acc-glow-subtle);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 10px var(--acc-glow), 0 0 20px var(--acc-glow-subtle);
+  }
+}
+
+@keyframes wl-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
+}
+
+.preset-wanderlust .wl-shimmer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 35%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,220,100,.12), transparent);
+  transform: translateX(-100%);
+  animation: wl-shimmer 5s ease-in-out infinite;
+  animation-delay: var(--shimmer-delay, 0s);
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preset-wanderlust .wl-gem {
+    animation: none;
+    opacity: 0.8;
+  }
+  .preset-wanderlust .wl-shimmer::after {
+    animation: none;
+  }
+}

@@ -1,0 +1,181 @@
+[
+    {
+        "id": "Tank",
+        "name": "Tank",
+        "description": "High survivability with massive HP and armor",
+        "category": "Tank",
+        "allocation": {
+            "hp": 40,
+            "armor": 25,
+            "resistance": 10,
+            "damage": 15,
+            "txc": 5,
+            "evasion": 0,
+            "critChance": 0,
+            "critMult": 0,
+            "lifesteal": 0,
+            "regen": 5,
+            "ward": 0,
+            "block": 0,
+            "armorPen": 0,
+            "penPercent": 0
+        },
+        "minBudget": 50,
+        "maxBudget": 500,
+        "tags": [
+            "defensive",
+            "melee",
+            "sustain"
+        ],
+        "version": "1.0.0"
+    },
+    {
+        "id": "DPS",
+        "name": "DPS",
+        "description": "High damage output with moderate HP",
+        "category": "DPS",
+        "allocation": {
+            "hp": 30,
+            "damage": 50,
+            "armor": 5,
+            "resistance": 5,
+            "txc": 10,
+            "evasion": 0,
+            "critChance": 0,
+            "critMult": 0,
+            "lifesteal": 0,
+            "regen": 0,
+            "ward": 0,
+            "block": 0,
+            "armorPen": 0,
+            "penPercent": 0
+        },
+        "minBudget": 50,
+        "maxBudget": 500,
+        "tags": [
+            "offensive",
+            "balanced"
+        ],
+        "version": "1.0.0"
+    },
+    {
+        "id": "Assassin",
+        "name": "Assassin",
+        "description": "Extreme burst damage with high crit, glass cannon",
+        "category": "Assassin",
+        "allocation": {
+            "hp": 20,
+            "damage": 45,
+            "armor": 3,
+            "resistance": 3,
+            "txc": 5,
+            "evasion": 0,
+            "critChance": 15,
+            "critMult": 9,
+            "lifesteal": 0,
+            "regen": 0,
+            "ward": 0,
+            "block": 0,
+            "armorPen": 0,
+            "penPercent": 0
+        },
+        "minBudget": 50,
+        "maxBudget": 500,
+        "tags": [
+            "offensive",
+            "burst",
+            "glass-cannon"
+        ],
+        "version": "1.0.0"
+    },
+    {
+        "id": "Bruiser",
+        "name": "Bruiser",
+        "description": "Balanced fighter with decent offense and defense",
+        "category": "Bruiser",
+        "allocation": {
+            "hp": 35,
+            "damage": 30,
+            "armor": 15,
+            "resistance": 10,
+            "txc": 5,
+            "evasion": 0,
+            "critChance": 0,
+            "critMult": 0,
+            "lifesteal": 0,
+            "regen": 5,
+            "ward": 0,
+            "block": 0,
+            "armorPen": 0,
+            "penPercent": 0
+        },
+        "minBudget": 50,
+        "maxBudget": 500,
+        "tags": [
+            "balanced",
+            "durable",
+            "melee"
+        ],
+        "version": "1.0.0"
+    },
+    {
+        "id": "Evasive",
+        "name": "Evasive",
+        "description": "High evasion dodge tank with low armor",
+        "category": "Hybrid",
+        "allocation": {
+            "hp": 30,
+            "damage": 25,
+            "armor": 5,
+            "resistance": 5,
+            "txc": 10,
+            "evasion": 20,
+            "critChance": 0,
+            "critMult": 0,
+            "lifesteal": 0,
+            "regen": 5,
+            "ward": 0,
+            "block": 0,
+            "armorPen": 0,
+            "penPercent": 0
+        },
+        "minBudget": 50,
+        "maxBudget": 500,
+        "tags": [
+            "defensive",
+            "mobile",
+            "dodge"
+        ],
+        "version": "1.0.0"
+    },
+    {
+        "id": "Sustain",
+        "name": "Sustain",
+        "description": "High regeneration and lifesteal healer fighter",
+        "category": "Support",
+        "allocation": {
+            "hp": 32,
+            "damage": 28,
+            "armor": 10,
+            "resistance": 8,
+            "txc": 5,
+            "evasion": 0,
+            "critChance": 0,
+            "critMult": 0,
+            "lifesteal": 10,
+            "regen": 7,
+            "ward": 0,
+            "block": 0,
+            "armorPen": 0,
+            "penPercent": 0
+        },
+        "minBudget": 50,
+        "maxBudget": 500,
+        "tags": [
+            "sustain",
+            "healing",
+            "durable"
+        ],
+        "version": "1.0.0"
+    }
+]

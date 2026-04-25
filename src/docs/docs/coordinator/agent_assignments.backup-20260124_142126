@@ -1,0 +1,3076 @@
+# WS6 Prompt Kanban
+
+<!-- markdownlint-disable MD013 MD031 MD032 MD007 -->
+
+Kanban per tracciare i prompt WS6. Ogni prompt deve essere aggiunto qui quando creato, aggiornato quando assegnato/completato.
+
+| Prompt ID/Descrizione | Stato | Dipende da | Agente | Start Time | End Time | Duration | Est. | Ultimo Update | Note |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| NP-226 – Gesture Library System | Non assegnato | - | - | PC-M3 |
+
+```text
+AGENT: Gesture-Master
+OBJ: Gesture library mobile
+FILES: gestureLibrary.ts, useGestureRecognition.ts
+OPS: Pattern recognition, custom gestures
+SAFE: lint, test, build, kanban
+EVID: np-226.log
+```
+| NP-227 – Network Quality Indicator | Non assegnato | - | - | PC-M3 |
+
+```text
+AGENT: Network-Monitor
+OBJ: Network quality real-time
+FILES: networkQualityIndicator.ts
+OPS: Quality detection, adaptive loading
+SAFE: lint, test, build, kanban
+EVID: np-227.log
+```
+| NP-228 – Training Plan Generator | Non assegnato | - | - | PC-M3 |
+
+```text
+AGENT: Plan-Generator
+OBJ: AI training plans
+FILES: trainingPlanGenerator.ts
+OPS: Stat analysis, goal planning
+SAFE: lint, test, build, kanban
+EVID: np-228.log
+```
+| NP-229 – Character Customization | Non assegnato | - | - | PC-M3 |
+
+```text
+AGENT: Custom-Character
+OBJ: Visual character editor
+FILES: characterCustomization.ts
+OPS: Visual editor, presets
+SAFE: lint, test, build, kanban
+EVID: np-229.log
+```
+| NP-230 – Social Share Integration | Completato | - | 2026-01-24 | Cascade | 2026-01-24 | 2h | 140 | 2026-01-24 | Evidence: test-results/np-230-social-share-2026-01-24.log – Complete social sharing system with Web Share API, 6 platforms, screenshot capture, template system, React hook, 2,400+ lines, comprehensive documentation. Config-first design with fallbacks and telemetry. |
+
+```text
+AGENT: Social-Share
+OBJ: Social sharing system
+FILES: socialShare.ts
+OPS: Web Share API, screenshots
+SAFE: lint, test, build, kanban
+EVID: np-230.log
+```
+| NP-231 – Audio System Manager | Non assegnato | - | - | PC-M3 |
+
+```text
+AGENT: Audio-Manager
+OBJ: Complete audio system
+FILES: audioSystemManager.ts
+OPS: Music/SFX, volume control
+SAFE: lint, test, build, kanban
+EVID: np-231.log
+```
+| NP-232 – Notification System | In corso | - | Notify-Manager | 2026-01-24 | 2026-01-24 | - | 140 | 2026-01-24 | - |
+
+```text
+AGENT: Notify-Manager
+OBJ: Push notifications
+FILES: notificationSystem.ts
+OPS: Push API, scheduling
+SAFE: lint, test, build, kanban
+EVID: np-232.log
+```
+| NP-233 – Cloud Save System | Non assegnato | - | - | PC-M3, NP-207 |
+
+```text
+AGENT: Cloud-Save
+OBJ: Cloud sync system
+FILES: cloudSaveSystem.ts
+OPS: Auto-sync, conflict resolution
+SAFE: lint, test, build, kanban
+EVID: np-233.log
+```
+| NP-234 – Tournament Mode | Non assegnato | - | - | PC-M3 |
+
+```text
+AGENT: Tournament-Master
+OBJ: Tournament bracket system
+FILES: tournamentMode.ts
+OPS: Bracket generation, prizes
+SAFE: lint, test, build, kanban
+EVID: np-234.log
+```
+| NP-235 – Training Mini-Games | Non assegnato | - | - | PC-M3 |
+
+```text
+AGENT: MiniGame-Designer
+OBJ: Training mini-games
+FILES: trainingMiniGames.ts
+OPS: Speed bag, dodge trainer
+SAFE: lint, test, build, kanban
+EVID: np-235.log
+```
+| NP-236 – Injury System | Non assegnato | - | - | PC-M3 |
+
+```text
+AGENT: Injury-Manager
+OBJ: Injury mechanics
+FILES: injurySystem.ts
+OPS: Injury types, recovery
+SAFE: lint, test, build, kanban
+EVID: np-236.log
+```
+| NP-237 – Stamina System | Non assegnato | - | - | PC-M3 |
+
+```text
+AGENT: Stamina-Manager
+OBJ: Stamina regeneration
+FILES: staminaSystem.ts
+OPS: Stamina bar, fatigue
+SAFE: lint, test, build, kanban
+EVID: np-237.log
+```
+| NP-238 – Equipment System | Non assegnato | - | - | PC-M3 |
+
+```text
+AGENT: Equipment-Manager
+OBJ: Equipment with bonuses
+FILES: equipmentSystem.ts
+OPS: Slots, stat bonuses
+SAFE: lint, test, build, kanban
+EVID: np-238.log
+```
+| NP-239 – Gym Management | Non assegnato | - | - | PC-M3 |
+
+```text
+AGENT: Gym-Manager
+OBJ: Gym upgrade system
+FILES: gymManagement.ts
+OPS: Upgrades, reputation
+SAFE: lint, test, build, kanban
+EVID: np-239.log
+```
+| NP-240 – Coach System | Non assegnato | - | - | PC-M3 |
+
+```text
+AGENT: Coach-Manager
+OBJ: Coach hiring system
+FILES: coachSystem.ts
+OPS: Coach types, bonuses
+SAFE: lint, test, build, kanban
+EVID: np-240.log
+```
+| NP-241 – Rival System | Non assegnato | - | - | PC-M3 |
+
+```text
+AGENT: Rival-Manager
+OBJ: Dynamic rival system
+FILES: rivalSystem.ts
+OPS: Rival generation, progression
+SAFE: lint, test, build, kanban
+EVID: np-241.log
+```
+| NP-242 – Career Mode | Non assegnato | - | - | PC-M3 |
+
+```text
+AGENT: Career-Manager
+OBJ: Career progression
+FILES: careerMode.ts
+OPS: Career path, milestones
+SAFE: lint, test, build, kanban
+EVID: np-242.log
+```
+| NP-243 – Sponsor System | Non assegnato | - | - | PC-M3 |
+
+```text
+AGENT: Sponsor-Manager
+OBJ: Sponsor deals system
+FILES: sponsorSystem.ts
+OPS: Sponsor offers, contracts
+SAFE: lint, test, build, kanban
+EVID: np-243.log
+```
+| NP-244 – Media System | Non assegnato | - | - | PC-M3 |
+
+```text
+AGENT: Media-Manager
+OBJ: Media interactions
+FILES: mediaSystem.ts
+OPS: Interviews, reputation
+SAFE: lint, test, build, kanban
+EVID: np-244.log
+```
+| NP-245 – Retirement System | Non assegnato | - | - | PC-M3 |
+
+```text
+AGENT: Retirement-Manager
+OBJ: Career end mechanics
+FILES: retirementSystem.ts
+OPS: Retirement triggers, legacy
+SAFE: lint, test, build, kanban
+EVID: np-245.log
+```
+| NP-246 – Punch Club Offline Consent Diagnostics CLI | Non assegnato | consentManager, telemetry | - | - | - | - | 140 | - | - |
+
+```text
+AGENT: Guardian-PC – Privacy Ops
+OBJ: Comparare stato consenso locale/server, segnalare drift.
+FILES: scripts/punchClub/consentDiagnostics.ts, docs/punchClub/consent_diagnostics.md, tests/unit/punchClub/ConsentDiagnostics.test.ts
+SAFE: npm run lint -- scripts/punchClub; npm run test -- tests/unit/punchClub/ConsentDiagnostics.test.ts; npm run build:check; npm run kanban:lint
+EVID: test-results/np-246-consent-diagnostics.log
+```
+| NP-247 – Surge Tutorial Tap Heatmap | Non assegnato | surge tutorial config, telemetry | - | - | - | - | 130 | - | - |
+
+```text
+AGENT: Vector-PC – Telemetry Viz
+OBJ: Registrare tap multi-step e creare heatmap mobile.
+FILES: src/analytics/punchClub/tutorialTapHeatmap.ts, src/ui/punchClub/tools/TapHeatmapPage.tsx, tests/unit/punchClub/TutorialTapHeatmap.test.tsx, docs/punchClub/tutorial_heatmap.md
+SAFE: npm run lint -- src/analytics/punchClub src/ui/punchClub; npm run test -- tests/unit/punchClub/TutorialTapHeatmap.test.tsx; npm run build:check; npm run kanban:lint
+EVID: test-results/np-247-tutorial-heatmap.log
+```
+| NP-248 – Punch Club Push Notification Readiness Audit | Non assegnato | service-worker, pushConfig | - | - | - | - | 130 | - | - |
+
+```text
+AGENT: Nexus-SW – Push Reliability
+OBJ: Audit permessi push, subscription e fallback schedule.
+FILES: scripts/pwa/pushReadinessAudit.ts, tests/unit/pwa/PushReadinessAudit.test.ts, docs/pwa/push_readiness_audit.md
+SAFE: npm run lint -- scripts/pwa; npm run test -- tests/unit/pwa/PushReadinessAudit.test.ts; npm run build:check; npm run kanban:lint
+EVID: test-results/np-248-push-readiness.log
+```
+| NP-249 – Mobile Session Tagging Latency Monitor | Non assegnato | sessionTagging pipeline | - | - | - | - | 120 | - | - |
+
+```text
+AGENT: Chronos-Session – Metrics
+OBJ: Misurare latency tagging sessioni e alert >150 ms.
+FILES: src/analytics/punchClub/sessionLatencyMonitor.ts, tests/unit/punchClub/SessionLatencyMonitor.test.ts, docs/punchClub/session_latency.md
+SAFE: npm run lint -- src/analytics/punchClub; npm run test -- tests/unit/punchClub/SessionLatencyMonitor.test.ts; npm run build:check; npm run kanban:lint
+EVID: test-results/np-249-session-latency.log
+```
+| NP-250 – Surge Tutorial Voiceover Localizer | Non assegnato | surgeCopy.json, localization | - | - | - | - | 150 | - | - |
+
+```text
+AGENT: Lyra-Copy – Localization
+OBJ: Generare pack audio multilanguage con checksum.
+FILES: scripts/punchClub/tutorialVoiceoverPack.ts, docs/punchClub/tutorial_voiceover.md, assets/punchClub/tutorial/voiceover/*
+SAFE: npm run lint -- scripts/punchClub; npm run test -- tests/unit/punchClub/TutorialVoiceover.test.ts; npm run build:check; npm run kanban:lint
+EVID: test-results/np-250-voiceover-pack.log
+```
+| NP-251 – Punch Club Offline Export Bundle Optimizer | Non assegnato | vite config, service worker | - | - | - | - | 140 | - | - |
+
+```text
+AGENT: Velocity-Perf – Build Optim
+OBJ: Analizzare bundle offline e proporre riduzioni asset.
+FILES: scripts/build/offlineBundleOptimizer.ts, docs/pwa/offline_bundle_optimizer.md, tests/unit/build/OfflineBundleOptimizer.test.ts
+SAFE: npm run lint -- scripts/build; npm run test -- tests/unit/build/OfflineBundleOptimizer.test.ts; npm run build:check; npm run kanban:lint
+EVID: test-results/np-251-offline-bundle.log
+```
+
+| NP-252 – Punch Club Offline Achievement Sync | Non assegnato | achievementsConfig, PersistenceService | - | - | - | - | 140 | - | - |
+
+```text
+AGENT: Chronicle-Sync – Achievements
+OBJ: Sincronizzare i progressi achievement offline e server con retry backoff e audit JSON.
+FILES: src/analytics/punchClub/offlineAchievementSync.ts, scripts/punchClub/offlineAchievementSyncCLI.ts, tests/unit/punchClub/OfflineAchievementSync.test.ts, docs/punchClub/offline_achievement_sync.md
+SAFE: npm run lint -- src/analytics/punchClub scripts/punchClub, npm run test -- tests/unit/punchClub/OfflineAchievementSync.test.ts, npm run build:check, npm run kanban:lint
+EVID: test-results/np-252-offline-achievement-sync.log
+```
+| NP-253 – Mobile Match Replay Compression | Non assegnato | replayRecorder, CompressionService | - | - | - | - | 130 | - | - |
+
+```text
+AGENT: Vector-PC – Replay Compression
+OBJ: Ridurre dimensione replay mobile con chunk delta e upload differito.
+FILES: src/analytics/punchClub/matchReplayCompressor.ts, scripts/punchClub/replayCompressCLI.ts, tests/unit/punchClub/MatchReplayCompressor.test.ts, docs/punchClub/match_replay_compression.md
+SAFE: npm run lint -- src/analytics/punchClub scripts/punchClub, npm run test -- tests/unit/punchClub/MatchReplayCompressor.test.ts, npm run build:check, npm run kanban:lint
+EVID: test-results/np-253-replay-compression.log
+```
+| NP-254 – Punch Club Input Lag Profiler | Non assegnato | InputManager, telemetry/perf | - | - | - | - | 150 | - | - |
+
+```text
+AGENT: Velocity-Perf – Input Lag
+OBJ: Profilare end-to-end input lag su dispositivi mobile con breakdown per frame e rete.
+FILES: src/analytics/punchClub/inputLagProfiler.ts, src/ui/punchClub/devtools/InputLagProfilerPanel.tsx, tests/unit/punchClub/InputLagProfiler.test.ts, docs/punchClub/input_lag_profiler.md
+SAFE: npm run lint -- src/analytics/punchClub src/ui/punchClub, npm run test -- tests/unit/punchClub/InputLagProfiler.test.ts, npm run build:check, npm run kanban:lint
+EVID: test-results/np-254-input-lag-profiler.log
+```
+| NP-255 – Surge Tutorial Narration Handoff Engine | Non assegnato | surge/tutorial config, audioSystem | - | - | - | - | 150 | - | - |
+
+```text
+AGENT: Lyra-Copy – Narration Ops
+OBJ: Gestire il passaggio dinamico tra voce mentore, SFX e testo accessibile nel tutorial.
+FILES: src/ui/punchClub/tutorial/NarrationHandoffEngine.ts, surge/tutorialNarrationConfig.ts, tests/unit/punchClub/NarrationHandoffEngine.test.ts, docs/punchClub/tutorial_narration_handoff.md
+SAFE: npm run lint -- src/ui/punchClub surge, npm run test -- tests/unit/punchClub/NarrationHandoffEngine.test.ts, npm run build:check, npm run kanban:lint
+EVID: test-results/np-255-narration-handoff.log
+```
+| NP-256 – Punch Club Consent Auto-Retry Scheduler | Non assegnato | consentManager, PersistenceService | - | - | - | - | 130 | - | - |
+
+```text
+AGENT: Privacy-Guard – Auto-Retry
+OBJ: Programmare retry intelligenti del consenso quando l’utente torna online evitando prompt ripetitivi.
+FILES: src/analytics/punchClub/consentAutoRetryScheduler.ts, scripts/punchClub/consentRetryCLI.ts, tests/unit/punchClub/ConsentAutoRetryScheduler.test.ts, docs/punchClub/consent_auto_retry.md
+SAFE: npm run lint -- src/analytics/punchClub scripts/punchClub, npm run test -- tests/unit/punchClub/ConsentAutoRetryScheduler.test.ts, npm run build:check, npm run kanban:lint
+EVID: test-results/np-256-consent-auto-retry.log
+```
+| NP-257 – Training Session Memory Optimizer | Non assegnato | trainingConfig, assetCache | - | - | - | - | 140 | - | - |
+
+```text
+AGENT: Atlas-Memory – Training
+OBJ: Ridurre consumo memoria durante training combinando asset streaming e eviction config-first.
+FILES: src/ui/punchClub/training/TrainingMemoryOptimizer.ts, trainingMemoryConfig.ts, tests/unit/punchClub/TrainingMemoryOptimizer.test.ts, docs/punchClub/training_memory_optimizer.md
+SAFE: npm run lint -- src/ui/punchClub, npm run test -- tests/unit/punchClub/TrainingMemoryOptimizer.test.ts, npm run build:check, npm run kanban:lint
+EVID: test-results/np-257-training-memory-optimizer.log
+```
+| NP-258 – Punch Club Live Bug Snapshotter | Non assegnato | playtestLogger, canvasRecorder | - | - | - | - | 140 | - | - |
+
+```text
+AGENT: Playtest-Logger – Snapshot
+OBJ: Catturare snapshot live (canvas + log) al tocco di un pulsante durante playtest mobile.
+FILES: src/ui/playtest/LiveBugSnapshotter.tsx, playtestSnapshotConfig.ts, tests/unit/playtest/LiveBugSnapshotter.test.tsx, docs/playtest/live_bug_snapshotter.md
+SAFE: npm run lint -- src/ui/playtest, npm run test -- tests/unit/playtest/LiveBugSnapshotter.test.tsx, npm run build:check, npm run kanban:lint
+EVID: test-results/np-258-live-bug-snapshotter.log
+```
+| NP-259 – Punch Club Session Resume Wizard | Non assegnato | sessionTagging, PersistenceService | - | - | - | - | 130 | - | - |
+
+```text
+AGENT: Chronos-Session – Resume
+OBJ: Creare un wizard che ripristina sessioni interrotte con checklist di sincronizzazione e log.
+FILES: src/ui/punchClub/session/SessionResumeWizard.tsx, sessionResumeConfig.ts, tests/unit/punchClub/SessionResumeWizard.test.tsx, docs/punchClub/session_resume_wizard.md
+SAFE: npm run lint -- src/ui/punchClub, npm run test -- tests/unit/punchClub/SessionResumeWizard.test.tsx, npm run build:check, npm run kanban:lint
+EVID: test-results/np-259-session-resume-wizard.log
+```
+| NP-260 – Punch Club Device Capability Matrix | Non assegnato | deviceProfiler, analytics | - | - | - | - | 140 | - | - |
+
+```text
+AGENT: Helix-Install – Capability Matrix
+OBJ: Costruire matrice capacità device (GPU, RAM, storage) per suggerire preset performance.
+FILES: src/analytics/punchClub/deviceCapabilityMatrix.ts, scripts/punchClub/deviceCapabilityReport.ts, tests/unit/punchClub/DeviceCapabilityMatrix.test.ts, docs/punchClub/device_capability_matrix.md
+SAFE: npm run lint -- src/analytics/punchClub scripts/punchClub, npm run test -- tests/unit/punchClub/DeviceCapabilityMatrix.test.ts, npm run build:check, npm run kanban:lint
+EVID: test-results/np-260-device-capability-matrix.log
+```
+| NP-261 – PWA Install Benchmark Reporter | Non assegnato | pwaInstallStore, analytics | - | - | - | - | 120 | - | - |
+
+```text
+AGENT: Zephyr-PWA – Install Bench
+OBJ: Benchmarkare il tempo install PWA su diverse reti e produrre report comparativi.
+FILES: src/analytics/pwa/installBenchmarkReporter.ts, scripts/pwa/installBenchmarkCLI.ts, tests/unit/pwa/InstallBenchmarkReporter.test.ts, docs/pwa/install_benchmark_reporter.md
+SAFE: npm run lint -- src/analytics/pwa scripts/pwa, npm run test -- tests/unit/pwa/InstallBenchmarkReporter.test.ts, npm run build:check, npm run kanban:lint
+EVID: test-results/np-261-install-benchmark.log
+```
+| NP-262 – Surge Tutorial Guardian Voicepack Loader | Non assegnato | surge/audio config | - | - | - | - | 130 | - | - |
+
+```text
+AGENT: Lyra-Copy – Voice Loader
+OBJ: Gestire caricamento dinamico dei voicepack guardiano (lingue multiple) con fallback.
+FILES: surge/tutorialVoicepackLoader.ts, src/ui/punchClub/tutorial/VoicepackPanel.tsx, tests/unit/punchClub/TutorialVoicepackLoader.test.ts, docs/punchClub/tutorial_voicepack_loader.md
+SAFE: npm run lint -- surge src/ui/punchClub, npm run test -- tests/unit/punchClub/TutorialVoicepackLoader.test.ts, npm run build:check, npm run kanban:lint
+EVID: test-results/np-262-voicepack-loader.log
+```
+| NP-263 – Punch Club FTUE Save-State Sandbox | Non assegnato | ftueConfig, PersistenceService | - | - | - | - | 150 | - | - |
+
+```text
+AGENT: FTUE-Ghost – Save Sandbox
+OBJ: Creare sandbox per testare salvataggi FTUE con stati multipli, export/import e rollback.
+FILES: src/ui/punchClub/ftue/FtueSaveSandbox.tsx, ftueSaveSandboxConfig.ts, tests/unit/punchClub/FtueSaveSandbox.test.tsx, docs/punchClub/ftue_save_sandbox.md
+SAFE: npm run lint -- src/ui/punchClub, npm run test -- tests/unit/punchClub/FtueSaveSandbox.test.tsx, npm run build:check, npm run kanban:lint
+EVID: test-results/np-263-ftue-save-sandbox.log
+```
+| NP-264 – Punch Club Telemetry Schema Linter | Non assegnato | telemetry schema, analytics | - | - | - | - | 120 | - | - |
+
+```text
+AGENT: Vector-PC – Schema Lint
+OBJ: Validare gli eventi telemetry contro schema JSON centralizzato con fix suggeriti.
+FILES: scripts/analytics/telemetrySchemaLinter.ts, src/analytics/punchClub/telemetrySchemaLinter.ts, tests/unit/analytics/TelemetrySchemaLinter.test.ts, docs/punchClub/telemetry_schema_linter.md
+SAFE: npm run lint -- scripts/analytics src/analytics/punchClub, npm run test -- tests/unit/analytics/TelemetrySchemaLinter.test.ts, npm run build:check, npm run kanban:lint
+EVID: test-results/np-264-telemetry-schema-linter.log
+```
+| NP-265 – Punch Club Mobile Control Remapper | Non assegnato | inputConfig, controlLayouts | - | - | - | - | 150 | - | - |
+
+```text
+AGENT: Control-Tactician – Remapper
+OBJ: Consentire remap controlli mobile con preset esportabili e indicatori compatibilità.
+FILES: src/ui/punchClub/settings/MobileControlRemapper.tsx, inputLayoutConfig.ts, tests/unit/punchClub/MobileControlRemapper.test.tsx, docs/punchClub/mobile_control_remapper.md
+SAFE: npm run lint -- src/ui/punchClub, npm run test -- tests/unit/punchClub/MobileControlRemapper.test.tsx, npm run build:check, npm run kanban:lint
+EVID: test-results/np-265-mobile-control-remapper.log
+```
+| NP-266 – Punch Club Energy Drink Economy Simulator | Non assegnato | economyConfig, balancing | - | - | - | - | 150 | - | - |
+
+```text
+AGENT: Balance-Lab – Energy Sim
+OBJ: Simulare consumo/rifornimento energy drink con curve di costo e rischio dipendenza.
+FILES: src/balancing/punchClub/EnergyDrinkEconomySimulator.ts, scripts/balancing/energyDrinkEconomyCLI.ts, tests/unit/punchClub/EnergyDrinkEconomySimulator.test.ts, docs/punchClub/energy_drink_economy.md
+SAFE: npm run lint -- src/balancing scripts/balancing, npm run test -- tests/unit/punchClub/EnergyDrinkEconomySimulator.test.ts, npm run build:check, npm run kanban:lint
+EVID: test-results/np-266-energy-drink-economy.log
+```
+| NP-267 – Punch Club Playtest Annotation Assistant | Non assegnato | playtestLogger, annotationConfig | - | - | - | - | 140 | - | - |
+
+```text
+AGENT: Playtest-Logger – Annotation
+OBJ: Permettere annotazioni timeline playtest con tagging rapido e export markdown.
+FILES: src/ui/playtest/PlaytestAnnotationAssistant.tsx, annotationConfig.ts, tests/unit/playtest/PlaytestAnnotationAssistant.test.tsx, docs/playtest/playtest_annotation_assistant.md
+SAFE: npm run lint -- src/ui/playtest, npm run test -- tests/unit/playtest/PlaytestAnnotationAssistant.test.tsx, npm run build:check, npm run kanban:lint
+EVID: test-results/np-267-playtest-annotation.log
+```
+| NP-268 – Punch Club Offline Patch Package Builder | Non assegnato | service-worker, assetManifest | - | - | - | - | 150 | - | - |
+
+```text
+AGENT: Nexus-SW – Patch Builder
+OBJ: Generare pacchetti patch offline con delta asset e firma integrità.
+FILES: scripts/pwa/offlinePatchPackageBuilder.ts, service-worker/offlinePatchConfig.ts, tests/unit/pwa/OfflinePatchPackageBuilder.test.ts, docs/pwa/offline_patch_package_builder.md
+SAFE: npm run lint -- scripts/pwa service-worker, npm run test -- tests/unit/pwa/OfflinePatchPackageBuilder.test.ts, npm run build:check, npm run kanban:lint
+EVID: test-results/np-268-offline-patch-package.log
+```
+| NP-269 – Punch Club Streaming Mode Overlay | Non assegnato | overlayConfig, telemetry | - | - | - | - | 130 | - | - |
+
+```text
+AGENT: Broadcast-Guardian – Streaming
+OBJ: Overlay streaming-friendly che oscura dati sensibili e mostra KPI configurabili.
+FILES: src/ui/punchClub/StreamingModeOverlay.tsx, streamingOverlayConfig.ts, tests/unit/punchClub/StreamingModeOverlay.test.tsx, docs/punchClub/streaming_mode_overlay.md
+SAFE: npm run lint -- src/ui/punchClub, npm run test -- tests/unit/punchClub/StreamingModeOverlay.test.tsx, npm run build:check, npm run kanban:lint
+EVID: test-results/np-269-streaming-mode-overlay.log
+```
+| NP-270 – Punch Club FTUE Emotion Tracker | Non assegnato | tutorialTelemetry, moodConfig | - | - | - | - | 140 | - | - |
+
+```text
+AGENT: Insight-FTUE – Emotion Tracker
+OBJ: Tracciare emozioni FTUE combinando telemetria evento, reazioni e sentiment UI.
+FILES: src/analytics/punchClub/ftueEmotionTracker.ts, src/ui/punchClub/tutorial/FtueEmotionPanel.tsx, tests/unit/punchClub/FtueEmotionTracker.test.ts, docs/punchClub/ftue_emotion_tracker.md
+SAFE: npm run lint -- src/analytics/punchClub src/ui/punchClub, npm run test -- tests/unit/punchClub/FtueEmotionTracker.test.ts, npm run build:check, npm run kanban:lint
+EVID: test-results/np-270-ftue-emotion-tracker.log
+```
+| NP-271 – Punch Club Mobile Accessibility Scanner | Non assegnato | accessibilityConfig, playwright | - | - | - | - | 130 | - | - |
+
+```text
+AGENT: Guardian-A11y – Mobile Scan
+OBJ: Scanner automatico accessibilità mobile con audit WCAG e screenshot comparativi.
+FILES: tests/accessibility/punchClub/MobileAccessibilityScanner.spec.ts, scripts/punchClub/mobileAccessibilityScan.ts, docs/punchClub/mobile_accessibility_scanner.md
+SAFE: npm run lint -- tests/accessibility scripts/punchClub, npm run test -- tests/accessibility/punchClub/MobileAccessibilityScanner.spec.ts, npm run build:check, npm run kanban:lint
+EVID: test-results/np-271-mobile-accessibility-scanner.log
+```
+
+| NP-206 – PWA Install Timing Optimizer | Non assegnato | - | - | PC-M3 |
+
+```text
+AGENT: Zephyr-PWA
+OBJECTIVE: Sistema timing intelligente per PWA install prompt con engagement metrics
+FILES: usePWAInstallTiming.ts, pwaInstallConfig.ts, installPromptTelemetry.ts, PWAInstallTiming.test.ts
+OPS: Config trigger conditions, state machine, telemetry tracking, A/B test framework
+SAFEGUARDS: lint, test, build:check, kanban:lint
+EVIDENCE: test-results/np-206-pwa-install-timing.log
+```
+| NP-207 – Offline Queue System | Non assegnato | - | - | PC-M3 |
+
+```text
+AGENT: Atlas-Offline
+OBJECTIVE: Queue per azioni offline con sync automatico e conflict resolution
+FILES: OfflineQueue.ts, useOfflineQueue.ts, offlineQueueConfig.ts, OfflineQueue.test.ts
+OPS: IndexedDB storage, retry logic, exponential backoff, conflict resolution, PersistenceService
+SAFEGUARDS: lint, test, build:check, kanban:lint
+EVIDENCE: test-results/np-207-offline-queue.log
+```
+| NP-212 – Haptic Feedback System | Non assegnato | - | - | PC-M3 |
+
+```text
+AGENT: Pulse-Haptic
+OBJECTIVE: Haptic feedback con pattern library e user preferences
+FILES: hapticFeedback.ts, useHaptic.ts, hapticConfig.ts, HapticFeedback.test.ts
+OPS: Pattern library (tap/success/error/impact), Vibration API wrapper, user preferences, config-first patterns
+SAFEGUARDS: lint, test, build:check, kanban:lint
+EVIDENCE: test-results/np-212-haptic-feedback.log
+```
+| NP-213 – Telemetry Export Dashboard | Non assegnato | - | - | PC-M3 |
+
+```text
+AGENT: Nexus-Export
+OBJECTIVE: Dashboard export telemetry multi-formato con filtering e aggregation
+FILES: TelemetryExportDashboard.tsx, telemetryExporter.ts, exportConfig.ts, TelemetryExporter.test.ts
+OPS: JSON/CSV/SQLite exporters, date range picker, filtering, aggregation, Web Workers, preview mode
+SAFEGUARDS: lint, test, build:check, kanban:lint
+EVIDENCE: test-results/np-213-telemetry-export.log
+```
+| NP-214 – Character Portrait Lazy Loading | Non assegnato | - | - | PC-M3 |
+
+```text
+AGENT: Flux-Assets
+OBJECTIVE: Lazy loading portraits con progressive loading e blur-up placeholders
+FILES: LazyPortrait.tsx, useProgressiveImage.ts, assetLoadingConfig.ts, LazyPortrait.test.ts
+OPS: IntersectionObserver, progressive loading (tiny→low→full), preload hints, SW cache integration
+SAFEGUARDS: lint, test, build:check, kanban:lint
+EVIDENCE: test-results/np-214-lazy-portrait.log
+```
+| NP-221 – Error Boundary System | Non assegnato | - | - | PC-M3 |
+
+```text
+AGENT: Guardian-Error
+OBJECTIVE: Error boundaries con graceful degradation e recovery strategies
+FILES: ErrorBoundary.tsx, errorReporter.ts, errorBoundaryConfig.ts, ErrorBoundary.test.ts
+OPS: componentDidCatch, error reporting (stack trace + telemetry), recovery strategies, user-friendly UI, categorization
+SAFEGUARDS: lint, test, build:check, kanban:lint
+EVIDENCE: test-results/np-221-error-boundary.log
+```
+| NP-223 – A/B Test Framework | Non assegnato | - | - | PC-M3 |
+
+```text
+AGENT: Experiment-AB
+OBJECTIVE: A/B test framework con statistical significance calculation
+FILES: abTestFramework.ts, useABTest.ts, abTestConfig.ts, ABTestFramework.test.ts
+OPS: Deterministic variant assignment (hash-based), telemetry integration, config schema, chi-square test
+SAFEGUARDS: lint, test, build:check, kanban:lint
+EVIDENCE: test-results/np-223-ab-test-framework.log
+```
+
+
+
+
+
+
+
+
+
+
+
+
+AGENT
+Trace-Idle – Visual Regression
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `agent-execution-mandate` prima di iniziare, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Implementare visual regression baseline per Phase 12 map di Idle Village con ActivitySlot mini-cards, Active HUD, e drag-drop interactions.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] tests/visual/idleVillage/phase12-baseline.spec.ts — baseline screenshot capture
+- [nuovo] tests/visual/idleVillage/phase12-interactions.spec.ts — interaction testing
+- [nuovo] tests/utils/visualInteraction/idleVillageMap.ts — interaction utilities
+- [nuovo] docs/visual/idle_village_phase12_baseline.md — baseline documentation
+
+DIPENDENZE
+- E2E-VRT-001 – Physical E2E Testing System (visual regression framework)
+- Phase 12 map implementation (ActivitySlot mini-cards, Active HUD)
+
+OPERAZIONI DA ESEGUIRE
+1. Creare baseline screenshot suite per Phase 12 map (25 screenshots target).
+2. Implementare interaction testing per drag-drop, mini-cards, ActivitySlot.
+3. Configurare visual interaction utilities per map state management.
+4. Documentare baseline setup e interaction coverage.
+5. Integrare con E2E-VRT-001 framework e Docker consistency.
+6. Validare baseline stability across 3 runs.
+
+OPERAZIONI VIETATE
+- Vietato hardcodare selettori CSS; usare data-testid e utility functions.
+- Nessun baseline senza interaction coverage completo.
+- Proibito skip accessibility testing nelle visual regression.
+
+ASSUNZIONI
+- E2E-VRT-001 framework già disponibile.
+- Phase 12 map con ActivitySlot mini-cards implementato.
+- Playwright visual regression configurato.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- tests/visual tests/utils`
+- `npm run test:e2e -- tests/visual/idleVillage/phase12-baseline.spec.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+AUTONOMIA & CHECK-IN
+- Autonomia Media; check-in dopo baseline capture e interaction testing.
+
+KANBAN COMPLETION
+1. Stato Kanban → "Completato" con data.
+2. Evidence `test-results/np-078-idle-visual-baseline-<data>.log`.
+3. Baseline stabile con 25+ screenshots e interaction coverage.
+
+NOTE
+- Target: 25 baseline screenshots per Phase 12 map.
+- Coverage: drag-drop, mini-cards, ActivitySlot, Active HUD.
+- Baseline stability validato across 3 runs.
+
+ANTI-STALL DIRECTIVE
+- Procedi autonomamente: non attendere ulteriori conferme salvo nuove istruzioni del coordinatore.
+
+EVIDENCE LOG
+- test-results/np-078-idle-visual-baseline-<data>.log
+``` | ```text
+AGENT
+Lumen-Idle – Visual QA
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `agent-execution-mandate` prima di iniziare, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Creare baseline visive Playwright per mini-card mappe Idle Village (jobs/quests/maintenance) con orchestrazione CLI.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] tests/visual/idleVillage/MapMiniCards.spec.ts — creare scaffolding prima di iniziare.
+- [nuovo] tests/visual/idleVillage/baselines/*.png — creare scaffolding prima di iniziare.
+- [nuovo] scripts/visual/idleVillageBaselineRunner.ts — creare scaffolding prima di iniziare.
+- [nuovo] docs/tests/idle_village_visual_baselines.md — creare scaffolding prima di iniziare.
+- [esistente] playwright.config.ts
+
+DIPENDENZE
+- Strategy Task E2E-VRT-001
+- NP-030 Map Mini Cards
+- Style Laboratory tokens
+
+OPERAZIONI DA ESEGUIRE
+1. Scrivere spec che carica sandbox, toggla filtri e cattura screenshot per i tre cluster.
+2. Salvare baseline PNG + metadata JSON.
+3. Creare runner CLI per aggiornare baseline con diff summary.
+4. Documentare workflow e storage location.
+5. Aggiornare plan VRT con KPI (63 baseline target).
+
+OPERAZIONI VIETATE
+- Nessun screenshot con UI instabile (disabilitare animazioni via config).
+- Vietato salvare baseline fuori tests/visual.
+- Non sovrascrivere file senza diff log.
+
+ASSUNZIONI
+- Playwright headless stable.
+- Map data mock disponibile.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- tests/visual scripts/visual`
+- `npm run test:visual -- tests/visual/idleVillage/MapMiniCards.spec.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+AUTONOMIA & CHECK-IN
+- Autonomia Alta; ping se asset >2 MB.
+
+KANBAN COMPLETION
+1. Stato Kanban → “Completato”.
+2. Evidence `test-results/np-078-idle-visual-baseline-<data>.log` con lint/test/build/kanban output.
+3. Note con elenco baseline generate.
+
+NOTE
+- Strategy Task: E2E-VRT-001 (Idle Village scope).
+- Allineare palette con doc Il Drago.
+
+ANTI-STALL DIRECTIVE
+- Procedi autonomamente: non attendere ulteriori conferme salvo nuove istruzioni del coordinatore.
+
+EVIDENCE LOG
+- test-results/np-078-idle-visual-baseline-<data>.log
+```
+
+
+
+
+
+
+
+
+
+| NP-105 – Idle Village Phase E Scenario Exporter | In corso | Phase E scenario plan | Aurora-Idle – Scenario Export | 2026-01-21 | - | 150 | 2026-01-21 | ```text
+AGENT
+Aurora-Idle – Scenario Export
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `agent-execution-mandate` prima di iniziare, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Serializzare scenari Phase E (drag/drop, fatigue, crew) in formato JSON/Markdown usando CLI `phaseEScenarioExport` e documentare pipeline.
+
+PROMPT READINESS
+FILE TARGET
+- [esistente] scripts/idleVillage/phaseEScenarioExport.ts
+- [nuovo] src/ui/idleVillage/config/phaseEScenarioSchema.ts — creare scaffolding prima di iniziare.
+- [nuovo] tests/unit/idleVillage/PhaseEScenarioSerializer.test.ts — creare scaffolding prima di iniziare.
+- [nuovo] docs/idle_village/phaseE_scenarios.md — creare scaffolding prima di iniziare.
+
+DIPENDENZE
+- Phase E scenario plan §12.17
+- PersistenceService (scenario presets)
+
+OPERAZIONI DA ESEGUIRE
+1. Definire schema scenario (residents, slots, validation rules, telemetry tags) con Zod.
+2. Aggiornare CLI per leggere config, validare e salvare JSON/Markdown in `test-results/phaseE-scenarios-<ts>.json`.
+3. Aggiungere opzione `--kpi-report` con summary (valid/invalid ratio, latency avg).
+4. Scrivere test/unit per serializer e CLI (mock fs) + doc con esempi.
+5. Collegare doc al plan Phase E e menzionare dipendenze.
+
+OPERAZIONI VIETATE
+- Vietato esportare file fuori repo.
+- Nessuno scenario senza validation.
+- Non usare JSON.stringify senza replacer/version.
+
+ASSUNZIONI
+- La CLI esiste come stub.
+- Node 20.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- scripts/idleVillage src/ui/idleVillage/config`
+- `npm run test -- tests/unit/idleVillage/PhaseEScenarioSerializer.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+AUTONOMIA & CHECK-IN
+- Autonomia Alta; ping se servono nuovi formati export.
+
+KANBAN COMPLETION
+1. Stato Kanban → “Completato”.
+2. Evidence `test-results/np-105-phasee-scenario-export-<data>.log`.
+3. Note con link doc e sample.
+
+| NP-108 – Punch Club PWA Performance Budget Monitor | Non assegnato | PC-M2 performance | - | - | - | - | 150 | - | - | ```text
+AGENT
+Atlas-PC – Performance Guard
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `agent-execution-mandate` prima di iniziare, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Implementare monitor che misura cold start (<3s) e runtime KPI PWA Punch Club con config budgets e reporting.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] src/ui/punchClub/perf/PWAPerformanceBudget.ts — creare scaffolding prima di iniziare.
+- [nuovo] scripts/punchClub/pwaPerformanceCheck.ts — creare scaffolding prima di iniziare.
+- [nuovo] tests/unit/punchClub/PWAPerformanceBudget.test.ts — creare scaffolding prima di iniziare.
+- [nuovo] docs/punch_club/pwa_performance_budget.md — creare scaffolding prima di iniziare.
+
+DIPENDENZE
+- Strategy Task PC-M2
+- Service worker version manager
+
+OPERAZIONI DA ESEGUIRE
+1. Definire config budget (TTFB, interactive, offline cache load) con thresholds.
+2. Implementare monitor (hook + CLI) che raccoglie metriche e salva log JSON in test-results.
+3. Integrare con service worker update events e telemetry `pwa_budget_violation`.
+4. Scrivere doc + test/unit per budget evaluator.
+5. Opzionale: script GitHub Action snippet.
+
+OPERAZIONI VIETATE
+- Vietato eseguire test reali senza gating; usare headless/lighthouse stub.
+- Nessun network call esterno non mockato.
+- Non hardcodare thresholds.
+
+ASSUNZIONI
+- Lighthouse CLI disponibile in devDependencies.
+- Node 20.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- src/ui/punchClub scripts/punchClub`
+- `npm run test -- tests/unit/punchClub/PWAPerformanceBudget.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+AUTONOMIA & CHECK-IN
+- Autonomia Alta; ping se servono nuove metriche.
+
+KANBAN COMPLETION
+1. Stato Kanban → “Completato”.
+2. Evidence `test-results/np-108-pwa-performance-budget-<data>.log`.
+3. Note con budget summary.
+
+NOTE
+- Prevedere esportazione Markdown compatibile con playtester guide.
+
+ANTI-STALL DIRECTIVE
+- Procedi autonomamente: non attendere ulteriori conferme salvo nuove istruzioni del coordinatore.
+
+EVIDENCE LOG
+- test-results/np-108-pwa-performance-budget-<data>.log
+```
+| NP-109 – Punch Club Telemetry Export Schema Visualizer | In corso | PC-M2 telemetry export | 2026-01-24 | Cascade | - | - | 140 | 2026-01-24 | In progress | ```text
+AGENT
+Vector-PC – Telemetry Schema
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `agent-execution-mandate` prima di iniziare, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Creare visualizzatore config-first per schema telemetry Punch Club (JSON export) con graph/radar e diff tool.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] src/ui/punchClub/telemetry/TelemetrySchemaVisualizer.tsx — creare scaffolding prima di iniziare.
+- [nuovo] src/ui/punchClub/hooks/useTelemetrySchema.ts — creare scaffolding prima di iniziare.
+- [esistente] src/analytics/telemetryExportValidator.ts
+- [nuovo] tests/unit/punchClub/TelemetrySchemaVisualizer.test.tsx — creare scaffolding prima di iniziare.
+- [nuovo] docs/punch_club/telemetry_schema_visualizer.md — creare scaffolding prima di iniziare.
+
+DIPENDENZE
+- PC-M2E plan
+- Telemetry validator (NP-071)
+
+OPERAZIONI DA ESEGUIRE
+1. Definire config per visual mapping (event categories, required fields, severity tokens).
+2. Implementare hook che legge schema (Zod) e produce graph nodes/edges.
+3. Creare UI (network graph + detail pane + Markdown diff) con export PNG/JSON.
+4. Integrare con validator per segnalare mismatch in tempo reale.
+5. Scrivere test/unit e doc.
+
+OPERAZIONI VIETATE
+- Vietato manipolare schema a runtime.
+- Nessun graph layout hardcoded; usare config.
+- Non esportare file fuori repo.
+
+ASSUNZIONI
+- Schema già esposto da validator.
+- Style tokens disponibili.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- src/ui/punchClub src/analytics`
+- `npm run test -- tests/unit/punchClub/TelemetrySchemaVisualizer.test.tsx`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+AUTONOMIA & CHECK-IN
+- Autonomia Media; sync se graph richiede libreria nuova.
+
+KANBAN COMPLETION
+1. Stato Kanban → “Completato”.
+2. Evidence `test-results/np-109-telemetry-schema-visualizer-<data>.log`.
+3. Note con screenshot ASCII.
+
+NOTE
+- Collegare output a playtester guide telemetry section.
+
+ANTI-STALL DIRECTIVE
+- Procedi autonomamente: non attendere ulteriori conferme salvo nuove istruzioni del coordinatore.
+
+EVIDENCE LOG
+- test-results/np-109-telemetry-schema-visualizer-<data>.log
+```
+| NP-110 – Punch Club Service Worker Update Simulator | In corso | PC-M2 service worker | 2026-01-24 | Guardian-PC – SW Reliability | - | 140 | 2026-01-24 | - | ```text
+AGENT
+Guardian-PC – SW Reliability
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `agent-execution-mandate` prima di iniziare, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Costruire simulator config-first che riproduce update del service worker Punch Club (version bump, cache invalidation, offline fallback) con report.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] scripts/punchClub/serviceWorkerUpdateSimulator.ts — creare scaffolding prima di iniziare.
+- [nuovo] tests/unit/punchClub/ServiceWorkerUpdateSimulator.test.ts — creare scaffolding prima di iniziare.
+- [nuovo] docs/punch_club/service_worker_update_simulator.md — creare scaffolding prima di iniziare.
+- [esistente] src/service-worker.ts
+
+DIPENDENZE
+- PC-M2 service worker plan
+- PersistenceService (cache metadata)
+
+OPERAZIONI DA ESEGUIRE
+1. Definire config scenario (version, assets, failure modes) con Zod.
+2. Implementare simulator (Node) che emula lifecycle events e scrive log JSON.
+3. Integrare con service-worker.ts hooking per version manifest.
+4. Aggiungere CLI flag `--telemetry` per inviare `pwa_sw_update_simulated`.
+5. Scrivere test/unit e doc.
+
+OPERAZIONI VIETATE
+- Vietato modificare service worker reale senza feature flag.
+- Nessun fetch reale; usare mock.
+- Non salvare log fuori test-results.
+
+ASSUNZIONI
+- Node 20.
+- Service worker config modulare.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- scripts/punchClub src/service-worker.ts`
+- `npm run test -- tests/unit/punchClub/ServiceWorkerUpdateSimulator.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+AUTONOMIA & CHECK-IN
+- Autonomia Media; ping se emergono nuovi failure modes.
+
+KANBAN COMPLETION
+1. Stato Kanban → “Completato”.
+2. Evidence `test-results/np-110-sw-update-simulator-<data>.log`.
+3. Note con scenario coverage.
+
+NOTE
+- Allegare tabella success/failure per 3 run.
+
+ANTI-STALL DIRECTIVE
+- Procedi autonomamente: non attendere ulteriori conferme salvo nuove istruzioni del coordinatore.
+
+EVIDENCE LOG
+- test-results/np-110-sw-update-simulator-<data>.log
+```
+| NP-122 – Balancer Formula Safety Reporter UI | In corso | CF-Phase10-card-safety | Cascade | 2026-01-24 | 2026-01-24 | 160 | 2026-01-24 | - | ```text
+AGENT
+Oracle-Balancer – Formula Safety
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `agent-execution-mandate` prima di iniziare, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Implementare UI/report per Formula Safety lint (cycle/range) con config-first severity mapping e export.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] src/ui/balancing/FormulaSafetyReporter.tsx — creare scaffolding prima di iniziare.
+- [nuovo] src/ui/balancing/hooks/useFormulaSafetyReport.ts — creare scaffolding prima di iniziare.
+- [nuovo] tests/unit/balancing/FormulaSafetyReporter.test.tsx — creare scaffolding prima di iniziare.
+- [nuovo] docs/balancing/formula_safety_reporter.md — creare scaffolding prima di iniziare.
+- [esistente] src/balancing/config/FormulaEngine.ts
+
+DIPENDENZE
+- NP-096 Formula Safety Lint
+- PersistenceService (reports)
+
+OPERAZIONI DA ESEGUIRE
+1. Definire schema report (formulaId, severity, suggested fix).
+2. Implementare hook che legge output lint e produce dataset filtrabile.
+3. Creare UI (table + severity filters + diff view) e export JSON/CSV.
+4. Telemetry `formula_safety_report_viewed`.
+5. Test/unit + doc.
+
+OPERAZIONI VIETATE
+- Nessuna logica lint duplicata in UI.
+- Vietato salvare file fuori test-results.
+- Non hardcodare severity colors.
+
+ASSUNZIONI
+- Lint produce JSON.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- src/ui/balancing`
+- `npm run test -- tests/unit/balancing/FormulaSafetyReporter.test.tsx`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+AUTONOMIA & CHECK-IN
+- Autonomia Media; ping se lint format cambia.
+
+KANBAN COMPLETION
+1. Stato Kanban → “Completato”.
+2. Evidence `test-results/np-122-formula-safety-reporter-<data>.log`.
+3. Note con screenshot ASCII.
+
+NOTE
+- Collegare a Phase 10 doc.
+
+ANTI-STALL DIRECTIVE
+- Procedi autonomamente: non attendere ulteriori conferme salvo nuove istruzioni del coordinatore.
+
+EVIDENCE LOG
+- test-results/np-122-formula-safety-reporter-<data>.log
+```
+| NP-128 – STS Numeric Simulator Telemetry Export CLI | Non assegnato | KS-080/KS-081, STS strategy | - | - | - | - | 150 | - | - | ```text
+AGENT
+Oracle-STS – Simulator Exports
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `agent-execution-mandate` prima di iniziare, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Implementare CLI config-first che esporta dati STS Numeric Simulator (mana curve, agency gaps, pacing) in JSON/CSV/Markdown per KS-081 dashboard e analisi esterne.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] scripts/sts/numericSimulatorExport.ts — creare scaffolding prima di iniziare.
+- [nuovo] src/analytics/sts/numericSimulatorExport.ts — creare scaffolding prima di iniziare.
+- [nuovo] tests/unit/sts/NumericSimulatorExport.test.ts — creare scaffolding prima di iniziare.
+- [nuovo] docs/sts/numeric_simulator_export.md — creare scaffolding prima di iniziare.
+
+DIPENDENZE
+- KS-080 Numeric Simulator spec
+- KS-081 Telemetry Dashboard
+
+OPERAZIONI DA ESEGUIRE
+1. Definire schema export (runId, phases, mana/agency/pacing arrays, anomalies) con Zod.
+2. Implementare exporter service con filtri (date, archetype, scenario) e smoothing config.
+3. CLI con opzioni `--format json|csv|md`, `--diff baseline`, `--evidence-log` salvando output in `test-results/`.
+4. Integrare telemetry `sts_numeric_export_generated` + PersistenceService per default settings.
+5. Test/unit (mock simulator) e doc con esempi.
+
+OPERAZIONI VIETATE
+- Nessun accesso diretto a file fuori repo.
+- Non duplicare logica simulatore.
+- Vietato esportare dati privi di schema.
+
+ASSUNZIONI
+- Simulator API espone stream/JSON.
+- Node 20.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- scripts/sts src/analytics/sts`
+- `npm run test -- tests/unit/sts/NumericSimulatorExport.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+AUTONOMIA & CHECK-IN
+- Autonomia Media; ping se API cambia.
+
+KANBAN COMPLETION
+1. Stato Kanban → “Completato”.
+2. Evidence `test-results/np-128-sts-numeric-export-<data>.log`.
+3. Note con sample export e KPI.
+
+NOTE
+- Collegare a docs KS-080/081.
+
+ANTI-STALL DIRECTIVE
+- Procedi autonomamente: non attendere ulteriori conferme salvo nuove istruzioni del coordinatore.
+
+EVIDENCE LOG
+- test-results/np-128-sts-numeric-export-<data>.log
+```
+| NP-138 – Punch Club PWA Install Tracker QA Harness | Non assegnato | PC-M2E install tracking | - | - | - | - | 140 | - | - | ```text
+AGENT
+Vector-PC – Install QA
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `agent-execution-mandate`, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Creare harness Playwright/config-first per testare `usePWAInstallTracker` (eventi install prompt) con log e screenshot.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] tests/e2e/punchClub/PWAInstallTrackerHarness.spec.ts — creare scaffolding prima di iniziare.
+- [nuovo] tests/utils/pwa/installTrackerHarness.ts — creare scaffolding prima di iniziare.
+- [nuovo] docs/punch_club/pwa_install_tracker_harness.md — creare scaffolding prima di iniziare.
+
+DIPENDENZE
+- PC-M2E plan (install tracker)
+- Telemetry events `pwa_install_prompt_*`
+
+OPERAZIONI DA ESEGUIRE
+1. Definire scenari config (accept, dismiss, timeout) e dataset.
+2. Implementare harness Playwright che simula prompt events e verifica telemetry.
+3. Salvare log/screenshot in `test-results/` + doc runbook.
+4. Collegare ai test unit esistenti e pipeline CI.
+5. Telemetry `pwa_install_tracker_harness_run`.
+
+OPERAZIONI VIETATE
+- Vietato usare API browser non supportate da Playwright.
+- Nessun network reale.
+
+ASSUNZIONI
+- Playwright 1.41+.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- tests/e2e tests/utils`
+- `npm run test:e2e -- tests/e2e/punchClub/PWAInstallTrackerHarness.spec.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+AUTONOMIA & CHECK-IN
+- Autonomia Media.
+
+KANBAN COMPLETION
+1. Stato → “Completato”.
+2. Evidence `test-results/np-138-pwa-install-harness-<data>.log`.
+3. Note con acceptance rate misurato.
+
+NOTE
+- Collegare ai KPI PC-M2E (≥90% install acceptance).
+
+ANTI-STALL DIRECTIVE
+- Procedi autonomamente salvo nuove istruzioni.
+
+EVIDENCE LOG
+- test-results/np-138-pwa-install-harness-<data>.log
+```
+| NP-141 – Punch Club Telemetry Drift Visual Diff CLI | Non assegnato | PC-M2E telemetry | - | - | - | - | 140 | - | - | ```text
+AGENT
+Vector-PC – Telemetry Diff
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `agent-execution-mandate`, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Creare CLI config-first che analizza drift di telemetry Punch Club e genera diff visuale con export Markdown/JSON.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] scripts/punchClub/telemetryDriftDiff.ts — creare scaffolding prima di iniziare.
+- [nuovo] src/analytics/punchClub/telemetryDriftAnalyzer.ts — creare scaffolding prima di iniziare.
+- [nuovo] tests/unit/punchClub/TelemetryDriftDiff.test.ts — creare scaffolding prima di iniziare.
+- [nuovo] docs/punch_club/telemetry_drift_diff.md — creare scaffolding prima di iniziare.
+
+DIPENDENZE
+- PC-M2E telemetry
+- Evidence buffer (NP-135)
+
+OPERAZIONI DA ESEGUIRE
+1. Definire schema drift (threshold, window) con Zod.
+2. Implementare analyzer che legge telemetry/evidence e identifica drift.
+3. Costruire CLI con opzioni `--window`, `--threshold`, `--output` e logging in `test-results/telemetry-drift-<ts>.{json,md}`.
+4. Integrare telemetry `punch_club_telemetry_drift_detected` e PersistenceService per default window.
+5. Testare CLI e documentare nel plan.
+
+OPERAZIONI VIETATE
+- Vietato esportare dati fuori repo.
+- Nessun accesso storage sincrono.
+- Non trascurare fallback english per copy.
+
+ASSUNZIONI
+- Node 20.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- scripts/punchClub src/analytics/punchClub`
+- `npm run test -- tests/unit/punchClub/TelemetryDriftDiff.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+AUTONOMIA & CHECK-IN
+- Autonomia Media.
+
+KANBAN COMPLETION
+1. Stato → “Completato”.
+2. Evidence `test-results/np-141-telemetry-drift-diff-<data>.log`.
+3. Note con drift principali.
+
+NOTE
+- Collegare ai KPI PC-M2E (≥90% install acceptance).
+
+ANTI-STALL DIRECTIVE
+- Procedi autonomamente salvo nuove istruzioni.
+
+EVIDENCE LOG
+- test-results/np-141-telemetry-drift-diff-<data>.log
+```
+| NP-144 – Archmage Spell Lifecycle Incident Monitor | Non assegnato | AM-1 spell telemetry | - | - | - | - | 140 | - | - | ```text
+AGENT
+Oracle-Archmage – Spell Monitor
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `agent-execution-mandate`, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Creare monitor config-first che analizza incidenti di ciclo di vita di spell Archmage e genera report di incidenti.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] scripts/archmage/spellLifecycleIncidentMonitor.ts — creare scaffolding prima di iniziare.
+- [nuovo] src/archmage/spellLifecycleAnalyzer.ts — creare scaffolding prima di iniziare.
+- [nuovo] tests/unit/archmage/SpellLifecycleIncidentMonitor.test.ts — creare scaffolding prima di iniziare.
+- [nuovo] docs/archmage/spell_lifecycle_incident_monitor.md — creare scaffolding prima di iniziare.
+
+DIPENDENZE
+- AM-1 spell telemetry
+- Evidence buffer (NP-135)
+
+OPERAZIONI DA ESEGUIRE
+1. Definire schema incidenti (threshold, window) con Zod.
+2. Implementare analyzer che legge telemetry/evidence e identifica incidenti.
+3. Costruire monitor con opzioni `--window`, `--threshold`, `--output` e logging in `test-results/spell-lifecycle-incident-<ts>.{json,md}`.
+4. Integrare telemetry `archmage_spell_lifecycle_incident_detected` e PersistenceService per default window.
+5. Testare monitor e documentare nel plan.
+
+OPERAZIONI VIETATE
+- Vietato esportare dati fuori repo.
+- Nessun accesso storage sincrono.
+- Non trascurare fallback english per copy.
+
+ASSUNZIONI
+- Node 20.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- scripts/archmage src/archmage`
+- `npm run test -- tests/unit/archmage/SpellLifecycleIncidentMonitor.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+AUTONOMIA & CHECK-IN
+- Autonomia Media.
+
+KANBAN COMPLETION
+1. Stato → “Completato”.
+2. Evidence `test-results/np-144-spell-incident-monitor-<data>.log`.
+3. Note con incidenti principali.
+
+NOTE
+- Collegare ai KPI Archmage (≥90% spell acceptance).
+
+ANTI-STALL DIRECTIVE
+- Procedi autonomamente salvo nuove istruzioni.
+
+EVIDENCE LOG
+- test-results/np-144-spell-incident-monitor-<data>.log
+```
+| NP-153 – Idle Village Drop Feedback Telemetry Heatmap | In corso | dropFeedbackTelemetry, Phase E map | 2026-01-24 | Cascade | - | - | 150 | 2026-01-24 | - | ```text
+AGENT
+Helix-Idle – Drop Analytics
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `agent-execution-mandate`, esegui tutte le safeguard e aggiorna la Kanban senza attendere conferme.
+
+OBIETTIVO
+Costruire heatmap interattiva che visualizzi la densità di feedback (valid/invalid/warning/blocked) per ogni slot Phase E con export JSON/Markdown.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] src/ui/idleVillage/analytics/DropFeedbackHeatmap.tsx — creare scaffolding prima di iniziare.
+- [nuovo] src/ui/idleVillage/hooks/useDropFeedbackHeatmap.ts — creare scaffolding prima di iniziare.
+- [nuovo] tests/unit/idleVillage/DropFeedbackHeatmap.test.tsx — creare scaffolding prima di iniziare.
+- [nuovo] docs/idle_village/drop_feedback_heatmap.md — creare scaffolding prima di iniziare.
+
+DIPENDENZE
+- dropFeedbackTelemetry.ts
+- Phase E map config
+
+OPERAZIONI DA ESEGUIRE
+1. Definire schema config-first per bucket/gradiente secondo Style Laboratory.
+2. Implementare hook che aggrega telemetria via PersistenceService e restituisce dataset memoized.
+3. Creare UI (heatmap + legend + filters) con fallback ASCII per report CLI.
+4. Telemetria `iv_drop_heatmap_viewed` + export JSON/Markdown in `data/exports/idleVillage`.
+5. Test RTL e doc con KPI (top invalid hotspots).
+
+OPERAZIONI VIETATE
+- Vietato hardcodare colori fuori config.
+- Nessun accesso diretto a DOM globale.
+- Non salvare file fuori `test-results` o `data/exports/idleVillage`.
+
+ASSUNZIONI
+- dropFeedbackTelemetry emette eventi completi (slotId, type, timestamp).
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- src/ui/idleVillage`
+- `npm run test -- tests/unit/idleVillage/DropFeedbackHeatmap.test.tsx`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato Kanban → “Completato” con data e agente.
+2. Evidence `test-results/np-153-drop-feedback-heatmap-<data>.log`.
+3. Note con screenshot ASCII heatmap + KPI riassunti.
+
+NOTE
+- Documentare come integrare il dataset con Theater mini-card.
+
+EVIDENCE LOG
+- test-results/np-153-drop-feedback-heatmap-<data>.log
+```
+| NP-154 – Idle Village Crew Scheduler Stress Harness | Non assegnato | crewScheduler config, Phase E validators | - | - | - | - | 150 | - | - | ```text
+AGENT
+Vector-Idle – Scheduler Ops
+
+ISTRUZIONI AGENTE
+Consulta `agent-execution-mandate`, esegui gli step senza chiedere conferme aggiuntive, aggiorna Kanban.
+
+OBIETTIVO
+Creare harness che esegue simulazioni massicce sul Crew Scheduler (WS3) per scoprire conflitti e generare report.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] src/ui/idleVillage/diagnostics/CrewSchedulerStressHarness.ts — creare scaffolding prima di iniziare.
+- [nuovo] scripts/idleVillage/crewSchedulerStress.ts — creare scaffolding prima di iniziare.
+- [nuovo] tests/unit/idleVillage/CrewSchedulerStressHarness.test.ts — creare scaffolding prima di iniziare.
+- [nuovo] docs/idle_village/crew_scheduler_stress.md — creare scaffolding prima di iniziare.
+
+DIPENDENZE
+- crewScheduler config (WS3)
+- Phase E drag validators
+
+OPERAZIONI DA ESEGUIRE
+1. Definire config (runs, crew caps, fatigue ranges) + schema Zod.
+2. Implementare harness React (per dev UI) e CLI per batch offline.
+3. Telemetria `iv_crew_stress_run` con KPI (conflict %, avg latency).
+4. Export JSON/Markdown in `data/exports/idleVillage/stress`.
+5. Test unitari su generazione dataset + doc con risultati baseline.
+
+OPERAZIONI VIETATE
+- Nessun accesso a state non tipizzato.
+- Vietato usare localStorage diretto.
+- Non introdurre mutazioni non deterministiche senza seed.
+
+ASSUNZIONI
+- Crew Scheduler expose API per iniettare scenari.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- src/ui/idleVillage scripts/idleVillage`
+- `npm run test -- tests/unit/idleVillage/CrewSchedulerStressHarness.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato Kanban → “Completato”.
+2. Evidence `test-results/np-154-crew-stress-harness-<data>.log`.
+3. Note con tabella KPI.
+
+NOTE
+- Segnalare scenari bloccanti in doc coordinamento.
+
+EVIDENCE LOG
+- test-results/np-154-crew-stress-harness-<data>.log
+```
+| NP-155 – Idle Village Theater Overlay Accessibility Doc Suite | Non assegnato | WS4 useTheaterController, Style Lab | - | - | - | - | 140 | - | - | ```text
+AGENT
+Aurora-Idle – Accessibility Ops
+
+ISTRUZIONI AGENTE
+Segui `agent-execution-mandate`, completa safeguard suite, aggiorna Kanban.
+
+OBIETTIVO
+Documentare e validare accessibility per Theater Overlay (hover timers, mini-card, narration) con test e guida.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] docs/idle_village/theater_overlay_accessibility.md — creare scaffolding prima di iniziare.
+- [nuovo] tests/accessibility/idleVillage/theater-overlay.a11y.ts — creare scaffolding prima di iniziare.
+- [nuovo] tests/unit/idleVillage/TheaterOverlayAccessibility.test.tsx — creare scaffolding prima di iniziare.
+- [esistente] src/ui/idleVillage/controllers/useTheaterController.ts (sola lettura per referenze API).
+
+DIPENDENZE
+- WS4 theater controller doc
+- Style Laboratory tokens
+
+OPERAZIONI DA ESEGUIRE
+1. Redigere checklist WCAG/ARIA per overlay (focus, narration, hover timers).
+2. Scrivere Playwright a11y spec (keyboard navigation, narration toggle, focus trap) con baseline deterministica.
+3. RTL test per verificare aria attributi e annunci.
+4. Documentare fallback, esempi config-first (narration copy, timers, density) e collegare telemetria `iv_theater_a11y_checked`.
+5. Allegare snippet ASCII e roadmap fix.
+
+OPERAZIONI VIETATE
+- Vietato modificare componenti di produzione.
+- Nessun skip dei test a11y.
+- Non hardcodare testo ARIA.
+
+ASSUNZIONI
+- Overlay già emette eventi drop feedback e timer via hook.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- docs tests`
+- `npm run test -- tests/unit/idleVillage/TheaterOverlayAccessibility.test.tsx`
+- `npm run test:e2e -- tests/accessibility/idleVillage/theater-overlay.a11y.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato → “Completato”.
+2. Evidence `test-results/np-155-theater-a11y-<data>.log`.
+3. Note con link doc + checklist.
+
+NOTE
+- Includere raccomandazioni per future varianti overlay.
+
+EVIDENCE LOG
+- test-results/np-155-theater-a11y-<data>.log
+```
+| NP-156 – Idle Village ActivitySlot Persistence Chaos Tests | Non assegnato | PersistenceService, ActivitySlot store | - | - | - | - | 140 | - | - | ```text
+AGENT
+Sentinel-Idle – Persistence Guard
+
+ISTRUZIONI AGENTE
+Consulta `agent-execution-mandate`, porta a termine tutte le safeguard, aggiorna Kanban.
+
+OBIETTIVO
+Creare suite di “chaos tests” per PersistenceService vs ActivitySlot store simulando crash, tab duplicate e quota exceeded.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] tests/unit/idleVillage/ActivitySlotPersistenceChaos.test.ts — creare scaffolding prima di iniziare.
+- [nuovo] scripts/idleVillage/activitySlotChaosRunner.ts — creare scaffolding prima di iniziare.
+- [nuovo] docs/idle_village/activityslot_persistence_resilience.md — creare scaffolding prima di iniziare.
+- [esistente] src/shared/persistence/PersistenceService.ts
+
+DIPENDENZE
+- ActivitySlot store Phase 12
+- Storage Testing Framework
+
+OPERAZIONI DA ESEGUIRE
+1. Definire matrice eventi (crash mid-save, quota exceeded, duplicate hydration) con config-first.
+2. Runner che manipola PersistenceService mock async e registra recovery KPI.
+3. Telemetria `iv_activityslot_chaos_run`.
+4. Export JSON/Markdown con KPI e suggerimenti mitigazione.
+5. Test unitari + doc runbook.
+
+OPERAZIONI VIETATE
+- Vietato usare localStorage diretto.
+- Nessun setTimeout senza await/cleanup.
+- Non modificare l’API PersistenceService.
+
+ASSUNZIONI
+- ActivitySlot store supporta hydration asincrona.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- tests scripts`
+- `npm run test -- tests/unit/idleVillage/ActivitySlotPersistenceChaos.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato → “Completato”.
+2. Evidence `test-results/np-156-activityslot-chaos-<data>.log`.
+3. Note con failure principali e fix suggeriti.
+
+NOTE
+- Documentare come integrare i test in guardian suite.
+
+EVIDENCE LOG
+- test-results/np-156-activityslot-chaos-<data>.log
+```
+| NP-157 – Idle Village Mini-Card Density Tuning Toolkit | Non assegnato | DensityContext, mini-card config | - | - | - | - | 140 | - | - | ```text
+AGENT
+Lumen-Idle – Visual Toolkit
+
+ISTRUZIONI AGENTE
+Segui `agent-execution-mandate`, rispetta safeguard suite, aggiorna Kanban.
+
+OBIETTIVO
+Creare toolkit per confrontare varianti di density (compact/comfortable) per mini-card ActivitySlot/Theater con export.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] src/ui/idleVillage/tools/MiniCardDensityLab.tsx — creare scaffolding prima di iniziare.
+- [nuovo] src/ui/idleVillage/hooks/useMiniCardDensityLab.ts — creare scaffolding prima di iniziare.
+- [nuovo] tests/unit/idleVillage/MiniCardDensityLab.test.tsx — creare scaffolding prima di iniziare.
+- [nuovo] docs/idle_village/mini_card_density_lab.md — creare scaffolding prima di iniziare.
+
+DIPENDENZE
+- DensityContext
+- ActivitySlot mini-card config
+
+OPERAZIONI DA ESEGUIRE
+1. Definire config varianti (tokens, spacing, typography) con schema Zod.
+2. Implementare tool UI con toggle, metrics e export JSON/CSV.
+3. Telemetria `iv_minicard_density_lab_viewed`.
+4. Test RTL + doc con comparative table.
+5. Allegare screenshot ASCII nel doc.
+
+OPERAZIONI VIETATE
+- Non duplicare tokens Style Laboratory.
+- Vietato modificare componenti di produzione.
+- Nessun inline style fuori config.
+
+ASSUNZIONI
+- Mini-card condividono props base.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- src/ui/idleVillage`
+- `npm run test -- tests/unit/idleVillage/MiniCardDensityLab.test.tsx`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato → “Completato”.
+2. Evidence `test-results/np-157-minicard-density-<data>.log`.
+3. Note con tabella varianti.
+
+NOTE
+- Aggiornare Phase 12 doc con raccomandazioni.
+
+EVIDENCE LOG
+- test-results/np-157-minicard-density-<data>.log
+```
+| NP-159 – Punch Club Surge Tutorial Localization Pack | Non assegnato | Surge tutorial module, i18n pipeline | - | - | - | - | 130 | - | - | ```text
+AGENT
+Lumen-PC – Localization Ops
+
+ISTRUZIONI AGENTE
+Segui `agent-execution-mandate`, completa safeguard, aggiorna Kanban.
+
+OBIETTIVO
+Estrarre copy del Surge Tutorial in pacchetto i18n config-first con tooling di verifica e doc.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] src/ui/punchClub/tutorials/surgeLocalizationConfig.ts — creare scaffolding prima di iniziare.
+- [nuovo] scripts/punchClub/surgeLocalizationAudit.ts — creare scaffolding prima di iniziare.
+- [nuovo] tests/unit/punchClub/SurgeLocalizationConfig.test.ts — creare scaffolding prima di iniziare.
+- [nuovo] docs/punch_club/surge_localization_pack.md — creare scaffolding prima di iniziare.
+
+DIPENDENZE
+- Surge tutorial module
+- Punch Club i18n pipeline
+
+OPERAZIONI DA ESEGUIRE
+1. Definire schema copy (keys, placeholders, tone tags) con Zod.
+2. CLI audit che verifica traduzioni, diff e coverage.
+3. Telemetria `pc_surge_localization_checked`.
+4. Export JSON in `data/presets/punchClub/surge_i18n` + doc.
+5. Test unitari su schema/CLI.
+
+OPERAZIONI VIETATE
+- Nessun testo hardcoded in componenti.
+- Vietato usare require dinamici.
+- Non salvare file fuori directory dedicate.
+
+ASSUNZIONI
+- Loader i18n già disponibile.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- src/ui/punchClub scripts/punchClub`
+- `npm run test -- tests/unit/punchClub/SurgeLocalizationConfig.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato → “Completato”.
+2. Evidence `test-results/np-159-surge-localization-<data>.log`.
+3. Note con coverage lingue.
+
+NOTE
+- Includere guidelines per copy future.
+
+EVIDENCE LOG
+- test-results/np-159-surge-localization-<data>.log
+```
+| NP-161 – STS Numeric Simulator GPU Benchmark Monitor | Non assegnato | STSNumericSimulator, telemetry dashboard | - | - | - | - | 150 | - | - | ```text
+AGENT
+Sentinel-STS – Perf Monitor
+
+ISTRUZIONI AGENTE
+Segui `agent-execution-mandate`, completare safeguard suite, aggiornare Kanban.
+
+OBIETTIVO
+Monitorare prestazioni GPU/WebGL dello STS Numeric Simulator con benchmark config-first e report.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] src/ui/tools/sts/telemetry/SimulatorPerfMonitor.ts — creare scaffolding prima di iniziare.
+- [nuovo] scripts/sts/simulatorPerfBenchmark.ts — creare scaffolding prima di iniziare.
+- [nuovo] tests/unit/sts/SimulatorPerfMonitor.test.ts — creare scaffolding prima di iniziare.
+- [nuovo] docs/sts/simulator_perf_monitor.md — creare scaffolding prima di iniziare.
+
+DIPENDENZE
+- STSNumericSimulator
+- Telemetry dashboard KS-081
+
+OPERAZIONI DA ESEGUIRE
+1. Configurare test cases (deck size, particles, shaders) + schema Zod.
+2. Hook/monitor che registra FPS, GPU timing, memory via PersistenceService.
+3. Telemetria `sts_simulator_perf_bench`.
+4. Export JSON/Markdown + doc con KPI.
+5. Test unitari con mock WebGL metrics.
+
+OPERAZIONI VIETATE
+- Non usare API WebGL non supportate.
+- Vietato bloccare UI thread >16ms.
+- Nessun log fuori test-results.
+
+ASSUNZIONI
+- Simulator espone hook metriche.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- src/ui/tools/sts scripts/sts`
+- `npm run test -- tests/unit/sts/SimulatorPerfMonitor.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato → “Completato”.
+2. Evidence `test-results/np-161-sts-perf-monitor-<data>.log`.
+3. Note con KPI.
+
+NOTE
+- Inserire raccomandazioni tuning reactive.
+
+EVIDENCE LOG
+- test-results/np-161-sts-perf-monitor-<data>.log
+```
+| NP-162 – STS Intent Overlay Accessibility Fix Pack | Non assegnato | IntentOverlay.tsx, telemetry logger | - | - | - | - | 140 | - | - | ```text
+AGENT
+Lyra-STS – Overlay A11y
+
+ISTRUZIONI AGENTE
+Consulta `agent-execution-mandate`, salvaguardie, aggiorna Kanban.
+
+OBIETTIVO
+Applicare fix e test per accessibilità intent overlay: focus order, screen reader annunci, keyboard shortcuts.
+
+PROMPT READINESS
+FILE TARGET
+- [esistente] src/ui/tools/sts/IntentOverlay.tsx
+- [nuovo] src/ui/tools/sts/hooks/useIntentOverlayAccessibility.ts — creare scaffolding prima di iniziare.
+- [nuovo] tests/unit/sts/IntentOverlayAccessibility.test.tsx — creare scaffolding prima di iniziare.
+- [nuovo] docs/sts/intent_overlay_accessibility.md — creare scaffolding prima di iniziare.
+
+DIPENDENZE
+- NP-120 logger
+- Style Laboratory tokens
+
+OPERAZIONI DA ESEGUIRE
+1. Estrarre logica ARIA/narration in hook configurabile.
+2. Aggiornare overlay per focus trap, rolename, keyboard hints.
+3. Telemetria `sts_intent_overlay_a11y`.
+4. Test RTL + doc checklist.
+5. Verificare VoiceOver/keyboard via Playwright mini harness (documentare).
+
+OPERAZIONI VIETATE
+- Vietato hardcodare testi ARIA.
+- Nessun accesso DOM diretto.
+- Non rompere API overlay.
+
+ASSUNZIONI
+- Overlay modulare.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- src/ui/tools/sts`
+- `npm run test -- tests/unit/sts/IntentOverlayAccessibility.test.tsx`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato → “Completato”.
+2. Evidence `test-results/np-162-intent-overlay-a11y-<data>.log`.
+3. Note con checklist.
+
+NOTE
+- Aggiornare doc telemetry per nuovi eventi.
+
+EVIDENCE LOG
+- test-results/np-162-intent-overlay-a11y-<data>.log
+```
+| NP-163 – Balancer Scenario Runner Automation Tests | Non assegnato | scenarioRunner CLI, stress configs | - | - | - | - | 140 | - | - | ```text
+AGENT
+Trace-Balancer – Scenario QA
+
+ISTRUZIONI AGENTE
+Segui `agent-execution-mandate`, esegui safeguard suite, aggiorna Kanban.
+
+OBIETTIVO
+Aggiungere suite automatizzata (Vitest + CLI) per scenarioRunner con dataset multipli e check sulle export.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] tests/unit/balancing/ScenarioRunnerAutomation.test.ts — creare scaffolding prima di iniziare.
+- [nuovo] scripts/balancer/scenarioRunnerAutomation.ts — creare scaffolding prima di iniziare.
+- [nuovo] docs/balancing/scenario_runner_automation.md — creare scaffolding prima di iniziare.
+- [esistente] scripts/balancer/scenarioRunner.ts
+
+DIPENDENZE
+- Scenario Runner CLI
+- Stress testing configs
+
+OPERAZIONI DA ESEGUIRE
+1. Definire set scenari “golden” con seed deterministici.
+2. CLI che lancia runner, verifica KPI (win rate, target turns) e salva log.
+3. Telemetria `balancer_scenario_automation_run`.
+4. Test + doc con workflow CI.
+5. Export JSON/Markdown.
+
+OPERAZIONI VIETATE
+- Nessun file fuori `test-results`.
+- Vietato cambiare parametri CLI esistenti senza doc.
+- Non usare randomness non seedata.
+
+ASSUNZIONI
+- Scenario Runner supporta config file.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- scripts/balancer tests/unit/balancing`
+- `npm run test -- tests/unit/balancing/ScenarioRunnerAutomation.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato → “Completato”.
+2. Evidence `test-results/np-163-scenario-automation-<data>.log`.
+3. Note con KPI.
+
+NOTE
+- Suggerire integrazione CI futura.
+
+EVIDENCE LOG
+- test-results/np-163-scenario-automation-<data>.log
+```
+| NP-164 – Balancer Formula Lint Auto-Runner CLI | Non assegnato | FormulaEngine lint, Reporter UI | - | - | - | - | 140 | - | - | ```text
+AGENT
+Oracle-Balancer – Formula Safety
+
+ISTRUZIONI AGENTE
+Consulta `agent-execution-mandate`, salvaguardie, aggiorna Kanban.
+
+OBIETTIVO
+Creare CLI che esegue FormulaEngine lint (cycle/range) su schedule, genera report e notifica conflitti.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] scripts/balancer/formulaLintAutoRunner.ts — creare scaffolding prima di iniziare.
+- [nuovo] src/balancing/config/formulaLintSchedulerConfig.ts — creare scaffolding prima di iniziare.
+- [nuovo] tests/unit/balancing/FormulaLintAutoRunner.test.ts — creare scaffolding prima di iniziare.
+- [nuovo] docs/balancing/formula_lint_auto_runner.md — creare scaffolding prima di iniziare.
+
+DIPENDENZE
+- FormulaEngine lint (NP-096)
+- Formula Safety Reporter (NP-122)
+
+OPERAZIONI DA ESEGUIRE
+1. Configurare job (cron interval, severity thresholds) con Zod.
+2. CLI che esegue lint, salva JSON/Markdown, opziona webhooks.
+3. Telemetria `balancer_formula_lint_auto_run`.
+4. Test + doc con guida scheduling.
+5. Archivia report in `test-results/balancer/formula-lint`.
+
+OPERAZIONI VIETATE
+- Nessun setInterval senza cleanup.
+- Vietato accedere a config non tipizzate.
+- Non saltare severity mapping.
+
+ASSUNZIONI
+- Lint produce JSON.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- scripts/balancer src/balancing/config`
+- `npm run test -- tests/unit/balancing/FormulaLintAutoRunner.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato → “Completato”.
+2. Evidence `test-results/np-164-formula-lint-auto-<data>.log`.
+3. Note con severity.
+
+NOTE
+- Collegare output a Formula Safety Reporter.
+
+EVIDENCE LOG
+- test-results/np-164-formula-lint-auto-<data>.log
+```
+| NP-165 – Balancer Monte Carlo Visual Summary UI | Non assegnato | Scenario Runner exports, Style Lab | - | - | - | - | 150 | - | - | ```text
+AGENT
+Lumen-Balancer – Visual Analytics
+
+ISTRUZIONI AGENTE
+Segui `agent-execution-mandate`, safeguard suite, aggiorna Kanban.
+
+OBIETTIVO
+Creare UI (Gilded Observatory) per visualizzare risultati Monte Carlo con grafici e filtri.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] src/ui/balancing/MonteCarloSummary.tsx — creare scaffolding prima di iniziare.
+- [nuovo] src/ui/balancing/hooks/useMonteCarloSummary.ts — creare scaffolding prima di iniziare.
+- [nuovo] tests/unit/balancing/MonteCarloSummary.test.tsx — creare scaffolding prima di iniziare.
+- [nuovo] docs/balancing/monte_carlo_summary_ui.md — creare scaffolding prima di iniziare.
+
+DIPENDENZE
+- Scenario Runner outputs
+- Stress testing plan
+
+OPERAZIONI DA ESEGUIRE
+1. Definire config visual (charts, thresholds) con tokens Style Lab.
+2. Hook per aggregare dataset, caching via PersistenceService.
+3. UI con table, sparkline, synergy highlight, export JSON/CSV.
+4. Telemetria `balancer_monte_carlo_summary_viewed`.
+5. Test RTL + doc con screenshot ASCII.
+
+OPERAZIONI VIETATE
+- Nessuna logica di simulazione nella UI.
+- Vietato hardcodare palette fuori config.
+- Non usare localStorage.
+
+ASSUNZIONI
+- Export JSON disponibili.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- src/ui/balancing`
+- `npm run test -- tests/unit/balancing/MonteCarloSummary.test.tsx`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato → “Completato”.
+2. Evidence `test-results/np-165-monte-carlo-summary-<data>.log`.
+3. Note con KPI.
+
+NOTE
+- Documentare collegamento a scenario automation.
+
+EVIDENCE LOG
+- test-results/np-165-monte-carlo-summary-<data>.log
+```
+| NP-166 – Archmage Rune Crafting Telemetry Planner | Non assegnato | AM-2 rune specs, telemetry pipeline | - | - | - | - | 130 | - | - | ```text
+AGENT
+Oracle-Archmage – Rune Ops
+
+ISTRUZIONI AGENTE
+Consulta `agent-execution-mandate`, esegui safeguard suite, aggiorna Kanban.
+
+OBIETTIVO
+Definire piano telemetry per il sistema Rune Crafting (spawn, fusioni, fallimenti) con schema e doc.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] src/analytics/archmage/runeCraftingTelemetryPlan.ts — creare scaffolding prima di iniziare.
+- [nuovo] tests/unit/archmage/RuneCraftingTelemetryPlan.test.ts — creare scaffolding prima di iniziare.
+- [nuovo] docs/archmage/rune_crafting_telemetry.md — creare scaffolding prima di iniziare.
+- [esistente] PersistenceService.ts (API)
+
+DIPENDENZE
+- AM-2 rune crafting spec
+- Spell lifecycle telemetry
+
+OPERAZIONI DA ESEGUIRE
+1. Definire eventi, payload, KPI e severity config-first.
+2. Documentare integrazione con pipeline esistente.
+3. Telemetria `archmage_rune_plan_ready`.
+4. Test schema Zod + doc con tabelle.
+5. Fornire sample JSON.
+
+OPERAZIONI VIETATE
+- Nessun evento senza schema.
+- Vietato salvare file fuori repo.
+- Non duplicare costanti.
+
+ASSUNZIONI
+- Rune spec disponibile.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- src/analytics/archmage`
+- `npm run test -- tests/unit/archmage/RuneCraftingTelemetryPlan.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato → “Completato”.
+2. Evidence `test-results/np-166-rune-telemetry-plan-<data>.log`.
+3. Note con KPI.
+
+NOTE
+- Aggiornare master plan AM.
+
+EVIDENCE LOG
+- test-results/np-166-rune-telemetry-plan-<data>.log
+```
+| NP-167 – Archmage Mental Palace Audio Cue Config | Non assegnato | MentalPalaceVisualizer, audio assets | - | - | - | - | 140 | - | - | ```text
+AGENT
+Sonar-Archmage – Audio Design
+
+ISTRUZIONI AGENTE
+Segui `agent-execution-mandate`, salvaguardie, aggiorna Kanban.
+
+OBIETTIVO
+Definire e implementare config audio (cues, volumi) per Mental Palace Visualizer con tool preview.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] src/ui/archmage/config/mentalPalaceAudioConfig.ts — creare scaffolding prima di iniziare.
+- [nuovo] src/ui/archmage/hooks/useMentalPalaceAudio.ts — creare scaffolding prima di iniziare.
+- [nuovo] tests/unit/archmage/MentalPalaceAudio.test.ts — creare scaffolding prima di iniziare.
+- [nuovo] docs/archmage/mental_palace_audio.md — creare scaffolding prima di iniziare.
+
+DIPENDENZE
+- Mental Palace Visualizer (NP-100)
+- Art Direction “Il Drago”
+
+OPERAZIONI DA ESEGUIRE
+1. Config-first cues (room enter, glyph highlight, alert) con tokens audio.
+2. Hook che sincronizza audio con visualizer events via WebAudio.
+3. Telemetria `archmage_palace_audio_played`.
+4. Test (mock audio) + doc guidelines.
+5. Export sample JSON e mapping asset.
+
+OPERAZIONI VIETATE
+- Vietato caricare asset fuori `public/assets`.
+- Nessun autoplay non conforme.
+- Non hardcodare volumi.
+
+ASSUNZIONI
+- Visualizer emette eventi bus.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- src/ui/archmage`
+- `npm run test -- tests/unit/archmage/MentalPalaceAudio.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato → “Completato”.
+2. Evidence `test-results/np-167-mental-palace-audio-<data>.log`.
+3. Note con tabella cues.
+
+NOTE
+- Aggiornare doc art direction audio.
+
+EVIDENCE LOG
+- test-results/np-167-mental-palace-audio-<data>.log
+```
+| NP-168 – Coordinator Prompt Aging Monitor | Non assegnato | agent_assignments.md parser, dependency graph | - | - | - | - | 130 | - | - | ```text
+AGENT
+Coordinator-Bot – Aging Guard
+
+ISTRUZIONI AGENTE
+Consulta `agent-execution-mandate`, completare safeguard suite, aggiornare Kanban.
+
+OBIETTIVO
+Script che identifica prompt Non assegnato/In corso più vecchi di N giorni, produce report e alert.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] scripts/coordinator/promptAgingMonitor.ts — creare scaffolding prima di iniziare.
+- [nuovo] src/coordinator/promptAgingConfig.ts — creare scaffolding prima di iniziare.
+- [nuovo] tests/unit/coordinator/PromptAgingMonitor.test.ts — creare scaffolding prima di iniziare.
+- [nuovo] docs/coordinator/prompt_aging_monitor.md — creare scaffolding prima di iniziare.
+
+DIPENDENZE
+- agent_assignments.md
+- DependencyGraphGenerator
+
+OPERAZIONI DA ESEGUIRE
+1. Configurare soglie (7d, 14d) e azioni suggestion.
+2. Script che legge Kanban, calcola aging e salva JSON/Markdown.
+3. Telemetria `coord_prompt_aging_report`.
+4. Test + doc con esempi.
+5. Output in `test-results/coordinator/prompt-aging`.
+
+OPERAZIONI VIETATE
+- Non modificare Kanban file.
+- Nessun parsing fragile senza fallback.
+- Non ignorare prompt senza date (loggare warning).
+
+ASSUNZIONI
+- Timestamp Kanban presenti.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- scripts/coordinator src/coordinator`
+- `npm run test -- tests/unit/coordinator/PromptAgingMonitor.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato → “Completato”.
+2. Evidence `test-results/np-168-prompt-aging-<data>.log`.
+3. Note con prompts più vecchi.
+
+NOTE
+- Proporre follow-up per prompt in stallo.
+
+EVIDENCE LOG
+- test-results/np-168-prompt-aging-<data>.log
+```
+| NP-170 – Analytics Storage Deterministic Replay Runner | Non assegnato | Storage Testing Framework, PersistenceService | - | - | - | - | 140 | - | - | ```text
+AGENT
+Sentinel-Analytics – Replay Ops
+
+ISTRUZIONI AGENTE
+Consulta `agent-execution-mandate`, esegui safeguard, aggiorna Kanban.
+
+OBIETTIVO
+Runner che riproduce log Storage Testing Framework deterministici per confrontare risultati e segnalare drift.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] scripts/analytics/storageDeterministicReplay.ts — creare scaffolding prima di iniziare.
+- [nuovo] src/analytics/storage/replayConfig.ts — creare scaffolding prima di iniziare.
+- [nuovo] tests/unit/analytics/StorageDeterministicReplay.test.ts — creare scaffolding prima di iniziare.
+- [nuovo] docs/analytics/storage_deterministic_replay.md — creare scaffolding prima di iniziare.
+
+DIPENDENZE
+- Storage Testing Framework
+- PersistenceService
+
+OPERAZIONI DA ESEGUIRE
+1. Configurare dataset (scenari, seeds, retry) con schema Zod.
+2. Runner che carica log JSON, rilancia test e confronta output.
+3. Telemetria `analytics_storage_replay_run`.
+4. Test + doc con esempi drift.
+5. Export diffs JSON/Markdown.
+
+OPERAZIONI VIETATE
+- Nessun I/O fuori `test-results` o `data/exports`.
+- Vietato modificare log sorgente.
+- Non usare randomness non seedata.
+
+ASSUNZIONI
+- Log disponibili in `data/exports`.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- scripts/analytics src/analytics/storage`
+- `npm run test -- tests/unit/analytics/StorageDeterministicReplay.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato → “Completato”.
+2. Evidence `test-results/np-170-storage-replay-<data>.log`.
+3. Note con drift trovati.
+
+NOTE
+- Aggiornare doc Storage Test se cambia workflow.
+
+EVIDENCE LOG
+- test-results/np-170-storage-replay-<data>.log
+```
+| NP-171 – Idle Village Drop Narration Localization CLI | Non assegnato | drop narration hook, PersistenceService | - | - | - | - | 130 | - | - | ```text
+AGENT
+Sonar-Idle – Narration Ops
+
+ISTRUZIONI AGENTE
+Segui `agent-execution-mandate`, salvaguardie, aggiorna Kanban.
+
+OBIETTIVO
+CLI che genera pacchetti di localizzazione per drop narration (NP-086) con validazione e diff.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] scripts/idleVillage/dropNarrationLocalization.ts — creare scaffolding prima di iniziare.
+- [nuovo] src/ui/idleVillage/config/dropNarrationLocaleConfig.ts — creare scaffolding prima di iniziare.
+- [nuovo] tests/unit/idleVillage/DropNarrationLocalization.test.ts — creare scaffolding prima di iniziare.
+- [nuovo] docs/idle_village/drop_narration_localization.md — creare scaffolding prima di iniziare.
+
+DIPENDENZE
+- Drop narration hook/config
+- PersistenceService
+
+OPERAZIONI DA ESEGUIRE
+1. Definire schema i18n (locale, messageId, emoji flags) con Zod.
+2. CLI per import/export JSON, validare stringhe e generare diff Markdown.
+3. Telemetria `iv_drop_narration_locale_pack`.
+4. Test + doc.
+5. Salvare pacchetti in `data/presets/idleVillage/dropNarration`.
+
+OPERAZIONI VIETATE
+- Vietato usare fs sync massivo.
+- Nessun testo inline.
+- Non generare file fuori directories dedicate.
+
+ASSUNZIONI
+- Base locale EN disponibile.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- scripts/idleVillage src/ui/idleVillage`
+- `npm run test -- tests/unit/idleVillage/DropNarrationLocalization.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato → “Completato”.
+2. Evidence `test-results/np-171-drop-narration-locale-<data>.log`.
+3. Note con lingue supportate.
+
+NOTE
+- Documentare guida per copywriter.
+
+EVIDENCE LOG
+- test-results/np-171-drop-narration-locale-<data>.log
+```
+| NP-172 – Punch Club Offline Cache Coverage Reporter | Non assegnato | service worker manifest, telemetry validator | - | - | - | - | 130 | - | - | ```text
+AGENT
+Guardian-PC – Offline Ops
+
+ISTRUZIONI AGENTE
+Consulta `agent-execution-mandate`, esegui safeguard suite, aggiorna Kanban.
+
+OBIETTIVO
+Reporter che misura la copertura delle risorse nella cache offline (service worker) e notifica le lacune.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] src/service-worker/offlineCoverageConfig.ts — creare scaffolding prima di iniziare.
+- [nuovo] scripts/punchClub/offlineCoverageReporter.ts — creare scaffolding prima di iniziare.
+- [nuovo] tests/unit/punchClub/OfflineCoverageReporter.test.ts — creare scaffolding prima di iniziare.
+- [nuovo] docs/punch_club/offline_cache_coverage.md — creare scaffolding prima di iniziare.
+
+DIPENDENZE
+- Service worker PC-M2
+- Telemetry export validator
+
+OPERAZIONI DA ESEGUIRE
+1. Definire config (asset groups, priority, version tags).
+2. Script che legge manifest SW, confronta con config e produce report JSON/Markdown.
+3. Telemetria `pc_offline_cache_coverage`.
+4. Test + doc con KPI (coverage %, missing assets).
+5. Output in `test-results/punchClub/offline-coverage`.
+
+OPERAZIONI VIETATE
+- Vietato modificare SW runtime.
+- Nessun fetch esterno.
+- Non ignorare asset mancanti.
+
+ASSUNZIONI
+- Manifest aggiornato.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- scripts/punchClub src/service-worker`
+- `npm run test -- tests/unit/punchClub/OfflineCoverageReporter.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato → “Completato”.
+2. Evidence `test-results/np-172-offline-coverage-<data>.log`.
+3. Note con coverage percentuale.
+
+NOTE
+- Consigliare next steps per colmare gap.
+
+EVIDENCE LOG
+- test-results/np-172-offline-coverage-<data>.log
+```
+| NP-0XX – Guardian Autopush Recovery & Clean Deploy (permanente) | Non assegnato | Guardian mandate, Vercel Deploy Checklist | Guardian-Bot – Deploy Ops | 2026-01-20 | - | 0 | 120 | 2026-01-20 | ```text
+AGENT
+Guardian-Bot – Deploy Ops
+
+NOTA IMPORTANTE
+Questo prompt è permanente: non cambiare lo stato (resta "Non assegnato"). Ogni volta che guardian_autopush/push fallisce o la build Vercel è rossa, il Guardian esegue i passi sotto e aggiunge una nota con timestamp + log senza modificare lo stato della riga.
+
+OBIETTIVO
+Ripristinare repo e pipeline dopo failure commit/push, correggere gli errori, rieseguire guardian_autopush e validare deploy seguendo `docs/tools/vercel_deploy_checklist.md`. Concludere con evidence `test-results/guardian-deploy-recovery-<data>.log` e build Vercel "Ready".
+
+OPERAZIONI DA ESEGUIRE
+1. `source ~/.nvm/nvm.sh && nvm use 20.19.6`; acquisisci `git status -sb` + `npm run build:check` iniziale nel log.
+2. Cleanup repo: `git fetch --all --prune`, `git reset --hard origin/<branch>`, `git clean -fd` (solo se approvato; altrimenti salva patch `/tmp/guardian-recovery.patch`).
+3. Safeguard suite completa: `npm install` (se serve), `npm run lint`, `npm run test`, `npm run build:check`. Correggi tutte le violazioni (config-first, JSDoc obbligatori) e descrivi i fix nel log.
+4. `npm run guardian:autopush:dry-run` (o script equivalente) → se fallisce torna allo step 3.
+5. Commit/push: `git add -A`, `git commit -m "fix: guardian deploy recovery"`, `./guardian_autopush.sh` (o npm script). Mai `--force` senza autorizzazione.
+6. **Verifica pagine operative**: documenta nel log esito per Moodboard, Idle Village Map, Punch Club, STS Simulator e STS CLI (usa `npx playwright test` oppure `openNavTab` + controlli `window.__*Ready`). Se una pagina fallisce, blocca il deploy e apri bugfix/prompt dedicato.
+7. Esegui checklist Vercel (`docs/tools/vercel_deploy_checklist.md`): `vercel deploy --prebuilt --prod` (o comando ufficiale), verifica dashboard e annota URL/stato "Ready".
+8. Aggiorna/crea `test-results/guardian-deploy-recovery-<data>.log` (lint/test/build, dry-run, autopush, verifiche pagine, vercel). Aggiungi nota in questa riga Kanban con timestamp + link log (stato invariato).
+
+OPERAZIONI VIETATE
+- Vietato forzare push senza ok coordinatore.
+- Non saltare lint/test/build né cancellare log.
+- Nessuna modifica ai config Vercel non documentata.
+
+REGRESSION SAFEGUARDS
+- `npm run lint`
+- `npm run test`
+- `npm run build:check`
+- `npm run guardian:autopush:dry-run`
+- `npm run kanban:lint`
+- Deploy Vercel completato "Ready".
+
+NOTE
+- Salva eventuali patch in `/tmp/guardian-recovery.patch` e allega nel log.
+- Escalare al coordinatore se dopo due cicli la build resta rossa per problemi infrastrutturali.
+``` |
+| NP-020 – Idle Village Resident Assignment Undo UX | Non assegnato | CF-Phase10-history-undo-hardening (pattern), PersistenceService | Cascade | 2026-01-19 | - | 0 | 160 | - | ```text
+AGENT
+Echo-Idle – Undo Flow
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `agent-execution-mandate` prima di iniziare, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Migliorare UX undo/redo delle assegnazioni residenti introducendo timeline visuale, keyboard shortcuts e persistence config-first.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] src/ui/idleVillage/components/ResidentUndoPanel.tsx — creare scaffolding prima di iniziare.
+- [nuovo] src/ui/idleVillage/hooks/useResidentUndo.ts — creare scaffolding prima di iniziare.
+- [esistente] src/ui/idleVillage/config/residentUndoConfig.ts
+- [esistente] tests/unit/idleVillage/ResidentUndoPanel.test.tsx
+- [esistente] docs/plans/idle_village_plan.md (§ undo UX)
+
+DIPENDENZE
+- CF-Phase10-history-undo-hardening (pattern)
+- PersistenceService
+
+OPERAZIONI DA ESEGUIRE
+1. Definire config per timeline length, shortcuts, badges.
+2. Implementare hook basato su PersistenceService per stack undo/redo.
+3. Creare panel UI con timeline, diff summary e actions.
+4. Aggiungere telemetry `resident_undo_performed`.
+5. Testare panel/hook + doc.
+
+OPERAZIONI VIETATE
+- Non manipolare scheduler state direttamente (usare API).
+- Vietato hardcodare combo key.
+- Nessun setState durante render.
+
+ASSUNZIONI
+- Crew scheduler esposto per revert operations.
+- UI supporta modali/side panels.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- src/ui/idleVillage`
+- `npm run test:unit -- tests/unit/idleVillage/ResidentUndoPanel.test.tsx`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+AUTONOMIA & CHECK-IN
+- Autonomia Media; sync se design richiede timeline multi-slot.
+
+KANBAN COMPLETION
+1. Stato Kanban + screenshot ASCII timeline.
+2. Evidence `test-results/np-020-resident-undo-<data>.log`.
+3. Log deve includere mapping shortcuts.
+
+NOTE
+- Prevedere tooltip per step timeline.
+- Documentare storage retention policy.
+
+EVIDENCE LOG
+- test-results/np-020-resident-undo-<data>.log
+```
+| NP-036 – Balancer Undo/Redo Persistence Monitor | Non assegnato | 2026-01-19 | Sentinel-Balancer – Persistence Monitor | - | 0 | 140 | - | ```text
+AGENT
+Sentinel-Balancer – Persistence Monitor
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `agent-execution-mandate`, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Monitor per integrità undo/redo del Balancer con log JSON e storage tests per rilevare corruzione dati.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] src/balancing/monitoring/UndoRedoPersistenceMonitor.ts
+- [nuovo] scripts/balancer/undoRedoIntegrityCheck.ts
+- [esistente] tests/unit/balancing/UndoRedoPersistenceMonitor.test.ts
+- [nuovo] docs/monitoring/balancer_undo_redo_monitor.md
+
+DIPENDENZE
+- BalancerConfigStore
+- Storage Testing Framework
+- PersistenceService
+
+OPERAZIONI DA ESEGUIRE
+1. Definire schema integrità undo/redo (checksum, depth, corruption) con Zod.
+2. Implementare monitor che traccia operazioni undo/redo e calcola checksum.
+3. Script CLI che esegue integrity check, genera report JSON/markdown.
+4. Integrare Storage Testing Framework per validare persistenza undo/redo.
+5. Telemetria `balancer_undo_redo_integrity_check`.
+
+OPERAZIONI VIETATE
+- Vietato modificare dati reali senza backup.
+- Nessun accesso diretto a storage sincrono.
+- Proibito bypassare PersistenceService.
+
+ASSUNZIONI
+- BalancerConfigStore usa PersistenceService.
+- Undo/redo stack salvato in localStorage.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- src/balancing scripts/balancer`
+- `npm run test -- tests/unit/balancing/UndoRedoPersistenceMonitor.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato Kanban + link doc.
+2. Evidence `test-results/np-036-undo-redo-monitor-<data>.log`.
+3. Note con integrità rilevata.
+
+NOTE
+- Annotare threshold per corruzione dati.
+- Documentare follow-up per recovery.
+
+EVIDENCE LOG
+- test-results/np-036-undo-redo-monitor-<data>.log
+```
+| NP-039 – Analytics Storage Integrity Monitor | Non assegnato | StorageTestFramework, critical stores | Cascade | 2026-01-20 | - | 0 | 140 | - | ```text
+AGENT
+Sentinel-Analytics – Storage Guard
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `agent-execution-mandate`, rispetta le safeguard e aggiorna la Kanban.
+
+OBIETTIVO
+Monitor schedulato che esegue StorageTestFramework sugli store critici e produce report di integrità.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] src/analytics/storage/StorageIntegrityMonitor.ts
+- [nuovo] scripts/analytics/storageIntegrityReport.ts
+- [esistente] tests/unit/analytics/StorageIntegrityMonitor.test.ts
+- [nuovo] docs/analytics/storage_integrity_monitor.md
+
+DIPENDENZE
+- StorageTestFramework
+- Critical stores (BalancerConfigStore, PersistenceService)
+
+OPERAZIONI DA ESEGUIRE
+1. Definire config (schedule, store list, thresholds) con schema Zod.
+2. Implementare monitor che esegue StorageTestFramework periodicamente.
+3. Creare CLI per generare report JSON/markdown in test-results/.
+4. Integrare telemetria `analytics_storage_integrity_check`.
+5. Test unit + doc completa.
+
+OPERAZIONI VIETATE
+- Vietato accedere direttamente a storage senza StorageTestFramework.
+- Nessun hardcode per store critici; usare config.
+- Non bloccare event loop con test >5s.
+
+ASSUNZIONI
+- StorageTestFramework già disponibile.
+- Critical stores definiti in config.
+- Report salvati in test-results/.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- src/analytics scripts/analytics`
+- `npm run test -- tests/unit/analytics/StorageIntegrityMonitor.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato Kanban → "Completato" con data/agente.
+2. Evidence `test-results/np-039-storage-integrity-<data>.log`.
+3. Includere sample report nel log.
+
+NOTE
+- Documentare performance del monitor su store grandi.
+- Annotare eventuali store esclusi e motivazione.
+
+EVIDENCE LOG
+- test-results/np-039-storage-integrity-<data>.log
+```
+
+| NP-106 – Idle Village Crew Scheduler Visual Debug Panel | Non assegnato | WS3 Crew Scheduler | - | - | - | - | 140 | - | - | ```text
+AGENT
+Vector-Idle – Scheduler Debug
+
+OBIETTIVO
+Pannello debug config-first per visualizzare stato crew scheduler in tempo reale con timeline, slot occupancy e conflict detection.
+
+FILE TARGET
+- [nuovo] src/ui/idleVillage/components/CrewSchedulerDebugPanel.tsx
+- [nuovo] src/ui/idleVillage/hooks/useCrewSchedulerDebug.ts
+- [nuovo] src/ui/idleVillage/config/crewSchedulerDebugConfig.ts
+- [nuovo] tests/unit/idleVillage/CrewSchedulerDebug.test.tsx
+- [esistente] docs/plans/ws3-theater-controller-crew-scheduler.md
+
+DIPENDENZE
+- WS3 Crew Scheduler implementation
+- CrewSchedulerController
+
+OPERAZIONI DA ESEGUIRE
+1. Definire config (refresh rate, metrics, visualization mode) con Zod.
+2. Implementare hook per raccogliere stato scheduler (active assignments, conflicts, timeline).
+3. Creare pannello UI con timeline view, slot occupancy heatmap e conflict list.
+4. Telemetria `crew_scheduler_debug_opened`.
+5. Test RTL + doc completa.
+
+OPERAZIONI VIETATE
+- Vietato modificare logica scheduler.
+- Nessun hardcode per colori/thresholds.
+- Non bloccare render >16ms.
+
+ASSUNZIONI
+- CrewSchedulerController espone stato interno.
+- Gilded Observatory theme disponibile.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- src/ui/idleVillage`
+- `npm run test -- tests/unit/idleVillage/CrewSchedulerDebug.test.tsx`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato → "Completato".
+2. Evidence `test-results/np-106-crew-scheduler-debug-<data>.log`.
+
+EVIDENCE LOG
+- test-results/np-106-crew-scheduler-debug-<data>.log
+```
+
+| NP-107 – Resident Fatigue Recovery System | Non assegnato | Phase E fatigue | - | - | - | - | 150 | - | - | ```text
+AGENT
+Aurora-Idle – Recovery Logic
+
+OBIETTIVO
+Sistema config-first per recovery fatigue con curve temporali, rest activities e telemetria.
+
+FILE TARGET
+- [nuovo] src/engine/game/idleVillage/FatigueRecoveryEngine.ts
+- [nuovo] src/balancing/config/idleVillage/fatigueRecoveryConfig.ts
+- [nuovo] tests/unit/idleVillage/FatigueRecoveryEngine.test.ts
+- [esistente] docs/plans/idle_village_plan.md
+
+DIPENDENZE
+- Phase E fatigue system
+- PersistenceService
+
+OPERAZIONI DA ESEGUIRE
+1. Definire config (recovery curves, rest activity bonuses, thresholds) con Zod.
+2. Implementare engine con calcolo recovery rate basato su tempo e activity type.
+3. Integrare con existing fatigue system.
+4. Telemetria `resident_fatigue_recovered`.
+5. Test unit + doc.
+
+OPERAZIONI VIETATE
+- Vietato hardcodare recovery rates.
+- Nessun accesso diretto a localStorage.
+- Non modificare fatigue calculation esistente senza backward compatibility.
+
+ASSUNZIONI
+- Fatigue system già implementato.
+- Rest activities definite in config.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- src/engine/game/idleVillage`
+- `npm run test -- tests/unit/idleVillage/FatigueRecoveryEngine.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato → "Completato".
+2. Evidence `test-results/np-107-fatigue-recovery-<data>.log`.
+
+EVIDENCE LOG
+- test-results/np-107-fatigue-recovery-<data>.log
+```
+
+| NP-108 – Activity Slot Drag Preview Enhancement | Non assegnato | Phase E drop feedback | - | - | - | - | 130 | - | - | ```text
+AGENT
+Lumen-Idle – Drag Preview
+
+OBIETTIVO
+Preview animato durante drag con ghost image, snap indicators e validation feedback.
+
+FILE TARGET
+- [nuovo] src/ui/idleVillage/components/DragPreviewOverlay.tsx
+- [nuovo] src/ui/idleVillage/hooks/useDragPreview.ts
+- [nuovo] src/ui/idleVillage/config/dragPreviewConfig.ts
+- [nuovo] tests/unit/idleVillage/DragPreview.test.tsx
+
+DIPENDENZE
+- Phase E drop feedback
+- useSandboxDragController
+
+OPERAZIONI DA ESEGUIRE
+1. Definire config (ghost opacity, snap distance, animation timing) con Zod.
+2. Implementare hook per gestire preview state durante drag.
+3. Creare overlay component con ghost image e snap indicators.
+4. Integrare validation feedback (valid/invalid visual states).
+5. Test RTL + doc.
+
+OPERAZIONI VIETATE
+- Vietato bloccare drag events.
+- Nessun hardcode per animation timing.
+- Non duplicare validation logic.
+
+ASSUNZIONI
+- Drop feedback system disponibile.
+- Drag controller espone drag state.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- src/ui/idleVillage`
+- `npm run test -- tests/unit/idleVillage/DragPreview.test.tsx`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato → "Completato".
+2. Evidence `test-results/np-108-drag-preview-<data>.log`.
+
+EVIDENCE LOG
+- test-results/np-108-drag-preview-<data>.log
+```
+
+| NP-109 – Map Location Tooltip System | Non assegnato | LocationCard component | - | - | - | - | 120 | - | - | ```text
+AGENT
+Vector-Idle – Tooltip UI
+
+OBIETTIVO
+Sistema tooltip config-first per LocationCard con info crew, requirements e stats.
+
+FILE TARGET
+- [nuovo] src/ui/idleVillage/components/LocationTooltip.tsx
+- [nuovo] src/ui/idleVillage/hooks/useLocationTooltip.ts
+- [nuovo] src/ui/idleVillage/config/locationTooltipConfig.ts
+- [nuovo] tests/unit/idleVillage/LocationTooltip.test.tsx
+
+DIPENDENZE
+- LocationCard component
+- Activity config
+
+OPERAZIONI DA ESEGUIRE
+1. Definire config (delay, position, content template) con Zod.
+2. Implementare hook per tooltip state e positioning.
+3. Creare tooltip component con crew info, stat requirements e capacity.
+4. Accessibility (ARIA labels, keyboard navigation).
+5. Test RTL + doc.
+
+OPERAZIONI VIETATE
+- Vietato hardcodare tooltip content.
+- Nessun positioning fisso; usare smart positioning.
+- Non bloccare hover events.
+
+ASSUNZIONI
+- LocationCard espone activity data.
+- Gilded Observatory theme disponibile.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- src/ui/idleVillage`
+- `npm run test -- tests/unit/idleVillage/LocationTooltip.test.tsx`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato → "Completato".
+2. Evidence `test-results/np-109-location-tooltip-<data>.log`.
+
+EVIDENCE LOG
+- test-results/np-109-location-tooltip-<data>.log
+```
+
+| NP-110 – Resident Assignment History Tracker | Non assegnato | PersistenceService | - | - | - | - | 140 | - | - | ```text
+AGENT
+Sentinel-Idle – History Track
+
+OBIETTIVO
+Tracker per storico assegnazioni resident con analytics, pattern detection e export.
+
+FILE TARGET
+- [nuovo] src/analytics/idleVillage/AssignmentHistoryTracker.ts
+- [nuovo] src/balancing/config/idleVillage/assignmentHistoryConfig.ts
+- [nuovo] scripts/idleVillage/assignmentHistoryExport.ts
+- [nuovo] tests/unit/idleVillage/AssignmentHistoryTracker.test.ts
+
+DIPENDENZE
+- PersistenceService
+- Resident assignment system
+
+OPERAZIONI DA ESEGUIRE
+1. Definire config (retention period, metrics, export format) con Zod.
+2. Implementare tracker che registra assignment events con timestamp.
+3. Analytics: pattern detection (favorite activities, optimal assignments).
+4. CLI export JSON/CSV con aggregated stats.
+5. Test unit + doc.
+
+OPERAZIONI VIETATE
+- Vietato accesso diretto a localStorage.
+- Nessun hardcode per retention policy.
+- Non bloccare assignment operations.
+
+ASSUNZIONI
+- Assignment events emessi da sistema esistente.
+- PersistenceService disponibile.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- src/analytics/idleVillage scripts/idleVillage`
+- `npm run test -- tests/unit/idleVillage/AssignmentHistoryTracker.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato → "Completato".
+2. Evidence `test-results/np-110-assignment-history-<data>.log`.
+
+EVIDENCE LOG
+- test-results/np-110-assignment-history-<data>.log
+```
+
+
+
+
+
+
+| NP-116 – STS Intent Prediction Accuracy Tracker | Non assegnato | STS Intent Overlay | - | - | - | - | 140 | - | - | ```text
+AGENT
+Lumen-Archmage – Intent Track
+
+OBIETTIVO
+Sistema per tracciare accuracy predizioni intent con confusion matrix e analytics.
+
+FILE TARGET
+- [nuovo] src/analytics/archmage/IntentAccuracyTracker.ts
+- [nuovo] src/balancing/config/archmage/intentAccuracyConfig.ts
+- [nuovo] scripts/archmage/intentAccuracyReport.ts
+- [nuovo] tests/unit/archmage/IntentAccuracyTracker.test.ts
+
+DIPENDENZE
+- STS Intent Overlay
+- Telemetry pipeline
+
+OPERAZIONI DA ESEGUIRE
+1. Definire config (tracking window, metrics, export format) con Zod.
+2. Implementare tracker che confronta predicted vs actual intents.
+3. Calcolare confusion matrix, precision, recall, F1 score.
+4. CLI report con visualizations (heatmap, charts).
+5. Test unit + doc.
+
+OPERAZIONI VIETATE
+- Vietato modificare intent prediction logic.
+- Nessun hardcode per metrics.
+- Non bloccare combat flow.
+
+ASSUNZIONI
+- Intent predictions logged in telemetry.
+- Actual intents disponibili post-combat.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- src/analytics/archmage scripts/archmage`
+- `npm run test -- tests/unit/archmage/IntentAccuracyTracker.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato → "Completato".
+2. Evidence `test-results/np-116-intent-accuracy-<data>.log`.
+
+EVIDENCE LOG
+- test-results/np-116-intent-accuracy-<data>.log
+```
+
+
+
+
+
+| NP-121 – Stat Weight Calibration Wizard | In corso | Monte Carlo Engine | Cascade | 2026-01-23 | - | - | 160 | 2026-01-23 | In progress | ```text
+AGENT
+Aurora-Balancer – Weight Wizard
+
+OBIETTIVO
+Wizard step-by-step per calibrare stat weights con simulation preview e validation.
+
+FILE TARGET
+- [nuovo] src/ui/balancing/components/WeightCalibrationWizard.tsx
+- [nuovo] src/ui/balancing/hooks/useWeightCalibration.ts
+- [nuovo] src/balancing/config/weightWizardConfig.ts
+- [nuovo] tests/unit/balancing/WeightCalibrationWizard.test.tsx
+
+DIPENDENZE
+- Monte Carlo Engine
+- BalancerConfigStore
+
+OPERAZIONI DA ESEGUIRE
+1. Definire config (wizard steps, validation rules, preview settings) con Zod.
+2. Implementare hook per gestire wizard state e run simulations.
+3. Creare wizard UI con steps: select stats → set weights → preview → validate → apply.
+4. Real-time simulation preview con win rate charts.
+5. Test RTL + doc.
+
+OPERAZIONI VIETATE
+- Vietato applicare weights senza validation.
+- Nessun hardcode per wizard flow.
+- Non bloccare UI durante simulations.
+
+ASSUNZIONI
+- Monte Carlo Engine disponibile.
+- Simulation results interpretabili.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- src/ui/balancing`
+- `npm run test -- tests/unit/balancing/WeightCalibrationWizard.test.tsx`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato → "Completato".
+2. Evidence `test-results/np-121-weight-wizard-<data>.log`.
+
+EVIDENCE LOG
+- test-results/np-121-weight-wizard-<data>.log
+```
+
+| NP-122 – Config Snapshot Diff Tool | Non assegnato | BalancerConfigStore | - | - | - | - | 140 | - | - | ```text
+AGENT
+Vector-Balancer – Snapshot Diff
+
+OBIETTIVO
+Tool CLI per diff tra config snapshots con semantic comparison e impact analysis.
+
+FILE TARGET
+- [nuovo] scripts/balancer/configSnapshotDiff.ts
+- [nuovo] src/ui/balancing/components/SnapshotDiffReport.tsx
+- [nuovo] src/balancing/config/snapshotDiffConfig.ts
+- [nuovo] tests/unit/balancing/ConfigSnapshotDiff.test.ts
+
+DIPENDENZE
+- BalancerConfigStore
+- Config history system
+
+OPERAZIONI DA ESEGUIRE
+1. Definire config (diff algorithm, impact thresholds, report format) con Zod.
+2. Implementare CLI per comparare snapshots e generare diff.
+3. Semantic comparison: detect stat changes, formula modifications, weight adjustments.
+4. Impact analysis: estimate effect on balance.
+5. Test unit + doc.
+
+OPERAZIONI VIETATE
+- Vietato modificare snapshots.
+- Nessun hardcode per diff logic.
+- Non perdere precision in numeric comparisons.
+
+ASSUNZIONI
+- Config snapshots salvati con checksum.
+- History system disponibile.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- scripts/balancer src/balancing`
+- `npm run test -- tests/unit/balancing/ConfigSnapshotDiff.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato → "Completato".
+2. Evidence `test-results/np-122-snapshot-diff-<data>.log`.
+
+EVIDENCE LOG
+- test-results/np-122-snapshot-diff-<data>.log
+```
+
+| NP-123 – Playwright Test Coverage Reporter | Non assegnato | Existing Playwright tests | - | - | - | - | 140 | - | - | ```text
+AGENT
+Sentinel-Test – Coverage Report
+
+OBIETTIVO
+Reporter per coverage test Playwright con gap analysis e priority suggestions.
+
+FILE TARGET
+- [nuovo] scripts/testing/playwrightCoverageReporter.ts
+- [nuovo] src/analytics/testing/coverageReportConfig.ts
+- [nuovo] tests/unit/testing/PlaywrightCoverageReporter.test.ts
+- [nuovo] docs/testing/playwright_coverage_report.md
+
+DIPENDENZE
+- Existing Playwright tests
+- Test result artifacts
+
+OPERAZIONI DA ESEGUIRE
+1. Definire config (coverage metrics, gap thresholds, priority rules) con Zod.
+2. Implementare reporter che analizza test files e identifica gaps.
+3. Generate report con coverage %, untested components, priority suggestions.
+4. Export JSON/Markdown/HTML.
+5. Test unit + doc.
+
+OPERAZIONI VIETATE
+- Vietato modificare existing tests.
+- Nessun hardcode per coverage thresholds.
+- Non assumere test file structure.
+
+ASSUNZIONI
+- Playwright tests in tests/ directory.
+- Test results disponibili.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- scripts/testing`
+- `npm run test -- tests/unit/testing/PlaywrightCoverageReporter.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato → "Completato".
+2. Evidence `test-results/np-123-playwright-coverage-<data>.log`.
+
+EVIDENCE LOG
+- test-results/np-123-playwright-coverage-<data>.log
+```
+
+| NP-124 – Tech Debt Backlog Manager | Non assegnato | New workflow mandates | - | - | - | - | 150 | - | - | ```text
+AGENT
+Coordinator-Bot – Debt Manager
+
+OBIETTIVO
+Tool per gestire tech debt backlog con priority scoring, aging tracking e export.
+
+FILE TARGET
+- [nuovo] scripts/coordinator/techDebtManager.ts
+- [nuovo] src/analytics/coordinator/techDebtConfig.ts
+- [nuovo] src/ui/coordinator/components/TechDebtDashboard.tsx
+- [nuovo] tests/unit/coordinator/TechDebtManager.test.ts
+
+DIPENDENZE
+- New workflow mandates
+- PersistenceService
+
+OPERAZIONI DA ESEGUIRE
+1. Definire config (priority algorithm, aging thresholds, categories) con Zod.
+2. Implementare manager per track, prioritize e age tech debt items.
+3. Creare dashboard UI con backlog list, priority scores e aging indicators.
+4. CLI export (JSON/Markdown) con recommendations.
+5. Test unit + doc.
+
+OPERAZIONI VIETATE
+- Vietato auto-fix tech debt.
+- Nessun hardcode per priority scores.
+- Non perdere tech debt items.
+
+ASSUNZIONI
+- Tech debt items documentati in standard format.
+- Priority algorithm config-driven.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- scripts/coordinator src/ui/coordinator`
+- `npm run test -- tests/unit/coordinator/TechDebtManager.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato → "Completato".
+2. Evidence `test-results/np-124-tech-debt-manager-<data>.log`.
+
+EVIDENCE LOG
+- test-results/np-124-tech-debt-manager-<data>.log
+```
+
+| NP-125 – Agent Performance Analytics | Non assegnato | Kanban completion data | - | - | - | - | 160 | - | - | ```text
+AGENT
+Sentinel-Coordinator – Agent Analytics
+
+OBIETTIVO
+Analytics per performance agenti (completion time, error rate, quality metrics).
+
+FILE TARGET
+- [nuovo] src/analytics/coordinator/AgentPerformanceAnalytics.ts
+- [nuovo] src/analytics/coordinator/agentAnalyticsConfig.ts
+- [nuovo] src/ui/coordinator/components/AgentAnalyticsDashboard.tsx
+- [nuovo] tests/unit/coordinator/AgentPerformanceAnalytics.test.ts
+
+DIPENDENZE
+- Kanban completion data
+- Evidence logs
+
+OPERAZIONI DA ESEGUIRE
+1. Definire config (metrics definitions, thresholds, aggregation rules) con Zod.
+2. Implementare analytics engine per parse evidence logs e calcolare metrics.
+3. Metrics: avg completion time, error rate, quality score, prompt complexity.
+4. Dashboard UI con charts, agent comparison e trend analysis.
+5. Test unit + doc.
+
+OPERAZIONI VIETATE
+- Vietato modificare evidence logs.
+- Nessun hardcode per metrics formulas.
+- Non esporre dati sensibili.
+
+ASSUNZIONI
+- Evidence logs in formato standard.
+- Kanban data accessibile.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- src/analytics/coordinator src/ui/coordinator`
+- `npm run test -- tests/unit/coordinator/AgentPerformanceAnalytics.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+KANBAN COMPLETION
+1. Stato → "Completato".
+2. Evidence `test-results/np-125-agent-analytics-<data>.log`.
+
+EVIDENCE LOG
+- test-results/np-125-agent-analytics-<data>.log
+```
+
+| E2E-VRT-001 – Physical E2E Testing System Foundation | In corso | Playwright, Docker | Guardian-VRT – E2E Infrastructure | 2026-01-23 | - | - | 180 | 2026-01-23 | In progress | ```text
+AGENT
+Guardian-VRT – E2E Infrastructure
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `agent-execution-mandate` prima di iniziare, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Implementare foundation del Physical E2E Testing System con Docker consistency, visual regression framework e physical interaction utilities per Idle Village, STS e Balancer.
+
+PROMPT READINESS
+FILE TARGET
+- [nuovo] Dockerfile.visual-tests — creare scaffolding prima di iniziare.
+- [nuovo] tests/utils/physicalInteraction.ts — creare scaffolding prima di iniziare.
+- [nuovo] tests/visual/README.md — creare scaffolding prima di iniziare.
+- [esistente] playwright.config.ts — modificare secondo necessità.
+- [nuovo] .github/workflows/visual-regression.yml — creare scaffolding prima di iniziare.
+- [nuovo] scripts/visual/baselineManager.ts — creare scaffolding prima di iniziare.
+- [esistente] docs/plans/physical_e2e_testing_plan.md
+
+DIPENDENZE
+- Playwright 1.41+
+- Docker disponibile per CI
+
+OPERAZIONI DA ESEGUIRE
+1. Creare Dockerfile.visual-tests con Node 20, Playwright browsers e font consistency.
+2. Implementare physicalInteraction.ts con utilities per drag-drop, hover, keyboard navigation.
+3. Configurare playwright.config.ts con visual regression settings (threshold, diff output).
+4. Creare baselineManager.ts CLI per capture/update/diff baseline screenshots.
+5. Setup GitHub workflow per visual regression su PR (Docker-based).
+6. Documentare usage in tests/visual/README.md con examples.
+7. Telemetria `e2e_vrt_baseline_captured`, `e2e_vrt_diff_detected`.
+
+OPERAZIONI VIETATE
+- Vietato hardcodare screenshot paths.
+- Nessun asset >5 MB per baseline.
+- Non bloccare CI >5min per visual regression.
+- Vietato skip Docker consistency (deve funzionare local + CI).
+
+ASSUNZIONI
+- Playwright già installato nel progetto.
+- GitHub Actions disponibile.
+- Docker disponibile per sviluppo locale.
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- tests/utils scripts/visual`
+- `npm run build:check`
+- `npm run kanban:lint`
+- Verificare Docker build success: `docker build -f Dockerfile.visual-tests .`
+
+AUTONOMIA & CHECK-IN
+- Autonomia Media; ping se Docker build fallisce o Playwright config conflicts.
+
+KANBAN COMPLETION
+1. Stato → "Completato".
+2. Evidence `test-results/e2e-vrt-001-foundation-<data>.log`.
+3. Note con Docker build output e sample baseline capture.
+
+NOTE
+- Questo è un BLOCKER per 10+ prompt visual regression.
+- Priorità massima: sbloccare NP-078, NP-079, NP-091, NP-095, NP-112.
+- Fase 1 (Foundation) deve essere completata prima di assegnare prompt dipendenti.
+
+ANTI-STALL DIRECTIVE
+- Procedi autonomamente: non attendere ulteriori conferme salvo nuove istruzioni del coordinatore.
+
+EVIDENCE LOG
+- test-results/e2e-vrt-001-foundation-<data>.log
+```
+
+| NP-272 – Punch Club Offline Telemetry Retry Orchestrator | Non assegnato | telemetryQueue, PersistenceService | - | - | - | - | 140 | - | - |
+
+```text
+AGENT: Vector-PC – Telemetry Queue
+OBJ: Orchestrare retry batching della telemetria offline con priorità e deduplicazione.
+FILES: src/analytics/punchClub/offlineTelemetryRetryOrchestrator.ts, telemetryRetryConfig.ts, tests/unit/punchClub/OfflineTelemetryRetryOrchestrator.test.ts, docs/punchClub/offline_telemetry_retry.md
+SAFE: npm run lint -- src/analytics/punchClub, npm run test -- tests/unit/punchClub/OfflineTelemetryRetryOrchestrator.test.ts, npm run build:check, npm run kanban:lint
+EVID: test-results/np-272-offline-telemetry-retry.log
+```
+| NP-273 – Punch Club Stress HUD Micro Profiler | Non assegnato | hudConfig, perfDiagnostics | - | - | - | - | 130 | - | - |
+
+```text
+AGENT: Insight-HUD – Micro Profiler
+OBJ: Integrare un micro-profiler HUD per misurare costi UI (ms, layout thrash) con overlay config-first.
+FILES: src/ui/punchClub/hud/HudMicroProfiler.tsx, hudProfilerConfig.ts, tests/unit/punchClub/HudMicroProfiler.test.tsx, docs/punchClub/hud_micro_profiler.md
+SAFE: npm run lint -- src/ui/punchClub, npm run test -- tests/unit/punchClub/HudMicroProfiler.test.tsx, npm run build:check, npm run kanban:lint
+EVID: test-results/np-273-hud-micro-profiler.log
+```
+| NP-274 – Surge Tutorial Auto Translator CLI | Non assegnato | surgeCopy.json, localization | - | - | - | - | 140 | - | - |
+
+```text
+AGENT: Lyra-Copy – Auto Translator
+OBJ: CLI per tradurre script tutorial usando TMX locale + glossario config-first e differenze evidenziate.
+FILES: scripts/punchClub/surgeTutorialAutoTranslator.ts, docs/punchClub/surge_tutorial_auto_translator.md, tests/unit/punchClub/SurgeTutorialAutoTranslator.test.ts
+SAFE: npm run lint -- scripts/punchClub, npm run test -- tests/unit/punchClub/SurgeTutorialAutoTranslator.test.ts, npm run build:check, npm run kanban:lint
+EVID: test-results/np-274-surge-auto-translator.log
+```
+| NP-275 – Punch Club Device Handoff Detector | Non assegnato | deviceProfile, sessionTagging | - | - | - | - | 130 | - | - |
+
+```text
+AGENT: Chronos-Session – Handoff
+OBJ: Rilevare cambio dispositivo durante la sessione e migrare tag + progressi con alert designer.
+FILES: src/analytics/punchClub/deviceHandoffDetector.ts, deviceHandoffConfig.ts, tests/unit/punchClub/DeviceHandoffDetector.test.ts, docs/punchClub/device_handoff_detector.md
+SAFE: npm run lint -- src/analytics/punchClub, npm run test -- tests/unit/punchClub/DeviceHandoffDetector.test.ts, npm run build:check, npm run kanban:lint
+EVID: test-results/np-275-device-handoff.log
+```
+| NP-276 – Punch Club Combat Coaching Tips Planner | Non assegnato | coachingConfig, textGen | - | - | - | - | 150 | - | - |
+
+```text
+AGENT: Coach-Insight – Tips Planner
+OBJ: Generare suggerimenti contestuali per coaching combattimento basati su config, telemetria e abitudini.
+FILES: src/ui/punchClub/coaching/CombatCoachingPlanner.tsx, coachingTipsConfig.ts, tests/unit/punchClub/CombatCoachingPlanner.test.tsx, docs/punchClub/combat_coaching_planner.md
+SAFE: npm run lint -- src/ui/punchClub, npm run test -- tests/unit/punchClub/CombatCoachingPlanner.test.tsx, npm run build:check, npm run kanban:lint
+EVID: test-results/np-276-combat-coaching-planner.log
+```
+| NP-277 – Punch Club Push Diagnostic Overlay | Non assegnato | pushConfig, service-worker | - | - | - | - | 130 | - | - |
+
+```text
+AGENT: Nexus-SW – Push Overlay
+OBJ: Overlay diagnostico per push che mostra permessi, subscription state, retry e fallback channel.
+FILES: src/ui/pwa/PushDiagnosticOverlay.tsx, pushDiagnosticConfig.ts, tests/unit/pwa/PushDiagnosticOverlay.test.tsx, docs/pwa/push_diagnostic_overlay.md
+SAFE: npm run lint -- src/ui/pwa service-worker, npm run test -- tests/unit/pwa/PushDiagnosticOverlay.test.tsx, npm run build:check, npm run kanban:lint
+EVID: test-results/np-277-push-diagnostic-overlay.log
+```
+| NP-278 – Punch Club Re-engagement Campaign Scheduler | Non assegnato | campaignConfig, telemetry | - | - | - | - | 150 | - | - |
+
+```text
+AGENT: Campaign-Atlas – Re-engagement
+OBJ: Pianificare campagne re-engagement in base a telemetria (drop reason, session gap) con export JSON.
+FILES: src/analytics/punchClub/reengagementCampaignScheduler.ts, campaignSchedulerConfig.ts, tests/unit/punchClub/ReengagementCampaignScheduler.test.ts, docs/punchClub/reengagement_campaign_scheduler.md
+SAFE: npm run lint -- src/analytics/punchClub, npm run test -- tests/unit/punchClub/ReengagementCampaignScheduler.test.ts, npm run build:check, npm run kanban:lint
+EVID: test-results/np-278-reengagement-campaign.log
+```
+| NP-279 – Punch Club Training Effort Heatmap | Non assegnato | trainingTelemetry, ui/heatmap | - | - | - | - | 140 | - | - |
+
+```text
+AGENT: Vector-PC – Training Heatmap
+OBJ: Visualizzare heatmap di sforzo training per slot con configurazione colori, smoothing e export PNG.
+FILES: src/ui/punchClub/training/TrainingEffortHeatmap.tsx, trainingHeatmapConfig.ts, tests/unit/punchClub/TrainingEffortHeatmap.test.tsx, docs/punchClub/training_effort_heatmap.md
+SAFE: npm run lint -- src/ui/punchClub, npm run test -- tests/unit/punchClub/TrainingEffortHeatmap.test.tsx, npm run build:check, npm run kanban:lint
+EVID: test-results/np-279-training-effort-heatmap.log
+```
+| NP-280 – Punch Club Live QA Checklist Recorder | Non assegnato | qaChecklists, playtestLogger | - | - | - | - | 130 | - | - |
+
+```text
+AGENT: Playtest-Logger – QA Checklist
+OBJ: Registrare checklist QA live con timestamp, screenshot e export Markdown/JSON.
+FILES: src/ui/playtest/QAChecklistRecorder.tsx, qaChecklistConfig.ts, tests/unit/playtest/QAChecklistRecorder.test.tsx, docs/playtest/qa_checklist_recorder.md
+SAFE: npm run lint -- src/ui/playtest, npm run test -- tests/unit/playtest/QAChecklistRecorder.test.tsx, npm run build:check, npm run kanban:lint
+EVID: test-results/np-280-qa-checklist-recorder.log
+```
+| NP-281 – Punch Club PWA Storage Budget Visualizer | Non assegnato | storageBudgetConfig, analytics | - | - | - | - | 120 | - | - |
+
+```text
+AGENT: Guardian-PC – Storage Viz
+OBJ: Visualizzare budget storage PWA (Cache, IDB, quota) con indicatori e consigli remediation.
+FILES: src/ui/pwa/StorageBudgetVisualizer.tsx, storageBudgetConfig.ts, tests/unit/pwa/StorageBudgetVisualizer.test.tsx, docs/pwa/storage_budget_visualizer.md
+SAFE: npm run lint -- src/ui/pwa, npm run test -- tests/unit/pwa/StorageBudgetVisualizer.test.tsx, npm run build:check, npm run kanban:lint
+EVID: test-results/np-281-storage-budget-visualizer.log
+```
+| NP-282 – Punch Club Offline Asset Integrity Auditor | Non assegnato | assetManifest, checksumService | - | - | - | - | 140 | - | - |
+
+```text
+AGENT: Nexus-SW – Asset Integrity
+OBJ: Auditare asset offline confrontando manifest checksum e generando report diff.
+FILES: scripts/pwa/offlineAssetIntegrityAuditor.ts, service-worker/offlineAssetIntegrityConfig.ts, tests/unit/pwa/OfflineAssetIntegrityAuditor.test.ts, docs/pwa/offline_asset_integrity_auditor.md
+SAFE: npm run lint -- scripts/pwa service-worker, npm run test -- tests/unit/pwa/OfflineAssetIntegrityAuditor.test.ts, npm run build:check, npm run kanban:lint
+EVID: test-results/np-282-offline-asset-integrity.log
+```
+| NP-283 – Punch Club Accessibility Contrast Monitor | Non assegnato | accessibilityConfig, ui theme | - | - | - | - | 120 | - | - |
+
+```text
+AGENT: Guardian-A11y – Contrast
+OBJ: Monitorare contrasto UI runtime con overlay e suggerimenti configurabili.
+FILES: src/ui/punchClub/accessibility/ContrastMonitor.tsx, accessibilityContrastConfig.ts, tests/unit/punchClub/ContrastMonitor.test.tsx, docs/punchClub/accessibility_contrast_monitor.md
+SAFE: npm run lint -- src/ui/punchClub, npm run test -- tests/unit/punchClub/ContrastMonitor.test.tsx, npm run build:check, npm run kanban:lint
+EVID: test-results/np-283-contrast-monitor.log
+```
+| NP-284 – Punch Club Session Timeline Exporter | Non assegnato | sessionLogger, analytics | - | - | - | - | 130 | - | - |
+
+```text
+AGENT: Chronos-Session – Timeline Export
+OBJ: Esportare timeline sessioni (tap, eventi, note) in JSON/CSV/PNG grafici.
+FILES: src/analytics/punchClub/sessionTimelineExporter.ts, sessionTimelineConfig.ts, tests/unit/punchClub/SessionTimelineExporter.test.ts, docs/punchClub/session_timeline_exporter.md
+SAFE: npm run lint -- src/analytics/punchClub, npm run test -- tests/unit/punchClub/SessionTimelineExporter.test.ts, npm run build:check, npm run kanban:lint
+EVID: test-results/np-284-session-timeline-exporter.log
+```
+| NP-285 – Punch Club Sandbox Crew Monitor | Non assegnato | idleVillage sandbox, crewScheduler | - | - | - | - | 130 | - | - |
+
+```text
+AGENT: Village-Sandbox – Crew Monitor
+OBJ: Monitorare crew e fatigue nella sandbox con alert e export JSON.
+FILES: src/ui/idleVillage/sandbox/SandboxCrewMonitor.tsx, sandboxCrewMonitorConfig.ts, tests/unit/idleVillage/SandboxCrewMonitor.test.tsx, docs/idleVillage/sandbox_crew_monitor.md
+SAFE: npm run lint -- src/ui/idleVillage, npm run test -- tests/unit/idleVillage/SandboxCrewMonitor.test.tsx, npm run build:check, npm run kanban:lint
+EVID: test-results/np-285-sandbox-crew-monitor.log
+```
+| NP-286 – Punch Club Touch Gesture Stress Tester | Non assegnato | gestureConfig, automation | - | - | - | - | 140 | - | - |
+
+```text
+AGENT: Gesture-Lab – Stress Tester
+OBJ: Generare test automatici di gesture multitouch con script config-first e report GIF.
+FILES: scripts/punchClub/touchGestureStressTester.ts, gestureStressConfig.ts, tests/unit/punchClub/TouchGestureStressTester.test.ts, docs/punchClub/touch_gesture_stress_tester.md
+SAFE: npm run lint -- scripts/punchClub, npm run test -- tests/unit/punchClub/TouchGestureStressTester.test.ts, npm run build:check, npm run kanban:lint
+EVID: test-results/np-286-touch-gesture-stress.log
+```
+| NP-287 – Punch Club Monetization Config Diff Tool | Non assegnato | monetizationConfig, storage | - | - | - | - | 130 | - | - |
+
+```text
+AGENT: Economy-Guard – Monetization Diff
+OBJ: Creare tool diff per monetizationConfig con alert su price mismatch e export Markdown.
+FILES: scripts/punchClub/monetizationConfigDiff.ts, monetizationDiffConfig.ts, tests/unit/punchClub/MonetizationConfigDiff.test.ts, docs/punchClub/monetization_config_diff.md
+SAFE: npm run lint -- scripts/punchClub, npm run test -- tests/unit/punchClub/MonetizationConfigDiff.test.ts, npm run build:check, npm run kanban:lint
+EVID: test-results/np-287-monetization-config-diff.log
+```
+| NP-288 – Punch Club Network Condition Simulator | Non assegnato | networkConfig, telemetry | - | - | - | - | 150 | - | - |
+
+```text
+AGENT: Network-Monitor – Condition Sim
+OBJ: Simulare condizioni rete (latency, packet loss) per Punch Club e registrare metriche.
+FILES: scripts/punchClub/networkConditionSimulator.ts, networkConditionConfig.ts, tests/unit/punchClub/NetworkConditionSimulator.test.ts, docs/punchClub/network_condition_simulator.md
+SAFE: npm run lint -- scripts/punchClub, npm run test -- tests/unit/punchClub/NetworkConditionSimulator.test.ts, npm run build:check, npm run kanban:lint
+EVID: test-results/np-288-network-condition-sim.log
+```
+| NP-289 – Punch Club Device Thermal Watchdog | Non assegnato | thermalTelemetry, perfConfig | - | - | - | - | 140 | - | - |
+
+```text
+AGENT: Velocity-Perf – Thermal Watchdog
+OBJ: Monitorare eventi termici device e applicare throttle config-first + export grafici.
+FILES: src/analytics/punchClub/deviceThermalWatchdog.ts, thermalWatchdogConfig.ts, tests/unit/punchClub/DeviceThermalWatchdog.test.ts, docs/punchClub/device_thermal_watchdog.md
+SAFE: npm run lint -- src/analytics/punchClub, npm run test -- tests/unit/punchClub/DeviceThermalWatchdog.test.ts, npm run build:check, npm run kanban:lint
+EVID: test-results/np-289-device-thermal-watchdog.log
+```
+| NP-290 – Punch Club Tutorial Choice Analytics | Non assegnato | tutorialTelemetry, analytics | - | - | - | - | 130 | - | - |
+
+```text
+AGENT: Insight-FTUE – Choice Analytics
+OBJ: Analizzare scelte tutorial (dialoghi, percorsi) con funnel multi-step e export HTML.
+FILES: src/analytics/punchClub/tutorialChoiceAnalytics.ts, tutorialChoiceAnalyticsConfig.ts, tests/unit/punchClub/TutorialChoiceAnalytics.test.ts, docs/punchClub/tutorial_choice_analytics.md
+SAFE: npm run lint -- src/analytics/punchClub, npm run test -- tests/unit/punchClub/TutorialChoiceAnalytics.test.ts, npm run build:check, npm run kanban:lint
+EVID: test-results/np-290-tutorial-choice-analytics.log
+```
+| NP-291 – Punch Club Localization Terminology Enforcer | Non assegnato | localizationConfig, glossary | - | - | - | - | 140 | - | - |
+
+```text
+AGENT: Lyra-Copy – Terminology
+OBJ: Applicare enforcement glossario con parser AST e suggerimenti inline per traduttori.
+FILES: scripts/punchClub/localizationTerminologyEnforcer.ts, localizationTerminologyConfig.ts, tests/unit/punchClub/LocalizationTerminologyEnforcer.test.ts, docs/punchClub/localization_terminology_enforcer.md
+SAFE: npm run lint -- scripts/punchClub, npm run test -- tests/unit/punchClub/LocalizationTerminologyEnforcer.test.ts, npm run build:check, npm run kanban:lint
+EVID: test-results/np-291-localization-terminology.log
+```
+

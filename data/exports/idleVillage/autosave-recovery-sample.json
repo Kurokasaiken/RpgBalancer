@@ -1,0 +1,41 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "createdAt": 1704067200000,
+    "checksum": "abc123def",
+    "summary": {
+      "gold": 500,
+      "food": 25,
+      "currentDay": 7,
+      "residentCount": 1
+    }
+  },
+  "data": {
+    "gold": 500,
+    "food": 25,
+    "maxFood": 50,
+    "currentDay": 7,
+    "currentTime": 604800,
+    "isPaused": false,
+    "speedMultiplier": 1,
+    "lastSavedAt": 1704067200000,
+    "residents": [
+      {
+        "id": "resident-1",
+        "name": "Aurora Calder",
+        "level": 2,
+        "stats": {
+          "strength": 6,
+          "endurance": 6,
+          "agility": 5,
+          "intelligence": 4,
+          "perception": 5
+        },
+        "fatigue": 0.3,
+        "isWorking": false,
+        "isInjured": false
+      }
+    ],
+    "activeActivities": []
+  }
+}
