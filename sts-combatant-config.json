@@ -1,0 +1,118 @@
+{
+  "playerArmor": {
+    "baseValue": 0,
+    "scalingType": "linear",
+    "scalingFactor": 1,
+    "maxCap": 50,
+    "decayPerTurn": 0
+  },
+  "enemyArmor": {
+    "baseValue": 0,
+    "scalingType": "linear",
+    "scalingFactor": 1,
+    "maxCap": 40,
+    "decayPerTurn": 0
+  },
+  "buffDefinitions": [
+    {
+      "id": "block",
+      "name": "Block",
+      "description": "Reduces incoming damage",
+      "icon": "🛡️",
+      "isDebuff": false,
+      "maxDuration": 3,
+      "stackBehavior": "max-stacks",
+      "maxStacks": 99,
+      "effects": [
+        {
+          "type": "block",
+          "value": 5,
+          "operation": "add",
+          "target": "player"
+        }
+      ],
+      "removalConditions": [
+        {
+          "type": "turn-end",
+          "value": 1
+        }
+      ],
+      "visualTheme": "buff"
+    },
+    {
+      "id": "vulnerable",
+      "name": "Vulnerable",
+      "description": "Take 50% more damage",
+      "icon": "💔",
+      "isDebuff": true,
+      "maxDuration": 2,
+      "stackBehavior": "replace",
+      "effects": [
+        {
+          "type": "damage",
+          "value": 1.5,
+          "operation": "multiply",
+          "target": "player"
+        }
+      ],
+      "removalConditions": [
+        {
+          "type": "turn-end",
+          "value": 1
+        }
+      ],
+      "visualTheme": "debuff"
+    }
+  ],
+  "intentPrediction": {
+    "windowSize": 3,
+    "patternWeights": {
+      "strike": 0.4,
+      "defend": 0.3,
+      "debuff": 0.2,
+      "heal": 0.05,
+      "special": 0.05
+    },
+    "difficultyScaling": {
+      "easy": 0.8,
+      "normal": 1,
+      "hard": 1.3
+    },
+    "randomnessFactor": 0.1,
+    "minConfidence": 0.3
+  },
+  "presets": [
+    {
+      "id": "balanced",
+      "name": "Balanced",
+      "description": "Standard combatant configuration",
+      "startingBuffs": []
+    },
+    {
+      "id": "tank",
+      "name": "Tank",
+      "description": "High armor, defensive focus",
+      "armorOverride": {
+        "baseValue": 10,
+        "scalingFactor": 1.5
+      },
+      "startingBuffs": [
+        "block"
+      ]
+    },
+    {
+      "id": "glass-cannon",
+      "name": "Glass Cannon",
+      "description": "Low armor, high damage output",
+      "armorOverride": {
+        "baseValue": -5,
+        "maxCap": 20
+      },
+      "startingBuffs": [
+        "vulnerable"
+      ]
+    }
+  ],
+  "version": "1.0.0",
+  "lastModified": 1768255031346
+}

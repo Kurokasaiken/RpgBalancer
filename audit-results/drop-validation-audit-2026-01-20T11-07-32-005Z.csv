@@ -1,0 +1,4 @@
+"Rule ID","Rule Name","Rule Type","Status","Score","Duration (ms)","Executions"
+"stat_tags_validation","Stat Tags Validation","stat_tags","PASSED","1","2","1"
+"fatigue_threshold_validation","Fatigue Threshold Validation","fatigue_threshold","PASSED","1","0","1"
+"crew_limits_validation","Crew Limits Validation","crew_limits","PASSED","1","0","1"

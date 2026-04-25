@@ -1,0 +1,460 @@
+/**
+ * Stress Testing Module Styles
+ * 
+ * Gilded Observatory retro theme for stress testing components
+ * with terminal green aesthetics and ASCII-inspired design elements.
+ * 
+ * @module stressTesting.module.css
+ * @since 2026-01-11
+ * @author Aurelia-Heatmap
+ */
+
+/* Base container styles */
+.stressTestingContainer {
+  background: radial-gradient(circle at top, #020617 0%, #020617 55%, #000000 100%);
+  color: #f4f1de;
+  font-family: 'Courier New', 'JetBrains Mono', monospace;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+/* Header styles */
+.stressTestingHeader {
+  text-align: center;
+  margin-bottom: 3rem;
+  border-bottom: 2px solid #00ff00;
+  padding-bottom: 1rem;
+}
+
+.stressTestingTitle {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #00ff00;
+  text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.1em;
+}
+
+.stressTestingSubtitle {
+  color: #88cc00;
+  font-size: 1.1rem;
+  opacity: 0.8;
+}
+
+/* Dashboard grid layout */
+.dashboardGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+@media (max-width: 1024px) {
+  .dashboardGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Card styles */
+.dashboardCard {
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid #00ff00;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboardCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00ff00, transparent);
+  animation: scanline 3s linear infinite;
+}
+
+@keyframes scanline {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.cardHeader {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #00ff00;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #00ff00;
+  padding-bottom: 0.5rem;
+}
+
+/* Table styles */
+.marginalUtilityTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.marginalUtilityTable th {
+  background: rgba(0, 255, 0, 0.1);
+  color: #00ff00;
+  padding: 0.75rem;
+  text-align: left;
+  border: 1px solid #00ff00;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.marginalUtilityTable td {
+  padding: 0.75rem;
+  border: 1px solid #00ff00;
+  color: #f4f1de;
+}
+
+.marginalUtilityTable tr:hover {
+  background: rgba(0, 255, 0, 0.1);
+  cursor: pointer;
+}
+
+.marginalUtilityTable tr:hover td {
+  color: #00ff00;
+  text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+}
+
+/* Performance color coding */
+.performanceExcellent {
+  color: #00ff00;
+  font-weight: bold;
+}
+
+.performanceGood {
+  color: #88ff00;
+  font-weight: bold;
+}
+
+.performanceAverage {
+  color: #ffaa00;
+  font-weight: bold;
+}
+
+.performancePoor {
+  color: #ff4444;
+  font-weight: bold;
+}
+
+/* Synergy heatmap styles */
+.synergyHeatmap {
+  width: 100%;
+  height: 400px;
+  border: 2px solid #00ff00;
+  border-radius: 8px;
+  background: #000000;
+  position: relative;
+  overflow: hidden;
+}
+
+.heatmapCell {
+  position: absolute;
+  border: 1px solid #00ff00;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+}
+
+.heatmapCell:hover {
+  transform: scale(1.1);
+  z-index: 10;
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+}
+
+.heatmapCellSynergyOp {
+  background: rgba(0, 255, 0, 0.8);
+  color: #000000;
+}
+
+.heatmapCellSynergyGood {
+  background: rgba(136, 255, 0, 0.6);
+  color: #000000;
+}
+
+.heatmapCellSynergyNeutral {
+  background: rgba(255, 170, 0, 0.4);
+  color: #000000;
+}
+
+.heatmapCellSynergyWeak {
+  background: rgba(255, 68, 68, 0.6);
+  color: #ffffff;
+}
+
+/* Radar chart styles */
+.statProfileRadar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #000000;
+  border: 2px solid #00ff00;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+}
+
+.statProfileRadar svg {
+  filter: drop-shadow(0 0 10px rgba(0, 255, 0, 0.2));
+}
+
+/* Loading and status styles */
+.loadingSpinner {
+  width: 3rem;
+  height: 3rem;
+  border: 3px solid #00ff00;
+  border-top: 3px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 2rem auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.errorDisplay {
+  color: #ff4444;
+  text-align: center;
+  padding: 2rem;
+  border: 2px solid #ff4444;
+  border-radius: 8px;
+  background: rgba(255, 68, 68, 0.1);
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Export controls */
+.exportControls {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.exportButton {
+  background: rgba(0, 255, 0, 0.1);
+  border: 2px solid #00ff00;
+  color: #00ff00;
+  padding: 0.75rem 1.5rem;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+
+.exportButton:hover {
+  background: rgba(0, 255, 0, 0.2);
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+  transform: translateY(-2px);
+}
+
+.exportButton:active {
+  transform: translateY(0);
+}
+
+/* Filter controls */
+.filterControls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filterInput {
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid #00ff00;
+  color: #00ff00;
+  padding: 0.5rem;
+  font-family: 'Courier New', monospace;
+  border-radius: 4px;
+  outline: none;
+}
+
+.filterInput:focus {
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+.filterSelect {
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid #00ff00;
+  color: #00ff00;
+  padding: 0.5rem;
+  font-family: 'Courier New', monospace;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+}
+
+.filterSelect:focus {
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+/* Threshold indicators */
+.thresholdIndicator {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+.thresholdOp {
+  background: #00ff00;
+  box-shadow: 0 0 5px rgba(0, 255, 0, 0.8);
+}
+
+.thresholdWeak {
+  background: #ff4444;
+  box-shadow: 0 0 5px rgba(255, 68, 68, 0.8);
+}
+
+.thresholdNeutral {
+  background: #ffaa00;
+  box-shadow: 0 0 5px rgba(255, 170, 0, 0.8);
+}
+
+/* ASCII box decorations */
+.asciiBox {
+  border: 2px solid #00ff00;
+  border-radius: 0;
+  position: relative;
+}
+
+.asciiBox::before,
+.asciiBox::after {
+  content: '┌';
+  position: absolute;
+  color: #00ff00;
+  font-family: 'Courier New', monospace;
+  font-size: 1.2rem;
+}
+
+.asciiBox::before {
+  top: -0.5rem;
+  left: -0.5rem;
+}
+
+.asciiBox::after {
+  content: '┐';
+  top: -0.5rem;
+  right: -0.5rem;
+  left: auto;
+}
+
+/* Stats summary */
+.statsSummary {
+  background: rgba(0, 255, 0, 0.05);
+  border: 1px solid #00ff00;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.statsSummaryItem {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  color: #88cc00;
+}
+
+.statsSummaryItem:last-child {
+  margin-bottom: 0;
+}
+
+.statsSummaryValue {
+  color: #00ff00;
+  font-weight: bold;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .stressTestingContainer {
+    padding: 1rem;
+  }
+  
+  .stressTestingTitle {
+    font-size: 2rem;
+  }
+  
+  .dashboardCard {
+    padding: 1rem;
+  }
+  
+  .exportControls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filterControls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .loadingSpinner,
+  .dashboardCard::before,
+  .heatmapCell,
+  .exportButton {
+    animation: none;
+    transition: none;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .dashboardCard {
+    border-width: 3px;
+  }
+  
+  .heatmapCell {
+    border-width: 2px;
+  }
+  
+  .exportButton {
+    border-width: 3px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .stressTestingContainer {
+    background: white;
+    color: black;
+  }
+  
+  .dashboardCard {
+    border: 2px solid black;
+    box-shadow: none;
+  }
+  
+  .exportButton {
+    display: none;
+  }
+}

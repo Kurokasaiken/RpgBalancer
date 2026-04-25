@@ -1,0 +1,2157 @@
+{
+  "generatedAt": "2026-02-12T14:06:02.034Z",
+  "snapshotMetadata": {
+    "version": "1.0",
+    "createdAt": 1770905121070,
+    "checksum": "8b759083f",
+    "summary": {
+      "gold": 500,
+      "food": 25,
+      "currentDay": 7,
+      "residentCount": 1
+    }
+  },
+  "configVersion": "0.1.0-minimal-gameplay",
+  "thresholds": {
+    "fatigueDangerPercent": 0.7,
+    "foodDangerDays": 2,
+    "injuryBadgeCopy": "Injured"
+  },
+  "grid": [
+    [
+      {
+        "fatigueBucket": 0,
+        "foodBucket": 0,
+        "fatigueRange": [
+          0,
+          0.1
+        ],
+        "foodRange": [
+          0,
+          0.1
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 1,
+        "foodBucket": 0,
+        "fatigueRange": [
+          0.1,
+          0.2
+        ],
+        "foodRange": [
+          0,
+          0.1
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 2,
+        "foodBucket": 0,
+        "fatigueRange": [
+          0.2,
+          0.3
+        ],
+        "foodRange": [
+          0,
+          0.1
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 3,
+        "foodBucket": 0,
+        "fatigueRange": [
+          0.3,
+          0.4
+        ],
+        "foodRange": [
+          0,
+          0.1
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 4,
+        "foodBucket": 0,
+        "fatigueRange": [
+          0.4,
+          0.5
+        ],
+        "foodRange": [
+          0,
+          0.1
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 5,
+        "foodBucket": 0,
+        "fatigueRange": [
+          0.5,
+          0.6
+        ],
+        "foodRange": [
+          0,
+          0.1
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 6,
+        "foodBucket": 0,
+        "fatigueRange": [
+          0.6,
+          0.7
+        ],
+        "foodRange": [
+          0,
+          0.1
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 7,
+        "foodBucket": 0,
+        "fatigueRange": [
+          0.7,
+          0.8
+        ],
+        "foodRange": [
+          0,
+          0.1
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 8,
+        "foodBucket": 0,
+        "fatigueRange": [
+          0.8,
+          0.9
+        ],
+        "foodRange": [
+          0,
+          0.1
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 9,
+        "foodBucket": 0,
+        "fatigueRange": [
+          0.9,
+          1
+        ],
+        "foodRange": [
+          0,
+          0.1
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      }
+    ],
+    [
+      {
+        "fatigueBucket": 0,
+        "foodBucket": 1,
+        "fatigueRange": [
+          0,
+          0.1
+        ],
+        "foodRange": [
+          0.1,
+          0.2
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 1,
+        "foodBucket": 1,
+        "fatigueRange": [
+          0.1,
+          0.2
+        ],
+        "foodRange": [
+          0.1,
+          0.2
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 2,
+        "foodBucket": 1,
+        "fatigueRange": [
+          0.2,
+          0.3
+        ],
+        "foodRange": [
+          0.1,
+          0.2
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 3,
+        "foodBucket": 1,
+        "fatigueRange": [
+          0.3,
+          0.4
+        ],
+        "foodRange": [
+          0.1,
+          0.2
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 4,
+        "foodBucket": 1,
+        "fatigueRange": [
+          0.4,
+          0.5
+        ],
+        "foodRange": [
+          0.1,
+          0.2
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 5,
+        "foodBucket": 1,
+        "fatigueRange": [
+          0.5,
+          0.6
+        ],
+        "foodRange": [
+          0.1,
+          0.2
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 6,
+        "foodBucket": 1,
+        "fatigueRange": [
+          0.6,
+          0.7
+        ],
+        "foodRange": [
+          0.1,
+          0.2
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 7,
+        "foodBucket": 1,
+        "fatigueRange": [
+          0.7,
+          0.8
+        ],
+        "foodRange": [
+          0.1,
+          0.2
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 8,
+        "foodBucket": 1,
+        "fatigueRange": [
+          0.8,
+          0.9
+        ],
+        "foodRange": [
+          0.1,
+          0.2
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 9,
+        "foodBucket": 1,
+        "fatigueRange": [
+          0.9,
+          1
+        ],
+        "foodRange": [
+          0.1,
+          0.2
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      }
+    ],
+    [
+      {
+        "fatigueBucket": 0,
+        "foodBucket": 2,
+        "fatigueRange": [
+          0,
+          0.1
+        ],
+        "foodRange": [
+          0.2,
+          0.3
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 1,
+        "foodBucket": 2,
+        "fatigueRange": [
+          0.1,
+          0.2
+        ],
+        "foodRange": [
+          0.2,
+          0.3
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 2,
+        "foodBucket": 2,
+        "fatigueRange": [
+          0.2,
+          0.3
+        ],
+        "foodRange": [
+          0.2,
+          0.3
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 3,
+        "foodBucket": 2,
+        "fatigueRange": [
+          0.3,
+          0.4
+        ],
+        "foodRange": [
+          0.2,
+          0.3
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 4,
+        "foodBucket": 2,
+        "fatigueRange": [
+          0.4,
+          0.5
+        ],
+        "foodRange": [
+          0.2,
+          0.3
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 5,
+        "foodBucket": 2,
+        "fatigueRange": [
+          0.5,
+          0.6
+        ],
+        "foodRange": [
+          0.2,
+          0.3
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 6,
+        "foodBucket": 2,
+        "fatigueRange": [
+          0.6,
+          0.7
+        ],
+        "foodRange": [
+          0.2,
+          0.3
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 7,
+        "foodBucket": 2,
+        "fatigueRange": [
+          0.7,
+          0.8
+        ],
+        "foodRange": [
+          0.2,
+          0.3
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 8,
+        "foodBucket": 2,
+        "fatigueRange": [
+          0.8,
+          0.9
+        ],
+        "foodRange": [
+          0.2,
+          0.3
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 9,
+        "foodBucket": 2,
+        "fatigueRange": [
+          0.9,
+          1
+        ],
+        "foodRange": [
+          0.2,
+          0.3
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      }
+    ],
+    [
+      {
+        "fatigueBucket": 0,
+        "foodBucket": 3,
+        "fatigueRange": [
+          0,
+          0.1
+        ],
+        "foodRange": [
+          0.3,
+          0.4
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 1,
+        "foodBucket": 3,
+        "fatigueRange": [
+          0.1,
+          0.2
+        ],
+        "foodRange": [
+          0.3,
+          0.4
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 2,
+        "foodBucket": 3,
+        "fatigueRange": [
+          0.2,
+          0.3
+        ],
+        "foodRange": [
+          0.3,
+          0.4
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 3,
+        "foodBucket": 3,
+        "fatigueRange": [
+          0.3,
+          0.4
+        ],
+        "foodRange": [
+          0.3,
+          0.4
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 4,
+        "foodBucket": 3,
+        "fatigueRange": [
+          0.4,
+          0.5
+        ],
+        "foodRange": [
+          0.3,
+          0.4
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 5,
+        "foodBucket": 3,
+        "fatigueRange": [
+          0.5,
+          0.6
+        ],
+        "foodRange": [
+          0.3,
+          0.4
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 6,
+        "foodBucket": 3,
+        "fatigueRange": [
+          0.6,
+          0.7
+        ],
+        "foodRange": [
+          0.3,
+          0.4
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 7,
+        "foodBucket": 3,
+        "fatigueRange": [
+          0.7,
+          0.8
+        ],
+        "foodRange": [
+          0.3,
+          0.4
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 8,
+        "foodBucket": 3,
+        "fatigueRange": [
+          0.8,
+          0.9
+        ],
+        "foodRange": [
+          0.3,
+          0.4
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 9,
+        "foodBucket": 3,
+        "fatigueRange": [
+          0.9,
+          1
+        ],
+        "foodRange": [
+          0.3,
+          0.4
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      }
+    ],
+    [
+      {
+        "fatigueBucket": 0,
+        "foodBucket": 4,
+        "fatigueRange": [
+          0,
+          0.1
+        ],
+        "foodRange": [
+          0.4,
+          0.5
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 1,
+        "foodBucket": 4,
+        "fatigueRange": [
+          0.1,
+          0.2
+        ],
+        "foodRange": [
+          0.4,
+          0.5
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 2,
+        "foodBucket": 4,
+        "fatigueRange": [
+          0.2,
+          0.3
+        ],
+        "foodRange": [
+          0.4,
+          0.5
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 3,
+        "foodBucket": 4,
+        "fatigueRange": [
+          0.3,
+          0.4
+        ],
+        "foodRange": [
+          0.4,
+          0.5
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 4,
+        "foodBucket": 4,
+        "fatigueRange": [
+          0.4,
+          0.5
+        ],
+        "foodRange": [
+          0.4,
+          0.5
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 5,
+        "foodBucket": 4,
+        "fatigueRange": [
+          0.5,
+          0.6
+        ],
+        "foodRange": [
+          0.4,
+          0.5
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 6,
+        "foodBucket": 4,
+        "fatigueRange": [
+          0.6,
+          0.7
+        ],
+        "foodRange": [
+          0.4,
+          0.5
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 7,
+        "foodBucket": 4,
+        "fatigueRange": [
+          0.7,
+          0.8
+        ],
+        "foodRange": [
+          0.4,
+          0.5
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 8,
+        "foodBucket": 4,
+        "fatigueRange": [
+          0.8,
+          0.9
+        ],
+        "foodRange": [
+          0.4,
+          0.5
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 9,
+        "foodBucket": 4,
+        "fatigueRange": [
+          0.9,
+          1
+        ],
+        "foodRange": [
+          0.4,
+          0.5
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      }
+    ],
+    [
+      {
+        "fatigueBucket": 0,
+        "foodBucket": 5,
+        "fatigueRange": [
+          0,
+          0.1
+        ],
+        "foodRange": [
+          0.5,
+          0.6
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 1,
+        "foodBucket": 5,
+        "fatigueRange": [
+          0.1,
+          0.2
+        ],
+        "foodRange": [
+          0.5,
+          0.6
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 2,
+        "foodBucket": 5,
+        "fatigueRange": [
+          0.2,
+          0.3
+        ],
+        "foodRange": [
+          0.5,
+          0.6
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 3,
+        "foodBucket": 5,
+        "fatigueRange": [
+          0.3,
+          0.4
+        ],
+        "foodRange": [
+          0.5,
+          0.6
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 4,
+        "foodBucket": 5,
+        "fatigueRange": [
+          0.4,
+          0.5
+        ],
+        "foodRange": [
+          0.5,
+          0.6
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 5,
+        "foodBucket": 5,
+        "fatigueRange": [
+          0.5,
+          0.6
+        ],
+        "foodRange": [
+          0.5,
+          0.6
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 6,
+        "foodBucket": 5,
+        "fatigueRange": [
+          0.6,
+          0.7
+        ],
+        "foodRange": [
+          0.5,
+          0.6
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 7,
+        "foodBucket": 5,
+        "fatigueRange": [
+          0.7,
+          0.8
+        ],
+        "foodRange": [
+          0.5,
+          0.6
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 8,
+        "foodBucket": 5,
+        "fatigueRange": [
+          0.8,
+          0.9
+        ],
+        "foodRange": [
+          0.5,
+          0.6
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 9,
+        "foodBucket": 5,
+        "fatigueRange": [
+          0.9,
+          1
+        ],
+        "foodRange": [
+          0.5,
+          0.6
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      }
+    ],
+    [
+      {
+        "fatigueBucket": 0,
+        "foodBucket": 6,
+        "fatigueRange": [
+          0,
+          0.1
+        ],
+        "foodRange": [
+          0.6,
+          0.7
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 1,
+        "foodBucket": 6,
+        "fatigueRange": [
+          0.1,
+          0.2
+        ],
+        "foodRange": [
+          0.6,
+          0.7
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 2,
+        "foodBucket": 6,
+        "fatigueRange": [
+          0.2,
+          0.3
+        ],
+        "foodRange": [
+          0.6,
+          0.7
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 3,
+        "foodBucket": 6,
+        "fatigueRange": [
+          0.3,
+          0.4
+        ],
+        "foodRange": [
+          0.6,
+          0.7
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 4,
+        "foodBucket": 6,
+        "fatigueRange": [
+          0.4,
+          0.5
+        ],
+        "foodRange": [
+          0.6,
+          0.7
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 5,
+        "foodBucket": 6,
+        "fatigueRange": [
+          0.5,
+          0.6
+        ],
+        "foodRange": [
+          0.6,
+          0.7
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 6,
+        "foodBucket": 6,
+        "fatigueRange": [
+          0.6,
+          0.7
+        ],
+        "foodRange": [
+          0.6,
+          0.7
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 7,
+        "foodBucket": 6,
+        "fatigueRange": [
+          0.7,
+          0.8
+        ],
+        "foodRange": [
+          0.6,
+          0.7
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 8,
+        "foodBucket": 6,
+        "fatigueRange": [
+          0.8,
+          0.9
+        ],
+        "foodRange": [
+          0.6,
+          0.7
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 9,
+        "foodBucket": 6,
+        "fatigueRange": [
+          0.9,
+          1
+        ],
+        "foodRange": [
+          0.6,
+          0.7
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      }
+    ],
+    [
+      {
+        "fatigueBucket": 0,
+        "foodBucket": 7,
+        "fatigueRange": [
+          0,
+          0.1
+        ],
+        "foodRange": [
+          0.7,
+          0.8
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 1,
+        "foodBucket": 7,
+        "fatigueRange": [
+          0.1,
+          0.2
+        ],
+        "foodRange": [
+          0.7,
+          0.8
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 2,
+        "foodBucket": 7,
+        "fatigueRange": [
+          0.2,
+          0.3
+        ],
+        "foodRange": [
+          0.7,
+          0.8
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 3,
+        "foodBucket": 7,
+        "fatigueRange": [
+          0.3,
+          0.4
+        ],
+        "foodRange": [
+          0.7,
+          0.8
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 4,
+        "foodBucket": 7,
+        "fatigueRange": [
+          0.4,
+          0.5
+        ],
+        "foodRange": [
+          0.7,
+          0.8
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 5,
+        "foodBucket": 7,
+        "fatigueRange": [
+          0.5,
+          0.6
+        ],
+        "foodRange": [
+          0.7,
+          0.8
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 6,
+        "foodBucket": 7,
+        "fatigueRange": [
+          0.6,
+          0.7
+        ],
+        "foodRange": [
+          0.7,
+          0.8
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 7,
+        "foodBucket": 7,
+        "fatigueRange": [
+          0.7,
+          0.8
+        ],
+        "foodRange": [
+          0.7,
+          0.8
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 8,
+        "foodBucket": 7,
+        "fatigueRange": [
+          0.8,
+          0.9
+        ],
+        "foodRange": [
+          0.7,
+          0.8
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 9,
+        "foodBucket": 7,
+        "fatigueRange": [
+          0.9,
+          1
+        ],
+        "foodRange": [
+          0.7,
+          0.8
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      }
+    ],
+    [
+      {
+        "fatigueBucket": 0,
+        "foodBucket": 8,
+        "fatigueRange": [
+          0,
+          0.1
+        ],
+        "foodRange": [
+          0.8,
+          0.9
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 1,
+        "foodBucket": 8,
+        "fatigueRange": [
+          0.1,
+          0.2
+        ],
+        "foodRange": [
+          0.8,
+          0.9
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 2,
+        "foodBucket": 8,
+        "fatigueRange": [
+          0.2,
+          0.3
+        ],
+        "foodRange": [
+          0.8,
+          0.9
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 3,
+        "foodBucket": 8,
+        "fatigueRange": [
+          0.3,
+          0.4
+        ],
+        "foodRange": [
+          0.8,
+          0.9
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 4,
+        "foodBucket": 8,
+        "fatigueRange": [
+          0.4,
+          0.5
+        ],
+        "foodRange": [
+          0.8,
+          0.9
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 5,
+        "foodBucket": 8,
+        "fatigueRange": [
+          0.5,
+          0.6
+        ],
+        "foodRange": [
+          0.8,
+          0.9
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 6,
+        "foodBucket": 8,
+        "fatigueRange": [
+          0.6,
+          0.7
+        ],
+        "foodRange": [
+          0.8,
+          0.9
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 7,
+        "foodBucket": 8,
+        "fatigueRange": [
+          0.7,
+          0.8
+        ],
+        "foodRange": [
+          0.8,
+          0.9
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 8,
+        "foodBucket": 8,
+        "fatigueRange": [
+          0.8,
+          0.9
+        ],
+        "foodRange": [
+          0.8,
+          0.9
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 9,
+        "foodBucket": 8,
+        "fatigueRange": [
+          0.9,
+          1
+        ],
+        "foodRange": [
+          0.8,
+          0.9
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      }
+    ],
+    [
+      {
+        "fatigueBucket": 0,
+        "foodBucket": 9,
+        "fatigueRange": [
+          0,
+          0.1
+        ],
+        "foodRange": [
+          0.9,
+          1
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 1,
+        "foodBucket": 9,
+        "fatigueRange": [
+          0.1,
+          0.2
+        ],
+        "foodRange": [
+          0.9,
+          1
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 2,
+        "foodBucket": 9,
+        "fatigueRange": [
+          0.2,
+          0.3
+        ],
+        "foodRange": [
+          0.9,
+          1
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 3,
+        "foodBucket": 9,
+        "fatigueRange": [
+          0.3,
+          0.4
+        ],
+        "foodRange": [
+          0.9,
+          1
+        ],
+        "residentCount": 1,
+        "severityBreakdown": {
+          "safe": 1,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0.3,
+        "averageFoodPercent": 1,
+        "residents": [
+          "Aurora Calder"
+        ]
+      },
+      {
+        "fatigueBucket": 4,
+        "foodBucket": 9,
+        "fatigueRange": [
+          0.4,
+          0.5
+        ],
+        "foodRange": [
+          0.9,
+          1
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 5,
+        "foodBucket": 9,
+        "fatigueRange": [
+          0.5,
+          0.6
+        ],
+        "foodRange": [
+          0.9,
+          1
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 6,
+        "foodBucket": 9,
+        "fatigueRange": [
+          0.6,
+          0.7
+        ],
+        "foodRange": [
+          0.9,
+          1
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 7,
+        "foodBucket": 9,
+        "fatigueRange": [
+          0.7,
+          0.8
+        ],
+        "foodRange": [
+          0.9,
+          1
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 8,
+        "foodBucket": 9,
+        "fatigueRange": [
+          0.8,
+          0.9
+        ],
+        "foodRange": [
+          0.9,
+          1
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      },
+      {
+        "fatigueBucket": 9,
+        "foodBucket": 9,
+        "fatigueRange": [
+          0.9,
+          1
+        ],
+        "foodRange": [
+          0.9,
+          1
+        ],
+        "residentCount": 0,
+        "severityBreakdown": {
+          "safe": 0,
+          "caution": 0,
+          "danger": 0
+        },
+        "averageFatigue": 0,
+        "averageFoodPercent": 0,
+        "residents": []
+      }
+    ]
+  ],
+  "summary": {
+    "totalResidents": 1,
+    "severityCounts": {
+      "safe": 1,
+      "caution": 0,
+      "danger": 0
+    },
+    "averageFatigue": 0.3,
+    "averageFoodPercent": 1,
+    "dangerResidents": [],
+    "cautionResidents": [],
+    "severityScore": 0
+  }
+}

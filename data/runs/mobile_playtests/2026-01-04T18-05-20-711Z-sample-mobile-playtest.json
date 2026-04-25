@@ -1,0 +1,39 @@
+{
+  "version": "1.0.0",
+  "sessionId": "sample-mobile-playtest",
+  "tester": "QA Ranger",
+  "device": "Pixel 8 · Android 15",
+  "cycleDurationMs": [
+    90000,
+    87000,
+    86000
+  ],
+  "tapsPerAssignment": [
+    3,
+    2,
+    3
+  ],
+  "assignmentLatencyMs": [
+    400,
+    420,
+    410
+  ],
+  "pickerCloseRate": 99,
+  "resourceDelta": {
+    "gold": 12,
+    "food": 3
+  },
+  "qualitativeNotes": "Picker felt responsive, no lag even with Rest overlay active.",
+  "telemetrySource": "data/runs/mobile_playtests/sample-telemetry.json",
+  "createdAt": "2026-01-04T18:05:20.711Z",
+  "derivedMetrics": {
+    "avgCycleDurationMs": 87666.67,
+    "avgTapsPerAssignment": 2.67,
+    "avgAssignmentLatencyMs": 410,
+    "meetsCycleTarget": true,
+    "meetsTapTarget": true,
+    "meetsLatencyTarget": true,
+    "meetsPickerTarget": true,
+    "meetsResourceTarget": true
+  }
+}

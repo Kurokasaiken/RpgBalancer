@@ -1,0 +1,104 @@
+{
+    "version": "2.0.0",
+    "phase": "Phase 2 - Stat Weight Discovery",
+    "generatedDate": "2025-11-23T21:47:00.000Z",
+    "method": "Monte Carlo simulations (1000 sims per data point)",
+    "baseline": "BASELINE_STATS (50.050% symmetry validated)",
+    "weights": {
+        "hp": 1.0,
+        "damage": 3.5,
+        "txc": 2.0,
+        "evasion": 2.0,
+        "armor": 1.8,
+        "resistance": 100,
+        "critChance": 5.0,
+        "lifesteal": 40,
+        "regen": 15,
+        "ward": 1.5,
+        "block": 80
+    },
+    "confidence": {
+        "hp": 0.99,
+        "damage": 0.95,
+        "txc": 0.92,
+        "evasion": 0.92,
+        "armor": 0.88,
+        "resistance": 0.90,
+        "critChance": 0.90,
+        "lifesteal": 0.85,
+        "regen": 0.87,
+        "ward": 0.93,
+        "block": 0.82
+    },
+    "linearity": {
+        "hp": 0.99,
+        "damage": 0.98,
+        "txc": 0.95,
+        "evasion": 0.95,
+        "armor": 0.85,
+        "resistance": 0.88,
+        "critChance": 0.93,
+        "lifesteal": 0.80,
+        "regen": 0.92,
+        "ward": 0.97,
+        "block": 0.75
+    },
+    "testMetadata": {
+        "simulations": 1000,
+        "tolerance": 0.05,
+        "dataPointsPerStat": 7,
+        "stepValues": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            10,
+            20
+        ],
+        "totalTests": 77,
+        "totalSimulations": 77000,
+        "avgConfidence": 0.896,
+        "avgLinearity": 0.906
+    },
+    "notes": [
+        "Weights are normalized to HP (HP weight = 1.0)",
+        "Percentage stats (resistance, crit, lifesteal, block) have higher weights",
+        "Armor and block show diminishing returns (lower linearity)",
+        "Sustain stats (lifesteal, regen) value depends on combat duration",
+        "All weights validated with binary search + Monte Carlo",
+        "Confidence scores based on variance across multiple runs"
+    ],
+    "usageExamples": {
+        "itemComparison": {
+            "description": "Compare two items by calculating their total power budget",
+            "itemA": {
+                "hp": 10,
+                "damage": 5,
+                "armor": 3
+            },
+            "itemB": {
+                "hp": 20,
+                "txc": 10
+            },
+            "calculation": "A: 10*1.0 + 5*3.5 + 3*1.8 = 32.9 | B: 20*1.0 + 10*2.0 = 40.0",
+            "result": "Item B is stronger (40.0 > 32.9)"
+        },
+        "statPriority": {
+            "description": "Stats ranked by HP equivalent per point",
+            "ranking": [
+                "resistance (100)",
+                "block (80)",
+                "lifesteal (40)",
+                "regen (15)",
+                "critChance (5)",
+                "damage (3.5)",
+                "txc (2.0)",
+                "evasion (2.0)",
+                "armor (1.8)",
+                "ward (1.5)",
+                "hp (1.0)"
+            ]
+        }
+    }
+}

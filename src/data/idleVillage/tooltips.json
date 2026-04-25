@@ -1,0 +1,48 @@
+{
+  "en": {
+    "workerTooltip": {
+      "labels": {
+        "hp": "HP",
+        "fatigue": "Fatigue",
+        "performance": "Performance",
+        "specialties": "Specialties",
+        "bio": "Bio",
+        "recommendations": "Recommendations",
+        "risk": "Risk Level"
+      },
+      "statuses": {
+        "working": "On Assignment",
+        "resting": "Resting",
+        "injured": "Injured",
+        "recovering": "Recovering",
+        "available": "Available",
+        "away": "Away",
+        "exhausted": "Exhausted",
+        "dead": "Fallen"
+      },
+      "riskLevels": {
+        "low": "Low Risk",
+        "medium": "Medium Risk",
+        "high": "High Risk",
+        "critical": "Critical Risk"
+      },
+      "recommendations": {
+        "lowHp": "Rest needed - HP critical",
+        "highFatigue": "High fatigue - consider rest",
+        "injured": "Recovering from injury",
+        "critical": "Immediate rest required"
+      },
+      "accessibility": {
+        "tooltipDetails": "{name} - Worker details",
+        "riskBadge": "{level} status",
+        "closeTooltip": "Close tooltip for {name}"
+      },
+      "actions": {
+        "close": "Close tooltip"
+      },
+      "sections": {
+        "quote": "Quote"
+      }
+    }
+  }
+}

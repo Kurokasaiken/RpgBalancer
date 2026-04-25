@@ -1,0 +1,1093 @@
+{
+  "scenario": {
+    "schemaVersion": "1.0.0",
+    "id": "phase-e-scenario-1769015418432-2aps7lwde",
+    "name": "Phase E Scenario Export 2026-01-21",
+    "description": "Generated Phase E scenario with 3 residents, 2 slots, and 30 quest timeline ticks",
+    "generatedAt": 1769015418432,
+    "author": "phase-e-scenario-exporter-cli",
+    "tags": [
+      "generated",
+      "phase-e",
+      "store-derived"
+    ],
+    "tick": {
+      "current": 0,
+      "total": 100,
+      "durationMs": 1000
+    },
+    "residents": [
+      {
+        "id": "resident-1",
+        "name": "Alice",
+        "status": "available",
+        "fatigue": 25,
+        "hp": 80,
+        "maxHp": 100,
+        "statTags": [
+          "strength",
+          "perception"
+        ],
+        "isHero": false,
+        "isInjured": false,
+        "survivalCount": 8,
+        "survivalScore": 58
+      },
+      {
+        "id": "resident-2",
+        "name": "Bob",
+        "status": "away",
+        "fatigue": 45,
+        "hp": 60,
+        "maxHp": 100,
+        "statTags": [
+          "agility"
+        ],
+        "isHero": true,
+        "isInjured": false,
+        "survivalCount": 0,
+        "survivalScore": 52
+      },
+      {
+        "id": "resident-3",
+        "name": "Charlie",
+        "status": "exhausted",
+        "fatigue": 85,
+        "hp": 20,
+        "maxHp": 100,
+        "statTags": [
+          "strength"
+        ],
+        "isHero": false,
+        "isInjured": true,
+        "survivalCount": 0,
+        "survivalScore": 9
+      }
+    ],
+    "slots": [
+      {
+        "id": "forest-work",
+        "activityId": "forest-work",
+        "name": "Forest Work",
+        "slotTags": [
+          "village_job"
+        ],
+        "maxCrew": 2,
+        "currentOccupants": 1,
+        "statRequirements": {
+          "allOf": [
+            "strength"
+          ],
+          "anyOf": [
+            "perception",
+            "agility"
+          ],
+          "noneOf": [
+            "injured"
+          ]
+        },
+        "isLocked": false,
+        "location": {
+          "x": 83,
+          "y": 97
+        }
+      },
+      {
+        "id": "village-gather",
+        "activityId": "village-gather",
+        "name": "Gather Resources",
+        "slotTags": [
+          "village_job"
+        ],
+        "maxCrew": 3,
+        "currentOccupants": 2,
+        "statRequirements": {
+          "allOf": [
+            "agility"
+          ],
+          "anyOf": [
+            "perception"
+          ],
+          "noneOf": [
+            "exhausted"
+          ]
+        },
+        "isLocked": false,
+        "location": {
+          "x": 24,
+          "y": 31
+        }
+      }
+    ],
+    "tagDefinitions": [
+      {
+        "id": "job",
+        "name": "Job",
+        "category": "activity_type",
+        "color": "#3b82f6",
+        "description": "Job activities"
+      },
+      {
+        "id": "resident",
+        "name": "Resident",
+        "category": "character_type",
+        "color": "#10b981",
+        "description": "Resident characters"
+      },
+      {
+        "id": "quest",
+        "name": "Quest",
+        "category": "content_type",
+        "color": "#f59e0b",
+        "description": "Quest content"
+      },
+      {
+        "id": "location",
+        "name": "Location",
+        "category": "spatial",
+        "color": "#8b5cf6",
+        "description": "Location tags"
+      },
+      {
+        "id": "strength",
+        "name": "Strength",
+        "category": "stat",
+        "color": "#ef4444",
+        "description": "Physical strength attribute"
+      },
+      {
+        "id": "agility",
+        "name": "Agility",
+        "category": "stat",
+        "color": "#22c55e",
+        "description": "Physical agility attribute"
+      },
+      {
+        "id": "perception",
+        "name": "Perception",
+        "category": "stat",
+        "color": "#3b82f6",
+        "description": "Perception attribute"
+      }
+    ],
+    "dropFeedbackConfigs": [
+      {
+        "slotId": "forest-work",
+        "dropState": "invalid",
+        "validationMessage": "Validation for Forest Work",
+        "compatibilityScore": 0.5054675256862184,
+        "visualFeedback": {
+          "highlightColor": "hsl(269.9017850200041, 70%, 50%)",
+          "borderColor": "hsl(39.25445706505773, 70%, 30%)",
+          "backgroundColor": "hsl(198.28490468063558, 70%, 10%)",
+          "icon": "✓"
+        },
+        "validationResults": {
+          "statRequirements": true,
+          "fatigueThreshold": true,
+          "crewCapacity": true,
+          "tagCompatibility": true,
+          "phaseLock": false
+        },
+        "lastValidatedAt": 1769015408467
+      },
+      {
+        "slotId": "village-gather",
+        "dropState": "valid",
+        "validationMessage": "Validation for Gather Resources",
+        "compatibilityScore": 0.5452281182886194,
+        "visualFeedback": {
+          "highlightColor": "hsl(290.3497167885838, 70%, 50%)",
+          "borderColor": "hsl(193.76916492993615, 70%, 30%)",
+          "backgroundColor": "hsl(288.3857721028269, 70%, 10%)",
+          "icon": "✓"
+        },
+        "validationResults": {
+          "statRequirements": true,
+          "fatigueThreshold": true,
+          "crewCapacity": true,
+          "tagCompatibility": false,
+          "phaseLock": false
+        },
+        "lastValidatedAt": 1769015413687
+      }
+    ],
+    "questTimelineTicks": [
+      {
+        "tick": 9,
+        "questId": "quest-1",
+        "questName": "Gather Supplies",
+        "status": "pending",
+        "progress": 0.1,
+        "priority": "normal",
+        "questType": "daily",
+        "timeRemainingTicks": 10,
+        "requiredResources": {
+          "gold": 89,
+          "food": 49
+        },
+        "rewards": {
+          "experience": 107,
+          "reputation": 17
+        },
+        "participatingResidents": [
+          "resident-1",
+          "resident-2"
+        ],
+        "location": {
+          "x": 63,
+          "y": 60
+        },
+        "metadata": {
+          "difficulty": 0.5888875336718589,
+          "rewardPool": 616
+        }
+      },
+      {
+        "tick": 10,
+        "questId": "quest-1",
+        "questName": "Gather Supplies",
+        "status": "active",
+        "progress": 0.2,
+        "priority": "normal",
+        "questType": "daily",
+        "timeRemainingTicks": 9,
+        "requiredResources": {
+          "gold": 88,
+          "food": 44
+        },
+        "rewards": {
+          "experience": 100,
+          "reputation": 33
+        },
+        "participatingResidents": [],
+        "location": {
+          "x": 2,
+          "y": 58
+        },
+        "metadata": {
+          "difficulty": 0.028357455880728022,
+          "rewardPool": 177
+        }
+      },
+      {
+        "tick": 11,
+        "questId": "quest-1",
+        "questName": "Gather Supplies",
+        "status": "active",
+        "progress": 0.3,
+        "priority": "normal",
+        "questType": "daily",
+        "timeRemainingTicks": 8,
+        "requiredResources": {
+          "gold": 71,
+          "food": 8
+        },
+        "rewards": {
+          "experience": 43,
+          "reputation": 38
+        },
+        "participatingResidents": [
+          "resident-1",
+          "resident-2"
+        ],
+        "location": {
+          "x": 95,
+          "y": 54
+        },
+        "metadata": {
+          "difficulty": 0.4433679623111353,
+          "rewardPool": 740
+        }
+      },
+      {
+        "tick": 12,
+        "questId": "quest-1",
+        "questName": "Gather Supplies",
+        "status": "active",
+        "progress": 0.4,
+        "priority": "normal",
+        "questType": "daily",
+        "timeRemainingTicks": 7,
+        "requiredResources": {
+          "gold": 73,
+          "food": 10
+        },
+        "rewards": {
+          "experience": 182,
+          "reputation": 19
+        },
+        "participatingResidents": [],
+        "location": {
+          "x": 95,
+          "y": 98
+        },
+        "metadata": {
+          "difficulty": 0.155635974766837,
+          "rewardPool": 505
+        }
+      },
+      {
+        "tick": 13,
+        "questId": "quest-1",
+        "questName": "Gather Supplies",
+        "status": "active",
+        "progress": 0.5,
+        "priority": "low",
+        "questType": "daily",
+        "timeRemainingTicks": 6,
+        "requiredResources": {
+          "gold": 20,
+          "food": 44
+        },
+        "rewards": {
+          "experience": 36,
+          "reputation": 49
+        },
+        "participatingResidents": [
+          "resident-1"
+        ],
+        "location": {
+          "x": 8,
+          "y": 90
+        },
+        "metadata": {
+          "difficulty": 0.287789667150957,
+          "rewardPool": 134
+        }
+      },
+      {
+        "tick": 14,
+        "questId": "quest-1",
+        "questName": "Gather Supplies",
+        "status": "failed",
+        "progress": 0.6,
+        "priority": "normal",
+        "questType": "daily",
+        "timeRemainingTicks": 5,
+        "requiredResources": {
+          "gold": 50,
+          "food": 43
+        },
+        "rewards": {
+          "experience": 16,
+          "reputation": 3
+        },
+        "participatingResidents": [],
+        "location": {
+          "x": 90,
+          "y": 11
+        },
+        "metadata": {
+          "difficulty": 0.43256087124082776,
+          "rewardPool": 350
+        }
+      },
+      {
+        "tick": 15,
+        "questId": "quest-1",
+        "questName": "Gather Supplies",
+        "status": "failed",
+        "progress": 0.7,
+        "priority": "normal",
+        "questType": "daily",
+        "timeRemainingTicks": 4,
+        "requiredResources": {
+          "gold": 12,
+          "food": 47
+        },
+        "rewards": {
+          "experience": 196,
+          "reputation": 7
+        },
+        "participatingResidents": [],
+        "location": {
+          "x": 76,
+          "y": 83
+        },
+        "metadata": {
+          "difficulty": 0.1909816448264383,
+          "rewardPool": 695
+        }
+      },
+      {
+        "tick": 16,
+        "questId": "quest-1",
+        "questName": "Gather Supplies",
+        "status": "failed",
+        "progress": 0.8,
+        "priority": "normal",
+        "questType": "daily",
+        "timeRemainingTicks": 3,
+        "requiredResources": {
+          "gold": 33,
+          "food": 41
+        },
+        "rewards": {
+          "experience": 31,
+          "reputation": 7
+        },
+        "participatingResidents": [
+          "resident-1"
+        ],
+        "location": {
+          "x": 12,
+          "y": 92
+        },
+        "metadata": {
+          "difficulty": 0.326284002703513,
+          "rewardPool": 417
+        }
+      },
+      {
+        "tick": 17,
+        "questId": "quest-1",
+        "questName": "Gather Supplies",
+        "status": "failed",
+        "progress": 0.9,
+        "priority": "normal",
+        "questType": "daily",
+        "timeRemainingTicks": 2,
+        "requiredResources": {
+          "gold": 54,
+          "food": 17
+        },
+        "rewards": {
+          "experience": 87,
+          "reputation": 43
+        },
+        "participatingResidents": [
+          "resident-1",
+          "resident-2"
+        ],
+        "location": {
+          "x": 65,
+          "y": 39
+        },
+        "metadata": {
+          "difficulty": 0.6470442303771569,
+          "rewardPool": 999
+        }
+      },
+      {
+        "tick": 18,
+        "questId": "quest-1",
+        "questName": "Gather Supplies",
+        "status": "completed",
+        "progress": 1,
+        "priority": "high",
+        "questType": "daily",
+        "timeRemainingTicks": 1,
+        "requiredResources": {
+          "gold": 73,
+          "food": 21
+        },
+        "rewards": {
+          "experience": 76,
+          "reputation": 2
+        },
+        "participatingResidents": [
+          "resident-1",
+          "resident-2"
+        ],
+        "location": {
+          "x": 24,
+          "y": 18
+        },
+        "metadata": {
+          "difficulty": 0.4522166121767437,
+          "rewardPool": 409
+        }
+      },
+      {
+        "tick": 2,
+        "questId": "quest-2",
+        "questName": "Craft Tools",
+        "status": "pending",
+        "progress": 0.1,
+        "priority": "critical",
+        "questType": "side",
+        "timeRemainingTicks": 10,
+        "requiredResources": {
+          "gold": 11,
+          "food": 42
+        },
+        "rewards": {
+          "experience": 65,
+          "reputation": 39
+        },
+        "participatingResidents": [
+          "resident-1",
+          "resident-2"
+        ],
+        "location": {
+          "x": 47,
+          "y": 39
+        },
+        "metadata": {
+          "difficulty": 0.9457334197317131,
+          "rewardPool": 519
+        }
+      },
+      {
+        "tick": 3,
+        "questId": "quest-2",
+        "questName": "Craft Tools",
+        "status": "active",
+        "progress": 0.2,
+        "priority": "critical",
+        "questType": "side",
+        "timeRemainingTicks": 9,
+        "requiredResources": {
+          "gold": 34,
+          "food": 27
+        },
+        "rewards": {
+          "experience": 93,
+          "reputation": 0
+        },
+        "participatingResidents": [
+          "resident-1"
+        ],
+        "location": {
+          "x": 20,
+          "y": 51
+        },
+        "metadata": {
+          "difficulty": 0.5942192299667728,
+          "rewardPool": 693
+        }
+      },
+      {
+        "tick": 4,
+        "questId": "quest-2",
+        "questName": "Craft Tools",
+        "status": "active",
+        "progress": 0.3,
+        "priority": "critical",
+        "questType": "side",
+        "timeRemainingTicks": 8,
+        "requiredResources": {
+          "gold": 68,
+          "food": 33
+        },
+        "rewards": {
+          "experience": 134,
+          "reputation": 24
+        },
+        "participatingResidents": [
+          "resident-1",
+          "resident-2"
+        ],
+        "location": {
+          "x": 38,
+          "y": 9
+        },
+        "metadata": {
+          "difficulty": 0.7112626793552221,
+          "rewardPool": 462
+        }
+      },
+      {
+        "tick": 5,
+        "questId": "quest-2",
+        "questName": "Craft Tools",
+        "status": "active",
+        "progress": 0.4,
+        "priority": "critical",
+        "questType": "side",
+        "timeRemainingTicks": 7,
+        "requiredResources": {
+          "gold": 95,
+          "food": 49
+        },
+        "rewards": {
+          "experience": 76,
+          "reputation": 32
+        },
+        "participatingResidents": [],
+        "location": {
+          "x": 71,
+          "y": 35
+        },
+        "metadata": {
+          "difficulty": 0.5356393331159461,
+          "rewardPool": 153
+        }
+      },
+      {
+        "tick": 6,
+        "questId": "quest-2",
+        "questName": "Craft Tools",
+        "status": "active",
+        "progress": 0.5,
+        "priority": "normal",
+        "questType": "side",
+        "timeRemainingTicks": 6,
+        "requiredResources": {
+          "gold": 82,
+          "food": 9
+        },
+        "rewards": {
+          "experience": 146,
+          "reputation": 47
+        },
+        "participatingResidents": [
+          "resident-1"
+        ],
+        "location": {
+          "x": 41,
+          "y": 77
+        },
+        "metadata": {
+          "difficulty": 0.486556509174094,
+          "rewardPool": 352
+        }
+      },
+      {
+        "tick": 7,
+        "questId": "quest-2",
+        "questName": "Craft Tools",
+        "status": "failed",
+        "progress": 0.6,
+        "priority": "high",
+        "questType": "side",
+        "timeRemainingTicks": 5,
+        "requiredResources": {
+          "gold": 46,
+          "food": 16
+        },
+        "rewards": {
+          "experience": 52,
+          "reputation": 48
+        },
+        "participatingResidents": [
+          "resident-1",
+          "resident-2"
+        ],
+        "location": {
+          "x": 67,
+          "y": 22
+        },
+        "metadata": {
+          "difficulty": 0.6316387913363342,
+          "rewardPool": 858
+        }
+      },
+      {
+        "tick": 8,
+        "questId": "quest-2",
+        "questName": "Craft Tools",
+        "status": "failed",
+        "progress": 0.7,
+        "priority": "low",
+        "questType": "side",
+        "timeRemainingTicks": 4,
+        "requiredResources": {
+          "gold": 61,
+          "food": 31
+        },
+        "rewards": {
+          "experience": 195,
+          "reputation": 40
+        },
+        "participatingResidents": [
+          "resident-1"
+        ],
+        "location": {
+          "x": 41,
+          "y": 73
+        },
+        "metadata": {
+          "difficulty": 0.481356223555901,
+          "rewardPool": 933
+        }
+      },
+      {
+        "tick": 9,
+        "questId": "quest-2",
+        "questName": "Craft Tools",
+        "status": "failed",
+        "progress": 0.8,
+        "priority": "normal",
+        "questType": "side",
+        "timeRemainingTicks": 3,
+        "requiredResources": {
+          "gold": 88,
+          "food": 9
+        },
+        "rewards": {
+          "experience": 87,
+          "reputation": 19
+        },
+        "participatingResidents": [],
+        "location": {
+          "x": 97,
+          "y": 6
+        },
+        "metadata": {
+          "difficulty": 0.3530041812281708,
+          "rewardPool": 466
+        }
+      },
+      {
+        "tick": 10,
+        "questId": "quest-2",
+        "questName": "Craft Tools",
+        "status": "failed",
+        "progress": 0.9,
+        "priority": "critical",
+        "questType": "side",
+        "timeRemainingTicks": 2,
+        "requiredResources": {
+          "gold": 48,
+          "food": 17
+        },
+        "rewards": {
+          "experience": 20,
+          "reputation": 24
+        },
+        "participatingResidents": [
+          "resident-1",
+          "resident-2"
+        ],
+        "location": {
+          "x": 15,
+          "y": 57
+        },
+        "metadata": {
+          "difficulty": 0.6777768277953864,
+          "rewardPool": 890
+        }
+      },
+      {
+        "tick": 11,
+        "questId": "quest-2",
+        "questName": "Craft Tools",
+        "status": "completed",
+        "progress": 1,
+        "priority": "high",
+        "questType": "side",
+        "timeRemainingTicks": 1,
+        "requiredResources": {
+          "gold": 88,
+          "food": 23
+        },
+        "rewards": {
+          "experience": 50,
+          "reputation": 7
+        },
+        "participatingResidents": [
+          "resident-1",
+          "resident-2"
+        ],
+        "location": {
+          "x": 87,
+          "y": 7
+        },
+        "metadata": {
+          "difficulty": 0.6424601475648208,
+          "rewardPool": 550
+        }
+      },
+      {
+        "tick": 4,
+        "questId": "quest-3",
+        "questName": "Defend Village",
+        "status": "pending",
+        "progress": 0.1,
+        "priority": "low",
+        "questType": "main",
+        "timeRemainingTicks": 10,
+        "requiredResources": {
+          "gold": 58,
+          "food": 32
+        },
+        "rewards": {
+          "experience": 180,
+          "reputation": 23
+        },
+        "participatingResidents": [],
+        "location": {
+          "x": 70,
+          "y": 85
+        },
+        "metadata": {
+          "difficulty": 0.542173253982394,
+          "rewardPool": 138
+        }
+      },
+      {
+        "tick": 5,
+        "questId": "quest-3",
+        "questName": "Defend Village",
+        "status": "active",
+        "progress": 0.2,
+        "priority": "low",
+        "questType": "main",
+        "timeRemainingTicks": 9,
+        "requiredResources": {
+          "gold": 97,
+          "food": 36
+        },
+        "rewards": {
+          "experience": 12,
+          "reputation": 16
+        },
+        "participatingResidents": [],
+        "location": {
+          "x": 78,
+          "y": 65
+        },
+        "metadata": {
+          "difficulty": 0.23618177911696914,
+          "rewardPool": 718
+        }
+      },
+      {
+        "tick": 6,
+        "questId": "quest-3",
+        "questName": "Defend Village",
+        "status": "active",
+        "progress": 0.3,
+        "priority": "normal",
+        "questType": "main",
+        "timeRemainingTicks": 8,
+        "requiredResources": {
+          "gold": 58,
+          "food": 42
+        },
+        "rewards": {
+          "experience": 60,
+          "reputation": 25
+        },
+        "participatingResidents": [
+          "resident-1"
+        ],
+        "location": {
+          "x": 23,
+          "y": 61
+        },
+        "metadata": {
+          "difficulty": 0.37375032742967895,
+          "rewardPool": 179
+        }
+      },
+      {
+        "tick": 7,
+        "questId": "quest-3",
+        "questName": "Defend Village",
+        "status": "active",
+        "progress": 0.4,
+        "priority": "low",
+        "questType": "main",
+        "timeRemainingTicks": 7,
+        "requiredResources": {
+          "gold": 96,
+          "food": 12
+        },
+        "rewards": {
+          "experience": 1,
+          "reputation": 45
+        },
+        "participatingResidents": [],
+        "location": {
+          "x": 78,
+          "y": 15
+        },
+        "metadata": {
+          "difficulty": 0.24214372922689398,
+          "rewardPool": 139
+        }
+      },
+      {
+        "tick": 8,
+        "questId": "quest-3",
+        "questName": "Defend Village",
+        "status": "active",
+        "progress": 0.5,
+        "priority": "high",
+        "questType": "main",
+        "timeRemainingTicks": 6,
+        "requiredResources": {
+          "gold": 96,
+          "food": 47
+        },
+        "rewards": {
+          "experience": 5,
+          "reputation": 33
+        },
+        "participatingResidents": [
+          "resident-1",
+          "resident-2"
+        ],
+        "location": {
+          "x": 16,
+          "y": 66
+        },
+        "metadata": {
+          "difficulty": 0.09825534804273528,
+          "rewardPool": 196
+        }
+      },
+      {
+        "tick": 9,
+        "questId": "quest-3",
+        "questName": "Defend Village",
+        "status": "failed",
+        "progress": 0.6,
+        "priority": "low",
+        "questType": "main",
+        "timeRemainingTicks": 5,
+        "requiredResources": {
+          "gold": 77,
+          "food": 3
+        },
+        "rewards": {
+          "experience": 99,
+          "reputation": 27
+        },
+        "participatingResidents": [],
+        "location": {
+          "x": 66,
+          "y": 40
+        },
+        "metadata": {
+          "difficulty": 0.27156478716047117,
+          "rewardPool": 364
+        }
+      },
+      {
+        "tick": 10,
+        "questId": "quest-3",
+        "questName": "Defend Village",
+        "status": "failed",
+        "progress": 0.7,
+        "priority": "low",
+        "questType": "main",
+        "timeRemainingTicks": 4,
+        "requiredResources": {
+          "gold": 35,
+          "food": 27
+        },
+        "rewards": {
+          "experience": 125,
+          "reputation": 13
+        },
+        "participatingResidents": [
+          "resident-1",
+          "resident-2"
+        ],
+        "location": {
+          "x": 12,
+          "y": 87
+        },
+        "metadata": {
+          "difficulty": 0.8553298880364391,
+          "rewardPool": 951
+        }
+      },
+      {
+        "tick": 11,
+        "questId": "quest-3",
+        "questName": "Defend Village",
+        "status": "failed",
+        "progress": 0.8,
+        "priority": "normal",
+        "questType": "main",
+        "timeRemainingTicks": 3,
+        "requiredResources": {
+          "gold": 70,
+          "food": 17
+        },
+        "rewards": {
+          "experience": 172,
+          "reputation": 15
+        },
+        "participatingResidents": [
+          "resident-1"
+        ],
+        "location": {
+          "x": 86,
+          "y": 18
+        },
+        "metadata": {
+          "difficulty": 0.8971297782747192,
+          "rewardPool": 508
+        }
+      },
+      {
+        "tick": 12,
+        "questId": "quest-3",
+        "questName": "Defend Village",
+        "status": "failed",
+        "progress": 0.9,
+        "priority": "critical",
+        "questType": "main",
+        "timeRemainingTicks": 2,
+        "requiredResources": {
+          "gold": 45,
+          "food": 15
+        },
+        "rewards": {
+          "experience": 88,
+          "reputation": 28
+        },
+        "participatingResidents": [],
+        "location": {
+          "x": 22,
+          "y": 78
+        },
+        "metadata": {
+          "difficulty": 0.850393614305051,
+          "rewardPool": 106
+        }
+      },
+      {
+        "tick": 13,
+        "questId": "quest-3",
+        "questName": "Defend Village",
+        "status": "completed",
+        "progress": 1,
+        "priority": "low",
+        "questType": "main",
+        "timeRemainingTicks": 1,
+        "requiredResources": {
+          "gold": 33,
+          "food": 0
+        },
+        "rewards": {
+          "experience": 72,
+          "reputation": 35
+        },
+        "participatingResidents": [],
+        "location": {
+          "x": 38,
+          "y": 12
+        },
+        "metadata": {
+          "difficulty": 0.1726898464622717,
+          "rewardPool": 746
+        }
+      }
+    ],
+    "metadata": {
+      "difficulty": "beginner",
+      "estimatedRuntimeMinutes": 11,
+      "requiredFeatures": [
+        "phase-e-scenario-exporter",
+        "drop-feedback-configs",
+        "quest-timeline-ticks"
+      ],
+      "compatibilityVersion": "1.0.0",
+      "exportSource": "manual",
+      "filterCriteria": {}
+    }
+  },
+  "exportMetadata": {
+    "exportedAt": 1769015418435,
+    "exportedBy": "phase-e-scenario-exporter-cli",
+    "format": "json",
+    "version": "1.0.0"
+  }
+}

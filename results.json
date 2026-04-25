@@ -1,0 +1,44 @@
+{
+  "totalScenarios": 2,
+  "successfulReplays": 0,
+  "failedReplays": 2,
+  "matchingResults": 0,
+  "mismatchingResults": 2,
+  "accuracyRate": 0,
+  "avgExecutionTimeMs": 0.17941700000000083,
+  "maxExecutionTimeMs": 0.2572089999999889,
+  "minExecutionTimeMs": 0.10162500000001273,
+  "scenarioResults": [
+    {
+      "scenarioId": "scenario-1",
+      "success": false,
+      "expectedResult": {
+        "valid": true,
+        "reason": "Sample validation reason",
+        "confidence": 0.6603589095997486,
+        "ruleViolations": []
+      },
+      "matches": false,
+      "executionTimeMs": 0.2572089999999889,
+      "error": "this.validator.validateDrop is not a function"
+    },
+    {
+      "scenarioId": "scenario-2",
+      "success": false,
+      "expectedResult": {
+        "valid": true,
+        "reason": "Sample validation reason",
+        "confidence": 0.24836276519971223,
+        "ruleViolations": []
+      },
+      "matches": false,
+      "executionTimeMs": 0.10162500000001273,
+      "error": "this.validator.validateDrop is not a function"
+    }
+  ],
+  "performanceKPIs": {
+    "totalTimeMs": 0.4626670000000104,
+    "scenariosPerSecond": 4322.7634562221965,
+    "memoryUsageMB": 16.099598489420842
+  }
+}

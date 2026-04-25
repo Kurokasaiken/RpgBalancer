@@ -1,0 +1,46 @@
+{
+  "id": "tutorial-basic",
+  "name": "Tutorial: Basic Combat",
+  "description": "Learn the basics of STS combat with a simple deck and enemy",
+  "tags": ["tutorial", "beginner", "learning"],
+  "difficulty": "beginner",
+  "metadata": {
+    "createdAt": 1704979200000,
+    "createdBy": "system",
+    "version": "1.0.0",
+    "category": "tutorial"
+  },
+  "deck": {
+    "id": "starter-strike",
+    "name": "Starter Strike Deck",
+    "cards": [
+      { "id": "strike-1", "name": "Strike", "cost": 1, "type": "attack", "description": "Deal 6 damage" },
+      { "id": "defend-1", "name": "Defend", "cost": 1, "type": "skill", "description": "Gain 5 block" },
+      { "id": "strike-2", "name": "Strike", "cost": 1, "type": "attack", "description": "Deal 6 damage" },
+      { "id": "defend-2", "name": "Defend", "cost": 1, "type": "skill", "description": "Gain 5 block" },
+      { "id": "bash", "name": "Bash", "cost": 2, "type": "attack", "description": "Deal 8 damage and apply 2 vulnerable" }
+    ]
+  },
+  "enemy": {
+    "id": "cultist-basic",
+    "name": "Cultist",
+    "stats": {
+      "maxHp": 48,
+      "currentHp": 48,
+      "damageRange": { "min": 6, "max": 10 },
+      "intentPattern": ["attack", "attack", "debuff"],
+      "abilities": ["incantation"]
+    }
+  },
+  "simulation": {
+    "seed": 12345,
+    "startingHealth": 75,
+    "startingMana": 3,
+    "startingHandSize": 5
+  },
+  "ui": {
+    "asciiPreview": "╔══════════════════════════════════════════════════════════════════╗\n║                    TUTORIAL: BASIC COMBAT                           ║\n║                                                                      ║\n║  Deck: Starter Strike (5 cards)                                      ║\n║  Enemy: Cultist (48 HP)                                               ║\n║  Seed: 12345                                                          ║\n║                                                                      ║\n║  Learn basic combat mechanics with strikes and defends.                ║\n╚══════════════════════════════════════════════════════════════════╝",
+    "colorTheme": "terminal",
+    "layout": "compact"
+  }
+}

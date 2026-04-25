@@ -1,0 +1,1401 @@
+# Sandbox Dependency Report
+
+Generated: 2026-02-16T08:49:58.876Z
+Components: 225
+Dependencies: 343
+
+## Components
+
+### utility:balancerStorageTelemetry
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/analytics/balancerStorageTelemetry.ts
+- **Exports**: StorageMetrics, StorageOperationRecord, StorageTelemetryConfig, DEFAULT_STORAGE_TELEMETRY_CONFIG, storageTelemetry, useStorageTelemetry
+- **Imports**: @/shared/telemetry/headlessDiagnostics
+
+### utility:devBootGuard
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/analytics/devBootGuard.ts
+- **Exports**: BootGuardEventType, BootGuardTelemetryPayload, BootGuardPageState, BootGuardState, trackBootGuardEvent
+- **Imports**: @/shared/telemetry/headlessDiagnostics, @/shared/persistence/PersistenceService
+
+### utility:GuardianDryRunAnalyzer
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/analytics/guardian/GuardianDryRunAnalyzer.ts
+- **Exports**: GuardianLogEntry, GuardianDiagnostic, GuardianSessionAnalysis, GuardianIssue, DryRunSimulation, DryRunConfig, SyntheticScenario, SyntheticDiagnostic, GuardianLogEntrySchema, DryRunConfigSchema, GuardianLogEntryType, DryRunConfigType, GuardianDryRunAnalyzer
+
+### utility:idleVillageActivitySlots
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/analytics/idleVillageActivitySlots.ts
+- **Exports**: ActivitySlotTelemetryEvent, ActivitySlotEventType, ActivitySlotContext, DragStartPayload, DragCompletePayload, DragCancelPayload, ResidentAssignPayload, AssignFailurePayload, ValidationCheckPayload, PerformanceMetricPayload, FatigueChangePayload, SlotStateChangePayload, ActivitySlotEventPayload, ActivitySlotContextSchema, DragStartPayloadSchema, DragCompletePayloadSchema, DragCancelPayloadSchema, ResidentAssignPayloadSchema, AssignFailurePayloadSchema, ValidationCheckPayloadSchema, PerformanceMetricPayloadSchema, FatigueChangePayloadSchema, SlotStateChangePayloadSchema, ActivitySlotTelemetryEventSchema, ActivitySlotTelemetryConfig, DEFAULT_ACTIVITY_SLOT_TELEMETRY_CONFIG, ActivitySlotTelemetryConfigType, ActivitySlotContextType
+- **Imports**: @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/config/residentDropRules, @/shared/telemetry/headlessDiagnostics
+
+### utility:idleVillageDragErrorRecovery
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/analytics/idleVillageDragErrorRecovery.ts
+- **Exports**: DragErrorOverlayEventType, DragErrorOverlayEvent, dragErrorRecoveryAnalytics
+- **Imports**: @/shared/telemetry/headlessDiagnostics, @/ui/idleVillage/config/dragErrorRecoveryConfig, @/ui/idleVillage/config/dragErrorRecoveryConfig
+
+### utility:idleVillageDragInstrumentation
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/analytics/idleVillageDragInstrumentation.ts
+- **Exports**: DragPreviewMetricChannel, DragPreviewMeasurementStatus, DragPreviewMetricSeverity, DragPreviewMetricSource, DragPreviewMeasurement, DragPreviewMetricPayload, DragPreviewMetricEvent, DragPreviewAnalyticsSummary, resolveDragPreviewMetricSeverity, DragPreviewInstrumentationAnalytics, dragPreviewInstrumentationAnalytics
+- **Imports**: @/ui/idleVillage/config/dragPreviewInstrumentationConfig, @/shared/telemetry/headlessDiagnostics
+
+### utility:idleVillageFoodChain
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/analytics/idleVillageFoodChain.ts
+- **Exports**: FoodChainSnapshot, FoodChainSchedulerKpi, FoodChainMetrics, FoodChainAlert, FoodChainAnalysisResult, FoodChainAlertAnalyzer, snapshotsFromSchedulerKpis, formatFoodChainReport
+- **Imports**: @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, @/shared/telemetry/headlessDiagnostics
+
+### utility:idleVillageInteractionMode
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/analytics/idleVillageInteractionMode.ts
+- **Exports**: InteractionModeTelemetryEvent, InteractionModeAnalytics, useInteractionModeAnalytics, getInteractionModeAnalytics
+- **Imports**: @/shared/persistence/PersistenceService
+
+### utility:idleVillageMaintenanceTaskForecaster
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/analytics/idleVillageMaintenanceTaskForecaster.ts
+- **Exports**: MaintenanceTaskCategory, MaintenanceTaskPriority, MaintenanceTask, TaskSchedulingRecommendation, MaintenanceForecastConfig, MaintenanceTaskForecast, DEFAULT_MAINTENANCE_FORECAST_CONFIG, MaintenanceTaskForecaster
+- **Imports**: @/engine/game/idleVillage/TimeEngine, @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, @/balancing/config/idleVillage/types, @/shared/telemetry/headlessDiagnostics
+
+### utility:idleVillageMaintenanceTaskScheduling
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/analytics/idleVillageMaintenanceTaskScheduling.ts
+- **Exports**: SchedulingConstraints, SchedulingOptimization, SchedulingConflict, MaintenanceTaskScheduler
+- **Imports**: @/engine/game/idleVillage/TimeEngine, @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, @/balancing/config/idleVillage/types, ./maintenanceTaskForecaster...
+
+### utility:idleVillageQuestFeed
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/analytics/idleVillageQuestFeed.ts
+- **Exports**: QuestFeedEventType, QuestFeedEventPayload, QuestFeedExportPayload, trackQuestFeedEvent, trackQuestFeedExport
+- **Imports**: @/shared/telemetry/headlessDiagnostics
+
+### utility:sessionTaggingPipeline
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/analytics/sessionTaggingPipeline.ts
+- **Exports**: SessionTagType, SessionTag, SessionMetrics, SessionTagConfig, DEFAULT_SESSION_TAG_CONFIG, SessionTaggingPipeline, getSessionTaggingPipeline
+- **Imports**: @/shared/telemetry/headlessDiagnostics, @/shared/persistence/PersistenceService, @/ui/punchClub/hooks/usePunchClubGame
+
+### utility:stressTesting
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/analytics/stressTesting.ts
+- **Exports**: StressTestingEventType, StressTestingTelemetryPayload, StatProfileViewedPayload, StatProfileSelectedPayload, StatProfileExportedPayload, StressTestStartedPayload, StressTestCompletedPayload, trackStressTestEvent, getStressTestingEvents, clearStressTestingEvents, exportStressTestingTelemetry
+- **Imports**: @/shared/telemetry/headlessDiagnostics
+
+### utility:syncConflictTelemetry
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/analytics/syncConflictTelemetry.ts
+- **Exports**: SyncConflictTelemetryEvent, SyncConflictTelemetryData, ConflictDetectedTelemetry, ConflictResolvedTelemetry, ConflictFailedTelemetry, ConflictTimeoutTelemetry, ManualResolutionRequestedTelemetry, ManualResolutionCompletedTelemetry, SyncConflictTelemetry, syncConflictTelemetry, useSyncConflictTelemetry
+- **Imports**: @/shared/persistence/PersistenceService, @/shared/telemetry/headlessDiagnostics
+
+### utility:telemetryProvider
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/analytics/telemetry/telemetryProvider.ts
+- **Exports**: PunchClubLandingEvent, StressTestTelemetryEvent, PWATelemetryEvent, PunchClubLandingEventPayload, StressTestTelemetryEventPayload, PWATelemetryEventPayload, AnalyticsEntry, trackTelemetryEvent, trackPunchClubLanding, STSTelemetryEventType, STSTelemetryEvent, reportSTSCombatMetrics, reportStressTestTelemetry, trackSTSTelemetry, calculateQuestRiskPercentages, normalizeRiskPercentages, QuestTelemetryEventType, QuestTelemetryEventPayload, trackQuestTelemetry, FatigueTelemetryEventType, FatigueTelemetryEventPayload, trackFatigueTelemetry, createFatigueTelemetryPayload, exportSTSTelemetry, getSTSTelemetrySummary, exportSTSTelemetryJSON, downloadSTSTelemetry, STSUploadConfig, STSUploadResult, getUploadStatistics, validateSTSTelemetry, exportStressTestTelemetry, getStressTestTelemetrySummary, exportStressTestTelemetryJSON, HUDNotificationTelemetryEventType, HUDNotificationTelemetryEventPayload, ActiveHUDTelemetryEventType, ActiveHUDTelemetryEventPayload, reportActiveHUDEvent, TheaterTelemetryEventType, TheaterTelemetryEventPayload, reportHUDNotificationEvent, reportPWAEvent, STSAnalyticsUploader, stsAnalyticsUploader, MinimalGameplayTraceEntry, traceMinimalGameplay
+- **Imports**: @/shared/telemetry/headlessDiagnostics, @/shared/persistence/PersistenceService
+
+### utility:telemetryExportValidator
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/analytics/telemetryExportValidator.ts
+- **Exports**: TelemetryValidationResult, ValidationError, ValidationWarning, ValidationStats, TelemetryValidatorConfig, CustomValidationRule, DEFAULT_TELEMETRY_VALIDATOR_CONFIG, TelemetryExportValidator, defaultTelemetryValidator, validateTelemetryExport
+- **Imports**: @/shared/telemetry/headlessDiagnostics
+
+### config:BalancerHistoryStore
+- **Type**: config
+- **File**: /Users/faustoboni/progetti personali/src/balancing/config/BalancerHistoryStore.ts
+- **Exports**: BalancerHistoryConfig, HistoryOperationType, HistoryOperation, HistoryHealthDiagnostics, BalancerHistoryState, BalancerHistoryStore, defaultHistoryStore
+- **Imports**: @/shared/persistence/PersistenceService, ./types
+
+### config:crewScheduler
+- **Type**: config
+- **File**: /Users/faustoboni/progetti personali/src/balancing/config/idleVillage/crewScheduler.ts
+- **Exports**: CrewSchedulerPriorityWeights, CrewSchedulerSeeding, CrewSchedulerThresholds, CrewSchedulerAnalyticsConfig, CrewSchedulerTimeTravelConfig, CrewSchedulerConfig, DEFAULT_CREW_SCHEDULER_CONFIG, TEST_CREW_SCHEDULER_CONFIG, validateCrewSchedulerConfig, createDeterministicRng, calculateAssignmentPriority, CrewSchedulerDiagnostics
+
+### config:questRiskBadgeConfig
+- **Type**: config
+- **File**: /Users/faustoboni/progetti personali/src/balancing/config/idleVillage/questRiskBadgeConfig.ts
+- **Exports**: RiskLevel, RiskBadgeVariant, RiskBadgeAnimation, RiskBadgePosition, RiskDataSource, RiskCalculationMethod, QuestRiskBadgeConfig, QuestRiskBadgeData, RiskBadgeDiagnostics, DEFAULT_QUEST_RISK_BADGE_CONFIG, TEST_QUEST_RISK_BADGE_CONFIG, getRiskLevelFromPercentage, calculateOverallRisk, validateRiskBadgeConfig, getRiskLevelColors, shouldShowRiskBadge, createFallbackRiskData
+
+### config:riskDisplayConfig
+- **Type**: config
+- **File**: /Users/faustoboni/progetti personali/src/balancing/config/idleVillage/riskDisplayConfig.ts
+- **Exports**: RiskColorConfig, RiskPolygonConfig, RiskAnimationConfig, RiskTelemetryConfig, RiskSmoothingConfig, RiskDisplayConfig, DEFAULT_RISK_DISPLAY_CONFIG, TEST_RISK_DISPLAY_CONFIG, validateRiskDisplayConfig, calculateStripeLength, shouldShowRiskStripes, calculateRiskLevel, generatePolygonPoints, RiskDisplayConfigSchema, RiskDisplayDiagnostics
+
+### config:testHarnessConfig
+- **Type**: config
+- **File**: /Users/faustoboni/progetti personali/src/balancing/config/idleVillage/testHarnessConfig.ts
+- **Exports**: TestHarnessConfigSchema, TestHarnessConfig, DEFAULT_TEST_HARNESS_CONFIG
+
+### hook:useSTSTelemetryData
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/balancing/hooks/archmage/useSTSTelemetryData.ts
+- **Exports**: STSTelemetrySession, STSSessionConfig, useSTSTelemetryData
+- **Imports**: @/shared/persistence/PersistenceService, @/shared/telemetry/headlessDiagnostics
+
+### utility:MarginalUtilityReportExporter
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/balancing/stressTesting/MarginalUtilityReportExporter.ts
+- **Exports**: ExportConfig, ExportResult, ExportSchema, MarginalUtilityReportExporter
+- **Imports**: ../config/stressTesting/marginalUtilityConfig, ../config/stressTesting/marginalUtilityConfig, @/shared/telemetry/headlessDiagnostics
+
+### utility:LCGDiagnostics
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/balancing/utils/archmage/LCGDiagnostics.ts
+- **Exports**: LCGDiagnosticResult, SeedVisualizationData, runLCGDiagnostics, generateSeedVisualization, compareSeedSequences, batchTestSeeds, findOptimalSeed
+- **Imports**: ./seededRng
+
+### utility:questDecisionTelemetryFallback
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/balancing/utils/idleVillage/questDecisionTelemetryFallback.ts
+- **Exports**: FallbackEvent, QuestDecisionTelemetryFallbackConfig, DEFAULT_QUEST_DECISION_TELEMETRY_FALLBACK_CONFIG, QuestDecisionTelemetryFallback, getQuestDecisionTelemetryFallback, resetQuestDecisionTelemetryFallback
+- **Imports**: @/shared/telemetry/headlessDiagnostics, @/balancing/config/idleVillage/questDecisionTelemetryConfig
+
+### utility:questDecisionTelemetryPipeline
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/balancing/utils/idleVillage/questDecisionTelemetryPipeline.ts
+- **Exports**: PipelineMetrics, QuestDecisionTelemetryPipeline, getQuestDecisionTelemetryPipeline, resetQuestDecisionTelemetryPipeline
+- **Imports**: @/shared/telemetry/headlessDiagnostics
+
+### utility:riskStripeCalibrationEngine
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/balancing/utils/idleVillage/riskStripeCalibrationEngine.ts
+- **Exports**: RiskStripeCalibrationEngine, calibrationEngine
+- **Imports**: @/shared/telemetry/headlessDiagnostics
+
+### utility:riskStripeCalibrationExport
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/balancing/utils/idleVillage/riskStripeCalibrationExport.ts
+- **Exports**: ExportOptions, ImportOptions, ExportResult, ImportResult, CalibrationBackupManager, CalibrationExportImportManager, calibrationExportImportManager
+- **Imports**: @/shared/telemetry/headlessDiagnostics
+
+### utility:riskStripeCalibrationPresets
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/balancing/utils/idleVillage/riskStripeCalibrationPresets.ts
+- **Exports**: CalibrationPresetManager, calibrationPresetManager, presetUtils
+- **Imports**: @/shared/telemetry/headlessDiagnostics
+
+### utility:main
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/main.tsx
+- **Exports**: none
+- **Imports**: ./App.tsx, ./shared/components/Toaster, ./contexts/DensityContext, ./shared/telemetry/headlessDiagnostics
+
+### utility:syncConflictResolver
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/service-worker/syncConflictResolver.ts
+- **Exports**: SyncConflictResolver, syncConflictResolver
+- **Imports**: @/ui/idleVillage/utils/sandboxDiagnostics, @/shared/persistence/PersistenceService
+
+### utility:service-worker
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/service-worker.ts
+- **Exports**: none
+- **Imports**: @/shared/telemetry/headlessDiagnostics
+
+### utility:cloudSaveService
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/shared/cloud/cloudSaveService.ts
+- **Exports**: CloudProviderConfig, CloudSaveMetadata, CloudSave, ConflictResolution, SyncResult, SyncProgress, CloudSaveConfig, DEFAULT_CLOUD_SAVE_CONFIG, CloudSaveService, getCloudSaveService, initializeCloudSave, cleanupCloudSave
+- **Imports**: @/shared/persistence/PersistenceService, @/shared/telemetry/headlessDiagnostics, @/ui/punchClub/hooks/usePunchClubGame
+
+### utility:gymManagement
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/shared/gym/gymManagement.ts
+- **Exports**: StaffRole, StaffMember, StaffSchedule, Equipment, EquipmentUpgrade, FacilityArea, MaintenanceSchedule, TrainingProgram, GymMember, GymFinances, GymMetrics, GymConfig, GymState, DEFAULT_GYM_CONFIG, DEFAULT_STAFF_ROLES, GymManagementService, getGymManagementService, initializeGymManagement, cleanupGymManagement
+- **Imports**: @/shared/telemetry/headlessDiagnostics, @/shared/persistence/PersistenceService
+
+### utility:PersistenceChaosHarness
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/shared/testing/PersistenceChaosHarness.ts
+- **Exports**: PersistenceChaosHarness
+- **Imports**: @/shared/telemetry/headlessDiagnostics, ../persistence/PersistenceService
+
+### component:PinballMonitorPanel
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/altVisuals/components/PinballMonitorPanel.tsx
+- **Exports**: PinballMonitorPanelProps, PinballMonitorPanel, default
+- **Imports**: @/ui/altVisuals/hooks/usePinballMonitor, @/ui/altVisuals/hooks/usePinballMonitor
+
+### config:pinballMonitorConfig
+- **Type**: config
+- **File**: /Users/faustoboni/progetti personali/src/ui/altVisuals/config/pinballMonitorConfig.ts
+- **Exports**: PinballMonitorConfig, DEFAULT_PINBALL_MONITOR_CONFIG, resolvePinballMonitorConfig
+- **Imports**: @/ui/testing/pinballPhysics
+
+### hook:usePinballMonitor
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/altVisuals/hooks/usePinballMonitor.ts
+- **Exports**: PinballAnimationSummary, PinballAnimationBridge, PinballWatchdogReason, PinballWatchdogAction, PinballWatchdogEvent, PinballMonitorFlags, PinballMonitorDerivedMetrics, PinballMonitorState, MonitorStatus, PinballRecoveryRecord, PinballMonitorOptions, UsePinballMonitorResult, usePinballMonitor
+- **Imports**: @/ui/altVisuals/config/pinballMonitorConfig
+
+### hook:useStorageTelemetry
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/balancing/hooks/useStorageTelemetry.ts
+- **Exports**: UseStorageTelemetryReturn, UseStorageTelemetryOptions, useStorageTelemetry, StorageAlert, useStorageAlerts, useStorageTrends
+- **Imports**: @/analytics/balancerStorageTelemetry, @/ui/idleVillage/utils/sandboxDiagnostics
+
+### hook:useSynergyHeatmap
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/balancing/hooks/useSynergyHeatmap.ts
+- **Exports**: SynergyHeatmapConfig, SynergyFilterOptions, ProcessedSynergyData, SynergyTableRow, HeatmapCell, UseSynergyHeatmapProps, UseSynergyHeatmapResult, useSynergyHeatmap
+- **Imports**: @/ui/balancing/config/synergyHeatmapConfig, @/ui/idleVillage/utils/sandboxDiagnostics
+
+### hook:useSynergyHeatmapEnhanced
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/balancing/hooks/useSynergyHeatmapEnhanced.ts
+- **Exports**: EnhancedSynergyFilterOptions, ProcessedSynergyData, SynergyTableRow, HeatmapCell, SynergyExportData, UseSynergyHeatmapEnhancedProps, UseSynergyHeatmapEnhancedResult, useSynergyHeatmapEnhanced
+- **Imports**: @/ui/idleVillage/utils/sandboxDiagnostics
+
+### utility:SeedVisualizer
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/balancing/stressTesting/SeedVisualizer.tsx
+- **Exports**: SeedVisualizerProps, SeedVisualizer, default
+
+### utility:ActiveActivityHUD
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/ActiveActivityHUD.tsx
+- **Exports**: ActiveActivityHUD, default
+- **Imports**: @/ui/idleVillage/selectors/useHudSelectors, @/ui/idleVillage/components/ActivityActionCard, @/ui/idleVillage/theater/riskStripes
+
+### utility:ActivityArea
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/ActivityArea.tsx
+- **Exports**: ActivityAreaSlot, ActivityAreaHandlers, ActivityAreaProps, default
+- **Imports**: @/ui/idleVillage/components/ActivitySlot, @/ui/idleVillage/components/LocationCard, @/ui/idleVillage/legacy/VerbCard, @/ui/idleVillage/components/InlineResidentChips, @/ui/idleVillage/components/InlineResidentChips
+
+### utility:MinimalFeedbackPage
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/MinimalFeedbackPage.tsx
+- **Exports**: MinimalFeedbackPage
+- **Imports**: @/store/useMinimalGameplay, @/store/useMinimalGameplay, @/ui/idleVillage/components/DropFeedbackAnimations, @/ui/idleVillage/hooks/useDropFeedbackTelemetry, @/ui/idleVillage/hooks/useDropFeedback...
+
+### utility:MinimalGameplayPage
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/MinimalGameplayPage.tsx
+- **Exports**: default
+- **Imports**: @/ui/styleLab/StyleLaboratoryPanel, @/hooks/useThemeSwitcher, @/ui/idleVillage/map/actionCards/DayNightActionCard, @/ui/idleVillage/components/WorkerPanel, @/ui/idleVillage/components/WorkerCard...
+
+### utility:MinimalIntegratedPage
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/MinimalIntegratedPage.tsx
+- **Exports**: MinimalIntegratedPage
+- **Imports**: @/store/useMinimalGameplay, @/store/useMinimalGameplay, @/ui/idleVillage/components/WorkerCard, @/ui/idleVillage/components/ActivitySlot, @/ui/idleVillage/hooks/useDropFeedback...
+
+### utility:TestRosterPage
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/TestRosterPage.tsx
+- **Exports**: none
+- **Imports**: @/store/useMinimalGameplay, @/balancing/config/idleVillage/minimalConfig, @/balancing/config/idleVillage/minimalGameplayConfig, @/ui/idleVillage/hooks/useMinimalStyleLabTokens, @/balancing/config/idleVillage/minimalConfig...
+
+### utility:VillageSandbox.cycle.test
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/__tests__/VillageSandbox.cycle.test.tsx
+- **Exports**: none
+- **Imports**: @/ui/idleVillage/components/DragContext, @/ui/idleVillage/VillageSandbox, @/ui/idleVillage/__tests__/testUtils/mockVillageSandboxContext, @/ui/idleVillage/hooks/useVillageSandbox
+
+### utility:VillageSandbox.reference
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/VillageSandbox.reference.tsx
+- **Exports**: ActivitySlotData, default
+- **Imports**: @/balancing/config/idleVillage/types, @/engine/game/idleVillage/characterImport, @/ui/idleVillage/components/LocationCard, @/ui/idleVillage/components/ActivitySlot, @/ui/idleVillage/components/ActivityCardDetail...
+
+### utility:VillageSandbox
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/VillageSandbox.tsx
+- **Exports**: VillageSandboxContentProps, VillageSandboxContent, default
+- **Imports**: @/ui/shared/bootGuard/useBootGuardDiagnostics, ./utils/dragOverride, @/balancing/config/idleVillage/defaultConfig, @/ui/idleVillage/components/SummaryStrip, @/ui/idleVillage/components/DragContextStore...
+
+### utility:ActivityArea.stories
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/__stories__/ActivityArea.stories.tsx
+- **Exports**: DesktopBoard, MobileStacked, default
+- **Imports**: @/ui/idleVillage/ActivityArea, @/ui/idleVillage/__tests__/utils/ActivityArea.test-utils, @/ui/idleVillage/components/ActivitySlot
+
+### utility:IdleVillagePinballMonitor.test
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/__tests__/IdleVillagePinballMonitor.test.tsx
+- **Exports**: none
+- **Imports**: @/ui/idleVillage/components/IdleVillagePinballMonitor, @/ui/altVisuals/hooks/usePinballMonitor
+
+### utility:VillageSandbox.skeleton.test
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/__tests__/VillageSandbox.skeleton.test.tsx
+- **Exports**: none
+- **Imports**: @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/types/ActivitySlotData, @/balancing/config/idleVillage/types, @/balancing/config/idleVillage/defaultConfig, @/ui/idleVillage/components/ResidentRosterPanel...
+
+### utility:VillageSandbox.test
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/__tests__/VillageSandbox.test.tsx
+- **Exports**: none
+- **Imports**: @/ui/idleVillage/types/ActivitySlotData, @/ui/idleVillage/verbSummaries, ../VillageSandbox, @/ui/idleVillage/hooks/useVillageSandbox
+
+### utility:locationDropValidators.test
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/__tests__/locationDropValidators.test.ts
+- **Exports**: none
+- **Imports**: ../utils/locationDropValidators, @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/utils/workerPickerTelemetry, @/ui/idleVillage/tests/testUtils/createTelemetryStore
+
+### utility:mockVillageSandboxContext
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/__tests__/testUtils/mockVillageSandboxContext.ts
+- **Exports**: demoResidents, baseSlot, MockSandboxContext, createMockContext
+- **Imports**: @/ui/idleVillage/types/ActivitySlotData, @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/hooks/useVillageSandbox, @/ui/idleVillage/ActivityArea, @/ui/idleVillage/components/AncillaryPanels...
+
+### utility:ActivityArea.test-utils
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/__tests__/utils/ActivityArea.test-utils.ts
+- **Exports**: createMockActivitySlot, createActivityAreaProps, mockResidentsCandidates
+- **Imports**: @/ui/idleVillage/ActivityArea, @/ui/idleVillage/components/InlineResidentChips
+
+### utility:ActivityLoopAnalyzer
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/analytics/ActivityLoopAnalyzer.tsx
+- **Exports**: ActivityLoopAnalyzer
+- **Imports**: ../hooks/useActivityLoopAnalytics, ../hooks/useActivityLoopAnalytics, ../utils/sandboxDiagnostics
+
+### utility:DropFeedbackHeatmap
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/analytics/DropFeedbackHeatmap.tsx
+- **Exports**: DropFeedbackHeatmap, default
+- **Imports**: ../hooks/useDropFeedbackHeatmap, ../utils/sandboxDiagnostics, ./dropFeedbackHeatmapHelpers
+
+### utility:useActivityAnalytics
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/analytics/useActivityAnalytics.ts
+- **Exports**: UseActivityAnalyticsReturn, UseActivityAnalyticsProps, useActivityAnalytics
+- **Imports**: ./IdleVillageActivityStore
+
+### utility:crewSchedulerConflictResolverCLI
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/cli/crewSchedulerConflictResolverCLI.ts
+- **Exports**: CLIOptions, CLIData, CLIResult, CLISummary, CrewSchedulerConflictResolverCLI
+- **Imports**: @/ui/idleVillage/hooks/useCrewScheduler, @/balancing/config/idleVillage/crewScheduler, @/balancing/utils/idleVillage/crewSchedulerConflictResolver, @/balancing/utils/idleVillage/crewSchedulerConflictDetection, @/balancing/utils/idleVillage/crewSchedulerResolutionStrategies...
+
+### utility:crewSchedulerExport
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/cli/crewSchedulerExport.ts
+- **Exports**: AssignmentEvent, CrewSchedulerExport, ExportConfig, DEFAULT_EXPORT_CONFIG, CrewSchedulerExportEngine, CrewSchedulerCLI
+- **Imports**: @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, @/balancing/config/idleVillage/crewScheduler
+
+### component:ActionDetailHarness
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/ActionDetailHarness.tsx
+- **Exports**: ActionDetailHarnessProps, default
+- **Imports**: @/ui/idleVillage/map/actionCards/JobActionCard, @/ui/idleVillage/constants
+
+### component:ActiveHUD
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/ActiveHUD.tsx
+- **Exports**: ActiveHUDVariant, ActiveHUDProps, default
+- **Imports**: @/ui/idleVillage/types/ActivitySlotData, @/ui/idleVillage/hooks/useActivityScheduler, @/ui/idleVillage/hooks/useActiveHUDState, @/ui/idleVillage/hooks/useActivityTelemetry, @/ui/idleVillage/hooks/useActiveHUDTelemetry...
+
+### component:ActivityActionCard
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/ActivityActionCard.tsx
+- **Exports**: ActivityActionCardVariant, ActivityActionCardProps, default
+- **Imports**: @/ui/idleVillage/legacy/VerbCard, @/ui/idleVillage/components/ActivitySlot, @/ui/idleVillage/constants
+
+### component:ActivityCardDetail
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/ActivityCardDetail.tsx
+- **Exports**: MetricTone, ActivityCardMetric, ActivityCardDetailProps, default
+- **Imports**: @/balancing/config/idleVillage/types, @/ui/idleVillage/types/VerbDetailPreview, @/hooks/useThemeSwitcher, @/ui/idleVillage/components/ResidentSlotRack, @/ui/idleVillage/slots/types...
+
+### component:AncillaryPanels
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/AncillaryPanels.tsx
+- **Exports**: AncillarySlotEntry, AncillaryPanelsProps, AncillaryPanels, default
+- **Imports**: @/ui/idleVillage/utils/sandboxDiagnostics, @/ui/idleVillage/types/ActivitySlotData, @/ui/idleVillage/hooks/useActivityScheduler, @/ui/idleVillage/selectors/useHudSelectors, ./ResourcePanel...
+
+### component:AssignmentDiffSummary
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/AssignmentDiffSummary.tsx
+- **Exports**: AssignmentDiffSummaryProps, AssignmentDiffSummary, CompactDiffSummaryProps, CompactDiffSummary, DiffSummaryListProps, DiffSummaryList
+- **Imports**: ../utils/sandboxDiagnostics
+
+### component:AssignmentTimeline
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/AssignmentTimeline.tsx
+- **Exports**: AssignmentTimelineProps, AssignmentTimeline, CompactTimelineProps, CompactTimeline
+- **Imports**: ../utils/sandboxDiagnostics
+
+### component:BoutCard
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/BoutCard.tsx
+- **Exports**: BoutCardProps, default
+- **Imports**: @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/components/ActivityActionCard, @/ui/idleVillage/components/RiskStripe, @/ui/idleVillage/utils/riskMetrics...
+
+### component:CardDetail
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/CardDetail.tsx
+- **Exports**: CardDetailProps, CardDetail
+- **Imports**: @/ui/atoms/FantasyButton, @/ui/idleVillage/hooks/useActionDetailHarness, @/ui/idleVillage/constants, @/balancing/config/idleVillage/types, @/ui/idleVillage/types/ActivitySlotData...
+
+### component:CrewQuickControls
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/CrewQuickControls.tsx
+- **Exports**: CrewQuickControlsProps, CrewQuickControls, default
+- **Imports**: ../utils/sandboxDiagnostics
+
+### component:CrewSchedulerDebugPanel
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/CrewSchedulerDebugPanel.tsx
+- **Exports**: CrewSchedulerDebugPanelProps, CrewSchedulerDebugPanel
+- **Imports**: ../hooks/useCrewSchedulerDebug, ../hooks/useCrewScheduler, @/balancing/config/idleVillage/crewScheduler, ../config/crewSchedulerDebugConfig, ../config/crewSchedulerDebugConfig
+
+### component:CrewSchedulerHUD
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/CrewSchedulerHUD.tsx
+- **Exports**: CrewSchedulerHUDProps, CrewSchedulerHUD, default
+- **Imports**: ../utils/sandboxDiagnostics
+
+### component:CrewSentimentPanel
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/CrewSentimentPanel.tsx
+- **Exports**: CrewSentimentPanel
+- **Imports**: ../hooks/useCrewSentimentDiff, ../utils/sandboxDiagnostics
+
+### component:DetailPanelCard
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/DetailPanelCard.tsx
+- **Exports**: ActivitySchedulerBridge, DetailPanelCardProps, DetailPanelCard, default
+- **Imports**: @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/components/ActivitySlot, @/ui/idleVillage/components/ActivityCardDetail...
+
+### component:DetailPanelStack
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/DetailPanelStack.tsx
+- **Exports**: DetailPanelContext, DetailPanelStackProps, DetailPanelStack, default
+- **Imports**: @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/types/ActivitySlotData, @/ui/idleVillage/components/DetailPanelCard
+
+### component:DiagnosticsPanel
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/DiagnosticsPanel.tsx
+- **Exports**: DiagnosticsPanel, default
+- **Imports**: ../utils/sandboxDiagnostics
+
+### component:DragPreviewInstrumentationPanel
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/DragPreviewInstrumentationPanel.tsx
+- **Exports**: DragPreviewInstrumentationPanel, default
+- **Imports**: @/analytics/idleVillageDragInstrumentation, @/ui/idleVillage/hooks/useDragPreviewInstrumentation, @/ui/idleVillage/config/dragPreviewInstrumentationConfig, @/ui/idleVillage/utils/sandboxDiagnostics
+
+### component:DragTestContainer
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/DragTestContainer.tsx
+- **Exports**: DragTestContainerProps, default
+- **Imports**: @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/residentName, ./PgCard, @/ui/idleVillage/constants, ./ResidentRosterTypes...
+
+### component:GymShiftCard
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/GymShiftCard.tsx
+- **Exports**: GymShiftCardProps, default
+- **Imports**: @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/components/ActivityActionCard
+
+### component:GymShiftHUD
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/GymShiftHUD.tsx
+- **Exports**: GymShiftHUDProps, default
+- **Imports**: @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/utils/sandboxDiagnostics
+
+### component:HeatmapChart
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/HeatmapChart.tsx
+- **Exports**: HeatmapChartProps, HeatmapChart, default
+- **Imports**: @/ui/idleVillage/utils/workerPickerTelemetry
+
+### component:IdleVillagePinballMonitor
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/IdleVillagePinballMonitor.tsx
+- **Exports**: IdleVillagePinballMonitorProps, IdleVillagePinballMonitor, default
+- **Imports**: @/ui/altVisuals/components/PinballMonitorPanel, @/ui/altVisuals/hooks/usePinballMonitor, @/ui/altVisuals/hooks/usePinballMonitor
+
+### component:InlineResidentChips
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/InlineResidentChips.tsx
+- **Exports**: ResidentPickerSlotMeta, ResidentAssignmentCandidate, ResidentAssignmentPickerProps, default
+- **Imports**: @/ui/idleVillage/types/compatibility
+
+### component:InteractionModeDiagnosticsDrawer
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/InteractionModeDiagnosticsDrawer.tsx
+- **Exports**: InteractionModeDiagnosticsDrawerProps, InteractionModeDiagnosticsDrawer, default
+- **Imports**: @/shared/persistence/PersistenceService
+
+### component:LocationCard
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/LocationCard.tsx
+- **Exports**: LocationFeaturedActivity, LocationCardProps, default
+- **Imports**: @/ui/idleVillage/components/ActivitySlot, @/assets/ui/idleVillage/panorama-hotspring.jpg, @/ui/idleVillage/utils/sandboxDiagnostics, @/ui/idleVillage/hooks/useLocationTooltip, @/ui/idleVillage/components/LocationTooltip...
+
+### component:LocationDeck
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/LocationDeck.tsx
+- **Exports**: LocationDeckProps, LocationDeck, default
+- **Imports**: @/balancing/config/idleVillage/minimalGameplayConfig, ../map/validators/locationDropValidators, ../map/validators/locationDropValidators, ../utils/sandboxDiagnostics, @/analytics/telemetry/telemetryProvider...
+
+### component:LocationDetail
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/LocationDetail.tsx
+- **Exports**: TheaterJobCardPreview, LocationDetailProps, TheaterRackSource, default
+- **Imports**: @/engine/quest/types, @/ui/idleVillage/verbSummaries, @/ui/idleVillage/components/ActivitySlot, @/ui/idleVillage/components/ActivityActionCard, @/ui/idleVillage/components/QuestBranchDiagram...
+
+### component:MapHeatmapOverlay
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/MapHeatmapOverlay.tsx
+- **Exports**: MapHeatmapOverlayProps, default
+- **Imports**: @/balancing/config/idleVillage/heatmapConfig
+
+### component:MapLocationSlot
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/MapLocationSlot.tsx
+- **Exports**: MapLocationSlotProps, default
+- **Imports**: @/balancing/config/idleVillage/types, @/ui/idleVillage/verbSummaries, @/ui/idleVillage/components/ActivitySlot, @/ui/idleVillage/constants
+
+### component:MapMiniCard
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/MapMiniCard.tsx
+- **Exports**: MapMiniCardProps, MapMiniCard, default
+- **Imports**: @/ui/idleVillage/components/ActivitySlotMiniCard, @/ui/idleVillage/config/mapMiniCardConfig
+
+### component:MapPerformanceProfiler
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/MapPerformanceProfiler.tsx
+- **Exports**: MapPerformanceProfilerProps, MapPerformanceProfiler, CompactMapPerformanceProfiler, FullScreenMapPerformanceProfiler, FloatingMapPerformanceProfiler, MinimalMapPerformanceProfiler, PerformanceMetricsDisplayProps, PerformanceMetricsDisplay, PerformanceRecommendationsDisplayProps, PerformanceRecommendationsDisplay, PerformanceStatisticsDisplayProps, PerformanceStatisticsDisplay, default
+- **Imports**: ../utils/sandboxDiagnostics, ../utils/mapPerformanceProfilerEngine, ./MapPerformanceProfilerHUD, ../hooks/useMapPerformanceProfiler
+
+### component:MapPerformanceProfilerHUD
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/MapPerformanceProfilerHUD.tsx
+- **Exports**: MapPerformanceProfilerHUDProps, MapPerformanceProfilerHUD, CompactMapPerformanceProfilerHUDProps, CompactMapPerformanceProfilerHUD, FloatingMapPerformanceProfilerHUDProps, FloatingMapPerformanceProfilerHUD
+- **Imports**: ../utils/sandboxDiagnostics
+
+### component:QuestDecisionHeatmap
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/QuestDecisionHeatmap.tsx
+- **Exports**: QuestDecisionHeatmapProps, QuestDecisionHeatmap, useQuestDecisionHeatmap, SimpleQuestDecisionHeatmapProps, SimpleQuestDecisionHeatmap
+- **Imports**: ../utils/sandboxDiagnostics, ../utils/questDecisionHeatmapEngine, ./QuestDecisionHeatmapLegend, ./QuestDecisionHeatmapTooltip, ./QuestDecisionHeatmapFilter
+
+### component:QuestDecisionHeatmapFilter
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/QuestDecisionHeatmapFilter.tsx
+- **Exports**: QuestDecisionFilterState, FilterPreset, QuestDecisionHeatmapFilterProps, QuestDecisionHeatmapFilter
+- **Imports**: ../utils/sandboxDiagnostics
+
+### component:QuestDecisionHeatmapLegend
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/QuestDecisionHeatmapLegend.tsx
+- **Exports**: QuestDecisionHeatmapLegendProps, QuestDecisionHeatmapLegend, CompactLegendProps, CompactLegend, FloatingLegendProps, FloatingLegend, LegendStatsProps, LegendStats
+- **Imports**: ../utils/sandboxDiagnostics
+
+### component:QuestDecisionHeatmapTooltip
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/QuestDecisionHeatmapTooltip.tsx
+- **Exports**: QuestDecisionHeatmapTooltipProps, QuestDecisionHeatmapTooltip, useQuestDecisionTooltip, SimpleTooltipProps, SimpleTooltip
+- **Imports**: ../utils/sandboxDiagnostics
+
+### component:QuestDetailLens
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/QuestDetailLens.tsx
+- **Exports**: QuestDetailLens, default
+- **Imports**: @/ui/idleVillage/hooks/useQuestLensState, ./QuestRiskDisplay, @/ui/idleVillage/components/types
+
+### component:QuestRiskBadge
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/QuestRiskBadge.tsx
+- **Exports**: QuestRiskBadgeProps, QuestRiskBadge, default
+- **Imports**: @/ui/idleVillage/utils/sandboxDiagnostics
+
+### component:QuestRiskDisplay
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/QuestRiskDisplay.tsx
+- **Exports**: QuestRiskDisplayProps, QuestRiskDisplay, default
+- **Imports**: @/balancing/config/idleVillage/riskDisplayConfig, @/ui/idleVillage/utils/sandboxDiagnostics
+
+### component:ResidentSlotRack
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/ResidentSlotRack.tsx
+- **Exports**: ResidentSlotRackLayout, ResidentSlotOverflow, ResidentSlotRackProps, ResidentSlotRack, ResidentSlotRackSkeleton, default
+- **Imports**: @/ui/idleVillage/components/ActivitySlot, @/ui/idleVillage/components/ActivitySlot, @/ui/idleVillage/slots/types, @/ui/idleVillage/residentName, @/ui/idleVillage/legacy/VerbCard...
+
+### component:RiskStripeCalibrationTool
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/RiskStripeCalibrationTool.tsx
+- **Exports**: RiskStripeCalibrationToolProps, RiskStripeCalibrationTool
+- **Imports**: @/ui/idleVillage/utils/sandboxDiagnostics
+
+### component:TheaterOverlay
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/TheaterOverlay.tsx
+- **Exports**: TheaterOverlayProps, default
+- **Imports**: @/ui/idleVillage/types/ActivitySlotData, @/ui/idleVillage/verbSummaries, @/ui/idleVillage/components/ActivitySlotMiniCard, @/ui/idleVillage/constants, @/assets/ui/idleVillage/panorama-hotspring.jpg
+
+### component:TrainingTracker
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/TrainingTracker.tsx
+- **Exports**: TrainingTrackerProps, default
+- **Imports**: @/engine/game/idleVillage/TimeEngine
+
+### component:VillageSandboxColumns
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/VillageSandboxColumns.tsx
+- **Exports**: VillageSandboxColumnsProps, default
+- **Imports**: @/ui/idleVillage/hooks/useResponsiveLayout
+
+### component:VillageSandboxHeader
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/VillageSandboxHeader.tsx
+- **Exports**: VillageSandboxHeaderProps, VillageSandboxHeader, default
+- **Imports**: ./SummaryStrip
+
+### component:WorkerPickerDiagnosticsPanel
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/WorkerPickerDiagnosticsPanel.tsx
+- **Exports**: default
+- **Imports**: ../utils/workerPickerTelemetry, ../utils/workerPickerTelemetry, ./HeatmapChart
+
+### component:WorkerPickerSheet
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/WorkerPickerSheet.tsx
+- **Exports**: WorkerPickerSheetProps, default
+- **Imports**: @/ui/idleVillage/utils/sandboxDiagnostics, @/ui/idleVillage/hooks/useSandboxInteractionMode
+
+### component:ActiveActivityHUD.test
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/__tests__/ActiveActivityHUD.test.tsx
+- **Exports**: none
+- **Imports**: @/ui/idleVillage/ActiveActivityHUD, @/ui/idleVillage/selectors/useHudSelectors, @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/verbSummaries, @/ui/idleVillage/theater/riskStripes
+
+### component:ActivityCardDetail.test
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/__tests__/ActivityCardDetail.test.tsx
+- **Exports**: none
+- **Imports**: @/balancing/config/idleVillage/types, @/ui/idleVillage/slots/useResidentSlotController, @/ui/idleVillage/components/ResidentSlotRack
+
+### component:DragTestContainer.test
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/__tests__/DragTestContainer.test.tsx
+- **Exports**: none
+- **Imports**: @/ui/idleVillage/config/dragConfig, @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/components/DragTestContainer, @/ui/idleVillage/components/DragTestContainer
+
+### component:DropTimelinePanel.test
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/__tests__/DropTimelinePanel.test.tsx
+- **Exports**: none
+- **Imports**: @/ui/idleVillage/components/DropTimelinePanel, @/analytics/idleVillageDropTimeline, @/ui/idleVillage/hooks/useDropTimelineData, @/ui/idleVillage/hooks/useDropTimelineData
+
+### component:LocationDetail.test
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/__tests__/LocationDetail.test.tsx
+- **Exports**: none
+- **Imports**: ../LocationDetail, @/ui/idleVillage/components/DragContext, @/ui/idleVillage/verbSummaries, @/ui/idleVillage/theater/riskStripes, ../ActivityActionCard
+
+### component:QuestRiskDisplay.test
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/__tests__/QuestRiskDisplay.test.tsx
+- **Exports**: none
+- **Imports**: @/ui/idleVillage/components/QuestRiskDisplay
+
+### component:VillageSandboxColumns.test
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/__tests__/VillageSandboxColumns.test.tsx
+- **Exports**: none
+- **Imports**: ../VillageSandboxColumns
+
+### component:VillageSandboxHeader.test
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/__tests__/VillageSandboxHeader.test.tsx
+- **Exports**: none
+- **Imports**: ../VillageSandboxHeader
+
+### component:WorkerPickerDiagnosticsPanel.test
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/__tests__/WorkerPickerDiagnosticsPanel.test.tsx
+- **Exports**: none
+- **Imports**: ../WorkerPickerDiagnosticsPanel, ../WorkerPickerSheet
+
+### component:WorkerPickerSheet.test
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/components/__tests__/WorkerPickerSheet.test.tsx
+- **Exports**: none
+- **Imports**: ../WorkerPickerSheet
+
+### config:crewSchedulerDebugConfig
+- **Type**: config
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/config/crewSchedulerDebugConfig.ts
+- **Exports**: RefreshRateSchema, RefreshRate, VisualizationModeSchema, VisualizationMode, ConflictSeveritySchema, ConflictSeverity, HeatmapColorSchemeSchema, HeatmapColorScheme, TimelineConfigSchema, TimelineConfig, MetricsConfigSchema, MetricsConfig, ConflictThresholdsSchema, ConflictThresholds, CrewSchedulerDebugConfigSchema, CrewSchedulerDebugConfig, DEFAULT_CREW_SCHEDULER_DEBUG_CONFIG, COMPACT_CREW_SCHEDULER_DEBUG_CONFIG, validateCrewSchedulerDebugConfig, REFRESH_RATE_INTERVALS, getRefreshInterval, determineConflictSeverity, getSeverityColor
+
+### config:crewSchedulerHUDConfig
+- **Type**: config
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/config/crewSchedulerHUDConfig.ts
+- **Exports**: CrewCardConfig, CrewQuickControlConfig, CrewTelemetryConfig, CrewHUDLayoutConfig, CrewHUDVisualConfig, CrewHUDPerformanceConfig, CrewSchedulerHUDConfig, DEFAULT_CREW_SCHEDULER_HUD_CONFIG, getCrewStatusColor, isQuickControlEnabled, sortCrewCards, filterCrewCards, createCrewCardConfig
+
+### config:interactionModeConfig
+- **Type**: config
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/config/interactionModeConfig.ts
+- **Exports**: InteractionMode, InteractionSource, InteractionModeKPI, InteractionModeEvent, InteractionModeConfig, DEFAULT_INTERACTION_MODE_CONFIG, createSafeInteractionModeConfig, isValidInteractionModeConfig, isValidInteractionModeKPI, isValidInteractionModeEvent, calculateKPIFromEvents, filterInteractionEvents, exportEventsToJSON, exportEventsToCSV, exportEventsToMarkdown
+
+### config:mapAssetRegistry
+- **Type**: config
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/config/mapAssetRegistry.ts
+- **Exports**: AssetSeverity, AssetType, AssetValidation, MapAssetConfig, MapAssetRegistry, DEFAULT_MAP_ASSET_REGISTRY, getAssetById, getAssetsByType, validateAssetConfig
+- **Imports**: @/ui/idleVillage/components/WorkerCard, @/ui/idleVillage/components/LocationCard
+
+### config:mapMiniCardConfig
+- **Type**: config
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/config/mapMiniCardConfig.ts
+- **Exports**: MapMiniCardLayout, MapMiniCardConfig, DEFAULT_MAP_MINI_CARD_CONFIG, getMapMiniCardLayout, getMapMiniCardActivityTypes, hasMapMiniCardLayout
+- **Imports**: @/ui/idleVillage/legacy/VerbCard, @/ui/idleVillage/components/ActivitySlotMiniCard
+
+### config:mapPerformanceProfilerConfig
+- **Type**: config
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/config/mapPerformanceProfilerConfig.ts
+- **Exports**: PerformanceThreshold, PerformanceMetrics, FramePerformanceEntry, PerformanceStatistics, PerformanceRecommendation, VisualizationConfig, HUDConfig, ExportConfig, MonitoringConfig, AnalysisConfig, MapPerformanceProfilerConfig, DEFAULT_PERFORMANCE_THRESHOLDS, DEFAULT_MAP_PERFORMANCE_PROFILER_CONFIG, generatePerformanceId, getPerformanceThreshold, getPerformanceSeverity, isOptimal, isAcceptable, requiresAttention, formatPerformanceValue, formatTimestamp, calculatePerformanceScore, generateRecommendations, validateProfilerConfig
+- **Imports**: ../utils/sandboxDiagnostics
+
+### config:questDecisionHeatmapConfig
+- **Type**: config
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/config/questDecisionHeatmapConfig.ts
+- **Exports**: QuestCoordinates, QuestDecisionData, HeatmapCell, ColorScheme, LegendConfig, TooltipConfig, FilterConfig, RenderingConfig, InteractionConfig, AnimationConfig, PerformanceConfig, QuestDecisionHeatmapConfig, DEFAULT_COLOR_SCHEMES, DEFAULT_QUEST_DECISION_HEATMAP_CONFIG, generateQuestDecisionId, calculateDistance, isWithinBounds, getDecisionTypeColor, getPriorityWeight, calculateIntensity, getDominantDecisionType, getDominantCategory, calculateSuccessRate, formatTimestamp, validateQuestDecisionData, aggregateDecisionsByTime, validateHeatmapConfig
+- **Imports**: ../utils/sandboxDiagnostics
+
+### utility:CrewSchedulerController
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/controllers/CrewSchedulerController.ts
+- **Exports**: CrewSchedulerController, createCrewSchedulerController, createDefaultCrewSchedulerController, validateSchedulingPrerequisites, shouldRebalanceQueue, getSchedulingRecommendations
+- **Imports**: @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, @/balancing/config/idleVillage/crewScheduler
+
+### utility:CrewSchedulerExporter
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/controllers/CrewSchedulerExporter.ts
+- **Exports**: ExportOptions, SchedulerExport, AssignmentTimelineEntry, RejectionEntry, ExportAssignmentFactors, ExportStatistics, ExportTelemetry, CrewSchedulerExporter, createCrewSchedulerExporter
+- **Imports**: ../utils/sandboxDiagnostics, @/shared/persistence/PersistenceService, ../hooks/useCrewScheduler, @/balancing/config/idleVillage/crewScheduler, @/engine/game/idleVillage/TimeEngine...
+
+### utility:PortraitDebugPage
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/debug/PortraitDebugPage.tsx
+- **Exports**: PortraitDebugPage, default
+- **Imports**: @/ui/idleVillage/components/DragContext, @/ui/idleVillage/hooks/useVillageSandbox, @/ui/idleVillage/components/DragTestContainer, @/ui/idleVillage/components/PgCard, @/engine/idle/characterStorage...
+
+### utility:dragDiagnosticsConfig
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/diagnostics/dragDiagnosticsConfig.ts
+- **Exports**: DragScenarioTypeSchema, DragScenarioType, DragScenarioSchema, DragScenario, DragDiagnosticsExecutionSchema, DragDiagnosticsExecution, DragDiagnosticsOutputSchema, DragDiagnosticsOutput, DragDiagnosticsTelemetrySchema, DragDiagnosticsTelemetry, DragDiagnosticsConfigSchema, DragDiagnosticsConfig, DEFAULT_DRAG_DIAGNOSTICS_CONFIG, DRAG_DIAGNOSTICS_PRESETS, DragDiagnosticsPreset
+
+### utility:MapMiniCardsExample
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/examples/MapMiniCardsExample.tsx
+- **Exports**: MapMiniCardsExample, MAP_LAYOUT_ASCII, default
+- **Imports**: @/ui/idleVillage/components/MapMiniCard, @/ui/idleVillage/hooks/useMapMiniCards, @/ui/idleVillage/config/mapMiniCardConfig
+
+### hook:useSandboxClock.test
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/__tests__/useSandboxClock.test.ts
+- **Exports**: none
+- **Imports**: ../useSandboxClock, @/balancing/config/idleVillage/defaultConfig, @/engine/game/idleVillage/TimeEngine, @/balancing/config/idleVillage/types
+
+### hook:useSandboxDragController.test
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/__tests__/useSandboxDragController.test.ts
+- **Exports**: none
+- **Imports**: ../useSandboxDragController, @/engine/game/idleVillage/TimeEngine, @/balancing/config/idleVillage/types, @/ui/idleVillage/types/ActivitySlotData, ../useActivityScheduler
+
+### hook:useActionDetailHarness
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useActionDetailHarness.ts
+- **Exports**: ActionDetailHarnessViewModel, useActionDetailHarness
+- **Imports**: @/ui/idleVillage/constants, ./useSandboxDragController
+
+### hook:useActivityLoopAnalytics
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useActivityLoopAnalytics.ts
+- **Exports**: useActivityLoopAnalytics
+- **Imports**: ../utils/sandboxDiagnostics, ../../../shared/persistence/PersistenceService
+
+### hook:useActivityScheduler
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useActivityScheduler.ts
+- **Exports**: ScheduledActivityState, ActivityResolutionResult, AssignmentDiagnostics, SchedulerTelemetryEvent, UseActivitySchedulerProps, useActivityScheduler, UseActivitySchedulerReturn
+- **Imports**: @/balancing/config/idleVillage/types, @/engine/game/idleVillage/InjuryEngine, @/engine/game/idleVillage/TimeEngine, @/engine/game/idleVillage/IdleVillageEngine, @/engine/game/idleVillage/JobResolver...
+
+### hook:useAssignmentUndo
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useAssignmentUndo.ts
+- **Exports**: UseAssignmentUndoProps, UseAssignmentUndoReturn, useAssignmentUndo, useAssignmentState
+- **Imports**: ../utils/sandboxDiagnostics, ../utils/assignmentUndoEngine, ../utils/assignmentKeyboardShortcuts
+
+### hook:useCrewFatigueData
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useCrewFatigueData.ts
+- **Exports**: CrewFatigueData, FatigueDashboardSummary, UseCrewFatigueDataOptions, UseCrewFatigueDataReturn, useCrewFatigueData, default
+- **Imports**: @/engine/game/idleVillage/TimeEngine, @/engine/game/idleVillage/TimeEngine, ../utils/sandboxDiagnostics, @/shared/persistence/PersistenceService
+
+### hook:useCrewHUDState
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useCrewHUDState.ts
+- **Exports**: CrewHUDEntry, CrewHUDMetrics, UseCrewHUDStateReturn, UseCrewHUDStateOptions, useCrewHUDState, default
+- **Imports**: @/engine/game/idleVillage/TimeEngine, ../controllers/CrewSchedulerController, ../utils/sandboxDiagnostics, @/shared/persistence/PersistenceService
+
+### hook:useCrewScheduler
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useCrewScheduler.ts
+- **Exports**: AssignmentFactors, QueuedAssignment, SchedulingDecision, UseCrewSchedulerOptions, useCrewScheduler, UseCrewSchedulerReturn
+- **Imports**: @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, ../utils/sandboxDiagnostics, @/balancing/config/idleVillage/crewSchedulerDeterminismGuard, @/shared/persistence/PersistenceService...
+
+### hook:useCrewSchedulerHUD
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useCrewSchedulerHUD.ts
+- **Exports**: UseCrewSchedulerHUDOptions, UseCrewSchedulerHUDReturn, useCrewSchedulerHUD, default
+- **Imports**: ../utils/sandboxDiagnostics, ../utils/crewSchedulerTelemetry, @/engine/game/idleVillage/TimeEngine, @/balancing/config/idleVillage/types
+
+### hook:useCrewSentimentDiff
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useCrewSentimentDiff.ts
+- **Exports**: useCrewSentimentDiff
+- **Imports**: ../utils/sandboxDiagnostics, ../../../shared/persistence/PersistenceService
+
+### hook:useDragErrorRecovery
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useDragErrorRecovery.ts
+- **Exports**: DragDropErrorCode, DragErrorSource, DragErrorEvent, ActiveDragError, DragErrorRecoveryState, DragErrorRecoveryActionContext, UseDragErrorRecoveryHook, useDragErrorRecovery
+- **Imports**: @/shared/persistence/PersistenceService, @/ui/idleVillage/utils/sandboxDiagnostics, @/analytics/idleVillageDragErrorRecovery
+
+### hook:useDragPreviewInstrumentation
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useDragPreviewInstrumentation.ts
+- **Exports**: DragPreviewInstrumentationState, UseDragPreviewInstrumentationOptions, DragPreviewMeasurementContext, DragPreviewMeasurementResult, UseDragPreviewInstrumentationHook, useDragPreviewInstrumentation
+- **Imports**: @/shared/persistence/PersistenceService, @/analytics/idleVillageDragInstrumentation, @/ui/idleVillage/config/dragPreviewInstrumentationConfig, @/shared/config/featureFlags, @/ui/idleVillage/utils/sandboxDiagnostics
+
+### hook:useDropAISuggestions
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useDropAISuggestions.ts
+- **Exports**: UseDropAISuggestionsParams, UseDropAISuggestionsReturn, useDropAISuggestions, useDropAISuggestionsWithDragDrop, useDropAISuggestionAnalytics
+- **Imports**: @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/utils/sandboxDiagnostics, @/ui/idleVillage/ai/dropSuggestionEngine
+
+### hook:useDropFeedback
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useDropFeedback.ts
+- **Exports**: UseDropFeedbackParams, UseDropFeedbackReturn, DropFeedbackVisuals, DropFeedbackResult, DropFeedbackState, useDropFeedback, createFeedbackStyles, shouldShowFeedback
+- **Imports**: @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/hooks/useResidentDropValidation, @/ui/idleVillage/utils/sandboxDiagnostics
+
+### hook:useFatiguePredictor
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useFatiguePredictor.ts
+- **Exports**: UseFatiguePredictorParams, UseFatiguePredictorReturn, useFatiguePredictor
+- **Imports**: @/balancing/idleVillage/FatiguePredictor, @/balancing/idleVillage/FatiguePredictor, @/engine/game/idleVillage/TimeEngine, @/balancing/config/idleVillage/types, @/shared/persistence/PersistenceService...
+
+### hook:useInteractionModeAccessibility
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useInteractionModeAccessibility.ts
+- **Exports**: DropStatusType, AccessibilityAnnouncement, InteractionModeAccessibilityConfig, DEFAULT_ACCESSIBILITY_CONFIG, useInteractionModeAccessibility, useInteractionModeA11y
+- **Imports**: @/ui/idleVillage/utils/workerPickerTelemetry
+
+### hook:useLocationTooltip
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useLocationTooltip.ts
+- **Exports**: LocationTooltipData, TooltipPosition, UseLocationTooltipReturn, useLocationTooltip, useLocationTooltipData
+- **Imports**: @/ui/idleVillage/components/LocationCard
+
+### hook:useMaintenanceForecast
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useMaintenanceForecast.ts
+- **Exports**: UseMaintenanceForecastOptions, UseMaintenanceForecastReturn, useMaintenanceForecast
+- **Imports**: @/balancing/config/idleVillage/maintenanceForecastConfig, ./useMaintenanceInsights, @/shared/persistence/PersistenceService, ../utils/sandboxDiagnostics
+
+### hook:useMaintenanceInsights
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useMaintenanceInsights.ts
+- **Exports**: MaintenanceCategory, ResourceMetrics, EfficiencyMetrics, InsightSeverity, MaintenanceInsight, MaintenanceOptimizerConfig, MaintenanceInsightsState, DEFAULT_MAINTENANCE_CONFIG, useMaintenanceInsights
+- **Imports**: @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, ../utils/sandboxDiagnostics, ./useCrewScheduler, ../utils/activityTelemetry
+
+### hook:useMaintenanceTaskForecaster
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useMaintenanceTaskForecaster.ts
+- **Exports**: UseMaintenanceTaskForecasterConfig, UseMaintenanceTaskForecasterReturn, useMaintenanceTaskForecaster, useMaintenanceTaskTrends, useTaskSchedulingConflicts
+- **Imports**: @/balancing/config/idleVillage/configLoader, @/shared/persistence/PersistenceService, @/ui/idleVillage/utils/sandboxDiagnostics, @/engine/game/idleVillage/TimeEngine
+
+### hook:useMapContext.test
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useMapContext.test.ts
+- **Exports**: none
+- **Imports**: @/ui/idleVillage/components/DragContextStore, ./useMapContext, ./useVillageSandbox, ./useActivityScheduler, ./useVillageShellContext...
+
+### hook:useMapContext
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useMapContext.ts
+- **Exports**: useMapContext
+- **Imports**: ./useSandboxDemoPanel, @/ui/idleVillage/components/DragContextStore, @/ui/idleVillage/types/ActivitySlotData, @/ui/idleVillage/hooks/useSandboxClock, ./useTheaterController...
+
+### hook:useMapMiniCards
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useMapMiniCards.ts
+- **Exports**: MapActivityData, UseMapMiniCardsReturn, UseMapMiniCardsOptions, useMapMiniCards
+- **Imports**: @/ui/idleVillage/components/ActivitySlotMiniCard, @/ui/idleVillage/config/mapMiniCardConfig
+
+### hook:useMapPerformanceProfiler
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useMapPerformanceProfiler.ts
+- **Exports**: UseMapPerformanceProfilerReturn, useMapPerformanceProfiler, useMapPerformanceProfilerHUD, usePerformanceAlerts, usePerformanceExport, usePerformanceAnalysis
+- **Imports**: ../utils/sandboxDiagnostics, ../utils/mapPerformanceProfilerEngine, ../utils/mapPerformanceProfilerExporter
+
+### hook:useMinimalActivitySlots
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useMinimalActivitySlots.ts
+- **Exports**: MinimalActivitySlotMetadata, MinimalActivitySlotProps, UseMinimalActivitySlotsResult, UseMinimalActivitySlotsWithStateOptions, UseMinimalActivitySlotsWithStateResult, useMinimalActivitySlotsWithState, useMinimalActivitySlots
+- **Imports**: @/store/useMinimalGameplay, @/ui/idleVillage/legacy/VerbCard, @/ui/idleVillage/config/residentDropRules, @/ui/idleVillage/components/ActivitySlot, @/ui/idleVillage/hooks/useDropFeedback...
+
+### hook:useMultiVillageMonitor
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useMultiVillageMonitor.ts
+- **Exports**: UseMultiVillageMonitorConfig, UseMultiVillageMonitorReturn, useMultiVillageMonitor, useSingleVillageMonitor, useAlertTrends
+- **Imports**: ../utils/sandboxDiagnostics
+
+### hook:useQuestChronicle
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useQuestChronicle.ts
+- **Exports**: QuestChronicleViewModel, UseQuestChronicleParams, useQuestChronicle
+- **Imports**: @/ui/idleVillage/components/QuestChronicle, @/ui/idleVillage/questChronicleHelpers
+
+### hook:useQuestChronicleBridge
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useQuestChronicleBridge.ts
+- **Exports**: QuestChronicleBridgeData, UseQuestChronicleBridgeParams, useQuestChronicleBridge
+- **Imports**: @/engine/quest/types, @/ui/idleVillage/components/QuestChronicle, @/ui/idleVillage/questChronicleHelpers
+
+### hook:useQuestDecisionTelemetry
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useQuestDecisionTelemetry.ts
+- **Exports**: UseQuestDecisionTelemetryReturn, SimpleDecisionParams, useQuestDecisionTelemetry, useQuestDecisionAnalytics, useQuestDecisionAlerts
+- **Imports**: @/ui/idleVillage/utils/sandboxDiagnostics
+
+### hook:useResidentDropValidation
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useResidentDropValidation.ts
+- **Exports**: UseResidentDropValidationParams, UseResidentDropValidationReturn, useResidentDropValidation
+- **Imports**: @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/utils/sandboxDiagnostics, @/analytics/telemetry/telemetryProvider, @/ui/idleVillage/config/residentDropRules...
+
+### hook:useResidentUndo
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useResidentUndo.ts
+- **Exports**: UndoAction, UndoStackState, UseResidentUndoReturn, useResidentUndo, default
+- **Imports**: ../utils/sandboxDiagnostics, @/shared/persistence/PersistenceService
+
+### hook:useRiskCalibration
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useRiskCalibration.ts
+- **Exports**: RiskCalibrationState, UseRiskCalibrationOptions, UseRiskCalibrationReturn, useRiskCalibration
+- **Imports**: @/ui/idleVillage/config/riskCalibrationConfig, @/ui/idleVillage/config/riskCalibrationConfig, @/shared/persistence/PersistenceService, @/ui/idleVillage/utils/sandboxDiagnostics
+
+### hook:useSandboxClock
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useSandboxClock.ts
+- **Exports**: UseSandboxClockOptions, SandboxClockState, useSandboxClock
+- **Imports**: @/balancing/config/idleVillage/types, @/engine/game/idleVillage/characterImport, @/ui/idleVillage/map/ticker/cycleMath, @/ui/idleVillage/hooks/useActivityScheduler, @/ui/idleVillage/legacy/VerbCard
+
+### hook:useSandboxCore
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useSandboxCore.ts
+- **Exports**: UseSandboxCoreParams, UseSandboxCoreReturn, useSandboxCore
+- **Imports**: @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/types/ActivitySlotData, @/ui/idleVillage/hooks/useActivityScheduler, ./useSandboxDragController...
+
+### hook:useSandboxCoreActionDetail
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useSandboxCoreActionDetail.ts
+- **Exports**: UseSandboxCoreActionDetailParams, UseSandboxCoreActionDetailReturn, useSandboxCoreActionDetail
+- **Imports**: @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/hooks/useSandboxSlotModels, ./useActionDetailHarness, ./useSandboxDragController...
+
+### hook:useSandboxDemoPanel
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useSandboxDemoPanel.ts
+- **Exports**: DemoRequirement, DemoSlotEntry, ResidentSlotViewModel, ActivityCardMetric, DemoPanelState, useSandboxDemoPanel
+- **Imports**: @/shared/persistence/PersistenceService, @/balancing/config/idleVillage/types, @/ui/idleVillage/types/VerbDetailPreview, @/ui/idleVillage/components/ActivitySlot, @/engine/game/idleVillage/TimeEngine
+
+### hook:useSandboxDragController
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useSandboxDragController.ts
+- **Exports**: DropState, UseSandboxDragControllerReturn, useSandboxDragController
+- **Imports**: @/ui/idleVillage/types/ActivitySlotData, @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/residentName, ./useActivityScheduler, @/ui/idleVillage/utils/sandboxDiagnostics...
+
+### hook:useSandboxInteractionMode
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useSandboxInteractionMode.ts
+- **Exports**: InteractionMode, InteractionSource, CtaHighlightState, UseSandboxInteractionModeParams, UseSandboxInteractionModeReturn, useSandboxInteractionMode
+- **Imports**: @/ui/idleVillage/utils/sandboxDiagnostics, @/ui/idleVillage/utils/workerPickerTelemetry, ./useInteractionModeStore
+
+### hook:useSandboxResetController
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useSandboxResetController.ts
+- **Exports**: DemoPanelResetApi, UseSandboxResetControllerOptions, UseSandboxResetControllerReturn, useSandboxResetController
+- **Imports**: @/engine/game/idleVillage/TimeEngine, @/balancing/config/idleVillage/types, ./useSandboxSlotModels
+
+### hook:useSandboxSlotModels
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useSandboxSlotModels.ts
+- **Exports**: UseSandboxSlotModelsParams, SlotAssignments, UseSandboxSlotModelsResult, createEmptySlotAssignmentMap, useSandboxSlotModels
+- **Imports**: @/balancing/config/idleVillage/types, @/balancing/config/idleVillage/defaultConfig, @/ui/idleVillage/types/ActivitySlotData, @/ui/idleVillage/hooks/useActivityScheduler, @/ui/idleVillage/hooks/useActivityScheduler...
+
+### hook:useSandboxTouchOptimizer
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useSandboxTouchOptimizer.ts
+- **Exports**: TouchOptimizerConfigSchema, TouchOptimizerConfig, DEFAULT_TOUCH_OPTIMIZER_CONFIG, TouchOptimizationMetrics, TouchOptimizationState, TouchEventData, UseSandboxTouchOptimizerReturn, useSandboxTouchOptimizer
+- **Imports**: @/hooks/useMediaQuery, ./useSandboxInteractionMode, @/shared/persistence/PersistenceService
+
+### hook:useTerrainModifiers
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useTerrainModifiers.ts
+- **Exports**: TerrainModifierPreview, TerrainModifierPreviewLayer, UseTerrainModifiersOptions, UseTerrainModifiersReturn, useTerrainModifiers, default
+- **Imports**: @/balancing/config/idleVillage/types, @/ui/idleVillage/mapLayoutUtils, @/shared/persistence/PersistenceService, @/ui/idleVillage/utils/sandboxDiagnostics
+
+### hook:useTheaterController
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useTheaterController.ts
+- **Exports**: UseTheaterControllerParams, UseTheaterControllerResult, useTheaterController
+- **Imports**: @/balancing/config/idleVillage/types, @/ui/idleVillage/types/ActivitySlotData, @/balancing/config/idleVillage/theaterTimings, ../utils/sandboxDiagnostics
+
+### hook:useTheaterViewModels
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useTheaterViewModels.ts
+- **Exports**: UseTheaterViewModelsParams, UseTheaterViewModelsResult, deriveVerbTone, formatRewardLabel, buildSandboxQuestSummary, useTheaterViewModels
+- **Imports**: @/balancing/config/idleVillage/types, @/ui/idleVillage/types/ActivitySlotData, @/ui/idleVillage/verbSummaries, @/ui/idleVillage/components/ActivitySlot, @/ui/idleVillage/hooks/useActivityScheduler...
+
+### hook:useVillageSandbox
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/hooks/useVillageSandbox.ts
+- **Exports**: useVillageSandbox, UseVillageSandboxReturn
+- **Imports**: ./useMapContext
+
+### utility:IdleVillageActivitiesTab
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/legacy/IdleVillageActivitiesTab.tsx
+- **Exports**: default
+- **Imports**: @/balancing/hooks/useIdleVillageConfig, @/assets/ui/idleVillage/idle-village-map.jpg, @/ui/idleVillage/mapLayoutUtils, @/ui/idleVillage/components/ActivityResourceRateEditor
+
+### utility:IdleVillageMapPage
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/legacy/IdleVillageMapPage.tsx
+- **Exports**: default
+- **Imports**: @/assets/ui/idleVillage/idle-village-map.jpg, @/ui/idleVillage/mapLayoutUtils, @/balancing/hooks/useIdleVillageConfig, @/engine/game/idleVillage/statMatching, @/engine/game/idleVillage/IdleVillageEngine...
+
+### utility:QuestChronicleSandbox
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/legacy/QuestChronicleSandbox.tsx
+- **Exports**: default
+- **Imports**: @/ui/idleVillage/components/QuestChronicle, @/ui/idleVillage/legacy/VerbCard, @/ui/idleVillage/components/CombatCardDetail, @/balancing/hooks/useIdleVillageConfig, @/balancing/config/idleVillage/types
+
+### utility:ResidentRoster
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/legacy/ResidentRoster.tsx
+- **Exports**: default
+- **Imports**: @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/components/PgCard, @/ui/idleVillage/residentName
+
+### utility:StyleLabMapPage
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/legacy/StyleLabMapPage.tsx
+- **Exports**: MapPage, default
+- **Imports**: @/ui/idleVillage/slots/useResidentSlotController, @/ui/styleLab/StyleLaboratoryPanel, @/ui/idleVillage/components/DragContext, @/ui/idleVillage/hooks/useVillageSandbox, @/ui/idleVillage/map/actionCards/DayNightActionCard...
+
+### utility:VerbDetailCard
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/legacy/VerbDetailCard.tsx
+- **Exports**: VerbDetailAssignment, VerbSlotState, VerbDetailPreview, VerbDetailCardProps, default
+- **Imports**: @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/components/ActivitySlot, @/ui/idleVillage/components/ResidentSlotRack, @/ui/idleVillage/slots/types
+
+### utility:MapPage.test
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/map/MapPage.test.tsx
+- **Exports**: none
+- **Imports**: ./components/ResourcePanel, ./actionCards/DayNightActionCard, ./MapPage
+
+### utility:MapPage
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/map/MapPage.tsx
+- **Exports**: MapPage, default
+- **Imports**: @/ui/styleLab/StyleLaboratoryPanel, @/ui/idleVillage/components/DragContext, @/ui/idleVillage/hooks/useMapContext, @/ui/idleVillage/hooks/useSandboxDragController, @/ui/idleVillage/hooks/useQuestChronicle...
+
+### component:PgCard.test
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/map/components/PgCard.test.tsx
+- **Exports**: none
+- **Imports**: ./PgCard, @/engine/game/idleVillage/TimeEngine
+
+### component:PgCardDebugPanel
+- **Type**: component
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/map/components/PgCardDebugPanel.tsx
+- **Exports**: PgCardDebugPanel
+- **Imports**: @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/components/DragContextStore, @/ui/idleVillage/components/PgCard, @/engine/game/idleVillage/residentVisualResolver, @/ui/idleVillage/residentName...
+
+### utility:mapSelectors
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/map/mapSelectors.ts
+- **Exports**: ActivityStateResolver, ResolveFeaturedActivityParams, resolveFeaturedActivity
+- **Imports**: @/balancing/config/idleVillage/defaultConfig, @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/hooks/useActivityScheduler, @/ui/idleVillage/hooks/useTheaterViewModels...
+
+### utility:questChronicleHelpers
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/questChronicleHelpers.ts
+- **Exports**: findQuestBlueprintForActivity, buildQuestChroniclePhases, createInitialQuestState, applyPhaseResult, revertPhase
+- **Imports**: @/ui/idleVillage/components/QuestChronicle
+
+### utility:multiVillageSchedulerMonitor
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/services/multiVillageSchedulerMonitor.ts
+- **Exports**: VillageEnvironment, SchedulerKPIs, MultiVillageMonitorConfig, MonitorAlert, ComparativeAnalysis, DEFAULT_MULTI_VILLAGE_MONITOR_CONFIG, MultiVillageSchedulerMonitor
+- **Imports**: @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, @/balancing/config/idleVillage/crewScheduler
+
+### utility:ResidentSlotRack.test
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/slots/ResidentSlotRack.test.tsx
+- **Exports**: none
+- **Imports**: @/ui/idleVillage/components/ResidentSlotRack, @/ui/idleVillage/slots/types
+
+### utility:residentSlotDisplay
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/slots/residentSlotDisplay.ts
+- **Exports**: mapStatLabelToIcon, ResidentSlotDisplayResolver, resolveResidentRackDisplayInfo
+- **Imports**: @/ui/idleVillage/components/ResidentSlotRack, @/ui/idleVillage/slots/types
+
+### utility:residentSlotValidators
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/slots/residentSlotValidators.ts
+- **Exports**: AssignmentFailureReason, ValidationFailureDetails, ResidentValidatorContext, AssignmentValidationResult, validateResidentAssignment, computeDropStateForResident
+- **Imports**: @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, @/engine/game/idleVillage/statMatching, @/ui/idleVillage/components/ActivitySlot
+
+### utility:types
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/slots/types.ts
+- **Exports**: SlotBloomState, ResidentSlotStatus, ResidentSlotBlueprint, ResidentSlotWarning, SlotOverflowPolicy, ResidentSlotViewModel, ResidentSlotAssignResult, SlotProgressData, ResidentSlotControllerOptions, ResidentSlotControllerResult, ResidentSlotTelemetryPayload
+- **Imports**: @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/components/ActivitySlot, @/ui/idleVillage/hooks/useActivityScheduler, @/ui/idleVillage/slots/residentSlotValidators
+
+### utility:useResidentSlotController
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/slots/useResidentSlotController.ts
+- **Exports**: useResidentSlotController, createResidentSlotTelemetryPayload
+- **Imports**: @/balancing/config/idleVillage/types, @/ui/idleVillage/components/ActivitySlot, @/ui/idleVillage/hooks/useActivityScheduler
+
+### utility:activitySlotTelemetryMapper
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/telemetry/activitySlotTelemetryMapper.ts
+- **Exports**: ActivitySlotTelemetryEvent, ActivitySlotEventType, ActivitySlotContext, ActivitySlotEventPayload, DragStartPayload, DragCompletePayload, DragCancelPayload, ResidentAssignPayload, ResidentRemovePayload, AssignFailurePayload, SlotStateChangePayload, CapacityWarningPayload, SlotLockChangePayload, BatchStartPayload, BatchCompletePayload, ValidationCheckPayload, PerformanceMetricPayload, ActivitySlotTelemetryConfig, DEFAULT_ACTIVITY_SLOT_TELEMETRY_CONFIG, ActivitySlotTelemetryMapper, getActivitySlotTelemetryMapper, resetActivitySlotTelemetryMapper
+- **Imports**: @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/config/residentDropRules, @/ui/idleVillage/utils/sandboxDiagnostics
+
+### utility:createTelemetryStore
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/tests/testUtils/createTelemetryStore.ts
+- **Exports**: createTelemetryTestStore
+- **Imports**: @/ui/idleVillage/utils/workerPickerTelemetry
+
+### utility:IdleVillageToolsPage
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/tools/IdleVillageToolsPage.tsx
+- **Exports**: default
+- **Imports**: @/ui/idleVillage/components/DragContext, @/ui/idleVillage/hooks/useVillageShellContext, @/ui/idleVillage/tools/TerrainModifierTool, @/ui/idleVillage/tools/ResidentRelationshipGraph
+
+### utility:RiskStripeCalibrator
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/tools/RiskStripeCalibrator.tsx
+- **Exports**: RiskStripeCalibrator
+- **Imports**: @/ui/idleVillage/hooks/useRiskCalibration, @/ui/idleVillage/config/riskCalibrationConfig, @/ui/idleVillage/utils/sandboxDiagnostics
+
+### type:ActivitySlotData
+- **Type**: type
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/types/ActivitySlotData.ts
+- **Exports**: ActivitySlotData
+- **Imports**: @/balancing/config/idleVillage/types, @/ui/idleVillage/legacy/VerbCard
+
+### type:IdleVillageTestHooks
+- **Type**: type
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/types/IdleVillageTestHooks.ts
+- **Exports**: IdleVillageResourceSnapshot, ActionDetailHarnessState, DemoPanelHandlerName, ResidentRosterEntry, DemoPanelHandlerArgs, TradeRoutesSnapshot, ShellPresetDiagnostics, SchedulerTelemetryEvent, SandboxDropState, DropState, UseActionDetailHarnessProps, IdleVillageTestHooks
+- **Imports**: @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/state/VillageRegistry, @/ui/idleVillage/hooks/useVillageSandbox, @/balancing/config/idleVillage/types, @/ui/idleVillage/hooks/useActivityScheduler...
+
+### type:compatibility
+- **Type**: type
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/types/compatibility.ts
+- **Exports**: SlotCompatibilityReason, SlotCompatibilityDiagnosticsEntry
+- **Imports**: @/ui/idleVillage/slots/residentSlotValidators
+
+### utility:dropSuggestionTelemetryAuditor.test
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/utils/__tests__/dropSuggestionTelemetryAuditor.test.ts
+- **Exports**: none
+- **Imports**: @/ui/idleVillage/components/DropSuggestionTelemetryAuditorPanel
+
+### utility:workerPickerTelemetry.test
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/utils/__tests__/workerPickerTelemetry.test.ts
+- **Exports**: none
+- **Imports**: @/ui/idleVillage/tests/testUtils/createTelemetryStore
+
+### utility:assignmentKeyboardShortcuts
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/utils/assignmentKeyboardShortcuts.ts
+- **Exports**: KeyboardShortcutEvents, AssignmentKeyboardShortcuts, useAssignmentKeyboardShortcuts
+- **Imports**: ../utils/sandboxDiagnostics
+
+### utility:assignmentUndoEngine
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/utils/assignmentUndoEngine.ts
+- **Exports**: UndoEngineEvents, AssignmentUndoEngine
+- **Imports**: ../utils/sandboxDiagnostics, @/shared/persistence/PersistenceService
+
+### utility:crewSchedulerTelemetry
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/utils/crewSchedulerTelemetry.ts
+- **Exports**: CrewTelemetryEvent, CrewTelemetryMetrics, CrewTelemetryStorage, InMemoryCrewTelemetryStorage, CrewTelemetryManager, useCrewTelemetry
+- **Imports**: ../utils/sandboxDiagnostics
+
+### utility:dragDropTelemetry
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/utils/dragDropTelemetry.ts
+- **Exports**: DragDropEventType, ValidationRuleType, DragDropTelemetryPayload, DragDropTelemetryConfig, DEFAULT_DRAG_DROP_TELEMETRY_CONFIG, TEST_DRAG_DROP_TELEMETRY_CONFIG, useDragDropTelemetry, useDropValidationTelemetry, exportDragDropTelemetry
+- **Imports**: @/ui/idleVillage/utils/sandboxDiagnostics
+
+### utility:dropAITelemetry
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/utils/dropAITelemetry.ts
+- **Exports**: DropAITelemetryEventType, DropAITelemetryEvent, SuggestionsGeneratedEvent, SuggestionShownEvent, SuggestionClickedEvent, SuggestionAcceptedEvent, SuggestionRejectedEvent, AIPerformanceMetricsEvent, DropAITelemetryManager, useDropAITelemetry, DropAITelemetryUtils
+- **Imports**: @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/utils/sandboxDiagnostics
+
+### utility:dropFeedbackTelemetry
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/utils/dropFeedbackTelemetry.ts
+- **Exports**: DropFeedbackTelemetryPayload, useDropFeedbackTelemetry, DropFeedbackTelemetryEvent, useDropFeedbackTelemetrySubscription, createDropFeedbackTelemetryPayload, dispatchDropFeedbackTelemetry, default
+- **Imports**: @/ui/idleVillage/utils/sandboxDiagnostics
+
+### utility:dropValidationTelemetryCollector
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/utils/dropValidationTelemetryCollector.ts
+- **Exports**: UnifiedTelemetryEvent, TelemetrySession, AggregatedStats, DropValidationTelemetryCollector, dropValidationTelemetryCollector
+- **Imports**: @/balancing/config/idleVillage/types, @/engine/game/idleVillage/TimeEngine, @/ui/idleVillage/utils/sandboxDiagnostics, ./dropFeedbackTelemetry, ./dropAITelemetry
+
+### utility:interactionModeAccessibilityTelemetry
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/utils/interactionModeAccessibilityTelemetry.ts
+- **Exports**: AccessibilityTelemetryEventType, AccessibilityTelemetryEvent, AccessibilityAnnouncementEvent, DropStatusAnnouncedEvent, FocusChangedEvent, KeyboardNavigationEvent, TouchInteractionEvent, ScreenReaderDetectedEvent, HighContrastModeDetectedEvent, ReducedMotionDetectedEvent, AccessibilityFeatureUsedEvent, AccessibilityErrorEvent, InteractionModeAccessibilityTelemetryEvent, AccessibilityTelemetry, getAccessibilityTelemetry, resetAccessibilityTelemetry, accessibilityTelemetry, default
+- **Imports**: ./workerPickerTelemetry
+
+### utility:locationDropValidators
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/utils/locationDropValidators.ts
+- **Exports**: DropValidationResult, ValidateResidentDropParams, validateResidentDrop
+- **Imports**: @/engine/game/idleVillage/TimeEngine, @/balancing/config/idleVillage/types, ./workerPickerTelemetry
+
+### utility:mapPerformanceProfilerEngine
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/utils/mapPerformanceProfilerEngine.ts
+- **Exports**: ProfilerEngineEvents, FrameAnalysisResult, MapPerformanceProfilerEngine
+- **Imports**: ../utils/sandboxDiagnostics
+
+### utility:mapPerformanceProfilerExporter
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/utils/mapPerformanceProfilerExporter.ts
+- **Exports**: ExportOptions, ExportData, MapPerformanceProfilerExporter
+- **Imports**: ../utils/sandboxDiagnostics
+
+### utility:questDecisionHeatmapAggregator
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/utils/questDecisionHeatmapAggregator.ts
+- **Exports**: PerformanceMetrics, AggregatedDataPoint, Cluster, AggregationConfig, QuestDecisionHeatmapAggregator
+- **Imports**: ../utils/sandboxDiagnostics
+
+### utility:questDecisionHeatmapEngine
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/utils/questDecisionHeatmapEngine.ts
+- **Exports**: HeatmapEngineEvents, RenderingContext, ViewportState, SelectionState, QuestDecisionHeatmapEngine
+- **Imports**: ../utils/sandboxDiagnostics
+
+### utility:sandboxDiagnostics
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/utils/sandboxDiagnostics.ts
+- **Exports**: DiagnosticsChannelId, PickerDiagnosticsPayload, ValidatorDiagnosticsPayload, RiskDiagnosticsPayload, TheaterDiagnosticsPayload, DiagnosticLog, ChannelRegistry, DiagnosticsFilter, configureDiagnosticsChannels, getDiagnosticsChannelRegistry, subscribeToDiagnostics, getDiagnosticLogs, exportDiagnosticLogs, clearDiagnosticLogs, isSandboxDiagnosticsRuntimeEnabled, SandboxDiagnostics, createSandboxDiagnostics, createSandboxDiagnosticsChannel
+
+### utility:workerPickerTelemetry
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/idleVillage/utils/workerPickerTelemetry.ts
+- **Exports**: WorkerPickerTelemetryEvent, AssignmentInteractionEvent, WorkerPickerTelemetryMetrics, WorkerPickerTelemetryStore, recordWorkerPickerEvent, trackAssignmentLatencySample, trackPickerCloseSample, accumulateTapSamples, recordAssignmentInteractionEvent, getTelemetrySnapshot, AssignmentHeatmapData, AssignmentCounts, aggregateAssignmentHeatmap, ReplayAction, getReplayActions
+- **Imports**: @/ui/idleVillage/hooks/useSandboxInteractionMode, @/ui/idleVillage/utils/sandboxDiagnostics
+
+### utility:MoodboardPage
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/moodboard/MoodboardPage.tsx
+- **Exports**: MoodboardPage, default
+- **Imports**: @/ui/atoms/GlassButton, @/ui/idleVillage/components/WorkerCard, @/ui/idleVillage/components/ActivitySlot, @/ui/idleVillage/components/LocationCard, @/ui/idleVillage/legacy/VerbCard...
+
+### utility:SWVersionManager
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/pwa/SWVersionManager.ts
+- **Exports**: isServiceWorkerRuntimeEnabled, SWVersionInfo, SWUpdateStatus, SWCacheInfo, SWPerformanceMetrics, SW_VERSION_CONFIG, SWVersionManager, getSWVersionManager
+- **Imports**: @/ui/idleVillage/utils/sandboxDiagnostics
+
+### hook:usePWAColdStartTelemetry
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/pwa/hooks/usePWAColdStartTelemetry.ts
+- **Exports**: ColdStartMetrics, ColdStartTelemetryConfig, DEFAULT_COLD_START_CONFIG, usePWAColdStartTelemetry, ColdStartTelemetryUtils, default
+- **Imports**: @/ui/idleVillage/utils/sandboxDiagnostics
+
+### hook:usePWAInstallTracking
+- **Type**: hook
+- **File**: /Users/faustoboni/progetti personali/src/ui/pwa/hooks/usePWAInstallTracking.ts
+- **Exports**: PWAInstallEventType, PWAInstallEventData, PWAInstallTrackingConfig, DEFAULT_PWA_INSTALL_CONFIG, usePWAInstallTracking, PWAInstallTrackingUtils, default
+- **Imports**: @/ui/idleVillage/utils/sandboxDiagnostics
+
+### utility:useBootGuardDiagnostics
+- **Type**: utility
+- **File**: /Users/faustoboni/progetti personali/src/ui/shared/bootGuard/useBootGuardDiagnostics.ts
+- **Exports**: UseBootGuardDiagnosticsOptions, BootGuardDiagnostics, useBootGuardDiagnostics
+- **Imports**: @/analytics/devBootGuard
+
+## Dependency Graph
+
+utility:syncConflictResolver → utility:sandboxDiagnostics (import)
+component:PinballMonitorPanel → hook:usePinballMonitor (import)
+hook:usePinballMonitor → config:pinballMonitorConfig (import)
+hook:useStorageTelemetry → utility:balancerStorageTelemetry (import)
+hook:useStorageTelemetry → utility:sandboxDiagnostics (import)
+hook:useSynergyHeatmap → utility:sandboxDiagnostics (import)
+hook:useSynergyHeatmapEnhanced → utility:sandboxDiagnostics (import)
+utility:ActiveActivityHUD → component:ActivityActionCard (import)
+utility:ActivityArea → component:LocationCard (import)
+utility:ActivityArea → component:InlineResidentChips (import)
+utility:MinimalFeedbackPage → hook:useDropFeedback (import)
+utility:MinimalFeedbackPage → hook:useMinimalActivitySlots (import)
+utility:MinimalGameplayPage → hook:useMinimalActivitySlots (import)
+utility:MinimalGameplayPage → utility:telemetryProvider (import)
+utility:MinimalGameplayPage → hook:useDropFeedback (import)
+utility:MinimalIntegratedPage → hook:useDropFeedback (import)
+utility:TestRosterPage → component:ActionDetailHarness (import)
+utility:TestRosterPage → utility:telemetryProvider (import)
+utility:TestRosterPage → config:testHarnessConfig (import)
+utility:VillageSandbox.cycle.test → utility:VillageSandbox (import)
+utility:VillageSandbox.cycle.test → utility:mockVillageSandboxContext (import)
+utility:VillageSandbox.cycle.test → hook:useVillageSandbox (import)
+utility:VillageSandbox.reference → component:LocationCard (import)
+utility:VillageSandbox.reference → component:ActivityCardDetail (import)
+utility:VillageSandbox.reference → component:DragTestContainer (import)
+utility:VillageSandbox.reference → component:LocationDetail (import)
+utility:VillageSandbox.reference → component:ActiveHUD (import)
+utility:VillageSandbox.reference → component:VillageSandboxHeader (import)
+utility:VillageSandbox.reference → utility:useResidentSlotController (import)
+utility:VillageSandbox.reference → hook:useSandboxDemoPanel (import)
+utility:VillageSandbox → utility:useBootGuardDiagnostics (import)
+utility:VillageSandbox → component:TheaterOverlay (import)
+utility:VillageSandbox → hook:useVillageSandbox (import)
+utility:VillageSandbox → hook:useSandboxCore (import)
+utility:VillageSandbox → utility:ActivityArea (import)
+utility:VillageSandbox → component:AncillaryPanels (import)
+utility:VillageSandbox → component:VillageSandboxColumns (import)
+utility:VillageSandbox → component:ResidentSlotRack (import)
+utility:VillageSandbox → utility:types (import)
+utility:VillageSandbox → component:DetailPanelStack (import)
+utility:VillageSandbox → component:LocationCard (import)
+utility:VillageSandbox → utility:residentSlotDisplay (import)
+utility:VillageSandbox → component:ActionDetailHarness (import)
+utility:VillageSandbox → component:GymShiftHUD (import)
+utility:VillageSandbox → component:GymShiftCard (import)
+utility:VillageSandbox → component:BoutCard (import)
+utility:VillageSandbox → component:TrainingTracker (import)
+utility:VillageSandbox → utility:sandboxDiagnostics (import)
+utility:VillageSandbox → hook:useSandboxInteractionMode (import)
+utility:VillageSandbox → component:WorkerPickerSheet (import)
+
+... and 293 more dependencies

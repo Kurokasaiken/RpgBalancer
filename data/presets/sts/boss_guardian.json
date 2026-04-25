@@ -1,0 +1,84 @@
+{
+  "id": "boss-guardian",
+  "name": "Boss: Guardian",
+  "description": "Advanced preset for testing against Guardian boss with multi-hit attacks and block mechanics",
+  "tags": ["boss", "guardian", "advanced", "endgame"],
+  "difficulty": "hard",
+  "metadata": {
+    "author": "system",
+    "difficulty": "hard",
+    "estimatedWinRate": 0.45,
+    "recommendedForBeginners": false,
+    "notes": "Requires strong deck building and block management",
+    "usage": {
+      "loadCount": 0,
+      "saveCount": 1,
+      "lastUsed": null
+    }
+  },
+  "deck": {
+    "deckId": "ironclad",
+    "deckName": "Ironclad Boss Deck",
+    "cards": [
+      {"id": "strike-1", "name": "Strike", "cost": 1, "type": "attack", "quantity": 3, "upgraded": false, "tags": ["basic", "attack"]},
+      {"id": "defend-1", "name": "Defend", "cost": 1, "type": "skill", "quantity": 3, "upgraded": false, "tags": ["basic", "defend"]},
+      {"id": "iron_wave", "name": "Iron Wave", "cost": 1, "type": "attack", "quantity": 2, "upgraded": false, "tags": ["attack", "block"]},
+      {"id": "armaments", "name": "Armaments", "cost": 1, "type": "skill", "quantity": 1, "upgraded": false, "tags": ["skill"]},
+      {"id": "shrug_it_off", "name": "Shrug It Off", "cost": 1, "type": "skill", "quantity": 2, "upgraded": false, "tags": ["skill", "block"]},
+      {"id": "battle_hymn", "name": "Battle Hymn", "cost": 1, "type": "skill", "quantity": 1, "upgraded": false, "tags": ["skill", "power"]},
+      {"id": "flame_barrier", "name": "Flame Barrier", "cost": 2, "type": "skill", "quantity": 1, "upgraded": false, "tags": ["skill", "block", "retaliate"]},
+      {"id": "disarm", "name": "Disarm", "cost": 1, "type": "skill", "quantity": 1, "upgraded": false, "tags": ["skill", "weak"]}
+    ],
+    "ascension": 15,
+    "seed": 77777
+  },
+  "relics": {
+    "relics": ["anchor", "red_skull", "bottled_flame"],
+    "startingRelics": ["anchor"],
+    "relicPool": ["blood_vial", "anchor", "red_skull", "bottled_flame", "charms_anklet"]
+  },
+  "enemy": {
+    "id": "guardian",
+    "name": "Guardian",
+    "type": "boss",
+    "maxHp": 240,
+    "damage": {
+      "base": 12,
+      "variation": 6,
+      "count": 1,
+      "type": "normal"
+    },
+    "intents": [
+      {"id": "attack", "type": "attack", "priority": 1, "conditions": [], "actions": [{"type": "damage", "value": 18, "target": "player"}]},
+      {"id": "defend", "type": "defend", "priority": 2, "conditions": [], "actions": [{"type": "block", "value": 12, "target": "self"}]},
+      {"id": "mode_shift", "type": "buff", "priority": 3, "conditions": [], "actions": [{"type": "mode_shift", "target": "self"}]}
+    ],
+    "modifiers": {
+      "health": {"multiplier": 1.0, "offset": 0},
+      "damage": {"multiplier": 1.0, "offset": 0},
+      "special": {"stun_threshold": 50}
+    },
+    "ai": {
+      "pattern": "adaptive",
+      "weights": {"attack": 0.6, "defend": 0.3, "special": 0.1},
+      "difficulty": 4,
+      "learning": true
+    }
+  },
+  "simulation": {
+    "iterations": 2000,
+    "seed": 77777,
+    "maxTurns": 80,
+    "verbose": false,
+    "deterministic": true
+  },
+  "ui": {
+    "asciiPreview": "╔══════════════════════════════════════════════════════════════════╗\n║                    BOSS: GUARDIAN                                ║\n║                                                                      ║\n║  Deck: Ironclad Boss Deck (15 cards)                                 ║\n║  Enemy: Guardian (240 HP)                                            ║\n║  Ascension: 15                                                       ║\n║  Seed: 77777                                                         ║\n║                                                                      ║\n║  Test your deck against Guardian's mode shifts and heavy damage.    ║\n╚══════════════════════════════════════════════════════════════════╝",
+    "colorTheme": "boss",
+    "layout": "detailed"
+  },
+  "version": "1.0.0",
+  "createdAt": "2026-01-12T19:00:00.000Z",
+  "modifiedAt": "2026-01-12T19:00:00.000Z",
+  "isBuiltIn": true
+}

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storage-to-Resident Conversion Trace</title>
+    <style>
+        body { font-family: monospace; margin: 20px; background: #1a1a1a; color: #fff; }
+        .log { white-space: pre-wrap; }
+        .error { color: #ff6b6b; }
+        .success { color: #51cf66; }
+        .warning { color: #ffd43b; }
+        .step { color: #74c0fc; font-weight: bold; }
+        .divergence { color: #ff8787; font-weight: bold; }
+        .ok { color: #51cf66; }
+    </style>
+</head>
+<body>
+    <h1>Storage-to-Resident Conversion Trace</h1>
+    <button onclick="runTrace()">Run Trace</button>
+    <button onclick="clearStorage()">Clear Storage</button>
+    <button onclick="loadTestData()">Load Test Data</button>
+    <div id="output" class="log"></div>
+
+    <script>
+        const STORAGE_KEY = 'idle_combat_characters';
+        const FALLBACK_MAX_HP = 100;
+        const DEFAULT_STATS = { hp: 100, damage: 10, htk: 10 };
+
+        function log(message, className = '') {
+            const output = document.getElementById('output');
+            const div = document.createElement('div');
+            div.className = className;
+            div.textContent = message;
+            output.appendChild(div);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function readLocalSnapshot() {
+            log('\n=== STEP 1: readLocalSnapshot() ===', 'step');
+            
+            if (typeof localStorage === 'undefined') {
+                log('❌ localStorage not available, using fallback', 'error');
+                return [];
+            }
+            
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (!stored) {
+                log('❌ No stored data found', 'error');
+                return [];
+            }
+            
+            try {
+                const parsed = JSON.parse(stored);
+                log(`✅ Found ${parsed.length} characters in storage`, 'success');
+                
+                // Log each character's storage values
+                parsed.forEach((char, index) => {
+                    log(`  Character ${index + 1}: ${char.name}`);
+                    log(`    id: ${char.id}`);
+                    log(`    currentHp: ${char.currentHp}`);
+                    log(`    maxHp: ${char.maxHp}`);
+                    log(`    statBlock.hp: ${char.statBlock?.hp}`);
+                    log(`    portraitUrl: ${char.portraitUrl}`);
+                    log(`    statSnapshot.portraitUrl: ${char.statSnapshot?.portraitUrl}`);
+                });
+                
+                // Apply DEFAULT_STATS merge (from characterStorage.ts line 83-89)
+                const withDefaults = parsed.map((char) => ({
+                    ...char,
+                    statBlock: {
+                        ...DEFAULT_STATS,
+                        ...char.statBlock,
+                    },
+                }));
+                
+                log('\n📊 After DEFAULT_STATS merge:');
+                withDefaults.forEach((char, index) => {
+                    log(`  Character ${index + 1}: ${char.name}`);
+                    log(`    statBlock.hp: ${char.statBlock?.hp}`);
+                });
+                
+                return withDefaults;
+            } catch (error) {
+                log('❌ Storage corrupted: ' + error.message, 'error');
+                return [];
+            }
+        }
+
+        function savedCharacterToResident(character, options = {}) {
+            log(`\n=== STEP 2: savedCharacterToResident(${character.name}) ===`, 'step');
+            
+            const statBlock = character.statBlock ?? {};
+            const hpValue = typeof statBlock.hp === 'number' && Number.isFinite(statBlock.hp) ? statBlock.hp : FALLBACK_MAX_HP;
+            const defaultFatigue = typeof options.defaultFatigue === 'number' && Number.isFinite(options.defaultFatigue) ? options.defaultFatigue : 0;
+            
+            log(`  Input statBlock.hp: ${statBlock.hp}`);
+            log(`  Calculated hpValue: ${hpValue}`);
+            log(`  Input currentHp: ${character.currentHp}`);
+            log(`  Input maxHp: ${character.maxHp}`);
+            
+            const resolvedStatSnapshot = character.statSnapshot && Object.keys(character.statSnapshot).length > 0
+                ? { ...character.statSnapshot }
+                : { ...statBlock };
+            
+            const resolvedCurrentHp = typeof character.currentHp === 'number' && Number.isFinite(character.currentHp) ? character.currentHp : hpValue;
+            const resolvedMaxHp = typeof character.maxHp === 'number' && Number.isFinite(character.maxHp) ? character.maxHp : hpValue;
+            
+            log(`  Resolved currentHp: ${resolvedCurrentHp}`);
+            log(`  Resolved maxHp: ${resolvedMaxHp}`);
+            log(`  Resolved statSnapshot.hp: ${resolvedStatSnapshot.hp}`);
+            
+            const baseResident = {
+                id: character.id,
+                displayName: character.name,
+                status: character.status ?? 'available',
+                fatigue: defaultFatigue,
+                statProfileId: character.statProfileId ?? character.aiBehavior,
+                visualProfileId: character.visualProfileId,
+                portraitUrl: character.portraitUrl,
+                fullFigureUrl: character.fullFigureUrl,
+                portraitCrop: character.portraitCrop,
+                statTags: [], // simplified for trace
+                statSnapshot: resolvedStatSnapshot,
+                currentHp: resolvedCurrentHp,
+                maxHp: resolvedMaxHp,
+                isHero: character.isHero ?? false,
+                isInjured: character.isInjured ?? false,
+                injuryRecoveryTime: character.injuryRecoveryTime,
+                survivalCount: character.survivalCount ?? 0,
+                survivalScore: character.survivalScore ?? 0,
+            };
+            
+            log(`  Base resident portraitUrl: ${baseResident.portraitUrl}`);
+            log(`  Base resident statSnapshot.portraitUrl: ${baseResident.statSnapshot.portraitUrl}`);
+            
+            // Portrait resolution simulation
+            const resolvedPortrait = resolveResidentPortrait(baseResident);
+            
+            const finalResident = {
+                ...baseResident,
+                portraitUrl: resolvedPortrait.portraitUrl,
+                fullFigureUrl: baseResident.fullFigureUrl ?? resolvedPortrait.fullFigureUrl,
+                portraitCrop: baseResident.portraitCrop ?? resolvedPortrait.crop,
+            };
+            
+            log(`  Final resident portraitUrl: ${finalResident.portraitUrl}`);
+            log(`  Portrait source: ${resolvedPortrait.source}`);
+            
+            return finalResident;
+        }
+
+        function resolveResidentPortrait(resident) {
+            log(`\n=== STEP 3: resolveResidentPortrait(${resident.displayName}) ===`, 'step');
+            
+            const snapshot = (resident.statSnapshot ?? {});
+            const snapshotPortrait = typeof snapshot.portraitUrl === 'string' ? snapshot.portraitUrl : undefined;
+            
+            log(`  resident.portraitUrl: ${resident.portraitUrl}`);
+            log(`  statSnapshot.portraitUrl: ${snapshotPortrait}`);
+            
+            if (typeof resident.portraitUrl === 'string' && resident.portraitUrl.trim().length > 0) {
+                log(`  ✅ Using resident.portraitUrl (source: resident_override)`, 'success');
+                return {
+                    portraitUrl: resident.portraitUrl,
+                    source: 'resident_override',
+                };
+            }
+            
+            if (snapshotPortrait && snapshotPortrait.trim().length > 0) {
+                log(`  ✅ Using statSnapshot.portraitUrl (source: snapshot)`, 'success');
+                return {
+                    portraitUrl: snapshotPortrait,
+                    source: 'snapshot',
+                };
+            }
+            
+            log(`  ❌ Using fallback portrait (source: profile)`, 'warning');
+            return {
+                portraitUrl: '', // fallback would be generated
+                source: 'profile',
+            };
+        }
+
+        function loadResidentsFromCharacterManager(options = {}) {
+            log('\n=== STEP 4: loadResidentsFromCharacterManager() ===', 'step');
+            
+            const defaultFatigue = 20; // simplified
+            const characters = readLocalSnapshot();
+            
+            log(`  Converting ${characters.length} characters with defaultFatigue: ${defaultFatigue}`);
+            
+            return characters.map((character) => savedCharacterToResident(character, { defaultFatigue }));
+        }
+
+        function runTrace() {
+            document.getElementById('output').innerHTML = '';
+            log('🔍 STORAGE-TO-RESIDENT CONVERSION TRACE');
+            log('=====================================');
+            
+            // Get current storage values
+            log('\n📦 CURRENT STORAGE VALUES:');
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (!stored) {
+                log('❌ No data in storage', 'error');
+                return;
+            }
+            
+            const storageData = JSON.parse(stored);
+            storageData.forEach((char, index) => {
+                log(`\n${index + 1}. ${char.name}:`);
+                log(`   Storage currentHp: ${char.currentHp}`);
+                log(`   Storage maxHp: ${char.maxHp}`);
+                log(`   Storage statBlock.hp: ${char.statBlock?.hp}`);
+                log(`   Storage portraitUrl: ${char.portraitUrl}`);
+                log(`   Storage statSnapshot.portraitUrl: ${char.statSnapshot?.portraitUrl}`);
+            });
+            
+            // Run the conversion
+            log('\n🔄 CONVERSION PROCESS:');
+            const residents = loadResidentsFromCharacterManager();
+            
+            // Show final values
+            log('\n🎯 FINAL RESIDENT VALUES:');
+            residents.forEach((resident, index) => {
+                log(`\n${index + 1}. ${resident.displayName}:`);
+                log(`   Final currentHp: ${resident.currentHp}`);
+                log(`   Final maxHp: ${resident.maxHp}`);
+                log(`   Final statSnapshot.hp: ${resident.statSnapshot.hp}`);
+                log(`   Final portraitUrl: ${resident.portraitUrl}`);
+                log(`   Portrait source: ${resident.portraitSource || 'unknown'}`);
+            });
+            
+            // Identify divergences
+            log('\n🚨 DIVERGENCE ANALYSIS:', 'warning');
+            storageData.forEach((storageChar, index) => {
+                const resident = residents[index];
+                log(`\n${index + 1}. ${storageChar.name}:`);
+                
+                // HP divergence check
+                const storageHp = storageChar.currentHp ?? storageChar.statBlock?.hp ?? 100;
+                const finalHp = resident.currentHp;
+                
+                if (storageHp !== finalHp) {
+                    log(`   ❌ HP DIVERGENCE: ${storageHp} → ${finalHp}`, 'divergence');
+                } else {
+                    log(`   ✅ HP OK: ${storageHp}`, 'ok');
+                }
+                
+                // Portrait divergence check
+                const storagePortrait = storageChar.portraitUrl ?? storageChar.statSnapshot?.portraitUrl;
+                const finalPortrait = resident.portraitUrl;
+                
+                if (storagePortrait !== finalPortrait) {
+                    log(`   ❌ PORTRAIT DIVERGENCE: "${storagePortrait}" → "${finalPortrait}"`, 'divergence');
+                } else {
+                    log(`   ✅ PORTRAIT OK: "${storagePortrait}"`, 'ok');
+                }
+            });
+        }
+
+        function clearStorage() {
+            localStorage.removeItem(STORAGE_KEY);
+            log('Storage cleared', 'warning');
+        }
+
+        function loadTestData() {
+            const testData = [
+                {
+                    id: 'sir-spaccaculi',
+                    name: 'Sir Spaccaculi',
+                    currentHp: 200,
+                    maxHp: 200,
+                    statBlock: { hp: 200, damage: 25 },
+                    statSnapshot: { hp: 200, portraitUrl: '/assets/portraits/sir-spaccaculi.png' },
+                    portraitUrl: '/assets/portraits/sir-spaccaculi.png',
+                    status: 'available',
+                    aiBehavior: 'warrior'
+                },
+                {
+                    id: 'salvatrice',
+                    name: 'Salvatrice',
+                    currentHp: 150,
+                    maxHp: 150,
+                    statBlock: { hp: 150, damage: 20 },
+                    statSnapshot: { hp: 150, portraitUrl: '/assets/portraits/salvatrice.png' },
+                    portraitUrl: '/assets/portraits/salvatrice.png',
+                    status: 'available',
+                    aiBehavior: 'healer'
+                },
+                {
+                    id: 'giggiolillo',
+                    name: 'Giggiolillo',
+                    currentHp: 150,
+                    maxHp: 150,
+                    statBlock: { hp: 150, damage: 18 },
+                    statSnapshot: { hp: 150, portraitUrl: '/assets/portraits/giggiolillo.png' },
+                    portraitUrl: '/assets/portraits/giggiolillo.png',
+                    status: 'available',
+                    aiBehavior: 'scout'
+                }
+            ];
+            
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(testData));
+            log('Test data loaded', 'success');
+        }
+    </script>
+</body>
+</html>

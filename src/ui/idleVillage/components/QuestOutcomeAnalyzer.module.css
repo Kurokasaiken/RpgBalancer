@@ -1,0 +1,615 @@
+/* Quest Outcome Analyzer Styles */
+
+.analyzer {
+  background: linear-gradient(135deg, #0f1a1d 0%, #1a2332 100%);
+  border: 1px solid #3b4b4d;
+  border-radius: 8px;
+  color: #f0efe4;
+  font-family: 'Crimson Text', serif;
+  font-size: 14px;
+  overflow: hidden;
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #3b4b4d;
+  background: linear-gradient(135deg, #1a2332 0%, #0f1a1d 100%);
+}
+
+.title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #c9a227;
+  font-family: 'Cinzel', serif;
+}
+
+.headerActions {
+  display: flex;
+  gap: 12px;
+}
+
+.exportButton {
+  background: linear-gradient(135deg, #8db3a5 0%, #6b8b7d 100%);
+  border: 1px solid #3b4b4d;
+  color: #0f1a1d;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'Lato', sans-serif;
+  transition: all 0.2s ease;
+}
+
+.exportButton:hover {
+  background: linear-gradient(135deg, #9dc3b5 0%, #7b9b8d 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Tab Navigation */
+.tabNavigation {
+  display: flex;
+  border-bottom: 1px solid #3b4b4d;
+  background: rgba(26, 35, 50, 0.5);
+}
+
+.tabButton {
+  flex: 1;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  color: #8db3a5;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'Lato', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 2px solid transparent;
+}
+
+.tabButton:hover {
+  background: rgba(139, 179, 165, 0.1);
+  color: #c9a227;
+}
+
+.tabButton.active {
+  color: #c9a227;
+  border-bottom-color: #c9a227;
+  background: rgba(201, 162, 39, 0.1);
+}
+
+/* Tab Content */
+.tabContent {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* Overview Tab */
+.overview {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.outcomeHeader {
+  text-align: center;
+  padding: 20px;
+  background: rgba(26, 35, 50, 0.5);
+  border-radius: 8px;
+}
+
+.outcomeStatus {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.outcomeStatus.success {
+  color: #22c55e;
+}
+
+.outcomeStatus.failure {
+  color: #ef4444;
+}
+
+.outcomeDescription {
+  font-size: 16px;
+  color: #f0efe4;
+  line-height: 1.5;
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.metricCard {
+  background: rgba(59, 75, 77, 0.3);
+  border: 1px solid #3b4b4d;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+}
+
+.metricCard h4 {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  color: #8db3a5;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metricValue {
+  font-size: 24px;
+  font-weight: 600;
+  color: #c9a227;
+}
+
+.metricValue.low {
+  color: #22c55e;
+}
+
+.metricValue.medium {
+  color: #eab308;
+}
+
+.metricValue.high {
+  color: #f97316;
+}
+
+.metricValue.extreme {
+  color: #ef4444;
+}
+
+.metricValue.good {
+  color: #22c55e;
+}
+
+.metricValue.poor {
+  color: #ef4444;
+}
+
+/* Risk Section */
+.riskSection {
+  background: rgba(26, 35, 50, 0.5);
+  border: 1px solid #3b4b4d;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.riskSection h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  color: #8db3a5;
+  font-family: 'Cinzel', serif;
+}
+
+.riskDisplay {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.riskDetails {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+}
+
+.riskMetric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.riskLabel {
+  font-size: 12px;
+  color: #8db3a5;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.riskValue {
+  font-size: 18px;
+  font-weight: 600;
+  color: #c9a227;
+}
+
+/* Risk Tab */
+.riskTab {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.riskAssessment {
+  background: rgba(26, 35, 50, 0.5);
+  border: 1px solid #3b4b4d;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.riskLevel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 12px;
+  background: rgba(59, 75, 77, 0.3);
+  border-radius: 6px;
+}
+
+.riskLevelLabel {
+  font-weight: 500;
+  color: #f0efe4;
+}
+
+.riskLevelValue {
+  font-weight: 600;
+  font-size: 16px;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.riskLevelValue.low {
+  background: #22c55e;
+  color: white;
+}
+
+.riskLevelValue.medium {
+  background: #eab308;
+  color: black;
+}
+
+.riskLevelValue.high {
+  background: #f97316;
+  color: white;
+}
+
+.riskLevelValue.extreme {
+  background: #ef4444;
+  color: white;
+}
+
+.riskMetrics {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.riskFactors {
+  margin-bottom: 20px;
+}
+
+.riskFactors h4 {
+  margin: 0 0 12px 0;
+  color: #8db3a5;
+  font-family: 'Cinzel', serif;
+}
+
+.riskFactor {
+  background: rgba(59, 75, 77, 0.2);
+  border: 1px solid #3b4b4d;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+.factorHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.factorName {
+  font-weight: 600;
+  color: #f0efe4;
+}
+
+.factorImpact {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.factorImpact.low {
+  background: #22c55e;
+  color: white;
+}
+
+.factorImpact.medium {
+  background: #eab308;
+  color: black;
+}
+
+.factorImpact.high {
+  background: #ef4444;
+  color: white;
+}
+
+.factorDescription {
+  font-size: 13px;
+  color: #f0efe4;
+  line-height: 1.4;
+}
+
+.mitigationStrategies {
+  border-top: 1px solid #3b4b4d;
+  padding-top: 16px;
+}
+
+.mitigationStrategies h4 {
+  margin: 0 0 12px 0;
+  color: #8db3a5;
+  font-family: 'Cinzel', serif;
+}
+
+.mitigationStrategies ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.mitigationStrategies li {
+  color: #f0efe4;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+/* Performance Tab */
+.performanceTab {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.performanceGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.performanceMetric {
+  background: rgba(59, 75, 77, 0.3);
+  border: 1px solid #3b4b4d;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+}
+
+.performanceMetric h4 {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  color: #8db3a5;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metricLarge {
+  font-size: 32px;
+  font-weight: 600;
+  color: #c9a227;
+}
+
+.metricLarge.good {
+  color: #22c55e;
+}
+
+.metricLarge.poor {
+  color: #ef4444;
+}
+
+/* Decisions Tab */
+.decisionsTab {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.decisionsTab h3 {
+  margin: 0;
+  color: #8db3a5;
+  font-family: 'Cinzel', serif;
+}
+
+.decisionList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.decisionPoint {
+  background: rgba(59, 75, 77, 0.3);
+  border: 1px solid #3b4b4d;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.decisionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.phaseId {
+  font-weight: 600;
+  color: #c9a227;
+  font-family: 'Courier New', monospace;
+}
+
+.impactBadge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.impactBadge.positive {
+  background: #22c55e;
+  color: white;
+}
+
+.impactBadge.negative {
+  background: #ef4444;
+  color: white;
+}
+
+.impactBadge.neutral {
+  background: #6b7280;
+  color: white;
+}
+
+.decisionText {
+  font-weight: 500;
+  color: #f0efe4;
+  margin-bottom: 4px;
+}
+
+.consequence {
+  font-size: 13px;
+  color: #8db3a5;
+  font-style: italic;
+}
+
+/* Lessons Tab */
+.lessonsTab {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lessonsTab h3 {
+  margin: 0;
+  color: #8db3a5;
+  font-family: 'Cinzel', serif;
+}
+
+.lessonsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.lessonCard {
+  background: rgba(59, 75, 77, 0.3);
+  border: 1px solid #3b4b4d;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.lessonCategory {
+  font-size: 12px;
+  color: #8db3a5;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.lessonContent {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lessonText {
+  font-weight: 500;
+  color: #f0efe4;
+  line-height: 1.4;
+}
+
+.recommendation {
+  font-size: 13px;
+  color: #c9a227;
+  font-style: italic;
+  padding-left: 12px;
+  border-left: 2px solid #c9a227;
+}
+
+/* Timeline Tab */
+.timelineTab {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* No Data State */
+.noData {
+  text-align: center;
+  color: #6b7280;
+  font-style: italic;
+  padding: 40px 20px;
+  background: rgba(59, 75, 77, 0.1);
+  border-radius: 6px;
+  border: 1px dashed #3b4b4d;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .analyzer {
+    min-height: 500px;
+  }
+
+  .header {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+
+  .tabNavigation {
+    flex-wrap: wrap;
+  }
+
+  .tabButton {
+    flex: none;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .metricsGrid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+
+  .performanceGrid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  .lessonsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .riskDetails {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tabContent {
+    padding: 16px;
+  }
+
+  .metricsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .performanceGrid {
+    grid-template-columns: 1fr;
+  }
+}

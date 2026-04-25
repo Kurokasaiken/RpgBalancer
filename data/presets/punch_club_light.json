@@ -1,0 +1,60 @@
+{
+  "residents": [
+    {
+      "id": "pc-trainee-1",
+      "displayName": "Lucia \"Lantern\" Bassi",
+      "status": "available",
+      "fatigue": 12,
+      "currentHp": 210,
+      "maxHp": 210,
+      "isHero": false,
+      "isInjured": false,
+      "survivalCount": 0,
+      "survivalScore": 0,
+      "statTags": ["punch_gym", "striker", "edge"],
+      "statSnapshot": { "hp": 210, "grit": 42, "edge": 18 }
+    },
+    {
+      "id": "pc-ring-anchor",
+      "displayName": "Anselmo \"Anchor\" Riva",
+      "status": "available",
+      "fatigue": 18,
+      "currentHp": 230,
+      "maxHp": 230,
+      "isHero": false,
+      "isInjured": false,
+      "survivalCount": 0,
+      "survivalScore": 0,
+      "statTags": ["punch_gym", "punch_ring", "discipline"],
+      "statSnapshot": { "hp": 230, "discipline": 24, "guard": 16 }
+    },
+    {
+      "id": "ws11-resident-2",
+      "displayName": "WS11 Vanguard",
+      "status": "available",
+      "fatigue": 10,
+      "currentHp": 180,
+      "maxHp": 180,
+      "isHero": false,
+      "isInjured": false,
+      "survivalCount": 0,
+      "survivalScore": 0,
+      "statTags": ["vanguard", "edge"],
+      "statSnapshot": { "hp": 180 }
+    },
+    {
+      "id": "ws11-resident-3",
+      "displayName": "WS11 Archivist",
+      "status": "available",
+      "fatigue": 5,
+      "currentHp": 150,
+      "maxHp": 150,
+      "isHero": false,
+      "isInjured": false,
+      "survivalCount": 0,
+      "survivalScore": 0,
+      "statTags": ["reason", "scholar", "lantern"],
+      "statSnapshot": { "hp": 150 }
+    }
+  ]
+}

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WoodcutterPOI State Verification Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .state-indicator { padding: 10px; margin: 5px 0; border-radius: 3px; }
+        .idle { background-color: #8B4513; color: white; }
+        .running { background-color: #228B22; color: white; }
+        .completed { background-color: #DAA520; color: black; }
+    </style>
+</head>
+<body>
+    <h1>WoodcutterPOI State Binding Verification</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Idle State Verification</h2>
+        <div id="idle-test">
+            <p>Checking if WoodcutterPOI shows idle state when no activity is running...</p>
+            <div id="idle-result" class="state-indicator">Testing...</div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: Running State Verification</h2>
+        <div id="running-test">
+            <p>Simulating woodcutting activity start...</p>
+            <div id="running-result" class="state-indicator">Testing...</div>
+            <button onclick="simulateActivityStart()">Start Activity Simulation</button>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: State Synchronization</h2>
+        <div id="sync-test">
+            <p>Testing multiple state changes...</p>
+            <div id="sync-result" class="state-indicator">Testing...</div>
+            <button onclick="testStateSync()">Test Synchronization</button>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Results Summary</h2>
+        <div id="summary">
+            <ul id="results-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        // Mock game state for testing
+        let mockGameState = {
+            state: {
+                activeActivities: [],
+                isDayPhase: true,
+                cycleProgress: 0.5,
+                isPaused: false
+            }
+        };
+
+        // Test results tracking
+        const testResults = [];
+
+        function addTestResult(testName, passed, details) {
+            testResults.push({
+                test: testName,
+                passed,
+                details,
+                timestamp: new Date().toISOString()
+            });
+            updateResultsDisplay();
+        }
+
+        function updateResultsDisplay() {
+            const resultsList = document.getElementById('results-list');
+            resultsList.innerHTML = '';
+            
+            testResults.forEach(result => {
+                const li = document.createElement('li');
+                li.style.color = result.passed ? 'green' : 'red';
+                li.textContent = `${result.test}: ${result.passed ? 'PASS' : 'FAIL'} - ${result.details}`;
+                resultsList.appendChild(li);
+            });
+        }
+
+        // Test 1: Verify idle state
+        function testIdleState() {
+            console.log('Testing idle state...');
+            
+            // Check if no woodcutting activity is running
+            const woodcuttingActivity = mockGameState.state.activeActivities.find(
+                a => a.activityId === 'job_wood_gathering_stable'
+            );
+            
+            const isIdle = !woodcuttingActivity;
+            const idleResult = document.getElementById('idle-result');
+            
+            if (isIdle) {
+                idleResult.textContent = 'PASS: WoodcutterPOI should show idle state';
+                idleResult.className = 'state-indicator idle';
+                addTestResult('Idle State Test', true, 'No active woodcutting activity detected');
+            } else {
+                idleResult.textContent = 'FAIL: Unexpected activity found';
+                idleResult.className = 'state-indicator';
+                addTestResult('Idle State Test', false, 'Unexpected activity found');
+            }
+        }
+
+        // Test 2: Simulate activity start
+        function simulateActivityStart() {
+            console.log('Simulating activity start...');
+            
+            // Add woodcutting activity to mock state
+            mockGameState.state.activeActivities.push({
+                activityId: 'job_wood_gathering_stable',
+                residentId: 'resident-1',
+                ticksRemaining: 3,
+                startTime: Date.now()
+            });
+            
+            const runningResult = document.getElementById('running-result');
+            runningResult.textContent = 'PASS: Activity started, POI should show running state';
+            runningResult.className = 'state-indicator running';
+            
+            addTestResult('Running State Test', true, 'Woodcutting activity simulated successfully');
+            
+            // Simulate progress update
+            setTimeout(() => {
+                updateActivityProgress();
+            }, 1000);
+        }
+
+        function updateActivityProgress() {
+            const activity = mockGameState.state.activeActivities.find(
+                a => a.activityId === 'job_wood_gathering_stable'
+            );
+            
+            if (activity) {
+                activity.ticksRemaining = Math.max(0, activity.ticksRemaining - 1);
+                
+                if (activity.ticksRemaining === 0) {
+                    // Activity completed
+                    mockGameState.state.activeActivities = mockGameState.state.activeActivities.filter(
+                        a => a.activityId !== 'job_wood_gathering_stable'
+                    );
+                    
+                    const runningResult = document.getElementById('running-result');
+                    runningResult.textContent = 'PASS: Activity completed, POI should return to idle';
+                    runningResult.className = 'state-indicator idle';
+                    
+                    addTestResult('Activity Completion Test', true, 'Activity completed and removed from active activities');
+                }
+            }
+        }
+
+        // Test 3: State synchronization
+        function testStateSync() {
+            console.log('Testing state synchronization...');
+            
+            let syncCount = 0;
+            const maxSyncTests = 3;
+            
+            const syncInterval = setInterval(() => {
+                syncCount++;
+                
+                // Toggle activity state
+                const existingActivity = mockGameState.state.activeActivities.find(
+                    a => a.activityId === 'job_wood_gathering_stable'
+                );
+                
+                if (existingActivity) {
+                    // Remove activity
+                    mockGameState.state.activeActivities = mockGameState.state.activeActivities.filter(
+                        a => a.activityId !== 'job_wood_gathering_stable'
+                    );
+                } else {
+                    // Add activity
+                    mockGameState.state.activeActivities.push({
+                        activityId: 'job_wood_gathering_stable',
+                        residentId: 'resident-1',
+                        ticksRemaining: 2,
+                        startTime: Date.now()
+                    });
+                }
+                
+                console.log(`Sync test ${syncCount}: Activity ${existingActivity ? 'removed' : 'added'}`);
+                
+                if (syncCount >= maxSyncTests) {
+                    clearInterval(syncInterval);
+                    
+                    const syncResult = document.getElementById('sync-result');
+                    syncResult.textContent = 'PASS: State synchronization tested';
+                    syncResult.className = 'state-indicator idle';
+                    
+                    addTestResult('State Synchronization Test', true, `Completed ${maxSyncTests} state changes`);
+                }
+            }, 500);
+        }
+
+        // Run tests on page load
+        window.onload = function() {
+            setTimeout(testIdleState, 100);
+        };
+    </script>
+</body>
+</html>

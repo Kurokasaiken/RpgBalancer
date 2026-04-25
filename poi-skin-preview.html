@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>POI Skin System — Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;min-height:100%;font-family:'Cinzel',serif;background:#0e0b07;}
+
+/* ── PAGE LAYOUT ─────────────────────────────── */
+.page{
+  display:flex;flex-direction:column;align-items:center;
+  padding:48px 32px 64px;gap:56px;
+}
+
+/* header */
+.page-header{text-align:center;}
+.page-header h1{
+  font-size:11px;letter-spacing:.45em;text-transform:uppercase;
+  color:#7a6040;margin-bottom:8px;
+}
+.page-header p{
+  font-family:'Crimson Text',serif;font-style:italic;
+  font-size:13px;color:#4a3820;
+}
+
+/* divider */
+.divider{
+  width:200px;height:1px;
+  background:linear-gradient(90deg,transparent,#5a4020,transparent);
+}
+
+/* ── SKIN CARDS ──────────────────────────────── */
+.skins-grid{
+  display:flex;flex-wrap:wrap;gap:40px;justify-content:center;
+}
+
+.skin-card{
+  display:flex;flex-direction:column;align-items:center;gap:20px;
+  background:linear-gradient(160deg,#1a1208 0%,#0d0902 100%);
+  border:1px solid #2a1e0e;
+  border-radius:3px;
+  padding:32px 28px 24px;
+  position:relative;
+}
+/* corner accents */
+.skin-card::before,.skin-card::after{
+  content:'';position:absolute;width:10px;height:10px;
+  border-color:#5a4020;border-style:solid;
+}
+.skin-card::before{top:6px;left:6px;border-width:1px 0 0 1px;}
+.skin-card::after{bottom:6px;right:6px;border-width:0 1px 1px 0;}
+
+.skin-meta{
+  text-align:center;
+}
+.skin-name{
+  font-size:9px;letter-spacing:.35em;text-transform:uppercase;
+  color:#8a6830;margin-bottom:4px;
+}
+.skin-sub{
+  font-family:'Crimson Text',serif;font-style:italic;
+  font-size:11px;color:#3a2a12;
+}
+
+/* POI wrapper */
+.poi-wrap{
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+}
+.poi-wrap svg{overflow:visible;display:block;}
+
+/* ── JSON PANEL ──────────────────────────────── */
+.json-section{
+  width:100%;max-width:760px;
+}
+.json-title{
+  font-size:8px;letter-spacing:.4em;text-transform:uppercase;
+  color:#5a4020;margin-bottom:16px;text-align:center;
+}
+.json-box{
+  background:#0a0806;
+  border:1px solid #1e1408;
+  border-radius:2px;
+  padding:24px;
+  font-family:'Courier New',monospace;
+  font-size:10.5px;line-height:1.7;
+  color:#8a7050;
+  overflow-x:auto;
+  white-space:pre;
+}
+.j-key{color:#c89832;}
+.j-str{color:#7a9860;}
+.j-num{color:#a06828;}
+.j-bool{color:#8870a0;}
+.j-null{color:#604830;}
+.j-comment{color:#3a2e1a;font-style:italic;}
+
+@keyframes rim-breath{0%,100%{opacity:.92}45%{opacity:.68}75%{opacity:.85}}
+.rim{animation:rim-breath 9.4s ease-in-out infinite}
+@keyframes s-amb{0%,100%{opacity:.15}50%{opacity:.32}}
+.s-amb{animation:s-amb 12.1s ease-in-out infinite}
+@keyframes flicker{0%,100%{opacity:1}4%{opacity:.84}4.8%{opacity:1}30%{opacity:.90}31%{opacity:1}62%{opacity:.74}63%{opacity:1}}
+.flicker{animation:flicker 4.3s steps(1,end) infinite}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <h1>POI Skin System · v1.0</h1>
+    <p>Varianti cromatiche della corona · Stone · Rim · Particelle</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Skin cards -->
+  <div class="skins-grid" id="skins-grid">
+    <!-- JS rendered -->
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- JSON output -->
+  <div class="json-section">
+    <div class="json-title">skin definition · JSON</div>
+    <div class="json-box" id="json-out"><!-- filled by JS --></div>
+  </div>
+
+</div>
+
+<script>
+const ns  = 'http://www.w3.org/2000/svg';
+const TAU = Math.PI * 2;
+const STONE_R  = 14;
+const RIM_R    = 19;
+const RIM_SW   = 2.8;
+const TRACK_R  = 28;
+const TRACK_SW = 5;
+const CIRC     = TAU * TRACK_R;
+
+// ── SKIN DEFINITIONS ─────────────────────────────────────────────────────────
+const SKINS = [
+  {
+    id: 'skin-amber',
+    name: 'Ambra Selvatica',
+    sub: 'wilderness · default',
+    bg: '#1a1208',
+    // corona
+    cr: 210, cg: 138, cb: 28,
+    gr: 180, gg: 105, gb: 10,
+    // rim
+    rimStop0: '#fce890',
+    rimStop1: '#c09030',
+    rimStop2: '#200e02',
+    // stone
+    stoneStop0: '#1e1608',
+    stoneStop1: '#030202',
+    stoneAmbient: 'rgba(255,220,120,.22)',
+    // pin
+    pinColor: 'rgba(205,190,148,.72)',
+    // progress
+    fillFraction: 0.72,
+  },
+  {
+    id: 'skin-lapis',
+    name: 'Lapislazzuli',
+    sub: 'arcane · variant',
+    bg: '#080c18',
+    cr:  42, cg:  82, cb: 190,
+    gr:  25, gg:  55, gb: 160,
+    rimStop0: '#c0d8fc',
+    rimStop1: '#3060b0',
+    rimStop2: '#020510',
+    stoneStop0: '#060c1e',
+    stoneStop1: '#010208',
+    stoneAmbient: 'rgba(120,160,255,.20)',
+    pinColor: 'rgba(148,170,210,.72)',
+    fillFraction: 0.45,
+  },
+  {
+    id: 'skin-ember',
+    name: 'Brace Viva',
+    sub: 'infernal · variant',
+    bg: '#180808',
+    cr: 220,  cg: 60, cb: 18,
+    gr: 180,  gg: 30, gb:  5,
+    rimStop0: '#fca878',
+    rimStop1: '#a03010',
+    rimStop2: '#1a0202',
+    stoneStop0: '#1a0808',
+    stoneStop1: '#030101',
+    stoneAmbient: 'rgba(255,120,60,.20)',
+    pinColor: 'rgba(210,160,130,.72)',
+    fillFraction: 0.90,
+  },
+  {
+    id: 'skin-verdigris',
+    name: 'Verderame',
+    sub: 'alchemical · variant',
+    bg: '#080e0a',
+    cr:  60, cg: 180, cb:  80,
+    gr:  30, gg: 130, gb:  50,
+    rimStop0: '#a0f0c0',
+    rimStop1: '#208050',
+    rimStop2: '#020e04',
+    stoneStop0: '#081208',
+    stoneStop1: '#010402',
+    stoneAmbient: 'rgba(80,220,120,.18)',
+    pinColor: 'rgba(140,210,160,.72)',
+    fillFraction: 0.30,
+  },
+];
+
+// ── BUILD SVG ─────────────────────────────────────────────────────────────────
+function mk(tag, attrs) {
+  const el = document.createElementNS(ns, tag);
+  Object.entries(attrs).forEach(([k,v]) => el.setAttribute(k,v));
+  return el;
+}
+
+function buildPOI(svgEl, s) {
+  const id = s.id;
+  const {cr,cg,cb,gr,gg,gb} = s;
+
+  svgEl.innerHTML = `<defs>
+  <radialGradient id="sf-${id}" cx="36%" cy="28%" r="70%">
+    <stop offset="0%"  stop-color="${s.stoneStop0}"/>
+    <stop offset="100%" stop-color="${s.stoneStop1}"/>
+  </radialGradient>
+  <radialGradient id="sa-${id}" cx="50%" cy="50%" r="50%">
+    <stop offset="0%"  stop-color="${s.stoneAmbient}"/>
+    <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+  </radialGradient>
+  <linearGradient id="bz-${id}" x1="14%" y1="4%" x2="86%" y2="96%">
+    <stop offset="0%"   stop-color="${s.rimStop0}"/>
+    <stop offset="28%"  stop-color="${s.rimStop1}"/>
+    <stop offset="100%" stop-color="${s.rimStop2}"/>
+  </linearGradient>
+  <filter id="fr-${id}" x="-80%" y="-80%" width="260%" height="260%">
+    <feGaussianBlur stdDeviation="1.0" result="b"/>
+    <feComposite in="SourceGraphic" in2="b" operator="over"/>
+  </filter>
+  <filter id="fim-${id}" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence type="fractalNoise" baseFrequency=".8 .4" numOctaves="3" seed="22" result="n"/>
+    <feColorMatrix in="n" type="matrix"
+      values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .18 0" result="nm"/>
+    <feComposite in="SourceGraphic" in2="nm" operator="arithmetic" k1="0" k2="1" k3="0.22" k4="0"/>
+  </filter>
+  <filter id="fn-${id}" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence type="fractalNoise" baseFrequency=".55" numOctaves="4" seed="7" stitchTiles="stitch" result="n"/>
+    <feColorMatrix in="n" type="matrix" values="0 0 0 0 .058 0 0 0 0 .040 0 0 0 0 .016 0 0 0 .22 0" result="c"/>
+    <feBlend in="SourceGraphic" in2="c" mode="overlay"/>
+  </filter>
+  <filter id="ftk-${id}" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence type="fractalNoise" baseFrequency=".35 .15" numOctaves="4" seed="3" stitchTiles="stitch" result="n"/>
+    <feColorMatrix in="n" type="matrix"
+      values="0 0 0 0 .04  0 0 0 0 .03  0 0 0 0 .02  0 0 0 .30 0" result="c"/>
+    <feBlend in="SourceGraphic" in2="c" mode="overlay"/>
+  </filter>
+  <filter id="fta-${id}" x="-15%" y="-15%" width="130%" height="130%">
+    <feTurbulence type="turbulence" baseFrequency=".008 .04" numOctaves="3" seed="9" result="t">
+      <animate attributeName="seed" values="9;10;11;12;9" dur="7.3s" repeatCount="indefinite"/>
+      <animate attributeName="baseFrequency" values=".008 .04;.010 .038;.008 .042;.009 .04;.008 .04"
+        dur="11.7s" repeatCount="indefinite"/>
+    </feTurbulence>
+    <feDisplacementMap in="SourceGraphic" in2="t" scale="3.5"
+      xChannelSelector="R" yChannelSelector="G" result="d"/>
+    <feGaussianBlur in="d" stdDeviation=".4"/>
+  </filter>
+  <filter id="ftb-${id}" x="-8%" y="-8%" width="116%" height="116%">
+    <feTurbulence type="turbulence" baseFrequency=".025 .08" numOctaves="2" seed="33" result="t">
+      <animate attributeName="seed" values="33;34;35;33" dur="3.1s" repeatCount="indefinite"/>
+    </feTurbulence>
+    <feDisplacementMap in="SourceGraphic" in2="t" scale="1.8"
+      xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <filter id="fg-${id}" x="-80%" y="-80%" width="260%" height="260%" color-interpolation-filters="sRGB">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="1.0" result="g1"/>
+    <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="g2"/>
+    <feColorMatrix in="g2" type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 .38 0" result="g2d"/>
+    <feBlend in="g2d" in2="g1" mode="screen" result="b1"/>
+    <feBlend in="b1" in2="SourceGraphic" mode="screen"/>
+  </filter>
+  <filter id="fpg-${id}" x="-600%" y="-600%" width="1300%" height="1300%">
+    <feGaussianBlur stdDeviation="2.2"/>
+  </filter>
+  <filter id="fd-${id}" x="-60%" y="-50%" width="220%" height="220%">
+    <feDropShadow dx="0" dy="3"   stdDeviation="4.5" flood-color="rgba(0,0,0,.55)"/>
+    <feDropShadow dx="0" dy="0.8" stdDeviation="1.5" flood-color="rgba(0,0,0,.35)"/>
+  </filter>
+  <clipPath id="cp-${id}"><circle cx="0" cy="0" r="${STONE_R}"/></clipPath>
+</defs>`;
+
+  const sg = mk('g', {filter:`url(#fd-${id})`});
+  sg.appendChild(mk('circle', {cx:'0',cy:'0',r:`${TRACK_R}`,fill:'none',
+    stroke:'rgba(0,0,0,.58)','stroke-width':`${TRACK_SW}`,
+    filter:`url(#ftk-${id})`}));
+  sg.appendChild(mk('circle', {cx:'0',cy:'0',
+    r:`${RIM_R + RIM_SW/2 + 0.8}`,fill:'none',
+    stroke:'rgba(0,0,0,.72)','stroke-width':'1.8'}));
+  const rimG = mk('g', {class:'rim'});
+  rimG.appendChild(mk('circle', {cx:'0',cy:'0',r:`${RIM_R}`,fill:'none',
+    stroke:`url(#bz-${id})`,'stroke-width':`${RIM_SW}`,
+    filter:`url(#fim-${id})`,opacity:'.92'}));
+  rimG.appendChild(mk('circle', {cx:'0',cy:'0',
+    r:`${RIM_R - RIM_SW/2 - 0.5}`,fill:'none',
+    stroke:'rgba(0,0,0,.50)','stroke-width':'.7'}));
+  sg.appendChild(rimG);
+  sg.appendChild(mk('circle', {cx:'0',cy:'0',r:`${STONE_R+0.8}`,
+    fill:`url(#sa-${id})`,class:'s-amb'}));
+  sg.appendChild(mk('circle', {cx:'0',cy:'0',r:`${STONE_R}`,
+    fill:`url(#sf-${id})`,filter:`url(#fn-${id})`,opacity:'.98'}));
+  const pinG = mk('g', {'clip-path':`url(#cp-${id})`});
+  pinG.innerHTML = `
+    <g transform="translate(.3,.4)" opacity=".55">
+      <path d="M0,-5 L0,4" fill="none" stroke="rgba(0,0,0,.95)" stroke-width="1.4" stroke-linecap="round"/>
+      <path d="M-2.8,-.3 L2.8,-.3" fill="none" stroke="rgba(0,0,0,.90)" stroke-width="1.0" stroke-linecap="round"/>
+      <path d="M-.6,3.4 L.6,3.4 L0,5.2 Z" fill="rgba(0,0,0,.90)"/>
+    </g>
+    <g class="flicker" opacity=".50">
+      <path d="M0,-5 L0,4" fill="none" stroke="${s.pinColor}" stroke-width="1.1" stroke-linecap="round"/>
+      <path d="M-2.8,-.3 L2.8,-.3" fill="none" stroke="${s.pinColor}" stroke-width=".85" stroke-linecap="round"/>
+      <path d="M-.6,3.4 L.6,3.4 L0,5.2 Z" fill="${s.pinColor}"/>
+      <path d="M0,-5 L0,-1.8" fill="none" stroke="rgba(255,238,185,.20)" stroke-width=".4" stroke-linecap="round"/>
+    </g>`;
+  sg.appendChild(pinG);
+  sg.appendChild(mk('circle', {cx:'.15',cy:'.18',r:`${STONE_R}`,
+    fill:'none',stroke:'rgba(0,0,0,.42)','stroke-width':'1.2'}));
+  svgEl.appendChild(sg);
+
+  const crownGlow = mk('circle', {cx:'0',cy:'0',r:`${TRACK_R}`,fill:'none',
+    stroke:`rgba(${gr},${gg},${gb},.50)`,'stroke-width':`${TRACK_SW + 2}`,
+    'stroke-dasharray':`0 ${CIRC}`,'stroke-linecap':'butt',
+    filter:`url(#fg-${id})`,transform:'rotate(-90)'});
+  const crownTurbA = mk('circle', {cx:'0',cy:'0',r:`${TRACK_R}`,fill:'none',
+    stroke:`rgba(${cr},${cg},${cb},.88)`,'stroke-width':`${TRACK_SW}`,
+    'stroke-dasharray':`0 ${CIRC}`,'stroke-linecap':'butt',
+    filter:`url(#fta-${id})`,transform:'rotate(-90)'});
+  const crownTurbB = mk('circle', {cx:'0',cy:'0',r:`${TRACK_R}`,fill:'none',
+    stroke:`rgba(${Math.min(255,cr+30)},${Math.min(255,cg+20)},${Math.min(255,cb+10)},.45)`,
+    'stroke-width':`${TRACK_SW * 0.5}`,'stroke-dasharray':`0 ${CIRC}`,
+    'stroke-linecap':'butt',filter:`url(#ftb-${id})`,transform:'rotate(-90)'});
+  const crownReflect = mk('circle', {cx:'0',cy:'0',r:`${TRACK_R}`,fill:'none',
+    stroke:`rgba(${Math.min(255,cr+60)},${Math.min(255,cg+50)},${Math.min(255,cb+30)},.28)`,
+    'stroke-width':`${TRACK_SW * 0.6}`,'stroke-dasharray':`0 ${CIRC}`,
+    'stroke-linecap':'round',transform:'rotate(-90)'});
+  const particleLayer = mk('g', {id:`ptl-${id}`});
+  svgEl.appendChild(crownGlow);
+  svgEl.appendChild(crownTurbA);
+  svgEl.appendChild(crownTurbB);
+  svgEl.appendChild(crownReflect);
+  svgEl.appendChild(particleLayer);
+
+  return {crownGlow, crownTurbA, crownTurbB, crownReflect, particleLayer};
+}
+
+function update(els, v, progress, pulseP, reflectOffset) {
+  const {cr,cg,cb,gr,gg,gb} = v;
+  const p = pulseP ?? 1.0;
+  const drawn = CIRC * Math.min(progress, 1);
+  const gap   = Math.max(0, CIRC - drawn);
+  const full  = progress >= 0.999;
+  const cap   = full ? 'butt' : 'round';
+  const da    = `${drawn} ${gap}`;
+  els.crownGlow.setAttribute('stroke-dasharray', da);
+  els.crownGlow.setAttribute('stroke-linecap', cap);
+  els.crownGlow.setAttribute('stroke',`rgba(${gr},${gg},${gb},${((0.38+0.20*progress)*p).toFixed(3)})`);
+  els.crownTurbA.setAttribute('stroke-dasharray', da);
+  els.crownTurbA.setAttribute('stroke-linecap', cap);
+  els.crownTurbA.setAttribute('stroke',`rgba(${cr},${cg},${cb},${((0.78+0.15*progress)*p).toFixed(3)})`);
+  els.crownTurbB.setAttribute('stroke-dasharray', da);
+  els.crownTurbB.setAttribute('stroke-linecap', cap);
+  if (progress > 0.12) {
+    const refLen    = CIRC * 0.14;
+    const maxOffset = Math.max(0, drawn - refLen - CIRC * 0.04);
+    const refStart  = maxOffset * reflectOffset;
+    const refGap    = CIRC - refLen;
+    els.crownReflect.setAttribute('stroke-dasharray', `${refLen} ${refGap}`);
+    els.crownReflect.setAttribute('stroke-dashoffset', `${-refStart}`);
+    els.crownReflect.setAttribute('stroke-linecap', 'round');
+    els.crownReflect.style.opacity = (0.6 * progress * p).toFixed(3);
+  } else {
+    els.crownReflect.style.opacity = '0';
+  }
+}
+
+function easeViscous(t) {
+  if (t<=0) return 0; if (t>=1) return 1;
+  return t < 0.08 ? (t/0.08)*(t/0.08)*0.08 : 0.08+(t-0.08)/(1-0.08)*0.92;
+}
+
+// ── RENDER CARDS ────────────────────────────────────────────────────────────
+const grid = document.getElementById('skins-grid');
+
+SKINS.forEach(s => {
+  const card = document.createElement('div');
+  card.className = 'skin-card';
+  card.style.background = `linear-gradient(160deg,${s.bg} 0%,#050302 100%)`;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'poi-wrap';
+
+  const svgEl = document.createElementNS(ns, 'svg');
+  svgEl.setAttribute('width','160');
+  svgEl.setAttribute('height','160');
+  svgEl.setAttribute('viewBox','-80 -80 160 160');
+  svgEl.style.overflow='visible';
+  svgEl.style.display='block';
+  wrap.appendChild(svgEl);
+
+  const meta = document.createElement('div');
+  meta.className = 'skin-meta';
+  meta.innerHTML = `<div class="skin-name">${s.name}</div><div class="skin-sub">${s.sub}</div>`;
+
+  card.appendChild(wrap);
+  card.appendChild(meta);
+  grid.appendChild(card);
+
+  const els = buildPOI(svgEl, s);
+
+  const FILL_MS = 7000 + Math.random()*3000;
+  let t0 = null, phase = 0, reflPhase = 0;
+
+  // Animate to target fillFraction then pulse
+  (function loop(now) {
+    if (!t0) t0 = now;
+    const raw = Math.min((now - t0) / FILL_MS, 1);
+    const prog  = easeViscous(raw) * s.fillFraction;
+    const filled = raw >= 1;
+    phase     += 0.015;
+    reflPhase += 0.0008;
+    const pulse = filled ? (0.60 + 0.40*Math.sin(phase)) : 1.0;
+    const reflO = Math.sin(reflPhase)*0.5 + 0.5;
+    update(els, s, prog, pulse, reflO);
+    requestAnimationFrame(loop);
+  })();
+});
+
+// ── JSON OUTPUT ──────────────────────────────────────────────────────────────
+const skinJson = {
+  id: "poi-wilderness-amber",
+  name: "Ambra Selvatica",
+  version: "1.0.0",
+  author: "skin-devtools",
+  quality: "AAA",
+  targetVersion: "poi@v10",
+  compatibility: ["POIComponent"],
+  colorTokens: {
+    "corona.core": { r: 210, g: 138, b: 28, label: "Colore principale arco" },
+    "corona.glow": { r: 180, g: 105, b: 10, label: "Glow bloom esterno" },
+    "rim.stop0":   "#fce890",
+    "rim.stop1":   "#c09030",
+    "rim.stop2":   "#200e02",
+    "stone.stop0": "#1e1608",
+    "stone.stop1": "#030202",
+    "stone.ambient": "rgba(255,220,120,.22)",
+    "pin.color":   "rgba(205,190,148,.72)"
+  },
+  filters: {
+    "corona.turbulence.slow": {
+      baseFrequency: "0.008 0.04",
+      numOctaves: 3,
+      animateSeed: true,
+      displacementScale: 3.5
+    },
+    "corona.turbulence.fast": {
+      baseFrequency: "0.025 0.08",
+      numOctaves: 2,
+      animateSeed: true,
+      displacementScale: 1.8
+    },
+    "rim.imperfections": {
+      baseFrequency: "0.8 0.4",
+      numOctaves: 3,
+      seed: 22,
+      blendAlpha: 0.18
+    },
+    "stone.noise": {
+      baseFrequency: "0.55",
+      numOctaves: 4,
+      seed: 7
+    }
+  },
+  animation: {
+    "rim.breath": { duration: "9.4s", easing: "ease-in-out", opacityMin: 0.68, opacityMax: 0.92 },
+    "stone.ambient": { duration: "12.1s", easing: "ease-in-out", opacityMin: 0.15, opacityMax: 0.32 },
+    "pin.flicker": { duration: "4.3s", timingFunction: "steps(1,end)" },
+    "corona.fill": { easing: "viscous", durationMs: 9000 },
+    "corona.pulse": { amplitudeMin: 0.60, amplitudeMax: 1.0, phaseIncrement: 0.015 },
+    "corona.reflect": { arcFraction: 0.14, driftSpeed: 0.0008 }
+  },
+  particles: {
+    maxCount: 5,
+    spawnIntervalMs: [600, 1800],
+    speedRange: [0.0002, 0.0005],
+    sizeRange: [0.6, 1.6],
+    maxAlphaRange: [0.45, 0.80],
+    lifetimeMs: [2800, 5000]
+  },
+  componentSlots: {
+    POIComponent: {
+      container: "svg[data-poi]",
+      replaceContent: false,
+      preserveStructure: true,
+      slotBindings: {
+        "coronaGlow":    "[data-slot='corona-glow']",
+        "coronaTurbA":   "[data-slot='corona-turb-a']",
+        "coronaTurbB":   "[data-slot='corona-turb-b']",
+        "coronaReflect": "[data-slot='corona-reflect']",
+        "rimCircle":     "[data-slot='rim']",
+        "stoneField":    "[data-slot='stone']",
+        "pinIcon":       "[data-slot='pin']",
+        "particleLayer": "[data-slot='particles']"
+      }
+    }
+  },
+  metadata: {
+    pillar: "Wilderness",
+    styleLabPreset: "frontier-bronze",
+    notes: "Corona turbolenta in ambra/oro su pietra ossidiana. Rim bronzo con imperfezioni organiche. Particelle bolle sull'arco."
+  }
+};
+
+// Syntax-highlighted JSON
+function syntaxHL(obj, indent=0) {
+  const json = JSON.stringify(obj, null, 2);
+  return json
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, m => {
+      if (/^"/.test(m)) {
+        if (/:$/.test(m)) return `<span class="j-key">${m}</span>`;
+        return `<span class="j-str">${m}</span>`;
+      }
+      if (/true|false/.test(m)) return `<span class="j-bool">${m}</span>`;
+      if (/null/.test(m)) return `<span class="j-null">${m}</span>`;
+      return `<span class="j-num">${m}</span>`;
+    });
+}
+
+document.getElementById('json-out').innerHTML = syntaxHL(skinJson);
+</script>
+</body>
+</html>

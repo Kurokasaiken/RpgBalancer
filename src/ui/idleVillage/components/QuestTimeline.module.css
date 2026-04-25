@@ -1,0 +1,221 @@
+/* Quest Timeline Styles */
+
+.timelineContainer {
+  background: linear-gradient(135deg, #0f1a1d 0%, #1a2332 100%);
+  border: 1px solid #3b4b4d;
+  border-radius: 8px;
+  padding: 20px;
+  color: #f0efe4;
+  font-family: 'Crimson Text', serif;
+  font-size: 14px;
+  overflow: hidden;
+}
+
+.timelineTitle {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  color: #8db3a5;
+  font-family: 'Cinzel', serif;
+  text-align: center;
+}
+
+.timeline {
+  position: relative;
+  width: 100%;
+  min-height: 200px;
+}
+
+.timelineTrack {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3b4b4d 0%, #8db3a5 50%, #3b4b4d 100%);
+  border-radius: 2px;
+  z-index: 1;
+}
+
+.eventsContainer {
+  position: relative;
+  width: 100%;
+  height: 120px;
+  margin-bottom: 20px;
+}
+
+.event {
+  position: absolute;
+  top: 20px;
+  transform: translateX(-50%);
+  z-index: 2;
+  min-width: 120px;
+  max-width: 200px;
+}
+
+.eventIcon {
+  display: block;
+  text-align: center;
+  font-size: 18px;
+  margin-bottom: 4px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.eventContent {
+  background: rgba(26, 35, 50, 0.9);
+  border: 1px solid #3b4b4d;
+  border-radius: 6px;
+  padding: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+}
+
+.eventDescription {
+  font-size: 12px;
+  font-weight: 500;
+  color: #f0efe4;
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+.eventTimestamp {
+  font-size: 10px;
+  color: #6b7280;
+  font-family: 'Courier New', monospace;
+}
+
+.riskIndicator {
+  font-size: 10px;
+  color: #eab308;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.phaseIndicator {
+  font-size: 10px;
+  color: #8db3a5;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.eventConnector {
+  position: absolute;
+  top: 46px; /* Align with timeline track */
+  left: 50%;
+  height: 4px;
+  background: linear-gradient(90deg, #8db3a5 0%, #c9a227 100%);
+  border-radius: 2px;
+  z-index: 1;
+  opacity: 0.7;
+}
+
+/* Event type styling */
+.fatal {
+  animation: fatalPulse 2s ease-in-out infinite;
+}
+
+.fatal .eventContent {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.highRisk .eventContent {
+  border-color: #f97316;
+  background: rgba(249, 115, 22, 0.1);
+}
+
+.mediumRisk .eventContent {
+  border-color: #eab308;
+  background: rgba(234, 179, 8, 0.1);
+}
+
+/* Timeline legend */
+.timelineLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  padding: 12px;
+  background: rgba(59, 75, 77, 0.2);
+  border-radius: 6px;
+  margin-top: 16px;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #f0efe4;
+}
+
+.legendIcon {
+  font-size: 12px;
+}
+
+/* No events state */
+.noEvents {
+  text-align: center;
+  color: #6b7280;
+  font-style: italic;
+  padding: 40px 20px;
+  background: rgba(59, 75, 77, 0.1);
+  border-radius: 6px;
+  border: 1px dashed #3b4b4d;
+}
+
+/* Animations */
+@keyframes fatalPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .timelineContainer {
+    padding: 16px;
+  }
+
+  .eventsContainer {
+    height: 140px;
+  }
+
+  .event {
+    min-width: 100px;
+    max-width: 160px;
+  }
+
+  .eventContent {
+    padding: 6px;
+  }
+
+  .eventDescription {
+    font-size: 11px;
+  }
+
+  .timelineLegend {
+    gap: 8px;
+  }
+
+  .legendItem {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .eventsContainer {
+    height: 160px;
+  }
+
+  .timelineLegend {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .legendItem {
+    justify-content: center;
+  }
+}

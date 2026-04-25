@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ActivityCapsuleDetail · Finestra</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#0d0a04;font-family:'Crimson Text',serif;}
+
+/* ─── BG ─────────────────────────────────────────────────────────────────── */
+#bg{
+  position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 55% 45% at 28% 42%, rgba(38,22,4,.0) 0%, rgba(8,5,1,.82) 68%),
+    radial-gradient(ellipse 70% 55% at 72% 58%, rgba(22,13,2,.0) 0%, rgba(5,3,1,.90) 78%),
+    #0c0902;
+}
+#bg::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.038'/%3E%3C/svg%3E");
+}
+
+/* ─── POI on map (trigger) ────────────────────────────────────────────────── */
+#map-stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+#poi-map-wrap{pointer-events:all;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform .2s;}
+#poi-map-wrap:hover{transform:scale(1.05);}
+.map-hint{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.28em;text-transform:uppercase;color:rgba(180,128,40,.40);}
+
+/* ─── WINDOW ─────────────────────────────────────────────────────────────── */
+#win{
+  position:fixed;
+  z-index:20;
+  /* Centrata al mount */
+  top:50%; left:50%;
+  transform:translate(-50%,-50%) scale(.90);
+  opacity:0; pointer-events:none;
+  transition:opacity .30s ease, transform .32s cubic-bezier(.22,.72,0,1);
+  user-select:none;
+  /* La larghezza è determinata dal contenuto / SVG */
+  width:400px;
+}
+#win.open{
+  opacity:1;pointer-events:all;
+  transform:translate(-50%,-50%) scale(1);
+}
+#win.dragging{ transition:none; }
+
+/* Drop-shadow dell'intera finestra */
+.win-body{
+  position:relative;
+  filter:
+    drop-shadow(0 24px 60px rgba(0,0,0,.88))
+    drop-shadow(0 8px 20px rgba(0,0,0,.65))
+    drop-shadow(0 2px 6px rgba(0,0,0,.50));
+}
+
+/* ─── ANIMAZIONI RIM ─────────────────────────────────────────────────────── */
+@keyframes rim-breath {0%,100%{opacity:.92}45%{opacity:.68}75%{opacity:.85}}
+@keyframes s-amb      {0%,100%{opacity:.15}50%{opacity:.32}}
+@keyframes flicker    {0%,100%{opacity:1}4%{opacity:.84}4.8%{opacity:1}30%{opacity:.90}31%{opacity:1}62%{opacity:.74}63%{opacity:1}}
+@keyframes dot-pulse  {0%,100%{box-shadow:0 0 5px rgba(255,200,60,.80)}50%{box-shadow:0 0 12px rgba(255,200,60,1)}}
+@keyframes sm-rim-idle  {0%,100%{opacity:.92}45%{opacity:.68}75%{opacity:.85}}
+@keyframes sm-rim-active{0%,100%{opacity:.96}50%{opacity:.82}}
+@keyframes sm-rim-done  {0%{opacity:.96}40%{opacity:1;filter:drop-shadow(0 0 8px rgba(58,218,88,.88))}100%{opacity:.92;filter:none}}
+@keyframes ghost-pulse  {0%,100%{opacity:.22}50%{opacity:.40}}
+@keyframes slot-appear  {0%{opacity:0;transform:scale(.70)}100%{opacity:1;transform:scale(1)}}
+
+/* ─── CONTENUTO FINESTRA ──────────────────────────────────────────────────── */
+.win-content{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  padding:36px 28px 32px;
+  overflow:hidden;
+}
+
+/* Handle drag */
+.drag-handle{
+  position:absolute;top:0;left:0;right:0;height:40px;
+  cursor:grab;z-index:10;
+  display:flex;align-items:center;justify-content:center;padding-top:6px;
+}
+.drag-handle:active{cursor:grabbing;}
+.handle-bar{
+  display:flex;gap:3px;opacity:.28;
+}
+.handle-bar span{width:3px;height:3px;border-radius:50%;background:rgba(200,160,55,.80);}
+
+/* Close */
+.win-close{
+  position:absolute;top:14px;right:18px;
+  width:22px;height:22px;background:none;border:none;cursor:pointer;
+  color:rgba(160,118,38,.48);font-size:15px;line-height:1;
+  transition:color .15s;z-index:11;font-family:'Cinzel',serif;
+}
+.win-close:hover{color:rgba(220,168,55,.82);}
+
+/* ─── HEADER: POI + meta ─────────────────────────────────────────────────── */
+.win-header{
+  display:flex;align-items:center;gap:16px;
+  margin-bottom:4px;flex-shrink:0;
+}
+.act-name{
+  font-family:'Cinzel',serif;font-size:14px;font-weight:700;
+  color:rgba(240,220,155,.92);letter-spacing:.05em;line-height:1.2;
+}
+.act-type{
+  font-size:10px;font-style:italic;
+  color:rgba(180,140,58,.55);margin-top:2px;
+}
+.status-pip{
+  display:inline-flex;align-items:center;gap:5px;margin-top:5px;
+  font-family:'Cinzel',serif;font-size:8px;letter-spacing:.18em;text-transform:uppercase;
+}
+.pip-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.pip-idle  .pip-dot{background:rgba(140,110,50,.45);}
+.pip-active .pip-dot{background:rgba(255,200,60,.90);box-shadow:0 0 7px rgba(255,200,60,.85);animation:dot-pulse 1.8s ease-in-out infinite;}
+.pip-done   .pip-dot{background:rgba(60,180,80,.90);}
+.pip-idle  {color:rgba(140,110,50,.55);}
+.pip-active{color:rgba(255,200,60,.80);}
+.pip-done  {color:rgba(80,200,100,.80);}
+
+/* ─── ORNAMENTO DIVISORE ─────────────────────────────────────────────────── */
+.ornament{display:flex;align-items:center;gap:8px;margin:10px 0;flex-shrink:0;}
+.orn-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(180,130,40,.28),transparent);}
+.orn-diamond{width:4px;height:4px;background:rgba(200,155,50,.40);transform:rotate(45deg);flex-shrink:0;}
+
+/* ─── INFO ROW ────────────────────────────────────────────────────────────── */
+.info-row{display:flex;gap:0;margin-bottom:4px;flex-shrink:0;}
+.info-item{
+  flex:1;display:flex;flex-direction:column;gap:2px;
+  padding:8px 10px;position:relative;
+}
+.info-item+.info-item::before{
+  content:'';position:absolute;left:0;top:20%;bottom:20%;width:1px;
+  background:linear-gradient(to bottom,transparent,rgba(180,130,40,.20),transparent);
+}
+.info-label{
+  font-family:'Cinzel',serif;font-size:7px;letter-spacing:.22em;
+  text-transform:uppercase;color:rgba(160,118,40,.48);
+}
+.info-value{
+  font-family:'Cinzel',serif;font-size:13px;font-weight:600;
+  color:rgba(235,212,140,.88);
+}
+.info-value.amber{color:rgba(255,200,58,.90);}
+
+/* ─── SLOT RACK SECTION ───────────────────────────────────────────────────── */
+.section-label{
+  font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:.28em;text-transform:uppercase;
+  color:rgba(150,110,38,.42);
+  display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-shrink:0;
+}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(180,130,40,.20),transparent);}
+
+/* Il rack: fila orizzontale di cavity SVG */
+.slot-rack{
+  display:flex;gap:14px;align-items:center;
+  flex-wrap:nowrap;overflow-x:auto;overflow-y:visible;
+  padding:6px 2px 12px;
+  scrollbar-width:none;flex-shrink:0;
+}
+.slot-rack::-webkit-scrollbar{display:none;}
+
+/* Ogni slot è un SVG — nessun div wrapper aggiuntivo */
+.slot-svg-wrap{
+  flex-shrink:0;position:relative;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* Ghost slot: tenue, tratteggiato, animato */
+.slot-ghost .slot-svg-wrap{opacity:.45;animation:ghost-pulse 2.8s ease-in-out infinite;}
+
+/* ─── TELEMETRIA ──────────────────────────────────────────────────────────── */
+.tele-wrap{
+  flex:1;min-height:0;display:flex;flex-direction:column;gap:0;
+  overflow:hidden;
+}
+.tele-log{
+  flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:0;
+}
+.tele-log::-webkit-scrollbar{width:2px;}
+.tele-log::-webkit-scrollbar-thumb{background:rgba(180,130,40,.18);}
+.tele-entry{
+  display:flex;gap:8px;align-items:baseline;
+  font-size:10px;line-height:1.4;padding:3px 6px;
+  border-left:1.5px solid transparent;border-radius:0 1px 1px 0;
+  transition:background .12s;
+}
+.tele-entry:hover{background:rgba(255,200,60,.03);}
+.tele-entry.ev-assign {border-left-color:rgba(210,148,28,.65);}
+.tele-entry.ev-start  {border-left-color:rgba(255,200,60,.65);}
+.tele-entry.ev-done   {border-left-color:rgba(60,180,80,.65);}
+.tele-entry.ev-detach {border-left-color:rgba(180,130,40,.35);}
+.tele-entry.ev-reject {border-left-color:rgba(200,60,40,.65);}
+.tele-time{
+  font-family:'Cinzel',serif;font-size:8px;
+  color:rgba(140,102,30,.42);flex-shrink:0;letter-spacing:.03em;
+  min-width:28px;
+}
+.tele-msg{color:rgba(190,158,85,.58);font-style:italic;}
+.tele-msg em{color:rgba(210,175,88,.82);font-style:normal;}
+.tele-empty{font-size:10px;font-style:italic;color:rgba(130,95,28,.28);padding:4px 6px;}
+
+/* ─── CTA ────────────────────────────────────────────────────────────────── */
+.cta-row{display:flex;gap:8px;margin-top:10px;flex-shrink:0;}
+.btn{
+  flex:1;padding:8px 12px;
+  font-family:'Cinzel',serif;font-size:9px;letter-spacing:.16em;
+  text-transform:uppercase;font-weight:600;
+  border-radius:1px;cursor:pointer;
+  border:1px solid transparent;
+  transition:all .16s ease;position:relative;overflow:hidden;
+}
+.btn::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);transition:left .30s;}
+.btn:hover::after{left:100%;}
+.btn-start{
+  background:linear-gradient(135deg,rgba(160,90,8,.90),rgba(120,65,4,.95));
+  border-color:rgba(180,120,28,.62);color:rgba(238,208,118,.90);
+  box-shadow:0 2px 10px rgba(160,90,8,.28),inset 0 1px 0 rgba(255,218,95,.14);
+}
+.btn-start:hover:not(:disabled){background:linear-gradient(135deg,rgba(188,108,12,.94),rgba(148,82,6,1));}
+.btn-start:disabled{opacity:.32;cursor:not-allowed;}
+.btn-cancel{background:transparent;border-color:rgba(180,58,38,.28);color:rgba(178,78,58,.62);}
+.btn-cancel:hover{border-color:rgba(200,68,48,.58);color:rgba(208,88,68,.88);}
+.btn-collect{
+  background:linear-gradient(135deg,rgba(38,138,58,.85),rgba(24,98,44,.90));
+  border-color:rgba(58,178,78,.48);color:rgba(158,238,178,.88);
+  box-shadow:0 0 14px rgba(58,178,78,.18);
+}
+</style>
+</head>
+<body>
+<div id="bg"></div>
+
+<!-- POI sulla mappa -->
+<div id="map-stage">
+  <div id="poi-map-wrap">
+    <svg id="poi-map" width="88" height="88" viewBox="-44 -44 88 88"
+         xmlns="http://www.w3.org/2000/svg" style="overflow:visible;display:block;"></svg>
+    <span class="map-hint">clicca per aprire</span>
+  </div>
+</div>
+
+<!-- Finestra flottante -->
+<div id="win">
+  <div class="win-body">
+
+    <!-- SVG cornice finestra -->
+    <svg id="win-svg" xmlns="http://www.w3.org/2000/svg"
+         style="display:block;width:400px;"
+         viewBox="0 0 400 480">
+      <defs>
+        <filter id="wf-noise" x="0" y="0" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency=".65" numOctaves="4" seed="14" stitchTiles="stitch" result="n"/>
+          <feColorMatrix in="n" type="matrix" values="0 0 0 0 .055 0 0 0 0 .038 0 0 0 0 .018 0 0 0 .16 0" result="c"/>
+          <feBlend in="SourceGraphic" in2="c" mode="overlay"/>
+        </filter>
+        <linearGradient id="wf-bg" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%"   stop-color="#1c1306"/>
+          <stop offset="30%"  stop-color="#130e04"/>
+          <stop offset="70%"  stop-color="#0f0b03"/>
+          <stop offset="100%" stop-color="#090602"/>
+        </linearGradient>
+        <linearGradient id="wf-bv" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%"   stop-color="rgba(200,155,50,.0)"/>
+          <stop offset="12%"  stop-color="rgba(200,155,50,.55)"/>
+          <stop offset="88%"  stop-color="rgba(200,155,50,.55)"/>
+          <stop offset="100%" stop-color="rgba(200,155,50,.0)"/>
+        </linearGradient>
+        <linearGradient id="wf-bh" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stop-color="rgba(200,155,50,.0)"/>
+          <stop offset="12%"  stop-color="rgba(200,155,50,.42)"/>
+          <stop offset="88%"  stop-color="rgba(200,155,50,.42)"/>
+          <stop offset="100%" stop-color="rgba(200,155,50,.0)"/>
+        </linearGradient>
+        <!-- Ambient glow sotto -->
+        <radialGradient id="wf-amb" cx="50%" cy="92%" r="52%">
+          <stop offset="0%" stop-color="rgba(255,188,30,.0)" id="wf-amb-stop"/>
+          <stop offset="100%" stop-color="rgba(255,188,30,.0)"/>
+        </radialGradient>
+      </defs>
+
+      <!-- Corpo -->
+      <rect x="0" y="0" width="400" height="480" rx="2" fill="url(#wf-bg)" filter="url(#wf-noise)"/>
+      <!-- Ambient -->
+      <rect x="0" y="0" width="400" height="480" rx="2" fill="url(#wf-amb)" id="wf-amb-rect" opacity="0"/>
+      <!-- Bordi ornamentali -->
+      <rect x=".5" y=".5" width="399" height="479" rx="1.5" fill="none" stroke="url(#wf-bv)" stroke-width="1"/>
+      <rect x=".5" y=".5" width="399" height="479" rx="1.5" fill="none" stroke="url(#wf-bh)" stroke-width="1"/>
+      <!-- Angoli incisi -->
+      <g stroke="rgba(180,132,42,.42)" stroke-width=".9" fill="none">
+        <path d="M16,7 L7,7 L7,16"/> <path d="M22,7 L7,7 L7,22"/>
+        <path d="M384,7 L393,7 L393,16"/> <path d="M378,7 L393,7 L393,22"/>
+        <path d="M16,473 L7,473 L7,464"/> <path d="M22,473 L7,473 L7,458"/>
+        <path d="M384,473 L393,473 L393,464"/> <path d="M378,473 L393,473 L393,458"/>
+      </g>
+      <!-- Handle grip lines -->
+      <line x1="168" y1="18" x2="232" y2="18" stroke="rgba(180,132,42,.28)" stroke-width=".8"/>
+      <line x1="176" y1="22" x2="224" y2="22" stroke="rgba(180,132,42,.16)" stroke-width=".5"/>
+    </svg>
+
+    <!-- Handle drag -->
+    <div class="drag-handle" id="drag-handle">
+      <div class="handle-bar">
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <!-- Close -->
+    <button class="win-close" id="win-close">✕</button>
+
+    <!-- Contenuto -->
+    <div class="win-content">
+
+      <!-- HEADER: POI + nome -->
+      <div class="win-header">
+        <svg id="poi-win" width="68" height="68" viewBox="-34 -34 68 68"
+             xmlns="http://www.w3.org/2000/svg"
+             style="overflow:visible;display:block;flex-shrink:0;"></svg>
+        <div>
+          <div class="act-name">City Rats Hunting</div>
+          <div class="act-type">Missione · Quartiere est</div>
+          <div class="status-pip pip-idle" id="status-pip">
+            <span class="pip-dot"></span>
+            <span id="status-text">In attesa</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ornament">
+        <div class="orn-line"></div><div class="orn-diamond"></div><div class="orn-line"></div>
+      </div>
+
+      <!-- INFO -->
+      <div class="info-row">
+        <div class="info-item">
+          <span class="info-label">Durata</span>
+          <span class="info-value amber">30s</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Ricompensa</span>
+          <span class="info-value amber">+5 oro</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">ETA</span>
+          <span class="info-value" id="eta-val" style="font-size:11px;">—</span>
+        </div>
+      </div>
+
+      <div class="ornament">
+        <div class="orn-line"></div><div class="orn-diamond"></div><div class="orn-line"></div>
+      </div>
+
+      <!-- SLOT RACK -->
+      <div class="section-label">Personaggi assegnati</div>
+      <div class="slot-rack" id="slot-rack">
+        <!-- generato via JS -->
+      </div>
+
+      <!-- TELEMETRIA -->
+      <div class="tele-wrap">
+        <div class="section-label" style="margin-bottom:6px;">Registro eventi</div>
+        <div class="tele-log" id="tele-log">
+          <div class="tele-empty">Nessun evento registrato.</div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="cta-row">
+        <button class="btn btn-start"   id="btn-start"   disabled>Avvia</button>
+        <button class="btn btn-cancel"  id="btn-cancel"  style="display:none;">Annulla</button>
+        <button class="btn btn-collect" id="btn-collect" style="display:none;">Raccogli</button>
+      </div>
+
+    </div><!-- /win-content -->
+  </div><!-- /win-body -->
+</div><!-- /win -->
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     SCRIPT
+═══════════════════════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+// ─── Costanti SVG ─────────────────────────────────────────────────────────────
+const NS = 'http://www.w3.org/2000/svg';
+const TAU = Math.PI * 2;
+
+// ─── Audio ────────────────────────────────────────────────────────────────────
+let actx = null;
+const ac  = () => { if(!actx||actx.state==='closed') actx=new(window.AudioContext||window.webkitAudioContext)(); return actx; };
+const ar  = c  => c.state==='suspended' ? c.resume() : Promise.resolve();
+function pOsc(c,{f,t='sine',g,a,d,sf,ef},w=0){
+  const T=c.currentTime+w, o=c.createOscillator(), gn=c.createGain();
+  o.type=t; o.frequency.setValueAtTime(sf??f,T);
+  if(ef!=null) o.frequency.exponentialRampToValueAtTime(Math.max(1,ef),T+d);
+  gn.gain.setValueAtTime(.001,T); gn.gain.linearRampToValueAtTime(g,T+a); gn.gain.exponentialRampToValueAtTime(.001,T+a+d);
+  o.connect(gn); gn.connect(c.destination); o.start(T); o.stop(T+a+d+.05);
+}
+function pNoise(c,g,dur,hz,w=0){
+  const T=c.currentTime+w, buf=c.createBuffer(1,Math.ceil(c.sampleRate*dur),c.sampleRate), d=buf.getChannelData(0);
+  for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+  const src=c.createBufferSource(); src.buffer=buf;
+  const flt=c.createBiquadFilter(); flt.type='bandpass'; flt.frequency.value=hz; flt.Q.value=.8;
+  const gn=c.createGain(); gn.gain.setValueAtTime(g,T); gn.gain.exponentialRampToValueAtTime(.001,T+dur);
+  src.connect(flt); flt.connect(gn); gn.connect(c.destination); src.start(T); src.stop(T+dur+.01);
+}
+const SND = {
+  clank()   { const c=ac();ar(c).then(()=>{ pNoise(c,.48,.05,1900); pOsc(c,{f:220,t:'triangle',g:.30,a:.002,d:.18,sf:285,ef:172}); pOsc(c,{f:675,g:.09,a:.001,d:.07}); }); },
+  detach()  { const c=ac();ar(c).then(()=>{ pOsc(c,{f:395,g:.24,a:.001,d:.08,sf:520,ef:262}); pNoise(c,.10,.04,3400); }); },
+  reject()  { const c=ac();ar(c).then(()=>{ pOsc(c,{f:80,g:.40,a:.003,d:.22,sf:112,ef:50}); pNoise(c,.26,.10,185); }); },
+  complete(){ const c=ac();ar(c).then(()=>{ [{f:330,d:0},{f:440,d:.12},{f:660,d:.24}].forEach(({f,d})=>pOsc(c,{f,g:.18,a:.005,d:.52},d)); pNoise(c,.06,.12,6200,.24); }); },
+  resist()  { const c=ac();ar(c).then(()=>pOsc(c,{f:1300,g:.07,a:.001,d:.020})); },
+  appear()  { const c=ac();ar(c).then(()=>{ pOsc(c,{f:520,g:.08,a:.002,d:.10,sf:380,ef:520}); }); },
+};
+
+// ─── SVG mk helper ────────────────────────────────────────────────────────────
+function mk(tag, attrs={}) {
+  const el = document.createElementNS(NS, tag);
+  Object.entries(attrs).forEach(([k,v]) => el.setAttribute(k,v));
+  return el;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  buildPOI — identico al POI v9, scalabile
+//  Ritorna { glow, core } per aggiornare il progress
+// ═══════════════════════════════════════════════════════════════════════════════
+function buildPOI(svgEl, R, crownR, variant='amber') {
+  const id = svgEl.id;
+  const CIRC = TAU * crownR;
+
+  const colors = {
+    amber: { cr:210, cg:138, cb:28, gr:178, gg:105, gb:10 },
+    green: { cr:58,  cg:188, cb:78, gr:28,  gg:148, gb:48 },
+  }[variant] || colors.amber;
+  const {cr,cg,cb,gr,gg,gb} = colors;
+
+  const RIM_R  = R * 0.58;
+  const RIM_SW = R * 0.09;
+  const STONE  = R * 0.42;
+
+  svgEl.innerHTML = `<defs>
+    <radialGradient id="sf-${id}" cx="36%" cy="28%" r="70%">
+      <stop offset="0%"  stop-color="#1e1608"/>
+      <stop offset="100%" stop-color="#030202"/>
+    </radialGradient>
+    <radialGradient id="sa-${id}" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"  stop-color="rgba(255,220,120,.22)"/>
+      <stop offset="100%" stop-color="rgba(255,180,60,0)"/>
+    </radialGradient>
+    <linearGradient id="bz-${id}" x1="14%" y1="4%" x2="86%" y2="96%">
+      <stop offset="0%"   stop-color="#fce890"/>
+      <stop offset="28%"  stop-color="#c09030"/>
+      <stop offset="100%" stop-color="#200e02"/>
+    </linearGradient>
+    <filter id="fr-${id}" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="${R*.028}" result="b"/>
+      <feComposite in="SourceGraphic" in2="b" operator="over"/>
+    </filter>
+    <filter id="fn-${id}" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency=".55" numOctaves="4" seed="7" stitchTiles="stitch" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 .058 0 0 0 0 .040 0 0 0 0 .016 0 0 0 .22 0" result="c"/>
+      <feBlend in="SourceGraphic" in2="c" mode="overlay"/>
+    </filter>
+    <filter id="fg-${id}" x="-80%" y="-80%" width="260%" height="260%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="${R*.028}" result="g1"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="${R*.07}"  result="g2"/>
+      <feColorMatrix in="g2" type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 .38 0" result="g2d"/>
+      <feBlend in="g2d" in2="g1" mode="screen" result="b1"/>
+      <feBlend in="b1" in2="SourceGraphic" mode="screen"/>
+    </filter>
+    <filter id="fd-${id}" x="-60%" y="-50%" width="220%" height="220%">
+      <feDropShadow dx="0" dy="${R*.08}" stdDeviation="${R*.12}" flood-color="rgba(0,0,0,.55)"/>
+    </filter>
+    <clipPath id="cp-${id}"><circle cx="0" cy="0" r="${STONE}"/></clipPath>
+  </defs>
+  <g filter="url(#fd-${id})">
+    <circle cx="0" cy="0" r="${crownR}" fill="none" stroke="rgba(0,0,0,.55)" stroke-width="${R*.14}"/>
+    <circle cx="0" cy="0" r="${RIM_R + RIM_SW*.5 + R*.02}" fill="none" stroke="rgba(0,0,0,.72)" stroke-width="${R*.04}"/>
+    <g style="animation:rim-breath 9.4s ease-in-out infinite">
+      <circle cx="0" cy="0" r="${RIM_R}" fill="none" stroke="url(#bz-${id})" stroke-width="${RIM_SW}" filter="url(#fr-${id})" opacity=".92"/>
+      <circle cx="0" cy="0" r="${RIM_R - RIM_SW*.5 - R*.012}" fill="none" stroke="rgba(0,0,0,.50)" stroke-width="${R*.018}"/>
+    </g>
+    <circle cx="0" cy="0" r="${STONE * 1.06}" fill="url(#sa-${id})" style="animation:s-amb 12.1s ease-in-out infinite"/>
+    <circle cx="0" cy="0" r="${STONE}" fill="url(#sf-${id})" filter="url(#fn-${id})" opacity=".98"/>
+    <g clip-path="url(#cp-${id})">
+      <g transform="translate(${STONE*.014},${STONE*.019})" opacity=".55">
+        <path d="M0,${-STONE*.36} L0,${STONE*.29}" fill="none" stroke="rgba(0,0,0,.95)" stroke-width="${STONE*.065}" stroke-linecap="round"/>
+        <path d="M${-STONE*.20},${-STONE*.018} L${STONE*.20},${-STONE*.018}" fill="none" stroke="rgba(0,0,0,.90)" stroke-width="${STONE*.046}" stroke-linecap="round"/>
+        <path d="M${-STONE*.043},${STONE*.245} L${STONE*.043},${STONE*.245} L0,${STONE*.375} Z" fill="rgba(0,0,0,.90)"/>
+      </g>
+      <g style="animation:flicker 4.3s steps(1,end) infinite" opacity=".50">
+        <path d="M0,${-STONE*.36} L0,${STONE*.29}" fill="none" stroke="rgba(205,190,148,.72)" stroke-width="${STONE*.052}" stroke-linecap="round"/>
+        <path d="M${-STONE*.20},${-STONE*.018} L${STONE*.20},${-STONE*.018}" fill="none" stroke="rgba(205,190,148,.66)" stroke-width="${STONE*.040}" stroke-linecap="round"/>
+        <path d="M${-STONE*.043},${STONE*.245} L${STONE*.043},${STONE*.245} L0,${STONE*.375} Z" fill="rgba(205,190,148,.64)"/>
+      </g>
+    </g>
+    <circle cx="${STONE*.011}" cy="${STONE*.013}" r="${STONE}" fill="none" stroke="rgba(0,0,0,.42)" stroke-width="${R*.034}"/>
+  </g>`;
+
+  // Corona (stessa tecnica POI v9)
+  const glow = mk('circle', {cx:'0',cy:'0',r:`${crownR}`,fill:'none',
+    stroke:`rgba(${gr},${gg},${gb},.50)`,
+    'stroke-width':`${R*.20}`, 'stroke-dasharray':`0 ${CIRC}`,
+    'stroke-linecap':'butt', filter:`url(#fg-${id})`, transform:'rotate(-90)'});
+  const core = mk('circle', {cx:'0',cy:'0',r:`${crownR}`,fill:'none',
+    stroke:`rgba(${cr},${cg},${cb},.90)`,
+    'stroke-width':`${R*.14}`, 'stroke-dasharray':`0 ${CIRC}`,
+    'stroke-linecap':'butt', transform:'rotate(-90)'});
+  svgEl.appendChild(glow);
+  svgEl.appendChild(core);
+
+  return { glow, core, CIRC };
+}
+
+function setPOIProgress(els, progress) {
+  const p    = Math.min(Math.max(progress,0),1);
+  const draw = els.CIRC * p;
+  const gap  = Math.max(0, els.CIRC - draw);
+  const cap  = p >= .999 ? 'butt' : 'round';
+  [els.glow, els.core].forEach(el => {
+    el.setAttribute('stroke-dasharray', `${draw} ${gap}`);
+    el.setAttribute('stroke-linecap', cap);
+  });
+}
+
+// Build POI mappa e finestra
+const poiMapEls = buildPOI(document.getElementById('poi-map'),  44, 36, 'amber');
+const poiWinEls = buildPOI(document.getElementById('poi-win'),  34, 28, 'amber');
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  buildSlot — costruisce un SVG da 80x80 che rappresenta una cavity + medal
+//  state: 'empty'|'ghost'|'idle'|'active'|'done'
+//  Stessa grammatica SVG del POI v9
+// ═══════════════════════════════════════════════════════════════════════════════
+const SLOT_SZ    = 80;  // px
+const SLOT_HALF  = SLOT_SZ / 2;
+const R_OUT      = 38;  // raggio cavity
+const R_RIM      = 26;  // raggio bronzo
+const R_RIM_SW   = 2.8;
+const R_STONE    = 17;  // raggio ritratto
+const R_TRACK    = 36;  // raggio halo orbitale
+const SLOT_CIRC  = TAU * R_TRACK;
+
+function buildSlotSVG(uid, state, progress, idleFill, initial='?') {
+  const isIdle   = state === 'idle';
+  const isActive = state === 'active';
+  const isLocked = state === 'locked';
+  const isDone   = state === 'done';
+  const isEmpty  = state === 'empty';
+  const isGhost  = state === 'ghost';
+  const hasMedal = !isEmpty && !isGhost;
+
+  const svg = mk('svg', {
+    width: SLOT_SZ, height: SLOT_SZ,
+    viewBox: `${-SLOT_HALF} ${-SLOT_HALF} ${SLOT_SZ} ${SLOT_SZ}`,
+    xmlns: NS,
+    style: 'overflow:visible;display:block;',
+  });
+
+  const defs = mk('defs');
+  defs.innerHTML = `
+  <radialGradient id="cav-${uid}" cx="36%" cy="28%" r="72%">
+    <stop offset="0%"  stop-color="#181006"/>
+    <stop offset="44%" stop-color="#0b0703"/>
+    <stop offset="100%" stop-color="#040201"/>
+  </radialGradient>
+  <linearGradient id="bz-${uid}" x1="14%" y1="4%" x2="86%" y2="96%">
+    <stop offset="0%"   stop-color="#fce890"/>
+    <stop offset="9%"   stop-color="#e4b048"/>
+    <stop offset="28%"  stop-color="#a05c18"/>
+    <stop offset="52%"  stop-color="#602c08"/>
+    <stop offset="76%"  stop-color="#341604"/>
+    <stop offset="100%" stop-color="#0e0602"/>
+  </linearGradient>
+  <linearGradient id="bv-${uid}" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%"   stop-color="rgba(255,240,165,.24)"/>
+    <stop offset="100%" stop-color="rgba(0,0,0,.52)"/>
+  </linearGradient>
+  <linearGradient id="ri-${uid}" x1="12%" y1="8%" x2="88%" y2="92%">
+    <stop offset="0%"   stop-color="#f0d070"/>
+    <stop offset="18%"  stop-color="#c08028"/>
+    <stop offset="50%"  stop-color="#6c3610"/>
+    <stop offset="100%" stop-color="#160a02"/>
+  </linearGradient>
+  <radialGradient id="fld-${uid}" cx="38%" cy="30%" r="70%">
+    <stop offset="0%"   stop-color="#2e2012"/>
+    <stop offset="40%"  stop-color="#18100a"/>
+    <stop offset="100%" stop-color="#050302"/>
+  </radialGradient>
+  <radialGradient id="fsp-${uid}" cx="26%" cy="20%" r="55%">
+    <stop offset="0%"   stop-color="rgba(255,245,200,.16)"/>
+    <stop offset="100%" stop-color="rgba(255,220,140,0)"/>
+  </radialGradient>
+  <radialGradient id="amb-${uid}" cx="50%" cy="50%" r="50%">
+    <stop offset="0%"   stop-color="rgba(255,220,120,.16)"/>
+    <stop offset="100%" stop-color="rgba(255,180,60,0)"/>
+  </radialGradient>
+  <radialGradient id="vgn-${uid}" cx="50%" cy="46%" r="52%">
+    <stop offset="0%"   stop-color="rgba(0,0,0,0)"/>
+    <stop offset="50%"  stop-color="rgba(0,0,0,.12)"/>
+    <stop offset="100%" stop-color="rgba(0,0,0,.76)"/>
+  </radialGradient>
+  <radialGradient id="ghl-${uid}" cx="28%" cy="22%" r="38%">
+    <stop offset="0%"   stop-color="rgba(255,255,255,.19)"/>
+    <stop offset="40%"  stop-color="rgba(255,255,255,.06)"/>
+    <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+  </radialGradient>
+  <!-- Drop shadow elevato (idle/done) -->
+  <filter id="fd-${uid}" x="-70%" y="-60%" width="240%" height="240%">
+    <feDropShadow dx="0" dy="6" stdDeviation="5.5" flood-color="rgba(0,0,0,.68)"/>
+    <feDropShadow dx="0" dy="1.5" stdDeviation="2" flood-color="rgba(0,0,0,.42)"/>
+  </filter>
+  <!-- Drop shadow incastonato (active/locked) -->
+  <filter id="fi-${uid}" x="-70%" y="-60%" width="240%" height="240%">
+    <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="rgba(0,0,0,.38)"/>
+  </filter>
+  <!-- Fractal noise bronzo -->
+  <filter id="fn-${uid}" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence type="fractalNoise" baseFrequency=".55" numOctaves="4" seed="7" stitchTiles="stitch" result="n"/>
+    <feColorMatrix in="n" type="matrix" values="0 0 0 0 .05 0 0 0 0 .034 0 0 0 0 .012 0 0 0 .18 0" result="c"/>
+    <feBlend in="SourceGraphic" in2="c" mode="overlay"/>
+  </filter>
+  <!-- Glow screen (corona orbitale) -->
+  <filter id="fg-${uid}" x="-80%" y="-80%" width="260%" height="260%" color-interpolation-filters="sRGB">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="1.2" result="g1"/>
+    <feGaussianBlur in="SourceGraphic" stdDeviation="3.2" result="g2"/>
+    <feColorMatrix in="g2" type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 .36 0" result="g2d"/>
+    <feBlend in="g2d" in2="g1" mode="screen" result="b1"/>
+    <feBlend in="b1" in2="SourceGraphic" mode="screen"/>
+  </filter>
+  <!-- Glow verde (done) -->
+  <filter id="fgd-${uid}" x="-80%" y="-80%" width="260%" height="260%" color-interpolation-filters="sRGB">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="1.0" result="g1"/>
+    <feGaussianBlur in="SourceGraphic" stdDeviation="3.8" result="g2"/>
+    <feColorMatrix in="g2" type="matrix" values="0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 .44 0" result="g2d"/>
+    <feBlend in="g2d" in2="g1" mode="screen" result="b1"/>
+    <feBlend in="b1" in2="SourceGraphic" mode="screen"/>
+  </filter>
+  <clipPath id="cp-${uid}"><circle cx="0" cy="0" r="${R_STONE}"/></clipPath>
+  <clipPath id="cm-${uid}"><circle cx="0" cy="0" r="${R_RIM}"/></clipPath>
+  `;
+  svg.appendChild(defs);
+
+  // ── CAVITY ────────────────────────────────────────────────────────────────
+  svg.appendChild(mk('circle',{cx:'0',cy:'0',r:`${R_OUT}`,fill:`url(#cav-${uid})`}));
+  // Inset shadow NW
+  svg.appendChild(mk('circle',{cx:'0',cy:'0',r:`${R_OUT}`,fill:'none',
+    stroke:'rgba(0,0,0,.88)','stroke-width':'5',transform:'translate(1.4,2.0)',opacity:'.52'}));
+  // Rim luce NW
+  svg.appendChild(mk('circle',{cx:'0',cy:'0',r:`${R_OUT - 1.2}`,fill:'none',
+    stroke:'rgba(255,240,170,.04)','stroke-width':'1.4'}));
+  // Bordo inciso
+  svg.appendChild(mk('circle',{cx:'0',cy:'0',r:`${R_OUT}`,fill:'none',
+    stroke:'rgba(52,36,10,.62)','stroke-width':'1.0'}));
+
+  // ── GHOST / EMPTY hint ────────────────────────────────────────────────────
+  if(isEmpty || isGhost) {
+    const hg = mk('g',{opacity: isGhost ? '.55' : '.28'});
+    hg.innerHTML = `
+      <circle cx="0" cy="0" r="${R_STONE + 3}" fill="none"
+        stroke="rgba(175,128,38,.62)" stroke-width="${isGhost?'.7':'1'}"
+        stroke-dasharray="${isGhost?'2.5 2':'3 2.5'}"/>
+      <line x1="0" y1="${-(R_STONE*.55)}" x2="0" y2="${R_STONE*.55}"
+        stroke="rgba(175,128,38,.62)" stroke-width="${isGhost?'.9':'1.3'}" stroke-linecap="round"/>
+      <line x1="${-(R_STONE*.55)}" y1="0" x2="${R_STONE*.55}" y2="0"
+        stroke="rgba(175,128,38,.62)" stroke-width="${isGhost?'.9':'1.3'}" stroke-linecap="round"/>
+    `;
+    svg.appendChild(hg);
+    return { svg };
+  }
+
+  // ── MEDAGLIONE ────────────────────────────────────────────────────────────
+  const sinkT  = (isActive||isLocked) ? 'scale(0.91) translate(0,3)' : 'scale(1)';
+  const filter = (isActive||isLocked) ? `url(#fi-${uid})` : `url(#fd-${uid})`;
+  const rimAnim = isActive||isLocked  ? 'sm-rim-active 4.2s ease-in-out infinite'
+               : isDone               ? 'sm-rim-done .65s ease-out forwards'
+               :                        'sm-rim-idle 9.4s ease-in-out infinite';
+
+  const mg = mk('g',{filter, transform: sinkT});
+  mg.id = `mg-${uid}`;
+  mg.innerHTML = `
+    <g clip-path="url(#cm-${uid})">
+      <circle cx="0" cy="0" r="${R_RIM}" fill="#1a0c04"/>
+      <circle cx="0" cy="0" r="${R_RIM}" fill="url(#bz-${uid})" opacity=".90"
+        filter="url(#fn-${uid})" style="animation:${rimAnim}"/>
+      <circle cx="0" cy="0" r="${R_RIM}" fill="url(#bv-${uid})" opacity=".40"/>
+      <!-- Rim highlight NW -->
+      <circle cx="0" cy="0" r="${R_RIM - 1.8}" fill="none"
+        stroke="rgba(255,250,178,.44)" stroke-width=".8"
+        stroke-dasharray="${R_RIM*1.85} 999" stroke-dashoffset="${R_RIM*2.10}" stroke-linecap="round"/>
+      <!-- Inner ring -->
+      <circle cx="0" cy="0" r="${R_RIM - 4.5}" fill="#130902"/>
+      <circle cx="0" cy="0" r="${R_RIM - 4.5}" fill="url(#ri-${uid})" opacity=".62"/>
+      <circle cx="0" cy="0" r="${R_RIM - 4.5}" fill="none"
+        stroke="rgba(0,0,0,.68)" stroke-width="1.6" transform="translate(.24,.28)"/>
+      <!-- Field stone -->
+      <circle cx="0" cy="0" r="${R_STONE + 3}" fill="url(#fld-${uid})"/>
+      <circle cx="0" cy="0" r="${R_STONE + 3}" fill="url(#fsp-${uid})"/>
+      <circle cx="0" cy="0" r="${R_STONE + 3}" fill="url(#amb-${uid})"
+        style="animation:s-amb 12.1s ease-in-out infinite"/>
+      <!-- Iniziale -->
+      <text x="0" y="${R_STONE*.07}" text-anchor="middle" dominant-baseline="middle"
+        fill="rgba(200,155,50,.62)" font-size="${R_STONE*.82}"
+        font-family="Cinzel,Georgia,serif" font-weight="600"
+        clip-path="url(#cp-${uid})">${initial}</text>
+      <!-- Vignette + glass -->
+      <circle cx="0" cy="0" r="${R_STONE}" fill="url(#vgn-${uid})"/>
+      <circle cx="0" cy="0" r="${R_STONE}" fill="url(#ghl-${uid})"/>
+      <circle cx="0" cy="0" r="${R_STONE}" fill="none"
+        stroke="rgba(172,105,24,.24)" stroke-width="1.2"/>
+      <circle cx="0" cy="0" r="${R_STONE}" fill="none"
+        stroke="rgba(0,0,0,.52)" stroke-width="1.4" transform="translate(.22,.26)"/>
+      <circle cx="0" cy="0" r="${R_STONE-.4}" fill="none"
+        stroke="rgba(255,255,255,.14)" stroke-width=".5"
+        stroke-dasharray="${R_STONE*1.68} 999" stroke-dashoffset="${R_STONE*1.90}" stroke-linecap="round"/>
+      <!-- AO bottom -->
+      <circle cx="0" cy="0" r="${R_STONE + 3}" fill="none"
+        stroke="rgba(0,0,0,.42)" stroke-width="3.2"
+        stroke-dasharray="${(R_STONE+3)*4.4} ${(R_STONE+3)*4.4}"
+        stroke-dashoffset="${-(R_STONE+3)*2.2}" stroke-linecap="round"/>
+    </g>
+  `;
+  svg.appendChild(mg);
+
+  // Lock badge
+  if(isActive||isLocked) {
+    const bx = R_RIM * .65, by = R_RIM * .65;
+    const bg = mk('g',{transform:`translate(${bx},${by})`});
+    bg.innerHTML = `
+      <circle cx="0" cy="0" r="7.5" fill="rgba(8,5,1,.96)"/>
+      <circle cx="0" cy="0" r="7.5" fill="none" stroke="rgba(148,104,24,.55)" stroke-width=".7"/>
+      <rect x="-3.6" y=".5" width="7.2" height="5.8" rx=".8" fill="rgba(172,124,26,.90)"/>
+      <path d="M-2.6 .5 V-1.7 a2.6 2.6 0 0 1 5.2 0 V.5"
+        fill="none" stroke="rgba(172,124,26,.90)" stroke-width="1.3" stroke-linecap="round"/>
+    `;
+    svg.appendChild(bg);
+  }
+
+  // ── CORONA ORBITALE ───────────────────────────────────────────────────────
+  let fill, cr, cg, cb, gr, gg, gb, glowFilter, trackW, arcW, dashed;
+
+  if(isIdle){
+    fill=idleFill; cr=192;cg=138;cb=30; gr=155;gg=108;gb=18;
+    glowFilter=`url(#fg-${uid})`; trackW=4.2;arcW=2.8;dashed=true;
+  } else if(isActive){
+    fill=Math.max(0,Math.min(1,progress)); cr=255;cg=220;cb=72; gr=210;gg=160;gb=22;
+    glowFilter=`url(#fg-${uid})`; trackW=6.5;arcW=4.5;dashed=false;
+  } else if(isLocked){
+    fill=Math.max(0,Math.min(1,progress)); cr=120;cg=88;cb=25; gr=85;gg=58;gb=12;
+    glowFilter=`url(#fg-${uid})`; trackW=6.0;arcW=4.0;dashed=false;
+  } else if(isDone){
+    fill=1; cr=72;cg=230;cb=105; gr=38;gg=180;gb=72;
+    glowFilter=`url(#fgd-${uid})`; trackW=5.8;arcW=4.0;dashed=false;
+  }
+
+  if(fill !== undefined) {
+    // Track scanalatura
+    svg.appendChild(mk('circle',{cx:'0',cy:'0',r:`${R_TRACK}`,fill:'none',
+      stroke:'rgba(0,0,0,.60)','stroke-width':`${trackW + 2.2}`}));
+
+    const drawn = SLOT_CIRC * Math.min(fill,1);
+    const gap   = Math.max(0, SLOT_CIRC - drawn);
+    const full  = fill >= .999;
+    const cap   = full ? 'butt' : (dashed ? 'butt' : 'round');
+
+    if(fill > .005) {
+      if(dashed) {
+        // Idle: tratteggiato antiorario
+        const segL = R_TRACK * .21;
+        const gapL = R_TRACK * .10;
+        svg.appendChild(mk('circle',{cx:'0',cy:'0',r:`${R_TRACK}`,fill:'none',
+          stroke:`rgba(${cr},${cg},${cb},.78)`,'stroke-width':`${arcW}`,
+          'stroke-dasharray':`${segL} ${gapL}`,
+          transform:'rotate(90) scale(1,-1)'}));
+      } else {
+        // Continuo con glow
+        const glEl = mk('circle',{cx:'0',cy:'0',r:`${R_TRACK}`,fill:'none',
+          stroke:`rgba(${gr},${gg},${gb},.44)`,'stroke-width':`${arcW + 3.2}`,
+          'stroke-dasharray':`${drawn} ${gap}`,'stroke-linecap':cap,
+          filter:glowFilter,transform:'rotate(-90)'});
+        const coreEl = mk('circle',{cx:'0',cy:'0',r:`${R_TRACK}`,fill:'none',
+          stroke:`rgba(${cr},${cg},${cb},.94)`,'stroke-width':`${arcW}`,
+          'stroke-dasharray':`${drawn} ${gap}`,'stroke-linecap':cap,
+          transform:'rotate(-90)'});
+        svg.appendChild(glEl);
+        svg.appendChild(coreEl);
+
+        // Punto luminoso fronte
+        if(!full && fill > .02) {
+          const ang = -Math.PI/2 + fill * TAU;
+          const px  = R_TRACK * Math.cos(ang);
+          const py  = R_TRACK * Math.sin(ang);
+          const dot = mk('circle',{cx:`${px.toFixed(2)}`,cy:`${py.toFixed(2)}`,
+            r:`${arcW*.65}`,fill:'rgba(255,252,200,.94)',filter:glowFilter});
+          svg.appendChild(dot);
+        }
+      }
+    }
+  }
+
+  return { svg, mg };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  SLOT RACK STATE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const NAMES   = ['Aldric','Maren','Soren','Livia','Theron','Kairos','Vael','Oren'];
+let   nameIdx = 0;
+
+// Ogni slot: { id, state, initial, progress, idleFill, idleRaf, svgWrap, svg }
+const slots = [];
+let   uidCounter = 0;
+
+const rack = document.getElementById('slot-rack');
+
+function nextName() { return NAMES[nameIdx++ % NAMES.length]; }
+
+// Crea uno slot DOM e lo aggiunge al rack
+function createSlot(state, initial) {
+  const uid  = `s${uidCounter++}`;
+  const slot = {
+    id: uid, state, initial: initial || '?',
+    progress: 0, idleFill: 0, idleRaf: null,
+    svgWrap: null, svg: null, svgEls: null,
+    holdRaf: null, holdTimer: null, resistPct: 0,
+  };
+
+  const wrap = document.createElement('div');
+  wrap.className = 'slot-svg-wrap';
+  if(state === 'ghost') wrap.classList.add('slot-ghost');
+  wrap.dataset.uid = uid;
+  wrap.style.cssText = 'animation:slot-appear .32s cubic-bezier(.22,.72,0,1) both;';
+
+  const {svg} = buildSlotSVG(uid, state, 0, 0, initial);
+  slot.svg = svg;
+  slot.svgWrap = wrap;
+  wrap.appendChild(svg);
+  rack.appendChild(wrap);
+
+  // Click su slot vuoto/ghost → assegna
+  wrap.addEventListener('click', () => {
+    if(slot.state === 'empty' || slot.state === 'ghost') {
+      assignSlot(slot);
+    }
+  });
+  // Hold per stacco su idle
+  wrap.addEventListener('pointerdown', e => { e.preventDefault(); startHold(slot); });
+  wrap.addEventListener('pointerup',   () => endHold(slot));
+  wrap.addEventListener('pointerleave',() => endHold(slot));
+
+  slots.push(slot);
+  return slot;
+}
+
+function redrawSlot(slot) {
+  const oldSvg = slot.svg;
+  const {svg} = buildSlotSVG(slot.id, slot.state, slot.progress, slot.idleFill, slot.initial);
+  slot.svg = svg;
+  slot.svgWrap.replaceChild(svg, oldSvg);
+
+  // Ricollega gli event listener (già sul wrap, non sull'svg — ok)
+}
+
+// Ghost sempre in coda
+function ensureGhost() {
+  const last = slots[slots.length - 1];
+  if(!last || last.state !== 'ghost') {
+    const g = createSlot('ghost', '');
+  }
+}
+
+// Assegna un personaggio allo slot
+function assignSlot(slot) {
+  if(slot.state !== 'empty' && slot.state !== 'ghost') return;
+  const name   = nextName();
+  const wasGhost = slot.state === 'ghost';
+
+  slot.state   = 'idle';
+  slot.initial = name[0].toUpperCase();
+  slot.svgWrap.classList.remove('slot-ghost');
+  redrawSlot(slot);
+  startIdleHalo(slot);
+  SND.clank();
+  tele(`Personaggio <em>${name}</em> assegnato`, 'ev-assign');
+
+  // Aggiorna btn start
+  document.getElementById('btn-start').disabled = false;
+
+  // Appendi nuovo ghost
+  if(wasGhost) { SND.appear(); ensureGhost(); }
+
+  updateStatus();
+}
+
+// ─── Idle halo animation ─────────────────────────────────────────────────────
+function startIdleHalo(slot) {
+  if(slot.idleRaf) cancelAnimationFrame(slot.idleRaf);
+  slot.idleFill = 0; let start = null;
+  function step(ts) {
+    if(!start) start = ts;
+    const t = Math.min(1,(ts-start)/1400);
+    slot.idleFill = t < .12 ? (t/.12)*(t/.12)*.12 : .12+(t-.12);
+    if(slot.state === 'idle') redrawSlot(slot);
+    if(t < 1) slot.idleRaf = requestAnimationFrame(step);
+  }
+  slot.idleRaf = requestAnimationFrame(step);
+}
+function stopIdleHalo(slot) {
+  if(slot.idleRaf) cancelAnimationFrame(slot.idleRaf);
+  slot.idleRaf = null;
+}
+
+// ─── Hold / resist / detach ───────────────────────────────────────────────────
+const HOLD_MS = 600;
+function startHold(slot) {
+  if(slot.state === 'active' || slot.state === 'locked') { SND.reject(); shakeSlot(slot); return; }
+  if(slot.state !== 'idle') return;
+  slot.resistPct = 0;
+  const start = performance.now();
+  let lastTick = start;
+  function step(ts) {
+    slot.resistPct = Math.min(1,(ts-start)/HOLD_MS);
+    if(ts-lastTick > 145) { SND.resist(); lastTick=ts; }
+    if(slot.state === 'idle') redrawResist(slot);
+    if(slot.resistPct < 1) slot.holdRaf = requestAnimationFrame(step);
+    else detachSlot(slot);
+  }
+  slot.holdRaf = requestAnimationFrame(step);
+  slot.holdTimer = setTimeout(() => detachSlot(slot), HOLD_MS+20);
+}
+function endHold(slot) {
+  if(slot.holdTimer) clearTimeout(slot.holdTimer);
+  if(slot.holdRaf)   cancelAnimationFrame(slot.holdRaf);
+  slot.holdTimer = slot.holdRaf = null;
+  slot.resistPct = 0;
+  if(slot.state === 'idle') redrawSlot(slot);
+}
+function detachSlot(slot) {
+  endHold(slot);
+  if(slot.state !== 'idle') return;
+  SND.detach(); stopIdleHalo(slot);
+  tele(`Personaggio <em>${slot.initial}</em> rimosso`, 'ev-detach');
+  // Rimuovi slot dal rack e dall'array
+  slot.svgWrap.remove();
+  slots.splice(slots.indexOf(slot), 1);
+  // Se non c'è più ghost, aggiungi
+  ensureGhost();
+  updateStatus();
+  checkStartButton();
+}
+function shakeSlot(slot) {
+  const xs = [0,-5,5,-4,4,-2,2,0];
+  let i=0, orig=slot.svgWrap.style.transform;
+  function step() {
+    if(i>=xs.length){ slot.svgWrap.style.transform=orig; return; }
+    slot.svgWrap.style.transform = `translateX(${xs[i++]}px)`;
+    setTimeout(step,42);
+  }
+  step();
+}
+function redrawResist(slot) {
+  // Sovrapponi arco rosso sull'SVG esistente senza ricostruire tutto
+  const existingR = slot.svg.querySelector('.resist-arc');
+  if(existingR) existingR.remove();
+  if(slot.resistPct > 0) {
+    const drawn = SLOT_CIRC * slot.resistPct;
+    const gap   = Math.max(0, SLOT_CIRC - drawn);
+    const ra = mk('circle',{cx:'0',cy:'0',r:`${R_TRACK}`,fill:'none',
+      'class':'resist-arc',
+      stroke:`rgba(200,50,30,${(.28+slot.resistPct*.55).toFixed(2)})`,
+      'stroke-width':'3.8','stroke-dasharray':`${drawn} ${gap}`,
+      'stroke-linecap':'round',transform:'rotate(-90)'});
+    slot.svg.appendChild(ra);
+  }
+}
+
+// ─── Activity lifecycle ───────────────────────────────────────────────────────
+let activityIv = null;
+
+function startActivity() {
+  const activeSlots = slots.filter(s => s.state === 'idle');
+  if(!activeSlots.length) return;
+
+  activeSlots.forEach(s => {
+    stopIdleHalo(s);
+    s.state = 'active'; s.progress = 0;
+    redrawSlot(s);
+  });
+
+  document.getElementById('btn-start').style.display   = 'none';
+  document.getElementById('btn-cancel').style.display  = 'flex';
+  document.getElementById('btn-collect').style.display = 'none';
+  setStatus('active');
+  tele('Attività <em>avviata</em>', 'ev-start');
+
+  // Ambient glow acceso
+  document.getElementById('wf-amb-stop').setAttribute('stop-color','rgba(255,188,30,.08)');
+  document.getElementById('wf-amb-rect').setAttribute('opacity','1');
+
+  // ETA
+  document.getElementById('eta-val').textContent = '30s';
+
+  let p = 0, elapsed = 0;
+  activityIv = setInterval(() => {
+    p = Math.min(1, p + .006); elapsed += 0.12;
+    activeSlots.forEach(s => { if(s.state==='active'){ s.progress=p; redrawSlot(s); }});
+    setPOIProgress(poiMapEls, p);
+    setPOIProgress(poiWinEls, p);
+    const rem = Math.max(0, 30 - elapsed).toFixed(0);
+    document.getElementById('eta-val').textContent = rem + 's';
+    if(p >= 1) { clearInterval(activityIv); completeActivity(activeSlots); }
+  }, 120);
+}
+
+function completeActivity(activeSlots) {
+  activeSlots.forEach(s => { s.state = 'done'; s.progress = 1; redrawSlot(s); });
+  SND.complete();
+  setStatus('done');
+  document.getElementById('btn-cancel').style.display  = 'none';
+  document.getElementById('btn-collect').style.display = 'flex';
+  document.getElementById('eta-val').textContent = '✓';
+  // Ambient verde
+  document.getElementById('wf-amb-stop').setAttribute('stop-color','rgba(48,188,72,.06)');
+  tele('Attività <em>completata</em>', 'ev-done');
+}
+
+function cancelActivity() {
+  if(activityIv) clearInterval(activityIv);
+  slots.filter(s => s.state === 'active' || s.state === 'done').forEach(s => {
+    s.state = 'idle'; s.progress = 0; redrawSlot(s); startIdleHalo(s);
+  });
+  setStatus('idle');
+  document.getElementById('btn-start').style.display  = 'flex';
+  document.getElementById('btn-cancel').style.display = 'none';
+  document.getElementById('btn-collect').style.display= 'none';
+  document.getElementById('eta-val').textContent = '—';
+  document.getElementById('wf-amb-stop').setAttribute('stop-color','rgba(255,188,30,.0)');
+  document.getElementById('wf-amb-rect').setAttribute('opacity','0');
+  setPOIProgress(poiMapEls, 0);
+  setPOIProgress(poiWinEls, 0);
+  tele('Attività <em>annullata</em>', 'ev-detach');
+}
+
+function collectRewards() {
+  slots.filter(s => s.state === 'done').forEach(s => {
+    stopIdleHalo(s); s.svgWrap.remove();
+    slots.splice(slots.indexOf(s), 1);
+  });
+  ensureGhost();
+  document.getElementById('btn-start').style.display  = 'flex';
+  document.getElementById('btn-collect').style.display= 'none';
+  document.getElementById('btn-start').disabled = true;
+  document.getElementById('eta-val').textContent = '—';
+  setStatus('idle');
+  document.getElementById('wf-amb-stop').setAttribute('stop-color','rgba(255,188,30,.0)');
+  document.getElementById('wf-amb-rect').setAttribute('opacity','0');
+  setPOIProgress(poiMapEls, 0);
+  setPOIProgress(poiWinEls, 0);
+  tele('Ricompense <em>raccolte</em>', 'ev-done');
+}
+
+function checkStartButton() {
+  const hasIdle = slots.some(s => s.state === 'idle');
+  document.getElementById('btn-start').disabled = !hasIdle;
+}
+
+// ─── Status pip ───────────────────────────────────────────────────────────────
+function setStatus(s) {
+  const pip  = document.getElementById('status-pip');
+  const text = document.getElementById('status-text');
+  pip.className = 'status-pip';
+  if(s==='active')    { pip.classList.add('pip-active'); text.textContent='In corso'; }
+  else if(s==='done') { pip.classList.add('pip-done');   text.textContent='Completato'; }
+  else                { pip.classList.add('pip-idle');    text.textContent='In attesa'; }
+}
+function updateStatus() { /* status aggiornato esplicitamente */ }
+
+// ─── Telemetria ───────────────────────────────────────────────────────────────
+function tele(msg, cls='') {
+  const log  = document.getElementById('tele-log');
+  const empty = log.querySelector('.tele-empty');
+  if(empty) empty.remove();
+  const now  = new Date();
+  const e    = document.createElement('div');
+  e.className = `tele-entry ${cls}`;
+  e.innerHTML = `<span class="tele-time">${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}</span><span class="tele-msg">${msg}</span>`;
+  log.prepend(e);
+  while(log.children.length > 14) log.removeChild(log.lastChild);
+}
+
+// ─── Button bindings ──────────────────────────────────────────────────────────
+document.getElementById('btn-start').addEventListener('click',   startActivity);
+document.getElementById('btn-cancel').addEventListener('click',  cancelActivity);
+document.getElementById('btn-collect').addEventListener('click', collectRewards);
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  DRAG — identico al capsule-scroll
+// ═══════════════════════════════════════════════════════════════════════════════
+const win     = document.getElementById('win');
+const handle  = document.getElementById('drag-handle');
+let isDragging=false, dragOffX=0, dragOffY=0;
+
+// Posizione iniziale (centrata)
+win.style.left = '50%';
+win.style.top  = '50%';
+
+handle.addEventListener('mousedown', e => {
+  isDragging = true;
+  const rect = win.getBoundingClientRect();
+  dragOffX   = e.clientX - rect.left - rect.width/2;
+  dragOffY   = e.clientY - rect.top  - rect.height/2;
+  win.style.transition = 'none';
+  win.classList.add('dragging');
+  e.preventDefault();
+});
+document.addEventListener('mousemove', e => {
+  if(!isDragging) return;
+  const vw=window.innerWidth, vh=window.innerHeight;
+  const sw=win.offsetWidth,   sh=win.offsetHeight;
+  let nx = e.clientX - dragOffX;
+  let ny = e.clientY - dragOffY;
+  nx = Math.max(sw/2, Math.min(vw-sw/2, nx));
+  ny = Math.max(sh/2, Math.min(vh-sh/2, ny));
+  win.style.left      = nx+'px';
+  win.style.top       = ny+'px';
+  win.style.transform = 'translate(-50%,-50%) scale(1)';
+});
+document.addEventListener('mouseup', () => { isDragging=false; win.classList.remove('dragging'); });
+
+// Touch
+handle.addEventListener('touchstart', e => {
+  isDragging = true;
+  const t=e.touches[0], rect=win.getBoundingClientRect();
+  dragOffX = t.clientX - rect.left - rect.width/2;
+  dragOffY = t.clientY - rect.top  - rect.height/2;
+  win.style.transition = 'none';
+  e.preventDefault();
+},{passive:false});
+document.addEventListener('touchmove', e => {
+  if(!isDragging) return;
+  const t=e.touches[0];
+  const vw=window.innerWidth, vh=window.innerHeight;
+  const sw=win.offsetWidth,   sh=win.offsetHeight;
+  let nx=t.clientX-dragOffX, ny=t.clientY-dragOffY;
+  nx=Math.max(sw/2,Math.min(vw-sw/2,nx));
+  ny=Math.max(sh/2,Math.min(vh-sh/2,ny));
+  win.style.left=nx+'px'; win.style.top=ny+'px';
+  win.style.transform='translate(-50%,-50%) scale(1)';
+},{passive:false});
+document.addEventListener('touchend', ()=>{ isDragging=false; });
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  OPEN / CLOSE
+// ═══════════════════════════════════════════════════════════════════════════════
+document.getElementById('poi-map-wrap').addEventListener('click', () => {
+  win.classList.add('open');
+});
+document.getElementById('win-close').addEventListener('click', () => {
+  win.classList.remove('open');
+  win.style.transition = '';
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════════════════════
+// Inizia con un solo ghost
+ensureGhost();
+
+// POI mappa — anima progress dimostrativo lentamente
+let mapPhase = 0;
+(function mapLoop(ts) {
+  mapPhase += .004;
+  const p = (Math.sin(mapPhase) + 1) / 2 * .35; // 0–35% demo
+  // Solo se non c'è attività in corso
+  const hasActivity = slots.some(s => s.state==='active'||s.state==='done');
+  if(!hasActivity) setPOIProgress(poiMapEls, p);
+  requestAnimationFrame(mapLoop);
+})();
+
+</script>
+</body>
+</html>
