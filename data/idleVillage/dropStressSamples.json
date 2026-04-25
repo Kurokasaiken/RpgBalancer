@@ -1,0 +1,51 @@
+{
+  "metadata": {
+    "name": "Idle Village Drop Stress Test Dataset",
+    "version": "1.0.0",
+    "description": "Comprehensive dataset for stress testing Idle Village drop validation system",
+    "totalScenarios": 8,
+    "created": "2026-01-20T00:00:00.000Z",
+    "updated": "2026-01-20T00:00:00.000Z",
+    "tags": ["stress-test", "drop-validation", "idle-village", "phase-e"]
+  },
+  "scenarios": [
+    {
+      "id": "basic-valid-drop",
+      "seed": 1001,
+      "residentStats": {
+        "id": "worker-001",
+        "name": "Alice Worker",
+        "level": 5,
+        "stats": {"strength": 45, "agility": 38, "intelligence": 52},
+        "fatigue": 25,
+        "tags": ["worker", "strong"]
+      },
+      "slotInfo": {
+        "id": "forest-gathering",
+        "type": "activity",
+        "name": "Forest Gathering",
+        "capacity": 3,
+        "currentOccupants": 1,
+        "requirements": {"minLevel": 1, "maxFatigue": 80, "requiredStats": {"strength": 20}}
+      },
+      "expectedVerdict": {
+        "valid": true,
+        "reason": "Resident meets all requirements",
+        "confidence": 0.95,
+        "ruleViolations": []
+      },
+      "metadata": {
+        "category": "basic-validation",
+        "difficulty": "easy",
+        "description": "Basic valid drop scenario",
+        "tags": ["basic", "valid"],
+        "created": "2026-01-20T00:00:00.000Z"
+      }
+    }
+  ],
+  "benchmarks": {
+    "maxLatencyMs": 100,
+    "minAccuracyRate": 0.95,
+    "maxMemoryUsageMB": 50
+  }
+}

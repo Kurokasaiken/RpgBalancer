@@ -1,0 +1,38 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@docs/*": ["./src/docs/*"],
+      "surge/*": ["./surge/*"]
+    },
+    "types": ["vitest/globals", "node", "vite/client"],
+    "typeRoots": [
+      "./src/types",
+      "./node_modules/@types",
+      "./node_modules"
+    ]
+  },
+  "include": [
+    "tests/global.d.ts",
+    "tests/unit/**/*.{test,spec}.{ts,tsx}",
+    "tests/simulators/**/*.{test,spec}.{ts,tsx}",
+    "tests/shared/**/*.{test,spec}.{ts,tsx}",
+    "src/**/*.unit.{test,spec}.{ts,tsx}",
+    "vitest.setup.ts",
+    "tests/unit/idleVillage/__fixtures__/**/*.ts"
+  ],
+  "exclude": [
+    "src/components/**/*",
+    "src/pages/**/*",
+    "src/stories/**/*",
+    "**/*.rtl.test.tsx",
+    "**/*.integration.test.ts",
+    "**/*.integration.test.tsx",
+    "tests/**/*.spec.tsx",
+    "tests/villageSandbox-*.spec.ts",
+    "tests/villageSandbox-*.spec.tsx"
+  ]
+}

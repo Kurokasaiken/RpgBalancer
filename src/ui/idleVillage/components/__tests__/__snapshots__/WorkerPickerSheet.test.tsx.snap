@@ -1,0 +1,375 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`WorkerPickerSheet > disables assign button for incompatible residents 1`] = `
+<div
+  class="fixed inset-0 z-50 flex items-end"
+  data-sandbox-interaction-picker="open"
+  data-testid="worker-picker-overlay"
+  role="presentation"
+  style="background: var(--body-bg-overlay, rgba(0, 0, 0, 0.78)); opacity: 1; transition: opacity 220ms ease;"
+>
+  <section
+    aria-describedby="_r_8_"
+    aria-labelledby="_r_7_"
+    aria-modal="true"
+    class="relative w-full rounded-t-4xl border p-0"
+    data-sandbox-worker-picker="open"
+    role="dialog"
+    style="background: var(--panel-surface, rgba(5, 6, 9, 0.95)); border-color: var(--panel-border, rgba(255, 255, 255, 0.08)); box-shadow: 0 -35px 80px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08); transform: translateY(0); transition: transform 360ms cubic-bezier(0.18, 0.9, 0.32, 1.15);"
+  >
+    <span
+      aria-hidden="true"
+      class="absolute h-0 w-0 opacity-0"
+      tabindex="0"
+    />
+    <div
+      class="sticky top-0 z-10 border-b px-5 py-4 backdrop-blur"
+      style="background: linear-gradient(135deg, rgba(8, 12, 20, 0.95), rgba(3, 5, 10, 0.9)); border-color: var(--panel-border, rgba(255, 255, 255, 0.12)); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);"
+    >
+      <div
+        class="flex items-start justify-between gap-3"
+      >
+        <div
+          class="space-y-1"
+        >
+          <p
+            class="text-[11px] uppercase tracking-[0.35em] text-slate-400"
+            id="_r_8_"
+          >
+            Seleziona un residente per il turno
+          </p>
+          <h2
+            class="text-lg font-semibold text-(--text-primary,#fefce8)"
+            id="_r_7_"
+          >
+            Allenamento
+          </h2>
+          <p
+            class="text-xs text-slate-400"
+          >
+            Work Shift
+          </p>
+        </div>
+        <div
+          class="flex items-center gap-2"
+        >
+          <div
+            aria-hidden="true"
+            class="hidden h-6 w-6 rounded-full border border-white/10 sm:block"
+            id="_r_6_"
+          />
+          <button
+            aria-label="Chiudi selezione lavoratore"
+            class="rounded-full border border-white/15 px-4 py-2 text-[11px] uppercase tracking-[0.3em] text-slate-200 transition hover:border-white/40 hover:text-white"
+            data-sandbox-worker-picker-close="true"
+            type="button"
+          >
+            Chiudi
+          </button>
+        </div>
+      </div>
+    </div>
+    <div
+      class="max-h-[60vh] space-y-3 overflow-y-auto px-5 py-4"
+    >
+      <article
+        class="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 shadow-[0_10px_20px_rgba(0,0,0,0.35)] opacity-70"
+        data-sandbox-worker-id="resident-invalid"
+      >
+        <div
+          class="flex items-center gap-3"
+        >
+          <div
+            aria-hidden="true"
+            class="flex items-center justify-center rounded-[18px] border border-white/15 bg-[rgba(6,10,18,0.85)] text-amber-100 shadow-[0_14px_30px_rgba(0,0,0,0.45)] transition-all overflow-hidden h-12 w-12"
+          >
+            <span
+              class="font-semibold uppercase tracking-[0.35em] text-xs"
+            >
+              T
+            </span>
+          </div>
+          <div>
+            <p
+              class="text-sm font-semibold text-white"
+            >
+              Tomas
+            </p>
+            <p
+              class="text-[11px] uppercase tracking-[0.3em] text-slate-400"
+            >
+              Disponibile
+            </p>
+            <div
+              class="mt-1 inline-flex items-center gap-2 text-[11px] text-slate-500"
+            >
+              <span
+                class="rounded-full border border-emerald-400/40 px-2 py-0.5 text-emerald-200"
+              >
+                35
+                % compatibilità
+              </span>
+              <span>
+                Fatica 
+                12
+              </span>
+            </div>
+          </div>
+        </div>
+        <div
+          class="flex flex-col gap-2 sm:flex-row"
+        >
+          <button
+            class="min-h-12 rounded-xl border border-white/15 px-4 text-[11px] uppercase tracking-[0.3em] text-slate-100 transition hover:border-white/40 hover:text-white"
+            type="button"
+          >
+            Dettagli
+          </button>
+          <button
+            class="min-h-12 rounded-xl px-4 text-[11px] uppercase tracking-[0.3em] transition focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-amber-200 border border-slate-600 text-slate-500 cursor-not-allowed"
+            disabled=""
+            type="button"
+          >
+            Assegna
+          </button>
+        </div>
+      </article>
+    </div>
+    <span
+      aria-hidden="true"
+      class="absolute h-0 w-0 opacity-0"
+      tabindex="0"
+    />
+  </section>
+</div>
+`;
+
+exports[`WorkerPickerSheet > renders empty state when there are no candidates 1`] = `
+<div
+  class="fixed inset-0 z-50 flex items-end"
+  data-sandbox-interaction-picker="open"
+  data-testid="worker-picker-overlay"
+  role="presentation"
+  style="background: var(--body-bg-overlay, rgba(0, 0, 0, 0.78)); opacity: 1; transition: opacity 220ms ease;"
+>
+  <section
+    aria-describedby="_r_5_"
+    aria-labelledby="_r_4_"
+    aria-modal="true"
+    class="relative w-full rounded-t-4xl border p-0"
+    data-sandbox-worker-picker="open"
+    role="dialog"
+    style="background: var(--panel-surface, rgba(5, 6, 9, 0.95)); border-color: var(--panel-border, rgba(255, 255, 255, 0.08)); box-shadow: 0 -35px 80px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08); transform: translateY(0); transition: transform 360ms cubic-bezier(0.18, 0.9, 0.32, 1.15);"
+  >
+    <span
+      aria-hidden="true"
+      class="absolute h-0 w-0 opacity-0"
+      tabindex="0"
+    />
+    <div
+      class="sticky top-0 z-10 border-b px-5 py-4 backdrop-blur"
+      style="background: linear-gradient(135deg, rgba(8, 12, 20, 0.95), rgba(3, 5, 10, 0.9)); border-color: var(--panel-border, rgba(255, 255, 255, 0.12)); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);"
+    >
+      <div
+        class="flex items-start justify-between gap-3"
+      >
+        <div
+          class="space-y-1"
+        >
+          <p
+            class="text-[11px] uppercase tracking-[0.35em] text-slate-400"
+            id="_r_5_"
+          >
+            Seleziona un residente per il turno
+          </p>
+          <h2
+            class="text-lg font-semibold text-(--text-primary,#fefce8)"
+            id="_r_4_"
+          >
+            Allenamento
+          </h2>
+          <p
+            class="text-xs text-slate-400"
+          >
+            Work Shift
+          </p>
+        </div>
+        <div
+          class="flex items-center gap-2"
+        >
+          <div
+            aria-hidden="true"
+            class="hidden h-6 w-6 rounded-full border border-white/10 sm:block"
+            id="_r_3_"
+          />
+          <button
+            aria-label="Chiudi selezione lavoratore"
+            class="rounded-full border border-white/15 px-4 py-2 text-[11px] uppercase tracking-[0.3em] text-slate-200 transition hover:border-white/40 hover:text-white"
+            data-sandbox-worker-picker-close="true"
+            type="button"
+          >
+            Chiudi
+          </button>
+        </div>
+      </div>
+    </div>
+    <div
+      class="max-h-[60vh] space-y-3 overflow-y-auto px-5 py-4"
+    >
+      <p
+        class="text-sm text-slate-400"
+      >
+        Nessun residente compatibile per questo slot in questo momento.
+      </p>
+    </div>
+    <span
+      aria-hidden="true"
+      class="absolute h-0 w-0 opacity-0"
+      tabindex="0"
+    />
+  </section>
+</div>
+`;
+
+exports[`WorkerPickerSheet > renders open state with residents (snapshot) 1`] = `
+<div
+  class="fixed inset-0 z-50 flex items-end"
+  data-sandbox-interaction-picker="open"
+  data-testid="worker-picker-overlay"
+  role="presentation"
+  style="background: var(--body-bg-overlay, rgba(0, 0, 0, 0.78)); opacity: 1; transition: opacity 220ms ease;"
+>
+  <section
+    aria-describedby="_r_2_"
+    aria-labelledby="_r_1_"
+    aria-modal="true"
+    class="relative w-full rounded-t-4xl border p-0"
+    data-sandbox-worker-picker="open"
+    role="dialog"
+    style="background: var(--panel-surface, rgba(5, 6, 9, 0.95)); border-color: var(--panel-border, rgba(255, 255, 255, 0.08)); box-shadow: 0 -35px 80px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08); transform: translateY(0); transition: transform 360ms cubic-bezier(0.18, 0.9, 0.32, 1.15);"
+  >
+    <span
+      aria-hidden="true"
+      class="absolute h-0 w-0 opacity-0"
+      tabindex="0"
+    />
+    <div
+      class="sticky top-0 z-10 border-b px-5 py-4 backdrop-blur"
+      style="background: linear-gradient(135deg, rgba(8, 12, 20, 0.95), rgba(3, 5, 10, 0.9)); border-color: var(--panel-border, rgba(255, 255, 255, 0.12)); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);"
+    >
+      <div
+        class="flex items-start justify-between gap-3"
+      >
+        <div
+          class="space-y-1"
+        >
+          <p
+            class="text-[11px] uppercase tracking-[0.35em] text-slate-400"
+            id="_r_2_"
+          >
+            Seleziona un residente per il turno
+          </p>
+          <h2
+            class="text-lg font-semibold text-(--text-primary,#fefce8)"
+            id="_r_1_"
+          >
+            Allenamento
+          </h2>
+          <p
+            class="text-xs text-slate-400"
+          >
+            Work Shift
+          </p>
+        </div>
+        <div
+          class="flex items-center gap-2"
+        >
+          <div
+            aria-hidden="true"
+            class="hidden h-6 w-6 rounded-full border border-white/10 sm:block"
+            id="_r_0_"
+          />
+          <button
+            aria-label="Chiudi selezione lavoratore"
+            class="rounded-full border border-white/15 px-4 py-2 text-[11px] uppercase tracking-[0.3em] text-slate-200 transition hover:border-white/40 hover:text-white"
+            data-sandbox-worker-picker-close="true"
+            type="button"
+          >
+            Chiudi
+          </button>
+        </div>
+      </div>
+    </div>
+    <div
+      class="max-h-[60vh] space-y-3 overflow-y-auto px-5 py-4"
+    >
+      <article
+        class="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 shadow-[0_10px_20px_rgba(0,0,0,0.35)]"
+        data-sandbox-worker-id="resident-1"
+      >
+        <div
+          class="flex items-center gap-3"
+        >
+          <div
+            aria-hidden="true"
+            class="flex items-center justify-center rounded-[18px] border border-white/15 bg-[rgba(6,10,18,0.85)] text-amber-100 shadow-[0_14px_30px_rgba(0,0,0,0.45)] transition-all overflow-hidden h-12 w-12"
+          >
+            <span
+              class="font-semibold uppercase tracking-[0.35em] text-xs"
+            >
+              G
+            </span>
+          </div>
+          <div>
+            <p
+              class="text-sm font-semibold text-white"
+            >
+              Gladia
+            </p>
+            <p
+              class="text-[11px] uppercase tracking-[0.3em] text-slate-400"
+            >
+              Disponibile
+            </p>
+            <div
+              class="mt-1 inline-flex items-center gap-2 text-[11px] text-slate-500"
+            >
+              <span
+                class="rounded-full border border-emerald-400/40 px-2 py-0.5 text-emerald-200"
+              >
+                92
+                % compatibilità
+              </span>
+              <span>
+                Fatica 
+                12
+              </span>
+            </div>
+          </div>
+        </div>
+        <div
+          class="flex flex-col gap-2 sm:flex-row"
+        >
+          <button
+            class="min-h-12 rounded-xl border border-white/15 px-4 text-[11px] uppercase tracking-[0.3em] text-slate-100 transition hover:border-white/40 hover:text-white"
+            type="button"
+          >
+            Dettagli
+          </button>
+          <button
+            class="min-h-12 rounded-xl px-4 text-[11px] uppercase tracking-[0.3em] transition focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-amber-200 border border-emerald-400/60 text-emerald-100 hover:border-emerald-300 hover:text-emerald-50"
+            type="button"
+          >
+            Assegna
+          </button>
+        </div>
+      </article>
+    </div>
+    <span
+      aria-hidden="true"
+      class="absolute h-0 w-0 opacity-0"
+      tabindex="0"
+    />
+  </section>
+</div>
+`;

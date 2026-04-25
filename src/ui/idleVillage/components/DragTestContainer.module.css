@@ -1,0 +1,15 @@
+.scrollArea {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollArea::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* Drag overlay CSS reset - minimal intervention */
+:global(.resident-card-overlay) {
+  margin: 0 !important;
+  pointer-events: none !important;
+}

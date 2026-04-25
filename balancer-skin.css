@@ -1,0 +1,467 @@
+/* ============================================================
+   WANDERLUST BALANCER — SKIN v4c
+   "Placca su Basalto"
+   
+   UTILIZZO:
+   1. Importa questo file dopo il tuo base.css
+   2. bg.png deve essere disponibile come variabile o URL
+   3. Sostituisci var(--bg-texture) con il path del tuo bg.png
+   
+   STRUTTURA HTML ATTESA:
+   .card
+     .card-overlay
+     .card-inner
+       .card-header
+         .card-header-left
+           .card-icon
+           .card-title
+         .card-actions
+           .btn-card
+           .btn-card.del
+       .plaques  (o display:grid per 2 colonne)
+         .plaque
+         .plaque.is-active
+         .plaque.danger
+           .stat-icon
+           .stat-lbl
+           .stat-lbl.danger
+           .stat-acts
+             .btn-ico
+           .track-wrap
+             .spm
+             .track
+               .fill
+               .thumb
+             .val
+             .val.is-max
+             .val.danger
+             .spm
+         .btn-add
+   ============================================================ */
+
+/* ── VARIABILE TEXTURE ─────────────────────────────────────── */
+:root {
+  --bg-texture: url('../assets/bg.png'); /* aggiorna il path */
+  --border-carbon: #4f4b45;
+  --gold-base: #c8a840;
+  --gold-bright: #d4b040;
+  --gold-max: #f5d050;
+  --text-warm: rgba(255, 248, 235, 0.90);
+  --text-dim: rgba(255, 248, 235, 0.32);
+  --obsidian: #040408;
+  --danger-border: #6a3028;
+  --active-border: #7a6a30;
+}
+
+/* ── ANIMAZIONI ────────────────────────────────────────────── */
+@keyframes wl-basalt-breathe {
+  0%,100% { background-position: 50% 50% }
+  33%      { background-position: 52% 51% }
+  66%      { background-position: 49% 52% }
+}
+
+@keyframes wl-val-max {
+  0%,100% {
+    color: var(--gold-bright);
+    text-shadow:
+      0 0 12px rgba(200,165,42,.72),
+      0 1px 0 rgba(0,0,0,.98)
+  }
+  50% {
+    color: var(--gold-max);
+    text-shadow:
+      0 0 24px rgba(245,208,50,1.0),
+      0 0 48px rgba(210,168,38,.52),
+      0 1px 0 rgba(0,0,0,.98)
+  }
+}
+
+@keyframes wl-shimmer {
+  0%          { transform: translateX(-150%); opacity: 0 }
+  15%, 85%    { opacity: 1 }
+  100%        { transform: translateX(250%);  opacity: 0 }
+}
+
+/* ── CARD — lastra di basalto ──────────────────────────────── */
+.card {
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  background-image: var(--bg-texture);
+  background-size: 115%;
+  animation: wl-basalt-breathe 18s ease-in-out infinite;
+  box-shadow:
+    inset 0 0 52px rgba(0,0,0,.55),
+    inset 0 1px 0 rgba(255,248,220,.16),
+    inset 0 -1px 0 rgba(0,0,0,.92),
+    0 0 0 1px var(--border-carbon),
+    0 8px 32px rgba(0,0,0,.92),
+    0 22px 60px rgba(0,0,0,.75);
+}
+
+/* Ambient occlusion overlay */
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse 90% 85% at 50% 50%,
+      transparent 28%, rgba(0,0,0,.62) 100%),
+    rgba(0,0,0,.18);
+}
+
+.card-inner {
+  position: relative;
+  z-index: 2;
+  padding: 10px;
+}
+
+/* ── HEADER ────────────────────────────────────────────────── */
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 2px 8px;
+}
+
+.card-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-icon {
+  font-size: 14px;
+  filter:
+    drop-shadow(0 0 8px rgba(175,110,25,.75))
+    drop-shadow(0 2px 4px rgba(0,0,0,.95));
+}
+
+/* Titolo oro estruso — effetto fisico 5 livelli */
+.card-title {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--gold-base);
+  text-shadow:
+    0 -1px 0 rgba(255,240,160,.55),
+    0  1px 0 rgba(30,18,2,.98),
+    0  2px 0 rgba(12,6,0,.90),
+    0  3px 0 rgba(8,4,0,.70),
+    0  4px 6px rgba(0,0,0,.65),
+    0  0 18px rgba(200,165,42,.20);
+}
+
+.card-actions {
+  display: flex;
+  gap: 3px;
+}
+
+.btn-card {
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  background: rgba(0,0,0,.58);
+  border: 1px solid var(--border-carbon);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.09),
+    inset 0 -1px 0 rgba(0,0,0,.75);
+  color: rgba(255,248,235,.50);
+  cursor: pointer;
+  transition: all 100ms;
+}
+
+.btn-card:hover {
+  background: rgba(0,0,0,.78);
+  color: rgba(255,248,235,.90);
+  transform: translateY(-1px);
+}
+
+.btn-card.del { color: rgba(210,72,50,.65); }
+.btn-card.del:hover {
+  background: rgba(180,42,22,.22);
+  color: #e06858;
+}
+
+/* ── PLACCHE — layout riga singola ─────────────────────────── */
+.plaques {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Griglia 2 colonne (opzionale) */
+.plaques-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+}
+
+.plaque {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+  min-height: 32px;
+  /* Ossidiana */
+  background: var(--obsidian);
+  border: 1px solid var(--border-carbon);
+  box-shadow:
+    inset 0  1px 0 rgba(255,248,220,.34),
+    inset 0 -1px 0 rgba(0,0,0,.98),
+    0 2px 5px rgba(0,0,0,.85),
+    0 3px 10px rgba(0,0,0,.65);
+  transition: all 140ms cubic-bezier(.22,.8,.36,1);
+}
+
+/* Shimmer ultra-lento — quasi impercettibile */
+.plaque::before {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 30%;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,248,220,.016) 50%,
+    transparent 100%);
+  transform: translateX(-150%);
+  opacity: 0;
+  animation: wl-shimmer 5s ease-in-out var(--shimmer-delay, 28s) infinite;
+}
+
+.plaque:hover {
+  background: #06060e;
+  border-color: #6a6460;
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0  1px 0 rgba(255,248,220,.40),
+    inset 0 -1px 0 rgba(0,0,0,.98),
+    0 3px 8px rgba(0,0,0,.90),
+    0 5px 14px rgba(0,0,0,.70);
+}
+
+.plaque.is-active {
+  border-color: var(--active-border);
+  box-shadow:
+    inset 0  1px 0 rgba(246,231,168,.32),
+    inset 0 -1px 0 rgba(0,0,0,.98),
+    0 2px 5px rgba(0,0,0,.85),
+    0 0 10px rgba(168,132,38,.16);
+}
+
+.plaque.danger {
+  border-color: var(--danger-border);
+  box-shadow:
+    inset 0  1px 0 rgba(255,90,60,.18),
+    inset 0 -1px 0 rgba(0,0,0,.98),
+    0 2px 5px rgba(0,0,0,.85),
+    0 0 10px rgba(185,42,18,.14);
+}
+
+/* ── Elementi dentro la placca ─────────────────────────────── */
+.stat-icon {
+  font-size: 10px;
+  flex-shrink: 0;
+  width: 14px;
+  text-align: center;
+}
+
+.stat-lbl {
+  font-family: 'Cinzel', serif;
+  font-size: 6.5px;
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--text-warm);
+  white-space: nowrap;
+  flex-shrink: 0;
+  width: 88px;
+}
+
+.stat-lbl.danger { color: rgba(235,110,78,.90); }
+
+.stat-acts {
+  display: flex;
+  gap: 1px;
+  flex-shrink: 0;
+  background: rgba(0,0,0,.50);
+  border: 1px solid rgba(79,75,69,.60);
+  border-radius: 4px;
+  padding: 1px;
+}
+
+.btn-ico {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 8px;
+  color: var(--text-dim);
+  transition: color 80ms, background 80ms;
+}
+
+.btn-ico:hover {
+  color: rgba(255,248,235,.88);
+  background: rgba(255,255,255,.10);
+}
+
+/* ── Slider ────────────────────────────────────────────────── */
+.track-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.spm {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 300;
+  line-height: 1;
+  background: linear-gradient(180deg, rgba(255,255,255,.08) 0%, rgba(255,255,255,.02) 100%);
+  border: 1px solid var(--border-carbon);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.12),
+    inset 0 -1px 0 rgba(0,0,0,.72);
+  color: rgba(255,248,235,.65);
+  cursor: pointer;
+  transition: all 85ms;
+}
+
+.spm:hover {
+  background: linear-gradient(180deg, rgba(255,255,255,.14) 0%, rgba(255,255,255,.06) 100%);
+  color: rgba(255,248,235,.98);
+  transform: scale(1.12);
+}
+
+.spm:active { transform: scale(.85); }
+
+.track {
+  position: relative;
+  flex: 1;
+  height: 3px;
+  background: rgba(0,0,0,.85);
+  border-radius: 2px;
+  border: 1px solid rgba(40,38,35,.80);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.95);
+  cursor: pointer;
+}
+
+.fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  border-radius: 2px;
+  background: linear-gradient(90deg,
+    rgba(80,55,8,.28)   0%,
+    rgba(150,110,24,.82) 35%,
+    rgba(200,158,38,.96) 68%,
+    rgba(228,185,48,1.0) 100%);
+  box-shadow:
+    0 0 7px rgba(210,168,42,.58),
+    0 0 14px rgba(185,145,28,.30);
+}
+
+.thumb {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle at 30% 24%,
+    #fffdee 0%, #f6de58 16%, #d0a020 42%, #7a4a0e 68%, #1c0e02 94%);
+  border: 1px solid rgba(0,0,0,.72);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255,255,240,.95),
+    0 1px 3px rgba(0,0,0,.92),
+    0 0 9px rgba(225,182,42,.70),
+    0 0 18px rgba(195,155,28,.35);
+  transition: transform 110ms, box-shadow 110ms;
+}
+
+.track:hover .thumb {
+  transform: translate(-50%, -50%) scale(1.25);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255,255,240,.98),
+    0 2px 5px rgba(0,0,0,.95),
+    0 0 14px rgba(228,185,46,.78),
+    0 0 26px rgba(205,155,30,.38);
+}
+
+/* ── Valore numerico ─────────────────────────────────────────  */
+.val {
+  width: 50px;
+  height: 22px;
+  flex-shrink: 0;
+  background: rgba(0,0,0,.75);
+  border: 1px solid var(--border-carbon);
+  border-radius: 5px;
+  color: var(--gold-bright);
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  text-shadow:
+    0 0 12px rgba(210,175,45,.85),
+    0 0 28px rgba(185,148,32,.45),
+    0 0 48px rgba(160,125,22,.18),
+    0 1px 0 rgba(0,0,0,.98);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.82);
+  outline: none;
+  transition: border-color 140ms;
+}
+
+.val.is-max {
+  animation: wl-val-max 2.8s ease-in-out infinite;
+}
+
+.val.danger {
+  color: #d84830;
+  text-shadow:
+    0 0 10px rgba(210,60,28,.58),
+    0 1px 0 rgba(0,0,0,.98);
+}
+
+/* ── Add stat ────────────────────────────────────────────────  */
+.btn-add {
+  width: 100%;
+  padding: 5px;
+  border-radius: 5px;
+  margin-top: 2px;
+  background: rgba(0,0,0,.45);
+  border: 1px solid var(--border-carbon);
+  color: var(--text-dim);
+  font-family: 'Cinzel', serif;
+  font-size: 6.5px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 140ms;
+}
+
+.btn-add:hover {
+  background: rgba(0,0,0,.65);
+  border-color: #6a6460;
+  color: rgba(255,248,235,.65);
+}

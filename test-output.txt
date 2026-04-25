@@ -1,0 +1,72 @@
+
+> progetti-personali@0.0.0 test:e2e
+> playwright test
+
+
+Running 5 tests using 5 workers
+
+[1A[2K[1/5] [chromium] › tests/ui.spec.ts:76:5 › UI Verification Suite › Balancer Tab: Loads Correctly
+[1A[2K[2/5] [chromium] › tests/ui.spec.ts:49:5 › UI Verification Suite › Stat Weigher: Full Analysis Flow
+[1A[2K[3/5] [chromium] › tests/ui.spec.ts:33:5 › UI Verification Suite › Grid Arena: Entities and Interaction
+[1A[2K[4/5] [chromium] › tests/ui.spec.ts:11:5 › UI Verification Suite › App Loads: Grid Arena Tab is Default
+[1A[2K[5/5] [chromium] › tests/ui.spec.ts:17:5 › UI Verification Suite › Spell Library: Navigation and Create Spell
+[1A[2K  1) [chromium] › tests/ui.spec.ts:33:5 › UI Verification Suite › Grid Arena: Entities and Interaction 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=WA')
+    Expected: visible
+    Error: strict mode violation: locator('text=WA') resolved to 2 elements:
+        1) <span>WA</span> aka getByText('WA', { exact: true })
+        2) <div class="border-l-2 border-blue-500 pl-2 py-1 bg-gray-900/50 rounded-r">Combat started. Select your Warrior.</div> aka getByText('Combat started. Select your')
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=WA')[22m
+
+
+      39 |
+      40 |         // Verify Entities exist (abbreviated names)
+    > 41 |         await expect(page.locator('text=WA')).toBeVisible(); // Warrior
+         |                                               ^
+      42 |         await expect(page.locator('text=OR')).toBeVisible(); // Orc
+      43 |
+      44 |         // Verify Combat Log sidebar
+        at /Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:41:47
+
+    Error Context: test-results/ui-UI-Verification-Suite-Grid-Arena-Entities-and-Interaction-chromium/error-context.md
+
+
+[1A[2K  2) [chromium] › tests/ui.spec.ts:17:5 › UI Verification Suite › Spell Library: Navigation and Create Spell 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Mana Cost')
+    Expected: visible
+    Error: strict mode violation: locator('text=Mana Cost') resolved to 2 elements:
+        1) <div class="relative inline-block">Mana Cost:</div> aka getByText('Mana Cost:')
+        2) <div class="relative inline-block">Mana Cost</div> aka getByText('Mana Cost', { exact: true })
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=Mana Cost')[22m
+
+
+      27 |
+      28 |         // Verify form has spell properties
+    > 29 |         await expect(page.locator('text=Mana Cost')).toBeVisible();
+         |                                                      ^
+      30 |         await expect(page.locator('text=Cooldown')).toBeVisible();
+      31 |     });
+      32 |
+        at /Users/faustoboni/projects/progetti personali/tests/ui.spec.ts:29:54
+
+    Error Context: test-results/ui-UI-Verification-Suite-S-151aa-Navigation-and-Create-Spell-chromium/error-context.md
+
+
+[1A[2K  2 failed
+    [chromium] › tests/ui.spec.ts:17:5 › UI Verification Suite › Spell Library: Navigation and Create Spell 
+    [chromium] › tests/ui.spec.ts:33:5 › UI Verification Suite › Grid Arena: Entities and Interaction 
+  3 passed (3.1s)
+
+  Serving HTML report at http://localhost:59960. Press Ctrl+C to quit.

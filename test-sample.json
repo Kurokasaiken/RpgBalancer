@@ -1,0 +1,113 @@
+{
+  "metadata": {
+    "name": "Sample Drop Stress Dataset",
+    "version": "1.0.0",
+    "description": "Sample dataset for drop stress testing",
+    "totalScenarios": 2,
+    "created": "2026-01-20T15:21:27.546Z",
+    "updated": "2026-01-20T15:21:27.546Z",
+    "tags": [
+      "sample",
+      "test"
+    ]
+  },
+  "scenarios": [
+    {
+      "id": "scenario-1",
+      "seed": 0,
+      "residentStats": {
+        "id": "resident-1",
+        "name": "Resident 1",
+        "level": 4,
+        "stats": {
+          "strength": 59,
+          "agility": 26,
+          "intelligence": 38
+        },
+        "fatigue": 8.989002790630018,
+        "tags": [
+          "worker",
+          "resident"
+        ]
+      },
+      "slotInfo": {
+        "id": "slot-1",
+        "type": "activity",
+        "name": "Slot 1",
+        "capacity": 4,
+        "currentOccupants": 0,
+        "requirements": {
+          "minLevel": 1,
+          "maxFatigue": 80
+        }
+      },
+      "expectedVerdict": {
+        "valid": true,
+        "reason": "Sample validation reason",
+        "confidence": 0.6603589095997486,
+        "ruleViolations": []
+      },
+      "metadata": {
+        "category": "sample",
+        "difficulty": "hard",
+        "description": "Sample scenario 1",
+        "tags": [
+          "sample",
+          "test"
+        ],
+        "created": "2026-01-20T15:21:27.546Z"
+      }
+    },
+    {
+      "id": "scenario-2",
+      "seed": 1,
+      "residentStats": {
+        "id": "resident-2",
+        "name": "Resident 2",
+        "level": 3,
+        "stats": {
+          "strength": 61,
+          "agility": 40,
+          "intelligence": 34
+        },
+        "fatigue": 14.257050507729385,
+        "tags": [
+          "worker",
+          "resident"
+        ]
+      },
+      "slotInfo": {
+        "id": "slot-2",
+        "type": "location",
+        "name": "Slot 2",
+        "capacity": 5,
+        "currentOccupants": 1,
+        "requirements": {
+          "minLevel": 1,
+          "maxFatigue": 80
+        }
+      },
+      "expectedVerdict": {
+        "valid": true,
+        "reason": "Sample validation reason",
+        "confidence": 0.24836276519971223,
+        "ruleViolations": []
+      },
+      "metadata": {
+        "category": "sample",
+        "difficulty": "medium",
+        "description": "Sample scenario 2",
+        "tags": [
+          "sample",
+          "test"
+        ],
+        "created": "2026-01-20T15:21:27.546Z"
+      }
+    }
+  ],
+  "benchmarks": {
+    "maxLatencyMs": 100,
+    "minAccuracyRate": 0.95,
+    "maxMemoryUsageMB": 50
+  }
+}

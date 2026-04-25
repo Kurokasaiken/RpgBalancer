@@ -1,0 +1,67 @@
+.card {
+    background: rgba(17, 24, 39, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom right,
+            rgba(255, 255, 255, 0.05),
+            transparent 40%);
+    pointer-events: none;
+}
+
+.interactive {
+    cursor: pointer;
+}
+
+.interactive:hover {
+    background: rgba(31, 41, 55, 0.8);
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow:
+        0 0 0 1px rgba(59, 130, 246, 0.1),
+        0 10px 15px -3px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
+}
+
+.variant-default {
+    /* Standard glass card */
+}
+
+.variant-neon {
+    background: rgba(17, 24, 39, 0.8);
+    border-color: rgba(59, 130, 246, 0.2);
+    box-shadow:
+        0 0 15px rgba(59, 130, 246, 0.1),
+        inset 0 0 20px rgba(59, 130, 246, 0.05);
+}
+
+.variant-danger {
+    background: rgba(30, 10, 10, 0.7);
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+.padding-none {
+    padding: 0;
+}
+
+.padding-sm {
+    padding: 0.75rem;
+}
+
+.padding-md {
+    padding: 1.25rem;
+}
+
+.padding-lg {
+    padding: 2rem;
+}

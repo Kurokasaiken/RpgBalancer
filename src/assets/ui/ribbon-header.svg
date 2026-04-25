@@ -1,0 +1,21 @@
+<svg width="400" height="60" viewBox="0 0 400 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="ribbon-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8b0000" />
+      <stop offset="50%" stop-color="#a52a2a" />
+      <stop offset="100%" stop-color="#5c0000" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  
+  <!-- Main Banner Body -->
+  <path d="M20,10 L380,10 L390,30 L380,50 L20,50 L10,30 Z" fill="url(#ribbon-grad)" stroke="#d4af37" stroke-width="2" filter="url(#shadow)" />
+  
+  <!-- Fold Effects -->
+  <path d="M10,30 L20,10 M390,30 L380,10" stroke="#5c0000" stroke-width="1" opacity="0.5" />
+  
+  <!-- Gold Trim -->
+  <rect x="30" y="15" width="340" height="30" rx="2" stroke="#d4af37" stroke-width="1" fill="none" opacity="0.5" />
+</svg>

@@ -1,0 +1,391 @@
+/**
+ * History Timeline Styles
+ * Gilded Observatory retro theme with accessibility support
+ * Config-first design with Style Laboratory tokens
+ */
+
+.historyTimeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--balancer-spacing-sm, 8px);
+  padding: var(--balancer-spacing-md, 12px);
+  background: var(--balancer-panel-background, rgba(0, 0, 0, 0.9));
+  border: 1px solid var(--balancer-panel-border, #333);
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+  font-size: 12px;
+  color: var(--balancer-text-primary, #e0e0e0);
+  max-height: 400px;
+  overflow: hidden;
+}
+
+/* Header with controls */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: var(--balancer-spacing-sm, 8px);
+  border-bottom: 1px solid var(--balancer-panel-border, #333);
+}
+
+.title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--balancer-text-secondary, #ccc);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.controls {
+  display: flex;
+  gap: var(--balancer-spacing-xs, 4px);
+}
+
+.controlButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  background: var(--balancer-button-background, rgba(255, 255, 255, 0.1));
+  border: 1px solid var(--balancer-button-border, #555);
+  border-radius: 2px;
+  color: var(--balancer-button-text, #ccc);
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 60px;
+}
+
+.controlButton:hover:not(.disabled) {
+  background: var(--balancer-button-hover-background, rgba(255, 255, 255, 0.2));
+  border-color: var(--balancer-button-hover-border, #777);
+  color: var(--balancer-button-hover-text, #fff);
+}
+
+.controlButton:active:not(.disabled) {
+  transform: translateY(1px);
+}
+
+.controlButton.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  color: var(--balancer-button-disabled-text, #666);
+}
+
+.controlButton:focus-visible {
+  outline: 2px solid var(--balancer-focus-color, #4ade80);
+  outline-offset: 1px;
+}
+
+/* Timeline list */
+.timeline {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--balancer-scrollbar-thumb, #555) var(--balancer-scrollbar-track, #222);
+}
+
+.timeline::-webkit-scrollbar {
+  width: 6px;
+}
+
+.timeline::-webkit-scrollbar-track {
+  background: var(--balancer-scrollbar-track, #222);
+}
+
+.timeline::-webkit-scrollbar-thumb {
+  background: var(--balancer-scrollbar-thumb, #555);
+  border-radius: 3px;
+}
+
+.timeline::-webkit-scrollbar-thumb:hover {
+  background: var(--balancer-scrollbar-thumb-hover, #777);
+}
+
+/* History items */
+.historyItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--balancer-spacing-sm, 8px);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-left: 2px solid transparent;
+  position: relative;
+}
+
+.historyItem:hover {
+  background: var(--balancer-item-hover-background, rgba(255, 255, 255, 0.05));
+  border-left-color: var(--balancer-item-hover-border, #666);
+}
+
+.historyItem.current {
+  background: var(--balancer-item-current-background, rgba(74, 222, 128, 0.1));
+  border-left-color: var(--balancer-item-current-border, #4ade80);
+}
+
+.itemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--balancer-spacing-xs, 4px);
+}
+
+.timestamp {
+  font-size: 10px;
+  color: var(--balancer-timestamp-text, #888);
+  white-space: nowrap;
+}
+
+.currentBadge {
+  font-size: 9px;
+  padding: 1px 4px;
+  background: var(--balancer-badge-background, #4ade80);
+  color: var(--balancer-badge-text, #000);
+  border-radius: 2px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.description {
+  font-size: 12px;
+  color: var(--balancer-text-primary, #e0e0e0);
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.diffSummary {
+  font-size: 10px;
+  color: var(--balancer-diff-text, #999);
+  margin-top: 2px;
+  font-style: italic;
+  line-height: 1.2;
+}
+
+/* Empty state */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--balancer-spacing-lg, 24px) 0;
+  text-align: center;
+  color: var(--balancer-empty-text, #666);
+}
+
+.emptyState p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+.emptyHint {
+  font-size: 11px;
+  margin-top: var(--balancer-spacing-xs, 4px) !important;
+  font-style: italic;
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--balancer-spacing-sm, 8px);
+  border-top: 1px solid var(--balancer-panel-border, #333);
+  font-size: 10px;
+  color: var(--balancer-footer-text, #666);
+}
+
+.shortcuts {
+  display: flex;
+  gap: var(--balancer-spacing-md, 12px);
+}
+
+.shortcut {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.shortcut kbd {
+  display: inline-block;
+  padding: 1px 3px;
+  background: var(--balancer-kbd-background, #333);
+  border: 1px solid var(--balancer-kbd-border, #555);
+  border-radius: 2px;
+  font-size: 9px;
+  font-family: inherit;
+  color: var(--balancer-kbd-text, #ccc);
+}
+
+.truncatedNotice {
+  font-style: italic;
+}
+
+/* Screen reader announcer */
+.announcer {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* Focus styles */
+.historyItem:focus-visible {
+  outline: 2px solid var(--balancer-focus-color, #4ade80);
+  outline-offset: 1px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .historyTimeline {
+    padding: var(--balancer-spacing-sm, 8px);
+    gap: var(--balancer-spacing-xs, 4px);
+    font-size: 11px;
+  }
+
+  .header {
+    flex-direction: column;
+    gap: var(--balancer-spacing-xs, 4px);
+    align-items: stretch;
+  }
+
+  .controls {
+    justify-content: center;
+  }
+
+  .controlButton {
+    flex: 1;
+    min-width: 50px;
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+
+  .historyItem {
+    padding: var(--balancer-spacing-xs, 4px);
+  }
+
+  .description {
+    font-size: 11px;
+  }
+
+  .footer {
+    flex-direction: column;
+    gap: var(--balancer-spacing-xs, 4px);
+    align-items: stretch;
+  }
+
+  .shortcuts {
+    justify-content: center;
+  }
+}
+
+/* High density mode */
+@media (max-width: 480px) {
+  .historyTimeline {
+    max-height: 300px;
+  }
+
+  .historyItem {
+    padding: 2px 4px;
+  }
+
+  .description {
+    font-size: 10px;
+    line-height: 1.2;
+  }
+
+  .diffSummary {
+    font-size: 9px;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .historyTimeline,
+  .controlButton,
+  .historyItem {
+    transition: none;
+  }
+  
+  .controlButton:active:not(.disabled) {
+    transform: none;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .historyTimeline {
+    border-width: 2px;
+  }
+  
+  .controlButton {
+    border-width: 2px;
+  }
+  
+  .historyItem.current {
+    border-left-width: 3px;
+  }
+}
+
+/* Dark theme adjustments */
+.historyTimeline {
+  color-scheme: dark;
+}
+
+/* Selection styling */
+.historyItem::selection {
+  background: var(--balancer-selection-background, rgba(74, 222, 128, 0.3));
+  color: var(--balancer-selection-text, #e0e0e0);
+}
+
+/* Loading state */
+.historyTimeline.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.historyTimeline.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border: 2px solid var(--balancer-loading-border, #333);
+  border-top-color: var(--balancer-loading-color, #4ade80);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Compact mode */
+.historyTimeline.compact {
+  max-height: 200px;
+  padding: var(--balancer-spacing-xs, 4px);
+}
+
+.historyTimeline.compact .header {
+  padding-bottom: var(--balancer-spacing-xs, 4px);
+}
+
+.historyTimeline.compact .historyItem {
+  padding: 2px 4px;
+}
+
+.historyTimeline.compact .description {
+  font-size: 11px;
+}
+
+.historyTimeline.compact .diffSummary {
+  display: none;
+}

@@ -1,0 +1,2 @@
+Session ID,Tester,Device,Created At,Avg Cycle Duration (ms),Meets Cycle Target,Avg Taps per Assignment,Meets Tap Target,Avg Assignment Latency (ms),Meets Latency Target,Picker Close Rate (%),Meets Picker Target,Resource Gold Delta,Resource Food Delta,Meets Resource Target,Qualitative Notes
+test-full,Test User,iPhone 14 Pro,2026-01-04T19:40:29.495Z,45500,Yes,2.5,Yes,225,Yes,95,No,5,2,No,"Full telemetry test session"

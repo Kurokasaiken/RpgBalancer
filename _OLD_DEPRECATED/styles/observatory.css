@@ -1,0 +1,247 @@
+@layer components {
+  .observatory-nav-frame {
+    position: relative;
+    border-radius: 0.9rem;
+    border: 1px solid rgba(148, 163, 253, 0.35);
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.12), transparent 55%),
+      radial-gradient(circle at 120% 120%, rgba(56, 189, 248, 0.08), transparent 70%),
+      rgba(6, 10, 18, 0.72);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow:
+      inset 0 0 25px rgba(0, 0, 0, 0.35),
+      0 18px 40px rgba(0, 0, 0, 0.65);
+    padding: 0.5rem 0.4rem 0.6rem;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .observatory-nav-frame::before {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border-radius: 0.75rem;
+    border: 1px dashed rgba(148, 163, 253, 0.25);
+    pointer-events: none;
+  }
+
+  .observatory-nav-scroll {
+    max-height: calc(100vh - 72px);
+    overflow-y: auto;
+    padding-right: 0.35rem;
+    margin-right: -0.2rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(148, 163, 253, 0.35) transparent;
+    touch-action: pan-y;
+  }
+
+  .observatory-nav-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .observatory-nav-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .observatory-nav-scroll::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(148, 163, 253, 0.45), rgba(14, 165, 233, 0.35));
+    border-radius: 999px;
+  }
+
+  .observatory-nav-scroll::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(148, 163, 253, 0.7), rgba(14, 165, 233, 0.55));
+  }
+
+  .observatory-nav-orb {
+    position: absolute;
+    inset-inline: 28%;
+    top: -28px;
+    height: 52px;
+    border-radius: 9999px;
+    background:
+      radial-gradient(circle at 50% 100%, rgba(201, 162, 39, 0.45) 0, transparent 60%),
+      radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.35) 0, transparent 65%);
+    opacity: 0.8;
+    filter: blur(2px);
+    pointer-events: none;
+  }
+
+  .observatory-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    text-align: left;
+    padding: 0.6rem 0.95rem;
+    border-radius: 0.85rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(226, 232, 240, 0.7);
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: background 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
+    background:
+      radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.07), transparent 55%),
+      rgba(5, 8, 14, 0.62);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .observatory-nav-item:hover {
+    color: rgba(226, 232, 240, 0.92);
+    border-color: rgba(129, 140, 248, 0.4);
+    background: rgba(15, 23, 42, 0.65);
+  }
+
+  .observatory-nav-item.is-active {
+    border-color: rgba(251, 191, 36, 0.45);
+    color: #fef3c7;
+    background:
+      linear-gradient(120deg, rgba(251, 191, 36, 0.35), rgba(17, 10, 0, 0.65)),
+      rgba(5, 7, 12, 0.75);
+    box-shadow: 0 0 25px rgba(251, 191, 36, 0.3);
+  }
+
+  .observatory-main-frame {
+    position: relative;
+    border-radius: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.12), transparent 60%),
+      rgba(5, 7, 12, 0.68);
+    backdrop-filter: blur(26px);
+    -webkit-backdrop-filter: blur(26px);
+    box-shadow:
+      inset 0 0 50px rgba(0, 0, 0, 0.38),
+      0 35px 80px rgba(0, 0, 0, 0.65);
+    padding: 1.5rem;
+    isolation: isolate;
+    overflow: hidden;
+  }
+
+  .observatory-main-frame::before {
+    content: '';
+    position: absolute;
+    inset: 1.25rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: radial-gradient(circle at 15% 0%, rgba(255, 255, 255, 0.08), transparent 55%);
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  .oil-slick-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.85rem 1.6rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-bronze-light, #ffd700);
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.35em;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: radial-gradient(circle at 20% 20%, rgba(255, 0, 255, 0.35), transparent 45%),
+      radial-gradient(circle at 80% 30%, rgba(0, 255, 255, 0.35), transparent 50%),
+      radial-gradient(circle at 50% 80%, rgba(0, 0, 255, 0.35), transparent 45%),
+      rgba(5, 6, 12, 0.95);
+    box-shadow:
+      inset 0 0 18px rgba(255, 255, 255, 0.08),
+      0 12px 35px rgba(0, 0, 0, 0.65);
+    overflow: hidden;
+  }
+
+  .oil-slick-button::after {
+    content: '';
+    position: absolute;
+    inset: -150%;
+    background: radial-gradient(circle, rgba(255, 0, 255, 0.45), rgba(0, 255, 255, 0.35), rgba(0, 0, 255, 0.45));
+    filter: blur(30px);
+    opacity: 0.7;
+    animation: oil-flow 10s linear infinite;
+  }
+
+  .oil-slick-button > span {
+    position: relative;
+    z-index: 1;
+  }
+
+  .shadow-cobalt {
+    box-shadow:
+      0 0 20px var(--color-cobalt-glow, rgba(0, 70, 120, 0.5)),
+      0 20px 60px rgba(0, 0, 0, 0.65);
+  }
+
+  .obsidian-panel {
+    background: var(--color-obsidian-alpha, rgba(13, 15, 18, 0.45));
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 1.5rem;
+    backdrop-filter: blur(var(--glass-blur, 24px));
+    padding: 1.5rem;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  }
+
+  .bronze-corners {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .bronze-corners::before,
+  .bronze-corners::after {
+    content: '';
+    position: absolute;
+    width: 42px;
+    height: 42px;
+    border-top: 4px solid var(--color-bronze-light, #ffd700);
+    border-left: 4px solid var(--color-bronze-dark, #8b4513);
+    border-top-left-radius: 12px;
+    pointer-events: none;
+    opacity: 0.85;
+  }
+
+  .bronze-corners::before {
+    top: 0.75rem;
+    left: 0.75rem;
+  }
+
+  .bronze-corners::after {
+    bottom: 0.75rem;
+    right: 0.75rem;
+    transform: rotate(180deg);
+  }
+
+  .quest-heroic-card {
+    border-radius: 1.25rem;
+    border: 1px solid rgba(255, 215, 0, 0.35);
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.04), transparent 65%),
+      rgba(5, 6, 12, 0.9);
+    box-shadow:
+      inset 0 0 60px rgba(0, 0, 0, 0.65),
+      0 30px 120px rgba(0, 0, 0, 0.65);
+  }
+
+  .quest-title-bronze {
+    background-image: linear-gradient(120deg, var(--color-bronze-light, #ffd700), var(--color-bronze-mid, #d4af37));
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
+  .gem-oil {
+    background: radial-gradient(circle at 20% 20%, rgba(255, 0, 255, 0.6), rgba(0, 255, 255, 0.2));
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow:
+      inset 0 0 12px rgba(255, 255, 255, 0.15),
+      0 0 25px rgba(0, 70, 120, 0.35);
+    transition: filter 250ms ease, transform 250ms ease;
+  }
+
+  .gem-oil.is-active {
+    filter: drop-shadow(0 0 18px rgba(0, 70, 120, 0.75));
+    transform: scale(1.05);
+  }
+}

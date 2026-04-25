@@ -1,0 +1,131 @@
+{
+  "skinId": "slot_rack_iron_bronze",
+  "name": "Ferro Ossidato · Bronzo Blizzard",
+  "pillar": "wilderness",
+  "version": "8.blizzard",
+
+  "dimensions": {
+    "slotSize": 80,
+    "slotGap": 22,
+    "trayPaddingX": 26,
+    "trayPaddingY": 24,
+    "edgeThickness": 6,
+    "edgeThicknessLateral": 5,
+    "borderWidth": 2
+  },
+
+  "colors": {
+    "trayBase":          "#0e0f10",
+    "trayBaseGradient": ["#131518", "#0e0f10", "#0b0c0e", "#0f1012", "#131416"],
+    "trayOxidation":     "#0a0c0f",
+
+    "bronzeSpecular":    "rgba(255,252,205,.72)",
+    "bronzeSpecularPure":"rgba(255,255,240,.22)",
+    "bronzeMid":         "rgba(125,78,18,.78)",
+    "bronzeShadow":      "rgba(0,0,0,.95)",
+    "bronzeBorder":      "#3a2008",
+    "bronzeRimLight":    "rgba(232,168,48,.68)",
+
+    "edgeTop":           "#5a3810",
+    "edgeMid":           "#2a1606",
+    "edgeBottom":        "#0e0802",
+    "edgeHighlight":     "rgba(255,235,120,.68)",
+    "edgeHighlightPeak": "rgba(255,252,200,.88)",
+
+    "rivetSpecular":     "rgba(255,255,220,.92)",
+    "rivetGold":         "rgba(245,200,60,.95)",
+    "rivetMid":          "rgba(180,118,28,.98)",
+    "rivetDark":         "rgba(90,52,12,1)",
+    "rivetBlack":        "rgba(22,10,2,1)",
+
+    "cavityDeep":        "#020101",
+    "cavityMid":         "#0f0605",
+    "cavityRim":         "rgba(80,45,12,.80)",
+
+    "boreLight":         "rgba(255,220,120,.18)",
+    "boreShadow":        "rgba(0,0,0,.65)",
+
+    "medallionSpecular": "rgba(255,255,230,.38)",
+    "medallionGold":     "#e8b858",
+    "medallionMid":      "#7a4a12",
+    "medallionDark":     "#140a02",
+    "medallionGlow":     "rgba(185,108,15,.35)",
+
+    "scratchLight":      "rgba(200,220,255,.020)",
+    "scratchShadow":     "rgba(0,0,0,.10)"
+  },
+
+  "lighting": {
+    "source": "zenithal",
+    "azimuth": 205,
+    "elevation": 58,
+    "ironLightColor": "#8ab0c8",
+    "ironSurfaceScale": 1.4,
+    "ironSpecularExp": 28,
+    "bezelSpecularArcFraction": 0.14,
+    "bezelSpecularOffsetFraction": 0.025,
+    "boreWidth": 0.038
+  },
+
+  "shadows": {
+    "contactShadowOpacity": 0.90,
+    "contactShadowBlur": 3.5,
+    "contactShadowOffsetY": -5,
+    "diffuseShadowOpacity": 0.42,
+    "diffuseShadowBlur": 14,
+    "innerShadowTop":    "inset 0 10px 32px rgba(0,0,0,.96)",
+    "innerShadowBottom": "inset 0 -4px 14px rgba(0,0,0,.72)",
+    "innerShadowSides":  "inset 8px 0 20px rgba(0,0,0,.75)",
+    "rivetnAO":          "0 0 0 2px rgba(0,0,0,.55)"
+  },
+
+  "texture": {
+    "type": "feSpecularLighting",
+    "baseFrequencyX": 0.55,
+    "baseFrequencyY": 0.52,
+    "numOctaves": 5,
+    "seed": 41,
+    "oxidationFreqX": 0.06,
+    "oxidationFreqY": 0.09,
+    "oxidationSeed": 31,
+    "scratchCount": 4,
+    "scratchOpacity": 0.016
+  },
+
+  "animations": {
+    "entry": {
+      "type": "drop-in",
+      "translateY": -8,
+      "duration": 180,
+      "easing": "ease-out"
+    },
+    "slotAssign": {
+      "type": "metal-click",
+      "scale": 1.06,
+      "duration": 200,
+      "glowColor": "rgba(185,108,15,.55)",
+      "glowRadius": 20
+    },
+    "slotEmpty": {
+      "type": "idle",
+      "pulse": false
+    }
+  },
+
+  "cssVars": {
+    "--rack-bg":              "#0e0f10",
+    "--rack-border":          "#3a2008",
+    "--rack-border-highlight":"rgba(255,252,205,.72)",
+    "--rack-border-shadow":   "rgba(0,0,0,.95)",
+    "--rack-edge-h":          "6px",
+    "--rack-edge-color-top":  "#5a3810",
+    "--rack-edge-color-bot":  "#0e0802",
+    "--rack-rivet-size":      "12px",
+    "--slot-size":            "80px",
+    "--slot-gap":             "22px",
+    "--slot-cavity-deep":     "#020101",
+    "--slot-bezel-mid":       "rgba(125,78,18,.78)",
+    "--slot-bezel-spec":      "rgba(255,252,205,.72)",
+    "--slot-medallion-glow":  "rgba(185,108,15,.35)"
+  }
+}

@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kurokasaiken.dev/schemas/mobilePlaytestLogger.schema.json",
+  "title": "Punch Club Mobile Playtest Log",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "sessionId",
+    "tester",
+    "device",
+    "cycleDurationMs",
+    "tapsPerAssignment",
+    "assignmentLatencyMs",
+    "pickerCloseRate",
+    "resourceDelta",
+    "qualitativeNotes",
+    "createdAt"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Schema version for the playtest log payload.",
+      "enum": ["1.0.0"]
+    },
+    "sessionId": {
+      "type": "string",
+      "description": "Identifier chosen by the tester for the playtest session.",
+      "minLength": 1
+    },
+    "tester": {
+      "type": "string",
+      "description": "Human tester running the mobile session.",
+      "minLength": 1
+    },
+    "device": {
+      "type": "string",
+      "description": "Device used for the playtest (model, OS version).",
+      "minLength": 1
+    },
+    "cycleDurationMs": {
+      "type": "array",
+      "description": "Durations for each Gym→Rest→Bout cycle measured in milliseconds.",
+      "minItems": 1,
+      "items": {
+        "type": "number",
+        "exclusiveMinimum": 0
+      }
+    },
+    "tapsPerAssignment": {
+      "type": "array",
+      "description": "Tap counts required to assign a resident across sampled interactions.",
+      "minItems": 1,
+      "items": {
+        "type": "number",
+        "exclusiveMinimum": 0
+      }
+    },
+    "assignmentLatencyMs": {
+      "type": "array",
+      "description": "Latency samples (in milliseconds) measured between chip tap and slot state change.",
+      "minItems": 1,
+      "items": {
+        "type": "number",
+        "exclusiveMinimum": 0
+      }
+    },
+    "pickerCloseRate": {
+      "type": "number",
+      "description": "Percentage of worker picker interactions that close within 1 second of assignment.",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "resourceDelta": {
+      "type": "object",
+      "description": "Net resource change per full cycle.",
+      "required": ["gold", "food"],
+      "additionalProperties": false,
+      "properties": {
+        "gold": {
+          "type": "number",
+          "description": "Net gold delta (positive means gain)."
+        },
+        "food": {
+          "type": "number",
+          "description": "Net food delta (positive means gain)."
+        }
+      }
+    },
+    "qualitativeNotes": {
+      "type": "string",
+      "description": "Free-form qualitative observations from the tester.",
+      "minLength": 1
+    },
+    "telemetrySource": {
+      "type": "string",
+      "description": "Optional relative path to the telemetry file imported into the CLI.",
+      "minLength": 1
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp (UTC) describing when the log was captured."
+    },
+    "derivedMetrics": {
+      "type": "object",
+      "description": "Convenience aggregations calculated by the CLI.",
+      "required": [
+        "avgCycleDurationMs",
+        "avgTapsPerAssignment",
+        "avgAssignmentLatencyMs",
+        "meetsCycleTarget",
+        "meetsTapTarget",
+        "meetsLatencyTarget",
+        "meetsPickerTarget",
+        "meetsResourceTarget"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "avgCycleDurationMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "avgTapsPerAssignment": {
+          "type": "number",
+          "minimum": 0
+        },
+        "avgAssignmentLatencyMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "meetsCycleTarget": {
+          "type": "boolean"
+        },
+        "meetsTapTarget": {
+          "type": "boolean"
+        },
+        "meetsLatencyTarget": {
+          "type": "boolean"
+        },
+        "meetsPickerTarget": {
+          "type": "boolean"
+        },
+        "meetsResourceTarget": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

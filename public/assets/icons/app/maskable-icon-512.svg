@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Maskable icon for iOS - Safe area with rounded corners -->
+  <!-- Background with safe zone for iOS mask -->
+  <rect width="512" height="512" rx="128" fill="#f2c94c"/>
+  
+  <!-- Inner dark background -->
+  <rect x="21" y="21" width="470" height="470" rx="107" fill="#0b0b12"/>
+  
+  <!-- Simplified RPG Balancer icon for maskable (scaled) -->
+  <g transform="translate(256, 256)">
+    <!-- Scale base -->
+    <rect x="-48" y="75" width="96" height="11" fill="#f2c94c"/>
+    
+    <!-- Scale pole -->
+    <rect x="-5" y="-96" width="11" height="171" fill="#f2c94c"/>
+    
+    <!-- Scale beam -->
+    <rect x="-144" y="-8" width="288" height="5" fill="#f2c94c"/>
+    
+    <!-- Left scale pan -->
+    <path d="M -120 -8 L -107 -48 L -80 -48 L -67 -8 Z" fill="#f2c94c"/>
+    
+    <!-- Right scale pan -->
+    <path d="M 67 -8 L 80 -48 L 107 -48 L 120 -8 Z" fill="#f2c94c"/>
+    
+    <!-- Balance indicators -->
+    <circle cx="-93" cy="-28" r="5" fill="#0b0b12"/>
+    <circle cx="93" cy="-28" r="5" fill="#0b0b12"/>
+  </g>
+  
+  <!-- Corner indicators for maskable safe zone -->
+  <g opacity="0.5">
+    <rect x="32" y="32" width="11" height="11" fill="#f2c94c"/>
+    <rect x="469" y="32" width="11" height="11" fill="#f2c94c"/>
+    <rect x="32" y="469" width="11" height="11" fill="#f2c94c"/>
+    <rect x="469" y="469" width="11" height="11" fill="#f2c94c"/>
+  </g>
+</svg>

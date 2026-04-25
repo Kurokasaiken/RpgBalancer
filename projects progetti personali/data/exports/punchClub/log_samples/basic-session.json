@@ -1,0 +1,13 @@
+{"timestamp": 1641894400000, "eventType": "session_started", "sessionId": "session-001", "payload": {"platform": "web", "userAgent": "Mozilla/5.0"}, "source": "system"}
+{"timestamp": 1641894401000, "eventType": "combat_completed", "sessionId": "session-001", "payload": {"won": true, "damageDealt": 45, "damageTaken": 12, "opponentLevel": 3, "experience": 50, "money": 20, "turns": 4}, "source": "game"}
+{"timestamp": 1641894405000, "eventType": "experience_gained", "sessionId": "session-001", "payload": {"amount": 50, "total": 150}, "source": "game"}
+{"timestamp": 1641894406000, "eventType": "money_gained", "sessionId": "session-001", "payload": {"amount": 20, "total": 120}, "source": "game"}
+{"timestamp": 1641894410000, "eventType": "level_up", "sessionId": "session-001", "payload": {"newLevel": 5, "oldLevel": 4, "experience": 150}, "source": "game"}
+{"timestamp": 1641894415000, "eventType": "tag_added", "sessionId": "session-001", "payload": {"id": "tag-001", "type": "playstyle", "name": "Aggressive", "value": "aggressive", "confidence": 0.8, "source": "auto"}, "source": "auto"}
+{"timestamp": 1641894420000, "eventType": "training_completed", "sessionId": "session-001", "payload": {"type": "strength", "duration": 3000, "statGain": 2}, "source": "game"}
+{"timestamp": 1641894425000, "eventType": "stat_points_allocated", "sessionId": "session-001", "payload": {"points": 2, "stats": {"strength": 2}}, "source": "game"}
+{"timestamp": 1641894430000, "eventType": "combat_completed", "sessionId": "session-001", "payload": {"won": false, "damageDealt": 30, "damageTaken": 25, "opponentLevel": 4, "experience": 25, "money": 10, "turns": 6}, "source": "game"}
+{"timestamp": 1641894435000, "eventType": "tag_added", "sessionId": "session-001", "payload": {"id": "tag-002", "type": "performance", "name": "Struggling", "value": "struggling", "confidence": 0.6, "source": "auto"}, "source": "auto"}
+{"timestamp": 1641894440000, "eventType": "combat_completed", "sessionId": "session-001", "payload": {"won": true, "damageDealt": 55, "damageTaken": 8, "opponentLevel": 4, "experience": 60, "money": 25, "turns": 3}, "source": "game"}
+{"timestamp": 1641894445000, "eventType": "tag_added", "sessionId": "session-001", "payload": {"id": "tag-003", "type": "milestone", "name": "First Win", "value": "first_win", "confidence": 1.0, "source": "system"}, "source": "system"}
+{"timestamp": 1641894450000, "eventType": "session_ended", "sessionId": "session-001", "payload": {"duration": 50000, "reason": "manual"}, "source": "system"}

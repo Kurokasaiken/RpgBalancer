@@ -1,0 +1,2 @@
+Session ID,Tester,Device,Created At,Avg Cycle Duration (ms),Meets Cycle Target,Avg Taps per Assignment,Meets Tap Target,Avg Assignment Latency (ms),Meets Latency Target,Picker Close Rate (%),Meets Picker Target,Resource Gold Delta,Resource Food Delta,Meets Resource Target,Qualitative Notes
+"sample-mobile-playtest","QA Ranger","Pixel 8 · Android 15","2026-01-04T18:05:20.711Z","87666.67","Yes","2.67","Yes","410","Yes","99","Yes","12","3","Yes","Picker felt responsive, no lag even with Rest overlay active."

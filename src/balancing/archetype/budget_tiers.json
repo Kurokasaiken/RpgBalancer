@@ -1,0 +1,27 @@
+[
+    {
+        "name": "Early Game",
+        "points": 10,
+        "description": "Level 1-3"
+    },
+    {
+        "name": "Mid Game",
+        "points": 20,
+        "description": "Level 4-6"
+    },
+    {
+        "name": "Late Game",
+        "points": 50,
+        "description": "Level 7-9"
+    },
+    {
+        "name": "Endgame",
+        "points": 75,
+        "description": "Level 10+"
+    },
+    {
+        "name": "Epic",
+        "points": 100,
+        "description": "Boss/Raid tier"
+    }
+]

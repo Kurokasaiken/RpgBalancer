@@ -1,0 +1,232 @@
+{
+  "component": "Table",
+  "version": "v12",
+  "description": "Superficie fisica fullscreen — basalto con overlay ossidiana, vetro, luci candelabro, imperfezioni narrative, micro-animazioni ambientali",
+
+  "layers": {
+    "order": [
+      "table-bg",
+      "table-obsidian",
+      "table-candles",
+      "table-map-glow",
+      "table-vign",
+      "glass-scratches (SVG)",
+      "dust-canvas",
+      "glint-canvas",
+      "stage (oggetti)"
+    ],
+    "tableBg": {
+      "source": "bg.png (base64)",
+      "filter": "brightness(.85) saturate(1.0)",
+      "note": "Colori nativi — verde, rosso rame, nero. Solo scurimento minimo"
+    },
+    "tableObsidian": {
+      "overlays": ["venature minerali SVG", "feSpecularLighting ossidiana SVG"],
+      "blendMode": "screen",
+      "opacity": 0.38,
+      "spec": {
+        "lightingColor": "#a0b8d0",
+        "azimuth": 235,
+        "elevation": 38,
+        "surfaceScale": 2.2,
+        "specularConstant": 0.85,
+        "specularExponent": 42
+      }
+    },
+    "tableGlass": {
+      "description": "Layer vetro — non aggiunge colore, aggiunge fisicità",
+      "blendMode": "overlay",
+      "specularPointTopLeft": {
+        "position": "18% 12%",
+        "size": "55% 40%",
+        "color": "rgba(255,252,235,.18)"
+      },
+      "secondHighlight": {
+        "position": "96% 35%",
+        "size": "30% 55%",
+        "color": "rgba(255,245,215,.10)"
+      },
+      "glintFixed": {
+        "description": "Punto bianco netto — riflesso finestra lontana",
+        "position": "14% 8%",
+        "coreSize": "2.5% x 4%",
+        "coreColor": "rgba(255,255,252,.82)",
+        "haloSize": "8% x 12%",
+        "haloColor": "rgba(255,252,235,.22)",
+        "stripe": "rgba(255,252,240,.06) su 6px verticali"
+      }
+    },
+    "tableCandles": {
+      "left": {
+        "position": "-4% 52%",
+        "size": "32% x 52%",
+        "color": "rgba(185,115,28,.38)",
+        "falloff": "rgba(155,88,18,.18) a 45%"
+      },
+      "right": {
+        "position": "104% 48%",
+        "size": "28% x 48%",
+        "color": "rgba(175,105,22,.28)",
+        "falloff": "rgba(145,78,14,.12) a 45%"
+      },
+      "zenithal": {
+        "position": "52% -2%",
+        "size": "48% x 32%",
+        "color": "rgba(165,145,85,.22)"
+      }
+    },
+    "tableMapGlow": {
+      "description": "Alone ambrato — il perimetro della mappa scalda il vetro",
+      "position": "22% 50%",
+      "size": "22% x 42%",
+      "color": "rgba(195,148,42,.28)",
+      "falloff": "rgba(165,115,28,.12) a 48%"
+    },
+    "tableVign": {
+      "description": "Vignette cinematografica — nero profondo, curva fisica, no angoli separati",
+      "radial": {
+        "size": "70% x 64%",
+        "stops": [
+          {"pos": "0%",   "val": "transparent"},
+          {"pos": "38%",  "val": "transparent"},
+          {"pos": "54%",  "val": "rgba(0,0,0,.08)"},
+          {"pos": "68%",  "val": "rgba(0,0,0,.32)"},
+          {"pos": "80%",  "val": "rgba(0,0,0,.62)"},
+          {"pos": "90%",  "val": "rgba(0,0,0,.85)"},
+          {"pos": "100%", "val": "rgba(0,0,0,.96)"}
+        ]
+      },
+      "linearPressures": {
+        "top":    {"start": "rgba(0,0,0,.45)", "mid": "rgba(0,0,0,.18) a 32px", "end": "transparent a 88px"},
+        "bottom": {"start": "rgba(0,0,0,.38)", "mid": "rgba(0,0,0,.14) a 28px", "end": "transparent a 80px"},
+        "left":   {"start": "rgba(0,0,0,.32)", "mid": "rgba(0,0,0,.12) a 24px", "end": "transparent a 72px"},
+        "right":  {"start": "rgba(0,0,0,.32)", "mid": "rgba(0,0,0,.12) a 24px", "end": "transparent a 72px"}
+      },
+      "border": "inset box-shadow 1px nero assoluto"
+    }
+  },
+
+  "imperfections": {
+    "calice": {
+      "description": "Alone tazza/calice — narrativo, il comandante beveva",
+      "position": "88% 76%",
+      "radius": 28,
+      "rings": [
+        {"color": "rgba(155,88,32,.28)", "strokeWidth": 2.2, "dasharray": "quasi completo"},
+        {"color": "rgba(130,68,22,.18)", "strokeWidth": 3.5, "inner": true}
+      ],
+      "drip": {"color": "rgba(140,72,22,.22)", "rotate": 28}
+    },
+    "cera": {
+      "description": "Bruciatura cera — candela che ha colato",
+      "position": "16% 12%",
+      "blobRotation": -18,
+      "layers": ["blob cera rgba(235,215,165,.14)", "alone bruciatura rgba(45,18,4,.22)", "deposito centrale rgba(245,232,188,.22)", "colata rgba(235,215,165,.20)", "speculare cera rgba(255,252,230,.45)"]
+    }
+  },
+
+  "animations": {
+    "dustParticles": {
+      "count": 65,
+      "pools": [
+        {"x": "18%", "y": "42%", "r": "22% of min(W,H)"},
+        {"x": "52%", "y": "15%", "r": "18% of min(W,H)"}
+      ],
+      "types": {
+        "gold":   {"color": "rgba(215,172,62,a)",    "ratio": 0.55},
+        "white":  {"color": "rgba(195,185,165,a)",   "ratio": 0.23},
+        "copper": {"color": "rgba(185,105,55,a)",    "ratio": 0.22}
+      },
+      "velocity": {"vx": "±0.15", "vy": "-0.10 drift up"},
+      "life": "200-480 frames",
+      "canvasBreath": {
+        "keyframes": [0, 8, 45, 72, 88, 100],
+        "opacity":   [0, 0.45, 0.58, 0.42, 0.18, 0],
+        "duration": "18s"
+      }
+    },
+    "glintMinerals": {
+      "count": 22,
+      "interval": "420-1280 frames tra apparizioni",
+      "duration": "28-70 frames",
+      "types": {
+        "copper": "rgba(200,120,55,a) — 40%",
+        "gold":   "rgba(225,178,62,a) — 35%",
+        "white":  "rgba(255,252,232,a) — 25%"
+      },
+      "shape": "croce con punto centrale",
+      "canvasPulse": {
+        "duration": "22s",
+        "opacity": {"min": 0.65, "max": 1.0}
+      }
+    },
+    "mapSway": {
+      "duration": "22s ease-in-out infinite",
+      "transformOrigin": "40% 85%",
+      "baseRotation": "-1.4deg",
+      "keyframes": [
+        {"pos": "0%,100%", "rotate": "-1.4deg",  "translateY": "0"},
+        {"pos": "28%",     "rotate": "-2.2deg",  "translateY": "1.8px"},
+        {"pos": "58%",     "rotate": "-0.6deg",  "translateY": "-1.4px"},
+        {"pos": "82%",     "rotate": "-1.8deg",  "translateY": "0.8px"}
+      ]
+    },
+    "poiDot": {
+      "duration": "2.4s ease-in-out infinite",
+      "opacity": "0.88 → 1.0",
+      "filter": "brightness(1.2) at peak"
+    }
+  },
+
+  "map": {
+    "width": 275,
+    "rotation": "-1.4deg (base, animata)",
+    "transformOrigin": "40% 85%",
+    "dropShadow": [
+      "3px 4px 0 rgba(0,0,0,.98)",
+      "6px 8px 10px rgba(0,0,0,.90)",
+      "12px 16px 28px rgba(0,0,0,.75)",
+      "18px 24px 48px rgba(0,0,0,.50)"
+    ],
+    "imageFilter": "sepia(.08) contrast(1.04) brightness(.96)",
+    "grainOverlay": {
+      "source": "feDiffuseLighting SVG parchment",
+      "blendMode": "soft-light",
+      "opacity": 0.22
+    },
+    "edgeVignette": {
+      "vertical": "rgba(35,18,4,.38) → transparent → rgba(35,18,4,.40)",
+      "horizontal": "rgba(30,14,3,.34) → transparent → rgba(30,14,3,.36)"
+    },
+    "border": {
+      "color": "rgba(138,92,32,.55)",
+      "innerHighlight": "rgba(235,205,140,.28) top",
+      "innerShadow": "rgba(12,6,1,.52) bottom"
+    },
+    "curl": {
+      "position": "top-right",
+      "size": "20x20px",
+      "gradient": "radial from 100% 0%, ambra → trasparente"
+    }
+  },
+
+  "antiPatterns": [
+    "Non usare SVG filter su background-image CSS — supporto browser parziale",
+    "Non aggiungere riflesso specchiato della mappa — distrae dalla mappa stessa",
+    "Non usare teal/orange overlay — il bg.png ha già la palette giusta",
+    "Non fare vignette con 4 gradienti angolari separati — creano triangoli visibili",
+    "Non tenere opacity troppo basse sui layer visivi (vetro, candele) — diventano invisibili",
+    "Non saturare troppo — il bg.png fa già il lavoro cromatico",
+    "Non aggiungere oggetti fisici (bussola, moneta) senza dedicargli sviluppo serio",
+    "Non toccare il centro del tavolo — sarà sempre coperto da oggetti di gioco"
+  ],
+
+  "materialHierarchy": {
+    "1_base": "bg.png basalto reale — verde, rosso rame, nero organico",
+    "2_ossidian": "SVG overlay screen — venature e specularità fredde",
+    "3_glass": "overlay blend — fisicità e lucentezza, non colore",
+    "4_candles": "pool luce caldi — valorizzano il rame del bg",
+    "5_vignette": "nero cinematografico — bordi come pareti di stanza buia",
+    "6_objects": "mappa pergamena + POI Detail — sopra tutto"
+  }
+}

@@ -1,0 +1,248 @@
+import React, { useEffect, useRef, useCallback } from 'react';
+import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
+import type { MinimalGameOverState } from '@/store/useMinimalGameplay';
+import type { MinimalGameOverConfig } from '@/balancing/config/idleVillage/minimalConfig';
+
+/**
+ * Props for the MinimalGameOverModal component.
+ */
+export interface MinimalGameOverModalProps {
+  /** Whether the modal is open */
+  isOpen: boolean;
+  /** Game over state with reason and summary */
+  gameOverState: MinimalGameOverState;
+  /** Game over configuration */
+  config: MinimalGameOverConfig;
+  /** Callback when restart is clicked */
+  onRestart: () => void;
+  /** Optional callback when modal is closed */
+  onClose?: () => void;
+  /** Optional test ID */
+  testId?: string;
+}
+
+/**
+ * Minimal Game Over Modal Component
+ *
+ * Displays game over state with statistics and restart option.
+ * Implements accessibility features: aria-modal, focus trap, keyboard navigation.
+ */
+const MinimalGameOverModal: React.FC<MinimalGameOverModalProps> = ({
+  isOpen,
+  gameOverState,
+  config,
+  onRestart,
+  onClose,
+  testId,
+}) => {
+  const modalRef = useRef<HTMLDivElement>(null);
+  const firstFocusableRef = useRef<HTMLButtonElement>(null);
+
+  // Focus trap implementation
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const modalElement = modalRef.current;
+    if (!modalElement) return;
+
+    const focusableElements = modalElement.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const firstElement = focusableElements[0] as HTMLElement;
+    const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+
+    const handleTabKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          lastElement?.focus();
+          e.preventDefault();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          firstElement?.focus();
+          e.preventDefault();
+        }
+      }
+    };
+
+    const handleEscapeKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && onClose) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleTabKey);
+    document.addEventListener('keydown', handleEscapeKey);
+
+    // Focus first element when modal opens
+    setTimeout(() => firstFocusableRef.current?.focus(), 100);
+
+    return () => {
+      document.removeEventListener('keydown', handleTabKey);
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [isOpen, onClose]);
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
+  // Handle backdrop click
+  const handleBackdropClick = useCallback((event: React.MouseEvent) => {
+    if (event.target === event.currentTarget && config.closeOnBackdropClick) {
+      handleRestart();
+    }
+  }, [config.closeOnBackdropClick]);
+
+  // Handle restart
+  const handleRestart = useCallback(() => {
+    // Emit telemetry
+    trackTelemetryEvent('minimal_gameplay_restart', {
+      reason: gameOverState.reason || 'modal_restart',
+      daysSurvived: gameOverState.summary?.daysSurvived || 0,
+      goldEarned: gameOverState.summary?.goldEarned || 0,
+      questsCompleted: gameOverState.summary?.questsCompleted || 0,
+      residentsLost: gameOverState.summary?.residentsLost || 0,
+      timestamp: Date.now(),
+    });
+
+    onRestart();
+  }, [gameOverState, onRestart]);
+
+  if (!isOpen || !gameOverState.isGameOver) {
+    return null;
+  }
+
+  const reasonMessages = config.reasons?.[gameOverState.reason || 'manual_reset'] || {
+    title: 'Game Over',
+    description: 'The game has ended.',
+    restartButton: 'Restart'
+  };
+  const summary = gameOverState.summary;
+  const statsLayout = config.statsLayout || {
+    daysSurvived: { label: 'Days Survived' },
+    goldEarned: { label: 'Gold Earned' },
+    questsCompleted: { label: 'Quests Completed' },
+    residentsLost: { label: 'Residents Lost' }
+  };
+  
+  // Safe access to stats layout labels
+  const getLabel = (key: keyof typeof statsLayout) => 
+    statsLayout[key]?.label || key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm"
+      onClick={handleBackdropClick}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="game-over-title"
+      aria-describedby="game-over-description"
+      data-testid={testId}
+    >
+      <div
+        ref={modalRef}
+        className="relative max-w-md w-full mx-4 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl"
+        tabIndex={-1}
+        style={{
+          maxHeight: '90vh',
+          overflow: 'auto',
+        }}
+      >
+        {/* Header */}
+        <div className="p-6 border-b border-slate-700">
+          <h1
+            id="game-over-title"
+            className="text-2xl font-bold text-center text-white"
+          >
+            {config.modalTitle || 'Game Over'}
+          </h1>
+        </div>
+
+        {/* Content */}
+        <div className="p-6">
+          {/* Reason */}
+          <div className="mb-6 text-center">
+            <h2 className="text-xl font-semibold text-amber-400 mb-2">
+              {reasonMessages.title}
+            </h2>
+            <p
+              id="game-over-description"
+              className="text-slate-300 leading-relaxed"
+            >
+              {reasonMessages.description}
+            </p>
+          </div>
+
+            {/* Statistics */}
+          {summary && (
+            <div className="mb-6 space-y-3">
+              <h3 className="text-lg font-medium text-white mb-4 text-center">
+                Statistiche Finali
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-slate-800 rounded-lg p-3 text-center">
+                  <div className="text-2xl font-bold text-amber-400">
+                    {summary.daysSurvived}
+                  </div>
+                  <div className="text-sm text-slate-400">
+                    {getLabel('daysSurvived')}
+                  </div>
+                </div>
+                <div className="bg-slate-800 rounded-lg p-3 text-center">
+                  <div className="text-2xl font-bold text-yellow-400">
+                    {summary.goldEarned}
+                  </div>
+                  <div className="text-sm text-slate-400">
+                    {getLabel('goldEarned')}
+                  </div>
+                </div>
+                <div className="bg-slate-800 rounded-lg p-3 text-center">
+                  <div className="text-2xl font-bold text-blue-400">
+                    {summary.questsCompleted}
+                  </div>
+                  <div className="text-sm text-slate-400">
+                    {getLabel('questsCompleted')}
+                  </div>
+                </div>
+                <div className="bg-slate-800 rounded-lg p-3 text-center">
+                  <div className="text-2xl font-bold text-red-400">
+                    {summary.residentsLost}
+                  </div>
+                  <div className="text-sm text-slate-400">
+                    {getLabel('residentsLost')}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Actions */}
+          <div className="flex justify-center">
+            <button
+              type="button"
+              onClick={handleRestart}
+              className="px-8 py-3 bg-amber-600 hover:bg-amber-500 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-slate-900"
+              autoFocus
+            >
+              {reasonMessages.restartButton}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default MinimalGameOverModal;

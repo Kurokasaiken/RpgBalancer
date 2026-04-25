@@ -1,0 +1,209 @@
+import { useState, useEffect } from 'react';
+import { useDensity } from '../../contexts/densityHooks';
+import {
+    BOTTOM_NAV,
+    NAV_SECTIONS,
+    type AppNavTabId,
+} from '@/shared/navigation/navConfig';
+
+interface FantasyLayoutProps {
+    children: React.ReactNode;
+    activeTab: AppNavTabId;
+    onTabChange: (tab: AppNavTabId) => void;
+}
+
+export const FantasyLayout: React.FC<FantasyLayoutProps> = ({ children, activeTab, onTabChange }) => {
+    const [isMobile, setIsMobile] = useState(false);
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const { density, toggleDensity } = useDensity();
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    const handleNavClick = (id: AppNavTabId | 'more') => {
+        if (id === 'more') {
+            setIsDrawerOpen(true);
+        } else {
+            onTabChange(id);
+            setIsDrawerOpen(false);
+        }
+    };
+
+    return (
+        <>
+            <div className="flex h-screen w-full overflow-hidden bg-linear-to-br from-obsidian-darkest via-obsidian-dark to-obsidian">
+                {/* Desktop Left Menu */}
+                {!isMobile && (
+                    <aside className="hidden lg:flex w-72 shrink-0 px-4 py-6">
+                        <div
+                            className="relative w-full overflow-hidden rounded-[26px] border px-4 py-5 shadow-[0_30px_65px_rgba(0,0,0,0.65)]"
+                            style={{
+                                borderColor: 'var(--panel-border)',
+                                background: 'radial-gradient(circle at 15% 0%, rgba(255,255,255,0.08), rgba(4,7,14,0.95))',
+                                boxShadow: `0 30px 60px var(--card-shadow-color)`,
+                            }}
+                        >
+                            <div
+                                className="pointer-events-none absolute inset-0 opacity-25"
+                                style={{ background: 'var(--card-surface-radial, radial-gradient(circle at 25% 0%, rgba(255,255,255,0.18), transparent 55%))' }}
+                            />
+                            <div className="relative z-10 flex h-full flex-col gap-5">
+                                <nav className="flex-1 flex flex-col gap-5 overflow-y-auto pr-1">
+                                    {NAV_SECTIONS.map((section) => (
+                                        <div key={section.title} className="space-y-2">
+                                            <p className="px-2 text-[9px] uppercase tracking-[0.35em] text-slate-400/70">
+                                                {section.title}
+                                            </p>
+                                            <div className="flex flex-col gap-2">
+                                                {section.items.map((item) => {
+                                                    const isActive = activeTab === item.id;
+                                                    return (
+                                                        <button
+                                                            key={item.id}
+                                                            data-tab-id={item.id}
+                                                            data-testid={`nav-btn-${item.id}`}
+                                                            onClick={() => onTabChange(item.id)}
+                                                            className={[
+                                                                'flex items-center gap-3 rounded-[18px] border px-3 py-2 text-left text-[10px] uppercase tracking-[0.28em] transition-all',
+                                                                isActive
+                                                                    ? 'text-amber-100 shadow-[0_0_25px_rgba(251,191,36,0.35)]'
+                                                                    : 'text-slate-200/85 hover:text-ivory hover:shadow-[0_0_25px_rgba(52,211,153,0.25)]',
+                                                            ].join(' ')}
+                                                            style={{
+                                                                borderColor: isActive ? 'rgba(251,191,36,0.65)' : 'rgba(255,255,255,0.12)',
+                                                                background: isActive
+                                                                    ? 'linear-gradient(120deg, rgba(251,191,36,0.2), rgba(17,10,0,0.85))'
+                                                                    : 'linear-gradient(120deg, rgba(5,7,12,0.85), rgba(2,4,6,0.92))',
+                                                            }}
+                                                        >
+                                                            <span className="text-lg">{item.icon}</span>
+                                                            <span className="truncate">{item.label}</span>
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </nav>
+                            </div>
+                        </div>
+                    </aside>
+                )}
+
+                {/* Main Content */}
+                <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+                {/* Mobile Header */}
+                {isMobile && (
+                    <header className="flex items-center justify-between px-4 py-3 bg-obsidian-light/90 border-b border-slate-darkest">
+                        <button
+                            type="button"
+                            data-testid="mobile-menu-btn"
+                            aria-label="Apri navigazione"
+                            className="flex items-center gap-2 rounded-full border border-gold/70 bg-obsidian-darkest/90 px-3 py-2 text-gold shadow-glow-gold"
+                            onClick={() => setIsDrawerOpen(true)}
+                        >
+                            <span className="text-lg">☰</span>
+                            <span className="text-xs tracking-widest uppercase">Menu</span>
+                        </button>
+                        <button
+                            onClick={toggleDensity}
+                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-darkest/50 text-teal text-sm"
+                        >
+                            {density === 'compact' ? '▪' : '▫'}
+                        </button>
+                    </header>
+                )}
+
+                {/* Content */}
+                <div className={`flex-1 overflow-y-auto scroll-smooth ${isMobile ? 'pb-20' : ''}`}>
+                    <div className="p-3 md:p-4">
+                        <div className="observatory-main-frame">
+                            {children}
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            </div>
+
+            {/* Mobile Bottom Navigation - THUMB ZONE */}
+            {isMobile && (
+                <nav className="fixed bottom-0 inset-x-0 z-50 bg-obsidian-light/95 backdrop-blur-sm border-t border-slate-darkest safe-area-inset-bottom">
+                    <div className="flex items-center justify-around h-16">
+                        {BOTTOM_NAV.map((item) => {
+                            const isActive = activeTab === item.id || (item.id === 'more' && isDrawerOpen);
+                            return (
+                                <button
+                                    key={item.id}
+                                    data-testid={`nav-btn-${item.id}`}
+                                    onClick={() => handleNavClick(item.id)}
+                                    className={`
+                                        flex flex-col items-center justify-center
+                                        w-16 h-14 rounded-xl no-select
+                                        transition-all duration-150 active:scale-95
+                                        ${isActive
+                                            ? 'bg-gold/15 text-gold'
+                                            : 'text-teal-muted active:bg-slate-darkest/50'
+                                        }
+                                    `}
+                                >
+                                    <span className="text-xl mb-0.5">{item.icon}</span>
+                                    <span className="text-2xs">{item.label}</span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </nav>
+            )}
+
+            {/* Mobile Drawer */}
+            {isMobile && isDrawerOpen && (
+                <>
+                    <div className="fixed inset-0 z-50 bg-black/60" onClick={() => setIsDrawerOpen(false)} />
+                    <div className="fixed inset-x-0 bottom-0 z-50 max-h-[75vh] bg-obsidian-light rounded-t-3xl border-t border-slate overflow-hidden animate-slide-up">
+                        <div className="flex justify-center py-3">
+                            <div className="w-12 h-1.5 bg-slate rounded-full" />
+                        </div>
+                        <div className="overflow-y-auto max-h-[calc(75vh-60px)] pb-safe scrollbar-hide">
+                            {NAV_SECTIONS.map((section) => (
+                                <div key={section.title} className="mb-2">
+                                    <p className="px-5 pt-2 pb-1">
+                                        <span className="flex items-center gap-2 text-[8px] text-teal-muted/40">
+                                            <span className="h-px flex-1 bg-slate-700/60" />
+                                            <span className="w-1.5 h-1.5 rounded-full bg-gold/70 shadow-glow-gold" />
+                                            <span className="h-px flex-1 bg-slate-700/60" />
+                                        </span>
+                                    </p>
+                                    <div className="px-3">
+                                        {section.items.map((item) => (
+                                            <button
+                                                key={item.id}
+                                                data-testid={`nav-btn-${item.id}`}
+                                                onClick={() => handleNavClick(item.id)}
+                                                className={`
+                                                    w-full flex items-center gap-4 px-4 py-3.5 rounded-xl mb-1
+                                                    transition-all duration-150 active:scale-98 no-select
+                                                    ${activeTab === item.id
+                                                        ? 'bg-gold/15 text-gold'
+                                                        : 'text-ivory hover:bg-slate-darkest/50 active:bg-slate-darkest'
+                                                    }
+                                                `}
+                                            >
+                                                <span className="text-xl">{item.icon}</span>
+                                                <span className="text-base">{item.label}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </>
+            )}
+        </>
+    );
+};

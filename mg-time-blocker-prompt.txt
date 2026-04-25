@@ -1,0 +1,107 @@
+| MG-TIME-BLOCKER-001 - BLOCKER: Fix Minimal Gameplay time progression runtime model | Non assegnato | - | - | BLOCKER: Time acceleration, missing speedMultiplier, incorrect cycleProgress - must fix before POI work |
+```text
+AGENT
+SWE Implementer - Runtime Systems
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `agent-execution-mandate` prima di iniziare, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+BLOCKER PRIORITY
+QUESTO È UN BLOCKER CRITICO. Il tempo di gioco in /minimal-gameplay è rotto e deve essere riparato prima di qualsiasi lavoro su POI assignment o altre funzionalità gameplay.
+
+OBIETTIVO
+Ripristinare il modello temporale runtime corretto per MinimalGameplayPage risolvendo i problemi confermati dal code review.
+
+PROMPT READINESS
+FILE TARGET
+- [esistente] src/ui/idleVillage/MinimalGameplayPage.tsx
+- [esistente] src/store/useMinimalGameplay.ts
+- [esistente] src/ui/idleVillage/components/minimal/TemporaryTimeStatus.tsx (solo se necessario per visualizzazione)
+
+STYLE LAB PRESET
+- N/A (task backend di timing)
+
+TEST ROUTE QA
+- Obbligatorio: /minimal-gameplay per verifica runtime manuale
+
+DATO DI ORIGINE
+- Code review diretto ha identificato: tick() ignora speedMultiplier, cycleProgress aggiornato solo su transizione giorno, loop timeout ricorsivo senza cleanup causa accelerazione progressiva.
+
+DIPENDENZE
+- -
+
+PROBLEMI CONFERMATI DA CORREGGERE
+1. **useMinimalGameplay.ts tick()**: deltaTimeUnits ignora state.speedMultiplier
+2. **useMinimalGameplay.ts cycleProgress**: aggiornato solo su logica transizione giorno, deve essere ricalcolato ad ogni tick
+3. **MinimalGameplayPage.tsx time loop**: usa catena scheduleTimeout ricorsiva senza cleanup corretto, causa loop sovrapposti e accelerazione progressiva
+
+COMPORTAMENTO TARGET BLOCCATO
+- 1 secondo reale = 1 engine tick
+- a velocità 1x, ogni tick avanza esattamente 1 unità tempo di gioco
+- a velocità Nx, ogni tick avanza esattamente N unità tempo di gioco
+- cycleProgress deve essere derivato ad ogni tick dal progresso fase corrente
+- dayTimeUnits/nightTimeUnits sono valori di design, non valori di compensazione visiva
+- solo una catena di timing runtime attiva può esistere
+
+OPERAZIONI DA ESEGUIRE
+1. **Fix tick() SpeedMultiplier**: In useMinimalGameplay.ts, correggere tick() in modo che deltaTimeUnits usi correttamente state.speedMultiplier
+2. **Fix cycleProgress Per-Tick**: In useMinimalGameplay.ts, ricalcolare isDayPhase e cycleProgress ad ogni tick, non solo durante transizione giorno
+3. **Fix Runtime Loop Cleanup**: In MinimalGameplayPage.tsx, aggiungere cleanup corretto per la catena timeout attiva, prevenire loop sovrapposti e accelerazione
+4. **Verify Single Timing Source**: Assicurarsi che esista solo una catena di timing runtime attiva
+5. **Update TemporaryTimeStatus**: Aggiornare solo se necessario per riflettere stato runtime corretto
+
+OPERAZIONI VIETATE
+- VIETATO risolvere questo problema solo ritunando dayTimeUnits/nightTimeUnits
+- VIETATO ridisegnare l'intero sistema temporale
+- VIETATO introdurre una seconda fonte di timing
+- VIETATO includere lavoro POI assignment o altre funzionalità gameplay in questo task
+- VIETATO rivendicare completamento solo da successo build/test
+
+RUNTIME VERIFICATION OBBLIGATORIA
+Report queste verità runtime esatte, non riassunti architetturali:
+
+1. **Causa Accelerazione**: Qual era la causa esatta dell'accelerazione temporale? (loop ricorsivo senza cleanup)
+2. **Fix deltaTimeUnits**: Qual è la formula esatta di deltaTimeUnits dopo il fix? (deve includere speedMultiplier)
+3. **speedMultiplier Usage**: speedMultiplier è ora effettivamente usato in tick()? Sì/No
+4. **cycleProgress Frequency**: cycleProgress è ricalcolato ad ogni tick? Sì/No
+5. **Single Chain**: È confermato che esiste solo una catena di timing attiva? Sì/No
+
+VERIFICA MANUALE OBBLIGATORIA
+1. Apri /minimal-gameplay
+2. Osserva velocità 1x per almeno 30 secondi
+3. Verifica nessuna accelerazione nel tempo
+4. Metti in pausa e conferma il freeze completo
+5. Riprendi e conferma riavvio pulito senza duplicazione
+6. Cambia velocità e conferma nessun timer stacking
+7. Fornisci risultato runtime osservato effettivo per ogni passo
+
+ASSUNZIONI
+- useMinimalGameplay store è la fonte autorevole stato temporale
+- Il modello previsto è 1 tick al secondo con speedMultiplier che influenza avanzamento tempo
+- TemporaryTimeStatus è display-only e non dovrebbe possedere logica timing
+
+REGRESSION SAFEGUARDS
+- `npm run lint -- src/ui/idleVillage/MinimalGameplayPage.tsx src/store/useMinimalGameplay.ts src/ui/idleVillage/components/minimal/TemporaryTimeStatus.tsx`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+AUTONOMIA & CHECK-IN
+- Autonomia media per implementer SWE
+- Apri blocker solo se esiste altra fonte di timing nascosta
+
+KANBAN COMPLETION
+1. Stato Kanban -> "Completato" con data
+2. Evidence `test-results/mg-time-blocker-001-<YYYY-MM-DD>.log`
+3. Il report finale deve includere verità runtime, non claim architetturali
+
+NOTE
+- La verifica manuale è la fonte di verità se i controlli automatizzati sono in disaccordo
+- Questo task è un prerequisito per qualsiasi lavoro POI futuro
+- System reuse first: non creare nuove astrazioni timing se il fix può essere fatto nel wiring esistente
+
+ANTI-STALL DIRECTIVE
+Procedi autonomamente: non attendere conferme aggiuntive
+
+EVIDENCE LOG
+- test-results/mg-time-blocker-001-<YYYY-MM-DD>.log
+```

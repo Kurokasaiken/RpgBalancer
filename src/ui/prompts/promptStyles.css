@@ -1,0 +1,284 @@
+.prompt-thumb-grid {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.prompt-thumb-grid--xs {
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+}
+
+.prompt-thumb-grid--sm {
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+}
+
+.prompt-thumb-grid--md {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+.prompt-thumb {
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: radial-gradient(circle at 35% 20%, rgba(255, 255, 255, 0.08), rgba(4, 7, 12, 0.85) 70%);
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.prompt-thumb img {
+  width: 100%;
+  height: 100%;
+  flex: 1 1 auto;
+  object-fit: cover;
+}
+
+.prompt-thumb__meta {
+  padding: 0.4rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(233, 241, 255, 0.8);
+}
+
+.prompt-thumb__label {
+  font-size: 0.58rem;
+  color: rgba(189, 214, 255, 0.75);
+}
+
+.prompt-thumb__title {
+  font-weight: 600;
+  color: #f7f4ea;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.prompt-thumb__missing {
+  height: 64px;
+  display: grid;
+  place-items: center;
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.5);
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+}
+
+.prompt-thumb:hover {
+  transform: translateY(-2px) scale(1.01);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+}
+
+.prompt-thumb.is-active {
+  border-color: rgba(201, 162, 39, 0.9);
+  box-shadow: 0 0 0 2px rgba(201, 162, 39, 0.4);
+}
+
+.prompt-thumb-scales {
+  display: inline-flex;
+  gap: 0.35rem;
+}
+
+.prompt-thumb-scale {
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.25rem 0.75rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(247, 244, 234, 0.85);
+  background: rgba(5, 7, 12, 0.6);
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.prompt-thumb-scale.is-active {
+  border-color: rgba(201, 162, 39, 0.8);
+  background: linear-gradient(135deg, rgba(201, 162, 39, 0.3), rgba(98, 175, 196, 0.3));
+  color: #ffffff;
+}
+
+.prompt-image--highlight {
+  animation: promptHighlight 1.2s ease;
+  box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.7);
+}
+
+@keyframes promptHighlight {
+  0% {
+    box-shadow: 0 0 0 0 rgba(201, 162, 39, 0.0);
+  }
+  25% {
+    box-shadow: 0 0 0 4px rgba(201, 162, 39, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(201, 162, 39, 0);
+  }
+}
+
+.prompt-thumb-card-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.prompt-thumb-card-grid--expanded {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.85rem;
+}
+
+.prompt-thumb-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.prompt-thumb-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.prompt-thumb-range {
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(210, 227, 255, 0.7);
+}
+
+.prompt-thumb-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.prompt-thumb-pagination {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(8, 12, 18, 0.7);
+}
+
+.prompt-thumb-nav {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: transparent;
+  color: rgba(247, 244, 234, 0.85);
+  font-size: 0.85rem;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.prompt-thumb-nav:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.prompt-thumb-nav:not(:disabled):hover {
+  border-color: rgba(201, 162, 39, 0.7);
+  color: #fff;
+}
+
+.prompt-thumb-page {
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(233, 241, 255, 0.8);
+}
+
+.prompt-thumb-expand {
+  border-radius: 999px;
+  border: 1px solid rgba(201, 162, 39, 0.4);
+  padding: 0.35rem 0.95rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(247, 244, 234, 0.9);
+  background: rgba(5, 7, 12, 0.5);
+  transition: border-color 0.25s ease, background 0.25s ease, color 0.25s ease;
+}
+
+.prompt-thumb-expand.is-active {
+  border-color: rgba(98, 175, 196, 0.8);
+  background: linear-gradient(135deg, rgba(98, 175, 196, 0.3), rgba(201, 162, 39, 0.25));
+  color: #fff;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+}
+
+.prompt-thumb-card {
+  width: 100%;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(145deg, rgba(5, 7, 12, 0.75), rgba(9, 14, 22, 0.95));
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.9rem;
+  text-align: left;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.prompt-thumb-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(201, 162, 39, 0.6);
+  box-shadow: 0 18px 28px rgba(0, 0, 0, 0.35);
+}
+
+.prompt-thumb-card__preview {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(3, 6, 9, 0.85);
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+}
+
+.prompt-thumb-card__preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.prompt-thumb-card__missing {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.prompt-thumb-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+}
+
+.prompt-thumb-card__label {
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(173, 197, 213, 0.7);
+}
+
+.prompt-thumb-card__title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #f7f4ea;
+}

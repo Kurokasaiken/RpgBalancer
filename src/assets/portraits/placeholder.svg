@@ -1,0 +1,27 @@
+<svg width="512" height="704" viewBox="0 0 512 704" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="obsidian" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop stop-color="#050509" offset="0%" />
+      <stop stop-color="#0f1a1d" offset="40%" />
+      <stop stop-color="#1b2a33" offset="100%" />
+    </linearGradient>
+    <linearGradient id="halo" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop stop-color="#c9a227" offset="0%" />
+      <stop stop-color="#8db3a5" offset="100%" />
+    </linearGradient>
+    <radialGradient id="aura" cx="50%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.4)" />
+      <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+    </radialGradient>
+  </defs>
+  <rect width="512" height="704" rx="28" fill="url(#obsidian)" />
+  <rect x="18" y="18" width="476" height="668" rx="22" stroke="rgba(201,162,39,0.6)" stroke-width="2" fill="none" />
+  <circle cx="256" cy="144" r="88" fill="rgba(5,5,9,0.7)" stroke="url(#halo)" stroke-width="4" />
+  <circle cx="256" cy="144" r="82" fill="url(#aura)" />
+  <path d="M256 88C286 88 312 112 312 144C312 176 286 200 256 200C226 200 200 176 200 144C200 112 226 88 256 88Z" fill="#0b141d" stroke="#8db3a5" stroke-width="4" />
+  <path d="M132 368C140 320 172 288 212 288H300C340 288 372 320 380 368L404 504C408 528 392 552 368 552H144C120 552 104 528 108 504L132 368Z" fill="#0b141d" stroke="#c9a227" stroke-width="4" />
+  <path d="M224 424H288L304 520H208L224 424Z" fill="#111a24" stroke="#8db3a5" stroke-width="3" />
+  <text x="256" y="640" text-anchor="middle" font-family="'Cinzel', serif" font-size="34" fill="#c9a227" letter-spacing="4">
+    PORTRAIT SLOT
+  </text>
+</svg>

@@ -1,0 +1,29 @@
+[
+  {
+    "timestamp": 1736779200000,
+    "foodStock": 240,
+    "foodProductionPerDay": 48,
+    "foodConsumptionPerDay": 42,
+    "metadata": {
+      "note": "stable production window"
+    }
+  },
+  {
+    "timestamp": 1736782800000,
+    "foodStock": 210,
+    "foodProductionPerDay": 32,
+    "foodConsumptionPerDay": 40,
+    "metadata": {
+      "note": "beginning of deficit"
+    }
+  },
+  {
+    "timestamp": 1736786400000,
+    "foodStock": 170,
+    "foodProductionPerDay": 22,
+    "foodConsumptionPerDay": 39,
+    "metadata": {
+      "note": "critical stock warning"
+    }
+  }
+]

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background - Gilded Observatory theme -->
+  <rect width="512" height="512" rx="64" fill="#0b0b12"/>
+  
+  <!-- Outer ring -->
+  <circle cx="256" cy="256" r="234" fill="none" stroke="#f2c94c" stroke-width="4" opacity="0.8"/>
+  
+  <!-- Inner decorative ring -->
+  <circle cx="256" cy="256" r="202" fill="none" stroke="#f2c94c" stroke-width="2" opacity="0.4"/>
+  
+  <!-- RPG Balancer icon - Balance scales (scaled up) -->
+  <g transform="translate(256, 256)">
+    <!-- Scale base -->
+    <rect x="-53" y="80" width="106" height="11" fill="#f2c94c"/>
+    
+    <!-- Scale pole -->
+    <rect x="-5" y="-107" width="11" height="187" fill="#f2c94c"/>
+    
+    <!-- Scale beam -->
+    <rect x="-160" y="-11" width="320" height="8" fill="#f2c94c"/>
+    
+    <!-- Left scale pan -->
+    <path d="M -133 -11 L -120 -53 L -93 -53 L -80 -11 Z" fill="#f2c94c" opacity="0.9"/>
+    
+    <!-- Right scale pan -->
+    <path d="M 80 -11 L 93 -53 L 120 -53 L 133 -11 Z" fill="#f2c94c" opacity="0.9"/>
+    
+    <!-- Balance indicators -->
+    <circle cx="-107" cy="-32" r="5" fill="#0b0b12"/>
+    <circle cx="107" cy="-32" r="5" fill="#0b0b12"/>
+    
+    <!-- Village/Sandbox elements (scaled) -->
+    <!-- Small house icon -->
+    <g transform="translate(-107, -32)">
+      <path d="M -21 0 L 0 -21 L 21 0 L 21 21 L -21 21 Z" fill="#f2c94c" opacity="0.7"/>
+      <rect x="-5" y="5" width="11" height="16" fill="#0b0b12"/>
+    </g>
+    
+    <!-- Stats bars -->
+    <g transform="translate(85, -32)">
+      <rect x="0" y="-16" width="8" height="32" fill="#f2c94c" opacity="0.7"/>
+      <rect x="13" y="-11" width="8" height="27" fill="#f2c94c" opacity="0.7"/>
+      <rect x="26" y="-21" width="8" height="42" fill="#f2c94c" opacity="0.7"/>
+    </g>
+  </g>
+  
+  <!-- Corner decorations (scaled) -->
+  <g opacity="0.3">
+    <!-- Top left -->
+    <path d="M 53 53 L 85 53 L 53 85 Z" fill="#f2c94c"/>
+    <!-- Top right -->
+    <path d="M 459 53 L 427 53 L 459 85 Z" fill="#f2c94c"/>
+    <!-- Bottom left -->
+    <path d="M 53 459 L 85 459 L 53 427 Z" fill="#f2c94c"/>
+    <!-- Bottom right -->
+    <path d="M 459 459 L 427 459 L 459 427 Z" fill="#f2c94c"/>
+  </g>
+  
+  <!-- Additional decorative elements -->
+  <g opacity="0.2">
+    <!-- Stars -->
+    <circle cx="128" cy="128" r="3" fill="#f2c94c"/>
+    <circle cx="384" cy="128" r="3" fill="#f2c94c"/>
+    <circle cx="128" cy="384" r="3" fill="#f2c94c"/>
+    <circle cx="384" cy="384" r="3" fill="#f2c94c"/>
+  </g>
+</svg>

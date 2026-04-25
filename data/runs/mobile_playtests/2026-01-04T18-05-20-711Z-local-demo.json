@@ -1,0 +1,39 @@
+{
+  "version": "1.0.0",
+  "sessionId": "local-demo",
+  "tester": "QA Bot",
+  "device": "iPhone 14 Pro iOS 18.2",
+  "cycleDurationMs": [
+    85000,
+    87000,
+    90000
+  ],
+  "tapsPerAssignment": [
+    3,
+    2,
+    3
+  ],
+  "assignmentLatencyMs": [
+    320,
+    410,
+    390
+  ],
+  "pickerCloseRate": 99,
+  "resourceDelta": {
+    "gold": 12,
+    "food": 3
+  },
+  "qualitativeNotes": "ok",
+  "telemetrySource": "data/runs/mobile_playtests/sample.json",
+  "createdAt": "2026-01-04T18:05:20.711Z",
+  "derivedMetrics": {
+    "avgCycleDurationMs": 87333.33333333333,
+    "avgTapsPerAssignment": 2.6666666666666665,
+    "avgAssignmentLatencyMs": 373.3333333333333,
+    "meetsCycleTarget": true,
+    "meetsTapTarget": true,
+    "meetsLatencyTarget": true,
+    "meetsPickerTarget": true,
+    "meetsResourceTarget": true
+  }
+}

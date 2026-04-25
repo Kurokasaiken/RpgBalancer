@@ -1,0 +1,27 @@
+{
+  "version": "1.0.0",
+  "sessionId": "demo-session",
+  "tester": "Demo Tester",
+  "device": "iPhone 15 Pro",
+  "cycleDurationMs": [45000, 42000, 48000],
+  "tapsPerAssignment": [2, 3, 2],
+  "assignmentLatencyMs": [300, 250, 400],
+  "pickerCloseRate": 95,
+  "resourceDelta": {
+    "gold": 12,
+    "food": -1
+  },
+  "qualitativeNotes": "Picker opens smoothly, close rate good, latency acceptable on WiFi.",
+  "telemetrySource": "data/runs/mobile_playtests/sample-telemetry.json",
+  "createdAt": "2026-01-04T19:00:00.000Z",
+  "derivedMetrics": {
+    "avgCycleDurationMs": 45000,
+    "avgTapsPerAssignment": 2.333,
+    "avgAssignmentLatencyMs": 316.666,
+    "meetsCycleTarget": true,
+    "meetsTapTarget": true,
+    "meetsLatencyTarget": true,
+    "meetsPickerTarget": false,
+    "meetsResourceTarget": true
+  }
+}

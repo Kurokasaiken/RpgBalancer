@@ -1,0 +1,146 @@
+{
+  "version": "1.0.0",
+  "generated": "2026-01-24T12:17:00.000Z",
+  "scenarios": [
+    {
+      "id": "scenario-001",
+      "description": "Valid drop - Lumberjack to Forest",
+      "resident": {
+        "id": "res-001",
+        "name": "Jack",
+        "stats": {
+          "strength": 8,
+          "dexterity": 5,
+          "intelligence": 3
+        },
+        "tags": ["physical", "outdoor"],
+        "fatigue": 20
+      },
+      "slot": {
+        "id": "slot-forest-1",
+        "location": "Forest",
+        "requiredTags": ["physical", "outdoor"],
+        "minStats": {
+          "strength": 5
+        },
+        "maxFatigue": 50,
+        "crewLimit": 3,
+        "currentCrew": 1
+      },
+      "expectedVerdict": "valid",
+      "expectedReasons": []
+    },
+    {
+      "id": "scenario-002",
+      "description": "Invalid drop - Missing required tag",
+      "resident": {
+        "id": "res-002",
+        "name": "Alice",
+        "stats": {
+          "strength": 4,
+          "dexterity": 7,
+          "intelligence": 8
+        },
+        "tags": ["mental", "indoor"],
+        "fatigue": 15
+      },
+      "slot": {
+        "id": "slot-forest-2",
+        "location": "Forest",
+        "requiredTags": ["physical", "outdoor"],
+        "minStats": {
+          "strength": 5
+        },
+        "maxFatigue": 50,
+        "crewLimit": 3,
+        "currentCrew": 0
+      },
+      "expectedVerdict": "invalid",
+      "expectedReasons": ["missing_required_tag", "insufficient_strength"]
+    },
+    {
+      "id": "scenario-003",
+      "description": "Invalid drop - Fatigue too high",
+      "resident": {
+        "id": "res-003",
+        "name": "Bob",
+        "stats": {
+          "strength": 9,
+          "dexterity": 6,
+          "intelligence": 4
+        },
+        "tags": ["physical", "outdoor"],
+        "fatigue": 75
+      },
+      "slot": {
+        "id": "slot-mine-1",
+        "location": "Mine",
+        "requiredTags": ["physical"],
+        "minStats": {
+          "strength": 7
+        },
+        "maxFatigue": 60,
+        "crewLimit": 2,
+        "currentCrew": 0
+      },
+      "expectedVerdict": "invalid",
+      "expectedReasons": ["fatigue_too_high"]
+    },
+    {
+      "id": "scenario-004",
+      "description": "Invalid drop - Crew limit reached",
+      "resident": {
+        "id": "res-004",
+        "name": "Charlie",
+        "stats": {
+          "strength": 7,
+          "dexterity": 7,
+          "intelligence": 6
+        },
+        "tags": ["physical", "outdoor"],
+        "fatigue": 30
+      },
+      "slot": {
+        "id": "slot-farm-1",
+        "location": "Farm",
+        "requiredTags": ["physical", "outdoor"],
+        "minStats": {
+          "strength": 5
+        },
+        "maxFatigue": 70,
+        "crewLimit": 2,
+        "currentCrew": 2
+      },
+      "expectedVerdict": "invalid",
+      "expectedReasons": ["crew_limit_reached"]
+    },
+    {
+      "id": "scenario-005",
+      "description": "Valid drop - Scholar to Library",
+      "resident": {
+        "id": "res-005",
+        "name": "Diana",
+        "stats": {
+          "strength": 3,
+          "dexterity": 5,
+          "intelligence": 9
+        },
+        "tags": ["mental", "indoor"],
+        "fatigue": 10
+      },
+      "slot": {
+        "id": "slot-library-1",
+        "location": "Library",
+        "requiredTags": ["mental", "indoor"],
+        "minStats": {
+          "intelligence": 7
+        },
+        "maxFatigue": 40,
+        "crewLimit": 4,
+        "currentCrew": 1
+      },
+      "expectedVerdict": "valid",
+      "expectedReasons": []
+    }
+  ]
+}

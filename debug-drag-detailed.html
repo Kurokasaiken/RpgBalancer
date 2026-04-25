@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detailed Drag Debug Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #444;
+            border-radius: 8px;
+        }
+        .test-card {
+            width: 150px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: 2px solid #666;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px;
+            cursor: grab;
+            user-select: none;
+            color: white;
+            font-weight: bold;
+            position: relative;
+        }
+        .test-card:active {
+            cursor: grabbing;
+        }
+        .test-card::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 10px;
+            height: 10px;
+            background: red;
+            border-radius: 50%;
+        }
+        .test-card::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 10px;
+            height: 10px;
+            background: blue;
+            border-radius: 50%;
+        }
+        .drop-zone {
+            width: 200px;
+            height: 100px;
+            background: #444;
+            border: 2px dashed #888;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px;
+            transition: all 0.3s;
+        }
+        .drop-zone.drag-over {
+            background: #555;
+            border-color: #0f0;
+            transform: scale(1.05);
+        }
+        .console-output {
+            background: #000;
+            border: 1px solid #666;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 20px 0;
+            height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 11px;
+        }
+        .log-entry {
+            margin: 2px 0;
+            padding: 2px 4px;
+        }
+        .log-pointer { color: #0f0; }
+        .log-drag { color: #ff0; }
+        .log-drop { color: #0ff; }
+        .log-error { color: #f00; }
+        .log-info { color: #888; }
+        .coordinates {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .test-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #5a6fd8;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Detailed Drag & Drop Debug Test</h1>
+    
+    <div class="coordinates" id="coordinates">
+        Mouse: X: 0, Y: 0
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 1: Basic Drag Events</h2>
+        <div class="test-card" draggable="true" id="testCard1">
+            Test Card 1
+        </div>
+        <div class="drop-zone" id="dropZone1">
+            Drop Zone 1
+        </div>
+        <button class="test-button" onclick="clearConsole()">Clear Console</button>
+        <button class="test-button" onclick="testOffsetCalculation()">Test Offset</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 2: Canvas Drag Image</h2>
+        <div class="test-card" draggable="true" id="testCard2">
+            Canvas Image
+        </div>
+        <div class="drop-zone" id="dropZone2">
+            Drop Zone 2
+        </div>
+    </div>
+    
+    <div class="console-output" id="console"></div>
+    
+    <script>
+        const consoleEl = document.getElementById('console');
+        const coordsEl = document.getElementById('coordinates');
+        
+        function log(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            consoleEl.appendChild(entry);
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+        
+        function clearConsole() {
+            consoleEl.innerHTML = '';
+            log('Console cleared', 'info');
+        }
+        
+        // Track mouse coordinates
+        document.addEventListener('mousemove', (e) => {
+            coordsEl.textContent = `Mouse: X: ${e.clientX}, Y: ${e.clientY}`;
+        });
+        
+        function setupDragTest(cardId, dropZoneId, useCanvas = false) {
+            const card = document.getElementById(cardId);
+            const dropZone = document.getElementById(dropZoneId);
+            
+            // Card events
+            card.addEventListener('pointerdown', (e) => {
+                const rect = card.getBoundingClientRect();
+                log(`🔍 POINTER DOWN on ${cardId}: clientX=${e.clientX}, clientY=${e.clientY}, rect=${JSON.stringify({left: rect.left, top: rect.top, width: rect.width, height: rect.height})}`, 'pointer');
+                log(`🔍 Click offset: x=${e.clientX - rect.left}, y=${e.clientY - rect.top}`, 'pointer');
+            });
+            
+            card.addEventListener('dragstart', (e) => {
+                const rect = card.getBoundingClientRect();
+                log(`🔍 DRAG START on ${cardId}: clientX=${e.clientX}, clientY=${e.clientY}`, 'drag');
+                
+                if (useCanvas) {
+                    // Create a custom drag image with canvas
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 72;
+                    canvas.height = 72;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Draw a circular portrait
+                    ctx.fillStyle = '#667eea';
+                    ctx.beginPath();
+                    ctx.arc(36, 36, 35, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Draw a face
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath();
+                    ctx.arc(25, 30, 5, 0, Math.PI * 2);
+                    ctx.arc(47, 30, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Draw smile
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(36, 36, 15, 0, Math.PI);
+                    ctx.stroke();
+                    
+                    // Try different offset strategies
+                    const clickOffsetX = e.clientX - rect.left;
+                    const clickOffsetY = e.clientY - rect.top;
+                    
+                    // Strategy 1: Center of canvas
+                    const offsetX1 = 36;
+                    const offsetY1 = 36;
+                    
+                    // Strategy 2: Click position within canvas
+                    const offsetX2 = Math.min(clickOffsetX, 72);
+                    const offsetY2 = Math.min(clickOffsetY, 72);
+                    
+                    log(`🔍 Canvas size: 72x72`, 'drag');
+                    log(`🔍 Strategy 1 - Center offset: ${offsetX1}, ${offsetY1}`, 'drag');
+                    log(`🔍 Strategy 2 - Click offset: ${offsetX2}, ${offsetY2}`, 'drag');
+                    
+                    // Use strategy 1 (center)
+                    e.dataTransfer.setDragImage(canvas, offsetX1, offsetY1);
+                    log(`🔍 SET DRAG IMAGE with center offset`, 'drag');
+                }
+            });
+            
+            card.addEventListener('dragend', (e) => {
+                log(`🔍 DRAG END on ${cardId}: clientX=${e.clientX}, clientY=${e.clientY}`, 'drag');
+            });
+            
+            // Drop zone events
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('drag-over');
+                log(`🔍 DRAG OVER on ${dropZoneId}: clientX=${e.clientX}, clientY=${e.clientY}`, 'drop');
+            });
+            
+            dropZone.addEventListener('dragleave', (e) => {
+                dropZone.classList.remove('drag-over');
+                log(`🔍 DRAG LEAVE on ${dropZoneId}`, 'drop');
+            });
+            
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('drag-over');
+                log(`🔍 DROP on ${dropZoneId}: clientX=${e.clientX}, clientY=${e.clientY}`, 'drop');
+            });
+        }
+        
+        function testOffsetCalculation() {
+            const card = document.getElementById('testCard1');
+            const rect = card.getBoundingClientRect();
+            
+            log('🧪 OFFSET CALCULATION TEST', 'info');
+            log(`Card rect: ${JSON.stringify(rect)}`, 'info');
+            log(`Card center: x=${rect.left + rect.width/2}, y=${rect.top + rect.height/2}`, 'info');
+            log(`Canvas center offset: 36, 36`, 'info');
+            log(`Expected drag image position: x=${rect.left + rect.width/2 - 36}, y=${rect.top + rect.height/2 - 36}`, 'info');
+        }
+        
+        // Initialize tests
+        setupDragTest('testCard1', 'dropZone1', false);
+        setupDragTest('testCard2', 'dropZone2', true);
+        
+        log('🚀 Detailed drag debug test initialized!', 'info');
+        log('📝 Try dragging both cards and observe the offset differences', 'info');
+        log('🎯 Pay attention to where the drag image appears relative to your mouse', 'info');
+    </script>
+</body>
+</html>

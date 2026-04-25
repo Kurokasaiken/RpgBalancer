@@ -1,0 +1,228 @@
+/**
+ * Gilded Observatory Design Tokens
+ * 
+ * Material palette for PhysicsLab + StyleLab integration
+ * Deep black OLED, ferro brunito, oro araldico, text hierarchy
+ */
+
+:root {
+  /* =========================================
+     DEPTH & SURFACE SYSTEM
+     ========================================= */
+  
+  /* Deep Black OLED Backgrounds */
+  --void: #000000;           /* pure black - deepest layer */
+  --abyss: #020304;         /* near-black - primary background */
+  --deep: #030508;          /* dark blue-tint - secondary backgrounds */
+  --base: #05070a;          /* base surface - panels, cards */
+  --surface: #080b10;       /* elevated surfaces - hover states */
+  
+  /* Raised Elements */
+  --raised: #0d0f12;        /* raised panels, dialogs */
+  --highlight: #14171c;     /* highlights, borders */
+  
+  /* =========================================
+     IRON MATERIALS (Ferro Brunito)
+     ========================================= */
+  
+  --iron-dk: #0c0e12;       /* ferro scuro - deepest shadows */
+  --iron-md: #181c24;       /* ferro medio - main panels */
+  --iron-rim: #242c38;      /* ferro bordo - edges, borders */
+  --iron-lg: #303644;       /* ferro chiaro - highlights */
+  
+  /* Iron Gradients */
+  --iron-gradient: linear-gradient(162deg, var(--iron-rim) 0%, var(--iron-md) 50%, var(--iron-dk) 100%);
+  --iron-inset: inset 0 2px 0 rgba(255,255,255,.06), inset 0 -2px 0 rgba(0,0,0,.9);
+  
+  /* =========================================
+     GOLD MATERIALS (Oro Araldico)
+     ========================================= */
+  
+  /* Gold Hierarchy */
+  --go1: #4a3800;           /* oro scuro - accents */
+  --go2: #634a00;           /* oro medio-scuro */
+  --go3: #786000;           /* oro scuro - borders */
+  --go4: #a08020;           /* oro medio - primary */
+  --go5: #c8a030;           /* oro chiaro - highlights */
+  --go6: #e0bc50;           /* oro brillante - text */
+  --go7: #f0d870;           /* oro molto brillante */
+  --go8: #faeaaa;           /* oro massimo - brightest */
+  
+  /* Gold Gradients */
+  --gold-gradient: linear-gradient(90deg, var(--go4), var(--go5));
+  --gold-radial: radial-gradient(circle, var(--go8) 0%, var(--go6) 45%, var(--go4) 100%);
+  
+  /* =========================================
+     TEXT HIERARCHY
+     ========================================= */
+  
+  --t0: #020304;           /* deep black - OLED backgrounds */
+  --t1: #c8b88a;           /* primary text - readable */
+  --t2: #806858;           /* secondary text - muted */
+  --t3: #3c2c20;           /* tertiary text - very muted */
+  --t4: #faf7f0;           /* parchment - special text */
+  
+  /* Text Shadows */
+  --text-shadow-subtle: 0 0 8px var(--acc-glow);
+  --text-shadow-strong: 0 0 12px var(--acc-glow), 0 0 24px rgba(200,160,48,.15);
+  
+  /* =========================================
+     ACCENT & GLOW SYSTEM
+     ========================================= */
+  
+  /* Core Glow */
+  --acc-glow: rgba(200,160,48,.38);        /* gold glow */
+  --acc-glow-strong: rgba(200,160,48,.55); /* strong glow */
+  --acc-glow-subtle: rgba(200,160,48,.22); /* subtle glow */
+  
+  /* Glow Variants */
+  --glow-amber: rgba(251,191,36,.4);        /* amber glow */
+  --glow-blue: rgba(56,189,248,.35);        /* blue glow */
+  --glow-emerald: rgba(16,185,129,.3);      /* emerald glow */
+  --glow-rose: rgba(244,63,94,.32);         /* rose glow */
+  
+  /* =========================================
+     SURFACE MATERIALS
+     ========================================= */
+  
+  /* Glass Materials */
+  --glass-clear: rgba(255,255,255,.018);    /* clear glass */
+  --glass-matte: rgba(255,255,255,.08);      /* matte glass */
+  --glass-polished: rgba(255,255,255,.12);  /* polished glass */
+  
+  /* Metal Materials */
+  --metal-brushed: rgba(139,69,19,.15);     /* brushed metal */
+  --metal-polished: rgba(255,215,0,.25);    /* polished metal */
+  --metal-weathered: rgba(92,74,58,.2);     /* weathered metal */
+  
+  /* =========================================
+     SHADOW SYSTEM
+     ========================================= */
+  
+  /* Depth Shadows */
+  --shadow-deep: 0 20px 60px rgba(0,0,0,.98), 0 6px 18px rgba(0,0,0,1);
+  --shadow-medium: 0 15px 35px rgba(0,0,0,.7), 0 3px 8px rgba(0,0,0,.8);
+  --shadow-shallow: 0 8px 28px rgba(0,0,0,.95), 0 3px 8px rgba(0,0,0,1);
+  
+  /* Glow Shadows */
+  --shadow-gold: 0 0 44px var(--acc-glow), 0 0 20px rgba(200,160,48,.15);
+  --shadow-gold-strong: 0 0 60px var(--acc-glow-strong), 0 0 30px rgba(200,160,48,.22);
+  
+  /* Inset Shadows */
+  --shadow-inset-deep: inset 5px 5px 20px rgba(0,0,0,1), inset 3px 3px 7px rgba(0,0,0,.98);
+  --shadow-inset-medium: inset 2px 2px 8px rgba(0,0,0,.85), inset 1px 1px 3px rgba(255,255,255,.016);
+  
+  /* =========================================
+     BACKDROP FILTERS
+     ========================================= */
+  
+  --blur-light: blur(12px);
+  --blur-medium: blur(18px);
+  --blur-heavy: blur(28px);
+  
+  /* =========================================
+     TYPOGRAPHY
+     ========================================= */
+  
+  --font-display: 'Cinzel', serif;
+  --font-body: 'Crimson Text', serif;
+  --font-ui: 'Lato', sans-serif;
+  --font-mono: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+  
+  /* Font Weights */
+  --font-thin: 100;
+  --font-light: 300;
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  --font-black: 900;
+  
+  /* =========================================
+     ANIMATION & TIMING
+     ========================================= */
+  
+  --transition-fast: 150ms cubic-bezier(.34,1.56,.64,1);
+  --transition-normal: 250ms cubic-bezier(.34,1.56,.64,1);
+  --transition-slow: 350ms cubic-bezier(.34,1.56,.64,1);
+  
+  --spring-gentle: cubic-bezier(.34,1.56,.64,1);
+  --spring-bouncy: cubic-bezier(.68,-.55,.265,1.55);
+  --spring-smooth: cubic-bezier(.4,0,.2,1);
+  
+  /* =========================================
+     BORDERS & RADIUS
+     ========================================= */
+  
+  --border-thin: 1px;
+  --border-medium: 2px;
+  --border-thick: 3px;
+  
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-full: 9999px;
+  
+  /* =========================================
+     SPACING & SCALE
+     ========================================= */
+  
+  --scale-xs: 0.75;
+  --scale-sm: 0.875;
+  --scale-base: 1;
+  --scale-lg: 1.125;
+  --scale-xl: 1.25;
+  --scale-2xl: 1.5;
+  --scale-3xl: 1.875;
+  
+  /* =========================================
+     PHYSICS PRESETS
+     ========================================= */
+  
+  /* Spring Physics */
+  --spring-stiffness-soft: 180;
+  --spring-stiffness-medium: 300;
+  --spring-stiffness-hard: 420;
+  
+  --spring-damping-low: 12;
+  --spring-damping-medium: 22;
+  --spring-damping-high: 35;
+  
+  /* Mass Values */
+  --mass-light: 0.8;
+  --mass-medium: 1.2;
+  --mass-heavy: 2.0;
+}
+
+/* =========================================
+   DARK MODE ENHANCEMENTS
+   ========================================= */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Enhance glows in dark mode */
+    --acc-glow: rgba(200,160,48,.45);
+    --acc-glow-strong: rgba(200,160,48,.65);
+    
+    /* Deeper shadows */
+    --shadow-deep: 0 25px 70px rgba(0,0,0,1), 0 8px 24px rgba(0,0,0,1);
+  }
+}
+
+/* =========================================
+   REDUCED MOTION SUPPORT
+   ========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-fast: 0ms;
+    --transition-normal: 0ms;
+    --transition-slow: 0ms;
+    
+    --spring-gentle: linear;
+    --spring-bouncy: linear;
+    --spring-smooth: linear;
+  }
+}
