@@ -1,0 +1,14 @@
+[
+  {
+    "timestamp": "2026-05-20T14:24:49.360Z",
+    "action": "component-modified",
+    "component": "PGCard",
+    "author": "fausto-boni"
+  },
+  {
+    "timestamp": "2026-05-20T14:24:49.391Z",
+    "action": "version-locked",
+    "component": "PGCard",
+    "author": "semantic-release"
+  }
+]

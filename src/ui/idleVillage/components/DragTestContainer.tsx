@@ -981,7 +981,6 @@ function DragTestContainer({
             </span>
           </div>
           <div className="flex items-center gap-1">
-            {headerControls}
             <label
               className="flex items-center gap-1 rounded-full border border-white/15 px-1.5 py-0.5 text-[7px] uppercase tracking-[0.18em] text-slate-200"
             >
@@ -1001,6 +1000,7 @@ function DragTestContainer({
                 <option value="dead">Caduti</option>
               </select>
             </label>
+            {headerControls}
             <button
               type="button"
               onClick={() => {

@@ -104,6 +104,9 @@ const PgCard = memo<PgCardProps>(({
     portraitUrl,
   });
   const { setDragCursorOffset, setDragHomeCenter } = useDragContext();
+  
+  // Ref for direct DOM manipulation of transform origin
+  const cardRef = useRef<HTMLDivElement>(null);
 
   // Skin binding integration
   const skinBinding = useSkinBinding({
@@ -155,11 +158,61 @@ const PgCard = memo<PgCardProps>(({
       height: rect.height,
     });
 
-    // Store home center for snap-back animation
+    // Store cursor offset globally for CustomDragOverlay modifier
+    if (typeof window !== 'undefined') {
+      (window as any).__dragCursorOffset = {
+        x: offsetX,
+        y: offsetY,
+        width: rect.width,
+        height: rect.height,
+      };
+    }
+
+    // Store home center for snap-back animation at REAL portrait position
+    // Find and measure the actual portrait DOM node
+    let portraitCenterX = 0, portraitCenterY = 0;
+    
+    // Find the actual portrait DOM node within the card
+    const portraitNode = event.currentTarget.querySelector('[aria-hidden="true"]') as HTMLElement;
+    
+    if (portraitNode) {
+      // Measure the REAL portrait bounding rect
+      const portraitRect = portraitNode.getBoundingClientRect();
+      
+      // Calculate portrait center relative to the card
+      portraitCenterX = portraitRect.left - rect.left + portraitRect.width / 2;
+      portraitCenterY = portraitRect.top - rect.top + portraitRect.height / 2;
+      
+      console.log('REAL portrait measurement:', {
+        portraitRect: {
+          left: portraitRect.left,
+          top: portraitRect.top,
+          width: portraitRect.width,
+          height: portraitRect.height
+        },
+        portraitCenterRelativeToCard: { x: portraitCenterX, y: portraitCenterY }
+      });
+    } else {
+      // Fallback to estimated values if portrait node not found
+      console.warn('Portrait node not found, using fallback estimation');
+      const isHorizontalCard = horizontal;
+      const portraitWidth = isHorizontalCard ? 56 : 64;
+      const portraitHeight = isHorizontalCard ? 32 : 40;
+      
+      portraitCenterX = isHorizontalCard ? portraitWidth / 2 : rect.width - 16 - portraitWidth / 2;
+      portraitCenterY = portraitHeight / 2;
+    }
+    
     setDragHomeCenter({
-      x: rect.left + rect.width / 2,
-      y: rect.top + rect.height / 2,
+      x: rect.left + portraitCenterX,
+      y: rect.top + portraitCenterY,
     });
+    
+    // Set transform origin dynamically for accurate spring-back
+    const transformOriginValue = `${portraitCenterX}px ${portraitCenterY}px`;
+    if (cardRef.current) {
+      cardRef.current.style.transformOrigin = transformOriginValue;
+    }
 
     if (!dragImageRef.current || !dragPreviewReady) {
       return;
@@ -349,7 +402,10 @@ const PgCard = memo<PgCardProps>(({
 
   return (
     <div
-      ref={setNodeRef}
+      ref={(node) => {
+        setNodeRef(node);
+        cardRef.current = node;
+      }}
       {...listeners}
       {...attributes}
       data-testid="pg-card"
@@ -377,8 +433,12 @@ const PgCard = memo<PgCardProps>(({
         .join(' ')}
       // Add skin data attributes
       {...skinAttributes}
-      // Add skin styles
-      style={styles}
+      // Add skin styles and dynamic transform origin for portrait-anchored spring-back
+      style={{
+        ...styles,
+        // Transform origin will be set dynamically in handlePointerDown
+        transformOrigin: horizontal ? '28px 16px' : '32px 20px',
+      }}
       // We combine dnd-kit listeners with our own logic
       onPointerDown={(e) => {
                 // Capture cursor offset for drag overlay alignment

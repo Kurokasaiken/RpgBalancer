@@ -194,7 +194,40 @@ Checklist when finishing a meaningful feature:
 
 ---
 
-## 7. Practical Do/Donts Summary
+## 7. Vertical Slice Development Rules
+
+### When to Use Vertical Slice Documentation
+
+- **Use vertical slice docs** when working on idle village vertical slice components (PgToken, Roster, SlotRack, ActivityCard, etc.)
+- **Use general docs** when working on core balancing, archetype system, or other project areas
+- **Reference DOCUMENTATION_GOVERNANCE.md** for single source of truth rules
+- **Reference context/RPG_PROJECT_CONTEXT.md** for semantic constraints (freezing, guard layers, state mutation)
+
+### Documentation Update Checklist for Vertical Slice Changes
+
+When modifying frozen vertical slice components:
+
+- [ ] Update trusted component documentation (if contract changes)
+- [ ] Update corresponding `.semantics.json` file (machine-readable state)
+- [ ] Update Playwright tests (add/remove/modify test cases)
+- [ ] Update code comments (link to documentation sections)
+- [ ] Update context/DECISION_LOG.md (log why you changed it)
+- [ ] Verify freezing semantics are respected (see RPG_PROJECT_CONTEXT.md §3.1)
+
+### Vertical Slice vs General Documentation
+
+- **Vertical slice docs** (`src/docs/docs/minimal_slice/`) - Specific to idle village vertical slice, detailed interaction specs
+- **General docs** (`src/docs/docs/`) - Project-wide philosophy, guidelines, architecture
+- **Context docs** (`context/`) - Project governance, semantic constraints, entity inventories
+
+When in doubt about which documentation to update:
+1. Check if the change affects vertical slice components → Use vertical slice docs
+2. Check if the change affects project-wide patterns → Use general docs
+3. Check if the change affects governance/semantics → Update context docs
+
+---
+
+## 8. Practical Do/Don'ts Summary
 
 - **Do**
   - Centralize stats, weights, and formulas.

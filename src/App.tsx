@@ -21,6 +21,20 @@ const PoiDetailVerificationPage = lazy(() => import('./ui/idleVillage/pages/PoiD
 const PoiStandardDetailIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiStandardDetailIntegrationPage'));
 const TimeDaynightIntegrationPage = lazy(() => import('./ui/idleVillage/pages/TimeDaynightIntegrationPage'));
 const DragPoiAssignmentPage = lazy(() => import('./ui/idleVillage/pages/DragPoiAssignmentPage'));
+// Minimal slice test pages (Phase 1-6)
+const MinimalPgCardPage = lazy(() => import('./pages/minimal-pgcard').then(m => ({ default: m.MinimalPgCardPage })));
+const MinimalSlottedMedalPage = lazy(() => import('./pages/minimal-slottedmedal').then(m => ({ default: m.MinimalSlottedMedalPage })));
+const MinimalRosterPage = lazy(() => import('./pages/minimal-roster').then(m => ({ default: m.default })));
+const MinimalClockPage = lazy(() => import('./pages/minimal-clock').then(m => ({ default: m.default })));
+const MinimalSlotRackPage = lazy(() => import('./pages/minimal-slotRack').then(m => ({ default: m.default })));
+const MinimalResourceHUDPage = lazy(() => import('./pages/minimal-resourcehud').then(m => ({ default: m.default })));
+const MinimalJobCardPage = lazy(() => import('./pages/minimal-jobcard').then(m => ({ default: m.default })));
+const MinimalQuestCardPage = lazy(() => import('./pages/minimal-questcard').then(m => ({ default: m.default })));
+const MinimalSkillCheckPage = lazy(() => import('./pages/minimal-skillcheck').then(m => ({ default: m.default })));
+const MinimalOutcomeModalPage = lazy(() => import('./pages/minimal-outcome').then(m => ({ default: m.default })));
+const MinimalMarketActionCardPage = lazy(() => import('./pages/minimal-market').then(m => ({ default: m.default })));
+const MinimalIntegrationDragJobPage = lazy(() => import('./pages/minimal-integration-drag-job').then(m => ({ default: m.default })));
+const MinimalIntegrationQuestFlowPage = lazy(() => import('./pages/minimal-integration-quest-flow').then(m => ({ default: m.default })));
 
 interface AppNavControls {
   getActiveTab: () => AppNavTabId;
@@ -109,6 +123,33 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/time-daynight-integration';
   const isDragPoiAssignmentPath =
     typeof window !== 'undefined' && window.location.pathname === '/drag-poi-assignment';
+  // Minimal slice test pages (Phase 1-6)
+  const isMinimalPgCardPath =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-pgcard';
+  const isMinimalSlottedMedalPath =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-slottedmedal';
+  const isMinimalRosterPath =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-roster';
+  const isMinimalClockPath =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-clock';
+  const isMinimalSlotRackPath =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-slotRack';
+  const isMinimalResourceHUDPath =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-resourcehud';
+  const isMinimalJobCardPath =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-jobcard';
+  const isMinimalQuestCardPath =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-questcard';
+  const isMinimalSkillCheckPath =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-skillcheck';
+  const isMinimalOutcomeModalPath =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-outcome';
+  const isMinimalMarketActionCardPath =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-market';
+  const isMinimalIntegrationDragJobPath =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-integration-drag-job';
+  const isMinimalIntegrationQuestFlowPath =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-integration-quest-flow';
   const isRootPath =
     typeof window !== 'undefined' &&
     (window.location.pathname === '/' || window.location.pathname === '/index.html');
@@ -257,6 +298,137 @@ function App() {
       <ErrorBoundary componentName="Test Roster Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Test Harness…</div>}>
           <TestRosterPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  // Minimal slice test pages (Phase 1+)
+  if (isMinimalPgCardPath) {
+    return (
+      <ErrorBoundary componentName="Minimal PgCard Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading PgCard Test…</div>}>
+          <MinimalPgCardPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMinimalSlottedMedalPath) {
+    return (
+      <ErrorBoundary componentName="Minimal SlottedMedal Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading SlottedMedal Test…</div>}>
+          <MinimalSlottedMedalPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMinimalRosterPath) {
+    return (
+      <ErrorBoundary componentName="Minimal Roster Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Roster Test…</div>}>
+          <MinimalRosterPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMinimalClockPath) {
+    return (
+      <ErrorBoundary componentName="Minimal Clock Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Clock Test…</div>}>
+          <MinimalClockPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMinimalSlotRackPath) {
+    return (
+      <ErrorBoundary componentName="Minimal SlotRack Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading SlotRack Test…</div>}>
+          <MinimalSlotRackPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMinimalResourceHUDPath) {
+    return (
+      <ErrorBoundary componentName="Minimal ResourceHUD Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading ResourceHUD Test…</div>}>
+          <MinimalResourceHUDPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMinimalJobCardPath) {
+    return (
+      <ErrorBoundary componentName="Minimal JobCard Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading JobCard Test…</div>}>
+          <MinimalJobCardPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMinimalQuestCardPath) {
+    return (
+      <ErrorBoundary componentName="Minimal QuestCard Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading QuestCard Test…</div>}>
+          <MinimalQuestCardPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMinimalSkillCheckPath) {
+    return (
+      <ErrorBoundary componentName="Minimal SkillCheck Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading SkillCheck Test…</div>}>
+          <MinimalSkillCheckPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMinimalOutcomeModalPath) {
+    return (
+      <ErrorBoundary componentName="Minimal OutcomeModal Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading OutcomeModal Test…</div>}>
+          <MinimalOutcomeModalPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMinimalMarketActionCardPath) {
+    return (
+      <ErrorBoundary componentName="Minimal MarketActionCard Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading MarketActionCard Test…</div>}>
+          <MinimalMarketActionCardPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMinimalIntegrationDragJobPath) {
+    return (
+      <ErrorBoundary componentName="Minimal Integration Drag Job Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Integration Drag Job Test…</div>}>
+          <MinimalIntegrationDragJobPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMinimalIntegrationQuestFlowPath) {
+    return (
+      <ErrorBoundary componentName="Minimal Integration Quest Flow Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Integration Quest Flow Test…</div>}>
+          <MinimalIntegrationQuestFlowPage />
         </Suspense>
       </ErrorBoundary>
     );

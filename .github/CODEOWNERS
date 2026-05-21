@@ -1,0 +1,43 @@
+# Vertical Slice Components - Access Control
+# Each component requires approval from its designated tech lead
+
+# Core Components (Phase 1)
+/src/components/core/PGCard.tsx              @fausto-primary
+/src/pages/minimal-pgcard.tsx                @fausto-primary
+/tests/e2e/minimal_slice_01_pgcard.spec.ts  @fausto-primary
+
+/src/components/core/ActivityCard.tsx        @fausto-tech-lead-2
+/src/pages/minimal-activity-card.tsx         @fausto-tech-lead-2
+/tests/e2e/minimal_slice_02_*.spec.ts       @fausto-tech-lead-2
+
+/src/components/core/TheaterView.tsx         @fausto-tech-lead-3
+/src/pages/minimal-theater-view.tsx          @fausto-tech-lead-3
+/tests/e2e/minimal_slice_03_*.spec.ts       @fausto-tech-lead-3
+
+/src/components/core/ActiveHUD.tsx           @fausto-tech-lead-4
+/src/pages/minimal-active-hud.tsx            @fausto-tech-lead-4
+/tests/e2e/minimal_slice_04_*.spec.ts       @fausto-tech-lead-4
+
+/src/components/core/ActivitySlot.tsx        @fausto-tech-lead-5
+/src/pages/minimal-activity-slot.tsx         @fausto-tech-lead-5
+/tests/e2e/minimal_slice_05_*.spec.ts       @fausto-tech-lead-5
+
+# CI/CD & Configuration
+/.github/workflows/                           @fausto-devops
+/.github/*.yml                                @fausto-devops
+/.github/*.yaml                               @fausto-devops
+
+# Versioning & Governance
+/context/VERTICAL_SLICE_*.md                  @fausto-architect
+/PHASE_*.md                                   @fausto-architect
+/.commitlintrc.json                           @fausto-architect
+/.releaserc.json                              @fausto-architect
+/.componentrc.json                            @fausto-architect
+
+# Documentation
+/README.md                                    @fausto-docs
+/CHANGELOG.md                                 @fausto-docs
+/QUICK_REFERENCE.md                           @fausto-docs
+
+# Default catch-all
+*                                             @fausto-primary

@@ -82,7 +82,13 @@ interface CustomDragOverlayProps {
   };
 }
 
-// Custom modifier that centers the overlay under the cursor using the overlay size instead of the draggable size
+// Custom modifier that aligns overlay center to cursor pickup position.
+//
+// IMPORTANT: this modifier MUST NOT touch __dragHomeCenter — that value is the
+// authoritative spring-return anchor and is written by PgCard.handlePointerDown
+// using the REAL portrait DOM rect. Overwriting it here with a hardcoded
+// estimate (the previous bug) made the token spring back to the card's
+// top-left corner instead of the portrait center.
 const snapOverlayCenterToCursor: Modifier = ({ activatorEvent, draggingNodeRect, transform }) => {
   if (!activatorEvent || !draggingNodeRect) {
     return transform;
@@ -93,26 +99,30 @@ const snapOverlayCenterToCursor: Modifier = ({ activatorEvent, draggingNodeRect,
     return transform;
   }
 
-  // Calculate portrait origin instead of card left edge
-  // Portrait dimensions: horizontal=56x32, vertical=64x40
-  // Portrait is positioned at the start of the card
-  const isHorizontalCard = draggingNodeRect.width > draggingNodeRect.height * 1.5;
-  const portraitWidth = isHorizontalCard ? 56 : 64;
-  const portraitHeight = isHorizontalCard ? 32 : 40;
-  
-  // Portrait center position relative to card left edge
-  const portraitCenterX = portraitWidth / 2;
-  const portraitCenterY = portraitHeight / 2;
-  
-  // Calculate offset from portrait center to cursor
-  const pointerOffsetX = activatorCoordinates.x - (draggingNodeRect.left + portraitCenterX);
-  const pointerOffsetY = activatorCoordinates.y - (draggingNodeRect.top + portraitCenterY);
+  // Use true pointer pickup offset captured by PgCard handlePointerDown.
+  // This ensures overlay center aligns exactly where the user clicked.
+  const dragCursorOffset = (window as any).__dragCursorOffset;
   const overlaySize = getDragConfig().overlay.medalSizePx ?? draggingNodeRect.width;
 
+  if (dragCursorOffset) {
+    // dnd-kit places overlay top-left where the original node top-left was,
+    // then applies `transform` (delta from pickup point). We add the pickup
+    // offset (cursor position relative to node top-left) and subtract half
+    // the overlay size so that overlay CENTER sits exactly on the cursor.
+    return {
+      ...transform,
+      x: transform.x + dragCursorOffset.x - overlaySize / 2,
+      y: transform.y + dragCursorOffset.y - overlaySize / 2,
+    };
+  }
+
+  // Fallback when pickup offset is unavailable: assume click was at the center
+  // of the dragged node, then re-center overlay (which may have different size)
+  // on the cursor.
   return {
     ...transform,
-    x: transform.x + pointerOffsetX - overlaySize / 2,
-    y: transform.y + pointerOffsetY - overlaySize / 2,
+    x: transform.x + draggingNodeRect.width / 2 - overlaySize / 2,
+    y: transform.y + draggingNodeRect.height / 2 - overlaySize / 2,
   };
 };
 
@@ -147,7 +157,7 @@ export function CustomDragOverlay({
   useChildVersion = false,
   dragVisualState,
 }: CustomDragOverlayProps) {
-  const { setDragPreviewCenter, magnetTargetCenter } = useDragContext();
+  const { setDragPreviewCenter, magnetTargetCenter, setDragHomeCenter } = useDragContext();
   const overlayPreviewIdRef = useRef<string | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
 
@@ -223,6 +233,13 @@ export function CustomDragOverlay({
     return { rotate, scale };
   }, [cursorPosition, magnetTargetCenter]);
 
+  // Sync portrait origin from window global to drag context
+  useEffect(() => {
+    if (typeof window !== 'undefined' && (window as any).__dragHomeCenter) {
+      setDragHomeCenter((window as any).__dragHomeCenter);
+    }
+  }, [activeId, setDragHomeCenter]);
+
   // Track cursor position during drag using global pointer events
   useEffect(() => {
     if (!activeId) {
@@ -243,6 +260,23 @@ export function CustomDragOverlay({
       setCursorPosition(null);
     };
   }, [activeId, setDragPreviewCenter]);
+
+  // Force `grabbing` cursor on every element while a drag is active.
+  // Without this, the cursor reverts to the arrow when it crosses elements
+  // whose own CSS sets a different cursor (or none).
+  useEffect(() => {
+    if (!activeId) return;
+    const previousBodyCursor = document.body.style.cursor;
+    document.body.style.cursor = 'grabbing';
+    const styleEl = document.createElement('style');
+    styleEl.setAttribute('data-drag-grabbing-cursor', 'true');
+    styleEl.textContent = '*, *::before, *::after { cursor: grabbing !important; }';
+    document.head.appendChild(styleEl);
+    return () => {
+      document.body.style.cursor = previousBodyCursor;
+      styleEl.remove();
+    };
+  }, [activeId]);
 
   const instrumentationMetadata = useMemo(
     () => ({
@@ -318,7 +352,6 @@ export function CustomDragOverlay({
 
   return (
     <DragOverlay
-      className="pointer-events-none"
       modifiers={[snapOverlayCenterToCursor]}
     >
       {activeId ? (
@@ -333,7 +366,13 @@ export function CustomDragOverlay({
             transform: `rotate(${magneticTilt.rotate}deg) scale(${magneticTilt.scale})`,
             transition: 'transform 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
             transformOrigin: 'center center',
-            display: 'inline-block',
+            // `block` + lineHeight/fontSize 0 prevents inline line-height from
+            // adding ~3-5 px of phantom height to the wrapper bbox, which would
+            // push the overlay center below the cursor.
+            display: 'block',
+            lineHeight: 0,
+            fontSize: 0,
+            cursor: 'grabbing',
           }}
         >
           {usePgCardPreview && activeResident ? (
