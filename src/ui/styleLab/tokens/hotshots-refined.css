@@ -1,0 +1,294 @@
+/**
+ * HotShots Refined Color System
+ * 
+ * Enhanced warm sunset luxury aesthetic with cleaner hierarchy
+ * Maintains sensual sunset mood while improving contrast and polish
+ * 
+ * Color phases:
+ * - Early/setup: warm peach, rose gold, soft amber
+ * - Core gameplay: burgundy, coral, crimson, deep plum  
+ * - Intense phases: richer crimson / obsidian contrast
+ * - Aftercare: softer lavender-rose / warm dusk tones
+ */
+
+:root {
+  /* =========================================
+     REFINED SUNSET PALETTE SYSTEM
+     ========================================= */
+  
+  /* Early/Setup Screens - Warm Peach & Rose Gold */
+  --sunset-peach: #ffd4cc;        /* soft warm peach */
+  --sunset-rose-gold: #e8b4a8;    /* muted rose gold */
+  --sunset-soft-amber: #f5d6a8;   /* gentle amber */
+  --sunset-warm-ivory: #faf0e6;   /* warm ivory */
+  
+  /* Core Gameplay - Burgundy & Coral */
+  --sunset-burgundy: #722f37;     /* rich burgundy */
+  --sunset-coral: #ff6b6b;        /* vibrant coral */
+  --sunset-crimson: #dc143c;      /* deep crimson */
+  --sunset-deep-plum: #4a2c4a;    /* sophisticated plum */
+  --sunset-rose: #e84393;         /* sunset rose */
+  
+  /* Intense Phases - Rich Crimson & Obsidian */
+  --sunset-rich-crimson: #8b1a1a; /* intense crimson */
+  --sunset-obsidian: #1a1a1a;     /* deep obsidian */
+  --sunset-ember: #ff4500;        /* burning ember */
+  --sunset-night: #0f0f0f;        /* deepest night */
+  
+  /* Aftercare - Lavender-Rose & Warm Dusk */
+  --sunset-lavender-rose: #d4a5a5; /* soft lavender-rose */
+  --sunset-warm-dusk: #c8a88c;    /* calming dusk */
+  --sunset-soft-plum: #b895b8;    /* gentle plum */
+  --sunset-misty-rose: #e6c5c5;   /* misty rose */
+  
+  /* =========================================
+     BACKGROUND GRADIENT SYSTEM
+     ========================================= */
+  
+  /* Setup Phase Gradients */
+  --bg-setup-primary: linear-gradient(135deg, 
+    var(--sunset-peach) 0%, 
+    var(--sunset-rose-gold) 50%, 
+    var(--sunset-soft-amber) 100%);
+  
+  --bg-setup-secondary: linear-gradient(to bottom right,
+    rgba(255, 212, 204, 0.15),
+    rgba(232, 180, 168, 0.08));
+  
+  /* Core Gameplay Gradients */
+  --bg-gameplay-primary: linear-gradient(135deg,
+    var(--sunset-obsidian) 0%,
+    var(--sunset-deep-plum) 40%,
+    var(--sunset-burgundy) 100%);
+  
+  --bg-gameplay-secondary: linear-gradient(to bottom right,
+    rgba(26, 26, 26, 0.95),
+    rgba(74, 44, 74, 0.85));
+  
+  /* Intense Phase Gradients */
+  --bg-intense-primary: linear-gradient(135deg,
+    var(--sunset-night) 0%,
+    var(--sunset-obsidian) 30%,
+    var(--sunset-rich-crimson) 100%);
+  
+  --bg-intense-secondary: radial-gradient(circle at 30% 20%,
+    rgba(139, 26, 26, 0.3),
+    transparent 70%);
+  
+  /* Aftercare Gradients */
+  --bg-aftercare-primary: linear-gradient(135deg,
+    var(--sunset-warm-dusk) 0%,
+    var(--sunset-lavender-rose) 50%,
+    var(--sunset-misty-rose) 100%);
+  
+  --bg-aftercare-secondary: linear-gradient(to bottom right,
+    rgba(200, 168, 140, 0.12),
+    rgba(212, 165, 165, 0.08));
+  
+  /* =========================================
+     GLASS CARD TINT SYSTEM
+     ========================================= */
+  
+  /* Setup Phase Glass */
+  --glass-setup-tint: rgba(255, 212, 204, 0.08);
+  --glass-setup-border: rgba(232, 180, 168, 0.2);
+  --glass-setup-glow: rgba(245, 214, 168, 0.15);
+  
+  /* Core Gameplay Glass */
+  --glass-gameplay-tint: rgba(114, 47, 55, 0.12);
+  --glass-gameplay-border: rgba(255, 107, 107, 0.25);
+  --glass-gameplay-glow: rgba(232, 67, 147, 0.2);
+  
+  /* Intense Phase Glass */
+  --glass-intense-tint: rgba(139, 26, 26, 0.15);
+  --glass-intense-border: rgba(255, 69, 0, 0.3);
+  --glass-intense-glow: rgba(220, 20, 60, 0.25);
+  
+  /* Aftercare Glass */
+  --glass-aftercare-tint: rgba(212, 165, 165, 0.1);
+  --glass-aftercare-border: rgba(184, 149, 184, 0.2);
+  --glass-aftercare-glow: rgba(230, 197, 197, 0.15);
+  
+  /* =========================================
+     PRIMARY CTA COLORS
+     ========================================= */
+  
+  /* Setup Phase CTA */
+  --cta-setup-bg: linear-gradient(135deg, var(--sunset-rose-gold), var(--sunset-coral));
+  --cta-setup-hover: linear-gradient(135deg, var(--sunset-coral), var(--sunset-rose));
+  --cta-setup-text: var(--sunset-warm-ivory);
+  --cta-setup-glow: rgba(255, 107, 107, 0.4);
+  
+  /* Core Gameplay CTA */
+  --cta-gameplay-bg: linear-gradient(135deg, var(--sunset-crimson), var(--sunset-burgundy));
+  --cta-gameplay-hover: linear-gradient(135deg, var(--sunset-rich-crimson), var(--sunset-crimson));
+  --cta-gameplay-text: var(--sunset-warm-ivory);
+  --cta-gameplay-glow: rgba(220, 20, 60, 0.5);
+  
+  /* Intense Phase CTA */
+  --cta-intense-bg: linear-gradient(135deg, var(--sunset-ember), var(--sunset-rich-crimson));
+  --cta-intense-hover: linear-gradient(135deg, var(--sunset-ember), var(--sunset-crimson));
+  --cta-intense-text: #ffffff;
+  --cta-intense-glow: rgba(255, 69, 0, 0.6);
+  
+  /* Aftercare CTA */
+  --cta-aftercare-bg: linear-gradient(135deg, var(--sunset-lavender-rose), var(--sunset-soft-plum));
+  --cta-aftercare-hover: linear-gradient(135deg, var(--sunset-soft-plum), var(--sunset-lavender-rose));
+  --cta-aftercare-text: var(--sunset-obsidian);
+  --cta-aftercare-glow: rgba(212, 165, 165, 0.3);
+  
+  /* =========================================
+     SECONDARY & GHOST BUTTON COLORS
+     ========================================= */
+  
+  /* Secondary Buttons */
+  --secondary-bg: rgba(255, 255, 255, 0.08);
+  --secondary-border: rgba(255, 255, 255, 0.15);
+  --secondary-text: var(--sunset-warm-ivory);
+  --secondary-hover-bg: rgba(255, 255, 255, 0.12);
+  --secondary-hover-border: rgba(255, 255, 255, 0.25);
+  
+  /* Ghost Buttons */
+  --ghost-bg: transparent;
+  --ghost-border: transparent;
+  --ghost-text: rgba(255, 255, 255, 0.6);
+  --ghost-hover-bg: rgba(255, 255, 255, 0.05);
+  --ghost-hover-text: var(--sunset-warm-ivory);
+  
+  /* =========================================
+     ACTIVE STATE GLOW SYSTEM
+     ========================================= */
+  
+  --glow-setup: 0 0 20px var(--glass-setup-glow), 0 0 40px rgba(255, 212, 204, 0.2);
+  --glow-gameplay: 0 0 25px var(--glass-gameplay-glow), 0 0 50px rgba(255, 107, 107, 0.25);
+  --glow-intense: 0 0 30px var(--glass-intense-glow), 0 0 60px rgba(255, 69, 0, 0.3);
+  --glow-aftercare: 0 0 20px var(--glass-aftercare-glow), 0 0 40px rgba(212, 165, 165, 0.2);
+  
+  /* =========================================
+     TIMER EMPHASIS COLORS
+     ========================================= */
+  
+  --timer-normal: var(--sunset-warm-ivory);
+  --timer-warning: var(--sunset-soft-amber);
+  --timer-urgent: var(--sunset-coral);
+  --timer-critical: var(--sunset-ember);
+  
+  --timer-glow-normal: 0 0 10px rgba(255, 240, 230, 0.3);
+  --timer-glow-warning: 0 0 15px var(--sunset-soft-amber);
+  --timer-glow-urgent: 0 0 20px var(--sunset-coral);
+  --timer-glow-critical: 0 0 25px var(--sunset-ember);
+  
+  /* =========================================
+     PLAYER STATUS CARDS
+     ========================================= */
+  
+  /* Health Status */
+  --status-health-high: var(--sunset-rose);
+  --status-health-medium: var(--sunset-coral);
+  --status-health-low: var(--sunset-crimson);
+  --status-health-critical: var(--sunset-rich-crimson);
+  
+  /* Energy Status */
+  --status-energy-high: var(--sunset-soft-amber);
+  --status-energy-medium: var(--sunset-rose-gold);
+  --status-energy-low: var(--sunset-lavender-rose);
+  --status-energy-critical: var(--sunset-deep-plum);
+  
+  /* Mood Status */
+  --status-mood-euphoric: var(--sunset-coral);
+  --status-mood-good: var(--sunset-rose);
+  --status-mood-neutral: var(--sunset-warm-dusk);
+  --status-mood-poor: var(--sunset-deep-plum);
+  --status-mood-desperate: var(--sunset-rich-crimson);
+  
+  /* =========================================
+     BOTTOM NAVIGATION CONTRAST
+     ========================================= */
+  
+  --nav-bg: rgba(15, 15, 15, 0.95);
+  --nav-border: rgba(255, 255, 255, 0.08);
+  --nav-item-default: rgba(255, 255, 255, 0.4);
+  --nav-item-active: var(--sunset-coral);
+  --nav-item-hover: rgba(255, 255, 255, 0.6);
+  --nav-glow-active: 0 0 15px var(--sunset-coral);
+  
+  /* =========================================
+     TEXT HIERARCHY (ENHANCED CONTRAST)
+     ========================================= */
+  
+  --text-primary: var(--sunset-warm-ivory);
+  --text-secondary: var(--sunset-warm-dusk);
+  --text-muted: rgba(255, 255, 255, 0.5);
+  --text-accent: var(--sunset-coral);
+  --text-inverse: var(--sunset-obsidian);
+  
+  /* Text Shadows for Better Readability */
+  --text-shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --text-shadow-medium: 0 2px 4px rgba(0, 0, 0, 0.4);
+  --text-shadow-strong: 0 3px 6px rgba(0, 0, 0, 0.5);
+  
+  /* =========================================
+     SHADOW SYSTEM (REFINED)
+     ========================================= */
+  
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.2);
+  --shadow-card-hover: 0 12px 48px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-modal: 0 24px 64px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.4);
+  
+  /* =========================================
+     PHASE TRANSITION SUPPORT
+     ========================================= */
+  
+  /* These can be applied to body or main containers for different phases */
+  .phase-setup {
+    --current-bg-primary: var(--bg-setup-primary);
+    --current-bg-secondary: var(--bg-setup-secondary);
+    --current-glass-tint: var(--glass-setup-tint);
+    --current-glass-border: var(--glass-setup-border);
+    --current-glass-glow: var(--glass-setup-glow);
+    --current-cta-bg: var(--cta-setup-bg);
+    --current-cta-hover: var(--cta-setup-hover);
+    --current-cta-text: var(--cta-setup-text);
+    --current-cta-glow: var(--cta-setup-glow);
+    --current-glow: var(--glow-setup);
+  }
+  
+  .phase-gameplay {
+    --current-bg-primary: var(--bg-gameplay-primary);
+    --current-bg-secondary: var(--bg-gameplay-secondary);
+    --current-glass-tint: var(--glass-gameplay-tint);
+    --current-glass-border: var(--glass-gameplay-border);
+    --current-glass-glow: var(--glass-gameplay-glow);
+    --current-cta-bg: var(--cta-gameplay-bg);
+    --current-cta-hover: var(--cta-gameplay-hover);
+    --current-cta-text: var(--cta-gameplay-text);
+    --current-cta-glow: var(--cta-gameplay-glow);
+    --current-glow: var(--glow-gameplay);
+  }
+  
+  .phase-intense {
+    --current-bg-primary: var(--bg-intense-primary);
+    --current-bg-secondary: var(--bg-intense-secondary);
+    --current-glass-tint: var(--glass-intense-tint);
+    --current-glass-border: var(--glass-intense-border);
+    --current-glass-glow: var(--glass-intense-glow);
+    --current-cta-bg: var(--cta-intense-bg);
+    --current-cta-hover: var(--cta-intense-hover);
+    --current-cta-text: var(--cta-intense-text);
+    --current-cta-glow: var(--cta-intense-glow);
+    --current-glow: var(--glow-intense);
+  }
+  
+  .phase-aftercare {
+    --current-bg-primary: var(--bg-aftercare-primary);
+    --current-bg-secondary: var(--bg-aftercare-secondary);
+    --current-glass-tint: var(--glass-aftercare-tint);
+    --current-glass-border: var(--glass-aftercare-border);
+    --current-glass-glow: var(--glass-aftercare-glow);
+    --current-cta-bg: var(--cta-aftercare-bg);
+    --current-cta-hover: var(--cta-aftercare-hover);
+    --current-cta-text: var(--cta-aftercare-text);
+    --current-cta-glow: var(--cta-aftercare-glow);
+    --current-glow: var(--glow-aftercare);
+  }
+}

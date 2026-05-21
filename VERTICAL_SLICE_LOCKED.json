@@ -1,0 +1,101 @@
+{
+  "generated": "2026-05-20T14:24:41.144Z",
+  "phase": 1,
+  "components": [
+    {
+      "name": "PGCard",
+      "version": "1.0.0",
+      "status": "stable",
+      "released": "2026-05-20T14:24:41.145Z",
+      "hash": {
+        "component": "not-found",
+        "page": "30ffc5b7819ef97904ae26cd9e411a5e2e51bbe5f62fe033822229895cc6da17"
+      },
+      "api": {
+        "props": [
+          {
+            "name": "id",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "character",
+            "type": "Character",
+            "required": true
+          },
+          {
+            "name": "isSelected",
+            "type": "boolean",
+            "required": false
+          },
+          {
+            "name": "onSelect",
+            "type": "(id: string) => void",
+            "required": true
+          }
+        ],
+        "exports": [
+          "PGCard"
+        ]
+      },
+      "files": {
+        "component": "src/components/core/PGCard.tsx",
+        "page": "src/pages/minimal-pgcard.tsx",
+        "spec": "tests/e2e/minimal_slice_01_pgcard.spec.ts"
+      },
+      "audit": [
+        {
+          "date": "2026-05-20T14:24:41.146Z",
+          "action": "lock",
+          "reason": "Phase 3 Version Lock Generation",
+          "author": "vertical-slice-cli"
+        }
+      ]
+    },
+    {
+      "name": "ActivityCard",
+      "version": "1.0.0",
+      "status": "stable",
+      "released": "2026-05-20T14:24:41.146Z",
+      "hash": {
+        "component": "not-found",
+        "page": "not-found"
+      },
+      "api": {
+        "props": [
+          {
+            "name": "activity",
+            "type": "Activity",
+            "required": true
+          },
+          {
+            "name": "onAction",
+            "type": "(type: string) => void",
+            "required": true
+          }
+        ],
+        "exports": [
+          "ActivityCard"
+        ]
+      },
+      "files": {
+        "component": "src/components/core/ActivityCard.tsx",
+        "page": "src/pages/minimal-activity-card.tsx",
+        "spec": "tests/e2e/minimal_slice_02_activity_card.spec.ts"
+      },
+      "audit": [
+        {
+          "date": "2026-05-20T14:24:41.147Z",
+          "action": "lock",
+          "reason": "Phase 3 Version Lock Generation",
+          "author": "vertical-slice-cli"
+        }
+      ]
+    }
+  ],
+  "integrity": {
+    "total": "e9cd1f72625b3f477d307a93f4d80fd06921fed6797af99b884b2170b4ce78fc",
+    "verified": true,
+    "timestamp": "2026-05-20T14:24:41.147Z"
+  }
+}

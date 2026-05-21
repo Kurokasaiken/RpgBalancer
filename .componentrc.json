@@ -1,0 +1,79 @@
+{
+  "version": "1.0.0",
+  "generated": "2026-05-20T15:45:00Z",
+  "components": [
+    {
+      "id": "pgcard",
+      "name": "PGCard",
+      "paths": {
+        "component": "src/components/core/PGCard.tsx",
+        "page": "src/pages/minimal-pgcard.tsx",
+        "spec": "tests/e2e/minimal_slice_01_pgcard.spec.ts"
+      },
+      "api": {
+        "props": [
+          {
+            "name": "id",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "character",
+            "type": "Character",
+            "required": true
+          },
+          {
+            "name": "isSelected",
+            "type": "boolean",
+            "required": false
+          },
+          {
+            "name": "onSelect",
+            "type": "(id: string) => void",
+            "required": true
+          }
+        ],
+        "exports": ["PGCard"]
+      }
+    },
+    {
+      "id": "activity-card",
+      "name": "ActivityCard",
+      "paths": {
+        "component": "src/components/core/ActivityCard.tsx",
+        "page": "src/pages/minimal-activity-card.tsx",
+        "spec": "tests/e2e/minimal_slice_02_activity_card.spec.ts"
+      },
+      "api": {
+        "props": [
+          {
+            "name": "activity",
+            "type": "Activity",
+            "required": true
+          },
+          {
+            "name": "onAction",
+            "type": "(type: string) => void",
+            "required": true
+          }
+        ],
+        "exports": ["ActivityCard"]
+      }
+    }
+  ],
+  "phases": {
+    "phase1": ["pgcard", "activity-card"],
+    "phase2": [],
+    "phase3": [],
+    "phase4": []
+  },
+  "stats": {
+    "total": 2,
+    "byPhase": {
+      "phase1": 2,
+      "phase2": 0,
+      "phase3": 0,
+      "phase4": 0
+    }
+  }
+}

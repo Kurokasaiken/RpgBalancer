@@ -1,4 +1,13 @@
-# Changelog - Sistema di Bilanciamento
+# Changelog - Sistema di Bilanciamento & Vertical Slice Architecture
+
+## [Unreleased]
+
+### Phase 2: Conventional Commits & Semantic Versioning (IN PROGRESS)
+- ✅ `.commitlintrc.json` - Commit message validation configuration
+- ✅ `.releaserc.json` - Semantic-release configuration
+- ✅ `.github/workflows/semantic-release.yml` - Auto-versioning CI/CD workflow
+- 📝 `PHASE_2_SETUP_GUIDE.md` - Implementation instructions (in progress)
+- 📝 Team training materials for conventional commits (in progress)
 
 ## 2025-12-17 - Phase 10 Priority Fix (Balancer)
 

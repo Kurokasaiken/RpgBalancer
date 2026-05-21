@@ -1,0 +1,114 @@
+{
+  "extends": ["@commitlint/config-conventional"],
+  "rules": {
+    "type-enum": [
+      2,
+      "always",
+      [
+        "feat",
+        "fix",
+        "docs",
+        "style",
+        "refactor",
+        "perf",
+        "test",
+        "chore",
+        "ci",
+        "revert"
+      ]
+    ],
+    "type-case": [2, "always", "lowercase"],
+    "type-empty": [2, "never"],
+    "scope-case": [2, "always", "lowercase"],
+    "subject-case": [2, "never", ["start-case", "pascal-case", "upper-case"]],
+    "subject-empty": [2, "never"],
+    "subject-full-stop": [2, "never", "."],
+    "body-leading-blank": [2, "always"],
+    "body-max-line-length": [2, "always", 100],
+    "footer-leading-blank": [2, "always"],
+    "footer-max-line-length": [2, "always", 100]
+  },
+  "prompt": {
+    "questions": {
+      "type": {
+        "description": "Select the type of change that you're committing",
+        "enum": {
+          "feat": "A new feature",
+          "fix": "A bug fix",
+          "docs": "Documentation only changes",
+          "style": "Changes that do not affect the meaning of the code (formatting, etc)",
+          "refactor": "A code change that neither fixes a bug nor adds a feature",
+          "perf": "A code change that improves performance",
+          "test": "Adding missing tests or correcting existing tests",
+          "chore": "Changes to build system, dependencies, or tooling",
+          "ci": "Changes to CI/CD configuration files and scripts",
+          "revert": "Reverts a previous commit"
+        }
+      },
+      "scope": {
+        "description": "What is the scope of this change (core, spell, village, etc)?",
+        "type": "list",
+        "choices": [
+          {
+            "name": "core",
+            "value": "core"
+          },
+          {
+            "name": "spell",
+            "value": "spell"
+          },
+          {
+            "name": "village",
+            "value": "village"
+          },
+          {
+            "name": "balancer",
+            "value": "balancer"
+          },
+          {
+            "name": "ui",
+            "value": "ui"
+          },
+          {
+            "name": "ci",
+            "value": "ci"
+          },
+          {
+            "name": "docs",
+            "value": "docs"
+          },
+          {
+            "name": "none",
+            "value": ""
+          }
+        ]
+      },
+      "subject": {
+        "description": "Write a short, imperative tense description of the change"
+      },
+      "body": {
+        "description": "Provide a longer description of the changes"
+      },
+      "isBreaking": {
+        "description": "Are there any breaking changes?",
+        "type": "confirm"
+      },
+      "breakingBody": {
+        "description": "A BREAKING CHANGE commit requires a body. Please enter a longer description of the commit itself"
+      },
+      "breaking": {
+        "description": "Describe the breaking changes"
+      },
+      "isIssueAffected": {
+        "description": "Does this change affect any open issues?",
+        "type": "confirm"
+      },
+      "issueBody": {
+        "description": "If issues are closed, the commit requires a body. Please enter a longer description of the commit itself"
+      },
+      "issue": {
+        "description": "Add issue references (e.g. fixes #123, closes #456)"
+      }
+    }
+  }
+}

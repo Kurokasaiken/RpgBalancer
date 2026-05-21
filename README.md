@@ -26,6 +26,19 @@ A powerful, web-based tool for designing, testing, and balancing RPG combat syst
 
 The application uses the **FantasyLayout** sidebar (desktop) and a compact bottom bar (mobile). Current sections and entries are entirely config-driven:
 
+- **Vertical Slice (Minimal Components)**
+  - 📊 [Component Hub](/minimal) – Isolated component testing with 370+ tests
+  - 📝 [Specs](./src/docs/docs/minimal_slice/) – Component specifications
+  - 🧪 [Test Coverage](./tests/e2e/minimal_slice_*.spec.ts) – Playwright E2E tests
+  - 📦 [Frozen Versions](./VERTICAL_SLICE_FROZEN_VERSIONS.md) – Version history
+  - 🔄 [Versioning Guide](./context/VERTICAL_SLICE_REFERENCE.md) – SemVer & governance
+  - **Quick Commands:**
+    ```bash
+    pnpm test:minimal              # Run all minimal slice tests
+    pnpm test:minimal:headed       # View browser during tests
+    pnpm test:minimal:debug        # Debug mode
+    pnpm test:minimal:report       # View HTML test report
+    ```
 - **Core**
   - `Balancer` – primary config-first balancing UI.
     - **Custom Archetypes via Helper**: every new template must use `withAllocationDefaults` from `src/balancing/archetype/allocationDefaults.ts` so all stats stay in sync with the config-first weight system.  

@@ -35,8 +35,21 @@ export function DraggableWorker({
   const constrainedHp = Math.max(0, Math.min(100, hp));
   const constrainedFatigue = Math.max(0, Math.min(100, fatigue));
 
+  // Calculate transform origin based on portrait position for spring-back anchor
+  // Portrait dimensions: horizontal=56x32, vertical=64x40
+  // Portrait is positioned at the start of the card (left side)
+  const isHorizontalCard = true; // DraggableWorker uses horizontal layout
+  const portraitWidth = isHorizontalCard ? 56 : 64;
+  const portraitHeight = isHorizontalCard ? 32 : 40;
+  const portraitCenterX = portraitWidth / 2;
+  const portraitCenterY = portraitHeight / 2;
+  
+  // Set transform origin to portrait center for spring-back animation
+  const transformOrigin = `${portraitCenterX}px ${portraitCenterY}px`;
+  
   const style = transform ? {
     transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+    transformOrigin,
   } : undefined;
 
   return (

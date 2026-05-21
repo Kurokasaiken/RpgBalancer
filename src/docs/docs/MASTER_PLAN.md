@@ -98,6 +98,14 @@ Example:
 - **Mandate:** Before creare qualunque nuova superficie roster/list PG o modificare componenti esistenti, verifica se il componente richiesto è già presente/approvato nella registry. Solo se non esiste, apri un prompt IV-CLP per estrarlo.
 - **Imports obbligatori:** Tutti i consumer devono importare attraverso `src/ui/idleVillage/roster/index.ts`. I componenti legacy rimangono in `_OLD_DEPRECATED/` e non possono essere referenziati nelle nuove implementazioni.
 
+### **Vertical Slice Documentation Governance**
+
+- **Source:** `src/docs/docs/DOCUMENTATION_GOVERNANCE.md` - Single source of truth rules for documentation
+- **Source:** `context/VERTICAL_SLICE_REFERENCE.md` - Versioning and governance for vertical slice components
+- **Mandate:** Vertical slice documentation follows strict single source of truth principles. All general documentation must link to trusted component docs, not duplicate contracts.
+- **Freeze Governance:** See `context/RPG_PROJECT_CONTEXT.md` §3.1 for freezing semantics rules
+- **Update Workflow:** When changing frozen components, update trusted docs, tests, and code comments in same commit
+
 ---
 
 ## 📊 OVERALL PROGRESS
@@ -114,16 +122,22 @@ Example:
 - Phase 10: Config Balancer — 🔥 ACTIVE (~140 tasks)
 - Phase 10.5: Stat Testing — 🔥 NEXT (~80 tasks)
 - Phase 11: Tactical Miss. — 📋 TODO (~100 tasks)
-- Phase 12 references:  
-  - Idle Incremental RPG – Implementation Plan  
-    (`docs/plans/idle_village_plan.md`)  
-  - Tick Fatigue Plan  
-    (`docs/plans/idle_village_tick_fatigue_plan.md`)  
-  - Atomic Sandbox Refactor  
-    (`docs/plans/idle_village_atomic_sandbox_plan.md`)  
-    (see `docs/plans/idle_village_tasks.md#phase-12e`)  
-  - Resident Slot Expansion Plan  
+- Phase 12 references:
+  - Idle Incremental RPG – Implementation Plan
+    (`docs/plans/idle_village_plan.md`)
+  - Tick Fatigue Plan
+    (`docs/plans/idle_village_tick_fatigue_plan.md`)
+  - Atomic Sandbox Refactor
+    (`docs/plans/idle_village_atomic_sandbox_plan.md`)
+    (see `docs/plans/idle_village_tasks.md#phase-12e`)
+  - Resident Slot Expansion Plan
     (`docs/plans/idle_village_resident_slot_plan.md`)
+  - Vertical Slice Implementation Plan
+    (`src/docs/docs/plans/vertical_slice_implementation_plan.md`)
+  - Card System Description
+    (`src/docs/docs/idle_village/card_system_description.md`)
+  - Vertical Slice Entities
+    (`context/VERTICAL_SLICE_ENTITIES_FULL.md`)
 
 **Total progress:** ███████████████░░░░░ 75%
 
