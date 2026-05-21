@@ -35,8 +35,18 @@ description: "Inventory of implementation plans across sessions"
 ## 📝 Current Session (da16ef3e-de83-4980-8e04-0dac67057a6b)
 
 ### implementation_plan.md ✅ **ACTIVE**
-**Title:** 1v1 Balancing Module - Comprehensive Matchup Analysis System  
-**Status:** Phase 1 Starting (Math Engine + Simulator)  
+**Title:** 1v1 Balancing Module - Comprehensive Matchup Analysis System
+**Status:** Phase 1 Starting (Math Engine + Simulator)
+
+### vertical_slice_implementation_plan.md ✅ **ACTIVE**
+**Title:** Vertical Slice Implementation Plan - Incremental Testing & Documentation Strategy
+**Status:** Phase 1 Complete - 6-Phase Incremental Build
+**Location:** `src/docs/docs/plans/vertical_slice_implementation_plan.md`
+**Related:**
+- [Vertical Slice Start Here](../minimal_slice/START_HERE.md) - Entry point for vertical slice
+- [Card System Description](../idle_village/card_system_description.md) - Complete card system architecture
+- [Vertical Slice Entities](../../context/VERTICAL_SLICE_ENTITIES_FULL.md) - Complete entity inventory
+- [Vertical Slice Reference](../../context/VERTICAL_SLICE_REFERENCE.md) - Versioning and governance  
 
 **Phases:**
 - 🔄 **Phase 1:** Core Math Engine & Deterministic Simulator

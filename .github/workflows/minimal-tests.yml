@@ -1,0 +1,146 @@
+name: Minimal Slice Tests
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'src/pages/minimal-*.tsx'
+      - 'src/components/core/*.tsx'
+      - 'src/docs/docs/minimal_slice/**'
+      - 'tests/e2e/minimal_slice_*.spec.ts'
+      - 'playwright.config.ts'
+      - 'package.json'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'src/pages/minimal-*.tsx'
+      - 'src/components/core/*.tsx'
+      - 'src/docs/docs/minimal_slice/**'
+      - 'tests/e2e/minimal_slice_*.spec.ts'
+  workflow_dispatch:
+
+jobs:
+  test-minimal:
+    name: Playwright Tests (Minimal Slice)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps
+
+      - name: Start dev server
+        run: pnpm dev &
+        timeout-minutes: 2
+
+      - name: Wait for server
+        run: |
+          echo "Waiting for dev server to be ready..."
+          npx wait-on http://127.0.0.1:5173 --timeout 30000
+
+      - name: Run Playwright tests (Minimal Slice)
+        run: pnpm test:minimal
+        timeout-minutes: 25
+
+      - name: Generate test summary
+        if: always()
+        run: |
+          if [ -f test-results.json ]; then
+            node scripts/generate-test-summary.js
+          fi
+
+      - name: Upload Playwright Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-${{ github.run_id }}
+          path: playwright-report/
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Upload Test Results (XML)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ github.run_id }}
+          path: |
+            test-results.xml
+            test-results.json
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Comment PR with test results
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let summary = { total: 0, passed: 0, failed: 0 };
+
+            try {
+              if (fs.existsSync('test-summary.json')) {
+                summary = JSON.parse(fs.readFileSync('test-summary.json', 'utf8'));
+              }
+            } catch (e) {
+              console.log('Could not read test summary');
+            }
+
+            const status = summary.failed === 0 ? '✅' : '❌';
+            const comment = `## ${status} Minimal Slice Test Results
+
+            **Tests:** ${summary.passed}/${summary.total} passed
+
+            ${summary.failed > 0 ? `**Failed:** ${summary.failed}` : ''}
+
+            [View Full Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  notify-slack:
+    name: Slack Notification (Optional)
+    runs-on: ubuntu-latest
+    needs: test-minimal
+    if: failure() && github.event_name == 'push'
+
+    steps:
+      - name: Send Slack notification
+        uses: slackapi/slack-github-action@v1
+        if: env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          payload: |
+            {
+              "text": "❌ Minimal Slice Tests Failed",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Minimal Slice Tests Failed on ${{ github.ref }}*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Details>"
+                  }
+                }
+              ]
+            }

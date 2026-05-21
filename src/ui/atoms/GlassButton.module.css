@@ -22,16 +22,16 @@
 /* VARIANTS */
 
 .primary {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    color: white;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--cta-gameplay-bg);
+    color: var(--cta-gameplay-text);
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--glass-gameplay-border);
 }
 
 .primary:hover {
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
-    filter: brightness(1.1);
+    box-shadow: var(--shadow-card-hover), var(--glow-gameplay);
+    background: var(--cta-gameplay-hover);
 }
 
 .primary:active {
@@ -39,38 +39,38 @@
 }
 
 .secondary {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--secondary-bg);
+    color: var(--secondary-text);
+    border: 1px solid var(--secondary-border);
     backdrop-filter: blur(4px);
 }
 
 .secondary:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.2);
+    background: var(--secondary-hover-bg);
+    border-color: var(--secondary-hover-border);
 }
 
 .danger {
-    background: rgba(220, 38, 38, 0.1);
-    color: #fca5a5;
-    border: 1px solid rgba(220, 38, 38, 0.3);
+    background: rgba(220, 20, 60, 0.1);
+    color: var(--sunset-coral);
+    border: 1px solid var(--sunset-crimson);
 }
 
 .danger:hover {
-    background: rgba(220, 38, 38, 0.2);
-    border-color: rgba(220, 38, 38, 0.5);
-    color: #fecaca;
-    box-shadow: 0 0 12px rgba(220, 38, 38, 0.2);
+    background: rgba(220, 20, 60, 0.2);
+    border-color: var(--sunset-rich-crimson);
+    color: var(--sunset-coral);
+    box-shadow: 0 0 12px var(--sunset-crimson);
 }
 
 .ghost {
-    background: transparent;
-    color: #9ca3af;
+    background: var(--ghost-bg);
+    color: var(--ghost-text);
 }
 
 .ghost:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: white;
+    background: var(--ghost-hover-bg);
+    color: var(--ghost-hover-text);
 }
 
 /* SIZES */

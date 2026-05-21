@@ -31,6 +31,8 @@ import ActionDetailHarness from '@/ui/idleVillage/components/ActionDetailHarness
 import { useResidentSlotController } from '@/ui/idleVillage/slots/useResidentSlotController';
 import ResidentSlotRack from '@/ui/idleVillage/components/ResidentSlotRack';
 import { resolveResidentRackDisplayInfo } from '@/ui/idleVillage/slots/residentSlotDisplay';
+import type { RosterSortMode } from '@/ui/idleVillage/config/rosterSortConfig';
+import { DEFAULT_ROSTER_SORT_MODE } from '@/ui/idleVillage/config/rosterSortConfig';
 
 /**
  * MinimalGameplayPage - Reusing proven /test DnD stack
@@ -80,6 +82,9 @@ function MinimalGameplayPageContent(): JSX.Element {
   // POI detail state for normal flow
   const [selectedPOI, setSelectedPOI] = useState<string | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  
+  // Sort mode state for roster
+  const [sortMode, setSortMode] = useState<RosterSortMode>(DEFAULT_ROSTER_SORT_MODE);
 
   // Convert residents array to Record for slot controller
   const residentsById = useMemo(() => 
@@ -512,6 +517,8 @@ function MinimalGameplayPageContent(): JSX.Element {
               pillar="frontier"
               context={{ locationType: 'slot-lab', residentType: 'worker', scenarioType: 'test' }}
               dragVisualState={dragVisualState}
+              sortMode={sortMode}
+              onSortModeChange={setSortMode}
             />
           </StyleLabSurface>
         </div>

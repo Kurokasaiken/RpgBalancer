@@ -1,0 +1,398 @@
+{
+  "entity": "PgToken",
+  "phase": 1,
+  "version": "2026-05-20",
+  "description": "Visual medaglione token with portrait, rarity ring, and status icons. Isolated component, no drag or assignment in Phase 1.",
+
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique resident identifier",
+      "example": "res_001"
+    },
+    "portraitUrl": {
+      "type": "string",
+      "description": "Portrait image URL from residentVisualResolver",
+      "example": "https://avatars.example/001.jpg",
+      "fallback": "Placeholder SVG on 404"
+    },
+    "name": {
+      "type": "string",
+      "description": "Display name shown in tooltip",
+      "example": "Elara the Scout"
+    },
+    "level": {
+      "type": "number",
+      "enum": [1, 2, 3],
+      "description": "Character level, determines rarity ring color",
+      "mapping": {
+        "1": "bronze (#C47D4A)",
+        "2": "silver (#D4D4D4)",
+        "3": "gold (#FFD700)"
+      }
+    },
+    "status": {
+      "type": "enum",
+      "enum": ["available", "away", "injured", "busy"],
+      "description": "Current resident state",
+      "icon_mapping": {
+        "injured": "🩹 (top-left)",
+        "away": "👣 (top-right)",
+        "busy": "⚙️ (center-right)",
+        "available": "no icon"
+      }
+    },
+    "isInjured": {
+      "type": "boolean",
+      "description": "Whether resident is injured (shows injury icon)",
+      "independent_of_status": true
+    },
+    "fatigue": {
+      "type": "number",
+      "range": [0, 100],
+      "description": "Fatigue level; > 80 shows fatigue icon 😴"
+    },
+    "statSnapshot": {
+      "type": "object",
+      "description": "Character stats shown in tooltip",
+      "properties": {
+        "str": "Strength",
+        "dex": "Dexterity",
+        "con": "Constitution",
+        "int": "Intelligence",
+        "wis": "Wisdom",
+        "cha": "Charisma"
+      },
+      "example": {
+        "str": 12,
+        "dex": 14,
+        "con": 10,
+        "int": 8,
+        "wis": 11,
+        "cha": 13
+      }
+    },
+    "currentHp": {
+      "type": "number",
+      "description": "Current health points"
+    },
+    "maxHp": {
+      "type": "number",
+      "description": "Maximum health points"
+    }
+  },
+
+  "frozen_states": [
+    {
+      "name": "During Drag",
+      "operation": "drag_in_progress",
+      "frozen": true,
+      "duration_ms": "variable (pointerDown → pointerUp)",
+      "when": "Phases 4+",
+      "affected_interactions": [
+        "click",
+        "auto_assign",
+        "roster_reorder"
+      ],
+      "visual_indicators": [
+        "opacity 0.7 in Roster",
+        "cursor grab-active",
+        "CustomDragOverlay follows cursor"
+      ],
+      "guard_layers": ["G1", "G2"],
+      "test_id": "test_drag_start_blocks_click",
+      "reason": "Drag operation in-flight; overlay controls visual position"
+    },
+    {
+      "name": "After Failed Drop",
+      "operation": "drop_outside_slot",
+      "frozen": true,
+      "duration_ms": 900,
+      "when": "Phases 4+",
+      "affected_interactions": [
+        "click",
+        "auto_assign"
+      ],
+      "visual_indicators": [
+        "token animates back to origin",
+        "opacity fade during return",
+        "cursor normal"
+      ],
+      "guard_layers": ["G3", "G5"],
+      "test_id": "test_ghost_click_blocked_900ms",
+      "reason": "Browser may fire synthetic click; guard prevents unintended assignment"
+    },
+    {
+      "name": "In Active Activity",
+      "operation": "activity_in_progress",
+      "frozen": true,
+      "duration_ms": "until onActivityComplete()",
+      "when": "Phases 5+",
+      "affected_interactions": [
+        "drag",
+        "reassign",
+        "click_to_assign"
+      ],
+      "visual_indicators": [
+        "busy icon ⚙️",
+        "dimmed appearance",
+        "grayed-out border",
+        "shows in SlotRack (not in Roster)"
+      ],
+      "guard_layers": ["slot_validator"],
+      "test_id": "test_in_activity_cannot_be_dragged",
+      "reason": "Token is occupied; cannot be double-assigned"
+    }
+  ],
+
+  "visual_properties": {
+    "size_desktop": {
+      "width_px": 80,
+      "height_px": 80,
+      "border_radius": "50%"
+    },
+    "size_mobile": {
+      "width_px": 60,
+      "height_px": 60,
+      "border_radius": "50%"
+    },
+    "portrait_image": {
+      "format": ["jpg", "webp", "png"],
+      "circular_crop": true,
+      "fallback_on_error": "Placeholder SVG"
+    },
+    "rarity_ring": {
+      "thickness_px": "4-6",
+      "opacity": 1.0,
+      "colors": {
+        "level_1": "#C47D4A",
+        "level_2": "#D4D4D4",
+        "level_3": "#FFD700"
+      },
+      "css_class_mapping": {
+        "level_1": "rarity-bronze",
+        "level_2": "rarity-silver",
+        "level_3": "rarity-gold"
+      }
+    },
+    "status_icons": {
+      "injured": {
+        "symbol": "🩹",
+        "position": "top-left",
+        "visible_when": "isInjured === true"
+      },
+      "away": {
+        "symbol": "👣",
+        "position": "top-right",
+        "visible_when": "status === 'away'"
+      },
+      "busy": {
+        "symbol": "⚙️",
+        "position": "center-right",
+        "visible_when": "status === 'busy'"
+      },
+      "fatigue": {
+        "symbol": "😴",
+        "position": "bottom-right",
+        "visible_when": "fatigue > 80"
+      }
+    },
+    "tooltip": {
+      "trigger": "hover",
+      "dismiss": "unhover",
+      "content": [
+        "Name",
+        "Level + HP",
+        "Stats (STR, DEX, WIS, etc)"
+      ],
+      "delay_ms": 300,
+      "position": "above or below token"
+    }
+  },
+
+  "interaction_paths": {
+    "phase_1": {
+      "hover": {
+        "description": "Show tooltip",
+        "blocked_by": "nothing (never frozen in Phase 1)"
+      }
+    },
+    "phase_4": {
+      "drag_start": {
+        "description": "Begin drag operation",
+        "blocked_by": ["already_dragging", "in_activity"],
+        "guard_layers": ["G1"]
+      },
+      "click_during_drag": {
+        "description": "Unintended click after drag gesture",
+        "blocked_by": "G1 (didDragRef)",
+        "guard_layers": ["G1"]
+      },
+      "click_after_failed_drop": {
+        "description": "Synthetic click after drop outside",
+        "blocked_by": "G3, G4, G5",
+        "guard_layers": ["G3", "G4", "G5"]
+      }
+    },
+    "phase_5": {
+      "drag_while_in_activity": {
+        "description": "Attempt to drag token in active activity",
+        "blocked_by": "slot_validator, visual_inert",
+        "guard_layers": ["activity_validator"]
+      }
+    }
+  },
+
+  "test_cases": [
+    {
+      "id": 1.1,
+      "name": "Portrait loads correctly",
+      "category": "rendering",
+      "phase": 1,
+      "source_md": "src/docs/docs/minimal_slice/01_pgtoken.md § 2.1",
+      "steps": [
+        "Navigate to /minimal-pgtoken",
+        "Locate [data-testid='pgtoken-portrait']",
+        "Verify img.src is not empty and ends with .jpg/.webp/.png"
+      ],
+      "expected_result": "Portrait image visible, no 404"
+    },
+    {
+      "id": 1.2,
+      "name": "Fallback placeholder on 404",
+      "category": "error_handling",
+      "phase": 1,
+      "source_md": "src/docs/docs/minimal_slice/01_pgtoken.md § 2.1",
+      "steps": [
+        "Mock portrait URL to return 404",
+        "Render PgToken",
+        "Verify placeholder SVG appears instead"
+      ],
+      "expected_result": "No white box, no console error, fallback visible"
+    },
+    {
+      "id": 2.1,
+      "name": "Rarity ring color matches level",
+      "category": "rendering",
+      "phase": 1,
+      "source_md": "src/docs/docs/minimal_slice/01_pgtoken.md § 2.2",
+      "steps": [
+        "Load /minimal-pgtoken",
+        "Find tokens with data-level='1', '2', '3'",
+        "Verify rarity-bronze, rarity-silver, rarity-gold CSS classes"
+      ],
+      "expected_result": "All 3 tokens have correct rarity ring color"
+    },
+    {
+      "id": 2.2,
+      "name": "Ring border thickness correct",
+      "category": "rendering",
+      "phase": 1,
+      "source_md": "src/docs/docs/minimal_slice/01_pgtoken.md § 2.2",
+      "steps": [
+        "Load /minimal-pgtoken",
+        "Get computed style of [data-testid='pgtoken']",
+        "Verify border-width is 4-6px"
+      ],
+      "expected_result": "Border width is 4-6px, opacity 1.0"
+    },
+    {
+      "id": 3.1,
+      "name": "Injured icon visible when isInjured=true",
+      "category": "rendering",
+      "phase": 1,
+      "source_md": "src/docs/docs/minimal_slice/01_pgtoken.md § 2.3",
+      "steps": [
+        "Load /minimal-pgtoken?injured=true",
+        "Locate [data-testid='pgtoken-icon-injured']",
+        "Verify it is visible"
+      ],
+      "expected_result": "Injury icon (🩹) visible at top-left"
+    },
+    {
+      "id": 3.2,
+      "name": "Away icon visible when status=away",
+      "category": "rendering",
+      "phase": 1,
+      "source_md": "src/docs/docs/minimal_slice/01_pgtoken.md § 2.3",
+      "steps": [
+        "Load /minimal-pgtoken?status=away",
+        "Locate [data-testid='pgtoken-icon-away']",
+        "Verify it is visible"
+      ],
+      "expected_result": "Away icon (👣) visible at top-right"
+    },
+    {
+      "id": 3.3,
+      "name": "No icons when status=available",
+      "category": "rendering",
+      "phase": 1,
+      "source_md": "src/docs/docs/minimal_slice/01_pgtoken.md § 2.3",
+      "steps": [
+        "Load /minimal-pgtoken?status=available",
+        "Query [data-testid^='pgtoken-icon']",
+        "Verify count is 0"
+      ],
+      "expected_result": "No status icons visible"
+    },
+    {
+      "id": 4.1,
+      "name": "Tooltip appears on hover",
+      "category": "interaction",
+      "phase": 1,
+      "source_md": "src/docs/docs/minimal_slice/01_pgtoken.md § 2.4",
+      "steps": [
+        "Load /minimal-pgtoken",
+        "Hover over [data-testid='pgtoken']",
+        "Wait for [role='tooltip'] to appear",
+        "Verify it contains resident name"
+      ],
+      "expected_result": "Tooltip visible, contains name + stats"
+    },
+    {
+      "id": 4.2,
+      "name": "Tooltip disappears on unhover",
+      "category": "interaction",
+      "phase": 1,
+      "source_md": "src/docs/docs/minimal_slice/01_pgtoken.md § 2.4",
+      "steps": [
+        "Load /minimal-pgtoken",
+        "Hover over token, wait for tooltip",
+        "Move mouse away (page.mouse.move(0, 0))",
+        "Verify tooltip is hidden"
+      ],
+      "expected_result": "Tooltip hidden within 300ms"
+    },
+    {
+      "id": 4.3,
+      "name": "Tooltip contains correct stats",
+      "category": "interaction",
+      "phase": 1,
+      "source_md": "src/docs/docs/minimal_slice/01_pgtoken.md § 2.4",
+      "steps": [
+        "Load /minimal-pgtoken",
+        "Hover over token",
+        "Verify tooltip contains STR:, DEX:, WIS:, etc"
+      ],
+      "expected_result": "All stats from statSnapshot visible in tooltip"
+    }
+  ],
+
+  "regression_tests": [
+    {
+      "phase": 2,
+      "description": "Portrait renders in Roster context",
+      "assertion": "Phase 2 page should still show portraits correctly"
+    },
+    {
+      "phase": 4,
+      "description": "Rarity ring colors stable after drag",
+      "assertion": "Rarity ring colors unchanged during/after drag"
+    },
+    {
+      "phase": 5,
+      "description": "Status icons correct in activity context",
+      "assertion": "Icons still visible/hidden correctly when token in activity"
+    }
+  ]
+}

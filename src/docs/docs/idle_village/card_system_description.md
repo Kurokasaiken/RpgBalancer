@@ -1,5 +1,11 @@
 # Idle Village Card System - Descrizione Completa per AI
 
+**Aligned with Config-First Philosophy:** See [DEVELOPMENT_GUIDELINES.md](../DEVELOPMENT_GUIDELINES.md) §2 for config-first rules
+**Aligned with Project Philosophy:** See [PROJECT_PHILOSOPHY.md](../PROJECT_PHILOSOPHY.md) for weight-based creator pattern
+**Aligned with Semantic Constraints:** See [context/RPG_PROJECT_CONTEXT.md](../../context/RPG_PROJECT_CONTEXT.md) for freezing semantics and state mutation rules
+
+---
+
 ## Panoramica del Sistema
 
 Il sistema Idle Village utilizza un'architettura di card evoluta che gestisce interazioni tra personaggi (PG) e attività attraverso un sistema drag & drop sofisticato. Il sistema è passato da "VerbCard" (legacy) a "ActionCard" (nuovo) mantenendo compatibilità e funzionalità avanzate.

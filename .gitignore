@@ -23,3 +23,4 @@ debug*.log
 np-*.log
 *.tar.gz
 *.zip
+src-tauri/target/

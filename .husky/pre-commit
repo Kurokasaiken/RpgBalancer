@@ -1,0 +1,27 @@
+#!/bin/sh
+set -e
+
+echo "🧪 Minimal Slice: Running pre-commit checks..."
+
+# Check if any minimal slice files were modified
+MODIFIED_FILES=$(git diff --cached --name-only)
+
+if echo "$MODIFIED_FILES" | grep -qE '(tests/e2e/minimal_slice_|src/pages/minimal-|src/components/core/)'; then
+  echo "⚠️ Minimal slice files detected - running tests..."
+
+  if ! npm run test:minimal -- --bail; then
+    echo ""
+    echo "❌ Minimal slice tests failed - commit aborted"
+    echo ""
+    echo "To debug:"
+    echo "  npm run test:minimal:headed    # Run tests with browser visible"
+    echo "  npm run test:minimal:debug     # Debug mode"
+    echo "  npm run test:minimal:report    # View HTML report"
+    echo ""
+    exit 1
+  fi
+
+  echo "✓ Minimal slice tests passed"
+fi
+
+echo "✓ Pre-commit checks passed"

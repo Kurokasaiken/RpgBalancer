@@ -1,5 +1,12 @@
 # Idle Village Documentation Governance Pack
 
+**Aligned with Project Philosophy:** See [PROJECT_PHILOSOPHY.md](PROJECT_PHILOSOPHY.md) for weight-based creator pattern and design system
+**Aligned with Master Plan:** See [MASTER_PLAN.md](MASTER_PLAN.md) for separation of concerns (plans vs tasks)
+**Aligned with Development Guidelines:** See [DEVELOPMENT_GUIDELINES.md](DEVELOPMENT_GUIDELINES.md) for config-first rules
+**Aligned with Semantic Constraints:** See [context/RPG_PROJECT_CONTEXT.md](../../context/RPG_PROJECT_CONTEXT.md) for freezing semantics
+
+---
+
 ## 1. Policy ufficiale — Single Source of Truth + Freeze Governance
 
 ### Scopo
@@ -82,6 +89,12 @@ Le pagine di test possono essere:
 - prova di interazione
 
 Ma non definiscono da sole il contratto canonico.
+
+#### Regola 8 — Trusted Component Registry (MASTER_PLAN.md §96)
+Prima di creare qualunque nuova superficie roster/list PG o modificare componenti esistenti, verifica se il componente richiesto è già presente/approvato nella registry.
+- Source: `src/docs/docs/idle_village/roster_trusted_components.md`
+- Imports obbligatori: Tutti i consumer devono importare attraverso `src/ui/idleVillage/roster/index.ts`
+- Componenti legacy rimangono in `_OLD_DEPRECATED/` e non possono essere referenziati nelle nuove implementazioni
 
 ### Stati consigliati del componente/contratto
 - `draft`
