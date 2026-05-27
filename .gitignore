@@ -24,3 +24,25 @@ np-*.log
 *.tar.gz
 *.zip
 src-tauri/target/
+
+# AI tooling directories
+.windsurf/
+.claude/
+
+# AI session artifacts — auto-generated reports & summaries
+COMPLETION_SUMMARY.md
+TEST_VERIFICATION_REPORT.md
+*_SESSION_SUMMARY.md
+*_COMPLETION_REPORT.md
+*COMPLETE_SUMMARY.md
+*COMPLETE_RESULTS*.md
+
+# AI task prompt files
+rt-*.md
+mg-*.md
+int-*-prompt.md
+doc-*-prompt.md
+np-*-report.md
+st-*-report.md
+bugfix-*-prompt.md
+prompt-iv-*.md

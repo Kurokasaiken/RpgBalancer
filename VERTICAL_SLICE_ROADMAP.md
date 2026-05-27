@@ -4,8 +4,7 @@
 **Cosa è questo file:** unica guida operativa per arrivare alla slice giocabile su Steam.
 
 > **Gerarchia documentale:**
-> - `CLAUDE_PROJECT_BRIEFING.md` — scope rigido (cosa toccare, cosa no)
-> - `GAMEPLAY_DESIGN.md` — visione e meccaniche del gioco
+>> - `GAMEPLAY_DESIGN.md` — visione e meccaniche del gioco
 > - `idle_village_conversation_context_handoff.md` — stato runtime autorevole
 > - `VERTICAL_SLICE_ROADMAP.md` — *(questo file)* piano operativo
 >
