@@ -1,6 +1,6 @@
 # Gameplay Design — Vertical Slice Steam
 
-**Companion di:** `CLAUDE_PROJECT_BRIEFING.md`, `VERTICAL_SLICE_ROADMAP.md`, `idle_village_conversation_context_handoff.md`
+**Companion di:** `VERTICAL_SLICE_ROADMAP.md`, `DEVELOPMENT_GUIDELINES.md`
 **Versione:** 2 (riscritta dopo correzioni utente del 2026-05-12)
 **Cosa è questo file:** descrivere il gameplay reale del progetto e della slice. Non spec tecnica, ma "cosa succede quando si gioca".
 
@@ -8,17 +8,27 @@
 
 ## 1. Identità del gioco
 
-**Genere:** village/incremental management RPG con drag & drop, in stile board game.
-**Riferimenti dichiarati dall'utente:**
+**Genere:** Village/incremental management RPG con drag & drop, ispirato a board game strategici.
+**Ispirazioni e Riferimenti Chiave:**
 
-- *Banished* (inizio partita: piccolo avamposto, risorse scarse, pochi abitanti)
-- *Neverwinter / Baldur's Gate* (frontiera dei Forgotten Realms, atmosfera D&D classica)
-- *Lord of Waterdeep* approfondito (assegni meeple a luoghi, ma con una catena di preparazione vera)
-- *Cultist Simulator* (skill check elegante: oggetti-carta che si combinano, niente UI fronzolo)
+1. **UI di base & Mappa: Ispirata a *Dispatch***
+   *   La UI non è una griglia classica né un mondo esplorabile a scorrimento, ma una **centrale operativa / mappa tattica** in cui i Point of Interest (POI) sono nodi interattivi connessi.
+   *   I progressi e i tempi sono rappresentati visivamente tramite indicatori circolari e animazioni di riempimento dei nodi stessi.
+   *   Estetica scura/glassmorfica in stile "Gilded Observatory" con glow dorati, ambra e rossi che segnalano gli allarmi o lo stato del villaggio.
 
-**Setting:** avamposto di frontiera dove civiltà incontra wilderness. Niente apocalisse, niente dark fantasy estremo: tono D&D classico, con quest "recupera l'artefatto / pulisci la cripta / sconfiggi il bandito".
+2. **Meccanica degli Aloni (Halos): Ispirata a *Cultist Simulator***
+   *   Ogni POI e Quest ha un anello esterno (halo) che indica il tempo rimanente o lo stato di avanzamento.
+   *   **Fase FOMO (Scadenza - Rosso):** Quando una quest temporanea appare, l'anello è rosso e si riduce progressivamente. Comunica l'urgenza e stimola il giocatore ad intervenire.
+   *   **Fase Azione (Risoluzione - Giallo/Ambra):** Quando l'eroe viene assegnato allo slot del POI prima della scadenza, l'halo si resetta, diventa giallo/ambra e comincia a riempirsi visualizzando il progresso del lavoro.
 
-**Tipo di tile/visual:** medaglioni circolari da board game per i personaggi (componente `SlottedMedal.tsx`), action card per quest/lavori/eventi sulla mappa (componenti `QuestCard`, `JobCard`, `ActionCardBase`). Niente sprite, niente pixel art, niente animazioni di camminata.
+3. **Gameplay Loop & Automazione: Ispirato a *Lords of Waterdeep* (Approfondito)**
+   *   **Divisione del Roster:**
+       *   *Peasants (Worker):* Lavoratori non-eroici senza stamina. Vengono reclutati (alla Locanda) e assegnati permanentemente ad attività di raccolta base (Taglialegna, Setacciare Oro) per generare risorse. Non possono fare quest.
+       *   *Eroi (Avventurieri):* Personaggi unici con statistiche, equipaggiamento e livelli. Consumano stamina per fare quest e guadagnare XP.
+   *   **Progressione del Motore:** Il giocatore piazzi i Peasants per stabilizzare la produzione passiva, mentre usa l'Eroe per risolvere le Quest che poppano a tempo sulla mappa. Il completamento delle quest sblocca upgrade di edifici, blueprint e l'acquisto di licenze (es. dal Mercante ambulante).
+
+**Setting:** Avamposto di frontiera dove la civiltà incontra la wilderness. Tono D&D classico, con quest del tipo "recupera l'artefatto / sconfiggi i banditi".
+**Visual Style:** Medaglioni circolari board-game per i personaggi (`SlottedMedal.tsx`), action card per quest/lavori/eventi sulla mappa. Niente sprite di camminata, ma una mappa astratta con feedback visivi e audio eccellenti.
 
 ---
 
@@ -50,41 +60,29 @@ Gli artigiani producono **i materiali**. I materiali servono a **comprare l'equi
 
 ## 3. La città all'inizio della slice
 
-Una piazza centrale con **3-4 edifici fissi** visibili dal primo secondo:
+All'avvio della Vertical Slice, il giocatore si trova in un piccolo avamposto di confine. L'incipit vede l'Eroe unico che giunge in questo villaggetto dopo essere stato esiliato, partendo con **stamina molto bassa**.
 
-| Edificio | Funzione | Stato slice |
-| --- | --- | --- |
-| **Taverna** | Punto di incontro. Qui spawnano eroi reclutabili (avventurieri di passaggio). Probabilmente anche alcune quest narrative iniziano qui. | Visibile, interagibile |
-| **Centro del villaggio** | Hub gestionale. Spawna quest casuali, gestisce reputazione, sblocca upgrade. | Visibile, interagibile |
-| **Taglialegna** | Edificio di produzione base. Assegni un artigiano → produce legname. Esempio di "work station" upgradabile. | Visibile, attivo dall'inizio |
-| *(opzionale 4° edificio: Fucina o Magazzino)* | Da definire in base alle ricompense reali del primo level up. | Da decidere W1 |
-
-**Regola dura per la slice:** **non si costruiscono nuovi edifici**. Gli edifici esistono già, all'avvio. L'unica evoluzione strutturale è l'**upgrade** di edifici esistenti.
+Il layout iniziale comprende:
+*   **Centro del villaggio (POI Permanente):** Il nucleo di controllo dell'avamposto. All'inizio serve principalmente come luogo di riposo per l'eroe per recuperare stamina.
+*   **Aree di Raccolta Base (POI Permanenti):**
+    *   *Taglialegna:* Consente di raccogliere Legno.
+    *   *Setacciare Oro:* Consente di raccogliere Oro.
+*   **Quest Ripetibile (POI Speciale):** Richiede un requisito specifico (**"Licenza di Caccia"**) che l'Eroe non possiede all'inizio, bloccandone l'esecuzione immediata.
+*   **Pannello di Controllo Villaggio (Village Screen):** Un menu overlay che mostra i blueprint disponibili. Il primo e fondamentale blueprint sbloccato è la **Locanda (Inn)**, acquistabile per 30 Oro e 40 Legno.
 
 ---
 
-## 4. POI sulla mappa
+## 4. POI sulla mappa & Eventi Dinamici
 
-Lo spazio attorno alla piazza centrale ospita due tipi di POI (Point of Interest):
+Lo spazio della mappa tattica (in stile *Dispatch*) ospita nodi interattivi (POI) che rappresentano attività e minacce:
 
-### 4.1 POI permanenti (legati a edifici)
+### 4.1 POI di Produzione (Permanenti)
+Nodi stabili in cui possono essere assegnati eroi o peasants per la produzione di risorse o il recupero di statistiche (es. Centro Villaggio per riposo, Taglialegna, Oro).
 
-Action card ricorrenti che vivono accanto al loro edificio.
-
-- **Job ripetibile**: "Taglia legna" (action card sopra l'edificio Taglialegna). Assegni un artigiano, parte un timer, alla fine ricevi legname.
-- **Quest narrativa edificio-driven**: "Pattuglia le rovine vicine" (dal Centro Villaggio). Assegni un eroe, parte il timer, skill check, outcome.
-
-Questi POI **restano sempre disponibili**. Sono il flusso di base.
-
-### 4.2 POI temporanei (spawnati nella mappa)
-
-Eventi che compaiono in posizioni libere della mappa e scadono dopo un tempo o un trigger.
-
-- **Mercante itinerante** (ogni X giorni): action card temporanea che permette scambi (vendere materiali → comprare equip / cibo / contratti eroi).
-- **Quest spawnate** dal centro del villaggio o eventi narrativi: "Cripta scoperta a nord-ovest — squadra di banditi avvistata — disturbo nei boschi".
-- **Eventi mistici / random encounter** (futuro): meteoriti, pellegrini, cacce al tesoro.
-
-Questi POI **sono pressione narrativa**: il giocatore deve decidere se rispondere mentre sono attivi, altrimenti scadono.
+### 4.2 POI Temporanei e Quest Urgenti (Ispirati a *Cultist Simulator*)
+Durante la partita, compaiono sulla mappa eventi e quest casuali che richiedono immediata attenzione:
+*   **Il Mercante Ambulante (Event Countdown):** Un widget di conto alla rovescia segnala l'arrivo imminente del mercante. Quando il countdown scade, il mercante appare come POI temporaneo per 1 giorno. È l'unico che vende la **Licenza di Caccia** per 30 Oro, consentendo di sbloccare la quest ripetibile.
+*   **Quest Urgenti (Expiring Quests):** Compaiono con un'anello esterno (halo) **rosso** che si svuota progressivamente. Se il tempo scade prima che l'Eroe venga assegnato allo slot, il POI svanisce. Se l'Eroe viene assegnato in tempo (e soddisfa i requisiti della quest), l'halo diventa **giallo** e inizia a riempirsi visualizzando il progresso del completamento. Se completate con successo, forniscono XP all'eroe e risorse rare.
 
 ---
 
@@ -138,52 +136,37 @@ Una "sessione tipica" del giocatore in slice Steam:
 7. **End of day**: edifici producono passivamente, eroi guariscono in taverna, day counter avanza.
 8. **Level up** (occasionale ma cruciale): un eroe sale di livello → upgrade di un edificio diventa disponibile → la macchina di produzione accelera.
 
-Il loop si ripete con sempre più contenuti sbloccati man mano che il villaggio cresce.
-
 ---
 
-## 7. Il "WoW moment" della slice
+## 7. Il "WoW moment" & Vittoria della slice
 
-L'utente lo ha indicato esplicitamente: **un eroe sale di livello e si sblocca l'upgrade di un edificio**.
-
-Significato di design:
-
-- Il giocatore vede una progressione **personale** (eroe più forte) e **strutturale** (villaggio più produttivo) in un unico evento.
-- Visivamente: animazione level up sul medaglione dell'eroe (anche solo un glow del ring + cambio skin bronze → silver), e un'icona "upgrade disponibile" che lampeggia sull'edificio.
-- Narrativamente: l'eroe ha portato fama → il villaggio attira più mercanti / più richieste / più lavoratori / migliori strumenti.
-
-È il primo momento in cui il giocatore **sente** che le sue scelte hanno costruito qualcosa.
+L'esperienza culmina in due momenti cruciali di progressione:
+1.  **L'Automazione (La Locanda):** Il giocatore, accumulando 30 Oro e 40 Legno con sforzi attivi (riposo e lavoro dell'Eroe), sblocca e costruisce la Locanda. Reclutando i **Peasants** e posizionandoli sui job stabili (Taglialegna e Setacciare Oro), sperimenta il sollievo dell'automazione passiva delle risorse base.
+2.  **Il Level Up & Fine Slice:** L'Eroe, ora libero dai lavori manuali e dotato della Licenza di Caccia, affronta ed esegue le Quest Urgenti a tempo. Risolvendo un numero target di quest (es. 3), accumula abbastanza XP da effettuare il **Level Up a Livello 2**. Questo sblocca un'animazione trionfale di vittoria e interrompe la Vertical Slice con un teaser del gioco completo.
 
 ---
 
 ## 8. Cosa la slice Steam mostra (e cosa no)
 
 ### 8.1 Mostra
+*   **Inizio in esilio:** Roster iniziale con 1 solo Eroe a stamina bassa (15/100).
+*   **Gestione stamina:** Loop iniziale di alternanza tra lavoro (Taglialegna/Oro) e riposo (Centro Villaggio).
+*   **Event Countdown:** Widget che conta i giorni/tick mancanti all'arrivo del Mercante Ambulante.
+*   **Il Mercante Temporaneo:** Visita del mercante con la possibilità di acquistare la "Licenza di Caccia" per 30 Oro.
+*   **Quest Ripetibile Sbloccata:** Esecuzione della quest speciale abilitata solo dopo l'acquisto della licenza.
+*   **Schermata Villaggio (Village Screen):** Interfaccia di acquisto e upgrade dei blueprint, in particolare la costruzione della Locanda.
+*   **Automazione con Peasants:** Reclutamento dei peasant alla Locanda e assegnamento permanente (senza stamina) a Taglialegna/Oro.
+*   **Quest Urgenti (FOMO):** Spawn di quest temporanee con halo rosso che si svuota e halo giallo che si riempie in fase di esecuzione.
+*   **Progressione & Livellamento:** Il Level Up dell'eroe come condizione di vittoria e completamento della demo.
 
-- Roster con 1-2 eroi iniziali + qualche artigiano.
-- 3-4 edifici interattivi (taverna, centro villaggio, taglialegna, +1 da definire).
-- Job ripetibili attivi dal minuto zero.
-- Mercante itinerante (almeno una visita durante la slice).
-- 2-3 quest D&D classiche con skill check Cultist Simulator-style.
-- Sistema di equipaggiamento minimo (comprare equip → migliorare stat → fare quest difficile).
-- Almeno **un level up + un upgrade edificio** durante la slice.
-- Reputazione che cresce, **un eroe nuovo che arriva spontaneamente alla taverna** come risultato.
-- Skill check estetica curata.
-
-### 8.2 Non mostra (out of scope per la slice)
-
-- Combattimento tattico (le quest si risolvono via skill check, non turn-based).
-- Costruzione di nuovi edifici da zero.
-- Multiplayer / cloud save.
-- Localizzazione completa (slice in EN con stub IT predisposto per dopo).
-- Tutorial scriptato (basta UI auto-esplicativa + tooltip).
-- Più di un biome / più di una mappa.
+### 8.2 Non mostra (out of scope per the slice)
+*   Combattimento tattico o visuale di scontro in tempo reale.
+*   Costruzione libera o posizionamento su griglia 3D degli edifici.
+*   Salvataggi multipli (slot) o persistenza cloud.
 
 ---
 
-## 9. Componenti già esistenti da usare (no reimplementazione)
-
-Mappa diretta visione → codice. Verificati nel repo.
+## 9. Componenti già esistenti da usare
 
 | Aspetto gameplay | Componente esistente | Path |
 | --- | --- | --- |
@@ -193,12 +176,13 @@ Mappa diretta visione → codice. Verificati nel repo.
 | Action card base | `ActionCardBase` | `src/ui/idleVillage/map/actionCards/ActionCardBase.tsx` |
 | Quest action card | `QuestCard` (via `QuestActionCard.tsx`) | `src/ui/idleVillage/map/actionCards/wrappers/QuestCard.tsx` |
 | Job action card | `JobCard` (via `JobActionCard.tsx`) | `src/ui/idleVillage/map/actionCards/wrappers/JobCard.tsx` |
-| Market action card | **TODO non implementato** | `src/ui/idleVillage/map/actionCards/MarketActionCard.tsx` |
-| Hook gestione action cards | `useActionCardsV2` | `src/ui/idleVillage/hooks/useActionCardsV2.ts` |
-| Resident state | Character → Resident pipeline (handoff §1.4) | `src/engine/game/idleVillage/TimeEngine.ts` + Village Resident Store |
-| Roster | `VillageRosterSection` | `src/ui/idleVillage/roster/...` |
+| Anello e Progresso Halo | `ActionHalo` | `src/ui/idleVillage/map/actionCards/ActionHalo.tsx` |
+| Roster personaggi | `VillageRosterSection` | `src/ui/idleVillage/roster/VillageRosterSection.tsx` |
 | Pagina canonical runtime | `MinimalGameplayPage` | `src/ui/idleVillage/MinimalGameplayPage.tsx` |
-| Surface route | `/minimal-gameplay` | confermata dall'handoff §1.3 |
+| Store di stato | `useMinimalGameplay` | `src/store/useMinimalGameplay.ts` |
+| Regole e Calcoli Engine | `minimalGameRules` | `src/engine/game/idleVillage/minimalGameRules.ts` |
+| Rotta di test | `/minimal-gameplay` | `src/ui/idleVillage/MinimalGameplayPage.tsx` |
+| Stili e Color Palette | WL-STY-004 e StyleLab presets | `src/ui/styleLab/presets/` |
 
 ---
 
