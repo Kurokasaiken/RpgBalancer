@@ -1,0 +1,30 @@
+{
+  "kitId": "rosterKit",
+  "version": "1.0.0",
+  "gitSha": "dd188ef3f0b16993818c10c82c5f162d7c5bd8ed",
+  "fixtureSha": "32244ae0e5b353338261716d9f56b058dc470aaa34f3b6efea5dcc705cc4630e",
+  "contractSha": "contract-verified-playwright-green-2026-05-21",
+  "certifiedAt": "2026-05-21T13:45:00+00:00",
+  "certifiedBy": "wave-1-day-6-playwright-sweep",
+  "evidence": [
+    {
+      "label": "vitest contract utilities",
+      "path": "tests/unit/frozen/contract.test.ts"
+    },
+    {
+      "label": "vitest cert manifest schema",
+      "path": "tests/unit/frozen/certManifest.test.ts"
+    },
+    {
+      "label": "vitest rosterKit DOM",
+      "path": "tests/unit/frozen/rosterKit.dom.test.tsx"
+    },
+    {
+      "label": "playwright contract sweep",
+      "path": "tests/contract/minimal-vs-test.spec.ts",
+      "result": "PASSED - reference /test and minimal /minimal-roster render identical subtree"
+    }
+  ],
+  "certified": true,
+  "notes": "Certified after Playwright contract sweep passed. The normalized subtree HTML from /test and /minimal-roster are identical. Contract subtree selector: [data-testid=\"village-roster-section\"]."
+}

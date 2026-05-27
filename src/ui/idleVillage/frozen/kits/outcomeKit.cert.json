@@ -1,0 +1,14 @@
+{
+  "kitId": "outcomeKit",
+  "version": "0.0.0",
+  "gitSha": "dd188ef3f0b16993818c10c82c5f162d7c5bd8ed",
+  "fixtureSha": "no-fixture",
+  "contractSha": "no-contract",
+  "certifiedAt": "2026-05-21T14:30:00+00:00",
+  "certifiedBy": "wave-1-batch-1-bootstrap",
+  "evidence": [
+    { "label": "canonical missing", "path": "n/a (no OutcomeModal.tsx)" }
+  ],
+  "certified": false,
+  "notes": "BLOCKED: no canonical OutcomeModal component exists. /minimal-outcome currently renders custom HTML. Freeze requires implementing the canonical component first."
+}

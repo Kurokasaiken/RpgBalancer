@@ -1,0 +1,14 @@
+{
+  "kitId": "skillCheckKit",
+  "version": "1.0.0",
+  "gitSha": "dd188ef3f0b16993818c10c82c5f162d7c5bd8ed",
+  "fixtureSha": "32244ae0e5b353338261716d9f56b058dc470aaa34f3b6efea5dcc705cc4630e",
+  "contractSha": "pending-playwright-run",
+  "certifiedAt": "2026-05-21T14:30:00+00:00",
+  "certifiedBy": "wave-1-batch-1-bootstrap",
+  "evidence": [
+    { "label": "playwright contract sweep (pending CI run)", "path": "tests/contract/minimal-vs-test.spec.ts" }
+  ],
+  "certified": false,
+  "notes": "Bootstrap. data-testid=\"skill-check-component\" added to canonical root 2026-05-21."
+}

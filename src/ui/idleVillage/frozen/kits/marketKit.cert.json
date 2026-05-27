@@ -1,0 +1,14 @@
+{
+  "kitId": "marketKit",
+  "version": "0.0.0",
+  "gitSha": "dd188ef3f0b16993818c10c82c5f162d7c5bd8ed",
+  "fixtureSha": "no-fixture",
+  "contractSha": "no-contract",
+  "certifiedAt": "2026-05-21T14:30:00+00:00",
+  "certifiedBy": "wave-1-batch-1-bootstrap",
+  "evidence": [
+    { "label": "canonical missing", "path": "src/ui/idleVillage/map/actionCards/MarketActionCard.tsx" }
+  ],
+  "certified": false,
+  "notes": "BLOCKED: canonical MarketActionCard is a TODO stub (only `export {};`). Freeze cannot proceed until the canonical component is implemented. Add to Wave 1 backlog as a prerequisite."
+}
