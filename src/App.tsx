@@ -14,6 +14,7 @@ const GameplayTestPage = lazy(() => import('./ui/idleVillage/components/Gameplay
 const GameplayTestSimple = lazy(() => import('./ui/idleVillage/components/GameplayTestSimple'));
 const GameplayTestMinimal = lazy(() => import('./ui/idleVillage/components/GameplayTestMinimal'));
 const TestRosterPage = lazy(() => import('./ui/idleVillage/TestRosterPage'));
+const TestHub = lazy(() => import('./ui/idleVillage/TestHub').then(m => ({ default: m.TestHub })));
 const IdleVillageConfigRoute = lazy(() => import('./pages/idle-village-config'));
 const StyleLabDemoPage = lazy(() => import('./pages/style-lab-demo'));
 const SkinLabPage = lazy(() => import('./pages/SkinLabPage'));
@@ -23,6 +24,8 @@ const TimeDaynightIntegrationPage = lazy(() => import('./ui/idleVillage/pages/Ti
 const DragPoiAssignmentPage = lazy(() => import('./ui/idleVillage/pages/DragPoiAssignmentPage'));
 // Minimal slice test pages (Phase 1-6)
 const MinimalPgCardPage = lazy(() => import('./pages/minimal-pgcard').then(m => ({ default: m.MinimalPgCardPage })));
+const TemplatePgCardPage = lazy(() => import('./pages/template-pgcard').then(m => ({ default: m.TemplatePgCardPage })));
+const TemplateRosterPage = lazy(() => import('./pages/template-roster').then(m => ({ default: m.TemplateRosterPage })));
 const MinimalSlottedMedalPage = lazy(() => import('./pages/minimal-slottedmedal').then(m => ({ default: m.MinimalSlottedMedalPage })));
 const MinimalRosterPage = lazy(() => import('./pages/minimal-roster').then(m => ({ default: m.default })));
 const MinimalClockPage = lazy(() => import('./pages/minimal-clock').then(m => ({ default: m.default })));
@@ -90,6 +93,7 @@ const ALLOWED_TABS: AppNavTabId[] = [
   'idleVillageConfig',
   'minimalGameplay',
   'test',
+  'testHub',
   'wanderlust',
 ];
 
@@ -113,6 +117,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/minimal';
   const isTestPath =
     typeof window !== 'undefined' && window.location.pathname === '/test';
+  const isTestHubPath =
+    typeof window !== 'undefined' && window.location.pathname === '/test-hub';
   const isSkinLabPath =
     typeof window !== 'undefined' && window.location.pathname === '/skin-lab';
   const isPoiDetailVerificationPath =
@@ -126,6 +132,10 @@ function App() {
   // Minimal slice test pages (Phase 1-6)
   const isMinimalPgCardPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-pgcard';
+  const isTemplatePgCardPath =
+    typeof window !== 'undefined' && window.location.pathname === '/template-pgcard';
+  const isTemplateRosterPath =
+    typeof window !== 'undefined' && window.location.pathname === '/template-roster';
   const isMinimalSlottedMedalPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-slottedmedal';
   const isMinimalRosterPath =
@@ -303,7 +313,35 @@ function App() {
     );
   }
 
+  if (isTestHubPath) {
+    return (
+      <ErrorBoundary componentName="Test Hub">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Test Hub…</div>}>
+          <TestHub />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
   // Minimal slice test pages (Phase 1+)
+  if (isTemplateRosterPath) {
+    return (
+      <ErrorBoundary componentName="Template Roster Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Template Roster…</div>}>
+          <TemplateRosterPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+  if (isTemplatePgCardPath) {
+    return (
+      <ErrorBoundary componentName="Template PgCard Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Template PgCard…</div>}>
+          <TemplatePgCardPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
   if (isMinimalPgCardPath) {
     return (
       <ErrorBoundary componentName="Minimal PgCard Page">
@@ -589,6 +627,13 @@ function App() {
           <ErrorBoundary componentName="Test Roster Page">
             <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Test Harness…</div>}>
               <TestRosterPage />
+            </Suspense>
+          </ErrorBoundary>
+        )}
+        {activeTab === 'testHub' && (
+          <ErrorBoundary componentName="Test Hub">
+            <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Test Hub…</div>}>
+              <TestHub />
             </Suspense>
           </ErrorBoundary>
         )}

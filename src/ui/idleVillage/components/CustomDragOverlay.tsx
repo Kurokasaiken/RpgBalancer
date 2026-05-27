@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { DragOverlay, type Modifier } from '@dnd-kit/core';
+import { DragOverlay, type Modifier, type DropAnimation, type DropAnimationFunctionArguments } from '@dnd-kit/core';
 import { useDragContext } from './DragContextStore';
 import { useDragPreviewInstrumentation } from '@/ui/idleVillage/hooks/useDragPreviewInstrumentation';
 import { WanderlustMedalOverlay } from './WanderlustMedalOverlay';
 import { getDragConfig } from '../config/dragConfig';
 import WorkerCard from './WorkerCard';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
-import { getEventCoordinates } from '@dnd-kit/utilities';
+import { getEventCoordinates, CSS } from '@dnd-kit/utilities';
 import { getResidentPortraitUrl } from '@/engine/game/idleVillage/residentVisualResolver';
 
 interface DragOverlayContentProps {
@@ -81,6 +81,95 @@ interface CustomDragOverlayProps {
     residentId?: string;
   };
 }
+
+// Drop animation: spring the overlay CENTER back to the CENTER of the original PgCard.
+//
+// ROOT CAUSE of the previous bug:
+//   When the drag ends, dnd-kit's AnimationManager clones the last PositionedOverlay
+//   and re-renders it inside NullifiedContextProvider, which injects
+//   `ActiveDraggableContext = {x:0, y:0}`. Our modifier snapOverlayCenterToCursor
+//   then runs on that zero-delta and positions the clone at the INITIAL CLICK OFFSET
+//   from the card top-left — not at the current cursor/release position.
+//   Reading getBoundingClientRect() or getComputedStyle() at that point therefore
+//   returns the initial-click position, not where the user let go.
+//
+// THE FIX:
+//   1. Store the EXACT cursor position on every pointermove AND on pointerup
+//      (capture phase) into window.__lastDragPosition.
+//   2. In the DropAnimationFunction, derive both keyframes in absolute viewport
+//      coordinates and convert to the clone's local transform space by subtracting
+//      the clone's base CSS top/left (which dnd-kit sets from initialRect).
+//
+// COORDINATE ALGEBRA (viewport-relative):
+//   clone base position: (baseLeft, baseTop) = clone.style.left/.top
+//   START keyframe: cursor at release = __lastDragPosition
+//     since snapOverlayCenterToCursor places medal center at cursor:
+//     containerLeft = cursorX − medalSize/2
+//     startTransform.x = containerLeft − baseLeft = cursorX − medalSize/2 − baseLeft
+//   END keyframe: PgCard center
+//     containerLeft = cardCenterX − medalSize/2
+//     endTransform.x = containerLeft − baseLeft = cardCenterX − medalSize/2 − baseLeft
+const centerReturnDropAnimation: DropAnimation = ({
+  active,
+  dragOverlay,
+}: DropAnimationFunctionArguments): Promise<void> => {
+  const medalSize = getDragConfig().overlay.medalSizePx;
+  const halfMedal = medalSize / 2;
+
+  // Base CSS position of the clone (initialRect stored as inline style by dnd-kit).
+  const baseLeft = parseFloat((dragOverlay.node as HTMLElement).style.left || '0');
+  const baseTop  = parseFloat((dragOverlay.node as HTMLElement).style.top  || '0');
+
+  // START: where the medal center was when the user released (viewport coords).
+  // __lastDragPosition is written on every pointermove + pointerup capture.
+  const lastPos = (window as any).__lastDragPosition as { x: number; y: number } | undefined;
+  const startCenterX = lastPos?.x ?? (baseLeft + halfMedal);
+  const startCenterY = lastPos?.y ?? (baseTop  + halfMedal);
+
+  // END: center of the PgCard (live measurement from dnd-kit, scroll-safe).
+  const endCenterX = active.rect.left + active.rect.width  / 2;
+  const endCenterY = active.rect.top  + active.rect.height / 2;
+
+  // Convert viewport centers to clone-local transforms:
+  //   containerTopLeft = center − halfMedal  →  transform = containerTopLeft − base
+  const startTransform = {
+    x: startCenterX - halfMedal - baseLeft,
+    y: startCenterY - halfMedal - baseTop,
+    scaleX: 1,
+    scaleY: 1,
+  };
+  const endTransform = {
+    x: endCenterX - halfMedal - baseLeft,
+    y: endCenterY - halfMedal - baseTop,
+    scaleX: 1,
+    scaleY: 1,
+  };
+
+  // Dim source card while overlay flies back.
+  const prevOpacity = active.node.style.getPropertyValue('opacity');
+  active.node.style.setProperty('opacity', '0.5');
+
+  const animation = dragOverlay.node.animate(
+    [
+      { opacity: 1, transform: CSS.Transform.toString(startTransform) },
+      { opacity: 0, transform: CSS.Transform.toString(endTransform) },
+    ],
+    {
+      duration: 250,
+      easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
+      fill: 'forwards',
+    },
+  );
+
+  return new Promise<void>((resolve) => {
+    const cleanup = () => {
+      active.node.style.setProperty('opacity', prevOpacity);
+      resolve();
+    };
+    animation.onfinish = cleanup;
+    animation.oncancel = cleanup;
+  });
+};
 
 // Custom modifier that aligns overlay center to cursor pickup position.
 //
@@ -248,15 +337,25 @@ export function CustomDragOverlay({
 
     const handlePointerMove = (e: PointerEvent) => {
       const pos = { x: e.clientX, y: e.clientY };
+      // Store release position for drop animation (read by centerReturnDropAnimation).
+      (window as any).__lastDragPosition = pos;
       setCursorPosition(pos);
       // With snapCenterToCursor, the overlay center should be at cursor position
       setDragPreviewCenter(pos);
       dispatchSyntheticDragOver(pos);
     };
 
+    // Capture the EXACT release coordinates before dnd-kit's pointerup handler
+    // fires and changes activeId (which would clean up this effect too early).
+    const handlePointerUp = (e: PointerEvent) => {
+      (window as any).__lastDragPosition = { x: e.clientX, y: e.clientY };
+    };
+
     window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp, { capture: true });
     return () => {
       window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp, { capture: true });
       setCursorPosition(null);
     };
   }, [activeId, setDragPreviewCenter]);
@@ -353,6 +452,7 @@ export function CustomDragOverlay({
   return (
     <DragOverlay
       modifiers={[snapOverlayCenterToCursor]}
+      dropAnimation={centerReturnDropAnimation}
     >
       {activeId ? (
         <div

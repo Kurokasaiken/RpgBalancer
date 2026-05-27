@@ -131,6 +131,7 @@ export function QuestCard({
 
   return (
     <div
+      data-testid="quest-card"
       className={`quest-card ${className}`}
       style={{
         backgroundColor: config.visual.backgroundColor,

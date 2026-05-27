@@ -68,8 +68,9 @@ export const SlotRackWithSkin: React.FC<SlotRackWithSkinProps> = ({
 
   return (
     <SkinSlot binding={SLOT_COMPONENT_BINDING}>
-      <div 
+      <div
         className="slot-rack-with-skin-wrapper"
+        data-testid="slot-rack-with-skin"
         data-skin-id={skinId}
         data-rack-type={rackType}
         data-slot-count={slotCount}

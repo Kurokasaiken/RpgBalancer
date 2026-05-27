@@ -166,52 +166,23 @@ const PgCard = memo<PgCardProps>(({
         width: rect.width,
         height: rect.height,
       };
-    }
 
-    // Store home center for snap-back animation at REAL portrait position
-    // Find and measure the actual portrait DOM node
-    let portraitCenterX = 0, portraitCenterY = 0;
-    
-    // Find the actual portrait DOM node within the card
-    const portraitNode = event.currentTarget.querySelector('[aria-hidden="true"]') as HTMLElement;
-    
-    if (portraitNode) {
-      // Measure the REAL portrait bounding rect
-      const portraitRect = portraitNode.getBoundingClientRect();
-      
-      // Calculate portrait center relative to the card
-      portraitCenterX = portraitRect.left - rect.left + portraitRect.width / 2;
-      portraitCenterY = portraitRect.top - rect.top + portraitRect.height / 2;
-      
-      console.log('REAL portrait measurement:', {
-        portraitRect: {
-          left: portraitRect.left,
-          top: portraitRect.top,
-          width: portraitRect.width,
-          height: portraitRect.height
-        },
-        portraitCenterRelativeToCard: { x: portraitCenterX, y: portraitCenterY }
-      });
-    } else {
-      // Fallback to estimated values if portrait node not found
-      console.warn('Portrait node not found, using fallback estimation');
-      const isHorizontalCard = horizontal;
-      const portraitWidth = isHorizontalCard ? 56 : 64;
-      const portraitHeight = isHorizontalCard ? 32 : 40;
-      
-      portraitCenterX = isHorizontalCard ? portraitWidth / 2 : rect.width - 16 - portraitWidth / 2;
-      portraitCenterY = portraitHeight / 2;
-    }
-    
-    setDragHomeCenter({
-      x: rect.left + portraitCenterX,
-      y: rect.top + portraitCenterY,
-    });
-    
-    // Set transform origin dynamically for accurate spring-back
-    const transformOriginValue = `${portraitCenterX}px ${portraitCenterY}px`;
-    if (cardRef.current) {
-      cardRef.current.style.transformOrigin = transformOriginValue;
+      // Calculate and store the REAL portrait center for spring-back animation
+      // This is the authoritative anchor point - CustomDragOverlay MUST NOT overwrite this
+      const portraitImg = event.currentTarget.querySelector('img');
+      if (portraitImg) {
+        const portraitRect = portraitImg.getBoundingClientRect();
+        (window as any).__dragHomeCenter = {
+          x: portraitRect.left + portraitRect.width / 2,
+          y: portraitRect.top + portraitRect.height / 2,
+        };
+      } else {
+        // Fallback: use card center if no portrait image found
+        (window as any).__dragHomeCenter = {
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2,
+        };
+      }
     }
 
     if (!dragImageRef.current || !dragPreviewReady) {
