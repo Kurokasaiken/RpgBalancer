@@ -42,6 +42,7 @@ export function JobCard({
 }: JobCardProps) {
   return (
     <ActionCardBase
+      dataTestId="job-card"
       label={rest.label}
       icon={rest.icon}
       subtitle={rest.subtitle}

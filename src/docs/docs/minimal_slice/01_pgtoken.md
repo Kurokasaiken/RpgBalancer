@@ -1,10 +1,18 @@
 # Phase 1: PgToken — Isolated Entity Specification
 
-**Phase:** 1 of 6  
-**Estimated Duration:** 2-3 days  
-**Entità:** PgToken (draggable medaglione visual)  
-**Page Route:** `/minimal-pgtoken`  
-**Last Updated:** 2026-05-20
+**Phase:** 1 of 6
+**Estimated Duration:** 2-3 days
+**Entità:** PgToken (draggable medaglione visual)
+**Page Route:** `/minimal-pgtoken`
+**Test Page Requirement:** MUST use real project components (PgCard) with mock data
+**Last Updated:** 2026-05-21
+
+---
+
+**Aligned with Master Plan:** See [MASTER_PLAN.md](../MASTER_PLAN.md) for separation of concerns (plans vs tasks)
+**Aligned with Semantic Constraints:** See [context/RPG_PROJECT_CONTEXT.md](../../context/RPG_PROJECT_CONTEXT.md) for freezing semantics
+**Aligned with Roster-Slot Integration:** See [roster_slot_integration_spec.md](../idle_village/roster_slot_integration_spec.md) for complete drag-and-drop integration (Phases 2+)
+**Aligned with Character-Resident Contract:** See [character_resident_trusted.md](../idle_village/trusted/character_resident_trusted.md) for Character → Resident conversion
 
 ---
 

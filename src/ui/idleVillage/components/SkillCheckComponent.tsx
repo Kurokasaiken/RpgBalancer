@@ -68,6 +68,7 @@ export function SkillCheckComponent({
 
   return (
     <div
+      data-testid="skill-check-component"
       style={{
         padding: '30px',
         textAlign: 'center',

@@ -691,7 +691,12 @@ export const ResidentSlotRack: React.FC<ResidentSlotRackProps> = ({
   }, [layout, overflowEnabled]);
 
   return (
-    <div className={rackClassName} aria-live="polite" style={rackShellStyle}>
+    <div
+      className={rackClassName}
+      aria-live="polite"
+      style={rackShellStyle}
+      data-testid="resident-slot-rack-root"
+    >
       {isOverflowing && showLeftFade && (
         <div
           className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8"

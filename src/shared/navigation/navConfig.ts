@@ -6,7 +6,7 @@ const BASE_APP_NAV_TAB_IDS = [
   'idleVillageConfig',
   'minimalGameplay',
   'test',
-  'skinLab',
+  'testHub',
   'moodboard',
   'promptBible',
   'styleLabDemo',
@@ -38,7 +38,7 @@ const NAV_ITEM_MAP: Record<AppNavTabId, AppNavItem> = {
   idleVillageConfig: { id: 'idleVillageConfig', label: 'Idle Village Config', icon: '🏘️' },
   minimalGameplay: { id: 'minimalGameplay', label: 'Minimal Gameplay', icon: '🌒' },
   test: { id: 'test', label: 'Test', icon: '🧪' },
-  skinLab: { id: 'skinLab', label: 'Skin Lab', icon: '🧬' },
+  testHub: { id: 'testHub', label: 'Test Hub', icon: '�' },
   moodboard: { id: 'moodboard', label: 'Moodboard', icon: '🖼️' },
   promptBible: { id: 'promptBible', label: 'Prompt & Bible', icon: '📜' },
   styleLabDemo: { id: 'styleLabDemo', label: 'Style Lab Demo', icon: '🎨' },
@@ -59,7 +59,7 @@ const NAV_SECTION_DEFS: { title: string; itemIds: AppNavTabId[] }[] = [
   },
   {
     title: 'Idle Village',
-    itemIds: ['minimalGameplay', 'idleVillageConfig', 'test', 'skinLab'],
+    itemIds: ['minimalGameplay', 'idleVillageConfig', 'test', 'testHub'],
   },
   {
     title: 'Content',
