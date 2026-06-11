@@ -18,14 +18,12 @@ const TestHub = lazy(() => import('./ui/idleVillage/TestHub').then(m => ({ defau
 const IdleVillageConfigRoute = lazy(() => import('./pages/idle-village-config'));
 const StyleLabDemoPage = lazy(() => import('./pages/style-lab-demo'));
 const SkinLabPage = lazy(() => import('./pages/SkinLabPage'));
-const PoiDetailVerificationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailVerificationPage'));
-const PoiStandardDetailIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiStandardDetailIntegrationPage'));
-const TimeDaynightIntegrationPage = lazy(() => import('./ui/idleVillage/pages/TimeDaynightIntegrationPage'));
-const DragPoiAssignmentPage = lazy(() => import('./ui/idleVillage/pages/DragPoiAssignmentPage'));
+const PoiDetailVerificationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailVerificationPage').then(m => ({ default: m.PoiDetailVerificationPage })));
+const PoiStandardDetailIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiStandardDetailIntegrationPage').then(m => ({ default: m.PoiStandardDetailIntegrationPage })));
+const TimeDaynightIntegrationPage = lazy(() => import('./ui/idleVillage/pages/TimeDaynightIntegrationPage').then(m => ({ default: m.TimeDaynightIntegrationPage })));
+const DragPoiAssignmentPage = lazy(() => import('./ui/idleVillage/pages/DragPoiAssignmentPage').then(m => ({ default: m.DragPoiAssignmentPage })));
 // Minimal slice test pages (Phase 1-6)
 const MinimalPgCardPage = lazy(() => import('./pages/minimal-pgcard').then(m => ({ default: m.MinimalPgCardPage })));
-const TemplatePgCardPage = lazy(() => import('./pages/template-pgcard').then(m => ({ default: m.TemplatePgCardPage })));
-const TemplateRosterPage = lazy(() => import('./pages/template-roster').then(m => ({ default: m.TemplateRosterPage })));
 const MinimalSlottedMedalPage = lazy(() => import('./pages/minimal-slottedmedal').then(m => ({ default: m.MinimalSlottedMedalPage })));
 const MinimalRosterPage = lazy(() => import('./pages/minimal-roster').then(m => ({ default: m.default })));
 const MinimalClockPage = lazy(() => import('./pages/minimal-clock').then(m => ({ default: m.default })));
@@ -132,10 +130,6 @@ function App() {
   // Minimal slice test pages (Phase 1-6)
   const isMinimalPgCardPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-pgcard';
-  const isTemplatePgCardPath =
-    typeof window !== 'undefined' && window.location.pathname === '/template-pgcard';
-  const isTemplateRosterPath =
-    typeof window !== 'undefined' && window.location.pathname === '/template-roster';
   const isMinimalSlottedMedalPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-slottedmedal';
   const isMinimalRosterPath =
@@ -324,24 +318,6 @@ function App() {
   }
 
   // Minimal slice test pages (Phase 1+)
-  if (isTemplateRosterPath) {
-    return (
-      <ErrorBoundary componentName="Template Roster Page">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Template Roster…</div>}>
-          <TemplateRosterPage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
-  if (isTemplatePgCardPath) {
-    return (
-      <ErrorBoundary componentName="Template PgCard Page">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Template PgCard…</div>}>
-          <TemplatePgCardPage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
   if (isMinimalPgCardPath) {
     return (
       <ErrorBoundary componentName="Minimal PgCard Page">
