@@ -604,8 +604,9 @@ function recomputeGeometry(skillIndex=0){
   /* keep a single tst for the verdict roll (skill resolved at landing) */
   const skill=skills.length>0?skills[Math.min(skillIndex,skills.length-1)]:{stat:60,difficulty:55};
   geo.tst=clamp(50+(skill.stat-skill.difficulty),1,99);
-  const failSpan=Math.max(0,100-(geo.tst+5));
-  geo.epicW=Math.max(5,(R-geo.rTip)*((failSpan*cfg.crit/100)/100)*3+5);
+  /* critical-fail band thickness — purely proportional to the arena radius and
+     scaled by crit% (like the wound/death sectors). No fixed pixel values. */
+  geo.epicW=(R-3)*clamp(cfg.crit/100,0.04,0.5);
   /* wedges: dead centered at 12 o'clock, wounded adjacent clockwise, 6° gap */
   const dA=Math.max(.14,TAU*cfg.dead/100);
   const wA=Math.max(.14,TAU*cfg.wound/100);
@@ -1200,7 +1201,7 @@ const gooBubbles=Array.from({length:6},(_,i)=>({ph:i*1.55,sp:.12+i*.035,rad:2.6+
    from the centre. So the goo is the annulus between the black-obelisk line
    (rCheckAt, never intruding past the flower) and the arena rim. */
 function gooInnerAt(a,rev){
-  const base=Math.max(rCheckAt(a), rStarAt(a)+2);   // never cover the flower
+  const base=rCheckAt(a);                            // lap up to the BLACK obelisks (the check)
   return (R-3) + (base-(R-3))*rev;                   // rev0→rim (no goo) … rev1→checks
 }
 function gooAnnulusPath(rev){
@@ -1279,7 +1280,7 @@ function drawGoo(now){
      with a readable minimum so it is always clearly visible. */
   ctx.save();
   const pul=.5+.5*Math.sin(t*2.2);
-  const ew=Math.max(18,geo.epicW);
+  const ew=geo.epicW;
   const cg=ctx.createRadialGradient(CX,CY,R-3-ew,CX,CY,R-3);
   cg.addColorStop(0,'rgba(90,8,28,0)');
   cg.addColorStop(.55,`rgba(150,18,44,${(.55+.2*pul).toFixed(3)})`);

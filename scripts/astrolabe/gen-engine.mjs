@@ -115,6 +115,13 @@ ${js}
     if(newSkills){ skills = newSkills.slice(); recomputeSkillAxes(); }
     if(newConfig){ Object.assign(cfg, newConfig); }
     recomputeGeometry();
+    /* reposition existing obelisks live to the new per-axis radii (keep drop state) */
+    if(scene.whitePillars && scene.whitePillars.length){
+      for(let i=0;i<scene.whitePillars.length;i+=1){
+        if(geo.axisTip[i]!=null) scene.whitePillars[i].r=geo.axisTip[i];
+        if(geo.axisCheck[i]!=null) scene.blackPillars[i].r=geo.axisCheck[i];
+      }
+    }
   }
   function destroy(){ cancelAnimationFrame(rafId); }
   return { roll: launchRoll, setConfig, destroy };
