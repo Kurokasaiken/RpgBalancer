@@ -931,13 +931,34 @@ function stepBall(p,snapPhase){
     b.vx=(b.vx+mx/md*k*f)*fric;
     b.vy=(b.vy+my/md*k*f)*fric;
     b.x+=b.vx*f; b.y+=b.vy*f;
-    /* arena wall bounce — high restitution = lively, repeated rim slams */
+    /* chaos amount: full while the ball is wild, fades as steering takes over */
+    const chaos=1-steer;
+    /* NON-SPECULAR bounce off normal (nx,ny): reflect, then scatter the
+       outgoing angle + add tangential spin + random restitution, so the
+       rebound is never a clean mirror of the incoming path. A guard re-reflects
+       if the scatter would send the ball back through the surface. */
+    const chaoticBounce=(nx,ny,extra)=>{
+      const dot=b.vx*nx+b.vy*ny;
+      if(extra && dot>=0) return false;           // pillar: only bounce when approaching
+      b.vx-=2*dot*nx; b.vy-=2*dot*ny;             // base reflection
+      const ang=(Math.random()*2-1)*0.55*chaos;   // ±~31° random scatter
+      const cs=Math.cos(ang), sn=Math.sin(ang);
+      const rvx=b.vx*cs-b.vy*sn, rvy=b.vx*sn+b.vy*cs;
+      b.vx=rvx; b.vy=rvy;
+      const tx=-ny, ty=nx;                          // tangential spin kick
+      const spin=(Math.random()*2-1)*2.6*chaos;
+      b.vx+=tx*spin; b.vy+=ty*spin;
+      const rest=0.92+Math.random()*0.08;          // 0.92–1.0, no two alike
+      b.vx*=rest; b.vy*=rest;
+      const od=b.vx*nx+b.vy*ny;                     // guard: don't tunnel through
+      if(od>0){ b.vx-=2*od*nx; b.vy-=2*od*ny; }
+      return true;
+    };
+    /* arena wall bounce — lively, repeated, chaotic rim slams */
     const d=dist(b.x,b.y);
     if(d>R-12){
       const nx=(b.x-CX)/d, ny=(b.y-CY)/d;
-      const dot=b.vx*nx+b.vy*ny;
-      b.vx-=2*dot*nx; b.vy-=2*dot*ny;
-      b.vx*=0.992; b.vy*=0.992;
+      chaoticBounce(nx,ny,false);
       b.x=CX+nx*(R-12); b.y=CY+ny*(R-12);
       scene.rimHits.push({ang:Math.atan2(ny,nx),life:600});
       addSpark(b.x,b.y);
@@ -950,10 +971,7 @@ function stepBall(p,snapPhase){
         const dx=b.x-px, dy=b.y-py, dd=Math.hypot(dx,dy);
         if(dd<24){
           const nx=dx/(dd||1), ny=dy/(dd||1);
-          const dot=b.vx*nx+b.vy*ny;
-          if(dot<0){ b.vx-=2*dot*nx; b.vy-=2*dot*ny; }
-          b.x=px+nx*24; b.y=py+ny*24;
-          pl.flash=1; addSpark(b.x,b.y);
+          if(chaoticBounce(nx,ny,true)!==false){ b.x=px+nx*24; b.y=py+ny*24; pl.flash=1; addSpark(b.x,b.y); }
         }
       });
     }
