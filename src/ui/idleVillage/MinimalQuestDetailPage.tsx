@@ -12,11 +12,22 @@ import {
   buildQuestChroniclePhases,
   createInitialQuestState,
 } from '@/ui/idleVillage/questChronicleHelpers';
+import { AltVisualsV6Asterism } from '@/ui/testing/AltVisualsV6Asterism';
+import type { AltVisualsV6OutcomeEvent } from '@/ui/testing/AltVisualsV6Asterism';
+import type { StatRow } from '@/ui/testing/types';
 import { SkinSystemProvider } from '@/ui/idleVillage/hooks/useSkinSystem';
 import { SandboxTimingProvider } from '@/ui/idleVillage/hooks/useSandboxTimingBridge';
 
 const BLUEPRINT_ID = 'quest_city_rats';
 const TICK_MS = 800;
+
+const FAKE_STATS: StatRow[] = [
+  { id: 'combat', name: 'Combattimento', questValue: 65, heroValue: 58, isDetrimental: false },
+  { id: 'stealth', name: 'Furtività', questValue: 45, heroValue: 38, isDetrimental: false },
+  { id: 'endurance', name: 'Resistenza', questValue: 70, heroValue: 55, isDetrimental: false },
+  { id: 'perception', name: 'Percezione', questValue: 50, heroValue: 42, isDetrimental: false },
+  { id: 'luck', name: 'Fortuna', questValue: 30, heroValue: 25, isDetrimental: false },
+];
 
 // Fake party for power resolution. Brando is NOT a hero yet: surviving a
 // high-risk phase (Trial of Fire) can promote him during the simulation.
@@ -76,16 +87,16 @@ export default function MinimalQuestDetailPage(): JSX.Element {
   const [ticksInPhase, setTicksInPhase] = useState(0);
   const [lastOutcome, setLastOutcome] = useState<QuestOutcome | null>(null);
   const [log, setLog] = useState<string[]>([]);
+  const [skillCheckActive, setSkillCheckActive] = useState(false);
+  const [skillCheckKey, setSkillCheckKey] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const questStateRef = useRef<QuestState | null>(null);
   const ticksRef = useRef(0);
-  // Mutable party state across phases: injuries, deaths, survival counts and
-  // hero promotion (Trial of Fire) accumulate during the simulation.
   const partyRef = useRef(FAKE_PARTY.map((m) => ({ ...m, dead: false })));
   const xpAwardedRef = useRef(0);
   questStateRef.current = questState;
 
-  const isRunning = questState?.status === 'in_progress';
+  const isRunning = questState?.status === 'in_progress' && !skillCheckActive;
 
   const resolvePhaseOutcome = useCallback((): { outcome: QuestOutcome; power: QuestPowerResult | null } => {
     const rules = idleVillageConfig.globalRules?.questPowerRules;
@@ -117,6 +128,7 @@ export default function MinimalQuestDetailPage(): JSX.Element {
     setQuestState(null);
     setTicksInPhase(0);
     setLastOutcome(null);
+    setSkillCheckActive(false);
     setLog([]);
     if (intervalRef.current) clearInterval(intervalRef.current);
   }, []);
@@ -142,68 +154,87 @@ export default function MinimalQuestDetailPage(): JSX.Element {
         return;
       }
 
-      // Phase finished — resolve once and advance via existing helper
-      const { outcome, power } = resolvePhaseOutcome();
-      const result = outcomeToPhaseResult(outcome);
-      const next = applyPhaseResult({ state, blueprint, result });
-      ticksRef.current = 0;
-      setTicksInPhase(0);
-      setLastOutcome(outcome);
-      setQuestState(next);
-
-      const entries: string[] = [`[Fase ${state.currentPhaseIndex + 1}] "${phase.title}" — ${outcomeLabel(outcome)}`];
-
-      // Per-character consequences (injury/death) from the power engine,
-      // plus Trial of Fire survival tracking and hero promotion.
-      const trialRules = idleVillageConfig.globalRules?.trialOfFire;
-      const phaseDeathRisk = (phase.riskProfile?.deathChance ?? 0) / 100;
-      for (const member of partyRef.current) {
-        if (member.dead) continue;
-        const consequence = power?.consequences.find((c) => c.residentId === member.id)?.consequence ?? 'none';
-        if (consequence === 'dead') {
-          member.dead = true;
-          entries.push(`☠ ${member.name} è MORTO durante "${phase.title}".`);
-          continue;
-        }
-        if (consequence === 'injured') {
-          member.isInjured = true;
-          entries.push(`🩸 ${member.name} è rimasto ferito.`);
-        }
-        // Survived the phase: Trial of Fire bookkeeping.
-        member.survivalCount += 1;
-        member.survivalScore += Math.round(phaseDeathRisk * 100);
-        if (!member.isHero && trialRules) {
-          const qualifiesByRisk = phaseDeathRisk >= (trialRules.highRiskThreshold ?? 0.25);
-          const threshold = trialRules.heroSurvivalThreshold;
-          const qualifiesByCount = typeof threshold === 'number' && member.survivalCount >= threshold;
-          if (qualifiesByRisk || qualifiesByCount) {
-            member.isHero = true;
-            entries.push(`🔥 Prova del Fuoco: ${member.name} è sopravvissuto e viene promosso a EROE!`);
-          }
-        }
-      }
-
-      if (next.status === 'completed') {
-        // XP award mirrors QuestResolver: baseXpPerLevel * level * rewardMultiplier.
-        const xpFormula = idleVillageConfig.globalRules?.questXpFormula;
-        const baseXpPerLevel = xpFormula && /^\d+$/.test(xpFormula.trim()) ? Number.parseInt(xpFormula.trim(), 10) : 10;
-        const level = typeof activity?.level === 'number' ? activity.level : 1;
-        const xpAwarded = Math.round(baseXpPerLevel * level * (power?.rewardMultiplier ?? 1));
-        xpAwardedRef.current = xpAwarded;
-        entries.push(`Quest "${blueprint.name}" COMPLETATA! +${xpAwarded} XP`);
-        const rewards = activity?.rewards ?? blueprint.rewards?.resources ?? [];
-        if (Array.isArray(rewards) && rewards.length > 0) {
-          entries.push(
-            `Ricompense: ${rewards.map((r: { resourceId: string; amountFormula?: string }) => `${r.resourceId} ×${r.amountFormula ?? '?'}`).join(', ')}`,
-          );
-        }
-      }
-      if (next.status === 'failed') entries.push(`Quest "${blueprint.name}" FALLITA.`);
-      setLog((l) => [...l, ...entries]);
+      // Phase ticks complete — pause and trigger skill check animation
+      setTicksInPhase(phase.durationValue);
+      setSkillCheckActive(true);
+      setSkillCheckKey((k) => k + 1);
+      if (intervalRef.current) clearInterval(intervalRef.current);
     }, TICK_MS);
 
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [isRunning, blueprint, resolvePhaseOutcome, idleVillageConfig, activity]);
+
+  const handleV6Outcome = useCallback((event: AltVisualsV6OutcomeEvent) => {
+    const state = questStateRef.current;
+    if (!state || state.status !== 'in_progress') return;
+    const phase = blueprint.phases[state.currentPhaseIndex];
+    if (!phase) return;
+
+    const rollNormalized = Math.round(event.roll);
+    const isCrit = rollNormalized >= 95;
+    const isFumble = rollNormalized <= 5;
+
+    let outcome: QuestOutcome;
+    if (isCrit) outcome = 'perfect';
+    else if (event.success) outcome = 'success';
+    else if (isFumble) outcome = 'deadly';
+    else outcome = 'fail';
+
+    const result = outcomeToPhaseResult(outcome);
+    const next = applyPhaseResult({ state, blueprint, result });
+    ticksRef.current = 0;
+    setTicksInPhase(0);
+    setLastOutcome(outcome);
+    setQuestState(next);
+    setSkillCheckActive(false);
+
+    const entries: string[] = [`[Fase ${state.currentPhaseIndex + 1}] "${phase.title}" — ${outcomeLabel(outcome)} (roll: ${rollNormalized}, ${event.success ? 'nella stella' : 'fuori dalla stella'})`];
+
+    const trialRules = idleVillageConfig.globalRules?.trialOfFire;
+    const phaseDeathRisk = (phase.riskProfile?.deathChance ?? 0) / 100;
+    const { power } = resolvePhaseOutcome();
+    for (const member of partyRef.current) {
+      if (member.dead) continue;
+      const consequence = power?.consequences.find((c: any) => c.residentId === member.id)?.consequence ?? 'none';
+      if (consequence === 'dead') {
+        member.dead = true;
+        entries.push(`☠ ${member.name} è MORTO durante "${phase.title}".`);
+        continue;
+      }
+      if (consequence === 'injured') {
+        member.isInjured = true;
+        entries.push(`🩸 ${member.name} è rimasto ferito.`);
+      }
+      member.survivalCount += 1;
+      member.survivalScore += Math.round(phaseDeathRisk * 100);
+      if (!member.isHero && trialRules) {
+        const qualifiesByRisk = phaseDeathRisk >= (trialRules.highRiskThreshold ?? 0.25);
+        const threshold = trialRules.heroSurvivalThreshold;
+        const qualifiesByCount = typeof threshold === 'number' && member.survivalCount >= threshold;
+        if (qualifiesByRisk || qualifiesByCount) {
+          member.isHero = true;
+          entries.push(`🔥 Prova del Fuoco: ${member.name} è sopravvissuto e viene promosso a EROE!`);
+        }
+      }
+    }
+
+    if (next.status === 'completed') {
+      const xpFormula = idleVillageConfig.globalRules?.questXpFormula;
+      const baseXpPerLevel = xpFormula && /^\d+$/.test(xpFormula.trim()) ? Number.parseInt(xpFormula.trim(), 10) : 10;
+      const level = typeof activity?.level === 'number' ? activity.level : 1;
+      const xpAwarded = Math.round(baseXpPerLevel * level * (power?.rewardMultiplier ?? 1));
+      xpAwardedRef.current = xpAwarded;
+      entries.push(`Quest "${blueprint.name}" COMPLETATA! +${xpAwarded} XP`);
+      const rewards = activity?.rewards ?? blueprint.rewards?.resources ?? [];
+      if (Array.isArray(rewards) && rewards.length > 0) {
+        entries.push(
+          `Ricompense: ${rewards.map((r: { resourceId: string; amountFormula?: string }) => `${r.resourceId} ×${r.amountFormula ?? '?'}`).join(', ')}`,
+        );
+      }
+    }
+    if (next.status === 'failed') entries.push(`Quest "${blueprint.name}" FALLITA.`);
+    setLog((l) => [...l, ...entries]);
+  }, [blueprint, resolvePhaseOutcome, idleVillageConfig, activity]);
 
   const chronicle = useMemo(
     () => buildQuestChroniclePhases({ blueprint, questState }),
@@ -267,6 +298,64 @@ export default function MinimalQuestDetailPage(): JSX.Element {
           outcome={chronicleOutcome}
           questDone={questDone}
         />
+
+        {/* Skill Check V6 Asterism overlay */}
+        {skillCheckActive && activePhase && (
+          <div className="rounded-3xl border border-amber-400/30 bg-black/60 p-4">
+            <p className="mb-2 text-center text-[9px] uppercase tracking-[0.4em] text-amber-200/60">
+              Prova di Abilità — {activePhase.title}
+            </p>
+            <AltVisualsV6Asterism
+              key={skillCheckKey}
+              stats={FAKE_STATS}
+              enablePerfectStarToggle={false}
+              onOutcome={handleV6Outcome}
+            />
+          </div>
+        )}
+
+        {/* Quest outcome summary: resources, injured PGs, etc. */}
+        {questDone && showOutcome && (
+          <div className={`rounded-3xl border p-5 ${questState?.status === 'completed' ? 'border-emerald-400/40 bg-emerald-500/5' : 'border-rose-400/40 bg-rose-500/5'}`}>
+            <h3 className="text-xs uppercase tracking-[0.35em] text-slate-400 mb-3">
+              {questState?.status === 'completed' ? 'Ricompense & Aggiornamenti' : 'Conseguenze'}
+            </h3>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {questState?.status === 'completed' && (
+                <>
+                  <div className="rounded-2xl border border-emerald-800/60 bg-black/30 px-3 py-2">
+                    <p className="text-[9px] uppercase tracking-[0.3em] text-emerald-400/60">XP Guadagnati</p>
+                    <p className="text-lg font-mono text-emerald-200">+{xpAwardedRef.current}</p>
+                  </div>
+                  {(activity?.rewards ?? blueprint.rewards?.resources ?? []).map((r: any, i: number) => (
+                    <div key={i} className="rounded-2xl border border-amber-800/60 bg-black/30 px-3 py-2">
+                      <p className="text-[9px] uppercase tracking-[0.3em] text-amber-400/60">{r.resourceId}</p>
+                      <p className="text-lg font-mono text-amber-200">+{r.amountFormula ?? '?'}</p>
+                    </div>
+                  ))}
+                </>
+              )}
+              {partyRef.current.filter(m => m.isInjured).map(m => (
+                <div key={m.id} className="rounded-2xl border border-amber-800/60 bg-black/30 px-3 py-2">
+                  <p className="text-[9px] uppercase tracking-[0.3em] text-amber-400/60">Ferito</p>
+                  <p className="text-sm text-amber-200">{m.name}</p>
+                </div>
+              ))}
+              {partyRef.current.filter(m => m.dead).map(m => (
+                <div key={m.id} className="rounded-2xl border border-rose-800/60 bg-black/30 px-3 py-2">
+                  <p className="text-[9px] uppercase tracking-[0.3em] text-rose-400/60">Morto</p>
+                  <p className="text-sm text-rose-200">{m.name}</p>
+                </div>
+              ))}
+              {partyRef.current.filter(m => m.isHero && !FAKE_PARTY.find(f => f.id === m.id)?.isHero).map(m => (
+                <div key={m.id} className="rounded-2xl border border-fuchsia-800/60 bg-black/30 px-3 py-2">
+                  <p className="text-[9px] uppercase tracking-[0.3em] text-fuchsia-400/60">Promosso Eroe</p>
+                  <p className="text-sm text-fuchsia-200">{m.name}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Event Log */}
         <div className="rounded-3xl border border-slate-800/60 bg-black/40 p-4">

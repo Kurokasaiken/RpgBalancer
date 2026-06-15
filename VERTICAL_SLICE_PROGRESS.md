@@ -1,6 +1,6 @@
 # Vertical Slice Progress — Idle Village
 
-**Ultimo aggiornamento:** 2026-06-09
+**Ultimo aggiornamento:** 2026-06-12
 **Surface canonica:** `/minimal-gameplay`
 **Riferimento piano:** `VERTICAL_SLICE_ROADMAP.md` (Macro-Fasi A–F)
 
@@ -12,7 +12,7 @@
 |------|--------|-------|------|
 | **A** | Drag pickup fix | ⚠️ DA VERIFICARE | Modifier `snapOverlayCenterToCursor` implementato, PgCard cattura offset. Serve verifica runtime |
 | **B** | Core loop minimo girabile | ❌ NON INIZIATA | Pezzi singoli esistono, loop non assemblato |
-| **C** | Skill check Cultist Simulator-style | ⚠️ PARZIALE | SkillCheck kit frozen, layout/UX da raffinare |
+| **C** | Skill check Cultist Simulator-style | ⚠️ PARZIALE | SkillCheck V6 Asterism ok, versione originale da rifare |
 | **D** | Reward + Level up + Upgrade | ❌ NON INIZIATA | OutcomeKit frozen, logica reward da collegare |
 | **E** | Contenuto Steam-presentabile | ❌ NON INIZIATA | — |
 | **F** | Polish, audio, distribuzione | ❌ NON INIZIATA | — |
@@ -23,20 +23,21 @@
 
 | Kit | Status | E2E Test | Note |
 |-----|--------|----------|------|
-| rosterKit | candidate | ✅ parziale | Sorting/filtering funzionante |
-| pgcardKit | candidate | ✅ parziale | Character card rendering ok |
-| slotRackKit | candidate | ✅ parziale | 4 slot grid |
-| clockKit | candidate | ✅ parziale | Time display |
-| resourceHudKit | candidate | ✅ parziale | Gold/food/materials |
-| jobCardKit | candidate | ✅ parziale | Job activity card |
-| questCardKit | candidate | ✅ parziale | Quest activity card |
-| skillCheckKit | candidate | ✅ parziale | Skill check resolver |
-| outcomeKit | **frozen** | ❌ mancante | 4 outcome tiers |
-| marketKit | **frozen** | ❌ mancante | MarketActionCard è TODO/placeholder |
+| rosterKit | ✅ OK | ✅ parziale | Sorting/filtering funzionante |
+| pgcardKit | ✅ OK | ✅ parziale | Character card rendering ok |
+| slotRackKit | ✅ OK | ✅ parziale | 4 slot grid |
+| clockKit | ✅ OK | ✅ parziale | DayNightPOI corretto come in Minimal Gameplay |
+| resourceHudKit | ⚠️ DA RIFARE | ✅ parziale | Implementazione non corretta |
+| jobCardKit | ⚠️ DA RIFARE | ✅ parziale | Implementazione non corretta |
+| questCardKit | ⚠️ DA RIFARE | ✅ parziale | Implementazione non corretta |
+| skillCheckKit (v6 Asterism) | ✅ OK | ✅ parziale | Visuale cinematica corretta |
+| skillCheckKit (originale) | ⚠️ DA RIFARE | ✅ parziale | Versione d20 da sostituire |
+| outcomeKit | ⚠️ DA RIFARE | ❌ mancante | 4 outcome tiers |
+| marketKit | ⚠️ DA RIFARE | ❌ mancante | MarketActionCard è TODO/placeholder |
 | activeHudKit | candidate | ❌ mancante | Active notifications |
-| slottedMedalKit | candidate | ✅ parziale | Medal token in slot |
-| integrationDragJobKit | integration | ❌ mancante | Drag→Job flow |
-| integrationQuestFlowKit | **frozen** | ❌ mancante | Quest→SkillCheck→Outcome |
+| integrationDragJobKit | ⚠️ DA RIFARE | ❌ mancante | Drag→Job flow |
+| integrationQuestFlowKit | ⚠️ DA RIFARE | ❌ mancante | Quest→SkillCheck→Outcome |
+| questChronicleKit | ✅ OK | ✅ parziale | Dettaglio quest con fasi, progress bar, esito finale |
 
 ---
 

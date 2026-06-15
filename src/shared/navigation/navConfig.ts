@@ -81,7 +81,7 @@ export const BOTTOM_NAV: MobileNavItem[] = [
   { id: 'more', label: 'More', icon: '☰' },
 ];
 
-export const DEFAULT_LANDING_TAB_ID: AppNavTabId = 'test';
+export const DEFAULT_LANDING_TAB_ID: AppNavTabId = 'testHub';
 
 export function getUniqueNavItems(): AppNavItem[] {
   return APP_NAV_TAB_IDS.filter(shouldIncludeTab).map((id) => NAV_ITEM_MAP[id]);

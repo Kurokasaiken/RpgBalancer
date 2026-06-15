@@ -105,15 +105,14 @@ export function applyPhaseResult(params: {
   });
 
   const isLastPhase = state.currentPhaseIndex >= blueprint.phases.length - 1;
-  const nextStatus =
-    result === 'success'
-      ? isLastPhase
-        ? 'completed'
-        : 'in_progress'
-      : 'failed';
+  const nextPhaseIndex = isLastPhase ? state.currentPhaseIndex : state.currentPhaseIndex + 1;
 
-  const nextPhaseIndex =
-    result === 'success' && !isLastPhase ? state.currentPhaseIndex + 1 : state.currentPhaseIndex;
+  let nextStatus: QuestState['status'] = 'in_progress';
+  if (isLastPhase) {
+    const allResults = [...nextPhaseResults];
+    const hasAnyFailure = allResults.some((r) => r.result === 'failure');
+    nextStatus = hasAnyFailure ? 'failed' : 'completed';
+  }
 
   return {
     ...state,

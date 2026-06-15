@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Asterism · Wanderlust / Gilded Observatory — 5-Axis Skill Roll</title>
+<style>
+  /* ================================================================
+     WANDERLUST / GILDED OBSERVATORY — Asterism Skill Roll Prototype
+     Multi-Layer Blizzard Architecture (see docs/visual_design_philosophy.md)
+     ================================================================ */
+  :root {
+    --obsidian: #050509;
+    --slate-deep: #0f1a1d;
+    --teal-shadow: rgba(141, 179, 165, 0.18);
+    --emerald-glow: rgba(16, 185, 129, 0.22);
+    --gold: #c9a227;
+    --gold-bright: #fce890;
+    --bronze-deep: #602c08;
+    --ivory: #f0efe4;
+    --amber-token: #e8a33d;
+    --teal-token: #4fc8b0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background:
+      radial-gradient(ellipse 90% 70% at 50% 38%, #0a1216 0%, var(--obsidian) 62%),
+      var(--obsidian);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    font-family: 'Cinzel', 'Crimson Text', Georgia, serif;
+    color: var(--ivory);
+    overflow: hidden;
+  }
+
+  header { text-align: center; }
+  header h1 {
+    font-size: 15px;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-shadow: 0 0 18px rgba(201, 162, 39, 0.35);
+  }
+  header p {
+    margin-top: 4px;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #5d7672;
+  }
+
+  .stage-wrap {
+    position: relative;
+    filter: drop-shadow(0 40px 80px rgba(0, 0, 0, 0.85))
+            drop-shadow(0 0 60px var(--teal-shadow));
+  }
+
+  svg.stage {
+    width: min(86vmin, 720px);
+    height: min(86vmin, 720px);
+    display: block;
+  }
+
+  /* ---------------- Rim breath: the astrolabe is alive even idle -------- */
+  @keyframes rim-breath {
+    0%, 100% { opacity: 0.92; }
+    45%      { opacity: 0.68; }
+    75%      { opacity: 0.85; }
+  }
+  .rim-breath { animation: rim-breath 9.4s ease-in-out infinite; }
+
+  @keyframes token-breath {
+    0%, 100% { opacity: 0.85; }
+    50%      { opacity: 0.62; }
+  }
+  .token-breath { animation: token-breath 7.3s ease-in-out infinite; }
+
+  @keyframes star-breath {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.018); }
+  }
+
+  /* ---------------- Phase 1: pillars rise from the stone ---------------- */
+  .pillar {
+    opacity: 0;
+    transform: translateY(46px) scaleY(0.05);
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+  }
+  .pillar.risen {
+    animation: pillar-rise 640ms cubic-bezier(0.34, 1.42, 0.44, 1) forwards;
+  }
+  @keyframes pillar-rise {
+    0%   { opacity: 0;   transform: translateY(46px) scaleY(0.05); }
+    55%  { opacity: 1;   transform: translateY(-4px) scaleY(1.06); }
+    78%  { transform: translateY(2px)  scaleY(0.97); }
+    100% { opacity: 1;   transform: translateY(0)    scaleY(1); }
+  }
+
+  .pillar-base-glow {
+    opacity: 0;
+    transition: opacity 420ms ease-out;
+  }
+  .pillar.risen .pillar-base-glow { opacity: 1; }
+
+  /* ---------------- Phase 3: white highlight AFTER star opens ----------- */
+  .pillar-white {
+    opacity: 0;
+  }
+  .pillar.ignited .pillar-white {
+    animation: pillar-ignite 900ms ease-out forwards;
+  }
+  @keyframes pillar-ignite {
+    0%   { opacity: 0; }
+    18%  { opacity: 0.95; }
+    55%  { opacity: 0.55; }
+    100% { opacity: 0.38; }
+  }
+
+  /* ---------------- Phase 2: star burst (BEFORE pillar ignite) ---------- */
+  .star-assembly {
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+    transform: scale(0);
+    opacity: 0;
+  }
+  .star-assembly.open {
+    animation: star-burst 560ms cubic-bezier(0.22, 1.6, 0.36, 1) forwards;
+  }
+  @keyframes star-burst {
+    0%   { transform: scale(0)    rotate(-32deg); opacity: 0; }
+    45%  { transform: scale(1.16) rotate(4deg);   opacity: 1; }
+    72%  { transform: scale(0.94) rotate(-1deg); }
+    100% { transform: scale(1)    rotate(0deg);   opacity: 1; }
+  }
+  .star-assembly.open .star-core-breathe {
+    animation: star-breath 5.6s ease-in-out infinite;
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+  }
+
+  /* ---------------- Phase 4/5: roll ball ------------------------------- */
+  .roll-ball { opacity: 0; }
+  .roll-ball.live { opacity: 1; }
+
+  /* Result flash */
+  .flash {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(252, 232, 144, 0.55), transparent 65%);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .flash.fire { animation: flash-pop 480ms ease-out; }
+  @keyframes flash-pop {
+    0% { opacity: 0; } 14% { opacity: 1; } 100% { opacity: 0; }
+  }
+
+  /* ---------------- Controls ------------------------------------------- */
+  .controls { display: flex; gap: 14px; align-items: center; }
+  button.replay {
+    font-family: inherit;
+    font-size: 11px;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--gold-bright);
+    background: linear-gradient(180deg, #1a130a, #0c0805);
+    border: 1px solid rgba(201, 162, 39, 0.55);
+    border-radius: 999px;
+    padding: 10px 28px;
+    cursor: pointer;
+    box-shadow: 0 0 24px rgba(201, 162, 39, 0.18), inset 0 1px 0 rgba(252, 232, 144, 0.22);
+    transition: all 180ms ease;
+  }
+  button.replay:hover {
+    box-shadow: 0 0 38px rgba(201, 162, 39, 0.4), inset 0 1px 0 rgba(252, 232, 144, 0.35);
+    transform: translateY(-1px);
+  }
+  button.replay:active { transform: scale(0.96); }
+
+  .phase-label {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #6f8a84;
+    min-width: 260px;
+    text-align: center;
+  }
+  .phase-label strong { color: var(--gold-bright); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Asterism — Skill Roll</h1>
+  <p>Wanderlust · Gilded Observatory · 5 Axes</p>
+</header>
+
+<div class="stage-wrap">
+  <svg class="stage" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- ============ FILTERS (noise / specular / bloom) ============ -->
+      <!-- Organic stone turbulence -->
+      <filter id="f-stone" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.012 0.016" numOctaves="4" seed="11" result="n"/>
+        <feColorMatrix in="n" type="matrix"
+          values="0 0 0 0 0.05  0 0 0 0 0.09  0 0 0 0 0.085  0 0 0 0.5 0" result="c"/>
+        <feComposite in="c" in2="SourceGraphic" operator="in" result="tex"/>
+        <feBlend in="SourceGraphic" in2="tex" mode="overlay"/>
+      </filter>
+      <!-- Fine grain for metal -->
+      <filter id="f-metal-noise" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.52" numOctaves="4" seed="3" stitchTiles="stitch" result="n"/>
+        <feColorMatrix in="n" type="matrix"
+          values="0 0 0 0 .068  0 0 0 0 .046  0 0 0 0 .021  0 0 0 .25 0" result="c"/>
+        <feBlend in="SourceGraphic" in2="c" mode="overlay"/>
+      </filter>
+      <!-- Bloom for glows -->
+      <filter id="f-bloom" x="-80%" y="-80%" width="260%" height="260%">
+        <feGaussianBlur stdDeviation="7" result="b"/>
+        <feMerge>
+          <feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+      <filter id="f-bloom-big" x="-120%" y="-120%" width="340%" height="340%">
+        <feGaussianBlur stdDeviation="16" result="b"/>
+        <feMerge>
+          <feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+      <!-- Specular sheen for the star -->
+      <filter id="f-specular" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur"/>
+        <feSpecularLighting in="blur" surfaceScale="4" specularConstant="0.85"
+          specularExponent="18" lighting-color="#fff6d8" result="spec">
+          <fePointLight x="330" y="300" z="180"/>
+        </feSpecularLighting>
+        <feComposite in="spec" in2="SourceAlpha" operator="in" result="specClip"/>
+        <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="specClip"/></feMerge>
+      </filter>
+
+      <!-- ============ GRADIENTS (multi-stop, no flat colors) ============ -->
+      <!-- Bronze edge: bright gold -> deep bronze -> shadow (6 stops) -->
+      <linearGradient id="g-bronze" x1="14%" y1="4%" x2="86%" y2="96%">
+        <stop offset="0%"   stop-color="#fce890"/>
+        <stop offset="9%"   stop-color="#e4b048"/>
+        <stop offset="28%"  stop-color="#a05c18"/>
+        <stop offset="52%"  stop-color="#602c08"/>
+        <stop offset="76%"  stop-color="#341604"/>
+        <stop offset="100%" stop-color="#0e0602"/>
+      </linearGradient>
+      <linearGradient id="g-bronze-rev" x1="86%" y1="96%" x2="14%" y2="4%">
+        <stop offset="0%"   stop-color="#fce890"/>
+        <stop offset="12%"  stop-color="#d89c38"/>
+        <stop offset="34%"  stop-color="#8a4c12"/>
+        <stop offset="58%"  stop-color="#502406"/>
+        <stop offset="82%"  stop-color="#2a1203"/>
+        <stop offset="100%" stop-color="#0e0602"/>
+      </linearGradient>
+      <!-- Stone plate -->
+      <radialGradient id="g-stone" cx="46%" cy="40%" r="72%">
+        <stop offset="0%"   stop-color="#131c20"/>
+        <stop offset="30%"  stop-color="#0d1417"/>
+        <stop offset="58%"  stop-color="#080c0f"/>
+        <stop offset="82%"  stop-color="#05070a"/>
+        <stop offset="100%" stop-color="#030406"/>
+      </radialGradient>
+      <radialGradient id="g-stone-vignette" cx="50%" cy="50%" r="50%">
+        <stop offset="0%"   stop-color="rgba(0,0,0,0)"/>
+        <stop offset="74%"  stop-color="rgba(0,0,0,0)"/>
+        <stop offset="92%"  stop-color="rgba(3,6,8,0.55)"/>
+        <stop offset="100%" stop-color="rgba(2,4,6,0.9)"/>
+      </radialGradient>
+      <!-- Teal ambient pooled in the engraving -->
+      <radialGradient id="g-teal-pool" cx="50%" cy="50%" r="50%">
+        <stop offset="0%"   stop-color="rgba(141,179,165,0.16)"/>
+        <stop offset="42%"  stop-color="rgba(79,200,176,0.07)"/>
+        <stop offset="72%"  stop-color="rgba(16,185,129,0.03)"/>
+        <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+      </radialGradient>
+      <!-- Amber token: 7 stops -->
+      <radialGradient id="g-amber-token" cx="38%" cy="32%" r="76%">
+        <stop offset="0%"   stop-color="#ffeebc"/>
+        <stop offset="16%"  stop-color="#fbd278"/>
+        <stop offset="34%"  stop-color="#eba83e"/>
+        <stop offset="52%"  stop-color="#c97c1c"/>
+        <stop offset="70%"  stop-color="#94500e"/>
+        <stop offset="86%"  stop-color="#5e2c06"/>
+        <stop offset="100%" stop-color="#2e1402"/>
+      </radialGradient>
+      <!-- Teal token: 7 stops -->
+      <radialGradient id="g-teal-token" cx="38%" cy="32%" r="76%">
+        <stop offset="0%"   stop-color="#dcfff4"/>
+        <stop offset="16%"  stop-color="#96f0d8"/>
+        <stop offset="34%"  stop-color="#4fc8b0"/>
+        <stop offset="52%"  stop-color="#2a9684"/>
+        <stop offset="70%"  stop-color="#176658"/>
+        <stop offset="86%"  stop-color="#0b3d36"/>
+        <stop offset="100%" stop-color="#041d1a"/>
+      </radialGradient>
+      <!-- Star body gold: 8 stops -->
+      <radialGradient id="g-star-gold" cx="44%" cy="38%" r="78%">
+        <stop offset="0%"   stop-color="#fff8df"/>
+        <stop offset="12%"  stop-color="#fce890"/>
+        <stop offset="26%"  stop-color="#f4ca5e"/>
+        <stop offset="40%"  stop-color="#e0a838"/>
+        <stop offset="56%"  stop-color="#bb7d1c"/>
+        <stop offset="72%"  stop-color="#8a520e"/>
+        <stop offset="87%"  stop-color="#5a3007"/>
+        <stop offset="100%" stop-color="#2e1603"/>
+      </radialGradient>
+      <radialGradient id="g-star-core" cx="50%" cy="50%" r="50%">
+        <stop offset="0%"   stop-color="#fffdf2"/>
+        <stop offset="28%"  stop-color="#ffeeae"/>
+        <stop offset="58%"  stop-color="#f3c75a"/>
+        <stop offset="100%" stop-color="rgba(224,168,56,0)"/>
+      </radialGradient>
+      <!-- Basalt pillar faces -->
+      <linearGradient id="g-basalt-front" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%"   stop-color="#2b3236"/>
+        <stop offset="22%"  stop-color="#1c2226"/>
+        <stop offset="50%"  stop-color="#11161a"/>
+        <stop offset="78%"  stop-color="#0a0d10"/>
+        <stop offset="100%" stop-color="#05070a"/>
+      </linearGradient>
+      <linearGradient id="g-basalt-side" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%"   stop-color="#0b0e11"/>
+        <stop offset="60%"  stop-color="#070a0c"/>
+        <stop offset="100%" stop-color="#030506"/>
+      </linearGradient>
+      <linearGradient id="g-pillar-white" x1="0%" y1="100%" x2="0%" y2="0%">
+        <stop offset="0%"   stop-color="rgba(255,255,255,0)"/>
+        <stop offset="45%"  stop-color="rgba(255,253,242,0.45)"/>
+        <stop offset="100%" stop-color="rgba(255,255,255,0.95)"/>
+      </linearGradient>
+      <!-- Center mechanical socket ring -->
+      <radialGradient id="g-socket" cx="50%" cy="42%" r="64%">
+        <stop offset="0%"   stop-color="#1d2428"/>
+        <stop offset="44%"  stop-color="#11171a"/>
+        <stop offset="72%"  stop-color="#090d10"/>
+        <stop offset="100%" stop-color="#04060a"/>
+      </radialGradient>
+      <radialGradient id="g-ball" cx="38%" cy="34%" r="72%">
+        <stop offset="0%"   stop-color="#ffffff"/>
+        <stop offset="24%"  stop-color="#fff2c4"/>
+        <stop offset="52%"  stop-color="#fcd45e"/>
+        <stop offset="78%"  stop-color="#e09a22"/>
+        <stop offset="100%" stop-color="#9a5a0c"/>
+      </radialGradient>
+    </defs>
+
+    <!-- ================= LAYER 1-3: OBSIDIAN STONE PLATE ================= -->
+    <g filter="url(#f-stone)">
+      <circle cx="400" cy="400" r="386" fill="url(#g-stone)"/>
+    </g>
+    <circle cx="400" cy="400" r="386" fill="url(#g-teal-pool)"/>
+    <circle cx="400" cy="400" r="386" fill="url(#g-stone-vignette)"/>
+    <!-- Engraved outer rims (bronze, breathing) -->
+    <g class="rim-breath">
+      <circle cx="400" cy="400" r="384" fill="none" stroke="url(#g-bronze)" stroke-width="3.4" opacity="0.9"/>
+      <circle cx="400" cy="400" r="372" fill="none" stroke="url(#g-bronze-rev)" stroke-width="1.2" opacity="0.55"/>
+      <circle cx="400" cy="400" r="306" fill="none" stroke="rgba(201,162,39,0.16)" stroke-width="1" stroke-dasharray="3 9"/>
+    </g>
+
+    <!-- ============ LAYER 4: ENGRAVED 5-AXIS GRID (built in JS) ========== -->
+    <g id="axis-grid"></g>
+
+    <!-- ============ LAYER 5: VERTEX SOCKETS + SKILL TOKENS (JS) ========== -->
+    <g id="tokens"></g>
+
+    <!-- ============ LAYER 6: PILLARS (5 obelisks, JS) ==================== -->
+    <g id="pillars"></g>
+
+    <!-- ============ LAYER 7: CENTER MECHANICAL SOCKET ==================== -->
+    <g id="center-socket">
+      <circle cx="400" cy="400" r="92" fill="url(#g-socket)" filter="url(#f-metal-noise)"/>
+      <circle cx="400" cy="400" r="92" fill="none" stroke="url(#g-bronze)" stroke-width="3"/>
+      <circle cx="400" cy="400" r="80" fill="none" stroke="url(#g-bronze-rev)" stroke-width="1.1" opacity="0.7"/>
+      <!-- bolts -->
+      <g id="socket-bolts"></g>
+    </g>
+
+    <!-- ============ LAYER 8: 12-LAYER SOLAR BAROQUE STAR (JS) ============ -->
+    <g id="star" class="star-assembly"></g>
+
+    <!-- ============ LAYER 9: ROLL BALL + TRAIL =========================== -->
+    <g id="ball-trail"></g>
+    <g id="ball-group" class="roll-ball" filter="url(#f-bloom-big)">
+      <circle id="ball-halo" cx="0" cy="0" r="17" fill="rgba(252,232,144,0.25)"/>
+      <circle id="ball" cx="0" cy="0" r="9" fill="url(#g-ball)" stroke="#fff8df" stroke-width="1.4"/>
+    </g>
+
+    <!-- ============ LAYER 10: RESULT LABEL =============================== -->
+    <text id="result-label" x="400" y="760" text-anchor="middle"
+      font-size="22" letter-spacing="6" fill="#fce890" opacity="0"
+      style="font-family:inherit; text-transform:uppercase;"></text>
+  </svg>
+  <div class="flash" id="flash"></div>
+</div>
+
+<div class="controls">
+  <button class="replay" id="replay">⟳ &nbsp;Rilancia</button>
+  <div class="phase-label" id="phase-label">In attesa…</div>
+</div>
+
+<script>
+/* ====================================================================
+   ASTERISM — timeline driver (vanilla JS)
+   Preserves the original V6 sequence: pillars -> star -> highlight ->
+   roll spin -> magnetic snap. Fixes: star opens BEFORE pillar ignite,
+   ball settles with exponential ease + crisp 150ms overshoot snap.
+   ==================================================================== */
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const CX = 400, CY = 400;
+const AXES = 5;
+const AXIS_R = 300;            // engraved axis length
+const TOKEN_R = 300;           // socket distance
+const ORBIT_R = 196;           // ball orbit radius
+const TICKS = 10;
+
+/* 3 Amber (Strength) + 2 Teal (Resistance) */
+const TOKEN_KIND = ['amber', 'teal', 'amber', 'teal', 'amber'];
+const KIND_COLOR = {
+  amber: { glow: '#e8a33d', bright: '#ffeebc', grad: 'url(#g-amber-token)' },
+  teal:  { glow: '#4fc8b0', bright: '#dcfff4', grad: 'url(#g-teal-token)' },
+};
+
+const axisAngle = (i) => -Math.PI / 2 + i * (2 * Math.PI / AXES);
+const polar = (r, a) => ({ x: CX + Math.cos(a) * r, y: CY + Math.sin(a) * r });
+
+function el(name, attrs = {}, parent) {
+  const node = document.createElementNS(SVG_NS, name);
+  for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+  if (parent) parent.appendChild(node);
+  return node;
+}
+
+/* ---------------- Engraved axis grid (bronze grooves + ticks) -------- */
+(function buildGrid() {
+  const grid = document.getElementById('axis-grid');
+  for (let i = 0; i < AXES; i += 1) {
+    const a = axisAngle(i);
+    const tip = polar(AXIS_R, a);
+    /* groove shadow (engraving depth) */
+    el('line', {
+      x1: CX, y1: CY, x2: tip.x, y2: tip.y,
+      stroke: 'rgba(0,0,0,0.85)', 'stroke-width': 7, 'stroke-linecap': 'round',
+    }, grid);
+    /* bronze inlay */
+    el('line', {
+      x1: CX, y1: CY, x2: tip.x, y2: tip.y,
+      stroke: 'url(#g-bronze)', 'stroke-width': 2.6, 'stroke-linecap': 'round',
+      class: 'rim-breath',
+    }, grid);
+    /* teal seep along the groove */
+    el('line', {
+      x1: CX, y1: CY, x2: tip.x, y2: tip.y,
+      stroke: 'rgba(79,200,176,0.10)', 'stroke-width': 11, 'stroke-linecap': 'round',
+    }, grid);
+    /* tick marks */
+    for (let t = 1; t <= TICKS; t += 1) {
+      const r = (AXIS_R / TICKS) * t;
+      const p = polar(r, a);
+      const nx = -Math.sin(a), ny = Math.cos(a);
+      el('line', {
+        x1: p.x - nx * 7, y1: p.y - ny * 7,
+        x2: p.x + nx * 7, y2: p.y + ny * 7,
+        stroke: 'rgba(201,162,39,0.30)', 'stroke-width': 1.2,
+      }, grid);
+    }
+  }
+  /* pentagon ring connecting sockets */
+  const pts = Array.from({ length: AXES }, (_, i) => {
+    const p = polar(TOKEN_R, axisAngle(i));
+    return `${p.x},${p.y}`;
+  }).join(' ');
+  el('polygon', {
+    points: pts, fill: 'none',
+    stroke: 'rgba(0,0,0,0.8)', 'stroke-width': 6,
+  }, grid);
+  el('polygon', {
+    points: pts, fill: 'none',
+    stroke: 'url(#g-bronze-rev)', 'stroke-width': 1.6, opacity: 0.6,
+    class: 'rim-breath',
+  }, grid);
+})();
+
+/* ---------------- Vertex sockets + physical skill tokens ------------- */
+(function buildTokens() {
+  const root = document.getElementById('tokens');
+  for (let i = 0; i < AXES; i += 1) {
+    const a = axisAngle(i);
+    const p = polar(TOKEN_R, a);
+    const kind = KIND_COLOR[TOKEN_KIND[i]];
+    const g = el('g', { id: `token-${i}` }, root);
+    /* socket recess */
+    el('circle', { cx: p.x, cy: p.y, r: 30, fill: 'rgba(0,0,0,0.9)' }, g);
+    el('circle', {
+      cx: p.x, cy: p.y, r: 30, fill: 'none',
+      stroke: 'url(#g-bronze)', 'stroke-width': 2.4,
+    }, g);
+    el('circle', {
+      cx: p.x, cy: p.y, r: 25, fill: 'none',
+      stroke: 'url(#g-bronze-rev)', 'stroke-width': 0.9, opacity: 0.6,
+    }, g);
+    /* ambient color halo */
+    el('circle', {
+      cx: p.x, cy: p.y, r: 40, fill: kind.glow, opacity: 0.10,
+      filter: 'url(#f-bloom-big)', class: 'token-breath',
+    }, g);
+    /* token body (gem) */
+    el('circle', {
+      cx: p.x, cy: p.y, r: 20, fill: kind.grad,
+      filter: 'url(#f-metal-noise)',
+    }, g);
+    /* glass overlay */
+    el('ellipse', {
+      cx: p.x - 6, cy: p.y - 7, rx: 9, ry: 6,
+      fill: 'rgba(255,255,255,0.32)',
+    }, g);
+    /* facet rim */
+    el('circle', {
+      cx: p.x, cy: p.y, r: 20, fill: 'none',
+      stroke: kind.bright, 'stroke-width': 0.8, opacity: 0.5,
+      class: 'rim-breath',
+    }, g);
+  }
+})();
+
+/* ---------------- Center socket bolts -------------------------------- */
+(function buildBolts() {
+  const root = document.getElementById('socket-bolts');
+  for (let i = 0; i < 8; i += 1) {
+    const a = (i / 8) * Math.PI * 2 + Math.PI / 8;
+    const p = polar(86, a);
+    el('circle', { cx: p.x, cy: p.y, r: 3.4, fill: 'url(#g-bronze)' }, root);
+    el('circle', {
+      cx: p.x - 1, cy: p.y - 1, r: 1.2,
+      fill: 'rgba(252,232,144,0.7)',
+    }, root);
+  }
+})();
+
+/* ---------------- Pillars: dark basalt obelisks, bronze edges --------- */
+const PILLAR_DIST = 232;
+function buildPillar(i) {
+  const a = axisAngle(i);
+  const p = polar(PILLAR_DIST, a);
+  const kind = KIND_COLOR[TOKEN_KIND[i]];
+  const W = 30, H = 84;
+  const root = document.getElementById('pillars');
+  const g = el('g', { id: `pillar-${i}`, class: 'pillar' }, root);
+
+  /* base glow matching token color */
+  el('ellipse', {
+    cx: p.x, cy: p.y + 6, rx: 30, ry: 11,
+    fill: kind.glow, opacity: 0.5,
+    filter: 'url(#f-bloom-big)', class: 'pillar-base-glow',
+  }, g);
+  /* ground contact shadow */
+  el('ellipse', {
+    cx: p.x, cy: p.y + 7, rx: 24, ry: 8, fill: 'rgba(0,0,0,0.65)',
+  }, g);
+
+  /* side face (basalt shadow) */
+  el('path', {
+    d: `M ${p.x} ${p.y + 10} L ${p.x - W / 2} ${p.y} L ${p.x - W * 0.42} ${p.y - H}
+        L ${p.x} ${p.y - H - 10} Z`,
+    fill: 'url(#g-basalt-side)',
+  }, g);
+  /* front face */
+  const frontD = `M ${p.x} ${p.y + 10} L ${p.x + W / 2} ${p.y} L ${p.x + W * 0.42} ${p.y - H}
+        L ${p.x} ${p.y - H - 10} Z`;
+  el('path', { d: frontD, fill: 'url(#g-basalt-front)', filter: 'url(#f-metal-noise)' }, g);
+  /* sun-bronze edges */
+  el('path', {
+    d: `M ${p.x} ${p.y + 10} L ${p.x} ${p.y - H - 10}`,
+    stroke: 'url(#g-bronze)', 'stroke-width': 2.2, fill: 'none',
+    filter: 'url(#f-bloom)',
+  }, g);
+  el('path', {
+    d: `M ${p.x + W / 2} ${p.y} L ${p.x + W * 0.42} ${p.y - H}`,
+    stroke: 'rgba(201,162,39,0.55)', 'stroke-width': 1.1, fill: 'none',
+  }, g);
+  /* capstone */
+  el('path', {
+    d: `M ${p.x - W * 0.42} ${p.y - H} L ${p.x} ${p.y - H - 18}
+        L ${p.x + W * 0.42} ${p.y - H} L ${p.x} ${p.y - H - 10} Z`,
+    fill: 'url(#g-bronze)', filter: 'url(#f-metal-noise)',
+  }, g);
+  /* capstone glint */
+  el('circle', {
+    cx: p.x, cy: p.y - H - 13, r: 2.4,
+    fill: kind.bright, filter: 'url(#f-bloom)', class: 'rim-breath',
+  }, g);
+  /* Phase-3 white energy overlay */
+  el('path', {
+    d: frontD, fill: 'url(#g-pillar-white)',
+    class: 'pillar-white', filter: 'url(#f-bloom)',
+  }, g);
+  el('path', {
+    d: `M ${p.x} ${p.y + 10} L ${p.x} ${p.y - H - 10}`,
+    stroke: '#ffffff', 'stroke-width': 1.6, fill: 'none',
+    class: 'pillar-white', filter: 'url(#f-bloom)',
+  }, g);
+  return g;
+}
+const pillars = Array.from({ length: AXES }, (_, i) => buildPillar(i));
+
+/* ---------------- 12-layer Solar Baroque star ------------------------- */
+function starPath(outerR, innerR, points = 5, rot = 0) {
+  let d = '';
+  for (let i = 0; i < points * 2; i += 1) {
+    const r = i % 2 === 0 ? outerR : innerR;
+    const a = -Math.PI / 2 + rot + i * (Math.PI / points);
+    const x = CX + Math.cos(a) * r;
+    const y = CY + Math.sin(a) * r;
+    d += (i === 0 ? 'M' : 'L') + `${x.toFixed(2)} ${y.toFixed(2)} `;
+  }
+  return d + 'Z';
+}
+
+(function buildStar() {
+  const star = document.getElementById('star');
+  /* L1: ambient bloom disc */
+  el('circle', {
+    cx: CX, cy: CY, r: 86, fill: 'rgba(252,232,144,0.10)',
+    filter: 'url(#f-bloom-big)',
+  }, star);
+  /* L2: outer ray burst (thin, rotated) */
+  el('path', {
+    d: starPath(84, 18, 10, Math.PI / 10),
+    fill: 'rgba(224,168,56,0.30)', filter: 'url(#f-bloom)',
+  }, star);
+  /* L3: dark gold underlay (drop shadow of the star body) */
+  el('path', { d: starPath(74, 30), fill: '#2e1603', transform: 'translate(2.5 3.5)' }, star);
+  /* L4: main star body, 8-stop radial gold */
+  el('path', { d: starPath(74, 30), fill: 'url(#g-star-gold)', filter: 'url(#f-specular)' }, star);
+  /* L5: fractal noise texture clipped to body */
+  el('path', { d: starPath(74, 30), fill: 'url(#g-star-gold)', filter: 'url(#f-metal-noise)', opacity: 0.55 }, star);
+  /* L6: inner counter-rotated star (baroque doubling) */
+  el('path', {
+    d: starPath(48, 19, 5, Math.PI / 5),
+    fill: 'none', stroke: 'url(#g-bronze-rev)', 'stroke-width': 1.6, opacity: 0.8,
+  }, star);
+  /* L7: engraved filigree ring */
+  el('circle', {
+    cx: CX, cy: CY, r: 26, fill: 'none',
+    stroke: 'rgba(94,44,8,0.9)', 'stroke-width': 3,
+  }, star);
+  el('circle', {
+    cx: CX, cy: CY, r: 26, fill: 'none',
+    stroke: 'url(#g-bronze)', 'stroke-width': 1.1,
+  }, star);
+  /* L8: core radial glow (breathing) */
+  el('circle', {
+    cx: CX, cy: CY, r: 24, fill: 'url(#g-star-core)',
+    class: 'star-core-breathe', filter: 'url(#f-bloom)',
+  }, star);
+  /* L9: specular crescent highlight */
+  el('path', {
+    d: `M ${CX - 30} ${CY - 34} Q ${CX} ${CY - 58} ${CX + 26} ${CY - 38}
+        Q ${CX + 2} ${CY - 46} ${CX - 30} ${CY - 34} Z`,
+    fill: 'rgba(255,253,242,0.55)', filter: 'url(#f-bloom)',
+  }, star);
+  /* L10: micro star sparkles on the tips */
+  for (let i = 0; i < 5; i += 1) {
+    const p = polar(70, axisAngle(i));
+    el('circle', {
+      cx: p.x, cy: p.y, r: 2,
+      fill: '#fff8df', filter: 'url(#f-bloom)', class: 'rim-breath',
+    }, star);
+  }
+  /* L11: bronze rim outline of the whole star */
+  el('path', {
+    d: starPath(74, 30), fill: 'none',
+    stroke: 'url(#g-bronze)', 'stroke-width': 1.8, class: 'rim-breath',
+  }, star);
+  /* L12: hairline ivory tracer */
+  el('path', {
+    d: starPath(74, 30), fill: 'none',
+    stroke: 'rgba(240,239,228,0.28)', 'stroke-width': 0.6,
+  }, star);
+})();
+
+/* ====================================================================
+   TIMELINE STATE MACHINE
+   Phase 1 (0–1s)    pillars rise sequentially
+   Phase 2 (2s)      star bursts open (BEFORE pillar highlight — fixed)
+   Phase 3 (2.6s)    pillars ignite white, reacting to the star
+   Phase 4 (3.2–5s)  ball orbit spin
+   Phase 5 (~6s)     exponential decel + violent magnetic snap (150ms bounce)
+   ==================================================================== */
+const phaseLabel = document.getElementById('phase-label');
+const starNode = document.getElementById('star');
+const ballGroup = document.getElementById('ball-group');
+const trailRoot = document.getElementById('ball-trail');
+const resultLabel = document.getElementById('result-label');
+const flash = document.getElementById('flash');
+
+let timeouts = [];
+let rafId = null;
+
+function schedule(fn, ms) { timeouts.push(setTimeout(fn, ms)); }
+function clearAll() {
+  timeouts.forEach(clearTimeout); timeouts = [];
+  if (rafId) cancelAnimationFrame(rafId); rafId = null;
+}
+
+function setPhase(html) { phaseLabel.innerHTML = html; }
+
+function setBallPos(angle, radius) {
+  const x = CX + Math.cos(angle) * radius;
+  const y = CY + Math.sin(angle) * radius;
+  ballGroup.setAttribute('transform', `translate(${x} ${y})`);
+  return { x, y };
+}
+
+function spawnTrailDot(x, y) {
+  const dot = el('circle', {
+    cx: x, cy: y, r: 4.5,
+    fill: 'rgba(252,232,144,0.5)', filter: 'url(#f-bloom)',
+  }, trailRoot);
+  let life = 1;
+  const fade = () => {
+    life -= 0.07;
+    if (life <= 0) { dot.remove(); return; }
+    dot.setAttribute('opacity', life * 0.55);
+    dot.setAttribute('r', 4.5 * life);
+    requestAnimationFrame(fade);
+  };
+  requestAnimationFrame(fade);
+}
+
+/* cubic-bezier(0.25, 1, 0.5, 1) sampled — smooth exponential-feel decel */
+function easeOutExpoSoft(t) {
+  /* numerically solve x(t)=t on bezier(0.25,1,0.5,1); close analytic match: */
+  return 1 - Math.pow(1 - t, 3.2);
+}
+
+function runRoll() {
+  const winAxis = Math.floor(Math.random() * AXES);
+  const winAngle = axisAngle(winAxis);
+  const kind = TOKEN_KIND[winAxis];
+
+  ballGroup.classList.add('live');
+
+  const SPIN_MS = 1800;       /* Phase 4: fast orbit */
+  const DECEL_MS = 1600;      /* Phase 5a: exponential deceleration */
+  const SNAP_MS = 150;        /* Phase 5b: crisp mechanical overshoot */
+  const SPIN_SPEED = 0.013;   /* rad per ms at full speed */
+
+  const t0 = performance.now();
+  let angle = winAngle - Math.PI;     /* start opposite the target */
+  let lastTrail = 0;
+  let decelStartAngle = 0;
+  let totalDecelSweep = 0;
+  let phase = 'spin';
+  let snapStart = 0;
+
+  function frame(now) {
+    const elapsed = now - t0;
+
+    if (phase === 'spin') {
+      angle += SPIN_SPEED * Math.min(16.7, now - (frame.last || now - 16.7));
+      setBallPos(angle, ORBIT_R);
+      if (now - lastTrail > 30) {
+        const p = setBallPos(angle, ORBIT_R);
+        spawnTrailDot(p.x, p.y);
+        lastTrail = now;
+      }
+      if (elapsed >= SPIN_MS) {
+        phase = 'decel';
+        decelStartAngle = angle;
+        /* sweep: at least 1.5 extra revolutions, ending exactly at winAngle */
+        const base = winAngle - (decelStartAngle % (Math.PI * 2));
+        totalDecelSweep = base + Math.PI * 2 * 2 + (base < 0 ? Math.PI * 2 : 0);
+        setPhase('Fase 5 · <strong>Decelerazione</strong>');
+      }
+    } else if (phase === 'decel') {
+      const t = Math.min(1, (elapsed - SPIN_MS) / DECEL_MS);
+      const eased = easeOutExpoSoft(t);
+      angle = decelStartAngle + totalDecelSweep * eased;
+      /* radius eases outward toward the socket ring */
+      const r = ORBIT_R + (TOKEN_R - ORBIT_R) * Math.pow(eased, 2.2);
+      setBallPos(angle, r);
+      if (now - lastTrail > 45 && t < 0.85) {
+        const p = setBallPos(angle, r);
+        spawnTrailDot(p.x, p.y);
+        lastTrail = now;
+      }
+      if (t >= 1) {
+        phase = 'snap';
+        snapStart = now;
+        setPhase('Fase 5 · <strong>Magnetic Snap!</strong>');
+      }
+    } else if (phase === 'snap') {
+      /* 150ms violent magnetic overshoot: shoot past the socket then bite back */
+      const t = Math.min(1, (now - snapStart) / SNAP_MS);
+      /* damped single-overshoot spring */
+      const k = Math.sin(t * Math.PI) * (1 - t);
+      const overshootR = TOKEN_R + 16 * k;        /* radial punch outwards */
+      const wobbleA = winAngle + 0.035 * Math.sin(t * Math.PI * 2) * (1 - t);
+      setBallPos(wobbleA, overshootR);
+      if (t >= 1) {
+        setBallPos(winAngle, TOKEN_R);
+        landed();
+        return;
+      }
+    }
+
+    frame.last = now;
+    rafId = requestAnimationFrame(frame);
+  }
+
+  function landed() {
+    /* impact flash + result */
+    flash.classList.remove('fire'); void flash.offsetWidth; flash.classList.add('fire');
+    const p = polar(TOKEN_R, winAngle);
+    /* impact ring burst */
+    const ring = el('circle', {
+      cx: p.x, cy: p.y, r: 22, fill: 'none',
+      stroke: KIND_COLOR[kind].bright, 'stroke-width': 3,
+      filter: 'url(#f-bloom)',
+    }, trailRoot);
+    let rr = 22, op = 1;
+    const burst = () => {
+      rr += 3.4; op -= 0.06;
+      if (op <= 0) { ring.remove(); return; }
+      ring.setAttribute('r', rr); ring.setAttribute('opacity', op);
+      requestAnimationFrame(burst);
+    };
+    requestAnimationFrame(burst);
+
+    const skillName = kind === 'amber' ? 'FORZA' : 'RESISTENZA';
+    resultLabel.textContent = `✦ ${skillName} · ASSE ${winAxis + 1} ✦`;
+    resultLabel.setAttribute('fill', KIND_COLOR[kind].bright);
+    resultLabel.setAttribute('opacity', '1');
+    setPhase(`Esito: <strong>${skillName}</strong> — asse ${winAxis + 1}`);
+  }
+
+  rafId = requestAnimationFrame(frame);
+}
+
+function resetScene() {
+  clearAll();
+  pillars.forEach((g) => g.classList.remove('risen', 'ignited'));
+  starNode.classList.remove('open');
+  ballGroup.classList.remove('live');
+  trailRoot.replaceChildren();
+  resultLabel.setAttribute('opacity', '0');
+  /* force reflow so animations can restart */
+  void starNode.getBoundingClientRect();
+}
+
+function playSequence() {
+  resetScene();
+
+  /* Phase 1 — pillars rise one by one (0 → ~1s) */
+  setPhase('Fase 1 · <strong>Attivazione pilastri</strong>');
+  pillars.forEach((g, i) => schedule(() => g.classList.add('risen'), i * 190));
+
+  /* Phase 2 — star bursts open FIRST (2.0s) */
+  schedule(() => {
+    setPhase('Fase 2 · <strong>Apertura della Stella</strong>');
+    starNode.classList.add('open');
+  }, 2000);
+
+  /* Phase 3 — pillars react with white highlight AFTER star is open (2.6s) */
+  schedule(() => {
+    setPhase('Fase 3 · <strong>Risonanza dei pilastri</strong>');
+    pillars.forEach((g, i) => schedule(() => g.classList.add('ignited'), i * 70));
+  }, 2600);
+
+  /* Phase 4+5 — roll spin, decel, magnetic snap (3.2s →) */
+  schedule(() => {
+    setPhase('Fase 4 · <strong>Roll Spin</strong>');
+    runRoll();
+  }, 3200);
+}
+
+document.getElementById('replay').addEventListener('click', playSequence);
+playSequence();
+</script>
+</body>
+</html>

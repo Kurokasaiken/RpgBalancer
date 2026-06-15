@@ -210,6 +210,11 @@ const FALLBACK_AXIS_META: AxisMetaEntry[] = [
   { name: 'Vita', icon: '❤️' },
 ] as const;
 
+export interface AltVisualsV6OutcomeEvent {
+  success: boolean;
+  roll: number;
+}
+
 export interface AltVisualsV6AsterismProps {
   stats: StatRow[];
   controlsPortal?: HTMLElement | null;
@@ -217,6 +222,7 @@ export interface AltVisualsV6AsterismProps {
   enablePerfectStarToggle?: boolean;
   axisValues?: AxisValues;
   preserveAxisValues?: boolean;
+  onOutcome?: (event: AltVisualsV6OutcomeEvent) => void;
 }
 
 export function AltVisualsV6Asterism({
@@ -226,6 +232,7 @@ export function AltVisualsV6Asterism({
   enablePerfectStarToggle = true,
   axisValues,
   preserveAxisValues,
+  onOutcome,
 }: AltVisualsV6AsterismProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const checkboxRef = useRef<HTMLInputElement | null>(null);
@@ -257,6 +264,7 @@ export function AltVisualsV6Asterism({
       resolvedAxisValues,
       resolvedAxisMeta,
       shouldPreserveAxisValues,
+      onOutcome,
     );
     rerollRef.current = controller.rerollDice;
     return () => {
@@ -334,6 +342,7 @@ function initAltVisualsV6(
   axisValues: { enemy: number[]; player: number[] },
   axisMeta: AxisMetaEntry[],
   preserveAxisValues: boolean,
+  onOutcome?: (event: AltVisualsV6OutcomeEvent) => void,
 ): AltVisualsController {
   const ctx = canvas.getContext('2d', { alpha: false });
   if (!ctx)
@@ -443,6 +452,11 @@ function initAltVisualsV6(
     drawBall(ctx, internalState);
     drawParticles(ctx, internalState);
 
+    if (onOutcome && internalState.ball.stopped && internalState.ball.success !== null && !outcomeFired) {
+      outcomeFired = true;
+      onOutcome({ success: internalState.ball.success, roll: internalState.successRoll ?? 0 });
+    }
+
     // Reset for UI (static elements)
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     drawStatOverlay(ctx, internalState);
@@ -456,9 +470,12 @@ function initAltVisualsV6(
     internalState.animationFrameId = requestAnimationFrame(drawLoop);
   };
 
+  let outcomeFired = false;
+
   drawLoop();
 
   const rerollDice = () => {
+    outcomeFired = false;
     if (!internalState.goldStar.active || internalState.goldStar.morphProgress < 1) return;
     internalState.ball.active = false;
     internalState.ball.stopped = false;
