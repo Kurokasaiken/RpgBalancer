@@ -562,6 +562,9 @@ const geo={
   rValley:90,
   rCore:46,          // 12-layer core ring (Big Win)
   epicW:14,          // epic-fail outer band thickness (∝ crit%)
+  axisTip:[200,200,200,200,200],    // per-axis star tip radius (white obelisk = stat)
+  axisCheck:[300,300,300,300,300],  // per-axis failure inner radius (black obelisk = check)
+  axisSkill:[0,0,0,0,0],
   wedges:{           // risk sectors, anchored at the upper rim — never overlapping
     dead:{a0:0,a1:0}, wound:{a0:0,a1:0},
   },
@@ -579,12 +582,28 @@ function getSkillIndexFromAngle(x,y){
   return Math.min(skillIndex, skills.length-1);
 }
 
+/* map a 0..100 value to a radius from core outward (white=stat, black=check) */
+function rOf(v){ return geo.rCore + clamp(v,1,99)/100*(R-22-geo.rCore); }
+
 function recomputeGeometry(skillIndex=0){
+  geo.rCore=Math.max(30,R*0.12);
+  /* assign each of the 5 axes to a skill, per the punte distribution */
+  geo.axisSkill=[];
+  for(let s=0;s<skillAxes.length;s+=1){ for(let n=0;n<skillAxes[s];n+=1) geo.axisSkill.push(s); }
+  while(geo.axisSkill.length<AXES) geo.axisSkill.push(geo.axisSkill.length%Math.max(1,skills.length));
+  /* per-axis radii: white obelisk = stat, black obelisk = check */
+  geo.axisTip=[]; geo.axisCheck=[];
+  for(let i=0;i<AXES;i+=1){
+    const sk=skills[geo.axisSkill[i]]||{stat:60,difficulty:50};
+    geo.axisTip[i]=rOf(sk.stat);        // success star reaches the white obelisk (stat)
+    geo.axisCheck[i]=rOf(sk.difficulty);// failure goo reaches the black obelisk (check)
+  }
+  /* cosmetic aggregate radii (halo/gradients) */
+  geo.rTip=Math.max(...geo.axisTip);
+  geo.rValley=Math.min(...geo.axisTip)*0.5;
+  /* keep a single tst for the verdict roll (skill resolved at landing) */
   const skill=skills.length>0?skills[Math.min(skillIndex,skills.length-1)]:{stat:60,difficulty:55};
   geo.tst=clamp(50+(skill.stat-skill.difficulty),1,99);
-  geo.rTip=R*(0.22+0.62*(geo.tst/100));
-  geo.rValley=geo.rTip*0.46;
-  geo.rCore=Math.max(30,geo.rTip*0.2);
   const failSpan=Math.max(0,100-(geo.tst+5));
   geo.epicW=Math.max(5,(R-geo.rTip)*((failSpan*cfg.crit/100)/100)*3+5);
   /* wedges: dead centered at 12 o'clock, wounded adjacent clockwise, 6° gap */
@@ -594,20 +613,31 @@ function recomputeGeometry(skillIndex=0){
   geo.wedges.dead={a0:-Math.PI/2-dA/2, a1:-Math.PI/2+dA/2};
   geo.wedges.wound={a0:-Math.PI/2+dA/2+gap, a1:-Math.PI/2+dA/2+gap+wA};
 }
-/* star radius at angle θ — piecewise linear between tips and valleys */
-function rStarAt(theta,scale=1){
-  const t=normAng(theta+Math.PI/2);                  // 0 at first tip
-  const seg=TAU/(AXES*2);                            // 36°
-  let a=((t%TAU)+TAU)%TAU;
-  const k=Math.floor(a/seg), f=(a-k*seg)/seg;
-  const rT=geo.rTip*scale, rV=geo.rValley*scale;
-  return (k%2===0) ? rT+(rV-rT)*f : rV+(rT-rV)*f;
+/* interpolate a per-axis radius array around the wheel (tips at TIP(i)) */
+function radialFromAxes(theta,arr,scale){
+  const t=((normAng(theta+Math.PI/2)%TAU)+TAU)%TAU;   // 0 at first tip (axis 0)
+  const seg=TAU/(AXES*2);                             // 36°
+  const k=Math.floor(t/seg), f=(t-k*seg)/seg;
+  const tipR=i=>arr[((i%AXES)+AXES)%AXES]*scale;      // radius at star point i
+  if(k%2===0){                                        // tip → valley
+    const a=tipR(k/2), b=tipR(k/2)* 0.0 + Math.min(tipR(k/2),tipR(k/2+1))*0.5;
+    return a+(b-a)*f;
+  } else {                                            // valley → tip
+    const b=tipR((k+1)/2), a=Math.min(tipR((k-1)/2),tipR((k+1)/2))*0.5;
+    return a+(b-a)*f;
+  }
 }
+/* star radius (success boundary) — per-axis, reaches the white obelisk (stat) */
+function rStarAt(theta,scale=1){ return radialFromAxes(theta,geo.axisTip,scale); }
+/* check radius (failure inner boundary) — per-axis, the black obelisk (check) */
+function rCheckAt(theta,scale=1){ return radialFromAxes(theta,geo.axisCheck,scale); }
 const dist=(x,y)=>Math.hypot(x-CX,y-CY);
 const angOf=(x,y)=>Math.atan2(y-CY,x-CX);
 const inStar=(x,y,s=1)=>dist(x,y)<=rStarAt(angOf(x,y),s);
 const inCore=(x,y)=>dist(x,y)<=geo.rCore;
-const inAlmost=(x,y)=>{const d=dist(x,y),r=rStarAt(angOf(x,y));return d>r&&d<=r+ALMOST_W;};
+/* almost = the band between the white obelisk (stat) and the black obelisk
+   (check). Exists only where the check sits beyond the stat (check>stat). */
+const inAlmost=(x,y)=>{const a=angOf(x,y),d=dist(x,y),rs=rStarAt(a),rc=Math.max(rCheckAt(a),rs+ALMOST_W);return d>rs&&d<=rc;};
 const inEpic=(x,y)=>{const d=dist(x,y);return d>R-geo.epicW&&d<=R-3;};
 const inWedge=(x,y,w)=>{const a=angOf(x,y);
   return normAng(a-w.a0)>=0 && normAng(a-w.a1)<=0;};
@@ -696,13 +726,12 @@ function pickTarget(res){
   window.__debugTarget.usedFallback=true;
   const a=Math.random()*TAU;
   if(res.verdict==='almost'){
-    const rStar=rStarAt(a);
-    const offset=ALMOST_W*(0.3+Math.random()*0.4);  // 30-70% into bronze rim
-    const d=rStar+offset;
+    const rStar=rStarAt(a), rChk=Math.max(rCheckAt(a),rStar+ALMOST_W);
+    const d=rStar+(rChk-rStar)*(0.3+Math.random()*0.4);  // 30-70% into the almost band
     return {x:CX+Math.cos(a)*d,y:CY+Math.sin(a)*d};
   } else if(res.verdict==='fail'){
-    const min=geo.rValley*0.4, max=R-geo.epicW-6;
-    const d=min+(Math.random()*(max-min));
+    const min=Math.max(rCheckAt(a),rStarAt(a)+ALMOST_W)+4, max=R-geo.epicW-6;
+    const d=min+(Math.random()*Math.max(1,max-min));
     return {x:CX+Math.cos(a)*d,y:CY+Math.sin(a)*d};
   } else if(res.verdict==='epicfail'){
     const min=R-geo.epicW, max=R-3;
@@ -735,10 +764,13 @@ const scene={
     r:.4+Math.random()*1.2,ph:Math.random()*TAU,sp:.4+Math.random()*1.1})),
 };
 function buildPillars(){
-  scene.blackPillars=Array.from({length:AXES},(_,i)=>({
-    ang:TIP(i)+Math.PI/AXES, r:R*0.86, drop:0, flash:0, landed:false}));
+  /* per axis: white obelisk at the stat radius, black obelisk at the check
+     radius — both on the SAME spoke so the star reaches white and the goo
+     reaches black on that axis */
   scene.whitePillars=Array.from({length:AXES},(_,i)=>({
-    ang:TIP(i), r:geo.rTip, drop:0, flash:0, landed:false}));
+    ang:TIP(i), r:geo.axisTip[i], drop:0, flash:0, landed:false}));
+  scene.blackPillars=Array.from({length:AXES},(_,i)=>({
+    ang:TIP(i), r:geo.axisCheck[i], drop:0, flash:0, landed:false}));
 }
 
 /* =========================================================================
@@ -1630,6 +1662,7 @@ function drawBlueprint(now){
    ========================================================================= */
 let lastT=performance.now();
 function frame(now){
+ try{
   const dt=Math.min(50,now-lastT); lastT=now;
   tickTimeline();
   /* goo wobble: slow viscous oscillation + slam ripple boost */
@@ -1664,7 +1697,8 @@ function frame(now){
   drawRimHits();
   drawMotes(now,dt);
   drawBall(now);
-  requestAnimationFrame(frame);
+ }catch(e){ if(!window.__frameErrLogged){ window.__frameErrLogged=true; console.error('FRAME ERROR:', e && e.stack || e); } }
+ requestAnimationFrame(frame);
 }
 
 /* =========================================================================
