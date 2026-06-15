@@ -678,24 +678,44 @@ function drawMotes(now,dt){
 
 /* the goo — full failure field, boiling & wobbling */
 const gooBubbles=Array.from({length:6},(_,i)=>({ph:i*1.55,sp:.12+i*.035,rad:2.6+i*1.1,ox:(i-2.5)*36,oy:(i%3-1)*30}));
+/* goo = the FAILURE medium: it oozes from the rim INWARD and its irregular
+   edge laps up to the black obelisks (the check). The flower pushes it back
+   from the centre. So the goo is the annulus between the black-obelisk line
+   (rCheckAt, never intruding past the flower) and the arena rim. */
+function gooInnerAt(a,rev){
+  const base=Math.max(rCheckAt(a), rStarAt(a)+2);   // never cover the flower
+  return (R-3) + (base-(R-3))*rev;                   // rev0→rim (no goo) … rev1→checks
+}
+function gooAnnulusPath(rev){
+  const P=new Path2D();
+  P.moveTo(CX+(R-3),CY); P.arc(CX,CY,R-3,0,TAU);    // outer rim (CW)
+  const SEG=160;                                     // inner irregular edge (the black-obelisk lap)
+  for(let i=0;i<=SEG;i+=1){
+    const a=i/SEG*TAU, r=gooInnerAt(a,rev);
+    const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
+    if(i===0) P.moveTo(x,y); else P.lineTo(x,y);
+  }
+  P.closePath();
+  return P;
+}
 function drawGoo(now){
   const rev=scene.gooReveal;
   if(rev<=0.001) return;                 // void start: no goo until it wells up
   const t=now/1000;
-  const RR=(R-3)*(0.16+0.84*rev);        // wells up from a small dark seed
+  const annulus=gooAnnulusPath(rev);
   ctx.save();
   ctx.globalAlpha=Math.min(1,rev*1.2);
   ctx.filter='url(#gooWobble)';
   ctx.shadowColor='rgba(10,40,40,.5)';   // cold, not violet
   ctx.shadowBlur=30;
-  /* deep obsidian-teal viscous body (no muddy magenta) */
-  const g=ctx.createRadialGradient(CX-20,CY-26,4,CX,CY,RR);
-  g.addColorStop(0,'#0c1620'); g.addColorStop(.45,'#060c12'); g.addColorStop(1,'#020507');
+  /* deep obsidian-teal viscous body — darkest toward the rim (deepest failure) */
+  const g=ctx.createRadialGradient(CX,CY,geo.rValley,CX,CY,R-3);
+  g.addColorStop(0,'#0c1620'); g.addColorStop(.5,'#08111a'); g.addColorStop(1,'#02060a');
   ctx.fillStyle=g;
-  ctx.beginPath(); ctx.arc(CX,CY,RR,0,TAU); ctx.fill();
+  ctx.fill(annulus,'evenodd');
   ctx.filter='none'; ctx.shadowBlur=0;
   ctx.save();
-  ctx.beginPath(); ctx.arc(CX,CY,RR,0,TAU); ctx.clip();
+  ctx.clip(annulus,'evenodd');
   /* breathing currents — cold teal / slate, very subtle */
   const v1=ctx.createRadialGradient(CX+60+Math.sin(t*.5)*26,CY+90+Math.cos(t*.4)*20,4,CX+60,CY+90,210);
   v1.addColorStop(0,'rgba(24,110,98,.22)'); v1.addColorStop(.5,'rgba(24,110,98,.05)'); v1.addColorStop(1,'transparent');
@@ -726,22 +746,33 @@ function drawGoo(now){
   wet.addColorStop(0,'rgba(220,240,238,.38)'); wet.addColorStop(.4,'rgba(220,240,238,.05)'); wet.addColorStop(1,'transparent');
   ctx.fillStyle=wet; ctx.fillRect(0,0,W,W);
   ctx.restore();
-  /* teal rim light (Wanderlust shadow rule) */
-  ctx.strokeStyle='rgba(16,150,130,.20)'; ctx.lineWidth=1.6;
-  ctx.shadowColor='rgba(16,185,129,.32)'; ctx.shadowBlur=8;
-  ctx.beginPath(); ctx.arc(CX,CY,RR,0,TAU); ctx.stroke();
   ctx.restore();
-  if(rev<0.999) return;                  // epic-fail rim only once fully formed
-  /* EPIC FAIL outer margin — thickness ∝ crit% */
+  /* teal lap-light along the goo's irregular inner edge (where it meets the checks) */
+  ctx.save();
+  ctx.filter='url(#gooWobble)';
+  ctx.strokeStyle='rgba(16,150,130,.28)'; ctx.lineWidth=2;
+  ctx.shadowColor='rgba(16,185,129,.38)'; ctx.shadowBlur=10;
+  ctx.beginPath();
+  for(let i=0;i<=160;i+=1){ const a=i/160*TAU, r=gooInnerAt(a,rev);
+    const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r; if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }
+  ctx.closePath(); ctx.stroke();
+  ctx.restore();
+  if(rev<0.999) return;                  // critical-fail band only once goo is fully formed
+  /* CRITICAL FAILURE — bold pulsing band hugging the arena rim, thickness ∝ crit%
+     with a readable minimum so it is always clearly visible. */
   ctx.save();
   const pul=.5+.5*Math.sin(t*2.2);
-  ctx.strokeStyle=`rgba(120,16,40,${.5+.25*pul})`;
-  ctx.lineWidth=geo.epicW;
-  ctx.shadowColor='rgba(255,40,90,.4)'; ctx.shadowBlur=12+8*pul;
-  ctx.beginPath(); ctx.arc(CX,CY,R-3-geo.epicW/2,0,TAU); ctx.stroke();
-  ctx.lineWidth=1;
-  ctx.strokeStyle=`rgba(255,80,120,${.35+.3*pul})`;
-  ctx.beginPath(); ctx.arc(CX,CY,R-3-geo.epicW,0,TAU); ctx.stroke();
+  const ew=Math.max(18,geo.epicW);
+  const cg=ctx.createRadialGradient(CX,CY,R-3-ew,CX,CY,R-3);
+  cg.addColorStop(0,'rgba(90,8,28,0)');
+  cg.addColorStop(.55,`rgba(150,18,44,${(.55+.2*pul).toFixed(3)})`);
+  cg.addColorStop(1,`rgba(255,46,92,${(.7+.3*pul).toFixed(3)})`);
+  ctx.strokeStyle=cg; ctx.lineWidth=ew;
+  ctx.shadowColor='rgba(255,40,90,.55)'; ctx.shadowBlur=16+10*pul;
+  ctx.beginPath(); ctx.arc(CX,CY,R-3-ew/2,0,TAU); ctx.stroke();
+  ctx.shadowBlur=0; ctx.lineWidth=2;
+  ctx.strokeStyle=`rgba(255,90,130,${(.5+.35*pul).toFixed(3)})`;
+  ctx.beginPath(); ctx.arc(CX,CY,R-3-ew,0,TAU); ctx.stroke();
   ctx.restore();
 }
 
