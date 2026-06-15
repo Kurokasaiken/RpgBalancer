@@ -7,7 +7,7 @@ test.describe('Minimal Time Daynight Integration Page', () => {
 
   test('should render the integration page', async ({ page }) => {
     // Check page title
-    await expect(page.getByText('Fase 4: Time Engine + Day/Night Cycle Integration')).toBeVisible();
+    await expect(page.getByText('Fase 6: Time Engine + Day/Night Cycle Integration')).toBeVisible();
     
     // Check description
     await expect(page.getByText(/Test completo dual-layer time architecture/)).toBeVisible();

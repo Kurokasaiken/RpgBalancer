@@ -1,205 +1,149 @@
-import React, { useState, useEffect } from 'react';
-
-/**
- * MinimalClockPage
- *
- * Isolated test page for ClockWidget component.
- * Shows time display and speed controls.
- *
- * Route: /minimal-clock
- * Spec: src/docs/docs/minimal_slice/04_clock.md
- */
+import { useState, useEffect, useRef } from 'react';
+import DayNightPoiSkin from '@/ui/idleVillage/components/minimal/DayNightPoiSkin';
+import { TimeEngineStrip } from '@/ui/idleVillage/components/minimal/TimeEngineStrip';
+import { SkinSystemProvider } from '@/ui/idleVillage/hooks/useSkinSystem';
+import { SandboxTimingProvider } from '@/ui/idleVillage/hooks/useSandboxTimingBridge';
 
 export default function MinimalClockPage() {
-  const [isRunning, setIsRunning] = useState(false);
+  const [isPaused, setIsPaused] = useState(true);
   const [speed, setSpeed] = useState(1);
-  const [gameTime, setGameTime] = useState({ day: 1, hour: 0, minute: 0 });
+  const [currentDay, setCurrentDay] = useState(1);
+  const [hour, setHour] = useState(6);
+  const [progressFraction, setProgressFraction] = useState(0);
+  const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    if (!isRunning) return;
-
-    const interval = setInterval(() => {
-      setGameTime((prev) => {
-        let { day, hour, minute } = prev;
-        const increment = speed; // Each tick advances by speed (minutes)
-        minute += increment;
-
-        if (minute >= 60) {
-          hour += Math.floor(minute / 60);
-          minute = minute % 60;
+    if (isPaused) {
+      if (tickRef.current) clearInterval(tickRef.current);
+      return;
+    }
+    tickRef.current = setInterval(() => {
+      setHour((h) => {
+        if (h >= 23) {
+          setCurrentDay((d) => d + 1);
+          return 0;
         }
-
-        if (hour >= 24) {
-          day += Math.floor(hour / 24);
-          hour = hour % 24;
-        }
-
-        return { day, hour, minute };
+        return h + 1;
       });
-    }, 1000 / speed); // Faster interval for 2x, 4x speed
+      setProgressFraction((p) => {
+        const next = p + 1 / 24;
+        return next >= 1 ? 0 : next;
+      });
+    }, 1000 / speed);
+    return () => { if (tickRef.current) clearInterval(tickRef.current); };
+  }, [isPaused, speed]);
 
-    return () => clearInterval(interval);
-  }, [isRunning, speed]);
+  const isDayTime = hour >= 6 && hour < 20;
+  const phaseIcon = (
+    <DayNightPoiSkin
+      isDayPhase={isDayTime}
+      cycleProgress={progressFraction}
+      isPaused={isPaused}
+    />
+  );
 
-  const handleSpeedChange = (newSpeed: number) => {
-    setSpeed(newSpeed);
-  };
-
-  const formatTime = (hour: number, minute: number) => {
-    const h = String(hour).padStart(2, '0');
-    const m = String(minute).padStart(2, '0');
-    return `${h}:${m}`;
+  const emptyHudState = {
+    activities: [],
+    totalActive: 0,
+    totalCompleted: 0,
+    counts: { jobs: 0, quests: 0, maintenance: 0, total: 0 },
+    hasActiveActivities: false,
+    persistence: {
+      lastSaveTime: null,
+      isDirty: false,
+      preferences: {
+        collapsed: false,
+        maxVisible: 5,
+        sortBy: 'remaining-time' as const,
+        showTypeBadges: true,
+        compactMode: false,
+      },
+      uiState: {
+        selectedTypeFilter: 'all' as const,
+        telemetryPanelOpen: false,
+        position: 'top' as const,
+      },
+      metadata: {
+        lastSaved: 0,
+        version: '1.0.0',
+      },
+    },
   };
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>ClockWidget Isolated Test</h1>
-      <p style={styles.subtitle}>Route: /minimal-clock | Spec: src/docs/docs/minimal_slice/04_clock.md</p>
+    <SkinSystemProvider>
+      <SandboxTimingProvider>
+        <div data-testid="minimal-clock-page" className="min-h-screen bg-slate-950 p-8 text-ivory">
+          <div className="mx-auto max-w-5xl space-y-8">
+            <header>
+              <p className="text-[10px] uppercase tracking-[0.45em] text-amber-200/70">Minimal Slice · Clock + Day/Night</p>
+              <h1 className="text-2xl font-semibold tracking-[0.2em] text-amber-100">CLOCK & DAY/NIGHT ISOLATED</h1>
+              <p className="mt-1 text-sm text-slate-400">Route: /minimal-clock</p>
+            </header>
 
-      <div style={styles.clockPanel}>
-        <div style={styles.timeDisplay} data-testid="time-display">
-          <div style={styles.dayLabel}>Day {gameTime.day}</div>
-          <div style={styles.timeValue} data-testid="time-value">
-            {formatTime(gameTime.hour, gameTime.minute)}
-          </div>
-          <div style={styles.statusLabel}>
-            {isRunning ? '▶ Running' : '⏸ Paused'} @ {speed}x
-          </div>
-        </div>
-
-        <div style={styles.controls}>
-          <button
-            onClick={() => setIsRunning(!isRunning)}
-            style={{
-              ...styles.button,
-              backgroundColor: isRunning ? '#ff6b6b' : '#51cf66',
-            }}
-            data-testid="play-pause-button"
-          >
-            {isRunning ? '⏸ Pause' : '▶ Play'}
-          </button>
-        </div>
-
-        <div style={styles.speedControls}>
-          <div style={styles.speedLabel}>Speed:</div>
-          {[1, 2, 4].map((s) => (
-            <button
-              key={s}
-              onClick={() => handleSpeedChange(s)}
-              style={{
-                ...styles.speedButton,
-                backgroundColor: speed === s ? '#4ecdc4' : '#f0f0f0',
-                color: speed === s ? '#fff' : '#333',
+            {/* Compact TimeEngineStrip — same as /test page */}
+            <TimeEngineStrip
+              phaseIcon={phaseIcon}
+              isPlaying={!isPaused}
+              progressFraction={progressFraction}
+              totalSeconds={86400}
+              onToggle={() => setIsPaused(!isPaused)}
+              label="Day/Night Cycle"
+              clockProps={{
+                currentDay,
+                isPaused,
+                speedMultiplier: speed,
+                defaultSpeedMultiplier: 1,
+                maxSpeedMultiplier: 5,
+                tickIntervalMs: 1000,
+                warmupDelayMs: 0,
+                accentHex: '#f59e0b',
+                onSpeedChange: (s: number) => setSpeed(s),
               }}
-              data-testid={`speed-${s}x-button`}
-            >
-              {s}x
-            </button>
-          ))}
-        </div>
-      </div>
+              hudState={emptyHudState}
+              villageState={{ resources: { gold: 0, wood: 0, stone: 0 } }}
+              secondsPerTimeUnit={1}
+              resourceSummaries={[
+                { id: 'gold', label: 'Gold', icon: <span>◆</span> },
+                { id: 'wood', label: 'Wood', icon: <span>🌳</span> },
+                { id: 'stone', label: 'Stone', icon: <span>🪨</span> },
+              ]}
+              compact
+            />
 
-      <div style={styles.info}>
-        <h2>Test Information</h2>
-        <ul>
-          <li><strong>Component:</strong> ClockWidget</li>
-          <li><strong>Test Cases:</strong> 28 (rendering, time display, speed control, state, edge cases)</li>
-          <li><strong>Test File:</strong> tests/e2e/minimal_slice_04_clock.spec.ts</li>
-          <li><strong>Features:</strong> Play/Pause, Speed (1x/2x/4x), Day/Hour/Minute display</li>
-        </ul>
-      </div>
-    </div>
+            {/* Controls */}
+            <div className="flex justify-center gap-3">
+              <button
+                onClick={() => setIsPaused(!isPaused)}
+                className={`rounded-full border px-5 py-2 text-[11px] uppercase tracking-[0.3em] ${
+                  isPaused
+                    ? 'border-emerald-400/60 bg-emerald-500/10 text-emerald-100 hover:bg-emerald-500/20'
+                    : 'border-rose-400/60 bg-rose-500/10 text-rose-100 hover:bg-rose-500/20'
+                }`}
+              >
+                {isPaused ? 'Play' : 'Pausa'}
+              </button>
+              {[1, 2, 4].map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setSpeed(s)}
+                  className={`rounded-full border px-4 py-2 text-[11px] uppercase tracking-[0.3em] ${
+                    speed === s
+                      ? 'border-amber-400/60 bg-amber-500/20 text-amber-100'
+                      : 'border-slate-500/60 bg-black/30 text-slate-300 hover:bg-slate-800/40'
+                  }`}
+                >
+                  {s}x
+                </button>
+              ))}
+            </div>
+
+            <div className="text-center text-sm text-slate-400">
+              {isDayTime ? 'Giorno' : 'Notte'} — Ora {String(hour).padStart(2, '0')}:00 — Giorno {currentDay}
+            </div>
+          </div>
+        </div>
+      </SandboxTimingProvider>
+    </SkinSystemProvider>
   );
 }
-
-const styles = {
-  container: {
-    padding: '2rem',
-    maxWidth: '800px',
-    margin: '0 auto',
-    fontFamily: 'system-ui, -apple-system, sans-serif',
-    backgroundColor: '#f5f5f5',
-    minHeight: '100vh',
-  } as React.CSSProperties,
-  title: {
-    fontSize: '2rem',
-    marginBottom: '0.5rem',
-    color: '#333',
-  } as React.CSSProperties,
-  subtitle: {
-    color: '#666',
-    marginBottom: '2rem',
-    fontSize: '0.9rem',
-  } as React.CSSProperties,
-  clockPanel: {
-    backgroundColor: '#fff',
-    padding: '2rem',
-    borderRadius: '8px',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-    marginBottom: '2rem',
-  } as React.CSSProperties,
-  timeDisplay: {
-    textAlign: 'center',
-    marginBottom: '2rem',
-    padding: '2rem',
-    backgroundColor: '#f9f9f9',
-    borderRadius: '8px',
-    border: '2px solid #e0e0e0',
-  } as React.CSSProperties,
-  dayLabel: {
-    fontSize: '1.2rem',
-    fontWeight: 'bold',
-    color: '#666',
-    marginBottom: '0.5rem',
-  } as React.CSSProperties,
-  timeValue: {
-    fontSize: '3rem',
-    fontWeight: 'bold',
-    color: '#333',
-    fontFamily: 'monospace',
-    marginBottom: '0.5rem',
-  } as React.CSSProperties,
-  statusLabel: {
-    fontSize: '0.9rem',
-    color: '#999',
-  } as React.CSSProperties,
-  controls: {
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '1rem',
-    marginBottom: '2rem',
-  } as React.CSSProperties,
-  button: {
-    padding: '0.75rem 1.5rem',
-    fontSize: '1rem',
-    fontWeight: 'bold',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    transition: 'opacity 0.2s',
-  } as React.CSSProperties,
-  speedControls: {
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '0.5rem',
-    alignItems: 'center',
-  } as React.CSSProperties,
-  speedLabel: {
-    fontWeight: 'bold',
-    marginRight: '1rem',
-    color: '#333',
-  } as React.CSSProperties,
-  speedButton: {
-    padding: '0.5rem 1rem',
-    border: '1px solid #ccc',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-  } as React.CSSProperties,
-  info: {
-    backgroundColor: '#fff',
-    padding: '2rem',
-    borderRadius: '8px',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-  } as React.CSSProperties,
-};

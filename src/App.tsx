@@ -24,7 +24,6 @@ const TimeDaynightIntegrationPage = lazy(() => import('./ui/idleVillage/pages/Ti
 const DragPoiAssignmentPage = lazy(() => import('./ui/idleVillage/pages/DragPoiAssignmentPage').then(m => ({ default: m.DragPoiAssignmentPage })));
 // Minimal slice test pages (Phase 1-6)
 const MinimalPgCardPage = lazy(() => import('./pages/minimal-pgcard').then(m => ({ default: m.MinimalPgCardPage })));
-const MinimalSlottedMedalPage = lazy(() => import('./pages/minimal-slottedmedal').then(m => ({ default: m.MinimalSlottedMedalPage })));
 const MinimalRosterPage = lazy(() => import('./pages/minimal-roster').then(m => ({ default: m.default })));
 const MinimalClockPage = lazy(() => import('./pages/minimal-clock').then(m => ({ default: m.default })));
 const MinimalSlotRackPage = lazy(() => import('./pages/minimal-slotRack').then(m => ({ default: m.default })));
@@ -32,10 +31,16 @@ const MinimalResourceHUDPage = lazy(() => import('./pages/minimal-resourcehud').
 const MinimalJobCardPage = lazy(() => import('./pages/minimal-jobcard').then(m => ({ default: m.default })));
 const MinimalQuestCardPage = lazy(() => import('./pages/minimal-questcard').then(m => ({ default: m.default })));
 const MinimalSkillCheckPage = lazy(() => import('./pages/minimal-skillcheck').then(m => ({ default: m.default })));
+const MinimalSkillCheckV6Page = lazy(() => import('./pages/minimal-skillcheck-v6').then(m => ({ default: m.default })));
+const MinimalDestinyAstrolabePage = lazy(() => import('./pages/minimal-destiny-astrolabe').then(m => ({ default: m.default })));
 const MinimalOutcomeModalPage = lazy(() => import('./pages/minimal-outcome').then(m => ({ default: m.default })));
 const MinimalMarketActionCardPage = lazy(() => import('./pages/minimal-market').then(m => ({ default: m.default })));
 const MinimalIntegrationDragJobPage = lazy(() => import('./pages/minimal-integration-drag-job').then(m => ({ default: m.default })));
 const MinimalIntegrationQuestFlowPage = lazy(() => import('./pages/minimal-integration-quest-flow').then(m => ({ default: m.default })));
+const MinimalJobPoiRosterIntegrationPage = lazy(() => import('./pages/minimal-job-poi-roster-integration').then(m => ({ default: m.default })));
+const MinimalJobPoiRosterTimeIntegrationPage = lazy(() => import('./pages/minimal-job-poi-roster-time-integration').then(m => ({ default: m.default })));
+const MinimalQuestDetailPage = lazy(() => import('./pages/minimal-quest-detail').then(m => ({ default: m.default })));
+const MinimalTimeDaynightIntegrationPage = lazy(() => import('./pages/minimal-time-daynight-integration').then(m => ({ default: m.default })));
 
 interface AppNavControls {
   getActiveTab: () => AppNavTabId;
@@ -130,8 +135,6 @@ function App() {
   // Minimal slice test pages (Phase 1-6)
   const isMinimalPgCardPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-pgcard';
-  const isMinimalSlottedMedalPath =
-    typeof window !== 'undefined' && window.location.pathname === '/minimal-slottedmedal';
   const isMinimalRosterPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-roster';
   const isMinimalClockPath =
@@ -146,6 +149,10 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/minimal-questcard';
   const isMinimalSkillCheckPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-skillcheck';
+  const isMinimalSkillCheckV6Path =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-skillcheck-v6';
+  const isMinimalDestinyAstrolabePath =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-destiny-astrolabe';
   const isMinimalOutcomeModalPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-outcome';
   const isMinimalMarketActionCardPath =
@@ -154,6 +161,14 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/minimal-integration-drag-job';
   const isMinimalIntegrationQuestFlowPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-integration-quest-flow';
+  const isMinimalJobPoiRosterIntegrationPath =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-job-poi-roster-integration';
+  const isMinimalJobPoiRosterTimeIntegrationPath =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-job-poi-roster-time-integration';
+  const isMinimalQuestDetailPath =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-quest-detail';
+  const isMinimalTimeDaynightIntegrationPath =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-time-daynight-integration';
   const isRootPath =
     typeof window !== 'undefined' &&
     (window.location.pathname === '/' || window.location.pathname === '/index.html');
@@ -328,15 +343,6 @@ function App() {
     );
   }
 
-  if (isMinimalSlottedMedalPath) {
-    return (
-      <ErrorBoundary componentName="Minimal SlottedMedal Page">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading SlottedMedal Test…</div>}>
-          <MinimalSlottedMedalPage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
 
   if (isMinimalRosterPath) {
     return (
@@ -408,6 +414,26 @@ function App() {
     );
   }
 
+  if (isMinimalSkillCheckV6Path) {
+    return (
+      <ErrorBoundary componentName="Minimal SkillCheck V6 Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading SkillCheck V6…</div>}>
+          <MinimalSkillCheckV6Page />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMinimalDestinyAstrolabePath) {
+    return (
+      <ErrorBoundary componentName="Minimal Destiny Astrolabe Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Destiny Astrolabe…</div>}>
+          <MinimalDestinyAstrolabePage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
   if (isMinimalOutcomeModalPath) {
     return (
       <ErrorBoundary componentName="Minimal OutcomeModal Page">
@@ -443,6 +469,46 @@ function App() {
       <ErrorBoundary componentName="Minimal Integration Quest Flow Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Integration Quest Flow Test…</div>}>
           <MinimalIntegrationQuestFlowPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMinimalJobPoiRosterIntegrationPath) {
+    return (
+      <ErrorBoundary componentName="Minimal Job POI Roster Integration Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading POI Roster Integration…</div>}>
+          <MinimalJobPoiRosterIntegrationPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMinimalJobPoiRosterTimeIntegrationPath) {
+    return (
+      <ErrorBoundary componentName="Minimal Job POI Roster Time Integration Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading POI Roster Time Integration…</div>}>
+          <MinimalJobPoiRosterTimeIntegrationPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMinimalQuestDetailPath) {
+    return (
+      <ErrorBoundary componentName="Minimal Quest Detail Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Quest Detail…</div>}>
+          <MinimalQuestDetailPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMinimalTimeDaynightIntegrationPath) {
+    return (
+      <ErrorBoundary componentName="Minimal Time Daynight Integration Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Time Daynight Integration…</div>}>
+          <MinimalTimeDaynightIntegrationPage />
         </Suspense>
       </ErrorBoundary>
     );

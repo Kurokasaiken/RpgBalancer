@@ -133,7 +133,7 @@ export const DEFAULT_MAP_ASSET_REGISTRY: MapAssetRegistry = {
     {
       id: 'quest-card',
       type: 'quest',
-      componentPath: 'src/ui/idleVillage/components/QuestCard.tsx',
+      componentPath: 'src/ui/idleVillage/map/actionCards/wrappers/QuestCard.tsx',
       requiredProps: ['questId', 'title', 'status'],
       assetPaths: [
         'src/assets/ui/idleVillage/quests/',

@@ -1,8 +1,5 @@
 /**
  * TestHub - Central navigation page for all Idle Village test pages
- *
- * This page provides links to all individual test pages for visual verification
- * of each feature area (Phase 1-10).
  */
 
 interface TestPageLink {
@@ -10,132 +7,189 @@ interface TestPageLink {
   title: string;
   description: string;
   path: string;
-  phase: number;
   icon: string;
+  status?: 'ok' | 'needs-refactor';
 }
 
 const TEST_PAGES: TestPageLink[] = [
-  // Phase 1: PgToken (real components)
   {
     id: 'pgcard',
-    title: 'PgCard (Real)',
-    description: 'Componente PgCard reale del progetto',
+    title: 'PgCard',
+    description: 'Card personaggio con ritratto, HP, stamina, status',
     path: '/minimal-pgcard',
-    phase: 1,
     icon: '👤',
+    status: 'ok',
   },
-  {
-    id: 'template-pgcard',
-    title: 'PgCard Template',
-    description: 'Template PgCard con drag & drop pre-configurato',
-    path: '/template-pgcard',
-    phase: 1,
-    icon: '🎯',
-  },
-  {
-    id: 'slottedmedal',
-    title: 'SlottedMedal (Real)',
-    description: 'Componente SlottedMedal reale del progetto',
-    path: '/minimal-slottedmedal',
-    phase: 1,
-    icon: '🏅',
-  },
-  // Phase 2: Roster
   {
     id: 'roster',
-    title: 'Roster (Real)',
-    description: 'Componente Roster reale del progetto',
+    title: 'Roster',
+    description: 'Lista eroi con sorting, filtering, drag & drop',
     path: '/minimal-roster',
-    phase: 2,
     icon: '📋',
+    status: 'ok',
   },
   {
-    id: 'template-roster',
-    title: 'Roster Template',
-    description: 'Template Roster con sorting/filtering/drag pre-configurato',
-    path: '/template-roster',
-    phase: 2,
-    icon: '🎯',
+    id: 'slotrack',
+    title: 'SlotRack',
+    description: 'Slot assegnazione residenti alle attivita',
+    path: '/minimal-slotRack',
+    icon: '🎰',
+    status: 'ok',
   },
-  // Phase 3-6: All real components are in TestRosterPage
   {
-    id: 'full-integration',
-    title: 'TestRosterPage (Full Integration)',
-    description: 'Tutti i componenti reali del progetto (Roster, SlotRack, Clock, Activity, ecc.)',
-    path: '/test',
-    phase: 3,
+    id: 'clock',
+    title: 'Clock',
+    description: 'Orologio giorno/notte con ciclo temporale',
+    path: '/minimal-clock',
+    icon: '🕐',
+    status: 'ok',
+  },
+  {
+    id: 'resourcehud',
+    title: 'Resource HUD',
+    description: 'Pannello risorse villaggio (gold, wood, food, iron)',
+    path: '/minimal-resourcehud',
+    icon: '📊',
+    status: 'needs-refactor',
+  },
+  {
+    id: 'jobcard',
+    title: 'JobCard',
+    description: 'Card attivita con ActionCardBase, progress, halo',
+    path: '/minimal-jobcard',
+    icon: '🪓',
+    status: 'needs-refactor',
+  },
+  {
+    id: 'questcard',
+    title: 'QuestCard',
+    description: 'Card quest con risk stripes, offer countdown, halo',
+    path: '/minimal-questcard',
+    icon: '🗡️',
+    status: 'needs-refactor',
+  },
+  {
+    id: 'skillcheck',
+    title: 'Skill Check',
+    description: 'Risoluzione skill check con dado d20 animato',
+    path: '/minimal-skillcheck',
+    icon: '🎲',
+    status: 'needs-refactor',
+  },
+  {
+    id: 'destiny-astrolabe',
+    title: 'Destiny Astrolabe (NEW)',
+    description: 'D100 skill check con fisica della palla, verdetti cinematici, reusable component',
+    path: '/minimal-destiny-astrolabe',
+    icon: '✨',
+    status: 'ok',
+  },
+  {
+    id: 'skillcheck-v6',
+    title: 'Skill Check V6 Asterism (Legacy)',
+    description: 'Versione HTML standalone (deprecata - usare Destiny Astrolabe)',
+    path: '/minimal-skillcheck-v6',
+    icon: '⭐',
+    status: 'needs-refactor',
+  },
+  {
+    id: 'outcome',
+    title: 'Outcome Modal',
+    description: 'Modale risultato dopo skill check',
+    path: '/minimal-outcome',
+    icon: '🏆',
+    status: 'needs-refactor',
+  },
+  {
+    id: 'market',
+    title: 'Market',
+    description: 'Card mercato per trading/acquisti',
+    path: '/minimal-market',
+    icon: '🏪',
+    status: 'needs-refactor',
+  },
+  {
+    id: 'integration-quest-flow',
+    title: 'Quest Flow Integration',
+    description: 'Flusso completo: QuestCard -> SkillCheck -> Outcome',
+    path: '/minimal-integration-quest-flow',
     icon: '🔗',
+    status: 'needs-refactor',
+  },
+  {
+    id: 'integration-drag-job',
+    title: 'Drag Job Integration',
+    description: 'Integrazione drag & drop assegnazione job',
+    path: '/minimal-integration-drag-job',
+    icon: '🔗',
+    status: 'needs-refactor',
+  },
+  {
+    id: 'job-poi-roster',
+    title: 'POI + Roster Integration',
+    description: 'Integrazione POI job detail con roster drag & drop',
+    path: '/minimal-job-poi-roster-integration',
+    icon: '🗺️',
+    status: 'needs-refactor',
+  },
+  {
+    id: 'job-poi-roster-time',
+    title: 'POI + Roster + Time Integration',
+    description: 'Integrazione completa con time engine e reward',
+    path: '/minimal-job-poi-roster-time-integration',
+    icon: '⏱️',
+    status: 'needs-refactor',
+  },
+  {
+    id: 'quest-detail',
+    title: 'Quest Chronicle',
+    description: 'Dettaglio quest con fasi, progress bar, esito finale',
+    path: '/minimal-quest-detail',
+    icon: '📜',
+    status: 'ok',
   },
 ];
-
-// Group by phase
-const GROUPED_PAGES = TEST_PAGES.reduce<Record<number, TestPageLink[]>>((acc, page) => {
-  if (!acc[page.phase]) {
-    acc[page.phase] = [];
-  }
-  acc[page.phase].push(page);
-  return acc;
-}, {});
-
-const PHASE_LABELS: Record<number, string> = {
-  1: 'Phase 1: PgToken',
-  2: 'Phase 2: Roster',
-  3: 'Phase 3: SlotRack',
-  4: 'Phase 4: Clock/Time',
-  5: 'Phase 5: Activity + Timer',
-  6: 'Phase 6: Integration',
-};
 
 export const TestHub: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-950 p-8">
       <div className="mx-auto max-w-6xl">
-        <header className="mb-12 text-center">
-          <h1 className="mb-4 text-4xl font-bold text-amber-200">
+        <header className="mb-8 text-center">
+          <h1 className="mb-2 text-3xl font-bold text-amber-200">
             Idle Village Test Hub
           </h1>
-          <p className="text-lg text-slate-400">
+          <p className="text-sm text-slate-400">
             Pagina centrale per verifica visuale di tutti i componenti
           </p>
-          <div className="mt-4 inline-flex items-center rounded-full bg-emerald-500/10 px-4 py-2 text-sm text-emerald-300">
-            <span className="mr-2">✅</span>
-            <span>589/589 Test Passanti (100%)</span>
-          </div>
         </header>
 
-        {Object.entries(GROUPED_PAGES)
-          .sort(([a], [b]) => Number(a) - Number(b))
-          .map(([phase, pages]) => (
-            <div key={phase} className="mb-12">
-              <h2 className="mb-6 text-2xl font-semibold text-amber-100">
-                {PHASE_LABELS[Number(phase)] || `Phase ${phase}`}
-              </h2>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {pages.map((page) => (
-                  <a
-                    key={page.id}
-                    href={page.path}
-                    className="group block rounded-2xl border border-white/10 bg-white/5 p-6 transition-all hover:border-amber-500/50 hover:bg-white/10"
-                  >
-                    <div className="mb-3 text-4xl">{page.icon}</div>
-                    <h3 className="mb-2 text-lg font-semibold text-white group-hover:text-amber-200">
-                      {page.title}
-                    </h3>
-                    <p className="text-sm text-slate-400">{page.description}</p>
-                    <div className="mt-4 text-xs text-slate-500 group-hover:text-slate-400">
-                      {page.path}
-                    </div>
-                  </a>
-                ))}
-              </div>
-            </div>
+        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {TEST_PAGES.map((page) => (
+            <a
+              key={page.id}
+              href={page.path}
+              className={`group block rounded-xl border p-4 transition-all hover:bg-white/10 ${
+                page.status === 'needs-refactor'
+                  ? 'border-red-500/50 bg-red-500/5 hover:border-red-500'
+                  : 'border-white/10 bg-white/5 hover:border-amber-500/50'
+              }`}
+            >
+              <div className="mb-2 text-2xl">{page.icon}</div>
+              <h3 className="mb-1 text-sm font-semibold text-white group-hover:text-amber-200">
+                {page.title}
+              </h3>
+              <p className="text-xs text-slate-400 line-clamp-2">{page.description}</p>
+              {page.status === 'needs-refactor' && (
+                <div className="mt-2 text-[10px] uppercase tracking-wider text-red-400 font-semibold">
+                  ⚠️ DA RIFARE
+                </div>
+              )}
+            </a>
           ))}
+        </div>
 
-        <footer className="mt-12 border-t border-white/10 pt-8 text-center text-sm text-slate-500">
+        <footer className="mt-8 border-t border-white/10 pt-6 text-center text-xs text-slate-500">
           <p>Test Hub · Idle Village Vertical Slice</p>
-          <p className="mt-1">
-            Apri ogni pagina per verificare visualmente il funzionamento del componente
-          </p>
         </footer>
       </div>
     </div>
