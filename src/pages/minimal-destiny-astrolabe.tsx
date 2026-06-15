@@ -4,8 +4,9 @@
  */
 
 import React, { useState } from 'react';
-import { DestinyAstrolabeComponent } from '@/ui/idleVillage/components/DestinyAstrolabeComponent';
-import type { DestinyAstrolabeResult, DestinyAstrolabeSkill } from '@/ui/idleVillage/components/DestinyAstrolabeComponent';
+import { SkinSystemProvider } from '@/ui/idleVillage/hooks/useSkinSystem';
+import { DestinyAstrolabe } from '@/ui/idleVillage/components/destinyAstrolabe/DestinyAstrolabe';
+import type { AstrolabeResult as DestinyAstrolabeResult, AstrolabeSkill as DestinyAstrolabeSkill } from '@/ui/idleVillage/components/destinyAstrolabe/DestinyAstrolabe';
 
 const SKILL_PRESETS = {
   single: [{ name: 'Atletica', stat: 65, difficulty: 50 }],
@@ -51,22 +52,23 @@ export default function MinimalDestinyAstrolabe() {
   };
 
   return (
+    <SkinSystemProvider>
     <div className="min-h-screen bg-gray-900 text-gray-100 p-6">
       <h1 className="text-3xl font-bold mb-4 text-amber-400">Destiny Astrolabe - Multi-Skill Test Hub</h1>
 
       {/* Astrolabe (reduced height so the config panel below stays in view) */}
       <div className="border-2 border-amber-600 rounded-lg overflow-hidden mb-6" style={{ height: '70vh' }}>
-        <div style={{ height: '100%', transform: 'scale(1)' }}>
-          <DestinyAstrolabeComponent
-            skills={skills}
-            criticalFailChance={critChance}
-            woundedChance={woundChance}
-            deathChance={deathChance}
-            onComplete={handleComplete}
-            autoStart={true}
-            forcedVerdict={forcedVerdict as any}
-          />
-        </div>
+        <DestinyAstrolabe
+          skills={skills}
+          config={{
+            crit: critChance,
+            wound: woundChance,
+            dead: deathChance,
+            mode: forcedVerdict || 'random',
+          }}
+          onResolve={handleComplete}
+          autoStart
+        />
       </div>
 
       {/* Last Result */}
@@ -229,5 +231,6 @@ export default function MinimalDestinyAstrolabe() {
         </div>
       </div>
     </div>
+    </SkinSystemProvider>
   );
 }

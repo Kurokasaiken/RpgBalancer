@@ -1,0 +1,1272 @@
+/* AUTO-GENERATED from public/destiny-astrolabe.html.
+   Do not edit by hand — regenerate via /tmp/gen-astrolabe.mjs (kept in repo history).
+   The standalone HTML remains the source of truth for the engine logic. */
+/* eslint-disable */
+// @ts-nocheck
+
+export interface AstrolabeSkill { name: string; stat: number; difficulty: number; }
+export interface AstrolabeConfig { crit?: number; wound?: number; dead?: number; mode?: string;
+  tSlam?: number; tBurst?: number; tPour?: number; tSpin?: number; tSnap?: number; }
+export interface AstrolabeResult { verdict: string; roll: number; riskRoll: number;
+  skillIndex: number; skillName: string; wounded: boolean; dead: boolean; }
+export interface AstrolabeEngineOpts {
+  skills: AstrolabeSkill[];
+  config?: AstrolabeConfig;
+  onResolve?: (r: AstrolabeResult) => void;
+}
+export interface AstrolabeEngineHandle {
+  roll: () => void;
+  setConfig: (skills: AstrolabeSkill[], config?: AstrolabeConfig) => void;
+  destroy: () => void;
+}
+
+export function createDestinyAstrolabeEngine(root: HTMLElement, opts: AstrolabeEngineOpts): AstrolabeEngineHandle {
+  const DUMMY: any = new Proxy(function(){}, {
+    get(_t, p){ if(p==='style'||p==='classList'||p==='dataset') return DUMMY;
+      if(p==='value') return '0'; if(p==='textContent'||p==='innerHTML') return ''; return DUMMY; },
+    set(){ return true; }, apply(){ return DUMMY; },
+  });
+  const $id = (id: string): any => root.querySelector('#'+id) || (root.querySelector('[data-'+id+']') || DUMMY);
+
+/* =========================================================================
+   CONFIG — bound to the tweak panel
+   ========================================================================= */
+/* config + skills injected by the React host */
+const cfg=Object.assign({stat:60,req:55,crit:5,wound:10,dead:5,tSlam:900,tBurst:1100,tPour:900,tSpin:2600,tSnap:650,mode:'random'}, opts.config||{});
+let skills=(opts.skills&&opts.skills.length)?opts.skills.slice():[{name:'Skill',stat:60,difficulty:50}];
+let skillAxes=[];
+function recomputeSkillAxes(){
+  if(skills.length===1) skillAxes=[5];
+  else if(skills.length===2) skillAxes=[3,2];
+  else if(skills.length===3) skillAxes=[2,2,1];
+  else if(skills.length===4) skillAxes=[2,1,1,1];
+  else skillAxes=[1,1,1,1,1].slice(0,skills.length);
+}
+recomputeSkillAxes();
+
+const W=800, CX=400, CY=400, R=362;       // arena disc
+const AXES=5;
+const TIP=i=>-Math.PI/2 + i*(2*Math.PI/AXES);
+const ALMOST_W=16;                        // bronze rim band (visual)
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const TAU=Math.PI*2;
+const normAng=a=>{a%=TAU; if(a<-Math.PI)a+=TAU; if(a>Math.PI)a-=TAU; return a;};
+
+const geo={
+  tst:55,            // target success threshold
+  rTip:200,          // star tip radius  (∝ TST)
+  rValley:90,
+  rCore:46,          // 12-layer core ring (Big Win)
+  epicW:14,          // epic-fail outer band thickness (∝ crit%)
+  axisTip:[200,200,200,200,200],    // per-axis star tip radius (white obelisk = stat)
+  axisCheck:[300,300,300,300,300],  // per-axis failure inner radius (black obelisk = check)
+  axisSkill:[0,0,0,0,0],
+  wedges:{           // risk sectors, anchored at the upper rim — never overlapping
+    dead:{a0:0,a1:0}, wound:{a0:0,a1:0},
+  },
+};
+
+/* Determine skill index from ball position (angle)
+   Skills are arranged as equal segments around the circle.
+   E.g. 2 skills = 180° each, 3 skills = 120° each, etc. */
+function getSkillIndexFromAngle(x,y){
+  if(skills.length===0) return 0;
+  if(skills.length===1) return 0;
+  const angle=normAng(angOf(x,y)+Math.PI/2);  // Normalize to 0..TAU starting from top
+  const segmentSize=TAU/skills.length;
+  const skillIndex=Math.floor(angle/segmentSize);
+  return Math.min(skillIndex, skills.length-1);
+}
+
+/* map a 0..100 value to a radius from core outward (white=stat, black=check) */
+function rOf(v){ return geo.rCore + clamp(v,1,99)/100*(R-22-geo.rCore); }
+
+function recomputeGeometry(skillIndex=0){
+  geo.rCore=Math.max(30,R*0.12);
+  /* assign each of the 5 axes to a skill, per the punte distribution */
+  geo.axisSkill=[];
+  for(let s=0;s<skillAxes.length;s+=1){ for(let n=0;n<skillAxes[s];n+=1) geo.axisSkill.push(s); }
+  while(geo.axisSkill.length<AXES) geo.axisSkill.push(geo.axisSkill.length%Math.max(1,skills.length));
+  /* per-axis radii: white obelisk = stat, black obelisk = check */
+  geo.axisTip=[]; geo.axisCheck=[];
+  for(let i=0;i<AXES;i+=1){
+    const sk=skills[geo.axisSkill[i]]||{stat:60,difficulty:50};
+    geo.axisTip[i]=rOf(sk.stat);        // success star reaches the white obelisk (stat)
+    geo.axisCheck[i]=rOf(sk.difficulty);// failure goo reaches the black obelisk (check)
+  }
+  /* cosmetic aggregate radii (halo/gradients) */
+  geo.rTip=Math.max(...geo.axisTip);
+  geo.rValley=Math.min(...geo.axisTip)*0.5;
+  /* keep a single tst for the verdict roll (skill resolved at landing) */
+  const skill=skills.length>0?skills[Math.min(skillIndex,skills.length-1)]:{stat:60,difficulty:55};
+  geo.tst=clamp(50+(skill.stat-skill.difficulty),1,99);
+  const failSpan=Math.max(0,100-(geo.tst+5));
+  geo.epicW=Math.max(5,(R-geo.rTip)*((failSpan*cfg.crit/100)/100)*3+5);
+  /* wedges: dead centered at 12 o'clock, wounded adjacent clockwise, 6° gap */
+  const dA=Math.max(.14,TAU*cfg.dead/100);
+  const wA=Math.max(.14,TAU*cfg.wound/100);
+  const gap=.105;
+  geo.wedges.dead={a0:-Math.PI/2-dA/2, a1:-Math.PI/2+dA/2};
+  geo.wedges.wound={a0:-Math.PI/2+dA/2+gap, a1:-Math.PI/2+dA/2+gap+wA};
+}
+/* interpolate a per-axis radius array around the wheel (tips at TIP(i)) */
+function radialFromAxes(theta,arr,scale){
+  const t=((normAng(theta+Math.PI/2)%TAU)+TAU)%TAU;   // 0 at first tip (axis 0)
+  const seg=TAU/(AXES*2);                             // 36°
+  const k=Math.floor(t/seg), f=(t-k*seg)/seg;
+  const tipR=i=>arr[((i%AXES)+AXES)%AXES]*scale;      // radius at star point i
+  if(k%2===0){                                        // tip → valley
+    const a=tipR(k/2), b=tipR(k/2)* 0.0 + Math.min(tipR(k/2),tipR(k/2+1))*0.5;
+    return a+(b-a)*f;
+  } else {                                            // valley → tip
+    const b=tipR((k+1)/2), a=Math.min(tipR((k-1)/2),tipR((k+1)/2))*0.5;
+    return a+(b-a)*f;
+  }
+}
+/* star radius (success boundary) — per-axis, reaches the white obelisk (stat) */
+function rStarAt(theta,scale=1){ return radialFromAxes(theta,geo.axisTip,scale); }
+/* check radius (failure inner boundary) — per-axis, the black obelisk (check) */
+function rCheckAt(theta,scale=1){ return radialFromAxes(theta,geo.axisCheck,scale); }
+const dist=(x,y)=>Math.hypot(x-CX,y-CY);
+const angOf=(x,y)=>Math.atan2(y-CY,x-CX);
+const inStar=(x,y,s=1)=>dist(x,y)<=rStarAt(angOf(x,y),s);
+const inCore=(x,y)=>dist(x,y)<=geo.rCore;
+/* almost = the band between the white obelisk (stat) and the black obelisk
+   (check). Exists only where the check sits beyond the stat (check>stat). */
+const inAlmost=(x,y)=>{const a=angOf(x,y),d=dist(x,y),rs=rStarAt(a),rc=Math.max(rCheckAt(a),rs+ALMOST_W);return d>rs&&d<=rc;};
+const inEpic=(x,y)=>{const d=dist(x,y);return d>R-geo.epicW&&d<=R-3;};
+const inWedge=(x,y,w)=>{const a=angOf(x,y);
+  return normAng(a-w.a0)>=0 && normAng(a-w.a1)<=0;};
+const inAnyWedge=(x,y)=>inWedge(x,y,geo.wedges.dead)||inWedge(x,y,geo.wedges.wound);
+
+/* =========================================================================
+   THE MATHEMATICAL ENGINE — D100 roll-under, pre-calculated verdict
+   ========================================================================= */
+function trueRoll(){
+  const roll=1+Math.floor(Math.random()*100);
+  const riskRoll=1+Math.floor(Math.random()*100);
+  const tst=geo.tst;
+  let verdict;
+  if(roll<=tst){
+    verdict=(roll<=Math.max(1,Math.round(tst*0.10)))?'bigwin':'win';
+  } else if(roll<=tst+5){
+    verdict='almost';
+  } else {
+    const failSpan=100-(tst+5);
+    const epicFrom=101-Math.max(1,Math.round(failSpan*cfg.crit/100));
+    verdict=(roll>=epicFrom)?'epicfail':'fail';
+  }
+  /* single risk d100 → mutually exclusive flags (they can never overlap) */
+  const dead=riskRoll<=cfg.dead;
+  const wounded=!dead && riskRoll<=cfg.dead+cfg.wound;
+  return {roll,riskRoll,verdict,wounded,dead};
+}
+function forcedRoll(mode){
+  const tst=geo.tst;
+  const failSpan=100-(tst+5);
+  const epicFrom=101-Math.max(1,Math.round(failSpan*cfg.crit/100));
+  const within=(a,b)=>a+Math.floor(Math.random()*Math.max(1,b-a+1));
+  const base={roll:50,riskRoll:100,verdict:'win',wounded:false,dead:false};
+  switch(mode){
+    case 'bigwin': return {...base,verdict:'bigwin',roll:within(1,Math.max(1,Math.round(tst*0.10)))};
+    case 'win': return {...base,verdict:'win',roll:within(Math.max(1,Math.round(tst*0.10))+1,tst)};
+    case 'almost': return {...base,verdict:'almost',roll:within(tst+1,Math.min(100,tst+5))};
+    case 'fail': return {...base,verdict:'fail',roll:within(Math.min(100,tst+6),Math.max(tst+6,epicFrom-1))};
+    case 'epicfail': return {...base,verdict:'epicfail',roll:within(epicFrom,100)};
+    case 'win-wounded': return {...base,verdict:'win',roll:within(2,tst),wounded:true,riskRoll:cfg.dead+1};
+    case 'win-dead': return {...base,verdict:'win',roll:within(2,tst),dead:true,riskRoll:1};
+    case 'fail-wounded': return {...base,verdict:'fail',roll:within(Math.min(100,tst+6),Math.max(tst+6,epicFrom-1)),wounded:true,riskRoll:cfg.dead+1};
+    case 'fail-dead': return {...base,verdict:'fail',roll:within(Math.min(100,tst+6),Math.max(tst+6,epicFrom-1)),dead:true,riskRoll:1};
+    default: return trueRoll();
+  }
+}
+/* pick the precise landing coordinate inside the verdict's visual zone */
+function pickTarget(res){
+  const wantWedge=res.dead?geo.wedges.dead:(res.wounded?geo.wedges.wound:null);
+  const tests={
+    bigwin:(x,y)=>inCore(x,y),
+    win:(x,y)=>inStar(x,y)&&!inCore(x,y),
+    almost:(x,y)=>inAlmost(x,y),
+    fail:(x,y)=>!inStar(x,y)&&!inAlmost(x,y)&&dist(x,y)<R-geo.epicW-6&&dist(x,y)>geo.rValley*0.4,
+    epicfail:(x,y)=>inEpic(x,y),
+  };
+  const zoneOk=tests[res.verdict];
+  window.__debugTarget={res:res.verdict,geoTip:geo.rTip,geoCore:geo.rCore,geoValley:geo.rValley,geoEpicW:geo.epicW};
+  let foundCount=0;
+  for(let relax=0;relax<2;relax+=1){
+    for(let i=0;i<500;i+=1){
+      const a=Math.random()*TAU, d=Math.sqrt(Math.random())*(R-8);
+      const x=CX+Math.cos(a)*d, y=CY+Math.sin(a)*d;
+      if(!zoneOk(x,y)) continue;
+      if(relax===0){
+        if(wantWedge && !inWedge(x,y,wantWedge)) continue;
+        if(!wantWedge && inAnyWedge(x,y) && (res.verdict==='win'||res.verdict==='fail')) continue;
+      }
+      foundCount++;
+      const result={x,y};
+      window.__debugTarget.foundTarget=result;
+      return result;
+    }
+  }
+  window.__debugTarget.foundCount=foundCount;
+  /* fallback: increase search passes with better initial distribution */
+  for(let pass=0;pass<3;pass+=1){
+    for(let i=0;i<800;i+=1){
+      const a=Math.random()*TAU, d=Math.sqrt(Math.random())*(R-8);
+      const x=CX+Math.cos(a)*d, y=CY+Math.sin(a)*d;
+      if(!zoneOk(x,y)) continue;
+      return {x,y};
+    }
+  }
+  /* last-resort geometric fallback — directly construct zone-appropriate points */
+  window.__debugTarget.usedFallback=true;
+  const a=Math.random()*TAU;
+  if(res.verdict==='almost'){
+    const rStar=rStarAt(a), rChk=Math.max(rCheckAt(a),rStar+ALMOST_W);
+    const d=rStar+(rChk-rStar)*(0.3+Math.random()*0.4);  // 30-70% into the almost band
+    return {x:CX+Math.cos(a)*d,y:CY+Math.sin(a)*d};
+  } else if(res.verdict==='fail'){
+    const min=Math.max(rCheckAt(a),rStarAt(a)+ALMOST_W)+4, max=R-geo.epicW-6;
+    const d=min+(Math.random()*Math.max(1,max-min));
+    return {x:CX+Math.cos(a)*d,y:CY+Math.sin(a)*d};
+  } else if(res.verdict==='epicfail'){
+    const min=R-geo.epicW, max=R-3;
+    const d=min+(Math.random()*(max-min));
+    return {x:CX+Math.cos(a)*d,y:CY+Math.sin(a)*d};
+  }
+  /* bigwin/win: true center */
+  return {x:CX,y:CY};
+}
+
+/* =========================================================================
+   SCENE STATE — choreography data (presentation)
+   ========================================================================= */
+const scene={
+  state:'idle',
+  t0:0,
+  res:null, target:null,
+  blackPillars:[], whitePillars:[],     // {ang,r,drop:0..1,flash,landed}
+  starScale:0,
+  pourP:0, streamAlpha:0,
+  ball:{x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false},
+  snapFrom:null,
+  shocks:[], rimHits:[], sparks:[],
+  gooRipple:0,                          // boosts displacement scale
+  gooReveal:0,                          // 0 in idle → goo wells up cinematically
+  ringReveal:0,                         // 0 until the bronze ring locks in
+  motes:Array.from({length:22},()=>({x:Math.random()*W,y:Math.random()*W,r:.5+Math.random()*1.5,
+    sp:2.5+Math.random()*6,ph:Math.random()*TAU,sw:Math.random()*TAU})),
+  stars:Array.from({length:42},()=>({x:Math.random()*W,y:Math.random()*W,
+    r:.4+Math.random()*1.2,ph:Math.random()*TAU,sp:.4+Math.random()*1.1})),
+};
+function buildPillars(){
+  /* per axis: white obelisk at the stat radius, black obelisk at the check
+     radius — both on the SAME spoke so the star reaches white and the goo
+     reaches black on that axis */
+  scene.whitePillars=Array.from({length:AXES},(_,i)=>({
+    ang:TIP(i), r:geo.axisTip[i], drop:0, flash:0, landed:false}));
+  scene.blackPillars=Array.from({length:AXES},(_,i)=>({
+    ang:TIP(i), r:geo.axisCheck[i], drop:0, flash:0, landed:false}));
+}
+
+/* =========================================================================
+   TIMELINE — strict data-state pipeline
+   idle → threat-slam → agency-burst → risk-pour → the-spin → magnetic-snap → resolution
+   ========================================================================= */
+const suite=$id('suite');
+const stage=$id('stage');
+const stateChip=$id('stateChip');
+function setState(s){
+  scene.state=s; scene.t0=performance.now();
+  suite.dataset.state=s;
+  stateChip.textContent=s;
+}
+function phaseT(durMs){ return clamp((performance.now()-scene.t0)/durMs,0,1); }
+const easeOutCubic=t=>1-Math.pow(1-t,3);
+const easeInCubic=t=>t*t*t;
+const easeOutBack=t=>{const c=1.7;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2);};
+const easeElastic=t=>t===0?0:t===1?1:Math.pow(2,-10*t)*Math.sin((t*10-0.75)*(TAU/3))+1;
+
+function shake(kind){
+  stage.classList.remove('shake-hard','shake-low','shake-slam');
+  void stage.offsetWidth;
+  stage.classList.add(kind);
+}
+
+function launchRoll(){
+  /* clear previous resolution */
+  card.classList.remove('show','triumph','win','almost','fail','epic');
+  suite.dataset.tone='';
+  $id('flare').classList.remove('fire');
+  $id('launch').classList.remove('pulse');
+  /* 1. recompute geometry from sliders, 2. pre-calculate verdict + target */
+  recomputeGeometry();
+  scene.res=(cfg.mode==='random')?trueRoll():forcedRoll(cfg.mode);
+  scene.target=pickTarget(scene.res);
+  buildPillars();
+  scene.starScale=0; scene.pourP=0; scene.streamAlpha=0;
+  scene.gooReveal=0; scene.ringReveal=0; scene.snapInit=false;
+  scene.ball={x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false};
+  scene.snapFrom=null;
+  scene.shocks.length=0; scene.rimHits.length=0; scene.sparks.length=0;
+  /* panel result removed */
+  /* ACT 0 — the Sun-Bronze ring slams into place like an ancient telescope lens */
+  scene.ringShaken=false;
+  stage.classList.remove('ring-locked');
+  void stage.offsetWidth;
+  stage.classList.add('ring-locked');
+  setState('ring-lock');
+}
+const RING_MS=820;
+
+/* advance choreography (called every frame) */
+function tickTimeline(){
+  const s=scene.state;
+  if(s==='idle') return;
+
+  if(s==='ring-lock'){
+    const p=phaseT(RING_MS);
+    scene.ringReveal=clamp(p/0.68,0,1);     // ring fades/locks into being
+    if(!scene.ringShaken && p>=0.68){       // impact frame of the ringlock keyframes
+      scene.ringShaken=true;
+      shake('shake-hard');
+    }
+    if(p>=1){ scene.ringReveal=1; setState('threat-slam'); }
+  }
+  else if(s==='threat-slam'){
+    const p=phaseT(cfg.tSlam);
+    /* the void fills: black goo wells up from the centre before the pillars fall */
+    scene.gooReveal=easeOutCubic(clamp(p/0.35,0,1));
+    if(scene.gooReveal>0 && scene.gooReveal<1) scene.gooRipple=Math.max(scene.gooRipple,0.5);
+    scene.blackPillars.forEach((pl,i)=>{
+      const local=clamp((p-(i*0.13))/0.4,0,1);
+      const prev=pl.drop;
+      pl.drop=easeInCubic(local);
+      if(prev<1&&pl.drop>=1&&!pl.landed){
+        pl.landed=true; pl.flash=1;
+        scene.gooRipple=1; shake('shake-slam');
+        addShock(pl,'rgba(200,134,46,.9)');
+      }
+    });
+    if(p>=1) setState('agency-burst');
+  }
+  else if(s==='agency-burst'){
+    const p=phaseT(cfg.tBurst);
+    scene.whitePillars.forEach((pl,i)=>{
+      const local=clamp((p-(i*0.09))/0.32,0,1);
+      const prev=pl.drop;
+      pl.drop=easeInCubic(local);
+      if(prev<1&&pl.drop>=1&&!pl.landed){
+        pl.landed=true; pl.flash=1; shake('shake-slam');
+        addShock(pl,'rgba(255,242,200,.95)');
+      }
+    });
+    /* star bursts open like a solar lens, locking tips to alabaster heights */
+    const sp=clamp((p-0.5)/0.5,0,1);
+    scene.starScale=easeElastic(sp);
+    if(p>=1){ scene.starScale=1; setState('risk-pour'); }
+  }
+  else if(s==='risk-pour'){
+    const p=phaseT(cfg.tPour);
+    scene.pourP=easeOutCubic(p);
+    scene.streamAlpha=0.5;
+    if(p>=1){ scene.streamAlpha=0.34; setState('the-spin'); fireBall(); }
+  }
+  else if(s==='the-spin'){
+    const p=phaseT(cfg.tSpin);
+    stepBall(p,false);
+    if(p>=1){ scene.snapFrom={x:scene.ball.x,y:scene.ball.y}; scene.snapInit=false; setState('magnetic-snap'); }
+  }
+  else if(s==='magnetic-snap'){
+    const p=phaseT(cfg.tSnap);
+    stepBall(p,true);
+    if(p>=1){ resolve(); }
+  }
+  /* decay one-shot fx */
+  scene.gooRipple=Math.max(0,scene.gooRipple-0.02);
+  scene.blackPillars.concat(scene.whitePillars).forEach(pl=>pl.flash=Math.max(0,pl.flash-0.03));
+}
+function addShock(pl,color){
+  scene.shocks.push({x:CX+Math.cos(pl.ang)*pl.r,y:CY+Math.sin(pl.ang)*pl.r,t:0,dur:600,c:color});
+}
+
+/* =========================================================================
+   THE BALL — pinball + hidden progressive magnetism + bullet-time snap
+   ========================================================================= */
+function fireBall(){
+  const b=scene.ball;
+  b.on=true; b.x=CX; b.y=CY;
+  /* MUCH faster launch — a violent kick so the sphere caroms wildly */
+  const a=Math.random()*TAU, sp=30+Math.random()*6;
+  b.vx=Math.cos(a)*sp; b.vy=Math.sin(a)*sp;
+}
+let lastBallT=performance.now();
+function stepBall(p,snapPhase){
+  const b=scene.ball;
+  if(!b.on) return;
+  const now=performance.now();
+  let dt=Math.min(40,now-lastBallT); lastBallT=now;
+  const T=scene.target;
+
+  if(!snapPhase){
+    const f=dt/16.7;
+    /* ENERGY-GATED STEERING (deterministic-plinko technique):
+       — Phase 1 (p<0.5): ZERO steering. Pure chaotic, energetic caroming.
+         Friction is very light so the ball keeps slamming the walls.
+       — Phase 2 (0.5<p<1): steering ramps up with a smoothstep as the ball
+         bleeds energy, so the late correction is invisible inside the
+         natural slowdown. No early curve — it looks fully random. */
+    const steerStart=0.5;
+    const sg=clamp((p-steerStart)/(1-steerStart),0,1);
+    const steer=sg*sg*(3-2*sg);                 // smoothstep guidance 0→1
+    /* friction: near-frictionless early (keeps bouncing), grips late */
+    const fric=Math.pow(0.9994-0.018*steer,f);
+    /* hidden magnetism, gated by steer (≈0 for first half of the roll) */
+    const mx=T.x-b.x, my=T.y-b.y, md=Math.hypot(mx,my)||1;
+    const k=0.85*steer;
+    b.vx=(b.vx+mx/md*k*f)*fric;
+    b.vy=(b.vy+my/md*k*f)*fric;
+    b.x+=b.vx*f; b.y+=b.vy*f;
+    /* arena wall bounce — high restitution = lively, repeated rim slams */
+    const d=dist(b.x,b.y);
+    if(d>R-12){
+      const nx=(b.x-CX)/d, ny=(b.y-CY)/d;
+      const dot=b.vx*nx+b.vy*ny;
+      b.vx-=2*dot*nx; b.vy-=2*dot*ny;
+      b.vx*=0.992; b.vy*=0.992;
+      b.x=CX+nx*(R-12); b.y=CY+ny*(R-12);
+      scene.rimHits.push({ang:Math.atan2(ny,nx),life:600});
+      addSpark(b.x,b.y);
+    }
+    /* pillar bounce (skip in final homing window to guarantee arrival) */
+    if(p<0.86){
+      scene.blackPillars.concat(scene.whitePillars).forEach(pl=>{
+        if(!pl.landed) return;
+        const px=CX+Math.cos(pl.ang)*pl.r, py=CY+Math.sin(pl.ang)*pl.r;
+        const dx=b.x-px, dy=b.y-py, dd=Math.hypot(dx,dy);
+        if(dd<24){
+          const nx=dx/(dd||1), ny=dy/(dd||1);
+          const dot=b.vx*nx+b.vy*ny;
+          if(dot<0){ b.vx-=2*dot*nx; b.vy-=2*dot*ny; }
+          b.x=px+nx*24; b.y=py+ny*24;
+          pl.flash=1; addSpark(b.x,b.y);
+        }
+      });
+    }
+    b.trail.push({x:b.x,y:b.y,life:480});
+  } else {
+    /* SETTLE — critically damped spiral: velocity decelerates monotonically,
+       gentle corrective spring keeps aim true without overshooting. */
+    if(!scene.snapInit){
+      scene.snapInit=true;
+      const dx=T.x-b.x, dy=T.y-b.y, d=Math.hypot(dx,dy)||1;
+      const sp=Math.max(Math.hypot(b.vx,b.vy),5.5);
+      b.vx=dx/d*sp; b.vy=dy/d*sp;
+    }
+    const f=dt/16.7*(p<0.32?0.72:1);
+    /* friction → monotonic deceleration */
+    b.vx*=Math.pow(0.905,f); b.vy*=Math.pow(0.905,f);
+    /* faint corrective spring toward target (no energy spike) */
+    b.vx+=(T.x-b.x)*0.008*f; b.vy+=(T.y-b.y)*0.008*f;
+    b.x+=b.vx*f; b.y+=b.vy*f;
+    /* final glide-in smoother: much gentler, starts later (p>0.92) */
+    if(p>0.92){ const e=(p-0.92)/0.08, s=e*e*(3-2*e);
+      b.x+=(T.x-b.x)*s*0.6; b.y+=(T.y-b.y)*s*0.6; b.vx*=(1-s*0.5); b.vy*=(1-s*0.5); }
+    scene.snapFrom={x:b.x,y:b.y};
+    b.trail.push({x:b.x,y:b.y,life:480});
+  }
+  for(let i=b.trail.length-1;i>=0;i-=1){
+    b.trail[i].life-=dt;
+    if(b.trail[i].life<=0) b.trail.splice(i,1);
+  }
+  if(b.trail.length>90) b.trail.splice(0,b.trail.length-90);
+  for(let i=scene.sparks.length-1;i>=0;i-=1){
+    const s=scene.sparks[i]; s.life-=dt;
+    if(s.life<=0){scene.sparks.splice(i,1);continue;}
+    s.x+=s.vx; s.y+=s.vy; s.vy+=0.04;
+  }
+  for(let i=scene.rimHits.length-1;i>=0;i-=1){
+    scene.rimHits[i].life-=dt;
+    if(scene.rimHits[i].life<=0) scene.rimHits.splice(i,1);
+  }
+}
+function addSpark(x,y){
+  for(let i=0;i<6;i+=1){
+    const a=Math.random()*TAU, sp=1+Math.random()*2.4;
+    scene.sparks.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,
+      r:1+Math.random()*2,life:280+Math.random()*220,max:500,
+      c:Math.random()>0.4?'#fce890':'#34d4b8'});
+  }
+}
+
+/* =========================================================================
+   RESOLUTION
+   ========================================================================= */
+const card=$id('card');
+const VERDICT_TEXT={
+  bigwin:{title:'TRIONFO',seal:'★',cls:'triumph',sub:'Il sole stesso firma la tua impresa.'},
+  win:{title:'VITTORIA',seal:'★',cls:'win',sub:'La vetta si inchina al tuo passo.'},
+  almost:{title:'PER UN SOFFIO',seal:'◐',cls:'almost',sub:'La sfera danza sul bronzo… e scivola oltre.'},
+  fail:{title:'SCONFITTA',seal:'✕',cls:'fail',sub:'La montagna respinge i mortali.'},
+  epicfail:{title:'ROVINA',seal:'✕',cls:'epic',sub:'L’abisso reclama ciò che osa troppo.'},
+};
+function resolve(){
+  const res=scene.res;
+  window.__debugResolve={targetX:scene.target?.x,targetY:scene.target?.y,ballBeforeX:scene.ball.x,ballBeforeY:scene.ball.y};
+  scene.ball.x=scene.target.x; scene.ball.y=scene.target.y;
+  window.__debugResolve.ballAfterX=scene.ball.x; window.__debugResolve.ballAfterY=scene.ball.y;
+  setState('resolution');
+  const V=VERDICT_TEXT[res.verdict];
+  /* title: split into letters for the crumble effect */
+  const titleEl=$id('cardTitle');
+  titleEl.innerHTML=[...V.title].map(ch=>{
+    if(ch===' ') return '<span class="ch">&nbsp;</span>';
+    const dx=(Math.random()*8-4).toFixed(1), dy=(6+Math.random()*12).toFixed(1);
+    const rot=(Math.random()*10-5).toFixed(1), del=(0.05+Math.random()*0.35).toFixed(2);
+    return `<span class="ch" style="--dx:${dx}px;--dy:${dy}px;--rot:${rot}deg;--del:${del}s">${ch}</span>`;
+  }).join('');
+  $id('cardSeal').textContent=V.seal;
+  $id('cardSub').textContent=V.sub;
+  $id('cardNums').textContent=`D100 ${res.roll} · Soglia ${geo.tst}`;
+  const chips=$id('cardChips');
+  chips.innerHTML='';
+  if(res.wounded) chips.innerHTML+='<span class="chip wounded">Ferito</span>';
+  if(res.dead) chips.innerHTML+='<span class="chip dead">Caduto</span>';
+  card.classList.remove('triumph','win','almost','fail','epic');
+  card.classList.add(V.cls);
+  void card.offsetWidth;
+  card.classList.add('show');
+  /* tone per verdict */
+  const isLoss=(res.verdict==='fail'||res.verdict==='epicfail');
+  if(res.verdict==='bigwin'||res.verdict==='win'){
+    suite.dataset.tone='triumph';
+    $id('flare').classList.remove('fire');
+    void $id('flare').offsetWidth;
+    $id('flare').classList.add('fire');
+  } else if(res.verdict==='almost'){
+    suite.dataset.tone='';
+  } else {
+    suite.dataset.tone=(res.verdict==='epicfail')?'grim':'doom';
+  }
+  /* SOLAR CLIMAX — blinding burst from the core + massive unified screen punch,
+     fired the same millisecond the typography appears */
+  const climax=$id('climax');
+  climax.classList.remove('burst','cold');
+  if(isLoss) climax.classList.add('cold');
+  void climax.offsetWidth;
+  climax.classList.add('burst');
+  shake('shake-resolve');
+  $id('launch').classList.add('pulse');
+  /* panel result removed */
+  /* Recalculate geometry for the tested skill */
+  const skillIndex=getSkillIndexFromAngle(scene.ball.x,scene.ball.y);
+  recomputeGeometry(skillIndex);
+  /* Update display with correct TST for this skill */
+  $id('cardNums').textContent=`D100 ${res.roll} · Soglia ${geo.tst}`;
+
+  /* Post result to parent window (for iframe embedding) */
+  if(opts.onResolve){
+    const skillName=skills.length>0?skills[skillIndex].name:'Skill';
+    opts.onResolve({verdict:res.verdict,roll:res.roll,riskRoll:res.riskRoll,skillIndex:skillIndex,skillName:skillName,wounded:res.wounded,dead:res.dead});
+  }
+}
+
+/* =========================================================================
+   RENDER — Wanderlust canvas painting
+   ========================================================================= */
+const cv=$id('cv');
+const ctx=cv.getContext('2d',{alpha:true});
+
+/* ---- procedural material textures (generated once) ---- */
+const stoneTex=(()=>{                 // porous volcanic basalt
+  const c=document.createElement('canvas'); c.width=c.height=96;
+  const x=c.getContext('2d');
+  const img=x.createImageData(96,96);
+  for(let i=0;i<img.data.length;i+=4){
+    const v=18+Math.random()*48;
+    img.data[i]=v*.9; img.data[i+1]=v*.95; img.data[i+2]=v*1.18; img.data[i+3]=255;
+  }
+  x.putImageData(img,0,0);
+  for(let i=0;i<80;i+=1){             // pores & erosions
+    x.fillStyle=`rgba(3,2,7,${.25+Math.random()*.45})`;
+    x.beginPath(); x.arc(Math.random()*96,Math.random()*96,.6+Math.random()*2,0,TAU); x.fill();
+  }
+  return c;
+})();
+const marbleTex=(()=>{                // ancient translucent marble with vein noise
+  const c=document.createElement('canvas'); c.width=c.height=96;
+  const x=c.getContext('2d');
+  const img=x.createImageData(96,96);
+  for(let i=0;i<img.data.length;i+=4){
+    const v=198+Math.random()*57;
+    img.data[i]=v; img.data[i+1]=v*.97; img.data[i+2]=v*.89; img.data[i+3]=255;
+  }
+  x.putImageData(img,0,0);
+  for(let k=0;k<8;k+=1){              // wandering mineral veins
+    x.strokeStyle=`rgba(148,124,84,${.16+Math.random()*.2})`;
+    x.lineWidth=.5+Math.random()*.9;
+    x.beginPath();
+    let px=Math.random()*96, py=-4;
+    x.moveTo(px,py);
+    for(let s=0;s<7;s+=1){ px+=(Math.random()-.5)*28; py+=16; x.lineTo(px,py); }
+    x.stroke();
+  }
+  return c;
+})();
+
+function drawBackdrop(now){
+  const t=now/1000;
+  /* cosmic dust: starlit gold + teal grains over astral ink */
+  ctx.save();
+  ctx.globalCompositeOperation='lighter';
+  scene.stars.forEach((s,i)=>{
+    const tw=.5+.5*Math.sin(t*s.sp+s.ph);
+    const a=.18+.55*tw;
+    const gold=(i%3!==0);
+    ctx.globalAlpha=a;
+    ctx.fillStyle=gold?'#ffe9a8':'#a8f0e0';
+    if(tw>.82){ ctx.shadowColor=gold?'#fce890':'#7fffe6'; ctx.shadowBlur=6+6*tw; } else ctx.shadowBlur=0;
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.r*(.8+.5*tw),0,TAU); ctx.fill();
+  });
+  ctx.shadowBlur=0; ctx.globalAlpha=1;
+  ctx.restore();
+  /* astrolabe engraving */
+  for(let ri=1;ri<=3;ri+=1){
+    ctx.strokeStyle=ri===3?'rgba(201,162,39,.13)':'rgba(110,90,220,.10)';
+    ctx.lineWidth=ri===3?1.2:.8;
+    ctx.beginPath(); ctx.arc(CX,CY,R*ri/3,0,TAU); ctx.stroke();
+  }
+  for(let i=0;i<AXES;i+=1){
+    const a=TIP(i), dx=Math.cos(a), dy=Math.sin(a);
+    const g=ctx.createLinearGradient(CX,CY,CX+dx*R,CY+dy*R);
+    g.addColorStop(0,'rgba(110,90,220,.05)');
+    g.addColorStop(.7,'rgba(90,120,255,.14)');
+    g.addColorStop(1,'rgba(252,232,144,.26)');
+    ctx.strokeStyle=g; ctx.lineWidth=1.3;
+    ctx.beginPath(); ctx.moveTo(CX,CY); ctx.lineTo(CX+dx*R,CY+dy*R); ctx.stroke();
+  }
+}
+function drawMotes(now,dt){
+  const t=now/1000;
+  scene.motes.forEach(m=>{
+    m.y-=m.sp*dt/1000; m.x+=Math.sin(t*.7+m.sw)*.12;
+    if(m.y<-4){m.y=W+4;m.x=Math.random()*W;}
+    ctx.globalAlpha=.1+.18*(.5+.5*Math.sin(t*1.3+m.ph));
+    ctx.fillStyle='#fce890';
+    ctx.beginPath(); ctx.arc(m.x,m.y,m.r,0,TAU); ctx.fill();
+  });
+  ctx.globalAlpha=1;
+}
+
+/* the goo — full failure field, boiling & wobbling */
+const gooBubbles=Array.from({length:6},(_,i)=>({ph:i*1.55,sp:.12+i*.035,rad:2.6+i*1.1,ox:(i-2.5)*36,oy:(i%3-1)*30}));
+function drawGoo(now){
+  const rev=scene.gooReveal;
+  if(rev<=0.001) return;                 // void start: no goo until it wells up
+  const t=now/1000;
+  const RR=(R-3)*(0.16+0.84*rev);        // wells up from a small dark seed
+  ctx.save();
+  ctx.globalAlpha=Math.min(1,rev*1.2);
+  ctx.filter='url(#gooWobble)';
+  ctx.shadowColor='rgba(10,40,40,.5)';   // cold, not violet
+  ctx.shadowBlur=30;
+  /* deep obsidian-teal viscous body (no muddy magenta) */
+  const g=ctx.createRadialGradient(CX-20,CY-26,4,CX,CY,RR);
+  g.addColorStop(0,'#0c1620'); g.addColorStop(.45,'#060c12'); g.addColorStop(1,'#020507');
+  ctx.fillStyle=g;
+  ctx.beginPath(); ctx.arc(CX,CY,RR,0,TAU); ctx.fill();
+  ctx.filter='none'; ctx.shadowBlur=0;
+  ctx.save();
+  ctx.beginPath(); ctx.arc(CX,CY,RR,0,TAU); ctx.clip();
+  /* breathing currents — cold teal / slate, very subtle */
+  const v1=ctx.createRadialGradient(CX+60+Math.sin(t*.5)*26,CY+90+Math.cos(t*.4)*20,4,CX+60,CY+90,210);
+  v1.addColorStop(0,'rgba(24,110,98,.22)'); v1.addColorStop(.5,'rgba(24,110,98,.05)'); v1.addColorStop(1,'transparent');
+  ctx.fillStyle=v1; ctx.fillRect(0,0,W,W);
+  const v2=ctx.createRadialGradient(CX-90+Math.cos(t*.36)*30,CY-50+Math.sin(t*.55)*24,4,CX-90,CY-50,240);
+  v2.addColorStop(0,'rgba(40,64,92,.20)'); v2.addColorStop(.55,'rgba(40,64,92,.05)'); v2.addColorStop(1,'transparent');
+  ctx.fillStyle=v2; ctx.fillRect(0,0,W,W);
+  /* simmering bubbles — cold slate, not purple */
+  gooBubbles.forEach(bu=>{
+    const cyc=((t*bu.sp+bu.ph)%1+1)%1;
+    const bx=CX+bu.ox+Math.sin(bu.ph*2.7)*40, by=CY+bu.oy-cyc*22;
+    if(cyc<0.8){
+      const br=bu.rad*(.3+cyc);
+      const bg=ctx.createRadialGradient(bx-br*.3,by-br*.3,.4,bx,by,br);
+      bg.addColorStop(0,'rgba(90,130,135,.34)'); bg.addColorStop(.7,'rgba(20,42,46,.22)'); bg.addColorStop(1,'transparent');
+      ctx.fillStyle=bg; ctx.beginPath(); ctx.arc(bx,by,br,0,TAU); ctx.fill();
+    } else {
+      const pop=(cyc-.8)/.2;
+      ctx.globalAlpha=(1-pop)*.4;
+      ctx.strokeStyle='rgba(120,165,160,.7)'; ctx.lineWidth=.8;
+      ctx.beginPath(); ctx.arc(bx,by,bu.rad*(1+pop*1.7),0,TAU); ctx.stroke();
+      ctx.globalAlpha=1;
+    }
+  });
+  /* wet specular — cool moonlight catch */
+  const wx=CX-30+Math.sin(t*.7)*10, wy=CY-60;
+  const wet=ctx.createRadialGradient(wx,wy,1,wx,wy,46);
+  wet.addColorStop(0,'rgba(220,240,238,.38)'); wet.addColorStop(.4,'rgba(220,240,238,.05)'); wet.addColorStop(1,'transparent');
+  ctx.fillStyle=wet; ctx.fillRect(0,0,W,W);
+  ctx.restore();
+  /* teal rim light (Wanderlust shadow rule) */
+  ctx.strokeStyle='rgba(16,150,130,.20)'; ctx.lineWidth=1.6;
+  ctx.shadowColor='rgba(16,185,129,.32)'; ctx.shadowBlur=8;
+  ctx.beginPath(); ctx.arc(CX,CY,RR,0,TAU); ctx.stroke();
+  ctx.restore();
+  if(rev<0.999) return;                  // epic-fail rim only once fully formed
+  /* EPIC FAIL outer margin — thickness ∝ crit% */
+  ctx.save();
+  const pul=.5+.5*Math.sin(t*2.2);
+  ctx.strokeStyle=`rgba(120,16,40,${.5+.25*pul})`;
+  ctx.lineWidth=geo.epicW;
+  ctx.shadowColor='rgba(255,40,90,.4)'; ctx.shadowBlur=12+8*pul;
+  ctx.beginPath(); ctx.arc(CX,CY,R-3-geo.epicW/2,0,TAU); ctx.stroke();
+  ctx.lineWidth=1;
+  ctx.strokeStyle=`rgba(255,80,120,${.35+.3*pul})`;
+  ctx.beginPath(); ctx.arc(CX,CY,R-3-geo.epicW,0,TAU); ctx.stroke();
+  ctx.restore();
+}
+
+/* star path sampled from the same radial function used for membership */
+function starPath(scale){
+  const p=new Path2D();
+  const SEG=80;
+  for(let i=0;i<=SEG;i+=1){
+    const a=-Math.PI/2+i/SEG*TAU;
+    const r=rStarAt(a,scale);
+    const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
+    if(i===0) p.moveTo(x,y); else p.lineTo(x,y);
+  }
+  p.closePath();
+  return p;
+}
+/* THE 12-LAYER MECHANICAL STAR — white gold & sun-bronze */
+function drawStar(now){
+  const s=scene.starScale;
+  if(s<=0.01) return;
+  const t=now/1000;
+  const p=starPath(s);
+  ctx.save();
+  /* L0 radiant sunlit halo behind the star (sun-bronze bloom) */
+  const halo=ctx.createRadialGradient(CX,CY,geo.rCore*s,CX,CY,geo.rTip*s*1.35);
+  halo.addColorStop(0,`rgba(255,238,180,${0.32+0.12*Math.sin(now/900)})`);
+  halo.addColorStop(.5,'rgba(252,210,120,.14)');
+  halo.addColorStop(1,'transparent');
+  ctx.fillStyle=halo;
+  ctx.beginPath(); ctx.arc(CX,CY,geo.rTip*s*1.35,0,TAU); ctx.fill();
+  /* L1 radiant white-gold ivory face with strong inner glow */
+  const face=ctx.createRadialGradient(CX-30,CY-46,6,CX,CY,geo.rTip*s);
+  face.addColorStop(0,'#ffffff'); face.addColorStop(.42,'#fdf8e9'); face.addColorStop(1,'#ecd49a');
+  ctx.fillStyle=face;
+  ctx.shadowColor='rgba(255,224,150,.75)'; ctx.shadowBlur=52;
+  ctx.fill(p); ctx.shadowBlur=0;
+  /* L2 rotating specular sheen */
+  ctx.save(); ctx.clip(p);
+  const ang=now/2600, sx=CX+Math.cos(ang)*240, sy=CY+Math.sin(ang)*240;
+  const sh=ctx.createLinearGradient(CX-(sx-CX),CY-(sy-CY),sx,sy);
+  sh.addColorStop(.42,'rgba(255,255,255,0)'); sh.addColorStop(.5,'rgba(255,255,255,.35)'); sh.addColorStop(.58,'rgba(255,255,255,0)');
+  ctx.fillStyle=sh; ctx.fillRect(0,0,W,W);
+  ctx.restore();
+  /* L3-L5 triple bronze rim — the ALMOST band */
+  ctx.lineJoin='round';
+  ctx.lineWidth=ALMOST_W; ctx.strokeStyle='rgba(96,44,8,.55)'; ctx.stroke(starPath(s*1.0));
+  ctx.lineWidth=4.5; ctx.strokeStyle='#602c08'; ctx.stroke(p);
+  ctx.lineWidth=2.4;
+  const rim=ctx.createLinearGradient(CX-120,CY-120,CX+120,CY+120);
+  rim.addColorStop(0,'#fce890'); rim.addColorStop(.5,'#a06a1e'); rim.addColorStop(1,'#fce890');
+  ctx.strokeStyle=rim; ctx.stroke(p);
+  /* L6 white specular hairline */
+  ctx.lineWidth=.8; ctx.strokeStyle='rgba(255,248,215,.85)'; ctx.stroke(p);
+  /* L7-L9 inset mechanical outlines */
+  [0.8,0.62,0.45].forEach((k,i)=>{
+    ctx.lineWidth=1;
+    ctx.strokeStyle=`rgba(160,106,30,${.32-.07*i})`;
+    ctx.stroke(starPath(s*k));
+  });
+  /* L10 core outer ring */
+  ctx.lineWidth=3;
+  ctx.strokeStyle='#8a5a18';
+  ctx.beginPath(); ctx.arc(CX,CY,geo.rCore*s,0,TAU); ctx.stroke();
+  /* L11 brushed bronze-on-gold core (the BIG WIN seat) */
+  const core=ctx.createRadialGradient(CX-8,CY-10,2,CX,CY,geo.rCore*s);
+  core.addColorStop(0,'#f7e1ad'); core.addColorStop(.55,'#cf9d4a'); core.addColorStop(1,'#7d4d12');
+  ctx.fillStyle=core;
+  ctx.beginPath(); ctx.arc(CX,CY,geo.rCore*s-2,0,TAU); ctx.fill();
+  ctx.save();
+  ctx.beginPath(); ctx.arc(CX,CY,geo.rCore*s-2,0,TAU); ctx.clip();
+  ctx.globalAlpha=.3;
+  for(let i=0;i<9;i+=1){                      // brushed arcs
+    ctx.strokeStyle=i%2?'rgba(255,240,200,.5)':'rgba(96,44,8,.5)';
+    ctx.lineWidth=.7;
+    ctx.beginPath(); ctx.arc(CX,CY,(geo.rCore*s-3)*(i+1)/10,t*.3*(i%2?1:-1),t*.3*(i%2?1:-1)+TAU*.8); ctx.stroke();
+  }
+  ctx.globalAlpha=1; ctx.restore();
+  /* L12 core inner sun-spark ring */
+  ctx.lineWidth=1.2;
+  ctx.strokeStyle=`rgba(255,238,188,${.55+.3*Math.sin(t*2.4)})`;
+  ctx.beginPath(); ctx.arc(CX,CY,geo.rCore*s*.55,0,TAU); ctx.stroke();
+  /* prismatic glints at tips */
+  if(s>0.98){
+    for(let i=0;i<AXES;i+=1){
+      const a=TIP(i), tw=.5+.5*Math.sin(t*2.2+i*2.4);
+      if(tw<.45) continue;
+      const gx=CX+Math.cos(a)*geo.rTip, gy=CY+Math.sin(a)*geo.rTip;
+      const L=4+8*tw;
+      ctx.globalAlpha=tw*.9;
+      ctx.strokeStyle=i%2?'rgba(180,240,255,.8)':'rgba(255,252,235,.95)';
+      ctx.lineWidth=.9;
+      ctx.beginPath();
+      ctx.moveTo(gx-L,gy); ctx.lineTo(gx+L,gy);
+      ctx.moveTo(gx,gy-L); ctx.lineTo(gx,gy+L);
+      ctx.stroke();
+      ctx.globalAlpha=1;
+    }
+  }
+  ctx.restore();
+}
+
+/* RISK STREAMS — flowing cosmic rivers / expanding ink veins.
+   Vivid translucent jewel-gel: reads on the astral ink AND tints the white-gold
+   star like stained glass. The centreline MEANDERS and the body SWELLS
+   asymmetrically as it pools inward — never a rigid vertical banner.
+   Coverage angle ∝ risk probability; edges shimmer via animated #fluidWobble. */
+function drawStream(wedge,color,edge,now,pour){
+  if(pour<=0) return;
+  const t=now/1000;
+  const mid=(wedge.a0+wedge.a1)/2;
+  const half=Math.max(0.06,(wedge.a1-wedge.a0)/2);
+  const reach=R*pour;
+  const STEPS=36;
+  const fade=clamp(pour*1.5,0,1);
+  const col=a=>color.replace('A',a.toFixed(3));
+  /* distinct per-stream personality so the two rivers bend differently */
+  const seed=color.indexOf('255,40,190')>=0 ? 1.6 : 4.3;
+  const bendDir=color.indexOf('255,40,190')>=0 ? 1 : -1;
+
+  /* u: 0 at the rim source → 1 at the inner pool */
+  const centreline=u=> mid
+      + Math.sin(u*2.15 + t*0.5 + seed)*half*0.85*u*bendDir   // growing S-meander
+      + Math.sin(u*4.6 + t*1.0 + seed)*0.018*u;               // fine ripple
+  const swell=u=> half*(0.42 + 1.05*Math.sin(Math.min(1,u*1.04)*Math.PI*0.9)); // vein bulge
+  const radAt=u=> R - reach*u;
+
+  /* ragged, creeping edge: low swell + higher-frequency irregular notches so the
+     border looks like bleeding ink, never a clean petal */
+  const ragged=(u,ph)=> 1
+      + 0.16*Math.sin(u*6.1 + t*1.3 + ph)
+      + 0.13*Math.sin(u*17.0 + ph*1.7 + t*0.5)
+      + 0.09*Math.sin(u*34.0 + ph*0.6)
+      + 0.05*Math.sin(u*61.0 + ph*2.2);
+  const buildPath=(wScale)=>{
+    ctx.beginPath();
+    for(let i=0;i<=STEPS;i+=1){              // left bank: rim → pool
+      const u=i/STEPS, c=centreline(u);
+      const w=swell(u)*wScale*ragged(u,seed);
+      const a=c-w, d=radAt(u);
+      ctx.lineTo(CX+Math.cos(a)*d,CY+Math.sin(a)*d);
+    }
+    for(let i=STEPS;i>=0;i-=1){              // right bank: pool → rim (asymmetric)
+      const u=i/STEPS, c=centreline(u);
+      const w=swell(u)*wScale*ragged(u,seed+2.9);
+      const a=c+w, d=radAt(u);
+      ctx.lineTo(CX+Math.cos(a)*d,CY+Math.sin(a)*d);
+    }
+    ctx.closePath();
+  };
+
+  ctx.save();
+  ctx.beginPath(); ctx.arc(CX,CY,R-4,0,TAU); ctx.clip();
+  ctx.filter='url(#fluidWobble)';
+
+  /* 1) VIVID GEL BODY (source-over): denser at the rim source, translucent toward
+        the pool — a clear, instantly-readable colored river */
+  const g=ctx.createRadialGradient(CX,CY,Math.max(0,R-reach),CX,CY,R);
+  g.addColorStop(0, col(0.24*fade));
+  g.addColorStop(.5, col(0.66*fade));
+  g.addColorStop(.85,col(0.86*fade));
+  g.addColorStop(1, col(0.95*fade));
+  ctx.fillStyle=g; buildPath(1); ctx.fill();
+
+  /* 2) LUMINOUS CORE — additive bright heart, glows like neon over dark ink */
+  ctx.globalCompositeOperation='lighter';
+  const c=ctx.createRadialGradient(CX,CY,Math.max(0,R-reach*0.9),CX,CY,R);
+  c.addColorStop(0, col(0.0));
+  c.addColorStop(.7, col(0.18*fade));
+  c.addColorStop(1, col(0.42*fade));
+  ctx.fillStyle=c; buildPath(0.5); ctx.fill();
+
+  /* 3) flowing filaments tracing the meandering current */
+  ctx.filter='none';
+  ctx.strokeStyle=edge; ctx.lineCap='round';
+  for(let k=0;k<4;k+=1){
+    ctx.lineWidth=(k===0?2.0:1.0);
+    ctx.globalAlpha=fade*(k===0?0.85:0.45);
+    ctx.beginPath();
+    for(let i=0;i<=STEPS;i+=1){
+      const u=i/STEPS;
+      const a=centreline(u)+(k-1.5)*swell(u)*0.5+Math.sin(t*1.2+i*.4+k*1.9)*half*0.18*u;
+      const d=radAt(u)+Math.sin(t*1.5+i*.5+k)*3;
+      const x=CX+Math.cos(a)*d, y=CY+Math.sin(a)*d;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+  /* drifting jewel droplets seeping ahead of the pool */
+  for(let k=0;k<6;k+=1){
+    const u=1+0.04*k;
+    const a=centreline(0.95)+Math.sin(t*.6+k*1.3)*half*0.7;
+    const dd=radAt(0.96)-4-Math.abs(Math.sin(t*.7+k*1.9))*Math.min(reach*.35,38);
+    if(dd<8) continue;
+    const dx=CX+Math.cos(a)*dd, dy=CY+Math.sin(a)*dd, rr=1.6+(k%3);
+    const dg=ctx.createRadialGradient(dx,dy,0,dx,dy,rr);
+    dg.addColorStop(0,edge); dg.addColorStop(1,col(0));
+    ctx.globalAlpha=fade*0.6; ctx.fillStyle=dg;
+    ctx.beginPath(); ctx.arc(dx,dy,rr,0,TAU); ctx.fill();
+  }
+
+  ctx.globalAlpha=1;
+  ctx.globalCompositeOperation='source-over';
+  ctx.restore();
+}
+
+/* obelisk pillars */
+function drawPillar(pl,isWhite){
+  if(pl.drop<=0) return;
+  const px=CX+Math.cos(pl.ang)*pl.r, py=CY+Math.sin(pl.ang)*pl.r;
+  const dropY=(1-pl.drop)*-520;
+  const vy=py+dropY;
+  /* tapered runic monolith with a faceted pyramidion cap */
+  const bw=17, tw=8.5;             // base / shoulder half-widths → strong taper
+  const h=94, capH=30;
+  const footF=12, frontF=3;
+  const lean=isWhite?0:3.5;         // basalt leans (asymmetry / Rude Beauty)
+  const shoulderY=vy-h;
+  const tipX=px+lean, tipY=shoulderY-capH;
+  const Bc=[px,vy+footF];
+  const bL=[px-bw,vy+frontF], bR=[px+bw,vy+frontF];
+  const sL=[px-tw,shoulderY], sR=[px+tw,shoulderY];
+  const Sc=[px,shoulderY+footF*0.42];
+  const mk=(...pts)=>{const p=new Path2D();pts.forEach((q,i)=>i?p.lineTo(q[0],q[1]):p.moveTo(q[0],q[1]));p.closePath();return p;};
+  const shaftL=mk(Bc,bL,sL,Sc);
+  const shaftR=mk(Bc,bR,sR,Sc);
+  const capL=mk(Sc,sL,[tipX,tipY]);
+  const capR=mk(Sc,sR,[tipX,tipY]);
+  const glow=isWhite?'#ffe9c0':'#c8862e';
+  const fl=pl.flash;
+  ctx.save();
+
+  /* ground shadow + faint teal contact glow when seated */
+  if(pl.drop>=1){
+    ctx.fillStyle='rgba(3,22,20,.62)';
+    ctx.beginPath(); ctx.ellipse(px,py,bw*1.15,bw*.4,0,0,TAU); ctx.fill();
+  }
+  /* descent motion-streak while falling */
+  if(pl.drop<1){
+    const tg=ctx.createLinearGradient(px,tipY-70,px,vy);
+    tg.addColorStop(0,glow+'00'); tg.addColorStop(.6,glow+'33'); tg.addColorStop(1,'transparent');
+    ctx.fillStyle=tg; ctx.globalAlpha=.6;
+    ctx.beginPath(); ctx.moveTo(px-tw,tipY-10); ctx.lineTo(px,tipY-72); ctx.lineTo(px+tw,tipY-10); ctx.closePath(); ctx.fill();
+    ctx.globalAlpha=1;
+  }
+
+  /* shadow (left) shaft + cap — SOLID volcanic stone, not a void */
+  ctx.fillStyle=isWhite?'#a48d60':'#221c30'; ctx.fill(shaftL);
+  ctx.fillStyle=isWhite?'#8f7a52':'#1a1626'; ctx.fill(capL);
+
+  /* lit (right) shaft — solid dark basalt block catching the light */
+  const fg=ctx.createLinearGradient(px-2,shoulderY,px+bw,vy);
+  if(isWhite){ fg.addColorStop(0,'#fefaf0'); fg.addColorStop(.4,'#ece0c1'); fg.addColorStop(1,'#c2a574'); }
+  else { fg.addColorStop(0,'#463c54'); fg.addColorStop(.5,'#2c2440'); fg.addColorStop(1,'#181323'); }
+  ctx.fillStyle=fg; ctx.fill(shaftR);
+
+  /* matte material grain clipped to the lit shaft — overlay so the basalt
+     reads as textured solid stone (grain catches both light and dark) */
+  ctx.save();
+  ctx.clip(shaftR);
+  ctx.globalCompositeOperation='overlay';
+  ctx.globalAlpha=isWhite?.55:.7;
+  ctx.drawImage(isWhite?marbleTex:stoneTex, px-bw, tipY, bw*2.2, h+capH+footF);
+  if(isWhite){
+    ctx.globalCompositeOperation='source-over'; ctx.globalAlpha=1;
+    const ss=ctx.createRadialGradient(px+2,shoulderY+h*.35,0,px+2,shoulderY+h*.35,h*.7);
+    ss.addColorStop(0,'rgba(255,206,128,.20)'); ss.addColorStop(.6,'rgba(255,200,110,.05)'); ss.addColorStop(1,'transparent');
+    ctx.fillStyle=ss; ctx.fillRect(px-bw,tipY,bw*2.2,h+capH+footF);
+  }
+  ctx.restore();
+
+  /* lit (right) pyramidion facet */
+  const cg=ctx.createLinearGradient(tipX,tipY,sR[0],shoulderY);
+  if(isWhite){ cg.addColorStop(0,'#fffdf6'); cg.addColorStop(1,'#d8c188'); }
+  else { cg.addColorStop(0,'#2a1c3a'); cg.addColorStop(1,'#070310'); }
+  ctx.fillStyle=cg; ctx.fill(capR);
+
+  /* glowing rune fissure down the lit face */
+  ctx.save();
+  ctx.clip(shaftR);
+  const rGlow=0.32+0.68*fl;
+  ctx.strokeStyle=isWhite?`rgba(255,233,176,${0.5*rGlow})`:`rgba(210,140,60,${0.55*rGlow})`;
+  ctx.shadowColor=glow; ctx.shadowBlur=(isWhite?6:5)*(0.4+rGlow);
+  ctx.lineWidth=1.1;
+  ctx.beginPath();
+  let rx=px+3, ry=shoulderY+10;
+  ctx.moveTo(rx,ry);
+  for(let k=1;k<=5;k+=1){ rx=px+3+(k%2?3:-2); ry=shoulderY+10+k*(h*0.62/5); ctx.lineTo(rx,ry); }
+  ctx.stroke();
+  /* a couple of rune notches */
+  ctx.lineWidth=0.9;
+  for(let k=1;k<=2;k+=1){ const ny=shoulderY+18+k*22; ctx.beginPath(); ctx.moveTo(px+1,ny); ctx.lineTo(px+8,ny-4); ctx.stroke(); }
+  ctx.restore();
+
+  /* ball-passage edge ignition */
+  if(fl>0.02){
+    ctx.shadowColor=glow; ctx.shadowBlur=26*fl;
+    ctx.strokeStyle=glow; ctx.lineWidth=.6+1.9*fl; ctx.globalAlpha=fl;
+    ctx.stroke(shaftR); ctx.stroke(capR);
+    ctx.globalAlpha=1; ctx.shadowBlur=0;
+  }
+
+  /* basalt: a BRIGHT TEAL back-rim on the shadow silhouette so the dark stone
+     never dissolves into the astral ink (cool edge separation) */
+  if(!isWhite){
+    ctx.strokeStyle='rgba(64,232,202,.9)'; ctx.lineWidth=1.4;
+    ctx.shadowColor='rgba(40,220,190,.85)'; ctx.shadowBlur=9;
+    ctx.beginPath();
+    ctx.moveTo(Bc[0],Bc[1]); ctx.lineTo(bL[0],bL[1]); ctx.lineTo(sL[0],sL[1]); ctx.lineTo(tipX,tipY);
+    ctx.stroke();
+    ctx.shadowBlur=0;
+  }
+
+  /* chiseled specular ridges — sharp warm catchlights on the lit face */
+  const spec=isWhite?'rgba(255,253,240,.95)':'rgba(230,170,80,.95)';
+  ctx.strokeStyle=spec; ctx.lineWidth=1.3;
+  ctx.shadowColor=spec; ctx.shadowBlur=isWhite?7:5;
+  ctx.beginPath(); ctx.moveTo(tipX,tipY); ctx.lineTo(sR[0],shoulderY); ctx.stroke();   // lit cap ridge
+  ctx.beginPath(); ctx.moveTo(tipX,tipY); ctx.lineTo(Sc[0],Sc[1]); ctx.stroke();       // central spine
+  const evg=ctx.createLinearGradient(sR[0],shoulderY,bR[0],vy);
+  evg.addColorStop(0,spec); evg.addColorStop(.55,'rgba(120,80,30,.22)'); evg.addColorStop(1,'transparent');
+  ctx.strokeStyle=evg; ctx.lineWidth=1.1;
+  ctx.beginPath(); ctx.moveTo(sR[0],shoulderY); ctx.lineTo(bR[0],vy+frontF); ctx.stroke();
+  ctx.shadowBlur=0;
+
+  /* basalt: a chipped fracture at the shoulder (broken, ancient) */
+  if(!isWhite){
+    ctx.strokeStyle='rgba(150,95,30,.5)'; ctx.lineWidth=.8;
+    ctx.beginPath(); ctx.moveTo(px-tw,shoulderY+6); ctx.lineTo(px-tw+5,shoulderY-3); ctx.lineTo(px-tw+1,shoulderY-9); ctx.stroke();
+  } else {
+    /* alabaster: a bright crystalline tip glint */
+    ctx.fillStyle='rgba(255,255,255,.9)'; ctx.shadowColor='#fff'; ctx.shadowBlur=8;
+    ctx.beginPath(); ctx.arc(tipX,tipY,1.6,0,TAU); ctx.fill(); ctx.shadowBlur=0;
+  }
+  ctx.restore();
+}
+
+function drawShocks(dt){
+  for(let i=scene.shocks.length-1;i>=0;i-=1){
+    const s=scene.shocks[i]; s.t+=dt;
+    const p=s.t/s.dur;
+    if(p>=1){scene.shocks.splice(i,1);continue;}
+    ctx.save();
+    ctx.globalAlpha=(1-p)*.8;
+    ctx.strokeStyle=s.c; ctx.lineWidth=2.4*(1-p)+.4;
+    ctx.shadowColor=s.c; ctx.shadowBlur=12;
+    ctx.beginPath(); ctx.ellipse(s.x,s.y,8+44*easeOutCubic(p),(8+44*easeOutCubic(p))*.42,0,0,TAU); ctx.stroke();
+    ctx.restore();
+  }
+}
+function drawRimHits(){
+  scene.rimHits.forEach(h=>{
+    const a=h.life/600;
+    ctx.save();
+    ctx.globalAlpha=a*.85;
+    ctx.strokeStyle='#fce890'; ctx.lineWidth=4;
+    ctx.shadowColor='#fce890'; ctx.shadowBlur=16;
+    ctx.beginPath(); ctx.arc(CX,CY,R-5,h.ang-.16,h.ang+.16); ctx.stroke();
+    ctx.restore();
+  });
+}
+function drawBall(now){
+  const b=scene.ball;
+  if(!b.on && scene.state!=='resolution') return;
+  /* gold→teal comet trail */
+  const n=b.trail.length;
+  for(let i=1;i<n;i+=1){
+    const t0=b.trail[i-1], t1=b.trail[i];
+    const a=t1.life/480;
+    if(a<=0) continue;
+    const mix=i/n;                              // tail→head
+    const cr=Math.round(52+(255-52)*mix), cg=Math.round(212+(233-212)*mix), cb=Math.round(184+(168-184)*mix);
+    ctx.globalAlpha=a*.6;
+    ctx.strokeStyle=`rgb(${cr},${cg},${cb})`;
+    ctx.lineWidth=b.r*1.5*a*(.4+.6*mix);
+    ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(t0.x,t0.y); ctx.lineTo(t1.x,t1.y); ctx.stroke();
+  }
+  ctx.globalAlpha=1;
+  scene.sparks.forEach(s=>{
+    const a=s.life/s.max;
+    ctx.globalAlpha=a; ctx.fillStyle=s.c; ctx.shadowColor=s.c; ctx.shadowBlur=6;
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.r*a,0,TAU); ctx.fill(); ctx.shadowBlur=0;
+  });
+  ctx.globalAlpha=1;
+  /* the energy pinball */
+  const pulse=scene.state==='resolution'?1+.08*Math.sin(now/120):1;
+  const r=b.r*pulse;
+  const halo=ctx.createRadialGradient(b.x,b.y,r*.5,b.x,b.y,r*4);
+  halo.addColorStop(0,'rgba(255,236,170,.5)'); halo.addColorStop(.5,'rgba(252,232,144,.12)'); halo.addColorStop(1,'transparent');
+  ctx.fillStyle=halo; ctx.beginPath(); ctx.arc(b.x,b.y,r*4,0,TAU); ctx.fill();
+  const g=ctx.createRadialGradient(b.x-3,b.y-3,1,b.x,b.y,r+2);
+  g.addColorStop(0,'#ffffff'); g.addColorStop(.4,'#ffeebc'); g.addColorStop(1,'#a06a1e');
+  ctx.shadowColor='rgba(252,232,144,.95)'; ctx.shadowBlur=26;
+  ctx.fillStyle=g; ctx.beginPath(); ctx.arc(b.x,b.y,r,0,TAU); ctx.fill();
+  ctx.lineWidth=1.4; ctx.strokeStyle='rgba(255,244,200,.95)'; ctx.stroke();
+  ctx.shadowBlur=0;
+}
+
+/* blueprint preview in idle — zones update live as sliders move */
+function drawBlueprint(now){
+  if(scene.state!=='idle') return;
+  /* the void before creation: only a single breathing ember-seed at the core */
+  const t=now/1000;
+  const pul=0.5+0.5*Math.sin(t*1.6);
+  ctx.save();
+  const sg=ctx.createRadialGradient(CX,CY,0,CX,CY,18+10*pul);
+  sg.addColorStop(0,`rgba(255,236,170,${0.5+0.3*pul})`);
+  sg.addColorStop(0.5,`rgba(201,162,39,${0.12+0.1*pul})`);
+  sg.addColorStop(1,'transparent');
+  ctx.fillStyle=sg;
+  ctx.beginPath(); ctx.arc(CX,CY,18+10*pul,0,TAU); ctx.fill();
+  ctx.fillStyle=`rgba(255,248,225,${0.7+0.3*pul})`;
+  ctx.beginPath(); ctx.arc(CX,CY,1.6+0.6*pul,0,TAU); ctx.fill();
+  ctx.restore();
+}
+
+/* =========================================================================
+   MAIN LOOP
+   ========================================================================= */
+let lastT=performance.now();
+function frame(now){
+ try{
+  const dt=Math.min(50,now-lastT); lastT=now;
+  tickTimeline();
+  /* goo wobble: slow viscous oscillation + slam ripple boost */
+  const gt=$id('gooTurb');
+  const gd=$id('gooDisp');
+  if(gt){
+    const bf1=(0.007+0.002*Math.sin(now/6200)).toFixed(5);
+    const bf2=(0.005+0.0015*Math.cos(now/8800)).toFixed(5);
+    gt.setAttribute('baseFrequency',bf1+' '+bf2);
+  }
+  if(gd) gd.setAttribute('scale',String(14+scene.gooRipple*26));
+  /* living liquid: keep the risk-fluid edges shimmering even after they pool */
+  const ft=$id('fluidTurb');
+  const fd=$id('fluidDisp');
+  if(ft){
+    const f1=(0.019+0.005*Math.sin(now/2300)).toFixed(5);
+    const f2=(0.030+0.006*Math.cos(now/1900)).toFixed(5);
+    ft.setAttribute('baseFrequency',f1+' '+f2);
+  }
+  if(fd) fd.setAttribute('scale',String(26+7*Math.sin(now/1400)));
+
+  ctx.clearRect(0,0,W,W);
+  drawBackdrop(now);
+  drawGoo(now);
+  drawBlueprint(now);
+  drawStar(now);
+  drawStream(geo.wedges.dead,'rgba(34,140,255,A)','rgba(150,225,255,1)',now,scene.pourP);   // Morte — azzurro cobalto
+  drawStream(geo.wedges.wound,'rgba(255,40,190,A)','rgba(255,180,240,1)',now,scene.pourP); // Ferito — magenta elettrico
+  scene.blackPillars.forEach(p=>drawPillar(p,false));
+  scene.whitePillars.forEach(p=>drawPillar(p,true));
+  drawShocks(dt);
+  drawRimHits();
+  drawMotes(now,dt);
+  drawBall(now);
+ }catch(e){ if(!window.__frameErrLogged){ window.__frameErrLogged=true; console.error('FRAME ERROR:', e && e.stack || e); } }
+ requestAnimationFrame(frame);
+}
+
+/* =========================================================================
+   PANEL BINDINGS + LIVE MATH
+   ========================================================================= */
+/* panel sliders removed — config comes from props */
+
+
+function updateMathPanel(){
+  const tst=geo.tst;
+  const failFrom=Math.min(100,tst+6);
+  const failSpan=Math.max(0,100-(tst+5));
+  const epicN=Math.max(1,Math.round(failSpan*cfg.crit/100));
+  const epicFrom=101-epicN;
+  $id('mTst').textContent=tst;
+  $id('mWin').textContent=`1 – ${tst}`;
+  $id('mAlmost').textContent=`${Math.min(100,tst+1)} – ${Math.min(100,tst+5)}`;
+  $id('mFail').textContent=failSpan>0?`${failFrom} – 100`:'—';
+  $id('mEpic').textContent=failSpan>0?`${epicFrom} – 100 (${epicN})`:'—';
+  $id('mWound').textContent=`${cfg.wound}%`;
+  $id('mDead').textContent=`${cfg.dead}%`;
+  const bar=$id('probBar');
+  const sW=tst, aW=Math.min(5,100-tst), fW=Math.max(0,failSpan-epicN), eW=Math.min(epicN,failSpan);
+  bar.innerHTML=`
+    <div class="seg s" style="width:${sW}%"></div>
+    <div class="seg a" style="width:${aW}%"></div>
+    <div class="seg f" style="width:${fW}%"></div>
+    <div class="seg e" style="width:${eW}%"></div>`;
+}
+function updateResultPanel(preOnly){
+  const r=scene.res;
+  if(!r) return;
+  const names={bigwin:'Trionfo',win:'Vittoria',almost:'Per un Soffio',fail:'Sconfitta',epicfail:'Rovina'};
+  const cls={bigwin:'triumph',win:'win',almost:'almost',fail:'fail',epicfail:'epic'};
+  const v=$id('rVerdict');
+  v.textContent=names[r.verdict]+(r.wounded?' · Ferito':'')+(r.dead?' · Caduto':'');
+  v.className='verdict '+cls[r.verdict];
+  $id('rRoll').textContent=r.roll;
+  $id('rVs').textContent=`${r.roll} ${r.roll<=geo.tst?'≤':'>'} ${geo.tst}`;
+  $id('rRisk').textContent=`${r.riskRoll} (≤${cfg.dead} morto · ≤${cfg.dead+cfg.wound} ferito)`;
+  $id('rZone').textContent=preOnly
+    ? `pre-calcolata (${Math.round(scene.target.x)}, ${Math.round(scene.target.y)})`
+    : `raggiunta (${Math.round(scene.ball.x)}, ${Math.round(scene.ball.y)})`;
+}
+
+/* frame decorations */
+(function buildFrame(){
+  const g=$id('studs');
+  for(let i=0;i<10;i+=1){
+    const a=-Math.PI/2+i*(Math.PI/5);
+    const x=500+Math.cos(a)*473, y=500+Math.sin(a)*473;
+    const big=i%2===0;
+    /* deep rivet shadow, saturated with emerald/teal */
+    const sh=document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+    sh.setAttribute('cx',x+2); sh.setAttribute('cy',y+5);
+    sh.setAttribute('rx',big?14:9); sh.setAttribute('ry',big?6:4);
+    sh.setAttribute('fill','rgba(7,46,38,.65)');
+    g.appendChild(sh);
+    const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',x); c.setAttribute('cy',y);
+    c.setAttribute('r',big?13:8);
+    c.setAttribute('fill','url(#studG)'); c.setAttribute('stroke','#3a2208'); c.setAttribute('stroke-width','2');
+    g.appendChild(c);
+  }
+  const ticks=$id('degreeTicks');
+  for(let i=0;i<72;i+=1){
+    const a=i*(Math.PI/36), r1=489, r2=i%6===0?481:485;
+    const l=document.createElementNS('http://www.w3.org/2000/svg','line');
+    l.setAttribute('x1',500+Math.cos(a)*r1); l.setAttribute('y1',500+Math.sin(a)*r1);
+    l.setAttribute('x2',500+Math.cos(a)*r2); l.setAttribute('y2',500+Math.sin(a)*r2);
+    l.setAttribute('stroke-width',i%6===0?'2':'1');
+    ticks.appendChild(l);
+  }
+})();
+
+
+
+  /* ---- public handle ---- */
+  let rafId = requestAnimationFrame(frame);
+  recomputeGeometry();
+  function setConfig(newSkills, newConfig){
+    if(newSkills){ skills = newSkills.slice(); recomputeSkillAxes(); }
+    if(newConfig){ Object.assign(cfg, newConfig); }
+    recomputeGeometry();
+  }
+  function destroy(){ cancelAnimationFrame(rafId); }
+  return { roll: launchRoll, setConfig, destroy };
+}
