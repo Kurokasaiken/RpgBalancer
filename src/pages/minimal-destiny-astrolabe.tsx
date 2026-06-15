@@ -103,15 +103,19 @@ export default function MinimalDestinyAstrolabe() {
       <div className="bg-gray-800 p-6 rounded-lg border border-amber-600/30">
         <h2 className="text-xl font-bold text-amber-400 mb-4">⚙️ Configurazione Skill Check</h2>
 
-        {/* Quick presets + skill count */}
+        {/* Skill count (keeps your edits) + load-preset shortcut */}
         <div className="flex flex-wrap items-center gap-3 mb-5">
           <span className="text-sm font-semibold text-gray-300">Numero di skill:</span>
           {[1, 2, 3, 4, 5].map((num) => (
             <button
               key={num}
               onClick={() => {
-                const presetKey = ['single', 'double', 'triple', 'quadruple', 'five'][num - 1] as keyof typeof SKILL_PRESETS;
-                setSkills(SKILL_PRESETS[presetKey].map((s) => ({ ...s })));
+                // Resize keeping existing edited rows; new rows get sensible defaults
+                setSkills((prev) =>
+                  Array.from({ length: num }, (_, i) =>
+                    prev[i] ? { ...prev[i] } : { name: `Skill ${i + 1}`, stat: 60, difficulty: 50 }
+                  )
+                );
               }}
               className={`w-10 h-10 rounded font-bold transition-colors ${
                 skills.length === num ? 'bg-amber-500 text-black' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
@@ -120,6 +124,17 @@ export default function MinimalDestinyAstrolabe() {
               {num}
             </button>
           ))}
+          <span className="mx-1 text-gray-600">|</span>
+          <button
+            onClick={() => {
+              const presetKey = ['single', 'double', 'triple', 'quadruple', 'five'][skills.length - 1] as keyof typeof SKILL_PRESETS;
+              setSkills(SKILL_PRESETS[presetKey].map((s) => ({ ...s })));
+            }}
+            className="px-3 h-10 rounded font-semibold bg-gray-700 text-amber-300 hover:bg-gray-600 transition-colors text-sm"
+            title="Ricarica i valori di esempio per il numero di skill corrente"
+          >
+            ↺ Carica preset
+          </button>
         </div>
 
         {/* Editable skill table */}
