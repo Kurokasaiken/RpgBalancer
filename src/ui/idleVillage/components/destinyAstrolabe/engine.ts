@@ -124,18 +124,28 @@ function radialFromAxes(theta,arr,scale){
     return a+(b-a)*f;
   }
 }
-/* star radius (success boundary) — per-axis, reaches the white obelisk (stat) */
+/* star radius (success boundary) — per-axis flower, reaches the white obelisk (stat) */
 function rStarAt(theta,scale=1){ return radialFromAxes(theta,geo.axisTip,scale); }
-/* check radius (failure inner boundary) — per-axis, the black obelisk (check) */
-function rCheckAt(theta,scale=1){ return radialFromAxes(theta,geo.axisCheck,scale); }
+/* GOO EDGE = failure boundary = the ball's physical wall. A SMOOTH blob that
+   touches each black obelisk (the check) and interpolates smoothly between
+   adjacent ones (no deep star valleys), so the goo's area is bounded exactly by
+   the dark obelisks. This is both the visible goo rim and the ball's container. */
+function rCheckAt(theta,scale=1){
+  const t=((normAng(theta+Math.PI/2)%TAU)+TAU)%TAU;   // 0 at axis 0
+  const seg=TAU/AXES;                                 // 72° between adjacent obelisks
+  const k=Math.floor(t/seg), f=(t-k*seg)/seg;
+  const r0=geo.axisCheck[k%AXES], r1=geo.axisCheck[(k+1)%AXES];
+  const s=f*f*(3-2*f);                                // smoothstep between neighbours
+  return Math.max(geo.rCore+30, r0+(r1-r0)*s)*scale;  // floor so the goo is never tiny
+}
 const dist=(x,y)=>Math.hypot(x-CX,y-CY);
 const angOf=(x,y)=>Math.atan2(y-CY,x-CX);
 const inStar=(x,y,s=1)=>dist(x,y)<=rStarAt(angOf(x,y),s);
 const inCore=(x,y)=>dist(x,y)<=geo.rCore;
-/* almost = the band between the white obelisk (stat) and the black obelisk
-   (check). Exists only where the check sits beyond the stat (check>stat). */
-const inAlmost=(x,y)=>{const a=angOf(x,y),d=dist(x,y),rs=rStarAt(a),rc=Math.max(rCheckAt(a),rs+ALMOST_W);return d>rs&&d<=rc;};
-const inEpic=(x,y)=>{const d=dist(x,y);return d>R-geo.epicW&&d<=R-3;};
+/* almost = thin margin just past the flower (success edge) */
+const inAlmost=(x,y)=>{const a=angOf(x,y),d=dist(x,y),rs=rStarAt(a);return d>rs&&d<=rs+ALMOST_W;};
+/* critical failure = the BORDER of the goo (its outermost band, against the wall) */
+const inEpic=(x,y)=>{const a=angOf(x,y),d=dist(x,y),e=rCheckAt(a);return d>e-geo.epicW&&d<=e;};
 const inWedge=(x,y,w)=>{const a=angOf(x,y);
   return normAng(a-w.a0)>=0 && normAng(a-w.a1)<=0;};
 const inAnyWedge=(x,y)=>inWedge(x,y,geo.wedges.dead)||inWedge(x,y,geo.wedges.wound);
@@ -188,7 +198,7 @@ function pickTarget(res){
     bigwin:(x,y)=>inCore(x,y),
     win:(x,y)=>inStar(x,y)&&!inCore(x,y),
     almost:(x,y)=>inAlmost(x,y),
-    fail:(x,y)=>!inStar(x,y)&&!inAlmost(x,y)&&dist(x,y)<R-geo.epicW-6&&dist(x,y)>geo.rValley*0.4,
+    fail:(x,y)=>{const a=angOf(x,y),d=dist(x,y),e=rCheckAt(a);return !inStar(x,y)&&!inAlmost(x,y)&&d>geo.rValley*0.4&&d<=e-geo.epicW;},
     epicfail:(x,y)=>inEpic(x,y),
   };
   const zoneOk=tests[res.verdict];
@@ -451,12 +461,14 @@ function stepBall(p,snapPhase){
       if(od>0){ b.vx-=2*od*nx; b.vy-=2*od*ny; }
       return true;
     };
-    /* arena wall bounce — lively, repeated, chaotic rim slams */
+    /* GOO WALL bounce — the ball is confined to the goo; it slams the goo's
+       irregular edge (the black-obelisk boundary), not the arena rim. */
     const d=dist(b.x,b.y);
-    if(d>R-12){
+    const aB=angOf(b.x,b.y), edge=rCheckAt(aB)-b.r;
+    if(d>edge){
       const nx=(b.x-CX)/d, ny=(b.y-CY)/d;
       chaoticBounce(nx,ny,false);
-      b.x=CX+nx*(R-12); b.y=CY+ny*(R-12);
+      b.x=CX+nx*edge; b.y=CY+ny*edge;
       scene.rimHits.push({ang:Math.atan2(ny,nx),life:600});
       addSpark(b.x,b.y);
     }
@@ -679,20 +691,15 @@ function drawMotes(now,dt){
 
 /* the goo — full failure field, boiling & wobbling */
 const gooBubbles=Array.from({length:6},(_,i)=>({ph:i*1.55,sp:.12+i*.035,rad:2.6+i*1.1,ox:(i-2.5)*36,oy:(i%3-1)*30}));
-/* goo = the FAILURE medium: it oozes from the rim INWARD and its irregular
-   edge laps up to the black obelisks (the check). The flower pushes it back
-   from the centre. So the goo is the annulus between the black-obelisk line
-   (rCheckAt, never intruding past the flower) and the arena rim. */
-function gooInnerAt(a,rev){
-  const base=rCheckAt(a);                            // lap up to the BLACK obelisks (the check)
-  return (R-3) + (base-(R-3))*rev;                   // rev0→rim (no goo) … rev1→checks
-}
-function gooAnnulusPath(rev){
+/* goo = the central FAILURE FIELD the ball lives in. It grows from the centre
+   outward and its irregular edge is bounded by the black obelisks (rCheckAt).
+   The flower (success) blooms on top of it; its outer border is critical fail. */
+function gooEdgeAt(a,rev){ return rCheckAt(a)*rev; }
+function gooBlobPath(rev,shrink){
   const P=new Path2D();
-  P.moveTo(CX+(R-3),CY); P.arc(CX,CY,R-3,0,TAU);    // outer rim (CW)
-  const SEG=160;                                     // inner irregular edge (the black-obelisk lap)
+  const SEG=160;
   for(let i=0;i<=SEG;i+=1){
-    const a=i/SEG*TAU, r=gooInnerAt(a,rev);
+    const a=i/SEG*TAU, r=Math.max(0,gooEdgeAt(a,rev)-(shrink||0));
     const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
     if(i===0) P.moveTo(x,y); else P.lineTo(x,y);
   }
@@ -703,20 +710,21 @@ function drawGoo(now){
   const rev=scene.gooReveal;
   if(rev<=0.001) return;                 // void start: no goo until it wells up
   const t=now/1000;
-  const annulus=gooAnnulusPath(rev);
+  const blob=gooBlobPath(rev,0);
+  const gr=Math.max(20, Math.max.apply(null,geo.axisCheck)*rev);
   ctx.save();
   ctx.globalAlpha=Math.min(1,rev*1.2);
   ctx.filter='url(#gooWobble)';
   ctx.shadowColor='rgba(10,40,40,.5)';   // cold, not violet
   ctx.shadowBlur=30;
-  /* deep obsidian-teal viscous body — darkest toward the rim (deepest failure) */
-  const g=ctx.createRadialGradient(CX,CY,geo.rValley,CX,CY,R-3);
+  /* deep obsidian-teal viscous body — darkest toward the edge (deepest failure) */
+  const g=ctx.createRadialGradient(CX,CY,2,CX,CY,gr);
   g.addColorStop(0,'#0c1620'); g.addColorStop(.5,'#08111a'); g.addColorStop(1,'#02060a');
   ctx.fillStyle=g;
-  ctx.fill(annulus,'evenodd');
+  ctx.fill(blob);
   ctx.filter='none'; ctx.shadowBlur=0;
   ctx.save();
-  ctx.clip(annulus,'evenodd');
+  ctx.clip(blob);
   /* breathing currents — cold teal / slate, very subtle */
   const v1=ctx.createRadialGradient(CX+60+Math.sin(t*.5)*26,CY+90+Math.cos(t*.4)*20,4,CX+60,CY+90,210);
   v1.addColorStop(0,'rgba(24,110,98,.22)'); v1.addColorStop(.5,'rgba(24,110,98,.05)'); v1.addColorStop(1,'transparent');
@@ -748,32 +756,27 @@ function drawGoo(now){
   ctx.fillStyle=wet; ctx.fillRect(0,0,W,W);
   ctx.restore();
   ctx.restore();
-  /* teal lap-light along the goo's irregular inner edge (where it meets the checks) */
+  /* teal lap-light along the goo's irregular edge (where it meets the black obelisks) */
   ctx.save();
   ctx.filter='url(#gooWobble)';
   ctx.strokeStyle='rgba(16,150,130,.28)'; ctx.lineWidth=2;
   ctx.shadowColor='rgba(16,185,129,.38)'; ctx.shadowBlur=10;
-  ctx.beginPath();
-  for(let i=0;i<=160;i+=1){ const a=i/160*TAU, r=gooInnerAt(a,rev);
-    const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r; if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }
-  ctx.closePath(); ctx.stroke();
+  ctx.stroke(gooBlobPath(rev,0));
   ctx.restore();
-  if(rev<0.999) return;                  // critical-fail band only once goo is fully formed
-  /* CRITICAL FAILURE — bold pulsing band hugging the arena rim, thickness ∝ crit%
-     with a readable minimum so it is always clearly visible. */
+  if(rev<0.999) return;                  // critical-fail border only once goo is fully formed
+  /* CRITICAL FAILURE = the goo's OUTER BORDER band, thickness ∝ crit% (proportional). */
   ctx.save();
   const pul=.5+.5*Math.sin(t*2.2);
-  const ew=geo.epicW;
-  const cg=ctx.createRadialGradient(CX,CY,R-3-ew,CX,CY,R-3);
-  cg.addColorStop(0,'rgba(90,8,28,0)');
-  cg.addColorStop(.55,`rgba(150,18,44,${(.55+.2*pul).toFixed(3)})`);
-  cg.addColorStop(1,`rgba(255,46,92,${(.7+.3*pul).toFixed(3)})`);
-  ctx.strokeStyle=cg; ctx.lineWidth=ew;
+  ctx.filter='url(#gooWobble)';
+  const band=new Path2D();
+  band.addPath(gooBlobPath(1,0));         // outer = goo edge
+  band.addPath(gooBlobPath(1,geo.epicW)); // inner = edge − epicW (hole)
+  ctx.fillStyle=`rgba(190,22,52,${(.5+.25*pul).toFixed(3)})`;
   ctx.shadowColor='rgba(255,40,90,.55)'; ctx.shadowBlur=16+10*pul;
-  ctx.beginPath(); ctx.arc(CX,CY,R-3-ew/2,0,TAU); ctx.stroke();
+  ctx.fill(band,'evenodd');
   ctx.shadowBlur=0; ctx.lineWidth=2;
   ctx.strokeStyle=`rgba(255,90,130,${(.5+.35*pul).toFixed(3)})`;
-  ctx.beginPath(); ctx.arc(CX,CY,R-3-ew,0,TAU); ctx.stroke();
+  ctx.stroke(gooBlobPath(1,0));
   ctx.restore();
 }
 
@@ -797,6 +800,8 @@ function drawStar(now){
   const t=now/1000;
   const p=starPath(s);
   ctx.save();
+  /* clip the star to the goo's boundary so it never bleeds beyond the walls */
+  ctx.clip(gooBlobPath(1,0));
   /* L0 radiant sunlit halo behind the star (sun-bronze bloom) */
   const halo=ctx.createRadialGradient(CX,CY,geo.rCore*s,CX,CY,geo.rTip*s*1.35);
   halo.addColorStop(0,`rgba(255,238,180,${0.32+0.12*Math.sin(now/900)})`);
