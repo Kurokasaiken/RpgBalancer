@@ -91,9 +91,15 @@ export interface AstrolabeEngineOpts {
   skills: AstrolabeSkill[];
   config?: AstrolabeConfig;
   onResolve?: (r: AstrolabeResult) => void;
+  /** raw state-machine state on every transition */
+  onState?: (state: string) => void;
+  /** true when the TIRA button should be shown (armed), false on throw / new roll */
+  onArmed?: (armed: boolean) => void;
 }
 export interface AstrolabeEngineHandle {
   roll: () => void;
+  /** start the spin (TIRA). Warps past any still-playing reveal. */
+  throw: () => void;
   setConfig: (skills: AstrolabeSkill[], config?: AstrolabeConfig) => void;
   destroy: () => void;
 }
@@ -124,7 +130,7 @@ ${js}
     }
   }
   function destroy(){ cancelAnimationFrame(rafId); }
-  return { roll: launchRoll, setConfig, destroy };
+  return { roll: launchRoll, throw: throwBall, setConfig, destroy };
 }
 `;
 fs.writeFileSync(`${OUT}/engine.ts`, engine);
