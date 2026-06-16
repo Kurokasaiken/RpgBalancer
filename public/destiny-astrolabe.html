@@ -797,10 +797,17 @@ function buildPillars(){
 const suite=document.getElementById('suite');
 const stage=document.getElementById('stage');
 const stateChip=document.getElementById('stateChip');
+/* host hooks — present when embedded by the React component (opts), no-op in
+   the standalone HTML (typeof guard so the page still runs on its own) */
+function emitState(s){ try{ if(typeof opts!=='undefined'&&opts&&opts.onState) opts.onState(s); }catch(e){} }
+function emitArmed(b){ try{ if(typeof opts!=='undefined'&&opts&&opts.onArmed) opts.onArmed(b); }catch(e){} }
+let armed=false;                 // true while the TIRA button should be shown
+const GOO_MS=620;                // springy goo-expansion duration
 function setState(s){
   scene.state=s; scene.t0=performance.now();
   suite.dataset.state=s;
   stateChip.textContent=s;
+  emitState(s);
 }
 function phaseT(durMs){ return clamp((performance.now()-scene.t0)/durMs,0,1); }
 const easeOutCubic=t=>1-Math.pow(1-t,3);
@@ -828,8 +835,9 @@ function launchRoll(){
   scene.starScale=0; scene.pourP=0; scene.streamAlpha=0;
   scene.gooReveal=0; scene.ringReveal=0; scene.snapInit=false;
   scene.ball={x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false};
-  scene.snapFrom=null;
+  scene.snapFrom=null; scene.warp=0;
   scene.shocks.length=0; scene.rimHits.length=0; scene.sparks.length=0;
+  armed=false; emitArmed(false);
   updateResultPanel(true);
   /* ACT 0 — the Sun-Bronze ring slams into place like an ancient telescope lens */
   scene.ringShaken=false;
@@ -837,6 +845,19 @@ function launchRoll(){
   void stage.offsetWidth;
   stage.classList.add('ring-locked');
   setState('ring-lock');
+}
+
+/* THROW (TIRA) — starts the spin. If clicked mid-reveal it WARPS: the reveal
+   snaps complete (no hard cut) and the ball fires immediately. */
+function throwBall(){
+  const s=scene.state;
+  if(s==='idle'||s==='the-spin'||s==='magnetic-snap'||s==='resolution') return;
+  armed=false; emitArmed(false);
+  /* warp: snap any still-playing reveal so we never fire from an empty scene */
+  scene.gooReveal=1; scene.starScale=1; scene.pourP=1; scene.streamAlpha=0.34;
+  scene.blackPillars.concat(scene.whitePillars).forEach(pl=>{ pl.drop=1; pl.landed=true; });
+  if(s!=='action-trigger'){ scene.warp=1; scene.gooRipple=1; }   // visual warp flash when skipping
+  setState('the-spin'); fireBall();
 }
 const RING_MS=820;
 
@@ -856,9 +877,9 @@ function tickTimeline(){
   }
   else if(s==='threat-slam'){
     const p=phaseT(cfg.tSlam);
-    /* the void fills: black goo wells up from the centre before the pillars fall */
-    scene.gooReveal=easeOutCubic(clamp(p/0.35,0,1));
-    if(scene.gooReveal>0 && scene.gooReveal<1) scene.gooRipple=Math.max(scene.gooRipple,0.5);
+    /* the void seeds: a small dark core forms while the obelisks slam down.
+       The full goo eruption happens next, in the dedicated goo-expand phase. */
+    scene.gooReveal=0.14*easeOutCubic(clamp(p/0.5,0,1));
     scene.blackPillars.forEach((pl,i)=>{
       const local=clamp((p-(i*0.13))/0.4,0,1);
       const prev=pl.drop;
@@ -869,7 +890,19 @@ function tickTimeline(){
         addShock(pl,'rgba(200,134,46,.9)');
       }
     });
-    if(p>=1) setState('agency-burst');
+    if(p>=1) setState('goo-expand');
+  }
+  else if(s==='goo-expand'){
+    /* GOO EXPANSION — erupts from the seeded core and springs outward to the
+       black obelisks with a cubic-bezier(.34,1.56,.64,1)-style overshoot. */
+    const p=phaseT(GOO_MS);
+    scene.gooReveal=clamp(0.14+(1-0.14)*easeOutBack(p),0,1.08);   // springy overshoot
+    scene.gooRipple=Math.max(scene.gooRipple,0.6*(1-p));
+    if(p>=1){
+      scene.gooReveal=1;
+      armed=true; emitArmed(true);     // arm the TIRA button (reveal keeps playing behind it)
+      setState('agency-burst');
+    }
   }
   else if(s==='agency-burst'){
     const p=phaseT(cfg.tBurst);
@@ -891,7 +924,11 @@ function tickTimeline(){
     const p=phaseT(cfg.tPour);
     scene.pourP=easeOutCubic(p);
     scene.streamAlpha=0.5;
-    if(p>=1){ scene.streamAlpha=0.34; setState('the-spin'); fireBall(); }
+    if(p>=1){ scene.streamAlpha=0.34; setState('action-trigger'); }   // GATE: wait for TIRA
+  }
+  else if(s==='action-trigger'){
+    /* WAITING_FOR_INPUT — hold here until the player throws (throwBall). The
+       button is already armed; the spin will not start on its own. */
   }
   else if(s==='the-spin'){
     const p=phaseT(cfg.tSpin);
@@ -1217,7 +1254,14 @@ const gooBubbles=Array.from({length:6},(_,i)=>({ph:i*1.55,sp:.12+i*.035,rad:2.6+
 /* goo = the central FAILURE FIELD the ball lives in. It grows from the centre
    outward and its irregular edge is bounded by the black obelisks (rCheckAt).
    The flower (success) blooms on top of it; its outer border is critical fail. */
-function gooEdgeAt(a,rev){ return rCheckAt(a)*rev; }
+/* visual goo edge: the static physics boundary (rCheckAt) × a gentle, slow
+   time-based "breathing" undulation (surface tension). Drawing-only — the ball
+   collides against the static rCheckAt, so the wobble never shoves the ball. */
+function gooEdgeAt(a,rev){
+  const t=scene.nowMs||0;
+  const breathe=1 + 0.022*Math.sin(a*3 + t*0.00060) + 0.016*Math.sin(a*5 - t*0.00095);
+  return rCheckAt(a)*rev*breathe;
+}
 function gooBlobPath(rev,shrink){
   const P=new Path2D();
   const SEG=160;
@@ -1741,6 +1785,8 @@ let lastT=performance.now();
 function frame(now){
  try{
   const dt=Math.min(50,now-lastT); lastT=now;
+  scene.nowMs=now;                       // drives the goo's breathing undulation
+  scene.warp=Math.max(0,(scene.warp||0)-0.04);
   tickTimeline();
   /* goo wobble: slow viscous oscillation + slam ripple boost */
   const gt=document.getElementById('gooTurb');
@@ -1871,9 +1917,9 @@ function updateResultPanel(preOnly){
   }
 })();
 
-document.getElementById('launch').addEventListener('click',launchRoll);
+document.getElementById('launch').addEventListener('click',()=>{ armed?throwBall():launchRoll(); });
 window.addEventListener('keydown',e=>{
-  if(e.code==='Space'&&!e.repeat){ e.preventDefault(); launchRoll(); }
+  if(e.code==='Space'&&!e.repeat){ e.preventDefault(); armed?throwBall():launchRoll(); }
 });
 
 recomputeGeometry();
