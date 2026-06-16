@@ -18,40 +18,30 @@ import type {
   AstrolabeEngineHandle,
 } from './engine';
 import { ASTROLABE_MARKUP } from './markup';
+import { SkillCheckLegend } from './SkillCheckLegend';
+import { useAstrolabeAudio } from './useAstrolabeAudio';
 import './astrolabe.css';
 import './astrolabe-ui.css';
 
 export type { AstrolabeSkill, AstrolabeConfig, AstrolabeResult };
 
 export interface DestinyAstrolabeHandle {
-  /** Programmatically launch a roll (plays the reveal, then waits for throw). */
   roll: () => void;
-  /** Throw (TIRA) — start the spin; warps past any still-playing reveal. */
   throw: () => void;
 }
 
 export interface DestinyAstrolabeProps {
-  /** Skills under test (1–5). White obelisk = stat, black obelisk = difficulty. */
   skills: AstrolabeSkill[];
-  /** Risk chances + scene timings + forced verdict ('mode'). */
   config?: AstrolabeConfig & { mode?: string };
-  /** Fired with the typed result when a roll resolves. */
   onResolve?: (result: AstrolabeResult) => void;
-  /** Auto-launch a roll on mount. Default true. */
   autoStart?: boolean;
-  /** Initial state of the Auto-Throw checkbox. Default false. */
   autoThrow?: boolean;
-  /** Initial state of the Skip Animation checkbox. Default false. */
   skipAnimation?: boolean;
-  /** Initial state of the Remove Sounds checkbox. Default false. */
   removeSounds?: boolean;
-  /** Hide the built-in throw controls (e.g. when the host owns pacing). */
   hideThrowControls?: boolean;
-  /** Extra classes on the root. */
   className?: string;
 }
 
-/** Skin binding descriptor — mirrors the certified-component pattern (see PgCard). */
 const SKIN_BINDING = {
   componentId: 'DestinyAstrolabe',
   name: 'DestinyAstrolabe',
@@ -72,9 +62,117 @@ const SKIN_BINDING = {
   tags: ['skillcheck', 'd100', 'astrolabe'],
 } as any;
 
+/** Compute TST from a skill (mirrors engine logic: clamp(50+(stat-difficulty),1,99)) */
+function computeTST(skill: AstrolabeSkill): number {
+  return Math.max(1, Math.min(99, 50 + (skill.stat - skill.difficulty)));
+}
+
+/** Radial countdown SVG — drains from full to empty over `durationMs` */
+function RadialTimer({ durationMs }: { durationMs: number }) {
+  const RADIUS = 52;
+  const CIRC = 2 * Math.PI * RADIUS;
+  return (
+    <svg
+      className="da-radial-timer"
+      viewBox="0 0 120 120"
+      aria-hidden="true"
+    >
+      <circle
+        cx="60" cy="60" r={RADIUS}
+        fill="none"
+        stroke="var(--v8-sun-bronze-dark, #602c08)"
+        strokeWidth="4"
+        opacity="0.35"
+      />
+      <circle
+        cx="60" cy="60" r={RADIUS}
+        fill="none"
+        stroke="var(--v8-sun-bronze-light, #e4b048)"
+        strokeWidth="4"
+        strokeLinecap="round"
+        strokeDasharray={CIRC}
+        strokeDashoffset="0"
+        transform="rotate(-90 60 60)"
+        style={{
+          animation: `da-timer-drain ${durationMs}ms linear forwards`,
+          '--da-timer-circ': `${CIRC}px`,
+        } as React.CSSProperties}
+      />
+    </svg>
+  );
+}
+
+/** Arc on the outer ring showing the success probability during the-spin */
+function SweetSpotRing({ tst }: { tst: number }) {
+  const R = 56;
+  const CIRC = 2 * Math.PI * R;
+  const successFrac = Math.max(0.01, Math.min(0.99, tst / 100));
+  const successDash = successFrac * CIRC;
+  const almostFrac = 5 / 100;
+  const almostDash = almostFrac * CIRC;
+
+  return (
+    <svg
+      className="da-sweetspot"
+      viewBox="0 0 120 120"
+      aria-hidden="true"
+    >
+      {/* failure arc (background) */}
+      <circle
+        cx="60" cy="60" r={R}
+        fill="none"
+        stroke="rgba(220,38,38,0.22)"
+        strokeWidth="6"
+      />
+      {/* success arc — green, drawn first from top */}
+      <circle
+        cx="60" cy="60" r={R}
+        fill="none"
+        stroke="rgba(16,185,129,0.55)"
+        strokeWidth="6"
+        strokeLinecap="butt"
+        strokeDasharray={`${successDash} ${CIRC - successDash}`}
+        strokeDashoffset={CIRC * 0.25}
+        transform="rotate(0 60 60)"
+      />
+      {/* almost arc — purple transition zone, offset by success arc */}
+      <circle
+        cx="60" cy="60" r={R}
+        fill="none"
+        stroke="rgba(139,92,246,0.6)"
+        strokeWidth="6"
+        strokeLinecap="butt"
+        strokeDasharray={`${almostDash} ${CIRC - almostDash}`}
+        strokeDashoffset={CIRC * 0.25 - successDash}
+        transform="rotate(0 60 60)"
+      />
+      {/* glow pulse overlay */}
+      <circle
+        cx="60" cy="60" r={R}
+        fill="none"
+        stroke="rgba(16,185,129,0.2)"
+        strokeWidth="10"
+        strokeDasharray={`${successDash} ${CIRC - successDash}`}
+        strokeDashoffset={CIRC * 0.25}
+        style={{ animation: 'da-sweetspot-pulse 1.2s ease-in-out infinite' }}
+      />
+    </svg>
+  );
+}
+
 export const DestinyAstrolabe = memo(
   forwardRef<DestinyAstrolabeHandle, DestinyAstrolabeProps>(function DestinyAstrolabe(
-    { skills, config, onResolve, autoStart = true, autoThrow = false, skipAnimation = false, removeSounds = false, hideThrowControls = false, className },
+    {
+      skills,
+      config,
+      onResolve,
+      autoStart = true,
+      autoThrow = false,
+      skipAnimation = false,
+      removeSounds = false,
+      hideThrowControls = false,
+      className,
+    },
     ref,
   ) {
     const rootRef = useRef<HTMLDivElement>(null);
@@ -82,11 +180,18 @@ export const DestinyAstrolabe = memo(
     const onResolveRef = useRef(onResolve);
     onResolveRef.current = onResolve;
 
-    const [armed, setArmed] = useState(false);   // true → show the TIRA button or manual THROW
-    const [flash, setFlash] = useState(false);   // click feedback
+    const [armed, setArmed] = useState(false);
+    const [flash, setFlash] = useState(false);
     const [autoThrowEnabled, setAutoThrowEnabled] = useState(autoThrow);
     const [skipAnimationEnabled, setSkipAnimationEnabled] = useState(skipAnimation);
     const [removeSoundsEnabled, setRemoveSoundsEnabled] = useState(removeSounds);
+
+    // Polish state
+    const [gameState, setGameState] = useState('idle');
+    const [screenFlash, setScreenFlash] = useState<'success' | 'failure' | null>(null);
+    const [legendOpen, setLegendOpen] = useState(false);
+
+    const play = useAstrolabeAudio(removeSoundsEnabled);
 
     const { classes, attributes, styles } = useSkinBinding(SKIN_BINDING, {
       properties: { skillCount: skills.length },
@@ -98,9 +203,7 @@ export const DestinyAstrolabe = memo(
       window.setTimeout(() => setFlash(false), 260);
     }, []);
 
-    // Mount the chrome + engine. Re-injecting the markup here (instead of
-    // dangerouslySetInnerHTML) guarantees a clean DOM per mount, so a
-    // StrictMode double-invoke can't leave two engines fighting over one canvas.
+    // Wire engine + audio + state tracking
     useEffect(() => {
       const root = rootRef.current;
       if (!root) return;
@@ -108,8 +211,20 @@ export const DestinyAstrolabe = memo(
       const engine = createDestinyAstrolabeEngine(root, {
         skills,
         config,
-        onResolve: (r) => onResolveRef.current?.(r),
+        onResolve: (r) => {
+          onResolveRef.current?.(r);
+          const isSuccess = r.verdict === 'bigwin' || r.verdict === 'win' || r.verdict === 'almost';
+          setScreenFlash(isSuccess ? 'success' : 'failure');
+          window.setTimeout(() => setScreenFlash(null), 700);
+          play(isSuccess ? 'success' : 'failure', { volume: 0.75 });
+        },
         onArmed: (a) => setArmed(a),
+        onState: (s) => {
+          setGameState(s);
+          if (s === 'action-trigger') play('arm', { volume: 0.6 });
+          if (s === 'the-spin') play('spin', { volume: 0.5 });
+          if (s === 'magnetic-snap') play('snap', { volume: 0.8 });
+        },
       });
       engineRef.current = engine;
       if (autoStart) engine.roll();
@@ -117,24 +232,24 @@ export const DestinyAstrolabe = memo(
         engine.destroy();
         engineRef.current = null;
         setArmed(false);
+        setGameState('idle');
         root.innerHTML = '';
       };
-      // mount-once: engine is long-lived; prop updates go through the effect below
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // Push live prop changes into the running engine (no remount).
+    // Push live prop changes into the running engine (no remount)
     useEffect(() => {
       engineRef.current?.setConfig(skills, config);
     }, [skills, config]);
 
-    // Skip Animation: throw immediately when armed if enabled.
+    // Skip Animation: throw immediately when armed
     useEffect(() => {
       if (!armed || !skipAnimationEnabled) return;
       doThrow();
     }, [armed, skipAnimationEnabled, doThrow]);
 
-    // Auto-Throw: throw 0.5s after the button arms (uses base stats, no precision bonus).
+    // Auto-Throw: throw 500ms after arming
     useEffect(() => {
       if (!armed || !autoThrowEnabled || skipAnimationEnabled) return;
       const id = window.setTimeout(() => doThrow(), 500);
@@ -147,8 +262,16 @@ export const DestinyAstrolabe = memo(
       [],
     );
 
+    // TST for sweet spot indicator (primary skill)
+    const primaryTST = skills.length > 0 ? computeTST(skills[0]) : 65;
+    const showSweetSpot = gameState === 'the-spin';
+    const showRadialTimer = armed && autoThrowEnabled && !skipAnimationEnabled;
+    const showThrowButton = armed && !skipAnimationEnabled && !autoThrowEnabled;
+    const isSnapping = gameState === 'magnetic-snap';
+
     return (
       <div className="destiny-astrolabe-wrap" style={{ position: 'relative', width: '100%', height: '100%' }}>
+        {/* Engine canvas */}
         <div
           ref={rootRef}
           data-testid="destiny-astrolabe"
@@ -157,8 +280,25 @@ export const DestinyAstrolabe = memo(
           style={styles}
         />
 
-        {/* Throw button — show when armed, unless skip animation or auto-throw enabled */}
-        {armed && !skipAnimationEnabled && !autoThrowEnabled && (
+        {/* Impact freeze-frame overlay — 200ms flash at magnetic-snap */}
+        {isSnapping && <div className="da-freeze-frame" aria-hidden="true" />}
+
+        {/* Screen flash at resolution */}
+        {screenFlash && (
+          <div
+            className={`da-screen-flash da-screen-flash--${screenFlash}`}
+            aria-hidden="true"
+          />
+        )}
+
+        {/* Sweet spot ring — visible during the-spin */}
+        {showSweetSpot && <SweetSpotRing tst={primaryTST} />}
+
+        {/* Radial countdown timer — visible when auto-throw is armed */}
+        {showRadialTimer && <RadialTimer durationMs={500} />}
+
+        {/* Manual throw button */}
+        {showThrowButton && (
           <button
             type="button"
             className={`da-tira wanderlust-artifact${flash ? ' da-tira--flash' : ''}`}
@@ -169,7 +309,21 @@ export const DestinyAstrolabe = memo(
           </button>
         )}
 
-        {/* Throw controls (checkboxes) */}
+        {/* Info toggle — always visible, top-right corner */}
+        <button
+          type="button"
+          className="da-legend-toggle"
+          onClick={() => setLegendOpen(v => !v)}
+          aria-label="Toggle skill check legend"
+          title="How to read the astrolabe"
+        >
+          ?
+        </button>
+
+        {/* Legend overlay */}
+        <SkillCheckLegend open={legendOpen} onClose={() => setLegendOpen(false)} />
+
+        {/* Throw controls */}
         {!hideThrowControls && (
           <fieldset className="da-throw-controls">
             <legend className="sr-only">Throw controls</legend>
@@ -177,30 +331,36 @@ export const DestinyAstrolabe = memo(
             <label className="da-control-label">
               <input
                 type="checkbox"
+                className="da-toggle"
                 checked={skipAnimationEnabled}
                 onChange={(e) => setSkipAnimationEnabled(e.target.checked)}
               />
-              <span>Skip Animation</span>
+              <span className="da-toggle-track" aria-hidden="true" />
+              <span className="da-toggle-label">Skip</span>
             </label>
 
             <label className="da-control-label">
               <input
                 type="checkbox"
+                className="da-toggle"
                 checked={autoThrowEnabled}
                 onChange={(e) => setAutoThrowEnabled(e.target.checked)}
                 disabled={skipAnimationEnabled}
-                title={skipAnimationEnabled ? "Disabled when Skip Animation is active" : "Auto-throw uses base stats, no precision bonus"}
+                title={skipAnimationEnabled ? 'Disabled when Skip is active' : 'Auto-throw 0.5s after arming'}
               />
-              <span>Auto</span>
+              <span className="da-toggle-track" aria-hidden="true" />
+              <span className="da-toggle-label">Auto</span>
             </label>
 
             <label className="da-control-label">
               <input
                 type="checkbox"
+                className="da-toggle"
                 checked={removeSoundsEnabled}
                 onChange={(e) => setRemoveSoundsEnabled(e.target.checked)}
               />
-              <span>No Sound</span>
+              <span className="da-toggle-track" aria-hidden="true" />
+              <span className="da-toggle-label">Mute</span>
             </label>
           </fieldset>
         )}
