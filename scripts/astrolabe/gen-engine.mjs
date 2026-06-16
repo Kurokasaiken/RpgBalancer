@@ -119,7 +119,7 @@ ${js}
     if(scene.whitePillars && scene.whitePillars.length){
       for(let i=0;i<scene.whitePillars.length;i+=1){
         if(geo.axisTip[i]!=null) scene.whitePillars[i].r=geo.axisTip[i];
-        if(geo.axisCheck[i]!=null) scene.blackPillars[i].r=geo.axisCheck[i];
+        scene.blackPillars[i].r=rCheckAt(scene.blackPillars[i].ang);  // sit on the goo edge
       }
     }
   }

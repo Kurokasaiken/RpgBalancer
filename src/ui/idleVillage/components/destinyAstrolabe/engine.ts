@@ -130,13 +130,18 @@ function rStarAt(theta,scale=1){ return radialFromAxes(theta,geo.axisTip,scale);
    touches each black obelisk (the check) and interpolates smoothly between
    adjacent ones (no deep star valleys), so the goo's area is bounded exactly by
    the dark obelisks. This is both the visible goo rim and the ball's container. */
+/* organic blob deformation — deterministic low-freq lobes so the goo edge is an
+   irregular blob, never a clean circle (stable per angle for physics + drawing) */
+function gooBlob(theta){
+  return 1 + 0.13*Math.sin(theta*3+0.7) + 0.08*Math.sin(theta*5-1.3) + 0.05*Math.sin(theta*7+2.1);
+}
 function rCheckAt(theta,scale=1){
   const t=((normAng(theta+Math.PI/2)%TAU)+TAU)%TAU;   // 0 at axis 0
   const seg=TAU/AXES;                                 // 72° between adjacent obelisks
   const k=Math.floor(t/seg), f=(t-k*seg)/seg;
   const r0=geo.axisCheck[k%AXES], r1=geo.axisCheck[(k+1)%AXES];
   const s=f*f*(3-2*f);                                // smoothstep between neighbours
-  return Math.max(geo.rCore+30, r0+(r1-r0)*s)*scale;  // floor so the goo is never tiny
+  return Math.max(geo.rCore+30, (r0+(r1-r0)*s)*gooBlob(theta))*scale;  // blobby, floored
 }
 const dist=(x,y)=>Math.hypot(x-CX,y-CY);
 const angOf=(x,y)=>Math.atan2(y-CY,x-CX);
@@ -276,8 +281,9 @@ function buildPillars(){
      reaches black on that axis */
   scene.whitePillars=Array.from({length:AXES},(_,i)=>({
     ang:TIP(i), r:geo.axisTip[i], drop:0, flash:0, landed:false}));
+  /* black obelisks sit exactly ON the (blobby) goo edge at their spoke */
   scene.blackPillars=Array.from({length:AXES},(_,i)=>({
-    ang:TIP(i), r:geo.axisCheck[i], drop:0, flash:0, landed:false}));
+    ang:TIP(i), r:rCheckAt(TIP(i)), drop:0, flash:0, landed:false}));
 }
 
 /* =========================================================================
@@ -800,8 +806,6 @@ function drawStar(now){
   const t=now/1000;
   const p=starPath(s);
   ctx.save();
-  /* clip the star to the goo's boundary so it never bleeds beyond the walls */
-  ctx.clip(gooBlobPath(1,0));
   /* L0 radiant sunlit halo behind the star (sun-bronze bloom) */
   const halo=ctx.createRadialGradient(CX,CY,geo.rCore*s,CX,CY,geo.rTip*s*1.35);
   halo.addColorStop(0,`rgba(255,238,180,${0.32+0.12*Math.sin(now/900)})`);
@@ -885,25 +889,26 @@ function drawStar(now){
    star like stained glass. The centreline MEANDERS and the body SWELLS
    asymmetrically as it pools inward — never a rigid vertical banner.
    Coverage angle ∝ risk probability; edges shimmer via animated #fluidWobble. */
-function drawStream(wedge,color,edge,now,pour){
+function drawStream(wedge,color,edge,now,pour,variant){
   if(pour<=0) return;
   const t=now/1000;
   const mid=(wedge.a0+wedge.a1)/2;
   const half=Math.max(0.06,(wedge.a1-wedge.a0)/2);
-  const reach=R*pour;
+  const ge=rCheckAt(mid);                       // source = the goo edge at this wedge
+  const reach=(ge-geo.rCore)*pour;              // pours INTO the goo — proportional to goo depth
   const STEPS=36;
   const fade=clamp(pour*1.5,0,1);
   const col=a=>color.replace('A',a.toFixed(3));
   /* distinct per-stream personality so the two rivers bend differently */
-  const seed=color.indexOf('255,40,190')>=0 ? 1.6 : 4.3;
-  const bendDir=color.indexOf('255,40,190')>=0 ? 1 : -1;
+  const seed=variant==='wound' ? 1.6 : 4.3;
+  const bendDir=variant==='wound' ? 1 : -1;
 
-  /* u: 0 at the rim source → 1 at the inner pool */
+  /* u: 0 at the goo-edge source → 1 toward the centre */
   const centreline=u=> mid
       + Math.sin(u*2.15 + t*0.5 + seed)*half*0.85*u*bendDir   // growing S-meander
       + Math.sin(u*4.6 + t*1.0 + seed)*0.018*u;               // fine ripple
   const swell=u=> half*(0.42 + 1.05*Math.sin(Math.min(1,u*1.04)*Math.PI*0.9)); // vein bulge
-  const radAt=u=> R - reach*u;
+  const radAt=(u,a)=> rCheckAt(a) - reach*u;    // creep inward from the goo edge per angle
 
   /* ragged, creeping edge: low swell + higher-frequency irregular notches so the
      border looks like bleeding ink, never a clean petal */
@@ -914,28 +919,28 @@ function drawStream(wedge,color,edge,now,pour){
       + 0.05*Math.sin(u*61.0 + ph*2.2);
   const buildPath=(wScale)=>{
     ctx.beginPath();
-    for(let i=0;i<=STEPS;i+=1){              // left bank: rim → pool
+    for(let i=0;i<=STEPS;i+=1){              // left bank: edge → centre
       const u=i/STEPS, c=centreline(u);
       const w=swell(u)*wScale*ragged(u,seed);
-      const a=c-w, d=radAt(u);
+      const a=c-w, d=radAt(u,a);
       ctx.lineTo(CX+Math.cos(a)*d,CY+Math.sin(a)*d);
     }
-    for(let i=STEPS;i>=0;i-=1){              // right bank: pool → rim (asymmetric)
+    for(let i=STEPS;i>=0;i-=1){              // right bank: centre → edge (asymmetric)
       const u=i/STEPS, c=centreline(u);
       const w=swell(u)*wScale*ragged(u,seed+2.9);
-      const a=c+w, d=radAt(u);
+      const a=c+w, d=radAt(u,a);
       ctx.lineTo(CX+Math.cos(a)*d,CY+Math.sin(a)*d);
     }
     ctx.closePath();
   };
 
   ctx.save();
-  ctx.beginPath(); ctx.arc(CX,CY,R-4,0,TAU); ctx.clip();
+  ctx.clip(gooBlobPath(1,0));                // rivers stay inside the goo
   ctx.filter='url(#fluidWobble)';
 
-  /* 1) VIVID GEL BODY (source-over): denser at the rim source, translucent toward
-        the pool — a clear, instantly-readable colored river */
-  const g=ctx.createRadialGradient(CX,CY,Math.max(0,R-reach),CX,CY,R);
+  /* 1) VIVID GEL BODY (source-over): denser at the goo-edge source, translucent
+        toward the centre — a clear, instantly-readable colored river */
+  const g=ctx.createRadialGradient(CX,CY,Math.max(0,ge-reach),CX,CY,ge);
   g.addColorStop(0, col(0.24*fade));
   g.addColorStop(.5, col(0.66*fade));
   g.addColorStop(.85,col(0.86*fade));
@@ -944,7 +949,7 @@ function drawStream(wedge,color,edge,now,pour){
 
   /* 2) LUMINOUS CORE — additive bright heart, glows like neon over dark ink */
   ctx.globalCompositeOperation='lighter';
-  const c=ctx.createRadialGradient(CX,CY,Math.max(0,R-reach*0.9),CX,CY,R);
+  const c=ctx.createRadialGradient(CX,CY,Math.max(0,ge-reach*0.9),CX,CY,ge);
   c.addColorStop(0, col(0.0));
   c.addColorStop(.7, col(0.18*fade));
   c.addColorStop(1, col(0.42*fade));
@@ -960,7 +965,7 @@ function drawStream(wedge,color,edge,now,pour){
     for(let i=0;i<=STEPS;i+=1){
       const u=i/STEPS;
       const a=centreline(u)+(k-1.5)*swell(u)*0.5+Math.sin(t*1.2+i*.4+k*1.9)*half*0.18*u;
-      const d=radAt(u)+Math.sin(t*1.5+i*.5+k)*3;
+      const d=radAt(u,a)+Math.sin(t*1.5+i*.5+k)*3;
       const x=CX+Math.cos(a)*d, y=CY+Math.sin(a)*d;
       if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
     }
@@ -970,7 +975,7 @@ function drawStream(wedge,color,edge,now,pour){
   for(let k=0;k<6;k+=1){
     const u=1+0.04*k;
     const a=centreline(0.95)+Math.sin(t*.6+k*1.3)*half*0.7;
-    const dd=radAt(0.96)-4-Math.abs(Math.sin(t*.7+k*1.9))*Math.min(reach*.35,38);
+    const dd=radAt(0.96,a)-4-Math.abs(Math.sin(t*.7+k*1.9))*Math.min(reach*.35,38);
     if(dd<8) continue;
     const dx=CX+Math.cos(a)*dd, dy=CY+Math.sin(a)*dd, rr=1.6+(k%3);
     const dg=ctx.createRadialGradient(dx,dy,0,dx,dy,rr);
@@ -990,11 +995,11 @@ function drawPillar(pl,isWhite){
   const px=CX+Math.cos(pl.ang)*pl.r, py=CY+Math.sin(pl.ang)*pl.r;
   const dropY=(1-pl.drop)*-520;
   const vy=py+dropY;
-  /* tapered runic monolith with a faceted pyramidion cap */
-  const bw=17, tw=8.5;             // base / shoulder half-widths → strong taper
-  const h=94, capH=30;
-  const footF=12, frontF=3;
-  const lean=isWhite?0:3.5;         // basalt leans (asymmetry / Rude Beauty)
+  /* tapered runic monolith with a faceted pyramidion cap — slender & elegant */
+  const bw=13.5, tw=5.5;           // base / shoulder half-widths → stronger, finer taper
+  const h=112, capH=40;            // taller shaft + a longer, sharper pyramidion
+  const footF=11, frontF=3;
+  const lean=isWhite?0:3;           // basalt leans (asymmetry / Rude Beauty)
   const shoulderY=vy-h;
   const tipX=px+lean, tipY=shoulderY-capH;
   const Bc=[px,vy+footF];
@@ -1010,10 +1015,21 @@ function drawPillar(pl,isWhite){
   const fl=pl.flash;
   ctx.save();
 
-  /* ground shadow + faint teal contact glow when seated */
+  /* ground shadow + emissive socket where the obelisk roots into the goo */
   if(pl.drop>=1){
     ctx.fillStyle='rgba(3,22,20,.62)';
-    ctx.beginPath(); ctx.ellipse(px,py,bw*1.15,bw*.4,0,0,TAU); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(px,py,bw*1.25,bw*.42,0,0,TAU); ctx.fill();
+    const sock=ctx.createRadialGradient(px,py,1,px,py,bw*1.7);
+    sock.addColorStop(0, isWhite?'rgba(255,221,150,.40)':'rgba(56,224,196,.36)');
+    sock.addColorStop(1,'transparent');
+    ctx.fillStyle=sock;
+    ctx.beginPath(); ctx.ellipse(px,py,bw*1.7,bw*.62,0,0,TAU); ctx.fill();
+    /* faint vertical emissive aura hugging the shaft */
+    const aura=ctx.createLinearGradient(px,py,px,py-h-capH);
+    aura.addColorStop(0, isWhite?'rgba(255,224,150,.18)':'rgba(60,224,196,.16)');
+    aura.addColorStop(1,'transparent');
+    ctx.fillStyle=aura;
+    ctx.beginPath(); ctx.ellipse(px,py-(h+capH)*0.5,bw*1.25,(h+capH)*0.5,0,0,TAU); ctx.fill();
   }
   /* descent motion-streak while falling */
   if(pl.drop<1){
@@ -1112,6 +1128,12 @@ function drawPillar(pl,isWhite){
     ctx.fillStyle='rgba(255,255,255,.9)'; ctx.shadowColor='#fff'; ctx.shadowBlur=8;
     ctx.beginPath(); ctx.arc(tipX,tipY,1.6,0,TAU); ctx.fill(); ctx.shadowBlur=0;
   }
+  /* soft emissive halo crowning the pyramidion */
+  const tipHalo=ctx.createRadialGradient(tipX,tipY,0,tipX,tipY,16+10*fl);
+  tipHalo.addColorStop(0, isWhite?`rgba(255,238,180,${.5+.4*fl})`:`rgba(120,210,255,${.32+.4*fl})`);
+  tipHalo.addColorStop(1,'transparent');
+  ctx.fillStyle=tipHalo;
+  ctx.beginPath(); ctx.arc(tipX,tipY,16+10*fl,0,TAU); ctx.fill();
   ctx.restore();
 }
 
@@ -1227,8 +1249,8 @@ function frame(now){
   drawGoo(now);
   drawBlueprint(now);
   drawStar(now);
-  drawStream(geo.wedges.dead,'rgba(34,140,255,A)','rgba(150,225,255,1)',now,scene.pourP);   // Morte — azzurro cobalto
-  drawStream(geo.wedges.wound,'rgba(255,40,190,A)','rgba(255,180,240,1)',now,scene.pourP); // Ferito — magenta elettrico
+  drawStream(geo.wedges.dead,'rgba(120,38,150,A)','rgba(214,170,255,1)',now,scene.pourP,'death');  // Morte — viola/ametista (mortalità, l'ignoto)
+  drawStream(geo.wedges.wound,'rgba(214,32,52,A)','rgba(255,150,160,1)',now,scene.pourP,'wound');  // Ferito — cremisi sangue
   scene.blackPillars.forEach(p=>drawPillar(p,false));
   scene.whitePillars.forEach(p=>drawPillar(p,true));
   drawShocks(dt);
@@ -1325,7 +1347,7 @@ function updateResultPanel(preOnly){
     if(scene.whitePillars && scene.whitePillars.length){
       for(let i=0;i<scene.whitePillars.length;i+=1){
         if(geo.axisTip[i]!=null) scene.whitePillars[i].r=geo.axisTip[i];
-        if(geo.axisCheck[i]!=null) scene.blackPillars[i].r=geo.axisCheck[i];
+        scene.blackPillars[i].r=rCheckAt(scene.blackPillars[i].ang);  // sit on the goo edge
       }
     }
   }
