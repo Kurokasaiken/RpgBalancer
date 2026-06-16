@@ -39,10 +39,14 @@ export interface DestinyAstrolabeProps {
   onResolve?: (result: AstrolabeResult) => void;
   /** Auto-launch a roll on mount. Default true. */
   autoStart?: boolean;
-  /** Initial state of the Auto-Tiro toggle. Default false. */
+  /** Initial state of the Auto-Throw checkbox. Default false. */
   autoThrow?: boolean;
-  /** Hide the built-in Auto-Tiro toggle (e.g. when the host owns pacing). */
-  hideAutoThrowToggle?: boolean;
+  /** Initial state of the Skip Animation checkbox. Default false. */
+  skipAnimation?: boolean;
+  /** Initial state of the Remove Sounds checkbox. Default false. */
+  removeSounds?: boolean;
+  /** Hide the built-in throw controls (e.g. when the host owns pacing). */
+  hideThrowControls?: boolean;
   /** Extra classes on the root. */
   className?: string;
 }
@@ -70,7 +74,7 @@ const SKIN_BINDING = {
 
 export const DestinyAstrolabe = memo(
   forwardRef<DestinyAstrolabeHandle, DestinyAstrolabeProps>(function DestinyAstrolabe(
-    { skills, config, onResolve, autoStart = true, autoThrow = false, hideAutoThrowToggle = false, className },
+    { skills, config, onResolve, autoStart = true, autoThrow = false, skipAnimation = false, removeSounds = false, hideThrowControls = false, className },
     ref,
   ) {
     const rootRef = useRef<HTMLDivElement>(null);
@@ -78,9 +82,11 @@ export const DestinyAstrolabe = memo(
     const onResolveRef = useRef(onResolve);
     onResolveRef.current = onResolve;
 
-    const [armed, setArmed] = useState(false);   // true → show the TIRA button
+    const [armed, setArmed] = useState(false);   // true → show the TIRA button or manual THROW
     const [flash, setFlash] = useState(false);   // click feedback
-    const [autoTiro, setAutoTiro] = useState(autoThrow);
+    const [autoThrowEnabled, setAutoThrowEnabled] = useState(autoThrow);
+    const [skipAnimationEnabled, setSkipAnimationEnabled] = useState(skipAnimation);
+    const [removeSoundsEnabled, setRemoveSoundsEnabled] = useState(removeSounds);
 
     const { classes, attributes, styles } = useSkinBinding(SKIN_BINDING, {
       properties: { skillCount: skills.length },
@@ -122,12 +128,18 @@ export const DestinyAstrolabe = memo(
       engineRef.current?.setConfig(skills, config);
     }, [skills, config]);
 
-    // Auto-Tiro: throw 0.5s after the button arms (uses base stats, no precision bonus).
+    // Skip Animation: throw immediately when armed if enabled.
     useEffect(() => {
-      if (!armed || !autoTiro) return;
+      if (!armed || !skipAnimationEnabled) return;
+      doThrow();
+    }, [armed, skipAnimationEnabled, doThrow]);
+
+    // Auto-Throw: throw 0.5s after the button arms (uses base stats, no precision bonus).
+    useEffect(() => {
+      if (!armed || !autoThrowEnabled || skipAnimationEnabled) return;
       const id = window.setTimeout(() => doThrow(), 500);
       return () => window.clearTimeout(id);
-    }, [armed, autoTiro, doThrow]);
+    }, [armed, autoThrowEnabled, skipAnimationEnabled, doThrow]);
 
     useImperativeHandle(
       ref,
@@ -145,31 +157,52 @@ export const DestinyAstrolabe = memo(
           style={styles}
         />
 
-        {/* TIRA — chiseled bronze coin inlay at the centre of the flower */}
-        {armed && (
+        {/* Throw button — show when armed, unless skip animation or auto-throw enabled */}
+        {armed && !skipAnimationEnabled && !autoThrowEnabled && (
           <button
             type="button"
             className={`da-tira wanderlust-artifact${flash ? ' da-tira--flash' : ''}`}
             onClick={doThrow}
-            aria-label="Tira"
+            aria-label="Throw"
           >
-            TIRA
+            THROW
           </button>
         )}
 
-        {/* Auto-Tiro toggle */}
-        {!hideAutoThrowToggle && (
-          <label
-            className="da-autotiro"
-            title="Auto-throw uses base stats, no precision bonus"
-          >
-            <input
-              type="checkbox"
-              checked={autoTiro}
-              onChange={(e) => setAutoTiro(e.target.checked)}
-            />
-            <span>Auto-Tiro</span>
-          </label>
+        {/* Throw controls (checkboxes) */}
+        {!hideThrowControls && (
+          <fieldset className="da-throw-controls">
+            <legend className="sr-only">Throw controls</legend>
+
+            <label className="da-control-label">
+              <input
+                type="checkbox"
+                checked={skipAnimationEnabled}
+                onChange={(e) => setSkipAnimationEnabled(e.target.checked)}
+              />
+              <span>Skip Animation</span>
+            </label>
+
+            <label className="da-control-label">
+              <input
+                type="checkbox"
+                checked={autoThrowEnabled}
+                onChange={(e) => setAutoThrowEnabled(e.target.checked)}
+                disabled={skipAnimationEnabled}
+                title={skipAnimationEnabled ? "Disabled when Skip Animation is active" : "Auto-throw uses base stats, no precision bonus"}
+              />
+              <span>Auto</span>
+            </label>
+
+            <label className="da-control-label">
+              <input
+                type="checkbox"
+                checked={removeSoundsEnabled}
+                onChange={(e) => setRemoveSoundsEnabled(e.target.checked)}
+              />
+              <span>No Sound</span>
+            </label>
+          </fieldset>
         )}
       </div>
     );

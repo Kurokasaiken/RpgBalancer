@@ -4,8 +4,8 @@
 
 .destiny-astrolabe-wrap { position: relative; }
 
-/* TIRA — chiseled bronze coin inlay at the centre of the flower (V8 material) */
-.da-tira {
+/* TIRA & THROW — chiseled bronze coin inlay at the centre of the flower (V8 material) */
+.da-tira, .da-throw {
   position: absolute;
   left: 50%;
   top: 50%;
@@ -32,8 +32,8 @@
   animation: da-tira-pulse 1.5s ease-in-out infinite;
   transition: transform 0.08s ease, filter 0.12s ease;
 }
-.da-tira:hover { filter: brightness(1.08); }
-.da-tira:active { transform: translate(-50%, -50%) scale(0.93); } /* haptic-like press */
+.da-tira:hover, .da-throw:hover { filter: brightness(1.08); }
+.da-tira:active, .da-throw:active { transform: translate(-50%, -50%) scale(0.93); } /* haptic-like press */
 
 @keyframes da-tira-pulse {
   0%, 100% {
@@ -67,25 +67,59 @@
   to   { opacity: 0;    transform: scale(1.4); }
 }
 
-/* Auto-Tiro toggle — small, unobtrusive, bottom-right */
-.da-autotiro {
+/* Throw controls — bottom-right panel with 3 checkboxes */
+.da-throw-controls {
   position: absolute;
   right: 12px;
   bottom: 12px;
   z-index: 5;
+  border: none;
+  padding: 0;
+  margin: 0;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 6px;
   font-family: 'Space Grotesk', system-ui, sans-serif;
   font-size: 11px;
   letter-spacing: 0.08em;
   color: var(--v8-ink-muted, #c0a878);
   opacity: 0.8;
+}
+.da-throw-controls:hover { opacity: 1; }
+
+/* Individual control label */
+.da-control-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   user-select: none;
   cursor: pointer;
 }
-.da-autotiro input { accent-color: var(--v8-sun-bronze, #a05c18); cursor: pointer; }
-.da-autotiro:hover { opacity: 1; }
+.da-control-label input {
+  accent-color: var(--v8-sun-bronze, #a05c18);
+  cursor: pointer;
+}
+.da-control-label input:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.da-control-label:has(input:disabled) {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Visually hidden legend */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .da-tira { animation: none; }
