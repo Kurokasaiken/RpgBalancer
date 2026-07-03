@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import clsx from 'clsx';
-import ActivitySlotCard, { type DropState } from '@/ui/idleVillage/components/ActivitySlot';
 import LocationCard from '@/ui/idleVillage/components/LocationCard';
 import type { VerbVisualVariant } from '@/ui/idleVillage/legacy/VerbCard';
+import type { LocationDropState } from '@/ui/idleVillage/map/validators/locationDropValidators';
 import InlineResidentChips from '@/ui/idleVillage/components/InlineResidentChips';
 import type { ResidentAssignmentCandidate } from '@/ui/idleVillage/components/InlineResidentChips';
 import { TooltipProvider } from '@/ui/idleVillage/components/TooltipProvider';
@@ -54,8 +54,8 @@ export interface ActivityAreaProps {
   cycleElapsedSeconds: number;
   secondsPerTimeUnit: number;
   draggingResidentId: string | null;
-  slotDropStates: Record<string, DropState>;
-  locationDropState: DropState;
+  slotDropStates: Record<string, LocationDropState>;
+  locationDropState: LocationDropState;
   handlers: ActivityAreaHandlers;
   locationTitle?: string;
   locationDescription?: string;
@@ -206,7 +206,8 @@ const ActivityArea: React.FC<ActivityAreaProps> = ({
 
             return (
               <React.Fragment key={slot.slotId}>
-                <ActivitySlotCard
+                {/* ActivitySlotCard component removed - needs replacement */}
+                {/* <ActivitySlotCard
                   slotId={slot.slotId}
                   iconName={slot.iconName}
                   label={label}
@@ -247,7 +248,7 @@ const ActivityArea: React.FC<ActivityAreaProps> = ({
                   onMouseEnter={() => onSlotHoverStart?.(slot.slotId)}
                   onMouseLeave={onSlotHoverEnd}
                   data-sandbox-interaction-slot={slot.slotId}
-                />
+                /> */}
                 {showPicker && residentsCandidates && onAssign && onClose && (
                   <InlineResidentChips
                     isOpen

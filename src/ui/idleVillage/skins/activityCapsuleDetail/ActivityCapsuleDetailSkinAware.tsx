@@ -8,6 +8,9 @@
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useSkinSystem } from '../../hooks/useSkinSystem';
+import { ResidentSlotRack } from '../../components/ResidentSlotRack';
+import type { ResidentSlotViewModel } from '../../slots/types';
+import type { LocationDropState } from '../../map/validators/locationDropValidators';
 import { useSkinSlot, type UseSkinSlotOptions } from '../../hooks/useSkinSlot';
 import { getSkinReplacementAPI_TS003 } from '../SkinReplacementAPI_TS003';
 import type { ActivityCapsuleDetailSkinConfig } from './ActivityCapsuleDetailSkinSchema';
@@ -27,6 +30,9 @@ import type {
   ComponentSkinBinding,
   SkinValidationResult
 } from '../types/SkinSchema';
+import { WanderlustSurface } from '@/ui/wanderlust-surface/WanderlustSurface';
+import { WanderlustRequirementList } from '@/ui/wanderlust-surface/layout/WanderlustLayout';
+import { WanderlustAmbientField } from '@/ui/wanderlust-surface/layout/WanderlustAmbientField';
 
 // Slot data interface
 export interface ActivityDetailSlotData {
@@ -36,6 +42,32 @@ export interface ActivityDetailSlotData {
   progress: number;
   assignedWorkerName?: string;
   assignedWorkerAvatarUrl?: string;
+}
+
+/**
+ * Maps ActivityDetailSlotData to ResidentSlotViewModel for ResidentSlotRack integration.
+ * This is a simplified mapper for POI detail context; full resident state is not available.
+ */
+function mapToResidentSlotViewModel(
+  slot: ActivityDetailSlotData,
+  index: number
+): ResidentSlotViewModel {
+  const isAssigned = slot.state !== 'empty' && slot.state !== 'ghost';
+
+  return {
+    id: slot.id,
+    index,
+    label: `Slot ${index + 1}`,
+    assignedResidentId: isAssigned ? slot.id : null,
+    activityId: 'activity-poi',
+    activityLabel: 'POI Activity',
+    displayRole: 'activity',
+    isPlaceholder: false,
+    dropState: 'idle',
+    bloomState: 'idle',
+    status: isAssigned ? 'assigned' : 'empty',
+    telemetryTags: [],
+  };
 }
 
 // Telemetry entry interface
@@ -344,13 +376,25 @@ export function ActivityCapsuleDetailSkinAware({
     if (isDragging && !inlineMode) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
-      
+
       return () => {
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
       };
     }
   }, [isDragging, handleMouseMove, handleMouseUp]);
+
+  // Debug logging
+  useEffect(() => {
+    console.log('DEBUG ActivityCapsuleDetailSkinAware:', {
+      showSlots,
+      showTelemetry,
+      showInfo,
+      isOpen,
+      slots: slots.length,
+      telemetry: telemetry.length,
+    });
+  }, [showSlots, showTelemetry, showInfo, isOpen, slots, telemetry]);
   
   // Generate CSS custom properties
   const cssVars = useMemo((): React.CSSProperties => {
@@ -484,7 +528,48 @@ export function ActivityCapsuleDetailSkinAware({
         return {};
     }
   }, [skinConfig, status]);
-  
+
+  // Convert slots to ResidentSlotViewModel for ResidentSlotRack
+  const residentSlots = useMemo(() => {
+    return slots.map((slot, index) => mapToResidentSlotViewModel(slot, index));
+  }, [slots]);
+
+  // Resolve slot size from skin config for detail layouts
+  const slotSizePx = useMemo(() => {
+    const parsed = parseInt(skinConfig.slotRack.slotSize, 10);
+    return Number.isNaN(parsed) ? 80 : parsed;
+  }, [skinConfig.slotRack.slotSize]);
+
+  // Resolve display info for slot icons
+  const resolveDisplayInfo = useCallback((slot: ResidentSlotViewModel) => {
+    const originalSlot = slots.find(s => s.id === slot.id);
+    return {
+      icon: originalSlot?.initial || '☆',
+      label: slot.label,
+    };
+  }, [slots]);
+
+  // Map slot activity state for ResidentSlotRack
+  const getSlotActivityState = useCallback((slotId: string) => {
+    const slot = slots.find(s => s.id === slotId);
+    if (!slot) return null;
+    // Map ResidentSlotViewModel state to SlotActivityUIState
+    const stateMap: Record<string, 'idle' | 'active' | 'locked' | 'completing' | 'failed' | 'done'> = {
+      'empty': 'idle',
+      'ghost': 'idle',
+      'idle': 'idle',
+      'active': 'active',
+      'done': 'done',
+      'locked': 'locked',
+    };
+    return {
+      state: stateMap[slot.state] || 'idle',
+      progress: 0,
+      remainingSeconds: 0,
+      isLockedByPhase: false,
+    };
+  }, [slots]);
+
   // Component classes
   const windowClasses = [
     'activity-capsule-detail-skin-aware',
@@ -502,44 +587,68 @@ export function ActivityCapsuleDetailSkinAware({
   
   if (!isOpen) return null;
 
-  const windowStyle: React.CSSProperties = {
+  // Style applied to the WanderlustSurface wrapper: it owns sizing and
+  // positioning so the bronze border tracks the panel exactly.
+  const surfaceStyle: React.CSSProperties = {
     ...cssVars,
-    ...statusStyles,
     opacity: isOpen ? 1 : 0,
     pointerEvents: isOpen ? 'all' : 'none',
+    width: compact ? 'var(--detail-window-width)' : 'var(--detail-window-width)',
+    minHeight: 'var(--detail-window-min-height)',
     ...(inlineMode
       ? {
           position: 'relative',
-          left: 'auto',
-          top: 'auto',
-          transform: 'none',
           margin: '0 auto',
           maxWidth: 'min(100%, var(--detail-window-width))',
         }
       : {
+          position: 'fixed',
           left: windowPosition.x ? `${windowPosition.x}px` : '50%',
           top: windowPosition.y ? `${windowPosition.y}px` : '50%',
-          transform:
-            windowPosition.x || windowPosition.y
-              ? 'translate(-50%, -50%)'
-              : 'translate(-50%, -50%) scale(0.9)',
+          transform: 'translate(-50%, -50%)',
+          zIndex: 1000,
         }),
   };
-  
+
+  // Inner content div: positioning + frame are handled by the surface, so
+  // neutralize the legacy floating/background styling.
+  const innerStyle: React.CSSProperties = {
+    ...statusStyles,
+    position: 'relative',
+    left: 'auto',
+    top: 'auto',
+    transform: 'none',
+    margin: 0,
+    width: '100%',
+    minHeight: 'auto',
+    background: 'transparent',
+    border: 'none',
+    boxShadow: 'none',
+    backdropFilter: 'none',
+  };
+
   return (
-    <div
-      className={windowClasses}
-      data-testid={dataTestId}
-      data-activity-id={activityId}
-      data-status={status}
-      data-pillar={resolvedPillar}
-      data-preset={resolvedPresetId}
-      data-motion-level={resolvedMotionLevel}
-      data-skin-binding-id={skinBindingId}
-      style={windowStyle}
-      aria-label={ariaLabel || `${name} activity detail window`}
-      aria-live={skinConfig.accessibility.enableAriaLive ? ariaLive : 'off'}
+    <WanderlustSurface
+      shape="panel"
+      material="bronze"
+      interactive={enableDrag}
+      isDragging={isDragging}
+      className="activity-capsule-detail-surface"
+      style={surfaceStyle}
     >
+      <div
+        className={windowClasses}
+        data-testid={dataTestId}
+        data-activity-id={activityId}
+        data-status={status}
+        data-pillar={resolvedPillar}
+        data-preset={resolvedPresetId}
+        data-motion-level={resolvedMotionLevel}
+        data-skin-binding-id={skinBindingId}
+        style={innerStyle}
+        aria-label={ariaLabel || `${name} activity detail window`}
+        aria-live={skinConfig.accessibility.enableAriaLive ? ariaLive : 'off'}
+      >
       {/* Window frame */}
       <div className="activity-capsule-detail-skin-aware__frame">
         {/* Window background with gradients */}
@@ -577,7 +686,8 @@ export function ActivityCapsuleDetailSkinAware({
         )}
         
         {/* Content */}
-        <div className="activity-capsule-detail-skin-aware__content">
+        <WanderlustAmbientField paused={false}>
+          <div className="activity-capsule-detail-skin-aware__content">
           {/* Header */}
           <div className="activity-capsule-detail-skin-aware__header">
             {/* POI */}
@@ -585,7 +695,7 @@ export function ActivityCapsuleDetailSkinAware({
               <svg
                 width={skinConfig.poi.poiSize}
                 height={skinConfig.poi.poiSize}
-                viewBox={`-${parseInt(skinConfig.poi.poiSize) / 2} -${parseInt(skinConfig.poiSize) / 2} ${skinConfig.poi.poiSize} ${skinConfig.poi.poiSize}`}
+                viewBox={`-${parseInt(skinConfig.poi.poiSize) / 2} -${parseInt(skinConfig.poi.poiSize) / 2} ${parseInt(skinConfig.poi.poiSize)} ${parseInt(skinConfig.poi.poiSize)}`}
                 className="activity-capsule-detail-skin-aware__poi-svg"
               >
                 {/* POI SVG implementation would go here */}
@@ -667,85 +777,44 @@ export function ActivityCapsuleDetailSkinAware({
               <div className="activity-capsule-detail-skin-aware__section-label">
                 Personaggi assegnati
               </div>
-              <div className="activity-capsule-detail-skin-aware__slot-rack">
-                {slots.map((slot) => (
-                  <div
-                    key={slot.id}
-                    className={`activity-capsule-detail-skin-aware__slot activity-capsule-detail-skin-aware__slot--${slot.state}`}
-                    onClick={() => {
-                      if (slot.state === 'empty' || slot.state === 'ghost') {
-                        onSlotAssign?.(slot.id);
-                      } else if (slot.state === 'idle') {
-                        onSlotDetach?.(slot.id);
-                      }
-                    }}
-                  >
-                    {slotSkin ? (
-                      // Use slot skin SVG template
-                      <div 
-                        className="activity-capsule-detail-skin-aware__slot-skin"
-                        dangerouslySetInnerHTML={{ __html: slotSkin.htmlTemplate }}
-                      />
-                    ) : (
-                      // Fallback to generic SVG
-                      <svg
-                        width={skinConfig.slotRack.slotSize}
-                        height={skinConfig.slotRack.slotSize}
-                        viewBox={`-${parseInt(skinConfig.slotRack.slotSize) / 2} -${parseInt(skinConfig.slotRack.slotSize) / 2} ${skinConfig.slotRack.slotSize} ${skinConfig.slotRack.slotSize}`}
-                        className="activity-capsule-detail-skin-aware__slot-svg"
-                      >
-                        {/* Slot SVG implementation */}
-                        <circle
-                          cx="0"
-                          cy="0"
-                          r="20"
-                          fill="var(--detail-cavity-gradient)"
-                          stroke="var(--detail-cavity-border)"
-                          strokeWidth="1"
-                        />
-                        {slot.state !== 'empty' && slot.state !== 'ghost' && (
-                          <>
-                            <circle
-                              cx="0"
-                              cy="0"
-                              r="16"
-                              fill="var(--detail-medal-gradient)"
-                              stroke="var(--detail-medal-border)"
-                              strokeWidth="2"
-                            />
-                            <text
-                              x="0"
-                              y="4"
-                              textAnchor="middle"
-                              fill="var(--detail-initials-color)"
-                              fontSize="var(--detail-initials-font-size)"
-                              fontFamily="var(--detail-initials-font)"
-                              fontWeight="600"
-                            >
-                              {slot.initial}
-                            </text>
-                          </>
-                        )}
-                        {(slot.state === 'active' || slot.state === 'locked') && (
-                          <circle
-                            cx="0"
-                            cy="0"
-                            r="24"
-                            fill="none"
-                            stroke="var(--detail-slot-progress-gradient)"
-                            strokeWidth="3"
-                            strokeDasharray={`${Math.PI * 2 * slot.progress} ${Math.PI * 2 * (1 - slot.progress)}`}
-                            transform="rotate(-90)"
-                          />
-                        )}
-                      </svg>
-                    )}
-                  </div>
-                ))}
-              </div>
+              <ResidentSlotRack
+                slots={residentSlots}
+                layout="detail"
+                overflowBehavior="scroll"
+                resolveDisplayInfo={resolveDisplayInfo}
+                getSlotActivityState={getSlotActivityState}
+                onSlotClick={(slotId) => {
+                  const slot = slots.find(s => s.id === slotId);
+                  if (!slot) return;
+                  if (slot.state === 'empty' || slot.state === 'ghost') {
+                    onSlotAssign?.(slotId);
+                  } else if (slot.state === 'idle') {
+                    onSlotDetach?.(slotId);
+                  }
+                }}
+                onSlotClear={onSlotDetach}
+                className="activity-capsule-detail-skin-aware__slot-rack"
+                slotSize={slotSizePx}
+              />
             </div>
           )}
-          
+
+          {/* Requirements */}
+          {showSlots && (
+            <div className="activity-capsule-detail-skin-aware__requirements">
+              <div className="activity-capsule-detail-skin-aware__section-label">
+                Requisiti
+              </div>
+              <WanderlustRequirementList
+                requirements={[
+                  { label: 'Forza', current: 45, required: 60 },
+                  { label: 'Destrezza', current: 38, required: 50 },
+                  { label: 'Costituzione', current: 42, required: 40 },
+                ]}
+              />
+            </div>
+          )}
+
           {/* Telemetry */}
           {showTelemetry && (
             <div className="activity-capsule-detail-skin-aware__telemetry">
@@ -808,6 +877,7 @@ export function ActivityCapsuleDetailSkinAware({
             )}
           </div>
         </div>
+        </WanderlustAmbientField>
       </div>
       
       {/* Validation errors for development */}
@@ -826,6 +896,12 @@ export function ActivityCapsuleDetailSkinAware({
       
       {/* CSS-in-JS styles */}
       <style>{`
+        /* Lift content above the WanderlustSurface SVG well (z-index 1) */
+        .activity-capsule-detail-surface .ws-content {
+          position: relative;
+          z-index: 2;
+        }
+
         .activity-capsule-detail-skin-aware {
           width: var(--detail-window-width);
           min-height: var(--detail-window-min-height);
@@ -965,7 +1041,7 @@ export function ActivityCapsuleDetailSkinAware({
           position: relative;
           display: flex;
           flex-direction: column;
-          padding: var(--detail-content-padding);
+          padding: calc(var(--detail-content-padding) + 6px) calc(var(--detail-content-padding) + 12px);
           gap: 16px;
           height: 100%;
           overflow: hidden;
@@ -1045,7 +1121,7 @@ export function ActivityCapsuleDetailSkinAware({
           display: flex;
           align-items: center;
           gap: 8px;
-          margin: 10px 0;
+          margin: 6px 0;
         }
         
         .activity-capsule-detail-skin-aware__ornament-line {
@@ -1111,11 +1187,11 @@ export function ActivityCapsuleDetailSkinAware({
         
         .activity-capsule-detail-skin-aware__section-label {
           font-family: var(--detail-primary-font);
-          font-size: 7.5px;
-          font-weight: 400;
+          font-size: 11px;
+          font-weight: 500;
           letter-spacing: 0.28em;
           text-transform: uppercase;
-          color: var(--detail-text-tertiary);
+          color: var(--detail-text-secondary);
           display: flex;
           align-items: center;
           gap: 8px;
@@ -1127,35 +1203,27 @@ export function ActivityCapsuleDetailSkinAware({
           height: 1px;
           background: linear-gradient(90deg, rgba(180, 130, 40, 0.2), transparent);
         }
-        
+
         .activity-capsule-detail-skin-aware__slot-rack {
+          max-width: 100%;
+        }
+
+        .activity-capsule-detail-skin-aware__slot-rack > div {
+          max-width: 100%;
+        }
+
+        .activity-capsule-detail-skin-aware__slot-rack .slot-v12__halo {
+          opacity: 0.35 !important;
+          filter: blur(10px) !important;
+        }
+
+        .activity-capsule-detail-skin-aware__requirements {
           display: flex;
-          gap: var(--detail-slot-gap);
-          align-items: center;
-          overflow-x: auto;
-          overflow-y: visible;
-          padding: 6px 2px 12px;
-          scrollbar-width: none;
+          flex-direction: column;
+          gap: 12px;
+          margin-top: 16px;
         }
-        
-        .activity-capsule-detail-skin-aware__slot-rack::-webkit-scrollbar {
-          display: none;
-        }
-        
-        .activity-capsule-detail-skin-aware__slot {
-          flex-shrink: 0;
-          position: relative;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          transition: transform var(--detail-hover-animation-duration) ease;
-        }
-        
-        .activity-capsule-detail-skin-aware__slot:hover {
-          transform: scale(1.02);
-        }
-        
+
         .activity-capsule-detail-skin-aware__slot--ghost {
           opacity: 0.45;
           animation: ghost-pulse 2.8s ease-in-out infinite;
@@ -1234,11 +1302,12 @@ export function ActivityCapsuleDetailSkinAware({
           flex-shrink: 0;
           letter-spacing: 0.03em;
           min-width: 28px;
+          font-variant-numeric: tabular-nums;
         }
-        
+
         .activity-capsule-detail-skin-aware__telemetry-message {
           color: var(--detail-text-secondary);
-          font-style: italic;
+          font-style: normal;
         }
         
         .activity-capsule-detail-skin-aware__telemetry-message em {
@@ -1382,6 +1451,7 @@ export function ActivityCapsuleDetailSkinAware({
         <style dangerouslySetInnerHTML={{ __html: slotSkin.cssStyles }} />
       )}
     </div>
+    </WanderlustSurface>
   );
 }
 

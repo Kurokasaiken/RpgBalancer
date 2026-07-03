@@ -18,7 +18,6 @@ import type { TradeResult, VillageSummary } from '@/ui/idleVillage/state/Village
 import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
 import ResidentSlotRack from '@/ui/idleVillage/slots/ResidentSlotRack';
 import type { ResidentSlotViewModel } from '@/ui/idleVillage/slots/useResidentSlotController';
-import ActivitySlotCard from '@/ui/idleVillage/components/ActivitySlot';
 import { DetailPanelStack } from '@/ui/idleVillage/components/DetailPanelStack';
 import LocationCard from '@/ui/idleVillage/components/LocationCard';
 import type { VerbSummary } from '@/ui/idleVillage/verbSummaries';

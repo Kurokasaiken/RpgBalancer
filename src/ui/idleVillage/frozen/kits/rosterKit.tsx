@@ -83,18 +83,24 @@ export function RosterDraggable({
   defaultFatigue = 0,
   componentId = 'roster-draggable',
   pillar = 'frontier',
+  useWanderlustSkin = false,
+  onDragEnd: externalOnDragEnd,
+  useExternalDndContext = false,
   ...props
 }: Omit<VillageRosterSectionProps, 'residents' | 'sortMode' | 'onSortModeChange'> & {
   defaultFatigue?: number;
   componentId?: string;
   pillar?: string;
+  useWanderlustSkin?: boolean;
+  onDragEnd?: (event: DragEndEvent) => void;
+  useExternalDndContext?: boolean; // If true, don't create internal DndContext
 }) {
   const { residents, residentsById } = useRosterKitData(defaultFatigue);
   const [sortMode, setSortMode] = useState<RosterSortMode>(DEFAULT_ROSTER_SORT_MODE);
 
   // Drag visual state
   const [dragVisualState, setDragVisualState] = useState<{
-    mode: 'idle' | 'dragging' | 'flight';
+    mode: 'idle' | 'dragging' | 'flight' | 'returning';
     residentId?: string;
   }>({ mode: 'idle' });
 
@@ -122,10 +128,51 @@ export function RosterDraggable({
     // Placeholder for drag move logic
   };
 
-  const handleDragEnd = (_event: DragEndEvent) => {
-    setDragVisualState({ mode: 'idle' });
+  const handleDragEnd = (event: DragEndEvent) => {
+    // Call external handler if provided
+    externalOnDragEnd?.(event);
+    
+    // Only reset to idle if the drop was valid (has 'over')
+    // If no 'over', set to 'returning' for spring-back animation
+    if (!event.over) {
+      setDragVisualState({ mode: 'returning' });
+      // Reset to idle after spring-back animation completes
+      setTimeout(() => {
+        setDragVisualState({ mode: 'idle' });
+      }, 300);
+    } else {
+      setDragVisualState({ mode: 'idle' });
+    }
   };
 
+  const rosterContent = (
+    <>
+      <VillageRosterSection
+        residents={residents}
+        sortMode={sortMode}
+        onSortModeChange={setSortMode}
+        componentId={componentId}
+        getResidentCompatibility={() => undefined}
+        context={{ locationType: 'roster', residentType: 'worker', scenarioType: 'test' }}
+        dragVisualState={dragVisualState}
+        pillar={pillar as any}
+        useWanderlustSkin={useWanderlustSkin}
+        {...props}
+      />
+      <CustomDragOverlay
+        residentsById={residentsById}
+        usePgCardPreview={true}
+        dragVisualState={dragVisualState}
+      />
+    </>
+  );
+
+  // If using external DndContext, return just the content without providers
+  if (useExternalDndContext) {
+    return rosterContent;
+  }
+
+  // Otherwise, wrap with full provider chain
   return (
     <SkinSystemProvider>
       <SandboxTimingProvider>
@@ -137,22 +184,7 @@ export function RosterDraggable({
             onDragMove={handleDragMove}
             onDragEnd={handleDragEnd}
           >
-            <VillageRosterSection
-              residents={residents}
-              sortMode={sortMode}
-              onSortModeChange={setSortMode}
-              componentId={componentId}
-              getResidentCompatibility={() => undefined}
-              context={{ locationType: 'roster', residentType: 'worker', scenarioType: 'test' }}
-              dragVisualState={dragVisualState}
-              pillar={pillar as any}
-              {...props}
-            />
-            <CustomDragOverlay
-              residentsById={residentsById}
-              usePgCardPreview={true}
-              dragVisualState={dragVisualState}
-            />
+            {rosterContent}
           </DndContext>
         </DragProvider>
       </SandboxTimingProvider>

@@ -34,7 +34,6 @@ import { useResidentDropValidation } from '@/ui/idleVillage/hooks/useResidentDro
 import { useResidentSlotController } from '@/ui/idleVillage/slots/useResidentSlotController';
 import type { ActivityCardKind, ActivityDefinition, StatRequirement } from '@/balancing/config/idleVillage/types';
 import type { ResidentSlotAssignResult } from '@/ui/idleVillage/slots/types';
-import type { DropState } from '@/ui/idleVillage/components/ActivitySlot';
 import type { DragFeedbackState } from '@/ui/idleVillage/components/ResidentRosterTypes';
 import { useActiveHUDState } from '@/ui/idleVillage/hooks/useActiveHUDState';
 import ActiveHUD from '@/ui/idleVillage/components/ActiveHUD';
@@ -54,7 +53,7 @@ import type { SkinPresetId } from '@/ui/idleVillage/skins/skinConfigRegistry';
 import { ActivityCapsule, type ActivitySlotData } from '@/ui/idleVillage/components/ActivityCapsule';
 import { getResidentPortraitUrl } from '@/engine/game/idleVillage/residentVisualResolver';
 import { SkinSystemProvider } from '@/ui/idleVillage/hooks/useSkinSystem';
-import { PoiDetailSkinWrapper } from '@/ui/idleVillage/components/PoiDetailSkinWrapper';
+import { ActivityCapsuleDetailSkinAware } from '@/ui/idleVillage/skins/activityCapsuleDetail/ActivityCapsuleDetailSkinAware';
 import { useSlotDebugVisualization } from '@/ui/idleVillage/hooks/useSlotDebugVisualization';
 import type { SlotDebugVisualizationSettings } from '@/balancing/config/idleVillage/slotDebugVisualizationConfig';
 // Temporarily commented out to avoid import conflicts with TS-Series
@@ -111,8 +110,17 @@ const RACK_SCENARIOS: RackScenario[] = [
   {
     id: 'open',
     title: 'Rack A · Scenario permissivo',
-    subtitle: 'Accetta qualunque residente disponibile',
+    subtitle: 'Richiede HP ≥ 200',
     minStaminaBeforeExhausted: 20, // Can work until stamina drops to 20%
+    statRequirement: {
+      label: 'HP ≥ 200',
+    },
+    validator: (resident) => {
+      const hp = resident.currentHp ?? resident.statSnapshot?.hp ?? 0;
+      return hp >= 200
+        ? { isValid: true }
+        : { isValid: false, message: `HP insufficiente (${hp}/200)` };
+    },
   },
   {
     id: 'restricted',
@@ -383,7 +391,7 @@ const RackScenarioPanel: React.FC<RackScenarioPanelProps> = ({
           <span>Stamina &gt; {scenario.minStaminaBeforeExhausted}</span>
         )}
         {hoverValidation?.message && (
-          <span className="text-rose-300">{hoverValidation.message}</span>
+          <span className="text-amber-300">{hoverValidation.message}</span>
         )}
         <button
           type="button"
@@ -1857,7 +1865,7 @@ const [dragVisualState, setDragVisualState] = useState<DragVisualState>({ mode: 
                     className="poi-detail-panel"
                     testId="poi-detail-panel"
                   >
-                    <PoiDetailSkinWrapper
+                    <ActivityCapsuleDetailSkinAware
                       activityId={poiCapsuleDataWithUpdates.config.activityId}
                       name={poiCapsuleDataWithUpdates.config.label}
                       type="poi-activity"

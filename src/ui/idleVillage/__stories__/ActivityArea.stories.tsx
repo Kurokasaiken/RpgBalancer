@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import ActivityArea, { type ActivityAreaProps } from '@/ui/idleVillage/ActivityArea';
 import { createMockActivitySlot, createActivityAreaProps, mockResidentsCandidates } from '@/ui/idleVillage/__tests__/utils/ActivityArea.test-utils';
-import type { DropState } from '@/ui/idleVillage/components/ActivitySlot';
+import type { LocationDropState } from '@/ui/idleVillage/map/validators/locationDropValidators';
 
 interface StoryArgs extends ActivityAreaProps {
   slotCount: number;
   pickerOpen: boolean;
-  dropState: DropState;
+  dropState: LocationDropState;
 }
 
 const meta: Meta<StoryArgs> = {

@@ -67,6 +67,8 @@ const POI_AMBER_SKIN_HTML = String.raw`
       <feDropShadow dx="0" dy="0.8" stdDeviation="1.5" flood-color="rgba(0,0,0,.35)"/>
     </filter>
     <clipPath id="cp-poi-wilderness-amber"><circle cx="0" cy="0" r="14"/></clipPath>
+    <clipPath id="cp-rim-poi-wilderness-amber"><circle cx="0" cy="0" r="21"/></clipPath>
+    <clipPath id="cp-corona-poi-wilderness-amber"><circle cx="0" cy="0" r="28"/></clipPath>
   </defs>
   
   <!-- Stone field (background circle) -->
@@ -76,30 +78,30 @@ const POI_AMBER_SKIN_HTML = String.raw`
   </g>
   
   <!-- Rim circle (bronze ring) -->
-  <g data-slot="rim" filter="url(#fd-poi-wilderness-amber)" class="rim">
+  <g data-slot="rim" filter="url(#fd-poi-wilderness-amber)" class="rim" clip-path="url(#cp-rim-poi-wilderness-amber)">
     <circle cx="0" cy="0" r="19" fill="none" stroke="rgba(0,0,0,.58)" stroke-width="1" filter="url(#ftk-poi-wilderness-amber)"/>
     <circle cx="0" cy="0" r="20.8" fill="none" stroke="rgba(0,0,0,.72)" stroke-width="1.8"/>
     <circle cx="0" cy="0" r="19" fill="none" stroke="url(#bz-poi-wilderness-amber)" stroke-width="1" filter="url(#fim-poi-wilderness-amber)" opacity=".92"/>
     <circle cx="0" cy="0" r="18" fill="none" stroke="rgba(0,0,0,.50)" stroke-width=".7"/>
   </g>
-  
+
   <!-- Corona glow (outer glow effect) -->
-  <g data-slot="corona-glow">
+  <g data-slot="corona-glow" clip-path="url(#cp-corona-poi-wilderness-amber)">
     <circle cx="0" cy="0" r="26" fill="none" stroke="rgba(210,138,28,.50)" stroke-width="3" filter="url(#fg-poi-wilderness-amber)"/>
   </g>
-  
+
   <!-- Corona turbulence A (animated distortion) -->
-  <g data-slot="corona-turb-a">
+  <g data-slot="corona-turb-a" clip-path="url(#cp-corona-poi-wilderness-amber)">
     <circle cx="0" cy="0" r="24" fill="none" stroke="rgba(210,138,28,.70)" stroke-width="2" stroke-dasharray="0 151" stroke-linecap="round" transform="rotate(-90)" filter="url(#fta-poi-wilderness-amber)"/>
   </g>
-  
+
   <!-- Corona turbulence B (faster animated distortion) -->
-  <g data-slot="corona-turb-b">
+  <g data-slot="corona-turb-b" clip-path="url(#cp-corona-poi-wilderness-amber)">
     <circle cx="0" cy="0" r="22" fill="none" stroke="rgba(180,105,10,.60)" stroke-width="1.5" stroke-dasharray="0 138" stroke-linecap="round" transform="rotate(-90)" filter="url(#ftb-poi-wilderness-amber)"/>
   </g>
-  
+
   <!-- Corona reflect (highlight arc) -->
-  <g data-slot="corona-reflect">
+  <g data-slot="corona-reflect" clip-path="url(#cp-corona-poi-wilderness-amber)">
     <path d="M -18,-18 A 25,25 0 0,1 18,-18" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="2" stroke-linecap="round" filter="url(#fr-poi-wilderness-amber)"/>
   </g>
   

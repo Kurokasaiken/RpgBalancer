@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import {
   DEFAULT_STYLE_LAB_PRESET,
+  WANDERLUST_PRESET,
   type ModifierScope,
   type ModifierScopePalette,
   type ModifierStatusPalette,
@@ -13,6 +14,7 @@ import { WANDERLUST_PRESETS } from '../presets/wanderlust';
 
 const PRESET_TOKEN_OVERRIDES: Record<string, Partial<StyleLabPreset>> = {
   wanderlust: WANDERLUST_STYLE_LAB_PRESET,
+  'wanderlust-v8': WANDERLUST_PRESET,
   'wanderlust-wilderness': WANDERLUST_PRESETS.wilderness,
   'wanderlust-empire': WANDERLUST_PRESETS.empire,
 };
@@ -154,11 +156,17 @@ export function useStyleLabTokens(options?: UseStyleLabTokensOptions): StyleLabT
       '--stylelab-accent-secondary': mergedPreset.interactionColors.accentSecondary,
       '--stylelab-focus-ring': mergedPreset.interactionColors.focusRing,
       '--stylelab-success': mergedPreset.interactionColors.success,
+      '--stylelab-success-soft': mergedPreset.interactionColors.success.replace('0.55', '0.30').replace('1)', '0.30)'),
       '--stylelab-warning': mergedPreset.interactionColors.warning,
       '--stylelab-danger': mergedPreset.interactionColors.danger,
       '--stylelab-shadow-depth-token': mergedPreset.materialFeel.shadowDepth,
       '--stylelab-highlight-sheen': mergedPreset.materialFeel.highlightSheen,
       '--stylelab-surface-sheen': mergedPreset.materialFeel.surfaceSheen,
+      '--stylelab-material-grain': mergedPreset.materialFeel.grain,
+      '--stylelab-material-edge-treatment': mergedPreset.materialFeel.edgeTreatment,
+      '--stylelab-base-obsidian': String(mergedPreset.surfaces.panel.background ?? '#03030d'),
+      '--stylelab-accent-primary-light': mergedPreset.interactionColors.accentPrimary === '#a05c18' ? '#e4b048' : mergedPreset.interactionColors.accentPrimary,
+      '--stylelab-accent-primary-dark': mergedPreset.interactionColors.accentPrimary === '#a05c18' ? '#602c08' : mergedPreset.interactionColors.accentPrimary,
       '--stylelab-physics-lift-scale': String(mergedPreset.interactionPhysics.liftScale),
       '--stylelab-physics-glow': String(mergedPreset.interactionPhysics.slotGlowIntensity),
       // ActionCard frame tokens

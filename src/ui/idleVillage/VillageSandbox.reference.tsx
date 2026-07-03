@@ -15,7 +15,7 @@ import {
 } from '@/engine/game/idleVillage/TimeEngine';
 import { loadResidentsFromCharacterManager } from '@/engine/game/idleVillage/characterImport';
 import LocationCard from '@/ui/idleVillage/components/LocationCard';
-import ActivitySlotCard, { type DropState } from '@/ui/idleVillage/components/ActivitySlot';
+import type { LocationDropState } from '@/ui/idleVillage/map/validators/locationDropValidators';
 import ActivityCardDetail, { type ActivityCardMetric } from '@/ui/idleVillage/components/ActivityCardDetail';
 import DragTestContainer from '@/ui/idleVillage/components/DragTestContainer';
 import { ActionCardWrapper } from '@/ui/idleVillage/components/ActionCardWrapper';

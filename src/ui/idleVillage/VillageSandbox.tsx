@@ -20,7 +20,6 @@ import type { TradeRoute, TradeResult, MigrationRequest, VillageSummary } from '
 import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
 import ResidentSlotRack from '@/ui/idleVillage/components/ResidentSlotRack';
 import type { ResidentSlotViewModel } from '@/ui/idleVillage/slots/types';
-import ActivitySlotCard from '@/ui/idleVillage/components/ActivitySlot';
 import { DetailPanelStack } from '@/ui/idleVillage/components/DetailPanelStack';
 import LocationCard from '@/ui/idleVillage/components/LocationCard';
 import type { VerbSummary } from '@/ui/idleVillage/verbSummaries';
@@ -1021,7 +1020,8 @@ export const VillageSandboxContent: React.FC<VillageSandboxContentProps> = ({
         <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
           <div className="text-[11px] uppercase tracking-[0.3em] text-slate-400">Active Activities</div>
           <div className="mt-3 flex flex-wrap gap-4">
-            {safeActivityAreaSlots.map((slot) => (
+            {/* ActivitySlotCard component removed - needs replacement */}
+            {/* {safeActivityAreaSlots.map((slot) => (
               <ActivitySlotCard
                 key={slot.slotId}
                 slotId={slot.slotId}
@@ -1052,7 +1052,7 @@ export const VillageSandboxContent: React.FC<VillageSandboxContentProps> = ({
                 }
                 onResidentDragLeave={() => activityAreaHandlers?.onSlotResidentDragLeave?.(slot.slotId)}
               />
-            ))}
+            ))} */}
           </div>
         </div>
 

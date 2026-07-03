@@ -3,10 +3,10 @@
  * Tests the reusable DestinyAstrolabeComponent with various configurations
  */
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { SkinSystemProvider } from '@/ui/idleVillage/hooks/useSkinSystem';
 import { DestinyAstrolabe } from '@/ui/idleVillage/components/destinyAstrolabe/DestinyAstrolabe';
-import type { AstrolabeResult as DestinyAstrolabeResult, AstrolabeSkill as DestinyAstrolabeSkill } from '@/ui/idleVillage/components/destinyAstrolabe/DestinyAstrolabe';
+import type { AstrolabeResult as DestinyAstrolabeResult, AstrolabeSkill as DestinyAstrolabeSkill, DestinyAstrolabeHandle } from '@/ui/idleVillage/components/destinyAstrolabe/DestinyAstrolabe';
 
 const SKILL_PRESETS = {
   single: [{ name: 'Atletica', stat: 65, difficulty: 50 }],
@@ -35,6 +35,7 @@ const SKILL_PRESETS = {
 };
 
 export default function MinimalDestinyAstrolabe() {
+  const astrolabeRef = useRef<DestinyAstrolabeHandle>(null);
   const [lastResult, setLastResult] = useState<DestinyAstrolabeResult | null>(null);
   const [skills, setSkills] = useState<DestinyAstrolabeSkill[]>(SKILL_PRESETS.single);
   const [critChance, setCritChance] = useState(5);
@@ -51,14 +52,31 @@ export default function MinimalDestinyAstrolabe() {
     setSkills((prev) => prev.map((s, i) => (i === idx ? { ...s, ...patch } : s)));
   };
 
+  const rollAgain = () => {
+    setLastResult(null);
+    astrolabeRef.current?.roll();
+  };
+
   return (
     <SkinSystemProvider>
-    <div className="min-h-screen bg-gray-900 text-gray-100 p-6">
-      <h1 className="text-3xl font-bold mb-4 text-amber-400">Destiny Astrolabe - Multi-Skill Test Hub</h1>
+    {/* ── Full-viewport upper section: header + astrolabe ── */}
+    <div className="bg-gray-900 text-gray-100" style={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      {/* Header bar */}
+      <div className="flex items-center justify-between px-6 py-3 flex-shrink-0">
+        <h1 className="text-xl font-bold text-amber-400">Destiny Astrolabe — Test Hub</h1>
+        <button
+          onClick={rollAgain}
+          className="px-5 py-2 rounded-full font-bold transition-colors text-sm"
+          style={{ background: 'linear-gradient(135deg, #e4b048, #a05c18)', color: '#2a1606' }}
+        >
+          Rolla di nuovo
+        </button>
+      </div>
 
-      {/* Astrolabe (reduced height so the config panel below stays in view) */}
-      <div className="border-2 border-amber-600 rounded-lg overflow-hidden mb-6" style={{ height: '70vh' }}>
+      {/* Astrolabe — fills remaining height, clipping the suite's 100vw/100vh overflow */}
+      <div className="flex-1 border-2 border-amber-600 rounded-lg mx-6 mb-3 overflow-hidden" style={{ minHeight: 0 }}>
         <DestinyAstrolabe
+          ref={astrolabeRef}
           skills={skills}
           config={{
             crit: critChance,
@@ -70,7 +88,10 @@ export default function MinimalDestinyAstrolabe() {
           autoStart
         />
       </div>
+    </div>
 
+    {/* ── Scrollable section below the fold ── */}
+    <div className="bg-gray-900 text-gray-100 p-6">
       {/* Last Result */}
       {lastResult && (
         <div className="mb-6 bg-green-900/30 border border-green-700 p-4 rounded-lg">
@@ -94,7 +115,7 @@ export default function MinimalDestinyAstrolabe() {
             <div>
               <p className="text-xs text-gray-400">Status</p>
               <p className="text-lg font-bold">
-                {lastResult.dead ? '☠️ DEAD' : lastResult.wounded ? '🩹 WOUNDED' : '✅ OK'}
+                {lastResult.dead ? 'DEAD' : lastResult.wounded ? 'WOUNDED' : 'OK'}
               </p>
             </div>
           </div>
@@ -234,3 +255,4 @@ export default function MinimalDestinyAstrolabe() {
     </SkinSystemProvider>
   );
 }
+

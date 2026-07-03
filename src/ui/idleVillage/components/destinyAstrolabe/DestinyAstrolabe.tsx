@@ -270,7 +270,7 @@ export const DestinyAstrolabe = memo(
     const isSnapping = gameState === 'magnetic-snap';
 
     return (
-      <div className="destiny-astrolabe-wrap" style={{ position: 'relative', width: '100%', height: '100%' }}>
+      <div className="destiny-astrolabe-wrap" style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', borderRadius: '50%' }}>
         {/* Engine canvas */}
         <div
           ref={rootRef}

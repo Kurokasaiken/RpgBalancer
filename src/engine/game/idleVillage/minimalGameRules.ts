@@ -337,6 +337,174 @@ export function startActivity(
 }
 
 /**
+ * Reward delta produced by a completed activity.
+ */
+export interface ActivityRewardDelta {
+  gold: number;
+  food: number;
+  wood: number;
+  xp: number;
+}
+
+/**
+ * Record of an activity that completed during a tick batch.
+ */
+export interface CompletedActivityRecord {
+  activityId: string;
+  activityName: string;
+  residentId: string;
+  residentName: string;
+  reward: ActivityRewardDelta;
+  injured: boolean;
+}
+
+/**
+ * Result of advancing all active activities by a single tick.
+ */
+export interface ActivityTickResult {
+  state: GameState;
+  events: VillageEvent[];
+  completed: CompletedActivityRecord[];
+}
+
+/**
+ * Advances every active activity by exactly one tick.
+ *
+ * Unlike {@link calculateTick}/{@link applyTickResult}, this helper is scoped to
+ * activity progression only: it decrements remaining ticks, accumulates per-tick
+ * fatigue on working residents, and applies config-driven `baseReward` + injury
+ * rolls when an activity completes. It deliberately does NOT handle daily food
+ * consumption or rest fatigue decay, which remain the responsibility of the
+ * caller (the gameplay store advances those on day boundaries).
+ *
+ * Pure and deterministic: identical inputs (including `rngState`) produce
+ * identical outputs.
+ */
+export function processActivitiesTick(state: GameState, config: MinimalConfig): ActivityTickResult {
+  const events: VillageEvent[] = [];
+  const completed: CompletedActivityRecord[] = [];
+  const eventTime = state.currentDay;
+
+  let workingRngState = ensureMinimalRngState(state.rngState, config.globalRules.rngSeed);
+
+  const rewardDelta: ActivityRewardDelta = { gold: 0, food: 0, wood: 0, xp: 0 };
+  const fatigueByResident: Record<string, number> = {};
+  const injuredResidentIds = new Set<string>();
+  const nextActiveActivities: GameState['activeActivities'] = [];
+
+  for (const active of state.activeActivities) {
+    const activity = config.activities.find((a) => a.id === active.activityId);
+    if (!activity) {
+      // Drop unknown activities defensively (config changed underneath us).
+      continue;
+    }
+
+    // Every working resident accrues fatigue for this tick.
+    fatigueByResident[active.residentId] =
+      (fatigueByResident[active.residentId] ?? 0) + activity.fatiguePerTick;
+
+    const ticksRemaining = active.ticksRemaining - 1;
+
+    if (ticksRemaining > 0) {
+      nextActiveActivities.push({ ...active, ticksRemaining });
+      continue;
+    }
+
+    // Activity completes this tick → apply config-driven rewards.
+    const reward: ActivityRewardDelta = {
+      gold: activity.baseReward.gold ?? 0,
+      food: activity.baseReward.food ?? 0,
+      wood: activity.baseReward.wood ?? 0,
+      xp: activity.baseReward.xp ?? 0,
+    };
+    rewardDelta.gold += reward.gold;
+    rewardDelta.food += reward.food;
+    rewardDelta.wood += reward.wood;
+    rewardDelta.xp += reward.xp;
+
+    const resident = state.residents.find((r) => r.id === active.residentId);
+    const residentName = resident?.name ?? active.residentId;
+
+    // Injury roll based on dangerRating (1% per danger point), matching calculateTick.
+    let injured = false;
+    const injuryChance = (activity.dangerRating ?? 0) * 0.01;
+    if (injuryChance > 0) {
+      const injuryRngSample = nextRandomValue(workingRngState);
+      workingRngState = injuryRngSample.nextState;
+      if (injuryRngSample.value < injuryChance) {
+        injured = true;
+        injuredResidentIds.add(active.residentId);
+      }
+    }
+
+    events.push({
+      time: eventTime,
+      type: 'activity_completed',
+      payload: {
+        residentId: active.residentId,
+        residentName,
+        activityId: activity.id,
+        activityName: activity.name,
+        rewardGold: reward.gold,
+        rewardFood: reward.food,
+        rewardWood: reward.wood,
+        rewardXp: reward.xp,
+      },
+    });
+
+    if (injured) {
+      events.push({
+        time: eventTime,
+        type: 'injury_applied',
+        payload: {
+          residentId: active.residentId,
+          residentName,
+          activityId: activity.id,
+          activityName: activity.name,
+          reason: 'activity_risk',
+          dangerRating: activity.dangerRating,
+          injuryChance,
+        },
+      });
+    }
+
+    completed.push({
+      activityId: activity.id,
+      activityName: activity.name,
+      residentId: active.residentId,
+      residentName,
+      reward,
+      injured,
+    });
+  }
+
+  const nextState: GameState = {
+    ...state,
+    gold: Math.max(0, state.gold + rewardDelta.gold),
+    food: Math.max(0, Math.min(state.maxFood, state.food + rewardDelta.food)),
+    wood: Math.max(0, state.wood + rewardDelta.wood),
+    xp: Math.max(0, state.xp + rewardDelta.xp),
+    residents: state.residents.map((resident) => {
+      const fatigueGain = fatigueByResident[resident.id] ?? 0;
+      const isInjured = resident.isInjured || injuredResidentIds.has(resident.id);
+      // A resident stops working when their activity completed or they got injured.
+      const stillWorking =
+        nextActiveActivities.some((a) => a.residentId === resident.id) && !isInjured;
+      return {
+        ...resident,
+        fatigue: Math.max(0, Math.min(100, resident.fatigue + fatigueGain)),
+        isInjured,
+        isWorking: stillWorking,
+      };
+    }),
+    activeActivities: nextActiveActivities,
+    rngState: workingRngState,
+  };
+
+  return { state: nextState, events, completed };
+}
+
+/**
  * Calculates how many days of food remain.
  */
 export function calculateDaysRemaining(state: GameState, config: MinimalConfig): number {

@@ -25,8 +25,10 @@ import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
 import {
   canStartActivity as engineCanStartActivity,
   startActivity as engineStartActivity,
+  processActivitiesTick,
   type GameState,
   type ActivityValidationResult,
+  type CompletedActivityRecord,
   MinimalGameplayActionError,
 } from '@/engine/game/idleVillage/minimalGameRules';
 import { startQuest } from '@/engine/game/idleVillage/QuestEngine';
@@ -38,8 +40,7 @@ import type { StatBlock } from '@/balancing/types';
 import { IntentBridge } from '@/ui/idleVillage/intent/GameIntent';
 // import { TEST_RESIDENTS } from '@/balancing/config/idleVillage/testResidents'; // Replaced by TEST_ROSTER_HEROES conversion
 import { TEST_ROSTER_HEROES } from '@/balancing/config/idleVillage/testRosterResidents';
-import { savedCharacterToResident, residentStateToMinimalResident } from '@/engine/game/idleVillage/characterImport';
-import { useCanonicalRosterBundle } from '@/ui/idleVillage/roster/CanonicalRosterBundle';
+import { savedCharacterToResident } from '@/engine/game/idleVillage/characterImport';
 import type { GameIntent } from '@/ui/idleVillage/intent/GameIntent';
 
 const PERSISTENCE_KEY = 'minimal-gameplay-state';
@@ -207,6 +208,8 @@ export interface MinimalGameplayState {
     gold: number;
     food: number;
     maxFood: number;
+    wood: number;
+    xp: number;
     currentDay: number;
     currentTick: number; // Integer tick count - primary source of truth
     isPaused: boolean;
@@ -488,6 +491,8 @@ function mapStoreStateToEngineState(state: MinimalGameplayState['state']): GameS
     gold: state.gold,
     food: state.food,
     maxFood: state.maxFood,
+    wood: state.wood,
+    xp: state.xp,
     residents: state.residents.map((resident) => ({
       id: resident.id,
       name: resident.name,
@@ -514,6 +519,8 @@ function mapEngineStateToStoreState(
     gold: engineState.gold,
     food: engineState.food,
     maxFood: engineState.maxFood,
+    wood: engineState.wood,
+    xp: engineState.xp,
     residents: engineState.residents.map((resident) => ({
       id: resident.id,
       name: resident.name,
@@ -529,6 +536,35 @@ function mapEngineStateToStoreState(
       ticksRemaining: activity.ticksRemaining,
     })),
     rngState: engineState.rngState,
+  };
+}
+
+/**
+ * Builds a human-readable event-log entry from a completed activity record.
+ * Reward amounts come directly from config (`baseReward`), never simulated.
+ */
+function buildActivityCompletionEntry(
+  record: CompletedActivityRecord,
+  tick: number
+): MinimalActivityEntry {
+  const rewardParts: string[] = [];
+  if (record.reward.gold) rewardParts.push(`+${record.reward.gold} gold`);
+  if (record.reward.food) rewardParts.push(`+${record.reward.food} food`);
+  if (record.reward.wood) rewardParts.push(`+${record.reward.wood} wood`);
+  if (record.reward.xp) rewardParts.push(`+${record.reward.xp} xp`);
+  const rewardSummary = rewardParts.length > 0 ? ` (${rewardParts.join(', ')})` : '';
+
+  return {
+    id: `activity-completed-${record.residentId}-${record.activityId}-${tick}-${Math.random()
+      .toString(36)
+      .slice(2, 8)}`,
+    timestamp: Date.now(),
+    severity: record.injured ? 'warning' : 'success',
+    message: record.injured
+      ? `${record.residentName} completed ${record.activityName}${rewardSummary} but got injured`
+      : `${record.residentName} completed ${record.activityName}${rewardSummary}`,
+    residentId: record.residentId,
+    activityId: record.activityId,
   };
 }
 
@@ -582,9 +618,8 @@ const minimalGameplayStoreInitializer: StateCreator<MinimalGameplayState> = (set
     if (state.isPaused) return;
 
     // Integer tick model: Add integer ticks based on speed multiplier
-    const tickBaseMs = config.loop.tickIntervalMs ?? 1000; // 1 second base
     const speedMultiplier = Math.max(1, state.speedMultiplier || 1);
-    
+
     // Calculate how many integer ticks to add based on elapsed time and speed
     const elapsedSeconds = deltaMs / 1000;
     const ticksToAdd = Math.floor(elapsedSeconds * speedMultiplier);
@@ -643,6 +678,36 @@ const minimalGameplayStoreInitializer: StateCreator<MinimalGameplayState> = (set
           ...resident,
           fatigue: Math.max(0, resident.fatigue - fatigueRecovery),
         }));
+      }
+
+      // Advance active activities one integer tick at a time, applying
+      // config-driven rewards on completion. This is the single source of truth
+      // for activity progression and reward generation (no UI-side simulation).
+      if (nextState.activeActivities.length > 0) {
+        let engineState = mapStoreStateToEngineState(nextState);
+        const completionEntries: MinimalActivityEntry[] = [];
+
+        for (let i = 0; i < ticksToAdd; i += 1) {
+          if (engineState.activeActivities.length === 0) break;
+          const tickOutcome = processActivitiesTick(engineState, config);
+          engineState = tickOutcome.state;
+          for (const record of tickOutcome.completed) {
+            completionEntries.push(buildActivityCompletionEntry(record, nextState.currentTick));
+          }
+        }
+
+        const mergedState = mapEngineStateToStoreState(engineState, nextState);
+        nextState.gold = mergedState.gold;
+        nextState.food = mergedState.food;
+        nextState.wood = mergedState.wood;
+        nextState.xp = mergedState.xp;
+        nextState.residents = mergedState.residents;
+        nextState.activeActivities = mergedState.activeActivities;
+        nextState.rngState = mergedState.rngState;
+
+        if (completionEntries.length > 0) {
+          nextState.eventLog = [...nextState.eventLog, ...completionEntries].slice(-EVENT_LOG_LIMIT);
+        }
       }
 
       trackTelemetryEvent('minimal_gameplay_tick', {

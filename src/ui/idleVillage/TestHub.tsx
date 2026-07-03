@@ -13,11 +13,19 @@ interface TestPageLink {
 
 const TEST_PAGES: TestPageLink[] = [
   {
-    id: 'pgcard',
-    title: 'PgCard',
-    description: 'Card personaggio con ritratto, HP, stamina, status',
-    path: '/minimal-pgcard',
-    icon: '👤',
+    id: 'slot-isolated',
+    title: 'Slot Isolated',
+    description: 'Test SlotV12Renderer isolato senza animazioni o wrapper',
+    path: '/slot-isolated',
+    icon: '🎯',
+    status: 'ok',
+  },
+  {
+    id: 'slot',
+    title: 'Slot',
+    description: 'Test animazioni incastonamento ed estrazione PgCard',
+    path: '/slot',
+    icon: '🎰',
     status: 'ok',
   },
   {
@@ -45,19 +53,19 @@ const TEST_PAGES: TestPageLink[] = [
     status: 'ok',
   },
   {
+    id: 'poi',
+    title: 'POI Ecosystem',
+    description: 'Day/Night cycle + Activity Capsules (Job, Quest, Exploration)',
+    path: '/minimal-poi',
+    icon: '🗺️',
+    status: 'ok',
+  },
+  {
     id: 'resourcehud',
     title: 'Resource HUD',
     description: 'Pannello risorse villaggio (gold, wood, food, iron)',
     path: '/minimal-resourcehud',
     icon: '📊',
-    status: 'needs-refactor',
-  },
-  {
-    id: 'jobcard',
-    title: 'JobCard',
-    description: 'Card attivita con ActionCardBase, progress, halo',
-    path: '/minimal-jobcard',
-    icon: '🪓',
     status: 'needs-refactor',
   },
   {
@@ -69,28 +77,12 @@ const TEST_PAGES: TestPageLink[] = [
     status: 'needs-refactor',
   },
   {
-    id: 'skillcheck',
-    title: 'Skill Check',
-    description: 'Risoluzione skill check con dado d20 animato',
-    path: '/minimal-skillcheck',
-    icon: '🎲',
-    status: 'needs-refactor',
-  },
-  {
     id: 'destiny-astrolabe',
-    title: 'Destiny Astrolabe (NEW)',
+    title: 'Destiny Astrolabe',
     description: 'D100 skill check con fisica della palla, verdetti cinematici, reusable component',
     path: '/minimal-destiny-astrolabe',
     icon: '✨',
     status: 'ok',
-  },
-  {
-    id: 'skillcheck-v6',
-    title: 'Skill Check V6 Asterism (Legacy)',
-    description: 'Versione HTML standalone (deprecata - usare Destiny Astrolabe)',
-    path: '/minimal-skillcheck-v6',
-    icon: '⭐',
-    status: 'needs-refactor',
   },
   {
     id: 'outcome',
@@ -130,7 +122,7 @@ const TEST_PAGES: TestPageLink[] = [
     description: 'Integrazione POI job detail con roster drag & drop',
     path: '/minimal-job-poi-roster-integration',
     icon: '🗺️',
-    status: 'needs-refactor',
+    status: 'ok',
   },
   {
     id: 'job-poi-roster-time',
@@ -138,7 +130,7 @@ const TEST_PAGES: TestPageLink[] = [
     description: 'Integrazione completa con time engine e reward',
     path: '/minimal-job-poi-roster-time-integration',
     icon: '⏱️',
-    status: 'needs-refactor',
+    status: 'ok',
   },
   {
     id: 'quest-detail',
@@ -146,6 +138,22 @@ const TEST_PAGES: TestPageLink[] = [
     description: 'Dettaglio quest con fasi, progress bar, esito finale',
     path: '/minimal-quest-detail',
     icon: '📜',
+    status: 'ok',
+  },
+  {
+    id: 'v8-skin-sandbox',
+    title: 'V8 Skin Sandbox',
+    description: 'Test Material Layer Engine e V8 Skin Architecture con preset procedurali',
+    path: '/skin-sandbox',
+    icon: '🎨',
+    status: 'ok',
+  },
+  {
+    id: 'poi-detail',
+    title: 'POI Detail',
+    description: 'POI Detail con ActivityCapsuleDetailSkinAware, config-first e telemetry',
+    path: '/poi-detail-verification',
+    icon: '🗺️',
     status: 'ok',
   },
 ];

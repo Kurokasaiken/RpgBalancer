@@ -1,6 +1,9 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
+import './ui/wanderlust-surface/layout/wanderlust-layout.css';
+import V8GlobalFilters from './ui/styleLab/components/V8GlobalFilters';
+import { WanderlustSurfaceDefs } from './ui/wanderlust-surface';
 
 const rootElement = document.getElementById('root');
 
@@ -15,6 +18,8 @@ if (isMinimalEntry) {
     .then(({ AppMinimal }) => {
       createRoot(rootElement).render(
         <StrictMode>
+          <V8GlobalFilters />
+          <WanderlustSurfaceDefs />
           <AppMinimal />
         </StrictMode>
       );
@@ -83,6 +88,8 @@ if (isMinimalEntry) {
       try {
         createRoot(rootElement).render(
           <StrictMode>
+            <V8GlobalFilters />
+            <WanderlustSurfaceDefs />
             <DensityProvider>
               <App />
               <Toaster />

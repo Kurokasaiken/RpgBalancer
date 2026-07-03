@@ -1,5 +1,5 @@
 import type { JSX } from 'react';
-import { useId, useMemo } from 'react';
+import { useEffect, useId, useMemo, useRef } from 'react';
 import { useSkinPreferences } from '@/ui/idleVillage/hooks/useSkinPreferences';
 import {
   getDayNightPoiSkinForPreset,
@@ -53,11 +53,25 @@ export default function DayNightPoiSkin(props: DayNightPoiSkinProps): JSX.Elemen
   const coreHighlightGradientId = `dn-core-highlight-${uniqueId}`;
   const glowFilterId = `dn-glow-${uniqueId}`;
   const bigBloomFilterId = `dn-bigbloom-${uniqueId}`;
+  const metalNoiseId = `dn-noise-${uniqueId}`;
+  const frostFilterId = `dn-frost-${uniqueId}`;
+  const baseClipId = `dn-baseclip-${uniqueId}`;
   const clipId = `dn-clip-${uniqueId}`;
 
   const size = config.size;
   const scaleFactor = size / 80;
   const progress = clamp01(cycleProgress);
+
+  /**
+   * Instant loop reset: when the progress wraps from near-full back to 0
+   * (phase switch), suppress the CSS transition so the arc snaps to 0 like a
+   * mechanical gear instead of draining backwards.
+   */
+  const prevProgressRef = useRef(progress);
+  const isLoopReset = progress < prevProgressRef.current - 0.5;
+  useEffect(() => {
+    prevProgressRef.current = progress;
+  }, [progress]);
 
   const palette = useMemo(() => {
     if (isPaused) return config.paused;
@@ -69,10 +83,20 @@ export default function DayNightPoiSkin(props: DayNightPoiSkinProps): JSX.Elemen
   const glowOpacity = palette.glowOpacity;
   const coreColor = palette.coreColor;
 
-  const bloomLayerRadius = size * 0.5;
+  // Frozen metallic platinum used to "crystallize" the icons while paused.
+  const frostColor = '#e0e0e6';
+  const sunBodyColor = isPaused ? 'rgba(224,224,230,0.95)' : 'rgba(255,215,110,0.92)';
+  const sunRayColor = isPaused ? 'rgba(224,224,230,0.85)' : 'rgba(255,215,100,0.90)';
+  const moonBodyColor = isPaused ? 'rgba(224,224,230,0.94)' : 'rgba(221,224,255,0.90)';
+  const moonStrokeColor = isPaused ? 'rgba(208,210,220,0.6)' : 'rgba(205,196,255,0.64)';
+
+  // Boundary = dark base ring radius. Nothing may bleed beyond it; all content
+  // is wrapped in a master clip at this radius.
+  const boundaryRadius = size * 0.475;
+  const bloomLayerRadius = size * 0.45;
   const outerGuideRadius = size * 0.4;
-  const progressHaloRadius = size * 0.34;
-  const decorativeMarksRadius = size * 0.295;
+  const progressHaloRadius = size * 0.355;
+  const decorativeMarksRadius = size * 0.3;
   const coreMedallionOuterRadius = size * 0.22;
   const coreMedallionInnerRadius = size * 0.17;
 
@@ -80,6 +104,9 @@ export default function DayNightPoiSkin(props: DayNightPoiSkinProps): JSX.Elemen
   const progressCircumference = 2 * Math.PI * progressHaloRadius;
   const progressDashArray = progressCircumference;
   const progressDashOffset = progressCircumference * (1 - progress);
+  const progressArcTransition = isLoopReset
+    ? 'none'
+    : `stroke-dashoffset ${config.animationDuration}ms ease, stroke ${config.animationDuration}ms ease`;
 
   const markAngles = [0, 45, 90, 135, 180, 225, 270, 315];
 
@@ -97,7 +124,7 @@ export default function DayNightPoiSkin(props: DayNightPoiSkinProps): JSX.Elemen
         height={size}
         viewBox={`-${size / 2} -${size / 2} ${size} ${size}`}
         className="absolute inset-0 transition-transform duration-300 hover:scale-[1.02]"
-        style={{ overflow: 'visible' }}
+        style={{ overflow: 'hidden' }}
       >
         <defs>
           <radialGradient id={bloomGradientId} cx="50%" cy="50%" r="50%">
@@ -126,11 +153,48 @@ export default function DayNightPoiSkin(props: DayNightPoiSkinProps): JSX.Elemen
             <feGaussianBlur stdDeviation={palette.bloomIntensity * 8.5} />
           </filter>
 
+          {/* Antique metal grain: monochrome fractal noise overlaid on the core */}
+          <filter id={metalNoiseId} x="-20%" y="-20%" width="140%" height="140%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="noise" />
+            <feColorMatrix in="noise" type="saturate" values="0" />
+          </filter>
+
+          {/* Frost / brina: magical frosted-glass texture for the paused porthole */}
+          <filter id={frostFilterId} x="-30%" y="-30%" width="160%" height="160%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.45" numOctaves="3" stitchTiles="stitch" result="frost" />
+            <feColorMatrix in="frost" type="saturate" values="0" result="frostMono" />
+            <feComponentTransfer in="frostMono" result="frostAlpha">
+              <feFuncA type="linear" slope="0.55" intercept="0" />
+            </feComponentTransfer>
+            <feGaussianBlur in="frostAlpha" stdDeviation="0.4" />
+          </filter>
+
+          {/* Master boundary clip — nothing may bleed past the dark base ring */}
+          <clipPath id={baseClipId}>
+            <circle cx="0" cy="0" r={boundaryRadius} />
+          </clipPath>
+
           <clipPath id={clipId}>
             <circle cx="0" cy="0" r={coreMedallionInnerRadius * 0.82} />
           </clipPath>
         </defs>
 
+        {/* Dark base ring — the widget frame and clip boundary */}
+        <circle
+          cx="0"
+          cy="0"
+          r={boundaryRadius}
+          fill="#0c0a07"
+          style={{
+            stroke: ringColor,
+            strokeWidth: 1.4 * scaleFactor,
+            strokeOpacity: 0.3,
+            transition: 'stroke 400ms ease',
+          }}
+        />
+
+        {/* All inner content clipped to the dark base ring */}
+        <g clipPath={`url(#${baseClipId})`}>
         {/* Layer 1: bloom */}
         <circle
           cx="0"
@@ -138,7 +202,8 @@ export default function DayNightPoiSkin(props: DayNightPoiSkinProps): JSX.Elemen
           r={bloomLayerRadius}
           fill={`url(#${bloomGradientId})`}
           filter={`url(#${bigBloomFilterId})`}
-          opacity={isPaused ? 0.34 : 1}
+          opacity={isPaused ? 0.55 : 1}
+          style={{ transition: 'opacity 320ms ease' }}
         />
 
         {/* Layer 2: outer guide */}
@@ -147,36 +212,44 @@ export default function DayNightPoiSkin(props: DayNightPoiSkinProps): JSX.Elemen
           cy="0"
           r={outerGuideRadius}
           fill="none"
-          stroke={ringColor}
-          strokeWidth={1.6 * scaleFactor}
-          opacity={0.16}
+          style={{
+            stroke: ringColor,
+            strokeWidth: 1.6 * scaleFactor,
+            opacity: 0.16,
+            transition: 'stroke 400ms ease',
+          }}
         />
 
-        {/* Layer 3: progress halo track + arc */}
-        <g transform="rotate(-90)">
+        {/* Layer 3: progress halo track + arc (frozen-in-place on pause) */}
+        <g transform="rotate(-90)" style={{ opacity: progress < 0.01 ? 0 : 1, transition: 'opacity 200ms ease' }}>
           <circle
             cx="0"
             cy="0"
             r={progressHaloRadius}
             fill="none"
-            stroke={ringColor}
-            strokeWidth={progressStrokeWidth}
-            opacity={0.14}
+            style={{
+              stroke: ringColor,
+              strokeWidth: progressStrokeWidth,
+              opacity: 0.14,
+              transition: 'stroke 400ms ease',
+            }}
           />
           <circle
             cx="0"
             cy="0"
             r={progressHaloRadius}
             fill="none"
-            stroke={glowColor}
-            strokeWidth={progressStrokeWidth}
             strokeDasharray={progressDashArray}
-            strokeDashoffset={progressDashOffset}
             strokeLinecap="round"
-            opacity={glowOpacity[1]}
             filter={`url(#${glowFilterId})`}
             style={{
-              transition: `stroke-dashoffset ${config.animationDuration}ms ease`,
+              stroke: glowColor,
+              strokeWidth: progressStrokeWidth,
+              strokeDashoffset: progressDashOffset,
+              opacity: isPaused ? glowOpacity[1] * 0.5 : glowOpacity[1],
+              transition: progressArcTransition
+                ? `${progressArcTransition}, stroke 400ms ease, opacity 400ms ease`
+                : 'stroke 400ms ease, opacity 400ms ease',
             }}
           />
         </g>
@@ -194,10 +267,13 @@ export default function DayNightPoiSkin(props: DayNightPoiSkinProps): JSX.Elemen
               y1={Math.sin(rad) * inner}
               x2={Math.cos(rad) * outer}
               y2={Math.sin(rad) * outer}
-              stroke={ringColor}
-              strokeOpacity={isCardinal ? 0.24 : 0.14}
-              strokeWidth={(isCardinal ? 1.3 : 0.9) * scaleFactor}
               strokeLinecap="round"
+              style={{
+                stroke: ringColor,
+                strokeOpacity: isCardinal ? 0.24 : 0.14,
+                strokeWidth: (isCardinal ? 1.3 : 0.9) * scaleFactor,
+                transition: 'stroke 400ms ease',
+              }}
             />
           );
         })}
@@ -211,12 +287,27 @@ export default function DayNightPoiSkin(props: DayNightPoiSkinProps): JSX.Elemen
           opacity={0.92}
         />
 
+        {/* Metallic grain on the bronze plating */}
+        <g clipPath={`url(#${baseClipId})`}>
+          <circle
+            cx="0"
+            cy="0"
+            r={coreMedallionOuterRadius}
+            filter={`url(#${metalNoiseId})`}
+            opacity={0.1}
+            style={{ mixBlendMode: 'overlay' }}
+          />
+        </g>
+
         <circle
           cx="0"
           cy="0"
           r={coreMedallionInnerRadius}
-          fill={coreColor}
-          opacity={0.98}
+          style={{
+            fill: coreColor,
+            opacity: 0.98,
+            transition: 'fill 400ms ease',
+          }}
         />
 
         <circle
@@ -231,17 +322,20 @@ export default function DayNightPoiSkin(props: DayNightPoiSkinProps): JSX.Elemen
           cy="0"
           r={coreMedallionOuterRadius}
           fill="none"
-          stroke={ringColor}
-          strokeWidth={1.6 * scaleFactor}
-          strokeOpacity={0.34}
           filter={`url(#${glowFilterId})`}
+          style={{
+            stroke: ringColor,
+            strokeWidth: 1.6 * scaleFactor,
+            strokeOpacity: 0.34,
+            transition: 'stroke 400ms ease',
+          }}
         />
 
-        {/* Day icon */}
+        {/* Day icon — stays visible by phase; crossfades to platinum when paused */}
         <g
           clipPath={`url(#${clipId})`}
           style={{
-            opacity: isDayPhase && !isPaused ? 1 : 0,
+            opacity: isDayPhase ? 1 : 0,
             transition: 'opacity 220ms ease',
           }}
         >
@@ -249,21 +343,37 @@ export default function DayNightPoiSkin(props: DayNightPoiSkinProps): JSX.Elemen
             cx="0"
             cy="0"
             r={coreMedallionInnerRadius * 0.31}
-            fill="rgba(255,215,110,0.92)"
-            stroke="rgba(255,239,165,0.72)"
             strokeWidth={0.7 * scaleFactor}
+            style={{
+              fill: sunBodyColor,
+              stroke: isPaused ? 'rgba(236,238,244,0.7)' : 'rgba(255,239,165,0.72)',
+              transition: 'fill 400ms ease, stroke 400ms ease',
+            }}
           />
-          <line x1="0" y1={-coreMedallionInnerRadius * 0.52} x2="0" y2={-coreMedallionInnerRadius * 0.70} stroke="rgba(255,215,100,0.90)" strokeWidth={1.2 * scaleFactor} strokeLinecap="round" />
-          <line x1="0" y1={coreMedallionInnerRadius * 0.52} x2="0" y2={coreMedallionInnerRadius * 0.70} stroke="rgba(255,215,100,0.90)" strokeWidth={1.2 * scaleFactor} strokeLinecap="round" />
-          <line x1={-coreMedallionInnerRadius * 0.52} y1="0" x2={-coreMedallionInnerRadius * 0.70} y2="0" stroke="rgba(255,215,100,0.90)" strokeWidth={1.2 * scaleFactor} strokeLinecap="round" />
-          <line x1={coreMedallionInnerRadius * 0.52} y1="0" x2={coreMedallionInnerRadius * 0.70} y2="0" stroke="rgba(255,215,100,0.90)" strokeWidth={1.2 * scaleFactor} strokeLinecap="round" />
+          {[
+            [0, -0.52, 0, -0.7],
+            [0, 0.52, 0, 0.7],
+            [-0.52, 0, -0.7, 0],
+            [0.52, 0, 0.7, 0],
+          ].map(([x1, y1, x2, y2], i) => (
+            <line
+              key={i}
+              x1={coreMedallionInnerRadius * x1}
+              y1={coreMedallionInnerRadius * y1}
+              x2={coreMedallionInnerRadius * x2}
+              y2={coreMedallionInnerRadius * y2}
+              strokeWidth={1.2 * scaleFactor}
+              strokeLinecap="round"
+              style={{ stroke: sunRayColor, transition: 'stroke 400ms ease' }}
+            />
+          ))}
         </g>
 
-        {/* Night icon */}
+        {/* Night icon — stays visible by phase; crossfades to platinum when paused */}
         <g
           clipPath={`url(#${clipId})`}
           style={{
-            opacity: !isDayPhase && !isPaused ? 1 : 0,
+            opacity: !isDayPhase ? 1 : 0,
             transition: 'opacity 220ms ease',
           }}
         >
@@ -274,42 +384,50 @@ export default function DayNightPoiSkin(props: DayNightPoiSkinProps): JSX.Elemen
               A ${coreMedallionInnerRadius * 0.22} ${coreMedallionInnerRadius * 0.22} 0 1 1 ${coreMedallionInnerRadius * 0.08} ${-coreMedallionInnerRadius * 0.34}
               Z
             `}
-            fill="rgba(221,224,255,0.90)"
-            stroke="rgba(205,196,255,0.64)"
             strokeWidth={0.7 * scaleFactor}
+            style={{
+              fill: moonBodyColor,
+              stroke: moonStrokeColor,
+              transition: 'fill 400ms ease, stroke 400ms ease',
+            }}
           />
           <circle
             cx={coreMedallionInnerRadius * 0.42}
             cy={-coreMedallionInnerRadius * 0.24}
             r={0.65 * scaleFactor}
-            fill="rgba(220,230,255,0.82)"
+            style={{
+              fill: isPaused ? 'rgba(228,230,238,0.85)' : 'rgba(220,230,255,0.82)',
+              transition: 'fill 400ms ease',
+            }}
           />
         </g>
 
-        {/* Pause icon */}
+        {/* Frosted-glass overlay — magical brina that fogs the porthole on pause */}
         <g
           clipPath={`url(#${clipId})`}
           style={{
             opacity: isPaused ? 1 : 0,
-            transition: 'opacity 220ms ease',
+            transition: 'opacity 500ms ease',
           }}
         >
-          <rect
-            x={-coreMedallionInnerRadius * 0.18}
-            y={-coreMedallionInnerRadius * 0.28}
-            width={coreMedallionInnerRadius * 0.13}
-            height={coreMedallionInnerRadius * 0.56}
-            rx={coreMedallionInnerRadius * 0.03}
-            fill="rgba(255,221,155,0.90)"
+          <circle
+            cx="0"
+            cy="0"
+            r={coreMedallionInnerRadius * 0.82}
+            fill={frostColor}
+            opacity={0.16}
           />
-          <rect
-            x={coreMedallionInnerRadius * 0.05}
-            y={-coreMedallionInnerRadius * 0.28}
-            width={coreMedallionInnerRadius * 0.13}
-            height={coreMedallionInnerRadius * 0.56}
-            rx={coreMedallionInnerRadius * 0.03}
-            fill="rgba(255,221,155,0.90)"
-          />
+          <g clipPath={`url(#${baseClipId})`}>
+            <circle
+              cx="0"
+              cy="0"
+              r={coreMedallionInnerRadius * 0.82}
+              fill={frostColor}
+              filter={`url(#${frostFilterId})`}
+              opacity={0.5}
+            />
+          </g>
+        </g>
         </g>
       </svg>
     </div>

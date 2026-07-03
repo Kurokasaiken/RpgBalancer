@@ -2,8 +2,6 @@ import type { CSSProperties } from 'react';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import ActivitySlotCard from '@/ui/idleVillage/components/ActivitySlot';
-import type { DropState } from '@/ui/idleVillage/components/ActivitySlot';
 import type { ResidentSlotViewModel, SlotProgressData } from '@/ui/idleVillage/slots/types';
 import { formatResidentLabel } from '@/ui/idleVillage/residentName';
 import type { VerbVisualVariant } from '@/ui/idleVillage/legacy/VerbCard';

@@ -10,12 +10,55 @@
   @import "./ui/styleLab/tokens/wanderlustTokens.css";
   /* HotShots Refined Color System */
   @import "./ui/styleLab/tokens/hotshots-refined.css";
+  /* V8 Skin Architecture — Wanderlust Artifact (Default Skin System) */
+  @import "./ui/styleLab/tokens/v8-wanderlust-artifact.css";
 
   @layer base {
     :root {
       /* Config-first theme tokens (HotShots Refined defaults) */
       --font-header: 'Cinzel', serif;
       --font-body: 'Crimson Text', serif;
+
+      /* Generic Design Tokens for useGenericTokens hook */
+      --font-display: 'Cinzel', serif;
+      --font-heading: 'Cinzel', serif;
+      --font-caption: 'Cinzel', serif;
+      --font-mono: 'SF Mono', monospace;
+
+      --font-size-xs: 11px;
+      --font-size-sm: 12px;
+      --font-size-base: 14px;
+      --font-size-lg: 16px;
+      --font-size-xl: 18px;
+      --font-size-2xl: 24px;
+      --font-size-3xl: 32px;
+
+      --spacing-xs: 4px;
+      --spacing-sm: 8px;
+      --spacing-md: 12px;
+      --spacing-lg: 16px;
+      --spacing-xl: 24px;
+      --spacing-2xl: 32px;
+      --spacing-3xl: 48px;
+
+      --border-width-thin: 1px;
+      --border-width-medium: 2px;
+      --border-width-thick: 3px;
+
+      --border-radius-sm: 4px;
+      --border-radius-md: 8px;
+      --border-radius-lg: 12px;
+      --border-radius-xl: 16px;
+      --border-radius-full: 9999px;
+
+      --border-color-default: rgba(148, 163, 184, 0.2);
+      --border-color-subtle: rgba(148, 163, 184, 0.1);
+      --border-color-strong: rgba(148, 163, 184, 0.4);
+
+      --text-primary: #e2e8f0;
+      --text-secondary: #94a3b8;
+      --text-tertiary: #64748b;
+      --text-inverse: #0f172a;
       
       /* Enhanced Surface System with Better Separation */
       --surface-base: var(--sunset-obsidian);
@@ -25,9 +68,7 @@
       --panel-sheen: radial-gradient(circle at 20% 20%, var(--sunset-soft-amber) 0%, transparent 65%);
       
       /* Enhanced Text Hierarchy */
-      --text-primary: var(--text-primary);
-      --text-secondary: var(--text-secondary);
-      --text-muted: var(--text-muted);
+      --text-muted: var(--text-secondary);
       --accent-color: var(--sunset-coral);
       --accent-strong: var(--sunset-crimson);
       

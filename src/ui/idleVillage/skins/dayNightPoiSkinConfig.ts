@@ -89,12 +89,12 @@ export const defaultDayNightPoiConfig: DayNightPoiConfig = {
   },
 
   paused: {
-    ringColor: '#8E97A8',
-    glowColor: '#8E97A8',
-    glowOpacity: [0.18, 0.24],
-    coreColor: '#22252C',
-    bloomRadius: 0.4,
-    bloomIntensity: 0.28,
+    ringColor: '#E0E0E6',
+    glowColor: '#ECEEF2',
+    glowOpacity: [0.3, 0.46],
+    coreColor: '#20242B',
+    bloomRadius: 0.42,
+    bloomIntensity: 0.6,
   },
 };
 

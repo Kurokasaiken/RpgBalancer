@@ -10,7 +10,7 @@ export default function MinimalRosterPage() {
           <p className="mt-1 text-sm text-slate-400">Route: /minimal-roster</p>
         </header>
 
-        <RosterDraggable componentId="minimal-roster" />
+        <RosterDraggable componentId="minimal-roster" useWanderlustSkin={true} />
       </div>
     </div>
   );

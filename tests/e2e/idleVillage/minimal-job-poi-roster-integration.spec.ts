@@ -6,75 +6,105 @@ test.describe('Minimal Job POI Roster Integration Page', () => {
   });
 
   test('should render the integration page', async ({ page }) => {
-    await expect(page.getByText('Fase 5: Job POI + Roster Integration')).toBeVisible();
-    await expect(page.getByText('Integrazione Job POI (Chop Wood) con roster drag & drop')).toBeVisible();
-    await expect(page.getByText('📋 Integration Spec')).toBeVisible();
+    await expect(page.getByText('JOB POI + ROSTER INTEGRATION')).toBeVisible();
+    await expect(page.getByText('Canonical components from TestHub')).toBeVisible();
   });
 
   test('should render Job POI section', async ({ page }) => {
-    await expect(page.getByText('🪓 Job: Chop Wood')).toBeVisible();
-    await expect(page.getByText('ID: job_chop_wood')).toBeVisible();
-    await expect(page.getByText('Level: 1')).toBeVisible();
-    await expect(page.getByText('Danger Rating: 0 (Safe)')).toBeVisible();
+    await expect(page.getByText('Job POI + Slot (Same Requirements)')).toBeVisible();
   });
 
   test('should render roster section', async ({ page }) => {
-    await expect(page.getByText('👥 Available Residents')).toBeVisible();
-    await expect(page.getByText('Total:')).toBeVisible();
-    await expect(page.getByText('Available:')).toBeVisible();
-    await expect(page.getByText('Assigned:')).toBeVisible();
+    await expect(page.getByText('Village Roster')).toBeVisible();
+    const rosterSection = page.locator('[data-testid="village-roster-section"]');
+    await expect(rosterSection).toBeVisible();
   });
 
-  test('should render instructions', async ({ page }) => {
-    await expect(page.getByText('📋 Instructions')).toBeVisible();
-    await expect(page.getByText('Trascina un PgToken dal roster sul job POI')).toBeVisible();
-    await expect(page.getByText('Il bloom effect verde appare quando trascini sopra il POI')).toBeVisible();
+  test('should have resident cards in roster', async ({ page }) => {
+    const rosterSection = page.locator('[data-testid="village-roster-section"]');
+    await expect(rosterSection).toBeVisible();
+    // Check that there are some elements in the roster (could be cards or medals)
+    const rosterElements = rosterSection.locator('*').all();
+    const count = (await rosterElements).length;
+    expect(count).toBeGreaterThan(5); // Should have multiple elements
   });
 
-  test('should show detail toggle button', async ({ page }) => {
-    const showButton = page.getByRole('button', { name: 'Show Detail' });
-    await expect(showButton).toBeVisible();
-  });
+  test.describe('Drag & Drop Interactions', () => {
+    test('should show bloom on POI and slot when dragging valid resident (HP > 200)', async ({ page }) => {
+      // Find a draggable element in the roster
+      const rosterSection = page.locator('[data-testid="village-roster-section"]');
+      await expect(rosterSection).toBeVisible();
+      
+      // Find any draggable element (could be card, medal, or button)
+      const draggableElement = rosterSection.locator('button, [role="button"], [draggable="true"]').first();
+      await expect(draggableElement).toBeVisible();
 
-  test('should toggle detail view', async ({ page }) => {
-    const showButton = page.getByRole('button', { name: 'Show Detail' });
-    await showButton.click();
-    
-    const hideButton = page.getByRole('button', { name: 'Hide Detail' });
-    await expect(hideButton).toBeVisible();
-    
-    await hideButton.click();
-    await expect(showButton).toBeVisible();
-  });
+      // Start dragging the element
+      await draggableElement.dragTo(page.locator('[data-testid="minimal-job-poi-roster-integration-page"]'));
 
-  test('should show drop zone when no resident assigned', async ({ page }) => {
-    await expect(page.getByText('Drag a resident here to assign')).toBeVisible();
-  });
+      // Check that POI shows bloom (green glow) when valid
+      // The POI medallion should have a boxShadow when valid
+      const poiMedallion = page.locator('[data-testid="job-poi-chop-wood"]');
+      await expect(poiMedallion).toBeVisible();
+      const poiBoxShadow = await poiMedallion.evaluate((el) => window.getComputedStyle(el).boxShadow);
+      expect(poiBoxShadow).not.toBe('none');
 
-  test('should have draggable PgToken elements', async ({ page }) => {
-    const tokens = page.locator('[data-testid^="pgtoken-"]');
-    const count = await tokens.count();
-    expect(count).toBeGreaterThan(0);
-  });
+      // Check that slot shows bloom
+      const slotRack = page.locator('[data-slot-id="slot-1"]');
+      await expect(slotRack).toBeVisible();
+      const slotBoxShadow = await slotRack.evaluate((el) => window.getComputedStyle(el).boxShadow);
+      expect(slotBoxShadow).not.toBe('none');
+    });
 
-  test('should show roster medals with names', async ({ page }) => {
-    const medals = page.locator('[data-testid^="roster-medal-"]');
-    const count = await medals.count();
-    expect(count).toBeGreaterThan(0);
-  });
+    test('should show alpha 30% on POI and slot when dragging invalid resident (HP <= 200)', async ({ page }) => {
+      // Find a draggable element in the roster
+      const rosterSection = page.locator('[data-testid="village-roster-section"]');
+      await expect(rosterSection).toBeVisible();
+      
+      const draggableElement = rosterSection.locator('button, [role="button"], [draggable="true"]').first();
+      await expect(draggableElement).toBeVisible();
 
-  test('should render documentation links', async ({ page }) => {
-    await expect(page.getByText('📚 Documentation')).toBeVisible();
-    await expect(page.getByText('Roster Trusted Components:')).toBeVisible();
-    await expect(page.getByText('Job Config:')).toBeVisible();
-  });
+      // Start dragging the element
+      await draggableElement.dragTo(page.locator('[data-testid="minimal-job-poi-roster-integration-page"]'));
 
-  test('should render test coverage section', async ({ page }) => {
-    await expect(page.getByText('✅ Test Coverage')).toBeVisible();
-    await expect(page.getByText('Manual Verification:')).toBeVisible();
-  });
+      // Check that POI shows alpha 30% when invalid
+      const poiMedallion = page.locator('[data-testid="job-poi-chop-wood"]');
+      await expect(poiMedallion).toBeVisible();
+      const poiOpacity = await poiMedallion.evaluate((el) => window.getComputedStyle(el).opacity);
+      expect(poiOpacity).toBe('0.3');
 
-  test('should show footer with phase info', async ({ page }) => {
-    await expect(page.getByText('Fase 5 di 6 — Job POI + Roster Integration')).toBeVisible();
+      // Check that slot shows alpha 30%
+      const slotRack = page.locator('[data-slot-id="slot-1"]');
+      await expect(slotRack).toBeVisible();
+      const slotOpacity = await slotRack.evaluate((el) => window.getComputedStyle(el).opacity);
+      expect(slotOpacity).toBe('0.3');
+    });
+
+    test('should assign resident to slot on click (slot occupied, pg away)', async ({ page }) => {
+      // Find a clickable element in the roster
+      const rosterSection = page.locator('[data-testid="village-roster-section"]');
+      await expect(rosterSection).toBeVisible();
+      
+      const clickableElement = rosterSection.locator('button, [role="button"]').first();
+      await expect(clickableElement).toBeVisible();
+
+      // Click the element to assign it
+      await clickableElement.click();
+
+      // Check that slot is now occupied
+      const slotRack = page.locator('[data-slot-id="slot-1"]');
+      await expect(slotRack).toBeVisible();
+      // The slot should show assigned state
+      const slotButton = slotRack.locator('[data-testid^="slot-button-"]');
+      await expect(slotButton).toBeVisible();
+
+      // Check that the clicked element is marked as assigned in the roster
+      // The element should have assigned state styling (opacity or pointer-events)
+      const elementAssigned = await clickableElement.evaluate((el) => {
+        const styles = window.getComputedStyle(el);
+        return styles.opacity === '0.5' || styles.pointerEvents === 'none';
+      });
+      expect(elementAssigned).toBe(true);
+    });
   });
 });

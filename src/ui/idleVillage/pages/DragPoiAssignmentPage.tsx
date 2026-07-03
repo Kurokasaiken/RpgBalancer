@@ -13,7 +13,7 @@ import React, { useState, useCallback } from 'react';
 import { useMinimalGameplayWithIdleVillageConfig } from '@/store/useMinimalGameplay';
 import { VillageRosterSection } from '@/ui/idleVillage/components/VillageRosterSection';
 import { ActivityCapsule } from '@/ui/idleVillage/components/ActivityCapsule';
-import { PoiDetailSkinWrapper } from '@/ui/idleVillage/components/PoiDetailSkinWrapper';
+import { ActivityCapsuleDetailSkinAware } from '@/ui/idleVillage/skins/activityCapsuleDetail/ActivityCapsuleDetailSkinAware';
 import { DragProvider, useDragContext } from '@/ui/idleVillage/components/DragContext';
 import { StyleLabSurface } from '@/ui/styleLab/StyleLabSurface';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
@@ -206,7 +206,7 @@ export const DragPoiAssignmentPage: React.FC = () => {
     },
   };
 
-  // Props for PoiDetailSkinWrapper
+  // Props for ActivityCapsuleDetailSkinAware
   const poiDetailProps = {
     ...activityCapsuleProps,
     isOpen: showDetail,
@@ -310,9 +310,9 @@ export const DragPoiAssignmentPage: React.FC = () => {
 
                 {showDetail && (
                   <div className="poi-detail">
-                    <h3>POI Detail (PoiDetailSkinWrapper)</h3>
+                    <h3>POI Detail (ActivityCapsuleDetailSkinAware)</h3>
                     <div className="component-wrapper">
-                      <PoiDetailSkinWrapper {...poiDetailProps} />
+                      <ActivityCapsuleDetailSkinAware {...poiDetailProps} />
                     </div>
                   </div>
                 )}
@@ -561,3 +561,5 @@ export const DragPoiAssignmentPage: React.FC = () => {
     </DragProvider>
   );
 };
+
+export default DragPoiAssignmentPage;

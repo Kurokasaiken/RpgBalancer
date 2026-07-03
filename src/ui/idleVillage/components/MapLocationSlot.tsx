@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import type { MapSlotDefinition } from '@/balancing/config/idleVillage/types';
 import type { VerbSummary } from '@/ui/idleVillage/verbSummaries';
-import type { DropState } from '@/ui/idleVillage/components/ActivitySlot';
+import type { LocationDropState } from '@/ui/idleVillage/map/validators/locationDropValidators';
 import { RESIDENT_DRAG_MIME } from '@/ui/idleVillage/constants';
 
 export interface MapLocationSlotProps {
