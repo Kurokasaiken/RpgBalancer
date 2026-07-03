@@ -12,6 +12,22 @@ export default function MinimalClockPage() {
   const [progressFraction, setProgressFraction] = useState(0);
   const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Space key handler: toggle pause/play, scroll if playing
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        if (isPaused) {
+          setIsPaused(false);
+        } else {
+          window.scrollBy({ top: 300, behavior: 'smooth' });
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isPaused]);
+
   useEffect(() => {
     if (isPaused) {
       if (tickRef.current) clearInterval(tickRef.current);
@@ -94,53 +110,23 @@ export default function MinimalClockPage() {
                 isPaused,
                 speedMultiplier: speed,
                 defaultSpeedMultiplier: 1,
-                maxSpeedMultiplier: 5,
+                maxSpeedMultiplier: 8,
                 tickIntervalMs: 1000,
                 warmupDelayMs: 0,
                 accentHex: '#f59e0b',
                 onSpeedChange: (s: number) => setSpeed(s),
+                availableSpeeds: [1, 2, 4, 8],
               }}
               hudState={emptyHudState}
               villageState={{ resources: { gold: 0, wood: 0, stone: 0 } }}
               secondsPerTimeUnit={1}
-              resourceSummaries={[
-                { id: 'gold', label: 'Gold', icon: <span>◆</span> },
-                { id: 'wood', label: 'Wood', icon: <span>🌳</span> },
-                { id: 'stone', label: 'Stone', icon: <span>🪨</span> },
-              ]}
+              temporalDisplay={{
+                year: `ANNO ${currentDay}`,
+                season: isDayTime ? 'GIORNO' : 'NOTTE',
+                time: `ORA ${String(hour).padStart(2, '0')}:00`,
+              }}
               compact
             />
-
-            {/* Controls */}
-            <div className="flex justify-center gap-3">
-              <button
-                onClick={() => setIsPaused(!isPaused)}
-                className={`rounded-full border px-5 py-2 text-[11px] uppercase tracking-[0.3em] ${
-                  isPaused
-                    ? 'border-emerald-400/60 bg-emerald-500/10 text-emerald-100 hover:bg-emerald-500/20'
-                    : 'border-rose-400/60 bg-rose-500/10 text-rose-100 hover:bg-rose-500/20'
-                }`}
-              >
-                {isPaused ? 'Play' : 'Pausa'}
-              </button>
-              {[1, 2, 4].map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setSpeed(s)}
-                  className={`rounded-full border px-4 py-2 text-[11px] uppercase tracking-[0.3em] ${
-                    speed === s
-                      ? 'border-amber-400/60 bg-amber-500/20 text-amber-100'
-                      : 'border-slate-500/60 bg-black/30 text-slate-300 hover:bg-slate-800/40'
-                  }`}
-                >
-                  {s}x
-                </button>
-              ))}
-            </div>
-
-            <div className="text-center text-sm text-slate-400">
-              {isDayTime ? 'Giorno' : 'Notte'} — Ora {String(hour).padStart(2, '0')}:00 — Giorno {currentDay}
-            </div>
           </div>
         </div>
       </SandboxTimingProvider>

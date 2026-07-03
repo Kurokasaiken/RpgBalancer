@@ -53,6 +53,8 @@ export interface VillageRosterSectionProps {
   sortMode?: RosterSortMode;
   /** Callback when sort mode changes */
   onSortModeChange?: (mode: RosterSortMode) => void;
+  /** Use Wanderlust skin styling instead of default PgCard */
+  useWanderlustSkin?: boolean;
 }
 
 /**
@@ -101,6 +103,7 @@ export function VillageRosterSection({
   dragVisualState,
   sortMode = DEFAULT_ROSTER_SORT_MODE,
   onSortModeChange,
+  useWanderlustSkin = false,
 }: VillageRosterSectionProps) {
   // Sort residents based on current sort mode
   const sortedResidents = sortResidents(residents, sortMode);
@@ -138,6 +141,7 @@ export function VillageRosterSection({
         context={context}
         dragVisualState={dragVisualState}
         headerControls={sortControl}
+        useWanderlustSkin={useWanderlustSkin}
       />
     </section>
   );

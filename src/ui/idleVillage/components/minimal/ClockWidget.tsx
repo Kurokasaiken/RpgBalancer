@@ -16,6 +16,8 @@ export interface ClockWidgetProps {
   className?: string;
   /** Optional handler to toggle pause/resume state. */
   onTogglePause?: () => void;
+  /** Available speed options for the compact strip. */
+  availableSpeeds?: number[];
 }
 
 const formatSeconds = (milliseconds: number): string => `${(milliseconds / 1000).toFixed(1)}s`;

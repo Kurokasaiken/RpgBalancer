@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import clsx from 'clsx';
 import type { VerbVisualVariant } from '@/ui/idleVillage/legacy/VerbCard';
-import type { DropState } from '@/ui/idleVillage/components/ActivitySlot';
+import type { LocationDropState } from '@/ui/idleVillage/map/validators/locationDropValidators';
 import { RESIDENT_DRAG_MIME } from '@/ui/idleVillage/constants';
 import {
     deriveTheaterRiskStripes,

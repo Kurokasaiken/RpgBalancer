@@ -9,7 +9,6 @@ import type { TheaterOverlayProps } from '@/ui/idleVillage/components/TheaterOve
 import type { ActivityAreaSlot, ActivityAreaHandlers, ActivityAreaProps } from '@/ui/idleVillage/ActivityArea';
 import type { ResidentSlotRackProps } from '@/ui/idleVillage/slots/ResidentSlotRack';
 import type { AncillarySlotEntry } from '@/ui/idleVillage/components/AncillaryPanels';
-import type { ActivitySlotCardProps } from '@/ui/idleVillage/components/ActivitySlot';
 import type { LocationCardProps } from '@/ui/idleVillage/components/LocationCard';
 import type { DetailPanelStackProps } from '@/ui/idleVillage/components/DetailPanelStack';
 
@@ -71,16 +70,7 @@ vi.mock('@/ui/idleVillage/slots/ResidentSlotRack', () => ({
   default: (props: ResidentSlotRackProps) => mockResidentSlotRack(props),
 }));
 
-const mockActivitySlotCard = vi.fn((props: ActivitySlotCardProps) => (
-  <div data-testid="activity-slot-card-mock" data-props={JSON.stringify(props)}>
-    ActivitySlotCard
-  </div>
-));
-
-vi.mock('@/ui/idleVillage/components/ActivitySlot', () => ({
-  __esModule: true,
-  default: (props: ActivitySlotCardProps) => mockActivitySlotCard(props),
-}));
+// ActivitySlotCard component removed - mock removed
 
 const mockLocationCard = vi.fn((props: LocationCardProps) => (
   <div data-testid="location-card-mock" data-props={JSON.stringify(props)}>
@@ -520,7 +510,7 @@ describe('VillageSandbox skeleton integration', () => {
       const { context } = await renderSandboxWithAct();
 
       expect(mockResidentSlotRack).toHaveBeenCalledTimes(1);
-      expect(mockActivitySlotCard).toHaveBeenCalledTimes(2);
+      // ActivitySlotCard component removed - assertion removed
       expect(mockLocationCard).toHaveBeenCalledTimes(1);
 
       // Verify ResidentSlotRack props
@@ -544,15 +534,7 @@ describe('VillageSandbox skeleton integration', () => {
       rackProps.onSlotInspect?.(rackSlotId);
       expect(context.activityAreaHandlers.onInspect).toHaveBeenCalledWith(rackSlotId);
 
-      // Verify ActivitySlotCard props
-      const cardProps = mockActivitySlotCard.mock.calls.find(([props]) => props.slotId === baseSlot.slotId)?.[0];
-      expect(cardProps).toBeDefined();
-      expect(cardProps?.iconName).toBe(baseSlot.iconName);
-      expect(cardProps?.progressFraction).toBe(0.25);
-      expect(cardProps?.elapsedSeconds).toBe(30);
-      expect(cardProps?.totalDuration).toBe(120);
-      expect(cardProps?.onWorkerDrop).toBeDefined();
-      expect(cardProps?.onInspect).toBeDefined();
+      // ActivitySlotCard component removed - props verification removed
 
       // Verify LocationCard props
       const locationProps = mockLocationCard.mock.calls[0][0];

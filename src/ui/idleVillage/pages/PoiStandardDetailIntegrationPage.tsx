@@ -12,7 +12,7 @@
 import React, { useState } from 'react';
 import { useSkinPreferences } from '@/ui/idleVillage/hooks/useSkinPreferences';
 import { ActivityCapsule } from '@/ui/idleVillage/components/ActivityCapsule';
-import { PoiDetailSkinWrapper } from '@/ui/idleVillage/components/PoiDetailSkinWrapper';
+import { ActivityCapsuleDetailSkinAware } from '@/ui/idleVillage/skins/activityCapsuleDetail/ActivityCapsuleDetailSkinAware';
 import { StyleLabSurface } from '@/ui/styleLab/StyleLabSurface';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import type { StyleLabPillar } from '@/ui/styleLab/config/demoConfig';
@@ -130,7 +130,7 @@ export const PoiStandardDetailIntegrationPage: React.FC = () => {
     compact: false,
   };
 
-  // Props specific to PoiDetailSkinWrapper
+  // Props specific to ActivityCapsuleDetailSkinAware
   const detailProps = {
     ...commonProps,
     isOpen: showDetail,
@@ -221,9 +221,9 @@ export const PoiStandardDetailIntegrationPage: React.FC = () => {
           </div>
 
           <div className="detail-section">
-            <h2>POI Detail (PoiDetailSkinWrapper)</h2>
+            <h2>POI Detail (ActivityCapsuleDetailSkinAware)</h2>
             <div className="component-container">
-              <PoiDetailSkinWrapper {...detailProps} />
+              <ActivityCapsuleDetailSkinAware {...detailProps} />
             </div>
           </div>
         </div>
@@ -369,3 +369,5 @@ export const PoiStandardDetailIntegrationPage: React.FC = () => {
     </StyleLabSurface>
   );
 };
+
+export default PoiStandardDetailIntegrationPage;

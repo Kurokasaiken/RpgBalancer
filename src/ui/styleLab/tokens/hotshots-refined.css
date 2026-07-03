@@ -95,9 +95,9 @@
   --glass-setup-glow: rgba(245, 214, 168, 0.15);
   
   /* Core Gameplay Glass */
-  --glass-gameplay-tint: rgba(114, 47, 55, 0.12);
-  --glass-gameplay-border: rgba(255, 107, 107, 0.25);
-  --glass-gameplay-glow: rgba(232, 67, 147, 0.2);
+  --glass-gameplay-tint: rgba(216, 177, 62, 0.12);
+  --glass-gameplay-border: rgba(201, 168, 78, 0.25);
+  --glass-gameplay-glow: rgba(185, 108, 15, 0.2);
   
   /* Intense Phase Glass */
   --glass-intense-tint: rgba(139, 26, 26, 0.15);

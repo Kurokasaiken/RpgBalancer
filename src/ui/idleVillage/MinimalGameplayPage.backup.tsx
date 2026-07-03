@@ -20,7 +20,6 @@ import WorkerPanel from '@/ui/idleVillage/components/WorkerPanel';
 import WorkerCard from '@/ui/idleVillage/components/WorkerCard';
 import { getCurrentDragConfig } from '@/ui/idleVillage/config/dragConfig';
 import { useMinimalActivitySlotsWithState } from '@/ui/idleVillage/hooks/useMinimalActivitySlots';
-import ActivitySlotCard from '@/ui/idleVillage/components/ActivitySlot';
 import { ResourceTicker } from '@/ui/idleVillage/components/ResourceTicker';
 import MinimalGameOverModal from '@/ui/idleVillage/components/MinimalGameOverModal';
 import ActionToolbar from '@/ui/idleVillage/components/minimal/ActionToolbar';
@@ -539,7 +538,8 @@ export default function MinimalGameplayPage(): JSX.Element {
               </div>
             </div>
             <div className="mt-6 grid gap-4 md:grid-cols-3">
-              {slotProps.map((slot) => {
+              {/* ActivitySlotCard component removed - needs replacement */}
+              {/* {slotProps.map((slot) => {
                 const feedback = slotFeedbackState[slot.slotId];
                 return (
                   <ActivitySlotCard
@@ -568,7 +568,7 @@ export default function MinimalGameplayPage(): JSX.Element {
                     testId={`minimal-activity-slot-${slot.slotId}`}
                   />
                 );
-              })}
+              })} */}
             </div>
           </section>
 

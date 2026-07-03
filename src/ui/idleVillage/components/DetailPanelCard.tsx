@@ -2,7 +2,7 @@ import React, { useMemo, useCallback } from 'react';
 import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { evaluateActivityDuration } from '@/engine/game/idleVillage/TimeEngine';
-import type { ActivitySlotData } from '@/ui/idleVillage/components/ActivitySlot';
+import type { ActivitySlotData } from '@/ui/idleVillage/types/ActivitySlotData';
 import ActivityCardDetail, { type ActivityCardMetric } from '@/ui/idleVillage/components/ActivityCardDetail';
 import { useResidentSlotController } from '@/ui/idleVillage/slots/useResidentSlotController';
 import type { ScheduledActivityState } from '@/ui/idleVillage/hooks/useActivityScheduler';

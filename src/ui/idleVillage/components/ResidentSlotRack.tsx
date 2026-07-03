@@ -3,17 +3,14 @@ import React, { memo, useRef, useEffect } from 'react';
 import { useMemo, useState, useCallback } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import ActivitySlotCard from '@/ui/idleVillage/components/ActivitySlot';
-import type { DropState } from '@/ui/idleVillage/components/ActivitySlot';
 import type { ResidentSlotViewModel, SlotProgressData } from '@/ui/idleVillage/slots/types';
 import { formatResidentLabel } from '@/ui/idleVillage/residentName';
 import type { VerbVisualVariant } from '@/ui/idleVillage/legacy/VerbCard';
 import { getResidentPortraitUrl } from '@/engine/game/idleVillage/residentVisualResolver';
 import { useSensoryAudio } from '@/ui/idleVillage/hooks/useSensoryAudio';
 import { useSlotSounds } from '@/ui/idleVillage/hooks/useSlotSounds';
-import { useSlottedMedalBehavior, type MedalBehaviorControls } from '@/ui/idleVillage/hooks/useSlottedMedalBehavior';
-import SlottedMedal from '@/ui/idleVillage/components/SlottedMedal';
 import { WanderlustMedalOverlay } from '@/ui/idleVillage/components/WanderlustMedalOverlay';
+import type { MedalBehaviorControls } from '@/ui/idleVillage/hooks/useSlottedMedalBehavior';
 import { FeatureFlags } from '@/shared/config/featureFlags';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import { DEFAULT_SLOTTED_MEDAL_CONFIG } from '@/balancing/config/idleVillage/slottedMedalConfig';
@@ -21,6 +18,8 @@ import { resolveSlotState } from '@/ui/idleVillage/utils/slotStateMapping';
 import type { MedalStyleBridgeConfig } from '@/ui/idleVillage/skins/slotRackSkinConfig';
 import type { SlotActivityState } from '@/ui/idleVillage/slots/types';
 import { SlotV12Renderer } from '@/ui/idleVillage/components/SlotV12Renderer';
+import { WanderlustSurface, type WanderlustShape } from '@/ui/wanderlust-surface/WanderlustSurface';
+import { type MaterialPreset } from '@/ui/wanderlust-surface/materialPresets';
 import styles from './SlotShake.module.css';
 import pgCardStyles from './PgCard.module.css';
 import type { SlotDebugVisualizationSettings } from '@/balancing/config/idleVillage/slotDebugVisualizationConfig';
@@ -71,6 +70,14 @@ export interface ResidentSlotRackProps {
   className?: string;
   medalStyleConfig?: MedalStyleBridgeConfig;
   slotDebugVisualization?: SlotDebugVisualizationSettings;
+  slotSize?: number; // Optional slot size in px for detail layouts
+  
+  // WanderlustSurface skin integration
+  wanderlustShape?: WanderlustShape;
+  wanderlustMaterial?: MaterialPreset;
+  wanderlustInteractive?: boolean;
+  wanderlustIsPaused?: boolean;
+  enableWanderlustSurface?: boolean;
 }
 
 const DEFAULT_ICON = '☆';
@@ -175,7 +182,8 @@ const BoardSlot = memo(
         data-highlighted={isHighlighted ? 'true' : undefined} 
         className="flex flex-col items-center gap-2"
       >
-        <ActivitySlotCard
+        {/* ActivitySlotCard component removed - needs replacement */}
+        {/* <ActivitySlotCard
           slotId={slot.id}
           iconName={displayInfo.icon ?? DEFAULT_ICON}
           label={displayInfo.label ?? slot.label}
@@ -192,11 +200,11 @@ const BoardSlot = memo(
           }}
           onInspect={() => onSlotInspect?.(slot.id)}
           onClick={onSlotClick ? () => onSlotClick(slot.id) : undefined}
-        />
+        /> */}
         {slot.assignedResidentId && onSlotClear && (
           <button
             type="button"
-            className="text-[10px] uppercase tracking-[0.2em] text-rose-200 hover:text-rose-100"
+            className="text-[10px] uppercase tracking-[0.2em] text-amber-200/80 hover:text-amber-100"
             onClick={() => onSlotClear(slot.id)}
           >
             Clear
@@ -221,6 +229,7 @@ interface DetailSlotProps {
   activityState?: SlotActivityState | null;
   medalStyleConfig?: MedalStyleBridgeConfig;
   slotDebugVisualization?: SlotDebugVisualizationSettings;
+  slotSize?: number;
 }
 
 const DetailSlot = memo(({
@@ -237,6 +246,7 @@ const DetailSlot = memo(({
   activityState,
   medalStyleConfig,
   slotDebugVisualization,
+  slotSize,
 }: DetailSlotProps) => {
   const { setNodeRef } = useDroppable({
     id: slot.id,
@@ -584,6 +594,7 @@ const DetailSlot = memo(({
           state={v12State}
           extractionProgress={extractionProgress}
           debugVisualization={debugVisualization ?? undefined}
+          size={slotSize}
         />
         {isAssigned && !isExtractionSpringAnimating && (
           <div className={`absolute inset-0 flex items-center justify-center z-10 ${isExtractionSpringAnimating ? pgCardStyles['animate-bounce-spring'] : ''}`}>
@@ -663,6 +674,12 @@ export const ResidentSlotRack: React.FC<ResidentSlotRackProps> = ({
   shakingSlotIds,
   className,
   slotDebugVisualization,
+  slotSize,
+  wanderlustShape = 'panel',
+  wanderlustMaterial = 'bronze',
+  wanderlustInteractive = false,
+  wanderlustIsPaused = false,
+  enableWanderlustSurface = false,
 }) => {
   const overflowEnabled = overflowBehavior === 'scroll';
   const { containerRef, leftRef, rightRef, isOverflowing, showLeftFade, showRightFade } = useOverflowIndicators(
@@ -690,7 +707,7 @@ export const ResidentSlotRack: React.FC<ResidentSlotRackProps> = ({
     return overflowEnabled ? `${base} overflow-x-auto pb-2 pr-1 text-center [-webkit-overflow-scrolling:touch]` : `${base} flex-wrap`;
   }, [layout, overflowEnabled]);
 
-  return (
+  const rackContent = (
     <div
       className={rackClassName}
       aria-live="polite"
@@ -793,6 +810,7 @@ export const ResidentSlotRack: React.FC<ResidentSlotRackProps> = ({
               isShaking={isShaking}
               activityState={getSlotActivityState?.(slot.id)}
               slotDebugVisualization={slotDebugVisualization}
+              slotSize={slotSize}
             />
           );
         })}
@@ -803,6 +821,23 @@ export const ResidentSlotRack: React.FC<ResidentSlotRackProps> = ({
       )}
     </div>
   );
+
+  if (enableWanderlustSurface) {
+    return (
+      <WanderlustSurface
+        shape={wanderlustShape}
+        material={wanderlustMaterial}
+        interactive={wanderlustInteractive}
+        isDragging={!!draggingResidentId}
+        isPaused={wanderlustIsPaused}
+        className={className}
+      >
+        {rackContent}
+      </WanderlustSurface>
+    );
+  }
+
+  return rackContent;
 };
 
 export const ResidentSlotRackSkeleton: React.FC<{ layout?: ResidentSlotRackLayout; slots?: number }> = ({

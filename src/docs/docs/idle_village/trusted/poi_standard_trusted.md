@@ -153,6 +153,23 @@ Define the canonical contract for POI (Point of Interest) standard components in
 }
 ```
 
+### Expiration / Time-Limited POI
+```typescript
+{
+  timeRemainingMs?: number;     // Time remaining before expiration (optional)
+  expirationThresholdMs?: number; // Threshold for "near expiration" visual warnings (default: 60000ms = 1 minute)
+  isExpirable?: boolean;       // Whether this POI can expire and disappear (vs. countdown-only)
+}
+```
+
+**Expiration Behavior:**
+- **Expirable POI** (e.g., quests with start deadline): Must be started within timeRemainingMs, then disappears from map
+- **Countdown-Only POI** (e.g., scheduled events): Uses timeRemainingMs as countdown display, but does not disappear
+- **Near Expiration Visuals**: When timeRemainingMs < expirationThresholdMs:
+  - Color transition: Orange → Red as timeRemainingMs approaches 0
+  - Counterclockwise rotation animation to indicate urgency
+  - No rotation speed acceleration (color change is the primary urgency indicator)
+
 ### Status and Actions
 ```typescript
 {

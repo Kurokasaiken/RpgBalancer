@@ -18,11 +18,88 @@ import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import type { TimeEngineSkinConfig } from '@/ui/idleVillage/skins/timeEngineSkinConfig';
 import { createTimeEngineSkinConfig } from '@/ui/idleVillage/skins/timeEngineSkinConfig';
 
-type ResourceSummary = {
-  id: string;
-  label: string;
-  icon?: ReactNode;
-};
+/**
+ * Elegant Play/Pause mechanical toggle icon
+ */
+const PlayPauseIcon = ({ isPlaying }: { isPlaying: boolean }) => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+    {isPlaying ? (
+      <>
+        <rect x="4" y="3" width="2.5" height="10" rx="0.5" fill="currentColor" />
+        <rect x="9.5" y="3" width="2.5" height="10" rx="0.5" fill="currentColor" />
+      </>
+    ) : (
+      <path d="M5 3.5L12 8L5 12.5V3.5Z" fill="currentColor" />
+    )}
+  </svg>
+);
+
+/**
+ * Single bronze chevron for 1X speed
+ */
+const Speed1XIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+    <path
+      d="M4 6L8 10L12 6"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+/**
+ * Double chiseled bronze chevron for 2X speed
+ */
+const Speed2XIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+    <path
+      d="M3 6L7 10L11 6"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M5 4L9 8L13 4"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+/**
+ * Triple chevron / stylized comet for 4X speed
+ */
+const Speed4XIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+    <path
+      d="M2 6L6 10L10 6"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M4 4L8 8L12 4"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M6 2L10 6L14 2"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 
 interface TimeEngineStripProps {
   /** Day/Night cycle properties */
@@ -42,7 +119,13 @@ interface TimeEngineStripProps {
   hudState: ActiveHUDState;
   villageState: any;
   secondsPerTimeUnit: number;
-  resourceSummaries?: ResourceSummary[];
+  
+  /** Temporal display data (Year, Season, Time) */
+  temporalDisplay?: {
+    year?: string;
+    season?: string;
+    time?: string;
+  };
   
   /** Strip layout options */
   compact?: boolean;
@@ -77,11 +160,11 @@ export function TimeEngineStrip({
   hudState,
   villageState,
   secondsPerTimeUnit,
+  temporalDisplay,
   compact = false,
   showClockDetails = false,
   maxVisibleActivities = 4,
   className,
-  resourceSummaries = [],
   skinPresetId = 'minimal_frontier',
   pillar = 'frontier',
   skinConfig,
@@ -101,7 +184,6 @@ export function TimeEngineStrip({
       isCompact: compact,
       showClockDetails,
       maxVisibleActivities,
-      resourceCount: resourceSummaries.length,
       activeActivities: hudState?.activities?.length || 0,
     });
   }, [
@@ -113,7 +195,6 @@ export function TimeEngineStrip({
     compact,
     showClockDetails,
     maxVisibleActivities,
-    resourceSummaries.length,
     hudState?.activities?.length,
   ]);
 
@@ -152,7 +233,7 @@ export function TimeEngineStrip({
 
   const clampedProgress = clamp01(progressFraction);
   const elapsedSeconds = clampedProgress * totalSeconds;
-  const icon = isPlaying ? phaseIcon : pauseIcon;
+  const icon = phaseIcon; // Always use phaseIcon; skin handles pause state internally
   
   // Day/Night card sizing
   const haloSizePx = compact ? 80 : 160;
@@ -166,33 +247,7 @@ export function TimeEngineStrip({
 
   if (compact) {
     const activeCount = hudState?.activities.length ?? 0;
-    const speedCycle: (number | 'pause')[] = [1, 2, 3, 5, 'pause'];
-    const normalizedSpeed = Number(resolvedSpeedMultiplier.toFixed(2));
-    const currentIndex = (() => {
-      if (!isPlaying) return speedCycle.indexOf('pause');
-      const idx = speedCycle.findIndex((value) => typeof value === 'number' && Math.abs(value - normalizedSpeed) < 0.05);
-      return idx >= 0 ? idx : 0;
-    })();
-    const handleSpeedCycle = () => {
-      const nextIndex = (currentIndex + 1) % speedCycle.length;
-      const nextValue = speedCycle[nextIndex];
-      if (nextValue === 'pause') {
-        if (isPlaying) {
-          onToggle?.();
-        }
-        return;
-      }
-      if (!isPlaying) {
-        onToggle?.();
-      }
-      clockProps.onSpeedChange?.(nextValue);
-    };
-    const speedButtonLabel = isPlaying ? `${normalizedSpeed}×` : 'Pause';
-
-    const resourceEntries = resourceSummaries.map((summary) => ({
-      ...summary,
-      value: Math.max(0, Math.floor(Number(villageState?.resources?.[summary.id] ?? 0))),
-    }));
+    const speeds = clockProps?.availableSpeeds ?? [1, 2, 4, 8];
 
     return (
       <div
@@ -225,46 +280,56 @@ export function TimeEngineStrip({
           </div>
         </div>
 
-        <div className="hidden h-2 flex-1 rounded-full bg-white/10 sm:flex" aria-hidden>
-          <div
-            className="rounded-full bg-linear-to-r from-amber-300 to-amber-100"
-            style={{ width: `${clampedProgress * 100}%` }}
-          />
-        </div>
 
-        <div className="flex items-center gap-2 text-[11px]">
+        <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={handleSpeedCycle}
-            className="rounded-full border border-white/20 px-3 py-1 text-white/80 transition-colors hover:border-white/50 hover:text-white"
-            aria-label="Cicla velocità (1× → 2× → 3× → 5× → pausa)"
+            onClick={onToggle}
+            className="relative flex h-8 w-8 items-center justify-center text-amber-200/70 transition-all hover:text-amber-100"
+            aria-label={isPlaying ? 'Pausa' : 'Play'}
           >
-            {speedButtonLabel}
+            <div
+              className="absolute inset-0 rounded-full bg-amber-500/20 blur-md opacity-0 transition-opacity"
+              style={{ opacity: isPlaying ? 0 : 0.6 }}
+            />
+            <PlayPauseIcon isPlaying={isPlaying} />
           </button>
+          {speeds.map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => {
+                if (!isPlaying) onToggle?.();
+                clockProps.onSpeedChange?.(s);
+              }}
+              className={`relative flex h-8 w-8 items-center justify-center text-xs font-semibold transition-all ${
+                resolvedSpeedMultiplier === s
+                  ? 'text-amber-100'
+                  : 'text-amber-200/70 hover:text-amber-100'
+              }`}
+              aria-label={`${s}x velocità`}
+            >
+              <div
+                className="absolute inset-0 rounded-full bg-amber-500/20 blur-md opacity-0 transition-opacity"
+                style={{ opacity: isPlaying && resolvedSpeedMultiplier === s ? 0.6 : 0 }}
+              />
+              x{s}
+            </button>
+          ))}
         </div>
 
-        <div className="flex flex-1 items-center justify-end gap-3 text-[10px] uppercase tracking-[0.3em] text-white/50">
-          {resourceEntries.length > 0 && (
-            <div className="flex items-center gap-3 rounded-full border border-white/15 px-3 py-1 text-[10px] tracking-[0.25em] text-white/70">
-              {resourceEntries.map((entry) => (
-                <span key={entry.id} className="flex items-center gap-1 text-white/80">
-                  {entry.icon ? (
-                    <span aria-hidden className="text-base leading-none">
-                      {entry.icon}
-                    </span>
-                  ) : null}
-                  <span>{entry.label}</span>
-                  <span className="font-mono text-white">
-                    {new Intl.NumberFormat('it-IT', { maximumFractionDigits: 0 }).format(entry.value)}
-                  </span>
-                </span>
-              ))}
-            </div>
-          )}
+        <div className="flex flex-1 items-center justify-end gap-4 text-[10px] uppercase tracking-[0.3em] text-white/50">
           <div className="flex items-center gap-3">
             <span>Attive {activeCount}</span>
             <span>{formatMiniCardCountdown(Math.max(totalSeconds - elapsedSeconds, 0))}</span>
           </div>
+          {temporalDisplay && (
+            <div className="flex items-center gap-3 font-serif text-amber-200/80">
+              {temporalDisplay.year && <span>{temporalDisplay.year}</span>}
+              {temporalDisplay.season && <span>{temporalDisplay.season}</span>}
+              {temporalDisplay.time && <span>{temporalDisplay.time}</span>}
+            </div>
+          )}
         </div>
       </div>
     );

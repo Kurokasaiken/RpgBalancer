@@ -8,7 +8,7 @@
  */
 
 import React, { useState } from 'react';
-import { PoiDetailSkinWrapper } from '@/ui/idleVillage/components/PoiDetailSkinWrapper';
+import { ActivityCapsuleDetailSkinAware } from '@/ui/idleVillage/skins/activityCapsuleDetail/ActivityCapsuleDetailSkinAware';
 import { StyleLabSurface } from '@/ui/styleLab/StyleLabSurface';
 import { DEFAULT_IDLE_VILLAGE_CONFIG } from '@/balancing/config/idleVillage/defaultConfig';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
@@ -131,7 +131,7 @@ export const JobPoiDetailPage: React.FC = () => {
               POI Detail Component
             </h2>
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
-              <PoiDetailSkinWrapper
+              <ActivityCapsuleDetailSkinAware
                 activityId={jobConfig.id}
                 name={jobConfig.label}
                 type="job"

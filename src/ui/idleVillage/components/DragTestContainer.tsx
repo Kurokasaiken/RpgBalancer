@@ -5,6 +5,7 @@ import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { formatResidentLabel } from '@/ui/idleVillage/residentName';
 import PgCard, { type PgCardProps } from '@/ui/idleVillage/components/PgCard';
 import { CardSocket } from '@/ui/idleVillage/components/CardSocket';
+import WanderlustRosterCard from '@/ui/idleVillage/components/WanderlustRosterCard';
 import type { GetResidentCompatibility, ResidentCompatibilityState } from './ResidentRosterTypes';
 import type { DropValidationResult } from '@/ui/idleVillage/config/residentDropRules';
 import { createSandboxDiagnostics } from '@/ui/idleVillage/utils/sandboxDiagnostics';
@@ -148,6 +149,8 @@ export interface DragTestContainerProps {
   lockedStatusLabel?: string;
   /** Visual feedback for the currently dragged resident. */
   activeDragFeedback?: DragFeedbackState;
+  /** Use Wanderlust skin styling instead of default PgCard */
+  useWanderlustSkin?: boolean;
 }
 
 /**
@@ -175,6 +178,7 @@ function DragTestContainer({
   componentId,
   dragVisualState,
   headerControls,
+  useWanderlustSkin = false,
 }: DragTestContainerProps) {
   const [draggingResidentId, setDraggingResidentId] = useState<string | null>(null);
   const [dragStartTime, setDragStartTime] = useState<number | null>(null);
@@ -644,7 +648,7 @@ function DragTestContainer({
     const isCompatibilityInvalid = compatibilityState === 'invalid';
     const interactive = isResidentInteractive(resident) && !isCompatibilityInvalid;
     // REGOLA 1: Durante il drag, solo il proxy è vivo
-    const isLifted = (dragVisualState?.mode === 'dragging' || dragVisualState?.mode === 'flight') && 
+    const isLifted = (dragVisualState?.mode === 'dragging' || dragVisualState?.mode === 'flight') &&
                     dragVisualState?.residentId === resident.id;
     
     const dragFeedbackState: PgCardProps['dragFeedbackState'] = draggingResidentId === resident.id ? activeDragFeedback : 'idle';
@@ -685,7 +689,7 @@ function DragTestContainer({
         data-blocked={isBlocked}
       >
         {heroFlashActive && (
-          <span className="pointer-events-none absolute inset-0 rounded-2xl border border-amber-300/60 opacity-70 animate-ping" />
+          <span className="pointer-events-none absolute inset-0 rounded-2xl border border-amber-300/60 opacity-70" />
         )}
         {isBlocked && (
           <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-black/60 text-[10px] uppercase tracking-[0.3em] text-amber-200">
@@ -694,6 +698,29 @@ function DragTestContainer({
         )}
         {isLifted ? (
           <CardSocket className="w-full" horizontal={cardVariant === 'horizontal'} />
+        ) : useWanderlustSkin ? (
+          <WanderlustRosterCard
+            workerId={resident.id}
+            label={formatResidentLabel(resident)}
+            subtitle={subtitle}
+            hp={resident.currentHp}
+            fatigue={resident.fatigue}
+            maxHp={resident.maxHp}
+            isDragging={draggingResidentId === resident.id}
+            disabled={!interactive}
+            isInteractive={interactive}
+            statusLabel={isLocked ? lockedStatusLabel : describeStatus(resident)}
+            portraitUrl={getResidentPortraitUrl(resident)}
+            compatibilityState={compatibilityState}
+            compatibilityLabel={compatibilityLabel}
+            onDragStateChange={handleDragStateChange}
+            onSelect={handleResidentSelectSafe}
+            isHero={resident.isHero}
+            className="w-full"
+            data-drag-state={dropState}
+            data-resident-id={resident.id}
+            data-compatibility={compatibilityState}
+          />
         ) : (
           <PgCard
             workerId={resident.id}
@@ -721,7 +748,7 @@ function DragTestContainer({
         )}
       </div>
     );
-  }, [activeDragFeedback, lockedSet, getResidentCompatibility, isResidentInteractive, draggingResidentId, diagnostics, handleDragStateChange, handleResidentSelectSafe, describeStatus, lockedStatusLabel, filters, heroFlashIds, isResidentBlocked, cardVariant, recentlyDraggedResidentId, dragVisualState]);
+  }, [activeDragFeedback, lockedSet, getResidentCompatibility, isResidentInteractive, draggingResidentId, diagnostics, handleDragStateChange, handleResidentSelectSafe, describeStatus, lockedStatusLabel, filters, heroFlashIds, isResidentBlocked, cardVariant, recentlyDraggedResidentId, dragVisualState, useWanderlustSkin]);
 
   const renderVirtualizedResident = useCallback((resident: ResidentState, actualIndex: number) => {
     const style: CSSProperties = {
@@ -741,6 +768,7 @@ function DragTestContainer({
     'relative overflow-hidden rounded-[26px] border border-[color:var(--panel-border)] bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,0.08),rgba(5,9,18,0.92))] p-4 shadow-[0_25px_45px_rgba(0,0,0,0.55)]',
     isInlineLayout && 'rounded-2xl border border-white/10 bg-black/25 p-3 shadow-[0_15px_30px_rgba(0,0,0,0.4)]',
     isGridLayout && 'rounded-2xl border border-white/10 bg-black/25 p-4 shadow-[0_15px_30px_rgba(0,0,0,0.4)]',
+    useWanderlustSkin && 'rounded-[20px] border border-[#d8b13e]/15 bg-[linear-gradient(180deg,rgba(3,2,2,0.95)_0%,rgba(6,4,3,0.98)_100%)] p-6 shadow-[inset_0_1px_0_rgba(216,177,62,0.08),0_4px_20px_rgba(0,0,0,0.6),0_0_0_1px_rgba(216,177,62,0.05)]',
     className,
   ]
     .filter(Boolean)
@@ -755,13 +783,17 @@ function DragTestContainer({
     .filter(Boolean)
     .join(' ');
 
-  const _headerTextClassName = isInlineLayout
-    ? 'flex items-center gap-2 text-[9px] uppercase tracking-[0.4em] text-amber-200/80'
-    : 'flex items-center gap-2 text-[9px] uppercase tracking-[0.45em] text-amber-200/70';
+  const _headerTextClassName = useWanderlustSkin
+    ? 'flex items-center gap-2 text-[15px] font-semibold tracking-[0.34em] text-[#d8b13e]'
+    : isInlineLayout
+      ? 'flex items-center gap-2 text-[9px] uppercase tracking-[0.4em] text-amber-200/80'
+      : 'flex items-center gap-2 text-[9px] uppercase tracking-[0.45em] text-amber-200/70';
 
-  const _controlButtonClassName = isInlineLayout
-    ? 'rounded-full border border-white/15 bg-white/5 p-1 text-slate-200 transition hover:border-amber-300/70 hover:text-amber-200'
-    : 'rounded-full border border-white/15 bg-white/5 p-1.5 text-slate-200 transition hover:border-amber-300/70 hover:text-amber-200';
+  const _controlButtonClassName = useWanderlustSkin
+    ? 'rounded-full border border-[#d8b13e]/25 bg-[#d8b13e]/5 p-1 text-[#c9a84e] transition hover:border-[#d8b13e]/40 hover:text-[#f0cf6a]'
+    : isInlineLayout
+      ? 'rounded-full border border-white/15 bg-white/5 p-1 text-slate-200 transition hover:border-amber-300/70 hover:text-amber-200'
+      : 'rounded-full border border-white/15 bg-white/5 p-1.5 text-slate-200 transition hover:border-amber-300/70 hover:text-amber-200';
 
   const handleStatusChange = useCallback((newStatus: FilterOptions['status']) => {
     if (filters.status === newStatus) return;
@@ -826,6 +858,15 @@ function DragTestContainer({
   const activePointerIdRef = useRef<number | null>(null);
   const FALLBACK_POINTER_ID = -1;
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Firefly configuration for Wanderlust skin
+  const FIREFLIES = useWanderlustSkin ? [
+    { left: '14%', size: 4, dur: 13, delay: 0 },
+    { left: '38%', size: 3, dur: 16, delay: 3.5 },
+    { left: '58%', size: 4, dur: 14, delay: 6 },
+    { left: '76%', size: 3, dur: 17, delay: 1.8 },
+    { left: '90%', size: 3, dur: 15, delay: 8.5 },
+  ] : [];
 
   const startDragging = useCallback(
     (clientX: number, clientY: number, pointerId: number) => {
@@ -948,7 +989,16 @@ function DragTestContainer({
       data-accessible-counters="true"
       data-accessible-states="true"
     >
-      {!isInlineLayout && (
+      {useWanderlustSkin && (
+        <div
+          className="pointer-events-none absolute inset-0 rounded-[20px]"
+          style={{
+            boxShadow: 'inset 0 0 20px rgba(216,177,62,0.03)',
+            animation: 'border-pulse 4s ease-in-out infinite',
+          }}
+        />
+      )}
+      {!isInlineLayout && !useWanderlustSkin && (
         <div
           className="pointer-events-none absolute inset-0 opacity-35"
           style={{
@@ -956,9 +1006,44 @@ function DragTestContainer({
           }}
         />
       )}
+      {useWanderlustSkin && (
+        <div 
+          className="pointer-events-none absolute inset-0 overflow-hidden rounded-[20px]"
+          style={{ opacity: 0.6 }}
+        >
+          {FIREFLIES.map((f, i) => (
+            <div
+              key={i}
+              style={{
+                position: 'absolute',
+                left: f.left,
+                bottom: '-10px',
+                width: `${f.size}px`,
+                height: `${f.size}px`,
+                borderRadius: '50%',
+                background: '#f0cf6a',
+                filter: 'blur(0.5px)',
+                boxShadow: '0 0 6px rgba(240,207,106,0.75)',
+                opacity: 0,
+                animation: `firefly ${f.dur}s ease-in-out infinite`,
+                animationDelay: `${f.delay}s`,
+                willChange: 'transform, opacity',
+              }}
+            />
+          ))}
+        </div>
+      )}
       <div className="relative z-10 space-y-4">
+        {useWanderlustSkin && (
+          <div 
+            className="block h-px mx-2 mb-5"
+            style={{
+              background: 'linear-gradient(90deg, transparent, rgba(216,177,62,0.32) 20%, rgba(216,177,62,0.32) 80%, transparent)',
+            }}
+          />
+        )}
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-[8px] uppercase tracking-[0.4em] text-amber-200/80">
+          <div className={_headerTextClassName}>
             {componentId && (
               <div 
                 className="cursor-grab active:cursor-grabbing"
@@ -968,12 +1053,12 @@ function DragTestContainer({
                 data-testid="roster-drag-handle"
                 data-roster-handle-state={isDragging ? 'dragging' : 'idle'}
               >
-                <GripVertical className="w-3 h-3 text-amber-200/80 hover:text-amber-100 transition-colors" />
+                <GripVertical className={`w-3 h-3 ${useWanderlustSkin ? 'text-[#d8b13e] hover:text-[#f0cf6a]' : 'text-amber-200/80 hover:text-amber-100'} transition-colors`} />
               </div>
             )}
-            <span>Roster</span>
+            <span style={useWanderlustSkin ? { fontFamily: 'var(--wl-font-display, "Cinzel", "Trajan Pro", serif)' } : {}}>Roster</span>
             <span 
-              className="text-amber-100"
+              className={useWanderlustSkin ? 'text-[#f0cf6a]' : 'text-amber-100'}
               aria-label={`Filtered residents: ${sortedResidents.length} of ${residents.length}`}
               data-testid="resident-count"
             >
@@ -982,12 +1067,12 @@ function DragTestContainer({
           </div>
           <div className="flex items-center gap-1">
             <label
-              className="flex items-center gap-1 rounded-full border border-white/15 px-1.5 py-0.5 text-[7px] uppercase tracking-[0.18em] text-slate-200"
+              className={`flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[7px] uppercase tracking-[0.18em] ${useWanderlustSkin ? 'border-[#d8b13e]/25 bg-[#d8b13e]/5 text-[#c9a84e]' : 'border-white/15 bg-white/5 text-slate-200'}`}
             >
               <select
                 value={filters.status}
                 onChange={(e) => handleStatusChange(e.target.value as FilterOptions['status'])}
-                className="bg-transparent text-[7px] uppercase tracking-[0.15em] focus:outline-none"
+                className={`bg-transparent text-[7px] uppercase tracking-[0.15em] focus:outline-none ${useWanderlustSkin ? 'text-[#c9a84e]' : ''}`}
                 aria-label="Filtra residenti per status"
                 data-testid="roster-filter-select"
               >
@@ -1017,7 +1102,7 @@ function DragTestContainer({
                   },
                 }, ['ui', 'toggle']);
               }}
-              className="rounded-full border border-white/15 bg-white/5 p-1 text-slate-200 transition hover:border-amber-300/70 hover:text-amber-200"
+              className={_controlButtonClassName}
               aria-label={isRosterCollapsed ? 'Mostra roster' : 'Nascondi roster'}
               aria-pressed={isRosterCollapsed}
             >
@@ -1025,6 +1110,35 @@ function DragTestContainer({
             </button>
           </div>
         </div>
+
+        {useWanderlustSkin && (
+          <style>{`
+            @keyframes firefly {
+              0%, 100% {
+                transform: translateY(0) scale(1);
+                opacity: 0;
+              }
+              10% {
+                opacity: 0.8;
+              }
+              50% {
+                transform: translateY(-12px) scale(1.2);
+                opacity: 0.4;
+              }
+              90% {
+                opacity: 0.8;
+              }
+            }
+            @keyframes border-pulse {
+              0%, 100% {
+                opacity: 0.5;
+              }
+              50% {
+                opacity: 1;
+              }
+            }
+          `}</style>
+        )}
 
         {!isRosterCollapsed && (
           <div

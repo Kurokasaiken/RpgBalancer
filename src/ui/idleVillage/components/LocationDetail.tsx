@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { X } from 'lucide-react';
 import type { QuestDefinition, QuestState } from '@/engine/quest/types';
 import type { VerbSummary } from '@/ui/idleVillage/verbSummaries';
-import type { ActivitySlotCardProps, DropState } from '@/ui/idleVillage/components/ActivitySlot';
+import type { LocationDropState } from '@/ui/idleVillage/map/validators/locationDropValidators';
 import ActivityActionCard from '@/ui/idleVillage/components/ActivityActionCard';
 import QuestBranchDiagram from '@/ui/idleVillage/components/QuestBranchDiagram';
 import { RESIDENT_DRAG_MIME } from '@/ui/idleVillage/constants';
@@ -38,8 +38,7 @@ export interface LocationDetailProps {
   acceptResidentDrop?: boolean;
   onResidentDrop?: (residentId: string | null) => void;
   onAssignResident?: (slotId: string, residentId: string | null) => void;
-  slotDropStates?: Record<string, DropState>;
-  slotCards?: ActivitySlotCardProps[];
+  slotDropStates?: Record<string, LocationDropState>;
   rackSources?: TheaterRackSource[];
   onVerbDrop?: (verb: VerbSummary, residentId: string | null) => void;
   jobCards?: TheaterJobCardPreview[];

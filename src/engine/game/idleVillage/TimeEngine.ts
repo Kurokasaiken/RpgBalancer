@@ -657,13 +657,15 @@ export function advanceTime(
     currentTickTime = nextTickTime;
   }
 
-  // Helper to stream fatigue ticks while activities run
-  const applyActivityFatigueProgress = (
+  // Helper to stream fatigue ticks while activities run.
+  // NOTE: declared as a hoisted function (not a const arrow) so it can be
+  // safely invoked from the tick loop above without a temporal-dead-zone error.
+  function applyActivityFatigueProgress(
     activity: ScheduledActivity,
     advanceStart: VillageTimeUnit,
     advanceEnd: VillageTimeUnit,
     config: IdleVillageConfig,
-  ) => {
+  ) {
     const activityDuration = Math.max(1, activity.endTime - activity.startTime);
     if (activityDuration <= 0) {
       return;
@@ -709,16 +711,18 @@ export function advanceTime(
         },
       });
     }
-  };
+  }
 
-  // Helper for continuous job per-tick logic
-  const applyContinuousJobTick = (
+  // Helper for continuous job per-tick logic.
+  // NOTE: declared as a hoisted function (not a const arrow) so it can be
+  // safely invoked from the tick loop above without a temporal-dead-zone error.
+  function applyContinuousJobTick(
     deps: TimeEngineDeps,
     activity: ScheduledActivity,
     resources: VillageResources,
     tickTime: VillageTimeUnit,
     events: VillageEvent[],
-  ) => {
+  ) {
     const activityDef = deps.config.activities[activity.activityId];
     if (!activityDef?.continuousJob) return;
 
@@ -782,7 +786,7 @@ export function advanceTime(
       // Halt production for this tick
       return;
     }
-  };
+  }
 
   const baseNextState: VillageState = {
     ...state,

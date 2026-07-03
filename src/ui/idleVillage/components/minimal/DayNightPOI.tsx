@@ -1,4 +1,5 @@
 import type { JSX } from 'react';
+import { useCallback } from 'react';
 import { useMinimalGameplayWithIdleVillageConfig } from '@/store/useMinimalGameplay';
 import DayNightPoiSkin from './DayNightPoiSkin';
 
@@ -19,17 +20,30 @@ import DayNightPoiSkin from './DayNightPoiSkin';
  * - Night Running: Purple ring, moon icon, reduced bloom  
  * - Paused: Gray ring, pause icon, minimal bloom
  * 
+ * Interaction: Click anywhere on the POI to toggle pause/play state.
+ * 
  * @component
  * @returns A visual-only POI indicator for day/night cycle state
  */
 export default function DayNightPOI(): JSX.Element {
   const gameplayState = useMinimalGameplayWithIdleVillageConfig();
+  const { pauseGame, resumeGame } = gameplayState;
+
+  const handleClick = useCallback(() => {
+    if (gameplayState.state.isPaused) {
+      resumeGame('user');
+    } else {
+      pauseGame('user');
+    }
+  }, [gameplayState.state.isPaused, pauseGame, resumeGame]);
 
   return (
-    <DayNightPoiSkin
-      isDayPhase={gameplayState.state.isDayPhase}
-      cycleProgress={gameplayState.state.cycleProgress || 0}
-      isPaused={gameplayState.state.isPaused}
-    />
+    <div onClick={handleClick} style={{ cursor: 'pointer' }}>
+      <DayNightPoiSkin
+        isDayPhase={gameplayState.state.isDayPhase}
+        cycleProgress={gameplayState.state.cycleProgress || 0}
+        isPaused={gameplayState.state.isPaused}
+      />
+    </div>
   );
 }

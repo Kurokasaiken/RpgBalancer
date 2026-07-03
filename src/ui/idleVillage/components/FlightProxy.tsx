@@ -10,9 +10,10 @@ interface FlightProxyProps {
   fromY: number;
   toX: number;
   toY: number;
-  onComplete: (residentId: string, slotId?: string) => void;
+  onComplete: (residentId: string, slotId?: string, isInset?: boolean) => void;
   slotId?: string;
   residentsById: Record<string, ResidentState>;
+  isInset?: boolean;
 }
 
 export function FlightProxy({ 
@@ -23,10 +24,26 @@ export function FlightProxy({
   toY, 
   onComplete, 
   slotId,
-  residentsById
+  residentsById,
+  isInset
 }: FlightProxyProps) {
+  console.log('=== FLIGHT PROXY MOUNTED ===');
+  console.log('Props:', { residentId, fromX, fromY, toX, toY, slotId, isInset });
+  
   const [isAnimating, setIsAnimating] = useState(true);
   const proxyRef = useRef<HTMLDivElement>(null);
+  const onCompleteRef = useRef(onComplete);
+  const residentIdRef = useRef(residentId);
+  const slotIdRef = useRef(slotId);
+  const isInsetRef = useRef(isInset);
+  
+  // Keep refs updated without triggering re-renders
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+    residentIdRef.current = residentId;
+    slotIdRef.current = slotId;
+    isInsetRef.current = isInset;
+  }, [onComplete, residentId, slotId, isInset]);
 
   // Debug coordinate tracking
   useEffect(() => {
@@ -67,14 +84,22 @@ export function FlightProxy({
   }, [residentId, fromX, fromY, toX, toY, isAnimating]);
 
   useEffect(() => {
-    // Auto-complete after animation - simple timeout is fine for UI animation
+    console.log('=== FLIGHT PROXY USE EFFECT RUNNING ===');
+    console.log('Will hide animation in 160ms');
+    
+    // Hide animation after duration and call onComplete
     const timer = setTimeout(() => {
+      console.log('=== TIMEOUT FIRED - HIDING ANIMATION AND CALLING ONCOMPLETE ===');
       setIsAnimating(false);
-      onComplete(residentId, slotId);
+      // Call onComplete to notify parent that flight animation is done
+      onCompleteRef.current(residentIdRef.current, slotIdRef.current, isInsetRef.current);
     }, 160); // Fixed duration for flight
 
-    return () => clearTimeout(timer);
-  }, [residentId, slotId, onComplete]);
+    return () => {
+      console.log('=== FLIGHT PROXY CLEANUP (unmount) ===');
+      clearTimeout(timer);
+    };
+  }, []); // Empty dependency array - run once on mount
 
   return (
     <AnimatePresence>

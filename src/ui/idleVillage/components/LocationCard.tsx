@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type { ButtonHTMLAttributes, MouseEvent, ReactNode, DragEvent } from 'react';
-import type { DropState } from '@/ui/idleVillage/components/ActivitySlot';
+import type { LocationDropState } from '@/ui/idleVillage/map/validators/locationDropValidators';
 import theaterPlaceholder from '@/assets/ui/idleVillage/panorama-hotspring.jpg';
 import { createSandboxDiagnostics } from '@/ui/idleVillage/utils/sandboxDiagnostics';
 import { useLocationTooltip, useLocationTooltipData } from '@/ui/idleVillage/hooks/useLocationTooltip';

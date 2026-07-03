@@ -491,3 +491,5 @@ export const TimeDaynightIntegrationPage: React.FC = () => {
     </StyleLabSurface>
   );
 };
+
+export default TimeDaynightIntegrationPage;

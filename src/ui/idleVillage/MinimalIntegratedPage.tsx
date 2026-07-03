@@ -11,7 +11,6 @@ import { DndContext, DragEndEvent, DragStartEvent, DragOverlay, PointerSensor, T
 import { useMinimalGameplayStore } from '@/store/useMinimalGameplay';
 import { initializeMinimalGameplayStore } from '@/store/useMinimalGameplay';
 import { WorkerCard } from '@/ui/idleVillage/components/WorkerCard';
-import { ActivitySlot } from '@/ui/idleVillage/components/ActivitySlot';
 import { useDropFeedback } from '@/ui/idleVillage/hooks/useDropFeedback';
 import { DEFAULT_DROP_FEEDBACK_CONFIG } from '@/ui/idleVillage/config/dropFeedbackConfig';
 import { TooltipProvider } from '@/ui/idleVillage/components/TooltipProvider';

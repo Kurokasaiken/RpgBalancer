@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { CSSProperties, ChangeEvent, KeyboardEvent, SyntheticEvent } from 'react';
 import { GlassButton } from '@/ui/atoms/GlassButton';
 import WorkerCard from '@/ui/idleVillage/components/WorkerCard';
-import ActivitySlot from '@/ui/idleVillage/components/ActivitySlot';
 import LocationCard from '@/ui/idleVillage/components/LocationCard';
 import VerbCard from '@/ui/idleVillage/legacy/VerbCard';
 import { useThemeSwitcher } from '@/hooks/useThemeSwitcher';

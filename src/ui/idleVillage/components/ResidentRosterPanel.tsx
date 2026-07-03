@@ -41,6 +41,8 @@ export interface ResidentRosterPanelProps {
   };
   /** Optional additional controls to render in header */
   headerControls?: ReactNode;
+  /** Use Wanderlust skin styling instead of default PgCard */
+  useWanderlustSkin?: boolean;
 }
 
 /**
@@ -97,6 +99,7 @@ export function ResidentRosterPanel({
   context,
   dragVisualState,
   headerControls,
+  useWanderlustSkin = false,
 }: ResidentRosterPanelProps) {
   // Instrument renderer stack at ResidentRosterPanel level
   rendererStackInstrumentation.captureResidentRosterPanel(residents);
@@ -116,6 +119,7 @@ export function ResidentRosterPanel({
         cardVariant={cardVariant}
         dragVisualState={dragVisualState}
         headerControls={headerControls}
+        useWanderlustSkin={useWanderlustSkin}
       />
 
       {assignmentFeedback && (

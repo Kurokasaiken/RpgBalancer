@@ -22,13 +22,13 @@ const PoiDetailVerificationPage = lazy(() => import('./ui/idleVillage/pages/PoiD
 const PoiStandardDetailIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiStandardDetailIntegrationPage').then(m => ({ default: m.PoiStandardDetailIntegrationPage })));
 const TimeDaynightIntegrationPage = lazy(() => import('./ui/idleVillage/pages/TimeDaynightIntegrationPage').then(m => ({ default: m.TimeDaynightIntegrationPage })));
 const DragPoiAssignmentPage = lazy(() => import('./ui/idleVillage/pages/DragPoiAssignmentPage').then(m => ({ default: m.DragPoiAssignmentPage })));
+const SlotPage = lazy(() => import('./ui/idleVillage/pages/SlotPage').then(m => ({ default: m.default })));
 // Minimal slice test pages (Phase 1-6)
-const MinimalPgCardPage = lazy(() => import('./pages/minimal-pgcard').then(m => ({ default: m.MinimalPgCardPage })));
+const MinimalPoiPage = lazy(() => import('./pages/minimal-poi').then(m => ({ default: m.default })));
 const MinimalRosterPage = lazy(() => import('./pages/minimal-roster').then(m => ({ default: m.default })));
 const MinimalClockPage = lazy(() => import('./pages/minimal-clock').then(m => ({ default: m.default })));
 const MinimalSlotRackPage = lazy(() => import('./pages/minimal-slotRack').then(m => ({ default: m.default })));
 const MinimalResourceHUDPage = lazy(() => import('./pages/minimal-resourcehud').then(m => ({ default: m.default })));
-const MinimalJobCardPage = lazy(() => import('./pages/minimal-jobcard').then(m => ({ default: m.default })));
 const MinimalQuestCardPage = lazy(() => import('./pages/minimal-questcard').then(m => ({ default: m.default })));
 const MinimalSkillCheckPage = lazy(() => import('./pages/minimal-skillcheck').then(m => ({ default: m.default })));
 const MinimalSkillCheckV6Page = lazy(() => import('./pages/minimal-skillcheck-v6').then(m => ({ default: m.default })));
@@ -132,9 +132,11 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/time-daynight-integration';
   const isDragPoiAssignmentPath =
     typeof window !== 'undefined' && window.location.pathname === '/drag-poi-assignment';
+  const isSlotPath =
+    typeof window !== 'undefined' && window.location.pathname === '/slot';
   // Minimal slice test pages (Phase 1-6)
-  const isMinimalPgCardPath =
-    typeof window !== 'undefined' && window.location.pathname === '/minimal-pgcard';
+  const isMinimalPoiPath =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-poi';
   const isMinimalRosterPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-roster';
   const isMinimalClockPath =
@@ -332,17 +334,26 @@ function App() {
     );
   }
 
-  // Minimal slice test pages (Phase 1+)
-  if (isMinimalPgCardPath) {
+  if (isSlotPath) {
     return (
-      <ErrorBoundary componentName="Minimal PgCard Page">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading PgCard Test…</div>}>
-          <MinimalPgCardPage />
+      <ErrorBoundary componentName="Slot Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Slot Test…</div>}>
+          <SlotPage />
         </Suspense>
       </ErrorBoundary>
     );
   }
 
+  // Minimal slice test pages (Phase 1+)
+  if (isMinimalPoiPath) {
+    return (
+      <ErrorBoundary componentName="Minimal POI Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading POI Test…</div>}>
+          <MinimalPoiPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
 
   if (isMinimalRosterPath) {
     return (

@@ -1,0 +1,206 @@
+/* ═══════════════════════════════════════════════════════════════════
+   wanderlust-surface.css
+   Bronze surface system — animations, layout, and state classes.
+   Import once in your app entry point.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Rim breathing animation ───────────────────────────────────── */
+@keyframes ws-rim-breath {
+  0%,
+  100% {
+    opacity: 0.9;
+  }
+  45% {
+    opacity: 0.65;
+  }
+  75% {
+    opacity: 0.82;
+  }
+}
+
+.ws-rim-arc {
+  animation: ws-rim-breath 9.4s ease-in-out infinite;
+}
+
+/* ── Layout wrapper ────────────────────────────────────────────── */
+.ws-root {
+  position: relative;
+  overflow: hidden;
+}
+
+/* The SVG border overlay sits on top of everything */
+.ws-border-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Content slot — lives below the border overlay */
+.ws-content {
+  position: relative;
+  z-index: 0;
+}
+
+/* ── Shape variants ────────────────────────────────────────────── */
+
+/* Panel: wide, cinematic (21:9ish or freeform) */
+.ws-root--panel {
+  border-radius: 18px;
+}
+.ws-root--panel .ws-content {
+  /* Inset matches the border thickness */
+  padding: 22px;
+}
+
+/* Card: portrait 3:4 */
+.ws-root--card {
+  border-radius: 18px;
+}
+.ws-root--card .ws-content {
+  padding: 22px;
+}
+
+/* Badge: pill shape */
+.ws-root--badge {
+  border-radius: 9999px;
+}
+.ws-root--badge .ws-content {
+  padding: 12px 20px;
+}
+
+/* Medallion: circular */
+.ws-root--medallion {
+  border-radius: 50%;
+}
+.ws-root--medallion .ws-content {
+  padding: 22px;
+}
+
+/* Tablet: 4:3 with cut corners */
+.ws-root--tablet {
+  border-radius: 18px;
+}
+.ws-root--tablet .ws-content {
+  padding: 22px;
+}
+
+/* ── Interactive states ────────────────────────────────────────── */
+
+/* Hover: slight lift + brighten */
+.ws-root--interactive {
+  transition:
+    transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+    filter 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.ws-root--interactive:hover {
+  transform: scale(1.012) translateY(-1px);
+  filter: brightness(1.06) saturate(1.05);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Circular shadow for medallion shape */
+.ws-root--medallion.ws-root--interactive:hover {
+  border-radius: 50%;
+}
+
+/* Increase top-left reflection opacity on hover */
+.ws-root--interactive:hover .ws-rim-arc {
+  opacity: 1;
+}
+
+.ws-root--interactive:active {
+  transform: scale(0.988) translateY(0.5px);
+  filter: brightness(0.97);
+}
+
+/* ── Dragging optimisation ─────────────────────────────────────── */
+.ws-root--dragging .ws-border-svg {
+  /* Kill heavy filters during drag for performance */
+  will-change: transform;
+}
+
+/* ── Paused state — freeze rim breathing ───────────────────────── */
+.ws-root--paused .ws-rim-arc {
+  animation-play-state: paused;
+}
+
+/* ── V8 MLE: Heavy Feel (weighted easing for physical presence) ─── */
+.ws-root--heavy-feel {
+  transition:
+    transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1.0),
+    box-shadow 0.3s cubic-bezier(0.2, 0.8, 0.2, 1.0),
+    filter 0.3s cubic-bezier(0.2, 0.8, 0.2, 1.0);
+}
+
+.ws-root--heavy-feel:hover {
+  transform: scale(1.015) translateY(-2px);
+  box-shadow:
+    0 2px 3px rgba(0, 0, 0, 0.25),
+    0 10px 20px rgba(0, 0, 0, 0.35),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.1);
+  filter: brightness(1.08) saturate(1.1);
+}
+
+.ws-root--heavy-feel:active {
+  transform: scale(0.985) translateY(1px);
+}
+
+/* ── V8 MLE: Emissive Halo disabled - causes visible border artifacts ── */
+
+/* ── Typography styles ──────────────────────────────────────────── */
+
+/* Primary text: cream/gold for important text */
+.ws-text--title {
+  color: #e4d5b7;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+}
+
+.ws-text--subtitle {
+  color: #e4d5b7;
+  font-size: 1.125rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+}
+
+.ws-text--body {
+  color: #e4d5b7;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* Secondary text: desaturated bronze for labels, captions */
+.ws-text--label {
+  color: #8a7050;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.ws-text--caption {
+  color: #8a7050;
+  font-size: 0.6875rem;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+/* ── Reduced motion ────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .ws-rim-arc {
+    animation: none;
+  }
+  .ws-root--interactive {
+    transition: none;
+  }
+}

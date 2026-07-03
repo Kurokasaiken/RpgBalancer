@@ -282,6 +282,12 @@ export const WanderlustMedalOverlay: React.FC<WanderlustMedalOverlayProps> = ({
               <feComposite in="SourceGraphic" in2="blur" operator="over" />
             </filter>
 
+            {/* Patina deformation - makes circles irregular */}
+            <filter id="f-patina" x="-20%" y="-20%" width="140%" height="140%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.15" numOctaves={3} seed="42" result="noise" />
+              <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.5" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+
             {/* Clips */}
             <clipPath id="c-port">
               <circle cx="43" cy="43" r="27.5" />
@@ -356,15 +362,15 @@ export const WanderlustMedalOverlay: React.FC<WanderlustMedalOverlayProps> = ({
               strokeLinecap="round" />
 
             {/* L7: Patina */}
-            <circle cx="16" cy="22" r="5.5" fill="rgba(34,18,8,.40)" />
-            <circle cx="13" cy="25" r="3.2" fill="rgba(28,14,6,.32)" />
-            <circle cx="11" cy="32" r="2.5" fill="rgba(26,12,5,.28)" />
-            <circle cx="71" cy="22" r="5"   fill="rgba(32,16,8,.36)" />
-            <circle cx="69" cy="19" r="2.8" fill="rgba(28,14,6,.30)" />
-            <circle cx="75" cy="30" r="2"   fill="rgba(26,12,5,.24)" />
-            <circle cx="21" cy="67" r="4.2" fill="rgba(32,16,8,.34)" />
-            <circle cx="67" cy="65" r="3.5" fill="rgba(28,14,6,.30)" />
-            <circle cx="43" cy="7"  r="3"   fill="rgba(36,20,8,.22)" />
+            <circle cx="16" cy="22" r="5.5" fill="rgba(34,18,8,.40)" filter={isDragging ? undefined : "url(#f-patina)"} />
+            <circle cx="13" cy="25" r="3.2" fill="rgba(28,14,6,.32)" filter={isDragging ? undefined : "url(#f-patina)"} />
+            <circle cx="11" cy="32" r="2.5" fill="rgba(26,12,5,.28)" filter={isDragging ? undefined : "url(#f-patina)"} />
+            <circle cx="71" cy="22" r="5"   fill="rgba(32,16,8,.36)" filter={isDragging ? undefined : "url(#f-patina)"} />
+            <circle cx="69" cy="19" r="2.8" fill="rgba(28,14,6,.30)" filter={isDragging ? undefined : "url(#f-patina)"} />
+            <circle cx="75" cy="30" r="2"   fill="rgba(26,12,5,.24)" filter={isDragging ? undefined : "url(#f-patina)"} />
+            <circle cx="21" cy="67" r="4.2" fill="rgba(32,16,8,.34)" filter={isDragging ? undefined : "url(#f-patina)"} />
+            <circle cx="67" cy="65" r="3.5" fill="rgba(28,14,6,.30)" filter={isDragging ? undefined : "url(#f-patina)"} />
+            <circle cx="43" cy="7"  r="3"   fill="rgba(36,20,8,.22)" filter={isDragging ? undefined : "url(#f-patina)"} />
 
             {/* Scratches */}
             <line x1="9"  y1="46" x2="16" y2="54" stroke="rgba(0,0,0,.44)" strokeWidth="1.2" strokeLinecap="round" />

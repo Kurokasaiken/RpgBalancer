@@ -38,7 +38,7 @@ import TheaterView from '@/ui/idleVillage/components/TheaterView';
 import MapLocationSlot from '@/ui/idleVillage/components/MapLocationSlot';
 import ActiveActivityHUD from '@/ui/idleVillage/ActiveActivityHUD';
 import QuestDetailPanel from '@/ui/idleVillage/components/QuestDetailPanel';
-import type { DropState } from '@/ui/idleVillage/components/ActivitySlot';
+import type { LocationDropState } from '@/ui/idleVillage/map/validators/locationDropValidators';
 import QuestActionCard from '@/ui/idleVillage/map/actionCards/QuestActionCard';
 import { RESIDENT_DRAG_MIME } from '@/ui/idleVillage/constants';
 import type { ResidentSlotViewModel } from '@/ui/idleVillage/slots/useResidentSlotController';

@@ -192,9 +192,9 @@
 .destiny-astrolabe .card.almost .title{color:#f2d9a8;
   text-shadow:0 1px 0 rgba(255,245,215,.4), 0 -1px 0 rgba(60,30,5,.6), 0 0 20px rgba(227,185,97,.55);}
 .destiny-astrolabe .card.fail .title, .destiny-astrolabe .card.epic .title{
-  background:linear-gradient(180deg,#9b94a8 0%,#5d5568 45%,#2c2535 100%);
+  background:linear-gradient(180deg,#d4c9d8 0%,#a499b0 45%,#6b6179 100%);
   -webkit-background-clip:text;background-clip:text;color:transparent;
-  filter:drop-shadow(0 2px 0 rgba(0,0,0,.7)) drop-shadow(0 0 18px rgba(90,59,255,.25));}
+  filter:drop-shadow(0 2px 0 rgba(0,0,0,.9)) drop-shadow(0 0 22px rgba(90,59,255,.35)) drop-shadow(0 0 6px rgba(100,70,150,.5));}
 .destiny-astrolabe .card .title .ch{display:inline-block;}
 .destiny-astrolabe .card.fail .title .ch, .destiny-astrolabe .card.epic .title .ch{animation:crumble 1.2s cubic-bezier(.5,.05,.7,.4) var(--del,0s) both;}
 

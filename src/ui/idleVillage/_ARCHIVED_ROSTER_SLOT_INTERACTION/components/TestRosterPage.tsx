@@ -30,7 +30,6 @@ import { useResidentDropValidation } from '@/ui/idleVillage/hooks/useResidentDro
 import { useResidentSlotController } from '@/ui/idleVillage/slots/useResidentSlotController';
 import type { ActivityDefinition, StatRequirement } from '@/balancing/config/idleVillage/types';
 import type { ResidentSlotAssignResult } from '@/ui/idleVillage/slots/types';
-import type { DropState } from '@/ui/idleVillage/components/ActivitySlot';
 import type { DragFeedbackState } from '@/ui/idleVillage/components/ResidentRosterTypes';
 import { useActiveHUDState } from '@/ui/idleVillage/hooks/useActiveHUDState';
 import ActiveHUD from '@/ui/idleVillage/components/ActiveHUD';

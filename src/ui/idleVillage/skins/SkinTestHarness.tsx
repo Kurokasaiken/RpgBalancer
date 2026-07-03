@@ -42,7 +42,6 @@ import { StyleLabSurface } from '@/ui/styleLab/StyleLabSurface';
 import { StyleLabStack } from '@/ui/styleLab/StyleLabStack';
 import { PgCard } from '../components/PgCard';
 import { WorkerCard } from '../components/WorkerCard';
-import { ActivitySlot } from '../components/ActivitySlot';
 import { useMinimalStyleLabTokens } from '../hooks/useMinimalStyleLabTokens';
 
 // ============================================================================

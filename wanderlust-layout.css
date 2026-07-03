@@ -1,0 +1,103 @@
+/* ════════════════════════════════════════════════════════════════════════
+ *  WANDERLUST LAYOUT SYSTEM — CSS Tokens + Ambient Animations
+ *  Import ONCE in your app root (e.g. App.tsx or main.css).
+ *
+ *  Override any --wl-* variable to re-theme globally.
+ * ════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── CANVAS ── */
+  --wl-canvas:          #030202;
+  --wl-canvas-warm:     #100a06;
+
+  /* ── TEXT ── */
+  --wl-text-title:      #e4d5b7;
+  --wl-text-body:       rgba(237, 224, 196, 0.92);
+  --wl-text-accent:     #f0cf6a;
+  --wl-label-primary:   #c9a84e;
+  --wl-label-tertiary:  #9a8246;
+
+  /* ── GOLD RAMP ── */
+  --wl-gold:            #d8b13e;
+  --wl-gold-bright:     #f0cf6a;
+  --wl-gold-dim:        rgba(216, 177, 62, 0.4);
+
+  /* ── STATUS ── */
+  --wl-status-met:      #7bc96f;
+  --wl-status-unmet:    #d98a4a;
+
+  /* ── SEPARATORS ── */
+  --wl-separator:       rgba(216, 177, 62, 0.2);
+
+  /* ── SPACING SCALE: the invisible grid ── */
+  --wl-space-xs:    4px;
+  --wl-space-sm:    8px;
+  --wl-space-md:   12px;
+  --wl-space-lg:   16px;
+  --wl-space-xl:   24px;
+  --wl-space-xxl:  32px;
+  --wl-gap-medium: 24px;
+
+  /* ── FONTS ── */
+  --wl-font-display: "Cinzel", "Trajan Pro", serif;
+  --wl-font-serif:   "EB Garamond", Georgia, serif;
+  --wl-font-sans:    system-ui, -apple-system, sans-serif;
+
+  /* ── TYPE SCALE ── */
+  --wl-title-size:    30px;
+  --wl-subtitle-size: 12px;
+  --wl-body-size:     15.5px;
+  --wl-label-size:    11px;
+  --wl-value-size:    23px;
+  --wl-caption-size:  12px;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ *  AMBIENT ANIMATIONS — GPU-only (transform + opacity)
+ * ════════════════════════════════════════════════════════════════════════ */
+
+@keyframes wl-nebula-drift {
+  0%   { transform: translate(0, 0) scale(1);           }
+  100% { transform: translate(-12px, -8px) scale(1.06); }
+}
+
+@keyframes wl-leak-breathe {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1;   }
+}
+
+@keyframes wl-fly-rise1 {
+  0%   { transform: translate(0, 0);              }
+  25%  { transform: translate(18px, -150px);      }
+  50%  { transform: translate(-10px, -300px);     }
+  75%  { transform: translate(14px, -440px);      }
+  100% { transform: translate(-6px, -580px);      }
+}
+
+@keyframes wl-fly-rise2 {
+  0%   { transform: translate(0, 0);              }
+  25%  { transform: translate(-16px, -150px);     }
+  50%  { transform: translate(12px, -300px);      }
+  75%  { transform: translate(-18px, -440px);     }
+  100% { transform: translate(8px, -580px);       }
+}
+
+@keyframes wl-fly-glow {
+  0%, 100% { opacity: 0.15; }
+  50%      { opacity: 0.85; }
+}
+
+@keyframes wl-dot-spin {
+  from { transform: rotate(0deg);   }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes wl-nebula-drift  { 0%, 100% { transform: none; } }
+  @keyframes wl-leak-breathe  { 0%, 100% { opacity: 0.8; }   }
+  @keyframes wl-fly-rise1     { 0%, 100% { transform: none; } }
+  @keyframes wl-fly-rise2     { 0%, 100% { transform: none; } }
+  @keyframes wl-fly-glow      { 0%, 100% { opacity: 0.4; }   }
+  @keyframes wl-dot-spin      { 0%, 100% { transform: none; } }
+}

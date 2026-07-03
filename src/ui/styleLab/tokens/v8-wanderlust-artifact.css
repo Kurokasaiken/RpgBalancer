@@ -1,0 +1,285 @@
+/**
+ * V8 Skin Architecture — "Wanderlust Artifact" Default Skin System
+ * =================================================================
+ *
+ * The definitive material anchor for Wanderlust. Every UI component (the
+ * Day/Night Clock, the Flipper Skill-Check, the Village Upgrade Menu, …)
+ * wraps its layout in `.wanderlust-artifact` to inherit a single, consistent
+ * heavy-material identity: obsidian body, eroded sun-bronze borders, and a
+ * saturated emerald/teal cast.
+ *
+ * Requires the global SVG filters injected by <V8GlobalFilters /> (mounted in
+ * main.tsx):
+ *   - #v8-obsidian-grain  → background porosity
+ *   - #v8-bronze-grit     → organically eroded borders (::before)
+ *
+ * USAGE
+ *   <div class="wanderlust-artifact"> … </div>
+ *
+ * Ad-hoc overrides combine with the base class WITHOUT rewriting the core
+ * material shading:
+ *   <div class="wanderlust-artifact wa--circular wa--halo-emerald"> … </div>
+ *   <div class="wanderlust-artifact wa--wide wa--quiet"> … </div>
+ */
+
+:root {
+  /* --- Core material palette (overridden by StyleLab tokens) ------- */
+  --stylelab-base-obsidian: #03030d;
+  --stylelab-accent-primary: #a05c18;
+  --stylelab-accent-primary-light: #e4b048;
+  --stylelab-accent-primary-dark: #602c08;
+  --stylelab-success: rgba(16, 185, 129, 0.55);
+  --stylelab-success-soft: rgba(16, 185, 129, 0.30);
+  --stylelab-material-grain: url(#v8-obsidian-grain);
+  --stylelab-material-edge-treatment: url(#v8-bronze-grit);
+
+  /* --- Structure --------------------------------------------------- */
+  --v8-border-width: 2px;
+  --v8-radius:       4px;
+  --v8-pad:          16px;
+  --v8-grain-opacity: 0.5;
+
+  /* --- Text (warm, never pure white) ------------------------------- */
+  --v8-ink:       #f0e8d5;
+  --v8-ink-muted: #c0a878;
+}
+
+/* =====================================================================
+   MASTER CLASS
+   ===================================================================== */
+.wanderlust-artifact {
+  position: relative;
+  isolation: isolate;
+  z-index: 0;
+
+  /* SAFEGUARD: the #v8-bronze-grit displacement pushes the ::before edge
+     beyond the box. Force visible overflow so a reset/inherited rule can
+     never clip the eroded bronze border flat on the sides. Components that
+     genuinely need to clip CONTENT must do so on an inner wrapper, never on
+     the .wanderlust-artifact root. */
+  overflow: visible;
+
+  padding: var(--v8-pad);
+  border-radius: var(--v8-radius);
+
+  /* Obsidian body — 3-layer Simmering Obsidian System */
+  /* Layer A: Base solid (from StyleLab token) */
+  background-color: var(--stylelab-base-obsidian);
+  /* Layer B: Shifting Dust — asymmetric radial gradients with slow animation */
+  background-image:
+    radial-gradient(ellipse 85% 70% at 30% 20%, rgba(30, 40, 60, 0.7) 0%, transparent 65%),
+    radial-gradient(ellipse 70% 60% at 75% 80%, rgba(20, 60, 50, 0.5) 0%, transparent 60%);
+  background-size: 120% 120%;
+  animation: none; /* DISABLED - dust breathing animation removed */
+  color: var(--v8-ink);
+  font-family: var(--font-body, 'EB Garamond', Georgia, serif);
+
+  /* Heavy sun-bronze border (the eroded overlay lives on ::before) */
+  border: var(--v8-border-width) solid var(--stylelab-accent-primary);
+
+  /* Depth + saturated emerald/teal cast */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 120, 0.08),
+    inset 0 0 24px rgba(0, 0, 0, 0.9),
+    0 14px 40px rgba(0, 0, 0, 0.85);
+  filter: drop-shadow(0 0 16px var(--stylelab-success));
+}
+
+/* --- Obsidian grain: background porosity (sits behind content) ------ */
+.wanderlust-artifact::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-color: var(--stylelab-base-obsidian);
+  filter: var(--stylelab-material-grain);
+  opacity: var(--v8-grain-opacity);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+/* --- Bronze grit: organically eroded / chiseled border -------------- */
+.wanderlust-artifact::before {
+  content: '';
+  position: absolute;
+  inset: calc(var(--v8-border-width) * -1);
+  z-index: -1;
+  border-radius: inherit;
+  border: var(--v8-border-width) solid var(--stylelab-accent-primary);
+  /* Bronze ramp identical to the character medallion */
+  background: linear-gradient(
+    155deg,
+    var(--stylelab-accent-primary-light) 0%,
+    var(--stylelab-accent-primary) 38%,
+    var(--stylelab-accent-primary-dark) 76%,
+    #0e0602 100%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  padding: var(--v8-border-width);
+  /* Displacement erosion makes the edge forged & imperfect */
+  filter: var(--stylelab-material-edge-treatment);
+  pointer-events: none;
+}
+
+/* =====================================================================
+   OVERRIDE UTILITIES — combine with the base class, never replace it
+   ===================================================================== */
+
+/* Inner content wrapper -------------------------------------------- */
+/* Use this on a child when a component must clip its CONTENT (e.g. a
+   circular clock face). Clipping happens here, NOT on the root, so the
+   eroded bronze border stays intact. */
+.wanderlust-artifact .wa-content {
+  position: relative;
+  z-index: 1;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+/* Shape ------------------------------------------------------------- */
+.wanderlust-artifact.wa--circular {
+  --v8-radius: 50%;
+  aspect-ratio: 1 / 1;
+}
+
+/* Constrain v8-bronze-grit filter to circular shape to prevent gray square artifacts */
+.wanderlust-artifact.wa--circular::before {
+  clip-path: circle(50%);
+}
+
+.wanderlust-artifact.wa--wide {
+  width: 100%;
+}
+
+/* Border weight ----------------------------------------------------- */
+.wanderlust-artifact.wa--thick { --v8-border-width: 4px; }
+.wanderlust-artifact.wa--hairline { --v8-border-width: 1px; }
+
+/* Padding ----------------------------------------------------------- */
+.wanderlust-artifact.wa--snug  { --v8-pad: 8px; }
+.wanderlust-artifact.wa--roomy { --v8-pad: 28px; }
+
+/* Halo / glow overrides --------------------------------------------- */
+.wanderlust-artifact.wa--halo-emerald {
+  filter: drop-shadow(0 0 22px var(--stylelab-success)) drop-shadow(0 0 8px var(--stylelab-success-soft));
+}
+
+.wanderlust-artifact.wa--halo-teal {
+  filter: drop-shadow(0 0 22px var(--stylelab-success));
+}
+
+.wanderlust-artifact.wa--halo-bronze {
+  filter: drop-shadow(0 0 20px var(--stylelab-accent-primary));
+}
+
+/* Quiet: keep the material, drop the saturated cast (e.g. dense lists) */
+.wanderlust-artifact.wa--quiet {
+  filter: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 120, 0.06),
+    0 8px 24px rgba(0, 0, 0, 0.8);
+}
+
+/* Reduced motion / texture fallback --------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .wanderlust-artifact::after { opacity: calc(var(--v8-grain-opacity) * 0.6); }
+  .wanderlust-artifact { animation: none; }
+}
+
+/* =====================================================================
+   MATERIAL LAYER ENGINE — Procedural AAA-style composition
+   ===================================================================== */
+
+/* Physical Depth: Multi-layer shadows for contact + elevation + bevel */
+.wa-physical-depth {
+  /* Contact shadow: small/sharp for surface contact */
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.4),
+    /* Elevation shadow: large/soft for depth */
+    0 15px 30px rgba(0, 0, 0, 0.5),
+    /* Inner bevel: catches light on edge */
+    inset 1px 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Rim Light: 1px soft highlight on top-left edge for depth */
+.ml-rim-light::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.08);
+  z-index: 1;
+}
+
+/* Dynamic Rim Light: Color-matched to background */
+.ml-rim-light-dynamic::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 1px 1px 0 var(--stylelab-rim-light-color, rgba(255, 248, 180, 0.12));
+  z-index: 1;
+}
+
+/* Haptic Ready: Enable micro-interactions (hover scale, glow transitions) */
+.wa--haptic-ready {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              filter 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wa--haptic-ready:hover {
+  transform: scale(1.01);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 8px 16px rgba(0, 0, 0, 0.4),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.08);
+  filter: brightness(1.05);
+}
+
+.wa--haptic-ready:active {
+  transform: scale(0.99);
+}
+
+/* Heavy Feel: Weighted easing for physical presence */
+.wa--heavy-feel {
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1.0),
+              box-shadow 0.3s cubic-bezier(0.2, 0.8, 0.2, 1.0),
+              filter 0.3s cubic-bezier(0.2, 0.8, 0.2, 1.0);
+}
+
+.wa--heavy-feel:hover {
+  transform: scale(1.015) translateY(-2px);
+  box-shadow:
+    0 2px 3px rgba(0, 0, 0, 0.25),
+    0 10px 20px rgba(0, 0, 0, 0.35),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.1);
+  filter: brightness(1.08) saturate(1.1);
+}
+
+.wa--heavy-feel:active {
+  transform: scale(0.985) translateY(1px);
+}
+
+/* =====================================================================
+   KEYFRAMES
+   ===================================================================== */
+
+@keyframes wanderlust-dust-breathe {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
+}

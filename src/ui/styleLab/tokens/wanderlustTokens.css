@@ -270,8 +270,7 @@
   height: 100%;
   background: linear-gradient(90deg, transparent, rgba(255,220,100,.12), transparent);
   transform: translateX(-100%);
-  animation: wl-shimmer 5s ease-in-out infinite;
-  animation-delay: var(--shimmer-delay, 0s);
+  animation: none; /* DISABLED - shimmer animation removed */
   pointer-events: none;
 }
 

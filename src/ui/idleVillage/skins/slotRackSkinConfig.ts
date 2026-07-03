@@ -774,6 +774,125 @@ export const WILDERNESS_BRONZE_SLOT_RACK_CONFIG: SlotRackSkinConfig = {
 };
 
 /**
+ * Wanderlust V8 Slot Rack skin configuration
+ * Precise borders for external component (via WanderlustSurface) and internal slots
+ */
+export const WANDERLUST_V8_SLOT_RACK_CONFIG: SlotRackSkinConfig = {
+  id: 'wanderlust_v8_slot_rack',
+  label: 'Wanderlust V8 Slot Rack',
+  description: 'V8 skin with precise borders for external WanderlustSurface wrapper and internal slot borders.',
+  version: 1,
+  supportedPresets: ['wanderlust'],
+
+  grid: {
+    gap: '12px',
+    padding: '16px',
+    borderRadius: '0px', // Border handled by WanderlustSurface
+    background: 'transparent', // Background handled by WanderlustSurface
+    border: 'none', // Border handled by WanderlustSurface
+  },
+
+  slotContainer: {
+    background: 'radial-gradient(circle at 35% 30%, rgba(45, 25, 15, 0.78), rgba(15, 8, 4, 0.95))',
+    border: '2px solid rgba(216, 119, 6, 0.6)', // Precise bronze border for internal slots
+    borderRadius: '50%',
+    padding: '0px',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  },
+
+  navigation: {
+    buttonBackground: 'rgba(15, 12, 8, 0.85)',
+    buttonBorder: '1px solid rgba(216, 119, 6, 0.35)',
+    buttonHoverBackground: 'rgba(58, 32, 8, 0.92)',
+    iconColor: 'rgba(205, 127, 50, 0.85)',
+    iconSize: '18px',
+  },
+
+  medalStyle: {
+    defaultPreset: 'enhanced',
+    variants: {
+      enhanced: {
+        depth: 8,
+        shadowBlur: 24,
+        shadowOpacity: 0.6,
+        rimThickness: 3,
+        rimColor: '#d87706',
+        faceColor: '#92400e',
+        highlightColor: '#fbbf24',
+        gradients: {
+          rim: {
+            type: 'radial',
+            gradientUnits: 'objectBoundingBox',
+            cx: '50%',
+            cy: '45%',
+            r: '70%',
+            stops: [
+              { offset: 0, color: 'rgba(205,127,50,0.95)' },
+              { offset: 0.35, color: '#cd7f32', opacity: 0.92 },
+              { offset: 0.75, color: '#8b4513', opacity: 0.88 },
+              { offset: 1, color: '#654321', opacity: 0.95 },
+            ],
+          },
+          face: {
+            type: 'radial',
+            gradientUnits: 'objectBoundingBox',
+            cx: '45%',
+            cy: '32%',
+            r: '58%',
+            stops: [
+              { offset: 0, color: '#ffe4b5' },
+              { offset: 0.55, color: '#cd7f32', opacity: 0.95 },
+              { offset: 1, color: '#8b4513', opacity: 0.92 },
+            ],
+          },
+        },
+      },
+    },
+  },
+
+  interactionPhysics: {
+    mass: 1.0,
+    damping: 0.25,
+    stiffness: 200,
+    shadowDepth: 'medium',
+    bloomIntensity: 0.5,
+  },
+
+  rackMotion: {
+    type: 'none',
+  },
+
+  audioProfile: 'slotrack.signature.bronze',
+
+  cssVars: {
+    '--slot-rack-slot-size': '60px',
+    '--slot-rack-slot-width': '60px',
+    '--slot-rack-slot-height': '60px',
+    '--slot-rack-slot-bg': 'radial-gradient(circle at 35% 30%, rgba(45, 25, 15, 0.78), rgba(15, 8, 4, 0.95))',
+    '--slot-rack-slot-border': '2px solid rgba(216, 119, 6, 0.6)', // Precise internal slot border
+    '--slot-rack-slot-border-radius': '50%',
+    '--slot-rack-slot-shadow': 'inset 0 2px 8px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.3)',
+    '--slot-rack-slot-border-valid': '2px solid rgba(114, 238, 130, 0.75)',
+    '--slot-rack-slot-border-invalid': '2px dashed rgba(255, 255, 255, 0.32)',
+    '--slot-rack-slot-border-assigned': '2px solid rgba(216, 119, 6, 0.78)',
+    '--slot-rack-slot-border-empty': '2px dashed rgba(216, 119, 6, 0.45)',
+    '--slot-rack-slot-text': '#f5d9a8',
+    '--slot-rack-slot-empty-text': 'rgba(252, 232, 144, 0.68)',
+    '--slot-rack-slot-shadow-valid': '0 0 28px rgba(114, 238, 130, 0.55)',
+    '--slot-rack-slot-shadow-highlighted': '0 0 26px rgba(255, 208, 128, 0.65)',
+    '--slot-rack-slot-ring-color': 'rgba(255, 248, 200, 0.45)',
+    '--slot-rack-slot-label-color': 'rgba(249, 222, 166, 0.52)',
+    '--slot-rack-slot-badge-bg': 'rgba(8, 6, 4, 0.9)',
+    '--slot-rack-slot-badge-text': '#fdf4ff',
+    '--slot-rack-slot-clear-text': 'rgba(255, 248, 200, 0.78)',
+  },
+
+  documentation: [
+    'Wanderlust V8 skin with precise borders for external wrapper and internal slots',
+  ],
+};
+
+/**
  * Registry of all slot rack skin configurations
  */
 export const SLOT_RACK_SKIN_REGISTRY: Record<string, SlotRackSkinConfig> = {
@@ -782,6 +901,7 @@ export const SLOT_RACK_SKIN_REGISTRY: Record<string, SlotRackSkinConfig> = {
   [WANDERLUST_SLOT_RACK_CONFIG.id]: WANDERLUST_SLOT_RACK_CONFIG,
   [RESIDENT_SLOT_RACK_SIGNATURE_CONFIG.id]: RESIDENT_SLOT_RACK_SIGNATURE_CONFIG,
   [WILDERNESS_BRONZE_SLOT_RACK_CONFIG.id]: WILDERNESS_BRONZE_SLOT_RACK_CONFIG,
+  [WANDERLUST_V8_SLOT_RACK_CONFIG.id]: WANDERLUST_V8_SLOT_RACK_CONFIG,
 };
 
 export const DEFAULT_SLOT_RACK_PRESET_ID = SLOT_RACK_IRON_BRONZE_CONFIG.id;
@@ -813,6 +933,8 @@ export function getSlotRackSkinForPreset(presetId: string): SlotRackSkinConfig |
       return MINIMAL_FRONTIER_SLOT_RACK_CONFIG;
     case 'wanderlust':
       return WANDERLUST_SLOT_RACK_CONFIG;
+    case 'wanderlust_v8':
+      return WANDERLUST_V8_SLOT_RACK_CONFIG;
     case 'resident_slotrack_signature':
       return RESIDENT_SLOT_RACK_SIGNATURE_CONFIG;
     case 'wilderness_bronze':
@@ -828,6 +950,7 @@ const SLOT_RACK_PRESET_OVERRIDES: Record<string, string> = {
   minimal_frontier: DEFAULT_SLOT_RACK_PRESET_ID,
   wanderlust: WILDERNESS_BRONZE_SLOT_RACK_CONFIG.id,
   wanderlust_dual_pillar: WILDERNESS_BRONZE_SLOT_RACK_CONFIG.id,
+  wanderlust_v8: WANDERLUST_V8_SLOT_RACK_CONFIG.id,
 };
 
 // Re-export the type for convenience

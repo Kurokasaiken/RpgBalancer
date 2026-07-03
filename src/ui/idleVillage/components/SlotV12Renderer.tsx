@@ -117,7 +117,8 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
         align-items: center;
         justify-content: center;
         border-radius: 50%;
-        filter: drop-shadow(0 18px 32px rgba(0, 0, 0, 0.75));
+        /* Removed drop-shadow to eliminate gray square artifact */
+        /* filter: drop-shadow(0 18px 32px rgba(0, 0, 0, 0.75)); */
       }
 
       .slot-v12__halo {
@@ -293,6 +294,9 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
           <clipPath id="slot-v12-clip-cavity">
             <circle cx="0" cy="0" r={geometry.R_CAV + 4} />
           </clipPath>
+          <clipPath id="slot-v12-clip-bezel">
+            <circle cx="0" cy="0" r={geometry.R_BZ_OUT + 2} />
+          </clipPath>
         </defs>
 
         {/* Layer 1: Cavity with complex filters and clipPath */}
@@ -439,16 +443,17 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
           </g>
         )}
 
-        {/* Layer 3: Bezel + Teeth - NOT clipped (scale must be visible) */}
+        {/* Layer 3: Bezel + Teeth - clipped to prevent filter bounding box artifacts */}
         <g
           className="slot-v12__bezel"
+          clipPath="url(#slot-v12-clip-bezel)"
           style={{
             transform: bezelTransform,
             transformOrigin: '0px 0px',
-            // Remove drop-shadow in debug mode to avoid visual interference
-            ...(debugViz ? {} : {
+            // Only apply drop-shadow in debug mode
+            ...(debugViz ? {
               filter: `drop-shadow(0 0 24px ${debugViz?.colors?.bezel || '#FF5C8D'})`,
-            }),
+            } : {}),
           }}
           data-layer="bezel"
         >
@@ -459,7 +464,7 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
             return (
               <>
                 <circle cx="0" cy="0" r={R_BZ_MID} fill="none" stroke="rgba(6,6,10,0.98)" strokeWidth={ringW + 3} />
-                <circle cx="0" cy="0" r={R_BZ_MID} fill="none" stroke="url(#slot-v12-silver)" strokeWidth={ringW} filter="url(#fn-silver)" />
+                <circle cx="0" cy="0" r={R_BZ_MID} fill="none" stroke="url(#slot-v12-silver)" strokeWidth={ringW} />
                 <circle cx="0" cy="0" r={R_BZ_MID} fill="none" stroke="url(#slot-v12-bevel)" strokeWidth={ringW} />
                 <circle cx="0" cy="0" r={R_BZ_MID} fill="none" stroke="rgba(10,10,16,0)" strokeWidth={ringW} filter="url(#fn-oxide)" opacity="0.60" />
                 
@@ -539,7 +544,7 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
                   })}
                 </g>
                 
-                {/* Complex teeth */}
+                {/* Complex teeth - removed fn-silver filter to prevent gray square artifact */}
                 {toothAngles.map((deg, i) => {
                   const angle = (deg * Math.PI) / 180;
                   const x = geometry.R_BZ_IN * Math.cos(angle);
@@ -550,7 +555,7 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
                   return (
                     <g key={`tooth-${i}`} transform={`translate(${x.toFixed(2)}, ${y.toFixed(2)}) rotate(${(deg - 90).toFixed(1)})`}>
                       <path d={path} fill="rgba(0,0,0,0.75)" transform="translate(0.7, 1.0)" />
-                      <path d={path} fill="url(#slot-v12-claw)" filter="url(#fn-silver)" />
+                      <path d={path} fill="url(#slot-v12-claw)" />
                       <path d={path} fill="url(#slot-v12-bevel)" opacity="0.75" />
                       <path d={path} fill="none" stroke="rgba(2,2,6,0.88)" strokeWidth="0.9" />
                       <path d={`M${-TW/2+0.7},0 L -0.6,${-TH+2}`} fill="none" stroke="rgba(255,255,255,0.34)" strokeWidth="0.9" strokeLinecap="round" />
