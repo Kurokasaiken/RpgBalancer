@@ -89,7 +89,9 @@ const WanderlustRosterCard = memo<WanderlustRosterCardProps>(({
       workerId,
       label,
       portraitUrl,
-      type: 'resident'
+      type: 'resident',
+      // Stats payload consumed by drop targets (e.g. JobPOI) for requirement checks
+      resident: { stats: { hp }, fatigue }
     }
   });
 
@@ -155,7 +157,11 @@ const WanderlustRosterCard = memo<WanderlustRosterCardProps>(({
       inset 0 -1px 0 rgba(0,0,0,0.3)
     `,
     transition: 'transform 300ms ease, box-shadow 300ms ease',
-    opacity: isDragging ? 0.5 : 1,
+    // Alpha states: 0.5 while dragged, 0.35 when unavailable (away/injured/locked)
+    opacity: isDragging ? 0.5 : isUnavailable ? 0.35 : 1,
+    filter: isUnavailable && !isDragging ? 'grayscale(0.9)' : undefined,
+    // While in alpha the card is read-only: no interactions
+    pointerEvents: isDragging || isUnavailable ? 'none' : undefined,
     transform: isHovered ? 'translateY(-2px)' : 'translateY(0)',
     willChange: 'transform',
   };

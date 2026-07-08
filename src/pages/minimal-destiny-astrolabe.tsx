@@ -5,8 +5,8 @@
 
 import React, { useRef, useState } from 'react';
 import { SkinSystemProvider } from '@/ui/idleVillage/hooks/useSkinSystem';
-import { DestinyAstrolabe } from '@/ui/idleVillage/components/destinyAstrolabe/DestinyAstrolabe';
-import type { AstrolabeResult as DestinyAstrolabeResult, AstrolabeSkill as DestinyAstrolabeSkill, DestinyAstrolabeHandle } from '@/ui/idleVillage/components/destinyAstrolabe/DestinyAstrolabe';
+import { DestinyAstrolabe } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeKit';
+import type { AstrolabeResult as DestinyAstrolabeResult, AstrolabeSkill as DestinyAstrolabeSkill, DestinyAstrolabeHandle } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeKit';
 
 const SKILL_PRESETS = {
   single: [{ name: 'Atletica', stat: 65, difficulty: 50 }],

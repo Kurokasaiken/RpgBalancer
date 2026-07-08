@@ -11,8 +11,10 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { WanderlustSurface, type MaterialLayerConfig } from '@/ui/wanderlust-surface';
+import { useDroppable } from '@dnd-kit/core';
+import { WanderlustSurface, InsetPanel, type MaterialLayerConfig } from '@/ui/wanderlust-surface';
 import { type MaterialPreset, MATERIAL_PRESETS } from '@/ui/wanderlust-surface/materialPresets';
+import { ResidentSlotRack } from '@/ui/idleVillage/components/ResidentSlotRack';
 import {
   WanderlustHeading,
   WanderlustField,
@@ -402,10 +404,20 @@ export const V8SkinSandbox: React.FC = () => {
   const [wanderlustInteractive, setWanderlustInteractive] = useState(true);
   const [wanderlustDragging, setWanderlustDragging] = useState(false);
   const [wanderlustPaused, setWanderlustPaused] = useState(false);
+  const [showPoiChrome, setShowPoiChrome] = useState(true);
+
+  // dnd-kit drop zone for the surface
+  const { setNodeRef: setDropRef, isOver } = useDroppable({
+    id: 'skin-sandbox-drop-zone',
+    data: {
+      accepts: ['resident'],
+      kind: 'poi',
+    },
+  });
 
   const [state, setState] = useState<SandboxState>({
-    backgroundMode: 'void',
-    activeTab: 'generic',
+    backgroundMode: 'bg',
+    activeTab: 'surface',
     // V8 MLE default state
     physicalDepth: true,
     heavyFeel: true,
@@ -505,6 +517,16 @@ export const V8SkinSandbox: React.FC = () => {
               }`}
             >
               Generic Tokens
+            </button>
+            <button
+              onClick={() => setShowPoiChrome((value) => !value)}
+              className={`rounded px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors border ${
+                showPoiChrome
+                  ? 'bg-emerald-500/20 text-emerald-200 border-emerald-400/40'
+                  : 'bg-black/30 text-white/60 border-white/10 hover:border-white/30'
+              }`}
+            >
+              {showPoiChrome ? 'Nascondi Copy' : 'Mostra Copy' }
             </button>
           </div>
         </div>
@@ -644,28 +666,85 @@ export const V8SkinSandbox: React.FC = () => {
       {state.activeTab === 'surface' && (
         <div className="flex items-center justify-center">
           <WanderlustSurface
+            ref={setDropRef}
             shape={wanderlustShape}
             material={material}
             interactive={wanderlustInteractive}
             isDragging={wanderlustDragging}
             isPaused={wanderlustPaused}
             materialLayer={materialLayerConfig}
-            style={{ width: wanderlustShape === 'badge' ? 280 : 400, height: wanderlustShape === 'badge' ? 60 : 250 }}
+            style={{
+              width: wanderlustShape === 'badge' ? 280 : 400,
+              height: 320,
+              transition: isOver ? 'transform 0.2s ease, box-shadow 0.2s ease' : 'none',
+              transform: isOver ? 'scale(1.02)' : 'none',
+              boxShadow: isOver ? '0 0 30px rgba(255, 197, 135, 0.4)' : 'none',
+            }}
           >
-            <div className="flex flex-col items-center justify-center gap-2 h-full text-center">
-              <h3 className="text-sm tracking-[0.2em] uppercase text-amber-200">
-                {WANDERLUST_SHAPES.find((s) => s.id === wanderlustShape)?.label ?? wanderlustShape}
-              </h3>
-              <p className="text-xs text-white/50 max-w-[80%]">
-                {WANDERLUST_SHAPES.find((s) => s.id === wanderlustShape)?.description}
-              </p>
-              <div className="flex gap-4 mt-2 text-[10px] uppercase tracking-[0.15em] text-white/40">
-                <span>Shape: {wanderlustShape}</span>
-                <span>Material: {MATERIAL_PRESETS[material].label}</span>
-                <span>Interactive: {wanderlustInteractive ? 'on' : 'off'}</span>
-                {wanderlustDragging && <span className="text-rose-300">Filters OFF</span>}
-                {wanderlustPaused && <span className="text-sky-300">Paused</span>}
-              </div>
+            <div className="flex flex-col items-center justify-center gap-2 text-center relative" style={{ height: '100%' }}>
+              {!showPoiChrome && (
+                <>
+                  <h3 className="text-sm tracking-[0.2em] uppercase text-amber-200">
+                    {WANDERLUST_SHAPES.find((s) => s.id === wanderlustShape)?.label ?? wanderlustShape}
+                  </h3>
+                  <p className="text-xs text-white/50 max-w-[80%]">
+                    {WANDERLUST_SHAPES.find((s) => s.id === wanderlustShape)?.description}
+                  </p>
+                  <div className="flex gap-4 mt-2 text-[10px] uppercase tracking-[0.15em] text-white/40">
+                    <span>Shape: {wanderlustShape}</span>
+                    <span>Material: {MATERIAL_PRESETS[material].label}</span>
+                    <span>Interactive: {wanderlustInteractive ? 'on' : 'off'}</span>
+                    {wanderlustDragging && <span className="text-rose-300">Filters OFF</span>}
+                    {wanderlustPaused && <span className="text-sky-300">Paused</span>}
+                  </div>
+                </>
+              )}
+              {showPoiChrome && (
+                <div className="poi-detail-demo" role="group" aria-label="POI Detail Preview">
+                  <button
+                    type="button"
+                    className="poi-detail-demo__close"
+                    onClick={() => setShowPoiChrome(false)}
+                    aria-label="Chiudi preview"
+                  >
+                    ×
+                  </button>
+                  <div className="poi-detail-demo__content">
+                    <div className="poi-detail-demo__header">
+                      <div className="poi-detail-demo__badge">Quest</div>
+                      <h4 className="poi-detail-demo__title">Dangerous Hunt</h4>
+                    </div>
+                    <div className="poi-detail-demo__body-placeholder">
+                      <div className="poi-detail-demo__line"></div>
+                      <div className="poi-detail-demo__line short"></div>
+                      <div className="poi-detail-demo__line"></div>
+                      <div className="poi-detail-demo__line"></div>
+                    </div>
+                    <div className="poi-detail-demo__stats">
+                      <div className="poi-detail-demo__stat-row">
+                        <span className="poi-detail-demo__stat-label">Danger</span>
+                        <span className="poi-detail-demo__stat-value">High</span>
+                      </div>
+                      <div className="poi-detail-demo__stat-row">
+                        <span className="poi-detail-demo__stat-label">Duration</span>
+                        <span className="poi-detail-demo__stat-value">8s</span>
+                      </div>
+                    </div>
+                    <div className="poi-detail-demo__footer">
+                      <button
+                        type="button"
+                        className="poi-detail-demo__cta"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Button does nothing - just visual
+                        }}
+                      >
+                        Avvia
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </WanderlustSurface>
         </div>
@@ -734,6 +813,26 @@ export const V8SkinSandbox: React.FC = () => {
                   ]}
                   rail
                 />
+
+                <WanderlustDivider />
+
+                <WanderlustSectionHeader tier="tertiary" hint="eredita il materiale dal pannello padre">
+                  InsetPanel · Slot Rack
+                </WanderlustSectionHeader>
+
+                {/* InsetPanel: eredita material dal WanderlustMaterialContext del WanderlustSurface padre */}
+                <InsetPanel>
+                  <ResidentSlotRack
+                    slots={[
+                      { id: 'demo-s1', index: 0, label: 'Slot 1', assignedResidentId: null, isPlaceholder: false, dropState: 'idle' },
+                      { id: 'demo-s2', index: 1, label: 'Slot 2', assignedResidentId: null, isPlaceholder: false, dropState: 'idle' },
+                      { id: 'demo-s3', index: 2, label: 'Slot 3', assignedResidentId: null, isPlaceholder: true,  dropState: 'idle' },
+                    ]}
+                    layout="detail"
+                    overflowBehavior="scroll"
+                    slotSize={96}
+                  />
+                </InsetPanel>
               </div>
             </WanderlustAmbientField>
           </WanderlustSurface>
@@ -741,6 +840,164 @@ export const V8SkinSandbox: React.FC = () => {
       )}
 
       {state.activeTab === 'generic' && <GenericTokensDemo material={material} materialLayer={materialLayerConfig} />}
+
+      {showPoiChrome && (
+        <style>{`
+          /* Raise content above the WanderlustSurface border SVG so text is visible
+             (the SVG carved well has an opaque dark fill at z-index 1) */
+          .ws-content {
+            z-index: 2;
+            padding: 0;
+          }
+
+          .poi-detail-demo {
+            position: relative;
+            padding: 0;
+            background: transparent;
+            text-align: left;
+            color: #f7ead0;
+            font-family: 'EB Garamond', serif;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+          }
+
+          .poi-detail-demo__close {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            border: 1px solid rgba(255,197,135,0.4);
+            background: rgba(0,0,0,0.45);
+            color: #ffc785;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            line-height: 1;
+            cursor: pointer;
+            z-index: 10;
+          }
+
+          .poi-detail-demo__content {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+          }
+
+          .poi-detail-demo__header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            margin-top: 8px;
+          }
+
+          .poi-detail-demo__badge {
+            background: rgba(255,197,135,0.35);
+            border: 1px solid rgba(255,197,135,0.6);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: #ffe7b5;
+            font-weight: 600;
+          }
+
+          .poi-detail-demo__title {
+            margin: 0;
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            letter-spacing: 0.05em;
+            color: #ffe7b5;
+            font-weight: 700;
+          }
+
+          .poi-detail-demo__body-placeholder {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+          }
+
+          .poi-detail-demo__line {
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            width: 100%;
+          }
+
+          .poi-detail-demo__line.short {
+            width: 60%;
+          }
+
+          .poi-detail-demo__stats {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            border: 1px solid rgba(255,197,135,0.15);
+          }
+
+          .poi-detail-demo__stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+
+          .poi-detail-demo__stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: rgba(200,168,105,0.6);
+          }
+
+          .poi-detail-demo__stat-value {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #ffe7b5;
+          }
+
+          .poi-detail-demo__footer {
+            display: flex;
+            justify-content: flex-end;
+          }
+
+          .poi-detail-demo__cta {
+            padding: 8px 20px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,197,135,0.5);
+            background: linear-gradient(120deg, rgba(255,221,150,0.2), rgba(122,76,16,0.4));
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-size: 0.7rem;
+            color: #ffe7b5;
+            cursor: pointer;
+          }
+
+          @media (max-width: 640px) {
+            .poi-detail-demo {
+              inset: 8px;
+              padding: 16px;
+            }
+
+            .poi-detail-demo__footer {
+              flex-direction: column;
+              align-items: flex-start;
+            }
+
+            .poi-detail-demo__cta {
+              margin-left: 0;
+            }
+          }
+        `}</style>
+      )}
     </div>
   );
 };

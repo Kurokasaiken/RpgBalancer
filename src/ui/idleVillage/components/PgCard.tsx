@@ -208,7 +208,9 @@ const PgCard = memo<PgCardProps>(({
       workerId,
       label,
       portraitUrl,
-      type: 'resident'
+      type: 'resident',
+      // Stats payload consumed by drop targets (e.g. JobPOI) for requirement checks
+      resident: { stats: { hp }, fatigue }
     }
   });
 
@@ -396,7 +398,7 @@ const PgCard = memo<PgCardProps>(({
         compatibilityAccentClass,
         isUnavailable ? 'cursor-not-allowed opacity-35 grayscale' : 'cursor-grab active:cursor-grabbing active:scale-95 hover:border-emerald-300/70',
         returningOverlayClass,
-        isDragging ? 'opacity-40' : '',
+        isDragging ? 'opacity-40 pointer-events-none' : '',
         ...classes, // Add skin binding classes
         className ?? '',
       ]
@@ -464,16 +466,24 @@ const PgCard = memo<PgCardProps>(({
               </span>
             </div>
 
-            {compatibilityState !== 'idle' && (
+            {compatibilityState !== 'idle' && compatibilityState !== 'valid' && (
               <div
                 className={[
                   'text-[10px] uppercase tracking-[0.2em]',
-                  compatibilityState === 'valid' ? 'text-emerald-200' : 'text-rose-200',
+                  'text-rose-200',
                 ].join(' ')}
               >
-                {compatibilityState === 'valid'
-                  ? `Compatibile${compatibilityLabel ? ` · ${compatibilityLabel}` : ''}`
-                  : 'Nessuno slot compatibile'}
+                Nessuno slot compatibile
+              </div>
+            )}
+            {compatibilityState === 'valid' && (
+              <div
+                className={[
+                  'text-[10px] uppercase tracking-[0.2em]',
+                  'text-emerald-200',
+                ].join(' ')}
+              >
+                {`Compatibile${compatibilityLabel ? ` · ${compatibilityLabel}` : ''}`}
               </div>
             )}
 

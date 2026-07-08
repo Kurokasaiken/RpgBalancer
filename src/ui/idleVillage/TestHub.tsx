@@ -1,6 +1,12 @@
 /**
  * TestHub - Central navigation page for all Idle Village test pages
+ *
+ * Kit-backed cards are GENERATED from KIT_REGISTRY (`hub` metadata), so hub,
+ * contract sweep and kit surface can never diverge. Pages without a kit yet
+ * live in EXTRA_PAGES and should migrate into the registry over time.
  */
+
+import { KIT_REGISTRY } from './frozen/registry';
 
 interface TestPageLink {
   id: string;
@@ -11,15 +17,17 @@ interface TestPageLink {
   status?: 'ok' | 'needs-refactor';
 }
 
-const TEST_PAGES: TestPageLink[] = [
-  {
-    id: 'slot-isolated',
-    title: 'Slot Isolated',
-    description: 'Test SlotV12Renderer isolato senza animazioni o wrapper',
-    path: '/slot-isolated',
-    icon: '🎯',
-    status: 'ok',
-  },
+const KIT_PAGES: TestPageLink[] = KIT_REGISTRY.filter((entry) => entry.hub).map((entry) => ({
+  id: entry.kitId,
+  title: entry.hub!.title,
+  description: entry.hub!.description,
+  path: entry.hub!.path,
+  icon: entry.hub!.icon,
+  status: entry.status === 'certified' ? 'ok' : 'needs-refactor',
+}));
+
+/** Test pages not (yet) backed by a frozen kit. */
+const EXTRA_PAGES: TestPageLink[] = [
   {
     id: 'slot',
     title: 'Slot',
@@ -29,92 +37,12 @@ const TEST_PAGES: TestPageLink[] = [
     status: 'ok',
   },
   {
-    id: 'roster',
-    title: 'Roster',
-    description: 'Lista eroi con sorting, filtering, drag & drop',
-    path: '/minimal-roster',
-    icon: '📋',
+    id: 'roster-slot-integration',
+    title: 'Roster + Slot Rack',
+    description: 'Integrazione Roster con SlotRack, drag & drop e assegnazione',
+    path: '/minimal-roster-slot-integration',
+    icon: '🎯',
     status: 'ok',
-  },
-  {
-    id: 'slotrack',
-    title: 'SlotRack',
-    description: 'Slot assegnazione residenti alle attivita',
-    path: '/minimal-slotRack',
-    icon: '🎰',
-    status: 'ok',
-  },
-  {
-    id: 'clock',
-    title: 'Clock',
-    description: 'Orologio giorno/notte con ciclo temporale',
-    path: '/minimal-clock',
-    icon: '🕐',
-    status: 'ok',
-  },
-  {
-    id: 'poi',
-    title: 'POI Ecosystem',
-    description: 'Day/Night cycle + Activity Capsules (Job, Quest, Exploration)',
-    path: '/minimal-poi',
-    icon: '🗺️',
-    status: 'ok',
-  },
-  {
-    id: 'resourcehud',
-    title: 'Resource HUD',
-    description: 'Pannello risorse villaggio (gold, wood, food, iron)',
-    path: '/minimal-resourcehud',
-    icon: '📊',
-    status: 'needs-refactor',
-  },
-  {
-    id: 'questcard',
-    title: 'QuestCard',
-    description: 'Card quest con risk stripes, offer countdown, halo',
-    path: '/minimal-questcard',
-    icon: '🗡️',
-    status: 'needs-refactor',
-  },
-  {
-    id: 'destiny-astrolabe',
-    title: 'Destiny Astrolabe',
-    description: 'D100 skill check con fisica della palla, verdetti cinematici, reusable component',
-    path: '/minimal-destiny-astrolabe',
-    icon: '✨',
-    status: 'ok',
-  },
-  {
-    id: 'outcome',
-    title: 'Outcome Modal',
-    description: 'Modale risultato dopo skill check',
-    path: '/minimal-outcome',
-    icon: '🏆',
-    status: 'needs-refactor',
-  },
-  {
-    id: 'market',
-    title: 'Market',
-    description: 'Card mercato per trading/acquisti',
-    path: '/minimal-market',
-    icon: '🏪',
-    status: 'needs-refactor',
-  },
-  {
-    id: 'integration-quest-flow',
-    title: 'Quest Flow Integration',
-    description: 'Flusso completo: QuestCard -> SkillCheck -> Outcome',
-    path: '/minimal-integration-quest-flow',
-    icon: '🔗',
-    status: 'needs-refactor',
-  },
-  {
-    id: 'integration-drag-job',
-    title: 'Drag Job Integration',
-    description: 'Integrazione drag & drop assegnazione job',
-    path: '/minimal-integration-drag-job',
-    icon: '🔗',
-    status: 'needs-refactor',
   },
   {
     id: 'job-poi-roster',
@@ -133,7 +61,7 @@ const TEST_PAGES: TestPageLink[] = [
     status: 'ok',
   },
   {
-    id: 'quest-detail',
+    id: 'quest-detail-legacy',
     title: 'Quest Chronicle',
     description: 'Dettaglio quest con fasi, progress bar, esito finale',
     path: '/minimal-quest-detail',
@@ -149,6 +77,14 @@ const TEST_PAGES: TestPageLink[] = [
     status: 'ok',
   },
   {
+    id: 'v9-skin-sandbox',
+    title: 'V9 Skin Sandbox',
+    description: 'Wilderness & Oily Prismatic Bronze — Pietra Alpina base, Azure ambient, iridescenza oil-slick',
+    path: '/v9-skin-sandbox',
+    icon: '🏔️',
+    status: 'ok',
+  },
+  {
     id: 'poi-detail',
     title: 'POI Detail',
     description: 'POI Detail con ActivityCapsuleDetailSkinAware, config-first e telemetry',
@@ -156,6 +92,12 @@ const TEST_PAGES: TestPageLink[] = [
     icon: '🗺️',
     status: 'ok',
   },
+];
+
+const TEST_PAGES: TestPageLink[] = [
+  ...KIT_PAGES,
+  // Skip extras whose route is already covered by a kit card.
+  ...EXTRA_PAGES.filter((extra) => !KIT_PAGES.some((kit) => kit.path === extra.path)),
 ];
 
 export const TestHub: React.FC = () => {

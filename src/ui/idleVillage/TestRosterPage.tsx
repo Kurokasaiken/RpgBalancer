@@ -44,8 +44,7 @@ import { SandboxTimingProvider } from '@/ui/idleVillage/hooks/useSandboxTimingBr
 import { useSandboxTiming } from '@/ui/idleVillage/hooks/useSandboxTiming';
 import type { ResidentAssignmentCandidate, ResidentPickerSlotMeta } from '@/ui/idleVillage/components/InlineResidentChips';
 import CertifiedWorkerPickerSheet from '@/ui/idleVillage/testHarness/components/CertifiedWorkerPickerSheet';
-import { ClockWidget } from '@/ui/idleVillage/components/minimal/ClockWidget';
-import { TimeEngineStrip } from '@/ui/idleVillage/components/minimal/TimeEngineStrip';
+import { ClockWidget, TimeEngineStrip } from '@/ui/idleVillage/frozen/kits/clockKit';
 import { themePresetMap, themePresets, type ThemePresetId } from '@/data/themePresets';
 import { exposeRendererStackData } from '@/ui/idleVillage/utils/rendererStackInstrumentation';
 import type { StyleLabPillar } from '@/ui/styleLab/config/demoConfig';

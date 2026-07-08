@@ -82,7 +82,7 @@ export default defineConfig(({ mode }) => ({
     {
       name: 'exclude-problematic-files',
       resolveId(id) {
-        if (id.includes('QuestDecisionFeed')) {
+        if (id.includes('QuestDecisionFeed') || id.includes('minimal-market')) {
           return 'virtual:empty-module';
         }
         return null;

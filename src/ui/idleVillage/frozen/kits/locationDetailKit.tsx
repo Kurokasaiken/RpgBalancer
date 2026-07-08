@@ -9,9 +9,8 @@
  */
 
 import React, { useState } from 'react';
-import type { JSX, ReactNode } from 'react';
-import { SkinSystemProvider } from '@/ui/idleVillage/hooks/useSkinSystem';
-import { SandboxTimingProvider } from '@/ui/idleVillage/hooks/useSandboxTimingBridge';
+import type { JSX } from 'react';
+import { createKitShell } from '../_infra/KitShell';
 import { DEFAULT_MINIMAL_CONFIG } from '@/ui/idleVillage/frozen/_infra/CanonicalDataBridge';
 import { trackTelemetryEvent } from '@/analytics/telemetryStub';
 
@@ -245,14 +244,11 @@ export function LocationDetail({ location, onExplore, onClose }: {
   );
 }
 
-/** Shell provider for locationDetailKit. */
-export function LocationDetailKitShell({ children }: { children: ReactNode }): JSX.Element {
-  return (
-    <SkinSystemProvider>
-      <SandboxTimingProvider>{children}</SandboxTimingProvider>
-    </SkinSystemProvider>
-  );
-}
+/** Shell provider for locationDetailKit. Smart: mounts only the providers missing above. */
+export const LocationDetailKitShell = createKitShell(
+  ['SkinSystemProvider', 'SandboxTimingProvider'],
+  'LocationDetailKitShell'
+);
 
 /** Isolated showcase component for /minimal-location-detail. */
 export function LocationDetailIsolated(): JSX.Element {

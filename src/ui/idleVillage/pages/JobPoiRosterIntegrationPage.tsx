@@ -23,7 +23,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { DndContext } from '@dnd-kit/core';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { VillageRosterSection } from '@/ui/idleVillage/roster';
-import { GenericPoiSkin } from '@/ui/idleVillage/components/minimal/GenericPoiSkin';
+import { GenericPoiSkin } from '@/ui/idleVillage/frozen/kits/poiKit';
 import { ActivityCapsuleDetailSkinAware } from '@/ui/idleVillage/skins/activityCapsuleDetail/ActivityCapsuleDetailSkinAware';
 import type { ActivityDetailSlotData, TelemetryEntry } from '@/ui/idleVillage/skins/activityCapsuleDetail/ActivityCapsuleDetailSkinAware';
 import { DragProvider } from '@/ui/idleVillage/components/DragContext';

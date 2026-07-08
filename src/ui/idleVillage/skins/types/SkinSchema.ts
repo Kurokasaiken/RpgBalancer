@@ -45,7 +45,9 @@ export type CertifiedComponentId =
   | 'SlottedMedal'
   | 'VillageRosterSection'
   | 'POI'
-  | 'ActivitySlot';
+  | 'ActivitySlot'
+  | 'OutcomeModal'
+  | 'MarketActionCard';
 
 // ============================================================================
 // SKIN PRESET CONFIGURATION

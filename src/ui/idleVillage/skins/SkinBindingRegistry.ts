@@ -8,15 +8,13 @@
 
 import type { StyleLabPillar } from '@/ui/styleLab/config/demoConfig';
 import type { SkinPresetId } from '@/ui/idleVillage/skins/skinConfigRegistry';
+import type { CertifiedComponentId } from './types/SkinSchema';
+
+// Re-export for convenience
+export type { CertifiedComponentId } from './types/SkinSchema';
 
 // Define types locally to avoid import issues
 type MotionLevel = 'minimal' | 'reduced' | 'full';
-
-/**
- * Certified component identifiers
- */
-// This type is now exported from SkinSchema.ts to avoid duplication
-export type { CertifiedComponentId } from './types/SkinSchema';
 
 /**
  * Skin binding configuration for a component
@@ -192,6 +190,36 @@ export const CERTIFIED_COMPONENT_BINDINGS: Record<CertifiedComponentId, Componen
       slotType: 'activity',
       dropZone: true,
       progressDisplay: true,
+    },
+  },
+
+  OutcomeModal: {
+    componentId: 'OutcomeModal',
+    defaultPreset: 'minimal-frontier',
+    supportedPillars: ['frontier', 'wilderness', 'empire'],
+    cssClassBase: 'outcomemodal-skin',
+    dataAttributePrefix: 'outcomemodal',
+    supportsMotionLevel: true,
+    supportsTelemetry: true,
+    skinProperties: {
+      modalStyle: 'minimal',
+      rewardDisplay: true,
+      consequenceDisplay: true,
+    },
+  },
+
+  MarketActionCard: {
+    componentId: 'MarketActionCard',
+    defaultPreset: 'minimal-frontier',
+    supportedPillars: ['frontier', 'wilderness', 'empire'],
+    cssClassBase: 'marketcard-skin',
+    dataAttributePrefix: 'marketcard',
+    supportsMotionLevel: true,
+    supportsTelemetry: true,
+    skinProperties: {
+      cardStyle: 'minimal',
+      purchaseInteraction: true,
+      stockDisplay: true,
     },
   },
 };

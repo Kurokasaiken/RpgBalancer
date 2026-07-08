@@ -11,7 +11,7 @@
  */
 
 import { test, expect, type Page } from '@playwright/test';
-import { KIT_REGISTRY } from '@/ui/idleVillage/frozen/registry';
+import { getContractEnforcedKits } from '@/ui/idleVillage/frozen/registry';
 import {
   normalizeDomString,
   compareContractHtml,
@@ -68,7 +68,7 @@ async function readNormalizedSubtree(
   );
 }
 
-for (const entry of KIT_REGISTRY) {
+for (const entry of getContractEnforcedKits()) {
   test.describe(`contract: ${entry.kitId}`, () => {
     test(`reference ${entry.contract.referenceRoute} and minimal ${entry.contract.minimalRoute} render an identical subtree`, async ({
       page,

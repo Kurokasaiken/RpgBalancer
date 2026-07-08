@@ -5,11 +5,28 @@
  * may be revised). Contract subtree: `[data-testid="minimal-clock-widget"]`.
  */
 
-import { useMemo } from 'react';
+import { useMemo, type ComponentProps } from 'react';
 import { DEFAULT_MINIMAL_CONFIG } from '../_infra/CanonicalDataBridge';
+import { createKitShell, withKitShell, type KitProviderName } from '../_infra/KitShell';
+import { ClockWidget } from '@/ui/idleVillage/components/minimal/ClockWidget';
+import { TimeEngineStrip } from '@/ui/idleVillage/components/minimal/TimeEngineStrip';
 
 export { ClockWidget } from '@/ui/idleVillage/components/minimal/ClockWidget';
+export { TimeEngineStrip } from '@/ui/idleVillage/components/minimal/TimeEngineStrip';
 export type { ClockWidgetProps } from '@/ui/idleVillage/components/minimal/ClockWidget';
+
+/** Chain mirrors src/pages/minimal-clock.tsx: SkinSystemProvider → SandboxTimingProvider. */
+export const CLOCK_PROVIDER_CHAIN: KitProviderName[] = ['SkinSystemProvider', 'SandboxTimingProvider'];
+
+/** Smart shell: mounts only the providers missing above in the tree. */
+export const ClockKitShell = createKitShell(CLOCK_PROVIDER_CHAIN, 'ClockKitShell');
+
+/** Drop-in variant: the canonical ClockWidget pre-wrapped in its smart shell. */
+export const ClockWidgetStandalone = withKitShell<ComponentProps<typeof ClockWidget>>(
+  ClockWidget,
+  CLOCK_PROVIDER_CHAIN,
+  'ClockWidgetStandalone'
+);
 
 /**
  * Canonical defaults for ClockWidget derived from `DEFAULT_MINIMAL_CONFIG`.

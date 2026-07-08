@@ -24,8 +24,8 @@ import {
   selectResidentRosterStates,
 } from '@/store/useMinimalGameplay';
 import { VillageRosterSection } from '@/ui/idleVillage/roster';
-import { TimeEngineStrip } from '@/ui/idleVillage/components/minimal/TimeEngineStrip';
-import DayNightPoiSkin from '@/ui/idleVillage/components/minimal/DayNightPoiSkin';
+import { TimeEngineStrip } from '@/ui/idleVillage/frozen/kits/clockKit';
+import { DayNightPoiSkin } from '@/ui/idleVillage/frozen/kits/poiKit';
 import { DragProvider } from '@/ui/idleVillage/components/DragContext';
 import { TooltipProvider } from '@/ui/idleVillage/components/TooltipProvider';
 import { SkinSystemProvider } from '@/ui/idleVillage/hooks/useSkinSystem';

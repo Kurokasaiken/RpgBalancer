@@ -16,21 +16,20 @@
  * src/docs/docs/plans/component_freezing_certification_plan_v2.md).
  */
 
-import type { ReactNode, ReactElement } from 'react';
-import { useState } from 'react';
 import {
   DndContext,
   PointerSensor,
   TouchSensor,
   useSensor,
   useSensors,
+  useDndMonitor,
   pointerWithin,
   type DragStartEvent,
   type DragEndEvent,
-  type DragMoveEvent,
 } from '@dnd-kit/core';
 import { useCanonicalRosterBundle } from '../_infra/CanonicalDataBridge';
 import type { CanonicalRosterBundle } from '../_infra/CanonicalDataBridge';
+import { createKitShell, FULL_PROVIDER_CHAIN } from '../_infra/KitShell';
 import { DragProvider } from '@/ui/idleVillage/components/DragContext';
 import { CustomDragOverlay } from '@/ui/idleVillage/components/CustomDragOverlay';
 import { SandboxTimingProvider } from '@/ui/idleVillage/hooks/useSandboxTimingBridge';
@@ -38,6 +37,21 @@ import { SkinSystemProvider } from '@/ui/idleVillage/hooks/useSkinSystem';
 import { VillageRosterSection } from '@/ui/idleVillage/roster';
 import type { VillageRosterSectionProps } from '@/ui/idleVillage/components/VillageRosterSection';
 import { DEFAULT_ROSTER_SORT_MODE, type RosterSortMode } from '@/ui/idleVillage/config/rosterSortConfig';
+import { useDragOutcome, elementCenter } from '@/ui/idleVillage/interaction/useDragOutcome';
+import { DragOutcomeFlight } from '@/ui/idleVillage/interaction/DragOutcomeFlight';
+import { useState } from 'react';
+
+/**
+ * Result of the consumer's onDragEnd:
+ * - `false` → invalid drop, spring-back to the roster card
+ * - `{ flightToSlot }` → valid drop: the kit flies the token into the slot
+ *   (from the actual release point) and then calls `onFlightComplete`
+ * - `true`/`void` → nothing special, reset to idle
+ */
+export type RosterDropVerdict =
+  | void
+  | boolean
+  | { flightToSlot: { slotId: string; element: Element | null } };
 
 // Canonical component — re-exported, not re-implemented.
 export { VillageRosterSection } from '@/ui/idleVillage/roster';
@@ -59,17 +73,23 @@ export function useRosterKitData(defaultFatigue: number = 0): CanonicalRosterBun
  *
  * Using this shell guarantees provider parity between `/test` and
  * `/minimal-roster`, which is a prerequisite for the contract test.
+ * Smart: mounts only the providers missing above in the tree.
  */
-export function RosterKitShell({ children }: { children: ReactNode }): ReactElement {
-  return (
-    <SkinSystemProvider>
-      <SandboxTimingProvider>
-        <DragProvider>
-          <DndContext>{children}</DndContext>
-        </DragProvider>
-      </SandboxTimingProvider>
-    </SkinSystemProvider>
-  );
+export const RosterKitShell = createKitShell(FULL_PROVIDER_CHAIN, 'RosterKitShell');
+
+/**
+ * Subscribes to drag events of the nearest DndContext (internal or external)
+ * and forwards them to the kit's handlers. Must be rendered INSIDE a DndContext.
+ */
+function RosterDragMonitor({
+  onDragStart,
+  onDragEnd,
+}: {
+  onDragStart: (event: DragStartEvent) => void;
+  onDragEnd: (event: DragEndEvent) => void;
+}) {
+  useDndMonitor({ onDragStart, onDragEnd });
+  return null;
 }
 
 /**
@@ -85,6 +105,7 @@ export function RosterDraggable({
   pillar = 'frontier',
   useWanderlustSkin = false,
   onDragEnd: externalOnDragEnd,
+  onFlightComplete,
   useExternalDndContext = false,
   ...props
 }: Omit<VillageRosterSectionProps, 'residents' | 'sortMode' | 'onSortModeChange'> & {
@@ -92,17 +113,16 @@ export function RosterDraggable({
   componentId?: string;
   pillar?: string;
   useWanderlustSkin?: boolean;
-  onDragEnd?: (event: DragEndEvent) => void;
+  onDragEnd?: (event: DragEndEvent) => RosterDropVerdict;
+  /** Called when a `flightToSlot` verdict finishes landing: apply the assignment here. */
+  onFlightComplete?: (residentId: string, slotId?: string) => void;
   useExternalDndContext?: boolean; // If true, don't create internal DndContext
 }) {
   const { residents, residentsById } = useRosterKitData(defaultFatigue);
   const [sortMode, setSortMode] = useState<RosterSortMode>(DEFAULT_ROSTER_SORT_MODE);
 
-  // Drag visual state
-  const [dragVisualState, setDragVisualState] = useState<{
-    mode: 'idle' | 'dragging' | 'flight' | 'returning';
-    residentId?: string;
-  }>({ mode: 'idle' });
+  // Shared drag-outcome state machine (idle → dragging → flight|returning → idle)
+  const { state: dragVisualState, startDrag, startFlight, springBack, settle } = useDragOutcome();
 
   // Sensors configuration
   const sensors = useSensors(
@@ -120,33 +140,51 @@ export function RosterDraggable({
   );
 
   const handleDragStart = (event: DragStartEvent) => {
-    const residentId = event.active.id as string;
-    setDragVisualState({ mode: 'dragging', residentId });
-  };
-
-  const handleDragMove = (_event: DragMoveEvent) => {
-    // Placeholder for drag move logic
+    startDrag(event.active.id as string);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
-    // Call external handler if provided
-    externalOnDragEnd?.(event);
-    
-    // Only reset to idle if the drop was valid (has 'over')
-    // If no 'over', set to 'returning' for spring-back animation
-    if (!event.over) {
-      setDragVisualState({ mode: 'returning' });
-      // Reset to idle after spring-back animation completes
-      setTimeout(() => {
-        setDragVisualState({ mode: 'idle' });
-      }, 300);
-    } else {
-      setDragVisualState({ mode: 'idle' });
+    // Call external handler if provided; see RosterDropVerdict for the protocol
+    const verdict = externalOnDragEnd?.(event);
+    const residentId = event.active.id as string;
+
+    // Spring-back when dropped outside any target OR the target rejected the drop
+    // (the hook auto-resets to idle after the bounce-spring completes)
+    if (!event.over || verdict === false) {
+      springBack(residentId);
+      return;
     }
+
+    // Valid drop with a slot destination: magnetic flight from the release
+    // point into the slot, then onFlightComplete applies the assignment.
+    if (verdict && typeof verdict === 'object' && 'flightToSlot' in verdict) {
+      const { slotId, element } = verdict.flightToSlot;
+      const target = elementCenter(element);
+      if (target) {
+        startFlight({ residentId, slotId, isInset: true, toX: target.x, toY: target.y });
+      } else {
+        // Slot not rendered (e.g. lives in a closed POI detail): no animation,
+        // apply the assignment immediately.
+        settle();
+        onFlightComplete?.(residentId, slotId);
+      }
+      return;
+    }
+
+    settle();
+  };
+
+  const handleFlightComplete = (residentId: string, slotId?: string) => {
+    settle();
+    onFlightComplete?.(residentId, slotId);
   };
 
   const rosterContent = (
     <>
+      {/* Bridges drag events from whichever DndContext is above (internal or
+          external) into the kit's visual state — required so the drag overlay
+          and spring-back animation also work with useExternalDndContext. */}
+      <RosterDragMonitor onDragStart={handleDragStart} onDragEnd={handleDragEnd} />
       <VillageRosterSection
         residents={residents}
         sortMode={sortMode}
@@ -164,6 +202,12 @@ export function RosterDraggable({
         usePgCardPreview={true}
         dragVisualState={dragVisualState}
       />
+      {/* Magnetic flight into the slot on a flightToSlot verdict */}
+      <DragOutcomeFlight
+        state={dragVisualState}
+        residentsById={residentsById}
+        onComplete={handleFlightComplete}
+      />
     </>
   );
 
@@ -177,13 +221,8 @@ export function RosterDraggable({
     <SkinSystemProvider>
       <SandboxTimingProvider>
         <DragProvider>
-          <DndContext
-            sensors={sensors}
-            collisionDetection={pointerWithin}
-            onDragStart={handleDragStart}
-            onDragMove={handleDragMove}
-            onDragEnd={handleDragEnd}
-          >
+          {/* Drag events are handled via RosterDragMonitor inside rosterContent */}
+          <DndContext sensors={sensors} collisionDetection={pointerWithin}>
             {rosterContent}
           </DndContext>
         </DragProvider>

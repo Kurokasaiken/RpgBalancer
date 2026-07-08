@@ -4,6 +4,9 @@ import { WanderlustMedalOverlay } from './WanderlustMedalOverlay';
 import { getDragConfig } from '../config/dragConfig';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 
+/** Flight duration — long enough for the slow-in/fast-out magnetic feel to read. */
+const FLIGHT_DURATION_MS = 280;
+
 interface FlightProxyProps {
   residentId: string;
   fromX: number;
@@ -55,7 +58,7 @@ export function FlightProxy({
         from: { x: Math.round(fromX), y: Math.round(fromY) },
         to: { x: Math.round(toX), y: Math.round(toY) },
         distance: Math.round(Math.hypot(toX - fromX, toY - fromY)),
-        duration: '160ms'
+        duration: `${FLIGHT_DURATION_MS}ms`
       });
       console.log('Is animating:', isAnimating);
       
@@ -85,7 +88,7 @@ export function FlightProxy({
 
   useEffect(() => {
     console.log('=== FLIGHT PROXY USE EFFECT RUNNING ===');
-    console.log('Will hide animation in 160ms');
+    console.log(`Will hide animation in ${FLIGHT_DURATION_MS}ms`);
     
     // Hide animation after duration and call onComplete
     const timer = setTimeout(() => {
@@ -93,7 +96,7 @@ export function FlightProxy({
       setIsAnimating(false);
       // Call onComplete to notify parent that flight animation is done
       onCompleteRef.current(residentIdRef.current, slotIdRef.current, isInsetRef.current);
-    }, 160); // Fixed duration for flight
+    }, FLIGHT_DURATION_MS); // Fixed duration for flight
 
     return () => {
       console.log('=== FLIGHT PROXY CLEANUP (unmount) ===');
@@ -126,8 +129,9 @@ export function FlightProxy({
             opacity: 1,
           }}
           transition={{
-            duration: 0.16,
-            ease: [0.4, 0, 0.2, 1], // Smooth ease-out
+            duration: FLIGHT_DURATION_MS / 1000,
+            // Magnetic feel: starts slow, then accelerates into the slot
+            ease: [0.55, 0.06, 0.85, 0.4],
           }}
         >
           <WanderlustMedalOverlay

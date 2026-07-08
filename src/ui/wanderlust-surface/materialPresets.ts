@@ -12,7 +12,7 @@
      <WanderlustSurface material="silver" … />
    ═══════════════════════════════════════════════════════════════════ */
 
-export type MaterialPreset = 'bronze' | 'silver' | 'obsidian' | 'jade';
+export type MaterialPreset = 'bronze' | 'silver' | 'obsidian' | 'jade' | 'parchment';
 
 /** A single stop inside a linear or radial gradient. */
 interface GradientStop {

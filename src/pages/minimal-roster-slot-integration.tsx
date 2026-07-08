@@ -1,167 +1,216 @@
 /**
- * MinimalRosterSlotIntegrationPage — Fase 6: Roster + SlotRack Integration
+ * MinimalRosterSlotIntegrationPage — L2: Roster + SlotRack
  *
- * Pagina di integrazione che mostra il roster e gli slot rack insieme
- * per verificare il funzionamento completo del drag & drop.
+ * Config-first: gli slot del rack (quanti, con quali requisiti, slot infiniti)
+ * vengono dall'activity `slot_rack_lab` in DEFAULT_IDLE_VILLAGE_CONFIG
+ * (stesso meccanismo di /test: useResidentSlotController + maxSlots 'infinite'
+ * — assegnato l'ultimo slot libero, ne appare automaticamente uno nuovo).
  *
- * Questa pagina monta TestRosterPage che contiene già l'integrazione completa
- * tra VillageRosterSection e ResidentSlotRack con validazione drag & drop.
+ * La pagina contiene solo DECISIONI (quale slot accetta quale pg); ogni
+ * comportamento (volo magnetico, spring-back, estrazione, bloom, stato Away)
+ * è ereditato dai kit certificati e dagli hook di interazione condivisi.
  *
- * Documentazione:
- * - src/docs/docs/idle_village/roster_slot_integration_spec.md
- * - src/docs/docs/idle_village/roster_slot_interaction_documentation.md
- *
- * Test Suite:
- * - tests/integration/roster-slotRack.spec.ts (18 tests)
+ * Spec: src/docs/docs/idle_village/interaction_core_spec.md
  */
+import { useCallback, useMemo, useState } from 'react';
+import {
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  pointerWithin,
+  type DragEndEvent,
+  type DragStartEvent,
+} from '@dnd-kit/core';
+import { TooltipProvider } from '@radix-ui/react-tooltip';
+import { RosterDraggable, RosterKitShell, useRosterKitData, type RosterDropVerdict } from '@/ui/idleVillage/frozen/kits/rosterKit';
+import { ResidentSlotRack } from '@/ui/idleVillage/frozen/kits/slotRackKit';
+import { WanderlustSurface } from '@/ui/wanderlust-surface/WanderlustSurface';
+import { useDragOutcome, elementCenter } from '@/ui/idleVillage/interaction/useDragOutcome';
+import { DragOutcomeFlight } from '@/ui/idleVillage/interaction/DragOutcomeFlight';
+import { useResidentSlotController } from '@/ui/idleVillage/slots/useResidentSlotController';
+import type { ResidentSlotBlueprint } from '@/ui/idleVillage/slots/types';
+import { DEFAULT_IDLE_VILLAGE_CONFIG } from '@/balancing/config/idleVillage/defaultConfig';
+import { evaluateStatRequirement } from '@/engine/game/idleVillage/statMatching';
 
-import React from 'react';
-import TestRosterPage from '@/ui/idleVillage/TestRosterPage';
+// Config-driven: the rack is entirely described by this activity definition
+const RACK_ACTIVITY = DEFAULT_IDLE_VILLAGE_CONFIG.activities.slot_rack_lab;
+const RACK_BLUEPRINTS = ((RACK_ACTIVITY.metadata as { slotBlueprints?: ResidentSlotBlueprint[] } | undefined)?.slotBlueprints ?? []);
+const SLOT_SIZE_PX = 140;
 
-/**
- * MinimalRosterSlotIntegrationPage
- *
- * Layout:
- * ┌────────────────────────────────────────┐
- * │ Title: Fase 6 - Roster + SlotRack      │
- * ├────────────────────────────────────────┤
- * │ Description & Spec Box                 │
- * ├────────────────────────────────────────┤
- * │ [TestRosterPage montato qui]           │
- * │ - Roster a sinistra                    │
- * │ - Slot Rack A (open)                   │
- * │ - Slot Rack B (restricted, HP≥200)    │
- * └────────────────────────────────────────┘
- */
-export default function MinimalRosterSlotIntegrationPage(): React.ReactNode {
+
+export default function MinimalRosterSlotIntegrationPage() {
+  const [draggingResidentId, setDraggingResidentId] = useState<string | null>(null);
+  const [assignments, setAssignments] = useState<Record<string, string | null>>({});
+  // Resident currently flying (click-assign or extraction return): locked meanwhile
+  const [flyingResidentId, setFlyingResidentId] = useState<string | null>(null);
+
+  const { residentsById } = useRosterKitData();
+  const { state: pageFlight, startFlight, settle: settleFlight } = useDragOutcome();
+
+  const assignedIds = useMemo(
+    () => Object.values(assignments).filter(Boolean) as string[],
+    [assignments]
+  );
+
+  // Canonical slot derivation: blueprints + assignments + infinite placeholders
+  const controller = useResidentSlotController({
+    activity: RACK_ACTIVITY,
+    assignments,
+    residents: residentsById,
+    hoveredResidentId: draggingResidentId,
+    slotBlueprints: RACK_BLUEPRINTS,
+    onAssign: (slotId, residentId) => setAssignments((a) => ({ ...a, [slotId]: residentId })),
+    onClear: (slotId) => setAssignments((a) => ({ ...a, [slotId]: null })),
+  });
+
+  /** First free slot that accepts the resident (config requirement check). */
+  const findAcceptingSlot = useCallback((residentId: string) => {
+    const resident = residentsById[residentId];
+    if (!resident || assignedIds.includes(residentId)) return null;
+    return controller.slots.find((slot) =>
+      !slot.assignedResidentId &&
+      evaluateStatRequirement(resident, slot.requirement).matches
+    ) ?? null;
+  }, [controller.slots, residentsById, assignedIds]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+  );
+
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    setDraggingResidentId(event.active.id as string);
+  }, []);
+
+  // Drop verdict: false → spring-back; flightToSlot → the kit flies the token
+  // into that slot; assignment happens on landing (onFlightComplete).
+  const handleDragEnd = useCallback((event: DragEndEvent): RosterDropVerdict => {
+    setDraggingResidentId(null);
+    const residentId = event.active.id as string;
+    const overId = event.over?.id as string | undefined;
+    if (!overId) return;
+
+    const slot = controller.slots.find((s) => s.id === overId);
+    if (!slot) return;
+    const resident = residentsById[residentId];
+    const accepted = Boolean(
+      resident &&
+      !slot.assignedResidentId &&
+      !assignedIds.includes(residentId) &&
+      evaluateStatRequirement(resident, slot.requirement).matches
+    );
+    if (!accepted) return false; // requirement failed or occupied → spring-back
+
+    return {
+      flightToSlot: {
+        slotId: slot.id,
+        element: document.querySelector(`[data-slot-id="${slot.id}"]`),
+      },
+    };
+  }, [controller.slots, residentsById, assignedIds]);
+
+  const handleFlightComplete = useCallback((residentId: string, slotId?: string) => {
+    if (slotId) setAssignments((a) => ({ ...a, [slotId]: residentId }));
+  }, []);
+
+  // Click-to-assign: first free compatible slot, magnetic flight, seat on landing
+  const handleResidentSelect = useCallback((residentId: string) => {
+    if (flyingResidentId) return;
+    const slot = findAcceptingSlot(residentId);
+    if (!slot) return;
+    const from = elementCenter(document.querySelector(`[data-resident-id="${residentId}"]`));
+    const to = elementCenter(document.querySelector(`[data-slot-id="${slot.id}"]`));
+    if (!from || !to) return;
+    setFlyingResidentId(residentId);
+    startFlight({ residentId, slotId: slot.id, isInset: true, fromX: from.x, fromY: from.y, toX: to.x, toY: to.y });
+  }, [flyingResidentId, findAcceptingSlot, startFlight]);
+
+  // Press-and-hold extraction: rack plays the shared sequence, then the token
+  // flies back to the roster card; the pg stays locked until it lands.
+  const handleSlotClear = useCallback((slotId: string) => {
+    const residentId = assignments[slotId];
+    setAssignments((a) => ({ ...a, [slotId]: null }));
+    if (!residentId) return;
+    const from = elementCenter(document.querySelector(`[data-slot-id="${slotId}"]`));
+    const to = elementCenter(document.querySelector(`[data-resident-id="${residentId}"]`));
+    if (from && to) {
+      setFlyingResidentId(residentId);
+      startFlight({ residentId, slotId, isInset: false, fromX: from.x, fromY: from.y, toX: to.x, toY: to.y });
+    }
+  }, [assignments, startFlight]);
+
+  const handlePageFlightComplete = useCallback((residentId: string, slotId?: string, isInset?: boolean) => {
+    if (isInset && slotId) setAssignments((a) => ({ ...a, [slotId]: residentId }));
+    setFlyingResidentId(null);
+    settleFlight();
+  }, [settleFlight]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            Fase 6: Roster + SlotRack Integration
-          </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400">
-            Test completo drag & drop dal roster agli slot con validazione
-          </p>
-        </div>
+    <TooltipProvider>
+      <RosterKitShell>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={pointerWithin}
+          onDragStart={handleDragStart}
+          onDragCancel={() => setDraggingResidentId(null)}
+        >
+          <div data-testid="minimal-roster-slot-integration-page" className="min-h-screen bg-slate-950 p-8 text-ivory">
+            <div className="mx-auto max-w-6xl space-y-8">
+              <header>
+                <p className="text-[10px] uppercase tracking-[0.45em] text-amber-200/70">Minimal Slice · Roster + SlotRack</p>
+                <h1 className="text-2xl font-semibold tracking-[0.2em] text-amber-100">ROSTER + SLOTRACK INTEGRATION</h1>
+                <p className="mt-1 text-sm text-slate-400">Slot config-driven (activity slot_rack_lab) · drag, click-to-assign, estrazione, slot infiniti</p>
+                <p className="mt-2 text-xs text-slate-500">Route: /minimal-roster-slot-integration</p>
+              </header>
 
-        {/* Description Box */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-            📋 Integration Spec
-          </h2>
-          <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-            <li>
-              <strong>Componenti:</strong> VillageRosterSection + ResidentSlotRack
-            </li>
-            <li>
-              <strong>Drag & Drop:</strong> @dnd-kit con pointerWithin collision detection
-            </li>
-            <li>
-              <strong>Scenari:</strong> 2 rack (open, restricted con HP≥200)
-            </li>
-            <li>
-              <strong>Validazione:</strong> Custom validator + useResidentDropValidation
-            </li>
-            <li>
-              <strong>Guard System:</strong> 6 livelli di protezione contro ghost clicks
-            </li>
-            <li>
-              <strong>Documentazione:</strong> roster_slot_integration_spec.md
-            </li>
-          </ul>
-        </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Left: certified roster kit */}
+                <div className="bg-slate-900/30 border border-slate-700/50 rounded-lg p-6">
+                  <h2 className="text-sm font-semibold text-amber-200 uppercase tracking-wider mb-4">Village Roster</h2>
+                  <RosterDraggable
+                    componentId="roster-slot-rack"
+                    useWanderlustSkin={true}
+                    useExternalDndContext={true}
+                    onDragEnd={handleDragEnd}
+                    onFlightComplete={handleFlightComplete}
+                    onResidentSelect={handleResidentSelect}
+                    lockedResidentIds={[...assignedIds, ...(flyingResidentId ? [flyingResidentId] : [])]}
+                    lockedStatusLabel="Away"
+                  />
+                </div>
 
-        {/* TestRosterPage Mounted Here */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-            🎮 TestRosterPage (Integration Harness)
-          </h3>
-          <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            <p>Questa pagina monta TestRosterPage che contiene:</p>
-            <ul className="mt-2 space-y-1 ml-4">
-              <li>• Roster con PgCard draggable</li>
-              <li>• Slot Rack A (open) - accetta qualsiasi residente</li>
-              <li>• Slot Rack B (restricted) - richiede HP ≥ 200</li>
-              <li>• Validazione drag & drop completa</li>
-              <li>• Sistema di guard contro ghost clicks</li>
-            </ul>
-          </div>
-          
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-            <TestRosterPage />
-          </div>
-        </div>
-
-        {/* Test Coverage Info */}
-        <div className="bg-purple-50 dark:bg-purple-900/30 rounded-lg p-6 border border-purple-200 dark:border-purple-700 mb-8">
-          <h3 className="text-lg font-semibold text-purple-900 dark:text-purple-100 mb-3">
-            ✅ Test Coverage
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-purple-800 dark:text-purple-200">
-            <div>
-              <strong>Integration Tests (18 total):</strong>
-              <ul className="mt-2 space-y-1 ml-4">
-                <li>✓ TEST-044: Roster renders draggable items</li>
-                <li>✓ TEST-045: SlotRack renders drop targets</li>
-                <li>✓ TEST-046: Draggable items have dnd-kit attributes</li>
-                <li>✓ TEST-047: Drop targets are accessible</li>
-                <li>✓ TEST-048: Both components render together</li>
-                <li>✓ TEST-049-053: Drag end event handling</li>
-                <li>✓ TEST-054-058: Resident state updates</li>
-                <li>✓ TEST-059-061: Freezing & spring-return</li>
-              </ul>
-            </div>
-            <div>
-              <strong>Manual Verification:</strong>
-              <ul className="mt-2 space-y-1 ml-4">
-                <li>✓ Navigate to /minimal-roster-slot-integration</li>
-                <li>✓ Roster appears on left with PgCards</li>
-                <li>✓ Slot Rack A (open) appears</li>
-                <li>✓ Slot Rack B (restricted) appears</li>
-                <li>✓ Drag resident from roster to slot</li>
-                <li>✓ HP validation works (restricted rack)</li>
-                <li>✓ Drop outside triggers return animation</li>
-              </ul>
+                {/* Right: config-driven slot rack (infinite slots via controller) */}
+                <div className="bg-slate-900/30 border border-slate-700/50 rounded-lg p-6">
+                  <h2 className="text-sm font-semibold text-amber-200 uppercase tracking-wider mb-4">
+                    Slot Rack · {RACK_ACTIVITY.label}
+                  </h2>
+                  <style>{`.roster-slot-rack-ws .ws-content { position: relative; z-index: 2; padding: 14px 16px; }`}</style>
+                  <WanderlustSurface shape="panel" material="bronze" interactive={false} className="roster-slot-rack-ws">
+                    <ResidentSlotRack
+                      slots={controller.slots}
+                      onSlotClear={handleSlotClear}
+                      draggingResidentId={draggingResidentId}
+                      layout="detail"
+                      overflowBehavior="scroll"
+                      slotSize={SLOT_SIZE_PX}
+                    />
+                  </WanderlustSurface>
+                  <p className="mt-3 text-xs text-slate-500">
+                    Slot Aperto: accetta chiunque · Slot HP &gt; 200: Giggiolillo (195) rimbalza ·
+                    riempi gli slot e ne appare automaticamente uno nuovo (infiniti)
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-
-        {/* Documentation Links */}
-        <div className="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-6 border border-blue-200 dark:border-blue-700">
-          <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-3">
-            📚 Documentation
-          </h3>
-          <ul className="space-y-2 text-sm text-blue-800 dark:text-blue-200">
-            <li>
-              <strong>Integration Spec:</strong>{' '}
-              <code className="bg-blue-100 dark:bg-blue-800 px-2 py-1 rounded">
-                src/docs/docs/idle_village/roster_slot_integration_spec.md
-              </code>
-            </li>
-            <li>
-              <strong>Interaction Documentation:</strong>{' '}
-              <code className="bg-blue-100 dark:bg-blue-800 px-2 py-1 rounded">
-                src/docs/docs/idle_village/roster_slot_interaction_documentation.md
-              </code>
-            </li>
-            <li>
-              <strong>Test Suite:</strong>{' '}
-              <code className="bg-blue-100 dark:bg-blue-800 px-2 py-1 rounded">
-                tests/integration/roster-slotRack.spec.ts
-              </code>
-            </li>
-          </ul>
-        </div>
-
-        {/* Footer */}
-        <div className="mt-12 text-center text-sm text-gray-500 dark:text-gray-400">
-          <p>Fase 6 di 6 — Vertical Slice Integration Complete</p>
-          <p>Basato su roster_slot_integration_spec.md + roster_slot_interaction_documentation.md</p>
-        </div>
-      </div>
-    </div>
+          {/* Page-level flights: click-to-assign + extraction return */}
+          <DragOutcomeFlight
+            state={pageFlight}
+            residentsById={residentsById}
+            onComplete={handlePageFlightComplete}
+          />
+        </DndContext>
+      </RosterKitShell>
+    </TooltipProvider>
   );
 }

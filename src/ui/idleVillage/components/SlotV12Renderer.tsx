@@ -5,6 +5,7 @@ import {
   SLOT_WILDERNESS_BRONZE_CONFIG,
 } from '@/ui/idleVillage/skins/converted/slotWildernessBronzeConfig';
 import type { SlotDebugVisualizationSettings } from '@/balancing/config/idleVillage/slotDebugVisualizationConfig';
+import { SlotGemPointer } from './SlotGemPointer';
 
 type SlotState = keyof typeof slotV12SkinData.states;
 
@@ -15,6 +16,8 @@ export interface SlotV12RendererProps {
   extractionProgress?: number; // 0-1 for press-and-hold extraction animation
   pgTokenVisible?: boolean; // Control PG token visibility
   debugVisualization?: SlotDebugVisualizationSettings;
+  /** Override rendered size in px (default: geometry.SZ = 210). Inline style wins over CSS class. */
+  sizePx?: number;
 }
 
 type TokenValue = string | number | number[];
@@ -42,6 +45,7 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
   extractionProgress = 0,
   pgTokenVisible = false,
   debugVisualization,
+  sizePx,
 }) => {
   const geometry = slotV12SkinData.geometry;
   const stateConfig = slotV12SkinData.states[state] ?? slotV12SkinData.states.occupied;
@@ -89,23 +93,46 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
     'sealVisible' in stateConfig ? stateConfig : slotV12SkinData.states.occupied;
   const debugViz = debugVisualization?.enabled ? debugVisualization : null;
 
-  // Calculate bezel animation based on extraction progress (inverse of insertion)
-  // Insertion: scale 1.08->1.0, rotation -30°->0°
-  // Extraction: scale 1.0->1.08, rotation 0°->-30°
-  // The scale is calibrated so teeth touch the medal edge without overlapping
+  // Extraction is a two-phase sequence:
+  //   phase 1 (progress 0 -> TEETH_PHASE): the teeth retract into the bezel
+  //   phase 2 (TEETH_PHASE -> 1): the bezel counter-rotates/opens
+  // Insertion is the inverse handled via CSS (bezel closes, THEN teeth extrude).
+  const TEETH_PHASE = 0.35;
   const clampedProgress = Math.min(extractionProgress, 1.0); // Clamp to 1.0 for normal animation
-  const extractionScale = 1.0 + (clampedProgress * 0.08); // 1.0 -> 1.08 (teeth touch medal)
-  const extractionRotation = 0 - (clampedProgress * 30); // 0° -> -30°
-  
+
+  // Bezel only starts moving after the teeth have fully retracted
+  const bezelProgress = extractionProgress > 0
+    ? Math.max(0, (clampedProgress - TEETH_PHASE) / (1 - TEETH_PHASE))
+    : 0;
+  const extractionScale = 1.0 + (bezelProgress * 0.08); // 1.0 -> 1.08 (teeth touch medal)
+  const extractionRotation = 0 - (bezelProgress * 30); // 0° -> -30°
+
   // Add spring effect for overshoot
-  const springScale = extractionProgress > 1.0 
+  const springScale = extractionProgress > 1.0
     ? extractionScale * (1.0 + (extractionProgress - 1.0) * 0.15) // Reduced spring overshoot
     : extractionScale;
+
+  // Teeth are extruded ONLY when the bezel is closed (rotation 0 = seated state).
+  // During extraction they retract first (phase 1); while the slot is empty/open
+  // they stay retracted.
+  const bezelClosed = (resolvedState.bezelRotateDeg ?? 0) === 0;
+  const teethExtrusion = extractionProgress > 0
+    ? Math.max(0, 1 - clampedProgress / TEETH_PHASE)
+    : (bezelClosed ? 1 : 0);
   
   // Override bezel transform if extracting
   const bezelTransform = extractionProgress > 0 
     ? `scale(${springScale}) rotate(${extractionRotation}deg)`
     : `scale(${resolvedState.bezelScale ?? 1}) rotate(${resolvedState.bezelRotateDeg ?? 0}deg)`;
+
+  // Heavy-bronze lock: when the token seats (occupied, not mid-extraction) the
+  // bezel doesn't glide to a stop — it SLAMS home, recoils ~2° at high speed,
+  // then dead-stops (metal-on-metal). Driven by a keyframe so the impact + elastic
+  // micro-rebound reads, instead of the soft ease-out of the plain CSS transition.
+  const bezelSlamActive =
+    resolvedState.medalVisible && extractionProgress === 0 && (resolvedState.bezelRotateDeg ?? 0) === 0;
+  const bezelStartScale = slotV12SkinData.states.empty.bezelScale ?? 1.18;
+  const bezelStartRotate = slotV12SkinData.states.empty.bezelRotateDeg ?? -30;
 
   const cssText = useMemo(
     () => `
@@ -148,6 +175,29 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
         transition: transform 560ms cubic-bezier(0.42, 0, 0.2, 1);
       }
 
+      /* Heavy-bronze lock: fast close, hard impact at home, a ~2° elastic
+         micro-rebound at high speed, then a dead stop (metal-on-metal). */
+      @keyframes bezelSlam {
+        0% {
+          transform: scale(${bezelStartScale}) rotate(${bezelStartRotate}deg);
+          animation-timing-function: cubic-bezier(0.45, 0, 0.75, 1);
+        }
+        54% {
+          transform: scale(1) rotate(0deg);
+          animation-timing-function: cubic-bezier(0.12, 0.9, 0.2, 1);
+        }
+        66% {
+          transform: scale(1) rotate(-2.2deg);
+          animation-timing-function: cubic-bezier(0.9, 0, 0.92, 1);
+        }
+        78% {
+          transform: scale(1) rotate(0deg);
+        }
+        100% {
+          transform: scale(1) rotate(0deg);
+        }
+      }
+
       @keyframes arcaneBreathe {
         0%, 100% { opacity: 0.55; }
         50% { opacity: 1; }
@@ -176,6 +226,9 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
       resolvedState.bezelScale,
       resolvedState.haloVisible,
       resolvedState.sealVisible,
+      bezelTransform,
+      bezelStartScale,
+      bezelStartRotate,
     ],
   );
 
@@ -208,7 +261,7 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
   };
 
   return (
-    <div className={clsx('slot-v12', `slot-v12--${state}`, className)} data-slot-state={state}>
+    <div className={clsx('slot-v12', `slot-v12--${state}`, className)} data-slot-state={state} style={sizePx ? { width: sizePx, height: sizePx } : undefined}>
       <style dangerouslySetInnerHTML={{ __html: cssText }} />
       <div className="slot-v12__halo" aria-hidden />
       <svg viewBox="-120 -120 240 240" role="img" aria-label={`Slot ${state}`}>
@@ -450,6 +503,9 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
           style={{
             transform: bezelTransform,
             transformOrigin: '0px 0px',
+            // Heavy-bronze lock choreography: slam + micro-rebound + dead stop.
+            // Skipped while extracting (JS drives the transform there).
+            ...(bezelSlamActive ? { animation: 'bezelSlam 620ms both' } : {}),
             // Only apply drop-shadow in debug mode
             ...(debugViz ? {
               filter: `drop-shadow(0 0 24px ${debugViz?.colors?.bezel || '#FF5C8D'})`,
@@ -545,6 +601,7 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
                 </g>
                 
                 {/* Complex teeth - removed fn-silver filter to prevent gray square artifact */}
+                {/* Extruded only when the bezel is closed; they retract as phase 1 of extraction */}
                 {toothAngles.map((deg, i) => {
                   const angle = (deg * Math.PI) / 180;
                   const x = geometry.R_BZ_IN * Math.cos(angle);
@@ -552,8 +609,20 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
                   const TH = geometry.TOOTH_HEIGHT;
                   const TW = geometry.TOOTH_WIDTH;
                   const path = `M${-TW/2},0 Q${-TW/2-0.8},${TH*0.12} 0,${TH*0.16} Q${TW/2+0.8},${TH*0.12} ${TW/2},0 L 0.8,${-TH} L -0.8,${-TH} Z`;
+                  // Local +y (after the group rotation) points away from the slot
+                  // center: translating by (1-extrusion)*(TH+2) slides the tooth
+                  // back under the bezel ring.
+                  const retractPx = (1 - teethExtrusion) * (TH + 2);
+                  const teethStyle: React.CSSProperties = {
+                    transform: `translate(0px, ${retractPx.toFixed(2)}px)`,
+                    // JS drives per-frame retraction during extraction; the CSS
+                    // transition (with 560ms delay) only handles the extrusion
+                    // AFTER the bezel has finished closing on insertion.
+                    transition: extractionProgress > 0 ? 'none' : 'transform 240ms ease-out 560ms',
+                  };
                   return (
                     <g key={`tooth-${i}`} transform={`translate(${x.toFixed(2)}, ${y.toFixed(2)}) rotate(${(deg - 90).toFixed(1)})`}>
+                    <g style={teethStyle}>
                       <path d={path} fill="rgba(0,0,0,0.75)" transform="translate(0.7, 1.0)" />
                       <path d={path} fill="url(#slot-v12-claw)" />
                       <path d={path} fill="url(#slot-v12-bevel)" opacity="0.75" />
@@ -562,12 +631,20 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
                       <ellipse cx="0" cy={`${-TH+1}`} rx="2.2" ry="1.0" fill="rgba(0,0,0,0.48)" />
                       <circle cx="0" cy={`${-TH}`} r="0.9" fill="rgba(175,195,255,0.18)" />
                     </g>
+                    </g>
                   );
                 })}
               </>
             );
           })()}
         </g>
+
+        {/* Layer 4: Gem pointer at 6 o'clock — the seated counterpart of the
+            dragged token's gem. Drawn AFTER the bezel so it is always mounted
+            ABOVE the frame and never swallowed when the token snaps home. */}
+        {resolvedState.medalVisible && (
+          <SlotGemPointer cy={geometry.R_MED_OUT + 4} />
+        )}
 
         {debugViz && renderDebugLabel('MEDAGLIA · layer 2', geometry.R_MED_OUT + 26)}
         {debugViz && renderDebugLabel('GHIERA', -geometry.R_BZ_OUT - 26)}

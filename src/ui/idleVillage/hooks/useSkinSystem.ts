@@ -415,12 +415,21 @@ export function SkinSystemProvider({ children, options }: SkinSystemProviderProp
  */
 export function useSkinSystemContext(): UseSkinSystemReturn {
   const context = useContext(SkinSystemContext);
-  
+
   if (!context) {
     throw new Error('useSkinSystemContext must be used within a SkinSystemProvider');
   }
-  
+
   return context.system;
+}
+
+/**
+ * Non-throwing variant: returns null when no SkinSystemProvider is mounted.
+ * Used by the frozen KitShell to auto-mount only the providers that are missing.
+ */
+export function useOptionalSkinSystemContext(): UseSkinSystemReturn | null {
+  const context = useContext(SkinSystemContext);
+  return context?.system ?? null;
 }
 
 // ============================================================================

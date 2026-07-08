@@ -18,6 +18,8 @@ const TestHub = lazy(() => import('./ui/idleVillage/TestHub').then(m => ({ defau
 const IdleVillageConfigRoute = lazy(() => import('./pages/idle-village-config'));
 const StyleLabDemoPage = lazy(() => import('./pages/style-lab-demo'));
 const SkinLabPage = lazy(() => import('./pages/SkinLabPage'));
+const V8SkinSandbox = lazy(() => import('./pages/v8-skin-sandbox').then(m => ({ default: m.V8SkinSandbox })));
+const V9SkinSandbox = lazy(() => import('./pages/v9-skin-sandbox').then(m => ({ default: m.V9SkinSandbox })));
 const PoiDetailVerificationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailVerificationPage').then(m => ({ default: m.PoiDetailVerificationPage })));
 const PoiStandardDetailIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiStandardDetailIntegrationPage').then(m => ({ default: m.PoiStandardDetailIntegrationPage })));
 const TimeDaynightIntegrationPage = lazy(() => import('./ui/idleVillage/pages/TimeDaynightIntegrationPage').then(m => ({ default: m.TimeDaynightIntegrationPage })));
@@ -26,6 +28,7 @@ const SlotPage = lazy(() => import('./ui/idleVillage/pages/SlotPage').then(m => 
 // Minimal slice test pages (Phase 1-6)
 const MinimalPoiPage = lazy(() => import('./pages/minimal-poi').then(m => ({ default: m.default })));
 const MinimalRosterPage = lazy(() => import('./pages/minimal-roster').then(m => ({ default: m.default })));
+const MinimalRosterSlotIntegrationPage = lazy(() => import('./pages/minimal-roster-slot-integration').then(m => ({ default: m.default })));
 const MinimalClockPage = lazy(() => import('./pages/minimal-clock').then(m => ({ default: m.default })));
 const MinimalSlotRackPage = lazy(() => import('./pages/minimal-slotRack').then(m => ({ default: m.default })));
 const MinimalResourceHUDPage = lazy(() => import('./pages/minimal-resourcehud').then(m => ({ default: m.default })));
@@ -34,8 +37,7 @@ const MinimalSkillCheckPage = lazy(() => import('./pages/minimal-skillcheck').th
 const MinimalSkillCheckV6Page = lazy(() => import('./pages/minimal-skillcheck-v6').then(m => ({ default: m.default })));
 const MinimalDestinyAstrolabePage = lazy(() => import('./pages/minimal-destiny-astrolabe').then(m => ({ default: m.default })));
 const MinimalOutcomeModalPage = lazy(() => import('./pages/minimal-outcome').then(m => ({ default: m.default })));
-const MinimalMarketActionCardPage = lazy(() => import('./pages/minimal-market').then(m => ({ default: m.default })));
-const MinimalIntegrationDragJobPage = lazy(() => import('./pages/minimal-integration-drag-job').then(m => ({ default: m.default })));
+const MinimalMarketActionCardPage = lazy(() => import('./pages/minimal-market-page').then(m => ({ default: m.default })));
 const MinimalIntegrationQuestFlowPage = lazy(() => import('./pages/minimal-integration-quest-flow').then(m => ({ default: m.default })));
 const MinimalJobPoiRosterIntegrationPage = lazy(() => import('./pages/minimal-job-poi-roster-integration').then(m => ({ default: m.default })));
 const MinimalJobPoiRosterTimeIntegrationPage = lazy(() => import('./pages/minimal-job-poi-roster-time-integration').then(m => ({ default: m.default })));
@@ -124,6 +126,10 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/test-hub';
   const isSkinLabPath =
     typeof window !== 'undefined' && window.location.pathname === '/skin-lab';
+  const isV8SkinSandboxPath =
+    typeof window !== 'undefined' && window.location.pathname === '/skin-sandbox';
+  const isV9SkinSandboxPath =
+    typeof window !== 'undefined' && window.location.pathname === '/v9-skin-sandbox';
   const isPoiDetailVerificationPath =
     typeof window !== 'undefined' && window.location.pathname === '/poi-detail-verification';
   const isPoiStandardDetailIntegrationPath =
@@ -139,6 +145,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/minimal-poi';
   const isMinimalRosterPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-roster';
+  const isMinimalRosterSlotIntegrationPath =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-roster-slot-integration';
   const isMinimalClockPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-clock';
   const isMinimalSlotRackPath =
@@ -159,8 +167,6 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/minimal-outcome';
   const isMinimalMarketActionCardPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-market';
-  const isMinimalIntegrationDragJobPath =
-    typeof window !== 'undefined' && window.location.pathname === '/minimal-integration-drag-job';
   const isMinimalIntegrationQuestFlowPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-integration-quest-flow';
   const isMinimalJobPoiRosterIntegrationPath =
@@ -365,6 +371,16 @@ function App() {
     );
   }
 
+  if (isMinimalRosterSlotIntegrationPath) {
+    return (
+      <ErrorBoundary componentName="Minimal Roster Slot Integration Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Roster + SlotRack…</div>}>
+          <MinimalRosterSlotIntegrationPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
   if (isMinimalClockPath) {
     return (
       <ErrorBoundary componentName="Minimal Clock Page">
@@ -465,16 +481,6 @@ function App() {
     );
   }
 
-  if (isMinimalIntegrationDragJobPath) {
-    return (
-      <ErrorBoundary componentName="Minimal Integration Drag Job Page">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Integration Drag Job Test…</div>}>
-          <MinimalIntegrationDragJobPage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
-
   if (isMinimalIntegrationQuestFlowPath) {
     return (
       <ErrorBoundary componentName="Minimal Integration Quest Flow Page">
@@ -530,6 +536,26 @@ function App() {
       <ErrorBoundary componentName="Skin Lab Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Skin Lab...</div>}>
           <SkinLabPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isV8SkinSandboxPath) {
+    return (
+      <ErrorBoundary componentName="V8 Skin Sandbox">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading V8 Skin Sandbox...</div>}>
+          <V8SkinSandbox />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isV9SkinSandboxPath) {
+    return (
+      <ErrorBoundary componentName="V9 Skin Sandbox">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading V9 Skin Sandbox...</div>}>
+          <V9SkinSandbox />
         </Suspense>
       </ErrorBoundary>
     );

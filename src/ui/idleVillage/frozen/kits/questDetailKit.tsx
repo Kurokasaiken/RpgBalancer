@@ -9,9 +9,8 @@
  */
 
 import React, { useState } from 'react';
-import type { JSX, ReactNode } from 'react';
-import { SkinSystemProvider } from '@/ui/idleVillage/hooks/useSkinSystem';
-import { SandboxTimingProvider } from '@/ui/idleVillage/hooks/useSandboxTimingBridge';
+import type { JSX } from 'react';
+import { createKitShell } from '../_infra/KitShell';
 import { DEFAULT_RISK_DISPLAY_CONFIG } from '@/balancing/config/idleVillage/riskDisplayConfig';
 import { DEFAULT_MINIMAL_CONFIG } from '@/ui/idleVillage/frozen/_infra/CanonicalDataBridge';
 import { trackTelemetryEvent } from '@/analytics/telemetryStub';
@@ -222,14 +221,11 @@ export function QuestDetail({ quest, onAccept, onClose }: {
   );
 }
 
-/** Shell provider for questDetailKit. */
-export function QuestDetailKitShell({ children }: { children: ReactNode }): JSX.Element {
-  return (
-    <SkinSystemProvider>
-      <SandboxTimingProvider>{children}</SandboxTimingProvider>
-    </SkinSystemProvider>
-  );
-}
+/** Shell provider for questDetailKit. Smart: mounts only the providers missing above. */
+export const QuestDetailKitShell = createKitShell(
+  ['SkinSystemProvider', 'SandboxTimingProvider'],
+  'QuestDetailKitShell'
+);
 
 /** Isolated showcase component for /minimal-quest-detail. */
 export function QuestDetailIsolated(): JSX.Element {

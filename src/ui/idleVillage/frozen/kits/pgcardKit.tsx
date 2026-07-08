@@ -8,13 +8,11 @@
  * Per Plan v2 §S2: no new component code. Re-export only, plus binder + Shell.
  */
 
-import type { ReactNode } from 'react';
-import { DndContext } from '@dnd-kit/core';
+import type { ComponentProps } from 'react';
 import { useCanonicalRosterBundle, getResidentPortraitUrl } from '../_infra/CanonicalDataBridge';
 import type { ResidentState } from '../_infra/CanonicalDataBridge';
-import { DragProvider } from '@/ui/idleVillage/components/DragContext';
-import { SandboxTimingProvider } from '@/ui/idleVillage/hooks/useSandboxTimingBridge';
-import { SkinSystemProvider } from '@/ui/idleVillage/hooks/useSkinSystem';
+import { createKitShell, withKitShell, FULL_PROVIDER_CHAIN } from '../_infra/KitShell';
+import PgCard from '@/ui/idleVillage/components/PgCard';
 
 // Canonical component — re-exported, not re-implemented.
 export { default as PgCard } from '@/ui/idleVillage/components/PgCard';
@@ -56,17 +54,15 @@ export function residentToPgCardProps(resident: ResidentState) {
  * Canonical provider chain required by `PgCard` and its dnd-kit usage.
  * Identical to `RosterKitShell` — see rosterKit.tsx — kept duplicated here for
  * explicitness so consumers don't depend transitively on `rosterKit`.
+ * Smart: mounts only the providers missing above in the tree.
  */
-export function PgCardKitShell({ children }: { children: ReactNode }): JSX.Element {
-  return (
-    <SkinSystemProvider>
-      <SandboxTimingProvider>
-        <DragProvider>
-          <DndContext>{children}</DndContext>
-        </DragProvider>
-      </SandboxTimingProvider>
-    </SkinSystemProvider>
-  );
-}
+export const PgCardKitShell = createKitShell(FULL_PROVIDER_CHAIN, 'PgCardKitShell');
+
+/** Drop-in variant: the canonical PgCard pre-wrapped in its smart shell. */
+export const PgCardStandalone = withKitShell<ComponentProps<typeof PgCard>>(
+  PgCard,
+  FULL_PROVIDER_CHAIN,
+  'PgCardStandalone'
+);
 
 export { PGCARD_KIT_VERSION, type PgCardKitContract } from './pgcardKit.contract';

@@ -42,8 +42,9 @@ StatusHUD (read-only view)
 
 **In the codebase:**
 - `MinimalHUDPage.tsx` (305 lines) - Full gameplay loop with StatusHUD
-- `DayNightPOI.tsx` - POI day/night visual component
-- `DayNightPoiSkin.tsx` - Skin configuration for day/night POI
+- `src/ui/idleVillage/frozen/kits/poiKit.tsx` - Certified kit export for DayNightPOI
+- `DayNightPOI.tsx` - POI day/night visual component (canonical)
+- `DayNightPoiSkin.tsx` - Skin configuration for day/night POI (canonical)
 - `DayNightActionCard.tsx` - Action card for pause/resume
 - `dayNightPoiSkinConfig.ts` - Visual configuration presets
 - `useMinimalGameplay.ts` - State integration for temporal state
@@ -73,7 +74,7 @@ StatusHUD (read-only view)
 | Component | Type | Path | Purpose |
 |-----------|------|------|---------|
 | **StatusHUD** | Read-only HUD | MinimalHUDPage.tsx | Shows day/night, speed, resources |
-| **DayNightPOI** | POI visual | components/minimal/DayNightPOI.tsx | Shows day/night state with halo |
+| **DayNightPOI** | POI visual | frozen/kits/poiKit.tsx (certified) | Shows day/night state with halo |
 | **DayNightPoiSkin** | Skin config | skins/dayNightPoiSkinConfig.ts | Visual configuration presets |
 | **DayNightActionCard** | Action card | map/actionCards/DayNightActionCard.tsx | Pause/resume toggle |
 | **ResourceTracker** | Resource display | (to be implemented) | Shows all resources with animation |

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import DayNightPoiSkin from '@/ui/idleVillage/components/minimal/DayNightPoiSkin';
-import { TimeEngineStrip } from '@/ui/idleVillage/components/minimal/TimeEngineStrip';
+import { DayNightPoiSkin } from '@/ui/idleVillage/frozen/kits/poiKit';
+import { TimeEngineStrip } from '@/ui/idleVillage/frozen/kits/clockKit';
 import { SkinSystemProvider } from '@/ui/idleVillage/hooks/useSkinSystem';
 import { SandboxTimingProvider } from '@/ui/idleVillage/hooks/useSandboxTimingBridge';
 
