@@ -14,10 +14,10 @@ import { useCentralizedTiming } from '@/ui/idleVillage/hooks/useCentralizedTimin
 import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
 import { CustomDragOverlay } from '@/ui/idleVillage/components/CustomDragOverlay';
 import { DragPhysicsProvider } from '@/ui/styleLab/physics/DragPhysicsContext';
-import { ClockWidget } from '@/ui/idleVillage/components/minimal/ClockWidget';
+import { ClockWidget } from '@/ui/idleVillage/frozen/kits/clockKit';
+import { DayNightPOI } from '@/ui/idleVillage/frozen/kits/poiKit';
 import { useMinimalGameplayWithIdleVillageConfig } from '@/store/useMinimalGameplay';
 import { useStyleLabTokens } from '@/ui/styleLab/hooks/useStyleLabTokens';
-import DayNightPOI from '@/ui/idleVillage/components/minimal/DayNightPOI';
 import type { StyleLabPillar } from '@/ui/styleLab/config/demoConfig';
 import { ResourcePanel } from '@/ui/idleVillage/components/ResourcePanel';
 import { useResidentSlotController } from '@/ui/idleVillage/slots/useResidentSlotController';

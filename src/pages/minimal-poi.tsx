@@ -1,15 +1,9 @@
 import { useState } from 'react';
 import { DndContext } from '@dnd-kit/core';
-import DayNightPoiSkin from '@/ui/idleVillage/components/minimal/DayNightPoiSkin';
-import { GenericPoiSkin } from '@/ui/idleVillage/components/minimal/GenericPoiSkin';
-import { JobPOI } from '@/ui/idleVillage/components/minimal/JobPOI';
-import { ActivityPOI } from '@/ui/idleVillage/components/minimal/ActivityPOI';
-import { QuestPOI } from '@/ui/idleVillage/components/minimal/QuestPOI';
+import { DayNightPoiSkin, GenericPoiSkin, JobPOI, ActivityPOI, QuestPOI } from '@/ui/idleVillage/frozen/kits/poiKit';
+import type { JobStatus, ActivityStatus, QuestStatus, QuestPOIPhase } from '@/ui/idleVillage/frozen/kits/poiKit';
 import { SkinSystemProvider } from '@/ui/idleVillage/hooks/useSkinSystem';
 import { SandboxTimingProvider } from '@/ui/idleVillage/hooks/useSandboxTimingBridge';
-import type { JobStatus } from '@/ui/idleVillage/components/minimal/JobPOI';
-import type { ActivityStatus } from '@/ui/idleVillage/components/minimal/ActivityPOI';
-import type { QuestStatus, QuestPOIPhase } from '@/ui/idleVillage/components/minimal/QuestPOI';
 
 export default function MinimalPoiPage() {
   const [jobStatus, setJobStatus] = useState<JobStatus>('idle');

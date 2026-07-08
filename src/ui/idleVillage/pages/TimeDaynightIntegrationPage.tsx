@@ -11,7 +11,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useMinimalGameplayWithIdleVillageConfig } from '@/store/useMinimalGameplay';
-import DayNightPOI from '@/ui/idleVillage/components/minimal/DayNightPOI';
+import { DayNightPOI } from '@/ui/idleVillage/frozen/kits/poiKit';
 import { StyleLabSurface } from '@/ui/styleLab/StyleLabSurface';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 

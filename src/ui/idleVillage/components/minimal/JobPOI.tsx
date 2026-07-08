@@ -6,7 +6,7 @@ import {
   resolveJobPoiPresetId,
 } from '@/ui/idleVillage/skins/jobPoiSkinConfig';
 import { GenericPoiSkin } from './GenericPoiSkin';
-import { getSlotGlowConfig } from '@/ui/idleVillage/config/minimalFeedbackConfig';
+import { getBloomStyle } from '@/ui/idleVillage/interaction/bloomEffect';
 
 /**
  * Runtime status of the job from the engine.
@@ -55,6 +55,7 @@ export interface JobPOIProps {
     minStrength?: number;
     minDexterity?: number;
     maxFatigue?: number;
+    minHp?: number;
     requiredSkills?: string[];
   };
   /** Individual slot configurations with per-slot requirements. */
@@ -65,9 +66,12 @@ export interface JobPOIProps {
       minStrength?: number;
       minDexterity?: number;
       maxFatigue?: number;
+      minHp?: number;
       requiredSkills?: string[];
     };
   }>;
+  /** Called when a resident is dropped on this POI. */
+  onDrop?: (residentId: string) => void;
 }
 
 /**
@@ -103,6 +107,7 @@ export function JobPOI(props: JobPOIProps): JSX.Element {
     canAcceptDrop = true,
     requirements,
     slots = [],
+    onDrop,
   } = props;
 
   const { presetId: stylePref } = useSkinPreferences();
@@ -139,17 +144,6 @@ export function JobPOI(props: JobPOIProps): JSX.Element {
   const draggedResident = active?.data.current as { resident?: { stats?: { hp?: number } } } | undefined;
   const residentHp = draggedResident?.resident?.stats?.hp ?? 0;
 
-  // Config-driven glow (same as ActivitySlot)
-  const slotGlowConfig = getSlotGlowConfig();
-  const highlightSettings = slotGlowConfig.highlight ?? {
-    stabilizeMs: 0,
-    focusScale: 1.04,
-    hoverScale: 1.02,
-    selectedScale: 1.05,
-    invalidOpacity: 0.30,
-    transitionMs: 200,
-  };
-
   // Highlight state logic - bloom only when dragging pgToken AND at least one free slot AND pg meets requirements for that slot
   type HighlightState = 'idle' | 'valid' | 'invalid';
   const highlightState: HighlightState = (() => {
@@ -172,25 +166,11 @@ export function JobPOI(props: JobPOIProps): JSX.Element {
     return hasValidSlot ? 'valid' : 'invalid';
   })();
 
-  // Glow styles based on state
-  const getGlowStyles = (state: HighlightState) => {
-    switch (state) {
-      case 'valid':
-        return slotGlowConfig.valid;
-      case 'invalid':
-        return slotGlowConfig.invalid;
-      case 'idle':
-      default:
-        return slotGlowConfig.idle;
-    }
-  };
-
-  const currentGlow = getGlowStyles(highlightState);
+  // Shared AAA bloom: drop-shadow layers follow the medallion's alpha channel
+  // (round halo, never a square box) — same effect used by the slots.
   const glowStyle = {
     transform: 'scale(1)',
-    transition: `transform ${highlightSettings.transitionMs}ms ease, opacity ${highlightSettings.transitionMs}ms ease`,
-    boxShadow: highlightState === 'valid' ? currentGlow.boxShadow : 'none',
-    opacity: highlightState === 'invalid' ? highlightSettings.invalidOpacity : 1,
+    ...getBloomStyle(highlightState, renderSize),
   };
 
   return (

@@ -113,6 +113,14 @@ const centerReturnDropAnimation: DropAnimation = ({
   active,
   dragOverlay,
 }: DropAnimationFunctionArguments): Promise<void> => {
+  // Valid drop: FlightProxy owns the token from here (flag set by
+  // useDragOutcome.startFlight). Hide the dnd-kit clone immediately or the
+  // token appears doubled (clone + flight proxy) for the animation duration.
+  if ((window as Window & { __dragFlightActive?: boolean }).__dragFlightActive) {
+    (dragOverlay.node as HTMLElement).style.display = 'none';
+    return Promise.resolve();
+  }
+
   const medalSize = getDragConfig().overlay.medalSizePx;
   const halfMedal = medalSize / 2;
 

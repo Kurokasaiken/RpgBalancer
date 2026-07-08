@@ -7,6 +7,8 @@
  */
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { motion, useDragControls } from 'framer-motion';
+import { useHeavyDrag } from '@/ui/wanderlust-surface/useHeavyDrag';
 import { useSkinSystem } from '../../hooks/useSkinSystem';
 import { ResidentSlotRack } from '../../components/ResidentSlotRack';
 import type { ResidentSlotViewModel } from '../../slots/types';
@@ -31,6 +33,7 @@ import type {
   SkinValidationResult
 } from '../types/SkinSchema';
 import { WanderlustSurface } from '@/ui/wanderlust-surface/WanderlustSurface';
+import { InsetPanel } from '@/ui/wanderlust-surface/InsetPanel';
 import { WanderlustRequirementList } from '@/ui/wanderlust-surface/layout/WanderlustLayout';
 import { WanderlustAmbientField } from '@/ui/wanderlust-surface/layout/WanderlustAmbientField';
 
@@ -255,16 +258,17 @@ export function ActivityCapsuleDetailSkinAware({
     return null;
   }, [skinConfig.pillar, skinConfig.presetId]);
   
+  // Framer Motion drag (deve stare prima dell'uso di heavyDrag.isDragging)
+  const dragControls = useDragControls();
+  const heavyDrag = useHeavyDrag();
+
   // Component state
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [windowPosition, setWindowPosition] = useState(position || { x: 0, y: 0 });
   const [validationErrors, setValidationErrors] = useState<SkinValidationResult | null>(null);
+  const isDragging = heavyDrag.isDragging;
   const [currentConfig, setCurrentConfig] = useState(skinConfig);
-  
+
   // Refs
   const windowRef = useRef<HTMLDivElement>(null);
-  const dragHandleRef = useRef<HTMLDivElement>(null);
   const configRef = useRef(skinConfig);
   const validationRef = useRef(validationErrors);
   
@@ -332,57 +336,6 @@ export function ActivityCapsuleDetailSkinAware({
   ]);
   
   // Drag handlers
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    if (inlineMode || !enableDrag || !dragHandleRef.current || !windowRef.current) return;
-    
-    const rect = windowRef.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    
-    setDragOffset({
-      x: e.clientX - centerX,
-      y: e.clientY - centerY,
-    });
-    
-    setIsDragging(true);
-    e.preventDefault();
-  }, [enableDrag]);
-  
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!isDragging || !windowRef.current) return;
-    
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const windowEl = windowRef.current;
-    const windowWidth = windowEl.offsetWidth;
-    const windowHeight = windowEl.offsetHeight;
-    
-    let newX = e.clientX - dragOffset.x;
-    let newY = e.clientY - dragOffset.y;
-    
-    // Constrain to viewport
-    newX = Math.max(windowWidth / 2, Math.min(vw - windowWidth / 2, newX));
-    newY = Math.max(windowHeight / 2, Math.min(vh - windowHeight / 2, newY));
-    
-    setWindowPosition({ x: newX, y: newY });
-  }, [isDragging, dragOffset]);
-  
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
-  }, []);
-  
-  // Global mouse event listeners
-  useEffect(() => {
-    if (isDragging && !inlineMode) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-      };
-    }
-  }, [isDragging, handleMouseMove, handleMouseUp]);
 
   // Debug logging
   useEffect(() => {
@@ -587,13 +540,13 @@ export function ActivityCapsuleDetailSkinAware({
   
   if (!isOpen) return null;
 
-  // Style applied to the WanderlustSurface wrapper: it owns sizing and
-  // positioning so the bronze border tracks the panel exactly.
+  // Style applied to the WanderlustSurface wrapper.
+  // Positioning for floating mode is handled by the motion.div parent.
   const surfaceStyle: React.CSSProperties = {
     ...cssVars,
     opacity: isOpen ? 1 : 0,
     pointerEvents: isOpen ? 'all' : 'none',
-    width: compact ? 'var(--detail-window-width)' : 'var(--detail-window-width)',
+    width: '100%',
     minHeight: 'var(--detail-window-min-height)',
     ...(inlineMode
       ? {
@@ -601,13 +554,7 @@ export function ActivityCapsuleDetailSkinAware({
           margin: '0 auto',
           maxWidth: 'min(100%, var(--detail-window-width))',
         }
-      : {
-          position: 'fixed',
-          left: windowPosition.x ? `${windowPosition.x}px` : '50%',
-          top: windowPosition.y ? `${windowPosition.y}px` : '50%',
-          transform: 'translate(-50%, -50%)',
-          zIndex: 1000,
-        }),
+      : {}),
   };
 
   // Inner content div: positioning + frame are handled by the surface, so
@@ -627,7 +574,7 @@ export function ActivityCapsuleDetailSkinAware({
     backdropFilter: 'none',
   };
 
-  return (
+  const surface = (
     <WanderlustSurface
       shape="panel"
       material="bronze"
@@ -663,9 +610,8 @@ export function ActivityCapsuleDetailSkinAware({
         {/* Drag handle */}
         {enableDrag && !inlineMode && (
           <div
-            ref={dragHandleRef}
             className="activity-capsule-detail-skin-aware__drag-handle"
-            onMouseDown={handleMouseDown}
+            onPointerDown={(e) => dragControls.start(e)}
           >
             <div className="activity-capsule-detail-skin-aware__handle-dots">
               <span></span><span></span><span></span>
@@ -688,36 +634,57 @@ export function ActivityCapsuleDetailSkinAware({
         {/* Content */}
         <WanderlustAmbientField paused={false}>
           <div className="activity-capsule-detail-skin-aware__content">
+
+          {/* ── LEFT COLUMN: narrativo + slot ── */}
+          <div className="activity-capsule-detail-skin-aware__col-left">
+
           {/* Header */}
           <div className="activity-capsule-detail-skin-aware__header">
-            {/* POI */}
+            {/* POI — progress ring con calcolo circumference corretto */}
             <div className="activity-capsule-detail-skin-aware__poi">
-              <svg
-                width={skinConfig.poi.poiSize}
-                height={skinConfig.poi.poiSize}
-                viewBox={`-${parseInt(skinConfig.poi.poiSize) / 2} -${parseInt(skinConfig.poi.poiSize) / 2} ${parseInt(skinConfig.poi.poiSize)} ${parseInt(skinConfig.poi.poiSize)}`}
-                className="activity-capsule-detail-skin-aware__poi-svg"
-              >
-                {/* POI SVG implementation would go here */}
-                <circle
-                  cx="0"
-                  cy="0"
-                  r="20"
-                  fill="var(--detail-cavity-gradient)"
-                  stroke="var(--detail-crown-border)"
-                  strokeWidth="2"
-                />
-                <circle
-                  cx="0"
-                  cy="0"
-                  r="16"
-                  fill="var(--detail-core-gradient)"
-                  stroke="var(--detail-progress-ring-gradient)"
-                  strokeWidth="3"
-                  strokeDasharray={`${Math.PI * 2 * progress} ${Math.PI * 2 * (1 - progress)}`}
-                  transform="rotate(-90)"
-                />
-              </svg>
+              {(() => {
+                const poiSizePx = parseInt(skinConfig.poi.poiSize) || 60;
+                const outerR = poiSizePx * 0.38;
+                const innerR = poiSizePx * 0.30;
+                const circumference = 2 * Math.PI * innerR;
+                const dashFilled = circumference * Math.min(1, Math.max(0, progress));
+                const dashGap = circumference - dashFilled;
+                return (
+                  <svg
+                    width={poiSizePx}
+                    height={poiSizePx}
+                    viewBox={`0 0 ${poiSizePx} ${poiSizePx}`}
+                    className="activity-capsule-detail-skin-aware__poi-svg"
+                  >
+                    {/* Outer cavity ring */}
+                    <circle cx={poiSizePx/2} cy={poiSizePx/2} r={outerR}
+                      fill="rgba(6,4,2,0.75)"
+                      stroke="rgba(160,110,25,0.5)"
+                      strokeWidth="1.5"
+                    />
+                    {/* Background track */}
+                    <circle cx={poiSizePx/2} cy={poiSizePx/2} r={innerR}
+                      fill="none"
+                      stroke="rgba(90,60,10,0.25)"
+                      strokeWidth="3"
+                    />
+                    {/* Progress arc */}
+                    <circle cx={poiSizePx/2} cy={poiSizePx/2} r={innerR}
+                      fill="none"
+                      stroke="rgba(215,165,45,0.85)"
+                      strokeWidth="3"
+                      strokeDasharray={`${dashFilled} ${dashGap}`}
+                      strokeLinecap="round"
+                      transform={`rotate(-90 ${poiSizePx/2} ${poiSizePx/2})`}
+                      style={{ transition: 'stroke-dasharray 0.4s ease' }}
+                    />
+                    {/* Inner core dot */}
+                    <circle cx={poiSizePx/2} cy={poiSizePx/2} r={poiSizePx*0.10}
+                      fill="rgba(200,150,35,0.55)"
+                    />
+                  </svg>
+                );
+              })()}
             </div>
             
             {/* Activity info */}
@@ -739,116 +706,44 @@ export function ActivityCapsuleDetailSkinAware({
             </div>
           </div>
           
-          {/* Ornament divider */}
+          {/* Left ornament */}
           <div className="activity-capsule-detail-skin-aware__ornament">
             <div className="activity-capsule-detail-skin-aware__ornament-line" />
             <div className="activity-capsule-detail-skin-aware__ornament-center" />
             <div className="activity-capsule-detail-skin-aware__ornament-line" />
           </div>
-          
-          {/* Info row */}
-          {showInfo && (
-            <div className="activity-capsule-detail-skin-aware__info-row">
-              <div className="activity-capsule-detail-skin-aware__info-item">
-                <div className="activity-capsule-detail-skin-aware__info-label">Durata</div>
-                <div className="activity-capsule-detail-skin-aware__info-value">{durationDisplay}</div>
-              </div>
-              <div className="activity-capsule-detail-skin-aware__info-item">
-                <div className="activity-capsule-detail-skin-aware__info-label">Ricompensa</div>
-                <div className="activity-capsule-detail-skin-aware__info-value">{rewardDisplay}</div>
-              </div>
-              <div className="activity-capsule-detail-skin-aware__info-item">
-                <div className="activity-capsule-detail-skin-aware__info-label">ETA</div>
-                <div className="activity-capsule-detail-skin-aware__info-value">{etaDisplay}</div>
-              </div>
-            </div>
-          )}
-          
-          {/* Second ornament */}
-          <div className="activity-capsule-detail-skin-aware__ornament">
-            <div className="activity-capsule-detail-skin-aware__ornament-line" />
-            <div className="activity-capsule-detail-skin-aware__ornament-center" />
-            <div className="activity-capsule-detail-skin-aware__ornament-line" />
-          </div>
-          
+
           {/* Slot rack */}
           {showSlots && (
             <div className="activity-capsule-detail-skin-aware__slot-section">
               <div className="activity-capsule-detail-skin-aware__section-label">
                 Personaggi assegnati
               </div>
-              <ResidentSlotRack
-                slots={residentSlots}
-                layout="detail"
-                overflowBehavior="scroll"
-                resolveDisplayInfo={resolveDisplayInfo}
-                getSlotActivityState={getSlotActivityState}
-                onSlotClick={(slotId) => {
-                  const slot = slots.find(s => s.id === slotId);
-                  if (!slot) return;
-                  if (slot.state === 'empty' || slot.state === 'ghost') {
-                    onSlotAssign?.(slotId);
-                  } else if (slot.state === 'idle') {
-                    onSlotDetach?.(slotId);
-                  }
-                }}
-                onSlotClear={onSlotDetach}
-                className="activity-capsule-detail-skin-aware__slot-rack"
-                slotSize={slotSizePx}
-              />
+              <InsetPanel style={{ overflow: 'hidden' }}>
+                <ResidentSlotRack
+                  slots={residentSlots}
+                  layout="detail"
+                  overflowBehavior="scroll"
+                  resolveDisplayInfo={resolveDisplayInfo}
+                  getSlotActivityState={getSlotActivityState}
+                  onSlotClick={(slotId) => {
+                    const slot = slots.find(s => s.id === slotId);
+                    if (!slot) return;
+                    if (slot.state === 'empty' || slot.state === 'ghost') {
+                      onSlotAssign?.(slotId);
+                    } else if (slot.state === 'idle') {
+                      onSlotDetach?.(slotId);
+                    }
+                  }}
+                  onSlotClear={onSlotDetach}
+                  className="activity-capsule-detail-skin-aware__slot-rack"
+                  slotSize={slotSizePx}
+                />
+              </InsetPanel>
             </div>
           )}
 
-          {/* Requirements */}
-          {showSlots && (
-            <div className="activity-capsule-detail-skin-aware__requirements">
-              <div className="activity-capsule-detail-skin-aware__section-label">
-                Requisiti
-              </div>
-              <WanderlustRequirementList
-                requirements={[
-                  { label: 'Forza', current: 45, required: 60 },
-                  { label: 'Destrezza', current: 38, required: 50 },
-                  { label: 'Costituzione', current: 42, required: 40 },
-                ]}
-              />
-            </div>
-          )}
-
-          {/* Telemetry */}
-          {showTelemetry && (
-            <div className="activity-capsule-detail-skin-aware__telemetry">
-              <div className="activity-capsule-detail-skin-aware__section-label">
-                Registro eventi
-              </div>
-              <div className="activity-capsule-detail-skin-aware__telemetry-log">
-                {telemetry.length === 0 ? (
-                  <div className="activity-capsule-detail-skin-aware__telemetry-empty">
-                    Nessun evento registrato.
-                  </div>
-                ) : (
-                  telemetry.map((entry) => (
-                    <div
-                      key={entry.id}
-                      className={`activity-capsule-detail-skin-aware__telemetry-entry activity-capsule-detail-skin-aware__telemetry-entry--${entry.type}`}
-                    >
-                      <span className="activity-capsule-detail-skin-aware__telemetry-time">
-                        {entry.timestamp.toLocaleTimeString('it-IT', { 
-                          hour: '2-digit', 
-                          minute: '2-digit' 
-                        })}
-                      </span>
-                      <span className="activity-capsule-detail-skin-aware__telemetry-message">
-                        {entry.message}
-                      </span>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          )}
-          
-          {/* CTA buttons */}
+          {/* CTA — bottom of left column */}
           <div className="activity-capsule-detail-skin-aware__cta-row">
             {status === 'idle' && onStart && (
               <button
@@ -876,7 +771,108 @@ export function ActivityCapsuleDetailSkinAware({
               </button>
             )}
           </div>
-        </div>
+
+          </div>{/* end __col-left */}
+
+          {/* ── COLUMN DIVIDER ── */}
+          <div className="activity-capsule-detail-skin-aware__col-divider" />
+
+          {/* ── RIGHT COLUMN: meccanico + registro ── */}
+          <div className="activity-capsule-detail-skin-aware__col-right">
+
+          {/* Stats strip: duration / reward / eta */}
+          {showInfo && (
+            <div className="activity-capsule-detail-skin-aware__info-row">
+              <div className="activity-capsule-detail-skin-aware__info-item">
+                <div className="activity-capsule-detail-skin-aware__info-label">Durata</div>
+                <div className="activity-capsule-detail-skin-aware__info-value">{durationDisplay}</div>
+              </div>
+              <div className="activity-capsule-detail-skin-aware__info-item">
+                <div className="activity-capsule-detail-skin-aware__info-label">Ricompensa</div>
+                <div className="activity-capsule-detail-skin-aware__info-value">{rewardDisplay}</div>
+              </div>
+              <div className="activity-capsule-detail-skin-aware__info-item">
+                <div className="activity-capsule-detail-skin-aware__info-label">ETA</div>
+                <div className="activity-capsule-detail-skin-aware__info-value">{etaDisplay}</div>
+              </div>
+            </div>
+          )}
+
+          {/* Right ornament */}
+          <div className="activity-capsule-detail-skin-aware__ornament">
+            <div className="activity-capsule-detail-skin-aware__ornament-line" />
+            <div className="activity-capsule-detail-skin-aware__ornament-center" />
+            <div className="activity-capsule-detail-skin-aware__ornament-line" />
+          </div>
+
+          {/* Requirements — su pergamena */}
+          {showSlots && (
+            <div className="activity-capsule-detail-skin-aware__requirements">
+              <div className="activity-capsule-detail-skin-aware__section-label">
+                Requisiti
+              </div>
+              <InsetPanel material="parchment" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {[
+                  { label: 'Forza', current: 45, required: 60 },
+                  { label: 'Destrezza', current: 38, required: 50 },
+                  { label: 'Costituzione', current: 42, required: 40 },
+                ].map((req, i) => {
+                  const met = req.current >= req.required;
+                  const pct = Math.min(1, req.current / req.required);
+                  return (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <span style={{ flex: '0 0 88px', fontSize: '9px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(55, 38, 12, 0.65)', fontFamily: 'inherit' }}>
+                        {req.label}
+                      </span>
+                      <div style={{ flex: 1, height: '3px', background: 'rgba(110, 80, 30, 0.18)', borderRadius: '2px', overflow: 'hidden' }}>
+                        <div style={{ width: `${pct * 100}%`, height: '100%', background: met ? 'rgba(65, 115, 50, 0.75)' : 'rgba(160, 85, 25, 0.65)', borderRadius: '2px', transition: 'width 0.4s ease' }} />
+                      </div>
+                      <span style={{ fontSize: '11px', fontVariantNumeric: 'tabular-nums', minWidth: '46px', textAlign: 'right', color: met ? 'rgba(45, 90, 35, 0.9)' : 'rgba(130, 65, 20, 0.9)' }}>
+                        {req.current}<span style={{ opacity: 0.5, fontSize: '9px' }}>/{req.required}</span>
+                      </span>
+                    </div>
+                  );
+                })}
+              </InsetPanel>
+            </div>
+          )}
+
+          {/* Telemetry */}
+          {showTelemetry && (
+            <div className="activity-capsule-detail-skin-aware__telemetry">
+              <div className="activity-capsule-detail-skin-aware__section-label">
+                Registro eventi
+              </div>
+              <div className="activity-capsule-detail-skin-aware__telemetry-log">
+                {telemetry.length === 0 ? (
+                  <div className="activity-capsule-detail-skin-aware__telemetry-empty">
+                    Nessun evento registrato.
+                  </div>
+                ) : (
+                  telemetry.map((entry) => (
+                    <div
+                      key={entry.id}
+                      className={`activity-capsule-detail-skin-aware__telemetry-entry activity-capsule-detail-skin-aware__telemetry-entry--${entry.type}`}
+                    >
+                      <span className="activity-capsule-detail-skin-aware__telemetry-time">
+                        {entry.timestamp.toLocaleTimeString('it-IT', {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </span>
+                      <span className="activity-capsule-detail-skin-aware__telemetry-message">
+                        {entry.message}
+                      </span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+          
+          </div>{/* end __col-right */}
+
+        </div>{/* end __content */}
         </WanderlustAmbientField>
       </div>
       
@@ -900,6 +896,14 @@ export function ActivityCapsuleDetailSkinAware({
         .activity-capsule-detail-surface .ws-content {
           position: relative;
           z-index: 2;
+        }
+
+        /* "Beautiful Fantasy" ambient — aggiunge un velo indaco/cosmico al fondo scuro */
+        .activity-capsule-detail-skin-aware__background {
+          background:
+            radial-gradient(ellipse at 28% 18%, rgba(40, 28, 60, 0.55) 0%, transparent 55%),
+            radial-gradient(ellipse at 72% 80%, rgba(25, 14, 4, 0.50) 0%, transparent 50%),
+            var(--detail-frame-gradient);
         }
 
         .activity-capsule-detail-skin-aware {
@@ -1037,21 +1041,63 @@ export function ActivityCapsuleDetailSkinAware({
           color: var(--detail-close-button-hover-color);
         }
         
+        /*
+         * WanderlustSurface (ws-root--panel) has ws-content padding: 22px on all sides.
+         * We fix the outer surface to 680px; the inner div takes 100% of ws-content's
+         * content area (680 - 44 = 636px), which fits inside ws-root without clipping.
+         */
+        .activity-capsule-detail-surface {
+          width: 680px !important;
+          max-width: 92vw !important;
+        }
+        .activity-capsule-detail-skin-aware {
+          width: 100%;
+          max-width: 100%;
+        }
+
         .activity-capsule-detail-skin-aware__content {
           position: relative;
           display: flex;
-          flex-direction: column;
-          padding: calc(var(--detail-content-padding) + 6px) calc(var(--detail-content-padding) + 12px);
-          gap: 16px;
+          flex-direction: row;
+          align-items: stretch;
+          padding: 20px 24px 18px;
+          gap: 0;
           height: 100%;
           overflow: hidden;
+        }
+
+        .activity-capsule-detail-skin-aware__col-left {
+          flex: 0 0 54%;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          padding-right: 22px;
+          min-height: 0;
+        }
+
+        .activity-capsule-detail-skin-aware__col-divider {
+          width: 1px;
+          align-self: stretch;
+          background: linear-gradient(to bottom, transparent, rgba(180, 130, 40, 0.22) 20%, rgba(180, 130, 40, 0.22) 80%, transparent);
+          flex-shrink: 0;
+          margin: 4px 0;
+        }
+
+        .activity-capsule-detail-skin-aware__col-right {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          padding-left: 22px;
+          min-height: 0;
         }
         
         .activity-capsule-detail-skin-aware__header {
           display: flex;
           align-items: center;
           gap: 16px;
-          margin-bottom: 4px;
+          margin-bottom: 0;
+          padding-bottom: 6px;
         }
         
         .activity-capsule-detail-skin-aware__poi {
@@ -1074,8 +1120,22 @@ export function ActivityCapsuleDetailSkinAware({
           font-size: var(--detail-name-font-size);
           font-weight: 700;
           color: var(--detail-name-color);
-          line-height: 1.2;
-          letter-spacing: 0.05em;
+          line-height: 1.15;
+          letter-spacing: 0.20em;
+          text-transform: uppercase;
+          text-shadow:
+            0 0 18px rgba(200, 155, 45, 0.40),
+            0 0 40px rgba(200, 155, 45, 0.15),
+            0 1px 3px rgba(0, 0, 0, 0.70);
+          background: linear-gradient(
+            160deg,
+            rgba(245, 210, 95, 1) 0%,
+            rgba(215, 165, 50, 1) 45%,
+            rgba(175, 120, 20, 1) 100%
+          );
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
         }
         
         .activity-capsule-detail-skin-aware__type {
@@ -1220,8 +1280,7 @@ export function ActivityCapsuleDetailSkinAware({
         .activity-capsule-detail-skin-aware__requirements {
           display: flex;
           flex-direction: column;
-          gap: 12px;
-          margin-top: 16px;
+          gap: 10px;
         }
 
         .activity-capsule-detail-skin-aware__slot--ghost {
@@ -1452,6 +1511,40 @@ export function ActivityCapsuleDetailSkinAware({
       )}
     </div>
     </WanderlustSurface>
+  );
+
+  if (inlineMode) return surface;
+
+  return (
+    // Outer div: static centering only
+    <div style={{ position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', zIndex: 1000 }}>
+      <div style={{ position: 'relative' }}>
+        {/* Ghost drag tracker — invisible, Framer Motion writes rawX/rawY directly */}
+        {enableDrag && (
+          <motion.div
+            drag
+            dragControls={dragControls}
+            dragListener={false}
+            dragMomentum={false}
+            style={{
+              x: heavyDrag.rawX,
+              y: heavyDrag.rawY,
+              position: 'absolute',
+              inset: 0,
+              opacity: 0,
+              zIndex: 2,
+              touchAction: 'none',
+            }}
+            onDragStart={heavyDrag.onDragStart}
+            onDragEnd={heavyDrag.onDragEnd}
+          />
+        )}
+        {/* Visual element — spring-lagged behind ghost = "lifting with effort" feel */}
+        <motion.div style={{ x: heavyDrag.x, y: heavyDrag.y, cursor: 'default' }}>
+          {surface}
+        </motion.div>
+      </div>
+    </div>
   );
 }
 

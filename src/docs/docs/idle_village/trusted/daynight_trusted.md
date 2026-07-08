@@ -5,8 +5,9 @@
 - Area: `time`
 - Canonical Name: `Day/Night Cycle System`
 - Primary Files:
-  - `src/ui/idleVillage/components/minimal/DayNightPOI.tsx`
-  - `src/ui/idleVillage/components/minimal/DayNightPoiSkin.tsx`
+  - `src/ui/idleVillage/frozen/kits/poiKit.tsx` (certified kit export)
+  - `src/ui/idleVillage/components/minimal/DayNightPOI.tsx` (canonical component)
+  - `src/ui/idleVillage/components/minimal/DayNightPoiSkin.tsx` (canonical component)
   - `src/ui/idleVillage/map/actionCards/DayNightActionCard.tsx`
   - `src/ui/idleVillage/skins/dayNightPoiSkinConfig.ts`
   - `src/store/useMinimalGameplay.ts` (state integration)
@@ -18,7 +19,8 @@
 - Related Contracts:
   - `[Time Engine Contract](time_engine_trusted.md)`
   - `[Minimal Gameplay Store](../minimal_gameplay_implementation_plan.md)`
-- Notes: `RT-DAYN-001 audit completed - fully compliant`
+  - `[Frozen Kits Pattern](../../../../ui/idleVillage/frozen/README.md)`
+- Notes: `RT-DAYN-001 audit completed - fully compliant. Kit pattern adopted 2026-01-20.`
 
 ## 1. Purpose
 The Day/Night Cycle System provides visual representation and control of the game's temporal progression. It displays the current phase (day/night), progress through the phase, and allows users to pause/resume the cycle. The system integrates with the Minimal Gameplay store to maintain temporal state consistency across the application.
@@ -188,7 +190,7 @@ interface DayNightActionCardProps {
 - **Do not drift from POI family visual grammar** (halo conventions, identity patterns, progress indicators)
 
 ## 11. Change Policy
-Since this component is `candidate`, any modification to:
+Since this component is `trusted`, any modification to:
 - behavior (phase calculation, progress tracking)
 - visual grammar (colors, icons, animations)
 - runtime contract (store integration, props interface)
@@ -217,6 +219,16 @@ requires:
   - Time layer separation: No local timers, authoritative store usage verified
   - Anti-pattern compliance: Zero violations of forbidden patterns
 - **Evidence**: `test-results/rt-dayn-001-alignment-2026-04-24.log`
+
+### 2026-01-20 (Kit Pattern Adoption)
+- **STATUS**: Kit pattern adopted for Day/Night components
+- **Changes Applied**:
+  - DayNightPOI now exported from `src/ui/idleVillage/frozen/kits/poiKit.tsx`
+  - All pages updated to import from kit instead of direct minimal path
+  - Barrel export created at `src/ui/idleVillage/frozen/kits/index.ts`
+  - ESLint rule enforces kit imports over deep imports
+- **Impact**: Single source of truth maintained, propagation via re-export
+- **Evidence**: Kit refactoring completed, all imports verified
 
 ### 2026-04-22
 - Initial trusted documentation creation

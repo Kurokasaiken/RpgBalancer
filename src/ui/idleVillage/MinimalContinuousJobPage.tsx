@@ -3,10 +3,10 @@ import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
 import { StyleLabSurface } from '@/ui/styleLab/StyleLabSurface';
 import { useCentralizedTiming } from '@/ui/idleVillage/hooks/useCentralizedTiming';
-import { ClockWidget } from '@/ui/idleVillage/components/minimal/ClockWidget';
+import { ClockWidget } from '@/ui/idleVillage/frozen/kits/clockKit';
+import { DayNightPOI } from '@/ui/idleVillage/frozen/kits/poiKit';
 import { useMinimalGameplayWithIdleVillageConfig, useMinimalGameplayStore } from '@/store/useMinimalGameplay';
 import { useStyleLabTokens } from '@/ui/styleLab/hooks/useStyleLabTokens';
-import DayNightPOI from '@/ui/idleVillage/components/minimal/DayNightPOI';
 import { ResourcePanel } from '@/ui/idleVillage/components/ResourcePanel';
 import { SlotRackKitShell, ResidentSlotRack } from '@/ui/idleVillage/frozen/kits/slotRackKit';
 import type { ResidentSlotViewModel } from '@/ui/idleVillage/slots/types';

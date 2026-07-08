@@ -259,15 +259,6 @@ export function MoodboardPage() {
     }),
     [],
   );
-  const showcaseSlot = useMemo(
-    () => ({
-      slotId: 'scouting-01',
-      iconName: '⛬',
-      label: 'Scout Ridge',
-      assignedWorkerName: 'Aurora V.',
-    }),
-    [],
-  );
 
   const goToOffset = useCallback(
     (offset: number) => {
@@ -476,22 +467,9 @@ export function MoodboardPage() {
               </div>
 
               <div className="moodboard-component-card">
-                <p className="moodboard-component-card__title">ActivitySlot & LocationCard</p>
-                <p className="moodboard-component-card__copy">Drop target circolare + card location per overlay tematici.</p>
+                <p className="moodboard-component-card__title">LocationCard</p>
+                <p className="moodboard-component-card__copy">Card location per validare textures, blur e bagliori dinamici.</p>
                 <div className="moodboard-component-stack">
-                  <div className="flex justify-center">
-                    <ActivitySlot
-                      slotId={showcaseSlot.slotId}
-                      iconName={showcaseSlot.iconName}
-                      label={showcaseSlot.label}
-                      assignedWorkerName={showcaseSlot.assignedWorkerName}
-                      onWorkerDrop={() => undefined}
-                      onInspect={() => undefined}
-                      progressFraction={0}
-                      elapsedSeconds={0}
-                      totalDuration={0}
-                    />
-                  </div>
                   <LocationCard
                     title="Foresta Radiante"
                     description="Preset location per validare textures, blur e bagliori dinamici."

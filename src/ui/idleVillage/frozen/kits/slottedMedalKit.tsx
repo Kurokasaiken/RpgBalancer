@@ -9,7 +9,20 @@
 export { default as SlottedMedal } from '@/ui/idleVillage/components/SlottedMedal';
 export type { SlottedMedalProps } from '@/ui/idleVillage/components/SlottedMedal';
 
+import type { ComponentProps } from 'react';
+import SlottedMedal from '@/ui/idleVillage/components/SlottedMedal';
 import { useCanonicalRosterBundle } from '../_infra/CanonicalDataBridge';
+import { createKitShell, withKitShell, FULL_PROVIDER_CHAIN } from '../_infra/KitShell';
+
+/** Smart shell: mounts only the providers missing above in the tree. */
+export const SlottedMedalKitShell = createKitShell(FULL_PROVIDER_CHAIN, 'SlottedMedalKitShell');
+
+/** Drop-in variant: the canonical SlottedMedal pre-wrapped in its smart shell. */
+export const SlottedMedalStandalone = withKitShell<ComponentProps<typeof SlottedMedal>>(
+  SlottedMedal,
+  FULL_PROVIDER_CHAIN,
+  'SlottedMedalStandalone'
+);
 
 export function useSlottedMedalKitData() {
   const { residents } = useCanonicalRosterBundle(0);

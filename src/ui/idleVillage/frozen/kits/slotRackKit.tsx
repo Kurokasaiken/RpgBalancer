@@ -9,11 +9,8 @@
  * Contract subtree: `[data-testid="resident-slot-rack-root"]`
  */
 
-import { useMemo, type ReactNode } from 'react';
-import { DndContext } from '@dnd-kit/core';
-import { DragProvider } from '@/ui/idleVillage/components/DragContext';
-import { SandboxTimingProvider } from '@/ui/idleVillage/hooks/useSandboxTimingBridge';
-import { SkinSystemProvider } from '@/ui/idleVillage/hooks/useSkinSystem';
+import { useMemo } from 'react';
+import { createKitShell, FULL_PROVIDER_CHAIN } from '../_infra/KitShell';
 import { useCanonicalRosterBundle, SLOT_LAB_CONFIG } from '../_infra/CanonicalDataBridge';
 import type { ResidentSlotViewModel } from '@/ui/idleVillage/slots/types';
 
@@ -60,19 +57,10 @@ export function useSlotRackKitData(): { slots: ResidentSlotViewModel[] } {
 
 /**
  * Canonical provider chain required by the slot rack and its dnd-kit usage.
- * Mirrors `TestRosterPage` (Audit §2.5).
+ * Mirrors `TestRosterPage` (Audit §2.5). Smart: mounts only the providers
+ * missing above in the tree, so the kit is drop-in anywhere.
  */
-export function SlotRackKitShell({ children }: { children: ReactNode }): JSX.Element {
-  return (
-    <SkinSystemProvider>
-      <SandboxTimingProvider>
-        <DragProvider>
-          <DndContext>{children}</DndContext>
-        </DragProvider>
-      </SandboxTimingProvider>
-    </SkinSystemProvider>
-  );
-}
+export const SlotRackKitShell = createKitShell(FULL_PROVIDER_CHAIN, 'SlotRackKitShell');
 
 export * from './slotRackKit.contract';
 export * from './slotRackKit.fixture';

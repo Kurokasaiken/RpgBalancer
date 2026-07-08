@@ -45,14 +45,25 @@ export interface ResourceDeltaDefinition {
 }
 
 /**
+ * Numeric stat threshold, e.g. { stat: 'hp', operator: '>', value: 200 }.
+ * Evaluated by statMatching.evaluateStatRequirement.
+ */
+export interface NumericStatRequirement {
+  stat: string;
+  operator: '>' | '>=' | '<' | '<=' | '==';
+  value: number;
+}
+
+/**
  * Constraints describing which resident stat tags are required/prohibited.
  */
 export interface StatRequirement {
   /**
-   * Resident must possess all of these stat tags.
-   * Example: ["discipline","lantern"].
+   * Resident must possess all of these stat tags (strings) and/or satisfy
+   * all numeric thresholds (NumericStatRequirement objects).
+   * Example: ["discipline", { stat: "hp", operator: ">", value: 200 }].
    */
-  allOf?: string[];
+  allOf?: Array<string | NumericStatRequirement>;
   /**
    * Resident must match at least one of these tags.
    * Example: ["edge","moth"].

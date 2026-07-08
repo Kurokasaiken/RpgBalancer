@@ -89,6 +89,36 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
   // Minimal starting activities: core jobs + an early quest to exercise
   // the time, job, quest and injury engines.
   activities: {
+    // TEST RACK — drives /minimal-roster-slot-integration (L2 Roster + SlotRack).
+    // One open slot + one HP>200 slot, infinite virtual slots beyond those.
+    slot_rack_lab: {
+      id: 'slot_rack_lab',
+      label: 'Slot Rack Lab',
+      description: 'Rack di test: slot aperto + slot HP > 200, slot infiniti.',
+      tags: ['job', 'test', 'slot_lab'],
+      slotTags: ['test_rack'],
+      resolutionEngineId: 'slot-lab-harness',
+      durationFormula: '60',
+      maxSlots: 'infinite',
+      metadata: {
+        slotBlueprints: [
+          {
+            id: 'rack-slot-open',
+            label: 'Slot Aperto',
+            requirementLabel: 'Qualsiasi',
+          },
+          {
+            id: 'rack-slot-hp200',
+            label: 'Slot HP > 200',
+            requirement: {
+              label: 'HP > 200',
+              allOf: [{ stat: 'hp', operator: '>', value: 200 }],
+            },
+            requirementLabel: 'HP > 200',
+          },
+        ],
+      },
+    },
     // STABLE JOBS - Low risk, repeatable, consistent rewards
     job_wood_gathering_stable: {
       id: 'job_wood_gathering_stable',

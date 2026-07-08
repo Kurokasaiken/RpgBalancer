@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import './ui/wanderlust-surface/layout/wanderlust-layout.css';
+import './ui/wanderlust-surface/wanderlust-surface.css';
 import V8GlobalFilters from './ui/styleLab/components/V8GlobalFilters';
 import { WanderlustSurfaceDefs } from './ui/wanderlust-surface';
 

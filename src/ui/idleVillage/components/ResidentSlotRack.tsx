@@ -21,8 +21,13 @@ import { SlotV12Renderer } from '@/ui/idleVillage/components/SlotV12Renderer';
 import { WanderlustSurface, type WanderlustShape } from '@/ui/wanderlust-surface/WanderlustSurface';
 import { type MaterialPreset } from '@/ui/wanderlust-surface/materialPresets';
 import styles from './SlotShake.module.css';
-import pgCardStyles from './PgCard.module.css';
+import rackScrollStyles from './RackScroll.module.css';
 import type { SlotDebugVisualizationSettings } from '@/balancing/config/idleVillage/slotDebugVisualizationConfig';
+import type { LocationDropState } from '@/ui/idleVillage/validators/locationDropValidators';
+import { useExtractionSequence } from '@/ui/idleVillage/interaction/useExtractionSequence';
+import { getBloomStyle } from '@/ui/idleVillage/interaction/bloomEffect';
+
+type DropState = LocationDropState;
 
 const SLOTTED_MEDAL_BEHAVIOR_CONFIG = {
   resistDurationMs: DEFAULT_SLOTTED_MEDAL_CONFIG.behavior.resistDurationMs,
@@ -63,6 +68,8 @@ export interface ResidentSlotRackProps {
   onSlotClear?: (slotId: string) => void;
   onSlotClick?: (slotId: string) => void;
   onSlotInspect?: (slotId: string) => void;
+  onSlotPointerDown?: (slotId: string) => void;
+  onSlotPointerUp?: (slotId: string) => void;
   selectedSlotId?: string | null;
   highlightedSlotId?: string | null;
   draggingResidentId?: string | null;
@@ -253,21 +260,37 @@ const DetailSlot = memo(({
     data: { type: 'slot', slotId: slot.id }
   });
 
-  // Extraction mechanism state
-  const [extractionProgress, setExtractionProgress] = useState(0);
-  const [isExtracting, setIsExtracting] = useState(false);
-  const extractionTimerRef = useRef<number | null>(null);
-  const extractionStartTimeRef = useRef<number>(0);
+  // Extraction choreography — single shared implementation (see /slot reference)
+  const extraction = useExtractionSequence({
+    onExtracted: () => {
+      if (onSlotClear) onSlotClear(slot.id);
+      // The consumer may start a return flight; the slot itself is done —
+      // reset shortly after so the bezel settles into the empty state.
+      scheduleExtractionTimeout(() => extraction.reset(), 200);
+    },
+    onOvershoot: () => {
+      if (shouldShowMedal) {
+        trackTelemetryEvent(SLOTTED_MEDAL_TELEMETRY.detachEvent, {
+          slotId: slot.id,
+          residentId: slot.assignedResidentId,
+          medalType: 'bronze',
+          timestamp: Date.now(),
+        });
+        slotSounds.detach();
+      }
+      // NOTE: the in-slot portrait must NOT spring in place here — that made it
+      // "move and come back" before extraction, diverging from /slot. The token
+      // only moves via the shared FlightProxy (started by the page on onExtracted).
+    },
+  });
+  const extractionProgress = extraction.progress;
+  const isExtracting = extraction.isExtracting;
   const extractionTimeoutsRef = useRef<number[]>([]);
-  const EXTRACTION_DURATION = 560; // 560ms to match bezel transition time
 
   // Drop impact animation state
   const [dropImpactScale, setDropImpactScale] = useState(1);
   const [isDropAnimating, setIsDropAnimating] = useState(false);
   const [dropGlowIntensity, setDropGlowIntensity] = useState(0);
-
-  // Extraction spring animation state for PG returning to roster
-  const [isExtractionSpringAnimating, setIsExtractionSpringAnimating] = useState(false);
 
   const scheduleExtractionTimeout = useCallback((callback: () => void, delay: number) => {
     const timeoutId = window.setTimeout(callback, delay);
@@ -356,16 +379,6 @@ const DetailSlot = memo(({
     }, 80);
   }, []);
 
-  // Extraction spring animation for PG returning to roster
-  const triggerExtractionSpring = useCallback(() => {
-    setIsExtractionSpringAnimating(true);
-    
-    // Use same duration as PgCard bounce-spring (0.6s)
-    scheduleExtractionTimeout(() => {
-      setIsExtractionSpringAnimating(false);
-    }, 600);
-  }, [scheduleExtractionTimeout]);
-
   // Handle medal drop telemetry when resident is assigned
   useEffect(() => {
     if (isAssigned && shouldShowMedal && slot.assignedResidentId) {
@@ -385,102 +398,18 @@ const DetailSlot = memo(({
     }
   }, [isAssigned, shouldShowMedal, slot.id, slot.assignedResidentId, slotSounds]);
 
-  // Press-and-hold extraction mechanism with spring physics
+  // Press-and-hold extraction mechanism — delegates to the shared sequence
   const startExtraction = useCallback(() => {
     if (!isAssigned || !onSlotClear) return;
-    setIsExtracting(true);
-    setExtractionProgress(0);
-    clearExtractionTimeouts();
-    extractionStartTimeRef.current = Date.now();
-    
-    // Start progress animation with requestAnimationFrame for immediate response
-    extractionTimerRef.current = requestAnimationFrame(function animate() {
-      const elapsed = Date.now() - extractionStartTimeRef.current;
-      const progress = Math.min(elapsed / EXTRACTION_DURATION, 1);
-      
-      // Use linear progress to match insertion animation exactly (no easing)
-      setExtractionProgress(progress);
-      
-      if (progress >= 1) {
-        // Extraction complete - trigger spring animation
-        extractionTimerRef.current = null;
-        
-        // Track medal detach event if SlottedMedal is present
-        if (shouldShowMedal) {
-          trackTelemetryEvent(SLOTTED_MEDAL_TELEMETRY.detachEvent, {
-            slotId: slot.id,
-            residentId: slot.assignedResidentId,
-            medalType: 'bronze',
-            timestamp: Date.now(),
-          });
-          slotSounds.detach();
-        }
-        
-        // Wait for bezel animation to complete (560ms) before starting spring animation
-        scheduleExtractionTimeout(() => {
-          // Spring animation effect - briefly overshoot then settle
-          setExtractionProgress(1.2); // Overshoot to mirror bezel flare
-          
-          scheduleExtractionTimeout(() => {
-            triggerExtractionSpring();
-
-            scheduleExtractionTimeout(() => {
-              setExtractionProgress(1.0);
-
-              // Wait for bounce-spring animation to complete before removing PG
-              scheduleExtractionTimeout(() => {
-                onSlotClear(slot.id);
-
-                scheduleExtractionTimeout(() => {
-                  setIsExtracting(false);
-                  setExtractionProgress(0);
-                }, EXTRACTION_TIMING.cleanupDelay);
-              }, EXTRACTION_TIMING.springDuration);
-            }, EXTRACTION_TIMING.postOpenHold);
-          }, EXTRACTION_TIMING.postOpenHold);
-        }, 560); // Wait for bezel animation (560ms)
-      } else {
-        // Continue animation
-        extractionTimerRef.current = requestAnimationFrame(animate);
-      }
-    });
-  }, [clearExtractionTimeouts, isAssigned, onSlotClear, scheduleExtractionTimeout, shouldShowMedal, slot.assignedResidentId, slot.id, triggerExtractionSpring]);
+    extraction.start();
+  }, [isAssigned, onSlotClear, extraction]);
 
   const cancelExtraction = useCallback(() => {
-    if (extractionTimerRef.current) {
-      cancelAnimationFrame(extractionTimerRef.current);
-      extractionTimerRef.current = null;
-    }
-    clearExtractionTimeouts();
-    
-    // Animate back to closed position from current progress
-    const currentProgress = extractionProgress;
-    const startTime = Date.now();
-    const duration = 300; // Quick close animation
-    
-    const closeTimer = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      
-      // Easing function for smooth closing
-      const easeInCubic = (t: number) => t * t * t;
-      const closeProgress = currentProgress * (1 - easeInCubic(progress));
-      
-      setExtractionProgress(closeProgress);
-      
-      if (progress >= 1) {
-        clearInterval(closeTimer);
-        setIsExtracting(false);
-        setExtractionProgress(0);
-      }
-    }, 16);
-  }, [clearExtractionTimeouts, extractionProgress]);
+    extraction.cancel();
+  }, [extraction]);
 
   useEffect(() => {
     return () => {
-      if (extractionTimerRef.current) {
-        cancelAnimationFrame(extractionTimerRef.current);
-      }
       clearExtractionTimeouts();
     };
   }, [clearExtractionTimeouts]);
@@ -514,12 +443,13 @@ const DetailSlot = memo(({
       dropGlowIntensity > 0
         ? `0 0 ${40 + dropGlowIntensity * 20}px rgba(58, 215, 128, ${0.6 * dropGlowIntensity}), 0 0 ${20 + dropGlowIntensity * 10}px rgba(255, 255, 255, ${0.3 * dropGlowIntensity})`
         : slotState === 'valid'
-          ? 'var(--slot-rack-slot-shadow-valid, 0 0 24px rgba(58, 215, 128, 0.45))'
+          // Valid bloom comes from the shared alpha-shaped effect on the wrapper
+          ? 'var(--slot-rack-slot-shadow-valid, none)'
           : isHighlighted
             ? 'var(--slot-rack-slot-shadow-highlighted, 0 0 24px rgba(251, 191, 36, 0.45))'
             : 'var(--slot-rack-slot-shadow, none)',
     transition: 'box-shadow 200ms ease, border 200ms ease, background 200ms ease, color 200ms ease, transform 80ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-    transform: `scale(${isExtractionSpringAnimating ? 1 : dropImpactScale})`,
+    transform: `scale(${dropImpactScale})`,
   };
 
   if (isSelected) {
@@ -571,16 +501,15 @@ const DetailSlot = memo(({
         onTouchEnd={isAssigned ? cancelExtraction : undefined}
         className={[
           'relative',
-          dropState === 'invalid' ? 'cursor-not-allowed opacity-35' : '',
-          isDropTarget ? 'animate-pulse' : '',
+          dropState === 'invalid' ? 'cursor-not-allowed' : '',
           isExtracting ? 'cursor-grabbing' : '',
         ]
           .filter(Boolean)
           .join(' ')}
         style={{
-          transition: 'filter 200ms ease',
-          ...(slotState === 'valid' ? { filter: 'drop-shadow(0 0 12px rgba(58, 215, 128, 0.6))' } : {}),
-          ...(isHighlighted ? { filter: 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' } : {}),
+          // Shared AAA bloom — identical to the POI medallion (alpha-shaped halo + pulse)
+          ...getBloomStyle(slotState === 'valid' ? 'valid' : slotState === 'invalid' ? 'invalid' : 'idle', slotSize ?? 96),
+          ...(isHighlighted && slotState !== 'valid' ? { filter: 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' } : {}),
           ...(isSelected ? { outline: '2px solid var(--slot-rack-slot-ring-color, rgba(255, 255, 255, 0.4))', outlineOffset: '4px', borderRadius: '50%' } : {}),
           ...(isExtracting ? { filter: 'drop-shadow(0 0 20px rgba(251, 191, 36, 0.8))' } : {}),
         }}
@@ -594,10 +523,10 @@ const DetailSlot = memo(({
           state={v12State}
           extractionProgress={extractionProgress}
           debugVisualization={debugVisualization ?? undefined}
-          size={slotSize}
+          sizePx={slotSize}
         />
-        {isAssigned && !isExtractionSpringAnimating && (
-          <div className={`absolute inset-0 flex items-center justify-center z-10 ${isExtractionSpringAnimating ? pgCardStyles['animate-bounce-spring'] : ''}`}>
+        {isAssigned && (
+          <div className="absolute inset-0 flex items-center justify-center z-10">
             <div className="relative">
               {debugVisualization?.showLabels && (
                 <span
@@ -634,25 +563,10 @@ const DetailSlot = memo(({
             </div>
           </div>
         )}
-        {isAssigned && onSlotClear && (
-          <span className="absolute -top-1 -right-1 rounded-full px-1 text-[8px]" style={badgeStyle}>
-            ×
-          </span>
-        )}
       </div>
       <p className="text-[9px] tracking-[0.2em]" style={labelStyle}>
         {slot.label}
       </p>
-      {slot.assignedResidentId && onSlotClear && (
-        <button
-          type="button"
-          className="text-[8px] uppercase tracking-[0.25em]"
-          style={clearButtonStyle}
-          onClick={() => onSlotClear(slot.id)}
-        >
-          Clear
-        </button>
-      )}
     </div>
   );
 });
@@ -701,10 +615,12 @@ export const ResidentSlotRack: React.FC<ResidentSlotRackProps> = ({
 
   const containerClasses = useMemo(() => {
     const base = 'flex gap-3 transition-all duration-300';
+    // Themed thin scrollbar (RackScroll.module.css) instead of the OS default
+    const scroll = `overflow-x-auto pb-2 pr-1 [-webkit-overflow-scrolling:touch] ${rackScrollStyles.rackScroll}`;
     if (layout === 'board') {
-      return overflowEnabled ? `${base} overflow-x-auto pb-2 pr-1 [-webkit-overflow-scrolling:touch]` : `${base} flex-wrap`;
+      return overflowEnabled ? `${base} ${scroll}` : `${base} flex-wrap`;
     }
-    return overflowEnabled ? `${base} overflow-x-auto pb-2 pr-1 text-center [-webkit-overflow-scrolling:touch]` : `${base} flex-wrap`;
+    return overflowEnabled ? `${base} ${scroll} text-center` : `${base} flex-wrap`;
   }, [layout, overflowEnabled]);
 
   const rackContent = (
@@ -775,6 +691,31 @@ export const ResidentSlotRack: React.FC<ResidentSlotRackProps> = ({
           const isSelected = slot.id === selectedSlotId;
           const isHighlighted = slot.id === highlightedSlotId;
           const isShaking = shakingSlotIds?.has(slot.id) ?? false;
+
+          // Infinite-slot placeholder: render as a "+" add indicator
+          if (slot.isPlaceholder && layout === 'detail') {
+            const sz = slotSize ?? 96;
+            return (
+              <div key={slot.id} className="flex flex-col items-center gap-1 shrink-0" role="listitem" aria-label="Slot aggiuntivo">
+                <div
+                  className="flex items-center justify-center rounded-full border-2 border-dashed"
+                  style={{
+                    width: sz, height: sz,
+                    borderColor: 'var(--slot-rack-slot-border-empty, rgba(148,163,184,0.3))',
+                    color: 'var(--slot-rack-slot-label-color, rgba(148,163,184,0.45))',
+                    fontSize: sz * 0.32,
+                    lineHeight: 1,
+                  }}
+                  title="Slot aggiuntivo disponibile"
+                >
+                  +
+                </div>
+                <p className="text-[9px] tracking-[0.2em]" style={{ color: 'var(--slot-rack-slot-label-color, #94a3b8)' }}>
+                  {slot.label}
+                </p>
+              </div>
+            );
+          }
 
           if (layout === 'board') {
             return (

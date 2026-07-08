@@ -4,7 +4,6 @@ import { Eye, EyeOff, GripVertical } from 'lucide-react';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { formatResidentLabel } from '@/ui/idleVillage/residentName';
 import PgCard, { type PgCardProps } from '@/ui/idleVillage/components/PgCard';
-import { CardSocket } from '@/ui/idleVillage/components/CardSocket';
 import WanderlustRosterCard from '@/ui/idleVillage/components/WanderlustRosterCard';
 import type { GetResidentCompatibility, ResidentCompatibilityState } from './ResidentRosterTypes';
 import type { DropValidationResult } from '@/ui/idleVillage/config/residentDropRules';
@@ -318,6 +317,19 @@ function DragTestContainer({
       return a.id.localeCompare(b.id);
     });
   }, [filteredResidents, isResidentBlocked]);
+
+  // Preload & decode every resident portrait as soon as the roster mounts, so
+  // the drag-overlay medallion (SVG <image>) can paint the portrait on its very
+  // first frame instead of waiting for fetch+decode at drag start.
+  useEffect(() => {
+    residents.forEach((resident) => {
+      const url = getResidentPortraitUrl(resident);
+      if (!url) return;
+      const img = new Image();
+      img.src = url;
+      img.decode?.().catch(() => { /* decode is best-effort preloading */ });
+    });
+  }, [residents]);
 
   // Instrument renderer stack at DragTestContainer level
   // Capture processed residents and PgCard props for divergence analysis
@@ -650,6 +662,9 @@ function DragTestContainer({
     // REGOLA 1: Durante il drag, solo il proxy è vivo
     const isLifted = (dragVisualState?.mode === 'dragging' || dragVisualState?.mode === 'flight') &&
                     dragVisualState?.residentId === resident.id;
+    // Spring-back in corso: la card è visibile ma non interagibile finché non torna idle
+    const isReturningCard = dragVisualState?.mode === 'returning' &&
+                    dragVisualState?.residentId === resident.id;
     
     const dragFeedbackState: PgCardProps['dragFeedbackState'] = draggingResidentId === resident.id ? activeDragFeedback : 'idle';
     const heroFlashActive = heroFlashIds.includes(resident.id);
@@ -687,6 +702,7 @@ function DragTestContainer({
         data-resident-id={resident.id}
         data-hero={resident.isHero}
         data-blocked={isBlocked}
+        style={{ pointerEvents: isLifted || isReturningCard ? 'none' : undefined }}
       >
         {heroFlashActive && (
           <span className="pointer-events-none absolute inset-0 rounded-2xl border border-amber-300/60 opacity-70" />
@@ -696,20 +712,20 @@ function DragTestContainer({
             Recupero necessario
           </div>
         )}
-        {isLifted ? (
-          <CardSocket className="w-full" horizontal={cardVariant === 'horizontal'} />
-        ) : useWanderlustSkin ? (
+        {/* Durante il drag la card resta montata e leggibile: va in alfa
+            (isDragging) e lo stato del PG diventa "Away" — mai socket vuoto. */}
+        {useWanderlustSkin ? (
           <WanderlustRosterCard
             workerId={resident.id}
             label={formatResidentLabel(resident)}
-            subtitle={subtitle}
+            subtitle={isLifted ? 'Away' : isLocked ? lockedStatusLabel : subtitle}
             hp={resident.currentHp}
             fatigue={resident.fatigue}
             maxHp={resident.maxHp}
-            isDragging={draggingResidentId === resident.id}
+            isDragging={isLifted || draggingResidentId === resident.id}
             disabled={!interactive}
             isInteractive={interactive}
-            statusLabel={isLocked ? lockedStatusLabel : describeStatus(resident)}
+            statusLabel={isLifted ? 'Away' : isLocked ? lockedStatusLabel : describeStatus(resident)}
             portraitUrl={getResidentPortraitUrl(resident)}
             compatibilityState={compatibilityState}
             compatibilityLabel={compatibilityLabel}
@@ -725,14 +741,14 @@ function DragTestContainer({
           <PgCard
             workerId={resident.id}
             label={formatResidentLabel(resident)}
-            subtitle={subtitle}
+            subtitle={isLifted ? 'Away' : isLocked ? lockedStatusLabel : subtitle}
             hp={resident.currentHp}
             fatigue={resident.fatigue}
             maxHp={resident.maxHp}
-            isDragging={draggingResidentId === resident.id}
+            isDragging={isLifted || draggingResidentId === resident.id}
             disabled={!interactive}
             isInteractive={interactive}
-            statusLabel={isLocked ? lockedStatusLabel : describeStatus(resident)}
+            statusLabel={isLifted ? 'Away' : isLocked ? lockedStatusLabel : describeStatus(resident)}
             horizontal={cardVariant === 'horizontal'}
             portraitUrl={getResidentPortraitUrl(resident)}
             compatibilityState={compatibilityState}

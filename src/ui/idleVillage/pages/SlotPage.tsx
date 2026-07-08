@@ -7,15 +7,12 @@ import { CustomDragOverlay } from '@/ui/idleVillage/components/CustomDragOverlay
 import { DragProvider } from '@/ui/idleVillage/components/DragContext';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { canonicalResidentData } from '@/ui/idleVillage/roster/CanonicalRosterBundle';
-import { FlightProxy } from '@/ui/idleVillage/components/FlightProxy';
+import { useDragOutcome } from '@/ui/idleVillage/interaction/useDragOutcome';
+import { useExtractionSequence } from '@/ui/idleVillage/interaction/useExtractionSequence';
+import { DragOutcomeFlight } from '@/ui/idleVillage/interaction/DragOutcomeFlight';
+import { getBloomStyle } from '@/ui/idleVillage/interaction/bloomEffect';
 
-type DragVisualState =
-  | { mode: 'idle' }
-  | { mode: 'dragging'; residentId: string }
-  | { mode: 'flight'; residentId: string; fromX: number; fromY: number; toX: number; toY: number; slotId: string; isInset: boolean }
-  | { mode: 'returning'; residentId: string };
-
-function DroppableSlot({ isOccupied, portraitUrl, extractionProgress, isExtracting, isFlight, onExtractionPointerDown, onExtractionPointerUp }: { isOccupied: boolean; portraitUrl?: string | null; extractionProgress: number; isExtracting: boolean; isFlight: boolean; onExtractionPointerDown?: () => void; onExtractionPointerUp?: () => void }) {
+function DroppableSlot({ isOccupied, portraitUrl, extractionProgress, isExtracting, isFlight, bloom = 'idle', onExtractionPointerDown, onExtractionPointerUp }: { isOccupied: boolean; portraitUrl?: string | null; extractionProgress: number; isExtracting: boolean; isFlight: boolean; bloom?: 'idle' | 'valid' | 'invalid'; onExtractionPointerDown?: () => void; onExtractionPointerUp?: () => void }) {
   const { setNodeRef, isOver: _isOver } = useDroppable({
     id: 'test-slot',
     data: { type: 'slot', slotId: 'test-slot' }
@@ -24,9 +21,9 @@ function DroppableSlot({ isOccupied, portraitUrl, extractionProgress, isExtracti
   return (
     <div ref={setNodeRef} className="flex flex-col items-center gap-4" data-slot-id="test-slot" style={{ background: 'transparent !important' }}>
       <div className="text-sm text-slate-400">SlotV12Renderer (Slot)</div>
-      <div 
-        className="relative" 
-        style={{ background: 'transparent !important' }}
+      <div
+        className="relative"
+        style={{ background: 'transparent !important', ...getBloomStyle(bloom, 120) }}
         onPointerDown={onExtractionPointerDown}
         onPointerUp={onExtractionPointerUp}
         onPointerLeave={onExtractionPointerUp}
@@ -61,18 +58,37 @@ export default function SlotPage() {
   const [draggedResidentId, setDraggedResidentId] = useState<string | null>(null);
   const [isSlotOccupied, setIsSlotOccupied] = useState(false);
   const [_dropState, _setDropState] = useState<'idle' | 'valid' | 'invalid'>('idle');
-  const [dragVisualState, setDragVisualState] = useState<DragVisualState>({ mode: 'idle' });
+  // Shared drag-outcome state machine (idle → dragging → flight|returning → idle)
+  const { state: dragVisualState, startDrag, startFlight, springBack, settle } = useDragOutcome();
   
-  // Extraction state (simplified like ResidentSlotRack)
-  const [isExtracting, setIsExtracting] = useState(false);
-  const [extractionProgress, setExtractionProgress] = useState(0);
-  const extractionTimerRef = useRef<number | null>(null);
-  const extractionTimeoutsRef = useRef<NodeJS.Timeout[]>([]);
-  const flightTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Extraction choreography — single shared implementation (certified here)
+  const extraction = useExtractionSequence({
+    onExtracted: () => {
+      // Clear the slot PG token, then fly the token back to the card
+      setIsSlotOccupied(false);
+      const slotRect = document.querySelector('[data-slot-id="test-slot"]')?.getBoundingClientRect();
+      const cardRect = document.querySelector('[data-dnd-id="pg-card"]')?.getBoundingClientRect();
+      if (slotRect && cardRect && selectedResidentRef.current) {
+        startFlight({
+          residentId: selectedResidentRef.current.id,
+          fromX: slotRect.left + slotRect.width / 2,
+          fromY: slotRect.top + slotRect.height / 2,
+          toX: cardRect.left + cardRect.width / 2,
+          toY: cardRect.top + cardRect.height / 2,
+          slotId: 'test-slot',
+          isInset: false,
+        });
+      }
+    },
+  });
+  const isExtracting = extraction.isExtracting;
+  const extractionProgress = extraction.progress;
 
   // Load real heroes with portraits
   const residents = useMemo(() => canonicalResidentData(20), []);
   const selectedResident = residents[0] || null;
+  const selectedResidentRef = useRef(selectedResident);
+  selectedResidentRef.current = selectedResident;
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -101,18 +117,17 @@ export default function SlotPage() {
     }
     
     // Always clear extraction state after flight completes
-    setIsExtracting(false);
-    setExtractionProgress(0);
+    extraction.reset();
     // Reset drag visual state to idle - this resets dragFeedbackState to 'idle'
-    setDragVisualState({ mode: 'idle' });
-  }, [setIsSlotOccupied]);
+    settle();
+  }, [setIsSlotOccupied, settle, extraction]);
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
     const residentId = event.active.id as string;
     setIsDragging(true);
     setDraggedResidentId(residentId);
-    setDragVisualState({ mode: 'dragging', residentId });
-  }, []);
+    startDrag(residentId);
+  }, [startDrag]);
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     setIsDragging(false);
@@ -126,15 +141,9 @@ export default function SlotPage() {
       const slotRect = slotElement?.getBoundingClientRect();
       
       if (slotRect && selectedResident) {
-        // Use center of screen as fallback for from coordinates
-        const fromX = window.innerWidth / 2;
-        const fromY = window.innerHeight / 2;
-        
-        setDragVisualState({
-          mode: 'flight',
+        // Origin resolved by the hook: the actual pointer release position
+        startFlight({
           residentId: selectedResident.id,
-          fromX,
-          fromY,
           toX: slotRect.left + slotRect.width / 2,
           toY: slotRect.top + slotRect.height / 2,
           slotId: 'test-slot',
@@ -142,12 +151,13 @@ export default function SlotPage() {
         });
       }
     } else {
-      // Invalid drop - trigger returning animation
+      // Invalid drop - spring-back, then the hook resets to idle so the card
+      // becomes available/interactive again
       if (selectedResident) {
-        setDragVisualState({ mode: 'returning', residentId: selectedResident.id });
+        springBack(selectedResident.id);
       }
     }
-  }, [selectedResident]);
+  }, [selectedResident, startFlight, springBack]);
 
   // Simulate drop animation (incastonamento)
   const simulateDrop = useCallback(() => {
@@ -170,8 +180,7 @@ export default function SlotPage() {
     console.log('slotRect:', slotRect);
     
     if (cardRect && slotRect) {
-      const flightState = {
-        mode: 'flight' as const,
+      startFlight({
         residentId: selectedResident.id,
         fromX: cardRect.left + cardRect.width / 2,
         fromY: cardRect.top + cardRect.height / 2,
@@ -179,172 +188,27 @@ export default function SlotPage() {
         toY: slotRect.top + slotRect.height / 2,
         slotId: 'test-slot',
         isInset: true
-      };
-      console.log('Setting dragVisualState to:', flightState);
-      setDragVisualState(flightState);
+      });
     } else {
       console.log('MISSING RECTS: cannot start flight');
     }
-  }, [isSlotOccupied, selectedResident]);
+  }, [isSlotOccupied, selectedResident, startFlight]);
 
-  // Clear extraction timeouts
-  const clearExtractionTimeouts = useCallback(() => {
-    extractionTimeoutsRef.current.forEach(id => clearTimeout(id));
-    extractionTimeoutsRef.current = [];
-  }, []);
-
-
-  // Schedule extraction timeout
-  // Test page without SandboxTimingProvider - using setTimeout directly
-  /* eslint-disable no-restricted-globals */
-  const scheduleExtractionTimeout = useCallback((callback: () => void, delay: number) => {
-    const id = setTimeout(() => {
-      callback();
-      extractionTimeoutsRef.current = extractionTimeoutsRef.current.filter(t => t !== id);
-    }, delay);
-    extractionTimeoutsRef.current.push(id);
-  }, []);
-  /* eslint-enable no-restricted-globals */
-
-  // Simulate extraction animation (spring-back) with press-and-hold
+  // Press-and-hold extraction (shared sequence)
   const handleExtractionPointerDown = useCallback(() => {
     if (!isSlotOccupied || !selectedResident) return;
-    setIsExtracting(true);
-    setExtractionProgress(0);
-    clearExtractionTimeouts();
-    
-    const startTime = Date.now();
-    const EXTRACTION_DURATION = 560; // Matches CSS transition
-    
-    extractionTimerRef.current = requestAnimationFrame(function animate() {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / EXTRACTION_DURATION, 1);
-      setExtractionProgress(progress);
-      
-      if (progress < 1) {
-        extractionTimerRef.current = requestAnimationFrame(animate);
-      } else {
-        extractionTimerRef.current = null;
-        
-        // Wait for bezel animation to complete before spring animation
-        scheduleExtractionTimeout(() => {
-          // Spring animation effect - briefly overshoot then settle
-          setExtractionProgress(1.2);
-          
-          scheduleExtractionTimeout(() => {
-            // Clear the slot PG token BEFORE setting extractionProgress to 1.0
-            // This ensures the token is hidden before any animation starts
-            setIsSlotOccupied(false);
-            
-            setExtractionProgress(1.0);
-            
-            // Trigger flight animation after spring completes
-            const slotElement = document.querySelector('[data-slot-id="test-slot"]');
-            const cardElement = document.querySelector('[data-dnd-id="pg-card"]');
-            const slotRect = slotElement?.getBoundingClientRect();
-            const cardRect = cardElement?.getBoundingClientRect();
-            
-            if (slotRect && cardRect) {
-              setDragVisualState({
-                mode: 'flight',
-                residentId: selectedResident.id,
-                fromX: slotRect.left + slotRect.width / 2,
-                fromY: slotRect.top + slotRect.height / 2,
-                toX: cardRect.left + cardRect.width / 2,
-                toY: cardRect.top + cardRect.height / 2,
-                slotId: 'test-slot',
-                isInset: false
-              });
-            }
-          }, 300);
-        }, 560);
-      }
-    });
-  }, [isSlotOccupied, selectedResident, clearExtractionTimeouts, scheduleExtractionTimeout]);
+    extraction.start();
+  }, [isSlotOccupied, selectedResident, extraction]);
 
   // Auto-play full extraction animation (for button click)
   const simulateExtraction = useCallback(() => {
     if (!isSlotOccupied || !selectedResident) return;
-    setIsExtracting(true);
-    setExtractionProgress(0);
-    clearExtractionTimeouts();
-    
-    const startTime = Date.now();
-    const EXTRACTION_DURATION = 560; // Matches CSS transition
-    
-    extractionTimerRef.current = requestAnimationFrame(function animate() {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / EXTRACTION_DURATION, 1);
-      setExtractionProgress(progress);
-      
-      if (progress < 1) {
-        extractionTimerRef.current = requestAnimationFrame(animate);
-      } else {
-        extractionTimerRef.current = null;
-        
-        // Wait for bezel animation to complete before spring animation
-        scheduleExtractionTimeout(() => {
-          // Spring animation effect - briefly overshoot then settle
-          setExtractionProgress(1.2);
-          
-          scheduleExtractionTimeout(() => {
-            // Clear the slot PG token BEFORE setting extractionProgress to 1.0
-            setIsSlotOccupied(false);
-            
-            setExtractionProgress(1.0);
-            
-            // Trigger flight animation after spring completes
-            const slotElement = document.querySelector('[data-slot-id="test-slot"]');
-            const cardElement = document.querySelector('[data-dnd-id="pg-card"]');
-            const slotRect = slotElement?.getBoundingClientRect();
-            const cardRect = cardElement?.getBoundingClientRect();
-            
-            if (slotRect && cardRect) {
-              setDragVisualState({
-                mode: 'flight',
-                residentId: selectedResident.id,
-                fromX: slotRect.left + slotRect.width / 2,
-                fromY: slotRect.top + slotRect.height / 2,
-                toX: cardRect.left + cardRect.width / 2,
-                toY: cardRect.top + cardRect.height / 2,
-                slotId: 'test-slot',
-                isInset: false
-              });
-            }
-          }, 300);
-        }, 560);
-      }
-    });
-  }, [isSlotOccupied, selectedResident, clearExtractionTimeouts, scheduleExtractionTimeout]);
+    extraction.start();
+  }, [isSlotOccupied, selectedResident, extraction]);
 
   const handleExtractionPointerUp = useCallback(() => {
-    if (extractionTimerRef.current) {
-      cancelAnimationFrame(extractionTimerRef.current);
-      extractionTimerRef.current = null;
-    }
-    clearExtractionTimeouts();
-    
-    // Animate back to closed position from current progress
-    const currentProgress = extractionProgress;
-    const startTime = Date.now();
-    const duration = 300; // Quick close animation
-    
-    const animateClose = () => {
-      const elapsed = Date.now() - startTime;
-      const t = Math.min(elapsed / duration, 1);
-      const newProgress = currentProgress * (1 - t);
-      setExtractionProgress(newProgress);
-      
-      if (t < 1) {
-        requestAnimationFrame(animateClose);
-      } else {
-        setIsExtracting(false);
-        setExtractionProgress(0);
-      }
-    };
-    
-    requestAnimationFrame(animateClose);
-  }, [extractionProgress, clearExtractionTimeouts]);
+    extraction.cancel();
+  }, [extraction]);
 
   return (
     <TooltipProvider>
@@ -388,7 +252,17 @@ export default function SlotPage() {
               <div className="flex flex-col items-center gap-4">
                 <div className="text-sm text-slate-400">PgCard (Draggable)</div>
                 {selectedResident && (
-                  <div data-dnd-id="pg-card" className={dragVisualState.mode === 'flight' ? 'opacity-30 pointer-events-none' : ''}>
+                  <div
+                    data-dnd-id="pg-card"
+                    className={dragVisualState.mode === 'flight' ? 'opacity-30 pointer-events-none' : ''}
+                    onClick={() => {
+                      // Click-to-assign: if the visible slot can accept the pg right now,
+                      // auto-inset with the same flight animation as a drop
+                      if (!isDragging && !isSlotOccupied && dragVisualState.mode === 'idle') {
+                        simulateDrop();
+                      }
+                    }}
+                  >
                     <PgCard
                       workerId={selectedResident.id}
                       label={selectedResident.displayName}
@@ -406,7 +280,8 @@ export default function SlotPage() {
               </div>
 
               {/* SlotV12Renderer - Slot */}
-              <DroppableSlot 
+              <DroppableSlot
+                bloom={isDragging && !isSlotOccupied ? 'valid' : 'idle'}
                 isOccupied={isSlotOccupied} 
                 portraitUrl={selectedResident?.portraitUrl} 
                 extractionProgress={extractionProgress}
@@ -429,20 +304,12 @@ export default function SlotPage() {
               )}
             </DndContext>
 
-            {/* FlightProxy Layer - Premium handoff animation */}
-            {dragVisualState.mode === 'flight' && (
-              <FlightProxy
-                residentId={dragVisualState.residentId}
-                fromX={dragVisualState.fromX}
-                fromY={dragVisualState.fromY}
-                toX={dragVisualState.toX}
-                toY={dragVisualState.toY}
-                slotId={dragVisualState.slotId}
-                onComplete={handleFlightComplete}
-                residentsById={selectedResident ? { [selectedResident.id]: selectedResident } : {}}
-                isInset={dragVisualState.isInset}
-              />
-            )}
+            {/* FlightProxy Layer - Premium handoff animation (shared renderer) */}
+            <DragOutcomeFlight
+              state={dragVisualState}
+              residentsById={selectedResident ? { [selectedResident.id]: selectedResident } : {}}
+              onComplete={handleFlightComplete}
+            />
           </div>
 
           <footer className="mt-8 border-t border-white/10 pt-6 text-center text-xs text-slate-500">

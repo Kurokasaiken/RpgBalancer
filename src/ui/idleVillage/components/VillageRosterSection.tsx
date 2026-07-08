@@ -55,6 +55,10 @@ export interface VillageRosterSectionProps {
   onSortModeChange?: (mode: RosterSortMode) => void;
   /** Use Wanderlust skin styling instead of default PgCard */
   useWanderlustSkin?: boolean;
+  /** Residents currently assigned elsewhere: shown as Away, non-interactive */
+  lockedResidentIds?: string[];
+  /** Status label for locked residents (default: 'Assigned') */
+  lockedStatusLabel?: string;
 }
 
 /**
@@ -104,6 +108,8 @@ export function VillageRosterSection({
   sortMode = DEFAULT_ROSTER_SORT_MODE,
   onSortModeChange,
   useWanderlustSkin = false,
+  lockedResidentIds,
+  lockedStatusLabel,
 }: VillageRosterSectionProps) {
   // Sort residents based on current sort mode
   const sortedResidents = sortResidents(residents, sortMode);
@@ -142,6 +148,8 @@ export function VillageRosterSection({
         dragVisualState={dragVisualState}
         headerControls={sortControl}
         useWanderlustSkin={useWanderlustSkin}
+        lockedResidentIds={lockedResidentIds}
+        lockedStatusLabel={lockedStatusLabel}
       />
     </section>
   );

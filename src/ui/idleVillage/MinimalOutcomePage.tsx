@@ -13,6 +13,7 @@
  */
 
 import React, { useState } from 'react';
+import { WanderlustSurface } from '@/ui/wanderlust-surface';
 
 // ─── Tipi locali ──────────────────────────────────────────────────────────────
 
@@ -120,11 +121,15 @@ function OutcomeModal({
       className="fixed inset-0 bg-black/75 flex items-center justify-center z-50 p-4"
       data-testid="outcome-modal-overlay"
     >
-      <div
-        className={`bg-gray-800 rounded-xl border-2 ${config.borderColor} shadow-2xl max-w-md w-full p-6 flex flex-col gap-4`}
+      <WanderlustSurface
+        shape="card"
+        material="bronze"
+        interactive={false}
+        style={{ maxWidth: '400px', width: '100%' }}
         data-testid="outcome-modal"
         data-outcome-type={outcome.type}
       >
+        <div className="flex flex-col gap-4 p-6">
         {/* Header */}
         <div className="flex items-center gap-3">
           <span className="text-4xl">{config.icon}</span>
@@ -234,7 +239,8 @@ function OutcomeModal({
         >
           {outcome.type === 'death' ? 'Continua...' : 'Ottimo! Continua →'}
         </button>
-      </div>
+        </div>
+      </WanderlustSurface>
     </div>
   );
 }

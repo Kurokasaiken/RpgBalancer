@@ -15,7 +15,7 @@ import { StyleLabSurface } from '@/ui/styleLab/StyleLabSurface';
 import { StyleLabStack } from '@/ui/styleLab/StyleLabStack';
 import VillageRosterSectionSkin from '@/ui/idleVillage/components/VillageRosterSectionSkin';
 import ResidentSlotRackSkin from '@/ui/idleVillage/components/ResidentSlotRackSkin';
-import { TimeEngineStrip } from '@/ui/idleVillage/components/minimal/TimeEngineStrip';
+import { TimeEngineStrip } from '@/ui/idleVillage/frozen/kits/clockKit';
 import ActiveHUD from '@/ui/idleVillage/components/ActiveHUD';
 import ActivityCapsule from '@/ui/idleVillage/components/ActivityCapsule';
 import ActionHalo from '@/ui/idleVillage/map/actionCards/ActionHalo';

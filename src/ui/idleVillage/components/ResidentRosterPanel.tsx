@@ -43,6 +43,10 @@ export interface ResidentRosterPanelProps {
   headerControls?: ReactNode;
   /** Use Wanderlust skin styling instead of default PgCard */
   useWanderlustSkin?: boolean;
+  /** Residents currently assigned elsewhere: shown as Away, non-interactive */
+  lockedResidentIds?: string[];
+  /** Status label for locked residents (default: 'Assigned') */
+  lockedStatusLabel?: string;
 }
 
 /**
@@ -100,6 +104,8 @@ export function ResidentRosterPanel({
   dragVisualState,
   headerControls,
   useWanderlustSkin = false,
+  lockedResidentIds,
+  lockedStatusLabel,
 }: ResidentRosterPanelProps) {
   // Instrument renderer stack at ResidentRosterPanel level
   rendererStackInstrumentation.captureResidentRosterPanel(residents);
@@ -120,6 +126,8 @@ export function ResidentRosterPanel({
         dragVisualState={dragVisualState}
         headerControls={headerControls}
         useWanderlustSkin={useWanderlustSkin}
+        lockedResidentIds={lockedResidentIds}
+        lockedStatusLabel={lockedStatusLabel}
       />
 
       {assignmentFeedback && (

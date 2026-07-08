@@ -6,20 +6,37 @@
  * with POI Detail trusted contract.
  */
 
-import React, { useState, useCallback, useMemo } from 'react';
-import { ActivityCapsuleDetailSkinAware } from '../skins/activityCapsuleDetail/ActivityCapsuleDetailSkinAware';
-import { GenericPoiSkin } from '../components/minimal/GenericPoiSkin';
-import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
-import { DEFAULT_IDLE_VILLAGE_CONFIG } from '@/balancing/config/idleVillage/defaultConfig';
-import type { ActivityDetailSlotData, TelemetryEntry } from '../skins/activityCapsuleDetail/ActivityCapsuleDetailSkinAware';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
+import { ActivityCapsuleDetailSkinAware } from '../skins/activityCapsuleDetail/ActivityCapsuleDetailSkinAware';
+import type { ActivityDetailSlotData, TelemetryEntry } from '../skins/activityCapsuleDetail/ActivityCapsuleDetailSkinAware';
+import { GenericPoiSkin } from '../components/minimal/GenericPoiSkin';
+import { DEFAULT_IDLE_VILLAGE_CONFIG } from '@/balancing/config/idleVillage/defaultConfig';
+import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
+import { StyleLabSurface } from '@/ui/styleLab/StyleLabSurface';
+import { POI_DETAIL_SKIN_CONFIG } from '@/ui/idleVillage/skins/poi/poiDetailSkinConfig';
 
 // Use existing quest from config
 const questConfig = DEFAULT_IDLE_VILLAGE_CONFIG.activities.quest_dangerous_hunt;
-const questDurationSeconds = parseInt(questConfig.durationFormula, 10);
+const questDurationMs = parseInt(questConfig.durationFormula, 10);
 const questProgress = 0.65;
-const questElapsedSeconds = Math.floor(questDurationSeconds * questProgress);
-const questRemainingSeconds = questDurationSeconds - questElapsedSeconds;
+const questElapsedMs = Math.floor(questDurationMs * questProgress);
+const questRemainingMs = questDurationMs - questElapsedMs;
+const questMetadata = questConfig.metadata ?? {};
+const questStatRequirement = questConfig.statRequirement ?? {
+  label: 'Requirements',
+  allOf: [],
+  anyOf: [],
+};
+
+const questRewardsCopy = questConfig.rewards
+  .map((reward) => `${reward.resourceId.toUpperCase()} +${reward.amountFormula}`)
+  .join(' · ');
+
+const STAT_LABEL_MAP: Record<'allOf' | 'anyOf', string> = {
+  allOf: 'Richiede',
+  anyOf: 'Accetta',
+};
 
 // Color mapping from poiAmberSkinConfig for wilderness pillar
 const WILDERNESS_COLORS = {
@@ -79,6 +96,14 @@ const mockTelemetry: TelemetryEntry[] = [
 export function PoiDetailVerificationPage() {
   const [detailOpen, setDetailOpen] = useState(true);
 
+  useEffect(() => {
+    trackTelemetryEvent('poi_detail_verification_loaded', {
+      questId: questConfig.id,
+      skinVersion: POI_DETAIL_SKIN_CONFIG.version,
+      edition: 'RT-POI-D-001',
+    });
+  }, []);
+
   const handleClose = useCallback(() => {
     setDetailOpen(false);
   }, []);
@@ -87,77 +112,200 @@ export function PoiDetailVerificationPage() {
     setDetailOpen(true);
   }, []);
 
+  const riskBadges = useMemo(
+    () => [
+      {
+        label: 'Injury Risk',
+        value: `${questMetadata.injuryChanceDisplay ?? 0}%`,
+      },
+      {
+        label: 'Death Risk',
+        value: `${questMetadata.deathChanceDisplay ?? 0}%`,
+      },
+      {
+        label: 'Danger Rating',
+        value: `${questConfig.dangerRating}/5`,
+      },
+    ],
+    []
+  );
+
+  const versionBadges = useMemo(
+    () => [
+      `Versione ${POI_DETAIL_SKIN_CONFIG.version}`,
+      `Target ${POI_DETAIL_SKIN_CONFIG.targetVersion}`,
+      `Qualità ${POI_DETAIL_SKIN_CONFIG.quality}`,
+    ],
+    []
+  );
+
   return (
-    <TooltipProvider>
-      <div className="poi-detail-verification-page" data-testid="poi-detail-verification-page">
-        <div className="poi-trigger-container" onClick={handlePoiClick}>
-          <GenericPoiSkin
-            icon="🏹"
-            progress={0.65}
-            coronaCore={WILDERNESS_COLORS.coronaCore}
-            coronaGlow={WILDERNESS_COLORS.coronaGlow}
-            rimColors={WILDERNESS_COLORS.rimColors}
-            stoneColors={WILDERNESS_COLORS.stoneColors}
-            stoneAmbient={WILDERNESS_COLORS.stoneAmbient}
-            pinColor={WILDERNESS_COLORS.pinColor}
-            pillar="wilderness"
-            size={160}
-            enableHover={true}
-          />
+    <StyleLabSurface className="poi-detail-surface" variant="panel">
+      <TooltipProvider>
+        <div className="poi-detail-verification-page" data-testid="poi-detail-verification-page">
+          <header className="poi-detail-hero">
+            <div className="poi-detail-hero__eyebrow">RT-POI-D-001 · Wilderness Amber Edition</div>
+            <div className="poi-detail-hero__headline">
+              <h1>POI Detail Verification</h1>
+              <p>
+                Replica fedele della scheda missione “{questConfig.label}”. Mostriamo testo, titolo, versione e
+                componenti estetici esattamente come nel POI Detail reale per garantire parità visiva.
+              </p>
+            </div>
+            <div className="poi-detail-hero__badges">
+              {versionBadges.map((badge) => (
+                <span key={badge} className="poi-detail-badge">
+                  {badge}
+                </span>
+              ))}
+              <button type="button" className="poi-detail-hero__toggle" onClick={() => setDetailOpen((open) => !open)}>
+                {detailOpen ? 'Nascondi detail' : 'Mostra detail'}
+              </button>
+            </div>
+          </header>
+
+          <section className="poi-detail-summary-grid">
+            <article className="summary-card">
+              <p className="summary-label">Quest</p>
+              <h2 className="summary-value">{questConfig.label}</h2>
+              <p className="summary-copy">{questConfig.description}</p>
+            </article>
+            <article className="summary-card">
+              <p className="summary-label">Pillar</p>
+              <h3 className="summary-value">Wilderness Amber</h3>
+              <p className="summary-copy">Slot tags: {questConfig.slotTags.join(', ')}</p>
+              <div className="summary-chips">
+                {questConfig.tags.map((tag) => (
+                  <span key={tag} className="summary-chip">
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            </article>
+            <article className="summary-card">
+              <p className="summary-label">Stat Requirements</p>
+              <h3 className="summary-value">{questStatRequirement.label}</h3>
+              {(['allOf', 'anyOf'] as const).map((key) =>
+                questStatRequirement[key]?.length ? (
+                  <p key={key} className="summary-copy">
+                    <strong>{STAT_LABEL_MAP[key]}:</strong> {questStatRequirement[key]?.join(', ')}
+                  </p>
+                ) : null
+              )}
+            </article>
+            <article className="summary-card">
+              <p className="summary-label">Ricompense</p>
+              <h3 className="summary-value">{questRewardsCopy}</h3>
+              <p className="summary-copy">Durata prevista: {questDurationMs / 1000}s · Max slots: {questConfig.maxSlots}</p>
+            </article>
+          </section>
+
+          <section className="poi-detail-stage">
+            <div className="poi-detail-stage__medallion" onClick={handlePoiClick} role="button" tabIndex={0}>
+              <div className="poi-detail-stage__legend">
+                <p>POI Trigger</p>
+                <h3>Clicca il medaglione per aprire il detail</h3>
+                <div className="poi-detail-stage__risk">
+                  {riskBadges.map((badge) => (
+                    <div key={badge.label}>
+                      <span>{badge.label}</span>
+                      <strong>{badge.value}</strong>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <GenericPoiSkin
+                icon="🏹"
+                progress={questProgress}
+                coronaCore={WILDERNESS_COLORS.coronaCore}
+                coronaGlow={WILDERNESS_COLORS.coronaGlow}
+                rimColors={WILDERNESS_COLORS.rimColors}
+                stoneColors={WILDERNESS_COLORS.stoneColors}
+                stoneAmbient={WILDERNESS_COLORS.stoneAmbient}
+                pinColor={WILDERNESS_COLORS.pinColor}
+                pillar="wilderness"
+                size={200}
+                enableHover
+                label="Dangerous Hunt"
+                timeRemainingMs={questRemainingMs}
+                isExpirable
+              />
+            </div>
+
+            <div className="poi-detail-stage__detail">
+              <ActivityCapsuleDetailSkinAware
+                activityId={questConfig.id}
+                name={questConfig.label}
+                type="quest"
+                subtitle={questConfig.description}
+                status="in-progress"
+                progress={questProgress}
+                duration={questDurationMs}
+                elapsed={questElapsedMs}
+                slots={mockSlots}
+                maxSlots={questConfig.maxSlots === 'infinite' ? 99 : questConfig.maxSlots}
+                durationDisplay={`${questDurationMs / 1000}s`}
+                rewardDisplay={questConfig.rewards
+                  .map((reward) => `${reward.resourceId}: +${reward.amountFormula}`)
+                  .join(', ')}
+                etaDisplay={`${questRemainingMs / 1000}s`}
+                telemetry={mockTelemetry}
+                isOpen={detailOpen}
+                onClose={handleClose}
+                enableDrag
+                showTelemetry
+                showSlots
+                showInfo
+                compact={false}
+                inlineMode={false}
+                ariaLabel={`POI Detail: ${questConfig.label}`}
+                ariaLive="polite"
+                enableDevTools
+                dataTestId="poi-detail-wrapper-test"
+              />
+            </div>
+          </section>
+
+          <section className="poi-detail-copy">
+            <article>
+              <h3>Versione estetica</h3>
+              <p>
+                La skin <strong>{POI_DETAIL_SKIN_CONFIG.name}</strong> applica il tema Dark Luxury: titolo Cinzel con glow,
+                cornici bronzee, rack in legno annerito e CTA serif. Questa verification page imposta gli stessi token di
+                colore e tipografia così da confrontare qualsiasi regressione visiva.
+              </p>
+              <ul>
+                <li>Material stack: {POI_DETAIL_SKIN_CONFIG.metadata?.materialHierarchy?.join(' → ')}</li>
+                <li>Target engine: {POI_DETAIL_SKIN_CONFIG.compatibility?.join(', ')}</li>
+                <li>Skin ID: {POI_DETAIL_SKIN_CONFIG.id}</li>
+              </ul>
+            </article>
+            <article>
+              <h3>Copy di missione</h3>
+              <p>
+                «Una bestia colossale sta devastando il bosco. Gli scout stimano <strong>25%</strong> di feriti e
+                <strong>8%</strong> di perdite, ma l’oro promesso attira comunque gli avventurieri. Solo hunter élite con
+                forza e agilità impeccabili vengono considerati.»
+              </p>
+              <p>
+                Il testo sopra replica l’headline narrativa usata nella pagina POI Detail, garantendo che la versione di
+                default del componente mantenga tono e gerarchia.
+              </p>
+            </article>
+            <article>
+              <h3>Telemetry attesa</h3>
+              <ol>
+                {mockTelemetry.map((entry) => (
+                  <li key={entry.id}>
+                    <span>{entry.message}</span> · <time dateTime={entry.timestamp.toISOString()}>{entry.timestamp.toLocaleTimeString()}</time>
+                  </li>
+                ))}
+              </ol>
+            </article>
+          </section>
         </div>
-
-        <ActivityCapsuleDetailSkinAware
-        activityId={questConfig.id}
-        name={questConfig.label}
-        type="quest"
-        subtitle={questConfig.description}
-        status="in-progress"
-        progress={questProgress}
-        duration={questDurationSeconds}
-        elapsed={questElapsedSeconds}
-        slots={mockSlots}
-        maxSlots={questConfig.maxSlots === 'infinite' ? 99 : questConfig.maxSlots}
-        durationDisplay={`${questDurationSeconds}s`}
-        rewardDisplay={questConfig.rewards.map(r => `${r.resourceId}: +${r.amountFormula}`).join(', ')}
-        etaDisplay={`${questRemainingSeconds}s`}
-        telemetry={mockTelemetry}
-        isOpen={detailOpen}
-        onClose={handleClose}
-        enableDrag={true}
-        showTelemetry={true}
-        showSlots={true}
-        showInfo={true}
-        compact={false}
-        inlineMode={false}
-        ariaLabel={`POI Detail: ${questConfig.label}`}
-        ariaLive="polite"
-        enableDevTools={true}
-        dataTestId="poi-detail-wrapper-test"
-        skinOverrideId="poi_wilderness_amber"
-      />
-
-      <style>{`
-        .poi-detail-verification-page {
-          padding: 2rem;
-          max-width: 1200px;
-          margin: 0 auto;
-          font-family: 'EB Garamond', serif;
-          color: #f5f5f4;
-        }
-        .poi-trigger-container {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          margin-bottom: 2rem;
-          cursor: pointer;
-          transition: transform 0.2s ease;
-        }
-        .poi-trigger-container:hover {
-          transform: scale(1.05);
-        }
-      `}</style>
-      </div>
-    </TooltipProvider>
+      </TooltipProvider>
+    </StyleLabSurface>
   );
 };
 

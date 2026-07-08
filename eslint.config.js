@@ -200,6 +200,30 @@ export default defineConfig([
     },
   },
   {
+    // Kit discipline: fuori dal subtree idleVillage i componenti coperti da un
+    // frozen kit vanno importati dal kit (una riga, provider inclusi), non con
+    // deep import del file canonico. 'warn' finché la migrazione è in corso.
+    files: ['src/pages/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'warn',
+        {
+          patterns: [
+            {
+              group: [
+                '@/ui/idleVillage/components/*',
+                '@/ui/idleVillage/components/minimal/*',
+                '@/ui/idleVillage/components/destinyAstrolabe/*',
+              ],
+              message:
+                'Componente coperto dal sistema kit: importa da @/ui/idleVillage/frozen/kits/<nome>Kit (drop-in con provider inclusi). Vedi KIT_REGISTRY in frozen/registry.ts.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     files: ['src/ui/idleVillage/**/*.{ts,tsx}'],
     rules: {
       'no-restricted-globals': [

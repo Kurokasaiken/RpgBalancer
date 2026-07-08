@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import './wanderlust-surface.css';
 import { MATERIAL_PRESETS, type MaterialPreset, type MaterialTheme } from './materialPresets';
 import WanderlustInnerSurface from './WanderlustInnerSurface';
+import { WanderlustMaterialContext } from './WanderlustMaterialContext';
 
 /* ═══════════════════════════════════════════════════════════════════
    WanderlustSurface
@@ -151,6 +152,7 @@ export const WanderlustSurface: React.FC<WanderlustSurfaceProps> = ({
   const diamonds = useMemo(() => generateDiamonds(w, h, outerX, outerY, outerW, outerH), [w, h, outerX, outerY, outerW, outerH]);
 
   return (
+    <WanderlustMaterialContext.Provider value={material}>
     <div ref={rootRef} className={rootCls} style={style}>
       {/* SVG Border Overlay */}
       <svg
@@ -307,6 +309,7 @@ export const WanderlustSurface: React.FC<WanderlustSurfaceProps> = ({
         {children}
       </div>
     </div>
+    </WanderlustMaterialContext.Provider>
   );
 };
 

@@ -1,15 +1,12 @@
 import { useState } from 'react';
 import { DndContext } from '@dnd-kit/core';
-import { GenericPoiSkin } from '@/ui/idleVillage/components/minimal/GenericPoiSkin';
-import { JobPOI } from '@/ui/idleVillage/components/minimal/JobPOI';
+import { GenericPoiSkin, JobPOI, DayNightPoiSkin } from '@/ui/idleVillage/frozen/kits/poiKit';
 import { RosterDraggable } from '@/ui/idleVillage/frozen/kits/rosterKit';
 import { SkinSystemProvider } from '@/ui/idleVillage/hooks/useSkinSystem';
 import { SandboxTimingProvider } from '@/ui/idleVillage/hooks/useSandboxTimingBridge';
-import DayNightPoiSkin from '@/ui/idleVillage/components/minimal/DayNightPoiSkin';
 
 export default function MinimalJobPoiRosterTimeIntegrationPage() {
-  const [jobStatus, setJobStatus] = useState<'idle' | 'working' | 'completed'>('idle');
-  const [jobFatigue, setJobFatigue] = useState(0);
+  const [jobStatus, setJobStatus] = useState<'idle' | 'working' | 'exhausted'>('idle');
   const [isDayPhase, setIsDayPhase] = useState(true);
   const [cycleProgress, setCycleProgress] = useState(0.65);
 
@@ -70,7 +67,7 @@ export default function MinimalJobPoiRosterTimeIntegrationPage() {
                     <GenericPoiSkin
                       icon="🪓"
                       label="Chop Wood"
-                      progress={jobStatus === 'working' ? 0.65 : jobStatus === 'completed' ? 1.0 : 0}
+                      progress={jobStatus === 'working' ? 0.65 : jobStatus === 'exhausted' ? 1.0 : 0}
                       coronaCore={{ r: 139, g: 105, b: 20 }}
                       coronaGlow={{ r: 180, g: 140, b: 40 }}
                       rimColors={['#fce890', '#c09030', '#200e02']}
@@ -80,7 +77,7 @@ export default function MinimalJobPoiRosterTimeIntegrationPage() {
                       pillar="wilderness"
                       size={160}
                       enableHover={true}
-                      isCompleted={jobStatus === 'completed'}
+                      isCompleted={jobStatus === 'exhausted'}
                     />
                   </div>
                   <div className="mt-4 flex items-center justify-center">
@@ -95,13 +92,10 @@ export default function MinimalJobPoiRosterTimeIntegrationPage() {
                     />
                   </div>
                   <div className="mt-4 flex gap-2 justify-center">
-                    {(['idle', 'working', 'completed'] as const).map((s) => (
+                    {(['idle', 'working', 'exhausted'] as const).map((s) => (
                       <button
                         key={s}
-                        onClick={() => {
-                          setJobStatus(s);
-                          setJobFatigue(s === 'working' ? 25 : s === 'completed' ? 50 : 0);
-                        }}
+                        onClick={() => setJobStatus(s)}
                         className="px-3 py-1 rounded text-xs font-medium transition-colors"
                         style={{
                           background: jobStatus === s ? 'rgba(34,197,94,.15)' : 'rgba(30,41,59,.60)',

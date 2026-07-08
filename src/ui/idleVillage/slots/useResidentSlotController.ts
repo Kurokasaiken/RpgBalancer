@@ -206,7 +206,7 @@ export const useResidentSlotController = ({
     return rawSlots.map<ResidentSlotViewModel>((slot) => {
       const assignedResidentId = assignments[slot.id] ?? null;
       const assignedResident = assignedResidentId ? residents[assignedResidentId] : undefined;
-      const dropState = computeDropStateForResident(
+      const computedDropState = computeDropStateForResident(
         hoveredResidentId,
         activity,
         scheduler,
@@ -214,6 +214,7 @@ export const useResidentSlotController = ({
         residents,
         { maxFatigueBeforeExhausted }
       );
+      const dropState: DropState = assignedResidentId ? 'locked' : computedDropState;
 
       // TODO(style-lab-flexibility): pipe bloomState transitions + interactionPhysics.audioProfile
       // into telemetry/audio/haptic adapters so heavy presets trigger deeper cues.

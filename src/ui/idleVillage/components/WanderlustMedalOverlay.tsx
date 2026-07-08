@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 export interface WanderlustMedalOverlayProps {
   portraitUrl?: string;
@@ -21,6 +21,25 @@ export const WanderlustMedalOverlay: React.FC<WanderlustMedalOverlayProps> = ({
   const rimAngleTargetRef = useRef(0);
   const rimIntensityRef = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Gate: don't show the medallion until the portrait is actually decoded —
+  // better a one-frame delay than a medal with a black hole in the middle.
+  // If the portrait is already in cache (preloaded by the roster) this is instant.
+  const [portraitReady, setPortraitReady] = useState(!portraitUrl);
+  useEffect(() => {
+    if (!portraitUrl) {
+      setPortraitReady(true);
+      return;
+    }
+    let alive = true;
+    setPortraitReady(false);
+    const img = new Image();
+    img.onload = () => { if (alive) setPortraitReady(true); };
+    img.onerror = () => { if (alive) setPortraitReady(true); }; // fallback portrait will show
+    img.src = portraitUrl;
+    if (img.complete) setPortraitReady(true);
+    return () => { alive = false; };
+  }, [portraitUrl]);
 
   // Debug coordinate tracking
   useEffect(() => {
@@ -141,13 +160,15 @@ export const WanderlustMedalOverlay: React.FC<WanderlustMedalOverlayProps> = ({
   const fallbackPortrait = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCARCB9ADASIAAhEBAxEB/8QAHQAAAQUBAQEBAAAAAAAAAAAABAECAwUGAAcICf/EAEsQAAEDAwIEBAMGBAQFBAACCwEAAgMEESEFMQYSQVETImFxBzKBFCNCkaGxUmLB0RUzcuEIJEPw8RY0U4KSJaKyNWNz0hcmVMJE/8QAGwEAAgMBAQEAAAAAAAAAAAAAAgMAAQQFBgf/xAAzEQACAwACAgICAgEEAgEDBQEAAQIDEQQhEjETQQUiMlFhFCNCcQYzgRVSYhY0kaGxQ//aAAwDAQACEQMRAD8A89m/zn+5TMlPl/zn2PUpgX0BHnTikuTlKVwsM/ooyHBKdkoHdcLHoq0sTKT32TiLHCQ2VEG7YSrrEpDfZWQ4HPZLuusF2AVZR3RIbBLdduoQQ4SYLkp32XDdQo7lzdd1v0XZXWyrLYpyEt+y7I2XbKyHFI0XclsO6c0Z3UIdsndFy6xseihBMrrpQDa11xB+isgh9Su/NLb1Xbb9FRZ1he647Ltze67rZQh1vVIDhLhcRsoUMJylK4A5XW7Z6KyCYulSgE9PRLZTSDbDulH6pQ1KAqIc25PTZKD2KXl2Fl1goQ62LlPGMdUgFuqXKhYo3ylsm53S37WUKOtYpricJxPdNcdlGRoafVcT3KUhdbO6oghsF26W2crgrINK62bpy4BUQQZKkb2XNbsngdbWQtkOb6p/S64D2TsqtKEFvqnCyQDO3VPA7qyCALrFO36Jwbi37qiyK21v1S8vZTclxZJy9lEyDAL7KRoSgXG1lKxuM2UbK0SNv5p4b+Sc0JxtfZLbItG26BdbqnfokIPZAWd6Lu5XXXdSVZBrjnITfS+3dPPfCa4Z+iNFCf8AZXZIOFwC4dVCI5qUDouv6JTY9UIQnX6Jric2S7Jryp7INSdOq4ZITgMg9kWEG7905g/Nd1TtsKFCbmyVKey62FChL4Sj8ku2LLgoQ7ltuutbulC4KEwQ4Cba6VwzfdIFCjh6LgeyW2Lrh7KEOykue6W2MruqogrR/unhoSAZ26p2LFQs4ggCyTHqEueiRoyqIOAP0Sj8l2ACuCjKFAPquJBwN+qaXW9U5rLgvmIYwC5zZBKSSLSI3SHNiL';
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className={`tok-svg ${className}`}
       style={{
         position: 'relative',
         width: `${sizePx}px`,
         height: `${sizePx}px`,
+        // Medal appears only when the portrait is decoded (never a black center)
+        visibility: portraitReady ? 'visible' : 'hidden',
         ...style,
       }}
     >

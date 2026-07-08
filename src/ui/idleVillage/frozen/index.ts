@@ -10,4 +10,19 @@
 
 export { IsolatedShowcase, type IsolatedShowcaseProps } from './_infra/IsolatedShowcase';
 export * from './_infra/CanonicalDataBridge';
-export { KIT_REGISTRY, getKitEntry, type KitRegistryEntry } from './registry';
+export {
+  KitShell,
+  createKitShell,
+  withKitShell,
+  FULL_PROVIDER_CHAIN,
+  type KitProviderName,
+  type KitShellProps,
+} from './_infra/KitShell';
+export {
+  KIT_REGISTRY,
+  getKitEntry,
+  getContractEnforcedKits,
+  type KitRegistryEntry,
+  type KitStatus,
+  type KitHubMeta,
+} from './registry';
