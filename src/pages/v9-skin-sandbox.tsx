@@ -363,7 +363,18 @@ export const V9SkinSandbox: React.FC = () => {
               )}
               {showPoiChrome && (
                 <div className="v9-poi-demo" role="group" aria-label="V9 POI Detail Preview">
-                  {/* bg — gestito via CSS background-image sul root */}
+                  {/* Layer 1: Texture Original (bg.png) */}
+                  <img
+                    src="/assets/ui/bg.png"
+                    alt=""
+                    className="v9-poi-demo__layer-1"
+                  />
+
+                  {/* Layer 2: Teal Dark Chromatic Fusion (Multiplier) */}
+                  <div className="v9-poi-demo__layer-2" />
+
+                  {/* Layer 3: Optical Effects and Vignette */}
+                  <div className="v9-poi-demo__layer-3" />
 
                   {/* Close */}
                   <button type="button" className="v9-poi-demo__close" onClick={() => setShowPoiChrome(false)} aria-label="Chiudi">×</button>
@@ -594,7 +605,7 @@ export const V9SkinSandbox: React.FC = () => {
 
         /* ══════════════════════════════════════════════════════════════
            POI Demo — V9 Obsidian Aesthetic
-           MASTER CONTAINER: Multi-layer background with bg.png texture
+           MASTER CONTAINER: Rigid layer structure
         ══════════════════════════════════════════════════════════════ */
         .v9-poi-demo {
           position: relative;
@@ -603,18 +614,39 @@ export const V9SkinSandbox: React.FC = () => {
           overflow: hidden;
           color: ${V9.textPrimary};
           font-family: 'EB Garamond', 'Georgia', serif;
-          /* Multi-layer background: azure/teal lens + prismatic gold + teal overlay + bg.png texture */
+        }
+
+        /* Layer 1: Texture Original (bg.png) */
+        .v9-poi-demo__layer-1 {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          pointer-events: none;
+          opacity: 0.45;
+          mix-blend-mode: normal;
+        }
+
+        /* Layer 2: Teal Dark Chromatic Fusion (Multiplier) */
+        .v9-poi-demo__layer-2 {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(to bottom, rgba(5, 34, 43, 0.85) 0%, rgba(3, 18, 24, 0.95) 100%);
+          mix-blend-mode: multiply;
+          pointer-events: none;
+        }
+
+        /* Layer 3: Optical Effects and Vignette */
+        .v9-poi-demo__layer-3 {
+          position: absolute;
+          inset: 0;
           background:
-            /* Layer 1: Lente Azure/Teal vibrante nell'angolo in alto a sinistra */
-            radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.22) 0%, transparent 55%),
-            /* Layer 2: Rifrazione prismatica calda/oro nell'angolo in basso a destra */
-            radial-gradient(circle at 85% 85%, rgba(223, 184, 87, 0.08) 0%, transparent 50%),
-            /* Layer 3: Overlay cromatico Teal Scuro/Ottanio di fusione (Sostituisce il nero/marrone) */
-            linear-gradient(to bottom, rgba(5, 34, 43, 0.78) 0%, rgba(3, 18, 24, 0.92) 100%),
-            /* Layer 4: Texture pittorica originale */
-            url('/assets/bg.png');
-          background-size: cover;
-          background-position: center;
+            radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.25) 0%, transparent 60%),
+            radial-gradient(circle at 85% 85%, rgba(223, 184, 87, 0.12) 0%, transparent 50%);
+          mix-blend-mode: screen;
+          box-shadow: inset 0 0 90px rgba(1, 11, 14, 0.98);
+          pointer-events: none;
         }
 
         /* ── Close button — embossed, evidente ── */
@@ -661,10 +693,10 @@ export const V9SkinSandbox: React.FC = () => {
           );
         }
 
-        /* ── Main content (sopra il velo) ── */
+        /* ── Main content (above background layers) ── */
         .v9-poi-demo__content {
           position: relative;
-          z-index: 1;
+          z-index: 10;
           height: 100%;
           display: flex;
           flex-direction: column;
@@ -688,16 +720,16 @@ export const V9SkinSandbox: React.FC = () => {
           margin-bottom: 6px;
         }
 
-        /* Badge: crystal teal glass with gold border */
+        /* Badge: transparent with backdrop-filter for texture show-through */
         .v9-poi-demo__badge {
           position: relative;
           padding: 5px 13px;
           border: 1px solid rgba(223,184,87,0.40);
           border-radius: 4px;
-          /* Crystal teal glass background */
-          background: linear-gradient(180deg, rgba(8, 48, 61, 0.5) 0%, rgba(4, 26, 33, 0.75) 100%);
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
+          /* Transparent background for texture show-through */
+          background: rgba(4, 22, 28, 0.6);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
           box-shadow:
             0 1px 4px rgba(0,0,0,0.50),
             0 0 6px rgba(223,184,87,0.10),
@@ -910,15 +942,15 @@ export const V9SkinSandbox: React.FC = () => {
           line-height: 1;
         }
 
-        /* Bottone AVVIA: crystal teal glass pill with gold border and glow */
+        /* Bottone AVVIA: transparent with backdrop-filter for texture show-through */
         .v9-poi-demo__cta {
           padding: 9px 32px;
           border-radius: 9999px;
           border: 1.5px solid rgba(223, 184, 87, 0.8);
-          /* Crystal teal glass background */
-          background: linear-gradient(180deg, rgba(8, 48, 61, 0.5) 0%, rgba(4, 26, 33, 0.75) 100%);
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
+          /* Transparent background for texture show-through */
+          background: rgba(4, 22, 28, 0.6);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
           /* Gold glow */
           box-shadow: 0 0 12px rgba(223, 184, 87, 0.15);
           color: ${V9.warmGold};
