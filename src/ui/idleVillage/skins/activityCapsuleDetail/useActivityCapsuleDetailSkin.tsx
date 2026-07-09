@@ -10,8 +10,8 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useSkinSystem } from '../hooks/useSkinSystem';
 import { useSkinSlot } from '../components/SkinSlot';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
-import { 
-  ActivityCapsuleDetailSkinConfig,
+import type { ActivityCapsuleDetailSkinConfig } from './ActivityCapsuleDetailSkinSchema';
+import {
   DEFAULT_ACTIVITY_CAPSULE_DETAIL_SKIN_CONFIG,
   getActivityCapsuleDetailSkinConfig,
   createActivityCapsuleDetailSkinBinding,
