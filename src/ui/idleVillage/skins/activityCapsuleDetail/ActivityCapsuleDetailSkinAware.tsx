@@ -24,6 +24,7 @@ import {
   validateActivityCapsuleDetailSkinConfig,
   mergeActivityCapsuleDetailSkinConfig,
 } from './ActivityCapsuleDetailSkinSchema';
+import { getActivityCapsuleDetailSkinConfigWithPreset } from './ActivityCapsuleDetailSkinPresets';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import type { 
   MotionLevel, 
@@ -203,15 +204,15 @@ export function ActivityCapsuleDetailSkinAware({
   const resolvedMotionLevel = motionLevel || skinSystem.state.currentMotionLevel;
   
   const baseSkinConfig = useMemo(() => {
-    return getActivityCapsuleDetailSkinConfig(resolvedPillar, {
-      presetId: resolvedPresetId,
-      pillar: resolvedPillar,
-      motionLevel: resolvedMotionLevel,
-      ...skinConfigOverride,
-    });
+    return getActivityCapsuleDetailSkinConfigWithPreset(
+      resolvedPresetId,
+      resolvedPillar,
+      resolvedMotionLevel,
+      skinConfigOverride,
+    );
   }, [
-    resolvedPillar,
     resolvedPresetId,
+    resolvedPillar,
     resolvedMotionLevel,
     skinConfigOverride,
   ]);
