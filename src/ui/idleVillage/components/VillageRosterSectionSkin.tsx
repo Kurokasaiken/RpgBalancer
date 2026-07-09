@@ -78,7 +78,7 @@ export function VillageRosterSectionSkin({
   pgCardSkinId,
   pillar,
   context,
-  skinPresetId = 'minimal_frontier',
+  skinPresetId = 'base',
   skinConfig,
 }: VillageRosterSectionSkinProps) {
   // Create skin configuration from preset and pillar
