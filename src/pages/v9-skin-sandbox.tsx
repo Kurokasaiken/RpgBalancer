@@ -16,8 +16,17 @@
  * Avoid: Gothic horror, grimdark, blood, skulls, spikes, aggressive medieval motifs
  */
 
-import React, { useState, useCallback } from 'react';
-import { useDroppable } from '@dnd-kit/core';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+import {
+  DndContext,
+  useDraggable,
+  useDroppable,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import { V9GlassLayers } from '@/ui/v9-skin/V9GlassLayers';
 import { WanderlustSurface, InsetPanel, type MaterialLayerConfig } from '@/ui/wanderlust-surface';
 import { type MaterialPreset, MATERIAL_PRESETS } from '@/ui/wanderlust-surface/materialPresets';
 import { ResidentSlotRack } from '@/ui/idleVillage/components/ResidentSlotRack';
@@ -161,6 +170,59 @@ const GenericTokensDemo: React.FC<{ material: MaterialPreset; materialLayer?: an
   );
 };
 
+// ─── DraggablePoiPanel — inner component (must live inside DndContext) ───────
+type PanelDragState = 'idle' | 'lifted' | 'thud';
+
+interface DraggablePanelProps {
+  children: React.ReactNode;
+  offset: { x: number; y: number };
+  dragState: PanelDragState;
+  onDragStateChange: (s: PanelDragState) => void;
+  dropRef: (node: HTMLElement | null) => void;
+  style?: React.CSSProperties;
+}
+
+const DraggablePoiPanel: React.FC<DraggablePanelProps> = ({
+  children, offset, dragState, onDragStateChange, dropRef,
+}) => {
+  const { attributes, listeners, setNodeRef: setDragRef, transform, isDragging } = useDraggable({
+    id: 'poi-panel',
+  });
+
+  const prevDragging = useRef(false);
+  useEffect(() => {
+    if (isDragging && !prevDragging.current) onDragStateChange('lifted');
+    prevDragging.current = isDragging;
+  }, [isDragging, onDragStateChange]);
+
+  const combinedRef = useCallback((node: HTMLElement | null) => {
+    setDragRef(node);
+    dropRef(node);
+  }, [setDragRef, dropRef]);
+
+  // Apply persistent offset + current drag delta. No lag modifier — position
+  // is accurate so e.delta on drop correctly matches visual position.
+  const tx = offset.x + (transform?.x ?? 0);
+  const ty = offset.y + (transform?.y ?? 0);
+
+  return (
+    <div
+      ref={combinedRef}
+      data-drag-state={dragState}
+      className="v9-panel-draggable"
+      style={{
+        transform: `translate(${tx}px, ${ty}px)`,
+        transition: isDragging ? 'none' : 'transform 0.50s cubic-bezier(0.22, 1, 0.36, 1)',
+      }}
+      {...listeners}
+      {...attributes}
+    >
+      {children}
+    </div>
+  );
+};
+// ────────────────────────────────────────────────────────────────────────────────
+
 export const V9SkinSandbox: React.FC = () => {
   const [wanderlustShape, setWanderlustShape] = useState<WanderlustShape>('panel');
   const [material, setMaterial] = useState<MaterialPreset>('bronze');
@@ -168,6 +230,20 @@ export const V9SkinSandbox: React.FC = () => {
   const [wanderlustDragging, setWanderlustDragging] = useState(false);
   const [wanderlustPaused, setWanderlustPaused] = useState(false);
   const [showPoiChrome, setShowPoiChrome] = useState(true);
+  const [poiVersion, setPoiVersion] = useState<'surface' | 'layout' | 'aureo' | 'sapphire' | 'cristallo'>('surface');
+
+  // ── Drag state ───────────────────────────────────────────────────
+  const [panelOffset, setPanelOffset] = useState({ x: 0, y: 0 });
+  const [panelDragState, setPanelDragState] = useState<PanelDragState>('idle');
+
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
+
+  const handleDragEnd = useCallback((e: DragEndEvent) => {
+    setPanelOffset(prev => ({ x: prev.x + e.delta.x, y: prev.y + e.delta.y }));
+    setPanelDragState('thud');
+    setTimeout(() => setPanelDragState('idle'), 540);
+  }, []);
+  // ────────────────────────────────────────────────────────────────
 
   const { setNodeRef: setDropRef, isOver } = useDroppable({
     id: 'v9-skin-sandbox-drop-zone',
@@ -202,11 +278,11 @@ export const V9SkinSandbox: React.FC = () => {
   };
 
   const backgroundStyle: React.CSSProperties = {
-    position: 'fixed', inset: 0, zIndex: -1,
+    position: 'fixed', inset: '-12%', zIndex: -1,
     ...(state.backgroundMode === 'marble'    && { backgroundImage: 'url(/assets/alt-visuals/v8/columns/Marble01/marble01_diff_2k.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }),
     ...(state.backgroundMode === 'parchment' && { backgroundColor: '#2a2418', backgroundImage: 'radial-gradient(circle at 50% 50%, rgba(180,140,80,0.15) 0%, transparent 70%)' }),
     ...(state.backgroundMode === 'void'      && { backgroundColor: '#02020b' }),
-    ...(state.backgroundMode === 'bg'        && { backgroundImage: 'url(/assets/bg.png)', backgroundSize: 'cover', backgroundPosition: 'center' }),
+    ...(state.backgroundMode === 'bg'        && { backgroundImage: 'url(/assets/ui/bg.png)', backgroundSize: 'cover', backgroundPosition: 'center' }),
   };
 
   // Active tab pill style — azure instead of amber
@@ -215,7 +291,7 @@ export const V9SkinSandbox: React.FC = () => {
 
   return (
     <div className="min-h-screen p-8 font-serif">
-      <div style={backgroundStyle} />
+      <div style={backgroundStyle} className={state.backgroundMode === 'bg' ? 'v9-bg-animated' : ''} />
 
       {/* ── Configuration Bar ── */}
       <div className="mb-8 rounded-lg border border-white/10 bg-black/40 p-6 backdrop-blur-sm">
@@ -241,10 +317,33 @@ export const V9SkinSandbox: React.FC = () => {
               onClick={() => setShowPoiChrome(v => !v)}
               className={`rounded px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors border ${showPoiChrome ? 'bg-emerald-500/20 text-emerald-200 border-emerald-400/40' : 'bg-black/30 text-white/60 border-white/10 hover:border-white/30'}`}
             >
-              {showPoiChrome ? 'Nascondi Copy' : 'Mostra Copy'}
+              {showPoiChrome ? 'Nascondi POI' : 'Mostra POI'}
             </button>
           </div>
         </div>
+
+        {/* POI Version Selector */}
+        {showPoiChrome && (
+          <div className="flex items-center gap-4 mb-4">
+            <span className="text-xs uppercase tracking-[0.2em] text-white/50">POI Version</span>
+            <div className="flex gap-2">
+              {([
+                { id: 'surface',  label: 'Surface' },
+                { id: 'layout',   label: 'Layout Primitives' },
+                { id: 'aureo',    label: 'Aureo Profondo' },
+                { id: 'sapphire', label: 'Zaffiro Abissale' },
+                { id: 'cristallo', label: 'Cristallo Abissale' },
+              ] as const).map(version => (
+                <button key={version.id}
+                  onClick={() => setPoiVersion(version.id)}
+                  className={`rounded px-3 py-1.5 text-xs uppercase tracking-[0.15em] transition-colors border ${poiVersion === version.id ? 'bg-sky-500/20 text-sky-200 border-sky-500/40' : 'bg-black/30 text-white/60 border-white/10 hover:border-white/30'}`}
+                >
+                  {version.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-wrap items-center gap-8">
           {/* Background */}
@@ -327,21 +426,25 @@ export const V9SkinSandbox: React.FC = () => {
 
       {/* ── Surface Tab ── */}
       {state.activeTab === 'surface' && (
-        <div className="flex items-center justify-center">
+        <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+        <div className="flex items-center justify-center" style={{ minHeight: '60vh', position: 'relative' }}>
+          <DraggablePoiPanel
+            offset={panelOffset}
+            dragState={panelDragState}
+            onDragStateChange={setPanelDragState}
+            dropRef={setDropRef}
+          >
           <WanderlustSurface
-            ref={setDropRef}
             shape={wanderlustShape}
             material={material}
             interactive={wanderlustInteractive}
-            isDragging={wanderlustDragging}
+            isDragging={wanderlustDragging || panelDragState === 'lifted'}
             isPaused={wanderlustPaused}
             materialLayer={materialLayerConfig}
             style={{
               width:  showPoiChrome ? 480 : (wanderlustShape === 'badge' ? 280 : 400),
               height: showPoiChrome ? 450 : 320,
-              transition: isOver ? 'transform 0.2s ease, box-shadow 0.2s ease' : 'none',
-              transform:  isOver ? 'scale(1.02)'  : 'none',
-              boxShadow:  isOver ? `0 0 30px ${V9.glowAzure}66` : 'none',
+              boxShadow: isOver ? `0 0 30px ${V9.glowAzure}66` : undefined,
             }}
           >
             <div className="relative" style={{ width: '100%', height: '100%' }}>
@@ -362,100 +465,95 @@ export const V9SkinSandbox: React.FC = () => {
                 </div>
               )}
               {showPoiChrome && (
-                <div className="v9-poi-demo" role="group" aria-label="V9 POI Detail Preview">
-                  {/* Layer 1: Texture Original (bg.png) */}
-                  <img
-                    src="/assets/ui/bg.png"
-                    alt=""
-                    className="v9-poi-demo__layer-1"
-                  />
+                <>
+                  {poiVersion === 'surface' && (
+                    <V9GlassLayers
+                      className="v9-poi-demo v9-poi-demo--surface"
+                      role="group"
+                      aria-label="V9 POI Detail Preview - Surface Version"
+                    >
+                      {/* Close button */}
+                      <button type="button" className="v9-poi-demo__close" title="Usa 'Nascondi POI' in alto per nascondere" aria-label="Chiudi (demo)">×</button>
 
-                  {/* Layer 2: Teal Dark Chromatic Fusion (Multiplier) */}
-                  <div className="v9-poi-demo__layer-2" />
+                      <div className="v9-poi-demo__content">
+                        {/* Ornamento bussola in alto */}
+                        <div className="v9-poi-demo__compass-top">
+                          <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M11 1 L12.2 9.8 L11 11 L9.8 9.8 Z" fill="#C9A227" opacity="0.9"/>
+                            <path d="M21 11 L12.2 12.2 L11 11 L12.2 9.8 Z" fill="#C9A227" opacity="0.55"/>
+                            <path d="M11 21 L9.8 12.2 L11 11 L12.2 12.2 Z" fill="#C9A227" opacity="0.55"/>
+                            <path d="M1 11 L9.8 9.8 L11 11 L9.8 12.2 Z" fill="#C9A227" opacity="0.55"/>
+                            <circle cx="11" cy="11" r="2" fill="none" stroke="#C9A227" strokeWidth="0.8" opacity="0.7"/>
+                          </svg>
+                        </div>
 
-                  {/* Layer 3: Optical Effects and Vignette */}
-                  <div className="v9-poi-demo__layer-3" />
+                        {/* Header: badge + titolo */}
+                        <div className="v9-poi-demo__header">
+                          <div className="v9-poi-demo__badge">
+                            <span className="v9-poi-demo__badge-inner">Quest</span>
+                          </div>
+                          <h4 className="v9-poi-demo__title">Dangerous Hunt</h4>
+                        </div>
 
-                  {/* Close */}
-                  <button type="button" className="v9-poi-demo__close" onClick={() => setShowPoiChrome(false)} aria-label="Chiudi">×</button>
+                        {/* Separatore ✦ */}
+                        <div className="v9-poi-demo__sep">
+                          <span className="v9-poi-demo__sep-line" />
+                          <span className="v9-poi-demo__sep-diamond">✦</span>
+                          <span className="v9-poi-demo__sep-line" />
+                        </div>
 
-                  <div className="v9-poi-demo__content">
+                        {/* POI Artwork */}
+                        <div className="v9-poi-demo__artwork">
+                          <div className="v9-poi-demo__artwork-inner">
+                            <svg className="v9-poi-demo__artwork-watermark" viewBox="0 0 300 130" fill="none" preserveAspectRatio="xMidYMid slice">
+                              <circle cx="150" cy="65" r="58" stroke="#dfb857" strokeWidth="0.4" />
+                              <circle cx="150" cy="65" r="42" stroke="#dfb857" strokeWidth="0.3" strokeDasharray="2 3" />
+                              <circle cx="150" cy="65" r="26" stroke="#00f0ff" strokeWidth="0.3" />
+                              <ellipse cx="150" cy="65" rx="58" ry="20" stroke="#00f0ff" strokeWidth="0.3" strokeDasharray="1 4" />
+                              <line x1="150" y1="7" x2="150" y2="123" stroke="#dfb857" strokeWidth="0.3" />
+                              <line x1="92" y1="65" x2="208" y2="65" stroke="#dfb857" strokeWidth="0.3" />
+                              <path d="M 20 110 Q 70 40 150 65" stroke="#00f0ff" strokeWidth="0.35" strokeDasharray="3 4" />
+                              <path d="M 280 20 Q 230 90 150 65" stroke="#dfb857" strokeWidth="0.35" strokeDasharray="3 4" />
+                              <polyline points="35,30 55,42 48,62 68,74 60,95" stroke="#dfb857" strokeWidth="0.5" />
+                              {['35,30','55,42','48,62','68,74','60,95'].map((p, i) => {
+                                const [x, y] = p.split(',').map(Number);
+                                return <circle key={i} cx={x} cy={y} r={i === 2 ? 2 : 1.3} fill="#dfb857" />;
+                              })}
+                              <polyline points="235,25 252,45 270,38 262,68 244,80" stroke="#00f0ff" strokeWidth="0.5" />
+                              {['235,25','252,45','270,38','262,68','244,80'].map((p, i) => {
+                                const [x, y] = p.split(',').map(Number);
+                                return <circle key={i} cx={x} cy={y} r={i === 3 ? 2 : 1.2} fill="#00f0ff" />;
+                              })}
+                              {[[105, 25], [190, 105], [120, 100], [95, 80], [205, 30]].map(([x, y], i) => (
+                                <path key={i} d={`M ${x} ${y - 3} L ${x + 1} ${y - 1} L ${x + 3} ${y} L ${x + 1} ${y + 1} L ${x} ${y + 3} L ${x - 1} ${y + 1} L ${x - 3} ${y} L ${x - 1} ${y - 1} Z`} fill="#dfb857" />
+                              ))}
+                            </svg>
+                          </div>
+                        </div>
 
-                    {/* Ornamento bussola in alto */}
-                    <div className="v9-poi-demo__compass-top">
-                      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <path d="M11 1 L12.2 9.8 L11 11 L9.8 9.8 Z" fill="#C9A227" opacity="0.9"/>
-                        <path d="M21 11 L12.2 12.2 L11 11 L12.2 9.8 Z" fill="#C9A227" opacity="0.55"/>
-                        <path d="M11 21 L9.8 12.2 L11 11 L12.2 12.2 Z" fill="#C9A227" opacity="0.55"/>
-                        <path d="M1 11 L9.8 9.8 L11 11 L9.8 12.2 Z" fill="#C9A227" opacity="0.55"/>
-                        <circle cx="11" cy="11" r="2" fill="none" stroke="#C9A227" strokeWidth="0.8" opacity="0.7"/>
-                      </svg>
-                    </div>
-
-                    {/* Header: badge + titolo */}
-                    <div className="v9-poi-demo__header">
-                      <div className="v9-poi-demo__badge">
-                        <span className="v9-poi-demo__badge-inner">Quest</span>
-                      </div>
-                      <h4 className="v9-poi-demo__title">Dangerous Hunt</h4>
-                    </div>
-
-                    {/* Separatore ✦ */}
-                    <div className="v9-poi-demo__sep">
-                      <span className="v9-poi-demo__sep-line" />
-                      <span className="v9-poi-demo__sep-diamond">✦</span>
-                      <span className="v9-poi-demo__sep-line" />
-                    </div>
-
-                    {/* POI Artwork Image Container */}
-                    <div className="v9-poi-demo__artwork">
-                      <div className="v9-poi-demo__artwork-inner">
-                        {/* Astrolabe SVG watermark */}
-                        <svg className="v9-poi-demo__artwork-watermark" viewBox="0 0 100 100" fill="none">
-                          {/* Outer circle */}
-                          <circle cx="50" cy="50" r="45" stroke="#00f0ff" strokeWidth="0.5" />
-                          {/* Inner circle */}
-                          <circle cx="50" cy="50" r="30" stroke="#00f0ff" strokeWidth="0.5" />
-                          {/* Center circle */}
-                          <circle cx="50" cy="50" r="15" stroke="#00f0ff" strokeWidth="0.5" />
-                          {/* Cardinal lines */}
-                          <line x1="50" y1="5" x2="50" y2="95" stroke="#00f0ff" strokeWidth="0.5" />
-                          <line x1="5" y1="50" x2="95" y2="50" stroke="#00f0ff" strokeWidth="0.5" />
-                          {/* Diagonal lines */}
-                          <line x1="18" y1="18" x2="82" y2="82" stroke="#00f0ff" strokeWidth="0.5" />
-                          <line x1="82" y1="18" x2="18" y2="82" stroke="#00f0ff" strokeWidth="0.5" />
-                        </svg>
-                      </div>
-                    </div>
-
-                    {/* Stats box */}
-                    <div className="v9-poi-demo__stats">
-                      {/* Stat: Danger */}
-                      <div className="v9-poi-demo__stat-row">
-                        <svg className="v9-poi-demo__stat-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                          {/* Compass/sun gold icon */}
-                          <circle cx="8" cy="8" r="6" stroke="#C9A227" strokeWidth="1" opacity="0.8"/>
-                          <circle cx="8" cy="8" r="3" stroke="#C9A227" strokeWidth="0.7" opacity="0.6"/>
-                          <line x1="8" y1="2" x2="8" y2="14" stroke="#C9A227" strokeWidth="0.8" opacity="0.7"/>
-                          <line x1="2" y1="8" x2="14" y2="8" stroke="#C9A227" strokeWidth="0.8" opacity="0.7"/>
-                          <circle cx="8" cy="8" r="1" fill="#C9A227" opacity="0.9"/>
-                        </svg>
-                        <span className="v9-poi-demo__stat-label">Danger</span>
-                        <span className="v9-poi-demo__stat-dots" aria-hidden="true" />
-                        <span className="v9-poi-demo__stat-value v9-danger">High</span>
-                      </div>
-                      {/* Divisore interno */}
-                      <div className="v9-poi-demo__stat-inner-sep">
-                        <span className="v9-poi-demo__stat-inner-line" />
-                        <span className="v9-poi-demo__sep-diamond" style={{ fontSize: '6px', opacity: 0.5 }}>✦</span>
-                        <span className="v9-poi-demo__stat-inner-line" />
-                      </div>
-                      {/* Stat: Duration */}
-                      <div className="v9-poi-demo__stat-row">
-                        <svg className="v9-poi-demo__stat-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                          {/* Bronze hourglass icon */}
-                          <rect x="4" y="1" width="8" height="2" rx="1" stroke="#8B6914" strokeWidth="1" fill="none" opacity="0.8"/>
-                          <rect x="4" y="13" width="8" height="2" rx="1" stroke="#8B6914" strokeWidth="1" fill="none" opacity="0.8"/>
+                        {/* Stats box */}
+                        <div className="v9-poi-demo__stats">
+                          <div className="v9-poi-demo__stat-row">
+                            <svg className="v9-poi-demo__stat-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                              <circle cx="8" cy="8" r="6" stroke="#C9A227" strokeWidth="1" opacity="0.8"/>
+                              <circle cx="8" cy="8" r="3" stroke="#C9A227" strokeWidth="0.7" opacity="0.6"/>
+                              <line x1="8" y1="2" x2="8" y2="14" stroke="#C9A227" strokeWidth="0.8" opacity="0.7"/>
+                              <line x1="2" y1="8" x2="14" y2="8" stroke="#C9A227" strokeWidth="0.8" opacity="0.7"/>
+                              <circle cx="8" cy="8" r="1" fill="#C9A227" opacity="0.9"/>
+                            </svg>
+                            <span className="v9-poi-demo__stat-label">Danger</span>
+                            <span className="v9-poi-demo__stat-dots" aria-hidden="true" />
+                            <span className="v9-poi-demo__stat-value v9-danger">High</span>
+                          </div>
+                          <div className="v9-poi-demo__stat-inner-sep">
+                            <span className="v9-poi-demo__stat-inner-line" />
+                            <span className="v9-poi-demo__sep-diamond" style={{ fontSize: '7px', opacity: 0.6 }}>◈</span>
+                            <span className="v9-poi-demo__stat-inner-line" />
+                          </div>
+                          <div className="v9-poi-demo__stat-row">
+                            <svg className="v9-poi-demo__stat-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                              <rect x="4" y="1" width="8" height="2" rx="1" stroke="#8B6914" strokeWidth="1" fill="none" opacity="0.8"/>
+                              <rect x="4" y="13" width="8" height="2" rx="1" stroke="#8B6914" strokeWidth="1" fill="none" opacity="0.8"/>
                           <path d="M5 3 Q5 8 8 9 Q5 10 5 13" stroke="#8B6914" strokeWidth="1" fill="none" opacity="0.6"/>
                           <path d="M11 3 Q11 8 8 9 Q11 10 11 13" stroke="#8B6914" strokeWidth="1" fill="none" opacity="0.6"/>
                           <circle cx="8" cy="9" r="1" fill="#8B6914" opacity="0.5"/>
@@ -469,18 +567,271 @@ export const V9SkinSandbox: React.FC = () => {
                     {/* Footer: CTA con ornamenti */}
                     <div className="v9-poi-demo__footer">
                       <div className="v9-poi-demo__cta-wrap">
-                        <span className="v9-poi-demo__cta-ornament">✦</span>
+                        <span className="v9-poi-demo__cta-ornament">◈</span>
                         <button type="button" className="v9-poi-demo__cta">Avvia</button>
-                        <span className="v9-poi-demo__cta-ornament">✦</span>
+                        <span className="v9-poi-demo__cta-ornament">◈</span>
                       </div>
                     </div>
 
                   </div>
-                </div>
+                </V9GlassLayers>
+                  )}
+
+                  {poiVersion === 'layout' && (
+                    <div className="v9-poi-demo v9-poi-demo--layout" role="group" aria-label="V9 POI Detail Preview - Layout Primitives Version">
+                      <button type="button" className="v9-poi-demo__close" title="Usa 'Nascondi POI' in alto per nascondere" aria-label="Chiudi (demo)">×</button>
+                      <div className="v9-poi-demo__content">
+                        <div className="v9-poi-demo__header">
+                          <div className="v9-poi-demo__badge">
+                            <span className="v9-poi-demo__badge-inner">Quest</span>
+                          </div>
+                          <h4 className="v9-poi-demo__title">Dangerous Hunt</h4>
+                        </div>
+                        <div className="v9-poi-demo__sep">
+                          <span className="v9-poi-demo__sep-line" />
+                          <span className="v9-poi-demo__sep-diamond">✦</span>
+                          <span className="v9-poi-demo__sep-line" />
+                        </div>
+                        <div className="v9-poi-demo__artwork">
+                          <div className="v9-poi-demo__artwork-inner">
+                            <svg className="v9-poi-demo__artwork-watermark" viewBox="0 0 300 130" fill="none" preserveAspectRatio="xMidYMid slice">
+                              <circle cx="150" cy="65" r="58" stroke="#dfb857" strokeWidth="0.4" />
+                              <circle cx="150" cy="65" r="42" stroke="#dfb857" strokeWidth="0.3" strokeDasharray="2 3" />
+                              <circle cx="150" cy="65" r="26" stroke="#00f0ff" strokeWidth="0.3" />
+                            </svg>
+                          </div>
+                        </div>
+                        <div className="v9-poi-demo__stats">
+                          <div className="v9-poi-demo__stat-row">
+                            <span className="v9-poi-demo__stat-label">Danger</span>
+                            <span className="v9-poi-demo__stat-dots" aria-hidden="true" />
+                            <span className="v9-poi-demo__stat-value v9-danger">High</span>
+                          </div>
+                          <div className="v9-poi-demo__stat-inner-sep">
+                            <span className="v9-poi-demo__stat-inner-line" />
+                            <span className="v9-poi-demo__sep-diamond" style={{ fontSize: '7px', opacity: 0.6 }}>◈</span>
+                            <span className="v9-poi-demo__stat-inner-line" />
+                          </div>
+                          <div className="v9-poi-demo__stat-row">
+                            <span className="v9-poi-demo__stat-label">Duration</span>
+                            <span className="v9-poi-demo__stat-dots" aria-hidden="true" />
+                            <span className="v9-poi-demo__stat-value v9-duration">8s</span>
+                          </div>
+                        </div>
+                        <div className="v9-poi-demo__footer">
+                          <div className="v9-poi-demo__cta-wrap">
+                            <span className="v9-poi-demo__cta-ornament">◈</span>
+                            <button type="button" className="v9-poi-demo__cta">Avvia</button>
+                            <span className="v9-poi-demo__cta-ornament">◈</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {poiVersion === 'aureo' && (
+                    <V9GlassLayers
+                      variant="aureo"
+                      className="v9-poi-demo"
+                      role="group"
+                      aria-label="V9 POI Detail Preview - Aureo Profondo"
+                    >
+                      <button type="button" className="v9-poi-demo__close" title="Usa 'Nascondi POI' in alto per nascondere" aria-label="Chiudi (demo)">×</button>
+                      <div className="v9-poi-demo__content">
+                        <div className="v9-poi-demo__header">
+                          <div className="v9-poi-demo__badge">
+                            <span className="v9-poi-demo__badge-inner">Scoperta</span>
+                          </div>
+                          <h4 className="v9-poi-demo__title">Caverna Aurea</h4>
+                        </div>
+                        <p className="v9-var-flavor">Luce dorata filtra dalle profondità, un calore antico richiama.</p>
+                        <div className="v9-poi-demo__sep">
+                          <span className="v9-poi-demo__sep-line" />
+                          <span className="v9-poi-demo__sep-diamond v9-accent-glyph">✦</span>
+                          <span className="v9-poi-demo__sep-line" />
+                        </div>
+                        <div className="v9-poi-demo__artwork">
+                          <div className="v9-poi-demo__artwork-inner">
+                            <svg className="v9-poi-demo__artwork-watermark" viewBox="0 0 300 130" fill="none" preserveAspectRatio="xMidYMid slice">
+                              <circle cx="150" cy="65" r="55" stroke="#e8c547" strokeWidth="0.4" opacity="0.8" />
+                              <circle cx="150" cy="65" r="38" stroke="#e8c547" strokeWidth="0.3" strokeDasharray="3 4" opacity="0.6" />
+                              <path d="M150 12 L156 59 L150 65 L144 59 Z" stroke="#e8c547" strokeWidth="0.5" opacity="0.7" />
+                              <path d="M150 118 L144 71 L150 65 L156 71 Z" stroke="#e8c547" strokeWidth="0.4" opacity="0.4" />
+                              <path d="M70 50 Q100 45 140 55 Q180 65 240 48" stroke="#e8c547" strokeWidth="0.5" strokeDasharray="2 3" opacity="0.6" />
+                            </svg>
+                          </div>
+                        </div>
+                        <div className="v9-poi-demo__stats">
+                          <div className="v9-poi-demo__stat-row">
+                            <span className="v9-poi-demo__stat-label">Splendore</span>
+                            <span className="v9-poi-demo__stat-dots" aria-hidden="true" />
+                            <span className="v9-poi-demo__stat-value v9-accent-value">Avvolgente</span>
+                          </div>
+                          <div className="v9-poi-demo__stat-inner-sep">
+                            <span className="v9-poi-demo__stat-inner-line" />
+                            <span className="v9-poi-demo__sep-diamond" style={{ fontSize: '7px', opacity: 0.6 }}>◈</span>
+                            <span className="v9-poi-demo__stat-inner-line" />
+                          </div>
+                          <div className="v9-poi-demo__stat-row">
+                            <span className="v9-poi-demo__stat-label">Ricompensa</span>
+                            <span className="v9-poi-demo__stat-dots" aria-hidden="true" />
+                            <span className="v9-poi-demo__stat-value v9-accent-value">120 oro</span>
+                          </div>
+                        </div>
+                        <div className="v9-poi-demo__footer">
+                          <div className="v9-poi-demo__cta-wrap">
+                            <span className="v9-poi-demo__cta-ornament">◈</span>
+                            <button type="button" className="v9-poi-demo__cta">Discendi</button>
+                            <span className="v9-poi-demo__cta-ornament">◈</span>
+                          </div>
+                          <div className="v9-var-btn-row">
+                            <button type="button" className="v9-var-btn">Esplora</button>
+                            <button type="button" className="v9-var-btn">Cartografa</button>
+                          </div>
+                        </div>
+                      </div>
+                    </V9GlassLayers>
+                  )}
+
+                  {/* ── Zaffiro Abissale — spedizione navale, argento lunare ── */}
+                  {poiVersion === 'sapphire' && (
+                    <V9GlassLayers
+                      variant="sapphire"
+                      className="v9-poi-demo"
+                      role="group"
+                      aria-label="V9 POI Detail Preview - Zaffiro Abissale"
+                    >
+                      <button type="button" className="v9-poi-demo__close" title="Usa 'Nascondi POI' in alto per nascondere" aria-label="Chiudi (demo)">×</button>
+                      <div className="v9-poi-demo__content">
+                        <div className="v9-poi-demo__header">
+                          <div className="v9-poi-demo__badge">
+                            <span className="v9-poi-demo__badge-inner">Viaggio</span>
+                          </div>
+                          <h4 className="v9-poi-demo__title">Rotta del Leviatano</h4>
+                        </div>
+                        <p className="v9-var-flavor">Le carte nautiche finiscono dove inizia il suo canto.</p>
+                        <div className="v9-poi-demo__sep">
+                          <span className="v9-poi-demo__sep-line" />
+                          <span className="v9-poi-demo__sep-diamond v9-accent-glyph">✦</span>
+                          <span className="v9-poi-demo__sep-line" />
+                        </div>
+                        <div className="v9-poi-demo__artwork">
+                          <div className="v9-poi-demo__artwork-inner">
+                            {/* Rosa dei venti abissale */}
+                            <svg className="v9-poi-demo__artwork-watermark" viewBox="0 0 300 130" fill="none" preserveAspectRatio="xMidYMid slice">
+                              <circle cx="150" cy="65" r="55" stroke="#8fd6ff" strokeWidth="0.4" opacity="0.7" />
+                              <circle cx="150" cy="65" r="38" stroke="#8fd6ff" strokeWidth="0.3" strokeDasharray="3 4" opacity="0.6" />
+                              <path d="M150 12 L156 59 L150 65 L144 59 Z" stroke="#dfb857" strokeWidth="0.5" opacity="0.8" />
+                              <path d="M150 118 L144 71 L150 65 L156 71 Z" stroke="#dfb857" strokeWidth="0.4" opacity="0.5" />
+                              <path d="M60 90 Q100 70 140 88 Q180 106 240 82" stroke="#8fd6ff" strokeWidth="0.5" strokeDasharray="1 3" opacity="0.7" />
+                              <path d="M55 102 Q105 84 150 100 Q195 116 245 96" stroke="#8fd6ff" strokeWidth="0.4" strokeDasharray="1 3" opacity="0.5" />
+                            </svg>
+                          </div>
+                        </div>
+                        <div className="v9-poi-demo__stats">
+                          <div className="v9-poi-demo__stat-row">
+                            <span className="v9-poi-demo__stat-label">Profondità</span>
+                            <span className="v9-poi-demo__stat-dots" aria-hidden="true" />
+                            <span className="v9-poi-demo__stat-value v9-accent-value">Abissale</span>
+                          </div>
+                          <div className="v9-poi-demo__stat-inner-sep">
+                            <span className="v9-poi-demo__stat-inner-line" />
+                            <span className="v9-poi-demo__sep-diamond" style={{ fontSize: '7px', opacity: 0.6 }}>◈</span>
+                            <span className="v9-poi-demo__stat-inner-line" />
+                          </div>
+                          <div className="v9-poi-demo__stat-row">
+                            <span className="v9-poi-demo__stat-label">Durata</span>
+                            <span className="v9-poi-demo__stat-dots" aria-hidden="true" />
+                            <span className="v9-poi-demo__stat-value v9-accent-value">12s</span>
+                          </div>
+                        </div>
+                        <div className="v9-poi-demo__footer">
+                          <div className="v9-poi-demo__cta-wrap">
+                            <span className="v9-poi-demo__cta-ornament">◈</span>
+                            <button type="button" className="v9-poi-demo__cta">Salpa</button>
+                            <span className="v9-poi-demo__cta-ornament">◈</span>
+                          </div>
+                          <div className="v9-var-btn-row">
+                            <button type="button" className="v9-var-btn">Sonda</button>
+                            <button type="button" className="v9-var-btn">Ritira</button>
+                          </div>
+                        </div>
+                      </div>
+                    </V9GlassLayers>
+                  )}
+
+                  {/* ── Cristallo Abissale — profondo, enigmatico ── */}
+                  {poiVersion === 'cristallo' && (
+                    <V9GlassLayers
+                      variant="cristallo"
+                      className="v9-poi-demo"
+                      role="group"
+                      aria-label="V9 POI Detail Preview - Cristallo Abissale"
+                    >
+                      <button type="button" className="v9-poi-demo__close" title="Usa 'Nascondi POI' in alto per nascondere" aria-label="Chiudi (demo)">×</button>
+                      <div className="v9-poi-demo__content">
+                        <div className="v9-poi-demo__header">
+                          <div className="v9-poi-demo__badge">
+                            <span className="v9-poi-demo__badge-inner">Mistero</span>
+                          </div>
+                          <h4 className="v9-poi-demo__title">Abisso Cristallino</h4>
+                        </div>
+                        <p className="v9-var-flavor">Dentro il cristallo, il tempo si ferma. Chi guarda troppo a lungo non torna più.</p>
+                        <div className="v9-poi-demo__sep">
+                          <span className="v9-poi-demo__sep-line" />
+                          <span className="v9-poi-demo__sep-diamond v9-accent-glyph">✦</span>
+                          <span className="v9-poi-demo__sep-line" />
+                        </div>
+                        <div className="v9-poi-demo__artwork">
+                          <div className="v9-poi-demo__artwork-inner">
+                            <svg className="v9-poi-demo__artwork-watermark" viewBox="0 0 300 130" fill="none" preserveAspectRatio="xMidYMid slice">
+                              <path d="M150 20 L180 65 L150 110 L120 65 Z" stroke="#5dd9ff" strokeWidth="0.6" opacity="0.7" />
+                              <path d="M150 35 L170 65 L150 95 L130 65 Z" stroke="#5dd9ff" strokeWidth="0.4" opacity="0.5" />
+                              <circle cx="150" cy="65" r="60" stroke="#5dd9ff" strokeWidth="0.3" strokeDasharray="4 3" opacity="0.4" />
+                              <path d="M100 65 Q100 40 150 20 Q200 40 200 65" stroke="#5dd9ff" strokeWidth="0.5" opacity="0.6" strokeDasharray="2 4" />
+                              <path d="M100 65 Q100 90 150 110 Q200 90 200 65" stroke="#5dd9ff" strokeWidth="0.4" opacity="0.4" strokeDasharray="2 4" />
+                            </svg>
+                          </div>
+                        </div>
+                        <div className="v9-poi-demo__stats">
+                          <div className="v9-poi-demo__stat-row">
+                            <span className="v9-poi-demo__stat-label">Purezza</span>
+                            <span className="v9-poi-demo__stat-dots" aria-hidden="true" />
+                            <span className="v9-poi-demo__stat-value v9-accent-value">Assoluta</span>
+                          </div>
+                          <div className="v9-poi-demo__stat-inner-sep">
+                            <span className="v9-poi-demo__stat-inner-line" />
+                            <span className="v9-poi-demo__sep-diamond" style={{ fontSize: '7px', opacity: 0.6 }}>◈</span>
+                            <span className="v9-poi-demo__stat-inner-line" />
+                          </div>
+                          <div className="v9-poi-demo__stat-row">
+                            <span className="v9-poi-demo__stat-label">Risonanza</span>
+                            <span className="v9-poi-demo__stat-dots" aria-hidden="true" />
+                            <span className="v9-poi-demo__stat-value v9-accent-value">Profonda</span>
+                          </div>
+                        </div>
+                        <div className="v9-poi-demo__footer">
+                          <div className="v9-poi-demo__cta-wrap">
+                            <span className="v9-poi-demo__cta-ornament">◈</span>
+                            <button type="button" className="v9-poi-demo__cta">Tocca</button>
+                            <span className="v9-poi-demo__cta-ornament">◈</span>
+                          </div>
+                          <div className="v9-var-btn-row">
+                            <button type="button" className="v9-var-btn">Ascolta</button>
+                            <button type="button" className="v9-var-btn">Arretra</button>
+                          </div>
+                        </div>
+                      </div>
+                    </V9GlassLayers>
+                  )}
+
+                </>
               )}
             </div>
           </WanderlustSurface>
+          </DraggablePoiPanel>
         </div>
+        </DndContext>
       )}
 
       {/* ── Layout Primitives Tab ── */}
@@ -603,53 +954,171 @@ export const V9SkinSandbox: React.FC = () => {
         /* WanderlustSurface content: z sopra l'SVG frame, height per propagare al child */
         .ws-content { z-index: 2; padding: 0; height: 100%; box-sizing: border-box; }
 
+        /* ── Sfondo animato: lento drift + respiro + colori vividi ── */
+        .v9-bg-animated {
+          animation:
+            v9BgDrift 45s ease-in-out infinite alternate,
+            v9BgBreath 28s ease-in-out infinite alternate;
+          will-change: transform, opacity;
+        }
+        @keyframes v9BgDrift {
+          0%   { transform: scale(1.12) translate(0%, 0%); }
+          25%  { transform: scale(1.12) translate(-1.2%, -0.7%); }
+          55%  { transform: scale(1.12) translate(-0.4%, -1.4%); }
+          80%  { transform: scale(1.12) translate(-1.8%, -0.3%); }
+          100% { transform: scale(1.12) translate(-0.8%, -1.1%); }
+        }
+        @keyframes v9BgBreath {
+          from { opacity: 0.88; }
+          to   { opacity: 1.00; }
+        }
+
+        /* ── Drag pesante ── */
+        .v9-panel-draggable {
+          cursor: grab;
+          touch-action: none;
+          user-select: none;
+          /* hover: glow ambientale oro, NO scala */
+          transition:
+            filter 0.35s ease-out,
+            box-shadow 0.35s ease-out;
+        }
+        /* HOVER: pulsazione oro sul frame — niente scala, effetto "risponde alla mano" */
+        .v9-panel-draggable:hover {
+          filter:
+            drop-shadow(0 0 14px rgba(223,184,87,0.45))
+            drop-shadow(0 0 30px rgba(0,229,255,0.18));
+        }
+
+        /* LIFTED: sale in aria — scala cresce, ombra profonda */
+        .v9-panel-draggable[data-drag-state="lifted"] {
+          cursor: grabbing;
+          filter:
+            drop-shadow(0 28px 48px rgba(0,0,0,0.72))
+            drop-shadow(0 8px 16px rgba(0,0,0,0.55));
+          transform-origin: center;
+          /* la scala viene sovrapposta via animation ma il translate viene da dnd */
+          animation: v9Lift 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+        @keyframes v9Lift {
+          from { scale: 1.00; }
+          to   { scale: 1.04; }
+        }
+
+        /* THUD: atterra con peso, rimbalzo fisico */
+        .v9-panel-draggable[data-drag-state="thud"] {
+          animation: v9Thud 0.54s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        @keyframes v9Thud {
+          0%   { scale: 1.04; filter: drop-shadow(0 28px 48px rgba(0,0,0,0.72)); }
+          38%  { scale: 1.00; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.60)); }   /* impatto */
+          58%  { scale: 1.01; filter: drop-shadow(0 8px 18px rgba(0,0,0,0.40)); }  /* micro-rimbalzo */
+          100% { scale: 1.00; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25)); }
+        }
+
         /* ══════════════════════════════════════════════════════════════
            POI Demo — V9 Obsidian Aesthetic
            MASTER CONTAINER: Rigid layer structure
         ══════════════════════════════════════════════════════════════ */
+        /* ══ MASTER: Obsidian Shield for Text Readability ══
+           Background is solid obsidian (#060f16) for crystal-clear text readability.
+           Oil painting texture is confined ONLY to the artwork slot at 10% opacity. */
         .v9-poi-demo {
           position: relative;
           width: 100%;
           height: 100%;
           overflow: hidden;
+          isolation: isolate;
           color: ${V9.textPrimary};
           font-family: 'EB Garamond', 'Georgia', serif;
+          background-color: #060f16;
+          border: 1.5px solid rgba(223, 184, 87, 0.4);
+          border-radius: 8px;
+          box-shadow:
+            0 15px 35px rgba(0, 0, 0, 0.6),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
 
-        /* Layer 1: Texture Original (bg.png) */
-        .v9-poi-demo__layer-1 {
-          position: absolute;
-          inset: 0;
+        /* ── POI Artwork Image Container: Confined oil painting texture at 10% opacity ── */
+        .v9-poi-demo__artwork {
+          position: relative;
+          width: 100%;
+          height: 130px;
+          margin-bottom: 10px;
+          border-radius: 6px;
+          overflow: hidden;
+          background-image: url('/assets/bg.png');
+          background-size: cover;
+          background-position: center;
+          opacity: 0.1;
+          border: 1px solid rgba(223, 184, 87, 0.15);
+        }
+        .v9-poi-demo__artwork-inner {
           width: 100%;
           height: 100%;
-          object-fit: cover;
-          pointer-events: none;
-          opacity: 0.45;
-          mix-blend-mode: normal;
+          position: relative;
+          z-index: 1;
         }
 
-        /* Layer 2: Teal Dark Chromatic Fusion (Multiplier) */
-        .v9-poi-demo__layer-2 {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(to bottom, rgba(5, 34, 43, 0.85) 0%, rgba(3, 18, 24, 0.95) 100%);
-          mix-blend-mode: multiply;
-          pointer-events: none;
+        /* ── Version-specific styles ── */
+        /* Surface: Full-featured with all decorations */
+        .v9-poi-demo--surface {
+          border-color: rgba(223, 184, 87, 0.5);
+        }
+        .v9-poi-demo--surface .v9-poi-demo__compass-top {
+          display: flex;
+        }
+        .v9-poi-demo--surface .v9-poi-demo__stat-icon {
+          display: block;
         }
 
-        /* Layer 3: Optical Effects and Vignette */
-        .v9-poi-demo__layer-3 {
-          position: absolute;
-          inset: 0;
-          background:
-            radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.25) 0%, transparent 60%),
-            radial-gradient(circle at 85% 85%, rgba(223, 184, 87, 0.12) 0%, transparent 50%);
-          mix-blend-mode: screen;
-          box-shadow: inset 0 0 90px rgba(1, 11, 14, 0.98);
-          pointer-events: none;
+        /* Layout: Minimalist, no compass, no icons, simplified artwork */
+        .v9-poi-demo--layout {
+          border-color: rgba(223, 184, 87, 0.3);
+        }
+        .v9-poi-demo--layout .v9-poi-demo__compass-top {
+          display: none;
+        }
+        .v9-poi-demo--layout .v9-poi-demo__stat-icon {
+          display: none;
+        }
+        .v9-poi-demo--layout .v9-poi-demo__artwork-watermark {
+          opacity: 0.15;
         }
 
-        /* ── Close button — embossed, evidente ── */
+        /* Aureo Profondo: Warm gold with soft shadows, cinematic depth */
+        .v9-poi-demo[variant="aureo"] {
+          --v9-accent: #e8c547;
+          --v9-accent-soft: rgba(232, 197, 71, 0.4);
+          border-color: rgba(232, 197, 71, 0.5);
+          background: linear-gradient(135deg, rgba(15, 12, 6, 0.95) 0%, rgba(20, 16, 10, 0.98) 100%);
+          box-shadow:
+            0 20px 50px rgba(232, 197, 71, 0.15),
+            0 15px 35px rgba(0, 0, 0, 0.6),
+            inset 0 1px 0 rgba(232, 197, 71, 0.25);
+        }
+        .v9-poi-demo[variant="aureo"] .v9-poi-demo__artwork {
+          opacity: 0.12;
+          background: radial-gradient(circle at 40% 30%, rgba(232, 197, 71, 0.2), transparent);
+        }
+
+        /* Cristallo Abissale: Deep cyan, layered, mysterious */
+        .v9-poi-demo[variant="cristallo"] {
+          --v9-accent: #5dd9ff;
+          --v9-accent-soft: rgba(93, 217, 255, 0.35);
+          border-color: rgba(93, 217, 255, 0.4);
+          background: linear-gradient(135deg, rgba(8, 22, 30, 0.97) 0%, rgba(10, 25, 35, 0.99) 100%);
+          box-shadow:
+            0 20px 50px rgba(93, 217, 255, 0.12),
+            0 15px 35px rgba(0, 0, 0, 0.7),
+            inset 0 1px 0 rgba(93, 217, 255, 0.20);
+        }
+        .v9-poi-demo[variant="cristallo"] .v9-poi-demo__artwork {
+          opacity: 0.14;
+          background: radial-gradient(circle at 50% 50%, rgba(93, 217, 255, 0.15), transparent);
+        }
+
+        /* ── Close button ── */
         .v9-poi-demo__close {
           position: absolute;
           top: 10px;
@@ -720,14 +1189,16 @@ export const V9SkinSandbox: React.FC = () => {
           margin-bottom: 6px;
         }
 
-        /* Badge: transparent with backdrop-filter for texture show-through */
+        /* Badge */
         .v9-poi-demo__badge {
           position: relative;
-          padding: 5px 13px;
-          border: 1px solid rgba(223,184,87,0.40);
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 4px 13px 5px;
+          border: 1.5px solid rgba(223, 184, 87, 0.7);
           border-radius: 4px;
-          /* Transparent background for texture show-through */
-          background: rgba(4, 22, 28, 0.6);
+          background-color: rgba(6, 29, 37, 0.5);
           backdrop-filter: blur(8px);
           -webkit-backdrop-filter: blur(8px);
           box-shadow:
@@ -810,30 +1281,27 @@ export const V9SkinSandbox: React.FC = () => {
           margin-bottom: 10px;
           border-radius: 6px;
           overflow: hidden;
-          /* Transparent background */
-          background: rgba(3, 15, 20, 0.4);
+          background: rgba(3, 15, 20, 0.15);
           border: 1px solid rgba(223, 184, 87, 0.15);
         }
         .v9-poi-demo__artwork-inner {
           width: 100%;
           height: 100%;
-          /* Neutral gradient */
+          /* Incavo nel cristallo: appena più profondo del master */
           background: linear-gradient(135deg,
-            rgba(20,28,35,0.8) 0%,
-            rgba(15,23,30,0.9) 50%,
-            rgba(18,26,33,0.85) 100%
+            rgba(4, 22, 30, 0.20) 0%,
+            rgba(3, 14, 20, 0.28) 100%
           );
+          box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
           position: relative;
         }
-        /* Astrolabe SVG watermark - ultra-light (3% opacity) */
+        /* Carta celeste — filigrana sottile, mistero accademico */
         .v9-poi-demo__artwork-watermark {
           position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 100px;
-          height: 100px;
-          opacity: 0.03;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          opacity: 0.30;
           pointer-events: none;
         }
 
@@ -861,7 +1329,7 @@ export const V9SkinSandbox: React.FC = () => {
           flex-direction: column;
           margin-bottom: 10px;
           border-radius: 7px;
-          background: rgba(6,15,22,0.75);
+          background: rgba(6,15,22,0.45);
           /* warm bronze border for contrast */
           border: 1px solid rgba(223,184,87,0.45);
           box-shadow:
@@ -893,11 +1361,11 @@ export const V9SkinSandbox: React.FC = () => {
           color: rgba(240,239,228,0.75);
           flex-shrink: 0;
         }
-        /* Gradient div separator - metal groove effect */
+        /* Gradient div separator - rigid specification */
         .v9-poi-demo__stat-dots {
           flex: 1;
           height: 1px;
-          background: linear-gradient(to right, transparent, rgba(223, 184, 87, 0.3) 20%, rgba(223, 184, 87, 0.3) 80%, transparent);
+          background: linear-gradient(to right, transparent, rgba(223, 184, 87, 0.3), transparent);
           margin: 0 4px;
           align-self: center;
         }
@@ -908,7 +1376,7 @@ export const V9SkinSandbox: React.FC = () => {
           flex-shrink: 0;
         }
         .v9-danger   { color: #e07060; }
-        .v9-duration { color: #67e8f9; }
+        .v9-duration { color: #a5f3fc; }  /* turchese spento antico — niente LED digitale */
 
         /* Separatore interno alle stat */
         .v9-poi-demo__stat-inner-sep {
@@ -929,43 +1397,130 @@ export const V9SkinSandbox: React.FC = () => {
           justify-content: flex-end;
           padding-top: 8px;
         }
+        /* ◈ ai lati della placca — spezzano la geometria */
         .v9-poi-demo__cta-wrap {
           display: flex;
-          flex-direction: column;
+          flex-direction: row;
           align-items: center;
-          gap: 3px;
+          gap: 8px;
         }
         .v9-poi-demo__cta-ornament {
-          font-size: 8px;
-          color: ${V9.warmGold};
-          opacity: 0.65;
+          font-size: 9px;
+          color: ${V9.goldBronze};
+          opacity: 0.75;
           line-height: 1;
+          text-shadow: 0 0 6px rgba(223,184,87,0.4);
         }
 
-        /* Bottone AVVIA: transparent with backdrop-filter for texture show-through */
+        /* CTA: placca metallica d'esplorazione — angoli tagliati, doppio bordo oro */
         .v9-poi-demo__cta {
-          padding: 9px 32px;
-          border-radius: 9999px;
-          border: 1.5px solid rgba(223, 184, 87, 0.8);
-          /* Transparent background for texture show-through */
-          background: rgba(4, 22, 28, 0.6);
-          backdrop-filter: blur(8px);
-          -webkit-backdrop-filter: blur(8px);
-          /* Gold glow */
-          box-shadow: 0 0 12px rgba(223, 184, 87, 0.15);
+          position: relative;
+          overflow: hidden;
+          padding: 10px 30px;
+          border-radius: 4px;
+          border: 2px solid #dfb857;
+          /* angoli tagliati (notched) — placca fusa nel bronzo */
+          clip-path: polygon(
+            8px 0, calc(100% - 8px) 0, 100% 8px,
+            100% calc(100% - 8px), calc(100% - 8px) 100%,
+            8px 100%, 0 calc(100% - 8px), 0 8px
+          );
+          /* metallo brunito con riflesso in alto */
+          background:
+            linear-gradient(to bottom, rgba(255,255,255,0.12) 0%, transparent 40%),
+            linear-gradient(135deg, rgba(13, 55, 72, 0.85) 0%, rgba(6, 29, 37, 0.95) 100%) !important;
+          box-shadow:
+            0 0 14px rgba(223, 184, 87, 0.2),
+            0 3px 8px rgba(0,0,0,0.5),
+            inset 0 0 0 1px rgba(4, 20, 26, 0.9),       /* gap scuro */
+            inset 0 0 0 2px rgba(223, 184, 87, 0.35),   /* secondo bordo oro interno */
+            inset 0 1px 0 rgba(245,242,232,0.15),
+            inset 0 -2px 4px rgba(0,0,0,0.4);
           color: ${V9.warmGold};
           font-family: 'Cinzel', 'Georgia', serif;
           font-size: 0.75rem;
           font-weight: 700;
           letter-spacing: 0.28em;
           text-transform: uppercase;
+          /* bevel d'oro: ombra dura sotto + filo di luce sopra */
+          text-shadow:
+            0 2px 4px rgba(0,0,0,0.8),
+            0 -1px 0 rgba(255,245,200,0.25);
           cursor: pointer;
           transition: filter 0.18s, box-shadow 0.18s, border-color 0.18s;
         }
+        /* sweep di luce — attraversa il bottone su hover */
+        .v9-poi-demo__cta::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -80%;
+          width: 55%;
+          height: 100%;
+          background: linear-gradient(105deg,
+            transparent 0%,
+            rgba(255, 244, 200, 0.22) 45%,
+            rgba(0, 229, 255, 0.12) 55%,
+            transparent 100%
+          );
+          transform: skewX(-18deg);
+          transition: left 0.55s ease;
+          pointer-events: none;
+        }
         .v9-poi-demo__cta:hover {
-          filter: brightness(1.15);
-          box-shadow: 0 0 18px rgba(223, 184, 87, 0.35);
+          filter: brightness(1.12);
+          box-shadow:
+            0 0 20px rgba(223, 184, 87, 0.35),
+            0 0 32px rgba(0, 229, 255, 0.12),
+            0 3px 8px rgba(0,0,0,0.5),
+            inset 0 1px 0 rgba(245,242,232,0.20),
+            inset 0 -2px 4px rgba(0,0,0,0.4);
           border-color: ${V9.azureLight};
+        }
+        .v9-poi-demo__cta:hover::before {
+          left: 125%;
+        }
+
+        /* ═══ Varianti POI — accento pilotato da --v9-accent (dal variant del glass) ═══ */
+        .v9-var-flavor {
+          margin: 8px auto 0;
+          font-style: italic;
+          font-size: 13px;
+          line-height: 1.5;
+          color: ${V9.textSecondary};
+          max-width: 270px;
+          text-align: center;
+        }
+        .v9-accent-value {
+          color: var(--v9-accent) !important;
+          text-shadow: 0 0 10px var(--v9-accent-soft);
+        }
+        .v9-accent-glyph {
+          color: var(--v9-accent);
+        }
+        .v9-var-btn-row {
+          display: flex;
+          justify-content: center;
+          gap: 10px;
+          margin-top: 10px;
+        }
+        .v9-var-btn {
+          padding: 6px 16px;
+          font-family: 'Cinzel', serif;
+          font-size: 10px;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          color: var(--v9-accent);
+          background: rgba(2, 8, 10, 0.35);
+          border: 1px solid var(--v9-accent-soft);
+          border-radius: 3px;
+          cursor: pointer;
+          transition: background 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+        }
+        .v9-var-btn:hover {
+          background: rgba(2, 8, 10, 0.6);
+          color: ${V9.ivory};
+          box-shadow: 0 0 12px var(--v9-accent-soft), inset 0 0 8px rgba(0, 0, 0, 0.4);
         }
       `}</style>
     </div>
