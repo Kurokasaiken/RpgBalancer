@@ -116,6 +116,15 @@ const PoiDetailRosterIntegrationPage: FC = () => {
   const activityIcon = useMemo(() => getActivityIcon(activity), [activity]);
   const slotBlueprints = useMemo(() => buildSlotBlueprints(activity), [activity]);
 
+  // ResidentSlotRack renders infinite slots as a non-droppable "+" placeholder.
+  // For the test page we want a real, interactive slot rack, so we cap infinite
+  // activities to a finite number of slots for the controller only.
+  const finiteMaxSlots = typeof activity.maxSlots === 'number' ? activity.maxSlots : 4;
+  const activityForController = useMemo(
+    () => ({ ...activity, maxSlots: finiteMaxSlots as number }),
+    [activity, finiteMaxSlots],
+  );
+
   const { residentsById } = useRosterKitData();
   const { state: pageFlight, startFlight, settle: settleFlight } = useDragOutcome();
 
@@ -163,7 +172,7 @@ const PoiDetailRosterIntegrationPage: FC = () => {
   );
 
   const controller = useResidentSlotController({
-    activity,
+    activity: activityForController,
     assignments,
     residents: residentsById,
     hoveredResidentId: draggingResidentId,
@@ -172,8 +181,7 @@ const PoiDetailRosterIntegrationPage: FC = () => {
     onClear: handleClear,
   });
 
-  const maxSlots =
-    typeof activity.maxSlots === 'number' ? activity.maxSlots : 99;
+  const maxSlots = controller.slots.length;
   const freeSlots = controller.slots.filter((s) => !s.assignedResidentId).length;
   const poiStatus = assignedIds.length > 0 ? 'working' : 'idle';
   const poiDropId = useMemo(() => `job-poi-drop-${activity.id}`, [activity.id]);
@@ -422,7 +430,18 @@ const PoiDetailRosterIntegrationPage: FC = () => {
                       freeSlots={freeSlots}
                       maxSlots={maxSlots}
                       canAcceptDrop={freeSlots > 0}
-                      slots={[]}
+                      slots={controller.slots.map((slot) => ({
+                        id: slot.id,
+                        assignedResidentId: slot.assignedResidentId ?? undefined,
+                        requirements: slot.requirement
+                          ? {
+                              requiredSkills: [
+                                ...(slot.requirement.allOf ?? []),
+                                ...(slot.requirement.anyOf ?? []),
+                              ],
+                            }
+                          : {},
+                      }))}
                       onClick={() => setIsDetailOpen((o) => !o)}
                     />
                   </div>

@@ -16,7 +16,7 @@ type StyleLabPillar = 'frontier' | 'wilderness' | 'empire';
 type SkinPresetId = 'minimal-frontier' | 'minimal-wilderness' | 'minimal-empire' | 'wanderlust' | 'arcane-tech' | 'gilded-observatory';
 
 // ← CAMBIA QUI per switchare la skin di default di tutti i componenti (v9 = 'wanderlust', v8 = 'minimal-frontier')
-export const DEFAULT_COMPONENT_SKIN_PRESET: SkinPresetId = 'wanderlust';
+export const DEFAULT_COMPONENT_SKIN_PRESET: SkinPresetId = 'base';
 
 interface ComponentSkinBinding {
   componentId: ComponentId;

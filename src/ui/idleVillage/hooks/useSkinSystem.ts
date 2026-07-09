@@ -14,7 +14,7 @@ import { DEFAULT_COMPONENT_SKIN_PRESET } from '../skins/SkinManager';
 type ComponentId = string;
 type MotionLevel = 'minimal' | 'reduced' | 'full';
 type StyleLabPillar = 'frontier' | 'wilderness' | 'empire';
-type SkinPresetId = 'minimal-frontier' | 'minimal-wilderness' | 'minimal-empire' | 'wanderlust' | 'arcane-tech' | 'gilded-observatory';
+type SkinPresetId = 'base' | 'minimal-frontier' | 'minimal-wilderness' | 'minimal-empire' | 'wanderlust' | 'arcane-tech' | 'gilded-observatory' | 'neon-cyber' | 'shadow-realm';
 
 interface ComponentSkinBinding {
   componentId: ComponentId;
