@@ -5,8 +5,8 @@
  * with full TS-Series integration, pillar-specific adaptations, and motion level support.
  */
 
-import { 
-  ActivityCapsuleDetailSkinConfig,
+import type { ActivityCapsuleDetailSkinConfig } from './ActivityCapsuleDetailSkinSchema';
+import {
   DEFAULT_ACTIVITY_CAPSULE_DETAIL_SKIN_CONFIG,
   mergeActivityCapsuleDetailSkinConfig,
 } from './ActivityCapsuleDetailSkinSchema';
@@ -182,6 +182,78 @@ export const BASE_LAYOUT_PRIMITIVES_PRESET: Partial<ActivityCapsuleDetailSkinCon
     collectButtonBorder: 'rgba(0, 229, 255, 0.5)',
     collectButtonColor: 'rgba(247, 240, 227, 0.92)',
     collectButtonGlow: '0 0 14px rgba(0, 229, 255, 0.18)',
+  },
+  wilderness: {
+    window: {
+      windowBackground: 'linear-gradient(160deg, rgba(6, 15, 22, 0.97) 0%, rgba(1, 12, 18, 0.99) 100%)',
+      windowBorder: '1px solid rgba(223, 184, 87, 0.35)',
+      frameGradient: 'linear-gradient(180deg, rgba(4, 24, 38, 0.96) 0%, rgba(2, 14, 22, 0.98) 50%, rgba(1, 10, 16, 0.99) 100%)',
+      frameCornerDecorations: 'rgba(223, 184, 87, 0.45)',
+      dragHandleDotColor: 'rgba(0, 229, 255, 0.7)',
+      closeButtonColor: 'rgba(223, 184, 87, 0.45)',
+      closeButtonHoverColor: 'rgba(247, 240, 227, 0.88)',
+    },
+    poi: {
+      crownGradient: 'linear-gradient(14% 4%, #dfb857 0%, #c9a040 9%, #a07828 28%, #7a5818 52%, #5a3c08 76%, #3a2408 100%)',
+      idleColor: 'rgba(206, 184, 136, 0.7)',
+      activeColor: 'rgba(0, 229, 255, 0.9)',
+      completedColor: 'rgba(206, 184, 136, 0.85)',
+      poiGlow: '0 0 22px rgba(0, 229, 255, 0.25)',
+    },
+    header: {
+      nameColor: 'rgba(247, 240, 227, 0.95)',
+      typeColor: 'rgba(206, 184, 136, 0.65)',
+      statusActiveColor: 'rgba(0, 229, 255, 0.7)',
+      statusCompletedColor: 'rgba(206, 184, 136, 0.75)',
+    },
+  },
+  empire: {
+    window: {
+      windowBackground: 'linear-gradient(160deg, rgba(6, 15, 22, 0.97) 0%, rgba(1, 12, 18, 0.99) 100%)',
+      windowBorder: '1px solid rgba(223, 184, 87, 0.35)',
+      frameGradient: 'linear-gradient(180deg, rgba(4, 24, 38, 0.96) 0%, rgba(2, 14, 22, 0.98) 50%, rgba(1, 10, 16, 0.99) 100%)',
+      frameCornerDecorations: 'rgba(223, 184, 87, 0.45)',
+      dragHandleDotColor: 'rgba(0, 229, 255, 0.7)',
+      closeButtonColor: 'rgba(223, 184, 87, 0.45)',
+      closeButtonHoverColor: 'rgba(247, 240, 227, 0.88)',
+    },
+    poi: {
+      crownGradient: 'linear-gradient(14% 4%, #dfb857 0%, #c9a040 9%, #a07828 28%, #7a5818 52%, #5a3c08 76%, #3a2408 100%)',
+      idleColor: 'rgba(206, 184, 136, 0.7)',
+      activeColor: 'rgba(0, 229, 255, 0.9)',
+      completedColor: 'rgba(206, 184, 136, 0.85)',
+      poiGlow: '0 0 22px rgba(0, 229, 255, 0.25)',
+    },
+    header: {
+      nameColor: 'rgba(247, 240, 227, 0.95)',
+      typeColor: 'rgba(206, 184, 136, 0.65)',
+      statusActiveColor: 'rgba(0, 229, 255, 0.7)',
+      statusCompletedColor: 'rgba(206, 184, 136, 0.75)',
+    },
+  },
+  frontier: {
+    window: {
+      windowBackground: 'linear-gradient(160deg, rgba(6, 15, 22, 0.97) 0%, rgba(1, 12, 18, 0.99) 100%)',
+      windowBorder: '1px solid rgba(223, 184, 87, 0.35)',
+      frameGradient: 'linear-gradient(180deg, rgba(4, 24, 38, 0.96) 0%, rgba(2, 14, 22, 0.98) 50%, rgba(1, 10, 16, 0.99) 100%)',
+      frameCornerDecorations: 'rgba(223, 184, 87, 0.45)',
+      dragHandleDotColor: 'rgba(0, 229, 255, 0.7)',
+      closeButtonColor: 'rgba(223, 184, 87, 0.45)',
+      closeButtonHoverColor: 'rgba(247, 240, 227, 0.88)',
+    },
+    poi: {
+      crownGradient: 'linear-gradient(14% 4%, #dfb857 0%, #c9a040 9%, #a07828 28%, #7a5818 52%, #5a3c08 76%, #3a2408 100%)',
+      idleColor: 'rgba(206, 184, 136, 0.7)',
+      activeColor: 'rgba(0, 229, 255, 0.9)',
+      completedColor: 'rgba(206, 184, 136, 0.85)',
+      poiGlow: '0 0 22px rgba(0, 229, 255, 0.25)',
+    },
+    header: {
+      nameColor: 'rgba(247, 240, 227, 0.95)',
+      typeColor: 'rgba(206, 184, 136, 0.65)',
+      statusActiveColor: 'rgba(0, 229, 255, 0.7)',
+      statusCompletedColor: 'rgba(206, 184, 136, 0.75)',
+    },
   },
   presetId: 'base',
 };
