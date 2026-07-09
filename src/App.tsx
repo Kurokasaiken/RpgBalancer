@@ -21,6 +21,7 @@ const SkinLabPage = lazy(() => import('./pages/SkinLabPage'));
 const V8SkinSandbox = lazy(() => import('./pages/v8-skin-sandbox').then(m => ({ default: m.V8SkinSandbox })));
 const V9SkinSandbox = lazy(() => import('./pages/v9-skin-sandbox').then(m => ({ default: m.V9SkinSandbox })));
 const PoiDetailVerificationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailVerificationPage').then(m => ({ default: m.PoiDetailVerificationPage })));
+const PoiDetailRosterIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailRosterIntegrationPage').then(m => ({ default: m.default })));
 const PoiStandardDetailIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiStandardDetailIntegrationPage').then(m => ({ default: m.PoiStandardDetailIntegrationPage })));
 const TimeDaynightIntegrationPage = lazy(() => import('./ui/idleVillage/pages/TimeDaynightIntegrationPage').then(m => ({ default: m.TimeDaynightIntegrationPage })));
 const DragPoiAssignmentPage = lazy(() => import('./ui/idleVillage/pages/DragPoiAssignmentPage').then(m => ({ default: m.DragPoiAssignmentPage })));
@@ -132,6 +133,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/v9-skin-sandbox';
   const isPoiDetailVerificationPath =
     typeof window !== 'undefined' && window.location.pathname === '/poi-detail-verification';
+  const isPoiDetailRosterIntegrationPath =
+    typeof window !== 'undefined' && window.location.pathname === '/poi-detail-roster-integration';
   const isPoiStandardDetailIntegrationPath =
     typeof window !== 'undefined' && window.location.pathname === '/poi-standard-detail-integration';
   const isTimeDaynightIntegrationPath =
@@ -566,6 +569,16 @@ function App() {
       <ErrorBoundary componentName="POI Detail Verification Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading POI Detail Verification...</div>}>
           <PoiDetailVerificationPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isPoiDetailRosterIntegrationPath) {
+    return (
+      <ErrorBoundary componentName="POI Detail Roster Integration Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading POI Detail Roster Integration...</div>}>
+          <PoiDetailRosterIntegrationPage />
         </Suspense>
       </ErrorBoundary>
     );

@@ -8,6 +8,7 @@
 import { useLayoutEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { createContext, useContext, ReactNode } from 'react';
 import React from 'react';
+import { DEFAULT_COMPONENT_SKIN_PRESET } from '../skins/SkinManager';
 
 // Define types locally to avoid import issues
 type ComponentId = string;
@@ -141,7 +142,7 @@ export function useSkinSystem(options: UseSkinSystemOptions = {}): UseSkinSystem
   const [state, setState] = useState<SkinState>(() => {
     // Default state while manager initializes
     return {
-      currentPreset: 'minimal-frontier' as SkinPresetId,
+      currentPreset: DEFAULT_COMPONENT_SKIN_PRESET,
       currentPillar: 'frontier' as StyleLabPillar,
       currentMotionLevel: 'full' as MotionLevel,
       isTransitioning: false,

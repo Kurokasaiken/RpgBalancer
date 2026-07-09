@@ -15,6 +15,9 @@ type MotionLevel = 'minimal' | 'reduced' | 'full';
 type StyleLabPillar = 'frontier' | 'wilderness' | 'empire';
 type SkinPresetId = 'minimal-frontier' | 'minimal-wilderness' | 'minimal-empire' | 'wanderlust' | 'arcane-tech' | 'gilded-observatory';
 
+// ← CAMBIA QUI per switchare la skin di default di tutti i componenti (v9 = 'wanderlust', v8 = 'minimal-frontier')
+export const DEFAULT_COMPONENT_SKIN_PRESET: SkinPresetId = 'wanderlust';
+
 interface ComponentSkinBinding {
   componentId: ComponentId;
   name: string;
@@ -217,7 +220,7 @@ function skinReducer(state: SkinState, action: SkinAction): SkinState {
  * Create initial skin state
  */
 function createInitialState(
-  preset: SkinPresetId = 'minimal-frontier',
+  preset: SkinPresetId = DEFAULT_COMPONENT_SKIN_PRESET,
   pillar: StyleLabPillar = 'frontier',
   motionLevel: MotionLevel = 'full'
 ): SkinState {
@@ -256,7 +259,7 @@ export class SkinManager implements ISkinManager {
       enableTelemetry: true,
       enableDebugMode: false,
       enablePerformanceMonitoring: false,
-      defaultPreset: 'minimal-frontier',
+      defaultPreset: DEFAULT_COMPONENT_SKIN_PRESET,
       defaultPillar: 'frontier',
       defaultMotionLevel: 'full',
       maxComponentCount: SKIN_SYSTEM_CONSTANTS.MAX_COMPONENTS,
