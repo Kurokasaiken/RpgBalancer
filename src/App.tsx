@@ -20,6 +20,7 @@ const StyleLabDemoPage = lazy(() => import('./pages/style-lab-demo'));
 const SkinLabPage = lazy(() => import('./pages/SkinLabPage'));
 const V8SkinSandbox = lazy(() => import('./pages/v8-skin-sandbox').then(m => ({ default: m.V8SkinSandbox })));
 const V9SkinSandbox = lazy(() => import('./pages/v9-skin-sandbox').then(m => ({ default: m.V9SkinSandbox })));
+const WanderlustDnaSandbox = lazy(() => import('./pages/wanderlust-dna-sandbox').then(m => ({ default: m.WanderlustDnaSandbox })));
 const PoiDetailVerificationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailVerificationPage').then(m => ({ default: m.PoiDetailVerificationPage })));
 const PoiDetailRosterIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailRosterIntegrationPage').then(m => ({ default: m.default })));
 const PoiStandardDetailIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiStandardDetailIntegrationPage').then(m => ({ default: m.PoiStandardDetailIntegrationPage })));
@@ -131,6 +132,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/skin-sandbox';
   const isV9SkinSandboxPath =
     typeof window !== 'undefined' && window.location.pathname === '/v9-skin-sandbox';
+  const isWanderlustDnaPath =
+    typeof window !== 'undefined' && window.location.pathname === '/wanderlust-dna';
   const isPoiDetailVerificationPath =
     typeof window !== 'undefined' && window.location.pathname === '/poi-detail-verification';
   const isPoiDetailRosterIntegrationPath =
@@ -559,6 +562,16 @@ function App() {
       <ErrorBoundary componentName="V9 Skin Sandbox">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading V9 Skin Sandbox...</div>}>
           <V9SkinSandbox />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isWanderlustDnaPath) {
+    return (
+      <ErrorBoundary componentName="Wanderlust DNA Sandbox">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Wanderlust DNA...</div>}>
+          <WanderlustDnaSandbox />
         </Suspense>
       </ErrorBoundary>
     );

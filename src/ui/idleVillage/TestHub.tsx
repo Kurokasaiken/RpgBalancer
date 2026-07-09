@@ -85,6 +85,14 @@ const EXTRA_PAGES: TestPageLink[] = [
     status: 'ok',
   },
   {
+    id: 'wanderlust-dna',
+    title: 'Wanderlust DNA V2',
+    description: 'Gettone 2.5D parallasse, slot con ghiera e flash anisotropico, pannello Lente con rifrazione WebGL',
+    path: '/wanderlust-dna',
+    icon: '🧿',
+    status: 'ok',
+  },
+  {
     id: 'poi-detail',
     title: 'POI Detail',
     description: 'POI Detail con ActivityCapsuleDetailSkinAware, config-first e telemetry',
