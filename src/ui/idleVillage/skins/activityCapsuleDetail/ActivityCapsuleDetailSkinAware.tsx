@@ -1559,7 +1559,10 @@ export function ActivityCapsuleDetailSkinAware({
               inset: 0,
               opacity: 0,
               zIndex: 2,
+              pointerEvents: 'none',
               touchAction: 'none',
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
             }}
             onDragStart={heavyDrag.onDragStart}
             onDragEnd={heavyDrag.onDragEnd}

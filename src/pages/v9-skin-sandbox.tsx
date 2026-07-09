@@ -26,6 +26,9 @@ import {
   useSensors,
   type DragEndEvent,
 } from '@dnd-kit/core';
+import giggiolilloPortrait from '@/assets/portraits/giggiolillo.png';
+import salvatricePortrait from '@/assets/portraits/portrait female magician.png';
+import spaccaculiPortrait from '@/assets/portraits/portrait male warrior.png';
 import { V9GlassLayers } from '@/ui/v9-skin/V9GlassLayers';
 import { WanderlustSurface, InsetPanel, type MaterialLayerConfig } from '@/ui/wanderlust-surface';
 import { type MaterialPreset, MATERIAL_PRESETS } from '@/ui/wanderlust-surface/materialPresets';
@@ -40,6 +43,8 @@ import {
   WanderlustSectionHeader,
   WanderlustAmbientField,
 } from '@/ui/wanderlust-surface/layout';
+import { WanderlustStatBar } from '@/ui/wanderlust-surface/layout/WanderlustStatBar';
+import DraggableSkinAware from '@/ui/idleVillage/components/DraggableSkinAware';
 import { useGenericTokens } from '@/ui/styleLab/hooks/useGenericTokens';
 
 type BackgroundMode = 'marble' | 'parchment' | 'void' | 'bg';
@@ -235,6 +240,36 @@ export const V9SkinSandbox: React.FC = () => {
   // ── Drag state ───────────────────────────────────────────────────
   const [panelOffset, setPanelOffset] = useState({ x: 0, y: 0 });
   const [panelDragState, setPanelDragState] = useState<PanelDragState>('idle');
+
+  // ── Layout Primitives drag state ─────────────────────────────────
+  const [layoutOffset, setLayoutOffset] = useState({ x: 0, y: 0 });
+  const [layoutDragging, setLayoutDragging] = useState(false);
+  const layoutDragStart = useRef({ x: 0, y: 0 });
+  const layoutStartOffset = useRef({ x: 0, y: 0 });
+
+  const handleLayoutMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    layoutDragStart.current = { x: e.clientX, y: e.clientY };
+    layoutStartOffset.current = { ...layoutOffset };
+    setLayoutDragging(true);
+  }, [layoutOffset]);
+
+  useEffect(() => {
+    if (!layoutDragging) return;
+    const handleMove = (e: MouseEvent) => {
+      setLayoutOffset({
+        x: layoutStartOffset.current.x + e.clientX - layoutDragStart.current.x,
+        y: layoutStartOffset.current.y + e.clientY - layoutDragStart.current.y,
+      });
+    };
+    const handleUp = () => setLayoutDragging(false);
+    window.addEventListener('mousemove', handleMove);
+    window.addEventListener('mouseup', handleUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMove);
+      window.removeEventListener('mouseup', handleUp);
+    };
+  }, [layoutDragging]);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
@@ -706,22 +741,51 @@ export const V9SkinSandbox: React.FC = () => {
       {/* ── Layout Primitives Tab ── */}
       {state.activeTab === 'layout' && (
         <div className="flex justify-center">
-          <WanderlustSurface
-            shape="panel"
-            material={material}
-            interactive={wanderlustInteractive}
-            isDragging={wanderlustDragging}
-            isPaused={wanderlustPaused}
-            materialLayer={materialLayerConfig}
-            style={{ width: 680, minHeight: 500 }}
-          >
-            <WanderlustAmbientField paused={wanderlustDragging}>
+          <div style={{ position: 'relative', width: 720, transform: `translate(${layoutOffset.x}px, ${layoutOffset.y}px)`, transition: layoutDragging ? 'none' : 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1)' }}>
+            <WanderlustSurface
+              shape="panel"
+              material={material}
+              interactive={wanderlustInteractive}
+              isDragging={wanderlustDragging || layoutDragging}
+              isPaused={wanderlustPaused}
+              materialLayer={materialLayerConfig}
+              style={{ width: '100%', minHeight: 800, borderRadius: '0 0 14px 14px' }}
+            >
+              <WanderlustAmbientField paused={wanderlustDragging || layoutDragging}>
               <div style={{ padding: '24px', background: V9.obsidianBg, borderRadius: 'inherit' }}>
-                <WanderlustHeading
-                  title="Layout Primitives Demo"
-                  subtitle="V9 Obsidian Aesthetic"
-                  description="Palette: Obsidian base (#060f16) · Azure light leak · Gold/bronze borders."
-                />
+                {/* Composed header: plaque (space for icon/tag) + incised title */}
+                <div className="skin-title-row">
+                  <span className="skin-plaque" style={{ cursor: 'grab' }} onMouseDown={handleLayoutMouseDown}>Quest</span>
+                  <div style={{ flex: '1 1 auto' }}>
+                    <h2
+                      style={{
+                        margin: 0,
+                        fontFamily: 'var(--skin-font-display)',
+                        fontSize: 'var(--skin-title-size)',
+                        fontWeight: 900,
+                        letterSpacing: '0.06em',
+                        textTransform: 'uppercase',
+                        color: 'var(--skin-title-color)',
+                        textShadow: '0 2px 4px rgba(0,0,0,0.85)',
+                      }}
+                    >
+                      Layout Primitives Demo
+                    </h2>
+                    <p style={{ margin: '2px 0 0', fontFamily: 'var(--skin-font-display)', fontSize: 'var(--skin-subtitle-size)', letterSpacing: 'var(--skin-subtitle-tracking)', textTransform: 'uppercase', color: 'var(--skin-subtitle-color)' }}>
+                      V9 Obsidian Aesthetic
+                    </p>
+                  </div>
+                  <button type="button" className="skin-close-corner" aria-label="Chiudi" tabIndex={-1}>×</button>
+                </div>
+                {/* Decorative divider under the title */}
+                <div className="skin-titlesep">
+                  <span className="skin-titlesep__line" />
+                  <span className="skin-titlesep__diamond">✦</span>
+                  <span className="skin-titlesep__line" />
+                </div>
+                <p style={{ margin: '0 0 4px', fontFamily: 'var(--skin-font-serif)', fontSize: 'var(--skin-body-size)', color: 'var(--skin-body-color)' }}>
+                  Palette: Obsidian base (#060f16) · Azure light leak · Gold/bronze borders.
+                </p>
                 <WanderlustDivider />
 
                 <WanderlustSectionHeader tier="primary">Field Group</WanderlustSectionHeader>
@@ -764,8 +828,9 @@ export const V9SkinSandbox: React.FC = () => {
                   InsetPanel · Slot Rack
                 </WanderlustSectionHeader>
                 {/* Obsidian base with gold trim for contrast */}
-                <InsetPanel style={{ background: V9.obsidianBase, border: `1px solid ${V9.borderGold}` }}>
+                <InsetPanel className="skin-rack-inset">
                   <ResidentSlotRack
+                    className="skin-rack"
                     slots={[
                       { id: 'v9-l1', index: 0, label: 'Slot 1', assignedResidentId: null, isPlaceholder: false, dropState: 'idle' },
                       { id: 'v9-l2', index: 1, label: 'Slot 2', assignedResidentId: null, isPlaceholder: false, dropState: 'idle' },
@@ -807,9 +872,92 @@ export const V9SkinSandbox: React.FC = () => {
                     })}
                   </div>
                 </InsetPanel>
+
+                <WanderlustDivider />
+
+                {/* ── Sub-element gallery: everything below reads ONLY var(--skin-*) ── */}
+                <WanderlustSectionHeader tier="tertiary" hint="var(--skin-*) tokens">
+                  Sotto-elementi · Skin Tokens
+                </WanderlustSectionHeader>
+                <div className="skin-gallery">
+                  <div className="skin-gallery__row">
+                    {/* Primary CTA plaque with ◈ ornaments — the "AVVIA" look */}
+                    <span className="skin-cta-wrap">
+                      <span className="skin-cta-ornament">◈</span>
+                      <button type="button" className="skin-cta">Avvia</button>
+                      <span className="skin-cta-ornament">◈</span>
+                    </span>
+                  </div>
+                  <div className="skin-gallery__row">
+                    <span className="skin-badge">Azure Badge</span>
+                    <span className="skin-icon" aria-hidden>⚔</span>
+                    <span className="skin-icon" aria-hidden>🛡</span>
+                    <span className="skin-icon skin-icon--accent" aria-hidden>✦</span>
+                    <span style={{ color: 'var(--skin-text-secondary)', fontSize: 12 }}>
+                      testo secondario
+                    </span>
+                    <span style={{ color: 'var(--skin-text-muted)', fontSize: 12 }}>
+                      testo muted
+                    </span>
+                  </div>
+                  <div className="skin-footer">
+                    <span>Piè di pagina — skin footer</span>
+                  </div>
+                </div>
+
+                <WanderlustDivider />
+
+                <WanderlustSectionHeader tier="tertiary" hint="var(--skin-statbar-*)">
+                  Stat Bars · HP / Stamina / Fatigue
+                </WanderlustSectionHeader>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                  <WanderlustStatBar label="HP" value={195} maxValue={195} variant="hp" size="md" />
+                  <WanderlustStatBar label="Stamina" value={100} maxValue={100} variant="stamina" size="md" />
+                  <WanderlustStatBar label="Fatica" value={45} maxValue={100} variant="fatigue" size="md" />
+                </div>
+
+                <WanderlustDivider />
+
+                <WanderlustSectionHeader tier="tertiary" hint="medaglioni con portrait e stat bar">
+                  Worker Roster · Medallions
+                </WanderlustSectionHeader>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  {[
+                    { id: 'w1', name: 'Giggiolillo', status: 'Eroe attivo', hp: 195, maxHp: 195, fatigue: 28, portrait: giggiolilloPortrait, tint: 'linear-gradient(135deg,#3a6d82,#1a2d3a)' },
+                    { id: 'w2', name: 'Salvatrice', status: 'Eroe attivo', hp: 210, maxHp: 210, fatigue: 45, portrait: salvatricePortrait, tint: 'linear-gradient(135deg,#6d5a3a,#2d1a0a)' },
+                    { id: 'w3', name: 'Sir Spaccaculi', status: 'Eroe attivo', hp: 280, maxHp: 280, fatigue: 12, portrait: spaccaculiPortrait, tint: 'linear-gradient(135deg,#4a3a6d,#1a0a2d)' },
+                  ].map((worker) => (
+                    <div key={worker.id} style={{ display: 'flex', alignItems: 'center', gap: 16, borderLeft: `2px solid ${V9.borderGold}`, paddingLeft: 16 }}>
+                      <div className="skin-medallion">
+                        <div
+                          className="skin-medallion__portrait"
+                          style={{
+                            backgroundImage: worker.portrait ? `url(${worker.portrait})` : worker.tint,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                          }}
+                        />
+                        <div className="skin-medallion__glint" />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div className="skin-incise-title" style={{ color: 'var(--skin-title-color)', fontSize: 15, fontWeight: 600, marginBottom: 2 }}>
+                          {worker.name}
+                        </div>
+                        <div className="skin-incise-label" style={{ color: 'var(--skin-label-tertiary)', fontSize: 11, marginBottom: 10 }}>
+                          {worker.status}
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                          <WanderlustStatBar label="HP" value={worker.hp} maxValue={worker.maxHp} variant="hp" size="sm" />
+                          <WanderlustStatBar label="Fatica" value={worker.fatigue} maxValue={100} variant="fatigue" size="sm" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </WanderlustAmbientField>
-          </WanderlustSurface>
+            </WanderlustSurface>
+          </div>
         </div>
       )}
 
@@ -819,6 +967,217 @@ export const V9SkinSandbox: React.FC = () => {
       )}
 
       {/* ── V9 Theme CSS ── */}
+      <style>{`
+        /* ── Skin token gallery: every rule reads var(--skin-*) only ── */
+        .skin-gallery { display: flex; flex-direction: column; gap: 14px; }
+        .skin-gallery__row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .skin-btn {
+          position: relative;
+          background: var(--skin-btn-bg);
+          border: var(--skin-btn-border);
+          color: var(--skin-btn-color);
+          font-family: var(--skin-btn-font);
+          font-size: var(--skin-btn-size);
+          font-weight: 600;
+          letter-spacing: var(--skin-btn-tracking);
+          text-transform: uppercase;
+          text-shadow: var(--skin-btn-text-shadow);
+          border-radius: var(--skin-btn-radius);
+          padding: var(--skin-btn-padding);
+          cursor: pointer;
+          box-shadow: var(--skin-btn-shadow);
+          transition: transform 0.14s ease-out, box-shadow 0.14s ease-out, background 0.14s ease-out, filter 0.08s ease-out;
+          will-change: transform;
+        }
+        /* struck-metal specular streak across the top */
+        .skin-btn::before {
+          content: '';
+          position: absolute;
+          inset: 1px 1px auto 1px;
+          height: 45%;
+          border-radius: inherit;
+          background: linear-gradient(180deg, rgba(255,255,255,0.35), transparent);
+          pointer-events: none;
+        }
+        .skin-btn:hover:not(:disabled) {
+          background: var(--skin-btn-hover-bg);
+          box-shadow: var(--skin-btn-hover-shadow);
+          transform: var(--skin-btn-hover-lift);
+        }
+        .skin-btn:active:not(:disabled) {
+          transform: translateY(0);
+          box-shadow: var(--skin-btn-active-shadow);
+          filter: var(--skin-btn-active-filter);
+        }
+        .skin-btn:disabled { opacity: var(--skin-btn-disabled-opacity); cursor: default; box-shadow: var(--skin-btn-active-shadow); }
+        .skin-btn--secondary {
+          background: var(--skin-btn2-bg);
+          border: var(--skin-btn2-border);
+          color: var(--skin-btn2-color);
+          text-shadow: var(--skin-incision-label);
+          box-shadow: var(--skin-btn2-shadow);
+        }
+        .skin-btn--secondary::before { opacity: 0.4; }
+        .skin-badge {
+          background: var(--skin-badge-bg);
+          border: var(--skin-badge-border);
+          color: var(--skin-badge-color);
+          font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+          padding: 4px 10px; border-radius: 999px;
+        }
+        .skin-icon {
+          font-size: var(--skin-icon-size);
+          color: var(--skin-icon-color);
+          opacity: var(--skin-icon-opacity);
+        }
+        .skin-icon--accent { color: var(--skin-icon-accent); }
+        .skin-footer {
+          display: flex; align-items: center; justify-content: space-between;
+          background: var(--skin-footer-bg);
+          border-top: var(--skin-footer-border);
+          padding: var(--skin-footer-padding);
+          margin: 4px -24px -24px;
+          color: var(--skin-text-secondary);
+          font-size: 12px;
+          border-radius: 0 0 var(--skin-surface-radius) var(--skin-surface-radius);
+        }
+
+        /* ── Text incision (Champlevé) — applied to titles & labels ── */
+        .skin-incise-title { text-shadow: var(--skin-incision-title); letter-spacing: 0.06em; }
+        .skin-incise-label { text-shadow: var(--skin-incision-label); }
+
+        /* ── Title plaque (QUEST label / icon holder, left of heading) ── */
+        .skin-title-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+        .skin-plaque {
+          display: inline-flex; align-items: center; justify-content: center;
+          padding: var(--skin-plaque-padding);
+          border: var(--skin-plaque-border);
+          border-radius: var(--skin-plaque-radius);
+          background-color: var(--skin-plaque-bg);
+          backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+          box-shadow: var(--skin-plaque-shadow);
+          font-family: 'Cinzel', 'Georgia', serif;
+          font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
+          letter-spacing: var(--skin-plaque-tracking);
+          color: var(--skin-plaque-color);
+          text-shadow: 0 0 8px rgba(201,162,39,0.6), 0 1px 2px rgba(0,0,0,0.7);
+          white-space: nowrap;
+        }
+
+        /* ── Decorative divider under the title ── */
+        .skin-titlesep { display: flex; align-items: center; gap: 8px; margin: 8px 0 4px; }
+        .skin-titlesep__line { flex: 1; height: 1px; background: var(--skin-titlesep-line); }
+        .skin-titlesep__diamond {
+          font-size: 12px; line-height: 1;
+          color: var(--skin-titlesep-diamond-color);
+          text-shadow: var(--skin-titlesep-diamond-glow);
+        }
+
+        /* ── Close coin (top-right corner of a panel) ── */
+        .skin-close-corner {
+          width: var(--skin-close-size); height: var(--skin-close-size);
+          border-radius: var(--skin-close-radius);
+          border: var(--skin-close-border);
+          background: var(--skin-close-bg);
+          color: var(--skin-close-color);
+          box-shadow: var(--skin-close-shadow);
+          font-size: 1.15rem; font-weight: 300; line-height: 1;
+          display: flex; align-items: center; justify-content: center;
+          cursor: default;
+        }
+
+        /* ── Primary CTA plaque + ◈ ornaments (the "AVVIA" button) ── */
+        .skin-cta-wrap { display: inline-flex; align-items: center; gap: 10px; }
+        .skin-cta-ornament {
+          font-size: 9px; line-height: 1; opacity: 0.85;
+          color: var(--skin-cta-ornament-color);
+          text-shadow: 0 0 6px rgba(223,184,87,0.4);
+        }
+        .skin-cta {
+          position: relative; overflow: hidden;
+          padding: 11px 32px;
+          border: var(--skin-cta-border);
+          clip-path: var(--skin-cta-clip);
+          background: var(--skin-cta-bg);
+          box-shadow: var(--skin-cta-shadow);
+          color: var(--skin-cta-color);
+          font-family: 'Cinzel', 'Georgia', serif;
+          font-size: 0.75rem; font-weight: 700;
+          letter-spacing: 0.28em; text-transform: uppercase;
+          text-shadow: var(--skin-cta-text-shadow);
+          cursor: pointer;
+          transition: filter 0.18s ease, box-shadow 0.18s ease;
+        }
+        .skin-cta:hover { filter: var(--skin-cta-hover-filter); box-shadow: var(--skin-cta-hover-glow); }
+
+        /* ── Slot Rack demo frame (InsetPanel + ResidentSlotRack) ── */
+        .skin-rack-inset {
+          position: relative;
+          background:
+            radial-gradient(circle at 0% 0%, rgba(0,229,255,0.08) 0%, transparent 40%),
+            linear-gradient(145deg, #0a0f12 0%, #1a1208 45%, #0a0f12 100%);
+          border: 1px solid rgba(223,184,87,0.45);
+          border-radius: 14px;
+          box-shadow:
+            0 0 0 1px rgba(120,80,25,0.65),
+            0 0 0 2px rgba(223,184,87,0.15),
+            0 12px 34px rgba(0,0,0,0.55),
+            inset 0 1px 0 rgba(255,255,255,0.06),
+            inset 0 0 28px rgba(0,0,0,0.35);
+          padding: 18px;
+          overflow: hidden;
+        }
+        /* corner ornaments */
+        .skin-rack-inset::before,
+        .skin-rack-inset::after {
+          content: '✦';
+          position: absolute;
+          font-size: 10px;
+          line-height: 1;
+          color: rgba(223,184,87,0.45);
+          text-shadow: 0 0 6px rgba(223,184,87,0.25);
+          pointer-events: none;
+        }
+        .skin-rack-inset::before { top: 10px; left: 12px; }
+        .skin-rack-inset::after  { bottom: 10px; right: 12px; }
+        .skin-rack {
+          --slot-rack-slot-label-color: #e8c56a;
+          --slot-rack-slot-border-empty: rgba(223,184,87,0.28);
+          --slot-rack-slot-ring-color: rgba(223,184,87,0.55);
+          --slot-rack-shadow: 0 8px 24px rgba(0,0,0,0.45);
+          position: relative;
+          padding: 18px;
+          background: rgba(0,0,0,0.38);
+          border: 1px solid rgba(223,184,87,0.22);
+          border-radius: 12px;
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+
+        /* ── Medallion (worker portrait token) ── */
+        .skin-medallion {
+          position: relative;
+          width: var(--skin-medallion-size);
+          height: var(--skin-medallion-size);
+          border-radius: 50%;
+          background: var(--skin-medallion-ring);
+          border: 2px solid var(--skin-medallion-ring-border);
+          box-shadow: var(--skin-medallion-ring-shadow);
+          flex: 0 0 auto;
+        }
+        .skin-medallion__portrait {
+          position: absolute;
+          inset: var(--skin-medallion-inner-inset);
+          border-radius: 50%;
+          background-size: cover;
+          background-position: center;
+        }
+        .skin-medallion__glint {
+          position: absolute; inset: 0;
+          border-radius: 50%;
+          background: var(--skin-medallion-highlight);
+          pointer-events: none;
+        }
+      `}</style>
       <style>{`
         /* WanderlustSurface content: z sopra l'SVG frame, height per propagare al child */
         .ws-content { z-index: 2; padding: 0; height: 100%; box-sizing: border-box; }
@@ -1097,29 +1456,15 @@ export const V9SkinSandbox: React.FC = () => {
           text-shadow: 0 0 8px rgba(201,162,39,0.60), 0 1px 2px rgba(0,0,0,0.70);
         }
 
-        /* Titolo: gold shimmer + Cinzel bold + glow multiplo */
+        /* Titolo: gold text with black shadow */
         .v9-poi-demo__title {
           margin: 0;
           font-family: 'Cinzel', 'Georgia', serif;
           font-size: 1.55rem;
           font-weight: 700;
           letter-spacing: 0.08em;
-          /* gradiente oro a 5 stop — simula la lucentezza del metallo */
-          background: linear-gradient(168deg,
-            #fff5c0 0%,
-            #f7dd80 18%,
-            ${V9.warmGold} 42%,
-            #e8c340 60%,
-            #a87010 80%,
-            #f0d070 100%
-          );
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          /* glow caldo + ombra per profondità */
-          filter:
-            drop-shadow(0 0 12px rgba(201,162,39,0.55))
-            drop-shadow(0 2px 4px rgba(0,0,0,0.80));
+          color: #f7dd80;
+          text-shadow: 0 2px 4px rgba(0,0,0,0.85);
           line-height: 1.15;
         }
 

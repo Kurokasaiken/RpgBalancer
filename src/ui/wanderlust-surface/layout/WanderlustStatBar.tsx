@@ -25,22 +25,22 @@ export interface WanderlustStatBarProps {
   style?: CSSProperties;
 }
 
-// Color variants for different stat types (matching roster_wanderlust_reskin.html)
+// Color variants — now read from skin tokens with fallback to hardcoded defaults
 const VARIANT_COLORS: Record<StatBarVariant, { start: string; end: string; shadow: string }> = {
   hp: {
-    start: '#4a9e5a',
-    end: '#7bc96f',
-    shadow: 'rgba(123,201,111,0.3)',
+    start: 'var(--skin-statbar-hp-start, #4a9e5a)',
+    end: 'var(--skin-statbar-hp-end, #7bc96f)',
+    shadow: 'var(--skin-statbar-hp-glow, rgba(123,201,111,0.3))',
   },
   stamina: {
-    start: '#b8862a',
-    end: '#e0b23e',
-    shadow: 'rgba(224,178,62,0.3)',
+    start: 'var(--skin-statbar-stamina-start, #b8862a)',
+    end: 'var(--skin-statbar-stamina-end, #e0b23e)',
+    shadow: 'var(--skin-statbar-stamina-glow, rgba(224,178,62,0.3))',
   },
   fatigue: {
-    start: '#9e5a4a',
-    end: '#d98a4a',
-    shadow: 'rgba(217,138,74,0.6)',
+    start: 'var(--skin-statbar-fatigue-start, #9e5a4a)',
+    end: 'var(--skin-statbar-fatigue-end, #d98a4a)',
+    shadow: 'var(--skin-statbar-fatigue-glow, rgba(217,138,74,0.6))',
   },
 };
 
@@ -107,10 +107,10 @@ export const WanderlustStatBar: React.FC<WanderlustStatBarProps> = ({
     flex: 1,
     height: sizeConfig.height,
     position: 'relative',
-    background: 'rgba(6,4,3,0.7)',
-    border: '1px solid rgba(216,177,62,0.06)',
+    background: 'var(--skin-statbar-track, rgba(6,4,3,0.7))',
+    border: `1px solid var(--skin-statbar-track-border, rgba(216,177,62,0.06))`,
     borderRadius: '5px',
-    boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(216,177,62,0.06)',
+    boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.7), inset 0 0 0 1px var(--skin-statbar-track-border, rgba(216,177,62,0.06))',
     overflow: 'hidden',
   };
 
