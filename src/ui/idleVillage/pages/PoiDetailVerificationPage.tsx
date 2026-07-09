@@ -234,6 +234,8 @@ export function PoiDetailVerificationPage() {
 
             <div className="poi-detail-stage__detail">
               <ActivityCapsuleDetailSkinAware
+                skinPresetId="wanderlust"
+                pillar="wilderness"
                 activityId={questConfig.id}
                 name={questConfig.label}
                 type="quest"

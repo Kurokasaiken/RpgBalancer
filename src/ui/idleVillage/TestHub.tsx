@@ -92,6 +92,14 @@ const EXTRA_PAGES: TestPageLink[] = [
     icon: '🗺️',
     status: 'ok',
   },
+  {
+    id: 'poi-detail-roster-integration',
+    title: 'POI Detail + Roster Integration',
+    description: 'POI reale con roster e slot rack interattivo da Idle Village config',
+    path: '/poi-detail-roster-integration',
+    icon: '🧩',
+    status: 'ok',
+  },
 ];
 
 const TEST_PAGES: TestPageLink[] = [

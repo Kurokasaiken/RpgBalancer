@@ -200,7 +200,8 @@ export const SKIN_CONFIG_REGISTRY: SkinRegistry = {
 
 export type SkinPresetId = keyof typeof SKIN_CONFIG_REGISTRY;
 
-export const DEFAULT_SKIN_PRESET_ID: SkinPresetId = MINIMAL_FRONTIER_CONFIG.id;
+// ← VERSIONE DEFAULT: cambia qui per switchare globalmente tra skin (v9 = wanderlust, v8 = minimal_frontier)
+export const DEFAULT_SKIN_PRESET_ID: SkinPresetId = WANDERLUST_CONFIG.id;
 
 export function getSkinPresetConfig(presetId?: string): SkinPresetConfig {
   const fallback = SKIN_CONFIG_REGISTRY[DEFAULT_SKIN_PRESET_ID];

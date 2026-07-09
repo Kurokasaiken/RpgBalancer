@@ -141,45 +141,92 @@ export const MINIMAL_EMPIRE_PRESET: Partial<ActivityCapsuleDetailSkinConfig> = {
 };
 
 // ============================================================================
+// BASE LAYOUT PRIMITIVES PRESET (GLOBAL DEFAULT)
+// ============================================================================
+
+/**
+ * Base Layout Primitives preset - Obsidian + Azure + Gold
+ * Clean minimal aesthetic with information clarity.
+ * This is the global default template for all skin-aware components.
+ */
+export const BASE_LAYOUT_PRIMITIVES_PRESET: Partial<ActivityCapsuleDetailSkinConfig> = {
+  window: {
+    windowBackground: 'linear-gradient(160deg, rgba(6, 15, 22, 0.97) 0%, rgba(1, 12, 18, 0.99) 100%)',
+    windowBorder: '1px solid rgba(223, 184, 87, 0.35)',
+    frameGradient: 'linear-gradient(180deg, rgba(4, 24, 38, 0.96) 0%, rgba(2, 14, 22, 0.98) 50%, rgba(1, 10, 16, 0.99) 100%)',
+    frameBorderGradient: 'linear-gradient(180deg, rgba(223, 184, 87, 0) 0%, rgba(223, 184, 87, 0.55) 12%, rgba(223, 184, 87, 0.55) 88%, rgba(223, 184, 87, 0) 100%)',
+    frameCornerDecorations: 'rgba(223, 184, 87, 0.45)',
+    dragHandleDotColor: 'rgba(0, 229, 255, 0.7)',
+    closeButtonColor: 'rgba(223, 184, 87, 0.45)',
+    closeButtonHoverColor: 'rgba(247, 240, 227, 0.88)',
+  },
+  poi: {
+    crownGradient: 'linear-gradient(14% 4%, #dfb857 0%, #c9a040 9%, #a07828 28%, #7a5818 52%, #5a3c08 76%, #3a2408 100%)',
+    idleColor: 'rgba(0, 200, 180, 0.85)',
+    activeColor: 'rgba(0, 229, 255, 0.9)',
+    completedColor: 'rgba(75, 196, 168, 0.9)',
+    poiGlow: '0 0 22px rgba(0, 229, 255, 0.35)',
+  },
+  header: {
+    nameColor: 'rgba(247, 240, 227, 0.95)',
+    typeColor: 'rgba(0, 229, 255, 0.55)',
+    statusActiveColor: 'rgba(0, 229, 255, 0.8)',
+    statusCompletedColor: 'rgba(75, 196, 168, 0.85)',
+  },
+  cta: {
+    startButtonBackground: 'linear-gradient(135deg, rgba(58, 36, 8, 0.92), rgba(42, 24, 4, 0.96))',
+    startButtonBorder: 'rgba(223, 184, 87, 0.65)',
+    startButtonColor: 'rgba(247, 240, 227, 0.95)',
+    startButtonGlow: '0 2px 12px rgba(223, 184, 87, 0.25), inset 0 1px 0 rgba(223, 184, 87, 0.12)',
+    collectButtonBackground: 'linear-gradient(135deg, rgba(0, 180, 160, 0.85), rgba(0, 140, 120, 0.9))',
+    collectButtonBorder: 'rgba(0, 229, 255, 0.5)',
+    collectButtonColor: 'rgba(247, 240, 227, 0.92)',
+    collectButtonGlow: '0 0 14px rgba(0, 229, 255, 0.18)',
+  },
+  presetId: 'base',
+};
+
+// ============================================================================
 // THEMED PRESETS
 // ============================================================================
 
 /**
- * Wanderlust preset - adventure theme
+ * Wanderlust preset - V9 Oily Prismatic Bronze & Wilderness Green
+ * Verde smeraldo profondo + bronzo oro + iridescenza teal
  */
 export const WANDERLUST_PRESET: Partial<ActivityCapsuleDetailSkinConfig> = {
   window: {
-    windowBackground: 'linear-gradient(135deg, rgba(139, 92, 246, 0.96) 0%, rgba(124, 58, 237, 0.98) 100%)',
-    windowBorder: '1px solid rgba(167, 139, 250, 0.3)',
-    frameGradient: 'linear-gradient(0% 0%, #6b21a8 0%, #7c3aed 30%, #581c87 70%, #3b0764 100%)',
-    frameBorderGradient: 'linear-gradient(0% 0%, rgba(167, 139, 250, 0) 0%, rgba(167, 139, 250, 0.55) 12%, rgba(167, 139, 250, 0.55) 88%, rgba(167, 139, 250, 0) 100%)',
-    frameCornerDecorations: 'rgba(196, 181, 253, 0.42)',
-    dragHandleDotColor: 'rgba(196, 181, 253, 0.8)',
-    closeButtonColor: 'rgba(196, 181, 253, 0.48)',
-    closeButtonHoverColor: 'rgba(221, 214, 254, 0.82)',
+    windowBackground: 'linear-gradient(160deg, rgba(2, 22, 18, 0.97) 0%, rgba(1, 12, 10, 0.99) 100%)',
+    windowBorder: '1px solid rgba(223, 184, 87, 0.35)',
+    frameGradient: 'linear-gradient(180deg, rgba(4, 32, 24, 0.96) 0%, rgba(2, 16, 12, 0.98) 50%, rgba(1, 10, 8, 0.99) 100%)',
+    frameBorderGradient: 'linear-gradient(180deg, rgba(223, 184, 87, 0) 0%, rgba(223, 184, 87, 0.55) 12%, rgba(223, 184, 87, 0.55) 88%, rgba(223, 184, 87, 0) 100%)',
+    frameCornerDecorations: 'rgba(223, 184, 87, 0.45)',
+    dragHandleDotColor: 'rgba(0, 229, 255, 0.7)',
+    closeButtonColor: 'rgba(223, 184, 87, 0.45)',
+    closeButtonHoverColor: 'rgba(247, 240, 227, 0.88)',
   },
   poi: {
-    crownGradient: 'linear-gradient(14% 4%, #c4b5fd 0%, #a78bfa 9%, #8b5cf6 28%, #7c3aed 52%, #6d28d9 76%, #5b21b6 100%)',
-    idleColor: 'rgba(139, 92, 246, 0.9)',
-    activeColor: 'rgba(167, 139, 250, 0.9)',
-    completedColor: 'rgba(72, 230, 105, 0.9)',
-    poiGlow: '0 0 20px rgba(139, 92, 246, 0.4)',
+    crownGradient: 'linear-gradient(14% 4%, #dfb857 0%, #c9a040 9%, #a07828 28%, #7a5818 52%, #5a3c08 76%, #3a2408 100%)',
+    idleColor: 'rgba(0, 200, 180, 0.85)',
+    activeColor: 'rgba(0, 229, 255, 0.9)',
+    completedColor: 'rgba(75, 196, 168, 0.9)',
+    poiGlow: '0 0 22px rgba(0, 229, 255, 0.35)',
   },
   header: {
-    nameColor: 'rgba(237, 233, 254, 0.92)',
-    typeColor: 'rgba(221, 214, 254, 0.55)',
-    statusActiveColor: 'rgba(139, 92, 246, 0.8)',
-    statusCompletedColor: 'rgba(72, 230, 105, 0.8)',
+    nameColor: 'rgba(247, 240, 227, 0.95)',
+    typeColor: 'rgba(0, 229, 255, 0.55)',
+    statusActiveColor: 'rgba(0, 229, 255, 0.8)',
+    statusCompletedColor: 'rgba(75, 196, 168, 0.85)',
   },
   cta: {
-    startButtonBackground: 'linear-gradient(135deg, rgba(139, 92, 246, 0.9), rgba(124, 58, 237, 0.95))',
-    startButtonBorder: 'rgba(196, 181, 253, 0.62)',
-    startButtonColor: 'rgba(237, 233, 254, 0.9)',
-    startButtonGlow: '0 2px 10px rgba(139, 92, 246, 0.28), inset 0 1px 0 rgba(196, 181, 253, 0.14)',
-    collectButtonBackground: 'linear-gradient(135deg, rgba(139, 92, 246, 0.85), rgba(124, 58, 237, 0.9))',
-    collectButtonBorder: 'rgba(196, 181, 253, 0.48)',
-    collectButtonColor: 'rgba(237, 233, 254, 0.88)',
-    collectButtonGlow: '0 0 14px rgba(139, 92, 246, 0.18)',
+    startButtonBackground: 'linear-gradient(135deg, rgba(58, 36, 8, 0.92), rgba(42, 24, 4, 0.96))',
+    startButtonBorder: 'rgba(223, 184, 87, 0.65)',
+    startButtonColor: 'rgba(247, 240, 227, 0.95)',
+    startButtonGlow: '0 2px 12px rgba(223, 184, 87, 0.25), inset 0 1px 0 rgba(223, 184, 87, 0.12)',
+    collectButtonBackground: 'linear-gradient(135deg, rgba(0, 180, 160, 0.85), rgba(0, 140, 120, 0.9))',
+    collectButtonBorder: 'rgba(0, 229, 255, 0.5)',
+    collectButtonColor: 'rgba(247, 240, 227, 0.92)',
+    collectButtonGlow: '0 0 14px rgba(0, 229, 255, 0.18)',
   },
   presetId: 'wanderlust',
 };
@@ -484,6 +531,7 @@ export const REDUCED_MOTION_ADAPTATIONS: Partial<ActivityCapsuleDetailSkinConfig
  * Complete preset registry
  */
 export const ACTIVITY_CAPSULE_DETAIL_SKIN_PRESETS: Record<SkinPresetId, Partial<ActivityCapsuleDetailSkinConfig>> = {
+  'base': BASE_LAYOUT_PRIMITIVES_PRESET,
   'minimal-frontier': MINIMAL_FRONTIER_PRESET,
   'minimal-wilderness': MINIMAL_WILDERNESS_PRESET,
   'minimal-empire': MINIMAL_EMPIRE_PRESET,

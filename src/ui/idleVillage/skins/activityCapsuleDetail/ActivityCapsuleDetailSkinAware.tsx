@@ -36,6 +36,7 @@ import { WanderlustSurface } from '@/ui/wanderlust-surface/WanderlustSurface';
 import { InsetPanel } from '@/ui/wanderlust-surface/InsetPanel';
 import { WanderlustRequirementList } from '@/ui/wanderlust-surface/layout/WanderlustLayout';
 import { WanderlustAmbientField } from '@/ui/wanderlust-surface/layout/WanderlustAmbientField';
+import { V9GlassLayersOnly } from '@/ui/v9-skin/V9GlassLayersOnly';
 
 // Slot data interface
 export interface ActivityDetailSlotData {
@@ -598,8 +599,12 @@ export function ActivityCapsuleDetailSkinAware({
       >
       {/* Window frame */}
       <div className="activity-capsule-detail-skin-aware__frame">
-        {/* Window background with gradients */}
-        <div className="activity-capsule-detail-skin-aware__background" />
+        {/* Window background: V9 Glass Layers (if wanderlust) or simple gradient */}
+        {skinConfig.presetId === 'wanderlust' ? (
+          <V9GlassLayersOnly />
+        ) : (
+          <div className="activity-capsule-detail-skin-aware__background" />
+        )}
         
         {/* Window decorations */}
         <div className="activity-capsule-detail-skin-aware__decorations">

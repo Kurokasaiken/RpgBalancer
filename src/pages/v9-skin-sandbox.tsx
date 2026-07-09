@@ -230,7 +230,7 @@ export const V9SkinSandbox: React.FC = () => {
   const [wanderlustDragging, setWanderlustDragging] = useState(false);
   const [wanderlustPaused, setWanderlustPaused] = useState(false);
   const [showPoiChrome, setShowPoiChrome] = useState(true);
-  const [poiVersion, setPoiVersion] = useState<'surface' | 'layout' | 'aureo' | 'sapphire' | 'cristallo'>('surface');
+  const [poiVersion, setPoiVersion] = useState<'surface' | 'layout' | 'sapphire'>('surface');
 
   // ── Drag state ───────────────────────────────────────────────────
   const [panelOffset, setPanelOffset] = useState({ x: 0, y: 0 });
@@ -330,9 +330,7 @@ export const V9SkinSandbox: React.FC = () => {
               {([
                 { id: 'surface',  label: 'Surface' },
                 { id: 'layout',   label: 'Layout Primitives' },
-                { id: 'aureo',    label: 'Aureo Profondo' },
                 { id: 'sapphire', label: 'Zaffiro Abissale' },
-                { id: 'cristallo', label: 'Cristallo Abissale' },
               ] as const).map(version => (
                 <button key={version.id}
                   onClick={() => setPoiVersion(version.id)}
@@ -629,70 +627,6 @@ export const V9SkinSandbox: React.FC = () => {
                     </div>
                   )}
 
-                  {poiVersion === 'aureo' && (
-                    <V9GlassLayers
-                      variant="aureo"
-                      className="v9-poi-demo"
-                      role="group"
-                      aria-label="V9 POI Detail Preview - Aureo Profondo"
-                    >
-                      <button type="button" className="v9-poi-demo__close" title="Usa 'Nascondi POI' in alto per nascondere" aria-label="Chiudi (demo)">×</button>
-                      <div className="v9-poi-demo__content">
-                        <div className="v9-poi-demo__header">
-                          <div className="v9-poi-demo__badge">
-                            <span className="v9-poi-demo__badge-inner">Scoperta</span>
-                          </div>
-                          <h4 className="v9-poi-demo__title">Caverna Aurea</h4>
-                        </div>
-                        <p className="v9-var-flavor">Luce dorata filtra dalle profondità, un calore antico richiama.</p>
-                        <div className="v9-poi-demo__sep">
-                          <span className="v9-poi-demo__sep-line" />
-                          <span className="v9-poi-demo__sep-diamond v9-accent-glyph">✦</span>
-                          <span className="v9-poi-demo__sep-line" />
-                        </div>
-                        <div className="v9-poi-demo__artwork">
-                          <div className="v9-poi-demo__artwork-inner">
-                            <svg className="v9-poi-demo__artwork-watermark" viewBox="0 0 300 130" fill="none" preserveAspectRatio="xMidYMid slice">
-                              <circle cx="150" cy="65" r="55" stroke="#e8c547" strokeWidth="0.4" opacity="0.8" />
-                              <circle cx="150" cy="65" r="38" stroke="#e8c547" strokeWidth="0.3" strokeDasharray="3 4" opacity="0.6" />
-                              <path d="M150 12 L156 59 L150 65 L144 59 Z" stroke="#e8c547" strokeWidth="0.5" opacity="0.7" />
-                              <path d="M150 118 L144 71 L150 65 L156 71 Z" stroke="#e8c547" strokeWidth="0.4" opacity="0.4" />
-                              <path d="M70 50 Q100 45 140 55 Q180 65 240 48" stroke="#e8c547" strokeWidth="0.5" strokeDasharray="2 3" opacity="0.6" />
-                            </svg>
-                          </div>
-                        </div>
-                        <div className="v9-poi-demo__stats">
-                          <div className="v9-poi-demo__stat-row">
-                            <span className="v9-poi-demo__stat-label">Splendore</span>
-                            <span className="v9-poi-demo__stat-dots" aria-hidden="true" />
-                            <span className="v9-poi-demo__stat-value v9-accent-value">Avvolgente</span>
-                          </div>
-                          <div className="v9-poi-demo__stat-inner-sep">
-                            <span className="v9-poi-demo__stat-inner-line" />
-                            <span className="v9-poi-demo__sep-diamond" style={{ fontSize: '7px', opacity: 0.6 }}>◈</span>
-                            <span className="v9-poi-demo__stat-inner-line" />
-                          </div>
-                          <div className="v9-poi-demo__stat-row">
-                            <span className="v9-poi-demo__stat-label">Ricompensa</span>
-                            <span className="v9-poi-demo__stat-dots" aria-hidden="true" />
-                            <span className="v9-poi-demo__stat-value v9-accent-value">120 oro</span>
-                          </div>
-                        </div>
-                        <div className="v9-poi-demo__footer">
-                          <div className="v9-poi-demo__cta-wrap">
-                            <span className="v9-poi-demo__cta-ornament">◈</span>
-                            <button type="button" className="v9-poi-demo__cta">Discendi</button>
-                            <span className="v9-poi-demo__cta-ornament">◈</span>
-                          </div>
-                          <div className="v9-var-btn-row">
-                            <button type="button" className="v9-var-btn">Esplora</button>
-                            <button type="button" className="v9-var-btn">Cartografa</button>
-                          </div>
-                        </div>
-                      </div>
-                    </V9GlassLayers>
-                  )}
-
                   {/* ── Zaffiro Abissale — spedizione navale, argento lunare ── */}
                   {poiVersion === 'sapphire' && (
                     <V9GlassLayers
@@ -754,71 +688,6 @@ export const V9SkinSandbox: React.FC = () => {
                           <div className="v9-var-btn-row">
                             <button type="button" className="v9-var-btn">Sonda</button>
                             <button type="button" className="v9-var-btn">Ritira</button>
-                          </div>
-                        </div>
-                      </div>
-                    </V9GlassLayers>
-                  )}
-
-                  {/* ── Cristallo Abissale — profondo, enigmatico ── */}
-                  {poiVersion === 'cristallo' && (
-                    <V9GlassLayers
-                      variant="cristallo"
-                      className="v9-poi-demo"
-                      role="group"
-                      aria-label="V9 POI Detail Preview - Cristallo Abissale"
-                    >
-                      <button type="button" className="v9-poi-demo__close" title="Usa 'Nascondi POI' in alto per nascondere" aria-label="Chiudi (demo)">×</button>
-                      <div className="v9-poi-demo__content">
-                        <div className="v9-poi-demo__header">
-                          <div className="v9-poi-demo__badge">
-                            <span className="v9-poi-demo__badge-inner">Mistero</span>
-                          </div>
-                          <h4 className="v9-poi-demo__title">Abisso Cristallino</h4>
-                        </div>
-                        <p className="v9-var-flavor">Dentro il cristallo, il tempo si ferma. Chi guarda troppo a lungo non torna più.</p>
-                        <div className="v9-poi-demo__sep">
-                          <span className="v9-poi-demo__sep-line" />
-                          <span className="v9-poi-demo__sep-diamond v9-accent-glyph">✦</span>
-                          <span className="v9-poi-demo__sep-line" />
-                        </div>
-                        <div className="v9-poi-demo__artwork">
-                          <div className="v9-poi-demo__artwork-inner">
-                            <svg className="v9-poi-demo__artwork-watermark" viewBox="0 0 300 130" fill="none" preserveAspectRatio="xMidYMid slice">
-                              <path d="M150 20 L180 65 L150 110 L120 65 Z" stroke="#5dd9ff" strokeWidth="0.6" opacity="0.7" />
-                              <path d="M150 35 L170 65 L150 95 L130 65 Z" stroke="#5dd9ff" strokeWidth="0.4" opacity="0.5" />
-                              <circle cx="150" cy="65" r="60" stroke="#5dd9ff" strokeWidth="0.3" strokeDasharray="4 3" opacity="0.4" />
-                              <path d="M100 65 Q100 40 150 20 Q200 40 200 65" stroke="#5dd9ff" strokeWidth="0.5" opacity="0.6" strokeDasharray="2 4" />
-                              <path d="M100 65 Q100 90 150 110 Q200 90 200 65" stroke="#5dd9ff" strokeWidth="0.4" opacity="0.4" strokeDasharray="2 4" />
-                            </svg>
-                          </div>
-                        </div>
-                        <div className="v9-poi-demo__stats">
-                          <div className="v9-poi-demo__stat-row">
-                            <span className="v9-poi-demo__stat-label">Purezza</span>
-                            <span className="v9-poi-demo__stat-dots" aria-hidden="true" />
-                            <span className="v9-poi-demo__stat-value v9-accent-value">Assoluta</span>
-                          </div>
-                          <div className="v9-poi-demo__stat-inner-sep">
-                            <span className="v9-poi-demo__stat-inner-line" />
-                            <span className="v9-poi-demo__sep-diamond" style={{ fontSize: '7px', opacity: 0.6 }}>◈</span>
-                            <span className="v9-poi-demo__stat-inner-line" />
-                          </div>
-                          <div className="v9-poi-demo__stat-row">
-                            <span className="v9-poi-demo__stat-label">Risonanza</span>
-                            <span className="v9-poi-demo__stat-dots" aria-hidden="true" />
-                            <span className="v9-poi-demo__stat-value v9-accent-value">Profonda</span>
-                          </div>
-                        </div>
-                        <div className="v9-poi-demo__footer">
-                          <div className="v9-poi-demo__cta-wrap">
-                            <span className="v9-poi-demo__cta-ornament">◈</span>
-                            <button type="button" className="v9-poi-demo__cta">Tocca</button>
-                            <span className="v9-poi-demo__cta-ornament">◈</span>
-                          </div>
-                          <div className="v9-var-btn-row">
-                            <button type="button" className="v9-var-btn">Ascolta</button>
-                            <button type="button" className="v9-var-btn">Arretra</button>
                           </div>
                         </div>
                       </div>
