@@ -1545,7 +1545,19 @@ export function ActivityCapsuleDetailSkinAware({
           />
         )}
         {/* Visual element — spring-lagged behind ghost = "lifting with effort" feel */}
-        <motion.div style={{ x: heavyDrag.x, y: heavyDrag.y, cursor: 'default' }}>
+        <motion.div
+          style={{ x: heavyDrag.x, y: heavyDrag.y, cursor: 'default' }}
+          animate={{
+            scale: heavyDrag.isDragging ? 1.05 : 1,
+            boxShadow: heavyDrag.isDragging
+              ? '0 24px 48px rgba(0, 0, 0, 0.8), 0 12px 24px rgba(0, 0, 0, 0.6)'
+              : '0 4px 12px rgba(0, 0, 0, 0.3)',
+          }}
+          transition={{
+            scale: { duration: 0.2, ease: 'easeOut' },
+            boxShadow: { duration: 0.2, ease: 'easeOut' },
+          }}
+        >
           {surface}
         </motion.div>
       </div>

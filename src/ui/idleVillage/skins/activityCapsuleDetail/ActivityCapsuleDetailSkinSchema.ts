@@ -1833,16 +1833,23 @@ export function getActivityCapsuleDetailSkinConfig(
   overrides?: Partial<ActivityCapsuleDetailSkinConfig>
 ): ActivityCapsuleDetailSkinConfig {
   const baseConfig = { ...DEFAULT_ACTIVITY_CAPSULE_DETAIL_SKIN_CONFIG };
-  
-  // Apply pillar-specific overrides
+
+  // Apply pillar-specific overrides (prefer from overrides/preset if available)
   if (pillar && pillar !== 'frontier') {
+    // First apply overrides so they merge with base
+    if (overrides) {
+      Object.assign(baseConfig, mergeActivityCapsuleDetailSkinConfig(baseConfig, overrides));
+    }
+
+    // Then apply pillar-specific overrides from the merged config (which includes preset)
     const pillarOverrides = baseConfig[pillar];
     if (pillarOverrides) {
       Object.assign(baseConfig, mergeActivityCapsuleDetailSkinConfig(baseConfig, pillarOverrides));
     }
     baseConfig.pillar = pillar;
+    return baseConfig;
   }
-  
+
   // Apply custom overrides
   return mergeActivityCapsuleDetailSkinConfig(baseConfig, overrides);
 }
