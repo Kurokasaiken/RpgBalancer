@@ -1,0 +1,39 @@
+/**
+ * Metallic Engraving Effects — AAA Game UI Standard
+ *
+ * Text-shadow technique for incised metal appearance:
+ * - Dark shadow toward top-left (light source assumption)
+ * - Gold highlight toward bottom-right (beveled edge)
+ *
+ * Apply to: headings, labels, important numbers
+ */
+
+/* Primary engraving: dark metal with gold highlights */
+.text-engraved {
+  text-shadow:
+    1px 1px 0 #1a1208,   /* dark shadow for depth */
+    -1px -1px 0 #d4af77; /* gold highlight for bevel */
+}
+
+/* Variant: lighter engraving for secondary text */
+.text-engraved-light {
+  text-shadow:
+    0.5px 0.5px 0 #1a1208,
+    -0.5px -0.5px 0 #c4a070;
+}
+
+/* Variant: stronger engraving for titles */
+.text-engraved-strong {
+  text-shadow:
+    2px 2px 0 #1a1208,
+    -1.5px -1.5px 0 #e0c284;
+  letter-spacing: 0.05em; /* slight spacing for metallic feel */
+}
+
+/* Variant: engraved with subtle glow (for critical numbers) */
+.text-engraved-glow {
+  text-shadow:
+    1px 1px 0 #1a1208,
+    -1px -1px 0 #d4af77,
+    0 0 8px rgba(212, 175, 119, 0.3); /* subtle gold glow */
+}

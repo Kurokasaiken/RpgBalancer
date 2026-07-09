@@ -7,6 +7,8 @@ import { useMinimalStyleLabTokens } from '@/ui/idleVillage/hooks/useMinimalStyle
 import { useSkinDataAttributes, useSkinTelemetry } from '@/ui/idleVillage/hooks/useSkinHarness';
 import { useSkinBinding } from '@/ui/idleVillage/hooks/useSkinBinding';
 import { getComponentSkinBinding, generateSkinClassName, type CertifiedComponentId } from '@/ui/idleVillage/skins/SkinBindingRegistry';
+import '@/ui/styles/metallic-engraving.css';
+import '@/ui/styles/irregular-clippath.css';
 
 // Define ComponentId locally to avoid import issues
 type ComponentId = string;
@@ -396,6 +398,7 @@ const PgCard = memo<PgCardProps>(({
       className={[
         baseTokenClasses,
         compatibilityAccentClass,
+        'clip-path-card', // Irregular corners — organic, non-web-like appearance
         isUnavailable ? 'cursor-not-allowed opacity-35 grayscale' : 'cursor-grab active:cursor-grabbing active:scale-95 hover:border-emerald-300/70',
         returningOverlayClass,
         isDragging ? 'opacity-40 pointer-events-none' : '',
@@ -455,7 +458,7 @@ const PgCard = memo<PgCardProps>(({
 
           <div className="min-w-0 flex-1 space-y-1">
             <div className="flex items-center justify-between gap-2">
-              <span className="truncate text-[11px] font-semibold tracking-[0.08em] text-ivory">{label}</span>
+              <span className="truncate text-[11px] font-semibold tracking-[0.08em] text-ivory text-engraved">{label}</span>
               <span
                 className={[
                   'rounded-full px-1.5 py-0.5 text-[7.5px] tracking-[0.18em] uppercase',
@@ -491,24 +494,36 @@ const PgCard = memo<PgCardProps>(({
               <span className="text-[9px] text-slate-500 w-3">HP</span>
               <div className="flex-1 h-1 rounded-full bg-white/10">
                 <div
-                  className="h-full rounded-full bg-linear-to-r from-emerald-300 to-emerald-500 transition-all"
-                  style={{ width: `${maxHp ? (hp / maxHp) * 100 : constrainedHp}%` }}
+                  className="h-full rounded-full transition-all"
+                  style={{
+                    width: `${maxHp ? (hp / maxHp) * 100 : constrainedHp}%`,
+                    background: `linear-gradient(90deg, #10b981 0%, #fcd34d 50%, #e63946 100%)`,
+                    boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.4)',
+                    transitionDuration: '250ms',
+                    transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+                  }}
                 />
               </div>
-              <span className="text-[9px] text-slate-400 w-6 text-right">
+              <span className="text-[9px] text-slate-400 w-6 text-right text-engraved-light">
                 {maxHp ? `${hp}/${maxHp}` : `${constrainedHp}`}
               </span>
             </div>
 
             <div className="flex items-center gap-1.5">
-              <span className="text-[9px] text-slate-500 w-3">S</span>
+              <span className="text-[9px] text-slate-500 w-3 text-engraved-light">S</span>
               <div className="flex-1 h-1 rounded-full bg-white/10">
                 <div
-                  className="h-full rounded-full bg-linear-to-r from-amber-300 to-amber-500 transition-all"
-                  style={{ width: `${100 - constrainedFatigue}%` }}
+                  className="h-full rounded-full transition-all"
+                  style={{
+                    width: `${100 - constrainedFatigue}%`,
+                    background: `linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%)`,
+                    boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.4)',
+                    transitionDuration: '300ms',
+                    transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+                  }}
                 />
               </div>
-              <span className="text-[9px] text-slate-400 w-6 text-right">
+              <span className="text-[9px] text-slate-400 w-6 text-right text-engraved-light">
                 {100 - constrainedFatigue}
               </span>
             </div>
@@ -518,7 +533,7 @@ const PgCard = memo<PgCardProps>(({
         // Original vertical mode
         <>
           <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold tracking-[0.08em] text-ivory">{label}</span>
+            <span className="text-sm font-semibold tracking-[0.08em] text-ivory text-engraved">{label}</span>
             {renderPortraitBadge('vertical')}
           </div>
           {compatibilityState !== 'idle' && (
@@ -538,26 +553,38 @@ const PgCard = memo<PgCardProps>(({
           {subtitle && <span className="text-[10px] tracking-wide text-slate-400">{subtitle}</span>}
           <div className="space-y-2 pt-1 text-[10px] tracking-[0.2em] uppercase">
             <div>
-              <div className="mb-1 flex items-center justify-between text-emerald-200/80">
+              <div className="mb-1 flex items-center justify-between text-emerald-200/80 text-engraved-light">
                 <span>HP</span>
                 <span>{maxHp ? `${hp}/${maxHp}` : `${constrainedHp}`}</span>
               </div>
               <div className="h-1.5 w-full rounded-full bg-slate-800/80">
                 <div
-                  className="h-full rounded-full bg-linear-to-r from-emerald-300 to-emerald-500 transition-all"
-                  style={{ width: `${maxHp ? (hp / maxHp) * 100 : constrainedHp}%` }}
+                  className="h-full rounded-full transition-all"
+                  style={{
+                    width: `${maxHp ? (hp / maxHp) * 100 : constrainedHp}%`,
+                    background: `linear-gradient(90deg, #10b981 0%, #fcd34d 50%, #e63946 100%)`,
+                    boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.4)',
+                    transitionDuration: '250ms',
+                    transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+                  }}
                 />
               </div>
             </div>
             <div>
-              <div className="mb-1 flex items-center justify-between text-amber-200/80">
+              <div className="mb-1 flex items-center justify-between text-amber-200/80 text-engraved-light">
                 <span>STAMINA</span>
                 <span>{100 - constrainedFatigue}%</span>
               </div>
               <div className="h-1.5 w-full rounded-full bg-slate-800/80">
                 <div
-                  className="h-full rounded-full bg-linear-to-r from-amber-300 to-amber-500 transition-all"
-                  style={{ width: `${100 - constrainedFatigue}%` }}
+                  className="h-full rounded-full transition-all"
+                  style={{
+                    width: `${100 - constrainedFatigue}%`,
+                    background: `linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%)`,
+                    boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.4)',
+                    transitionDuration: '300ms',
+                    transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+                  }}
                 />
               </div>
             </div>

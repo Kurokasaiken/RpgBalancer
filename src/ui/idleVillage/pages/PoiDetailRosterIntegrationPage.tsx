@@ -7,8 +7,9 @@
  * dell'attività e un vero slot rack interattivo alimentato da
  * useResidentSlotController.
  *
- * Dati reali letti da DEFAULT_IDLE_VILLAGE_CONFIG.activities: icona, numero di
- * slot, requisiti, durata, ricompense, affaticamento, rischio ferita/morte.
+ * L'attività predefinita è la stessa quest di riferimento usata da
+ * /poi-detail-verification (quest_dangerous_hunt) in modo che il dettaglio POI
+ * sia visivamente identico alla pagina di verification.
  */
 
 import { useCallback, useMemo, useState } from 'react';
@@ -46,11 +47,38 @@ import { GenericPoiSkin } from '@/ui/idleVillage/components/minimal/GenericPoiSk
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import { formatResidentLabel } from '@/ui/idleVillage/residentName';
 import { getResidentPortraitUrl } from '@/engine/game/idleVillage/residentVisualResolver';
+import { StyleLabSurface } from '@/ui/styleLab/StyleLabSurface';
+
+/** Attività di riferimento usata dalla pagina di verification. */
+const DEFAULT_ACTIVITY = DEFAULT_IDLE_VILLAGE_CONFIG.activities.quest_dangerous_hunt;
+const DEFAULT_ACTIVITY_ID = DEFAULT_ACTIVITY.id;
 
 /** Elenco attività reali escluse le voci di test. */
 const ACTIVITIES = Object.values(DEFAULT_IDLE_VILLAGE_CONFIG.activities).filter(
   (a) => !a.tags.includes('test'),
 );
+
+/** Dati di esempio del registro eventi, identici a quelli di verification. */
+const mockTelemetry: TelemetryEntry[] = [
+  {
+    id: 'tel-1',
+    timestamp: new Date(Date.now() - 3600000),
+    message: 'Activity started',
+    type: 'start',
+  },
+  {
+    id: 'tel-2',
+    timestamp: new Date(Date.now() - 1800000),
+    message: 'Worker assigned to slot 3',
+    type: 'assign',
+  },
+  {
+    id: 'tel-3',
+    timestamp: new Date(Date.now() - 600000),
+    message: 'Progress update: 65%',
+    type: 'done',
+  },
+];
 
 type ActivityKind = 'job' | 'quest' | 'training' | 'maintenance';
 
@@ -62,6 +90,8 @@ function getActivityKind(activity: ActivityDefinition): ActivityKind {
 }
 
 function getActivityIcon(activity: ActivityDefinition): string {
+  // Same icon used in the verification page for Dangerous Hunt.
+  if (activity.id === 'quest_dangerous_hunt') return '🏹';
   const meta = activity.metadata as Record<string, unknown> | undefined;
   if (typeof meta?.icon === 'string' && meta.icon) return meta.icon;
   if (activity.tags.includes('wood')) return '🪵';
@@ -73,10 +103,12 @@ function getActivityIcon(activity: ActivityDefinition): string {
   return '⭐';
 }
 
-function formatDuration(formula?: string): string {
-  const value = parseInt(formula ?? '', 10);
+function formatSeconds(value: number): string {
   if (Number.isNaN(value)) return '—';
-  if (value >= 1000) return `${(value / 1000).toFixed(1)}s`;
+  if (value >= 1000) {
+    const seconds = value / 1000;
+    return Number.isInteger(seconds) ? `${seconds}s` : `${seconds.toFixed(1)}s`;
+  }
   if (value >= 60) return `${Math.ceil(value / 60)}m`;
   return `${value}ms`;
 }
@@ -84,11 +116,13 @@ function formatDuration(formula?: string): string {
 function formatRewards(activity: ActivityDefinition): string {
   const parts: string[] = [];
   if (activity.rewards && activity.rewards.length > 0) {
-    parts.push(activity.rewards.map((r) => `${r.resourceId} ${r.amountFormula}`).join(' + '));
+    parts.push(
+      activity.rewards.map((r) => `${r.resourceId}: +${r.amountFormula}`).join(', '),
+    );
   }
   if (activity.dailyRewardProfile && activity.dailyRewardProfile.length > 0) {
     parts.push(
-      activity.dailyRewardProfile.map((r) => `${r.resourceId}/day ${r.amountPerDay}`).join(' + '),
+      activity.dailyRewardProfile.map((r) => `${r.resourceId}/day ${r.amountPerDay}`).join(', '),
     );
   }
   return parts.length > 0 ? parts.join(' · ') : '—';
@@ -118,11 +152,24 @@ interface DroppablePoiProps {
   icon: string;
   label: string;
   progress: number;
+  timeRemainingMs?: number;
+  isExpirable?: boolean;
+  riskBadges?: { label: string; value: string }[];
   canAcceptDrop: boolean;
   onClick: () => void;
 }
 
-function DroppablePoi({ dropId, icon, label, progress, canAcceptDrop, onClick }: DroppablePoiProps) {
+function DroppablePoi({
+  dropId,
+  icon,
+  label,
+  progress,
+  timeRemainingMs,
+  isExpirable,
+  riskBadges,
+  canAcceptDrop,
+  onClick,
+}: DroppablePoiProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: dropId,
     disabled: !canAcceptDrop,
@@ -132,7 +179,7 @@ function DroppablePoi({ dropId, icon, label, progress, canAcceptDrop, onClick }:
   return (
     <div
       ref={setNodeRef}
-      className="relative flex cursor-pointer flex-col items-center gap-2"
+      className="poi-detail-stage__medallion relative flex cursor-pointer flex-col items-center gap-2"
       onClick={onClick}
       style={
         isOver
@@ -146,6 +193,22 @@ function DroppablePoi({ dropId, icon, label, progress, canAcceptDrop, onClick }:
       tabIndex={0}
       aria-label={`${label} — clicca per aprire il detail`}
     >
+      <div className="poi-detail-stage__legend text-center">
+        <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">POI Trigger</p>
+        <h3 className="mb-1 text-sm font-semibold text-amber-100">
+          Clicca il medaglione per aprire il detail
+        </h3>
+        {riskBadges && riskBadges.length > 0 && (
+          <div className="poi-detail-stage__risk flex flex-wrap justify-center gap-2 text-[10px] text-amber-200/80">
+            {riskBadges.map((badge) => (
+              <div key={badge.label} className="flex flex-col items-center">
+                <span>{badge.label}</span>
+                <strong>{badge.value}</strong>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
       <GenericPoiSkin
         icon={icon}
         progress={progress}
@@ -158,39 +221,58 @@ function DroppablePoi({ dropId, icon, label, progress, canAcceptDrop, onClick }:
         pillar="wilderness"
         size={200}
         enableHover
-        label={undefined}
+        label={label}
+        timeRemainingMs={timeRemainingMs}
+        isExpirable={isExpirable}
       />
-      <div className="text-xs font-semibold tracking-wider text-amber-200">{label}</div>
     </div>
   );
 }
 
 const PoiDetailRosterIntegrationPage: FC = () => {
-  const [selectedActivityId, setSelectedActivityId] = useState<string>(ACTIVITIES[0]?.id ?? '');
+  const { residentsById } = useRosterKitData();
+
+  // Pre-fill slot 3 with a real resident to mirror the verification mock state.
+  const defaultResidentId = residentsById['hero-giggiolillo']
+    ? 'hero-giggiolillo'
+    : Object.keys(residentsById)[0];
+  const defaultSlotId = `${DEFAULT_ACTIVITY_ID}-slot-2`;
+  const defaultAssignments = defaultResidentId
+    ? { [defaultSlotId]: defaultResidentId }
+    : ({} as Record<string, string | null>);
+
+  const [selectedActivityId, setSelectedActivityId] = useState<string>(DEFAULT_ACTIVITY_ID);
   const [draggingResidentId, setDraggingResidentId] = useState<string | null>(null);
-  const [assignments, setAssignments] = useState<Record<string, string | null>>({});
+  const [assignments, setAssignments] = useState<Record<string, string | null>>(
+    defaultAssignments,
+  );
   const [flyingResidentId, setFlyingResidentId] = useState<string | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [telemetry, setTelemetry] = useState<TelemetryEntry[]>([]);
+  const [telemetry, setTelemetry] = useState<TelemetryEntry[]>(mockTelemetry);
 
   const activity = useMemo(
-    () => ACTIVITIES.find((a) => a.id === selectedActivityId) ?? ACTIVITIES[0]!,
+    () => ACTIVITIES.find((a) => a.id === selectedActivityId) ?? DEFAULT_ACTIVITY,
     [selectedActivityId],
   );
   const activityKind = useMemo(() => getActivityKind(activity), [activity]);
   const activityIcon = useMemo(() => getActivityIcon(activity), [activity]);
   const slotBlueprints = useMemo(() => buildSlotBlueprints(activity), [activity]);
 
-  // ResidentSlotRack renders infinite slots as a non-droppable "+" placeholder.
-  // For the test page we want a real, interactive slot rack, so we cap infinite
-  // activities to a finite number of slots for the controller only.
-  const finiteMaxSlots = typeof activity.maxSlots === 'number' ? activity.maxSlots : 4;
+  // The verification page renders 3 slots for quest_dangerous_hunt. Use the real
+  // maxSlots for other activities so the roster remains generic.
+  const controllerMaxSlots = useMemo(() => {
+    if (activity.id === 'quest_dangerous_hunt') return 3;
+    return typeof activity.maxSlots === 'number' ? activity.maxSlots : 4;
+  }, [activity]);
+
+  // Remove the stat requirement in the controller so any real resident can be
+  // assigned to the test quest; the detail component still receives the original
+  // activity config for display.
   const activityForController = useMemo(
-    () => ({ ...activity, maxSlots: finiteMaxSlots as number }),
-    [activity, finiteMaxSlots],
+    () => ({ ...activity, maxSlots: controllerMaxSlots, statRequirement: undefined }),
+    [activity, controllerMaxSlots],
   );
 
-  const { residentsById } = useRosterKitData();
   const { state: pageFlight, startFlight, settle: settleFlight } = useDragOutcome();
 
   const assignedIds = useMemo(
@@ -297,7 +379,7 @@ const PoiDetailRosterIntegrationPage: FC = () => {
 
       const element = isDetailOpen
         ? document.querySelector(`[data-slot-id="${slot.id}"]`)
-        : null;
+        : document.querySelector('.poi-detail-stage__medallion');
       return { flightToSlot: { slotId: slot.id, element } };
     },
     [controller.slots, findAcceptingSlot, poiDropId, residentsById, assignedIds, isDetailOpen],
@@ -316,10 +398,15 @@ const PoiDetailRosterIntegrationPage: FC = () => {
       const slot = findAcceptingSlot(residentId);
       if (!slot) return;
       const from = elementCenter(document.querySelector(`[data-resident-id="${residentId}"]`));
-      if (isDetailOpen) {
+      if (!from) return;
+
+      // Open the POI detail so the target slot is rendered, then launch the
+      // resident card into the slot with the same flight animation used for drag.
+      setIsDetailOpen(true);
+      setFlyingResidentId(residentId);
+      setTimeout(() => {
         const to = elementCenter(document.querySelector(`[data-slot-id="${slot.id}"]`));
-        if (!from || !to) return;
-        setFlyingResidentId(residentId);
+        if (!to) return;
         startFlight({
           residentId,
           slotId: slot.id,
@@ -329,11 +416,9 @@ const PoiDetailRosterIntegrationPage: FC = () => {
           toX: to.x,
           toY: to.y,
         });
-      } else {
-        handleAssign(slot.id, residentId);
-      }
+      }, 50);
     },
-    [flyingResidentId, findAcceptingSlot, isDetailOpen, startFlight, handleAssign],
+    [flyingResidentId, findAcceptingSlot, setIsDetailOpen, startFlight],
   );
 
   const handleSlotClear = useCallback(
@@ -371,6 +456,29 @@ const PoiDetailRosterIntegrationPage: FC = () => {
   const status: 'idle' | 'in-progress' | 'completed' | 'blocked' =
     poiStatus === 'working' ? 'in-progress' : 'idle';
 
+  const activityProgress = assignedIds.length > 0 ? 0.65 : 0;
+  const duration = parseInt(activity.durationFormula ?? '0', 10) || 0;
+  const elapsed = Math.floor(duration * activityProgress);
+  const remaining = duration - elapsed;
+
+  const riskBadges = useMemo(() => {
+    const meta = activity.metadata as Record<string, unknown> | undefined;
+    return [
+      {
+        label: 'Injury Risk',
+        value: `${(meta?.injuryChanceDisplay as number | undefined) ?? 0}%`,
+      },
+      {
+        label: 'Death Risk',
+        value: `${(meta?.deathChanceDisplay as number | undefined) ?? 0}%`,
+      },
+      {
+        label: 'Danger Rating',
+        value: `${activity.dangerRating}/5`,
+      },
+    ];
+  }, [activity]);
+
   const detailSlots = useMemo<ActivityDetailSlotData[]>(() => {
     return controller.slots.map((slot) => {
       const resident = slot.assignedResident;
@@ -378,14 +486,14 @@ const PoiDetailRosterIntegrationPage: FC = () => {
       return {
         id: slot.id,
         residentId: slot.assignedResidentId ?? undefined,
-        state: isAssigned ? 'idle' : 'empty',
+        state: isAssigned ? 'active' : 'empty',
         initial: '',
-        progress: 0,
+        progress: isAssigned ? activityProgress : 0,
         assignedWorkerName: resident ? formatResidentLabel(resident) : undefined,
         assignedWorkerAvatarUrl: resident ? getResidentPortraitUrl(resident) : undefined,
       };
     });
-  }, [controller.slots]);
+  }, [controller.slots, activityProgress]);
 
   const detailProps = useMemo(
     () => ({
@@ -394,14 +502,14 @@ const PoiDetailRosterIntegrationPage: FC = () => {
       type: activityKind,
       subtitle: activity.description,
       status,
-      progress: 0,
-      duration: parseInt(activity.durationFormula ?? '0', 10) || 0,
-      elapsed: 0,
+      progress: activityProgress,
+      duration,
+      elapsed,
       slots: detailSlots,
       maxSlots,
-      durationDisplay: formatDuration(activity.durationFormula),
+      durationDisplay: formatSeconds(duration),
       rewardDisplay: formatRewards(activity),
-      etaDisplay: formatDuration(activity.durationFormula),
+      etaDisplay: formatSeconds(remaining),
       telemetry,
       isOpen: isDetailOpen,
       onClose: () => setIsDetailOpen(false),
@@ -415,6 +523,8 @@ const PoiDetailRosterIntegrationPage: FC = () => {
       skinPresetId: 'wanderlust' as const,
       dataTestId: 'poi-detail-wrapper-test',
       ariaLabel: `POI Detail: ${activity.label}`,
+      ariaLive: 'polite' as const,
+      enableDevTools: true,
       onStart: () => {
         addTelemetry('start', `Attività ${activity.label} avviata`);
         trackTelemetryEvent('poi_detail_roster_start', { activityId: activity.id });
@@ -436,6 +546,10 @@ const PoiDetailRosterIntegrationPage: FC = () => {
       activity,
       activityKind,
       status,
+      activityProgress,
+      duration,
+      elapsed,
+      remaining,
       maxSlots,
       detailSlots,
       telemetry,
@@ -481,7 +595,7 @@ const PoiDetailRosterIntegrationPage: FC = () => {
                   onChange={(e) => {
                     setSelectedActivityId(e.target.value);
                     setAssignments({});
-                    setTelemetry([]);
+                    setTelemetry(mockTelemetry);
                     setIsDetailOpen(false);
                   }}
                 >
@@ -510,25 +624,25 @@ const PoiDetailRosterIntegrationPage: FC = () => {
                   />
                 </div>
 
-                <div className="flex flex-col items-center gap-6 rounded-lg border border-slate-700/50 bg-slate-900/30 p-6">
-                  <div className="poi-detail-stage__medallion flex flex-col items-center gap-2">
-                  <p className="mb-2 text-[10px] uppercase tracking-[0.3em] text-slate-500">
-                    {isDetailOpen ? 'Clicca per chiudere' : 'Clicca per aprire il detail'}
-                  </p>
-                  <DroppablePoi
-                    dropId={poiDropId}
-                    icon={activityIcon}
-                    label={activity.label}
-                    progress={0}
-                    canAcceptDrop={freeSlots > 0}
-                    onClick={() => setIsDetailOpen((o) => !o)}
-                  />
-                </div>
+                <StyleLabSurface className="poi-detail-surface" variant="panel">
+                  <section className="poi-detail-stage">
+                    <DroppablePoi
+                      dropId={poiDropId}
+                      icon={activityIcon}
+                      label={activity.label}
+                      progress={activityProgress}
+                      timeRemainingMs={remaining}
+                      isExpirable={assignedIds.length > 0}
+                      riskBadges={riskBadges}
+                      canAcceptDrop={freeSlots > 0}
+                      onClick={() => setIsDetailOpen(true)}
+                    />
 
-                <div className="poi-detail-stage__detail">
-                  <ActivityCapsuleDetailSkinAware {...detailProps} />
-                </div>
-                </div>
+                    <div className="poi-detail-stage__detail">
+                      <ActivityCapsuleDetailSkinAware {...detailProps} />
+                    </div>
+                  </section>
+                </StyleLabSurface>
               </div>
             </div>
           </div>
