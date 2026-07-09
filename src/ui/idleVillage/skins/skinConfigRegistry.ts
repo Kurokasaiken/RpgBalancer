@@ -30,6 +30,71 @@ const SLOT_RACK_SIGNATURE_COMPONENT_THEMES = {
   pgCard: 'slotrackSignature.pgCard.ceremonial',
 } as const;
 
+const BASE_LAYOUT_PRIMITIVES_COMPONENT_THEMES = {
+  roster: 'base.roster.minimal-frame',
+  slotRack: 'base.slot.clean-grid',
+  timeStrip: 'base.time.simple-strip',
+  hud: 'base.hud.minimal-line',
+  capsule: 'base.capsule.glass-minimal',
+  halo: 'base.halo.azure-glow',
+  pgCard: 'base.pgCard.minimal-portrait',
+} as const;
+
+const BASE_LAYOUT_PRIMITIVES_CONFIG: SkinPresetConfig = {
+  id: 'base',
+  label: 'Layout Primitives',
+  description: 'Global default: Obsidian base + Azure light + Gold/bronze accents. Clean, minimal aesthetic optimized for information clarity.',
+  version: 1,
+  defaultPillar: 'frontier',
+  supportedPillars: ['frontier', 'wilderness', 'empire'],
+  exposure: 'public',
+  palette: {
+    primary: '#dfb857',
+    secondary: '#c9a040',
+    accent: '#00e5ff',
+    glow: 'rgba(0, 229, 255, 0.35)',
+    background: '#060f16',
+    text: '#f7f0e3',
+  },
+  densityMode: 'default',
+  motionLevel: 'full',
+  typographyScale: 1,
+  componentThemes: BASE_LAYOUT_PRIMITIVES_COMPONENT_THEMES,
+  interactionPhysics: {
+    mass: 1,
+    damping: 0.2,
+    stiffness: 200,
+    shadowDepth: 'medium',
+    bloomIntensity: 0.8,
+    audioProfile: 'base.minimal',
+  },
+  styleLabOverrides: {
+    palettePreset: 'base.layout-primitives',
+    densityMode: 'default',
+    motionLevel: 'full',
+    typographyScale: 1,
+    colorFilters: {
+      visionMode: 'standard',
+    },
+    interactionPhysics: {
+      mass: 1,
+      damping: 0.2,
+      stiffness: 200,
+      shadowDepth: 'medium',
+      bloomIntensity: 0.8,
+      audioProfile: 'base.minimal',
+    },
+  },
+  telemetry: {
+    presetChangedEvent: 'skin_preset_changed',
+    renderedEvent: 'skin_rendered',
+    context: 'idle_village_base_layout_primitives',
+  },
+  documentation: [
+    'Layout Primitives is the global default aesthetic for all skin-aware components.',
+  ],
+};
+
 const RESIDENT_SLOT_RACK_SIGNATURE_CONFIG: SkinPresetConfig = {
   id: 'resident_slotrack_signature',
   label: 'Resident Slot Signature',
@@ -193,6 +258,7 @@ const WANDERLUST_CONFIG: SkinPresetConfig = {
 };
 
 export const SKIN_CONFIG_REGISTRY: SkinRegistry = {
+  [BASE_LAYOUT_PRIMITIVES_CONFIG.id]: BASE_LAYOUT_PRIMITIVES_CONFIG,
   [MINIMAL_FRONTIER_CONFIG.id]: MINIMAL_FRONTIER_CONFIG,
   [WANDERLUST_CONFIG.id]: WANDERLUST_CONFIG,
   [RESIDENT_SLOT_RACK_SIGNATURE_CONFIG.id]: RESIDENT_SLOT_RACK_SIGNATURE_CONFIG,
@@ -200,8 +266,8 @@ export const SKIN_CONFIG_REGISTRY: SkinRegistry = {
 
 export type SkinPresetId = keyof typeof SKIN_CONFIG_REGISTRY;
 
-// ← VERSIONE DEFAULT: cambia qui per switchare globalmente tra skin (v9 = wanderlust, v8 = minimal_frontier)
-export const DEFAULT_SKIN_PRESET_ID: SkinPresetId = WANDERLUST_CONFIG.id;
+// ← VERSIONE DEFAULT: Layout Primitives (base) is now the global default for all components
+export const DEFAULT_SKIN_PRESET_ID: SkinPresetId = BASE_LAYOUT_PRIMITIVES_CONFIG.id;
 
 export function getSkinPresetConfig(presetId?: string): SkinPresetConfig {
   const fallback = SKIN_CONFIG_REGISTRY[DEFAULT_SKIN_PRESET_ID];

@@ -165,7 +165,7 @@ export function TimeEngineStrip({
   showClockDetails = false,
   maxVisibleActivities = 4,
   className,
-  skinPresetId = 'minimal_frontier',
+  skinPresetId = 'base',
   pillar = 'frontier',
   skinConfig,
 }: TimeEngineStripProps) {

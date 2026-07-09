@@ -71,7 +71,7 @@ const ActiveHUD: React.FC<ActiveHUDProps> = ({
   variant = 'default',
   maxVisible,
   enableTelemetry = false,
-  skinPresetId = 'minimal_frontier',
+  skinPresetId = 'base',
   pillar = 'frontier',
   skinConfig,
 }) => {
