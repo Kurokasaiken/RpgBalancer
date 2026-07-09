@@ -430,18 +430,17 @@ const PoiDetailRosterIntegrationPage: FC = () => {
                       freeSlots={freeSlots}
                       maxSlots={maxSlots}
                       canAcceptDrop={freeSlots > 0}
-                      slots={controller.slots.map((slot) => ({
-                        id: slot.id,
-                        assignedResidentId: slot.assignedResidentId ?? undefined,
-                        requirements: slot.requirement
-                          ? {
-                              requiredSkills: [
-                                ...(slot.requirement.allOf ?? []),
-                                ...(slot.requirement.anyOf ?? []),
-                              ],
-                            }
-                          : {},
-                      }))}
+                      slots={controller.slots.map((slot) => {
+                        const stringTags = [
+                          ...(slot.requirement?.allOf?.filter((x): x is string => typeof x === 'string') ?? []),
+                          ...(slot.requirement?.anyOf ?? []),
+                        ];
+                        return {
+                          id: slot.id,
+                          assignedResidentId: slot.assignedResidentId ?? undefined,
+                          requirements: stringTags.length > 0 ? { requiredSkills: stringTags } : {},
+                        };
+                      })}
                       onClick={() => setIsDetailOpen((o) => !o)}
                     />
                   </div>
