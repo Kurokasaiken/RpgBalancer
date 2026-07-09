@@ -19,6 +19,7 @@ import {
   useSensor,
   useSensors,
   pointerWithin,
+  useDroppable,
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core';
@@ -29,9 +30,11 @@ import {
   useRosterKitData,
   type RosterDropVerdict,
 } from '@/ui/idleVillage/frozen/kits/rosterKit';
-import { ResidentSlotRack } from '@/ui/idleVillage/frozen/kits/slotRackKit';
 import { ActivityCapsuleDetailSkinAware } from '@/ui/idleVillage/skins/activityCapsuleDetail/ActivityCapsuleDetailSkinAware';
-import { WanderlustSurface } from '@/ui/wanderlust-surface/WanderlustSurface';
+import type {
+  ActivityDetailSlotData,
+  TelemetryEntry,
+} from '@/ui/idleVillage/skins/activityCapsuleDetail/ActivityCapsuleDetailSkinAware';
 import { useResidentSlotController } from '@/ui/idleVillage/slots/useResidentSlotController';
 import type { ResidentSlotBlueprint } from '@/ui/idleVillage/slots/types';
 import { DEFAULT_IDLE_VILLAGE_CONFIG } from '@/balancing/config/idleVillage/defaultConfig';
@@ -39,10 +42,10 @@ import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
 import { evaluateStatRequirement } from '@/engine/game/idleVillage/statMatching';
 import { useDragOutcome, elementCenter } from '@/ui/idleVillage/interaction/useDragOutcome';
 import { DragOutcomeFlight } from '@/ui/idleVillage/interaction/DragOutcomeFlight';
-import { JobPOI } from '@/ui/idleVillage/components/minimal/JobPOI';
+import { GenericPoiSkin } from '@/ui/idleVillage/components/minimal/GenericPoiSkin';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import { formatResidentLabel } from '@/ui/idleVillage/residentName';
-import type { TelemetryEntry } from '@/ui/idleVillage/skins/activityCapsuleDetail/ActivityCapsuleDetailSkinAware';
+import { getResidentPortraitUrl } from '@/engine/game/idleVillage/residentVisualResolver';
 
 /** Elenco attività reali escluse le voci di test. */
 const ACTIVITIES = Object.values(DEFAULT_IDLE_VILLAGE_CONFIG.activities).filter(
@@ -98,6 +101,68 @@ function formatRequirementLabel(req?: ResidentSlotBlueprint['requirement']): str
 function buildSlotBlueprints(activity: ActivityDefinition): ResidentSlotBlueprint[] | undefined {
   const meta = activity.metadata as { slotBlueprints?: ResidentSlotBlueprint[] } | undefined;
   return meta?.slotBlueprints;
+}
+
+// Color mapping from poiAmberSkinConfig for wilderness pillar
+const WILDERNESS_COLORS = {
+  coronaCore: { r: 210, g: 138, b: 28 },
+  coronaGlow: { r: 180, g: 105, b: 10 },
+  rimColors: ['#fce890', '#c09030', '#200e02'] as [string, string, string],
+  stoneColors: ['#1e1608', '#030202'] as [string, string],
+  stoneAmbient: 'rgba(255,220,120,.22)',
+  pinColor: 'rgba(205,190,148,.72)',
+};
+
+interface DroppablePoiProps {
+  dropId: string;
+  icon: string;
+  label: string;
+  progress: number;
+  canAcceptDrop: boolean;
+  onClick: () => void;
+}
+
+function DroppablePoi({ dropId, icon, label, progress, canAcceptDrop, onClick }: DroppablePoiProps) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: dropId,
+    disabled: !canAcceptDrop,
+    data: { accepts: ['resident'] },
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className="relative flex cursor-pointer flex-col items-center gap-2"
+      onClick={onClick}
+      style={
+        isOver
+          ? {
+              transform: 'scale(1.05)',
+              filter: 'drop-shadow(0 0 12px rgba(201, 162, 39, 0.8))',
+            }
+          : undefined
+      }
+      role="button"
+      tabIndex={0}
+      aria-label={`${label} — clicca per aprire il detail`}
+    >
+      <GenericPoiSkin
+        icon={icon}
+        progress={progress}
+        coronaCore={WILDERNESS_COLORS.coronaCore}
+        coronaGlow={WILDERNESS_COLORS.coronaGlow}
+        rimColors={WILDERNESS_COLORS.rimColors}
+        stoneColors={WILDERNESS_COLORS.stoneColors}
+        stoneAmbient={WILDERNESS_COLORS.stoneAmbient}
+        pinColor={WILDERNESS_COLORS.pinColor}
+        pillar="wilderness"
+        size={200}
+        enableHover
+        label={undefined}
+      />
+      <div className="text-xs font-semibold tracking-wider text-amber-200">{label}</div>
+    </div>
+  );
 }
 
 const PoiDetailRosterIntegrationPage: FC = () => {
@@ -306,6 +371,22 @@ const PoiDetailRosterIntegrationPage: FC = () => {
   const status: 'idle' | 'in-progress' | 'completed' | 'blocked' =
     poiStatus === 'working' ? 'in-progress' : 'idle';
 
+  const detailSlots = useMemo<ActivityDetailSlotData[]>(() => {
+    return controller.slots.map((slot) => {
+      const resident = slot.assignedResident;
+      const isAssigned = !!resident;
+      return {
+        id: slot.id,
+        residentId: slot.assignedResidentId ?? undefined,
+        state: isAssigned ? 'idle' : 'empty',
+        initial: '',
+        progress: 0,
+        assignedWorkerName: resident ? formatResidentLabel(resident) : undefined,
+        assignedWorkerAvatarUrl: resident ? getResidentPortraitUrl(resident) : undefined,
+      };
+    });
+  }, [controller.slots]);
+
   const detailProps = useMemo(
     () => ({
       activityId: activity.id,
@@ -316,7 +397,7 @@ const PoiDetailRosterIntegrationPage: FC = () => {
       progress: 0,
       duration: parseInt(activity.durationFormula ?? '0', 10) || 0,
       elapsed: 0,
-      slots: [] as { id: string; state: 'empty'; initial: string; progress: number }[],
+      slots: detailSlots,
       maxSlots,
       durationDisplay: formatDuration(activity.durationFormula),
       rewardDisplay: formatRewards(activity),
@@ -325,11 +406,15 @@ const PoiDetailRosterIntegrationPage: FC = () => {
       isOpen: isDetailOpen,
       onClose: () => setIsDetailOpen(false),
       showTelemetry: true,
-      showSlots: false,
+      showSlots: true,
       showInfo: true,
-      inlineMode: true,
+      compact: false,
+      inlineMode: false,
+      enableDrag: true,
       pillar: 'wilderness' as const,
       skinPresetId: 'wanderlust' as const,
+      dataTestId: 'poi-detail-wrapper-test',
+      ariaLabel: `POI Detail: ${activity.label}`,
       onStart: () => {
         addTelemetry('start', `Attività ${activity.label} avviata`);
         trackTelemetryEvent('poi_detail_roster_start', { activityId: activity.id });
@@ -342,15 +427,23 @@ const PoiDetailRosterIntegrationPage: FC = () => {
         addTelemetry('done', `Ricompensa ${activity.label} raccolta`);
         trackTelemetryEvent('poi_detail_roster_collect', { activityId: activity.id });
       },
+      onSlotDetach: handleSlotClear,
+      onSlotAssign: () => {
+        // No-op: assignments are driven by roster drag/click.
+      },
     }),
-    [activity, activityKind, status, maxSlots, telemetry, isDetailOpen, addTelemetry],
+    [
+      activity,
+      activityKind,
+      status,
+      maxSlots,
+      detailSlots,
+      telemetry,
+      isDetailOpen,
+      addTelemetry,
+      handleSlotClear,
+    ],
   );
-
-  const panelStyle: React.CSSProperties = {
-    width: 680,
-    maxWidth: '92vw',
-    margin: '0 auto',
-  };
 
   return (
     <TooltipProvider>
@@ -418,139 +511,23 @@ const PoiDetailRosterIntegrationPage: FC = () => {
                 </div>
 
                 <div className="flex flex-col items-center gap-6 rounded-lg border border-slate-700/50 bg-slate-900/30 p-6">
-                  <div className="flex flex-col items-center gap-1">
-                    <p className="mb-2 text-[10px] uppercase tracking-[0.3em] text-slate-500">
-                      {isDetailOpen ? 'Clicca per chiudere' : 'Clicca per aprire il detail'}
-                    </p>
-                    <JobPOI
-                      activityId={activity.id}
-                      label={activity.label}
-                      icon={activityIcon}
-                      status={poiStatus}
-                      freeSlots={freeSlots}
-                      maxSlots={maxSlots}
-                      canAcceptDrop={freeSlots > 0}
-                      slots={controller.slots.map((slot) => {
-                        const stringTags = [
-                          ...(slot.requirement?.allOf?.filter((x): x is string => typeof x === 'string') ?? []),
-                          ...(slot.requirement?.anyOf ?? []),
-                        ];
-                        return {
-                          id: slot.id,
-                          assignedResidentId: slot.assignedResidentId ?? undefined,
-                          requirements: stringTags.length > 0 ? { requiredSkills: stringTags } : {},
-                        };
-                      })}
-                      onClick={() => setIsDetailOpen((o) => !o)}
-                    />
-                  </div>
+                  <div className="poi-detail-stage__medallion flex flex-col items-center gap-2">
+                  <p className="mb-2 text-[10px] uppercase tracking-[0.3em] text-slate-500">
+                    {isDetailOpen ? 'Clicca per chiudere' : 'Clicca per aprire il detail'}
+                  </p>
+                  <DroppablePoi
+                    dropId={poiDropId}
+                    icon={activityIcon}
+                    label={activity.label}
+                    progress={0}
+                    canAcceptDrop={freeSlots > 0}
+                    onClick={() => setIsDetailOpen((o) => !o)}
+                  />
+                </div>
 
-                  {isDetailOpen && (
-                    <div className="w-full space-y-4" data-testid="poi-detail-panel">
-                      <ActivityCapsuleDetailSkinAware {...detailProps} />
-
-                      <WanderlustSurface
-                        shape="panel"
-                        material="bronze"
-                        interactive={false}
-                        style={panelStyle}
-                      >
-                        <div className="p-4">
-                          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-amber-200">
-                            Slot Rack
-                          </h3>
-                          <ResidentSlotRack
-                            slots={controller.slots}
-                            onSlotClear={handleSlotClear}
-                            draggingResidentId={draggingResidentId}
-                            layout="detail"
-                            overflowBehavior="scroll"
-                            slotSize={120}
-                          />
-                          {controller.warnings.length > 0 && (
-                            <div className="mt-3 text-[10px] text-red-300">
-                              {controller.warnings[0].message}
-                            </div>
-                          )}
-                        </div>
-                      </WanderlustSurface>
-
-                      <WanderlustSurface
-                        shape="panel"
-                        material="bronze"
-                        interactive={false}
-                        style={panelStyle}
-                      >
-                        <div className="p-4">
-                          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-amber-200">
-                            Requisiti, ricompense e rischi
-                          </h3>
-                          <div className="grid grid-cols-1 gap-4 text-xs text-slate-300 md:grid-cols-2">
-                            <div className="space-y-2">
-                              <div>
-                                <strong className="text-amber-100/80">Requisiti attività:</strong>
-                                <div className="text-slate-400">
-                                  {activity.statRequirement?.label ?? '—'}
-                                </div>
-                              </div>
-                              <div>
-                                <strong className="text-amber-100/80">Slot:</strong>
-                                <ul className="mt-1 list-inside list-disc text-slate-400">
-                                  {slotBlueprints && slotBlueprints.length > 0 ? (
-                                    slotBlueprints.map((bp, i) => (
-                                      <li key={bp.id}>
-                                        {bp.label ?? `Slot ${i + 1}`}: {formatRequirementLabel(bp)}
-                                      </li>
-                                    ))
-                                  ) : (
-                                    <li>
-                                      {maxSlots === 99
-                                        ? 'Infiniti slot aperti'
-                                        : `${maxSlots} slot disponibili`}
-                                    </li>
-                                  )}
-                                </ul>
-                              </div>
-                            </div>
-                            <div className="space-y-2">
-                              <div>
-                                <strong className="text-amber-100/80">Durata:</strong>{' '}
-                                {formatDuration(activity.durationFormula)}
-                              </div>
-                              <div>
-                                <strong className="text-amber-100/80">Fatica:</strong>{' '}
-                                {activity.dailyFatigueCost ??
-                                  activity.fatigueProfile?.baseGain ??
-                                  '—'}
-                              </div>
-                              <div>
-                                <strong className="text-amber-100/80">Ricompense:</strong>
-                                <div className="text-slate-400">{formatRewards(activity)}</div>
-                              </div>
-                              {typeof activity.dangerRating === 'number' && (
-                                <div>
-                                  <strong className="text-amber-100/80">Pericolo:</strong>{' '}
-                                  {activity.dangerRating}
-                                </div>
-                              )}
-                              {typeof activity.metadata?.injuryChanceDisplay === 'number' && (
-                                <div>
-                                  <strong className="text-amber-100/80">Ferita:</strong>{' '}
-                                  {activity.metadata.injuryChanceDisplay}%
-                                </div>
-                              )}
-                              {typeof activity.metadata?.deathChanceDisplay === 'number' && (
-                                <div>
-                                  <strong className="text-amber-100/80">Morte:</strong>{' '}
-                                  {activity.metadata.deathChanceDisplay}%
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </WanderlustSurface>
-                    </div>
-                  )}
+                <div className="poi-detail-stage__detail">
+                  <ActivityCapsuleDetailSkinAware {...detailProps} />
+                </div>
                 </div>
               </div>
             </div>

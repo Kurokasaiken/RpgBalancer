@@ -12,6 +12,7 @@ import { useHeavyDrag } from '@/ui/wanderlust-surface/useHeavyDrag';
 import { useSkinSystem } from '../../hooks/useSkinSystem';
 import { ResidentSlotRack } from '../../components/ResidentSlotRack';
 import type { ResidentSlotViewModel } from '../../slots/types';
+import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import type { LocationDropState } from '../../map/validators/locationDropValidators';
 import { useSkinSlot, type UseSkinSlotOptions } from '../../hooks/useSkinSlot';
 import { getSkinReplacementAPI_TS003 } from '../SkinReplacementAPI_TS003';
@@ -42,6 +43,8 @@ import { V9GlassLayersOnly } from '@/ui/v9-skin/V9GlassLayersOnly';
 // Slot data interface
 export interface ActivityDetailSlotData {
   id: string;
+  /** Resident ID currently assigned to this slot. */
+  residentId?: string;
   state: 'empty' | 'ghost' | 'idle' | 'active' | 'done' | 'locked';
   initial: string;
   progress: number;
@@ -59,11 +62,28 @@ function mapToResidentSlotViewModel(
 ): ResidentSlotViewModel {
   const isAssigned = slot.state !== 'empty' && slot.state !== 'ghost';
 
+  const assignedResident: ResidentState | undefined = isAssigned
+    ? ({
+        id: slot.residentId ?? slot.id,
+        displayName: slot.assignedWorkerName,
+        portraitUrl: slot.assignedWorkerAvatarUrl,
+        status: 'available',
+        fatigue: 0,
+        currentHp: 1,
+        maxHp: 1,
+        isHero: false,
+        isInjured: false,
+        survivalCount: 0,
+        survivalScore: 0,
+      } as ResidentState)
+    : undefined;
+
   return {
     id: slot.id,
     index,
     label: `Slot ${index + 1}`,
-    assignedResidentId: isAssigned ? slot.id : null,
+    assignedResidentId: isAssigned ? (slot.residentId ?? slot.id) : null,
+    assignedResident,
     activityId: 'activity-poi',
     activityLabel: 'POI Activity',
     displayRole: 'activity',
