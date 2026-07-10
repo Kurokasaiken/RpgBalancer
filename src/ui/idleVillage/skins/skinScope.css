@@ -1,0 +1,247 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ *  SKIN SCOPE — automatic, role-based inheritance for the active skin.
+ *
+ *  Wrap any subtree in an element carrying `.skin-scope` (see <SkinScope>) and
+ *  every standard role inside it is styled from the `--skin-*` tokens WITHOUT
+ *  hardcoding a single color:
+ *
+ *    • first-level titles  → h1  /  [data-skin="title"]
+ *    • section headers     → h2  /  [data-skin="section"]
+ *    • sub-titles          → h3, h4
+ *    • body text           → p, li, span (inherited default)
+ *    • buttons             → button  /  [data-skin="button"]   (bronze)
+ *    • primary CTA         → [data-skin="cta"]                 (gold plaque)
+ *    • close button        → [data-skin="close"]              (gold coin)
+ *    • badge / pill        → [data-skin="badge"]              (azure)
+ *    • panel / modal       → [data-skin="panel"|"modal"|"modal-backdrop"]
+ *
+ *  The token VALUES live in skinCssVariables.ts (applied on <html>). This file
+ *  only maps semantic roles → those tokens. Change the skin preset and every
+ *  scoped subtree follows automatically.
+ *
+ *  Rule: components inside a scope must NOT set colors themselves. Declare the
+ *  role (a tag or a data-skin attribute, or a <Skin*> primitive) and stop.
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+/* ── Scope root: default text + font for the whole subtree ─────────────── */
+.skin-scope {
+  color: var(--skin-text-primary);
+  font-family: var(--skin-font-serif);
+}
+.skin-scope :where(p, li, span, small, td, dd, dt, label) {
+  color: var(--skin-body-color);
+}
+.skin-scope :where(a) { color: var(--skin-icon-accent); }
+.skin-scope :where(strong, b) { color: var(--skin-text-primary); }
+.skin-scope :where(.skin-text-secondary) { color: var(--skin-text-secondary); }
+.skin-scope :where(.skin-text-muted) { color: var(--skin-text-muted); }
+
+/* ── First-level title (gold, incised, Cinzel) ────────────────────────── */
+.skin-scope :where(h1, [data-skin="title"]) {
+  margin: 0;
+  font-family: var(--skin-font-display);
+  font-size: var(--skin-title-size);
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--skin-title-color);
+  text-shadow: var(--skin-incision-title);
+}
+
+/* ── Sub-title / display caption under a title ────────────────────────── */
+.skin-scope :where([data-skin="subtitle"]) {
+  margin: 2px 0 0;
+  font-family: var(--skin-font-display);
+  font-size: var(--skin-subtitle-size);
+  letter-spacing: var(--skin-subtitle-tracking);
+  text-transform: uppercase;
+  color: var(--skin-subtitle-color);
+}
+
+/* ── Section header (tracked-out bronze label) ────────────────────────── */
+.skin-scope :where(h2, [data-skin="section"]) {
+  margin: 0 0 10px;
+  font-family: var(--skin-font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: var(--skin-label-tracking);
+  text-transform: uppercase;
+  color: var(--skin-label-primary);
+  text-shadow: var(--skin-incision-label);
+}
+.skin-scope :where(h3, h4) {
+  margin: 0;
+  font-family: var(--skin-font-display);
+  color: var(--skin-title-color);
+  letter-spacing: 0.04em;
+}
+
+/* ── Buttons — default = struck-bronze utility button ─────────────────── */
+.skin-scope :where(button, [data-skin="button"]):not([data-skin="cta"]):not([data-skin="close"]) {
+  position: relative;
+  background: var(--skin-btn-bg);
+  border: var(--skin-btn-border);
+  color: var(--skin-btn-color);
+  font-family: var(--skin-btn-font);
+  font-size: var(--skin-btn-size);
+  font-weight: 600;
+  letter-spacing: var(--skin-btn-tracking);
+  text-transform: uppercase;
+  text-shadow: var(--skin-btn-text-shadow);
+  border-radius: var(--skin-btn-radius);
+  padding: var(--skin-btn-padding);
+  cursor: pointer;
+  box-shadow: var(--skin-btn-shadow);
+  transition: transform 0.14s ease-out, box-shadow 0.14s ease-out,
+    background 0.14s ease-out, filter 0.08s ease-out;
+}
+/* struck-metal specular streak across the top */
+.skin-scope :where(button, [data-skin="button"]):not([data-skin="cta"]):not([data-skin="close"])::before {
+  content: '';
+  position: absolute;
+  inset: 1px 1px auto 1px;
+  height: 45%;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), transparent);
+  pointer-events: none;
+}
+.skin-scope :where(button, [data-skin="button"]):not([data-skin="cta"]):not([data-skin="close"]):hover:not(:disabled) {
+  background: var(--skin-btn-hover-bg);
+  box-shadow: var(--skin-btn-hover-shadow);
+  transform: var(--skin-btn-hover-lift);
+}
+.skin-scope :where(button, [data-skin="button"]):not([data-skin="cta"]):not([data-skin="close"]):active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: var(--skin-btn-active-shadow);
+  filter: var(--skin-btn-active-filter);
+}
+.skin-scope :where(button, [data-skin="button"]):disabled {
+  opacity: var(--skin-btn-disabled-opacity);
+  cursor: default;
+  box-shadow: var(--skin-btn-active-shadow);
+}
+/* Secondary / ghost variant (engraved slate) */
+.skin-scope :where([data-skin="button"][data-variant="secondary"]) {
+  background: var(--skin-btn2-bg);
+  border: var(--skin-btn2-border);
+  color: var(--skin-btn2-color);
+  text-shadow: var(--skin-incision-label);
+  box-shadow: var(--skin-btn2-shadow);
+}
+.skin-scope :where([data-skin="button"][data-variant="secondary"])::before { opacity: 0.4; }
+
+/* ── Primary CTA plaque (the "AVVIA" look) ────────────────────────────── */
+.skin-scope :where([data-skin="cta"]) {
+  position: relative;
+  overflow: hidden;
+  padding: 11px 32px;
+  border: var(--skin-cta-border);
+  clip-path: var(--skin-cta-clip);
+  background: var(--skin-cta-bg);
+  box-shadow: var(--skin-cta-shadow);
+  color: var(--skin-cta-color);
+  font-family: var(--skin-font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  text-shadow: var(--skin-cta-text-shadow);
+  cursor: pointer;
+  transition: filter 0.18s ease, box-shadow 0.18s ease;
+}
+.skin-scope :where([data-skin="cta"]):hover:not(:disabled) {
+  filter: var(--skin-cta-hover-filter);
+  box-shadow: var(--skin-cta-hover-glow);
+}
+.skin-scope :where([data-skin="cta"]):disabled { opacity: var(--skin-btn-disabled-opacity); cursor: default; }
+/* flanking ◈ ornaments wrapper */
+.skin-scope :where([data-skin="cta-wrap"]) { display: inline-flex; align-items: center; gap: 10px; }
+.skin-scope :where([data-skin="cta-ornament"]) {
+  font-size: 9px;
+  line-height: 1;
+  opacity: 0.85;
+  color: var(--skin-cta-ornament-color);
+  text-shadow: 0 0 6px rgba(223, 184, 87, 0.4);
+}
+
+/* ── Close button — gold radial coin ──────────────────────────────────── */
+.skin-scope :where([data-skin="close"]) {
+  width: var(--skin-close-size);
+  height: var(--skin-close-size);
+  border-radius: var(--skin-close-radius);
+  border: var(--skin-close-border);
+  background: var(--skin-close-bg);
+  color: var(--skin-close-color);
+  box-shadow: var(--skin-close-shadow);
+  font-size: 1.15rem;
+  font-weight: 300;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.15s ease, filter 0.15s ease;
+}
+.skin-scope :where([data-skin="close"]):hover { color: var(--skin-close-hover-color); filter: brightness(1.1); }
+/* corner placement helper (top-right of a positioned panel) */
+.skin-scope :where([data-skin="close"][data-corner]) {
+  position: absolute;
+  top: var(--skin-close-offset);
+  right: var(--skin-close-offset);
+}
+
+/* ── Badge / pill (azure status) ──────────────────────────────────────── */
+.skin-scope :where([data-skin="badge"]) {
+  display: inline-flex;
+  align-items: center;
+  background: var(--skin-badge-bg);
+  border: var(--skin-badge-border);
+  color: var(--skin-badge-color);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+/* ── Panel / surface & modal ──────────────────────────────────────────── */
+.skin-scope :where([data-skin="panel"]) {
+  background: var(--skin-surface-bg);
+  border: 1px solid var(--skin-surface-border);
+  border-radius: var(--skin-surface-radius);
+  color: var(--skin-text-primary);
+}
+.skin-scope :where([data-skin="modal-backdrop"]) {
+  position: fixed;
+  inset: 0;
+  background: var(--skin-modal-overlay-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--skin-modal-z-index);
+}
+.skin-scope :where([data-skin="modal"]) {
+  background: var(--skin-modal-container-bg);
+  border: 1px solid var(--skin-modal-container-border);
+  border-radius: var(--skin-surface-radius);
+  color: var(--skin-text-primary);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+
+/* ── Decorative divider under a title (line · ✦ · line) ───────────────── */
+.skin-scope :where([data-skin="titlesep"]) { display: flex; align-items: center; gap: 8px; margin: 8px 0 4px; }
+.skin-scope :where([data-skin="titlesep"])::before,
+.skin-scope :where([data-skin="titlesep"])::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--skin-titlesep-line);
+}
+
+/* ── Status colors (met / unmet), reusable helpers ────────────────────── */
+.skin-scope :where(.skin-status-met) { color: var(--skin-status-met); }
+.skin-scope :where(.skin-status-unmet) { color: var(--skin-status-unmet); }

@@ -7,6 +7,10 @@ import {
 } from '@/ui/idleVillage/skins/jobPoiSkinConfig';
 import { GenericPoiSkin } from './GenericPoiSkin';
 import { getBloomStyle } from '@/ui/idleVillage/interaction/bloomEffect';
+import type { StatRequirement } from '@/balancing/config/idleVillage/types';
+import type { StatBlock } from '@/balancing/types';
+import { evaluateStatRequirement } from '@/engine/game/idleVillage/statMatching';
+import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 
 /**
  * Runtime status of the job from the engine.
@@ -50,25 +54,14 @@ export interface JobPOIProps {
   maxSlots?: number;
   /** Whether this job can accept drops (based on requirements, phase, etc.). */
   canAcceptDrop?: boolean;
-  /** Requirements for assigning a resident (activity-level, can be overridden per-slot). */
-  requirements?: {
-    minStrength?: number;
-    minDexterity?: number;
-    maxFatigue?: number;
-    minHp?: number;
-    requiredSkills?: string[];
-  };
-  /** Individual slot configurations with per-slot requirements. */
+  /** Activity-level stat requirement used as fallback for slots. */
+  requirements?: StatRequirement;
+  /** Individual slot configurations with per-slot stat requirements. */
   slots?: Array<{
     id: string;
     assignedResidentId?: string;
-    requirements?: {
-      minStrength?: number;
-      minDexterity?: number;
-      maxFatigue?: number;
-      minHp?: number;
-      requiredSkills?: string[];
-    };
+    /** Per-slot stat requirement; falls back to the activity-level `requirements` prop. */
+    statRequirement?: StatRequirement;
   }>;
   /** Called when a resident is dropped on this POI. */
   onDrop?: (residentId: string) => void;
@@ -141,28 +134,54 @@ export function JobPOI(props: JobPOIProps): JSX.Element {
 
   // Get currently dragged resident from dnd context
   const { active } = useDndContext();
-  const draggedResident = active?.data.current as { resident?: { stats?: { hp?: number } } } | undefined;
-  const residentHp = draggedResident?.resident?.stats?.hp ?? 0;
+  const draggedResident = active?.data.current as {
+    resident?: {
+      currentHp?: number;
+      stats?: { hp?: number };
+      fatigue?: number;
+      statTags?: string[];
+      statSnapshot?: Record<string, unknown>;
+    };
+  } | undefined;
 
-  // Highlight state logic - bloom only when dragging pgToken AND at least one free slot AND pg meets requirements for that slot
+  const residentHp = draggedResident?.resident?.currentHp ?? draggedResident?.resident?.stats?.hp ?? 0;
+  const residentFatigue = draggedResident?.resident?.fatigue ?? 0;
+
+  // Build a minimal ResidentState for canonical stat matching
+  const residentForEval: ResidentState | undefined = draggedResident?.resident
+    ? {
+        id: '',
+        displayName: '',
+        status: 'available',
+        currentHp: residentHp,
+        maxHp: residentHp,
+        fatigue: residentFatigue,
+        isHero: false,
+        isInjured: false,
+        survivalCount: 0,
+        survivalScore: 0,
+        statTags: draggedResident.resident.statTags ?? [],
+        statSnapshot: {
+          hp: residentHp,
+          fatigue: residentFatigue,
+          ...(draggedResident.resident.statSnapshot ?? {}),
+        } as Partial<StatBlock>,
+      }
+    : undefined;
+
+  // Highlight state logic - bloom only when dragging a pg token AND at least one free slot AND the pg meets the slot's stat requirement
   type HighlightState = 'idle' | 'valid' | 'invalid';
   const highlightState: HighlightState = (() => {
-    // Check if there's a resident being dragged
-    if (!active) return 'idle';
-    // Check if POI can accept drops and has free slots
+    if (!active || !residentForEval) return 'idle';
     if (!canAcceptDrop || freeSlots === 0) return 'invalid';
-    // Check if dragged resident meets requirements for at least one free slot
-    const hasValidSlot = slots.some(slot => {
+
+    const hasValidSlot = slots.some((slot) => {
       if (slot.assignedResidentId) return false; // slot is occupied
-      const slotReq = slot.requirements || requirements;
+      const slotReq = slot.statRequirement ?? requirements;
       if (!slotReq) return true; // no requirements = valid
-      // Check if resident meets slot requirements
-      if (slotReq.minHp && residentHp < slotReq.minHp) return false;
-      if (slotReq.minStrength && draggedResident?.resident?.stats?.strength < slotReq.minStrength) return false;
-      if (slotReq.minDexterity && draggedResident?.resident?.stats?.dexterity < slotReq.minDexterity) return false;
-      if (slotReq.maxFatigue && draggedResident?.resident?.fatigue > slotReq.maxFatigue) return false;
-      return true;
+      return evaluateStatRequirement(residentForEval, slotReq).matches;
     });
+
     return hasValidSlot ? 'valid' : 'invalid';
   })();
 

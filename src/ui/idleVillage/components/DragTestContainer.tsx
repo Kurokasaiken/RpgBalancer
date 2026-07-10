@@ -129,10 +129,7 @@ export interface DragTestContainerProps {
   validationResults?: DropValidationResult[];
   showHUDSignals?: boolean;
   isInlineLayout?: boolean;
-  dragVisualState?: {
-    mode: 'idle' | 'dragging' | 'flight';
-    residentId?: string;
-  };
+  dragVisualState?: DragVisualState;
   /** Enable virtualization for large rosters */
   enableVirtualization?: boolean;
   /** Component ID for sortable dragging */
@@ -151,6 +148,11 @@ export interface DragTestContainerProps {
   /** Use Wanderlust skin styling instead of default PgCard */
   useWanderlustSkin?: boolean;
 }
+
+type DragVisualState = {
+  mode: 'idle' | 'dragging' | 'flight' | 'returning';
+  residentId?: string;
+};
 
 /**
  * Main DragTestContainer component.

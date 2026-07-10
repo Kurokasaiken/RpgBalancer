@@ -45,10 +45,7 @@ export interface VillageRosterSectionProps {
   /** Additional inline styles */
   style?: React.CSSProperties;
   /** Premium drag visual state for CardSocket */
-  dragVisualState?: {
-    mode: 'idle' | 'dragging' | 'flight';
-    residentId?: string;
-  };
+  dragVisualState?: DragVisualState;
   /** Current sort mode for roster */
   sortMode?: RosterSortMode;
   /** Callback when sort mode changes */
@@ -60,6 +57,11 @@ export interface VillageRosterSectionProps {
   /** Status label for locked residents (default: 'Assigned') */
   lockedStatusLabel?: string;
 }
+
+type DragVisualState = {
+  mode: 'idle' | 'dragging' | 'flight' | 'returning';
+  residentId?: string;
+};
 
 /**
  * VillageRosterSection - Roster Section Wrapper (CANONICAL VERSION)

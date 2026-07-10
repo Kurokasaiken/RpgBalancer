@@ -11,7 +11,12 @@ import { motion, useDragControls } from 'framer-motion';
 import { useHeavyDrag } from '@/ui/wanderlust-surface/useHeavyDrag';
 import { useSkinSystem } from '../../hooks/useSkinSystem';
 import { ResidentSlotRack } from '../../components/ResidentSlotRack';
-import type { ResidentSlotViewModel } from '../../slots/types';
+import type { ResidentSlotViewModel, SlotBloomState } from '../../slots/types';
+import type { StatRequirementRow } from '../../utils/statRequirementDisplay';
+import { getStatIconComponent } from '@/ui/shared/statIconUtils';
+
+/** Drop-validation state a slot can carry into the rack (mirrors LocationDropState). */
+type SlotDropState = 'idle' | 'valid' | 'invalid' | 'locked';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import type { LocationDropState } from '../../map/validators/locationDropValidators';
 import { useSkinSlot, type UseSkinSlotOptions } from '../../hooks/useSkinSlot';
@@ -36,6 +41,7 @@ import type {
 } from '../types/SkinSchema';
 import { WanderlustSurface } from '@/ui/wanderlust-surface/WanderlustSurface';
 import { InsetPanel } from '@/ui/wanderlust-surface/InsetPanel';
+import { GenericPoiSkin } from '@/ui/idleVillage/components/minimal/GenericPoiSkin';
 import { WanderlustRequirementList } from '@/ui/wanderlust-surface/layout/WanderlustLayout';
 import { WanderlustAmbientField } from '@/ui/wanderlust-surface/layout/WanderlustAmbientField';
 import { V9GlassLayersOnly } from '@/ui/v9-skin/V9GlassLayersOnly';
@@ -50,6 +56,13 @@ export interface ActivityDetailSlotData {
   progress: number;
   assignedWorkerName?: string;
   assignedWorkerAvatarUrl?: string;
+  /** Visual profile ids carried through so the slot rack resolves the
+   *  assigned resident's REAL portrait (not the default) after remapping. */
+  visualProfileId?: string;
+  statProfileId?: string;
+  /** Live drop-validation state for the currently-dragged token. Drives the
+   *  shared AAA bloom on the slot; defaults to 'idle' when no drag is active. */
+  dropState?: SlotDropState;
 }
 
 /**
@@ -67,6 +80,10 @@ function mapToResidentSlotViewModel(
         id: slot.residentId ?? slot.id,
         displayName: slot.assignedWorkerName,
         portraitUrl: slot.assignedWorkerAvatarUrl,
+        // Carry the visual profile ids so the rack resolves the REAL portrait
+        // (branch 3 of resolveResidentPortrait) instead of the default one.
+        visualProfileId: slot.visualProfileId,
+        statProfileId: slot.statProfileId,
         status: 'available',
         fatigue: 0,
         currentHp: 1,
@@ -78,6 +95,12 @@ function mapToResidentSlotViewModel(
       } as ResidentState)
     : undefined;
 
+  // Live drop state flows in from the controller (via ActivityDetailSlotData).
+  // Assigned slots read 'locked'; free slots read 'valid'/'invalid' during a
+  // drag. This is what lets the bloom fire inside the skin-aware detail.
+  const dropState: SlotDropState = slot.dropState ?? 'idle';
+  const bloomState: SlotBloomState = dropState === 'valid' ? 'valid' : 'idle';
+
   return {
     id: slot.id,
     index,
@@ -88,8 +111,8 @@ function mapToResidentSlotViewModel(
     activityLabel: 'POI Activity',
     displayRole: 'activity',
     isPlaceholder: false,
-    dropState: 'idle',
-    bloomState: 'idle',
+    dropState,
+    bloomState,
     status: isAssigned ? 'assigned' : 'empty',
     telemetryTags: [],
   };
@@ -120,6 +143,13 @@ export interface ActivityCapsuleDetailSkinAwareProps {
   /** Slot management */
   slots: ActivityDetailSlotData[];
   maxSlots: number;
+  /** Resident currently being dragged, so the slot rack can render drop-target
+   *  feedback (bloom + highlight) exactly like the standalone rack pages. */
+  draggingResidentId?: string | null;
+  /** Requirement rows derived from the activity's `statRequirement` (variable
+   *  count; name/icon/color resolved from the Balancer stat catalog). When
+   *  omitted the requirements panel is hidden. */
+  requirements?: StatRequirementRow[];
   
   /** Information display */
   durationDisplay: string;
@@ -170,6 +200,11 @@ export interface ActivityCapsuleDetailSkinAwareProps {
 
   /** Presentation */
   inlineMode?: boolean;
+
+  /** POI medallion mirror: the icon of the POI that opens this detail, so the
+   *  header circle reproduces the EXACT same POI (same halo fill = `progress`).
+   *  Defaults to a star if the opening context isn't provided. */
+  poiIcon?: string;
 }
 
 export function ActivityCapsuleDetailSkinAware({
@@ -183,6 +218,8 @@ export function ActivityCapsuleDetailSkinAware({
   elapsed,
   slots,
   maxSlots,
+  draggingResidentId,
+  requirements,
   durationDisplay,
   rewardDisplay,
   etaDisplay,
@@ -213,6 +250,7 @@ export function ActivityCapsuleDetailSkinAware({
   onSkinChange,
   dataTestId = 'activity-capsule-detail-skin-aware',
   inlineMode = false,
+  poiIcon = '⭐',
 }: ActivityCapsuleDetailSkinAwareProps) {
   // TS-Series skin system integration
   const skinSystem = useSkinSystem();
@@ -359,18 +397,6 @@ export function ActivityCapsuleDetailSkinAware({
   
   // Drag handlers
 
-  // Debug logging
-  useEffect(() => {
-    console.log('DEBUG ActivityCapsuleDetailSkinAware:', {
-      showSlots,
-      showTelemetry,
-      showInfo,
-      isOpen,
-      slots: slots.length,
-      telemetry: telemetry.length,
-    });
-  }, [showSlots, showTelemetry, showInfo, isOpen, slots, telemetry]);
-  
   // Generate CSS custom properties
   const cssVars = useMemo((): React.CSSProperties => {
     const { window, poi, header, ornament, info, slotRack, telemetry, cta, animation, typography, audio, accessibility } = skinConfig;
@@ -666,49 +692,19 @@ export function ActivityCapsuleDetailSkinAware({
 
           {/* Header */}
           <div className="activity-capsule-detail-skin-aware__header">
-            {/* POI — progress ring con calcolo circumference corretto */}
+            {/* POI — the EXACT same medallion that opens this detail, reproduced
+                here with the same `progress` so both halos fill together. */}
             <div className="activity-capsule-detail-skin-aware__poi">
               {(() => {
                 const poiSizePx = parseInt(skinConfig.poi.poiSize) || 60;
-                const outerR = poiSizePx * 0.38;
-                const innerR = poiSizePx * 0.30;
-                const circumference = 2 * Math.PI * innerR;
-                const dashFilled = circumference * Math.min(1, Math.max(0, progress));
-                const dashGap = circumference - dashFilled;
                 return (
-                  <svg
-                    width={poiSizePx}
-                    height={poiSizePx}
-                    viewBox={`0 0 ${poiSizePx} ${poiSizePx}`}
-                    className="activity-capsule-detail-skin-aware__poi-svg"
-                  >
-                    {/* Outer cavity ring */}
-                    <circle cx={poiSizePx/2} cy={poiSizePx/2} r={outerR}
-                      fill="rgba(6,4,2,0.75)"
-                      stroke="rgba(160,110,25,0.5)"
-                      strokeWidth="1.5"
-                    />
-                    {/* Background track */}
-                    <circle cx={poiSizePx/2} cy={poiSizePx/2} r={innerR}
-                      fill="none"
-                      stroke="rgba(90,60,10,0.25)"
-                      strokeWidth="3"
-                    />
-                    {/* Progress arc */}
-                    <circle cx={poiSizePx/2} cy={poiSizePx/2} r={innerR}
-                      fill="none"
-                      stroke="rgba(215,165,45,0.85)"
-                      strokeWidth="3"
-                      strokeDasharray={`${dashFilled} ${dashGap}`}
-                      strokeLinecap="round"
-                      transform={`rotate(-90 ${poiSizePx/2} ${poiSizePx/2})`}
-                      style={{ transition: 'stroke-dasharray 0.4s ease' }}
-                    />
-                    {/* Inner core dot */}
-                    <circle cx={poiSizePx/2} cy={poiSizePx/2} r={poiSizePx*0.10}
-                      fill="rgba(200,150,35,0.55)"
-                    />
-                  </svg>
+                  <GenericPoiSkin
+                    icon={poiIcon}
+                    progress={progress}
+                    size={poiSizePx}
+                    pillar={resolvedPillar === 'empire' ? 'empire' : 'wilderness'}
+                    enableHover={false}
+                  />
                 );
               })()}
             </div>
@@ -745,11 +741,14 @@ export function ActivityCapsuleDetailSkinAware({
               <div className="activity-capsule-detail-skin-aware__section-label">
                 Personaggi assegnati
               </div>
-              <InsetPanel style={{ overflow: 'hidden' }}>
+              {/* overflow visible so the slots' AAA bloom (drop-shadow halo)
+                  isn't clipped by the inset — matches the standalone rack pages. */}
+              <InsetPanel style={{ overflow: 'visible' }}>
                 <ResidentSlotRack
                   slots={residentSlots}
                   layout="detail"
                   overflowBehavior="scroll"
+                  draggingResidentId={draggingResidentId}
                   resolveDisplayInfo={resolveDisplayInfo}
                   getSlotActivityState={getSlotActivityState}
                   onSlotClick={(slotId) => {
@@ -831,32 +830,86 @@ export function ActivityCapsuleDetailSkinAware({
             <div className="activity-capsule-detail-skin-aware__ornament-line" />
           </div>
 
-          {/* Requirements — su pergamena */}
-          {showSlots && (
+          {/* Requirements — derived from the activity's statRequirement (variable
+              count). Name/icon/color per stat come from the Balancer catalog. */}
+          {requirements && requirements.length > 0 && (
             <div className="activity-capsule-detail-skin-aware__requirements">
               <div className="activity-capsule-detail-skin-aware__section-label">
                 Requisiti
               </div>
-              <InsetPanel material="parchment" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {[
-                  { label: 'Forza', current: 45, required: 60 },
-                  { label: 'Destrezza', current: 38, required: 50 },
-                  { label: 'Costituzione', current: 42, required: 40 },
-                ].map((req, i) => {
-                  const met = req.current >= req.required;
-                  const pct = Math.min(1, req.current / req.required);
+              <InsetPanel
+                style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: '8px',
+                  padding: '12px 14px',
+                  background: 'var(--skin-inset-bg, #060f16)',
+                  border: '1px solid var(--skin-inset-border, rgba(223,184,87,0.5))',
+                  borderRadius: 'var(--skin-inset-radius, 10px)',
+                }}
+              >
+                {requirements.map((req) => {
+                  const relationMeta = {
+                    all: { label: 'Richiesto', color: 'var(--skin-status-met, #7bc96f)' },
+                    any: { label: 'Uno tra', color: 'var(--skin-title-color, #f0cf6a)' },
+                    none: { label: 'Vietato', color: 'var(--skin-status-unmet, #d98a4a)' },
+                  }[req.relation];
+                  const Icon = getStatIconComponent(req.icon);
+                  const isColorClass = !!req.bgColor && /^(bg|text)-/.test(req.bgColor);
+                  const isColorValue = !!req.bgColor && /^(#|rgb|hsl|oklch)/.test(req.bgColor);
                   return (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <span style={{ flex: '0 0 88px', fontSize: '9px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(55, 38, 12, 0.65)', fontFamily: 'inherit' }}>
-                        {req.label}
+                    <span
+                      key={req.key}
+                      className={isColorClass ? req.bgColor : undefined}
+                      title={`${req.label} — ${relationMeta.label}`}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '7px',
+                        padding: '5px 10px',
+                        borderRadius: '999px',
+                        fontSize: '11px',
+                        lineHeight: 1,
+                        color: 'var(--skin-text-primary, #f5f2e8)',
+                        background: isColorValue
+                          ? req.bgColor
+                          : isColorClass
+                            ? undefined
+                            : 'rgba(255,255,255,0.05)',
+                        border: `1px solid ${relationMeta.color}`,
+                      }}
+                    >
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          width: 15,
+                          height: 15,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: relationMeta.color,
+                          fontSize: '13px',
+                        }}
+                      >
+                        {Icon ? <Icon size={13} /> : req.icon ?? '◆'}
                       </span>
-                      <div style={{ flex: 1, height: '3px', background: 'rgba(110, 80, 30, 0.18)', borderRadius: '2px', overflow: 'hidden' }}>
-                        <div style={{ width: `${pct * 100}%`, height: '100%', background: met ? 'rgba(65, 115, 50, 0.75)' : 'rgba(160, 85, 25, 0.65)', borderRadius: '2px', transition: 'width 0.4s ease' }} />
-                      </div>
-                      <span style={{ fontSize: '11px', fontVariantNumeric: 'tabular-nums', minWidth: '46px', textAlign: 'right', color: met ? 'rgba(45, 90, 35, 0.9)' : 'rgba(130, 65, 20, 0.9)' }}>
-                        {req.current}<span style={{ opacity: 0.5, fontSize: '9px' }}>/{req.required}</span>
+                      <span style={{ fontWeight: 600, letterSpacing: '0.02em' }}>{req.label}</span>
+                      {req.numeric && (
+                        <span style={{ fontVariantNumeric: 'tabular-nums', opacity: 0.85 }}>
+                          {req.numeric.operator} {req.numeric.value}
+                        </span>
+                      )}
+                      <span
+                        style={{
+                          fontSize: '8px',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.16em',
+                          color: relationMeta.color,
+                          opacity: 0.9,
+                        }}
+                      >
+                        {relationMeta.label}
                       </span>
-                    </div>
+                    </span>
                   );
                 })}
               </InsetPanel>
@@ -922,6 +975,41 @@ export function ActivityCapsuleDetailSkinAware({
         .activity-capsule-detail-surface .ws-content {
           position: relative;
           z-index: 2;
+        }
+
+        /* An open detail panel must NOT grow on hover — kill the generic
+           .ws-root--interactive hover scale for this surface only. Drag/lift
+           feedback still comes from the framer-motion wrapper. */
+        .activity-capsule-detail-surface.ws-root--interactive:hover {
+          transform: none;
+        }
+
+        /* ── Inherit the global V9 Obsidian default skin ──
+           The --detail-* tokens are applied INLINE via cssVars, so we override
+           the key ones with !important (stylesheet !important beats inline).
+           Obsidian base (#060f16) + azure light leak + gold accents + ivory text. */
+        .activity-capsule-detail-surface.ws-root {
+          --detail-frame-gradient:
+            radial-gradient(circle at 0% 0%, rgba(0,229,255,0.15) 0%, transparent 50%),
+            var(--skin-surface-base, #060f16) !important;
+          --detail-window-background: var(--skin-surface-base, #060f16) !important;
+          --detail-text-primary: var(--skin-text-primary, #f5f2e8) !important;
+          --detail-text-secondary: var(--skin-text-secondary, rgba(245,242,232,0.70)) !important;
+          --detail-text-tertiary: var(--skin-text-muted, rgba(245,242,232,0.50)) !important;
+          --detail-name-color: var(--skin-title-color, #f0cf6a) !important;
+          --detail-type-color: var(--skin-label-tertiary, #9a8246) !important;
+          --detail-initials-color: var(--skin-text-primary, #f5f2e8) !important;
+        }
+        /* base fill = obsidian + azure leak (over any warm veil) */
+        .activity-capsule-detail-surface .activity-capsule-detail-skin-aware__background {
+          background:
+            radial-gradient(circle at 0% 0%, rgba(0,229,255,0.15) 0%, transparent 50%),
+            var(--skin-surface-base, #060f16) !important;
+        }
+        /* slot rack + requisiti panels → obsidian inset with gold trim */
+        .activity-capsule-detail-surface .activity-capsule-detail-skin-aware__requirements,
+        .activity-capsule-detail-surface .activity-capsule-detail-skin-aware__info-row {
+          --slot-rack-slot-bg: var(--skin-inset-bg, #060f16);
         }
 
         /* "Beautiful Fantasy" ambient — aggiunge un velo indaco/cosmico al fondo scuro */
@@ -1048,23 +1136,30 @@ export function ActivityCapsuleDetailSkinAware({
         
         .activity-capsule-detail-skin-aware__close-button {
           position: absolute;
-          top: 14px;
-          right: 18px;
-          width: 22px;
-          height: 22px;
-          background: none;
-          border: none;
+          top: var(--skin-close-offset, 12px);
+          right: var(--skin-close-offset, 12px);
+          width: var(--skin-close-size, 34px);
+          height: var(--skin-close-size, 34px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: var(--skin-close-bg);
+          border: var(--skin-close-border);
+          border-radius: var(--skin-close-radius, 50%);
+          box-shadow: var(--skin-close-shadow);
           cursor: pointer;
-          color: var(--detail-close-button-color);
-          font-size: 15px;
+          color: var(--skin-close-color);
+          font-size: 1.15rem;
+          font-weight: 300;
           line-height: 1;
-          transition: color 0.15s;
+          transition: color 0.15s, filter 0.18s;
           z-index: 11;
           font-family: var(--detail-primary-font);
         }
-        
+
         .activity-capsule-detail-skin-aware__close-button:hover {
-          color: var(--detail-close-button-hover-color);
+          color: var(--skin-close-hover-color);
+          filter: brightness(1.25);
         }
         
         /*
@@ -1466,6 +1561,34 @@ export function ActivityCapsuleDetailSkinAware({
           box-shadow: 0 0 14px rgba(58, 178, 78, 0.18);
         }
         
+        /* ── Inherit the global default skin (--skin-* tokens) so the detail
+           buttons match the rest of the app regardless of skin-system
+           resolution. Avvia = CTA plaque, Annulla = engraved secondary. ── */
+        .activity-capsule-detail-skin-aware__button--start {
+          background: var(--skin-cta-bg);
+          border: var(--skin-cta-border);
+          color: var(--skin-cta-color);
+          clip-path: var(--skin-cta-clip);
+          border-radius: 0;
+          box-shadow: var(--skin-cta-shadow);
+          text-shadow: var(--skin-cta-text-shadow);
+          letter-spacing: 0.28em;
+        }
+        .activity-capsule-detail-skin-aware__button--start:hover {
+          filter: var(--skin-cta-hover-filter);
+          box-shadow: var(--skin-cta-hover-glow);
+        }
+        .activity-capsule-detail-skin-aware__button--cancel {
+          background: var(--skin-btn2-bg);
+          border: var(--skin-btn2-border);
+          color: var(--skin-btn2-color);
+          box-shadow: var(--skin-btn2-shadow);
+          text-shadow: var(--skin-incision-label);
+        }
+        .activity-capsule-detail-skin-aware__button--cancel:hover {
+          filter: brightness(1.12);
+        }
+
         .activity-capsule-detail-skin-aware__button:disabled {
           opacity: var(--detail-button-disabled-opacity);
           cursor: not-allowed;

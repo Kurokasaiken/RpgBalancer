@@ -30,7 +30,7 @@ import { useResidentSlotController } from '@/ui/idleVillage/slots/useResidentSlo
 import type { ResidentSlotBlueprint } from '@/ui/idleVillage/slots/types';
 import { DEFAULT_IDLE_VILLAGE_CONFIG } from '@/balancing/config/idleVillage/defaultConfig';
 import { evaluateStatRequirement } from '@/engine/game/idleVillage/statMatching';
-import { JobPOI } from '@/ui/idleVillage/components/minimal/JobPOI';
+import { JobPOI } from '@/ui/idleVillage/frozen/kits/poiKit';
 
 const RACK_ACTIVITY = DEFAULT_IDLE_VILLAGE_CONFIG.activities.slot_rack_lab;
 const RACK_BLUEPRINTS = ((RACK_ACTIVITY.metadata as { slotBlueprints?: ResidentSlotBlueprint[] } | undefined)?.slotBlueprints ?? []);
@@ -38,19 +38,6 @@ const RACK_BLUEPRINTS = ((RACK_ACTIVITY.metadata as { slotBlueprints?: ResidentS
 // dnd-kit droppable id used internally by JobPOI — must match its `job-poi-drop-${activityId}` pattern
 const POI_DROP_ID = `job-poi-drop-${RACK_ACTIVITY.id}`;
 
-// Translate NumericStatRequirement → JobPOI legacy format (used only for bloom approximation)
-function buildPoiRequirements() {
-  for (const bp of RACK_BLUEPRINTS) {
-    const allOf = bp.requirement?.allOf ?? [];
-    for (const r of allOf) {
-      if (typeof r === 'object' && r.stat === 'hp' && r.operator === '>') {
-        return { minHp: r.value };
-      }
-    }
-  }
-  return undefined;
-}
-const POI_REQUIREMENTS = buildPoiRequirements();
 
 export default function MinimalJobPoiRosterIntegrationPage() {
   const [draggingResidentId, setDraggingResidentId] = useState<string | null>(null);
@@ -80,12 +67,12 @@ export default function MinimalJobPoiRosterIntegrationPage() {
   const realSlots = controller.slots.filter((s) => !s.isPlaceholder);
   const freeSlots = realSlots.filter((s) => !s.assignedResidentId).length;
 
-  // Slots in JobPOI legacy format (bloom approximation only)
+  // Slots for JobPOI bloom validation — each slot carries its canonical StatRequirement.
   const poiSlots = useMemo(
     () => realSlots.map((s) => ({
       id: s.id,
       assignedResidentId: s.assignedResidentId ?? undefined,
-      requirements: POI_REQUIREMENTS,
+      statRequirement: s.requirement,
     })),
     [realSlots]
   );
@@ -98,7 +85,7 @@ export default function MinimalJobPoiRosterIntegrationPage() {
       !slot.assignedResidentId &&
       evaluateStatRequirement(resident, slot.requirement).matches
     ) ?? null;
-  }, [controller.slots, residentsById, assignedIds]);
+  }, [controller, residentsById, assignedIds]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -142,7 +129,7 @@ export default function MinimalJobPoiRosterIntegrationPage() {
       : null;
 
     return { flightToSlot: { slotId: slot.id, element } };
-  }, [controller.slots, residentsById, assignedIds, isDetailOpen]);
+  }, [controller, residentsById, assignedIds, isDetailOpen]);
 
   // Kit-managed drop flight landing
   const handleFlightComplete = useCallback((residentId: string, slotId?: string) => {
@@ -238,7 +225,6 @@ export default function MinimalJobPoiRosterIntegrationPage() {
                       freeSlots={freeSlots}
                       maxSlots={realSlots.length}
                       canAcceptDrop={freeSlots > 0}
-                      requirements={POI_REQUIREMENTS}
                       slots={poiSlots}
                       onClick={() => setIsDetailOpen((o) => !o)}
                     />

@@ -76,11 +76,13 @@ interface CustomDragOverlayProps {
   /** Use PgCard skin preview instead of WorkerCard */
   usePgCardPreview?: boolean;
   /** Premium drag visual state — single source of truth for overlay visibility */
-  dragVisualState?: {
-    mode: 'idle' | 'dragging' | 'flight';
-    residentId?: string;
-  };
+  dragVisualState?: DragVisualState;
 }
+
+type DragVisualState = {
+  mode: 'idle' | 'dragging' | 'flight' | 'returning';
+  residentId?: string;
+};
 
 // Drop animation: spring the overlay CENTER back to the CENTER of the original PgCard.
 //

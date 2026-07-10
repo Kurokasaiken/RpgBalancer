@@ -175,22 +175,38 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
         transition: transform 560ms cubic-bezier(0.42, 0, 0.2, 1);
       }
 
-      /* Heavy-bronze lock: fast close, hard impact at home, a ~2° elastic
-         micro-rebound at high speed, then a dead stop (metal-on-metal). */
+      /* Heavy-bronze lock: the ring ACCELERATES into home (peak velocity at
+         contact), impacts with a micro scale-compression (the "clunk"), kicks
+         back ~2.4° at high speed, does one damped bounce, then dead-stops on a
+         linear tail (metal-on-metal). No soft ease-out anywhere near the hit. */
       @keyframes bezelSlam {
+        /* approach: accelerate — fastest the instant before contact */
         0% {
           transform: scale(${bezelStartScale}) rotate(${bezelStartRotate}deg);
-          animation-timing-function: cubic-bezier(0.45, 0, 0.75, 1);
+          animation-timing-function: cubic-bezier(0.66, 0, 0.9, 0.25);
         }
-        54% {
-          transform: scale(1) rotate(0deg);
-          animation-timing-function: cubic-bezier(0.12, 0.9, 0.2, 1);
+        /* CONTACT at peak velocity + scale compression = the impact */
+        48% {
+          transform: scale(0.99) rotate(0deg);
+          animation-timing-function: cubic-bezier(0.1, 0.9, 0.15, 1);
         }
+        /* elastic micro-rebound backward, near-instant kick */
+        58% {
+          transform: scale(1) rotate(-2.4deg);
+          animation-timing-function: cubic-bezier(0.95, 0, 1, 1);
+        }
+        /* slam back to home, hard (linear) */
         66% {
-          transform: scale(1) rotate(-2.2deg);
-          animation-timing-function: cubic-bezier(0.9, 0, 0.92, 1);
+          transform: scale(1) rotate(0.6deg);
+          animation-timing-function: linear;
         }
-        78% {
+        /* second damped bounce */
+        72% {
+          transform: scale(1) rotate(-0.5deg);
+          animation-timing-function: linear;
+        }
+        /* DEAD STOP — no easing tail, freezes */
+        76% {
           transform: scale(1) rotate(0deg);
         }
         100% {
@@ -505,7 +521,7 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
             transformOrigin: '0px 0px',
             // Heavy-bronze lock choreography: slam + micro-rebound + dead stop.
             // Skipped while extracting (JS drives the transform there).
-            ...(bezelSlamActive ? { animation: 'bezelSlam 620ms both' } : {}),
+            ...(bezelSlamActive ? { animation: 'bezelSlam 440ms both' } : {}),
             // Only apply drop-shadow in debug mode
             ...(debugViz ? {
               filter: `drop-shadow(0 0 24px ${debugViz?.colors?.bezel || '#FF5C8D'})`,
@@ -615,10 +631,11 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
                   const retractPx = (1 - teethExtrusion) * (TH + 2);
                   const teethStyle: React.CSSProperties = {
                     transform: `translate(0px, ${retractPx.toFixed(2)}px)`,
-                    // JS drives per-frame retraction during extraction; the CSS
-                    // transition (with 560ms delay) only handles the extrusion
-                    // AFTER the bezel has finished closing on insertion.
-                    transition: extractionProgress > 0 ? 'none' : 'transform 240ms ease-out 560ms',
+                    // JS drives per-frame retraction during extraction; on
+                    // insertion the teeth SNAP out (70ms, hard) synced to the
+                    // ~48% contact frame of the 440ms bezelSlam (≈200ms delay),
+                    // so the bite lands ON the impact instead of gliding out late.
+                    transition: extractionProgress > 0 ? 'none' : 'transform 70ms cubic-bezier(0.2, 0, 0, 1) 200ms',
                   };
                   return (
                     <g key={`tooth-${i}`} transform={`translate(${x.toFixed(2)}, ${y.toFixed(2)}) rotate(${(deg - 90).toFixed(1)})`}>

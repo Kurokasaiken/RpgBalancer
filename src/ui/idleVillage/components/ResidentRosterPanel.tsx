@@ -35,10 +35,7 @@ export interface ResidentRosterPanelProps {
     scenarioType?: string;
   };
   /** Premium drag visual state for CardSocket */
-  dragVisualState?: {
-    mode: 'idle' | 'dragging' | 'flight';
-    residentId?: string;
-  };
+  dragVisualState?: DragVisualState;
   /** Optional additional controls to render in header */
   headerControls?: ReactNode;
   /** Use Wanderlust skin styling instead of default PgCard */
@@ -48,6 +45,11 @@ export interface ResidentRosterPanelProps {
   /** Status label for locked residents (default: 'Assigned') */
   lockedStatusLabel?: string;
 }
+
+type DragVisualState = {
+  mode: 'idle' | 'dragging' | 'flight' | 'returning';
+  residentId?: string;
+};
 
 /**
  * ResidentRosterPanel - Roster Component (CANONICAL VERSION)

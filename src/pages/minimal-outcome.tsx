@@ -1,4 +1,11 @@
 import React, { useState } from 'react';
+import {
+  SkinScope,
+  SkinTitle,
+  SkinButton,
+  SkinCloseButton,
+  SkinBadge,
+} from '@/ui/idleVillage/skins/primitives';
 
 /**
  * MinimalOutcomeModalPage
@@ -8,6 +15,9 @@ import React, { useState } from 'react';
  *
  * Route: /minimal-outcome
  * Spec: src/docs/docs/minimal_slice/10_outcome.md
+ *
+ * Skinned via <SkinScope> + role primitives — no hardcoded colors. Every
+ * title/button/close/badge inherits the active `--skin-*` skin (V9 default).
  */
 
 interface OutcomeData {
@@ -67,12 +77,12 @@ const mockOutcomes: OutcomeData[] = [
 ];
 
 export default function MinimalOutcomeModalPage() {
-  const [outcomes, setOutcomes] = useState(mockOutcomes);
+  const [outcomes] = useState(mockOutcomes);
   const [selectedOutcomeIdx, setSelectedOutcomeIdx] = useState(0);
   const [visibleOutcomeIdx, setVisibleOutcomeIdx] = useState<number | null>(0);
 
-  const currentOutcome = outcomes[selectedOutcomeIdx];
   const visibleOutcome = visibleOutcomeIdx !== null ? outcomes[visibleOutcomeIdx] : null;
+  void selectedOutcomeIdx;
 
   const handleContinue = () => {
     setVisibleOutcomeIdx(null);
@@ -90,28 +100,30 @@ export default function MinimalOutcomeModalPage() {
   };
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>OutcomeModal Isolated Test</h1>
-      <p style={styles.subtitle}>Route: /minimal-outcome | Spec: src/docs/docs/minimal_slice/10_outcome.md</p>
+    <SkinScope style={styles.container}>
+      <SkinTitle>OutcomeModal Isolated Test</SkinTitle>
+      <SkinTitle level="subtitle">
+        Route: /minimal-outcome · Spec: src/docs/docs/minimal_slice/10_outcome.md
+      </SkinTitle>
 
       <div style={styles.contentArea}>
-        <div style={styles.buttonsPanel}>
-          <h2>Show Outcomes</h2>
+        <div data-skin="panel" style={styles.buttonsPanel}>
+          <SkinTitle level="section">Show Outcomes</SkinTitle>
           <div style={styles.buttonList}>
             {outcomes.map((outcome, idx) => (
-              <button
+              <SkinButton
                 key={idx}
+                variant="secondary"
                 onClick={() => handleShowOutcome(idx)}
-                style={{
-                  ...styles.outcomeButton,
-                  backgroundColor: outcome.success ? '#4caf50' : '#f44336',
-                }}
+                style={styles.outcomeButton}
                 data-testid={`btn-outcome-${idx}`}
               >
                 {outcome.residentName}
                 <br />
-                {outcome.success ? '✓ Success' : '✗ Failure'}
-              </button>
+                <span className={outcome.success ? 'skin-status-met' : 'skin-status-unmet'}>
+                  {outcome.success ? '✓ Success' : '✗ Failure'}
+                </span>
+              </SkinButton>
             ))}
           </div>
         </div>
@@ -119,7 +131,7 @@ export default function MinimalOutcomeModalPage() {
         {/* Modal Backdrop */}
         {visibleOutcome && (
           <div
-            style={styles.modalBackdrop}
+            data-skin="modal-backdrop"
             onClick={handleContinue}
             onKeyDown={handleKeyDown}
             tabIndex={0}
@@ -127,17 +139,24 @@ export default function MinimalOutcomeModalPage() {
             data-testid="outcome-modal-backdrop"
           >
             {/* Modal Content */}
-            <div style={styles.modal} onClick={(e) => e.stopPropagation()} data-testid="outcome-modal">
+            <div
+              data-skin="modal"
+              style={styles.modal}
+              onClick={(e) => e.stopPropagation()}
+              data-testid="outcome-modal"
+            >
+              <SkinCloseButton corner onClick={handleContinue} aria-label="Chiudi esito" />
+
               {/* Header */}
-              <div
-                style={{
-                  ...styles.modalHeader,
-                  backgroundColor: visibleOutcome.success ? '#4caf50' : '#f44336',
-                }}
-              >
-                <h2 style={styles.modalTitle} data-testid="outcome-title">
-                  {visibleOutcome.success ? '✓ SUCCESS' : '✗ FAILURE'}
-                </h2>
+              <div style={styles.modalHeader}>
+                <SkinBadge>{visibleOutcome.success ? 'Esito' : 'Esito'}</SkinBadge>
+                <SkinTitle
+                  data-testid="outcome-title"
+                  className={visibleOutcome.success ? 'skin-status-met' : 'skin-status-unmet'}
+                  style={styles.modalTitle}
+                >
+                  {visibleOutcome.success ? '✓ Success' : '✗ Failure'}
+                </SkinTitle>
               </div>
 
               {/* Content */}
@@ -151,23 +170,24 @@ export default function MinimalOutcomeModalPage() {
                 />
 
                 {/* Description */}
-                <h3 style={styles.residentNameModal} data-testid="outcome-resident-name">
+                <SkinTitle level="section" data-testid="outcome-resident-name" style={styles.residentNameModal}>
                   {visibleOutcome.residentName}
-                </h3>
-                <p style={styles.description} data-testid="outcome-description">
+                </SkinTitle>
+                <p data-testid="outcome-description" style={styles.description}>
                   {visibleOutcome.description}
                 </p>
 
                 {/* Consequence (if failure) */}
                 {visibleOutcome.consequence && (
-                  <div style={styles.consequenceBox} data-testid="outcome-consequence">
-                    <strong>⚠️ Consequence:</strong> {visibleOutcome.consequence}
+                  <div data-skin="panel" style={styles.consequenceBox} data-testid="outcome-consequence">
+                    <strong className="skin-status-unmet">⚠️ Consequence:</strong>{' '}
+                    <span className="skin-status-unmet">{visibleOutcome.consequence}</span>
                   </div>
                 )}
 
                 {/* Rewards */}
-                <div style={styles.rewardSection}>
-                  <h4 style={styles.rewardTitle}>Rewards</h4>
+                <div data-skin="panel" style={styles.rewardSection}>
+                  <SkinTitle level="section">Rewards</SkinTitle>
                   <div style={styles.rewardRow} data-testid="outcome-gold">
                     <span>Gold:</span>
                     <span style={styles.rewardValue}>{visibleOutcome.actualReward}</span>
@@ -179,8 +199,8 @@ export default function MinimalOutcomeModalPage() {
                 </div>
 
                 {/* Roll Info */}
-                <div style={styles.rollInfo} data-testid="outcome-margin">
-                  <small>
+                <div data-testid="outcome-margin" style={styles.rollInfo}>
+                  <small className="skin-text-secondary">
                     {visibleOutcome.success
                       ? `Succeeded by ${visibleOutcome.rollMargin}`
                       : `Failed by ${Math.abs(visibleOutcome.rollMargin)}`}
@@ -190,22 +210,18 @@ export default function MinimalOutcomeModalPage() {
 
               {/* Actions */}
               <div style={styles.modalActions}>
-                <button
-                  onClick={handleContinue}
-                  style={styles.continueButton}
-                  data-testid="outcome-continue-button"
-                >
+                <SkinButton variant="cta" onClick={handleContinue} data-testid="outcome-continue-button">
                   Continue
-                </button>
+                </SkinButton>
               </div>
             </div>
           </div>
         )}
       </div>
 
-      <div style={styles.testInfo}>
-        <h2>Test Information</h2>
-        <ul>
+      <div data-skin="panel" style={styles.testInfo}>
+        <SkinTitle level="section">Test Information</SkinTitle>
+        <ul style={styles.testList}>
           <li>
             <strong>Component:</strong> OutcomeModal
           </li>
@@ -220,165 +236,118 @@ export default function MinimalOutcomeModalPage() {
           </li>
         </ul>
       </div>
-    </div>
+    </SkinScope>
   );
 }
 
+/* Layout only — NO colors here. Every color comes from the skin scope/tokens. */
 const styles = {
   container: {
     padding: '2rem',
     maxWidth: '1200px',
     margin: '0 auto',
-    fontFamily: 'system-ui, -apple-system, sans-serif',
-    backgroundColor: '#f5f5f5',
     minHeight: '100vh',
-  } as React.CSSProperties,
-  title: {
-    fontSize: '2rem',
-    marginBottom: '0.5rem',
-    color: '#333',
-  } as React.CSSProperties,
-  subtitle: {
-    color: '#666',
-    marginBottom: '2rem',
-    fontSize: '0.9rem',
+    background: 'var(--skin-surface-bg)',
   } as React.CSSProperties,
   contentArea: {
     display: 'flex',
     gap: '2rem',
-    marginBottom: '2rem',
+    margin: '1.5rem 0 2rem',
     position: 'relative',
   } as React.CSSProperties,
   buttonsPanel: {
-    width: '250px',
-    backgroundColor: '#fff',
+    width: '260px',
     padding: '1.5rem',
-    borderRadius: '8px',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
     height: 'fit-content',
   } as React.CSSProperties,
   buttonList: {
     display: 'flex',
     flexDirection: 'column',
     gap: '0.75rem',
+    marginTop: '0.75rem',
   } as React.CSSProperties,
   outcomeButton: {
-    padding: '0.75rem',
-    borderRadius: '4px',
-    border: 'none',
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: '0.9rem',
-    cursor: 'pointer',
-    transition: 'all 0.2s',
-  } as React.CSSProperties,
-  modalBackdrop: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1000,
+    width: '100%',
+    textAlign: 'center',
+    lineHeight: 1.5,
   } as React.CSSProperties,
   modal: {
-    backgroundColor: '#fff',
-    borderRadius: '12px',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+    position: 'relative',
     maxWidth: '500px',
     width: '90%',
-    overflow: 'hidden',
   } as React.CSSProperties,
   modalHeader: {
-    padding: '2rem',
-    color: '#fff',
-    textAlign: 'center',
+    padding: '1.75rem 2rem 1rem',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '0.6rem',
   } as React.CSSProperties,
   modalTitle: {
     margin: 0,
-    fontSize: '1.5rem',
+    fontSize: '1.6rem',
   } as React.CSSProperties,
   modalContent: {
-    padding: '2rem',
+    padding: '0 2rem 1rem',
     textAlign: 'center',
   } as React.CSSProperties,
   outcomePortrait: {
     width: '120px',
     height: '120px',
-    borderRadius: '8px',
+    borderRadius: '10px',
     marginBottom: '1rem',
     objectFit: 'cover',
-    border: '3px solid #ddd',
+    border: '2px solid var(--skin-surface-border)',
   } as React.CSSProperties,
   residentNameModal: {
     margin: '0.5rem 0',
-    fontSize: '1.25rem',
-    color: '#333',
+    fontSize: '1.1rem',
   } as React.CSSProperties,
   description: {
     marginBottom: '1rem',
-    color: '#666',
     fontSize: '0.95rem',
     lineHeight: 1.6,
   } as React.CSSProperties,
   consequenceBox: {
     padding: '1rem',
-    backgroundColor: '#ffebee',
-    borderRadius: '6px',
     marginBottom: '1rem',
-    color: '#c62828',
     fontSize: '0.9rem',
+    textAlign: 'left',
   } as React.CSSProperties,
   rewardSection: {
-    padding: '1.5rem',
-    backgroundColor: '#f5f5f5',
-    borderRadius: '6px',
+    padding: '1.25rem 1.5rem',
     marginBottom: '1rem',
-  } as React.CSSProperties,
-  rewardTitle: {
-    margin: '0 0 0.75rem 0',
-    fontSize: '0.95rem',
-    color: '#333',
+    textAlign: 'left',
   } as React.CSSProperties,
   rewardRow: {
     display: 'flex',
     justifyContent: 'space-between',
-    padding: '0.5rem 0',
+    padding: '0.4rem 0',
     fontSize: '0.9rem',
   } as React.CSSProperties,
   rewardValue: {
     fontWeight: 'bold',
-    color: '#4caf50',
-    fontFamily: 'monospace',
+    color: 'var(--skin-title-color)',
+    fontFamily: 'var(--skin-font-display)',
   } as React.CSSProperties,
   rollInfo: {
-    color: '#999',
     fontSize: '0.85rem',
   } as React.CSSProperties,
   modalActions: {
-    padding: '1.5rem',
+    padding: '1.25rem 1.5rem 1.75rem',
     display: 'flex',
     gap: '1rem',
     justifyContent: 'center',
-    borderTop: '1px solid #e0e0e0',
-  } as React.CSSProperties,
-  continueButton: {
-    padding: '0.75rem 2rem',
-    backgroundColor: '#4caf50',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '4px',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-    transition: 'background-color 0.2s',
+    borderTop: '1px solid var(--skin-separator)',
   } as React.CSSProperties,
   testInfo: {
-    backgroundColor: '#fff',
-    padding: '2rem',
-    borderRadius: '8px',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+    padding: '1.5rem 2rem',
+  } as React.CSSProperties,
+  testList: {
+    margin: '0.5rem 0 0',
+    paddingLeft: '1.1rem',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.4rem',
   } as React.CSSProperties,
 };
