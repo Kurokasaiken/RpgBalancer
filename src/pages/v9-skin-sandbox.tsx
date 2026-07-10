@@ -745,17 +745,21 @@ export const V9SkinSandbox: React.FC = () => {
             <WanderlustSurface
               shape="panel"
               material={material}
-              interactive={wanderlustInteractive}
+              interactive={false}
               isDragging={wanderlustDragging || layoutDragging}
               isPaused={wanderlustPaused}
-              materialLayer={materialLayerConfig}
+              materialLayer={{ ...materialLayerConfig, microInteraction: false, heavyFeel: false }}
               style={{ width: '100%', minHeight: 800, borderRadius: '0 0 14px 14px' }}
             >
-              <WanderlustAmbientField paused={wanderlustDragging || layoutDragging}>
-              <div style={{ padding: '24px', background: V9.obsidianBg, borderRadius: 'inherit' }}>
+              <WanderlustAmbientField
+                paused={wanderlustDragging || layoutDragging}
+                fireflyCount={8}
+                style={{ background: V9.obsidianBg, borderRadius: 'inherit' }}
+              >
+              <div style={{ padding: '24px', background: 'transparent', borderRadius: 'inherit' }}>
                 {/* Composed header: plaque (space for icon/tag) + incised title */}
                 <div className="skin-title-row">
-                  <span className="skin-plaque" style={{ cursor: 'grab' }} onMouseDown={handleLayoutMouseDown}>Quest</span>
+                  <span className="skin-plaque" style={{ cursor: 'default', userSelect: 'none' }} onMouseDown={handleLayoutMouseDown}>Quest</span>
                   <div style={{ flex: '1 1 auto' }}>
                     <h2
                       style={{

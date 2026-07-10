@@ -21,9 +21,11 @@ import {
   useSensors,
   pointerWithin,
   useDroppable,
+  useDndContext,
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core';
+import { getBloomStyle, type BloomState } from '@/ui/idleVillage/interaction/bloomEffect';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
 import {
   RosterDraggable,
@@ -37,6 +39,7 @@ import type {
   TelemetryEntry,
 } from '@/ui/idleVillage/skins/activityCapsuleDetail/ActivityCapsuleDetailSkinAware';
 import { useResidentSlotController } from '@/ui/idleVillage/slots/useResidentSlotController';
+import { buildStatRequirementRows } from '@/ui/idleVillage/utils/statRequirementDisplay';
 import type { ResidentSlotBlueprint } from '@/ui/idleVillage/slots/types';
 import { DEFAULT_IDLE_VILLAGE_CONFIG } from '@/balancing/config/idleVillage/defaultConfig';
 import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
@@ -170,25 +173,26 @@ function DroppablePoi({
   canAcceptDrop,
   onClick,
 }: DroppablePoiProps) {
-  const { setNodeRef, isOver } = useDroppable({
+  const { setNodeRef } = useDroppable({
     id: dropId,
     disabled: !canAcceptDrop,
     data: { accepts: ['resident'] },
   });
+
+  // Shared AAA bloom: glow across the WHOLE drag (not just on hover-over),
+  // same system as JobPOI / slots. 'valid' while a resident is dragged and
+  // this POI can accept it; 'idle' otherwise. No hover/over scale jump.
+  const { active } = useDndContext();
+  const highlightState: BloomState = active
+    ? (canAcceptDrop ? 'valid' : 'invalid')
+    : 'idle';
 
   return (
     <div
       ref={setNodeRef}
       className="poi-detail-stage__medallion relative flex cursor-pointer flex-col items-center gap-2"
       onClick={onClick}
-      style={
-        isOver
-          ? {
-              transform: 'scale(1.05)',
-              filter: 'drop-shadow(0 0 12px rgba(201, 162, 39, 0.8))',
-            }
-          : undefined
-      }
+      style={getBloomStyle(highlightState, 200)}
       role="button"
       tabIndex={0}
       aria-label={`${label} — clicca per aprire il detail`}
@@ -222,8 +226,6 @@ function DroppablePoi({
         size={200}
         enableHover
         label={label}
-        timeRemainingMs={timeRemainingMs}
-        isExpirable={isExpirable}
       />
     </div>
   );
@@ -491,9 +493,21 @@ const PoiDetailRosterIntegrationPage: FC = () => {
         progress: isAssigned ? activityProgress : 0,
         assignedWorkerName: resident ? formatResidentLabel(resident) : undefined,
         assignedWorkerAvatarUrl: resident ? getResidentPortraitUrl(resident) : undefined,
+        visualProfileId: resident?.visualProfileId,
+        statProfileId: resident?.statProfileId,
+        // Carry the controller's live drop state so the slot rack blooms during
+        // a drag — same behaviour as /minimal-job-poi-roster-integration.
+        dropState: slot.dropState,
       };
     });
   }, [controller.slots, activityProgress]);
+
+  // Real requirements from the activity config; name/icon/color per stat are
+  // resolved from the Balancer stat catalog inside the builder.
+  const requirementRows = useMemo(
+    () => buildStatRequirementRows(activity.statRequirement),
+    [activity],
+  );
 
   const detailProps = useMemo(
     () => ({
@@ -507,6 +521,8 @@ const PoiDetailRosterIntegrationPage: FC = () => {
       elapsed,
       slots: detailSlots,
       maxSlots,
+      draggingResidentId,
+      requirements: requirementRows,
       durationDisplay: formatSeconds(duration),
       rewardDisplay: formatRewards(activity),
       etaDisplay: formatSeconds(remaining),
@@ -517,11 +533,14 @@ const PoiDetailRosterIntegrationPage: FC = () => {
       showSlots: true,
       showInfo: true,
       compact: false,
-      inlineMode: false,
-      enableDrag: true,
+      // In-flow (not a floating fixed modal): keeps the slot rack in the page
+      // layout so its [data-slot-id] rects match the visuals → correct drag
+      // coordinates, same feel as /minimal-roster-slot-integration.
+      inlineMode: true,
+      enableDrag: false,
       pillar: 'wilderness' as const,
-      skinPresetId: 'wanderlust' as const,
       dataTestId: 'poi-detail-wrapper-test',
+      poiIcon: activityIcon,
       ariaLabel: `POI Detail: ${activity.label}`,
       ariaLive: 'polite' as const,
       enableDevTools: true,
@@ -552,10 +571,13 @@ const PoiDetailRosterIntegrationPage: FC = () => {
       remaining,
       maxSlots,
       detailSlots,
+      draggingResidentId,
+      requirementRows,
       telemetry,
       isDetailOpen,
       addTelemetry,
       handleSlotClear,
+      activityIcon,
     ],
   );
 

@@ -108,7 +108,7 @@ export function RosterDraggable({
   onFlightComplete,
   useExternalDndContext = false,
   ...props
-}: Omit<VillageRosterSectionProps, 'residents' | 'sortMode' | 'onSortModeChange'> & {
+}: Omit<VillageRosterSectionProps, 'residents' | 'sortMode' | 'onSortModeChange' | 'onDragEnd'> & {
   defaultFatigue?: number;
   componentId?: string;
   pillar?: string;

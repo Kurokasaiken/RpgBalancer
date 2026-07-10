@@ -31,6 +31,12 @@ export type DragOutcomeState =
   | ({ mode: 'flight'; residentId: string; slotId: string; isInset: boolean } & FlightCoords)
   | { mode: 'returning'; residentId: string };
 
+/** Visual-only subset of DragOutcomeState used by UI components and consumers. */
+export type DragVisualState = {
+  mode: 'idle' | 'dragging' | 'flight' | 'returning';
+  residentId?: string;
+};
+
 export interface StartFlightParams {
   residentId: string;
   slotId: string;
