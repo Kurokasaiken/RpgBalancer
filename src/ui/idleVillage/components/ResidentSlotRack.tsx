@@ -3,7 +3,7 @@ import React, { memo, useRef, useEffect } from 'react';
 import { useMemo, useState, useCallback } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import type { ResidentSlotViewModel, SlotProgressData } from '@/ui/idleVillage/slots/types';
+import type { ResidentSlotViewModel, SlotProgressData, DropState } from '@/ui/idleVillage/slots/types';
 import { formatResidentLabel } from '@/ui/idleVillage/residentName';
 import type { VerbVisualVariant } from '@/ui/idleVillage/legacy/VerbCard';
 import { getResidentPortraitUrl } from '@/engine/game/idleVillage/residentVisualResolver';
@@ -17,17 +17,15 @@ import { DEFAULT_SLOTTED_MEDAL_CONFIG } from '@/balancing/config/idleVillage/slo
 import { resolveSlotState } from '@/ui/idleVillage/utils/slotStateMapping';
 import type { MedalStyleBridgeConfig } from '@/ui/idleVillage/skins/slotRackSkinConfig';
 import type { SlotActivityState } from '@/ui/idleVillage/slots/types';
-import { SlotV12Renderer } from '@/ui/idleVillage/components/SlotV12Renderer';
+import { Slot } from '@/ui/idleVillage/components/Slot';
 import { WanderlustSurface, type WanderlustShape } from '@/ui/wanderlust-surface/WanderlustSurface';
 import { type MaterialPreset } from '@/ui/wanderlust-surface/materialPresets';
 import styles from './SlotShake.module.css';
 import rackScrollStyles from './RackScroll.module.css';
 import type { SlotDebugVisualizationSettings } from '@/balancing/config/idleVillage/slotDebugVisualizationConfig';
-import type { LocationDropState } from '@/ui/idleVillage/validators/locationDropValidators';
 import { useExtractionSequence } from '@/ui/idleVillage/interaction/useExtractionSequence';
 import { getBloomStyle } from '@/ui/idleVillage/interaction/bloomEffect';
-
-type DropState = LocationDropState;
+import { useV9Tooltip } from '@/ui/v9-skin/useV9Tooltip';
 
 const SLOTTED_MEDAL_BEHAVIOR_CONFIG = {
   resistDurationMs: DEFAULT_SLOTTED_MEDAL_CONFIG.behavior.resistDurationMs,
@@ -260,6 +258,8 @@ const DetailSlot = memo(({
     data: { type: 'slot', slotId: slot.id }
   });
 
+  const slotTooltip = slot.statHint ?? slot.requirement?.label ?? 'Any stat';
+
   // Extraction choreography — single shared implementation (see /slot reference)
   const extraction = useExtractionSequence({
     onExtracted: () => {
@@ -488,43 +488,45 @@ const DetailSlot = memo(({
 
   return (
     <div className="flex flex-col items-center gap-1" role="listitem" data-slot-id={slotId} data-drop-state={dropState}>
-      <div
+      <Slot
         ref={setNodeRef}
-        role="button"
-        tabIndex={0}
-        data-testid={`slot-button-${slot.id}`}
-        onClick={handleClick}
-        onMouseDown={isAssigned ? startExtraction : undefined}
-        onMouseUp={isAssigned ? cancelExtraction : undefined}
-        onMouseLeave={isAssigned ? cancelExtraction : undefined}
-        onTouchStart={isAssigned ? startExtraction : undefined}
-        onTouchEnd={isAssigned ? cancelExtraction : undefined}
-        className={[
-          'relative',
-          dropState === 'invalid' ? 'cursor-not-allowed' : '',
-          isExtracting ? 'cursor-grabbing' : '',
-        ]
-          .filter(Boolean)
-          .join(' ')}
-        style={{
-          // Shared AAA bloom — identical to the POI medallion (alpha-shaped halo + pulse)
-          ...getBloomStyle(slotState === 'valid' ? 'valid' : slotState === 'invalid' ? 'invalid' : 'idle', slotSize ?? 96),
-          ...(isHighlighted && slotState !== 'valid' ? { filter: 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' } : {}),
-          ...(isSelected ? { outline: '2px solid var(--slot-rack-slot-ring-color, rgba(255, 255, 255, 0.4))', outlineOffset: '4px', borderRadius: '50%' } : {}),
-          ...(isExtracting ? { filter: 'drop-shadow(0 0 20px rgba(251, 191, 36, 0.8))' } : {}),
+        tooltip={slotTooltip}
+        slotProps={{
+          letter: displayInfo.icon ?? 'Q',
+          state: v12State,
+          extractionProgress,
+          debugVisualization: debugVisualization ?? undefined,
+          sizePx: slotSize,
         }}
-        title={slot.statHint ?? slot.requirement?.label ?? 'Any stat'}
-        data-selected={isSelected ? 'true' : undefined}
-        data-highlighted={isHighlighted ? 'true' : undefined}
-        data-extracting={isExtracting ? 'true' : undefined}
+        wrapperProps={{
+          role: 'button',
+          tabIndex: 0,
+          'data-testid': `slot-button-${slot.id}`,
+          onClick: handleClick,
+          onMouseDown: isAssigned ? startExtraction : undefined,
+          onMouseUp: isAssigned ? cancelExtraction : undefined,
+          onMouseLeave: isAssigned ? cancelExtraction : undefined,
+          onTouchStart: isAssigned ? startExtraction : undefined,
+          onTouchEnd: isAssigned ? cancelExtraction : undefined,
+          className: [
+            'relative',
+            dropState === 'invalid' ? 'cursor-not-allowed' : '',
+            isExtracting ? 'cursor-grabbing' : '',
+          ]
+            .filter(Boolean)
+            .join(' '),
+          style: {
+            // Shared AAA bloom — identical to the POI medallion (alpha-shaped halo + pulse)
+            ...getBloomStyle(slotState === 'valid' ? 'valid' : slotState === 'invalid' ? 'invalid' : 'idle', slotSize ?? 96),
+            ...(isHighlighted && slotState !== 'valid' ? { filter: 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' } : {}),
+            ...(isSelected ? { outline: '2px solid var(--slot-rack-slot-ring-color, rgba(255, 255, 255, 0.4))', outlineOffset: '4px', borderRadius: '50%' } : {}),
+            ...(isExtracting ? { filter: 'drop-shadow(0 0 20px rgba(251, 191, 36, 0.8))' } : {}),
+          },
+          'data-selected': isSelected ? 'true' : undefined,
+          'data-highlighted': isHighlighted ? 'true' : undefined,
+          'data-extracting': isExtracting ? 'true' : undefined,
+        }}
       >
-        <SlotV12Renderer
-          letter={displayInfo.icon ?? 'Q'}
-          state={v12State}
-          extractionProgress={extractionProgress}
-          debugVisualization={debugVisualization ?? undefined}
-          sizePx={slotSize}
-        />
         {isAssigned && (
           <div className="absolute inset-0 flex items-center justify-center z-10">
             <div className="relative">
@@ -563,7 +565,7 @@ const DetailSlot = memo(({
             </div>
           </div>
         )}
-      </div>
+      </Slot>
       <p className="text-[9px] tracking-[0.2em]" style={labelStyle}>
         {slot.label}
       </p>
@@ -603,6 +605,10 @@ export const ResidentSlotRack: React.FC<ResidentSlotRackProps> = ({
 
   const canScroll = overflowEnabled && isOverflowing;
 
+  // Tooltip props for infinite-slot placeholders; must be created at the top level,
+  // not inside the map below, to keep hook count stable across renders.
+  const placeholderTooltipProps = useV9Tooltip('Slot aggiuntivo disponibile');
+
   const rackShellStyle: CSSProperties = {
     background: 'var(--slot-rack-bg, transparent)',
     border: 'var(--slot-rack-border, none)',
@@ -614,7 +620,7 @@ export const ResidentSlotRack: React.FC<ResidentSlotRackProps> = ({
   const rackClassName = ['relative group/rack', className].filter(Boolean).join(' ');
 
   const containerClasses = useMemo(() => {
-    const base = 'flex gap-3 transition-all duration-300';
+    const base = 'flex gap-[var(--slot-rack-gap,12px)] transition-all duration-300';
     // Themed thin scrollbar (RackScroll.module.css) instead of the OS default
     const scroll = `overflow-x-auto pb-2 pr-1 [-webkit-overflow-scrolling:touch] ${rackScrollStyles.rackScroll}`;
     if (layout === 'board') {
@@ -706,7 +712,7 @@ export const ResidentSlotRack: React.FC<ResidentSlotRackProps> = ({
                     fontSize: sz * 0.32,
                     lineHeight: 1,
                   }}
-                  title="Slot aggiuntivo disponibile"
+                  {...placeholderTooltipProps}
                 >
                   +
                 </div>

@@ -1,7 +1,7 @@
 /**
  * Test per verificare il drop state durante il trascinamento
- * Verifica che i residenti validi per il rack B mostrino DROP: VALID
- * e quelli invalidi mostrino DROP: INVALID durante il drag
+ * Verifica che i residenti validi per il rack B mostrino Drop: Valid
+ * e quelli invalidi mostrino Drop: Invalid durante il drag
  */
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
@@ -13,7 +13,7 @@ vi.mock('@dnd-kit/core', async () => {
   const actual = await vi.importActual('@dnd-kit/core');
   return {
     ...actual,
-    DndContext: ({ children, onDragStart, onDragMove }: any) => {
+    DndContext: ({ children, onDragStart, onDragMove, onDragEnd }: any) => {
       return (
         <div data-testid="mock-dnd-context">
           {children}
@@ -22,35 +22,44 @@ vi.mock('@dnd-kit/core', async () => {
             onClick={() => {
               // Simula drag di un residente valido per rack B (HP >= 200)
               onDragStart?.({ active: { id: 'hero-sir-spaccaculi' } });
-              
+
               // Simula drag move per triggerare validazione
               setTimeout(() => {
-                onDragMove?.({ 
+                onDragMove?.({
                   active: { id: 'hero-sir-spaccaculi' },
                   delta: { x: 10, y: 10 }
                 });
               }, 10);
             }}
           >
-            Simulate Drag Valid Resident (HP >= 200)
+            Simulate Drag Valid Resident {'(HP >= 200)'}
           </button>
-          
+
           <button
             data-testid="simulate-drag-invalid-resident"
             onClick={() => {
               // Simula drag di un residente invalido per rack B (HP < 200)
               onDragStart?.({ active: { id: 'hero-giggiolillo' } });
-              
+
               // Simula drag move per triggerare validazione
               setTimeout(() => {
-                onDragMove?.({ 
+                onDragMove?.({
                   active: { id: 'hero-giggiolillo' },
                   delta: { x: 10, y: 10 }
                 });
               }, 10);
             }}
           >
-            Simulate Drag Invalid Resident (HP < 200)
+            Simulate Drag Invalid Resident {'(HP < 200)'}
+          </button>
+
+          <button
+            data-testid="simulate-drag-end"
+            onClick={() => {
+              onDragEnd?.({ active: { id: 'hero-sir-spaccaculi' }, over: null });
+            }}
+          >
+            Simulate Drag End
           </button>
         </div>
       );
@@ -82,7 +91,7 @@ describe('TestRosterPage - Drop State Validation During Drag', () => {
     vi.clearAllMocks();
   });
 
-  it('should show DROP: VALID for resident with HP >= 200 when dragging over restricted rack', async () => {
+  it('should show Drop: Valid for resident with HP >= 200 when dragging over restricted rack', async () => {
     render(<TestRosterPage />);
 
     // Simula il trascinamento di un residente valido (Sir Spaccaculi ha HP >= 200)
@@ -92,14 +101,14 @@ describe('TestRosterPage - Drop State Validation During Drag', () => {
     // Aspetta che il drag move venga processato
     await waitFor(() => {
       // Verifica che ci siano slot nel rack restrittivo
-      const restrictedSlots = screen.getAllByTestId(/slot-lab-restricted-slot/);
+      const restrictedSlots = Array.from(document.querySelectorAll('[data-slot-id^="slot-lab-restricted-slot-"]'));
       expect(restrictedSlots.length).toBeGreaterThan(0);
       
       // Verifica che almeno uno slot mostri stato valido
       // Questo dipende dall'implementazione specifica del componente
       const validSlot = restrictedSlots.find(slot => 
         slot.getAttribute('data-drop-state') === 'valid' ||
-        slot.textContent?.includes('DROP: VALID') ||
+        slot.textContent?.includes('Drop: Valid') ||
         slot.className?.includes('drop-valid')
       );
       
@@ -110,7 +119,7 @@ describe('TestRosterPage - Drop State Validation During Drag', () => {
         // Altrimenti verifichiamo che non ci siano stati invalid
         const invalidSlots = restrictedSlots.filter(slot => 
           slot.getAttribute('data-drop-state') === 'invalid' ||
-          slot.textContent?.includes('DROP: INVALID') ||
+          slot.textContent?.includes('Drop: Invalid') ||
           slot.className?.includes('drop-invalid')
         );
         expect(invalidSlots.length).toBe(0);
@@ -118,7 +127,7 @@ describe('TestRosterPage - Drop State Validation During Drag', () => {
     }, { timeout: 1000 });
   });
 
-  it('should show DROP: INVALID for resident with HP < 200 when dragging over restricted rack', async () => {
+  it('should show Drop: Invalid for resident with HP < 200 when dragging over restricted rack', async () => {
     render(<TestRosterPage />);
 
     // Simula il trascinamento di un residente invalido (Giggiolillo ha HP < 200)
@@ -128,16 +137,16 @@ describe('TestRosterPage - Drop State Validation During Drag', () => {
     // Aspetta che il drag move venga processato
     await waitFor(() => {
       // Verifica che ci siano slot nel rack restrittivo
-      const restrictedSlots = screen.getAllByTestId(/slot-lab-restricted-slot/);
+      const restrictedSlots = Array.from(document.querySelectorAll('[data-slot-id^="slot-lab-restricted-slot-"]'));
       expect(restrictedSlots.length).toBeGreaterThan(0);
-      
+
       // Verifica che gli slot mostrino stato invalido
-      const invalidSlots = restrictedSlots.filter(slot => 
+      const invalidSlots = restrictedSlots.filter(slot =>
         slot.getAttribute('data-drop-state') === 'invalid' ||
-        slot.textContent?.includes('DROP: INVALID') ||
+        slot.textContent?.includes('Drop: Invalid') ||
         slot.className?.includes('drop-invalid')
       );
-      
+
       expect(invalidSlots.length).toBeGreaterThan(0);
     }, { timeout: 1000 });
   });
@@ -151,8 +160,7 @@ describe('TestRosterPage - Drop State Validation During Drag', () => {
 
     // Aspetta che il drag inizi
     await waitFor(() => {
-      const activeResident = screen.getByText(/hero-sir-spaccaculi/i);
-      expect(activeResident).toBeInTheDocument();
+      expect(screen.getByText(/Dragging/)).toBeInTheDocument();
     }, { timeout: 500 });
 
     // Simula movimenti continui durante il drag
@@ -160,12 +168,12 @@ describe('TestRosterPage - Drop State Validation During Drag', () => {
       fireEvent.mouseMove(document, { clientX: 100 + i * 10, clientY: 100 + i * 10 });
       
       await waitFor(() => {
-        const restrictedSlots = screen.getAllByTestId(/slot-lab-restricted-slot/);
+        const restrictedSlots = Array.from(document.querySelectorAll('[data-slot-id^="slot-lab-restricted-slot-"]'));
         
         // Durante tutto il drag, lo stato dovrebbe rimanere valido
         const validSlots = restrictedSlots.filter(slot => 
           slot.getAttribute('data-drop-state') === 'valid' ||
-          slot.textContent?.includes('DROP: VALID') ||
+          slot.textContent?.includes('Drop: Valid') ||
           slot.className?.includes('drop-valid')
         );
         
@@ -184,8 +192,7 @@ describe('TestRosterPage - Drop State Validation During Drag', () => {
 
     // Aspetta che il drag inizi
     await waitFor(() => {
-      const activeResident = screen.getByText(/hero-giggiolillo/i);
-      expect(activeResident).toBeInTheDocument();
+      expect(screen.getByText(/Dragging/)).toBeInTheDocument();
     }, { timeout: 500 });
 
     // Simula movimenti continui durante il drag
@@ -193,12 +200,12 @@ describe('TestRosterPage - Drop State Validation During Drag', () => {
       fireEvent.mouseMove(document, { clientX: 100 + i * 10, clientY: 100 + i * 10 });
       
       await waitFor(() => {
-        const restrictedSlots = screen.getAllByTestId(/slot-lab-restricted-slot/);
+        const restrictedSlots = Array.from(document.querySelectorAll('[data-slot-id^="slot-lab-restricted-slot-"]'));
         
         // Durante tutto il drag, lo stato dovrebbe rimanere invalido
         const invalidSlots = restrictedSlots.filter(slot => 
           slot.getAttribute('data-drop-state') === 'invalid' ||
-          slot.textContent?.includes('DROP: INVALID') ||
+          slot.textContent?.includes('Drop: Invalid') ||
           slot.className?.includes('drop-invalid')
         );
         
@@ -215,19 +222,19 @@ describe('TestRosterPage - Drop State Validation During Drag', () => {
     const dragValidButton = screen.getByTestId('simulate-drag-valid-resident');
     dragValidButton.click();
 
-    // Simula la fine del drag (mouse up)
-    fireEvent.mouseUp(document);
+    // Simula la fine del drag
+    const endDragButton = screen.getByTestId('simulate-drag-end');
+    endDragButton.click();
 
     // Aspetta che lo stato venga resettato
     await waitFor(() => {
-      const restrictedSlots = screen.getAllByTestId(/slot-lab-restricted-slot/);
+      const restrictedSlots = Array.from(document.querySelectorAll('[data-slot-id^="slot-lab-restricted-slot-"]'));
       
-      // Dopo la fine del drag, non dovrebbero esserci stati di drop
-      const slotsWithDropState = restrictedSlots.filter(slot => 
-        slot.getAttribute('data-drop-state') ||
-        slot.textContent?.includes('DROP:') ||
-        slot.className?.includes('drop-')
-      );
+      // Dopo la fine del drag, non dovrebbero esserci stati di drop attivi
+      const slotsWithDropState = restrictedSlots.filter(slot => {
+        const state = slot.getAttribute('data-drop-state');
+        return state && state !== 'idle';
+      });
       
       expect(slotsWithDropState.length).toBe(0);
     }, { timeout: 500 });

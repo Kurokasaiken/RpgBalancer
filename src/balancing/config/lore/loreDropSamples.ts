@@ -1,0 +1,118 @@
+import type { LoreDrop } from './loreDropTypes';
+
+/**
+ * Initial sample pool of Lore Drops.
+ *
+ * These entries are config-first and can be moved to a JSON file or CMS later.
+ * Each drop can be assigned to a matching entity only once per playthrough.
+ */
+export const LORE_DROP_SAMPLES: LoreDrop[] = [
+  {
+    id: 'ld-ashes-oath',
+    titleKey: 'lore:history.ashesOath.title',
+    bodyKey: 'lore:history.ashesOath.body',
+    category: 'history',
+    assignableTo: ['quest'],
+    tags: ['combat', 'ritual'],
+    weight: 1,
+  },
+  {
+    id: 'ld-wolf-hunger',
+    titleKey: 'lore:faction.wolfHunger.title',
+    bodyKey: 'lore:faction.wolfHunger.body',
+    category: 'faction',
+    assignableTo: ['quest', 'location'],
+    tags: ['wolves', 'night', 'forest'],
+    weight: 1,
+  },
+  {
+    id: 'ld-gate-whispers',
+    titleKey: 'lore:location.gateWhispers.title',
+    bodyKey: 'lore:location.gateWhispers.body',
+    category: 'location',
+    assignableTo: ['building', 'location'],
+    tags: ['village_gate', 'defense'],
+    weight: 1,
+  },
+  {
+    id: 'ld-first-forge',
+    titleKey: 'lore:history.firstForge.title',
+    bodyKey: 'lore:history.firstForge.body',
+    category: 'history',
+    assignableTo: ['building'],
+    tags: ['forge', 'smithy'],
+    weight: 1,
+  },
+  {
+    id: 'ld-sewer-cartographer',
+    titleKey: 'lore:character.sewerCartographer.title',
+    bodyKey: 'lore:character.sewerCartographer.body',
+    category: 'character',
+    assignableTo: ['quest', 'location'],
+    tags: ['city_sewers', 'explore'],
+    weight: 1,
+  },
+  {
+    id: 'ld-ember-sigil',
+    titleKey: 'lore:item.emberSigil.title',
+    bodyKey: 'lore:item.emberSigil.body',
+    category: 'item',
+    assignableTo: ['item'],
+    tags: ['currency', 'ember'],
+    weight: 1,
+  },
+  {
+    id: 'ld-forest-resin',
+    titleKey: 'lore:location.forestResin.title',
+    bodyKey: 'lore:location.forestResin.body',
+    category: 'location',
+    assignableTo: ['location', 'quest'],
+    tags: ['forest', 'wood'],
+    weight: 1,
+  },
+  {
+    id: 'ld-ghost-furnace',
+    titleKey: 'lore:history.ghostFurnace.title',
+    bodyKey: 'lore:history.ghostFurnace.body',
+    category: 'history',
+    assignableTo: ['quest'],
+    tags: ['wraith', 'forge'],
+    weight: 1,
+  },
+  {
+    id: 'ld-spy-blade',
+    titleKey: 'lore:character.spyBlade.title',
+    bodyKey: 'lore:character.spyBlade.body',
+    category: 'character',
+    assignableTo: ['character'],
+    tags: ['spy', 'night'],
+    weight: 1,
+  },
+  {
+    id: 'ld-stellar-blood',
+    titleKey: 'lore:item.stellarBlood.title',
+    bodyKey: 'lore:item.stellarBlood.body',
+    category: 'item',
+    assignableTo: ['item', 'quest'],
+    tags: ['arcane', 'ritual'],
+    weight: 1,
+  },
+  {
+    id: 'ld-market-scales',
+    titleKey: 'lore:location.marketScales.title',
+    bodyKey: 'lore:location.marketScales.body',
+    category: 'location',
+    assignableTo: ['building', 'location'],
+    tags: ['market', 'shop'],
+    weight: 1,
+  },
+  {
+    id: 'ld-obsidian-tyrant',
+    titleKey: 'lore:faction.obsidianTyrant.title',
+    bodyKey: 'lore:faction.obsidianTyrant.body',
+    category: 'faction',
+    assignableTo: ['quest'],
+    tags: ['combat', 'tyrant'],
+    weight: 1,
+  },
+];

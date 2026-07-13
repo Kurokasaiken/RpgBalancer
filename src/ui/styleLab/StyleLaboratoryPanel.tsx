@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from '@/localization/useTranslation';
 import type { ThemePreset, ThemePresetId } from '@/data/themePresets';
 import { Eye, EyeOff } from 'lucide-react';
 
@@ -45,6 +46,7 @@ export function StyleLaboratoryPanel({
   collapsible = true,
   defaultCollapsed = false,
 }: StyleLaboratoryPanelProps) {
+  const { t } = useTranslation('styleLab');
   const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
 
   return (
@@ -91,7 +93,7 @@ export function StyleLaboratoryPanel({
                 color: 'var(--text-primary)',
               }}
             >
-              Randomize
+              {t('styleLab:actions.randomize')}
             </button>
             {isRandomized && (
               <button
@@ -103,14 +105,14 @@ export function StyleLaboratoryPanel({
                   color: 'var(--text-muted)',
                 }}
               >
-                Reset
+                {t('styleLab:actions.reset')}
               </button>
             )}
             <button
               type="button"
               onClick={() => setIsCollapsed((prev) => !prev)}
               className="rounded-full border border-white/15 bg-white/5 p-1.5 text-slate-200 transition hover:border-amber-300/70 hover:text-amber-200"
-              aria-label={isCollapsed ? 'Mostra Style Lab' : 'Nascondi Style Lab'}
+              aria-label={isCollapsed ? t('styleLab:accessibility.show') : t('styleLab:accessibility.hide')}
               aria-pressed={!isCollapsed}
             >
               {isCollapsed ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
@@ -123,7 +125,7 @@ export function StyleLaboratoryPanel({
           type="button"
           onClick={() => setIsCollapsed((prev) => !prev)}
           className="rounded-full border border-white/15 bg-white/5 p-1.5 text-slate-200 transition hover:border-amber-300/70 hover:text-amber-200 ml-auto"
-          aria-label={isCollapsed ? 'Mostra Style Lab' : 'Nascondi Style Lab'}
+          aria-label={isCollapsed ? t('styleLab:accessibility.show') : t('styleLab:accessibility.hide')}
           aria-pressed={!isCollapsed}
         >
           {isCollapsed ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}

@@ -33,7 +33,8 @@ import {
 } from '@dnd-kit/core';
 import { motion } from 'framer-motion';
 import SlottedMedal from '@/ui/idleVillage/components/SlottedMedal';
-import { SlotV12Renderer } from '@/ui/idleVillage/components/SlotV12Renderer';
+import { Slot } from '@/ui/idleVillage/components/Slot';
+import { V9TooltipProvider } from '@/ui/v9-skin/V9Tooltip';
 import SlottedMedalSkin from '@/ui/idleVillage/components/SlottedMedalSkin';
 import SlottedMedalHaloCanvas from '@/ui/idleVillage/components/SlottedMedalHaloCanvas';
 import SlottedMedalResistRing from '@/ui/idleVillage/components/SlottedMedalResistRing';
@@ -104,7 +105,7 @@ const DemoEmpty = memo(() => (
     titleCls="text-slate-300"
   >
     <div style={{ filter: 'drop-shadow(0 0 8px rgba(148,163,184,0.3))' }}>
-      <SlotV12Renderer state="empty" letter="?" />
+      <Slot tooltip="Empty" slotProps={{ state: 'empty', letter: '?' }} />
     </div>
   </ShowcaseCard>
 ));
@@ -128,7 +129,7 @@ const DemoFilled = memo(() => {
       titleCls="text-amber-400"
     >
       <div className="relative">
-        <SlotV12Renderer state="occupied" letter="A" />
+        <Slot tooltip="Filled" slotProps={{ state: 'occupied', letter: 'A' }} />
         <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
           <SlottedMedal
             ref={ref}
@@ -162,7 +163,7 @@ const DemoDragover = memo(() => (
         outlineOffset: 6,
       }}
     >
-      <SlotV12Renderer state="empty" letter="+" />
+      <Slot tooltip="Dragover" slotProps={{ state: 'empty', letter: '+' }} />
     </div>
   </ShowcaseCard>
 ));
@@ -201,7 +202,7 @@ const DemoRejected = memo(() => {
       titleCls="text-red-400"
     >
       <div className="relative">
-        <SlotV12Renderer state="occupied" letter="✗" />
+        <Slot tooltip="Rejected" slotProps={{ state: 'occupied', letter: '✗' }} />
         <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
           <SlottedMedal
             ref={ref}
@@ -250,7 +251,7 @@ const DemoLocked = memo(() => {
       titleCls="text-purple-400"
     >
       <div className="relative">
-        <SlotV12Renderer state="occupied" letter="⊗" />
+        <Slot tooltip="Locked" slotProps={{ state: 'occupied', letter: '⊗' }} />
         <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
           <SlottedMedal
             ref={ref}
@@ -427,9 +428,12 @@ const InteractiveLab = () => {
         {/* Preview area */}
         <div className="flex items-center justify-center flex-1 bg-slate-800 rounded-lg border border-slate-700 min-h-[256px]">
           <div className="relative">
-            <SlotV12Renderer
-              state={b.state === 'empty' ? 'empty' : 'occupied'}
-              letter={medalType[0].toUpperCase()}
+            <Slot
+              tooltip={`Slot: ${b.state}`}
+              slotProps={{
+                state: b.state === 'empty' ? 'empty' : 'occupied',
+                letter: medalType[0].toUpperCase(),
+              }}
             />
             <div className="absolute inset-0 flex items-center justify-center z-10">
               {/* Render skin layers directly so behavior state stays reactive */}
@@ -494,8 +498,9 @@ export function SlotBehaviorPage(): JSX.Element {
   );
 
   return (
-    <DndContext sensors={sensors} collisionDetection={pointerWithin}>
-      <div className="min-h-screen bg-slate-950 text-white p-8 space-y-12">
+    <V9TooltipProvider>
+      <DndContext sensors={sensors} collisionDetection={pointerWithin}>
+        <div className="min-h-screen bg-slate-950 text-white p-8 space-y-12">
 
         {/* ── Header ────────────────────────────────────────────────────────── */}
         <div className="border-b border-slate-800 pb-6">
@@ -529,7 +534,8 @@ export function SlotBehaviorPage(): JSX.Element {
           <InteractiveLab />
         </section>
 
-      </div>
-    </DndContext>
+        </div>
+      </DndContext>
+    </V9TooltipProvider>
   );
 }

@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import clsx from 'clsx';
+import { useTranslation } from '@/localization/useTranslation';
 import {
   slotV12SkinData,
   SLOT_WILDERNESS_BRONZE_CONFIG,
@@ -47,6 +48,8 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
   debugVisualization,
   sizePx,
 }) => {
+  const { t } = useTranslation('idleVillage');
+
   const geometry = slotV12SkinData.geometry;
   const stateConfig = slotV12SkinData.states[state] ?? slotV12SkinData.states.occupied;
   const rawToothAngles = getTokenValue('tooth.positions.deg');
@@ -276,11 +279,13 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
     );
   };
 
+  const stateLabel = t('idleVillage:slotRack.states.' + state, state);
+
   return (
     <div className={clsx('slot-v12', `slot-v12--${state}`, className)} data-slot-state={state} style={sizePx ? { width: sizePx, height: sizePx } : undefined}>
       <style dangerouslySetInnerHTML={{ __html: cssText }} />
       <div className="slot-v12__halo" aria-hidden />
-      <svg viewBox="-120 -120 240 240" role="img" aria-label={`Slot ${state}`}>
+      <svg viewBox="-120 -120 240 240" role="img" aria-label={t('idleVillage:slotRack.ariaLabel', { defaultValue: 'Slot {state}', state: stateLabel })}>
         <defs>
           {/* Complex filters from HTML reference */}
           <filter id="fn-basalt" x="-4%" y="-4%" width="108%" height="108%">
@@ -478,7 +483,7 @@ export const SlotV12Renderer: React.FC<SlotV12RendererProps> = ({
                 fill="rgba(255,255,255,0.92)"
                 style={{ pointerEvents: 'none' }}
               >
-                PG
+                {t('idleVillage:medalOverlay.token', { defaultValue: 'PG' })}
               </text>
             ) : (
               <text

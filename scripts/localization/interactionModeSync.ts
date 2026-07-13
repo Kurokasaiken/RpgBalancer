@@ -67,11 +67,11 @@ function ensureDirectories(): void {
  */
 function readInteractionModeCopy(): any {
   const configPath = join(CONFIG_DIR, 'interactionModeCopy.ts');
-  
+
   if (!existsSync(configPath)) {
     throw new Error(`Configuration file not found: ${configPath}`);
   }
-  
+
   // Read and parse the TypeScript file
   const content = readFileSync(configPath, 'utf-8');
   

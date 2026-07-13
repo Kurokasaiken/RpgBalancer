@@ -29,6 +29,7 @@ import GymShiftHUD from '@/ui/idleVillage/components/GymShiftHUD';
 import GymShiftCard from '@/ui/idleVillage/components/GymShiftCard';
 import { TooltipProvider } from '@/ui/idleVillage/components/TooltipProvider';
 import { DragErrorOverlay } from '@/ui/idleVillage/components/DragErrorOverlay';
+import { useTranslation } from '@/localization/useTranslation';
 import BoutCard from '@/ui/idleVillage/components/BoutCard';
 import RestOverlay from '@/ui/idleVillage/components/RestOverlay';
 import TrainingTracker from '@/ui/idleVillage/components/TrainingTracker';
@@ -76,6 +77,7 @@ export const VillageSandboxContent: React.FC<VillageSandboxContentProps> = ({
   activeShellPresetId,
   shellPresetOptions,
 }) => {
+  const { t } = useTranslation('idleVillage');
   const bootGuardDiagnostics = useBootGuardDiagnostics({
     pageId: 'idle-village-sandbox',
     source: 'VillageSandbox',
@@ -1004,7 +1006,7 @@ export const VillageSandboxContent: React.FC<VillageSandboxContentProps> = ({
     return (
       <div className="flex flex-col gap-4">
         <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
-          <div className="text-[11px] uppercase tracking-[0.3em] text-slate-400">Activity Slots</div>
+          <div className="text-[11px] uppercase tracking-[0.3em] text-slate-400">{t('idleVillage:map.activitySlots', { defaultValue: 'Activity Slots' })}</div>
           <ResidentSlotRack
             slots={safeResidentSlotRackSlots}
             layout="board"
@@ -1018,7 +1020,7 @@ export const VillageSandboxContent: React.FC<VillageSandboxContentProps> = ({
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
-          <div className="text-[11px] uppercase tracking-[0.3em] text-slate-400">Active Activities</div>
+          <div className="text-[11px] uppercase tracking-[0.3em] text-slate-400">{t('idleVillage:map.activeActivities', { defaultValue: 'Active Activities' })}</div>
           <div className="mt-3 flex flex-wrap gap-4">
             {/* ActivitySlotCard component removed - needs replacement */}
             {/* {safeActivityAreaSlots.map((slot) => (
@@ -1332,7 +1334,7 @@ export const VillageSandboxContent: React.FC<VillageSandboxContentProps> = ({
         <ErrorBoundary
           fallbackRender={({ error }) => (
             <div data-testid="idle-village-sandbox-error" className="idle-village-sandbox-error">
-              <p>Something went wrong in Village Sandbox.</p>
+              <p>{t('idleVillage:map.error', { defaultValue: 'Something went wrong in Village Sandbox.' })}</p>
               <pre>{error.message}</pre>
               <button
                 type="button"
@@ -1342,7 +1344,7 @@ export const VillageSandboxContent: React.FC<VillageSandboxContentProps> = ({
                 aria-live="polite"
                 aria-busy={isResetting}
               >
-                {isResetting ? 'Resetting…' : 'Reset'}
+                {isResetting ? t('idleVillage:map.resetting', { defaultValue: 'Resetting…' }) : t('idleVillage:map.reset', { defaultValue: 'Reset' })}
               </button>
             </div>
           )}
@@ -1426,11 +1428,11 @@ export const VillageSandboxContent: React.FC<VillageSandboxContentProps> = ({
               autoOpen={dragErrorRecovery.state.autoOpen}
             />
           )}
-        </main>
       </ErrorBoundary>
       </SandboxTimingProvider>
     </TooltipProvider>
   );
+};
 
 const VillageSandbox: React.FC<VillageSandboxContentProps> = (props) => (
   <DragProvider>

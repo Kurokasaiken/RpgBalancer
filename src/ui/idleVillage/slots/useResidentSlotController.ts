@@ -1,11 +1,11 @@
 import { useMemo, useCallback, useEffect } from 'react';
 import type { ActivityDefinition, StatRequirement } from '@/balancing/config/idleVillage/types';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
-import type { DropState } from '@/ui/idleVillage/components/ActivitySlot';
 import type { ScheduledActivityState } from '@/ui/idleVillage/hooks/useActivityScheduler';
 import type {
   ResidentSlotAssignResult,
   AssignmentFailureReason,
+  DropState,
 } from './types';
 import {
   computeDropStateForResident,
@@ -232,6 +232,9 @@ export const useResidentSlotController = ({
         assignedResident,
         requirement: slot.requirement ?? activity.statRequirement,
         modifiers: slot.modifiers,
+        role: slot.role,
+        emptyPenalty: slot.emptyPenalty,
+        residentRiskModifiers: slot.residentRiskModifiers,
         isPlaceholder: Boolean(slot.isVirtual && !assignedResidentId),
         dropState,
         bloomState,

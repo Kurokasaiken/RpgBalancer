@@ -1,7 +1,7 @@
 import type { ActivityDefinition, StatRequirement } from '@/balancing/config/idleVillage/types';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { evaluateStatRequirement } from '@/engine/game/idleVillage/statMatching';
-import type { DropState } from '@/ui/idleVillage/components/ActivitySlot';
+import type { DropState } from './types';
 
 /**
  * Unique reasons returned by {@link validateResidentAssignment}.

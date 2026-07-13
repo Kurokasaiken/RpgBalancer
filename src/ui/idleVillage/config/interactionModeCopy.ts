@@ -6,6 +6,7 @@
  */
 
 import { z } from 'zod';
+import { InteractionModeCopyAdapter } from '@/localization/adapters/InteractionModeCopyAdapter';
 
 /**
  * Copy entry structure for interaction mode strings
@@ -45,9 +46,9 @@ export interface InteractionModeCopyEntry {
  */
 export const InteractionModeCopyConfigSchema = z.object({
   /** Default locale for the application */
-  defaultLocale: z.string().default('it-IT'),
+  defaultLocale: z.string().default('en'),
   /** Supported locales */
-  supportedLocales: z.array(z.string()).default(['it-IT', 'en-US']),
+  supportedLocales: z.array(z.string()).default(['en', 'it-IT', 'pseudo']),
   /** Copy entries organized by key */
   entries: z.array(z.object({
     key: z.string(),
@@ -350,8 +351,8 @@ export const DEFAULT_INTERACTION_MODE_COPY_ENTRIES: InteractionModeCopyEntry[] =
  * Default interaction mode copy configuration
  */
 export const DEFAULT_INTERACTION_MODE_COPY_CONFIG: InteractionModeCopyConfig = {
-  defaultLocale: 'it-IT',
-  supportedLocales: ['it-IT', 'en-US'],
+  defaultLocale: 'en',
+  supportedLocales: ['en', 'it-IT', 'pseudo'],
   entries: DEFAULT_INTERACTION_MODE_COPY_ENTRIES,
   metadata: {
     version: '1.0.0',
@@ -365,44 +366,44 @@ export const DEFAULT_INTERACTION_MODE_COPY_CONFIG: InteractionModeCopyConfig = {
 };
 
 /**
- * Get copy entry by key and locale
+ * Local fallback helper: searches the static entry list when i18next data is
+ * not available (e.g., during initialization or in a missing namespace).
+ */
+function getLocalFallbackEntry(key: string, locale?: string): InteractionModeCopyEntry | null {
+  const targetLocale = locale ?? DEFAULT_INTERACTION_MODE_COPY_CONFIG.defaultLocale;
+  const entry = DEFAULT_INTERACTION_MODE_COPY_CONFIG.entries.find(
+    e => e.key === key && e.locale === targetLocale
+  );
+  if (entry) return entry;
+
+  const fallbackEntry = DEFAULT_INTERACTION_MODE_COPY_CONFIG.entries.find(
+    e => e.key === key && e.locale === DEFAULT_INTERACTION_MODE_COPY_CONFIG.defaultLocale
+  );
+  if (fallbackEntry) return fallbackEntry;
+
+  return DEFAULT_INTERACTION_MODE_COPY_CONFIG.entries.find(e => e.key === key) || null;
+}
+
+/**
+ * Get copy entry by key and locale.
+ * Reads from i18next via the InteractionModeCopyAdapter; falls back to the
+ * local static entry list when the adapter cannot resolve the entry.
  */
 export function getCopyEntry(
   key: string,
-  locale: string = DEFAULT_INTERACTION_MODE_COPY_CONFIG.defaultLocale
+  locale?: string,
 ): InteractionModeCopyEntry | null {
-  const entry = DEFAULT_INTERACTION_MODE_COPY_CONFIG.entries.find(
-    e => e.key === key && e.locale === locale
+  const adapterEntry = InteractionModeCopyAdapter.getCopyEntry(
+    key,
+    locale ?? DEFAULT_INTERACTION_MODE_COPY_CONFIG.defaultLocale,
   );
-  
-  if (!entry) {
-    // Try fallback locale
-    const fallbackEntry = DEFAULT_INTERACTION_MODE_COPY_CONFIG.entries.find(
-      e => e.key === key && e.locale === DEFAULT_INTERACTION_MODE_COPY_CONFIG.defaultLocale
-    );
-    
-    if (fallbackEntry) {
-      return fallbackEntry;
-    }
-    
-    // Try any locale as last resort
-    const anyEntry = DEFAULT_INTERACTION_MODE_COPY_CONFIG.entries.find(
-      e => e.key === key
-    );
-    
-    return anyEntry || null;
-  }
-  
-  return entry;
+  return adapterEntry ?? getLocalFallbackEntry(key, locale);
 }
 
 /**
  * Get copy text by key and locale
  */
-export function getCopyText(
-  key: string,
-  locale: string = DEFAULT_INTERACTION_MODE_COPY_CONFIG.defaultLocale
-): string {
+export function getCopyText(key: string, locale?: string): string {
   const entry = getCopyEntry(key, locale);
   return entry?.text || key;
 }
@@ -410,10 +411,7 @@ export function getCopyText(
 /**
  * Get copy description by key and locale
  */
-export function getCopyDescription(
-  key: string,
-  locale: string = DEFAULT_INTERACTION_MODE_COPY_CONFIG.defaultLocale
-): string {
+export function getCopyDescription(key: string, locale?: string): string {
   const entry = getCopyEntry(key, locale);
   return entry?.description || '';
 }
@@ -423,10 +421,22 @@ export function getCopyDescription(
  */
 export function getCopyByCategory(
   category: InteractionModeCopyEntry['category'],
-  locale: string = DEFAULT_INTERACTION_MODE_COPY_CONFIG.defaultLocale
+  locale?: string,
 ): InteractionModeCopyEntry[] {
+  const adapterEntries = InteractionModeCopyAdapter.getCopyByCategory(
+    category,
+    locale ?? DEFAULT_INTERACTION_MODE_COPY_CONFIG.defaultLocale,
+  );
+  if (adapterEntries.length > 0) return adapterEntries;
+
+  const targetLocale = locale ?? DEFAULT_INTERACTION_MODE_COPY_CONFIG.defaultLocale;
+  const localeEntries = DEFAULT_INTERACTION_MODE_COPY_CONFIG.entries.filter(
+    entry => entry.category === category && entry.locale === targetLocale,
+  );
+  if (localeEntries.length > 0) return localeEntries;
+
   return DEFAULT_INTERACTION_MODE_COPY_CONFIG.entries.filter(
-    entry => entry.category === category && entry.locale === locale
+    entry => entry.category === category,
   );
 }
 
@@ -435,10 +445,22 @@ export function getCopyByCategory(
  */
 export function getCopyByContext(
   context: InteractionModeCopyEntry['context'],
-  locale: string = DEFAULT_INTERACTION_MODE_COPY_CONFIG.defaultLocale
+  locale?: string,
 ): InteractionModeCopyEntry[] {
+  const adapterEntries = InteractionModeCopyAdapter.getCopyByContext(
+    context,
+    locale ?? DEFAULT_INTERACTION_MODE_COPY_CONFIG.defaultLocale,
+  );
+  if (adapterEntries.length > 0) return adapterEntries;
+
+  const targetLocale = locale ?? DEFAULT_INTERACTION_MODE_COPY_CONFIG.defaultLocale;
+  const localeEntries = DEFAULT_INTERACTION_MODE_COPY_CONFIG.entries.filter(
+    entry => entry.context === context && entry.locale === targetLocale,
+  );
+  if (localeEntries.length > 0) return localeEntries;
+
   return DEFAULT_INTERACTION_MODE_COPY_CONFIG.entries.filter(
-    entry => entry.context === context && entry.locale === locale
+    entry => entry.context === context,
   );
 }
 
@@ -446,8 +468,9 @@ export function getCopyByContext(
  * Check if copy entry is translatable
  */
 export function isCopyTranslatable(key: string): boolean {
-  const entry = DEFAULT_INTERACTION_MODE_COPY_CONFIG.entries.find(e => e.key === key);
-  return entry?.translatable ?? false;
+  return InteractionModeCopyAdapter.isCopyTranslatable(key)
+    ?? getLocalFallbackEntry(key)?.translatable
+    ?? false;
 }
 
 /**
@@ -455,7 +478,7 @@ export function isCopyTranslatable(key: string): boolean {
  */
 export function getCopyAccessibility(
   key: string,
-  locale: string = DEFAULT_INTERACTION_MODE_COPY_CONFIG.defaultLocale
+  locale?: string,
 ): InteractionModeCopyEntry['accessibility'] | null {
   const entry = getCopyEntry(key, locale);
   return entry?.accessibility || null;
@@ -467,14 +490,14 @@ export function getCopyAccessibility(
 export function formatCopyText(
   key: string,
   placeholders: Record<string, string>,
-  locale: string = DEFAULT_INTERACTION_MODE_COPY_CONFIG.defaultLocale
+  locale?: string,
 ): string {
   const text = getCopyText(key, locale);
   let formatted = text;
-  
+
   Object.entries(placeholders).forEach(([placeholder, value]) => {
     formatted = formatted.replace(new RegExp(`\\{${placeholder}\\}`, 'g'), value);
   });
-  
+
   return formatted;
 }

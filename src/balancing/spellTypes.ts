@@ -1,6 +1,7 @@
 // Spell / Skill type definitions
 
 export type SpellType = 'damage' | 'heal' | 'shield' | 'buff' | 'debuff' | 'cc';
+export type SpellQuality = 'Amateur' | 'Standard' | 'Masterpiece';
 
 /**
  * Represents a single spell/skill that can be created by the user.
@@ -82,6 +83,10 @@ export interface Spell {
   spellPoints?: number;
   /** Tier label used by some UIs */
   tier?: string;
+  /** Quality affix affecting spell budget and stats */
+  quality?: SpellQuality;
+  /** If true, detailed internal stats (combat metrics) are revealed to the player */
+  isInspected?: boolean;
   /** Description of the spell */
   description?: string;
   /** Tags for categorization */
@@ -145,4 +150,6 @@ export const createEmptySpell = (id: string = crypto.randomUUID()): Spell => ({
   description: '',
   tags: [],
   targetStat: 'damage', // baseline = no modifications
+  quality: undefined,
+  isInspected: false,
 });

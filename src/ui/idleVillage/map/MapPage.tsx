@@ -984,6 +984,9 @@ function MapPageContent() {
               summary={questChronicle.summary}
               phases={questChronicle.chronicle.phases}
               currentPhaseIndex={questChronicle.chronicle.activeIndex}
+              questId={questActivity?.id}
+              questTags={questActivity?.tags}
+              questDone={questState?.status === 'completed'}
             />
             <button
               type="button"

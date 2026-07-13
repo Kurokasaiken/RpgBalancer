@@ -1,0 +1,16 @@
+{
+  "accessibility": {
+    "hide": "Hide Style Lab",
+    "show": "Show Style Lab"
+  },
+  "actions": {
+    "randomize": "Randomize",
+    "reset": "Reset"
+  },
+  "app": {
+    "title": "Style Lab"
+  },
+  "panel": {
+    "kicker": "Style Laboratory"
+  }
+}

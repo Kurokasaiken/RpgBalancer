@@ -2,7 +2,7 @@
 title: RPG Balancer – Master Plan
 status: active
 owner: Strategy-Lead
-last_reviewed: 2026-02-11
+last_reviewed: 2026-07-13
 domain: core
 description: "Single source of truth for roadmap, documentation governance, and phase tracking"
 ---
@@ -693,11 +693,98 @@ Linked artifacts: `docs/plans/idle_village_tasks.md`,
 `docs/plans/village_sandbox_activitycard_refactor_plan.md`,
 `docs/plans/idle_village_trial_of_fire_plan.md`,
 `docs/plans/idle_village_drag_drop_e2e_plan.md`,
-`docs/plans/idle_village_progression_system_plan.md`.
+`docs/plans/idle_village_progression_system_plan.md`,
+`docs/plans/trailer_vertical_slice_plan.md`,
+`docs/plans/trailer_vertical_slice_tasks.md`.
 
 ---
 
-### 🎯 **SlottedMedal Failed State Implementation ✅ COMPLETED**
+### 🎬 **Idle Village — Trailer Vertical Slice**
+
+**Status:** 📋 Draft — awaiting component inventory confirmation
+**Scope:** 45-second Steam-first cinematic trailer (not a playable build)
+**Plan:** `src/docs/docs/plans/trailer_vertical_slice_plan.md`
+**Tasks:** `src/docs/docs/plans/trailer_vertical_slice_tasks.md`
+**Owner:** Cascade
+
+This is a **marketing artifact** for the Steam page and devlogs. It is intentionally separate from the playable `Idle Village` vertical slice and is not part of the in-game simulation. The trailer uses scripted cinematic sequences, fixed seeds, and deterministic timers.
+
+**Trailer phases (timecoded):**
+
+| Phase | Time | Viewer must see | Key missing components |
+|-------|------|-----------------|------------------------|
+| **A — Title & Loading** | `00:00 - 00:06` | Title card, deterministic progress bar, living village backdrop | `VillageBackdrop`, `TrailerIntroPage`, `TrailerProgressBar` |
+| **B — POI Map** | `00:06 - 00:14` | Map with multiple POI markers appearing; choose one and reject others, then transition to high-risk POI | `PoiMap`, `PoiMapMarker`, `PoiMapRiskBar`, `PoiMapTransition` |
+| **C — Three Mock UI Screens** | `00:14 - 00:22` | Forge, Spell, Hero mock UIs with animated numbers and sliders | `ForgeScreen`, `HeroSheet`, `AnimatedNumber`, `MathFlash`, `MockScreenCarousel` |
+| **D — Astrolabe Ball** | `00:22 - 00:32` | Scripted astrolabe ball avoiding crimson spikes, loot explosion | `LootExplosion`, `AstrolabeTrailerController` |
+| **E — Celestial Forge Unlock & Wishlist CTA** | `00:32 - 00:45` | Village dissolve, Celestial Forge unlock, wishlist sign | `VillageDissolveTransition`, `ParticleField`, `CelestialForgeUnlockAnimation`, `WishlistSign` |
+
+**Component inventory (existing vs missing):**
+
+| Phase | Existing | Missing |
+|-------|----------|---------|
+| A | `ActionProgressBar`, `MapPage` background | `VillageBackdrop`, `TrailerIntroPage`, `TrailerProgressBar` |
+| B | `QuestPOI`, `GenericPoiSkin`, `LocationCard`, `MapPage`, `useMapContext` | `PoiMap`, `PoiMapMarker`, `PoiMapRiskBar`, `PoiMapTransition`, `PoiMapConfig` |
+| C | `SpellCreatorNewMockup`, `SpellCreatorNew`, `SpellEditor`, `SpellLibrary`, `SpellBuilder`, `CharacterCreator`, `CharacterBuilder`, `PgDetailCard`, `StatAllocationCard`, `EnhancedStatSlider`, `ConfigurableCard`, `ConfigurableStat` | `ForgeScreen`, `HeroSheet`, `AnimatedNumber`, `MathFlash`, `MockScreenCarousel` |
+| D | `DestinyAstrolabe`, `SkillCheckLegend`, `pinballPhysics`, `IdleVillagePinballMonitor` | `LootExplosion`, `AstrolabeTrailerController` |
+| E | `VillageDissolveTransition` (particle dissolve overlay) | `ParticleField`, `CelestialForgeUnlockAnimation`, `WishlistSign`, `PostTrailerPage` |
+
+**Specialist feedback:**
+
+- **UI text in the trailer must be at least 20% larger** than the final game UI (e.g. `Day 42`, `+30% Area`, `Blueprint Unlocked`).
+- Steam client reduced windows / Steam Deck viewing means counters must be readable at a glance or the “strategic brain” effect is lost.
+- The 45-second trailer is high-impact marketing: the goal is the Coming Soon page and collecting niche wishlists.
+
+**Implementation guardrails:**
+
+- Scripted cinematic; fixed seeds, deterministic timers, and pre-baked state machines.
+- Config-first: `src/balancing/config/idleVillage/trailerConfig.ts` (or the plan doc until implementation begins) owns all timing, copy, palette, and camera keyframes.
+- Reuse existing frozen kits (`pgcardKit`, `slotRackKit`, `skillCheckKit`, `questPoiSkinConfig`) instead of duplicating styling.
+- No implementation starts until the user confirms the component inventory.
+- Each phase runnable independently in Storybook or `/trailer-phase-<x>` route.
+- Telemetry: `trailer_phase_completed`, `trailer_wishlist_cta_shown` (opt-in).
+
+**Next steps:**
+
+1. Confirm the component inventory (existing vs missing) with the user.
+2. Create `trailerConfig.ts` with exact timing, copy, and palette.
+3. Implement missing components phase by phase using the `trailer_vertical_slice_tasks.md` checklist.
+4. Wire phases into a single `/trailer` route and Storybook stories.
+5. Visual regression capture after each phase.
+
+**Marketing note:** `Punch Club` is the internal sandbox-only tool and must not appear in this trailer or any public marketing material.
+
+---
+
+### � **Wanderlust Triumph — Steam Concept Slice (55s Gameplay Teaser)**
+
+**Status:** 📋 Planning  
+**Scope:** Hollywood-facade gameplay teaser for Steam; not a playable build.  
+**Plan:** `src/docs/docs/plans/wanderlust_triumph_steam_concept_slice_plan.md`  
+**Owner:** Cascade
+
+A 55-second, deterministic, linear teaser for the Steam Coming Soon page. It reuses existing `Idle Village` and `Wanderlust` UI components as a **facade** with hardcoded mock data and a scene controller. No backend, no engine simulation, no persistence.
+
+**Key beats:**
+
+1. **0:00–0:05** — Map opens, POIs emerge, `GOBLIN INVASION — 5 DAYS REMAIN` banner.
+2. **0:05–0:15** — Living village, asymmetric choice: `Training Grounds` vs `Forgotten Ruins`.
+3. **0:15–0:25** — Hero sheet (Attack 15, Defense 8, Magic 12), drag into the `Forgotten Ruins` bronze slot.
+4. **0:25–0:32** — `DestinyAstrolabe` with forced injury outcome: `FAILED / HERO INJURED`.
+5. **0:32–0:40** — Village desaturates to oxidized grey, `SETTLEMENT LOST` overlay.
+6. **0:40–0:50** — Legacy screen: `KNOWLEDGE PRESERVED`, unlocked artifacts/blueprints/survivors.
+7. **0:50–0:55** — Outro: `WANDERLUST TRIUMPH` + `PREPARE · ENDURE · TRIUMPH` + `WISHLIST NOW ON STEAM`.
+
+**Implementation approach:**
+
+- New `TeaserSceneController` + `TeaserShowcase` page under `/teaser-showcase`.
+- Hardcoded `TeaserConfig.ts` for all timing, copy, hero, POIs, astrolabe result, legacy list.
+- Reuse `MapPage`, `VillageSandbox`, `WanderlustRosterCard`, `WanderlustSurface`, `DestinyAstrolabe`, `OutcomeModal`, `HUDNotificationLayer`.
+- No modification of existing game components; only a new route in `App.tsx` and optional dev tab in `navConfig.ts`.
+
+---
+
+### �🎯 **SlottedMedal Failed State Implementation ✅ COMPLETED**
 
 **Status:** ✅ Completed (2026-03-01)  
 **Evidence:** `test-results/slotted-medal-failed-state-2026-03-01.log`

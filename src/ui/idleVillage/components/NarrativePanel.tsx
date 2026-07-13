@@ -33,6 +33,7 @@ import {
 import { useQuestNarrative } from '../hooks/useNarrativeHooks';
 import { useNarrativeTelemetry } from '../hooks/useNarrativeTelemetry';
 import { useNarrativeConfig } from '../hooks/useNarrativeConfig';
+import { useTranslation } from '@/localization/useTranslation';
 import type { GeneratedNarrative, NarrativeContext } from '../hooks/useNarrativeHooks';
 
 interface NarrativePanelProps {
@@ -109,6 +110,7 @@ export function NarrativePanel({
   });
 
   const [narratives, setNarratives] = useState<GeneratedNarrative[]>([]);
+  const { t } = useTranslation('idleVillage');
 
   // Auto-generate narratives when playing
   useEffect(() => {
@@ -201,7 +203,7 @@ export function NarrativePanel({
       <Card className="w-full max-w-4xl mx-auto">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-semibold">Quest Narrative Panel</CardTitle>
+            <CardTitle className="text-lg font-semibold">{t('idleVillage:narrative.title', { defaultValue: 'Quest Narrative Panel' })}</CardTitle>
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
@@ -210,7 +212,7 @@ export function NarrativePanel({
                 className="flex items-center gap-1"
               >
                 {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                {isPlaying ? 'Pause' : 'Play'}
+                {isPlaying ? t('idleVillage:narrative.pause', { defaultValue: 'Pause' }) : t('idleVillage:narrative.play', { defaultValue: 'Play' })}
               </Button>
               <Button
                 variant="outline"
@@ -220,7 +222,7 @@ export function NarrativePanel({
                 className="flex items-center gap-1"
               >
                 <RefreshCw className="w-4 h-4" />
-                Refresh
+                {t('idleVillage:narrative.refresh', { defaultValue: 'Refresh' })}
               </Button>
             </div>
           </div>
@@ -228,7 +230,7 @@ export function NarrativePanel({
           {/* Progress Bar */}
           <div className="mt-3">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">Quest Progress</span>
+              <span className="text-sm font-medium">{t('idleVillage:narrative.questProgress', { defaultValue: 'Quest Progress' })}</span>
               <span className="text-sm text-muted-foreground">{context.progressPercentage}%</span>
             </div>
             <Progress 
@@ -244,22 +246,22 @@ export function NarrativePanel({
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="narratives" className="flex items-center gap-2">
                 <FileText className="w-4 h-4" />
-                Narratives
+                {t('idleVillage:narrative.tabs.narratives', { defaultValue: 'Narratives' })}
               </TabsTrigger>
               <TabsTrigger value="context" className="flex items-center gap-2">
                 <Settings className="w-4 h-4" />
-                Context
+                {t('idleVillage:narrative.tabs.context', { defaultValue: 'Context' })}
               </TabsTrigger>
               {showTelemetry && (
                 <TabsTrigger value="telemetry" className="flex items-center gap-2">
                   <BarChart3 className="w-4 h-4" />
-                  Telemetry
+                  {t('idleVillage:narrative.tabs.telemetry', { defaultValue: 'Telemetry' })}
                 </TabsTrigger>
               )}
               {showConfig && (
                 <TabsTrigger value="config" className="flex items-center gap-2">
                   <Settings className="w-4 h-4" />
-                  Config
+                  {t('idleVillage:narrative.tabs.config', { defaultValue: 'Config' })}
                 </TabsTrigger>
               )}
             </TabsList>
@@ -267,9 +269,9 @@ export function NarrativePanel({
             {/* Narratives Tab */}
             <TabsContent value="narratives" className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">Generated Narratives</h3>
+                <h3 className="text-lg font-semibold">{t('idleVillage:narrative.narratives.title', { defaultValue: 'Generated Narratives' })}</h3>
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline">{narratives.length} narratives</Badge>
+                  <Badge variant="outline">{t('idleVillage:narrative.narratives.count', { count: narratives.length, defaultValue: '{count} narratives' })}</Badge>
                   {isLoading && <RefreshCw className="w-4 h-4 animate-spin" />}
                 </div>
               </div>
@@ -302,7 +304,7 @@ export function NarrativePanel({
                   className="flex items-center gap-1"
                 >
                   <CheckCircle className="w-4 h-4" />
-                  Complete Quest
+                  {t('idleVillage:narrative.narratives.complete', { defaultValue: 'Complete Quest' })}
                 </Button>
                 <Button
                   onClick={handleFailQuest}
@@ -311,7 +313,7 @@ export function NarrativePanel({
                   className="flex items-center gap-1"
                 >
                   <XCircle className="w-4 h-4" />
-                  Fail Quest
+                  {t('idleVillage:narrative.narratives.fail', { defaultValue: 'Fail Quest' })}
                 </Button>
               </div>
 
@@ -339,11 +341,11 @@ export function NarrativePanel({
                         </div>
                         <p className="text-sm mb-2">{narrative.text}</p>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <span>ID: {narrative.id}</span>
+                          <span>{t('idleVillage:narrative.narratives.details.id', { id: narrative.id, defaultValue: 'ID: {id}' })}</span>
                           <Separator orientation="vertical" className="h-3" />
-                          <span>Hook: {narrative.hookId}</span>
+                          <span>{t('idleVillage:narrative.narratives.details.hook', { defaultValue: 'Hook' })}: {narrative.hookId}</span>
                           <Separator orientation="vertical" className="h-3" />
-                          <span>Template: {narrative.templateId}</span>
+                          <span>{t('idleVillage:narrative.narratives.details.template', { defaultValue: 'Template' })}: {narrative.templateId}</span>
                         </div>
                       </CardContent>
                     </Card>
@@ -352,8 +354,8 @@ export function NarrativePanel({
                   {narratives.length === 0 && (
                     <div className="text-center py-8 text-muted-foreground">
                       <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                      <p>No narratives generated yet</p>
-                      <p className="text-sm">Click "Play" to start auto-generating or use the buttons above</p>
+                      <p>{t('idleVillage:narrative.narratives.noNarratives', { defaultValue: 'No narratives generated yet' })}</p>
+                      <p className="text-sm">{t('idleVillage:narrative.narratives.noNarrativesHint', { defaultValue: 'Click "Play" to start auto-generating or use the buttons above' })}</p>
                     </div>
                   )}
                 </div>
@@ -363,17 +365,17 @@ export function NarrativePanel({
               {selectedNarrative && (
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-base">Narrative Details</CardTitle>
+                    <CardTitle className="text-base">{t('idleVillage:narrative.narratives.details.title', { defaultValue: 'Narrative Details' })}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
                       <div>
-                        <h4 className="font-semibold mb-2">Text</h4>
+                        <h4 className="font-semibold mb-2">{t('idleVillage:narrative.narratives.details.text', { defaultValue: 'Text' })}</h4>
                         <p className="text-sm bg-muted p-3 rounded">{selectedNarrative.text}</p>
                       </div>
                       
                       <div>
-                        <h4 className="font-semibold mb-2">Variables</h4>
+                        <h4 className="font-semibold mb-2">{t('idleVillage:narrative.narratives.details.variables', { defaultValue: 'Variables' })}</h4>
                         <div className="grid grid-cols-2 gap-2 text-sm">
                           {Object.entries(selectedNarrative.variables).map(([key, value]) => (
                             <div key={key} className="flex justify-between">
@@ -385,22 +387,22 @@ export function NarrativePanel({
                       </div>
                       
                       <div>
-                        <h4 className="font-semibold mb-2">Metadata</h4>
+                        <h4 className="font-semibold mb-2">{t('idleVillage:narrative.narratives.details.metadata', { defaultValue: 'Metadata' })}</h4>
                         <div className="grid grid-cols-2 gap-2 text-sm">
                           <div className="flex justify-between">
-                            <span className="font-medium">Hook:</span>
+                            <span className="font-medium">{t('idleVillage:narrative.narratives.details.hook', { defaultValue: 'Hook' })}:</span>
                             <span>{selectedNarrative.metadata.hookName}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="font-medium">Template:</span>
+                            <span className="font-medium">{t('idleVillage:narrative.narratives.details.template', { defaultValue: 'Template' })}:</span>
                             <span>{selectedNarrative.metadata.templateName}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="font-medium">Telemetry:</span>
-                            <span>{selectedNarrative.metadata.telemetryTracked ? 'Tracked' : 'Not Tracked'}</span>
+                            <span className="font-medium">{t('idleVillage:narrative.narratives.details.telemetry', { defaultValue: 'Telemetry' })}:</span>
+                            <span>{selectedNarrative.metadata.telemetryTracked ? t('idleVillage:narrative.narratives.details.telemetryTracked', { defaultValue: 'Tracked' }) : t('idleVillage:narrative.narratives.details.telemetryNotTracked', { defaultValue: 'Not Tracked' })}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="font-medium">Generated:</span>
+                            <span className="font-medium">{t('idleVillage:narrative.narratives.details.generated', { defaultValue: 'Generated' })}:</span>
                             <span>{new Date(selectedNarrative.timestamp).toLocaleString()}</span>
                           </div>
                         </div>
@@ -415,7 +417,7 @@ export function NarrativePanel({
             <TabsContent value="context" className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Quest Name</label>
+                  <label className="block text-sm font-medium mb-2">{t('idleVillage:narrative.context.questName', { defaultValue: 'Quest Name' })}</label>
                   <input
                     type="text"
                     value={context.questName || ''}
@@ -424,34 +426,34 @@ export function NarrativePanel({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Quest Type</label>
+                  <label className="block text-sm font-medium mb-2">{t('idleVillage:narrative.context.questType', { defaultValue: 'Quest Type' })}</label>
                   <select
                     value={context.questType || ''}
                     onChange={(e) => handleContextChange('questType', e.target.value)}
                     className="w-full p-2 border rounded"
                   >
-                    <option value="exploration">Exploration</option>
-                    <option value="combat">Combat</option>
-                    <option value="diplomacy">Diplomacy</option>
-                    <option value="crafting">Crafting</option>
-                    <option value="social">Social</option>
+                    <option value="exploration">{t('idleVillage:narrative.questTypes.exploration', { defaultValue: 'Exploration' })}</option>
+                    <option value="combat">{t('idleVillage:narrative.questTypes.combat', { defaultValue: 'Combat' })}</option>
+                    <option value="diplomacy">{t('idleVillage:narrative.questTypes.diplomacy', { defaultValue: 'Diplomacy' })}</option>
+                    <option value="crafting">{t('idleVillage:narrative.questTypes.crafting', { defaultValue: 'Crafting' })}</option>
+                    <option value="social">{t('idleVillage:narrative.questTypes.social', { defaultValue: 'Social' })}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Quest Difficulty</label>
+                  <label className="block text-sm font-medium mb-2">{t('idleVillage:narrative.context.questDifficulty', { defaultValue: 'Quest Difficulty' })}</label>
                   <select
                     value={context.questDifficulty || ''}
                     onChange={(e) => handleContextChange('questDifficulty', e.target.value)}
                     className="w-full p-2 border rounded"
                   >
-                    <option value="easy">Easy</option>
-                    <option value="normal">Normal</option>
-                    <option value="hard">Hard</option>
-                    <option value="nightmare">Nightmare</option>
+                    <option value="easy">{t('idleVillage:narrative.difficulty.easy', { defaultValue: 'Easy' })}</option>
+                    <option value="normal">{t('idleVillage:narrative.difficulty.normal', { defaultValue: 'Normal' })}</option>
+                    <option value="hard">{t('idleVillage:narrative.difficulty.hard', { defaultValue: 'Hard' })}</option>
+                    <option value="nightmare">{t('idleVillage:narrative.difficulty.nightmare', { defaultValue: 'Nightmare' })}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Resident Name</label>
+                  <label className="block text-sm font-medium mb-2">{t('idleVillage:narrative.context.residentName', { defaultValue: 'Resident Name' })}</label>
                   <input
                     type="text"
                     value={context.residentName || ''}
@@ -460,7 +462,7 @@ export function NarrativePanel({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Resident Level</label>
+                  <label className="block text-sm font-medium mb-2">{t('idleVillage:narrative.context.residentLevel', { defaultValue: 'Resident Level' })}</label>
                   <input
                     type="number"
                     value={context.residentLevel || ''}
@@ -471,7 +473,7 @@ export function NarrativePanel({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Location</label>
+                  <label className="block text-sm font-medium mb-2">{t('idleVillage:narrative.context.location', { defaultValue: 'Location' })}</label>
                   <input
                     type="text"
                     value={context.location || ''}
@@ -480,37 +482,37 @@ export function NarrativePanel({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Weather</label>
+                  <label className="block text-sm font-medium mb-2">{t('idleVillage:narrative.context.weather', { defaultValue: 'Weather' })}</label>
                   <select
                     value={context.weather || ''}
                     onChange={(e) => handleContextChange('weather', e.target.value)}
                     className="w-full p-2 border rounded"
                   >
-                    <option value="clear">Clear</option>
-                    <option value="rain">Rain</option>
-                    <option value="snow">Snow</option>
-                    <option value="storm">Storm</option>
-                    <option value="fog">Fog</option>
-                    <option value="windy">Windy</option>
+                    <option value="clear">{t('idleVillage:narrative.weather.clear', { defaultValue: 'Clear' })}</option>
+                    <option value="rain">{t('idleVillage:narrative.weather.rain', { defaultValue: 'Rain' })}</option>
+                    <option value="snow">{t('idleVillage:narrative.weather.snow', { defaultValue: 'Snow' })}</option>
+                    <option value="storm">{t('idleVillage:narrative.weather.storm', { defaultValue: 'Storm' })}</option>
+                    <option value="fog">{t('idleVillage:narrative.weather.fog', { defaultValue: 'Fog' })}</option>
+                    <option value="windy">{t('idleVillage:narrative.weather.windy', { defaultValue: 'Windy' })}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Time of Day</label>
+                  <label className="block text-sm font-medium mb-2">{t('idleVillage:narrative.context.timeOfDay', { defaultValue: 'Time of Day' })}</label>
                   <select
                     value={context.timeOfDay || ''}
                     onChange={(e) => handleContextChange('timeOfDay', e.target.value)}
                     className="w-full p-2 border rounded"
                   >
-                    <option value="dawn">Dawn</option>
-                    <option value="day">Day</option>
-                    <option value="dusk">Dusk</option>
-                    <option value="night">Night</option>
+                    <option value="dawn">{t('idleVillage:narrative.timeOfDay.dawn', { defaultValue: 'Dawn' })}</option>
+                    <option value="day">{t('idleVillage:narrative.timeOfDay.day', { defaultValue: 'Day' })}</option>
+                    <option value="dusk">{t('idleVillage:narrative.timeOfDay.dusk', { defaultValue: 'Dusk' })}</option>
+                    <option value="night">{t('idleVillage:narrative.timeOfDay.night', { defaultValue: 'Night' })}</option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Progress: {context.progressPercentage}%</label>
+                <label className="block text-sm font-medium mb-2">{t('idleVillage:narrative.context.progress', { progress: context.progressPercentage, defaultValue: 'Progress: {progress}%' })}</label>
                 <Progress 
                   value={context.progressPercentage} 
                   className="w-full"
@@ -529,7 +531,7 @@ export function NarrativePanel({
                         <FileText className="w-4 h-4 text-blue-500" />
                         <span className="text-2xl font-bold">{telemetryData.events}</span>
                       </div>
-                      <p className="text-sm text-muted-foreground">Events</p>
+                      <p className="text-sm text-muted-foreground">{t('idleVillage:narrative.telemetry.events', { defaultValue: 'Events' })}</p>
                     </CardContent>
                   </Card>
                   <Card>
@@ -538,7 +540,7 @@ export function NarrativePanel({
                         <TrendingUp className="w-4 h-4 text-green-500" />
                         <span className="text-2xl font-bold">{telemetryData.metrics}</span>
                       </div>
-                      <p className="text-sm text-muted-foreground">Metrics</p>
+                      <p className="text-sm text-muted-foreground">{t('idleVillage:narrative.telemetry.metrics', { defaultValue: 'Metrics' })}</p>
                     </CardContent>
                   </Card>
                   <Card>
@@ -550,10 +552,10 @@ export function NarrativePanel({
                           <XCircle className="w-4 h-4 text-red-500" />
                         )}
                         <span className="text-sm font-medium">
-                          {isConnected ? 'Connected' : 'Disconnected'}
+                          {isConnected ? t('idleVillage:narrative.telemetry.connected', { defaultValue: 'Connected' }) : t('idleVillage:narrative.telemetry.disconnected', { defaultValue: 'Disconnected' })}
                         </span>
                       </div>
-                      <p className="text-sm text-muted-foreground">Status</p>
+                      <p className="text-sm text-muted-foreground">{t('idleVillage:narrative.telemetry.status', { defaultValue: 'Status' })}</p>
                     </CardContent>
                   </Card>
                   <Card>
@@ -564,7 +566,7 @@ export function NarrativePanel({
                           {new Date(telemetryData.lastActivity).toLocaleTimeString()}
                         </span>
                       </div>
-                      <p className="text-sm text-muted-foreground">Last Activity</p>
+                      <p className="text-sm text-muted-foreground">{t('idleVillage:narrative.telemetry.lastActivity', { defaultValue: 'Last Activity' })}</p>
                     </CardContent>
                   </Card>
                 </div>
@@ -572,7 +574,7 @@ export function NarrativePanel({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-base">Top Events</CardTitle>
+                      <CardTitle className="text-base">{t('idleVillage:narrative.telemetry.topEvents', { defaultValue: 'Top Events' })}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
@@ -588,7 +590,7 @@ export function NarrativePanel({
 
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-base">Top Metrics</CardTitle>
+                      <CardTitle className="text-base">{t('idleVillage:narrative.telemetry.topMetrics', { defaultValue: 'Top Metrics' })}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
@@ -614,7 +616,7 @@ export function NarrativePanel({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-base">Available Hooks</CardTitle>
+                      <CardTitle className="text-base">{t('idleVillage:narrative.config.availableHooks', { defaultValue: 'Available Hooks' })}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
@@ -637,26 +639,26 @@ export function NarrativePanel({
 
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-base">Configuration Status</CardTitle>
+                      <CardTitle className="text-base">{t('idleVillage:narrative.config.configurationStatus', { defaultValue: 'Configuration Status' })}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
-                          <span className="text-sm">Hooks</span>
+                          <span className="text-sm">{t('idleVillage:narrative.config.hooks', { defaultValue: 'Hooks' })}</span>
                           <Badge variant="secondary">{hookIds.length}</Badge>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-sm">Templates</span>
+                          <span className="text-sm">{t('idleVillage:narrative.config.templates', { defaultValue: 'Templates' })}</span>
                           <Badge variant="secondary">{Object.keys(templates).length}</Badge>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-sm">Telemetry Enabled</span>
+                          <span className="text-sm">{t('idleVillage:narrative.config.telemetryEnabled', { defaultValue: 'Telemetry Enabled' })}</span>
                           <Badge variant={config.telemetry.enabled ? 'default' : 'destructive'}>
-                            {config.telemetry.enabled ? 'Yes' : 'No'}
+                            {config.telemetry.enabled ? t('idleVillage:narrative.config.yes', { defaultValue: 'Yes' }) : t('idleVillage:narrative.config.no', { defaultValue: 'No' })}
                           </Badge>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-sm">Config Version</span>
+                          <span className="text-sm">{t('idleVillage:narrative.config.configVersion', { defaultValue: 'Config Version' })}</span>
                           <Badge variant="outline">{config.version}</Badge>
                         </div>
                       </div>

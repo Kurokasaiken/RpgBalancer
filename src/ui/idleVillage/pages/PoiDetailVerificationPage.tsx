@@ -202,18 +202,6 @@ export function PoiDetailVerificationPage() {
 
           <section className="poi-detail-stage">
             <div className="poi-detail-stage__medallion" onClick={handlePoiClick} role="button" tabIndex={0}>
-              <div className="poi-detail-stage__legend">
-                <p>POI Trigger</p>
-                <h3>Clicca il medaglione per aprire il detail</h3>
-                <div className="poi-detail-stage__risk">
-                  {riskBadges.map((badge) => (
-                    <div key={badge.label}>
-                      <span>{badge.label}</span>
-                      <strong>{badge.value}</strong>
-                    </div>
-                  ))}
-                </div>
-              </div>
               <GenericPoiSkin
                 icon="🏹"
                 progress={questProgress}
@@ -229,6 +217,10 @@ export function PoiDetailVerificationPage() {
                 label="Dangerous Hunt"
                 timeRemainingMs={questRemainingMs}
                 isExpirable
+                showRiskBadges
+                injuryRisk={questMetadata.injuryChanceDisplay ?? 0}
+                deathRisk={questMetadata.deathChanceDisplay ?? 0}
+                dangerRating={`${questConfig.dangerRating}/5`}
               />
             </div>
 
@@ -238,6 +230,7 @@ export function PoiDetailVerificationPage() {
                 activityId={questConfig.id}
                 name={questConfig.label}
                 type="quest"
+                questTags={questConfig.tags}
                 subtitle={questConfig.description}
                 status="in-progress"
                 progress={questProgress}

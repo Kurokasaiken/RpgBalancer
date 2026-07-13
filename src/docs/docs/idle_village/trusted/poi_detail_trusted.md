@@ -118,16 +118,67 @@ Non-authoritative sources:
 ### Core Props
 ```typescript
 interface ActivityCapsuleDetailSkinAwareProps {
-  poiId: string;
-  poiData: POIData;
+  activityId: string;
+  name: string;
+  type: string;
+  subtitle?: string;
+  status: 'idle' | 'in-progress' | 'completed' | 'blocked';
+  progress: number;
+  duration: number;
+  elapsed: number;
   slots: ActivityDetailSlotData[];
+  maxSlots: number;
+  draggingResidentId?: string | null;
+  requirements?: StatRequirementRow[];
+  durationDisplay: string;
+  rewardDisplay: string;
+  etaDisplay: string;
   telemetry: TelemetryEntry[];
-  onSlotAssign: (slotId: string, workerId: string) => void;
-  onSlotRemove: (slotId: string) => void;
-  onCollect: () => void;
-  onStart: () => void;
-  onCancel: () => void;
-  onClose: () => void;
+  onStart?: () => void;
+  onCancel?: () => void;
+  onCollect?: () => void;
+  onSlotAssign?: (slotId: string) => void;
+  onSlotDetach?: (slotId: string) => void;
+  /** Explicit override for the Start/Embark CTA disabled state.
+   *  Pages that validate required slots (e.g. quest assignment) must pass this
+   *  from upstream state such as `useQuestAssignmentPreview().canEmbark`. */
+  startDisabled?: boolean;
+  isOpen: boolean;
+  onClose?: () => void;
+  pillar?: StyleLabPillar;
+  skinPresetId?: SkinPresetId;
+  motionLevel?: MotionLevel;
+  skinConfigOverride?: Partial<ActivityCapsuleDetailSkinConfig>;
+  showTelemetry?: boolean;
+  showSlots?: boolean;
+  showInfo?: boolean;
+  compact?: boolean;
+  ariaLabel?: string;
+  dataTestId?: string;
+  poiIcon?: string;
+  questTags?: string[];
+}
+```
+
+### Slot Data Contract
+```typescript
+interface ActivityDetailSlotData {
+  id: string;
+  residentId?: string;
+  state: 'empty' | 'ghost' | 'idle' | 'active' | 'done' | 'locked';
+  initial: string;
+  progress: number;
+  assignedWorkerName?: string;
+  assignedWorkerAvatarUrl?: string;
+  visualProfileId?: string;
+  statProfileId?: string;
+  dropState?: DropState;
+  /** Semantic role of this slot (e.g. 'combatant', 'support'), forwarded from ResidentSlotBlueprint.role. */
+  role?: string;
+  /** Human-readable label for the role, shown instead of the generic "Slot N". */
+  roleLabel?: string;
+  /** Whether this slot must be filled before the activity can start. */
+  required?: boolean;
 }
 ```
 

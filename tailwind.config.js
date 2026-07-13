@@ -165,6 +165,7 @@ export default {
         display: ['Cinzel', 'serif'],
         body: ['Crimson Text', 'serif'],
         ui: ['Lato', 'sans-serif'],
+        locale: ['var(--font-family-locale)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       // Compact typography scale (base 14px, not 18px)
       fontSize: {

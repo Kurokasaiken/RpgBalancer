@@ -13,10 +13,6 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   narrativeConfigManager, 
   type NarrativeConfig,
-  type NarrativeConfig['hooks'][string],
-  type NarrativeConfig['templates'][string],
-  type NarrativeConfig['variables'][string],
-  type NarrativeConfig['telemetry']
 } from '../../../balancing/config/narrative/narrativeConfig';
 
 export interface UseNarrativeConfigOptions {

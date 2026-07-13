@@ -20,6 +20,7 @@ import {
   validateRiskDisplayConfig,
 } from '@/balancing/config/idleVillage/riskDisplayConfig';
 import { createSandboxDiagnostics } from '@/ui/idleVillage/utils/sandboxDiagnostics';
+import { useTranslation } from '@/localization/useTranslation';
 
 interface RiskDisplayTelemetryEvent {
   type: string;
@@ -30,6 +31,9 @@ interface RiskDisplayTelemetryEvent {
   timestamp: number;
   stripeType?: 'injury' | 'death';
   percentage?: number;
+  showStripes?: boolean;
+  stripeHeights?: { injury: number; death: number };
+  configSource?: string;
 }
 
 export interface QuestRiskDisplayProps {
@@ -49,6 +53,10 @@ export interface QuestRiskDisplayProps {
   onStripeClick?: (type: 'injury' | 'death', percentage: number) => void;
   /** Callback for telemetry events */
   onTelemetry?: (event: RiskDisplayTelemetryEvent) => void;
+  /** Explicit SVG height for the risk polygon */
+  polygonHeight?: number;
+  /** Explicit SVG width for the risk polygon */
+  polygonWidth?: number;
 }
 
 /**
@@ -70,7 +78,10 @@ export const QuestRiskDisplay: React.FC<QuestRiskDisplayProps> = ({
   className,
   onStripeClick,
   onTelemetry,
+  polygonHeight: polygonHeightProp,
+  polygonWidth: polygonWidthProp,
 }) => {
+  const { t } = useTranslation('idleVillage');
   // Merge configuration with appropriate defaults
   const config = useMemo(() => {
     const baseConfig = testMode ? TEST_RISK_DISPLAY_CONFIG : DEFAULT_RISK_DISPLAY_CONFIG;
@@ -90,10 +101,19 @@ export const QuestRiskDisplay: React.FC<QuestRiskDisplayProps> = ({
     []
   );
 
+  // Calculate polygon dimensions from optional props or config
+  const polygonWidth = polygonWidthProp ?? config.polygon.polygonRadius * 2;
+  const polygonHeight = polygonHeightProp ?? config.polygon.polygonRadius * 2;
+  const polygonRadius = Math.min(polygonWidth, polygonHeight) / 2;
+  const centerX = polygonWidth / 2;
+  const centerY = polygonHeight / 2;
+
   // Calculate stripe dimensions and risk data
   const riskData = useMemo(() => {
     const shouldShow = shouldShowRiskStripes(injuryPercentage, deathPercentage, config);
     const riskLevel = calculateRiskLevel(injuryPercentage, deathPercentage);
+
+    const polygonPoints = generatePolygonPoints(config.polygon.polygonSides, polygonRadius, centerX, centerY);
 
     if (!shouldShow) {
       return {
@@ -101,7 +121,12 @@ export const QuestRiskDisplay: React.FC<QuestRiskDisplayProps> = ({
         injuryStripeLength: 0,
         deathStripeLength: 0,
         riskLevel,
-        polygonPoints: generatePolygonPoints(config.polygon.polygonSides, config.polygon.polygonRadius),
+        polygonPoints,
+        polygonWidth,
+        polygonHeight,
+        polygonRadius,
+        centerX,
+        centerY,
         stripePositions: [],
       };
     }
@@ -119,11 +144,9 @@ export const QuestRiskDisplay: React.FC<QuestRiskDisplayProps> = ({
       const stripeColor = stripeType === 'injury' ? config.colors.injuryColor : config.colors.deathColor;
 
       // Calculate stripe start and end positions
-      const centerX = config.polygon.polygonRadius;
-      const centerY = config.polygon.polygonRadius;
       const startX = centerX - stripeLength / 2;
       const endX = centerX + stripeLength / 2;
-      const y = centerY + (i - 0.5) * (config.polygon.stripeWidthPercent / 100 * config.polygon.polygonRadius);
+      const y = centerY + (i - 0.5) * (config.polygon.stripeWidthPercent / 100 * polygonRadius);
 
       stripePositions.push({
         startX,
@@ -132,6 +155,7 @@ export const QuestRiskDisplay: React.FC<QuestRiskDisplayProps> = ({
         color: stripeColor,
         type: stripeType,
         percentage: stripeType === 'injury' ? injuryPercentage : deathPercentage,
+        length: stripeLength,
       });
     }
 
@@ -140,10 +164,15 @@ export const QuestRiskDisplay: React.FC<QuestRiskDisplayProps> = ({
       injuryStripeLength: injuryLength,
       deathStripeLength: deathLength,
       riskLevel,
-      polygonPoints: generatePolygonPoints(config.polygon.polygonSides, config.polygon.polygonRadius),
+      polygonPoints,
+      polygonWidth,
+      polygonHeight,
+      polygonRadius,
+      centerX,
+      centerY,
       stripePositions,
     };
-  }, [injuryPercentage, deathPercentage, config]);
+  }, [injuryPercentage, deathPercentage, config, polygonWidth, polygonHeight, polygonRadius, centerX, centerY]);
 
   // Handle stripe clicks
   const handleStripeClick = useCallback((type: 'injury' | 'death', percentage: number) => {
@@ -164,6 +193,7 @@ export const QuestRiskDisplay: React.FC<QuestRiskDisplayProps> = ({
     }
 
     // Log diagnostics
+    const clickConfigSource = testMode ? 'test' : customConfig ? 'custom' : 'default';
     diagnostics.log('stripe_click', {
       timestamp: Date.now(),
       questId,
@@ -171,16 +201,15 @@ export const QuestRiskDisplay: React.FC<QuestRiskDisplayProps> = ({
       deathPercentage,
       injuryStripeLength: riskData.injuryStripeLength,
       deathStripeLength: riskData.deathStripeLength,
-      polygonRadius: config.polygon.polygonRadius,
+      polygonRadius: riskData.polygonRadius,
       stripesVisible: riskData.shouldShow,
       riskLevel: riskData.riskLevel,
-      configSource: testMode ? 'test' : customConfig ? 'custom' : 'default',
+      configSource: clickConfigSource,
       stripeType: type,
       stripePercentage: percentage,
     });
   }, [
     config.animation.clickableStripes,
-    config.polygon.polygonRadius,
     config.telemetry.enabled,
     config.telemetry.eventPrefix,
     config.telemetry.trackClicks,
@@ -193,13 +222,23 @@ export const QuestRiskDisplay: React.FC<QuestRiskDisplayProps> = ({
     questId,
     riskData.deathStripeLength,
     riskData.injuryStripeLength,
+    riskData.polygonRadius,
     riskData.riskLevel,
     riskData.shouldShow,
     testMode,
   ]);
 
+  // Handle keyboard activation of stripes
+  const handleStripeKeyDown = useCallback((event: React.KeyboardEvent<SVGRectElement>, type: 'injury' | 'death', percentage: number) => {
+    if (event.key === 'Enter' || event.key === ' ' || event.key === 'Spacebar') {
+      event.preventDefault();
+      handleStripeClick(type, percentage);
+    }
+  }, [handleStripeClick]);
+
   // Emit render telemetry
   React.useEffect(() => {
+    const configSource = testMode ? 'test' : customConfig ? 'custom' : 'default';
     if (config.telemetry.enabled && config.telemetry.trackRenders && onTelemetry) {
       onTelemetry({
         type: `${config.telemetry.eventPrefix}_render`,
@@ -208,6 +247,12 @@ export const QuestRiskDisplay: React.FC<QuestRiskDisplayProps> = ({
         deathPercentage,
         riskLevel: riskData.riskLevel,
         timestamp: Date.now(),
+        showStripes: riskData.shouldShow,
+        stripeHeights: {
+          injury: riskData.injuryStripeLength,
+          death: riskData.deathStripeLength,
+        },
+        configSource,
       });
     }
 
@@ -219,13 +264,12 @@ export const QuestRiskDisplay: React.FC<QuestRiskDisplayProps> = ({
       deathPercentage,
       injuryStripeLength: riskData.injuryStripeLength,
       deathStripeLength: riskData.deathStripeLength,
-      polygonRadius: config.polygon.polygonRadius,
+      polygonRadius: riskData.polygonRadius,
       stripesVisible: riskData.shouldShow,
       riskLevel: riskData.riskLevel,
-      configSource: testMode ? 'test' : customConfig ? 'custom' : 'default',
+      configSource,
     });
   }, [
-    config.polygon.polygonRadius,
     config.telemetry.enabled,
     config.telemetry.eventPrefix,
     config.telemetry.trackRenders,
@@ -237,14 +281,21 @@ export const QuestRiskDisplay: React.FC<QuestRiskDisplayProps> = ({
     questId,
     riskData.deathStripeLength,
     riskData.injuryStripeLength,
+    riskData.polygonRadius,
     riskData.riskLevel,
     riskData.shouldShow,
     testMode,
   ]);
 
+  const transitionDuration = config.animation.enabled ? `${config.animation.durationMs}ms` : '0ms';
+  const transitionStyle: React.CSSProperties = {
+    transitionDuration,
+    transitionProperty: 'all',
+    transitionTimingFunction: config.animation.easing,
+  };
+
   // Don't render if no risk stripes should be shown
   if (!riskData.shouldShow) {
-    const svgSize = config.polygon.polygonRadius * 2;
     return (
       <div
         className={clsx('relative flex items-center justify-center', className)}
@@ -253,14 +304,13 @@ export const QuestRiskDisplay: React.FC<QuestRiskDisplayProps> = ({
         data-injury-pct={injuryPercentage}
         data-death-pct={deathPercentage}
         data-show-stripes="false"
+        style={{ width: riskData.polygonWidth, height: riskData.polygonHeight }}
       >
         <svg
-          width={svgSize}
-          height={svgSize}
+          width={riskData.polygonWidth}
+          height={riskData.polygonHeight}
           className="drop-shadow-sm"
-          style={{
-            transition: config.animation.enabled ? `all ${config.animation.durationMs}ms ${config.animation.easing}` : 'none',
-          }}
+          style={transitionStyle}
         >
           <polygon
             points={riskData.polygonPoints}
@@ -270,20 +320,18 @@ export const QuestRiskDisplay: React.FC<QuestRiskDisplayProps> = ({
             className="transition-all"
           />
           <text
-            x={config.polygon.polygonRadius}
-            y={config.polygon.polygonRadius}
+            x={riskData.centerX}
+            y={riskData.centerY}
             textAnchor="middle"
             dominantBaseline="middle"
             className="text-xs fill-slate-400 font-medium"
           >
-            No Risk
+            {t('idleVillage:questRisk.noRisk', { defaultValue: 'No Risk' })}
           </text>
         </svg>
       </div>
     );
   }
-
-  const svgSize = config.polygon.polygonRadius * 2;
 
   return (
     <div
@@ -294,14 +342,13 @@ export const QuestRiskDisplay: React.FC<QuestRiskDisplayProps> = ({
       data-death-pct={deathPercentage}
       data-show-stripes="true"
       data-risk-level={riskData.riskLevel}
+      style={{ width: riskData.polygonWidth, height: riskData.polygonHeight }}
     >
       <svg
-        width={svgSize}
-        height={svgSize}
+        width={riskData.polygonWidth}
+        height={riskData.polygonHeight}
         className="drop-shadow-sm"
-        style={{
-          transition: config.animation.enabled ? `all ${config.animation.durationMs}ms ${config.animation.easing}` : 'none',
-        }}
+        style={transitionStyle}
       >
         {/* Background polygon */}
         <polygon
@@ -318,22 +365,28 @@ export const QuestRiskDisplay: React.FC<QuestRiskDisplayProps> = ({
             {/* Stripe rectangle */}
             <rect
               x={stripe.startX}
-              y={stripe.y - (config.polygon.stripeWidthPercent / 100 * config.polygon.polygonRadius) / 2}
+              y={stripe.y - (config.polygon.stripeWidthPercent / 100 * riskData.polygonRadius) / 2}
               width={stripe.endX - stripe.startX}
-              height={config.polygon.stripeWidthPercent / 100 * config.polygon.polygonRadius}
+              height={config.polygon.stripeWidthPercent / 100 * riskData.polygonRadius}
               fill={stripe.color}
+              style={{ fill: stripe.color, ...transitionStyle }}
               rx={config.polygon.stripeBorderRadius === '2px' ? 2 : 1}
               className={clsx(
                 'cursor-pointer transition-all',
                 config.animation.hover.enabled && 'hover:opacity-80 hover:scale-105'
               )}
-              style={{
-                transition: config.animation.enabled ? `all ${config.animation.durationMs}ms ${config.animation.easing}` : 'none',
-              }}
               onClick={() => handleStripeClick(stripe.type, stripe.percentage)}
+              onKeyDown={(e) => handleStripeKeyDown(e, stripe.type, stripe.percentage)}
               data-testid={`${stripe.type}-stripe`}
               data-stripe-type={stripe.type}
               data-stripe-percentage={stripe.percentage}
+              data-stripe-height={stripe.length}
+              role="button"
+              tabIndex={0}
+              aria-label={t(
+                `idleVillage:questRisk.stripeAriaLabel.${stripe.type}` as any,
+                { percent: stripe.percentage, defaultValue: `${stripe.type === 'injury' ? 'Injury' : 'Death'} risk: {percent}%` }
+              )}
             />
 
             {/* Percentage label */}
@@ -354,8 +407,8 @@ export const QuestRiskDisplay: React.FC<QuestRiskDisplayProps> = ({
 
         {/* Risk level indicator */}
         <text
-          x={config.polygon.polygonRadius}
-          y={config.polygon.polygonRadius * 0.3}
+          x={riskData.centerX}
+          y={riskData.centerY * 0.3}
           textAnchor="middle"
           dominantBaseline="middle"
           className={clsx(
@@ -365,7 +418,7 @@ export const QuestRiskDisplay: React.FC<QuestRiskDisplayProps> = ({
             'fill-slate-600'
           )}
         >
-          {riskData.riskLevel}
+          {t(`idleVillage:questRisk.level.${riskData.riskLevel.toLowerCase()}` as any, { defaultValue: riskData.riskLevel })}
         </text>
       </svg>
     </div>

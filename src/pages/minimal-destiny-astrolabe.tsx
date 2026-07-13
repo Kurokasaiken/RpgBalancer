@@ -9,6 +9,7 @@ import { DestinyAstrolabe } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeK
 import type { AstrolabeResult as DestinyAstrolabeResult, AstrolabeSkill as DestinyAstrolabeSkill, DestinyAstrolabeHandle } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeKit';
 
 const SKILL_PRESETS = {
+  hard: [{ name: 'Atletica', stat: 30, difficulty: 80 }],
   single: [{ name: 'Atletica', stat: 65, difficulty: 50 }],
   double: [
     { name: 'Atletica', stat: 65, difficulty: 50 },      // Saltare burraco
@@ -157,6 +158,13 @@ export default function MinimalDestinyAstrolabe() {
             title="Ricarica i valori di esempio per il numero di skill corrente"
           >
             ↺ Carica preset
+          </button>
+          <button
+            onClick={() => setSkills(SKILL_PRESETS.hard.map((s) => ({ ...s })))}
+            className="px-3 h-10 rounded font-semibold bg-red-900 text-red-300 hover:bg-red-800 transition-colors text-sm"
+            title="Stat 30 / Difficoltà 80 → forza SCONFITTA"
+          >
+            ⚡ HARD (forza fail)
           </button>
         </div>
 

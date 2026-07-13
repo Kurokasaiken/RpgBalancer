@@ -737,6 +737,13 @@ export interface GlobalRules {
    * Optional Trial of Fire configuration used when processing high-risk survivals.
    */
   trialOfFire?: TrialOfFireRules;
+
+  /**
+   * Party power / outcome distribution rules consumed by QuestPowerEngine
+   * (calculateResidentPower, calculatePartyPower, getOutcomeDistribution, ...).
+   * Optional for backward compatibility with configs authored before this field existed.
+   */
+  questPowerRules?: import('@/engine/game/idleVillage/QuestPowerEngine').QuestPowerRules;
 }
 
 export interface OverlaySettings {

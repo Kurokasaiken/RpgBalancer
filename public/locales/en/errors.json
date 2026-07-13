@@ -1,0 +1,11 @@
+{
+  "boundary": {
+    "title": "Something went wrong",
+    "retry": "Retry",
+    "reload": "Reload app"
+  },
+  "fallback": {
+    "loading": "Loading…",
+    "unknown": "An unknown error occurred"
+  }
+}

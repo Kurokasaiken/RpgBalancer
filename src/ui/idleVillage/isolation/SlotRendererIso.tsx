@@ -9,7 +9,8 @@
  */
 
 import { useState } from 'react';
-import { SlotV12Renderer } from '@/ui/idleVillage/components/SlotV12Renderer';
+import { Slot } from '@/ui/idleVillage/components/Slot';
+import { V9TooltipProvider } from '@/ui/v9-skin/V9Tooltip';
 import { useSlotDebugVisualization } from '@/ui/idleVillage/hooks/useSlotDebugVisualization';
 import { StyleLabSurface } from '@/ui/styleLab/StyleLabSurface';
 import { StyleLabStack } from '@/ui/styleLab/StyleLabStack';
@@ -22,7 +23,8 @@ export default function SlotRendererIso() {
   const { settings: debugSettings, isHydrated, toggleEnabled } = useSlotDebugVisualization();
 
   return (
-    <StyleLabSurface variant="panel" className="mx-auto min-h-screen w-full max-w-4xl px-6 py-10">
+    <V9TooltipProvider>
+      <StyleLabSurface variant="panel" className="mx-auto min-h-screen w-full max-w-4xl px-6 py-10">
       <StyleLabStack spacing="lg" className="w-full">
         {/* Header */}
         <StyleLabSurface variant="card" className="text-center">
@@ -127,11 +129,14 @@ export default function SlotRendererIso() {
           </h3>
           
           <div className="flex justify-center">
-            <SlotV12Renderer
-              letter={letter}
-              state={slotState}
-              extractionProgress={extractionProgress}
-              debugVisualization={debugSettings?.enabled ? debugSettings : undefined}
+            <Slot
+              tooltip={`Slot: ${slotState}`}
+              slotProps={{
+                letter,
+                state: slotState,
+                extractionProgress,
+                debugVisualization: debugSettings?.enabled ? debugSettings : undefined,
+              }}
             />
           </div>
         </div>
@@ -250,5 +255,6 @@ export default function SlotRendererIso() {
         </div>
       </StyleLabStack>
     </StyleLabSurface>
+    </V9TooltipProvider>
   );
 }

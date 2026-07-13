@@ -6,6 +6,7 @@ import type { IdleVillageConfig } from './types';
 import { DEFAULT_QUEST_TYPES } from './questTypeDefaults';
 import { DEFAULT_PASSIVE_EFFECTS } from './passiveEffects';
 import { defaultQuestBlueprints } from './quests/questBlueprints';
+import { DEFAULT_QUEST_POWER_RULES } from '@/engine/game/idleVillage/QuestPowerEngine';
 
 export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
   version: '1.0.0',
@@ -279,7 +280,7 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
       level: 2,
       dangerRating: 4, // High danger rating
       durationFormula: '8000', // 8 seconds
-      maxSlots: 1, // Only one at a time
+      maxSlots: 3, // Role-based party: 1 vanguard + 2 support
       statRequirement: {
         label: 'Elite Hunter',
         allOf: ['strength'],
@@ -299,6 +300,35 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
         highRisk: true,
         injuryChanceDisplay: 25, // 25% injury chance display
         deathChanceDisplay: 8, // 8% death chance display
+        // Role-based quest slots — the most exposed role (vanguard) carries a
+        // higher death-chance modifier; support slots are optional. Requirement
+        // tags match the canonical test roster's real statTags (fortitude,
+        // warden, ward, clarity, edge, precision) so the slots are fillable
+        // with the actual roster instead of a fictitious tag set.
+        slotBlueprints: [
+          {
+            id: 'quest_dangerous_hunt-slot-0',
+            label: 'Vanguard',
+            role: 'vanguard',
+            required: true,
+            requirement: { label: 'Vanguard', anyOf: ['fortitude', 'warden'] },
+            residentRiskModifiers: { deathChanceDelta: 10 },
+          },
+          {
+            id: 'quest_dangerous_hunt-slot-1',
+            label: 'Supporto',
+            role: 'support',
+            required: false,
+            requirement: { label: 'Supporto', anyOf: ['edge', 'precision', 'ward', 'clarity'] },
+          },
+          {
+            id: 'quest_dangerous_hunt-slot-2',
+            label: 'Supporto',
+            role: 'support',
+            required: false,
+            requirement: { label: 'Supporto', anyOf: ['edge', 'precision', 'ward', 'clarity'] },
+          },
+        ],
       },
     },
     quest_city_rats: {
@@ -334,6 +364,35 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
         // UI-only display hints for FTUE: not used by engines yet.
         injuryChanceDisplay: 35,
         deathChanceDisplay: 5,
+        // Role-based quest slots — 2 required combatants plus 1 optional support
+        // slot; leaving support empty raises the whole party's risk. Requirement
+        // tags match the canonical test roster's real statTags (fortitude,
+        // warden, ward, clarity, edge, precision) so the slots are fillable
+        // with the actual roster instead of a fictitious tag set.
+        slotBlueprints: [
+          {
+            id: 'quest_city_rats-slot-0',
+            label: 'Combattente',
+            role: 'combatant',
+            required: true,
+            requirement: { label: 'Combattente', anyOf: ['edge', 'fortitude', 'warden'] },
+          },
+          {
+            id: 'quest_city_rats-slot-1',
+            label: 'Combattente',
+            role: 'combatant',
+            required: true,
+            requirement: { label: 'Combattente', anyOf: ['edge', 'fortitude', 'warden'] },
+          },
+          {
+            id: 'quest_city_rats-slot-2',
+            label: 'Supporto',
+            role: 'support',
+            required: false,
+            requirement: { label: 'Supporto', anyOf: ['ward', 'clarity'] },
+            emptyPenalty: { extraDeathChance: 5, extraInjuryChance: 10 },
+          },
+        ],
       },
     },
     job_visit_market: {
@@ -1062,6 +1121,10 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
         materialsLowThreshold: 5, // Low materials warning
       },
     },
+    // Party power / outcome distribution rules consumed by QuestPowerEngine.
+    // Previously undefined, forcing every consumer to fall back to a raw
+    // Math.random() roll instead of the real config-driven pipeline.
+    questPowerRules: DEFAULT_QUEST_POWER_RULES,
   },
 
   overlaySettings: {

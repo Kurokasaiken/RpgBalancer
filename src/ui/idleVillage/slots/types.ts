@@ -1,8 +1,13 @@
 import type { ActivityDefinition, ActivitySlotModifier, StatRequirement } from '@/balancing/config/idleVillage/types';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
-import type { DropState } from '@/ui/idleVillage/components/ActivitySlot';
 import type { ScheduledActivityState } from '@/ui/idleVillage/hooks/useActivityScheduler';
 import type { AssignmentFailureReason } from '@/ui/idleVillage/slots/residentSlotValidators';
+
+/**
+ * Drop state for a slot during drag operations.
+ * Mirrors location drop states plus a locked state for already-assigned slots.
+ */
+export type DropState = 'idle' | 'valid' | 'invalid' | 'locked';
 
 // Re-export types for convenience
 export type { ActivitySlotModifier, AssignmentFailureReason };
@@ -63,6 +68,30 @@ export interface ResidentSlotBlueprint {
   requirementLabel?: string;
   /** Per-slot modifiers applied to fatigue/risk/yield calculations. */
   modifiers?: ActivitySlotModifier;
+  /** Semantic role of this slot (e.g. 'combatant', 'support', 'vanguard'). Label/logic only, not a closed enum. */
+  role?: string;
+  /** Penalty applied to the party-level calculations when this required slot is left empty. */
+  emptyPenalty?: QuestSlotEmptyPenalty;
+  /** Risk modifiers applied only to the resident occupying this slot (not the whole party). */
+  residentRiskModifiers?: QuestSlotResidentRiskModifiers;
+}
+
+/** Party-level penalty applied when a required quest slot is left empty. */
+export interface QuestSlotEmptyPenalty {
+  /** Multiplier applied to the computed party power (e.g. 0.85 = -15%). */
+  partyPowerMult?: number;
+  /** Percentage points added to the final death chance. */
+  extraDeathChance?: number;
+  /** Percentage points added to the final injury chance. */
+  extraInjuryChance?: number;
+}
+
+/** Risk modifiers applied to the resident assigned to a specific quest slot. */
+export interface QuestSlotResidentRiskModifiers {
+  /** Percentage points added to (or removed from) this resident's injury chance. */
+  injuryChanceDelta?: number;
+  /** Percentage points added to (or removed from) this resident's death chance. */
+  deathChanceDelta?: number;
 }
 
 /**
@@ -102,6 +131,12 @@ export interface ResidentSlotViewModel {
   requirement?: StatRequirement;
   /** Per-slot modifiers (fatigue/risk/yield). */
   modifiers?: ActivitySlotModifier;
+  /** Semantic role of this slot (e.g. 'combatant', 'support', 'vanguard'). */
+  role?: string;
+  /** Penalty applied to party-level calculations when this required slot is left empty. */
+  emptyPenalty?: QuestSlotEmptyPenalty;
+  /** Risk modifiers applied only to the resident occupying this slot. */
+  residentRiskModifiers?: QuestSlotResidentRiskModifiers;
   /** True when the slot is a virtual placeholder (infinite slots). */
   isPlaceholder: boolean;
   /** Drop validation state for the currently hovered resident. */

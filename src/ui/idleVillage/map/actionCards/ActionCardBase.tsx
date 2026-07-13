@@ -32,6 +32,8 @@ export interface ActionCardBaseProps {
   pillar?: StyleLabPillar;
   /** Drop state for visual feedback */
   dropState?: 'valid' | 'invalid' | 'idle';
+  /** Extra content rendered inside the card frame (e.g. progress bar, halo, risk stripes). */
+  children?: ReactNode;
 }
 
 /**
@@ -52,6 +54,7 @@ export function ActionCardBase({
   dataTestId,
   pillar,
   dropState,
+  children,
 }: ActionCardBaseProps) {
   const liveTokens = useStyleLabTokens();
   const fallbackTokens = useMinimalStyleLabTokens(DEFAULT_MINIMAL_CONFIG.ui);
@@ -236,6 +239,7 @@ export function ActionCardBase({
           )}
         </div>
       )}
+      {children}
     </div>
   );
 }

@@ -16,6 +16,11 @@ import { DEFAULT_MINIMAL_CONFIG } from '@/balancing/config/idleVillage/minimalCo
 import { useDragContext } from '@/ui/idleVillage/components/DragContextStore';
 import type { ResidentCompatibilityState } from './ResidentRosterTypes';
 import { rendererStackInstrumentation } from '@/ui/idleVillage/utils/rendererStackInstrumentation';
+import {
+  type PgCardFrameType,
+  getPgCardFrameTokens,
+  getPgCardFrameStyle,
+} from '@/ui/idleVillage/config/pgCardFrameConfig';
 
 /**
  * Props for the draggable rectangular token that mirrors resident stats.
@@ -45,6 +50,56 @@ export interface PgCardProps {
   compatibilityLabel?: string;
   /** Visual feedback state coming from DragTestContainer */
   dragFeedbackState?: 'idle' | 'valid' | 'invalid' | 'returning';
+  /** Frame style applied to the portrait medallion. Defaults to `heroic`. */
+  frameType?: PgCardFrameType;
+}
+
+type StatBarVariant = 'hp' | 'stamina' | 'fatigue';
+
+const STAT_BAR_COLORS: Record<StatBarVariant, { start: string; end: string; shadow: string }> = {
+  hp: { start: 'var(--skin-statbar-hp-start, #0a8a4a)', end: 'var(--skin-statbar-hp-end, #6ee7b7)', shadow: 'var(--skin-statbar-hp-glow, rgba(110,231,183,0.45))' },
+  stamina: { start: 'var(--skin-statbar-stamina-start, #d4af37)', end: 'var(--skin-statbar-stamina-end, #f59e0b)', shadow: 'var(--skin-statbar-stamina-glow, rgba(245,158,11,0.45))' },
+  fatigue: { start: 'var(--skin-statbar-fatigue-start, #9e5a4a)', end: 'var(--skin-statbar-fatigue-end, #d98a4a)', shadow: 'var(--skin-statbar-fatigue-glow, rgba(217,138,74,0.6))' },
+};
+
+interface PgCardStatBarProps {
+  variant: StatBarVariant;
+  value: number;
+  maxValue?: number;
+  className?: string;
+}
+
+function PgCardStatBar({ variant, value, maxValue = 100, className = '' }: PgCardStatBarProps) {
+  const percent = maxValue > 0 ? Math.max(0, Math.min(100, (value / maxValue) * 100)) : Math.max(0, Math.min(100, value));
+  const colors = STAT_BAR_COLORS[variant];
+  return (
+    <div
+      className={['rounded-full overflow-hidden', className].filter(Boolean).join(' ')}
+      style={{
+        background: 'var(--skin-statbar-track, linear-gradient(180deg, #0c0b0a, #050505))',
+        border: '1px solid var(--skin-statbar-track-border, rgba(216,177,62,0.08))',
+        boxShadow: 'inset 0 2px 5px rgba(0,0,0,0.85), inset 0 1px 0 rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.03)',
+      }}
+    >
+      <div
+        className="h-full rounded-full transition-all"
+        style={{
+          width: `${percent}%`,
+          background: `linear-gradient(90deg, ${colors.start}, ${colors.end})`,
+          boxShadow: `inset 0 0 0 0.5px color-mix(in srgb, var(--skin-icon-color, #dfb857) 85%, transparent), 0 0 6px ${colors.shadow}`,
+          transitionDuration: '300ms',
+          transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+        }}
+      >
+        <div
+          className="h-1/2 w-full rounded-t-full"
+          style={{
+            background: 'radial-gradient(ellipse 70% 55% at 50% 0%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.12) 45%, transparent 70%), linear-gradient(180deg, rgba(255,255,255,0.22), transparent)',
+          }}
+        />
+      </div>
+    </div>
+  );
 }
 
 const PgCard = memo<PgCardProps>(({  
@@ -71,6 +126,7 @@ const PgCard = memo<PgCardProps>(({
   compatibilityState,
   compatibilityLabel,
   dragFeedbackState = 'idle',
+  frameType = 'heroic',
 }) => {
   // Instrument renderer stack at PgCard level (final rendering stage)
   useEffect(() => {
@@ -89,6 +145,7 @@ const PgCard = memo<PgCardProps>(({
         portraitUrl,
         compatibilityState,
         compatibilityLabel,
+        frameType,
       },
       {
         displayName: label,
@@ -96,9 +153,10 @@ const PgCard = memo<PgCardProps>(({
         displayedFatigue: fatigue,
         portraitResolvedSource: portraitUrl,
         finalRenderOrder: renderIndex,
+        frameType,
       }
     );
-  }, [workerId, label, subtitle, hp, fatigue, maxHp, portraitUrl, compatibilityState, compatibilityLabel]);
+  }, [workerId, label, subtitle, hp, fatigue, maxHp, portraitUrl, compatibilityState, compatibilityLabel, frameType]);
 
   const { dragImageRef, isReady: dragPreviewReady } = useResidentDragPreview({
     residentId: workerId,
@@ -238,8 +296,9 @@ const PgCard = memo<PgCardProps>(({
       disabled,
       isInteractive,
       portraitType: hasPortrait ? 'portrait' : 'initials',
+      frameType,
     }),
-    [workerId, label, computedStatusLabel, compatibilityState, horizontal, disabled, isInteractive, hasPortrait],
+    [workerId, label, computedStatusLabel, compatibilityState, horizontal, disabled, isInteractive, hasPortrait, frameType],
   );
 
   // Still track instrumentation for analytics even if we don't use the canvas preview for drag
@@ -260,19 +319,21 @@ const PgCard = memo<PgCardProps>(({
       disabled,
       horizontal,
       hasPortrait,
+      frameType,
       skinBinding: skinBinding.componentId,
     });
-  }, [workerId, label, hp, fatigue, isDragging, disabled, horizontal, hasPortrait, skinBinding.componentId, trackComponentEvent]);
+  }, [workerId, label, hp, fatigue, isDragging, disabled, horizontal, hasPortrait, frameType, skinBinding.componentId, trackComponentEvent]);
 
   useEffect(() => {
     if (isDragging) {
       trackComponentEvent('drag_start', {
         workerId,
         label,
+        frameType,
         skinBinding: skinBinding.componentId,
       });
     }
-  }, [isDragging, workerId, label, skinBinding.componentId, trackComponentEvent]);
+  }, [isDragging, workerId, label, frameType, skinBinding.componentId, trackComponentEvent]);
 
   // Trigger audio cues on interaction state changes
   useEffect(() => {
@@ -306,6 +367,24 @@ const PgCard = memo<PgCardProps>(({
         onSelect?.(workerId);
   }, [isUnavailable, isReturning, onSelect, workerId, dragFeedbackState]);
 
+  const handleDragStart = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+    if (isUnavailable || isReturning) {
+      event.preventDefault();
+      return;
+    }
+    playCue('pickup');
+    onDragStart?.(event);
+    onDragStateChange?.(workerId, true);
+  }, [isUnavailable, isReturning, playCue, onDragStart, onDragStateChange, workerId]);
+
+  const handleDragEnd = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+    onDragEnd?.(event);
+    onDragStateChange?.(workerId, false);
+    if (isReturning) {
+      playCue('drop_invalid');
+    }
+  }, [onDragEnd, onDragStateChange, workerId, isReturning, playCue]);
+
   const handleKeyDownInternal = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
@@ -320,8 +399,8 @@ const PgCard = memo<PgCardProps>(({
   const constrainedHp = hp;
   const constrainedFatigue = fatigue;
   const baseTokenClasses = horizontal
-    ? 'flex items-center gap-3 rounded-[18px] border border-white/15 bg-[rgba(8,12,18,0.65)] px-3 py-2 text-left text-xs text-amber-100 shadow-[0_12px_26px_rgba(0,0,0,0.45)] backdrop-blur-md transition-all max-w-sm'
-    : 'flex flex-col gap-2 rounded-[22px] border border-white/15 bg-[rgba(6,10,18,0.7)] px-4 py-3 text-left text-xs text-amber-100 shadow-[0_18px_30px_rgba(0,0,0,0.5)] backdrop-blur-md transition-all';
+    ? 'flex items-center gap-3 rounded-[18px] border border-[var(--skin-surface-border)] bg-transparent px-3 py-2 text-left text-xs text-[var(--skin-text-primary)] shadow-[0_12px_26px_rgba(0,0,0,0.45)] backdrop-blur-md transition-all max-w-sm'
+    : 'flex flex-col gap-2 rounded-[22px] border border-[var(--skin-surface-border)] bg-transparent px-4 py-3 text-left text-xs text-[var(--skin-text-primary)] shadow-[0_18px_30px_rgba(0,0,0,0.5)] backdrop-blur-md transition-all';
 
   const returningOverlayClass = isReturning
     ? 'pointer-events-none opacity-60 grayscale animate-bounce-spring'
@@ -329,12 +408,14 @@ const PgCard = memo<PgCardProps>(({
 
   const compatibilityAccentClass =
     compatibilityState === 'valid'
-      ? 'ring-2 ring-emerald-400/60 shadow-[0_0_25px_rgba(16,185,129,0.25)]'
+      ? 'ring-2 ring-[var(--skin-status-met)]/60 shadow-[0_0_25px_color-mix(in_srgb,var(--skin-status-met)_25%,transparent)]'
       : compatibilityState === 'invalid'
-        ? 'ring-1 ring-white/20 shadow-[0_0_20px_rgba(255,255,255,0.1)]'
+        ? 'ring-1 ring-[var(--skin-text-muted)]/20 shadow-[0_0_20px_color-mix(in_srgb,var(--skin-text-muted)_20%,transparent)]'
         : '';
 
   const renderPortraitBadge = (variant: 'horizontal' | 'vertical') => {
+    const frameTokens = getPgCardFrameTokens(frameType);
+    const isCircular = frameTokens.borderRadius === 'full';
     const sizeClasses =
       variant === 'horizontal'
         ? hasPortrait
@@ -343,33 +424,85 @@ const PgCard = memo<PgCardProps>(({
         : hasPortrait
           ? 'h-10 w-16'
           : 'h-8 w-8';
-    const shapeClass = hasPortrait ? 'rounded-[999px]' : 'rounded-full';
+    const shapeClass = isCircular ? 'rounded-full' : 'rounded-[14px]';
     const textStyle =
       variant === 'horizontal'
         ? 'text-[11px] font-semibold uppercase tracking-[0.3em]'
         : 'text-base font-semibold uppercase tracking-[0.3em]';
+    const frameStyle = getPgCardFrameStyle(frameType, variant);
+
     return (
       <div
         className={[
-          'flex items-center justify-center border border-amber-200/70 bg-[rgba(18,12,0,0.65)] text-ivory shadow-inner shadow-amber-900/40 overflow-hidden',
+          'relative flex items-center justify-center overflow-hidden text-[var(--skin-text-primary)]',
+          'pgcard-frame',
+          `pgcard-frame-${frameTokens.classSuffix}`,
           sizeClasses,
           shapeClass,
           hasPortrait ? '' : textStyle,
         ]
           .filter(Boolean)
           .join(' ')}
-        style={hasPortrait ? {
+        style={{
+          ...frameStyle,
           width: variant === 'horizontal' ? '56px' : '64px',
           height: variant === 'horizontal' ? '32px' : '40px',
           minWidth: variant === 'horizontal' ? '56px' : '64px',
           minHeight: variant === 'horizontal' ? '32px' : '40px',
-        } : undefined}
+        }}
+        data-frame-type={frameType}
         aria-hidden="true"
       >
+        {frameTokens.hasInnerBevel && (
+          <div
+            className="pointer-events-none absolute inset-0 z-10 rounded-[inherit]"
+            style={{
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.35)',
+            }}
+          />
+        )}
+
         {hasPortrait ? (
           <img src={portraitUrl} alt="" className="h-full w-full object-cover" draggable={false} />
         ) : (
-          portraitInitial
+          <span className="relative z-0">{portraitInitial}</span>
+        )}
+
+        {frameTokens.hasCornerDecorations && (
+          <>
+            <span
+              className="pointer-events-none absolute top-0 left-0 z-20 h-1.5 w-1.5"
+              style={{
+                borderTop: `2px solid ${frameTokens.accentColor}`,
+                borderLeft: `2px solid ${frameTokens.accentColor}`,
+                borderTopLeftRadius: frameTokens.borderRadius === 'sharp' ? '1px' : '6px',
+              }}
+            />
+            <span
+              className="pointer-events-none absolute top-0 right-0 z-20 h-1.5 w-1.5"
+              style={{
+                borderTop: `2px solid ${frameTokens.accentColor}`,
+                borderRight: `2px solid ${frameTokens.accentColor}`,
+                borderTopRightRadius: frameTokens.borderRadius === 'sharp' ? '1px' : '6px',
+              }}
+            />
+            <span
+              className="pointer-events-none absolute bottom-0 left-0 z-20 h-1.5 w-1.5"
+              style={{
+                borderBottom: `2px solid ${frameTokens.accentColor}`,
+                borderLeft: `2px solid ${frameTokens.accentColor}`,
+                borderBottomLeftRadius: frameTokens.borderRadius === 'sharp' ? '1px' : '6px',
+              }}
+            />
+            <span
+              className="pointer-events-none absolute bottom-0 right-0 z-20 h-1.5 w-1.5"
+              style={{
+                borderBottom: `2px solid ${frameTokens.accentColor}`,
+                borderRight: `2px solid ${frameTokens.accentColor}`,
+                borderBottomRightRadius: frameTokens.borderRadius === 'sharp' ? '1px' : '6px',
+              }}
+            />
+          </>
         )}
       </div>
     );
@@ -395,11 +528,12 @@ const PgCard = memo<PgCardProps>(({
       data-drag-state={isDragging ? 'dragging' : isReturning ? 'returning' : isUnavailable ? 'disabled' : 'idle'}
       data-resident-id={workerId}
       data-compatibility={compatibilityState}
+      data-pgcard-frame={frameType}
       className={[
         baseTokenClasses,
         compatibilityAccentClass,
         'clip-path-card', // Irregular corners — organic, non-web-like appearance
-        isUnavailable ? 'cursor-not-allowed opacity-35 grayscale' : 'cursor-grab active:cursor-grabbing active:scale-95 hover:border-emerald-300/70',
+        isUnavailable ? 'cursor-not-allowed opacity-35 grayscale' : 'cursor-grab active:cursor-grabbing active:scale-95 hover:border-[var(--skin-status-met)]/70',
         returningOverlayClass,
         isDragging ? 'opacity-40 pointer-events-none' : '',
         ...classes, // Add skin binding classes
@@ -412,6 +546,7 @@ const PgCard = memo<PgCardProps>(({
       // Add skin styles and dynamic transform origin for portrait-anchored spring-back
       style={{
         ...styles,
+        background: 'var(--skin-surface-bg)',
         // Transform origin will be set dynamically in handlePointerDown
         transformOrigin: horizontal ? '28px 16px' : '32px 20px',
       }}
@@ -446,6 +581,8 @@ const PgCard = memo<PgCardProps>(({
         listeners?.onPointerCancel?.(e);
       }}
       onClick={handleClickInternal}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
       onKeyDown={(e) => {
         handleKeyDownInternal(e);
         listeners?.onKeyDown?.(e);
@@ -458,11 +595,11 @@ const PgCard = memo<PgCardProps>(({
 
           <div className="min-w-0 flex-1 space-y-1">
             <div className="flex items-center justify-between gap-2">
-              <span className="truncate text-[11px] font-semibold tracking-[0.08em] text-ivory text-engraved">{label}</span>
+              <span className="truncate text-[11px] font-semibold tracking-[0.08em] text-[var(--skin-text-primary)] text-engraved">{label}</span>
               <span
                 className={[
                   'rounded-full px-1.5 py-0.5 text-[7.5px] tracking-[0.18em] uppercase',
-                  isUnavailable ? 'border border-rose-300/70 text-rose-100/80 bg-rose-900/20' : 'border border-emerald-200/70 text-emerald-100/80 bg-emerald-900/20',
+                  isUnavailable ? 'border border-[var(--skin-status-unmet)]/70 text-[var(--skin-status-unmet)]/80 bg-[var(--skin-status-unmet)]/20' : 'border border-[var(--skin-status-met)]/70 text-[var(--skin-status-met)]/80 bg-[var(--skin-status-met)]/20',
                 ].join(' ')}
               >
                 {computedStatusLabel}
@@ -473,7 +610,7 @@ const PgCard = memo<PgCardProps>(({
               <div
                 className={[
                   'text-[10px] uppercase tracking-[0.2em]',
-                  'text-rose-200',
+                  'text-[var(--skin-status-unmet)]',
                 ].join(' ')}
               >
                 Nessuno slot compatibile
@@ -483,7 +620,7 @@ const PgCard = memo<PgCardProps>(({
               <div
                 className={[
                   'text-[10px] uppercase tracking-[0.2em]',
-                  'text-emerald-200',
+                  'text-[var(--skin-status-met)]',
                 ].join(' ')}
               >
                 {`Compatibile${compatibilityLabel ? ` · ${compatibilityLabel}` : ''}`}
@@ -491,39 +628,17 @@ const PgCard = memo<PgCardProps>(({
             )}
 
             <div className="flex items-center gap-1.5">
-              <span className="text-[9px] text-slate-500 w-3">HP</span>
-              <div className="flex-1 h-1 rounded-full bg-white/10">
-                <div
-                  className="h-full rounded-full transition-all"
-                  style={{
-                    width: `${maxHp ? (hp / maxHp) * 100 : constrainedHp}%`,
-                    background: `linear-gradient(90deg, #10b981 0%, #fcd34d 50%, #e63946 100%)`,
-                    boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.4)',
-                    transitionDuration: '250ms',
-                    transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
-                  }}
-                />
-              </div>
-              <span className="text-[9px] text-slate-400 w-6 text-right text-engraved-light">
+              <span className="text-[9px] text-[var(--skin-label-tertiary)] w-3">HP</span>
+              <PgCardStatBar variant="hp" value={hp} maxValue={maxHp ?? 0} className="flex-1 h-1" />
+              <span className="text-[9px] text-[var(--skin-body-color)] w-6 text-right text-engraved-light">
                 {maxHp ? `${hp}/${maxHp}` : `${constrainedHp}`}
               </span>
             </div>
 
             <div className="flex items-center gap-1.5">
-              <span className="text-[9px] text-slate-500 w-3 text-engraved-light">S</span>
-              <div className="flex-1 h-1 rounded-full bg-white/10">
-                <div
-                  className="h-full rounded-full transition-all"
-                  style={{
-                    width: `${100 - constrainedFatigue}%`,
-                    background: `linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%)`,
-                    boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.4)',
-                    transitionDuration: '300ms',
-                    transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
-                  }}
-                />
-              </div>
-              <span className="text-[9px] text-slate-400 w-6 text-right text-engraved-light">
+              <span className="text-[9px] text-[var(--skin-label-tertiary)] w-3 text-engraved-light">S</span>
+              <PgCardStatBar variant="stamina" value={100 - constrainedFatigue} maxValue={100} className="flex-1 h-1" />
+              <span className="text-[9px] text-[var(--skin-body-color)] w-6 text-right text-engraved-light">
                 {100 - constrainedFatigue}
               </span>
             </div>
@@ -533,7 +648,7 @@ const PgCard = memo<PgCardProps>(({
         // Original vertical mode
         <>
           <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold tracking-[0.08em] text-ivory text-engraved">{label}</span>
+            <span className="text-sm font-semibold tracking-[0.08em] text-[var(--skin-text-primary)] text-engraved">{label}</span>
             {renderPortraitBadge('vertical')}
           </div>
           {compatibilityState !== 'idle' && (
@@ -541,8 +656,8 @@ const PgCard = memo<PgCardProps>(({
               className={[
                 'rounded-full border px-2 py-0.5 text-[9px] uppercase tracking-[0.2em]',
                 compatibilityState === 'valid'
-                  ? 'border-emerald-300/70 text-emerald-100 bg-emerald-900/30'
-                  : 'border-rose-300/70 text-rose-100 bg-rose-900/30',
+                  ? 'border-[var(--skin-status-met)]/70 text-[var(--skin-status-met)] bg-[var(--skin-status-met)]/30'
+                  : 'border-[var(--skin-status-unmet)]/70 text-[var(--skin-status-unmet)] bg-[var(--skin-status-unmet)]/30',
               ].join(' ')}
             >
               {compatibilityState === 'valid'
@@ -550,43 +665,21 @@ const PgCard = memo<PgCardProps>(({
                 : 'Nessuno slot compatibile'}
             </div>
           )}
-          {subtitle && <span className="text-[10px] tracking-wide text-slate-400">{subtitle}</span>}
+          {subtitle && <span className="text-[10px] tracking-wide text-[var(--skin-body-color)]">{subtitle}</span>}
           <div className="space-y-2 pt-1 text-[10px] tracking-[0.2em] uppercase">
             <div>
-              <div className="mb-1 flex items-center justify-between text-emerald-200/80 text-engraved-light">
+              <div className="mb-1 flex items-center justify-between text-[var(--skin-status-met)]/80 text-engraved-light">
                 <span>HP</span>
                 <span>{maxHp ? `${hp}/${maxHp}` : `${constrainedHp}`}</span>
               </div>
-              <div className="h-1.5 w-full rounded-full bg-slate-800/80">
-                <div
-                  className="h-full rounded-full transition-all"
-                  style={{
-                    width: `${maxHp ? (hp / maxHp) * 100 : constrainedHp}%`,
-                    background: `linear-gradient(90deg, #10b981 0%, #fcd34d 50%, #e63946 100%)`,
-                    boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.4)',
-                    transitionDuration: '250ms',
-                    transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
-                  }}
-                />
-              </div>
+              <PgCardStatBar variant="hp" value={hp} maxValue={maxHp ?? 0} className="h-1.5 w-full" />
             </div>
             <div>
-              <div className="mb-1 flex items-center justify-between text-amber-200/80 text-engraved-light">
+              <div className="mb-1 flex items-center justify-between text-[var(--skin-icon-color)]/80 text-engraved-light">
                 <span>STAMINA</span>
                 <span>{100 - constrainedFatigue}%</span>
               </div>
-              <div className="h-1.5 w-full rounded-full bg-slate-800/80">
-                <div
-                  className="h-full rounded-full transition-all"
-                  style={{
-                    width: `${100 - constrainedFatigue}%`,
-                    background: `linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%)`,
-                    boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.4)',
-                    transitionDuration: '300ms',
-                    transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
-                  }}
-                />
-              </div>
+              <PgCardStatBar variant="stamina" value={100 - constrainedFatigue} maxValue={100} className="h-1.5 w-full" />
             </div>
           </div>
         </>

@@ -1,0 +1,10 @@
+{
+  "app": {
+    "title": "Wanderlust"
+  },
+  "mockup": {
+    "error": "Failed to load mockup content",
+    "help": "Please check the console for details",
+    "title": "Wanderlust Mockup"
+  }
+}

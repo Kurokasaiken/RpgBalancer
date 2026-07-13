@@ -186,7 +186,7 @@ export function normalizeQuestEntry(
   
   // Use telemetry data to estimate risk factors
   const injuryPercentage = normalizePercentage(
-    telemetry.failurePoints.length > 0 ? failureRate * 0.7 : failureRate * 0.3
+    (telemetry?.failurePoints?.length ?? 0) > 0 ? failureRate * 0.7 : failureRate * 0.3
   );
   const deathPercentage = normalizePercentage(
     failureRate * 0.2 // Assume 20% of failures result in death

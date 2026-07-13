@@ -1,64 +1,32 @@
-import idleVillageTooltipsJson from '@/data/idleVillage/tooltips.json';
+import { LocalizationServiceAdapter } from './adapters/LocalizationServiceAdapter';
+import type { SupportedLocale } from './LocaleConfig';
+import type {
+  WorkerRiskLevelKey,
+  WorkerRecommendationKey,
+  WorkerTooltipLabels,
+  WorkerTooltipCopy,
+} from './types';
 
-export type WorkerRiskLevelKey = 'low' | 'medium' | 'high' | 'critical';
-export type WorkerRecommendationKey = 'lowHp' | 'highFatigue' | 'injured' | 'critical';
-
-/**
- * Label entries exposed to the UI when rendering worker tooltips.
- */
-export interface WorkerTooltipLabels {
-  hp?: string;
-  fatigue?: string;
-  performance?: string;
-  specialties?: string;
-  bio?: string;
-  recommendations?: string;
-  risk?: string;
-}
-
-/**
- * Copy dictionary for Idle Village worker tooltips.
- */
-export interface WorkerTooltipCopy {
-  labels?: WorkerTooltipLabels;
-  statuses?: Partial<Record<string, string>>;
-  riskLevels?: Partial<Record<WorkerRiskLevelKey, string>>;
-  recommendations?: Partial<Record<WorkerRecommendationKey, string>>;
-  accessibility?: {
-    tooltipDetails?: string;
-    riskBadge?: string;
-    closeTooltip?: string;
-  };
-  actions?: Partial<Record<'close', string>>;
-  sections?: Partial<Record<'quote', string>>;
-}
+export type {
+  WorkerRiskLevelKey,
+  WorkerRecommendationKey,
+  WorkerTooltipLabels,
+  WorkerTooltipCopy,
+  SupportedLocale,
+};
 
 /**
- * Localization bundle containing Idle Village dictionaries per locale.
- */
-interface IdleVillageLocalizationBundle {
-  workerTooltip: WorkerTooltipCopy;
-}
-
-type IdleVillageTooltipDictionary = Record<string, IdleVillageLocalizationBundle>;
-
-const idleVillageTooltips = idleVillageTooltipsJson as IdleVillageTooltipDictionary;
-
-export type SupportedLocale = keyof typeof idleVillageTooltips;
-
-/**
- * Centralized localization service in charge of loading dictionaries,
- * tracking the active locale, and providing helpers for components/hooks.
+ * Legacy LocalizationService facade.
+ * Delegates all operations to the i18next-backed LocalizationServiceAdapter
+ * while preserving the original public API.
  */
 export class LocalizationService {
   private static instance: LocalizationService;
 
-  private currentLocale: SupportedLocale = 'en';
-  private readonly tooltipsDictionary: IdleVillageTooltipDictionary;
-  private readonly listeners = new Set<() => void>();
+  private readonly adapter: LocalizationServiceAdapter;
 
-  private constructor(tooltipsDictionary: IdleVillageTooltipDictionary = idleVillageTooltips) {
-    this.tooltipsDictionary = tooltipsDictionary;
+  private constructor() {
+    this.adapter = LocalizationServiceAdapter.getInstance();
   }
 
   /**
@@ -71,53 +39,24 @@ export class LocalizationService {
     return LocalizationService.instance;
   }
 
-  /**
-   * Returns the currently active locale.
-   */
   public getLocale(): SupportedLocale {
-    return this.currentLocale;
+    return this.adapter.getLocale();
   }
 
-  /**
-   * Sets the active locale if the dictionary exists.
-   */
   public setLocale(locale: SupportedLocale): void {
-    if (!this.tooltipsDictionary[locale]) {
-      throw new Error(`Locale ${locale} is not supported.`);
-    }
-    this.currentLocale = locale;
-    this.listeners.forEach((listener) => listener());
+    this.adapter.setLocale(locale);
   }
 
-  /**
-   * Returns the worker tooltip copy for the active locale.
-   */
   public getWorkerTooltipCopy(): WorkerTooltipCopy {
-    return this.tooltipsDictionary[this.currentLocale].workerTooltip;
+    return this.adapter.getWorkerTooltipCopy();
   }
 
-  /**
-   * Replaces placeholders in the provided template with runtime parameters.
-   */
   public format(template: string, params?: Record<string, string | number>): string {
-    if (!params) {
-      return template;
-    }
-    return Object.entries(params).reduce(
-      (result, [key, value]) =>
-        result.replace(new RegExp(`{${key}}`, 'g'), String(value)),
-      template,
-    );
+    return this.adapter.format(template, params);
   }
 
-  /**
-   * Registers a listener that will be notified whenever the locale changes.
-   */
   public subscribe(listener: () => void): () => void {
-    this.listeners.add(listener);
-    return () => {
-      this.listeners.delete(listener);
-    };
+    return this.adapter.subscribe(listener);
   }
 }
 

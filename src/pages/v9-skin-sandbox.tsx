@@ -32,9 +32,10 @@ import spaccaculiPortrait from '@/assets/portraits/portrait male warrior.png';
 import { V9GlassLayers } from '@/ui/v9-skin/V9GlassLayers';
 import { WanderlustSurface, InsetPanel, type MaterialLayerConfig } from '@/ui/wanderlust-surface';
 import { type MaterialPreset, MATERIAL_PRESETS } from '@/ui/wanderlust-surface/materialPresets';
-import { ResidentSlotRack } from '@/ui/idleVillage/components/ResidentSlotRack';
+import type { SkinPresetId } from '@/ui/idleVillage/skins/skinConfigRegistry';
+import { ResidentSlotRackSkin } from '@/ui/idleVillage/frozen/kits/slotRackKit';
+import { useSkinPreferences } from '@/ui/idleVillage/hooks/useSkinPreferences';
 import {
-  WanderlustHeading,
   WanderlustField,
   WanderlustFieldGroup,
   WanderlustRequirementList,
@@ -44,8 +45,9 @@ import {
   WanderlustAmbientField,
 } from '@/ui/wanderlust-surface/layout';
 import { WanderlustStatBar } from '@/ui/wanderlust-surface/layout/WanderlustStatBar';
-import DraggableSkinAware from '@/ui/idleVillage/components/DraggableSkinAware';
 import { useGenericTokens } from '@/ui/styleLab/hooks/useGenericTokens';
+import { V9TooltipProvider } from '@/ui/v9-skin/V9Tooltip';
+import { useV9Tooltip } from '@/ui/v9-skin/useV9Tooltip';
 
 type BackgroundMode = 'marble' | 'parchment' | 'void' | 'bg';
 
@@ -67,32 +69,25 @@ const WANDERLUST_SHAPES: { id: WanderlustShape; label: string; description: stri
   { id: 'tablet',    label: 'Tablet',    description: '4:3 with corners — dialogs, info boxes' },
 ];
 
-// ─── V9 Obsidian Palette ────────────────────────────────────────────────────────
+// ─── V9 Skin Token Palette ────────────────────────────────────────────────────────
+// All values are CSS variable references so the sandbox follows the active skin.
 const V9 = {
-  // Core colors - Obsidian aesthetic
-  obsidianBase:    '#060f16',                      // Dark teal/midnight navy base
-  azureLight:      '#00e5ff',                      // Crystalline azure for light leak
-  goldBronze:      '#dfb857',                      // Gold/bronze for borders
-  warmGold:        '#f7dd80',                      // Light gold for text
-  ivory:           '#F5F2E8',                      // Ivory text
-  textPrimary:     '#F5F2E8',                      // Ivory primary
-  textSecondary:   'rgba(245,242,232,0.70)',       // Ivory secondary
-  textMuted:       'rgba(245,242,232,0.50)',       // Ivory muted
-
-  // Obsidian background with azure light leak from top-left
-  obsidianBg: `
-    radial-gradient(circle at 0% 0%, rgba(0,229,255,0.15) 0%, transparent 50%),
-    #060f16
-  `.trim(),
-
-  // Borders and glows
-  borderGold:      'rgba(223,184,87,0.50)',
-  glowAzure:       'rgba(0,229,255,0.25)',
-  glowGold:        'rgba(223,184,87,0.20)',
+  obsidianBase:    'var(--skin-surface-base)',
+  azureLight:      'var(--skin-icon-accent)',
+  goldBronze:      'var(--skin-title-color)',
+  warmGold:        'var(--skin-title-color)',
+  ivory:           'var(--skin-text-primary)',
+  textPrimary:     'var(--skin-text-primary)',
+  textSecondary:   'var(--skin-text-secondary)',
+  textMuted:       'var(--skin-text-muted)',
+  obsidianBg:      'var(--skin-surface-bg)',
+  borderGold:      'var(--skin-surface-border)',
+  glowAzure:       'var(--skin-glow-accent)',
+  glowGold:        'var(--skin-glow-primary)',
 };
 // ────────────────────────────────────────────────────────────────────────────────
 
-const GenericTokensDemo: React.FC<{ material: MaterialPreset; materialLayer?: any }> = ({ material, materialLayer }) => {
+const GenericTokensDemo: React.FC<{ material: MaterialPreset }> = ({ material }) => {
   const { typography, spacing } = useGenericTokens();
 
   return (
@@ -103,7 +98,6 @@ const GenericTokensDemo: React.FC<{ material: MaterialPreset; materialLayer?: an
         interactive={true}
         isDragging={false}
         isPaused={false}
-        materialLayer={materialLayer}
         style={{ width: '100%', maxWidth: 1400, minHeight: '80vh' }}
       >
         <div style={{ padding: '32px', background: V9.obsidianBg }}>
@@ -116,7 +110,7 @@ const GenericTokensDemo: React.FC<{ material: MaterialPreset; materialLayer?: an
               marginBottom: spacing.md,
               letterSpacing: '0.18em',
               textTransform: 'uppercase',
-              textShadow: `0 0 20px ${V9.glowAzure}55`,
+              textShadow: `0 0 20px ${V9.glowAzure}`,
             }}>
               Generic Tokens · V9 Explorer Journal
             </h2>
@@ -158,7 +152,7 @@ const GenericTokensDemo: React.FC<{ material: MaterialPreset; materialLayer?: an
             InsetPanel · Slot Rack
           </WanderlustSectionHeader>
           <InsetPanel style={{ background: V9.obsidianBase, border: `1px solid ${V9.borderGold}` }}>
-            <ResidentSlotRack
+            <ResidentSlotRackSkin
               slots={[
                 { id: 'v9-s1', index: 0, label: 'Slot 1', assignedResidentId: null, isPlaceholder: false, dropState: 'idle' },
                 { id: 'v9-s2', index: 1, label: 'Slot 2', assignedResidentId: null, isPlaceholder: false, dropState: 'idle' },
@@ -228,7 +222,23 @@ const DraggablePoiPanel: React.FC<DraggablePanelProps> = ({
 };
 // ────────────────────────────────────────────────────────────────────────────────
 
+const TooltipButton: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement> & { tooltip: string }> = ({ tooltip, ...props }) => {
+  const tooltipProps = useV9Tooltip(tooltip);
+  return <button type="button" {...props} {...tooltipProps} />;
+};
+
 export const V9SkinSandbox: React.FC = () => {
+  const { presetId, setPreset, pillar, setPillar, availablePresets, supportedPillars } = useSkinPreferences();
+
+  useEffect(() => {
+    if (
+      typeof window !== 'undefined' &&
+      ['/skin-lab', '/skin-sandbox'].includes(window.location.pathname)
+    ) {
+      console.warn('The /skin-lab and /skin-sandbox paths are deprecated. Use /v9-skin-sandbox instead.');
+    }
+  }, []);
+
   const [wanderlustShape, setWanderlustShape] = useState<WanderlustShape>('panel');
   const [material, setMaterial] = useState<MaterialPreset>('bronze');
   const [wanderlustInteractive, setWanderlustInteractive] = useState(true);
@@ -301,7 +311,7 @@ export const V9SkinSandbox: React.FC = () => {
   const toggleHeavyFeel      = useCallback(() => setState(prev => ({ ...prev, heavyFeel:         !prev.heavyFeel        })), []);
   const toggleDynamicRimLight= useCallback(() => setState(prev => ({ ...prev, dynamicRimLight:   !prev.dynamicRimLight  })), []);
 
-  const materialLayerConfig: any = {
+  const materialLayerConfig: MaterialLayerConfig = {
     baseTexture:       'obsidian',
     edgeTreatment:     'eroded-bronze',
     emissiveHalo:      'none',
@@ -325,14 +335,15 @@ export const V9SkinSandbox: React.FC = () => {
   const tabInactive = 'bg-black/30 text-white/60 border border-white/10 hover:border-white/30';
 
   return (
-    <div className="min-h-screen p-8 font-serif">
+    <V9TooltipProvider>
+      <div className="min-h-screen p-8 font-serif">
       <div style={backgroundStyle} className={state.backgroundMode === 'bg' ? 'v9-bg-animated' : ''} />
 
       {/* ── Configuration Bar ── */}
       <div className="mb-8 rounded-lg border border-white/10 bg-black/40 p-6 backdrop-blur-sm">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h1 className="text-xl tracking-[0.3em] uppercase" style={{ color: V9.azureLight }}>
+            <h1 className="text-xl tracking-[0.3em] uppercase" style={{ color: V9.warmGold, textShadow: '0 2px 4px rgba(0,0,0,0.85)' }}>
               V9 Explorer Journal
             </h1>
             <p className="text-xs mt-0.5" style={{ color: V9.textSecondary, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
@@ -398,10 +409,38 @@ export const V9SkinSandbox: React.FC = () => {
             <span className="text-xs uppercase tracking-[0.2em] text-white/50">Shape</span>
             <div className="flex gap-2">
               {WANDERLUST_SHAPES.map(s => (
-                <button key={s.id} onClick={() => setWanderlustShape(s.id)} title={s.description}
+                <TooltipButton key={s.id} onClick={() => setWanderlustShape(s.id)} tooltip={s.description}
                   className={`rounded px-3 py-1.5 text-xs uppercase tracking-[0.15em] transition-colors ${wanderlustShape === s.id ? tabActive : tabInactive}`}
                 >
                   {s.label}
+                </TooltipButton>
+              ))}
+            </div>
+          </div>
+
+          {/* Skin Preset */}
+          <div className="flex flex-col gap-2">
+            <span className="text-xs uppercase tracking-[0.2em] text-white/50">Skin Preset</span>
+            <div className="flex gap-2">
+              {availablePresets.map(p => (
+                <button key={p.id} onClick={() => setPreset(p.id as SkinPresetId)}
+                  className={`rounded px-3 py-1.5 text-xs uppercase tracking-[0.15em] transition-colors ${presetId === p.id ? tabActive : tabInactive}`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Pillar */}
+          <div className="flex flex-col gap-2">
+            <span className="text-xs uppercase tracking-[0.2em] text-white/50">Pillar</span>
+            <div className="flex gap-2">
+              {supportedPillars.map(p => (
+                <button key={p} onClick={() => setPillar(p)}
+                  className={`rounded px-3 py-1.5 text-xs uppercase tracking-[0.15em] transition-colors ${pillar === p ? tabActive : tabInactive}`}
+                >
+                  {p}
                 </button>
               ))}
             </div>
@@ -409,7 +448,7 @@ export const V9SkinSandbox: React.FC = () => {
 
           {/* Material */}
           <div className="flex flex-col gap-2">
-            <span className="text-xs uppercase tracking-[0.2em] text-white/50">Material</span>
+            <span className="text-xs uppercase tracking-[0.2em] text-white/50">Surface Material</span>
             <div className="flex gap-2">
               {(Object.keys(MATERIAL_PRESETS) as MaterialPreset[]).map(m => (
                 <button key={m} onClick={() => setMaterial(m)}
@@ -477,7 +516,7 @@ export const V9SkinSandbox: React.FC = () => {
             style={{
               width:  showPoiChrome ? 480 : (wanderlustShape === 'badge' ? 280 : 400),
               height: showPoiChrome ? 450 : 320,
-              boxShadow: isOver ? `0 0 30px ${V9.glowAzure}66` : undefined,
+              boxShadow: isOver ? `0 0 30px ${V9.glowAzure}` : undefined,
             }}
           >
             <div className="relative" style={{ width: '100%', height: '100%' }}>
@@ -506,7 +545,7 @@ export const V9SkinSandbox: React.FC = () => {
                       aria-label="V9 POI Detail Preview - Surface Version"
                     >
                       {/* Close button */}
-                      <button type="button" className="v9-poi-demo__close" title="Usa 'Nascondi POI' in alto per nascondere" aria-label="Chiudi (demo)">×</button>
+                      <TooltipButton type="button" className="v9-poi-demo__close" tooltip="Usa 'Nascondi POI' in alto per nascondere" aria-label="Chiudi (demo)">×</TooltipButton>
 
                       <div className="v9-poi-demo__content">
                         {/* Ornamento bussola in alto */}
@@ -612,7 +651,7 @@ export const V9SkinSandbox: React.FC = () => {
 
                   {poiVersion === 'layout' && (
                     <div className="v9-poi-demo v9-poi-demo--layout" role="group" aria-label="V9 POI Detail Preview - Layout Primitives Version">
-                      <button type="button" className="v9-poi-demo__close" title="Usa 'Nascondi POI' in alto per nascondere" aria-label="Chiudi (demo)">×</button>
+                      <TooltipButton type="button" className="v9-poi-demo__close" tooltip="Usa 'Nascondi POI' in alto per nascondere" aria-label="Chiudi (demo)">×</TooltipButton>
                       <div className="v9-poi-demo__content">
                         <div className="v9-poi-demo__header">
                           <div className="v9-poi-demo__badge">
@@ -670,7 +709,7 @@ export const V9SkinSandbox: React.FC = () => {
                       role="group"
                       aria-label="V9 POI Detail Preview - Zaffiro Abissale"
                     >
-                      <button type="button" className="v9-poi-demo__close" title="Usa 'Nascondi POI' in alto per nascondere" aria-label="Chiudi (demo)">×</button>
+                      <TooltipButton type="button" className="v9-poi-demo__close" tooltip="Usa 'Nascondi POI' in alto per nascondere" aria-label="Chiudi (demo)">×</TooltipButton>
                       <div className="v9-poi-demo__content">
                         <div className="v9-poi-demo__header">
                           <div className="v9-poi-demo__badge">
@@ -833,7 +872,7 @@ export const V9SkinSandbox: React.FC = () => {
                 </WanderlustSectionHeader>
                 {/* Obsidian base with gold trim for contrast */}
                 <InsetPanel className="skin-rack-inset">
-                  <ResidentSlotRack
+                  <ResidentSlotRackSkin
                     className="skin-rack"
                     slots={[
                       { id: 'v9-l1', index: 0, label: 'Slot 1', assignedResidentId: null, isPlaceholder: false, dropState: 'idle' },
@@ -1117,10 +1156,8 @@ export const V9SkinSandbox: React.FC = () => {
         /* ── Slot Rack demo frame (InsetPanel + ResidentSlotRack) ── */
         .skin-rack-inset {
           position: relative;
-          background:
-            radial-gradient(circle at 0% 0%, rgba(0,229,255,0.08) 0%, transparent 40%),
-            linear-gradient(145deg, #0a0f12 0%, #1a1208 45%, #0a0f12 100%);
-          border: 1px solid rgba(223,184,87,0.45);
+          background: var(--skin-surface-bg);
+          border: 1px solid var(--skin-surface-border);
           border-radius: 14px;
           box-shadow:
             0 0 0 1px rgba(120,80,25,0.65),
@@ -1145,15 +1182,15 @@ export const V9SkinSandbox: React.FC = () => {
         .skin-rack-inset::before { top: 10px; left: 12px; }
         .skin-rack-inset::after  { bottom: 10px; right: 12px; }
         .skin-rack {
-          --slot-rack-slot-label-color: #e8c56a;
-          --slot-rack-slot-border-empty: rgba(223,184,87,0.28);
-          --slot-rack-slot-ring-color: rgba(223,184,87,0.55);
+          --slot-rack-slot-label-color: var(--skin-title-color);
+          --slot-rack-slot-border-empty: var(--skin-surface-border);
+          --slot-rack-slot-ring-color: var(--skin-surface-border);
           --slot-rack-shadow: 0 8px 24px rgba(0,0,0,0.45);
           position: relative;
           padding: 18px;
-          background: rgba(0,0,0,0.38);
-          border: 1px solid rgba(223,184,87,0.22);
-          border-radius: 12px;
+          background: var(--skin-inset-bg);
+          border: 1px solid var(--skin-surface-border);
+          border-radius: var(--skin-surface-radius);
           box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
         }
 
@@ -1263,8 +1300,8 @@ export const V9SkinSandbox: React.FC = () => {
           isolation: isolate;
           color: ${V9.textPrimary};
           font-family: 'EB Garamond', 'Georgia', serif;
-          background-color: #060f16;
-          border: 1.5px solid rgba(223, 184, 87, 0.4);
+          background-color: var(--skin-surface-base);
+          border: 1.5px solid var(--skin-surface-border);
           border-radius: 8px;
           box-shadow:
             0 15px 35px rgba(0, 0, 0, 0.6),
@@ -1742,6 +1779,7 @@ export const V9SkinSandbox: React.FC = () => {
         }
       `}</style>
     </div>
+    </V9TooltipProvider>
   );
 };
 

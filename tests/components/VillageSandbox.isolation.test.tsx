@@ -21,6 +21,24 @@ beforeAll(() => {
       dispatchEvent: vi.fn(),
     })),
   });
+
+  // IntersectionObserver / ResizeObserver polyfills for lazy-loaded components
+  Object.defineProperty(window, 'IntersectionObserver', {
+    writable: true,
+    value: class {
+      observe = vi.fn();
+      disconnect = vi.fn();
+      unobserve = vi.fn();
+    },
+  });
+  Object.defineProperty(window, 'ResizeObserver', {
+    writable: true,
+    value: class {
+      observe = vi.fn();
+      disconnect = vi.fn();
+      unobserve = vi.fn();
+    },
+  });
 });
 
 // Mock all dependencies
@@ -104,6 +122,13 @@ vi.mock('@/ui/idleVillage/hooks/useVillageSandbox', () => ({
     resourceItems: [],
     headerResources: { gold: 100, food: 50, population: 10 },
     getResidentCompatibility: vi.fn(() => ({ score: 0.8, reasons: [] })),
+    dragErrorRecovery: {
+      state: { activeError: null, autoOpen: false },
+      dismissError: vi.fn(),
+      trackAction: vi.fn(),
+    },
+    scheduleTimeout: 1000,
+    isPickerActive: false,
     getActionDetailHarnessSnapshot: () => ({
       title: 'Test Activity',
       slotId: 'test-slot',
@@ -322,6 +347,13 @@ describe('VillageSandbox Component Isolation', () => {
     render(<VillageSandbox />);
 
     expect(screen.getByTestId('village-sandbox-layout')).toBeInTheDocument();
+  });
+
+  it('renders localized map labels', () => {
+    render(<VillageSandbox />);
+
+    expect(screen.getByText('Activity Slots')).toBeInTheDocument();
+    expect(screen.getByText('Active Activities')).toBeInTheDocument();
   });
 });
 

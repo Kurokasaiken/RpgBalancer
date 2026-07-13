@@ -7,18 +7,16 @@
  */
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import type { TFunction } from 'i18next';
 import { motion, useDragControls } from 'framer-motion';
 import { useHeavyDrag } from '@/ui/wanderlust-surface/useHeavyDrag';
 import { useSkinSystem } from '../../hooks/useSkinSystem';
 import { ResidentSlotRack } from '../../components/ResidentSlotRack';
-import type { ResidentSlotViewModel, SlotBloomState } from '../../slots/types';
+import type { ResidentSlotViewModel, SlotBloomState, DropState } from '../../slots/types';
 import type { StatRequirementRow } from '../../utils/statRequirementDisplay';
 import { getStatIconComponent } from '@/ui/shared/statIconUtils';
 
-/** Drop-validation state a slot can carry into the rack (mirrors LocationDropState). */
-type SlotDropState = 'idle' | 'valid' | 'invalid' | 'locked';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
-import type { LocationDropState } from '../../map/validators/locationDropValidators';
 import { useSkinSlot, type UseSkinSlotOptions } from '../../hooks/useSkinSlot';
 import { getSkinReplacementAPI_TS003 } from '../SkinReplacementAPI_TS003';
 import type { ActivityCapsuleDetailSkinConfig } from './ActivityCapsuleDetailSkinSchema';
@@ -32,6 +30,8 @@ import {
 } from './ActivityCapsuleDetailSkinSchema';
 import { getActivityCapsuleDetailSkinConfigWithPreset } from './ActivityCapsuleDetailSkinPresets';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
+import { useQuestLoreDrop } from '@/ui/idleVillage/hooks/useQuestLoreDrop';
+import { useTranslation } from '@/localization/useTranslation';
 import type { 
   MotionLevel, 
   StyleLabPillar, 
@@ -62,7 +62,13 @@ export interface ActivityDetailSlotData {
   statProfileId?: string;
   /** Live drop-validation state for the currently-dragged token. Drives the
    *  shared AAA bloom on the slot; defaults to 'idle' when no drag is active. */
-  dropState?: SlotDropState;
+  dropState?: DropState;
+  /** Semantic role of this slot (e.g. 'combatant', 'support'), forwarded from ResidentSlotBlueprint. */
+  role?: string;
+  /** Human-readable label for the role, shown instead of the generic "Slot N". */
+  roleLabel?: string;
+  /** Whether this slot must be filled before the activity can start. */
+  required?: boolean;
 }
 
 /**
@@ -71,7 +77,8 @@ export interface ActivityDetailSlotData {
  */
 function mapToResidentSlotViewModel(
   slot: ActivityDetailSlotData,
-  index: number
+  index: number,
+  t: TFunction<'idleVillage'>
 ): ResidentSlotViewModel {
   const isAssigned = slot.state !== 'empty' && slot.state !== 'ghost';
 
@@ -98,18 +105,18 @@ function mapToResidentSlotViewModel(
   // Live drop state flows in from the controller (via ActivityDetailSlotData).
   // Assigned slots read 'locked'; free slots read 'valid'/'invalid' during a
   // drag. This is what lets the bloom fire inside the skin-aware detail.
-  const dropState: SlotDropState = slot.dropState ?? 'idle';
+  const dropState: DropState = slot.dropState ?? 'idle';
   const bloomState: SlotBloomState = dropState === 'valid' ? 'valid' : 'idle';
+
+  const baseLabel = slot.roleLabel ?? t('idleVillage:activityCapsule.slotLabel', { defaultValue: 'Slot {index}', index: index + 1 });
+  const label = slot.required ? `${baseLabel} *` : baseLabel;
 
   return {
     id: slot.id,
     index,
-    label: `Slot ${index + 1}`,
+    label,
     assignedResidentId: isAssigned ? (slot.residentId ?? slot.id) : null,
     assignedResident,
-    activityId: 'activity-poi',
-    activityLabel: 'POI Activity',
-    displayRole: 'activity',
     isPlaceholder: false,
     dropState,
     bloomState,
@@ -165,6 +172,13 @@ export interface ActivityCapsuleDetailSkinAwareProps {
   onCollect?: () => void;
   onSlotAssign?: (slotId: string) => void;
   onSlotDetach?: (slotId: string) => void;
+
+  /**
+   * Explicit override for the Start/Embark button's disabled state (e.g. driven
+   * by required-slot validation upstream). When omitted, falls back to the
+   * legacy heuristic (disabled when there are no idle/open slots left).
+   */
+  startDisabled?: boolean;
   
   /** TS-Series skin configuration */
   pillar?: StyleLabPillar;
@@ -205,6 +219,10 @@ export interface ActivityCapsuleDetailSkinAwareProps {
    *  header circle reproduces the EXACT same POI (same halo fill = `progress`).
    *  Defaults to a star if the opening context isn't provided. */
   poiIcon?: string;
+
+  /** Tags used to match a quest Lore Drop for this POI. When provided and the
+   *  activity type is 'quest', the component will show the assigned Lore Drop. */
+  questTags?: string[];
 }
 
 export function ActivityCapsuleDetailSkinAware({
@@ -229,6 +247,7 @@ export function ActivityCapsuleDetailSkinAware({
   onCollect,
   onSlotAssign,
   onSlotDetach,
+  startDisabled,
   pillar,
   skinPresetId,
   motionLevel,
@@ -251,7 +270,9 @@ export function ActivityCapsuleDetailSkinAware({
   dataTestId = 'activity-capsule-detail-skin-aware',
   inlineMode = false,
   poiIcon = '⭐',
+  questTags,
 }: ActivityCapsuleDetailSkinAwareProps) {
+  const { t } = useTranslation('idleVillage');
   // TS-Series skin system integration
   const skinSystem = useSkinSystem();
   const componentId = skinBindingId || `activity-capsule-detail-${activityId}`;
@@ -301,14 +322,14 @@ export function ActivityCapsuleDetailSkinAware({
   }, [componentId, skinSystem.getComponentBinding, skinSlot.renderCount, skinSlot.lastUpdate]);
 
   const skinConfig = useMemo(() => {
-    if (slotBinding?.config) {
+    if (slotBinding?.skinProperties) {
       return mergeActivityCapsuleDetailSkinConfig(
         baseSkinConfig,
-        slotBinding.config as ActivityCapsuleDetailSkinConfig
+        slotBinding.skinProperties as unknown as Partial<ActivityCapsuleDetailSkinConfig>
       );
     }
     return baseSkinConfig;
-  }, [baseSkinConfig, slotBinding?.config]);
+  }, [baseSkinConfig, slotBinding?.skinProperties]);
   
   // Get slot skin for wilderness bronze theme
   const slotSkin = useMemo(() => {
@@ -396,6 +417,13 @@ export function ActivityCapsuleDetailSkinAware({
   ]);
   
   // Drag handlers
+
+  // Floating position: the consumer supplies a top-left coordinate (usually the
+  // clicked POI center, clamped to viewport). When no position is provided, the
+  // panel falls back to center of the screen.
+  const floatingLeft = position?.x ?? '50%';
+  const floatingTop = position?.y ?? '50%';
+  const usePositionedFloating = position !== undefined;
 
   // Generate CSS custom properties
   const cssVars = useMemo((): React.CSSProperties => {
@@ -501,7 +529,7 @@ export function ActivityCapsuleDetailSkinAware({
   }, [skinConfig, compact]);
   
   // Apply status-specific styles
-  const statusStyles = useMemo((): React.CSSProperties => {
+  const statusStyles = useMemo((): React.CSSProperties & Record<string, string> => {
     switch (status) {
       case 'idle':
         return {
@@ -532,14 +560,24 @@ export function ActivityCapsuleDetailSkinAware({
 
   // Convert slots to ResidentSlotViewModel for ResidentSlotRack
   const residentSlots = useMemo(() => {
-    return slots.map((slot, index) => mapToResidentSlotViewModel(slot, index));
-  }, [slots]);
+    return slots.map((slot, index) => mapToResidentSlotViewModel(slot, index, t));
+  }, [slots, t]);
 
   // Resolve slot size from skin config for detail layouts
   const slotSizePx = useMemo(() => {
     const parsed = parseInt(skinConfig.slotRack.slotSize, 10);
     return Number.isNaN(parsed) ? 80 : parsed;
   }, [skinConfig.slotRack.slotSize]);
+
+  // Quest POIs can expose their assigned Lore Drop in the detail panel.
+  const isQuestType = type === 'quest';
+  const typeLabel = t('idleVillage:activityCapsule.type.' + type as any, { defaultValue: type });
+  const questLore = useQuestLoreDrop({
+    entityId: isQuestType ? activityId : null,
+    entityType: 'quest',
+    tags: questTags,
+    completed: status === 'completed',
+  });
 
   // Resolve display info for slot icons
   const resolveDisplayInfo = useCallback((slot: ResidentSlotViewModel) => {
@@ -641,7 +679,7 @@ export function ActivityCapsuleDetailSkinAware({
         data-motion-level={resolvedMotionLevel}
         data-skin-binding-id={skinBindingId}
         style={innerStyle}
-        aria-label={ariaLabel || `${name} activity detail window`}
+        aria-label={ariaLabel || t('idleVillage:activityCapsule.accessibility.activityCapsule', { defaultValue: '{label} activity capsule', label: name })}
         aria-live={skinConfig.accessibility.enableAriaLive ? ariaLive : 'off'}
       >
       {/* Window frame */}
@@ -660,7 +698,7 @@ export function ActivityCapsuleDetailSkinAware({
         </div>
         
         {/* Drag handle */}
-        {enableDrag && !inlineMode && (
+        {enableDrag && (
           <div
             className="activity-capsule-detail-skin-aware__drag-handle"
             onPointerDown={(e) => dragControls.start(e)}
@@ -677,7 +715,7 @@ export function ActivityCapsuleDetailSkinAware({
           <button
             className="activity-capsule-detail-skin-aware__close-button"
             onClick={onClose}
-            aria-label="Close activity details"
+            aria-label={t('idleVillage:activityCapsule.accessibility.closeDetails')}
           >
             ✕
           </button>
@@ -712,17 +750,17 @@ export function ActivityCapsuleDetailSkinAware({
             {/* Activity info */}
             <div className="activity-capsule-detail-skin-aware__activity-info">
               <h2 className="activity-capsule-detail-skin-aware__name">{name}</h2>
-              <div className="activity-capsule-detail-skin-aware__type">{type}</div>
+              <div className="activity-capsule-detail-skin-aware__type">{typeLabel}</div>
               {subtitle && (
                 <div className="activity-capsule-detail-skin-aware__subtitle">{subtitle}</div>
               )}
               <div className="activity-capsule-detail-skin-aware__status">
                 <div className="activity-capsule-detail-skin-aware__status-dot" />
                 <span className="activity-capsule-detail-skin-aware__status-text">
-                  {status === 'idle' && 'In attesa'}
-                  {status === 'in-progress' && 'In corso'}
-                  {status === 'completed' && 'Completato'}
-                  {status === 'blocked' && 'Bloccato'}
+                  {status === 'idle' && t('idleVillage:activityCapsule.status.idle')}
+                  {status === 'in-progress' && t('idleVillage:activityCapsule.status.inProgress')}
+                  {status === 'completed' && t('idleVillage:activityCapsule.status.completed')}
+                  {status === 'blocked' && t('idleVillage:activityCapsule.status.blocked')}
                 </span>
               </div>
             </div>
@@ -735,11 +773,46 @@ export function ActivityCapsuleDetailSkinAware({
             <div className="activity-capsule-detail-skin-aware__ornament-line" />
           </div>
 
+          {/* Lore Drop — assigned quest fragment */}
+          {isQuestType && questLore.loreDrop && (
+            <div className="activity-capsule-detail-skin-aware__lore">
+              <div className="activity-capsule-detail-skin-aware__section-label">
+                {t('idleVillage:activityCapsule.sections.lore')}
+              </div>
+              <InsetPanel
+                style={{
+                  padding: '12px 14px',
+                  background: 'var(--skin-inset-bg, #060f16)',
+                  border: '1px solid var(--skin-inset-border, rgba(223,184,87,0.5))',
+                  borderRadius: 'var(--skin-inset-radius, 10px)',
+                }}
+              >
+                <div className="activity-capsule-detail-skin-aware__lore-title">
+                  {questLore.loreDrop.title}
+                  {!questLore.isDiscovered && (
+                    <span style={{ marginLeft: 8, fontSize: '0.85em', opacity: 0.6 }}>
+                      🔒
+                    </span>
+                  )}
+                </div>
+                {questLore.isDiscovered ? (
+                  <div className="activity-capsule-detail-skin-aware__lore-body">
+                    {questLore.loreDrop.body}
+                  </div>
+                ) : (
+                  <div className="activity-capsule-detail-skin-aware__lore-locked">
+                    {t('idleVillage:activityCapsule.lore.locked')}
+                  </div>
+                )}
+              </InsetPanel>
+            </div>
+          )}
+
           {/* Slot rack */}
           {showSlots && (
             <div className="activity-capsule-detail-skin-aware__slot-section">
               <div className="activity-capsule-detail-skin-aware__section-label">
-                Personaggi assegnati
+                {t('idleVillage:activityCapsule.sections.assignedCharacters')}
               </div>
               {/* overflow visible so the slots' AAA bloom (drop-shadow halo)
                   isn't clipped by the inset — matches the standalone rack pages. */}
@@ -774,9 +847,9 @@ export function ActivityCapsuleDetailSkinAware({
               <button
                 className="activity-capsule-detail-skin-aware__button activity-capsule-detail-skin-aware__button--start"
                 onClick={onStart}
-                disabled={slots.filter(s => s.state === 'idle').length === 0}
+                disabled={startDisabled ?? false}
               >
-                Avvia
+                {t('idleVillage:activityCapsule.actions.start')}
               </button>
             )}
             {status === 'in-progress' && onCancel && (
@@ -784,7 +857,7 @@ export function ActivityCapsuleDetailSkinAware({
                 className="activity-capsule-detail-skin-aware__button activity-capsule-detail-skin-aware__button--cancel"
                 onClick={onCancel}
               >
-                Annulla
+                {t('idleVillage:activityCapsule.actions.cancel')}
               </button>
             )}
             {status === 'completed' && onCollect && (
@@ -792,7 +865,7 @@ export function ActivityCapsuleDetailSkinAware({
                 className="activity-capsule-detail-skin-aware__button activity-capsule-detail-skin-aware__button--collect"
                 onClick={onCollect}
               >
-                Raccogli
+                {t('idleVillage:activityCapsule.actions.collect')}
               </button>
             )}
           </div>
@@ -809,15 +882,15 @@ export function ActivityCapsuleDetailSkinAware({
           {showInfo && (
             <div className="activity-capsule-detail-skin-aware__info-row">
               <div className="activity-capsule-detail-skin-aware__info-item">
-                <div className="activity-capsule-detail-skin-aware__info-label">Durata</div>
+                <div className="activity-capsule-detail-skin-aware__info-label">{t('idleVillage:activityCapsule.info.duration')}</div>
                 <div className="activity-capsule-detail-skin-aware__info-value">{durationDisplay}</div>
               </div>
               <div className="activity-capsule-detail-skin-aware__info-item">
-                <div className="activity-capsule-detail-skin-aware__info-label">Ricompensa</div>
+                <div className="activity-capsule-detail-skin-aware__info-label">{t('idleVillage:activityCapsule.info.reward')}</div>
                 <div className="activity-capsule-detail-skin-aware__info-value">{rewardDisplay}</div>
               </div>
               <div className="activity-capsule-detail-skin-aware__info-item">
-                <div className="activity-capsule-detail-skin-aware__info-label">ETA</div>
+                <div className="activity-capsule-detail-skin-aware__info-label">{t('idleVillage:activityCapsule.info.eta')}</div>
                 <div className="activity-capsule-detail-skin-aware__info-value">{etaDisplay}</div>
               </div>
             </div>
@@ -835,7 +908,7 @@ export function ActivityCapsuleDetailSkinAware({
           {requirements && requirements.length > 0 && (
             <div className="activity-capsule-detail-skin-aware__requirements">
               <div className="activity-capsule-detail-skin-aware__section-label">
-                Requisiti
+                {t('idleVillage:activityCapsule.sections.requirements')}
               </div>
               <InsetPanel
                 style={{
@@ -850,9 +923,9 @@ export function ActivityCapsuleDetailSkinAware({
               >
                 {requirements.map((req) => {
                   const relationMeta = {
-                    all: { label: 'Richiesto', color: 'var(--skin-status-met, #7bc96f)' },
-                    any: { label: 'Uno tra', color: 'var(--skin-title-color, #f0cf6a)' },
-                    none: { label: 'Vietato', color: 'var(--skin-status-unmet, #d98a4a)' },
+                    all: { label: t('idleVillage:activityCapsule.requirements.relation.all', { defaultValue: 'Required' }), color: 'var(--skin-status-met, #7bc96f)' },
+                    any: { label: t('idleVillage:activityCapsule.requirements.relation.any', { defaultValue: 'One of' }), color: 'var(--skin-title-color, #f0cf6a)' },
+                    none: { label: t('idleVillage:activityCapsule.requirements.relation.none', { defaultValue: 'Forbidden' }), color: 'var(--skin-status-unmet, #d98a4a)' },
                   }[req.relation];
                   const Icon = getStatIconComponent(req.icon);
                   const isColorClass = !!req.bgColor && /^(bg|text)-/.test(req.bgColor);
@@ -920,12 +993,12 @@ export function ActivityCapsuleDetailSkinAware({
           {showTelemetry && (
             <div className="activity-capsule-detail-skin-aware__telemetry">
               <div className="activity-capsule-detail-skin-aware__section-label">
-                Registro eventi
+                {t('idleVillage:activityCapsule.sections.telemetry')}
               </div>
               <div className="activity-capsule-detail-skin-aware__telemetry-log">
                 {telemetry.length === 0 ? (
                   <div className="activity-capsule-detail-skin-aware__telemetry-empty">
-                    Nessun evento registrato.
+                    {t('idleVillage:activityCapsule.telemetry.empty')}
                   </div>
                 ) : (
                   telemetry.map((entry) => (
@@ -959,7 +1032,7 @@ export function ActivityCapsuleDetailSkinAware({
       {enableDevTools && validationErrors && !validationErrors.isValid && (
         <div className="activity-capsule-detail-skin-aware__validation-errors">
           <div className="activity-capsule-detail-skin-aware__validation-error-title">
-            Skin Validation Errors
+            {t('idleVillage:activityCapsule.devTools.validationTitle', { defaultValue: 'Skin Validation Errors' })}
           </div>
           {validationErrors.errors.map((error, index) => (
             <div key={index} className="activity-capsule-detail-skin-aware__validation-error">
@@ -1404,6 +1477,38 @@ export function ActivityCapsuleDetailSkinAware({
           gap: 10px;
         }
 
+        .activity-capsule-detail-skin-aware__lore {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .activity-capsule-detail-skin-aware__lore-title {
+          font-family: var(--detail-primary-font);
+          font-size: 12px;
+          font-weight: 600;
+          color: var(--detail-name-color, #f0cf6a);
+          line-height: 1.5;
+          margin-bottom: 6px;
+        }
+
+        .activity-capsule-detail-skin-aware__lore-body {
+          font-family: var(--detail-primary-font);
+          font-size: 11px;
+          color: var(--detail-text-primary);
+          line-height: 1.6;
+          font-style: italic;
+        }
+
+        .activity-capsule-detail-skin-aware__lore-locked {
+          font-family: var(--detail-primary-font);
+          font-size: 11px;
+          color: var(--detail-text-secondary);
+          line-height: 1.6;
+          font-style: italic;
+          opacity: 0.7;
+        }
+
         .activity-capsule-detail-skin-aware__slot--ghost {
           opacity: 0.45;
           animation: ghost-pulse 2.8s ease-in-out infinite;
@@ -1665,8 +1770,9 @@ export function ActivityCapsuleDetailSkinAware({
   if (inlineMode) return surface;
 
   return (
-    // Outer div: static centering only
-    <div style={{ position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', zIndex: 1000 }}>
+    // Outer div: fixed positioning — uses the provided position when available,
+    // otherwise centers on the screen. The motion.div inside adds the spring-lag.
+    <div style={{ position: 'fixed', left: floatingLeft, top: floatingTop, transform: usePositionedFloating ? 'translate(0, 0)' : 'translate(-50%, -50%)', zIndex: 1000 }}>
       <div style={{ position: 'relative' }}>
         {/* Ghost drag tracker — invisible, Framer Motion writes rawX/rawY directly */}
         {enableDrag && (

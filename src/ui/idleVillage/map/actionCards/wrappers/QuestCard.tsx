@@ -1,22 +1,16 @@
-import ActionCardBase from '../ActionCardBase';
+import ActionCardBase, { type ActionCardBaseProps } from '../ActionCardBase';
 import ActionProgressBar from '../ActionProgressBar';
 import ActionHalo from '../ActionHalo';
-import type { ActionCardProps } from '../ActionCard';
 import { formatMiniCardCountdown } from '../cardFormatting';
 import { buildTimeMetrics, resolveMetrics } from './shared';
 
-export type QuestCardProps = Omit<
-  ActionCardProps,
-  | 'variant'
-  | 'showStats'
-  | 'hideHeader'
-  | 'showStatusLabel'
-  | 'countdownFontSizePx'
-  | 'countdownFormatter'
-  | 'chromeless'
-  | 'injuryPercentage'
-  | 'deathPercentage'
->;
+export type QuestCardProps = ActionCardBaseProps & {
+  progressFraction: number;
+  elapsedSeconds: number;
+  totalDurationSeconds: number;
+  injuryPercentage?: number;
+  deathPercentage?: number;
+};
 
 /**
  * Quest wrapper that composes ActionCardBase + ActionProgressBar + ActionHalo.
@@ -35,13 +29,14 @@ export function QuestCard({
   dataTestId,
   pillar,
   dropState,
-  _onStatusChange,
-  _onCollect,
-  _collectLabel,
-  _collectDisabled,
   ...rest
 }: QuestCardProps) {
   const fallbackMetrics = buildTimeMetrics(progressFraction, elapsedSeconds, totalDurationSeconds);
+
+  const totalRisk = injuryPercentage + deathPercentage;
+  const riskScale = totalRisk > 100 ? 100 / totalRisk : 1;
+  const injuryWidth = injuryPercentage * riskScale;
+  const deathWidth = deathPercentage * riskScale;
 
   return (
     <ActionCardBase
@@ -80,6 +75,7 @@ export function QuestCard({
       {/* Risk stripes overlay */}
       {(injuryPercentage > 0 || deathPercentage > 0) && (
         <div
+          data-testid="quest-risk-stripes"
           style={{
             position: 'absolute',
             bottom: 0,
@@ -93,28 +89,31 @@ export function QuestCard({
         >
           {injuryPercentage > 0 && (
             <div
+              data-testid="quest-injury-risk"
               style={{
                 backgroundColor: 'rgba(251, 191, 36, 0.8)',
                 height: '100%',
-                width: `${injuryPercentage}%`,
+                width: `${injuryWidth}%`,
               }}
             />
           )}
           {deathPercentage > 0 && injuryPercentage > 0 && (
             <div
+              data-testid="quest-death-risk"
               style={{
                 backgroundColor: 'rgba(239, 68, 68, 0.8)',
                 height: '100%',
-                width: `${deathPercentage}%`,
+                width: `${deathWidth}%`,
               }}
             />
           )}
           {deathPercentage > 0 && injuryPercentage === 0 && (
             <div
+              data-testid="quest-death-risk"
               style={{
                 backgroundColor: 'rgba(239, 68, 68, 0.8)',
                 height: '100%',
-                width: `${deathPercentage}%`,
+                width: `${deathWidth}%`,
               }}
             />
           )}

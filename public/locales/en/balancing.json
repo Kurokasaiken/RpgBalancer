@@ -1,0 +1,63 @@
+{
+  "actions": {
+    "addCard": "Add Card",
+    "addStat": "Stat",
+    "close": "Close",
+    "export": "Export",
+    "import": "Import",
+    "newCard": "New Card",
+    "resetAll": "Reset All",
+    "scenarioLab": "Scenario Lab",
+    "showCard": "Show card",
+    "stressTest": "Stress Test"
+  },
+  "app": {
+    "subtitle": "Arcane Tech Glass · Config-Driven",
+    "title": "Balancer"
+  },
+  "labels": {
+    "hiddenCards": "Hidden cards"
+  },
+  "metrics": {
+    "earlyImpact": "Early Impact (3T)",
+    "edptVsSelf": "EDPT vs Self",
+    "equalFight": {
+      "title": "1v1 Equal (Self vs Self)",
+      "turns": "{value} turns"
+    }
+  },
+  "reset": {
+    "confirmTitle": "Click again to confirm full reset",
+    "title": "Reset to initial values"
+  },
+  "scenario": {
+    "avg": "Avg: {value}",
+    "baseline": "Baseline: {value}",
+    "build": "Build: {value}",
+    "configTitle": "Scenario Configuration",
+    "damageOverkill": "Damage/Overkill",
+    "dptBase": "DPT Base: {value}",
+    "dptBuild": "DPT Build: {value}",
+    "draws": "Draws: {value}",
+    "elitePreset": "Elite Preset",
+    "iterations": "Iter",
+    "median": "Median: {value}",
+    "overkillAvg": "Overkill Avg: {value1} / {value2}",
+    "powerSubtitle": "Based on current build",
+    "powerTitle": "Scenario Power (HP eq)",
+    "range": "Range: {min}-{max}",
+    "running": "Running...",
+    "runSim": "Run Sim",
+    "simulationTitle": "Scenario Simulation (vs Baseline)",
+    "subtitle": "Duel · Boss · Swarm · 5v5",
+    "ttkTurns": "TTK (Turns)",
+    "winrate": "Winrate"
+  },
+  "stressTesting": {
+    "title": "Stat Stress Testing & Marginal Utility Analysis"
+  },
+  "viewMode": {
+    "config": "Config",
+    "legacy": "Legacy"
+  }
+}

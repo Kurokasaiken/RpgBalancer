@@ -58,7 +58,7 @@ export const ResidentSlotRackSkin = memo(({
   // Determine active preset
   const activePresetId = skinPresetId || skinPreferences.presetId || DEFAULT_SLOT_RACK_PRESET_ID;
   const preferredPresetId = resolveSlotRackPresetId(activePresetId);
-  const skinConfig = useMemo(() => getSlotRackSkinForPreset(activePresetId), [activePresetId]);
+  const skinConfig = useMemo(() => getSlotRackSkinForPreset(preferredPresetId), [preferredPresetId]);
   
   // Extract halo/bloom tokens from Style Lab
   const interactionPhysics = styleLabTokens.preset.interactionPhysics || {
@@ -169,25 +169,18 @@ export const ResidentSlotRackSkin = memo(({
   }, [skinConfig, activePresetId, skinPreferences.pillar, residentSlotRackProps.slots.length, residentSlotRackProps.layout]);
   
   // Generate CSS custom properties string for inline styles
+  // The inner ResidentSlotRack root consumes these variables via rackShellStyle.
   const cssVarsString = useMemo(() => {
     if (!skinConfig) return {};
-    
+
     const vars: Record<string, string> = {};
     Object.entries(skinConfig.cssVars).forEach(([key, value]) => {
       // Convert CSS custom property format to inline style format
       const styleKey = key.startsWith('--') ? key : `--${key}`;
       vars[styleKey] = value;
     });
-    
-    // Apply actual visual styles using the CSS variables
-    return {
-      ...vars,
-      background: `var(--slot-rack-bg-gradient, var(--slot-rack-bg, transparent))`,
-      border: `var(--slot-rack-border, none)`,
-      borderRadius: `var(--slot-rack-border-radius, 0)`,
-      padding: `var(--slot-rack-padding, 0)`,
-      gap: `var(--slot-rack-gap, 0)`,
-    };
+
+    return vars;
   }, [skinConfig]);
   
   // Generate data attributes for CSS targeting

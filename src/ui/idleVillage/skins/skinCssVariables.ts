@@ -190,17 +190,17 @@ export const BASE_SKIN_CSS_VARS: SkinCssVarMap = {
     'radial-gradient(ellipse 60% 50% at var(--skin-mouse-x, 30%) var(--skin-mouse-y, 20%), rgba(255,255,255,0.10) 0%, transparent 55%)',
 
   /* Stat bars — HP, Stamina, Fatigue */
-  '--skin-statbar-hp-start': '#4a9e5a',
-  '--skin-statbar-hp-end': '#7bc96f',
-  '--skin-statbar-hp-glow': 'rgba(123,201,111,0.3)',
-  '--skin-statbar-stamina-start': '#b8862a',
-  '--skin-statbar-stamina-end': '#e0b23e',
-  '--skin-statbar-stamina-glow': 'rgba(224,178,62,0.3)',
+  '--skin-statbar-hp-start': '#0a8a4a',
+  '--skin-statbar-hp-end': '#6ee7b7',
+  '--skin-statbar-hp-glow': 'rgba(110,231,183,0.45)',
+  '--skin-statbar-stamina-start': '#d4af37',
+  '--skin-statbar-stamina-end': '#f59e0b',
+  '--skin-statbar-stamina-glow': 'rgba(245,158,11,0.45)',
   '--skin-statbar-fatigue-start': '#9e5a4a',
   '--skin-statbar-fatigue-end': '#d98a4a',
   '--skin-statbar-fatigue-glow': 'rgba(217,138,74,0.6)',
-  '--skin-statbar-track': 'rgba(6,4,3,0.7)',
-  '--skin-statbar-track-border': 'rgba(216,177,62,0.06)',
+  '--skin-statbar-track': 'linear-gradient(180deg, #0c0b0a, #050505)',
+  '--skin-statbar-track-border': 'rgba(216,177,62,0.08)',
   /* engraved graduation overlaid on the fill — reads as a bronze ruler */
   '--skin-statbar-engrave':
     'repeating-linear-gradient(115deg, transparent 0, transparent 5px, rgba(0,0,0,0.16) 5px, rgba(0,0,0,0.16) 7px)',

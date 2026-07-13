@@ -27,6 +27,7 @@ import { getPoiAmberSkinConfig } from '@/ui/idleVillage/skins/poi/poiAmberSkinCo
 import { getTemporarySkinConfig } from '@/ui/idleVillage/skins/temporary/temporarySkinRegistry';
 import { useDroppable } from '@dnd-kit/core';
 import { useResidentDropValidation } from '@/ui/idleVillage/hooks/useResidentDropValidation';
+import { useTranslation } from '@/localization/useTranslation';
 import ActionHalo from '@/ui/idleVillage/map/actionCards/ActionHalo';
 
 /**
@@ -53,6 +54,8 @@ const ActivityCapsuleSlot = ({
   onResidentDetach?: (slotId: string) => void;
   compact: boolean;
 }) => {
+  const { t } = useTranslation('idleVillage');
+
   // DnD setup for drop mode
   const { setNodeRef, isOver } = useDroppable({
     id: `activity-capsule-slot-${slot.slotId}`,
@@ -90,6 +93,7 @@ const ActivityCapsuleSlot = ({
         'activity-capsule__slot--drop-over': enableDropMode && isOver && !slot.isOccupied,
         'activity-capsule__slot--drop-invalid': enableDropMode && isOver && slot.isLocked,
       })}
+      data-testid={slot.slotId}
       data-slot-id={slot.slotId}
       data-occupied={slot.isOccupied}
       data-locked={slot.isLocked}
@@ -120,7 +124,7 @@ const ActivityCapsuleSlot = ({
       {slot.assignedWorkerAvatarUrl ? (
         <img
           src={slot.assignedWorkerAvatarUrl}
-          alt={slot.assignedWorkerName || 'Worker'}
+          alt={slot.assignedWorkerName || t('idleVillage:activityCapsule.workerAlt', { defaultValue: 'Worker' })}
           style={{
             width: '100%',
             height: '100%',
@@ -156,7 +160,7 @@ const ActivityCapsuleSlot = ({
             pointerEvents: 'none',
           }}
         >
-          {isOver ? 'Drop' : ''}
+          {isOver ? t('idleVillage:activityCapsule.dropHint', { defaultValue: 'Drop' }) : ''}
         </div>
       )}
     </div>
@@ -176,8 +180,9 @@ const useAriaLiveAnnouncements = (
   enableAriaLive: boolean,
   ariaLiveMode: 'polite' | 'assertive' | 'off'
 ) => {
+  const { t } = useTranslation('idleVillage');
   const [announcement, setAnnouncement] = useState('');
-  const announcementTimeoutRef = useRef<NodeJS.Timeout>();
+  const announcementTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   // Previous state refs for change detection
   const prevStatusRef = useRef(status);
@@ -195,16 +200,16 @@ const useAriaLiveAnnouncements = (
     if (prevStatusRef.current !== status) {
       switch (status) {
         case 'in-progress':
-          message = `${label} activity started`;
+          message = t('idleVillage:activityCapsule.ariaLive.started', { defaultValue: '{label} activity started', label });
           break;
         case 'completed':
-          message = `${label} activity completed`;
+          message = t('idleVillage:activityCapsule.ariaLive.completed', { defaultValue: '{label} activity completed', label });
           break;
         case 'blocked':
-          message = `${label} activity blocked`;
+          message = t('idleVillage:activityCapsule.ariaLive.blocked', { defaultValue: '{label} activity blocked', label });
           break;
         case 'idle':
-          message = `${label} activity is idle`;
+          message = t('idleVillage:activityCapsule.ariaLive.idle', { defaultValue: '{label} activity is idle', label });
           break;
       }
       prevStatusRef.current = status;
@@ -218,7 +223,8 @@ const useAriaLiveAnnouncements = (
       // Announce at 25%, 50%, 75%, 100%
       const milestones = [25, 50, 75, 100];
       if (milestones.includes(currentPercent) && currentPercent > prevPercent) {
-        message = message ? `${message}. ${label} progress: ${currentPercent}%` : `${label} progress: ${currentPercent}%`;
+        const progressAnnouncement = t('idleVillage:activityCapsule.ariaLive.progress', { defaultValue: '{label} progress: {percent}%', label, percent: currentPercent });
+        message = message ? `${message}. ${progressAnnouncement}` : progressAnnouncement;
       }
       prevProgressRef.current = progressFraction;
     }
@@ -234,17 +240,20 @@ const useAriaLiveAnnouncements = (
       const newlyVacant = slotChanges.filter(s => !s.isOccupied).length;
 
       if (newlyOccupied > 0) {
-        message = message ? `${message}. ${newlyOccupied} worker${newlyOccupied > 1 ? 's' : ''} assigned` : `${newlyOccupied} worker${newlyOccupied > 1 ? 's' : ''} assigned to ${label}`;
+        const workerAssigned = t('idleVillage:activityCapsule.ariaLive.workerAssigned', { defaultValue: '{count} worker(s) assigned to {label}', count: newlyOccupied, label });
+        message = message ? `${message}. ${workerAssigned}` : workerAssigned;
       }
       if (newlyVacant > 0) {
-        message = message ? `${message}. ${newlyVacant} slot${newlyVacant > 1 ? 's' : ''} freed` : `${newlyVacant} slot${newlyVacant > 1 ? 's' : ''} freed from ${label}`;
+        const slotFreed = t('idleVillage:activityCapsule.ariaLive.slotFreed', { defaultValue: '{count} slot(s) freed from {label}', count: newlyVacant, label });
+        message = message ? `${message}. ${slotFreed}` : slotFreed;
       }
       prevSlotsRef.current = currentSlots;
     }
 
     // Collect availability changes
     if (prevCanCollectRef.current !== canCollect && canCollect) {
-      message = message ? `${message}. ${label} ready to collect` : `${label} ready to collect`;
+      const readyToCollect = t('idleVillage:activityCapsule.ariaLive.readyToCollect', { defaultValue: '{label} ready to collect', label });
+      message = message ? `${message}. ${readyToCollect}` : readyToCollect;
       prevCanCollectRef.current = canCollect;
     }
 
@@ -271,7 +280,7 @@ const useAriaLiveAnnouncements = (
       // Store a reference for cleanup (though RAF cleans up automatically)
       announcementTimeoutRef.current = true as any;
     }
-  }, [label, status, progressFraction, slots, canCollect, enableAriaLive, ariaLiveMode]);
+  }, [t, label, status, progressFraction, slots, canCollect, enableAriaLive, ariaLiveMode]);
 
   // Effect to detect changes and generate announcements
   useEffect(() => {
@@ -406,7 +415,7 @@ export function ActivityCapsule({
   status,
   canCollect,
   onCollect,
-  collectLabel = 'Collect',
+  collectLabel,
   collectDisabled = false,
   pillar,
   skinPresetOverrideId,
@@ -431,6 +440,9 @@ export function ActivityCapsule({
   // Config hooks
   const _idleVillageConfig = useIdleVillageConfig();
   const { presetId: skinPresetId, pillar: currentPillar } = useSkinPreferences();
+  const { t } = useTranslation('idleVillage');
+
+  const resolvedCollectLabel = collectLabel ?? t('idleVillage:activityCapsule.actions.collect', { defaultValue: 'Collect' });
 
   // Resolve pillar and skin config
   const resolvedPillar = pillar || currentPillar;
@@ -450,7 +462,9 @@ export function ActivityCapsule({
 
   // Calculate remaining time
   const remainingSeconds = useMemo(() =>
-    Math.max(0, totalDurationSeconds - elapsedSeconds),
+    Number.isFinite(elapsedSeconds) && elapsedSeconds >= 0
+      ? Math.max(0, totalDurationSeconds - elapsedSeconds)
+      : -1,
     [totalDurationSeconds, elapsedSeconds]
   );
 
@@ -478,10 +492,10 @@ export function ActivityCapsule({
   }, [skinConfig.layout?.slotSize]);
 
   const haloIconText = useMemo(() => {
-    if (!label) return 'POI';
+    if (!label) return t('idleVillage:activityCapsule.defaultHalo', { defaultValue: 'POI' });
     const firstWord = label.split(' ')[0] ?? label;
     return firstWord.slice(0, 4).toUpperCase();
-  }, [label]);
+  }, [label, t]);
 
   // Determine if capsule should be interactive
   const isInteractive = Boolean(onActivityClick || onSlotClick || (canCollect && onCollect));
@@ -707,7 +721,7 @@ export function ActivityCapsule({
         data-pillar={resolvedPillar}
         data-skin-preset={skinPresetId}
         style={cssVars}
-        aria-label={ariaLabel || `${label} activity capsule`}
+        aria-label={ariaLabel || t('idleVillage:activityCapsule.accessibility.activityCapsule', { defaultValue: `${label} activity capsule`, label })}
         aria-live={skinConfig.enableAriaLive ? ariaLive : 'off'}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -819,7 +833,7 @@ export function ActivityCapsule({
           )}
 
           {/* CTA Collect button */}
-          {canCollect && onCollect && (
+          {canCollect && (
             <button
               className={clsx('activity-capsule__cta', {
                 'activity-capsule__cta--disabled': collectDisabled || isCollecting,
@@ -848,7 +862,7 @@ export function ActivityCapsule({
                 transform: isCollecting ? 'var(--capsule-cta-active-scale)' : 'scale(1)',
               }}
             >
-              {isCollecting ? 'Collecting...' : collectLabel}
+              {isCollecting ? t('idleVillage:activityCapsule.actions.collecting', { defaultValue: 'Collecting...' }) : resolvedCollectLabel}
             </button>
           )}
         </div>

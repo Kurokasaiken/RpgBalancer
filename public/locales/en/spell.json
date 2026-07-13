@@ -1,0 +1,104 @@
+{
+  "app": {
+    "title": "Spell Creation"
+  },
+  "ccOptions": {
+    "knockback": "Knockback",
+    "none": "None",
+    "silence": "Silence",
+    "slow": "Slow",
+    "stun": "Stun"
+  },
+  "damageTypes": {
+    "magical": "Magical",
+    "physical": "Physical",
+    "true": "True"
+  },
+  "editor": {
+    "advancedStats": "Advanced Stats",
+    "balanced": "✓ Balanced",
+    "balanceRequired": "Balance Required (Cost ≠ 0)",
+    "budget": "Budget: {value}",
+    "cancel": "Cancel",
+    "ccEffect": "CC Effect",
+    "coreStats": "Core Stats",
+    "damageType": "Damage Type",
+    "descriptionPlaceholder": "Spell description...",
+    "hpEquivalent": "HP-equivalent",
+    "mana": "mana",
+    "manaCost": "Mana Cost",
+    "namePlaceholder": "Spell Name",
+    "none": "None",
+    "overpriced": "Overpriced",
+    "passive": "Passive",
+    "recommended": "Recommended",
+    "resetToBase": "Reset to Base",
+    "resetWeight": "Reset weight",
+    "resetWeights": "Reset Weights",
+    "saveSpell": "Save Spell",
+    "scalingStat": "Scaling Stat",
+    "situationalModifiers": "Situational Modifiers (JSON array)",
+    "spellPower": "Spell Power",
+    "tags": "Tags (comma-separated)",
+    "targetStat": "Target Stat",
+    "title": "Edit Spell",
+    "type": "Type",
+    "underpriced": "Underpriced"
+  },
+  "labels": {
+    "balance": "Balance",
+    "duration": "Duration (Turns)",
+    "effect": "Effect",
+    "modification": "Modification %"
+  },
+  "library": {
+    "availableCount": "{count} spells available",
+    "avgDamage": "Avg Damage (effect% × base × eco)",
+    "avgDamageFormula": "base = {base}, eco = {eco}",
+    "baseEffect": "Base Effect",
+    "cooldown": "CD: {value} turns",
+    "delete": "Delete",
+    "editSpell": "Edit Spell",
+    "newSpell": "New Spell",
+    "selectPrompt": "Select a spell to view details",
+    "statistics": "Statistics",
+    "title": "Spell Library"
+  },
+  "preview": {
+    "buffDebuff": "{type} for {eco} turn{turns}",
+    "title": "Preview Spell"
+  },
+  "save": {
+    "defaultDescription": "Spell, card order, collapsed states, and slider positions saved",
+    "defaultError": "Failed to save default",
+    "defaultErrorDescription": "Please try again or check console for errors",
+    "defaultSuccess": "Configuration saved as default!",
+    "success": "Spell saved successfully!",
+    "successDescription": "{name} has been added to your library"
+  },
+  "scalingStats": {
+    "attack": "Attack",
+    "defense": "Defense",
+    "health": "Health",
+    "magic": "Magic",
+    "mana": "Mana"
+  },
+  "stats": {
+    "aoe": "AoE Targets",
+    "cooldown": "Cooldown",
+    "dangerous": "Dangerous",
+    "duration": "Duration",
+    "manaCost": "Mana Cost",
+    "pierce": "Pierce",
+    "scale": "Scale",
+    "tags": "Tags"
+  },
+  "types": {
+    "buff": "Buff",
+    "cc": "CC",
+    "damage": "Damage",
+    "debuff": "Debuff",
+    "heal": "Heal",
+    "shield": "Shield"
+  }
+}

@@ -129,6 +129,12 @@ POI detail). The POI's own highlight (`JobPOI`) reads the dragged pg's stats fro
 drag payload — PgCard/WanderlustRosterCard put `resident: { stats: { hp }, fatigue }`
 in `useDraggable().data`. Valid → shared bloom; invalid → alpha.
 
+> **Interaction design note (L3 reference page):** in `/minimal-job-poi-roster-integration`
+> clicking the POI toggles the **POI detail only**; the slot rack is rendered inside the
+> detail and is never opened as a standalone panel. This page is an example interaction
+> surface, not a real production screen, so the POI must never expose the slot rack
+> directly without the detail.
+
 ### 2.5 Config-driven slots (L2)
 
 Slots come from an `ActivityDefinition` in `DEFAULT_IDLE_VILLAGE_CONFIG.activities`
@@ -137,10 +143,36 @@ Slots come from an `ActivityDefinition` in `DEFAULT_IDLE_VILLAGE_CONFIG.activiti
 - `metadata.slotBlueprints` — per-slot `requirement` overrides (e.g. HP > 200 via the
   typed `NumericStatRequirement`: `{ stat: 'hp', operator: '>', value: 200 }`,
   evaluated by `statMatching.evaluateStatRequirement`).
+  Slot blueprints also carry **semantic role** (`role`), an optional human-readable
+  `roleLabel`, and the `required` flag. For quests, two additional modifiers are
+  recognized:
+  - `emptyPenalty` — party-level malus applied when a `required` slot is left empty
+    (`partyPowerMult` and flat `extraDeathChance`/`extraInjuryChance` percentage points).
+  - `residentRiskModifiers` — per-slot flat risk deltas (`deathChanceDelta` / `injuryChanceDelta`)
+    applied to the resident occupying that slot.
+  These fields are config-only; the controller forwards them into `ResidentSlotViewModel`
+  and `ActivityDetailSlotData` without interpretation.
 - `maxSlots: 'infinite'` — the controller always keeps ≥1 empty virtual slot: fill the
   last free slot and a new one appears. This IS the "infinite slots" mechanic.
 - Rack `overflowBehavior="scroll"` past N slots → themed thin gold scrollbar
   (`RackScroll.module.css`).
+
+### 2.5.1 Quest Assignment deterministic preview
+
+Quest pages use `useQuestAssignmentPreview` for a **live, RNG-free preview** of the
+outcome distribution. The hook consumes:
+
+- `ActivityDefinition` (level, `dangerRating`, `metadata.slotBlueprints`)
+- `ResidentSlotViewModel[]` (assignments, `emptyPenalty`, `residentRiskModifiers`)
+- `QuestPowerRules` (from `DEFAULT_IDLE_VILLAGE_CONFIG.globalRules.questPowerRules`)
+- `QuestItemMock[]` (optional toggle items)
+
+It returns the expected `projectedDeathChance`, `projectedInjuryChance`,
+`projectedRewardMultiplier`, and `canEmbark` (false if any required slot is empty).
+The hook uses only the **pure** functions from `QuestPowerEngine` (`calculatePartyPower`,
+`calculateQuestDifficulty`, `calculatePowerRatio`, `getOutcomeDistribution`). `resolveQuestPower`
+and any other RNG-consuming function must be called only once, by the `onClick` handler
+of the **Embark** CTA.
 
 ---
 
@@ -198,7 +230,49 @@ occluded tabs (headless previews). Interaction tests must run with a visible vie
 
 ---
 
-## 5. Extension checklist (new page or new receiver)
+## 5. Aesthetic profile of the L2 reference page
+
+The `/minimal-roster-slot-integration` route is the visual reference for the
+**Roster + SlotRack** interaction. It adopts the *DNA Prismatic Wanderlust*
+art direction described in
+[`../plans/art_direction_plan.md`](../plans/art_direction_plan.md): anti-flat,
+anti-grim, material-first surfaces with warm amber/gold accents over a dark
+slate canvas.
+
+### Concrete tokens on the page
+
+- **Page canvas**: `min-h-screen bg-slate-950 p-8 text-ivory` with a centered
+  `max-w-6xl` grid.
+- **Header**: small label in `text-amber-200/70` uppercase with wide tracking;
+  title in `text-2xl font-semibold text-amber-100`.
+- **Card panels**: `bg-slate-900/30 border border-slate-700/50 rounded-lg p-6`.
+- **Roster kit**: `<RosterDraggable useWanderlustSkin={true} ... />` renders
+  `VillageRosterSection` through the certified `rosterKit`, with
+  `lockedResidentIds` shown as `Away` (alpha 0.35 + grayscale +
+  pointer-events none).
+- **Slot rack surface**: the rack is wrapped in
+  `<WanderlustSurface shape="panel" material="bronze" interactive={false}>`
+  (see [`WanderlustSurface.tsx`][ws] and [`materialPresets.ts`][mp]). The
+  `bronze` material preset provides a warm copper-to-brown field with gold
+  rim gradients.
+- **Slot rack config**: `ResidentSlotRack` is rendered with `layout="detail"`,
+  `overflowBehavior="scroll"` and `slotSize={140}`; themed overflow indicators
+  are handled by `RackScroll.module.css`.
+
+### Why it matters
+
+These style choices are not decoration: the `WanderlustSurface` bronze panel is
+the drop target for the `WanderlustMedalOverlay` drag preview, and the dark
+slate background keeps the glowing bloom (`bloomEffect.ts`) and drag flight
+visible. Any page replicating the L2 behavior should reuse the same certified
+kits and material tokens rather than inventing new chrome.
+
+[ws]: ../../../ui/wanderlust-surface/WanderlustSurface.tsx
+[mp]: ../../../ui/wanderlust-surface/materialPresets.ts
+
+---
+
+## 6. Extension checklist (new page or new receiver)
 
 1. Compose kits only: `RosterDraggable` / `ResidentSlotRack` / `JobPOI` (one-line imports from `frozen/kits/*`).
 2. Slots from config: an `ActivityDefinition` (+ `metadata.slotBlueprints`) consumed by `useResidentSlotController` — never hardcode slot lists in page code.

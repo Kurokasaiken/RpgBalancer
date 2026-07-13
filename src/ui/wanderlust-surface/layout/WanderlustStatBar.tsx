@@ -28,14 +28,14 @@ export interface WanderlustStatBarProps {
 // Color variants — now read from skin tokens with fallback to hardcoded defaults
 const VARIANT_COLORS: Record<StatBarVariant, { start: string; end: string; shadow: string }> = {
   hp: {
-    start: 'var(--skin-statbar-hp-start, #4a9e5a)',
-    end: 'var(--skin-statbar-hp-end, #7bc96f)',
-    shadow: 'var(--skin-statbar-hp-glow, rgba(123,201,111,0.3))',
+    start: 'var(--skin-statbar-hp-start, #0a8a4a)',
+    end: 'var(--skin-statbar-hp-end, #6ee7b7)',
+    shadow: 'var(--skin-statbar-hp-glow, rgba(110,231,183,0.45))',
   },
   stamina: {
-    start: 'var(--skin-statbar-stamina-start, #b8862a)',
-    end: 'var(--skin-statbar-stamina-end, #e0b23e)',
-    shadow: 'var(--skin-statbar-stamina-glow, rgba(224,178,62,0.3))',
+    start: 'var(--skin-statbar-stamina-start, #d4af37)',
+    end: 'var(--skin-statbar-stamina-end, #f59e0b)',
+    shadow: 'var(--skin-statbar-stamina-glow, rgba(245,158,11,0.45))',
   },
   fatigue: {
     start: 'var(--skin-statbar-fatigue-start, #9e5a4a)',
@@ -59,9 +59,9 @@ const FONT = {
 } as const;
 
 const COLOR = {
-  labelPrimary: 'var(--wl-label-primary, #c9a84e)',
-  labelTertiary: 'var(--wl-label-tertiary, #9a8246)',
-  body: 'var(--wl-text-body, rgba(237,224,196,0.92))',
+  labelPrimary: 'var(--skin-label-primary, #c9a84e)',
+  labelTertiary: 'var(--skin-label-tertiary, #9a8246)',
+  body: 'var(--skin-body-color, rgba(237,224,196,0.92))',
 } as const;
 
 // Engraving shadows for text
@@ -107,10 +107,10 @@ export const WanderlustStatBar: React.FC<WanderlustStatBarProps> = ({
     flex: 1,
     height: sizeConfig.height,
     position: 'relative',
-    background: 'var(--skin-statbar-track, rgba(6,4,3,0.7))',
-    border: `1px solid var(--skin-statbar-track-border, rgba(216,177,62,0.06))`,
-    borderRadius: '5px',
-    boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.7), inset 0 0 0 1px var(--skin-statbar-track-border, rgba(216,177,62,0.06))',
+    background: 'var(--skin-statbar-track, linear-gradient(180deg, #0c0b0a, #050505))',
+    border: '1px solid var(--skin-statbar-track-border, rgba(216,177,62,0.08))',
+    borderRadius: '6px',
+    boxShadow: 'inset 0 2px 5px rgba(0,0,0,0.85), inset 0 1px 0 rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.03)',
     overflow: 'hidden',
   };
 
@@ -121,7 +121,8 @@ export const WanderlustStatBar: React.FC<WanderlustStatBarProps> = ({
     height: '100%',
     width: `${percent}%`,
     background: `linear-gradient(90deg, ${colors.start}, ${colors.end})`,
-    boxShadow: `0 0 8px ${colors.shadow}`,
+    borderRadius: '5px',
+    boxShadow: `inset 0 0 0 0.5px color-mix(in srgb, var(--skin-icon-color, #dfb857) 85%, transparent), 0 0 8px rgba(0,0,0,0.35), 0 0 6px ${colors.shadow}`,
     transition: 'width 280ms cubic-bezier(0.34,1.56,0.64,1)',
     willChange: 'width',
   };
@@ -139,12 +140,12 @@ export const WanderlustStatBar: React.FC<WanderlustStatBarProps> = ({
     textAlign: 'right',
   };
 
-  // Add specular highlight (matching roster_wanderlust_reskin.html)
+  // Add specular highlight (liquid-gem / resin glossy top sheen)
   const fillHighlightStyle: CSSProperties = {
     position: 'absolute',
     inset: '0 0 50% 0',
     borderRadius: '5px 5px 0 0',
-    background: 'linear-gradient(180deg, rgba(255,255,255,0.22), transparent)',
+    background: 'radial-gradient(ellipse 70% 55% at 50% 0%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.12) 45%, transparent 70%), linear-gradient(180deg, rgba(255,255,255,0.22), transparent)',
     pointerEvents: 'none',
   };
 

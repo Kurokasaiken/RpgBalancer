@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useTranslation } from '@/localization/useTranslation';
 import { DndContext, closestCenter, type DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -104,7 +105,7 @@ const SortableCard: React.FC<SortableCardProps> = ({
           className="mt-1 w-full text-[10px] px-2 py-1.5 rounded-lg border border-dashed border-amber-400/60 text-amber-200 hover:bg-amber-500/10 tracking-[0.3em] uppercase transition-colors"
           onClick={() => onClickAddStat(card)}
         >
-          ＋ Stat
+          ＋ {t('balancing:actions.addStat')}
         </button>
       )}
     </div>
@@ -130,6 +131,7 @@ function buildStatBlockFromSimValues(simValues: Record<string, number>): StatBlo
 }
 
 export const Balancer: React.FC = () => {
+  const { t } = useTranslation('balancing');
   const { config, reorderCards, updateStat, deleteStat, updateCard, deleteCard, resetStatToInitial, resetCardToInitial, resetToInitialConfig } = useBalancerConfig();
 
   const [lastCreatedStatId, setLastCreatedStatId] = useState<string | null>(null);
@@ -627,10 +629,10 @@ export const Balancer: React.FC = () => {
             <div className="flex flex-col">
               <h1 className="flex items-center gap-2 text-2xl md:text-3xl font-semibold tracking-[0.22em] md:tracking-[0.3em] uppercase text-indigo-200 drop-shadow-[0_0_14px_rgba(129,140,248,0.9)]">
                 <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-cyan-300 drop-shadow-[0_0_10px_rgba(56,189,248,0.8)]" />
-                <span>Balancer</span>
+                <span>{t('balancing:app.title')}</span>
               </h1>
               <p className="mt-0.5 md:mt-1 text-[9px] md:text-[10px] text-slate-400 uppercase tracking-[0.2em] md:tracking-[0.26em]">
-                Arcane Tech Glass · Config-Driven
+                {t('balancing:app.subtitle')}
               </p>
             </div>
             <div className="flex items-center gap-1.5 md:gap-2 mt-2 md:mt-0">
@@ -646,7 +648,7 @@ export const Balancer: React.FC = () => {
                   }`}
                 >
                   <Settings className="w-3 h-3 inline mr-1" />
-                  Legacy
+                  {t('balancing:viewMode.legacy')}
                 </button>
                 <button
                   type="button"
@@ -658,7 +660,7 @@ export const Balancer: React.FC = () => {
                   }`}
                 >
                   <Sparkles className="w-3 h-3 inline mr-1" />
-                  Config
+                  {t('balancing:viewMode.config')}
                 </button>
               </div>
               
@@ -670,23 +672,23 @@ export const Balancer: React.FC = () => {
                     ? 'border-red-400/80 text-red-100 bg-red-500/20'
                     : 'border-red-500/60 text-red-200 hover:bg-red-500/10'
                 }`}
-                title={resetConfirmPending ? 'Clicca di nuovo per confermare il reset completo' : 'Resetta tutto ai valori iniziali'}
+                title={resetConfirmPending ? t('balancing:reset.confirmTitle') : t('balancing:reset.title')}
               >
-                ↺ Reset All
+                ↺ {t('balancing:actions.resetAll')}
               </button>
               <button
                 type="button"
                 onClick={handleAddCard}
                 className="px-3 md:px-4 py-1.5 md:py-2 rounded-full border border-amber-400/60 text-amber-200 text-[10px] tracking-[0.35em] uppercase hover:bg-amber-500/10"
               >
-                ＋ Nuova Card
+                ＋ {t('balancing:actions.newCard')}
               </button>
               <button
                 type="button"
                 onClick={() => setShowScenarioLab((prev) => !prev)}
                 className="px-3 md:px-4 py-1.5 md:py-2 rounded-full border border-cyan-400/60 text-cyan-200 text-[10px] tracking-[0.3em] uppercase hover:bg-cyan-500/10"
               >
-                Scenario Lab
+                {t('balancing:actions.scenarioLab')}
               </button>
               <button
                 type="button"
@@ -694,7 +696,7 @@ export const Balancer: React.FC = () => {
                 className="px-3 md:px-4 py-1.5 md:py-2 rounded-full border border-purple-400/60 text-purple-200 text-[10px] tracking-[0.3em] uppercase hover:bg-purple-500/10"
               >
                 <BarChart3 className="w-3 h-3 inline mr-1" />
-                Stress Test
+                {t('balancing:actions.stressTest')}
               </button>
             </div>
           </header>
@@ -709,19 +711,19 @@ export const Balancer: React.FC = () => {
               {equalFightMetrics && (
             <div className="mt-3 rounded-xl border border-cyan-500/40 bg-slate-900/70 px-3 md:px-4 py-2.5 md:py-3 flex flex-wrap items-center gap-3 md:gap-4 text-[9px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.22em]">
               <div className="flex flex-col min-w-[120px]">
-                <span className="text-slate-400">1v1 Equal (Self vs Self)</span>
+                <span className="text-slate-400">{t('balancing:metrics.equalFight.title')}</span>
                 <span className="font-mono text-cyan-300 text-[11px] md:text-xs">
-                  {equalFightMetrics.ttk.toFixed(2)} turns
+                  {t('balancing:metrics.equalFight.turns', { value: equalFightMetrics.ttk.toFixed(2) })}
                 </span>
               </div>
               <div className="flex flex-col min-w-[120px]">
-                <span className="text-slate-400">EDPT vs Self</span>
+                <span className="text-slate-400">{t('balancing:metrics.edptVsSelf')}</span>
                 <span className="font-mono text-emerald-300 text-[11px] md:text-xs">
                   {equalFightMetrics.edpt.toFixed(2)}
                 </span>
               </div>
               <div className="flex flex-col min-w-[140px]">
-                <span className="text-slate-400">Early Impact (3T)</span>
+                <span className="text-slate-400">{t('balancing:metrics.earlyImpact')}</span>
                 <span className="font-mono text-amber-300 text-[11px] md:text-xs">
                   {equalFightMetrics.earlyImpact.toFixed(2)}
                 </span>
@@ -735,7 +737,7 @@ export const Balancer: React.FC = () => {
                 <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-baseline gap-2">
                     <h3 className="text-[9px] md:text-[10px] font-semibold uppercase tracking-[0.2em] md:tracking-[0.24em] text-indigo-300">
-                      Scenario Simulation (vs Baseline)
+                      {t('balancing:scenario.simulationTitle')}
                     </h3>
                     <select
                       className="rounded-full border border-indigo-500/60 bg-slate-950 px-2 py-0.5 text-[9px] uppercase tracking-[0.2em] text-indigo-200 hover:border-indigo-400/80"
@@ -753,7 +755,7 @@ export const Balancer: React.FC = () => {
                   </div>
                   <div className="flex items-center gap-2 text-[9px] md:text-[10px]">
                     <label className="flex items-center gap-1 text-slate-300">
-                      <span className="uppercase tracking-[0.2em]">Iter</span>
+                      <span className="uppercase tracking-[0.2em]">{t('balancing:scenario.iterations')}</span>
                       <input
                         type="number"
                         min={50}
@@ -770,7 +772,7 @@ export const Balancer: React.FC = () => {
                       disabled={isScenarioSimRunning}
                       className="rounded-full border border-indigo-500/80 px-2.5 md:px-3 py-1 text-[9px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.22em] text-indigo-100 hover:bg-indigo-500/10 disabled:opacity-50"
                     >
-                      {isScenarioSimRunning ? 'Running...' : 'Run Sim'}
+                      {isScenarioSimRunning ? t('balancing:scenario.running') : t('balancing:scenario.runSim')}
                     </button>
                   </div>
                 </div>
@@ -778,41 +780,39 @@ export const Balancer: React.FC = () => {
                 {scenarioSimResult && (
                   <div className="grid gap-2.5 text-[9px] md:text-[10px] sm:grid-cols-3">
                     <div className="flex flex-col">
-                      <span className="text-slate-400 uppercase tracking-[0.2em]">Winrate</span>
+                      <span className="text-slate-400 uppercase tracking-[0.2em]">{t('balancing:scenario.winrate')}</span>
                       <span className="mt-0.5 font-mono text-emerald-300">
-                        Build: {(scenarioSimResult.summary.winRates.entity1 * 100).toFixed(1)}%
+                        {t('balancing:scenario.build', { value: (scenarioSimResult.summary.winRates.entity1 * 100).toFixed(1) })}%
                       </span>
                       <span className="font-mono text-rose-300">
-                        Baseline: {(scenarioSimResult.summary.winRates.entity2 * 100).toFixed(1)}%
+                        {t('balancing:scenario.baseline', { value: (scenarioSimResult.summary.winRates.entity2 * 100).toFixed(1) })}%
                       </span>
                       <span className="font-mono text-slate-400">
-                        Draws: {(scenarioSimResult.summary.winRates.draws * 100).toFixed(1)}%
+                        {t('balancing:scenario.draws', { value: (scenarioSimResult.summary.winRates.draws * 100).toFixed(1) })}%
                       </span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-slate-400 uppercase tracking-[0.2em]">TTK (Turns)</span>
+                      <span className="text-slate-400 uppercase tracking-[0.2em]">{t('balancing:scenario.ttkTurns')}</span>
                       <span className="mt-0.5 font-mono text-cyan-300">
-                        Avg: {scenarioSimResult.combatStatistics.averageTurns.toFixed(1)}
+                        {t('balancing:scenario.avg', { value: scenarioSimResult.combatStatistics.averageTurns.toFixed(1) })}
                       </span>
                       <span className="font-mono text-slate-200">
-                        Median: {scenarioSimResult.combatStatistics.medianTurns.toFixed(1)}
+                        {t('balancing:scenario.median', { value: scenarioSimResult.combatStatistics.medianTurns.toFixed(1) })}
                       </span>
                       <span className="font-mono text-slate-400">
-                        Range: {scenarioSimResult.combatStatistics.minTurns.toFixed(0)}-
-                        {scenarioSimResult.combatStatistics.maxTurns.toFixed(0)}
+                        {t('balancing:scenario.range', { min: scenarioSimResult.combatStatistics.minTurns.toFixed(0), max: scenarioSimResult.combatStatistics.maxTurns.toFixed(0) })}
                       </span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-slate-400 uppercase tracking-[0.2em]">Damage/Overkill</span>
+                      <span className="text-slate-400 uppercase tracking-[0.2em]">{t('balancing:scenario.damageOverkill')}</span>
                       <span className="mt-0.5 font-mono text-amber-300">
-                        DPT Build: {scenarioSimResult.damageMetrics.entity1.average.toFixed(1)}
+                        {t('balancing:scenario.dptBuild', { value: scenarioSimResult.damageMetrics.entity1.average.toFixed(1) })}
                       </span>
                       <span className="font-mono text-amber-200">
-                        DPT Base: {scenarioSimResult.damageMetrics.entity2.average.toFixed(1)}
+                        {t('balancing:scenario.dptBase', { value: scenarioSimResult.damageMetrics.entity2.average.toFixed(1) })}
                       </span>
                       <span className="font-mono text-slate-400">
-                        Overkill Avg: {scenarioSimResult.damageMetrics.averageOverkill.entity1.toFixed(1)} /
-                        {scenarioSimResult.damageMetrics.averageOverkill.entity2.toFixed(1)}
+                        {t('balancing:scenario.overkillAvg', { value1: scenarioSimResult.damageMetrics.averageOverkill.entity1.toFixed(1), value2: scenarioSimResult.damageMetrics.averageOverkill.entity2.toFixed(1) })}
                       </span>
                     </div>
                   </div>
@@ -822,11 +822,11 @@ export const Balancer: React.FC = () => {
               <div className="mt-4 space-y-2">
                 <div className="flex items-baseline justify-between gap-2">
                   <h2 className="text-[11px] md:text-xs font-semibold uppercase tracking-[0.22em] md:tracking-[0.26em] text-cyan-300">
-                    🎯 Configurazione Scenari
+                    🎯 {t('balancing:scenario.configTitle')}
                   </h2>
                   <div className="flex items-center gap-2">
                     <span className="text-[8px] md:text-[9px] uppercase tracking-[0.18em] md:tracking-[0.2em] text-slate-500">
-                      Duel · Boss · Swarm · 5v5
+                      {t('balancing:scenario.subtitle')}
                     </span>
                     <select
                       className="rounded-full border border-cyan-500/60 bg-slate-950 px-2 py-0.5 text-[8px] md:text-[9px] uppercase tracking-[0.18em] md:tracking-[0.2em] text-cyan-200 hover:border-cyan-400/80"
@@ -839,7 +839,7 @@ export const Balancer: React.FC = () => {
                         }
                       }}
                     >
-                      <option value="">Elite Preset</option>
+                      <option value="">{t('balancing:scenario.elitePreset')}</option>
                       {(Object.values(ELITE_SCENARIOS) as typeof ELITE_SCENARIOS[keyof typeof ELITE_SCENARIOS][]).map(
                         (elite) => (
                           <option key={elite.id} value={elite.id}>
@@ -853,10 +853,10 @@ export const Balancer: React.FC = () => {
                       onClick={handleExportScenarios}
                       className="rounded-full border border-cyan-500/60 px-2 py-0.5 text-[8px] md:text-[9px] uppercase tracking-[0.18em] md:tracking-[0.2em] text-cyan-200 hover:bg-cyan-500/10"
                     >
-                      Export
+                      {t('balancing:actions.export')}
                     </button>
                     <label className="cursor-pointer rounded-full border border-cyan-500/60 px-2 py-0.5 text-[9px] uppercase tracking-[0.2em] text-cyan-200 hover:bg-cyan-500/10">
-                      Import
+                      {t('balancing:actions.import')}
                       <input
                         type="file"
                         accept="application/json"
@@ -887,10 +887,10 @@ export const Balancer: React.FC = () => {
                 <div className="mt-3 rounded-xl border border-amber-500/40 bg-slate-900/70 px-4 py-3">
                   <div className="mb-2 flex items-baseline justify-between">
                     <h3 className="text-[10px] font-semibold uppercase tracking-[0.24em] text-amber-300">
-                      Scenario Power (HP eq)
+                      {t('balancing:scenario.powerTitle')}
                     </h3>
                     <span className="text-[9px] uppercase tracking-[0.18em] text-slate-500">
-                      Basato sul build corrente
+                      {t('balancing:scenario.powerSubtitle')}
                     </span>
                   </div>
                   <div className="grid gap-2 xs:grid-cols-2 xl:grid-cols-4">
@@ -924,14 +924,14 @@ export const Balancer: React.FC = () => {
           {/* Hidden cards row */}
           {hiddenCards.length > 0 && (
             <div className="mb-3 flex flex-wrap items-center gap-1.5 text-[10px]">
-              <span className="mr-2 uppercase tracking-[0.22em] text-slate-400">Cards nascoste</span>
+              <span className="mr-2 uppercase tracking-[0.22em] text-slate-400">{t('balancing:labels.hiddenCards')}</span>
               {hiddenCards.map((card) => (
                 <button
                   key={card.id}
                   type="button"
                   onClick={() => updateCard(card.id, { isHidden: false })}
                   className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-slate-600/70 bg-slate-900/60 text-slate-200 hover:border-indigo-400/80 hover:text-indigo-100 hover:bg-slate-900/90 transition-colors"
-                  title="Mostra card"
+                  title={t('balancing:actions.showCard')}
                 >
                   <span aria-hidden className="text-xs">{card.icon || '🂠'}</span>
                   <span className="text-[10px] tracking-[0.18em] uppercase truncate max-w-28">{card.title}</span>
@@ -981,7 +981,7 @@ export const Balancer: React.FC = () => {
                           type="button"
                           onClick={handleAddCard}
                           className="flex items-center justify-center rounded-2xl border border-dashed border-amber-500/50 text-amber-200 text-xl hover:bg-amber-500/5 min-h-[120px]"
-                          title="Add Card"
+                          title={t('balancing:actions.addCard')}
                         >
                           ＋
                         </button>
@@ -1010,13 +1010,13 @@ export const Balancer: React.FC = () => {
             <div className="mt-4 rounded-xl border border-purple-500/40 bg-slate-900/70 px-3 md:px-4 py-2.5 md:py-3">
               <div className="mb-4 flex items-center justify-between">
                 <h3 className="text-[9px] md:text-[10px] font-semibold uppercase tracking-[0.2em] md:tracking-[0.24em] text-purple-300">
-                  Phase 10.5: Stat Stress Testing & Marginal Utility Analysis
+                  {t('balancing:stressTesting.title')}
                 </h3>
                 <button
                   onClick={() => setShowStressTesting(false)}
                   className="px-2 py-1 rounded-full border border-slate-600 text-slate-400 hover:text-slate-200 text-[9px] tracking-[0.2em] uppercase transition-colors"
                 >
-                  ✕ Close
+                  ✕ {t('balancing:actions.close')}
                 </button>
               </div>
               <StressTestDashboard />

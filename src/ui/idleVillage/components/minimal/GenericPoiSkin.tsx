@@ -1,5 +1,6 @@
 import type { JSX } from 'react';
 import { useId, useEffect, useRef, useState } from 'react';
+import { useTranslation } from '@/localization/useTranslation';
 
 /**
  * Props for GenericPoiSkin component
@@ -37,6 +38,14 @@ export interface GenericPoiSkinProps {
   expirationThresholdMs?: number;
   /** Whether this POI can expire and disappear (vs. countdown-only) */
   isExpirable?: boolean;
+  /** Injury risk percentage (0-100) */
+  injuryRisk?: number;
+  /** Death risk percentage (0-100) */
+  deathRisk?: number;
+  /** Danger rating (0-10) */
+  dangerRating?: number | string;
+  /** Whether to show risk badges below the POI */
+  showRiskBadges?: boolean;
 }
 
 const TAU = Math.PI * 2;
@@ -99,7 +108,13 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
     timeRemainingMs,
     expirationThresholdMs = 60000, // Default: 1 minute
     isExpirable = false,
+    injuryRisk,
+    deathRisk,
+    dangerRating,
+    showRiskBadges = false,
   } = props;
+
+  const { t } = useTranslation('idleVillage');
 
   const uniqueId = useId().replace(/:/g, '');
   const svgRef = useRef<SVGSVGElement>(null);
@@ -278,12 +293,17 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
         width={size}
         height={size}
         viewBox="-80 -80 160 160"
-        className="overflow-visible transition-transform duration-200 ease-out cursor-pointer"
+        className="overflow-visible transition-all duration-300 ease-out cursor-pointer"
         style={{
           display: 'block',
           transform: `scale(${hoverScale})`,
-          filter: isHovered && enableHover ? 'drop-shadow(0 0 8px rgba(201, 162, 39, 0.6))' : undefined,
-        }}
+          borderRadius: '50%',
+          filter: isHovered && enableHover 
+            ? 'brightness(1.15) drop-shadow(0 0 12px var(--pulse-glow-heavy, rgba(201, 162, 39, 0.6)))' 
+            : undefined,
+          '--pulse-glow-color': `rgba(${expiredCoronaGlow.r}, ${expiredCoronaGlow.g}, ${expiredCoronaGlow.b}, 0.22)`,
+          '--pulse-glow-heavy': `rgba(${expiredCoronaGlow.r}, ${expiredCoronaGlow.g}, ${expiredCoronaGlow.b}, 0.55)`,
+        } as React.CSSProperties}
         onMouseEnter={() => enableHover && setIsHovered(true)}
         onMouseLeave={() => enableHover && setIsHovered(false)}
       >
@@ -305,6 +325,15 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
             <stop offset="0%" stopColor={rimColors[0]} />
             <stop offset="28%" stopColor={rimColors[1]} />
             <stop offset="100%" stopColor={rimColors[2]} />
+          </linearGradient>
+
+          {/* Specular highlight for hover */}
+          <linearGradient id="rimHoverSpecular" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="rgba(255,255,255,0)" />
+            <stop offset="35%" stopColor="rgba(255,255,255,0)" />
+            <stop offset="50%" stopColor="rgba(255,255,255,0.85)" />
+            <stop offset="65%" stopColor="rgba(255,255,255,0)" />
+            <stop offset="100%" stopColor="rgba(255,255,255,0)" />
           </linearGradient>
 
           {/* Rim glow filter */}
@@ -478,6 +507,10 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
             [data-pin-flicker] {
               animation: pinFlicker 4.3s steps(1, end) infinite;
             }
+            @keyframes specularSweep {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
           `}</style>
 
           <g data-rim clipPath={`url(#${cpId}-rim)`}>
@@ -492,6 +525,29 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
               opacity="0.92"
             />
             <circle cx="0" cy="0" r={RIM_R - rimStrokeWidth / 2 - 0.5} fill="none" stroke="rgba(0,0,0,.50)" strokeWidth="0.7" />
+          </g>
+
+          {/* Specular metallic sweep overlay on rim */}
+          <g 
+            style={{
+              opacity: isHovered && enableHover ? 0.95 : 0,
+              mixBlendMode: 'color-dodge',
+              transition: isHovered && enableHover
+                ? 'opacity 0.3s ease-in-out, transform 0.8s ease-out'
+                : 'opacity 0.3s ease-in-out, transform 0s',
+              transform: isHovered && enableHover ? 'rotate(360deg)' : 'rotate(0deg)',
+              transformOrigin: '0px 0px',
+              pointerEvents: 'none',
+            }}
+          >
+            <circle
+              cx="0"
+              cy="0"
+              r={RIM_R}
+              fill="none"
+              stroke="url(#rimHoverSpecular)"
+              strokeWidth={rimStrokeWidth}
+            />
           </g>
 
           {/* Stone ambient glow */}
@@ -566,6 +622,81 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
 
       {/* Label */}
       {label && <div className="text-xs font-semibold text-amber-200 tracking-wider">{label}</div>}
+
+      {/* Risk Badges */}
+      {showRiskBadges && (injuryRisk !== undefined || deathRisk !== undefined || dangerRating !== undefined) && (
+        <div className="flex flex-wrap items-center justify-center gap-1.5 mt-2">
+          {/* Injury Risk Badge */}
+          {injuryRisk !== undefined && (
+            <div 
+              className="flex items-center px-2.5 py-1 text-[10px] font-semibold tracking-wider uppercase rounded border select-none transition-all duration-200 hover:scale-105"
+              style={{
+                background: 'linear-gradient(135deg, #15110f 0%, #0c0908 100%)',
+                border: '1px solid rgba(192, 140, 34, 0.35)',
+                color: 'rgba(230, 220, 200, 0.95)',
+                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 2px 4px rgba(0,0,0,0.8)',
+              }}
+              title={t('idleVillage:poiDetail.risk.injury.title')}
+            >
+              {/* Stylized blood drop icon */}
+              <svg width="10" height="12" viewBox="0 0 24 24" fill="none" className="mr-1.5 shrink-0">
+                <path d="M12 3C12 3 6 11 6 15C6 18.3 8.7 21 12 21C15.3 21 18 18.3 18 15C18 11 12 3 12 3Z" fill="#ef4444" stroke="#7f1d1d" strokeWidth="1" />
+              </svg>
+              <span>{t('idleVillage:poiDetail.risk.injury.label', { defaultValue: 'INJURY: {risk}%', risk: injuryRisk })}</span>
+            </div>
+          )}
+
+          {/* Death Risk Badge */}
+          {deathRisk !== undefined && (
+            <div 
+              className="flex items-center px-2.5 py-1 text-[10px] font-semibold tracking-wider uppercase rounded border select-none transition-all duration-200 hover:scale-105"
+              style={{
+                background: 'linear-gradient(135deg, #15110f 0%, #0c0908 100%)',
+                border: '1px solid rgba(192, 140, 34, 0.35)',
+                color: 'rgba(230, 220, 200, 0.95)',
+                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 2px 4px rgba(0,0,0,0.8)',
+              }}
+              title={t('idleVillage:poiDetail.risk.death.title')}
+            >
+              {/* Stylized golden skull icon */}
+              <svg width="11" height="12" viewBox="0 0 24 24" fill="none" className="mr-1.5 shrink-0">
+                <path
+                  d="M12 2C7.58 2 4 5.58 4 10C4 12.87 5.5 15.38 7.75 16.78L7 21L10 20L12 22L14 20L17 21L16.25 16.78C18.5 15.38 20 12.87 20 10C20 5.58 16.42 2 12 2ZM9 9C9.55 9 10 9.45 10 10C10 10.55 9.55 11 9 11C8.45 11 8 10.55 8 10C8 9.45 8.45 9 9 9ZM15 9C15.55 9 16 9.45 16 10C16 10.55 15.55 11 15 11C14.45 11 14 10.55 14 10C14 9.45 14.45 9 15 9Z"
+                  fill="#ffd700"
+                  stroke="#8b6508"
+                  strokeWidth="1"
+                />
+              </svg>
+              <span>{t('idleVillage:poiDetail.risk.death.label', { defaultValue: 'DEATH: {risk}%', risk: deathRisk })}</span>
+            </div>
+          )}
+
+          {/* Danger Rating Badge */}
+          {dangerRating !== undefined && (
+            <div 
+              className="flex items-center px-2.5 py-1 text-[10px] font-semibold tracking-wider uppercase rounded border select-none transition-all duration-200 hover:scale-105"
+              style={{
+                background: 'linear-gradient(135deg, #15110f 0%, #0c0908 100%)',
+                border: '1px solid rgba(192, 140, 34, 0.35)',
+                color: 'rgba(230, 220, 200, 0.95)',
+                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 2px 4px rgba(0,0,0,0.8)',
+              }}
+              title={t('idleVillage:poiDetail.risk.danger.title')}
+            >
+              {/* Stylized warning triangle icon */}
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="mr-1.5 shrink-0">
+                <path
+                  d="M12 2L2 22H22L12 2ZM12 18C11.45 18 11 17.55 11 17C11 16.45 11.45 16 12 16C12.55 16 13 16.45 13 17C13 17.55 12.55 18 12 18ZM11 14V10C11 9.45 11.45 9 12 9C12.55 9 13 9.45 13 10V14C13 14.55 12.55 15 12 15C12.45 15 11 14.55 11 14Z"
+                  fill="#f97316"
+                  stroke="#7c2d12"
+                  strokeWidth="1"
+                />
+              </svg>
+              <span>{t('idleVillage:poiDetail.risk.danger.label', { defaultValue: 'DANGER: {rating}', rating: dangerRating })}</span>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

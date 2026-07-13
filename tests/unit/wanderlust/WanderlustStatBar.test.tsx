@@ -81,24 +81,27 @@ describe('WanderlustStatBar', () => {
       const { container } = render(
         <WanderlustStatBar label="HP" value={30} maxValue={50} variant="hp" />
       );
-      const fill = container.querySelector('[style*="rgba(44,116,66"]');
+      const fill = container.querySelector('[style*="width: 60%"]');
       expect(fill).toBeInTheDocument();
+      expect(fill?.getAttribute('style')).toContain('var(--skin-statbar-hp-start, #0a8a4a)');
     });
 
     it('renders stamina variant with amber colors', () => {
       const { container } = render(
         <WanderlustStatBar label="STA" value={25} maxValue={50} variant="stamina" />
       );
-      const fill = container.querySelector('[style*="rgba(192,112,40"]');
+      const fill = container.querySelector('[style*="width: 50%"]');
       expect(fill).toBeInTheDocument();
+      expect(fill?.getAttribute('style')).toContain('var(--skin-statbar-stamina-start, #d4af37)');
     });
 
     it('renders fatigue variant with rose colors', () => {
       const { container } = render(
         <WanderlustStatBar label="FAT" value={40} maxValue={50} variant="fatigue" />
       );
-      const fill = container.querySelector('[style*="rgba(138,56,56"]');
+      const fill = container.querySelector('[style*="width: 80%"]');
       expect(fill).toBeInTheDocument();
+      expect(fill?.getAttribute('style')).toContain('var(--skin-statbar-fatigue-start, #9e5a4a)');
     });
   });
 

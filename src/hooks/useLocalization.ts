@@ -1,9 +1,17 @@
-import { useCallback, useSyncExternalStore } from 'react';
+import { useCallback, useMemo, useSyncExternalStore } from 'react';
 import {
   localizationService,
   type SupportedLocale,
   type WorkerTooltipCopy,
 } from '@/localization/LocalizationService';
+import {
+  formatNumber,
+  formatPercent,
+  formatDate,
+  formatDateTime,
+  formatCurrency,
+  formatRelativeTime,
+} from '@/localization/intlFormatters';
 
 export interface LocalizationHandle {
   /** Currently active locale identifier */
@@ -14,6 +22,13 @@ export interface LocalizationHandle {
   format: (template: string, params?: Record<string, string | number>) => string;
   /** Copy dictionary for worker tooltips */
   workerTooltip: WorkerTooltipCopy;
+  /** Locale-aware Intl formatters */
+  formatNumber: (value: number, options?: Intl.NumberFormatOptions) => string;
+  formatPercent: (value: number, options?: Intl.NumberFormatOptions) => string;
+  formatDate: (value: Date | number, options?: Intl.DateTimeFormatOptions) => string;
+  formatDateTime: (value: Date | number, options?: Intl.DateTimeFormatOptions) => string;
+  formatCurrency: (value: number, currency: string, options?: Intl.NumberFormatOptions) => string;
+  formatRelativeTime: (value: number, unit: Intl.RelativeTimeFormatUnit, options?: Intl.RelativeTimeFormatOptions) => string;
 }
 
 /**
@@ -39,10 +54,29 @@ export function useLocalization(): LocalizationHandle {
     [],
   );
 
+  const formatters = useMemo(
+    () => ({
+      formatNumber: (value: number, options?: Intl.NumberFormatOptions) =>
+        formatNumber(value, { locale, ...options }),
+      formatPercent: (value: number, options?: Intl.NumberFormatOptions) =>
+        formatPercent(value, { locale, ...options }),
+      formatDate: (value: Date | number, options?: Intl.DateTimeFormatOptions) =>
+        formatDate(value, { locale, ...options }),
+      formatDateTime: (value: Date | number, options?: Intl.DateTimeFormatOptions) =>
+        formatDateTime(value, { locale, ...options }),
+      formatCurrency: (value: number, currency: string, options?: Intl.NumberFormatOptions) =>
+        formatCurrency(value, currency, { locale, ...options }),
+      formatRelativeTime: (value: number, unit: Intl.RelativeTimeFormatUnit, options?: Intl.RelativeTimeFormatOptions) =>
+        formatRelativeTime(value, unit, { locale, ...options }),
+    }),
+    [locale],
+  );
+
   return {
     locale,
     setLocale,
     format,
     workerTooltip,
+    ...formatters,
   };
 }

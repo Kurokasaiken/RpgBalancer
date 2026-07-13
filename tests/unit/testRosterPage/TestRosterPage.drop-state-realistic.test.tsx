@@ -29,12 +29,9 @@ beforeAll(() => {
       fontBoundingBoxDescent: 0,
       emHeightAscent: 0,
       emHeightDescent: 0,
-      actualHeight: 0,
-      font: '',
       alphabeticBaseline: 0,
       hangingBaseline: 0,
       ideographicBaseline: 0,
-      width: 100,
     };
     return {
       ...metrics,
@@ -133,7 +130,7 @@ describe('TestRosterPage - Drop State Realistic Validation', () => {
         const hasValidState = 
           firstRestrictedSlot.getAttribute('data-drop-state') === 'valid' ||
           firstRestrictedSlot.className.includes('drop-valid') ||
-          firstRestrictedSlot.textContent?.includes('DROP: VALID');
+          firstRestrictedSlot.textContent?.includes('Drop: Valid');
 
         // Se il tuo componente usa data-attributes per lo stato
         if (hasValidState) {
@@ -143,7 +140,7 @@ describe('TestRosterPage - Drop State Realistic Validation', () => {
           const hasInvalidState = 
             firstRestrictedSlot.getAttribute('data-drop-state') === 'invalid' ||
             firstRestrictedSlot.className.includes('drop-invalid') ||
-            firstRestrictedSlot.textContent?.includes('DROP: INVALID');
+            firstRestrictedSlot.textContent?.includes('Drop: Invalid');
           
           expect(hasInvalidState).toBe(false);
         }
@@ -167,7 +164,7 @@ describe('TestRosterPage - Drop State Realistic Validation', () => {
         const hasInvalidState = 
           secondRestrictedSlot.getAttribute('data-drop-state') === 'invalid' ||
           secondRestrictedSlot.className.includes('drop-invalid') ||
-          secondRestrictedSlot.textContent?.includes('DROP: INVALID');
+          secondRestrictedSlot.textContent?.includes('Drop: Invalid');
 
         if (hasInvalidState) {
           expect(hasInvalidState).toBe(true);
@@ -176,7 +173,7 @@ describe('TestRosterPage - Drop State Realistic Validation', () => {
           const hasValidState = 
             secondRestrictedSlot.getAttribute('data-drop-state') === 'valid' ||
             secondRestrictedSlot.className.includes('drop-valid') ||
-            secondRestrictedSlot.textContent?.includes('DROP: VALID');
+            secondRestrictedSlot.textContent?.includes('Drop: Valid');
           
           expect(hasValidState).toBe(false);
         }
@@ -255,7 +252,7 @@ describe('TestRosterPage - Drop State Realistic Validation', () => {
         const slotsWithDropState = restrictedSlots.filter(slot => 
           slot.getAttribute('data-drop-state') ||
           slot.className.includes('drop-') ||
-          slot.textContent?.includes('DROP:')
+          slot.textContent?.includes('Drop:')
         );
 
         // Dopo la fine del drag, gli stati dovrebbero essere resettati

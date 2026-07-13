@@ -19,10 +19,9 @@ export default function MinimalSlotRackPage() {
 
           <ResidentSlotRackSkin
             slots={slots}
-            activityLabel="Chop Wood"
-            activityIcon="🪓"
-            componentId="minimal-slot-rack"
-            dataTestId="resident-slot-rack-root"
+            layout="detail"
+            slotSize={96}
+            overflowBehavior="scroll"
           />
         </div>
       </div>

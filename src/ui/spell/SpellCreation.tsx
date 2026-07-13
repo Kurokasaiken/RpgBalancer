@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useTranslation } from '@/localization/useTranslation';
 import { BASELINE_STATS } from '../../balancing/baseline';
 import { toast } from 'sonner';
 import { SpellInfoForm } from './components/SpellInfoForm';
@@ -24,6 +25,7 @@ type StatStep = { value: number; weight: number };
 type StatStepsRecord = Record<string, StatStep[]>;
 
 export const SpellCreation: React.FC = () => {
+    const { t } = useTranslation('spell');
     // Use custom hooks for state management
     const {
         spell,
@@ -208,8 +210,8 @@ export const SpellCreation: React.FC = () => {
         });
         const finalSpell = minimalSpell as Spell;
         upsertSpell(finalSpell);
-        toast.success('Spell saved successfully!', {
-            description: `"${finalSpell.name}" has been added to your library`
+        toast.success(t('spell:save.success'), {
+            description: t('spell:save.successDescription', { name: finalSpell.name })
         });
         setSpell(createEmptySpell());
         // setCustomWeights({});
@@ -229,12 +231,12 @@ export const SpellCreation: React.FC = () => {
         });
 
         if (success) {
-            toast.success('Configuration saved as default!', {
-                description: 'Spell, card order, collapsed states, and slider positions saved'
+            toast.success(t('spell:save.defaultSuccess'), {
+                description: t('spell:save.defaultDescription')
             });
         } else {
-            toast.error('Failed to save default', {
-                description: 'Please try again or check console for errors'
+            toast.error(t('spell:save.defaultError'), {
+                description: t('spell:save.defaultErrorDescription')
             });
         }
     };
@@ -270,9 +272,9 @@ export const SpellCreation: React.FC = () => {
             <div className="max-w-7xl mx-auto relative z-10">
 
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-3xl font-bold text-white drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]">🔮 Spell Creation</h1>
+                    <h1 className="text-3xl font-bold text-white drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]">🔮 {t('spell:app.title')}</h1>
                     <div className="flex items-center gap-4 bg-black/40 px-4 py-2 rounded-lg border border-white/10 backdrop-blur-md">
-                        <span className="text-sm uppercase tracking-wider text-gray-400 font-semibold">Balance</span>
+                        <span className="text-sm uppercase tracking-wider text-gray-400 font-semibold">{t('spell:labels.balance')}</span>
                         <span className={`text - 2xl font - bold font - mono drop - shadow - [0_0_8px_currentColor] ${balance === 0 ? 'text-emerald-400' : 'text-red-400'} `}>
                             {balance > 0 ? '+' : ''}{balance.toFixed(2)}
                         </span>
@@ -294,7 +296,7 @@ export const SpellCreation: React.FC = () => {
                     <div className="w-full md:w-7/12 min-w-[300px]">
                         <div className="backdrop-blur-md bg-cyan-900/20 border border-cyan-500/30 rounded-lg p-4 h-full shadow-[0_4px_16px_rgba(6,182,212,0.15)] overflow-y-auto">
                             <div className="flex justify-between items-center text-lg font-bold text-cyan-100 mb-2 drop-shadow-[0_0_6px_rgba(6,182,212,0.6)] border-b border-cyan-500/20 pb-1">
-                                <span>Preview Spell</span>
+                                <span>{t('spell:preview.title')}</span>
                                 {spell.type === 'damage' && (
                                     <span className="text-sm font-mono text-cyan-400">
                                         {previewDamage(spell)}
@@ -303,7 +305,7 @@ export const SpellCreation: React.FC = () => {
                                 )}
                                 {(spell.type === 'buff' || spell.type === 'debuff') && (
                                     <span className="text-sm font-mono text-cyan-400">
-                                        {spell.type === 'buff' ? '⬆️ Buff' : '⬇️ Debuff'} for {spell.eco || 1} turn{(spell.eco || 1) > 1 ? 's' : ''}
+                                        {t('spell:preview.buffDebuff', { type: spell.type === 'buff' ? '⬆️ Buff' : '⬇️ Debuff', eco: spell.eco || 1, turns: (spell.eco || 1) > 1 ? 's' : '' })}
                                     </span>
                                 )}
                             </div>
@@ -327,7 +329,7 @@ export const SpellCreation: React.FC = () => {
                                 {spell.effect !== undefined && (
                                     <li className="flex justify-between items-center hover:bg-cyan-500/10 p-0.5 rounded transition-colors border-b border-cyan-500/10">
                                         <span className="font-medium text-cyan-300/70 capitalize truncate mr-2">
-                                            {spell.type === 'buff' || spell.type === 'debuff' ? 'Modification %' : 'Effect'}
+                                            {spell.type === 'buff' || spell.type === 'debuff' ? t('spell:labels.modification') : t('spell:labels.effect')}
                                         </span>
                                         <span className="font-mono text-cyan-300 font-bold drop-shadow-[0_0_4px_rgba(34,211,238,0.4)]">{spell.effect}</span>
                                     </li>
@@ -348,7 +350,7 @@ export const SpellCreation: React.FC = () => {
                                     .map(([key, value]) => (
                                         <li key={key} className="flex justify-between items-center hover:bg-cyan-500/10 p-0.5 rounded transition-colors border-b border-cyan-500/10">
                                             <span className="font-medium text-cyan-300/70 capitalize truncate mr-2" title={key}>
-                                                {key === 'eco' && (spell.type === 'buff' || spell.type === 'debuff') ? 'Duration (Turns)' : key.replace(/([A-Z])/g, ' $1').trim()}
+                                                {key === 'eco' && (spell.type === 'buff' || spell.type === 'debuff') ? t('spell:labels.duration') : key.replace(/([A-Z])/g, ' $1').trim()}
                                             </span>
                                             <span className="font-mono text-cyan-300 font-bold drop-shadow-[0_0_4px_rgba(34,211,238,0.4)]">{String(value)}</span>
                                         </li>

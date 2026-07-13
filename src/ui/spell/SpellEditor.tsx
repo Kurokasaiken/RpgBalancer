@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from '@/localization/useTranslation';
 import type { Spell } from '../../balancing/spellTypes';
 import { upsertSpell, loadSpells } from '../../balancing/spellStorage';
 
@@ -12,6 +13,7 @@ interface SpellEditorProps {
 }
 
 export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) => {
+    const { t } = useTranslation('spell');
     const [editedSpell, setEditedSpell] = useState<Spell | null>(null);
     const [customWeights, setCustomWeights] = useState<Record<string, number>>({});
 
@@ -81,34 +83,34 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
                 {/* Header */}
                 <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-gray-800 sticky top-0 z-10">
                     <div className="flex-1">
-                        <h2 className="text-xl font-bold text-white mb-2">Edit Spell</h2>
+                        <h2 className="text-xl font-bold text-white mb-2">{t('spell:editor.title')}</h2>
                         <input
                             type="text"
                             value={editedSpell.name}
                             onChange={(e) => updateField('name', e.target.value)}
                             className="text-xl font-bold text-white bg-transparent border-b border-gray-600 focus:border-blue-500 outline-none max-w-md"
-                            placeholder="Spell Name"
+                            placeholder={t('spell:editor.namePlaceholder')}
                         />
                         <div className="text-xs text-gray-400 mt-1">
-                            Type:
+                            {t('spell:editor.type')}:
                             <select
                                 value={editedSpell.type}
                                 onChange={(e) => updateField('type', e.target.value)}
                                 className="ml-2 bg-gray-700 text-white px-2 py-0.5 rounded text-xs"
                             >
-                                <option value="damage">Damage</option>
-                                <option value="heal">Heal</option>
-                                <option value="shield">Shield</option>
-                                <option value="buff">Buff</option>
-                                <option value="debuff">Debuff</option>
-                                <option value="cc">CC</option>
+                                <option value="damage">{t('spell:types.damage')}</option>
+                                <option value="heal">{t('spell:types.heal')}</option>
+                                <option value="shield">{t('spell:types.shield')}</option>
+                                <option value="buff">{t('spell:types.buff')}</option>
+                                <option value="debuff">{t('spell:types.debuff')}</option>
+                                <option value="cc">{t('spell:types.cc')}</option>
                             </select>
                         </div>
 
                         {/* Target Stat for Buff/Debuff */}
                         {(editedSpell.type === 'buff' || editedSpell.type === 'debuff') && (
                             <div className="mt-2">
-                                <label className="block text-xs text-gray-400 mb-1">Target Stat</label>
+                                <label className="block text-xs text-gray-400 mb-1">{t('spell:editor.targetStat')}</label>
                                 <select
                                     value={editedSpell.targetStat || 'damage'}
                                     onChange={(e) => updateField('targetStat', e.target.value)}
@@ -128,23 +130,23 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
                     <div className="flex gap-4">
                         {/* HP-Equivalent Power */}
                         <div className="text-center">
-                            <div className="text-xs text-gray-400 mb-1">Spell Power</div>
+                            <div className="text-xs text-gray-400 mb-1">{t('spell:editor.spellPower')}</div>
                             <div className="text-2xl font-bold text-cyan-400">
                                 {powerBreakdown?.totalPower.toFixed(1)}
                             </div>
-                            <div className="text-[10px] text-gray-500">HP-equivalent</div>
+                            <div className="text-[10px] text-gray-500">{t('spell:editor.hpEquivalent')}</div>
                         </div>
 
                         {/* Recommended Mana */}
                         <div className="text-center">
-                            <div className="text-xs text-gray-400 mb-1">Recommended</div>
+                            <div className="text-xs text-gray-400 mb-1">{t('spell:editor.recommended')}</div>
                             <div className={`text-2xl font-bold ${editedSpell.manaCost === recommendedMana ? 'text-green-400' :
                                 Math.abs((editedSpell.manaCost || 0) - recommendedMana) <= 2 ? 'text-yellow-400' :
                                     'text-red-400'
                                 }`}>
                                 {recommendedMana}
                             </div>
-                            <div className="text-[10px] text-gray-500">mana</div>
+                            <div className="text-[10px] text-gray-500">{t('spell:editor.mana')}</div>
                         </div>
 
                         {/* Balance Status */}
@@ -152,9 +154,9 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
                             budget < 0 ? 'bg-red-900 text-red-200' :
                                 'bg-yellow-900 text-yellow-200'
                             }`}>
-                            {isBalanced ? '✓ Balanced' : budget < 0 ? 'Overpriced' : 'Underpriced'}
+                            {isBalanced ? t('spell:editor.balanced') : budget < 0 ? t('spell:editor.overpriced') : t('spell:editor.underpriced')}
                             <div className="text-xs font-normal">
-                                Budget: {budget.toFixed(1)}
+                                {t('spell:editor.budget', { value: budget.toFixed(1) })}
                             </div>
                         </div>
                     </div>
@@ -163,12 +165,12 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
                 <div className="p-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {/* Core Stats */}
                     <div className="space-y-3">
-                        <h3 className="text-lg font-bold text-blue-400 border-b border-gray-700 pb-2">Core Stats</h3>
+                        <h3 className="text-lg font-bold text-blue-400 border-b border-gray-700 pb-2">{t('spell:editor.coreStats')}</h3>
                         {['effect', 'cooldown', 'eco', 'aoe', 'dangerous', 'pierce'].map(field => {
                             let label = field.charAt(0).toUpperCase() + field.slice(1);
                             if ((editedSpell.type === 'buff' || editedSpell.type === 'debuff')) {
-                                if (field === 'eco') label = 'Duration (Turns)';
-                                if (field === 'effect') label = 'Modification %';
+                                if (field === 'eco') label = t('spell:labels.duration');
+                                if (field === 'effect') label = t('spell:labels.modification');
                             }
 
                             return (
@@ -192,7 +194,7 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
 
                     {/* Advanced Stats */}
                     <div className="space-y-3">
-                        <h3 className="text-lg font-bold text-purple-400 border-b border-gray-700 pb-2">Advanced Stats</h3>
+                        <h3 className="text-lg font-bold text-purple-400 border-b border-gray-700 pb-2">{t('spell:editor.advancedStats')}</h3>
                         {['castTime', 'range', 'priority'].map(field => (
                             <StatSlider
                                 key={field}
@@ -221,14 +223,14 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
                                 onChange={(e) => updateField('isPassive', e.target.checked)}
                                 className="accent-blue-500"
                             />
-                            Passive
+                            {t('spell:editor.passive')}
                         </label>
                     </div>
 
                     <textarea
                         value={editedSpell.description || ''}
                         onChange={(e) => updateField('description', e.target.value)}
-                        placeholder="Spell description..."
+                        placeholder={t('spell:editor.descriptionPlaceholder')}
                         className="w-full bg-gray-800 text-white px-3 py-2 rounded border border-gray-700 text-sm"
                         rows={2}
                     />
@@ -243,7 +245,7 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
                             onClick={resetWeights}
                             className="px-3 py-2 bg-purple-700 hover:bg-purple-600 text-white rounded transition text-sm"
                         >
-                            Reset Weights
+                            {t('spell:editor.resetWeights')}
                         </button>
                     )}
                 </div>
@@ -253,24 +255,24 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
                     {/* CC Effect (only for type cc) */}
                     {editedSpell.type === 'cc' && (
                         <div>
-                            <label className="block text-sm text-gray-400 mb-1">CC Effect</label>
+                            <label className="block text-sm text-gray-400 mb-1">{t('spell:editor.ccEffect')}</label>
                             <select
                                 value={editedSpell.ccEffect || ''}
                                 onChange={e => updateField('ccEffect', e.target.value || undefined)}
                                 className="w-full bg-gray-800 text-white px-4 py-2 rounded border border-gray-700 focus:border-blue-500 outline-none"
                             >
-                                <option value="">None</option>
-                                <option value="stun">Stun</option>
-                                <option value="slow">Slow</option>
-                                <option value="knockback">Knockback</option>
-                                <option value="silence">Silence</option>
+                                <option value="">{t('spell:ccOptions.none')}</option>
+                                <option value="stun">{t('spell:ccOptions.stun')}</option>
+                                <option value="slow">{t('spell:ccOptions.slow')}</option>
+                                <option value="knockback">{t('spell:ccOptions.knockback')}</option>
+                                <option value="silence">{t('spell:ccOptions.silence')}</option>
                             </select>
                         </div>
                     )}
 
                     {/* Mana Cost */}
                     <div>
-                        <label className="block text-sm text-gray-400 mb-1">Mana Cost</label>
+                        <label className="block text-sm text-gray-400 mb-1">{t('spell:editor.manaCost')}</label>
                         <input
                             type="number"
                             min={0}
@@ -283,38 +285,38 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
 
                     {/* Damage Type */}
                     <div>
-                        <label className="block text-sm text-gray-400 mb-1">Damage Type</label>
+                        <label className="block text-sm text-gray-400 mb-1">{t('spell:editor.damageType')}</label>
                         <select
                             value={editedSpell.damageType || ''}
                             onChange={e => updateField('damageType', e.target.value || undefined)}
                             className="w-full bg-gray-800 text-white px-4 py-2 rounded border border-gray-700 focus:border-blue-500 outline-none"
                         >
-                            <option value="">None</option>
-                            <option value="physical">Physical</option>
-                            <option value="magical">Magical</option>
-                            <option value="true">True</option>
+                            <option value="">{t('spell:editor.none')}</option>
+                            <option value="physical">{t('spell:damageTypes.physical')}</option>
+                            <option value="magical">{t('spell:damageTypes.magical')}</option>
+                            <option value="true">{t('spell:damageTypes.true')}</option>
                         </select>
                     </div>
 
                     {/* Scaling Stat */}
                     <div>
-                        <label className="block text-sm text-gray-400 mb-1">Scaling Stat</label>
+                        <label className="block text-sm text-gray-400 mb-1">{t('spell:editor.scalingStat')}</label>
                         <select
                             value={editedSpell.scalingStat || ''}
                             onChange={e => updateField('scalingStat', e.target.value || undefined)}
                             className="w-full bg-gray-800 text-white px-4 py-2 rounded border border-gray-700 focus:border-blue-500 outline-none"
                         >
-                            <option value="">None</option>
-                            <option value="attack">Attack</option>
-                            <option value="magic">Magic</option>
-                            <option value="health">Health</option>
-                            <option value="mana">Mana</option>
-                            <option value="defense">Defense</option>
+                            <option value="">{t('spell:editor.none')}</option>
+                            <option value="attack">{t('spell:scalingStats.attack')}</option>
+                            <option value="magic">{t('spell:scalingStats.magic')}</option>
+                            <option value="health">{t('spell:scalingStats.health')}</option>
+                            <option value="mana">{t('spell:scalingStats.mana')}</option>
+                            <option value="defense">{t('spell:scalingStats.defense')}</option>
                         </select>
                     </div>
                     {/* Tags */}
                     <div>
-                        <label className="block text-sm text-gray-400 mb-1">Tags (comma-separated)</label>
+                        <label className="block text-sm text-gray-400 mb-1">{t('spell:editor.tags')}</label>
                         <input
                             type="text"
                             value={(editedSpell.tags || []).join(', ')}
@@ -324,7 +326,7 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
                     </div>
                     {/* Situational Modifiers */}
                     <div className="col-span-2">
-                        <label className="block text-sm text-gray-400 mb-1">Situational Modifiers (JSON array)</label>
+                        <label className="block text-sm text-gray-400 mb-1">{t('spell:editor.situationalModifiers')}</label>
                         <textarea
                             rows={4}
                             value={JSON.stringify(editedSpell.situationalModifiers || [], null, 2)}
@@ -347,14 +349,14 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
                         onClick={onClose}
                         className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded transition text-sm"
                     >
-                        Cancel
+                        {t('spell:editor.cancel')}
                     </button>
                     <div className="flex gap-2">
                         <button
                             onClick={handleReset}
                             className="px-3 py-2 bg-yellow-700 hover:bg-yellow-600 text-white rounded transition text-sm"
                         >
-                            Reset to Base
+                            {t('spell:editor.resetToBase')}
                         </button>
                         <button
                             onClick={handleSave}
@@ -364,7 +366,7 @@ export const SpellEditor: React.FC<SpellEditorProps> = ({ spellId, onClose }) =>
                                 : 'bg-green-600 hover:bg-green-500 text-white'
                                 }`}
                         >
-                            {Math.abs(budget) > 1 ? 'Balance Required (Cost ≠ 0)' : 'Save Spell'}
+                            {Math.abs(budget) > 1 ? t('spell:editor.balanceRequired') : t('spell:editor.saveSpell')}
                         </button>
                     </div>
                 </div>
@@ -450,7 +452,7 @@ const StatSlider: React.FC<StatSliderProps> = ({
                     <button
                         onClick={() => onWeightChange(defaultWeight)}
                         className="text-[10px] text-purple-400 hover:text-purple-300"
-                        title="Reset weight"
+                        title={t('spell:editor.resetWeight')}
                     >
                         ↻
                     </button>

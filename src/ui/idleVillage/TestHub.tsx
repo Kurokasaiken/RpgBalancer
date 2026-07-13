@@ -93,11 +93,19 @@ const EXTRA_PAGES: TestPageLink[] = [
     status: 'ok',
   },
   {
-    id: 'poi-detail-roster-integration',
-    title: 'POI Detail + Roster Integration',
-    description: 'POI reale con roster e slot rack interattivo da Idle Village config',
-    path: '/poi-detail-roster-integration',
+    id: 'poi-quest-detail-roster-integration',
+    title: 'Quest POI Detail + Roster Integration',
+    description: 'POI quest reale con roster e slot rack interattivo da Idle Village config',
+    path: '/poi-quest-detail-roster-integration',
     icon: '🧩',
+    status: 'ok',
+  },
+  {
+    id: 'poi-job-detail-roster-integration',
+    title: 'Job POI Detail + Roster Integration',
+    description: 'POI job reale con roster e slot rack interattivo da Idle Village config',
+    path: '/poi-job-detail-roster-integration',
+    icon: '🪵',
     status: 'ok',
   },
 ];

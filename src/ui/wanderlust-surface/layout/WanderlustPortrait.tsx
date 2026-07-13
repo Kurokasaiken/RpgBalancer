@@ -21,13 +21,13 @@ export interface WanderlustPortraitProps {
   style?: CSSProperties;
 }
 
-// Wanderlust color tokens (matching roster_wanderlust_reskin.html)
+// Wanderlust color tokens (V9 skin-aware; fallbacks mirror base layout primitives)
 const COLOR = {
-  gold: '#d8b13e',
-  goldBright: '#f0cf6a',
-  label: '#c9a84e',
-  labelDim: '#9a8246',
-  parchment: '#ede0c4',
+  gold: 'var(--skin-icon-color, #d8b13e)',
+  goldBright: 'var(--skin-title-color, #f0cf6a)',
+  label: 'var(--skin-label-primary, #c9a84e)',
+  labelDim: 'var(--skin-label-tertiary, #9a8246)',
+  parchment: 'var(--skin-text-primary, #F5F2E8)',
 } as const;
 
 const FONT = {
@@ -58,9 +58,9 @@ export const WanderlustPortrait: React.FC<WanderlustPortraitProps> = ({
     border: `1.5px solid ${COLOR.gold}`,
     boxShadow: `
       inset 0 1px 4px rgba(0,0,0,0.5),
-      0 0 12px rgba(216,177,62,0.2)
+      0 0 12px rgba(223,184,87,0.2)
     `,
-    background: 'radial-gradient(circle at 38% 32%, #2a1810, #0a0503)',
+    background: 'radial-gradient(circle at 38% 32%, var(--skin-surface-base, #060f16), var(--skin-surface-base, #060f16))',
   };
 
   const heroGlowStyle: CSSProperties = {
@@ -69,7 +69,7 @@ export const WanderlustPortrait: React.FC<WanderlustPortraitProps> = ({
     borderRadius: '50%',
     pointerEvents: 'none',
     boxShadow: isHero
-      ? `0 0 16px rgba(216,177,62,0.12), inset 0 0 0 1px rgba(216,177,62,0.25)`
+      ? `0 0 16px rgba(223,184,87,0.12), inset 0 0 0 1px rgba(223,184,87,0.25)`
       : 'none',
   };
 
