@@ -1,0 +1,19 @@
+{
+  "appName": "Rollenspiel-Balancer",
+  "welcome": "Willkommen",
+  "language": "Sprache",
+  "locale": {
+    "en": "English",
+    "it-IT": "Italiano",
+    "pseudo": "Pseudo",
+    "de": "Deutsch",
+    "ar": "العربية",
+    "ja": "日本語",
+    "zh-CN": "简体中文"
+  },
+  "examples": {
+    "swordCount": "{count, plural, one {ein einzelnes Schwert} other {{count} Schwerter}}",
+    "riskLevel": "{level, select, low {Niedriges Risiko} medium {Mittleres Risiko} high {Hohes Risiko} other {Unbekanntes Risiko}}",
+    "characterGreeting": "{gender, select, male {Willkommen, mein Lord} female {Willkommen, meine Lady} other {Willkommen, Abenteurer}}"
+  }
+}

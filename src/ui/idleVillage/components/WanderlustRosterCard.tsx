@@ -37,17 +37,17 @@ export interface WanderlustRosterCardProps {
   onPointerDown?: (event: React.PointerEvent<HTMLDivElement>) => void;
 }
 
-// Wanderlust color tokens (matching roster_wanderlust_reskin.html)
+// V9 skin-aware color tokens (base layout primitives)
 const COLOR = {
-  gold: '#d8b13e',
-  goldBright: '#f0cf6a',
-  label: '#c9a84e',
-  labelDim: '#9a8246',
-  parchment: '#ede0c4',
-  parchmentSoft: 'rgba(237,224,196,0.92)',
-  hp: '#7bc96f',
+  gold: 'var(--skin-icon-color, #d8b13e)',
+  goldBright: 'var(--skin-title-color, #f0cf6a)',
+  label: 'var(--skin-label-primary, #c9a84e)',
+  labelDim: 'var(--skin-label-tertiary, #9a8246)',
+  parchment: 'var(--skin-text-primary, #F5F2E8)',
+  parchmentSoft: 'var(--skin-body-color, rgba(237,224,196,0.92))',
+  hp: 'var(--skin-status-met, #7bc96f)',
   hpDim: 'rgba(123,201,111,0.85)',
-  stamina: '#e0b23e',
+  stamina: 'var(--skin-icon-color, #e0b23e)',
 } as const;
 
 const FONT = {
@@ -150,9 +150,9 @@ const WanderlustRosterCard = memo<WanderlustRosterCardProps>(({
     padding: '18px 22px',
     borderRadius: '14px',
     cursor: isUnavailable ? 'not-allowed' : isInteractive ? 'grab' : 'default',
-    background: 'linear-gradient(160deg, rgba(216,177,62,0.05) 0%, rgba(20,12,7,0.2) 45%, rgba(6,4,3,0.3) 100%)',
+    background: 'var(--skin-surface-bg, linear-gradient(160deg, rgba(216,177,62,0.05) 0%, rgba(20,12,7,0.2) 45%, rgba(6,4,3,0.3) 100%))',
     boxShadow: `
-      inset 0 1px 0 rgba(216,177,62,0.1),
+      inset 0 1px 0 rgba(223,184,87,0.1),
       inset 0 2px 10px rgba(0,0,0,0.35),
       inset 0 -1px 0 rgba(0,0,0,0.3)
     `,
@@ -168,9 +168,9 @@ const WanderlustRosterCard = memo<WanderlustRosterCardProps>(({
 
   // Ring glow for hover and active heroes
   const ringGlow = isHero 
-    ? `0 0 0 1px rgba(216,177,62,0.3)`
+    ? `0 0 0 1px rgba(223,184,87,0.3)`
     : isHovered 
-      ? `0 0 0 1px rgba(216,177,62,0.28), 0 10px 34px rgba(216,177,62,0.08)`
+      ? `0 0 0 1px rgba(223,184,87,0.28), 0 10px 34px rgba(223,184,87,0.08)`
       : 'none';
 
   const heroGlowStyle: CSSProperties = {
@@ -178,7 +178,7 @@ const WanderlustRosterCard = memo<WanderlustRosterCardProps>(({
       ? `
         inset 0 1px 0 rgba(240,207,106,0.2),
         inset 0 2px 10px rgba(0,0,0,0.35),
-        0 0 16px rgba(216,177,62,0.12),
+        0 0 16px rgba(223,184,87,0.12),
         ${ringGlow}
       `
       : `${cardStyle.boxShadow}, ${ringGlow}`,
@@ -191,7 +191,7 @@ const WanderlustRosterCard = memo<WanderlustRosterCardProps>(({
         inset: 0,
         borderRadius: '10px',
         pointerEvents: 'none',
-        boxShadow: 'inset 0 0 0 1px rgba(216,177,62,0.25)',
+        boxShadow: 'inset 0 0 0 1px rgba(223,184,87,0.25)',
       }
     : {};
 
@@ -203,7 +203,7 @@ const WanderlustRosterCard = memo<WanderlustRosterCardProps>(({
     height: '60%',
     width: '0px',
     borderRadius: '2px',
-    background: 'linear-gradient(180deg, transparent, #f0cf6a, transparent)',
+    background: 'linear-gradient(180deg, transparent, var(--skin-title-color, #f0cf6a), transparent)',
     boxShadow: 'none',
     transition: 'none',
     zIndex: 2,
@@ -214,7 +214,7 @@ const WanderlustRosterCard = memo<WanderlustRosterCardProps>(({
     position: 'absolute',
     inset: 0,
     pointerEvents: 'none',
-    background: 'radial-gradient(ellipse 180px 120px at 78% 30%, rgba(216,177,62,0.08), transparent 70%)',
+    background: 'radial-gradient(ellipse 180px 120px at 78% 30%, rgba(223,184,87,0.08), transparent 70%)',
     mixBlendMode: 'screen',
     opacity: isHero ? 0.8 : 0.5,
     borderRadius: '14px',

@@ -27,6 +27,7 @@ export interface AstrolabeEngineHandle {
 }
 
 export function createDestinyAstrolabeEngine(root: HTMLElement, opts: AstrolabeEngineOpts): AstrolabeEngineHandle {
+  console.log('[engine] createDestinyAstrolabeEngine called, skills=', opts.skills?.map(s=>`${s.name}:${s.stat}/${s.difficulty}`));
   const DUMMY: any = new Proxy(function(){}, {
     get(_t, p){ if(p==='style'||p==='classList'||p==='dataset') return DUMMY;
       if(p==='value') return '0'; if(p==='textContent'||p==='innerHTML') return ''; return DUMMY; },
@@ -109,12 +110,10 @@ function recomputeGeometry(skillIndex=0){
   /* critical-fail band thickness — purely proportional to the arena radius and
      scaled by crit% (like the wound/death sectors). No fixed pixel values. */
   geo.epicW=(R-3)*clamp(cfg.crit/100,0.04,0.5);
-  /* wedges: dead centered at 12 o'clock, wounded adjacent clockwise, 6° gap */
-  const dA=Math.max(.14,TAU*cfg.dead/100);
-  const wA=Math.max(.14,TAU*cfg.wound/100);
-  const gap=.105;
-  geo.wedges.dead={a0:-Math.PI/2-dA/2, a1:-Math.PI/2+dA/2};
-  geo.wedges.wound={a0:-Math.PI/2+dA/2+gap, a1:-Math.PI/2+dA/2+gap+wA};
+  /* Wound corona: outer band thickness ∝ wound%, from goo edge inward */
+  geo.woundW=(R-3)*clamp(cfg.wound/100,0.04,0.4)*0.65;
+  /* Death void: strip depth just outside star edge in valleys, ∝ dead% */
+  geo.deathDepth=(geo.rValley||80)*clamp(cfg.dead/100,0.02,0.3)*4.5;
 }
 /* interpolate a per-axis radius array around the wheel (tips at TIP(i)) */
 function radialFromAxes(theta,arr,scale){
@@ -157,107 +156,31 @@ const inCore=(x,y)=>dist(x,y)<=geo.rCore;
 const inAlmost=(x,y)=>{const a=angOf(x,y),d=dist(x,y),rs=rStarAt(a);return d>rs&&d<=rs+ALMOST_W;};
 /* critical failure = the BORDER of the goo (its outermost band, against the wall) */
 const inEpic=(x,y)=>{const a=angOf(x,y),d=dist(x,y),e=rCheckAt(a);return d>e-geo.epicW&&d<=e;};
-const inWedge=(x,y,w)=>{const a=angOf(x,y);
-  return normAng(a-w.a0)>=0 && normAng(a-w.a1)<=0;};
-const inAnyWedge=(x,y)=>inWedge(x,y,geo.wedges.dead)||inWedge(x,y,geo.wedges.wound);
+/* FERITA zone: outer band of goo (just inside goo edge), proportional to wound% */
+const inWoundZone=(x,y)=>{const a=angOf(x,y),d=dist(x,y),starR=rStarAt(a);if(d<=starR)return false;const e=rCheckAt(a);return d>=e-geo.woundW&&d<=e;};
+/* MORTE zone: strip just outside star edge in valley directions, proportional to dead% */
+const inDeathZone=(x,y)=>{const a=angOf(x,y),d=dist(x,y),starR=rStarAt(a);if(d<=starR)return false;return d<=starR+geo.deathDepth;};
 
 /* =========================================================================
-   THE MATHEMATICAL ENGINE — D100 roll-under, pre-calculated verdict
+   SPATIAL RESOLUTION — verdict determined by ball position, no D100 pre-roll.
+   The Challenge Surface (rCheckAt) is the ball's physical container.
+   The Player Star (rStarAt) is the success zone.
+   Where the ball stops determines the outcome.
    ========================================================================= */
-function trueRoll(){
-  const roll=1+Math.floor(Math.random()*100);
+function spatialVerdict(x,y){
+  if(inCore(x,y))       return 'bigwin';
+  if(inStar(x,y))       return 'win';
+  if(inAlmost(x,y))     return 'almost';
+  if(inDeathZone(x,y))  return 'fail_dead';
+  if(inWoundZone(x,y))  return 'fail_wound';
+  if(inEpic(x,y))       return 'epicfail';
+  return 'fail';
+}
+function spatialRiskRoll(){
   const riskRoll=1+Math.floor(Math.random()*100);
-  const tst=geo.tst;
-  let verdict;
-  if(roll<=tst){
-    verdict=(roll<=Math.max(1,Math.round(tst*0.10)))?'bigwin':'win';
-  } else if(roll<=tst+5){
-    verdict='almost';
-  } else {
-    const failSpan=100-(tst+5);
-    const epicFrom=101-Math.max(1,Math.round(failSpan*cfg.crit/100));
-    verdict=(roll>=epicFrom)?'epicfail':'fail';
-  }
-  /* single risk d100 → mutually exclusive flags (they can never overlap) */
   const dead=riskRoll<=cfg.dead;
-  const wounded=!dead && riskRoll<=cfg.dead+cfg.wound;
-  return {roll,riskRoll,verdict,wounded,dead};
-}
-function forcedRoll(mode){
-  const tst=geo.tst;
-  const failSpan=100-(tst+5);
-  const epicFrom=101-Math.max(1,Math.round(failSpan*cfg.crit/100));
-  const within=(a,b)=>a+Math.floor(Math.random()*Math.max(1,b-a+1));
-  const base={roll:50,riskRoll:100,verdict:'win',wounded:false,dead:false};
-  switch(mode){
-    case 'bigwin': return {...base,verdict:'bigwin',roll:within(1,Math.max(1,Math.round(tst*0.10)))};
-    case 'win': return {...base,verdict:'win',roll:within(Math.max(1,Math.round(tst*0.10))+1,tst)};
-    case 'almost': return {...base,verdict:'almost',roll:within(tst+1,Math.min(100,tst+5))};
-    case 'fail': return {...base,verdict:'fail',roll:within(Math.min(100,tst+6),Math.max(tst+6,epicFrom-1))};
-    case 'epicfail': return {...base,verdict:'epicfail',roll:within(epicFrom,100)};
-    case 'win-wounded': return {...base,verdict:'win',roll:within(2,tst),wounded:true,riskRoll:cfg.dead+1};
-    case 'win-dead': return {...base,verdict:'win',roll:within(2,tst),dead:true,riskRoll:1};
-    case 'fail-wounded': return {...base,verdict:'fail',roll:within(Math.min(100,tst+6),Math.max(tst+6,epicFrom-1)),wounded:true,riskRoll:cfg.dead+1};
-    case 'fail-dead': return {...base,verdict:'fail',roll:within(Math.min(100,tst+6),Math.max(tst+6,epicFrom-1)),dead:true,riskRoll:1};
-    default: return trueRoll();
-  }
-}
-/* pick the precise landing coordinate inside the verdict's visual zone */
-function pickTarget(res){
-  const wantWedge=res.dead?geo.wedges.dead:(res.wounded?geo.wedges.wound:null);
-  const tests={
-    bigwin:(x,y)=>inCore(x,y),
-    win:(x,y)=>inStar(x,y)&&!inCore(x,y),
-    almost:(x,y)=>inAlmost(x,y),
-    fail:(x,y)=>{const a=angOf(x,y),d=dist(x,y),e=rCheckAt(a);return !inStar(x,y)&&!inAlmost(x,y)&&d>geo.rValley*0.4&&d<=e-geo.epicW;},
-    epicfail:(x,y)=>inEpic(x,y),
-  };
-  const zoneOk=tests[res.verdict];
-  window.__debugTarget={res:res.verdict,geoTip:geo.rTip,geoCore:geo.rCore,geoValley:geo.rValley,geoEpicW:geo.epicW};
-  let foundCount=0;
-  for(let relax=0;relax<2;relax+=1){
-    for(let i=0;i<500;i+=1){
-      const a=Math.random()*TAU, d=Math.sqrt(Math.random())*(R-8);
-      const x=CX+Math.cos(a)*d, y=CY+Math.sin(a)*d;
-      if(!zoneOk(x,y)) continue;
-      if(relax===0){
-        if(wantWedge && !inWedge(x,y,wantWedge)) continue;
-        if(!wantWedge && inAnyWedge(x,y) && (res.verdict==='win'||res.verdict==='fail')) continue;
-      }
-      foundCount++;
-      const result={x,y};
-      window.__debugTarget.foundTarget=result;
-      return result;
-    }
-  }
-  window.__debugTarget.foundCount=foundCount;
-  /* fallback: increase search passes with better initial distribution */
-  for(let pass=0;pass<3;pass+=1){
-    for(let i=0;i<800;i+=1){
-      const a=Math.random()*TAU, d=Math.sqrt(Math.random())*(R-8);
-      const x=CX+Math.cos(a)*d, y=CY+Math.sin(a)*d;
-      if(!zoneOk(x,y)) continue;
-      return {x,y};
-    }
-  }
-  /* last-resort geometric fallback — directly construct zone-appropriate points */
-  window.__debugTarget.usedFallback=true;
-  const a=Math.random()*TAU;
-  if(res.verdict==='almost'){
-    const rStar=rStarAt(a), rChk=Math.max(rCheckAt(a),rStar+ALMOST_W);
-    const d=rStar+(rChk-rStar)*(0.3+Math.random()*0.4);  // 30-70% into the almost band
-    return {x:CX+Math.cos(a)*d,y:CY+Math.sin(a)*d};
-  } else if(res.verdict==='fail'){
-    const min=Math.max(rCheckAt(a),rStarAt(a)+ALMOST_W)+4, max=R-geo.epicW-6;
-    const d=min+(Math.random()*Math.max(1,max-min));
-    return {x:CX+Math.cos(a)*d,y:CY+Math.sin(a)*d};
-  } else if(res.verdict==='epicfail'){
-    const min=R-geo.epicW, max=R-3;
-    const d=min+(Math.random()*(max-min));
-    return {x:CX+Math.cos(a)*d,y:CY+Math.sin(a)*d};
-  }
-  /* bigwin/win: true center */
-  return {x:CX,y:CY};
+  const wounded=!dead&&riskRoll<=cfg.dead+cfg.wound;
+  return {riskRoll,dead,wounded};
 }
 
 /* =========================================================================
@@ -329,15 +252,13 @@ function launchRoll(){
   suite.dataset.tone='';
   $id('flare').classList.remove('fire');
   $id('launch').classList.remove('pulse');
-  /* 1. recompute geometry from sliders, 2. pre-calculate verdict + target */
+  /* recompute geometry, build obelisks, reset all scene state */
   recomputeGeometry();
-  scene.res=(cfg.mode==='random')?trueRoll():forcedRoll(cfg.mode);
-  scene.target=pickTarget(scene.res);
   buildPillars();
   scene.starScale=0; scene.pourP=0; scene.streamAlpha=0;
-  scene.gooReveal=0; scene.ringReveal=0; scene.snapInit=false;
+  scene.gooReveal=0; scene.ringReveal=0;
   scene.ball={x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false};
-  scene.snapFrom=null; scene.warp=0;
+  scene.warp=0;
   scene.shocks.length=0; scene.rimHits.length=0; scene.sparks.length=0;
   armed=false; emitArmed(false);
   /* panel result removed */
@@ -379,8 +300,7 @@ function tickTimeline(){
   }
   else if(s==='threat-slam'){
     const p=phaseT(cfg.tSlam);
-    /* the void seeds: a small dark core forms while the obelisks slam down.
-       The full goo eruption happens next, in the dedicated goo-expand phase. */
+    /* void seeds: nucleus forms while obelisks slam down */
     scene.gooReveal=0.14*easeOutCubic(clamp(p/0.5,0,1));
     scene.blackPillars.forEach((pl,i)=>{
       const local=clamp((p-(i*0.13))/0.4,0,1);
@@ -398,7 +318,7 @@ function tickTimeline(){
     /* GOO EXPANSION — erupts from the seeded core and springs outward to the
        black obelisks with a cubic-bezier(.34,1.56,.64,1)-style overshoot. */
     const p=phaseT(GOO_MS);
-    scene.gooReveal=clamp(0.14+(1-0.14)*easeOutBack(p),0,1.08);   // springy overshoot
+    scene.gooReveal=clamp(easeOutBack(p),0,1.08);   // springy overshoot
     scene.gooRipple=Math.max(scene.gooRipple,0.6*(1-p));
     if(p>=1){
       scene.gooReveal=1;
@@ -408,8 +328,9 @@ function tickTimeline(){
   }
   else if(s==='agency-burst'){
     const p=phaseT(cfg.tBurst);
+    /* Pillars drop first (compressed into first 65% of phase) */
     scene.whitePillars.forEach((pl,i)=>{
-      const local=clamp((p-(i*0.09))/0.32,0,1);
+      const local=clamp((p-(i*0.07))/0.26,0,1);
       const prev=pl.drop;
       pl.drop=easeInCubic(local);
       if(prev<1&&pl.drop>=1&&!pl.landed){
@@ -417,9 +338,9 @@ function tickTimeline(){
         addShock(pl,'rgba(255,242,200,.95)');
       }
     });
-    /* star bursts open like a solar lens, locking tips to alabaster heights */
-    const sp=clamp((p-0.5)/0.5,0,1);
-    scene.starScale=easeElastic(sp);
+    /* Star appears AFTER all pillars are landed (p≥0.65), grows with overshoot */
+    const STAR_START=0.65;
+    scene.starScale=easeOutBack(clamp((p-STAR_START)/(1-STAR_START),0,1));
     if(p>=1){ scene.starScale=1; setState('risk-pour'); }
   }
   else if(s==='risk-pour'){
@@ -434,13 +355,10 @@ function tickTimeline(){
   }
   else if(s==='the-spin'){
     const p=phaseT(cfg.tSpin);
-    stepBall(p,false);
-    if(p>=1){ scene.snapFrom={x:scene.ball.x,y:scene.ball.y}; scene.snapInit=false; setState('magnetic-snap'); }
-  }
-  else if(s==='magnetic-snap'){
-    const p=phaseT(cfg.tSnap);
-    stepBall(p,true);
-    if(p>=1){ resolve(); }
+    stepBall(p);
+    /* when ball effectively stops, resolve immediately rather than waiting */
+    const spd=Math.hypot(scene.ball.vx,scene.ball.vy);
+    if(p>=1||(p>0.7&&spd<0.4)){ resolve(); }
   }
   /* decay one-shot fx */
   scene.gooRipple=Math.max(0,scene.gooRipple-0.02);
@@ -453,108 +371,129 @@ function addShock(pl,color){
 /* =========================================================================
    THE BALL — pinball + hidden progressive magnetism + bullet-time snap
    ========================================================================= */
+/* Compute a target position for the ball based on forced verdict mode.
+   Returns {x,y} in canvas space, or null for random. */
+function computeTargetPos(){
+  const mode=cfg.mode||'random';
+  if(mode==='bigwin') return {x:CX+4,y:CY-6};
+  if(mode==='win'){
+    const a=TIP(0)*0.55+TIP(1)*0.45;
+    const r=geo.axisTip[0]*0.68;
+    return {x:CX+Math.cos(a)*r,y:CY+Math.sin(a)*r};
+  }
+  if(mode==='almost'){
+    const a=TIP(2)+0.1;
+    const r=rStarAt(a)+ALMOST_W*0.5;
+    return {x:CX+Math.cos(a)*r,y:CY+Math.sin(a)*r};
+  }
+  if(mode==='fail'){
+    const a=TIP(1)+Math.PI/AXES;
+    const starR=rStarAt(a), checkR=rCheckAt(a);
+    const r=starR+(checkR-starR)*0.5;
+    return {x:CX+Math.cos(a)*r,y:CY+Math.sin(a)*r};
+  }
+  if(mode==='fail_wound'){
+    /* outer band of failure gap near goo edge */
+    const a=TIP(0)+0.22;
+    const checkR=rCheckAt(a);
+    const r=Math.max(geo.rCore+40, checkR-geo.woundW*0.4);
+    return {x:CX+Math.cos(a)*r,y:CY+Math.sin(a)*r};
+  }
+  if(mode==='fail_dead'){
+    /* valley floor just past star edge */
+    const valleyAng=TIP(0)+Math.PI/AXES;
+    const starR=rStarAt(valleyAng);
+    const r=starR+Math.max(14,geo.deathDepth*0.45);
+    return {x:CX+Math.cos(valleyAng)*r,y:CY+Math.sin(valleyAng)*r};
+  }
+  if(mode==='epicfail'){
+    const a=TIP(3)+0.3;
+    const checkR=rCheckAt(a);
+    const r=Math.max(geo.rCore+30,checkR-geo.epicW*0.4);
+    return {x:CX+Math.cos(a)*r,y:CY+Math.sin(a)*r};
+  }
+  return null;
+}
+
 function fireBall(){
   const b=scene.ball;
   b.on=true; b.x=CX; b.y=CY;
-  /* MUCH faster launch — a violent kick so the sphere caroms wildly */
-  const a=Math.random()*TAU, sp=30+Math.random()*6;
+  const tp=computeTargetPos();
+  scene.targetPos=tp;
+  /* Target-aware kick: aim roughly toward target with wide jitter (still chaotic) */
+  const baseAngle=tp ? Math.atan2(tp.y-CY,tp.x-CX) : Math.random()*TAU;
+  const jitter=(Math.random()*2-1)*Math.PI*0.85;
+  const a=baseAngle+jitter;
+  const sp=28+Math.random()*8;
   b.vx=Math.cos(a)*sp; b.vy=Math.sin(a)*sp;
 }
 let lastBallT=performance.now();
-function stepBall(p,snapPhase){
+function stepBall(p){
   const b=scene.ball;
   if(!b.on) return;
   const now=performance.now();
   let dt=Math.min(40,now-lastBallT); lastBallT=now;
-  const T=scene.target;
+  const f=dt/16.7;
 
-  if(!snapPhase){
-    const f=dt/16.7;
-    /* ENERGY-GATED STEERING (deterministic-plinko technique):
-       — Phase 1 (p<0.5): ZERO steering. Pure chaotic, energetic caroming.
-         Friction is very light so the ball keeps slamming the walls.
-       — Phase 2 (0.5<p<1): steering ramps up with a smoothstep as the ball
-         bleeds energy, so the late correction is invisible inside the
-         natural slowdown. No early curve — it looks fully random. */
-    const steerStart=0.5;
-    const sg=clamp((p-steerStart)/(1-steerStart),0,1);
-    const steer=sg*sg*(3-2*sg);                 // smoothstep guidance 0→1
-    /* friction: near-frictionless early (keeps bouncing), grips late */
-    const fric=Math.pow(0.9994-0.018*steer,f);
-    /* hidden magnetism, gated by steer (≈0 for first half of the roll) */
-    const mx=T.x-b.x, my=T.y-b.y, md=Math.hypot(mx,my)||1;
-    const k=0.85*steer;
-    b.vx=(b.vx+mx/md*k*f)*fric;
-    b.vy=(b.vy+my/md*k*f)*fric;
-    b.x+=b.vx*f; b.y+=b.vy*f;
-    /* chaos amount: full while the ball is wild, fades as steering takes over */
-    const chaos=1-steer;
-    /* NON-SPECULAR bounce off normal (nx,ny): reflect, then scatter the
-       outgoing angle + add tangential spin + random restitution, so the
-       rebound is never a clean mirror of the incoming path. A guard re-reflects
-       if the scatter would send the ball back through the surface. */
-    const chaoticBounce=(nx,ny,extra)=>{
-      const dot=b.vx*nx+b.vy*ny;
-      if(extra && dot>=0) return false;           // pillar: only bounce when approaching
-      b.vx-=2*dot*nx; b.vy-=2*dot*ny;             // base reflection
-      const ang=(Math.random()*2-1)*0.55*chaos;   // ±~31° random scatter
-      const cs=Math.cos(ang), sn=Math.sin(ang);
-      const rvx=b.vx*cs-b.vy*sn, rvy=b.vx*sn+b.vy*cs;
-      b.vx=rvx; b.vy=rvy;
-      const tx=-ny, ty=nx;                          // tangential spin kick
-      const spin=(Math.random()*2-1)*2.6*chaos;
-      b.vx+=tx*spin; b.vy+=ty*spin;
-      const rest=0.92+Math.random()*0.08;          // 0.92–1.0, no two alike
-      b.vx*=rest; b.vy*=rest;
-      const od=b.vx*nx+b.vy*ny;                     // guard: don't tunnel through
-      if(od>0){ b.vx-=2*od*nx; b.vy-=2*od*ny; }
-      return true;
-    };
-    /* GOO WALL bounce — the ball is confined to the goo; it slams the goo's
-       irregular edge (the black-obelisk boundary), not the arena rim. */
-    const d=dist(b.x,b.y);
-    const aB=angOf(b.x,b.y), edge=rCheckAt(aB)-b.r;
-    if(d>edge){
-      const nx=(b.x-CX)/d, ny=(b.y-CY)/d;
-      chaoticBounce(nx,ny,false);
-      b.x=CX+nx*edge; b.y=CY+ny*edge;
-      scene.rimHits.push({ang:Math.atan2(ny,nx),life:600});
-      addSpark(b.x,b.y);
-    }
-    /* pillar bounce (skip in final homing window to guarantee arrival) */
-    if(p<0.86){
-      scene.blackPillars.concat(scene.whitePillars).forEach(pl=>{
-        if(!pl.landed) return;
-        const px=CX+Math.cos(pl.ang)*pl.r, py=CY+Math.sin(pl.ang)*pl.r;
-        const dx=b.x-px, dy=b.y-py, dd=Math.hypot(dx,dy);
-        if(dd<24){
-          const nx=dx/(dd||1), ny=dy/(dd||1);
-          if(chaoticBounce(nx,ny,true)!==false){ b.x=px+nx*24; b.y=py+ny*24; pl.flash=1; addSpark(b.x,b.y); }
-        }
-      });
-    }
-    b.trail.push({x:b.x,y:b.y,life:480});
-  } else {
-    /* SETTLE — critically damped spiral: velocity decelerates monotonically,
-       gentle corrective spring keeps aim true without overshooting. */
-    if(!scene.snapInit){
-      scene.snapInit=true;
-      const dx=T.x-b.x, dy=T.y-b.y, d=Math.hypot(dx,dy)||1;
-      const sp=Math.max(Math.hypot(b.vx,b.vy),5.5);
-      b.vx=dx/d*sp; b.vy=dy/d*sp;
-    }
-    const f=dt/16.7*(p<0.32?0.72:1);
-    /* friction → monotonic deceleration */
-    b.vx*=Math.pow(0.905,f); b.vy*=Math.pow(0.905,f);
-    /* faint corrective spring toward target (no energy spike) */
-    b.vx+=(T.x-b.x)*0.008*f; b.vy+=(T.y-b.y)*0.008*f;
-    b.x+=b.vx*f; b.y+=b.vy*f;
-    /* final glide-in smoother: much gentler, starts later (p>0.92) */
-    if(p>0.92){ const e=(p-0.92)/0.08, s=e*e*(3-2*e);
-      b.x+=(T.x-b.x)*s*0.6; b.y+=(T.y-b.y)*s*0.6; b.vx*=(1-s*0.5); b.vy*=(1-s*0.5); }
-    scene.snapFrom={x:b.x,y:b.y};
-    b.trail.push({x:b.x,y:b.y,life:480});
+  /* Cinematic deceleration + optional target magnetism (for forced verdicts). */
+  const decayStart=0.30;
+  const grip=clamp((p-decayStart)/(1-decayStart),0,1);
+  const fric=Math.pow(0.9996-0.025*grip,f);
+  b.vx*=fric; b.vy*=fric;
+  /* Magnetic pull toward target zone — grows from 0 at p=0.55 to max at p=1 */
+  if(grip>0.45 && scene.targetPos){
+    const mag=clamp((grip-0.45)/0.55,0,1)*0.022;
+    b.vx+=(scene.targetPos.x-b.x)*mag*f;
+    b.vy+=(scene.targetPos.y-b.y)*mag*f;
   }
+  b.x+=b.vx*f; b.y+=b.vy*f;
+  /* scatter amount: full early, fades as ball slows */
+  const chaos=1-grip*0.6;
+
+  /* NON-SPECULAR bounce — reflect + random scatter so no clean mirror paths */
+  const chaoticBounce=(nx,ny,extra)=>{
+    const dot=b.vx*nx+b.vy*ny;
+    if(extra&&dot>=0) return false;
+    b.vx-=2*dot*nx; b.vy-=2*dot*ny;
+    const ang=(Math.random()*2-1)*0.55*chaos;
+    const cs=Math.cos(ang), sn=Math.sin(ang);
+    const rvx=b.vx*cs-b.vy*sn, rvy=b.vx*sn+b.vy*cs;
+    b.vx=rvx; b.vy=rvy;
+    const tx=-ny, ty=nx;
+    const spin=(Math.random()*2-1)*2.6*chaos;
+    b.vx+=tx*spin; b.vy+=ty*spin;
+    const rest=0.92+Math.random()*0.08;
+    b.vx*=rest; b.vy*=rest;
+    const od=b.vx*nx+b.vy*ny;
+    if(od>0){ b.vx-=2*od*nx; b.vy-=2*od*ny; }
+    return true;
+  };
+
+  /* CHALLENGE SURFACE bounce — ball is strictly confined inside rCheckAt */
+  const d=dist(b.x,b.y);
+  const aB=angOf(b.x,b.y), edge=rCheckAt(aB)-b.r;
+  if(d>edge){
+    const nx=(b.x-CX)/d, ny=(b.y-CY)/d;
+    chaoticBounce(nx,ny,false);
+    b.x=CX+nx*edge; b.y=CY+ny*edge;
+    scene.rimHits.push({ang:Math.atan2(ny,nx),life:600});
+    addSpark(b.x,b.y);
+  }
+
+  /* pillar bounce (skip when ball is nearly stopped) */
+  if(grip<0.9){
+    scene.blackPillars.concat(scene.whitePillars).forEach(pl=>{
+      if(!pl.landed) return;
+      const px=CX+Math.cos(pl.ang)*pl.r, py=CY+Math.sin(pl.ang)*pl.r;
+      const dx=b.x-px, dy=b.y-py, dd=Math.hypot(dx,dy);
+      if(dd<24){
+        const nx=dx/(dd||1), ny=dy/(dd||1);
+        if(chaoticBounce(nx,ny,true)!==false){ b.x=px+nx*24; b.y=py+ny*24; pl.flash=1; addSpark(b.x,b.y); }
+      }
+    });
+  }
+
+  b.trail.push({x:b.x,y:b.y,life:480});
   for(let i=b.trail.length-1;i>=0;i-=1){
     b.trail[i].life-=dt;
     if(b.trail[i].life<=0) b.trail.splice(i,1);
@@ -591,12 +530,23 @@ const VERDICT_TEXT={
   epicfail:{title:'ROVINA',seal:'✕',cls:'epic',sub:'L’abisso reclama ciò che osa troppo.'},
 };
 function resolve(){
+  const b=scene.ball;
+  /* Verdict = ball position in 2D space relative to the two surfaces */
+  const _d=Math.hypot(b.x-CX,b.y-CY);
+  console.log(`[resolve] ball=(${(b.x-CX).toFixed(1)},${(b.y-CY).toFixed(1)}) dist=${_d.toFixed(1)} rStar=${rStarAt(Math.atan2(b.y-CY,b.x-CX)).toFixed(1)} rCheck=${rCheckAt(Math.atan2(b.y-CY,b.x-CX)).toFixed(1)} spd=${Math.hypot(b.vx,b.vy).toFixed(2)}`);
+  const _sv=spatialVerdict(b.x,b.y);
+  const forced=(cfg.mode&&cfg.mode!=='random'&&['bigwin','win','almost','fail','epicfail'].includes(cfg.mode))?cfg.mode:null;
+  let verdict=forced||_sv;
+  let dead=false, wounded=false, riskRoll=0;
+  if(verdict==='fail_dead'){verdict='fail';dead=true;riskRoll=1;}
+  else if(verdict==='fail_wound'){verdict='fail';wounded=true;riskRoll=cfg.dead+1;}
+  else{const rr=spatialRiskRoll();dead=rr.dead;wounded=rr.wounded;riskRoll=rr.riskRoll;}
+  const skillIndex=getSkillIndexFromAngle(b.x,b.y);
+  recomputeGeometry(skillIndex);
+  scene.res={verdict,roll:0,riskRoll,skillIndex,wounded,dead};
   const res=scene.res;
-  window.__debugResolve={targetX:scene.target?.x,targetY:scene.target?.y,ballBeforeX:scene.ball.x,ballBeforeY:scene.ball.y};
-  scene.ball.x=scene.target.x; scene.ball.y=scene.target.y;
-  window.__debugResolve.ballAfterX=scene.ball.x; window.__debugResolve.ballAfterY=scene.ball.y;
   setState('resolution');
-  const V=VERDICT_TEXT[res.verdict];
+  const V=VERDICT_TEXT[verdict];
   /* title: split into letters for the crumble effect */
   const titleEl=$id('cardTitle');
   titleEl.innerHTML=[...V.title].map(ch=>{
@@ -607,7 +557,8 @@ function resolve(){
   }).join('');
   $id('cardSeal').textContent=V.seal;
   $id('cardSub').textContent=V.sub;
-  $id('cardNums').textContent=`D100 ${res.roll} · Soglia ${geo.tst}`;
+  const posZone=inStar(b.x,b.y)?'Nella Stella':'Fuori dalla Stella';
+  $id('cardNums').textContent=posZone;
   const chips=$id('cardChips');
   chips.innerHTML='';
   if(res.wounded) chips.innerHTML+='<span class="chip wounded">Ferito</span>';
@@ -638,16 +589,10 @@ function resolve(){
   shake('shake-resolve');
   $id('launch').classList.add('pulse');
   /* panel result removed */
-  /* Recalculate geometry for the tested skill */
-  const skillIndex=getSkillIndexFromAngle(scene.ball.x,scene.ball.y);
-  recomputeGeometry(skillIndex);
-  /* Update display with correct TST for this skill */
-  $id('cardNums').textContent=`D100 ${res.roll} · Soglia ${geo.tst}`;
-
-  /* Post result to parent window (for iframe embedding) */
+  /* Post result to parent window */
   if(opts.onResolve){
     const skillName=skills.length>0?skills[skillIndex].name:'Skill';
-    opts.onResolve({verdict:res.verdict,roll:res.roll,riskRoll:res.riskRoll,skillIndex:skillIndex,skillName:skillName,wounded:res.wounded,dead:res.dead});
+    opts.onResolve({verdict,roll:0,riskRoll,skillIndex,skillName,wounded,dead});
   }
 }
 
@@ -696,6 +641,21 @@ const marbleTex=(()=>{                // ancient translucent marble with vein no
 
 function drawBackdrop(now){
   const t=now/1000;
+  /* V2-style teal-azure base fill */
+  ctx.save();
+  const _bg=ctx.createRadialGradient(CX,CY,0,CX,CY,R*1.15);
+  _bg.addColorStop(0,'rgba(0,22,32,1)');
+  _bg.addColorStop(1,'#02020b');
+  ctx.fillStyle=_bg;
+  ctx.beginPath(); ctx.arc(CX,CY,R*1.12,0,TAU); ctx.fill();
+  /* azure light-leak from top-left (V9 signature) */
+  const _leak=ctx.createRadialGradient(CX-R*.7,CY-R*.7,0,CX-R*.7,CY-R*.7,R*1.4);
+  _leak.addColorStop(0,'rgba(0,229,255,.16)');
+  _leak.addColorStop(.5,'rgba(0,229,255,.03)');
+  _leak.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=_leak;
+  ctx.beginPath(); ctx.arc(CX,CY,R*1.12,0,TAU); ctx.fill();
+  ctx.restore();
   /* cosmic dust: starlit gold + teal grains over astral ink */
   ctx.save();
   ctx.globalCompositeOperation='lighter';
@@ -704,8 +664,8 @@ function drawBackdrop(now){
     const a=.18+.55*tw;
     const gold=(i%3!==0);
     ctx.globalAlpha=a;
-    ctx.fillStyle=gold?'#ffe9a8':'#a8f0e0';
-    if(tw>.82){ ctx.shadowColor=gold?'#fce890':'#7fffe6'; ctx.shadowBlur=6+6*tw; } else ctx.shadowBlur=0;
+    ctx.fillStyle=gold?'#ffe9a8':'#d0dcff';
+    if(tw>.82){ ctx.shadowColor=gold?'#fce890':'#a8b8ff'; ctx.shadowBlur=6+6*tw; } else ctx.shadowBlur=0;
     ctx.beginPath(); ctx.arc(s.x,s.y,s.r*(.8+.5*tw),0,TAU); ctx.fill();
   });
   ctx.shadowBlur=0; ctx.globalAlpha=1;
@@ -738,101 +698,77 @@ function drawMotes(now,dt){
   ctx.globalAlpha=1;
 }
 
-/* the goo — full failure field, boiling & wobbling */
-const gooBubbles=Array.from({length:6},(_,i)=>({ph:i*1.55,sp:.12+i*.035,rad:2.6+i*1.1,ox:(i-2.5)*36,oy:(i%3-1)*30}));
-/* goo = the central FAILURE FIELD the ball lives in. It grows from the centre
-   outward and its irregular edge is bounded by the black obelisks (rCheckAt).
-   The flower (success) blooms on top of it; its outer border is critical fail. */
-/* visual goo edge: the static physics boundary (rCheckAt) × a gentle, slow
-   time-based "breathing" undulation (surface tension). Drawing-only — the ball
-   collides against the static rCheckAt, so the wobble never shoves the ball. */
-function gooEdgeAt(a,rev){
-  const t=scene.nowMs||0;
-  const breathe=1 + 0.022*Math.sin(a*3 + t*0.00060) + 0.016*Math.sin(a*5 - t*0.00095);
-  return rCheckAt(a)*rev*breathe;
-}
+/* challenge surface path — polygon bounded by rCheckAt (difficulty mesh) */
 function gooBlobPath(rev,shrink){
   const P=new Path2D();
   const SEG=160;
   for(let i=0;i<=SEG;i+=1){
-    const a=i/SEG*TAU, r=Math.max(0,gooEdgeAt(a,rev)-(shrink||0));
+    const a=i/SEG*TAU, r=Math.max(0,rCheckAt(a,rev)-(shrink||0));
     const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
     if(i===0) P.moveTo(x,y); else P.lineTo(x,y);
   }
   P.closePath();
   return P;
 }
-function drawGoo(now){
+
+/* SUPERFICIE SFIDA — danger void that bounds the ball.
+   Clean, legible: pure dark fill + single pulsing danger border.
+   No crystal facets — those conflicted visually with the star. */
+function drawChallengeSurface(now){
   const rev=scene.gooReveal;
-  if(rev<=0.001) return;                 // void start: no goo until it wells up
+  if(rev<=0.001) return;
   const t=now/1000;
-  const blob=gooBlobPath(rev,0);
-  const gr=Math.max(20, Math.max.apply(null,geo.axisCheck)*rev);
+  const path=gooBlobPath(rev,0);
   ctx.save();
-  ctx.globalAlpha=Math.min(1,rev*1.2);
-  ctx.filter='url(#gooWobble)';
-  ctx.shadowColor='rgba(10,40,40,.5)';   // cold, not violet
-  ctx.shadowBlur=30;
-  /* deep obsidian-teal viscous body — darkest toward the edge (deepest failure) */
-  const g=ctx.createRadialGradient(CX,CY,2,CX,CY,gr);
-  g.addColorStop(0,'#0c1620'); g.addColorStop(.5,'#08111a'); g.addColorStop(1,'#02060a');
-  ctx.fillStyle=g;
-  ctx.fill(blob);
-  ctx.filter='none'; ctx.shadowBlur=0;
-  ctx.save();
-  ctx.clip(blob);
-  /* breathing currents — cold teal / slate, very subtle */
-  const v1=ctx.createRadialGradient(CX+60+Math.sin(t*.5)*26,CY+90+Math.cos(t*.4)*20,4,CX+60,CY+90,210);
-  v1.addColorStop(0,'rgba(24,110,98,.22)'); v1.addColorStop(.5,'rgba(24,110,98,.05)'); v1.addColorStop(1,'transparent');
-  ctx.fillStyle=v1; ctx.fillRect(0,0,W,W);
-  const v2=ctx.createRadialGradient(CX-90+Math.cos(t*.36)*30,CY-50+Math.sin(t*.55)*24,4,CX-90,CY-50,240);
-  v2.addColorStop(0,'rgba(40,64,92,.20)'); v2.addColorStop(.55,'rgba(40,64,92,.05)'); v2.addColorStop(1,'transparent');
-  ctx.fillStyle=v2; ctx.fillRect(0,0,W,W);
-  /* simmering bubbles — cold slate, not purple */
-  gooBubbles.forEach(bu=>{
-    const cyc=((t*bu.sp+bu.ph)%1+1)%1;
-    const bx=CX+bu.ox+Math.sin(bu.ph*2.7)*40, by=CY+bu.oy-cyc*22;
-    if(cyc<0.8){
-      const br=bu.rad*(.3+cyc);
-      const bg=ctx.createRadialGradient(bx-br*.3,by-br*.3,.4,bx,by,br);
-      bg.addColorStop(0,'rgba(90,130,135,.34)'); bg.addColorStop(.7,'rgba(20,42,46,.22)'); bg.addColorStop(1,'transparent');
-      ctx.fillStyle=bg; ctx.beginPath(); ctx.arc(bx,by,br,0,TAU); ctx.fill();
-    } else {
-      const pop=(cyc-.8)/.2;
-      ctx.globalAlpha=(1-pop)*.4;
-      ctx.strokeStyle='rgba(120,165,160,.7)'; ctx.lineWidth=.8;
-      ctx.beginPath(); ctx.arc(bx,by,bu.rad*(1+pop*1.7),0,TAU); ctx.stroke();
-      ctx.globalAlpha=1;
-    }
-  });
-  /* wet specular — cool moonlight catch */
-  const wx=CX-30+Math.sin(t*.7)*10, wy=CY-60;
-  const wet=ctx.createRadialGradient(wx,wy,1,wx,wy,46);
-  wet.addColorStop(0,'rgba(220,240,238,.38)'); wet.addColorStop(.4,'rgba(220,240,238,.05)'); wet.addColorStop(1,'transparent');
-  ctx.fillStyle=wet; ctx.fillRect(0,0,W,W);
+
+  /* 1. Deep void fill */
+  const fill=ctx.createRadialGradient(CX,CY,0,CX,CY,geo.rTip*rev*1.5);
+  fill.addColorStop(0,'rgba(1,3,14,0.97)');
+  fill.addColorStop(0.6,'rgba(3,5,20,0.95)');
+  fill.addColorStop(1,'rgba(2,3,16,0.90)');
+  ctx.fillStyle=fill; ctx.fill(path);
+
+  /* 2. Subtle inner texture: faint radial spokes */
+  ctx.save(); ctx.clip(path);
+  for(let i=0;i<AXES;i+=1){
+    const a=TIP(i);
+    const grad=ctx.createLinearGradient(CX,CY,CX+Math.cos(a)*rCheckAt(a,rev),CY+Math.sin(a)*rCheckAt(a,rev));
+    grad.addColorStop(0,'rgba(40,20,60,0)');
+    grad.addColorStop(0.7,`rgba(40,20,60,${0.12*rev})`);
+    grad.addColorStop(1,'rgba(40,20,60,0)');
+    ctx.strokeStyle=grad; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(CX,CY); ctx.lineTo(CX+Math.cos(a)*rCheckAt(a,rev),CY+Math.sin(a)*rCheckAt(a,rev)); ctx.stroke();
+  }
   ctx.restore();
-  ctx.restore();
-  /* teal lap-light along the goo's irregular edge (where it meets the black obelisks) */
-  ctx.save();
-  ctx.filter='url(#gooWobble)';
-  ctx.strokeStyle='rgba(16,150,130,.28)'; ctx.lineWidth=2;
-  ctx.shadowColor='rgba(16,185,129,.38)'; ctx.shadowBlur=10;
-  ctx.stroke(gooBlobPath(rev,0));
-  ctx.restore();
-  if(rev<0.999) return;                  // critical-fail border only once goo is fully formed
-  /* CRITICAL FAILURE = the goo's OUTER BORDER band, thickness ∝ crit% (proportional). */
-  ctx.save();
-  const pul=.5+.5*Math.sin(t*2.2);
-  ctx.filter='url(#gooWobble)';
-  const band=new Path2D();
-  band.addPath(gooBlobPath(1,0));         // outer = goo edge
-  band.addPath(gooBlobPath(1,geo.epicW)); // inner = edge − epicW (hole)
-  ctx.fillStyle=`rgba(190,22,52,${(.5+.25*pul).toFixed(3)})`;
-  ctx.shadowColor='rgba(255,40,90,.55)'; ctx.shadowBlur=16+10*pul;
-  ctx.fill(band,'evenodd');
-  ctx.shadowBlur=0; ctx.lineWidth=2;
-  ctx.strokeStyle=`rgba(255,90,130,${(.5+.35*pul).toFixed(3)})`;
-  ctx.stroke(gooBlobPath(1,0));
+
+  /* 3. Single pulsing danger border — amber-red, clearly "dangerous" */
+  const puls=0.5+0.5*Math.sin(t*1.8);
+  ctx.strokeStyle=`rgba(200,80,20,${(0.55+0.35*puls)*rev})`;
+  ctx.lineWidth=2+1.5*puls;
+  ctx.shadowColor='rgba(255,60,0,0.55)'; ctx.shadowBlur=10+8*puls;
+  ctx.stroke(path); ctx.shadowBlur=0;
+
+  /* 4. Critical-fail outer band — deeper red, qualitatively different */
+  if(rev>=0.999){
+    const pul=.5+.5*Math.sin(t*2.2);
+    ctx.strokeStyle=`rgba(190,22,52,${(.55+.3*pul).toFixed(3)})`;
+    ctx.lineWidth=4+2.5*pul;
+    ctx.shadowColor='rgba(255,40,90,.7)'; ctx.shadowBlur=18+12*pul;
+    ctx.stroke(gooBlobPath(rev,geo.epicW*0.5));
+    ctx.shadowBlur=0;
+  }
+
+  /* 5. Vertex markers at difficulty tips — subtle position indicators */
+  for(let i=0;i<AXES;i+=1){
+    const a=TIP(i), vr=rCheckAt(a,rev);
+    const vx=CX+Math.cos(a)*vr, vy=CY+Math.sin(a)*vr;
+    const vg=ctx.createRadialGradient(vx,vy,0,vx,vy,10);
+    vg.addColorStop(0,`rgba(220,80,20,${0.6*rev})`); vg.addColorStop(1,'transparent');
+    ctx.fillStyle=vg; ctx.beginPath(); ctx.arc(vx,vy,10,0,TAU); ctx.fill();
+    ctx.fillStyle=`rgba(230,100,30,${0.85*rev})`;
+    ctx.beginPath(); ctx.arc(vx,vy,3,0,TAU); ctx.fill();
+  }
+
   ctx.restore();
 }
 
@@ -851,7 +787,13 @@ function starPath(scale){
 }
 /* THE 12-LAYER MECHANICAL STAR — white gold & sun-bronze */
 function drawStar(now){
-  const s=scene.starScale;
+  let s=scene.starScale;
+  /* In fail/epicfail resolution the star fades to let the card text read */
+  if(scene.state==='resolution'&&scene.res){
+    const v=scene.res.verdict;
+    if(v==='fail'||v==='epicfail') s*=0.35;
+    else if(v==='almost') s*=0.65;
+  }
   if(s<=0.01) return;
   const t=now/1000;
   const p=starPath(s);
@@ -986,31 +928,29 @@ function drawStream(wedge,color,edge,now,pour,variant){
 
   ctx.save();
   ctx.clip(gooBlobPath(1,0));                // rivers stay inside the goo
-  ctx.filter='url(#fluidWobble)';
+  /* no organic wobble — crystal streams have clean, faceted edges */
 
-  /* 1) VIVID GEL BODY (source-over): denser at the goo-edge source, translucent
-        toward the centre — a clear, instantly-readable colored river */
+  /* 1) CRYSTAL ENERGY BODY — additive so it glows like neon, not painted ink */
+  ctx.globalCompositeOperation='lighter';
   const g=ctx.createRadialGradient(CX,CY,Math.max(0,ge-reach),CX,CY,ge);
-  g.addColorStop(0, col(0.24*fade));
-  g.addColorStop(.5, col(0.66*fade));
-  g.addColorStop(.85,col(0.86*fade));
-  g.addColorStop(1, col(0.95*fade));
+  g.addColorStop(0, col(0.10*fade));
+  g.addColorStop(.5, col(0.52*fade));
+  g.addColorStop(.85,col(0.78*fade));
+  g.addColorStop(1, col(0.92*fade));
   ctx.fillStyle=g; buildPath(1); ctx.fill();
 
-  /* 2) LUMINOUS CORE — additive bright heart, glows like neon over dark ink */
-  ctx.globalCompositeOperation='lighter';
+  /* 2) LUMINOUS CORE — bright additive heart */
   const c=ctx.createRadialGradient(CX,CY,Math.max(0,ge-reach*0.9),CX,CY,ge);
   c.addColorStop(0, col(0.0));
-  c.addColorStop(.7, col(0.18*fade));
-  c.addColorStop(1, col(0.42*fade));
+  c.addColorStop(.7, col(0.30*fade));
+  c.addColorStop(1, col(0.58*fade));
   ctx.fillStyle=c; buildPath(0.5); ctx.fill();
 
-  /* 3) flowing filaments tracing the meandering current */
-  ctx.filter='none';
+  /* 3) crystalline edge filaments — two bold arcs, vivid */
   ctx.strokeStyle=edge; ctx.lineCap='round';
-  for(let k=0;k<4;k+=1){
-    ctx.lineWidth=(k===0?2.0:1.0);
-    ctx.globalAlpha=fade*(k===0?0.85:0.45);
+  for(let k=0;k<3;k+=1){
+    ctx.lineWidth=(k===0?2.4:1.1);
+    ctx.globalAlpha=fade*(k===0?0.95:0.55);
     ctx.beginPath();
     for(let i=0;i<=STEPS;i+=1){
       const u=i/STEPS;
@@ -1030,12 +970,116 @@ function drawStream(wedge,color,edge,now,pour,variant){
     const dx=CX+Math.cos(a)*dd, dy=CY+Math.sin(a)*dd, rr=1.6+(k%3);
     const dg=ctx.createRadialGradient(dx,dy,0,dx,dy,rr);
     dg.addColorStop(0,edge); dg.addColorStop(1,col(0));
-    ctx.globalAlpha=fade*0.6; ctx.fillStyle=dg;
+    ctx.globalAlpha=fade*0.85; ctx.fillStyle=dg;
     ctx.beginPath(); ctx.arc(dx,dy,rr,0,TAU); ctx.fill();
   }
 
   ctx.globalAlpha=1;
   ctx.globalCompositeOperation='source-over';
+  ctx.restore();
+}
+
+/* ZONE DI RISCHIO — drawn ON TOP of the star, visible regardless of gap size.
+   FERITA (wound): amber-crimson arc band around the full star perimeter.
+   MORTE (death): deep-violet void spots at the 5 valley floors.
+   Both use additive glow that bleeds over the star's bronze rim.
+   Pour animation: appears as scene.pourP goes 0→1. */
+function drawValleyRisks(now,pour){
+  if(pour<=0) return;
+  const t=now/1000;
+  const fade=clamp(pour*1.5,0,1);
+
+  /* ── FERITA (WOUND): crimson arc-band around the star's outer rim ── */
+  /* Drawn as an additive glow ring following rStarAt, extending outward.
+     Visible as a danger halo even when failure gap is tiny. */
+  ctx.save();
+  ctx.globalCompositeOperation='lighter';
+  const WOUND_SEGS=120;
+  const woundGlowR=Math.max(18, geo.woundW*0.9+12); // minimum 18px so always visible
+  for(let k=0;k<WOUND_SEGS;k+=1){
+    const a=(k/WOUND_SEGS)*TAU;
+    const starR=rStarAt(a);
+    /* outer band mid-point */
+    const bandMid=starR+woundGlowR*0.4;
+    const wx=CX+Math.cos(a)*bandMid, wy=CY+Math.sin(a)*bandMid;
+    const pulse=0.5+0.5*Math.sin(t*2.1+k*0.23+0.8);
+    const alpha=fade*(0.28+0.22*pulse);
+    const gw=ctx.createRadialGradient(wx,wy,0,wx,wy,woundGlowR);
+    gw.addColorStop(0,`rgba(220,60,30,${alpha})`);
+    gw.addColorStop(0.5,`rgba(180,30,10,${alpha*0.5})`);
+    gw.addColorStop(1,'transparent');
+    ctx.fillStyle=gw;
+    ctx.beginPath(); ctx.arc(wx,wy,woundGlowR,0,TAU); ctx.fill();
+  }
+  ctx.globalAlpha=1;
+  ctx.globalCompositeOperation='source-over';
+  ctx.restore();
+
+  /* Wound arc stroke directly on the star bronze rim */
+  ctx.save();
+  const WOUND_ARC=200;
+  ctx.lineWidth=2.5;
+  for(let k=0;k<WOUND_ARC;k+=1){
+    const a0=(k/WOUND_ARC)*TAU;
+    const a1=((k+1)/WOUND_ARC)*TAU;
+    const r0=rStarAt(a0), r1=rStarAt(a1);
+    const pulse=0.5+0.5*Math.sin(t*2.4+(k/WOUND_ARC)*TAU*3.7);
+    const alpha=fade*(0.55+0.35*pulse);
+    ctx.strokeStyle=`rgba(230,70,30,${alpha})`;
+    ctx.shadowColor='rgba(255,60,20,0.8)'; ctx.shadowBlur=6+4*pulse;
+    ctx.beginPath();
+    ctx.moveTo(CX+Math.cos(a0)*r0, CY+Math.sin(a0)*r0);
+    ctx.lineTo(CX+Math.cos(a1)*r1, CY+Math.sin(a1)*r1);
+    ctx.stroke();
+  }
+  ctx.shadowBlur=0;
+  ctx.restore();
+
+  /* ── MORTE (DEATH): void spots at the 5 valley floors ── */
+  /* Qualitatively different from wound: black cores + violet glow,
+     positioned at star valley tips (not in the failure gap). */
+  ctx.save();
+  for(let i=0;i<AXES;i+=1){
+    const valleyAng=TIP(i)+Math.PI/AXES;  // midpoint between tips = valley
+    const starAtV=rStarAt(valleyAng);
+    /* death void centered just OUTSIDE the star valley edge */
+    const deathR=Math.max(22, geo.deathDepth*1.2);
+    const voidCtrR=starAtV+deathR*0.35;
+    const vx=CX+Math.cos(valleyAng)*voidCtrR;
+    const vy2=CY+Math.sin(valleyAng)*voidCtrR;
+    const pulse=0.5+0.5*Math.sin(t*2.7+i*1.26);
+    const voidSize=deathR*(0.9+0.2*pulse)*pour;
+
+    /* outer violet glow (additive — bleeds over anything) */
+    ctx.globalCompositeOperation='lighter';
+    const g=ctx.createRadialGradient(vx,vy2,0,vx,vy2,voidSize*2.2);
+    g.addColorStop(0,`rgba(120,0,220,${fade*0.7*(0.5+0.5*pulse)})`);
+    g.addColorStop(0.4,`rgba(70,0,150,${fade*0.4})`);
+    g.addColorStop(1,'transparent');
+    ctx.fillStyle=g; ctx.globalAlpha=1;
+    ctx.beginPath(); ctx.arc(vx,vy2,voidSize*2.2,0,TAU); ctx.fill();
+    ctx.globalCompositeOperation='source-over';
+
+    /* black void core — clearly "dead space" */
+    const bc=ctx.createRadialGradient(vx,vy2,0,vx,vy2,voidSize*0.8);
+    bc.addColorStop(0,`rgba(0,0,0,${fade*0.95})`);
+    bc.addColorStop(0.65,`rgba(8,0,20,${fade*0.75})`);
+    bc.addColorStop(1,'transparent');
+    ctx.fillStyle=bc;
+    ctx.beginPath(); ctx.arc(vx,vy2,voidSize*0.8,0,TAU); ctx.fill();
+
+    /* rotating violet ring arcs — qualitatively distinct from wound style */
+    ctx.globalAlpha=fade*(0.55+0.25*pulse);
+    ctx.strokeStyle=`rgba(190,80,255,${0.5+0.3*pulse})`;
+    ctx.lineWidth=1.2; ctx.shadowColor='rgba(160,60,255,0.8)'; ctx.shadowBlur=6;
+    for(let ring=1;ring<=3;ring+=1){
+      const dir=ring%2?1:-1;
+      ctx.beginPath();
+      ctx.arc(vx,vy2,voidSize*(0.18+ring*0.14),t*dir*0.95,t*dir*0.95+TAU*0.7);
+      ctx.stroke();
+    }
+    ctx.shadowBlur=0; ctx.globalAlpha=1;
+  }
   ctx.restore();
 }
 
@@ -1090,35 +1134,40 @@ function drawPillar(pl,isWhite){
     ctx.globalAlpha=1;
   }
 
-  /* shadow (left) shaft + cap — SOLID volcanic stone, not a void */
-  ctx.fillStyle=isWhite?'#a48d60':'#221c30'; ctx.fill(shaftL);
-  ctx.fillStyle=isWhite?'#8f7a52':'#1a1626'; ctx.fill(capL);
+  /* shadow (left) shaft + cap — near-black obsidian face */
+  ctx.fillStyle=isWhite?'#a48d60':'#07050f'; ctx.fill(shaftL);
+  ctx.fillStyle=isWhite?'#8f7a52':'#050310'; ctx.fill(capL);
 
-  /* lit (right) shaft — solid dark basalt block catching the light */
+  /* lit (right) shaft — dark crystal face with cold azure catch-light */
   const fg=ctx.createLinearGradient(px-2,shoulderY,px+bw,vy);
   if(isWhite){ fg.addColorStop(0,'#fefaf0'); fg.addColorStop(.4,'#ece0c1'); fg.addColorStop(1,'#c2a574'); }
-  else { fg.addColorStop(0,'#463c54'); fg.addColorStop(.5,'#2c2440'); fg.addColorStop(1,'#181323'); }
+  else { fg.addColorStop(0,'#1c2a3a'); fg.addColorStop(.45,'#0e1a26'); fg.addColorStop(1,'#060d14'); }
   ctx.fillStyle=fg; ctx.fill(shaftR);
 
-  /* matte material grain clipped to the lit shaft — overlay so the basalt
-     reads as textured solid stone (grain catches both light and dark) */
+  /* matte material grain clipped to the lit shaft */
   ctx.save();
   ctx.clip(shaftR);
   ctx.globalCompositeOperation='overlay';
-  ctx.globalAlpha=isWhite?.55:.7;
+  ctx.globalAlpha=isWhite?.55:.65;
   ctx.drawImage(isWhite?marbleTex:stoneTex, px-bw, tipY, bw*2.2, h+capH+footF);
   if(isWhite){
     ctx.globalCompositeOperation='source-over'; ctx.globalAlpha=1;
     const ss=ctx.createRadialGradient(px+2,shoulderY+h*.35,0,px+2,shoulderY+h*.35,h*.7);
     ss.addColorStop(0,'rgba(255,206,128,.20)'); ss.addColorStop(.6,'rgba(255,200,110,.05)'); ss.addColorStop(1,'transparent');
     ctx.fillStyle=ss; ctx.fillRect(px-bw,tipY,bw*2.2,h+capH+footF);
+  } else {
+    /* subtle azure crystal vein in the lit face */
+    ctx.globalCompositeOperation='screen'; ctx.globalAlpha=.18;
+    const vein=ctx.createLinearGradient(px,shoulderY,px+bw,vy);
+    vein.addColorStop(0,'rgba(0,229,255,1)'); vein.addColorStop(1,'rgba(0,80,120,1)');
+    ctx.fillStyle=vein; ctx.fillRect(px-bw,tipY,bw*2.2,h+capH+footF);
   }
   ctx.restore();
 
   /* lit (right) pyramidion facet */
   const cg=ctx.createLinearGradient(tipX,tipY,sR[0],shoulderY);
   if(isWhite){ cg.addColorStop(0,'#fffdf6'); cg.addColorStop(1,'#d8c188'); }
-  else { cg.addColorStop(0,'#2a1c3a'); cg.addColorStop(1,'#070310'); }
+  else { cg.addColorStop(0,'#243444'); cg.addColorStop(1,'#040210'); }
   ctx.fillStyle=cg; ctx.fill(capR);
 
   /* glowing rune fissure down the lit face */
@@ -1146,25 +1195,32 @@ function drawPillar(pl,isWhite){
     ctx.globalAlpha=1; ctx.shadowBlur=0;
   }
 
-  /* basalt: a BRIGHT TEAL back-rim on the shadow silhouette so the dark stone
-     never dissolves into the astral ink (cool edge separation) */
+  /* crystal: strong azure back-rim + secondary cap edge — forces dark monolith
+     to read as crystal against the teal background */
   if(!isWhite){
-    ctx.strokeStyle='rgba(64,232,202,.9)'; ctx.lineWidth=1.4;
-    ctx.shadowColor='rgba(40,220,190,.85)'; ctx.shadowBlur=9;
+    /* primary left-edge azure line */
+    ctx.strokeStyle='rgba(0,229,255,.95)'; ctx.lineWidth=1.8;
+    ctx.shadowColor='rgba(0,200,255,.90)'; ctx.shadowBlur=14;
     ctx.beginPath();
     ctx.moveTo(Bc[0],Bc[1]); ctx.lineTo(bL[0],bL[1]); ctx.lineTo(sL[0],sL[1]); ctx.lineTo(tipX,tipY);
+    ctx.stroke();
+    /* secondary softer outer glow pass */
+    ctx.strokeStyle='rgba(0,180,255,.35)'; ctx.lineWidth=5;
+    ctx.shadowBlur=22;
+    ctx.beginPath();
+    ctx.moveTo(bL[0],bL[1]); ctx.lineTo(sL[0],sL[1]); ctx.lineTo(tipX,tipY);
     ctx.stroke();
     ctx.shadowBlur=0;
   }
 
-  /* chiseled specular ridges — sharp warm catchlights on the lit face */
-  const spec=isWhite?'rgba(255,253,240,.95)':'rgba(230,170,80,.95)';
-  ctx.strokeStyle=spec; ctx.lineWidth=1.3;
-  ctx.shadowColor=spec; ctx.shadowBlur=isWhite?7:5;
+  /* chiseled specular ridges — sharp catchlights on the lit face */
+  const spec=isWhite?'rgba(255,253,240,.95)':'rgba(160,230,255,.95)';
+  ctx.strokeStyle=spec; ctx.lineWidth=isWhite?1.3:1.5;
+  ctx.shadowColor=spec; ctx.shadowBlur=isWhite?7:10;
   ctx.beginPath(); ctx.moveTo(tipX,tipY); ctx.lineTo(sR[0],shoulderY); ctx.stroke();   // lit cap ridge
   ctx.beginPath(); ctx.moveTo(tipX,tipY); ctx.lineTo(Sc[0],Sc[1]); ctx.stroke();       // central spine
   const evg=ctx.createLinearGradient(sR[0],shoulderY,bR[0],vy);
-  evg.addColorStop(0,spec); evg.addColorStop(.55,'rgba(120,80,30,.22)'); evg.addColorStop(1,'transparent');
+  evg.addColorStop(0,spec); evg.addColorStop(.55,isWhite?'rgba(120,80,30,.22)':'rgba(0,120,180,.18)'); evg.addColorStop(1,'transparent');
   ctx.strokeStyle=evg; ctx.lineWidth=1.1;
   ctx.beginPath(); ctx.moveTo(sR[0],shoulderY); ctx.lineTo(bR[0],vy+frontF); ctx.stroke();
   ctx.shadowBlur=0;
@@ -1298,11 +1354,10 @@ function frame(now){
 
   ctx.clearRect(0,0,W,W);
   drawBackdrop(now);
-  drawGoo(now);
+  drawChallengeSurface(now);
   drawBlueprint(now);
   drawStar(now);
-  drawStream(geo.wedges.dead,'rgba(120,38,150,A)','rgba(214,170,255,1)',now,scene.pourP,'death');  // Morte — viola/ametista (mortalità, l'ignoto)
-  drawStream(geo.wedges.wound,'rgba(214,32,52,A)','rgba(255,150,160,1)',now,scene.pourP,'wound');  // Ferito — cremisi sangue
+  drawValleyRisks(now,scene.pourP);
   scene.blackPillars.forEach(p=>drawPillar(p,false));
   scene.whitePillars.forEach(p=>drawPillar(p,true));
   drawShocks(dt);

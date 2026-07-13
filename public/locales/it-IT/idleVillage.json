@@ -1,0 +1,276 @@
+{
+  "workerTooltip": {
+    "labels": {
+      "hp": "HP",
+      "fatigue": "Fatica",
+      "performance": "Prestazione",
+      "specialties": "Specialità",
+      "bio": "Bio",
+      "recommendations": "Raccomandazioni",
+      "risk": "Livello di Rischio"
+    },
+    "statuses": {
+      "working": "In Incarico",
+      "resting": "In Riposo",
+      "injured": "Ferito",
+      "recovering": "In Recupero",
+      "available": "Disponibile",
+      "away": "Assente",
+      "exhausted": "Esausto",
+      "dead": "Caduto"
+    },
+    "riskLevels": {
+      "low": "Rischio Basso",
+      "medium": "Rischio Medio",
+      "high": "Rischio Alto",
+      "critical": "Rischio Critico"
+    },
+    "recommendations": {
+      "lowHp": "Riposo necessario - HP critico",
+      "highFatigue": "Fatica alta - considera riposo",
+      "injured": "In recupero da ferita",
+      "critical": "Riposo immediato richiesto"
+    },
+    "accessibility": {
+      "tooltipDetails": "{name} - Dettagli lavoratore",
+      "riskBadge": "Stato {level}",
+      "closeTooltip": "Chiudi tooltip per {name}"
+    },
+    "actions": {
+      "close": "Chiudi tooltip"
+    },
+    "sections": {
+      "quote": "Citazione"
+    }
+  },
+  "interactionMode": {
+    "mode": {
+      "sandbox": {
+        "text": "Sandbox",
+        "description": "Modalità sandbox per test e sperimentazione",
+        "fallback": "Sandbox",
+        "category": "mode",
+        "context": "picker",
+        "translatable": true,
+        "maxLength": 20,
+        "accessibility": {
+          "ariaLabel": "Modalità Sandbox",
+          "keyHint": "S"
+        }
+      },
+      "planning": {
+        "text": "Pianificazione",
+        "description": "Modalità pianificazione per organizzare attività",
+        "fallback": "Planning",
+        "category": "mode",
+        "context": "picker",
+        "translatable": true,
+        "maxLength": 20,
+        "accessibility": {
+          "ariaLabel": "Modalità Pianificazione",
+          "keyHint": "P"
+        }
+      },
+      "execution": {
+        "text": "Esecuzione",
+        "description": "Modalità esecuzione per attività in corso",
+        "fallback": "Execution",
+        "category": "mode",
+        "context": "picker",
+        "translatable": true,
+        "maxLength": 20,
+        "accessibility": {
+          "ariaLabel": "Modalità Esecuzione",
+          "keyHint": "E"
+        }
+      },
+      "analytics": {
+        "text": "Analitica",
+        "description": "Modalità analitica per statistiche e report",
+        "fallback": "Analytics",
+        "category": "mode",
+        "context": "picker",
+        "translatable": true,
+        "maxLength": 20,
+        "accessibility": {
+          "ariaLabel": "Modalità Analitica",
+          "keyHint": "A"
+        }
+      }
+    },
+    "action": {
+      "switch_mode": {
+        "text": "Cambia modalità",
+        "description": "Cambia la modalità di interazione corrente",
+        "fallback": "Switch mode",
+        "category": "action",
+        "context": "picker",
+        "translatable": true,
+        "maxLength": 30,
+        "accessibility": {
+          "ariaLabel": "Cambia modalità di interazione",
+          "keyHint": "M"
+        }
+      },
+      "confirm_switch": {
+        "text": "Conferma cambio",
+        "description": "Conferma il cambio di modalità",
+        "fallback": "Confirm switch",
+        "category": "action",
+        "context": "picker",
+        "translatable": true,
+        "maxLength": 25,
+        "accessibility": {
+          "ariaLabel": "Conferma cambio modalità",
+          "keyHint": "Enter"
+        }
+      },
+      "cancel_switch": {
+        "text": "Annulla",
+        "description": "Annulla il cambio di modalità",
+        "fallback": "Cancel",
+        "category": "action",
+        "context": "picker",
+        "translatable": true,
+        "maxLength": 15,
+        "accessibility": {
+          "ariaLabel": "Annulla cambio",
+          "keyHint": "Escape"
+        }
+      }
+    },
+    "help": {
+      "mode_description": {
+        "text": "Seleziona la modalità di interazione per il villaggio",
+        "description": "Descrizione del selettore modalità di interazione",
+        "fallback": "Select interaction mode for the village",
+        "category": "help",
+        "context": "picker",
+        "translatable": true,
+        "maxLength": 60,
+        "accessibility": {
+          "ariaLabel": "Aiuto selezione modalità",
+          "ariaDescription": "Usa le frecce per navigare tra le modalità disponibili"
+        }
+      }
+    },
+    "tooltip": {
+      "sandbox_info": {
+        "text": "Modalità sandbox: testa nuove funzionalità senza effetti persistenti",
+        "description": "Informazioni sulla modalità sandbox",
+        "fallback": "Sandbox mode: test new features without persistent effects",
+        "category": "tooltip",
+        "context": "picker",
+        "translatable": true,
+        "maxLength": 80
+      },
+      "planning_info": {
+        "text": "Modalità pianificazione: organizza attività e assegna residenti",
+        "description": "Informazioni sulla modalità pianificazione",
+        "fallback": "Planning mode: organize activities and assign residents",
+        "category": "tooltip",
+        "context": "picker",
+        "translatable": true,
+        "maxLength": 80
+      },
+      "execution_info": {
+        "text": "Modalità esecuzione: monitora attività in tempo reale",
+        "description": "Informazioni sulla modalità esecuzione",
+        "fallback": "Execution mode: monitor activities in real time",
+        "category": "tooltip",
+        "context": "picker",
+        "translatable": true,
+        "maxLength": 80
+      },
+      "analytics_info": {
+        "text": "Modalità analitica: visualizza statistiche e report",
+        "description": "Informazioni sulla modalità analitica",
+        "fallback": "Analytics mode: view statistics and reports",
+        "category": "tooltip",
+        "context": "picker",
+        "translatable": true,
+        "maxLength": 80
+      }
+    },
+    "ftue": {
+      "welcome_title": {
+        "text": "Benvenuto nel Villaggio Idlio",
+        "description": "Titolo di benvenuto per il FTUE",
+        "fallback": "Welcome to Idle Village",
+        "category": "help",
+        "context": "ftue",
+        "translatable": true,
+        "maxLength": 40,
+        "accessibility": {
+          "ariaLabel": "Titolo di benvenuto"
+        }
+      },
+      "mode_selection_title": {
+        "text": "Scegli la tua modalità",
+        "description": "Titolo per la selezione della modalità nel FTUE",
+        "fallback": "Choose your mode",
+        "category": "help",
+        "context": "ftue",
+        "translatable": true,
+        "maxLength": 30,
+        "accessibility": {
+          "ariaLabel": "Selezione modalità"
+        }
+      },
+      "mode_selection_description": {
+        "text": "Ogni modalità offre un modo diverso di interagire con il villaggio. Inizia con la modalità Sandbox per imparare!",
+        "description": "Descrizione della selezione modalità nel FTUE",
+        "fallback": "Each mode offers a different way to interact with the village. Start with Sandbox mode to learn!",
+        "category": "help",
+        "context": "ftue",
+        "translatable": true,
+        "maxLength": 120,
+        "accessibility": {
+          "ariaLabel": "Descrizione modalità",
+          "ariaDescription": "Informazioni sulle diverse modalità di interazione disponibili"
+        }
+      }
+    },
+    "accessibility": {
+      "mode_changed": {
+        "text": "Modalità cambiata in {mode}",
+        "description": "Annuncio di cambio modalità per screen reader",
+        "fallback": "Mode changed to {mode}",
+        "category": "help",
+        "context": "accessibility",
+        "translatable": true,
+        "maxLength": 50,
+        "accessibility": {
+          "ariaLabel": "Notifica cambio modalità",
+          "ariaDescription": "Annuncio quando la modalità di interazione viene cambiata"
+        }
+      },
+      "mode_selector_open": {
+        "text": "Selettore modalità aperto",
+        "description": "Annuncio di apertura selettore modalità",
+        "fallback": "Mode selector opened",
+        "category": "help",
+        "context": "accessibility",
+        "translatable": true,
+        "maxLength": 30,
+        "accessibility": {
+          "ariaLabel": "Selettore modalità aperto",
+          "ariaDescription": "Il selettore di modalità è stato aperto"
+        }
+      },
+      "mode_selector_closed": {
+        "text": "Selettore modalità chiuso",
+        "description": "Annuncio di chiusura selettore modalità",
+        "fallback": "Mode selector closed",
+        "category": "help",
+        "context": "accessibility",
+        "translatable": true,
+        "maxLength": 30,
+        "accessibility": {
+          "ariaLabel": "Selettore modalità chiuso",
+          "ariaDescription": "Il selettore di modalità è stato chiuso"
+        }
+      }
+    }
+  }
+}

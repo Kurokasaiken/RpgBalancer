@@ -23,10 +23,12 @@ import { ResourcePanel } from '@/ui/idleVillage/components/ResourcePanel';
 import { useResidentSlotController } from '@/ui/idleVillage/slots/useResidentSlotController';
 import { ResidentSlotRack } from '@/ui/idleVillage/components/ResidentSlotRack';
 import { TooltipProvider } from '@/ui/idleVillage/components/TooltipProvider';
+import { useTranslation } from '@/localization/useTranslation';
 import type { RosterSortMode } from '@/ui/idleVillage/config/rosterSortConfig';
 import { DEFAULT_ROSTER_SORT_MODE } from '@/ui/idleVillage/config/rosterSortConfig';
 
 function MinimalGameplayPageContent(): JSX.Element {
+  const { t } = useTranslation('idleVillage');
   const themeApi = useThemeSwitcher();
   const { config: idleVillageConfig } = useIdleVillageConfig();
   const gameplayState = useMinimalGameplayWithIdleVillageConfig();
@@ -152,9 +154,9 @@ function MinimalGameplayPageContent(): JSX.Element {
           <div className="p-4">
             <StyleLabSurface variant="card" className="w-full">
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                Time Engine
+                {t('idleVillage:ftue.timeEngine', { defaultValue: 'Time Engine' })}
                 <span className={`text-sm px-2 py-1 rounded ${gameplayState.state.isDayPhase ? 'bg-amber-100 text-amber-800' : 'bg-indigo-100 text-indigo-800'}`}>
-                  {gameplayState.state.isDayPhase ? '☀️ Day' : '🌙 Night'}
+                  {gameplayState.state.isDayPhase ? t('idleVillage:ftue.phase.day', { defaultValue: '☀️ Day' }) : t('idleVillage:ftue.phase.night', { defaultValue: '🌙 Night' })}
                 </span>
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -172,9 +174,9 @@ function MinimalGameplayPageContent(): JSX.Element {
                   />
                 </div>
                 <div className="flex flex-col justify-center space-y-2">
-                  <div className="text-sm"><strong>Day:</strong> {gameplayState.state.currentDay}</div>
-                  <div className="text-sm"><strong>Tick:</strong> {gameplayState.state.currentTick}</div>
-                  <div className="text-sm"><strong>Cycle Progress:</strong> {(gameplayState.state.cycleProgress * 100).toFixed(1)}%</div>
+                  <div className="text-sm"><strong>{t('idleVillage:ftue.day', { defaultValue: 'Day' })}:</strong> {gameplayState.state.currentDay}</div>
+                  <div className="text-sm"><strong>{t('idleVillage:ftue.tick', { defaultValue: 'Tick' })}:</strong> {gameplayState.state.currentTick}</div>
+                  <div className="text-sm"><strong>{t('idleVillage:ftue.cycleProgress', { defaultValue: 'Cycle Progress' })}:</strong> {(gameplayState.state.cycleProgress * 100).toFixed(1)}%</div>
                   <div className="flex gap-2 mt-2">
                     <button
                       onClick={() => gameplayState.state.isPaused ? gameplayState.resumeGame('user') : gameplayState.pauseGame('user')}
@@ -184,13 +186,13 @@ function MinimalGameplayPageContent(): JSX.Element {
                           : 'bg-orange-500 hover:bg-orange-600 text-white'
                       }`}
                     >
-                      {gameplayState.state.isPaused ? '▶️ Resume' : '⏸️ Pause'}
+                      {gameplayState.state.isPaused ? t('idleVillage:ftue.resume', { defaultValue: '▶️ Resume' }) : t('idleVillage:ftue.pause', { defaultValue: '⏸️ Pause' })}
                     </button>
                     <button
                       onClick={() => gameplayState.resetGame()}
                       className="px-3 py-1 rounded text-sm font-medium bg-gray-500 hover:bg-gray-600 text-white transition-colors"
                     >
-                      🔄 Reset
+                      {t('idleVillage:ftue.reset', { defaultValue: '🔄 Reset' })}
                     </button>
                   </div>
                 </div>
@@ -208,12 +210,12 @@ function MinimalGameplayPageContent(): JSX.Element {
           {/* SECTION 3: Resources */}
           <div className="p-4">
             <StyleLabSurface variant="card" className="w-full">
-              <h3 className="text-lg font-semibold mb-4">Resources</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('idleVillage:ftue.resources', { defaultValue: 'Resources' })}</h3>
               <ResourcePanel
                 items={[
-                  { id: 'gold', label: 'Gold', icon: 'gold', value: gameplayState.state.gold, accentClass: 'text-yellow-600' },
+                  { id: 'gold', label: t('idleVillage:ftue.resourceLabels.gold', { defaultValue: 'Gold' }), icon: 'gold', value: gameplayState.state.gold, accentClass: 'text-yellow-600' },
                   {
-                    id: 'food', label: 'Food', icon: 'food',
+                    id: 'food', label: t('idleVillage:ftue.resourceLabels.food', { defaultValue: 'Food' }), icon: 'food',
                     value: `${gameplayState.state.food}/${gameplayState.state.maxFood}`,
                     accentClass: gameplayState.state.food < 3 ? 'text-red-600' : 'text-green-600'
                   },
@@ -225,7 +227,7 @@ function MinimalGameplayPageContent(): JSX.Element {
           {/* SECTION 4: Roster (single instance) */}
           <div className="p-4">
             <StyleLabSurface variant="card" className="w-full">
-              <h3 className="text-lg font-semibold mb-4">Roster</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('idleVillage:ftue.roster', { defaultValue: 'Roster' })}</h3>
               <VillageRosterSection
                 residents={rosterResidents}
                 assignmentFeedback={undefined}
@@ -244,7 +246,7 @@ function MinimalGameplayPageContent(): JSX.Element {
           {/* SECTION 5: Slot Rack (simplified) */}
           <div className="p-4">
             <StyleLabSurface variant="card" className="w-full">
-              <h3 className="text-lg font-semibold mb-4">Available Activities</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('idleVillage:ftue.availableActivities', { defaultValue: 'Available Activities' })}</h3>
               <ResidentSlotRack
                 layout="board"
                 overflowBehavior="wrap"
@@ -266,9 +268,9 @@ function MinimalGameplayPageContent(): JSX.Element {
           {/* PLACEHOLDER: SlottedMetal (white box) */}
           <div className="p-4">
             <StyleLabSurface variant="card" className="w-full">
-              <h3 className="text-lg font-semibold mb-4">SlottedMetal (Placeholder)</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('idleVillage:ftue.slottedMetal', { defaultValue: 'SlottedMetal (Placeholder)' })}</h3>
               <div className="w-full h-32 bg-white rounded border border-gray-300 flex items-center justify-center">
-                <p className="text-gray-500">SlottedMetal component — To be developed</p>
+                <p className="text-gray-500">{t('idleVillage:ftue.slottedMetalPlaceholder', { defaultValue: 'SlottedMetal component — To be developed' })}</p>
               </div>
             </StyleLabSurface>
           </div>

@@ -7,6 +7,8 @@
  */
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import type { CSSProperties } from 'react';
+import type { TFunction } from 'i18next';
+import { useTranslation } from '@/localization/useTranslation';
 import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
 import { DEFAULT_IDLE_VILLAGE_CONFIG } from '@/balancing/config/idleVillage/defaultConfig';
 import { DEFAULT_MINIMAL_CONFIG } from '@/balancing/config/idleVillage/minimalConfig';
@@ -33,7 +35,7 @@ import { resolveResidentRackDisplayInfo } from '@/ui/idleVillage/slots/residentS
 import { useResidentDropValidation } from '@/ui/idleVillage/hooks/useResidentDropValidation';
 import { useResidentSlotController } from '@/ui/idleVillage/slots/useResidentSlotController';
 import type { ActivityCardKind, ActivityDefinition, StatRequirement } from '@/balancing/config/idleVillage/types';
-import type { ResidentSlotAssignResult } from '@/ui/idleVillage/slots/types';
+import type { ResidentSlotAssignResult, DropState } from '@/ui/idleVillage/slots/types';
 import type { DragFeedbackState } from '@/ui/idleVillage/components/ResidentRosterTypes';
 import { useActiveHUDState } from '@/ui/idleVillage/hooks/useActiveHUDState';
 import ActiveHUD from '@/ui/idleVillage/components/ActiveHUD';
@@ -108,8 +110,8 @@ interface ScenarioPanelApi {
 const RACK_SCENARIOS: RackScenario[] = [
   {
     id: 'open',
-    title: 'Rack A · Scenario permissivo',
-    subtitle: 'Richiede HP ≥ 200',
+    title: 'Rack A · Permissive scenario',
+    subtitle: 'Requires HP ≥ 200',
     minStaminaBeforeExhausted: 20, // Can work until stamina drops to 20%
     statRequirement: {
       label: 'HP ≥ 200',
@@ -118,13 +120,13 @@ const RACK_SCENARIOS: RackScenario[] = [
       const hp = resident.currentHp ?? resident.statSnapshot?.hp ?? 0;
       return hp >= 200
         ? { isValid: true }
-        : { isValid: false, message: `HP insufficiente (${hp}/200)` };
+        : { isValid: false, message: `HP insufficient (${hp}/200)` };
     },
   },
   {
     id: 'restricted',
-    title: 'Rack B · Scenario restrittivo',
-    subtitle: 'Richiede HP ≥ 200',
+    title: 'Rack B · Restrictive scenario',
+    subtitle: 'Requires HP ≥ 200',
     minStaminaBeforeExhausted: 30, // Higher stamina requirement for restricted slots
     statRequirement: {
       label: 'HP ≥ 200',
@@ -133,31 +135,44 @@ const RACK_SCENARIOS: RackScenario[] = [
       const hp = resident.currentHp ?? resident.statSnapshot?.hp ?? 0;
       return hp >= 200
         ? { isValid: true }
-        : { isValid: false, message: `HP insufficiente (${hp}/200)` };
+        : { isValid: false, message: `HP insufficient (${hp}/200)` };
     },
   },
 ];
 
 
-const dropStateCopy: Record<DropState, string> = {
-  idle: 'Idle',
-  valid: 'Valid',
-  invalid: 'Invalid',
-  locked: 'Locked',
-};
-
 const getScenarioActivityId = (scenario: RackScenario) => `slot-lab-${scenario.id}`;
+
+function getRackScenarios(t: TFunction<'idleVillage'>): RackScenario[] {
+  return RACK_SCENARIOS.map((scenario) => {
+    const scenarioKey = `idleVillage:testRoster.scenarios.${scenario.id}`;
+    return {
+      ...scenario,
+      title: t(`${scenarioKey}.title` as any, { defaultValue: scenario.title }),
+      subtitle: t(`${scenarioKey}.subtitle` as any, { defaultValue: scenario.subtitle }),
+      statRequirement: {
+        label: t(`${scenarioKey}.requirement` as any, { defaultValue: scenario.statRequirement?.label ?? 'Any' }),
+      },
+      validator: (resident) => {
+        const hp = resident.currentHp ?? resident.statSnapshot?.hp ?? 0;
+        return hp >= 200
+          ? { isValid: true }
+          : { isValid: false, message: t(`${scenarioKey}.hpInsufficient` as any, { defaultValue: 'HP insufficient ({hp}/200)', hp }) };
+      },
+    };
+  });
+}
 
 const buildScenarioActivityDefinition = (scenario: RackScenario): ActivityDefinition => ({
   id: getScenarioActivityId(scenario),
   label: scenario.title,
   description: scenario.subtitle,
   tags: ['slot_lab', scenario.id],
-  slotTags: scenario.statRequirement?.allOf ?? ['test-harness'],
+  slotTags: (scenario.statRequirement?.allOf as string[] | undefined) ?? ['test-harness'],
   resolutionEngineId: 'slot-lab-harness',
   durationFormula: `${SLOT_LAB_CONFIG.timer.totalDurationSeconds}`,
   maxSlots: 'infinite',
-  statRequirement: scenario.statRequirement ?? { label: 'Qualsiasi' },
+  statRequirement: scenario.statRequirement ?? { label: 'Any' },
 });
 
 const buildInitialAssignments = (): Record<RackScenarioKey, Record<string, string | null>> =>
@@ -216,6 +231,7 @@ const RackScenarioPanel: React.FC<RackScenarioPanelProps> = ({
   const activityDefinition = useMemo(() => buildScenarioActivityDefinition(scenario), [scenario]);
   const rackTestId = scenario.id === 'open' ? 'slot-rack-A' : scenario.id === 'restricted' ? 'slot-rack-B' : `slot-rack-${scenario.id}`;
   const panelTestId = `slot-lab-panel-${scenario.id}`;
+  const { t } = useTranslation('idleVillage');
 
   const {
     slots,
@@ -249,7 +265,7 @@ const RackScenarioPanel: React.FC<RackScenarioPanelProps> = ({
             const errorResult: ResidentSlotAssignResult = {
               success: false,
               reason: 'VALIDATION_FAILED',
-              details: validation.message ?? 'Requisito dello scenario non soddisfatto',
+              details: validation.message ?? t('idleVillage:testRoster.validation.scenarioRequirementNotMet', { defaultValue: 'Scenario requirement not met' }),
               slotId,
             };
             // Notify UI to show error message
@@ -276,7 +292,7 @@ const RackScenarioPanel: React.FC<RackScenarioPanelProps> = ({
               return {
                 success: false,
                 reason: 'VALIDATION_FAILED',
-                details: 'Drop fuori area valida'
+                details: t('idleVillage:testRoster.validation.dropOutsideValidArea', { defaultValue: 'Drop outside valid area' })
               } as ResidentSlotAssignResult;
             }
 
@@ -302,19 +318,17 @@ const RackScenarioPanel: React.FC<RackScenarioPanelProps> = ({
   }, [assignments, residentsById]);
 
   const lastAttemptMessage = useMemo(() => {
-    if (!lastAttempt) return 'Nessuna interazione registrata';
+    if (!lastAttempt) return t('idleVillage:testRoster.lastAttempt.none', { defaultValue: 'No interaction recorded' });
     if (lastAttempt.result.success) {
       const resident = lastAttempt.residentId ? residentsById[lastAttempt.residentId] : undefined;
-      return resident ? `Successo · ${formatResidentLabel(resident)}` : 'Successo';
+      return resident
+        ? t('idleVillage:testRoster.lastAttempt.successWithResident', { defaultValue: 'Success · {resident}', resident: formatResidentLabel(resident) })
+        : t('idleVillage:testRoster.lastAttempt.success', { defaultValue: 'Success' });
     }
-    // Type guard for failure case
-    if (!lastAttempt.result.success) {
-      const reason = (lastAttempt.result as any).reason;
-      const details = (lastAttempt.result as any).details ? ` · ${(lastAttempt.result as any).details}` : '';
-      return `Errore · ${reason}${details}`;
-    }
-    return 'Errore · sconosciuto';
-  }, [lastAttempt, residentsById]);
+    const reason = (lastAttempt.result as any).reason ?? '';
+    const details = (lastAttempt.result as any).details ? ` · ${(lastAttempt.result as any).details}` : '';
+    return t('idleVillage:testRoster.lastAttempt.errorWithDetails', { defaultValue: 'Error · {reason}{details}', reason, details });
+  }, [lastAttempt, residentsById, t]);
 
   const hoverValidation = useMemo(() => {
     if (!scenario.validator || !hoveredResidentId) return null;
@@ -378,16 +392,17 @@ const RackScenarioPanel: React.FC<RackScenarioPanelProps> = ({
           {scenario.title}
         </h3>
         <p className="text-xs text-white/70">{scenario.subtitle}</p>
+        <p className="text-[10px] text-white/50">{lastAttemptMessage}</p>
       </div>
 
       <div className="flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.25em]" style={{ color: 'var(--minimal-text-secondary)' }}>
         <span className={`rounded-full border border-white/10 px-2 py-0.5 text-[10px] font-semibold ${dropStateTone}`}>
-          Drop: {dropStateCopy[effectiveDropState]}
+          {t('idleVillage:testRoster.debug.drop')}: {t('idleVillage:testRoster.debug.dropStates.' + effectiveDropState, { defaultValue: effectiveDropState })}
         </span>
-        <span>Slots: {slots.length}</span>
-        <span>Warnings: {warnings.length}</span>
+        <span>{t('idleVillage:testRoster.debug.slots')}: {slots.length}</span>
+        <span>{t('idleVillage:testRoster.debug.warnings')}: {warnings.length}</span>
         {scenario.minStaminaBeforeExhausted && (
-          <span>Stamina &gt; {scenario.minStaminaBeforeExhausted}</span>
+          <span>{t('idleVillage:testRoster.debug.stamina')} {scenario.minStaminaBeforeExhausted}</span>
         )}
         {hoverValidation?.message && (
           <span className="text-amber-300">{hoverValidation.message}</span>
@@ -398,7 +413,7 @@ const RackScenarioPanel: React.FC<RackScenarioPanelProps> = ({
           className="rounded-full border border-white/15 px-3 py-0.5 text-[10px] uppercase tracking-[0.2em] text-white/80 transition hover:border-white/40 hover:text-white disabled:opacity-40"
           disabled={!primarySlot || pickerCandidates.length === 0}
         >
-          Apri picker
+          {t('idleVillage:testRoster.picker.button')}
         </button>
       </div>
 
@@ -434,12 +449,14 @@ const RackScenarioPanel: React.FC<RackScenarioPanelProps> = ({
 };
 
 const TestRosterPageContent: React.FC = () => {
+  const { t } = useTranslation('idleVillage');
   const { config: idleConfig } = useIdleVillageConfig();
   const resolvedIdleConfig = idleConfig ?? DEFAULT_IDLE_VILLAGE_CONFIG;
   const uiConfig = (DEFAULT_MINIMAL_CONFIG.ui ?? DEFAULT_MINIMAL_CONFIG.ui) as MinimalUIConfig;
   const styleTokens = useMinimalStyleLabTokens(uiConfig);
   const harnessResidentDefaults = SLOT_LAB_CONFIG.residentDefaults;
   const harnessStartingFatigue = harnessResidentDefaults.startingFatigue;
+  const scenarios = useMemo(() => getRackScenarios(t), [t]);
   
   // Use canonical Village Resident Store
   const {
@@ -991,30 +1008,6 @@ const [dragVisualState, setDragVisualState] = useState<DragVisualState>({ mode: 
     [resolvedIdleConfig.globalRules.startingResources],
   );
 
-  const timeEngineResourceSummaries = useMemo(
-    () => {
-      const definitions = resolvedIdleConfig.resources ?? {};
-      return [
-        {
-          id: 'gold',
-          label: definitions.gold?.label ?? 'Gold',
-          icon: definitions.gold?.icon ?? '🪙',
-        },
-        {
-          id: 'wood',
-          label: definitions.wood?.label ?? 'Wood',
-          icon: definitions.wood?.icon ?? '🪵',
-        },
-        {
-          id: 'stone',
-          label: definitions.stone?.label ?? 'Stone',
-          icon: definitions.stone?.icon ?? '🪨',
-        },
-      ];
-    },
-    [resolvedIdleConfig.resources],
-  );
-
   const hudVillageState = useMemo<VillageState>(() => {
     const activityMap = hudActivities.reduce<Record<string, ScheduledActivity>>((acc, activity) => {
       acc[activity.id] = activity;
@@ -1228,7 +1221,8 @@ const [dragVisualState, setDragVisualState] = useState<DragVisualState>({ mode: 
     
     // Reset visual state
     setDragVisualState({ mode: 'idle' });
-  }, [handleScenarioAssignmentResult]);
+    setActiveId(null);
+  }, [handleScenarioAssignmentResult, setActiveId]);
 
   const handleRosterSelect = useCallback(
     (residentId: string) => {
@@ -1342,13 +1336,15 @@ const [dragVisualState, setDragVisualState] = useState<DragVisualState>({ mode: 
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
     const residentId = event.active.id as string;
-    
+
+    setActiveId(residentId);
+
     // STEP 2: Set premium visual state
     setDragVisualState({
       mode: 'dragging',
       residentId,
     });
-  }, []);
+  }, [setActiveId]);
 
 
   const handleDragMove = useCallback((event: DragMoveEvent) => {
@@ -1413,6 +1409,8 @@ const [dragVisualState, setDragVisualState] = useState<DragVisualState>({ mode: 
     lastDragEndTimeRef.current = Date.now();
     lastDraggedResidentRef.current = (event.active?.id as string) || null;
 
+    setActiveId(null);
+
     const { active, over } = event;
 
     // CRITICAL FIX: If dropped outside any droppable (over is null), do NOT trigger any assignment
@@ -1448,7 +1446,7 @@ const [dragVisualState, setDragVisualState] = useState<DragVisualState>({ mode: 
               handleScenarioAssignmentResult(scenarioId, {
                 success: false,
                 reason: 'VALIDATION_FAILED',
-                details: customValidation.message ?? 'Requisito non soddisfatto',
+                details: customValidation.message ?? t('idleVillage:testRoster.validation.scenarioRequirementNotMet', { defaultValue: 'Scenario requirement not met' }),
               }, residentId);
 
               setDragVisualState({ mode: 'idle' }); // STEP 3: Reset on validation fail
@@ -1538,18 +1536,21 @@ const [dragVisualState, setDragVisualState] = useState<DragVisualState>({ mode: 
   const rosterFeedback = useMemo(() => {
     const attempt = lastAttemptByScenario.open;
     if (!attempt) return null;
+    const rack = t('idleVillage:testRoster.rosterFeedback.rack', { defaultValue: 'Rack A' });
     if (attempt.result.success) {
       const resident = attempt.residentId ? residentsById[attempt.residentId] : undefined;
-      return resident ? `Rack A · assegnato ${formatResidentLabel(resident)}` : 'Rack A · assegnato';
+      return resident
+        ? t('idleVillage:testRoster.rosterFeedback.assigned', { defaultValue: '{rack} · assigned {resident}', rack, resident: formatResidentLabel(resident) })
+        : t('idleVillage:testRoster.rosterFeedback.assignedNoResident', { defaultValue: '{rack} · assigned', rack });
     }
     // Type guard for failure case
     if (!attempt.result.success) {
       const reason = (attempt.result as any).reason;
       const details = (attempt.result as any).details ? ` · ${(attempt.result as any).details}` : '';
-      return `Rack A · ${reason}${details}`;
+      return t('idleVillage:testRoster.rosterFeedback.error', { defaultValue: '{rack} · {reason}{details}', rack, reason, details });
     }
-    return 'Rack A · invalid';
-  }, [lastAttemptByScenario, residentsById]);
+    return t('idleVillage:testRoster.rosterFeedback.invalid', { defaultValue: '{rack} · invalid', rack });
+  }, [lastAttemptByScenario, residentsById, t]);
 
   const handleMiniLabPresetChange = useCallback((presetId: ThemePresetId) => {
     lastManualPresetRef.current = presetId;
@@ -1660,7 +1661,7 @@ const [dragVisualState, setDragVisualState] = useState<DragVisualState>({ mode: 
                   onClick={handleRandomizeTheme}
                   className="rounded-full border border-white/30 px-4 py-1 text-[11px] uppercase tracking-[0.3em] text-white/80 transition-colors hover:text-white"
                 >
-                  Randomize
+                  {t('idleVillage:testRoster.controls.randomize')}
                 </button>
                 {isRandomized && (
                   <button
@@ -1668,7 +1669,7 @@ const [dragVisualState, setDragVisualState] = useState<DragVisualState>({ mode: 
                     onClick={handleResetRandomization}
                     className="rounded-full border border-dashed border-white/30 px-4 py-1 text-[11px] uppercase tracking-[0.3em] text-white/60 hover:text-white"
                   >
-                    Reset
+                    {t('idleVillage:testRoster.controls.reset')}
                   </button>
                 )}
               </StyleLabStack>
@@ -1693,7 +1694,7 @@ const [dragVisualState, setDragVisualState] = useState<DragVisualState>({ mode: 
                   totalSeconds={totalDurationSeconds}
                   onToggle={handleTimeEngineToggle}
                   variant="solar"
-                  label="Day/Night Cycle"
+                  label={t('idleVillage:testRoster.controls.dayNightCycle')}
                   clockProps={{
                     currentDay: timeEngineState.currentDay,
                     isPaused: timeEngineState.isPaused,
@@ -1711,7 +1712,6 @@ const [dragVisualState, setDragVisualState] = useState<DragVisualState>({ mode: 
                   compact
                   showClockDetails={false}
                   maxVisibleActivities={2}
-                  resourceSummaries={timeEngineResourceSummaries}
                 />
               </StyleLabSurface>
             </div>
@@ -1720,7 +1720,7 @@ const [dragVisualState, setDragVisualState] = useState<DragVisualState>({ mode: 
 
             {isLoading && (
               <StyleLabSurface variant="card" className="text-center text-sm" style={{ color: 'var(--minimal-text-secondary)' }}>
-                Caricamento roster…
+                {t('idleVillage:testRoster.loading')}
               </StyleLabSurface>
             )}
 
@@ -1728,22 +1728,22 @@ const [dragVisualState, setDragVisualState] = useState<DragVisualState>({ mode: 
               <StyleLabSurface variant="card" className="text-center p-6">
                 <div className="space-y-4">
                   <div className="text-lg font-semibold" style={{ color: 'var(--minimal-danger-color)' }}>
-                    ⚠️ Errore nel Caricamento
+                    ⚠️ {t('idleVillage:testRoster.error.title')}
                   </div>
                   <div className="text-sm" style={{ color: 'var(--minimal-text-secondary)' }}>
                     {error}
                   </div>
                   <div className="text-xs" style={{ color: 'var(--minimal-text-tertiary)' }}>
-                    Per eseguire i test, caricare prima i residenti dal Character Manager.
+                    {t('idleVillage:testRoster.error.description')}
                   </div>
                   <div className="mt-4 p-3 rounded" style={{ backgroundColor: 'var(--minimal-surface-elevated)' }}>
                     <div className="text-xs font-mono" style={{ color: 'var(--minimal-text-secondary)' }}>
-                      Azioni suggerite:
+                      {t('idleVillage:testRoster.error.suggestedActions')}
                     </div>
                     <ul className="text-xs mt-2 space-y-1" style={{ color: 'var(--minimal-text-tertiary)' }}>
-                      <li>• Verificare che il Character Manager contenga residenti</li>
-                      <li>• Ricaricare la pagina dopo aver configurato i dati</li>
-                      <li>• Controllare la console per eventuali errori di caricamento</li>
+                      <li>• {t('idleVillage:testRoster.error.actions.0', { defaultValue: 'Verify the Character Manager contains residents.' })}</li>
+                      <li>• {t('idleVillage:testRoster.error.actions.1', { defaultValue: 'Reload the page after configuring data.' })}</li>
+                      <li>• {t('idleVillage:testRoster.error.actions.2', { defaultValue: 'Check the console for loading errors.' })}</li>
                     </ul>
                   </div>
                 </div>
@@ -1752,9 +1752,9 @@ const [dragVisualState, setDragVisualState] = useState<DragVisualState>({ mode: 
 
             {usedFallback && !error && (
               <StyleLabSurface variant="card" className="text-center text-sm" style={{ color: 'var(--minimal-warning-color)' }}>
-                <div className="font-semibold">Mock roster attivo</div>
+                <div className="font-semibold">{t('idleVillage:testRoster.mockRoster.title')}</div>
                 <div className="text-xs text-white/70">
-                  Il Character Manager è vuoto: stiamo usando il roster minimal predefinito per consentire il test del drag.
+                  {t('idleVillage:testRoster.mockRoster.description')}
                 </div>
               </StyleLabSurface>
             )}
@@ -1762,10 +1762,10 @@ const [dragVisualState, setDragVisualState] = useState<DragVisualState>({ mode: 
             <StyleLabSurface variant="card" className="flex items-center justify-between gap-4" testId="slot-debug-visualization-toggle">
               <div>
                 <div className="text-sm font-semibold" style={{ color: 'var(--minimal-text-primary)' }}>
-                  Slot debug visualization
+                  {t('idleVillage:testRoster.debug.toggle')}
                 </div>
                 <div className="text-xs text-white/70">
-                  Evidenzia ghiera, medaglia e token per il confronto DOM.
+                  {t('idleVillage:testRoster.debug.toggleDescription')}
                 </div>
               </div>
               <button
@@ -1775,7 +1775,7 @@ const [dragVisualState, setDragVisualState] = useState<DragVisualState>({ mode: 
                 onClick={() => void toggleSlotDebug()}
                 className={`rounded-full px-4 py-1 text-[11px] uppercase tracking-[0.3em] transition ${slotDebugSettings.enabled ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-300/40' : 'border border-white/20 text-white/60 hover:text-white'}`}
               >
-                {slotDebugSettings.enabled ? 'On' : 'Off'}
+                {slotDebugSettings.enabled ? t('idleVillage:testRoster.debug.on', { defaultValue: 'On' }) : t('idleVillage:testRoster.debug.off', { defaultValue: 'Off' })}
               </button>
             </StyleLabSurface>
 
@@ -1783,13 +1783,13 @@ const [dragVisualState, setDragVisualState] = useState<DragVisualState>({ mode: 
               <StyleLabSurface variant="card" className="text-center p-6">
                 <div className="space-y-4">
                   <div className="text-lg font-semibold" style={{ color: 'var(--minimal-warning-color)' }}>
-                    📋 Nessun Residente Caricato
+                    📋 {t('idleVillage:testRoster.empty.title')}
                   </div>
                   <div className="text-sm" style={{ color: 'var(--minimal-text-secondary)' }}>
-                    Il Character Manager non contiene residenti da testare.
+                    {t('idleVillage:testRoster.empty.description')}
                   </div>
                   <div className="text-xs" style={{ color: 'var(--minimal-text-tertiary)' }}>
-                    Configurare i residenti nel Character Manager per eseguire i test di drag & drop.
+                    {t('idleVillage:testRoster.empty.configureResidents', { defaultValue: 'Configure residents in the Character Manager to run drag & drop tests.' })}
                   </div>
                 </div>
               </StyleLabSurface>
@@ -1817,18 +1817,18 @@ const [dragVisualState, setDragVisualState] = useState<DragVisualState>({ mode: 
                   
                   {/* RACK A - Right side of roster */}
                   <RackScenarioPanel
-                    scenario={RACK_SCENARIOS[0]} // Rack A (open scenario)
+                    scenario={scenarios[0]} // Rack A (open scenario)
                     residentsById={residentsById}
                     hoveredResidentId={activeId}
-                    assignments={assignmentsByScenario[RACK_SCENARIOS[0].id] ?? {}}
+                    assignments={assignmentsByScenario[scenarios[0].id] ?? {}}
                     onAssign={handleScenarioAssign}
                     onClear={handleScenarioClear}
                     onAssignmentResult={handleScenarioAssignmentResult}
-                    lastAttempt={lastAttemptByScenario[RACK_SCENARIOS[0].id]}
+                    lastAttempt={lastAttemptByScenario[scenarios[0].id]}
                     registerScenarioApi={registerScenarioApi}
-                    pickerCandidates={resolvePickerCandidates(RACK_SCENARIOS[0])}
+                    pickerCandidates={resolvePickerCandidates(scenarios[0])}
                     onOpenPicker={({ slotId, slotMeta, candidates }) =>
-                      openPickerWithResidents(slotId, candidates, slotMeta, RACK_SCENARIOS[0].id)
+                      openPickerWithResidents(slotId, candidates, slotMeta, scenarios[0].id)
                     }
                     shakingSlotIds={shakingSlotIds}
                     miniLabPreset={miniLabPreset}
@@ -1839,18 +1839,18 @@ const [dragVisualState, setDragVisualState] = useState<DragVisualState>({ mode: 
                 {/* RACK B - Below */}
                 <section>
                   <RackScenarioPanel
-                    scenario={RACK_SCENARIOS[1]} // Rack B (restricted scenario)
+                    scenario={scenarios[1]} // Rack B (restricted scenario)
                     residentsById={residentsById}
                     hoveredResidentId={activeId}
-                    assignments={assignmentsByScenario[RACK_SCENARIOS[1].id] ?? {}}
+                    assignments={assignmentsByScenario[scenarios[1].id] ?? {}}
                     onAssign={handleScenarioAssign}
                     onClear={handleScenarioClear}
                     onAssignmentResult={handleScenarioAssignmentResult}
-                    lastAttempt={lastAttemptByScenario[RACK_SCENARIOS[1].id]}
+                    lastAttempt={lastAttemptByScenario[scenarios[1].id]}
                     registerScenarioApi={registerScenarioApi}
-                    pickerCandidates={resolvePickerCandidates(RACK_SCENARIOS[1])}
+                    pickerCandidates={resolvePickerCandidates(scenarios[1])}
                     onOpenPicker={({ slotId, slotMeta, candidates }) =>
-                      openPickerWithResidents(slotId, candidates, slotMeta, RACK_SCENARIOS[1].id)
+                      openPickerWithResidents(slotId, candidates, slotMeta, scenarios[1].id)
                     }
                     shakingSlotIds={shakingSlotIds}
                     miniLabPreset={miniLabPreset}
@@ -1885,14 +1885,14 @@ const [dragVisualState, setDragVisualState] = useState<DragVisualState>({ mode: 
                         };
                       })}
                       maxSlots={poiCapsuleDataWithUpdates.maxSlots}
-                      durationDisplay={`${Math.floor(poiCapsuleDataWithUpdates.totalDurationSeconds / 60)}m`}
-                      rewardDisplay="Resources + XP"
-                      etaDisplay={`${Math.floor((poiCapsuleDataWithUpdates.totalDurationSeconds - poiCapsuleDataWithUpdates.elapsedSeconds) / 60)}m`}
+                      durationDisplay={t('idleVillage:poiDetail.duration.minutes', { defaultValue: '{minutes}m', minutes: Math.floor(poiCapsuleDataWithUpdates.totalDurationSeconds / 60) })}
+                      rewardDisplay={t('idleVillage:poiDetail.reward.summary', { defaultValue: 'Resources + XP' })}
+                      etaDisplay={t('idleVillage:poiDetail.duration.minutes', { defaultValue: '{minutes}m', minutes: Math.floor((poiCapsuleDataWithUpdates.totalDurationSeconds - poiCapsuleDataWithUpdates.elapsedSeconds) / 60) })}
                       telemetry={[
                         {
                           id: '1',
                           timestamp: new Date(),
-                          message: 'Activity initialized',
+                          message: t('idleVillage:poiDetail.telemetry.initialized', { defaultValue: 'Activity initialized' }),
                           type: 'assign',
                         },
                       ]}

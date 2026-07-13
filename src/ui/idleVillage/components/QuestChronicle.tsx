@@ -1,6 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import type { QuestPhase, QuestPhaseResult, QuestPhaseType } from '@/balancing/config/idleVillage/types';
 import idleVillagePanorama from '@/assets/ui/idleVillage/idle-village-map.jpg';
+import type { LoreDrop } from '@/balancing/config/lore/loreDropTypes';
+import { useQuestLoreDrop } from '@/ui/idleVillage/hooks/useQuestLoreDrop';
+import { useTranslation } from '@/localization/useTranslation';
 
 export type PhaseVisualState = 'locked' | 'active' | 'success' | 'failure';
 
@@ -25,8 +28,14 @@ export interface QuestChronicleProps {
   activePhaseProgress?: number;
   outcome?: QuestChronicleOutcome;
   questDone?: boolean;
+  /** Runtime entity id used to auto-assign a lore drop. */
+  questId?: string;
+  /** Entity tags used for lore drop matching. */
+  questTags?: string[];
   onOpenTheater?: () => void;
   panoramaUrl?: string;
+  loreDrop?: LoreDrop | null;
+  loreDropDiscovered?: boolean;
 }
 
 const RISK_FALLBACKS: Record<QuestPhaseType, { injury: number; death: number }> = {
@@ -121,11 +130,16 @@ const QuestChronicle: React.FC<QuestChronicleProps> = ({
   currentPhaseIndex,
   activePhaseProgress = 0,
   outcome: _outcome,
-  questDone: _questDone,
+  questDone,
+  questId,
+  questTags,
   onOpenTheater,
   panoramaUrl,
+  loreDrop,
+  loreDropDiscovered = false,
 }) => {
   const [isNarrativeExpanded, setIsNarrativeExpanded] = useState(true);
+  const { t } = useTranslation('idleVillage');
 
   const cards: DerivedCard[] = useMemo(() => {
     return phases.map((entry, index) => {
@@ -167,11 +181,25 @@ const QuestChronicle: React.FC<QuestChronicleProps> = ({
     return 'pending';
   })();
 
-  const boardLabel = boardStatus === 'success'
-    ? 'Ultima prova superata'
-    : boardStatus === 'failure'
-      ? 'Prova fallita'
-      : 'In attesa di esito dalla pattuglia';
+  const isQuestResolved = boardStatus !== 'pending';
+  const questLore = useQuestLoreDrop({
+    entityId: questId,
+    entityType: 'quest',
+    tags: questTags,
+    completed: questDone ?? isQuestResolved,
+  });
+  const effectiveLoreDrop = loreDrop ?? questLore.loreDrop;
+  const effectiveLoreDropDiscovered = loreDropDiscovered ?? questLore.isDiscovered;
+
+  const boardLabel = useMemo(() => {
+    if (boardStatus === 'success') {
+      return t('idleVillage:questChronicle.boardStatus.success', { defaultValue: 'Last trial passed' });
+    }
+    if (boardStatus === 'failure') {
+      return t('idleVillage:questChronicle.boardStatus.failure', { defaultValue: 'Trial failed' });
+    }
+    return t('idleVillage:questChronicle.boardStatus.pending', { defaultValue: 'Waiting for patrol outcome' });
+  }, [boardStatus, t]);
 
   const activeNarrative = cards[currentPhaseIndex]?.phase.copy?.narrative ?? null;
   const backgroundImage = panoramaUrl ?? idleVillagePanorama;
@@ -241,7 +269,7 @@ const QuestChronicle: React.FC<QuestChronicleProps> = ({
                 cursor: 'pointer',
               }}
             >
-              Apri Teatro
+              {t('idleVillage:questChronicle.openTheater', { defaultValue: 'Open Theater' })}
             </button>
           )}
           {/* Title block */}
@@ -255,7 +283,7 @@ const QuestChronicle: React.FC<QuestChronicleProps> = ({
               color: 'rgba(195,155,55,.58)',
               marginBottom: 4,
             }}>
-              Quest Chronicle
+              {t('idleVillage:questChronicle.title', { defaultValue: 'Quest Chronicle' })}
             </div>
             <div style={{
               fontSize: 'clamp(13px, 2.2vw, 28px)',
@@ -328,7 +356,7 @@ const QuestChronicle: React.FC<QuestChronicleProps> = ({
                   onClick={() => setIsNarrativeExpanded((p) => !p)}
                 >
                   <span style={{ width: 11, height: 1, background: 'rgba(190,145,50,.26)', flexShrink: 0 }} />
-                  Diario
+                  {t('idleVillage:questChronicle.journal', { defaultValue: 'Journal' })}
                 </div>
                 {isNarrativeExpanded && (
                   <div style={{
@@ -337,7 +365,25 @@ const QuestChronicle: React.FC<QuestChronicleProps> = ({
                     fontStyle: 'italic',
                     color: 'rgba(215,200,165,.75)',
                   }}>
-                    {activeNarrative ?? 'La pattuglia avanza tra le rovine — ogni passo potrebbe essere l\'ultimo.'}
+                    {effectiveLoreDrop ? (
+                      <div>
+                        <div style={{ fontWeight: 600, color: 'rgba(230,200,130,.92)', marginBottom: '0.6em' }}>
+                          {t(effectiveLoreDrop.titleKey ?? effectiveLoreDrop.title ?? '')}
+                          {!effectiveLoreDropDiscovered && (
+                            <span style={{ marginLeft: 8, fontSize: '0.85em', opacity: 0.6 }}>🔒</span>
+                          )}
+                        </div>
+                        {effectiveLoreDropDiscovered ? (
+                          <div>{t(effectiveLoreDrop.bodyKey ?? effectiveLoreDrop.body ?? '')}</div>
+                        ) : (
+                          <div style={{ opacity: 0.7 }}>
+                            {t('lore:questChronicle.loreLocked')}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      activeNarrative ?? t('lore:questChronicle.defaultNarrative')
+                    )}
                   </div>
                 )}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap' }}>
@@ -353,7 +399,9 @@ const QuestChronicle: React.FC<QuestChronicleProps> = ({
                       color: boardStatus === 'success' ? 'rgba(105,225,165,.9)' : 'rgba(255,130,130,.9)',
                       background: boardStatus === 'success' ? 'rgba(10,80,50,.2)' : 'rgba(80,10,20,.2)',
                     }}>
-                      {boardStatus === 'success' ? 'Successo' : 'Fallimento'}
+                      {boardStatus === 'success'
+                        ? t('idleVillage:questChronicle.outcome.success', { defaultValue: 'Success' })
+                        : t('idleVillage:questChronicle.outcome.failure', { defaultValue: 'Failure' })}
                     </span>
                   )}
                   <span style={{
@@ -429,6 +477,7 @@ interface PhaseCardProps {
 }
 
 const PhaseCard: React.FC<PhaseCardProps> = ({ card }) => {
+  const { t } = useTranslation('idleVillage');
   const pal = PAL[card.variant];
   const sat = saturation(card.state, card.progressFraction);
   const bri = brightness(card.state, card.progressFraction);
@@ -446,7 +495,7 @@ const PhaseCard: React.FC<PhaseCardProps> = ({ card }) => {
         letterSpacing: '0.15em',
         color: 'rgba(245,158,11,.75)',
       }}>
-        {card.injury}% ferita
+        {t('idleVillage:questChronicle.risk.injury', { percent: card.injury, defaultValue: '{percent}% injury' })}
       </span>
     );
   }
@@ -458,7 +507,7 @@ const PhaseCard: React.FC<PhaseCardProps> = ({ card }) => {
         letterSpacing: '0.15em',
         color: 'rgba(244,63,94,.75)',
       }}>
-        {card.death}% morte
+        {t('idleVillage:questChronicle.risk.death', { percent: card.death, defaultValue: '{percent}% death' })}
       </span>
     );
   }
@@ -561,7 +610,7 @@ const PhaseCard: React.FC<PhaseCardProps> = ({ card }) => {
             color: 'rgba(115,130,140,.5)',
             display: 'block',
           }}>
-            {card.phase.type}
+            {t(`idleVillage:questChronicle.phaseType.${card.phase.type}` as any, { defaultValue: card.phase.type })}
           </span>
           {risks.length > 0 && (
             <div style={{ display: 'flex', gap: 4, justifyContent: 'center', marginTop: 3 }}>

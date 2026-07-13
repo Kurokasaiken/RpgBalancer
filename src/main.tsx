@@ -6,6 +6,7 @@ import './ui/wanderlust-surface/wanderlust-surface.css';
 import './ui/idleVillage/skins/skinScope.css';
 import V8GlobalFilters from './ui/styleLab/components/V8GlobalFilters';
 import { WanderlustSurfaceDefs } from './ui/wanderlust-surface';
+import { I18nProvider } from './localization/I18nProvider';
 
 const rootElement = document.getElementById('root');
 
@@ -20,9 +21,11 @@ if (isMinimalEntry) {
     .then(({ AppMinimal }) => {
       createRoot(rootElement).render(
         <StrictMode>
-          <V8GlobalFilters />
-          <WanderlustSurfaceDefs />
-          <AppMinimal />
+          <I18nProvider>
+            <V8GlobalFilters />
+            <WanderlustSurfaceDefs />
+            <AppMinimal />
+          </I18nProvider>
         </StrictMode>
       );
     })
@@ -90,12 +93,14 @@ if (isMinimalEntry) {
       try {
         createRoot(rootElement).render(
           <StrictMode>
-            <V8GlobalFilters />
-            <WanderlustSurfaceDefs />
-            <DensityProvider>
-              <App />
-              <Toaster />
-            </DensityProvider>
+            <I18nProvider>
+              <V8GlobalFilters />
+              <WanderlustSurfaceDefs />
+              <DensityProvider>
+                <App />
+                <Toaster />
+              </DensityProvider>
+            </I18nProvider>
           </StrictMode>
         );
       } catch (error) {

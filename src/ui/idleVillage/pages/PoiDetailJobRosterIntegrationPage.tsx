@@ -1,19 +1,19 @@
 /**
- * PoiDetailRosterIntegrationPage — POI + Roster + real POI Detail
+ * PoiDetailJobRosterIntegrationPage — Job POI + Roster + real POI Detail
  *
  * Pagina di test in /test-hub che integra un roster draggabile con un vero POI
- * proveniente dalla configurazione Idle Village. Al click sul medaglione POI si
+ * job proveniente dalla configurazione Idle Village. Al click sul medaglione POI si
  * apre il pannello dettaglio (ActivityCapsuleDetailSkinAware) con i dati reali
  * dell'attività e un vero slot rack interattivo alimentato da
  * useResidentSlotController.
  *
- * L'attività predefinita è la stessa quest di riferimento usata da
- * /poi-detail-verification (quest_dangerous_hunt) in modo che il dettaglio POI
- * sia visivamente identico alla pagina di verification.
+ * Route: /poi-job-detail-roster-integration
  */
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import type { FC } from 'react';
+import type { TFunction } from 'i18next';
+import { useTranslation } from '@/localization/useTranslation';
 import {
   DndContext,
   PointerSensor,
@@ -42,7 +42,7 @@ import { useResidentSlotController } from '@/ui/idleVillage/slots/useResidentSlo
 import { buildStatRequirementRows } from '@/ui/idleVillage/utils/statRequirementDisplay';
 import type { ResidentSlotBlueprint } from '@/ui/idleVillage/slots/types';
 import { DEFAULT_IDLE_VILLAGE_CONFIG } from '@/balancing/config/idleVillage/defaultConfig';
-import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
+import type { ActivityDefinition, ActivityMaxSlots } from '@/balancing/config/idleVillage/types';
 import { evaluateStatRequirement } from '@/engine/game/idleVillage/statMatching';
 import { useDragOutcome, elementCenter } from '@/ui/idleVillage/interaction/useDragOutcome';
 import { DragOutcomeFlight } from '@/ui/idleVillage/interaction/DragOutcomeFlight';
@@ -52,36 +52,38 @@ import { formatResidentLabel } from '@/ui/idleVillage/residentName';
 import { getResidentPortraitUrl } from '@/engine/game/idleVillage/residentVisualResolver';
 import { StyleLabSurface } from '@/ui/styleLab/StyleLabSurface';
 
-/** Attività di riferimento usata dalla pagina di verification. */
-const DEFAULT_ACTIVITY = DEFAULT_IDLE_VILLAGE_CONFIG.activities.quest_dangerous_hunt;
+/** Attività di default: raccolta di legname stabile (job). */
+const DEFAULT_ACTIVITY = DEFAULT_IDLE_VILLAGE_CONFIG.activities.job_wood_gathering_stable;
 const DEFAULT_ACTIVITY_ID = DEFAULT_ACTIVITY.id;
 
 /** Elenco attività reali escluse le voci di test. */
 const ACTIVITIES = Object.values(DEFAULT_IDLE_VILLAGE_CONFIG.activities).filter(
-  (a) => !a.tags.includes('test'),
+  (a) => !a.tags.includes('test') && getActivityKind(a) === 'job',
 );
 
 /** Dati di esempio del registro eventi, identici a quelli di verification. */
-const mockTelemetry: TelemetryEntry[] = [
-  {
-    id: 'tel-1',
-    timestamp: new Date(Date.now() - 3600000),
-    message: 'Activity started',
-    type: 'start',
-  },
-  {
-    id: 'tel-2',
-    timestamp: new Date(Date.now() - 1800000),
-    message: 'Worker assigned to slot 3',
-    type: 'assign',
-  },
-  {
-    id: 'tel-3',
-    timestamp: new Date(Date.now() - 600000),
-    message: 'Progress update: 65%',
-    type: 'done',
-  },
-];
+function getMockTelemetry(t: TFunction<'idleVillage'>): TelemetryEntry[] {
+  return [
+    {
+      id: 'tel-1',
+      timestamp: new Date(Date.now() - 3600000),
+      message: t('idleVillage:poiDetail.telemetry.initialized', { defaultValue: 'Activity started' }),
+      type: 'start',
+    },
+    {
+      id: 'tel-2',
+      timestamp: new Date(Date.now() - 1800000),
+      message: t('idleVillage:poiDetail.telemetry.workerAssigned', { defaultValue: '{worker} assigned to slot {slotNumber}', worker: t('idleVillage:activityCapsule.workerAlt', { defaultValue: 'Worker' }), slotNumber: 3 }),
+      type: 'assign',
+    },
+    {
+      id: 'tel-3',
+      timestamp: new Date(Date.now() - 600000),
+      message: t('idleVillage:poiDetail.telemetry.progressUpdate', { defaultValue: 'Progress update: {percent}%', percent: 65 }),
+      type: 'done',
+    },
+  ];
+}
 
 type ActivityKind = 'job' | 'quest' | 'training' | 'maintenance';
 
@@ -93,7 +95,8 @@ function getActivityKind(activity: ActivityDefinition): ActivityKind {
 }
 
 function getActivityIcon(activity: ActivityDefinition): string {
-  // Same icon used in the verification page for Dangerous Hunt.
+  // Job- and quest-specific icons resolved from config.
+  if (activity.id === 'job_wood_gathering_stable') return '🪵';
   if (activity.id === 'quest_dangerous_hunt') return '🏹';
   const meta = activity.metadata as Record<string, unknown> | undefined;
   if (typeof meta?.icon === 'string' && meta.icon) return meta.icon;
@@ -106,33 +109,29 @@ function getActivityIcon(activity: ActivityDefinition): string {
   return '⭐';
 }
 
-function formatSeconds(value: number): string {
-  if (Number.isNaN(value)) return '—';
+function formatSeconds(value: number, t: TFunction<'idleVillage'>): string {
+  if (Number.isNaN(value)) return t('idleVillage:poiDetail.duration.none', { defaultValue: '—' });
   if (value >= 1000) {
     const seconds = value / 1000;
-    return Number.isInteger(seconds) ? `${seconds}s` : `${seconds.toFixed(1)}s`;
+    return t('idleVillage:poiDetail.duration.seconds', { defaultValue: '{seconds}s', seconds: Number.isInteger(seconds) ? seconds : Number(seconds.toFixed(1)) });
   }
-  if (value >= 60) return `${Math.ceil(value / 60)}m`;
-  return `${value}ms`;
+  if (value >= 60) return t('idleVillage:poiDetail.duration.minutes', { defaultValue: '{minutes}m', minutes: Math.ceil(value / 60) });
+  return t('idleVillage:poiDetail.duration.milliseconds', { defaultValue: '{ms}ms', ms: value });
 }
 
-function formatRewards(activity: ActivityDefinition): string {
+function formatRewards(activity: ActivityDefinition, t: TFunction<'idleVillage'>): string {
   const parts: string[] = [];
   if (activity.rewards && activity.rewards.length > 0) {
     parts.push(
-      activity.rewards.map((r) => `${r.resourceId}: +${r.amountFormula}`).join(', '),
+      activity.rewards.map((r) => t('idleVillage:poiDetail.reward.single', { defaultValue: '{resourceId}: +{amountFormula}', resourceId: r.resourceId, amountFormula: r.amountFormula })).join(', '),
     );
   }
   if (activity.dailyRewardProfile && activity.dailyRewardProfile.length > 0) {
     parts.push(
-      activity.dailyRewardProfile.map((r) => `${r.resourceId}/day ${r.amountPerDay}`).join(', '),
+      activity.dailyRewardProfile.map((r) => t('idleVillage:poiDetail.reward.daily', { defaultValue: '{resourceId}/day {amountPerDay}', resourceId: r.resourceId, amountPerDay: r.amountPerDay })).join(', '),
     );
   }
-  return parts.length > 0 ? parts.join(' · ') : '—';
-}
-
-function formatRequirementLabel(req?: ResidentSlotBlueprint['requirement']): string {
-  return req?.label ?? 'Any';
+  return parts.length > 0 ? parts.join(t('idleVillage:poiDetail.reward.separator', { defaultValue: ' · ' })) : t('idleVillage:poiDetail.reward.none', { defaultValue: '—' });
 }
 
 function buildSlotBlueprints(activity: ActivityDefinition): ResidentSlotBlueprint[] | undefined {
@@ -157,9 +156,11 @@ interface DroppablePoiProps {
   progress: number;
   timeRemainingMs?: number;
   isExpirable?: boolean;
-  riskBadges?: { label: string; value: string }[];
+  injuryRisk?: number;
+  deathRisk?: number;
+  dangerRating?: string;
   canAcceptDrop: boolean;
-  onClick: () => void;
+  onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
 }
 
 function DroppablePoi({
@@ -169,10 +170,13 @@ function DroppablePoi({
   progress,
   timeRemainingMs,
   isExpirable,
-  riskBadges,
+  injuryRisk,
+  deathRisk,
+  dangerRating,
   canAcceptDrop,
   onClick,
 }: DroppablePoiProps) {
+  const { t } = useTranslation('idleVillage');
   const { setNodeRef } = useDroppable({
     id: dropId,
     disabled: !canAcceptDrop,
@@ -195,24 +199,8 @@ function DroppablePoi({
       style={getBloomStyle(highlightState, 200)}
       role="button"
       tabIndex={0}
-      aria-label={`${label} — clicca per aprire il detail`}
+      aria-label={`${label} — ${t('idleVillage:poiDetail.openDetail', { defaultValue: 'click to open details' })}`}
     >
-      <div className="poi-detail-stage__legend text-center">
-        <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">POI Trigger</p>
-        <h3 className="mb-1 text-sm font-semibold text-amber-100">
-          Clicca il medaglione per aprire il detail
-        </h3>
-        {riskBadges && riskBadges.length > 0 && (
-          <div className="poi-detail-stage__risk flex flex-wrap justify-center gap-2 text-[10px] text-amber-200/80">
-            {riskBadges.map((badge) => (
-              <div key={badge.label} className="flex flex-col items-center">
-                <span>{badge.label}</span>
-                <strong>{badge.value}</strong>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
       <GenericPoiSkin
         icon={icon}
         progress={progress}
@@ -226,22 +214,23 @@ function DroppablePoi({
         size={200}
         enableHover
         label={label}
+        timeRemainingMs={timeRemainingMs}
+        isExpirable={isExpirable}
+        showRiskBadges
+        injuryRisk={injuryRisk}
+        deathRisk={deathRisk}
+        dangerRating={dangerRating}
       />
     </div>
   );
 }
 
-const PoiDetailRosterIntegrationPage: FC = () => {
+const PoiDetailJobRosterIntegrationPage: FC = () => {
+  const { t } = useTranslation('idleVillage');
   const { residentsById } = useRosterKitData();
 
-  // Pre-fill slot 3 with a real resident to mirror the verification mock state.
-  const defaultResidentId = residentsById['hero-giggiolillo']
-    ? 'hero-giggiolillo'
-    : Object.keys(residentsById)[0];
-  const defaultSlotId = `${DEFAULT_ACTIVITY_ID}-slot-2`;
-  const defaultAssignments = defaultResidentId
-    ? { [defaultSlotId]: defaultResidentId }
-    : ({} as Record<string, string | null>);
+  // No pre-fill: the first slot must appear empty until the player assigns a resident.
+  const defaultAssignments = {} as Record<string, string | null>;
 
   const [selectedActivityId, setSelectedActivityId] = useState<string>(DEFAULT_ACTIVITY_ID);
   const [draggingResidentId, setDraggingResidentId] = useState<string | null>(null);
@@ -250,7 +239,10 @@ const PoiDetailRosterIntegrationPage: FC = () => {
   );
   const [flyingResidentId, setFlyingResidentId] = useState<string | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [telemetry, setTelemetry] = useState<TelemetryEntry[]>(mockTelemetry);
+  const [detailPosition, setDetailPosition] = useState<{ x: number; y: number } | undefined>(undefined);
+  const [telemetry, setTelemetry] = useState<TelemetryEntry[]>(() => getMockTelemetry(t));
+
+  const poiRef = useRef<HTMLDivElement | null>(null);
 
   const activity = useMemo(
     () => ACTIVITIES.find((a) => a.id === selectedActivityId) ?? DEFAULT_ACTIVITY,
@@ -260,18 +252,16 @@ const PoiDetailRosterIntegrationPage: FC = () => {
   const activityIcon = useMemo(() => getActivityIcon(activity), [activity]);
   const slotBlueprints = useMemo(() => buildSlotBlueprints(activity), [activity]);
 
-  // The verification page renders 3 slots for quest_dangerous_hunt. Use the real
-  // maxSlots for other activities so the roster remains generic.
-  const controllerMaxSlots = useMemo(() => {
-    if (activity.id === 'quest_dangerous_hunt') return 3;
+  // Jobs can have infinite slots; preserve that behavior for real job config.
+  const controllerMaxSlots = useMemo<ActivityMaxSlots>(() => {
+    if (activity.maxSlots === 'infinite') return 'infinite';
     return typeof activity.maxSlots === 'number' ? activity.maxSlots : 4;
   }, [activity]);
 
-  // Remove the stat requirement in the controller so any real resident can be
-  // assigned to the test quest; the detail component still receives the original
-  // activity config for display.
+  // For jobs, keep the real stat requirement so the slot rack validates
+  // assignments against the actual activity config.
   const activityForController = useMemo(
-    () => ({ ...activity, maxSlots: controllerMaxSlots, statRequirement: undefined }),
+    () => ({ ...activity, maxSlots: controllerMaxSlots }),
     [activity, controllerMaxSlots],
   );
 
@@ -295,11 +285,11 @@ const PoiDetailRosterIntegrationPage: FC = () => {
       const resident = residentsById[residentId];
       addTelemetry(
         'assign',
-        `${resident ? formatResidentLabel(resident) : residentId} → ${slotId}`,
+        t('idleVillage:poiDetail.telemetry.assigned', { defaultValue: '{resident} → {slotId}', resident: resident ? formatResidentLabel(resident) : residentId, slotId }),
       );
-      trackTelemetryEvent('poi_detail_roster_assign', { activityId: activity.id, slotId, residentId });
+      trackTelemetryEvent('poi_detail_job_roster_assign', { activityId: activity.id, slotId, residentId });
     },
-    [residentsById, activity.id, addTelemetry],
+    [residentsById, activity.id, addTelemetry, t],
   );
 
   const handleClear = useCallback(
@@ -310,14 +300,14 @@ const PoiDetailRosterIntegrationPage: FC = () => {
         if (residentId) {
           addTelemetry(
             'detach',
-            `${resident ? formatResidentLabel(resident) : residentId} ← ${slotId}`,
+            t('idleVillage:poiDetail.telemetry.detached', { defaultValue: '{resident} ← {slotId}', resident: resident ? formatResidentLabel(resident) : residentId, slotId }),
           );
-          trackTelemetryEvent('poi_detail_roster_detach', { activityId: activity.id, slotId });
+          trackTelemetryEvent('poi_detail_job_roster_detach', { activityId: activity.id, slotId });
         }
         return { ...a, [slotId]: null };
       });
     },
-    [residentsById, activity.id, addTelemetry],
+    [residentsById, activity.id, addTelemetry, t],
   );
 
   const controller = useResidentSlotController({
@@ -394,6 +384,35 @@ const PoiDetailRosterIntegrationPage: FC = () => {
     [handleAssign],
   );
 
+  const openDetailFromPoi = useCallback(() => {
+    const poi = poiRef.current ?? document.querySelector('.poi-detail-stage__medallion');
+    const rect = poi?.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const detailWidth = 680;
+    const detailHeight = 520;
+    const padding = 16;
+
+    const maxLeft = Math.max(padding, viewportWidth - detailWidth - padding);
+    const maxTop = Math.max(padding, viewportHeight - detailHeight - padding);
+
+    const clampedLeft = rect
+      ? Math.min(
+          Math.max(rect.left + rect.width / 2 - detailWidth / 2, padding),
+          maxLeft,
+        )
+      : padding;
+    const clampedTop = rect
+      ? Math.min(
+          Math.max(rect.top + rect.height / 2 - detailHeight / 2, padding),
+          maxTop,
+        )
+      : padding;
+
+    setDetailPosition({ x: clampedLeft, y: clampedTop });
+    setIsDetailOpen(true);
+  }, []);
+
   const handleResidentSelect = useCallback(
     (residentId: string) => {
       if (flyingResidentId) return;
@@ -404,7 +423,7 @@ const PoiDetailRosterIntegrationPage: FC = () => {
 
       // Open the POI detail so the target slot is rendered, then launch the
       // resident card into the slot with the same flight animation used for drag.
-      setIsDetailOpen(true);
+      openDetailFromPoi();
       setFlyingResidentId(residentId);
       setTimeout(() => {
         const to = elementCenter(document.querySelector(`[data-slot-id="${slot.id}"]`));
@@ -420,7 +439,7 @@ const PoiDetailRosterIntegrationPage: FC = () => {
         });
       }, 50);
     },
-    [flyingResidentId, findAcceptingSlot, setIsDetailOpen, startFlight],
+    [flyingResidentId, findAcceptingSlot, openDetailFromPoi, startFlight],
   );
 
   const handleSlotClear = useCallback(
@@ -458,28 +477,32 @@ const PoiDetailRosterIntegrationPage: FC = () => {
   const status: 'idle' | 'in-progress' | 'completed' | 'blocked' =
     poiStatus === 'working' ? 'in-progress' : 'idle';
 
-  const activityProgress = assignedIds.length > 0 ? 0.65 : 0;
   const duration = parseInt(activity.durationFormula ?? '0', 10) || 0;
+  const hasDuration = duration > 0;
+  const activityProgress = hasDuration && assignedIds.length > 0 ? 0.65 : 0;
   const elapsed = Math.floor(duration * activityProgress);
   const remaining = duration - elapsed;
 
   const riskBadges = useMemo(() => {
     const meta = activity.metadata as Record<string, unknown> | undefined;
-    return [
-      {
-        label: 'Injury Risk',
-        value: `${(meta?.injuryChanceDisplay as number | undefined) ?? 0}%`,
-      },
-      {
-        label: 'Death Risk',
-        value: `${(meta?.deathChanceDisplay as number | undefined) ?? 0}%`,
-      },
-      {
-        label: 'Danger Rating',
-        value: `${activity.dangerRating}/5`,
-      },
-    ];
-  }, [activity]);
+    const badges: { label: string; value: string }[] = [];
+    if (activityKind === 'job') {
+      if (typeof meta?.riskLevel === 'string') {
+        badges.push({ label: t('idleVillage:poiDetail.badgeLabels.riskLevel', { defaultValue: 'Risk Level' }), value: meta.riskLevel });
+      } else if (activity.dangerRating && activity.dangerRating <= 1) {
+        badges.push({ label: t('idleVillage:poiDetail.badgeLabels.riskLevel', { defaultValue: 'Risk Level' }), value: 'low' });
+      }
+      if (typeof meta?.repeatable === 'boolean') {
+        badges.push({ label: t('idleVillage:poiDetail.badgeLabels.repeatable', { defaultValue: 'Repeatable' }), value: meta.repeatable ? t('idleVillage:poiDetail.badgeLabels.yes', { defaultValue: 'Yes' }) : t('idleVillage:poiDetail.badgeLabels.no', { defaultValue: 'No' }) });
+      }
+    }
+    const injury = meta?.injuryChanceDisplay as number | undefined;
+    const death = meta?.deathChanceDisplay as number | undefined;
+    if (injury !== undefined) badges.push({ label: t('idleVillage:poiDetail.badgeLabels.injuryRisk', { defaultValue: 'Injury Risk' }), value: `${injury}%` });
+    if (death !== undefined) badges.push({ label: t('idleVillage:poiDetail.badgeLabels.deathRisk', { defaultValue: 'Death Risk' }), value: `${death}%` });
+    badges.push({ label: t('idleVillage:poiDetail.badgeLabels.dangerRating', { defaultValue: 'Danger Rating' }), value: t('idleVillage:poiDetail.rating.outOf', { defaultValue: '{rating}/5', rating: activity.dangerRating }) });
+    return badges;
+  }, [activity, activityKind, t]);
 
   const detailSlots = useMemo<ActivityDetailSlotData[]>(() => {
     return controller.slots.map((slot) => {
@@ -523,38 +546,40 @@ const PoiDetailRosterIntegrationPage: FC = () => {
       maxSlots,
       draggingResidentId,
       requirements: requirementRows,
-      durationDisplay: formatSeconds(duration),
-      rewardDisplay: formatRewards(activity),
-      etaDisplay: formatSeconds(remaining),
+      durationDisplay: formatSeconds(duration, t),
+      rewardDisplay: formatRewards(activity, t),
+      etaDisplay: formatSeconds(remaining, t),
       telemetry,
       isOpen: isDetailOpen,
-      onClose: () => setIsDetailOpen(false),
+      onClose: () => {
+        setIsDetailOpen(false);
+        setDetailPosition(undefined);
+      },
       showTelemetry: true,
       showSlots: true,
       showInfo: true,
       compact: false,
-      // In-flow (not a floating fixed modal): keeps the slot rack in the page
-      // layout so its [data-slot-id] rects match the visuals → correct drag
-      // coordinates, same feel as /minimal-roster-slot-integration.
-      inlineMode: true,
-      enableDrag: false,
+      // Floating modal so the panel can be dragged and positioned over the POI.
+      inlineMode: false,
+      enableDrag: true,
+      position: detailPosition,
       pillar: 'wilderness' as const,
       dataTestId: 'poi-detail-wrapper-test',
       poiIcon: activityIcon,
-      ariaLabel: `POI Detail: ${activity.label}`,
+      ariaLabel: t('idleVillage:poiDetail.ariaLabel', { defaultValue: 'POI Detail: {label}', label: activity.label }),
       ariaLive: 'polite' as const,
       enableDevTools: true,
       onStart: () => {
-        addTelemetry('start', `Attività ${activity.label} avviata`);
-        trackTelemetryEvent('poi_detail_roster_start', { activityId: activity.id });
+        addTelemetry('start', t('idleVillage:poiDetail.telemetry.started', { defaultValue: 'Activity {label} started', label: activity.label }));
+        trackTelemetryEvent('poi_detail_job_roster_start', { activityId: activity.id });
       },
       onCancel: () => {
-        addTelemetry('done', `Attività ${activity.label} annullata`);
-        trackTelemetryEvent('poi_detail_roster_cancel', { activityId: activity.id });
+        addTelemetry('done', t('idleVillage:poiDetail.telemetry.cancelled', { defaultValue: 'Activity {label} cancelled', label: activity.label }));
+        trackTelemetryEvent('poi_detail_job_roster_cancel', { activityId: activity.id });
       },
       onCollect: () => {
-        addTelemetry('done', `Ricompensa ${activity.label} raccolta`);
-        trackTelemetryEvent('poi_detail_roster_collect', { activityId: activity.id });
+        addTelemetry('done', t('idleVillage:poiDetail.telemetry.collected', { defaultValue: 'Reward {label} collected', label: activity.label }));
+        trackTelemetryEvent('poi_detail_job_roster_collect', { activityId: activity.id });
       },
       onSlotDetach: handleSlotClear,
       onSlotAssign: () => {
@@ -575,6 +600,7 @@ const PoiDetailRosterIntegrationPage: FC = () => {
       requirementRows,
       telemetry,
       isDetailOpen,
+      detailPosition,
       addTelemetry,
       handleSlotClear,
       activityIcon,
@@ -591,25 +617,25 @@ const PoiDetailRosterIntegrationPage: FC = () => {
           onDragCancel={() => setDraggingResidentId(null)}
         >
           <div
-            data-testid="poi-detail-roster-integration-page"
+            data-testid="poi-detail-job-roster-integration-page"
             className="min-h-screen bg-slate-950 p-4 text-ivory sm:p-8"
           >
             <div className="mx-auto max-w-7xl space-y-6">
               <header>
                 <p className="text-[10px] uppercase tracking-[0.45em] text-amber-200/70">
-                  Test Hub · POI Detail + Roster Integration
+                  {t('idleVillage:testRoster.poiDetailPage.pretitle')}
                 </p>
                 <h1 className="text-2xl font-semibold tracking-[0.2em] text-amber-100">
-                  POI DETAIL + ROSTER INTEGRATION
+                  {t('idleVillage:testRoster.poiDetailPage.title')}
                 </h1>
                 <p className="mt-1 text-sm text-slate-400">
-                  POI reale da Idle Village config, detail completo e slot rack interattivo.
+                  {t('idleVillage:testRoster.poiDetailPage.description')}
                 </p>
               </header>
 
               <div className="flex flex-wrap items-center gap-4 rounded-lg border border-slate-700/50 bg-slate-900/30 p-4">
                 <label className="text-xs font-semibold uppercase tracking-wider text-amber-200">
-                  Attività:
+                  {t('idleVillage:testRoster.poiDetailPage.activityLabel')}
                 </label>
                 <select
                   className="rounded border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-ivory"
@@ -617,7 +643,7 @@ const PoiDetailRosterIntegrationPage: FC = () => {
                   onChange={(e) => {
                     setSelectedActivityId(e.target.value);
                     setAssignments({});
-                    setTelemetry(mockTelemetry);
+                    setTelemetry(getMockTelemetry(t));
                     setIsDetailOpen(false);
                   }}
                 >
@@ -632,17 +658,17 @@ const PoiDetailRosterIntegrationPage: FC = () => {
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <div className="rounded-lg border border-slate-700/50 bg-slate-900/30 p-6">
                   <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-amber-200">
-                    Village Roster
+                    {t('idleVillage:testRoster.poiDetailPage.rosterTitle')}
                   </h2>
                   <RosterDraggable
-                    componentId="poi-detail-roster"
+                    componentId="poi-detail-job-roster"
                     useWanderlustSkin={true}
                     useExternalDndContext={true}
                     onDragEnd={handleDragEnd as unknown as any}
                     onFlightComplete={handleFlightComplete}
                     onResidentSelect={handleResidentSelect}
                     lockedResidentIds={[...assignedIds, ...(flyingResidentId ? [flyingResidentId] : [])]}
-                    lockedStatusLabel="Away"
+                    lockedStatusLabel={t('idleVillage:workerTooltip.statuses.away', { defaultValue: 'Away' })}
                   />
                 </div>
 
@@ -655,19 +681,24 @@ const PoiDetailRosterIntegrationPage: FC = () => {
                       progress={activityProgress}
                       timeRemainingMs={remaining}
                       isExpirable={assignedIds.length > 0}
-                      riskBadges={riskBadges}
+                      injuryRisk={(activity.metadata as Record<string, number> | undefined)?.injuryChanceDisplay}
+                      deathRisk={(activity.metadata as Record<string, number> | undefined)?.deathChanceDisplay}
+                      dangerRating={t('idleVillage:poiDetail.rating.outOf', { defaultValue: '{rating}/5', rating: activity.dangerRating })}
                       canAcceptDrop={freeSlots > 0}
-                      onClick={() => setIsDetailOpen(true)}
+                      onClick={(event) => {
+                        poiRef.current = event.currentTarget;
+                        openDetailFromPoi();
+                      }}
                     />
 
-                    <div className="poi-detail-stage__detail">
-                      <ActivityCapsuleDetailSkinAware {...detailProps} />
-                    </div>
+                    <div className="poi-detail-stage__detail" />
                   </section>
                 </StyleLabSurface>
               </div>
             </div>
           </div>
+
+          <ActivityCapsuleDetailSkinAware {...detailProps} />
 
           <DragOutcomeFlight
             state={pageFlight}
@@ -680,4 +711,4 @@ const PoiDetailRosterIntegrationPage: FC = () => {
   );
 };
 
-export default PoiDetailRosterIntegrationPage;
+export default PoiDetailJobRosterIntegrationPage;

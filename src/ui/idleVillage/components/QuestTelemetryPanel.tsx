@@ -20,6 +20,7 @@ import { transformTelemetryData } from '@/ui/idleVillage/utils/questTelemetryTra
 import { DEFAULT_QUEST_TELEMETRY_CONFIG } from '@/balancing/config/idleVillage/questTelemetryConfig';
 import { DEFAULT_DECISION_FEED_CONFIG } from './QuestDecisionFeedConfig';
 import type { HeatmapCell } from '@/ui/idleVillage/utils/questTelemetryTransforms';
+import { useTranslation } from '@/localization/useTranslation';
 
 export interface QuestTelemetryPanelProps {
   className?: string;
@@ -42,19 +43,22 @@ const QuestTypeHeatmap: React.FC<{
   questTypeDefinitions: Record<string, QuestTypeDefinition>;
   className?: string;
 }> = ({ questTypeBreakdown, questTypeDefinitions, className }) => {
+  const { t } = useTranslation('idleVillage');
   const totalQuests = Object.values(questTypeBreakdown).reduce((sum, count) => sum + count, 0);
   const questTypes = useMemo(() => sortQuestTypes(questTypeDefinitions), [questTypeDefinitions]);
 
   return (
     <div className={clsx('space-y-1', className)}>
-      <h4 className="text-xs font-medium text-slate-300 uppercase tracking-wide">Quest Types</h4>
+      <h4 className="text-xs font-medium text-slate-300 uppercase tracking-wide">
+        {t('idleVillage:questTelemetry.questTypes', { defaultValue: 'Quest Types' })}
+      </h4>
       {questTypes.length === 0 ? (
         <div className="rounded-lg border border-dashed border-slate-700/60 bg-slate-900/40 px-3 py-2 text-center text-xs text-slate-500">
-          No quest taxonomy configured. Define questTypes in IdleVillageConfig.
+          {t('idleVillage:questTelemetry.noQuestTaxonomy', { defaultValue: 'No quest taxonomy configured. Define questTypes in IdleVillageConfig.' })}
         </div>
       ) : totalQuests === 0 ? (
         <div className="rounded-lg border border-dashed border-slate-700/60 bg-slate-900/40 px-3 py-2 text-center text-xs text-slate-500">
-          No quest data yet
+          {t('idleVillage:questTelemetry.noQuestData', { defaultValue: 'No quest data yet' })}
         </div>
       ) : (
         <div className="grid grid-cols-5 gap-1">
@@ -92,16 +96,19 @@ const RecentDecisionsList: React.FC<{
   branchDecisions: AggregatedTelemetry['branchDecisions'];
   className?: string;
 }> = ({ branchDecisions, className }) => {
+  const { t } = useTranslation('idleVillage');
   const recentDecisions = branchDecisions.slice(-5); // Show last 5 decisions
 
   return (
     <div className={clsx('space-y-2', className)}>
       <h4 className="text-xs font-medium text-slate-300 uppercase tracking-wide">
-        Recent Decisions
+        {t('idleVillage:questTelemetry.recentDecisions', { defaultValue: 'Recent Decisions' })}
       </h4>
       <div className="space-y-1 max-h-32 overflow-y-auto">
         {recentDecisions.length === 0 ? (
-          <div className="text-xs text-slate-500 italic">No decisions yet</div>
+          <div className="text-xs text-slate-500 italic">
+            {t('idleVillage:questTelemetry.noDecisions', { defaultValue: 'No decisions yet' })}
+          </div>
         ) : (
           recentDecisions.map((decision: AggregatedTelemetry['branchDecisions'][0], index: number) => (
             <div
@@ -110,7 +117,7 @@ const RecentDecisionsList: React.FC<{
             >
               <div className="flex items-center justify-between">
                 <span className="text-slate-300 truncate">
-                  {decision.outcome.metadata?.choiceMade || 'Decision'}
+                  {decision.outcome.metadata?.choiceMade || t('idleVillage:questTelemetry.decisionFallback', { defaultValue: 'Decision' })}
                 </span>
                 <span className="text-slate-500 ml-2">
                   {new Date(decision.timestamp).toLocaleTimeString([], {
@@ -120,7 +127,7 @@ const RecentDecisionsList: React.FC<{
                 </span>
               </div>
               <div className="text-[10px] text-slate-400 mt-0.5">
-                Phase: {decision.phaseId}
+                {t('idleVillage:questTelemetry.phaseLabel', { phaseId: decision.phaseId, defaultValue: 'Phase: {phaseId}' })}
               </div>
             </div>
           ))
@@ -138,6 +145,7 @@ const RiskDisplaySection: React.FC<{
   onRiskStripeClick?: (type: 'injury' | 'death', percentage: number) => void;
   className?: string;
 }> = ({ _telemetry, onRiskStripeClick, className }) => {
+  const { t } = useTranslation('idleVillage');
   // Fixed mock risk data for demonstration - in real implementation this would come from quest telemetry
   const mockRiskData = useMemo(() => ({
     injuryPercentage: 25.5, // Fixed value for demo
@@ -147,7 +155,7 @@ const RiskDisplaySection: React.FC<{
   return (
     <div className={clsx('space-y-2', className)}>
       <h4 className="text-xs font-medium text-slate-300 uppercase tracking-wide">
-        Quest Risk Assessment
+        {t('idleVillage:questTelemetry.riskAssessment', { defaultValue: 'Quest Risk Assessment' })}
       </h4>
       <div className="flex justify-center">
         <QuestRiskDisplay
@@ -159,8 +167,11 @@ const RiskDisplaySection: React.FC<{
         />
       </div>
       <div className="text-xs text-slate-500 text-center">
-        Injury: {mockRiskData.injuryPercentage.toFixed(1)}% | 
-        Death: {mockRiskData.deathPercentage.toFixed(1)}%
+        {t('idleVillage:questTelemetry.riskSummary', {
+          injury: mockRiskData.injuryPercentage.toFixed(1),
+          death: mockRiskData.deathPercentage.toFixed(1),
+          defaultValue: 'Injury: {injury}% | Death: {death}%'
+        })}
       </div>
     </div>
   );
@@ -169,6 +180,7 @@ const PerformanceMetrics: React.FC<{
   telemetry: AggregatedTelemetry;
   className?: string;
 }> = ({ telemetry, className }) => {
+  const { t } = useTranslation('idleVillage');
   const formatDuration = (seconds: number): string => {
     if (seconds < 60) return `${Math.round(seconds)}s`;
     const minutes = Math.floor(seconds / 60);
@@ -177,7 +189,7 @@ const PerformanceMetrics: React.FC<{
   };
 
   const formatPercentage = (value: number): string => {
-    return `${(value * 100).toFixed(1)}%`;
+    return `${(value * 100).toFixed(0)}%`;
   };
 
   return (
@@ -187,7 +199,7 @@ const PerformanceMetrics: React.FC<{
           {telemetry.totalQuests}
         </div>
         <div className="text-xs text-slate-400 uppercase tracking-wide">
-          Total Quests
+          {t('idleVillage:questTelemetry.metrics.totalQuests', { defaultValue: 'Total Quests' })}
         </div>
       </div>
 
@@ -196,7 +208,7 @@ const PerformanceMetrics: React.FC<{
           {formatPercentage(telemetry.successRate)}
         </div>
         <div className="text-xs text-slate-400 uppercase tracking-wide">
-          Success Rate
+          {t('idleVillage:questTelemetry.metrics.successRate', { defaultValue: 'Success Rate' })}
         </div>
       </div>
 
@@ -205,7 +217,7 @@ const PerformanceMetrics: React.FC<{
           {formatDuration(telemetry.averageDuration)}
         </div>
         <div className="text-xs text-slate-400 uppercase tracking-wide">
-          Avg Duration
+          {t('idleVillage:questTelemetry.metrics.avgDuration', { defaultValue: 'Avg Duration' })}
         </div>
       </div>
 
@@ -214,7 +226,7 @@ const PerformanceMetrics: React.FC<{
           {telemetry.heroicMoments}
         </div>
         <div className="text-xs text-slate-400 uppercase tracking-wide">
-          Heroic Moments
+          {t('idleVillage:questTelemetry.metrics.heroicMoments', { defaultValue: 'Heroic Moments' })}
         </div>
       </div>
     </div>
@@ -236,6 +248,7 @@ export const QuestTelemetryPanel: React.FC<QuestTelemetryPanelProps> = ({
   onClear,
   onRiskStripeClick,
 }) => {
+  const { t } = useTranslation('idleVillage');
   const [selectedHeatmapCell, setSelectedHeatmapCell] = React.useState<HeatmapCell | null>(null);
   const questTypeDefinitions = useIdleVillageConfigStore((state) => state.config.questTypes ?? {});
 
@@ -287,7 +300,9 @@ export const QuestTelemetryPanel: React.FC<QuestTelemetryPanelProps> = ({
     return (
       <div className={panelClasses}>
         <div className="flex items-center justify-center h-32">
-          <div className="text-slate-400 text-sm">Loading telemetry...</div>
+          <div className="text-slate-400 text-sm">
+            {t('idleVillage:questTelemetry.loading', { defaultValue: 'Loading telemetry...' })}
+          </div>
         </div>
       </div>
     );
@@ -311,7 +326,7 @@ export const QuestTelemetryPanel: React.FC<QuestTelemetryPanelProps> = ({
         )}
       >
         <h3 className="text-sm font-semibold text-slate-200 uppercase tracking-wide">
-          Quest Telemetry
+          {t('idleVillage:questTelemetry.title', { defaultValue: 'Quest Telemetry' })}
         </h3>
         <div className="flex items-center space-x-2">
           {onClear ? (
@@ -320,11 +335,13 @@ export const QuestTelemetryPanel: React.FC<QuestTelemetryPanelProps> = ({
               onClick={() => onClear()}
               className="text-xs px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded border border-slate-600 text-slate-300 transition-colors"
             >
-              Clear
+              {t('idleVillage:questTelemetry.clear', { defaultValue: 'Clear' })}
             </button>
           ) : null}
           <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-          <span className="text-xs text-slate-400">Live</span>
+          <span className="text-xs text-slate-400">
+            {t('idleVillage:questTelemetry.live', { defaultValue: 'Live' })}
+          </span>
         </div>
       </div>
 
@@ -335,7 +352,7 @@ export const QuestTelemetryPanel: React.FC<QuestTelemetryPanelProps> = ({
       {showHeatmap && transformedData && (
         <div className="heatmap-section mb-4">
           <h4 className="text-xs font-medium text-slate-300 uppercase tracking-wide mb-3">
-            Quest Risk Heatmap
+            {t('idleVillage:questTelemetry.heatmapTitle', { defaultValue: 'Quest Risk Heatmap' })}
           </h4>
           <QuestHeatmap
             matrix={transformedData.heatmapMatrix}
@@ -351,6 +368,7 @@ export const QuestTelemetryPanel: React.FC<QuestTelemetryPanelProps> = ({
       {showRiskDisplay && (
         <div className="risk-display-section mb-4">
           <QuestRiskDisplay
+            questId="telemetry-risk"
             injuryPercentage={transformedData.statistics.averageRisk * 0.6}
             deathPercentage={transformedData.statistics.averageRisk * 0.4}
             onStripeClick={onRiskStripeClick}
@@ -385,10 +403,10 @@ export const QuestTelemetryPanel: React.FC<QuestTelemetryPanelProps> = ({
       <div className="mt-4 pt-3 border-t border-slate-700/50">
         <div className="flex items-center justify-between text-xs text-slate-500">
           <span>
-            {telemetry.totalBranches} total branches
+            {t('idleVillage:questTelemetry.totalBranches', { count: telemetry.totalBranches, defaultValue: '{count} total branches' })}
           </span>
           <span>
-            {formatDuration(telemetry.averageChoiceTime)} avg choice time
+            {t('idleVillage:questTelemetry.avgChoiceTime', { duration: formatDuration(telemetry.averageChoiceTime / 1000), defaultValue: '{duration} avg choice time' })}
           </span>
         </div>
       </div>

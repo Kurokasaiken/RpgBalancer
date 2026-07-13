@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
+import { useTranslation } from '@/localization/useTranslation';
 
 const getMockupPath = (): string => {
   const basePath = import.meta.env.BASE_URL ?? '/';
@@ -7,6 +8,7 @@ const getMockupPath = (): string => {
 };
 
 export const WanderlustMockupPage = () => {
+  const { t } = useTranslation('wanderlust');
   const containerRef = useRef<HTMLDivElement>(null);
   const mockupUrl = useMemo(() => getMockupPath(), []);
 
@@ -44,9 +46,9 @@ export const WanderlustMockupPage = () => {
           containerRef.current.innerHTML = `
             <div class="flex items-center justify-center h-screen bg-black text-amber-100">
               <div class="text-center">
-                <h2 class="text-2xl font-bold mb-4">Wanderlust Mockup</h2>
-                <p class="text-amber-200">Failed to load mockup content</p>
-                <p class="text-sm text-amber-300 mt-2">Please check the console for details</p>
+                <h2 class="text-2xl font-bold mb-4">${t('wanderlust:mockup.title')}</h2>
+                <p class="text-amber-200">${t('wanderlust:mockup.error')}</p>
+                <p class="text-sm text-amber-300 mt-2">${t('wanderlust:mockup.help')}</p>
               </div>
             </div>
           `;
@@ -55,7 +57,7 @@ export const WanderlustMockupPage = () => {
     };
 
     loadMockup();
-  }, [mockupUrl]);
+  }, [mockupUrl, t]);
 
   return (
     <div className="w-full h-full overflow-hidden">

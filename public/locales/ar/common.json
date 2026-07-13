@@ -1,0 +1,19 @@
+{
+  "appName": "موازن تقمص الأدوار",
+  "welcome": "مرحباً",
+  "language": "اللغة",
+  "locale": {
+    "en": "English",
+    "it-IT": "Italiano",
+    "pseudo": "Pseudo",
+    "de": "Deutsch",
+    "ar": "العربية",
+    "ja": "日本語",
+    "zh-CN": "简体中文"
+  },
+  "examples": {
+    "swordCount": "{count, plural, one {سيف واحد} other {{count} سيوف}}",
+    "riskLevel": "{level, select, low {مخاطرة منخفضة} medium {مخاطرة متوسطة} high {مخاطرة عالية} other {مخاطرة غير معروفة}}",
+    "characterGreeting": "{gender, select, male {أهلاً بك يا سيدي} female {أهلاً بك يا سيدتي} other {أهلاً بك يا مغامر}}"
+  }
+}

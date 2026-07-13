@@ -1,5 +1,8 @@
 import '@testing-library/jest-dom/vitest';
 import './src/test/setup/polyfills';
+import { i18n, i18nReady } from '@/localization/i18n';
+import enIdleVillage from './public/locales/en/idleVillage.json';
+import enCommon from './public/locales/en/common.json';
 
 declare global {
   interface Window {
@@ -120,3 +123,10 @@ if (typeof Array.prototype.findLastIndex !== 'function') {
     },
   });
 }
+
+// Preload English i18n resources for component tests
+await i18nReady;
+i18n.addResourceBundle('en', 'common', enCommon, true, true);
+i18n.addResourceBundle('en', 'idleVillage', enIdleVillage, true, true);
+i18n.options.saveMissing = false;
+await i18n.changeLanguage('en').catch(() => undefined);

@@ -1,6 +1,7 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { vi } from 'vitest';
 import PgCard from '@/ui/idleVillage/components/PgCard';
+import { DragProvider } from '@/ui/idleVillage/components/DragContext';
 import { useSensoryAudio } from '@/ui/idleVillage/hooks/useSensoryAudio';
 import { useResidentDragPreview } from '@/ui/idleVillage/hooks/useResidentDragPreview';
 import type { DragFeedbackState } from '@/ui/idleVillage/components/ResidentRosterTypes';
@@ -42,7 +43,7 @@ describe('PgCard interactions', () => {
   describe('drag start', () => {
     it('calls playCue(pickup) and triggers drag start', async () => {
       const baseProps = createBaseProps();
-      render(<PgCard {...baseProps} />);
+      render(<DragProvider><PgCard {...baseProps} /></DragProvider>);
 
       const card = screen.getByTestId('pg-card');
 
@@ -58,7 +59,7 @@ describe('PgCard interactions', () => {
 
     it('does not trigger drag when disabled', () => {
       const baseProps = createBaseProps();
-      render(<PgCard {...baseProps} disabled />);
+      render(<DragProvider><PgCard {...baseProps} disabled /></DragProvider>);
 
       const card = screen.getByTestId('pg-card');
       const mockDataTransfer = createMockDataTransfer();
@@ -74,7 +75,7 @@ describe('PgCard interactions', () => {
   describe('drag end', () => {
     it('plays drop_invalid when dragFeedbackState is returning', () => {
       const baseProps = createBaseProps();
-      render(<PgCard {...baseProps} dragFeedbackState="returning" />);
+      render(<DragProvider><PgCard {...baseProps} dragFeedbackState="returning" /></DragProvider>);
 
       const card = screen.getByTestId('pg-card');
       act(() => {
@@ -88,7 +89,7 @@ describe('PgCard interactions', () => {
 
     it('does not play drop_invalid when not returning', () => {
       const baseProps = createBaseProps();
-      render(<PgCard {...baseProps} dragFeedbackState="idle" />);
+      render(<DragProvider><PgCard {...baseProps} dragFeedbackState="idle" /></DragProvider>);
 
       const card = screen.getByTestId('pg-card');
       act(() => {
@@ -103,7 +104,7 @@ describe('PgCard interactions', () => {
   describe('returning state', () => {
     it('blocks interactions when dragFeedbackState is returning', () => {
       const baseProps = createBaseProps();
-      render(<PgCard {...baseProps} dragFeedbackState="returning" />);
+      render(<DragProvider><PgCard {...baseProps} dragFeedbackState="returning" /></DragProvider>);
 
       const card = screen.getByTestId('pg-card');
       expect(card).toHaveAttribute('aria-disabled', 'true');
@@ -112,7 +113,7 @@ describe('PgCard interactions', () => {
 
     it('applies spring animation class when returning', () => {
       const baseProps = createBaseProps();
-      render(<PgCard {...baseProps} dragFeedbackState="returning" />);
+      render(<DragProvider><PgCard {...baseProps} dragFeedbackState="returning" /></DragProvider>);
 
       const card = screen.getByTestId('pg-card');
       expect(card).toHaveClass(/animate-bounce-spring/);
@@ -122,7 +123,7 @@ describe('PgCard interactions', () => {
   describe('away state', () => {
     it('shows grayscale and reduced opacity when status is away', () => {
       const baseProps = createBaseProps();
-      render(<PgCard {...baseProps} statusLabel="Away" disabled />);
+      render(<DragProvider><PgCard {...baseProps} statusLabel="Away" disabled /></DragProvider>);
 
       const card = screen.getByTestId('pg-card');
       expect(card).toHaveClass('grayscale', 'opacity-35');
@@ -130,7 +131,7 @@ describe('PgCard interactions', () => {
 
     it('prevents drag when status is away', () => {
       const baseProps = createBaseProps();
-      render(<PgCard {...baseProps} statusLabel="Away" disabled />);
+      render(<DragProvider><PgCard {...baseProps} statusLabel="Away" disabled /></DragProvider>);
 
       const card = screen.getByTestId('pg-card');
       const mockDataTransfer = createMockDataTransfer();
@@ -146,7 +147,7 @@ describe('PgCard interactions', () => {
   describe('hover valid audio', () => {
     it('plays hover_valid when dragFeedbackState is valid', () => {
       const baseProps = createBaseProps();
-      render(<PgCard {...baseProps} dragFeedbackState="valid" compatibilityState="valid" />);
+      render(<DragProvider><PgCard {...baseProps} dragFeedbackState="valid" compatibilityState="valid" /></DragProvider>);
 
       // Simulate hover entering a valid slot via drag context
       const card = screen.getByTestId('pg-card');
@@ -157,7 +158,7 @@ describe('PgCard interactions', () => {
   describe('accessibility', () => {
     it('announces compatibility state', () => {
       const baseProps = createBaseProps();
-      render(<PgCard {...baseProps} compatibilityState="valid" compatibilityLabel="Rack A" />);
+      render(<DragProvider><PgCard {...baseProps} compatibilityState="valid" compatibilityLabel="Rack A" /></DragProvider>);
 
       const card = screen.getByTestId('pg-card');
       expect(card).toHaveAttribute('aria-label', expect.stringContaining('Compatible with Rack A'));
@@ -165,7 +166,7 @@ describe('PgCard interactions', () => {
 
     it('announces returning state', () => {
       const baseProps = createBaseProps();
-      render(<PgCard {...baseProps} dragFeedbackState="returning" />);
+      render(<DragProvider><PgCard {...baseProps} dragFeedbackState="returning" /></DragProvider>);
 
       const card = screen.getByTestId('pg-card');
       expect(card).toHaveAttribute('data-drag-state', 'returning');

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { SlotV12Renderer } from '@/ui/idleVillage/components/SlotV12Renderer';
+import { Slot } from '@/ui/idleVillage/components/Slot';
+import { V9TooltipProvider } from '@/ui/v9-skin/V9Tooltip';
 
 const SLOT_STATES = ['empty', 'occupied', 'locking'] as const;
 
@@ -17,7 +18,8 @@ const SkinLabPage: React.FC = () => {
   };
 
   return (
-    <div className="skin-lab" data-testid="skin-lab-page">
+    <V9TooltipProvider>
+      <div className="skin-lab" data-testid="skin-lab-page">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap');
         .skin-lab {
@@ -82,12 +84,16 @@ const SkinLabPage: React.FC = () => {
           </select>
         </label>
       </div>
-      <SlotV12Renderer
-        className="skin-lab__slot"
-        letter={letter}
-        state={SLOT_STATES[slotStateIndex]}
+      <Slot
+        tooltip={`Slot: ${SLOT_STATES[slotStateIndex]}`}
+        slotProps={{
+          className: 'skin-lab__slot',
+          letter,
+          state: SLOT_STATES[slotStateIndex],
+        }}
       />
     </div>
+    </V9TooltipProvider>
   );
 };
 

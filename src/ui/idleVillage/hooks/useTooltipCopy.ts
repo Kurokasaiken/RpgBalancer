@@ -1,13 +1,20 @@
 /**
  * Tooltip Copy Hook
  *
- * Config-first hook for tooltip content with telemetry integration.
- * Reads from tooltip configuration and emits telemetry events.
+ * i18next-backed hook for tooltip content with telemetry integration.
+ * Reads from the `idleVillage` namespace and falls back to the provided
+ * tooltip configuration and static fallback copy.
  */
 
 import { useCallback, useMemo } from 'react';
+import { useTranslation } from '@/localization/useTranslation';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import type { MinimalUITooltips } from '@/balancing/config/idleVillage/minimalConfig';
+
+/**
+ * Tooltip sections exposed by the hook.
+ */
+export type TooltipSection = 'hudResources' | 'workerTraits' | 'slotStatus';
 
 /**
  * Hook parameters for useTooltipCopy
@@ -26,42 +33,49 @@ export interface UseTooltipCopyParams {
  */
 export interface UseTooltipCopyReturn {
   /** Get tooltip content for a section and key */
-  getTooltipCopy: (section: keyof MinimalUITooltips, key: string) => string;
+  getTooltipCopy: (section: TooltipSection, key: string) => string;
   /** Check if tooltip exists */
-  hasTooltip: (section: keyof MinimalUITooltips, key: string) => boolean;
+  hasTooltip: (section: TooltipSection, key: string) => boolean;
   /** Get all tooltips for a section */
-  getSectionTooltips: (section: keyof MinimalUITooltips) => Record<string, string>;
+  getSectionTooltips: (section: TooltipSection) => Record<string, string>;
 }
 
 /**
  * Hook for accessing tooltip content with telemetry integration.
- * Reads from tooltip configuration and emits telemetry events when tooltips are shown.
+ * Reads from the `idleVillage` i18next namespace and emits telemetry
+ * events when tooltips are resolved.
  */
 export const useTooltipCopy = ({
   tooltipConfig,
   telemetryEnabled = true,
   telemetrySource = 'unknown',
 }: UseTooltipCopyParams): UseTooltipCopyReturn => {
-  // Memoize tooltip entries to avoid repeated lookups
-  const tooltipEntries = useMemo(() => {
-    if (!tooltipConfig) return {};
-    
-    return {
-      hudResources: tooltipConfig.hudResources?.entries || {},
-      workerTraits: tooltipConfig.workerTraits?.entries || {},
-      slotStatus: tooltipConfig.slotStatus?.entries || {},
-    };
-  }, [tooltipConfig]);
+  const { t, i18n } = useTranslation('idleVillage');
+
+  // Extract entry-only records from the optional config fallback.
+  const configEntries = useMemo(
+    () =>
+      tooltipConfig
+        ? {
+            hudResources: tooltipConfig.hudResources?.entries || {},
+            workerTraits: tooltipConfig.workerTraits?.entries || {},
+            slotStatus: tooltipConfig.slotStatus?.entries || {},
+          }
+        : undefined,
+    [tooltipConfig]
+  );
 
   // Get tooltip content for a section and key
   const getTooltipCopy = useCallback(
-    (section: keyof MinimalUITooltips, key: string): string => {
-      const content = tooltipEntries[section]?.[key] || '';
-      
+    (section: TooltipSection, key: string): string => {
+      const nsKey = `${section}.${key}`;
+      const fallback = configEntries?.[section]?.[key] || getFallbackTooltip(key);
+      const content = t(nsKey, { defaultValue: fallback }) as string;
+
       // Emit telemetry event when tooltip is accessed
-      if (telemetryEnabled && content) {
+      if (telemetryEnabled && content && content !== nsKey) {
         trackTelemetryEvent('tooltip_shown', {
-          tooltipId: `${section}.${key}`,
+          tooltipId: nsKey,
           section,
           key,
           content,
@@ -69,26 +83,40 @@ export const useTooltipCopy = ({
           timestamp: Date.now(),
         });
       }
-      
+
       return content;
     },
-    [tooltipEntries, telemetryEnabled, telemetrySource]
+    [t, configEntries, telemetryEnabled, telemetrySource]
   );
 
   // Check if tooltip exists
   const hasTooltip = useCallback(
-    (section: keyof MinimalUITooltips, key: string): boolean => {
-      return Boolean(tooltipEntries[section]?.[key]);
+    (section: TooltipSection, key: string): boolean => {
+      const nsKey = `${section}.${key}`;
+      const lng = i18n.resolvedLanguage || i18n.language || 'en';
+      if (typeof i18n.exists === 'function' && i18n.exists(nsKey, { lng })) {
+        return true;
+      }
+      const fallback = configEntries?.[section]?.[key];
+      return Boolean(fallback);
     },
-    [tooltipEntries]
+    [i18n, configEntries]
   );
 
   // Get all tooltips for a section
   const getSectionTooltips = useCallback(
-    (section: keyof MinimalUITooltips): Record<string, string> => {
-      return tooltipEntries[section] || {};
+    (section: TooltipSection): Record<string, string> => {
+      const fallback = configEntries?.[section] || {};
+      const lng = i18n.resolvedLanguage || i18n.language || 'en';
+      const bundle = i18n.getResourceBundle(lng, 'idleVillage') as
+        | Record<string, unknown>
+        | undefined;
+      const sectionData = bundle?.[section] as Record<string, string> | undefined;
+      return sectionData && typeof sectionData === 'object' && !Array.isArray(sectionData)
+        ? sectionData
+        : fallback;
     },
-    [tooltipEntries]
+    [i18n, configEntries]
   );
 
   return {

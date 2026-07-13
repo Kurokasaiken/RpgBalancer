@@ -46,26 +46,33 @@ vi.mock('@/ui/idleVillage/components/QuestHeatmap', () => ({
 }));
 
 vi.mock('@/ui/idleVillage/components/QuestDecisionFeed', () => ({
-  default: ({ decisions, onDecisionClick, compact }: any) => (
-    <div data-testid="quest-decision-feed" data-compact={compact}>
-      <div data-testid="decision-count">{decisions.length}</div>
-      <button onClick={() => onDecisionClick?.(decisions[0])}>
-        Decision Click
-      </button>
-    </div>
-  ),
+  default: ({ telemetry, onDecisionClick, compact, config }: any) => {
+    const decisions = telemetry?.branchDecisions ?? [];
+    const maxItems = config?.maxItems ?? decisions.length;
+    const visibleDecisions = decisions.slice(0, maxItems);
+    return (
+      <div data-testid="quest-decision-feed" data-compact={compact}>
+        <div data-testid="decision-count">{visibleDecisions.length}</div>
+        <button onClick={() => onDecisionClick?.(visibleDecisions[0], {})}>
+          Decision Click
+        </button>
+      </div>
+    );
+  },
 }));
+
+const mockIdleVillageConfig = {
+  config: {
+    questTypes: {
+      'combat': { id: 'combat', label: 'Combat', colorClass: 'bg-red-500', priority: 0 },
+      'exploration': { id: 'exploration', label: 'Exploration', colorClass: 'bg-blue-500', priority: 1 },
+    },
+  },
+};
 
 // Mock config store
 vi.mock('@/balancing/config/idleVillage/IdleVillageConfigStore', () => ({
-  useIdleVillageConfigStore: () => () => ({
-    config: {
-      questTypes: {
-        'combat': { id: 'combat', name: 'Combat', difficulty: 'medium' },
-        'exploration': { id: 'exploration', name: 'Exploration', difficulty: 'low' },
-      },
-    },
-  }),
+  useIdleVillageConfigStore: (selector?: (state: any) => any) => (selector ? selector(mockIdleVillageConfig) : mockIdleVillageConfig),
 }));
 
 describe('QuestTelemetryPanel', () => {
@@ -77,12 +84,11 @@ describe('QuestTelemetryPanel', () => {
     averageChoiceTime: 3000,
     heroicMoments: 3,
     branchDecisions: [
-      {
-        phaseId: 'phase-1',
-        choiceId: 'choice-1',
-        outcome: { type: 'success', nextPhaseId: 'phase-2' },
-        timestamp: Date.now(),
-      },
+      { phaseId: 'phase-1', choiceId: 'choice-1', outcome: { type: 'success', nextPhaseId: 'phase-2' }, timestamp: Date.now() },
+      { phaseId: 'phase-2', choiceId: 'choice-2', outcome: { type: 'success', nextPhaseId: 'phase-3' }, timestamp: Date.now() },
+      { phaseId: 'phase-3', choiceId: 'choice-3', outcome: { type: 'failure', nextPhaseId: 'phase-4' }, timestamp: Date.now() },
+      { phaseId: 'phase-4', choiceId: 'choice-4', outcome: { type: 'success', nextPhaseId: 'phase-5' }, timestamp: Date.now() },
+      { phaseId: 'phase-5', choiceId: 'choice-5', outcome: { type: 'success', nextPhaseId: 'phase-6' }, timestamp: Date.now() },
     ],
     recentQuests: [
       {
@@ -141,6 +147,7 @@ describe('QuestTelemetryPanel', () => {
     showHeatmap: true,
     showRecentDecisions: true,
     showRiskDisplay: true,
+    onClear: vi.fn(),
   };
 
   beforeEach(() => {
@@ -299,8 +306,8 @@ describe('QuestTelemetryPanel', () => {
     
     render(<QuestTelemetryPanel {...defaultProps} telemetry={emptyTelemetry} />);
     
-    expect(screen.getByText('0')).toBeInTheDocument(); // totalQuests
-    expect(screen.getByText('0%')).toBeInTheDocument(); // successRate
+    expect(screen.getAllByText('0')).toHaveLength(3); // totalQuests + heroicMoments + decision-count
+    expect(screen.getAllByText('0%')).toHaveLength(3); // successRate + risk display percentages
     expect(screen.getByTestId('quest-risk-display')).toBeInTheDocument();
   });
 
@@ -308,15 +315,15 @@ describe('QuestTelemetryPanel', () => {
     render(<QuestTelemetryPanel {...defaultProps} showHeatmap={false} />);
     
     expect(screen.getByText('Quest Types')).toBeInTheDocument();
-    expect(screen.getByText('6')).toBeInTheDocument(); // combat quests
-    expect(screen.getByText('4')).toBeInTheDocument(); // exploration quests
+    expect(screen.getByTitle(/6 quests/)).toBeInTheDocument(); // combat quests
+    expect(screen.getByTitle(/4 quests/)).toBeInTheDocument(); // exploration quests
   });
 
   it('applies custom className', () => {
     const customClass = 'custom-telemetry-panel';
     render(<QuestTelemetryPanel {...defaultProps} className={customClass} />);
     
-    const panel = screen.getByText('Quest Telemetry').closest('div');
+    const panel = screen.getByText('Quest Telemetry').closest('div')?.parentElement;
     expect(panel).toHaveClass(customClass);
   });
 
@@ -325,7 +332,8 @@ describe('QuestTelemetryPanel', () => {
       const consoleSpy = vi.spyOn(console, 'log');
       render(<QuestTelemetryPanel {...defaultProps} showHeatmap={true} />);
       
-      // Check if telemetry event would be logged (mocked)
+      fireEvent.click(screen.getByText('Cell Click'));
+      
       expect(consoleSpy).toHaveBeenCalledWith(
         '[QuestTelemetryPanel] Heatmap cell selected:',
         expect.any(Object)
@@ -338,7 +346,8 @@ describe('QuestTelemetryPanel', () => {
       const consoleSpy = vi.spyOn(console, 'log');
       render(<QuestTelemetryPanel {...defaultProps} showRecentDecisions={true} />);
       
-      // Check if telemetry event would be logged (mocked)
+      fireEvent.click(screen.getByText('Decision Click'));
+      
       expect(consoleSpy).toHaveBeenCalledWith(
         '[QuestTelemetryPanel] Decision selected:',
         expect.any(Object)

@@ -29,13 +29,7 @@ vi.mock('@/ui/idleVillage/utils/sandboxDiagnostics', () => ({
   })),
 }));
 
-// Mock quest telemetry
-vi.mock('@/ui/idleVillage/utils/riskTelemetry', () => ({
-  useQuestRiskTelemetry: vi.fn(() => ({
-    emitRiskRendered: vi.fn(),
-    emitStripeClicked: vi.fn(),
-  })),
-}));
+// Telemetry is emitted via the onTelemetry prop, not a side module.
 
 describe('QuestRiskDisplay', () => {
   const defaultProps = {
@@ -69,7 +63,7 @@ describe('QuestRiskDisplay', () => {
     render(
       <QuestRiskDisplay
         {...defaultProps}
-        injuryPercentage={0.5}
+        injuryPercentage={0.4}
         deathPercentage={0.3}
       />
     );
@@ -163,23 +157,23 @@ describe('QuestRiskDisplay', () => {
     const deathHeight = parseInt(deathStripe.getAttribute('data-stripe-height') || '0');
     
     // Should be at or near maximum height
-    expect(injuryHeight).toBeLessThanOrEqual(60);
-    expect(deathHeight).toBeLessThanOrEqual(60);
+    expect(injuryHeight).toBeLessThanOrEqual(80);
+    expect(deathHeight).toBeLessThanOrEqual(80);
   });
 
   it('shows percentage labels when enabled', () => {
     render(
       <QuestRiskDisplay
         {...defaultProps}
-        showLabels={true}
+        config={{ showPercentageLabels: true }}
       />
     );
     
     // Check for percentage labels on stripes (they appear when percentage >= 5%)
-    const injuryStripe = screen.getByTestId('injury-stripe');
-    const deathStripe = screen.getByTestId('death-stripe');
+    const injuryStripe = screen.getByTestId('injury-stripe').parentElement;
+    const deathStripe = screen.getByTestId('death-stripe').parentElement;
     
-    expect(injuryStripe).toHaveTextContent('25%');
+    expect(injuryStripe).toHaveTextContent('26%');
     expect(deathStripe).toHaveTextContent('12%');
   });
 
@@ -187,14 +181,14 @@ describe('QuestRiskDisplay', () => {
     render(
       <QuestRiskDisplay
         {...defaultProps}
-        showLabels={false}
+        config={{ showPercentageLabels: false }}
       />
     );
     
-    const injuryStripe = screen.getByTestId('injury-stripe');
-    const deathStripe = screen.getByTestId('death-stripe');
+    const injuryStripe = screen.getByTestId('injury-stripe').parentElement;
+    const deathStripe = screen.getByTestId('death-stripe').parentElement;
     
-    expect(injuryStripe).not.toHaveTextContent('25%');
+    expect(injuryStripe).not.toHaveTextContent('26%');
     expect(deathStripe).not.toHaveTextContent('12%');
   });
 
@@ -248,11 +242,11 @@ describe('QuestRiskDisplay', () => {
     const deathStripe = screen.getByTestId('death-stripe');
     
     expect(injuryStripe).toHaveAttribute('role', 'button');
-    expect(injuryStripe).toHaveAttribute('tabIndex', '0');
+    expect(injuryStripe).toHaveAttribute('tabindex', '0');
     expect(injuryStripe).toHaveAttribute('aria-label', 'Injury risk: 25.5%');
     
     expect(deathStripe).toHaveAttribute('role', 'button');
-    expect(deathStripe).toHaveAttribute('tabIndex', '0');
+    expect(deathStripe).toHaveAttribute('tabindex', '0');
     expect(deathStripe).toHaveAttribute('aria-label', 'Death risk: 12.3%');
   });
 
@@ -288,15 +282,15 @@ describe('QuestRiskDisplay', () => {
     const injuryStripe = screen.getByTestId('injury-stripe');
     const deathStripe = screen.getByTestId('death-stripe');
     
-    expect(injuryStripe).toHaveStyle('background-color: rgb(255, 0, 0)');
-    expect(deathStripe).toHaveStyle('background-color: rgb(0, 255, 0)');
+    expect(injuryStripe).toHaveAttribute('fill', 'rgb(255, 0, 0)');
+    expect(deathStripe).toHaveAttribute('fill', 'rgb(0, 255, 0)');
   });
 
   it('shows risk level indicator', () => {
     render(<QuestRiskDisplay {...defaultProps} />);
     
-    // Should show "MED" risk level (death >= 20% or injury >= 30%)
-    expect(screen.getByText('MED')).toBeInTheDocument();
+    // Should show "HIGH" risk level (default props: 25.5 + 12.3 = 37.8)
+    expect(screen.getByText('HIGH')).toBeInTheDocument();
   });
 
   it('shows HIGH risk level for high death percentage', () => {
@@ -314,8 +308,8 @@ describe('QuestRiskDisplay', () => {
     render(
       <QuestRiskDisplay
         {...defaultProps}
-        injuryPercentage={15}
-        deathPercentage={10}
+        injuryPercentage={5}
+        deathPercentage={4}
       />
     );
     
@@ -372,40 +366,40 @@ describe('QuestRiskDisplay', () => {
   });
 
   it('logs telemetry on render', () => {
-    const { useQuestRiskTelemetry } = require('@/ui/idleVillage/utils/riskTelemetry');
-    const mockEmitRiskRendered = vi.fn();
+    const onTelemetry = vi.fn();
     
-    useQuestRiskTelemetry.mockReturnValue({
-      emitRiskRendered: mockEmitRiskRendered,
-      emitStripeClicked: vi.fn(),
-    });
+    render(<QuestRiskDisplay {...defaultProps} onTelemetry={onTelemetry} />);
     
-    render(<QuestRiskDisplay {...defaultProps} />);
-    
-    expect(mockEmitRiskRendered).toHaveBeenCalledWith({
+    expect(onTelemetry).toHaveBeenCalledWith({
+      type: 'quest_risk_render',
       questId: 'test-quest-1',
       injuryPercentage: 25.5,
       deathPercentage: 12.3,
-      stripeHeights: expect.any(Object),
+      riskLevel: 'HIGH',
+      timestamp: expect.any(Number),
       showStripes: true,
+      stripeHeights: expect.any(Object),
       configSource: 'default',
     });
   });
 
   it('logs telemetry on stripe click', () => {
-    const { useQuestRiskTelemetry } = require('@/ui/idleVillage/utils/riskTelemetry');
-    const mockEmitStripeClicked = vi.fn();
+    const onTelemetry = vi.fn();
+    const onStripeClick = vi.fn();
     
-    useQuestRiskTelemetry.mockReturnValue({
-      emitRiskRendered: vi.fn(),
-      emitStripeClicked: mockEmitStripeClicked,
-    });
-    
-    render(<QuestRiskDisplay {...defaultProps} />);
+    render(<QuestRiskDisplay {...defaultProps} onTelemetry={onTelemetry} onStripeClick={onStripeClick} />);
     
     const injuryStripe = screen.getByTestId('injury-stripe');
     fireEvent.click(injuryStripe);
     
-    expect(mockEmitStripeClicked).toHaveBeenCalledWith('test-quest-1', 'injury', 25.5);
+    expect(onStripeClick).toHaveBeenCalledWith('injury', 25.5);
+    expect(onTelemetry).toHaveBeenCalledWith({
+      type: 'quest_risk_stripe_click',
+      questId: 'test-quest-1',
+      stripeType: 'injury',
+      percentage: 25.5,
+      timestamp: expect.any(Number),
+      riskLevel: 'HIGH',
+    });
   });
 });

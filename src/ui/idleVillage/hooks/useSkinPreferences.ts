@@ -15,6 +15,7 @@ import {
   getSupportedPillars,
   isPillarSupported,
 } from '../skins/skinConfigRegistry';
+import { applySkinCssVariables } from '../skins/skinCssVariables';
 import { resolveSlotRackPresetId } from '../skins/slotRackSkinConfig';
 
 const STORAGE_KEY = 'style-lab-skin-preset';
@@ -152,6 +153,13 @@ export function useSkinPreferences(): UseSkinPreferencesResult {
       handleTelemetryFlush();
     }
   }, [preferences, isLoading, handleTelemetryFlush]);
+
+  useEffect(() => {
+    if (!isLoading) {
+      applySkinCssVariables(preferences.presetId);
+      document.documentElement.setAttribute('data-skin-preset', preferences.presetId);
+    }
+  }, [preferences.presetId, isLoading]);
 
   const setPreset = useCallback(
     (presetId: SkinPresetId, pillar?: StyleLabPillar, overrides?: SkinStyleLabOverrides) => {

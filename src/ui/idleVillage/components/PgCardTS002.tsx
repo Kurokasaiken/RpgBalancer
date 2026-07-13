@@ -16,6 +16,11 @@ import { SkinSlot, useSkinSlot } from '@/ui/idleVillage/components/SkinSlot';
 import { DEFAULT_MINIMAL_CONFIG } from '@/balancing/config/idleVillage/minimalConfig';
 import { useDragContext } from '@/ui/idleVillage/components/DragContextStore';
 import type { ResidentCompatibilityState } from './ResidentRosterTypes';
+import {
+  type PgCardFrameType,
+  getPgCardFrameTokens,
+  getPgCardFrameStyle,
+} from '@/ui/idleVillage/config/pgCardFrameConfig';
 
 // ============================================================================
 // TYPES
@@ -70,7 +75,108 @@ export interface PgCardTS002Props {
   compatibilityState?: ResidentCompatibilityState;
   compatibilityLabel?: string;
   dragFeedbackState?: 'idle' | 'valid' | 'invalid' | 'returning';
+  /** Frame style applied to the portrait medallion. Defaults to `heroic`. */
+  frameType?: PgCardFrameType;
 }
+
+// ============================================================================
+// PORTRAIT FRAME HELPER
+// ============================================================================
+
+interface PgCardTS002PortraitFrameProps {
+  portraitUrl: string;
+  label: string;
+  frameType: PgCardFrameType;
+  horizontal: boolean;
+}
+
+const PgCardTS002PortraitFrame = memo<PgCardTS002PortraitFrameProps>({
+  portraitUrl,
+  label,
+  frameType,
+  horizontal,
+}) => {
+  const frameTokens = getPgCardFrameTokens(frameType);
+  const variant = horizontal ? 'horizontal' : 'vertical';
+  const isCircular = frameTokens.borderRadius === 'full';
+  const sizeStyle = {
+    width: horizontal ? '56px' : '64px',
+    height: horizontal ? '32px' : '40px',
+    minWidth: horizontal ? '56px' : '64px',
+    minHeight: horizontal ? '32px' : '40px',
+  };
+
+  return (
+    <div
+      className={[
+        'pg-card__portrait',
+        'pgcard-frame',
+        'relative',
+        `pgcard-frame-${frameTokens.classSuffix}`,
+        isCircular ? 'rounded-full' : 'rounded-[14px]',
+      ].join(' ')}
+      style={{
+        ...getPgCardFrameStyle(frameType, variant),
+        ...sizeStyle,
+      }}
+      data-frame-type={frameType}
+      aria-hidden="true"
+    >
+      {frameTokens.hasInnerBevel && (
+        <div
+          className="pointer-events-none absolute inset-0 z-10 rounded-[inherit]"
+          style={{
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.35)',
+          }}
+        />
+      )}
+      <img
+        src={portraitUrl}
+        alt={`${label} portrait`}
+        className="pg-card__portrait-image h-full w-full object-cover"
+        loading="lazy"
+      />
+      {frameTokens.hasCornerDecorations && (
+        <>
+          <span
+            className="pointer-events-none absolute top-0 left-0 z-20 h-1.5 w-1.5"
+            style={{
+              borderTop: `2px solid ${frameTokens.accentColor}`,
+              borderLeft: `2px solid ${frameTokens.accentColor}`,
+              borderTopLeftRadius: frameTokens.borderRadius === 'sharp' ? '1px' : '6px',
+            }}
+          />
+          <span
+            className="pointer-events-none absolute top-0 right-0 z-20 h-1.5 w-1.5"
+            style={{
+              borderTop: `2px solid ${frameTokens.accentColor}`,
+              borderRight: `2px solid ${frameTokens.accentColor}`,
+              borderTopRightRadius: frameTokens.borderRadius === 'sharp' ? '1px' : '6px',
+            }}
+          />
+          <span
+            className="pointer-events-none absolute bottom-0 left-0 z-20 h-1.5 w-1.5"
+            style={{
+              borderBottom: `2px solid ${frameTokens.accentColor}`,
+              borderLeft: `2px solid ${frameTokens.accentColor}`,
+              borderBottomLeftRadius: frameTokens.borderRadius === 'sharp' ? '1px' : '6px',
+            }}
+          />
+          <span
+            className="pointer-events-none absolute bottom-0 right-0 z-20 h-1.5 w-1.5"
+            style={{
+              borderBottom: `2px solid ${frameTokens.accentColor}`,
+              borderRight: `2px solid ${frameTokens.accentColor}`,
+              borderBottomRightRadius: frameTokens.borderRadius === 'sharp' ? '1px' : '6px',
+            }}
+          />
+        </>
+      )}
+    </div>
+  );
+});
+
+PgCardTS002PortraitFrame.displayName = 'PgCardTS002PortraitFrame';
 
 // ============================================================================
 // SKIN BINDING CONFIGURATION
@@ -142,6 +248,7 @@ const PgCardInternal = memo<PgCardInternalProps>(({
   compatibilityState,
   compatibilityLabel,
   dragFeedbackState = 'idle',
+  frameType = 'heroic',
   skinData,
 }) => {
   // Hooks
@@ -282,8 +389,9 @@ const PgCardInternal = memo<PgCardInternalProps>(({
       'data-preset': skinData.currentPreset,
       'data-pillar': skinData.currentPillar,
       'data-motion': skinData.currentMotionLevel,
+      'data-pgcard-frame': frameType,
     };
-  }, [skinData.attributes, workerId, hp, fatigue, maxHp, horizontal, isInteractive, disabled, compatibilityState, dragFeedbackState, skinData]);
+  }, [skinData.attributes, workerId, hp, fatigue, maxHp, horizontal, isInteractive, disabled, compatibilityState, dragFeedbackState, frameType, skinData]);
 
   return (
     <div
@@ -310,14 +418,12 @@ const PgCardInternal = memo<PgCardInternalProps>(({
       <div className="pg-card__content">
         {/* Portrait */}
         {portraitUrl && (
-          <div className="pg-card__portrait">
-            <img
-              src={portraitUrl}
-              alt={`${label} portrait`}
-              className="pg-card__portrait-image"
-              loading="lazy"
-            />
-          </div>
+          <PgCardTS002PortraitFrame
+            portraitUrl={portraitUrl}
+            label={label}
+            frameType={frameType}
+            horizontal={horizontal}
+          />
         )}
 
         {/* Stats */}

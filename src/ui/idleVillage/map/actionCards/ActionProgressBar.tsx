@@ -38,7 +38,7 @@ export function ActionProgressBar({
   countdownFontSizePx = 12,
   className,
   dataTestId,
-  _pillar,
+  pillar: _pillar,
 }: ActionProgressBarProps) {
   const tokens = useStyleLabTokens();
 
@@ -61,15 +61,7 @@ export function ActionProgressBar({
   const defaultFormatter = countdownFormatter || formatSeconds;
   const remainingSeconds = Math.max(0, totalDurationSeconds - elapsedSeconds);
 
-  const progressStyle = useMemo(() => ({
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    pointerEvents: 'none' as const,
-  }), []);
-
-  const containerStyle = useMemo(() => ({
+  const containerStyle = useMemo<React.CSSProperties>(() => ({
     position: 'relative',
     width: '60px',
     height: '60px',
@@ -78,14 +70,14 @@ export function ActionProgressBar({
     justifyContent: 'center',
   }), []);
 
-  const countdownStyle = useMemo(() => ({
+  const countdownStyle = useMemo<React.CSSProperties>(() => ({
     position: 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
     fontSize: `${countdownFontSizePx}px`,
     fontWeight: 'bold',
-    color: tokens.preset.text.primary,
+    color: tokens?.preset?.genericTypography?.color?.primary ?? '#fff',
     textShadow: '0 1px 2px rgba(0,0,0,0.5)',
     pointerEvents: 'none' as const,
     textAlign: 'center',
@@ -97,9 +89,8 @@ export function ActionProgressBar({
       <GlowProgress
         variant={variant}
         progress={progressFraction}
-        size={60}
+        sizePx={60}
         strokeWidth={4}
-        style={progressStyle}
       />
       <div style={countdownStyle}>
         {defaultFormatter(remainingSeconds)}

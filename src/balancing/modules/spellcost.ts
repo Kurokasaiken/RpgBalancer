@@ -8,7 +8,7 @@
  * with stat investment and combat effectiveness.
  */
 
-import type { Spell } from '../spellTypes';
+import type { Spell, SpellQuality } from '../spellTypes';
 import { DotModule } from './dot';
 import { BuffModule, type Buff } from './buffs';
 import { NORMALIZED_WEIGHTS } from '../statWeights';
@@ -241,6 +241,33 @@ export const SpellCostModule = {
         const maxRatio = targetRatio * (1 + tolerance);
 
         return powerPerMana >= minRatio && powerPerMana <= maxRatio;
+    },
+
+    /**
+     * Apply a quality affix modifier to a spell.
+     * Amateur reduces the effective budget by ~20% by lowering effect (and precision),
+     * Masterpiece increases it by ~20%.
+     * Returns a new spell object; mana cost is left unchanged so callers can recompute it.
+     */
+    applyQualityModifier(spell: Spell, quality: SpellQuality): Spell {
+        const multiplier = quality === 'Amateur' ? 0.8 : quality === 'Masterpiece' ? 1.2 : 1.0;
+        const modified = { ...spell };
+
+        modified.effect = Math.max(0, modified.effect * multiplier);
+        if (modified.precision !== undefined) {
+            modified.precision = Math.max(-50, Math.min(50, modified.precision * multiplier));
+        }
+
+        return modified;
+    },
+
+    /**
+     * Calculate the current power/mana ratio for a spell.
+     */
+    calculatePowerPerMana(spell: Spell): number {
+        if (!spell.manaCost || spell.manaCost === 0) return 0;
+        const { totalPower } = this.calculateSpellPower(spell);
+        return totalPower / spell.manaCost;
     },
 
     /**

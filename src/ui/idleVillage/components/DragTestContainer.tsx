@@ -802,16 +802,16 @@ function DragTestContainer({
     .join(' ');
 
   const _headerTextClassName = useWanderlustSkin
-    ? 'flex items-center gap-2 text-[15px] font-semibold tracking-[0.34em] text-[#d8b13e]'
+    ? 'flex items-center gap-2 text-[15px] font-semibold tracking-[0.34em] text-[var(--skin-title-color)]'
     : isInlineLayout
-      ? 'flex items-center gap-2 text-[9px] uppercase tracking-[0.4em] text-amber-200/80'
-      : 'flex items-center gap-2 text-[9px] uppercase tracking-[0.45em] text-amber-200/70';
+      ? 'flex items-center gap-2 text-[9px] uppercase tracking-[0.4em] text-[var(--skin-label-primary)]/80'
+      : 'flex items-center gap-2 text-[9px] uppercase tracking-[0.45em] text-[var(--skin-label-primary)]/70';
 
   const _controlButtonClassName = useWanderlustSkin
-    ? 'rounded-full border border-[#d8b13e]/25 bg-[#d8b13e]/5 p-1 text-[#c9a84e] transition hover:border-[#d8b13e]/40 hover:text-[#f0cf6a]'
+    ? 'rounded-full border border-[var(--skin-icon-color)]/25 bg-[var(--skin-icon-color)]/5 p-1 text-[var(--skin-label-primary)] transition hover:border-[var(--skin-icon-color)]/40 hover:text-[var(--skin-title-color)]'
     : isInlineLayout
-      ? 'rounded-full border border-white/15 bg-white/5 p-1 text-slate-200 transition hover:border-amber-300/70 hover:text-amber-200'
-      : 'rounded-full border border-white/15 bg-white/5 p-1.5 text-slate-200 transition hover:border-amber-300/70 hover:text-amber-200';
+      ? 'rounded-full border border-[var(--skin-surface-border)]/15 bg-[var(--skin-text-primary)]/5 p-1 text-[var(--skin-text-secondary)] transition hover:border-[var(--skin-icon-color)]/70 hover:text-[var(--skin-title-color)]'
+      : 'rounded-full border border-[var(--skin-surface-border)]/15 bg-[var(--skin-text-primary)]/5 p-1.5 text-[var(--skin-text-secondary)] transition hover:border-[var(--skin-icon-color)]/70 hover:text-[var(--skin-title-color)]';
 
   const handleStatusChange = useCallback((newStatus: FilterOptions['status']) => {
     if (filters.status === newStatus) return;
@@ -988,6 +988,8 @@ function DragTestContainer({
         opacity: isDragging ? 0.8 : 1,
         cursor: isDragging ? 'grabbing' : componentId ? 'grab' : 'default',
         zIndex: isDragging ? 1000 : 1,
+        background: 'var(--skin-surface-bg)',
+        borderColor: 'var(--skin-surface-border)',
       }}
       className={wrapperClassName}
       data-testid="drag-test-container"
@@ -1011,7 +1013,7 @@ function DragTestContainer({
         <div
           className="pointer-events-none absolute inset-0 rounded-[20px]"
           style={{
-            boxShadow: 'inset 0 0 20px rgba(216,177,62,0.03)',
+            boxShadow: 'inset 0 0 20px rgba(223,184,87,0.03)',
             animation: 'border-pulse 4s ease-in-out infinite',
           }}
         />
@@ -1039,9 +1041,9 @@ function DragTestContainer({
                 width: `${f.size}px`,
                 height: `${f.size}px`,
                 borderRadius: '50%',
-                background: '#f0cf6a',
+                background: 'var(--skin-title-color, #f0cf6a)',
                 filter: 'blur(0.5px)',
-                boxShadow: '0 0 6px rgba(240,207,106,0.75)',
+                boxShadow: '0 0 6px rgba(223,184,87,0.75)',
                 opacity: 0,
                 animation: `firefly ${f.dur}s ease-in-out infinite`,
                 animationDelay: `${f.delay}s`,
@@ -1056,7 +1058,7 @@ function DragTestContainer({
           <div 
             className="block h-px mx-2 mb-5"
             style={{
-              background: 'linear-gradient(90deg, transparent, rgba(216,177,62,0.32) 20%, rgba(216,177,62,0.32) 80%, transparent)',
+              background: 'linear-gradient(90deg, transparent, rgba(223,184,87,0.32) 20%, rgba(223,184,87,0.32) 80%, transparent)',
             }}
           />
         )}
@@ -1071,12 +1073,12 @@ function DragTestContainer({
                 data-testid="roster-drag-handle"
                 data-roster-handle-state={isDragging ? 'dragging' : 'idle'}
               >
-                <GripVertical className={`w-3 h-3 ${useWanderlustSkin ? 'text-[#d8b13e] hover:text-[#f0cf6a]' : 'text-amber-200/80 hover:text-amber-100'} transition-colors`} />
+                <GripVertical className={`w-3 h-3 ${useWanderlustSkin ? 'text-[var(--skin-icon-color)] hover:text-[var(--skin-title-color)]' : 'text-[var(--skin-label-primary)]/80 hover:text-[var(--skin-text-primary)]'} transition-colors`} />
               </div>
             )}
             <span style={useWanderlustSkin ? { fontFamily: 'var(--wl-font-display, "Cinzel", "Trajan Pro", serif)' } : {}}>Roster</span>
             <span 
-              className={useWanderlustSkin ? 'text-[#f0cf6a]' : 'text-amber-100'}
+              className={useWanderlustSkin ? 'text-[var(--skin-title-color)]' : 'text-[var(--skin-text-primary)]'}
               aria-label={`Filtered residents: ${sortedResidents.length} of ${residents.length}`}
               data-testid="resident-count"
             >
@@ -1085,12 +1087,12 @@ function DragTestContainer({
           </div>
           <div className="flex items-center gap-1">
             <label
-              className={`flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[7px] uppercase tracking-[0.18em] ${useWanderlustSkin ? 'border-[#d8b13e]/25 bg-[#d8b13e]/5 text-[#c9a84e]' : 'border-white/15 bg-white/5 text-slate-200'}`}
+              className={`flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[7px] uppercase tracking-[0.18em] ${useWanderlustSkin ? 'border-[var(--skin-icon-color)]/25 bg-[var(--skin-icon-color)]/5 text-[var(--skin-label-primary)]' : 'border-[var(--skin-surface-border)]/15 bg-[var(--skin-text-primary)]/5 text-[var(--skin-text-secondary)]'}`}
             >
               <select
                 value={filters.status}
                 onChange={(e) => handleStatusChange(e.target.value as FilterOptions['status'])}
-                className={`bg-transparent text-[7px] uppercase tracking-[0.15em] focus:outline-none ${useWanderlustSkin ? 'text-[#c9a84e]' : ''}`}
+                className={`bg-transparent text-[7px] uppercase tracking-[0.15em] focus:outline-none ${useWanderlustSkin ? 'text-[var(--skin-label-primary)]' : 'text-[var(--skin-text-secondary)]'}`}
                 aria-label="Filtra residenti per status"
                 data-testid="roster-filter-select"
               >

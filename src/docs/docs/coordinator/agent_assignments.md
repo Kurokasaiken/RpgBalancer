@@ -9544,3 +9544,204 @@ E. evidence log path
 EVIDENCE LOG
 - `test-results/minimal-gameplay-minimal-restore-<YYYY-MM-DD>.log`
 ```
+| I18N-001 - Game Localization Foundation – i18next engine, ICU, types, store, adapters | Completato | 2026-07-10 | Cascade | Completato: i18next engine, ICU, types, store, adapters, provider, pseudo-locale. Evidence: test-results/i18n-001-foundation-2026-07-10.log. Link prompt: `src/docs/docs/coordinator/localization_prompts.md` §I18N-001 | ```text
+AGENT
+Localization Infrastructure Engineer
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `agent-execution-mandate` prima di iniziare, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Installare e configurare il motore i18next con ICU MessageFormat, lazy loading, store locale, provider React e tipi TypeScript generati.
+
+FILE TARGET
+- [nuovo] src/localization/i18n.ts
+- [nuovo] src/localization/I18nProvider.tsx
+- [nuovo] src/localization/i18n.types.ts
+- [nuovo] src/localization/LocaleConfig.ts
+- [nuovo] src/localization/LocaleConfigStore.ts
+- [nuovo] src/localization/useTranslation.ts
+- [nuovo] src/localization/pseudoLocalize.ts
+- [nuovo] src/localization/adapters/LocalizationServiceAdapter.ts
+- [nuovo] src/localization/adapters/InteractionModeCopyAdapter.ts
+- [nuovo] public/locales/en/common.json
+- [nuovo] public/locales/en/idleVillage.json
+- [nuovo] public/locales/pseudo/common.json
+- [nuovo] public/locales/pseudo/idleVillage.json
+- [nuovo] scripts/i18n/generateTypes.ts
+- [nuovo] scripts/i18n/buildPseudo.ts
+- [modifica] package.json
+- [modifica] src/main.tsx
+- [modifica] src/localization/LocalizationService.ts
+- [modifica] src/hooks/useLocalization.ts
+- [modifica] src/ui/idleVillage/config/interactionModeCopy.ts
+- [sposta] src/data/idleVillage/tooltips.json → public/locales/en/idleVillage.json
+
+KANBAN COMPLETION
+1. Stato Kanban -> "Completato" con data odierna
+2. Evidence: `test-results/i18n-001-foundation-2026-07-10.log`
+3. Report finale con: dipendenze installate, provider attivo, locale switch funzionante, `en` e `pseudo` caricabili.
+
+EVIDENCE LOG
+- test-results/i18n-001-foundation-2026-07-10.log
+```
+| I18N-002 - Idle Village Worker Tooltip & Interaction Mode Copy | Completato | 2026-07-10 | Cascade | Completato: useTooltipCopy e interactionModeCopy refactorate per namespace idleVillage; metadata e fallback preservati. Nuovi test unit 37/37 pass. Evidence: test-results/i18n-002-idle-tooltip-copy-2026-07-10.log. Link prompt: `src/docs/docs/coordinator/localization_prompts.md` §I18N-002 | ```text
+AGENT
+Idle Village Localization Engineer
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `agent-execution-mandate` e `idle-village-task` prima di iniziare, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Esternalizzare i worker tooltip e le interaction mode copy in namespace `idleVillage` ICU, mantenendo metadata e fallback.
+
+FILE TARGET
+- [esistente] public/locales/en/idleVillage.json
+- [esistente] public/locales/pseudo/idleVillage.json
+- [esistente] src/ui/idleVillage/config/interactionModeCopy.ts
+- [esistente] src/ui/idleVillage/hooks/useTooltipCopy.ts
+- [esistente] src/localization/LocalizationService.ts
+- [esistente] src/localization/adapters/InteractionModeCopyAdapter.ts
+
+DIPENDENZE
+- I18N-001 completato
+
+REGRESSION SAFEGUARDS
+- npm run lint -- src/ui/idleVillage/config/interactionModeCopy.ts src/ui/idleVillage/hooks/useTooltipCopy.ts
+- npm run test -- tests/unit/idleVillage/ (trovare test pertinenti)
+- npm run build:check
+- npm run kanban:lint
+
+KANBAN COMPLETION
+1. Stato Kanban -> "Completato" con data odierna
+2. Evidence: `test-results/i18n-002-idle-tooltip-copy-<YYYY-MM-DD>.log`
+3. Report finale con: worker tooltip e interaction mode switchabili in `en` e `pseudo`, metadata preservati.
+
+EVIDENCE LOG
+- test-results/i18n-002-idle-tooltip-copy-<YYYY-MM-DD>.log
+```
+| I18N-003a - Idle Village Core UI Extraction – Slot Rack & POI | Completato | 2026-07-13 | Cascade | Estrazione testo hardcoded completata per Slot Rack, POI, Activity Capsule, Medal Overlay e TestRosterPage. Chiavi aggiunte in en/pseudo, testi sostituiti con t()/Trans, telemetry translation_missing/translation_fallback_used implementata. Evidence: test-results/i18n-003a-slot-rack-poi-2026-07-13.log. Link prompt: `src/docs/docs/coordinator/localization_prompts.md` §I18N-003a | ```text
+AGENT
+Idle Village UI Engineer
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `agent-execution-mandate` e `idle-village-task` prima di iniziare, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Estrarre il testo hardcoded dalle componenti di Slot Rack, POI detail, Activity Capsule e overlay medal in `idleVillage`, sostituendo JSX text con chiavi i18n.
+
+PROMPT READINESS
+FILE TARGET
+- [esistente] src/ui/idleVillage/components/SlotV12Renderer.tsx
+- [esistente] src/ui/idleVillage/components/GenericPoiSkin.tsx
+- [esistente] src/ui/idleVillage/components/ActivityCapsule.tsx
+- [esistente] src/ui/idleVillage/components/ActivityCapsuleDetailSkinAware.tsx
+- [esistente] src/ui/idleVillage/components/WanderlustMedalOverlay.tsx
+- [esistente] src/ui/idleVillage/pages/PoiDetailJobRosterIntegrationPage.tsx
+- [esistente] src/ui/idleVillage/TestRosterPage.tsx
+- [modifica] public/locales/en/idleVillage.json
+- [modifica] public/locales/pseudo/idleVillage.json
+- [modifica] tests/unit/idleVillage/* (aggiornare se test verificano testo esatto)
+
+DATO DI ORIGINE
+- Piano: src/docs/docs/plans/game_localization_implementation_plan.md §6 Fase 2
+
+DIPENDENZE
+- I18N-001 e I18N-002 completati
+
+OPERAZIONI DA ESEGUIRE
+1. Catalogare stringhe visibili nelle componenti target.
+2. Aggiungere chiavi in `public/locales/en/idleVillage.json` sotto:
+   - `idleVillage:slotRack.*`
+   - `idleVillage:poiDetail.*`
+   - `idleVillage:activityCapsule.*`
+   - `idleVillage:medalOverlay.*`
+   - `idleVillage:testRoster.*`
+3. Sostituire JSX text con `t('...')` o `<Trans i18nKey="..." />`.
+4. Aggiungere metadata `context`, `maxLength` dove noto.
+5. Generare `pseudo` locale per le chiavi aggiunte.
+6. Aggiornare test con assert su testo esatto.
+7. Emettere telemetry `translation_missing`/`translation_fallback_used` per le chiavi dello scope.
+
+OPERAZIONI VIETATE
+- Vietato rompere layout, drag-and-drop, skin o animazioni.
+- Vietato tradurre testo di test harness/debug-only (lasciare in `en`/`pseudo` a discrezione).
+- Vietato rimuovere test senza equivalente valido.
+
+ASSUNZIONI
+- I18N-001 ha i18next pronto con namespace `idleVillage`.
+- I18N-002 ha già migrato tooltip e interaction mode.
+
+REGRESSION SAFEGUARDS
+- npm run lint -- src/ui/idleVillage
+- npm run test -- tests/unit/idleVillage/
+- npm run build:check
+- npm run kanban:lint
+
+AUTONOMIA & CHECK-IN
+- Autonomia media; apri blocker se un componente richiede rifattorizzazione strutturale.
+
+KANBAN COMPLETION
+1. Stato Kanban -> "Completato" con data odierna
+2. Evidence: `test-results/i18n-003a-slot-rack-poi-<YYYY-MM-DD>.log`
+3. Report finale con: componenti coperti, chiavi aggiunte, test aggiornati, pseudo-locale testata.
+
+NOTE
+- Lavorare per componente; non spazzare tutto in un unico grande diff.
+- Documentare nel log qualsiasi stringa diagnostic-only non estratta.
+
+ANTI-STALL DIRECTIVE
+Procedi autonomamente: non attendere conferme aggiuntive salvo istruzioni contrarie esplicite.
+
+EVIDENCE LOG
+- test-results/i18n-003a-slot-rack-poi-<YYYY-MM-DD>.log
+
+SKILL RICHIESTE
+- `agent-execution-mandate`
+- `idle-village-task` (per tutti i file sotto `src/ui/idleVillage/**`)
+
+CONTEXTO ATTUALE
+- I18N-001 e I18N-002 devono essere `Completati`.
+- `SlotV12Renderer`, `GenericPoiSkin`, `ActivityCapsule`, `ActivityCapsuleDetailSkinAware`, `WanderlustMedalOverlay`, `PoiDetailJobRosterIntegrationPage` e `TestRosterPage` contengono testo player-facing hardcoded.
+- I test esistenti fanno spesso assert su testo esatto; devono essere migrati su `data-testid` o chiavi.
+- `PROJECT_PHILOSOPHY.md` richiede config-first, Style Lab tokens, `trackTelemetryEvent` per `translation_missing`/`translation_fallback_used`.
+
+CRITERI DI ACCETTAZIONE
+- I componenti target non contengono testo player-facing hardcoded; usano `t('idleVillage:...')` o `<Trans i18nKey="..." />`.
+- Chiavi strutturate `namespace:domain.section.key` (es. `idleVillage:slotRack.emptySlot.label`, `idleVillage:poiDetail.title`).
+- Metadata `context` e `maxLength` aggiunti per le chiavi che ne hanno bisogno.
+- `public/locales/pseudo/idleVillage.json` aggiornato e testato.
+- Drag & drop, layout, animazioni e skin non devono regredire.
+- Test con assert su testo esatto aggiornati o riscritti con `data-testid`.
+
+STRATEGIA DI TESTING
+- `npm run i18n:extract` (o scansione) per trovare stringhe residue.
+- `npm run i18n:validate` per verificare chiavi mancanti.
+- `npm run test -- tests/unit/idleVillage/` per aggiornare e far passare i test.
+- `npm run test:visual` (se disponibile) per pseudo-locale su `/test` e `/idle-village`.
+- `npm run build:check`, `npm run lint -- src/ui/idleVillage`, `npm run kanban:lint`.
+
+AGGIORNAMENTI DOCUMENTALI
+- `src/docs/docs/plans/game_localization_implementation_plan.md` §6 Phase 2: annotare `slotRack`, `poiDetail`, `activityCapsule`, `medalOverlay` come completati.
+- `src/docs/docs/plans/idle_village_plan.md` e component fact sheets: annotare namespace e chiavi usate.
+- `strategy_tasks.md` e `agent_assignments.md` via `/kanban-update`.
+
+NOTE DI PARALLELISMO
+- Dipende da I18N-001 e I18N-002.
+- Può partire in parallelo con I18N-003b e I18N-003c.
+- Non deve sovrapporsi in modo concorrenziale con I18N-002 (tooltip/interaction).
+```
+
+| IV-SLOT-RACK-SKIN-DEBUG – Debug Slot Rack Skinning | Completato | - | Cascade | - | - | - | - | 2026-07-12 | Evidence: test-results/iv-slot-rack-skin-debug-2026-07-12.log - base V9 slot rack config, CSS var binding, minimal-slotRack props fixed, runtime verified |
+
+| IV-QUEST-ASSIGNMENT – Quest Assignment Rework (docs, tests, safeguards) | Completato | - | Cascade | - | - | - | - | 2026-07-13 | Evidence: test-results/build-check-2026-07-13.log - docs A1-A4 updated, C1-C4 precision fixes, B unit tests (useQuestAssignmentPreview, QuestAssignmentPreview, QuestCard) added, D build:check + kanban:lint passed, E runtime verification of PoiDetailQuestRosterIntegrationPage (preview + start disabled) via browser preview |
+
+| I18N-003b - Idle Village Core UI Extraction – Quest & Telemetry | Completato | I18N-001, I18N-002 | Cascade | - | - | - | - | 2026-07-13 | Evidence: test-results/i18n-003b-quest-telemetry-2026-07-13.log - hardcoded strings extracted from QuestChronicle, QuestTelemetryPanel, QuestRiskDisplay; en/pseudo locale keys and i18n.types.ts updated; QuestRiskDisplay.test.tsx and QuestTelemetryPanel.test.tsx stabilized (50 tests pass); lint on touched files, build:check, kanban:lint passed |
+
+| I18N-003c - Idle Village Core UI Extraction – Narrative, FTUE, Map & Scheduler | Completato | I18N-001, I18N-002 | Cascade | - | - | - | - | 2026-07-13 | Evidence: test-results/i18n-003c-narrative-ftue-map-scheduler-2026-07-13.log - hardcoded strings extracted from NarrativePanel, VillageSandbox, MinimalGameplayPage, MultiVillageSchedulerMonitor; en/pseudo locale keys and i18n.types.ts updated; tests for NarrativePanel, MinimalGameplayPage, MultiVillageSchedulerMonitor and VillageSandbox isolation test stabilized; build:check, kanban:lint, and targeted lint passed |
+
+| I18N-004 - Localization Tooling & Validation | Completato | I18N-001 | Cascade | - | - | - | - | 2026-07-13 | Evidence: test-results/i18n-004-tooling-2026-07-13.log - i18n:extract/validate/types/build-pseudo scripts verified; tests/i18n/i18n.test.ts 8 passing; build:check and kanban:lint passed; generated i18n.types.ts, en/idleVillage.json, and pseudo locale files |
+
+| I18N-005 - Wider Project Localization | Completato | I18N-003, I18N-004 | Cascade | - | - | - | - | 2026-07-13 | Evidence: test-results/i18n-005-wider-coverage-2026-07-13.log - namespaces balancing/spell/styleLab/sts/wanderlust/lore/errors created and populated; hardcoded strings extracted from Balancer.tsx, SpellCreation.tsx, SpellLibrary.tsx, SpellEditor.tsx, StyleLaboratoryPanel.tsx, WanderlustMockupPage.tsx, QuestChronicle.tsx, and lore samples; i18n:extract/validate/build-pseudo pass; build:check, kanban:lint, npm run build, tsc --noEmit, and tests/i18n/i18n.test.ts pass; full npm run test has pre-existing failures in BalancerHistoryStore/UndoRedoPersistenceMonitor unrelated to this change |
+
+| I18N-006 - Advanced Localization | Completato | I18N-005 | Cascade | - | - | - | - | 2026-07-13 | Evidence: test-results/i18n-006-advanced-2026-07-13.log - ICU plural/select examples added to common.json (en/de/ar); intlFormatters.ts/useIntlFormatters hook created with Intl.NumberFormat/DateTimeFormat/RelativeTimeFormat; LocaleConfig extended with de/ar/ja/zh-CN and LOCALE_FAMILIES; rtlUtils.ts created with getDirectionForLocale/isRTL/getLocaleFontFamily/applyLocaleAttributes; LocaleConfigStore applies lang/dir/font-family; tailwind.config.js font-locale token; de/ar locale JSONs created; tests/i18n/i18n.test.ts extended with 18 tests; tests/i18n/i18n.visual.spec.ts added for pseudo/de/ar on home/idle-village/balancer/punch-club; i18n:extract/validate/build-pseudo, build:check, kanban:lint, npm run build, tsc --noEmit pass; visual test needs baseline update via npm run test:visual -- --update-snapshots |

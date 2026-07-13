@@ -1,0 +1,19 @@
+{
+  "appName": "!! ŘŘṖṖĞĞ ββååłłååññççééřř !!",
+  "welcome": "!! ẄẄééłłççööṃṃéé !!",
+  "language": "!! ŁŁååññğğüüååğğéé !!",
+  "locale": {
+    "en": "!! ÉÉññğğłłîîššĥĥ !!",
+    "it-IT": "!! ÎÎţţååłłîîååññöö !!",
+    "pseudo": "!! ṖṖššééüüδδöö !!",
+    "de": "!! ΔΔééüüţţššççĥĥ !!",
+    "ar": "!! العربية !!",
+    "ja": "!! 日本語 !!",
+    "zh-CN": "!! 简体中文 !!"
+  },
+  "examples": {
+    "swordCount": "!! {count, plural, one {one sword} other {{count} swords}} !!",
+    "riskLevel": "!! {level, select, low {Low risk} medium {Medium risk} high {High risk} other {Unknown risk}} !!",
+    "characterGreeting": "!! {gender, select, male {Welcome, my lord} female {Welcome, my lady} other {Welcome, adventurer}} !!"
+  }
+}

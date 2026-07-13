@@ -2,9 +2,16 @@
 // Works with the full Spell definition (src/balancing/spellTypes.ts) and the cost
 // calculator (src/balancing/spellCost.ts).
 
-import type { Spell } from '../spellTypes';
+import type { Spell, SpellQuality } from '../spellTypes';
 import type { SpellInstance } from './types';
+import type { CardDefinition } from '../config/types';
+import type { CombatMetrics } from '../modules/combatPredictor';
+import { z } from 'zod';
 import { SpellCostModule } from '../modules/spellcost';
+import { CombatPredictor } from '../modules/combatPredictor';
+import { BASELINE_STATS } from '../baseline';
+import { ALL_SPELL_STATS } from '../spellStatDefinitions';
+import { CardDefinitionSchema } from '../config/schemas';
 
 /** Validate a Spell. Returns `{valid, errors}`. */
 export function validateTemplate(spell: Spell): { valid: boolean; errors: string[] } {
@@ -139,3 +146,229 @@ export function compareSpells(a: SpellInstance, b: SpellInstance): SpellDiff {
         tierChange,
     };
 }
+
+// ============== PROCEDURAL SPELL GENERATION ==============
+
+export type VariantStrategy =
+    | 'biggerLessDamage'
+    | 'smallerMoreDamage'
+    | 'precisionForMana'
+    | 'default';
+
+export interface GenerateVariantOptions {
+    strategy?: VariantStrategy;
+    quality?: SpellQuality;
+    /** Target power/mana ratio (default 2.0 HP/mana) */
+    targetRatio?: number;
+    /** Tolerance around the target ratio (default ±0.2, i.e. 1.6–2.4) */
+    tolerance?: number;
+    /** Number of attempts before giving up on a balanced variant */
+    maxAttempts?: number;
+    /** If true, the variant exposes detailed combat metrics */
+    isInspected?: boolean;
+}
+
+export interface ProceduralSpellVariant extends CardDefinition, Spell {
+    quality: SpellQuality;
+    isInspected: boolean;
+    combatMetrics?: CombatMetrics;
+}
+
+function getTierName(tier: number): string {
+    return ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary'][tier - 1] ?? 'Unknown';
+}
+
+function getQualityColor(quality: SpellQuality): string {
+    switch (quality) {
+        case 'Amateur': return 'text-stone-400';
+        case 'Masterpiece': return 'text-amber-400';
+        default: return 'text-blue-400';
+    }
+}
+
+function sanitizeId(raw: string): string {
+    let clean = raw.replace(/[^a-zA-Z0-9_]/g, '_');
+    if (!/^[a-zA-Z]/.test(clean)) clean = 'sp_' + clean;
+    return clean;
+}
+
+function computeSpellCombatMetrics(spell: Spell): CombatMetrics | undefined {
+    if (spell.type !== 'damage') return undefined;
+    const damage = BASELINE_STATS.damage * (spell.effect / 100);
+    const txc = BASELINE_STATS.txc + (spell.precision ?? 0);
+    return CombatPredictor.predict({
+        hp: BASELINE_STATS.hp,
+        damage,
+        txc,
+        evasion: BASELINE_STATS.evasion,
+        critChance: BASELINE_STATS.critChance,
+        lifesteal: 0,
+        regen: 0,
+    });
+}
+
+function applyVariantStrategy(spell: Spell, strategy: VariantStrategy, attempt: number): Spell {
+    const variant = { ...spell };
+    const aoe = variant.aoe;
+
+    switch (strategy) {
+        case 'biggerLessDamage': {
+            const newAoe = Math.min(6, aoe + 2);
+            const oldMultiplier = SpellCostModule.calculateAoeMultiplier(aoe);
+            const newMultiplier = SpellCostModule.calculateAoeMultiplier(newAoe);
+            variant.aoe = newAoe;
+            variant.effect = Math.max(10, Math.min(300, variant.effect * (oldMultiplier / newMultiplier)));
+            break;
+        }
+        case 'smallerMoreDamage': {
+            if (aoe > 1) {
+                const newAoe = aoe - 1;
+                const oldMultiplier = SpellCostModule.calculateAoeMultiplier(aoe);
+                const newMultiplier = SpellCostModule.calculateAoeMultiplier(newAoe);
+                variant.aoe = newAoe;
+                variant.effect = Math.max(10, Math.min(300, variant.effect * (oldMultiplier / newMultiplier)));
+            } else {
+                // Narrow/focused: keep single-target and push damage up
+                variant.effect = Math.min(300, variant.effect * 1.25);
+            }
+            break;
+        }
+        case 'precisionForMana': {
+            // Precision is a hit-chance modifier in this model; keep effect
+            // stable but push precision and rebalance mana later.
+            variant.precision = Math.max(-50, Math.min(50, (variant.precision ?? 0) + 10));
+            variant.effect = Math.max(10, variant.effect * 0.95);
+            break;
+        }
+        case 'default':
+        default:
+            break;
+    }
+
+    return variant;
+}
+
+/** Recompute mana cost so the spell falls inside the configured balance range. */
+function rebalanceToTarget(spell: Spell, targetRatio: number): Spell {
+    const { totalPower } = SpellCostModule.calculateSpellPower(spell);
+    if (totalPower <= 0) return spell;
+    return { ...spell, manaCost: totalPower / targetRatio };
+}
+
+/**
+ * Generate a procedural variant of a base spell.
+ * Returns a ProceduralSpellVariant that extends CardDefinition (and Spell) so it can be
+ * treated as a regular balancer card, or `null` if a balanced variant could not be produced.
+ */
+export function generateProceduralSpellVariant(
+    baseSpell: Partial<Spell>,
+    options: GenerateVariantOptions = {}
+): ProceduralSpellVariant | null {
+    const opts: Required<GenerateVariantOptions> = {
+        strategy: 'default',
+        quality: 'Standard',
+        targetRatio: 2.0,
+        tolerance: 0.2,
+        maxAttempts: 20,
+        isInspected: false,
+        ...options,
+    };
+
+    const template = optimizeAllocation(baseSpell);
+
+    for (let attempt = 0; attempt < opts.maxAttempts; attempt++) {
+        let variant = applyVariantStrategy({ ...template }, opts.strategy, attempt);
+        variant = SpellCostModule.applyQualityModifier(variant, opts.quality);
+        variant = rebalanceToTarget(variant, opts.targetRatio);
+
+        const points = SpellCostModule.calculateSpellPoints(variant);
+        variant.spellPoints = points;
+        variant.tier = getTierName(SpellCostModule.calculateTier(points));
+
+        const { valid, errors } = validateTemplate(variant);
+        if (!valid) {
+            if (process.env.NODE_ENV !== 'production') console.warn('Variant validation failed:', errors);
+            continue;
+        }
+
+        if (!SpellCostModule.isBalanced(variant, opts.tolerance)) {
+            // Try a second recalculation pass before discarding
+            variant = rebalanceToTarget(variant, opts.targetRatio);
+            if (!SpellCostModule.isBalanced(variant, opts.tolerance)) continue;
+        }
+
+        const combatMetrics = computeSpellCombatMetrics(variant);
+
+        const cardPart: CardDefinition = {
+            id: sanitizeId(`${variant.id}_${opts.quality.toLowerCase()}_${attempt}`),
+            title: variant.name.slice(0, 50),
+            color: getQualityColor(opts.quality),
+            statIds: ALL_SPELL_STATS,
+            isCore: false,
+            order: 0,
+            isLocked: false,
+            isHidden: false,
+        };
+
+        const result: ProceduralSpellVariant = {
+            ...variant,
+            ...cardPart,
+            quality: opts.quality,
+            isInspected: opts.isInspected,
+            combatMetrics,
+        };
+
+        return result;
+    }
+
+    return null;
+}
+
+// ============== ZOD VALIDATION ==============
+
+export const SpellQualitySchema = z.enum(['Amateur', 'Standard', 'Masterpiece']);
+
+export const SpellSchema = z.object({
+    id: z.string().min(1),
+    name: z.string().min(1),
+    type: z.enum(['damage', 'heal', 'shield', 'buff', 'debuff', 'cc']),
+    effect: z.number().min(10).max(300),
+    scale: z.number().min(-10).max(10),
+    eco: z.number().min(1),
+    aoe: z.number().min(1),
+    precision: z.number().min(-50).max(50).optional(),
+    dangerous: z.number().min(0).max(100),
+    cooldown: z.number().min(0).max(5.0),
+    range: z.number().min(1).max(10),
+    priority: z.number().min(-5).max(5),
+    spellLevel: z.number().min(0).max(9),
+    manaCost: z.number().min(0).max(200).optional(),
+    spellPoints: z.number().optional(),
+    tier: z.string().optional(),
+    quality: SpellQualitySchema.optional(),
+    isInspected: z.boolean().optional(),
+    description: z.string().optional(),
+    tags: z.array(z.string()).optional(),
+    targetStat: z.string().optional(),
+    ccEffect: z.enum(['stun', 'slow', 'knockback', 'silence']).optional(),
+    castTime: z.number().min(0.1).max(2.0).optional(),
+    pierce: z.number().min(0).max(50).optional(),
+    duration: z.number().min(0).optional(),
+    reflection: z.number().min(0).max(100).optional(),
+    maxStacks: z.number().min(1).optional(),
+    charges: z.number().min(1).optional(),
+    channel: z.number().min(0).optional(),
+});
+
+export const ProceduralSpellVariantSchema = SpellSchema.merge(CardDefinitionSchema)
+    .extend({
+        quality: SpellQualitySchema,
+        isInspected: z.boolean(),
+        combatMetrics: z.object({
+            ttk: z.number(),
+            ttd: z.number(),
+            winProb: z.number(),
+            dps: z.number(),
+            dtps: z.number(),
+        }).optional(),
+    });

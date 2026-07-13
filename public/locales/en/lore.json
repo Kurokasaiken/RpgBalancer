@@ -1,0 +1,67 @@
+{
+  "app": {
+    "title": "Lore"
+  },
+  "character": {
+    "sewerCartographer": {
+      "body": "Nessuno ha mai disegnato le fogne del villaggio. Nessuno, tranne lui. E lui non è mai tornato su.",
+      "title": "Il Cartografo delle Fogne"
+    },
+    "spyBlade": {
+      "body": "Non tutti gli spie portano pugnali. Alcuni portano silenzi così affilati da tagliare la verità a metà.",
+      "title": "La Lama della Spia"
+    }
+  },
+  "faction": {
+    "obsidianTyrant": {
+      "body": "Il Tiranno Ossidiano non cerca la carne. Cerca lo specchio in cui il calore di un coraggio ancora si riflette.",
+      "title": "L'Anima dell'Ossidiana"
+    },
+    "wolfHunger": {
+      "body": "I lupi delle rovine non attaccano per fame: seguono un ordine più antico, scritto nelle fosse fuori dalle mura.",
+      "title": "La Fame del Branco"
+    }
+  },
+  "history": {
+    "ashesOath": {
+      "body": "«Quando l'ultima fiamma si sarà spenta, il patto sarà sigillato con la cenere, non con il sangue.»",
+      "title": "Il Giuramento delle Ceneri"
+    },
+    "firstForge": {
+      "body": "Prima che le fucine spettrali crollassero, un solo martello fu battuto sotto il sole. Ne rimane il calco.",
+      "title": "La Prima Forgia"
+    },
+    "ghostFurnace": {
+      "body": "I wraith non difendono le fornaci. Le fornaci li ricordano. E il ricordo è più forte della paura.",
+      "title": "Le Fornaci Spettrali"
+    }
+  },
+  "item": {
+    "emberSigil": {
+      "body": "Gli Ember Sigils non sono moneta: sono memoria compressa di un'era in cui il sole non tramontava mai.",
+      "title": "Il Sigillo di Brace"
+    },
+    "stellarBlood": {
+      "body": "Quando il sangue delle stelle tocca la terra, il terreno diventa memoria. Quando tocca un uomo, diventa legge.",
+      "title": "Sangue Stellare"
+    }
+  },
+  "location": {
+    "forestResin": {
+      "body": "La resina della foresta settentrionale non brucia. Canta, a bassa voce, quando il vento cambia direzione.",
+      "title": "Resina del Confine"
+    },
+    "gateWhispers": {
+      "body": "Di notte, le grate del villaggio vibrano come corde. I vecchi dicono che le mura stiano imparando a parlare.",
+      "title": "I Sussurri del Cancello"
+    },
+    "marketScales": {
+      "body": "Nel mercato del villaggio, le bilance non misurano il peso. Misurano quanto un uomo è disposto a dimenticare.",
+      "title": "Le Bilance del Mercato"
+    }
+  },
+  "questChronicle": {
+    "defaultNarrative": "La pattuglia avanza tra le rovine — ogni passo potrebbe essere l'ultimo.",
+    "loreLocked": "Una vibrazione antica attende nel silenzio di questa impresa."
+  }
+}

@@ -893,9 +893,124 @@ export const WANDERLUST_V8_SLOT_RACK_CONFIG: SlotRackSkinConfig = {
 };
 
 /**
+ * Base V9 slot rack skin configuration
+ * Default obsidian surface with antique gold/bronze accents and azure light leak.
+ */
+export const SLOT_RACK_BASE_CONFIG: SlotRackSkinConfig = {
+  id: 'slot_rack_base',
+  label: 'Slot Rack · Base V9',
+  description: 'Default V9 obsidian surface with antique gold/bronze accents and azure light leak.',
+  version: 1,
+  supportedPresets: ['base'],
+
+  grid: {
+    gap: 'var(--slot-rack-gap, 12px)',
+    padding: 'var(--slot-rack-padding, 18px)',
+    borderRadius: 'var(--slot-rack-border-radius, 14px)',
+    background: 'var(--slot-rack-bg, #060f16)',
+    border: 'var(--slot-rack-border, 1px solid rgba(223,184,87,0.45))',
+  },
+
+  slotContainer: {
+    background: 'rgba(0, 0, 0, 0.38)',
+    border: '1px solid rgba(223, 184, 87, 0.28)',
+    borderRadius: '50%',
+    padding: '0px',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  },
+
+  navigation: {
+    buttonBackground: 'rgba(6, 15, 22, 0.9)',
+    buttonBorder: '1px solid rgba(223, 184, 87, 0.35)',
+    buttonHoverBackground: 'rgba(223, 184, 87, 0.25)',
+    iconColor: '#f7dd80',
+    iconSize: '18px',
+  },
+
+  medalStyle: {
+    defaultPreset: 'minimal',
+    variants: {
+      minimal: {
+        depth: 8,
+        shadowBlur: 24,
+        shadowOpacity: 0.6,
+        rimThickness: 3,
+        rimColor: '#dfb857',
+        faceColor: '#7a4a12',
+        highlightColor: '#f7dd80',
+        glow: {
+          color: 'rgba(0, 229, 255, 0.25)',
+          blur: 28,
+          opacity: 0.5,
+        },
+        glyphStyle: {
+          fill: '#F5F2E8',
+          shadow: '0 1px 4px rgba(0,0,0,0.65)',
+        },
+      } as MedalStyleConfig,
+    },
+  },
+
+  interactionPhysics: {
+    mass: 1.0,
+    damping: 0.28,
+    stiffness: 220,
+    shadowDepth: 'medium',
+    bloomIntensity: 0.6,
+  },
+
+  rackMotion: {
+    type: 'none',
+  },
+
+  audioProfile: 'slotrack.base.v9',
+
+  cssVars: {
+    '--slot-rack-slot-size': '96px',
+    '--slot-rack-gap': '12px',
+    '--slot-rack-padding': '18px',
+    '--slot-rack-border-radius': '14px',
+    '--slot-rack-bg': 'radial-gradient(circle at 0% 0%, rgba(0,229,255,0.10) 0%, transparent 45%), #060f16',
+    '--slot-rack-bg-gradient': 'radial-gradient(circle at 0% 0%, rgba(0,229,255,0.10) 0%, transparent 45%), #060f16',
+    '--slot-rack-border': '1px solid rgba(223,184,87,0.45)',
+    '--slot-rack-shadow': '0 8px 24px rgba(0,0,0,0.45)',
+    '--slot-rack-halo-color': 'rgba(0,229,255,0.25)',
+    '--slot-rack-tray-ridge-color': 'rgba(223,184,87,0.25)',
+    '--slot-rack-nav-bg': 'rgba(6,15,22,0.9)',
+    '--slot-rack-nav-border': '1px solid rgba(223,184,87,0.35)',
+    '--slot-rack-nav-hover-bg': 'rgba(223,184,87,0.25)',
+    '--slot-rack-nav-icon': '#f7dd80',
+    '--slot-rack-slot-bg': 'rgba(0,0,0,0.38)',
+    '--slot-rack-slot-border-valid': '1px solid rgba(0,229,255,0.7)',
+    '--slot-rack-slot-border-invalid': '1px dashed rgba(217,138,74,0.5)',
+    '--slot-rack-slot-border-empty': 'rgba(223,184,87,0.28)',
+    '--slot-rack-slot-border-assigned': '1px solid rgba(223,184,87,0.7)',
+    '--slot-rack-slot-text': '#F5F2E8',
+    '--slot-rack-slot-empty-text': 'rgba(245,242,232,0.50)',
+    '--slot-rack-slot-shadow': '0 8px 24px rgba(0,0,0,0.45)',
+    '--slot-rack-slot-shadow-valid': '0 0 28px rgba(0,229,255,0.55)',
+    '--slot-rack-slot-shadow-highlighted': '0 0 26px rgba(247,221,128,0.65)',
+    '--slot-rack-slot-ring-color': 'rgba(223,184,87,0.55)',
+    '--slot-rack-slot-glow': 'rgba(0,229,255,0.25)',
+    '--slot-rack-slot-label-color': '#e8c56a',
+    '--slot-rack-slot-badge-bg': 'rgba(0,0,0,0.6)',
+    '--slot-rack-slot-badge-text': '#F5F2E8',
+    '--slot-rack-slot-clear-text': 'rgba(245,242,232,0.85)',
+    '--slot-rack-slot-initials-bg': 'rgba(0,0,0,0.6)',
+    '--slot-rack-scroll-fade-left': 'linear-gradient(90deg, rgba(6,15,22,0.95), rgba(6,15,22,0.25), transparent)',
+    '--slot-rack-scroll-fade-right': 'linear-gradient(270deg, rgba(6,15,22,0.95), rgba(6,15,22,0.25), transparent)',
+  },
+
+  documentation: [
+    'Base V9 obsidian skin with antique gold/bronze accents and azure light leak',
+  ],
+};
+
+/**
  * Registry of all slot rack skin configurations
  */
 export const SLOT_RACK_SKIN_REGISTRY: Record<string, SlotRackSkinConfig> = {
+  [SLOT_RACK_BASE_CONFIG.id]: SLOT_RACK_BASE_CONFIG,
   [SLOT_RACK_IRON_BRONZE_CONFIG.id]: SLOT_RACK_IRON_BRONZE_CONFIG,
   [MINIMAL_FRONTIER_SLOT_RACK_CONFIG.id]: MINIMAL_FRONTIER_SLOT_RACK_CONFIG,
   [WANDERLUST_SLOT_RACK_CONFIG.id]: WANDERLUST_SLOT_RACK_CONFIG,
@@ -904,7 +1019,7 @@ export const SLOT_RACK_SKIN_REGISTRY: Record<string, SlotRackSkinConfig> = {
   [WANDERLUST_V8_SLOT_RACK_CONFIG.id]: WANDERLUST_V8_SLOT_RACK_CONFIG,
 };
 
-export const DEFAULT_SLOT_RACK_PRESET_ID = SLOT_RACK_IRON_BRONZE_CONFIG.id;
+export const DEFAULT_SLOT_RACK_PRESET_ID = SLOT_RACK_BASE_CONFIG.id;
 
 export function resolveSlotRackPresetId(presetId?: string): string {
   if (!presetId) {
@@ -926,6 +1041,9 @@ export function getSlotRackSkinConfig(skinId: string): SlotRackSkinConfig | null
  */
 export function getSlotRackSkinForPreset(presetId: string): SlotRackSkinConfig | null {
   switch (presetId) {
+    case 'base':
+    case 'slot_rack_base':
+      return SLOT_RACK_BASE_CONFIG;
     case 'minimal_frontier':
     case 'slot_rack_iron_bronze':
       return SLOT_RACK_IRON_BRONZE_CONFIG;
@@ -940,14 +1058,14 @@ export function getSlotRackSkinForPreset(presetId: string): SlotRackSkinConfig |
     case 'wilderness_bronze':
       return WILDERNESS_BRONZE_SLOT_RACK_CONFIG;
     default:
-      return SLOT_RACK_IRON_BRONZE_CONFIG;
+      return SLOT_RACK_BASE_CONFIG;
   }
 }
 
 
 // Slot rack preset overrides - must be defined after the configs
 const SLOT_RACK_PRESET_OVERRIDES: Record<string, string> = {
-  minimal_frontier: DEFAULT_SLOT_RACK_PRESET_ID,
+  minimal_frontier: SLOT_RACK_IRON_BRONZE_CONFIG.id,
   wanderlust: WILDERNESS_BRONZE_SLOT_RACK_CONFIG.id,
   wanderlust_dual_pillar: WILDERNESS_BRONZE_SLOT_RACK_CONFIG.id,
   wanderlust_v8: WANDERLUST_V8_SLOT_RACK_CONFIG.id,

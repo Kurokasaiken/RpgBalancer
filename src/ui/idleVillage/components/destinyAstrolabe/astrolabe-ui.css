@@ -8,6 +8,73 @@
 .destiny-astrolabe-wrap { position: relative; }
 
 /* ===================================================================
+   CANVAS-ALIGNED OVERLAY SYSTEM
+   da-canvas-overlay: absolute div measured and snapped to the actual
+   square canvas element (not the landscape wrap). All overlays live
+   here so they align with the circular arena, not the outer container.
+   da-canvas-clip: circular crop for elements that must stay inside the
+   arena disc (ring, freeze flash, screen flash).
+   =================================================================== */
+.da-canvas-overlay {
+  position: absolute;
+  /* Bounds set inline via JS cvBounds measurement */
+  pointer-events: none;
+  z-index: 3;
+  overflow: visible; /* allow narrator to bleed right */
+}
+
+/* ===================================================================
+   ELEMENT NARRATOR — side text that appears when a new zone shows up
+   =================================================================== */
+.da-narrator {
+  position: absolute;
+  right: -12px;
+  top: 50%;
+  transform: translateY(-50%) translateX(calc(100% + 12px));
+  width: 172px;
+  background: rgba(6, 3, 16, 0.88);
+  border: 1px solid rgba(220, 80, 30, 0.25);
+  border-radius: 7px;
+  padding: 10px 13px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.da-narrator--visible {
+  opacity: 1;
+}
+.da-narrator-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: #e0cbb0;
+  font-family: 'Cinzel', serif;
+}
+.da-narrator-dot {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: 2px;
+}
+.da-narrator-dot--wound { background: rgba(230,70,30,0.9); box-shadow: 0 0 6px rgba(255,60,20,0.7); }
+.da-narrator-dot--dead  { background: rgba(140,0,240,0.9); box-shadow: 0 0 6px rgba(160,60,255,0.7); }
+.da-narrator-label { font-weight: 700; letter-spacing: 0.04em; }
+.da-narrator-sub   { font-size: 10px; opacity: 0.7; letter-spacing: 0; font-family: sans-serif; font-weight: 400; }
+.da-canvas-clip {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* ===================================================================
    TIRA / THROW BUTTON — chiseled V8 bronze coin at center of flower
    =================================================================== */
 .da-tira {
@@ -24,11 +91,20 @@
     var(--v8-sun-bronze-light, #e4b048),
     var(--v8-sun-bronze, #a05c18) 55%,
     var(--v8-sun-bronze-dark, #602c08));
-  color: #2a1606;
+  color: #fce890;
   font-family: 'Cinzel', serif;
   font-weight: 700;
-  letter-spacing: 0.14em;
-  font-size: 18px;
+  letter-spacing: 0.07em;
+  font-size: 14px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-shadow:
+    0 0 3px rgba(255, 200, 50, 1),
+    0 0 9px rgba(255, 140, 10, 0.9),
+    0 0 20px rgba(220, 80, 0, 0.55),
+    0 1px 2px rgba(0, 0, 0, 0.85);
   cursor: pointer;
   box-shadow:
     inset 0 2px 6px rgba(255, 225, 150, 0.5),
@@ -45,14 +121,14 @@
     box-shadow:
       inset 0 2px 6px rgba(255, 225, 150, 0.5),
       inset 0 -4px 10px rgba(0, 0, 0, 0.5),
-      0 0 0 0 rgba(16, 185, 129, 0),
+      0 0 0 0 rgba(247, 221, 128, 0),
       0 6px 20px rgba(0, 0, 0, 0.55);
   }
   50% {
     box-shadow:
       inset 0 2px 6px rgba(255, 225, 150, 0.5),
       inset 0 -4px 10px rgba(0, 0, 0, 0.5),
-      0 0 26px 8px rgba(16, 185, 129, 0.45),
+      0 0 28px 10px rgba(247, 221, 128, 0.55),
       0 6px 20px rgba(0, 0, 0, 0.55);
   }
 }
@@ -104,6 +180,34 @@
     rgba(212, 175, 55, 0.55) 0%,
     rgba(212, 175, 55, 0.18) 50%,
     transparent 80%);
+  animation: da-lens-expand 0.8s cubic-bezier(.1,.85,.3,1) forwards;
+}
+/* Specular rim — simulates a glass lens snapping into position */
+.da-screen-flash--success::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 3px solid rgba(255, 240, 150, 0.95);
+  box-shadow:
+    0 0 0 1px rgba(212, 175, 55, 0.35),
+    0 0 18px 6px rgba(255, 210, 60, 0.7),
+    inset 0 0 10px rgba(255, 235, 120, 0.4);
+  animation: da-specular-ring 0.65s cubic-bezier(.08,.85,.2,1) forwards;
+}
+@keyframes da-lens-expand {
+  0%   { opacity: 0; }
+  12%  { opacity: 1; }
+  70%  { opacity: 0.9; }
+  100% { opacity: 0; }
+}
+@keyframes da-specular-ring {
+  0%   { width: 8%;  height: 8%;  opacity: 0;    filter: brightness(5); }
+  18%  { opacity: 1; filter: brightness(3.5); }
+  55%  { width: 90%; height: 90%; opacity: 0.85; filter: brightness(2); }
+  78%  { width: 100%; height: 100%; opacity: 0.45; filter: brightness(1.4); }
+  100% { width: 112%; height: 112%; opacity: 0;    filter: brightness(1); }
 }
 .da-screen-flash--failure {
   background: rgba(20, 8, 28, 0.5);
@@ -119,25 +223,72 @@
 }
 
 /* ===================================================================
-   SWEET SPOT RING — arc overlay during the-spin
+   SKILL BADGE — skill name + TST plaque, V9 gold style
    =================================================================== */
-.da-sweetspot {
+.da-skill-badge {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: 9%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  z-index: 7;
   pointer-events: none;
-  z-index: 3;
-  animation: da-sweetspot-in 0.4s ease-out forwards;
+  animation: da-badge-in 0.45s cubic-bezier(.18,.9,.24,1.12) both;
 }
-@keyframes da-sweetspot-in {
-  from { opacity: 0; transform: scale(0.96); }
-  to   { opacity: 1; transform: scale(1); }
+@keyframes da-badge-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(-8px) scale(0.92); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0)    scale(1); }
 }
-@keyframes da-sweetspot-pulse {
-  0%, 100% { opacity: 0.2; }
-  50%       { opacity: 0.5; }
+
+.da-skill-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 11px 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(223, 184, 87, 0.5);
+  background: rgba(6, 15, 22, 0.78);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.55), inset 0 1px 0 rgba(247,221,128,0.08);
+}
+
+.da-skill-name {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #f7dd80;
+}
+
+.da-skill-sep {
+  color: rgba(223, 184, 87, 0.45);
+  font-size: 10px;
+}
+
+.da-skill-tst {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  color: #dfb857;
+  text-shadow: 0 0 10px rgba(223, 184, 87, 0.5);
+}
+
+/* ===================================================================
+   EXTRA STARFIELD — injected canvas behind the engine canvas
+   =================================================================== */
+.da-stars-extra {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: inherit;
 }
 
 /* ===================================================================
@@ -185,56 +336,80 @@
 .da-legend-toggle:hover { opacity: 1; transform: scale(1.1); }
 
 /* ===================================================================
-   LEGEND PANEL — slide-up backdrop artifact
+   LEGEND PANEL — left-side slide-in panel
    =================================================================== */
 .da-legend {
   position: absolute;
-  bottom: 48px;
+  top: 0;
   left: 0;
-  right: 0;
+  bottom: 0;
+  width: 210px;
   z-index: 9;
-  /* V8 obsidian glass */
-  background: rgba(12, 8, 20, 0.82);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(228, 176, 72, 0.22);
-  border-radius: 10px;
-  padding: 14px 16px 12px;
+  background: rgba(8, 5, 16, 0.90);
+  backdrop-filter: blur(14px);
+  border-right: 1px solid rgba(228, 176, 72, 0.18);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 12px 12px;
   pointer-events: none;
   opacity: 0;
-  transform: translateY(12px);
-  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+  transform: translateX(-8px);
+  transition: opacity 0.22s ease-out, transform 0.22s ease-out;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 .da-legend--open {
   opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
+  transform: translateX(0);
 }
 
-.da-legend-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px 16px;
+/* Header row */
+.da-legend-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(228, 176, 72, 0.2);
+  flex-shrink: 0;
 }
+.da-legend-title {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--v8-sun-bronze-light, #e4b048);
+}
+.da-legend-close {
+  background: none;
+  border: none;
+  color: rgba(228, 176, 72, 0.5);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 3px;
+  transition: color 0.15s;
+}
+.da-legend-close:hover { color: rgba(228, 176, 72, 0.9); }
 
 .da-legend-section {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-}
-.da-legend-section--full {
-  grid-column: 1 / -1;
+  gap: 5px;
 }
 
 .da-legend-heading {
   margin: 0;
   font-family: 'Cinzel', serif;
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--v8-sun-bronze, #a05c18);
-  border-bottom: 1px solid rgba(160, 92, 24, 0.3);
-  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(160, 92, 24, 0.25);
+  padding-bottom: 3px;
 }
 
 .da-legend-list {
@@ -246,43 +421,67 @@
   gap: 5px;
 }
 
-.da-legend-list li {
+/* Row inside list */
+.da-legend-row {
   display: flex;
   align-items: flex-start;
   gap: 7px;
   font-family: 'Space Grotesk', system-ui, sans-serif;
-  font-size: 10px;
+  font-size: 9.5px;
   color: var(--v8-ink-muted, #c0a878);
   line-height: 1.45;
 }
 
+/* Dot swatches */
 .da-legend-swatch {
   flex-shrink: 0;
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 1px;
+  margin-top: 2px;
+  border: 1px solid rgba(255,255,255,0.08);
 }
-.da-legend-swatch svg {
-  width: 14px;
-  height: 14px;
+
+/* Pillar swatches (taller rectangle) */
+.da-legend-swatch--pillar {
+  width: 8px;
+  height: 18px;
+  border-radius: 2px;
+  margin-top: 0;
 }
-.da-legend-swatch--icon {
-  width: auto;
-  height: auto;
-  background: none;
-  border-radius: 0;
+.da-legend-swatch--white {
+  background: linear-gradient(to bottom, #fffef0, #c2a574);
+  border-color: rgba(255,244,200,0.5);
+  box-shadow: 0 0 5px rgba(255,224,150,0.4);
 }
-.da-legend-swatch--icon svg {
-  display: block;
+.da-legend-swatch--black {
+  background: linear-gradient(to bottom, #1c2a3a, #06090f);
+  border-color: rgba(0,229,255,0.35);
+  box-shadow: 0 0 5px rgba(0,180,255,0.3);
+}
+
+/* Ball swatch */
+.da-legend-swatch--ball {
+  background: radial-gradient(circle at 38% 38%, #ffffff, #ffeebc, #a06a1e);
+  border-color: rgba(255,244,200,0.6);
+  box-shadow: 0 0 6px rgba(252,232,144,0.5);
 }
 
 .da-legend-label strong {
   color: var(--v8-sun-bronze-light, #e4b048);
 }
+.da-legend-label em {
+  font-style: normal;
+  font-weight: 700;
+}
+
+/* Verdict color accents */
+.da-legend-verdict--bigwin  { color: #f7d060; }
+.da-legend-verdict--win     { color: #ecd49a; }
+.da-legend-verdict--almost  { color: #a08060; }
+.da-legend-verdict--dead    { color: #b060ff; }
+.da-legend-verdict--wound   { color: #e03050; }
+.da-legend-verdict--epic    { color: #ff2050; }
 
 /* ===================================================================
    THROW CONTROLS — V8 bronze/obsidian toggle switches
@@ -395,11 +594,161 @@
 }
 
 /* ===================================================================
+   FATE RING OVERLAY — proportional zone ring + risk arcs
+   =================================================================== */
+.da-fate-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 3;
+  border-radius: 50%;
+  animation: da-fate-in 0.55s cubic-bezier(.18,.9,.22,1.1) both;
+  overflow: visible;
+}
+@keyframes da-fate-in {
+  from { opacity: 0; transform: scale(0.93) rotate(-4deg); }
+  to   { opacity: 1; transform: scale(1)    rotate(0deg); }
+}
+
+/* Gold arc pulses during the-spin — suspense */
+.da-fate-ring--spinning .da-fate-win-arc {
+  animation: da-fate-win-pulse 1.05s ease-in-out infinite;
+}
+@keyframes da-fate-win-pulse {
+  0%, 100% { filter: none; opacity: 1; }
+  50% {
+    filter: drop-shadow(0 0 5px rgba(247,221,128,0.9))
+            drop-shadow(0 0 12px rgba(223,184,87,0.5));
+    opacity: 1;
+  }
+}
+
+/* Obsidian arc ripples during spin too — dread */
+.da-fate-ring--spinning .da-fate-fail-arc {
+  animation: da-fate-fail-pulse 1.35s ease-in-out infinite;
+}
+@keyframes da-fate-fail-pulse {
+  0%, 100% { opacity: 0.85; }
+  50% {
+    filter: drop-shadow(0 0 3px rgba(0,200,255,0.25));
+    opacity: 1;
+  }
+}
+
+/* Risk arcs surge during risk-pour phase */
+.da-fate-ring--risk .da-fate-dead-arc {
+  animation: da-fate-dead-surge 0.6s ease-in-out infinite;
+}
+@keyframes da-fate-dead-surge {
+  0%, 100% { opacity: 0.65; }
+  50% { opacity: 1; filter: drop-shadow(0 0 4px rgba(160,55,210,0.85)); }
+}
+.da-fate-ring--risk .da-fate-wound-arc {
+  animation: da-fate-wound-surge 0.6s ease-in-out infinite 0.1s;
+}
+@keyframes da-fate-wound-surge {
+  0%, 100% { opacity: 0.65; }
+  50% { opacity: 1; filter: drop-shadow(0 0 4px rgba(215,38,55,0.85)); }
+}
+
+/* Boundary dot pulses subtly */
+.da-fate-boundary {
+  animation: da-fate-boundary-pulse 2.2s ease-in-out infinite;
+}
+@keyframes da-fate-boundary-pulse {
+  0%, 100% { opacity: 0.9; r: 1.5; }
+  50% { opacity: 0.5; r: 1; }
+}
+
+/* Risk text labels */
+.da-fate-risk-text {
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+/* ===================================================================
+   PHASE COMMENTARY — bottom-center pillar labels
+   =================================================================== */
+.da-phase-commentary {
+  position: absolute;
+  bottom: 17%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 7;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  animation: da-phase-in 0.3s ease-out both;
+}
+@keyframes da-phase-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(5px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.da-phase-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 11px 3px 9px;
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.da-phase-chip--threat {
+  background: rgba(6, 10, 18, 0.8);
+  border: 1px solid rgba(80, 110, 140, 0.4);
+  color: rgba(130, 165, 205, 0.85);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+.da-phase-chip--agency {
+  background: rgba(6, 14, 22, 0.8);
+  border: 1px solid rgba(223, 184, 87, 0.35);
+  color: rgba(247, 221, 128, 0.88);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5), 0 0 12px rgba(223,184,87,0.08);
+}
+.da-phase-chip--risk {
+  background: rgba(10, 4, 18, 0.82);
+  border: 1px solid rgba(140, 40, 160, 0.4);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.55);
+  gap: 7px;
+}
+
+.da-phase-chip-icon { font-size: 7px; opacity: 0.7; }
+.da-phase-chip-label { opacity: 0.75; }
+.da-phase-chip-value {
+  margin-left: 2px;
+  font-weight: 900;
+  opacity: 1;
+  letter-spacing: 0.06em;
+}
+
+.da-phase-risk-item {
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+.da-phase-risk--dead  { color: rgba(190, 110, 250, 0.95); }
+.da-phase-risk--wound { color: rgba(235,  75,  95, 0.95); }
+.da-phase-risk-sep    { opacity: 0.35; font-size: 9px; }
+
+/* ===================================================================
    REDUCED MOTION — disable all decorative animations
    =================================================================== */
 @media (prefers-reduced-motion: reduce) {
   .da-tira,
-  .da-sweetspot,
+  .da-skill-badge,
   .da-freeze-frame,
-  .da-screen-flash { animation: none; }
+  .da-screen-flash,
+  .da-fate-ring,
+  .da-phase-commentary { animation: none; }
 }

@@ -1,0 +1,66 @@
+name: I18N Validation
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'src/**'
+      - 'public/locales/**'
+      - 'scripts/i18n/**'
+      - 'tests/i18n/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig*.json'
+      - 'vitest.config.ts'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'src/**'
+      - 'public/locales/**'
+      - 'scripts/i18n/**'
+      - 'tests/i18n/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig*.json'
+      - 'vitest.config.ts'
+  workflow_dispatch:
+
+jobs:
+  validate-i18n:
+    name: Validate i18n keys, types and pseudo locale
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Extract i18n keys
+        run: npm run i18n:extract
+
+      - name: Validate missing English keys
+        run: npm run i18n:validate
+
+      - name: Generate i18n TypeScript types
+        run: npm run i18n:types
+
+      - name: Build pseudo locale
+        run: npm run i18n:build-pseudo
+
+      - name: Run i18n unit tests
+        run: npm test -- tests/i18n/i18n.test.ts
+
+      - name: Run build check
+        run: npm run build:check
+
+      - name: Run Kanban lint
+        run: npm run kanban:lint

@@ -237,6 +237,46 @@ Per stile visivo, palette e coerenza con il tema **Gilded Observatory**, vedere 
   - `src/ui/idleVillage/components/QuestTelemetryPanel.tsx` (integrato)
   - `tests/unit/idleVillage/QuestRiskDisplay.test.tsx` (nuovo)
 
+### 12.15.1 – Quest Assignment Rework (a ruoli + oggetti + preview live)
+
+**Implementation status (2026-07-12): _Completo in runtime, in candidatura per trusted_**
+
+- ✅ `ResidentSlotBlueprint` esteso con `role`, `roleLabel`, `required`, `emptyPenalty`, `residentRiskModifiers`.
+- ✅ `slotBlueprints` aggiunte a `quest_city_rats` e `quest_dangerous_hunt` in `DEFAULT_IDLE_VILLAGE_CONFIG`.
+- ✅ `questPowerRules` aggiunti a `DEFAULT_IDLE_VILLAGE_CONFIG.globalRules`.
+- ✅ `QuestPowerEngine` importa e usa `DEFAULT_QUEST_POWER_RULES` da config.
+- ✅ `MOCK_QUEST_ITEMS` (`src/balancing/config/idleVillage/quests/questItemsMock.ts`) per oggetti consumabili/mock.
+- ✅ `useQuestAssignmentPreview` — calcolo live deterministico (no RNG) di successo/ferita/morte/reward.
+- ✅ `QuestAssignmentPreview` — pannello UI che mostra le percentuali e le motivazioni di blocco.
+- ✅ `PoiDetailQuestRosterIntegrationPage` — usa `QuestCard` canonico, `useQuestAssignmentPreview`, oggetti mock, e CTA **Embark** con `resolveQuestPower` singolo.
+- ✅ `ActivityCapsuleDetailSkinAware` supporta `startDisabled` per pilotare l'abilitazione del CTA da `useQuestAssignmentPreview.canEmbark`.
+
+**Obiettivo:** fornire la UX "Lords of Waterdeep under steroids" per la pagina `/poi-quest-detail-roster-integration`.
+
+- **Ruoli e slot:**
+  - Slot con `role` (es. `combatant`, `support`) e `required=true` devono essere riempiti per abilitare Embark.
+  - `roleLabel` sostituisce la label generica "Slot N".
+- **Preview live:**
+  - `useQuestAssignmentPreview` usa solo funzioni pure di `QuestPowerEngine` (`calculatePartyPower`, `calculateQuestDifficulty`, `calculatePowerRatio`, `getOutcomeDistribution`).
+  - `resolveQuestPower` / `rollQuestOutcome` vengono chiamati **una sola volta** al click di Embark.
+- **Oggetti mock:**
+  - `QuestItemMock` applica `deathChanceDelta`, `injuryChanceDelta`, `rewardMultiplierDelta`.
+  - Selezionabili in UI; aggiornano il preview in tempo reale.
+- **Empty penalty / resident risk modifiers:**
+  - Slot `required` vuoto applica `emptyPenalty` (malus power e/o extra chance di morte/ferita).
+  - `residentRiskModifiers` applicano delta di rischio per-resident (in preview aggregati per semplicità deterministica).
+
+**File creati/modificati:**
+- `src/ui/idleVillage/hooks/useQuestAssignmentPreview.ts` (nuovo)
+- `src/ui/idleVillage/components/QuestAssignmentPreview.tsx` (nuovo)
+- `src/balancing/config/idleVillage/quests/questItemsMock.ts` (nuovo)
+- `src/ui/idleVillage/slots/types.ts` (`ResidentSlotBlueprint` esteso)
+- `src/balancing/config/idleVillage/defaultConfig.ts` (`slotBlueprints` + `questPowerRules`)
+- `src/ui/idleVillage/pages/PoiDetailQuestRosterIntegrationPage.tsx` (QuestCard, preview, Embark)
+- `src/ui/idleVillage/skins/activityCapsuleDetail/ActivityCapsuleDetailSkinAware.tsx` (`startDisabled`)
+- `src/ui/idleVillage/map/actionCards/wrappers/QuestCard.tsx` (clamp risk stripes)
+- `src/docs/docs/plans/quest_role_assignment_rework_strategy.md` (piano strategico)
+
 ### 12.16 – Characters & Roster Integration
 
 **Implementation status: _Parziale_**

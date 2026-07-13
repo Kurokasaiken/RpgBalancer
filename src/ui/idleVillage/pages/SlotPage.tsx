@@ -2,10 +2,11 @@ import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { DndContext, PointerSensor, useSensor, useSensors, useDroppable, pointerWithin } from '@dnd-kit/core';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import PgCard from '@/ui/idleVillage/components/PgCard';
-import { SlotV12Renderer } from '@/ui/idleVillage/components/SlotV12Renderer';
+import { Slot } from '@/ui/idleVillage/components/Slot';
 import { CustomDragOverlay } from '@/ui/idleVillage/components/CustomDragOverlay';
 import { DragProvider } from '@/ui/idleVillage/components/DragContext';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
+import { V9TooltipProvider } from '@/ui/v9-skin/V9Tooltip';
 import { canonicalResidentData } from '@/ui/idleVillage/roster/CanonicalRosterBundle';
 import { useDragOutcome } from '@/ui/idleVillage/interaction/useDragOutcome';
 import { useExtractionSequence } from '@/ui/idleVillage/interaction/useExtractionSequence';
@@ -21,20 +22,23 @@ function DroppableSlot({ isOccupied, portraitUrl, extractionProgress, isExtracti
   return (
     <div ref={setNodeRef} className="flex flex-col items-center gap-4" data-slot-id="test-slot" style={{ background: 'transparent !important' }}>
       <div className="text-sm text-slate-400">SlotV12Renderer (Slot)</div>
-      <div
-        className="relative"
-        style={{ background: 'transparent !important', ...getBloomStyle(bloom, 120) }}
-        onPointerDown={onExtractionPointerDown}
-        onPointerUp={onExtractionPointerUp}
-        onPointerLeave={onExtractionPointerUp}
+      <Slot
+        tooltip="Slot"
+        slotProps={{
+          letter: 'Q',
+          state: isOccupied ? 'occupied' : 'empty',
+          sizePx: 120,
+          extractionProgress: isExtracting ? extractionProgress : 0,
+          pgTokenVisible: false,
+        }}
+        wrapperProps={{
+          className: 'relative',
+          style: { background: 'transparent !important', ...getBloomStyle(bloom, 120) },
+          onPointerDown: onExtractionPointerDown,
+          onPointerUp: onExtractionPointerUp,
+          onPointerLeave: onExtractionPointerUp,
+        }}
       >
-        <SlotV12Renderer
-          letter="Q"
-          state={isOccupied ? 'occupied' : 'empty'}
-          size={120}
-          extractionProgress={isExtracting ? extractionProgress : 0}
-          pgTokenVisible={false}
-        />
         {isOccupied && (
           <div className={`absolute inset-0 flex items-center justify-center z-10 ${isFlight ? 'opacity-30' : ''}`}>
             <div className="relative">
@@ -48,7 +52,7 @@ function DroppableSlot({ isOccupied, portraitUrl, extractionProgress, isExtracti
             </div>
           </div>
         )}
-      </div>
+      </Slot>
     </div>
   );
 }
@@ -211,9 +215,10 @@ export default function SlotPage() {
   }, [extraction]);
 
   return (
-    <TooltipProvider>
-      <DragProvider>
-        <div className="min-h-screen p-8" style={{ backgroundColor: '#ffffff' }}>
+    <V9TooltipProvider>
+      <TooltipProvider>
+        <DragProvider>
+          <div className="min-h-screen p-8" style={{ backgroundColor: '#ffffff' }}>
         <div className="mx-auto max-w-4xl">
           <header className="mb-8 text-center">
             <h1 className="mb-2 text-3xl font-bold text-amber-200">
@@ -317,7 +322,8 @@ export default function SlotPage() {
           </footer>
         </div>
       </div>
-      </DragProvider>
-    </TooltipProvider>
+        </DragProvider>
+      </TooltipProvider>
+    </V9TooltipProvider>
   );
 }

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
+import { useTranslation } from '@/localization/useTranslation';
 import type { Spell } from '@/balancing/spellTypes';
 import { deleteSpell, loadSpellsAsync, saveSpells } from '@/balancing/spellStorage';
 import { BASELINE_STATS } from '@/balancing/baseline';
@@ -15,6 +16,7 @@ import {
 
 /** Enhanced Spell Library with detailed cards */
 export const SpellLibrary: React.FC = () => {
+    const { t } = useTranslation('spell');
     const spells = useSyncExternalStore(subscribeSpellLibrary, getSpellLibrarySnapshot, getSpellLibrarySnapshot);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [isEditing, setIsEditing] = useState(false);
@@ -87,16 +89,16 @@ export const SpellLibrary: React.FC = () => {
                 {/* Left: Spell List */}
                 <div className="w-1/3 backdrop-blur-md bg-white/5 border border-white/10 rounded-xl overflow-hidden flex flex-col shadow-[0_4px_16px_rgba(0,0,0,0.3)]">
                     <div className="p-4 border-b border-white/10 bg-white/5">
-                        <h2 className="text-2xl font-bold text-white drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]">📚 Spell Library</h2>
+                        <h2 className="text-2xl font-bold text-white drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]">📚 {t('spell:library.title')}</h2>
                         <button
                             onClick={openEditor}
                             className="px-4 py-2 bg-linear-to-r from-emerald-500 to-teal-500 hover:shadow-[0_0_16px_rgba(52,211,153,0.6)] text-white text-sm font-bold rounded mt-3 inline-block transition-all"
                         >
-                            + New Spell
+                            + {t('spell:library.newSpell')}
                         </button>
                     </div>
                     <div className="p-3 bg-white/5 text-xs text-gray-300 border-b border-white/10">
-                        {orderedSpells.length} spells available
+                        {t('spell:library.availableCount', { count: orderedSpells.length })}
                     </div>
                     <div className="flex-1 overflow-y-auto p-2 space-y-2">
                         {orderedSpells.map(spell => (
@@ -113,7 +115,7 @@ export const SpellLibrary: React.FC = () => {
                                 </div>
                                 <div className="flex justify-between text-xs text-gray-400">
                                     <span>{spell.type}</span>
-                                    <span>CD: {spell.cooldown} turns</span>
+                                    <span>{t('spell:library.cooldown', { value: spell.cooldown })}</span>
                                 </div>
                             </div>
                         ))}
@@ -139,62 +141,62 @@ export const SpellLibrary: React.FC = () => {
                             {/* Key Stats Cards */}
                             <div className="grid grid-cols-2 gap-4 mb-6">
                                 <div className="backdrop-blur-md bg-white/5 border border-white/10 p-4 rounded hover:scale-[1.02] transition-all">
-                                    <div className="text-gray-400 text-sm mb-1">Base Effect</div>
+                                    <div className="text-gray-400 text-sm mb-1">{t('spell:library.baseEffect')}</div>
                                     <div className="text-2xl font-bold text-white">{selectedSpell.effect}%</div>
                                 </div>
                                 <div className="backdrop-blur-md bg-white/5 border border-white/10 p-4 rounded hover:scale-[1.02] transition-all">
-                                    <div className="text-gray-400 text-sm mb-1">Avg Damage (effect% × base × eco)</div>
+                                    <div className="text-gray-400 text-sm mb-1">{t('spell:library.avgDamage')}</div>
                                     <div className="text-2xl font-bold text-green-400">{calculateAverageDamage(selectedSpell, BASELINE_STATS.damage).toFixed(1)}</div>
-                                    <div className="text-xs text-gray-500">base = {BASELINE_STATS.damage}, eco = {selectedSpell.eco}</div>
+                                    <div className="text-xs text-gray-500">{t('spell:library.avgDamageFormula', { base: BASELINE_STATS.damage, eco: selectedSpell.eco })}</div>
                                 </div>
                             </div>
 
                             {/* Detailed Stats */}
                             <div className="backdrop-blur-md bg-white/5 border border-white/10 p-4 rounded mb-6">
-                                <h3 className="text-xl font-bold text-white mb-4">Statistics</h3>
+                                <h3 className="text-xl font-bold text-white mb-4">{t('spell:library.statistics')}</h3>
                                 <div className="grid grid-cols-2 gap-3 text-sm">
                                     <div className="flex justify-between">
                                         <span className="text-gray-400 cursor-help">
-                                            <Tooltip content={STAT_DESCRIPTIONS.scale}>Scale:</Tooltip>
+                                            <Tooltip content={STAT_DESCRIPTIONS.scale}>{t('spell:stats.scale')}:</Tooltip>
                                         </span>
                                         <span className="text-white font-bold">{selectedSpell.scale > 0 ? '+' : ''}{selectedSpell.scale}</span>
                                     </div>
                                     <div className="flex justify-between">
                                         <span className="text-gray-400 cursor-help">
-                                            <Tooltip content={STAT_DESCRIPTIONS.cooldown}>Cooldown:</Tooltip>
+                                            <Tooltip content={STAT_DESCRIPTIONS.cooldown}>{t('spell:stats.cooldown')}:</Tooltip>
                                         </span>
                                         <span className="text-white font-bold">{selectedSpell.cooldown}s</span>
                                     </div>
                                     <div className="flex justify-between">
                                         <span className="text-gray-400 cursor-help">
-                                            <Tooltip content={STAT_DESCRIPTIONS.manaCost}>Mana Cost:</Tooltip>
+                                            <Tooltip content={STAT_DESCRIPTIONS.manaCost}>{t('spell:stats.manaCost')}:</Tooltip>
                                         </span>
                                         <span className="text-white font-bold">{selectedSpell.manaCost}</span>
                                     </div>
                                     <div className="flex justify-between">
                                         <span className="text-gray-400 cursor-help">
-                                            <Tooltip content={STAT_DESCRIPTIONS.dangerous}>Dangerous:</Tooltip>
+                                            <Tooltip content={STAT_DESCRIPTIONS.dangerous}>{t('spell:stats.dangerous')}:</Tooltip>
                                         </span>
                                         <span className="text-white font-bold">{selectedSpell.precision}%</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-gray-400">Pierce:</span>
+                                        <span className="text-gray-400">{t('spell:stats.pierce')}:</span>
                                         <span className="text-white font-bold">{selectedSpell.dangerous}%</span>
                                     </div>
                                     <div className="flex justify-between">
                                         <span className="text-gray-400 cursor-help">
-                                            <Tooltip content={STAT_DESCRIPTIONS.aoe}>AoE Targets:</Tooltip>
+                                            <Tooltip content={STAT_DESCRIPTIONS.aoe}>{t('spell:stats.aoe')}:</Tooltip>
                                         </span>
                                         <span className="text-white font-bold">{selectedSpell.aoe}</span>
                                     </div>
                                     <div className="flex justify-between">
                                         <span className="text-gray-400 cursor-help">
-                                            <Tooltip content={STAT_DESCRIPTIONS.duration}>Duration:</Tooltip>
+                                            <Tooltip content={STAT_DESCRIPTIONS.duration}>{t('spell:stats.duration')}:</Tooltip>
                                         </span>
                                         <span className="text-white font-bold">{selectedSpell.eco} turns</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-gray-400">Tags:</span>
+                                        <span className="text-gray-400">{t('spell:stats.tags')}:</span>
                                         <span className="text-white font-bold">{selectedSpell.tags?.join(', ') || '-'}</span>
                                     </div>
                                 </div>
@@ -206,19 +208,19 @@ export const SpellLibrary: React.FC = () => {
                                     onClick={openEditor}
                                     className="flex-1 bg-linear-to-r from-blue-500 to-cyan-500 hover:shadow-[0_0_16px_rgba(59,130,246,0.6)] text-white py-3 rounded-lg font-bold transition-all"
                                 >
-                                    Edit Spell
+                                    {t('spell:library.editSpell')}
                                 </button>
                                 <button
                                     onClick={() => handleDelete(selectedSpell.id)}
                                     className="px-6 py-3 bg-white/10 border border-red-400/50 hover:bg-red-950/30 hover:shadow-[0_0_12px_rgba(248,113,113,0.4)] text-red-400 rounded-lg font-bold transition-all"
                                 >
-                                    Delete
+                                    {t('spell:library.delete')}
                                 </button>
                             </div>
                         </div>
                     ) : (
                         <div className="flex items-center justify-center h-full text-gray-500">
-                            Select a spell to view details
+                            {t('spell:library.selectPrompt')}
                         </div>
                     )}
                 </div>

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from '@/localization/useTranslation';
 
 export interface WanderlustMedalOverlayProps {
   portraitUrl?: string;
@@ -17,6 +18,7 @@ export const WanderlustMedalOverlay: React.FC<WanderlustMedalOverlayProps> = ({
   style,
   cursorVelocity = null,
 }) => {
+  const { t } = useTranslation('idleVillage');
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rimAngleTargetRef = useRef(0);
   const rimIntensityRef = useRef(0);
@@ -119,14 +121,14 @@ export const WanderlustMedalOverlay: React.FC<WanderlustMedalOverlayProps> = ({
       
       ctx.beginPath();
       ctx.arc(cx, cy, r, a0, a1);
-      ctx.strokeStyle = `rgba(255,248,180,${opacity * 0.28})`;
+      ctx.strokeStyle = `rgba(240,207,106,${opacity * 0.28})`;
       ctx.lineWidth = 3.5;
       ctx.lineCap = 'round';
       ctx.stroke();
       
       ctx.beginPath();
       ctx.arc(cx, cy, r, a0 + (a1 - a0) * 0.35, a1 - (a1 - a0) * 0.35);
-      ctx.strokeStyle = `rgba(255,252,200,${opacity * 0.55})`;
+      ctx.strokeStyle = `rgba(245,242,232,${opacity * 0.55})`;
       ctx.lineWidth = 1;
       ctx.stroke();
     };
@@ -162,6 +164,8 @@ export const WanderlustMedalOverlay: React.FC<WanderlustMedalOverlayProps> = ({
   return (
     <div
       ref={containerRef}
+      role="img"
+      aria-label={t('idleVillage:medalOverlay.ariaLabel', { defaultValue: 'Resident medal' })}
       className={`tok-svg ${className}`}
       style={{
         position: 'relative',
@@ -207,12 +211,12 @@ export const WanderlustMedalOverlay: React.FC<WanderlustMedalOverlayProps> = ({
           <defs>
             {/* Bronze - warm oxidized */}
             <linearGradient id="g-b" x1="14%" y1="4%" x2="86%" y2="96%">
-              <stop offset="0%" stopColor="#fce890" />
-              <stop offset="9%" stopColor="#e4b048" />
-              <stop offset="28%" stopColor="#a05c18" />
-              <stop offset="52%" stopColor="#602c08" />
-              <stop offset="76%" stopColor="#341604" />
-              <stop offset="100%" stopColor="#0e0602" />
+              <stop offset="0%" stopColor="#f0cf6a" />
+              <stop offset="9%" stopColor="#dfb857" />
+              <stop offset="28%" stopColor="#8a5a20" />
+              <stop offset="52%" stopColor="#060f16" />
+              <stop offset="76%" stopColor="#060f16" />
+              <stop offset="100%" stopColor="#060f16" />
             </linearGradient>
 
             {/* Bevel diagonal */}
@@ -225,19 +229,19 @@ export const WanderlustMedalOverlay: React.FC<WanderlustMedalOverlayProps> = ({
 
             {/* Inner ring */}
             <linearGradient id="g-ri" x1="12%" y1="8%" x2="88%" y2="92%">
-              <stop offset="0%" stopColor="#f0d070" />
-              <stop offset="16%" stopColor="#c88430" />
-              <stop offset="46%" stopColor="#7c3e10" />
-              <stop offset="80%" stopColor="#3c1c04" />
-              <stop offset="100%" stopColor="#160a02" />
+              <stop offset="0%" stopColor="#f0cf6a" />
+              <stop offset="16%" stopColor="#dfb857" />
+              <stop offset="46%" stopColor="#8a5a20" />
+              <stop offset="80%" stopColor="#060f16" />
+              <stop offset="100%" stopColor="#060f16" />
             </linearGradient>
 
             {/* Field stone */}
             <radialGradient id="g-f" cx="40%" cy="33%" r="70%">
-              <stop offset="0%" stopColor="#2e2012" />
-              <stop offset="38%" stopColor="#1a1008" />
-              <stop offset="72%" stopColor="#0e0804" />
-              <stop offset="100%" stopColor="#050302" />
+              <stop offset="0%" stopColor="#0c1517" />
+              <stop offset="38%" stopColor="#060f16" />
+              <stop offset="72%" stopColor="#060f16" />
+              <stop offset="100%" stopColor="#050a0d" />
             </radialGradient>
 
             {/* Specular soft */}
@@ -278,13 +282,13 @@ export const WanderlustMedalOverlay: React.FC<WanderlustMedalOverlayProps> = ({
             {/* Filters */}
             <filter id="f-nm" x="0%" y="0%" width="100%" height="100%">
               <feTurbulence type="fractalNoise" baseFrequency="0.52" numOctaves={4} seed="3" stitchTiles="stitch" result="n" />
-              <feColorMatrix in="n" type="matrix" values="0 0 0 0 .068  0 0 0 0 .046  0 0 0 0 .021  0 0 0 .25 0" result="c" />
+              <feColorMatrix in="n" type="matrix" values="0 0 0 0 .020  0 0 0 0 .030  0 0 0 0 .040  0 0 0 .25 0" result="c" />
               <feBlend in="SourceGraphic" in2="c" mode="overlay" />
             </filter>
             
             <filter id="f-fs" x="0%" y="0%" width="100%" height="100%">
               <feTurbulence type="fractalNoise" baseFrequency="0.90" numOctaves={5} seed="11" stitchTiles="stitch" result="n" />
-              <feColorMatrix in="n" type="matrix" values="0 0 0 0 .038  0 0 0 0 .026  0 0 0 0 .014  0 0 0 .18 0" result="c" />
+              <feColorMatrix in="n" type="matrix" values="0 0 0 0 .020  0 0 0 0 .030  0 0 0 0 .040  0 0 0 .18 0" result="c" />
               <feBlend in="SourceGraphic" in2="c" mode="overlay" />
             </filter>
             
@@ -322,28 +326,28 @@ export const WanderlustMedalOverlay: React.FC<WanderlustMedalOverlayProps> = ({
           {/* MEDALLION BODY */}
           <g clipPath="url(#c-medal)">
             {/* L1: Bronze outer body + texture + bevel */}
-            <circle cx="43" cy="43" r="42" fill="#1a0c04" />
+            <circle cx="43" cy="43" r="42" fill="#060f16" />
             <circle cx="43" cy="43" r="42" fill="url(#g-b)" filter={isDragging ? undefined : "url(#f-nm)"} opacity=".90" />
             <circle cx="43" cy="43" r="42" fill="url(#g-bv)" filter={isDragging ? undefined : "url(#f-dp)"} opacity=".48" />
 
             {/* L2: Rim top - arc of warm light */}
             <circle cx="43" cy="43" r="40.5" fill="none"
-              stroke="rgba(255,238,148,.26)" strokeWidth="3.5"
+              stroke="rgba(240,207,106,.26)" strokeWidth="3.5"
               strokeDasharray="108 148" strokeDashoffset="72"
               strokeLinecap="round" filter={isDragging ? undefined : "url(#f-gl)"} />
             <circle cx="43" cy="43" r="41" fill="none"
-              stroke="rgba(255,250,178,.68)" strokeWidth=".9"
+              stroke="rgba(240,207,106,.68)" strokeWidth=".9"
               strokeDasharray="76 178" strokeDashoffset="82"
               strokeLinecap="round" />
 
             {/* L3: Inner ring separator */}
-            <circle cx="43" cy="43" r="34" fill="#130902" />
+            <circle cx="43" cy="43" r="34" fill="#060f16" />
             <circle cx="43" cy="43" r="34" fill="url(#g-ri)" filter={isDragging ? undefined : "url(#f-nm)"} opacity=".68" />
             <circle cx="43" cy="43" r="34" fill="none"
               stroke="rgba(0,0,0,.75)" strokeWidth="2.2"
               transform="translate(.3,.35)" />
             <circle cx="43" cy="43" r="33.4" fill="none"
-              stroke="rgba(255,222,120,.18)" strokeWidth=".8" />
+              stroke="rgba(240,207,106,.18)" strokeWidth=".8" />
 
             {/* L4: Field stone */}
             <circle cx="43" cy="43" r="30.5" fill="url(#g-f)" />

@@ -26,8 +26,8 @@ test('🔍 Simple Debug Test - Real Drag Drop Behavior', async ({ page }) => {
   await firstSlot.click();
   await page.waitForTimeout(1000);
 
-  // Check for any assignment text
-  const anyAssignment = page.locator('text=/assegnato/');
+  // Check for any assignment feedback (Success / assigned / Error)
+  const anyAssignment = page.locator('text=/Success ·|assigned|Error ·/');
   const assignmentCount = await anyAssignment.count();
   const assignmentTexts = [];
   for (let i = 0; i < assignmentCount; i++) {
@@ -40,31 +40,31 @@ test('🔍 Simple Debug Test - Real Drag Drop Behavior', async ({ page }) => {
   console.log('\n🎯 Test 2: Click assignment su slot restrittivo (dovrebbe fallire)');
   const restrictedSlot = page.getByTestId('slot-button-slot-lab-restricted-slot-0');
   await expect(restrictedSlot).toBeVisible();
-  
+
   // Clear any existing assignments first
   await page.reload();
   await page.waitForSelector('[data-testid="test-roster-page"]');
   await page.waitForTimeout(1000);
-  
+
   // Try to click on restricted slot
   await restrictedSlot.click();
   await page.waitForTimeout(1000);
 
-  const rackBAssignment = page.getByText(/Rack B · assegnato/);
-  const restrictedClickResult = await rackBAssignment.first().isVisible();
+  const rackBPanel = page.getByTestId('slot-lab-panel-restricted');
+  const restrictedClickResult = await rackBPanel.getByText(/Error ·/).first().isVisible();
   console.log('🎯 Click on restricted slot result:', restrictedClickResult);
-  
+
   // Test 3: Manual drag test using dnd-kit compatible method
   console.log('\n🎯 Test 3: Drag manuale su slot restrittivo');
   const residentCard = page.getByTestId('pg-card').first();
   const restrictedSlot2 = page.getByTestId('slot-button-slot-lab-restricted-slot-0');
-  
+
   // Try a more realistic drag approach
   await residentCard.hover();
   await page.waitForTimeout(100);
   await page.mouse.down();
   await page.waitForTimeout(100);
-  
+
   // Move to restricted slot
   const slotBox = await restrictedSlot2.boundingBox();
   if (slotBox) {
@@ -72,9 +72,9 @@ test('🔍 Simple Debug Test - Real Drag Drop Behavior', async ({ page }) => {
     await page.waitForTimeout(200);
     await page.mouse.up();
     await page.waitForTimeout(1000);
-    
-    const rackBAssignment2 = page.getByText(/Rack B · assegnato/);
-    const dragResult = await rackBAssignment2.first().isVisible();
+
+    const rackBPanel2 = page.getByTestId('slot-lab-panel-restricted');
+    const dragResult = await rackBPanel2.getByText(/Error ·/).first().isVisible();
     console.log('🎯 Drag to restricted result:', dragResult);
   }
 
@@ -101,9 +101,9 @@ test('🔍 Simple Debug Test - Real Drag Drop Behavior', async ({ page }) => {
     await page.waitForTimeout(200);
     await page.mouse.up();
     await page.waitForTimeout(1000);
-    
-    const rackBAssignment3 = page.getByText(/Rack B · assegnato/);
-    const highHpResult = await rackBAssignment3.first().isVisible();
+
+    const rackBPanel3 = page.getByTestId('slot-lab-panel-restricted');
+    const highHpResult = await rackBPanel3.getByText(/Success ·/).first().isVisible();
     console.log('🎯 High HP resident to restricted result:', highHpResult);
   }
 
@@ -122,6 +122,6 @@ test('🔍 Simple Debug Test - Real Drag Drop Behavior', async ({ page }) => {
   // Simple assertions
   console.log('\n📊 FINAL RESULTS:');
   console.log('👆 Click assignment worked:', clickResult);
-  console.log('🎯 Drag to restricted assigned:', (await page.getByText(/Rack B · assegnato/).first().isVisible()));
-  console.log('🎯 Any assignment occurred:', (await page.getByText(/Rack [AB] · assegnato/).first().isVisible()));
+  console.log('🎯 Drag to restricted assigned:', (await page.getByTestId('slot-lab-panel-restricted').getByText(/Success ·/).first().isVisible()));
+  console.log('🎯 Any assignment occurred:', (await page.locator('text=/Success ·|assigned|Error ·/').first().isVisible()));
 });
