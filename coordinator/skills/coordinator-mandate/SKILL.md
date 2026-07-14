@@ -95,6 +95,11 @@ Prima di ogni dispatch (verso qualsiasi executor), esegui in ordine:
 1. Dependency gate: tutte le dependencies hanno status 'Completato'
 2. File-target audit cross-channel: i file_targets non sono occupati da task In corso in agent_assignments.md, ai-worker/kanban.json, o worktree harness attivi
 Se un gate fallisce: task resta 'Non assegnato' con nota del motivo. NON impostare executor='manual' per blocchi temporanei — solo per fallimenti permanenti (architectural o N retry falliti).
+Human Confirmation Policy
+Per sequenze di task già approvate dallo Strategist e inserite nel Kanban come "Non assegnato", il Coordinator NON chiede conferma umana prima del dispatch. Procede direttamente rispettando l'ordine delle dipendenze. Chiede conferma umana SOLO se:
+- Un dispatch gate fallisce per motivo non previsto
+- Un task è architectural e non ha executor_reason esplicito
+- Un safeguard fallisce con errore non recuperabile automaticamente
 Task Dispatch Rules
 Agent Assignment
 Dispatch to appropriate agent based on:
