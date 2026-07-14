@@ -27,6 +27,7 @@ Do NOT mark task complete without these updates
 3. Invariant Compliance
 Follow ALL invariants from rules:
 
+canonical-systems.md: prima di iniziare qualsiasi task UI, consulta coordinator/canonical-systems.md e verifica compatibilità con tutti i sistemi elencati — non solo quelli esplicitamente citati nello spec.
 Persistence: Use @/shared/persistence/PersistenceService only
 Config-first: No hardcoded values, use Zod schemas for new config
 Skin system: New skins as presets in skinConfigRegistry, never standalone .css
@@ -66,14 +67,13 @@ New config modules use Zod schemas for validation
 No hardcoded gameplay/UI values in components
 Reference config in src/balancing/config/**, skin/style configs
 Component Reuse Verification
-Before creating new UI component:
-
-Check atoms for equivalent primitives
-Check atoms for fantasy-specific primitives
-Check primitives for idle village primitives
-If primitive exists: reuse or extend via props
-If no primitive exists: create in correct primitive directory
-NEVER duplicate primitive markup/styling from scratch
+Prima di creare un nuovo componente UI, tutte e 5 le condizioni devono essere verificate:
+(1) Hai cercato in src/ui/atoms/ ?
+(2) Hai cercato in src/ui/fantasy/atoms/ ?
+(3) Hai cercato in src/ui/idleVillage/skins/primitives/ ?
+(4) Il nuovo componente NON duplica markup/styling di una primitiva esistente?
+(5) Se crei una nuova primitiva, la stai aggiungendo alla directory corretta (non lasciandola come componente isolato)?
+Se anche solo una risposta è 'no' → STOP, segnala.
 Testing Requirements
 Unit Test Coverage
 Create comprehensive unit tests for new functions/components

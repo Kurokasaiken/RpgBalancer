@@ -20,6 +20,7 @@ Never bypass frozen kit system for idle village components
 2. Skin System Requirements
 All Idle Village UI MUST use the default skin system:
 
+Il CSS ad-hoc per pagina/componente è un pattern LEGACY deprecato. Qualsiasi nuovo skin/tema DEVE essere implementato come preset in skinConfigRegistry. Creare un file .css standalone per un skin è VIOLAZIONE di questo invariant — non eseguire, segnala.
 Use useSkinPreferences hook for skin management
 Reference DEFAULT_SKIN_PRESET_ID for default skin
 New skins implemented as presets in skinConfigRegistry
@@ -102,6 +103,11 @@ Create new primitive only if no equivalent exists
 Document extension rationale in comments
 Avoid creating isolated components that duplicate primitives
 Add new primitives to correct directory for reuse
+State Management
+Zustand store: per stato di dominio/gioco condiviso tra più pagine (risorse, roster, quest attive) — sopravvive alla navigazione.
+React Context: per stato di presentazione/UI locale scoped a un sottoalbero (densità pannello, stato modale, tema scoped a una vista).
+Criterio: se lo stato serve fuori dal sottoalbero che lo consuma → Zustand. Se descrive solo come si comporta/appare una porzione locale → Context.
+Violazione: Context per stato di dominio (o viceversa) → STOP, segnala.
 Telemetry Requirements
 Event Emission
 All Idle Village interactions MUST emit telemetry:
