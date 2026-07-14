@@ -224,6 +224,12 @@ Completion Protocol
 Before marking Idle Village task complete:
 
 All safeguards pass (lint, test, build:check, kanban:lint)
+Runtime smoke test: per ogni pagina creata o modificata, verifica che la route sia raggiungibile e la pagina renderizzi senza errori:
+1. npm run dev (se non già in esecuzione)
+2. curl -s -o /dev/null -w '%{http_code}' http://localhost:5173/<route> deve restituire 200
+3. Se la pagina usa React: verifica assenza di errori in console (nessun 'Cannot read properties of undefined', nessun React error boundary triggered)
+Se il smoke test fallisce: task è BLOCKED, non Completato.
+Il Coordinator verifica la presenza del log del smoke test nell'evidence log prima di chiudere la riga del Kanban.
 Frozen kits used where applicable
 Skin system requirements met
 i18n requirements met (no hardcoded strings)
