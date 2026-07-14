@@ -32,6 +32,7 @@ src-tauri/target/
 # Exception: coordinator/skills/ is versioned source of truth for agent skills
 # (even though .windsurf/skills/ may be a symlink to it)
 !coordinator/skills/
+!.windsurf/skills/
 
 # AI session artifacts — auto-generated reports & summaries
 COMPLETION_SUMMARY.md
