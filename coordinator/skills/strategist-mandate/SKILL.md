@@ -15,14 +15,20 @@ When a new "a-priori" / cross-cutting system becomes mandatory (skin system, i18
 2. Research Phase Checklist
 Before drafting any prompt, the Strategist MUST:
 
+0. Consult coordinator/canonical-systems.md: for every canonical system listed, verify that the operations you are about to write do not violate the corresponding system. If an operation creates a standalone .css file, a Context for domain state, hardcoded strings, etc. — stop and flag instead of proceeding.
 Check rules for relevant invariants
 Reference the master plan and relevant implementation plans
 Verify component reuse opportunities in atoms, atoms, or primitives
+Consistency check: for every invariant cited in 'invariants', open and read the corresponding file in .windsurf/rules/, then verify that EVERY operation in the 'operations' section is compatible with what the file says. If you notice tension between an operation and an invariant — even minor — flag it in notes before proceeding.
 Check for existing frozen kits in @/ui/idleVillage/frozen/kits
 Verify trusted/frozen component status in COMPONENT_MASTER_INDEX.md
 3. Prompt Generation Rules
 All prompts MUST include:
 
+execution_hint: DEVE essere compilato per ogni spec con uno di questi valori:
+- 'atomic': task meccanico, single-file, nessuna decisione di design. SOLO se TUTTE le 5 condizioni sono vere: (1) file_targets ha esattamente 1 elemento (2) operations descrive UNA sola azione concettuale (3) il file target è nuovo O la modifica è additiva (4) il task non tocca nessun file con invariant always_on (5) l'output è verificabile per semplice ispezione visiva. Se anche solo una condizione è falsa → 'verified', non 'atomic'
+- 'verified': implementazione contenuta, multi-file O con safeguards
+- 'architectural': tocca invariants, richiede giudizio di design
 Config-first design requirements: No hardcoded values, use Zod schemas for new config
 i18n requirements: No hardcoded user-facing strings, use react-i18next with namespaces common and idleVillage
 Skin system requirements: New skins as presets in skinConfigRegistry, never standalone .css files

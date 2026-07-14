@@ -75,6 +75,7 @@ Required fields are present
 Invariant references are correct
 Trusted/frozen component references are accurate
 Safeguard scope is appropriate
+Spec consistency gate: prima del dispatch, verifica che le operations dello spec siano compatibili con OGNI invariant citato in 'invariants'. Questo gate blocca task come quello che chiedeva di creare arcane-tech-glass.css pur citando useSkinPreferences come invariant. Se rilevi una contraddizione → status 'Spec in revisione', notifica lo Strategist con la contraddizione specifica.
 File Audit
 Verify impacted files:
 
@@ -89,6 +90,11 @@ In corso → Prompt dispatched to agent
 Completato → Agent completed with evidence
 Failed → Safeguard failure or blocker
 Blocked → Governance violation or missing dependency
+Dispatch Gates
+Prima di ogni dispatch (verso qualsiasi executor), esegui in ordine:
+1. Dependency gate: tutte le dependencies hanno status 'Completato'
+2. File-target audit cross-channel: i file_targets non sono occupati da task In corso in agent_assignments.md, ai-worker/kanban.json, o worktree harness attivi
+Se un gate fallisce: task resta 'Non assegnato' con nota del motivo. NON impostare executor='manual' per blocchi temporanei — solo per fallimenti permanenti (architectural o N retry falliti).
 Task Dispatch Rules
 Agent Assignment
 Dispatch to appropriate agent based on:
@@ -106,13 +112,11 @@ Integration points
 Testing requirements
 Documentation updates
 Execution Hint Assignment
-Provide execution hints:
-
-Estimated duration
-Priority level
-Dependencies on other tasks
-Risk assessment
-Special considerations
+L'execution_hint dello spec determina il canale executor:
+- 'atomic' → ai-worker (GitHub Actions + OpenRouter free, zero RAM locale). Condizione: safeguards vuoto, file_targets.length === 1
+- 'verified' → harness (Groq locale, worktree isolata, safeguards completi)
+- 'architectural' → manuale (Cascade/Windsurf, richiede supervisione)
+Il Coordinator NON può cambiare execution_hint — può solo fare override esplicito con executor_reason documentato.
 Safeguard Enforcement
 Running Safeguard Gates
 After agent completion, verify:
