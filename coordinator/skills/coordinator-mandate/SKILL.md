@@ -33,6 +33,7 @@ Execute prompts after:
 - Execution hints are assigned
 
 Use existing harness commands:
+
 - harness:run for single task execution
 - harness:dispatch for batch execution
 
@@ -101,10 +102,10 @@ Verify impacted files:
 ### Agent Assignment
 Dispatch to appropriate agent based on:
 
-- **Agent Execution**: General implementation tasks
-- **Idle Village Task**: Idle village specific work
-- **Strategist**: Planning and research tasks
-- **Coordinator**: Governance and management tasks
+- Agent Execution: General implementation tasks
+- Idle Village Task: Idle village specific work
+- Strategist: Planning and research tasks
+- Coordinator: Governance and management tasks
 
 ### Scope Determination
 Define execution scope:
