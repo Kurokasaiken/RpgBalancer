@@ -100,6 +100,11 @@ Per sequenze di task già approvate dallo Strategist e inserite nel Kanban come 
 - Un dispatch gate fallisce per motivo non previsto
 - Un task è architectural e non ha executor_reason esplicito
 - Un safeguard fallisce con errore non recuperabile automaticamente
+Pre-Dispatch Checks
+Verifica disponibilità chiavi API prima del dispatch:
+- harness (verified): controlla presenza GROQ_API_KEY
+- ai-worker (atomic): controlla presenza OPENROUTER_API_KEY, GEMINI_API_KEY, CEREBRAS_API_KEY (almeno una)
+Se una chiave manca per il canale richiesto: blocca il task con motivo esplicito invece di eseguire in fallback silenzioso.
 Task Dispatch Rules
 Agent Assignment
 Dispatch to appropriate agent based on:
@@ -227,6 +232,12 @@ Set Kanban status appropriately
 Flag for human review if needed
 Provide clear next steps
 Do not mark task complete if governance fails
+API Key mancante: se GROQ_API_KEY non è presente nell'ambiente e il task ha execution_hint 'verified' (che richiede harness):
+- NON eseguire il task direttamente come fallback silenzioso
+- Marca il task come 'Bloccato - GROQ_API_KEY mancante'
+- Logga in coordinator/dispatch-blocks.log con motivo
+- Se il task ha execution_hint 'atomic', può essere rediretto su ai-worker come fallback esplicito (con nota nel Kanban)
+- Se il task ha execution_hint 'verified' o 'architectural': richiede intervento umano — non eseguire senza harness
 Continuous Improvement
 The Coordinator must:
 
