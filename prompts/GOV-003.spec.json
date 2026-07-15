@@ -1,6 +1,7 @@
 {
   "id": "GOV-003",
   "agent": "harness",
+  "execution_hint": "atomic",
   "objective": "Update strategist-mandate and coordinator-mandate skills to reference Frozen Kits and Documentation Governance in auto-registration and research checklists.",
   "file_targets": [
     ".windsurf/skills/strategist-mandate/SKILL.md",

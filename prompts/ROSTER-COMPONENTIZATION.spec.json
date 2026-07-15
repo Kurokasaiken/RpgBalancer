@@ -38,5 +38,5 @@
     "localization_keys": "chiavi i18n per opzioni filtro in en/idleVillage.json e pseudo/idleVillage.json",
     "evidence_log": "test-results/roster-componentization-<YYYY-MM-DD>.log"
   },
-  "execution_hint": "verified"
+  "execution_hint": "atomic"
 }

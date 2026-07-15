@@ -1,6 +1,7 @@
 {
   "id": "ASTRO-V3-F2",
   "agent": "harness",
+  "execution_hint": "verified",
   "objective": "Destiny Astrolabe V3 — F2 Rischio leggibile: corona ferita, voragini morte, banda crit, obelischi rifatti, skin token `--skin-status-wound`/`--skin-status-death`.",
   "file_targets": [
     "src/ui/idleVillage/components/destinyAstrolabeV3/engineV3.ts",

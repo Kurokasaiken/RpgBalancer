@@ -1,6 +1,7 @@
 {
   "id": "GOV-001",
   "agent": "harness",
+  "execution_hint": "atomic",
   "objective": "Register the Frozen Kits system in .windsurf/rules/ by creating 30-frozen-kits.md and updating 00-project-invariants.md shared baseline examples.",
   "file_targets": [
     ".windsurf/rules/30-frozen-kits.md",

@@ -1,6 +1,7 @@
 {
   "id": "GOV-006",
   "agent": "harness",
+  "execution_hint": "atomic",
   "objective": "Apply the GOV-005 audit findings to COMPONENT_MASTER_INDEX.md, updating statuses, links, and last-certified dates to match KIT_REGISTRY.",
   "file_targets": [
     "src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md",

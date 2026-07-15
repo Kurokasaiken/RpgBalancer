@@ -1,0 +1,75 @@
+{
+  "task_id": "ADR001-T6",
+  "title": "Deprecate C1 (questConfig.ts) and E2",
+  "plan_reference": "ADR-001 — Quest Engine Reconciliation & Opportunity Foundation",
+  "execution_hint": "atomic",
+  "priority": "high",
+  "objectives": [
+    "Add @deprecated JSDoc + ADR-001 reference to questConfig.ts",
+    "Add @deprecated JSDoc + ADR-001 reference to QuestEngine.ts (E2)",
+    "Keep exports (types still consumed by QuestChainProgressTracker, telemetry)",
+    "Documentation only - no runtime changes"
+  ],
+  "invariants": [
+    "No runtime changes - only JSDoc documentation",
+    "Keep exports for types still consumed by other systems",
+    "Reference ADR-001 in deprecation notices"
+  ],
+  "scope": {
+    "files_to_create": [],
+    "files_to_modify": [
+      "src/balancing/config/idleVillage/questConfig.ts",
+      "src/engine/game/idleVillage/QuestEngine.ts"
+    ],
+    "components_affected": [
+      "questConfig.ts (C1)",
+      "QuestEngine.ts (E2)"
+    ],
+    "integration_points": []
+  },
+  "operations": [
+    {
+      "step": 1,
+      "description": "Add @deprecated JSDoc + ADR-001 reference to questConfig.ts at file head",
+      "file": "src/balancing/config/idleVillage/questConfig.ts",
+      "action": "add_deprecated_header"
+    },
+    {
+      "step": 2,
+      "description": "Add @deprecated JSDoc + ADR-001 reference to QuestEngine.ts (E2) at file head",
+      "file": "src/engine/game/idleVillage/QuestEngine.ts",
+      "action": "add_deprecated_header"
+    },
+    {
+      "step": 3,
+      "description": "Verify exports are kept (types still consumed by QuestChainProgressTracker, telemetry)",
+      "file": "src/balancing/config/idleVillage/questConfig.ts",
+      "action": "verify_exports"
+    }
+  ],
+  "guardrails": [
+    "DO NOT make any runtime changes - only JSDoc documentation",
+    "DO NOT remove exports - types are still consumed by other systems",
+    "DO NOT break QuestChainProgressTracker or telemetry",
+    "This is atomic - depends on T5 completion"
+  ],
+  "safeguards": {
+    "lint_scope": "src/balancing/config/idleVillage src/engine/game/idleVillage",
+    "test_scope": "",
+    "build_check": true,
+    "kanban_lint": true
+  },
+  "acceptance_criteria": [
+    "@deprecated JSDoc present in questConfig.ts with ADR-001 reference",
+    "@deprecated JSDoc present in QuestEngine.ts (E2) with ADR-001 reference",
+    "Exports are kept for types still consumed by other systems",
+    "No runtime changes - only documentation",
+    "No new C1 imports after this task"
+  ],
+  "evidence_requirements": {
+    "log_file": "test-results/adr001-t6-<YYYY-MM-DD>.log",
+    "screenshots": false,
+    "test_results": false
+  },
+  "notes": "T6 depends on T5 completion. This is atomic - documentation only, no runtime changes. Keep exports (types still consumed by QuestChainProgressTracker, telemetry)."
+}

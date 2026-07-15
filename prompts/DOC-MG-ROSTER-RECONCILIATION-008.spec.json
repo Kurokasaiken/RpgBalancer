@@ -1,0 +1,99 @@
+{
+  "task_id": "DOC-MG-ROSTER-RECONCILIATION-008",
+  "title": "Optional Post-Fix Documentation Reconciliation",
+  "plan_reference": "Character-to-Resident Architecture - Documentation Governance",
+  "execution_hint": "verified",
+  "priority": "medium",
+  "objectives": [
+    "Update documentation to reflect shared roster bundle adoption",
+    "Remove page-specific roster references",
+    "Update COMPONENT_MASTER_INDEX.md with shared bundle reference",
+    "Verify trusted documentation is still valid"
+  ],
+  "invariants": [
+    "Documentation Governance: No documentation closure before runtime verification",
+    "Runtime Verification First: Base documentation only on verified runtime results",
+    "Single Source of Truth: Ensure single source of truth for roster documentation",
+    "Trusted Contracts: DO NOT modify trusted contracts - only verify",
+    "Evidence-Based: Document only what exists and is verified"
+  ],
+  "scope": {
+    "files_to_create": [],
+    "files_to_modify": [
+      "src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md"
+    ],
+    "components_affected": [
+      "COMPONENT_MASTER_INDEX",
+      "roster_drag_trusted"
+    ],
+    "integration_points": [
+      "src/ui/idleVillage/roster/index.ts",
+      "src/docs/docs/idle_village/trusted/roster_drag_trusted.md"
+    ]
+  },
+  "operations": [
+    {
+      "step": 1,
+      "description": "Verify that RT-MG-ROSTER-BUNDLE-006 and RT-MG-ROSTER-ADOPT-007 are completed with success by checking evidence logs",
+      "file": "test-results",
+      "action": "verify_runtime_success"
+    },
+    {
+      "step": 2,
+      "description": "Update COMPONENT_MASTER_INDEX.md to add reference to shared bundle src/ui/idleVillage/roster/index.ts",
+      "file": "src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md",
+      "action": "update_component_master_index"
+    },
+    {
+      "step": 3,
+      "description": "Update COMPONENT_MASTER_INDEX.md status to reflect shared architecture and remove page-specific references",
+      "file": "src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md",
+      "action": "update_status_references"
+    },
+    {
+      "step": 4,
+      "description": "Verify roster_drag_trusted.md is still valid as baseline and has no page-specific references",
+      "file": "src/docs/docs/idle_village/trusted/roster_drag_trusted.md",
+      "action": "verify_trusted_doc"
+    },
+    {
+      "step": 5,
+      "description": "Remove or update any page-specific roster documentation that describes duplicate implementations",
+      "file": "src/docs/docs/idle_village",
+      "action": "remove_page_specific_docs"
+    },
+    {
+      "step": 6,
+      "description": "Create minimal bundle usage documentation with import/usage patterns and link to trusted contract",
+      "file": "src/docs/docs/idle_village",
+      "action": "create_bundle_docs"
+    }
+  ],
+  "guardrails": [
+    "DO NOT modify trusted contracts - only verify",
+    "DO NOT create new documentation before runtime success",
+    "DO NOT modify the shared bundle",
+    "DO NOT document implementations that don't exist anymore",
+    "Proceed only if runtime success is confirmed"
+  ],
+  "safeguards": {
+    "lint_scope": "src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md",
+    "test_scope": "",
+    "build_check": true,
+    "kanban_lint": true
+  },
+  "acceptance_criteria": [
+    "COMPONENT_MASTER_INDEX.md references shared bundle src/ui/idleVillage/roster/index.ts",
+    "COMPONENT_MASTER_INDEX.md reflects shared architecture with no page-specific references",
+    "roster_drag_trusted.md is verified as valid baseline",
+    "Page-specific roster documentation is removed or updated",
+    "Bundle usage documentation is created with import/usage patterns",
+    "All documentation reflects verified runtime implementation"
+  ],
+  "evidence_requirements": {
+    "log_file": "test-results/doc-mg-roster-reconciliation-008-<YYYY-MM-DD>.log",
+    "screenshots": false,
+    "test_results": false
+  },
+  "notes": "This is an optional task to be executed only after RT-MG-ROSTER-BUNDLE-006 and RT-MG-ROSTER-ADOPT-007 are completed with success. Shared bundle reference: src/ui/idleVillage/roster/index.ts, trusted doc: src/docs/docs/idle_village/trusted/roster_drag_trusted.md."
+}

@@ -2,7 +2,7 @@
   "task_id": "PANELS-FIX-COMPONENT-REUSE",
   "title": "Panels System Fix - Component Reuse Invariant Violation",
   "plan_reference": "coordinator/canonical-systems.md",
-  "execution_hint": "verified",
+  "execution_hint": "atomic",
   "priority": "high",
   "objectives": [
     "Fix Component Reuse invariant violation in V9PanelShell by replacing inline styles with existing CSS classes from wanderlustTokens.css",

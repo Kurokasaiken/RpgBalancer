@@ -1,0 +1,103 @@
+{
+  "task_id": "GM-REG",
+  "title": "Gameplay Modifier Registry Spec",
+  "plan_reference": "strategy_tasks.md - GM-REG Gameplay Modifier Registry Spec",
+  "execution_hint": "verified",
+  "priority": "high",
+  "objectives": [
+    "Create Zod schema and registry for gameplay modifiers with metadata and validation",
+    "Implement registry with registration, lookup, validation, and metadata management",
+    "Define type system for modifiers, scopes, operations, and effects",
+    "Create documentation with architecture overview and usage patterns",
+    "Define telemetry contract for modifier lifecycle events"
+  ],
+  "invariants": [
+    "Config-first: All modifier definitions from config, no hardcoded values",
+    "Zod Validation: Use Zod schemas for complete validation",
+    "Type-safe: Strong TypeScript typing for entire system",
+    "Telemetry: Define telemetry events for modifier lifecycle",
+    "Component Reuse: Reuse existing config patterns"
+  ],
+  "scope": {
+    "files_to_create": [
+      "src/balancing/config/idleVillage/gameplayModifierRegistry.ts",
+      "src/balancing/modifiers/types.ts",
+      "docs/plans/idle_village_modifiers_plan.md",
+      "tests/unit/balancing/gameplayModifierRegistry.test.ts"
+    ],
+    "files_to_modify": [],
+    "components_affected": [
+      "gameplayModifierRegistry",
+      "modifier types"
+    ],
+    "integration_points": [
+      "Zod",
+      "telemetry system"
+    ]
+  },
+  "operations": [
+    {
+      "step": 1,
+      "description": "Create Zod schemas for ModifierDefinition, ModifierScope, ModifierOperation with complete validation",
+      "file": "src/balancing/modifiers/types.ts",
+      "action": "create_zod_schemas"
+    },
+    {
+      "step": 2,
+      "description": "Define TypeScript interfaces for modifiers, scopes, operations, and effects in types.ts",
+      "file": "src/balancing/modifiers/types.ts",
+      "action": "define_types"
+    },
+    {
+      "step": 3,
+      "description": "Implement gameplayModifierRegistry.ts with registration, lookup, validation, and metadata management",
+      "file": "src/balancing/config/idleVillage/gameplayModifierRegistry.ts",
+      "action": "implement_registry"
+    },
+    {
+      "step": 4,
+      "description": "Create idle_village_modifiers_plan.md with architecture overview, usage patterns, and telemetry requirements",
+      "file": "docs/plans/idle_village_modifiers_plan.md",
+      "action": "create_documentation"
+    },
+    {
+      "step": 5,
+      "description": "Define telemetry events for modifier lifecycle (applied/removed/stack_changed)",
+      "file": "src/balancing/modifiers/types.ts",
+      "action": "define_telemetry_contract"
+    },
+    {
+      "step": 6,
+      "description": "Create unit tests for registry operations, validation, edge cases, and error handling",
+      "file": "tests/unit/balancing/gameplayModifierRegistry.test.ts",
+      "action": "create_tests"
+    }
+  ],
+  "guardrails": [
+    "DO NOT create UI components - only backend registry",
+    "DO NOT hardcode modifier definitions in registry",
+    "DO NOT skip validation for modifier metadata",
+    "Ensure all modifier definitions come from config"
+  ],
+  "safeguards": {
+    "lint_scope": "src/balancing/config/idleVillage src/balancing/modifiers",
+    "test_scope": "tests/unit/balancing/gameplayModifierRegistry.test.ts",
+    "build_check": true,
+    "kanban_lint": true
+  },
+  "acceptance_criteria": [
+    "Zod schemas for ModifierDefinition, ModifierScope, ModifierOperation are complete",
+    "TypeScript interfaces for modifiers, scopes, operations, effects are defined",
+    "gameplayModifierRegistry.ts implements registration, lookup, validation, metadata management",
+    "idle_village_modifiers_plan.md documents architecture and usage patterns",
+    "Telemetry contract is defined for modifier lifecycle events",
+    "Unit tests pass for registry operations, validation, edge cases, error handling",
+    "All modifier definitions come from config, not hardcoded"
+  ],
+  "evidence_requirements": {
+    "log_file": "test-results/gm-reg-modifier-registry-<YYYY-MM-DD>.log",
+    "screenshots": false,
+    "test_results": true
+  },
+  "notes": "Config structure: ModifierDefinition (id, name, description, scope, operation, value, duration, conditions, metadata), ModifierScope (GLOBAL|SESSION|LOCATION|QUEST|RESIDENT), ModifierOperation (ADD|MULTIPLY|SET|DISABLE). Export: ModifierRegistrySchema, defaultModifierRegistry, ModifierRegistry."
+}

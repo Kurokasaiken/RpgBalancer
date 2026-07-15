@@ -74,6 +74,10 @@ export const BASE_SKIN_CSS_VARS: SkinCssVarMap = {
   /* Status */
   '--skin-status-met': '#7bc96f',
   '--skin-status-unmet': '#d98a4a',
+  /* Canali semantici esclusivi del rischio (Destiny Astrolabe V3 §4):
+     cremisi = carne (solo corona ferita) · viola = morte (solo voragini) */
+  '--skin-status-wound': '#a11d33',
+  '--skin-status-death': '#6d3fb0',
 
   /* Inset panels */
   '--skin-inset-bg': '#060f16',
@@ -266,6 +270,8 @@ const SKIN_CSS_VAR_OVERRIDES: Partial<Record<SkinPresetId, Partial<SkinCssVarMap
     '--skin-surface-bg':
       'radial-gradient(circle at 0% 0%, rgba(216,144,64,0.18) 0%, transparent 50%), #0a0402',
     '--skin-icon-accent': '#3ad750',
+    '--skin-status-wound': '#b03422',
+    '--skin-status-death': '#5a3a8f',
     '--skin-badge-bg': 'rgba(58,215,80,0.10)',
     '--skin-badge-border': '1px solid rgba(58,215,80,0.35)',
     '--skin-badge-color': '#3ad750',
@@ -278,6 +284,8 @@ const SKIN_CSS_VAR_OVERRIDES: Partial<Record<SkinPresetId, Partial<SkinCssVarMap
     '--skin-title-gradient': 'linear-gradient(180deg, #ffffff 0%, #f7f2e9 60%, #c6c1b7 100%)',
     '--skin-subtitle-color': '#4a6d82',
     '--skin-icon-accent': '#4a6d82',
+    '--skin-status-wound': '#8f2f3c',
+    '--skin-status-death': '#585a9e',
     '--skin-badge-bg': 'rgba(74,109,130,0.12)',
     '--skin-badge-border': '1px solid rgba(74,109,130,0.40)',
     '--skin-badge-color': '#8fb4c9',

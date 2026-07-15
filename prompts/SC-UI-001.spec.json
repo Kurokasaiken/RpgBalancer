@@ -1,6 +1,7 @@
 {
   "id": "SC-UI-001",
   "agent": "harness",
+  "execution_hint": "verified",
   "objective": "Crea una nuova pagina di test /spell-creator nel Test Hub come versione modernizzata di src/ui/spells/SpellCreatorNew.tsx, preservando logica e comportamento, applicando il tema Arcane Tech Glass, il sistema di skin, l'i18n e le project invariants.",
   "file_targets": [
     "src/ui/spells/SpellCreatorTestPage.tsx",

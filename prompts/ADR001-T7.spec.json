@@ -1,0 +1,90 @@
+{
+  "task_id": "ADR001-T7",
+  "title": "Complete quality-roll via existing variance.rewardCategories",
+  "plan_reference": "ADR-001 — Quest Engine Reconciliation & Opportunity Foundation",
+  "execution_hint": "verified",
+  "priority": "high",
+  "objectives": [
+    "Replace 'always first category' stub in QuestResolver with varianceCategory roll",
+    "Read varianceCategory from ActivityDefinition",
+    "Roll via RngService.rollOutcome",
+    "Ensure deterministic outcome given same seed"
+  ],
+  "invariants": [
+    "Config-first: Read varianceCategory from config",
+    "Determinism: Outcome must be deterministic per seed",
+    "No new Zod schema - use existing WeightedDistribution"
+  ],
+  "scope": {
+    "files_to_create": [],
+    "files_to_modify": [
+      "src/engine/game/idleVillage/QuestResolver.ts",
+      "src/balancing/config/idleVillage/types.ts"
+    ],
+    "components_affected": [
+      "QuestResolver",
+      "types"
+    ],
+    "integration_points": [
+      "RngService",
+      "ActivityDefinition"
+    ]
+  },
+  "operations": [
+    {
+      "step": 1,
+      "description": "Replace 'always first category' stub in QuestResolver.ts (lines ~77–86) with varianceCategory roll",
+      "file": "src/engine/game/idleVillage/QuestResolver.ts",
+      "action": "replace_quality_roll_stub"
+    },
+    {
+      "step": 2,
+      "description": "Read varianceCategory from ActivityDefinition",
+      "file": "src/engine/game/idleVillage/QuestResolver.ts",
+      "action": "read_variance_category"
+    },
+    {
+      "step": 3,
+      "description": "Roll via RngService.rollOutcome using varianceCategory weights",
+      "file": "src/engine/game/idleVillage/QuestResolver.ts",
+      "action": "implement_roll"
+    },
+    {
+      "step": 4,
+      "description": "Ensure QualityResult { tier, multiplier } type exists in types.ts (extend if missing, do not duplicate)",
+      "file": "src/balancing/config/idleVillage/types.ts",
+      "action": "verify_quality_result_type"
+    },
+    {
+      "step": 5,
+      "description": "Add tests in QuestResolver.test.ts covering roll distribution across categories with seeded RNG",
+      "file": "tests/unit/idleVillage/QuestResolver.test.ts",
+      "action": "add_distribution_tests"
+    }
+  ],
+  "guardrails": [
+    "DO NOT create new Zod schema - use existing WeightedDistribution",
+    "DO NOT use Math.random() - must use RngService",
+    "DO NOT break determinism - outcome must be deterministic per seed",
+    "Distribution must match config weights within tolerance in test"
+  ],
+  "safeguards": {
+    "lint_scope": "src/engine/game/idleVillage src/balancing/config/idleVillage",
+    "test_scope": "tests/unit/idleVillage",
+    "build_check": true,
+    "kanban_lint": true
+  },
+  "acceptance_criteria": [
+    "QuestResolver reads varianceCategory from ActivityDefinition",
+    "Quality roll uses RngService.rollOutcome",
+    "Deterministic outcome given same seed",
+    "Distribution matches config weights within tolerance in test",
+    "QualityResult type exists and is correct"
+  ],
+  "evidence_requirements": {
+    "log_file": "test-results/adr001-t7-<YYYY-MM-DD>.log",
+    "screenshots": false,
+    "test_results": true
+  },
+  "notes": "T7 depends on T2 and T4. No new Zod schema - use existing WeightedDistribution from T2."
+}

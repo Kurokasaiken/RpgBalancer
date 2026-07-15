@@ -185,7 +185,7 @@ export function buildGeometry(
   input: GeometryInput,
   config: AstrolabeV3Config = astrolabeV3Config,
 ): GeometrySnapshot {
-  const skills = input.stats.length
+  const skills = input.stats?.length
     ? input.stats
     : [{ name: 'Skill', stat: 50, difficulty: input.difficulty }];
   const axisSkill = axisSkillMap(skills.length);
@@ -211,15 +211,32 @@ export function buildGeometry(
   };
 
   const challengeArea = polarArea((a) => rChallengeAt(snap, a));
-  const starPerimeter = polarPerimeter((a) => rStarAt(snap, a));
   const challengePerimeter = polarPerimeter((a) => rChallengeAt(snap, a));
 
   snap.challengeArea = challengeArea;
-  // proporzionalità onesta: area banda = pct% dell'area sfida
-  snap.woundThickness = Math.max(
-    config.minVisualThickness,
-    ((input.woundPct / 100) * challengeArea) / Math.max(1e-6, starPerimeter),
-  );
+  // proporzionalità onesta: area banda = pct% dell'area sfida.
+  // La corona è clippata dal bordo sfida vicino alle punte, quindi lo spessore
+  // si calibra per bisezione sull'area REALE (integrazione polare esatta).
+  const crownAreaFor = (w: number): number => {
+    let area = 0;
+    for (let i = 0; i < SAMPLES; i += 1) {
+      const a = (i / SAMPLES) * TAU;
+      const rs = rStarAt(snap, a);
+      const outer = Math.min(rChallengeAt(snap, a), rs + w / 2);
+      const inner = Math.max(0, rs - w / 2);
+      if (outer > inner) area += 0.5 * (outer * outer - inner * inner) * (TAU / SAMPLES);
+    }
+    return area;
+  };
+  const woundTarget = (input.woundPct / 100) * challengeArea;
+  let wLo = 0;
+  let wHi = 0.6;
+  for (let it = 0; it < 24; it += 1) {
+    const mid = (wLo + wHi) / 2;
+    if (crownAreaFor(mid) < woundTarget) wLo = mid;
+    else wHi = mid;
+  }
+  snap.woundThickness = Math.max(config.minVisualThickness, (wLo + wHi) / 2);
   snap.critThickness = Math.max(
     config.minVisualThickness,
     ((input.critPct / 100) * challengeArea) / Math.max(1e-6, challengePerimeter),

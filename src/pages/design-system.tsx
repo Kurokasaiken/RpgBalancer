@@ -4,20 +4,81 @@ import { DndContext } from '@dnd-kit/core';
 import { TokenSwatchGrid } from '@/ui/designSystem/TokenSwatch';
 import { V9PanelShell } from '@/ui/designSystem/V9PanelShell';
 import { usePanelsStore, selectVisiblePanels } from '@/ui/designSystem/store/usePanelsStore';
+import { useLiveSkinTokens } from '@/ui/designSystem/useLiveSkinTokens';
+import { useSkinPreferences } from '@/ui/idleVillage/hooks/useSkinPreferences';
+import {
+  SkinScope,
+  SkinTitle,
+  SkinButton,
+  SkinBadge,
+  SkinCloseButton,
+} from '@/ui/idleVillage/skins/primitives';
 
 /**
- * Design System Page
- * 
- * Pagina di riferimento per il sistema di design con sezioni per:
- * - Tokens: Visualizzazione swatch dei token wanderlustTokens.css
- * - Panels: Demo del sistema di pannelli draggabili
- * - Store: Stato Zustand per pannelli
- * - Shell: Componenti headless per pannelli
- * - Integration: Esempi di integrazione
+ * /design-system — UI Review Room del gioco.
+ *
+ * Non è una documentazione tecnica né una libreria di componenti: è il luogo
+ * dove ogni schermata viene confrontata con il linguaggio visivo approvato,
+ * e dove ogni nuovo componente nasce da pattern reali già validati.
+ *
+ * Due superfici:
+ *  - Review Room (quotidiana): Hero, Matrix, Current Production, Patterns,
+ *    Visual Rules, Interaction Patterns, Components
+ *  - Advanced Lab (strumentazione): Tokens live, Panels, Store, Shell,
+ *    Integration
+ *
+ * Regola non negoziabile: zero valori visivi duplicati — ogni colore arriva
+ * da getComputedStyle (useLiveSkinTokens) o da un componente reale.
  */
+
+type Surface = 'review' | 'lab';
+
+/** Sezioni tematiche dei token: mappa gruppi derivati dal prefisso --skin-<group>-… */
+const TOKEN_SECTIONS: Array<{ label: string; groups: string[] }> = [
+  { label: 'Surface & Depth', groups: ['surface', 'glow', 'inset', 'footer', 'separator'] },
+  { label: 'Typography', groups: ['font', 'title', 'subtitle', 'body', 'text', 'label', 'incision'] },
+  { label: 'Actions', groups: ['btn', 'btn2', 'cta', 'close', 'icon'] },
+  { label: 'Signals', groups: ['badge', 'plaque', 'titlesep', 'status'] },
+  { label: 'Stat Bars', groups: ['statbar'] },
+  { label: 'Motion & Drag', groups: ['drag', 'snap', 'parallax'] },
+  { label: 'Structures', groups: ['medallion', 'modal', 'clip'] },
+];
+
+const REVIEW_SECTIONS: Array<{ id: string; label: string }> = [
+  { id: 'section-hero', label: 'Hero' },
+  { id: 'section-matrix', label: 'Preview Matrix' },
+  { id: 'section-production', label: 'Current Production' },
+  { id: 'section-patterns', label: 'Game Patterns' },
+  { id: 'section-visual-rules', label: 'Visual Rules' },
+  { id: 'section-interaction-patterns', label: 'Interaction Patterns' },
+  { id: 'section-components', label: 'Components' },
+];
+
+const LAB_SECTIONS: Array<{ id: string; label: string }> = [
+  { id: 'section-tokens', label: 'Tokens' },
+  { id: 'section-panels', label: 'Panels' },
+  { id: 'section-store', label: 'Store' },
+  { id: 'section-shell', label: 'Shell' },
+  { id: 'section-integration', label: 'Integration' },
+];
+
+function SectionPlaceholder({ note }: { note: string }) {
+  return (
+    <p className="skin-text-muted" style={{ fontStyle: 'italic' }}>
+      {note}
+    </p>
+  );
+}
+
 export default function DesignSystemPage() {
   const { t } = useTranslation('common');
-  
+  const [surface, setSurface] = useState<Surface>('review');
+
+  // Skin system — setPreset re-applies the CSS vars globally: the whole page
+  // (and the rest of the app) re-themes live, no logical refresh.
+  const { presetId, availablePresets, setPreset, isLoading: skinLoading } = useSkinPreferences();
+  const tokenGroups = useLiveSkinTokens(presetId);
+
   // Panel store state
   const panels = usePanelsStore((state) => state.panels);
   const activePanelId = usePanelsStore((state) => state.activePanelId);
@@ -28,189 +89,238 @@ export default function DesignSystemPage() {
   const saveState = usePanelsStore((state) => state.saveState);
   const loadState = usePanelsStore((state) => state.loadState);
   const clearState = usePanelsStore((state) => state.clearState);
-  
+
   const visiblePanels = selectVisiblePanels(usePanelsStore.getState());
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load panel state on mount
   useEffect(() => {
     loadState().then(() => setIsLoaded(true));
   }, [loadState]);
 
-  // Handle panel close
-  const handleClosePanel = (panelId: string) => {
-    removePanel(panelId);
-  };
-
-  // Handle panel click
-  const handlePanelClick = (panelId: string) => {
-    setActivePanel(panelId);
-  };
-
-  // Handle layout mode toggle
   const handleLayoutToggle = () => {
-    const newMode = layoutMode === 'full' ? 'strip' : 'full';
-    setLayoutMode(newMode);
+    setLayoutMode(layoutMode === 'full' ? 'strip' : 'full');
   };
 
-  // Handle save state
-  const handleSaveState = async () => {
-    await saveState();
-  };
-
-  // Handle load state
-  const handleLoadState = async () => {
-    await loadState();
-  };
-
-  // Handle clear state
-  const handleClearState = async () => {
-    await clearState();
-  };
-
-  // Token da wanderlustTokens.css
-  const depthTokens = [
-    { name: '--void', value: '#000000', label: 'Void' },
-    { name: '--abyss', value: '#060604', label: 'Abyss' },
-    { name: '--deep', value: '#0a0906', label: 'Deep' },
-    { name: '--base', value: '#0e0c08', label: 'Base' },
-    { name: '--surface', value: '#131008', label: 'Surface' },
-  ];
-
-  const ironTokens = [
-    { name: '--iron-dk', value: '#0c0a06', label: 'Iron Dark' },
-    { name: '--iron-md', value: '#1a1610', label: 'Iron Medium' },
-    { name: '--iron-rim', value: '#282018', label: 'Iron Rim' },
-    { name: '--iron-lg', value: '#342c1e', label: 'Iron Light' },
-  ];
-
-  const accentTokens = [
-    { name: '--acc-primary', value: '#c07028', label: 'Primary' },
-    { name: '--acc-primary-light', value: '#d89040', label: 'Primary Light' },
-    { name: '--acc-primary-dark', value: '#6a3c10', label: 'Primary Dark' },
-  ];
-
-  const glowTokens = [
-    { name: '--glow-amber', value: 'rgba(216,144,64,.45)', label: 'Glow Amber' },
-    { name: '--glow-emerald', value: 'rgba(44,116,66,.42)', label: 'Glow Emerald' },
-    { name: '--glow-rose', value: 'rgba(138,56,56,.40)', label: 'Glow Rose' },
-    { name: '--glow-blue', value: 'rgba(44,80,116,.38)', label: 'Glow Blue' },
-  ];
-
-  const textTokens = [
-    { name: '--t0', value: '#060604', label: 'Text 0' },
-    { name: '--t1', value: '#f0e8d5', label: 'Text 1' },
-    { name: '--t2', value: '#c0a878', label: 'Text 2' },
-    { name: '--t3', value: '#6e5838', label: 'Text 3' },
-    { name: '--t4', value: '#faf0dc', label: 'Text 4' },
-  ];
+  const sections = surface === 'review' ? REVIEW_SECTIONS : LAB_SECTIONS;
 
   return (
-    <div className="observatory-page min-h-screen">
-      <div className="max-w-7xl mx-auto px-8 py-12">
-        {/* Header */}
-        <header className="mb-12">
-          <p className="observatory-kicker text-sm uppercase tracking-wider mb-2">
-            {t('designSystem.kicker', 'Design System')}
-          </p>
-          <h1 className="observatory-title text-4xl font-bold mb-4">
+    <SkinScope className="ds-page min-h-screen" data-testid="design-system-page">
+      <style>{`
+        .ds-page { background: var(--skin-surface-base); min-height: 100vh; }
+        .ds-shell { max-width: 1180px; margin: 0 auto; padding: 40px 32px 80px; }
+        .ds-manifesto {
+          border-left: 2px solid var(--skin-surface-border);
+          padding: 10px 16px;
+          margin: 18px 0 0;
+          color: var(--skin-text-secondary);
+          font-family: var(--skin-font-serif);
+          font-size: 14px;
+          font-style: italic;
+        }
+        .ds-toolbar {
+          position: sticky; top: 0; z-index: 40;
+          display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+          padding: 12px 16px; margin: 24px -16px;
+          background: var(--skin-surface-bg);
+          border: 1px solid var(--skin-surface-border);
+          border-radius: var(--skin-inset-radius);
+          box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+        }
+        .ds-toolbar-label {
+          font-family: var(--skin-font-display);
+          font-size: 10px; letter-spacing: var(--skin-label-tracking);
+          text-transform: uppercase; color: var(--skin-label-tertiary);
+        }
+        .ds-nav { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 0 0 28px; padding: 0; list-style: none; }
+        .ds-nav a {
+          font-family: var(--skin-font-display);
+          font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+          text-decoration: none;
+        }
+        .ds-section { margin-bottom: 28px; padding: 22px 24px; }
+        .ds-row { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+        .ds-group-title { margin-top: 22px; }
+      `}</style>
+
+      <div className="ds-shell">
+        {/* ── Header ─────────────────────────────────────────────────── */}
+        <header style={{ marginBottom: '12px' }}>
+          <div data-skin="subtitle">{t('designSystem.kicker', 'UI Review Room')}</div>
+          <SkinTitle data-testid="page-title">
             {t('designSystem.title', 'Design System Reference')}
-          </h1>
-          <p className="observatory-subcopy text-lg text-slate-400">
-            {t('designSystem.subtitle', 'Component library, tokens, and integration patterns')}
+          </SkinTitle>
+          <div data-skin="titlesep" aria-hidden />
+          <p className="ds-manifesto" data-testid="manifesto">
+            {t(
+              'designSystem.manifesto',
+              '/design-system non documenta la UI del gioco: la definisce. Ogni elemento visivo prodotto deve poter essere confrontato qui con il linguaggio visivo approvato.'
+            )}
           </p>
         </header>
 
-        {/* Sections Grid */}
-        <div className="space-y-8">
-          {/* Tokens Section */}
-          <section className="default-card p-6 rounded-lg border border-slate-700 bg-slate-800/50">
-            <h2 className="text-2xl font-semibold mb-4" data-testid="section-tokens">
-              {t('designSystem.sections.tokens.title', 'Tokens')}
-            </h2>
-            
-            {/* Depth & Surface Tokens */}
-            <div className="mb-8">
-              <h3 className="text-lg font-medium mb-3 text-slate-300">
-                {t('designSystem.sections.tokens.depth', 'Depth & Surface')}
-              </h3>
-              <TokenSwatchGrid tokens={depthTokens} />
-            </div>
+        {/* ── Toolbar: preset switcher + surface tabs ─────────────────── */}
+        <div className="ds-toolbar" data-testid="ds-toolbar">
+          <span className="ds-toolbar-label">{t('designSystem.preset', 'Skin preset')}</span>
+          {availablePresets.map((preset) => (
+            <SkinButton
+              key={preset.id}
+              variant={preset.id === presetId ? 'utility' : 'secondary'}
+              aria-pressed={preset.id === presetId}
+              disabled={skinLoading}
+              onClick={() => setPreset(preset.id)}
+              data-testid={`preset-${preset.id}`}
+            >
+              {preset.label}
+            </SkinButton>
+          ))}
+          <span style={{ flex: 1 }} />
+          <span className="ds-toolbar-label">{t('designSystem.surface', 'Surface')}</span>
+          <SkinButton
+            variant={surface === 'review' ? 'utility' : 'secondary'}
+            aria-pressed={surface === 'review'}
+            onClick={() => setSurface('review')}
+            data-testid="surface-review"
+          >
+            {t('designSystem.reviewRoom', 'Review Room')}
+          </SkinButton>
+          <SkinButton
+            variant={surface === 'lab' ? 'utility' : 'secondary'}
+            aria-pressed={surface === 'lab'}
+            onClick={() => setSurface('lab')}
+            data-testid="surface-lab"
+          >
+            {t('designSystem.lab', 'Advanced Lab')}
+          </SkinButton>
+        </div>
 
-            {/* Iron Tokens */}
-            <div className="mb-8">
-              <h3 className="text-lg font-medium mb-3 text-slate-300">
-                {t('designSystem.sections.tokens.iron', 'Iron (Warm)')}
-              </h3>
-              <TokenSwatchGrid tokens={ironTokens} />
-            </div>
+        {/* ── Anchor nav ──────────────────────────────────────────────── */}
+        <ul className="ds-nav" data-testid="ds-nav">
+          {sections.map((s) => (
+            <li key={s.id}>
+              <a href={`#${s.id}`}>{s.label}</a>
+            </li>
+          ))}
+        </ul>
 
-            {/* Accent Tokens */}
-            <div className="mb-8">
-              <h3 className="text-lg font-medium mb-3 text-slate-300">
-                {t('designSystem.sections.tokens.accent', 'Accent & Glow')}
-              </h3>
-              <TokenSwatchGrid tokens={accentTokens} />
-            </div>
-
-            {/* Glow Tokens */}
-            <div className="mb-8">
-              <h3 className="text-lg font-medium mb-3 text-slate-300">
-                {t('designSystem.sections.tokens.glow', 'Glow Effects')}
-              </h3>
-              <TokenSwatchGrid tokens={glowTokens} />
-            </div>
-
-            {/* Text Tokens */}
-            <div className="mb-8">
-              <h3 className="text-lg font-medium mb-3 text-slate-300">
-                {t('designSystem.sections.tokens.text', 'Typography')}
-              </h3>
-              <TokenSwatchGrid tokens={textTokens} />
-            </div>
+        {/* ═══ REVIEW ROOM ═══════════════════════════════════════════ */}
+        <div hidden={surface !== 'review'} data-testid="surface-review-content">
+          <section id="section-hero" className="ds-section" data-skin="panel">
+            <h2 data-testid="section-hero">{t('designSystem.sections.hero', 'Hero Showcase')}</h2>
+            <SectionPlaceholder note="Fase 3 — composizione Village Overview (80% componenti reali)." />
           </section>
 
-          {/* Panels Section */}
-          <section className="default-card p-6 rounded-lg border border-slate-700 bg-slate-800/50">
-            <h2 className="text-2xl font-semibold mb-4" data-testid="section-panels">
-              {t('designSystem.sections.panels.title', 'Panels')}
+          <section id="section-matrix" className="ds-section" data-skin="panel">
+            <h2 data-testid="section-matrix">{t('designSystem.sections.matrix', 'Preview Matrix')}</h2>
+            <SectionPlaceholder note="Fase 3 — stessa scena composta per ogni preset, affiancate, con Skin Compatibility health." />
+          </section>
+
+          <section id="section-production" className="ds-section" data-skin="panel">
+            <h2 data-testid="section-production">{t('designSystem.sections.production', 'Current Production')}</h2>
+            <SectionPlaceholder note="Fase 2 — la UI vera del gioco, read-only, con Source e Last validated." />
+          </section>
+
+          <section id="section-patterns" className="ds-section" data-skin="panel">
+            <h2 data-testid="section-patterns">{t('designSystem.sections.patterns', 'Game Patterns')}</h2>
+            <SectionPlaceholder note="Fase 2 — POI Detail, Resident Card, Reward Popup… con Anatomy scomponibile." />
+          </section>
+
+          <section id="section-visual-rules" className="ds-section" data-skin="panel">
+            <h2 data-testid="section-visual-rules">{t('designSystem.sections.visualRules', 'Visual Rules')}</h2>
+            <SectionPlaceholder note="Fase 4 — shape language, density, material, hierarchy, decoration & attention budget." />
+          </section>
+
+          <section id="section-interaction-patterns" className="ds-section" data-skin="panel">
+            <h2 data-testid="section-interaction-patterns">
+              {t('designSystem.sections.interactionPatterns', 'Interaction Patterns')}
             </h2>
-            
-            {/* Layout Mode Toggle */}
-            <div className="mb-4 flex items-center gap-4">
-              <button
-                onClick={handleLayoutToggle}
-                className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded text-sm transition-colors"
-                data-testid="layout-toggle"
-              >
-                {t('designSystem.sections.panels.toggleLayout', `Layout: ${layoutMode}`)}
-              </button>
-              <button
-                onClick={handleSaveState}
-                className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded text-sm transition-colors"
-                data-testid="save-state"
-              >
-                {t('designSystem.sections.panels.saveState', 'Save State')}
-              </button>
-              <button
-                onClick={handleLoadState}
-                className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded text-sm transition-colors"
-                data-testid="load-state"
-              >
-                {t('designSystem.sections.panels.loadState', 'Load State')}
-              </button>
-              <button
-                onClick={handleClearState}
-                className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded text-sm transition-colors"
-                data-testid="clear-state"
-              >
-                {t('designSystem.sections.panels.clearState', 'Clear State')}
-              </button>
+            <SectionPlaceholder note="Fase 4 — layout + flow + emotional goal (Reward Presentation, POI Discovery…)." />
+          </section>
+
+          {/* Components — primitivi skin reali, nessun valore duplicato */}
+          <section id="section-components" className="ds-section" data-skin="panel">
+            <h2 data-testid="section-components">{t('designSystem.sections.components', 'Components')}</h2>
+
+            <h3 className="ds-group-title">{t('designSystem.components.buttons', 'Buttons')}</h3>
+            <div className="ds-row" data-testid="components-buttons">
+              <SkinButton>{t('designSystem.components.utility', 'Utility')}</SkinButton>
+              <SkinButton variant="secondary">{t('designSystem.components.secondary', 'Secondary')}</SkinButton>
+              <SkinButton variant="cta">{t('designSystem.components.cta', 'Avvia')}</SkinButton>
+              <SkinButton disabled>{t('designSystem.components.disabled', 'Disabled')}</SkinButton>
             </div>
 
-            {/* Panels Demo */}
-            <div 
-              className="relative min-h-[500px] bg-slate-900/50 rounded border border-slate-700"
+            <h3 className="ds-group-title">{t('designSystem.components.signals', 'Badges & Close')}</h3>
+            <div className="ds-row" data-testid="components-signals">
+              <SkinBadge>{t('designSystem.components.badge', 'Azure Badge')}</SkinBadge>
+              <SkinCloseButton aria-label={t('designSystem.components.close', 'Close')} />
+            </div>
+
+            <h3 className="ds-group-title">{t('designSystem.components.typography', 'Typography roles')}</h3>
+            <div data-testid="components-typography">
+              <div data-skin="subtitle">Subtitle · tracked caption</div>
+              <h3>Section heading (h3)</h3>
+              <p>
+                Body text — <strong>strong emphasis</strong>, <span className="skin-text-secondary">secondary</span>,{' '}
+                <span className="skin-text-muted">muted</span>, <a href="#section-components">link accent</a>.
+              </p>
+            </div>
+          </section>
+        </div>
+
+        {/* ═══ ADVANCED LAB ═══════════════════════════════════════════ */}
+        <div hidden={surface !== 'lab'} data-testid="surface-lab-content">
+          {/* Tokens — letti LIVE da getComputedStyle, mai duplicati */}
+          <section id="section-tokens" className="ds-section" data-skin="panel">
+            <h2 data-testid="section-tokens">{t('designSystem.sections.tokens.title', 'Tokens')}</h2>
+            <p className="skin-text-secondary">
+              {t(
+                'designSystem.sections.tokens.note',
+                'Valori letti live dal documento (getComputedStyle): cambiando preset, cambiano. Nessun valore copiato a mano.'
+              )}
+            </p>
+            {TOKEN_SECTIONS.map(({ label, groups }) => {
+              const tokens = groups.flatMap((g) => tokenGroups[g] ?? []);
+              if (tokens.length === 0) return null;
+              return (
+                <div key={label} style={{ marginBottom: '26px' }}>
+                  <h3 className="ds-group-title">{label}</h3>
+                  <TokenSwatchGrid
+                    tokens={tokens.map((tk) => ({
+                      name: tk.name,
+                      value: tk.value,
+                      source: tk.source,
+                    }))}
+                  />
+                </div>
+              );
+            })}
+          </section>
+
+          {/* Panels */}
+          <section id="section-panels" className="ds-section" data-skin="panel">
+            <h2 data-testid="section-panels">{t('designSystem.sections.panels.title', 'Panels')}</h2>
+
+            <div className="ds-row" style={{ marginBottom: '16px' }}>
+              <SkinButton onClick={handleLayoutToggle} data-testid="layout-toggle">
+                {t('designSystem.sections.panels.toggleLayout', `Layout: ${layoutMode}`)}
+              </SkinButton>
+              <SkinButton variant="secondary" onClick={() => void saveState()} data-testid="save-state">
+                {t('designSystem.sections.panels.saveState', 'Save State')}
+              </SkinButton>
+              <SkinButton variant="secondary" onClick={() => void loadState()} data-testid="load-state">
+                {t('designSystem.sections.panels.loadState', 'Load State')}
+              </SkinButton>
+              <SkinButton variant="secondary" onClick={() => void clearState()} data-testid="clear-state">
+                {t('designSystem.sections.panels.clearState', 'Clear State')}
+              </SkinButton>
+            </div>
+
+            <div
+              className="relative min-h-[500px]"
+              style={{
+                background: 'var(--skin-inset-bg)',
+                border: '1px solid var(--skin-inset-border)',
+                borderRadius: 'var(--skin-inset-radius)',
+              }}
               data-testid="panels-demo"
             >
               {isLoaded && (
@@ -219,18 +329,16 @@ export default function DesignSystemPage() {
                     <V9PanelShell
                       key={panel.id}
                       panel={panel}
-                      onClose={() => handleClosePanel(panel.id)}
+                      onClose={() => removePanel(panel.id)}
                       isActive={activePanelId === panel.id}
-                      onClick={() => handlePanelClick(panel.id)}
+                      onClick={() => setActivePanel(panel.id)}
                     >
                       <div>
-                        <p className="text-slate-300 mb-2">
-                          {t('designSystem.sections.panels.panelContent', 'Panel Content')}
-                        </p>
-                        <p className="text-slate-400 text-sm">
+                        <p>{t('designSystem.sections.panels.panelContent', 'Panel Content')}</p>
+                        <p className="skin-text-muted text-sm">
                           {t('designSystem.sections.panels.panelPosition', `Position: ${panel.position.x}, ${panel.position.y}`)}
                         </p>
-                        <p className="text-slate-400 text-sm">
+                        <p className="skin-text-muted text-sm">
                           {t('designSystem.sections.panels.panelSize', `Size: ${panel.size.width}x${panel.size.height}`)}
                         </p>
                       </div>
@@ -241,139 +349,107 @@ export default function DesignSystemPage() {
             </div>
           </section>
 
-          {/* Store Section */}
-          <section className="default-card p-6 rounded-lg border border-slate-700 bg-slate-800/50">
-            <h2 className="text-2xl font-semibold mb-4" data-testid="section-store">
-              {t('designSystem.sections.store.title', 'Store')}
-            </h2>
-            
-            {/* Store Debug View */}
-            <div className="space-y-4" data-testid="store-debug">
-              <div>
-                <h3 className="text-lg font-medium mb-2 text-slate-300">
-                  {t('designSystem.sections.store.layoutMode', 'Layout Mode')}
-                </h3>
-                <p className="text-slate-400">{layoutMode}</p>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-medium mb-2 text-slate-300">
-                  {t('designSystem.sections.store.activePanel', 'Active Panel')}
-                </h3>
-                <p className="text-slate-400">{activePanelId || 'None'}</p>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-medium mb-2 text-slate-300">
-                  {t('designSystem.sections.store.panelCount', 'Panel Count')}
-                </h3>
-                <p className="text-slate-400">{Object.keys(panels).length}</p>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-medium mb-2 text-slate-300">
-                  {t('designSystem.sections.store.visiblePanels', 'Visible Panels')}
-                </h3>
-                <p className="text-slate-400">{visiblePanels.length}</p>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-medium mb-2 text-slate-300">
-                  {t('designSystem.sections.store.panelIds', 'Panel IDs')}
-                </h3>
-                <ul className="text-slate-400 list-disc list-inside">
-                  {Object.keys(panels).map((id) => (
-                    <li key={id}>{id}</li>
-                  ))}
-                </ul>
-              </div>
+          {/* Store */}
+          <section id="section-store" className="ds-section" data-skin="panel">
+            <h2 data-testid="section-store">{t('designSystem.sections.store.title', 'Store')}</h2>
+            <div className="space-y-3" data-testid="store-debug">
+              <p>
+                <span className="skin-text-secondary">{t('designSystem.sections.store.layoutMode', 'Layout Mode')}: </span>
+                {layoutMode}
+              </p>
+              <p>
+                <span className="skin-text-secondary">{t('designSystem.sections.store.activePanel', 'Active Panel')}: </span>
+                {activePanelId || 'None'}
+              </p>
+              <p>
+                <span className="skin-text-secondary">{t('designSystem.sections.store.panelCount', 'Panel Count')}: </span>
+                {Object.keys(panels).length}
+              </p>
+              <p>
+                <span className="skin-text-secondary">{t('designSystem.sections.store.visiblePanels', 'Visible Panels')}: </span>
+                {visiblePanels.length}
+              </p>
+              <ul className="list-disc list-inside">
+                {Object.keys(panels).map((id) => (
+                  <li key={id}>{id}</li>
+                ))}
+              </ul>
             </div>
           </section>
 
-          {/* Shell Section */}
-          <section className="default-card p-6 rounded-lg border border-slate-700 bg-slate-800/50">
-            <h2 className="text-2xl font-semibold mb-4" data-testid="section-shell">
-              {t('designSystem.sections.shell.title', 'Shell')}
-            </h2>
-            <p className="text-slate-400" data-testid="section-shell-content">
+          {/* Shell */}
+          <section id="section-shell" className="ds-section" data-skin="panel">
+            <h2 data-testid="section-shell">{t('designSystem.sections.shell.title', 'Shell')}</h2>
+            <p className="skin-text-muted" data-testid="section-shell-content">
               {t('designSystem.sections.shell.placeholder', 'Work in progress')}
             </p>
           </section>
 
-          {/* Integration Section */}
-          <section className="default-card p-6 rounded-lg border border-slate-700 bg-slate-800/50">
-            <h2 className="text-2xl font-semibold mb-4" data-testid="section-integration">
-              {t('designSystem.sections.integration.title', 'Integration')}
-            </h2>
-            
-            {/* Integration Guide */}
+          {/* Integration */}
+          <section id="section-integration" className="ds-section" data-skin="panel">
+            <h2 data-testid="section-integration">{t('designSystem.sections.integration.title', 'Integration')}</h2>
             <div className="space-y-4" data-testid="integration-guide">
               <div>
-                <h3 className="text-lg font-medium mb-2 text-slate-300">
-                  {t('designSystem.sections.integration.step1', 'Step 1: Import Components')}
-                </h3>
-                <pre className="bg-slate-900 p-4 rounded text-sm text-slate-300 overflow-x-auto">
+                <h3>{t('designSystem.sections.integration.step1', 'Step 1: Wrap in SkinScope')}</h3>
+                <pre
+                  className="p-4 rounded text-sm overflow-x-auto"
+                  style={{
+                    background: 'var(--skin-inset-bg)',
+                    border: '1px solid var(--skin-separator)',
+                    color: 'var(--skin-text-secondary)',
+                  }}
+                >
+                  {`import { SkinScope, SkinButton, SkinTitle } from '@/ui/idleVillage/skins/primitives';
+
+<SkinScope>
+  <SkinTitle>Titolo</SkinTitle>
+  <SkinButton variant="cta">Avvia</SkinButton>
+</SkinScope>`}
+                </pre>
+              </div>
+              <div>
+                <h3>{t('designSystem.sections.integration.step2', 'Step 2: Style with --skin-* only')}</h3>
+                <pre
+                  className="p-4 rounded text-sm overflow-x-auto"
+                  style={{
+                    background: 'var(--skin-inset-bg)',
+                    border: '1px solid var(--skin-separator)',
+                    color: 'var(--skin-text-secondary)',
+                  }}
+                >
+                  {`/* ✔ Do */
+background: var(--skin-surface-bg);
+
+/* ✖ Don't — mai valori hardcoded, mai token legacy */
+background: #060f16;
+background: var(--panel-bg);`}
+                </pre>
+              </div>
+              <div>
+                <h3>{t('designSystem.sections.integration.step3', 'Step 3: Panels (drag + store)')}</h3>
+                <pre
+                  className="p-4 rounded text-sm overflow-x-auto"
+                  style={{
+                    background: 'var(--skin-inset-bg)',
+                    border: '1px solid var(--skin-separator)',
+                    color: 'var(--skin-text-secondary)',
+                  }}
+                >
                   {`import { V9PanelShell } from '@/ui/designSystem/V9PanelShell';
 import { usePanelsStore } from '@/ui/designSystem/store/usePanelsStore';
-import { DndContext } from '@dnd-kit/core';`}
-                </pre>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-medium mb-2 text-slate-300">
-                  {t('designSystem.sections.integration.step2', 'Step 2: Use Store')}
-                </h3>
-                <pre className="bg-slate-900 p-4 rounded text-sm text-slate-300 overflow-x-auto">
-                  {`const panels = usePanelsStore((state) => state.panels);
-const activePanelId = usePanelsStore((state) => state.activePanelId);
-const setActivePanel = usePanelsStore((state) => state.setActivePanel);
-const removePanel = usePanelsStore((state) => state.removePanel);`}
-                </pre>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-medium mb-2 text-slate-300">
-                  {t('designSystem.sections.integration.step3', 'Step 3: Render Panels')}
-                </h3>
-                <pre className="bg-slate-900 p-4 rounded text-sm text-slate-300 overflow-x-auto">
-                  {`<DndContext>
+import { DndContext } from '@dnd-kit/core';
+
+<DndContext>
   {visiblePanels.map((panel) => (
-    <V9PanelShell
-      key={panel.id}
-      panel={panel}
-      onClose={() => removePanel(panel.id)}
-      isActive={activePanelId === panel.id}
-      onClick={() => setActivePanel(panel.id)}
-    >
-      {/* Panel Content */}
-    </V9PanelShell>
+    <V9PanelShell key={panel.id} panel={panel} …>{content}</V9PanelShell>
   ))}
 </DndContext>`}
-                </pre>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-medium mb-2 text-slate-300">
-                  {t('designSystem.sections.integration.step4', 'Step 4: Persistence (Optional)')}
-                </h3>
-                <pre className="bg-slate-900 p-4 rounded text-sm text-slate-300 overflow-x-auto">
-                  {`// Load state on mount
-useEffect(() => {
-  loadState();
-}, [loadState]);
-
-// Save state on unmount
-useEffect(() => {
-  return () => {
-    saveState();
-  };
-}, [saveState]);`}
                 </pre>
               </div>
             </div>
           </section>
         </div>
       </div>
-    </div>
+    </SkinScope>
   );
 }

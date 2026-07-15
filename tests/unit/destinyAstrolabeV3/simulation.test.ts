@@ -1,188 +1,170 @@
 import { describe, it, expect } from 'vitest';
-import { Vector2 } from '@/ui/idleVillage/components/destinyAstrolabeV3/Vector2';
-import { pickLandingPoint, synthesizeTrajectory, type ZoneMap } from '@/ui/idleVillage/components/destinyAstrolabeV3/simulation';
+import {
+  buildGeometry,
+  type GeometryInput,
+} from '@/ui/idleVillage/components/destinyAstrolabeV3/geometry';
+import {
+  classify,
+  createRng,
+  inChallenge,
+  inCrown,
+  inNearMissBand,
+  inStar,
+  inVoid,
+} from '@/ui/idleVillage/components/destinyAstrolabeV3/zones';
+import {
+  pickLandingPoint,
+  rollOutcome,
+  simulateThrow,
+  synthesizeTrajectory,
+  type AstrolabeOutcome,
+} from '@/ui/idleVillage/components/destinyAstrolabeV3/simulation';
 
-describe('simulation', () => {
-  describe('pickLandingPoint', () => {
-    it('near-miss 5% - roll 52 su soglia 50 -> atterraggio in nearMissBand esterno', () => {
-      const zoneMap: ZoneMap = {
-        star: [new Vector2(0, 0), new Vector2(100, 0), new Vector2(50, 86.6)],
-        crown: [new Vector2(0, 0), new Vector2(120, 0), new Vector2(60, 103.9)],
-        nearMissBand: [new Vector2(110, 0), new Vector2(130, 0), new Vector2(120, 17.3)],
-        void: [],
-        ruin: [],
-        crit: [],
-      };
+const input: GeometryInput = {
+  stats: [
+    { name: 'Atletica', stat: 80, difficulty: 50 },
+    { name: 'Astuzia', stat: 65, difficulty: 50 },
+    { name: 'Vigore', stat: 50, difficulty: 50 },
+  ],
+  difficulty: 50,
+  critPct: 5,
+  woundPct: 10,
+  deathPct: 5,
+};
+const snap = buildGeometry(input);
 
-      // Simula roll 52 su soglia 50 (near-miss)
-      const rng = () => 0.5; // Deterministico
-      const point = pickLandingPoint('near-miss', zoneMap, rng);
+const outcomeOf = (over: Partial<AstrolabeOutcome>): AstrolabeOutcome => ({
+  roll: 40,
+  success: true,
+  nearMiss: false,
+  crit: false,
+  riskRoll: 99,
+  wounded: false,
+  dead: false,
+  ...over,
+});
 
-      expect(point).toBeDefined();
-      // Il punto dovrebbe essere in nearMissBand
-      const isInNearMiss = zoneMap.nearMissBand.some(p => 
-        Math.abs(p.x - point.x) < 1 && Math.abs(p.y - point.y) < 1
-      );
-      expect(isInNearMiss).toBe(true);
-    });
-
-    it('successo+ferita -> punto in star∩crown', () => {
-      const zoneMap: ZoneMap = {
-        star: [new Vector2(0, 0), new Vector2(100, 0), new Vector2(50, 86.6)],
-        crown: [new Vector2(0, 0), new Vector2(120, 0), new Vector2(60, 103.9)],
-        nearMissBand: [],
-        void: [],
-        ruin: [],
-        crit: [],
-      };
-
-      const rng = () => 0.5;
-      const point = pickLandingPoint('wound', zoneMap, rng);
-
-      expect(point).toBeDefined();
-      // Il punto dovrebbe essere in crown (vicino alla stella)
-      const isInCrown = zoneMap.crown.some(p => 
-        Math.abs(p.x - point.x) < 1 && Math.abs(p.y - point.y) < 1
-      );
-      expect(isInCrown).toBe(true);
-    });
-
-    it('spin con seed diversi non identici', () => {
-      const zoneMap: ZoneMap = {
-        star: [new Vector2(0, 0), new Vector2(100, 0), new Vector2(50, 86.6)],
-        crown: [],
-        nearMissBand: [],
-        void: [],
-        ruin: [],
-        crit: [],
-      };
-
-      let callCount = 0;
-      const rng1 = () => {
-        callCount++;
-        return 0.3;
-      };
-      const rng2 = () => {
-        callCount++;
-        return 0.7;
-      };
-
-      const point1 = pickLandingPoint('success', zoneMap, rng1);
-      const point2 = pickLandingPoint('success', zoneMap, rng2);
-
-      // Punti diversi dovrebbero essere diversi
-      expect(point1.x).not.toBe(point2.x);
-      expect(point1.y).not.toBe(point2.y);
-    });
-
-    it('determinismo con stesso seed', () => {
-      const zoneMap: ZoneMap = {
-        star: [new Vector2(0, 0), new Vector2(100, 0), new Vector2(50, 86.6)],
-        crown: [],
-        nearMissBand: [],
-        void: [],
-        ruin: [],
-        crit: [],
-      };
-
-      const rng = () => 0.42; // Seed fisso
-      const point1 = pickLandingPoint('success', zoneMap, rng);
-      const point2 = pickLandingPoint('success', zoneMap, rng);
-
-      // Stesso seed -> stesso punto
-      expect(point1.x).toBe(point2.x);
-      expect(point1.y).toBe(point2.y);
-    });
+describe('pickLandingPoint — il punto è la prova visiva dell’esito (D1/D2)', () => {
+  it('successo pulito → dentro la stella, lontano dai confini', () => {
+    const p = pickLandingPoint(outcomeOf({}), snap, createRng(1));
+    expect(inStar(p, snap)).toBe(true);
+    expect(inCrown(p, snap)).toBe(false);
+    expect(inVoid(p, snap)).toBe(false);
   });
 
-  describe('synthesizeTrajectory', () => {
-    it('rispetto delle normali del poligono', () => {
-      const landingPoint = new Vector2(100, 100);
-      const rng = () => 0.5;
-      const config = {
-        bounceCountMin: 2,
-        bounceCountMax: 4,
-        trailFadeMs: 400,
-      };
-
-      const trajectory = synthesizeTrajectory(landingPoint, rng, config);
-
-      expect(trajectory).toBeDefined();
-      expect(trajectory.points).toBeDefined();
-      expect(trajectory.points.length).toBeGreaterThan(0);
-      expect(trajectory.duration).toBeGreaterThan(0);
-
-      // Verifica che il punto finale sia il landing point
-      const lastPoint = trajectory.points[trajectory.points.length - 1];
-      expect(lastPoint.position.x).toBeCloseTo(landingPoint.x, 0);
-      expect(lastPoint.position.y).toBeCloseTo(landingPoint.y, 0);
-    });
-
-    it('bounce count in range config', () => {
-      const landingPoint = new Vector2(100, 100);
-      const rng = () => 0.5;
-      const config = {
-        bounceCountMin: 2,
-        bounceCountMax: 4,
-        trailFadeMs: 400,
-      };
-
-      const trajectory = synthesizeTrajectory(landingPoint, rng, config);
-
-      // I punti di rimbalzo sono quelli prima della fase spirale (ultimi 31 punti: 30 spiral + 1 finale)
-      const spiralStartIndex = trajectory.points.length - 31;
-      const bouncePoints = trajectory.points.slice(1, spiralStartIndex);
-
-      expect(bouncePoints.length).toBeGreaterThanOrEqual(config.bounceCountMin);
-      expect(bouncePoints.length).toBeLessThanOrEqual(config.bounceCountMax);
-    });
-
-    it('durata totale in range config', () => {
-      const landingPoint = new Vector2(100, 100);
-      const rng = () => 0.5;
-      const config = {
-        bounceCountMin: 2,
-        bounceCountMax: 4,
-        trailFadeMs: 400,
-      };
-
-      const trajectory = synthesizeTrajectory(landingPoint, rng, config);
-
-      // La durata dovrebbe essere ragionevole (tra 500ms e 2000ms)
-      expect(trajectory.duration).toBeGreaterThan(500);
-      expect(trajectory.duration).toBeLessThan(2000);
-    });
+  it('successo + ferito → stella ∩ corona (acceptance F3)', () => {
+    const p = pickLandingPoint(outcomeOf({ wounded: true }), snap, createRng(2));
+    expect(inStar(p, snap)).toBe(true);
+    expect(inCrown(p, snap)).toBe(true);
   });
 
-  describe('near-miss Monte Carlo 5%', () => {
-    it('near-miss rate ~5% con 1000 iterazioni', () => {
-      const zoneMap: ZoneMap = {
-        star: [new Vector2(0, 0), new Vector2(100, 0), new Vector2(50, 86.6)],
-        crown: [],
-        nearMissBand: [new Vector2(110, 0), new Vector2(130, 0), new Vector2(120, 17.3)],
-        void: [],
-        ruin: [],
-        crit: [],
-      };
+  it('near-miss (roll soglia+2) → nearMissBand esterna alla stella', () => {
+    const p = pickLandingPoint(
+      outcomeOf({ roll: snap.tst + 2, success: false, nearMiss: true }),
+      snap,
+      createRng(3),
+    );
+    expect(inStar(p, snap)).toBe(false);
+    expect(inNearMissBand(p, snap)).toBe(true);
+  });
 
-      const iterations = 1000;
-      let nearMissCount = 0;
+  it('morte → dentro una voragine', () => {
+    const p = pickLandingPoint(
+      outcomeOf({ success: false, dead: true, riskRoll: 1 }),
+      snap,
+      createRng(4),
+    );
+    expect(inVoid(p, snap)).toBe(true);
+  });
 
-      for (let i = 0; i < iterations; i++) {
-        const roll = Math.random() * 100;
-        const threshold = 50;
-        
-        // Simula logica near-miss: roll in (threshold, threshold+5]
-        if (roll > threshold && roll <= threshold + 5) {
-          nearMissCount++;
-        }
-      }
+  it('fallimento critico → banda rovina al bordo sfida', () => {
+    const p = pickLandingPoint(
+      outcomeOf({ roll: 99, success: false, crit: true }),
+      snap,
+      createRng(5),
+    );
+    expect(classify(p, snap)).toBe('crit');
+  });
+});
 
-      const nearMissRate = (nearMissCount / iterations) * 100;
-      
-      // La banda è 5% del D100, quindi il rate dovrebbe essere ~5%
-      expect(nearMissRate).toBeGreaterThan(3);
-      expect(nearMissRate).toBeLessThan(7);
+describe('rollOutcome — near-miss = banda naturale 5% (D7)', () => {
+  it('near-miss solo per roll ∈ ]tst, tst+5], frequenza ≈5% ±1.5%', () => {
+    const nearMissRolls: number[] = [];
+    for (let seed = 0; seed < 4000; seed += 1) {
+      const o = rollOutcome(snap, createRng(seed));
+      if (o.nearMiss) nearMissRolls.push(o.roll);
+    }
+    nearMissRolls.forEach((r) => {
+      expect(r).toBeGreaterThan(snap.tst);
+      expect(r).toBeLessThanOrEqual(snap.tst + 5);
     });
+    const rate = (nearMissRolls.length / 4000) * 100;
+    expect(rate).toBeGreaterThan(5 - 1.5);
+    expect(rate).toBeLessThan(5 + 1.5);
+  });
+});
+
+describe('synthesizeTrajectory — messa in scena onesta', () => {
+  const landing = pickLandingPoint(outcomeOf({}), snap, createRng(10));
+
+  it('termina ESATTAMENTE sul landing point, sempre dentro la sfida', () => {
+    const tr = synthesizeTrajectory(landing, snap, 123);
+    const last = tr.points[tr.points.length - 1];
+    expect(last.x).toBe(landing.x);
+    expect(last.y).toBe(landing.y);
+    tr.points.forEach((p) => expect(inChallenge({ x: p.x, y: p.y }, snap)).toBe(true));
+  });
+
+  it('durata nel range config (3.5–4.5s)', () => {
+    const tr = synthesizeTrajectory(landing, snap, 123);
+    expect(tr.durationMs).toBeGreaterThanOrEqual(3500);
+    expect(tr.durationMs).toBeLessThanOrEqual(4500);
+  });
+
+  it('rimbalza sul perimetro (almeno bounceCountMin)', () => {
+    const tr = synthesizeTrajectory(landing, snap, 123);
+    expect(tr.bounceIndices.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('deterministico a parità di seed, mai identico con seed diversi', () => {
+    const a = synthesizeTrajectory(landing, snap, 42);
+    const b = synthesizeTrajectory(landing, snap, 42);
+    const c = synthesizeTrajectory(landing, snap, 43);
+    expect(a.points).toEqual(b.points);
+    const differs = a.points.some((p, i) => p.x !== c.points[i]?.x || p.y !== c.points[i]?.y);
+    expect(differs).toBe(true);
+  });
+
+  it('nessuna correzione visibile sull’ultimo frame (homing distribuito)', () => {
+    const tr = synthesizeTrajectory(landing, snap, 7);
+    const n = tr.points.length;
+    const lastStep = Math.hypot(
+      tr.points[n - 1].x - tr.points[n - 2].x,
+      tr.points[n - 1].y - tr.points[n - 2].y,
+    );
+    const prevStep = Math.hypot(
+      tr.points[n - 2].x - tr.points[n - 3].x,
+      tr.points[n - 2].y - tr.points[n - 3].y,
+    );
+    expect(lastStep).toBeLessThan(Math.max(0.02, prevStep * 6 + 0.01));
+  });
+});
+
+describe('simulateThrow — end to end', () => {
+  it('la zona di atterraggio prova sempre l’esito', () => {
+    for (let seed = 1; seed <= 120; seed += 1) {
+      const { outcome, trajectory } = simulateThrow(snap, seed);
+      const landed = trajectory.landing;
+      expect(inStar(landed, snap)).toBe(outcome.success);
+      if (outcome.dead) expect(inVoid(landed, snap)).toBe(true);
+      if (outcome.wounded) expect(inCrown(landed, snap)).toBe(true);
+      if (!outcome.success && outcome.nearMiss) expect(inNearMissBand(landed, snap)).toBe(true);
+    }
+  });
+
+  it('spin mai identico con seed diversi (acceptance F3)', () => {
+    const a = simulateThrow(snap, 1).trajectory.points;
+    const b = simulateThrow(snap, 2).trajectory.points;
+    expect(a).not.toEqual(b);
   });
 });

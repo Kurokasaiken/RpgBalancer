@@ -1,6 +1,7 @@
 {
   "id": "GOV-007",
   "agent": "harness",
+  "execution_hint": "atomic",
   "objective": "Migrate TestHub EXTRA_PAGES entries into KIT_REGISTRY as draft kits or keep them as deliberate non-kit pages, reducing EXTRA_PAGES to documented exceptions.",
   "file_targets": [
     "src/ui/idleVillage/TestHub.tsx",

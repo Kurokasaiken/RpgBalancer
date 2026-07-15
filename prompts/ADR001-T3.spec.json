@@ -1,0 +1,94 @@
+{
+  "task_id": "ADR001-T3",
+  "title": "Persist masterSeed",
+  "plan_reference": "ADR-001 — Quest Engine Reconciliation & Opportunity Foundation",
+  "execution_hint": "verified",
+  "priority": "high",
+  "objectives": [
+    "Add masterSeed field to gameplay store",
+    "Initialize masterSeed once at run creation",
+    "Persist masterSeed via PersistenceService",
+    "Inject RNG derived from masterSeed into TimeEngine"
+  ],
+  "invariants": [
+    "Persistence: Use PersistenceService only - no direct localStorage",
+    "State Management: Zustand for shared domain state",
+    "Determinism: masterSeed must never regenerate on load",
+    "Telemetry: master_seed_initialized event fires exactly once per run"
+  ],
+  "scope": {
+    "files_to_create": [
+      "tests/unit/idleVillage/masterSeed.test.ts"
+    ],
+    "files_to_modify": [
+      "src/engine/game/idleVillage/store.ts",
+      "src/shared/persistence/persistenceKeys.ts",
+      "src/engine/game/idleVillage/TimeEngine.ts"
+    ],
+    "components_affected": [
+      "gameplayStore",
+      "TimeEngine"
+    ],
+    "integration_points": [
+      "PersistenceService",
+      "RngService"
+    ]
+  },
+  "operations": [
+    {
+      "step": 1,
+      "description": "Add masterSeed field to src/engine/game/idleVillage/store.ts (or equivalent Zustand store), initialize once at run creation",
+      "file": "src/engine/game/idleVillage/store.ts",
+      "action": "add_master_seed_field"
+    },
+    {
+      "step": 2,
+      "description": "Add idleVillage_master_seed_v1 key to src/shared/persistence/persistenceKeys.ts",
+      "file": "src/shared/persistence/persistenceKeys.ts",
+      "action": "add_persistence_key"
+    },
+    {
+      "step": 3,
+      "description": "Implement persistence of masterSeed via PersistenceService in the store",
+      "file": "src/engine/game/idleVillage/store.ts",
+      "action": "implement_persistence"
+    },
+    {
+      "step": 4,
+      "description": "Update TimeEngine to accept injected rng derived from masterSeed via deriveSeed(masterSeed, 'timeEngine')",
+      "file": "src/engine/game/idleVillage/TimeEngine.ts",
+      "action": "inject_rng"
+    },
+    {
+      "step": 5,
+      "description": "Create tests/unit/idleVillage/masterSeed.test.ts with persistence roundtrip and no regeneration on load tests",
+      "file": "tests/unit/idleVillage/masterSeed.test.ts",
+      "action": "create_tests"
+    }
+  ],
+  "guardrails": [
+    "DO NOT use direct localStorage - must use PersistenceService",
+    "DO NOT regenerate masterSeed on load - must persist",
+    "DO NOT fire master_seed_initialized more than once per run",
+    "Ensure save→load→save produces identical seed"
+  ],
+  "safeguards": {
+    "lint_scope": "src/engine/game/idleVillage src/shared/persistence",
+    "test_scope": "tests/unit/idleVillage",
+    "build_check": true,
+    "kanban_lint": true
+  },
+  "acceptance_criteria": [
+    "masterSeed field exists in gameplay store",
+    "masterSeed is persisted via PersistenceService",
+    "save→load→save produces identical seed",
+    "telemetry event master_seed_initialized fires exactly once per run",
+    "TimeEngine accepts injected RNG from masterSeed"
+  ],
+  "evidence_requirements": {
+    "log_file": "test-results/adr001-t3-<YYYY-MM-DD>.log",
+    "screenshots": false,
+    "test_results": true
+  },
+  "notes": "T3 depends on T2 (RngService). This is the persistence half of D2."
+}

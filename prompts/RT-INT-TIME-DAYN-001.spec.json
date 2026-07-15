@@ -1,0 +1,95 @@
+{
+  "task_id": "RT-INT-TIME-DAYN-001",
+  "title": "Time + Day/Night Integration Page Assembly",
+  "plan_reference": "Runtime Component Alignment Plan - Integration Assembly",
+  "execution_hint": "verified",
+  "priority": "high",
+  "objectives": [
+    "Create integration page demonstrating dual-layer time architecture with day/night integration",
+    "Serve as verification harness for time + day/night integration",
+    "Verify dual-layer time architecture in action",
+    "Ensure day/night state is derived correctly from simulation time"
+  ],
+  "invariants": [
+    "Time Layer: Maintain dual-layer architecture (simulation layer + gameplay layer)",
+    "Day/Night: Day/night state must be derived from simulation time, not gameplay layer",
+    "TimeEngine: DO NOT modify TimeEngine or time contracts - only integration",
+    "Style Lab: Apply Style Lab tokens for theming",
+    "Config-first: No hardcoded values - use existing config patterns"
+  ],
+  "scope": {
+    "files_to_create": [
+      "src/ui/idleVillage/pages/TimeDaynightIntegrationPage.tsx"
+    ],
+    "files_to_modify": [],
+    "components_affected": [
+      "TimeDaynightIntegrationPage"
+    ],
+    "integration_points": [
+      "useMinimalGameplay",
+      "DayNightPOI",
+      "TimeEngine"
+    ]
+  },
+  "operations": [
+    {
+      "step": 1,
+      "description": "Create TimeDaynightIntegrationPage.tsx that mounts useMinimalGameplay store with time state and DayNightPOI component",
+      "file": "src/ui/idleVillage/pages/TimeDaynightIntegrationPage.tsx",
+      "action": "create_integration_page"
+    },
+    {
+      "step": 2,
+      "description": "Implement UI that shows simulation layer time (currentTime 1:1) and gameplay layer time (currentTick with speedMultiplier)",
+      "file": "src/ui/idleVillage/pages/TimeDaynightIntegrationPage.tsx",
+      "action": "implement_dual_layer_display"
+    },
+    {
+      "step": 3,
+      "description": "Demonstrate day/night calculation from simulation time and allow speedMultiplier modification for testing",
+      "file": "src/ui/idleVillage/pages/TimeDaynightIntegrationPage.tsx",
+      "action": "implement_day_night_demo"
+    },
+    {
+      "step": 4,
+      "description": "Apply Style Lab tokens for theming throughout the integration page",
+      "file": "src/ui/idleVillage/pages/TimeDaynightIntegrationPage.tsx",
+      "action": "apply_style_lab_tokens"
+    },
+    {
+      "step": 5,
+      "description": "Create /time-daynight-integration route that serves as verification harness with telemetry for tracking time events",
+      "file": "src/ui/idleVillage/pages/TimeDaynightIntegrationPage.tsx",
+      "action": "create_verification_route"
+    }
+  ],
+  "guardrails": [
+    "DO NOT create new time components - only integration",
+    "DO NOT modify TimeEngine or time contracts",
+    "DO NOT add new time domain logic",
+    "DO NOT modify /minimal-gameplay",
+    "DO NOT break dual-layer architecture",
+    "Ensure speed multiplier does not affect day/night calculation"
+  ],
+  "safeguards": {
+    "lint_scope": "src/ui/idleVillage/pages/TimeDaynightIntegrationPage.tsx",
+    "test_scope": "src/ui/idleVillage/pages",
+    "build_check": true,
+    "kanban_lint": true
+  },
+  "acceptance_criteria": [
+    "TimeDaynightIntegrationPage successfully mounts time state and DayNightPOI",
+    "Dual-layer time architecture is clearly demonstrated",
+    "Day/night state is derived correctly from simulation time",
+    "Speed multiplier modification works without affecting day/night calculation",
+    "Style Lab tokens are applied correctly",
+    "Verification route /time-daynight-integration is functional",
+    "Telemetry events are tracked for time events"
+  ],
+  "evidence_requirements": {
+    "log_file": "test-results/rt-int-time-dayn-001-<YYYY-MM-DD>.log",
+    "screenshots": true,
+    "test_results": true
+  },
+  "notes": "RT-TIME-001 verified TimeEngine compliance, RT-DAYN-001 verified day/night compliance, DOC-TIME-REV-001 documented dual-layer architecture. This task integrates these verified systems into a single verification harness."
+}

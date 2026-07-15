@@ -1,7 +1,10 @@
 # Destiny Astrolabe V3 — Implementation Plan
 
 > Skill check spaziale 2D (radar-chart gameplay) — sostituisce il banale D100 a barra.
-> Stato: **PLAN APPROVATO IN BOZZA — nessun codice ancora scritto.**
+> Stato: **IMPLEMENTATO (slice verticale F0→F4) — 2026-07-15.**
+> Riscrittura completa da zero (gli stub generati dagli agent il 2026-07-14 non erano funzionanti).
+> Verificato: 25 test unitari (Monte Carlo aree, near-miss 5%, landing∩zone, determinismo) + run end-to-end in browser (roll 13 → zona star → VICTORY).
+> Resta per iterazioni successive: audio reale (hook già presenti), dev-overlay % aree, perf pass formale con performance.mark.
 > Owner: Fausto · Redatto con analisi UI/UX AAA + ricerca di settore (fonti in fondo).
 
 ---

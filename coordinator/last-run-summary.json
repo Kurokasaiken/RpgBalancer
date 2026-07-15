@@ -1,8 +1,16 @@
 {
-  "timestamp": "2026-07-15T14:59:39.897333+00:00",
-  "task_lanciati": 0,
+  "timestamp": "2026-07-15T15:09:36.030850+00:00",
+  "task_lanciati": 1,
   "task_bloccati": 0,
   "task_completati_questo_giro": 0,
   "dettaglio_bloccati": [],
-  "max_paralleli_calcolato": 0
+  "max_paralleli_calcolato": 20,
+  "task_manuali_in_attesa": [],
+  "manual_dispatch": {
+    "pending": 0,
+    "completed": 0,
+    "failed": 0,
+    "queue_file": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/queue.json",
+    "next_action": "Aprire Windsurf ed eseguire /run-manual-tasks"
+  }
 }

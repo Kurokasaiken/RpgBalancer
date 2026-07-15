@@ -1,6 +1,7 @@
 {
   "id": "GOV-002",
   "agent": "harness",
+  "execution_hint": "atomic",
   "objective": "Register the Documentation Governance system in .windsurf/rules/ by creating 40-documentation-governance.md.",
   "file_targets": [
     ".windsurf/rules/40-documentation-governance.md"

@@ -164,11 +164,14 @@ export function createAstrolabeV3Engine(
     resizeTimer = window.setTimeout(resize, 80);
   });
   ro.observe(root);
-  resize();
 
   /* ── stato ── */
   let input: GeometryInput = opts.input;
   let snap: GeometrySnapshot = buildGeometry(input, cfg);
+  resize(); // dopo l'init di snap: emitLayout legge la geometria
+  // il primo layout può avvenire prima che il flex posizioni il canvas:
+  // ri-emetti le ancore quando il DOM è assestato (double rAF)
+  requestAnimationFrame(() => requestAnimationFrame(() => emitLayout()));
   let ghostSnap: GeometrySnapshot | null = null; // preview modifier (outline)
   let morphFrom: GeometrySnapshot | null = null;
   let morphT0 = 0;
@@ -253,12 +256,17 @@ export function createAstrolabeV3Engine(
 
   function emitLayout() {
     if (!opts.onLayout) return;
+    /* ancore in px CSS relative al wrap (il canvas è centrato nel root) */
+    const rootRect = root.getBoundingClientRect();
+    const cvRect = canvas.getBoundingClientRect();
+    const offX = cvRect.left - rootRect.left;
+    const offY = cvRect.top - rootRect.top;
     const anchors = Array.from({ length: AXES }, (_, i) => {
       const a = tipAngle(i);
       const r = rChallengeAt(snap, a);
       return {
-        x: (cx + Math.cos(a) * r * R) / dpr,
-        y: (cy + Math.sin(a) * r * R) / dpr,
+        x: offX + (cx + Math.cos(a) * r * R) / dpr,
+        y: offY + (cy + Math.sin(a) * r * R) / dpr,
         axis: i,
         skill: snap.axisSkill[i],
       };
@@ -769,6 +777,17 @@ export function createAstrolabeV3Engine(
   let destroyed = false;
   function frame(now: number) {
     if (destroyed) return;
+    try {
+      frameBody(now);
+    } catch (e) {
+      /* un errore di draw non deve mai uccidere il loop */
+      // eslint-disable-next-line no-console
+      console.error('[dav3] frame error', e);
+    }
+    lastFrame = now;
+    raf = requestAnimationFrame(frame);
+  }
+  function frameBody(now: number) {
     tickTimeline(now);
     if (backdropDirty) paintBackdrop();
     const s = currentSnap(now);
@@ -794,9 +813,6 @@ export function createAstrolabeV3Engine(
     if (phase === 'the-spin' || phase === 'magnetic-snap' || phase === 'resolution') drawBall(now);
     ctx.restore();
     drawRing(ringReveal);
-
-    lastFrame = now;
-    raf = requestAnimationFrame(frame);
   }
   raf = requestAnimationFrame(frame);
 

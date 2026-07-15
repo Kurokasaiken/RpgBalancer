@@ -27,7 +27,7 @@ Execution hint selection: per task che toccano solo file .md, .json di config, o
 All prompts MUST include:
 
 execution_hint: DEVE essere compilato per ogni spec con uno di questi valori:
-- 'atomic': task meccanico, single-file, nessuna decisione di design. SOLO se TUTTE le 5 condizioni sono vere: (1) file_targets ha esattamente 1 elemento (2) operations descrive UNA sola azione concettuale (3) il file target è nuovo O la modifica è additiva (4) il task non tocca nessun file con invariant always_on (5) l'output è verificabile per semplice ispezione visiva. Se anche solo una condizione è falsa → 'verified', non 'atomic'
+- 'atomic': task meccanico, 1-3 file correlati, nessuna logica complessa. SOLO se TUTTE le 5 condizioni sono vere: (1) file_targets ha 1-3 elementi correlati (2) operations descrive 1-3 azioni correlate (3) i file target sono nuovi, additivi, o refactoring meccanico (no logica complessa) (4) il task può toccare invariant solo per documentazione semplice (no logica runtime) (5) l'output è verificabile per semplice ispezione visiva o test semplice. Se anche solo una condizione è falsa → 'verified', non 'atomic'
 - 'assisted': task multi-file ma semplici, nessuna logica complessa, nessun test di integrazione necessario. Esempi: aggiornamenti documentazione, nuovi file di config/registry senza logica, refactoring meccanico di naming/import, aggiunta di JSDoc a funzioni esistenti, creazione di file di tipi TypeScript senza logica runtime. Condizioni: operations sono tutte additive o meccaniche, nessun rischio di regression su logica esistente, safeguard: solo lint (no test, no build:check completo)
 - 'verified': implementazione contenuta, multi-file O con safeguards
 - 'architectural': tocca invariants, richiede giudizio di design

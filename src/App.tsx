@@ -33,6 +33,7 @@ const PoiDetailJobRosterIntegrationPage = lazy(() => import('./ui/idleVillage/pa
 const PoiStandardDetailIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiStandardDetailIntegrationPage').then(m => ({ default: m.PoiStandardDetailIntegrationPage })));
 const TimeDaynightIntegrationPage = lazy(() => import('./ui/idleVillage/pages/TimeDaynightIntegrationPage').then(m => ({ default: m.TimeDaynightIntegrationPage })));
 const DragPoiAssignmentPage = lazy(() => import('./ui/idleVillage/pages/DragPoiAssignmentPage').then(m => ({ default: m.DragPoiAssignmentPage })));
+const DragPoiIntegrationPage = lazy(() => import('./ui/idleVillage/pages/DragPoiIntegrationPage').then(m => ({ default: m.DragPoiIntegrationPage })));
 const SlotPage = lazy(() => import('./ui/idleVillage/pages/SlotPage').then(m => ({ default: m.default })));
 // Minimal slice test pages (Phase 1-6)
 const MinimalPoiPage = lazy(() => import('./pages/minimal-poi').then(m => ({ default: m.default })));
@@ -157,6 +158,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/time-daynight-integration';
   const isDragPoiAssignmentPath =
     typeof window !== 'undefined' && window.location.pathname === '/drag-poi-assignment';
+  const isDragPoiIntegrationPath =
+    typeof window !== 'undefined' && window.location.pathname === '/drag-poi-integration';
   const isSlotPath =
     typeof window !== 'undefined' && window.location.pathname === '/slot';
   // Minimal slice test pages (Phase 1-6)
@@ -649,6 +652,16 @@ function App() {
       <ErrorBoundary componentName="Drag + POI Assignment Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Drag + POI Assignment...</div>}>
           <DragPoiAssignmentPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isDragPoiIntegrationPath) {
+    return (
+      <ErrorBoundary componentName="Drag + POI Integration Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Drag + POI Integration...</div>}>
+          <DragPoiIntegrationPage />
         </Suspense>
       </ErrorBoundary>
     );
