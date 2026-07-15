@@ -1,14 +1,218 @@
-```css
-/* Implement skin-token driven styles */
-.astrolabe-v3 {
-  /* Add styles here */
+/* Destiny Astrolabe V3 — overlay skin-token driven (mai hex hardcoded). */
+
+.dav3-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
-.astrolabe-v3 .throw-button {
-  /* Add styles here */
+.dav3-canvas-root {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.astrolabe-v3 .skip-button {
-  /* Add styles here */
+.dav3-canvas-root canvas {
+  display: block;
+  margin: auto;
 }
-```
+
+/* Placca label obelisco — mai galleggiante sopra il cristallo (D8) */
+.dav3-obelisk-plaque {
+  position: absolute;
+  transform: translate(-50%, 14px);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px 3px;
+  background: var(--skin-plaque-bg);
+  border: var(--skin-plaque-border);
+  border-radius: var(--skin-plaque-radius);
+  box-shadow: var(--skin-plaque-shadow);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.dav3-plaque-name {
+  font-family: var(--skin-font-display);
+  font-size: 10px;
+  letter-spacing: var(--skin-plaque-tracking);
+  text-transform: uppercase;
+  color: var(--skin-plaque-color);
+  text-shadow: var(--skin-incision-label);
+}
+
+.dav3-plaque-value {
+  font-family: var(--skin-font-display);
+  font-size: 12px;
+  color: var(--skin-text-primary);
+  text-shadow: var(--skin-incision-value);
+}
+
+/* Verdetto: fascia alta, arena sempre visibile (§5 resolution) */
+.dav3-verdict {
+  position: absolute;
+  top: 4%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 22px;
+  background: var(--skin-plaque-bg);
+  border: var(--skin-plaque-border);
+  border-radius: var(--skin-plaque-radius);
+  box-shadow: var(--skin-plaque-shadow);
+  pointer-events: none;
+  animation: dav3-verdict-in 0.35s var(--skin-snap-ease) both;
+}
+
+.dav3-verdict-title {
+  font-family: var(--skin-font-display);
+  font-size: 20px;
+  letter-spacing: 0.18em;
+  background: var(--skin-title-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: var(--skin-title-shadow);
+}
+
+.dav3-verdict--failure .dav3-verdict-title {
+  background: none;
+  color: var(--skin-text-secondary);
+  filter: none;
+}
+
+.dav3-chip {
+  font-family: var(--skin-font-display);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  padding: 2px 10px;
+  border-radius: 999px;
+}
+
+.dav3-chip--wound {
+  color: var(--skin-status-wound);
+  border: 1px solid var(--skin-status-wound);
+}
+
+.dav3-chip--death {
+  color: var(--skin-status-death);
+  border: 1px solid var(--skin-status-death);
+}
+
+@keyframes dav3-verdict-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* THROW — unico attore oro caldo (§3.11) */
+.dav3-throw {
+  position: absolute;
+  bottom: 7%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--skin-btn-bg);
+  border: var(--skin-btn-border);
+  color: var(--skin-btn-color);
+  font-family: var(--skin-btn-font);
+  font-size: var(--skin-btn-size);
+  letter-spacing: var(--skin-btn-tracking);
+  border-radius: var(--skin-btn-radius);
+  padding: var(--skin-btn-padding);
+  box-shadow: var(--skin-btn-shadow);
+  text-shadow: var(--skin-btn-text-shadow);
+  cursor: pointer;
+  animation: dav3-throw-pulse 1.6s ease-in-out infinite;
+}
+
+.dav3-throw:hover {
+  background: var(--skin-btn-hover-bg);
+  box-shadow: var(--skin-btn-hover-shadow);
+  transform: translateX(-50%) translateY(-2px);
+}
+
+.dav3-throw--again {
+  animation: none;
+}
+
+@keyframes dav3-throw-pulse {
+  0%,
+  100% {
+    box-shadow: var(--skin-btn-shadow);
+  }
+  50% {
+    box-shadow: var(--skin-btn-hover-shadow);
+  }
+}
+
+/* Onboarding contestuale */
+.dav3-onboarding {
+  position: absolute;
+  bottom: 16%;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 60%;
+  text-align: center;
+  font-family: var(--skin-font-serif);
+  font-size: 13px;
+  color: var(--skin-text-secondary);
+  background: var(--skin-inset-bg);
+  border: 1px solid var(--skin-inset-border);
+  border-radius: var(--skin-inset-radius);
+  padding: 6px 14px;
+  pointer-events: none;
+}
+
+.dav3-onboarding:empty {
+  display: none;
+}
+
+/* Toggle Skip/Auto/Mute */
+.dav3-controls {
+  position: absolute;
+  right: 4%;
+  bottom: 6%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.dav3-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--skin-font-display);
+  font-size: 11px;
+  letter-spacing: var(--skin-label-tracking);
+  text-transform: uppercase;
+  color: var(--skin-label-primary);
+  cursor: pointer;
+}
+
+.dav3-toggle input {
+  accent-color: var(--skin-icon-color);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dav3-throw,
+  .dav3-verdict {
+    animation: none;
+  }
+}
