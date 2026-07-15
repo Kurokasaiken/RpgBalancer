@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+      max_parallel: ${{ steps.set-matrix.outputs.max_parallel }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -32,14 +33,16 @@ jobs:
 
       - name: Set matrix output
         id: set-matrix
-        run: echo "matrix=$(cat coordinator/batch.json)" >> $GITHUB_OUTPUT
+        run: |
+          echo "matrix=$(cat coordinator/batch.json | jq '.tasks')" >> $GITHUB_OUTPUT
+          echo "max_parallel=$(cat coordinator/batch.json | jq -r '.max_parallel // 20')" >> $GITHUB_OUTPUT
 
   ai-worker:
     needs: select-tasks
     if: needs.select-tasks.outputs.matrix != '[]'
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 20
+      max-parallel: ${{ needs.select-tasks.outputs.max_parallel }}
       matrix:
         task: ${{ fromJson(needs.select-tasks.outputs.matrix) }}
     steps:
