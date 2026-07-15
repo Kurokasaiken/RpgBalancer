@@ -3,6 +3,7 @@
 **Bundle Location**: `src/ui/idleVillage/roster/index.ts`
 **Status**: Active - Shared roster surface for all Idle Village pages
 **Last Updated**: 2026-07-15
+**Adoption**: MinimalGameplayPage (RT-MG-ROSTER-ADOPT-007)
 
 ## Overview
 

@@ -16,7 +16,7 @@ Indice unico dei componenti e integration contracts rilevanti per la vertical sl
 | POI Standard Contract | poi | trusted | `src/docs/docs/idle_village/trusted/poi_standard_trusted.md` | dedicated page | 2026-04-22 | ActivityCapsule family |
 | POI Detail Contract | poi-detail | trusted | `src/docs/docs/idle_village/trusted/poi_detail_trusted.md` | dedicated page | 2026-04-25 | PoiDetailSkinWrapper - TEST-POI-D-ALIGN-001 completed, integration verified |
 | Day/Night Contract | day-night | trusted | `src/docs/docs/idle_village/trusted/daynight_trusted.md` | `/minimal-gameplay` | 2026-04-24 | RT-DAYN-001 audit completed - fully compliant |
-| Roster/Drag Contract | roster-drag | trusted | `src/docs/docs/idle_village/trusted/roster_drag_trusted.md` | `/test` | 2026-04-25 | VillageRosterSection, DragContext, statMatching - INT-DRAG-POI-ASSIGNMENT-001 completed, assignment verified. Shared bundle: `src/ui/idleVillage/roster/index.ts` |
+| Roster/Drag Contract | roster-drag | trusted | `src/docs/docs/idle_village/trusted/roster_drag_trusted.md` + `src/ui/idleVillage/roster/index.ts` | `/test`, `/minimal-gameplay` | 2026-07-15 | VillageRosterSection, DragContext, statMatching - INT-DRAG-POI-ASSIGNMENT-001 completed, assignment verified. Shared bundle adopted by MinimalGameplayPage (RT-MG-ROSTER-ADOPT-007). Single source of truth for roster UI across all pages. |
 | Interaction Core (drag outcome, flight, extraction, bloom) | interaction-core | trusted | `src/docs/docs/idle_village/interaction_core_spec.md` | `/slot`, `/minimal-roster-slot-integration`, `/minimal-job-poi-roster-integration` | 2026-07-12 | useDragOutcome, DragOutcomeFlight, useExtractionSequence, bloomEffect, RosterDropVerdict, lockedResidentIds; slot blueprints now support role/emptyPenalty/residentRiskModifiers |
 | Quest Assignment Rework | quest-assignment | candidate | `src/docs/docs/plans/quest_role_assignment_rework_strategy.md` | `/poi-quest-detail-roster-integration` | 2026-07-12 | QuestCard, useQuestAssignmentPreview, QuestAssignmentPreview, PoiDetailQuestRosterIntegrationPage, slotBlueprints role/emptyPenalty/residentRiskModifiers; build:check passed |
 | Test Roster Population | roster-data | trusted | `scripts/populate-test-roster.js` | N/A | 2026-04-27 | Script ufficiale per popolare roster di test con 3 PG (Sir Spaccaculi 280HP, Salvatrice 210HP, Giggiolillo 195HP) |
@@ -80,11 +80,11 @@ Questo index segue le regole governative:
 - **Notes**: RT-DAYN-001 audit completed - fully compliant with trusted contract
 
 ### Roster/Drag System
-- **Contract**: `src/docs/docs/idle_village/trusted/roster_drag_trusted.md`
+- **Contract**: `src/docs/docs/idle_village/trusted/roster_drag_trusted.md` + `src/ui/idleVillage/roster/index.ts`
 - **Status**: trusted
 - **Area**: Drag & drop system architecture
-- **Last Certified**: 2026-04-25
-- **Notes**: INT-DRAG-POI-ASSIGNMENT-001 completed, assignment flow verified
+- **Last Certified**: 2026-07-15
+- **Notes**: INT-DRAG-POI-ASSIGNMENT-001 completed, assignment flow verified. Shared bundle adopted by MinimalGameplayPage (RT-MG-ROSTER-ADOPT-007). Single source of truth for roster UI across all pages.
 
 ### Character-to-Resident Architecture
 - **Contract**: `src/docs/docs/idle_village/trusted/character_resident_trusted.md`
