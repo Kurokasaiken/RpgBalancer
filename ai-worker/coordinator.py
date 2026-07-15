@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import subprocess
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -51,6 +52,7 @@ def write_evidence(
     error: Optional[str] = None,
     skipped: bool = False,
     provider: Optional[str] = None,
+    lint_result: Optional[dict] = None,
 ):
     """Scrive il log di esecuzione per permettere al coordinator interno di chiudere il task."""
     EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
@@ -65,6 +67,7 @@ def write_evidence(
         "elapsed_seconds": round(elapsed, 3),
         "error": error,
         "skipped": skipped,
+        "lint_result": lint_result,
     }
     path = EVIDENCE_DIR / f"ai-worker-{task['id']}.json"
     with open(path, "w", encoding="utf-8") as f:
@@ -78,6 +81,38 @@ def extract_code(raw_text: str) -> str:
     if match:
         return match.group(1).strip()
     return raw_text.strip()
+
+
+def run_lint(scope: str, timeout: int = 120) -> dict:
+    """Esegue npm run lint -- <scope> e restituisce il risultato."""
+    try:
+        result = subprocess.run(
+            ["npm", "run", "lint", "--", scope],
+            cwd=ROOT_DIR,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+        return {
+            "success": result.returncode == 0,
+            "returncode": result.returncode,
+            "stdout": result.stdout,
+            "stderr": result.stderr,
+        }
+    except subprocess.TimeoutExpired:
+        return {
+            "success": False,
+            "returncode": -1,
+            "stdout": "",
+            "stderr": f"Lint timeout after {timeout}s",
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "returncode": -1,
+            "stdout": "",
+            "stderr": str(e),
+        }
 
 
 def call_provider(provider_name: str, model: str, prompt: str, max_tokens: int = 2048):
@@ -191,8 +226,9 @@ def run_single_task():
     target_file = task["target_file"]
     prompt = task["prompt"]
     complexity = task.get("complexity", 1)
+    execution_hint = task.get("execution_hint", "atomic")
 
-    print(f"[INFO] Esecuzione task {task_id} -> {target_file} (complexity {complexity})")
+    print(f"[INFO] Esecuzione task {task_id} -> {target_file} (complexity {complexity}, execution_hint={execution_hint})")
 
     if complexity > MAX_COMPLEXITY:
         reason = f"Complexity {complexity} superiore alla soglia {MAX_COMPLEXITY}; delegato a executor esterno."
@@ -255,12 +291,42 @@ def run_single_task():
         with open(target_path, "w", encoding="utf-8") as f:
             f.write(generated_code)
 
+        print(f"[DONE] File scritto: {target_path}")
+
+        # Post-generation lint verification for 'assisted' tasks
+        lint_result = None
+        if execution_hint == "assisted":
+            print(f"[LINT] Esecuzione lint post-generazione per task 'assisted'")
+            # Determine lint scope from target file
+            if target_file.endswith(".md"):
+                lint_scope = "*.md"
+            elif target_file.endswith(".json"):
+                lint_scope = "*.json"
+            elif target_file.endswith(".ts"):
+                lint_scope = target_file
+            else:
+                lint_scope = target_file
+
+            lint_result = run_lint(lint_scope)
+            if lint_result["success"]:
+                print(f"[LINT] SUCCESS: lint passato per {lint_scope}")
+            else:
+                print(f"[LINT] FAILED: lint fallito per {lint_scope}")
+                print(f"[LINT] stderr: {lint_result['stderr'][:500]}")
+                task["status"] = "failed"
+                task["error"] = f"Lint fallito: {lint_result['stderr'][:200]}"
+                task["lint_result"] = lint_result
+                write_evidence(task, "failed", used_model, elapsed, error=task["error"], provider=used_provider, lint_result=lint_result)
+                save_kanban(data)
+                return
+
         task["status"] = "done"
         task["used_provider"] = used_provider
         task["used_model"] = used_model
         task.pop("error", None)
-        print(f"[DONE] File scritto: {target_path}")
-        write_evidence(task, "done", used_model, elapsed, provider=used_provider)
+        if lint_result:
+            task["lint_result"] = lint_result
+        write_evidence(task, "done", used_model, elapsed, provider=used_provider, lint_result=lint_result)
     else:
         error = "Tutti i provider/modelli hanno fallito o sono andati in rate limit"
         task["status"] = "failed"

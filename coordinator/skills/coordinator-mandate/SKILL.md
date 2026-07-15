@@ -124,6 +124,7 @@ Documentation updates
 Execution Hint Assignment
 L'execution_hint dello spec determina il canale executor:
 - 'atomic' → ai-worker (GitHub Actions + OpenRouter free, zero RAM locale). Condizione: safeguards vuoto, file_targets.length === 1
+- 'assisted' → ai-worker esteso (OpenRouter free, GitHub Actions, con solo npm run lint come verifica post-generazione — NON test completi, NON build:check)
 - 'verified' → harness (Groq locale, worktree isolata, safeguards completi)
 - 'architectural' → manuale (Cascade/Windsurf, richiede supervisione)
 Il Coordinator NON può cambiare execution_hint — può solo fare override esplicito con executor_reason documentato.

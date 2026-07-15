@@ -22,11 +22,13 @@ Verify component reuse opportunities in atoms, atoms, or primitives
 Consistency check: for every invariant cited in 'invariants', open and read the corresponding file in .windsurf/rules/, then verify that EVERY operation in the 'operations' section is compatible with what the file says. If you notice tension between an operation and an invariant — even minor — flag it in notes before proceeding.
 Check for existing frozen kits in @/ui/idleVillage/frozen/kits
 Verify trusted/frozen component status in COMPONENT_MASTER_INDEX.md
+Execution hint selection: per task che toccano solo file .md, .json di config, o .ts di soli tipi/interfacce → suggerisci 'assisted' come primo candidato prima di valutare 'verified'
 3. Prompt Generation Rules
 All prompts MUST include:
 
 execution_hint: DEVE essere compilato per ogni spec con uno di questi valori:
 - 'atomic': task meccanico, single-file, nessuna decisione di design. SOLO se TUTTE le 5 condizioni sono vere: (1) file_targets ha esattamente 1 elemento (2) operations descrive UNA sola azione concettuale (3) il file target è nuovo O la modifica è additiva (4) il task non tocca nessun file con invariant always_on (5) l'output è verificabile per semplice ispezione visiva. Se anche solo una condizione è falsa → 'verified', non 'atomic'
+- 'assisted': task multi-file ma semplici, nessuna logica complessa, nessun test di integrazione necessario. Esempi: aggiornamenti documentazione, nuovi file di config/registry senza logica, refactoring meccanico di naming/import, aggiunta di JSDoc a funzioni esistenti, creazione di file di tipi TypeScript senza logica runtime. Condizioni: operations sono tutte additive o meccaniche, nessun rischio di regression su logica esistente, safeguard: solo lint (no test, no build:check completo)
 - 'verified': implementazione contenuta, multi-file O con safeguards
 - 'architectural': tocca invariants, richiede giudizio di design
 Config-first design requirements: No hardcoded values, use Zod schemas for new config
