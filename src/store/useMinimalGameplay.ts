@@ -169,6 +169,17 @@ export interface LoopWarningsResult {
 }
 
 /**
+ * Resource warning state for UI display.
+ */
+export interface ResourceWarningState {
+  lowFood: boolean;
+  highFatigue: boolean;
+  anyResidentInjured: boolean;
+  averageFatigue: number;
+  daysOfFoodRemaining: number;
+}
+
+/**
  * Represents an activity currently running in the Minimal Gameplay loop.
  */
 export interface ActiveActivityState {
@@ -1349,6 +1360,41 @@ export function selectResidentStatus(
   });
 
   return statusMap;
+}
+
+/**
+ * Selector: resource warning state for UI display.
+ * Calculates warnings based on config thresholds.
+ */
+export function selectResourceWarnings(
+  state: MinimalGameplayState['state'],
+  config: MinimalConfig
+): ResourceWarningState {
+  const lowFoodThreshold = config.warningConfig?.lowFoodThreshold ?? 20;
+  const highFatigueThreshold = config.warningConfig?.highFatigueThreshold ?? 80;
+  const dailyConsumption = config.globalRules.dailyFoodConsumptionPerResident * state.residents.length;
+
+  // Calculate average fatigue
+  const totalFatigue = state.residents.reduce((sum, resident) => sum + resident.fatigue, 0);
+  const averageFatigue = state.residents.length > 0 ? totalFatigue / state.residents.length : 0;
+
+  // Calculate days of food remaining
+  const daysOfFoodRemaining = dailyConsumption > 0 ? Math.floor(state.food / dailyConsumption) : 999;
+
+  // Check for any injured residents
+  const anyResidentInjured = state.residents.some((resident) => resident.isInjured);
+
+  // Determine warning states
+  const lowFood = state.food <= lowFoodThreshold;
+  const highFatigue = averageFatigue >= highFatigueThreshold;
+
+  return {
+    lowFood,
+    highFatigue,
+    anyResidentInjured,
+    averageFatigue,
+    daysOfFoodRemaining,
+  };
 }
 
 /**

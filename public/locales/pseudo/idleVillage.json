@@ -993,5 +993,21 @@
       "hpDescDescription": "!! ŠŠööřřţţ þþÿÿ ççüüŗŗŗŗééññţţ ĤĤṖṖ (ĥĥîîğğĥĥééššţţ ƒƒîîŗŗššţţ) !!",
       "fatigueAscDescription": "!! ŠŠööřřţţ þþÿÿ ƒƒååţţîîğğüüéé (ļļööŵŵééššţţ ƒƒîîŗŗššţţ) !!"
     }
+  },
+  "astrolabeV3": {
+    "verdictSuccess": "[!! Vîctöry !!]",
+    "verdictNearMiss": "[!! By à Whîskér !!]",
+    "verdictFail": "[!! Déféàt !!]",
+    "verdictCrit": "[!! Rûîn !!]",
+    "wounded": "[!! Wöûndéd !!]",
+    "dead": "[!! Fàllén !!]",
+    "rollAgain": "[!! Röll àgàîn !!]",
+    "throwControls": "[!! Thröw cöntröls !!]",
+    "skip": "[!! Skîp !!]",
+    "auto": "[!! Àûtö !!]",
+    "mute": "[!! Mûté !!]",
+    "onboardingStar": "[!! Yöûr stréngth: thé hîghér thé stàt, thé löngér thé îvöry löbé strétchés. !!]",
+    "onboardingRisk": "[!! Crîmsön cröwn: lànd théré ànd yöû àré wöûndéd. Vîölét chàsms: à léthàl fàll. !!]",
+    "onboardingThrow": "[!! Thröw thé spàrk — whéré ît stöps îs thé prööf öf yöûr fàté. !!]"
   }
 }

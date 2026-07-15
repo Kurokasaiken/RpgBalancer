@@ -1,0 +1,109 @@
+{
+  "task_id": "ADR001-T5",
+  "title": "Migrate C1 quests to C2 (ActivityDefinition)",
+  "plan_reference": "ADR-001 — Quest Engine Reconciliation & Opportunity Foundation",
+  "execution_hint": "architectural",
+  "priority": "high",
+  "objectives": [
+    "Add bandit-camp-demo, ancient-ruins, herb-gathering as ActivityDefinition in C2",
+    "Migrate all C1 consumers to read from C2",
+    "Lossy translation: per-skill checks collapse into single questDifficulty scalar",
+    "Verify parity via Playwright tests"
+  ],
+  "invariants": [
+    "Config-first: All quest config in defaultConfig.ts",
+    "i18n: All labels must go through t() with common/idleVillage namespaces",
+    "Documentation Governance: Update trusted docs for frozen kits",
+    "No behavioral changes - only migration"
+  ],
+  "scope": {
+    "files_to_create": [],
+    "files_to_modify": [
+      "src/balancing/config/idleVillage/defaultConfig.ts",
+      "src/pages/minimal-poi.tsx",
+      "src/ui/idleVillage/frozen/kits/questDetailKit.tsx",
+      "src/ui/idleVillage/frozen/kits/locationDetailKit.tsx",
+      "src/ui/idleVillage/store/gameplayStore.ts"
+    ],
+    "components_affected": [
+      "defaultConfig.ts",
+      "questDetailKit",
+      "locationDetailKit",
+      "gameplayStore"
+    ],
+    "integration_points": [
+      "ActivityDefinition",
+      "questPowerEngine"
+    ]
+  },
+  "operations": [
+    {
+      "step": 1,
+      "description": "Add bandit-camp-demo, ancient-ruins, herb-gathering as ActivityDefinition in defaultConfig.ts with tag: 'quest', slotBlueprints, resolutionEngineId: 'questPower', questPowerRules, varianceCategory",
+      "file": "src/balancing/config/idleVillage/defaultConfig.ts",
+      "action": "add_activity_definitions"
+    },
+    {
+      "step": 2,
+      "description": "Update src/pages/minimal-poi.tsx to read from C2 instead of C1",
+      "file": "src/pages/minimal-poi.tsx",
+      "action": "migrate_minimal_poi"
+    },
+    {
+      "step": 3,
+      "description": "Update src/ui/idleVillage/frozen/kits/questDetailKit.tsx to read from C2 (trusted)",
+      "file": "src/ui/idleVillage/frozen/kits/questDetailKit.tsx",
+      "action": "migrate_quest_detail_kit"
+    },
+    {
+      "step": 4,
+      "description": "Update src/ui/idleVillage/frozen/kits/locationDetailKit.tsx to read from C2 (trusted)",
+      "file": "src/ui/idleVillage/frozen/kits/locationDetailKit.tsx",
+      "action": "migrate_location_detail_kit"
+    },
+    {
+      "step": 5,
+      "description": "Replace DEFAULT_QUEST_STATE C1 source with C2 equivalent in gameplayStore.ts",
+      "file": "src/ui/idleVillage/store/gameplayStore.ts",
+      "action": "migrate_gameplay_store"
+    },
+    {
+      "step": 6,
+      "description": "Document the mapping table (skill_check → difficulty component) in the plan changelog",
+      "file": "src/docs/docs/plans/quest_engine_reconciliation_plan.md",
+      "action": "document_mapping"
+    },
+    {
+      "step": 7,
+      "description": "Update trusted docs: poi_detail_trusted.md and COMPONENT_MASTER_INDEX.md rows for questDetailKit and locationDetailKit",
+      "file": "src/docs/docs/idle_village/trusted/poi_detail_trusted.md",
+      "action": "update_trusted_docs"
+    }
+  ],
+  "guardrails": [
+    "DO NOT change quest behavior - only migrate config source",
+    "DO NOT introduce new hardcoded values - use config",
+    "DO NOT skip trusted doc updates for frozen kits",
+    "Labels must go through i18n - no hardcoded strings",
+    "This is the only architectural task - requires human review of skill-check→difficulty mapping"
+  ],
+  "safeguards": {
+    "lint_scope": "src/balancing/config/idleVillage src/pages/minimal-poi.tsx src/ui/idleVillage/frozen/kits",
+    "test_scope": "",
+    "build_check": true,
+    "kanban_lint": true
+  },
+  "acceptance_criteria": [
+    "All C1 quests migrated to C2 ActivityDefinition",
+    "/minimal-gameplay behaves identically to pre-migration (verified via Playwright)",
+    "Trusted docs updated with last-certified dates",
+    "Mapping table documented in plan changelog",
+    "No behavioral changes - only config source migration"
+  ],
+  "evidence_requirements": {
+    "log_file": "test-results/adr001-t5-<YYYY-MM-DD>.log",
+    "screenshots": true,
+    "test_results": true
+  },
+  "notes": "T5 is the only architectural task. Lossy C1→C2 translation demands human review of the skill-check→difficulty mapping table before merge. Trusted doc updates required for poi_detail_trusted.md and COMPONENT_MASTER_INDEX.md."
+}

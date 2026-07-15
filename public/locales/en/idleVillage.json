@@ -28,5 +28,21 @@
       "hpDescDescription": "Sort by current HP (highest first)",
       "fatigueAscDescription": "Sort by fatigue (lowest first)"
     }
+  },
+  "astrolabeV3": {
+    "verdictSuccess": "Victory",
+    "verdictNearMiss": "By a Whisker",
+    "verdictFail": "Defeat",
+    "verdictCrit": "Ruin",
+    "wounded": "Wounded",
+    "dead": "Fallen",
+    "rollAgain": "Roll again",
+    "throwControls": "Throw controls",
+    "skip": "Skip",
+    "auto": "Auto",
+    "mute": "Mute",
+    "onboardingStar": "Your strength: the higher the stat, the longer the ivory lobe stretches.",
+    "onboardingRisk": "Crimson crown: land there and you are wounded. Violet chasms: a lethal fall.",
+    "onboardingThrow": "Throw the spark — where it stops is the proof of your fate."
   }
 }

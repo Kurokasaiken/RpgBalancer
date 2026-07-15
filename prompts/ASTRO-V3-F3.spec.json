@@ -1,6 +1,7 @@
 {
   "id": "ASTRO-V3-F3",
   "agent": "harness",
+  "execution_hint": "verified",
   "objective": "Destiny Astrolabe V3 — F3 La pallina: simulation.ts, near-miss naturale 5%, tre atti, slow-motion, hit-stop.",
   "file_targets": [
     "src/ui/idleVillage/components/destinyAstrolabeV3/simulation.ts",

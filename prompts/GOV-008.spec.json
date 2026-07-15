@@ -1,6 +1,7 @@
 {
   "id": "GOV-008",
   "agent": "harness",
+  "execution_hint": "verified",
   "objective": "Create scripts/validate-systems.ts and unit tests as a deterministic executable gate, then register it as validate:systems in package.json.",
   "file_targets": [
     "scripts/validate-systems.ts",

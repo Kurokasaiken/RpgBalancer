@@ -1,6 +1,7 @@
 {
   "id": "GOV-005",
   "agent": "harness",
+  "execution_hint": "atomic",
   "objective": "Audit COMPONENT_MASTER_INDEX.md against KIT_REGISTRY and produce a discrepancy report without modifying either source.",
   "file_targets": [
     "src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md (read)",

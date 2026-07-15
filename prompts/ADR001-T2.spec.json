@@ -1,0 +1,87 @@
+{
+  "task_id": "ADR001-T2",
+  "title": "Extract RngService",
+  "plan_reference": "ADR-001 — Quest Engine Reconciliation & Opportunity Foundation",
+  "execution_hint": "verified",
+  "priority": "high",
+  "objectives": [
+    "Extract LCG class out of E1 into RngService",
+    "Create RngService with createRng, deriveSeed, rollOutcome API",
+    "Create Zod schema for WeightedDistribution",
+    "Add comprehensive unit tests for RngService"
+  ],
+  "invariants": [
+    "Config-first: Zod schema for WeightedDistribution",
+    "Component Reuse: Single PRNG for the repo",
+    "Determinism: LCG must be deterministic",
+    "No behavioral drift in existing QuestEngine.test.ts"
+  ],
+  "scope": {
+    "files_to_create": [
+      "src/engine/shared/RngService.ts",
+      "src/engine/shared/rngConfig.ts",
+      "tests/unit/engine/shared/RngService.test.ts"
+    ],
+    "files_to_modify": [
+      "src/engine/quest/QuestEngine.ts"
+    ],
+    "components_affected": [
+      "RngService",
+      "rngConfig"
+    ],
+    "integration_points": [
+      "src/engine/quest/QuestEngine.ts"
+    ]
+  },
+  "operations": [
+    {
+      "step": 1,
+      "description": "Create src/engine/shared/RngService.ts with LCG class lifted from E1, with public API: createRng, deriveSeed, rollOutcome",
+      "file": "src/engine/shared/RngService.ts",
+      "action": "create_rng_service"
+    },
+    {
+      "step": 2,
+      "description": "Create src/engine/shared/rngConfig.ts with Zod schema for WeightedDistribution unifying variance.rewardCategories and E3 outcome distribution",
+      "file": "src/engine/shared/rngConfig.ts",
+      "action": "create_rng_config"
+    },
+    {
+      "step": 3,
+      "description": "Update E1 to import from new RngService module instead of internal LCG",
+      "file": "src/engine/quest/QuestEngine.ts",
+      "action": "update_e1_imports"
+    },
+    {
+      "step": 4,
+      "description": "Create tests/unit/engine/shared/RngService.test.ts with determinism, deriveSeed stability, and rollOutcome distribution invariants",
+      "file": "tests/unit/engine/shared/RngService.test.ts",
+      "action": "create_tests"
+    }
+  ],
+  "guardrails": [
+    "DO NOT change LCG algorithm - only extract it",
+    "DO NOT modify E1 behavior - only change imports",
+    "Public API must match ADR §D2 specification exactly",
+    "Tests must verify determinism and deriveSeed stability"
+  ],
+  "safeguards": {
+    "lint_scope": "src/engine/shared tests/unit/engine/shared",
+    "test_scope": "tests/unit/engine/shared",
+    "build_check": true,
+    "kanban_lint": true
+  },
+  "acceptance_criteria": [
+    "RngService.ts exists with correct public API",
+    "rngConfig.ts has Zod schema for WeightedDistribution",
+    "E1 still compiles and works",
+    "No behavioral drift in QuestEngine.test.ts",
+    "Tests verify determinism and deriveSeed stability"
+  ],
+  "evidence_requirements": {
+    "log_file": "test-results/adr001-t2-<YYYY-MM-DD>.log",
+    "screenshots": false,
+    "test_results": true
+  },
+  "notes": "T2 gates T3, T4, and T7. Public API strictly as specified in ADR §D2."
+}

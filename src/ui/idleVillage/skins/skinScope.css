@@ -122,15 +122,17 @@
   cursor: default;
   box-shadow: var(--skin-btn-active-shadow);
 }
-/* Secondary / ghost variant (engraved slate) */
-.skin-scope :where([data-skin="button"][data-variant="secondary"]) {
+/* Secondary / ghost variant (engraved slate).
+   No :where() here: the base rule above carries 0,3,0 specificity from its
+   :not() chain, so this rule must match it to win by source order. */
+.skin-scope [data-skin="button"][data-variant="secondary"] {
   background: var(--skin-btn2-bg);
   border: var(--skin-btn2-border);
   color: var(--skin-btn2-color);
   text-shadow: var(--skin-incision-label);
   box-shadow: var(--skin-btn2-shadow);
 }
-.skin-scope :where([data-skin="button"][data-variant="secondary"])::before { opacity: 0.4; }
+.skin-scope [data-skin="button"][data-variant="secondary"]::before { opacity: 0.4; }
 
 /* ── Primary CTA plaque (the "AVVIA" look) ────────────────────────────── */
 .skin-scope :where([data-skin="cta"]) {

@@ -350,6 +350,24 @@ const MinimalLoopConfigSchema = z.object({
   defaultSpeedMultiplier: z.number().positive().default(1),
 });
 
+/**
+ * Schema for roster display configuration.
+ */
+const MinimalRosterConfigSchema = z.object({
+  maxWorkers: z.number().int().min(1).default(10),
+  showWarnings: z.boolean().default(true),
+  enableDragPrep: z.boolean().default(true),
+});
+
+/**
+ * Schema for resource warning thresholds.
+ */
+const MinimalWarningConfigSchema = z.object({
+  lowFoodThreshold: z.number().min(0).default(20),
+  highFatigueThreshold: z.number().min(0).max(100).default(80),
+  warningInterval: z.number().positive().default(5000),
+});
+
 const MinimalUIConfigSchema = z.object({
   hudFields: z.array(MinimalHudFieldSchema).min(1),
   tokens: MinimalUITokensSchema,
@@ -365,6 +383,8 @@ const MinimalUIConfigSchema = z.object({
 });
 
 export type MinimalLoopConfig = z.infer<typeof MinimalLoopConfigSchema>;
+export type MinimalRosterConfig = z.infer<typeof MinimalRosterConfigSchema>;
+export type MinimalWarningConfig = z.infer<typeof MinimalWarningConfigSchema>;
 export type MinimalUIConfig = z.infer<typeof MinimalUIConfigSchema>;
 export type MinimalHUDFieldConfig = z.infer<typeof MinimalHudFieldSchema>;
 export type MinimalUITokens = z.infer<typeof MinimalUITokensSchema>;
@@ -413,6 +433,8 @@ export const MinimalConfigSchema = z.object({
   buildings: z.array(MinimalBuildingDefinitionSchema).default([]),
   nightThreat: MinimalNightThreatConfigSchema.optional(),
   poiStates: MinimalPOIStateColorsSchema.optional(),
+  rosterConfig: MinimalRosterConfigSchema,
+  warningConfig: MinimalWarningConfigSchema,
 });
 
 export type MinimalConfig = z.infer<typeof MinimalConfigSchema>;
@@ -785,5 +807,15 @@ export const DEFAULT_MINIMAL_CONFIG: MinimalConfig = {
       bg: 'rgb(251, 191, 36)',
       border: 'rgb(245, 158, 11)',
     },
+  },
+  rosterConfig: {
+    maxWorkers: 10,
+    showWarnings: true,
+    enableDragPrep: true,
+  },
+  warningConfig: {
+    lowFoodThreshold: 20,
+    highFatigueThreshold: 80,
+    warningInterval: 5000,
   },
 };

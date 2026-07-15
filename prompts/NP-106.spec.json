@@ -1,0 +1,94 @@
+{
+  "task_id": "NP-106",
+  "title": "Idle Village Crew Scheduler Visual Debug Panel",
+  "plan_reference": "WS3 Crew Scheduler Implementation Plan",
+  "execution_hint": "verified",
+  "priority": "high",
+  "objectives": [
+    "Create visual debug panel for crew scheduler",
+    "Display crew scheduler state, assignments, and constraints",
+    "Provide real-time visualization of scheduler operations",
+    "Enable debugging and inspection of scheduler behavior"
+  ],
+  "invariants": [
+    "Config-first: All scheduler configuration from crewScheduler.ts",
+    "Style Lab: Apply Style Lab tokens for UI theming",
+    "Persistence: All state changes through async PersistenceService",
+    "Component Reuse: Use existing UI primitives where possible",
+    "WS3 Integration: Integrate with WS3 crew scheduler system"
+  ],
+  "scope": {
+    "files_to_create": [
+      "src/ui/idleVillage/debug/CrewSchedulerDebugPanel.tsx",
+      "src/ui/idleVillage/debug/hooks/useCrewSchedulerDebug.ts",
+      "tests/unit/idleVillage/CrewSchedulerDebugPanel.test.tsx"
+    ],
+    "files_to_modify": [],
+    "components_affected": [
+      "CrewSchedulerDebugPanel"
+    ],
+    "integration_points": [
+      "CrewSchedulerController",
+      "useCrewScheduler",
+      "crewScheduler.ts"
+    ]
+  },
+  "operations": [
+    {
+      "step": 1,
+      "description": "Create useCrewSchedulerDebug.ts hook that provides debug state and inspection methods for crew scheduler",
+      "file": "src/ui/idleVillage/debug/hooks/useCrewSchedulerDebug.ts",
+      "action": "create_debug_hook"
+    },
+    {
+      "step": 2,
+      "description": "Create CrewSchedulerDebugPanel.tsx with visual display of scheduler state, assignments, and constraints",
+      "file": "src/ui/idleVillage/debug/CrewSchedulerDebugPanel.tsx",
+      "action": "create_debug_panel"
+    },
+    {
+      "step": 3,
+      "description": "Implement real-time visualization of scheduler operations and state changes",
+      "file": "src/ui/idleVillage/debug/CrewSchedulerDebugPanel.tsx",
+      "action": "implement_realtime_viz"
+    },
+    {
+      "step": 4,
+      "description": "Apply Style Lab tokens for theming throughout the debug panel",
+      "file": "src/ui/idleVillage/debug/CrewSchedulerDebugPanel.tsx",
+      "action": "apply_style_lab_tokens"
+    },
+    {
+      "step": 5,
+      "description": "Create unit tests for debug hook and panel components",
+      "file": "tests/unit/idleVillage/CrewSchedulerDebugPanel.test.tsx",
+      "action": "create_tests"
+    }
+  ],
+  "guardrails": [
+    "DO NOT modify crew scheduler runtime behavior - only visualization",
+    "DO NOT hardcode scheduler configuration - read from crewScheduler.ts",
+    "DO NOT create new scheduler logic - only debug UI",
+    "Ensure debug panel does not interfere with normal scheduler operation"
+  ],
+  "safeguards": {
+    "lint_scope": "src/ui/idleVillage/debug",
+    "test_scope": "tests/unit/idleVillage/CrewSchedulerDebugPanel.test.tsx",
+    "build_check": true,
+    "kanban_lint": true
+  },
+  "acceptance_criteria": [
+    "CrewSchedulerDebugPanel displays scheduler state correctly",
+    "Real-time visualization of scheduler operations works",
+    "Debug panel provides useful inspection methods",
+    "Style Lab tokens are applied correctly",
+    "Unit tests pass for debug hook and panel",
+    "Debug panel does not interfere with normal scheduler operation"
+  ],
+  "evidence_requirements": {
+    "log_file": "test-results/np-106-crew-scheduler-debug-<YYYY-MM-DD>.log",
+    "screenshots": true,
+    "test_results": true
+  },
+  "notes": "WS3 crew scheduler system is implemented. This task provides visual debugging capabilities for the scheduler to aid in development and troubleshooting."
+}

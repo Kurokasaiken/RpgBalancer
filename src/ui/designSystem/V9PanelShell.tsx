@@ -31,9 +31,9 @@ export interface V9PanelShellProps {
 /**
  * V9PanelShell Component
  * 
- * Wrapper around PanelShell that applies V9 aesthetics using wanderlustTokens.css.
- * Uses CSS variables for colors, borders, shadows, and typography.
- * Wraps PanelShell and passes all necessary props.
+ * Wrapper around PanelShell styled exclusively with `--skin-` tokens
+ * (skinCssVariables.ts), so it follows the active skin preset like every
+ * other skin-aware component. No legacy `--panel-` or `--wl-` vocabulary.
  * 
  * @param panel - Panel data from store
  * @param children - Panel content to render
@@ -57,40 +57,44 @@ export function V9PanelShell({
   const { t } = useTranslation('common');
 
   const panelStyle = {
-    backgroundColor: 'var(--panel-bg)',
-    border: '1px solid var(--panel-border)',
-    borderRadius: 'var(--radius-md)',
-    boxShadow: 'var(--shadow-medium)',
-    color: 'var(--t1)',
+    background: 'var(--skin-surface-bg)',
+    border: '1px solid var(--skin-surface-border)',
+    borderRadius: 'var(--skin-surface-radius)',
+    boxShadow: 'var(--skin-drag-lift-shadow)',
+    color: 'var(--skin-body-color)',
   };
 
   const headerStyle = {
-    backgroundColor: 'var(--raised)',
-    borderBottom: '1px solid var(--panel-border)',
+    background: 'var(--skin-inset-bg)',
+    borderBottom: '1px solid var(--skin-inset-border)',
     padding: '12px 16px',
-    borderTopLeftRadius: 'var(--radius-md)',
-    borderTopRightRadius: 'var(--radius-md)',
+    borderTopLeftRadius: 'var(--skin-surface-radius)',
+    borderTopRightRadius: 'var(--skin-surface-radius)',
   };
 
   const titleStyle = {
-    color: 'var(--t1)',
+    color: 'var(--skin-title-color)',
+    fontFamily: 'var(--skin-font-display)',
+    textShadow: 'var(--skin-incision-label)',
     fontSize: '14px',
     fontWeight: '600',
+    letterSpacing: 'var(--skin-label-tracking)',
+    textTransform: 'uppercase' as const,
     margin: 0,
   };
 
   const dragHandleStyle = {
-    color: 'var(--t2)',
+    color: 'var(--skin-drag-handle-color)',
     cursor: disabled ? 'default' : 'move',
     userSelect: 'none' as const,
     padding: '4px 8px',
-    borderRadius: 'var(--radius-sm)',
-    transition: 'background-color 180ms ease',
+    borderRadius: 'var(--skin-btn-radius)',
+    transition: 'color 180ms ease',
   };
 
   const activeState = isActive ? {
-    borderColor: 'var(--acc-primary)',
-    boxShadow: 'var(--shadow-gold)',
+    borderColor: 'var(--skin-title-color)',
+    boxShadow: '0 0 18px var(--skin-glow-primary), var(--skin-drag-lift-shadow)',
   } : {};
 
   const customDragHandle = dragHandle || (

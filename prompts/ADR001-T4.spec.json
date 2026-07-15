@@ -1,0 +1,100 @@
+{
+  "task_id": "ADR001-T4",
+  "title": "Purge Math.random() inside idleVillage engines",
+  "plan_reference": "ADR-001 — Quest Engine Reconciliation & Opportunity Foundation",
+  "execution_hint": "verified",
+  "priority": "high",
+  "objectives": [
+    "Replace all Math.random() calls in idleVillage engines with injected RNG",
+    "Make IDs deterministic via deriveSeed(masterSeed, 'ids', counter)",
+    "Ensure complete removal of Math.random() from scope"
+  ],
+  "invariants": [
+    "Config-first: Use config for any new constants",
+    "Determinism: All random operations must be deterministic",
+    "No test regression in existing idleVillage tests"
+  ],
+  "scope": {
+    "files_to_create": [],
+    "files_to_modify": [
+      "src/engine/game/idleVillage/JobResolver.ts",
+      "src/engine/game/idleVillage/QuestPowerEngine.ts",
+      "src/engine/game/idleVillage/QuestResolver.ts",
+      "src/engine/game/idleVillage/QuestEngine.ts",
+      "src/engine/game/idleVillage/TimeEngine.ts"
+    ],
+    "components_affected": [
+      "JobResolver",
+      "QuestPowerEngine",
+      "QuestResolver",
+      "QuestEngine (E2)",
+      "TimeEngine"
+    ],
+    "integration_points": [
+      "RngService",
+      "masterSeed"
+    ]
+  },
+  "operations": [
+    {
+      "step": 1,
+      "description": "Audit QuestPowerEngine.ts - verify it already accepts injected rng and has no Math.random() residuals",
+      "file": "src/engine/game/idleVillage/QuestPowerEngine.ts",
+      "action": "audit_quest_power_engine"
+    },
+    {
+      "step": 2,
+      "description": "Replace Math.random() in JobResolver.ts with injected RNG derived from masterSeed",
+      "file": "src/engine/game/idleVillage/JobResolver.ts",
+      "action": "replace_math_random_job_resolver"
+    },
+    {
+      "step": 3,
+      "description": "Replace Math.random() in QuestResolver.ts with injected RNG derived from masterSeed",
+      "file": "src/engine/game/idleVillage/QuestResolver.ts",
+      "action": "replace_math_random_quest_resolver"
+    },
+    {
+      "step": 4,
+      "description": "Replace Math.random() in QuestEngine.ts (E2) with injected RNG derived from masterSeed",
+      "file": "src/engine/game/idleVillage/QuestEngine.ts",
+      "action": "replace_math_random_e2"
+    },
+    {
+      "step": 5,
+      "description": "Replace Math.random() in TimeEngine.ts spawnQuestOffersIfNeeded with injected RNG derived from masterSeed",
+      "file": "src/engine/game/idleVillage/TimeEngine.ts",
+      "action": "replace_math_random_time_engine"
+    },
+    {
+      "step": 6,
+      "description": "Make IDs generated with Math.random() (e.g., scheduled activity IDs in JobResolver) deterministic via deriveSeed(masterSeed, 'ids', counter)",
+      "file": "src/engine/game/idleVillage/JobResolver.ts",
+      "action": "make_ids_deterministic"
+    }
+  ],
+  "guardrails": [
+    "DO NOT leave any Math.random() calls in scope",
+    "DO NOT break existing tests - ensure no regression",
+    "All random operations must use injected RNG from masterSeed",
+    "IDs must be deterministic via deriveSeed stream"
+  ],
+  "safeguards": {
+    "lint_scope": "src/engine/game/idleVillage",
+    "test_scope": "tests/unit/idleVillage",
+    "build_check": true,
+    "kanban_lint": true
+  },
+  "acceptance_criteria": [
+    "grep 'Math.random' src/engine/game/idleVillage returns 0 matches",
+    "No test regression in tests/unit/idleVillage",
+    "All random operations use injected RNG from masterSeed",
+    "IDs are deterministic via deriveSeed(masterSeed, 'ids', counter)"
+  ],
+  "evidence_requirements": {
+    "log_file": "test-results/adr001-t4-<YYYY-MM-DD>.log",
+    "screenshots": false,
+    "test_results": true
+  },
+  "notes": "T4 depends on T2 and T3. This task touches every idleVillage engine. The grep 'Math.random' regression check must be added to CI as a permanent gate."
+}

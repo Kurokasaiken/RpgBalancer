@@ -251,6 +251,24 @@ API Key mancante: se GROQ_API_KEY non è presente nell'ambiente e il task ha exe
 - Logga in coordinator/dispatch-blocks.log con motivo
 - Se il task ha execution_hint 'atomic', può essere rediretto su ai-worker come fallback esplicito (con nota nel Kanban)
 - Se il task ha execution_hint 'verified' o 'architectural': richiede intervento umano — non eseguire senza harness
+Automatic Execution Policy
+Il coordinator viene eseguito automaticamente ogni 10 minuti via LaunchAgent macOS (coordinator_cron_wrapper.sh). Prima di ogni esecuzione automatica:
+
+1. Verifica che non ci sia già un coordinator in esecuzione (PID file check)
+2. Verifica che non ci siano task in esecuzione nel live_registry.json
+3. Se entrambi i controlli passano, esegue coordinator.py --select-only
+4. Se uno dei controlli fallisce, skip l'esecuzione e logga il motivo
+
+Questo previene esecuzioni concorrenti che potrebbero creare conflitti nel Kanban o nei file_targets.
+
+Manual Task Notification
+I task con executor='manual' vengono separati dal batch automatico e non vengono eseguiti. Quando ci sono task manuali in attesa:
+
+1. Il coordinator li elenca in console con "[INFO] X manual tasks waiting for user intervention"
+2. Scrive la lista in last-run-summary.json sotto "task_manuali_in_attesa"
+3. Invia una notifica desktop macOS con osascript: "Coordinator: Task Manuali - X task manuali in attesa: TASK1, TASK2, ..."
+4. L'utente deve intervenire manualmente per eseguire questi task (via Windsurf/Cascade o altro)
+
 Continuous Improvement
 The Coordinator must:
 

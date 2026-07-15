@@ -1,0 +1,90 @@
+{
+  "task_id": "RT-INT-DRAG-POI-001",
+  "title": "Drag + POI Integration Page Assembly",
+  "plan_reference": "Runtime Component Alignment Plan - Integration Assembly",
+  "execution_hint": "verified",
+  "priority": "high",
+  "objectives": [
+    "Create integration page demonstrating drag & drop to POI components",
+    "Serve as verification harness for drag + POI integration",
+    "Verify roster system integrates correctly with POI components",
+    "Ensure time layer usage is consistent (gameplay layer)"
+  ],
+  "invariants": [
+    "Component Reuse: Use existing canonical components (VillageRosterSection, ActivityCapsule, PoiDetailSkinWrapper)",
+    "Drag & Drop: Use DragContext and DragOverlay canonics from RT-ROSTER-001",
+    "Time Layer: Use gameplay layer time for UI interactions (dual-layer architecture)",
+    "Style Lab: Apply Style Lab tokens for theming",
+    "Config-first: No hardcoded values - use existing config patterns"
+  ],
+  "scope": {
+    "files_to_create": [
+      "src/ui/idleVillage/pages/DragPoiIntegrationPage.tsx"
+    ],
+    "files_to_modify": [],
+    "components_affected": [
+      "DragPoiIntegrationPage"
+    ],
+    "integration_points": [
+      "VillageRosterSection",
+      "ActivityCapsule",
+      "PoiDetailSkinWrapper",
+      "DragContext",
+      "DragOverlay"
+    ]
+  },
+  "operations": [
+    {
+      "step": 1,
+      "description": "Create DragPoiIntegrationPage.tsx that mounts VillageRosterSection, ActivityCapsule examples, and PoiDetailSkinWrapper examples",
+      "file": "src/ui/idleVillage/pages/DragPoiIntegrationPage.tsx",
+      "action": "create_integration_page"
+    },
+    {
+      "step": 2,
+      "description": "Implement drag & drop that allows dragging residents onto POI capsules with stat validation and visual feedback",
+      "file": "src/ui/idleVillage/pages/DragPoiIntegrationPage.tsx",
+      "action": "implement_drag_to_poi"
+    },
+    {
+      "step": 3,
+      "description": "Apply Style Lab tokens for theming throughout the integration page",
+      "file": "src/ui/idleVillage/pages/DragPoiIntegrationPage.tsx",
+      "action": "apply_style_lab_tokens"
+    },
+    {
+      "step": 4,
+      "description": "Create /drag-poi-integration route that serves as verification harness with telemetry for tracking drag events",
+      "file": "src/ui/idleVillage/pages/DragPoiIntegrationPage.tsx",
+      "action": "create_verification_route"
+    }
+  ],
+  "guardrails": [
+    "DO NOT create new roster or POI components - use existing canonicals",
+    "DO NOT modify TimeEngine or time contracts - only use existing time layer",
+    "DO NOT hardcode stat validation - use existing validation system",
+    "DO NOT create new drag infrastructure - use DragContext/DragOverlay canonics",
+    "Ensure time layer usage is consistent with dual-layer architecture"
+  ],
+  "safeguards": {
+    "lint_scope": "src/ui/idleVillage/pages/DragPoiIntegrationPage.tsx",
+    "test_scope": "src/ui/idleVillage/pages",
+    "build_check": true,
+    "kanban_lint": true
+  },
+  "acceptance_criteria": [
+    "DragPoiIntegrationPage successfully mounts all canonical components",
+    "Drag & drop to POI capsules works with stat validation",
+    "Visual feedback is provided for drag operations",
+    "Style Lab tokens are applied correctly",
+    "Time layer usage is consistent (gameplay layer)",
+    "Verification route /drag-poi-integration is functional",
+    "Telemetry events are tracked for drag operations"
+  ],
+  "evidence_requirements": {
+    "log_file": "test-results/rt-int-drag-poi-001-<YYYY-MM-DD>.log",
+    "screenshots": true,
+    "test_results": true
+  },
+  "notes": "RT-ROSTER-001 verified drag system compliance, RT-POI-S-001 verified POI standard compliance, RT-POI-D-001 verified POI detail compliance. This task integrates these verified systems into a single verification harness."
+}

@@ -1,6 +1,7 @@
 {
   "id": "GOV-004",
   "agent": "harness",
+  "execution_hint": "atomic",
   "objective": "Update agent-execution-mandate and idle-village-task skills to enforce frozen kit usage and trusted-doc updates for certified/frozen components.",
   "file_targets": [
     ".windsurf/skills/agent-execution-mandate/SKILL.md",

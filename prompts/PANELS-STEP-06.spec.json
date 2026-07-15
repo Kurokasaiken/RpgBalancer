@@ -1,6 +1,7 @@
 {
   "id": "PANELS-STEP-06",
   "agent": "harness",
+  "execution_hint": "verified",
   "objective": "Draggable Panels System — Step 06: Integrate panels in /design-system page with full/strip demo and PersistenceService.",
   "file_targets": [
     "src/pages/design-system.tsx",

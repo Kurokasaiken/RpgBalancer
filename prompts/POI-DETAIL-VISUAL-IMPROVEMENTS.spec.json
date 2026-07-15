@@ -1,5 +1,6 @@
 {
   "promptId": "POI-DETAIL-VISUAL-IMPROVEMENTS",
+  "execution_hint": "verified",
   "title": "POI Detail Visual Improvements - Material Consistency & Drag Fix",
   "description": "Fix POI detail panel drag behavior and apply material-consistent visual improvements to roster frame, stat bars, portraits, and filter controls",
   "agent": "Idle Village Runtime Integration Specialist",

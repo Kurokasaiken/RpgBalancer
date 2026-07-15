@@ -1,6 +1,7 @@
 {
   "id": "ASTRO-V3-F4",
   "agent": "harness",
+  "execution_hint": "verified",
   "objective": "Destiny Astrolabe V3 — F4 Resolution & polish: i18n, modifier API, camera focus, TestHub V3, prefers-reduced-motion/skip.",
   "file_targets": [
     "src/ui/idleVillage/components/destinyAstrolabeV3/DestinyAstrolabeV3.tsx",

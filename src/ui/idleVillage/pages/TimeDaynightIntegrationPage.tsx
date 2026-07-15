@@ -27,7 +27,7 @@ import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 export const TimeDaynightIntegrationPage: React.FC = () => {
   const gameplayState = useMinimalGameplayWithIdleVillageConfig();
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [manualSpeed, setManualSpeed] = useState(1);
+  const previousSpeedRef = useRef(1);
 
   // Extract time state for demonstration
   const timeState = {
@@ -54,7 +54,7 @@ export const TimeDaynightIntegrationPage: React.FC = () => {
   const dayNightPhase = timeState.isDayPhase ? 'Day' : 'Night';
   const cycleProgressPercent = Math.round(timeState.cycleProgress * 100);
 
-  // Track time events
+  // Track time events (once on mount)
   useEffect(() => {
     trackTelemetryEvent('time_integration_page_loaded', {
       currentTime: simulationTime,
@@ -63,19 +63,19 @@ export const TimeDaynightIntegrationPage: React.FC = () => {
       isDayPhase: timeState.isDayPhase,
       cycleProgress: timeState.cycleProgress,
     });
-  }, []);
+  }, [simulationTime, timeState.currentTick, timeState.speedMultiplier, timeState.isDayPhase, timeState.cycleProgress]);
 
-  // Track speed changes
+  // Track speed changes using ref to avoid setState in effect
   useEffect(() => {
-    if (timeState.speedMultiplier !== manualSpeed) {
-      setManualSpeed(timeState.speedMultiplier);
+    if (previousSpeedRef.current !== timeState.speedMultiplier) {
       trackTelemetryEvent('time_speed_multiplier_changed', {
-        oldSpeed: manualSpeed,
+        oldSpeed: previousSpeedRef.current,
         newSpeed: timeState.speedMultiplier,
         source: 'integration_page',
       });
+      previousSpeedRef.current = timeState.speedMultiplier;
     }
-  }, [timeState.speedMultiplier, manualSpeed]);
+  }, [timeState.speedMultiplier]);
 
   // Track day/night transitions
   useEffect(() => {

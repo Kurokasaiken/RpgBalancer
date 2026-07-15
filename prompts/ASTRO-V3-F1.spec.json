@@ -1,6 +1,7 @@
 {
   "id": "ASTRO-V3-F1",
   "agent": "harness",
+  "execution_hint": "verified",
   "objective": "Destiny Astrolabe V3 — F1 Materia: canvas layer, stella, sfida, backdrop, shell DestinyAstrolabeV3.tsx e palette token.",
   "file_targets": [
     "src/ui/idleVillage/components/destinyAstrolabeV3/engineV3.ts",

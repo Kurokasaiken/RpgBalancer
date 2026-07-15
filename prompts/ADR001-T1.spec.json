@@ -1,0 +1,71 @@
+{
+  "task_id": "ADR001-T1",
+  "title": "Freeze E1 (branching QuestEngine)",
+  "plan_reference": "ADR-001 — Quest Engine Reconciliation & Opportunity Foundation",
+  "execution_hint": "atomic",
+  "priority": "high",
+  "objectives": [
+    "Freeze E1 (branching QuestEngine) by adding @experimental FROZEN JSDoc header",
+    "No logic changes - only documentation header",
+    "Prevent new imports of QuestEngine from E1"
+  ],
+  "invariants": [
+    "Documentation Governance: Update trusted documentation",
+    "No runtime changes - only JSDoc header",
+    "Preserve existing E1 functionality"
+  ],
+  "scope": {
+    "files_to_create": [],
+    "files_to_modify": [
+      "src/engine/quest/QuestEngine.ts"
+    ],
+    "components_affected": [
+      "QuestEngine (E1)"
+    ],
+    "integration_points": []
+  },
+  "operations": [
+    {
+      "step": 1,
+      "description": "Prepend @experimental FROZEN JSDoc header to src/engine/quest/QuestEngine.ts verbatim from ADR §D1",
+      "file": "src/engine/quest/QuestEngine.ts",
+      "action": "add_frozen_header"
+    },
+    {
+      "step": 2,
+      "description": "Verify no import diff - E1 should still compile and work",
+      "file": "src/engine/quest/QuestEngine.ts",
+      "action": "verify_compilation"
+    },
+    {
+      "step": 3,
+      "description": "Run grep 'new QuestEngine(' in src/ to verify only tests + docs use E1",
+      "file": "src/",
+      "action": "verify_usage"
+    }
+  ],
+  "guardrails": [
+    "DO NOT modify any logic in QuestEngine.ts - only add JSDoc header",
+    "DO NOT change any imports or exports",
+    "DO NOT break existing tests that use E1",
+    "Header must be verbatim from ADR §D1"
+  ],
+  "safeguards": {
+    "lint_scope": "src/engine/quest",
+    "test_scope": "",
+    "build_check": true,
+    "kanban_lint": true
+  },
+  "acceptance_criteria": [
+    "@experimental FROZEN JSDoc header is present in QuestEngine.ts",
+    "No import diff - E1 still compiles",
+    "grep 'new QuestEngine(' in src/ yields only tests + docs",
+    "No logic changes in QuestEngine.ts"
+  ],
+  "evidence_requirements": {
+    "log_file": "test-results/adr001-t1-<YYYY-MM-DD>.log",
+    "screenshots": false,
+    "test_results": false
+  },
+  "notes": "This is the lowest risk task that unblocks governance narrative. T1 is independent and can ship first."
+}

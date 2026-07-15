@@ -1,6 +1,7 @@
 {
   "id": "PANELS-STEP-01",
   "agent": "harness",
+  "execution_hint": "atomic",
   "objective": "Draggable Panels System — Step 01: Create empty /design-system page with 5 placeholder sections (Tokens, Panels, Store, Shell, Integration).",
   "file_targets": [
     "src/pages/design-system.tsx"

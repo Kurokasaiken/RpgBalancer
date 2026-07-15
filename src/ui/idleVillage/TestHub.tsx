@@ -73,6 +73,15 @@ const EXTRA_PAGES: TestPageLink[] = [
     icon: '🪄',
     status: 'ok',
   },
+  // Non-kit page: Design System reference page.
+  {
+    id: 'design-system',
+    title: 'Design System',
+    description: 'Component library, tokens, panels, and integration patterns',
+    path: '/design-system',
+    icon: '🎨',
+    status: 'ok',
+  },
 ];
 
 const TEST_PAGES: TestPageLink[] = [

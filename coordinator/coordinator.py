@@ -8,12 +8,19 @@ basati su file_targets, e seleziona il batch eseguibile in base alla capacità d
 import argparse
 import json
 import re
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Set, Tuple
 
 from dispatch_gates import check_dispatch_gates, extract_file_targets_from_notes, parse_agent_assignments_rows
+from dispatcher import (
+    dispatch_batch_to_manual,
+    get_manual_status,
+    print_manual_reminder,
+    send_manual_notification,
+)
 from registry_manager import (
     get_available_models,
     get_model_capacity,
@@ -179,14 +186,16 @@ def get_file_targets_from_spec_or_notes(task_id: str, notes: str) -> List[str]:
     return list(extract_file_targets_from_notes(notes))
 
 
-def calcola_batch_eseguibile(coda_task: List[dict]) -> Tuple[List[dict], List[dict], int]:
+def calcola_batch_eseguibile(coda_task: List[dict]) -> Tuple[List[dict], List[dict], List[dict], int]:
     """Calculate the executable batch of tasks.
     
     a. Group ready tasks into independent clusters based on file_targets
     b. For each cluster, select one representative task (serial within cluster)
     c. Filter selected tasks based on model capacity from live_registry.json
     d. Limit batch size based on dynamic max_paralleli calculation
-    e. Return list of {task_id, channel, model} ready for dispatch, list of blocked tasks, and max_paralleli
+    e. Separate manual tasks (executor='manual' or 'swe') from automatic tasks
+    f. Dispatch manual tasks to the manual queue
+    g. Return list of {task_id, channel, model} ready for dispatch, list of blocked tasks, list of manual tasks, and max_paralleli
     """
     # Step 1: Filter tasks with satisfied dependencies
     ready_with_deps = []
@@ -211,19 +220,39 @@ def calcola_batch_eseguibile(coda_task: List[dict]) -> Tuple[List[dict], List[di
     available_models = get_available_models()
     batch = []
     blocked_tasks = []
+    manual_tasks = []
     
     for task in selected_tasks:
-        # Stop if we've reached max_paralleli
-        if len(batch) >= max_paralleli:
-            blocked_tasks.append({
-                "task_id": task["id"].split()[0],
-                "motivo": f"batch limit reached (max_paralleli={max_paralleli})"
-            })
-            continue
-        
         task_id = task["id"].split()[0]
         dependencies = task["dependencies"]
         file_targets = get_file_targets_from_spec_or_notes(task_id, task["notes"])
+        
+        # Determine channel from executor field or default
+        executor = task.get("executor", "manual")
+        
+        # Separate manual tasks immediately (both 'manual' and 'swe' executors)
+        if executor in ("manual", "swe"):
+            manual_tasks.append({
+                "task_id": task_id,
+                "channel": "manual",
+                "model": "N/A",
+                "file_targets": list(file_targets),
+                "title": task.get("title", ""),
+                "description": task.get("description", ""),
+                "prompt": task.get("prompt", ""),
+                "dependencies": task.get("dependencies", "-"),
+                "executor": executor,
+            })
+            continue  # Manual tasks don't go through automatic dispatch
+        
+        # For automatic tasks, check dispatch gates and capacity
+        # Stop if we've reached max_paralleli
+        if len(batch) >= max_paralleli:
+            blocked_tasks.append({
+                "task_id": task_id,
+                "motivo": f"batch limit reached (max_paralleli={max_paralleli})"
+            })
+            continue
         
         # Run dispatch gates
         allowed, reason = check_dispatch_gates(task_id, dependencies, file_targets)
@@ -248,14 +277,13 @@ def calcola_batch_eseguibile(coda_task: List[dict]) -> Tuple[List[dict], List[di
                     blocked_tasks.append({"task_id": task_id, "motivo": "all models saturated"})
                     continue
         
-        # Determine channel from executor field or default
-        executor = task.get("executor", "manual")
+        # Determine channel for automatic tasks
         if executor == "ai-worker":
             channel = "ai-worker"
         elif executor == "harness":
             channel = "harness"
         else:
-            channel = "manual"
+            channel = "manual"  # Fallback
         
         batch.append({
             "task_id": task_id,
@@ -267,7 +295,7 @@ def calcola_batch_eseguibile(coda_task: List[dict]) -> Tuple[List[dict], List[di
         # Increment model usage (will be decremented on task completion)
         increment_model_usage(model)
     
-    return batch, blocked_tasks, max_paralleli
+    return batch, blocked_tasks, manual_tasks, max_paralleli
 
 
 def dispatch_task(task_id: str, channel: str, model: str, file_targets: List[str]):
@@ -280,14 +308,31 @@ def dispatch_task(task_id: str, channel: str, model: str, file_targets: List[str
     print(f"[DISPATCH] Task {task_id} started on {channel} with model {model}")
 
 
+def send_desktop_notification(title: str, message: str):
+    """Send a desktop notification on macOS using osascript."""
+    try:
+        subprocess.run([
+            "osascript",
+            "-e",
+            f'display notification "{message}" with title "{title}"'
+        ], check=True, capture_output=True)
+        print(f"[NOTIFY] Desktop notification sent: {title}")
+    except (subprocess.SubprocessError, FileNotFoundError) as e:
+        print(f"[WARN] Failed to send desktop notification: {e}")
+
+
 def write_run_summary(
     task_lanciati: int,
     task_bloccati: int,
     task_completati_questo_giro: int,
     dettaglio_bloccati: List[dict],
     max_paralleli_calcolato: int = 0,
+    task_manuali_in_attesa: List[dict] = None,
 ):
     """Write the coordinator run summary to last-run-summary.json."""
+    # Get manual dispatch status
+    manual_status = get_manual_status()
+    
     summary = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "task_lanciati": task_lanciati,
@@ -295,6 +340,14 @@ def write_run_summary(
         "task_completati_questo_giro": task_completati_questo_giro,
         "dettaglio_bloccati": dettaglio_bloccati,
         "max_paralleli_calcolato": max_paralleli_calcolato,
+        "task_manuali_in_attesa": task_manuali_in_attesa or [],
+        "manual_dispatch": {
+            "pending": manual_status["pending"],
+            "completed": manual_status["completed"],
+            "failed": manual_status["failed"],
+            "queue_file": manual_status["queue_file"],
+            "next_action": "Aprire Windsurf ed eseguire /run-manual-tasks"
+        }
     }
     
     LAST_RUN_SUMMARY_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -351,11 +404,38 @@ def main():
         return
     
     # Calculate executable batch
-    batch, blocked_tasks, max_paralleli = calcola_batch_eseguibile(ready_tasks)
+    batch, blocked_tasks, manual_tasks, max_paralleli = calcola_batch_eseguibile(ready_tasks)
     
     print(f"[INFO] Selected {len(batch)} tasks for dispatch (max_paralleli={max_paralleli})")
     for item in batch:
         print(f"  - {item['task_id']} -> {item['channel']} ({item['model']})")
+    
+    if manual_tasks:
+        print(f"[INFO] {len(manual_tasks)} manual tasks detected, dispatching to queue...")
+        
+        # Convert manual tasks to dispatcher format
+        dispatcher_tasks = []
+        for task in manual_tasks:
+            dispatcher_tasks.append({
+                "task_id": task["task_id"],
+                "title": task.get("title", task["task_id"]),
+                "description": task.get("description", ""),
+                "prompt": task.get("prompt", ""),
+                "file_targets": task["file_targets"],
+                "dependencies": task.get("dependencies", "-"),
+                "executor": task.get("executor", "manual"),
+            })
+        
+        # Dispatch to manual queue
+        added_count = dispatch_batch_to_manual(dispatcher_tasks)
+        print(f"[INFO] {added_count} new tasks added to manual queue")
+        
+        # Send desktop notification if new tasks were added
+        if added_count > 0:
+            send_manual_notification(
+                "Nuovi task SWE disponibili",
+                f"{added_count} nuovi task in attesa di esecuzione manuale"
+            )
     
     if blocked_tasks:
         print(f"[INFO] {len(blocked_tasks)} tasks blocked:")
@@ -384,10 +464,13 @@ def main():
         rows_after = parse_agent_assignments_rows()
         status_after = {row["id"].split()[0]: row["status"] for row in rows_after}
         completed_this_cycle = count_completed_this_cycle(status_before, status_after)
-        write_run_summary(len(batch), len(blocked_tasks), completed_this_cycle, blocked_tasks, max_paralleli)
+        write_run_summary(len(batch), len(blocked_tasks), completed_this_cycle, blocked_tasks, max_paralleli, manual_tasks)
     else:
         # TODO: Implement actual dispatch logic
         print("[INFO] Dispatch not yet implemented (use --select-only)")
+    
+    # Always print manual reminder if queue is not empty
+    print_manual_reminder()
 
 
 if __name__ == "__main__":

@@ -166,6 +166,13 @@ export const DestinyAstrolabeV3 = memo(
       }
     }, [armed, skipAnim, autoThrow, doThrow]);
 
+    /* Skip attivato durante lo spin → salto diretto a snap+resolution (§5) */
+    useEffect(() => {
+      if (skipAnim && (phase === 'the-spin' || phase === 'ring-lock' || phase === 'threat-slam' || phase === 'agency-burst' || phase === 'risk-pour')) {
+        engineRef.current?.skip();
+      }
+    }, [skipAnim, phase]);
+
     useImperativeHandle(
       ref,
       () => ({

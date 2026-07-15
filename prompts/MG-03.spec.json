@@ -1,0 +1,120 @@
+{
+  "task_id": "MG-03",
+  "title": "Roster & Resource Warnings Implementation",
+  "plan_reference": "strategy_tasks.md - MG-03 Roster & Resource Warnings",
+  "execution_hint": "verified",
+  "priority": "high",
+  "objectives": [
+    "Implement roster display for Minimal Gameplay",
+    "Implement resource warnings (low food, fatigue, etc.)",
+    "Prepare drag tokens for future drag & drop functionality",
+    "Integrate WorkerCard.tsx with Minimal Gameplay context"
+  ],
+  "invariants": [
+    "Config-first: All resource thresholds from minimalConfig.ts, no hardcoded values",
+    "Component Reuse: Use existing WorkerCard.tsx instead of creating new component",
+    "Style Lab: Apply Style Lab tokens for UI theming (Minimal Frontier preset)",
+    "Persistence: All state changes through useMinimalGameplay store",
+    "Drag-Ready: Roster must prepare drag tokens for future D&D"
+  ],
+  "scope": {
+    "files_to_create": [
+      "src/ui/idleVillage/components/minimal/WorkerPanel.tsx",
+      "tests/unit/idleVillage/WorkerPanel.test.tsx"
+    ],
+    "files_to_modify": [
+      "src/ui/idleVillage/MinimalGameplayPage.tsx",
+      "src/store/useMinimalGameplay.ts",
+      "src/balancing/config/idleVillage/minimalConfig.ts"
+    ],
+    "components_affected": [
+      "WorkerPanel",
+      "WorkerCard",
+      "MinimalGameplayPage"
+    ],
+    "integration_points": [
+      "useMinimalGameplay",
+      "WorkerCard",
+      "minimalConfig"
+    ]
+  },
+  "operations": [
+    {
+      "step": 1,
+      "description": "Create WorkerPanel.tsx with roster display, resource warnings, and drag token preparation using Style Lab tokens",
+      "file": "src/ui/idleVillage/components/minimal/WorkerPanel.tsx",
+      "action": "create_worker_panel"
+    },
+    {
+      "step": 2,
+      "description": "Integrate WorkerCard.tsx with Minimal Gameplay context and resource status display",
+      "file": "src/ui/idleVillage/components/minimal/WorkerPanel.tsx",
+      "action": "integrate_worker_card"
+    },
+    {
+      "step": 3,
+      "description": "Extend useMinimalGameplay.ts with roster state, resource tracking, and warning calculations",
+      "file": "src/store/useMinimalGameplay.ts",
+      "action": "extend_store"
+    },
+    {
+      "step": 4,
+      "description": "Update minimalConfig.ts with roster settings, warning thresholds, and resource definitions",
+      "file": "src/balancing/config/idleVillage/minimalConfig.ts",
+      "action": "update_config"
+    },
+    {
+      "step": 5,
+      "description": "Implement drag token preparation for future drag & drop functionality",
+      "file": "src/ui/idleVillage/components/minimal/WorkerPanel.tsx",
+      "action": "implement_drag_prep"
+    },
+    {
+      "step": 6,
+      "description": "Create resource warnings system with configurable thresholds (low food, fatigue, etc.)",
+      "file": "src/ui/idleVillage/components/minimal/WorkerPanel.tsx",
+      "action": "implement_warnings"
+    },
+    {
+      "step": 7,
+      "description": "Create unit tests for WorkerPanel, resource calculations, warning logic, and drag preparation",
+      "file": "tests/unit/idleVillage/WorkerPanel.test.tsx",
+      "action": "create_tests"
+    },
+    {
+      "step": 8,
+      "description": "Integrate WorkerPanel into MinimalGameplayPage",
+      "file": "src/ui/idleVillage/MinimalGameplayPage.tsx",
+      "action": "integrate_to_page"
+    }
+  ],
+  "guardrails": [
+    "DO NOT hardcode resource thresholds outside of config",
+    "DO NOT create roster system without drag preparation",
+    "DO NOT skip Style Lab token usage for UI",
+    "DO NOT create new WorkerCard - reuse existing component",
+    "Ensure all resource thresholds are configurable via minimalConfig.ts"
+  ],
+  "safeguards": {
+    "lint_scope": "src/ui/idleVillage/MinimalGameplayPage.tsx src/ui/idleVillage/components/minimal src/store/useMinimalGameplay.ts",
+    "test_scope": "tests/unit/idleVillage/WorkerPanel.test.tsx",
+    "build_check": true,
+    "kanban_lint": true
+  },
+  "acceptance_criteria": [
+    "WorkerPanel displays roster correctly",
+    "Resource warnings are active with configurable thresholds",
+    "Drag token preparation is ready for future D&D",
+    "WorkerCard is integrated with Minimal Gameplay context",
+    "Style Lab tokens are applied correctly (Minimal Frontier preset)",
+    "All resource thresholds are in minimalConfig.ts",
+    "Unit tests pass for WorkerPanel and related logic",
+    "/minimal-gameplay page shows roster and warnings correctly"
+  ],
+  "evidence_requirements": {
+    "log_file": "test-results/mg-03-roster-warnings-<YYYY-MM-DD>.log",
+    "screenshots": true,
+    "test_results": true
+  },
+  "notes": "MG-02 completed with clock & loop controls available. WorkerCard.tsx exists and can be reused. Resource tracking system can be integrated in useMinimalGameplay. Config structure: rosterConfig (maxWorkers, showWarnings, enableDragPrep), warningConfig (lowFoodThreshold, highFatigueThreshold, warningInterval)."
+}

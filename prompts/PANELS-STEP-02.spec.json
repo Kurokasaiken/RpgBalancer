@@ -1,6 +1,7 @@
 {
   "id": "PANELS-STEP-02",
   "agent": "harness",
+  "execution_hint": "atomic",
   "objective": "Draggable Panels System — Step 02: Implement Tokens section with visual swatches from wanderlustTokens.css.",
   "file_targets": [
     "src/pages/design-system.tsx",

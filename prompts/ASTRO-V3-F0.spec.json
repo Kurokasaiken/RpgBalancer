@@ -1,6 +1,7 @@
 {
   "id": "ASTRO-V3-F0",
   "agent": "harness",
+  "execution_hint": "verified",
   "objective": "Destiny Astrolabe V3 — F0 Fondamenta: geometry.ts, zones.ts, config Zod, test Monte Carlo area e near-miss 5%.",
   "file_targets": [
     "src/balancing/config/idleVillage/destinyAstrolabeV3/astrolabeV3Config.ts",

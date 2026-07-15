@@ -1,5 +1,6 @@
 {
   "id": "portrait-propagation-regression",
+  "execution_hint": "atomic",
   "title": "Portrait Propagation Regression Coverage",
   "description": "Add minimal regression coverage so the fixed portrait propagation bug in `/minimal-gameplay` cannot regress",
   "priority": "high",

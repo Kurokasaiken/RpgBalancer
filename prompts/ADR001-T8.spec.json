@@ -1,0 +1,112 @@
+{
+  "task_id": "ADR001-T8",
+  "title": "Documentation & governance closure",
+  "plan_reference": "ADR-001 — Quest Engine Reconciliation & Opportunity Foundation",
+  "execution_hint": "verified",
+  "priority": "high",
+  "objectives": [
+    "Create canonical ADR-001 file",
+    "Update quest_engine_reconciliation_plan.md with per-task changelog",
+    "Cross-link ADR-001 in idle_village_plan.md",
+    "Mark quest_chronicle_plan.md Phase C as Step 2 post-reconciliation",
+    "Mark idle_village_modifiers_plan.md GM-ENG wiring as post-demo",
+    "Add ADR-001 entry to MASTER_PLAN.md governance section",
+    "Update COMPONENT_MASTER_INDEX.md with touched frozen kit rows"
+  ],
+  "invariants": [
+    "Documentation Governance: Update trusted docs and COMPONENT_MASTER_INDEX",
+    "Runtime Verification First: Base documentation on verified runtime results",
+    "Cross-linking: Ensure all links resolve correctly",
+    "Evidence-Based: Document only what exists and is verified"
+  ],
+  "scope": {
+    "files_to_create": [
+      "src/docs/docs/adr/ADR-001-quest-engine-reconciliation.md"
+    ],
+    "files_to_modify": [
+      "src/docs/docs/plans/quest_engine_reconciliation_plan.md",
+      "src/docs/docs/plans/idle_village_plan.md",
+      "src/docs/docs/plans/quest_chronicle_plan.md",
+      "src/docs/docs/plans/idle_village_modifiers_plan.md",
+      "src/docs/docs/MASTER_PLAN.md",
+      "src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md"
+    ],
+    "components_affected": [
+      "Documentation system",
+      "COMPONENT_MASTER_INDEX"
+    ],
+    "integration_points": []
+  },
+  "operations": [
+    {
+      "step": 1,
+      "description": "Create src/docs/docs/adr/ADR-001-quest-engine-reconciliation.md as canonical ADR file",
+      "file": "src/docs/docs/adr/ADR-001-quest-engine-reconciliation.md",
+      "action": "create_adr_file"
+    },
+    {
+      "step": 2,
+      "description": "Update quest_engine_reconciliation_plan.md with per-task changelog entries",
+      "file": "src/docs/docs/plans/quest_engine_reconciliation_plan.md",
+      "action": "update_changelog"
+    },
+    {
+      "step": 3,
+      "description": "Cross-link ADR-001 in idle_village_plan.md Quest/Job System section",
+      "file": "src/docs/docs/plans/idle_village_plan.md",
+      "action": "cross_link_idle_village_plan"
+    },
+    {
+      "step": 4,
+      "description": "Mark quest_chronicle_plan.md Phase C theater CTA + sandbox wiring as Step 2 post-reconciliation, reference ADR §D6",
+      "file": "src/docs/docs/plans/quest_chronicle_plan.md",
+      "action": "mark_phase_c_step_2"
+    },
+    {
+      "step": 5,
+      "description": "Mark idle_village_modifiers_plan.md GM-ENG wiring as post-demo, reference ADR-001",
+      "file": "src/docs/docs/plans/idle_village_modifiers_plan.md",
+      "action": "mark_gm_eng_post_demo"
+    },
+    {
+      "step": 6,
+      "description": "Add ADR-001 entry to MASTER_PLAN.md governance section",
+      "file": "src/docs/docs/MASTER_PLAN.md",
+      "action": "update_master_plan"
+    },
+    {
+      "step": 7,
+      "description": "Update COMPONENT_MASTER_INDEX.md with touched frozen kit rows (last-certified dates)",
+      "file": "src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md",
+      "action": "update_component_master_index"
+    }
+  ],
+  "guardrails": [
+    "DO NOT create documentation before runtime verification",
+    "DO NOT modify trusted contracts - only update last-certified dates",
+    "Ensure all cross-links resolve correctly",
+    "This is the final task - consolidates all documentation deltas",
+    "Depends on all previous T1-T7 completion"
+  ],
+  "safeguards": {
+    "lint_scope": "",
+    "test_scope": "",
+    "build_check": false,
+    "kanban_lint": true
+  },
+  "acceptance_criteria": [
+    "ADR-001 exists as src/docs/docs/adr/ADR-001-quest-engine-reconciliation.md",
+    "quest_engine_reconciliation_plan.md updated with per-task changelog",
+    "All cross-links resolve correctly",
+    "COMPONENT_MASTER_INDEX.md last-certified dates updated for touched rows",
+    "Master plan references ADR-001",
+    "Phase C marked as Step 2 post-reconciliation",
+    "GM-ENG wiring marked as post-demo"
+  ],
+  "evidence_requirements": {
+    "log_file": "test-results/adr001-t8-<YYYY-MM-DD>.log",
+    "screenshots": false,
+    "test_results": false
+  },
+  "notes": "T8 is the final task - depends on all previous T1-T7 completion. This consolidates all documentation deltas into one commit. Safeguards: kanban:lint, markdown lint if configured."
+}
