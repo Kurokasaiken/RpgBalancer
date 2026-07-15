@@ -17,48 +17,62 @@ interface BuildResult {
  * Executes build check and captures output for safeguard logging.
  * Fails explicitly if TypeScript build has errors.
  */
-async function runBuildCheck(): Promise<BuildResult> {
+const DEFAULT_BUILD_TIMEOUT_MS = 180000;
+
+function parseArgs(argv: string[]): { timeoutMs: number } {
+  const timeoutArg = argv.find((arg) => arg.startsWith('--timeout='));
+  const timeoutMs = timeoutArg
+    ? Number(timeoutArg.split('=')[1]) || DEFAULT_BUILD_TIMEOUT_MS
+    : DEFAULT_BUILD_TIMEOUT_MS;
+  return { timeoutMs };
+}
+
+async function runBuildCheck(timeoutMs: number): Promise<BuildResult> {
   const startTime = Date.now();
   const timestamp = new Date().toISOString();
-  
+
   console.log('🏗️  Running build check...');
-  
+
   try {
-    const stdout = execSync('npm run build', { 
+    const stdout = execSync('npm run build', {
       encoding: 'utf8',
-      stdio: 'pipe'
+      stdio: 'pipe',
+      timeout: timeoutMs,
     });
-    
+
     const duration = Date.now() - startTime;
-    
+
     const result: BuildResult = {
       success: true,
       exitCode: 0,
       stdout,
       stderr: '',
       timestamp,
-      duration
+      duration,
     };
-    
+
     console.log('✅ Build check passed');
     return result;
-    
+
   } catch (error: unknown) {
     const duration = Date.now() - startTime;
-    
+    const err = error as { status?: number; code?: string; stdout?: string; stderr?: string; message?: string };
+
     const result: BuildResult = {
       success: false,
-      exitCode: (error as { status?: number; code?: number }).status || (error as { status?: number; code?: number }).code || 1,
-      stdout: (error as { stdout?: string }).stdout || '',
-      stderr: (error as { stderr?: string; message?: string }).stderr || (error as { stderr?: string; message?: string }).message || '',
+      exitCode: err.status || (err.code === 'ETIMEDOUT' ? 124 : 1),
+      stdout: err.stdout || '',
+      stderr: err.code === 'ETIMEDOUT'
+        ? `Build timed out after ${timeoutMs}ms. Reduce scope or check for infinite loops.`
+        : (err.stderr || err.message || ''),
       timestamp,
-      duration
+      duration,
     };
-    
+
     console.error('❌ Build check failed');
     console.error('Exit code:', result.exitCode);
     console.error('Duration:', `${result.duration}ms`);
-    
+
     return result;
   }
 }
@@ -97,9 +111,10 @@ function saveBuildLog(result: BuildResult): void {
  * Main execution
  */
 async function main(): Promise<void> {
-  const result = await runBuildCheck();
+  const { timeoutMs } = parseArgs(process.argv.slice(2));
+  const result = await runBuildCheck(timeoutMs);
   saveBuildLog(result);
-  
+
   // Exit with same code as build to fail CI if build fails
   if (!result.success) {
     process.exit(result.exitCode || 1);

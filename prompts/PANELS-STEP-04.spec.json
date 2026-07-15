@@ -1,0 +1,60 @@
+{
+  "id": "PANELS-STEP-04",
+  "agent": "harness",
+  "objective": "Draggable Panels System — Step 04: Implement PanelShell headless component with dnd-kit drag functionality and tests.",
+  "file_targets": [
+    "src/ui/designSystem/PanelShell.tsx",
+    "tests/unit/designSystem/PanelShell.test.tsx"
+  ],
+  "dependencies": [
+    "PANELS-STEP-03"
+  ],
+  "invariants": [
+    "Sei un agente Windsurf: consulta le skill `agent-execution-mandate` prima di iniziare.",
+    "`.windsurf/rules/00-project-invariants.md` (config-first, Zod, i18n, JSDoc, safeguards).",
+    "`.windsurf/rules/10-ui-invariants.md` (skin tokens, zero hardcoded colors, Gilded Observatory theme, <16ms/frame).",
+    "Drag & Drop: usare @dnd-kit per drag functionality (già presente nel progetto).",
+    "Tutte le stringhe user-facing devono usare `useTranslation` con namespace `common` o `idleVillage`.",
+    "Nessun CSS standalone; usare token da `wanderlustTokens.css` per eventuali stili.",
+    "Verifica primitive esistenti in `src/ui/atoms/`, `src/ui/fantasy/atoms/`, `src/ui/idleVillage/skins/primitives/` prima di creare nuovi componenti.",
+    "Tutte le funzioni e interfacce nuove devono avere JSDoc."
+  ],
+  "operations": [
+    "Crea `src/ui/designSystem/PanelShell.tsx` come componente headless che: accetta props (panel data, children, onDragEnd, onResize, onClose), usa `useDraggable` da @dnd-kit per drag functionality, fornisce drag handle (es. header), supporta resize (se implementato), supporta close action.",
+    "Il componente deve essere headless: nessuno stile hardcoded, solo struttura semantica e drag logic. Eventuali stili devono usare token wanderlustTokens.css.",
+    "Integra con `usePanelsStore` per aggiornare posizione/size quando drag/resize avviene.",
+    "Usa `useTranslation` per labels user-facing (es. 'Close panel', 'Drag to move').",
+    "Aggiungi test RTL in `tests/unit/designSystem/PanelShell.test.tsx` per: render componente, drag handle functionality, drag events trigger onDragEnd, close action trigger onClose.",
+    "Verifica che il componente funzioni correttamente con @dnd-kit DndContext provider.",
+    "Non applicare estetica V9 in questo step; solo headless shell."
+  ],
+  "forbidden": [
+    "Nessun colore hardcoded; tutti gli stili devono usare token CSS.",
+    "Nessun CSS standalone per PanelShell; usare inline styles con CSS variables.",
+    "Nessuna estetica V9 specifica in questo step; mantenere headless.",
+    "Non duplicare primitive esistenti; riutilizza componenti drag se già presenti nel progetto."
+  ],
+  "assumptions": [
+    "Esegui direttamente i passi noti senza chiedere conferma.",
+    "PANELS-STEP-03 è completato e `usePanelsStore` è disponibile.",
+    "@dnd-kit è già installato nel progetto (verifica in package.json).",
+    "Estetica V9 sarà applicata in PANELS-STEP-05."
+  ],
+  "safeguards": [
+    "npm run lint -- src/ui/designSystem/PanelShell.tsx tests/unit/designSystem/",
+    "npm run test -- tests/unit/designSystem/PanelShell.test.tsx",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "`src/ui/designSystem/PanelShell.tsx` headless component con dnd-kit",
+    "`tests/unit/designSystem/PanelShell.test.tsx` test suite",
+    "Evidence log in `test-results/panels-step-04-<YYYY-MM-DD>.log`"
+  ],
+  "notes": [
+    "Quando prendi questo prompt, imposta subito la riga in `src/docs/docs/coordinator/agent_assignments.md` su 'In corso' con data e nome agente.",
+    "Al completamento, esegui la safeguard suite e chiudi con: `KANBAN STATUS: PANELS-STEP-04 – Completato (Evidence: test-results/panels-step-04-<YYYY-MM-DD>.log)`.",
+    "Step 04 è prerequisito di PANELS-STEP-05.",
+    "Execution hint: verified (multi-file con safeguards)."
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "id": "PANELS-STEP-05",
+  "agent": "agent",
+  "objective": "V9 Panel Shell — create <V9PanelShell> wrapper with V9 aesthetics (titlebar, close button, usage of existing wanderlustTokens.css tokens). Separates behavior from aesthetics.",
+  "file_targets": [
+    "src/ui/panels/V9PanelShell.tsx",
+    "tests/unit/panels/V9PanelShell.test.tsx"
+  ],
+  "dependencies": [
+    "PANELS-STEP-04"
+  ],
+  "invariants": [
+    "Sei un agente Windsurf: consulta le skill `agent-execution-mandate` prima di iniziare.",
+    "`.windsurf/rules/00-project-invariants.md` (config-first, i18n, JSDoc, safeguards, Skin/Theme system).",
+    "`.windsurf/rules/10-ui-invariants.md` (skin tokens, zero hardcoded colors, Gilded Observatory theme).",
+    "Tutti gli stili devono passare dai token V9 (wanderlustTokens.css), MAI CSS ad-hoc o file .css standalone.",
+    "Tutte le stringhe user-facing devono passare da useTranslation.",
+    "Tutte le funzioni e interfacce nuove devono avere JSDoc.",
+    "Verifica primitive esistenti (WanderlustSurface, WanderlustField, ecc.) prima di scrivere nuovo markup."
+  ],
+  "operations": [
+    "Crea `src/ui/panels/V9PanelShell.tsx` come wrapper con estetica V9.",
+    "Il componente accetta props: panelId, title (string o i18n key), children (ReactNode), showCloseButton (boolean), showModeToggle (boolean).",
+    "Internamente usa PanelShell (headless) per behavior (drag, position, z-index).",
+    "Applica styling V9 usando i token da wanderlustTokens.css (es. --surface, --iron-md, --iron-rim, ecc.).",
+    "Include titlebar con titolo e close button (se showCloseButton).",
+    "Include mode toggle button (se showModeToggle) per passare da 'full' a 'strip'.",
+    "Usa WanderlustSurface se esiste e copre il caso d'uso per il container principale.",
+    "Tutte le stringhe user-facing (title, button labels) devono usare useTranslation.",
+    "Crea `tests/unit/panels/V9PanelShell.test.tsx` con test per rendering, interazioni, e integrazione con PanelShell.",
+    "Aggiungi JSDoc al componente."
+  ],
+  "forbidden": [
+    "Nessun CSS ad-hoc o file .css standalone.",
+    "Nessun colore hardcoded — tutti i colori devono venire dai token wanderlustTokens.css.",
+    "Non duplicare markup/styling di primitive esistenti.",
+    "Non mescolare behavior e aesthetics — PanelShell resta headless, V9PanelShell è solo wrapper visuale."
+  ],
+  "assumptions": [
+    "Esegui direttamente i passi noti senza chiedere conferma.",
+    "PanelShell esiste da PANELS-STEP-04.",
+    "wanderlustTokens.css esiste in src/ui/styleLab/tokens/wanderlustTokens.css.",
+    "WanderlustSurface esiste in src/ui/wanderlust-surface/."
+  ],
+  "safeguards": [
+    "npm run lint -- src/ui/panels/ tests/unit/panels/",
+    "npm run test -- tests/unit/panels/V9PanelShell.test.tsx",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "`src/ui/panels/V9PanelShell.tsx`",
+    "`tests/unit/panels/V9PanelShell.test.tsx`",
+    "Evidence log in `test-results/panels-step-05-<YYYY-MM-DD>.log`"
+  ],
+  "notes": [
+    "Quando prendi questo prompt, imposta subito la riga in `src/docs/docs/coordinator/agent_assignments.md` su 'In corso' con data e nome agente.",
+    "Al completamento, esegui la safeguard suite e chiudi con: `KANBAN STATUS: PANELS-STEP-05 – Completato (Evidence: test-results/panels-step-05-<YYYY-MM-DD>.log)`.",
+    "Questo step è prerequisito di PANELS-STEP-06.",
+    "Execution hint: verified (multi-file, requires safeguards)."
+  ]
+}

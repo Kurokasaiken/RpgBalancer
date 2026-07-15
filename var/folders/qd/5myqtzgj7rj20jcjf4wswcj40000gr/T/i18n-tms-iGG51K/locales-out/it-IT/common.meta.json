@@ -1,0 +1,17 @@
+{
+  "appName": {
+    "context": "App title",
+    "description": "",
+    "maxLength": 32
+  },
+  "greeting": {
+    "context": "namespace:greeting",
+    "description": "",
+    "maxLength": 17
+  },
+  "nested.label": {
+    "context": "Inventory label",
+    "description": "",
+    "maxLength": 20
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "id": "PANELS-STEP-02",
+  "agent": "harness",
+  "objective": "Draggable Panels System — Step 02: Implement Tokens section with visual swatches from wanderlustTokens.css.",
+  "file_targets": [
+    "src/pages/design-system.tsx",
+    "src/ui/designSystem/TokenSwatch.tsx"
+  ],
+  "dependencies": [
+    "PANELS-STEP-01"
+  ],
+  "invariants": [
+    "Sei un agente Windsurf: consulta le skill `agent-execution-mandate` prima di iniziare.",
+    "`.windsurf/rules/00-project-invariants.md` (config-first, Zod, i18n, JSDoc, safeguards).",
+    "`.windsurf/rules/10-ui-invariants.md` (skin tokens, zero hardcoded colors, Gilded Observatory theme, <16ms/frame).",
+    "Tutte le stringhe user-facing devono usare `useTranslation` con namespace `common` o `idleVillage`.",
+    "Nessun CSS standalone; usare token da `wanderlustTokens.css` per tutti i colori.",
+    "Verifica primitive esistenti in `src/ui/atoms/`, `src/ui/fantasy/atoms/`, `src/ui/idleVillage/skins/primitives/` prima di creare nuovi componenti.",
+    "Tutte le funzioni e interfacce nuove devono avere JSDoc."
+  ],
+  "operations": [
+    "Crea `src/ui/designSystem/TokenSwatch.tsx` come componente headless che renderizza un quadrato colorato con nome token e valore hex/rgb.",
+    "Il componente deve leggere i token CSS da `wanderlustTokens.css` (es. `--skin-surface-base`, `--skin-text-primary`, `--skin-icon-accent`, ecc.) e mostrarli come swatch visivi.",
+    "Implementa la sezione 'Tokens' in `src/pages/design-system.tsx` usando `TokenSwatch` per mostrare una griglia di token wanderlust.",
+    "Usa `useTranslation` per titoli e labels della sezione Tokens.",
+    "Aggiungi test RTL in `tests/unit/designSystem/TokenSwatch.test.tsx` per verificare render dei swatch e lettura corretta dei token.",
+    "Verifica che i token corrispondano a quelli definiti in `wanderlustTokens.css`."
+  ],
+  "forbidden": [
+    "Nessun colore hardcoded; tutti i colori devono venire da token CSS.",
+    "Nessun CSS standalone per gli swatch; usare inline styles con CSS variables.",
+    "Non duplicare primitive esistenti; riutilizza componenti base se disponibili."
+  ],
+  "assumptions": [
+    "Esegui direttamente i passi noti senza chiedere conferma.",
+    "PANELS-STEP-01 è completato e `src/pages/design-system.tsx` esiste.",
+    "I token wanderlustTokens.css sono già definiti nel progetto."
+  ],
+  "safeguards": [
+    "npm run lint -- src/pages/design-system.tsx src/ui/designSystem/TokenSwatch.tsx tests/unit/designSystem/",
+    "npm run test -- tests/unit/designSystem/TokenSwatch.test.tsx",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "`src/ui/designSystem/TokenSwatch.tsx` componente swatch",
+    "`src/pages/design-system.tsx` aggiornato con sezione Tokens",
+    "`tests/unit/designSystem/TokenSwatch.test.tsx` test suite",
+    "Evidence log in `test-results/panels-step-02-<YYYY-MM-DD>.log`"
+  ],
+  "notes": [
+    "Quando prendi questo prompt, imposta subito la riga in `src/docs/docs/coordinator/agent_assignments.md` su 'In corso' con data e nome agente.",
+    "Al completamento, esegui la safeguard suite e chiudi con: `KANBAN STATUS: PANELS-STEP-02 – Completato (Evidence: test-results/panels-step-02-<YYYY-MM-DD>.log)`.",
+    "Step 02 è prerequisito di PANELS-STEP-03."
+  ]
+}

@@ -151,37 +151,32 @@ const WanderlustRosterCard = memo<WanderlustRosterCardProps>(({
     borderRadius: '14px',
     cursor: isUnavailable ? 'not-allowed' : isInteractive ? 'grab' : 'default',
     background: 'var(--skin-surface-bg, linear-gradient(160deg, rgba(216,177,62,0.05) 0%, rgba(20,12,7,0.2) 45%, rgba(6,4,3,0.3) 100%))',
-    boxShadow: `
-      inset 0 1px 0 rgba(223,184,87,0.1),
-      inset 0 2px 10px rgba(0,0,0,0.35),
-      inset 0 -1px 0 rgba(0,0,0,0.3)
-    `,
-    transition: 'transform 300ms ease, box-shadow 300ms ease',
     // Alpha states: 0.5 while dragged, 0.35 when unavailable (away/injured/locked)
     opacity: isDragging ? 0.5 : isUnavailable ? 0.35 : 1,
     filter: isUnavailable && !isDragging ? 'grayscale(0.9)' : undefined,
     // While in alpha the card is read-only: no interactions
     pointerEvents: isDragging || isUnavailable ? 'none' : undefined,
-    transform: isHovered ? 'translateY(-2px)' : 'translateY(0)',
-    willChange: 'transform',
   };
 
-  // Ring glow for hover and active heroes
-  const ringGlow = isHero 
-    ? `0 0 0 1px rgba(223,184,87,0.3)`
-    : isHovered 
-      ? `0 0 0 1px rgba(223,184,87,0.28), 0 10px 34px rgba(223,184,87,0.08)`
-      : 'none';
+  // Hover / active hero glow tokens (no transform, so first-card border is not clipped)
+  const baseInsetShadow = `
+    inset 0 1px 0 rgba(223,184,87,0.10),
+    inset 0 2px 10px rgba(0,0,0,0.35),
+    inset 0 -1px 0 rgba(0,0,0,0.30)
+  `;
+  const hoverInsetShadow = `
+    inset 0 1px 0 rgba(240,207,106,0.18),
+    inset 0 0 0 1px rgba(223,184,87,0.25),
+    inset 0 2px 10px rgba(0,0,0,0.35),
+    inset 0 -1px 0 rgba(0,0,0,0.30)
+  `;
+  // Inset-only glow ring: avoids the overflow:auto clipping that was hiding the
+  // top border of the first card in the roster list.
+  const cardBoxShadow = isHovered ? hoverInsetShadow : baseInsetShadow;
 
-  const heroGlowStyle: CSSProperties = {
-    boxShadow: isHero
-      ? `
-        inset 0 1px 0 rgba(240,207,106,0.2),
-        inset 0 2px 10px rgba(0,0,0,0.35),
-        0 0 16px rgba(223,184,87,0.12),
-        ${ringGlow}
-      `
-      : `${cardStyle.boxShadow}, ${ringGlow}`,
+  const cardGlowStyle: CSSProperties = {
+    boxShadow: cardBoxShadow,
+    transition: 'box-shadow 300ms ease, opacity 300ms ease',
   };
 
   // Hero border style
@@ -216,7 +211,8 @@ const WanderlustRosterCard = memo<WanderlustRosterCardProps>(({
     pointerEvents: 'none',
     background: 'radial-gradient(ellipse 180px 120px at 78% 30%, rgba(223,184,87,0.08), transparent 70%)',
     mixBlendMode: 'screen',
-    opacity: isHero ? 0.8 : 0.5,
+    opacity: isHero ? (isHovered ? 0.9 : 0.8) : (isHovered ? 0.7 : 0.5),
+    transition: 'opacity 300ms ease',
     borderRadius: '14px',
   };
 
@@ -281,7 +277,7 @@ const WanderlustRosterCard = memo<WanderlustRosterCardProps>(({
       className={className}
       style={{
         ...cardStyle,
-        ...heroGlowStyle,
+        ...cardGlowStyle,
       }}
       onClick={handleClick}
       onPointerDown={(e) => {

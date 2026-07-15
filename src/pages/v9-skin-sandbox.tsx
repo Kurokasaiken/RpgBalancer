@@ -30,7 +30,7 @@ import giggiolilloPortrait from '@/assets/portraits/giggiolillo.png';
 import salvatricePortrait from '@/assets/portraits/portrait female magician.png';
 import spaccaculiPortrait from '@/assets/portraits/portrait male warrior.png';
 import { V9GlassLayers } from '@/ui/v9-skin/V9GlassLayers';
-import { WanderlustSurface, InsetPanel, type MaterialLayerConfig } from '@/ui/wanderlust-surface';
+import { WanderlustSurface, InsetPanel, InsetPanelDelicate, type MaterialLayerConfig } from '@/ui/wanderlust-surface';
 import { type MaterialPreset, MATERIAL_PRESETS } from '@/ui/wanderlust-surface/materialPresets';
 import type { SkinPresetId } from '@/ui/idleVillage/skins/skinConfigRegistry';
 import { ResidentSlotRackSkin } from '@/ui/idleVillage/frozen/kits/slotRackKit';
@@ -149,9 +149,9 @@ const GenericTokensDemo: React.FC<{ material: MaterialPreset }> = ({ material })
           <WanderlustDivider />
 
           <WanderlustSectionHeader tier="tertiary" hint="Lacquered Wood + Aged Brass">
-            InsetPanel · Slot Rack
+            InsetPanelDelicate · Slot Rack
           </WanderlustSectionHeader>
-          <InsetPanel style={{ background: V9.obsidianBase, border: `1px solid ${V9.borderGold}` }}>
+          <InsetPanelDelicate style={{ background: V9.obsidianBase }}>
             <ResidentSlotRackSkin
               slots={[
                 { id: 'v9-s1', index: 0, label: 'Slot 1', assignedResidentId: null, isPlaceholder: false, dropState: 'idle' },
@@ -162,7 +162,7 @@ const GenericTokensDemo: React.FC<{ material: MaterialPreset }> = ({ material })
               overflowBehavior="scroll"
               slotSize={96}
             />
-          </InsetPanel>
+          </InsetPanelDelicate>
         </div>
       </WanderlustSurface>
     </div>

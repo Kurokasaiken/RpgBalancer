@@ -28,54 +28,7 @@ const KIT_PAGES: TestPageLink[] = KIT_REGISTRY.filter((entry) => entry.hub).map(
 
 /** Test pages not (yet) backed by a frozen kit. */
 const EXTRA_PAGES: TestPageLink[] = [
-  {
-    id: 'slot',
-    title: 'Slot',
-    description: 'Test animazioni incastonamento ed estrazione PgCard',
-    path: '/slot',
-    icon: '🎰',
-    status: 'ok',
-  },
-  {
-    id: 'roster-slot-integration',
-    title: 'Roster + Slot Rack',
-    description: 'Integrazione Roster con SlotRack, drag & drop e assegnazione',
-    path: '/minimal-roster-slot-integration',
-    icon: '🎯',
-    status: 'ok',
-  },
-  {
-    id: 'job-poi-roster',
-    title: 'POI + Roster Integration',
-    description: 'Integrazione POI job detail con roster drag & drop',
-    path: '/minimal-job-poi-roster-integration',
-    icon: '🗺️',
-    status: 'ok',
-  },
-  {
-    id: 'job-poi-roster-time',
-    title: 'POI + Roster + Time Integration',
-    description: 'Integrazione completa con time engine e reward',
-    path: '/minimal-job-poi-roster-time-integration',
-    icon: '⏱️',
-    status: 'ok',
-  },
-  {
-    id: 'quest-detail-legacy',
-    title: 'Quest Chronicle',
-    description: 'Dettaglio quest con fasi, progress bar, esito finale',
-    path: '/minimal-quest-detail',
-    icon: '📜',
-    status: 'ok',
-  },
-  {
-    id: 'v8-skin-sandbox',
-    title: 'V8 Skin Sandbox',
-    description: 'Test Material Layer Engine e V8 Skin Architecture con preset procedurali',
-    path: '/skin-sandbox',
-    icon: '🎨',
-    status: 'ok',
-  },
+  // Non-kit page: visual sandbox for v9 skin, not a component kit.
   {
     id: 'v9-skin-sandbox',
     title: 'V9 Skin Sandbox',
@@ -84,6 +37,7 @@ const EXTRA_PAGES: TestPageLink[] = [
     icon: '🏔️',
     status: 'ok',
   },
+  // Non-kit page: verification harness for POI detail, not a production kit.
   {
     id: 'poi-detail',
     title: 'POI Detail',
@@ -92,6 +46,7 @@ const EXTRA_PAGES: TestPageLink[] = [
     icon: '🗺️',
     status: 'ok',
   },
+  // Non-kit page: integration page for POI quest + roster; TBD future merge/deprecation.
   {
     id: 'poi-quest-detail-roster-integration',
     title: 'Quest POI Detail + Roster Integration',
@@ -100,12 +55,22 @@ const EXTRA_PAGES: TestPageLink[] = [
     icon: '🧩',
     status: 'ok',
   },
+  // Non-kit page: integration page for POI job + roster; TBD future merge/deprecation.
   {
     id: 'poi-job-detail-roster-integration',
     title: 'Job POI Detail + Roster Integration',
     description: 'POI job reale con roster e slot rack interattivo da Idle Village config',
     path: '/poi-job-detail-roster-integration',
     icon: '🪵',
+    status: 'ok',
+  },
+  // Non-kit page: Spell Creator test page with default skin system.
+  {
+    id: 'spell-creator',
+    title: 'Spell Creator (Default Skin)',
+    description: 'Modern Spell Creator with default skin system, i18n, and async persistence',
+    path: '/spell-creator',
+    icon: '🪄',
     status: 'ok',
   },
 ];

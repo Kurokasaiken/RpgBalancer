@@ -1,0 +1,60 @@
+{
+  "id": "ASTRO-V3-F2",
+  "agent": "harness",
+  "objective": "Destiny Astrolabe V3 — F2 Rischio leggibile: corona ferita, voragini morte, banda crit, obelischi rifatti, skin token `--skin-status-wound`/`--skin-status-death`.",
+  "file_targets": [
+    "src/ui/idleVillage/components/destinyAstrolabeV3/engineV3.ts",
+    "src/ui/idleVillage/skins/skinConfigRegistry.ts",
+    "src/ui/styleLab/tokens/gilded-observatory.css"
+  ],
+  "dependencies": [
+    "ASTRO-V3-F1"
+  ],
+  "invariants": [
+    "Sei un agente Windsurf: consulta le skill `agent-execution-mandate` e `idle-village-task` prima di iniziare.",
+    "`src/docs/docs/plans/destiny_astrolabe_v3_implementation_plan.md` §2.1, §3, §4, §9 F2.",
+    "`.windsurf/rules/00-project-invariants.md` e `.windsurf/rules/10-ui-invariants.md`.",
+    "Nessun colore hardcoded; tutti i token semantici (ferita, morte, rovina, mondo, azione, forza) da skin config.",
+    "Regola esclusiva canali cromatici: ferita = solo corona (cremisi), morte = solo voragini (viola), rovina = sfida + banda crit (ossidiana/fumo), azione = THROW/pallina, forza = stella.",
+    "Nuovi token `--skin-status-wound` e `--skin-status-death` registrati in `skinConfigRegistry.ts` e nel CSS token file.",
+    "i18n namespace `idleVillage` per label, tooltip, onboarding.",
+    "Nessun `ctx.filter`/`shadowBlur` nel hot path; glow pre-cotto in gradienti/sprite se necessario."
+  ],
+  "operations": [
+    "Aggiungi in `src/ui/idleVillage/skins/skinConfigRegistry.ts` i nuovi token `--skin-status-wound` (cremisi) e `--skin-status-death` (viola spettrale) con fallback. Aggiorna `src/ui/styleLab/tokens/gilded-observatory.css` per includere i nuovi token.",
+    "Aggiungi in `src/balancing/config/idleVillage/destinyAstrolabeV3/astrolabeV3Config.ts` (creato in F0) i parametri per corona/voragini/banda crit: clamp minimo, curve di smoothing, opacita', soglie pulso.",
+    "Estendi `src/ui/idleVillage/components/destinyAstrolabeV3/geometry.ts` (F0) per fornire i dati degli obelischi: posizione per asse su perimetro sfida, forma poligonale asimmetrica, base e placca label. Mantieni purezza funzionale.",
+    "Estendi `src/ui/idleVillage/components/destinyAstrolabeV3/engineV3.ts` per disegnare: corona ferita (banda lungo perimetro stella, spessore ∝ woundPct), voragini morte (dischi nei valli, area ∝ deathPct, lente scura + nucleo violaceo), banda rovina critica (bordo esterno sfida, spessore ∝ critPct), obelischi (cristalli ossidiana affilati, rim bronzo/azurro, label su placche laterali, animazione `threat-slam` in stagger). Implementa dev-overlay percentuale per audit.",
+    "Implementa onboarding contestuale (prime N=3 aperture, persistenza via PersistenceService): micro-tooltip sincronizzati con nascita stella/corona/voragini. Usa `useTranslation` e config per i testi.",
+    "Aggiorna i test: `tests/unit/destinyAstrolabeV3/geometryAndZones.test.ts` per obelischi; `tests/unit/destinyAstrolabeV3/engineV3.test.ts` per token e area."
+  ],
+  "forbidden": [
+    "Nessuna pallina o simulazione in questa fase (F3).",
+    "Nessun testo-percentuale in legenda: le percentuali devono emergere dalle zone.",
+    "Nessun rosso extra: il rosso e' solo per ferita; nessun altro elemento deve competere.",
+    "Nessun hardcoded shape: forma obelischi da config."
+  ],
+  "assumptions": [
+    "Esegui direttamente i passi noti senza chiedere conferma.",
+    "F1 e' completato: engine, canvas, stella, sfida, palette esistono.",
+    "Per l'onboarding, usa `PersistenceService.saveData/loadData` con chiave config-driven."
+  ],
+  "safeguards": [
+    "npm run lint -- src/ui/idleVillage/components/destinyAstrolabeV3/ src/ui/idleVillage/skins/ src/ui/styleLab/tokens/ tests/unit/destinyAstrolabeV3/",
+    "npm run test -- tests/unit/destinyAstrolabeV3/",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "Token `--skin-status-wound` e `--skin-status-death` registrati e in CSS",
+    "`engineV3.ts` disegna corona, voragini, banda crit, obelischi",
+    "`geometry.ts` esteso con dati obelischi",
+    "Onboarding tooltip config-first con PersistenceService",
+    "Evidence log `test-results/astro-v3-f2-<YYYY-MM-DD>.log`"
+  ],
+  "notes": [
+    "Quando prendi questo prompt, imposta subito la riga in `src/docs/docs/coordinator/agent_assignments.md` su 'In corso' con data e nome agente.",
+    "Al completamento, esegui la safeguard suite e chiudi con: `KANBAN STATUS: ASTRO-V3-F2 – Completato (Evidence: test-results/astro-v3-f2-<YYYY-MM-DD>.log)`.",
+    "F2 dipende da F1; e' prerequisito di F3."
+  ]
+}

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { ROSTER_SORT_MODES } from '@/ui/idleVillage/config/rosterSortConfig';
 import type { RosterSortMode } from '@/ui/idleVillage/config/rosterSortConfig';
 
 /**
@@ -14,13 +16,13 @@ export interface RosterSortIconProps {
 
 /**
  * RosterSortIcon - Compact icon-based sort control for roster display
- * 
+ *
  * A simple icon button that toggles between alphabetical sort modes:
  * - Name A -> Z (default)
  * - Name Z -> A
- * 
+ *
  * Uses displayName for alphabetical sorting as required by the prompt.
- * 
+ *
  * @component
  * @example
  * ```tsx
@@ -36,6 +38,7 @@ export function RosterSortIcon({
   onSortModeChange,
   className = '',
 }: RosterSortIconProps) {
+  const { t } = useTranslation('idleVillage');
   const handleClick = () => {
     // Toggle between name-asc and name-desc
     const newMode = currentMode === 'name-asc' ? 'name-desc' : 'name-asc';
@@ -43,7 +46,8 @@ export function RosterSortIcon({
   };
 
   const isAscending = currentMode === 'name-asc';
-  const tooltip = isAscending ? 'Sort: Name A → Z (click to reverse)' : 'Sort: Name Z → A (click to reverse)';
+  const sortModeConfig = ROSTER_SORT_MODES[currentMode];
+  const tooltip = t(sortModeConfig.tooltipKey, sortModeConfig.tooltip);
   
   return (
     <button

@@ -1,0 +1,58 @@
+{
+  "id": "PANELS-STEP-02",
+  "agent": "agent",
+  "objective": "Design System Tokens Section — populate 'Tokens' section of /design-system page with visual swatches of existing V9 tokens from wanderlustTokens.css (colors, typography, spacing, shadows) reading directly from CSS variables.",
+  "file_targets": [
+    "src/pages/design-system.tsx"
+  ],
+  "dependencies": [
+    "PANELS-STEP-01"
+  ],
+  "invariants": [
+    "Sei un agente Windsurf: consulta le skill `agent-execution-mandate` prima di iniziare.",
+    "`.windsurf/rules/00-project-invariants.md` (config-first, i18n, JSDoc, safeguards).",
+    "`.windsurf/rules/10-ui-invariants.md` (skin tokens, zero hardcoded colors, Gilded Observatory theme).",
+    "Tutte le stringhe user-facing devono passare da useTranslation.",
+    "Tutte le funzioni e interfacce nuove devono avere JSDoc.",
+    "Nessun CSS ad-hoc o file .css standalone.",
+    "Leggi direttamente dalle CSS variables di wanderlustTokens.css, non duplicare i valori."
+  ],
+  "operations": [
+    "Popola la sezione 'Tokens' in `src/pages/design-system.tsx` con swatch visivi dei token V9.",
+    "Crea sottosezioni per: Colori, Tipografie, Spacing, Shadows.",
+    "Per i colori: leggi le CSS variables da wanderlustTokens.css (es. --void, --abyss, --deep, --base, --surface, --iron-dk, --iron-md, --iron-rim, --iron-lg, ecc.) e mostra swatch con nome e valore hex.",
+    "Per le tipografie: mostra le font family e scale sizes se definite in wanderlustTokens.css.",
+    "Per lo spacing: mostra spacing scale se definita.",
+    "Per gli shadows: mostra shadow tokens se definiti.",
+    "Usa un hook custom o utility per leggere le CSS variables (es. getComputedStyle su un elemento con classe .preset-wanderlust).",
+    "Tutte le label devono usare useTranslation.",
+    "Aggiungi JSDoc alle funzioni di lettura CSS variables."
+  ],
+  "forbidden": [
+    "Nessun CSS ad-hoc o file .css standalone.",
+    "Nessun colore hardcoded — tutti i valori devono essere letti dalle CSS variables.",
+    "Non duplicare i valori dei token nel codice TypeScript.",
+    "Non creare nuovi componenti UI duplicando primitive esistenti."
+  ],
+  "assumptions": [
+    "Esegui direttamente i passi noti senza chiedere conferma.",
+    "wanderlustTokens.css esiste in src/ui/styleLab/tokens/wanderlustTokens.css.",
+    "La pagina /design-system esiste da PANELS-STEP-01.",
+    "Le CSS variables sono definite con la classe .preset-wanderlust."
+  ],
+  "safeguards": [
+    "npm run lint -- src/pages/design-system.tsx",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "`src/pages/design-system.tsx` aggiornato con sezione Tokens popolata",
+    "Evidence log in `test-results/panels-step-02-<YYYY-MM-DD>.log`"
+  ],
+  "notes": [
+    "Quando prendi questo prompt, imposta subito la riga in `src/docs/docs/coordinator/agent_assignments.md` su 'In corso' con data e nome agente.",
+    "Al completamento, esegui la safeguard suite e chiudi con: `KANBAN STATUS: PANELS-STEP-02 – Completato (Evidence: test-results/panels-step-02-<YYYY-MM-DD>.log)`.",
+    "Questo step è prerequisito di PANELS-STEP-03.",
+    "Execution hint: atomic (single-file update, verified)."
+  ]
+}

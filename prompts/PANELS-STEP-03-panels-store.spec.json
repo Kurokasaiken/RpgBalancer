@@ -1,0 +1,58 @@
+{
+  "id": "PANELS-STEP-03",
+  "agent": "agent",
+  "objective": "Panels Store (Zustand) — create usePanelsStore with panel state (position, z-index, collapse mode, spawnPosition, open/closed status). No UI, just store + actions. Unit tests.",
+  "file_targets": [
+    "src/engine/game/panels/usePanelsStore.ts",
+    "tests/unit/panels/usePanelsStore.test.ts"
+  ],
+  "dependencies": [
+    "PANELS-STEP-02"
+  ],
+  "invariants": [
+    "Sei un agente Windsurf: consulta le skill `agent-execution-mandate` prima di iniziare.",
+    "`.windsurf/rules/00-project-invariants.md` (config-first, i18n, JSDoc, safeguards, State Management).",
+    "`.windsurf/rules/00-project-invariants.md` → 'State Management': Zustand per domain/game state condiviso tra pagine.",
+    "Tutte le funzioni e interfacce nuove devono avere JSDoc.",
+    "Se la posizione dei pannelli viene persistita, deve passare da PersistenceService, non localStorage (ma questo step è solo store, no persistence ancora)."
+  ],
+  "operations": [
+    "Crea `src/engine/game/panels/usePanelsStore.ts` come Zustand store.",
+    "Definisci l'interfaccia PanelState: id, position {x, y}, zIndex, mode ('full' | 'strip'), spawnPosition {x, y}, isOpen (boolean).",
+    "Definisci l'interfaccia PanelsState: panelsById (Record<string, PanelState>), maxZIndex (number).",
+    "Azioni dello store: openPanel(id), closePanel(id), togglePanelMode(id), setPanelPosition(id, x, y), bringToFront(id), resetPanelToSpawn(id).",
+    "La logica z-index: quando un panel viene aperto o trascinato, incrementa maxZIndex e assegna al panel.",
+    "La logica spawnPosition: ogni panel ha una spawnPosition predefinita, resetPanelToSpawn ripristina quella posizione.",
+    "Crea `tests/unit/panels/usePanelsStore.test.ts` con test per tutte le azioni e la logica z-index.",
+    "Aggiungi JSDoc a tutte le interfacce e funzioni."
+  ],
+  "forbidden": [
+    "Nessuna UI in questo step — solo store e test.",
+    "Nessun Context — questo è domain state condiviso, deve essere Zustand.",
+    "Nessuna persistenza in questo step — solo store in-memory.",
+    "Nessun localStorage o sessionStorage diretto."
+  ],
+  "assumptions": [
+    "Esegui direttamente i passi noti senza chiedere conferma.",
+    "Zustand è già nello stack del progetto.",
+    "La directory src/engine/game/panels/ non esiste, creala.",
+    "I test usano Vitest (già in uso nel progetto)."
+  ],
+  "safeguards": [
+    "npm run lint -- src/engine/game/panels/ tests/unit/panels/",
+    "npm run test -- tests/unit/panels/usePanelsStore.test.ts",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "`src/engine/game/panels/usePanelsStore.ts`",
+    "`tests/unit/panels/usePanelsStore.test.ts`",
+    "Evidence log in `test-results/panels-step-03-<YYYY-MM-DD>.log`"
+  ],
+  "notes": [
+    "Quando prendi questo prompt, imposta subito la riga in `src/docs/docs/coordinator/agent_assignments.md` su 'In corso' con data e nome agente.",
+    "Al completamento, esegui la safeguard suite e chiudi con: `KANBAN STATUS: PANELS-STEP-03 – Completato (Evidence: test-results/panels-step-03-<YYYY-MM-DD>.log)`.",
+    "Questo step è prerequisito di PANELS-STEP-04.",
+    "Execution hint: verified (multi-file, requires safeguards)."
+  ]
+}

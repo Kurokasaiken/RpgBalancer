@@ -11,3 +11,5 @@ export type { VillageRosterSectionProps } from '@/ui/idleVillage/components/Vill
 export type { ResidentRosterPanelProps } from '@/ui/idleVillage/components/ResidentRosterPanel';
 export type { ResidentSlotRackProps } from '@/ui/idleVillage/components/ResidentSlotRack';
 export type { WanderlustRosterCardProps } from '@/ui/idleVillage/components/WanderlustRosterCard';
+export { MatericRosterComponent } from '@/ui/idleVillage/components/MatericRosterComponent';
+export type { MatericRosterComponentProps } from '@/ui/idleVillage/components/MatericRosterComponent';

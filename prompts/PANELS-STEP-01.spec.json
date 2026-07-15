@@ -1,0 +1,53 @@
+{
+  "id": "PANELS-STEP-01",
+  "agent": "harness",
+  "objective": "Draggable Panels System — Step 01: Create empty /design-system page with 5 placeholder sections (Tokens, Panels, Store, Shell, Integration).",
+  "file_targets": [
+    "src/pages/design-system.tsx"
+  ],
+  "dependencies": [],
+  "invariants": [
+    "Sei un agente Windsurf: consulta le skill `agent-execution-mandate` prima di iniziare.",
+    "`.windsurf/rules/00-project-invariants.md` (config-first, Zod, i18n, JSDoc, safeguards).",
+    "`.windsurf/rules/10-ui-invariants.md` (skin tokens, zero hardcoded colors, Gilded Observatory theme, <16ms/frame).",
+    "Tutte le stringhe user-facing devono usare `useTranslation` con namespace `common` o `idleVillage`.",
+    "Nessun CSS standalone; usare token da `wanderlustTokens.css` per eventuali stili.",
+    "Verifica primitive esistenti in `src/ui/atoms/`, `src/ui/fantasy/atoms/`, `src/ui/idleVillage/skins/primitives/` prima di creare nuovi componenti.",
+    "Tutte le funzioni e interfacce nuove devono avere JSDoc."
+  ],
+  "operations": [
+    "Crea `src/pages/design-system.tsx` come pagina React con layout standard Gilded Observatory (usa `observatory-page` class da `src/index.css`).",
+    "Implementa 5 sezioni placeholder: 'Tokens', 'Panels', 'Store', 'Shell', 'Integration'. Ogni sezione deve avere un titolo e un contenuto placeholder (es. 'Work in progress').",
+    "Usa `useTranslation` per tutti i titoli e testi user-facing con namespace appropriato.",
+    "Aggiungi la route in `src/App.tsx` o router configurazione per `/design-system`.",
+    "Verifica che la pagina renderizzi correttamente senza errori.",
+    "Aggiungi test smoke test in `tests/unit/designSystem/designSystemPage.test.tsx` per verificare render dei 5 titoli di sezione."
+  ],
+  "forbidden": [
+    "Nessun CSS inline o hardcoded colors.",
+    "Nessuna logica di pannelli o drag-drop in questa fase.",
+    "Nessun Zustand store o PersistenceService in questa fase.",
+    "Non duplicare primitive esistenti; riutilizza WanderlustSurface o altri componenti base se disponibili."
+  ],
+  "assumptions": [
+    "Esegui direttamente i passi noti senza chiedere conferma.",
+    "La pagina deve essere accessibile via `/design-system` route.",
+    "I token wanderlustTokens.css sono già definiti nel progetto."
+  ],
+  "safeguards": [
+    "npm run lint -- src/pages/design-system.tsx tests/unit/designSystem/",
+    "npm run test -- tests/unit/designSystem/designSystemPage.test.tsx",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "`src/pages/design-system.tsx` con 5 sezioni placeholder",
+    "`tests/unit/designSystem/designSystemPage.test.tsx` smoke test",
+    "Evidence log in `test-results/panels-step-01-<YYYY-MM-DD>.log`"
+  ],
+  "notes": [
+    "Quando prendi questo prompt, imposta subito la riga in `src/docs/docs/coordinator/agent_assignments.md` su 'In corso' con data e nome agente.",
+    "Al completamento, esegui la safeguard suite e chiudi con: `KANBAN STATUS: PANELS-STEP-01 – Completato (Evidence: test-results/panels-step-01-<YYYY-MM-DD>.log)`.",
+    "Step 01 è prerequisito di PANELS-STEP-02."
+  ]
+}

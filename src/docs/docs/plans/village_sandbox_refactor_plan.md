@@ -11,13 +11,12 @@
 - Garantire un'unica UX config-first tra desktop (drag completo) e mobile (tap-first) senza reset automatici quando cambia device.
 - Rifinire WorkerPickerSheet/bottom sheet mobile con CTA ≥ 44 px, focus trap completo e diagnostica integrata.
 - Consolidare layout stacked (`VillageSandboxColumns`) e HUD ridotti per schermi <1024 px.
-- Chiudere la suite QA cross-device mantenendo i preset Punch Club deterministici.
+- Chiudere la suite QA cross-device mantenendo i preset deterministici.
 
 ## Quick links
 
 - [Archive storico](./village_sandbox_refactor_archive.md)
 - [Idle Village Cross-Device & Mobile Vision](../strategy/idle_village_vision.md)
-- [Punch Club Vision & KPI](../strategy/idle_village_punch_club_vision.md)
 - [Prompt Library](../prompts/prompt_library.md)
 - [Playwright Guide](../tests/PLAYWRIGHT_GUIDE.md)
 
@@ -35,7 +34,7 @@
 | Tap per assignment | ≤ 3 (slot → chip → conferma) | Playwright `touch-mode` + telemetria `assignment_interaction` |
 | Latency assignment | < 450 ms dal tap alla conferma | Telemetria picker (`assignment_latency_ms`) + trace Playwright |
 | Picker close rate | ≥ 98 % entro 1 s | `workerPickerSheet` telemetry buffer |
-| Cycle Punch Club | < 90 s Gym→Rest→Bout | `cycleProgress` + manual QA |
+| Cycle | < 90 s Gym→Rest→Bout | `cycleProgress` + manual QA |
 | Delta risorse per ciclo | ≥ +10 gold / ≥ +2 food | Telemetria `resource_change` |
 
 ## Checklist corrente
@@ -49,20 +48,16 @@
 | F4 WorkerPickerSheet UX polish | ✅ | Focus trap, theme tokens, animazioni, diagnostics buffer |
 | F5 Layout stacked hardening | ✅ | `sandboxLayout` centralizzato, soppressione/swap shell durante picker |
 | F6 WorkerPickerSheet diagnostics panel | ✅ | KPI rolling + sparklines desktop-only |
-| F7 Punch Club Risk HUD revamp | ✅ | Stripe gialla/rossa proporzionale + prefers-reduced-motion |
-| PC-M1 Mobile landing + redirect | ✅ | Completato (redirect + opt-out + analytics) |
-| PC-M2 Distribuzione mobile & Telemetria export | 📌 | Milestone strategica per playtest PWA/Testflight-like + export telemetria JSON; PC-M2B SW offline-first completato, PC-M2A manifest + PC-M2C guida + PC-M2D CLI da implementare |
 
 ## TODO attivi
 
 - [x] Strumentare `assignment_interaction` per confrontare tap vs drag KPI mobile/desktop e integrare nel buffer telemetry.
-- [x] Aggiornare Playwright suite con spec `punch-club-landing.spec.ts` (MobileChrome + Desktop) una volta finalizzata la landing.
 - [x] Validare layout stacked su <768 px con QA manuale + screenshot (VillageSandboxColumns).
 -- [x] Pulire warning residui `useTheaterController`/`useMapContext` segnalati da ESLint.
 
 ## QA & telemetry expectations
 
-- `npm run dev` deve essere privo di warning console su `/map` e `/punch-club` (diagnostica solo via `createSandboxDiagnostics`).
+- `npm run dev` deve essere privo di warning console su `/map` e `/test` (diagnostica solo via `createSandboxDiagnostics`).
 - `npm run lint -- src/ui/idleVillage` come smoke test obbligatorio prima di ogni merge WS6.
 - Playwright deve utilizzare fixture `tests/fixtures/villageSandbox.ts`, locator semantici e trace sempre attivi.
 - Tutte le nuove metriche devono passare da `window.__sandboxTelemetry` o moduli analytics dedicati.
@@ -72,7 +67,6 @@
 | Data target | Deliverable | Owner |
 | --- | --- | --- |
 | 2026-01-15 | Telemetria `assignment_interaction` + dashboard KPI | Cascade |
-| 2026-01-28 | **PC-M2** – Manifest + service worker + guida playtester (vedi [Punch Club Vision §3-§5](../strategy/idle_village_punch_club_vision.md)) | Platform × Strategy |
 | 2026-02-02 | Manifest/PWA polish + state preservation (WS6.3 F2) | Platform |
 | 2026-02-15 | QA suite cross-device pienamente verde | QA Guild |
 
@@ -87,7 +81,5 @@
 
 - [village_sandbox_refactor_archive.md](./village_sandbox_refactor_archive.md)
 - [Idle Village Cross-Device & Mobile Vision](../strategy/idle_village_vision.md)
-- [Punch Club Vision](../strategy/idle_village_punch_club_vision.md)
-- [Punch Club realistic mini-plan](./punch_club_realistic.md)
 - [Idle Village workstreams](./idle_village_workstreams.md)
 - [Playwright guide](../tests/PLAYWRIGHT_GUIDE.md)

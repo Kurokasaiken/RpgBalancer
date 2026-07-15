@@ -46,6 +46,19 @@ npm run lint -- <scope>
 npm run test -- <scope>
 npm run build:check
 npm run kanban:lint
+Content validation gate (prima di chiamare task_complete):
+1. Per ogni file_target creato o modificato, verifica che NON contenga:
+   - Commenti TODO senza implementazione circostante
+   - Funzioni con body vuoto o che restituiscono solo undefined/null/placeholder
+   - Stringhe tipo 'not implemented', 'placeholder', 'coming soon'
+   - Hook React usati come componenti (es. useX() chiamato come <useX/>)
+2. Per ogni file di test creato: esegui i test prima di task_complete.
+   Se i test hanno syntax error o falliscono: task è BLOCKED.
+3. Per ogni file TypeScript: verifica che tsc non produca errori
+   sui file modificati specificamente (non build globale se lenta).
+Se anche uno solo di questi check fallisce: task è BLOCKED.
+Scrivere TODO invece di implementazione non è 'Completato' —
+è 'Non iniziato' con un file in più.
 Runtime smoke test: per ogni pagina creata o modificata, verifica che la route sia raggiungibile e la pagina renderizzi senza errori:
 1. npm run dev (se non già in esecuzione)
 2. curl -s -o /dev/null -w '%{http_code}' http://localhost:5173/<route> deve restituire 200

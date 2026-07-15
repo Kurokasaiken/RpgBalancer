@@ -624,7 +624,6 @@ VerbDetail sandbox ora generano `ResidentState` validi.
 ### 🗺️ **PHASE 12: Idle Incremental RPG (Village Sandbox Vertical Slice)**
 
 **Status:** 🔄 In Progress  
-**Nota:** Punch Club è un tool interno sandbox-only e non deve essere incluso nei materiali marketing pubblici.  
 **Roadmap Update (2026-02-13):** adottato il percorso `Minimal Gameplay → Vertical Slice` (`/.windsurf/plans/minimal-to-vertical-slice-roadmap-2d36d2.md`) con stage MG-Finalize → VS-Freeze. Ogni prompt Phase 12 deve indicare in quale stage si trova, riportare preset Style Lab e allegare evidence test (lint/test/build/kanban + Playwright/visual quando applicabile).  
 **Latest Progress (2026-01-01):**
 
@@ -751,8 +750,6 @@ This is a **marketing artifact** for the Steam page and devlogs. It is intention
 3. Implement missing components phase by phase using the `trailer_vertical_slice_tasks.md` checklist.
 4. Wire phases into a single `/trailer` route and Storybook stories.
 5. Visual regression capture after each phase.
-
-**Marketing note:** `Punch Club` is the internal sandbox-only tool and must not appear in this trailer or any public marketing material.
 
 ---
 
@@ -1223,8 +1220,7 @@ For details, see `docs/archmage/README.md`.
 
 ### Immediate Priority (Post-current Prompt)
 
-1. **✅ Punch Club Gameplay Loop Closure** – Reactivated the legacy loop (duels, tutorial, telemetry) and certified via safeguard suite. **COMPLETED** 2026-01-13.
-2. **Gatekeeping Rule** – No new Archmage features begin until KS-PUNCH milestone is marked "Completato" on Kanban with evidence logs. **RESOLVED**.
+1. **Gatekeeping Rule** – No new Archmage features begin until the related milestone is marked "Completato" on Kanban with evidence logs. **RESOLVED**.
 
 ---
 

@@ -127,6 +127,18 @@ L'execution_hint dello spec determina il canale executor:
 - 'verified' → harness (Groq locale, worktree isolata, safeguards completi)
 - 'architectural' → manuale (Cascade/Windsurf, richiede supervisione)
 Il Coordinator NON può cambiare execution_hint — può solo fare override esplicito con executor_reason documentato.
+Model Selection Policy
+Prima di ogni dispatch, assegna il modello in base al tipo di task:
+- execution_hint 'atomic' → ai-worker (OpenRouter free, zero costo Windsurf)
+- execution_hint 'verified', Coordinator, Agent Execution → SWE-1.5 o SWE-1
+  (zero crediti, sufficienti per implementation tasks standard)
+- execution_hint 'verified' con complessità elevata → Claude Sonnet
+- execution_hint 'architectural', decisioni di design → Claude Opus
+  (massimo 1-2 sessioni al giorno, solo per lavoro che lo giustifica)
+
+Regola generale: usa il modello più economico che può fare il lavoro.
+Escalation al modello superiore solo se il precedente fallisce o
+il task richiede esplicitamente ragionamento profondo.
 Safeguard Enforcement
 Running Safeguard Gates
 After agent completion, verify:

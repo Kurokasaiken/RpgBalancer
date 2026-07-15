@@ -1,4 +1,5 @@
 import type { ChangeEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { RosterSortMode, RosterSortConfig } from '@/ui/idleVillage/config/rosterSortConfig';
 import { getRosterSortModes } from '@/ui/idleVillage/config/rosterSortConfig';
 
@@ -16,15 +17,15 @@ export interface RosterSortControlProps {
 
 /**
  * RosterSortControl - Minimal sort control for roster display
- * 
+ *
  * A simple dropdown component that allows users to sort the roster by:
  * - Name A -> Z (default)
- * - Name Z -> A  
+ * - Name Z -> A
  * - HP (highest first)
  * - Fatigue (lowest first)
- * 
+ *
  * Uses displayName for alphabetical sorting as required by the prompt.
- * 
+ *
  * @component
  * @example
  * ```tsx
@@ -40,6 +41,7 @@ export function RosterSortControl({
   onSortModeChange,
   className = '',
 }: RosterSortControlProps) {
+  const { t } = useTranslation('idleVillage');
   const sortModes = getRosterSortModes();
 
   const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -49,11 +51,11 @@ export function RosterSortControl({
 
   return (
     <div className={`flex items-center gap-1 ${className}`}>
-      <label 
-        htmlFor="roster-sort-select" 
+      <label
+        htmlFor="roster-sort-select"
         className="text-[8px] uppercase text-slate-400 font-medium"
       >
-        Sort
+        {t('roster.sort.label', 'Sort')}
       </label>
       <select
         id="roster-sort-select"
@@ -63,12 +65,12 @@ export function RosterSortControl({
         data-testid="roster-sort-select"
       >
         {sortModes.map((mode: RosterSortConfig) => (
-          <option 
-            key={mode.mode} 
+          <option
+            key={mode.mode}
             value={mode.mode}
             className="bg-slate-800 text-slate-200"
           >
-            {mode.label}
+            {t(mode.labelKey, mode.label)}
           </option>
         ))}
       </select>

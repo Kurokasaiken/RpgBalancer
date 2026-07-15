@@ -93,7 +93,36 @@ Questo index segue le regole governative:
 - **Last Certified**: 2026-04-24
 - **Notes**: Canonical bootstrap pipeline verified, fallback policy implemented
 
+<!-- GOV-006-FROZEN-KITS-START -->
+## Frozen Kits
+
+| Kit ID | Status | Source of Truth | Runtime/Test Page | Last Certified | Owner / Notes |
+| --- | --- | --- | --- | --- | --- |
+| rosterKit | frozen | src/ui/idleVillage/frozen/kits/rosterKit.md | /minimal-roster | 2026-07-14 | KIT_REGISTRY status: certified |
+| pgcardKit | frozen | src/ui/idleVillage/frozen/kits/pgcardKit.md | N/A | 2026-07-14 | KIT_REGISTRY status: certified |
+| slotRackKit | frozen | src/ui/idleVillage/frozen/kits/slotRackKit.md | /minimal-slotRack | 2026-07-14 | KIT_REGISTRY status: certified |
+| destinyAstrolabeKit | draft | TBD | /minimal-destiny-astrolabe | 2026-07-14 | KIT_REGISTRY status: certified |
+| poiKit | draft | TBD | /minimal-poi | 2026-07-14 | KIT_REGISTRY status: certified |
+| clockKit | frozen | src/ui/idleVillage/frozen/kits/clockKit.md | /minimal-clock | 2026-07-14 | KIT_REGISTRY status: certified |
+| questDetailKit | draft | TBD | /minimal-quest-detail | 2026-07-14 | KIT_REGISTRY status: certified |
+| resourceHudKit | draft | src/ui/idleVillage/frozen/kits/resourceHudKit.md | /minimal-resourcehud | 2026-07-14 | KIT_REGISTRY status: draft |
+| questCardKit | draft | src/ui/idleVillage/frozen/kits/questCardKit.md | /minimal-questcard | 2026-07-14 | KIT_REGISTRY status: draft |
+| outcomeKit | draft | src/ui/idleVillage/frozen/kits/outcomeKit.md | /minimal-outcome | 2026-07-14 | KIT_REGISTRY status: draft |
+| marketKit | draft | src/ui/idleVillage/frozen/kits/marketKit.md | /minimal-market | 2026-07-14 | KIT_REGISTRY status: draft |
+| integrationQuestFlowKit | draft | src/ui/idleVillage/frozen/kits/integrationQuestFlowKit.md | /minimal-integration-quest-flow | 2026-07-14 | KIT_REGISTRY status: draft |
+| skillCheckKit | draft | src/ui/idleVillage/frozen/kits/skillCheckKit.md | N/A | 2026-07-14 | KIT_REGISTRY status: draft |
+| activeHudKit | draft | src/ui/idleVillage/frozen/kits/activeHudKit.md | N/A | 2026-07-14 | KIT_REGISTRY status: draft |
+| activityCapsuleKit | draft | src/ui/idleVillage/frozen/kits/activityCapsuleKit.md | N/A | 2026-07-14 | KIT_REGISTRY status: draft |
+| slottedMedalKit | draft | src/ui/idleVillage/frozen/kits/slottedMedalKit.md | N/A | 2026-07-14 | KIT_REGISTRY status: draft |
+| jobDetailKit | draft | TBD | N/A | 2026-07-14 | KIT_REGISTRY status: draft |
+| locationDetailKit | draft | TBD | N/A | 2026-07-14 | KIT_REGISTRY status: draft |
+| rosterSlotKit | draft | TBD | /minimal-roster-slot-integration | 2026-07-14 | KIT_REGISTRY status: draft |
+| jobPoiRosterKit | draft | TBD | /minimal-job-poi-roster-integration | 2026-07-14 | KIT_REGISTRY status: draft |
+| jobPoiRosterTimeKit | draft | TBD | /minimal-job-poi-roster-time-integration | 2026-07-14 | KIT_REGISTRY status: draft |
+
+<!-- GOV-006-FROZEN-KITS-END -->
+
 ---
 
-*Last Updated: 2026-04-27*
-*Status: All components promoted to trusted - final reconciliation completed, ready for freeze*
+*Last Updated: 2026-07-14*
+*Status: Reconciled from KIT_REGISTRY.*

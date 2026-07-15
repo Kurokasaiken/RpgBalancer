@@ -251,6 +251,39 @@ export const KIT_REGISTRY: KitRegistryEntry[] = [
     status: 'draft',
   },
   // entries appended here
+  {
+    kitId: 'rosterSlotKit',
+    kitModule: './kits/rosterSlotKit', // TODO: placeholder until the module is created
+    status: 'draft',
+    hub: {
+      title: 'Roster + Slot Rack',
+      description: 'Integrazione Roster con SlotRack, drag & drop e assegnazione',
+      icon: '🎯',
+      path: '/minimal-roster-slot-integration',
+    },
+  },
+  {
+    kitId: 'jobPoiRosterKit',
+    kitModule: './kits/jobPoiRosterKit', // TODO: placeholder until the module is created
+    status: 'draft',
+    hub: {
+      title: 'POI + Roster Integration',
+      description: 'Integrazione POI job detail con roster drag & drop',
+      icon: '🗺️',
+      path: '/minimal-job-poi-roster-integration',
+    },
+  },
+  {
+    kitId: 'jobPoiRosterTimeKit',
+    kitModule: './kits/jobPoiRosterTimeKit', // TODO: placeholder until the module is created
+    status: 'draft',
+    hub: {
+      title: 'POI + Roster + Time Integration',
+      description: 'Integrazione completa con time engine e reward',
+      icon: '⏱️',
+      path: '/minimal-job-poi-roster-time-integration',
+    },
+  },
 ];
 
 /**

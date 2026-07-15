@@ -1,0 +1,46 @@
+{
+  "id": "GOV-006",
+  "agent": "harness",
+  "objective": "Apply the GOV-005 audit findings to COMPONENT_MASTER_INDEX.md, updating statuses, links, and last-certified dates to match KIT_REGISTRY.",
+  "file_targets": [
+    "src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md",
+    "src/docs/docs/idle_village/COMPONENT_MASTER_INDEX_AUDIT.md (read)"
+  ],
+  "dependencies": [
+    "GOV-005"
+  ],
+  "invariants": [
+    "`.windsurf/rules/00-project-invariants.md`",
+    "`.windsurf/rules/40-documentation-governance.md`",
+    "`src/docs/docs/plans/systems_governance_alignment_plan.md` §4.C"
+  ],
+  "operations": [
+    "Read `src/docs/docs/idle_village/COMPONENT_MASTER_INDEX_AUDIT.md` from GOV-005.",
+    "In `COMPONENT_MASTER_INDEX.md`, update only status/metadata columns (status, source-of-truth link, runtime/test page, last certified date) per the audit. Do not copy contract details.",
+    "Add missing entries for `KIT_REGISTRY` kits that are in the runtime but not in the index, using a status of `draft` or `candidate` and a placeholder or existing `docPath`.",
+    "Do not create new trusted docs; do not modify `KIT_REGISTRY` or `.windsurf/rules/`.",
+    "Run `npm run lint -- src/docs/docs/idle_village/`, `npm run build:check`, `npm run kanban:lint` and fix any errors."
+  ],
+  "forbidden": [
+    "Do not modify `KIT_REGISTRY` or `TestHub.tsx`.",
+    "Do not create new trusted docs (GOV-005/GOV-006 are index alignment only).",
+    "Do not update `.windsurf/rules/`."
+  ],
+  "assumptions": [
+    "GOV-005 is completed and the audit file is available.",
+    "`COMPONENT_MASTER_INDEX.md` is allowed to be edited only for metadata."
+  ],
+  "safeguards": [
+    "npm run lint -- src/docs/docs/idle_village/",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "updated `src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md`",
+    "`test-results/gov-006-<YYYY-MM-DD>.log`"
+  ],
+  "notes": [
+    "Governance-only task, no runtime code changes.",
+    "Close with `KANBAN STATUS: GOV-006 – Completato (Evidence: test-results/gov-006-<YYYY-MM-DD>.log)`."
+  ]
+}

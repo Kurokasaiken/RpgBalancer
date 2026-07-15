@@ -373,6 +373,8 @@ export function useTranslation(ns?: DefaultNamespace) {
 
 **Goal**: export for translators and integrate a TMS or community workflow.
 
+**Status**: `Completato` 2026-07-13 — `scripts/i18n/exportTms.ts` exports `public/locales/en/*.json` to XLIFF 1.2 (`dist/i18n/tms-export`) preserving `context` and `maxLength`; `scripts/i18n/importTms.ts` merges XLIFF/PO files (`dist/i18n/tms-import`) into `public/locales/<locale>/*.json` and `*.meta.json`; `npm run i18n:export` and `npm run i18n:import` scripts added; `LQAProvider` and `LQAOverlay` enabled in dev mode via `?lqa=true`; `docs/localization/TRANSLATION_GUIDE.md` created; round-trip tested and metadata preserved; `i18n:validate`, `build:check`, `test:unit`, `kanban:lint` pass; evidence in `test-results/i18n-007-tms-lqa-2026-07-13.log`.
+
 **Tasks**
 
 1. Add `scripts/i18n/exportTms.ts` to convert JSON to XLIFF or PO.

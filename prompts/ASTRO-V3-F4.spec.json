@@ -1,0 +1,64 @@
+{
+  "id": "ASTRO-V3-F4",
+  "agent": "harness",
+  "objective": "Destiny Astrolabe V3 — F4 Resolution & polish: i18n, modifier API, camera focus, TestHub V3, prefers-reduced-motion/skip.",
+  "file_targets": [
+    "src/ui/idleVillage/components/destinyAstrolabeV3/DestinyAstrolabeV3.tsx",
+    "src/ui/idleVillage/components/destinyAstrolabeV3/modifiers.ts",
+    "src/pages/minimal-destiny-astrolabe-v3.tsx"
+  ],
+  "dependencies": [
+    "ASTRO-V3-F3"
+  ],
+  "invariants": [
+    "Sei un agente Windsurf: consulta le skill `agent-execution-mandate` e `idle-village-task` prima di iniziare.",
+    "`src/docs/docs/plans/destiny_astrolabe_v3_implementation_plan.md` §7, §8, §9 F4.",
+    "`.windsurf/rules/00-project-invariants.md` e `.windsurf/rules/10-ui-invariants.md`.",
+    "Nessuna fog sopra l'arena: camera focus sulla pallina, banner verdetto in fascia alta/bassa, arena sempre visibile.",
+    "Tutte le stringhe player-facing in `useTranslation` namespace `idleVillage`.",
+    "SKIP e `prefers-reduced-motion` onorati: salto diretto a snap+resolution.",
+    "Modifier API placeholder (tipi + eventi, zero UI inventario) in `modifiers.ts`.",
+    "TestHub V3 espone tutti i parametri Zod per iterare senza ricompilare.",
+    "Nessun `ctx.filter`/`shadowBlur` nel hot path; perf pass finale."
+  ],
+  "operations": [
+    "Crea `src/ui/idleVillage/components/destinyAstrolabeV3/modifiers.ts` con i tipi `AstrolabeModifier` e l'interfaccia `AstrolabeV3Handle`: `previewModifier(m)`, `applyModifier(m)`, `revokeModifier(id)`, `onModifiersChanged(cb)`. Implementa morph GHOST in outline tratteggiato e morph reale 300ms via `lerpGeometry`. Aggiungi pannello dev in TestHub con slider/bottoni fake-item.",
+    "Estendi `src/ui/idleVillage/components/destinyAstrolabeV3/DestinyAstrolabeV3.tsx` per resolution: camera focus 2D sulla pallina, zona catturante illuminata, banner verdetto (success/failure/near-miss/wound/death/crit) in fascia alta o bassa senza coprire l'arena. THROW pulsa. Implementa SKIP e `prefers-reduced-motion`.",
+    "Completa `src/pages/minimal-destiny-astrolabe-v3.tsx` come TestHub V3: controlli per stats (default asimmetriche), difficulty, crit/wound/death percent, near-miss band, spin duration, slow-mo, hit-stop, DPR; pulsanti per i modifier fake; bottone SKIP; toggle reduced-motion.",
+    "Aggiungi le chiavi i18n in `public/locales/en/idleVillage.json` (e aggiorna `i18n.types.ts` se esiste): label esiti, tooltip onboarding, THROW, SKIP, verdetto, stat names. Zero stringhe hardcoded.",
+    "Crea `src/ui/idleVillage/components/destinyAstrolabeV3/astrolabe-v3.css` (o estendi `src/index.css`) per stili overlay skin-token driven (nessun colore hardcoded).",
+    "Perf pass finale: `performance.mark` per fase, verifica <16ms/frame, layer caching, Path2D cache, nessuna allocazione nel draw loop.",
+    "Aggiungi test `tests/unit/destinyAstrolabeV3/DestinyAstrolabeV3.test.tsx` (resolution i18n, reduced-motion, modifier API), `tests/unit/destinyAstrolabeV3/modifiers.test.ts` (preview/apply/revoke), `tests/unit/destinyAstrolabeV3/testHub.test.tsx` (render TestHub)."
+  ],
+  "forbidden": [
+    "Non costruire l'inventory UI: solo placeholder API.",
+    "Nessuna fog/modale che copra l'arena in resolution.",
+    "Nessun hardcoded string o valore in React.",
+    "Nessun salto di stato senza onorare `prefers-reduced-motion`."
+  ],
+  "assumptions": [
+    "Esegui direttamente i passi noti senza chiedere conferma.",
+    "F3 e' completato: simulazione, engine, tre atti, hit-stop funzionanti.",
+    "I18n e' gia' configurato (`useTranslation`, `idleVillage` namespace)."
+  ],
+  "safeguards": [
+    "npm run lint -- src/ui/idleVillage/components/destinyAstrolabeV3/ src/pages/minimal-destiny-astrolabe-v3.tsx public/locales/en/idleVillage.json tests/unit/destinyAstrolabeV3/",
+    "npm run i18n:validate",
+    "npm run test -- tests/unit/destinyAstrolabeV3/",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "`modifiers.ts` con API placeholder e morph",
+    "`DestinyAstrolabeV3.tsx` con resolution, i18n, reduced-motion, SKIP",
+    "`src/pages/minimal-destiny-astrolabe-v3.tsx` TestHub V3",
+    "`public/locales/en/idleVillage.json` aggiornato",
+    "`astrolabe-v3.css` skin-token driven",
+    "Evidence log `test-results/astro-v3-f4-<YYYY-MM-DD>.log`"
+  ],
+  "notes": [
+    "Quando prendi questo prompt, imposta subito la riga in `src/docs/docs/coordinator/agent_assignments.md` su 'In corso' con data e nome agente.",
+    "Al completamento, esegui la safeguard suite e chiudi con: `KANBAN STATUS: ASTRO-V3-F4 – Completato (Evidence: test-results/astro-v3-f4-<YYYY-MM-DD>.log)`.",
+    "F4 e' l'ultima fase; dipende da F3."
+  ]
+}

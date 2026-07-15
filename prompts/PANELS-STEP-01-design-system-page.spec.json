@@ -1,0 +1,56 @@
+{
+  "id": "PANELS-STEP-01",
+  "agent": "agent",
+  "objective": "Design System Page — create /design-system page as empty container with predefined sections (Tokens, Primitive, Panel Shell, Pannelli Reali, Stati/Interazioni). Sections are placeholders now, will be populated in subsequent steps.",
+  "file_targets": [
+    "src/pages/design-system.tsx"
+  ],
+  "dependencies": [],
+  "invariants": [
+    "Sei un agente Windsurf: consulta le skill `agent-execution-mandate` prima di iniziare.",
+    "`.windsurf/rules/00-project-invariants.md` (config-first, i18n, JSDoc, safeguards).",
+    "`.windsurf/rules/10-ui-invariants.md` (skin tokens, zero hardcoded colors, Gilded Observatory theme).",
+    "Tutte le stringhe user-facing devono passare da useTranslation (namespace 'common' o nuovo namespace se necessario).",
+    "Tutte le funzioni e interfacce nuove devono avere JSDoc.",
+    "Nessun CSS ad-hoc o file .css standalone per lo styling.",
+    "Usa WanderlustSurface se esiste e copre il caso d'uso, verifica in src/ui/wanderlust-surface/."
+  ],
+  "operations": [
+    "Crea `src/pages/design-system.tsx` come pagina React con routing path '/design-system'.",
+    "La pagina deve avere 5 sezioni principali: 'Tokens', 'Primitive', 'Panel Shell', 'Pannelli Reali', 'Stati/Interazioni'.",
+    "Ogni sezione è un placeholder con titolo e contenuto vuoto (es. <div> con placeholder text).",
+    "Usa WanderlustSurface come container principale se esiste e copre il caso d'uso.",
+    "Aggiungi la pagina al routing system (verifica App.tsx o file di routing esistente).",
+    "Tutti i titoli delle sezioni devono usare useTranslation con chiave appropriata (es. 'designSystem.tokens', 'designSystem.primitive', ecc.).",
+    "Aggiungi JSDoc al componente e alle sezioni."
+  ],
+  "forbidden": [
+    "Nessun CSS ad-hoc o file .css standalone.",
+    "Nessun colore hardcoded nel JSX.",
+    "Nessuna stringa user-facing hardcoded senza useTranslation.",
+    "Non popolare le sezioni con contenuto reale in questo step — solo placeholder.",
+    "Non creare nuovi componenti UI duplicando primitive esistenti."
+  ],
+  "assumptions": [
+    "Esegui direttamente i passi noti senza chiedere conferma.",
+    "Se WanderlustSurface esiste e copre il caso d'uso, riutilizzalo.",
+    "Le chiavi i18n verranno aggiunte ai file di locale in un task separato se necessario.",
+    "Il routing esiste già (App.tsx o simile)."
+  ],
+  "safeguards": [
+    "npm run lint -- src/pages/design-system.tsx",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "`src/pages/design-system.tsx`",
+    "Routing aggiornato per includere '/design-system'",
+    "Evidence log in `test-results/panels-step-01-<YYYY-MM-DD>.log`"
+  ],
+  "notes": [
+    "Quando prendi questo prompt, imposta subito la riga in `src/docs/docs/coordinator/agent_assignments.md` su 'In corso' con data e nome agente.",
+    "Al completamento, esegui la safeguard suite e chiudi con: `KANBAN STATUS: PANELS-STEP-01 – Completato (Evidence: test-results/panels-step-01-<YYYY-MM-DD>.log)`.",
+    "Questo step è prerequisito di PANELS-STEP-02.",
+    "Execution hint: atomic (single-file addition, verified)."
+  ]
+}

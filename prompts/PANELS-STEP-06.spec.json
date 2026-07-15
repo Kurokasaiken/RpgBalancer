@@ -1,0 +1,61 @@
+{
+  "id": "PANELS-STEP-06",
+  "agent": "harness",
+  "objective": "Draggable Panels System — Step 06: Integrate panels in /design-system page with full/strip demo and PersistenceService.",
+  "file_targets": [
+    "src/pages/design-system.tsx",
+    "src/ui/designSystem/store/usePanelsStore.ts"
+  ],
+  "dependencies": [
+    "PANELS-STEP-05"
+  ],
+  "invariants": [
+    "Sei un agente Windsurf: consulta le skill `agent-execution-mandate` prima di iniziare.",
+    "`.windsurf/rules/00-project-invariants.md` (config-first, Zod, i18n, JSDoc, safeguards, PersistenceService-only).",
+    "`.windsurf/rules/10-ui-invariants.md` (skin tokens, zero hardcoded colors, Gilded Observatory theme, <16ms/frame).",
+    "Persistence: Tutte le operazioni save/load devono usare `@/shared/persistence/PersistenceService` (saveData/loadData/clearData).",
+    "State Management: Zustand store già creato in STEP-03, ora aggiungere persistenza.",
+    "Tutte le stringhe user-facing devono usare `useTranslation` con namespace `common` o `idleVillage`.",
+    "Nessun CSS standalone; usare token da `wanderlustTokens.css`.",
+    "Tutte le funzioni e interfacce nuove devono avere JSDoc."
+  ],
+  "operations": [
+    "Aggiorna `src/ui/designSystem/store/usePanelsStore.ts` per integrare PersistenceService: usa `persist` middleware di Zustand con custom storage adapter che usa PersistenceService, configura persistenza per salvare panel state (positions, sizes, visibility, layoutMode), usa `saveData`/`loadData` da PersistenceService, gestisci errori di persistenza con fallback a stato in-memory.",
+    "Aggiorna sezione 'Panels' in `src/pages/design-system.tsx` per mostrare demo interattiva: usa `V9PanelShell` per renderizzare pannelli, integra con `usePanelsStore` per state management, mostra toggle per layoutMode (full/strip), mostra pannelli di esempio con contenuti dummy, implementa drag/resize/close functionality.",
+    "Aggiorna sezione 'Store' per mostrare stato corrente del store (debug view).",
+    "Aggiorna sezione 'Integration' per mostrare come integrare i pannelli in altre pagine.",
+    "Usa `useTranslation` per tutti i titoli e labels user-facing.",
+    "Aggiungi test RTL in `tests/unit/designSystem/designSystemIntegration.test.tsx` per: persistenza caricamento/salvataggio, layoutMode toggle, drag/resize/close integration.",
+    "Verifica che PersistenceService funzioni correttamente con il store."
+  ],
+  "forbidden": [
+    "Nessun localStorage/sessionStorage diretto; usare solo PersistenceService.",
+    "Nessun colore hardcoded; tutti i colori devono venire da token wanderlustTokens.css.",
+    "Nessun CSS standalone per la demo page.",
+    "Non duplicare primitive esistenti; riutilizza componenti già creati."
+  ],
+  "assumptions": [
+    "Esegui direttamente i passi noti senza chiedere conferma.",
+    "PANELS-STEP-05 è completato e `V9PanelShell` è disponibile.",
+    "PersistenceService è già implementato in `@/shared/persistence/PersistenceService`.",
+    "Zustand persist middleware è disponibile (verifica in package.json)."
+  ],
+  "safeguards": [
+    "npm run lint -- src/pages/design-system.tsx src/ui/designSystem/store/usePanelsStore.ts tests/unit/designSystem/",
+    "npm run test -- tests/unit/designSystem/designSystemIntegration.test.tsx",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "`src/pages/design-system.tsx` aggiornato con demo panels interattiva",
+    "`src/ui/designSystem/store/usePanelsStore.ts` aggiornato con PersistenceService",
+    "`tests/unit/designSystem/designSystemIntegration.test.tsx` test suite",
+    "Evidence log in `test-results/panels-step-06-<YYYY-MM-DD>.log`"
+  ],
+  "notes": [
+    "Quando prendi questo prompt, imposta subito la riga in `src/docs/docs/coordinator/agent_assignments.md` su 'In corso' con data e nome agente.",
+    "Al completamento, esegui la safeguard suite e chiudi con: `KANBAN STATUS: PANELS-STEP-06 – Completato (Evidence: test-results/panels-step-06-<YYYY-MM-DD>.log)`.",
+    "Step 06 completa il sistema di pannelli draggabili.",
+    "Execution hint: atomic/verified (integrazione finale con safeguards)."
+  ]
+}

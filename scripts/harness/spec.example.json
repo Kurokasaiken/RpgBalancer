@@ -1,0 +1,20 @@
+{
+  "id": "HARNESS-EXAMPLE",
+  "agent": "harness",
+  "objective": "Create a pure utility function with JSDoc in a new file.",
+  "file_targets": ["scripts/tmp/example.ts"],
+  "dependencies": [],
+  "execution_hint": "atomic",
+  "operations": [
+    "Write scripts/tmp/example.ts with a single pure function and JSDoc."
+  ],
+  "forbidden": ["No UI changes", "No new dependencies", "No build or test execution"],
+  "safeguards": [],
+  "output": ["scripts/tmp/example.ts"],
+  "notes": [
+    "Token-lean smoke test for the harness spec parser.",
+    "This is a true atomic example: single file, single operation, no safeguards needed, output verifiable by visual inspection."
+  ],
+  "executor": "ai-worker",
+  "executor_reason": "atomic single-file, no safeguards"
+}

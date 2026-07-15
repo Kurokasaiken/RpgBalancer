@@ -11,6 +11,8 @@ import { createSandboxDiagnostics } from '@/ui/idleVillage/utils/sandboxDiagnost
 import { getCurrentDragConfig } from '@/ui/idleVillage/config/dragConfig';
 import { rendererStackInstrumentation } from '@/ui/idleVillage/utils/rendererStackInstrumentation';
 import { getResidentPortraitUrl } from '@/engine/game/idleVillage/residentVisualResolver';
+import { useMatericSkin } from '@/ui/wanderlust-surface/MatericSkinContext';
+import { MATERIC_SKIN_CONFIG } from '@/ui/wanderlust-surface/matericSkinConfig';
 
 /**
  * DragTestContainer - Resident Roster Container (CANONICAL VERSION)
@@ -181,6 +183,7 @@ function DragTestContainer({
   headerControls,
   useWanderlustSkin = false,
 }: DragTestContainerProps) {
+  const isMateric = useMatericSkin();
   const [draggingResidentId, setDraggingResidentId] = useState<string | null>(null);
   const [dragStartTime, setDragStartTime] = useState<number | null>(null);
   const [filters, setFilters] = useState<FilterOptions>({
@@ -808,10 +811,10 @@ function DragTestContainer({
       : 'flex items-center gap-2 text-[9px] uppercase tracking-[0.45em] text-[var(--skin-label-primary)]/70';
 
   const _controlButtonClassName = useWanderlustSkin
-    ? 'rounded-full border border-[var(--skin-icon-color)]/25 bg-[var(--skin-icon-color)]/5 p-1 text-[var(--skin-label-primary)] transition hover:border-[var(--skin-icon-color)]/40 hover:text-[var(--skin-title-color)]'
+    ? 'p-1 text-[var(--skin-label-primary)] transition'
     : isInlineLayout
-      ? 'rounded-full border border-[var(--skin-surface-border)]/15 bg-[var(--skin-text-primary)]/5 p-1 text-[var(--skin-text-secondary)] transition hover:border-[var(--skin-icon-color)]/70 hover:text-[var(--skin-title-color)]'
-      : 'rounded-full border border-[var(--skin-surface-border)]/15 bg-[var(--skin-text-primary)]/5 p-1.5 text-[var(--skin-text-secondary)] transition hover:border-[var(--skin-icon-color)]/70 hover:text-[var(--skin-title-color)]';
+      ? 'p-1 text-[var(--skin-text-secondary)] transition'
+      : 'p-1.5 text-[var(--skin-text-secondary)] transition';
 
   const handleStatusChange = useCallback((newStatus: FilterOptions['status']) => {
     if (filters.status === newStatus) return;
@@ -1009,6 +1012,19 @@ function DragTestContainer({
       data-accessible-counters="true"
       data-accessible-states="true"
     >
+      {isMateric && (
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            backgroundImage: `url(${MATERIC_SKIN_CONFIG.grain.textureUrl})`,
+            backgroundSize: MATERIC_SKIN_CONFIG.grain.size,
+            backgroundRepeat: MATERIC_SKIN_CONFIG.grain.repeat,
+            mixBlendMode: MATERIC_SKIN_CONFIG.grain.mixBlendMode,
+            opacity: MATERIC_SKIN_CONFIG.grain.opacity,
+          }}
+          aria-hidden="true"
+        />
+      )}
       {useWanderlustSkin && (
         <div
           className="pointer-events-none absolute inset-0 rounded-[20px]"
@@ -1087,12 +1103,19 @@ function DragTestContainer({
           </div>
           <div className="flex items-center gap-1">
             <label
-              className={`flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[7px] uppercase tracking-[0.18em] ${useWanderlustSkin ? 'border-[var(--skin-icon-color)]/25 bg-[var(--skin-icon-color)]/5 text-[var(--skin-label-primary)]' : 'border-[var(--skin-surface-border)]/15 bg-[var(--skin-text-primary)]/5 text-[var(--skin-text-secondary)]'}`}
+              className="flex items-center gap-1 px-1.5 py-0.5 text-[7px] uppercase tracking-[0.18em]"
+              style={{
+                borderRadius: 'var(--radius-sm, 2px)',
+                border: '1px solid var(--acc-primary-dark, #6a3c10)',
+                background: 'var(--card-bg, rgba(13,11,8,0.96))',
+                color: 'var(--t2, #c0a878)',
+              }}
             >
               <select
                 value={filters.status}
                 onChange={(e) => handleStatusChange(e.target.value as FilterOptions['status'])}
-                className={`bg-transparent text-[7px] uppercase tracking-[0.15em] focus:outline-none ${useWanderlustSkin ? 'text-[var(--skin-label-primary)]' : 'text-[var(--skin-text-secondary)]'}`}
+                className="bg-transparent text-[7px] uppercase tracking-[0.15em] focus:outline-none"
+                style={{ color: 'var(--t2, #c0a878)' }}
                 aria-label="Filtra residenti per status"
                 data-testid="roster-filter-select"
               >
@@ -1111,7 +1134,7 @@ function DragTestContainer({
               onClick={() => {
                 const newState = !isRosterCollapsed;
                 setIsRosterCollapsed(newState);
-                
+
                 diagnostics.debug('roster_collapsed_toggled', {
                   isCollapsed: newState,
                   timestamp: Date.now(),
@@ -1123,6 +1146,12 @@ function DragTestContainer({
                 }, ['ui', 'toggle']);
               }}
               className={_controlButtonClassName}
+              style={{
+                borderRadius: 'var(--radius-sm, 2px)',
+                border: '1px solid var(--acc-primary-dark, #6a3c10)',
+                background: 'var(--card-bg, rgba(13,11,8,0.96))',
+                color: 'var(--t2, #c0a878)',
+              }}
               aria-label={isRosterCollapsed ? 'Mostra roster' : 'Nascondi roster'}
               aria-pressed={isRosterCollapsed}
             >

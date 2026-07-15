@@ -1,0 +1,109 @@
+{
+  "task_id": "PANELS-STEP-06",
+  "title": "Panels System Step 06 - Populate Panel Shell Section",
+  "plan_reference": "coordinator/canonical-systems.md",
+  "execution_hint": "verified",
+  "priority": "medium",
+  "objectives": [
+    "Populate 'Panel Shell' section of /design-system page with V9PanelShell demos",
+    "Show V9PanelShell in both full mode and strip mode",
+    "Demonstrate panel states (active, inactive) and interactions (drag, close)",
+    "Verify that PanelShell and V9PanelShell work correctly in design system context"
+  ],
+  "invariants": [
+    "Skin/Theme: All styles must pass through wanderlustTokens.css, use CSS classes instead of inline styles",
+    "Localization: All user-facing strings must use useTranslation with common or idleVillage namespace",
+    "Component Reuse: Use existing V9PanelShell component, do not duplicate markup",
+    "State Management: Panel state managed by usePanelsStore (Zustand), not Context",
+    "Config-first: No hardcoded values, use wanderlustTokens CSS variables"
+  ],
+  "scope": {
+    "files_to_modify": [
+      "src/pages/design-system.tsx"
+    ],
+    "files_to_create": [],
+    "components_affected": [
+      "V9PanelShell",
+      "PanelShell",
+      "usePanelsStore"
+    ],
+    "integration_points": [
+      "wanderlustTokens.css",
+      "DndContext"
+    ]
+  },
+  "operations": [
+    {
+      "step": 1,
+      "description": "Replace placeholder content in 'Shell' section with actual V9PanelShell demos",
+      "file": "src/pages/design-system.tsx",
+      "action": "replace_placeholder_with_demos"
+    },
+    {
+      "step": 2,
+      "description": "Add demo panel in full mode showing basic V9PanelShell with sample content",
+      "file": "src/pages/design-system.tsx",
+      "action": "add_full_mode_demo"
+    },
+    {
+      "step": 3,
+      "description": "Add demo panel in strip/compact mode showing collapsed V9PanelShell",
+      "file": "src/pages/design-system.tsx",
+      "action": "add_strip_mode_demo"
+    },
+    {
+      "step": 4,
+      "description": "Add demo showing active vs inactive panel states with visual differences",
+      "file": "src/pages/design-system.tsx",
+      "action": "add_active_inactive_demo"
+    },
+    {
+      "step": 5,
+      "description": "Add controls to toggle between full and strip modes for shell demos",
+      "file": "src/pages/design-system.tsx",
+      "action": "add_mode_toggle_controls"
+    },
+    {
+      "step": 6,
+      "description": "Ensure all user-facing strings use useTranslation with appropriate namespace",
+      "file": "src/pages/design-system.tsx",
+      "action": "apply_i18n_to_strings"
+    },
+    {
+      "step": 7,
+      "description": "Wrap shell demos in DndContext to enable drag functionality",
+      "file": "src/pages/design-system.tsx",
+      "action": "add_dnd_context_wrapper"
+    }
+  ],
+  "guardrails": [
+    "DO NOT create new panel components - use existing V9PanelShell",
+    "DO NOT add hardcoded CSS - use wanderlustTokens.css classes",
+    "DO NOT bypass usePanelsStore - panel state must come from Zustand store",
+    "DO NOT add inline user-facing strings - all must use useTranslation",
+    "Maintain existing Panels section functionality while adding Shell section"
+  ],
+  "safeguards": {
+    "lint_scope": "src/pages/design-system.tsx",
+    "test_scope": "src/pages",
+    "build_check": true,
+    "kanban_lint": true
+  },
+  "acceptance_criteria": [
+    "Shell section shows V9PanelShell in full mode with sample content",
+    "Shell section shows V9PanelShell in strip/compact mode",
+    "Active and inactive panel states are visually distinguishable",
+    "Drag functionality works in shell demos",
+    "Close button functionality works in shell demos",
+    "All user-facing strings use useTranslation",
+    "No hardcoded CSS or values - all use wanderlustTokens",
+    "Panel state managed by usePanelsStore",
+    "Design system page renders without errors"
+  ],
+  "evidence_requirements": {
+    "log_file": "test-results/panels-step-06-<YYYY-MM-DD>.log",
+    "screenshots": false,
+    "test_results": true
+  },
+  "notes": "The Shell section currently shows only placeholder 'Work in progress'. This step should replace that with actual working demos of V9PanelShell showing different modes and states. Use existing panel store state or create demo panels specifically for the shell section."
+}

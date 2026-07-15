@@ -1,0 +1,54 @@
+{
+  "id": "PANELS-STEP-06",
+  "agent": "agent",
+  "objective": "Design System Integration — populate 'Panel Shell' section of /design-system page with empty <V9PanelShell> in full and strip modes. Verify visual appearance.",
+  "file_targets": [
+    "src/pages/design-system.tsx"
+  ],
+  "dependencies": [
+    "PANELS-STEP-05"
+  ],
+  "invariants": [
+    "Sei un agente Windsurf: consulta le skill `agent-execution-mandate` prima di iniziare.",
+    "`.windsurf/rules/00-project-invariants.md` (config-first, i18n, JSDoc, safeguards).",
+    "`.windsurf/rules/10-ui-invariants.md` (skin tokens, zero hardcoded colors).",
+    "Tutte le stringhe user-facing devono passare da useTranslation.",
+    "Tutte le funzioni e interfacce nuove devono avere JSDoc."
+  ],
+  "operations": [
+    "Popola la sezione 'Panel Shell' in `src/pages/design-system.tsx`.",
+    "Aggiungi 2 istanze di V9PanelShell: una in modalità 'full', una in modalità 'strip'.",
+    "Ogni istanza deve avere un panelId univoco (es. 'demo-panel-full', 'demo-panel-strip').",
+    "Le istanze sono vuote (children vuoti o placeholder text).",
+    "Configura spawnPosition appropriata per ogni panel nel usePanelsStore (o usa default dallo store).",
+    "Tutte le label devono usare useTranslation.",
+    "Aggiungi JSDoc se necessario."
+  ],
+  "forbidden": [
+    "Nessun CSS ad-hoc o file .css standalone.",
+    "Nessun colore hardcoded.",
+    "Non creare nuovi componenti UI duplicando primitive esistenti.",
+    "Non popolare i panel con contenuto reale — solo demo vuoti."
+  ],
+  "assumptions": [
+    "Esegui direttamente i passi noti senza chiedere conferma.",
+    "V9PanelShell esiste da PANELS-STEP-05.",
+    "usePanelsStore esiste da PANELS-STEP-03.",
+    "La pagina /design-system esiste da PANELS-STEP-01 e ha sezione 'Panel Shell' placeholder."
+  ],
+  "safeguards": [
+    "npm run lint -- src/pages/design-system.tsx",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "`src/pages/design-system.tsx` aggiornato con sezione Panel Shell popolata",
+    "Evidence log in `test-results/panels-step-06-<YYYY-MM-DD>.log`"
+  ],
+  "notes": [
+    "Quando prendi questo prompt, imposta subito la riga in `src/docs/docs/coordinator/agent_assignments.md` su 'In corso' con data e nome agente.",
+    "Al completamento, esegui la safeguard suite e chiudi con: `KANBAN STATUS: PANELS-STEP-06 – Completato (Evidence: test-results/panels-step-06-<YYYY-MM-DD>.log)`.",
+    "Questo step completa il primo giro di implementazione. Step 7 (migrazione pannelli reali) è rimandato.",
+    "Execution hint: atomic (single-file update, verified)."
+  ]
+}

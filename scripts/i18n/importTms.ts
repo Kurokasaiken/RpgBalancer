@@ -10,6 +10,7 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import {
+  DEFAULT_EN_DIR,
   DEFAULT_LOCALES_DIR,
   flattenKeys,
   getValueAtKeyPath,
@@ -132,11 +133,10 @@ async function collectImportFiles(importDir: string): Promise<Map<string, string
 }
 
 async function importTms(): Promise<void> {
-  const importDir = process.argv[2] ? path.resolve(process.argv[2]) : IMPORT_DIR;
-  const filesByLocale = await collectImportFiles(importDir);
+  const filesByLocale = await collectImportFiles(IMPORT_DIR);
 
   if (filesByLocale.size === 0) {
-    console.log(`No TMS files found in ${path.relative(ROOT, importDir)}. Nothing to import.`);
+    console.log(`No TMS files found in ${path.relative(ROOT, IMPORT_DIR)}. Nothing to import.`);
     return;
   }
 
@@ -150,8 +150,8 @@ async function importTms(): Promise<void> {
       const content = await fs.readFile(filePath, 'utf8');
       const units = ext === '.po' ? parsePo(content) : parseXliff(content);
 
-      const targetJsonPath = path.join(ROOT, OUTPUT_LOCALES_DIR, locale, `${namespace}.json`);
-      const targetMetaPath = path.join(ROOT, OUTPUT_LOCALES_DIR, locale, `${namespace}.meta.json`);
+      const targetJsonPath = path.resolve(OUTPUT_LOCALES_DIR, locale, `${namespace}.json`);
+      const targetMetaPath = path.resolve(OUTPUT_LOCALES_DIR, locale, `${namespace}.meta.json`);
 
       let existingTarget: Record<string, unknown> = {};
       let existingMeta: NamespaceMeta = {};

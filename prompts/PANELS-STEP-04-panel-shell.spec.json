@@ -1,0 +1,65 @@
+{
+  "id": "PANELS-STEP-04",
+  "agent": "agent",
+  "objective": "Panel Shell Component — create headless <PanelShell> component that reads from usePanelsStore, manages drag via dnd-kit useDraggable, applies position/zIndex/focus. No V9 styling.",
+  "file_targets": [
+    "src/ui/panels/PanelShell.tsx",
+    "tests/unit/panels/PanelShell.test.tsx"
+  ],
+  "dependencies": [
+    "PANELS-STEP-03"
+  ],
+  "invariants": [
+    "Sei un agente Windsurf: consulta le skill `agent-execution-mandate` prima di iniziare.",
+    "`.windsurf/rules/00-project-invariants.md` (config-first, i18n, JSDoc, safeguards, Component Reuse).",
+    "`.windsurf/rules/10-ui-invariants.md` (dnd-kit only for drag, <16ms/frame).",
+    "Tutte le stringhe user-facing devono passare da useTranslation.",
+    "Tutte le funzioni e interfacce nuove devono avere JSDoc.",
+    "Nessun CSS ad-hoc o file .css standalone.",
+    "Verifica primitive esistenti in src/ui/atoms/, src/ui/fantasy/atoms/, src/ui/idleVillage/skins/primitives/ prima di scrivere nuovo markup.",
+    "dnd-kit è già nello stack e deve essere usato per drag."
+  ],
+  "operations": [
+    "Crea `src/ui/panels/PanelShell.tsx` come componente headless.",
+    "Il componente accetta props: panelId, children (ReactNode), onClose? (callback), onModeToggle? (callback).",
+    "Usa usePanelsStore per leggere lo stato del panel (position, zIndex, mode, isOpen).",
+    "Usa dnd-kit useDraggable per gestire il drag del panel.",
+    "Applica position absolute basata su store state (x, y).",
+    "Applica zIndex basato su store state.",
+    "Quando il drag inizia, chiama bringToFront(panelId) dallo store.",
+    "Quando il drag finisce, chiama setPanelPosition(panelId, x, y) dallo store.",
+    "Il componente è headless: nessuno styling V9, solo position/zIndex/drag logic.",
+    "Crea `tests/unit/panels/PanelShell.test.tsx` con test per drag, position update, z-index update.",
+    "Aggiungi JSDoc al componente e alle funzioni."
+  ],
+  "forbidden": [
+    "Nessuno styling V9 in questo step — solo headless behavior.",
+    "Nessun CSS ad-hoc o file .css standalone.",
+    "Nessun colore hardcoded.",
+    "Non usare HTML5 drag API — usa solo dnd-kit.",
+    "Non duplicare primitive esistenti."
+  ],
+  "assumptions": [
+    "Esegui direttamente i passi noti senza chiedere conferma.",
+    "dnd-kit è già installato e configurato nel progetto.",
+    "usePanelsStore esiste da PANELS-STEP-03.",
+    "La directory src/ui/panels/ non esiste, creala."
+  ],
+  "safeguards": [
+    "npm run lint -- src/ui/panels/ tests/unit/panels/",
+    "npm run test -- tests/unit/panels/PanelShell.test.tsx",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "`src/ui/panels/PanelShell.tsx`",
+    "`tests/unit/panels/PanelShell.test.tsx`",
+    "Evidence log in `test-results/panels-step-04-<YYYY-MM-DD>.log`"
+  ],
+  "notes": [
+    "Quando prendi questo prompt, imposta subito la riga in `src/docs/docs/coordinator/agent_assignments.md` su 'In corso' con data e nome agente.",
+    "Al completamento, esegui la safeguard suite e chiudi con: `KANBAN STATUS: PANELS-STEP-04 – Completato (Evidence: test-results/panels-step-04-<YYYY-MM-DD>.log)`.",
+    "Questo step è prerequisito di PANELS-STEP-05.",
+    "Execution hint: verified (multi-file, requires safeguards)."
+  ]
+}

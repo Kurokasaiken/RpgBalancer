@@ -1,0 +1,61 @@
+{
+  "id": "ASTRO-V3-F1",
+  "agent": "harness",
+  "objective": "Destiny Astrolabe V3 — F1 Materia: canvas layer, stella, sfida, backdrop, shell DestinyAstrolabeV3.tsx e palette token.",
+  "file_targets": [
+    "src/ui/idleVillage/components/destinyAstrolabeV3/engineV3.ts",
+    "src/ui/idleVillage/components/destinyAstrolabeV3/DestinyAstrolabeV3.tsx",
+    "src/ui/idleVillage/components/destinyAstrolabeV3/palette.ts"
+  ],
+  "dependencies": [
+    "ASTRO-V3-F0"
+  ],
+  "invariants": [
+    "Sei un agente Windsurf: consulta le skill `agent-execution-mandate` e `idle-village-task` prima di iniziare.",
+    "`src/docs/docs/plans/destiny_astrolabe_v3_implementation_plan.md` §2, §3, §5, §9 F1.",
+    "`.windsurf/rules/00-project-invariants.md` e `.windsurf/rules/10-ui-invariants.md`.",
+    "Colori SOLO da token `--skin-*` via `applySkinCssVariables` / `palette.ts`; zero hex hardcoded.",
+    "Un solo canvas, engine ne e' proprietario; testo nitido (label, numeri) in layer React.",
+    "Budget <16ms/frame; layer caching per materia/velatura/vignetta; Path2D cache per poligoni.",
+    "DPR-aware con cap a 2x; resize via ResizeObserver debounced.",
+    "i18n namespace `idleVillage` per tutte le stringhe player-facing.",
+    "Nessun `ctx.filter` o `shadowBlur` nel hot path."
+  ],
+  "operations": [
+    "Estendi `src/balancing/config/idleVillage/destinyAstrolabeV3/astrolabeV3Config.ts` (creato in F0) con durate timeline: `ring-lock`, `threat-slam`, `agency-burst`, `risk-pour`, `action-trigger`, `the-spin`, `magnetic-snap`, `resolution` e parametri di easing. Mantiene schema Zod.",
+    "Crea `src/ui/idleVillage/components/destinyAstrolabeV3/palette.ts` che legge `--skin-*` token (inclusi `--skin-icon-color`, `--skin-text-primary`, `--skin-surface-base`, `--skin-icon-accent`) a runtime e fornisce fallback.",
+    "Crea `src/ui/idleVillage/components/destinyAstrolabeV3/engineV3.ts` come orchestratore canvas: state machine, draw loop, timeline, caching. Implementa layer caching: materia (`bg.png` + velatura teal in multiply + grana), starfield parallattico, light-leak, vignettatura. Disegna superficie sfida (ossidiana), stella d'avorio (luminanza cappata a 70%), nascita animata `threat-slam` e `agency-burst` con easing ease-out-back. Supporta morph 300ms via `lerpGeometry`.",
+    "Crea `src/ui/idleVillage/components/destinyAstrolabeV3/DestinyAstrolabeV3.tsx` come host React: gestisce canvas ref, overlay, THROW, label, tooltips, render condizionale. Usa `useTranslation` per tutte le stringhe.",
+    "Aggiungi la route/pagina di TestHub in `src/pages/minimal-destiny-astrolabe-v3.tsx` (skeleton F1; verra' arricchita in F4) con stats asimmetriche di default.",
+    "Aggiungi test RTL minimi: `tests/unit/destinyAstrolabeV3/DestinyAstrolabeV3.test.tsx` (render componente, presenza canvas, nessun errore), `tests/unit/destinyAstrolabeV3/engineV3.test.ts` (perf mark presente, caching) e `tests/unit/destinyAstrolabeV3/palette.test.ts` (lettura token)."
+  ],
+  "forbidden": [
+    "Nessuna pallina, corona, voragini, obelischi in questa fase (arrivano in F2/F3).",
+    "Nessun gradiente liscio: lo sfondo deve usare `bg.png` + velatura + starfield.",
+    "Nessun hardcoded timing o easing: tutto da `astrolabeV3Config.ts`.",
+    "Nessun `ctx.filter` o `shadowBlur` nel draw loop."
+  ],
+  "assumptions": [
+    "Esegui direttamente i passi noti senza chiedere conferma.",
+    "F0 e' completato e `geometry.ts`/`zones.ts`/`astrolabeV3Config.ts` sono stabili.",
+    "Asset `bg.png` e `oil-grain.png` sono in `public/assets/ui/` (se mancano, usa placeholder tinta unita skin-token e segnala)."
+  ],
+  "safeguards": [
+    "npm run lint -- src/ui/idleVillage/components/destinyAstrolabeV3/ src/pages/minimal-destiny-astrolabe-v3.tsx tests/unit/destinyAstrolabeV3/",
+    "npm run test -- tests/unit/destinyAstrolabeV3/",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "`engineV3.ts` con draw loop, caching, timeline",
+    "`DestinyAstrolabeV3.tsx` host React",
+    "`palette.ts` lettura skin token",
+    "`src/pages/minimal-destiny-astrolabe-v3.tsx` (skeleton)",
+    "Evidence log `test-results/astro-v3-f1-<YYYY-MM-DD>.log`"
+  ],
+  "notes": [
+    "Quando prendi questo prompt, imposta subito la riga in `src/docs/docs/coordinator/agent_assignments.md` su 'In corso' con data e nome agente.",
+    "Al completamento, esegui la safeguard suite e chiudi con: `KANBAN STATUS: ASTRO-V3-F1 – Completato (Evidence: test-results/astro-v3-f1-<YYYY-MM-DD>.log)`.",
+    "F1 dipende da F0; e' prerequisito di F2."
+  ]
+}

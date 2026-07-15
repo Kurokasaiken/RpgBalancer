@@ -1,0 +1,47 @@
+{
+  "id": "GOV-005",
+  "agent": "harness",
+  "objective": "Audit COMPONENT_MASTER_INDEX.md against KIT_REGISTRY and produce a discrepancy report without modifying either source.",
+  "file_targets": [
+    "src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md (read)",
+    "src/ui/idleVillage/frozen/registry.ts (read)",
+    "src/docs/docs/idle_village/COMPONENT_MASTER_INDEX_AUDIT.md (new)"
+  ],
+  "dependencies": [
+    "GOV-002"
+  ],
+  "invariants": [
+    "`.windsurf/rules/00-project-invariants.md`",
+    "`.windsurf/rules/40-documentation-governance.md`",
+    "`src/docs/docs/plans/systems_governance_alignment_plan.md` §4.C"
+  ],
+  "operations": [
+    "Read `src/ui/idleVillage/frozen/registry.ts` to extract `KIT_REGISTRY` entries, statuses, `docPath`, `certManifestPath`, and `hub` metadata.",
+    "Read `src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md` and parse the component table, navigation sections, and links to trusted docs.",
+    "Create `src/docs/docs/idle_village/COMPONENT_MASTER_INDEX_AUDIT.md` with a table listing: `kitId`/`Component`, `KIT_REGISTRY` status, `COMPONENT_MASTER_INDEX` status, `Source of Truth` existence, `last certified` freshness, `docPath` existence, and `Discrepancy`/`Recommended action`.",
+    "Report only; do not modify `COMPONENT_MASTER_INDEX.md` or `KIT_REGISTRY`.",
+    "Run `npm run lint -- src/docs/docs/idle_village/`, `npm run build:check`, `npm run kanban:lint` and fix any errors."
+  ],
+  "forbidden": [
+    "Do not modify `COMPONENT_MASTER_INDEX.md` or `KIT_REGISTRY`.",
+    "Do not create new trusted docs.",
+    "Do not update `.windsurf/rules/`."
+  ],
+  "assumptions": [
+    "GOV-001 and GOV-002 are completed.",
+    "`KIT_REGISTRY` is the runtime source of truth; `COMPONENT_MASTER_INDEX.md` is the documentation index."
+  ],
+  "safeguards": [
+    "npm run lint -- src/docs/docs/idle_village/",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "`src/docs/docs/idle_village/COMPONENT_MASTER_INDEX_AUDIT.md`",
+    "`test-results/gov-005-<YYYY-MM-DD>.log`"
+  ],
+  "notes": [
+    "Audit-only task, no source code changes.",
+    "Close with `KANBAN STATUS: GOV-005 – Completato (Evidence: test-results/gov-005-<YYYY-MM-DD>.log)`."
+  ]
+}

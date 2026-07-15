@@ -1,0 +1,102 @@
+{
+  "task_id": "PANELS-FIX-COMPONENT-REUSE",
+  "title": "Panels System Fix - Component Reuse Invariant Violation",
+  "plan_reference": "coordinator/canonical-systems.md",
+  "execution_hint": "verified",
+  "priority": "high",
+  "objectives": [
+    "Fix Component Reuse invariant violation in V9PanelShell by replacing inline styles with existing CSS classes from wanderlustTokens.css",
+    "Replace inline style objects with class names that leverage predefined .wl-panel styles",
+    "Maintain all existing functionality while using CSS classes instead of inline styles"
+  ],
+  "invariants": [
+    "Component Reuse: Before writing new UI component markup/styling, verify if equivalent primitive exists. V9PanelShell currently uses inline styles instead of existing .wl-panel classes from wanderlustTokens.css",
+    "Skin/Theme: All styles must pass through wanderlustTokens.css, which already defines .wl-panel, .wl-panel::before, .wl-panel::after classes with proper styling",
+    "Config-first: No hardcoded values - use existing CSS classes that reference tokens"
+  ],
+  "scope": {
+    "files_to_modify": [
+      "src/ui/designSystem/V9PanelShell.tsx"
+    ],
+    "files_to_create": [],
+    "components_affected": [
+      "V9PanelShell"
+    ],
+    "integration_points": [
+      "wanderlustTokens.css",
+      "PanelShell"
+    ]
+  },
+  "operations": [
+    {
+      "step": 1,
+      "description": "Remove all inline style objects from V9PanelShell.tsx (panelStyle, headerStyle, titleStyle, dragHandleStyle, activeState)",
+      "file": "src/ui/designSystem/V9PanelShell.tsx",
+      "action": "replace_inline_styles_with_classes"
+    },
+    {
+      "step": 2,
+      "description": "Apply .wl-panel class to the main panel container div instead of inline panelStyle",
+      "file": "src/ui/designSystem/V9PanelShell.tsx",
+      "action": "use_existing_css_class"
+    },
+    {
+      "step": 3,
+      "description": "Apply .wl-panel-corner class for corner decoration if needed (remove from inline styles)",
+      "file": "src/ui/designSystem/V9PanelShell.tsx",
+      "action": "use_existing_css_class"
+    },
+    {
+      "step": 4,
+      "description": "For header, use CSS classes with wanderlustTokens tokens instead of inline headerStyle (e.g., background: var(--raised), border-bottom: 1px solid var(--panel-border))",
+      "file": "src/ui/designSystem/V9PanelShell.tsx",
+      "action": "use_css_classes_with_tokens"
+    },
+    {
+      "step": 5,
+      "description": "For drag handle, use CSS classes with wanderlustTokens tokens instead of inline dragHandleStyle (e.g., color: var(--t2), cursor: move)",
+      "file": "src/ui/designSystem/V9PanelShell.tsx",
+      "action": "use_css_classes_with_tokens"
+    },
+    {
+      "step": 6,
+      "description": "For active state, use CSS class .active with border-color: var(--acc-primary) and box-shadow: var(--shadow-gold) instead of inline activeState",
+      "file": "src/ui/designSystem/V9PanelShell.tsx",
+      "action": "use_css_class_for_state"
+    },
+    {
+      "step": 7,
+      "description": "Verify that the component still renders correctly with CSS classes instead of inline styles",
+      "file": "src/ui/designSystem/V9PanelShell.tsx",
+      "action": "verify_rendering"
+    }
+  ],
+  "guardrails": [
+    "DO NOT create new CSS file - use existing wanderlustTokens.css classes",
+    "DO NOT add new CSS variables - all needed variables already exist in wanderlustTokens.css",
+    "DO NOT duplicate primitive markup - reuse existing .wl-panel classes",
+    "Maintain all existing props and functionality of V9PanelShell",
+    "Ensure drag functionality still works after style changes"
+  ],
+  "safeguards": {
+    "lint_scope": "src/ui/designSystem/V9PanelShell.tsx",
+    "test_scope": "src/ui/designSystem",
+    "build_check": true,
+    "kanban_lint": true
+  },
+  "acceptance_criteria": [
+    "V9PanelShell uses CSS classes instead of inline styles for all visual styling",
+    "Component uses .wl-panel class from wanderlustTokens.css for main panel container",
+    "Component uses wanderlustTokens CSS variables via CSS classes, not inline styles",
+    "All existing functionality (drag, close, active state) still works",
+    "Visual appearance matches or improves compared to inline style version",
+    "No new CSS files or variables created",
+    "Component Reuse invariant is satisfied - reusing existing CSS classes"
+  ],
+  "evidence_requirements": {
+    "log_file": "test-results/panels-fix-component-reuse-<YYYY-MM-DD>.log",
+    "screenshots": false,
+    "test_results": true
+  },
+  "notes": "The wanderlustTokens.css file already defines comprehensive panel styling with .wl-panel class including ::before and ::after pseudo-elements for rim light and noise overlay. V9PanelShell should leverage these existing classes instead of duplicating styling logic with inline styles."
+}

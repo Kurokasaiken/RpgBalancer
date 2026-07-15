@@ -1,0 +1,53 @@
+{
+  "id": "GOV-007",
+  "agent": "harness",
+  "objective": "Migrate TestHub EXTRA_PAGES entries into KIT_REGISTRY as draft kits or keep them as deliberate non-kit pages, reducing EXTRA_PAGES to documented exceptions.",
+  "file_targets": [
+    "src/ui/idleVillage/TestHub.tsx",
+    "src/ui/idleVillage/frozen/registry.ts",
+    "src/docs/docs/plans/systems_governance_alignment_plan.md (read)"
+  ],
+  "dependencies": [
+    "GOV-001"
+  ],
+  "invariants": [
+    "`.windsurf/rules/00-project-invariants.md`",
+    "`.windsurf/rules/30-frozen-kits.md`",
+    "`.windsurf/rules/40-documentation-governance.md`",
+    "`src/docs/docs/plans/systems_governance_alignment_plan.md` §5.1"
+  ],
+  "operations": [
+    "Read `TestHub.tsx` `EXTRA_PAGES` and `KIT_REGISTRY`.",
+    "Apply the decision matrix from `systems_governance_alignment_plan.md` §5.1: remove `slot` (covered by `slotRackKit`); create draft `rosterSlotKit`, `jobPoiRosterKit`, `jobPoiRosterTimeKit` with `hub` copied and `kitModule: './kits/<kitId>' // TODO`; remove `quest-detail-legacy` (duplicated by `questDetailKit`) and `v8-skin-sandbox` (deprecated); keep `v9-skin-sandbox`, `poi-detail`, `poi-quest-detail-roster-integration`, and `poi-job-detail-roster-integration` in `EXTRA_PAGES` with justification comments.",
+    "Drop any `EXTRA_PAGES` entry whose `path` is already covered by a `KIT_REGISTRY.hub` path.",
+    "Update `TestHub.tsx` to remove migrated entries and add comments for remaining non-kit pages.",
+    "Do not create real kit modules; use `kitModule` placeholder and `// TODO`.",
+    "Do not modify `src/ui/idleVillage/frozen/kits/index.ts` except to re-export existing kits.",
+    "Run `npm run lint -- src/ui/idleVillage/TestHub.tsx src/ui/idleVillage/frozen/registry.ts`, `npm run build:check`, `npm run kanban:lint` and fix any errors."
+  ],
+  "forbidden": [
+    "Do not change page behavior (only metadata/kit registration).",
+    "Do not create trusted docs or contracts for draft kits.",
+    "Do not remove remaining non-kit pages without a justification comment.",
+    "Do not create new kit module exports in the public barrel."
+  ],
+  "assumptions": [
+    "GOV-001 and GOV-002 are completed.",
+    "`TestHub` is generated from `KIT_REGISTRY.hub`.",
+    "EXTRA_PAGES entries are test pages missing `hub` metadata."
+  ],
+  "safeguards": [
+    "npm run lint -- src/ui/idleVillage/TestHub.tsx src/ui/idleVillage/frozen/registry.ts",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "updated `src/ui/idleVillage/TestHub.tsx`",
+    "updated `src/ui/idleVillage/frozen/registry.ts`",
+    "`test-results/gov-007-<YYYY-MM-DD>.log`"
+  ],
+  "notes": [
+    "Metadata-only migration, no runtime behavior changes.",
+    "Close with `KANBAN STATUS: GOV-007 – Completato (Evidence: test-results/gov-007-<YYYY-MM-DD>.log)`."
+  ]
+}

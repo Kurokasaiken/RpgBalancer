@@ -1,0 +1,60 @@
+{
+  "id": "PANELS-STEP-03",
+  "agent": "harness",
+  "objective": "Draggable Panels System — Step 03: Implement usePanelsStore (Zustand) with panel state management and unit tests.",
+  "file_targets": [
+    "src/ui/designSystem/store/usePanelsStore.ts",
+    "src/ui/designSystem/store/panelsTypes.ts",
+    "tests/unit/designSystem/usePanelsStore.test.ts"
+  ],
+  "dependencies": [
+    "PANELS-STEP-02"
+  ],
+  "invariants": [
+    "Sei un agente Windsurf: consulta le skill `agent-execution-mandate` prima di iniziare.",
+    "`.windsurf/rules/00-project-invariants.md` (config-first, Zod, i18n, JSDoc, safeguards, PersistenceService-only).",
+    "`.windsurf/rules/10-ui-invariants.md` (skin tokens, zero hardcoded colors, Gilded Observatory theme, <16ms/frame).",
+    "State Management: Zustand per domain state condiviso tra pagine (pannelli trascinabili).",
+    "In questo step: store in-memory solo, senza PersistenceService (persistence viene aggiunta in step successivi).",
+    "Tutte le funzioni e interfacce nuove devono avere JSDoc.",
+    "Config-first: definire tipi e default in `panelsTypes.ts` con Zod per validazione."
+  ],
+  "operations": [
+    "Crea `src/ui/designSystem/store/panelsTypes.ts` con interfacce TypeScript per: `Panel` (id, title, content, position, size, isVisible), `PanelState` (panels array, activePanelId, layoutMode), `PanelsStoreActions` (addPanel, removePanel, updatePanel, setActivePanel, togglePanel, reorderPanels). Usa Zod per validare gli schemi.",
+    "Crea `src/ui/designSystem/store/usePanelsStore.ts` come Zustand store con: stato iniziale (pannelli di default), actions per CRUD pannelli, selector per pannelli visibili, selector per pannello attivo. Store deve essere persistente in memoria (no localStorage in questo step).",
+    "Implementa `layoutMode` con valori: 'full' (tutti i pannelli visibili), 'strip' (solo pannello attivo visibile), 'grid' (griglia di pannelli minimizzati).",
+    "Aggiungi unit test in `tests/unit/designSystem/usePanelsStore.test.ts` per: stato iniziale, addPanel, removePanel, updatePanel, setActivePanel, togglePanel, reorderPanels, layoutMode changes.",
+    "Verifica che il store sia importabile e funzionante senza errori.",
+    "Non integrare ancora con UI; questo step è solo store + test."
+  ],
+  "forbidden": [
+    "Nessun PersistenceService in questo step; store deve essere in-memory solo.",
+    "Nessun componente UI in questo step; solo store e types.",
+    "Nessun colore hardcoded; usare token wanderlustTokens.css per eventuali default values.",
+    "Non duplicare primitive esistenti; riutilizza store patterns se già presenti nel progetto."
+  ],
+  "assumptions": [
+    "Esegui direttamente i passi noti senza chiedere conferma.",
+    "PANELS-STEP-02 è completato.",
+    "Zustand è già installato nel progetto (verifica in package.json).",
+    "PersistenceService sarà integrato in step successivi."
+  ],
+  "safeguards": [
+    "npm run lint -- src/ui/designSystem/store/ tests/unit/designSystem/",
+    "npm run test -- tests/unit/designSystem/usePanelsStore.test.ts",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "`src/ui/designSystem/store/panelsTypes.ts` con Zod schemas",
+    "`src/ui/designSystem/store/usePanelsStore.ts` Zustand store",
+    "`tests/unit/designSystem/usePanelsStore.test.ts` test suite completa",
+    "Evidence log in `test-results/panels-step-03-<YYYY-MM-DD>.log`"
+  ],
+  "notes": [
+    "Quando prendi questo prompt, imposta subito la riga in `src/docs/docs/coordinator/agent_assignments.md` su 'In corso' con data e nome agente.",
+    "Al completamento, esegui la safeguard suite e chiudi con: `KANBAN STATUS: PANELS-STEP-03 – Completato (Evidence: test-results/panels-step-03-<YYYY-MM-DD>.log)`.",
+    "Step 03 è prerequisito di PANELS-STEP-04.",
+    "Execution hint: verified (multi-file con safeguards)."
+  ]
+}
