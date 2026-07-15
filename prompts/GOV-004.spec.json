@@ -1,0 +1,48 @@
+{
+  "id": "GOV-004",
+  "agent": "harness",
+  "objective": "Update agent-execution-mandate and idle-village-task skills to enforce frozen kit usage and trusted-doc updates for certified/frozen components.",
+  "file_targets": [
+    ".windsurf/skills/agent-execution-mandate/SKILL.md",
+    ".windsurf/skills/idle-village-task/SKILL.md"
+  ],
+  "dependencies": [
+    "GOV-001",
+    "GOV-002"
+  ],
+  "invariants": [
+    "`.windsurf/rules/00-project-invariants.md`",
+    "`.windsurf/rules/30-frozen-kits.md`",
+    "`.windsurf/rules/40-documentation-governance.md`",
+    "`src/docs/docs/plans/systems_governance_alignment_plan.md` §4.B"
+  ],
+  "operations": [
+    "In `agent-execution-mandate/SKILL.md`: add a step in the execution flow: if the task modifies a trusted/frozen component, the agent must update the corresponding `*_trusted.md` and `COMPONENT_MASTER_INDEX.md` before marking complete; cite `.windsurf/rules/30-frozen-kits.md` and `.windsurf/rules/40-documentation-governance.md` as mandatory references.",
+    "In `idle-village-task/SKILL.md`: add a `Frozen Kits` section in Core requirements: use kits exported from `@/ui/idleVillage/frozen/kits`; create new kits via `npm run freeze:kit <KitName>`; add `hub` metadata for test pages; keep `TestHub` generated from `KIT_REGISTRY`; add the requirement that modifications to trusted/frozen components require updating `*_trusted.md` + `COMPONENT_MASTER_INDEX.md`.",
+    "Run `npm run lint -- .windsurf/skills/`, `npm run build:check`, `npm run kanban:lint` and fix any errors."
+  ],
+  "forbidden": [
+    "Do not create new rule files.",
+    "Do not modify `KIT_REGISTRY`, `TestHub`, or `COMPONENT_MASTER_INDEX.md`.",
+    "Do not touch the strategist/coordinator skills (GOV-003)."
+  ],
+  "assumptions": [
+    "GOV-001 and GOV-002 are completed.",
+    "`scripts/freeze-kit.ts` exists and `npm run freeze:kit` works.",
+    "`src/ui/idleVillage/frozen/kits/index.ts` is the official barrel."
+  ],
+  "safeguards": [
+    "npm run lint -- .windsurf/skills/",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "updated `.windsurf/skills/agent-execution-mandate/SKILL.md`",
+    "updated `.windsurf/skills/idle-village-task/SKILL.md`",
+    "`test-results/gov-004-<YYYY-MM-DD>.log`"
+  ],
+  "notes": [
+    "Governance-only task, no runtime code changes.",
+    "Close with `KANBAN STATUS: GOV-004 – Completato (Evidence: test-results/gov-004-<YYYY-MM-DD>.log)`."
+  ]
+}

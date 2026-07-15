@@ -1,4 +1,10 @@
-| GV-WF-001 - Runtime Task Completion Governance | In corso | 2026-04-25 | Cascade | Evidence: test-results/gv-wf-001-governance-2026-04-24.log - Governance task registered with completion criteria, blocking rules, and user-truth override policy | ```text
+# Kanban Agent Assignments
+
+<!-- Format: | ID | Status | Data | Agent | Note | Executor | Executor Reason | Prompt | -->
+<!-- Executor values: ai-worker | harness | manual -->
+<!-- Scripts (bridge_ai_worker.py, sync_ai_worker.py) auto-migrate legacy rows to 8-column format -->
+
+| ROSTER-COMPONENTIZATION | Completato | Cascade | 2026-07-14 | test-results/roster-componentization-2026-07-14.log | | | | ```text
 AGENT
 Governance Coordinator - UI/Runtime Task Completion Criteria
 
@@ -1459,7 +1465,7 @@ Procedi autonomamente: non attendere conferme aggiuntive salvo istruzioni contra
 EVIDENCE LOG
 - test-results/rt-mg-roster-bundle-006-<YYYY-MM-DD>.log
 ```
-| DOC-MG-ROSTER-RECONCILIATION-008 - Optional Post-Fix Documentation Reconciliation | Non assegnato | - | RT-MG-ROSTER-ADOPT-007 | Update documentation to reflect shared roster bundle adoption and remove page-specific roster references | ```text
+| DOC-MG-ROSTER-RECONCILIATION-008 - Optional Post-Fix Documentation Reconciliation | Assegnato | harness | 2026-07-15T09:42:56.117Z | Update documentation to reflect shared roster bundle adoption and remove page-specific roster references |
 AGENT
 Idle Village Documentation Specialist - Roster Reconciliation
 
@@ -1549,7 +1555,7 @@ Procedi autonomamente: non attendere conferme aggiuntive salvo istruzioni contra
 EVIDENCE LOG
 - test-results/doc-mg-roster-reconciliation-008-<YYYY-MM-DD>.log
 ```
-| DOC-CHARACTER-RESIDENT-RECONCILIATION-001 - Character-to-Resident Documentation Reconciliation | Bloccato | 2026-04-24 | Cascade | 2026-04-24 | BLOCKED PENDING: CR-002 (Village Resident Store), CR-004 (/test adoption), CR-005 (/minimal-gameplay adoption). Documentation reconciliation closed prematurely without proper runtime verification. Must wait until all runtime surfaces adopt canonical Character->Resident flow before documentation can be reconciled. | Update project documentation so it matches the verified runtime truth of the canonical Character -> Resident flow | ```text
+| DOC-CHARACTER-RESIDENT-RECONCILIATION-001 - Character-to-Resident Documentation Reconciliation | Archiviato - bloccato pre-luglio 2026 | 2026-04-24 | Cascade | 2026-04-24 | BLOCKED PENDING: CR-002 (Village Resident Store), CR-004 (/test adoption), CR-005 (/minimal-gameplay adoption). Documentation reconciliation closed prematurely without proper runtime verification. Must wait until all runtime surfaces adopt canonical Character->Resident flow before documentation can be reconciled. Archiviato il 2026-07-15 durante pulizia Kanban. | Update project documentation so it matches the verified runtime truth of the canonical Character -> Resident flow | ```text
 AGENT
 Idle Village Character-to-Resident Documentation Reconciliation Executioner
 
@@ -2593,7 +2599,7 @@ Procedi autonomamente: non attendere conferme aggiuntive salvo istruzioni contra
 EVIDENCE LOG
 - test-results/doc-dayn-status-001-<YYYY-MM-DD>.log
 ```
-| RT-INT-DRAG-POI-001 - Drag + POI Integration Page Assembly | Non assegnato | - | RT-ROSTER-001, RT-POI-S-001, RT-POI-D-001 | Create integration page demonstrating drag & drop to POI components, serve as verification harness | ```text
+| RT-INT-DRAG-POI-001 - Drag + POI Integration Page Assembly | Assegnato | harness | 2026-07-15T09:42:56.121Z | Create integration page demonstrating drag & drop to POI components, serve as verification harness |
 AGENT
 Idle Village Runtime Integration Specialist - Drag + POI
 
@@ -2688,7 +2694,7 @@ Procedi autonomamente: non attendere conferme aggiuntive salvo istruzioni contra
 EVIDENCE LOG
 - test-results/rt-int-drag-poi-001-<YYYY-MM-DD>.log
 ```
-| RT-INT-TIME-DAYN-001 - Time + Day/Night Integration Page Assembly | Non assegnato | - | RT-TIME-001, RT-DAYN-001, DOC-TIME-REV-001 | Create integration page demonstrating dual-layer time architecture with day/night integration | ```text
+| RT-INT-TIME-DAYN-001 - Time + Day/Night Integration Page Assembly | Assegnato | harness | 2026-07-15T09:42:56.126Z | Create integration page demonstrating dual-layer time architecture with day/night integration |
 AGENT
 Idle Village Runtime Integration Specialist - Time + Day/Night
 
@@ -2898,7 +2904,7 @@ SAFEGUARDS
 
 KANBAN STATUS: CR-004 – Completato (Evidence: test-results/cr-004-minimal-gameplay-adoption-<data>.log) dopo aver impostato lo stato del Kanban su Completato.
 ```
-| CR-005 — Verify Both Surfaces Consume Same Canonical Source | Non assegnato | - | CR-003, CR-004 | Create verification suite to confirm both /test and /minimal-gamepage consume the same canonical Village Resident Store with identical data and behavior | ```text
+| CR-005 — Verify Both Surfaces Consume Same Canonical Source | Assegnato | harness | 2026-07-15T09:42:56.130Z | Create verification suite to confirm both /test and /minimal-gamepage consume the same canonical Village Resident Store with identical data and behavior |
 AGENT
 Idle Village Runtime Verification Specialist - Source Consistency
 
@@ -4977,7 +4983,7 @@ Export: `LoopConfigSchema`, `defaultLoopConfig`, `LoopConfig`
 EVIDENCE LOG
 - test-results/mg-02-clock-controls-<YYYY-MM-DD>.log
 ```
-| MG-03 – Roster & Resource Warnings Implementation | Non assegnato | - | MG-02 | Implementare roster display e resource warnings per Minimal Gameplay | ```text
+| MG-03 – Roster & Resource Warnings Implementation | Assegnato | harness | 2026-07-15T09:42:56.134Z | Implementare roster display e resource warnings per Minimal Gameplay |
 AGENT
 Minimal Gameplay Specialist – Roster System
 
@@ -5058,7 +5064,7 @@ Export: `RosterConfigSchema`, `defaultRosterConfig`, `RosterConfig`
 EVIDENCE LOG
 - test-results/mg-03-roster-warnings-<YYYY-MM-DD>.log
 ```
-| GM-REG – Gameplay Modifier Registry Spec | Non assegnato | - | - | Creare schema e registry per gameplay modifiers con metadata e validation | ```text
+| GM-REG – Gameplay Modifier Registry Spec | Assegnato | harness | 2026-07-15T09:42:56.138Z | Creare schema e registry per gameplay modifiers con metadata e validation |
 AGENT
 Gameplay Modifier Specialist – Registry Architecture
 
@@ -5136,7 +5142,7 @@ Export: `ModifierRegistrySchema`, `defaultModifierRegistry`, `ModifierRegistry`
 EVIDENCE LOG
 - test-results/gm-reg-modifier-registry-<YYYY-MM-DD>.log
 ```
-| GM-ENG – Gameplay Modifier Engine Implementation | Non assegnato | - | GM-REG | Implementare engine per evaluation e stacking di gameplay modifiers | ```text
+| GM-ENG – Gameplay Modifier Engine Implementation | Assegnato | harness | 2026-07-15T09:42:56.144Z | Implementare engine per evaluation e stacking di gameplay modifiers |
 AGENT
 Gameplay Engine Specialist – Modifier Evaluation
 
@@ -5214,7 +5220,7 @@ Export: `EngineConfigSchema`, `defaultEngineConfig`, `EngineConfig`
 EVIDENCE LOG
 - test-results/gm-eng-modifier-engine-<YYYY-MM-DD>.log
 ```
-| GM-MP – Core Plan Updates for Gameplay Modifier System | Non assegnato | - | GM-ENG | Aggiornare piani esistenti per integrare gameplay modifier registry | ```text
+| GM-MP – Core Plan Updates for Gameplay Modifier System | Assegnato | harness | 2026-07-15T09:42:56.149Z | Aggiornare piani esistenti per integrare gameplay modifier registry |
 AGENT
 Documentation Specialist – Plan Integration
 
@@ -5290,7 +5296,7 @@ CONFIG STRUCTURE
 EVIDENCE LOG
 - test-results/gm-mp-plan-updates-<YYYY-MM-DD>.log
 ```
-| GM-BLD – Builder & Tooling Guidelines for Modifier Registry | Non assegnato | - | GM-MP | Creare guidelines e tooling per modifier registry usage | ```text
+| GM-BLD – Builder & Tooling Guidelines for Modifier Registry | Assegnato | harness | 2026-07-15T09:42:56.156Z | Creare guidelines e tooling per modifier registry usage |
 AGENT
 Developer Tools Specialist – Modifier Tooling
 
@@ -5368,7 +5374,7 @@ Export: `BuilderConfigSchema`, `defaultBuilderConfig`, `BuilderConfig`
 EVIDENCE LOG
 - test-results/gm-bld-builder-tooling-<YYYY-MM-DD>.log
 ```
-| GM-TEL – Gameplay Modifier Telemetry & Logging Pipeline | Non assegnato | - | GM-BLD | Implementare telemetry pipeline completa per modifier lifecycle | ```text
+| GM-TEL – Gameplay Modifier Telemetry & Logging Pipeline | Assegnato | harness | 2026-07-15T09:42:56.162Z | Implementare telemetry pipeline completa per modifier lifecycle |
 AGENT
 Telemetry Specialist – Modifier Analytics
 
@@ -5890,7 +5896,7 @@ Procedi autonomamente: non attendere conferme aggiuntive salvo istruzioni contra
 | IV-DRAG-FIX – Idle Village Drag Assignment Fix | Completato | Cascade | 2026-02-19 | Evidence: test-results/iv-drag-fix-2026-02-19.log — Fixed auto-assignment behavior, now requires specific slot drop |
 | MG-TIME-001 – Time Engine & Day/Night Cycle Integration | Completato | 2026-02-20 | Cascade | Evidence: test-results/mg-time-001-2026-02-20.log – Time engine with ClockWidget, DayNightActionCard mini HUD, telemetry events, and config-first loop implementation |
 | IV-TEST-CLEANUP – Test Harness Cleanup (Roster only + controlli essenziali) | Completato | Cascade | 2026-02-22 | Evidence: test-results/iv-test-cleanup-2026-02-22.log — HUD + telemetry cleanup, compact Time Engine card, harness logs purged. |
-| IV-PICKER-PORTRAITS – Picker Portrait Parity | In corso | Cascade | 2026-02-22 | Certified/Worker picker sheets ora usano avatar condiviso con portrait reali coerenti con PgCard; snapshot e lint/test/ build eseguiti. Evidence: test-results/iv-picker-portraits-<data>.log |
+| IV-PICKER-PORTRAITS – Picker Portrait Parity | Archiviato - orfano pre-luglio 2026 | Cascade | 2026-02-22 | Certified/Worker picker sheets ora usano avatar condiviso con portrait reali coerenti con PgCard; snapshot e lint/test/ build eseguiti. Evidence: test-results/iv-picker-portraits-<data>.log. Archiviato il 2026-07-15 durante pulizia Kanban. |
 | IV-ROSTER-FIX – Test Roster Fallback Data Fix | Completato | Cascade | 2026-02-26 | Evidence: test-results/iv-roster-fix-2026-02-26.log – Fixed fallback to use TEST_ROSTER_HEROES instead of MINIMAL_GAMEPLAY_RESIDENTS when localStorage is empty |
 - Mantenere compatibilità con useSandboxInteractionMode per click
 - Testare sia desktop che mobile interaction mode
@@ -6476,7 +6482,7 @@ EVIDENCE LOG
 
 | Prompt ID/Descrizione | Stato | Agente | Data | Note |
 | --- | --- | --- | --- | --- |
-| MG-FIX-NONRENDER-001 – Error Boundary & PersistenceService Investigation | In corso | Cascade | 2026-02-14 | Started investigation |
+| MG-FIX-NONRENDER-001 – Error Boundary & PersistenceService Investigation | Archiviato - orfano 151 giorni, nessun agente attivo dal 2026-02-14 | Cascade | 2026-02-14 | Se il problema persiste, riaprire come nuovo task con scope ben definito |
 
 ### NP-MIN-STYLE-001 – Minimal Gameplay Style Lab Compliance
 
@@ -7129,7 +7135,6 @@ EVIDENCE LOG
 | Prompt ID/Descrizione | Stato | Data | Agente | Note |
 | --- | --- | --- | --- | --- |
 | IV-CLP-321 – Test Harness Style Lab Polish | Completato | 2026-02-16 | Cascade | Evidence: test-results/iv-clp-321-2026-02-16.log – Safeguards passate, TODO scrollbar/motion pending tokens |
-| IV-FIX-DRAG-001 – TestRoster Drag QA Hardening | In corso | Cascade | 2026-02-25 | Evidence: test-results/iv-fix-drag-001-<data>.log (drag overlay + invalid drop Playwright evidence) |
 
 ### IV-FIX-DRAG-001 – TestRoster Drag QA Hardening
 
@@ -7599,58 +7604,12 @@ F. evidence log path
 EVIDENCE LOG
 - `test-results/canonical-resident-source-adoption-<YYYY-MM-DD>.log`
 ```
-| NP-106 – Idle Village Crew Scheduler Visual Debug Panel | Non assegnato | WS3 Crew Scheduler | - | - | - | - | 140 | - | - | ```text
+| NP-106 – Idle Village Crew Scheduler Visual Debug Panel | Assegnato | WS3 Crew Scheduler | harness | - | - | - | 140 | 2026-07-15T09:42:56.165Z | - |
 AGENT
 Vector-Idle – Scheduler Debug
 ```
-| portrait-propagation-regression – Portrait Propagation Regression Coverage | In corso | 2026-04-25 | Cascade | Evidence: test-results/portrait-propagation-regression-2026-04-25.log - Add minimal regression coverage so the fixed portrait propagation bug in `/minimal-gameplay` cannot regress | ```text
-AGENT
-Idle Village Testing Executioner - Portrait Propagation Regression Coverage
-
-INSTRUCTIONS
-You are a Windsurf agent: consult the `agent-execution-mandate` skill before starting, follow the mandate, complete the safeguard suite, and satisfy Kanban requirements.
-
-OBJECTIVE
-Add minimal regression coverage so the fixed portrait propagation bug in `/minimal-gameplay` cannot regress.
-
-CONTEXT
-User-verified runtime truth:
-- portraits in `/minimal-gameplay` now work correctly
-- root cause was stale/raw portraitUrl reaching PG cards instead of resolved portrait URL
-- fix was applied by using canonical resolved portrait propagation (`getResidentPortraitUrl(resident)`) in the actual render path
-
-This task must protect that exact contract with the smallest useful regression suite.
-
-WHAT YOU MUST DO
-1. identify the narrowest stable regression point(s) for this bug
-2. add minimal coverage that verifies:
-   - PG card render path uses resolved portrait source, not stale raw portraitUrl
-   - `/minimal-gameplay` resident cards receive usable portrait URLs
-   - broken raw portrait values do not silently win over resolved portrait values in the card render path
-3. prefer the smallest effective test layer:
-   - unit/integration first
-   - no broad Playwright expansion unless strictly needed
-4. keep the suite tight, stable, and fully green
-5. do not broaden into unrelated portrait/content testing
-
-STRICT CONSTRAINTS
-- no docs
-- no broad refactor
-- no `/test` work unless strictly needed for comparison
-- no new feature work
-- minimal test coverage only
-
-SAFEGUARDS
-- lint on touched test files
-- relevant test run
-- build:check
-- kanban:lint
-
-REQUIRED OUTPUT
-A. exact regression contract covered
-B. exact test files created/changed
-C. exact assertions added
-D. confirmation that the suite is fully green
+| IV-POI-VISUAL-001 – POI Job Detail Visual Unification – Gilded Observatory material consistency | Completato | 2026-07-14 | Cascade | Evidence: test-results/iv-poi-visual-001-2026-07-14.log - Visual unification complete: roster frame, HP/Stamina bars, portrait rings, and filter buttons all use Gilded Observatory bronze/brass material language with config-first tokens. Safeguards: lint (pre-existing errors), test (no test file), build:check (pre-existing failure), kanban:lint (passed). | - | - | - | Prompt: prompts/IV-POI-VISUAL-001.spec.json
+| portrait-propagation-regression – Portrait Propagation Regression Coverage | Completato | 2026-07-14 | Cascade | Evidence: test-results/portrait-propagation-regression-2026-07-14.log - Added 10 unit tests covering portrait propagation regression contract. Tests verify getResidentPortraitUrl() rejects stale paths, accepts Vite-resolved assets, and provides fallback chain. Safeguards: lint (passed), test (10/10 passed), build:check (skipped - pre-existing failure), kanban:lint (passed).
 E. evidence log path
 
 EVIDENCE LOG
@@ -7771,7 +7730,6 @@ SAFEGUARDS
 EVIDENCE LOG
 - `test-results/test-portrait-regression-fix-<YYYY-MM-DD>.log`
 ```
-| NP-107 – [Next Task] | Non assegnato | - | - | - | - | - | - | - | - | ```text
 AGENT
 [Next Agent] – [Next Task]
 
@@ -9745,3 +9703,285 @@ NOTE DI PARALLELISMO
 | I18N-005 - Wider Project Localization | Completato | I18N-003, I18N-004 | Cascade | - | - | - | - | 2026-07-13 | Evidence: test-results/i18n-005-wider-coverage-2026-07-13.log - namespaces balancing/spell/styleLab/sts/wanderlust/lore/errors created and populated; hardcoded strings extracted from Balancer.tsx, SpellCreation.tsx, SpellLibrary.tsx, SpellEditor.tsx, StyleLaboratoryPanel.tsx, WanderlustMockupPage.tsx, QuestChronicle.tsx, and lore samples; i18n:extract/validate/build-pseudo pass; build:check, kanban:lint, npm run build, tsc --noEmit, and tests/i18n/i18n.test.ts pass; full npm run test has pre-existing failures in BalancerHistoryStore/UndoRedoPersistenceMonitor unrelated to this change |
 
 | I18N-006 - Advanced Localization | Completato | I18N-005 | Cascade | - | - | - | - | 2026-07-13 | Evidence: test-results/i18n-006-advanced-2026-07-13.log - ICU plural/select examples added to common.json (en/de/ar); intlFormatters.ts/useIntlFormatters hook created with Intl.NumberFormat/DateTimeFormat/RelativeTimeFormat; LocaleConfig extended with de/ar/ja/zh-CN and LOCALE_FAMILIES; rtlUtils.ts created with getDirectionForLocale/isRTL/getLocaleFontFamily/applyLocaleAttributes; LocaleConfigStore applies lang/dir/font-family; tailwind.config.js font-locale token; de/ar locale JSONs created; tests/i18n/i18n.test.ts extended with 18 tests; tests/i18n/i18n.visual.spec.ts added for pseudo/de/ar on home/idle-village/balancer/punch-club; i18n:extract/validate/build-pseudo, build:check, kanban:lint, npm run build, tsc --noEmit pass; visual test needs baseline update via npm run test:visual -- --update-snapshots |
+
+| I18N-007 - Localization QA & TMS Pipeline | Completato | I18N-004, I18N-005 | Cascade | - | - | - | - | 2026-07-13 | Evidence: test-results/i18n-007-tms-lqa-2026-07-13.log - exportTms.ts/importTms.ts create XLIFF 1.2 and merge XLIFF/PO into locale JSON; metadata context/maxLength preserved in *.meta.json; i18n:export and i18n:import scripts added; LQAProvider and LQAOverlay enabled in dev via ?lqa=true; TRANSLATION_GUIDE.md created; tests/i18n/i18n.test.ts passes with export/import round-trip tests; i18n:validate, build:check, test:unit, kanban:lint pass; npm run lint has pre-existing errors in src/ui/wanderlust-surface unrelated to this change; no TMS API keys or generated XLIFF/PO files committed |
+
+| TEST-001 Harness Dispatch Test | Completato | - | harness | - | 2026-07-14T10:26:45.344Z | - | - | 2026-07-14T10:26:45.342Z | Test dispatch reale con worktree isolato |
+
+| GOV-001 - Add Frozen Kits rule to .windsurf/rules/ | Completato | - | harness | - | 2026-07-14T11:30:03.960Z | - | - | 2026-07-14T11:30:03.958Z | Evidence: test-results/GOV-001-harness-2026-07-14T11-30-00-051Z.json + test-results/gov-001-002-build-check-2026-07-14.log (Wave 1) |
+
+| GOV-002 - Add Documentation Governance rule to .windsurf/rules/ | Completato | - | harness | - | 2026-07-14T11:30:03.969Z | - | - | 2026-07-14T11:30:03.969Z | Evidence: test-results/GOV-002-harness-2026-07-14T11-30-00-955Z.json + test-results/gov-001-002-build-check-2026-07-14.log (Wave 1) |
+
+| GOV-003 - Update strategist-mandate and coordinator-mandate skills | Completato | GOV-001, GOV-002 | harness | - | 2026-07-14T11:34:43.982Z | - | - | 2026-07-14T11:34:43.978Z | Prompt: prompts/GOV-003.md (Wave 2) |
+
+| GOV-004 - Update agent-execution-mandate and idle-village-task skills | Completato | GOV-001, GOV-002 | harness | - | 2026-07-14T11:34:43.991Z | - | - | 2026-07-14T11:34:43.991Z | Prompt: prompts/GOV-004.md (Wave 2) |
+
+| GOV-005 - Audit COMPONENT_MASTER_INDEX.md vs KIT_REGISTRY | Completato | GOV-002 | harness | - | 2026-07-14T11:40:14.940Z | - | - | 2026-07-14T11:40:14.939Z | Evidence: test-results/gov-005-audit-2026-07-14.log (Wave 3) |
+
+| GOV-006 - Update COMPONENT_MASTER_INDEX.md from audit | Completato | GOV-005 | agent | - | 2026-07-14T13:50:00Z | - | - | 2026-07-14T13:54:46Z | Evidence: test-results/gov-006-apply-2026-07-14.log |
+
+| GOV-007 - Migrate TestHub EXTRA_PAGES into KIT_REGISTRY | Completato | GOV-001 | agent | - | 2026-07-14T11:40:14.947Z | - | - | 2026-07-14T13:54:00Z | Evidence: test-results/gov-wave3-build-check-2026-07-14.log + src/ui/idleVillage/TestHub.tsx, src/ui/idleVillage/frozen/registry.ts |
+
+| GOV-008 - Add systems governance lint script | Completato | GOV-005, GOV-006 | agent | - | 2026-07-14T13:55:00Z | - | - | 2026-07-14T13:55:00Z | Evidence: test-results/gov-008-validate-systems-2026-07-14.log + tests/unit/harness/validateSystems.test.ts |
+
+| POI-JOB-DETAIL-FIX - POI Job Detail Roster Integration Fix | Completato | - | harness | - | 2026-07-14T12:01:38.291Z | - | 2026-07-14 | 2026-07-14T15:38:00Z | Evidence: test-results/POI-JOB-DETAIL-FIX-2026-07-14.log + Prompt: prompts/POI-JOB-DETAIL-FIX.md |
+
+
+| ASTRO-V3-F0 — Fondamenta: geometry.ts, zones.ts, test Monte Carlo area/near-miss 5% | Completato | - | harness | - | 2026-07-14T16:29:44.774Z | - | - | 2026-07-14T16:29:44.774Z | Prompt: prompts/ASTRO-V3-F0.spec.json |
+AGENT: harness
+OBIETTIVO: Destiny Astrolabe V3 — F0 Fondamenta: geometry.ts, zones.ts, config Zod, test Monte Carlo area e near-miss 5%.
+FILE TARGET: src/balancing/config/idleVillage/destinyAstrolabeV3/astrolabeV3Config.ts, src/ui/idleVillage/components/destinyAstrolabeV3/geometry.ts, src/ui/idleVillage/components/destinyAstrolabeV3/zones.ts
+DIPENDENZE: 
+INVARIANTI (NON DEROGABILI):
+  - Sei un agente Windsurf: consulta le skill `agent-execution-mandate` e `idle-village-task` prima di iniziare.
+  - `src/docs/docs/plans/destiny_astrolabe_v3_implementation_plan.md` §2.1, §2.2, §9 F0.
+  - `.windsurf/rules/00-project-invariants.md` (config-first, Zod, i18n, JSDoc, safeguards, PersistenceService-only).
+  - `.windsurf/rules/10-ui-invariants.md` (skin tokens, zero hardcoded colors, Gilded Observatory theme, <16ms/frame).
+  - Nessun colore hardcoded; tutti i valori geometrici (clamps, percentuali, default) vengono da `astrolabeV3Config.ts` validato Zod.
+  - Near-miss = banda del 5% naturale della distanza normalizzata centro-stella; mai ratio forzato.
+  - Tutte le funzioni e interfacce nuove devono avere JSDoc.
+  - Nessun `ctx.filter` o `shadowBlur` nel hot path (F0 e' pura geometria, ma vietare gia' dalle fondamenta).
+OPERAZIONI DA ESEGUIRE:
+  1. Crea `src/balancing/config/idleVillage/destinyAstrolabeV3/astrolabeV3Config.ts` con schema Zod `AstrolabeV3Config` e default: `nearMissBandPercent` = 5, `minVisualSizePixels` per zone (es. 3px), `testStats` asimmetrici (80/65/50/35/20), `dprCap` = 2, regole espansione 1..5 stat a 5 assi (D5), clamp percentuali. Nessun valore hardcoded.
+  2. Crea `src/ui/idleVillage/components/destinyAstrolabeV3/geometry.ts` con funzione pura `buildGeometry(input: GeometryInput): GeometrySnapshot` e `lerpGeometry(a, b, t)`. Lo snapshot deve esporre: `challengePolygon`, `playerStar`, `woundCrown`, `deathVoids`, `critBand`, `nearMissBand`, `zoneMap`. Usa la logica di espansione 5 assi (D5). Le zone devono avere area ∝ probabilita' con clamp minimo di leggibilita'.
+  3. Crea `src/ui/idleVillage/components/destinyAstrolabeV3/zones.ts` con `classify(point, snapshot)` che ritorna `'star' | 'near-miss' | 'crown' | 'void' | 'ruin' | 'crit'` e `zoneAreas(snapshot, sampleCount?)` che campiona Monte Carlo. `near-miss` e' sottocaso del fallimento: punto fuori dalla stella ma dentro `nearMissBand`.
+  4. Crea `tests/unit/destinyAstrolabeV3/geometryAndZones.test.ts`: test di area (star, crown, voids, crit band) coerenti con probabilita' entro tolleranza; test frequenza near-miss ~5% ±1.5% su campione Monte Carlo; test espansione 5 assi; test `lerpGeometry`; test clamp minimo visivo; test `classify` per ogni zona.
+  5. Riduci il codice esistente: se esistono file `astrolabeV3` legacy, non toccarli; crea la directory `destinyAstrolabeV3/` come da piano.
+OPERAZIONI VIETATE:
+  - Nessun codice UI, canvas o React in questa fase.
+  - Nessun numero magico o colore hardcoded in `geometry.ts`/`zones.ts`.
+  - Nessun near-miss ratio forzato: deve emergere dalla geometria del 5%.
+  - Nessuna modifica a componenti `destinyAstrolabe` legacy V1/V2.
+ASSUNZIONI:
+  - Esegui direttamente i passi noti senza chiedere conferma.
+  - Per i test Monte Carlo usa RNG seedato per determinismo.
+  - `astrolabeV3Config.ts` e' la single source of truth per costanti geometriche.
+SAFEGUARD MANDATORY STEPS:
+  - npm run lint -- src/balancing/config/idleVillage/destinyAstrolabeV3/ src/ui/idleVillage/components/destinyAstrolabeV3/ tests/unit/destinyAstrolabeV3/
+  - npm run test -- tests/unit/destinyAstrolabeV3/geometryAndZones.test.ts
+  - npm run build:check
+  - npm run kanban:lint
+OUTPUT ATTESI:
+  - `src/balancing/config/idleVillage/destinyAstrolabeV3/astrolabeV3Config.ts`
+  - `src/ui/idleVillage/components/destinyAstrolabeV3/geometry.ts`
+  - `src/ui/idleVillage/components/destinyAstrolabeV3/zones.ts`
+  - `tests/unit/destinyAstrolabeV3/geometryAndZones.test.ts`
+  - Evidence log in `test-results/astro-v3-f0-<YYYY-MM-DD>.log`
+NOTE:
+  - Quando prendi questo prompt, imposta subito la riga in `src/docs/docs/coordinator/agent_assignments.md` su 'In corso' con data e nome agente.
+  - Al completamento, esegui la safeguard suite e chiudi con: `KANBAN STATUS: ASTRO-V3-F0 – Completato (Evidence: test-results/astro-v3-f0-<YYYY-MM-DD>.log)`.
+  - F0 e' prerequisito di ASTRO-V3-F1.
+
+```
+
+| ASTRO-V3-F1 — Materia: canvas layer, stella, sfida, backdrop, DestinyAstrolabeV3.tsx shell | Completato | ASTRO-V3-F0 | harness | - | 2026-07-14T19:12:56.294Z | - | - | 2026-07-14T19:12:56.294Z | Evidence: test-results/ASTRO-V3-F1-harness-2026-07-14T19-12-56-293Z.json | Prompt: prompts/ASTRO-V3-F1.spec.json |
+AGENT: harness
+OBIETTIVO: Destiny Astrolabe V3 — F1 Materia: canvas layer, stella, sfida, backdrop, shell DestinyAstrolabeV3.tsx e palette token.
+FILE TARGET: src/ui/idleVillage/components/destinyAstrolabeV3/engineV3.ts, src/ui/idleVillage/components/destinyAstrolabeV3/DestinyAstrolabeV3.tsx, src/ui/idleVillage/components/destinyAstrolabeV3/palette.ts
+DIPENDENZE: ASTRO-V3-F0
+INVARIANTI (NON DEROGABILI):
+  - Sei un agente Windsurf: consulta le skill `agent-execution-mandate` e `idle-village-task` prima di iniziare.
+  - `src/docs/docs/plans/destiny_astrolabe_v3_implementation_plan.md` §2, §3, §5, §9 F1.
+  - `.windsurf/rules/00-project-invariants.md` e `.windsurf/rules/10-ui-invariants.md`.
+  - Colori SOLO da token `--skin-*` via `applySkinCssVariables` / `palette.ts`; zero hex hardcoded.
+  - Un solo canvas, engine ne e' proprietario; testo nitido (label, numeri) in layer React.
+  - Budget <16ms/frame; layer caching per materia/velatura/vignetta; Path2D cache per poligoni.
+  - DPR-aware con cap a 2x; resize via ResizeObserver debounced.
+  - i18n namespace `idleVillage` per tutte le stringhe player-facing.
+  - Nessun `ctx.filter` o `shadowBlur` nel hot path.
+OPERAZIONI DA ESEGUIRE:
+  1. Estendi `src/balancing/config/idleVillage/destinyAstrolabeV3/astrolabeV3Config.ts` (creato in F0) con durate timeline: `ring-lock`, `threat-slam`, `agency-burst`, `risk-pour`, `action-trigger`, `the-spin`, `magnetic-snap`, `resolution` e parametri di easing. Mantiene schema Zod.
+  2. Crea `src/ui/idleVillage/components/destinyAstrolabeV3/palette.ts` che legge `--skin-*` token (inclusi `--skin-icon-color`, `--skin-text-primary`, `--skin-surface-base`, `--skin-icon-accent`) a runtime e fornisce fallback.
+  3. Crea `src/ui/idleVillage/components/destinyAstrolabeV3/engineV3.ts` come orchestratore canvas: state machine, draw loop, timeline, caching. Implementa layer caching: materia (`bg.png` + velatura teal in multiply + grana), starfield parallattico, light-leak, vignettatura. Disegna superficie sfida (ossidiana), stella d'avorio (luminanza cappata a 70%), nascita animata `threat-slam` e `agency-burst` con easing ease-out-back. Supporta morph 300ms via `lerpGeometry`.
+  4. Crea `src/ui/idleVillage/components/destinyAstrolabeV3/DestinyAstrolabeV3.tsx` come host React: gestisce canvas ref, overlay, THROW, label, tooltips, render condizionale. Usa `useTranslation` per tutte le stringhe.
+  5. Aggiungi la route/pagina di TestHub in `src/pages/minimal-destiny-astrolabe-v3.tsx` (skeleton F1; verra' arricchita in F4) con stats asimmetriche di default.
+  6. Aggiungi test RTL minimi: `tests/unit/destinyAstrolabeV3/DestinyAstrolabeV3.test.tsx` (render componente, presenza canvas, nessun errore), `tests/unit/destinyAstrolabeV3/engineV3.test.ts` (perf mark presente, caching) e `tests/unit/destinyAstrolabeV3/palette.test.ts` (lettura token).
+OPERAZIONI VIETATE:
+  - Nessuna pallina, corona, voragini, obelischi in questa fase (arrivano in F2/F3).
+  - Nessun gradiente liscio: lo sfondo deve usare `bg.png` + velatura + starfield.
+  - Nessun hardcoded timing o easing: tutto da `astrolabeV3Config.ts`.
+  - Nessun `ctx.filter` o `shadowBlur` nel draw loop.
+ASSUNZIONI:
+  - Esegui direttamente i passi noti senza chiedere conferma.
+  - F0 e' completato e `geometry.ts`/`zones.ts`/`astrolabeV3Config.ts` sono stabili.
+  - Asset `bg.png` e `oil-grain.png` sono in `public/assets/ui/` (se mancano, usa placeholder tinta unita skin-token e segnala).
+SAFEGUARD MANDATORY STEPS:
+  - npm run lint -- src/ui/idleVillage/components/destinyAstrolabeV3/ src/pages/minimal-destiny-astrolabe-v3.tsx tests/unit/destinyAstrolabeV3/
+  - npm run test -- tests/unit/destinyAstrolabeV3/
+  - npm run build:check
+  - npm run kanban:lint
+OUTPUT ATTESI:
+  - `engineV3.ts` con draw loop, caching, timeline
+  - `DestinyAstrolabeV3.tsx` host React
+  - `palette.ts` lettura skin token
+  - `src/pages/minimal-destiny-astrolabe-v3.tsx` (skeleton)
+  - Evidence log `test-results/astro-v3-f1-<YYYY-MM-DD>.log`
+NOTE:
+  - Quando prendi questo prompt, imposta subito la riga in `src/docs/docs/coordinator/agent_assignments.md` su 'In corso' con data e nome agente.
+  - Al completamento, esegui la safeguard suite e chiudi con: `KANBAN STATUS: ASTRO-V3-F1 – Completato (Evidence: test-results/astro-v3-f1-<YYYY-MM-DD>.log)`.
+  - F1 dipende da F0; e' prerequisito di F2.
+
+```
+
+| ASTRO-V3-F2 — Rischio leggibile: corona, voragini, banda crit, obelischi rifatti, skin token --skin-status-wound/death | Completato | ASTRO-V3-F1 | harness | - | 2026-07-14T19:13:33.731Z | - | - | 2026-07-14T19:13:33.731Z | Evidence: test-results/ASTRO-V3-F2-harness-2026-07-14T19-13-33-731Z.json | Prompt: prompts/ASTRO-V3-F2.spec.json |
+AGENT: harness
+OBIETTIVO: Destiny Astrolabe V3 — F2 Rischio leggibile: corona ferita, voragini morte, banda crit, obelischi rifatti, skin token `--skin-status-wound`/`--skin-status-death`.
+FILE TARGET: src/ui/idleVillage/components/destinyAstrolabeV3/engineV3.ts, src/ui/idleVillage/skins/skinConfigRegistry.ts, src/ui/styleLab/tokens/gilded-observatory.css
+DIPENDENZE: ASTRO-V3-F1
+INVARIANTI (NON DEROGABILI):
+  - Sei un agente Windsurf: consulta le skill `agent-execution-mandate` e `idle-village-task` prima di iniziare.
+  - `src/docs/docs/plans/destiny_astrolabe_v3_implementation_plan.md` §2.1, §3, §4, §9 F2.
+  - `.windsurf/rules/00-project-invariants.md` e `.windsurf/rules/10-ui-invariants.md`.
+  - Nessun colore hardcoded; tutti i token semantici (ferita, morte, rovina, mondo, azione, forza) da skin config.
+  - Regola esclusiva canali cromatici: ferita = solo corona (cremisi), morte = solo voragini (viola), rovina = sfida + banda crit (ossidiana/fumo), azione = THROW/pallina, forza = stella.
+  - Nuovi token `--skin-status-wound` e `--skin-status-death` registrati in `skinConfigRegistry.ts` e nel CSS token file.
+  - i18n namespace `idleVillage` per label, tooltip, onboarding.
+  - Nessun `ctx.filter`/`shadowBlur` nel hot path; glow pre-cotto in gradienti/sprite se necessario.
+OPERAZIONI DA ESEGUIRE:
+  1. Aggiungi in `src/ui/idleVillage/skins/skinConfigRegistry.ts` i nuovi token `--skin-status-wound` (cremisi) e `--skin-status-death` (viola spettrale) con fallback. Aggiorna `src/ui/styleLab/tokens/gilded-observatory.css` per includere i nuovi token.
+  2. Aggiungi in `src/balancing/config/idleVillage/destinyAstrolabeV3/astrolabeV3Config.ts` (creato in F0) i parametri per corona/voragini/banda crit: clamp minimo, curve di smoothing, opacita', soglie pulso.
+  3. Estendi `src/ui/idleVillage/components/destinyAstrolabeV3/geometry.ts` (F0) per fornire i dati degli obelischi: posizione per asse su perimetro sfida, forma poligonale asimmetrica, base e placca label. Mantieni purezza funzionale.
+  4. Estendi `src/ui/idleVillage/components/destinyAstrolabeV3/engineV3.ts` per disegnare: corona ferita (banda lungo perimetro stella, spessore ∝ woundPct), voragini morte (dischi nei valli, area ∝ deathPct, lente scura + nucleo violaceo), banda rovina critica (bordo esterno sfida, spessore ∝ critPct), obelischi (cristalli ossidiana affilati, rim bronzo/azurro, label su placche laterali, animazione `threat-slam` in stagger). Implementa dev-overlay percentuale per audit.
+  5. Implementa onboarding contestuale (prime N=3 aperture, persistenza via PersistenceService): micro-tooltip sincronizzati con nascita stella/corona/voragini. Usa `useTranslation` e config per i testi.
+  6. Aggiorna i test: `tests/unit/destinyAstrolabeV3/geometryAndZones.test.ts` per obelischi; `tests/unit/destinyAstrolabeV3/engineV3.test.ts` per token e area.
+OPERAZIONI VIETATE:
+  - Nessuna pallina o simulazione in questa fase (F3).
+  - Nessun testo-percentuale in legenda: le percentuali devono emergere dalle zone.
+  - Nessun rosso extra: il rosso e' solo per ferita; nessun altro elemento deve competere.
+  - Nessun hardcoded shape: forma obelischi da config.
+ASSUNZIONI:
+  - Esegui direttamente i passi noti senza chiedere conferma.
+  - F1 e' completato: engine, canvas, stella, sfida, palette esistono.
+  - Per l'onboarding, usa `PersistenceService.saveData/loadData` con chiave config-driven.
+SAFEGUARD MANDATORY STEPS:
+  - npm run lint -- src/ui/idleVillage/components/destinyAstrolabeV3/ src/ui/idleVillage/skins/ src/ui/styleLab/tokens/ tests/unit/destinyAstrolabeV3/
+  - npm run test -- tests/unit/destinyAstrolabeV3/
+  - npm run build:check
+  - npm run kanban:lint
+OUTPUT ATTESI:
+  - Token `--skin-status-wound` e `--skin-status-death` registrati e in CSS
+  - `engineV3.ts` disegna corona, voragini, banda crit, obelischi
+  - `geometry.ts` esteso con dati obelischi
+  - Onboarding tooltip config-first con PersistenceService
+  - Evidence log `test-results/astro-v3-f2-<YYYY-MM-DD>.log`
+NOTE:
+  - Quando prendi questo prompt, imposta subito la riga in `src/docs/docs/coordinator/agent_assignments.md` su 'In corso' con data e nome agente.
+  - Al completamento, esegui la safeguard suite e chiudi con: `KANBAN STATUS: ASTRO-V3-F2 – Completato (Evidence: test-results/astro-v3-f2-<YYYY-MM-DD>.log)`.
+  - F2 dipende da F1; e' prerequisito di F3.
+
+```
+
+| ASTRO-V3-F3 — La pallina: simulation.ts, near-miss naturale 5%, tre atti, slow-motion, hit-stop | Completato | ASTRO-V3-F2 | Cascade | - | 2026-07-14T19:54:32.000Z | - | - | 2026-07-14T19:54:32.000Z | Evidence: test-results/astro-v3-f3-manual-2026-07-14.log | Prompt: prompts/ASTRO-V3-F3.spec.json |
+AGENT: harness
+OBIETTIVO: Destiny Astrolabe V3 — F3 La pallina: simulation.ts, near-miss naturale 5%, tre atti, slow-motion, hit-stop.
+FILE TARGET: src/ui/idleVillage/components/destinyAstrolabeV3/simulation.ts, src/ui/idleVillage/components/destinyAstrolabeV3/engineV3.ts, src/balancing/config/idleVillage/destinyAstrolabeV3/astrolabeV3Config.ts
+DIPENDENZE: ASTRO-V3-F2
+INVARIANTI (NON DEROGABILI):
+  - Sei un agente Windsurf: consulta le skill `agent-execution-mandate` e `idle-village-task` prima di iniziare.
+  - `src/docs/docs/plans/destiny_astrolabe_v3_implementation_plan.md` §2.3, §6, §9 F3.
+  - `.windsurf/rules/00-project-invariants.md` e `.windsurf/rules/10-ui-invariants.md`.
+  - Risoluzione = D100 pre-calcolato (modello 1A); la traiettoria e' sintetizzata, l'atterraggio e' la prova visiva dell'esito.
+  - Near-miss naturale 5%: la pallina deve terminare in `nearMissBand` esterna alla stella quando il roll e' entro (soglia, soglia+5] su D100.
+  - Tutti i timings (tre atti, slow-motion, hit-stop) da config Zod; nessun magic number.
+  - Nessun `ctx.filter`/`shadowBlur` nel hot path; motion trail via path/gradienti, non blur.
+  - i18n namespace `idleVillage` per stringhe esito.
+OPERAZIONI DA ESEGUIRE:
+  1. Estendi `src/balancing/config/idleVillage/destinyAstrolabeV3/astrolabeV3Config.ts` con parametri della pallina: `theSpinDurationMin`, `theSpinDurationMax`, `slowMoScale`, `slowMoDistance`, `hitStopFreeze`, `bounceCountMin`, `bounceCountMax`, `cameraPushIn`, `trailFadeMs`, RNG seed.
+  2. Crea `src/ui/idleVillage/components/destinyAstrolabeV3/simulation.ts` pura: `pickLandingPoint(esito, zoneMap, rng)` sceglie punto uniforme nella zona coerente (inclusa intersezione star∩crown per successo+ferita). Per near-miss, punteggia punti vicini al bordo stella. `synthesizeTrajectory(landingPoint, rng)` genera lancio, 2-4 rimbalzi con normali reali del poligono, spirale decelerante, homing invisibile negli ultimi N px. Il seed rende deterministico per test.
+  3. Estendi `src/ui/idleVillage/components/destinyAstrolabeV3/engineV3.ts` per riprodurre la traiettoria: tre atti (`lancio`, `caccia`, `verdetto`), slow-motion a soglia, hit-stop (freeze 80-120ms, micro-shake, flash zona), camera push-in 2D. La pallina e' scintilla grande con nucleo bianco-oro, coda cometa fade ~400ms.
+  4. Aggiungi test `tests/unit/destinyAstrolabeV3/simulation.test.ts`: roll 52 su soglia 50 -> atterraggio in `nearMissBand` esterno; successo+ferita -> punto in star∩crown; spin con seed diversi non identici; determinismo con stesso seed; rispetto delle normali del poligono.
+  5. Aggiungi test `tests/unit/destinyAstrolabeV3/engineV3.test.ts` per integrazione engine+simulation: hit-stop trigger, slow-motion, durata totale in range config.
+OPERAZIONI VIETATE:
+  - Nessun ratio forzato di near-miss: deve emergere dalla banda 5%.
+  - Nessun snapping visibile nell'ultimo frame: l'homing e' invisibile.
+  - Nessun percorso identico ripetuto: varia velocita' iniziale/direzione per seed.
+  - Nessun UI di resolution (banner, camera focus) in questa fase (F4).
+ASSUNZIONI:
+  - Esegui direttamente i passi noti senza chiedere conferma.
+  - F2 e' completato: corona, voragini, banda crit, obelischi, palette esistono.
+  - Per i test, `zoneMap` e `geometry.ts` forniscono le zone e il challenge polygon.
+SAFEGUARD MANDATORY STEPS:
+  - npm run lint -- src/ui/idleVillage/components/destinyAstrolabeV3/ src/balancing/config/idleVillage/destinyAstrolabeV3/ tests/unit/destinyAstrolabeV3/
+  - npm run test -- tests/unit/destinyAstrolabeV3/
+  - npm run build:check
+  - npm run kanban:lint
+OUTPUT ATTESI:
+  - `simulation.ts` con `pickLandingPoint` e `synthesizeTrajectory`
+  - `engineV3.ts` integra tre atti, slow-motion, hit-stop, trail pallina
+  - Test deterministici e near-miss 5%
+  - Evidence log `test-results/astro-v3-f3-<YYYY-MM-DD>.log`
+NOTE:
+  - Quando prendi questo prompt, imposta subito la riga in `src/docs/docs/coordinator/agent_assignments.md` su 'In corso' con data e nome agente.
+  - Al completamento, esegui la safeguard suite e chiudi con: `KANBAN STATUS: ASTRO-V3-F3 – Completato (Evidence: test-results/astro-v3-f3-<YYYY-MM-DD>.log)`.
+  - F3 dipende da F2; e' prerequisito di F4.
+
+```
+
+| ASTRO-V3-F4 — Resolution & polish: i18n, modifier API, camera, TestHub V3, prefers-reduced-motion/skip | Completato | ASTRO-V3-F3 | harness | - | 2026-07-14T19:29:54.266Z | - | - | 2026-07-14T19:29:54.266Z | Evidence: test-results/ASTRO-V3-F4-harness-2026-07-14T19-29-54-256Z.json | Prompt: prompts/ASTRO-V3-F4.spec.json |
+AGENT: harness
+OBIETTIVO: Destiny Astrolabe V3 — F4 Resolution & polish: i18n, modifier API, camera focus, TestHub V3, prefers-reduced-motion/skip.
+FILE TARGET: src/ui/idleVillage/components/destinyAstrolabeV3/DestinyAstrolabeV3.tsx, src/ui/idleVillage/components/destinyAstrolabeV3/modifiers.ts, src/pages/minimal-destiny-astrolabe-v3.tsx
+DIPENDENZE: ASTRO-V3-F3
+INVARIANTI (NON DEROGABILI):
+  - Sei un agente Windsurf: consulta le skill `agent-execution-mandate` e `idle-village-task` prima di iniziare.
+  - `src/docs/docs/plans/destiny_astrolabe_v3_implementation_plan.md` §7, §8, §9 F4.
+  - `.windsurf/rules/00-project-invariants.md` e `.windsurf/rules/10-ui-invariants.md`.
+  - Nessuna fog sopra l'arena: camera focus sulla pallina, banner verdetto in fascia alta/bassa, arena sempre visibile.
+  - Tutte le stringhe player-facing in `useTranslation` namespace `idleVillage`.
+  - SKIP e `prefers-reduced-motion` onorati: salto diretto a snap+resolution.
+  - Modifier API placeholder (tipi + eventi, zero UI inventario) in `modifiers.ts`.
+  - TestHub V3 espone tutti i parametri Zod per iterare senza ricompilare.
+  - Nessun `ctx.filter`/`shadowBlur` nel hot path; perf pass finale.
+OPERAZIONI DA ESEGUIRE:
+  1. Crea `src/ui/idleVillage/components/destinyAstrolabeV3/modifiers.ts` con i tipi `AstrolabeModifier` e l'interfaccia `AstrolabeV3Handle`: `previewModifier(m)`, `applyModifier(m)`, `revokeModifier(id)`, `onModifiersChanged(cb)`. Implementa morph GHOST in outline tratteggiato e morph reale 300ms via `lerpGeometry`. Aggiungi pannello dev in TestHub con slider/bottoni fake-item.
+  2. Estendi `src/ui/idleVillage/components/destinyAstrolabeV3/DestinyAstrolabeV3.tsx` per resolution: camera focus 2D sulla pallina, zona catturante illuminata, banner verdetto (success/failure/near-miss/wound/death/crit) in fascia alta o bassa senza coprire l'arena. THROW pulsa. Implementa SKIP e `prefers-reduced-motion`.
+  3. Completa `src/pages/minimal-destiny-astrolabe-v3.tsx` come TestHub V3: controlli per stats (default asimmetriche), difficulty, crit/wound/death percent, near-miss band, spin duration, slow-mo, hit-stop, DPR; pulsanti per i modifier fake; bottone SKIP; toggle reduced-motion.
+  4. Aggiungi le chiavi i18n in `public/locales/en/idleVillage.json` (e aggiorna `i18n.types.ts` se esiste): label esiti, tooltip onboarding, THROW, SKIP, verdetto, stat names. Zero stringhe hardcoded.
+  5. Crea `src/ui/idleVillage/components/destinyAstrolabeV3/astrolabe-v3.css` (o estendi `src/index.css`) per stili overlay skin-token driven (nessun colore hardcoded).
+  6. Perf pass finale: `performance.mark` per fase, verifica <16ms/frame, layer caching, Path2D cache, nessuna allocazione nel draw loop.
+  7. Aggiungi test `tests/unit/destinyAstrolabeV3/DestinyAstrolabeV3.test.tsx` (resolution i18n, reduced-motion, modifier API), `tests/unit/destinyAstrolabeV3/modifiers.test.ts` (preview/apply/revoke), `tests/unit/destinyAstrolabeV3/testHub.test.tsx` (render TestHub).
+OPERAZIONI VIETATE:
+  - Non costruire l'inventory UI: solo placeholder API.
+  - Nessuna fog/modale che copra l'arena in resolution.
+  - Nessun hardcoded string o valore in React.
+  - Nessun salto di stato senza onorare `prefers-reduced-motion`.
+ASSUNZIONI:
+  - Esegui direttamente i passi noti senza chiedere conferma.
+  - F3 e' completato: simulazione, engine, tre atti, hit-stop funzionanti.
+  - I18n e' gia' configurato (`useTranslation`, `idleVillage` namespace).
+SAFEGUARD MANDATORY STEPS:
+  - npm run lint -- src/ui/idleVillage/components/destinyAstrolabeV3/ src/pages/minimal-destiny-astrolabe-v3.tsx public/locales/en/idleVillage.json tests/unit/destinyAstrolabeV3/
+  - npm run i18n:validate
+  - npm run test -- tests/unit/destinyAstrolabeV3/
+  - npm run build:check
+  - npm run kanban:lint
+OUTPUT ATTESI:
+  - `modifiers.ts` con API placeholder e morph
+  - `DestinyAstrolabeV3.tsx` con resolution, i18n, reduced-motion, SKIP
+  - `src/pages/minimal-destiny-astrolabe-v3.tsx` TestHub V3
+  - `public/locales/en/idleVillage.json` aggiornato
+  - `astrolabe-v3.css` skin-token driven
+  - Evidence log `test-results/astro-v3-f4-<YYYY-MM-DD>.log`
+NOTE:
+  - Quando prendi questo prompt, imposta subito la riga in `src/docs/docs/coordinator/agent_assignments.md` su 'In corso' con data e nome agente.
+  - Al completamento, esegui la safeguard suite e chiudi con: `KANBAN STATUS: ASTRO-V3-F4 – Completato (Evidence: test-results/astro-v3-f4-<YYYY-MM-DD>.log)`.
+  - F4 e' l'ultima fase; dipende da F3.
+
+```
+
+| SC-UI-001 — Spell Creator Modern UI Migration | Completato | 2026-07-14 | Cascade | - | 2026-07-14T19:30:00.000Z | - | - | 2026-07-14T19:30:00.000Z | Evidence: test-results/sc-ui-001-spell-creator-migration-2026-07-14.md | Prompt: prompts/SC-UI-001.spec.json |
+| PANELS-STEP-01 — Draggable Panels System Step 01: Empty /design-system page with 5 placeholder sections | Completato | Cascade | - | Create empty /design-system page with 5 placeholder sections (Tokens, Panels, Store, Shell, Integration) | Evidence: test-results/panels-step-01-2026-07-14.log | Prompt: prompts/PANELS-STEP-01.spec.json |
+| PANELS-STEP-02 — Draggable Panels System Step 02: Tokens section with visual swatches from wanderlustTokens.css | Completato | Cascade | - | Implement Tokens section with visual swatches from wanderlustTokens.css | Evidence: test-results/panels-step-02-2026-07-14.log | Prompt: prompts/PANELS-STEP-02.spec.json |
+| PANELS-STEP-03 — Draggable Panels System Step 03: usePanelsStore (Zustand) with panel state management and unit tests | Completato | Cascade | - | Implement usePanelsStore (Zustand) with panel state management and unit tests | Evidence: test-results/panels-step-03-2026-07-14.log | Prompt: prompts/PANELS-STEP-03.spec.json |
+| PANELS-STEP-04 — Draggable Panels System Step 04: PanelShell headless component with dnd-kit drag functionality and tests | Completato | Cascade | - | Implement PanelShell headless component with dnd-kit drag functionality and tests | Evidence: test-results/panels-step-04-2026-07-14.log | Prompt: prompts/PANELS-STEP-04.spec.json |
+| PANELS-STEP-05 — Draggable Panels System Step 05: V9PanelShell wrapper with V9 aesthetics and tests | Completato | Cascade | - | Implement V9PanelShell wrapper with V9 aesthetics and tests | Evidence: test-results/panels-step-05-2026-07-14.log | Prompt: prompts/PANELS-STEP-05.spec.json |
+| PANELS-STEP-06 — Draggable Panels System Step 06: Integration in /design-system with full/strip demo and PersistenceService | Completato | Cascade | - | Integrate panels in /design-system with full/strip demo and PersistenceService | Evidence: test-results/panels-step-06-2026-07-15.log | Prompt: prompts/PANELS-STEP-06.spec.json |
+| PANELS-FIX-COMPONENT-REUSE — Panels System Fix: Component Reuse Invariant Violation in V9PanelShell | Completato | PANELS-STEP-06 | harness | Fix Component Reuse invariant violation in V9PanelShell by replacing inline styles with existing CSS classes from wanderlustTokens.css (.wl-panel, .wl-panel::before, .wl-panel::after). Verified. Safeguards: lint src/ui/designSystem/V9PanelShell.tsx, test src/ui/designSystem, build:check, kanban:lint. Evidence: test-results/panels-fix-component-reuse-<YYYY-MM-DD>.log. DoD: V9PanelShell uses CSS classes instead of inline styles, leverages existing .wl-panel classes, no new CSS files created. | 2026-07-15T09:49:44.985Z | - | - | 2026-07-15T09:49:44.984Z | Plan: coordinator/canonical-systems.md |
+| ADR001-T1 — Freeze E1 (branching QuestEngine) | Assegnato | - | harness | Prepend @experimental FROZEN JSDoc header to src/engine/quest/QuestEngine.ts (D1). Atomic, independent. Safeguards: lint src/engine/quest, build:check. Evidence: test-results/adr001-t1-<date>.log. DoD: header present, no import diff, grep "new QuestEngine(" in src/ yields only tests+docs. | - | - | - | 2026-07-15T09:42:56.181Z | Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T1 |
+| ADR001-T2 — Extract RngService | Assegnato | - | harness | Create src/engine/shared/RngService.ts (LCG + createRng, deriveSeed, rollOutcome), src/engine/shared/rngConfig.ts (Zod WeightedDistribution), tests/unit/engine/shared/RngService.test.ts. Lift LCG from E1, keep E1 importing from new module. Verified. Safeguards: lint src/engine/shared tests/unit/engine/shared, test src/engine/shared, build:check. Evidence: test-results/adr001-t2-<date>.log. DoD: tests green, E1 compiles, no behavioral drift. | - | - | - | 2026-07-15T09:42:56.186Z | Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T2 |
+| ADR001-T3 — Persist masterSeed | Assegnato | - | harness | Add masterSeed field to Zustand store, initialize once at run creation. Add persistence key idleVillage_master_seed_v1. TimeEngine accepts injected rng derived from masterSeed. Create tests/unit/idleVillage/masterSeed.test.ts. Verified. Safeguards: lint+test+build:check on scope. Evidence: test-results/adr001-t3-<date>.log. DoD: save→load→save produces identical seed, telemetry master_seed_initialized fires once per run. | - | - | - | 2026-07-15T09:42:56.191Z | Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T3 |
+| ADR001-T4 — Purge Math.random() in idleVillage engines | Assegnato | - | harness | Replace all Math.random() in JobResolver, QuestPowerEngine, QuestResolver, QuestEngine (E2), TimeEngine (spawnQuestOffersIfNeeded) with injected Rng derived from masterSeed. IDs become deterministic via deriveSeed(masterSeed, 'ids', counter). Verified. Safeguards: lint+test+build:check on src/engine/game/idleVillage. Regression test: grep "Math.random" src/engine/game/idleVillage returns 0. Evidence: test-results/adr001-t4-<date>.log with grep output. DoD: grep clean, no test regression. | - | - | - | 2026-07-15T09:42:56.196Z | Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T4 |
+| ADR001-T5 — Migrate C1 quests to C2 (ActivityDefinition) | Assegnato | - | harness | Add bandit-camp-demo, ancient-ruins, herb-gathering to defaultConfig.ts as ActivityDefinition with tag:'quest', slotBlueprints, resolutionEngineId:'questPower', questPowerRules, varianceCategory. Update minimal-poi.tsx, questDetailKit.tsx, locationDetailKit.tsx, gameplayStore.ts to read from C2. Architectural (touches trusted kits). Lossy translation: per-skill checks collapse to single questDifficulty scalar. Document mapping table in plan changelog. Safeguards: lint+test+build:check on scope, RTL smoke test on /minimal-gameplay with parity screenshots. Evidence: test-results/adr001-t5-<date>.log + before/after screenshots. DoD: /minimal-gameplay parity verified via Playwright suites. Trusted doc updates: poi_detail_trusted.md, COMPONENT_MASTER_INDEX.md rows for questDetailKit/locationDetailKit. | - | - | - | 2026-07-15T09:42:56.201Z | Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T5 |
+| ADR001-T6 — Deprecate C1 (questConfig.ts) and E2 | Assegnato | - | harness | Add @deprecated JSDoc + ADR-001 reference to questConfig.ts and QuestEngine.ts (E2). Keep exports (types still consumed by QuestChainProgressTracker, telemetry). Atomic. Documentation only, no runtime changes. Safeguards: lint+build:check. Evidence: test-results/adr001-t6-<date>.log. DoD: JSDoc present, no new C1 imports after this task. | - | - | - | 2026-07-15T09:42:56.205Z | Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T6 |
+| ADR001-T7 — Complete quality-roll via variance.rewardCategories | Assegnato | - | harness | Replace "always first category" stub in QuestResolver.ts (~lines 77-86) with rollOutcome using varianceCategory from ActivityDefinition. Ensure QualityResult { tier, multiplier } type exists in types.ts. Add tests/unit/idleVillage/QuestResolver.test.ts covering roll distribution with seeded RNG. Verified. Safeguards: lint+test+build:check on scope. Evidence: test-results/adr001-t7-<date>.log. DoD: deterministic outcome given same seed, distribution matches config weights within tolerance. | - | - | - | 2026-07-15T09:42:56.209Z | Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T7 |
+| ADR001-T8 — Documentation & governance closure | Assegnato | - | harness | Create src/docs/docs/adr/ADR-001-quest-engine-reconciliation.md. Update quest_engine_reconciliation_plan.md with per-task changelog. Cross-link ADR-001 in idle_village_plan.md Quest/Job System section. Mark quest_chronicle_plan.md Phase C theater CTA + sandbox wiring as Step 2 post-reconciliation. Mark idle_village_modifiers_plan.md GM-ENG wiring as post-demo. Add ADR-001 entry to MASTER_PLAN.md governance section. Update COMPONENT_MASTER_INDEX.md with touched frozen kit rows. Verified. Safeguards: kanban:lint, markdown lint if configured. Evidence: test-results/adr001-t8-<date>.log. DoD: all links resolve, COMPONENT_MASTER_INDEX.md last-certified dates updated, master plan references ADR. | - | - | - | 2026-07-15T09:42:56.214Z | Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T8 |

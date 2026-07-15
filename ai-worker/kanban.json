@@ -1,0 +1,18 @@
+{
+  "tasks": [
+    {
+      "id": "task_01",
+      "status": "todo",
+      "target_file": "ai-worker/examples/hello.py",
+      "prompt": "Create a Python file with a function greet(name) that returns 'Ciao, {name}!' and a small main block that asks for a name and prints the result. Return only raw source code, no markdown, no explanations.",
+      "complexity": 1
+    },
+    {
+      "id": "task_02",
+      "status": "todo",
+      "target_file": "ai-worker/examples/too-complex.md",
+      "prompt": "Refactor the entire idle village game engine into a single file with zero dependencies. This task is intentionally above the ai-worker complexity threshold and should be skipped.",
+      "complexity": 5
+    }
+  ]
+}

@@ -140,6 +140,16 @@ npm run test:e2e:ui:dev    # Playwright UI/Watch (development only)
 npm run preview:playwright # Build + preview bundle used automatically by Playwright config
 ```
 
+### GitHub Actions Secrets
+
+The project uses GitHub Actions for automated task dispatch and AI worker execution. The following secrets must be configured in your repository settings:
+
+- **OPENROUTER_API_KEY**: API key for OpenRouter (get from [openrouter.ai](https://openrouter.ai))
+- **GEMINI_API_KEY**: API key for Google Gemini (get from [ai.google.dev](https://ai.google.dev))
+- **CEREBRAS_API_KEY**: API key for Cerebras (get from [cloud.cerebras.ai](https://cloud.cerebras.ai))
+
+These secrets are used by the multi-provider AI worker system to distribute load across different LLM providers.
+
 > ℹ️ **Playwright WebServer Hardening** – The test runner now triggers `npm run preview:playwright`, which first executes `npm run build:playwright` (bundle with `--mode playwright`) and then serves it on `http://127.0.0.1:5179` with `--strictPort`. No manual `npm run dev` is needed for e2e tests; just run `npx playwright test` or the scripts above and the hardened web server lifecycle is handled automatically.
 
 ### Component Lab → Minimal Promotion Guard

@@ -1,0 +1,43 @@
+{
+  "id": "GOV-002",
+  "agent": "harness",
+  "objective": "Register the Documentation Governance system in .windsurf/rules/ by creating 40-documentation-governance.md.",
+  "file_targets": [
+    ".windsurf/rules/40-documentation-governance.md"
+  ],
+  "dependencies": [],
+  "invariants": [
+    "`.windsurf/rules/00-project-invariants.md`",
+    "`src/docs/docs/DOCUMENTATION_GOVERNANCE.md`",
+    "`src/docs/docs/plans/systems_governance_alignment_plan.md` §4.A.2"
+  ],
+  "operations": [
+    "Create `.windsurf/rules/40-documentation-governance.md` with `trigger: always_on`; header `# Documentation Governance Invariants`; bullets derived from `DOCUMENTATION_GOVERNANCE.md` and the plan: every trusted/frozen component/contract has a single `*_trusted.md` and an entry in `COMPONENT_MASTER_INDEX.md`; any behavior/visual/runtime/source-of-truth/binding change requires updating the trusted doc, master index, and evidence; no doc closure without runtime verification; no contract duplication in general docs; canonical statuses are `draft`, `candidate`, `trusted`, `frozen`, `deprecated`; kit exceptions are tracked in `src/docs/docs/idle_village/EXCEPTIONS.md`.",
+    "Do not modify `00-project-invariants.md` (handled by GOV-001) or create trusted docs.",
+    "Run `npm run lint -- .windsurf/rules/`, `npm run build:check`, `npm run kanban:lint` and fix any errors."
+  ],
+  "forbidden": [
+    "Do not modify `src/docs/docs/DOCUMENTATION_GOVERNANCE.md`.",
+    "Do not update `COMPONENT_MASTER_INDEX.md` (GOV-006).",
+    "Do not create new trusted docs.",
+    "Do not modify `00-project-invariants.md`."
+  ],
+  "assumptions": [
+    "`DOCUMENTATION_GOVERNANCE.md` already contains the full policy.",
+    "`COMPONENT_MASTER_INDEX.md` exists.",
+    "GOV-001 and GOV-002 are independent and can run in parallel."
+  ],
+  "safeguards": [
+    "npm run lint -- .windsurf/rules/",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "`.windsurf/rules/40-documentation-governance.md`",
+    "`test-results/gov-002-<YYYY-MM-DD>.log`"
+  ],
+  "notes": [
+    "Governance-only task, no runtime code changes.",
+    "Close with `KANBAN STATUS: GOV-002 – Completato (Evidence: test-results/gov-002-<YYYY-MM-DD>.log)`."
+  ]
+}

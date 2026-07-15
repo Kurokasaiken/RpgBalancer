@@ -1,0 +1,42 @@
+{
+  "objective": "Componentizzare il roster con skin materica rimuovendo il duplicato e applicando il sistema di traduzioni",
+  "file_targets": [
+    "src/pages/minimal-roster.tsx",
+    "src/ui/idleVillage/components/MatericRosterComponent.tsx"
+  ],
+  "dependencies": [
+    "src/ui/idleVillage/frozen/kits/rosterKit.tsx",
+    "src/ui/wanderlust-surface/MatericSkinProvider.tsx",
+    "src/localization/i18n.ts",
+    "public/locales/en/idleVillage.json",
+    "public/locales/pseudo/idleVillage.json"
+  ],
+  "operations": [
+    "Creare nuovo componente MatericRosterComponent che incapsula RosterDraggable + MatericSkinProvider",
+    "Rimuovere il primo roster (senza skin materica) dalla pagina minimal-roster",
+    "Sostituire il secondo roster con il nuovo componente componentizzato",
+    "Estrarre tutti i testi hardcoded delle opzioni filtro e applicare useTranslation",
+    "Aggiornare i file di localizzazione con le chiavi per le opzioni filtro",
+    "Mantenere la funzionalità drag & drop e la skin materica",
+    "Applicare JSDoc a tutte le nuove funzioni/interfaces"
+  ],
+  "forbidden": [
+    "Creare file CSS ad-hoc per la skin (usare solo MatericSkinProvider)",
+    "Hardcodare testi user-facing nel componente",
+    "Modificare il frozen kit rosterKit.tsx",
+    "Rimuovere la funzionalità drag & drop esistente"
+  ],
+  "safeguards": [
+    "npm run lint -- src/pages/minimal-roster.tsx src/ui/idleVillage/components/MatericRosterComponent.tsx",
+    "npm run test -- src/ui/idleVillage/components",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": {
+    "component_file": "src/ui/idleVillage/components/MatericRosterComponent.tsx",
+    "updated_page": "src/pages/minimal-roster.tsx (con solo un roster componentizzato)",
+    "localization_keys": "chiavi i18n per opzioni filtro in en/idleVillage.json e pseudo/idleVillage.json",
+    "evidence_log": "test-results/roster-componentization-<YYYY-MM-DD>.log"
+  },
+  "execution_hint": "verified"
+}

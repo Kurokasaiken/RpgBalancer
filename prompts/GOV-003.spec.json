@@ -1,0 +1,47 @@
+{
+  "id": "GOV-003",
+  "agent": "harness",
+  "objective": "Update strategist-mandate and coordinator-mandate skills to reference Frozen Kits and Documentation Governance in auto-registration and research checklists.",
+  "file_targets": [
+    ".windsurf/skills/strategist-mandate/SKILL.md",
+    ".windsurf/skills/coordinator-mandate/SKILL.md"
+  ],
+  "dependencies": [
+    "GOV-001",
+    "GOV-002"
+  ],
+  "invariants": [
+    "`.windsurf/rules/00-project-invariants.md`",
+    "`.windsurf/rules/30-frozen-kits.md`",
+    "`.windsurf/rules/40-documentation-governance.md`",
+    "`src/docs/docs/plans/systems_governance_alignment_plan.md` §4.B"
+  ],
+  "operations": [
+    "In `strategist-mandate/SKILL.md`: add `Frozen Kits` and `Documentation Governance` to the Shared Baseline Maintenance auto-registration examples; add a pre-draft check: if the task touches a trusted/frozen component, require the corresponding `*_trusted.md` and `COMPONENT_MASTER_INDEX.md` update.",
+    "In `coordinator-mandate/SKILL.md`: add `Frozen Kits` and `Documentation Governance` to the Shared Baseline Maintenance examples; add a responsibility: verify every prompt that touches a trusted/frozen component references the trusted doc update; add a check: compare `KIT_REGISTRY` with file targets to avoid bypassing the registry.",
+    "Run `npm run lint -- .windsurf/skills/`, `npm run build:check`, `npm run kanban:lint` and fix any errors."
+  ],
+  "forbidden": [
+    "Do not create new rule files.",
+    "Do not modify `KIT_REGISTRY` or `COMPONENT_MASTER_INDEX.md`.",
+    "Do not touch skills other than strategist and coordinator."
+  ],
+  "assumptions": [
+    "GOV-001 and GOV-002 are completed and the rule files exist.",
+    "Skills are in `.windsurf/skills/<name>/SKILL.md`."
+  ],
+  "safeguards": [
+    "npm run lint -- .windsurf/skills/",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "updated `.windsurf/skills/strategist-mandate/SKILL.md`",
+    "updated `.windsurf/skills/coordinator-mandate/SKILL.md`",
+    "`test-results/gov-003-<YYYY-MM-DD>.log`"
+  ],
+  "notes": [
+    "Governance-only task, no runtime code changes.",
+    "Close with `KANBAN STATUS: GOV-003 – Completato (Evidence: test-results/gov-003-<YYYY-MM-DD>.log)`."
+  ]
+}

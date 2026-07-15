@@ -1,0 +1,57 @@
+{
+  "id": "ASTRO-V3-F0",
+  "agent": "harness",
+  "objective": "Destiny Astrolabe V3 — F0 Fondamenta: geometry.ts, zones.ts, config Zod, test Monte Carlo area e near-miss 5%.",
+  "file_targets": [
+    "src/balancing/config/idleVillage/destinyAstrolabeV3/astrolabeV3Config.ts",
+    "src/ui/idleVillage/components/destinyAstrolabeV3/geometry.ts",
+    "src/ui/idleVillage/components/destinyAstrolabeV3/zones.ts"
+  ],
+  "dependencies": [],
+  "invariants": [
+    "Sei un agente Windsurf: consulta le skill `agent-execution-mandate` e `idle-village-task` prima di iniziare.",
+    "`src/docs/docs/plans/destiny_astrolabe_v3_implementation_plan.md` §2.1, §2.2, §9 F0.",
+    "`.windsurf/rules/00-project-invariants.md` (config-first, Zod, i18n, JSDoc, safeguards, PersistenceService-only).",
+    "`.windsurf/rules/10-ui-invariants.md` (skin tokens, zero hardcoded colors, Gilded Observatory theme, <16ms/frame).",
+    "Nessun colore hardcoded; tutti i valori geometrici (clamps, percentuali, default) vengono da `astrolabeV3Config.ts` validato Zod.",
+    "Near-miss = banda del 5% naturale della distanza normalizzata centro-stella; mai ratio forzato.",
+    "Tutte le funzioni e interfacce nuove devono avere JSDoc.",
+    "Nessun `ctx.filter` o `shadowBlur` nel hot path (F0 e' pura geometria, ma vietare gia' dalle fondamenta)."
+  ],
+  "operations": [
+    "Crea `src/balancing/config/idleVillage/destinyAstrolabeV3/astrolabeV3Config.ts` con schema Zod `AstrolabeV3Config` e default: `nearMissBandPercent` = 5, `minVisualSizePixels` per zone (es. 3px), `testStats` asimmetrici (80/65/50/35/20), `dprCap` = 2, regole espansione 1..5 stat a 5 assi (D5), clamp percentuali. Nessun valore hardcoded.",
+    "Crea `src/ui/idleVillage/components/destinyAstrolabeV3/geometry.ts` con funzione pura `buildGeometry(input: GeometryInput): GeometrySnapshot` e `lerpGeometry(a, b, t)`. Lo snapshot deve esporre: `challengePolygon`, `playerStar`, `woundCrown`, `deathVoids`, `critBand`, `nearMissBand`, `zoneMap`. Usa la logica di espansione 5 assi (D5). Le zone devono avere area ∝ probabilita' con clamp minimo di leggibilita'.",
+    "Crea `src/ui/idleVillage/components/destinyAstrolabeV3/zones.ts` con `classify(point, snapshot)` che ritorna `'star' | 'near-miss' | 'crown' | 'void' | 'ruin' | 'crit'` e `zoneAreas(snapshot, sampleCount?)` che campiona Monte Carlo. `near-miss` e' sottocaso del fallimento: punto fuori dalla stella ma dentro `nearMissBand`.",
+    "Crea `tests/unit/destinyAstrolabeV3/geometryAndZones.test.ts`: test di area (star, crown, voids, crit band) coerenti con probabilita' entro tolleranza; test frequenza near-miss ~5% ±1.5% su campione Monte Carlo; test espansione 5 assi; test `lerpGeometry`; test clamp minimo visivo; test `classify` per ogni zona.",
+    "Riduci il codice esistente: se esistono file `astrolabeV3` legacy, non toccarli; crea la directory `destinyAstrolabeV3/` come da piano."
+  ],
+  "forbidden": [
+    "Nessun codice UI, canvas o React in questa fase.",
+    "Nessun numero magico o colore hardcoded in `geometry.ts`/`zones.ts`.",
+    "Nessun near-miss ratio forzato: deve emergere dalla geometria del 5%.",
+    "Nessuna modifica a componenti `destinyAstrolabe` legacy V1/V2."
+  ],
+  "assumptions": [
+    "Esegui direttamente i passi noti senza chiedere conferma.",
+    "Per i test Monte Carlo usa RNG seedato per determinismo.",
+    "`astrolabeV3Config.ts` e' la single source of truth per costanti geometriche."
+  ],
+  "safeguards": [
+    "npm run lint -- src/balancing/config/idleVillage/destinyAstrolabeV3/ src/ui/idleVillage/components/destinyAstrolabeV3/ tests/unit/destinyAstrolabeV3/",
+    "npm run test -- tests/unit/destinyAstrolabeV3/geometryAndZones.test.ts",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "`src/balancing/config/idleVillage/destinyAstrolabeV3/astrolabeV3Config.ts`",
+    "`src/ui/idleVillage/components/destinyAstrolabeV3/geometry.ts`",
+    "`src/ui/idleVillage/components/destinyAstrolabeV3/zones.ts`",
+    "`tests/unit/destinyAstrolabeV3/geometryAndZones.test.ts`",
+    "Evidence log in `test-results/astro-v3-f0-<YYYY-MM-DD>.log`"
+  ],
+  "notes": [
+    "Quando prendi questo prompt, imposta subito la riga in `src/docs/docs/coordinator/agent_assignments.md` su 'In corso' con data e nome agente.",
+    "Al completamento, esegui la safeguard suite e chiudi con: `KANBAN STATUS: ASTRO-V3-F0 – Completato (Evidence: test-results/astro-v3-f0-<YYYY-MM-DD>.log)`.",
+    "F0 e' prerequisito di ASTRO-V3-F1."
+  ]
+}

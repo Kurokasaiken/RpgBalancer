@@ -213,7 +213,26 @@ No `PersistenceService`, no `useIdleVillageConfig`, no real engine `tick`. The t
 
 ---
 
-## 6. Open Questions
+## 6. Storyboard Page
+
+A scene-by-scene storyboard page is now live and accessible from the main menu (`Storyboard` tab). It visualizes the 55-second teaser as anime-style storyboard panels, with:
+
+- Shot type, camera direction and timing for each scene.
+- SVG rough sketches inside a 16:9 frame.
+- A caption explaining the action.
+- The real component names used.
+- A link to the TestHub page where each component is currently visible.
+
+**Files created/updated:**
+
+- `src/ui/storyboard/StoryboardPage.tsx`
+- `src/pages/storyboard.tsx`
+- `src/shared/navigation/navConfig.ts`
+- `src/App.tsx`
+
+---
+
+## 7. Open Questions
 
 1. Should the `MapPage` be used directly, or is a simplified `TeaserMapScene` with `LocationCard` components preferred?
 2. Should the existing `WanderlustMockupPage` (`/wanderlust`) be replaced or left as a separate design mock?

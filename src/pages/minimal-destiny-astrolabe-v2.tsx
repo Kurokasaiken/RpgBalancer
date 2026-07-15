@@ -66,9 +66,25 @@ export default function MinimalDestinyAstrolabeV2() {
     <SkinSystemProvider>
       <div className="bg-gray-900 text-gray-100" style={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div className="flex items-center justify-between px-6 py-3 flex-shrink-0">
-          <h1 className="text-xl font-bold" style={{ color: '#dfb857', letterSpacing: '0.12em' }}>
-            Destiny Astrolabe · V2 <span style={{ color: '#00e5ff', fontSize: 12, letterSpacing: '0.28em' }}>V9 OBSIDIAN</span>
-          </h1>
+          <div className="flex items-center gap-4">
+            <h1 className="text-xl font-bold" style={{ color: '#dfb857', letterSpacing: '0.12em' }}>
+              Destiny Astrolabe · V2 <span style={{ color: '#00e5ff', fontSize: 12, letterSpacing: '0.28em' }}>V9 OBSIDIAN</span>
+            </h1>
+            <div className="flex gap-2">
+              <a
+                href="/minimal-destiny-astrolabe"
+                className="px-3 py-1 rounded text-sm font-semibold bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors"
+              >
+                V1
+              </a>
+              <a
+                href="/minimal-destiny-astrolabe-v3"
+                className="px-3 py-1 rounded text-sm font-semibold bg-amber-600 text-black hover:bg-amber-500 transition-colors"
+              >
+                V3
+              </a>
+            </div>
+          </div>
           <button
             onClick={rollAgain}
             className="px-5 py-2 rounded-full font-bold transition-colors text-sm"

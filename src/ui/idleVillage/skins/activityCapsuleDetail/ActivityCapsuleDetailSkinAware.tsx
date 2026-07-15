@@ -12,7 +12,8 @@ import { motion, useDragControls } from 'framer-motion';
 import { useHeavyDrag } from '@/ui/wanderlust-surface/useHeavyDrag';
 import { useSkinSystem } from '../../hooks/useSkinSystem';
 import { ResidentSlotRack } from '../../components/ResidentSlotRack';
-import type { ResidentSlotViewModel, SlotBloomState, DropState } from '../../slots/types';
+import type { ResidentSlotViewModel, SlotBloomState, DropState, SlotActivityState } from '../../slots/types';
+import type { VerbVisualVariant } from '@/ui/idleVillage/legacy/VerbCard';
 import type { StatRequirementRow } from '../../utils/statRequirementDisplay';
 import { getStatIconComponent } from '@/ui/shared/statIconUtils';
 
@@ -173,6 +174,13 @@ export interface ActivityCapsuleDetailSkinAwareProps {
   onSlotAssign?: (slotId: string) => void;
   onSlotDetach?: (slotId: string) => void;
 
+  /** Optional slot rack overrides. Allows the page to control how slots are
+   *  rendered and which activity state each slot reports. */
+  getSlotActivityState?: (slotId: string) => SlotActivityState | null;
+  resolveDisplayInfo?: (
+    slot: ResidentSlotViewModel,
+  ) => { icon?: string; label?: string; visualVariant?: VerbVisualVariant };
+
   /**
    * Explicit override for the Start/Embark button's disabled state (e.g. driven
    * by required-slot validation upstream). When omitted, falls back to the
@@ -247,6 +255,8 @@ export function ActivityCapsuleDetailSkinAware({
   onCollect,
   onSlotAssign,
   onSlotDetach,
+  getSlotActivityState: getSlotActivityStateProp,
+  resolveDisplayInfo: resolveDisplayInfoProp,
   startDisabled,
   pillar,
   skinPresetId,
@@ -580,7 +590,7 @@ export function ActivityCapsuleDetailSkinAware({
   });
 
   // Resolve display info for slot icons
-  const resolveDisplayInfo = useCallback((slot: ResidentSlotViewModel) => {
+  const resolveDisplayInfoDefault = useCallback((slot: ResidentSlotViewModel) => {
     const originalSlot = slots.find(s => s.id === slot.id);
     return {
       icon: originalSlot?.initial || '☆',
@@ -589,7 +599,7 @@ export function ActivityCapsuleDetailSkinAware({
   }, [slots]);
 
   // Map slot activity state for ResidentSlotRack
-  const getSlotActivityState = useCallback((slotId: string) => {
+  const getSlotActivityStateDefault = useCallback((slotId: string) => {
     const slot = slots.find(s => s.id === slotId);
     if (!slot) return null;
     // Map ResidentSlotViewModel state to SlotActivityUIState
@@ -822,8 +832,8 @@ export function ActivityCapsuleDetailSkinAware({
                   layout="detail"
                   overflowBehavior="scroll"
                   draggingResidentId={draggingResidentId}
-                  resolveDisplayInfo={resolveDisplayInfo}
-                  getSlotActivityState={getSlotActivityState}
+                  resolveDisplayInfo={resolveDisplayInfoProp ?? resolveDisplayInfoDefault}
+                  getSlotActivityState={getSlotActivityStateProp ?? getSlotActivityStateDefault}
                   onSlotClick={(slotId) => {
                     const slot = slots.find(s => s.id === slotId);
                     if (!slot) return;

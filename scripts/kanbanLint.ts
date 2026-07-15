@@ -114,8 +114,26 @@ function validateRows(rows: KanbanRow[]): string[] {
   return errors;
 }
 
+const DEFAULT_KANBAN_TIMEOUT_MS = 30000;
+
+function parseArgs(argv: string[]): { timeoutMs: number } {
+  const timeoutArg = argv.find((arg) => arg.startsWith('--timeout='));
+  const timeoutMs = timeoutArg
+    ? Number(timeoutArg.split('=')[1]) || DEFAULT_KANBAN_TIMEOUT_MS
+    : DEFAULT_KANBAN_TIMEOUT_MS;
+  return { timeoutMs };
+}
+
 async function main() {
-  const rows = await loadKanbanRows();
+  const { timeoutMs } = parseArgs(process.argv.slice(2));
+
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error(`kanban:lint timed out after ${timeoutMs}ms`)), timeoutMs);
+  });
+
+  const rows = await Promise.race([loadKanbanRows(), timeoutPromise]);
+  clearTimeout(timeoutId);
   if (rows.length === 0) {
     console.warn('Nessuna riga Kanban trovata.');
     return;

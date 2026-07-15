@@ -1,0 +1,97 @@
+{
+  "id": "SC-UI-001",
+  "agent": "harness",
+  "objective": "Crea una nuova pagina di test /spell-creator nel Test Hub come versione modernizzata di src/ui/spells/SpellCreatorNew.tsx, preservando logica e comportamento, applicando il tema Arcane Tech Glass, il sistema di skin, l'i18n e le project invariants.",
+  "file_targets": [
+    "src/ui/spells/SpellCreatorTestPage.tsx",
+    "src/pages/spell-creator.tsx",
+    "src/ui/spells/theme/arcane-tech-glass.css",
+    "src/ui/spells/components/SpellInfoForm.tsx",
+    "src/ui/spells/components/SpellIdentityCard.tsx",
+    "src/ui/spells/components/StatsGrid.tsx",
+    "src/ui/spells/components/ActionsBar.tsx",
+    "src/ui/spells/components/EnhancedStatSlider/index.tsx",
+    "src/ui/spells/components/EnhancedStatSlider/styles.module.css",
+    "src/ui/spells/components/EnhancedStatSlider/StatSliderHeader.tsx",
+    "src/ui/spells/components/EnhancedStatSlider/StatSliderTick.tsx",
+    "src/ui/spells/components/EnhancedStatSlider/StatSliderTrack.tsx",
+    "src/ui/spells/components/EnhancedStatSlider/useStatSlider.ts",
+    "src/ui/spells/components/EnhancedStatSlider/types.ts",
+    "src/ui/idleVillage/TestHub.tsx",
+    "src/App.tsx",
+    "src/docs/docs/idle_village/test_hub_pages.md",
+    "public/locales/en/spell.json",
+    "public/locales/pseudo/spell.json"
+  ],
+  "dependencies": [],
+  "invariants": [
+    "Non modificare src/ui/spells/SpellCreatorNew.tsx ne src/ui/spells/SpellCreatorNewMockup.tsx.",
+    "Non modificare alcun file in src/ui/spell/components/*.",
+    "Non modificare src/ui/atoms/GlassCard.tsx ne src/ui/atoms/GlassButton.tsx: usa gli atomi esistenti passando className.",
+    "Tutti i colori e i valori visivi devono essere definiti in src/ui/spells/theme/arcane-tech-glass.css come variabili CSS; nessun colore hardcoded in JSX/TSX.",
+    "Usa useSkinPreferences per legare la pagina al sistema di skin.",
+    "Tutte le stringhe user-facing usano useTranslation('spell') e il namespace spell.",
+    "Nessuna persistenza sincrona: sostituisci i localStorage.setItem diretti in toggleCollapse con saveData di PersistenceService.",
+    "La logica di business, i calcoli, gli handler e l'ordine dei componenti di SpellCreatorNew devono rimanere invariati.",
+    "JSDoc per ogni nuova funzione e componente."
+  ],
+  "operations": [
+    "Crea src/ui/spells/theme/arcane-tech-glass.css con palette Arcane Tech Glass (variabili --spell-*).",
+    "Copia i componenti da src/ui/spell/components/ in src/ui/spells/components/ (SpellInfoForm, SpellIdentityCard, StatsGrid, ActionsBar, EnhancedStatSlider/) mantenendo la logica e applicando i18n + variabili CSS.",
+    "Crea src/ui/spells/SpellCreatorTestPage.tsx copiando il corpo di SpellCreatorNew.tsx, importando i componenti locali, sostituendo classi CSS e localStorage.",
+    "Crea src/pages/spell-creator.tsx come thin wrapper.",
+    "Registra la route /spell-creator in src/App.tsx.",
+    "Aggiungi la pagina a EXTRA_PAGES in src/ui/idleVillage/TestHub.tsx.",
+    "Aggiorna src/docs/docs/idle_village/test_hub_pages.md.",
+    "Aggiorna public/locales/en/spell.json e public/locales/pseudo/spell.json, esegui i18n:extract, i18n:validate e i18n:build-pseudo.",
+    "Aggiungi un test minimo per la nuova pagina.",
+    "Esegui la safeguard suite e salva test-results/SC-UI-001-<YYYY-MM-DD>.log."
+  ],
+  "forbidden": [
+    "Modificare SpellCreatorNew.tsx, SpellCreatorNewMockup.tsx o src/ui/spell/components/*.",
+    "Modificare src/ui/atoms/GlassCard.tsx o src/ui/atoms/GlassButton.tsx.",
+    "Creare nuove varianti permanenti di GlassCard/GlassButton.",
+    "Usare localStorage/sessionStorage diretti.",
+    "Hardcodare colori, font, spaziature o ombre in componenti TSX/TS.",
+    "Usare classi CSS observatory-* deprecate.",
+    "Aggiungere dipendenze esterne."
+  ],
+  "assumptions": [
+    "useDefaultStorage e useSpellConfig si possono riutilizzare.",
+    "Il namespace spell e gia registrato in src/localization/i18n.ts.",
+    "BUFFABLE_STATS, SPELL_CORE_STATS, SPELL_ADVANCED_STATS, SPELL_OPTIONAL_STATS e le funzioni di spellBalancingConfig non cambiano.",
+    "L'agente puo copiare file esistenti per modificarne solo presentazione e stringhe."
+  ],
+  "safeguards": [
+    "npm run lint -- src/ui/spells",
+    "npm run lint -- src/pages/spell-creator.tsx",
+    "npm run lint -- src/ui/idleVillage/TestHub.tsx",
+    "npm run lint -- src/App.tsx",
+    "npm run test -- tests/unit/spell",
+    "npm run i18n:validate",
+    "npm run i18n:build-pseudo",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "src/ui/spells/SpellCreatorTestPage.tsx",
+    "src/pages/spell-creator.tsx",
+    "src/ui/spells/theme/arcane-tech-glass.css",
+    "src/ui/spells/components/SpellInfoForm.tsx",
+    "src/ui/spells/components/SpellIdentityCard.tsx",
+    "src/ui/spells/components/StatsGrid.tsx",
+    "src/ui/spells/components/ActionsBar.tsx",
+    "src/ui/spells/components/EnhancedStatSlider/*",
+    "src/ui/idleVillage/TestHub.tsx",
+    "src/App.tsx",
+    "src/docs/docs/idle_village/test_hub_pages.md",
+    "public/locales/en/spell.json",
+    "public/locales/pseudo/spell.json",
+    "test-results/SC-UI-001-<YYYY-MM-DD>.log"
+  ],
+  "notes": [
+    "Quando prendi questo prompt, imposta la riga in src/docs/docs/coordinator/agent_assignments.md su 'In corso' con data e nome agente.",
+    "Al completamento, esegui la safeguard suite e chiudi con: KANBAN STATUS: SC-UI-001 – Completato (Evidence: test-results/SC-UI-001-<YYYY-MM-DD>.log).",
+    "Il Coordinator deve assegnare questo prompt a un agente UI/runtime e verificare che SpellCreatorNew.tsx originale non sia modificato."
+  ]
+}

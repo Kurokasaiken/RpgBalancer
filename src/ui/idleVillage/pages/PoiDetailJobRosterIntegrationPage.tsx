@@ -40,7 +40,7 @@ import type {
 } from '@/ui/idleVillage/skins/activityCapsuleDetail/ActivityCapsuleDetailSkinAware';
 import { useResidentSlotController } from '@/ui/idleVillage/slots/useResidentSlotController';
 import { buildStatRequirementRows } from '@/ui/idleVillage/utils/statRequirementDisplay';
-import type { ResidentSlotBlueprint } from '@/ui/idleVillage/slots/types';
+import type { ResidentSlotBlueprint, ResidentSlotViewModel, SlotActivityState } from '@/ui/idleVillage/slots/types';
 import { DEFAULT_IDLE_VILLAGE_CONFIG } from '@/balancing/config/idleVillage/defaultConfig';
 import type { ActivityDefinition, ActivityMaxSlots } from '@/balancing/config/idleVillage/types';
 import { evaluateStatRequirement } from '@/engine/game/idleVillage/statMatching';
@@ -51,6 +51,7 @@ import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import { formatResidentLabel } from '@/ui/idleVillage/residentName';
 import { getResidentPortraitUrl } from '@/engine/game/idleVillage/residentVisualResolver';
 import { StyleLabSurface } from '@/ui/styleLab/StyleLabSurface';
+import { getDefaultPoiColors } from '@/balancing/config/idleVillage/poiColorConfig';
 
 /** Attività di default: raccolta di legname stabile (job). */
 const DEFAULT_ACTIVITY = DEFAULT_IDLE_VILLAGE_CONFIG.activities.job_wood_gathering_stable;
@@ -139,15 +140,8 @@ function buildSlotBlueprints(activity: ActivityDefinition): ResidentSlotBlueprin
   return meta?.slotBlueprints;
 }
 
-// Color mapping from poiAmberSkinConfig for wilderness pillar
-const WILDERNESS_COLORS = {
-  coronaCore: { r: 210, g: 138, b: 28 },
-  coronaGlow: { r: 180, g: 105, b: 10 },
-  rimColors: ['#fce890', '#c09030', '#200e02'] as [string, string, string],
-  stoneColors: ['#1e1608', '#030202'] as [string, string],
-  stoneAmbient: 'rgba(255,220,120,.22)',
-  pinColor: 'rgba(205,190,148,.72)',
-};
+// Config-first POI color palette (replaces hardcoded WILDERNESS_COLORS).
+const DEFAULT_POI_COLORS = getDefaultPoiColors('wilderness');
 
 interface DroppablePoiProps {
   dropId: string;
@@ -204,12 +198,12 @@ function DroppablePoi({
       <GenericPoiSkin
         icon={icon}
         progress={progress}
-        coronaCore={WILDERNESS_COLORS.coronaCore}
-        coronaGlow={WILDERNESS_COLORS.coronaGlow}
-        rimColors={WILDERNESS_COLORS.rimColors}
-        stoneColors={WILDERNESS_COLORS.stoneColors}
-        stoneAmbient={WILDERNESS_COLORS.stoneAmbient}
-        pinColor={WILDERNESS_COLORS.pinColor}
+        coronaCore={DEFAULT_POI_COLORS.coronaCore}
+        coronaGlow={DEFAULT_POI_COLORS.coronaGlow}
+        rimColors={DEFAULT_POI_COLORS.rimColors}
+        stoneColors={DEFAULT_POI_COLORS.stoneColors}
+        stoneAmbient={DEFAULT_POI_COLORS.stoneAmbient}
+        pinColor={DEFAULT_POI_COLORS.pinColor}
         pillar="wilderness"
         size={200}
         enableHover
@@ -525,6 +519,32 @@ const PoiDetailJobRosterIntegrationPage: FC = () => {
     });
   }, [controller.slots, activityProgress]);
 
+  // Activity state + display info for the ResidentSlotRack rendered inside
+  // ActivityCapsuleDetailSkinAware. Empty slots show the POI icon; assigned
+  // slots show the resident's first initial.
+  const getDetailSlotActivityState = useCallback(
+    (slotId: string): SlotActivityState | null => {
+      const slot = detailSlots.find((s) => s.id === slotId);
+      if (!slot) return null;
+      const isAssigned = !!slot.residentId;
+      return {
+        state: isAssigned ? 'active' : 'idle',
+        progress: isAssigned ? activityProgress : 0,
+        remainingSeconds: isAssigned ? remaining : 0,
+        isLockedByPhase: false,
+      };
+    },
+    [detailSlots, activityProgress, remaining],
+  );
+
+  const resolveDetailSlotDisplayInfo = useCallback(
+    (slot: ResidentSlotViewModel) => ({
+      icon: slot.assignedResident?.displayName ? slot.assignedResident.displayName.charAt(0) : activityIcon,
+      label: slot.label,
+    }),
+    [activityIcon],
+  );
+
   // Real requirements from the activity config; name/icon/color per stat are
   // resolved from the Balancer stat catalog inside the builder.
   const requirementRows = useMemo(
@@ -569,18 +589,24 @@ const PoiDetailJobRosterIntegrationPage: FC = () => {
       ariaLabel: t('idleVillage:poiDetail.ariaLabel', { defaultValue: 'POI Detail: {label}', label: activity.label }),
       ariaLive: 'polite' as const,
       enableDevTools: true,
-      onStart: () => {
-        addTelemetry('start', t('idleVillage:poiDetail.telemetry.started', { defaultValue: 'Activity {label} started', label: activity.label }));
-        trackTelemetryEvent('poi_detail_job_roster_start', { activityId: activity.id });
-      },
-      onCancel: () => {
-        addTelemetry('done', t('idleVillage:poiDetail.telemetry.cancelled', { defaultValue: 'Activity {label} cancelled', label: activity.label }));
-        trackTelemetryEvent('poi_detail_job_roster_cancel', { activityId: activity.id });
-      },
-      onCollect: () => {
-        addTelemetry('done', t('idleVillage:poiDetail.telemetry.collected', { defaultValue: 'Reward {label} collected', label: activity.label }));
-        trackTelemetryEvent('poi_detail_job_roster_collect', { activityId: activity.id });
-      },
+      ...(activityKind === 'quest'
+        ? {
+            onStart: () => {
+              addTelemetry('start', t('idleVillage:poiDetail.telemetry.started', { defaultValue: 'Activity {label} started', label: activity.label }));
+              trackTelemetryEvent('poi_detail_job_roster_start', { activityId: activity.id });
+            },
+            onCancel: () => {
+              addTelemetry('done', t('idleVillage:poiDetail.telemetry.cancelled', { defaultValue: 'Activity {label} cancelled', label: activity.label }));
+              trackTelemetryEvent('poi_detail_job_roster_cancel', { activityId: activity.id });
+            },
+            onCollect: () => {
+              addTelemetry('done', t('idleVillage:poiDetail.telemetry.collected', { defaultValue: 'Reward {label} collected', label: activity.label }));
+              trackTelemetryEvent('poi_detail_job_roster_collect', { activityId: activity.id });
+            },
+          }
+        : {}),
+      getSlotActivityState: getDetailSlotActivityState,
+      resolveDisplayInfo: resolveDetailSlotDisplayInfo,
       onSlotDetach: handleSlotClear,
       onSlotAssign: () => {
         // No-op: assignments are driven by roster drag/click.
@@ -604,6 +630,8 @@ const PoiDetailJobRosterIntegrationPage: FC = () => {
       addTelemetry,
       handleSlotClear,
       activityIcon,
+      getDetailSlotActivityState,
+      resolveDetailSlotDisplayInfo,
     ],
   );
 
@@ -633,12 +661,26 @@ const PoiDetailJobRosterIntegrationPage: FC = () => {
                 </p>
               </header>
 
-              <div className="flex flex-wrap items-center gap-4 rounded-lg border border-slate-700/50 bg-slate-900/30 p-4">
+              <div
+                className="flex flex-wrap items-center gap-4 p-4"
+                style={{
+                  borderRadius: 'var(--radius-md, 3px)',
+                  border: '1px solid var(--panel-border, rgba(255,255,255,0.055))',
+                  background: 'var(--panel-bg, rgba(9,8,6,0.94))',
+                  boxShadow: 'var(--shadow-deep, 0 24px 64px rgba(0,0,0,0.98), 0 6px 18px rgba(0,0,0,1))',
+                }}
+              >
                 <label className="text-xs font-semibold uppercase tracking-wider text-amber-200">
                   {t('idleVillage:testRoster.poiDetailPage.activityLabel')}
                 </label>
                 <select
-                  className="rounded border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-ivory"
+                  className="px-3 py-1.5 text-sm"
+                  style={{
+                    borderRadius: 'var(--radius-sm, 2px)',
+                    border: '1px solid var(--card-border, rgba(255,255,255,0.04))',
+                    background: 'var(--card-bg, rgba(13,11,8,0.96))',
+                    color: 'var(--t1, #f0e8d5)',
+                  }}
                   value={selectedActivityId}
                   onChange={(e) => {
                     setSelectedActivityId(e.target.value);

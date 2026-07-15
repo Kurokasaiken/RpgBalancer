@@ -1,0 +1,292 @@
+{
+  "promptId": "POI-DETAIL-VISUAL-IMPROVEMENTS",
+  "title": "POI Detail Visual Improvements - Material Consistency & Drag Fix",
+  "description": "Fix POI detail panel drag behavior and apply material-consistent visual improvements to roster frame, stat bars, portraits, and filter controls",
+  "agent": "Idle Village Runtime Integration Specialist",
+  "priority": "high",
+  "estimatedTime": "90-120 minutes",
+  "dependencies": [],
+  "objectives": [
+    "Fix POI detail panel drag behavior to match quest detail behavior",
+    "Apply bronze/dark border treatment to roster frame matching right panel",
+    "Transform HP/Stamina bars from smooth pills to carved/engraved stone channels",
+    "Convert portrait frames from glowing sci-fi circles to bronze/brass cameo frames",
+    "Upgrade filter controls to material/physical styling with darker backgrounds and metal studs"
+  ],
+  "guardrails": [
+    "Config-first design: all visual tokens from skin config modules",
+    "Skin system compliance: use existing skin registry and presets",
+    "No hardcoded values: read all colors, borders, shadows from config",
+    "I18n compliance: all user-facing strings through useTranslation",
+    "Drag system: use existing dnd-kit infrastructure, no custom drag logic",
+    "Performance: maintain <16ms/frame with GPU-only animations"
+  ],
+  "invariants": [
+    "All persistence via PersistenceService (no direct localStorage)",
+    "Config-first architecture with Zod validation",
+    "Skin system via skinConfigRegistry (no standalone CSS files)",
+    "I18n via react-i18next (ns: common, idleVillage)",
+    "JSDoc on all new functions/interfaces",
+    "Node version from .nvmrc (20.19.6)",
+    "Safeguards: lint, test, build:check, kanban:lint before completion"
+  ],
+  "deliverables": [
+    {
+      "item": "Fix POI detail panel drag behavior",
+      "description": "Ensure POI detail panel drags consistently like quest detail, with proper positioning and slot rack behavior",
+      "files": [
+        "src/ui/idleVillage/pages/PoiDetailJobRosterIntegrationPage.tsx"
+      ],
+      "acceptanceCriteria": [
+        "POI detail panel drag positioning matches quest detail behavior",
+        "Slot rack inside detail panel behaves identically to quest detail",
+        "No visual glitches or offset issues during drag operations"
+      ]
+    },
+    {
+      "item": "Roster frame material consistency",
+      "description": "Apply bronze/dark border treatment to roster frame matching right panel's visual language",
+      "files": [
+        "src/ui/idleVillage/pages/PoiDetailJobRosterIntegrationPage.tsx",
+        "src/ui/idleVillage/skins/rosterSkinConfig.ts"
+      ],
+      "acceptanceCriteria": [
+        "Roster frame has bronze/dark border instead of transparent rounded plastic",
+        "Border uses same visual language as right panel (bronze/dark with slight chamfer)",
+        "Border radius reduced from soft smartphone rounding to slight chamfer (2-3px)",
+        "Background maintains transparency but with proper material depth"
+      ]
+    },
+    {
+      "item": "HP/Stamina bar carved stone treatment",
+      "description": "Transform stat bars from smooth plastic pills to carved/engraved stone channels with strong inset shadows",
+      "files": [
+        "src/ui/wanderlust-surface/layout/WanderlustStatBar.tsx",
+        "src/ui/wanderlust-surface/matericSkinConfig.ts"
+      ],
+      "acceptanceCriteria": [
+        "Border radius reduced from pill shape to slight chamfer (2px or sharp corners)",
+        "Track background has strong inset shadow (box-shadow: inset 0 2px 4px rgba(0,0,0,0.6))",
+        "Visual appearance matches carved stone channel in slate surface",
+        "HP fill appears as green linfa in carved channel",
+        "Stamina fill appears as gold powder in carved channel",
+        "Config tokens control all shadow and radius values"
+      ]
+    },
+    {
+      "item": "Portrait cameo frame conversion",
+      "description": "Convert portrait frames from glowing sci-fi circles to bronze/brass cameo frames matching astrolabe pins",
+      "files": [
+        "src/ui/wanderlust-surface/layout/WanderlustPortrait.tsx",
+        "src/ui/wanderlust-surface/matericSkinConfig.ts"
+      ],
+      "acceptanceCriteria": [
+        "Portrait frame uses bronze/brass material instead of glowing sci-fi ring",
+        "Frame matches visual language of astrolabe pins and gold buttons",
+        "Portrait appears as cameo set in physical metal medallion",
+        "Glow effect reduced/removed to avoid sci-fi appearance",
+        "Config tokens control frame material and glow intensity"
+      ]
+    },
+    {
+      "item": "Filter controls material upgrade",
+      "description": "Upgrade filter controls (TUTTI dropdown, sword/eye buttons) to material/physical styling",
+      "files": [
+        "src/ui/idleVillage/components/ResidentRosterPanel.tsx",
+        "src/ui/idleVillage/skins/rosterSkinConfig.ts"
+      ],
+      "acceptanceCriteria": [
+        "TUTTI dropdown has darker background and bronze border",
+        "Sword and eye filter buttons appear as metal studs/pressed buttons",
+        "Filter controls have physical depth (inset shadows, material borders)",
+        "Visual language matches other material controls in the interface",
+        "Config tokens control all filter control styling"
+      ]
+    }
+  ],
+  "implementationPlan": [
+    {
+      "step": 1,
+      "title": "Analyze drag behavior discrepancy",
+      "description": "Compare POI detail drag behavior with quest detail to identify root cause of slot rack behavior difference",
+      "actions": [
+        "Review PoiDetailJobRosterIntegrationPage.tsx drag handlers",
+        "Compare with PoiDetailQuestRosterIntegrationPage.tsx implementation",
+        "Identify differences in positioning logic and slot rack integration",
+        "Document root cause of drag behavior inconsistency"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "Fix POI detail drag behavior",
+      "description": "Apply quest detail drag behavior patterns to POI detail for consistency",
+      "actions": [
+        "Align positioning logic with quest detail implementation",
+        "Ensure slot rack receives proper drag state propagation",
+        "Verify drop validation and assignment flow matches quest detail",
+        "Test drag operations end-to-end"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "Create roster frame skin config",
+      "description": "Add config tokens for roster frame material treatment",
+      "actions": [
+        "Extend rosterSkinConfig.ts with frame border tokens",
+        "Add bronze/dark border color variables",
+        "Add border radius and chamfer tokens",
+        "Add background depth and shadow tokens"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "Apply roster frame styling",
+      "description": "Update roster panel to use new frame styling tokens",
+      "actions": [
+        "Replace rounded-lg border with config-driven frame styling",
+        "Apply bronze/dark border from skin config",
+        "Reduce border radius to slight chamfer",
+        "Maintain transparency while adding material depth"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "Update stat bar carved treatment",
+      "description": "Modify WanderlustStatBar to use carved stone channel styling",
+      "actions": [
+        "Update matericSkinConfig.ts with carved track tokens",
+        "Reduce border radius to 2px or sharp corners",
+        "Add strong inset shadow to track background",
+        "Ensure fill colors appear as linfa/powder in carved channel",
+        "Maintain specular highlight for liquid gem effect"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "Convert portrait to cameo frame",
+      "description": "Update WanderlustPortrait to use bronze/brass cameo frame styling",
+      "actions": [
+        "Update matericSkinConfig.ts with cameo frame tokens",
+        "Replace glowing sci-fi border with bronze/brass material",
+        "Match frame visual language to astrolabe pins",
+        "Reduce or remove sci-fi glow effect",
+        "Ensure portrait appears as physical medallion"
+      ]
+    },
+    {
+      "step": 7,
+      "title": "Upgrade filter controls styling",
+      "description": "Apply material styling to filter dropdown and buttons",
+      "actions": [
+        "Update rosterSkinConfig.ts with filter control tokens",
+        "Apply darker background to TUTTI dropdown",
+        "Add bronze border to dropdown",
+        "Style sword/eye buttons as metal studs/pressed buttons",
+        "Add inset shadows and material borders for physical depth"
+      ]
+    },
+    {
+      "step": 8,
+      "title": "Verify visual consistency",
+      "description": "Ensure all improvements maintain visual consistency with right panel",
+      "actions": [
+        "Compare roster frame with right panel border treatment",
+        "Verify stat bars match carved stone aesthetic",
+        "Check portrait frames match astrolabe visual language",
+        "Confirm filter controls match other material controls",
+        "Test all improvements in both light and dark contexts"
+      ]
+    },
+    {
+      "step": 9,
+      "title": "Test drag and drop functionality",
+      "description": "Verify drag behavior fixes don't break existing functionality",
+      "actions": [
+        "Test resident drag from roster to POI detail",
+        "Test resident drag from roster to detail slot rack",
+        "Test click assignment functionality",
+        "Test slot clear functionality",
+        "Verify flight animations work correctly"
+      ]
+    },
+    {
+      "step": 10,
+      "title": "Run safeguards",
+      "description": "Execute full safeguard suite before completion",
+      "actions": [
+        "Run npm run lint -- src/ui/idleVillage/pages/PoiDetailJobRosterIntegrationPage.tsx",
+        "Run npm run lint -- src/ui/wanderlust-surface/layout/WanderlustStatBar.tsx",
+        "Run npm run lint -- src/ui/wanderlust-surface/layout/WanderlustPortrait.tsx",
+        "Run npm run lint -- src/ui/idleVillage/components/ResidentRosterPanel.tsx",
+        "Run npm run build:check",
+        "Run npm run kanban:lint",
+        "Log all results to test-results/poi-detail-visual-improvements-<date>.log"
+      ]
+    }
+  ],
+  "testingStrategy": [
+    {
+      "type": "manual",
+      "description": "Visual regression testing",
+      "cases": [
+        "Verify roster frame matches right panel border treatment",
+        "Verify stat bars appear as carved stone channels",
+        "Verify portrait frames appear as bronze/brass cameos",
+        "Verify filter controls appear as material physical controls"
+      ]
+    },
+    {
+      "type": "manual",
+      "description": "Drag behavior testing",
+      "cases": [
+        "Test POI detail panel drag positioning",
+        "Test slot rack behavior during drag operations",
+        "Compare drag behavior with quest detail for consistency"
+      ]
+    },
+    {
+      "type": "manual",
+      "description": "Functionality testing",
+      "cases": [
+        "Test resident drag from roster to POI",
+        "Test resident drag from roster to detail slots",
+        "Test click assignment",
+        "Test slot clear and return animation"
+      ]
+    }
+  ],
+  "documentationUpdates": [
+    {
+      "file": "src/docs/docs/plans/idle_village_plan.md",
+      "section": "POI Detail Integration",
+      "description": "Document visual improvements and drag behavior fixes"
+    },
+    {
+      "file": "CHANGELOG.md",
+      "entry": "POI detail visual improvements: material consistency, drag behavior fix, carved stat bars, cameo portraits, material filter controls"
+    }
+  ],
+  "evidenceLogging": {
+    "logFile": "test-results/poi-detail-visual-improvements-<YYYY-MM-DD>.log",
+    "requiredOutputs": [
+      "npm run lint output",
+      "npm run build:check output",
+      "npm run kanban:lint output",
+      "Manual testing results",
+      "Visual comparison screenshots"
+    ]
+  },
+  "kanbanUpdate": {
+    "file": "src/docs/docs/coordinator/agent_assignments.md",
+    "status": "Completato",
+    "evidenceField": "Evidence: test-results/poi-detail-visual-improvements-<YYYY-MM-DD>.log"
+  },
+  "notes": [
+    "Preserve Requirements section (Strength/Endurance) - user noted it's perfect",
+    "Preserve typography and spacing - user noted they're perfect",
+    "Use config-first approach for all visual tokens",
+    "Maintain skin system compliance",
+    "Ensure drag behavior matches quest detail exactly",
+    "All improvements must maintain <16ms/frame performance"
+  ]
+}

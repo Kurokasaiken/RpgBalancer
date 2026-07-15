@@ -1,0 +1,38 @@
+{
+  "objective": "Apply Gilded Observatory material consistency to POI Job Detail Roster Integration page - unify roster frame, HP/Stamina bars, portrait rings, and filter buttons with bronze/brass styling matching the right card panel",
+  "file_targets": [
+    "src/ui/idleVillage/pages/PoiDetailJobRosterIntegrationPage.tsx",
+    "src/ui/idleVillage/components/DragTestContainer.tsx",
+    "src/ui/idleVillage/components/PgCard.tsx",
+    "src/ui/styleLab/tokens/gilded-observatory.css"
+  ],
+  "dependencies": [
+    "Style Lab token system (gilded-observatory.css)",
+    "Wanderlust skin tokens (wanderlustTokens.css)",
+    "Skin system (useSkinPreferences, skinConfigRegistry)"
+  ],
+  "operations": [
+    "Replace roster frame container styling from 'rounded-lg border border-slate-700/50 bg-slate-900/30' to bronze/brass border with sharp or slightly beveled corners matching StyleLabSurface panel variant",
+    "Modify HP and Stamina bars in PgCardStatBar from 'rounded-full' pill-shaped tubes to recessed stone-engraved grooves with minimal border-radius (2px or sharp corners) and strong inset shadow (box-shadow: inset 0 2px 4px rgba(0,0,0,0.6)) to simulate grooves in slate",
+    "Replace glowing portrait rings with bronze/brass metal rings consistent with other golden UI elements, making portraits appear as cameos in metal medals",
+    "Restyle top-right filter dropdown and round icon buttons with darker background, bronze border, and metal stud pressed appearance",
+    "Ensure all styling uses config-first Style Lab tokens from gilded-observatory.css and wanderlustTokens.css (e.g., --panel-border, --card-border, --slot-border, --iron-inset, --shadow-deep)",
+    "Preserve the Requirements section and typography on the right card - do not modify these elements as they are already perfect"
+  ],
+  "forbidden": [
+    "Do not modify the Requirements section or typography on the right card panel",
+    "Do not introduce hardcoded colors or shadows - must use Style Lab tokens",
+    "Do not break existing drag-and-drop functionality",
+    "Do not modify the slot rack behavior inside the detail - this is a separate concern"
+  ],
+  "safeguards": [
+    "npm run lint -- src/ui/idleVillage/pages/PoiDetailJobRosterIntegrationPage.tsx src/ui/idleVillage/components/DragTestContainer.tsx src/ui/idleVillage/components/PgCard.tsx",
+    "npm run test -- src/ui/idleVillage/components/__tests__/DragTestContainer.test.tsx",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "Visual unification complete - roster frame, HP/Stamina bars, portrait rings, and filter buttons all use Gilded Observatory bronze/brass material language with config-first tokens"
+  ],
+  "execution_hint": "verified"
+}

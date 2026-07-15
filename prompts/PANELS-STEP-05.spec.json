@@ -1,0 +1,59 @@
+{
+  "id": "PANELS-STEP-05",
+  "agent": "harness",
+  "objective": "Draggable Panels System — Step 05: Implement V9PanelShell wrapper with V9 aesthetics and tests.",
+  "file_targets": [
+    "src/ui/designSystem/V9PanelShell.tsx",
+    "tests/unit/designSystem/V9PanelShell.test.tsx"
+  ],
+  "dependencies": [
+    "PANELS-STEP-04"
+  ],
+  "invariants": [
+    "Sei un agente Windsurf: consulta le skill `agent-execution-mandate` prima di iniziare.",
+    "`.windsurf/rules/00-project-invariants.md` (config-first, Zod, i18n, JSDoc, safeguards).",
+    "`.windsurf/rules/10-ui-invariants.md` (skin tokens, zero hardcoded colors, Gilded Observatory theme, <16ms/frame).",
+    "Skin/Theme: usare token wanderlustTokens.css per estetica V9, nessun CSS standalone.",
+    "Tutte le stringhe user-facing devono usare `useTranslation` con namespace `common` o `idleVillage`.",
+    "Verifica primitive esistenti in `src/ui/atoms/`, `src/ui/fantasy/atoms/`, `src/ui/idleVillage/skins/primitives/` prima di creare nuovi componenti.",
+    "Tutte le funzioni e interfacce nuove devono avere JSDoc."
+  ],
+  "operations": [
+    "Crea `src/ui/designSystem/V9PanelShell.tsx` come wrapper di `PanelShell` che applica estetica V9: usa token wanderlustTokens.css per colors (surface, border, text, accent), applica bordi, ombre, e typography consistenti con tema V9, aggiunge header con drag handle visibile, aggiunge close button con icona, supporta active/inactive states visualmente.",
+    "Il componente deve wrappare `PanelShell` e passare tutti i props necessari.",
+    "Usa `useTranslation` per labels user-facing.",
+    "Verifica primitive esistenti (es. WanderlustSurface, CloseButton) e riutilizzale se disponibili.",
+    "Aggiungi test RTL in `tests/unit/designSystem/V9PanelShell.test.tsx` per: render con estetica V9, active/inactive states, close button functionality, drag handle visibile.",
+    "Verifica che i token wanderlustTokens.css siano applicati correttamente.",
+    "Non integrare ancora con /design-system page; questo step è solo componente + test."
+  ],
+  "forbidden": [
+    "Nessun colore hardcoded; tutti i colori devono venire da token wanderlustTokens.css.",
+    "Nessun CSS standalone per V9PanelShell; usare inline styles con CSS variables.",
+    "Non duplicare primitive esistenti; riutilizza WanderlustSurface, CloseButton, ecc. se disponibili.",
+    "Non integrare con /design-system page in questo step."
+  ],
+  "assumptions": [
+    "Esegui direttamente i passi noti senza chiedere conferma.",
+    "PANELS-STEP-04 è completato e `PanelShell` è disponibile.",
+    "I token wanderlustTokens.css per tema V9 sono già definiti.",
+    "Primitive esistenti (WanderlustSurface, ecc.) sono disponibili."
+  ],
+  "safeguards": [
+    "npm run lint -- src/ui/designSystem/V9PanelShell.tsx tests/unit/designSystem/",
+    "npm run test -- tests/unit/designSystem/V9PanelShell.test.tsx",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "`src/ui/designSystem/V9PanelShell.tsx` wrapper con estetica V9",
+    "`tests/unit/designSystem/V9PanelShell.test.tsx` test suite",
+    "Evidence log in `test-results/panels-step-05-<YYYY-MM-DD>.log`"
+  ],
+  "notes": [
+    "Quando prendi questo prompt, imposta subito la riga in `src/docs/docs/coordinator/agent_assignments.md` su 'In corso' con data e nome agente.",
+    "Al completamento, esegui la safeguard suite e chiudi con: `KANBAN STATUS: PANELS-STEP-05 – Completato (Evidence: test-results/panels-step-05-<YYYY-MM-DD>.log)`.",
+    "Step 05 è prerequisito di PANELS-STEP-06.",
+    "Execution hint: verified (multi-file con safeguards)."
+  ]
+}

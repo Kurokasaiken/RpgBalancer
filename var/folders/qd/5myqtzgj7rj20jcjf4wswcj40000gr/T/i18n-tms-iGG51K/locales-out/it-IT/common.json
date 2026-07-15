@@ -1,0 +1,7 @@
+{
+  "appName": "Bilanciere GDR",
+  "greeting": "[it] Hello {name}",
+  "nested": {
+    "label": "[it] Items"
+  }
+}

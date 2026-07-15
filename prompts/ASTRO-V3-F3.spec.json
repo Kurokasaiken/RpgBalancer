@@ -1,0 +1,58 @@
+{
+  "id": "ASTRO-V3-F3",
+  "agent": "harness",
+  "objective": "Destiny Astrolabe V3 — F3 La pallina: simulation.ts, near-miss naturale 5%, tre atti, slow-motion, hit-stop.",
+  "file_targets": [
+    "src/ui/idleVillage/components/destinyAstrolabeV3/simulation.ts",
+    "src/ui/idleVillage/components/destinyAstrolabeV3/engineV3.ts",
+    "src/balancing/config/idleVillage/destinyAstrolabeV3/astrolabeV3Config.ts"
+  ],
+  "dependencies": [
+    "ASTRO-V3-F2"
+  ],
+  "invariants": [
+    "Sei un agente Windsurf: consulta le skill `agent-execution-mandate` e `idle-village-task` prima di iniziare.",
+    "`src/docs/docs/plans/destiny_astrolabe_v3_implementation_plan.md` §2.3, §6, §9 F3.",
+    "`.windsurf/rules/00-project-invariants.md` e `.windsurf/rules/10-ui-invariants.md`.",
+    "Risoluzione = D100 pre-calcolato (modello 1A); la traiettoria e' sintetizzata, l'atterraggio e' la prova visiva dell'esito.",
+    "Near-miss naturale 5%: la pallina deve terminare in `nearMissBand` esterna alla stella quando il roll e' entro (soglia, soglia+5] su D100.",
+    "Tutti i timings (tre atti, slow-motion, hit-stop) da config Zod; nessun magic number.",
+    "Nessun `ctx.filter`/`shadowBlur` nel hot path; motion trail via path/gradienti, non blur.",
+    "i18n namespace `idleVillage` per stringhe esito."
+  ],
+  "operations": [
+    "Estendi `src/balancing/config/idleVillage/destinyAstrolabeV3/astrolabeV3Config.ts` con parametri della pallina: `theSpinDurationMin`, `theSpinDurationMax`, `slowMoScale`, `slowMoDistance`, `hitStopFreeze`, `bounceCountMin`, `bounceCountMax`, `cameraPushIn`, `trailFadeMs`, RNG seed.",
+    "Crea `src/ui/idleVillage/components/destinyAstrolabeV3/simulation.ts` pura: `pickLandingPoint(esito, zoneMap, rng)` sceglie punto uniforme nella zona coerente (inclusa intersezione star∩crown per successo+ferita). Per near-miss, punteggia punti vicini al bordo stella. `synthesizeTrajectory(landingPoint, rng)` genera lancio, 2-4 rimbalzi con normali reali del poligono, spirale decelerante, homing invisibile negli ultimi N px. Il seed rende deterministico per test.",
+    "Estendi `src/ui/idleVillage/components/destinyAstrolabeV3/engineV3.ts` per riprodurre la traiettoria: tre atti (`lancio`, `caccia`, `verdetto`), slow-motion a soglia, hit-stop (freeze 80-120ms, micro-shake, flash zona), camera push-in 2D. La pallina e' scintilla grande con nucleo bianco-oro, coda cometa fade ~400ms.",
+    "Aggiungi test `tests/unit/destinyAstrolabeV3/simulation.test.ts`: roll 52 su soglia 50 -> atterraggio in `nearMissBand` esterno; successo+ferita -> punto in star∩crown; spin con seed diversi non identici; determinismo con stesso seed; rispetto delle normali del poligono.",
+    "Aggiungi test `tests/unit/destinyAstrolabeV3/engineV3.test.ts` per integrazione engine+simulation: hit-stop trigger, slow-motion, durata totale in range config."
+  ],
+  "forbidden": [
+    "Nessun ratio forzato di near-miss: deve emergere dalla banda 5%.",
+    "Nessun snapping visibile nell'ultimo frame: l'homing e' invisibile.",
+    "Nessun percorso identico ripetuto: varia velocita' iniziale/direzione per seed.",
+    "Nessun UI di resolution (banner, camera focus) in questa fase (F4)."
+  ],
+  "assumptions": [
+    "Esegui direttamente i passi noti senza chiedere conferma.",
+    "F2 e' completato: corona, voragini, banda crit, obelischi, palette esistono.",
+    "Per i test, `zoneMap` e `geometry.ts` forniscono le zone e il challenge polygon."
+  ],
+  "safeguards": [
+    "npm run lint -- src/ui/idleVillage/components/destinyAstrolabeV3/ src/balancing/config/idleVillage/destinyAstrolabeV3/ tests/unit/destinyAstrolabeV3/",
+    "npm run test -- tests/unit/destinyAstrolabeV3/",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "`simulation.ts` con `pickLandingPoint` e `synthesizeTrajectory`",
+    "`engineV3.ts` integra tre atti, slow-motion, hit-stop, trail pallina",
+    "Test deterministici e near-miss 5%",
+    "Evidence log `test-results/astro-v3-f3-<YYYY-MM-DD>.log`"
+  ],
+  "notes": [
+    "Quando prendi questo prompt, imposta subito la riga in `src/docs/docs/coordinator/agent_assignments.md` su 'In corso' con data e nome agente.",
+    "Al completamento, esegui la safeguard suite e chiudi con: `KANBAN STATUS: ASTRO-V3-F3 – Completato (Evidence: test-results/astro-v3-f3-<YYYY-MM-DD>.log)`.",
+    "F3 dipende da F2; e' prerequisito di F4."
+  ]
+}

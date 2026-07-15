@@ -11,7 +11,17 @@ export type RosterSortMode = 'name-asc' | 'name-desc' | 'hp-desc' | 'fatigue-asc
  */
 export interface RosterSortConfig {
   mode: RosterSortMode;
+  /** i18n key for the sort option label. */
+  labelKey: string;
+  /** Fallback label used when the translation is not available. */
   label: string;
+  /** i18n key for the sort option tooltip. */
+  tooltipKey: string;
+  /** Fallback tooltip used when the translation is not available. */
+  tooltip: string;
+  /** i18n key for the sort option description. */
+  descriptionKey: string;
+  /** Fallback description used when the translation is not available. */
   description: string;
 }
 
@@ -21,22 +31,38 @@ export interface RosterSortConfig {
 export const ROSTER_SORT_MODES: Record<RosterSortMode, RosterSortConfig> = {
   'name-asc': {
     mode: 'name-asc',
+    labelKey: 'roster.sort.nameAsc',
     label: 'Name A → Z',
+    tooltipKey: 'roster.sort.nameAscTooltip',
+    tooltip: 'Sort: Name A → Z (click to reverse)',
+    descriptionKey: 'roster.sort.nameAscDescription',
     description: 'Sort by display name alphabetically (A to Z)'
   },
   'name-desc': {
     mode: 'name-desc',
+    labelKey: 'roster.sort.nameDesc',
     label: 'Name Z → A',
+    tooltipKey: 'roster.sort.nameDescTooltip',
+    tooltip: 'Sort: Name Z → A (click to reverse)',
+    descriptionKey: 'roster.sort.nameDescDescription',
     description: 'Sort by display name alphabetically (Z to A)'
   },
   'hp-desc': {
     mode: 'hp-desc',
+    labelKey: 'roster.sort.hpDesc',
     label: 'HP',
+    tooltipKey: 'roster.sort.hpDescTooltip',
+    tooltip: 'Sort: HP (highest first)',
+    descriptionKey: 'roster.sort.hpDescDescription',
     description: 'Sort by current HP (highest first)'
   },
   'fatigue-asc': {
     mode: 'fatigue-asc',
+    labelKey: 'roster.sort.fatigueAsc',
     label: 'Fatigue',
+    tooltipKey: 'roster.sort.fatigueAscTooltip',
+    tooltip: 'Sort: Fatigue (lowest first)',
+    descriptionKey: 'roster.sort.fatigueAscDescription',
     description: 'Sort by fatigue (lowest first)'
   }
 } as const;

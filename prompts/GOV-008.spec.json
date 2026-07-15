@@ -1,0 +1,54 @@
+{
+  "id": "GOV-008",
+  "agent": "harness",
+  "objective": "Create scripts/validate-systems.ts and unit tests as a deterministic executable gate, then register it as validate:systems in package.json.",
+  "file_targets": [
+    "scripts/validate-systems.ts",
+    "tests/unit/harness/validateSystems.test.ts",
+    "package.json"
+  ],
+  "dependencies": [
+    "GOV-005",
+    "GOV-006"
+  ],
+  "invariants": [
+    "`.windsurf/rules/00-project-invariants.md`",
+    "`.windsurf/rules/30-frozen-kits.md`",
+    "`.windsurf/rules/40-documentation-governance.md`",
+    "`src/docs/docs/plans/systems_governance_alignment_plan.md` §4.E"
+  ],
+  "operations": [
+    "Create `scripts/validate-systems.ts` as a `tsx` CLI gate that imports/parses `KIT_REGISTRY` from `src/ui/idleVillage/frozen/registry.ts`, parses `src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md`, checks every kit has a matching index row, docPath existence, certified contract/certManifest, every master index row has a valid source-of-truth file and canonical status, and prints a machine-readable report with exit code 1 on critical errors and 0 on success.",
+    "Create `tests/unit/harness/validateSystems.test.ts` with at least three tests covering missing docPath, missing source-of-truth, and non-canonical status.",
+    "Add `\"validate:systems\": \"tsx scripts/validate-systems.ts\"` to `package.json` `scripts`.",
+    "Do not modify `COMPONENT_MASTER_INDEX.md` or `KIT_REGISTRY`.",
+    "Run `npm run validate:systems`, `npm run test -- tests/unit/harness/validateSystems.test.ts`, `npm run lint -- scripts/validate-systems.ts tests/unit/harness/validateSystems.test.ts package.json`, `npm run build:check`, `npm run kanban:lint` and fix any errors."
+  ],
+  "forbidden": [
+    "Do not modify `COMPONENT_MASTER_INDEX.md` or `KIT_REGISTRY`.",
+    "Do not create new trusted docs.",
+    "Do not write logic that mutates governance files."
+  ],
+  "assumptions": [
+    "GOV-005, GOV-006, and GOV-007 are completed.",
+    "`KIT_REGISTRY` is exported from `src/ui/idleVillage/frozen/registry.ts`.",
+    "`COMPONENT_MASTER_INDEX.md` has a standard markdown table."
+  ],
+  "safeguards": [
+    "npm run validate:systems",
+    "npm run test -- tests/unit/harness/validateSystems.test.ts",
+    "npm run lint -- scripts/validate-systems.ts tests/unit/harness/validateSystems.test.ts package.json",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "`scripts/validate-systems.ts`",
+    "`tests/unit/harness/validateSystems.test.ts`",
+    "updated `package.json`",
+    "`test-results/gov-008-<YYYY-MM-DD>.log`"
+  ],
+  "notes": [
+    "Governance tooling task, no runtime code changes.",
+    "Close with `KANBAN STATUS: GOV-008 – Completato (Evidence: test-results/gov-008-<YYYY-MM-DD>.log)`."
+  ]
+}

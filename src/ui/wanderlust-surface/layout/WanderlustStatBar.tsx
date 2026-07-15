@@ -1,5 +1,7 @@
 import type { CSSProperties } from 'react';
 import React from 'react';
+import { useMatericSkin } from '../MatericSkinContext';
+import { MATERIC_SKIN_CONFIG } from '../matericSkinConfig';
 
 /* ════════════════════════════════════════════════════════════════════════
  *  WANDERLUST STAT BAR
@@ -83,6 +85,7 @@ export const WanderlustStatBar: React.FC<WanderlustStatBarProps> = ({
   const percent = maxValue > 0 ? Math.max(0, Math.min(100, (value / maxValue) * 100)) : 0;
   const colors = VARIANT_COLORS[variant];
   const sizeConfig = SIZE_CONFIG[size];
+  const isMateric = useMatericSkin();
 
   const containerStyle: CSSProperties = {
     display: 'flex',
@@ -103,29 +106,61 @@ export const WanderlustStatBar: React.FC<WanderlustStatBarProps> = ({
     minWidth: '24px',
   };
 
-  const trackStyle: CSSProperties = {
-    flex: 1,
-    height: sizeConfig.height,
-    position: 'relative',
-    background: 'var(--skin-statbar-track, linear-gradient(180deg, #0c0b0a, #050505))',
-    border: '1px solid var(--skin-statbar-track-border, rgba(216,177,62,0.08))',
-    borderRadius: '6px',
-    boxShadow: 'inset 0 2px 5px rgba(0,0,0,0.85), inset 0 1px 0 rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.03)',
-    overflow: 'hidden',
-  };
+  const trackStyle: CSSProperties = isMateric
+    ? {
+        flex: 1,
+        height: sizeConfig.height,
+        position: 'relative',
+        backgroundColor: MATERIC_SKIN_CONFIG.track.backgroundColor,
+        backgroundImage: MATERIC_SKIN_CONFIG.track.backgroundImage,
+        backgroundBlendMode: MATERIC_SKIN_CONFIG.track.backgroundBlendMode,
+        backgroundRepeat: MATERIC_SKIN_CONFIG.track.backgroundRepeat,
+        backgroundSize: MATERIC_SKIN_CONFIG.track.backgroundSize,
+        border: MATERIC_SKIN_CONFIG.track.border,
+        borderRadius: MATERIC_SKIN_CONFIG.track.borderRadius,
+        boxShadow: MATERIC_SKIN_CONFIG.track.boxShadow,
+        overflow: 'hidden',
+      }
+    : {
+        flex: 1,
+        height: sizeConfig.height,
+        position: 'relative',
+        background: 'var(--skin-statbar-track, linear-gradient(180deg, #0c0b0a, #050505))',
+        border: '1px solid var(--skin-statbar-track-border, rgba(216,177,62,0.08))',
+        borderRadius: '6px',
+        boxShadow: 'inset 0 2px 5px rgba(0,0,0,0.85), inset 0 1px 0 rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.03)',
+        overflow: 'hidden',
+      };
 
-  const fillStyle: CSSProperties = {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    height: '100%',
-    width: `${percent}%`,
-    background: `linear-gradient(90deg, ${colors.start}, ${colors.end})`,
-    borderRadius: '5px',
-    boxShadow: `inset 0 0 0 0.5px color-mix(in srgb, var(--skin-icon-color, #dfb857) 85%, transparent), 0 0 8px rgba(0,0,0,0.35), 0 0 6px ${colors.shadow}`,
-    transition: 'width 280ms cubic-bezier(0.34,1.56,0.64,1)',
-    willChange: 'width',
-  };
+  const fillConfig = MATERIC_SKIN_CONFIG[variant === 'hp' ? 'hpFill' : variant === 'stamina' ? 'staminaFill' : 'fatigueFill'];
+
+  const fillStyle: CSSProperties = isMateric
+    ? {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        height: '100%',
+        width: `${percent}%`,
+        backgroundImage: fillConfig.backgroundImage,
+        backgroundSize: fillConfig.backgroundSize,
+        backgroundBlendMode: fillConfig.backgroundBlendMode,
+        borderRadius: fillConfig.borderRadius,
+        boxShadow: fillConfig.boxShadow,
+        transition: 'width 280ms cubic-bezier(0.34,1.56,0.64,1)',
+        willChange: 'width',
+      }
+    : {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        height: '100%',
+        width: `${percent}%`,
+        background: `linear-gradient(90deg, ${colors.start}, ${colors.end})`,
+        borderRadius: '5px',
+        boxShadow: `inset 0 0 0 0.5px color-mix(in srgb, var(--skin-icon-color, #dfb857) 85%, transparent), 0 0 8px rgba(0,0,0,0.35), 0 0 6px ${colors.shadow}`,
+        transition: 'width 280ms cubic-bezier(0.34,1.56,0.64,1)',
+        willChange: 'width',
+      };
 
   const valueStyle: CSSProperties = {
     fontFamily: FONT.sans,
@@ -141,13 +176,21 @@ export const WanderlustStatBar: React.FC<WanderlustStatBarProps> = ({
   };
 
   // Add specular highlight (liquid-gem / resin glossy top sheen)
-  const fillHighlightStyle: CSSProperties = {
-    position: 'absolute',
-    inset: '0 0 50% 0',
-    borderRadius: '5px 5px 0 0',
-    background: 'radial-gradient(ellipse 70% 55% at 50% 0%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.12) 45%, transparent 70%), linear-gradient(180deg, rgba(255,255,255,0.22), transparent)',
-    pointerEvents: 'none',
-  };
+  const fillHighlightStyle: CSSProperties = isMateric
+    ? {
+        position: 'absolute',
+        inset: '0 0 50% 0',
+        borderRadius: MATERIC_SKIN_CONFIG.fillHighlight.borderRadius,
+        backgroundImage: MATERIC_SKIN_CONFIG.fillHighlight.backgroundImage,
+        pointerEvents: 'none',
+      }
+    : {
+        position: 'absolute',
+        inset: '0 0 50% 0',
+        borderRadius: '5px 5px 0 0',
+        background: 'radial-gradient(ellipse 70% 55% at 50% 0%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.12) 45%, transparent 70%), linear-gradient(180deg, rgba(255,255,255,0.22), transparent)',
+        pointerEvents: 'none',
+      };
 
   return (
     <div className={className} style={containerStyle}>

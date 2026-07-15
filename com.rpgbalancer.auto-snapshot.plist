@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.rpgbalancer.auto-snapshot</string>
+    
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/python3</string>
+        <string>/Users/faustoboni/progetti_personali/RPG/scripts/auto-snapshot.py</string>
+    </array>
+    
+    <key>WorkingDirectory</key>
+    <string>/Users/faustoboni/progetti_personali/RPG</string>
+    
+    <key>StartInterval</key>
+    <integer>7200</integer>
+    
+    <key>StandardOutPath</key>
+    <string>/Users/faustoboni/Library/Logs/auto-snapshot.log</string>
+    
+    <key>StandardErrorPath</key>
+    <string>/Users/faustoboni/Library/Logs/auto-snapshot-error.log</string>
+    
+    <key>RunAtLoad</key>
+    <false/>
+    
+    <key>KeepAlive</key>
+    <false/>
+    
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PYTHONPATH</key>
+        <string>/Users/faustoboni/progetti_personali/RPG/scripts</string>
+    </dict>
+</dict>
+</plist>

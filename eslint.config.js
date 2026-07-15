@@ -30,6 +30,7 @@ const legacyEslintIgnorePatterns = [
   'src/main.tsx',
   'src/vite-env.d.ts',
   'scripts/**',
+  '!scripts/harness/**',
 ]
 
 // TODO(WS5 Baseline QA – remove by 2026-02-28): temporary quarantine until legacy folders are either deleted or refactored.

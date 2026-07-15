@@ -1,0 +1,43 @@
+{
+  "id": "GOV-001",
+  "agent": "harness",
+  "objective": "Register the Frozen Kits system in .windsurf/rules/ by creating 30-frozen-kits.md and updating 00-project-invariants.md shared baseline examples.",
+  "file_targets": [
+    ".windsurf/rules/30-frozen-kits.md",
+    ".windsurf/rules/00-project-invariants.md"
+  ],
+  "dependencies": [],
+  "invariants": [
+    "`.windsurf/rules/00-project-invariants.md`",
+    "`.windsurf/rules/10-ui-invariants.md`",
+    "`src/docs/docs/plans/systems_governance_alignment_plan.md` §4.A.1"
+  ],
+  "operations": [
+    "Create `.windsurf/rules/30-frozen-kits.md` with `trigger: glob` over `src/ui/idleVillage/frozen/**`, `src/ui/idleVillage/**/*.tsx`, `src/pages/minimal-*.tsx`; header `# Frozen Kits Invariants`; bullets: new Idle Village components must be added as a frozen kit, extend an existing kit, or have a documented exception in `src/docs/docs/idle_village/EXCEPTIONS.md`; public consumers import from `src/ui/idleVillage/frozen/kits/index.ts`; each kit has a `KitShell`/`withKitShell` provider chain; certified kits require `contract`, `certManifestPath`, `docPath`, and `hub` in `KIT_REGISTRY`; draft kits require `status: 'draft'` in `KIT_REGISTRY` (docPath optional but recommended); new minimal pages must add `hub` metadata to keep `TestHub` generated; `tests/contract/minimal-vs-test.spec.ts` must pass for certified kits.",
+    "Update `.windsurf/rules/00-project-invariants.md` §\"This layer is the shared baseline\" to add `Frozen Kits` and `Documentation Governance` to the mandatory a-priori system examples.",
+    "Run `npm run lint -- .windsurf/rules/`, `npm run build:check`, `npm run kanban:lint` and fix any errors."
+  ],
+  "forbidden": [
+    "Do not modify `src/ui/idleVillage/frozen/registry.ts` or `TestHub.tsx`.",
+    "Do not create new kits or pages.",
+    "Do not touch `COMPONENT_MASTER_INDEX.md`."
+  ],
+  "assumptions": [
+    "Frozen Kits system is implemented under `src/ui/idleVillage/frozen/**` and `scripts/freeze-kit.ts`.",
+    "GOV-001 and GOV-002 are independent and can run in parallel."
+  ],
+  "safeguards": [
+    "npm run lint -- .windsurf/rules/",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "`.windsurf/rules/30-frozen-kits.md`",
+    "updated `.windsurf/rules/00-project-invariants.md`",
+    "`test-results/gov-001-<YYYY-MM-DD>.log`"
+  ],
+  "notes": [
+    "Governance-only task, no runtime code changes.",
+    "Close with `KANBAN STATUS: GOV-001 – Completato (Evidence: test-results/gov-001-<YYYY-MM-DD>.log)`."
+  ]
+}

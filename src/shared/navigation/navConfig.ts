@@ -5,6 +5,7 @@ const BASE_APP_NAV_TAB_IDS = [
   'spellCreationNew',
   'idleVillageConfig',
   'minimalGameplay',
+  'storyboard',
   'test',
   'testHub',
   'moodboard',
@@ -37,6 +38,7 @@ const NAV_ITEM_MAP: Record<AppNavTabId, AppNavItem> = {
   spellCreationNew: { id: 'spellCreationNew', label: 'Spell Creation', icon: '✨' },
   idleVillageConfig: { id: 'idleVillageConfig', label: 'Idle Village Config', icon: '🏘️' },
   minimalGameplay: { id: 'minimalGameplay', label: 'Minimal Gameplay', icon: '🌒' },
+  storyboard: { id: 'storyboard', label: 'Storyboard', icon: '🎬' },
   test: { id: 'test', label: 'Test', icon: '🧪' },
   testHub: { id: 'testHub', label: 'Test Hub', icon: '�' },
   moodboard: { id: 'moodboard', label: 'Moodboard', icon: '🖼️' },
@@ -59,7 +61,7 @@ const NAV_SECTION_DEFS: { title: string; itemIds: AppNavTabId[] }[] = [
   },
   {
     title: 'Idle Village',
-    itemIds: ['minimalGameplay', 'idleVillageConfig', 'test', 'testHub'],
+    itemIds: ['minimalGameplay', 'idleVillageConfig', 'storyboard', 'test', 'testHub'],
   },
   {
     title: 'Content',

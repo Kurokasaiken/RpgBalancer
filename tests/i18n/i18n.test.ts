@@ -1,4 +1,5 @@
-import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
+import { mkdtemp, mkdir, writeFile, readFile, rm } from 'node:fs/promises';
+import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import os from 'node:os';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -238,5 +239,99 @@ describe('locale direction and font', () => {
     expect(getTextExpansionFactor('pseudo')).toBe(1.3);
     expect(getTextExpansionFactor('de')).toBe(1.15);
     expect(getTextExpansionFactor('en')).toBe(1.0);
+  });
+});
+
+describe('TMS export/import', () => {
+  let tmpDir: string;
+  let enDir: string;
+  let importDir: string;
+  let outLocalesDir: string;
+  let exportDir: string;
+
+  beforeEach(async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), 'i18n-tms-'));
+    enDir = path.join(tmpDir, 'locales', 'en');
+    importDir = path.join(tmpDir, 'import');
+    outLocalesDir = path.join(tmpDir, 'locales-out');
+    exportDir = path.join(tmpDir, 'export');
+
+    await mkdir(enDir, { recursive: true });
+    await mkdir(importDir, { recursive: true });
+    await mkdir(outLocalesDir, { recursive: true });
+
+    const enCommon = {
+      appName: 'RPG Balancer',
+      greeting: 'Hello {name}',
+      nested: { label: 'Items' },
+    };
+    const enMeta = {
+      appName: { context: 'App title', maxLength: 32 },
+      'nested.label': { context: 'Inventory label', maxLength: 20 },
+    };
+    await writeFile(path.join(enDir, 'common.json'), JSON.stringify(enCommon, null, 2));
+    await writeFile(path.join(enDir, 'common.meta.json'), JSON.stringify(enMeta, null, 2));
+  });
+
+  afterEach(async () => {
+    await rm(tmpDir, { recursive: true, force: true });
+  });
+
+  function runScript(script: string, extraEnv: Record<string, string>): void {
+    const scriptPath = path.resolve(process.cwd(), 'scripts', 'i18n', script);
+    execFileSync('npx', ['tsx', scriptPath], {
+      cwd: process.cwd(),
+      env: { ...process.env, ...extraEnv },
+      stdio: 'pipe',
+    });
+  }
+
+  it('exports English JSON to XLIFF with context and maxLength', async () => {
+    runScript('exportTms.ts', {
+      I18N_EN_DIR: enDir,
+      I18N_EXPORT_DIR: exportDir,
+    });
+
+    const xlfPath = path.join(exportDir, 'en', 'common.xlf');
+    const xlf = await readFile(xlfPath, 'utf8');
+    expect(xlf).toContain('appName');
+    expect(xlf).toContain('RPG Balancer');
+    expect(xlf).toContain('App title');
+    expect(xlf).toContain('maxwidth="32"');
+    expect(xlf).toContain('Hello {name}');
+  });
+
+  it('imports translated XLIFF into locale JSON and preserves metadata', async () => {
+    runScript('exportTms.ts', {
+      I18N_EN_DIR: enDir,
+      I18N_EXPORT_DIR: exportDir,
+    });
+
+    const xlfPath = path.join(exportDir, 'en', 'common.xlf');
+    let xlf = await readFile(xlfPath, 'utf8');
+    // Add an Italian translation target.
+    xlf = xlf.replace(/<source>([^<]+)<\/source>/g, (match, source) => {
+      const target = source === 'RPG Balancer' ? 'Bilanciere GDR' : `[it] ${source}`;
+      return match + `<target>${target}</target>`;
+    });
+
+    const itImportDir = path.join(importDir, 'it-IT');
+    await mkdir(itImportDir, { recursive: true });
+    await writeFile(path.join(itImportDir, 'common.xlf'), xlf);
+
+    runScript('importTms.ts', {
+      I18N_IMPORT_DIR: importDir,
+      I18N_EN_DIR: enDir,
+      I18N_OUTPUT_LOCALES_DIR: outLocalesDir,
+    });
+
+    const itJson = JSON.parse(await readFile(path.join(outLocalesDir, 'it-IT', 'common.json'), 'utf8')) as Record<string, unknown>;
+    expect(itJson.appName).toBe('Bilanciere GDR');
+    expect(itJson.greeting).toBe('[it] Hello {name}');
+    expect(itJson.nested).toEqual({ label: '[it] Items' });
+
+    const itMeta = JSON.parse(await readFile(path.join(outLocalesDir, 'it-IT', 'common.meta.json'), 'utf8')) as Record<string, unknown>;
+    expect((itMeta.appName as { context?: string }).context).toBe('App title');
+    expect((itMeta.appName as { maxLength?: number }).maxLength).toBe(32);
   });
 });

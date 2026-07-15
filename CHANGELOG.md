@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Roster Visual Prototype - Materic (Pulsazione Materica) Variant
+- Added `MatericSkinContext`/`MatericSkinProvider` and `MATERIC_SKIN_CONFIG` (Zod-validated) to toggle a rough stone/bronze skin variant.
+- `WanderlustStatBar` now renders sharp, non-rounded tracks with a sap-like HP fill and golden-sand stamina fill when inside a `MatericSkinProvider`.
+- `DragTestContainer` renders a low-opacity `bg.png` grain overlay when the Materic skin is active.
+- `/minimal-roster` now renders the original roster side-by-side with a Materic copy for A/B comparison.
+
 ### Phase 2: Conventional Commits & Semantic Versioning (IN PROGRESS)
 - ✅ `.commitlintrc.json` - Commit message validation configuration
 - ✅ `.releaserc.json` - Semantic-release configuration

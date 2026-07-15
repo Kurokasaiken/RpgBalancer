@@ -1,0 +1,55 @@
+{
+  "id": "portrait-propagation-regression",
+  "title": "Portrait Propagation Regression Coverage",
+  "description": "Add minimal regression coverage so the fixed portrait propagation bug in `/minimal-gameplay` cannot regress",
+  "priority": "high",
+  "dependencies": [],
+  "file_targets": [
+    "tests/unit/idleVillage/**/*.test.ts",
+    "tests/integration/idleVillage/**/*.test.ts"
+  ],
+  "operations": [
+    "Identify the narrowest stable regression point(s) for the portrait propagation bug",
+    "Add minimal coverage that verifies PG card render path uses resolved portrait source",
+    "Verify `/minimal-gameplay` resident cards receive usable portrait URLs",
+    "Ensure broken raw portrait values do not silently win over resolved portrait values",
+    "Prefer unit/integration tests over broad Playwright expansion",
+    "Keep the suite tight, stable, and fully green"
+  ],
+  "forbidden_actions": [
+    "No docs",
+    "No broad refactor",
+    "No `/test` work unless strictly needed for comparison",
+    "No new feature work",
+    "No unrelated portrait/content testing"
+  ],
+  "safeguards": [
+    "npm run lint -- <scope>",
+    "npm run test -- <scope>",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "Exact regression contract covered",
+    "Exact test files created/changed",
+    "Exact assertions added",
+    "Confirmation that the suite is fully green"
+  ],
+  "context": {
+    "root_cause": "Stale/raw portraitUrl reaching PG cards instead of resolved portrait URL",
+    "fix_applied": "Using canonical resolved portrait propagation (getResidentPortraitUrl(resident)) in render path",
+    "scope": "Minimal regression coverage only - no broad expansion"
+  },
+  "invariants": [
+    "config-first",
+    "persistence",
+    "skin system",
+    "i18n",
+    "component reuse",
+    "state management",
+    "documentation",
+    "Node version",
+    "safeguards",
+    "separation of concerns"
+  ]
+}

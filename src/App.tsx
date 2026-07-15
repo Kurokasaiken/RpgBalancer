@@ -11,9 +11,12 @@ import {
   type AppNavTabId,
 } from '@/shared/navigation/navConfig';
 import { applyPerfTier } from './ui/idleVillage/skins/perfTier';
+import { applySkinCssVariables } from './ui/idleVillage/skins/skinCssVariables';
 
 // Detect device capability → data-perf-tier on <html> gates parallax/WebGL.
 applyPerfTier();
+// Apply V9 Obsidian skin tokens globally so --skin-* vars exist from boot.
+applySkinCssVariables('base');
 const MinimalGameplayPage = lazy(() => import('./ui/idleVillage/MinimalGameplayPage'));
 const GameplayTestPage = lazy(() => import('./ui/idleVillage/components/GameplayTestPage'));
 const GameplayTestSimple = lazy(() => import('./ui/idleVillage/components/GameplayTestSimple'));
@@ -22,6 +25,7 @@ const TestRosterPage = lazy(() => import('./ui/idleVillage/TestRosterPage'));
 const TestHub = lazy(() => import('./ui/idleVillage/TestHub').then(m => ({ default: m.TestHub })));
 const IdleVillageConfigRoute = lazy(() => import('./pages/idle-village-config'));
 const StyleLabDemoPage = lazy(() => import('./pages/style-lab-demo'));
+const DesignSystemPage = lazy(() => import('./pages/design-system'));
 const V9SkinSandbox = lazy(() => import('./pages/v9-skin-sandbox').then(m => ({ default: m.V9SkinSandbox })));
 const PoiDetailVerificationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailVerificationPage').then(m => ({ default: m.PoiDetailVerificationPage })));
 const PoiDetailQuestRosterIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailQuestRosterIntegrationPage').then(m => ({ default: m.default })));
@@ -42,6 +46,7 @@ const MinimalSkillCheckPage = lazy(() => import('./pages/minimal-skillcheck').th
 const MinimalSkillCheckV6Page = lazy(() => import('./pages/minimal-skillcheck-v6').then(m => ({ default: m.default })));
 const MinimalDestinyAstrolabePage = lazy(() => import('./pages/minimal-destiny-astrolabe').then(m => ({ default: m.default })));
 const MinimalDestinyAstrolabeV2Page = lazy(() => import('./pages/minimal-destiny-astrolabe-v2').then(m => ({ default: m.default })));
+const MinimalDestinyAstrolabeV3Page = lazy(() => import('./pages/minimal-destiny-astrolabe-v3').then(m => ({ default: m.default })));
 const MinimalOutcomeModalPage = lazy(() => import('./pages/minimal-outcome').then(m => ({ default: m.default })));
 const MinimalMarketActionCardPage = lazy(() => import('./pages/minimal-market-page').then(m => ({ default: m.default })));
 const MinimalIntegrationQuestFlowPage = lazy(() => import('./pages/minimal-integration-quest-flow').then(m => ({ default: m.default })));
@@ -49,6 +54,7 @@ const MinimalJobPoiRosterIntegrationPage = lazy(() => import('./pages/minimal-jo
 const MinimalJobPoiRosterTimeIntegrationPage = lazy(() => import('./pages/minimal-job-poi-roster-time-integration').then(m => ({ default: m.default })));
 const MinimalQuestDetailPage = lazy(() => import('./pages/minimal-quest-detail').then(m => ({ default: m.default })));
 const MinimalTimeDaynightIntegrationPage = lazy(() => import('./pages/minimal-time-daynight-integration').then(m => ({ default: m.default })));
+const SpellCreatorTestPage = lazy(() => import('./pages/spell-creator').then(m => ({ default: m.default })));
 
 interface AppNavControls {
   getActiveTab: () => AppNavTabId;
@@ -67,6 +73,9 @@ const Balancer = lazy(() =>
 );
 const MoodboardPage = lazy(() =>
   import('./ui/moodboard/MoodboardPage').then((m) => ({ default: m.MoodboardPage }))
+);
+const StoryboardPage = lazy(() =>
+  import('./pages/storyboard').then((m) => ({ default: m.default }))
 );
 const MoodboardSkeleton = () => (
   <div className="moodboard-shell" data-testid="moodboard-content" data-moodboard="true" aria-busy="true">
@@ -103,6 +112,7 @@ const ALLOWED_TABS: AppNavTabId[] = [
   'styleLabDemo',
   'idleVillageConfig',
   'minimalGameplay',
+  'storyboard',
   'test',
   'testHub',
   'wanderlust',
@@ -133,6 +143,8 @@ function App() {
   const isV9SkinSandboxPath =
     typeof window !== 'undefined' &&
     ['/v9-skin-sandbox', '/skin-lab', '/skin-sandbox'].includes(window.location.pathname);
+  const isDesignSystemPath =
+    typeof window !== 'undefined' && window.location.pathname === '/design-system';
   const isPoiDetailVerificationPath =
     typeof window !== 'undefined' && window.location.pathname === '/poi-detail-verification';
   const isPoiQuestDetailRosterIntegrationPath =
@@ -170,6 +182,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/minimal-destiny-astrolabe';
   const isMinimalDestinyAstrolabeV2Path =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-destiny-astrolabe-v2';
+  const isMinimalDestinyAstrolabeV3Path =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-destiny-astrolabe-v3';
   const isMinimalOutcomeModalPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-outcome';
   const isMinimalMarketActionCardPath =
@@ -184,6 +198,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/minimal-quest-detail';
   const isMinimalTimeDaynightIntegrationPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-time-daynight-integration';
+  const isSpellCreatorPath =
+    typeof window !== 'undefined' && window.location.pathname === '/spell-creator';
   const isRootPath =
     typeof window !== 'undefined' &&
     (window.location.pathname === '/' || window.location.pathname === '/index.html');
@@ -468,6 +484,16 @@ function App() {
     );
   }
 
+  if (isMinimalDestinyAstrolabeV3Path) {
+    return (
+      <ErrorBoundary componentName="Minimal Destiny Astrolabe V3 Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Destiny Astrolabe V3…</div>}>
+          <MinimalDestinyAstrolabeV3Page />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
   if (isMinimalOutcomeModalPath) {
     return (
       <ErrorBoundary componentName="Minimal OutcomeModal Page">
@@ -538,11 +564,31 @@ function App() {
     );
   }
 
+  if (isSpellCreatorPath) {
+    return (
+      <ErrorBoundary componentName="Spell Creator Test Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Spell Creator…</div>}>
+          <SpellCreatorTestPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
   if (isV9SkinSandboxPath) {
     return (
       <ErrorBoundary componentName="V9 Skin Sandbox">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading V9 Skin Sandbox...</div>}>
           <V9SkinSandbox />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isDesignSystemPath) {
+    return (
+      <ErrorBoundary componentName="Design System Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Design System...</div>}>
+          <DesignSystemPage />
         </Suspense>
       </ErrorBoundary>
     );
@@ -686,6 +732,13 @@ function App() {
           <ErrorBoundary componentName="Moodboard">
             <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Moodboard…</div>}>
               <MoodboardPage />
+            </Suspense>
+          </ErrorBoundary>
+        )}
+        {activeTab === 'storyboard' && (
+          <ErrorBoundary componentName="Storyboard">
+            <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Storyboard…</div>}>
+              <StoryboardPage />
             </Suspense>
           </ErrorBoundary>
         )}

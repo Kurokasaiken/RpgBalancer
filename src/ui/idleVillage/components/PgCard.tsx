@@ -74,15 +74,16 @@ function PgCardStatBar({ variant, value, maxValue = 100, className = '' }: PgCar
   const colors = STAT_BAR_COLORS[variant];
   return (
     <div
-      className={['rounded-full overflow-hidden', className].filter(Boolean).join(' ')}
+      className={['overflow-hidden', className].filter(Boolean).join(' ')}
       style={{
+        borderRadius: 'var(--radius-sm, 2px)',
         background: 'var(--skin-statbar-track, linear-gradient(180deg, #0c0b0a, #050505))',
-        border: '1px solid var(--skin-statbar-track-border, rgba(216,177,62,0.08))',
-        boxShadow: 'inset 0 2px 5px rgba(0,0,0,0.85), inset 0 1px 0 rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.03)',
+        border: '1px solid var(--slot-border, rgba(255,255,255,0.07))',
+        boxShadow: 'var(--slot-inset, inset 4px 5px 14px rgba(0,0,0,1), inset 0 0 28px rgba(0,0,0,0.9))',
       }}
     >
       <div
-        className="h-full rounded-full transition-all"
+        className="h-full transition-all"
         style={{
           width: `${percent}%`,
           background: `linear-gradient(90deg, ${colors.start}, ${colors.end})`,
@@ -92,7 +93,7 @@ function PgCardStatBar({ variant, value, maxValue = 100, className = '' }: PgCar
         }}
       >
         <div
-          className="h-1/2 w-full rounded-t-full"
+          className="h-1/2 w-full"
           style={{
             background: 'radial-gradient(ellipse 70% 55% at 50% 0%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.12) 45%, transparent 70%), linear-gradient(180deg, rgba(255,255,255,0.22), transparent)',
           }}
@@ -533,7 +534,7 @@ const PgCard = memo<PgCardProps>(({
         baseTokenClasses,
         compatibilityAccentClass,
         'clip-path-card', // Irregular corners — organic, non-web-like appearance
-        isUnavailable ? 'cursor-not-allowed opacity-35 grayscale' : 'cursor-grab active:cursor-grabbing active:scale-95 hover:border-[var(--skin-status-met)]/70',
+        isUnavailable ? 'cursor-not-allowed opacity-35 grayscale' : 'cursor-grab active:cursor-grabbing active:scale-95 hover:ring-1 hover:ring-(--skin-status-met)/70',
         returningOverlayClass,
         isDragging ? 'opacity-40 pointer-events-none' : '',
         ...classes, // Add skin binding classes
