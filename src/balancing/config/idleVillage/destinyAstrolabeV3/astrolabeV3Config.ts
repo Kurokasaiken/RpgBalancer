@@ -14,6 +14,8 @@ export const AstrolabeV3ConfigSchema = z.object({
   minVoidRadius: z.number().min(0).max(0.2).default(0.03),
   /** Banda near-miss: % della distanza normalizzata centro→stella (D7). */
   nearMissPct: z.number().min(0).max(25).default(5),
+  /** Successo critico (nucleo centrale V4): roll ≤ critSuccessPct. */
+  critSuccessPct: z.number().min(0).max(25).default(5),
 
   /* Timeline (ms) — fasi §5 */
   tRingLock: z.number().default(600),
