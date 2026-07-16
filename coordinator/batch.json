@@ -1,4 +1,13 @@
 {
   "max_parallel": 20,
-  "tasks": []
+  "tasks": [
+    {
+      "task_id": "DOC-MG-ROSTER-RECONCILIATION-008",
+      "channel": "manual",
+      "model": "qwen/qwen3-coder:free",
+      "file_targets": [
+        "src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md"
+      ]
+    }
+  ]
 }
