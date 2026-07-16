@@ -56,6 +56,7 @@ const MinimalJobPoiRosterTimeIntegrationPage = lazy(() => import('./pages/minima
 const MinimalQuestDetailPage = lazy(() => import('./pages/minimal-quest-detail').then(m => ({ default: m.default })));
 const MinimalTimeDaynightIntegrationPage = lazy(() => import('./pages/minimal-time-daynight-integration').then(m => ({ default: m.default })));
 const SpellCreatorTestPage = lazy(() => import('./pages/spell-creator').then(m => ({ default: m.default })));
+const MinimalSlottedMedalPage = lazy(() => import('./pages/minimal-slottedmedal').then(m => ({ default: m.default })));
 
 interface AppNavControls {
   getActiveTab: () => AppNavTabId;
@@ -173,6 +174,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/minimal-clock';
   const isMinimalSlotRackPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-slotRack';
+  const isMinimalSlottedMedalPath =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-slottedmedal';
   const isMinimalResourceHUDPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-resourcehud';
   const isMinimalQuestCardPath =
@@ -422,6 +425,16 @@ function App() {
       <ErrorBoundary componentName="Minimal SlotRack Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading SlotRack Test…</div>}>
           <MinimalSlotRackPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMinimalSlottedMedalPath) {
+    return (
+      <ErrorBoundary componentName="Minimal SlottedMedal Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading SlottedMedal Test…</div>}>
+          <MinimalSlottedMedalPage />
         </Suspense>
       </ErrorBoundary>
     );
