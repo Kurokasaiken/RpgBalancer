@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-15T15:39:36.821918+00:00",
+  "timestamp": "2026-07-16T07:25:41.484799+00:00",
   "task_lanciati": 0,
   "task_bloccati": 0,
   "task_completati_questo_giro": 0,
@@ -10,7 +10,7 @@
     "pending": 0,
     "completed": 0,
     "failed": 0,
-    "queue_file": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/queue.json",
+    "queue_file": "/home/runner/work/RpgBalancer/RpgBalancer/coordinator/manual-dispatch/queue.json",
     "next_action": "Aprire Windsurf ed eseguire /run-manual-tasks"
   }
 }
