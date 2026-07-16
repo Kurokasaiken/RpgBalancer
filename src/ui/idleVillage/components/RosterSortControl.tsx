@@ -2,6 +2,8 @@ import type { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { RosterSortMode, RosterSortConfig } from '@/ui/idleVillage/config/rosterSortConfig';
 import { getRosterSortModes } from '@/ui/idleVillage/config/rosterSortConfig';
+import type { FilterCriterion } from '@/ui/idleVillage/config/rosterFilterConfig';
+import { RosterStatFilter, RosterFilterProvider } from './RosterStatFilter';
 
 /**
  * Props for the RosterSortControl component
@@ -11,6 +13,12 @@ export interface RosterSortControlProps {
   currentMode: RosterSortMode;
   /** Callback when sort mode changes */
   onSortModeChange: (mode: RosterSortMode) => void;
+  /** Filter criteria for stat-based filtering */
+  filterCriteria?: FilterCriterion[];
+  /** Callback when filter criteria changes */
+  onFilterCriteriaChange?: (criteria: FilterCriterion[]) => void;
+  /** Whether to show the filter UI */
+  showFilter?: boolean;
   /** Additional CSS classes */
   className?: string;
 }
@@ -25,6 +33,8 @@ export interface RosterSortControlProps {
  * - Fatigue (lowest first)
  *
  * Uses displayName for alphabetical sorting as required by the prompt.
+ * 
+ * Now includes optional stat-based filtering via RosterStatFilter.
  *
  * @component
  * @example
@@ -32,6 +42,9 @@ export interface RosterSortControlProps {
  * <RosterSortControl
  *   currentMode={sortMode}
  *   onSortModeChange={setSortMode}
+ *   filterCriteria={filterCriteria}
+ *   onFilterCriteriaChange={setFilterCriteria}
+ *   showFilter={true}
  *   className="text-xs"
  * />
  * ```
@@ -39,6 +52,9 @@ export interface RosterSortControlProps {
 export function RosterSortControl({
   currentMode,
   onSortModeChange,
+  filterCriteria = [],
+  onFilterCriteriaChange,
+  showFilter = false,
   className = '',
 }: RosterSortControlProps) {
   const { t } = useTranslation('idleVillage');
@@ -49,7 +65,7 @@ export function RosterSortControl({
     onSortModeChange(newMode);
   };
 
-  return (
+  const sortControl = (
     <div className={`flex items-center gap-1 ${className}`}>
       <label
         htmlFor="roster-sort-select"
@@ -75,6 +91,21 @@ export function RosterSortControl({
         ))}
       </select>
     </div>
+  );
+
+  // If filter is not enabled, return only sort control
+  if (!showFilter) {
+    return sortControl;
+  }
+
+  // If filter is enabled, wrap in provider and include filter UI
+  return (
+    <RosterFilterProvider>
+      <div className="flex flex-col gap-2">
+        {sortControl}
+        <RosterStatFilter className={className} />
+      </div>
+    </RosterFilterProvider>
   );
 }
 

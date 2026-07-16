@@ -282,6 +282,7 @@ Per stile visivo, palette e coerenza con il tema **Gilded Observatory**, vedere 
 **Implementation status: _Parziale_**
 
 - ✅ Import residenti da Character Storage tramite `bootstrapResidentsFromCharacters()` (canonical pipeline); fallback founder in VillageSandbox.
+- ✅ Stat-based filtering system for roster (ROSTER-STAT-FILTER): config-first Zod schema, React Context for filter state, UI component with i18n support, integrated with VillageRosterSection before sorting.
 - ⚠️ Mancano recruitment flow, housing cap e costi cibo in UI.
 - ⚠️ Nessuna visualizzazione assegnamenti casa/status oltre agli stati base.
 

@@ -46,9 +46,9 @@ fi
 # Crea PID file
 echo $$ > "$PID_FILE"
 
-# Esegui coordinator
-echo "[$(date)] Avvio coordinator select-only"
-python3 coordinator/coordinator.py --select-only --output coordinator/batch.json
+# Esegui coordinator con dispatch completo (incluso harness automatico)
+echo "[$(date)] Avvio coordinator con dispatch harness"
+python3 coordinator/coordinator.py --output coordinator/batch.json
 
 # Rimuovi PID file
 rm -f "$PID_FILE"

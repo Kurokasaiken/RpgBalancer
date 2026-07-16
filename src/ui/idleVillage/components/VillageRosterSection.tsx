@@ -8,6 +8,8 @@ import { rendererStackInstrumentation } from '@/ui/idleVillage/utils/rendererSta
 import { RosterSortIcon } from './RosterSortIcon';
 import type { RosterSortMode } from '@/ui/idleVillage/config/rosterSortConfig';
 import { DEFAULT_ROSTER_SORT_MODE, sortResidents } from '@/ui/idleVillage/config/rosterSortConfig';
+import type { FilterCriterion } from '@/ui/idleVillage/config/rosterFilterConfig';
+import { filterResidents } from '@/ui/idleVillage/config/rosterFilterConfig';
 
 /**
  * Props for the {@link VillageRosterSection} component.
@@ -50,6 +52,8 @@ export interface VillageRosterSectionProps {
   sortMode?: RosterSortMode;
   /** Callback when sort mode changes */
   onSortModeChange?: (mode: RosterSortMode) => void;
+  /** Filter criteria for stat-based filtering */
+  filterCriteria?: FilterCriterion[];
   /** Use Wanderlust skin styling instead of default PgCard */
   useWanderlustSkin?: boolean;
   /** Residents currently assigned elsewhere: shown as Away, non-interactive */
@@ -109,12 +113,16 @@ export function VillageRosterSection({
   dragVisualState,
   sortMode = DEFAULT_ROSTER_SORT_MODE,
   onSortModeChange,
+  filterCriteria = [],
   useWanderlustSkin = false,
   lockedResidentIds,
   lockedStatusLabel,
 }: VillageRosterSectionProps) {
+  // Apply filtering before sorting
+  const filteredResidents = filterResidents(residents, filterCriteria);
+  
   // Sort residents based on current sort mode
-  const sortedResidents = sortResidents(residents, sortMode);
+  const sortedResidents = sortResidents(filteredResidents, sortMode);
   
   // Instrument renderer stack at VillageRosterSection level
   rendererStackInstrumentation.captureVillageRosterSection(sortedResidents);

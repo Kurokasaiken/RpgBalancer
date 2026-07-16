@@ -154,3 +154,127 @@ Elite character portrait of a noble male hero. THE FACE: Ruan Jia sculptural per
 ---
 
 Versione controllata e approvata per il rollout artistico v0.10.
+
+---
+
+## 9. RENDERING SYSTEM – ARCHITETTURA A STRATI BLIZZARD-STYLE
+
+### Filosofia Core
+
+Ogni componente visivo è costruito con **8-12 layer** che si sovrappongono per creare profondità e complessità materica. Nessun componente finale può essere composto da meno di 6 layer.
+
+### Pattern Layer Tipico (dal basso all'alto)
+
+1. **Base Layer** - Forma primaria con colore solido
+2. **Texture Layer** - Rumore organico (feTurbulence)
+3. **Gradient Layer** - Sfumature radiali/lineari
+4. **Highlight Layer** - Riflessi e specchi
+5. **Detail Layer** - Imperfezioni, scratches, patina
+6. **Overlay Layer** - Effetti di vetro, cristallo
+7. **Accent Layer** - Bordi, anelli decorativi
+8. **Animation Layer** - Elementi animati (pulse, flicker)
+9. **Shadow Layer** - Ombre per profondità
+10. **Glow Layer** - Bloom e glow esterni
+
+### Imperfezioni Organiche
+
+Niente superfici perfette. Ogni componente ha imperfezioni organiche che lo rendono "materico":
+
+- **feTurbulence filters** per creare texture naturali
+- **Scratches e nicks** sui bordi metallici
+- **Patina spots** per ossidazione
+- **Oxidation streaks** per invecchiamento
+- **Noise overlay** per rugosità
+
+### Regola Gerarchica dei Layer
+
+- **Layer 1-5:** Sempre (base, texture, gradient, AO, border)
+- **Layer 6-8:** Solo pannelli importanti (medium)
+- **Layer 9-12:** Solo Hero Showcase, modali principali, reward, boss (rich)
+- **Layer 13-18:** Solo momenti leggendari (legendary)
+
+### Visual Richness Rule
+
+> "Visual richness follows narrative importance. Ogni layer aggiunto deve aumentare il valore percepito dell'elemento. I componenti più frequenti rimangono semplici; quelli che rappresentano ricompense, scelte importanti o momenti memorabili possono accumulare più layer, più profondità e più dettagli."
+
+### Sistemi di Rendering
+
+#### Material Library
+Materiali fisici con base color, lighting, AO, texture, noise, specular, vignette:
+- Obsidian, Stone, Bronze, Dark Wood, Crystal, Cloth, Parchment, Iron, Leather
+
+#### Frame Library
+Frame oggetti con outer bevel, metal body, highlight, AO, inner line, decorative corners, glow hooks:
+- Bronze, Imperial, Stone, Simple, Parchment, Guild, Hero, Reward, Glass, None
+
+#### Layer Recipes
+Ricette di costruzione per tipi di componente:
+- Panel, Button, Reward, Tooltip, Modal, Card, HUD, Capsule
+
+#### Decoration Packs
+Pack decorativi tematici:
+- Explorer, Imperial, Village, Nature, Magic, Ancient, Boss, Quest, Legendary
+
+#### Corner Library
+Stili di angoli indipendenti dal frame:
+- Square, Bevel, Rounded, Leaf, Bronze, Imperial, Rune, Stone, None
+
+#### Divider Library
+Stili di divisori per separazione sezioni:
+- Simple, Double, Diamond, Leaves, Imperial, Runic, Compass, Gold Fade, Stone Crack
+
+#### Overlay Library
+Overlay di texture opzionali per imperfezioni organiche:
+- Dust, Fog, Light Leak, Scratches, Patina, Noise, Paper Grain, Crystal Reflections
+
+#### Light Sources
+Preset di illuminazione:
+- North (Cold Teal), South (Warm Gold), Sun (White), Torch (Orange), Moon (Blue), Ambient
+
+#### Visual Recipes
+Ricette pre-configurate per pattern UI comuni:
+- Village Panel, Quest Panel, Inventory Panel, Reward Panel, Boss Panel, Dialogue Panel, Character Sheet, Tooltip, Window, Card, Popup
+
+### Integrazione con Pillar
+
+#### Wilderness Pillar
+- Materiali: Timber, Alpine Stone, Golden Thatch
+- Frame: Simple, Stone, Wood
+- Decoration: Explorer, Village, Nature
+- Light: Ambient, North
+
+#### Empire Pillar
+- Materiali: Basalt, Sun-Bronze, Iridescent Silk
+- Frame: Imperial, Bronze, Hero
+- Decoration: Imperial, Ancient, Legendary
+- Light: Sun, South, Torch
+
+### Integrazione con Artist Styles
+
+#### Ruan Jia Style
+- Clean, sculptural, divine light
+- Layer 1-5: Always
+- Layer 6-8: For focal points
+- Zero imperfezioni su volti
+
+#### Jaime Jones Style
+- Impasto, textured, oil brushstrokes
+- Layer 1-8: Always
+- Layer 9-12: For matter
+- Heavy texture on body
+
+#### Sparth Style
+- Monumental, asymmetric, heroic scale
+- Layer 1-6: Always
+- Layer 7-12: For architecture
+- Grand silhouettes
+
+#### Jeff Easley Style
+- Bronze weight, legendary monsters, heroic '80s
+- Layer 1-8: Always
+- Layer 9-15: For monsters/armor
+- Heavy metallic feel
+
+---
+
+Rendering System aggiunto in v0.11.

@@ -1,0 +1,131 @@
+{
+  "task_id": "ROSTER-STAT-FILTER",
+  "title": "Roster Stat-Based Filtering System",
+  "description": "Add stat-based filtering capability to the Roster component on /roster page, enabling users to filter residents by their stats (e.g., HP, damage, stamina) in addition to existing sorting functionality.",
+  "plan_reference": "User request via Strategist reconnaissance",
+  "estimated_duration": "90-120 minutes",
+  "objectives": [
+    "Add UI controls to select/filter by stats (HP, damage, stamina, etc.)",
+    "Implement filtering logic that filters residents by selected stat criteria before sorting",
+    "Maintain existing sorting functionality (name, HP, fatigue)",
+    "Integrate with existing config-first architecture and resident data sources",
+    "Ensure accessibility, theming, and drag-drop compatibility remain intact",
+    "Provide clear feedback when no residents match filters"
+  ],
+  "success_criteria": [
+    "Users can filter roster by stat (e.g., HP > 50, damage > 20)",
+    "Filtering works in combination with existing sort modes",
+    "All UI labels use i18n (no hardcoded strings)",
+    "Filter configuration is config-first with Zod validation",
+    "Existing drag-drop and assignment logic unaffected",
+    "Lint, build:check, and kanban:lint safeguards pass"
+  ],
+  "kpi_targets": {
+    "filter_latency_ms": "< 50ms for 100 residents",
+    "i18n_coverage": "100% of user-facing strings",
+    "config_first_compliance": "100% (no hardcoded values)",
+    "safeguard_pass_rate": "100%"
+  },
+  "integration_points": [
+    "VillageRosterSection.tsx - apply filtering before sorting",
+    "RosterSortControl.tsx - extend or create companion filter control",
+    "rosterSortConfig.ts - create rosterFilterConfig.ts following same pattern",
+    "ResidentState.statSnapshot - data source for stat values",
+    "TestRosterPage.tsx - integration testing"
+  ],
+  "dependencies": [
+    "Existing roster sorting system (rosterSortConfig.ts)",
+    "ResidentState with statSnapshot (TimeEngine.ts)",
+    "i18n system (react-i18next with idleVillage namespace)",
+    "Skin system (skinConfigRegistry for UI styling)"
+  ],
+  "guardrails": {
+    "invariants": [
+      "Config-first: All filter options and thresholds from config modules with Zod schemas",
+      "i18n: All user-facing strings through react-i18next (idleVillage namespace)",
+      "Skin system: Use existing primitives from atoms/fantasy atoms, no new CSS files",
+      "Component reuse: Check existing primitives before creating new components",
+      "State management: Filter state as local UI state (Context), not domain state (Zustand)"
+    ],
+    "trusted_frozen_components": [
+      "VillageRosterSection - canonical roster wrapper (verify before modification)",
+      "ResidentRosterPanel - canonical roster display (verify before modification)",
+      "RosterSortControl - existing sort control (extend, do not break)"
+    ],
+    "forbidden_actions": [
+      "Do not remove or alter existing sorting controls except to integrate filtering",
+      "Do not bypass config-first principles (no hardcoded stat names or thresholds)",
+      "Do not modify drag-drop logic or slot assignment",
+      "Do not create standalone .css files for styling",
+      "Do not use direct localStorage/sessionStorage for filter state"
+    ]
+  },
+  "implementation_scope": {
+    "files_to_create": [
+      "src/ui/idleVillage/config/rosterFilterConfig.ts - filter configuration with Zod schema",
+      "src/ui/idleVillage/components/RosterStatFilter.tsx - stat filter UI component",
+      "tests/unit/idleVillage/RosterStatFilter.test.tsx - unit tests for filter logic"
+    ],
+    "files_to_modify": [
+      "src/ui/idleVillage/components/VillageRosterSection.tsx - integrate filtering before sorting",
+      "src/ui/idleVillage/components/RosterSortControl.tsx - add filter control or create companion",
+      "public/locales/en/idleVillage.json - add i18n keys for filter UI",
+      "public/locales/pseudo/idleVillage.json - add pseudo-locale keys for testing"
+    ],
+    "component_reuse_requirements": [
+      "Check src/ui/atoms/ for select/dropdown primitives",
+      "Check src/ui/fantasy/atoms/ for fantasy-themed UI primitives",
+      "Reuse QuestDecisionHeatmapFilter patterns if applicable (FilterGroup, multi-select)",
+      "Use existing input primitives instead of creating new ones"
+    ],
+    "testing_requirements": {
+      "unit_tests": [
+        "Test filter logic with various stat thresholds",
+        "Test filter + sort combination",
+        "Test edge cases (no residents match, all residents match, empty filters)",
+        "Test i18n key coverage"
+      ],
+      "integration_tests": [
+        "Test filter UI in TestRosterPage",
+        "Test filter persistence across UI interactions",
+        "Test drag-drop compatibility with active filters"
+      ],
+      "accessibility_tests": [
+        "Keyboard navigation for filter controls",
+        "Screen reader announcements for filter changes",
+        "ARIA labels on all filter inputs"
+      ]
+    },
+    "documentation_updates": [
+      "Update idle_village_plan.md with stat filtering feature",
+      "Add JSDoc to all new functions and interfaces",
+      "Document filter configuration schema in rosterFilterConfig.ts"
+    ]
+  },
+  "safeguards": {
+    "lint": {
+      "scope": "src/ui/idleVillage/config/rosterFilterConfig.ts src/ui/idleVillage/components/RosterStatFilter.tsx src/ui/idleVillage/components/VillageRosterSection.tsx src/ui/idleVillage/components/RosterSortControl.tsx",
+      "timeout_seconds": 120
+    },
+    "test": {
+      "scope": "tests/unit/idleVillage/RosterStatFilter.test.tsx",
+      "timeout_seconds": 300
+    },
+    "build_check": {
+      "timeout_seconds": 180
+    },
+    "kanban_lint": {
+      "timeout_seconds": 30
+    },
+    "evidence_log": "test-results/roster-stat-filter-<date>.log"
+  },
+  "execution_hint": "verified",
+  "notes": {
+    "architecture_approach": "Create rosterFilterConfig.ts following rosterSortConfig.ts pattern. Define available stats (from StatBlock keys), operators (>, <, =, >=, <=), and thresholds. Use React Context for filter state (local UI state). Apply filtering in VillageRosterSection before sorting: filterResidents(residents, filterCriteria) -> sortResidents(filtered, sortMode).",
+    "stat_block_integration": "Residents have statSnapshot: Partial<StatBlock>. Filter by checking statSnapshot[statKey] against threshold with operator. Handle missing stats gracefully (treat as 0 or exclude based on config).",
+    "ui_pattern": "Simple dropdown for stat selection, dropdown for operator, number input for threshold. Optional: multi-select for stats, range sliders for thresholds. Start simple, enhance based on user feedback.",
+    "i18n_keys": "Add keys: roster.filter.label, roster.filter.stat.{statName}, roster.filter.operator.{operator}, roster.filter.threshold, roster.filter.clear, roster.filter.noResults",
+    "fallback_behavior": "If no filters active, show all residents. If no residents match, show 'No residents match current filters' message (i18n). Clear filters button to reset.",
+    "drag_drop_compatibility": "Filtering only affects display, not underlying resident data. Drag-drop works on filtered list normally. Assignment validation uses full resident data."
+  }
+}

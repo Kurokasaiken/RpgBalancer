@@ -230,8 +230,8 @@ def calcola_batch_eseguibile(coda_task: List[dict]) -> Tuple[List[dict], List[di
         # Determine channel from executor field or default
         executor = task.get("executor", "manual")
         
-        # Separate manual tasks immediately (both 'manual' and 'swe' executors)
-        if executor in ("manual", "swe"):
+        # Separate manual tasks immediately (manual, swe, Cascade executors)
+        if executor in ("manual", "swe", "Cascade"):
             manual_tasks.append({
                 "task_id": task_id,
                 "channel": "manual",
@@ -306,6 +306,67 @@ def dispatch_task(task_id: str, channel: str, model: str, file_targets: List[str
     """
     register_task_start(task_id, channel, file_targets, model)
     print(f"[DISPATCH] Task {task_id} started on {channel} with model {model}")
+
+
+def dispatch_harness_batch(batch: List[dict], timeout_seconds: int = 1800):
+    """Dispatch harness tasks by invoking npm run harness:dispatch.
+    
+    Filters tasks with channel="harness" from the batch and executes them
+    via the harness system with proper timeout and error handling.
+    
+    Args:
+        batch: List of task dicts with task_id, channel, model, file_targets
+        timeout_seconds: Maximum time to wait for harness dispatch (default 1800s)
+    
+    Returns:
+        Number of harness tasks dispatched
+    """
+    # Filter harness tasks
+    harness_tasks = [task for task in batch if task.get("channel") == "harness"]
+    
+    if not harness_tasks:
+        print("[INFO] No harness tasks in batch")
+        return 0
+    
+    print(f"[INFO] Dispatching {len(harness_tasks)} harness tasks...")
+    
+    # Build task IDs for harness:dispatch
+    task_ids = [task["task_id"] for task in harness_tasks]
+    
+    try:
+        # Invoke harness:dispatch with task ID filter
+        cmd = [
+            "npm", "run", "harness:dispatch", "--",
+            "--id-filter", ",".join(task_ids),
+            "--max-parallel", str(min(len(harness_tasks), 5))  # Limit parallelism
+        ]
+        
+        print(f"[HARNESS] Executing: {' '.join(cmd)}")
+        
+        # Run with timeout
+        result = subprocess.run(
+            cmd,
+            cwd=ROOT_DIR,
+            capture_output=True,
+            text=True,
+            timeout=timeout_seconds
+        )
+        
+        if result.returncode == 0:
+            print(f"[HARNESS] Dispatch completed successfully")
+            print(f"[HARNESS] Output: {result.stdout[:500]}")  # First 500 chars
+            return len(harness_tasks)
+        else:
+            print(f"[ERROR] Harness dispatch failed with code {result.returncode}")
+            print(f"[ERROR] Stderr: {result.stderr}")
+            return 0
+            
+    except subprocess.TimeoutExpired:
+        print(f"[ERROR] Harness dispatch timed out after {timeout_seconds}s")
+        return 0
+    except (subprocess.SubprocessError, FileNotFoundError) as e:
+        print(f"[ERROR] Failed to invoke harness: {e}")
+        return 0
 
 
 def send_desktop_notification(title: str, message: str):
@@ -466,8 +527,24 @@ def main():
         completed_this_cycle = count_completed_this_cycle(status_before, status_after)
         write_run_summary(len(batch), len(blocked_tasks), completed_this_cycle, blocked_tasks, max_paralleli, manual_tasks)
     else:
-        # TODO: Implement actual dispatch logic
-        print("[INFO] Dispatch not yet implemented (use --select-only)")
+        # Full dispatch mode: execute harness tasks automatically
+        print("[INFO] Full dispatch mode - executing harness tasks automatically")
+        
+        # Dispatch harness tasks
+        harness_count = dispatch_harness_batch(batch)
+        if harness_count > 0:
+            print(f"[INFO] {harness_count} harness tasks dispatched")
+            # Send desktop notification for harness tasks
+            send_desktop_notification(
+                "Harness tasks in esecuzione",
+                f"{harness_count} task harness avviati automaticamente"
+            )
+        
+        # Write run summary
+        rows_after = parse_agent_assignments_rows()
+        status_after = {row["id"].split()[0]: row["status"] for row in rows_after}
+        completed_this_cycle = count_completed_this_cycle(status_before, status_after)
+        write_run_summary(len(batch), len(blocked_tasks), completed_this_cycle, blocked_tasks, max_paralleli, manual_tasks)
     
     # Always print manual reminder if queue is not empty
     print_manual_reminder()

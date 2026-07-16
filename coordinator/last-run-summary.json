@@ -1,13 +1,13 @@
 {
-  "timestamp": "2026-07-15T15:39:36.821918+00:00",
-  "task_lanciati": 0,
+  "timestamp": "2026-07-16T07:22:53.510407+00:00",
+  "task_lanciati": 1,
   "task_bloccati": 0,
   "task_completati_questo_giro": 0,
   "dettaglio_bloccati": [],
   "max_paralleli_calcolato": 20,
   "task_manuali_in_attesa": [],
   "manual_dispatch": {
-    "pending": 0,
+    "pending": 1,
     "completed": 0,
     "failed": 0,
     "queue_file": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/queue.json",
