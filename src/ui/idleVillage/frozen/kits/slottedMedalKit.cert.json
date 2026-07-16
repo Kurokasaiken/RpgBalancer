@@ -8,10 +8,22 @@
   "certifiedBy": "wave-1-batch-1-bootstrap",
   "evidence": [
     {
+      "label": "SlottedMedal.tsx + SlottedMedalSkin.tsx restored from git (deleted in fa5a01bc)",
+      "path": "src/ui/idleVillage/components/SlottedMedal.tsx"
+    },
+    {
+      "label": "/minimal-slottedmedal route added to App.tsx",
+      "path": "src/pages/minimal-slottedmedal.tsx"
+    },
+    {
+      "label": "73 unit tests passing (SlottedMedal.test.tsx, SlottedMedal.unit.test.tsx, SlottedMedal.ui.test.tsx)",
+      "path": "tests/unit/idleVillage/SlottedMedal.test.tsx"
+    },
+    {
       "label": "playwright contract sweep (pending CI run)",
       "path": "tests/contract/minimal-vs-test.spec.ts"
     }
   ],
   "certified": false,
-  "notes": "Bootstrap. The minimal page passes data-testid=\"slotted-medal-root\" since SlottedMedal accepts it as prop."
+  "notes": "Bootstrap. The minimal page passes data-testid=\"slotted-medal-root\" since SlottedMedal accepts it as prop. Vite import error resolved: SlottedMedal.tsx and SlottedMedalSkin.tsx were accidentally deleted in commit fa5a01bc and have been restored. tsc --noEmit blind spot: tsconfig.json has 'files':[] and is a project-references composite root — it checks nothing itself; only tsconfig.app.json (used by tsc -p tsconfig.app.json) covers src/, so bare 'tsc --noEmit' silently passes even with broken imports. Fix: use 'npx tsc -p tsconfig.app.json --noEmit' in CI."
 }
