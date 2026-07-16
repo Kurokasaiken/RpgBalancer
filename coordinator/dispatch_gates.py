@@ -54,17 +54,29 @@ def parse_agent_assignments_rows() -> List[dict]:
             continue
         
         # Parse based on column count (5, 8, or 10 columns)
-        if len(columns) >= 8:
-            # New format with executor columns
+        if len(columns) >= 10:
+            # Full format with executor columns: ID, Status, Dependencies, Agent, Last Update, Notes, Executor, Executor Reason, Date, Prompt
             row = {
                 "id": columns[0],
                 "status": columns[1],
                 "dependencies": columns[2],
                 "agent": columns[3],
-                "last_update": columns[6] if len(columns) >= 10 else columns[4],
-                "notes": columns[7] if len(columns) >= 10 else columns[5],
-                "executor": columns[5] if len(columns) >= 8 else "",
-                "executor_reason": columns[6] if len(columns) >= 8 else "",
+                "last_update": columns[4],
+                "notes": columns[5],
+                "executor": columns[6],
+                "executor_reason": columns[7],
+            }
+        elif len(columns) >= 8:
+            # Medium format with executor columns
+            row = {
+                "id": columns[0],
+                "status": columns[1],
+                "dependencies": columns[2],
+                "agent": columns[3],
+                "last_update": columns[4],
+                "notes": columns[5],
+                "executor": columns[6],
+                "executor_reason": columns[7] if len(columns) >= 8 else "",
             }
         else:
             # Legacy format

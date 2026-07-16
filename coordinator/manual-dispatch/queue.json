@@ -1,5 +1,12 @@
 {
   "version": "1.0",
-  "tasks": [],
-  "last_updated": "2026-07-15T12:59:39.075077+00:00"
+  "tasks": [
+    {
+      "task_id": "ADR001-T5",
+      "status": "pending",
+      "timestamp": "2026-07-15T16:16:18.544101+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/ADR001-T5.md"
+    }
+  ],
+  "last_updated": "2026-07-15T16:16:18.544418+00:00"
 }

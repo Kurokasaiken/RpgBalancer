@@ -1,14 +1,13 @@
 /**
- * TestHub — Destiny Astrolabe V3.
- * Default ASIMMETRICI (80/65/50/35/20) per mostrare la stella data-driven
- * (piano §10). Pannello dev fake-item che dimostra preview/apply dei
- * modifiers (§7) senza inventario.
+ * TestHub — Destiny Astrolabe V4.
+ * Stessa griglia di controllo della V3 (default asimmetrici, fake-item §7),
+ * componente V4: ghiera materica, obelischi-cristallo, climax tipografico.
  */
 import React, { useMemo, useRef, useState } from 'react';
-import DestinyAstrolabeV3, {
-  type DestinyAstrolabeV3Handle,
-} from '../ui/idleVillage/components/destinyAstrolabeV3/DestinyAstrolabeV3';
-import type { AstrolabeV3Result } from '../ui/idleVillage/components/destinyAstrolabeV3/engineV3';
+import DestinyAstrolabeV4, {
+  type DestinyAstrolabeV4Handle,
+} from '../ui/idleVillage/components/destinyAstrolabeV4/DestinyAstrolabeV4';
+import type { AstrolabeV4Result } from '../ui/idleVillage/components/destinyAstrolabeV4/engineV4';
 import type { AstrolabeModifier } from '../ui/idleVillage/components/destinyAstrolabeV3/modifiers';
 
 const DEFAULT_STATS = [
@@ -50,15 +49,15 @@ const FAKE_ITEMS: { label: string; modifier: AstrolabeModifier }[] = [
   },
 ];
 
-const MinimalDestinyAstrolabeV3 = () => {
-  const astroRef = useRef<DestinyAstrolabeV3Handle>(null);
+const MinimalDestinyAstrolabeV4 = () => {
+  const astroRef = useRef<DestinyAstrolabeV4Handle>(null);
   const [skillCount, setSkillCount] = useState(3);
   const [stats, setStats] = useState(DEFAULT_STATS);
   const [difficulty, setDifficulty] = useState(50);
   const [critPct, setCritPct] = useState(5);
   const [woundPct, setWoundPct] = useState(10);
   const [deathPct, setDeathPct] = useState(5);
-  const [lastResult, setLastResult] = useState<AstrolabeV3Result | null>(null);
+  const [lastResult, setLastResult] = useState<AstrolabeV4Result | null>(null);
   const [applied, setApplied] = useState<string[]>([]);
 
   const skills = useMemo(
@@ -84,7 +83,7 @@ const MinimalDestinyAstrolabeV3 = () => {
     >
       <div className="flex items-center justify-between px-6 py-3 flex-shrink-0">
         <div className="flex items-center gap-4">
-          <h1 className="text-xl font-bold text-amber-400">Destiny Astrolabe · V3</h1>
+          <h1 className="text-xl font-bold text-amber-400">Destiny Astrolabe · V4</h1>
           <div className="flex gap-2">
             <a
               href="/minimal-destiny-astrolabe"
@@ -99,10 +98,10 @@ const MinimalDestinyAstrolabeV3 = () => {
               V2
             </a>
             <a
-              href="/minimal-destiny-astrolabe-v4"
-              className="px-3 py-1 rounded text-sm font-semibold bg-amber-600 text-black hover:bg-amber-500 transition-colors"
+              href="/minimal-destiny-astrolabe-v3"
+              className="px-3 py-1 rounded text-sm font-semibold bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors"
             >
-              V4
+              V3
             </a>
           </div>
         </div>
@@ -118,7 +117,7 @@ const MinimalDestinyAstrolabeV3 = () => {
       </div>
 
       <div className="flex-1 overflow-hidden" style={{ minHeight: 0 }}>
-        <DestinyAstrolabeV3
+        <DestinyAstrolabeV4
           ref={astroRef}
           skills={skills}
           difficulty={difficulty}
@@ -217,4 +216,4 @@ const MinimalDestinyAstrolabeV3 = () => {
   );
 };
 
-export default MinimalDestinyAstrolabeV3;
+export default MinimalDestinyAstrolabeV4;

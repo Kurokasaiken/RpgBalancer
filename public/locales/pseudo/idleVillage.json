@@ -992,6 +992,19 @@
       "nameDescDescription": "!! ŠŠööřřţţ þþÿÿ ððîîššþþļļååÿÿ ññååṃméé ååååþþĥĥååƀƀééţţîîççååļļļļÿÿ (ŽŽ ţţöö ÅÅ) !!",
       "hpDescDescription": "!! ŠŠööřřţţ þþÿÿ ççüüŗŗŗŗééññţţ ĤĤṖṖ (ĥĥîîğğĥĥééššţţ ƒƒîîŗŗššţţ) !!",
       "fatigueAscDescription": "!! ŠŠööřřţţ þþÿÿ ƒƒååţţîîğğüüéé (ļļööŵŵééššţţ ƒƒîîŗŗššţţ) !!"
+    },
+    "filter": {
+      "label": "!! ƑƑîîłłţţééřř !!",
+      "statLabel": "!! ŠŠţţååţţ !!",
+      "operatorLabel": "!! ÖÖṗṗééřååţţööřř !!",
+      "thresholdLabel": "!! ŢŢĥĥŘŘééššĥĥööłłδδ !!",
+      "thresholdAriaLabel": "!! ƑƑîîłłţţééŘŘ ţţĥĥŘŘééššĥĥööłłδδ ṽṽååłłüüéé !!",
+      "addFilter": "!! ÅÅδδδδ !!",
+      "addFilterAriaLabel": "!! ÅÅδδδδ ƒƑîîłłţţééŘŘ !!",
+      "clearFilters": "!! ÇçççļļééååŘŘ !!",
+      "clearFiltersAriaLabel": "!! ÇçççļļééååŘŘ ååłłłł ƒƑîîłłţţééŘŘşş !!",
+      "removeFilterAriaLabel": "!! ŘŘééṁṗööṽṽéé ƒƑîîłłţţééŘŘ !!",
+      "noResults": "!! ÑÑöö ŘŘééşşîîδδééññţţşş ṁṁååţţççĥĥ ççüüŘŘŘŘééññţţ ƒƑîîłłţţééŘŘşş !!"
     }
   },
   "astrolabeV3": {
@@ -1009,5 +1022,11 @@
     "onboardingStar": "[!! Yöûr stréngth: thé hîghér thé stàt, thé löngér thé îvöry löbé strétchés. !!]",
     "onboardingRisk": "[!! Crîmsön cröwn: lànd théré ànd yöû àré wöûndéd. Vîölét chàsms: à léthàl fàll. !!]",
     "onboardingThrow": "[!! Thröw thé spàrk — whéré ît stöps îs thé prööf öf yöûr fàté. !!]"
+  },
+  "astrolabeV4": {
+    "subSuccess": "[!! Thé sûmmît böws tö yöûr strîdé. !!]",
+    "subNearMiss": "[!! Thé spàrk dàncéd ön thé rîm… ànd slîppéd béyönd. !!]",
+    "subFail": "[!! Thé möûntàîn répéls mörtàls. !!]",
+    "subCrit": "[!! Thé àbyss clàîms thösé whö dàré töö mûch. !!]"
   }
 }

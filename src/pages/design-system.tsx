@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DndContext } from '@dnd-kit/core';
 import { TokenSwatchGrid } from '@/ui/designSystem/TokenSwatch';
 import { V9PanelShell } from '@/ui/designSystem/V9PanelShell';
 import { usePanelsStore, selectVisiblePanels } from '@/ui/designSystem/store/usePanelsStore';
 import { useLiveSkinTokens } from '@/ui/designSystem/useLiveSkinTokens';
+import { getCatalogCounts, getCatalogEntry } from '@/ui/designSystem/componentCatalog';
+import { ComponentTechSheet } from '@/ui/designSystem/ComponentTechSheet';
+import { ErrorBoundary } from '@/ui/organisms/ErrorBoundary';
 import { useSkinPreferences } from '@/ui/idleVillage/hooks/useSkinPreferences';
 import {
   SkinScope,
@@ -13,6 +16,19 @@ import {
   SkinBadge,
   SkinCloseButton,
 } from '@/ui/idleVillage/skins/primitives';
+
+// Embed dei kit reali: lazy per non gravare sul first paint della Review Room.
+const CurrentProductionSection = React.lazy(() =>
+  import('@/ui/designSystem/GamePatternEmbeds').then((m) => ({ default: m.CurrentProductionSection }))
+);
+const GamePatternsSection = React.lazy(() =>
+  import('@/ui/designSystem/GamePatternEmbeds').then((m) => ({ default: m.GamePatternsSection }))
+);
+const HeroShowcase = React.lazy(() => import('@/ui/designSystem/HeroShowcase'));
+const SkinPreviewMatrix = React.lazy(() => import('@/ui/designSystem/SkinPreviewMatrix'));
+const VisualRulesSection = React.lazy(() => import('@/ui/designSystem/VisualRulesSection'));
+const InteractionPatterns = React.lazy(() => import('@/ui/designSystem/InteractionPatterns'));
+const UIHealthReport = React.lazy(() => import('@/ui/designSystem/UIHealthReport'));
 
 /**
  * /design-system — UI Review Room del gioco.
@@ -55,6 +71,7 @@ const REVIEW_SECTIONS: Array<{ id: string; label: string }> = [
 ];
 
 const LAB_SECTIONS: Array<{ id: string; label: string }> = [
+  { id: 'section-health', label: 'UI Health' },
   { id: 'section-tokens', label: 'Tokens' },
   { id: 'section-panels', label: 'Panels' },
   { id: 'section-store', label: 'Store' },
@@ -156,6 +173,15 @@ export default function DesignSystemPage() {
               '/design-system non documenta la UI del gioco: la definisce. Ogni elemento visivo prodotto deve poter essere confrontato qui con il linguaggio visivo approvato.'
             )}
           </p>
+          <div className="ds-row" style={{ marginTop: '12px' }} data-testid="inventory-counter">
+            {Object.entries(getCatalogCounts()).map(([status, count]) =>
+              count > 0 ? (
+                <SkinBadge key={status} data-testid={`inventory-${status}`}>
+                  {count} {status}
+                </SkinBadge>
+              ) : null
+            )}
+          </div>
         </header>
 
         {/* ── Toolbar: preset switcher + surface tabs ─────────────────── */}
@@ -206,34 +232,58 @@ export default function DesignSystemPage() {
         <div hidden={surface !== 'review'} data-testid="surface-review-content">
           <section id="section-hero" className="ds-section" data-skin="panel">
             <h2 data-testid="section-hero">{t('designSystem.sections.hero', 'Hero Showcase')}</h2>
-            <SectionPlaceholder note="Fase 3 — composizione Village Overview (80% componenti reali)." />
+            <ErrorBoundary>
+              <Suspense fallback={<SectionPlaceholder note="Loading hero…" />}>
+                {surface === 'review' && <HeroShowcase />}
+              </Suspense>
+            </ErrorBoundary>
           </section>
 
           <section id="section-matrix" className="ds-section" data-skin="panel">
             <h2 data-testid="section-matrix">{t('designSystem.sections.matrix', 'Preview Matrix')}</h2>
-            <SectionPlaceholder note="Fase 3 — stessa scena composta per ogni preset, affiancate, con Skin Compatibility health." />
+            <ErrorBoundary>
+              <Suspense fallback={<SectionPlaceholder note="Loading matrix…" />}>
+                {surface === 'review' && <SkinPreviewMatrix />}
+              </Suspense>
+            </ErrorBoundary>
           </section>
 
           <section id="section-production" className="ds-section" data-skin="panel">
             <h2 data-testid="section-production">{t('designSystem.sections.production', 'Current Production')}</h2>
-            <SectionPlaceholder note="Fase 2 — la UI vera del gioco, read-only, con Source e Last validated." />
+            <ErrorBoundary>
+              <Suspense fallback={<SectionPlaceholder note="Loading production kits…" />}>
+                {surface === 'review' && <CurrentProductionSection />}
+              </Suspense>
+            </ErrorBoundary>
           </section>
 
           <section id="section-patterns" className="ds-section" data-skin="panel">
             <h2 data-testid="section-patterns">{t('designSystem.sections.patterns', 'Game Patterns')}</h2>
-            <SectionPlaceholder note="Fase 2 — POI Detail, Resident Card, Reward Popup… con Anatomy scomponibile." />
+            <ErrorBoundary>
+              <Suspense fallback={<SectionPlaceholder note="Loading game patterns…" />}>
+                {surface === 'review' && <GamePatternsSection />}
+              </Suspense>
+            </ErrorBoundary>
           </section>
 
           <section id="section-visual-rules" className="ds-section" data-skin="panel">
             <h2 data-testid="section-visual-rules">{t('designSystem.sections.visualRules', 'Visual Rules')}</h2>
-            <SectionPlaceholder note="Fase 4 — shape language, density, material, hierarchy, decoration & attention budget." />
+            <ErrorBoundary>
+              <Suspense fallback={<SectionPlaceholder note="Loading rules…" />}>
+                {surface === 'review' && <VisualRulesSection />}
+              </Suspense>
+            </ErrorBoundary>
           </section>
 
           <section id="section-interaction-patterns" className="ds-section" data-skin="panel">
             <h2 data-testid="section-interaction-patterns">
               {t('designSystem.sections.interactionPatterns', 'Interaction Patterns')}
             </h2>
-            <SectionPlaceholder note="Fase 4 — layout + flow + emotional goal (Reward Presentation, POI Discovery…)." />
+            <ErrorBoundary>
+              <Suspense fallback={<SectionPlaceholder note="Loading patterns…" />}>
+                {surface === 'review' && <InteractionPatterns />}
+              </Suspense>
+            </ErrorBoundary>
           </section>
 
           {/* Components — primitivi skin reali, nessun valore duplicato */}
@@ -263,11 +313,29 @@ export default function DesignSystemPage() {
                 <span className="skin-text-muted">muted</span>, <a href="#section-components">link accent</a>.
               </p>
             </div>
+
+            <h3 className="ds-group-title">{t('designSystem.components.sheets', 'Tech sheets')}</h3>
+            <div style={{ display: 'grid', gap: '14px' }} data-testid="components-sheets">
+              {['skin-button', 'skin-badge'].map((id) => {
+                const entry = getCatalogEntry(id);
+                return entry ? <ComponentTechSheet key={id} entry={entry} /> : null;
+              })}
+            </div>
           </section>
         </div>
 
         {/* ═══ ADVANCED LAB ═══════════════════════════════════════════ */}
         <div hidden={surface !== 'lab'} data-testid="surface-lab-content">
+          {/* UI Health Report — com'è messo il sistema, a colpo d'occhio */}
+          <section id="section-health" className="ds-section" data-skin="panel">
+            <h2 data-testid="section-health">{t('designSystem.sections.health', 'UI Health Report')}</h2>
+            <ErrorBoundary>
+              <Suspense fallback={<SectionPlaceholder note="Loading health…" />}>
+                {surface === 'lab' && <UIHealthReport />}
+              </Suspense>
+            </ErrorBoundary>
+          </section>
+
           {/* Tokens — letti LIVE da getComputedStyle, mai duplicati */}
           <section id="section-tokens" className="ds-section" data-skin="panel">
             <h2 data-testid="section-tokens">{t('designSystem.sections.tokens.title', 'Tokens')}</h2>

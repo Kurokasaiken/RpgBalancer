@@ -1,0 +1,296 @@
+/* Destiny Astrolabe V4 — overlay skin-token driven (mai hex hardcoded). */
+
+.dav4-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* screen-punch sul contatto finale (hit-stop) */
+.dav4-wrap--punch {
+  animation: dav4-punch 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes dav4-punch {
+  10%,
+  90% {
+    transform: translate(-1px, 1px);
+  }
+  20%,
+  80% {
+    transform: translate(2px, -1px);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translate(-3px, 2px);
+  }
+  40%,
+  60% {
+    transform: translate(3px, -2px);
+  }
+}
+
+.dav4-canvas-root {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dav4-canvas-root canvas {
+  display: block;
+  margin: auto;
+}
+
+/* Placca label — fuori dal bordo sfida (anti-collisione, engine emitLayout) */
+.dav4-obelisk-plaque {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px 3px;
+  background: var(--skin-plaque-bg);
+  border: var(--skin-plaque-border);
+  border-radius: var(--skin-plaque-radius);
+  box-shadow: var(--skin-plaque-shadow);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.dav4-plaque-name {
+  font-family: var(--skin-font-display);
+  font-size: 10px;
+  letter-spacing: var(--skin-plaque-tracking);
+  text-transform: uppercase;
+  color: var(--skin-plaque-color);
+  text-shadow: var(--skin-incision-label);
+}
+
+.dav4-plaque-value {
+  font-family: var(--skin-font-display);
+  font-size: 12px;
+  color: var(--skin-text-primary);
+  text-shadow: var(--skin-incision-value);
+}
+
+/* ── CLIMAX TIPOGRAFICO — monumentale, in fascia alta, arena visibile ── */
+.dav4-verdict {
+  position: absolute;
+  top: 3%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+  text-align: center;
+}
+
+.dav4-verdict-title {
+  font-family: var(--skin-font-display);
+  font-size: clamp(34px, 6vw, 64px);
+  letter-spacing: 0.22em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.dav4-ch {
+  display: inline-block;
+  background: var(--skin-title-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: var(--skin-title-shadow);
+  animation: dav4-ch-in 0.5s var(--skin-snap-ease) both;
+  animation-delay: var(--del);
+}
+
+@keyframes dav4-ch-in {
+  from {
+    opacity: 0;
+    transform: translate(var(--dx), calc(var(--dy) * -1)) rotate(var(--rot)) scale(1.4);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0) scale(1);
+  }
+}
+
+/* fallimento: lettere cineree che CADONO assestandosi (crumble inverso) */
+.dav4-verdict--failure .dav4-ch,
+.dav4-verdict--almost .dav4-ch {
+  background: none;
+  color: var(--skin-text-secondary);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+  animation-name: dav4-ch-fall;
+}
+
+.dav4-verdict--almost .dav4-ch {
+  color: var(--skin-text-primary);
+}
+
+@keyframes dav4-ch-fall {
+  from {
+    opacity: 0;
+    transform: translate(var(--dx), calc(var(--dy) * -1.6)) rotate(var(--rot));
+  }
+  60% {
+    opacity: 1;
+    transform: translate(0, 2px) rotate(0);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0);
+  }
+}
+
+.dav4-verdict-sub {
+  font-family: var(--skin-font-serif);
+  font-style: italic;
+  font-size: clamp(12px, 1.6vw, 16px);
+  color: var(--skin-text-secondary);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  animation: dav4-sub-in 0.6s ease-out 0.45s both;
+}
+
+@keyframes dav4-sub-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dav4-verdict-chips {
+  display: flex;
+  gap: 8px;
+}
+
+.dav4-chip {
+  font-family: var(--skin-font-display);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  padding: 2px 10px;
+  border-radius: 999px;
+  animation: dav4-sub-in 0.5s ease-out 0.6s both;
+}
+
+.dav4-chip--wound {
+  color: var(--skin-status-wound);
+  border: 1px solid var(--skin-status-wound);
+}
+
+.dav4-chip--death {
+  color: var(--skin-status-death);
+  border: 1px solid var(--skin-status-death);
+}
+
+/* THROW — unico attore oro caldo */
+.dav4-throw {
+  position: absolute;
+  bottom: 7%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--skin-btn-bg);
+  border: var(--skin-btn-border);
+  color: var(--skin-btn-color);
+  font-family: var(--skin-btn-font);
+  font-size: var(--skin-btn-size);
+  letter-spacing: var(--skin-btn-tracking);
+  border-radius: var(--skin-btn-radius);
+  padding: var(--skin-btn-padding);
+  box-shadow: var(--skin-btn-shadow);
+  text-shadow: var(--skin-btn-text-shadow);
+  cursor: pointer;
+  animation: dav4-throw-pulse 1.6s ease-in-out infinite;
+}
+
+.dav4-throw:hover {
+  background: var(--skin-btn-hover-bg);
+  box-shadow: var(--skin-btn-hover-shadow);
+  transform: translateX(-50%) translateY(-2px);
+}
+
+.dav4-throw--again {
+  animation: none;
+}
+
+@keyframes dav4-throw-pulse {
+  0%,
+  100% {
+    box-shadow: var(--skin-btn-shadow);
+  }
+  50% {
+    box-shadow: var(--skin-btn-hover-shadow);
+  }
+}
+
+.dav4-onboarding {
+  position: absolute;
+  bottom: 16%;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 60%;
+  text-align: center;
+  font-family: var(--skin-font-serif);
+  font-size: 13px;
+  color: var(--skin-text-secondary);
+  background: var(--skin-inset-bg);
+  border: 1px solid var(--skin-inset-border);
+  border-radius: var(--skin-inset-radius);
+  padding: 6px 14px;
+  pointer-events: none;
+}
+
+.dav4-onboarding:empty {
+  display: none;
+}
+
+.dav4-controls {
+  position: absolute;
+  right: 4%;
+  bottom: 6%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.dav4-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--skin-font-display);
+  font-size: 11px;
+  letter-spacing: var(--skin-label-tracking);
+  text-transform: uppercase;
+  color: var(--skin-label-primary);
+  cursor: pointer;
+}
+
+.dav4-toggle input {
+  accent-color: var(--skin-icon-color);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dav4-wrap--punch,
+  .dav4-throw,
+  .dav4-ch,
+  .dav4-verdict-sub,
+  .dav4-chip {
+    animation: none;
+  }
+}
