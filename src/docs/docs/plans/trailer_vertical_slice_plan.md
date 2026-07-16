@@ -1,170 +1,434 @@
 ---
-title: Idle Village — Trailer Vertical Slice Plan
-status: draft
+title: Idle Village — Steam Teaser Vertical Slice Implementation Plan v2
+status: candidate
 owner: Cascade
-last_updated: 2026-07-13
-description: "Single source of truth for the 45-second Steam-first trailer vertical slice: phases, code behaviour, viewer experience, and component inventory."
+last_updated: 2026-07-16
+description: "Pragmatic implementation plan for 45-second Steam teaser: 5 independent recordable cinematic scenes built on existing game UI components."
 ---
 
-# Idle Village — Trailer Vertical Slice Plan
+# Idle Village — Steam Teaser Vertical Slice Implementation Plan v2
 
-> **Scope:** 45-second cinematic trailer for the Steam page / broadcast / devlog.  
-> **Primary owner:** Cascade · Go-To-Market Pod  
-> **Related docs:** [go_to_market_steam_first.md](../strategy/go_to_market_steam_first.md), [VERTICAL_SLICE_ROADMAP.md](../../../../VERTICAL_SLICE_ROADMAP.md), [MASTER_PLAN.md](../MASTER_PLAN.md), [vertical_slice_implementation_plan.md](vertical_slice_implementation_plan.md), [trailer_vertical_slice_tasks.md](trailer_vertical_slice_tasks.md)
-
----
-
-## 1. Objective
-
-Document the trailer as a vertical slice in its own right: a scripted, timed sequence of UI scenes that shows the Gilded Observatory fantasy of the Idle Village loop without exposing the full game simulation. Each phase declares **what the code must do** and **what the viewer must see**, and references existing components or new components that must be built.
-
-This plan feeds the master roadmap and is the basis for the component inventory the user must confirm before implementation begins.
+> **Principle:** This is not a gameplay system. It is a deterministic marketing capture layer built on top of existing game UI components.
+>
+> **Objective:** Produce a 45-second Steam teaser by creating five independent recordable cinematic scenes.
+>
+> **Primary owner:** Cascade · Go-To-Market Pod
+> **Related docs:** [go_to_market_steam_first.md](../strategy/go_to_market_steam_first.md), [MASTER_PLAN.md](../MASTER_PLAN.md)
 
 ---
 
-## 2. Trailer phases
+## 1. Philosophy
 
-| Phase | Time | Code must do | Viewer must see | Key notes / existing artefacts |
-|-------|------|--------------|-----------------|--------------------------------|
-| **A — Title & Loading** | `00:00 - 00:06` | Render a static title card with a progress bar that fills deterministically; behind it, a looping, non-interactive village backdrop with gold/ivory premium lights and a subtle shader. | The game title appears, a progress bar fills, and the village background feels alive (warm lantern lights, starfield, aurora). | Missing: `TrailerIntroPage`, `VillageBackdrop` (loop shader or image/video). Existing: `MapPage` background overlay, `ActionProgressBar`. |
-| **B — POI Map** | `00:06 - 00:14` | Render `MapPage` with several POI markers that appear; the trailer highlights one selected POI and one rejected POI, then transitions to the selected high-risk POI. | A living map with POI markers popping in; a risky POI is chosen while others are rejected, then the scene dissolves into the selected location. | Missing: `PoiMap`, `PoiMapMarker`, `PoiMapRiskBar`, `PoiMapTransition`. Existing: `QuestPOI`, `GenericPoiSkin`, `LocationCard`, `MapPage`, `useMapContext`.
-| **C — Three Mock UI Screens** | `00:14 - 00:22` | Show three cinematic, non-interactive (or lightly animated) UI screens: Forge, Spell, Hero. The screens should simulate quick click feedback and fast mathematical/stat changes (numbers flashing, sliders moving). | Forgeria arc, Spell creator, and Hero sheet flick through in a seamless montage; numbers and sliders animate in response to fake input. | Missing: `ForgeScreen`, `HeroSheet`, `AnimatedNumber`, `MathFlash`. Existing: `SpellCreatorNewMockup`, `SpellCreatorNew`, `SpellEditor`, `SpellLibrary`, `CharacterCreator`, `CharacterBuilder`, `PgDetailCard`, `StatAllocationCard`, `EnhancedStatSlider`, `ConfigurableCard`/`ConfigurableStat`. |
-| **D — Astrolabe Ball** | `00:22 - 00:32` | Drive the pre-calculated ball movement in the astrolabe: the ball dodges crimson spikes and lands on a scripted success, then a loot explosion burst fires. | The player sees the spatial tension of the astrolabe: crimson risk spikes, the ball orbiting, a near-miss, and a golden loot explosion. | Existing: `DestinyAstrolabe` (ball physics + crimson spine + spatial verdict), `SkillCheckLegend`. Missing/needs config: `LootExplosion` particle burst, `AstrolabeTrailerController` (scripted sequence). |
-| **E — Celestial Forge Unlock & Wishlist CTA** | `00:32 - 00:45` | Apply a dissolve / particle effect on the village background, then play the Celestial Forge unlock animation and end with a Wishlist / Coming Soon sign. | The village dissolves into golden particles, the Celestial Forge rises/illuminates, then a wishlist sign appears with the Steam CTA. | Missing: `VillageDissolveTransition`, `ParticleField`, `CelestialForgeUnlockAnimation`, `WishlistSign`. Existing: `go_to_market_steam_first.md` defines the Steam KPI. |
+The trailer is a temporary marketing asset built on top of existing game systems. It is NOT a gameplay feature.
 
----
+**DO NOT create:**
+- Cinematic engine
+- Reusable framework
+- Premature abstraction
+- Permanent systems
 
-## 3. Component inventory (for user confirmation)
+**DO create:**
+- Deterministic scenes that produce beautiful frames for capture
+- Scripted sequences on top of existing UI components
+- Config-driven timing and values for easy iteration
 
-Components are grouped by phase. For each component, the status is **EXISTS** or **MISSING**.
-
-### A — Title & Loading
-
-| Component | Path / Note | Status |
-|-----------|-------------|--------|
-| `ActionProgressBar` | `src/ui/idleVillage/map/actionCards/ActionProgressBar.tsx` | EXISTS |
-| `MapPage` background overlay | `src/ui/idleVillage/map/MapPage.tsx` | EXISTS |
-| `VillageBackdrop` (loop shader or image/video; not real-time game render) | New component | MISSING |
-| `TrailerIntroPage` | New orchestrator page | MISSING |
-| `TrailerProgressBar` | Deterministic, cinematic progress bar | MISSING |
-
-### B — POI Map
-
-| Component | Path / Note | Status |
-|-----------|-------------|--------|
-| `QuestPOI` / `GenericPoiSkin` | `src/ui/idleVillage/components/minimal/QuestPOI.tsx` | EXISTS |
-| `LocationCard` | `src/ui/idleVillage/components/LocationCard.tsx` | EXISTS |
-| `MapPage` | `src/ui/idleVillage/map/MapPage.tsx` | EXISTS |
-| `useMapContext` | `src/ui/idleVillage/hooks/useMapContext.ts` | EXISTS |
-| `PoiMap` | Wrapper on `MapPage` with POI appear/choice | MISSING |
-| `PoiMapMarker` | POI marker with appear/selected/rejected states | MISSING |
-| `PoiMapRiskBar` | Risk bar for marker | MISSING |
-| `PoiMapTransition` | Transition from selected POI | MISSING |
-| `PoiMapConfig` | Config-first POI map data | MISSING |
-
-### C — Three Mock UI Screens
-
-| Component | Path / Note | Status |
-|-----------|-------------|--------|
-| `SpellCreatorNewMockup` | `src/ui/spells/SpellCreatorNewMockup.tsx` | EXISTS |
-| `SpellCreatorNew` | `src/ui/spells/SpellCreatorNew.tsx` | EXISTS |
-| `SpellEditor` / `SpellLibrary` | `src/ui/spell/SpellEditor.tsx` / `SpellLibrary.tsx` | EXISTS |
-| `SpellBuilder` | `src/balancing/spell/SpellBuilder.ts` | EXISTS |
-| `CharacterCreator` | `src/ui/character/CharacterCreator.tsx` | EXISTS |
-| `CharacterBuilder` | `src/ui/idle/CharacterBuilder.tsx` | EXISTS |
-| `PgDetailCard` | `src/ui/idleVillage/components/PgDetailCard.tsx` | EXISTS |
-| `StatAllocationCard` | `src/ui/character/components/StatAllocationCard.tsx` | EXISTS |
-| `EnhancedStatSlider` | `src/ui/balancing/EnhancedStatSlider.tsx` | EXISTS |
-| `ConfigurableCard` / `ConfigurableStat` | `src/ui/balancing/ConfigurableCard.tsx` | EXISTS |
-| `ForgeScreen` (Celestial Forge mock UI) | New component | MISSING |
-| `HeroSheet` (hero overview card) | New component | MISSING |
-| `AnimatedNumber` | New component | MISSING |
-| `MathFlash` | New component | MISSING |
-| `MockScreenCarousel` | New orchestrator | MISSING |
-
-### D — Astrolabe Ball
-
-| Component | Path / Note | Status |
-|-----------|-------------|--------|
-| `DestinyAstrolabe` (v1) | `src/ui/idleVillage/components/destinyAstrolabe/DestinyAstrolabe.tsx` | EXISTS (ball, crimson spine, spatial verdict) |
-| `SkillCheckLegend` | `src/ui/idleVillage/components/destinyAstrolabe/SkillCheckLegend.tsx` | EXISTS |
-| `pinballPhysics` | `src/ui/testing/pinballPhysics.ts` | EXISTS |
-| `IdleVillagePinballMonitor` | `src/ui/idleVillage/components/IdleVillagePinballMonitor.tsx` | EXISTS |
-| `LootExplosion` (particle burst on success) | New component | MISSING |
-| `AstrolabeTrailerController` (scripted mode + camera) | New wrapper | MISSING |
-
-### E — Celestial Forge Unlock & Wishlist CTA
-
-| Component | Path / Note | Status |
-|-----------|-------------|--------|
-| `VillageDissolveTransition` | Dissolve / particle overlay on village | MISSING |
-| `ParticleField` (gold/ivory) | New particle system | MISSING |
-| `CelestialForgeUnlockAnimation` | Building rise + light reveal | MISSING |
-| `WishlistSign` / `SteamCTA` | End-card with wishlist copy | MISSING |
-| `PostTrailerPage` | Final orchestrator | MISSING |
+The code serves one purpose: create recordable video content.
 
 ---
 
-## 4. Specialist feedback & guardrails
+## 1.1 Trailer-Only Convention
 
-### 4.1 Specialist feedback: UI readability
+All trailer components bypass standard project invariants. They are **mocked, scripted, and temporary**.
 
-- **Font size rule:** every UI text (counters, labels, CTAs, e.g. `Day 42`, `+30% Area`, `Blueprint Unlocked`) must be rendered at least **20% larger** in the trailer than in the final game UI.
-- **Reason:** many viewers will watch the trailer inside the Steam client’s reduced window or on a Steam Deck. If math and counters are not readable at a glance, the “strategic brain” effect disappears.
-- **Trailer mission:** these 45 seconds are meant to be high-impact eye candy that drives traffic to the Coming Soon page and starts collecting the only currency that matters before launch: wishlists from the target niche.
-
-### 4.2 Implementation guardrails
-
-- This is a **scripted cinematic** trailer, not a playable build. The code can use fixed seeds, pre-baked `mode` values, and timer-driven state machines.
-- Follow config-first architecture: all times, text, palette, and camera keyframes must be read from config (`src/balancing/config/idleVillage/trailerConfig.ts` proposed below).
-- Re-use existing frozen kits (`pgcardKit`, `slotRackKit`, `skillCheckKit`, `questPoiSkinConfig`) rather than duplicating styling.
-- Do **not** start implementation until the user has confirmed the component inventory (what exists vs. what is missing).
-- Each phase must be individually runnable in Storybook / a `trailer-phase-<x>` route for review and automated visual regression.
-- Telemetry is for trailer playback analytics: `trailer_phase_completed`, `trailer_wishlist_cta_shown` (opt-in).
-
----
-
-## 5. Proposed files
-
-```
-src/
-  docs/docs/plans/trailer_vertical_slice_tasks.md   # execution checklist
-  balancing/config/idleVillage/trailerConfig.ts       # phase timing, copy, seed
-  ui/idleVillage/trailer/
-    TrailerIntroPage.tsx
-    VillageBackdrop.tsx
-    TrailerProgressBar.tsx
-    PoiMap.tsx
-    PoiMapMarker.tsx
-    PoiMapRiskBar.tsx
-    PoiMapTransition.tsx
-    MockScreenCarousel.tsx
-    ForgeScreen.tsx
-    HeroSheet.tsx
-    AnimatedNumber.tsx
-    MathFlash.tsx
-    AstrolabeTrailerController.tsx
-    LootExplosion.tsx
-    VillageDissolveTransition.tsx
-    ParticleField.tsx
-    CelestialForgeUnlockAnimation.tsx
-    WishlistSign.tsx
-    PostTrailerPage.tsx
+**File header convention:**
+```typescript
+/**
+ * @trailer-only
+ *
+ * This component is part of the Steam teaser trailer production pipeline.
+ * It does NOT follow standard project invariants:
+ * - NO PersistenceService (mock data only)
+ * - NO real gameplay logic (scripted sequences)
+ * - NO full i18n (hardcoded copy for iteration speed)
+ * - NO telemetry (marketing asset, not product)
+ * - NO Zod validation (tunable config only)
+ *
+ * This code exists solely to produce recordable video content.
+ * Do NOT reuse for gameplay features.
+ */
 ```
 
+**Directory isolation:**
+```
+src/ui/idleVillage/trailer/  # All trailer code lives here
+```
+
+**Naming convention:**
+- Prefix `Trailer` for all components
+- NO reuse in production gameplay
+- Delete after trailer production (optional cleanup)
+
 ---
 
-## 6. Next steps
+## 2. Frozen Objective
 
-1. Wait for the user to confirm the component inventory above (existing vs. missing).
-2. If needed, update `trailerConfig.ts` with exact copy, timing, and palette.
-3. Implement missing components phase by phase, using the `trailer_vertical_slice_tasks.md` checklist.
-4. Wire each phase into a single `/trailer` route and a Storybook story.
-5. Visual regression capture after each phase.
+**Definition:** The Trailer Vertical Slice is a controlled, recordable cinematic scene that demonstrates Idle Village fantasy. It does NOT represent a gameplay system and does NOT introduce permanent mechanics.
+
+**Note:** This must be written in the trailer folder README. In 6 months, someone (even you) might think "we have AstrolabeTrailerController, so we can use it in gameplay." NO. It is a controlled mock.
 
 ---
 
-## 7. Change log
+## 3. Architecture Rule
 
-- `2026-03-02`: Initial plan created. Phases, code/viewer table, and component inventory added.
-- `2026-07-13`: Added Specialist feedback on font size/readability and wishlist goal. Removed `AltVisualsV6Asterism`, `QuestBranchDiagram`, and legacy panel references from the inventory.
+**Every trailer component must have this mindset:**
+
+❌ WRONG: "How do I implement the system?"
+
+✅ CORRECT: "How do I create the best frame to capture?"
+
+**Example - Astrolabe:**
+- Wrong: Create generic physics replay system
+- Correct: Bring DestinyAstrolabe to controlled state, script spectacular sequence, capture
+
+**Example - Forge:**
+- Wrong: Create forge system
+- Correct: Create screen that communicates "forge progression fantasy"
+
+---
+
+## 4. Five Recordable Scenes
+
+| Scene | Time | What exists | What to build | Deliverable |
+|-------|------|-------------|---------------|-------------|
+| **Intro** | 0-6s | MapPage background, ActionProgressBar | TrailerIntro (background + logo + progress) | Atmospheric opening |
+| **Map** | 6-14s | MapPage, QuestPOI, LocationCard | TrailerMapSequence (auto POI appear + zoom) | Exploration showcase |
+| **UI** | 14-22s | SpellCreatorNew, CharacterBuilder | TrailerUIShowcase (Hero/Spell/Forge carousel) | Depth montage |
+| **Astrolabe** | 22-32s | DestinyAstrolabe (physics, ball, spine) | AstrolabeTrailerController + LootExplosion | Hero moment |
+| **Ending** | 32-45s | MapPage background | TrailerEnding (village + Forge + CTA) | Wishlist conversion |
+
+---
+
+## 5. Component Inventory (7 new components)
+
+```
+src/ui/idleVillage/trailer/
+├── TrailerViewer.tsx              # Shell: /trailer?scene=xxx
+├── TrailerIntro.tsx              # Background + logo + progress
+├── TrailerMapSequence.tsx        # Map + POI + auto zoom
+├── TrailerUIShowcase.tsx         # Hero/Spell/Forge carousel
+├── AstrolabeTrailerController.tsx # Scripted astrolabe sequence
+├── LootExplosion.tsx            # Gold particles MVP
+└── TrailerEnding.tsx            # Village + Forge + CTA
+
+src/balancing/config/idleVillage/
+└── trailerConfig.ts              # Tunable values only
+```
+
+**Existing components to reuse:**
+- DestinyAstrolabe (physics, ball, spine, verdict)
+- SpellCreatorNew, CharacterBuilder
+- MapPage, QuestPOI, LocationCard
+
+---
+
+## 6. Development Sprints (14 days)
+
+### Sprint 1 — Astrolabe Vertical Slice (Days 1-5)
+**Priority:** Maximum. This is the hero shot.
+
+**Build:**
+- `AstrolabeTrailerController.tsx` — wrapper on DestinyAstrolabe
+- `LootExplosion.tsx` — MVP canvas/CSS particles
+
+**Detailed Sequence (spend most time here):**
+
+**0-2 sec — Reveal**
+- Don't show everything immediately
+- Dark background
+- Rings illuminate
+- Camera scale-in
+
+**2-5 sec — Tension**
+- Ball enters
+- Spines visible
+- Perceived risk
+
+**5-8 sec — Payoff**
+- Near collision
+- Success
+- Gold burst
+
+**8-10 sec — Hero Frame**
+- **Critical:** Best frame of the trailer is probably here
+- Freeze
+- Why? From this you can get: Steam screenshot, thumbnail, GIF
+
+**LootExplosion MVP:**
+- NO particle engine
+- 30 CSS particles are sufficient
+- Perception > technique
+- Brain sees: gold, explosion, reward
+- Doesn't matter if there's a physics system behind it
+
+**Success criteria:** Press button → record 10s scripted sequence that looks like real gameplay.
+
+**Value:** First Steam-ready material (GIF, screenshots, devlog).
+
+**Realistic Timeline:**
+- Day 1: Don't write elegant code. Just integrate DestinyAstrolabe, get sequence playing
+- Day 2-3: Polish
+- Day 4-5: Loot + hero frame
+
+If by Day 5 you have a beautiful Astrolabe: the project changes. You already have something to show.
+
+---
+
+### Sprint 2 — Trailer Viewer + Intro (Days 6-8)
+**Build:**
+- `TrailerViewer.tsx` — shell with scene selector
+- `TrailerIntro.tsx` — background + logo + progress bar
+
+**TrailerViewer Implementation (keep it STUPID):**
+```typescript
+// Literally this simple:
+switch (scene) {
+  case "intro": return <TrailerIntro />
+  case "map": return <TrailerMapSequence />
+  case "ui": return <TrailerUIShowcase />
+  case "astrolabe": return <AstrolabeTrailerController />
+  case "ending": return <TrailerEnding />
+}
+```
+NO patterns. NO abstraction. Just routing.
+
+**Features:**
+- Route `/trailer` with debug buttons
+- Route `/trailer?scene=intro|map|ui|astrolabe|ending`
+- Capture mode: `?capture=true` (hides debug, forces autoplay, resets to t=0)
+
+**Success criteria:** Navigate between scenes, see intro play deterministically.
+
+---
+
+### Sprint 3 — UI + Map (Days 9-11)
+**Build:**
+- `TrailerUIShowcase.tsx` — Hero/Spell/Forge carousel with animated numbers
+- `TrailerMapSequence.tsx` — auto POI appear + highlight + zoom
+
+**UI Showcase:**
+- Hero: Level 12 → 13, skill unlock
+- Spell: Arcane Power +50
+- Forge: Blueprint unlocked, +30% production
+- Fade/scale transitions
+
+**Map Sequence:**
+- Map appears
+- POI 1 appears
+- POI 2 appears
+- Dangerous POI highlighted
+- Zoom to selected
+
+**Success criteria:** Both scenes recordable with no clicks required.
+
+---
+
+### Sprint 4 — Ending + Polish (Days 12-14)
+**Build:**
+- `TrailerEnding.tsx` — village + Forge reveal + CTA
+
+**Polish:**
+- Timing adjustments
+- Visual consistency
+- OBS capture testing
+- 1080p/60fps output
+
+**Success criteria:** Complete 45s video ready for Steam.
+
+---
+
+## 5. Configuration
+
+**File:** `src/balancing/config/idleVillage/trailerConfig.ts`
+
+**Structure (tunable values only):**
+```typescript
+export const trailerConfig = {
+  duration: 45000,
+
+  intro: {
+    duration: 6000,
+    fontScale: 1.2,
+    title: "Idle Village",
+  },
+
+  map: {
+    duration: 8000,
+    poiSequence: [
+      { id: "poi-1", time: 1000, x: 200, y: 150 },
+      { id: "poi-2", time: 2000, x: 400, y: 300 },
+      { id: "dangerous", time: 3000, x: 600, y: 450, highlight: true },
+    ],
+  },
+
+  ui: {
+    duration: 8000,
+    screens: [
+      { type: "hero", duration: 2500 },
+      { type: "spell", duration: 2500 },
+      { type: "forge", duration: 3000 },
+    ],
+  },
+
+  astrolabe: {
+    duration: 10000,
+    sequence: [
+      { time: 0, event: "spawn" },
+      { time: 1000, event: "energy" },
+      { time: 3000, event: "ballEnter" },
+      { time: 5000, event: "nearMiss" },
+      { time: 7000, event: "success" },
+      { time: 8000, event: "loot" },
+      { time: 10000, event: "freeze" },
+    ],
+  },
+
+  ending: {
+    duration: 13000,
+    cta: "Wishlist on Steam",
+  },
+};
+```
+
+**CSS Variables (trailer.css):**
+```css
+.trailer-root {
+  --trailer-bg: #030202;
+  --trailer-gold: #d8b13e;
+  --trailer-gold-bright: #f0cf6a;
+  --trailer-parchment: #ede0c4;
+}
+```
+
+**Why CSS variables:** Easy palette changes without touching components.
+
+---
+
+## 7. Capture Mode
+
+**URL:** `/trailer?scene=astrolabe&capture=true`
+
+**Behavior (explicit):**
+- Autoplay
+- Hides controls
+- Forces seed
+- Disables mouse
+- Auto reset
+
+**Implementation:**
+```typescript
+const isCaptureMode = new URLSearchParams(location.search).get("capture") === "true";
+```
+
+**Cost:** 15 minutes. **Value:** Eliminates recording problems.
+
+---
+
+## 8. Definition of Done (per scene)
+
+Before moving to the next scene, each must pass:
+
+### Functional Done
+- Dedicated URL works
+- Starts without clicks
+- Reset consistent
+- No React warnings
+
+### Visual Done
+- Screenshot looks like a real game
+- Readable at 1080p
+- Colors consistent
+- Animations smooth
+- At least one "poster frame"
+
+---
+
+## 9. Decision Order During Development
+
+When time is limited, decide in this order:
+
+**FIRST:** "Does this improve the frame?"
+- If yes → do it
+
+**SECOND:** "Does this improve recording?"
+- If yes → do it
+
+**LAST:** "Does this improve architecture?"
+- Only if it costs very little
+
+---
+
+## 10. Capture Notes Folder
+
+Create: `docs/trailer_capture_notes.md`
+
+**Purpose:** Non-technical notes during final 3 days
+
+**Content:**
+- Best timestamps
+- Successful screenshots
+- Edit ideas
+- Problems encountered
+
+**Why:** During final polish, you'll forget what worked. This prevents that.
+
+---
+
+## 11. Scene Done Checklist
+
+Every scene must pass:
+
+### Technical Done
+- Starts independently (no clicks required)
+- Reset always identical
+- No console errors
+- OBS recordable
+- Deterministic timing
+
+### Visual Done
+- Readable at 1080p
+- Text +20% larger than game UI
+- Colors consistent
+- Transitions clean
+- 5 seconds of stable loop
+
+---
+
+## 12. What NOT to Build
+
+❌ Zustand trailer store
+❌ Zod config validation
+❌ Full i18n system
+❌ Storybook
+❌ Visual regression
+❌ Telemetry
+❌ Particle engine
+❌ Generic animation framework
+❌ Reusable cinematic components
+
+These are product features. This is marketing.
+
+---
+
+## 13. Success Criteria
+
+**Day 7:** Can record intro + astrolabe + UI (Steam-ready GIF/screenshots/devlog material)
+
+**Day 14:** Complete 45s video ready for Steam upload
+
+---
+
+## 14. Change Log
+
+- `2026-03-02`: Initial plan created (v1)
+- `2026-07-13`: Added font size/readability feedback
+- `2026-07-16`: Complete rewrite to pragmatic v2 — focus on 5 recordable scenes, Astrolabe-first sprint, capture mode, simplified config, @trailer-only convention, detailed sequence breakdown, decision order, capture notes folder
