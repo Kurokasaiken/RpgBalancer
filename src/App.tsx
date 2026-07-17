@@ -27,6 +27,8 @@ const IdleVillageConfigRoute = lazy(() => import('./pages/idle-village-config'))
 const StyleLabDemoPage = lazy(() => import('./pages/style-lab-demo'));
 const DesignSystemPage = lazy(() => import('./pages/design-system'));
 const V9SkinSandbox = lazy(() => import('./pages/v9-skin-sandbox').then(m => ({ default: m.V9SkinSandbox })));
+const VisualGrammarValidationPage = lazy(() => import('./ui/visualGrammarValidation/VisualGrammarValidationPage').then(m => ({ default: m.VisualGrammarValidationPage })));
+const VisualFidelityLabPage = lazy(() => import('./ui/visualFidelityLab/VisualFidelityLabPage').then(m => ({ default: m.VisualFidelityLabPage })));
 const PoiDetailVerificationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailVerificationPage').then(m => ({ default: m.PoiDetailVerificationPage })));
 const PoiDetailQuestRosterIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailQuestRosterIntegrationPage').then(m => ({ default: m.default })));
 const PoiDetailJobRosterIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailJobRosterIntegrationPage').then(m => ({ default: m.default })));
@@ -58,6 +60,14 @@ const MinimalQuestDetailPage = lazy(() => import('./pages/minimal-quest-detail')
 const MinimalTimeDaynightIntegrationPage = lazy(() => import('./pages/minimal-time-daynight-integration').then(m => ({ default: m.default })));
 const SpellCreatorTestPage = lazy(() => import('./pages/spell-creator').then(m => ({ default: m.default })));
 const TrailerViewer = lazy(() => import('./ui/idleVillage/trailer/TrailerViewer'));
+const TrailerThreatIter = lazy(() => import('./ui/idleVillage/trailer/TrailerThreatIter'));
+const TrailerThreatPage = lazy(() => import('./ui/idleVillage/trailer/TrailerThreatPage').then(m => ({ default: m.TrailerThreatPage })));
+const TrailerChoicePage = lazy(() => import('./ui/idleVillage/trailer/TrailerChoicePage').then(m => ({ default: m.TrailerChoicePage })));
+const TrailerPreparationPage = lazy(() => import('./ui/idleVillage/trailer/TrailerPreparationPage').then(m => ({ default: m.TrailerPreparationPage })));
+const TrailerRiskPage = lazy(() => import('./ui/idleVillage/trailer/TrailerRiskPage').then(m => ({ default: m.TrailerRiskPage })));
+const TrailerConsequencePage = lazy(() => import('./ui/idleVillage/trailer/TrailerConsequencePage').then(m => ({ default: m.TrailerConsequencePage })));
+const TrailerLegacyPage = lazy(() => import('./ui/idleVillage/trailer/TrailerLegacyPage').then(m => ({ default: m.TrailerLegacyPage })));
+const TrailerOutroPage = lazy(() => import('./ui/idleVillage/trailer/TrailerOutroPage').then(m => ({ default: m.TrailerOutroPage })));
 
 interface AppNavControls {
   getActiveTab: () => AppNavTabId;
@@ -148,6 +158,10 @@ function App() {
     ['/v9-skin-sandbox', '/skin-lab', '/skin-sandbox'].includes(window.location.pathname);
   const isDesignSystemPath =
     typeof window !== 'undefined' && window.location.pathname === '/design-system';
+  const isVisualGrammarValidationPath =
+    typeof window !== 'undefined' && window.location.pathname === '/visual-grammar-validation';
+  const isVisualFidelityLabPath =
+    typeof window !== 'undefined' && window.location.pathname === '/visual-fidelity-lab';
   const isPoiDetailVerificationPath =
     typeof window !== 'undefined' && window.location.pathname === '/poi-detail-verification';
   const isPoiQuestDetailRosterIntegrationPath =
@@ -207,8 +221,22 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/minimal-time-daynight-integration';
   const isSpellCreatorPath =
     typeof window !== 'undefined' && window.location.pathname === '/spell-creator';
-  const isTrailerPath =
-    typeof window !== 'undefined' && window.location.pathname === '/trailer';
+  const isTrailerThreatPath =
+    typeof window !== 'undefined' && window.location.pathname === '/trailer-threat';
+  const isTrailerChoicePath =
+    typeof window !== 'undefined' && window.location.pathname === '/trailer-choice';
+  const isTrailerPreparationPath =
+    typeof window !== 'undefined' && window.location.pathname === '/trailer-preparation';
+  const isTrailerRiskPath =
+    typeof window !== 'undefined' && window.location.pathname === '/trailer-risk';
+  const isTrailerConsequencePath =
+    typeof window !== 'undefined' && window.location.pathname === '/trailer-consequence';
+  const isTrailerLegacyPath =
+    typeof window !== 'undefined' && window.location.pathname === '/trailer-legacy';
+  const isTrailerOutroPath =
+    typeof window !== 'undefined' && window.location.pathname === '/trailer-outro';
+  const isTrailerThreatIterPath =
+    typeof window !== 'undefined' && window.location.pathname === '/trailer-threat-iter';
   const isRootPath =
     typeof window !== 'undefined' &&
     (window.location.pathname === '/' || window.location.pathname === '/index.html');
@@ -593,11 +621,81 @@ function App() {
     );
   }
 
-  if (isTrailerPath) {
+  if (isTrailerThreatPath) {
     return (
-      <ErrorBoundary componentName="Trailer">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer…</div>}>
-          <TrailerViewer />
+      <ErrorBoundary componentName="Trailer Threat">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer Threat…</div>}>
+          <TrailerThreatPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isTrailerChoicePath) {
+    return (
+      <ErrorBoundary componentName="Trailer Choice">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer Choice…</div>}>
+          <TrailerChoicePage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isTrailerPreparationPath) {
+    return (
+      <ErrorBoundary componentName="Trailer Preparation">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer Preparation…</div>}>
+          <TrailerPreparationPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isTrailerRiskPath) {
+    return (
+      <ErrorBoundary componentName="Trailer Risk">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer Risk…</div>}>
+          <TrailerRiskPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isTrailerConsequencePath) {
+    return (
+      <ErrorBoundary componentName="Trailer Consequence">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer Consequence…</div>}>
+          <TrailerConsequencePage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isTrailerLegacyPath) {
+    return (
+      <ErrorBoundary componentName="Trailer Legacy">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer Legacy…</div>}>
+          <TrailerLegacyPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isTrailerOutroPath) {
+    return (
+      <ErrorBoundary componentName="Trailer Outro">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer Outro…</div>}>
+          <TrailerOutroPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isTrailerThreatIterPath) {
+    return (
+      <ErrorBoundary componentName="Trailer Threat Iter">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer Threat Iter…</div>}>
+          <TrailerThreatIter autoStart captureMode={false} />
         </Suspense>
       </ErrorBoundary>
     );
@@ -608,6 +706,26 @@ function App() {
       <ErrorBoundary componentName="V9 Skin Sandbox">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading V9 Skin Sandbox...</div>}>
           <V9SkinSandbox />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isVisualGrammarValidationPath) {
+    return (
+      <ErrorBoundary componentName="Visual Grammar Validation Spike">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Visual Grammar Validation...</div>}>
+          <VisualGrammarValidationPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isVisualFidelityLabPath) {
+    return (
+      <ErrorBoundary componentName="Visual Fidelity Lab">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Visual Fidelity Lab...</div>}>
+          <VisualFidelityLabPage />
         </Suspense>
       </ErrorBoundary>
     );

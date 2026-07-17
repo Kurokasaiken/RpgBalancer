@@ -2,96 +2,20 @@
   "max_parallel": 20,
   "tasks": [
     {
-      "task_id": "TRAILER-V9-PHASE1",
-      "channel": "manual",
-      "model": "qwen/qwen3-coder:free",
-      "file_targets": []
-    },
-    {
-      "task_id": "TRAILER-V9-PHASE2",
-      "channel": "manual",
-      "model": "qwen/qwen3-coder:free",
-      "file_targets": []
-    },
-    {
-      "task_id": "TRAILER-V9-PHASE3",
-      "channel": "manual",
-      "model": "qwen/qwen3-coder:free",
-      "file_targets": []
-    },
-    {
-      "task_id": "TRAILER-V9-PHASE4",
-      "channel": "manual",
-      "model": "qwen/qwen3-coder:free",
-      "file_targets": []
-    },
-    {
       "task_id": "ADR001-T1",
-      "channel": "manual",
+      "channel": "ai-worker",
       "model": "qwen/qwen3-coder:free",
       "file_targets": [
         "src/engine/quest/QuestEngine.ts"
-      ]
-    },
-    {
-      "task_id": "ADR001-T2",
-      "channel": "manual",
-      "model": "qwen/qwen3-coder:free",
-      "file_targets": [
-        "src/engine/quest/QuestEngine.ts"
-      ]
-    },
-    {
-      "task_id": "ADR001-T3",
-      "channel": "manual",
-      "model": "qwen/qwen3-coder:free",
-      "file_targets": [
-        "src/engine/game/idleVillage/store.ts",
-        "src/shared/persistence/persistenceKeys.ts",
-        "src/engine/game/idleVillage/TimeEngine.ts"
-      ]
-    },
-    {
-      "task_id": "ADR001-T4",
-      "channel": "manual",
-      "model": "qwen/qwen3-coder:free",
-      "file_targets": [
-        "src/engine/game/idleVillage/JobResolver.ts",
-        "src/engine/game/idleVillage/QuestPowerEngine.ts",
-        "src/engine/game/idleVillage/QuestResolver.ts",
-        "src/engine/game/idleVillage/QuestEngine.ts",
-        "src/engine/game/idleVillage/TimeEngine.ts"
       ]
     },
     {
       "task_id": "ADR001-T6",
-      "channel": "manual",
+      "channel": "ai-worker",
       "model": "qwen/qwen3-coder:free",
       "file_targets": [
         "src/balancing/config/idleVillage/questConfig.ts",
         "src/engine/game/idleVillage/QuestEngine.ts"
-      ]
-    },
-    {
-      "task_id": "ADR001-T7",
-      "channel": "manual",
-      "model": "qwen/qwen3-coder:free",
-      "file_targets": [
-        "src/engine/game/idleVillage/QuestResolver.ts",
-        "src/balancing/config/idleVillage/types.ts"
-      ]
-    },
-    {
-      "task_id": "ADR001-T8",
-      "channel": "manual",
-      "model": "qwen/qwen3-coder:free",
-      "file_targets": [
-        "src/docs/docs/plans/quest_engine_reconciliation_plan.md",
-        "src/docs/docs/plans/idle_village_plan.md",
-        "src/docs/docs/plans/quest_chronicle_plan.md",
-        "src/docs/docs/plans/idle_village_modifiers_plan.md",
-        "src/docs/docs/MASTER_PLAN.md",
-        "src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md"
       ]
     }
   ]

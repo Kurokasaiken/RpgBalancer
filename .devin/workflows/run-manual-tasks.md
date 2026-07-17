@@ -10,7 +10,7 @@ This workflow executes manual SWE tasks that have been dispatched to the manual 
 
 1. **Check queue status**
    ```bash
-   python3 coordinator/dispatcher.py
+   python3 coordinator/dispatcher.py --status
    ```
    Or use the status function:
    ```python
@@ -59,7 +59,7 @@ This workflow executes manual SWE tasks that have been dispatched to the manual 
 7. **Re-run coordinator**
    After completing all manual tasks, re-run the coordinator to process any new tasks:
    ```bash
-   python coordinator.py
+   python3 coordinator/coordinator.py
    ```
 
 ## Example Usage

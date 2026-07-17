@@ -1,0 +1,84 @@
+/*
+ * FINDING #2 (documented, not fixed here):
+ * The header "language" (plaque / title-row / titlesep / close-corner) is NOT a
+ * shared primitive. In the reference it lives as a LOCAL <style> block inside
+ * v9-skin-sandbox.tsx (~line 1093). Only the `--skin-*` TOKENS are global; the
+ * class RULES are not. This file replicates those rules VERBATIM (consuming only
+ * existing tokens) so the fidelity test compares like-with-like. It creates no
+ * new component and no new token — it makes an existing, un-extracted "language"
+ * usable outside the sandbox. Extraction (if any) happens only after the gate.
+ */
+
+.vfl-scope .skin-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.vfl-scope .skin-plaque {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--skin-plaque-padding);
+  border: var(--skin-plaque-border);
+  border-radius: var(--skin-plaque-radius);
+  background-color: var(--skin-plaque-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: var(--skin-plaque-shadow);
+  font-family: 'Cinzel', 'Georgia', serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--skin-plaque-tracking);
+  color: var(--skin-plaque-color);
+  text-shadow: 0 0 8px rgba(201, 162, 39, 0.6), 0 1px 2px rgba(0, 0, 0, 0.7);
+  white-space: nowrap;
+}
+
+.vfl-scope .skin-titlesep {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 4px;
+}
+.vfl-scope .skin-titlesep__line {
+  flex: 1;
+  height: 1px;
+  background: var(--skin-titlesep-line);
+}
+.vfl-scope .skin-titlesep__diamond {
+  font-size: 12px;
+  line-height: 1;
+  color: var(--skin-titlesep-diamond-color);
+  text-shadow: var(--skin-titlesep-diamond-glow);
+}
+
+.vfl-scope .skin-close-corner {
+  width: var(--skin-close-size);
+  height: var(--skin-close-size);
+  border-radius: var(--skin-close-radius);
+  border: var(--skin-close-border);
+  background: var(--skin-close-bg);
+  color: var(--skin-close-color);
+  box-shadow: var(--skin-close-shadow);
+  font-size: 1.15rem;
+  font-weight: 300;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+}
+
+/*
+ * FINDING #1 (documented, not fixed here):
+ * WanderlustSurface renders `.ws-content` (z-index 0) BEHIND its own frame SVG
+ * (`.ws-border-svg`, z-index 1). The reference only shows content because the
+ * sandbox overrides it locally. Same page-scoped override here. In the extracted
+ * system this belongs in the component default.
+ */
+.vfl-scope .ws-content {
+  z-index: 2;
+}

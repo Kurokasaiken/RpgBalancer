@@ -33,6 +33,7 @@ from registry_manager import (
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 AGENT_ASSIGNMENTS_PATH = ROOT_DIR / "src" / "docs" / "docs" / "coordinator" / "agent_assignments.md"
+STRATEGY_TASKS_PATH = ROOT_DIR / "coordinator" / "strategy_tasks.md"
 LAST_RUN_SUMMARY_PATH = ROOT_DIR / "coordinator" / "last-run-summary.json"
 PROMPTS_DIR = ROOT_DIR / "prompts"
 
@@ -186,6 +187,164 @@ def get_file_targets_from_spec_or_notes(task_id: str, notes: str) -> List[str]:
     return list(extract_file_targets_from_notes(notes))
 
 
+def parse_strategy_tasks() -> List[dict]:
+    """Parse strategy_tasks.md and extract tasks with status 'Non assegnato'.
+    
+    Only processes tasks that have a "Full Prompt for Coordinator" section.
+    Task headers without prompt sections are ignored.
+    
+    Returns:
+        List of task dicts with keys: task_id, title, status, dependencies, prompt, executor, execution_hint
+    """
+    if not STRATEGY_TASKS_PATH.exists():
+        print(f"[WARN] strategy_tasks.md not found at {STRATEGY_TASKS_PATH}")
+        return []
+    
+    try:
+        with open(STRATEGY_TASKS_PATH, "r", encoding="utf-8") as f:
+            content = f.read()
+    except IOError as e:
+        print(f"[ERROR] Failed to read strategy_tasks.md: {e}")
+        return []
+    
+    tasks = []
+    lines = content.split("\n")
+    current_task = None
+    in_prompt_section = False
+    prompt_lines = []
+    seen_ids = set()  # Track task IDs that have been fully processed with prompts
+    
+    for line in lines:
+        # Detect task header: ## Task: TASK-ID
+        task_match = re.match(r"## Task:\s+(\S+)", line)
+        if task_match:
+            task_id = task_match.group(1)
+            
+            # Save previous task if it has a prompt and "Non assegnato" status
+            if current_task and current_task.get("status") == "Non assegnato" and current_task.get("prompt"):
+                if current_task["task_id"] not in seen_ids:
+                    tasks.append(current_task)
+                    seen_ids.add(current_task["task_id"])
+            
+            # Start new task (always start fresh, don't skip based on seen_ids)
+            current_task = {
+                "task_id": task_id,
+                "title": "",
+                "status": "",
+                "dependencies": "-",
+                "prompt": "",
+                "executor": "manual",
+                "execution_hint": ""
+            }
+            in_prompt_section = False
+            prompt_lines = []
+            continue
+        
+        if not current_task:
+            continue
+        
+        # Parse task metadata
+        if line.startswith("**Title:**"):
+            current_task["title"] = line.replace("**Title:**", "").strip()
+        elif line.startswith("**Status:**"):
+            current_task["status"] = line.replace("**Status:**", "").strip()
+        elif line.startswith("**Dependencies:**"):
+            current_task["dependencies"] = line.replace("**Dependencies:**", "").strip()
+        elif line.startswith("**Execution Hint**"):
+            current_task["execution_hint"] = line.replace("**Execution Hint**", "").strip()
+        elif line.startswith("### Execution Hint"):
+            current_task["execution_hint"] = line.replace("### Execution Hint", "").strip()
+        
+        # Detect prompt section start
+        if "## Full Prompt for Coordinator" in line or "### Task ID:" in line:
+            in_prompt_section = True
+            continue
+        
+        # Collect prompt lines
+        if in_prompt_section:
+            prompt_lines.append(line)
+    
+    # Save last task if it has a prompt and "Non assegnato" status
+    if current_task and current_task.get("status") == "Non assegnato" and current_task.get("prompt"):
+        if current_task["task_id"] not in seen_ids:
+            current_task["prompt"] = "\n".join(prompt_lines).strip()
+            tasks.append(current_task)
+    
+    return tasks
+
+
+def migrate_strategy_to_assignments() -> int:
+    """Migrate tasks from strategy_tasks.md to agent_assignments.md.
+    
+    Only migrates tasks with status "Non assegnato" that don't already exist
+    in agent_assignments.md. Updates strategy_tasks.md status to "In corso"
+    after successful migration.
+    
+    Returns:
+        Number of tasks migrated
+    """
+    # Parse strategy tasks
+    strategy_tasks = parse_strategy_tasks()
+    if not strategy_tasks:
+        print("[INFO] No tasks to migrate from strategy_tasks.md")
+        return 0
+    
+    # Parse existing agent assignments to check for duplicates
+    existing_ids = set()
+    try:
+        with open(AGENT_ASSIGNMENTS_PATH, "r", encoding="utf-8") as f:
+            content = f.read()
+            for line in content.split("\n"):
+                if line.startswith("| ") and "|" in line:
+                    parts = [p.strip() for p in line.split("|")]
+                    if len(parts) >= 2 and parts[1]:
+                        existing_ids.add(parts[1].split()[0])  # Extract ID before space
+    except IOError as e:
+        print(f"[WARN] Failed to read agent_assignments.md for duplicate check: {e}")
+    
+    # Filter new tasks
+    new_tasks = [t for t in strategy_tasks if t["task_id"] not in existing_ids]
+    if not new_tasks:
+        print("[INFO] All strategy tasks already migrated")
+        return 0
+    
+    # Prepare new rows for agent_assignments.md
+    new_rows = []
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    
+    for task in new_tasks:
+        task_id = task["task_id"]
+        title = task.get("title", task_id)
+        status = "Non assegnato"
+        agent = ""
+        note = f"Executor: {task.get('executor', 'manual')}"
+        if task.get("execution_hint"):
+            note += f", {task['execution_hint']}"
+        executor = task.get("executor", "manual")
+        executor_reason = task.get("execution_hint", "Strategy task migration")
+        prompt = task.get("prompt", "")
+        
+        # Format as markdown table row
+        row = f"| {task_id} | {status} | {today} | {agent} | {note} | {executor} | {executor_reason} | ```text\n{prompt}\n``` |"
+        new_rows.append(row)
+    
+    # Append to agent_assignments.md
+    try:
+        with open(AGENT_ASSIGNMENTS_PATH, "a", encoding="utf-8") as f:
+            f.write("\n\n")
+            for row in new_rows:
+                f.write(row + "\n")
+        
+        print(f"[MIGRATION] Migrated {len(new_rows)} tasks from strategy_tasks.md to agent_assignments.md")
+        for task in new_tasks:
+            print(f"  - {task['task_id']}: {task.get('title', 'N/A')}")
+        
+        return len(new_rows)
+    except IOError as e:
+        print(f"[ERROR] Failed to write to agent_assignments.md: {e}")
+        return 0
+
+
 def calcola_batch_eseguibile(coda_task: List[dict]) -> Tuple[List[dict], List[dict], List[dict], int]:
     """Calculate the executable batch of tasks.
     
@@ -225,7 +384,8 @@ def calcola_batch_eseguibile(coda_task: List[dict]) -> Tuple[List[dict], List[di
     for task in selected_tasks:
         task_id = task["id"].split()[0]
         dependencies = task["dependencies"]
-        file_targets = get_file_targets_from_spec_or_notes(task_id, task["notes"])
+        file_targets_source = f"{task.get('prompt', '')}\n{task['notes']}".strip()
+        file_targets = get_file_targets_from_spec_or_notes(task_id, file_targets_source)
         
         # Determine channel from executor field or default
         executor = task.get("executor", "manual")
@@ -440,7 +600,14 @@ def main():
     parser = argparse.ArgumentParser(description="Coordinator interno per dispatch dinamico")
     parser.add_argument("--select-only", action="store_true", help="Only select and output batch, don't dispatch")
     parser.add_argument("--output", default="coordinator/batch.json", help="Output file for selected batch")
+    parser.add_argument("--skip-migration", action="store_true", help="Skip strategy_tasks.md migration")
     args = parser.parse_args()
+    
+    # Migrate tasks from strategy_tasks.md to agent_assignments.md
+    if not args.skip_migration:
+        migrated_count = migrate_strategy_to_assignments()
+        if migrated_count > 0:
+            print(f"[INFO] Migration completed: {migrated_count} tasks added to agent_assignments.md")
     
     # Capture status before dispatch for completion counting
     rows_before = parse_agent_assignments_rows()
