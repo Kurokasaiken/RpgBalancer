@@ -31,55 +31,134 @@ def log_dispatch_block(task_id: str, reason: str, blocking_info: str):
 
 
 def parse_agent_assignments_rows() -> List[dict]:
-    """Parse agent_assignments.md and return list of row dicts."""
+    """Parse agent_assignments.md and return list of row dicts.
+
+    Supports multi-line prompt blocks embedded in the last table cell (```text ... ```).
+    """
     if not AGENT_ASSIGNMENTS_PATH.exists():
         return []
-    
+
     with open(AGENT_ASSIGNMENTS_PATH, "r", encoding="utf-8") as f:
         content = f.read()
-    
+
     lines = content.splitlines()
     rows = []
-    
-    for line in lines:
-        if not line.strip().startswith("|"):
+    i = 0
+
+    def _title_from_prompt(prompt: str, fallback: str) -> str:
+        """Extract a title from the prompt block (line after AGENT)."""
+        if not prompt:
+            return fallback
+        prompt_lines = prompt.splitlines()
+        for idx, pline in enumerate(prompt_lines):
+            if pline.strip() == "AGENT" and idx + 1 < len(prompt_lines):
+                return prompt_lines[idx + 1].strip()
+        first = prompt.strip().lstrip("`").strip()
+        return first or fallback
+
+    while i < len(lines):
+        line = lines[i]
+        stripped = line.strip()
+        if not stripped.startswith("|"):
+            i += 1
             continue
-        if "---" in line:
+        if "---" in stripped or stripped.startswith("| Prompt ID/Descrizione"):
+            i += 1
             continue
-        
-        columns = [col.strip() for col in line.split("|")[1:-1]]
+
+        # Split the row into cells. Do not drop the last cell even when the row
+        # does not end with a trailing |, because the last cell may start the
+        # multi-line prompt block.
+        raw_cells = stripped.strip("|").split("|")
+        columns = [c.strip() for c in raw_cells]
+        # Drop a truly empty trailing cell caused by a trailing |.
+        if columns and columns[-1] == "":
+            columns = columns[:-1]
+
+        # Consume a multi-line prompt block when the last cell starts with ```text.
+        if columns and columns[-1].startswith("```text"):
+            prompt_lines = [columns[-1]]
+            i += 1
+            while i < len(lines):
+                pline = lines[i]
+                if pline.strip().startswith("```") and not pline.strip().startswith("```text"):
+                    prompt_lines.append(pline.strip())
+                    i += 1
+                    break
+                prompt_lines.append(pline)
+                i += 1
+            columns[-1] = "\n".join(prompt_lines).strip()
+
         if len(columns) < 5:
+            i += 1
             continue
         if columns[0] == "Prompt ID/Descrizione":
+            i += 1
             continue
-        
-        # Parse based on column count (5, 8, or 10 columns)
+
+        prompt_text = ""
         if len(columns) >= 10:
-            # Full format with executor columns: ID, Status, Dependencies, Agent, Last Update, Notes, Executor, Executor Reason, Date, Prompt
+            # ADR/GOV 10-column format: ID, Status, Dependencies, Agent, Notes,
+            # Executor, Executor Reason, Date, Prompt/Notes.
+            # The exact column layout varies, so we detect the executor by value.
+            known_executors = {"ai-worker", "harness", "manual", "agent", "swe", "Cascade"}
+            executor = ""
+            executor_reason = ""
+            for idx, value in enumerate(columns[4:-1], start=4):
+                if value in known_executors:
+                    executor = value
+                    if idx + 1 < len(columns) - 1:
+                        executor_reason = columns[idx + 1]
+                    break
+
+            # Treat the last non-prompt cell before the prompt/notes as last_update
+            # if it looks like a timestamp or date; otherwise leave empty.
+            last_update = columns[8] if len(columns) > 8 else ""
+            notes = columns[9] if len(columns) > 9 else columns[4]
+            prompt_text = columns[-1] if columns[-1].startswith("```text") else notes
+
             row = {
                 "id": columns[0],
                 "status": columns[1],
                 "dependencies": columns[2],
                 "agent": columns[3],
-                "last_update": columns[4],
-                "notes": columns[5],
-                "executor": columns[6],
-                "executor_reason": columns[7],
+                "last_update": last_update,
+                "notes": notes,
+                "executor": executor,
+                "executor_reason": executor_reason,
             }
         elif len(columns) >= 8:
-            # Medium format with executor columns
+            # Trailer 8-column format: ID, Status, Data, Agent, Notes, Executor,
+            # Executor Reason, Prompt.
+            prompt_text = columns[7]
             row = {
                 "id": columns[0],
                 "status": columns[1],
-                "dependencies": columns[2],
+                "dependencies": "",
                 "agent": columns[3],
-                "last_update": columns[4],
-                "notes": columns[5],
-                "executor": columns[6],
-                "executor_reason": columns[7] if len(columns) >= 8 else "",
+                "last_update": columns[2],
+                "notes": columns[4],
+                "executor": columns[5],
+                "executor_reason": columns[6],
+            }
+        elif len(columns) == 7:
+            # 7-column format (no Data column): ID, Status, Agent, Notes, Executor,
+            # Executor Reason, Prompt/Reason.
+            prompt_text = columns[6] if columns[6].startswith("```text") else ""
+            reason = "" if prompt_text else columns[6]
+            row = {
+                "id": columns[0],
+                "status": columns[1],
+                "dependencies": "",
+                "agent": columns[2],
+                "last_update": "",
+                "notes": columns[3],
+                "executor": columns[4],
+                "executor_reason": reason,
             }
         else:
-            # Legacy format
+            # Legacy 5-column format: ID, Status, Agent, Data, Notes.
+            prompt_text = columns[4]
             row = {
                 "id": columns[0],
                 "status": columns[1],
@@ -90,25 +169,50 @@ def parse_agent_assignments_rows() -> List[dict]:
                 "executor": "",
                 "executor_reason": "",
             }
-        
+
+        row["prompt"] = prompt_text
+        row["title"] = _title_from_prompt(prompt_text, row["id"])
+        row["description"] = row["title"]
         rows.append(row)
-    
+        # If we consumed a prompt block, i already points to the next line.
+        if not (columns and columns[-1].startswith("```text")):
+            i += 1
+
     return rows
 
 
 def extract_file_targets_from_notes(notes: str) -> Set[str]:
-    """Extract FILE TARGET entries from notes."""
+    """Extract FILE TARGET or FILES TO MODIFY entries from notes/prompt."""
+    # Try the explicit "FILE TARGET:" section first.
     match = re.search(r"FILE TARGET:\s*(.+?)(?=\n\n|\n[A-Z]|\n#|$)", notes, re.DOTALL)
+    if match:
+        targets_text = match.group(1).strip()
+        targets = set()
+        for target in re.split(r",|\n", targets_text):
+            target = target.strip().strip("`")
+            if target:
+                targets.add(target)
+        return targets
+
+    # Try a "FILES TO MODIFY" numbered list (common in prompts).
+    match = re.search(r"FILES TO MODIFY\s*\n(.*?)(?=\n\n|\n[A-Z][A-Z\s]+\n|\n#|$)", notes, re.DOTALL)
     if not match:
         return set()
-    
+
     targets_text = match.group(1).strip()
     targets = set()
-    for target in re.split(r",|\n", targets_text):
-        target = target.strip()
+    for line in targets_text.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        # Match "1. `path/to/file` (note)" or just "1. path/to/file"
+        m = re.match(r"\d+\.\s*`?(.+?)`?\s*$", line)
+        if not m:
+            continue
+        target = m.group(1).strip("`").split(" - ")[0].split(" (")[0].strip()
         if target:
             targets.add(target)
-    
+
     return targets
 
 

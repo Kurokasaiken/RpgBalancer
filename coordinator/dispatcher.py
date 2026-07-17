@@ -67,7 +67,10 @@ class ManualDispatcher:
     
     def _update_agent_assignments_status(self, task_id: str, status: str):
         """Update task status in agent_assignments.md.
-        
+
+        Updates only the second column (Status) of the matching table row and
+        preserves the original trailing pipe and multi-line prompt block.
+
         Args:
             task_id: Task ID to update
             status: New status (e.g., "Completato", "Fallito")
@@ -75,32 +78,32 @@ class ManualDispatcher:
         if not AGENT_ASSIGNMENTS_PATH.exists():
             print(f"[WARN] agent_assignments.md not found at {AGENT_ASSIGNMENTS_PATH}")
             return
-        
+
         try:
             with open(AGENT_ASSIGNMENTS_PATH, "r", encoding="utf-8") as f:
                 content = f.read()
-            
-            # Find the task row and update status
-            # Pattern: | TASK-ID | ... | <old_status> | ...
+
             lines = content.split("\n")
             updated_lines = []
-            
+            prefix = f"| {task_id} "
+
             for line in lines:
-                if line.startswith(f"| {task_id} ") or f"| {task_id} " in line:
-                    # Split by | and find status column (typically 4th column after ID)
-                    parts = [p.strip() for p in line.split("|")]
-                    if len(parts) >= 4:
-                        # Update status column (assuming it's the 4th column)
-                        parts[3] = status
-                        updated_line = " | ".join(parts)
+                # Match the task row at the start (allow leading whitespace).
+                if line.strip().startswith(prefix):
+                    parts = line.split("|")
+                    if len(parts) >= 3:
+                        # parts[0] is empty (before the first |), parts[1] is the ID,
+                        # parts[2] is the Status column.
+                        parts[2] = f" {status} "
+                        updated_line = "|".join(parts)
                         updated_lines.append(updated_line)
                         print(f"[DISPATCH] Updated {task_id} status to {status} in agent_assignments.md")
                         continue
                 updated_lines.append(line)
-            
+
             with open(AGENT_ASSIGNMENTS_PATH, "w", encoding="utf-8") as f:
                 f.write("\n".join(updated_lines))
-                
+
         except IOError as e:
             print(f"[ERROR] Failed to update agent_assignments.md: {e}")
     
@@ -336,7 +339,7 @@ class ManualDispatcher:
             print(f"\nPer eseguirli apri Windsurf ed esegui:")
             print(f"  {MANUAL_TASKS_COMMAND}")
             print(f"\nDopo il completamento rilancia:")
-            print(f"  python coordinator.py")
+            print(f"  python3 coordinator/coordinator.py")
             print(f"oppure attendi il prossimo ciclo automatico.")
             print("=" * 50 + "\n")
     
@@ -397,3 +400,15 @@ def complete_manual_task(task_id: str, status: str = "Completato"):
         status: Status to set ("Completato" for success, "Fallito" for failure)
     """
     get_dispatcher().complete_manual_task(task_id, status)
+
+
+if __name__ == "__main__":
+    import sys
+
+    if len(sys.argv) > 1 and sys.argv[1] in ("--status", "status"):
+        import json
+        print(json.dumps(get_manual_status(), indent=2, ensure_ascii=False))
+    elif len(sys.argv) > 2 and sys.argv[1] in ("--complete", "complete"):
+        complete_manual_task(sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else "Completato")
+    else:
+        print_manual_reminder()

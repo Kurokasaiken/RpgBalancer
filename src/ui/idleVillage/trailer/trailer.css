@@ -1,0 +1,261 @@
+/**
+ * @trailer-only
+ *
+ * CSS variables for Steam teaser trailer styling.
+ * All trailer components use these variables for consistent theming.
+ *
+ * This CSS is exempt from gameplay architecture requirements.
+ * It exists solely to produce recordable video content.
+ */
+
+.trailer-root {
+  --trailer-bg: var(--skin-surface-base);
+  --trailer-gold: var(--skin-title-color);
+  /* Used for solid bright gold text/borders; --skin-glow-primary is too transparent for color. */
+  --trailer-gold-bright: var(--skin-title-color);
+  --trailer-gold-glow: var(--skin-glow-primary);
+  --trailer-parchment: var(--skin-text-primary);
+  --trailer-azure: var(--skin-icon-accent);
+  --trailer-text-secondary: var(--skin-text-secondary);
+  --trailer-surface-bg: var(--skin-surface-bg);
+  --trailer-border: var(--skin-surface-border);
+  --trailer-font-display: var(--skin-font-display);
+  --trailer-title-tracking: 0.18em;
+  --trailer-transition-duration: 0.3s;
+  --trailer-glow-intensity: 0.8;
+  --trailer-text-scale: 1.2;
+}
+
+/* Dark background for cinematic feel with V9 volumetric lighting (cyan top-left + gold bottom-right). */
+.trailer-background {
+  background:
+    radial-gradient(circle at 100% 100%, var(--trailer-gold-glow) 0%, transparent 45%),
+    var(--trailer-surface-bg);
+}
+
+/* Gold text for emphasis */
+.trailer-gold-text {
+  color: var(--trailer-gold);
+  text-shadow: 0 0 20px var(--trailer-gold-glow);
+}
+
+/* Bright gold for highlights */
+.trailer-gold-bright {
+  color: var(--trailer-gold-bright);
+  text-shadow: 0 0 30px var(--trailer-gold-glow);
+}
+
+/* Parchment for readable text */
+.trailer-parchment {
+  color: var(--trailer-parchment);
+}
+
+/* Hero frame freeze animation */
+@keyframes trailer-hero-freeze {
+  0% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.1);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+.trailer-hero-frame {
+  animation: trailer-hero-freeze 2s ease-in-out infinite;
+}
+
+/* CSS reward burst for astrolabe success */
+@keyframes trailer-gold-burst {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.trailer-gold-particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--trailer-gold-bright);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--trailer-gold);
+  animation: trailer-gold-burst 1s ease-out forwards;
+}
+
+/* Fade in/out transitions */
+.trailer-fade-in {
+  animation: fadeIn var(--trailer-transition-duration) ease-in forwards;
+}
+
+.trailer-fade-out {
+  animation: fadeOut var(--trailer-transition-duration) ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Banner text styling */
+.trailer-banner {
+  font-family: var(--trailer-font-display);
+  font-size: clamp(24px, 4vw, 48px);
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: var(--trailer-title-tracking);
+  color: var(--trailer-gold);
+  text-shadow: 0 0 20px var(--trailer-gold-glow);
+  animation: fadeIn 0.5s ease-in;
+}
+
+/* Capture mode: hide all debug UI */
+.trailer-capture-mode .trailer-debug {
+  display: none !important;
+}
+
+/* Greyscale filter for consequence scene */
+.trailer-greyscale {
+  filter: grayscale(100%);
+}
+
+/* Impact overlay */
+.trailer-impact-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, transparent 30%, rgba(0, 0, 0, 0.8) 100%);
+  pointer-events: none;
+}
+
+/* Scene root layout defaults */
+.trailer-scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Pulsing selection ring around a POI or CTA */
+@keyframes trailer-pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.75;
+  }
+  50% {
+    transform: scale(1.18);
+    opacity: 0.35;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.75;
+  }
+}
+
+/* Hero token drags from the hero sheet to the target POI */
+@keyframes trailer-hero-drag {
+  0% {
+    left: 18vw;
+    top: 50vh;
+    opacity: 0;
+  }
+  8% {
+    left: 18vw;
+    top: 50vh;
+    opacity: 1;
+  }
+  85% {
+    left: 72%;
+    top: 50%;
+    opacity: 1;
+  }
+  92% {
+    left: 72%;
+    top: 50%;
+    opacity: 1;
+  }
+  100% {
+    left: 72%;
+    top: 50%;
+    opacity: 0;
+  }
+}
+
+/* Notification cards slide in from the right */
+@keyframes trailer-notification-in {
+  from {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Impact shockwave ring expansion */
+@keyframes trailer-impact-pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0.75;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.2);
+    opacity: 0;
+  }
+}
+
+/* CTA button glow pulse */
+@keyframes trailer-cta-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 transparent;
+  }
+  50% {
+    box-shadow: 0 0 24px var(--trailer-gold-glow);
+  }
+}
+
+/* Legacy cards rise into view */
+@keyframes trailer-legacy-card-in {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Phase 2 helpers: remove WanderlustSurface content padding for full-bleed scene wrappers and badge CTA */
+.trailer-ws-fullbleed .ws-content {
+  padding: 0 !important;
+}
+
+.trailer-ws-badge .ws-content {
+  padding: 0 !important;
+}

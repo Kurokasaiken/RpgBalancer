@@ -97,7 +97,7 @@ PLAN REFERENCE
 trailer_vertical_slice_plan.md - Section 6, Sprint 1 (Days 1-3)
 ```
 
- | TRAILER-V9-PHASE1 | Non assegnato | | | | manual | @trailer-only exemption, SWE/Cascade required | ```text
+ | TRAILER-V9-PHASE1 | Completato | Completato | Cascade | Evidence: test-results/trailer-v9-phase1-2026-07-17.log | manual | @trailer-only exemption, SWE/Cascade required | ```text
 AGENT
 Idle Village Task - Trailer V9 Skin Alignment Phase 1: CSS Variables
 
@@ -181,7 +181,81 @@ After completing this task:
 4. Attach lint, build:check, and kanban:lint output in final report
 ```
 
-| TRAILER-V9-PHASE2 | Non assegnato | | | | manual | @trailer-only exemption, SWE/Cascade required | ```text
+| TRAILER-THREAT-ITER-V2 | Completato | Cascade | 2026-07-17 | | manual | Evidence: test-results/trailer-threat-iter-v2-2026-07-17.log; TestHub card /trailer-threat-iter added, /trailer-threat removed; visual adjustment: teal moved inside panel, panel moved lower-right + scaled 0.9 | ```text
+AGENT
+Idle Village Task - TrailerThreatIter V2 Visual Rework
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `idle-village-task` prima di iniziare, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Riscrivere `src/ui/idleVillage/trailer/TrailerThreatIter.tsx` usando la mappa corretta, l'estetica teal di Visual Fidelity Lab, i POI esistenti di `/minimal-poi` e una copia del componente POI detail per il pannello titolo/timer.
+
+CONTEXT
+L'utente ha confermato:
+1. La mappa si chiama `map.jpg` (repo root).
+2. La base teal e' quella di `/visual-fidelity-lab` (obsidian #060f16 + azure radial leak in alto).
+3. Il pannello titolo/timer va copiato dal POI detail di `/poi-detail-verification` (`ActivityCapsuleDetailSkinAware`) e modificato liberamente.
+4. I POI devono essere quelli gia' esistenti su `/minimal-poi` (`GenericPoiSkin` / POI kit).
+5. Il route `/trailer-threat-iter` resta invariato.
+
+@trailer-only CONVENTION
+EXEMPT:
+- NO PersistenceService, NO localStorage/sessionStorage
+- NO i18n per copy di trailer (hardcoded ammesso)
+- NO telemetry
+- NO gameplay mutation, NO economy systems
+
+MUST PRESERVE:
+- Config-first: valori in `trailerConfig.ts`
+- Component reuse: GenericPoiSkin, WanderlustSurface, WanderlustAmbientField, InsetPanel
+- NO standalone .css files
+- JSDoc su nuove funzioni/interfacce
+- Route invariato
+- Safeguards: lint, build:check, kanban:lint
+
+WHAT YOU MUST DO
+1. Verifica che `map.jpg` sia raggiungibile dal dev server (copia in `public/` se necessario); aggiorna `trailerConfig.threat.mapImage`.
+2. Crea `src/ui/idleVillage/trailer/TrailerThreatDetailPanel.tsx` come fork ridotto di `ActivityCapsuleDetailSkinAware` (solo titolo, sottotitolo, targa, timer; niente slot rack, telemetry, CTA).
+3. Riscrivi `src/ui/idleVillage/trailer/TrailerThreatIter.tsx`:
+   - Sfondo `map.jpg`.
+   - Overlay teal/obsidian di Visual Fidelity Lab (#060f16 + radial gradient azure in alto).
+   - POI nodes come `GenericPoiSkin` da `@/ui/idleVillage/frozen/kits/poiKit`, posizionati secondo `trailerConfig.threat.pois`.
+   - Pannello centrale con `TrailerThreatDetailPanel` e timer in `InsetPanelDelicate` con testo old-gold e ombre forti.
+4. Aggiorna `src/balancing/config/idleVillage/trailerConfig.ts` se servono nuovi token.
+5. Verifica `/trailer-threat-iter` senza errori console.
+
+SUCCESS CRITERIA
+- /trailer-threat-iter renderizza.
+- Sfondo = map.jpg.
+- Base = VFL teal/obsidian.
+- POI = GenericPoiSkin (non medaglie custom).
+- Pannello centrale = copia POI detail con old-gold heraldic text e ombre forti.
+- Route invariato.
+- Lint/build/kanban pass.
+
+FILES TO CREATE
+1. `src/ui/idleVillage/trailer/TrailerThreatDetailPanel.tsx`
+
+FILES TO MODIFY
+1. `src/ui/idleVillage/trailer/TrailerThreatIter.tsx`
+2. `src/balancing/config/idleVillage/trailerConfig.ts`
+
+SAFEGUARDS
+- Lint: `npm run lint -- src/ui/idleVillage/trailer/` (120s)
+- Build: `npm run build:check` (180s)
+- Kanban: `npm run kanban:lint` (30s)
+
+PLAN REFERENCE
+docs/plans/trailer_threat_iter_rework_plan.md
+
+KANBAN UPDATE
+Dopo il completamento:
+1. Aggiorna questa riga a "Completato" con la data e l'evidence log.
+2. Esegui `npm run kanban:lint`.
+```
+
+| TRAILER-V9-PHASE2 | Completato | 2026-07-17 | Cascade | Evidence: test-results/trailer-v9-phase2-2026-07-17.log | manual | @trailer-only exemption, SWE/Cascade required | ```text
 AGENT
 Idle Village Task - Trailer V9 Skin Alignment Phase 2: Component Architecture
 
@@ -282,7 +356,7 @@ After completing this task:
 4. Attach lint, build:check, and kanban:lint output in final report
 ```
 
-| TRAILER-V9-PHASE3 | Non assegnato | | | | manual | @trailer-only exemption, SWE/Cascade required | ```text
+| TRAILER-V9-PHASE3 | Completato | 2026-07-17 | Cascade | Evidence: test-results/trailer-v9-phase3-2026-07-17.log | manual | @trailer-only exemption, SWE/Cascade required | ```text
 AGENT
 Idle Village Task - Trailer V9 Skin Alignment Phase 3: Separate Scene Pages
 
@@ -376,7 +450,7 @@ After completing this task:
 4. Attach lint, build:check, and kanban:lint output in final report
 ```
 
-| TRAILER-V9-PHASE4 | Non assegnato | | | | manual | @trailer-only exemption, SWE/Cascade required | ```text
+| TRAILER-V9-PHASE4 | Completato | 2026-07-17 | Cascade | Evidence: test-results/trailer-v9-phase4-2026-07-17.log | manual | @trailer-only exemption, SWE/Cascade required | ```text
 AGENT
 Idle Village Task - Trailer V9 Skin Alignment Phase 4: Test Hub Update
 
@@ -10928,11 +11002,122 @@ NOTE:
 | PANELS-STEP-06 — Draggable Panels System Step 06: Integration in /design-system with full/strip demo and PersistenceService | Completato | Cascade | - | Integrate panels in /design-system with full/strip demo and PersistenceService | Evidence: test-results/panels-step-06-2026-07-15.log | Prompt: prompts/PANELS-STEP-06.spec.json |
 | PANELS-FIX-COMPONENT-REUSE — Panels System Fix: Component Reuse Invariant Violation in V9PanelShell | Completato | PANELS-STEP-06 | harness | - | 2026-07-15T09:49:44.985Z | - | - | 2026-07-15T09:49:44.984Z | Fix Component Reuse invariant violation in V9PanelShell by replacing inline styles with existing CSS classes from wanderlustTokens.css (.wl-panel, .wl-panel::before, .wl-panel::after). ARCHIVIATO: V9PanelShell usa già correttamente --skin-* tokens (V9 design system), non i vecchi .wl-panel classes. Il prompt era basato su assunzione errata sui percorsi. Componente già conforme a Component Reuse invariant. Plan: coordinator/canonical-systems.md |
 | POI-DETAIL-VISUAL-IMPROVEMENTS — POI Detail Visual Improvements - Material Consistency & Drag Fix | Completato | - | harness | 2026-07-15 | - | - | - | 2026-07-15 | Fix POI detail panel drag behavior to match quest detail, apply bronze/dark border to roster frame, transform HP/Stamina bars to carved stone channels, convert portrait frames to bronze/brass cameos, upgrade filter controls to material styling. Config-first design, skin system compliance, i18n, dnd-kit drag infrastructure. Prompt: prompts/POI-DETAIL-VISUAL-IMPROVEMENTS.md |
-| ADR001-T1 — Freeze E1 (branching QuestEngine) | Non assegnato | - | - | - | - | - | - | - | Prepend @experimental FROZEN JSDoc header to src/engine/quest/QuestEngine.ts (D1). Atomic, independent. Safeguards: lint src/engine/quest, build:check. Evidence: test-results/adr001-t1-<date>.log. DoD: header present, no import diff, grep "new QuestEngine(" in src/ yields only tests+docs. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T1 |
-| ADR001-T2 — Extract RngService | Non assegnato | - | - | - | - | - | - | - | Create src/engine/shared/RngService.ts (LCG + createRng, deriveSeed, rollOutcome), src/engine/shared/rngConfig.ts (Zod WeightedDistribution), tests/unit/engine/shared/RngService.test.ts. Lift LCG from E1, keep E1 importing from new module. Verified. Safeguards: lint src/engine/shared tests/unit/engine/shared, test src/engine/shared, build:check. Evidence: test-results/adr001-t2-<date>.log. DoD: tests green, E1 compiles, no behavioral drift. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T2 |
-| ADR001-T3 — Persist masterSeed | Non assegnato | - | - | - | - | - | - | - | Add masterSeed field to Zustand store, initialize once at run creation. Add persistence key idleVillage_master_seed_v1. TimeEngine accepts injected rng derived from masterSeed. Create tests/unit/idleVillage/masterSeed.test.ts. Verified. Safeguards: lint+test+build:check on scope. Evidence: test-results/adr001-t3-<date>.log. DoD: save→load→save produces identical seed, telemetry master_seed_initialized fires once per run. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T3 |
-| ADR001-T4 — Purge Math.random() in idleVillage engines | Non assegnato | - | - | - | - | - | - | - | Replace all Math.random() in JobResolver, QuestPowerEngine, QuestResolver, QuestEngine (E2), TimeEngine (spawnQuestOffersIfNeeded) with injected Rng derived from masterSeed. IDs become deterministic via deriveSeed(masterSeed, 'ids', counter). Verified. Safeguards: lint+test+build:check on src/engine/game/idleVillage. Regression test: grep "Math.random" src/engine/game/idleVillage returns 0. Evidence: test-results/adr001-t4-<date>.log with grep output. DoD: grep clean, no test regression. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T4 |
- | ADR001-T5 — Migrate C1 quests to C2 (ActivityDefinition) | Completato | Fallito | Cascade | - | - | - | - | 2026-07-16 | Migrated C1 quests to C2 ActivityDefinition entries. Updated defaultConfig.ts, minimal-poi.tsx, questDetailKit.tsx, locationDetailKit.tsx, gameplayStore.ts, questStateDefaults.ts. Evidence: test-results/adr001-t5-2026-07-16.log. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T5 | 
-| ADR001-T6 — Deprecate C1 (questConfig.ts) and E2 | Non assegnato | - | - | - | - | - | - | - | Add @deprecated JSDoc + ADR-001 reference to questConfig.ts and QuestEngine.ts (E2). Keep exports (types still consumed by QuestChainProgressTracker, telemetry). Atomic. Documentation only, no runtime changes. Safeguards: lint+build:check. Evidence: test-results/adr001-t6-<date>.log. DoD: JSDoc present, no new C1 imports after this task. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T6 |
-| ADR001-T7 — Complete quality-roll via variance.rewardCategories | Non assegnato | - | - | - | - | - | - | - | Replace "always first category" stub in QuestResolver.ts (~lines 77-86) with rollOutcome using varianceCategory from ActivityDefinition. Ensure QualityResult { tier, multiplier } type exists in types.ts. Add tests/unit/idleVillage/QuestResolver.test.ts covering roll distribution with seeded RNG. Verified. Safeguards: lint+test+build:check on scope. Evidence: test-results/adr001-t7-<date>.log. DoD: deterministic outcome given same seed, distribution matches config weights within tolerance. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T7 |
-| ADR001-T8 — Documentation & governance closure | Non assegnato | - | - | - | - | - | - | - | Create src/docs/docs/adr/ADR-001-quest-engine-reconciliation.md. Update quest_engine_reconciliation_plan.md with per-task changelog. Cross-link ADR-001 in idle_village_plan.md Quest/Job System section. Mark quest_chronicle_plan.md Phase C theater CTA + sandbox wiring as Step 2 post-reconciliation. Mark idle_village_modifiers_plan.md GM-ENG wiring as post-demo. Add ADR-001 entry to MASTER_PLAN.md governance section. Update COMPONENT_MASTER_INDEX.md with touched frozen kit rows. Verified. Safeguards: kanban:lint, markdown lint if configured. Evidence: test-results/adr001-t8-<date>.log. DoD: all links resolve, COMPONENT_MASTER_INDEX.md last-certified dates updated, master plan references ADR. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T8 |
+| ADR001-T1 — Freeze E1 (branching QuestEngine) | Non assegnato | - | - | - | - | ai-worker | - | - | Prepend @experimental FROZEN JSDoc header to src/engine/quest/QuestEngine.ts (D1). Atomic, independent. Safeguards: lint src/engine/quest, build:check. Evidence: test-results/adr001-t1-<date>.log. DoD: header present, no import diff, grep "new QuestEngine(" in src/ yields only tests+docs. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T1 |
+| ADR001-T2 — Extract RngService | Completato | - | harness | - | 2026-07-17T13:53:06.683Z | harness | - | 2026-07-17T13:53:06.677Z | Create src/engine/shared/RngService.ts (LCG + createRng, deriveSeed, rollOutcome), src/engine/shared/rngConfig.ts (Zod WeightedDistribution), tests/unit/engine/shared/RngService.test.ts. Lift LCG from E1, keep E1 importing from new module. Verified. Safeguards: lint src/engine/shared tests/unit/engine/shared, test src/engine/shared, build:check. Evidence: test-results/adr001-t2-<date>.log. DoD: tests green, E1 compiles, no behavioral drift. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T2 |
+| ADR001-T3 — Persist masterSeed | Completato | - | harness | - | 2026-07-17T13:53:06.711Z | harness | - | 2026-07-17T13:53:06.711Z | Add masterSeed field to Zustand store, initialize once at run creation. Add persistence key idleVillage_master_seed_v1. TimeEngine accepts injected rng derived from masterSeed. Create tests/unit/idleVillage/masterSeed.test.ts. Verified. Safeguards: lint+test+build:check on scope. Evidence: test-results/adr001-t3-<date>.log. DoD: save→load→save produces identical seed, telemetry master_seed_initialized fires once per run. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T3 |
+| ADR001-T4 — Purge Math.random() in idleVillage engines | Completato | - | harness | - | 2026-07-17T13:53:06.732Z | harness | - | 2026-07-17T13:53:06.732Z | Replace all Math.random() in JobResolver, QuestPowerEngine, QuestResolver, QuestEngine (E2), TimeEngine (spawnQuestOffersIfNeeded) with injected Rng derived from masterSeed. IDs become deterministic via deriveSeed(masterSeed, 'ids', counter). Verified. Safeguards: lint+test+build:check on src/engine/game/idleVillage. Regression test: grep "Math.random" src/engine/game/idleVillage returns 0. Evidence: test-results/adr001-t4-<date>.log with grep output. DoD: grep clean, no test regression. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T4 |
+ | ADR001-T5 — Migrate C1 quests to C2 (ActivityDefinition) | Completato | - | Cascade | - | - | - | - | 2026-07-16 | Migrated C1 quests to C2 ActivityDefinition entries. Updated defaultConfig.ts, minimal-poi.tsx, questDetailKit.tsx, locationDetailKit.tsx, gameplayStore.ts, questStateDefaults.ts. Evidence: test-results/adr001-t5-2026-07-16.log. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T5 | 
+| ADR001-T6 — Deprecate C1 (questConfig.ts) and E2 | Non assegnato | - | - | - | - | ai-worker | - | - | Add @deprecated JSDoc + ADR-001 reference to questConfig.ts and QuestEngine.ts (E2). Keep exports (types still consumed by QuestChainProgressTracker, telemetry). Atomic. Documentation only, no runtime changes. Safeguards: lint+build:check. Evidence: test-results/adr001-t6-<date>.log. DoD: JSDoc present, no new C1 imports after this task. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T6 |
+| ADR001-T7 — Complete quality-roll via variance.rewardCategories | Completato | - | harness | - | 2026-07-17T13:53:06.764Z | harness | - | 2026-07-17T13:53:06.764Z | Replace "always first category" stub in QuestResolver.ts (~lines 77-86) with rollOutcome using varianceCategory from ActivityDefinition. Ensure QualityResult { tier, multiplier } type exists in types.ts. Add tests/unit/idleVillage/QuestResolver.test.ts covering roll distribution with seeded RNG. Verified. Safeguards: lint+test+build:check on scope. Evidence: test-results/adr001-t7-<date>.log. DoD: deterministic outcome given same seed, distribution matches config weights within tolerance. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T7 |
+| ADR001-T8 — Documentation & governance closure | Completato | - | harness | - | 2026-07-17T13:53:06.787Z | harness | - | 2026-07-17T13:53:06.787Z | Create src/docs/docs/adr/ADR-001-quest-engine-reconciliation.md. Update quest_engine_reconciliation_plan.md with per-task changelog. Cross-link ADR-001 in idle_village_plan.md Quest/Job System section. Mark quest_chronicle_plan.md Phase C theater CTA + sandbox wiring as Step 2 post-reconciliation. Mark idle_village_modifiers_plan.md GM-ENG wiring as post-demo. Add ADR-001 entry to MASTER_PLAN.md governance section. Update COMPONENT_MASTER_INDEX.md with touched frozen kit rows. Verified. Safeguards: kanban:lint, markdown lint if configured. Evidence: test-results/adr001-t8-<date>.log. DoD: all links resolve, COMPONENT_MASTER_INDEX.md last-certified dates updated, master plan references ADR. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T8 |
+
+### Brief Description
+Create AstrolabeTrailerController that demonstrates DestinyAstrolabe can be controlled for deterministic capture. This is Sprint 1 from the approved trailer vertical slice plan, focusing on the hero shot (Scene 4: Risk).
+
+### Plan Reference
+[trailer_vertical_slice_plan.md](../docs/plans/trailer_vertical_slice_plan.md) - Section 6, Sprint 1 (Days 1-3)
+
+### Estimated Duration
+120-180 minutes
+
+### Objectives
+1. Create `src/ui/idleVillage/trailer/` directory structure
+2. Create `AstrolabeTrailerController.tsx` that wraps DestinyAstrolabe
+3. Implement scripted timeline (reveal → tension → near miss → HERO INJURED)
+4. Implement internal CSS reward burst (NO separate component)
+5. Verify DestinyAstrolabe renders correctly in trailer context
+6. Demonstrate deterministic 7-second sequence that can be replayed identically
+7. Capture first Steam-ready material (GIF, screenshots)
+
+### Success Criteria and KPI Targets
+- **Functional:** DestinyAstrolabe renders in trailer context without errors
+- **Deterministic:** Pressing F5 produces identical 7-second sequence
+- **Timeline:** Sequence follows reveal (0-2s) → tension (2-5s) → near miss (5-7s) → HERO INJURED
+- **No Gameplay Mutation:** AstrolabeTrailerController does NOT modify DestinyAstrolabe internals, physics, or gameplay rules
+- **Capture Ready:** At least 3 screenshot-worthy frames and 1 GIF-worthy loop
+- **CSS Reward Burst:** Predefined particles, deterministic positions, NO physics, NO canvas, NO separate component
+
+### Integration Points and Dependencies
+- **Existing Component:** DestinyAstrolabe (reuse only, do NOT modify)
+- **Routing:** Add `/trailer` route to existing routing system
+- **CSS Variables:** Use trailer.css variables for tuning (--trailer-bg, --trailer-gold, etc.)
+- **Config:** Reference `trailerConfig.ts` for timing values (create if needed)
+
+### Guardrails
+
+#### @trailer-only Convention (EXEMPT from gameplay architecture)
+**Standard Invariants - EXEMPT (do NOT apply):**
+- **Persistence Invariant:** NO PersistenceService, NO localStorage/sessionStorage, NO persistence of any kind
+- **Localization Invariant:** NO i18n for copy text (hardcoded allowed for iteration speed), NO translation keys
+- **Telemetry:** NO telemetry of any kind (marketing asset, not product)
+- **Gameplay State:** NO gameplay state mutation, NO economy systems, NO player progression
+
+**Standard Invariants - MUST PRESERVE (DO apply):**
+- **Config-first:** All timing values, camera settings, sequence events in `trailerConfig.ts` with Zod validation
+- **Skin/Theme:** Use CSS variables from trailer.css, NO standalone .css files, use Gilded Observatory tokens
+- **Component Reuse:** Verify primitives before creating new components, reuse DestinyAstrolabe as-is
+- **State Management:** Use React Context for local presentation state, NO Zustand (marketing-only)
+- **Documentation:** JSDoc on all functions/interfaces, update plan changelog
+- **Node/tooling:** Use pinned Node version from .nvmrc
+- **Safeguards:** Run lint, build:check, kanban:lint before task complete
+
+#### AstrolabeTrailerController Constraints
+- **MAY:** Set initial state, trigger scripted actions, control presentation, include internal CSS reward burst
+- **MAY NOT:** Change physics, modify probabilities, alter gameplay rules, fork DestinyAstrolabe, modify DestinyAstrolabe internals
+
+#### Deterministic Seed Rule
+- **FORBIDDEN:** NO `Math.random()` in trailer code
+- **REQUIRED:** All randomness must come from deterministic seed
+- **Config:** Add `capture.seed: 12345` to trailerConfig.ts
+- **Implementation:** Use seeded random generator for all random values
+
+#### No Placeholder Rule
+- **FORBIDDEN:** No temporary shapes, debug boxes, fake assets, or developer UI after first integration day
+- **REQUIRED:** Every captured frame must represent final visual language
+
+### Implementation Scope
+
+#### Files to Create
+1. `src/ui/idleVillage/trailer/README.md` - Trailer system rules and @trailer-only convention
+2. `src/ui/idleVillage/trailer/AstrolabeTrailerController.tsx` - Main component with scripted timeline
+3. `src/ui/idleVillage/trailer/trailer.css` - CSS variables for trailer styling
+4. `src/balancing/config/idleVillage/trailerConfig.ts` - Config with timing, camera, seed values
+
+#### Files to Modify
+1. **Routing system** - Add `/trailer` route with scene parameter support
+2. **App.tsx or equivalent** - Add TrailerViewer shell (minimal switch statement for scene routing)
+
+#### Component Reuse Requirements
+- **DestinyAstrolabe:** Reuse existing component, do NOT modify internals
+- **CSS Variables:** Use existing theme tokens from `src/ui/styleLab/tokens/gilded-observatory.css`
+
+#### Testing Requirements
+- **Unit Tests:** None required for Sprint 1 (focus on visual capture)
+- **Integration Tests:** None required for Sprint 1
+- **Visual Verification:** Manual browser test - verify DestinyAstrolabe renders correctly
+- **Deterministic Test:** Press F5 10 times, verify sequence is identical each time
+- **Capture Test:** OBS recording test for GIF production
+
+### Documentation Updates
+1. **trailer_vertical_slice_plan.md:** Update Sprint 1 progress in changelog after completion
+2. **docs/trailer_capture_notes.md:** Add best timestamps, successful screenshots
+
+### Safeguards
+- **Lint Scope:** `src/ui/idleVillage/trailer/` (120s timeout)
+- **Test Scope:** None for Sprint 1
+- **Build Check:** `npm run build:check` (180s timeout)
+- **Kanban Lint:** `npm run kanban:lint` (30s timeout)
+
+### Evidence Logging Location
+- Update `docs/plans/trailer_vertical_slice_plan.md` changelog with Sprint 1 completion
+- Add screenshots/GIF to `docs/trailer_capture_notes.md`
+
+### Governance Enforcement
+- **Trusted/Frozen Components:** DestinyAstrolabe is trusted - do NOT modify, only reuse
+- **Documentation Governance:** Update plan changelog, no trusted doc updates required (not touching frozen components)
+- **COMPONENT_MASTER_INDEX:** No updates required (not creating reusable components)
+
+### Execution Hint
+**verified** - This task touches invariants (@trailer-only exemption, deterministic seed rule, no placeholder rule) and requires design judgment on what is exempt from gameplay architecture while preserving presentation architecture.
+
+---
