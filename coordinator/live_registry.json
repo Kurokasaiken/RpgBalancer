@@ -3,7 +3,7 @@
   "model_capacity": {
     "qwen/qwen3-coder:free": {
       "limit_per_min": 20,
-      "used_last_60s": 0
+      "used_last_60s": 11
     },
     "meta-llama/llama-3.1-8b-instruct:free": {
       "limit_per_min": 20,

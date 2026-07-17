@@ -104,7 +104,7 @@ Questo index segue le regole governative:
 | destinyAstrolabeKit | draft | TBD | /minimal-destiny-astrolabe | 2026-07-14 | KIT_REGISTRY status: certified |
 | poiKit | draft | TBD | /minimal-poi | 2026-07-14 | KIT_REGISTRY status: certified |
 | clockKit | frozen | src/ui/idleVillage/frozen/kits/clockKit.md | /minimal-clock | 2026-07-14 | KIT_REGISTRY status: certified |
-| questDetailKit | draft | TBD | /minimal-quest-detail | 2026-07-14 | KIT_REGISTRY status: certified |
+| questDetailKit | candidate | src/ui/idleVillage/frozen/kits/questDetailKit.tsx | /minimal-quest-detail | 2026-07-15 | C2 ActivityDefinition source adopted; reads from `DEFAULT_IDLE_VILLAGE_CONFIG.activities` |
 | resourceHudKit | draft | src/ui/idleVillage/frozen/kits/resourceHudKit.md | /minimal-resourcehud | 2026-07-14 | KIT_REGISTRY status: draft |
 | questCardKit | draft | src/ui/idleVillage/frozen/kits/questCardKit.md | /minimal-questcard | 2026-07-14 | KIT_REGISTRY status: draft |
 | outcomeKit | draft | src/ui/idleVillage/frozen/kits/outcomeKit.md | /minimal-outcome | 2026-07-14 | KIT_REGISTRY status: draft |
@@ -115,7 +115,7 @@ Questo index segue le regole governative:
 | activityCapsuleKit | draft | src/ui/idleVillage/frozen/kits/activityCapsuleKit.md | N/A | 2026-07-14 | KIT_REGISTRY status: draft |
 | slottedMedalKit | draft | src/ui/idleVillage/frozen/kits/slottedMedalKit.md | N/A | 2026-07-14 | KIT_REGISTRY status: draft |
 | jobDetailKit | draft | TBD | N/A | 2026-07-14 | KIT_REGISTRY status: draft |
-| locationDetailKit | draft | TBD | N/A | 2026-07-14 | KIT_REGISTRY status: draft |
+| locationDetailKit | candidate | src/ui/idleVillage/frozen/kits/locationDetailKit.tsx | /minimal-location-detail | 2026-07-15 | ancient-ruins demo location now derived from C2 `ActivityDefinition` |
 | rosterSlotKit | draft | TBD | /minimal-roster-slot-integration | 2026-07-14 | KIT_REGISTRY status: draft |
 | jobPoiRosterKit | draft | TBD | /minimal-job-poi-roster-integration | 2026-07-14 | KIT_REGISTRY status: draft |
 | jobPoiRosterTimeKit | draft | TBD | /minimal-job-poi-roster-time-integration | 2026-07-14 | KIT_REGISTRY status: draft |
@@ -124,5 +124,5 @@ Questo index segue le regole governative:
 
 ---
 
-*Last Updated: 2026-07-14*
+*Last Updated: 2026-07-16*
 *Status: Reconciled from KIT_REGISTRY.*

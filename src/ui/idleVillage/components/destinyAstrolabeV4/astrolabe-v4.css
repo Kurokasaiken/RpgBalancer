@@ -285,6 +285,138 @@
   accent-color: var(--skin-icon-color);
 }
 
+/* ── EXPLANATION: pannello step + legenda ── */
+.dav4-explain {
+  position: absolute;
+  left: 50%;
+  bottom: 6%;
+  transform: translateX(-50%);
+  max-width: min(72%, 560px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 22px;
+  background: var(--skin-inset-bg);
+  border: 1.5px solid var(--skin-surface-border);
+  border-radius: var(--skin-inset-radius);
+  box-shadow: var(--skin-plaque-shadow);
+  animation: dav4-explain-in 0.3s ease-out both;
+}
+
+@keyframes dav4-explain-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* la legenda si legge GUARDANDO il campo: pannello a lato, mai sopra l'arena */
+.dav4-explain--legend {
+  left: 2%;
+  bottom: auto;
+  top: 50%;
+  transform: translateY(-50%);
+  max-width: 320px;
+  animation: dav4-explain-in-side 0.3s ease-out both;
+}
+
+.dav4-explain--legend .dav4-legend {
+  grid-template-columns: 1fr;
+}
+
+@keyframes dav4-explain-in-side {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+}
+
+.dav4-explain-text {
+  margin: 0;
+  font-family: var(--skin-font-serif);
+  font-size: 15px;
+  line-height: 1.45;
+  text-align: center;
+  color: var(--skin-body-color);
+}
+
+.dav4-explain-next {
+  background: var(--skin-btn-bg);
+  border: var(--skin-btn-border);
+  color: var(--skin-btn-color);
+  font-family: var(--skin-btn-font);
+  font-size: var(--skin-btn-size);
+  letter-spacing: var(--skin-btn-tracking);
+  border-radius: var(--skin-btn-radius);
+  padding: 7px 18px;
+  box-shadow: var(--skin-btn-shadow);
+  cursor: pointer;
+}
+
+.dav4-explain-next:hover {
+  background: var(--skin-btn-hover-bg);
+}
+
+.dav4-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 18px;
+  font-family: var(--skin-font-serif);
+  font-size: 13px;
+  color: var(--skin-text-secondary);
+}
+
+.dav4-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dav4-sw {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  flex: none;
+}
+
+.dav4-sw--star {
+  background: var(--skin-text-primary);
+}
+.dav4-sw--almost {
+  background: linear-gradient(135deg, var(--skin-close-color), var(--skin-icon-color) 60%, #8a652a);
+}
+.dav4-sw--enemy {
+  background: var(--skin-astro-enemy);
+}
+.dav4-sw--crit {
+  background: var(--skin-surface-base);
+  border-color: var(--skin-icon-color);
+}
+.dav4-sw--nucleus {
+  background: var(--skin-astro-nucleus);
+}
+.dav4-sw--wound {
+  background: color-mix(in srgb, var(--skin-astro-stripe-wound) 30%, transparent);
+  border-color: var(--skin-astro-stripe-wound);
+}
+.dav4-sw--death {
+  background: color-mix(in srgb, var(--skin-astro-stripe-death) 30%, transparent);
+  border-color: var(--skin-astro-stripe-death);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .dav4-wrap--punch,
   .dav4-throw,

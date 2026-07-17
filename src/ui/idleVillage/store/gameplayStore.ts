@@ -11,7 +11,7 @@ import { saveData, loadData, clearData } from '@/shared/persistence/PersistenceS
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import { DEFAULT_ECONOMY_STATE } from '@/balancing/config/idleVillage/economyConfig';
 import type { EconomyState } from '@/balancing/config/idleVillage/types/economyTypes';
-import { DEFAULT_QUEST_STATE } from '@/balancing/config/idleVillage/questConfig';
+import { DEFAULT_QUEST_STATE } from '@/balancing/config/idleVillage/questStateDefaults';
 import type { QuestState } from '@/balancing/config/idleVillage/types/questTypes';
 import { DEFAULT_SURVIVAL_STATE } from '@/balancing/config/idleVillage/survivalConfig';
 import type { SurvivalState } from '@/balancing/config/idleVillage/types/survivalTypes';

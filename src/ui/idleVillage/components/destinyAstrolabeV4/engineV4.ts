@@ -1,15 +1,18 @@
 /**
- * engineV4.ts — Destiny Astrolabe V4: stessa architettura informativa della V3
- * (zone ∝ probabilità, D100 pre-rollato, canali colore esclusivi) con i tre
- * assi estetici recuperati dalla V1:
- *   1. GHIERA MATERICA — bronzo battuto pre-cotto su offscreen (bevel, brush,
- *      borchie con specular e ombra), non un gradiente piatto;
- *   2. OBELISCHI CARISMATICI — cristalli d'ossidiana grandi e sfaccettati,
- *      anello di base bronzo, rim oro + spigolo azzurro vivo;
- *   3. CLIMAX — shockwave anulare dal punto di atterraggio (mai fog sopra
- *      l'arena: il landing point resta la prova visiva).
+ * engineV4.ts — Destiny Astrolabe V4.
  *
- * La logica pura (geometry/zones/simulation/modifiers) è riusata dalla V3.
+ * Modello zone (vedi zonesV4.ts, tutte le % calibrate sull'area del NEMICO):
+ *   nucleo (successo critico) · stella (successo) · banda bronzo esterna alla
+ *   stella (Almost/near-miss) · nemico (fallimento) · banda interna al bordo
+ *   nemico (fallimento critico) · strisce diagonali α30% (ferita/morte).
+ *
+ * Estetica: ghiera bronzo battuto pre-cotta, colonne NERE (valori richiesti
+ * dalla prova, sul bordo nemico) + colonne BIANCHE (stat della spedizione,
+ * sulle punte della stella), nemico in tono slate distinto dallo sfondo,
+ * scena decluttered (niente corona/voragini/coni luce).
+ *
+ * Explanation mode: la timeline si ferma dopo ogni elemento presentato e
+ * emette onExplain(step); riparte con handle.resume().
  */
 import {
   astrolabeV3Config,
@@ -27,29 +30,35 @@ import {
   type GeometryInput,
   type GeometrySnapshot,
 } from '../destinyAstrolabeV3/geometry';
-import { classify, type Point, type Zone } from '../destinyAstrolabeV3/zones';
-import { simulateThrow, type AstrolabeOutcome, type Trajectory } from '../destinyAstrolabeV3/simulation';
+import type { Point } from '../destinyAstrolabeV3/zones';
 import {
   applyModifiersToInput,
   type AstrolabeModifier,
   type AstrolabeModifierApi,
   type ModifiersChangedListener,
 } from '../destinyAstrolabeV3/modifiers';
+import { buildZonesV4, type ZonesV4, type ZoneV4 } from './zonesV4';
+import { simulateThrowV4, type AstrolabeOutcomeV4 } from './simulationV4';
+import type { Trajectory } from '../destinyAstrolabeV3/simulation';
 
 export type EnginePhase =
   | 'idle'
   | 'ring-lock'
-  | 'threat-slam'
-  | 'agency-burst'
+  | 'threat-pillars'
+  | 'threat-surface'
+  | 'agency-pillars'
+  | 'agency-star'
   | 'risk-pour'
   | 'action-trigger'
   | 'the-spin'
   | 'magnetic-snap'
   | 'resolution';
 
+export type ExplainStep = 'required' | 'enemy' | 'stats' | 'star' | 'legend';
+
 export interface AstrolabeV4Result {
-  outcome: AstrolabeOutcome;
-  zone: Zone;
+  outcome: AstrolabeOutcomeV4;
+  zone: ZoneV4;
   landing: Point;
 }
 
@@ -57,10 +66,11 @@ export interface EngineV4Opts {
   input: GeometryInput;
   config?: Partial<AstrolabeV3Config>;
   reducedMotion?: boolean;
+  explainMode?: boolean;
   onState?: (s: EnginePhase) => void;
   onArmed?: (armed: boolean) => void;
   onResolve?: (r: AstrolabeV4Result) => void;
-  /** ancore placche label in px CSS relative al wrap, spinte FUORI dal bordo sfida */
+  onExplain?: (step: ExplainStep | null) => void;
   onLayout?: (anchors: { x: number; y: number; axis: number; skill: number }[]) => void;
   onSound?: (kind: 'slam' | 'burst' | 'spin' | 'bounce' | 'snap' | 'success' | 'failure') => void;
 }
@@ -69,6 +79,8 @@ export interface AstrolabeV4EngineHandle extends AstrolabeModifierApi {
   roll(): void;
   throw(): void;
   skip(): void;
+  resume(): void;
+  setExplainMode(on: boolean): void;
   setInput(input: GeometryInput): void;
   destroy(): void;
 }
@@ -81,6 +93,10 @@ interface Palette {
   ivory: string;
   wound: string;
   death: string;
+  enemy: string;
+  nucleus: string;
+  stripeWound: string;
+  stripeDeath: string;
 }
 
 function readPalette(el: HTMLElement): Palette {
@@ -94,6 +110,10 @@ function readPalette(el: HTMLElement): Palette {
     ivory: g('--skin-text-primary', '#F5F2E8'),
     wound: g('--skin-status-wound', '#a11d33'),
     death: g('--skin-status-death', '#6d3fb0'),
+    enemy: g('--skin-astro-enemy', '#26314a'),
+    nucleus: g('--skin-astro-nucleus', '#ffe9b0'),
+    stripeWound: g('--skin-astro-stripe-wound', '#c22a3d'),
+    stripeDeath: g('--skin-astro-stripe-death', '#05060a'),
   };
 }
 
@@ -117,12 +137,11 @@ const easeOutBack = (t: number) => {
   return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
 };
 
-const ZONE_COLOR: Record<Zone, keyof Palette> = {
+const ZONE_COLOR: Record<ZoneV4, keyof Palette> = {
+  nucleus: 'nucleus',
   star: 'ivory',
-  'near-miss': 'ivory',
-  crown: 'wound',
-  void: 'death',
-  ruin: 'obsidian',
+  almost: 'gold',
+  enemy: 'enemy',
   crit: 'obsidian',
 };
 
@@ -132,6 +151,7 @@ export function createAstrolabeV4Engine(
 ): AstrolabeV4EngineHandle {
   const cfg: AstrolabeV3Config = { ...astrolabeV3Config, ...(opts.config ?? {}) };
   const palette = readPalette(root);
+  let explainMode = opts.explainMode ?? false;
 
   const canvas = document.createElement('canvas');
   canvas.className = 'dav4-canvas';
@@ -144,7 +164,7 @@ export function createAstrolabeV4Engine(
   let cy = 400;
   let R = 360;
   const backdrop = document.createElement('canvas');
-  const ringLayer = document.createElement('canvas'); // ghiera pre-cotta (asse 1)
+  const ringLayer = document.createElement('canvas');
   let backdropDirty = true;
 
   function resize() {
@@ -171,13 +191,24 @@ export function createAstrolabeV4Engine(
   /* ── stato ── */
   let input: GeometryInput = opts.input;
   let snap: GeometrySnapshot = buildGeometry(input, cfg);
-  resize(); // dopo l'init di snap: emitLayout legge la geometria
-  /* il flex layout può assestarsi dopo il mount: ri-misura a breve distanza */
+  let zones: ZonesV4 = rebuildZones(snap);
+  resize();
   const settleTimers = [
     window.setTimeout(resize, 50),
     window.setTimeout(resize, 250),
     window.setTimeout(resize, 800),
   ];
+
+  function rebuildZones(s: GeometrySnapshot): ZonesV4 {
+    return buildZonesV4(s, {
+      critSuccessPct: cfg.critSuccessPct,
+      nearMissPct: cfg.nearMissPct,
+      critPct: s.input.critPct,
+      woundPct: s.input.woundPct,
+      deathPct: s.input.deathPct,
+      minVisualThickness: cfg.minVisualThickness,
+    });
+  }
 
   let ghostSnap: GeometrySnapshot | null = null;
   let morphFrom: GeometrySnapshot | null = null;
@@ -190,29 +221,33 @@ export function createAstrolabeV4Engine(
   let armed = false;
   let seedCounter = Math.floor(Math.random() * 2 ** 31);
 
+  /* explanation: pausa a fine fase */
+  let paused = false;
+  let pausedAt = 0;
+  let pendingNext: (() => void) | null = null;
+
   let trajectory: Trajectory | null = null;
-  let outcome: AstrolabeOutcome | null = null;
-  let resultZone: Zone = 'ruin';
+  let outcome: AstrolabeOutcomeV4 | null = null;
+  let resultZone: ZoneV4 = 'enemy';
   let spinClock = 0;
   let lastFrame = performance.now();
   let hitStopUntil = 0;
   let cameraZoom = 1;
   let flashT = 0;
-  /* shockwave climax: anello che si espande dal landing point */
-  let shockT = -1; // -1 = inattiva; 0..1 progressione
+  let shockT = -1;
 
   interface TrailPoint { x: number; y: number; t: number; }
   const trail: TrailPoint[] = [];
   let ballPx: Point = { x: 0, y: 0 };
   let nextBounce = 0;
 
-  /* starfield parallattico */
+  /* starfield (2 layer: decluttered) */
   type Star = { x: number; y: number; r: number; ph: number };
-  const starLayers: Star[][] = [90, 45, 18].map((n, li) =>
+  const starLayers: Star[][] = [70, 26].map((n, li) =>
     Array.from({ length: n }, () => ({
       x: Math.random(),
       y: Math.random(),
-      r: (0.3 + Math.random() * 0.6) * (1 + li * 0.5),
+      r: (0.3 + Math.random() * 0.6) * (1 + li * 0.6),
       ph: Math.random() * TAU,
     })),
   );
@@ -260,14 +295,34 @@ export function createAstrolabeV4Engine(
     }
   }
 
+  /** Fine fase: o pausa esplicativa (explainMode) o transizione diretta. */
+  function advance(step: ExplainStep | null, next: () => void) {
+    if (explainMode && step) {
+      paused = true;
+      pausedAt = performance.now();
+      pendingNext = next;
+      opts.onExplain?.(step);
+    } else {
+      next();
+    }
+  }
+  function resume() {
+    if (!paused) return;
+    paused = false;
+    /* il tempo in pausa non conta per la fase corrente */
+    phaseT0 += performance.now() - pausedAt;
+    opts.onExplain?.(null);
+    const next = pendingNext;
+    pendingNext = null;
+    next?.();
+  }
+
   function emitLayout() {
     if (!opts.onLayout) return;
     const rootRect = root.getBoundingClientRect();
     const cvRect = canvas.getBoundingClientRect();
     const offX = cvRect.left - rootRect.left;
     const offY = cvRect.top - rootRect.top;
-    /* anti-collisione: le placche stanno FUORI dal bordo sfida, lungo l'asse,
-       così non coprono mai stella/corona/voragini */
     const anchors = Array.from({ length: AXES }, (_, i) => {
       const a = tipAngle(i);
       const r = Math.min(0.99, rChallengeAt(snap, a) + 0.14);
@@ -283,9 +338,6 @@ export function createAstrolabeV4Engine(
 
   /* ── path builders ── */
   const SEG = 180;
-  let cachedPathsFor: GeometrySnapshot | null = null;
-  let starPath = new Path2D();
-  let challengePath = new Path2D();
   function polarPath(
     s: GeometrySnapshot,
     rFn: (s: GeometrySnapshot, a: number) => number,
@@ -303,14 +355,8 @@ export function createAstrolabeV4Engine(
     p.closePath();
     return p;
   }
-  function ensurePaths(s: GeometrySnapshot, starScale: number, chalScale: number, force: boolean) {
-    if (!force && cachedPathsFor === s) return;
-    challengePath = polarPath(s, rChallengeAt, chalScale);
-    starPath = polarPath(s, rStarAt, starScale);
-    cachedPathsFor = s;
-  }
 
-  /* ── backdrop pre-cotto (materia + velatura + vignetta + leak) ── */
+  /* ── backdrop pre-cotto ── */
   function paintBackdrop() {
     backdrop.width = canvas.width;
     backdrop.height = canvas.height;
@@ -353,7 +399,7 @@ export function createAstrolabeV4Engine(
     }
     b.globalCompositeOperation = 'screen';
     const leak = b.createRadialGradient(cx - R * 0.7, cy - R * 0.7, 0, cx - R * 0.7, cy - R * 0.7, R * 1.4);
-    leak.addColorStop(0, rgba(palette.azure, 0.16));
+    leak.addColorStop(0, rgba(palette.azure, 0.14));
     leak.addColorStop(0.5, rgba(palette.azure, 0.03));
     leak.addColorStop(1, 'rgba(0,0,0,0)');
     b.fillStyle = leak;
@@ -370,7 +416,7 @@ export function createAstrolabeV4Engine(
     backdropDirty = false;
   }
 
-  /* ── ASSE 1: ghiera materica pre-cotta (bronzo battuto stile V1) ── */
+  /* ── ghiera bronzo battuto pre-cotta ── */
   function paintRingLayer() {
     ringLayer.width = canvas.width;
     ringLayer.height = canvas.height;
@@ -381,7 +427,6 @@ export function createAstrolabeV4Engine(
     const mid = (outer + inner) / 2;
     const bandW = outer - inner;
 
-    /* ombra portata della ghiera sul fondo */
     b.save();
     b.beginPath();
     b.arc(cx, cy + R * 0.012, outer * 1.01, 0, TAU);
@@ -390,7 +435,6 @@ export function createAstrolabeV4Engine(
     b.fill('evenodd');
     b.restore();
 
-    /* corpo bronzo: luce da alto-sinistra */
     const body = b.createLinearGradient(cx - outer, cy - outer, cx + outer, cy + outer);
     body.addColorStop(0, '#a8843e');
     body.addColorStop(0.22, '#e9c96f');
@@ -404,7 +448,6 @@ export function createAstrolabeV4Engine(
     b.fillStyle = body;
     b.fill('evenodd');
 
-    /* battitura: archi radiali irregolari (brush) dentro la banda */
     b.save();
     b.beginPath();
     b.arc(cx, cy, outer, 0, TAU);
@@ -421,7 +464,6 @@ export function createAstrolabeV4Engine(
       b.arc(cx, cy, rr, a0, a0 + len);
       b.stroke();
     }
-    /* macchie di ossidazione */
     for (let i = 0; i < 26; i += 1) {
       const a0 = Math.sin(i * 12.1) * TAU;
       const rr = mid + Math.sin(i * 5.3) * bandW * 0.3;
@@ -437,7 +479,6 @@ export function createAstrolabeV4Engine(
     }
     b.restore();
 
-    /* bevel: filo chiaro esterno-alto, scuro interno-basso */
     b.lineWidth = Math.max(1.5, R * 0.006);
     b.strokeStyle = 'rgba(255,240,200,0.55)';
     b.beginPath();
@@ -447,7 +488,6 @@ export function createAstrolabeV4Engine(
     b.beginPath();
     b.arc(cx, cy, outer - b.lineWidth / 2, Math.PI * -0.1, Math.PI * 0.9);
     b.stroke();
-    /* gola interna incisa (doppio filo) */
     b.lineWidth = Math.max(1, R * 0.003);
     b.strokeStyle = 'rgba(20,12,2,0.85)';
     b.beginPath();
@@ -458,7 +498,6 @@ export function createAstrolabeV4Engine(
     b.arc(cx, cy, inner + R * 0.018, 0, TAU);
     b.stroke();
 
-    /* borchie: specular alto-sx + ombra portata bassa */
     for (let i = 0; i < 12; i += 1) {
       const a = (i / 12) * TAU + 0.12;
       const bx = cx + Math.cos(a) * mid;
@@ -508,9 +547,9 @@ export function createAstrolabeV4Engine(
     ctx.clip();
     ctx.globalCompositeOperation = 'lighter';
     starLayers.forEach((layer, li) => {
-      const depth = (li + 1) / 3;
-      const speed = [0.6, 1.0, 1.5][li];
-      const base = [0.15, 0.24, 0.36][li];
+      const depth = (li + 1) / 2;
+      const speed = [0.6, 1.2][li];
+      const base = [0.14, 0.26][li];
       layer.forEach((s, si) => {
         const tw = 0.5 + 0.5 * Math.sin(t * speed + s.ph);
         ctx.globalAlpha = base + base * 0.6 * tw;
@@ -529,210 +568,229 @@ export function createAstrolabeV4Engine(
     ctx.restore();
   }
 
-  let sceneStarScale = 0;
-
-  function drawChallenge(s: GeometrySnapshot, reveal: number) {
+  /* ── NEMICO: superficie slate distinta dallo sfondo + bordo bronzo inciso ── */
+  function drawEnemy(s: GeometrySnapshot, reveal: number) {
     if (reveal <= 0.001) return;
-    ensurePaths(s, sceneStarScale, reveal, true);
+    const path = polarPath(s, rChallengeAt, reveal);
     ctx.save();
     const fill = ctx.createRadialGradient(cx, cy, 0, cx, cy, R);
-    fill.addColorStop(0, rgba(palette.obsidian, 0.98));
-    fill.addColorStop(1, 'rgba(2,4,9,0.96)');
+    fill.addColorStop(0, rgba(palette.enemy, 0.98));
+    fill.addColorStop(0.75, rgba(palette.enemy, 0.94));
+    fill.addColorStop(1, 'rgba(10,14,24,0.96)');
     ctx.fillStyle = fill;
-    ctx.fill(challengePath);
-    if (s.critThickness > 0) {
-      ctx.save();
-      ctx.clip(challengePath);
-      const critInner = polarPath(s, (ss, a) => rChallengeAt(ss, a) - ss.critThickness, reveal);
-      ctx.fillStyle = 'rgba(120,120,130,0.16)';
-      const both = new Path2D();
-      both.addPath(challengePath);
-      both.addPath(critInner);
-      ctx.fill(both, 'evenodd');
-      ctx.restore();
+    ctx.fill(path);
+    /* tessitura minima: spicchi radiali appena percettibili (no clutter) */
+    ctx.save();
+    ctx.clip(path);
+    ctx.globalAlpha = 0.05;
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < AXES; i += 1) {
+      const a = tipAngle(i) + Math.PI / AXES;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + Math.cos(a) * R, cy + Math.sin(a) * R);
+      ctx.stroke();
     }
-    ctx.strokeStyle = rgba(palette.gold, 0.55);
-    ctx.lineWidth = Math.max(1.5, R * 0.008);
-    ctx.stroke(challengePath);
+    ctx.restore();
+    /* bordo: inciso bronzo scuro (muro, non neon) */
+    ctx.strokeStyle = rgba(palette.gold, 0.5);
+    ctx.lineWidth = Math.max(1.5, R * 0.007);
+    ctx.stroke(path);
     ctx.strokeStyle = 'rgba(0,0,0,0.7)';
     ctx.lineWidth = Math.max(1, R * 0.003);
-    ctx.stroke(challengePath);
+    ctx.stroke(path);
     ctx.restore();
   }
 
-  /* ── stella d'avorio caldo: traslucenza a 3 stop, cap ma non gesso ── */
-  function drawStar(s: GeometrySnapshot, scale: number, highlight: number) {
+  /* ── bande e strisce (risk-pour) ── */
+  function drawZones(s: GeometrySnapshot, z: ZonesV4, pour: number) {
+    if (pour <= 0.001) return;
+    ctx.save();
+
+    /* banda crit: si allarga verso l'interno del nemico (fumo denso) */
+    if (z.critThickness > 0) {
+      const outer = polarPath(s, rChallengeAt);
+      const inner = polarPath(s, (ss, a) => Math.max(0.02, rChallengeAt(ss, a) - z.critThickness * pour));
+      const band = new Path2D();
+      band.addPath(outer);
+      band.addPath(inner);
+      ctx.fillStyle = `rgba(8,10,16,${0.75 * pour})`;
+      ctx.fill(band, 'evenodd');
+      ctx.strokeStyle = rgba(palette.gold, 0.25 * pour);
+      ctx.lineWidth = Math.max(1, R * 0.002);
+      ctx.stroke(inner);
+    }
+
+    /* strisce diagonali α30%: ferita (cremisi) e morte (nera) */
+    const challengeClip = polarPath(s, rChallengeAt);
+    const drawStripe = (spec: ZonesV4['woundStripe'], color: string) => {
+      if (spec.halfWidth <= 0) return;
+      ctx.save();
+      ctx.clip(challengeClip);
+      ctx.translate(cx, cy);
+      ctx.rotate(Math.atan2(spec.ny, spec.nx));
+      /* dopo la rotazione la normale è l'asse X: la striscia è la fascia
+         x ∈ [offset−w, offset+w] */
+      ctx.fillStyle = rgba(color, 0.3 * pour);
+      ctx.fillRect((spec.offset - spec.halfWidth) * R, -R * 1.5, spec.halfWidth * 2 * R, R * 3);
+      ctx.restore();
+    };
+    drawStripe(z.woundStripe, palette.stripeWound);
+    drawStripe(z.deathStripe, palette.stripeDeath);
+
+    /* banda bronzo (Almost): esterna alla stella — l'unico "bordo" della stella */
+    if (z.almostThickness > 0) {
+      const outer = polarPath(s, (ss, a) => rStarAt(ss, a) + z.almostThickness * pour);
+      const inner = polarPath(s, rStarAt);
+      const band = new Path2D();
+      band.addPath(outer);
+      band.addPath(inner);
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, R);
+      g.addColorStop(0, rgba(palette.gold, 0.75 * pour));
+      g.addColorStop(1, rgba('#8a652a', 0.7 * pour));
+      ctx.fillStyle = g;
+      ctx.fill(band, 'evenodd');
+      ctx.strokeStyle = 'rgba(30,18,4,0.6)';
+      ctx.lineWidth = Math.max(1, R * 0.002);
+      ctx.stroke(outer);
+    }
+
+    ctx.restore();
+  }
+
+  /* ── stella d'avorio + nucleo ── */
+  let sceneStarScale = 0;
+  function drawStar(
+    s: GeometrySnapshot,
+    z: ZonesV4,
+    scale: number,
+    pour: number,
+    highlight: number,
+  ) {
     if (scale <= 0.001) return;
     const path = polarPath(s, rStarAt, scale);
     ctx.save();
     const maxTip = Math.max(...s.axisTip) * R * scale;
     const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxTip);
-    g.addColorStop(0, `rgba(255,250,235,${0.88 + 0.08 * highlight})`);
-    g.addColorStop(0.45, 'rgba(243,232,205,0.78)');
-    g.addColorStop(0.78, 'rgba(226,203,156,0.62)');
-    g.addColorStop(1, 'rgba(196,163,106,0.46)');
+    g.addColorStop(0, `rgba(255,252,242,${0.92 + 0.06 * highlight})`);
+    g.addColorStop(0.55, 'rgba(246,238,216,0.85)');
+    g.addColorStop(1, 'rgba(226,206,162,0.6)');
     ctx.fillStyle = g;
     ctx.fill(path);
-    /* vena interna: secondo fiore più piccolo, caldo (finto subsurface) */
-    const innerPath = polarPath(s, rStarAt, scale * 0.62);
-    const ig = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxTip * 0.62);
-    ig.addColorStop(0, 'rgba(255,241,200,0.5)');
-    ig.addColorStop(1, 'rgba(255,241,200,0)');
-    ctx.fillStyle = ig;
-    ctx.fill(innerPath);
-    /* bordo: doppio filo, avorio + oro scuro sotto */
-    ctx.strokeStyle = 'rgba(120,92,44,0.8)';
-    ctx.lineWidth = Math.max(1.5, R * 0.006);
-    ctx.stroke(path);
-    ctx.strokeStyle = rgba(palette.ivory, 0.95);
+    /* filo di definizione sottile (il bordo vero è la banda bronzo) */
+    ctx.strokeStyle = 'rgba(120,92,44,0.55)';
     ctx.lineWidth = Math.max(1, R * 0.003);
     ctx.stroke(path);
-    ctx.restore();
-  }
 
-  /* ── rischio: corona con sangue che sbava, voragini che assorbono ── */
-  function drawRisk(s: GeometrySnapshot, pour: number) {
-    if (pour <= 0.001) return;
-    ctx.save();
-    if (s.input.woundPct > 0) {
-      const half = (s.woundThickness / 2) * pour;
-      const outerBleed = polarPath(s, (ss, a) => rStarAt(ss, a) + half * 1.9);
-      const outer = polarPath(s, (ss, a) => rStarAt(ss, a) + half);
-      const inner = polarPath(s, (ss, a) => Math.max(0.02, rStarAt(ss, a) - half));
-      /* bleed esterno morbido (sangue che filtra nel buio) */
-      const bleed = new Path2D();
-      bleed.addPath(outerBleed);
-      bleed.addPath(outer);
-      ctx.fillStyle = rgba(palette.wound, 0.16 * pour);
-      ctx.fill(bleed, 'evenodd');
-      /* banda vera: piena, con filo scuro interno */
-      const band = new Path2D();
-      band.addPath(outer);
-      band.addPath(inner);
-      ctx.fillStyle = rgba(palette.wound, 0.58 * pour);
-      ctx.fill(band, 'evenodd');
-      ctx.strokeStyle = 'rgba(40,4,10,0.8)';
-      ctx.lineWidth = Math.max(1, R * 0.002);
-      ctx.stroke(inner);
-      ctx.strokeStyle = rgba(palette.wound, 0.9 * pour);
-      ctx.stroke(outer);
-    }
-    if (s.voidRadius > 0) {
-      s.voidCenters.forEach((c) => {
-        const p = toPx(c);
-        const vr = s.voidRadius * pour * R;
-        const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, vr);
-        g.addColorStop(0, 'rgba(4,0,10,0.97)');
-        g.addColorStop(0.55, rgba(palette.death, 0.55));
-        g.addColorStop(0.9, rgba(palette.death, 0.2));
-        g.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, vr, 0, TAU);
-        ctx.fill();
-        ctx.strokeStyle = rgba(palette.death, 0.65 * pour);
-        ctx.lineWidth = Math.max(1, R * 0.0025);
-        ctx.stroke();
-      });
+    /* NUCLEO: successo critico, area ∝ critSuccessPct */
+    if (pour > 0 && z.nucleusRadius > 0) {
+      const nr = z.nucleusRadius * R * pour;
+      const ng = ctx.createRadialGradient(cx, cy, 0, cx, cy, nr * 1.25);
+      ng.addColorStop(0, rgba(palette.nucleus, 0.95));
+      ng.addColorStop(0.7, rgba(palette.nucleus, 0.55));
+      ng.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = ng;
+      ctx.beginPath();
+      ctx.arc(cx, cy, nr * 1.25, 0, TAU);
+      ctx.fill();
+      ctx.strokeStyle = rgba(palette.gold, 0.7);
+      ctx.lineWidth = Math.max(1, R * 0.0025);
+      ctx.beginPath();
+      ctx.arc(cx, cy, nr, 0, TAU);
+      ctx.stroke();
     }
     ctx.restore();
   }
 
-  /* ── ASSE 2: obelischi-cristallo carismatici ── */
+  /* ── colonne: NERE (valori richiesti) sul bordo nemico, BIANCHE (stat) sulle punte ── */
   interface Pillar { drop: number; flash: number; }
-  const pillars: Pillar[] = Array.from({ length: AXES }, () => ({ drop: 0, flash: 0 }));
-  function drawObelisks(s: GeometrySnapshot, now: number) {
+  const blackPillars: Pillar[] = Array.from({ length: AXES }, () => ({ drop: 0, flash: 0 }));
+  const whitePillars: Pillar[] = Array.from({ length: AXES }, () => ({ drop: 0, flash: 0 }));
+
+  function drawPillarSet(
+    s: GeometrySnapshot,
+    set: Pillar[],
+    kind: 'black' | 'white',
+    now: number,
+  ) {
     ctx.save();
     for (let i = 0; i < AXES; i += 1) {
-      const pl = pillars[i];
+      const pl = set[i];
       if (pl.drop <= 0) continue;
       const a = tipAngle(i);
-      const base = rChallengeAt(s, a) * R;
-      const bx = cx + Math.cos(a) * base;
-      const by = cy + Math.sin(a) * base;
-      const h = R * 0.26 * pl.drop; // ~60% più alti della V3
-      const w = R * 0.055;
-      const lean = 0.14 + (i % 2) * 0.05;
-      const dirX = -Math.cos(a);
-      const dirY = -Math.sin(a);
-      const tipX = bx + dirX * h * lean * 2.4;
-      const tipY = by + dirY * h * lean * 2.4 - h;
-      const skew = (i - 2) * w * 0.15;
+      const baseR = kind === 'black' ? rChallengeAt(s, a) : rStarAt(s, a) * sceneStarScale;
+      if (baseR <= 0.03) continue;
+      const bx = cx + Math.cos(a) * baseR * R;
+      const by = cy + Math.sin(a) * baseR * R;
+      const h = R * (kind === 'black' ? 0.24 : 0.18) * pl.drop;
+      const w = R * (kind === 'black' ? 0.05 : 0.038);
+      const tipX = bx - Math.cos(a) * h * 0.32;
+      const tipY = by - Math.sin(a) * h * 0.32 - h;
 
-      /* anello di base bronzo (firma V1) + ombra di ancoraggio */
+      /* ombra + anello base bronzo */
       ctx.fillStyle = 'rgba(0,0,0,0.5)';
       ctx.beginPath();
-      ctx.ellipse(bx, by + w * 0.28, w * 1.9, w * 0.6, 0, 0, TAU);
+      ctx.ellipse(bx, by + w * 0.26, w * 1.7, w * 0.55, 0, 0, TAU);
       ctx.fill();
-      ctx.strokeStyle = rgba(palette.gold, 0.75);
-      ctx.lineWidth = Math.max(1.2, R * 0.004);
+      ctx.strokeStyle = rgba(palette.gold, 0.7);
+      ctx.lineWidth = Math.max(1.1, R * 0.0035);
       ctx.beginPath();
-      ctx.ellipse(bx, by + w * 0.1, w * 1.55, w * 0.5, 0, 0, TAU);
+      ctx.ellipse(bx, by + w * 0.08, w * 1.4, w * 0.45, 0, 0, TAU);
       ctx.stroke();
 
-      /* tre facce: sinistra scura, centrale media, destra riflettente */
-      const leftX = bx - w + skew;
-      const midLX = bx - w * 0.25 + skew;
-      const midRX = bx + w * 0.3 + skew;
-      const rightX = bx + w * 0.95 + skew;
-      const shoulderY = by - h * 0.16;
+      /* due facce */
+      const leftX = bx - w;
+      const midX = bx + w * 0.15;
+      const rightX = bx + w * 0.9;
       const faceL = new Path2D();
       faceL.moveTo(leftX, by);
       faceL.lineTo(tipX, tipY);
-      faceL.lineTo(midLX, shoulderY);
+      faceL.lineTo(midX, by - h * 0.12);
+      faceL.lineTo(midX, by);
       faceL.closePath();
-      const faceM = new Path2D();
-      faceM.moveTo(midLX, shoulderY);
-      faceM.lineTo(tipX, tipY);
-      faceM.lineTo(midRX, shoulderY * 0.995 + by * 0.005);
-      faceM.lineTo(midRX, by);
-      faceM.lineTo(midLX, by);
-      faceM.closePath();
       const faceR = new Path2D();
-      faceR.moveTo(midRX, shoulderY);
+      faceR.moveTo(midX, by);
+      faceR.lineTo(midX, by - h * 0.12);
       faceR.lineTo(tipX, tipY);
       faceR.lineTo(rightX, by);
       faceR.closePath();
-      ctx.fillStyle = 'rgba(4,8,16,0.97)';
-      ctx.fill(faceL);
-      const gm = ctx.createLinearGradient(midLX, tipY, midRX, by);
-      gm.addColorStop(0, 'rgba(26,38,56,0.97)');
-      gm.addColorStop(1, 'rgba(10,16,28,0.97)');
-      ctx.fillStyle = gm;
-      ctx.fill(faceM);
-      const gr = ctx.createLinearGradient(midRX, tipY, rightX, by);
-      gr.addColorStop(0, 'rgba(44,64,88,0.95)');
-      gr.addColorStop(1, 'rgba(16,24,40,0.95)');
-      ctx.fillStyle = gr;
-      ctx.fill(faceR);
-
-      /* rim oro sullo spigolo sinistro, azzurro vivo sul destro */
+      if (kind === 'black') {
+        ctx.fillStyle = 'rgba(4,7,13,0.98)';
+        ctx.fill(faceL);
+        const gm = ctx.createLinearGradient(midX, tipY, rightX, by);
+        gm.addColorStop(0, 'rgba(30,40,58,0.98)');
+        gm.addColorStop(1, 'rgba(10,14,24,0.98)');
+        ctx.fillStyle = gm;
+        ctx.fill(faceR);
+      } else {
+        ctx.fillStyle = 'rgba(214,202,176,0.97)';
+        ctx.fill(faceL);
+        const gm = ctx.createLinearGradient(midX, tipY, rightX, by);
+        gm.addColorStop(0, 'rgba(255,250,238,0.97)');
+        gm.addColorStop(1, 'rgba(230,216,186,0.97)');
+        ctx.fillStyle = gm;
+        ctx.fill(faceR);
+      }
+      /* rim: oro a sinistra; azzurro (nere) / bronzo scuro (bianche) a destra */
       ctx.strokeStyle = rgba(palette.gold, 0.85 + pl.flash * 0.15);
-      ctx.lineWidth = Math.max(1.2, R * 0.0035);
+      ctx.lineWidth = Math.max(1.1, R * 0.003);
       ctx.beginPath();
       ctx.moveTo(leftX, by);
       ctx.lineTo(tipX, tipY);
       ctx.stroke();
-      const shimmer = 0.5 + 0.35 * Math.sin(now / 700 + i * 1.3);
-      ctx.strokeStyle = rgba(palette.azure, shimmer + pl.flash * 0.4);
-      ctx.lineWidth = Math.max(1.4, R * 0.004);
+      const shimmer = 0.45 + 0.3 * Math.sin(now / 700 + i * 1.3);
+      ctx.strokeStyle =
+        kind === 'black' ? rgba(palette.azure, shimmer + pl.flash * 0.4) : 'rgba(138,101,42,0.8)';
       ctx.beginPath();
       ctx.moveTo(rightX, by);
       ctx.lineTo(tipX, tipY);
       ctx.stroke();
-      /* scintilla in punta */
-      const tg = ctx.createRadialGradient(tipX, tipY, 0, tipX, tipY, w * 0.9);
-      tg.addColorStop(0, rgba(palette.azure, 0.5 * shimmer + pl.flash * 0.4));
-      tg.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = tg;
-      ctx.beginPath();
-      ctx.arc(tipX, tipY, w * 0.9, 0, TAU);
-      ctx.fill();
 
       if (pl.flash > 0.01) {
-        ctx.fillStyle = rgba(palette.warmGold, pl.flash * 0.5);
+        ctx.fillStyle = rgba(palette.warmGold, pl.flash * 0.45);
         ctx.beginPath();
-        ctx.arc(bx, by, w * 2.2 * pl.flash, 0, TAU);
+        ctx.arc(bx, by, w * 2 * pl.flash, 0, TAU);
         ctx.fill();
       }
       pl.flash = Math.max(0, pl.flash - 0.03);
@@ -784,16 +842,13 @@ export function createAstrolabeV4Engine(
     ctx.restore();
   }
 
-  /* ── ASSE 3: climax — shockwave anulare dal landing point + zona illuminata.
-     Mai fog sull'arena: il punto di atterraggio resta sempre leggibile. ── */
-  function drawResolutionFx(s: GeometrySnapshot, now: number) {
+  function drawResolutionFx(now: number) {
     if (phase !== 'magnetic-snap' && phase !== 'resolution') return;
     if (!trajectory) return;
     const lp = toPx(trajectory.landing);
     const colorKey = ZONE_COLOR[resultZone];
     const color = colorKey === 'obsidian' ? '#9aa0ad' : palette[colorKey];
 
-    /* zona illuminata pulsante */
     const pulse = flashT > 0 ? flashT : 0.4 + 0.15 * Math.sin(now / 300);
     const g = ctx.createRadialGradient(lp.x, lp.y, 0, lp.x, lp.y, R * 0.16);
     g.addColorStop(0, rgba(color, 0.5 * pulse));
@@ -804,7 +859,6 @@ export function createAstrolabeV4Engine(
     ctx.fill();
     flashT = Math.max(0, flashT - 0.02);
 
-    /* shockwave: doppio anello che si espande e sfuma, clippato nell'arena */
     if (shockT >= 0 && shockT < 1) {
       ctx.save();
       ctx.beginPath();
@@ -830,42 +884,63 @@ export function createAstrolabeV4Engine(
 
   /* ── timeline ── */
   let ringReveal = 0;
-  let chalReveal = 0;
+  let enemyReveal = 0;
   let pourP = 0;
 
+  const dropPillars = (set: Pillar[], p: number): boolean => {
+    let allLanded = true;
+    set.forEach((pl, i) => {
+      const local = clamp((p - i * 0.1) / 0.4, 0, 1);
+      const prev = pl.drop;
+      pl.drop = local * local * local;
+      if (prev < 1 && pl.drop >= 1) {
+        pl.flash = 1;
+        opts.onSound?.('slam');
+      }
+      if (pl.drop < 1) allLanded = false;
+    });
+    return allLanded;
+  };
+
   function tickTimeline(now: number) {
+    if (paused) return;
     switch (phase) {
       case 'ring-lock': {
         const p = phaseP(cfg.tRingLock);
         ringReveal = easeOutCubic(p);
-        if (p >= 1) setPhase('threat-slam');
+        if (p >= 1) setPhase('threat-pillars');
         break;
       }
-      case 'threat-slam': {
-        const p = phaseP(cfg.tThreatSlam);
-        chalReveal = clamp(easeOutBack(p), 0, 1.05);
-        pillars.forEach((pl, i) => {
-          const local = clamp((p - i * 0.11) / 0.4, 0, 1);
-          const prev = pl.drop;
-          pl.drop = local * local * local;
-          if (prev < 1 && pl.drop >= 1) {
-            pl.flash = 1;
-            opts.onSound?.('slam');
-          }
-        });
+      case 'threat-pillars': {
+        const p = phaseP(cfg.tThreatSlam * 0.8);
+        dropPillars(blackPillars, p);
+        if (p >= 1) advance('required', () => setPhase('threat-surface'));
+        break;
+      }
+      case 'threat-surface': {
+        const p = phaseP(cfg.tThreatSlam * 0.8);
+        enemyReveal = clamp(easeOutBack(p), 0, 1.05);
         if (p >= 1) {
-          chalReveal = 1;
-          setPhase('agency-burst');
+          enemyReveal = 1;
           opts.onSound?.('burst');
+          advance('enemy', () => setPhase('agency-pillars'));
         }
         break;
       }
-      case 'agency-burst': {
+      case 'agency-pillars': {
+        const p = phaseP(cfg.tAgencyBurst * 0.7);
+        /* le colonne bianche nascono con la stella già alla scala minima */
+        sceneStarScale = Math.max(sceneStarScale, 0.25);
+        dropPillars(whitePillars, p);
+        if (p >= 1) advance('stats', () => setPhase('agency-star'));
+        break;
+      }
+      case 'agency-star': {
         const p = phaseP(cfg.tAgencyBurst);
-        sceneStarScale = clamp(easeOutBack(p), 0, 1.08);
+        sceneStarScale = clamp(0.25 + 0.75 * easeOutBack(p), 0, 1.08);
         if (p >= 1) {
           sceneStarScale = 1;
-          setPhase('risk-pour');
+          advance('star', () => setPhase('risk-pour'));
         }
         break;
       }
@@ -873,8 +948,10 @@ export function createAstrolabeV4Engine(
         pourP = easeOutCubic(phaseP(cfg.tRiskPour));
         if (phaseP(cfg.tRiskPour) >= 1) {
           pourP = 1;
-          setArmed(true);
-          setPhase('action-trigger');
+          advance('legend', () => {
+            setArmed(true);
+            setPhase('action-trigger');
+          });
         }
         break;
       }
@@ -957,14 +1034,14 @@ export function createAstrolabeV4Engine(
     }
     ctx.drawImage(backdrop, 0, 0);
     drawStars(now);
-    if (chalReveal > 0) {
-      drawChallenge(s, chalReveal);
-      drawObelisks(s, now);
-    }
-    if (sceneStarScale > 0) drawStar(s, sceneStarScale, phase === 'resolution' && outcome?.success ? 1 : 0);
-    if (pourP > 0) drawRisk(s, pourP);
+    if (enemyReveal > 0) drawEnemy(s, enemyReveal);
+    if (pourP > 0) drawZones(s, zones, pourP);
+    if (sceneStarScale > 0)
+      drawStar(s, zones, sceneStarScale, pourP, phase === 'resolution' && outcome?.success ? 1 : 0);
+    drawPillarSet(s, blackPillars, 'black', now);
+    if (sceneStarScale > 0.2) drawPillarSet(s, whitePillars, 'white', now);
     drawGhost();
-    drawResolutionFx(s, now);
+    drawResolutionFx(now);
     if (phase === 'the-spin' || phase === 'magnetic-snap' || phase === 'resolution') drawBall(now);
     ctx.restore();
     drawRing(ringReveal);
@@ -977,7 +1054,7 @@ export function createAstrolabeV4Engine(
     morphFrom = snap;
     morphT0 = performance.now();
     snap = buildGeometry(effective, cfg);
-    cachedPathsFor = null;
+    zones = rebuildZones(snap);
     emitLayout();
   }
 
@@ -990,17 +1067,22 @@ export function createAstrolabeV4Engine(
     cameraZoom = 1;
     pourP = 0;
     sceneStarScale = 0;
-    chalReveal = 0;
+    enemyReveal = 0;
     ringReveal = 0;
     shockT = -1;
-    pillars.forEach((pl) => { pl.drop = 0; pl.flash = 0; });
+    paused = false;
+    pendingNext = null;
+    opts.onExplain?.(null);
+    blackPillars.forEach((pl) => { pl.drop = 0; pl.flash = 0; });
+    whitePillars.forEach((pl) => { pl.drop = 0; pl.flash = 0; });
     setArmed(false);
     if (opts.reducedMotion) {
       ringReveal = 1;
-      chalReveal = 1;
+      enemyReveal = 1;
       sceneStarScale = 1;
       pourP = 1;
-      pillars.forEach((pl) => { pl.drop = 1; });
+      blackPillars.forEach((pl) => { pl.drop = 1; });
+      whitePillars.forEach((pl) => { pl.drop = 1; });
       setArmed(true);
       setPhase('action-trigger');
     } else {
@@ -1010,17 +1092,22 @@ export function createAstrolabeV4Engine(
 
   function doThrow() {
     if (phase === 'the-spin' || phase === 'magnetic-snap') return;
+    paused = false;
+    pendingNext = null;
+    opts.onExplain?.(null);
     ringReveal = 1;
-    chalReveal = 1;
+    enemyReveal = 1;
     sceneStarScale = 1;
     pourP = 1;
-    pillars.forEach((pl) => { pl.drop = 1; });
+    blackPillars.forEach((pl) => { pl.drop = 1; });
+    whitePillars.forEach((pl) => { pl.drop = 1; });
     setArmed(false);
     seedCounter = (seedCounter + 0x1000193) >>> 0;
-    const sim = simulateThrow(snap, seedCounter, cfg);
+    const sim = simulateThrowV4(snap, seedCounter, cfg);
     outcome = sim.outcome;
     trajectory = sim.trajectory;
-    resultZone = classify(trajectory.landing, snap);
+    resultZone = sim.zone;
+    zones = sim.zones;
     spinClock = 0;
     nextBounce = 0;
     ballPx = toPx(trajectory.points[0]);
@@ -1053,6 +1140,11 @@ export function createAstrolabeV4Engine(
     roll: startRoll,
     throw: doThrow,
     skip,
+    resume,
+    setExplainMode(on: boolean) {
+      explainMode = on;
+      if (!on) resume();
+    },
     setInput(next: GeometryInput) {
       input = next;
       rebuild();

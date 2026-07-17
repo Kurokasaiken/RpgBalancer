@@ -52,3 +52,6 @@ st-*-report.md
 bugfix-*-prompt.md
 prompt-iv-*.md
 assets_originals/
+
+# Coordinator runtime files
+coordinator/last-run-summary.json

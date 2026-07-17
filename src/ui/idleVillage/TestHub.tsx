@@ -82,6 +82,15 @@ const EXTRA_PAGES: TestPageLink[] = [
     icon: '🎨',
     status: 'ok',
   },
+  // Non-kit page: Steam teaser trailer - marketing asset, not a gameplay kit.
+  {
+    id: 'trailer',
+    title: 'Steam Teaser Trailer',
+    description: '55-second deterministic trailer with 7 scenes (Threat, Choice, Preparation, Risk, Consequence, Legacy, Outro)',
+    path: '/trailer',
+    icon: '🎬',
+    status: 'ok',
+  },
 ];
 
 const TEST_PAGES: TestPageLink[] = [

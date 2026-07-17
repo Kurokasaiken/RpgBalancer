@@ -52,6 +52,7 @@ Questo documento elenca le pagine raggiungibili da `/test-hub` con il loro stato
 | `/skin-sandbox` | V8 Skin Sandbox | `src/pages/v8-skin-sandbox.tsx` | **L1** | Playground per V8 Material Layer Engine e `WanderlustSurface`. | `WanderlustSurface`, `InsetPanel`, `MATERIAL_PRESETS` |
 | `/v9-skin-sandbox` | V9 Skin Sandbox | `src/pages/v9-skin-sandbox.tsx` | **L1** | Playground per V9 skin Explorer Journal. | `V9GlassLayers`, `WanderlustSurface`, generic tokens |
 | `/spell-creator` | Spell Creator (Default Skin) | `src/pages/spell-creator.tsx` | **L1** | Spell Creator con default skin system, i18n, e async persistence. | `SpellCreatorTestPage`, `EnhancedStatSlider`, `GlassCard`, `GlassButton` |
+| `/trailer` | Steam Teaser Trailer | `src/ui/idleVillage/trailer/TrailerViewer.tsx` | **Marketing** | 55-second deterministic trailer con 7 scene (Threat, Choice, Preparation, Risk, Consequence, Legacy, Outro). | `TrailerViewer`, `TrailerThreat`, `TrailerChoice`, `TrailerPreparation`, `TrailerConsequence`, `TrailerLegacy`, `TrailerOutro`, `AstrolabeTrailerController` |
 
 ---
 

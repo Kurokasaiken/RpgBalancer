@@ -55,6 +55,8 @@ const MinimalDestinyAstrolabeV4 = () => {
   const [stats, setStats] = useState(DEFAULT_STATS);
   const [difficulty, setDifficulty] = useState(50);
   const [critPct, setCritPct] = useState(5);
+  const [critSuccessPct, setCritSuccessPct] = useState(5);
+  const [nearMissPct, setNearMissPct] = useState(5);
   const [woundPct, setWoundPct] = useState(10);
   const [deathPct, setDeathPct] = useState(5);
   const [lastResult, setLastResult] = useState<AstrolabeV4Result | null>(null);
@@ -109,7 +111,9 @@ const MinimalDestinyAstrolabeV4 = () => {
           <div className="text-sm text-gray-300">
             roll <span className="text-amber-300 font-bold">{lastResult.outcome.roll}</span> · zona{' '}
             <span className="text-amber-300 font-bold">{lastResult.zone}</span>
-            {lastResult.outcome.nearMiss && <span className="text-orange-400"> · near-miss</span>}
+            {lastResult.outcome.critSuccess && <span className="text-yellow-300"> · trionfo</span>}
+            {lastResult.outcome.almost && <span className="text-orange-400"> · almost</span>}
+            {lastResult.outcome.critFail && <span className="text-gray-400"> · crit</span>}
             {lastResult.outcome.wounded && <span className="text-red-400"> · ferito</span>}
             {lastResult.outcome.dead && <span className="text-purple-400"> · caduto</span>}
           </div>
@@ -124,6 +128,7 @@ const MinimalDestinyAstrolabeV4 = () => {
           critPct={critPct}
           woundPct={woundPct}
           deathPct={deathPct}
+          config={{ critSuccessPct, nearMissPct }}
           onResolve={setLastResult}
         />
       </div>
@@ -152,6 +157,14 @@ const MinimalDestinyAstrolabeV4 = () => {
               <div>
                 <label className="block text-xs font-semibold mb-1 text-gray-300">Morte %</label>
                 {num(deathPct, setDeathPct, 0, 60)}
+              </div>
+              <div>
+                <label className="block text-xs font-semibold mb-1 text-gray-300">Crit succ %</label>
+                {num(critSuccessPct, setCritSuccessPct, 0, 25)}
+              </div>
+              <div>
+                <label className="block text-xs font-semibold mb-1 text-gray-300">Near miss %</label>
+                {num(nearMissPct, setNearMissPct, 0, 25)}
               </div>
             </div>
             <div className="grid grid-cols-5 gap-2 mt-3">

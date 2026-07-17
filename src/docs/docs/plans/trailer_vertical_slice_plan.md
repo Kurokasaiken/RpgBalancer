@@ -1,19 +1,18 @@
 ---
 title: Idle Village — Steam Teaser Vertical Slice Implementation Plan v2
-status: candidate
+status: APPROVED_FOR_IMPLEMENTATION
 owner: Cascade
 last_updated: 2026-07-16
-description: "Pragmatic implementation plan for 45-second Steam teaser: 5 independent recordable cinematic scenes built on existing game UI components."
----
+description: "Pragmatic implementation plan for 55-second Steam teaser: 7 independent recordable cinematic scenes matching StoryboardPage.tsx narrative."
 
 # Idle Village — Steam Teaser Vertical Slice Implementation Plan v2
 
 > **Principle:** This is not a gameplay system. It is a deterministic marketing capture layer built on top of existing game UI components.
 >
-> **Objective:** Produce a 45-second Steam teaser by creating five independent recordable cinematic scenes.
+> **Objective:** Produce a 55-second Steam teaser by creating seven independent recordable cinematic scenes matching StoryboardPage.tsx.
 >
 > **Primary owner:** Cascade · Go-To-Market Pod
-> **Related docs:** [go_to_market_steam_first.md](../strategy/go_to_market_steam_first.md), [MASTER_PLAN.md](../MASTER_PLAN.md)
+> **Related docs:** [go_to_market_steam_first.md](../strategy/go_to_market_steam_first.md), [MASTER_PLAN.md](../MASTER_PLAN.md), [StoryboardPage.tsx](../../src/ui/storyboard/StoryboardPage.tsx)
 
 ---
 
@@ -38,7 +37,15 @@ The code serves one purpose: create recordable video content.
 
 ## 1.1 Trailer-Only Convention
 
-All trailer components bypass standard project invariants. They are **mocked, scripted, and temporary**.
+Trailer components are exempt from gameplay architecture requirements.
+
+They MUST preserve presentation architecture requirements:
+- Visual consistency
+- Deterministic behavior
+- Existing component contracts
+- Project styling conventions
+
+They are marketing-only implementations.
 
 **File header convention:**
 ```typescript
@@ -46,12 +53,20 @@ All trailer components bypass standard project invariants. They are **mocked, sc
  * @trailer-only
  *
  * This component is part of the Steam teaser trailer production pipeline.
- * It does NOT follow standard project invariants:
- * - NO PersistenceService (mock data only)
- * - NO real gameplay logic (scripted sequences)
- * - NO full i18n (hardcoded copy for iteration speed)
- * - NO telemetry (marketing asset, not product)
- * - NO Zod validation (tunable config only)
+ * It is exempt from gameplay architecture requirements but must preserve
+ * presentation architecture requirements.
+ *
+ * NO gameplay logic (scripted sequences, mock data only)
+ * NO persistence (marketing asset, not product)
+ * NO full i18n (hardcoded copy for iteration speed)
+ * NO telemetry (marketing asset, not product)
+ * NO Zod validation (tunable config only)
+ *
+ * MUST preserve:
+ * - Visual consistency with existing components
+ * - Existing component contracts (reuse, don't fork)
+ * - Deterministic behavior for recording
+ * - Project styling conventions
  *
  * This code exists solely to produce recordable video content.
  * Do NOT reuse for gameplay features.
@@ -66,7 +81,8 @@ src/ui/idleVillage/trailer/  # All trailer code lives here
 **Naming convention:**
 - Prefix `Trailer` for all components
 - NO reuse in production gameplay
-- Delete after trailer production (optional cleanup)
+- Trailer code is isolated and disposable
+- Cleanup decision happens after release
 
 ---
 
@@ -96,51 +112,70 @@ src/ui/idleVillage/trailer/  # All trailer code lives here
 
 ---
 
-## 4. Five Recordable Scenes
+## 4. Seven Recordable Scenes (matching StoryboardPage.tsx)
 
 | Scene | Time | What exists | What to build | Deliverable |
 |-------|------|-------------|---------------|-------------|
-| **Intro** | 0-6s | MapPage background, ActionProgressBar | TrailerIntro (background + logo + progress) | Atmospheric opening |
-| **Map** | 6-14s | MapPage, QuestPOI, LocationCard | TrailerMapSequence (auto POI appear + zoom) | Exploration showcase |
-| **UI** | 14-22s | SpellCreatorNew, CharacterBuilder | TrailerUIShowcase (Hero/Spell/Forge carousel) | Depth montage |
-| **Astrolabe** | 22-32s | DestinyAstrolabe (physics, ball, spine) | AstrolabeTrailerController + LootExplosion | Hero moment |
-| **Ending** | 32-45s | MapPage background | TrailerEnding (village + Forge + CTA) | Wishlist conversion |
+| **1. Threat** | 0:00-0:05 | MapPage, LocationCard, QuestPOI, MapHeatmapOverlay | TrailerThreat (map + POI appear + GOBLIN INVASION banner) | Wide establishing shot |
+| **2. Choice** | 0:05-0:15 | VillageSandbox, ResidentSlotRack, VillageRosterSection, WanderlustSurface | TrailerChoice (village + asymmetric POI choices) | Medium two-shot |
+| **3. Preparation** | 0:15-0:25 | WanderlustRosterCard, WanderlustPortrait, WanderlustStatBar, QuestPOI | TrailerPreparation (hero sheet + drag to POI) | Close-up + drag detail |
+| **4. Risk** | 0:25-0:32 | DestinyAstrolabe, SkillCheckLegend, OutcomeModal | AstrolabeTrailerController (astrolabe + HERO INJURED) | Close-up on astrolabe (HERO MOMENT) |
+| **5. Consequence** | 0:32-0:40 | VillageSandbox, ActiveHUD, HUDNotificationLayer, TeaserImpactOverlay | TrailerConsequence (village lost + greyscale) | Wide village shot |
+| **6. Legacy** | 0:40-0:50 | VictoryComponent, ActivityLogPanel, WanderlustSurface, WanderlustPortrait | TrailerLegacy (knowledge preserved list) | Vertical list / scroll |
+| **7. Outro** | 0:50-0:55 | WanderlustHeading, WanderlustSurface | TrailerOutro (WANDERLUST TRIUMPH + wishlist CTA) | Title card |
+
+**Total: 55 seconds**
 
 ---
 
-## 5. Component Inventory (7 new components)
+## 5. Component Inventory (8 new components)
 
 ```
 src/ui/idleVillage/trailer/
 ├── TrailerViewer.tsx              # Shell: /trailer?scene=xxx
-├── TrailerIntro.tsx              # Background + logo + progress
-├── TrailerMapSequence.tsx        # Map + POI + auto zoom
-├── TrailerUIShowcase.tsx         # Hero/Spell/Forge carousel
-├── AstrolabeTrailerController.tsx # Scripted astrolabe sequence
-├── LootExplosion.tsx            # Gold particles MVP
-└── TrailerEnding.tsx            # Village + Forge + CTA
+├── TrailerThreat.tsx             # Map + POI appear + GOBLIN INVASION banner
+├── TrailerChoice.tsx             # Village + asymmetric POI choices
+├── TrailerPreparation.tsx        # Hero sheet + drag to POI
+├── AstrolabeTrailerController.tsx # Scripted astrolabe sequence + CSS reward burst
+├── TrailerConsequence.tsx        # Village lost + greyscale
+├── TrailerLegacy.tsx             # Knowledge preserved list
+└── TrailerOutro.tsx             # WANDERLUST TRIUMPH + wishlist CTA
 
 src/balancing/config/idleVillage/
 └── trailerConfig.ts              # Tunable values only
 ```
 
 **Existing components to reuse:**
-- DestinyAstrolabe (physics, ball, spine, verdict)
-- SpellCreatorNew, CharacterBuilder
-- MapPage, QuestPOI, LocationCard
+- MapPage, LocationCard, QuestPOI, MapHeatmapOverlay
+- VillageSandbox, ResidentSlotRack, VillageRosterSection, WanderlustSurface
+- WanderlustRosterCard, WanderlustPortrait, WanderlustStatBar
+- DestinyAstrolabe, SkillCheckLegend, OutcomeModal
+- ActiveHUD, HUDNotificationLayer, TeaserImpactOverlay
+- VictoryComponent, ActivityLogPanel
+- WanderlustHeading
 
 ---
 
 ## 6. Development Sprints (14 days)
 
-### Sprint 1 — Astrolabe Vertical Slice (Days 1-5)
-**Priority:** Maximum. This is the hero shot.
+### Sprint 1 — Astrolabe Vertical Slice (Days 1-3)
+**Priority:** Maximum. This is the hero shot (Scene 4: Risk).
 
 **Build:**
-- `AstrolabeTrailerController.tsx` — wrapper on DestinyAstrolabe
-- `LootExplosion.tsx` — MVP canvas/CSS particles
+- `AstrolabeTrailerController.tsx` — wrapper on DestinyAstrolabe with internal CSS reward burst
 
-**Detailed Sequence (spend most time here):**
+**AstrolabeTrailerController constraints:**
+- MAY set initial state
+- MAY trigger scripted actions
+- MAY control presentation
+- MAY include internal CSS reward burst (no separate component)
+- MAY NOT change physics
+- MAY NOT modify probabilities
+- MAY NOT alter gameplay rules
+- MAY NOT fork DestinyAstrolabe
+- MAY NOT modify DestinyAstrolabe internals
+
+**Detailed Sequence (Scene 4: Risk - 0:25-0:32):**
 
 **0-2 sec — Reveal**
 - Don't show everything immediately
@@ -163,139 +198,200 @@ src/balancing/config/idleVillage/
 - Freeze
 - Why? From this you can get: Steam screenshot, thumbnail, GIF
 
-**LootExplosion MVP:**
+**Internal CSS reward burst:**
+- CSS transforms only
+- Predefined particles
+- Deterministic positions
+- NO physics simulation
 - NO particle engine
-- 30 CSS particles are sufficient
-- Perception > technique
-- Brain sees: gold, explosion, reward
-- Doesn't matter if there's a physics system behind it
+- NO canvas rendering
+- NO separate component
 
-**Success criteria:** Press button → record 10s scripted sequence that looks like real gameplay.
+**Success criteria:** Press button → record 7s scripted sequence that looks like real gameplay.
 
 **Value:** First Steam-ready material (GIF, screenshots, devlog).
 
 **Realistic Timeline:**
 - Day 1: Don't write elegant code. Just integrate DestinyAstrolabe, get sequence playing
-- Day 2-3: Polish
-- Day 4-5: Loot + hero frame
+- Day 2: Polish
+- Day 3: CSS reward burst + hero frame
 
 If by Day 5 you have a beautiful Astrolabe: the project changes. You already have something to show.
 
 ---
 
-### Sprint 2 — Trailer Viewer + Intro (Days 6-8)
+### Sprint 2 — Trailer Viewer + Threat + Choice (Days 4-6)
 **Build:**
 - `TrailerViewer.tsx` — shell with scene selector
-- `TrailerIntro.tsx` — background + logo + progress bar
+- `TrailerThreat.tsx` — map + POI appear + GOBLIN INVASION banner
+- `TrailerChoice.tsx` — village + asymmetric POI choices
 
 **TrailerViewer Implementation (keep it STUPID):**
 ```typescript
 // Literally this simple:
 switch (scene) {
-  case "intro": return <TrailerIntro />
-  case "map": return <TrailerMapSequence />
-  case "ui": return <TrailerUIShowcase />
-  case "astrolabe": return <AstrolabeTrailerController />
-  case "ending": return <TrailerEnding />
+  case "threat": return <TrailerThreat />
+  case "choice": return <TrailerChoice />
+  case "preparation": return <TrailerPreparation />
+  case "risk": return <AstrolabeTrailerController />
+  case "consequence": return <TrailerConsequence />
+  case "legacy": return <TrailerLegacy />
+  case "outro": return <TrailerOutro />
 }
 ```
 NO patterns. NO abstraction. Just routing.
 
 **Features:**
 - Route `/trailer` with debug buttons
-- Route `/trailer?scene=intro|map|ui|astrolabe|ending`
+- Route `/trailer?scene=threat|choice|preparation|risk|consequence|legacy|outro`
 - Capture mode: `?capture=true` (hides debug, forces autoplay, resets to t=0)
 
-**Success criteria:** Navigate between scenes, see intro play deterministically.
+**Success criteria:** Navigate between scenes, see threat and choice play deterministically.
 
 ---
 
-### Sprint 3 — UI + Map (Days 9-11)
+### Sprint 3 — Preparation + Consequence (Days 7-9)
 **Build:**
-- `TrailerUIShowcase.tsx` — Hero/Spell/Forge carousel with animated numbers
-- `TrailerMapSequence.tsx` — auto POI appear + highlight + zoom
+- `TrailerPreparation.tsx` — hero sheet + drag to POI
+- `TrailerConsequence.tsx` — village lost + greyscale
 
-**UI Showcase:**
-- Hero: Level 12 → 13, skill unlock
-- Spell: Arcane Power +50
-- Forge: Blueprint unlocked, +30% production
-- Fade/scale transitions
+**Preparation:**
+- Hero sheet: Attack 15, Defense 8, Magic 12
+- Drag hero token into QuestPOI
+- POI begins pulsing to show ready
 
-**Map Sequence:**
-- Map appears
-- POI 1 appears
-- POI 2 appears
-- Dangerous POI highlighted
-- Zoom to selected
+**Consequence:**
+- Timer reaches zero
+- Greyscale filter and impact overlay
+- SETTLEMENT LOST
 
 **Success criteria:** Both scenes recordable with no clicks required.
 
 ---
 
-### Sprint 4 — Ending + Polish (Days 12-14)
+### Sprint 4 — Legacy + Outro (Days 10-12)
 **Build:**
-- `TrailerEnding.tsx` — village + Forge reveal + CTA
+- `TrailerLegacy.tsx` — knowledge preserved list
+- `TrailerOutro.tsx` — WANDERLUST TRIUMPH + wishlist CTA
 
-**Polish:**
-- Timing adjustments
-- Visual consistency
-- OBS capture testing
-- 1080p/60fps output
+**Legacy:**
+- KNOWLEDGE PRESERVED
+- Artifacts, blueprints, surviving heroes appear with checkmarks
+- Bronze surface cards for each legacy item
 
-**Success criteria:** Complete 45s video ready for Steam.
+**Outro:**
+- WANDERLUST TRIUMPH logo
+- PREPARE · ENDURE · TRIUMPH tagline
+- Animated wishlist CTA button
+
+**Success criteria:** Both scenes recordable, final CTA compelling.
 
 ---
 
-## 5. Configuration
+### Sprint 5 — Final Polish and Integration (Days 13-14)
+**Build:**
+- Timing adjustments across all 7 scenes
+- Visual consistency tuning
+- OBS capture testing
+- Final polish
+
+**Success criteria:** Complete 55s video ready for Steam upload.
+
+---
+
+## 7. Configuration
 
 **File:** `src/balancing/config/idleVillage/trailerConfig.ts`
 
 **Structure (tunable values only):**
 ```typescript
 export const trailerConfig = {
-  duration: 45000,
+  duration: 55000,
 
-  intro: {
-    duration: 6000,
-    fontScale: 1.2,
-    title: "Idle Village",
-  },
-
-  map: {
-    duration: 8000,
+  threat: {
+    duration: 5000,
+    banner: "GOBLIN INVASION — 5 DAYS REMAIN",
     poiSequence: [
-      { id: "poi-1", time: 1000, x: 200, y: 150 },
-      { id: "poi-2", time: 2000, x: 400, y: 300 },
-      { id: "dangerous", time: 3000, x: 600, y: 450, highlight: true },
+      { id: "poi-1", time: 1000 },
+      { id: "poi-2", time: 2000 },
+      { id: "poi-3", time: 3000 },
     ],
   },
 
-  ui: {
-    duration: 8000,
-    screens: [
-      { type: "hero", duration: 2500 },
-      { type: "spell", duration: 2500 },
-      { type: "forge", duration: 3000 },
-    ],
-  },
-
-  astrolabe: {
+  choice: {
     duration: 10000,
+    choices: [
+      { id: "training", type: "safe", label: "Training Grounds" },
+      { id: "ruins", type: "high-risk", label: "Forgotten Ruins" },
+    ],
+  },
+
+  preparation: {
+    duration: 10000,
+    hero: {
+      attack: 15,
+      defense: 8,
+      magic: 12,
+    },
+    poi: "Forgotten Ruins",
+  },
+
+  risk: {
+    duration: 7000,
+    camera: {
+      initialScale: 0.8,
+      focusTarget: "astrolabe",
+      shakeAt: ["impact"],
+    },
     sequence: [
       { time: 0, event: "spawn" },
-      { time: 1000, event: "energy" },
-      { time: 3000, event: "ballEnter" },
+      { time: 2000, event: "ballEnter" },
       { time: 5000, event: "nearMiss" },
-      { time: 7000, event: "success" },
-      { time: 8000, event: "loot" },
-      { time: 10000, event: "freeze" },
+      { time: 7000, event: "heroInjured" },
+    ],
+    posterFrames: [
+      { id: "nearMiss", time: 5500 },
+      { id: "heroInjured", time: 7000 },
     ],
   },
 
-  ending: {
-    duration: 13000,
-    cta: "Wishlist on Steam",
+  consequence: {
+    duration: 8000,
+    timer: 0,
+    overlay: "greyscale",
+    message: "SETTLEMENT LOST",
   },
+
+  legacy: {
+    duration: 10000,
+    items: [
+      { id: "artifact", label: "Ancient Artifact" },
+      { id: "blueprint", label: "Sacred Altar Blueprint" },
+      { id: "heroes", label: "Surviving Heroes" },
+    ],
+  },
+
+  outro: {
+    duration: 5000,
+    title: "WANDERLUST TRIUMPH",
+    tagline: "PREPARE · ENDURE · TRIUMPH",
+    cta: "WISHLIST NOW ON STEAM",
+  },
+
+  capture: {
+    seed: 12345,
+    freezeAt: undefined,
+  },
+};
+
+// Copy constants (separated from timing data)
+const TRAILER_COPY = {
+  threatBanner: "GOBLIN INVASION — 5 DAYS REMAIN",
+  consequenceMessage: "SETTLEMENT LOST",
+  legacyTitle: "KNOWLEDGE PRESERVED",
+  outroTitle: "WANDERLUST TRIUMPH",
+  outroTagline: "PREPARE · ENDURE · TRIUMPH",
+  cta: "WISHLIST NOW ON STEAM",
 };
 ```
 
@@ -306,6 +402,9 @@ export const trailerConfig = {
   --trailer-gold: #d8b13e;
   --trailer-gold-bright: #f0cf6a;
   --trailer-parchment: #ede0c4;
+  --trailer-transition-duration: 0.3s;
+  --trailer-glow-intensity: 0.8;
+  --trailer-text-scale: 1.2;
 }
 ```
 
@@ -313,7 +412,7 @@ export const trailerConfig = {
 
 ---
 
-## 7. Capture Mode
+## 8. Capture Mode
 
 **URL:** `/trailer?scene=astrolabe&capture=true`
 
@@ -324,16 +423,134 @@ export const trailerConfig = {
 - Disables mouse
 - Auto reset
 
+**Poster frame capture:**
+- URL: `/trailer?scene=astrolabe&frame=nearMiss`
+- URL: `/trailer?scene=astrolabe&frame=success`
+- Jumps to specific timestamp from config.posterFrames
+- Freezes for screenshot capture
+
+**Capture mode must guarantee:**
+- Same initial state
+- Same animation timing
+- Same particle positions
+- Same poster frames
+
 **Implementation:**
 ```typescript
 const isCaptureMode = new URLSearchParams(location.search).get("capture") === "true";
+const posterFrame = new URLSearchParams(location.search).get("frame");
 ```
 
-**Cost:** 15 minutes. **Value:** Eliminates recording problems.
+**Cost:** 15 minutes. **Value:** Eliminates recording problems + enables asset production (Steam capsule, Twitter, Discord, devlog, screenshots).
 
 ---
 
-## 8. Definition of Done (per scene)
+## 9. Mock Data Policy
+
+Trailer data is intentionally fake.
+
+**Allowed:**
+- heroLevel: 99
+- artifactPower: +500
+- rareLoot: true
+- fake progression numbers
+- scripted outcomes
+
+**Forbidden:**
+- Modify player save
+- Update inventory
+- Change economy
+- Unlock real content
+- Alter gameplay state
+
+The trailer creates an illusion of gameplay, not gameplay state.
+
+---
+
+## 10. No Placeholder Rule
+
+A trailer scene cannot use temporary shapes, debug boxes, fake assets, or developer UI after the first integration day.
+
+Every captured frame must represent final visual language.
+
+**Rationale:** The trailer is the product. Placeholder assets in a trailer become marketing assets. Fix this at the source, not in post-production.
+
+---
+
+## 11. Deterministic Seed Rule
+
+Trailer code cannot use `Math.random()`. All randomness must come from deterministic seed.
+
+**Config:**
+```typescript
+capture: {
+  seed: 12345,
+  freezeAt: undefined,
+}
+```
+
+**Implementation:**
+- Use seeded random generator for all random values
+- Capture mode forces seed to fixed value
+- This guarantees identical particle positions, timing, and poster frames across recordings
+
+**Rationale:** If React mounts/unmounts components, a single `Math.random()` call breaks reproducibility. Deterministic seed prevents this.
+
+---
+
+## 12. Visual Rules
+
+Every scene must follow these presentation rules:
+
+### Background (minimum)
+- Base gradient
+- Atmospheric particles
+- Vignettes
+- Depth layer
+
+### Motion (allowed)
+- Transform
+- Opacity
+- Scale
+- Rotation
+
+### Motion (avoid)
+- Layout animation
+- Expensive filters
+- Canvas rendering loops
+
+### Text rules
+- Max 6 words per screen
+- Minimum 48px equivalent at 1080p
+- Fade in/out only
+- +20% larger than game UI for readability
+
+### Hero Frame requirement
+Every scene must produce:
+- 1 screenshot-worthy frame
+- 1 5-second recording loop
+
+This saves you in the final polish phase and ensures you have marketing assets beyond the video.
+
+---
+
+## 13. Production Gate
+
+A scene is NOT considered complete if:
+- It technically works but looks generic
+- It requires manual clicks
+- It cannot produce a screenshot
+- Timing changes require code edits
+
+**Acceptance criteria:**
+- Scene runs automatically without interaction
+- Produces at least one screenshot-worthy frame
+- Can be recorded in OBS with consistent timing
+- Visual quality matches game aesthetic
+
+---
+
+## 14. Definition of Done (per scene)
 
 Before moving to the next scene, each must pass:
 
@@ -352,7 +569,7 @@ Before moving to the next scene, each must pass:
 
 ---
 
-## 9. Decision Order During Development
+## 15. Decision Order During Development
 
 When time is limited, decide in this order:
 
@@ -367,7 +584,7 @@ When time is limited, decide in this order:
 
 ---
 
-## 10. Capture Notes Folder
+## 16. Capture Notes Folder
 
 Create: `docs/trailer_capture_notes.md`
 
@@ -383,7 +600,7 @@ Create: `docs/trailer_capture_notes.md`
 
 ---
 
-## 11. Scene Done Checklist
+## 17. Scene Done Checklist
 
 Every scene must pass:
 
@@ -403,7 +620,7 @@ Every scene must pass:
 
 ---
 
-## 12. What NOT to Build
+## 18. What NOT to Build
 
 ❌ Zustand trailer store
 ❌ Zod config validation
@@ -419,16 +636,29 @@ These are product features. This is marketing.
 
 ---
 
-## 13. Success Criteria
+## 19. Success Criteria
 
-**Day 7:** Can record intro + astrolabe + UI (Steam-ready GIF/screenshots/devlog material)
+**Day 3:** Can record astrolabe (Steam-ready GIF/screenshots/devlog material)
 
-**Day 14:** Complete 45s video ready for Steam upload
+**Day 6:** Can record threat + choice + astrolabe
+
+**Day 9:** Can record preparation + consequence
+
+**Day 12:** Can record legacy + outro
+
+**Day 14:** Complete 55s video ready for Steam upload
+
+**Ultimate metric:** By July 30, can open OBS and capture 7 memorable frames that make someone on Steam say "I want to see this game."
 
 ---
 
-## 14. Change Log
+## 20. Change Log
 
 - `2026-03-02`: Initial plan created (v1)
 - `2026-07-13`: Added font size/readability feedback
-- `2026-07-16`: Complete rewrite to pragmatic v2 — focus on 5 recordable scenes, Astrolabe-first sprint, capture mode, simplified config, @trailer-only convention, detailed sequence breakdown, decision order, capture notes folder
+- `2026-07-16`: Complete rewrite to pragmatic v2 — focus on 5 recordable scenes, 45s duration, Astrolabe-first sprint, capture mode, simplified config, @trailer-only convention, detailed sequence breakdown, decision order, capture notes folder
+- `2026-07-16`: AAA-level critique applied — "exempt from gameplay architecture" instead of "bypass invariants", camera metadata, poster frame capture, visual rules, deterministic particles, TRAILER_COPY separation, hero moment prioritization, production gate, mock data policy, CSS variables tuning
+- `2026-07-16`: Final corrections for APPROVED_FOR_IMPLEMENTATION — removed LootExplosion as separate component (internal to AstrolabeTrailerController), reduced Ending to 7s with narrative loop, added No Placeholder Rule, added Deterministic Seed Rule, status set to APPROVED_FOR_IMPLEMENTATION
+- `2026-07-16`: Aligned to StoryboardPage.tsx — 7 scenes (Threat, Choice, Preparation, Risk, Consequence, Legacy, Outro), 55s duration, specific narrative elements (GOBLIN INVASION banner, HERO INJURED, SETTLEMENT LOST, KNOWLEDGE PRESERVED, WANDERLUST TRIUMPH), 7 components, 5 sprints
+- `2026-07-16`: Sprint 1 (Days 1-3) completed — AstrolabeTrailerController implemented with scripted timeline, CSS reward burst, deterministic seeded random, trailer config, CSS variables, routing at /trailer, safeguards passed (lint, build:check). Evidence: test-results/build-check-2026-07-16.log
+- `2026-07-16`: Sprints 2-5 completed — TrailerViewer (scene router), TrailerThreat, TrailerChoice, TrailerPreparation, TrailerConsequence, TrailerLegacy, TrailerOutro, and TeaserImpactOverlay implemented; `trailerConfig.ts` expanded with scene data, positions, and scene order; `App.tsx` wired to `TrailerViewer`; deterministic auto-cycle, query-param scene selection, and capture mode added; safeguards passed (lint, build:check, test, kanban:lint). Evidence: test-results/trailer-sprints-2-5-2026-07-16.md

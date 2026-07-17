@@ -21,7 +21,7 @@ const legacyEslintIgnorePatterns = [
   'src/ui/shared/**',
   'src/ui/playtest/**',
   'src/ui/tools/**',
-  'src/ui/idleVillage/**',
+  'src/ui/idleVillage/**/*',
   'src/balancing/**',
   'src/engine/**',
   'src/shared/**',
@@ -109,7 +109,7 @@ const lintQuarantineIgnores = [
   'src/ui/shared/**',
   'src/ui/playtest/**',
   'src/ui/tools/**',
-  'src/ui/idleVillage/**',
+  'src/ui/idleVillage/**/*',
   'src/balancing/**',
   'src/engine/**',
   'src/shared/**',
@@ -131,6 +131,12 @@ const lintQuarantineIgnores = [
   'src/ui/balancing/components/BalancerStorageTelemetryDashboard.tsx',
 ];
 
+// Unignore specific @trailer-only files so the trailer scope can be linted
+// while the rest of src/ui/idleVillage and src/balancing remains quarantined.
+const trailerUnignorePatterns = [
+  '!src/ui/idleVillage/trailer/**',
+];
+
 const combinedIgnorePatterns = Array.from(new Set([
   ...legacyEslintIgnorePatterns,
   ...lintQuarantineIgnores,
@@ -139,6 +145,9 @@ const combinedIgnorePatterns = Array.from(new Set([
 export default defineConfig([
   {
     ignores: combinedIgnorePatterns,
+  },
+  {
+    ignores: trailerUnignorePatterns,
   },
   {
     files: ['**/*.{ts,tsx}'],

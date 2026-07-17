@@ -78,6 +78,12 @@ export const BASE_SKIN_CSS_VARS: SkinCssVarMap = {
      cremisi = carne (solo corona ferita) · viola = morte (solo voragini) */
   '--skin-status-wound': '#a11d33',
   '--skin-status-death': '#6d3fb0',
+  /* Destiny Astrolabe V4 — superficie nemico (distinta dallo sfondo),
+     nucleo successo critico, strisce rischio (ferita/morte, α30% nel canvas) */
+  '--skin-astro-enemy': '#26314a',
+  '--skin-astro-nucleus': '#ffe9b0',
+  '--skin-astro-stripe-wound': '#c22a3d',
+  '--skin-astro-stripe-death': '#05060a',
 
   /* Inset panels */
   '--skin-inset-bg': '#060f16',

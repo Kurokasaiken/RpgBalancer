@@ -12,9 +12,57 @@ import React, { useState } from 'react';
 import type { JSX } from 'react';
 import { createKitShell } from '../_infra/KitShell';
 import { DEFAULT_MINIMAL_CONFIG } from '@/ui/idleVillage/frozen/_infra/CanonicalDataBridge';
+import { DEFAULT_IDLE_VILLAGE_CONFIG } from '@/balancing/config/idleVillage/defaultConfig';
 import { trackTelemetryEvent } from '@/analytics/telemetryStub';
 
 const _accentHex = (DEFAULT_MINIMAL_CONFIG as { ui?: { tokens?: { accentHex?: string } } }).ui?.tokens?.accentHex ?? '#c9a227';
+
+const getDangerMeta = (dangerLevel: number): { label: string; color: string } => {
+  if (dangerLevel <= 0) return { label: 'Nullo', color: 'var(--text-muted, #6b7280)' };
+  if (dangerLevel <= 2) return { label: 'Basso', color: 'var(--accent-strong, #22c55e)' };
+  if (dangerLevel <= 4) return { label: 'Medio-Alto', color: 'var(--halo-color, #f97316)' };
+  return { label: 'Critico', color: 'var(--risk-death-color, #ef4444)' };
+};
+
+/**
+ * Builds the ancient-ruins demo location from the C2 ActivityDefinition.
+ * This replaces the hardcoded entry with a config-driven one while preserving
+ * the showcase location-specific fields (biome, distance, resources, etc.).
+ */
+const buildAncientRuinsLocation = () => {
+  const activity = DEFAULT_IDLE_VILLAGE_CONFIG.activities['ancient-ruins'];
+  const dangerLevel = activity?.dangerRating ?? 5;
+  const { dangerLabel, dangerColor } = getDangerMeta(dangerLevel);
+  const fallbackLinked = [
+    { id: 'explore-ruins', label: 'Esplora Rovine', icon: '🔍' },
+    { id: 'recover-artifact', label: 'Recupera Artefatto', icon: '🏺' },
+  ];
+  const linkedActivities = activity
+    ? [{ id: activity.id, label: activity.label, icon: (activity.metadata?.icon as string | undefined) ?? '🏛️' }]
+    : fallbackLinked;
+
+  return {
+    id: 'ancient-ruins',
+    label: activity?.label ?? 'Rovine di Valdor',
+    icon: (activity?.metadata?.icon as string | undefined) ?? '🏛️',
+    type: 'dungeon',
+    biome: 'Rovine Pre-Guerra',
+    distance: '8.0 km',
+    dangerLevel,
+    dangerLabel,
+    dangerColor,
+    description: activity?.description ?? 'I resti di un\'antica città sommersa dalla vegetazione. Oggetti di valore inestimabile, ma protetti da guardiani millenari.',
+    flavorText: 'Statue di divinità dimenticate ti osservano dalle nicchie. Il silenzio qui ha un peso fisico.',
+    slots: activity?.maxSlots === 'infinite' ? 99 : (activity?.maxSlots ?? 2),
+    activeResidents: 0,
+    linkedActivities,
+    resources: [
+      { label: 'Artefatti', icon: '🏺', abundance: 'Rara' },
+      { label: 'Conoscenza', icon: '📜', abundance: 'Moderata' },
+    ],
+    unlocked: false,
+  };
+};
 
 const DEMO_LOCATIONS = [
   {
@@ -37,7 +85,7 @@ const DEMO_LOCATIONS = [
     ],
     resources: [
       { label: 'Legname', icon: '🪵', abundance: 'Abbondante' },
-      { label: 'Selvaggina', icon: '🦌', abundance: 'Moderata' },
+      { label: 'Selvaggina', icon: '�', abundance: 'Moderata' },
     ],
     unlocked: true,
   },
@@ -65,30 +113,7 @@ const DEMO_LOCATIONS = [
     ],
     unlocked: true,
   },
-  {
-    id: 'ancient-ruins',
-    label: 'Rovine di Valdor',
-    icon: '🏛️',
-    type: 'dungeon',
-    biome: 'Rovine Pre-Guerra',
-    distance: '8.0 km',
-    dangerLevel: 5,
-    dangerLabel: 'Critico',
-    dangerColor: 'var(--risk-death-color, #ef4444)',
-    description: 'I resti di un\'antica città sommersa dalla vegetazione. Oggetti di valore inestimabile, ma protetti da guardiani millenari.',
-    flavorText: 'Statue di divinità dimenticate ti osservano dalle nicchie. Il silenzio qui ha un peso fisico.',
-    slots: 2,
-    activeResidents: 0,
-    linkedActivities: [
-      { id: 'explore-ruins', label: 'Esplora Rovine', icon: '🔍' },
-      { id: 'recover-artifact', label: 'Recupera Artefatto', icon: '🏺' },
-    ],
-    resources: [
-      { label: 'Artefatti', icon: '🏺', abundance: 'Rara' },
-      { label: 'Conoscenza', icon: '📜', abundance: 'Moderata' },
-    ],
-    unlocked: false,
-  },
+  buildAncientRuinsLocation(),
   {
     id: 'village-fields',
     label: 'Campi del Villaggio',
