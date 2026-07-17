@@ -126,9 +126,25 @@
     "onboardingThrow": "Throw the spark — where it stops is the proof of your fate."
   },
   "astrolabeV4": {
+    "verdictBigwin": "Triumph",
+    "subBigwin": "The sun itself signs your deed.",
     "subSuccess": "The summit bows to your stride.",
     "subNearMiss": "The spark danced on the rim… and slipped beyond.",
     "subFail": "The mountain repels mortals.",
-    "subCrit": "The abyss claims those who dare too much."
+    "subCrit": "The abyss claims those who dare too much.",
+    "explanation": "Explanation",
+    "explainContinue": "Continue",
+    "explainRequired": "The black columns are the values demanded by the trial: one for each axis of the check.",
+    "explainEnemy": "This surface is the Enemy. If the spark stops here, the check fails.",
+    "explainStats": "The white columns are your expedition's stats: the higher they rise, the further your star reaches.",
+    "explainStar": "The ivory star is your ground. If the spark stops inside it, the check succeeds.",
+    "explainLegend": "Every colour is a fate. Read the field before you throw:",
+    "legendStar": "White — star interior: success",
+    "legendAlmost": "Bronze — star rim: Almost (failed by a whisker)",
+    "legendEnemy": "Slate — the Enemy: failure",
+    "legendCrit": "Dark band inside the Enemy's edge: critical failure",
+    "legendNucleus": "Central core: critical success",
+    "legendWound": "Crimson stripe: wound",
+    "legendDeath": "Black stripe: death"
   }
 }

@@ -67,6 +67,15 @@ Verify prompt structure matches template
 Check for required sections (header, objectives, guardrails, scope, safeguards)
 Validate task ID and plan references
 Ensure KPI targets are measurable
+
+Batch Prompt Registration Rule
+When the Strategist provides a multi-phase plan (e.g., 4-phase trailer alignment):
+- Create ALL phase prompts immediately and register them in agent_assignments.md
+- Set all prompts to "Non assegnato" status initially
+- Begin dispatching immediately after registration completes
+- Do NOT wait for phase-by-phase prompt creation
+- Dependencies between phases are documented in prompt descriptions (e.g., "DEPENDS ON PHASE 1 COMPLETION")
+- This enables automatic dispatch workflow without manual intervention
 Prompt Validation
 Run prompt:check to verify:
 
@@ -113,6 +122,23 @@ Agent Execution: General implementation tasks
 Idle Village Task: Idle village specific work
 Strategist: Planning and research tasks
 Coordinator: Governance and management tasks
+
+SWE/Cascade Manual Execution
+For tasks requiring SWE/Cascade (execution_hint 'architectural', complex design judgment, or @trailer-only exemption):
+- Use Windsurf slash command: /run-manual-tasks
+- This executes tasks from coordinator/manual-dispatch/pending/ queue
+- Each task file contains: task_id, title, description, prompt, file_targets, dependencies
+- After execution, task is marked as completed/failed and moved to completed/ or failed/
+- This is different from harness system (Groq executor for atomic/verified tasks)
+- Use this for: trailer tasks, architectural decisions, complex governance work
+
+Manual Dispatch File Creation Rule
+When setting executor='manual' and status='In corso' for a task:
+- MUST create task file in coordinator/manual-dispatch/pending/{TASK_ID}.md
+- File format: title, description, prompt, files to modify, expected output, dependencies, timestamp, executor
+- This is REQUIRED for /run-manual-tasks workflow to discover and execute the task
+- Do NOT set status='In corso' without creating the pending file
+- The coordinator.py dispatcher should automate this, but manual dispatch requires explicit file creation
 Scope Determination
 Define execution scope:
 

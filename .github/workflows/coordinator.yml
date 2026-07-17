@@ -39,6 +39,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add coordinator/batch.json coordinator/last-run-summary.json coordinator/live_registry.json
+          git add coordinator/batch.json coordinator/live_registry.json
           git diff --cached --quiet || git commit -m "Coordinator: batch selection [ci skip]"
           git push

@@ -2,11 +2,12 @@
   "version": "1.0",
   "tasks": [
     {
-      "task_id": "ADR001-T5",
-      "status": "pending",
-      "timestamp": "2026-07-15T16:16:18.544101+00:00",
-      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/ADR001-T5.md"
+      "task_id": "IV-TRAILER-DAY4-006",
+      "status": "completed",
+      "timestamp": "2026-07-16T12:37:58.749614+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/completed/IV-TRAILER-DAY4-006.md",
+      "completed_at": "2026-07-16T12:48:25.943764+00:00"
     }
   ],
-  "last_updated": "2026-07-15T16:16:18.544418+00:00"
+  "last_updated": "2026-07-16T12:48:25.943914+00:00"
 }

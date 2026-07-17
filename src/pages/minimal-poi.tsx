@@ -4,6 +4,12 @@ import { DayNightPoiSkin, GenericPoiSkin, JobPOI, ActivityPOI, QuestPOI } from '
 import type { JobStatus, ActivityStatus, QuestStatus, QuestPOIPhase } from '@/ui/idleVillage/frozen/kits/poiKit';
 import { SkinSystemProvider } from '@/ui/idleVillage/hooks/useSkinSystem';
 import { SandboxTimingProvider } from '@/ui/idleVillage/hooks/useSandboxTimingBridge';
+import { DEFAULT_IDLE_VILLAGE_CONFIG } from '@/balancing/config/idleVillage/defaultConfig';
+
+const getActivityIcon = (activityId: string): string => {
+  const activity = DEFAULT_IDLE_VILLAGE_CONFIG.activities[activityId];
+  return (activity?.metadata?.icon as string | undefined) ?? '⚔️';
+};
 
 export default function MinimalPoiPage() {
   const [jobStatus, setJobStatus] = useState<JobStatus>('idle');
@@ -526,8 +532,8 @@ export default function MinimalPoiPage() {
                   <div className="flex items-center justify-center min-h-56 bg-slate-900/30 border border-slate-700/50 rounded-lg p-4">
                     <QuestPOI
                       questId="bandit-camp-demo"
-                      label="Bandit Camp"
-                      icon="⚔️"
+                      label={DEFAULT_IDLE_VILLAGE_CONFIG.activities['bandit-camp-demo']?.label ?? 'Bandit Camp'}
+                      icon={getActivityIcon('bandit-camp-demo')}
                       status="available"
                       phases={[
                         { id: 'p1', state: 'locked' },
@@ -536,7 +542,7 @@ export default function MinimalPoiPage() {
                       ]}
                       currentPhaseIndex={0}
                       progress={0}
-                      dangerRating={6}
+                      dangerRating={DEFAULT_IDLE_VILLAGE_CONFIG.activities['bandit-camp-demo']?.dangerRating ?? 6}
                       size={120}
                     />
                   </div>
@@ -551,9 +557,9 @@ export default function MinimalPoiPage() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-center min-h-56 bg-slate-900/30 border border-slate-700/50 rounded-lg p-4">
                     <QuestPOI
-                      questId="ancient-ruin-demo"
-                      label="Ancient Ruin"
-                      icon="🏛️"
+                      questId="ancient-ruins"
+                      label={DEFAULT_IDLE_VILLAGE_CONFIG.activities['ancient-ruins']?.label ?? 'Ancient Ruins'}
+                      icon={getActivityIcon('ancient-ruins')}
                       status="in_progress"
                       phases={[
                         { id: 'p1', state: 'success' },
@@ -563,7 +569,7 @@ export default function MinimalPoiPage() {
                       ]}
                       currentPhaseIndex={1}
                       progress={0.40}
-                      dangerRating={8}
+                      dangerRating={DEFAULT_IDLE_VILLAGE_CONFIG.activities['ancient-ruins']?.dangerRating ?? 8}
                       size={120}
                     />
                   </div>

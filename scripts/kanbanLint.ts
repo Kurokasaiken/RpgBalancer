@@ -29,9 +29,18 @@ async function loadKanbanRows(): Promise<KanbanRow[]> {
   const lines = raw.split(/\r?\n/);
 
   const rows: KanbanRow[] = [];
+  let inCodeFence = false;
   for (let lineIndex = 0; lineIndex < lines.length; lineIndex += 1) {
     const line = lines[lineIndex];
-    if (!line.trim().startsWith('|')) {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('```')) {
+      inCodeFence = !inCodeFence;
+      continue;
+    }
+    if (inCodeFence) {
+      continue;
+    }
+    if (!trimmed.startsWith('|')) {
       continue;
     }
     if (line.includes('---')) {

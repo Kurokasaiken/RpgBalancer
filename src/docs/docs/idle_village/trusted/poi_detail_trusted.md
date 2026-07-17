@@ -450,3 +450,7 @@ function AdvancedPOIDetailExample() {
 *Last Updated: 2026-04-27*  
 *Version: 1.0*  
 *Status: trusted*
+
+## 13. ADR-001 T5 Integration Note
+
+As of 2026-07-15, downstream frozen detail kits (`questDetailKit` and `locationDetailKit`) source their quest/activity display data from the canonical C2 configuration in `DEFAULT_IDLE_VILLAGE_CONFIG.activities` (`src/balancing/config/idleVillage/defaultConfig.ts`). This preserves the POI Detail contract while ensuring no C1 quest config leaks into the runtime path. The C1→C2 skill-check to `questDifficulty` scalar mapping is recorded in `src/docs/docs/plans/quest_engine_reconciliation_plan.md` §8.

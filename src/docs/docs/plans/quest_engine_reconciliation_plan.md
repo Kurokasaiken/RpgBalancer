@@ -246,3 +246,13 @@ Strategist flags for Coordinator awareness:
 ## 8. Changelog
 
 - **2026-07-15:** Initial draft by Strategist. Awaiting Coordinator dispatch.
+- **2026-07-15 (T5 executed):** Migrated C1 quests `bandit-camp-demo`, `ancient-ruins`, and `herb-gathering` to C2 `ActivityDefinition` entries in `defaultConfig.ts`.
+  - Updated consumers: `minimal-poi.tsx`, `questDetailKit.tsx`, `locationDetailKit.tsx`, `gameplayStore.ts`.
+  - Created `questStateDefaults.ts` as the C2 source for `DEFAULT_QUEST_STATE`.
+  - Lossy skill-check → `questDifficulty` mapping:
+
+    | C1 Source | Skill Check Multiplier(s) | C2 `questDifficulty` scalar | C2 `difficultyLabel` |
+    |-----------|---------------------------|-------------------------------|----------------------|
+    | `bandit-hunt` → `bandit-camp-demo` | 1.5, 1.2 | 1.35 | Medio |
+    | `ancient-ruins` | 1.8, 1.4 | 1.6 | Alto |
+    | `herb-gathering` | 0.8 | 0.8 | Facile |

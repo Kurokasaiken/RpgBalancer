@@ -57,6 +57,7 @@ const MinimalJobPoiRosterTimeIntegrationPage = lazy(() => import('./pages/minima
 const MinimalQuestDetailPage = lazy(() => import('./pages/minimal-quest-detail').then(m => ({ default: m.default })));
 const MinimalTimeDaynightIntegrationPage = lazy(() => import('./pages/minimal-time-daynight-integration').then(m => ({ default: m.default })));
 const SpellCreatorTestPage = lazy(() => import('./pages/spell-creator').then(m => ({ default: m.default })));
+const TrailerViewer = lazy(() => import('./ui/idleVillage/trailer/TrailerViewer'));
 
 interface AppNavControls {
   getActiveTab: () => AppNavTabId;
@@ -206,6 +207,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/minimal-time-daynight-integration';
   const isSpellCreatorPath =
     typeof window !== 'undefined' && window.location.pathname === '/spell-creator';
+  const isTrailerPath =
+    typeof window !== 'undefined' && window.location.pathname === '/trailer';
   const isRootPath =
     typeof window !== 'undefined' &&
     (window.location.pathname === '/' || window.location.pathname === '/index.html');
@@ -585,6 +588,16 @@ function App() {
       <ErrorBoundary componentName="Spell Creator Test Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Spell Creator…</div>}>
           <SpellCreatorTestPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isTrailerPath) {
+    return (
+      <ErrorBoundary componentName="Trailer">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer…</div>}>
+          <TrailerViewer />
         </Suspense>
       </ErrorBoundary>
     );

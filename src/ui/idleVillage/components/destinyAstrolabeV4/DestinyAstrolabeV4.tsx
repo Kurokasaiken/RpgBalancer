@@ -1,11 +1,11 @@
 /**
  * DestinyAstrolabeV4 — host React dell'engine V4.
- * Differenze estetiche dalla V3 (assi rubati alla V1):
- *  - CLIMAX TIPOGRAFICO: verdetto monumentale con lettere in stagger che si
- *    assestano (successo) o si sgretolano (fallimento), in fascia alta —
- *    l'arena e il landing point restano SEMPRE visibili;
- *  - screen-punch (shake) sul contatto finale;
- *  - placche label spinte fuori dal bordo sfida (anti-collisione).
+ *
+ * - Explanation mode: toggle nel pannello controlli; a ogni elemento
+ *   presentato la timeline si ferma e appare un testo esplicativo (i18n)
+ *   con "Continua". L'ultimo step è la legenda colori completa.
+ * - Climax tipografico per-lettera + screen-punch (arena sempre visibile).
+ * - Placche label fuori dal bordo nemico (anti-collisione).
  */
 import React, {
   forwardRef,
@@ -23,14 +23,11 @@ import {
   type AstrolabeV4EngineHandle,
   type AstrolabeV4Result,
   type EnginePhase,
+  type ExplainStep,
 } from './engineV4';
 import type { AstrolabeSkill, GeometryInput } from '../destinyAstrolabeV3/geometry';
 import type { AstrolabeModifier } from '../destinyAstrolabeV3/modifiers';
 import type { AstrolabeV3Config } from '@/balancing/config/idleVillage/destinyAstrolabeV3/astrolabeV3Config';
-import {
-  shouldShowOnboarding,
-  recordOnboardingView,
-} from '../destinyAstrolabeV3/onboarding';
 import './astrolabe-v4.css';
 
 export interface DestinyAstrolabeV4Handle {
@@ -61,13 +58,25 @@ interface Anchor {
   skill: number;
 }
 
-const ONBOARDING_STEPS: Record<string, string> = {
-  'agency-burst': 'astrolabeV3.onboardingStar',
-  'risk-pour': 'astrolabeV3.onboardingRisk',
-  'action-trigger': 'astrolabeV3.onboardingThrow',
+const EXPLAIN_KEY: Record<ExplainStep, string> = {
+  required: 'astrolabeV4.explainRequired',
+  enemy: 'astrolabeV4.explainEnemy',
+  stats: 'astrolabeV4.explainStats',
+  star: 'astrolabeV4.explainStar',
+  legend: 'astrolabeV4.explainLegend',
 };
 
-/** Lettere del verdetto con offset/rotazioni deterministici per indice. */
+/** Voci della legenda: swatch CSS (token) + chiave i18n. */
+const LEGEND_ITEMS: { swatchClass: string; key: string }[] = [
+  { swatchClass: 'dav4-sw--star', key: 'astrolabeV4.legendStar' },
+  { swatchClass: 'dav4-sw--almost', key: 'astrolabeV4.legendAlmost' },
+  { swatchClass: 'dav4-sw--enemy', key: 'astrolabeV4.legendEnemy' },
+  { swatchClass: 'dav4-sw--crit', key: 'astrolabeV4.legendCrit' },
+  { swatchClass: 'dav4-sw--nucleus', key: 'astrolabeV4.legendNucleus' },
+  { swatchClass: 'dav4-sw--wound', key: 'astrolabeV4.legendWound' },
+  { swatchClass: 'dav4-sw--death', key: 'astrolabeV4.legendDeath' },
+];
+
 function verdictLetters(title: string) {
   return [...title].map((ch, i) => {
     const dx = (Math.sin(i * 12.9898) * 4).toFixed(1);
@@ -106,26 +115,14 @@ export const DestinyAstrolabeV4 = memo(
     const [mute, setMute] = useState(false);
     const [autoThrow, setAutoThrow] = useState(false);
     const [skipAnim, setSkipAnim] = useState(false);
-    const [showOnboarding, setShowOnboarding] = useState(false);
+    const [explainMode, setExplainMode] = useState(false);
+    const [explainStep, setExplainStep] = useState<ExplainStep | null>(null);
     const [punch, setPunch] = useState(false);
     const muteRef = useRef(mute);
     muteRef.current = mute;
 
     const input: GeometryInput = { stats: skills, difficulty, critPct, woundPct, deathPct };
     const inputRef = useRef(input);
-
-    useEffect(() => {
-      let mounted = true;
-      shouldShowOnboarding().then((show) => {
-        if (mounted && show) {
-          setShowOnboarding(true);
-          void recordOnboardingView();
-        }
-      });
-      return () => {
-        mounted = false;
-      };
-    }, []);
 
     useEffect(() => {
       const root = rootRef.current;
@@ -149,6 +146,7 @@ export const DestinyAstrolabeV4 = memo(
           setResult(r);
           onResolveRef.current?.(r);
         },
+        onExplain: setExplainStep,
         onLayout: setAnchors,
         onSound: () => {
           if (muteRef.current) return;
@@ -169,6 +167,10 @@ export const DestinyAstrolabeV4 = memo(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [JSON.stringify(input)]);
 
+    useEffect(() => {
+      engineRef.current?.setExplainMode(explainMode);
+    }, [explainMode]);
+
     const doThrow = useCallback(() => engineRef.current?.throw(), []);
 
     useEffect(() => {
@@ -183,11 +185,11 @@ export const DestinyAstrolabeV4 = memo(
       }
     }, [armed, skipAnim, autoThrow, doThrow]);
 
-    /* Skip attivato durante lo spin/reveal → salto a snap+resolution (§5) */
+    /* Skip attivato durante lo spin/reveal → salto a snap+resolution */
     useEffect(() => {
       if (
         skipAnim &&
-        ['the-spin', 'ring-lock', 'threat-slam', 'agency-burst', 'risk-pour'].includes(phase)
+        ['the-spin', 'ring-lock', 'threat-pillars', 'threat-surface', 'agency-pillars', 'agency-star', 'risk-pour'].includes(phase)
       ) {
         engineRef.current?.skip();
       }
@@ -209,30 +211,33 @@ export const DestinyAstrolabeV4 = memo(
     const verdict = useMemo(() => {
       if (!result) return null;
       const { outcome } = result;
-      const key = outcome.success
-        ? 'astrolabeV3.verdictSuccess'
-        : outcome.nearMiss
-          ? 'astrolabeV3.verdictNearMiss'
-          : outcome.crit
-            ? 'astrolabeV3.verdictCrit'
-            : 'astrolabeV3.verdictFail';
-      const subKey = outcome.success
-        ? 'astrolabeV4.subSuccess'
-        : outcome.nearMiss
-          ? 'astrolabeV4.subNearMiss'
-          : outcome.crit
-            ? 'astrolabeV4.subCrit'
-            : 'astrolabeV4.subFail';
+      const key = outcome.critSuccess
+        ? 'astrolabeV4.verdictBigwin'
+        : outcome.success
+          ? 'astrolabeV3.verdictSuccess'
+          : outcome.almost
+            ? 'astrolabeV3.verdictNearMiss'
+            : outcome.critFail
+              ? 'astrolabeV3.verdictCrit'
+              : 'astrolabeV3.verdictFail';
+      const subKey = outcome.critSuccess
+        ? 'astrolabeV4.subBigwin'
+        : outcome.success
+          ? 'astrolabeV4.subSuccess'
+          : outcome.almost
+            ? 'astrolabeV4.subNearMiss'
+            : outcome.critFail
+              ? 'astrolabeV4.subCrit'
+              : 'astrolabeV4.subFail';
       return {
         title: t(key),
         sub: t(subKey, { defaultValue: '' }),
-        tone: outcome.success ? 'success' : outcome.nearMiss ? 'almost' : 'failure',
+        tone: outcome.success ? 'success' : outcome.almost ? 'almost' : 'failure',
         letters: verdictLetters(t(key)),
       };
     }, [result, t]);
 
-    const showLabels = phase !== 'idle' && phase !== 'ring-lock' && anchors.length > 0;
-    const onboardingKey = showOnboarding ? ONBOARDING_STEPS[phase] : undefined;
+    const showLabels = !['idle', 'ring-lock'].includes(phase) && anchors.length > 0;
 
     return (
       <div
@@ -253,13 +258,35 @@ export const DestinyAstrolabeV4 = memo(
             );
           })}
 
-        {onboardingKey && (
-          <div className="dav4-onboarding" role="status">
-            {t(onboardingKey, { defaultValue: '' })}
+        {/* ── EXPLANATION: testo per lo step corrente + Continua ── */}
+        {explainStep && (
+          <div
+            className={`dav4-explain${explainStep === 'legend' ? ' dav4-explain--legend' : ''}`}
+            role="dialog"
+            aria-live="polite"
+          >
+            <p className="dav4-explain-text">{t(EXPLAIN_KEY[explainStep])}</p>
+            {explainStep === 'legend' && (
+              <ul className="dav4-legend">
+                {LEGEND_ITEMS.map(({ swatchClass, key }) => (
+                  <li key={key} className="dav4-legend-item">
+                    <span className={`dav4-sw ${swatchClass}`} aria-hidden="true" />
+                    <span>{t(key)}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <button
+              type="button"
+              className="dav4-explain-next"
+              onClick={() => engineRef.current?.resume()}
+            >
+              {t('astrolabeV4.explainContinue')}
+            </button>
           </div>
         )}
 
-        {/* CLIMAX TIPOGRAFICO — fascia alta, arena sempre visibile */}
+        {/* climax tipografico — fascia alta, arena sempre visibile */}
         {phase === 'resolution' && verdict && (
           <div className={`dav4-verdict dav4-verdict--${verdict.tone}`} role="status">
             <div className="dav4-verdict-title" aria-label={verdict.title}>
@@ -276,7 +303,7 @@ export const DestinyAstrolabeV4 = memo(
                     } as React.CSSProperties
                   }
                 >
-                  {l.ch === ' ' ? ' ' : l.ch}
+                  {l.ch === ' ' ? ' ' : l.ch}
                 </span>
               ))}
             </div>
@@ -309,6 +336,14 @@ export const DestinyAstrolabeV4 = memo(
 
         <fieldset className="dav4-controls">
           <legend className="sr-only">{t('astrolabeV3.throwControls')}</legend>
+          <label className="dav4-toggle">
+            <input
+              type="checkbox"
+              checked={explainMode}
+              onChange={(e) => setExplainMode(e.target.checked)}
+            />
+            <span>{t('astrolabeV4.explanation')}</span>
+          </label>
           <label className="dav4-toggle">
             <input
               type="checkbox"

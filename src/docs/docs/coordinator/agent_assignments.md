@@ -4,6 +4,795 @@
 <!-- Executor values: ai-worker | harness | manual -->
 <!-- Scripts (bridge_ai_worker.py, sync_ai_worker.py) auto-migrate legacy rows to 8-column format -->
 
+| IV-TRAILER-DAY1-001 | Completato | 2026-07-16 | Cascade | Evidence: test-results/build-check-2026-07-16.log | manual | @trailer-only exemption, SWE/Cascade required | ```text
+AGENT
+Idle Village Task - Astrolabe Vertical Slice (Scene 4: Risk)
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `idle-village-task` prima di iniziare, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Create AstrolabeTrailerController that demonstrates DestinyAstrolabe can be controlled for deterministic capture. This is Sprint 1 from the approved trailer vertical slice plan, focusing on the hero shot (Scene 4: Risk).
+
+CONTEXT
+This is part of the Steam teaser trailer production pipeline. The trailer is exempt from gameplay architecture requirements but must preserve presentation architecture requirements. This code exists solely to produce recordable video content.
+
+WHAT YOU MUST DO
+1. Create `src/ui/idleVillage/trailer/` directory structure
+2. Create `AstrolabeTrailerController.tsx` that wraps DestinyAstrolabe
+3. Implement scripted timeline (reveal → tension → near miss → HERO INJURED)
+4. Implement internal CSS reward burst (NO separate component)
+5. Verify DestinyAstrolabe renders correctly in trailer context
+6. Demonstrate deterministic 7-second sequence that can be replayed identically
+7. Capture first Steam-ready material (GIF, screenshots)
+
+@trailer-only CONVENTION
+EXEMPT from gameplay architecture:
+- NO PersistenceService, NO localStorage/sessionStorage, NO persistence of any kind
+- NO i18n for copy text (hardcoded allowed for iteration speed), NO translation keys
+- NO telemetry of any kind (marketing asset, not product)
+- NO gameplay state mutation, NO economy systems, NO player progression
+
+MUST PRESERVE:
+- Config-first: All timing values, camera settings, sequence events in `trailerConfig.ts` with Zod validation
+- Skin/Theme: Use CSS variables from trailer.css, NO standalone .css files, use Gilded Observatory tokens
+- Component Reuse: Verify primitives before creating new components, reuse DestinyAstrolabe as-is
+- State Management: Use React Context for local presentation state, NO Zustand (marketing-only)
+- Documentation: JSDoc on all functions/interfaces, update plan changelog
+- Node/tooling: Use pinned Node version from .nvmrc
+- Safeguards: Run lint, build:check, kanban:lint before task complete
+
+AstrolabeTrailerController Constraints:
+- MAY: Set initial state, trigger scripted actions, control presentation, include internal CSS reward burst
+- MAY NOT: Change physics, modify probabilities, alter gameplay rules, fork DestinyAstrolabe, modify DestinyAstrolabe internals
+
+Deterministic Seed Rule:
+- FORBIDDEN: NO `Math.random()` in trailer code
+- REQUIRED: All randomness must come from deterministic seed
+- Config: Add `capture.seed: 12345` to trailerConfig.ts
+- Implementation: Use seeded random generator for all random values
+
+No Placeholder Rule:
+- FORBIDDEN: No temporary shapes, debug boxes, fake assets, or developer UI after first integration day
+- REQUIRED: Every captured frame must represent final visual language
+
+SUCCESS CRITERIA
+- Functional: DestinyAstrolabe renders in trailer context without errors
+- Deterministic: Pressing F5 produces identical 7-second sequence
+- Timeline: Sequence follows reveal (0-2s) → tension (2-5s) → near miss (5-7s) → HERO INJURED
+- No Gameplay Mutation: AstrolabeTrailerController does NOT modify DestinyAstrolabe internals, physics, or gameplay rules
+- Capture Ready: At least 3 screenshot-worthy frames and 1 GIF-worthy loop
+- CSS Reward Burst: Predefined particles, deterministic positions, NO physics, NO canvas, NO separate component
+
+INTEGRATION POINTS
+- Existing Component: DestinyAstrolabe (reuse only, do NOT modify)
+- Routing: Add `/trailer` route to existing routing system
+- CSS Variables: Use trailer.css variables for tuning (--trailer-bg, --trailer-gold, etc.)
+- Config: Reference `trailerConfig.ts` for timing values (create if needed)
+
+FILES TO CREATE
+1. `src/ui/idleVillage/trailer/README.md` - Trailer system rules and @trailer-only convention
+2. `src/ui/idleVillage/trailer/AstrolabeTrailerController.tsx` - Main component with scripted timeline
+3. `src/ui/idleVillage/trailer/trailer.css` - CSS variables for trailer styling
+4. `src/balancing/config/idleVillage/trailerConfig.ts` - Timing, seed, and scene config
+
+FILES TO MODIFY
+1. `src/App.tsx` - Add `/trailer` route with AstrolabeTrailerController
+
+TESTING REQUIREMENTS
+- Manual browser test: Verify DestinyAstrolabe renders correctly
+- Deterministic test: F5 10 times to verify identical sequence
+- Visual test: At least 3 screenshot-worthy frames and 1 GIF-worthy loop
+
+DOCUMENTATION UPDATES
+1. `trailer_vertical_slice_plan.md`: Update Sprint 1 progress in changelog
+
+SAFEGUARDS
+- Lint Scope: `src/ui/idleVillage/trailer/` (120s timeout)
+- Test Scope: None
+- Build Check: `npm run build:check` (180s timeout)
+- Kanban Lint: `npm run kanban:lint` (30s timeout)
+
+PLAN REFERENCE
+trailer_vertical_slice_plan.md - Section 6, Sprint 1 (Days 1-3)
+```
+
+ | TRAILER-V9-PHASE1 | Non assegnato | | | | manual | @trailer-only exemption, SWE/Cascade required | ```text
+AGENT
+Idle Village Task - Trailer V9 Skin Alignment Phase 1: CSS Variables
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `idle-village-task` prima di iniziare, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Replace all hardcoded colors in trailer.css with V9 skin variables to align the Steam teaser trailer with the V9 Explorer Journal theme. This is Phase 1 of the approved trailer_v9_skin_alignment_plan.md.
+
+CONTEXT
+This is part of the Steam teaser trailer production pipeline. The trailer is exempt from gameplay architecture requirements but must preserve presentation architecture requirements. This code exists solely to produce recordable video content.
+
+WHAT YOU MUST DO
+1. Refactor `src/ui/idleVillage/trailer/trailer.css` to use V9 skin variables
+2. Replace hardcoded colors (#030202, #d8b13e, #f0cf6a, #ede0c4) with CSS variable references
+3. Add V9-specific typography (serif, tracking 0.18em for titles)
+4. Update gradients to match V9 volumetric lighting pattern (cyan top-left, gold bottom-right)
+5. Verify all trailer.css classes use the new variables
+
+@trailer-only CONVENTION
+EXEMPT from gameplay architecture:
+- NO PersistenceService, NO localStorage/sessionStorage, NO persistence of any kind
+- NO i18n for copy text (hardcoded allowed for iteration speed), NO translation keys
+- NO telemetry of any kind (marketing asset, not product)
+- NO gameplay state mutation, NO economy systems, NO player progression
+
+MUST PRESERVE:
+- Config-first: All color values from V9 skin variables (--skin-surface-base, --skin-title-color, etc.)
+- Skin/Theme: Use CSS variables from V9 system, NO standalone .css files
+- Component Reuse: NO new components, only CSS variable substitution
+- Documentation: JSDoc on CSS classes, update plan changelog
+- Node/tooling: Use pinned Node version from .nvmrc
+- Safeguards: Run lint, build:check, kanban:lint before task complete
+
+CSS Variable Mapping:
+--trailer-bg → var(--skin-surface-base)
+--trailer-gold → var(--skin-title-color)
+--trailer-gold-bright → var(--skin-glow-primary)
+--trailer-parchment → var(--skin-text-primary)
+--trailer-azure → var(--skin-icon-accent)
+--trailer-text-secondary → var(--skin-text-secondary)
+--trailer-surface-bg → var(--skin-surface-bg)
+--trailer-border → var(--skin-surface-border)
+
+SUCCESS CRITERIA
+- All hardcoded colors replaced with V9 skin variables
+- Typography matches V9 Explorer Journal (serif, tracking 0.18em)
+- Gradients updated to V9 volumetric lighting pattern
+- trailer.css compiles without errors
+- Visual design uses V9 Explorer Journal palette
+
+INTEGRATION POINTS
+- Existing File: src/ui/idleVillage/trailer/trailer.css (modify only)
+- V9 Reference: src/pages/v9-skin-sandbox.tsx (V9 token palette)
+- Plan Reference: src/docs/docs/plans/trailer_v9_skin_alignment_plan.md (Phase 1)
+
+FILES TO MODIFY
+1. src/ui/idleVillage/trailer/trailer.css (replace hardcoded colors with V9 variables)
+
+TESTING REQUIREMENTS
+- Manual browser test: Verify trailer renders with V9 colors
+- Visual test: Compare with v9-skin-sandbox reference
+
+DOCUMENTATION UPDATES
+1. trailer_v9_skin_alignment_plan.md: Update Phase 1 progress in changelog
+
+SAFEGUARDS
+- Lint Scope: src/ui/idleVillage/trailer/ (120s timeout)
+- Test Scope: None
+- Build Check: npm run build:check (180s timeout)
+- Kanban Lint: npm run kanban:lint (30s timeout)
+
+PLAN REFERENCE
+trailer_v9_skin_alignment_plan.md - Phase 1 (CSS Variables Alignment)
+
+KANBAN UPDATE
+After completing this task:
+1. Update this Kanban row to "Completato" with today's date
+2. Add "Evidence: test-results/trailer-v9-phase1-<YYYY-MM-DD>.log" in Note
+3. Run npm run kanban:lint and verify it passes
+4. Attach lint, build:check, and kanban:lint output in final report
+```
+
+| TRAILER-V9-PHASE2 | Non assegnato | | | | manual | @trailer-only exemption, SWE/Cascade required | ```text
+AGENT
+Idle Village Task - Trailer V9 Skin Alignment Phase 2: Component Architecture
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `idle-village-task` prima di iniziare, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Wrap trailer scenes in WanderlustSurface and V9GlassLayers for consistent V9 Explorer Journal aesthetic. This is Phase 2 of the approved trailer_v9_skin_alignment_plan.md. DEPENDS ON PHASE 1 COMPLETION.
+
+CONTEXT
+This is part of the Steam teaser trailer production pipeline. The trailer is exempt from gameplay architecture requirements but must preserve presentation architecture requirements. This code exists solely to produce recordable video content.
+
+WHAT YOU MUST DO
+1. Wrap trailer scenes in WanderlustSurface (shape="panel", material="bronze")
+2. Add V9GlassLayers for glass effects
+3. Use InsetPanelDelicate for nested content
+4. Apply V9 material presets (bronze, obsidian)
+5. Update 6 scene components: TrailerThreat, TrailerChoice, TrailerPreparation, TrailerConsequence, TrailerLegacy, TrailerOutro
+
+@trailer-only CONVENTION
+EXEMPT from gameplay architecture:
+- NO PersistenceService, NO localStorage/sessionStorage, NO persistence of any kind
+- NO i18n for copy text (hardcoded allowed for iteration speed), NO translation keys
+- NO telemetry of any kind (marketing asset, not product)
+- NO gameplay state mutation, NO economy systems, NO player progression
+
+MUST PRESERVE:
+- Config-first: Material presets from MATERIAL_PRESETS, NO hardcoded values
+- Skin/Theme: Use WanderlustSurface/V9GlassLayers from @/ui/wanderlust-surface
+- Component Reuse: Reuse existing WanderlustSurface, V9GlassLayers, InsetPanelDelicate
+- State Management: Use React Context for local presentation state, NO Zustand
+- Documentation: JSDoc on all functions/interfaces, update plan changelog
+- Node/tooling: Use pinned Node version from .nvmrc
+- Safeguards: Run lint, build:check, kanban:lint before task complete
+
+Component Updates:
+- TrailerThreat.tsx: Use WanderlustSurface for map container
+- TrailerChoice.tsx: Use WanderlustSurface for choice cards
+- TrailerPreparation.tsx: Use InsetPanelDelicate for hero sheet
+- TrailerConsequence.tsx: Use V9GlassLayers for overlay
+- TrailerLegacy.tsx: Use WanderlustSurface for legacy cards
+- TrailerOutro.tsx: Use WanderlustSurface for CTA
+
+Example Pattern:
+<WanderlustSurface 
+  shape="panel" 
+  material="bronze"
+  interactive={false}
+  style={{ width: '100%', height: '100%' }}
+>
+  <V9GlassLayers variant="base">
+    {/* Scene content */}
+  </V9GlassLayers>
+</WanderlustSurface>
+
+SUCCESS CRITERIA
+- All 6 scene components use WanderlustSurface/V9GlassLayers
+- Material presets from MATERIAL_PRESETS (bronze, obsidian)
+- interactive={false} for static scenes
+- Visual design matches V9 Explorer Journal reference
+- No performance degradation
+
+INTEGRATION POINTS
+- Existing Components: TrailerThreat, TrailerChoice, TrailerPreparation, TrailerConsequence, TrailerLegacy, TrailerOutro
+- V9 Components: WanderlustSurface, V9GlassLayers, InsetPanelDelicate from @/ui/wanderlust-surface
+- Material Presets: MATERIAL_PRESETS from @/ui/wanderlust-surface/materialPresets
+- Plan Reference: src/docs/docs/plans/trailer_v9_skin_alignment_plan.md (Phase 2)
+
+FILES TO MODIFY
+1. src/ui/idleVillage/trailer/TrailerThreat.tsx (add WanderlustSurface)
+2. src/ui/idleVillage/trailer/TrailerChoice.tsx (add WanderlustSurface)
+3. src/ui/idleVillage/trailer/TrailerPreparation.tsx (add InsetPanelDelicate)
+4. src/ui/idleVillage/trailer/TrailerConsequence.tsx (add V9GlassLayers)
+5. src/ui/idleVillage/trailer/TrailerLegacy.tsx (add WanderlustSurface)
+6. src/ui/idleVillage/trailer/TrailerOutro.tsx (add WanderlustSurface)
+
+TESTING REQUIREMENTS
+- Manual browser test: Verify all scenes render with V9 components
+- Performance test: Verify no performance degradation
+
+DOCUMENTATION UPDATES
+1. trailer_v9_skin_alignment_plan.md: Update Phase 2 progress in changelog
+
+SAFEGUARDS
+- Lint Scope: src/ui/idleVillage/trailer/ (120s timeout)
+- Test Scope: None
+- Build Check: npm run build:check (180s timeout)
+- Kanban Lint: npm run kanban:lint (30s timeout)
+
+PLAN REFERENCE
+trailer_v9_skin_alignment_plan.md - Phase 2 (Component Architecture)
+
+KANBAN UPDATE
+After completing this task:
+1. Update this Kanban row to "Completato" with today's date
+2. Add "Evidence: test-results/trailer-v9-phase2-<YYYY-MM-DD>.log" in Note
+3. Run npm run kanban:lint and verify it passes
+4. Attach lint, build:check, and kanban:lint output in final report
+```
+
+| TRAILER-V9-PHASE3 | Non assegnato | | | | manual | @trailer-only exemption, SWE/Cascade required | ```text
+AGENT
+Idle Village Task - Trailer V9 Skin Alignment Phase 3: Separate Scene Pages
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `idle-village-task` prima di iniziare, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Create 7 separate page components for each trailer scene to enable recording workflow. This is Phase 3 of the approved trailer_v9_skin_alignment_plan.md. DEPENDS ON PHASE 2 COMPLETION.
+
+CONTEXT
+This is part of the Steam teaser trailer production pipeline. The trailer is exempt from gameplay architecture requirements but must preserve presentation architecture requirements. This code exists solely to produce recordable video content.
+
+WHAT YOU MUST DO
+1. Create 7 separate page components (TrailerThreatPage, TrailerChoicePage, TrailerPreparationPage, TrailerRiskPage, TrailerConsequencePage, TrailerLegacyPage, TrailerOutroPage)
+2. Each page renders only its scene (no auto-cycle, no debug buttons)
+3. Add routes in App.tsx for all 7 pages
+4. Keep TrailerViewer.tsx for reference but remove from routing
+5. Extract common scene logic into shared hooks if needed
+
+@trailer-only CONVENTION
+EXEMPT from gameplay architecture:
+- NO PersistenceService, NO localStorage/sessionStorage, NO persistence of any kind
+- NO i18n for copy text (hardcoded allowed for iteration speed), NO translation keys
+- NO telemetry of any kind (marketing asset, not product)
+- NO gameplay state mutation, NO economy systems, NO player progression
+
+MUST PRESERVE:
+- Config-first: Scene timing from trailerConfig.ts, NO hardcoded values
+- Skin/Theme: Use V9 skin variables, NO standalone .css files
+- Component Reuse: Reuse existing scene components, extract shared logic
+- State Management: Use React Context for local presentation state, NO Zustand
+- Documentation: JSDoc on all functions/interfaces, update plan changelog
+- Node/tooling: Use pinned Node version from .nvmrc
+- Safeguards: Run lint, build:check, kanban:lint before task complete
+
+Page Structure:
+- TrailerThreatPage.tsx → /trailer-threat (renders TrailerThreat only)
+- TrailerChoicePage.tsx → /trailer-choice (renders TrailerChoice only)
+- TrailerPreparationPage.tsx → /trailer-preparation (renders TrailerPreparation only)
+- TrailerRiskPage.tsx → /trailer-risk (renders AstrolabeTrailerController only)
+- TrailerConsequencePage.tsx → /trailer-consequence (renders TrailerConsequence only)
+- TrailerLegacyPage.tsx → /trailer-legacy (renders TrailerLegacy only)
+- TrailerOutroPage.tsx → /trailer-outro (renders TrailerOutro only)
+
+SUCCESS CRITERIA
+- 7 separate page components created
+- All 7 routes accessible in App.tsx
+- Each page renders only its scene (no auto-cycle)
+- TrailerViewer removed from routing but kept for reference
+- Recording workflow enabled (separate pages per scene)
+
+INTEGRATION POINTS
+- Existing Components: TrailerThreat, TrailerChoice, TrailerPreparation, AstrolabeTrailerController, TrailerConsequence, TrailerLegacy, TrailerOutro
+- Routing: src/App.tsx (add 7 new routes)
+- Config: trailerConfig.ts (scene timing)
+- Plan Reference: src/docs/docs/plans/trailer_v9_skin_alignment_plan.md (Phase 3)
+
+FILES TO CREATE
+1. src/ui/idleVillage/trailer/TrailerThreatPage.tsx (new)
+2. src/ui/idleVillage/trailer/TrailerChoicePage.tsx (new)
+3. src/ui/idleVillage/trailer/TrailerPreparationPage.tsx (new)
+4. src/ui/idleVillage/trailer/TrailerRiskPage.tsx (new)
+5. src/ui/idleVillage/trailer/TrailerConsequencePage.tsx (new)
+6. src/ui/idleVillage/trailer/TrailerLegacyPage.tsx (new)
+7. src/ui/idleVillage/trailer/TrailerOutroPage.tsx (new)
+
+FILES TO MODIFY
+1. src/App.tsx (add 7 new routes, remove TrailerViewer from routing)
+
+TESTING REQUIREMENTS
+- Manual browser test: Verify all 7 routes render correctly
+- Navigation test: Verify each page shows only its scene
+
+DOCUMENTATION UPDATES
+1. trailer_v9_skin_alignment_plan.md: Update Phase 3 progress in changelog
+
+SAFEGUARDS
+- Lint Scope: src/ui/idleVillage/trailer/ (120s timeout)
+- Test Scope: None
+- Build Check: npm run build:check (180s timeout)
+- Kanban Lint: npm run kanban:lint (30s timeout)
+
+PLAN REFERENCE
+trailer_v9_skin_alignment_plan.md - Phase 3 (Separate Scene Pages)
+
+KANBAN UPDATE
+After completing this task:
+1. Update this Kanban row to "Completato" with today's date
+2. Add "Evidence: test-results/trailer-v9-phase3-<YYYY-MM-DD>.log" in Note
+3. Run npm run kanban:lint and verify it passes
+4. Attach lint, build:check, and kanban:lint output in final report
+```
+
+| TRAILER-V9-PHASE4 | Non assegnato | | | | manual | @trailer-only exemption, SWE/Cascade required | ```text
+AGENT
+Idle Village Task - Trailer V9 Skin Alignment Phase 4: Test Hub Update
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `idle-village-task` prima di iniziare, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Update Test Hub to show 7 separate scene cards instead of single "Steam Teaser Trailer" card. This is Phase 4 of the approved trailer_v9_skin_alignment_plan.md. DEPENDS ON PHASE 3 COMPLETION.
+
+CONTEXT
+This is part of the Steam teaser trailer production pipeline. The trailer is exempt from gameplay architecture requirements but must preserve presentation architecture requirements. This code exists solely to produce recordable video content.
+
+WHAT YOU MUST DO
+1. Remove single "Steam Teaser Trailer" card from Test Hub
+2. Add 7 separate cards for each scene (threat, choice, preparation, risk, consequence, legacy, outro)
+3. Update descriptions to reflect V9 Explorer Journal theme
+4. Update test_hub_pages.md documentation
+5. Verify all 7 cards link to correct routes
+
+@trailer-only CONVENTION
+EXEMPT from gameplay architecture:
+- NO PersistenceService, NO localStorage/sessionStorage, NO persistence of any kind
+- NO i18n for copy text (hardcoded allowed for iteration speed), NO translation keys
+- NO telemetry of any kind (marketing asset, not product)
+- NO gameplay state mutation, NO economy systems, NO player progression
+
+MUST PRESERVE:
+- Config-first: Test Hub config from existing system, NO hardcoded values
+- Skin/Theme: Use V9 skin variables in descriptions
+- Component Reuse: Reuse existing Test Hub card pattern
+- Documentation: Update test_hub_pages.md with new entries
+- Node/tooling: Use pinned Node version from .nvmrc
+- Safeguards: Run lint, build:check, kanban:lint before task complete
+
+Test Hub Entries:
+{
+  id: 'trailer-threat',
+  title: 'Trailer: Threat',
+  description: 'Scene 1 - Goblin Invasion with V9 Explorer Journal theme',
+  path: '/trailer-threat',
+  icon: '⚔️',
+  status: 'ok',
+},
+// Repeat for choice, preparation, risk, consequence, legacy, outro
+
+SUCCESS CRITERIA
+- Single "Steam Teaser Trailer" card removed
+- 7 separate scene cards added to Test Hub
+- All cards link to correct routes (/trailer-threat, /trailer-choice, etc.)
+- Descriptions reflect V9 Explorer Journal theme
+- test_hub_pages.md updated with new entries
+
+INTEGRATION POINTS
+- Test Hub: src/docs/docs/idle_village/test_hub_pages.md (update documentation)
+- Test Hub Config: Existing Test Hub configuration (update entries)
+- Routes: /trailer-threat, /trailer-choice, /trailer-preparation, /trailer-risk, /trailer-consequence, /trailer-legacy, /trailer-outro
+- Plan Reference: src/docs/docs/plans/trailer_v9_skin_alignment_plan.md (Phase 4)
+
+FILES TO MODIFY
+1. src/docs/docs/idle_village/test_hub_pages.md (update Test Hub entries)
+2. Test Hub configuration file (remove single card, add 7 scene cards)
+
+TESTING REQUIREMENTS
+- Manual browser test: Verify Test Hub shows 7 separate cards
+- Navigation test: Verify each card links to correct route
+
+DOCUMENTATION UPDATES
+1. test_hub_pages.md: Update Test Hub entries with 7 scene cards
+2. trailer_v9_skin_alignment_plan.md: Update Phase 4 progress in changelog
+
+SAFEGUARDS
+- Lint Scope: src/docs/docs/idle_village/ (120s timeout)
+- Test Scope: None
+- Build Check: npm run build:check (180s timeout)
+- Kanban Lint: npm run kanban:lint (30s timeout)
+
+PLAN REFERENCE
+trailer_v9_skin_alignment_plan.md - Phase 4 (Test Hub Update)
+
+KANBAN UPDATE
+After completing this task:
+1. Update this Kanban row to "Completato" with today's date
+2. Add "Evidence: test-results/trailer-v9-phase4-<YYYY-MM-DD>.log" in Note
+3. Run npm run kanban:lint and verify it passes
+4. Attach lint, build:check, and kanban:lint output in final report
+```
+
+| IV-TRAILER-DAY4-006 | Completato | 2026-07-16 | Cascade | Evidence: test-results/trailer-sprints-2-5-2026-07-16.md | manual | @trailer-only exemption, SWE/Cascade required | ```text
+AGENT
+Idle Village Task - Trailer Viewer + Threat + Choice (Scene 1-2)
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `idle-village-task` prima di iniziare, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Create TrailerViewer shell with scene routing and implement Threat (Scene 1) and Choice (Scene 2) scenes. This establishes the trailer infrastructure and first two scenes.
+
+CONTEXT
+This is Sprint 2 from the approved trailer vertical slice plan. The trailer is exempt from gameplay architecture requirements but must preserve presentation architecture requirements.
+
+WHAT YOU MUST DO
+1. Create TrailerViewer.tsx shell with scene selector (switch statement, NO patterns)
+2. Add `/trailer` route with debug buttons and scene parameter support
+3. Implement TrailerThreat.tsx (map + POI appear + GOBLIN INVASION banner, 0:00-0:05)
+4. Implement TrailerChoice.tsx (village + asymmetric POI choices, 0:05-0:15)
+5. Add capture mode support (?capture=true hides debug, forces autoplay, resets to t=0)
+6. Verify all scenes navigate correctly
+7. Test both scenes deterministically
+
+@trailer-only CONVENTION
+EXEMPT from gameplay architecture:
+- NO PersistenceService, NO localStorage/sessionStorage, NO persistence of any kind
+- NO i18n for copy text (hardcoded allowed for iteration speed), NO translation keys
+- NO telemetry of any kind (marketing asset, not product)
+- NO gameplay state mutation, NO economy systems, NO player progression
+
+MUST PRESERVE:
+- Config-first: All timing values, camera settings, sequence events in `trailerConfig.ts` with Zod validation
+- Skin/Theme: Use CSS variables from trailer.css, NO standalone .css files, use Gilded Observatory tokens
+- Component Reuse: Verify primitives before creating new components, reuse existing components as-is
+- State Management: Use React Context for local presentation state, NO Zustand (marketing-only)
+- Documentation: JSDoc on all functions/interfaces, update plan changelog
+- Node/tooling: Use pinned Node version from .nvmrc
+- Safeguards: Run lint, build:check, kanban:lint before task complete
+
+SUCCESS CRITERIA
+- TrailerViewer: Simple switch statement routing, NO abstraction, NO patterns
+- Routing: `/trailer` with debug buttons, `/trailer?scene=threat|choice|preparation|risk|consequence|legacy|outro`
+- Capture Mode: ?capture=true hides debug, forces autoplay, resets to t=0
+- Threat Scene: 5-second map + POI appear + GOBLIN INVASION banner, screenshot-worthy frame
+- Choice Scene: 10-second village + asymmetric POI choices, screenshot-worthy frame
+- Navigation: All scenes navigate without errors
+- Deterministic: Both sequences identical on F5 refresh
+
+INTEGRATION POINTS
+- Existing Components: MapPage, LocationCard, QuestPOI, MapHeatmapOverlay (Threat)
+- Existing Components: VillageSandbox, ResidentSlotRack, VillageRosterSection, WanderlustSurface (Choice)
+- Existing: AstrolabeTrailerController.tsx (from Sprint 1)
+- Routing: Extend existing routing system
+- Config: trailerConfig.ts threat and choice timing
+
+FILES TO CREATE
+1. `src/ui/idleVillage/trailer/TrailerViewer.tsx` - Scene selector shell
+2. `src/ui/idleVillage/trailer/TrailerThreat.tsx` - Threat scene (map + POI + banner)
+3. `src/ui/idleVillage/trailer/TrailerChoice.tsx` - Choice scene (village + POI choices)
+
+FILES TO MODIFY
+1. `src/App.tsx` - Update `/trailer` route to use TrailerViewer
+2. `src/balancing/config/idleVillage/trailerConfig.ts` - Add threat and choice timing
+
+COMPONENT REUSE
+- MapPage, LocationCard, QuestPOI, MapHeatmapOverlay: Reuse for Threat scene
+- VillageSandbox, ResidentSlotRack, VillageRosterSection, WanderlustSurface: Reuse for Choice scene
+
+TESTING REQUIREMENTS
+- Navigation Test: All scenes navigate correctly
+- Capture Mode Test: ?capture=true hides debug, forces autoplay
+- Deterministic Test: Both sequences identical on F5
+- Visual Test: Screenshot-worthy frames exist for both scenes
+
+DOCUMENTATION UPDATES
+1. `trailer_vertical_slice_plan.md`: Update Sprint 2 progress in changelog
+
+SAFEGUARDS
+- Lint Scope: `src/ui/idleVillage/trailer/` (120s timeout)
+- Test Scope: None
+- Build Check: `npm run build:check` (180s timeout)
+- Kanban Lint: `npm run kanban:lint` (30s timeout)
+
+PLAN REFERENCE
+trailer_vertical_slice_plan.md - Section 6, Sprint 2 (Days 4-6)
+```
+
+ | IV-TRAILER-DAY7-009 | Completato | 2026-07-16 | Cascade | Evidence: test-results/trailer-sprints-2-5-2026-07-16.md | manual | @trailer-only exemption, SWE/Cascade required | ```text
+AGENT
+Idle Village Task - Preparation + Consequence (Scene 3-5)
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `idle-village-task` prima di iniziare, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Implement Preparation (Scene 3) and Consequence (Scene 5) scenes. Preparation shows hero sheet + drag to POI. Consequence shows village lost + greyscale.
+
+CONTEXT
+This is Sprint 3 from the approved trailer vertical slice plan. The trailer is exempt from gameplay architecture requirements but must preserve presentation architecture requirements.
+
+WHAT YOU MUST DO
+1. Create TrailerPreparation.tsx (hero sheet + drag to POI, 0:15-0:30)
+2. Create TrailerConsequence.tsx (village lost + greyscale, 0:35-0:40)
+3. Implement hero sheet with Attack 15, Defense 8, Magic 12
+4. Implement drag hero token into QuestPOI with pulsing animation
+5. Implement timer reaching zero with greyscale filter and impact overlay
+6. Implement SETTLEMENT LOST narrative moment
+7. Verify both scenes recordable with no clicks required
+
+@trailer-only CONVENTION
+EXEMPT from gameplay architecture:
+- NO PersistenceService, NO localStorage/sessionStorage, NO persistence of any kind
+- NO i18n for copy text (hardcoded allowed for iteration speed), NO translation keys
+- NO telemetry of any kind (marketing asset, not product)
+- NO gameplay state mutation, NO economy systems, NO player progression
+
+MUST PRESERVE:
+- Config-first: All timing values, camera settings, sequence events in `trailerConfig.ts` with Zod validation
+- Skin/Theme: Use CSS variables from trailer.css, NO standalone .css files, use Gilded Observatory tokens
+- Component Reuse: Verify primitives before creating new components, reuse existing components as-is
+- State Management: Use React Context for local presentation state, NO Zustand (marketing-only)
+- Documentation: JSDoc on all functions/interfaces, update plan changelog
+- Node/tooling: Use pinned Node version from .nvmrc
+- Safeguards: Run lint, build:check, kanban:lint before task complete
+
+SUCCESS CRITERIA
+- Preparation Scene: Hero sheet with stats, drag to POI, pulsing animation, screenshot-worthy frame
+- Consequence Scene: Timer zero, greyscale filter, impact overlay, SETTLEMENT LOST, screenshot-worthy frame
+- Navigation: Both scenes navigate without errors
+- Deterministic: Both sequences identical on F5 refresh
+- No Clicks Required: Both scenes recordable without user interaction
+
+INTEGRATION POINTS
+- Existing Components: HeroSheet, ResidentSlotRack, QuestPOI (Preparation)
+- Existing Components: VillageSandbox, WanderlustSurface (Consequence)
+- Existing: TrailerViewer.tsx (from Sprint 2)
+- Config: trailerConfig.ts preparation and consequence timing
+
+FILES TO CREATE
+1. `src/ui/idleVillage/trailer/TrailerPreparation.tsx` - Preparation scene
+2. `src/ui/idleVillage/trailer/TrailerConsequence.tsx` - Consequence scene
+
+FILES TO MODIFY
+1. `src/ui/idleVillage/trailer/TrailerViewer.tsx` - Add preparation and consequence cases
+2. `src/balancing/config/idleVillage/trailerConfig.ts` - Add preparation and consequence timing
+
+COMPONENT REUSE
+- HeroSheet, ResidentSlotRack, QuestPOI: Reuse for Preparation scene
+- VillageSandbox, WanderlustSurface: Reuse for Consequence scene
+
+TESTING REQUIREMENTS
+- Navigation Test: Both scenes navigate correctly
+- Capture Mode Test: ?capture=true hides debug, forces autoplay
+- Deterministic Test: Both sequences identical on F5
+- Visual Test: Screenshot-worthy frames exist for both scenes
+- No Clicks Test: Both scenes play without user interaction
+
+DOCUMENTATION UPDATES
+1. `trailer_vertical_slice_plan.md`: Update Sprint 3 progress in changelog
+
+SAFEGUARDS
+- Lint Scope: `src/ui/idleVillage/trailer/` (120s timeout)
+- Test Scope: None
+- Build Check: `npm run build:check` (180s timeout)
+- Kanban Lint: `npm run kanban:lint` (30s timeout)
+
+PLAN REFERENCE
+trailer_vertical_slice_plan.md - Section 6, Sprint 3 (Days 7-9)
+```
+
+ | IV-TRAILER-DAY10-012 | Completato | 2026-07-16 | Cascade | Evidence: test-results/trailer-sprints-2-5-2026-07-16.md | manual | @trailer-only exemption, SWE/Cascade required | ```text
+AGENT
+Idle Village Task - Legacy + Outro (Scene 6-7)
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `idle-village-task` prima di iniziare, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Implement Legacy (Scene 6) and Outro (Scene 7) scenes. Legacy shows knowledge preserved list. Outro shows WANDERLUST TRIUMPH + wishlist CTA.
+
+CONTEXT
+This is Sprint 4 from the approved trailer vertical slice plan. The trailer is exempt from gameplay architecture requirements but must preserve presentation architecture requirements.
+
+WHAT YOU MUST DO
+1. Create TrailerLegacy.tsx (knowledge preserved list, 0:40-0:50)
+2. Create TrailerOutro.tsx (WANDERLUST TRIUMPH + wishlist CTA, 0:50-0:55)
+3. Implement KNOWLEDGE PRESERVED with artifacts, blueprints, surviving heroes
+4. Implement bronze surface cards for each legacy item with checkmarks
+5. Implement WANDERLUST TRIUMPH logo with PREPARE · ENDURE · TRIUMPH tagline
+6. Implement animated wishlist CTA button
+7. Verify both scenes recordable with compelling CTA
+
+@trailer-only CONVENTION
+EXEMPT from gameplay architecture:
+- NO PersistenceService, NO localStorage/sessionStorage, NO persistence of any kind
+- NO i18n for copy text (hardcoded allowed for iteration speed), NO translation keys
+- NO telemetry of any kind (marketing asset, not product)
+- NO gameplay state mutation, NO economy systems, NO player progression
+
+MUST PRESERVE:
+- Config-first: All timing values, camera settings, sequence events in `trailerConfig.ts` with Zod validation
+- Skin/Theme: Use CSS variables from trailer.css, NO standalone .css files, use Gilded Observatory tokens
+- Component Reuse: Verify primitives before creating new components, reuse existing components as-is
+- State Management: Use React Context for local presentation state, NO Zustand (marketing-only)
+- Documentation: JSDoc on all functions/interfaces, update plan changelog
+- Node/tooling: Use pinned Node version from .nvmrc
+- Safeguards: Run lint, build:check, kanban:lint before task complete
+
+SUCCESS CRITERIA
+- Legacy Scene: KNOWLEDGE PRESERVED, artifacts/blueprints/heroes with checkmarks, bronze surface cards, screenshot-worthy frame
+- Outro Scene: WANDERLUST TRIUMPH logo, PREPARE · ENDURE · TRIUMPH tagline, animated CTA, compelling final frame
+- Navigation: Both scenes navigate without errors
+- Deterministic: Both sequences identical on F5 refresh
+- CTA Compelling: Final CTA is visually compelling and clear
+
+INTEGRATION POINTS
+- Existing Components: WanderlustSurface, bronze surface cards (Legacy)
+- Existing Components: CTA button components (Outro)
+- Existing: TrailerViewer.tsx (from Sprint 2)
+- Config: trailerConfig.ts legacy and outro timing
+
+FILES TO CREATE
+1. `src/ui/idleVillage/trailer/TrailerLegacy.tsx` - Legacy scene
+2. `src/ui/idleVillage/trailer/TrailerOutro.tsx` - Outro scene
+
+FILES TO MODIFY
+1. `src/ui/idleVillage/trailer/TrailerViewer.tsx` - Add legacy and outro cases
+2. `src/balancing/config/idleVillage/trailerConfig.ts` - Add legacy and outro timing
+
+COMPONENT REUSE
+- WanderlustSurface, bronze surface cards: Reuse for Legacy scene
+- CTA button components: Reuse for Outro scene
+
+TESTING REQUIREMENTS
+- Navigation Test: Both scenes navigate correctly
+- Capture Mode Test: ?capture=true hides debug, forces autoplay
+- Deterministic Test: Both sequences identical on F5
+- Visual Test: Screenshot-worthy frames exist for both scenes
+- CTA Test: Final CTA is compelling and clear
+
+DOCUMENTATION UPDATES
+1. `trailer_vertical_slice_plan.md`: Update Sprint 4 progress in changelog
+
+SAFEGUARDS
+- Lint Scope: `src/ui/idleVillage/trailer/` (120s timeout)
+- Test Scope: None
+- Build Check: `npm run build:check` (180s timeout)
+- Kanban Lint: `npm run kanban:lint` (30s timeout)
+
+PLAN REFERENCE
+trailer_vertical_slice_plan.md - Section 6, Sprint 4 (Days 10-12)
+```
+
+ | IV-TRAILER-DAY13-015 | Completato | 2026-07-16 | Cascade | Evidence: test-results/trailer-sprints-2-5-2026-07-16.md | manual | @trailer-only exemption, SWE/Cascade required | ```text
+AGENT
+Idle Village Task - Final Polish and Integration
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `idle-village-task` prima di iniziare, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Perform final polish across all 7 scenes, timing adjustments, visual consistency tuning, and OBS capture testing. This completes the 55-second video ready for Steam upload.
+
+CONTEXT
+This is Sprint 5 from the approved trailer vertical slice plan. The trailer is exempt from gameplay architecture requirements but must preserve presentation architecture requirements.
+
+WHAT YOU MUST DO
+1. Perform timing adjustments across all 7 scenes (threat, choice, preparation, risk, consequence, legacy, outro)
+2. Perform visual consistency tuning across all scenes
+3. OBS capture testing for 1080p/60fps output
+4. Verify all 7 scenes run deterministically
+5. Verify all 7 scenes have screenshot-worthy frames
+6. Final polish and Steam-ready verification
+
+@trailer-only CONVENTION
+EXEMPT from gameplay architecture:
+- NO PersistenceService, NO localStorage/sessionStorage, NO persistence of any kind
+- NO i18n for copy text (hardcoded allowed for iteration speed), NO translation keys
+- NO telemetry of any kind (marketing asset, not product)
+- NO gameplay state mutation, NO economy systems, NO player progression
+
+MUST PRESERVE:
+- Config-first: All timing values, camera settings, sequence events in `trailerConfig.ts` with Zod validation
+- Skin/Theme: Use CSS variables from trailer.css, NO standalone .css files, use Gilded Observatory tokens
+- Component Reuse: Verify primitives before creating new components, reuse existing components as-is
+- State Management: Use React Context for local presentation state, NO Zustand (marketing-only)
+- Documentation: JSDoc on all functions/interfaces, update plan changelog
+- Node/tooling: Use pinned Node version from .nvmrc
+- Safeguards: Run lint, build:check, kanban:lint before task complete
+
+SUCCESS CRITERIA
+- Timing: All 7 scenes flow together in 55-second sequence
+- Visual Consistency: All scenes follow Gilded Observatory theme consistently
+- OBS Capture: 1080p/60fps output tested and verified
+- Deterministic: All 7 scenes identical on F5 refresh
+- Screenshot-Worthy: All 7 scenes have at least one screenshot-worthy frame
+- Steam Ready: Complete 55-second video ready for Steam upload
+
+INTEGRATION POINTS
+- All trailer scenes: Threat, Choice, Preparation, Risk, Consequence, Legacy, Outro
+- Config: trailerConfig.ts final timing values
+- CSS: trailer.css final visual tuning
+
+FILES TO MODIFY
+1. `src/ui/idleVillage/trailer/TrailerViewer.tsx` - Final routing polish
+2. `src/ui/idleVillage/trailer/*.tsx` - All scene components for consistency
+3. `src/balancing/config/idleVillage/trailerConfig.ts` - Final timing values
+4. `src/ui/idleVillage/trailer/trailer.css` - Final visual tuning
+
+TESTING REQUIREMENTS
+- Full Sequence Test: All 7 scenes run in sequence without errors
+- Timing Test: Total duration is 55 seconds
+- Deterministic Test: Full sequence identical on F5 refresh
+- Visual Test: All scenes have screenshot-worthy frames
+- OBS Test: 1080p/60fps capture tested
+
+DOCUMENTATION UPDATES
+1. `trailer_vertical_slice_plan.md`: Update Sprint 5 progress in changelog
+2. `trailer_vertical_slice_plan.md`: Mark plan as COMPLETE
+
+SAFEGUARDS
+- Lint Scope: `src/ui/idleVillage/trailer/` (120s timeout)
+- Test Scope: None
+- Build Check: `npm run build:check` (180s timeout)
+- Kanban Lint: `npm run kanban:lint` (30s timeout)
+
+PLAN REFERENCE
+trailer_vertical_slice_plan.md - Section 6, Sprint 5 (Days 13-14)
+```
+
 | ROSTER-COMPONENTIZATION | Completato | Cascade | 2026-07-14 | test-results/roster-componentization-2026-07-14.log | | | | ```text
 AGENT
 Governance Coordinator - UI/Runtime Task Completion Criteria
@@ -7765,7 +8554,7 @@ F. evidence log path
 EVIDENCE LOG
 - `test-results/canonical-resident-source-adoption-<YYYY-MM-DD>.log`
 ```
-| NP-106 – Idle Village Crew Scheduler Visual Debug Panel | Completato | 2026-07-15 | Cascade | Evidence: test-results/np-106-crew-scheduler-debug-2026-07-15.log – Debug panel with hook, component, and tests already implemented. All safeguards passed. | - | - | 140 | - | - |
+> | NP-106 – Idle Village Crew Scheduler Visual Debug Panel | Completato | 2026-07-15 | Cascade | Evidence: test-results/np-106-crew-scheduler-debug-2026-07-15.log – Debug panel with hook, component, and tests already implemented. All safeguards passed. | - | - | 140 | - | - |
 AGENT
 Vector-Idle – Scheduler Debug
 ```
@@ -10137,13 +10926,13 @@ NOTE:
 | PANELS-STEP-04 — Draggable Panels System Step 04: PanelShell headless component with dnd-kit drag functionality and tests | Completato | Cascade | - | Implement PanelShell headless component with dnd-kit drag functionality and tests | Evidence: test-results/panels-step-04-2026-07-14.log | Prompt: prompts/PANELS-STEP-04.spec.json |
 | PANELS-STEP-05 — Draggable Panels System Step 05: V9PanelShell wrapper with V9 aesthetics and tests | Completato | Cascade | - | Implement V9PanelShell wrapper with V9 aesthetics and tests | Evidence: test-results/panels-step-05-2026-07-14.log | Prompt: prompts/PANELS-STEP-05.spec.json |
 | PANELS-STEP-06 — Draggable Panels System Step 06: Integration in /design-system with full/strip demo and PersistenceService | Completato | Cascade | - | Integrate panels in /design-system with full/strip demo and PersistenceService | Evidence: test-results/panels-step-06-2026-07-15.log | Prompt: prompts/PANELS-STEP-06.spec.json |
-| PANELS-FIX-COMPONENT-REUSE — Panels System Fix: Component Reuse Invariant Violation in V9PanelShell | Archiviato - Non applicabile | PANELS-STEP-06 | harness | Fix Component Reuse invariant violation in V9PanelShell by replacing inline styles with existing CSS classes from wanderlustTokens.css (.wl-panel, .wl-panel::before, .wl-panel::after). ARCHIVIATO: V9PanelShell usa già correttamente --skin-* tokens (V9 design system), non i vecchi .wl-panel classes. Il prompt era basato su assunzione errata sui percorsi. Componente già conforme a Component Reuse invariant. | 2026-07-15T09:49:44.985Z | - | - | 2026-07-15T09:49:44.984Z | Plan: coordinator/canonical-systems.md |
-| POI-DETAIL-VISUAL-IMPROVEMENTS — POI Detail Visual Improvements - Material Consistency & Drag Fix | In corso | harness | 2026-07-15 | Fix POI detail panel drag behavior to match quest detail, apply bronze/dark border to roster frame, transform HP/Stamina bars to carved stone channels, convert portrait frames to bronze/brass cameos, upgrade filter controls to material styling. Config-first design, skin system compliance, i18n, dnd-kit drag infrastructure. | - | - | - | - | - | Prompt: prompts/POI-DETAIL-VISUAL-IMPROVEMENTS.md |
-| ADR001-T1 — Freeze E1 (branching QuestEngine) | Non assegnato - in attesa di approvazione umana per refactoring RNG | - | - | Prepend @experimental FROZEN JSDoc header to src/engine/quest/QuestEngine.ts (D1). Atomic, independent. Safeguards: lint src/engine/quest, build:check. Evidence: test-results/adr001-t1-<date>.log. DoD: header present, no import diff, grep "new QuestEngine(" in src/ yields only tests+docs. | - | - | - | 2026-07-15T09:42:56.181Z | Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T1 |
-| ADR001-T2 — Extract RngService | Non assegnato - in attesa di approvazione umana per refactoring RNG | - | - | Create src/engine/shared/RngService.ts (LCG + createRng, deriveSeed, rollOutcome), src/engine/shared/rngConfig.ts (Zod WeightedDistribution), tests/unit/engine/shared/RngService.test.ts. Lift LCG from E1, keep E1 importing from new module. Verified. Safeguards: lint src/engine/shared tests/unit/engine/shared, test src/engine/shared, build:check. Evidence: test-results/adr001-t2-<date>.log. DoD: tests green, E1 compiles, no behavioral drift. | - | - | - | 2026-07-15T09:42:56.186Z | Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T2 |
-| ADR001-T3 — Persist masterSeed | Non assegnato - in attesa di approvazione umana per refactoring RNG | - | - | Add masterSeed field to Zustand store, initialize once at run creation. Add persistence key idleVillage_master_seed_v1. TimeEngine accepts injected rng derived from masterSeed. Create tests/unit/idleVillage/masterSeed.test.ts. Verified. Safeguards: lint+test+build:check on scope. Evidence: test-results/adr001-t3-<date>.log. DoD: save→load→save produces identical seed, telemetry master_seed_initialized fires once per run. | - | - | - | 2026-07-15T09:42:56.191Z | Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T3 |
-| ADR001-T4 — Purge Math.random() in idleVillage engines | Non assegnato - in attesa di approvazione umana per refactoring RNG | - | - | Replace all Math.random() in JobResolver, QuestPowerEngine, QuestResolver, QuestEngine (E2), TimeEngine (spawnQuestOffersIfNeeded) with injected Rng derived from masterSeed. IDs become deterministic via deriveSeed(masterSeed, 'ids', counter). Verified. Safeguards: lint+test+build:check on src/engine/game/idleVillage. Regression test: grep "Math.random" src/engine/game/idleVillage returns 0. Evidence: test-results/adr001-t4-<date>.log with grep output. DoD: grep clean, no test regression. | - | - | - | 2026-07-15T09:42:56.196Z | Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T4 |
-| ADR001-T5 — Migrate C1 quests to C2 (ActivityDefinition) | Non assegnato - in attesa di approvazione umana per refactoring RNG | - | - | Add bandit-camp-demo, ancient-ruins, herb-gathering to defaultConfig.ts as ActivityDefinition with tag:'quest', slotBlueprints, resolutionEngineId:'questPower', questPowerRules, varianceCategory. Update minimal-poi.tsx, questDetailKit.tsx, locationDetailKit.tsx, gameplayStore.ts to read from C2. Architectural (touches trusted kits). Lossy translation: per-skill checks collapse to single questDifficulty scalar. Document mapping table in plan changelog. Safeguards: lint+test+build:check on scope, RTL smoke test on /minimal-gameplay with parity screenshots. Evidence: test-results/adr001-t5-<date>.log + before/after screenshots. DoD: /minimal-gameplay parity verified via Playwright suites. Trusted doc updates: poi_detail_trusted.md, COMPONENT_MASTER_INDEX.md rows for questDetailKit/locationDetailKit. | - | - | - | 2026-07-15T09:42:56.201Z | Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T5 |
-| ADR001-T6 — Deprecate C1 (questConfig.ts) and E2 | Non assegnato - in attesa di approvazione umana per refactoring RNG | - | - | Add @deprecated JSDoc + ADR-001 reference to questConfig.ts and QuestEngine.ts (E2). Keep exports (types still consumed by QuestChainProgressTracker, telemetry). Atomic. Documentation only, no runtime changes. Safeguards: lint+build:check. Evidence: test-results/adr001-t6-<date>.log. DoD: JSDoc present, no new C1 imports after this task. | - | - | - | 2026-07-15T09:42:56.205Z | Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T6 |
-| ADR001-T7 — Complete quality-roll via variance.rewardCategories | Non assegnato - in attesa di approvazione umana per refactoring RNG | - | - | Replace "always first category" stub in QuestResolver.ts (~lines 77-86) with rollOutcome using varianceCategory from ActivityDefinition. Ensure QualityResult { tier, multiplier } type exists in types.ts. Add tests/unit/idleVillage/QuestResolver.test.ts covering roll distribution with seeded RNG. Verified. Safeguards: lint+test+build:check on scope. Evidence: test-results/adr001-t7-<date>.log. DoD: deterministic outcome given same seed, distribution matches config weights within tolerance. | - | - | - | 2026-07-15T09:42:56.209Z | Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T7 |
-| ADR001-T8 — Documentation & governance closure | Non assegnato - in attesa di approvazione umana per refactoring RNG | - | - | Create src/docs/docs/adr/ADR-001-quest-engine-reconciliation.md. Update quest_engine_reconciliation_plan.md with per-task changelog. Cross-link ADR-001 in idle_village_plan.md Quest/Job System section. Mark quest_chronicle_plan.md Phase C theater CTA + sandbox wiring as Step 2 post-reconciliation. Mark idle_village_modifiers_plan.md GM-ENG wiring as post-demo. Add ADR-001 entry to MASTER_PLAN.md governance section. Update COMPONENT_MASTER_INDEX.md with touched frozen kit rows. Verified. Safeguards: kanban:lint, markdown lint if configured. Evidence: test-results/adr001-t8-<date>.log. DoD: all links resolve, COMPONENT_MASTER_INDEX.md last-certified dates updated, master plan references ADR. | - | - | - | 2026-07-15T09:42:56.214Z | Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T8 |
+| PANELS-FIX-COMPONENT-REUSE — Panels System Fix: Component Reuse Invariant Violation in V9PanelShell | Completato | PANELS-STEP-06 | harness | - | 2026-07-15T09:49:44.985Z | - | - | 2026-07-15T09:49:44.984Z | Fix Component Reuse invariant violation in V9PanelShell by replacing inline styles with existing CSS classes from wanderlustTokens.css (.wl-panel, .wl-panel::before, .wl-panel::after). ARCHIVIATO: V9PanelShell usa già correttamente --skin-* tokens (V9 design system), non i vecchi .wl-panel classes. Il prompt era basato su assunzione errata sui percorsi. Componente già conforme a Component Reuse invariant. Plan: coordinator/canonical-systems.md |
+| POI-DETAIL-VISUAL-IMPROVEMENTS — POI Detail Visual Improvements - Material Consistency & Drag Fix | Completato | - | harness | 2026-07-15 | - | - | - | 2026-07-15 | Fix POI detail panel drag behavior to match quest detail, apply bronze/dark border to roster frame, transform HP/Stamina bars to carved stone channels, convert portrait frames to bronze/brass cameos, upgrade filter controls to material styling. Config-first design, skin system compliance, i18n, dnd-kit drag infrastructure. Prompt: prompts/POI-DETAIL-VISUAL-IMPROVEMENTS.md |
+| ADR001-T1 — Freeze E1 (branching QuestEngine) | Non assegnato | - | - | - | - | - | - | - | Prepend @experimental FROZEN JSDoc header to src/engine/quest/QuestEngine.ts (D1). Atomic, independent. Safeguards: lint src/engine/quest, build:check. Evidence: test-results/adr001-t1-<date>.log. DoD: header present, no import diff, grep "new QuestEngine(" in src/ yields only tests+docs. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T1 |
+| ADR001-T2 — Extract RngService | Non assegnato | - | - | - | - | - | - | - | Create src/engine/shared/RngService.ts (LCG + createRng, deriveSeed, rollOutcome), src/engine/shared/rngConfig.ts (Zod WeightedDistribution), tests/unit/engine/shared/RngService.test.ts. Lift LCG from E1, keep E1 importing from new module. Verified. Safeguards: lint src/engine/shared tests/unit/engine/shared, test src/engine/shared, build:check. Evidence: test-results/adr001-t2-<date>.log. DoD: tests green, E1 compiles, no behavioral drift. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T2 |
+| ADR001-T3 — Persist masterSeed | Non assegnato | - | - | - | - | - | - | - | Add masterSeed field to Zustand store, initialize once at run creation. Add persistence key idleVillage_master_seed_v1. TimeEngine accepts injected rng derived from masterSeed. Create tests/unit/idleVillage/masterSeed.test.ts. Verified. Safeguards: lint+test+build:check on scope. Evidence: test-results/adr001-t3-<date>.log. DoD: save→load→save produces identical seed, telemetry master_seed_initialized fires once per run. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T3 |
+| ADR001-T4 — Purge Math.random() in idleVillage engines | Non assegnato | - | - | - | - | - | - | - | Replace all Math.random() in JobResolver, QuestPowerEngine, QuestResolver, QuestEngine (E2), TimeEngine (spawnQuestOffersIfNeeded) with injected Rng derived from masterSeed. IDs become deterministic via deriveSeed(masterSeed, 'ids', counter). Verified. Safeguards: lint+test+build:check on src/engine/game/idleVillage. Regression test: grep "Math.random" src/engine/game/idleVillage returns 0. Evidence: test-results/adr001-t4-<date>.log with grep output. DoD: grep clean, no test regression. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T4 |
+ | ADR001-T5 — Migrate C1 quests to C2 (ActivityDefinition) | Completato | Fallito | Cascade | - | - | - | - | 2026-07-16 | Migrated C1 quests to C2 ActivityDefinition entries. Updated defaultConfig.ts, minimal-poi.tsx, questDetailKit.tsx, locationDetailKit.tsx, gameplayStore.ts, questStateDefaults.ts. Evidence: test-results/adr001-t5-2026-07-16.log. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T5 | 
+| ADR001-T6 — Deprecate C1 (questConfig.ts) and E2 | Non assegnato | - | - | - | - | - | - | - | Add @deprecated JSDoc + ADR-001 reference to questConfig.ts and QuestEngine.ts (E2). Keep exports (types still consumed by QuestChainProgressTracker, telemetry). Atomic. Documentation only, no runtime changes. Safeguards: lint+build:check. Evidence: test-results/adr001-t6-<date>.log. DoD: JSDoc present, no new C1 imports after this task. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T6 |
+| ADR001-T7 — Complete quality-roll via variance.rewardCategories | Non assegnato | - | - | - | - | - | - | - | Replace "always first category" stub in QuestResolver.ts (~lines 77-86) with rollOutcome using varianceCategory from ActivityDefinition. Ensure QualityResult { tier, multiplier } type exists in types.ts. Add tests/unit/idleVillage/QuestResolver.test.ts covering roll distribution with seeded RNG. Verified. Safeguards: lint+test+build:check on scope. Evidence: test-results/adr001-t7-<date>.log. DoD: deterministic outcome given same seed, distribution matches config weights within tolerance. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T7 |
+| ADR001-T8 — Documentation & governance closure | Non assegnato | - | - | - | - | - | - | - | Create src/docs/docs/adr/ADR-001-quest-engine-reconciliation.md. Update quest_engine_reconciliation_plan.md with per-task changelog. Cross-link ADR-001 in idle_village_plan.md Quest/Job System section. Mark quest_chronicle_plan.md Phase C theater CTA + sandbox wiring as Step 2 post-reconciliation. Mark idle_village_modifiers_plan.md GM-ENG wiring as post-demo. Add ADR-001 entry to MASTER_PLAN.md governance section. Update COMPONENT_MASTER_INDEX.md with touched frozen kit rows. Verified. Safeguards: kanban:lint, markdown lint if configured. Evidence: test-results/adr001-t8-<date>.log. DoD: all links resolve, COMPONENT_MASTER_INDEX.md last-certified dates updated, master plan references ADR. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T8 |

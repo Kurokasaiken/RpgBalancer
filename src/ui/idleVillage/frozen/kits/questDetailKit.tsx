@@ -13,83 +13,112 @@ import type { JSX } from 'react';
 import { createKitShell } from '../_infra/KitShell';
 import { DEFAULT_RISK_DISPLAY_CONFIG } from '@/balancing/config/idleVillage/riskDisplayConfig';
 import { DEFAULT_MINIMAL_CONFIG } from '@/ui/idleVillage/frozen/_infra/CanonicalDataBridge';
+import { DEFAULT_IDLE_VILLAGE_CONFIG } from '@/balancing/config/idleVillage/defaultConfig';
+import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
 import { trackTelemetryEvent } from '@/analytics/telemetryStub';
 
 const _riskColors = DEFAULT_RISK_DISPLAY_CONFIG.colors;
 const _accentHex = (DEFAULT_MINIMAL_CONFIG as { ui?: { tokens?: { accentHex?: string } } }).ui?.tokens?.accentHex ?? '#c9a227';
 const _dangerHex = (DEFAULT_MINIMAL_CONFIG as { ui?: { tokens?: { dangerHex?: string } } }).ui?.tokens?.dangerHex ?? _riskColors.deathColor;
 
-const DEMO_QUESTS = [
-  {
-    id: 'goblin-raid',
-    label: 'Incursione Goblin',
-    icon: '🗡️',
-    category: 'combat',
-    minLevel: 2,
-    maxParticipants: 3,
-    durationHours: 3,
-    description: 'I goblin si sono radunati a sud del villaggio. Sconfiggili prima che attacchino.',
-    narrative: 'Il guardiano del villaggio riferisce movimenti sospetti nella foresta. Un gruppo di esploratori ha individuato un accampamento goblin a soli 2 chilometri dalle mura.',
-    skillChecks: [
-      { label: 'Prova di Forza', stat: 'Forza', minValue: 10, icon: '💪' },
-      { label: 'Prova di Agilità', stat: 'Agilità', minValue: 8, icon: '🏃' },
-    ],
-    rewards: [
-      { resource: 'Oro', amount: 150, icon: '💰' },
-      { resource: 'XP', amount: 80, icon: '⭐' },
-      { resource: 'Pozione', amount: 1, icon: '🧪' },
-    ],
-    risks: { injury: 0.25, death: 0.05 },
-    difficulty: 'Medio',
-    difficultyColor: 'var(--halo-color, #f97316)',
-  },
-  {
-    id: 'ancient-ruins',
-    label: 'Rovine Antiche',
-    icon: '🏛️',
-    category: 'exploration',
-    minLevel: 5,
-    maxParticipants: 2,
-    durationHours: 8,
-    description: 'Esplora le rovine a est per recuperare artefatti perduti.',
-    narrative: 'Un mercante ha riportato storie di rovine semi-sepolte, ricche di oggetti dell\'era pre-guerra. Il percorso è lungo e i pericoli sconosciuti.',
-    skillChecks: [
-      { label: 'Prova di Intelligenza', stat: 'Intelligenza', minValue: 14, icon: '🧠' },
-      { label: 'Prova di Percezione', stat: 'Percezione', minValue: 12, icon: '👁️' },
-    ],
-    rewards: [
-      { resource: 'Oro', amount: 400, icon: '💰' },
-      { resource: 'XP', amount: 200, icon: '⭐' },
-      { resource: 'Artefatto', amount: 1, icon: '🏺' },
-    ],
-    risks: { injury: 0.40, death: 0.15 },
-    difficulty: 'Alto',
-    difficultyColor: _dangerHex,
-  },
-  {
-    id: 'herb-gathering',
-    label: 'Raccolta Erbe',
-    icon: '🌿',
-    category: 'gathering',
-    minLevel: 1,
-    maxParticipants: 4,
-    durationHours: 2,
-    description: 'Raccogli erbe medicinali per rifornire la scorta del guaritore.',
-    narrative: 'Il guaritore del villaggio ha esaurito le sue riserve. Le erbe crescono abbondanti nei prati oltre il fiume, ma serve qualcuno capace di riconoscerle.',
-    skillChecks: [
-      { label: 'Conoscenza Erbe', stat: 'Natura', minValue: 6, icon: '🌱' },
-    ],
-    rewards: [
-      { resource: 'Erbe', amount: 15, icon: '🌿' },
-      { resource: 'XP', amount: 30, icon: '⭐' },
-    ],
-    risks: { injury: 0.05, death: 0.0 },
-    difficulty: 'Facile',
-    difficultyColor: 'var(--accent-strong, #22c55e)',
-  },
-];
+const MIGRATED_QUEST_IDS = ['bandit-camp-demo', 'ancient-ruins', 'herb-gathering'] as const;
 
-type DemoQuest = (typeof DEMO_QUESTS)[number];
+/**
+ * Resolves the display label for a resource id using the canonical config.
+ */
+const getResourceLabel = (resourceId: string): string =>
+  DEFAULT_IDLE_VILLAGE_CONFIG.resources[resourceId]?.label ?? resourceId;
+
+/**
+ * Resolves the display icon for a resource id using the canonical config.
+ */
+const getResourceIcon = (resourceId: string): string =>
+  DEFAULT_IDLE_VILLAGE_CONFIG.resources[resourceId]?.icon ?? '📦';
+
+/**
+ * Resolves a difficulty label and colour from the ActivityDefinition metadata.
+ * Lossy mapping from C1 per-skill checks to a single C2 difficulty scalar.
+ */
+const getDifficultyMeta = (activity: ActivityDefinition): { label: string; color: string } => {
+  const label = (activity.metadata?.difficultyLabel as string | undefined) ?? 'Medio';
+  if (label === 'Facile') return { label, color: 'var(--accent-strong, #22c55e)' };
+  if (label === 'Medio') return { label, color: 'var(--halo-color, #f97316)' };
+  if (label === 'Alto') return { label, color: _dangerHex };
+  return { label, color: _dangerHex };
+};
+
+/**
+ * Converts a C2 ActivityDefinition into the DemoQuest shape used by QuestDetail.
+ * Per-skill checks are collapsed into the single questDifficulty scalar exposed
+ * through config metadata; stat requirements are displayed as a single combined hint.
+ */
+const activityToDemoQuest = (activity: ActivityDefinition): DemoQuest => {
+  const meta = (activity.metadata ?? {}) as Record<string, unknown>;
+  const difficultyMeta = getDifficultyMeta(activity);
+  const statRequirement = activity.statRequirement;
+  const statTags = [
+    ...(statRequirement?.allOf?.filter((t): t is string => typeof t === 'string') ?? []),
+    ...(statRequirement?.anyOf ?? []),
+  ];
+  const durationHours = Number(meta.durationHours ?? activity.durationFormula ?? '0');
+  const maxParticipants = activity.maxSlots === 'infinite' ? 99 : (activity.maxSlots ?? 1);
+  const injuryDisplay = typeof meta.injuryChanceDisplay === 'number' ? meta.injuryChanceDisplay : (activity.dangerRating ?? 0) * 5;
+  const deathDisplay = typeof meta.deathChanceDisplay === 'number' ? meta.deathChanceDisplay : (activity.dangerRating ?? 0);
+
+  return {
+    id: activity.id,
+    label: activity.label,
+    icon: (meta.icon as string | undefined) ?? '⚔️',
+    category: activity.tags.find((t) => t !== 'quest') ?? 'quest',
+    minLevel: activity.level ?? 1,
+    maxParticipants,
+    durationHours,
+    description: activity.description ?? '',
+    narrative: (meta.narrative as string | undefined) ?? activity.description ?? '',
+    skillChecks:
+      statTags.length > 0
+        ? [
+            {
+              label: statRequirement?.label ?? 'Skill Check',
+              stat: statTags.join(' | '),
+              minValue: activity.level ?? 1,
+              icon: '�',
+            },
+          ]
+        : [],
+    rewards:
+      activity.rewards?.map((r) => ({
+        resource: getResourceLabel(r.resourceId),
+        amount: Number.parseInt(r.amountFormula, 10) || 0,
+        icon: getResourceIcon(r.resourceId),
+      })) ?? [],
+    risks: {
+      injury: Math.max(0, Math.min(1, injuryDisplay / 100)),
+      death: Math.max(0, Math.min(1, deathDisplay / 100)),
+    },
+    difficulty: difficultyMeta.label,
+    difficultyColor: difficultyMeta.color,
+  };
+};
+
+const DEMO_QUESTS: DemoQuest[] = MIGRATED_QUEST_IDS.map((id) => DEFAULT_IDLE_VILLAGE_CONFIG.activities[id]).filter(Boolean).map(activityToDemoQuest);
+
+type DemoQuest = {
+  id: string;
+  label: string;
+  icon: string;
+  category: string;
+  minLevel: number;
+  maxParticipants: number;
+  durationHours: number;
+  description: string;
+  narrative: string;
+  skillChecks: { label: string; stat: string; minValue: number; icon: string }[];
+  rewards: { resource: string; amount: number; icon: string }[];
+  risks: { injury: number; death: number };
+  difficulty: string;
+  difficultyColor: string;
+};
 
 /** QuestDetail panel component. */
 export function QuestDetail({ quest, onAccept, onClose }: {

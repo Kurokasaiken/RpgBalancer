@@ -1024,9 +1024,25 @@
     "onboardingThrow": "[!! Thröw thé spàrk — whéré ît stöps îs thé prööf öf yöûr fàté. !!]"
   },
   "astrolabeV4": {
+    "verdictBigwin": "[!! Trîûmph !!]",
+    "subBigwin": "[!! Thé sûn îtsélf sîgns yöûr dééd. !!]",
     "subSuccess": "[!! Thé sûmmît böws tö yöûr strîdé. !!]",
     "subNearMiss": "[!! Thé spàrk dàncéd ön thé rîm… ànd slîppéd béyönd. !!]",
     "subFail": "[!! Thé möûntàîn répéls mörtàls. !!]",
-    "subCrit": "[!! Thé àbyss clàîms thösé whö dàré töö mûch. !!]"
+    "subCrit": "[!! Thé àbyss clàîms thösé whö dàré töö mûch. !!]",
+    "explanation": "[!! Éxplànàtîön !!]",
+    "explainContinue": "[!! Cöntînûé !!]",
+    "explainRequired": "[!! Thé blàck cölûmns àré thé vàlûés démàndéd by thé trîàl: öné för éàch àxîs öf thé chéck. !!]",
+    "explainEnemy": "[!! Thîs sûrfàcé îs thé Énémy. Îf thé spàrk stöps héré, thé chéck fàîls. !!]",
+    "explainStats": "[!! Thé whîté cölûmns àré yöûr éxpédîtîön's stàts: thé hîghér théy rîsé, thé fûrthér yöûr stàr réàchés. !!]",
+    "explainStar": "[!! Thé îvöry stàr îs yöûr gröûnd. Îf thé spàrk stöps însîdé ît, thé chéck sûccééds. !!]",
+    "explainLegend": "[!! Évéry cölöûr îs à fàté. Réàd thé fîéld béföré yöû thröw: !!]",
+    "legendStar": "[!! Whîté — stàr întérîör: sûccéss !!]",
+    "legendAlmost": "[!! Brönzé — stàr rîm: Àlmöst (fàîléd by à whîskér) !!]",
+    "legendEnemy": "[!! Slàté — thé Énémy: fàîlûré !!]",
+    "legendCrit": "[!! Dàrk bànd însîdé thé Énémy's édgé: crîtîcàl fàîlûré !!]",
+    "legendNucleus": "[!! Céntràl cöré: crîtîcàl sûccéss !!]",
+    "legendWound": "[!! Crîmsön strîpé: wöûnd !!]",
+    "legendDeath": "[!! Blàck strîpé: déàth !!]"
   }
 }
