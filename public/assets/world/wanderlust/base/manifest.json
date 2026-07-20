@@ -1,0 +1,165 @@
+{
+  "version": "1.0.0",
+  "world": "wanderlust",
+  "variant": "base",
+  "coordinateSystem": {
+    "space": "world_pixels",
+    "origin": "top_left",
+    "unit": "px",
+    "canvas": {
+      "width": 1248,
+      "height": 832
+    }
+  },
+  "resolutionHint": {
+    "runtime": {
+      "width": 1248,
+      "height": 832
+    },
+    "source": {
+      "width": 3744,
+      "height": 2496
+    },
+    "scaleTarget": 3
+  },
+  "assetPolicy": {
+    "resolution": "runtime_only"
+  },
+  "camera": {
+    "minZoom": 0.5,
+    "maxZoom": 3,
+    "defaultZoom": 1,
+    "panEnabled": true,
+    "zoomEnabled": true,
+    "bounds": {
+      "minX": 0,
+      "maxX": 1248,
+      "minY": 0,
+      "maxY": 832
+    }
+  },
+  "surfaceLayers": [
+    {
+      "id": "water",
+      "file": "05_water.png",
+      "type": "animated_texture",
+      "zIndex": 5,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.02, "y": 0 },
+      "animation": {
+        "mode": "wave",
+        "implementation": "shader",
+        "direction": "left",
+        "speed": 0.2,
+        "amplitude": 3
+      },
+      "tags": ["water"]
+    },
+    {
+      "id": "terrain",
+      "file": "10_terrain.png",
+      "type": "texture",
+      "zIndex": 10,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.05, "y": 0 },
+      "conditions": {
+        "corrupted": {
+          "id": "corrupted",
+          "tint": "#5c1a1a",
+          "blendMode": "multiply",
+          "opacity": 0.85
+        }
+      },
+      "tags": ["terrain"]
+    },
+    {
+      "id": "mountains_back",
+      "file": "50_mountains_back.png",
+      "type": "texture",
+      "zIndex": 50,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.08, "y": 0 },
+      "tags": ["mountains"]
+    },
+    {
+      "id": "forest",
+      "file": "55_forest.png",
+      "type": "texture",
+      "zIndex": 55,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.1, "y": 0 },
+      "tags": ["forest"]
+    },
+    {
+      "id": "settlements",
+      "file": "70_settlements.png",
+      "type": "texture",
+      "zIndex": 70,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.12, "y": 0 },
+      "tags": ["settlements", "landmarks"]
+    }
+  ],
+  "atmosphereLayers": [
+    {
+      "id": "vignette",
+      "file": "90_vignette.png",
+      "type": "ui_overlay",
+      "zIndex": 90,
+      "opacity": 0.6,
+      "blendMode": "multiply",
+      "parallax": { "x": 0, "y": 0 },
+      "tags": ["vignette"]
+    }
+  ],
+  "visualStates": [
+    {
+      "id": "default",
+      "labelKey": "world.states.default",
+      "base": true,
+      "overrides": []
+    },
+    {
+      "id": "corrupted",
+      "labelKey": "world.states.corrupted",
+      "overrides": [
+        { "type": "apply_condition", "layerId": "terrain", "conditionId": "corrupted" },
+        { "type": "set_opacity", "layerId": "vignette", "opacity": 0.85 },
+        { "type": "tint_layer", "layerId": "vignette", "tint": "#2b0a0a" }
+      ],
+      "activation": {
+        "condition": "event",
+        "eventId": "corruption_spread"
+      }
+    }
+  ],
+  "regions": [
+    {
+      "id": "enchanted_forest",
+      "nameKey": "world.region.enchanted_forest",
+      "bounds": {
+        "x": 200,
+        "y": 100,
+        "width": 500,
+        "height": 400
+      },
+      "tags": ["forest"]
+    }
+  ],
+  "anchors": [
+    {
+      "id": "village_01",
+      "x": 624,
+      "y": 416,
+      "type": "settlement",
+      "targetId": "idle_village",
+      "labelKey": "world.anchors.village_01"
+    }
+  ],
+  "tags": ["world-map", "idle-village", "wanderlust"]
+}

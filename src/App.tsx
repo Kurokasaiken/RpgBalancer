@@ -68,6 +68,7 @@ const TrailerRiskPage = lazy(() => import('./ui/idleVillage/trailer/TrailerRiskP
 const TrailerConsequencePage = lazy(() => import('./ui/idleVillage/trailer/TrailerConsequencePage').then(m => ({ default: m.TrailerConsequencePage })));
 const TrailerLegacyPage = lazy(() => import('./ui/idleVillage/trailer/TrailerLegacyPage').then(m => ({ default: m.TrailerLegacyPage })));
 const TrailerOutroPage = lazy(() => import('./ui/idleVillage/trailer/TrailerOutroPage').then(m => ({ default: m.TrailerOutroPage })));
+const WorldSurfaceTestPage = lazy(() => import('./ui/idleVillage/pages/WorldSurfaceTestPage').then(m => ({ default: m.WorldSurfaceTestPage })));
 
 interface AppNavControls {
   getActiveTab: () => AppNavTabId;
@@ -237,6 +238,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/trailer-outro';
   const isTrailerThreatIterPath =
     typeof window !== 'undefined' && window.location.pathname === '/trailer-threat-iter';
+  const isWorldSurfacePath =
+    typeof window !== 'undefined' && window.location.pathname === '/world-surface';
   const isRootPath =
     typeof window !== 'undefined' &&
     (window.location.pathname === '/' || window.location.pathname === '/index.html');
@@ -846,6 +849,16 @@ function App() {
       <ErrorBoundary componentName="Minimal Gameplay Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Minimal Gameplay...</div>}>
           <MinimalGameplayPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isWorldSurfacePath) {
+    return (
+      <ErrorBoundary componentName="World Surface Test Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading World Surface...</div>}>
+          <WorldSurfaceTestPage />
         </Suspense>
       </ErrorBoundary>
     );

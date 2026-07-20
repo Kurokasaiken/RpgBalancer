@@ -72,11 +72,48 @@ export const trailerConfig = {
 
   threat: {
     duration: 5000,
+    announcement: {
+      duration: 3000,
+      vignetteOpacity: 0.25,
+      dimOpacity: 0.35,
+      dimFilter: 'brightness(0.55) saturate(0.7)',
+      dustCloud: {
+        duration: 2400,
+        delay: 200,
+        width: '60vw',
+        opacity: 0.45,
+      },
+      sticker: {
+        width: '42vmin',
+        bobDuration: 3200,
+        glow: '0 0 40px rgba(201, 162, 39, 0.25)',
+      },
+      title: 'GOBLIN INVASION',
+      subtitle: 'The eastern tribes have begun their march',
+      timerRing: {
+        size: 92,
+        daysText: '5 DAYS REMAIN',
+        number: '5',
+        rotationDuration: 6000,
+      },
+      warHorn: '/audio/war-horn.mp3',
+    },
     banner: "GOBLIN INVASION — 5 DAYS REMAIN",
     subBanner: "The frontier watch fires have gone dark",
     eventTitle: "GOBLIN INVASION",
     eventPlaque: "⚔️ Invasion",
-    mapImage: '/map.jpg',
+    mapImage: '/Map finale.jpg',
+    goblinImage: '/goblin-march-trasparente.png',
+    goblin: {
+      baseWidth: '50vw',
+      scale: 0.33,
+      spawnDurationMs: 600,
+      toLeftDurationMs: 1000,
+      // 1/10 of current march speed, ending just before the centre of the viewport.
+      marchDurationMs: 100000,
+      marchEndPercent: 50,
+      marchEndOffsetVw: 2,
+    },
     mapBackground: 'radial-gradient(circle at 70% 30%, rgba(139, 92, 43, 0.12) 0%, transparent 55%), radial-gradient(circle at 30% 70%, rgba(60, 20, 20, 0.18) 0%, transparent 50%), #030202',
     baseTealOverlay: {
       background: [

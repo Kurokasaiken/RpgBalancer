@@ -1,0 +1,46 @@
+{
+  "max_parallel": 20,
+  "tasks": [
+    {
+      "task_id": "GM-ENG",
+      "channel": "manual",
+      "model": "qwen/qwen3-coder:free",
+      "file_targets": []
+    },
+    {
+      "task_id": "GM-MP",
+      "channel": "manual",
+      "model": "qwen/qwen3-coder:free",
+      "file_targets": []
+    },
+    {
+      "task_id": "GM-BLD",
+      "channel": "manual",
+      "model": "qwen/qwen3-coder:free",
+      "file_targets": []
+    },
+    {
+      "task_id": "GM-TEL",
+      "channel": "manual",
+      "model": "qwen/qwen3-coder:free",
+      "file_targets": []
+    },
+    {
+      "task_id": "ADR001-T1",
+      "channel": "ai-worker",
+      "model": "qwen/qwen3-coder:free",
+      "file_targets": [
+        "src/engine/quest/QuestEngine.ts"
+      ]
+    },
+    {
+      "task_id": "ADR001-T6",
+      "channel": "ai-worker",
+      "model": "qwen/qwen3-coder:free",
+      "file_targets": [
+        "src/balancing/config/idleVillage/questConfig.ts",
+        "src/engine/game/idleVillage/QuestEngine.ts"
+      ]
+    }
+  ]
+}

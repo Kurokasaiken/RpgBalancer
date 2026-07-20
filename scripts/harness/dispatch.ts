@@ -8,7 +8,7 @@
  */
 
 import { execSync, spawn } from 'node:child_process';
-import { mkdirSync, rmSync, existsSync } from 'node:fs';
+import { mkdirSync, rmSync, existsSync, cpSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { loadKanbanRows, updateKanbanRow, type KanbanRow } from './kanbanManager.js';
 import { loadHarnessConfig } from './config.js';
@@ -25,7 +25,7 @@ interface CliArgs {
 }
 
 function parseArgs(argv: string[]): CliArgs {
-  const args: CliArgs = { dryRun: false, maxParallel: 3, statusFilter: 'Non assegnato', worktreeBase: 'tmp/harness-worktrees' };
+  const args: CliArgs = { dryRun: false, maxParallel: 3, statusFilter: 'Assegnato', worktreeBase: 'tmp/harness-worktrees' };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     switch (arg) {
@@ -127,10 +127,26 @@ function createWorktree(taskId: string, worktreePath: string, dryRun: boolean): 
     return;
   }
 
-  execSync(`git worktree add -b ${branch} ${worktreePath} HEAD`, {
-    stdio: 'pipe',
-    encoding: 'utf8',
-  });
+  // Reuse the branch if it already exists (e.g. from a previous run).
+  let branchExists = false;
+  try {
+    execSync(`git show-ref --verify --quiet refs/heads/${branch}`);
+    branchExists = true;
+  } catch {
+    branchExists = false;
+  }
+
+  if (branchExists) {
+    execSync(`git worktree add ${worktreePath} ${branch}`, {
+      stdio: 'pipe',
+      encoding: 'utf8',
+    });
+  } else {
+    execSync(`git worktree add -b ${branch} ${worktreePath} HEAD`, {
+      stdio: 'pipe',
+      encoding: 'utf8',
+    });
+  }
 }
 
 /**
@@ -219,6 +235,46 @@ async function runTask(
 }
 
 /**
+ * Copy touched files from a harness worktree back to the main repo.
+ */
+function copyTouchedFilesFromWorktree(taskId: string, worktreePath: string, repoRoot: string): void {
+  const evidenceDir = path.join(repoRoot, 'test-results');
+  if (!existsSync(evidenceDir)) {
+    return;
+  }
+
+  const files = readdirSync(evidenceDir).filter(
+    (f) => f.startsWith(`${taskId}-harness-`) && f.endsWith('.json'),
+  );
+  if (files.length === 0) {
+    return;
+  }
+
+  const mostRecent = files
+    .map((f) => ({ name: f, mtime: statSync(path.join(evidenceDir, f)).mtimeMs }))
+    .sort((a, b) => b.mtime - a.mtime)[0].name;
+
+  let evidence: { touchedFiles?: string[] };
+  try {
+    evidence = JSON.parse(readFileSync(path.join(evidenceDir, mostRecent), 'utf8')) as {
+      touchedFiles?: string[];
+    };
+  } catch {
+    return;
+  }
+
+  for (const relPath of evidence.touchedFiles ?? []) {
+    const src = path.join(worktreePath, relPath);
+    const dest = path.join(repoRoot, relPath);
+    if (!existsSync(src)) {
+      continue;
+    }
+    mkdirSync(path.dirname(dest), { recursive: true });
+    cpSync(src, dest, { force: true, recursive: true });
+  }
+}
+
+/**
  * Run tasks in a wave with limited concurrency.
  */
 async function runWave(
@@ -228,6 +284,7 @@ async function runWave(
   maxParallel: number,
   timeoutMs: number,
   allRows: KanbanRow[],
+  repoRoot: string,
 ): Promise<{ taskId: string; ok: boolean; output: string }[]> {
   const results: { taskId: string; ok: boolean; output: string }[] = [];
 
@@ -260,6 +317,9 @@ async function runWave(
         createWorktree(taskId, worktreePath, dryRun);
         const result = await runTask(taskId, worktreePath, dryRun, timeoutMs);
         if (!dryRun) {
+          if (result.ok) {
+            copyTouchedFilesFromWorktree(taskId, worktreePath, repoRoot);
+          }
           removeWorktree(worktreePath, dryRun);
         }
         return result;
@@ -282,7 +342,13 @@ async function main(): Promise<void> {
   }
 
   const rows = await loadKanbanRows();
-  let candidateRows = rows.filter((r) => r.status === args.statusFilter);
+  const allowedStatuses = new Set(
+    args.statusFilter
+      .split(',')
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0),
+  );
+  let candidateRows = rows.filter((r) => allowedStatuses.has(r.status));
 
   if (args.idFilter && args.idFilter.length > 0) {
     const allowed = new Set(args.idFilter);
@@ -312,7 +378,7 @@ async function main(): Promise<void> {
     const wave = waves[waveIndex];
     console.log(`\nWave ${waveIndex + 1}/${waves.length}: ${wave.join(', ')}`);
 
-    const results = await runWave(wave, args.worktreeBase, args.dryRun, args.maxParallel, args.timeout ?? config.taskTimeout, rows);
+    const results = await runWave(wave, args.worktreeBase, args.dryRun, args.maxParallel, args.timeout ?? config.taskTimeout, rows, config.repoRoot);
 
     for (const result of results) {
       console.log(`  ${result.ok ? '✅' : '❌'} ${result.taskId}`);

@@ -46,7 +46,7 @@ MODEL_FALLBACK = [
 
 
 def get_ready_tasks() -> List[dict]:
-    """Get all tasks that are ready for dispatch (status 'Non assegnato' or blocked states that can be retried).
+    """Get all tasks that are ready for dispatch (status 'Non assegnato', 'Assegnato' or blocked states that can be retried).
     
     Tasks with temporary blocks (dependencies, file conflicts) remain candidates and will be
     re-evaluated on each dispatch cycle. executor='manual' is reserved only for the original
@@ -57,9 +57,10 @@ def get_ready_tasks() -> List[dict]:
     
     for row in rows:
         # Consider tasks that are not already running/completed
+        # Include "Assegnato" so tasks assigned by the coordinator/plan can be dispatched
         # Include "Non assegnato" even if notes contain "Bloccato temporaneo"
         # These tasks will be re-evaluated by dispatch gates on each cycle
-        if row["status"] in ("Non assegnato", "In attesa di dipendenze", "In attesa - file occupato"):
+        if row["status"] in ("Non assegnato", "Assegnato", "In attesa di dipendenze", "In attesa - file occupato"):
             ready.append(row)
     
     return ready
@@ -81,6 +82,67 @@ def check_dependencies_satisfied(task_id: str, dependencies: str) -> bool:
             return False
     
     return True
+
+
+def _format_assignment_line(cells: List[str]) -> str:
+    """Reconstruct a markdown table row from a list of cell values."""
+    return "| " + " | ".join(cells) + " |"
+
+
+def _update_row_status(content: str, task_id: str, old_status: str, new_status: str) -> str:
+    """Find the first markdown table row for task_id and replace the status cell.
+
+    Also updates the last_update cell when the row has at least 10 columns.
+    """
+    lines = content.splitlines()
+    for i, line in enumerate(lines):
+        stripped = line.strip()
+        if not stripped.startswith("|"):
+            continue
+        cells = [c.strip() for c in stripped.strip("|").split("|")]
+        if not cells or not cells[0].startswith(task_id):
+            continue
+        if len(cells) > 1 and cells[1] == old_status:
+            cells[1] = new_status
+            if len(cells) > 9:
+                cells[8] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+            lines[i] = _format_assignment_line(cells)
+            break
+    return "\n".join(lines)
+
+
+def unblock_blocked_tasks() -> List[str]:
+    """Promote 'Bloccato' tasks to 'Assegnato' when all dependencies are completed.
+
+    This enables automatic dispatch of dependency chains: as soon as a blocking
+    task is marked Completato, the blocked task becomes ready for execution in
+    the same coordinator cycle.
+    """
+    rows = parse_agent_assignments_rows()
+    unblocked: List[str] = []
+    path = AGENT_ASSIGNMENTS_PATH
+    if not path.exists():
+        return unblocked
+
+    content = path.read_text(encoding="utf-8")
+    for row in rows:
+        if row["status"] != "Bloccato":
+            continue
+        task_id = row["id"].split()[0]
+        dependencies = row.get("dependencies", "")
+        # Only auto-unblock tasks whose block is explicitly a dependency;
+        # tasks with no dependencies are blocked for other reasons and stay Bloccato.
+        if dependencies and dependencies != "-" and check_dependencies_satisfied(task_id, dependencies):
+            content = _update_row_status(content, row["id"], "Bloccato", "Assegnato")
+            unblocked.append(task_id)
+
+    if unblocked:
+        path.write_text(content, encoding="utf-8")
+        print(f"[UNBLOCK] {len(unblocked)} task(s) unblocked: {', '.join(unblocked)}")
+    else:
+        print("[INFO] No blocked tasks to unblock")
+
+    return unblocked
 
 
 def build_file_target_clusters(tasks: List[dict]) -> List[List[dict]]:
@@ -618,6 +680,9 @@ def main():
     
     # Reconcile registry from end events (process files from parallel jobs)
     reconcile_registry()
+    
+    # Auto-unblock tasks whose dependencies are now completed
+    unblock_blocked_tasks()
     
     # Get ready tasks from agent_assignments.md
     ready_tasks = get_ready_tasks()

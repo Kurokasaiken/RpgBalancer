@@ -143,6 +143,50 @@ implementation is SVG lighting; 9-slice / painted assets remain options too, wei
 against the procedural / stable-seed / per-instance philosophy — neither banned nor
 mandated.
 
+**Spend photons UP, not down (the near-black depth law).** On a near-black floor
+(`#060f16`, ~0.4% luminance) a dark shadow can reach at most ~1.09:1 contrast downward —
+below the eye's Weber JND once blurred, so it dies. A warm-gold edge has ~10:1 headroom
+upward. Therefore on dark themes DEPTH IS DRAWN WITH LIGHT, never with the absence of it:
+- **Letterpress polarity** for a recess: hard dark crease on the TOP-inside edge, a lit
+  warm-gold lip on the BOTTOM-inside edge. (Exact mirror = a raised element; keep the two
+  polarities strictly consistent app-wide.) The single strongest surviving cue is a 1px
+  warm-gold line on the FLOOR just below the well's opening (the cut edge catching light).
+- **Lift funds the wall.** A dark wall-shadow over a floor-colored interior has no
+  luminance to remove and vanishes — lift the interior fill 4–8 RGB above the floor FIRST
+  (azure-family, e.g. `#0b1620`), THEN shade the wall over it.
+- **Hard edges survive, blur dies.** Zero blur on structural creases/rims; ≤2px blur on
+  lit gold lines (more reads as emissive glow). Wall bands ≤14px or they become vignettes.
+  This is why `feDiffuseLighting`'s shallow full-surface gradient washed grey — the eye
+  DISCOUNTS smooth wide gradients as mere illumination; depth must live at hard edges.
+- **Warm only.** Every lit line is gold (`#dfb857`/`#f0cf6a`), every dark is an
+  azure-black (hue ≈210), never neutral grey/silver (reads cool/cyberpunk, off-palette).
+**Bake-off verdict (2026-07-17, revised by the IN-CONTEXT test):** Bezel Molding won in
+isolation but FAILED in context — its thick glossy tube read as a raised tray (no internal
+cast shadow), fractured the design system (Hearthstone/mobile dialect vs the Ancient
+Compass plaque's thin-notched V9 language), overpowered narrow internal wells, and its
+polished perfection read as plastic. **Canonical winner: SLOPED WALLS (perfected)** — a
+true carved cut in the V9 dialect: thin, sharp, matte. Foreshortened mitred trapezoid
+walls (ONE geometry: top 8px, sides 5px, bottom 3px), azure-lifted interior funding the
+wall shadow, letterpress polarity (hard dark crease top-left, solid gold kiss + inner lip
+bottom-right), gold floor-arris line below the opening, static micro-grain against
+machine-perfection, faint 45° miter seams echoing the notched-plaque language.
+**LESSON (permanent): isolated-winner ≠ system-winner — every primitive must pass the
+in-context test (repeated, next to its siblings) before promotion. Internal wells WHISPER;
+only the outer Surface frame shouts. Frame weight is hierarchy.**
+
+**Bezel Molding is NOT discarded — it is archived as the HERO-frame candidate.** Its
+thick raised NMM molding is exactly the right voice for components that *should* shout:
+the Roster, the slot Rack, hero/featured objects. Kept in `plateVariants.tsx`
+(`BezelMolding`) and in the lab quad for that future extraction.
+
+**Field luminance (2026-07-17 experiment, reverted 2026-07-18).** The panel field was briefly
+lifted away from near-black with a vertical gradient `#16304c → #102544 → #0b1a30` and
+vignette softened to 0.55. This experiment was reverted to the original sacred obsidian
+base (`#060f16` solid) with the original vignette (0.8) to maintain consistency with the
+V9 reference. The current `FIELD_BACKGROUND` in `foundationRecipe.ts` uses the original
+configuration: azure light leak (`rgba(0,229,255,0.12) → rgba(0,150,255,0.03)`) over
+`#060f16` with `inset 0 0 60px rgba(2,6,10,0.8)` vignette.
+
 **Object-identity (THE test).** Every UI element must answer: *"what physical object
 is this in the world?"* If it has no answer, it is still a web component. This is the
 real leap — from *graphic component* to *physical object*. The target was never "more

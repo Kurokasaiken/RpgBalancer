@@ -4,6 +4,109 @@
 <!-- Executor values: ai-worker | harness | manual -->
 <!-- Scripts (bridge_ai_worker.py, sync_ai_worker.py) auto-migrate legacy rows to 8-column format -->
 
+| IV-TRAILER-ANNOUNCE-001 | Completato | 2026-07-18 | Cascade | Evidence: test-results/iv-trailer-announce-001-2026-07-18.log | manual | @trailer-only, design judgment | ```text
+AGENT
+Idle Village Task - Trailer Threat Iter Fase 1 Announcement
+
+ISTRUZIONI AGENTE
+Sei un agente Windsurf: consulta la skill `idle-village-task` prima di iniziare, segui il mandato, completa la safeguard suite ed esegui le consegne Kanban.
+
+OBIETTIVO
+Ridefinire la scena Threat di TrailerThreatIter con presentazione stile Hearthstone: mappa visibile, vignette scuro, corno da guerra, nube di polvere, illustrazione goblin come sticker dipinto grande e sospeso, testo "GOBLIN INVASION" + "The eastern tribes have begun their march" + "5 DAYS REMAIN" con anello bronzeo rotante.
+
+CONTEXT
+This is part of the Steam teaser trailer production pipeline. The trailer is exempt from gameplay architecture requirements but must preserve presentation architecture requirements. This code exists solely to produce recordable video content.
+
+WHAT YOU MUST DO
+1. Implementare Fase 1 Announcement (3 secondi) in TrailerThreatIter
+2. Mappa completamente visibile all'inizio
+3. Leggero vignette scuro (20-30%) che appare all'improvviso
+4. UI rimane visibile ma perde enfasi
+5. Suono corno da guerra (placeholder audio file)
+6. Nube di polvere attraversa lo schermo (CSS animation)
+7. Al centro compare illustrazione goblin come sticker dipinto (non card)
+8. Grande, sospeso, stile Hearthstone card reveal
+9. Sotto: "GOBLIN INVASION" + "The eastern tribes have begun their march" + "5 DAYS REMAIN"
+10. Piccolo anello bronzeo che ruota lentamente attorno al timer
+11. Niente pulsanti - solo presentazione
+
+@trailer-only CONVENTION
+EXEMPT from gameplay architecture:
+- NO PersistenceService, NO localStorage/sessionStorage, NO persistence of any kind
+- NO i18n for copy text (hardcoded allowed for iteration speed), NO translation keys
+- NO telemetry of any kind (marketing asset, not product)
+- NO gameplay state mutation, NO economy systems, NO player progression
+
+MUST PRESERVE:
+- Config-first: All timing values, animation settings, sequence events in `trailerConfig.ts` with Zod validation
+- Skin/Theme: Use CSS variables from trailer.css, NO standalone .css files, use Gilded Observatory tokens
+- Component Reuse: Verify primitives before creating new components, reuse existing CSS patterns
+- State Management: Use React Context for local presentation state, NO Zustand (marketing-only)
+- Documentation: JSDoc on all functions/interfaces, update plan changelog
+- Node/tooling: Use pinned Node version from .nvmrc
+- Safeguards: Run lint, build:check, kanban:lint before task complete
+
+Visual Presentation Requirements:
+- REQUIRED: Hearthstone card reveal style - sticker dipinto, non card UI
+- REQUIRED: Goblin illustration grande e sospeso al centro
+- REQUIRED: Vignette scuro 20-30% opacity
+- REQUIRED: Nube di polvere CSS animation
+- REQUIRED: Anello bronzeo rotante attorno al timer
+- FORBIDDEN: Niente pulsanti o interazioni utente
+- FORBIDDEN: Card UI pattern - deve essere sticker dipinto
+
+No Placeholder Rule:
+- FORBIDDEN: No temporary shapes, debug boxes, fake assets
+- REQUIRED: Every visual element must be final quality
+- ALLOWED: Placeholder audio file for war horn (document as placeholder)
+
+SUCCESS CRITERIA
+- Fase 1 Duration: 3 secondi totali
+- Map Visibility: Mappa completamente visibile all'inizio
+- Vignette Effect: 20-30% opacity, appare all'improvviso
+- Audio: Corno da guerra suona (placeholder file OK)
+- Dust Cloud: Nube di polvere attraversa schermo (CSS animation)
+- Goblin Sticker: Illustrazione come sticker dipinto, non card, grande e sospeso
+- Text Layout: "GOBLIN INVASION" + subtitle + "5 DAYS REMAIN" sotto
+- Bronze Ring: Anello bronzeo rotante attorno al timer
+- No Buttons: Niente pulsanti, solo presentazione
+- Hearthstone Style: Card reveal feel, sospeso e drammatico
+
+INTEGRATION POINTS
+- Existing Component: TrailerThreatIter.tsx (modify phase logic)
+- Existing Config: trailerConfig.ts (add announcement timing)
+- Existing Asset: goblin-march-trasparente.png (already updated to no-arrow version)
+- Audio: Placeholder war horn audio file (create if needed)
+
+FILES TO MODIFY
+1. `src/ui/idleVillage/trailer/TrailerThreatIter.tsx` - Add announcement phase logic
+2. `src/balancing/config/idleVillage/trailerConfig.ts` - Add announcement timing and config
+3. `src/ui/idleVillage/trailer/TrailerThreatDetailPanel.tsx` - Modify for sticker presentation (if needed)
+
+FILES TO CREATE (Optional)
+1. `public/audio/war-horn.mp3` - Placeholder war horn audio (if not exists)
+
+TESTING REQUIREMENTS
+- Visual Test: Verify Hearthstone-style sticker presentation
+- Timing Test: Verify 3-second announcement phase
+- Animation Test: Verify dust cloud and bronze ring rotation
+- Audio Test: Verify war horn plays (placeholder OK)
+- Deterministic Test: F5 refresh produces identical sequence
+
+DOCUMENTATION UPDATES
+1. `trailer_threat_iter_rework_plan.md`: Update Fase 1 progress in changelog
+2. `docs/trailer_capture_notes.md`: Add best timestamps, successful screenshots
+
+SAFEGUARDS
+- Lint Scope: `src/ui/idleVillage/trailer/` (120s timeout)
+- Test Scope: None
+- Build Check: `npm run build:check` (180s timeout)
+- Kanban Lint: `npm run kanban:lint` (30s timeout)
+
+PLAN REFERENCE
+trailer_threat_iter_rework_plan.md - Fase 1 Announcement
+```
+
 | IV-TRAILER-DAY1-001 | Completato | 2026-07-16 | Cascade | Evidence: test-results/build-check-2026-07-16.log | manual | @trailer-only exemption, SWE/Cascade required | ```text
 AGENT
 Idle Village Task - Astrolabe Vertical Slice (Scene 4: Risk)
@@ -181,7 +284,7 @@ After completing this task:
 4. Attach lint, build:check, and kanban:lint output in final report
 ```
 
-| TRAILER-THREAT-ITER-V2 | Completato | Cascade | 2026-07-17 | | manual | Evidence: test-results/trailer-threat-iter-v2-2026-07-17.log; TestHub card /trailer-threat-iter added, /trailer-threat removed; visual adjustment: teal moved inside panel, panel moved lower-right + scaled 0.9 | ```text
+| TRAILER-THREAT-ITER-V2 | Completato | 2026-07-18 | Cascade | Evidence: test-results/trailer-threat-iter-v2-2026-07-18.log | manual | @trailer-only exemption, SWE/Cascade required | ```text
 AGENT
 Idle Village Task - TrailerThreatIter V2 Visual Rework
 
@@ -3971,7 +4074,7 @@ SAFEGUARDS
 
 KANBAN STATUS: CR-005 – Bloccato (Evidence: test-results/cr-005-blocker-report-2026-07-15.md) dopo aver impostato lo stato del Kanban su Bloccato.
 ```
-| DOC-CHARACTER-RESIDENT-RECONCILIATION-001 — Character-to-Resident Documentation Reconciliation | Bloccato | - | CR-005 | Update all Character-to-Resident documentation to reflect verified runtime implementation, promote docs to trusted status, and archive outdated documentation | ```text
+| DOC-CHARACTER-RESIDENT-RECONCILIATION-001 — Character-to-Resident Documentation Reconciliation | Bloccato | - | CR-005 | Update all Character-to-Resident documentation to reflect verified runtime implementation, promote docs to trusted status, and archive outdated documentation | ```text |
 AGENT
 Idle Village Documentation Specialist - Character-to-Resident Reconciliation
 
@@ -10991,8 +11094,6 @@ NOTE:
   - Al completamento, esegui la safeguard suite e chiudi con: `KANBAN STATUS: ASTRO-V3-F4 – Completato (Evidence: test-results/astro-v3-f4-<YYYY-MM-DD>.log)`.
   - F4 e' l'ultima fase; dipende da F3.
 
-```
-
 | SC-UI-001 — Spell Creator Modern UI Migration | Completato | 2026-07-14 | Cascade | - | 2026-07-14T19:30:00.000Z | - | - | 2026-07-14T19:30:00.000Z | Evidence: test-results/sc-ui-001-spell-creator-migration-2026-07-14.md | Prompt: prompts/SC-UI-001.spec.json |
 | PANELS-STEP-01 — Draggable Panels System Step 01: Empty /design-system page with 5 placeholder sections | Completato | Cascade | - | Create empty /design-system page with 5 placeholder sections (Tokens, Panels, Store, Shell, Integration) | Evidence: test-results/panels-step-01-2026-07-14.log | Prompt: prompts/PANELS-STEP-01.spec.json |
 | PANELS-STEP-02 — Draggable Panels System Step 02: Tokens section with visual swatches from wanderlustTokens.css | Completato | Cascade | - | Implement Tokens section with visual swatches from wanderlustTokens.css | Evidence: test-results/panels-step-02-2026-07-14.log | Prompt: prompts/PANELS-STEP-02.spec.json |
@@ -11010,6 +11111,9 @@ NOTE:
 | ADR001-T6 — Deprecate C1 (questConfig.ts) and E2 | Non assegnato | - | - | - | - | ai-worker | - | - | Add @deprecated JSDoc + ADR-001 reference to questConfig.ts and QuestEngine.ts (E2). Keep exports (types still consumed by QuestChainProgressTracker, telemetry). Atomic. Documentation only, no runtime changes. Safeguards: lint+build:check. Evidence: test-results/adr001-t6-<date>.log. DoD: JSDoc present, no new C1 imports after this task. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T6 |
 | ADR001-T7 — Complete quality-roll via variance.rewardCategories | Completato | - | harness | - | 2026-07-17T13:53:06.764Z | harness | - | 2026-07-17T13:53:06.764Z | Replace "always first category" stub in QuestResolver.ts (~lines 77-86) with rollOutcome using varianceCategory from ActivityDefinition. Ensure QualityResult { tier, multiplier } type exists in types.ts. Add tests/unit/idleVillage/QuestResolver.test.ts covering roll distribution with seeded RNG. Verified. Safeguards: lint+test+build:check on scope. Evidence: test-results/adr001-t7-<date>.log. DoD: deterministic outcome given same seed, distribution matches config weights within tolerance. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T7 |
 | ADR001-T8 — Documentation & governance closure | Completato | - | harness | - | 2026-07-17T13:53:06.787Z | harness | - | 2026-07-17T13:53:06.787Z | Create src/docs/docs/adr/ADR-001-quest-engine-reconciliation.md. Update quest_engine_reconciliation_plan.md with per-task changelog. Cross-link ADR-001 in idle_village_plan.md Quest/Job System section. Mark quest_chronicle_plan.md Phase C theater CTA + sandbox wiring as Step 2 post-reconciliation. Mark idle_village_modifiers_plan.md GM-ENG wiring as post-demo. Add ADR-001 entry to MASTER_PLAN.md governance section. Update COMPONENT_MASTER_INDEX.md with touched frozen kit rows. Verified. Safeguards: kanban:lint, markdown lint if configured. Evidence: test-results/adr001-t8-<date>.log. DoD: all links resolve, COMPONENT_MASTER_INDEX.md last-certified dates updated, master plan references ADR. Plan: src/docs/docs/plans/quest_engine_reconciliation_plan.md §T8 |
+| IV-WORLD-SURFACE-001 — World Surface Runtime Step 1-3 (asset pipeline + schemas + TestHub) | Completato | - | Cascade | - | - | - | - | 2026-07-19 | Evidence: test-results/iv-world-surface-001-2026-07-19.log. Prompt: coordinator/manual-dispatch/completed/IV-WORLD-SURFACE-001.md. |
+| IV-WORLD-SURFACE-002 — World Surface Runtime Step 5 (runtime objects & events) | Completato | IV-WORLD-SURFACE-001 | harness | - | 2026-07-19T11:15:23.909Z | - | - | 2026-07-19T11:15:23.907Z | Implement WorldState with RuntimeObject and WorldEvent; connect events to visual states and region tints. Plan: src/docs/docs/plans/world_surface_runtime_implementation_plan.md §Step 5. |
+| IV-WORLD-SURFACE-003 — World Surface Runtime Step 6 (advanced renderer evaluation) | Completato | IV-WORLD-SURFACE-002 | Cascade | - | - | - | - | 2026-07-19T11:48:50Z | Evidence: test-results/iv-world-surface-003-2026-07-19.md. Evaluate Pixi/WebGL renderer when runtime objects > 50 or heavy particles. Plan: src/docs/docs/plans/world_surface_runtime_implementation_plan.md §Step 6. |
 
 ### Brief Description
 Create AstrolabeTrailerController that demonstrates DestinyAstrolabe can be controlled for deterministic capture. This is Sprint 1 from the approved trailer vertical slice plan, focusing on the hero shot (Scene 4: Risk).

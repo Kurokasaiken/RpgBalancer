@@ -77,28 +77,33 @@ const Floor: React.FC<{ w: number; h: number; uid: string }> = ({ w, h, uid }) =
 
 /* ── A · Bezel Molding ───────────────────────────────────────────── */
 
-const BezelMolding: React.FC<PlateVariantProps> = ({ children, className, style }) => {
+export const BezelMolding: React.FC<PlateVariantProps> = ({ children, className, style }) => {
   const { ref, w, h } = usePlateSize();
   const uid = useId().replace(/:/g, '');
   const BAND = 5; // molding thickness
   const inset = BAND / 2 + 1;
+  const innerX = BAND + 1;
   return (
     <div ref={ref} className={`mp-root ${className ?? ''}`.trim()} style={style}>
       <svg className="mp-svg" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden="true">
         <defs>
           <clipPath id={`clip-${uid}`}>
-            <rect x={BAND + 1} y={BAND + 1} width={w - (BAND + 1) * 2} height={h - (BAND + 1) * 2} rx={RX - 4} />
+            <rect x={innerX} y={innerX} width={w - innerX * 2} height={h - innerX * 2} rx={RX - 4} />
           </clipPath>
-          {/* one molding band, painted like an artist paints a frame:
-              lit crest → body → core shadow, top to bottom */}
+          {/* the molding band as an artist paints raised metal (NMM ladder):
+              ivory specular crest → gold → body → bronze turn → warm-umber core
+              at ~80% → a reflected-light uptick at the very bottom. Raised = lit
+              crest at top. Warm throughout, no grey. */}
           <linearGradient id={`band-${uid}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#e8c06a" />
-            <stop offset="30%" stopColor="#b0803a" />
-            <stop offset="65%" stopColor="#7a5218" />
-            <stop offset="100%" stopColor="#3d2508" />
+            <stop offset="0%" stopColor="#fff3c9" />
+            <stop offset="11%" stopColor="#f0cf6a" />
+            <stop offset="33%" stopColor="#dfb857" />
+            <stop offset="55%" stopColor="#b0803a" />
+            <stop offset="80%" stopColor="#5f3f16" />
+            <stop offset="100%" stopColor="#7a5220" />
           </linearGradient>
           <linearGradient id={`drop-${uid}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="rgba(0,3,8,0.6)" />
+            <stop offset="0%" stopColor="rgba(0,3,8,0.7)" />
             <stop offset="100%" stopColor="rgba(0,3,8,0)" />
           </linearGradient>
         </defs>
@@ -108,14 +113,17 @@ const BezelMolding: React.FC<PlateVariantProps> = ({ children, className, style 
         {/* THE molding: one band, one vertical light */}
         <rect x={inset} y={inset} width={w - inset * 2} height={h - inset * 2} rx={RX - 2} fill="none" stroke={`url(#band-${uid})`} strokeWidth={BAND} />
         {/* inner step edge (hard) */}
-        <rect x={BAND + 1} y={BAND + 1} width={w - (BAND + 1) * 2} height={h - (BAND + 1) * 2} rx={RX - 4} fill="none" stroke="rgba(1,3,6,0.8)" strokeWidth="1" />
+        <rect x={innerX} y={innerX} width={w - innerX * 2} height={h - innerX * 2} rx={RX - 4} fill="none" stroke="rgba(1,3,6,0.8)" strokeWidth="1" />
 
         <g clipPath={`url(#clip-${uid})`}>
           <Floor w={w} h={h} uid={uid} />
-          {/* contact shadow the molding casts into the well */}
-          <rect x={BAND + 1} y={BAND + 1} width={w - (BAND + 1) * 2} height="8" fill={`url(#drop-${uid})`} />
-          {/* light escaping at the bottom inner lip */}
-          <rect x={BAND + 2} y={h - BAND - 2.5} width={w - (BAND + 2) * 2} height="1" fill="rgba(240,207,106,0.22)" />
+          {/* LIFT the interior 4-8 RGB (azure family) so the wall shadow has
+              luminance to remove — the research's "lift funds the wall" */}
+          <rect x={innerX} y={innerX} width={w - innerX * 2} height={h - innerX * 2} fill="rgba(26,52,72,0.16)" />
+          {/* contact shadow the raised molding casts down into the well (top wall) */}
+          <rect x={innerX} y={innerX} width={w - innerX * 2} height="11" fill={`url(#drop-${uid})`} />
+          {/* load-bearing cue: warm-gold lit lip on the bottom-inside edge */}
+          <rect x={innerX + 1} y={h - innerX - 2} width={w - (innerX + 1) * 2} height="1.25" fill="rgba(240,207,106,0.34)" />
         </g>
       </svg>
       <div className="mp-content">{children}</div>
@@ -123,59 +131,133 @@ const BezelMolding: React.FC<PlateVariantProps> = ({ children, className, style 
   );
 };
 
-/* ── B · Sloped Walls (mitred trapezoids — one geometry) ─────────── */
+/* ── Well bronze bezel (frame-only overlay, reused NMM ladder) ────── */
 
-const SlopedWalls: React.FC<PlateVariantProps> = ({ children, className, style }) => {
+/**
+ * WellBronzeBezel — a FRAME-ONLY bronze bezel overlay (the medallion's NMM metal
+ * ladder: ivory crest → gold → bronze → warm-umber). Unlike BezelMolding it draws
+ * NO interior — it sits ON TOP of a well that already owns its dark floor, adding
+ * only the sculpted metal edge. `band` = molding thickness in px (default 1.75 =
+ * "half of medio"). Absolutely positioned, pointer-transparent; drop it as the
+ * first child of a position:relative well. Content stays inset by the well's
+ * padding, so it never collides with the thin perimeter band.
+ */
+export const WellBronzeBezel: React.FC<{ band?: number; rx?: number }> = ({ band = 1.75, rx = RX - 1 }) => {
   const { ref, w, h } = usePlateSize();
   const uid = useId().replace(/:/g, '');
-  const D = 4; // wall depth
+  const inset = band / 2 + 1;
+  const innerX = band + 1;
+  return (
+    <div ref={ref} aria-hidden style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
+      <svg width="100%" height="100%" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" style={{ display: 'block' }}>
+        <defs>
+          {/* NMM ladder — WARM-GOLD crest (no white specular: the #fff3c9 crest
+              read too clean/perfect/luminous). Dim warm gold on top → bronze →
+              warm-umber base. */}
+          <linearGradient id={`wbb-${uid}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#d8bd78" />
+            <stop offset="12%" stopColor="#cfaf63" />
+            <stop offset="34%" stopColor="#c2a355" />
+            <stop offset="55%" stopColor="#a0762f" />
+            <stop offset="80%" stopColor="#5f3f16" />
+            <stop offset="100%" stopColor="#71501f" />
+          </linearGradient>
+          {/* micro-wear: displaces the band edge so the metal reads WORN, not
+              machine-perfect (anti-perfection law). Subtle at this band width. */}
+          <filter id={`wear-${uid}`} x="-6%" y="-6%" width="112%" height="112%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.75 0.4" numOctaves="2" seed="7" result="n" />
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="1.1" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+        </defs>
+        {/* dark seat: separates the metal from the field */}
+        <rect x="0.5" y="0.5" width={w - 1} height={h - 1} rx={rx + 1} fill="none" stroke="rgba(0,0,0,0.55)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+        {/* the bronze band — one vertical light (NMM ladder), half of medio */}
+        <rect x={inset} y={inset} width={w - inset * 2} height={h - inset * 2} rx={rx} fill="none" stroke={`url(#wbb-${uid})`} strokeWidth={band} vectorEffect="non-scaling-stroke" />
+        {/* inner hard step where the metal meets the recess */}
+        <rect x={innerX} y={innerX} width={w - innerX * 2} height={h - innerX * 2} rx={Math.max(2, rx - 1)} fill="none" stroke="rgba(1,3,6,0.8)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+      </svg>
+    </div>
+  );
+};
+
+/* ── B · Sloped Walls (mitred trapezoids — one geometry) ─────────── */
+
+export const SlopedWalls: React.FC<PlateVariantProps> = ({ children, className, style }) => {
+  const { ref, w, h } = usePlateSize();
+  const uid = useId().replace(/:/g, '');
+  // Foreshortened wall depths under a top-light: the top wall shows tallest,
+  // sides medium, bottom shortest (research: uniform depths read as a flat
+  // vignette; foreshortening is what reads as a real cut).
+  const T = 8, L = 5, R = 5, B = 3;
   return (
     <div ref={ref} className={`mp-root ${className ?? ''}`.trim()} style={style}>
-      <svg className="mp-svg" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden="true">
+      <svg
+        className="mp-svg"
+        viewBox={`0 0 ${w} ${h}`}
+        preserveAspectRatio="none"
+        aria-hidden="true"
+        style={{ overflow: 'visible' }}
+      >
         <defs>
           <clipPath id={`clip-${uid}`}>
-            <rect x={D} y={D} width={w - D * 2} height={h - D * 2} rx={RX - 3} />
+            <rect x={L} y={T} width={w - L - R} height={h - T - B} rx={4} />
           </clipPath>
-          {/* userSpace gradients so each wall shades rim→floor exactly */}
-          <linearGradient id={`wt-${uid}`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2={D}>
-            <stop offset="0%" stopColor="rgba(0,2,5,0.92)" />
-            <stop offset="100%" stopColor="rgba(0,2,5,0.28)" />
+          {/* userSpace gradients: each wall shades rim→floor. Darks are
+              azure-black (hue≈210), lights are warm gold — never grey. */}
+          <linearGradient id={`wt-${uid}`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2={T}>
+            <stop offset="0%" stopColor="rgba(1,4,8,0.92)" />
+            <stop offset="100%" stopColor="rgba(1,4,8,0.2)" />
           </linearGradient>
-          <linearGradient id={`wl-${uid}`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2={D} y2="0">
-            <stop offset="0%" stopColor="rgba(0,2,5,0.86)" />
-            <stop offset="100%" stopColor="rgba(0,2,5,0.24)" />
+          <linearGradient id={`wl-${uid}`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2={L} y2="0">
+            <stop offset="0%" stopColor="rgba(1,4,8,0.85)" />
+            <stop offset="100%" stopColor="rgba(1,4,8,0.18)" />
           </linearGradient>
-          <linearGradient id={`wb-${uid}`} gradientUnits="userSpaceOnUse" x1="0" y1={h} x2="0" y2={h - D}>
-            <stop offset="0%" stopColor="rgba(214,164,56,0.34)" />
-            <stop offset="100%" stopColor="rgba(214,164,56,0.05)" />
+          <linearGradient id={`wb-${uid}`} gradientUnits="userSpaceOnUse" x1="0" y1={h} x2="0" y2={h - B}>
+            <stop offset="0%" stopColor="rgba(224,178,66,0.38)" />
+            <stop offset="100%" stopColor="rgba(224,178,66,0.06)" />
           </linearGradient>
-          <linearGradient id={`wr-${uid}`} gradientUnits="userSpaceOnUse" x1={w} y1="0" x2={w - D} y2="0">
-            <stop offset="0%" stopColor="rgba(214,164,56,0.24)" />
-            <stop offset="100%" stopColor="rgba(214,164,56,0.04)" />
+          <linearGradient id={`wr-${uid}`} gradientUnits="userSpaceOnUse" x1={w} y1="0" x2={w - R} y2="0">
+            <stop offset="0%" stopColor="rgba(224,178,66,0.24)" />
+            <stop offset="100%" stopColor="rgba(224,178,66,0.04)" />
           </linearGradient>
-          <linearGradient id={`drop-${uid}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="rgba(0,2,6,0.5)" />
-            <stop offset="100%" stopColor="rgba(0,2,6,0)" />
+          <linearGradient id={`drop-${uid}`} gradientUnits="userSpaceOnUse" x1="0" y1={T} x2="0" y2={T + 7}>
+            <stop offset="0%" stopColor="rgba(0,3,7,0.55)" />
+            <stop offset="100%" stopColor="rgba(0,3,7,0)" />
           </linearGradient>
         </defs>
 
-        {/* floor first */}
+        {/* interior: floor + azure LIFT (the lift is what funds the walls'
+            darkness — without it dark walls have no luminance to remove) */}
         <g clipPath={`url(#clip-${uid})`}>
           <Floor w={w} h={h} uid={uid} />
-          <rect x={D} y={D} width={w - D * 2} height="7" fill={`url(#drop-${uid})`} />
+          <rect x={L} y={T} width={w - L - R} height={h - T - B} fill="rgba(30,58,80,0.13)" />
+          {/* static micro-grain so the interior isn't machine-perfect */}
+          <rect x="0" y="0" width={w} height={h} fill="#0b1620" filter="url(#bronze-ws-f-fs)" opacity="0.28" />
+          {/* contact shadow the rim casts onto the lifted floor */}
+          <rect x={L} y={T} width={w - L - R} height="7" fill={`url(#drop-${uid})`} />
         </g>
 
         {/* THE walls: four mitred trapezoids sharing vertices — one geometry,
-            45° corners meet perfectly, no doubled lines */}
-        <polygon points={`0,0 ${w},0 ${w - D},${D} ${D},${D}`} fill={`url(#wt-${uid})`} />
-        <polygon points={`0,0 ${D},${D} ${D},${h - D} 0,${h}`} fill={`url(#wl-${uid})`} />
-        <polygon points={`0,${h} ${D},${h - D} ${w - D},${h - D} ${w},${h}`} fill={`url(#wb-${uid})`} />
-        <polygon points={`${w},0 ${w},${h} ${w - D},${h - D} ${w - D},${D}`} fill={`url(#wr-${uid})`} />
+            asymmetric depths, 45° miters meet perfectly (no doubled lines) */}
+        <polygon points={`0,0 ${w},0 ${w - R},${T} ${L},${T}`} fill={`url(#wt-${uid})`} />
+        <polygon points={`0,0 ${L},${T} ${L},${h - B} 0,${h}`} fill={`url(#wl-${uid})`} />
+        <polygon points={`0,${h} ${L},${h - B} ${w - R},${h - B} ${w},${h}`} fill={`url(#wb-${uid})`} />
+        <polygon points={`${w},0 ${w},${h} ${w - R},${h - B} ${w - R},${T}`} fill={`url(#wr-${uid})`} />
 
-        {/* rim break lines: dark where the surface tears (top/left), a kiss of
-            gold where the edge catches light (bottom/right) */}
-        <path d={`M 0.5,${h - 2} L 0.5,${RX} Q 0.5,0.5 ${RX},0.5 L ${w - 2},0.5`} fill="none" stroke="rgba(0,0,0,0.6)" strokeWidth="1" />
-        <path d={`M ${w - 0.5},2 L ${w - 0.5},${h - RX} Q ${w - 0.5},${h - 0.5} ${w - RX},${h - 0.5} L 2,${h - 0.5}`} fill="none" stroke="rgba(240,207,106,0.3)" strokeWidth="1" />
+        {/* miter seams: faint 45° facet hairlines at the corners — the chisel
+            cuts, echoing the notched-plaque language */}
+        <path d={`M 0,0 L ${L},${T} M ${w},0 L ${w - R},${T} M 0,${h} L ${L},${h - B} M ${w},${h} L ${w - R},${h - B}`} stroke="rgba(2,6,10,0.45)" strokeWidth="0.75" fill="none" />
+
+        {/* rim break lines: hard dark crease where the surface tears (top/left),
+            a solid gold kiss where the cut edge catches light (bottom/right) */}
+        <path d={`M 0.5,${h - 1} L 0.5,0.5 L ${w - 1},0.5`} fill="none" stroke="rgba(2,5,9,0.7)" strokeWidth="1" />
+        <path d={`M ${w - 0.5},1 L ${w - 0.5},${h - 0.5} L 1,${h - 0.5}`} fill="none" stroke="rgba(240,207,106,0.32)" strokeWidth="1" />
+        {/* inner lip catching light at the bottom of the well */}
+        <rect x={L + 1} y={h - B - 1.5} width={w - L - R - 2} height="1" fill="rgba(240,207,106,0.3)" />
+
+        {/* the floor's cut edge just below the opening — research: the single
+            strongest surviving recess cue on near-black */}
+        <line x1={3} y1={h + 1} x2={w - 3} y2={h + 1} stroke="rgba(223,184,87,0.17)" strokeWidth="1" />
       </svg>
       <div className="mp-content">{children}</div>
     </div>

@@ -146,5 +146,52 @@
     "legendNucleus": "Central core: critical success",
     "legendWound": "Crimson stripe: wound",
     "legendDeath": "Black stripe: death"
+  },
+  "world": {
+    "title": "World Surface",
+    "loading": "Loading world surface…",
+    "error": "Failed to load world surface",
+    "back": "Back",
+    "camera": {
+      "reset": "Reset camera"
+    },
+    "layers": {
+      "title": "Layers",
+      "scale": "Scale",
+      "offsetX": "Offset X",
+      "offsetY": "Offset Y",
+      "saveDefaults": "Save defaults"
+    },
+    "states": {
+      "default": "Default",
+      "corrupted": "Corrupted"
+    },
+    "region": {
+      "enchanted_forest": "Enchanted Forest"
+    },
+    "anchors": {
+      "village_01": "Village 01"
+    },
+    "debug": {
+      "title": "Debug",
+      "statesTitle": "States",
+      "camera": "Camera",
+      "mouseWorld": "Mouse (world)",
+      "activeState": "Active state",
+      "regions": "Regions",
+      "anchors": "Anchors",
+      "renderer": "Renderer",
+      "objects": "Objects",
+      "spawnObjects": "Spawn 60",
+      "clearObjects": "Clear"
+    }
+  },
+  "worldEvents": {
+    "weather": "Weather",
+    "threat": "Threat",
+    "resource": "Resource",
+    "weather-tint": "Weather Tint",
+    "threat-tint": "Threat Tint",
+    "resource-tint": "Resource Tint"
   }
 }

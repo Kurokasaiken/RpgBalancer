@@ -15,7 +15,7 @@ interface KanbanRow {
   lineNumber: number;
 }
 
-const ALLOWED_STATUSES = new Set(['Non assegnato', 'Assegnato', 'In corso', 'Completato']);
+const ALLOWED_STATUSES = new Set(['Non assegnato', 'Assegnato', 'Bloccato', 'In corso', 'Completato']);
 
 async function loadKanbanRows(): Promise<KanbanRow[]> {
   const kanbanPath = path.resolve(

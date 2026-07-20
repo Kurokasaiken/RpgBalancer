@@ -117,6 +117,10 @@ def parse_agent_assignments_rows() -> List[dict]:
             notes = columns[9] if len(columns) > 9 else columns[4]
             prompt_text = columns[-1] if columns[-1].startswith("```text") else notes
 
+            # Fallback: if no executor found in later columns, use the Agent column.
+            if not executor and columns[3] in known_executors:
+                executor = columns[3]
+
             row = {
                 "id": columns[0],
                 "status": columns[1],

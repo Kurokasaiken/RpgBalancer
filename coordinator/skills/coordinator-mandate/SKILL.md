@@ -76,6 +76,17 @@ When the Strategist provides a multi-phase plan (e.g., 4-phase trailer alignment
 - Do NOT wait for phase-by-phase prompt creation
 - Dependencies between phases are documented in prompt descriptions (e.g., "DEPENDS ON PHASE 1 COMPLETION")
 - This enables automatic dispatch workflow without manual intervention
+
+Plan-to-Kanban Registration Rule
+When the Coordinator receives or creates an implementation plan, the Coordinator MUST:
+- Break the plan into concrete tasks (one per step or per logical unit) and create one row in agent_assignments.md for each task
+- Register every task in agent_assignments.md before any task is dispatched
+- Assign an AI/agent to every task immediately (e.g. Cascade, harness, ai-worker)
+- Set status to "Assegnato" when the task has no pending dependencies and is ready to start
+- Set status to "Bloccato" when the task has unmet dependencies, must not be started, or is waiting for a gate
+- Tasks in status "Bloccato" must have the blocking reason documented in the notes column
+- Do NOT leave plan tasks in "Non assegnato" once the plan is accepted
+- Update both agent_assignments.md and strategy_tasks.md so strategy backlog and AI Kanban stay aligned
 Prompt Validation
 Run prompt:check to verify:
 
@@ -94,16 +105,17 @@ Paths are correct relative to project root
 No circular dependencies
 Component reuse opportunities are identified
 Prompt Lifecycle
-Non assegnato → Prompt received from Strategist
+Non assegnato → Prompt received from Strategist (temporary, must be assigned before dispatch)
+Assegnato → Prompt assigned to an AI, ready to start when dependencies are met
+Bloccato → Task has unmet dependencies, a missing gate, or an explicit hold; cannot be started
 In corso → Prompt dispatched to agent
 Completato → Agent completed with evidence
 Failed → Safeguard failure or blocker
-Blocked → Governance violation or missing dependency
 Dispatch Gates
 Prima di ogni dispatch (verso qualsiasi executor), esegui in ordine:
 1. Dependency gate: tutte le dependencies hanno status 'Completato'
 2. File-target audit cross-channel: i file_targets non sono occupati da task In corso in agent_assignments.md, ai-worker/kanban.json, o worktree harness attivi
-Se un gate fallisce: task resta 'Non assegnato' con nota del motivo. NON impostare executor='manual' per blocchi temporanei — solo per fallimenti permanenti (architectural o N retry falliti).
+Se un gate fallisce: task resta 'Bloccato' con nota del motivo. Non iniziare task bloccati finché il gate non passa. NON impostare executor='manual' per blocchi temporanei — solo per fallimenti permanenti (architectural o N retry falliti).
 Human Confirmation Policy
 Per sequenze di task già approvate dallo Strategist e inserite nel Kanban come "Non assegnato", il Coordinator NON chiede conferma umana prima del dispatch. Procede direttamente rispettando l'ordine delle dipendenze. Chiede conferma umana SOLO se:
 - Un dispatch gate fallisce per motivo non previsto

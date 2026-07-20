@@ -1,0 +1,59 @@
+{
+  "id": "IV-WORLD-SURFACE-002",
+  "objective": "World Surface Runtime Step 5 — implement WorldState with RuntimeObject and WorldEvent, connect events to visual state overrides and region tints, add i18n keys and unit tests.",
+  "execution_hint": "verified",
+  "priority": "high",
+  "dependencies": ["IV-WORLD-SURFACE-001"],
+  "file_targets": [
+    "src/engine/world/systems/WorldState.ts",
+    "src/engine/world/config/worldEventRegistry.ts",
+    "src/ui/idleVillage/hooks/useWorldSurface.ts"
+  ],
+  "invariants": [
+    "Use Zustand for WorldState store, scoped to world surface runtime",
+    "RuntimeObject and WorldEvent reuse existing Zod schemas from src/engine/world/model/",
+    "All user-facing strings go through react-i18next idleVillage namespace",
+    "No hardcoded gameplay values; read timings/IDs from existing configs",
+    "Persistence: if state must persist, use async PersistenceService only",
+    "Component Reuse: extend existing primitives in src/ui/idleVillage/ before creating new ones"
+  ],
+  "operations": [
+    "Create src/engine/world/systems/WorldState.ts with addObject, removeObject, moveObject, addEvent, removeEvent, tick, getObjectsByRegion, getActiveEvents selectors.",
+    "Update src/engine/world/config/worldEventRegistry.ts with built-in event types (weather, threat, resource) and their visual state override rules.",
+    "Extend src/ui/idleVillage/hooks/useWorldSurface.ts to consume WorldState and expose activeEvents + object collections to the renderer.",
+    "Update src/ui/idleVillage/components/WorldSurfaceRenderer.tsx to apply event-driven region tints and runtime object overlays using existing visual state system.",
+    "Add i18n keys in public/locales/en/idleVillage.json for event labels, region tint labels and runtime object tooltips.",
+    "Create tests/unit/idleVillage/WorldState.test.ts covering add/remove, tick lifecycle, visual override computation and region queries.",
+    "Run safeguards: npm run lint -- src/engine/world src/ui/idleVillage tests/unit/idleVillage public/locales/en, npm run test -- tests/unit/idleVillage/WorldState.test.ts, npm run build:check, npm run kanban:lint."
+  ],
+  "forbidden": [
+    "Direct localStorage/sessionStorage usage",
+    "Page-level transformation of runtime objects",
+    "Ad-hoc CSS files for new skins/themes",
+    "Skipping i18n for new user-facing strings"
+  ],
+  "assumptions": [
+    "World Surface Runtime Steps 1-4 are completed and the DOM renderer is working.",
+    "Zod schemas in src/engine/world/model/RuntimeObject.ts and WorldEvent.ts are already fixed and importable."
+  ],
+  "safeguards": [
+    "npm run lint -- src/engine/world src/ui/idleVillage tests/unit/idleVillage public/locales/en",
+    "npm run test -- tests/unit/idleVillage/WorldState.test.ts",
+    "npm run build:check",
+    "npm run kanban:lint"
+  ],
+  "output": [
+    "src/engine/world/systems/WorldState.ts",
+    "src/engine/world/config/worldEventRegistry.ts",
+    "updated src/ui/idleVillage/hooks/useWorldSurface.ts",
+    "updated src/ui/idleVillage/components/WorldSurfaceRenderer.tsx",
+    "updated public/locales/en/idleVillage.json",
+    "tests/unit/idleVillage/WorldState.test.ts",
+    "evidence log test-results/iv-world-surface-002-<YYYY-MM-DD>.log"
+  ],
+  "notes": [
+    "Implementation plan reference: src/docs/docs/plans/world_surface_runtime_implementation_plan.md §Step 5.",
+    "Region tint means a CSS filter/overlay applied to a WorldSurfaceRegion when an active WorldEvent targets it.",
+    "Visual state override means an event can force a layer or region to switch to a predefined visual state key from the manifest."
+  ]
+}

@@ -18,8 +18,6 @@ import { GenericPoiSkin } from '@/ui/idleVillage/frozen/kits/poiKit';
 import { TrailerThreatDetailPanel } from './TrailerThreatDetailPanel';
 import type { TrailerSceneProps } from './types';
 
-const EVENT_DELAY_MS = 600;
-const TIMER_DELAY_MS = 2800;
 const TIMER_UPDATE_MS = 1000;
 
 /**
@@ -37,12 +35,13 @@ export interface ThreatPoiConfig {
 }
 
 /**
- * Scene 1 iteration — goblin invasion event becomes a persistent on-screen timer.
+ * Scene 1 — Hearthstone-style goblin invasion announcement (3 seconds).
  *
  * Phases:
- *   1. intro: map + POIs fade in
- *   2. event: centered "GOBLIN INVASION" plaque
- *   3. timer: plaque collapses to a persistent top-bar countdown
+ *   1. announcement (0-3000ms): full map visible, dark vignette appears,
+ *      war horn, dust cloud, floating goblin sticker, title, subtitle,
+ *      bronze ring timer showing "5 DAYS REMAIN".
+ *   2. timer (3000ms+): announcement collapses to persistent top-bar countdown.
  */
 export const TrailerThreatIter: React.FC<TrailerSceneProps> = ({
   onComplete,
@@ -50,20 +49,17 @@ export const TrailerThreatIter: React.FC<TrailerSceneProps> = ({
   captureMode = false,
 }) => {
   const scene = trailerConfig.threat;
+  const announcement = scene.announcement;
   const pois = useMemo<ThreatPoiConfig[]>(() => scene.pois as unknown as ThreatPoiConfig[], [scene.pois]);
 
-  const [phase, setPhase] = useState<'intro' | 'event' | 'timer'>('intro');
+  const [phase, setPhase] = useState<'announcement' | 'timer'>('announcement');
   const [timeRemaining, setTimeRemaining] = useState(5 * 3600 + 47 * 60 + 12);
 
   useEffect(() => {
     if (!autoStart) return undefined;
-    const eventTimer = window.setTimeout(() => setPhase('event'), EVENT_DELAY_MS);
-    const timerTimer = window.setTimeout(() => setPhase('timer'), TIMER_DELAY_MS);
-    return () => {
-      window.clearTimeout(eventTimer);
-      window.clearTimeout(timerTimer);
-    };
-  }, [autoStart]);
+    const announcementTimer = window.setTimeout(() => setPhase('timer'), announcement.duration);
+    return () => window.clearTimeout(announcementTimer);
+  }, [autoStart, announcement.duration]);
 
   useEffect(() => {
     if (phase !== 'timer') return undefined;
@@ -79,48 +75,116 @@ export const TrailerThreatIter: React.FC<TrailerSceneProps> = ({
     return () => window.clearTimeout(timer);
   }, [autoStart, onComplete, scene.duration]);
 
+  useEffect(() => {
+    if (!autoStart || phase !== 'announcement') return undefined;
+    const audio = new Audio(encodeURI(announcement.warHorn));
+    audio.volume = 0.6;
+    audio.play().catch(() => {
+      // Placeholder audio is allowed to fail silently.
+    });
+    return undefined;
+  }, [autoStart, phase, announcement.warHorn]);
+
   return (
     <div className={`tti-root ${captureMode ? 'tti-capture-mode' : ''}`}>
       <style>{ttiStyles}</style>
 
-      <div className="tti-map" style={{ backgroundImage: `url(${scene.mapImage})` }} />
-      <div className="tti-vignette" />
+      <div
+        className="tti-map"
+        style={{ backgroundImage: `url(${encodeURI(scene.mapImage)})` }}
+      />
+      <div
+        className="tti-vignette"
+        style={{ opacity: phase === 'announcement' ? announcement.vignetteOpacity : 0 }}
+      />
+      <div
+        className="tti-dim"
+        style={{ opacity: phase === 'announcement' ? announcement.dimOpacity : 0 }}
+      />
 
-      {pois.map((poi) => (
+      {phase === 'announcement' && (
         <div
-          key={poi.id}
-          className="tti-poi"
+          className="tti-dust-cloud"
           style={{
-            position: 'absolute',
-            left: `${poi.x}%`,
-            top: `${poi.y}%`,
-            transform: 'translate(-50%, -50%)',
-            animationDelay: `${poi.delay}ms`,
+            width: announcement.dustCloud.width,
+            opacity: announcement.dustCloud.opacity,
+            animationDuration: `${announcement.dustCloud.duration}ms`,
+            animationDelay: `${announcement.dustCloud.delay}ms`,
           }}
-        >
-          <GenericPoiSkin
-            icon={poi.icon}
-            label={poi.label}
-            progress={0.35}
-            size={72}
-            pillar="wilderness"
-            enableHover={false}
-            dangerRating={poi.dangerRating}
-            showRiskBadges={false}
-          />
-        </div>
-      ))}
+        />
+      )}
 
-      {(phase === 'event' || phase === 'timer') && (
-        <div className={phase === 'event' ? 'tti-event-card' : 'tti-timer-bar'}>
-          <TrailerThreatDetailPanel
-            title={scene.eventTitle}
-            subtitle={phase === 'event' ? scene.subBanner : undefined}
-            plaque={scene.eventPlaque}
-            timeRemaining={timeRemaining}
-            poiIcon="⚔️"
-            mode={phase === 'event' ? 'event' : 'timer'}
-          />
+      <div
+        className="tti-ui"
+        style={{ filter: phase === 'announcement' ? announcement.dimFilter : 'none' }}
+      >
+        {pois.map((poi) => (
+          <div
+            key={poi.id}
+            className="tti-poi"
+            style={{
+              position: 'absolute',
+              left: `${poi.x}%`,
+              top: `${poi.y}%`,
+              transform: 'translate(-50%, -50%)',
+              animationDelay: `${poi.delay}ms`,
+            }}
+          >
+            <GenericPoiSkin
+              icon={poi.icon}
+              label={poi.label}
+              progress={0.35}
+              size={72}
+              pillar="wilderness"
+              enableHover={false}
+              dangerRating={poi.dangerRating}
+              showRiskBadges={false}
+            />
+          </div>
+        ))}
+
+        {phase === 'timer' && (
+          <div className="tti-panel tti-panel--timer">
+            <TrailerThreatDetailPanel
+              title={scene.eventTitle}
+              plaque={scene.eventPlaque}
+              timeRemaining={timeRemaining}
+              poiIcon="⚔️"
+              mode="timer"
+            />
+          </div>
+        )}
+      </div>
+
+      {phase === 'announcement' && (
+        <div className="tti-announcement">
+          <div
+            className="tti-sticker"
+            style={{
+              width: announcement.sticker.width,
+              filter: `drop-shadow(${announcement.sticker.glow})`,
+              animationDuration: `${announcement.sticker.bobDuration}ms`,
+            }}
+          >
+            <img src={encodeURI(scene.goblinImage)} alt="" />
+          </div>
+
+          <div className="tti-ring-wrap">
+            <div
+              className="tti-ring"
+              style={{
+                width: announcement.timerRing.size,
+                height: announcement.timerRing.size,
+                animationDuration: `${announcement.timerRing.rotationDuration}ms`,
+              }}
+            >
+              <span className="tti-ring__number">{announcement.timerRing.number}</span>
+            </div>
+            <span className="tti-ring__days">{announcement.timerRing.daysText}</span>
+          </div>
+
+          <h1 className="tti-title">{announcement.title}</h1>
+          <p className="tti-subtitle">{announcement.subtitle}</p>
         </div>
       )}
     </div>
@@ -143,19 +207,9 @@ const ttiStyles = `
     inset: 0;
     background-size: cover;
     background-position: center;
-    filter: brightness(0.42) saturate(1.15) contrast(1.08);
-    opacity: 0;
-    animation: tti-fade-in 0.8s ease forwards;
-  }
-
-  .tti-azure {
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(circle at 0% 0%, rgba(0, 229, 255, 0.18) 0%, transparent 42%),
-      radial-gradient(circle at 100% 80%, rgba(201, 162, 39, 0.06) 0%, transparent 35%);
-    mix-blend-mode: screen;
-    pointer-events: none;
+    filter: brightness(1) saturate(1) contrast(1);
+    opacity: 1;
+    transition: filter 0.8s ease;
   }
 
   .tti-vignette {
@@ -163,6 +217,38 @@ const ttiStyles = `
     inset: 0;
     background: radial-gradient(ellipse 90% 90% at 50% 50%, transparent 35%, rgba(2, 5, 8, 0.72) 80%, rgba(1, 2, 4, 0.92) 100%);
     pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    z-index: 10;
+  }
+
+  .tti-dim {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 11;
+  }
+
+  .tti-dust-cloud {
+    position: absolute;
+    top: 52%;
+    left: 110vw;
+    height: 22vh;
+    background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(160, 140, 120, 0.32) 0%, rgba(120, 100, 80, 0.18) 40%, transparent 75%);
+    filter: blur(20px);
+    pointer-events: none;
+    animation: tti-dust-move linear forwards;
+    z-index: 12;
+  }
+
+  .tti-ui {
+    position: absolute;
+    inset: 0;
+    transition: filter 0.4s ease;
+    z-index: 5;
   }
 
   .tti-poi {
@@ -172,25 +258,107 @@ const ttiStyles = `
     animation: tti-fade-in 0.7s ease forwards;
   }
 
-  .tti-event-card {
+  .tti-panel {
     position: absolute;
-    right: 4vw;
-    bottom: 6vh;
-    z-index: 10;
-    transform: scale(0.9);
-    transform-origin: bottom right;
+    z-index: 20;
+    pointer-events: none;
+    transition: top 0.7s ease, left 0.7s ease, transform 0.7s ease, opacity 0.7s ease;
+    animation: tti-fade-in 0.6s ease forwards;
+    width: 320px;
+  }
+
+  .tti-panel--timer {
+    top: 24px;
+    right: 24px;
+    left: auto;
+    transform: translate(0, 0);
+  }
+
+  .tti-announcement {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 30;
     pointer-events: none;
     animation: tti-fade-in 0.5s ease forwards;
   }
 
-  .tti-timer-bar {
-    position: absolute;
-    top: 24px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 20;
-    animation: tti-slide-down 0.5s ease forwards;
-    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.55));
+  .tti-sticker {
+    position: relative;
+    z-index: 31;
+    animation: tti-sticker-float ease-in-out infinite;
+  }
+
+  .tti-sticker img {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: drop-shadow(0 8px 24px rgba(0,0,0,0.65));
+  }
+
+  .tti-ring-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-top: 18px;
+    z-index: 31;
+  }
+
+  .tti-ring {
+    position: relative;
+    border-radius: 50%;
+    border: 3px solid rgba(201, 162, 39, 0.25);
+    border-top-color: #c9a227;
+    box-shadow: 0 0 18px rgba(201, 162, 39, 0.25), inset 0 0 12px rgba(201, 162, 39, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: tti-ring-spin linear infinite;
+  }
+
+  .tti-ring__number {
+    font-family: var(--skin-font-display, 'Cinzel', Georgia, serif);
+    font-size: 2rem;
+    font-weight: 900;
+    color: #c9a227;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.85);
+  }
+
+  .tti-ring__days {
+    font-family: var(--skin-font-sans, 'Lato', sans-serif);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--skin-text-primary, #f0efe4);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.85);
+  }
+
+  .tti-title {
+    margin: 18px 0 0;
+    font-family: var(--skin-font-display, 'Cinzel', Georgia, serif);
+    font-size: clamp(2rem, 5.5vw, 4.2rem);
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--skin-title-color, #f0efe4);
+    text-shadow: 0 3px 8px rgba(0,0,0,0.9);
+    text-align: center;
+  }
+
+  .tti-subtitle {
+    margin: 8px 0 0;
+    font-family: var(--skin-font-display, 'Cinzel', Georgia, serif);
+    font-size: clamp(0.8rem, 1.8vw, 1.1rem);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--skin-subtitle-color, #b8b5a6);
+    text-shadow: 0 2px 6px rgba(0,0,0,0.85);
+    text-align: center;
   }
 
   .tti-capture-mode .tti-debug {
@@ -202,14 +370,19 @@ const ttiStyles = `
     to { opacity: 1; }
   }
 
-  @keyframes tti-scale-in {
-    from { transform: scale(0.96); }
-    to { transform: scale(1); }
+  @keyframes tti-sticker-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
   }
 
-  @keyframes tti-slide-down {
-    from { opacity: 0; transform: translate(-50%, -20px); }
-    to { opacity: 1; transform: translate(-50%, 0); }
+  @keyframes tti-ring-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes tti-dust-move {
+    from { transform: translateX(0); }
+    to { transform: translateX(-220vw); }
   }
 `;
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import './fidelity-header.css';
 import ForgottenObservatory from './ForgottenObservatory';
+import NewObservatory from './NewObservatory';
 import PlateQuad from './PlateQuad';
 
 /**
@@ -56,9 +57,41 @@ export const VisualFidelityLabPage: React.FC = () => (
     </figure>
 
     {/* ── The rebuild, alone (blind step 1) ── */}
-    <figure style={{ width: 640, maxWidth: '100%', margin: '0 auto' }} data-testid="rebuild-column">
-      <ForgottenObservatory />
-    </figure>
+    <div style={{ display: 'flex', gap: '40px', justifyContent: 'center', flexWrap: 'wrap' }}>
+      <figure style={{ width: 640, maxWidth: '100%' }} data-testid="rebuild-column">
+        <figcaption
+          style={{
+            fontFamily: 'var(--skin-font-display)',
+            fontSize: 12,
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase',
+            color: 'var(--skin-title-color)',
+            textAlign: 'center',
+            margin: '0 0 14px',
+          }}
+        >
+          The Forgotten Observatory
+        </figcaption>
+        <ForgottenObservatory />
+      </figure>
+
+      <figure style={{ width: 640, maxWidth: '100%' }} data-testid="prototype-column">
+        <figcaption
+          style={{
+            fontFamily: 'var(--skin-font-display)',
+            fontSize: 12,
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase',
+            color: 'var(--skin-title-color)',
+            textAlign: 'center',
+            margin: '0 0 14px',
+          }}
+        >
+          The New Observatory (Prototype)
+        </figcaption>
+        <NewObservatory />
+      </figure>
+    </div>
 
     {/* ── Reference is deliberately BELOW the fold: view the rebuild first. ── */}
     <div
