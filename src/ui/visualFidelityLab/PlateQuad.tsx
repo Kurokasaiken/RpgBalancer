@@ -6,7 +6,7 @@ import {
   WanderlustSectionHeader,
   WanderlustAmbientField,
 } from '@/ui/wanderlust-surface/layout';
-import { SURFACE_MATERIAL, SURFACE_MATERIAL_LAYER } from './foundationRecipe';
+import { SURFACE_MATERIAL, SURFACE_MATERIAL_LAYER, FIELD_BACKGROUND, FIELD_VIGNETTE } from './foundationRecipe';
 import { PLATE_VARIANTS } from './plateVariants';
 
 /**
@@ -50,11 +50,8 @@ export const PlateQuad: React.FC = () => (
     <WanderlustAmbientField
       fireflyCount={0}
       style={{
-        background: [
-          'radial-gradient(circle at 50% -10%, rgba(0,229,255,0.12) 0%, rgba(0,150,255,0.03) 50%, transparent 80%)',
-          '#060f16',
-        ].join(', '),
-        boxShadow: 'inset 0 0 60px rgba(2,6,10,0.8)',
+        background: FIELD_BACKGROUND,
+        boxShadow: FIELD_VIGNETTE,
         borderRadius: 'inherit',
       }}
     >

@@ -23,6 +23,6 @@
     <string>/Users/faustoboni/progetti_personali/RPG/coordinator/coordinator-cron-error.log</string>
     
     <key>RunAtLoad</key>
-    <false/>
+    <true/>
 </dict>
 </plist>

@@ -148,6 +148,15 @@ const EXTRA_PAGES: TestPageLink[] = [
     icon: '🔬',
     status: 'ok',
   },
+  // Non-kit page: World Surface Runtime - multi-layer animated map for Wanderlust.
+  {
+    id: 'world-surface',
+    title: 'World Surface',
+    description: 'Multi-layer animated map: Wanderlust base variant with pan/zoom and debug panel',
+    path: '/world-surface',
+    icon: '🗺️',
+    status: 'ok',
+  },
 ];
 
 const TEST_PAGES: TestPageLink[] = [

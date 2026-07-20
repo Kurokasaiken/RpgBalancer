@@ -15,10 +15,10 @@
 
 import React, { useMemo } from 'react';
 import { WanderlustSurface } from '@/ui/wanderlust-surface';
-import { InsetPanelDelicate } from '@/ui/wanderlust-surface';
 import { WanderlustAmbientField } from '@/ui/wanderlust-surface/layout';
 import { GenericPoiSkin } from '@/ui/idleVillage/frozen/kits/poiKit';
-import { trailerConfig } from '@/balancing/config/idleVillage/trailerConfig';
+import { SkinScope } from '@/ui/idleVillage/skins/primitives';
+import { FIELD_BACKGROUND, FIELD_VIGNETTE, SURFACE_MATERIAL, SURFACE_MATERIAL_LAYER } from '@/ui/visualFidelityLab/foundationRecipe';
 
 /**
  * Format a total-seconds countdown into H:MM:SS.
@@ -47,15 +47,13 @@ export interface TrailerThreatDetailPanelProps {
   poiIcon?: string;
   /** Visual layout mode. */
   mode?: TrailerThreatDetailMode;
-  /** Optional test id. */
-  dataTestId?: string;
 }
 
 /**
  * TrailerThreatDetailPanel — reduced POI-detail fork for the threat scene.
  *
- * Renders a `WanderlustSurface` bronze frame over a Visual Fidelity Lab
- * teal/obsidian well, with a POI mirror, heraldic title, and a timer inset.
+ * Renders a `WanderlustSurface` bronze frame around a skin-system interior
+ * panel, with a POI mirror, title, and timer well.
  */
 export const TrailerThreatDetailPanel: React.FC<TrailerThreatDetailPanelProps> = ({
   title,
@@ -64,193 +62,155 @@ export const TrailerThreatDetailPanel: React.FC<TrailerThreatDetailPanelProps> =
   timeRemaining,
   poiIcon = '⚔️',
   mode = 'event',
-  dataTestId = 'trailer-threat-detail-panel',
 }) => {
-  const scene = trailerConfig.threat;
-  const baseOverlay = scene.baseTealOverlay;
   const timerText = useMemo(() => formatCountdown(timeRemaining), [timeRemaining]);
 
   const isEvent = mode === 'event';
 
   return (
-    <WanderlustSurface shape="panel" material="bronze" interactive={false}>
+    <WanderlustSurface
+      shape="panel"
+      material={SURFACE_MATERIAL}
+      interactive={false}
+      materialLayer={SURFACE_MATERIAL_LAYER}
+      style={{ width: '100%', borderRadius: 14 }}
+    >
       <WanderlustAmbientField
-        paused={false}
+        fireflyCount={isEvent ? 9 : 0}
         style={{
-          background: baseOverlay.background,
-          boxShadow: baseOverlay.boxShadow,
+          background: FIELD_BACKGROUND,
+          boxShadow: FIELD_VIGNETTE,
           borderRadius: 'inherit',
-          padding: isEvent ? '32px 44px' : '12px 22px',
         }}
       >
-        <div
-          data-testid={dataTestId}
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: isEvent ? 14 : 8,
-            textAlign: 'center',
-            minWidth: isEvent ? 320 : 520,
-          }}
-        >
-          {/* POI mirror */}
-          <GenericPoiSkin
-            icon={poiIcon}
-            progress={0.35}
-            size={isEvent ? 72 : 44}
-            pillar="wilderness"
-            enableHover={false}
-          />
-
-          {/* Plaque */}
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '5px 10px',
-              border: '1px solid rgba(180, 130, 30, 0.35)',
-              borderRadius: '5px',
-              background: 'rgba(201, 162, 39, 0.08)',
-              fontFamily: 'var(--skin-font-display, Cinzel, Georgia, serif)',
-              fontSize: '0.58rem',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.18em',
-              color: 'var(--skin-title-color, #c9a227)',
-              textShadow: '0 0 8px rgba(201, 162, 39, 0.55), 0 1px 2px rgba(0, 0, 0, 0.7)',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {plaque}
-          </div>
-
-          {/* Title / subtitle */}
-          {isEvent && (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-              <h1
-                style={{
-                  margin: 0,
-                  fontFamily: 'var(--skin-font-display, Cinzel, Georgia, serif)',
-                  fontSize: 'clamp(34px, 6vw, 72px)',
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.14em',
-                  lineHeight: 1.05,
-                  color: 'var(--skin-title-color, #c9a227)',
-                  textShadow: `
-                    0 0 28px rgba(201, 162, 39, 0.55),
-                    0 2px 0 rgba(0, 0, 0, 0.85),
-                    0 -1px 0 rgba(255, 255, 255, 0.06)
-                  `,
-                  filter: 'drop-shadow(0 10px 18px rgba(0, 0, 0, 0.75))',
-                }}
-              >
-                {title}
-              </h1>
-              {subtitle && (
-                <p
-                  style={{
-                    margin: 0,
-                    fontFamily: 'var(--skin-font-display, Cinzel, Georgia, serif)',
-                    fontSize: 'clamp(12px, 1.6vw, 16px)',
-                    fontWeight: 500,
-                    letterSpacing: '0.18em',
-                    textTransform: 'uppercase',
-                    color: 'var(--skin-text-secondary, #a7b0b3)',
-                    textShadow: '0 1px 2px rgba(0, 0, 0, 0.85)',
-                    textAlign: 'center',
-                    maxWidth: 520,
-                  }}
-                >
-                  {subtitle}
-                </p>
+        <SkinScope>
+          <div style={{ padding: isEvent ? 26 : 12 }}>
+          {/* ── Header (plaque + incised title + subtitle) ── */}
+          <div className="skin-title-row">
+            <span className="skin-plaque" style={{ userSelect: 'none' }}>{plaque}</span>
+            <div style={{ flex: '1 1 auto' }}>
+              {isEvent && (
+                <>
+                  <h2
+                    style={{
+                      margin: 0,
+                      fontFamily: 'var(--skin-font-display)',
+                      fontSize: 'var(--skin-title-size)',
+                      fontWeight: 900,
+                      letterSpacing: '0.06em',
+                      textTransform: 'uppercase',
+                      color: 'var(--skin-title-color)',
+                      textShadow: '0 2px 4px rgba(0,0,0,0.85)',
+                    }}
+                  >
+                    {title}
+                  </h2>
+                  {subtitle && (
+                    <p
+                      style={{
+                        margin: '2px 0 0',
+                        fontFamily: 'var(--skin-font-display)',
+                        fontSize: 'var(--skin-subtitle-size)',
+                        letterSpacing: 'var(--skin-subtitle-tracking)',
+                        textTransform: 'uppercase',
+                        color: 'var(--skin-subtitle-color)',
+                      }}
+                    >
+                      {subtitle}
+                    </p>
+                  )}
+                </>
               )}
             </div>
-          )}
+          </div>
+
+          <div className="skin-titlesep">
+            <span className="skin-titlesep__line" />
+            <span className="skin-titlesep__diamond">✦</span>
+            <span className="skin-titlesep__line" />
+          </div>
+
+          {/* POI mirror */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: isEvent ? 14 : 8 }}>
+            <GenericPoiSkin
+              icon={poiIcon}
+              progress={0.35}
+              size={isEvent ? 72 : 44}
+              pillar="wilderness"
+              enableHover={false}
+            />
+          </div>
 
           {/* Timer well */}
-          <InsetPanelDelicate material="bronze" style={{ width: '100%' }}>
+          <div style={{ padding: '15px 17px', background: 'linear-gradient(180deg, #11191e, #08121a)', borderRadius: 8, border: '1px solid rgba(7,16,26,0.4)', boxShadow: 'inset 0 2px 6px rgba(7,16,26,0.65), inset 0 1px 0 rgba(9,18,28,0.55)' }}>
             <div
               style={{
                 display: 'flex',
+                flexDirection: 'column',
                 alignItems: 'center',
-                justifyContent: 'center',
-                gap: isEvent ? 18 : 24,
+                gap: 2,
+                padding: isEvent ? '14px 16px' : '8px 12px',
               }}
             >
               {!isEvent && (
                 <span
+                  data-skin="title"
                   style={{
-                    fontFamily: 'var(--skin-font-display, Cinzel, Georgia, serif)',
+                    fontFamily: 'var(--skin-font-display)',
                     fontSize: '0.65rem',
                     fontWeight: 700,
-                    letterSpacing: '0.16em',
+                    letterSpacing: '0.22em',
                     textTransform: 'uppercase',
-                    color: 'var(--skin-title-color, #c9a227)',
-                    textShadow: '0 0 8px rgba(201, 162, 39, 0.45), 0 1px 2px rgba(0,0,0,0.8)',
+                    color: 'var(--skin-title-color)',
                   }}
                 >
                   {title}
                 </span>
               )}
 
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  color: 'var(--skin-text-secondary, #a7b0b3)',
-                }}
-              >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ width: 40, height: 1, background: 'var(--skin-titlesep-line)' }} />
                 <span
                   style={{
-                    width: 40,
-                    height: 1,
-                    background: 'linear-gradient(90deg, transparent, rgba(180, 130, 30, 0.55), transparent)',
+                    fontSize: 11,
+                    color: 'var(--skin-titlesep-diamond-color)',
+                    textShadow: 'var(--skin-titlesep-diamond-glow)',
                   }}
-                />
-                <span style={{ fontSize: 11, color: 'var(--skin-title-color, #c9a227)', opacity: 0.8 }}>◆</span>
-                <span
-                  style={{
-                    width: 40,
-                    height: 1,
-                    background: 'linear-gradient(90deg, transparent, rgba(180, 130, 30, 0.55), transparent)',
-                  }}
-                />
+                >
+                  ◆
+                </span>
+                <span style={{ width: 40, height: 1, background: 'var(--skin-titlesep-line)' }} />
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                 <span
+                  className="skin-text-secondary"
                   style={{
-                    fontFamily: 'var(--skin-font-display, Cinzel, Georgia, serif)',
+                    fontFamily: 'var(--skin-font-display)',
                     fontSize: '0.5rem',
                     fontWeight: 700,
                     letterSpacing: '0.22em',
                     textTransform: 'uppercase',
-                    color: 'var(--skin-text-secondary, #a7b0b3)',
-                    textShadow: '0 1px 1px rgba(0, 0, 0, 0.7)',
                   }}
                 >
                   TIME REMAINING
                 </span>
                 <span
+                  data-skin="title"
                   style={{
-                    fontFamily: "'Lato', var(--skin-font-display, Cinzel), sans-serif",
+                    fontFamily: 'var(--skin-font-sans)',
                     fontSize: isEvent ? '1.55rem' : '1.35rem',
                     fontWeight: 700,
                     letterSpacing: '0.08em',
-                    color: '#f0cf6a',
-                    textShadow: '0 0 12px rgba(240, 207, 106, 0.4), 0 2px 4px rgba(0, 0, 0, 0.85)',
                   }}
                 >
                   {timerText}
                 </span>
               </div>
             </div>
-          </InsetPanelDelicate>
+          </div>
         </div>
+        </SkinScope>
       </WanderlustAmbientField>
     </WanderlustSurface>
   );

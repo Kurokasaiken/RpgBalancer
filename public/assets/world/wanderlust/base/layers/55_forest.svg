@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1248" height="832" viewBox="0 0 1248 832" preserveAspectRatio="none">
+  <defs>
+    <clipPath id="enchantedForestClip">
+      <rect x="200" y="100" width="500" height="400" rx="24" ry="24" />
+    </clipPath>
+    <pattern id="treePattern" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+      <g transform="translate(40, 40) scale(0.9)">
+        <polygon points="0,-28 18,12 -18,12" fill="#1e4d2b" />
+        <polygon points="0,-22 14,6 -14,6" fill="#2d6a3f" />
+        <rect x="-3" y="12" width="6" height="10" fill="#3d2b1f" />
+      </g>
+    </pattern>
+    <radialGradient id="forestGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#3a9d5d" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#1e4d2b" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <rect width="1248" height="832" fill="url(#treePattern)" clip-path="url(#enchantedForestClip)" opacity="0.92" />
+  <rect width="1248" height="832" fill="url(#forestGlow)" clip-path="url(#enchantedForestClip)" opacity="0.4" />
+</svg>

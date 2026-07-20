@@ -1,5 +1,5 @@
 import React from 'react';
-import { WanderlustSurface, InsetPanel } from '@/ui/wanderlust-surface';
+import { WanderlustSurface } from '@/ui/wanderlust-surface';
 import {
   WanderlustField,
   WanderlustFieldGroup,
@@ -9,7 +9,8 @@ import {
   WanderlustSectionHeader,
   WanderlustAmbientField,
 } from '@/ui/wanderlust-surface/layout';
-import { SURFACE_MATERIAL, SURFACE_MATERIAL_LAYER } from './foundationRecipe';
+import { SURFACE_MATERIAL, SURFACE_MATERIAL_LAYER, FIELD_BACKGROUND, FIELD_VIGNETTE, GOLD_FILET_SHADOW } from './foundationRecipe';
+import { WellBronzeBezel } from './plateVariants';
 
 /**
  * REBUILD — "The Forgotten Observatory".
@@ -41,16 +42,13 @@ export const ForgottenObservatory: React.FC = () => (
     <WanderlustAmbientField
       fireflyCount={9}
       style={{
-        // V9 "anima": azure light leak raining from above + sacred obsidian base
-        // + inner vignette for edge depth. NOTE: `--skin-surface-bg` already
-        // carries a top-LEFT leak; the earlier warm-teal overlay is what muddied
-        // it into flat dark-mode grey. In extraction, the well background should
-        // simply BE this token — no per-component overlay.
-        background: [
-          'radial-gradient(circle at 50% -10%, rgba(0,229,255,0.12) 0%, rgba(0,150,255,0.03) 50%, transparent 80%)',
-          '#060f16',
-        ].join(', '),
-        boxShadow: 'inset 0 0 60px rgba(2,6,10,0.8)',
+        // V9 "anima", LIFTED (see foundationRecipe.FIELD_BACKGROUND): azure
+        // light raining from above onto a deep-night field that breathes —
+        // no longer near-black. The wells keep darker floors, so they now
+        // read recessed by rank ordering ("lighten the surroundings, not
+        // the hole").
+        background: FIELD_BACKGROUND,
+        boxShadow: FIELD_VIGNETTE,
         borderRadius: 'inherit',
       }}
     >
@@ -117,7 +115,8 @@ export const ForgottenObservatory: React.FC = () => (
             provider not in the grammar). Composed here "poor" as a channel CARVED
             into slate: sharp 2px corners + deep inset shadow, green sap flowing
             inside. Spec for a future materic StatBar primitive. */}
-        <InsetPanel style={{ marginBottom: 14 }}>
+        <div style={{ position: 'relative', marginBottom: 14, padding: '15px 17px', background: 'linear-gradient(180deg, #040a11, #020509)', borderRadius: 8, boxShadow: 'inset 0 1px 0 rgba(224,178,66,0.10), inset 0 2px 8px rgba(0,0,0,0.7)' }}>
+          <WellBronzeBezel />
           <WanderlustSectionHeader tier="tertiary" hint="charting the dome" marginBottom="sm">
             Observatory Progress
           </WanderlustSectionHeader>
@@ -152,27 +151,43 @@ export const ForgottenObservatory: React.FC = () => (
             </div>
             <span style={{ fontFamily: 'var(--skin-font-sans, system-ui)', fontSize: 11, color: 'var(--skin-body-color)', whiteSpace: 'nowrap' }}>63/100</span>
           </div>
-        </InsetPanel>
+        </div>
 
-        {/* ── Well 2: reward reveal — DIFFERENTIATED as a special plaque ── */}
-        {/* REFINEMENT: breaks the "box in box" monotony. Notched 45° top corners
-            (clip-path) + gold inset hairline read it as a reward plaque, not a
-            status container. Spec for a future "plaque" InsetPanel variant. */}
+        {/* ── Well 2: reward reveal — DIFFERENTIATED as a special reward plaque ── */}
+        {/* Not a status well: a reward is PRESENTED on the surface, framed in gold.
+            The muddy-brown bg is GONE — obsidian floor (blue-black, on-palette),
+            lifted a hair at the top (photons up). Notched 45° top corners + the
+            thin GOLD_FILET frame (isolated in foundationRecipe — first consumer)
+            + ONE bright-gold focal (the reward name) read it as precious, not a
+            box. It sits RAISED above the field (drop-shadow follows the notched
+            silhouette) — the one element that comes toward you = the prize. */}
         <div
           style={{
             position: 'relative',
             marginBottom: 14,
             padding: '15px 17px',
-            background: 'rgba(9,6,3,0.86)',
+            background: [
+              // whisper warm reward-glow raining from the top notch (focal, restrained)
+              'radial-gradient(130% 90% at 50% 0%, rgba(224,178,66,0.09) 0%, transparent 55%)',
+              // obsidian floor — cool blue-black, lifted a hair at the top
+              'linear-gradient(180deg, #0b1620 0%, #060f16 100%)',
+            ].join(', '),
             clipPath: 'polygon(13px 0, calc(100% - 13px) 0, 100% 13px, 100% 100%, 0 100%, 0 13px)',
-            boxShadow: 'inset 0 0 0 1px rgba(196,146,42,0.55), inset 0 1px 0 rgba(224,178,66,0.2), inset 0 -1px 0 rgba(0,0,0,0.4)',
+            boxShadow: GOLD_FILET_SHADOW,
+            // raised off the field — drop-shadow (not box-shadow) so it follows the notched silhouette
+            filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.5))',
           }}
         >
-          <WanderlustSectionHeader tier="tertiary" marginBottom="sm">Ancient Compass</WanderlustSectionHeader>
+          <WanderlustSectionHeader tier="tertiary" marginBottom="sm">Reward Recovered</WanderlustSectionHeader>
           <WanderlustField
             orientation="horizontal"
             label="Reward"
-            value="Ancient Compass"
+            tier="tertiary"
+            value={
+              <span style={{ color: '#f0cf6a', textShadow: '0 0 14px rgba(240,207,106,0.28), 0 1px 0 rgba(0,0,0,0.6)' }}>
+                Ancient Compass
+              </span>
+            }
           />
           <p style={{ margin: '6px 0 0', fontFamily: 'var(--skin-font-serif)', fontSize: '12px', color: 'var(--skin-body-color)', opacity: 0.85 }}>
             A brass astrolabe that points not north, but toward the nearest undiscovered ruin.
@@ -180,7 +195,8 @@ export const ForgottenObservatory: React.FC = () => (
         </div>
 
         {/* ── Well 3: repeated slot well — COMPOSED "poor" from primitives ── */}
-        <InsetPanel style={{ marginBottom: 4 }}>
+        <div style={{ position: 'relative', marginBottom: 4, padding: '15px 17px', background: 'linear-gradient(180deg, #040a11, #020509)', borderRadius: 8, boxShadow: 'inset 0 1px 0 rgba(224,178,66,0.10), inset 0 2px 8px rgba(0,0,0,0.7)' }}>
+          <WellBronzeBezel />
           <WanderlustSectionHeader tier="tertiary" hint="assigned" marginBottom="sm">Required Crew</WanderlustSectionHeader>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 10 }}>
             {[
@@ -244,7 +260,7 @@ export const ForgottenObservatory: React.FC = () => (
               </div>
             ))}
           </div>
-        </InsetPanel>
+        </div>
 
         <WanderlustDivider />
 

@@ -165,8 +165,25 @@ Implemented on 2026-07-17 by Cascade:
 - **VFL base:** `#060f16` obsidian + radial azure light leak from top, box-shadow inset.
 - **Route:** `/trailer-threat-iter` unchanged.
 
-Safeguards passed: lint, build:check, kanban:lint, smoke test (200, no console errors).
-Evidence: `test-results/trailer-threat-iter-v2-2026-07-17.log`.
+Updated on 2026-07-18 by Cascade:
+
+- **Detail panel skin:** `TrailerThreatDetailPanel.tsx` refactored to use `SkinScope` + `--skin-*` tokens, `SkinTitle`, and `data-skin="panel"`; removed `WanderlustAmbientField` and `InsetPanelDelicate` dependencies; preserved `WanderlustSurface` bronze frame.
+- **Stage positioning:** `TrailerThreatIter.tsx` event panel now centers on screen; the timer panel transitions to the top-right (via CSS `transition`) when the phase changes.
+
+Safeguards passed: lint, build:check, kanban:lint, test (pass with no tests), smoke test (200, no console errors).
+Evidence: `test-results/trailer-threat-iter-v2-2026-07-18.log`.
+
+Updated on 2026-07-18 by Cascade (IV-TRAILER-ANNOUNCE-001):
+
+- **Fase 1 Announcement:** 3-second Hearthstone-style reveal in `TrailerThreatIter.tsx`.
+- **Config:** `trailerConfig.threat.announcement` added with timing, vignette, dust cloud, sticker, bronze ring, war horn placeholder.
+- **Audio:** `public/audio/war-horn.mp3` placeholder created.
+- **Visuals:** Full map visible, dark vignette (25%), UI dimmed, dust cloud CSS animation, floating goblin sticker, "GOBLIN INVASION" + subtitle + "5 DAYS REMAIN" + rotating bronze ring, no buttons.
+- **Detail panel:** not modified (sticker presentation handled in scene component).
+- **Route:** `/trailer-threat-iter` unchanged.
+
+Safeguards passed: lint, build:check, kanban:lint.
+Evidence: `test-results/iv-trailer-announce-001-2026-07-18.log`.
 
 ---
 
