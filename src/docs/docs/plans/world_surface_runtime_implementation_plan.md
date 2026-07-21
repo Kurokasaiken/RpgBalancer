@@ -271,8 +271,11 @@ npm run kanban:lint
 
 ## 9. Changelog
 
+<!-- markdownlint-disable MD060 -->
 | Data       | Autore                  | Modifica                                                                                                                                                |
 |------------|-------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
 | 2026-07-19 | Strategia / Coordinator | Contratto schema Zod, manifest, README, roadmap Step 1-3 approvati.                                                                                     |
 | 2026-07-19 | Cascade                 | Step 1-3 implementati: asset pipeline, Zod schemas, useWorldSurface hook, WorldSurfaceRenderer DOM, DebugPanel, TestHub page. Safeguards pass. |
 | 2026-07-19 | Cascade                 | Step 6 implementato: renderer config, scelta DOM/WebGL basata su soglia/oggetti/particle/shader, WorldSurfacePixiOverlay con Pixi.js, controlli debug spawn/clear. Safeguards pass. |
+| 2026-07-21 | Strategia               | v2.0 direction: component-based world surface with semantic grouping defined in `component_based_world_surface_plan.md`. Manifest v1 remains supported through in-memory migration. |
+<!-- markdownlint-enable MD060 -->

@@ -3,14 +3,44 @@ title: Prompt Library
 description: Prompt reference catalog aligned with the DNA Prismatic Wanderlust art direction.
 ---
 
-## Prompt Library
+## Creature IP Development System
 
+> This catalog is part of the Creature IP Development System. Prompts are derived from canonical identity cards, not the other way around.
+>
 > Reference: [DNA Prismatic Wanderlust – Art Style Bible](../plans/art_direction_plan.md)
 >
 > **Dev tooling:** in modalità sviluppo, tutti i prompt e la Style Bible sono navigabili dalla pagina “Prompt & Bible Style” (tab dedicato nel menu Observatory). La UI legge dinamicamente questo documento, quindi ogni modifica qui verrà esposta automaticamente.
 
-1. Elemento uno
-2. Elemento due
+### Core Principles
+
+- **Identity before image.** A creature must have a documented reason to exist before any prompt is generated.
+- **Canon is explicit.** AI outputs are not world truth until reviewed and versioned.
+- **Creative memory matters.** Rejected directions and decisions are preserved.
+- **Family DNA first.** New creatures inherit mandatory traits from their family.
+
+### Workflow
+
+1. Write the [design-intent](../art-direction/creatures/creatures/gnarled-nightmare/design-intent.md) first.
+2. Check the [family-dna](../art-direction/creatures/families/forest-parasites/family-dna.md).
+3. Write the [identity](../art-direction/creatures/creatures/gnarled-nightmare/identity.md) card.
+4. Run the Coherence Test against family DNA and kill list.
+5. Generate the [prompt](../art-direction/creatures/creatures/gnarled-nightmare/prompt.md) from identity only.
+6. Produce the [reference-card](../art-direction/creatures/creatures/gnarled-nightmare/reference-card.md).
+7. Review and approve; move to `canonical`; write `versions/v1.0.0.md`.
+8. Update the [registry](../art-direction/creatures/registry.md).
+
+### Creature Registry
+
+| Creature | Family | Status | Version |
+| --- | --- | --- | --- |
+| [Gnarled Nightmare](../art-direction/creatures/creatures/gnarled-nightmare/identity.md) | Forest Parasites | canonical | 1.0.0 |
+| [Bronze Relic Guardian](../art-direction/creatures/creatures/bronze-relic-guardian/identity.md) | Ancient Constructs | canonical | 1.0.0 |
+| [Emerald Scale Serpent](../art-direction/creatures/creatures/emerald-scale-serpent/identity.md) | Mythic Beasts | canonical | 1.0.0 |
+| [Momentum Bruiser](../art-direction/creatures/creatures/momentum-bruiser/identity.md) | Beasts | canonical | 1.0.0 |
+
+### Legacy Prompts
+
+The prompts below are retained as historical references and examples.
 
 ## Master Prompt + Child Pipeline Examples
 

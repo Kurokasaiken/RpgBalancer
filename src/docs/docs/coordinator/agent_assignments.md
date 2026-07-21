@@ -6269,7 +6269,7 @@ Export: `ModifierRegistrySchema`, `defaultModifierRegistry`, `ModifierRegistry`
 EVIDENCE LOG
 - test-results/gm-reg-modifier-registry-<YYYY-MM-DD>.log
 ```
-| GM-ENG – Gameplay Modifier Engine Implementation | Assegnato | harness | 2026-07-15T09:42:56.144Z | Implementare engine per evaluation e stacking di gameplay modifiers |
+| GM-ENG – Gameplay Modifier Engine Implementation | Completato | harness | 2026-07-20T14:28:02.314Z | Implementare engine per evaluation e stacking di gameplay modifiers. Dipende da GM-REG (completato). Prompt: prompts/GM-ENG.md |
 AGENT
 Gameplay Engine Specialist – Modifier Evaluation
 
@@ -6347,7 +6347,7 @@ Export: `EngineConfigSchema`, `defaultEngineConfig`, `EngineConfig`
 EVIDENCE LOG
 - test-results/gm-eng-modifier-engine-<YYYY-MM-DD>.log
 ```
-| GM-MP – Core Plan Updates for Gameplay Modifier System | Assegnato | harness | 2026-07-15T09:42:56.149Z | Aggiornare piani esistenti per integrare gameplay modifier registry |
+| GM-MP – Core Plan Updates for Gameplay Modifier System | Bloccato | harness | 2026-07-15T09:42:56.149Z | Bloccato in attesa completamento GM-ENG. Prompt: prompts/GM-MP.md (da creare quando sbloccato). |
 AGENT
 Documentation Specialist – Plan Integration
 
@@ -6423,7 +6423,7 @@ CONFIG STRUCTURE
 EVIDENCE LOG
 - test-results/gm-mp-plan-updates-<YYYY-MM-DD>.log
 ```
-| GM-BLD – Builder & Tooling Guidelines for Modifier Registry | Assegnato | harness | 2026-07-15T09:42:56.156Z | Creare guidelines e tooling per modifier registry usage |
+| GM-BLD – Builder & Tooling Guidelines for Modifier Registry | Bloccato | harness | 2026-07-15T09:42:56.156Z | Bloccato in attesa completamento GM-MP. Prompt: prompts/GM-BLD.md (da creare quando sbloccato). |
 AGENT
 Developer Tools Specialist – Modifier Tooling
 
@@ -6501,7 +6501,7 @@ Export: `BuilderConfigSchema`, `defaultBuilderConfig`, `BuilderConfig`
 EVIDENCE LOG
 - test-results/gm-bld-builder-tooling-<YYYY-MM-DD>.log
 ```
-| GM-TEL – Gameplay Modifier Telemetry & Logging Pipeline | Assegnato | harness | 2026-07-15T09:42:56.162Z | Implementare telemetry pipeline completa per modifier lifecycle |
+| GM-TEL – Gameplay Modifier Telemetry & Logging Pipeline | Bloccato | harness | 2026-07-15T09:42:56.162Z | Bloccato in attesa completamento GM-BLD. Prompt: prompts/GM-TEL.md (da creare quando sbloccato). |
 AGENT
 Telemetry Specialist – Modifier Analytics
 
@@ -11114,6 +11114,7 @@ NOTE:
 | IV-WORLD-SURFACE-001 — World Surface Runtime Step 1-3 (asset pipeline + schemas + TestHub) | Completato | - | Cascade | - | - | - | - | 2026-07-19 | Evidence: test-results/iv-world-surface-001-2026-07-19.log. Prompt: coordinator/manual-dispatch/completed/IV-WORLD-SURFACE-001.md. |
 | IV-WORLD-SURFACE-002 — World Surface Runtime Step 5 (runtime objects & events) | Completato | IV-WORLD-SURFACE-001 | harness | - | 2026-07-19T11:15:23.909Z | - | - | 2026-07-19T11:15:23.907Z | Implement WorldState with RuntimeObject and WorldEvent; connect events to visual states and region tints. Plan: src/docs/docs/plans/world_surface_runtime_implementation_plan.md §Step 5. |
 | IV-WORLD-SURFACE-003 — World Surface Runtime Step 6 (advanced renderer evaluation) | Completato | IV-WORLD-SURFACE-002 | Cascade | - | - | - | - | 2026-07-19T11:48:50Z | Evidence: test-results/iv-world-surface-003-2026-07-19.md. Evaluate Pixi/WebGL renderer when runtime objects > 50 or heavy particles. Plan: src/docs/docs/plans/world_surface_runtime_implementation_plan.md §Step 6. |
+| WORLD-PRESENTATION-RUNTIME-FOUNDATION — World Presentation Runtime Foundation | In corso | 2026-07-20 | Cascade | prompt:check passed; execution by Cascade (manual) 2026-07-20 | manual | execution_hint architectural, design judgment | Prompt: prompts/WORLD-PRESENTATION-RUNTIME-FOUNDATION.md |
 
 ### Brief Description
 Create AstrolabeTrailerController that demonstrates DestinyAstrolabe can be controlled for deterministic capture. This is Sprint 1 from the approved trailer vertical slice plan, focusing on the hero shot (Scene 4: Risk).

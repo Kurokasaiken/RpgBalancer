@@ -164,7 +164,8 @@
     },
     "states": {
       "default": "Default",
-      "corrupted": "Corrupted"
+      "corrupted": "Corrupted",
+      "threatened": "Threatened"
     },
     "region": {
       "enchanted_forest": "Enchanted Forest"
@@ -193,5 +194,43 @@
     "weather-tint": "Weather Tint",
     "threat-tint": "Threat Tint",
     "resource-tint": "Resource Tint"
+  },
+  "presentation": {
+    "play": "Play",
+    "pause": "Pause",
+    "step": "Step",
+    "seed": "Seed",
+    "tick": "Tick",
+    "objects": "Objects",
+    "layers": "Layers",
+    "states": {
+      "unknown": "Unknown"
+    },
+    "director": {
+      "title": "World Presentation Director"
+    },
+    "scenarios": {
+      "title": "Scenario",
+      "peaceful": "Peaceful",
+      "threat": "Threat",
+      "corruption": "Corruption"
+    }
+  },
+  "threatStatus": {
+    "title": "THREAT STATUS",
+    "page": {
+      "title": "Threat Status Indicator",
+      "description": "Client-only component showcase for use client directive"
+    },
+    "urgency": {
+      "calm": "CALM",
+      "warning": "WARNING",
+      "critical": "CRITICAL"
+    },
+    "type": {
+      "GOBLIN_RAID": "Goblin Raid",
+      "PLAGUE": "Plague",
+      "SIEGE": "Siege"
+    }
   }
 }

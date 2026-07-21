@@ -17,6 +17,7 @@ interface WorldSurfaceRendererProps {
   camera: { panX: number; panY: number; zoom: number };
   onCameraChange: (camera: { panX: number; panY: number; zoom: number }) => void;
   activeVisualStateId?: string;
+  visualStateOverrides?: WorldSurfaceVisualStateOverride[];
   visibleLayerIds?: Set<string> | string[];
   layerScales?: Record<string, number>;
   layerOffsets?: Record<string, { x: number; y: number }>;
@@ -120,6 +121,7 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
   camera,
   onCameraChange,
   activeVisualStateId,
+  visualStateOverrides = [],
   visibleLayerIds,
   layerScales,
   layerOffsets,
@@ -161,8 +163,13 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
   }, [activeVisualStateId, manifest.visualStates, visualStateMap]);
 
   const activeOverrides = useMemo(() => {
-    return visualStateMap.get(resolvedActiveStateId)?.overrides ?? [];
-  }, [resolvedActiveStateId, visualStateMap]);
+    const stateOverrides = visualStateMap.get(resolvedActiveStateId)?.overrides ?? [];
+    // Runtime overrides are applied after state overrides so effects can refine
+    // the active visual state without editing the manifest.
+    return visualStateOverrides.length > 0
+      ? [...stateOverrides, ...visualStateOverrides]
+      : stateOverrides;
+  }, [resolvedActiveStateId, visualStateMap, visualStateOverrides]);
 
   const effectiveLayers = useMemo<EffectiveLayer[]>(() => {
     const visibleSet =

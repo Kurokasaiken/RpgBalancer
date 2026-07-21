@@ -59,6 +59,7 @@ Questo documento elenca le pagine raggiungibili da `/test-hub` con il loro stato
 | `/trailer-consequence` | Trailer: Consequence | `src/ui/idleVillage/trailer/TrailerConsequencePage.tsx` | **Marketing** | Scene 5 — Consequence with V9 Explorer Journal theme. | `TrailerConsequence` |
 | `/trailer-legacy` | Trailer: Legacy | `src/ui/idleVillage/trailer/TrailerLegacyPage.tsx` | **Marketing** | Scene 6 — Legacy with V9 Explorer Journal theme. | `TrailerLegacy` |
 | `/trailer-outro` | Trailer: Outro | `src/ui/idleVillage/trailer/TrailerOutroPage.tsx` | **Marketing** | Scene 7 — Outro CTA with V9 Explorer Journal theme. | `TrailerOutro` |
+| `/use-client` | Use Client | `src/ui/idleVillage/pages/UseClientPage.tsx` | **L1** | Client-only `ThreatStatusIndicator` showcase with `use client` directive, i18n and config-first urgency tokens. | `ThreatStatusIndicator`, `threatStatusConfig` |
 
 ---
 

@@ -3,6 +3,7 @@ import styleBibleRaw from '@docs/plans/art_direction_plan.md?raw';
 import promptLibraryRaw from '@docs/prompts/prompt_library.md?raw';
 import { PromptReferenceGallery } from './PromptReferenceGallery';
 import './promptStyles.css';
+import { CreatureDevelopmentRoom } from './CreatureDevelopmentRoom';
 
 const assetModules = import.meta.glob<{ default: string }>('@/assets/**/*', { eager: true });
 const assetUrlMap = new Map<string, string>();
@@ -304,6 +305,7 @@ export function PromptAndBibleStylePage() {
         </header>
 
         <section className="space-y-4">
+          <CreatureDevelopmentRoom />
           <div className="default-card border border-white/10 p-4 shadow-[0_15px_35px_rgba(0,0,0,0.4)]">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>

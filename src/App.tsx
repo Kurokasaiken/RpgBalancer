@@ -69,6 +69,8 @@ const TrailerConsequencePage = lazy(() => import('./ui/idleVillage/trailer/Trail
 const TrailerLegacyPage = lazy(() => import('./ui/idleVillage/trailer/TrailerLegacyPage').then(m => ({ default: m.TrailerLegacyPage })));
 const TrailerOutroPage = lazy(() => import('./ui/idleVillage/trailer/TrailerOutroPage').then(m => ({ default: m.TrailerOutroPage })));
 const WorldSurfaceTestPage = lazy(() => import('./ui/idleVillage/pages/WorldSurfaceTestPage').then(m => ({ default: m.WorldSurfaceTestPage })));
+const WorldPresentationDirectorPage = lazy(() => import('./ui/idleVillage/pages/WorldPresentationDirectorPage').then(m => ({ default: m.default })));
+const UseClientPage = lazy(() => import('./ui/idleVillage/pages/UseClientPage').then(m => ({ default: m.default })));
 
 interface AppNavControls {
   getActiveTab: () => AppNavTabId;
@@ -240,6 +242,10 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/trailer-threat-iter';
   const isWorldSurfacePath =
     typeof window !== 'undefined' && window.location.pathname === '/world-surface';
+  const isWorldPresentationDirectorPath =
+    typeof window !== 'undefined' && window.location.pathname === '/world-presentation-director';
+  const isUseClientPath =
+    typeof window !== 'undefined' && window.location.pathname === '/use-client';
   const isRootPath =
     typeof window !== 'undefined' &&
     (window.location.pathname === '/' || window.location.pathname === '/index.html');
@@ -859,6 +865,26 @@ function App() {
       <ErrorBoundary componentName="World Surface Test Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading World Surface...</div>}>
           <WorldSurfaceTestPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isWorldPresentationDirectorPath) {
+    return (
+      <ErrorBoundary componentName="World Presentation Director">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading World Presentation Director...</div>}>
+          <WorldPresentationDirectorPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isUseClientPath) {
+    return (
+      <ErrorBoundary componentName="Use Client Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Use Client...</div>}>
+          <UseClientPage />
         </Suspense>
       </ErrorBoundary>
     );

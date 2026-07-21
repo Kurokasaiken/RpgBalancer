@@ -7,6 +7,7 @@ basati su file_targets, e seleziona il batch eseguibile in base alla capacità d
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
@@ -33,9 +34,10 @@ from registry_manager import (
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 AGENT_ASSIGNMENTS_PATH = ROOT_DIR / "src" / "docs" / "docs" / "coordinator" / "agent_assignments.md"
-STRATEGY_TASKS_PATH = ROOT_DIR / "coordinator" / "strategy_tasks.md"
+STRATEGY_TASKS_PATH = ROOT_DIR / "src" / "docs" / "docs" / "coordinator" / "strategy_tasks.md"
 LAST_RUN_SUMMARY_PATH = ROOT_DIR / "coordinator" / "last-run-summary.json"
 PROMPTS_DIR = ROOT_DIR / "prompts"
+AI_KANBAN_PATH = ROOT_DIR / "ai-worker" / "kanban.json"
 
 # Model fallback list in order of preference
 MODEL_FALLBACK = [
@@ -522,12 +524,144 @@ def calcola_batch_eseguibile(coda_task: List[dict]) -> Tuple[List[dict], List[di
 
 def dispatch_task(task_id: str, channel: str, model: str, file_targets: List[str]):
     """Dispatch a single task and register it in the live registry.
-    
+
     This function should be called by the actual executor (ai-worker, harness, manual)
     to register the task start. The executor must call register_task_end() when done.
     """
     register_task_start(task_id, channel, file_targets, model)
     print(f"[DISPATCH] Task {task_id} started on {channel} with model {model}")
+
+
+def write_batch_json(batch: List[dict], max_paralleli: int, output_path: str):
+    """Write the selected batch to a JSON file for CI matrix consumption.
+
+    This is emitted both in select-only and full-dispatch modes so that
+    downstream jobs or workflows can inspect the selected tasks.
+    """
+    output = Path(output_path)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    batch_with_metadata = {
+        "max_parallel": max_paralleli,
+        "tasks": batch,
+    }
+    with open(output, "w", encoding="utf-8") as f:
+        json.dump(batch_with_metadata, f, indent=2)
+    print(f"[INFO] Batch written to {output_path}")
+
+
+def build_ai_worker_payload(task: dict) -> List[dict]:
+    """Convert a coordinator task into one or more ai-worker kanban entries.
+
+    If the task has multiple file targets, it is split into one ai-worker
+    entry per target so that each entry writes a single file.  The prompt
+    is kept identical for each split entry.
+    """
+    prompt = task.get("prompt", task.get("notes", ""))
+    # Remove ```text fences if present
+    prompt = re.sub(r"^```text\s*", "", prompt.strip())
+    prompt = re.sub(r"\s*```\s*$", "", prompt)
+
+    file_targets = task.get("file_targets", [])
+    if not file_targets:
+        # Fallback: try to extract from prompt using common patterns
+        target_match = re.search(r"FILE TARGET:\s*(.+?)(?=\n\n|\n[A-Z]|\n#|$)", prompt, re.DOTALL)
+        if target_match:
+            file_targets = [c.strip().strip("`") for c in re.split(r"[,\n]", target_match.group(1)) if c.strip()]
+
+    if not file_targets:
+        file_targets = [""]
+
+    # Complexity extraction
+    complexity_match = re.search(r"(?i)(?:complexity|complessit[aà])[:=]\s*(\d+)", prompt)
+    complexity = int(complexity_match.group(1)) if complexity_match else 1
+
+    # Execution hint extraction
+    execution_hint = "atomic"
+    hint_match = re.search(r"(?i)(?:execution hint|execution_hint)[:=]\s*(assisted|atomic)", prompt)
+    if hint_match:
+        execution_hint = hint_match.group(1).lower()
+
+    entries = []
+    for idx, target_file in enumerate(file_targets):
+        task_id = task["task_id"]
+        if len(file_targets) > 1:
+            task_id = f"{task['task_id']}-{chr(ord('a') + idx)}"
+        entries.append({
+            "id": task_id,
+            "status": "todo",
+            "target_file": target_file,
+            "prompt": prompt,
+            "complexity": complexity,
+            "execution_hint": execution_hint,
+        })
+
+    return entries
+
+
+def dispatch_ai_worker_batch(batch: List[dict], timeout_per_task: int = 600) -> int:
+    """Prepare and run ai-worker tasks automatically.
+
+    Writes ai-worker/kanban.json with the selected ai-worker tasks and
+    invokes ai-worker/coordinator.py in a loop until no todo tasks remain.
+    If OPENROUTER_API_KEY is missing the batch is skipped without failing.
+    """
+    ai_tasks = [task for task in batch if task.get("channel") == "ai-worker"]
+    if not ai_tasks:
+        print("[INFO] No ai-worker tasks in batch")
+        return 0
+
+    if not os.environ.get("OPENROUTER_API_KEY"):
+        print("[WARN] OPENROUTER_API_KEY not set; skipping ai-worker dispatch")
+        return 0
+
+    print(f"[INFO] Preparing {len(ai_tasks)} ai-worker tasks...")
+
+    ai_entries = []
+    for task in ai_tasks:
+        ai_entries.extend(build_ai_worker_payload(task))
+
+    payload = {"tasks": ai_entries}
+    AI_KANBAN_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with open(AI_KANBAN_PATH, "w", encoding="utf-8") as f:
+        json.dump(payload, f, indent=2, ensure_ascii=False)
+    print(f"[INFO] ai-worker kanban written to {AI_KANBAN_PATH}")
+
+    completed = 0
+    while True:
+        # Run one ai-worker task per invocation
+        try:
+            result = subprocess.run(
+                ["python", str(ROOT_DIR / "ai-worker" / "coordinator.py")],
+                cwd=ROOT_DIR,
+                capture_output=True,
+                text=True,
+                timeout=timeout_per_task,
+            )
+            print(result.stdout[-500:] if len(result.stdout) > 500 else result.stdout)
+            if result.returncode != 0:
+                print(f"[ERROR] ai-worker coordinator failed: {result.stderr[-500:]}")
+                break
+        except subprocess.TimeoutExpired:
+            print(f"[ERROR] ai-worker task timed out after {timeout_per_task}s")
+            break
+        except (subprocess.SubprocessError, FileNotFoundError) as e:
+            print(f"[ERROR] Failed to invoke ai-worker: {e}")
+            break
+
+        # Check kanban status and remaining todo tasks
+        try:
+            with open(AI_KANBAN_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            tasks = data.get("tasks", [])
+            completed = sum(1 for t in tasks if t.get("status") == "done")
+            if not any(t.get("status") == "todo" for t in tasks):
+                print("[INFO] All ai-worker tasks completed")
+                break
+        except (json.JSONDecodeError, IOError) as e:
+            print(f"[WARN] Failed to read ai-worker kanban: {e}")
+            break
+
+    return completed
 
 
 def dispatch_harness_batch(batch: List[dict], timeout_seconds: int = 1800):
@@ -735,49 +869,43 @@ def main():
         for item in blocked_tasks:
             print(f"  - {item['task_id']}: {item['motivo']}")
     
+    # Always emit batch.json so CI and downstream jobs can see the selected tasks
+    write_batch_json(batch, max_paralleli, args.output)
+
     if args.select_only:
-        # DO NOT register task starts here - that happens in the executor job
-        # select-tasks only prepares the batch
-        
-        # Output batch as JSON for GitHub Actions matrix
-        output_path = Path(args.output)
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        
-        # Add max_parallel field to batch metadata
-        batch_with_metadata = {
-            "max_parallel": max_paralleli,
-            "tasks": batch
-        }
-        
-        with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(batch_with_metadata, f, indent=2)
-        print(f"[INFO] Batch written to {args.output}")
-        
-        # Write run summary - count tasks that completed during this cycle
+        # select-tasks only prepares the batch; dispatch happens later
         rows_after = parse_agent_assignments_rows()
         status_after = {row["id"].split()[0]: row["status"] for row in rows_after}
         completed_this_cycle = count_completed_this_cycle(status_before, status_after)
         write_run_summary(len(batch), len(blocked_tasks), completed_this_cycle, blocked_tasks, max_paralleli, manual_tasks)
     else:
-        # Full dispatch mode: execute harness tasks automatically
-        print("[INFO] Full dispatch mode - executing harness tasks automatically")
-        
+        # Full dispatch mode: execute automatic tasks
+        print("[INFO] Full dispatch mode - executing automatic tasks")
+
         # Dispatch harness tasks
         harness_count = dispatch_harness_batch(batch)
         if harness_count > 0:
             print(f"[INFO] {harness_count} harness tasks dispatched")
-            # Send desktop notification for harness tasks
             send_desktop_notification(
                 "Harness tasks in esecuzione",
                 f"{harness_count} task harness avviati automaticamente"
             )
-        
+
+        # Dispatch ai-worker tasks
+        ai_worker_count = dispatch_ai_worker_batch(batch)
+        if ai_worker_count > 0:
+            print(f"[INFO] {ai_worker_count} ai-worker tasks completed")
+            send_desktop_notification(
+                "AI worker tasks completati",
+                f"{ai_worker_count} task ai-worker completati automaticamente"
+            )
+
         # Write run summary
         rows_after = parse_agent_assignments_rows()
         status_after = {row["id"].split()[0]: row["status"] for row in rows_after}
         completed_this_cycle = count_completed_this_cycle(status_before, status_after)
         write_run_summary(len(batch), len(blocked_tasks), completed_this_cycle, blocked_tasks, max_paralleli, manual_tasks)
-    
+
     # Always print manual reminder if queue is not empty
     print_manual_reminder()
 

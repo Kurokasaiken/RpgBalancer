@@ -248,6 +248,9 @@ async function checkFileTargetAudit(taskId: string, fileTargets: Set<string>): P
     const occupiedArray = Array.from(allOccupied);
     for (let j = 0; j < occupiedArray.length; j++) {
       const [occupiedFile, occupiedTaskId] = occupiedArray[j]!;
+      if (occupiedTaskId === taskId) {
+        continue;
+      }
       if (target === occupiedFile || target.includes(occupiedFile) || occupiedFile.includes(target)) {
         // Determine channel
         let channel = 'unknown';

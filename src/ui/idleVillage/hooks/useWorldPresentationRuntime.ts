@@ -1,0 +1,102 @@
+import { useEffect, useMemo, useState } from 'react';
+import type { RuntimeObject } from '../../../engine/world/model/RuntimeObject';
+import { buildWorldPresentationModel } from '../../../engine/world/presentation/buildWorldPresentationModel';
+import { WorldPresentationRuntime } from '../../../engine/world/presentation/WorldPresentationRuntime';
+import type { PresentationOutput } from '../../../engine/world/presentation/types';
+import type { WorldSurfaceManifest, WorldSurfaceVisualStateOverride } from '../config/worldSurfaceConfig';
+import type { PresentationScenario } from '../config/presentationConfig';
+import { usePresentationClock } from './usePresentationClock';
+
+interface WorldSurfaceRendererInput {
+  manifest: WorldSurfaceManifest;
+  camera: { panX: number; panY: number; zoom: number };
+  onCameraChange: (camera: { panX: number; panY: number; zoom: number }) => void;
+  activeVisualStateId?: string;
+  visualStateOverrides?: WorldSurfaceVisualStateOverride[];
+  visibleLayerIds?: string[];
+  layerScales?: Record<string, number>;
+  layerOffsets?: Record<string, { x: number; y: number }>;
+  runtimeObjects?: RuntimeObject[];
+}
+
+export interface UseWorldPresentationRuntimeResult {
+  output: PresentationOutput;
+  tick: number;
+  interpolation: number;
+  isPlaying: boolean;
+  seed: number;
+  play: () => void;
+  pause: () => void;
+  step: () => void;
+  setSeed: (seed: number) => void;
+  setTick: (tick: number) => void;
+  rendererProps: WorldSurfaceRendererInput;
+}
+
+/**
+ * Adapter hook that maps `PresentationOutput` to `WorldSurfaceRenderer` props.
+ *
+ * Keeps a local camera state so the user can pan/zoom without mutating the
+ * presentation runtime or `WorldState`.
+ */
+export function useWorldPresentationRuntime(scenario: PresentationScenario): UseWorldPresentationRuntimeResult {
+  const [seed, setSeed] = useState(scenario.seed);
+  const [camera, setCamera] = useState({ panX: 0, panY: 0, zoom: scenario.manifest.camera.defaultZoom });
+
+  const {
+    tick,
+    interpolation,
+    isPlaying,
+    play,
+    pause,
+    step,
+    setTick,
+  } = usePresentationClock({ tickIntervalMs: 500, initialTick: 0 });
+
+  const runtime = useMemo(() => {
+    const model = buildWorldPresentationModel(scenario.worldState, scenario.rules);
+    return new WorldPresentationRuntime({ model, manifest: scenario.manifest });
+  }, [scenario]);
+
+  const output = useMemo(
+    () => runtime.update(tick, seed, { deltaTick: 1, interpolation }),
+    [runtime, tick, seed, interpolation],
+  );
+
+  // Keep local camera in sync with runtime output while allowing user override.
+  useEffect(() => {
+    setCamera((prev) => ({
+      ...prev,
+      zoom: output.camera.zoom,
+    }));
+  }, [output.camera.zoom]);
+
+  const rendererProps: WorldSurfaceRendererInput = useMemo(
+    () => ({
+      manifest: scenario.manifest,
+      camera,
+      onCameraChange: setCamera,
+      activeVisualStateId: output.activeVisualStateId,
+      visualStateOverrides: output.visualStateOverrides as WorldSurfaceVisualStateOverride[],
+      visibleLayerIds: output.visibleLayerIds,
+      layerScales: output.layerScales,
+      layerOffsets: output.layerOffsets,
+      runtimeObjects: output.runtimeObjects,
+    }),
+    [scenario.manifest, camera, output],
+  );
+
+  return {
+    output,
+    tick,
+    interpolation,
+    isPlaying,
+    seed,
+    play,
+    pause,
+    step,
+    setSeed,
+    setTick,
+    rendererProps,
+  };
+}

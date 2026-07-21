@@ -157,6 +157,24 @@ const EXTRA_PAGES: TestPageLink[] = [
     icon: '🗺️',
     status: 'ok',
   },
+  // Non-kit page: World Presentation Director - deterministic presentation runtime sandbox.
+  {
+    id: 'world-presentation-director',
+    title: 'World Presentation Director',
+    description: 'Deterministic WorldState → PresentationOutput runtime sandbox with scenario selector and playback controls',
+    path: '/world-presentation-director',
+    icon: '🎬',
+    status: 'ok',
+  },
+  // Non-kit page: Use Client — client-only ThreatStatusIndicator showcase.
+  {
+    id: 'use-client',
+    title: 'Use Client',
+    description: "Client-only ThreatStatusIndicator with 'use client' directive, i18n and config-first urgency tokens",
+    path: '/use-client',
+    icon: '⚠️',
+    status: 'ok',
+  },
 ];
 
 const TEST_PAGES: TestPageLink[] = [
