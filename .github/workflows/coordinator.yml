@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - "src/docs/docs/coordinator/agent_assignments.md"
+      - "src/docs/docs/coordinator/strategy_tasks.md"
+      - ".github/workflows/coordinator.yml"
   workflow_dispatch:
   schedule:
     # Run every 5 minutes to check for new tasks
@@ -20,6 +22,10 @@ concurrency:
 jobs:
   coordinator:
     runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -29,16 +35,25 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: pip install -r coordinator/requirements.txt 2>/dev/null || pip install pyyaml
 
-      - name: Run coordinator to select batch
-        run: python coordinator/coordinator.py --select-only --output coordinator/batch.json
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Migrate and dispatch tasks
+        run: python coordinator/coordinator.py --output coordinator/batch.json
 
       - name: Commit and push changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add coordinator/batch.json coordinator/live_registry.json
-          git diff --cached --quiet || git commit -m "Coordinator: batch selection [ci skip]"
+          git add -A
+          git diff --cached --quiet || git commit -m "Coordinator: auto-migrate and dispatch [ci skip]"
           git push

@@ -637,3 +637,45 @@ ActivityCard (contains SlottedMedal) ✅
 **This document is the source of truth.** If there's a question about "should we freeze X during operation Y?", the answer is in §3.1 table. If there's a question about "how should we test it?", the answer is in §5.2 test categories.
 
 **For integration status:** Read §11.9 (Integration Phase Complete) for what's wired and working.
+
+---
+
+## 12. Creature IP Development System
+
+### 12.1 Creative Memory Rule
+
+- Decisions are preserved, not only outputs.
+- Rejected directions are stored in `rejected-directions.md` at family or creature level.
+- Every versioned change must explain *why*.
+
+### 12.2 Conversation vs Canon
+
+- Chat / exploration is temporary.
+- Only approved, versioned documents are canon.
+- AI-generated images, prompts, or ideas are not world truth until reviewed.
+
+### 12.3 Authority Hierarchy
+
+| Level | Scope |
+| --- | --- |
+| world | tone, color rules, kill list |
+| art | art stack, rendering rules |
+| family | family DNA, rejected directions |
+| creature | identity, prompt, reference card |
+| detail | single image variant |
+
+### 12.4 Semantic Versioning
+
+- **MAJOR** — identity or family DNA change
+- **MINOR** — visual refinement or new decision
+- **PATCH** — typo, link fix
+
+### 12.5 Design Intent First
+
+No creature identity card can be created before its `design-intent.md` explains:
+
+- gameplay purpose
+- player lesson
+- desired emotion
+- desired player behavior
+- why Wanderlust needs it

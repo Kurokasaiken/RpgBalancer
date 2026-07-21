@@ -161,16 +161,24 @@ def parse_agent_assignments_rows() -> List[dict]:
                 "executor_reason": reason,
             }
         else:
-            # Legacy 5-column format: ID, Status, Agent, Data, Notes.
+            # Legacy 5-column format: ID, Status, Agent/Executor, Data, Notes.
             prompt_text = columns[4]
+            known_executors = {"ai-worker", "harness", "manual", "agent", "swe", "Cascade"}
+            agent_or_executor = columns[2]
+            if agent_or_executor in known_executors:
+                executor = agent_or_executor
+                agent = ""
+            else:
+                executor = "manual"
+                agent = agent_or_executor
             row = {
                 "id": columns[0],
                 "status": columns[1],
                 "dependencies": "",
-                "agent": columns[2],
+                "agent": agent,
                 "last_update": columns[3],
                 "notes": columns[4],
-                "executor": "",
+                "executor": executor,
                 "executor_reason": "",
             }
 
@@ -319,6 +327,8 @@ def check_file_target_audit(task_id: str, file_targets: Set[str]) -> Tuple[bool,
     conflicts = []
     for target in file_targets:
         for (occupied_file, occupied_task_id) in all_occupied:
+            if occupied_task_id == task_id:
+                continue
             if target == occupied_file or target in occupied_file or occupied_file in target:
                 # Determine channel
                 channel = "unknown"
@@ -328,7 +338,7 @@ def check_file_target_audit(task_id: str, file_targets: Set[str]) -> Tuple[bool,
                     channel = "ai-worker"
                 elif (occupied_file, occupied_task_id) in harness:
                     channel = "harness"
-                
+
                 conflicts.append(f"{target} occupied by {occupied_task_id} ({channel})")
     
     if conflicts:
