@@ -1,3 +1,12 @@
 {
-  "tasks": []
+  "tasks": [
+    {
+      "id": "AI-SMOKE-TEST-001",
+      "status": "todo",
+      "target_file": "coordinator/AI_WORKER_SMOKE_TEST.md",
+      "prompt": "",
+      "complexity": 1,
+      "execution_hint": "atomic"
+    }
+  ]
 }

@@ -11118,7 +11118,7 @@ NOTE:
 | WORLD-PRESENTATION-RUNTIME-DEMO — World Presentation Runtime Demo (Milestone A: Threat Semantic Presence) | Completato | WORLD-PRESENTATION-RUNTIME-FOUNDATION | Cascade | 2026-07-22T12:30:00Z | 2026-07-22T16:05:00Z | manual | execution_hint architectural, design judgment | 2026-07-22T16:05:00Z | ThreatPresenceEffect + threat scenario + inspector verified. Evidence: test-results/WORLD-PRESENTATION-RUNTIME-DEMO-2026-07-22.log |
 | IV-SLOT-RACK-RESKIN-001 — Slot Rack Container Reskin to Roster Materic Style | Completato | - | Cascade | 2026-07-22 | Evidence: test-results/iv-slot-rack-reskin-2026-07-22.log; safeguards passed | manual | harness failure, manual retry |
 | POI-MEDALLION-MATERIAL-PREVIEW-00E669 — POI Medallion Material Preview (GenericPoiSkin V2) | In corso | 2026-07-22 | Cascade | prompt:check passed; GenericPoiSkin base medallion V2 with Materic stone/bronze aesthetic; A/B route /poi-visual-preview; canonical files untouched | manual | execution_hint architectural, visual design judgment | Prompt: coordinator/manual-dispatch/pending/POI-MEDALLION-MATERIAL-PREVIEW-00E669.md |
-| AI-SMOKE-TEST-001 — Trivial atomic ai-worker dispatch test | Non assegnato | - | - | Smoke test for ai-worker kanban dispatch | ai-worker | atomic single-file, no safeguards | ```text
+| AI-SMOKE-TEST-001 — Trivial atomic ai-worker dispatch test | In corso | - | - | Smoke test for ai-worker kanban dispatch | ai-worker | atomic single-file, no safeguards | ```text |
 AGENT
 Write a short markdown file confirming this ai-worker smoke test executed.
 
