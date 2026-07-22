@@ -1,12 +1,3 @@
 {
-  "tasks": [
-    {
-      "id": "ADR001-T1",
-      "status": "todo",
-      "target_file": "src/engine/quest/QuestEngine.ts",
-      "prompt": "Read the file src/engine/quest/QuestEngine.ts, prepend a JSDoc header with `@experimental FROZEN` and a reference to ADR-001 at the very top, keep all existing code unchanged, and return the complete updated file (raw source, no Markdown fences, no explanations).",
-      "complexity": 1,
-      "execution_hint": "atomic"
-    }
-  ]
+  "tasks": []
 }

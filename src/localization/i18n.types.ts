@@ -1,994 +1,583 @@
 import 'i18next';
 
 export default interface Resources {
+  "balancing": {
+    "actions": {
+      "addCard": "Add Card",
+      "addStat": "Stat",
+      "close": "Close",
+      "export": "Export",
+      "import": "Import",
+      "newCard": "New Card",
+      "resetAll": "Reset All",
+      "scenarioLab": "Scenario Lab",
+      "showCard": "Show card",
+      "stressTest": "Stress Test"
+    },
+    "app": {
+      "subtitle": "Arcane Tech Glass · Config-Driven",
+      "title": "Balancer"
+    },
+    "labels": {
+      "hiddenCards": "Hidden cards"
+    },
+    "metrics": {
+      "earlyImpact": "Early Impact (3T)",
+      "edptVsSelf": "EDPT vs Self",
+      "equalFight": {
+        "title": "1v1 Equal (Self vs Self)",
+        "turns": "{value} turns"
+      }
+    },
+    "reset": {
+      "confirmTitle": "Click again to confirm full reset",
+      "title": "Reset to initial values"
+    },
+    "scenario": {
+      "avg": "Avg: {value}",
+      "baseline": "Baseline: {value}",
+      "build": "Build: {value}",
+      "configTitle": "Scenario Configuration",
+      "damageOverkill": "Damage/Overkill",
+      "dptBase": "DPT Base: {value}",
+      "dptBuild": "DPT Build: {value}",
+      "draws": "Draws: {value}",
+      "elitePreset": "Elite Preset",
+      "iterations": "Iter",
+      "median": "Median: {value}",
+      "overkillAvg": "Overkill Avg: {value1} / {value2}",
+      "powerSubtitle": "Based on current build",
+      "powerTitle": "Scenario Power (HP eq)",
+      "range": "Range: {min}-{max}",
+      "runSim": "Run Sim",
+      "running": "Running...",
+      "simulationTitle": "Scenario Simulation (vs Baseline)",
+      "subtitle": "Duel · Boss · Swarm · 5v5",
+      "ttkTurns": "TTK (Turns)",
+      "winrate": "Winrate"
+    },
+    "stressTesting": {
+      "title": "Stat Stress Testing & Marginal Utility Analysis"
+    },
+    "viewMode": {
+      "config": "Config",
+      "legacy": "Legacy"
+    }
+  },
   "common": {
     "appName": "RPG Balancer",
+    "examples": {
+      "characterGreeting": "{gender, select, male {Welcome, my lord} female {Welcome, my lady} other {Welcome, adventurer}}",
+      "riskLevel": "{level, select, low {Low risk} medium {Medium risk} high {High risk} other {Unknown risk}}",
+      "swordCount": "{count, plural, one {one sword} other {{count} swords}}"
+    },
     "language": "Language",
     "locale": {
+      "ar": "العربية",
+      "de": "Deutsch",
       "en": "English",
       "it-IT": "Italiano",
-      "pseudo": "Pseudo"
+      "ja": "日本語",
+      "pseudo": "Pseudo",
+      "zh-CN": "简体中文"
     },
     "welcome": "Welcome"
   },
+  "errors": {
+    "boundary": {
+      "reload": "Reload app",
+      "retry": "Retry",
+      "title": "Something went wrong"
+    },
+    "fallback": {
+      "loading": "Loading…",
+      "unknown": "An unknown error occurred"
+    }
+  },
   "idleVillage": {
-    "activityCapsule": {
-      "accessibility": {
-        "activityCapsule": "{label} activity capsule",
-        "closeDetails": "Close activity details"
-      },
-      "actions": {
-        "cancel": "Cancel",
-        "collect": "Collect",
-        "collecting": "Collecting...",
-        "start": "Start"
-      },
-      "ariaLive": {
-        "blocked": "{label} activity blocked",
-        "completed": "{label} activity completed",
-        "idle": "{label} activity is idle",
-        "progress": "{label} progress: {percent}%",
-        "readyToCollect": "{label} ready to collect",
-        "slotFreed": "{count, plural, one {{count} slot freed from {label}} other {{count} slots freed from {label}}}",
-        "started": "{label} activity started",
-        "workerAssigned": "{count, plural, one {{count} worker assigned to {label}} other {{count} workers assigned to {label}}}"
-      },
-      "defaultHalo": "POI",
-      "devTools": {
-        "validationTitle": "Skin Validation Errors"
-      },
-      "dropHint": "Drop",
-      "info": {
-        "duration": "Duration",
-        "eta": "ETA",
-        "reward": "Reward"
-      },
-      "lore": {
-        "locked": "An ancient vibration awaits in the silence of this endeavor."
-      },
-      "requirements": {
-        "relation": {
-          "all": "Required",
-          "any": "One of",
-          "none": "Forbidden"
-        }
-      },
-      "sections": {
-        "assignedCharacters": "Assigned Characters",
-        "lore": "Journal",
-        "requirements": "Requirements",
-        "telemetry": "Event Log"
-      },
-      "slotLabel": "Slot {index}",
-      "status": {
-        "blocked": "Blocked",
-        "completed": "Completed",
-        "idle": "Idle",
-        "inProgress": "In Progress"
-      },
-      "telemetry": {
-        "empty": "No events recorded."
-      },
-      "type": {
-        "job": "Job",
-        "maintenance": "Maintenance",
-        "poi-activity": "POI Activity",
-        "quest": "Quest",
-        "training": "Training"
-      },
-      "workerAlt": "Worker"
+    "SKIP": "Skip",
+    "THROW": "Throw",
+    "astrolabeV3": {
+      "auto": "Auto",
+      "dead": "Fallen",
+      "mute": "Mute",
+      "onboardingRisk": "Crimson crown: land there and you are wounded. Violet chasms: a lethal fall.",
+      "onboardingStar": "Your strength: the higher the stat, the longer the ivory lobe stretches.",
+      "onboardingThrow": "Throw the spark — where it stops is the proof of your fate.",
+      "rollAgain": "Roll again",
+      "skip": "Skip",
+      "throwControls": "Throw controls",
+      "verdictCrit": "Ruin",
+      "verdictFail": "Defeat",
+      "verdictNearMiss": "By a Whisker",
+      "verdictSuccess": "Victory",
+      "wounded": "Wounded"
     },
-    "ftue": {
-      "availableActivities": "Available Activities",
-      "cycleProgress": "Cycle Progress",
-      "day": "Day",
-      "pause": "⏸️ Pause",
-      "phase": {
-        "day": "☀️ Day",
-        "night": "🌙 Night"
-      },
-      "reset": "🔄 Reset",
-      "resourceLabels": {
-        "food": "Food",
-        "gold": "Gold"
-      },
-      "resources": "Resources",
-      "resume": "▶️ Resume",
-      "roster": "Roster",
-      "slottedMetal": "SlottedMetal (Placeholder)",
-      "slottedMetalPlaceholder": "SlottedMetal component — To be developed",
-      "tick": "Tick",
-      "timeEngine": "Time Engine"
+    "astrolabeV4": {
+      "explainContinue": "Continue",
+      "explainEnemy": "This surface is the Enemy. If the spark stops here, the check fails.",
+      "explainLegend": "Every colour is a fate. Read the field before you throw:",
+      "explainRequired": "The black columns are the values demanded by the trial: one for each axis of the check.",
+      "explainStar": "The ivory star is your ground. If the spark stops inside it, the check succeeds.",
+      "explainStats": "The white columns are your expedition's stats: the higher they rise, the further your star reaches.",
+      "explanation": "Explanation",
+      "legendAlmost": "Bronze — star rim: Almost (failed by a whisker)",
+      "legendCrit": "Dark band inside the Enemy's edge: critical failure",
+      "legendDeath": "Black stripe: death",
+      "legendEnemy": "Slate — the Enemy: failure",
+      "legendNucleus": "Central core: critical success",
+      "legendStar": "White — star interior: success",
+      "legendWound": "Crimson stripe: wound",
+      "subBigwin": "The sun itself signs your deed.",
+      "subCrit": "The abyss claims those who dare too much.",
+      "subFail": "The mountain repels mortals.",
+      "subNearMiss": "The spark danced on the rim… and slipped beyond.",
+      "subSuccess": "The summit bows to your stride.",
+      "verdictBigwin": "Triumph"
     },
-    "hudResources": {
-      "day": "Current day in the village cycle. Advances with time.",
-      "fatigue": "Average resident fatigue level. High fatigue reduces efficiency.",
-      "food": "Food supplies remaining. Consumed daily by residents.",
-      "gold": "Current gold reserves. Earned from mining and other activities."
-    },
-    "interactionMode": {
-      "accessibility": {
-        "mode_changed": {
-          "accessibility": {
-            "ariaDescription": "Announcement when the interaction mode is changed",
-            "ariaLabel": "Mode change notification"
-          },
-          "category": "help",
-          "context": "accessibility",
-          "description": "Mode change announcement for screen readers",
-          "fallback": "Mode changed to {mode}",
-          "maxLength": 50,
-          "text": "Mode changed to {mode}",
-          "translatable": true
-        },
-        "mode_selector_closed": {
-          "accessibility": {
-            "ariaDescription": "The mode selector has been closed",
-            "ariaLabel": "Mode selector closed"
-          },
-          "category": "help",
-          "context": "accessibility",
-          "description": "Mode selector closing announcement",
-          "fallback": "Mode selector closed",
-          "maxLength": 30,
-          "text": "Mode selector closed",
-          "translatable": true
-        },
-        "mode_selector_open": {
-          "accessibility": {
-            "ariaDescription": "The mode selector has been opened",
-            "ariaLabel": "Mode selector opened"
-          },
-          "category": "help",
-          "context": "accessibility",
-          "description": "Mode selector opening announcement",
-          "fallback": "Mode selector opened",
-          "maxLength": 30,
-          "text": "Mode selector opened",
-          "translatable": true
-        }
+    "critPercent": "Crit Percent",
+    "deathPercent": "Death Percent",
+    "difficulty": "Difficulty",
+    "dpr": "DPR",
+    "hitStop": "Hit Stop",
+    "nearMissBand": "Near Miss Band",
+    "presentation": {
+      "director": {
+        "title": "World Presentation Director"
       },
-      "action": {
-        "cancel_switch": {
-          "accessibility": {
-            "ariaLabel": "Cancel switch",
-            "keyHint": "Escape"
-          },
-          "category": "action",
-          "context": "picker",
-          "description": "Cancel the mode change",
-          "fallback": "Cancel",
-          "maxLength": 15,
-          "text": "Cancel",
-          "translatable": true
-        },
-        "confirm_switch": {
-          "accessibility": {
-            "ariaLabel": "Confirm mode switch",
-            "keyHint": "Enter"
-          },
-          "category": "action",
-          "context": "picker",
-          "description": "Confirm the mode change",
-          "fallback": "Confirm switch",
-          "maxLength": 25,
-          "text": "Confirm switch",
-          "translatable": true
-        },
-        "switch_mode": {
-          "accessibility": {
-            "ariaLabel": "Switch interaction mode",
-            "keyHint": "M"
-          },
-          "category": "action",
-          "context": "picker",
-          "description": "Change the current interaction mode",
-          "fallback": "Switch mode",
-          "maxLength": 30,
-          "text": "Switch mode",
-          "translatable": true
-        }
+      "inspector": {
+        "title": "Output Inspector",
+        "activeState": "Active State",
+        "runtimeObjects": "Runtime Objects",
+        "visualStateOverrides": "Visual Overrides",
+        "tick": "Tick"
       },
-      "ftue": {
-        "mode_selection_description": {
-          "accessibility": {
-            "ariaDescription": "Information about the available interaction modes",
-            "ariaLabel": "Mode description"
-          },
-          "category": "help",
-          "context": "ftue",
-          "description": "Mode selection description in the FTUE",
-          "fallback": "Each mode offers a different way to interact with the village. Start with Sandbox mode to learn!",
-          "maxLength": 120,
-          "text": "Each mode offers a different way to interact with the village. Start with Sandbox mode to learn!",
-          "translatable": true
-        },
-        "mode_selection_title": {
-          "accessibility": {
-            "ariaLabel": "Mode selection"
-          },
-          "category": "help",
-          "context": "ftue",
-          "description": "Mode selection title in the FTUE",
-          "fallback": "Choose your mode",
-          "maxLength": 30,
-          "text": "Choose your mode",
-          "translatable": true
-        },
-        "welcome_title": {
-          "accessibility": {
-            "ariaLabel": "Welcome title"
-          },
-          "category": "help",
-          "context": "ftue",
-          "description": "Welcome title for the FTUE",
-          "fallback": "Welcome to Idle Village",
-          "maxLength": 40,
-          "text": "Welcome to Idle Village",
-          "translatable": true
-        }
-      },
-      "help": {
-        "mode_description": {
-          "accessibility": {
-            "ariaDescription": "Use the arrows to navigate between the available modes",
-            "ariaLabel": "Mode selection help"
-          },
-          "category": "help",
-          "context": "picker",
-          "description": "Description of the interaction mode selector",
-          "fallback": "Select interaction mode for the village",
-          "maxLength": 60,
-          "text": "Select the interaction mode for the village",
-          "translatable": true
-        }
-      },
-      "mode": {
-        "analytics": {
-          "accessibility": {
-            "ariaLabel": "Analytics Mode",
-            "keyHint": "A"
-          },
-          "category": "mode",
-          "context": "picker",
-          "description": "Analytics mode for statistics and reports",
-          "fallback": "Analytics",
-          "maxLength": 20,
-          "text": "Analytics",
-          "translatable": true
-        },
-        "execution": {
-          "accessibility": {
-            "ariaLabel": "Execution Mode",
-            "keyHint": "E"
-          },
-          "category": "mode",
-          "context": "picker",
-          "description": "Execution mode for ongoing activities",
-          "fallback": "Execution",
-          "maxLength": 20,
-          "text": "Execution",
-          "translatable": true
-        },
-        "planning": {
-          "accessibility": {
-            "ariaLabel": "Planning Mode",
-            "keyHint": "P"
-          },
-          "category": "mode",
-          "context": "picker",
-          "description": "Planning mode for organizing activities",
-          "fallback": "Planning",
-          "maxLength": 20,
-          "text": "Planning",
-          "translatable": true
-        },
-        "sandbox": {
-          "accessibility": {
-            "ariaLabel": "Sandbox Mode",
-            "keyHint": "S"
-          },
-          "category": "mode",
-          "context": "picker",
-          "description": "Sandbox mode for testing and experimentation",
-          "fallback": "Sandbox",
-          "maxLength": 20,
-          "text": "Sandbox",
-          "translatable": true
-        }
-      },
-      "tooltip": {
-        "analytics_info": {
-          "category": "tooltip",
-          "context": "picker",
-          "description": "Information about analytics mode",
-          "fallback": "Analytics mode: view statistics and reports",
-          "maxLength": 80,
-          "text": "Analytics mode: view statistics and reports",
-          "translatable": true
-        },
-        "execution_info": {
-          "category": "tooltip",
-          "context": "picker",
-          "description": "Information about execution mode",
-          "fallback": "Execution mode: monitor activities in real time",
-          "maxLength": 80,
-          "text": "Execution mode: monitor activities in real time",
-          "translatable": true
-        },
-        "planning_info": {
-          "category": "tooltip",
-          "context": "picker",
-          "description": "Information about planning mode",
-          "fallback": "Planning mode: organize activities and assign residents",
-          "maxLength": 80,
-          "text": "Planning mode: organize activities and assign residents",
-          "translatable": true
-        },
-        "sandbox_info": {
-          "category": "tooltip",
-          "context": "picker",
-          "description": "Information about sandbox mode",
-          "fallback": "Sandbox mode: test new features without persistent effects",
-          "maxLength": 80,
-          "text": "Sandbox mode: test new features without persistent effects",
-          "translatable": true
-        }
-      }
-    },
-    "map": {
-      "activeActivities": "Active Activities",
-      "activitySlots": "Activity Slots",
-      "error": "Something went wrong in Village Sandbox.",
-      "reset": "Reset",
-      "resetting": "Resetting…"
-    },
-    "medalOverlay": {
-      "ariaLabel": "Resident medal",
-      "token": "PG"
-    },
-    "narrative": {
-      "config": {
-        "availableHooks": "Available Hooks",
-        "configVersion": "Config Version",
-        "configurationStatus": "Configuration Status",
-        "hooks": "Hooks",
-        "no": "No",
-        "telemetryEnabled": "Telemetry Enabled",
-        "templates": "Templates",
-        "yes": "Yes"
-      },
-      "context": {
-        "location": "Location",
-        "progress": "Progress: {progress}%",
-        "questDifficulty": "Quest Difficulty",
-        "questName": "Quest Name",
-        "questType": "Quest Type",
-        "residentLevel": "Resident Level",
-        "residentName": "Resident Name",
-        "timeOfDay": "Time of Day",
-        "weather": "Weather"
-      },
-      "difficulty": {
-        "easy": "Easy",
-        "hard": "Hard",
-        "nightmare": "Nightmare",
-        "normal": "Normal"
-      },
-      "narratives": {
-        "complete": "Complete Quest",
-        "count": "{count} narratives",
-        "details": {
-          "generated": "Generated",
-          "hook": "Hook",
-          "id": "ID: {id}",
-          "metadata": "Metadata",
-          "telemetry": "Telemetry",
-          "telemetryNotTracked": "Not Tracked",
-          "telemetryTracked": "Tracked",
-          "template": "Template",
-          "text": "Text",
-          "title": "Narrative Details",
-          "variables": "Variables"
-        },
-        "fail": "Fail Quest",
-        "noNarratives": "No narratives generated yet",
-        "noNarrativesHint": "Click \"Play\" to start auto-generating or use the buttons above",
-        "title": "Generated Narratives"
-      },
+      "layers": "Layers",
+      "objects": "Objects",
       "pause": "Pause",
       "play": "Play",
-      "questProgress": "Quest Progress",
-      "questTypes": {
-        "combat": "Combat",
-        "crafting": "Crafting",
-        "diplomacy": "Diplomacy",
-        "exploration": "Exploration",
-        "social": "Social"
+      "scenarios": {
+        "corruption": "Corruption",
+        "peaceful": "Peaceful",
+        "threat": "Threat",
+        "title": "Scenario"
       },
-      "refresh": "Refresh",
-      "tabs": {
-        "config": "Config",
-        "context": "Context",
-        "narratives": "Narratives",
-        "telemetry": "Telemetry"
+      "seed": "Seed",
+      "states": {
+        "unknown": "Unknown"
       },
-      "telemetry": {
-        "connected": "Connected",
-        "disconnected": "Disconnected",
-        "events": "Events",
-        "lastActivity": "Last Activity",
-        "metrics": "Metrics",
-        "status": "Status",
-        "topEvents": "Top Events",
-        "topMetrics": "Top Metrics"
+      "step": "Step",
+      "tick": "Tick"
+    },
+    "roster": {
+      "filter": {
+        "addFilter": "Add",
+        "addFilterAriaLabel": "Add filter",
+        "clearFilters": "Clear",
+        "clearFiltersAriaLabel": "Clear all filters",
+        "label": "Filter",
+        "noResults": "No residents match current filters",
+        "operator": {
+          "equals": "=",
+          "equalsDescription": "Stat equals threshold",
+          "equalsTooltip": "Equals",
+          "greaterThan": ">",
+          "greaterThanDescription": "Stat is greater than threshold",
+          "greaterThanOrEqual": ">=",
+          "greaterThanOrEqualDescription": "Stat is greater than or equal to threshold",
+          "greaterThanOrEqualTooltip": "Greater than or equal",
+          "greaterThanTooltip": "Greater than",
+          "lessThan": "<",
+          "lessThanDescription": "Stat is less than threshold",
+          "lessThanOrEqual": "<=",
+          "lessThanOrEqualDescription": "Stat is less than or equal to threshold",
+          "lessThanOrEqualTooltip": "Less than or equal",
+          "lessThanTooltip": "Less than"
+        },
+        "operatorLabel": "Operator",
+        "removeFilterAriaLabel": "Remove filter",
+        "stat": {
+          "agility": "Agility",
+          "agilityDescription": "Initiative stat for turn order",
+          "agilityTooltip": "Agility",
+          "armor": "Armor",
+          "armorDescription": "Flat armor value",
+          "armorTooltip": "Armor",
+          "block": "Block",
+          "blockDescription": "Block chance percentage",
+          "blockTooltip": "Block %",
+          "critChance": "Crit Chance",
+          "critChanceDescription": "Critical hit chance percentage",
+          "critChanceTooltip": "Critical Chance %",
+          "damage": "Damage",
+          "damageDescription": "Base damage value",
+          "damageTooltip": "Damage",
+          "effectiveDamage": "Effective Damage",
+          "effectiveDamageDescription": "Damage after mitigation",
+          "effectiveDamageTooltip": "Effective Damage",
+          "evasion": "Evasion",
+          "evasionDescription": "Flat evasion value",
+          "evasionTooltip": "Evasion",
+          "hitChance": "Hit Chance",
+          "hitChanceDescription": "Calculated hit chance percentage",
+          "hitChanceTooltip": "Hit Chance %",
+          "hp": "HP",
+          "hpDescription": "Current health points",
+          "hpTooltip": "Health Points",
+          "htk": "Hits to Kill",
+          "htkDescription": "Number of hits to kill target",
+          "htkTooltip": "Hits to Kill",
+          "lifesteal": "Lifesteal",
+          "lifestealDescription": "Lifesteal percentage",
+          "lifestealTooltip": "Lifesteal %",
+          "regen": "Regen",
+          "regenDescription": "Health regeneration per turn",
+          "regenTooltip": "Regeneration",
+          "resistance": "Resistance",
+          "resistanceDescription": "Damage resistance percentage",
+          "resistanceTooltip": "Resistance %",
+          "txc": "TxC",
+          "txcDescription": "Flat to-hit chance bonus",
+          "txcTooltip": "To-Hit Chance",
+          "unknown": "Unknown",
+          "unknownDescription": "Unknown stat",
+          "unknownTooltip": "Unknown stat",
+          "ward": "Ward",
+          "wardDescription": "Flat shield value",
+          "wardTooltip": "Ward"
+        },
+        "statLabel": "Stat",
+        "thresholdAriaLabel": "Filter threshold value",
+        "thresholdLabel": "Threshold"
       },
-      "timeOfDay": {
-        "dawn": "Dawn",
-        "day": "Day",
-        "dusk": "Dusk",
-        "night": "Night"
-      },
-      "title": "Quest Narrative Panel",
-      "weather": {
-        "clear": "Clear",
-        "fog": "Fog",
-        "rain": "Rain",
-        "snow": "Snow",
-        "storm": "Storm",
-        "windy": "Windy"
+      "sort": {
+        "fatigueAsc": "Fatigue",
+        "fatigueAscDescription": "Sort by fatigue (lowest first)",
+        "fatigueAscTooltip": "Sort: Fatigue (lowest first)",
+        "hpDesc": "HP",
+        "hpDescDescription": "Sort by current HP (highest first)",
+        "hpDescTooltip": "Sort: HP (highest first)",
+        "label": "Sort",
+        "nameAsc": "Name A → Z",
+        "nameAscDescription": "Sort by display name alphabetically (A to Z)",
+        "nameAscTooltip": "Sort: Name A → Z (click to reverse)",
+        "nameDesc": "Name Z → A",
+        "nameDescDescription": "Sort by display name alphabetically (Z to A)",
+        "nameDescTooltip": "Sort: Name Z → A (click to reverse)"
       }
     },
-    "poiDetail": {
-      "ariaLabel": "POI Detail: {label}",
-      "badgeLabels": {
-        "dangerRating": "Danger Rating",
-        "deathRisk": "Death Risk",
-        "injuryRisk": "Injury Risk",
-        "no": "No",
-        "repeatable": "Repeatable",
-        "riskLevel": "Risk Level",
-        "yes": "Yes"
+    "slotRackPage": {
+      "route": "Route: /minimal-slotRack",
+      "subtitle": "Minimal Slice · SlotRack",
+      "title": "SLOT RACK ISOLATED"
+    },
+    "slowMo": "Slow Mo",
+    "spinDuration": "Spin Duration",
+    "stats": "Stats",
+    "threatStatus": {
+      "page": {
+        "description": "Client-only component showcase for use client directive",
+        "title": "Threat Status Indicator"
       },
-      "duration": {
-        "milliseconds": "{ms}ms",
-        "minutes": "{minutes}m",
-        "none": "—",
-        "seconds": "{seconds}s"
+      "title": "THREAT STATUS",
+      "type": {
+        "GOBLIN_RAID": "Goblin Raid",
+        "PLAGUE": "Plague",
+        "SIEGE": "Siege"
       },
-      "openDetail": "click to open details",
-      "rating": {
-        "outOf": "{rating}/5"
+      "urgency": {
+        "calm": "CALM",
+        "critical": "CRITICAL",
+        "warning": "WARNING"
+      }
+    },
+    "verdict": "Verdict",
+    "world": {
+      "anchors": {
+        "village_01": "Village 01"
       },
-      "requirement": {
-        "any": "Any"
+      "back": "Back",
+      "camera": {
+        "reset": "Reset camera"
       },
-      "reward": {
-        "daily": "{resourceId}/day {amountPerDay}",
-        "none": "—",
-        "separator": " · ",
-        "single": "{resourceId}: +{amountFormula}",
-        "summary": "Resources + XP"
+      "debug": {
+        "activeState": "Active state",
+        "anchors": "Anchors",
+        "camera": "Camera",
+        "clearObjects": "Clear",
+        "mouseWorld": "Mouse (world)",
+        "objects": "Objects",
+        "regions": "Regions",
+        "renderer": "Renderer",
+        "spawnObjects": "Spawn 60",
+        "statesTitle": "States",
+        "title": "Debug"
       },
-      "risk": {
-        "danger": {
-          "label": "DANGER: {rating}",
-          "title": "Danger Rating"
-        },
-        "death": {
-          "label": "DEATH: {risk}%",
-          "title": "Death Risk"
-        },
-        "injury": {
-          "label": "INJURY: {risk}%",
-          "title": "Injury Risk"
-        }
+      "error": "Failed to load world surface",
+      "layers": {
+        "offsetX": "Offset X",
+        "offsetY": "Offset Y",
+        "saveDefaults": "Save defaults",
+        "scale": "Scale",
+        "title": "Layers"
       },
-      "telemetry": {
-        "assigned": "{resident} → {slotId}",
-        "cancelled": "Activity {label} cancelled",
-        "collected": "Reward {label} collected",
-        "detached": "{resident} ← {slotId}",
-        "initialized": "Activity started",
-        "progressUpdate": "Progress update: {percent}%",
-        "started": "Activity {label} started",
-        "workerAssigned": "{worker} assigned to slot {slotNumber}"
+      "loading": "Loading world surface…",
+      "region": {
+        "enchanted_forest": "Enchanted Forest"
+      },
+      "states": {
+        "corrupted": "Corrupted",
+        "default": "Default",
+        "threat_manifesting": "Manifesting",
+        "threatened": "Threatened"
+      },
+      "title": "World Surface"
+    },
+    "worldEvents": {
+      "resource": "Resource",
+      "resource-tint": "Resource Tint",
+      "threat": "Threat",
+      "threat-tint": "Threat Tint",
+      "weather": "Weather",
+      "weather-tint": "Weather Tint"
+    },
+    "woundPercent": "Wound Percent"
+  },
+  "lore": {
+    "app": {
+      "title": "Lore"
+    },
+    "character": {
+      "sewerCartographer": {
+        "body": "Nessuno ha mai disegnato le fogne del villaggio. Nessuno, tranne lui. E lui non è mai tornato su.",
+        "title": "Il Cartografo delle Fogne"
+      },
+      "spyBlade": {
+        "body": "Non tutti gli spie portano pugnali. Alcuni portano silenzi così affilati da tagliare la verità a metà.",
+        "title": "La Lama della Spia"
+      }
+    },
+    "faction": {
+      "obsidianTyrant": {
+        "body": "Il Tiranno Ossidiano non cerca la carne. Cerca lo specchio in cui il calore di un coraggio ancora si riflette.",
+        "title": "L'Anima dell'Ossidiana"
+      },
+      "wolfHunger": {
+        "body": "I lupi delle rovine non attaccano per fame: seguono un ordine più antico, scritto nelle fosse fuori dalle mura.",
+        "title": "La Fame del Branco"
+      }
+    },
+    "history": {
+      "ashesOath": {
+        "body": "«Quando l'ultima fiamma si sarà spenta, il patto sarà sigillato con la cenere, non con il sangue.»",
+        "title": "Il Giuramento delle Ceneri"
+      },
+      "firstForge": {
+        "body": "Prima che le fucine spettrali crollassero, un solo martello fu battuto sotto il sole. Ne rimane il calco.",
+        "title": "La Prima Forgia"
+      },
+      "ghostFurnace": {
+        "body": "I wraith non difendono le fornaci. Le fornaci li ricordano. E il ricordo è più forte della paura.",
+        "title": "Le Fornaci Spettrali"
+      }
+    },
+    "item": {
+      "emberSigil": {
+        "body": "Gli Ember Sigils non sono moneta: sono memoria compressa di un'era in cui il sole non tramontava mai.",
+        "title": "Il Sigillo di Brace"
+      },
+      "stellarBlood": {
+        "body": "Quando il sangue delle stelle tocca la terra, il terreno diventa memoria. Quando tocca un uomo, diventa legge.",
+        "title": "Sangue Stellare"
+      }
+    },
+    "location": {
+      "forestResin": {
+        "body": "La resina della foresta settentrionale non brucia. Canta, a bassa voce, quando il vento cambia direzione.",
+        "title": "Resina del Confine"
+      },
+      "gateWhispers": {
+        "body": "Di notte, le grate del villaggio vibrano come corde. I vecchi dicono che le mura stiano imparando a parlare.",
+        "title": "I Sussurri del Cancello"
+      },
+      "marketScales": {
+        "body": "Nel mercato del villaggio, le bilance non misurano il peso. Misurano quanto un uomo è disposto a dimenticare.",
+        "title": "Le Bilance del Mercato"
       }
     },
     "questChronicle": {
-      "boardStatus": {
-        "failure": "Trial failed",
-        "pending": "Waiting for patrol outcome",
-        "success": "Last trial passed"
-      },
-      "journal": "Journal",
-      "openTheater": "Open Theater",
-      "outcome": {
-        "failure": "Failure",
-        "success": "Success"
-      },
-      "phaseType": {
-        "branch": "Branch",
-        "check": "Check",
-        "dialogue": "Dialogue",
-        "explore": "Explore",
-        "fight": "Fight",
-        "stealth": "Stealth",
-        "timedChoice": "Timed Choice",
-        "trap": "Trap"
-      },
-      "risk": {
-        "death": "{percent}% death",
-        "injury": "{percent}% injury"
-      },
-      "title": "Quest Chronicle"
+      "defaultNarrative": "La pattuglia avanza tra le rovine — ogni passo potrebbe essere l'ultimo.",
+      "loreLocked": "Una vibrazione antica attende nel silenzio di questa impresa."
+    }
+  },
+  "spell": {
+    "app": {
+      "title": "Spell Creation"
     },
-    "questRisk": {
-      "level": {
-        "high": "HIGH",
-        "low": "LOW",
-        "med": "MED"
-      },
-      "noRisk": "No Risk",
-      "stripeAriaLabel": {
-        "death": "Death risk: {percent}%",
-        "injury": "Injury risk: {percent}%"
-      }
+    "by": "by",
+    "ccOptions": {
+      "knockback": "Knockback",
+      "none": "None",
+      "silence": "Silence",
+      "slow": "Slow",
+      "stun": "Stun"
     },
-    "questTelemetry": {
-      "avgChoiceTime": "{duration} avg choice time",
-      "choiceTime": "Choice time: {time}s",
-      "clear": "Clear",
-      "decisionFallback": "Decision",
-      "heatmapTitle": "Quest Risk Heatmap",
-      "live": "Live",
-      "loading": "Loading telemetry...",
-      "metrics": {
-        "avgDuration": "Avg Duration",
-        "heroicMoments": "Heroic Moments",
-        "successRate": "Success Rate",
-        "totalQuests": "Total Quests"
-      },
-      "noDecisions": "No decisions yet",
-      "noQuestData": "No quest data yet",
-      "noQuestTaxonomy": "No quest taxonomy configured. Define questTypes in IdleVillageConfig.",
-      "phaseLabel": "Phase: {phaseId}",
-      "questTypes": "Quest Types",
-      "recentDecisions": "Recent Decisions",
-      "riskAssessment": "Quest Risk Assessment",
-      "riskSummary": "Injury: {injury}% | Death: {death}%",
-      "title": "Quest Telemetry",
-      "totalBranches": "{count} total branches"
+    "configSaved": "Configuration saved as default!",
+    "configSavedDescription": "Spell, card order, collapsed states, and slider positions saved",
+    "currentMana": "Current Mana",
+    "damageTypes": {
+      "magical": "Magical",
+      "physical": "Physical",
+      "true": "True"
     },
-    "scheduler": {
-      "alerts": {
-        "contextDetails": "Context Details",
-        "noAlerts": "✅ No Active Alerts",
-        "noAlertsDescription": "All village schedulers are operating within normal parameters."
-      },
-      "comparison": {
-        "analysisTimeWindow": "Analysis Time Window",
-        "avgEfficiency": "Avg Efficiency",
-        "bestPerformer": "Best Performer",
-        "columns": {
-          "assignmentSuccess": "Assignment Success",
-          "queueEfficiency": "Queue Efficiency",
-          "residentUtilization": "Resident Utilization",
-          "throughput": "Throughput",
-          "village": "Village"
-        },
-        "performanceRankings": "Performance Rankings",
-        "rankValue": "#{rank} ({score})",
-        "recommendations": "💡 Recommendations",
-        "timeRanges": {
-          "15m": "15 minutes",
-          "1h": "1 hour",
-          "24h": "24 hours",
-          "30m": "30 minutes",
-          "4h": "4 hours"
-        },
-        "variance": "Variance",
-        "worstPerformer": "Worst Performer"
-      },
-      "details": {
-        "activeActivities": "Active Activities",
-        "activeCount": "{active}/{total} active",
-        "activityDistribution": "Activity Distribution",
-        "byType": "By Type:",
-        "currentMetrics": "Current Metrics",
-        "fatigueLevels": {
-          "critical": "Critical",
-          "high": "High",
-          "low": "Low",
-          "medium": "Medium"
-        },
-        "queueSize": "Queue Size",
-        "queueUtilized": "{utilized} utilized",
-        "residentFatigueDistribution": "Resident Fatigue Distribution",
-        "selectVillage": "Select Village",
-        "selectVillageHint": "Choose a village from the dropdown above to view detailed metrics and charts.",
-        "selectVillagePlaceholder": "Select a village...",
-        "selectVillagePrompt": "Select a Village",
-        "successCount": "{successful}/{total}",
-        "successRate": "Success Rate",
-        "throughput": "Throughput",
-        "throughputUnit": "assignments/min",
-        "totalActivities": "Total Activities",
-        "utilization": "Utilization",
-        "utilizationLabel": "Utilization"
-      },
-      "lastUpdated": "Last updated",
-      "overview": {
-        "efficiency": "Efficiency",
-        "queue": "Queue",
-        "queueSize": "{size}/{maxSize}",
-        "successRate": "Success Rate",
-        "throughput": "Throughput",
-        "utilization": "Utilization",
-        "villageId": "{id}"
-      },
-      "subtitle": "Monitoring {villages} villages • {kpis} KPIs collected • {alerts} active alerts",
-      "tabs": {
-        "alerts": "🚨 Alerts",
-        "comparison": "🏆 Comparison",
-        "details": "📈 Details",
-        "overview": "📊 Overview"
-      },
-      "title": "🏘️ Multi-Village Scheduler Monitor"
+    "decreases": "Decreases",
+    "dragToSelect": "Drag to select tick",
+    "editor": {
+      "advancedStats": "Advanced Stats",
+      "balanceRequired": "Balance Required (Cost ≠ 0)",
+      "balanced": "✓ Balanced",
+      "budget": "Budget: {value}",
+      "cancel": "Cancel",
+      "ccEffect": "CC Effect",
+      "coreStats": "Core Stats",
+      "damageType": "Damage Type",
+      "descriptionPlaceholder": "Spell description...",
+      "effectPercent": "Effect (%)",
+      "hpEquivalent": "HP-equivalent",
+      "mana": "mana",
+      "manaCost": "Mana Cost",
+      "namePlaceholder": "Spell Name",
+      "none": "None",
+      "overpriced": "Overpriced",
+      "passive": "Passive",
+      "recommended": "Recommended",
+      "resetToBase": "Reset to Base",
+      "resetWeight": "Reset weight",
+      "resetWeights": "Reset Weights",
+      "saveSpell": "Save Spell",
+      "scalingStat": "Scaling Stat",
+      "situationalModifiers": "Situational Modifiers (JSON array)",
+      "spellPower": "Spell Power",
+      "tags": "Tags",
+      "tagsPlaceholder": "comma-separated tags",
+      "targetStat": "Target Stat",
+      "title": "Edit Spell",
+      "type": "Type",
+      "underpriced": "Underpriced"
     },
-    "slotRack": {
-      "ariaLabel": "Slot {state}",
-      "states": {
-        "empty": "empty",
-        "locking": "locking",
-        "occupied": "occupied"
-      }
+    "for": "for",
+    "hide": "Hide",
+    "increases": "Increases",
+    "labels": {
+      "balance": "Balance",
+      "duration": "Duration (Turns)",
+      "effect": "Effect",
+      "modification": "Modification %"
     },
-    "slotStatus": {
-      "active": "Activity is currently in progress.",
-      "blocked": "This slot is locked or unavailable.",
-      "idle": "Activity slot is available for assignment.",
-      "invalid_drop": "This resident cannot be assigned here.",
-      "valid_drop": "This resident can be assigned here.",
-      "warning": "Assignment may have risks or requirements."
+    "level": "Level",
+    "library": {
+      "availableCount": "{count} spells available",
+      "avgDamage": "Avg Damage (effect% × base × eco)",
+      "avgDamageFormula": "base = {base}, eco = {eco}",
+      "baseEffect": "Base Effect",
+      "configLibrary": "Config Library",
+      "cooldown": "CD: {value} turns",
+      "delete": "Delete",
+      "editSpell": "Edit Spell",
+      "newSpell": "New Spell",
+      "selectPrompt": "Select a spell to view details",
+      "selectSpell": "Select Spell",
+      "statistics": "Statistics",
+      "title": "Spell Library"
     },
-    "testRoster": {
-      "controls": {
-        "dayNightCycle": "Day/Night Cycle",
-        "randomize": "Randomize",
-        "reset": "Reset"
-      },
-      "debug": {
-        "drop": "Drop",
-        "dropStates": {
-          "idle": "Idle",
-          "invalid": "Invalid",
-          "locked": "Locked",
-          "valid": "Valid"
-        },
-        "off": "Off",
-        "on": "On",
-        "slots": "Slots",
-        "stamina": "Stamina >",
-        "toggle": "Slot debug visualization",
-        "toggleDescription": "Highlight bezel, medal and token for DOM comparison.",
-        "warnings": "Warnings"
-      },
-      "empty": {
-        "configureResidents": "Configure residents in the Character Manager to run drag & drop tests.",
-        "description": "The Character Manager does not contain residents to test.",
-        "title": "No Residents Loaded"
-      },
-      "error": {
-        "actions": {
-          "0": "Verify the Character Manager contains residents.",
-          "1": "Reload the page after configuring data.",
-          "2": "Check the console for loading errors."
-        },
-        "description": "Load residents from the Character Manager before testing.",
-        "suggestedActions": "Suggested actions:",
-        "title": "Loading Error"
-      },
-      "ftue": {
-        "availableActivities": "Available Activities",
-        "cycleProgress": "Cycle Progress",
-        "day": "Day",
-        "pause": "⏸️ Pause",
-        "phase": {
-          "day": "☀️ Day",
-          "night": "🌙 Night"
-        },
-        "reset": "🔄 Reset",
-        "resourceLabels": {
-          "food": "Food",
-          "gold": "Gold"
-        },
-        "resources": "Resources",
-        "resume": "▶️ Resume",
-        "roster": "Roster",
-        "slottedMetal": "SlottedMetal (Placeholder)",
-        "slottedMetalPlaceholder": "SlottedMetal component — To be developed",
-        "tick": "Tick",
-        "timeEngine": "Time Engine"
-      },
-      "lastAttempt": {
-        "error": "Error",
-        "errorWithDetails": "Error · {reason}{details}",
-        "none": "No interaction recorded",
-        "success": "Success",
-        "successWithResident": "Success · {resident}",
-        "unknown": "Error · unknown"
-      },
-      "loading": "Loading roster…",
-      "map": {
-        "activeActivities": "Active Activities",
-        "activitySlots": "Activity Slots",
-        "error": "Something went wrong in Village Sandbox.",
-        "reset": "Reset",
-        "resetting": "Resetting…"
-      },
-      "mockRoster": {
-        "description": "The Character Manager is empty: using the default minimal roster to enable drag testing.",
-        "title": "Mock roster active"
-      },
-      "narrative": {
-        "config": {
-          "availableHooks": "Available Hooks",
-          "configVersion": "Config Version",
-          "configurationStatus": "Configuration Status",
-          "hooks": "Hooks",
-          "no": "No",
-          "telemetryEnabled": "Telemetry Enabled",
-          "templates": "Templates",
-          "yes": "Yes"
-        },
-        "context": {
-          "location": "Location",
-          "progress": "Progress: {progress}%",
-          "questDifficulty": "Quest Difficulty",
-          "questName": "Quest Name",
-          "questType": "Quest Type",
-          "residentLevel": "Resident Level",
-          "residentName": "Resident Name",
-          "timeOfDay": "Time of Day",
-          "weather": "Weather"
-        },
-        "difficulty": {
-          "easy": "Easy",
-          "hard": "Hard",
-          "nightmare": "Nightmare",
-          "normal": "Normal"
-        },
-        "narratives": {
-          "complete": "Complete Quest",
-          "count": "{count, plural, one {1 narrative} other {{count} narratives}}",
-          "details": {
-            "generated": "Generated",
-            "hook": "Hook",
-            "id": "ID: {id}",
-            "metadata": "Metadata",
-            "telemetry": "Telemetry",
-            "telemetryNotTracked": "Not Tracked",
-            "telemetryTracked": "Tracked",
-            "template": "Template",
-            "text": "Text",
-            "title": "Narrative Details",
-            "variables": "Variables"
-          },
-          "fail": "Fail Quest",
-          "noNarratives": "No narratives generated yet",
-          "noNarrativesHint": "Click \"Play\" to start auto-generating or use the buttons above",
-          "title": "Generated Narratives"
-        },
-        "pause": "Pause",
-        "play": "Play",
-        "questProgress": "Quest Progress",
-        "questTypes": {
-          "combat": "Combat",
-          "crafting": "Crafting",
-          "diplomacy": "Diplomacy",
-          "exploration": "Exploration",
-          "social": "Social"
-        },
-        "refresh": "Refresh",
-        "tabs": {
-          "config": "Config",
-          "context": "Context",
-          "narratives": "Narratives",
-          "telemetry": "Telemetry"
-        },
-        "telemetry": {
-          "connected": "Connected",
-          "disconnected": "Disconnected",
-          "events": "Events",
-          "lastActivity": "Last Activity",
-          "metrics": "Metrics",
-          "status": "Status",
-          "topEvents": "Top Events",
-          "topMetrics": "Top Metrics"
-        },
-        "timeOfDay": {
-          "dawn": "Dawn",
-          "day": "Day",
-          "dusk": "Dusk",
-          "night": "Night"
-        },
-        "title": "Quest Narrative Panel",
-        "weather": {
-          "clear": "Clear",
-          "fog": "Fog",
-          "rain": "Rain",
-          "snow": "Snow",
-          "storm": "Storm",
-          "windy": "Windy"
-        }
-      },
-      "picker": {
-        "button": "Open picker"
-      },
-      "poiDetailPage": {
-        "activityLabel": "Attività:",
-        "description": "POI job reale da Idle Village config, detail completo e slot rack interattivo.",
-        "pretitle": "Test Hub · Job POI Detail + Roster Integration",
-        "rosterTitle": "Village Roster",
-        "title": "JOB POI DETAIL + ROSTER INTEGRATION"
-      },
-      "rosterFeedback": {
-        "assigned": "{rack} · assigned {resident}",
-        "assignedNoResident": "{rack} · assigned",
-        "error": "{rack} · {reason}{details}",
-        "invalid": "{rack} · invalid",
-        "rack": "Rack A"
-      },
-      "scenarios": {
-        "open": {
-          "hpInsufficient": "HP insufficient ({hp}/200)",
-          "requirement": "HP ≥ 200",
-          "subtitle": "Requires HP ≥ 200",
-          "title": "Rack A · Permissive scenario"
-        },
-        "restricted": {
-          "hpInsufficient": "HP insufficient ({hp}/200)",
-          "requirement": "HP ≥ 200",
-          "subtitle": "Requires HP ≥ 200",
-          "title": "Rack B · Restrictive scenario"
-        }
-      },
-      "scheduler": {
-        "alerts": {
-          "contextDetails": "Context Details",
-          "noAlerts": "✅ No Active Alerts",
-          "noAlertsDescription": "All village schedulers are operating within normal parameters."
-        },
-        "comparison": {
-          "analysisTimeWindow": "Analysis Time Window",
-          "avgEfficiency": "Avg Efficiency",
-          "bestPerformer": "Best Performer",
-          "columns": {
-            "assignmentSuccess": "Assignment Success",
-            "queueEfficiency": "Queue Efficiency",
-            "residentUtilization": "Resident Utilization",
-            "throughput": "Throughput",
-            "village": "Village"
-          },
-          "performanceRankings": "Performance Rankings",
-          "rankValue": "#{rank} ({score})",
-          "recommendations": "💡 Recommendations",
-          "timeRanges": {
-            "15m": "15 minutes",
-            "1h": "1 hour",
-            "24h": "24 hours",
-            "30m": "30 minutes",
-            "4h": "4 hours"
-          },
-          "variance": "Variance",
-          "worstPerformer": "Worst Performer"
-        },
-        "details": {
-          "activeActivities": "Active Activities",
-          "activeCount": "{active}/{total} active",
-          "activityDistribution": "Activity Distribution",
-          "byType": "By Type:",
-          "currentMetrics": "Current Metrics",
-          "fatigueLevels": {
-            "critical": "Critical",
-            "high": "High",
-            "low": "Low",
-            "medium": "Medium"
-          },
-          "queueSize": "Queue Size",
-          "queueUtilized": "{utilized} utilized",
-          "residentFatigueDistribution": "Resident Fatigue Distribution",
-          "selectVillage": "Select Village",
-          "selectVillageHint": "Choose a village from the dropdown above to view detailed metrics and charts.",
-          "selectVillagePlaceholder": "Select a village...",
-          "selectVillagePrompt": "Select a Village",
-          "successCount": "{successful}/{total}",
-          "successRate": "Success Rate",
-          "throughput": "Throughput",
-          "throughputUnit": "assignments/min",
-          "totalActivities": "Total Activities",
-          "utilization": "Utilization",
-          "utilizationLabel": "Utilization"
-        },
-        "lastUpdated": "Last updated",
-        "overview": {
-          "efficiency": "Efficiency",
-          "queue": "Queue",
-          "queueSize": "{size}/{maxSize}",
-          "successRate": "Success Rate",
-          "throughput": "Throughput",
-          "utilization": "Utilization",
-          "villageId": "{id}",
-          "villageName": "{name}"
-        },
-        "subtitle": "Monitoring {villages} villages • {kpis} KPIs collected • {alerts} active alerts",
-        "tabs": {
-          "alerts": "🚨 Alerts",
-          "comparison": "🏆 Comparison",
-          "details": "📈 Details",
-          "overview": "📊 Overview"
-        },
-        "title": "🏘️ Multi-Village Scheduler Monitor"
-      },
-      "title": "Idle Village Slot Lab",
-      "validation": {
-        "dropOutsideValidArea": "Drop outside valid area",
-        "scenarioRequirementNotMet": "Scenario requirement not met"
-      }
+    "malus": "Malus",
+    "modificationPercent": "Modification %",
+    "power": "Power",
+    "preview": {
+      "buffDebuff": "{type} for {eco} turn{turns}",
+      "title": "Preview Spell"
     },
-    "workerTooltip": {
-      "accessibility": {
-        "closeTooltip": "Close tooltip for {name}",
-        "riskBadge": "{level} status",
-        "tooltipDetails": "{name} - Worker details"
-      },
-      "actions": {
-        "close": "Close tooltip"
-      },
-      "labels": {
-        "bio": "Bio",
-        "fatigue": "Fatigue",
-        "hp": "HP",
-        "performance": "Performance",
-        "recommendations": "Recommendations",
-        "risk": "Risk Level",
-        "specialties": "Specialties"
-      },
-      "recommendations": {
-        "critical": "Immediate rest required",
-        "highFatigue": "High fatigue - consider rest",
-        "injured": "Recovering from injury",
-        "lowHp": "Rest needed - HP critical"
-      },
-      "riskLevels": {
-        "critical": "Critical Risk",
-        "high": "High Risk",
-        "low": "Low Risk",
-        "medium": "Medium Risk"
-      },
-      "sections": {
-        "quote": "Quote"
-      },
-      "statuses": {
-        "available": "Available",
-        "away": "Away",
-        "dead": "Fallen",
-        "exhausted": "Exhausted",
-        "injured": "Injured",
-        "recovering": "Recovering",
-        "resting": "Resting",
-        "working": "On Assignment"
-      }
+    "range": "Range",
+    "recommendedMana": "Recommended Mana",
+    "reset": "Reset",
+    "save": {
+      "defaultDescription": "Spell, card order, collapsed states, and slider positions saved",
+      "defaultError": "Failed to save default",
+      "defaultErrorDescription": "Please try again or check console for errors",
+      "defaultSuccess": "Configuration saved as default!",
+      "success": "Spell saved successfully!",
+      "successDescription": "{name} has been added to your library"
     },
-    "workerTraits": {
-      "agility": "Speed and reflexes for hunting and scouting tasks.",
-      "endurance": "Stamina for long-duration activities and fatigue resistance.",
-      "exhausted": "This resident is too exhausted to work effectively.",
-      "injured": "This resident is injured and cannot work until recovered.",
-      "intelligence": "Problem-solving ability for complex quests and crafting.",
-      "perception": "Awareness and detection skills for exploration.",
-      "strength": "Physical power for mining and combat activities."
+    "saveDefault": "Save Default",
+    "saveDefaultTitle": "Save current configuration as default for new spells",
+    "saveFailed": "Failed to save default",
+    "saveFailedDescription": "Please try again or check console for errors",
+    "scalingStats": {
+      "attack": "Attack",
+      "defense": "Defense",
+      "health": "Health",
+      "magic": "Magic",
+      "mana": "Mana"
+    },
+    "school": "School",
+    "show": "Show",
+    "spellAddedToLibrary": "\"{name}\" has been added to your library",
+    "spellCreator": "Spell Creator",
+    "spellSaved": "Spell saved successfully!",
+    "statInvestment": "Stat Investment",
+    "stats": {
+      "aoe": "AoE Targets",
+      "cooldown": "Cooldown",
+      "dangerous": "Dangerous",
+      "duration": "Duration",
+      "manaCost": "Mana Cost",
+      "pierce": "Pierce",
+      "scale": "Scale",
+      "tags": "Tags"
+    },
+    "summary": "Summary",
+    "targetCost": "Target Cost",
+    "tickValue": "Tick value",
+    "turns": "turns",
+    "types": {
+      "buff": "Buff",
+      "cc": "CC",
+      "crowdControl": "Crowd Control",
+      "damage": "Damage",
+      "debuff": "Debuff",
+      "heal": "Heal",
+      "shield": "Shield"
+    }
+  },
+  "sts": {
+    "app": {
+      "title": "STS"
+    }
+  },
+  "styleLab": {
+    "accessibility": {
+      "hide": "Hide Style Lab",
+      "show": "Show Style Lab"
+    },
+    "actions": {
+      "randomize": "Randomize",
+      "reset": "Reset"
+    },
+    "app": {
+      "title": "Style Lab"
+    },
+    "panel": {
+      "kicker": "Style Laboratory"
+    }
+  },
+  "wanderlust": {
+    "app": {
+      "title": "Wanderlust"
+    },
+    "mockup": {
+      "error": "Failed to load mockup content",
+      "help": "Please check the console for details",
+      "title": "Wanderlust Mockup"
     }
   }
 }

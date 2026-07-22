@@ -22,6 +22,7 @@ export default function MinimalSlotRackPage() {
             layout="detail"
             slotSize={96}
             overflowBehavior="scroll"
+            skinPresetId="slot_rack_materic"
           />
         </div>
       </div>

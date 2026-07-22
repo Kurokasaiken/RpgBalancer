@@ -1,0 +1,111 @@
+{
+  "task_id": "IV-SLOT-RACK-RESKIN-001",
+  "title": "Slot Rack Container Reskin to Roster Materic Style",
+  "description": "Apply the Roster Materic/Wanderlust container styling (bronze/gold border, dark gradient inner color, and subtle grain texture from /assets/ui/bg.png) to the ResidentSlotRack container on /minimal-slotRack. The slot internals and the page shell must remain unchanged.",
+  "plan_reference": "src/docs/docs/minimal_slice/03_slotRack.md, src/docs/docs/minimal_slice/02_roster_pgtoken.md, IMPLEMENTATION_PLAN_SKIN_READY_COMPONENTS.md §5.2",
+  "estimated_duration": "60-90 minutes",
+  "objectives": [
+    "Create a new `slot_rack_materic` skin preset in `slotRackSkinConfig.ts` that reproduces the roster container border, inner gradient, and grain overlay",
+    "Update `ResidentSlotRack.tsx` `rackShellStyle` to support multi-layer backgrounds and blend modes via CSS custom properties (additive, backward compatible)",
+    "Apply the new preset to `ResidentSlotRackSkin` on `/minimal-slotRack` via the `skinPresetId` prop without changing the page layout, header, or background",
+    "Leave slot appearance (Slot, SlottedMedal, labels, drop states) unchanged"
+  ],
+  "success_criteria": [
+    "`/minimal-slotRack` container has rounded corners, dark roster gradient, gold/bronze shadow outline, and visible `bg.png` grain overlay matching `/minimal-roster`",
+    "No standalone `.css` files are created",
+    "No hardcoded colors/borders in component code; all visual tokens live in `slotRackSkinConfig.ts`",
+    "Existing slot rack tests still pass",
+    "`npm run lint --`, `npm run build:check`, and `npm run kanban:lint` pass for the touched scope"
+  ],
+  "kpi_targets": {
+    "visual_parity": "container matches roster Materic shell",
+    "config_first_compliance": "100% of visual tokens in config",
+    "safeguard_pass_rate": "100%"
+  },
+  "integration_points": [
+    "`src/ui/idleVillage/skins/slotRackSkinConfig.ts` — new preset and registry mapping",
+    "`src/ui/idleVillage/components/ResidentSlotRack.tsx` — `rackShellStyle` CSS variable support",
+    "`src/pages/minimal-slotRack.tsx` — `skinPresetId` prop selection",
+    "`src/ui/wanderlust-surface/matericSkinConfig.ts` — grain texture source of truth"
+  ],
+  "dependencies": [
+    "`slotRackKit` (frozen/certified) — `ResidentSlotRack` and `ResidentSlotRackSkin`",
+    "`MatericSkinConfig` grain values",
+    "`DragTestContainer` roster container visual reference",
+    "Existing slot rack test harness"
+  ],
+  "guardrails": {
+    "invariants": [
+      "Config-first: all border, background, shadow, and grain values come from `slotRackSkinConfig.ts`",
+      "Skin system: no new standalone `.css` files; use CSS custom properties and existing skin registry",
+      "Component reuse: check `src/ui/idleVillage/skins/primitives/` and `src/ui/wanderlust-surface/` before creating a new wrapper; prefer CSS-variable-driven shell",
+      "i18n: no new user-facing strings; if labels are added, route them through `react-i18next` `idleVillage` namespace",
+      "State management: this is a visual reskin only; no state changes or persistence"
+    ],
+    "trusted_frozen_components": [
+      "`slotRackKit` is frozen (COMPONENT_MASTER_INDEX). Changes inside `ResidentSlotRack`/`ResidentSlotRackSkin` source must preserve the kit contract and pass kit tests."
+    ],
+    "forbidden_actions": [
+      "Do not change the page header, page background, or page layout in `minimal-slotRack.tsx`",
+      "Do not alter slot inner styling (Slot, medal, labels, drop-state colors)",
+      "Do not change `DEFAULT_SLOT_RACK_PRESET_ID` globally",
+      "Do not create standalone `.css` files",
+      "Do not use `localStorage`/`sessionStorage` or synchronous persistence"
+    ]
+  },
+  "implementation_scope": {
+    "files_to_create": [
+      "No new files are strictly required; the new preset lives in `slotRackSkinConfig.ts`"
+    ],
+    "files_to_modify": [
+      "`src/ui/idleVillage/skins/slotRackSkinConfig.ts` — add `SLOT_RACK_MATERIC_CONFIG`, register it, and map preset ids",
+      "`src/ui/idleVillage/components/ResidentSlotRack.tsx` — extend `rackShellStyle` to read `--slot-rack-bg-blend`, `--slot-rack-bg-size`, `--slot-rack-bg-repeat`, `--slot-rack-bg-position` via `var(...)` with safe defaults",
+      "`src/pages/minimal-slotRack.tsx` — pass `skinPresetId=\"slot_rack_materic\"` to `ResidentSlotRackSkin`"
+    ],
+    "component_reuse_requirements": [
+      "Verify that no existing `InsetPanel`, `WanderlustSurface`, or `Skin*` primitive already provides a rounded bronze/dark container with grain before adding a new wrapper",
+      "If `rackShellStyle` CSS variables are sufficient, do not introduce a new component"
+    ],
+    "testing_requirements": {
+      "unit_tests": [
+        "Add/update `ResidentSlotRack.skin.integration.test.tsx` to assert `--slot-rack-bg` contains the roster gradient and grain URL when `slot_rack_materic` is active",
+        "Run existing `ResidentSlotRack.unit.test.tsx` and `ResidentSlotRack.medal.test.tsx` to ensure no regression"
+      ],
+      "visual_verification": [
+        "Load `/minimal-slotRack` and confirm the rack container has the same rounded dark shell and grain as `/minimal-roster`",
+        "Confirm slots still render with their existing skin (no gold overlay on slots)"
+      ]
+    },
+    "documentation_updates": [
+      "Update `src/docs/docs/minimal_slice/03_slotRack.md` to mention the `slot_rack_materic` skin preset",
+      "Add JSDoc to any new helper or mapping function in `slotRackSkinConfig.ts`",
+      "Log evidence to `test-results/iv-slot-rack-reskin-<date>.log`"
+    ]
+  },
+  "safeguards": {
+    "lint": {
+      "scope": "src/ui/idleVillage/skins/slotRackSkinConfig.ts src/ui/idleVillage/components/ResidentSlotRack.tsx src/pages/minimal-slotRack.tsx",
+      "timeout_seconds": 120
+    },
+    "test": {
+      "scope": "tests/unit/idleVillage/ResidentSlotRack.skin.integration.test.tsx tests/unit/idleVillage/ResidentSlotRack.unit.test.tsx tests/unit/idleVillage/03_slotRack.unit.test.tsx",
+      "timeout_seconds": 300
+    },
+    "build_check": {
+      "timeout_seconds": 180
+    },
+    "kanban_lint": {
+      "timeout_seconds": 30
+    },
+    "evidence_log": "test-results/iv-slot-rack-reskin-<date>.log"
+  },
+  "execution_hint": "verified",
+  "notes": {
+    "roster_reference_values": "The roster container under `DragTestContainer` `useWanderlustSkin` uses `rounded-[20px]`, `bg-[linear-gradient(180deg,rgba(3,2,2,0.95)_0%,rgba(6,4,3,0.98)_100%)]`, and `shadow-[inset_0_1px_0_rgba(216,177,62,0.08),0_4px_20px_rgba(0,0,0,0.6),0_0_0_1px_rgba(216,177,62,0.05)]`.",
+    "grain_reference": "`MATERIC_SKIN_CONFIG.grain` uses `/assets/ui/bg.png` with opacity `0.1` and `mixBlendMode` `normal`. Implement the grain as a blended layer over the container gradient (e.g. `background: url('/assets/ui/bg.png'), linear-gradient(...)` with `backgroundBlendMode: soft-light, normal`).",
+    "css_vars_approach": "`ResidentSlotRack` `rackShellStyle` already reads `--slot-rack-bg`, `--slot-rack-border`, `--slot-rack-border-radius`, `--slot-rack-padding`, and `--slot-rack-shadow`. Add `--slot-rack-bg-blend`, `--slot-rack-bg-size`, `--slot-rack-bg-repeat`, and `--slot-rack-bg-position` as optional vars with safe defaults. Then populate them in the new preset.",
+    "preset_mapping": "Add `slot_rack_materic` to `SLOT_RACK_SKIN_REGISTRY`, `getSlotRackSkinForPreset` (handle `materic` and `slot_rack_materic`), and `SLOT_RACK_PRESET_OVERRIDES` if a short alias is desired.",
+    "page_change_note": "The only `minimal-slotRack.tsx` change is adding `skinPresetId=\"slot_rack_materic\"` to the existing `ResidentSlotRackSkin`. Do not change the header, page background, or surrounding layout.",
+    "skills": "Before editing, invoke `agent-execution-mandate` and `idle-village-task` skills, then follow their safeguard and reporting instructions."
+  }
+}

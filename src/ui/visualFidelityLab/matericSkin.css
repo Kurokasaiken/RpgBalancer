@@ -1,0 +1,35 @@
+/*
+ * Materic skin — the TRIVIAL FLAG (2026-07-18).
+ *
+ * Presence of the `.materic-skin` class on any ancestor flips components that
+ * read these tokens into the Material Language; removing the class reverts to
+ * the "liscio" (fallback) look. Nothing else changes — components already read
+ * these CSS vars with their own fallbacks.
+ *
+ * To make materic the GAME default: add `materic-skin` on the app root.
+ * To revert: remove the class. That is the whole flag.
+ *
+ * NOTE: today this maps the STAT-BAR tokens (proven on PgCard). Other components
+ * (medal, POI, clock, slotRack) expose their own material tokens — their materic
+ * mappings get added here as each is harmonized. Until then they render the same
+ * in both columns (honest: mapping pending), which is why the gallery labels it.
+ */
+.materic-skin {
+  /* carved channel: cold azure-black groove + warm gold bottom-lip */
+  --skin-statbar-track: linear-gradient(180deg, #05101c, #02070f);
+  --slot-border: rgba(60, 110, 150, 0.12);
+  --slot-inset: inset 0 2px 5px rgba(0, 0, 0, 0.9), inset 0 -1px 0 rgba(240, 207, 106, 0.18);
+
+  /* HP → emerald / jade (life) */
+  --skin-statbar-hp-start: #2f8f5c;
+  --skin-statbar-hp-end: #8fe0a8;
+  --skin-statbar-hp-glow: rgba(120, 240, 170, 0.4);
+
+  /* Stamina → amber (vigour) */
+  --skin-statbar-stamina-start: #c9852e;
+  --skin-statbar-stamina-end: #ffd98a;
+  --skin-statbar-stamina-glow: rgba(255, 190, 90, 0.4);
+
+  /* fill rim / meniscus → warm gold */
+  --skin-icon-color: #f0cf6a;
+}

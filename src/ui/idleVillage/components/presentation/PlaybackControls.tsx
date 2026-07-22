@@ -32,19 +32,19 @@ export function PlaybackControls({
     <SkinScope className="presentation-playback-controls space-y-3">
       <div className="flex flex-wrap items-center gap-2">
         <SkinButton onClick={onPlay} disabled={isPlaying} data-testid="play-button">
-          {t('presentation.play')}
+          {t('idleVillage:presentation.play')}
         </SkinButton>
         <SkinButton onClick={onPause} disabled={!isPlaying} data-testid="pause-button">
-          {t('presentation.pause')}
+          {t('idleVillage:presentation.pause')}
         </SkinButton>
         <SkinButton onClick={onStep} data-testid="step-button">
-          {t('presentation.step')}
+          {t('idleVillage:presentation.step')}
         </SkinButton>
       </div>
 
       <div className="grid grid-cols-2 gap-2 text-sm">
         <label className="text-slate-300" htmlFor="presentation-seed">
-          {t('presentation.seed')}
+          {t('idleVillage:presentation.seed')}
         </label>
         <input
           id="presentation-seed"
@@ -56,7 +56,7 @@ export function PlaybackControls({
         />
 
         <label className="text-slate-300" htmlFor="presentation-tick">
-          {t('presentation.tick')}
+          {t('idleVillage:presentation.tick')}
         </label>
         <input
           id="presentation-tick"

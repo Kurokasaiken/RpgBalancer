@@ -36,7 +36,7 @@ export interface ResidentSlotRackSkinProps extends Omit<ResidentSlotRackProps, '
   skinPresetId?: string;
   /** Additional CSS class names */
   className?: string;
-  /** Test ID for testing */
+  /** Test ID for testing (defaults to resident-slot-rack-skin) */
   'data-testid'?: string;
 }
 
@@ -49,7 +49,7 @@ export interface ResidentSlotRackSkinProps extends Omit<ResidentSlotRackProps, '
 export const ResidentSlotRackSkin = memo(({
   skinPresetId,
   className = '',
-  'data-testid': testId,
+  'data-testid': testId = 'resident-slot-rack-skin',
   ...residentSlotRackProps
 }: ResidentSlotRackSkinProps) => {
   const skinPreferences = useSkinPreferences();
@@ -142,30 +142,16 @@ export const ResidentSlotRackSkin = memo(({
     };
   }, [skinConfig, interactionPhysics, materialFeel]);
   
-  // Apply CSS custom properties when skin config changes
+  // Emit telemetry event when skin config changes
   useEffect(() => {
     if (!skinConfig) return;
-    
-    // Apply CSS custom properties to the root element
-    const root = document.documentElement;
-    Object.entries(skinConfig.cssVars).forEach(([property, value]) => {
-      root.style.setProperty(property, value);
-    });
-    
-    // Emit telemetry event using the new helper
+
     trackSlotRackSkinRendered(
       skinConfig as any,
       residentSlotRackProps.slots.length,
       residentSlotRackProps.layout || 'board',
       'idle'
     );
-    
-    // Cleanup function to remove CSS vars
-    return () => {
-      Object.keys(skinConfig.cssVars).forEach(property => {
-        root.style.removeProperty(property);
-      });
-    };
   }, [skinConfig, activePresetId, skinPreferences.pillar, residentSlotRackProps.slots.length, residentSlotRackProps.layout]);
   
   // Generate CSS custom properties string for inline styles

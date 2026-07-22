@@ -171,8 +171,11 @@ export const WellBronzeBezel: React.FC<{ band?: number; rx?: number }> = ({ band
         </defs>
         {/* dark seat: separates the metal from the field */}
         <rect x="0.5" y="0.5" width={w - 1} height={h - 1} rx={rx + 1} fill="none" stroke="rgba(0,0,0,0.55)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
-        {/* the bronze band — one vertical light (NMM ladder), half of medio */}
-        <rect x={inset} y={inset} width={w - inset * 2} height={h - inset * 2} rx={rx} fill="none" stroke={`url(#wbb-${uid})`} strokeWidth={band} vectorEffect="non-scaling-stroke" />
+        {/* the bronze band — one vertical light (NMM ladder, warm-gold crest),
+            half of medio, WORN by the displacement filter (anti-perfection) */}
+        <g filter={`url(#wear-${uid})`}>
+          <rect x={inset} y={inset} width={w - inset * 2} height={h - inset * 2} rx={rx} fill="none" stroke={`url(#wbb-${uid})`} strokeWidth={band} vectorEffect="non-scaling-stroke" />
+        </g>
         {/* inner hard step where the metal meets the recess */}
         <rect x={innerX} y={innerX} width={w - innerX * 2} height={h - innerX * 2} rx={Math.max(2, rx - 1)} fill="none" stroke="rgba(1,3,6,0.8)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
       </svg>

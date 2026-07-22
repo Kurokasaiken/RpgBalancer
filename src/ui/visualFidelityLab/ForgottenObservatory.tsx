@@ -11,6 +11,7 @@ import {
 } from '@/ui/wanderlust-surface/layout';
 import { SURFACE_MATERIAL, SURFACE_MATERIAL_LAYER, FIELD_BACKGROUND, FIELD_VIGNETTE, GOLD_FILET_SHADOW } from './foundationRecipe';
 import { WellBronzeBezel } from './plateVariants';
+import { CarvedBar } from './CarvedBar';
 
 /**
  * REBUILD — "The Forgotten Observatory".
@@ -120,37 +121,8 @@ export const ForgottenObservatory: React.FC = () => (
           <WanderlustSectionHeader tier="tertiary" hint="charting the dome" marginBottom="sm">
             Observatory Progress
           </WanderlustSectionHeader>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontFamily: 'var(--skin-font-display)', fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--skin-label-primary, #c9a84e)', whiteSpace: 'nowrap' }}>
-              Survey Completion
-            </span>
-            <div
-              style={{
-                flex: 1,
-                height: 13,
-                position: 'relative',
-                borderRadius: 2,
-                background: 'linear-gradient(180deg, #0a0908, #040404)',
-                border: '1px solid rgba(216,177,62,0.16)',
-                boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.9), inset 0 1px 0 rgba(0,0,0,0.7), 0 1px 0 rgba(255,255,255,0.03)',
-                overflow: 'hidden',
-              }}
-            >
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  height: '100%',
-                  width: '63%',
-                  borderRadius: 1,
-                  background: 'linear-gradient(180deg, #86d8a1 0%, #3a9c62 55%, #206e42 100%)',
-                  boxShadow: 'inset 0 1px 0 rgba(205,255,222,0.55), inset 0 -2px 3px rgba(0,0,0,0.45), 0 0 8px rgba(80,200,120,0.35)',
-                }}
-              />
-            </div>
-            <span style={{ fontFamily: 'var(--skin-font-sans, system-ui)', fontSize: 11, color: 'var(--skin-body-color)', whiteSpace: 'nowrap' }}>63/100</span>
-          </div>
+          {/* Proof #2 now CONSUMES the extracted CarvedBar primitive (energy=xp). */}
+          <CarvedBar energy="xp" value={63} max={100} label="Survey Completion" />
         </div>
 
         {/* ── Well 2: reward reveal — DIFFERENTIATED as a special reward plaque ── */}
