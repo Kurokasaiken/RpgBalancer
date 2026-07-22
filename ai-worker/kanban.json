@@ -5,8 +5,9 @@
       "execution_hint": "atomic",
       "id": "AI-SMOKE-TEST-001",
       "prompt": "AGENT\nWrite a short markdown file confirming this ai-worker smoke test executed.\n\nISTRUZIONI\nCreate the file coordinator/AI_WORKER_SMOKE_TEST.md containing exactly this text (no extra commentary):\n\n# AI Worker Smoke Test\nThis file was created automatically by the ai-worker as a trivial atomic dispatch test.\n\nFILE TARGET: coordinator/AI_WORKER_SMOKE_TEST.md\nEXECUTION HINT: atomic\nCOMPLEXITY: 1",
-      "status": "todo",
-      "target_file": "coordinator/AI_WORKER_SMOKE_TEST.md"
+      "status": "failed",
+      "target_file": "coordinator/AI_WORKER_SMOKE_TEST.md",
+      "error": "Nessun provider con modelli disponibili trovato"
     }
   ],
   "_retrigger_at": "2026-07-22T15:47:14.293765+00:00"
