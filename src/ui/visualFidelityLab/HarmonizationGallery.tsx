@@ -3,11 +3,12 @@ import type { CSSProperties, ReactNode } from 'react';
 import './matericSkin.css';
 import { ErrorBoundary } from '@/ui/organisms/ErrorBoundary';
 import { FIELD_BACKGROUND, FIELD_VIGNETTE } from './foundationRecipe';
-import { PgCardStandalone, residentToPgCardProps } from '@/ui/idleVillage/frozen/kits/pgcardKit';
-import { pgcardFixtureResidents } from '@/ui/idleVillage/frozen/kits/pgcardKit.fixture';
-// Import each Standalone DIRECTLY from its kit file — the barrel index re-exports
-// slottedMedalKit, whose `@/ui/idleVillage/components/SlottedMedal` import is broken
-// upstream (pre-existing), and pulling the barrel would fail the whole module.
+// Real embedded contexts, imported DIRECTLY from each kit file (the barrel index
+// re-exports slottedMedalKit, whose SlottedMedal import is broken upstream).
+// NB: the pgCard is NEVER shown solo in the product — the real context is the
+// ROSTER (a list of embedded cards). The standalone card + its "no compatible
+// slot" banner are testing-only artifacts, so we mount the roster instead.
+import { MatericRosterComponent } from '@/ui/idleVillage/components/MatericRosterComponent';
 import { ClockWidgetStandalone } from '@/ui/idleVillage/frozen/kits/clockKit';
 import { ActivityCapsuleStandalone } from '@/ui/idleVillage/frozen/kits/activityCapsuleKit';
 import { QuestPOIStandalone } from '@/ui/idleVillage/frozen/kits/poiKit';
@@ -31,17 +32,6 @@ import { QuestPOIStandalone } from '@/ui/idleVillage/frozen/kits/poiKit';
 
 type Mode = 'pairs' | 'materic' | 'plain';
 
-const PG_FALLBACK = { workerId: 'gal-pg', label: 'Salvatrice', hp: 168, maxHp: 210, fatigue: 22 };
-let pgProps: Record<string, unknown> = PG_FALLBACK;
-try {
-  const first = pgcardFixtureResidents?.[0];
-  // keep the real portrait from the fixture, but populate the bars with realistic
-  // values (the fixture resident sits at 0 HP → bars would be empty = unjudgeable)
-  if (first) pgProps = { ...residentToPgCardProps(first), label: 'Salvatrice', hp: 168, maxHp: 210, fatigue: 22 };
-} catch {
-  /* keep fallback if fixture/portrait derivation throws at module load */
-}
-
 interface GalleryTab {
   id: string;
   label: string;
@@ -51,9 +41,10 @@ interface GalleryTab {
 
 const TABS: GalleryTab[] = [
   {
-    id: 'pgcard',
-    label: 'PgCard',
-    render: (k) => <PgCardStandalone {...(pgProps as Record<string, never>)} workerId={`gal-pg-${k}`} />,
+    id: 'roster',
+    label: 'Roster',
+    note: 'contesto reale del pgCard: MatericRosterComponent, come /minimal-roster — differenza = colore barre',
+    render: (k) => <MatericRosterComponent componentId={`gallery-roster-${k}`} />,
   },
   {
     id: 'clock',
@@ -148,7 +139,7 @@ export const HarmonizationGallery: React.FC = () => {
 
       <div
         style={{
-          maxWidth: mode === 'pairs' ? 900 : 480,
+          maxWidth: 1200,
           margin: '0 auto',
           padding: 26,
           borderRadius: 14,
@@ -157,7 +148,7 @@ export const HarmonizationGallery: React.FC = () => {
         }}
       >
         {mode === 'pairs' ? (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28, alignItems: 'start' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 36 }}>
             <div>
               <p style={caption}>as-is (liscio)</p>
               <Skinned materic={false} tag={`${tab.id}-asis`}>{tab.render('asis')}</Skinned>

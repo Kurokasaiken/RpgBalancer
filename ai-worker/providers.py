@@ -22,7 +22,7 @@ PROVIDERS = {
         "models": ["qwen/qwen3-coder:free", "meta-llama/llama-3.3-70b-instruct:free"],
     },
     "gemini": {
-        "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/",
+        "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
         "api_key_env": "GEMINI_API_KEY",
         "models": ["gemini-2.5-flash"],
     },

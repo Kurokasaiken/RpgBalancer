@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD013 -->
 # World Presentation Runtime — Implementation Plan
 
-> Stato: **approved plan v1.4**, close-out in progress for `WORLD-PRESENTATION-RUNTIME-FOUNDATION`.  
+> Stato: **approved plan v1.4**, `WORLD-PRESENTATION-RUNTIME-FOUNDATION` e `WORLD-PRESENTATION-RUNTIME-DEMO` completati.  
 > Include `WORLD-PRESENTATION-RUNTIME-DEMO` come Milestone A: visual verb `show_threat_presence` + presentazione ambientale parallela.  
 > RFC di riferimento: `world_presentation_runtime_rfc.md` (v1.4).  
 > Owner: Strategia / Coordinator.
@@ -431,3 +431,4 @@ Dopo implementazione:
 | 2026-07-20 | Strategia | Approved implementation plan v1.0 from RFC v1.3. |
 | 2026-07-20 | Strategia | v1.1 — aggiunto `WORLD-PRESENTATION-RUNTIME-DEMO`, criteri close-out Foundation, governance checklist estesa. |
 | 2026-07-22 | Strategia | v1.4 — visual verb architecture con `show_threat_presence`, A-E semantic verb roadmap, assi `Ambient Life` paralleli, validazione percezione 3-secondi, `sequenceId` sullo scenario, nessun SequenceScheduler in Milestone A. |
+| 2026-07-22 | Cascade | `WORLD-PRESENTATION-RUNTIME-FOUNDATION` e `WORLD-PRESENTATION-RUNTIME-DEMO` completati: ThreatPresenceEffect, registro effetti, scenario `threat`, Output Debug Inspector, test deterministici, build:check e kanban:lint passati. |

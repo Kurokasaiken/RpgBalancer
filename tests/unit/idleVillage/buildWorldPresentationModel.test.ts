@@ -38,7 +38,7 @@ describe('buildWorldPresentationModel', () => {
       { id: 'obj-1', location: { mode: 'dynamic' as const, x: 0, y: 0 }, type: 'test' },
     ];
     const events = [
-      { id: 'evt-1', type: 'test', category: 'environment' as const },
+      { id: 'evt-1', type: 'test', category: 'environment' as const, lifecycle: { state: 'active' as const } },
     ];
     const model = buildWorldPresentationModel({ objects, events }, TEST_RULES);
     expect(model.runtimeObjects).toHaveLength(1);
