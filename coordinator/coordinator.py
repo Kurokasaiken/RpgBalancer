@@ -514,6 +514,9 @@ def calcola_batch_eseguibile(coda_task: List[dict]) -> Tuple[List[dict], List[di
             "channel": channel,
             "model": model,
             "file_targets": list(file_targets),
+            "prompt": task.get("prompt", ""),
+            "title": task.get("title", ""),
+            "description": task.get("description", ""),
         })
         
         # Increment model usage (will be decremented on task completion)
