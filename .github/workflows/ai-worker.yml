@@ -74,6 +74,7 @@ jobs:
           git add ai-worker/kanban.json
           git add test-results/ai-worker-*.json 2>/dev/null || true
           git add coordinator/registry-events/${{ matrix.task.id }}-end.json
+          git add "${{ matrix.task.target_file }}" 2>/dev/null || true
           git diff --cached --quiet || git commit -m "AI worker: ${{ matrix.task.id }} [ci skip]"
 
           # Retry with rebase on conflict (max 3 attempts)
