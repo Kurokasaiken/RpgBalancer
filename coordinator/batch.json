@@ -1,22 +1,4 @@
 {
   "max_parallel": 20,
-  "tasks": [
-    {
-      "task_id": "ADR001-T1",
-      "channel": "ai-worker",
-      "model": "qwen/qwen3-coder:free",
-      "file_targets": [
-        "src/engine/quest/QuestEngine.ts"
-      ]
-    },
-    {
-      "task_id": "ADR001-T6",
-      "channel": "ai-worker",
-      "model": "qwen/qwen3-coder:free",
-      "file_targets": [
-        "src/balancing/config/idleVillage/questConfig.ts",
-        "src/engine/game/idleVillage/QuestEngine.ts"
-      ]
-    }
-  ]
+  "tasks": []
 }

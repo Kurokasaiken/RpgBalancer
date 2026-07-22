@@ -260,17 +260,64 @@ _Source_: Adapted from trait metadata inside `traitsConfig`. The builder
 automatically injects `requiresNightPhase` predicate when designers toggle the
 night-phase capability.
 
+## Fluent Builder (`modifierBuilder.ts`)
+
+`src/balancing/modifiers/modifierBuilder.ts` now ships a typed, chainable builder
+and config schema:
+
+```ts
+import { ModifierBuilder, defaultBuilderConfig } from '@/balancing/modifiers/modifierBuilder';
+
+const modifier = new ModifierBuilder(defaultBuilderConfig)
+  .forStat('stat_core_focus')
+  .add(5)
+  .inScope('LOCATION')
+  .ownedBy('building', 'barracks', 'Barracks')
+  .fromConfig('idleVillage.modifiers.barracksLvl1')
+  .withLifetime('SESSION')
+  .withTags('barracks')
+  .build();
+```
+
+Key constraints enforced at build time:
+
+- `statId` matches `stat_<domain>_<slug>`.
+- `operation`, `scope`, `value`, `owner`, `sourceConfigId` are mandatory.
+- Default `mode` is derived from `operation` unless overridden.
+- `TIMED` lifetime requires `durationTicks`.
+- `GameplayModifierSchema` is run as the final validation gate.
+
+`BuilderConfigSchema` exports `validation`, `typeCheck`, `enableTelemetry` flags.
+Set `validation: false` only for exploratory serialization, never for persisted
+payloads.
+
+## Registry CLI (`modifierRegistryCLI.ts`)
+
+`scripts/modifierRegistryCLI.ts` exposes `commander`-powered commands for local
+development and CI:
+
+```bash
+npx tsx scripts/modifierRegistryCLI.ts list --scope LOCATION --stat stat_core_focus
+npx tsx scripts/modifierRegistryCLI.ts validate data/exports/idleVillage/activities/*.modifiers.json
+npx tsx scripts/modifierRegistryCLI.ts register data/exports/idleVillage/newModifiers.json --merge
+npx tsx scripts/modifierRegistryCLI.ts example
+```
+
+| Command | Purpose |
+|---|---|
+| `list` | Dump registered modifiers, with optional `--scope`, `--stat`, `--output` filters. |
+| `validate` | Validate a JSON export against `GameplayModifierSchema`. |
+| `register` | Load modifiers from JSON into the in-memory registry (`--merge` to combine). |
+| `example` | Print a fluent-builder example for quick smoke testing. |
+
 ## Next Steps
 
-1. **Implement Modifier Linter CLI** – Create `scripts/builder/modifierLinter.ts`
-   that loads exports, validates via schema, enforces checklist, and writes
-   reports to `test-results/modifier-lint-<date>.json`.
-2. **Add Gameplay Stats Module** – Introduce
+1. **Add Gameplay Stats Module** – Introduce
    `src/balancing/config/idleVillage/gameplayStats.ts` with typed catalog
    consumed by all builders.
-3. **Wire UI Builders** – Update Activity/Barracks/Market/Trait builders to
+2. **Wire UI Builders** – Update Activity/Barracks/Market/Trait builders to
    consume this guide, replacing ad-hoc dropdowns and persistence.
-4. **Telemetry Dashboard** – Extend analytics
+3. **Telemetry Dashboard** – Extend analytics
    (`src/analytics/idleVillage/modifierAuthoringTelemetry.ts`) to visualize builder
    usage and policy violations.
 

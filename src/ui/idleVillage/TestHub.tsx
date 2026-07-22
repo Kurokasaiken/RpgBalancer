@@ -129,6 +129,15 @@ const EXTRA_PAGES: TestPageLink[] = [
     icon: '🗺️',
     status: 'ok',
   },
+  // Non-kit page: World Surface V3 - hierarchical perception system test page.
+  {
+    id: 'world-surface-v3',
+    title: 'World Surface V3',
+    description: 'Hierarchical perception system: parallax, breath, events, wonders, underwater',
+    path: '/world-surface-v3',
+    icon: '🌍',
+    status: 'ok',
+  },
   // Non-kit page: World Presentation Director - deterministic presentation runtime sandbox.
   {
     id: 'world-presentation-director',

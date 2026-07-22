@@ -2,7 +2,7 @@
 title: Character-to-Resident Canonical Architecture
 status: trusted
 owner: Idle Village Team
-last_reviewed: 2026-04-24
+last_reviewed: 2026-07-22
 domain: core
 description: "Canonical Character -> Resident conversion and consumption patterns"
 ---
@@ -90,8 +90,14 @@ Page Layer
 **Verified Implementations**:
 - `src/ui/idleVillage/TestRosterPage.tsx` - Uses `useVillageResidents()` hook → canonical Village Resident Store
 - `src/ui/idleVillage/MinimalGameplayPage.tsx` - Uses `useVillageResidents()` hook → canonical Village Resident Store
-- `src/store/useMinimalGameplay.ts` - Uses `savedCharacterToResident()` for TEST_ROSTER_HEROES (legacy)
-- `src/pages/idle-village-config.tsx` - Uses `loadResidentsFromCharacterManager()` (legacy)
+
+CR-005 (`Verify Both Surfaces Consume Same Canonical Source`) confirmed both pages read from the same `VillageResidentStore` instance. Verification artifacts:
+- `src/ui/idleVillage/verification/StoreConsistencyChecker.ts` - store reference identity, data/behavior/telemetry consistency checks
+- `tests/integration/idleVillage/CanonicalStoreVerification.test.tsx` - 25 tests covering data, behavior, telemetry, error-handling, and complete report generation
+
+**Legacy / Isolated Implementations** (not part of the canonical runtime path):
+- `src/store/useMinimalGameplay.ts` - Uses `savedCharacterToResident()` for `TEST_ROSTER_HEROES` (legacy test fixture path, isolated from production pages)
+- `src/pages/idle-village-config.tsx` - Uses `loadResidentsFromCharacterManager()` (legacy configuration page, isolated from production runtime)
 
 ## C. Forbidden Patterns
 
@@ -278,13 +284,14 @@ This architecture has been verified and adopted in runtime:
 - ✅ Telemetry events integrated (character_to_resident_* events)
 - ✅ Competing resident sources removed from active pages (legacy paths isolated)
 - ✅ Page-level conversion logic eliminated from production
+- ✅ CR-005 completed 2026-07-15: both `/test` and `/minimal-gameplay` verified to consume the same canonical `VillageResidentStore` instance with identical data, behavior, and telemetry
 
 ## J. Governance
 
 **Status**: trusted
-**Last Certified**: 2026-04-24
-**Certification Evidence**: CR-VERIFY completed - canonical Village Resident Store verified in /test and /minimal-gameplay, competing paths removed from active pages
-**Next Review**: 2026-05-24
+**Last Certified**: 2026-07-15
+**Certification Evidence**: CR-005 completed - canonical Village Resident Store verified in `/test` and `/minimal-gameplay` via `StoreConsistencyChecker` and `CanonicalStoreVerification.test.tsx`; competing paths removed from active pages
+**Next Review**: 2026-08-22
 
 ---
 

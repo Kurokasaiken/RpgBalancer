@@ -64,9 +64,7 @@ export function buildWorldPresentationModel(
 ): WorldPresentationModel {
   const snapshot: Record<string, unknown> = {};
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   const objects = (input.objects as RuntimeObject[] | undefined) ?? [];
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   const events = (input.events as WorldEvent[] | undefined) ?? [];
   const activeEvents = events.filter((event) => event.lifecycle?.state === 'active');
 

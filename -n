@@ -1,0 +1,5 @@
+
+> progetti-personali@0.0.0 harness:dispatch
+> tsx scripts/harness/dispatch.ts --id-filter ADR001-T1,ADR001-T6 --max-parallel 2 --timeout 600000
+
+No rows with status "Assegnato" found.

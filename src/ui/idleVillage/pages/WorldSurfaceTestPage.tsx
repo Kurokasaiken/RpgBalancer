@@ -13,6 +13,7 @@ const WorldSurfacePixiOverlay = lazy(() => import('../components/WorldSurfacePix
 
 const MANIFEST_PATH = '/assets/world/wanderlust/base/manifest.json';
 const PERSIST_LAYER_OVERRIDES_KEY = 'worldSurfaceLayerOverrides';
+const PERSIST_LAYER_ORDER_KEY = 'worldSurfaceLayerOrder';
 
 function defaultCamera(config: CameraConfig) {
   return { panX: 0, panY: 0, zoom: config.defaultZoom };
@@ -40,7 +41,9 @@ export const WorldSurfaceTestPage: React.FC = () => {
   const [visibleLayerIds, setVisibleLayerIds] = useState<Set<string>>(new Set());
   const [layerScales, setLayerScales] = useState<Record<string, number>>({});
   const [layerOffsets, setLayerOffsets] = useState<Record<string, { x: number; y: number }>>({});
+  const [surfaceLayerOrder, setSurfaceLayerOrder] = useState<string[] | undefined>(undefined);
   const [mouseWorld, setMouseWorld] = useState<{ x: number; y: number } | null>(null);
+  const [autoFitTrigger, setAutoFitTrigger] = useState(1);
 
   // Initialise local state once the manifest is loaded.
   const overridesLoaded = useRef(false);
@@ -51,7 +54,9 @@ export const WorldSurfaceTestPage: React.FC = () => {
 
     const base = manifest.visualStates.find((s) => s.base);
     setActiveVisualStateId(base?.id ?? manifest.visualStates[0]?.id ?? 'default');
-    setCamera(defaultCamera(cameraConfig));
+    if (!manifest.renderer?.autoFit) {
+      setCamera(defaultCamera(cameraConfig));
+    }
     setVisibleLayerIds(new Set(layers.map((l) => l.id)));
 
     const loadOverrides = async () => {
@@ -61,6 +66,11 @@ export const WorldSurfaceTestPage: React.FC = () => {
       );
       setLayerScales(data.scales);
       setLayerOffsets(data.offsets);
+
+      const order = await loadData<string[]>(PERSIST_LAYER_ORDER_KEY, []);
+      if (order.length > 0) {
+        setSurfaceLayerOrder(order);
+      }
     };
     void loadOverrides();
   }, [manifest, cameraConfig, layers]);
@@ -86,14 +96,25 @@ export const WorldSurfaceTestPage: React.FC = () => {
     setLayerOffsets((prev) => ({ ...prev, [layerId]: offset }));
   }, []);
 
+  const handleLayerOrderChange = useCallback((order: string[]) => {
+    setSurfaceLayerOrder(order);
+  }, []);
+
   const handleSaveLayerDefaults = useCallback(async () => {
     await saveData(PERSIST_LAYER_OVERRIDES_KEY, { scales: layerScales, offsets: layerOffsets });
-  }, [layerScales, layerOffsets]);
+    if (surfaceLayerOrder) {
+      await saveData(PERSIST_LAYER_ORDER_KEY, surfaceLayerOrder);
+    }
+  }, [layerScales, layerOffsets, surfaceLayerOrder]);
 
   const handleResetCamera = useCallback(() => {
-    if (!cameraConfig) return;
-    setCamera(defaultCamera(cameraConfig));
-  }, [cameraConfig]);
+    if (!cameraConfig || !manifest) return;
+    if (manifest.renderer?.autoFit) {
+      setAutoFitTrigger((n) => n + 1);
+    } else {
+      setCamera(defaultCamera(cameraConfig));
+    }
+  }, [cameraConfig, manifest]);
 
   const rendererType = useMemo(() => {
     if (!manifest) return 'dom' as const;
@@ -177,9 +198,11 @@ export const WorldSurfaceTestPage: React.FC = () => {
           visibleLayerIds={visibleLayerIds}
           layerScales={layerScales}
           layerOffsets={layerOffsets}
+          surfaceLayerOrder={surfaceLayerOrder}
           onMouseWorldChange={setMouseWorld}
           runtimeObjects={objects}
           renderObjects={rendererType !== 'webgl'}
+          autoFitTrigger={autoFitTrigger}
         />
 
         {rendererType === 'webgl' && (
@@ -199,13 +222,15 @@ export const WorldSurfaceTestPage: React.FC = () => {
           visibleLayerIds={visibleLayerIds}
           layerScales={layerScales}
           layerOffsets={layerOffsets}
-          mouseWorld={mouseWorld}
+          surfaceLayerOrder={surfaceLayerOrder}
           onToggleLayer={handleToggleLayer}
           onLayerScaleChange={handleLayerScaleChange}
           onLayerOffsetChange={handleLayerOffsetChange}
+          onLayerOrderChange={handleLayerOrderChange}
           onSaveLayerDefaults={handleSaveLayerDefaults}
           onSetVisualState={setActiveVisualStateId}
           onResetCamera={handleResetCamera}
+          mouseWorld={mouseWorld}
           rendererType={rendererType}
           objectCount={objects.length}
           onSpawnObjects={handleSpawnObjects}

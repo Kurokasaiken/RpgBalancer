@@ -45,22 +45,88 @@
     },
     {
       "task_id": "POI-MEDALLION-MATERIAL-PREVIEW-00E669",
-      "status": "pending",
+      "status": "completed",
       "timestamp": "2026-07-22T09:56:18.294751+00:00",
-      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/POI-MEDALLION-MATERIAL-PREVIEW-00E669.md"
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/completed/POI-MEDALLION-MATERIAL-PREVIEW-00E669.md",
+      "completed_at": "2026-07-22T18:35:00.000000+02:00",
+      "notes": "Placeholder with no instructions or files to modify; no action required."
     },
     {
       "task_id": "WORLD-PRESENTATION-RUNTIME-DEMO",
-      "status": "in_progress",
+      "status": "completed",
       "timestamp": "2026-07-22T12:30:00.000000+00:00",
-      "file_path": "coordinator/manual-dispatch/pending/WORLD-PRESENTATION-RUNTIME-DEMO.md"
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/completed/WORLD-PRESENTATION-RUNTIME-DEMO.md",
+      "completed_at": "2026-07-22T18:30:00.000000+02:00"
     },
     {
       "task_id": "WORLD-PRESENTATION-RUNTIME-FOUNDATION",
-      "status": "pending",
+      "status": "completed",
       "timestamp": "2026-07-22T09:58:02.271504+00:00",
-      "file_path": "coordinator/manual-dispatch/pending/WORLD-PRESENTATION-RUNTIME-FOUNDATION.md"
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/completed/WORLD-PRESENTATION-RUNTIME-FOUNDATION.md",
+      "completed_at": "2026-07-22T18:45:00.000000+02:00"
+    },
+    {
+      "task_id": "IV-WORLD-SURFACE-HD-001",
+      "status": "completed",
+      "timestamp": "2026-07-22T19:27:56.538499+00:00",
+      "started_at": "2026-07-22T19:29:00+02:00",
+      "completed_at": "2026-07-22T21:42:00+02:00",
+      "agent": "Cascade",
+      "file_path": "coordinator/manual-dispatch/completed/IV-WORLD-SURFACE-HD-001.md"
+    },
+    {
+      "task_id": "DOC-CHARACTER-RESIDENT-RECONCILIATION-001",
+      "status": "completed",
+      "timestamp": "2026-07-22T20:08:06.252181+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/completed/DOC-CHARACTER-RESIDENT-RECONCILIATION-001.md",
+      "completed_at": "2026-07-22T20:24:44.651460+00:00"
+    },
+    {
+      "task_id": "GM-MP",
+      "status": "completed",
+      "timestamp": "2026-07-22T20:38:26.173314+00:00",
+      "started_at": "2026-07-22T22:42:00+02:00",
+      "completed_at": "2026-07-22T23:05:00+02:00",
+      "agent": "Cascade",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/completed/GM-MP.md",
+      "evidence_log": "test-results/gm-mp-plan-updates-2026-07-22.log",
+      "notes": "Harness dispatch failed and was reverted; completed manually."
+    },
+    {
+      "task_id": "OPS-SHUTDOWN-000",
+      "status": "completed",
+      "timestamp": "2026-07-22T23:10:00.000000+00:00",
+      "started_at": "2026-07-22T23:10:00+02:00",
+      "completed_at": "2026-07-22T23:08:38+02:00",
+      "agent": "Cascade",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/completed/OPS-SHUTDOWN-000.md",
+      "evidence_log": "test-results/ops-shutdown-000-emergency-2026-07-22.log",
+      "notes": "Emergency kill switch completed — script disabled, sentinel and evidence log created, kanban:lint passed."
+    },
+    {
+      "task_id": "GM-BLD",
+      "status": "completed",
+      "timestamp": "2026-07-22T23:10:00.000000+00:00",
+      "started_at": "2026-07-22T23:10:00+02:00",
+      "completed_at": "2026-07-22T23:25:00+02:00",
+      "agent": "Cascade",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/completed/GM-BLD.md",
+      "evidence_log": "test-results/gm-bld-builder-tooling-2026-07-22.log",
+      "notes": "Unblocked after GM-MP completion; completed manually."
+    },
+    {
+      "task_id": "GM-TEL",
+      "status": "assigned",
+      "timestamp": "2026-07-22T23:30:00.000000+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/GM-TEL.md",
+      "notes": "Unblocked after GM-BLD completion; manual dispatch to Cascade."
+    },
+    {
+      "task_id": "GM-TEL",
+      "status": "pending",
+      "timestamp": "2026-07-22T21:28:53.529350+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/GM-TEL.md"
     }
   ],
-  "last_updated": "2026-07-22T12:30:00.000000+00:00"
+  "last_updated": "2026-07-22T21:28:53.530119+00:00"
 }

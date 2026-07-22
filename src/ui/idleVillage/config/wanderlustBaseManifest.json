@@ -1,0 +1,293 @@
+{
+  "version": "1.0.2",
+  "world": "wanderlust",
+  "variant": "base",
+  "coordinateSystem": {
+    "space": "world_pixels",
+    "origin": "top_left",
+    "unit": "px",
+    "canvas": {
+      "width": 4240,
+      "height": 2828
+    }
+  },
+  "resolutionHint": {
+    "runtime": {
+      "width": 4240,
+      "height": 2828
+    },
+    "source": {
+      "width": 4240,
+      "height": 2828
+    },
+    "scaleTarget": 1
+  },
+  "assetPolicy": {
+    "resolution": "prefer_hd"
+  },
+  "camera": {
+    "minZoom": 0.5,
+    "maxZoom": 3,
+    "defaultZoom": 1,
+    "panEnabled": true,
+    "zoomEnabled": true,
+    "bounds": {
+      "minX": 0,
+      "maxX": 4240,
+      "minY": 0,
+      "maxY": 2828
+    }
+  },
+  "renderer": {
+    "mode": "auto",
+    "domObjectThreshold": 50,
+    "enableForParticles": true,
+    "enableForShaders": true,
+    "fallbackToDom": true
+  },
+  "surfaceLayers": [
+    {
+      "id": "background",
+      "file": "Background.png",
+      "type": "texture",
+      "zIndex": 5,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0, "y": 0 },
+      "tags": ["background"]
+    },
+    {
+      "id": "sea",
+      "file": "mare.png",
+      "type": "texture",
+      "zIndex": 10,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.02, "y": 0 },
+      "tags": ["water"]
+    },
+    {
+      "id": "island_bottom_left",
+      "file": "Isola basso sinistra.png",
+      "type": "texture",
+      "zIndex": 15,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.03, "y": 0 },
+      "tags": ["island"]
+    },
+    {
+      "id": "island_bottom_right",
+      "file": "Isola basso a destra.png",
+      "type": "texture",
+      "zIndex": 20,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.03, "y": 0 },
+      "tags": ["island"]
+    },
+    {
+      "id": "mountain_island_bottom_left",
+      "file": "Montagna isola basso sinistra.png",
+      "type": "texture",
+      "zIndex": 25,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.04, "y": 0 },
+      "tags": ["mountain", "island"]
+    },
+    {
+      "id": "mountains_dark_bottom",
+      "file": "Montagne scure basso.png",
+      "type": "texture",
+      "zIndex": 30,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.05, "y": 0 },
+      "tags": ["mountain"]
+    },
+    {
+      "id": "mountains_light_bottom_right",
+      "file": "Montagne chiare basso destra.png",
+      "type": "texture",
+      "zIndex": 35,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.06, "y": 0 },
+      "tags": ["mountain"]
+    },
+    {
+      "id": "mountains_dark_right",
+      "file": "Montagne scure destra.png",
+      "type": "texture",
+      "zIndex": 40,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.07, "y": 0 },
+      "tags": ["mountain"]
+    },
+    {
+      "id": "mountain_zone_north",
+      "file": "Zona montana nord.png",
+      "type": "texture",
+      "zIndex": 45,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.08, "y": 0 },
+      "tags": ["mountain"]
+    },
+    {
+      "id": "trees_brown_hills_center",
+      "file": "Alberi e colline marroni al centro.png",
+      "type": "texture",
+      "zIndex": 50,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.09, "y": 0 },
+      "tags": ["trees", "hills"]
+    },
+    {
+      "id": "small_trees_center",
+      "file": "Alberelli centro mappa.png",
+      "type": "texture",
+      "zIndex": 55,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.1, "y": 0 },
+      "tags": ["trees"]
+    },
+    {
+      "id": "trees_center_right",
+      "file": "Alberi destra centrali.png",
+      "type": "texture",
+      "zIndex": 60,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.11, "y": 0 },
+      "tags": ["trees"]
+    },
+    {
+      "id": "forest_1_top_left",
+      "file": "Foresta 1 Alto Sin.png",
+      "type": "texture",
+      "zIndex": 65,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.12, "y": 0 },
+      "tags": ["forest"]
+    },
+    {
+      "id": "forest_1_light_top_left",
+      "file": "Foresta 1 chiara alto sin.png",
+      "type": "texture",
+      "zIndex": 70,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.13, "y": 0 },
+      "tags": ["forest"]
+    },
+    {
+      "id": "forest_2_dark_bottom_left",
+      "file": "Foresta 2 scura basso sin.png",
+      "type": "texture",
+      "zIndex": 75,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.14, "y": 0 },
+      "tags": ["forest"]
+    },
+    {
+      "id": "forest_3_dark_bottom",
+      "file": "Foresta 3 scura basso.png",
+      "type": "texture",
+      "zIndex": 80,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.15, "y": 0 },
+      "tags": ["forest"]
+    },
+    {
+      "id": "forest_light_right_center",
+      "file": "Foresta chiara destra centro.png",
+      "type": "texture",
+      "zIndex": 85,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.16, "y": 0 },
+      "tags": ["forest"]
+    },
+    {
+      "id": "forest_dark_north",
+      "file": "Foresta scura nord.png",
+      "type": "texture",
+      "zIndex": 90,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.17, "y": 0 },
+      "tags": ["forest"]
+    },
+    {
+      "id": "village",
+      "file": "Villaggio.png",
+      "type": "texture",
+      "zIndex": 95,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.18, "y": 0 },
+      "tags": ["settlements", "landmarks"]
+    },
+    {
+      "id": "level_1",
+      "file": "Livello 1.png",
+      "type": "texture",
+      "zIndex": 98,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.19, "y": 0 },
+      "tags": ["level"]
+    },
+    {
+      "id": "frame",
+      "file": "frame.png",
+      "type": "ui_overlay",
+      "zIndex": 99,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0, "y": 0 },
+      "tags": ["frame", "ui"]
+    }
+  ],
+  "atmosphereLayers": [],
+  "visualStates": [
+    {
+      "id": "default",
+      "labelKey": "world.states.default",
+      "base": true,
+      "overrides": []
+    }
+  ],
+  "regions": [
+    {
+      "id": "enchanted_forest",
+      "nameKey": "world.region.enchanted_forest",
+      "bounds": {
+        "x": 200,
+        "y": 100,
+        "width": 500,
+        "height": 400
+      },
+      "tags": ["forest"]
+    }
+  ],
+  "anchors": [
+    {
+      "id": "village_01",
+      "x": 624,
+      "y": 416,
+      "type": "settlement",
+      "targetId": "idle_village",
+      "labelKey": "world.anchors.village_01"
+    }
+  ],
+  "tags": ["world-map", "idle-village", "wanderlust"]
+}

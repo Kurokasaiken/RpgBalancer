@@ -77,7 +77,7 @@ export const RuntimeObjectSchema = z.object({
   state: z.string().default('idle'),
   visual: RuntimeObjectVisualSchema.default(defaultVisual),
   animation: RuntimeObjectAnimationSchema.default(defaultAnimation),
-  data: z.record(z.unknown()).default({}),
+  data: z.record(z.string(), z.unknown()).default({}),
 });
 
 export type LocationMode = z.infer<typeof LocationModeSchema>;

@@ -431,3 +431,5 @@ Dopo implementazione:
 | 2026-07-20 | Strategia | Approved implementation plan v1.0 from RFC v1.3. |
 | 2026-07-20 | Strategia | v1.1 — aggiunto `WORLD-PRESENTATION-RUNTIME-DEMO`, criteri close-out Foundation, governance checklist estesa. |
 | 2026-07-22 | Strategia | v1.4 — visual verb architecture con `show_threat_presence`, A-E semantic verb roadmap, assi `Ambient Life` paralleli, validazione percezione 3-secondi, `sequenceId` sullo scenario, nessun SequenceScheduler in Milestone A. |
+| 2026-07-22 | Agent | Completato `WORLD-PRESENTATION-RUNTIME-DEMO`: fix Zod v4 `z.record(valueType)` crash, `activeEvents` filtrati per `lifecycle.state === 'active'`, test 22/22 passati, safeguard superati. |
+| 2026-07-22 | Agent | Completato `WORLD-PRESENTATION-RUNTIME-FOUNDATION`: runtime end-to-end, contratti Zod, `PresentationDirectorShell`, useWorldPresentationRuntime, trusted doc e COMPONENT_MASTER_INDEX aggiornati. |

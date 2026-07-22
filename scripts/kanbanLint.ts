@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -135,6 +136,13 @@ function parseArgs(argv: string[]): { timeoutMs: number } {
 
 async function main() {
   const { timeoutMs } = parseArgs(process.argv.slice(2));
+
+  // Passaggio di sblocco robusto: sblocca task il cui blocker e' Completato.
+  try {
+    execSync('tsx scripts/kanbanUnblock.ts', { stdio: 'inherit' });
+  } catch {
+    console.warn('kanban:unblock ha riportato un errore; continuo con il lint.');
+  }
 
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
   const timeoutPromise = new Promise<never>((_, reject) => {

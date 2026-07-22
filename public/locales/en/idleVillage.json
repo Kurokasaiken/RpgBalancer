@@ -204,6 +204,11 @@
     "tick": "Tick",
     "objects": "Objects",
     "layers": "Layers",
+    "layerOrder": {
+      "title": "Layer Order",
+      "moveUp": "move up",
+      "moveDown": "move down"
+    },
     "states": {
       "unknown": "Unknown"
     },

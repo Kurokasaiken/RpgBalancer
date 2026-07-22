@@ -21,7 +21,8 @@ Indice unico dei componenti e integration contracts rilevanti per la vertical sl
 | Interaction Core (drag outcome, flight, extraction, bloom) | interaction-core | trusted | `src/docs/docs/idle_village/interaction_core_spec.md` | `/slot`, `/minimal-roster-slot-integration`, `/minimal-job-poi-roster-integration` | 2026-07-12 | useDragOutcome, DragOutcomeFlight, useExtractionSequence, bloomEffect, RosterDropVerdict, lockedResidentIds; slot blueprints now support role/emptyPenalty/residentRiskModifiers |
 | Quest Assignment Rework | quest-assignment | candidate | `src/docs/docs/plans/quest_role_assignment_rework_strategy.md` | `/poi-quest-detail-roster-integration` | 2026-07-12 | QuestCard, useQuestAssignmentPreview, QuestAssignmentPreview, PoiDetailQuestRosterIntegrationPage, slotBlueprints role/emptyPenalty/residentRiskModifiers; build:check passed |
 | Test Roster Population | roster-data | trusted | `scripts/populate-test-roster.js` | N/A | 2026-04-27 | Script ufficiale per popolare roster di test con 3 PG (Sir Spaccaculi 280HP, Salvatrice 210HP, Giggiolillo 195HP) |
-| Character-to-Resident Contract | character-resident | trusted | `src/docs/docs/idle_village/trusted/character_resident_trusted.md` | `/test`, `/minimal-gameplay` | 2026-04-24 | Canonical Character -> Resident conversion architecture, bootstrap pipeline verified |
+| Character-to-Resident Contract | character-resident | trusted | `src/docs/docs/idle_village/trusted/character_resident_trusted.md` | `/test`, `/minimal-gameplay` | 2026-07-15 | CR-005 verified both surfaces consume the same canonical Village Resident Store; StoreConsistencyChecker + CanonicalStoreVerification tests pass |
+| World Presentation Runtime Contract | world-presentation | trusted | `src/docs/docs/idle_village/trusted/world_presentation_runtime_trusted.md` | `/world-presentation-director` | 2026-07-22 | WorldState → PresentationOutput deterministic runtime; Foundation + DEMO verified. |
 
 ## Regole di aggiornamento
 - Se cambia il contratto di un componente, aggiornare il suo trusted doc.
@@ -91,8 +92,15 @@ Questo index segue le regole governative:
 - **Contract**: `src/docs/docs/idle_village/trusted/character_resident_trusted.md`
 - **Status**: trusted
 - **Area**: Character -> Resident conversion pipeline
-- **Last Certified**: 2026-04-24
-- **Notes**: Canonical bootstrap pipeline verified, fallback policy implemented
+- **Last Certified**: 2026-07-15
+- **Notes**: CR-005 verified both `/test` and `/minimal-gameplay` consume the same canonical Village Resident Store; StoreConsistencyChecker + CanonicalStoreVerification tests pass
+
+### World Presentation Runtime
+- **Contract**: `src/docs/docs/idle_village/trusted/world_presentation_runtime_trusted.md`
+- **Status**: trusted
+- **Area**: World presentation runtime
+- **Last Certified**: 2026-07-22
+- **Notes**: `WORLD-PRESENTATION-RUNTIME-FOUNDATION` + `WORLD-PRESENTATION-RUNTIME-DEMO` verified; deterministic `WorldState → PresentationOutput` loop.
 
 <!-- GOV-006-FROZEN-KITS-START -->
 ## Frozen Kits
@@ -125,5 +133,5 @@ Questo index segue le regole governative:
 
 ---
 
-*Last Updated: 2026-07-16*
+*Last Updated: 2026-07-22*
 *Status: Reconciled from KIT_REGISTRY.*

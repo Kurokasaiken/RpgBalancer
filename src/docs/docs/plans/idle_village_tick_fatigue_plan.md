@@ -99,9 +99,9 @@
   - `SESSION/GLOBAL` scopes handle seasonal effects (e.g., `mod_winter_rest_penalty`) so Tick Engine can apply them uniformly without ad-hoc constants.
 
 - **Authoring Flow**
-  1. Designers register/flag the modifier in the Gameplay Modifier Registry (`gameplayModifiersConfig.ts`) with `sourceConfigId` pointing to the originating plan/config.
-  2. Tick engine queries `selectResolvedModifiers({ statId: 'stat_fatigue_gain', scope: ['GLOBAL','SESSION','LOCATION','RESIDENT'] })` once per resident per tick and feeds the aggregated multiplier into fatigue math.
-  3. UI surfaces display modifier provenance via Style Lab tokens (see Style Lab Flexibility plan update) instead of textual “+10% fatigue” strings.
+  1. Designers register modifiers via `registerModifiers(modifiers, { merge?: boolean })` in `src/balancing/config/idleVillage/gameplayModifierRegistry.ts` using `sourceConfigId` pointing to the originating plan/config.
+  2. Tick engine calls `resolveStatGraph({ statId: 'stat_fatigue_gain', baseValue, scopes: ['GLOBAL','SESSION','LOCATION','RESIDENT'], context: { residentId, locationId } })` once per resident per tick and feeds the `finalValue` into fatigue math.
+  3. UI surfaces display modifier provenance via `MODIFIER_VISUALIZATION_CONFIG` tokens (`src/balancing/config/idleVillage/modifierVisualizationConfig.ts`) instead of textual “+10% fatigue” strings.
 
 - **Migration Notes**
   - Existing references to `slot.modifiers.fatigueMultiplier` or `terrainFatiguePenalty` are now marked **Deprecated – replace with registry**. Their values must be migrated into explicit `GameplayModifier` entries so the pipeline remains auditable and telemetry-ready.
@@ -120,3 +120,83 @@
 3. For continuous jobs, should there be a UI control to pause/resume production, or must they run 24/7 until manually unassigned?
 4. How should multi-resident jobs split fatigue and rewards—equally per resident, or weighted via slot modifiers/stat weights?
 5. Are there activities whose rewards are not strictly linear with time (e.g., all-or-nothing) that must remain exempt from partial payouts?
+
+## 7. Gameplay Modifier Integration (GM-MP)
+
+Il `TimeEngine` non calcola mai fatica, rischio o ricompense con valori hardcoded. Ogni valore per tick passa attraverso il `Gameplay Modifier Registry` come descritto in `docs/plans/idle_village_modifiers_plan.md`.
+
+### 7.1 Stat Target per Tick System
+
+| Concetto | StatId | Scope tipico | Esempio sorgente |
+|----------|--------|--------------|------------------|
+| Costo fatica per tick | `stat_fatigue_gain` | `LOCATION` / `RESIDENT` | `slot.dailyFatigueCost / ticksPerDay` |
+| Recupero notte per tick | `stat_fatigue_recovery` | `RESIDENT` / `GLOBAL` | `globalRules.fatigueRecoveryPerNightTick` |
+| Produzione oro per tick | `stat_reward_gold` | `LOCATION` | `job.goldPerDay / ticksPerDay` |
+| Rischio infortunio per tick | `stat_risk_injury` | `QUEST` / `LOCATION` | `quest.dangerRating` |
+
+`TimeEngine` calcola il `baseValue` per tick e chiama:
+
+```ts
+import { resolveStatGraph } from '@/balancing/config/idleVillage/gameplayModifierRegistry';
+
+const resolved = resolveStatGraph({
+  statId: 'stat_fatigue_gain',
+  baseValue: dailyFatigueCost / ticksPerDay,
+  scopes: ['GLOBAL', 'SESSION', 'LOCATION', 'QUEST', 'RESIDENT'],
+  context: { residentId, locationId, questId },
+});
+
+// resolved.finalValue è la fatica effettiva per tick.
+```
+
+### 7.2 Esempi di Modifier
+
+**Barracks rest bonus (LOCATION, ADD):**
+
+```ts
+{
+  id: 'mod_barracks_rest_recovery',
+  statId: 'stat_fatigue_recovery',
+  scope: 'LOCATION',
+  operation: 'ADD',
+  value: 2,
+  owner: { type: 'building', id: 'barracks', label: 'Barracks' },
+  sourceConfigId: 'buildings.barracks.rest_bonus',
+  conditions: { tags: ['rest', 'barracks'] },
+}
+```
+
+**Cursed terrain penalty (LOCATION, MULT):**
+
+```ts
+{
+  id: 'mod_terrain_cursed_fatigue',
+  statId: 'stat_fatigue_gain',
+  scope: 'LOCATION',
+  operation: 'MULT',
+  value: 0.15,
+  mode: 'MULTIPLICATIVE',
+  owner: { type: 'terrain', id: 'cursed_swamp', label: 'Cursed Swamp' },
+  sourceConfigId: 'terrain.cursed_swamp.fatigue_penalty',
+}
+```
+
+### 7.3 Continuous Job e Resting
+
+Residenti in lavori continui (`runtimeMode: 'continuous'`) ricevono i modifier attivi sullo slot durante i day ticks e transitano in `resting` durante i night ticks. Il recupero notturno è risolto tramite `resolveStatGraph` con scope `RESIDENT` e `LOCATION`, evitando logica duplicata.
+
+### 7.4 Telemetry
+
+Ogni tick che applica un modifier emette `modifier_applied` (o `modifier_stack_changed`) tramite `src/analytics/idleVillage/modifierTelemetry.ts`. Il payload include `residentId`, `locationId`, `questId` e il delta `valueBefore/valueAfter`.
+
+### 7.5 Vincoli
+
+- Vietato inserire percentuali o addendi hardcoded nei calcoli per tick.
+- `TimeEngine` deve chiamare `resolveStatGraph` per ogni stat coinvolto.
+- I test unitari devono verificare che `ADD` nello stesso scope si sommino e `MULT` tra scope diversi si moltiplicano.
+
+### 7.6 Cross-References
+
+- `docs/plans/idle_village_modifiers_plan.md` — schema e catalogo.
+- `docs/plans/idle_village_progression_system_plan.md` — reward/risk scaling.
+- `.windsurf/plans/style-lab-flexibility-1a9890.md` — rendering tokens.

@@ -21,11 +21,15 @@ interface WorldSurfaceRendererProps {
   visibleLayerIds?: Set<string> | string[];
   layerScales?: Record<string, number>;
   layerOffsets?: Record<string, { x: number; y: number }>;
+  surfaceLayerOrder?: string[];
   onMouseWorldChange?: (point: { x: number; y: number } | null) => void;
   showAnchors?: boolean;
   showRegions?: boolean;
   runtimeObjects?: RuntimeObject[];
   renderObjects?: boolean;
+  imageFit?: 'fill' | 'cover' | 'contain';
+  autoFit?: boolean;
+  autoFitTrigger?: number;
 }
 
 interface EffectiveLayer extends WorldSurfaceLayer {
@@ -125,11 +129,15 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
   visibleLayerIds,
   layerScales,
   layerOffsets,
+  surfaceLayerOrder,
   onMouseWorldChange,
   showAnchors = true,
   showRegions = true,
   runtimeObjects = [],
   renderObjects = true,
+  imageFit: imageFitProp,
+  autoFit: autoFitProp,
+  autoFitTrigger = 1,
 }) => {
   const { t } = useTranslation('idleVillage');
   const translate = useCallback(
@@ -139,6 +147,11 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const dragStart = useRef<{ x: number; y: number; panX: number; panY: number } | null>(null);
+  const hasAutoFitted = useRef(false);
+  const prevAutoFitTrigger = useRef(autoFitTrigger);
+
+  const resolvedImageFit = imageFitProp ?? manifest.renderer?.imageFit ?? 'fill';
+  const resolvedAutoFit = autoFitProp ?? manifest.renderer?.autoFit ?? false;
 
   const { width, height } = manifest.coordinateSystem.canvas;
   const bounds = useMemo(
@@ -177,12 +190,25 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
         ? visibleLayerIds
         : new Set(visibleLayerIds ?? manifest.surfaceLayers.concat(manifest.atmosphereLayers).map((l) => l.id));
 
-    return manifest.surfaceLayers
-      .concat(manifest.atmosphereLayers)
-      .sort((a, b) => a.zIndex - b.zIndex)
+    const orderIndex = new Map<string, number>();
+    if (surfaceLayerOrder) {
+      surfaceLayerOrder.forEach((id, index) => orderIndex.set(id, index));
+    }
+
+    const sortByOrder = (a: WorldSurfaceLayer, b: WorldSurfaceLayer) => {
+      const aOrder = orderIndex.get(a.id);
+      const bOrder = orderIndex.get(b.id);
+      if (aOrder !== undefined && bOrder !== undefined) return aOrder - bOrder;
+      if (aOrder !== undefined) return -1;
+      if (bOrder !== undefined) return 1;
+      return a.zIndex - b.zIndex;
+    };
+
+    return [...manifest.surfaceLayers, ...manifest.atmosphereLayers]
+      .sort(sortByOrder)
       .map((layer) => applyOverrides(layer, activeOverrides))
       .filter((layer) => visibleSet.has(layer.id));
-  }, [manifest, activeOverrides, visibleLayerIds]);
+  }, [manifest, activeOverrides, visibleLayerIds, surfaceLayerOrder]);
 
   const containerSize = useRef<{ width: number; height: number }>({ width: 0, height: 0 });
 
@@ -205,6 +231,38 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
+
+  useEffect(() => {
+    if (autoFitTrigger !== prevAutoFitTrigger.current) {
+      prevAutoFitTrigger.current = autoFitTrigger;
+      hasAutoFitted.current = false;
+    }
+
+    if (!resolvedAutoFit || hasAutoFitted.current || !containerRef.current || !onCameraChange) {
+      return;
+    }
+
+    const rect = containerRef.current.getBoundingClientRect();
+    const rawFitZoom =
+      resolvedImageFit === 'cover'
+        ? Math.max(rect.width / width, rect.height / height)
+        : Math.min(rect.width / width, rect.height / height);
+    // For contain/fill, never auto-fit beyond 100% so the entire world remains visible.
+    const fitZoom = resolvedImageFit === 'cover' ? rawFitZoom : Math.min(1, rawFitZoom);
+    const clampedZoom = clampZoom(fitZoom, manifest.camera.minZoom, manifest.camera.maxZoom);
+
+    onCameraChange({ panX: 0, panY: 0, zoom: clampedZoom });
+    hasAutoFitted.current = true;
+  }, [
+    resolvedAutoFit,
+    autoFitTrigger,
+    resolvedImageFit,
+    width,
+    height,
+    manifest.camera.minZoom,
+    manifest.camera.maxZoom,
+    onCameraChange,
+  ]);
 
   const reportMouseWorld = useCallback(
     (clientX: number, clientY: number) => {
@@ -335,6 +393,7 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
             layer={layer}
             worldPoint={worldPoint}
             worldName={manifest.world}
+            imageFit={resolvedImageFit}
             scale={layerScales?.[layer.id] ?? layer.scale ?? 1}
             offset={
               layerOffsets?.[layer.id] ?? {
@@ -439,11 +498,12 @@ interface LayerViewProps {
   layer: EffectiveLayer;
   worldPoint: { x: number; y: number };
   worldName: string;
+  imageFit: 'fill' | 'cover' | 'contain';
   scale?: number;
   offset?: { x: number; y: number };
 }
 
-const LayerView: React.FC<LayerViewProps> = ({ layer, worldPoint, worldName, scale = 1, offset = { x: 0, y: 0 } }) => {
+const LayerView: React.FC<LayerViewProps> = ({ layer, worldPoint, worldName, imageFit, scale = 1, offset = { x: 0, y: 0 } }) => {
   const parallaxX = worldPoint.x * (1 - layer.parallax.x);
   const parallaxY = worldPoint.y * (1 - layer.parallax.y);
 
@@ -464,7 +524,7 @@ const LayerView: React.FC<LayerViewProps> = ({ layer, worldPoint, worldName, sca
   const imgStyle: React.CSSProperties = {
     width: '100%',
     height: '100%',
-    objectFit: 'fill',
+    objectFit: imageFit,
     mixBlendMode: BLEND_MODE_CSS[layer.blendMode],
     filter: layer.grayscale ? 'grayscale(100%)' : undefined,
     ...animationStyle,
@@ -483,7 +543,7 @@ const LayerView: React.FC<LayerViewProps> = ({ layer, worldPoint, worldName, sca
     <div style={wrapperStyle}>
       <div style={scaleStyle}>
         <img
-          src={`/assets/world/${worldName}/base/layers/${layer.file}`}
+          src={`/assets/world/${worldName}/base/layers/${encodeURIComponent(layer.file)}`}
           alt=""
           style={imgStyle}
           draggable={false}
