@@ -1,6 +1,15 @@
+---
+title: Roster Fallback Troubleshooting Guide
+status: archived
+archived_date: 2026-07-22
+reason: Outdated fallback patterns (TEST_ROSTER_HEROES, MINIMAL_GAMEPLAY_RESIDENTS, page-level conversion) superseded by the canonical Character-to-Resident architecture.
+replacement: src/docs/docs/idle_village/trusted/character_resident_trusted.md
+---
+
 # Roster Fallback Troubleshooting Guide
 
-> **⚠️ DEPRECATED**: This document describes legacy fallback behavior.  
+> **ARCHIVED**: This document is retained for historical reference only.  
+> It describes legacy fallback behavior that is no longer authoritative.  
 > For the current canonical Character-to-Resident architecture, see:  
 > **`src/docs/docs/idle_village/trusted/character_resident_trusted.md`**
 

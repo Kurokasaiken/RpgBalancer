@@ -143,17 +143,23 @@ Example:
 
 ---
 
-### ⚙️ Gameplay Modifier System (GM-REG → GM-MP)
+### ⚙️ Gameplay Modifier System (GM-REG → GM-MP) — In Progress
 
-The Gameplay Modifier Registry is now the canonical source for every Idle Village buff/debuff. All roadmap surfaces that mention reward boosts, fatigue gates, or UI previews must explicitly reference [`docs/plans/idle_village_modifiers_plan.md`](../plans/idle_village_modifiers_plan.md) instead of ad-hoc multipliers.
+The Gameplay Modifier Registry is the canonical source for every Idle Village buff/debuff. All roadmap surfaces that mention reward boosts, fatigue gates, or UI previews must explicitly reference [`docs/plans/idle_village_modifiers_plan.md`](../plans/idle_village_modifiers_plan.md) instead of ad-hoc multipliers.
 
+- **Runtime Source of Truth:**
+  - Registry: `src/balancing/config/idleVillage/gameplayModifierRegistry.ts` (`registerModifiers`, `resolveStatGraph`, `DEFAULT_IDLE_VILLAGE_MODIFIERS`).
+  - Engine: `src/balancing/modifiers/gameplayModifierEngine.ts` (`GameplayModifierEngine.evaluateModifiers`).
+  - Types: `src/balancing/types/gameplayModifierTypes.ts` (`DEFAULT_SCOPE_ORDER`, `GameplayModifierSchema`).
+  - Telemetry: `src/analytics/idleVillage/modifierTelemetry.ts` (`modifier_applied`, `modifier_removed`, `modifier_stack_changed`).
+  - Visualization: `src/balancing/config/idleVillage/modifierVisualizationConfig.ts` (`MODIFIER_VISUALIZATION_CONFIG`).
 - **Design Mandate:** Plans touching Idle Village progression, fatigue, Style Lab HUD, or builders must cite the registry schema (`GameplayModifier`, `GameplayStatId`, scope order) and forbid inline multipliers.
 - **Document Owners:**
   - `GM-MP` updates to `MASTER_PLAN`, `idle_village_progression_system_plan.md`, `idle_village_tick_fatigue_plan.md`, `.windsurf/plans/style-lab-flexibility-1a9890.md` keep the spec in sync.
   - `GM-BLD` and `GM-MIG` inherit this mandate for tooling/migrations; they should link back to the same spec rather than redefining schema.
-- **UI Contract:** Any HUD/tooltip (e.g., StatModifierDisplay, Quest telemetry panels) must read modifier metadata (`scope`, `operation`, `owner`) from registry selectors; Style Lab docs now include TODOs to color-code entries by scope using registry metadata.
+- **UI Contract:** Any HUD/tooltip (e.g., `StatModifierDisplay`, Quest telemetry panels) must read modifier metadata (`scope`, `operation`, `owner`) from registry selectors or from `MODIFIER_VISUALIZATION_CONFIG`; Style Lab color-codes entries by scope using registry metadata.
 
-> **Rule of thumb:** if a plan mentions "+X%" to a stat, it must also name the `GameplayModifier.id`, scope bucket, and source config ID defined in the registry.
+> **Rule of thumb:** if a plan mentions "+X%" to a stat, it must also name the `GameplayModifier.id`, scope bucket, and `sourceConfigId` defined in the registry.
 
 ### 🎬 Skill Check Ritual – Asterism V2
 

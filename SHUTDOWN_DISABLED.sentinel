@@ -1,0 +1,6 @@
+timestamp: 2026-07-22T21:08:32Z
+reason: Emergency kill switch OPS-SHUTDOWN-000 — auto-commit-push-shutdown.sh neutralized
+original_path: auto-commit-push-shutdown.sh
+disabled_path: archive/legacy_shutdown/auto-commit-push-shutdown.sh.DISABLED
+plan_reference: src/docs/docs/plans/global_session_shutdown_manager_plan_v2.md
+evidence_log: test-results/ops-shutdown-000-emergency-2026-07-22.log

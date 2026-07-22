@@ -1,0 +1,99 @@
+{
+  "task_id": "OPS-SHUTDOWN-000",
+  "title": "Emergency Kill Switch — Neutralize active auto-commit-push-shutdown.sh",
+  "description": "Immediately stop and neutralize the active auto-commit-push-shutdown.sh script. This script is currently dangerous: it has already auto-committed 211 files, pushed to main, and attempted shutdown. Do not delete it yet; make it impossible to execute and prove that no process, cron, launchd, or other script can restart it. No git operations are allowed in this phase.",
+  "plan_reference": "src/docs/docs/plans/global_session_shutdown_manager_plan_v2.md § Phase 0",
+  "estimated_duration": "15-30 minutes",
+  "objectives": [
+    "Stop any running auto-commit-push-shutdown.sh or auto-commit-only.sh process",
+    "Verify no cron entry, launchd job, shell profile, or other script invokes auto-commit-push-shutdown.sh",
+    "Neutralize the script by moving/renaming it to archive/legacy_shutdown/auto-commit-push-shutdown.sh.DISABLED",
+    "Create SHUTDOWN_DISABLED.sentinel in repo root with timestamp and human-readable warning",
+    "Write evidence log test-results/ops-shutdown-000-emergency-<date>.log"
+  ],
+  "success_criteria": [
+    "auto-commit-push-shutdown.sh is not running",
+    "No cron/launchd/script references auto-commit-push-shutdown.sh as executable",
+    "The original path no longer points to an executable file",
+    "SHUTDOWN_DISABLED.sentinel exists and is readable",
+    "Evidence log exists with current process list and audit result",
+    "No git reset, git clean, git commit, or git push was performed"
+  ],
+  "kpi_targets": {
+    "downtime_of_dangerous_script": "< 60 seconds from prompt start",
+    "git_side_effects": "0",
+    "evidence_log_created": "true"
+  },
+  "integration_points": [
+    "~/.rpg-shutdown/session-registry.json (created in later phase)",
+    ".windsurf/rules/50-shutdown-governance.md (must not be violated)"
+  ],
+  "dependencies": [
+    "None — this is the first phase and must run before any other shutdown work"
+  ],
+  "guardrails": {
+    "invariants": [
+      ".windsurf/rules/50-shutdown-governance.md — only the Global Shutdown Manager may execute shutdown",
+      "Kill switch before cleanup: neutralize, do not delete, do not alter git state"
+    ],
+    "trusted_frozen_components": [],
+    "forbidden_actions": [
+      "Do NOT run git reset --hard",
+      "Do NOT run git clean -fd",
+      "Do NOT run git commit",
+      "Do NOT run git push",
+      "Do NOT delete auto-commit-push-shutdown.sh yet (deletion is OPS-SHUTDOWN-001)",
+      "Do NOT modify unrelated source files",
+      "Do NOT create a replacement shutdown mechanism"
+    ]
+  },
+  "implementation_scope": {
+    "files_to_create": [
+      "SHUTDOWN_DISABLED.sentinel",
+      "test-results/ops-shutdown-000-emergency-<date>.log"
+    ],
+    "files_to_modify": [
+      "auto-commit-push-shutdown.sh — move/rename to archive/legacy_shutdown/auto-commit-push-shutdown.sh.DISABLED (create archive/legacy_shutdown if needed)"
+    ],
+    "component_reuse_requirements": [],
+    "testing_requirements": {
+      "unit_tests": [],
+      "integration_tests": [
+        "Verify the script cannot be executed from its original path",
+        "Verify no matching process is in ps output",
+        "Verify launchctl list / crontab -l contain no active references"
+      ],
+      "accessibility_tests": []
+    },
+    "documentation_updates": [
+      "Evidence log is the only required documentation for this phase"
+    ]
+  },
+  "safeguards": {
+    "lint": {
+      "scope": "",
+      "timeout_seconds": 0
+    },
+    "test": {
+      "scope": "",
+      "timeout_seconds": 0
+    },
+    "build_check": {
+      "timeout_seconds": 0
+    },
+    "kanban_lint": {
+      "timeout_seconds": 30
+    },
+    "evidence_log": "test-results/ops-shutdown-000-emergency-<date>.log"
+  },
+  "execution_hint": "atomic",
+  "notes": {
+    "priority": "EMERGENCY — must run before any other OPS-SHUTDOWN phase",
+    "process_check": "Run ps aux | grep -E 'auto-commit-push|auto-commit-only|coordinator_watch' and terminate any matches safely",
+    "launchd_check": "Run launchctl list | grep -i -E 'shutdown|auto|commit' and launchctl print for any matching agent",
+    "cron_check": "Run crontab -l",
+    "script_neutralization": "Preserve file content and git history; only move/rename so it cannot be invoked by path or habit",
+    "sentinel_content": "Include timestamp, reason, and pointer to global_session_shutdown_manager_plan_v2.md",
+    "handoff": "After this phase completes, the coordinator may queue OPS-SHUTDOWN-001 (audit and cleanup)"
+  }
+}

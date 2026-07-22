@@ -76,6 +76,7 @@
     "lint:docs": "markdownlint src/docs/**/*.md",
     "storage:test:balancer": "npm run test:unit -- tests/unit/storage/BalancerConfigStore.storage.test.ts",
     "kanban:lint": "tsx scripts/kanbanLint.ts",
+    "kanban:unblock": "tsx scripts/kanbanUnblock.ts",
     "prompt:check": "tsx scripts/checkPromptLock.ts",
     "harness:run": "tsx scripts/harness/runPrompt.ts",
     "harness:dispatch": "tsx scripts/harness/dispatch.ts",

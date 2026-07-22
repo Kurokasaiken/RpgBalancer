@@ -62,6 +62,8 @@ export const WorldSurfaceRendererConfigSchema = z.object({
   enableForParticles: z.boolean().default(true),
   enableForShaders: z.boolean().default(true),
   fallbackToDom: z.boolean().default(true),
+  imageFit: z.enum(['fill', 'cover', 'contain']).default('fill'),
+  autoFit: z.boolean().default(false),
   webglOptions: z
     .object({
       antialias: z.boolean().optional(),

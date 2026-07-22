@@ -1,4 +1,16 @@
+---
+title: Guida - Come Creare una Pagina di Integration Test
+status: archived
+archived_date: 2026-07-22
+reason: Source-of-truth guidance contradicted CR-005 verification; both /test and /minimal-gameplay now consume the same canonical Village Resident Store via useVillageResidents().
+replacement: src/docs/docs/idle_village/trusted/character_resident_trusted.md
+---
+
 # Guida: Come Creare una Pagina di Integration Test
+
+> **ARCHIVED** — This guide is retained for historical reference only.  
+> Its resident source-of-truth guidance is no longer authoritative.  
+> See `src/docs/docs/idle_village/trusted/character_resident_trusted.md` for the current canonical Character-to-Resident architecture.
 
 Questa guida documenta i pattern, le trappole e le soluzioni scoperte costruendo `/minimal-continuous-job`. Seguila per creare nuove pagine di test che funzionino al primo colpo.
 

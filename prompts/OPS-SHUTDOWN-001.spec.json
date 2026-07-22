@@ -1,0 +1,114 @@
+{
+  "task_id": "OPS-SHUTDOWN-001",
+  "title": "Legacy Audit & Cleanup — Remove all vestigial shutdown/auto-commit/auto-push mechanisms",
+  "description": "After OPS-SHUTDOWN-000 neutralized the active dangerous script, perform a full repository and macOS environment audit for every shutdown / poweroff / halt / pmset / osascript shutdown / sudo shutdown / auto-commit / auto-push / idle watcher mechanism. Delete or archive legacy scripts, strip shutdown calls from commitFailureMonitor.js and vercelDeploymentGuard.ts, and prove that no old shutdown path remains capable of triggering shutdown.",
+  "plan_reference": "src/docs/docs/plans/global_session_shutdown_manager_plan_v2.md § Phase 1",
+  "estimated_duration": "60-90 minutes",
+  "objectives": [
+    "Search repository and relevant macOS paths for every shutdown/auto-commit/auto-push reference",
+    "Delete or archive legacy scripts: ai-worker/autospegnimento.sh, ai-worker/coordinator_watch.py, ai-worker/start_coordinator_watch.sh, ai-worker/README_WATCH.md, ai-worker/last_activity.json, the disabled auto-commit-push-shutdown.sh, test_shutdown_verification.sh, shutdown.log, shutdown_when_done.log, shutdown.pid",
+    "Strip shutdown calls from scripts/autoCommit/commitFailureMonitor.js and scripts/guardian/vercelDeploymentGuard.ts",
+    "Update or deprecate src/docs/docs/operations/guardian_autopush_mandate.md",
+    "Run a second search after cleanup and classify remaining references",
+    "Produce audit report and evidence log"
+  ],
+  "success_criteria": [
+    "All legacy shutdown scripts are removed or explicitly archived",
+    "commitFailureMonitor.js no longer calls shutdownSystem; it logs or exits instead",
+    "vercelDeploymentGuard.ts no longer calls shutdownSystem; it logs or exits instead",
+    "No cron/launchd/plist triggers shutdown",
+    "Second search classifies every remaining reference as intentional-doc, active-new-system, or false-positive",
+    "Evidence log lists every removed/deactivated mechanism and remaining references"
+  ],
+  "kpi_targets": {
+    "legacy_shutdown_paths_removed": "100%",
+    "remaining_shutdown_call_sites": "0 outside scripts/shutdownManager/",
+    "audit_coverage": "repository + ~/Library/LaunchAgents + crontab + shell profiles"
+  },
+  "integration_points": [
+    "package.json scripts",
+    ".github/workflows/*",
+    "~/.zshrc and other shell profiles",
+    "~/Library/LaunchAgents/",
+    "src/docs/docs/operations/guardian_autopush_mandate.md"
+  ],
+  "dependencies": [
+    "OPS-SHUTDOWN-000 completed and dangerous script neutralized"
+  ],
+  "guardrails": {
+    "invariants": [
+      ".windsurf/rules/50-shutdown-governance.md — only the Global Shutdown Manager may execute shutdown"
+    ],
+    "trusted_frozen_components": [],
+    "forbidden_actions": [
+      "Do NOT run git reset --hard or git clean -fd unless explicitly scoped to removed files",
+      "Do NOT delete unrelated project logs or data",
+      "Do NOT delete Git history",
+      "Do NOT remove useful operational documentation without archiving",
+      "Do NOT leave shutdown calls in commitFailureMonitor.js or vercelDeploymentGuard.ts",
+      "Do NOT unload com.kurokasaiken.rpg-coordinator.plist if it is still used by the coordinator"
+    ]
+  },
+  "implementation_scope": {
+    "files_to_create": [
+      "test-results/ops-shutdown-001-audit-<date>.log",
+      "archive/legacy_shutdown/README.md (index of archived legacy artifacts)"
+    ],
+    "files_to_modify": [
+      "scripts/autoCommit/commitFailureMonitor.js — remove shutdownSystem, replace with log/exit",
+      "scripts/guardian/vercelDeploymentGuard.ts — remove shutdownSystem, replace with log/exit",
+      "src/docs/docs/operations/guardian_autopush_mandate.md — mark deprecated or archive"
+    ],
+    "files_to_delete_or_archive": [
+      "ai-worker/autospegnimento.sh",
+      "ai-worker/coordinator_watch.py",
+      "ai-worker/start_coordinator_watch.sh",
+      "ai-worker/README_WATCH.md",
+      "ai-worker/last_activity.json",
+      "auto-commit-push-shutdown.sh (already disabled in 000)",
+      "test_shutdown_verification.sh",
+      "shutdown.log",
+      "shutdown_when_done.log",
+      "shutdown.pid"
+    ],
+    "component_reuse_requirements": [],
+    "testing_requirements": {
+      "unit_tests": [],
+      "integration_tests": [
+        "grep -R for shutdown/poweroff/halt/pmset/osascript shutdown/sudo shutdown across repository returns only authorized references",
+        "launchctl list shows no shutdown-related agents",
+        "crontab -l is empty of shutdown/auto-commit/auto-push entries"
+      ],
+      "accessibility_tests": []
+    },
+    "documentation_updates": [
+      "Update or deprecate guardian_autopush_mandate.md",
+      "Add audit report to test-results/"
+    ]
+  },
+  "safeguards": {
+    "lint": {
+      "scope": "scripts/autoCommit/commitFailureMonitor.js scripts/guardian/vercelDeploymentGuard.ts",
+      "timeout_seconds": 120
+    },
+    "test": {
+      "scope": "",
+      "timeout_seconds": 0
+    },
+    "build_check": {
+      "timeout_seconds": 180
+    },
+    "kanban_lint": {
+      "timeout_seconds": 30
+    },
+    "evidence_log": "test-results/ops-shutdown-001-audit-<date>.log"
+  },
+  "execution_hint": "verified",
+  "notes": {
+    "audit_scope": "Search the repository root, scripts/, tools/, ai-worker/, .github/, coordinator/, package.json, and relevant macOS paths. Also search for synonyms: poweroff, halt, pmset sleep, osascript shut down, sudo shutdown -h now.",
+    "commit_failure_monitor": "The shutdownSystem function must be removed or made a no-op that logs 'SHUTDOWN_CAPABILITY_NOT_OWNED'. Do not leave a fallback shutdown path.",
+    "vercel_guard": "Same as commitFailureMonitor: remove shutdownSystem; deployment success/failure should exit with appropriate code, not shut down the machine.",
+    "coordinator_plist": "Only unload com.kurokasaiken.rpg-coordinator.plist if it is confirmed unrelated to current coordinator usage. If still used, leave it and document in evidence log.",
+    "handoff": "After this phase completes, the coordinator may queue OPS-SHUTDOWN-002 (registry)."
+  }
+}

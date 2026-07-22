@@ -152,6 +152,11 @@ export default interface Resources {
         "visualStateOverrides": "Visual Overrides",
         "tick": "Tick"
       },
+      "layerOrder": {
+        "title": "Layer Order",
+        "moveUp": "move up",
+        "moveDown": "move down"
+      },
       "layers": "Layers",
       "objects": "Objects",
       "pause": "Pause",

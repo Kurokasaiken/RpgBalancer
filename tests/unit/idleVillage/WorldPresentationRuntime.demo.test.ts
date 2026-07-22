@@ -31,8 +31,11 @@ const ACTIVE_THREAT_EVENT: WorldEvent = {
 };
 
 function createRuntime(events: WorldEvent[] = [ACTIVE_THREAT_EVENT]) {
+  const activeThreat = events.some(
+    (event) => event.category === 'threat' && event.lifecycle?.state === 'active',
+  );
   const worldState = {
-    threat: { active: true },
+    threat: { active: activeThreat },
     events,
   };
   const model = buildWorldPresentationModel(worldState, TEST_RULES);

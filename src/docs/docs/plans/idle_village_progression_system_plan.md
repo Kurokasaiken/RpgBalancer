@@ -586,3 +586,66 @@ Per ogni fase:
 - `src/docs/docs/plans/idle_village_plan.md` – Phase 12 overview
 - `src/balancing/config/idleVillage/types.ts` – Tipi esistenti
 - `src/balancing/config/idleVillage/defaultConfig.ts` – Config attuale
+- `src/balancing/config/idleVillage/gameplayModifierRegistry.ts` – Registry e `resolveStatGraph`
+- `src/balancing/modifiers/gameplayModifierEngine.ts` – Valutazione modifier
+- `src/docs/docs/plans/idle_village_modifiers_plan.md` – Schema e catalogo `GameplayStatId`
+
+---
+
+## 12. Gameplay Modifier Integration (GM-MP)
+
+Il sistema di progressione non dichiara mai valori fissi per buff/debuff. Ogni moltiplicatore o delta (reward scaling, risk injury/death, XP bonus) è modellato come `GameplayModifier` con:
+
+- `statId` target (es. `stat_reward_gold`, `stat_risk_injury`, `stat_core_xp`)
+- `scope` (`GLOBAL`, `SESSION`, `LOCATION`, `QUEST`, `RESIDENT`)
+- `operation` (`ADD`, `MULT`, `SET`)
+- `sourceConfigId` che punta alla config di provenienza
+- `owner` che traccia l'entità che emette il modifier (quest, edificio, evento, residenza)
+
+### 12.1 Esempi di Usage
+
+#### Reward Scaling
+
+Un festival stagionale che aumenta il gold delle quest di livello basso:
+
+```ts
+const harvestFestivalBuff: GameplayModifier = {
+  id: 'mod_festival_harvest_gold',
+  statId: 'stat_reward_gold',
+  scope: 'SESSION',
+  operation: 'MULT',
+  value: 0.2,
+  mode: 'MULTIPLICATIVE',
+  owner: { type: 'system', id: 'seasonal_event', label: 'Harvest Festival' },
+  sourceConfigId: 'events.harvest_festival.session_modifiers',
+};
+```
+
+`QuestResolver` calcola il reward base, poi chiama `resolveStatGraph({ statId: 'stat_reward_gold', baseValue, scopes: ['GLOBAL','SESSION','LOCATION','QUEST','RESIDENT'], context })` per ottenere il valore finale.
+
+#### Risk Scaling
+
+Una quest ad alto pericolo applica un modifier `QUEST` sul rischio:
+
+```ts
+const fogOfDread: GameplayModifier = {
+  id: 'mod_quest_fog_of_dread',
+  statId: 'stat_risk_injury',
+  scope: 'QUEST',
+  operation: 'MULT',
+  value: 0.25,
+  mode: 'MULTIPLICATIVE',
+  owner: { type: 'quest', id: 'trial_fire', label: 'Trial of Fire' },
+  sourceConfigId: 'quests.trial_fire.phase_fog',
+};
+```
+
+### 12.2 Ordine di Valutazione
+
+L'ordine `GLOBAL → SESSION → LOCATION → QUEST → RESIDENT` è definito in `DEFAULT_SCOPE_ORDER` in `src/balancing/types/gameplayModifierTypes.ts`. All'interno dello stesso scope le operazioni `ADD` si sommano, tra scope diversi le operazioni `MULT` si moltiplicano. Questo garantisce composizione deterministica e predicibile.
+
+### 12.3 Timeline e KPI
+
+- **Engine integration:** `GM-ENG` completato; `gameplayModifierRegistry.ts` e `gameplayModifierEngine.ts` disponibili.
+- **Prossimo passo:** `GM-BLD` fornirà il builder fluente per creare modifier senza scrivere a mano l'oggetto.
+- **KPI:** nessun moltiplicatore hardcoded nel `QuestResolver` o nelle formule di progressione; ogni parametro configurabile proviene da `sourceConfigId`.

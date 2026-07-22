@@ -50,8 +50,12 @@ The Gameplay Modifier Registry is the single source of truth for every buff, deb
 | `docs/plans/idle_village_tick_fatigue_plan.md` | Defines fatigue/risk checkpoints that modifiers must target (e.g., per-slot fatigue multipliers). |
 | `src/balancing/config/idleVillage/types.ts` | Existing stat/tag definitions and activity metadata consumed by modifiers. |
 | `src/balancing/config/idleVillage/minimalGameplayConfig.ts` | Source of UI tokens, thresholds, and roster stats used in examples. |
+| `src/balancing/config/idleVillage/gameplayModifierRegistry.ts` | Runtime registry: `registerModifiers`, `getAllRegisteredModifiers`, `getModifiersByScope`, `getModifiersByStat`, `resolveStatGraph`. |
+| `src/balancing/modifiers/gameplayModifierEngine.ts` | Evaluation entry point `GameplayModifierEngine.evaluateModifiers` used by `resolveStatGraph`. |
+| `src/analytics/idleVillage/modifierTelemetry.ts` | Telemetry wiring for `modifier_applied`, `modifier_removed`, `modifier_stack_changed` events. |
+| `src/balancing/config/idleVillage/modifierVisualizationConfig.ts` | Style Lab visualization tokens for modifier rendering (`activitySlot`, `workerPanel`, `questDetail`). |
 
-No other files are modified by this prompt, but future prompts (GM-MP, GM-BLD, GM-MIG) depend on this spec.
+This spec is the source of truth for registry semantics; downstream prompts (GM-MP, GM-BLD, GM-MIG) extend but do not duplicate it.
 
 ## GameplayStatId Catalog
 
@@ -537,3 +541,97 @@ Example emission:
 - Surfaces consuming `StatModifierDisplay` (loading + empty fallbacks): Activity Slot tooltip, ActivityCardDetail, WorkerTooltip, QuestDetailPanel.
 - Each surface uses Style Lab scope/status tokens and shares mock config defined in `modifierVisualizationConfig.ts`.
 - Tests: `ActivityCardDetail.test.tsx`, `WorkerTooltip.test.tsx`, `QuestDetailPanel.test.tsx` cover modifier preview rendering.
+
+## 9. Engine Integration Examples (GM-MP)
+
+This section maps the abstract `GameplayModifier` schema to the concrete runtime implementation delivered by `GM-ENG`.
+
+### 9.1 Default Registry Payload
+
+`src/balancing/config/idleVillage/gameplayModifierRegistry.ts` ships with `DEFAULT_IDLE_VILLAGE_MODIFIERS`, a baseline payload translated from §4.3. It is registered at module load and can be replaced or merged via `registerModifiers(modifiers, { merge?: boolean })`.
+
+```ts
+import { registerModifiers, getAllRegisteredModifiers } from '@/balancing/config/idleVillage/gameplayModifierRegistry';
+
+registerModifiers([
+  {
+    id: 'mod_quest_fog_of_dread',
+    statId: 'stat_risk_injury',
+    operation: 'MULT',
+    scope: 'QUEST',
+    value: 0.25,
+    mode: 'MULTIPLICATIVE',
+    maxStacks: 1,
+    refreshPolicy: 'RESET_DURATION',
+    lifetime: { type: 'TIMED', durationTicks: 3 },
+    owner: { type: 'quest', id: 'trial_fire', label: 'Trial of Fire' },
+    sourceConfigId: 'quests.trial_fire.phase_fog',
+    phaseId: 'trial_fire_phase_fog',
+  },
+]);
+```
+
+### 9.2 Resolving a Stat Graph
+
+Consumers that need a final stat value call `resolveStatGraph` from the registry. It collects modifiers for the requested scopes, runs them through `resolveModifiers` in `src/balancing/modifiers/gameplayModifierEngine.ts`, and emits telemetry via the `onModifierApplied` callback.
+
+```ts
+import { resolveStatGraph } from '@/balancing/config/idleVillage/gameplayModifierRegistry';
+
+const result = resolveStatGraph({
+  statId: 'stat_core_focus',
+  baseValue: resident.focus,
+  scopes: ['GLOBAL', 'SESSION', 'LOCATION', 'QUEST', 'RESIDENT'],
+  context: { residentId: resident.id, locationId: slot.id, questId: quest.id },
+});
+
+// result.finalValue is the computed stat after additive/multiplicative stacking.
+```
+
+### 9.3 Telemetry Integration
+
+`src/analytics/idleVillage/modifierTelemetry.ts` registers the default telemetry callback used by `resolveStatGraph`. Events are routed through `trackTelemetryEvent` with channel `gameplay_modifier`.
+
+- `modifier_applied` — emitted when a modifier enters the active stack.
+- `modifier_removed` — emitted on expiration, manual clear, or predicate failure.
+- `modifier_stack_changed` — emitted when a repeatable modifier changes stack count.
+
+### 9.4 Style Lab Rendering Tokens
+
+`src/balancing/config/idleVillage/modifierVisualizationConfig.ts` exports `MODIFIER_VISUALIZATION_CONFIG`, a config-first map of modifier entries per UI context (`activitySlot`, `workerPanel`, `questDetail`). Each entry defines `valueLabel`, `lifetime`, `status`, `owner`, `stackCount`, and `sourceConfigId`, ensuring Style Lab surfaces render modifiers without ad-hoc formatting logic.
+
+### 9.5 Cross-References
+
+- `docs/plans/idle_village_progression_system_plan.md` — reward/risk scaling integration.
+- `docs/plans/idle_village_tick_fatigue_plan.md` — per-tick fatigue and recovery modifiers.
+- `.windsurf/plans/style-lab-flexibility-1a9890.md` — modifier metadata rendering tokens.
+- `src/docs/docs/plans/idle_village_modifiers_plan.md` (this document) — canonical schema and catalog.
+
+> **Hardcoded Number Policy:** Numeric literals in examples above are illustrative. Production modifiers must source `value` from config (`sourceConfigId`) and be validated by `GameplayModifierSchema`.
+
+## 10. Builder & Tooling (GM-BLD)
+
+`src/balancing/modifiers/modifierBuilder.ts` provides a typed fluent API for authoring `GameplayModifier` objects. All builder methods validate against the canonical schema and forbid inline magic numbers by requiring `sourceConfigId` and a typed `statId`.
+
+```ts
+import { ModifierBuilder } from '@/balancing/modifiers/modifierBuilder';
+
+const aura = new ModifierBuilder()
+  .forStat('stat_core_focus')
+  .add(5)
+  .inScope('LOCATION')
+  .ownedBy('building', 'barracks', 'Barracks')
+  .fromConfig('idleVillage.modifiers.barracksLvl1')
+  .withLifetime('SESSION')
+  .withTags('barracks')
+  .build();
+```
+
+`scripts/modifierRegistryCLI.ts` exposes local commands:
+
+- `list` — dump registry with scope/stat filters.
+- `validate <file>` — validate JSON exports against `GameplayModifierSchema`.
+- `register <file> [--merge]` — load modifiers into the in-memory registry.
+- `example` — print a fluent-builder smoke test.
+
+For full guidelines, see `src/docs/docs/idle_village/builder_tooling.md`.

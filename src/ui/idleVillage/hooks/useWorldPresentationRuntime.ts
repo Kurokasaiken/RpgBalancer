@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { RuntimeObject } from '../../../engine/world/model/RuntimeObject';
 import { buildWorldPresentationModel } from '../../../engine/world/presentation/buildWorldPresentationModel';
 import { WorldPresentationRuntime } from '../../../engine/world/presentation/WorldPresentationRuntime';
@@ -42,7 +42,7 @@ export interface UseWorldPresentationRuntimeResult {
  */
 export function useWorldPresentationRuntime(scenario: PresentationScenario): UseWorldPresentationRuntimeResult {
   const [seed, setSeed] = useState(scenario.seed);
-  const [camera, setCamera] = useState({ panX: 0, panY: 0, zoom: scenario.manifest.camera.defaultZoom });
+  const [camera, setCamera] = useState({ panX: 0, panY: 0, zoom: 1 });
 
   const {
     tick,
@@ -83,19 +83,32 @@ export function useWorldPresentationRuntime(scenario: PresentationScenario): Use
     [runtime, tick, seed, interpolation],
   );
 
-  // Keep local camera in sync with runtime output while allowing user override.
-  useEffect(() => {
-    setCamera((prev) => ({
-      ...prev,
-      zoom: output.camera.zoom,
-    }));
-  }, [output.camera.zoom]);
+  // Preserve user pan/zoom while still layering runtime camera output on top.
+  const handleCameraChange = useCallback(
+    (next: { panX: number; panY: number; zoom: number }) => {
+      setCamera({
+        panX: next.panX,
+        panY: next.panY,
+        zoom: next.zoom / output.camera.zoom,
+      });
+    },
+    [output.camera.zoom],
+  );
+
+  const rendererCamera = useMemo(
+    () => ({
+      panX: camera.panX,
+      panY: camera.panY,
+      zoom: output.camera.zoom * camera.zoom,
+    }),
+    [camera.panX, camera.panY, output.camera.zoom, camera.zoom],
+  );
 
   const rendererProps: WorldSurfaceRendererInput = useMemo(
     () => ({
       manifest: scenario.manifest,
-      camera,
-      onCameraChange: setCamera,
+      camera: rendererCamera,
+      onCameraChange: handleCameraChange,
       activeVisualStateId: output.activeVisualStateId,
       visualStateOverrides: output.visualStateOverrides as WorldSurfaceVisualStateOverride[],
       visibleLayerIds: output.visibleLayerIds,
@@ -103,7 +116,7 @@ export function useWorldPresentationRuntime(scenario: PresentationScenario): Use
       layerOffsets: output.layerOffsets,
       runtimeObjects: output.runtimeObjects,
     }),
-    [scenario.manifest, camera, output],
+    [scenario.manifest, rendererCamera, handleCameraChange, output],
   );
 
   return {
