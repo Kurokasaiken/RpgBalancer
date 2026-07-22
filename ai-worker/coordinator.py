@@ -253,6 +253,8 @@ def run_single_task() -> bool:
     used_model = None
     success = False
     max_tokens = get_max_tokens(complexity)
+    last_error_detail = None
+    attempt_log = []
 
     for attempt_index, delay in enumerate(BACKOFF_DELAYS):
         for provider_name, model in provider_model_pairs:
@@ -260,15 +262,24 @@ def run_single_task() -> bool:
             try:
                 response = call_provider(provider_name, model, prompt, max_tokens=max_tokens)
 
-                if response.status_code == 429:
-                    print(f"[WARN] Rate limit (429) per {provider_name}/{model}")
+                status_code = response.status_code
+                response_text = response.text[:200].replace("\n", " ") if response.text else ""
+
+                if status_code == 429:
+                    msg = f"Rate limit (429) per {provider_name}/{model}"
+                    print(f"[WARN] {msg}")
+                    last_error_detail = f"{provider_name}/{model}: {msg}"
+                    attempt_log.append(last_error_detail)
                     continue
 
                 response.raise_for_status()
                 payload = response.json()
                 choices = payload.get("choices", [])
                 if not choices:
-                    print(f"[WARN] Nessuna scelta nella risposta di {provider_name}/{model}")
+                    msg = f"Nessuna scelta nella risposta di {provider_name}/{model}"
+                    print(f"[WARN] {msg}")
+                    last_error_detail = msg
+                    attempt_log.append(last_error_detail)
                     continue
 
                 raw_content = choices[0].get("message", {}).get("content", "")
@@ -280,9 +291,15 @@ def run_single_task() -> bool:
                 break
 
             except requests.exceptions.RequestException as e:
-                print(f"[WARN] Errore di rete con {provider_name}/{model}: {e}")
+                detail = f"{provider_name}/{model}: {e}"
+                print(f"[WARN] Errore di rete: {detail}")
+                last_error_detail = detail
+                attempt_log.append(detail)
             except Exception as e:
-                print(f"[WARN] Errore con {provider_name}/{model}: {e}")
+                detail = f"{provider_name}/{model}: {e}"
+                print(f"[WARN] Errore: {detail}")
+                last_error_detail = detail
+                attempt_log.append(detail)
 
         if success:
             break
@@ -339,8 +356,11 @@ def run_single_task() -> bool:
         return True
     else:
         error = "Tutti i provider/modelli hanno fallito o sono andati in rate limit"
+        if last_error_detail:
+            error = f"{error}. Ultimo errore: {last_error_detail}"
         task["status"] = "failed"
         task["error"] = error
+        task["provider_attempt_log"] = attempt_log[:20]
         print("[FAILED] Impossibile completare il task")
         write_evidence(task, "failed", used_model, elapsed, error=error, provider=used_provider)
 
