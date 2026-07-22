@@ -20,22 +20,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install dependencies
-        run: pip install -r coordinator/requirements.txt 2>/dev/null || pip install pyyaml
-
-      - name: Run coordinator to select batch
-        run: python coordinator/coordinator.py --select-only --output coordinator/batch.json
-
-      - name: Set matrix output
+      - name: Set matrix from ai-worker kanban
         id: set-matrix
         run: |
-          echo "matrix=$(cat coordinator/batch.json | jq '.tasks')" >> $GITHUB_OUTPUT
-          echo "max_parallel=$(cat coordinator/batch.json | jq -r '.max_parallel // 20')" >> $GITHUB_OUTPUT
+          echo "matrix=$(jq -c '.tasks' ai-worker/kanban.json)" >> $GITHUB_OUTPUT
+          echo "max_parallel=1" >> $GITHUB_OUTPUT
 
   ai-worker:
     needs: select-tasks
@@ -61,27 +50,28 @@ jobs:
         id: run-task
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          TASK_ID: ${{ matrix.task.task_id }}
-          CHANNEL: ${{ matrix.task.channel }}
-          MODEL: ${{ matrix.task.model }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          CEREBRAS_API_KEY: ${{ secrets.CEREBRAS_API_KEY }}
         run: |
-          python ai-worker/coordinator.py --task-id $TASK_ID --channel $CHANNEL --model $MODEL
+          python ai-worker/coordinator.py
           echo "status=done" >> $GITHUB_OUTPUT
 
       - name: Write registry end event
         if: always()
         run: |
           mkdir -p coordinator/registry-events
-          echo "{\"task_id\": \"${{ matrix.task.task_id }}\", \"ended_at\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\", \"status\": \"${{ steps.run-task.outputs.status || 'failed' }}\", \"model_used\": \"${{ matrix.task.model }}\"}" > coordinator/registry-events/${{ matrix.task.task_id }}-end.json
+          echo "{\"task_id\": \"${{ matrix.task.id }}\", \"ended_at\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\", \"status\": \"${{ steps.run-task.outputs.status || 'failed' }}\", \"model_used\": \"\"}" > coordinator/registry-events/${{ matrix.task.id }}-end.json
 
       - name: Commit and push changes
         if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add coordinator/registry-events/${{ matrix.task.task_id }}-end.json
-          git diff --cached --quiet || git commit -m "AI worker: task end event [ci skip]"
-          
+          git add ai-worker/kanban.json
+          git add test-results/ai-worker-*.json 2>/dev/null || true
+          git add coordinator/registry-events/${{ matrix.task.id }}-end.json
+          git diff --cached --quiet || git commit -m "AI worker: ${{ matrix.task.id }} [ci skip]"
+
           # Retry with rebase on conflict (max 3 attempts)
           for i in {1..3}; do
             if git push; then

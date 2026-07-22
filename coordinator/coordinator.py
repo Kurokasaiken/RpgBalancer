@@ -599,22 +599,21 @@ def build_ai_worker_payload(task: dict) -> List[dict]:
 
 
 def dispatch_ai_worker_batch(batch: List[dict], timeout_per_task: int = 600) -> int:
-    """Prepare and run ai-worker tasks automatically.
+    """Dispatch ai-worker tasks by writing ai-worker/kanban.json and pushing it.
 
-    Writes ai-worker/kanban.json with the selected ai-worker tasks and
-    invokes ai-worker/coordinator.py in a loop until no todo tasks remain.
-    If OPENROUTER_API_KEY is missing the batch is skipped without failing.
+    Reverts the previous local-run behavior: the Coordinator no longer runs
+    ai-worker/coordinator.py itself. Instead it queues tasks in
+    ai-worker/kanban.json, marks them as in progress in agent_assignments.md,
+    commits and pushes so that the ai-worker.yml workflow is triggered.
     """
+    del timeout_per_task  # Kept for signature compatibility; remote runner decides timeout.
+
     ai_tasks = [task for task in batch if task.get("channel") == "ai-worker"]
     if not ai_tasks:
         print("[INFO] No ai-worker tasks in batch")
         return 0
 
-    if not os.environ.get("OPENROUTER_API_KEY"):
-        print("[WARN] OPENROUTER_API_KEY not set; skipping ai-worker dispatch")
-        return 0
-
-    print(f"[INFO] Preparing {len(ai_tasks)} ai-worker tasks...")
+    print(f"[INFO] Preparing {len(ai_tasks)} ai-worker tasks for remote execution...")
 
     ai_entries = []
     for task in ai_tasks:
@@ -626,42 +625,47 @@ def dispatch_ai_worker_batch(batch: List[dict], timeout_per_task: int = 600) -> 
         json.dump(payload, f, indent=2, ensure_ascii=False)
     print(f"[INFO] ai-worker kanban written to {AI_KANBAN_PATH}")
 
-    completed = 0
-    while True:
-        # Run one ai-worker task per invocation
-        try:
-            result = subprocess.run(
-                ["python", str(ROOT_DIR / "ai-worker" / "coordinator.py")],
-                cwd=ROOT_DIR,
-                capture_output=True,
-                text=True,
-                timeout=timeout_per_task,
-            )
-            print(result.stdout[-500:] if len(result.stdout) > 500 else result.stdout)
-            if result.returncode != 0:
-                print(f"[ERROR] ai-worker coordinator failed: {result.stderr[-500:]}")
-                break
-        except subprocess.TimeoutExpired:
-            print(f"[ERROR] ai-worker task timed out after {timeout_per_task}s")
-            break
-        except (subprocess.SubprocessError, FileNotFoundError) as e:
-            print(f"[ERROR] Failed to invoke ai-worker: {e}")
-            break
+    # Mark base tasks as in progress so the Coordinator does not re-select them.
+    files_to_stage = [str(AI_KANBAN_PATH.relative_to(ROOT_DIR))]
+    if AGENT_ASSIGNMENTS_PATH.exists():
+        rows = parse_agent_assignments_rows()
+        status_by_id = {row["id"].split()[0]: row["status"] for row in rows}
 
-        # Check kanban status and remaining todo tasks
-        try:
-            with open(AI_KANBAN_PATH, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            tasks = data.get("tasks", [])
-            completed = sum(1 for t in tasks if t.get("status") == "done")
-            if not any(t.get("status") == "todo" for t in tasks):
-                print("[INFO] All ai-worker tasks completed")
-                break
-        except (json.JSONDecodeError, IOError) as e:
-            print(f"[WARN] Failed to read ai-worker kanban: {e}")
-            break
+        with open(AGENT_ASSIGNMENTS_PATH, "r", encoding="utf-8") as f:
+            content = f.read()
 
-    return completed
+        updated = False
+        for task in ai_tasks:
+            task_id = task["task_id"]
+            old_status = status_by_id.get(task_id)
+            if old_status:
+                new_content = _update_row_status(content, task_id, old_status, "In corso")
+                if new_content != content:
+                    content = new_content
+                    updated = True
+                    print(f"[INFO] Marked {task_id} as In corso in {AGENT_ASSIGNMENTS_PATH}")
+
+        if updated:
+            with open(AGENT_ASSIGNMENTS_PATH, "w", encoding="utf-8") as f:
+                f.write(content)
+            files_to_stage.append(str(AGENT_ASSIGNMENTS_PATH.relative_to(ROOT_DIR)))
+
+    # Commit and push so ai-worker.yml triggers on the kanban push.
+    try:
+        run_git(["add", *files_to_stage])
+        diff = run_git(["diff", "--cached", "--quiet"], check=False)
+        if diff.returncode == 0:
+            print("[INFO] No changes to commit for ai-worker dispatch")
+            return len(ai_tasks)
+
+        run_git(["commit", "-m", f"Coordinator: queue {len(ai_tasks)} ai-worker task(s) in kanban"])
+        run_git(["push"])
+        print(f"[INFO] Pushed ai-worker kanban for {len(ai_tasks)} task(s)")
+    except subprocess.CalledProcessError as e:
+        print(f"[ERROR] Failed to commit/push ai-worker kanban: {e.stderr}")
+        return 0
+
+    return len(ai_tasks)
 
 
 def dispatch_harness_batch(batch: List[dict], timeout_seconds: int = 1800):
@@ -723,6 +727,20 @@ def dispatch_harness_batch(batch: List[dict], timeout_seconds: int = 1800):
     except (subprocess.SubprocessError, FileNotFoundError) as e:
         print(f"[ERROR] Failed to invoke harness: {e}")
         return 0
+
+
+def run_git(args: List[str], check: bool = True) -> subprocess.CompletedProcess:
+    """Run a git command from the repository root."""
+    cmd = ["git", *args]
+    print(f"[GIT] {' '.join(cmd)}")
+    result = subprocess.run(cmd, cwd=ROOT_DIR, capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f"[GIT ERROR] {result.stderr.strip()}")
+        if check:
+            raise subprocess.CalledProcessError(result.returncode, cmd, output=result.stdout, stderr=result.stderr)
+    elif result.stdout.strip():
+        print(f"[GIT] {result.stdout.strip()}")
+    return result
 
 
 def send_desktop_notification(title: str, message: str):
