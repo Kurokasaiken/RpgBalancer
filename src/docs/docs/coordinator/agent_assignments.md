@@ -11114,10 +11114,24 @@ NOTE:
 | IV-WORLD-SURFACE-001 — World Surface Runtime Step 1-3 (asset pipeline + schemas + TestHub) | Completato | - | Cascade | - | - | - | - | 2026-07-19 | Evidence: test-results/iv-world-surface-001-2026-07-19.log. Prompt: coordinator/manual-dispatch/completed/IV-WORLD-SURFACE-001.md. |
 | IV-WORLD-SURFACE-002 — World Surface Runtime Step 5 (runtime objects & events) | Completato | IV-WORLD-SURFACE-001 | harness | - | 2026-07-19T11:15:23.909Z | - | - | 2026-07-19T11:15:23.907Z | Implement WorldState with RuntimeObject and WorldEvent; connect events to visual states and region tints. Plan: src/docs/docs/plans/world_surface_runtime_implementation_plan.md §Step 5. |
 | IV-WORLD-SURFACE-003 — World Surface Runtime Step 6 (advanced renderer evaluation) | Completato | IV-WORLD-SURFACE-002 | Cascade | - | - | - | - | 2026-07-19T11:48:50Z | Evidence: test-results/iv-world-surface-003-2026-07-19.md. Evaluate Pixi/WebGL renderer when runtime objects > 50 or heavy particles. Plan: src/docs/docs/plans/world_surface_runtime_implementation_plan.md §Step 6. |
-| WORLD-PRESENTATION-RUNTIME-FOUNDATION — World Presentation Runtime Foundation | In corso | 2026-07-20 | Cascade | prompt:check passed; execution by Cascade (manual) 2026-07-20 | manual | execution_hint architectural, design judgment | Prompt: prompts/WORLD-PRESENTATION-RUNTIME-FOUNDATION.md |
-| WORLD-PRESENTATION-RUNTIME-DEMO — World Presentation Runtime Demo (Milestone A: Threat Semantic Presence) | In corso | 2026-07-22 | Cascade | Scenario fixture con WorldEvent threat attivo; ThreatPresenceEffect con progressione 0/5/15/30; nessun SequenceScheduler/movimento/HUD | manual | execution_hint architectural, design judgment | Prompt: coordinator/manual-dispatch/pending/WORLD-PRESENTATION-RUNTIME-DEMO.md v1.4 (visual verb + ambient axis) |
+| WORLD-PRESENTATION-RUNTIME-FOUNDATION — World Presentation Runtime Foundation | Completato | - | Cascade | 2026-07-20T09:58:00Z | 2026-07-22T16:05:00Z | manual | execution_hint architectural, design judgment | 2026-07-22T16:05:00Z | Closed with trusted doc and evidence log. Evidence: test-results/WORLD-PRESENTATION-RUNTIME-DEMO-2026-07-22.log |
+| WORLD-PRESENTATION-RUNTIME-DEMO — World Presentation Runtime Demo (Milestone A: Threat Semantic Presence) | Completato | WORLD-PRESENTATION-RUNTIME-FOUNDATION | Cascade | 2026-07-22T12:30:00Z | 2026-07-22T16:05:00Z | manual | execution_hint architectural, design judgment | 2026-07-22T16:05:00Z | ThreatPresenceEffect + threat scenario + inspector verified. Evidence: test-results/WORLD-PRESENTATION-RUNTIME-DEMO-2026-07-22.log |
 | IV-SLOT-RACK-RESKIN-001 — Slot Rack Container Reskin to Roster Materic Style | Completato | - | Cascade | 2026-07-22 | Evidence: test-results/iv-slot-rack-reskin-2026-07-22.log; safeguards passed | manual | harness failure, manual retry |
 | POI-MEDALLION-MATERIAL-PREVIEW-00E669 — POI Medallion Material Preview (GenericPoiSkin V2) | In corso | 2026-07-22 | Cascade | prompt:check passed; GenericPoiSkin base medallion V2 with Materic stone/bronze aesthetic; A/B route /poi-visual-preview; canonical files untouched | manual | execution_hint architectural, visual design judgment | Prompt: coordinator/manual-dispatch/pending/POI-MEDALLION-MATERIAL-PREVIEW-00E669.md |
+| AI-SMOKE-TEST-001 — Trivial atomic ai-worker dispatch test | Non assegnato | - | - | Smoke test for ai-worker kanban dispatch | ai-worker | atomic single-file, no safeguards | ```text
+AGENT
+Write a short markdown file confirming this ai-worker smoke test executed.
+
+ISTRUZIONI
+Create the file coordinator/AI_WORKER_SMOKE_TEST.md containing exactly this text (no extra commentary):
+
+# AI Worker Smoke Test
+This file was created automatically by the ai-worker as a trivial atomic dispatch test.
+
+FILE TARGET: coordinator/AI_WORKER_SMOKE_TEST.md
+EXECUTION HINT: atomic
+COMPLEXITY: 1
+```
 
 ### Brief Description
 Create AstrolabeTrailerController that demonstrates DestinyAstrolabe can be controlled for deterministic capture. This is Sprint 1 from the approved trailer vertical slice plan, focusing on the hero shot (Scene 4: Risk).
