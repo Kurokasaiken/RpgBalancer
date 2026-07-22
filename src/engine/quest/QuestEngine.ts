@@ -1,4 +1,13 @@
 /**
+ * @experimental FROZEN
+ *
+ * Reference: ADR-001 — Quest Engine Reconciliation & Opportunity Foundation
+ *
+ * This file is frozen while the new quest engine (C2) is reconciled.
+ * No new code should depend on it; new code should use the C2 ActivityDefinition-based quest system.
+ */
+
+/**
  * Quest Engine with Branching Support
  *
  * Deterministic execution of quests with branching logic, choice handling,

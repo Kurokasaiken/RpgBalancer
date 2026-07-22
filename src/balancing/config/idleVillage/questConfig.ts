@@ -1,9 +1,11 @@
 /**
- * Quest Configuration for Idle Village
- * 
- * Config-first design for quest system with skill checks and rewards.
- * All values are configurable - no hardcoded magic numbers.
- * 
+ * @deprecated
+ *
+ * Reference: ADR-001 — Quest Engine Reconciliation & Opportunity Foundation
+ *
+ * C1 quest configuration is deprecated. The new C2 ActivityDefinition-based quest system should be used.
+ * Types are still consumed by QuestChainProgressTracker and telemetry, so exports are preserved.
+ *
  * @module questConfig
  */
 
