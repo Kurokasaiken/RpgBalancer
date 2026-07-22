@@ -171,7 +171,8 @@ def get_effective_provider_model_pairs() -> List[tuple]:
 
     For each provider, intersects the hardcoded whitelist (models known to be suitable
     for coding) with the live models fetched from the provider's /models endpoint.
-    Logs provider drift if intersection is empty and excludes that provider.
+    Logs provider drift if intersection is empty, then falls back to the whitelist so
+    the task still has a chance to run.
     """
     effective_pairs = []
     
@@ -190,7 +191,9 @@ def get_effective_provider_model_pairs() -> List[tuple]:
             if not intersection:
                 # Provider drift: all expected models are gone
                 log_provider_drift(provider_name, whitelist, available)
-                print(f"[WARN] Excluding {provider_name} from fallback cycle (no whitelisted models available)")
+                print(f"[WARN] No whitelisted models in live list for {provider_name}; using whitelist as fallback")
+                for model in whitelist:
+                    effective_pairs.append((provider_name, model))
                 continue
             
             # Add intersection pairs to effective list
