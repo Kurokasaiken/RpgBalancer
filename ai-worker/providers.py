@@ -19,17 +19,17 @@ PROVIDERS = {
     "openrouter": {
         "base_url": "https://openrouter.ai/api/v1",
         "api_key_env": "OPENROUTER_API_KEY",
-        "models": ["qwen/qwen3-coder:free", "meta-llama/llama-3.3-70b-instruct:free"],
+        "models": ["openai/gpt-oss-20b:free", "cohere/north-mini-code:free"],
     },
     "gemini": {
         "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
         "api_key_env": "GEMINI_API_KEY",
-        "models": ["gemini-2.5-flash"],
+        "models": ["gemini-3.5-flash", "gemini-3.6-flash"],
     },
     "cerebras": {
         "base_url": "https://api.cerebras.ai/v1",
         "api_key_env": "CEREBRAS_API_KEY",
-        "models": ["llama-3.3-70b"],
+        "models": ["gpt-oss-120b", "gemma-4-31b"],
     },
 }
 
