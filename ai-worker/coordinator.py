@@ -2,10 +2,11 @@ import json
 import os
 import re
 import subprocess
+import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 import requests
 
@@ -208,26 +209,32 @@ def get_effective_provider_model_pairs() -> List[tuple]:
     return effective_pairs
 
 
-def run_single_task():
+def run_single_task() -> bool:
     start_time = time.time()
-
-    # Get effective provider/model pairs (intersection of whitelist and live models)
-    provider_model_pairs = get_effective_provider_model_pairs()
-    if not provider_model_pairs:
-        print("[ERRORE] Nessun provider con modelli disponibili trovato.")
-        return
 
     data = load_kanban()
     task = find_next_todo(data)
     if task is None:
         print("[INFO] Nessun task con status 'todo' trovato.")
-        return
+        return True
 
     task_id = task["id"]
     target_file = task["target_file"]
     prompt = task["prompt"]
     complexity = task.get("complexity", 1)
     execution_hint = task.get("execution_hint", "atomic")
+
+    # Get effective provider/model pairs (intersection of whitelist and live models)
+    provider_model_pairs = get_effective_provider_model_pairs()
+    if not provider_model_pairs:
+        elapsed = time.time() - start_time
+        error = "Nessun provider con modelli disponibili trovato"
+        print(f"[ERRORE] {error}")
+        task["status"] = "failed"
+        task["error"] = error
+        write_evidence(task, "failed", None, elapsed, error=error)
+        save_kanban(data)
+        return False
 
     print(f"[INFO] Esecuzione task {task_id} -> {target_file} (complexity {complexity}, execution_hint={execution_hint})")
 
@@ -239,7 +246,7 @@ def run_single_task():
         elapsed = time.time() - start_time
         write_evidence(task, "skipped", None, elapsed, error=reason, skipped=True)
         save_kanban(data)
-        return
+        return True
 
     generated_code = None
     used_provider = None
@@ -319,7 +326,7 @@ def run_single_task():
                 task["lint_result"] = lint_result
                 write_evidence(task, "failed", used_model, elapsed, error=task["error"], provider=used_provider, lint_result=lint_result)
                 save_kanban(data)
-                return
+                return False
 
         task["status"] = "done"
         task["used_provider"] = used_provider
@@ -328,6 +335,8 @@ def run_single_task():
         if lint_result:
             task["lint_result"] = lint_result
         write_evidence(task, "done", used_model, elapsed, provider=used_provider, lint_result=lint_result)
+        save_kanban(data)
+        return True
     else:
         error = "Tutti i provider/modelli hanno fallito o sono andati in rate limit"
         task["status"] = "failed"
@@ -336,7 +345,8 @@ def run_single_task():
         write_evidence(task, "failed", used_model, elapsed, error=error, provider=used_provider)
 
     save_kanban(data)
+    return False
 
 
 if __name__ == "__main__":
-    run_single_task()
+    sys.exit(0 if run_single_task() else 1)
