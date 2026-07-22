@@ -240,5 +240,10 @@
       "PLAGUE": "Plague",
       "SIEGE": "Siege"
     }
+  },
+  "poiVisualPreview": {
+    "title": "POI Medallion Preview",
+    "v1Label": "GenericPoiSkin V1 (Amber)",
+    "v2Label": "GenericPoiSkin V2 (Materic)"
   }
 }

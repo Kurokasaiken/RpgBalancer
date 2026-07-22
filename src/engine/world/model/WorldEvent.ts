@@ -50,7 +50,7 @@ export const WorldEventSchema = z.object({
   category: WorldEventCategorySchema,
   lifecycle: WorldEventLifecycleSchema.default({ state: 'pending' }),
   effects: z.array(WorldEventEffectSchema).default([]),
-  data: z.record(z.unknown()).default({}),
+  data: z.record(z.string(), z.unknown()).default({}),
 });
 
 export type WorldEventCategory = z.infer<typeof WorldEventCategorySchema>;

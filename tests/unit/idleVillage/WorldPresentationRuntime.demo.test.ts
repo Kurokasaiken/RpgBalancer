@@ -87,11 +87,12 @@ describe('WorldPresentationRuntime ThreatPresenceEffect demo', () => {
     expect(JSON.stringify(run1)).toBe(JSON.stringify(run2));
   });
 
-  it('uses the default state when no active threat event is present', () => {
+  it('falls back to rule-driven threatened state when no active threat event is present', () => {
     const runtime = createRuntime([
       { ...ACTIVE_THREAT_EVENT, lifecycle: { state: 'pending' } },
     ]);
     const output = runtime.update(15, 12345);
-    expect(output.activeVisualStateId).toBe('default');
+    expect(output.activeVisualStateId).toBe('threatened');
+    expect(output.runtimeObjects).toHaveLength(0);
   });
 });

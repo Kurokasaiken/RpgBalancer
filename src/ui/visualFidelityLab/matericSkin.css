@@ -32,4 +32,15 @@
 
   /* fill rim / meniscus → warm gold */
   --skin-icon-color: #f0cf6a;
+
+  /* Materic-path bar FILLS (the isMateric roster reads these via
+     MATERIC_SKIN_CONFIG's `var(--mat-*-fill, …)` hooks). Lab semantic ramps,
+     SAME 2-layer structure as the config fallback so background-size/blend
+     stay aligned. HP → emerald, Stamina → amber. */
+  --mat-hp-fill:
+    radial-gradient(ellipse 80% 80% at 20% 50%, rgba(255, 255, 255, 0.12), transparent 50%),
+    linear-gradient(90deg, #1f6e42, #2f8f5c, #4fbd82, #8fe0a8);
+  --mat-stamina-fill:
+    radial-gradient(circle, rgba(255, 255, 255, 0.18) 1px, transparent 1px),
+    linear-gradient(90deg, #8a5410, #c9852e, #ffd98a);
 }

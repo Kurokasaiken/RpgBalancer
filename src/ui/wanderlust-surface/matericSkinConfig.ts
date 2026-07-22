@@ -93,14 +93,18 @@ export const MATERIC_SKIN_CONFIG: MatericSkinConfig = matericSkinConfigSchema.pa
     boxShadow: 'inset 0 3px 8px rgba(0,0,0,0.95), inset 0 1px 0 rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.03)',
   },
   hpFill: {
-    backgroundImage: 'radial-gradient(ellipse 80% 80% at 20% 50%, rgba(255,255,255,0.12), transparent 50%), linear-gradient(90deg, #0d4a2a, #2d6a4f, #4a9c6a, #7bc96f)',
+    // token-driven (lab migration): `--mat-hp-fill` overrides; fallback = the
+    // current sap-green recipe, so pages without the token layer are UNCHANGED.
+    backgroundImage: 'var(--mat-hp-fill, radial-gradient(ellipse 80% 80% at 20% 50%, rgba(255,255,255,0.12), transparent 50%), linear-gradient(90deg, #0d4a2a, #2d6a4f, #4a9c6a, #7bc96f))',
     backgroundSize: '100% 100%, 100% 100%',
     backgroundBlendMode: 'overlay, normal',
     boxShadow: 'inset 0 0 0 0.5px rgba(123,201,111,0.4), 0 0 8px rgba(0,0,0,0.35), 0 0 6px rgba(123,201,111,0.25)',
     borderRadius: '0px',
   },
   staminaFill: {
-    backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.18) 1px, transparent 1px), linear-gradient(90deg, #7a5c00, #d4af37, #f0cf6a)',
+    // token-driven (lab migration): `--mat-stamina-fill` overrides; fallback =
+    // the current golden-sand recipe (pages without the token layer UNCHANGED).
+    backgroundImage: 'var(--mat-stamina-fill, radial-gradient(circle, rgba(255,255,255,0.18) 1px, transparent 1px), linear-gradient(90deg, #7a5c00, #d4af37, #f0cf6a))',
     backgroundSize: '3px 3px, 100% 100%',
     backgroundBlendMode: 'overlay, normal',
     boxShadow: 'inset 0 0 0 0.5px rgba(245,158,11,0.4), 0 0 8px rgba(0,0,0,0.35), 0 0 6px rgba(245,158,11,0.2)',
