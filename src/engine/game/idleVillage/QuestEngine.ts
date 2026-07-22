@@ -1,9 +1,11 @@
 /**
- * Quest Engine for Idle Village
- * 
- * Core logic for quest skill checks, success calculation, and reward processing.
- * All calculations are config-driven with no hardcoded values.
- * 
+ * @deprecated
+ *
+ * Reference: ADR-001 — Quest Engine Reconciliation & Opportunity Foundation
+ *
+ * E2 quest engine is deprecated. The new C2 ActivityDefinition-based quest system should be used.
+ * Types are still consumed by QuestChainProgressTracker and telemetry, so exports are preserved.
+ *
  * @module QuestEngine
  */
 
