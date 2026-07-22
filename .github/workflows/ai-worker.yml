@@ -35,7 +35,7 @@ jobs:
     if: needs.select-tasks.outputs.matrix != '[]'
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: ${{ needs.select-tasks.outputs.max_parallel }}
+      max-parallel: 1
       matrix:
         task: ${{ fromJson(needs.select-tasks.outputs.matrix) }}
     steps:
