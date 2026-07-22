@@ -4,6 +4,10 @@ on:
   push:
     paths:
       - "ai-worker/kanban.json"
+  workflow_run:
+    workflows: ["Coordinator"]
+    types: [completed]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
