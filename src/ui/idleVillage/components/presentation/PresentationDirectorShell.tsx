@@ -27,9 +27,9 @@ export function PresentationDirectorShell() {
   return (
     <SkinScope className="presentation-director-shell flex min-h-screen flex-col bg-slate-950 text-slate-100">
       <header className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-        <SkinTitle level="section">{t('presentation.director.title')}</SkinTitle>
+        <SkinTitle level="section">{t('idleVillage:presentation.director.title')}</SkinTitle>
         <SkinBadge data-testid="active-state-badge">
-          {output.activeVisualStateId ?? t('presentation.states.unknown')}
+          {output.activeVisualStateId ?? t('idleVillage:presentation.states.unknown')}
         </SkinBadge>
       </header>
 
@@ -51,9 +51,32 @@ export function PresentationDirectorShell() {
             onTickChange={setTick}
           />
           <section className="space-y-2 text-xs text-slate-400">
-            <p>{t('presentation.objects')}: {output.runtimeObjects.length}</p>
-            <p>{t('presentation.layers')}: {rendererProps.visibleLayerIds?.length ?? 0}</p>
+            <p>{t('idleVillage:presentation.objects')}: {output.runtimeObjects.length}</p>
+            <p>{t('idleVillage:presentation.layers')}: {rendererProps.visibleLayerIds?.length ?? 0}</p>
           </section>
+
+          <SkinScope className="rounded border border-white/10 bg-slate-900/50 p-3">
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-amber-200">
+              {t('idleVillage:presentation.inspector.title')}
+            </h3>
+            <div className="space-y-1.5 text-xs text-slate-300">
+              <p>
+                {t('idleVillage:presentation.inspector.activeState')}:{' '}
+                <SkinBadge data-testid="inspector-active-state">
+                  {output.activeVisualStateId ?? t('idleVillage:presentation.states.unknown')}
+                </SkinBadge>
+              </p>
+              <p data-testid="inspector-objects">
+                {t('idleVillage:presentation.inspector.runtimeObjects')}: {output.runtimeObjects.length}
+              </p>
+              <p data-testid="inspector-overrides">
+                {t('idleVillage:presentation.inspector.visualStateOverrides')}: {output.visualStateOverrides.length}
+              </p>
+              <p data-testid="inspector-tick">
+                {t('idleVillage:presentation.inspector.tick')}: {tick}
+              </p>
+            </div>
+          </SkinScope>
         </aside>
 
         <section className="relative flex-1 overflow-hidden">

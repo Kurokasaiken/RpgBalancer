@@ -119,6 +119,14 @@ export const WANDERLUST_PRESENTATION_MANIFEST = WorldSurfaceManifestSchema.parse
       overrides: [],
     },
     {
+      id: 'threat_manifesting',
+      labelKey: 'world.states.threat_manifesting',
+      overrides: [
+        { type: 'tint_layer' as const, layerId: 'vignette', tint: '#6a1a1a' },
+        { type: 'set_opacity' as const, layerId: 'vignette', opacity: 0.45 },
+      ],
+    },
+    {
       id: 'threatened',
       labelKey: 'world.states.threatened',
       overrides: [
@@ -164,6 +172,8 @@ export interface PresentationScenario {
   manifest: WorldSurfaceManifest;
   rules: PresentationRules;
   seed: number;
+  /** Optional effect ids resolved through the presentation effect registry. */
+  effectIds?: string[];
 }
 
 export const DEFAULT_PRESENTATION_SEED = 12345;
@@ -180,10 +190,22 @@ export const PRESENTATION_SCENARIOS: PresentationScenario[] = [
   {
     id: 'threat',
     labelKey: 'presentation.scenarios.threat',
-    worldState: { threat: { active: true } },
+    worldState: {
+      threat: { active: true },
+      events: [
+        {
+          id: 'goblin-threat-north',
+          type: 'goblin_invasion',
+          category: 'threat',
+          lifecycle: { state: 'active', startAt: 0, endAt: 300 },
+          data: { origin: 'north', regionId: 'enchanted_forest' },
+        },
+      ],
+    },
     manifest: WANDERLUST_PRESENTATION_MANIFEST,
     rules: getPresentationRules('wanderlust_default'),
     seed: DEFAULT_PRESENTATION_SEED,
+    effectIds: ['threat_presence'],
   },
   {
     id: 'corruption',

@@ -8,13 +8,24 @@
 
 import { KIT_REGISTRY } from './frozen/registry';
 
-interface TestPageLink {
+export interface TestPageLink {
   id: string;
   title: string;
   description: string;
   path: string;
   icon: string;
   status?: 'ok' | 'needs-refactor';
+}
+
+export interface TestHubProps {
+  /** Optional page title. Defaults to "Idle Village Test Hub". */
+  title?: string;
+  /** Optional subtitle below the title. */
+  subtitle?: string;
+  /** Optional list of pages to show. Defaults to the full generated + extra page list. */
+  pages?: TestPageLink[];
+  /** Optional back link shown above the grid. */
+  backTo?: { path: string; label: string };
 }
 
 const KIT_PAGES: TestPageLink[] = KIT_REGISTRY.filter((entry) => entry.hub).map((entry) => ({
@@ -82,61 +93,22 @@ const EXTRA_PAGES: TestPageLink[] = [
     icon: '🎨',
     status: 'ok',
   },
-  // Non-kit pages: Steam teaser trailer scenes - marketing assets, not gameplay kits.
+  // Non-kit page: Steam Trailer Hub — grouped trailer scenes.
   {
-    id: 'trailer-threat-iter',
-    title: 'Trailer: Threat Iter',
-    description: 'Scene 1 iteration — Goblin Invasion with VFL teal/obsidian theme and POI kit',
-    path: '/trailer-threat-iter',
-    icon: '⚔️',
-    status: 'ok',
-  },
-  {
-    id: 'trailer-choice',
-    title: 'Trailer: Choice',
-    description: 'Scene 2 — Branching Choice with V9 Explorer Journal theme',
-    path: '/trailer-choice',
-    icon: '🔀',
-    status: 'ok',
-  },
-  {
-    id: 'trailer-preparation',
-    title: 'Trailer: Preparation',
-    description: 'Scene 3 — Hero Preparation with V9 Explorer Journal theme',
-    path: '/trailer-preparation',
-    icon: '🛡️',
-    status: 'ok',
-  },
-  {
-    id: 'trailer-risk',
-    title: 'Trailer: Risk',
-    description: 'Scene 4 — Astrolabe Risk with V9 Explorer Journal theme',
-    path: '/trailer-risk',
-    icon: '☸️',
-    status: 'ok',
-  },
-  {
-    id: 'trailer-consequence',
-    title: 'Trailer: Consequence',
-    description: 'Scene 5 — Consequence with V9 Explorer Journal theme',
-    path: '/trailer-consequence',
-    icon: '⚖️',
-    status: 'ok',
-  },
-  {
-    id: 'trailer-legacy',
-    title: 'Trailer: Legacy',
-    description: 'Scene 6 — Legacy with V9 Explorer Journal theme',
-    path: '/trailer-legacy',
-    icon: '🏛️',
-    status: 'ok',
-  },
-  {
-    id: 'trailer-outro',
-    title: 'Trailer: Outro',
-    description: 'Scene 7 — Outro CTA with V9 Explorer Journal theme',
-    path: '/trailer-outro',
+    id: 'steam-trailer-hub',
+    title: 'Steam Trailer Hub',
+    description: 'All Steam teaser trailer scenes in one hub',
+    path: '/test-hub/steam-trailer-hub',
     icon: '🎬',
+    status: 'ok',
+  },
+  // Non-kit page: Harmonization Gallery — canonical components vs material tokens.
+  {
+    id: 'harmonization-gallery',
+    title: 'Harmonization Gallery',
+    description: 'Canonical components mounted with material token scopes',
+    path: '/harmonization-gallery',
+    icon: '🖼️',
     status: 'ok',
   },
   // Non-kit page: Visual Fidelity Lab - blind protocol for visual grammar validation.
@@ -183,21 +155,36 @@ const TEST_PAGES: TestPageLink[] = [
   ...EXTRA_PAGES.filter((extra) => !KIT_PAGES.some((kit) => kit.path === extra.path)),
 ];
 
-export const TestHub: React.FC = () => {
+export const TestHub: React.FC<TestHubProps> = ({
+  title = 'Idle Village Test Hub',
+  subtitle = 'Pagina centrale per verifica visuale di tutti i componenti',
+  pages = TEST_PAGES,
+  backTo,
+}) => {
   return (
     <div className="min-h-screen bg-slate-950 p-8">
       <div className="mx-auto max-w-6xl">
+        {backTo && (
+          <div className="mb-4">
+            <a
+              href={backTo.path}
+              className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-300 transition-colors hover:border-amber-500/50 hover:text-amber-200"
+            >
+              {backTo.label}
+            </a>
+          </div>
+        )}
         <header className="mb-8 text-center">
           <h1 className="mb-2 text-3xl font-bold text-amber-200">
-            Idle Village Test Hub
+            {title}
           </h1>
           <p className="text-sm text-slate-400">
-            Pagina centrale per verifica visuale di tutti i componenti
+            {subtitle}
           </p>
         </header>
 
         <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {TEST_PAGES.map((page) => (
+          {pages.map((page) => (
             <a
               key={page.id}
               href={page.path}
@@ -222,7 +209,7 @@ export const TestHub: React.FC = () => {
         </div>
 
         <footer className="mt-8 border-t border-white/10 pt-6 text-center text-xs text-slate-500">
-          <p>Test Hub · Idle Village Vertical Slice</p>
+          <p>{title} · Idle Village Vertical Slice</p>
         </footer>
       </div>
     </div>

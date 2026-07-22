@@ -171,6 +171,7 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
   const stoneGradientId = `sg-${uniqueId}`;
   const stoneAmbientId = `sa-${uniqueId}`;
   const rimGradientId = `bz-${uniqueId}`;
+  const rimHoverGradientId = `rh-${uniqueId}`;
   const bloomGradientId = `bl-${uniqueId}`;
   const specularGradientId = `sp-${uniqueId}`;
   const glowFilterId = `gf-${uniqueId}`;
@@ -292,6 +293,14 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
             <stop offset="100%" stopColor={rimColors[2]} />
           </linearGradient>
 
+          <linearGradient id={rimHoverGradientId} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="rgba(255,255,255,0)" />
+            <stop offset="35%" stopColor="rgba(255,255,255,0)" />
+            <stop offset="50%" stopColor="rgba(255,255,255,0.85)" />
+            <stop offset="65%" stopColor="rgba(255,255,255,0)" />
+            <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+          </linearGradient>
+
           <radialGradient id={bloomGradientId} cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor={`rgb(${expiredCoronaGlow.r},${expiredCoronaGlow.g},${expiredCoronaGlow.b})`} stopOpacity={isStone ? 0.18 : 0.28} />
             <stop offset="55%" stopColor={`rgb(${expiredCoronaGlow.r},${expiredCoronaGlow.g},${expiredCoronaGlow.b})`} stopOpacity={0.06} />
@@ -401,6 +410,25 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
         ) : (
           <circle cx="0" cy="0" r={rimRx} fill="none" stroke={`url(#${rimGradientId})`} strokeWidth="3.0" filter={`url(#${glowFilterId})`} opacity={0.86} data-poi-rim />
         )}
+
+        <g
+          style={{
+            opacity: isHovered && enableHover ? 0.95 : 0,
+            mixBlendMode: 'color-dodge',
+            transition: isHovered && enableHover
+              ? 'opacity 0.3s ease-in-out, transform 0.8s ease-out'
+              : 'opacity 0.3s ease-in-out, transform 0s',
+            transform: isHovered && enableHover ? 'rotate(360deg)' : 'rotate(0deg)',
+            transformOrigin: '0px 0px',
+            pointerEvents: 'none',
+          }}
+        >
+          {isStone ? (
+            <ellipse cx="0" cy="0" rx={rimRx} ry={rimRy} fill="none" stroke={`url(#${rimHoverGradientId})`} strokeWidth="3.0" />
+          ) : (
+            <circle cx="0" cy="0" r={rimRx} fill="none" stroke={`url(#${rimHoverGradientId})`} strokeWidth="3.0" />
+          )}
+        </g>
 
         {isStone ? (
           <ellipse cx="0" cy="0" rx={rimRx} ry={rimRy} fill="none" stroke="rgba(255,235,148,.34)" strokeWidth="0.8" strokeDasharray="20 100" strokeDashoffset="20" strokeLinecap="round" />

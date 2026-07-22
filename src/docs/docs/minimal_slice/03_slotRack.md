@@ -420,6 +420,7 @@
 
 **SlotRack skins:**
 - Default skin (Gilded Observatory)
+- `slot_rack_materic` — Materic/Wanderlust roster-style shell with teal (#060f16) surface, subtle cyan top-left glow, and 2px solid gold (#f0cf6a) border
 - Wilderness skin (if available)
 - Empire skin (if available)
 

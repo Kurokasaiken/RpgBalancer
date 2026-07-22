@@ -3,6 +3,7 @@ import type { RuntimeObject } from '../../../engine/world/model/RuntimeObject';
 import { buildWorldPresentationModel } from '../../../engine/world/presentation/buildWorldPresentationModel';
 import { WorldPresentationRuntime } from '../../../engine/world/presentation/WorldPresentationRuntime';
 import type { PresentationOutput } from '../../../engine/world/presentation/types';
+import { resolvePresentationEffect } from '../../../engine/world/presentation/config/presentationEffectRegistry';
 import type { WorldSurfaceManifest, WorldSurfaceVisualStateOverride } from '../config/worldSurfaceConfig';
 import type { PresentationScenario } from '../config/presentationConfig';
 import { usePresentationClock } from './usePresentationClock';
@@ -57,6 +58,25 @@ export function useWorldPresentationRuntime(scenario: PresentationScenario): Use
     const model = buildWorldPresentationModel(scenario.worldState, scenario.rules);
     return new WorldPresentationRuntime({ model, manifest: scenario.manifest });
   }, [scenario]);
+
+  useEffect(() => {
+    const effectIds = scenario.effectIds ?? [];
+    if (effectIds.length === 0) return undefined;
+
+    const registeredIds: string[] = [];
+    for (const effectId of effectIds) {
+      const effect = resolvePresentationEffect(effectId);
+      if (effect) {
+        registeredIds.push(runtime.register(effect));
+      }
+    }
+
+    return () => {
+      for (const id of registeredIds) {
+        runtime.unregister(id);
+      }
+    };
+  }, [runtime, scenario.effectIds]);
 
   const output = useMemo(
     () => runtime.update(tick, seed, { deltaTick: 1, interpolation }),

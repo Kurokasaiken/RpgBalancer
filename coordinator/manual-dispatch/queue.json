@@ -42,7 +42,25 @@
       "timestamp": "2026-07-19T11:28:02.670707+00:00",
       "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/completed/IV-WORLD-SURFACE-003.md",
       "completed_at": "2026-07-19T11:48:19.900824+00:00"
+    },
+    {
+      "task_id": "POI-MEDALLION-MATERIAL-PREVIEW-00E669",
+      "status": "pending",
+      "timestamp": "2026-07-22T09:56:18.294751+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/POI-MEDALLION-MATERIAL-PREVIEW-00E669.md"
+    },
+    {
+      "task_id": "WORLD-PRESENTATION-RUNTIME-DEMO",
+      "status": "in_progress",
+      "timestamp": "2026-07-22T12:30:00.000000+00:00",
+      "file_path": "coordinator/manual-dispatch/pending/WORLD-PRESENTATION-RUNTIME-DEMO.md"
+    },
+    {
+      "task_id": "WORLD-PRESENTATION-RUNTIME-FOUNDATION",
+      "status": "pending",
+      "timestamp": "2026-07-22T09:58:02.271504+00:00",
+      "file_path": "coordinator/manual-dispatch/pending/WORLD-PRESENTATION-RUNTIME-FOUNDATION.md"
     }
   ],
-  "last_updated": "2026-07-19T11:48:19.901080+00:00"
+  "last_updated": "2026-07-22T12:30:00.000000+00:00"
 }

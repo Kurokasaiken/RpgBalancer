@@ -68,6 +68,7 @@ export function buildWorldPresentationModel(
   const objects = (input.objects as RuntimeObject[] | undefined) ?? [];
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   const events = (input.events as WorldEvent[] | undefined) ?? [];
+  const activeEvents = events.filter((event) => event.lifecycle?.state === 'active');
 
   for (const [key, value] of Object.entries(input)) {
     if (key === 'objects' || key === 'events') continue;
@@ -79,7 +80,7 @@ export function buildWorldPresentationModel(
   const model: WorldPresentationModel = {
     stateSnapshot: snapshot,
     activeStateIds,
-    activeEvents: events,
+    activeEvents,
     runtimeObjects: objects,
   };
 

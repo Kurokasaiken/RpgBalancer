@@ -1007,6 +1007,61 @@ export const SLOT_RACK_BASE_CONFIG: SlotRackSkinConfig = {
 };
 
 /**
+ * Materic slot rack skin configuration
+ * Matches the MatericRosterComponent / DragTestContainer shell: teal
+ * (#060f16) surface with a subtle cyan top-left glow, a solid gold border,
+ * and a soft outer shadow.
+ */
+export const SLOT_RACK_MATERIC_CONFIG: SlotRackSkinConfig = {
+  ...SLOT_RACK_BASE_CONFIG,
+  id: 'slot_rack_materic',
+  label: 'Slot Rack · Materic',
+  description: 'Materic/Wanderlust roster-style shell with teal surface, cyan top-left glow, and gold border.',
+  version: 1,
+  supportedPresets: ['slot_rack_materic', 'materic'],
+
+  grid: {
+    ...SLOT_RACK_BASE_CONFIG.grid,
+    padding: '20px',
+    borderRadius: '26px',
+    background: 'radial-gradient(circle at 0% 0%, rgba(0,229,255,0.15) 0%, transparent 50%), #060f16',
+    border: '2px solid #f0cf6a',
+  },
+
+  interactionPhysics: {
+    ...SLOT_RACK_BASE_CONFIG.interactionPhysics,
+    mass: 1.0,
+    damping: 0.28,
+    stiffness: 220,
+  },
+
+  rackMotion: {
+    type: 'none',
+  },
+
+  audioProfile: 'slotrack.materic.roster',
+
+  cssVars: {
+    ...SLOT_RACK_BASE_CONFIG.cssVars,
+    '--slot-rack-bg': 'radial-gradient(circle at 0% 0%, rgba(0,229,255,0.15) 0%, transparent 50%), #060f16',
+    '--slot-rack-bg-gradient': 'radial-gradient(circle at 0% 0%, rgba(0,229,255,0.15) 0%, transparent 50%), #060f16',
+    '--slot-rack-bg-blend': 'normal',
+    '--slot-rack-bg-size': 'auto',
+    '--slot-rack-bg-repeat': 'no-repeat',
+    '--slot-rack-bg-position': '0% 0%',
+    '--slot-rack-border-radius': '26px',
+    '--slot-rack-border': '2px solid #f0cf6a',
+    '--slot-rack-shadow': '0 25px 45px rgba(0,0,0,0.55), inset 0 1px 0 rgba(216,177,62,0.08)',
+    '--slot-rack-padding': '20px',
+  },
+
+  documentation: [
+    ...SLOT_RACK_BASE_CONFIG.documentation,
+    'src/docs/docs/minimal_slice/03_slotRack.md',
+  ],
+};
+
+/**
  * Registry of all slot rack skin configurations
  */
 export const SLOT_RACK_SKIN_REGISTRY: Record<string, SlotRackSkinConfig> = {
@@ -1017,6 +1072,7 @@ export const SLOT_RACK_SKIN_REGISTRY: Record<string, SlotRackSkinConfig> = {
   [RESIDENT_SLOT_RACK_SIGNATURE_CONFIG.id]: RESIDENT_SLOT_RACK_SIGNATURE_CONFIG,
   [WILDERNESS_BRONZE_SLOT_RACK_CONFIG.id]: WILDERNESS_BRONZE_SLOT_RACK_CONFIG,
   [WANDERLUST_V8_SLOT_RACK_CONFIG.id]: WANDERLUST_V8_SLOT_RACK_CONFIG,
+  [SLOT_RACK_MATERIC_CONFIG.id]: SLOT_RACK_MATERIC_CONFIG,
 };
 
 export const DEFAULT_SLOT_RACK_PRESET_ID = SLOT_RACK_BASE_CONFIG.id;
@@ -1057,6 +1113,9 @@ export function getSlotRackSkinForPreset(presetId: string): SlotRackSkinConfig |
       return RESIDENT_SLOT_RACK_SIGNATURE_CONFIG;
     case 'wilderness_bronze':
       return WILDERNESS_BRONZE_SLOT_RACK_CONFIG;
+    case 'slot_rack_materic':
+    case 'materic':
+      return SLOT_RACK_MATERIC_CONFIG;
     default:
       return SLOT_RACK_BASE_CONFIG;
   }
@@ -1069,6 +1128,7 @@ const SLOT_RACK_PRESET_OVERRIDES: Record<string, string> = {
   wanderlust: WILDERNESS_BRONZE_SLOT_RACK_CONFIG.id,
   wanderlust_dual_pillar: WILDERNESS_BRONZE_SLOT_RACK_CONFIG.id,
   wanderlust_v8: WANDERLUST_V8_SLOT_RACK_CONFIG.id,
+  materic: SLOT_RACK_MATERIC_CONFIG.id,
 };
 
 // Re-export the type for convenience

@@ -11,6 +11,8 @@ import {
 } from '@/ui/wanderlust-surface/layout';
 import { SURFACE_MATERIAL, SURFACE_MATERIAL_LAYER } from './foundationRecipe';
 import { WellBronzeBezel } from './plateVariants';
+import { FieldGrain } from './FieldGrain';
+import { CarvedBar } from './CarvedBar';
 
 // Field for the New Observatory prototype — CANDIDATE A (chosen 2026-07-18): a
 // MINIMAL step from the Forgotten Observatory. Same azure leak (barely touched),
@@ -44,8 +46,12 @@ export const NewObservatory: React.FC = () => (
         background: NEW_FIELD_BACKGROUND,
         boxShadow: NEW_FIELD_VIGNETTE,
         borderRadius: 'inherit',
+        position: 'relative' as const,
       }}
     >
+      {/* GRAINED version (see FieldGrain) — the PNG-texture field. The plain
+          version lives on the Forgotten Observatory; both coexist by design. */}
+      <FieldGrain />
       <div style={{ padding: 26 }}>
         {/* ── Header (plaque + incised title + subtitle + close coin) ── */}
         <div className="skin-title-row">
@@ -109,48 +115,8 @@ export const NewObservatory: React.FC = () => (
           <WanderlustSectionHeader tier="tertiary" hint="charting the dome" marginBottom="sm">
             Observatory Progress
           </WanderlustSectionHeader>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontFamily: 'var(--skin-font-display)', fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--skin-label-primary, #c9a84e)', whiteSpace: 'nowrap' }}>
-              Survey Completion
-            </span>
-            <div
-              style={{
-                flex: 1,
-                height: 13,
-                position: 'relative',
-                borderRadius: 2,
-                background: 'linear-gradient(180deg, #11191e, #08121a)',
-                border: '1px solid rgba(216,177,62,0.24)',
-                boxShadow: 'inset 0 2px 6px rgba(7,16,26,0.65), inset 0 1px 0 rgba(9,18,28,0.55), 0 1px 0 rgba(255,255,255,0.03)',
-                overflow: 'hidden',
-              }}
-            >
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  height: '100%',
-                  width: '63%',
-                  borderRadius: 1,
-                  background: 'linear-gradient(180deg, #95e6b0 0%, #59c889 40%, #379d70 70%, #2b7d73 90%, #205f73 100%)',
-                  boxShadow: 'inset 0 1px 0 rgba(225,255,240,0.65), inset 0 -2px 3px rgba(12,24,36,0.35), 0 0 4px rgba(143,255,211,0.08), 0 0 16px rgba(143,255,211,0.15), 0 0 30px rgba(143,255,211,0.25)',
-                }}
-              />
-              {/* Bounce light - WoW-style bottom reflection */}
-              <div
-                style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: '1px',
-                  background: 'rgba(120,255,210,0.08)',
-                }}
-              />
-            </div>
-            <span style={{ fontFamily: 'var(--skin-font-sans, system-ui)', fontSize: 11, color: 'var(--skin-body-color)', whiteSpace: 'nowrap' }}>63/100</span>
-          </div>
+          {/* Proof #2 now CONSUMES the extracted CarvedBar primitive (energy=xp). */}
+          <CarvedBar energy="xp" value={63} max={100} label="Survey Completion" />
         </div>
 
         {/* ── Well 2: reward reveal ── */}

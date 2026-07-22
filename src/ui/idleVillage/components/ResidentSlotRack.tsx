@@ -611,6 +611,10 @@ export const ResidentSlotRack: React.FC<ResidentSlotRackProps> = ({
 
   const rackShellStyle: CSSProperties = {
     background: 'var(--slot-rack-bg, transparent)',
+    backgroundBlendMode: 'var(--slot-rack-bg-blend, normal)',
+    backgroundSize: 'var(--slot-rack-bg-size, auto)',
+    backgroundRepeat: 'var(--slot-rack-bg-repeat, no-repeat)',
+    backgroundPosition: 'var(--slot-rack-bg-position, center)',
     border: 'var(--slot-rack-border, none)',
     borderRadius: 'var(--slot-rack-border-radius, 0px)',
     padding: 'var(--slot-rack-padding, 0px)',

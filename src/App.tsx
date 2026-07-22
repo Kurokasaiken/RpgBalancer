@@ -23,12 +23,14 @@ const GameplayTestSimple = lazy(() => import('./ui/idleVillage/components/Gamepl
 const GameplayTestMinimal = lazy(() => import('./ui/idleVillage/components/GameplayTestMinimal'));
 const TestRosterPage = lazy(() => import('./ui/idleVillage/TestRosterPage'));
 const TestHub = lazy(() => import('./ui/idleVillage/TestHub').then(m => ({ default: m.TestHub })));
+const SteamTrailerHub = lazy(() => import('./ui/idleVillage/SteamTrailerHub').then(m => ({ default: m.SteamTrailerHub })));
 const IdleVillageConfigRoute = lazy(() => import('./pages/idle-village-config'));
 const StyleLabDemoPage = lazy(() => import('./pages/style-lab-demo'));
 const DesignSystemPage = lazy(() => import('./pages/design-system'));
 const V9SkinSandbox = lazy(() => import('./pages/v9-skin-sandbox').then(m => ({ default: m.V9SkinSandbox })));
 const VisualGrammarValidationPage = lazy(() => import('./ui/visualGrammarValidation/VisualGrammarValidationPage').then(m => ({ default: m.VisualGrammarValidationPage })));
 const VisualFidelityLabPage = lazy(() => import('./ui/visualFidelityLab/VisualFidelityLabPage').then(m => ({ default: m.VisualFidelityLabPage })));
+const HarmonizationGalleryPage = lazy(() => import('./ui/visualFidelityLab/HarmonizationGallery').then(m => ({ default: m.HarmonizationGallery })));
 const PoiDetailVerificationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailVerificationPage').then(m => ({ default: m.PoiDetailVerificationPage })));
 const PoiDetailQuestRosterIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailQuestRosterIntegrationPage').then(m => ({ default: m.default })));
 const PoiDetailJobRosterIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailJobRosterIntegrationPage').then(m => ({ default: m.default })));
@@ -156,6 +158,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/test';
   const isTestHubPath =
     typeof window !== 'undefined' && window.location.pathname === '/test-hub';
+  const isSteamTrailerHubPath =
+    typeof window !== 'undefined' && window.location.pathname === '/test-hub/steam-trailer-hub';
   const isV9SkinSandboxPath =
     typeof window !== 'undefined' &&
     ['/v9-skin-sandbox', '/skin-lab', '/skin-sandbox'].includes(window.location.pathname);
@@ -165,6 +169,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/visual-grammar-validation';
   const isVisualFidelityLabPath =
     typeof window !== 'undefined' && window.location.pathname === '/visual-fidelity-lab';
+  const isHarmonizationGalleryPath =
+    typeof window !== 'undefined' && window.location.pathname === '/harmonization-gallery';
   const isPoiDetailVerificationPath =
     typeof window !== 'undefined' && window.location.pathname === '/poi-detail-verification';
   const isPoiQuestDetailRosterIntegrationPath =
@@ -394,6 +400,16 @@ function App() {
       <ErrorBoundary componentName="Test Roster Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Test Harness…</div>}>
           <TestRosterPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isSteamTrailerHubPath) {
+    return (
+      <ErrorBoundary componentName="Steam Trailer Hub">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Steam Trailer Hub…</div>}>
+          <SteamTrailerHub />
         </Suspense>
       </ErrorBoundary>
     );
@@ -735,6 +751,16 @@ function App() {
       <ErrorBoundary componentName="Visual Fidelity Lab">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Visual Fidelity Lab...</div>}>
           <VisualFidelityLabPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isHarmonizationGalleryPath) {
+    return (
+      <ErrorBoundary componentName="Harmonization Gallery">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Harmonization Gallery...</div>}>
+          <HarmonizationGalleryPage />
         </Suspense>
       </ErrorBoundary>
     );

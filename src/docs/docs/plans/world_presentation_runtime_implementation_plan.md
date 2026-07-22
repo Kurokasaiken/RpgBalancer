@@ -1,8 +1,8 @@
 <!-- markdownlint-disable MD013 -->
 # World Presentation Runtime — Implementation Plan
 
-> Stato: **approved plan v1.1**, close-out in progress for `WORLD-PRESENTATION-RUNTIME-FOUNDATION`.  
-> Include il nuovo micro-task `WORLD-PRESENTATION-RUNTIME-DEMO` (primo "hello world" di Sequence + Effect).  
+> Stato: **approved plan v1.4**, close-out in progress for `WORLD-PRESENTATION-RUNTIME-FOUNDATION`.  
+> Include `WORLD-PRESENTATION-RUNTIME-DEMO` come Milestone A: visual verb `show_threat_presence` + presentazione ambientale parallela.  
 > RFC di riferimento: `world_presentation_runtime_rfc.md` (v1.4).  
 > Owner: Strategia / Coordinator.
 
@@ -10,28 +10,42 @@
 
 ## 0. Obiettivo
 
-Costruire il primo loop end-to-end che traduce lo stato del mondo di Wanderlust in una rappresentazione visiva leggibile e deterministica:
+Costruire il primo loop end-to-end che traduce lo stato del mondo di Wanderlust in una rappresentazione visiva leggibile e deterministica. Il focus di questa evoluzione è il **visual verb**: una funzione semantica pura che mappa `WorldPresentationModel` → percezione visiva.
 
 ```text
-Scenario / WorldState
-        |
-        v
+GAMEPLAY TRUTH
+WorldState
+    │
+    ▼
+SEMANTIC TRANSLATION
 WorldPresentationModel
-        |
-        v
-WorldPresentationRuntime
-        |
-        v
+    │
+    ▼
+VISUAL LANGUAGE
+show_threat_presence
+show_threat_arrival
+show_threat_communication
+show_weather_storm
+show_region_corruption
+...
+    │
+    ▼
+COMPOSITION
+OutputComposer
+    │
+    ▼
+PRESENTATION CONTRACT
 PresentationOutput
-        |
-        v
+    │
+    ▼
+RENDERING
 WorldSurfaceRenderer
-        |
-        v
-Sandbox Director
+    │
+    ▼
+Player perceives world
 ```
 
-Il primo task (`WORLD-PRESENTATION-RUNTIME-FOUNDATION`) produce il **primo organo sensoriale del runtime**: `WorldState → PresentationOutput`. Non include Goblin Arrival né Director tooling completo.
+Il primo task (`WORLD-PRESENTATION-RUNTIME-FOUNDATION`) produce il **primo organo sensoriale del runtime**: `WorldState → PresentationOutput`. `WORLD-PRESENTATION-RUNTIME-DEMO` (Milestone A) dimostra il primo visual verb `show_threat_presence`. Non include Goblin Arrival, cinematiche né Director tooling completo.
 
 ---
 
@@ -75,10 +89,10 @@ Il primo task (`WORLD-PRESENTATION-RUNTIME-FOUNDATION`) produce il **primo organ
 9. **Error/empty states**:
    - manifest missing
    - scenario missing o non valido
-10. **`WORLD-PRESENTATION-RUNTIME-DEMO` — primo effetto concreto**:
-    - `ThreatPresenceEffect` registrato nel runtime
-    - `PresentationSequence` che ne orchestra il mount/update/dispose
-    - output deterministico: `visualStateOverrides` con tint che evolve per 3 secondi
+10. **`WORLD-PRESENTATION-RUNTIME-DEMO` — primo visual verb concreto**:
+    - `ThreatPresenceEffect` come visual verb `show_threat_presence`
+    - nessun `SequenceScheduler` in Milestone A; la transizione è calcolata da `update` in base al tick
+    - output deterministico: `visualStateOverrides` con tint, aura e marker statico
 11. **Renderer integration test**:
     - `visualStateOverrides` prodotte dal runtime arrivano al `WorldSurfaceRenderer` e modificano il layer
     - focus/camera state in `PresentationOutput`
@@ -97,6 +111,42 @@ Il primo task (`WORLD-PRESENTATION-RUNTIME-FOUNDATION`) produce il **primo organ
 - `@dnd-kit` clip drag
 - Preset management completo (dirty state / beforeunload / import / export / undo)
 - Nuovi effetti complessi oltre a `ThreatPresenceEffect` (differiti a `WORLD-PRESENTATION-GOBLIN-ARRIVAL`)
+- Sequence orchestration completa (differita a `WORLD-PRESENTATION-SEQUENCE-ORCHESTRATION`)
+- Movimento/path interpolation del marker e HUD countdown (differiti a `WORLD-PRESENTATION-GOBLIN-ARRIVAL` e `WORLD-PRESENTATION-THREAT-UX`)
+- Ambient Presentation (nuvole, mare, vento, sole, nebbia, vegetazione) come asse parallelo; placeholder/layer possono essere preparati ora, ma non devono essere confusi con `show_threat_arrival`.
+
+## 1.1 Visual Verb & Ambient Presentation Architecture
+
+```text
+GAMEPLAY TRUTH
+WorldState
+    │
+    ▼
+SEMANTIC TRANSLATION
+WorldPresentationModel
+    │
+    ├───────────────────┬───────────────────┐
+    ▼                   ▼                   ▼
+Semantic Verbs      Ambient Life       OutputComposer
+show_threat_...     animate_clouds          │
+                    animate_ocean           │
+                    animate_wind            │
+                    animate_fog             │
+                    animate_vegetation      ▼
+                    animate_sun       PresentationOutput
+    │                                       │
+    └───────────────────┬───────────────────┘
+                        ▼
+                WorldSurfaceRenderer
+                        │
+                        ▼
+              Player perceives world
+```
+
+- `show_threat_presence` è il primo **Semantic Verb**.
+- **Ambient Life** (`animate_clouds`, `animate_ocean`, `animate_wind`, `animate_fog`, `animate_vegetation`, `animate_sun`) è un asse parallelo: dà vita al mondo ma non racconta eventi.
+- `OutputComposer` compone semplicemente gli override provenienti da entrambi gli assi.
+- `PresentationOutput` è l'unico contratto con il renderer.
 
 ---
 
@@ -126,24 +176,27 @@ Il primo task (`WORLD-PRESENTATION-RUNTIME-FOUNDATION`) produce il **primo organ
 
 ```text
 WorldState
-    |
-    v
+    │
+    ▼
 buildWorldPresentationModel(worldState, rules)
-    |
-    v
+    │
+    ▼
+WorldPresentationModel
+    │
+    ▼
 WorldPresentationRuntime
-    |---- PresentationEffects
-    |---- PresentationSequence  // show_threat_presence
-    |       |
-    |       v
-    |---- ThreatPresenceEffect  // mount/update/dispose, emette overrides
-    |---- OutputComposer        // compose(baseOutput, overrides[]): PresentationOutput
-    |
-    v
+    │---- Semantic Verbs  (show_threat_presence, show_threat_arrival, ...)
+    │---- Ambient Life    (animate_clouds, animate_ocean, animate_wind, ...)
+    │---- OutputComposer  // compose(baseOutput, overrides[]): PresentationOutput
+    │
+    ▼
 PresentationOutput
-    |
-    v
+    │
+    ▼
 WorldSurfaceRenderer
+    │
+    ▼
+Player perceives world
 ```
 
 ### 3.3 Determinismo
@@ -253,18 +306,25 @@ src/
   - `PlaybackControls`
 - Capture frame (priorità: renderer native snapshot → Canvas API → DOM fallback), timeline editing, dnd-kit, preset management completo, undo: rimandati a `WORLD-PRESENTATION-DIRECTOR-TOOLING`.
 
-### Step 6 — Runtime Demo (`WORLD-PRESENTATION-RUNTIME-DEMO`)
+### Step 6 — Runtime Demo (`WORLD-PRESENTATION-RUNTIME-DEMO`) — Milestone A: `show_threat_presence` (Semantic Verb)
 
+- Inquadramento: `ThreatPresenceEffect` implementa il primo **visual verb** `show_threat_presence`. Traduce un `WorldEvent` threat attivo in uno stato visivo persistente, config-driven, deterministico. Non è un'animazione e non usa `SequenceScheduler`.
 - Implementare `ThreatPresenceEffect` in `src/engine/world/presentation/effects/ThreatPresenceEffect.ts`:
-  - `mount(ctx)`: legge `ctx.model.worldState.threat.active` e `ctx.model.worldState.threat.level`.
-  - `update(ctx, tick, deltaTick, interpolation)`: emette `visualStateOverrides` di tipo `tint_layer` e `set_opacity` per il layer `vignette`, con tint che tende a `#4a0a0a` e opacity che sale da `0.6` a `0.85` in 3 secondi (180 tick a 60 Hz).
-  - `dispose(ctx)`: rimuove gli override e lascia lo stato pulito.
-- Tutti i valori numerici (durata, tint target, opacity range, layer id) vengono letti da un config Zod (`threatPresenceEffectConfig.ts`), mai hardcoded.
-- Creare `PresentationSequence` di esempio `show_threat_presence` che mappa su `ThreatPresenceEffect`.
-- Il runtime carica la sequence iniziale dallo scenario `threat` di `presentationConfig.ts`.
-- Verificare replay: stesso scenario/seed/tick → stesso colore e opacity.
+  - `enabled(ctx)`: true se `ctx.model.activeEvents` contiene almeno un `WorldEvent` con `category === 'threat'` e `lifecycle.state === 'active'`.
+  - `update(ctx)`: calcola la fase da `ctx.tick` e restituisce `Partial<PresentationOutput>` con `activeVisualStateId`, `visualStateOverrides` (`tint_layer`, `set_opacity`, `set_animation`) e `runtimeObjects` (marker statico).
+- Progressione temporale deterministica:
+  - tick 0..4: `activeVisualStateId` `default` (SAFE), nessun override, nessun marker.
+  - tick 5..14: fase `manifesting`, tint/opacity parziali, marker statico a nord visibile.
+  - tick 15+: `activeVisualStateId` `threatened`, tint/opacity persistenti, marker persistente.
+  - tick 30: conferma persistenza; stesso output di tick 15.
+- Tutti i valori (tick di fase, colori, opacity, posizione/appearance marker) vivono in `threatPresenceEffectConfig.ts` validato con Zod, mai hardcoded nell'effetto.
+- Creare `presentationEffectRegistry.ts` con factory `createThreatPresenceEffect(config)` e id `threat_presence`; lo scenario `threat` dichiara `sequenceId: 'show_threat_presence'`, `effectIds: ['threat_presence']` e `useWorldPresentationRuntime` registra gli effetti dal registry. Non introdurre SequenceScheduler in Milestone A.
+- La fixture dello scenario `threat` è un `WorldEvent` reale di categoria `threat` (es. `id: 'goblin-threat-north'`, `lifecycle.state: 'active'`, `data: { origin: 'north', regionId: 'enchanted_forest' }`).
+- Aggiungere un mini Output Debug Inspector in `PresentationDirectorShell` che mostri `activeVisualStateId`, numero di `runtimeObjects`, numero di `visualStateOverrides` e tick corrente, usando i18n e SkinBadge/SkinScope.
+- **Validazione visiva**: la domanda fondamentale è "Guardando la mappa per 3 secondi, senza testo, capisco che qualcosa di pericoloso sta succedendo?". Se sì → A è riuscita; se no → migliorare tint/aura/marker/intensità. Non aggiungere movimento, HUD, countdown o cinematiche.
+- Verificare replay e World Translation: stesso scenario/seed/tick → stesso output; screenshot senza testo, ≥ 4/5 osservatori identificano "zona in pericolo".
 
-### Step 7 — Determinism test
+### Step 7 — Determinism & Perception test
 
 - `WorldPresentationRuntime.replay.test.ts`:
   - stesso scenario, seed, tick
@@ -272,7 +332,13 @@ src/
 - `WorldPresentationRuntime.translation.test.ts`:
   - `WorldState` con `threat.active = true`
   - `expect(output.activeVisualStateId).toBe('threatened')`
-  - acceptance umana: screenshot senza testo, domanda "questa zona è in pericolo?", ≥ 4/5 risposte corrette
+- `WorldPresentationRuntime.demo.test.ts`:
+  - tick 0/5/15/30 progression
+  - deterministic output
+- `WorldPresentationRuntime.perception.test.ts` (manuale / Playwright):
+  - screenshot senza testo, esposizione 3 secondi
+  - domanda: "Guardando questa mappa, qualcosa di pericoloso sta succedendo?"
+  - ≥ 4/5 risposte corrette → `show_threat_presence` validato
 - `OutputComposer.test.ts`:
   - `compose(baseOutput, overrides[])`
   - override precedence
@@ -303,8 +369,9 @@ src/
 - Play produce output deterministico: stesso scenario + seed + tick → stesso `PresentationOutput`.
 - `PresentationOutput` viene passato a `WorldSurfaceRenderer` e renderizza la mappa.
 - `WorldPresentationRuntime.translation.test.ts` passa (es. `threat.active = true` → `activeVisualStateId === 'threatened'`).
-- `WORLD-PRESENTATION-RUNTIME-DEMO` / `WorldPresentationRuntime.demo.test.ts` passa: scenario `threat` play per 180 tick produce `visualStateOverrides` con `tint_layer`/`set_opacity` su `vignette` e replay identico.
+- `WORLD-PRESENTATION-RUNTIME-DEMO` / `WorldPresentationRuntime.demo.test.ts` passa: progressione tick 0/5/15/30, `activeVisualStateId` corretto, `visualStateOverrides` con `tint_layer`/`set_opacity` su `vignette`, replay identico.
 - `visualStateOverrides` del runtime arrivano al `WorldSurfaceRenderer` e modificano il layer (`WorldSurfaceRenderer` integration test).
+- **Perception test**: screenshot senza testo, 3 secondi di esposizione, ≥ 4/5 osservatori percepiscono la minaccia prima di passare a `show_threat_arrival`.
 
 ### Non-functional
 
@@ -340,9 +407,12 @@ Dopo implementazione:
 
 | Task ID | Descrizione | Dipende da |
 | --- | --- | --- |
-| `WORLD-PRESENTATION-RUNTIME-DEMO` | Primo effetto concreto: `ThreatPresenceEffect` + `PresentationSequence` orchestrata, determinismo dimostrato | `WORLD-PRESENTATION-RUNTIME-FOUNDATION` |
+| `WORLD-PRESENTATION-RUNTIME-DEMO` | Primo visual verb: `show_threat_presence` con progressione 0/5/15/30, percezione visiva validata | `WORLD-PRESENTATION-RUNTIME-FOUNDATION` |
 | `WORLD-PRESENTATION-DIRECTOR-TOOLING` | Director tooling completo: timeline editing, capture workflow, preset management (dirty state, undo, import/export), `@dnd-kit` clip drag | `WORLD-PRESENTATION-RUNTIME-FOUNDATION` |
-| `WORLD-PRESENTATION-GOBLIN-ARRIVAL` | Primo contenuto reale: goblin origin, march, threat transition, `ThreatPresence` lifecycle, trailer capture preset | `WORLD-PRESENTATION-DIRECTOR-TOOLING` |
+| `WORLD-PRESENTATION-GOBLIN-ARRIVAL` | `show_threat_arrival`: goblin origin, march, threat transition, `ThreatPresence` lifecycle, trailer capture preset | `WORLD-PRESENTATION-DIRECTOR-TOOLING` |
+| `WORLD-PRESENTATION-THREAT-UX` | `show_threat_communication`: countdown, `ThreatStatusIndicator`, urgenza | `WORLD-PRESENTATION-GOBLIN-ARRIVAL` |
+| `WORLD-PRESENTATION-SEQUENCE-ORCHESTRATION` | `show_threat_cinematic`: sequence orchestration, transizioni tra visual verb | `WORLD-PRESENTATION-THREAT-UX` |
+| `WORLD-PRESENTATION-AMBIENT-LIFE` | `animate_*` placeholders: nuvole, mare, vento, sole, nebbia, vegetazione; layer separati e vita alla mappa | `WORLD-PRESENTATION-RUNTIME-FOUNDATION` (parallel) |
 
 ---
 
@@ -360,3 +430,4 @@ Dopo implementazione:
 | --- | --- | --- |
 | 2026-07-20 | Strategia | Approved implementation plan v1.0 from RFC v1.3. |
 | 2026-07-20 | Strategia | v1.1 — aggiunto `WORLD-PRESENTATION-RUNTIME-DEMO`, criteri close-out Foundation, governance checklist estesa. |
+| 2026-07-22 | Strategia | v1.4 — visual verb architecture con `show_threat_presence`, A-E semantic verb roadmap, assi `Ambient Life` paralleli, validazione percezione 3-secondi, `sequenceId` sullo scenario, nessun SequenceScheduler in Milestone A. |

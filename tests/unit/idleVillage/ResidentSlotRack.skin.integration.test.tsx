@@ -480,4 +480,35 @@ describe('ResidentSlotRackSkin Integration', () => {
       expect(wrapper).toHaveAttribute('data-testid', 'resident-slot-rack-skin');
     });
   });
+
+  describe('Materic Preset Support', () => {
+    it('applies teal roster background with cyan top-left glow', () => {
+      render(<ResidentSlotRackSkin slots={mockSlots} skinPresetId="slot_rack_materic" />);
+
+      const wrapper = screen.getByTestId('resident-slot-rack-skin');
+
+      expect(wrapper).toHaveAttribute('data-slot-skin', 'slot_rack_materic');
+      expect(wrapper).toHaveAttribute('data-skin-preset', 'slot_rack_materic');
+
+      const background = wrapper.style.getPropertyValue('--slot-rack-bg');
+      expect(background).toContain('radial-gradient');
+      expect(background).toContain('rgba(0,229,255,0.15)');
+      expect(background).toContain('#060f16');
+
+      expect(wrapper.style.getPropertyValue('--slot-rack-bg-blend')).toBe('normal');
+      expect(wrapper.style.getPropertyValue('--slot-rack-bg-size')).toBe('auto');
+      expect(wrapper.style.getPropertyValue('--slot-rack-bg-repeat')).toBe('no-repeat');
+      expect(wrapper.style.getPropertyValue('--slot-rack-bg-position')).toBe('0% 0%');
+    });
+
+    it('applies golden border and 26px radius', () => {
+      render(<ResidentSlotRackSkin slots={mockSlots} skinPresetId="slot_rack_materic" />);
+
+      const wrapper = screen.getByTestId('resident-slot-rack-skin');
+
+      expect(wrapper.style.getPropertyValue('--slot-rack-border-radius')).toBe('26px');
+      expect(wrapper.style.getPropertyValue('--slot-rack-border')).toBe('2px solid #f0cf6a');
+      expect(wrapper.style.getPropertyValue('--slot-rack-shadow')).toContain('rgba(216,177,62');
+    });
+  });
 });

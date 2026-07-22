@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "world": "wanderlust",
   "variant": "base",
   "coordinateSystem": {
@@ -17,13 +17,13 @@
       "height": 832
     },
     "source": {
-      "width": 3744,
-      "height": 2496
+      "width": 4240,
+      "height": 2828
     },
-    "scaleTarget": 3
+    "scaleTarget": 3.397
   },
   "assetPolicy": {
-    "resolution": "runtime_only"
+    "resolution": "prefer_hd"
   },
   "camera": {
     "minZoom": 0.5,
@@ -38,104 +38,232 @@
       "maxY": 832
     }
   },
+  "renderer": {
+    "mode": "auto",
+    "domObjectThreshold": 50,
+    "enableForParticles": true,
+    "enableForShaders": true,
+    "fallbackToDom": true
+  },
   "surfaceLayers": [
     {
-      "id": "water",
-      "file": "05_water.png",
-      "type": "animated_texture",
+      "id": "background",
+      "file": "05_background.png",
+      "type": "texture",
       "zIndex": 5,
       "opacity": 1,
       "blendMode": "normal",
-      "parallax": { "x": 0.02, "y": 0 },
-      "animation": {
-        "mode": "wave",
-        "implementation": "shader",
-        "direction": "left",
-        "speed": 0.2,
-        "amplitude": 3
-      },
-      "tags": ["water"]
+      "parallax": { "x": 0, "y": 0 },
+      "tags": ["background"]
     },
     {
-      "id": "terrain",
-      "file": "10_terrain.png",
+      "id": "sea",
+      "file": "10_sea.png",
       "type": "texture",
       "zIndex": 10,
       "opacity": 1,
       "blendMode": "normal",
-      "parallax": { "x": 0.05, "y": 0 },
-      "conditions": {
-        "corrupted": {
-          "id": "corrupted",
-          "tint": "#5c1a1a",
-          "blendMode": "multiply",
-          "opacity": 0.85
-        }
-      },
-      "tags": ["terrain"]
+      "parallax": { "x": 0.02, "y": 0 },
+      "tags": ["water"]
     },
     {
-      "id": "mountains_back",
-      "file": "50_mountains_back.png",
+      "id": "island_bottom_left",
+      "file": "15_island_bottom_left.png",
+      "type": "texture",
+      "zIndex": 15,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.03, "y": 0 },
+      "tags": ["island"]
+    },
+    {
+      "id": "island_bottom_right",
+      "file": "20_island_bottom_right.png",
+      "type": "texture",
+      "zIndex": 20,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.03, "y": 0 },
+      "tags": ["island"]
+    },
+    {
+      "id": "mountain_island_bottom_left",
+      "file": "25_mountain_island_bottom_left.png",
+      "type": "texture",
+      "zIndex": 25,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.04, "y": 0 },
+      "tags": ["mountain", "island"]
+    },
+    {
+      "id": "mountains_dark_bottom",
+      "file": "30_mountains_dark_bottom.png",
+      "type": "texture",
+      "zIndex": 30,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.05, "y": 0 },
+      "tags": ["mountain"]
+    },
+    {
+      "id": "mountains_light_bottom_right",
+      "file": "35_mountains_light_bottom_right.png",
+      "type": "texture",
+      "zIndex": 35,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.06, "y": 0 },
+      "tags": ["mountain"]
+    },
+    {
+      "id": "mountains_dark_right",
+      "file": "40_mountains_dark_right.png",
+      "type": "texture",
+      "zIndex": 40,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.07, "y": 0 },
+      "tags": ["mountain"]
+    },
+    {
+      "id": "mountain_zone_north",
+      "file": "45_mountain_zone_north.png",
+      "type": "texture",
+      "zIndex": 45,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.08, "y": 0 },
+      "tags": ["mountain"]
+    },
+    {
+      "id": "trees_brown_hills_center",
+      "file": "50_trees_brown_hills_center.png",
       "type": "texture",
       "zIndex": 50,
       "opacity": 1,
       "blendMode": "normal",
-      "parallax": { "x": 0.08, "y": 0 },
-      "tags": ["mountains"]
+      "parallax": { "x": 0.09, "y": 0 },
+      "tags": ["trees", "hills"]
     },
     {
-      "id": "forest",
-      "file": "55_forest.png",
+      "id": "small_trees_center",
+      "file": "55_small_trees_center.png",
       "type": "texture",
       "zIndex": 55,
       "opacity": 1,
       "blendMode": "normal",
       "parallax": { "x": 0.1, "y": 0 },
+      "tags": ["trees"]
+    },
+    {
+      "id": "trees_center_right",
+      "file": "60_trees_center_right.png",
+      "type": "texture",
+      "zIndex": 60,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.11, "y": 0 },
+      "tags": ["trees"]
+    },
+    {
+      "id": "forest_1_top_left",
+      "file": "65_forest_1_top_left.png",
+      "type": "texture",
+      "zIndex": 65,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.12, "y": 0 },
       "tags": ["forest"]
     },
     {
-      "id": "settlements",
-      "file": "70_settlements.png",
+      "id": "forest_1_light_top_left",
+      "file": "70_forest_1_light_top_left.png",
       "type": "texture",
       "zIndex": 70,
       "opacity": 1,
       "blendMode": "normal",
-      "parallax": { "x": 0.12, "y": 0 },
-      "tags": ["settlements", "landmarks"]
-    }
-  ],
-  "atmosphereLayers": [
+      "parallax": { "x": 0.13, "y": 0 },
+      "tags": ["forest"]
+    },
     {
-      "id": "vignette",
-      "file": "90_vignette.png",
-      "type": "ui_overlay",
+      "id": "forest_2_dark_bottom_left",
+      "file": "75_forest_2_dark_bottom_left.png",
+      "type": "texture",
+      "zIndex": 75,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.14, "y": 0 },
+      "tags": ["forest"]
+    },
+    {
+      "id": "forest_3_dark_bottom",
+      "file": "80_forest_3_dark_bottom.png",
+      "type": "texture",
+      "zIndex": 80,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.15, "y": 0 },
+      "tags": ["forest"]
+    },
+    {
+      "id": "forest_light_right_center",
+      "file": "85_forest_light_right_center.png",
+      "type": "texture",
+      "zIndex": 85,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.16, "y": 0 },
+      "tags": ["forest"]
+    },
+    {
+      "id": "forest_dark_north",
+      "file": "90_forest_dark_north.png",
+      "type": "texture",
       "zIndex": 90,
-      "opacity": 0.6,
-      "blendMode": "multiply",
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.17, "y": 0 },
+      "tags": ["forest"]
+    },
+    {
+      "id": "village",
+      "file": "95_village.png",
+      "type": "texture",
+      "zIndex": 95,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.18, "y": 0 },
+      "tags": ["settlements", "landmarks"]
+    },
+    {
+      "id": "level_1",
+      "file": "98_level_1.png",
+      "type": "texture",
+      "zIndex": 98,
+      "opacity": 1,
+      "blendMode": "normal",
+      "parallax": { "x": 0.19, "y": 0 },
+      "tags": ["level"]
+    },
+    {
+      "id": "frame",
+      "file": "99_frame.png",
+      "type": "ui_overlay",
+      "zIndex": 99,
+      "opacity": 1,
+      "blendMode": "normal",
       "parallax": { "x": 0, "y": 0 },
-      "tags": ["vignette"]
+      "tags": ["frame", "ui"]
     }
   ],
+  "atmosphereLayers": [],
   "visualStates": [
     {
       "id": "default",
       "labelKey": "world.states.default",
       "base": true,
       "overrides": []
-    },
-    {
-      "id": "corrupted",
-      "labelKey": "world.states.corrupted",
-      "overrides": [
-        { "type": "apply_condition", "layerId": "terrain", "conditionId": "corrupted" },
-        { "type": "set_opacity", "layerId": "vignette", "opacity": 0.85 },
-        { "type": "tint_layer", "layerId": "vignette", "tint": "#2b0a0a" }
-      ],
-      "activation": {
-        "condition": "event",
-        "eventId": "corruption_spread"
-      }
     }
   ],
   "regions": [
