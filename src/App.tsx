@@ -72,7 +72,6 @@ const TrailerLegacyPage = lazy(() => import('./ui/idleVillage/trailer/TrailerLeg
 const TrailerOutroPage = lazy(() => import('./ui/idleVillage/trailer/TrailerOutroPage').then(m => ({ default: m.TrailerOutroPage })));
 const WorldSurfaceTestPage = lazy(() => import('./ui/idleVillage/pages/WorldSurfaceTestPage').then(m => ({ default: m.WorldSurfaceTestPage })));
 const WorldPresentationDirectorPage = lazy(() => import('./ui/idleVillage/pages/WorldPresentationDirectorPage').then(m => ({ default: m.default })));
-const PoiVisualPreviewPage = lazy(() => import('./ui/idleVillage/pages/PoiVisualPreviewPage').then(m => ({ default: m.default })));
 const UseClientPage = lazy(() => import('./ui/idleVillage/pages/UseClientPage').then(m => ({ default: m.default })));
 
 interface AppNavControls {
@@ -251,8 +250,6 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/world-surface';
   const isWorldPresentationDirectorPath =
     typeof window !== 'undefined' && window.location.pathname === '/world-presentation-director';
-  const isPoiVisualPreviewPath =
-    typeof window !== 'undefined' && window.location.pathname === '/poi-visual-preview';
   const isUseClientPath =
     typeof window !== 'undefined' && window.location.pathname === '/use-client';
   const isRootPath =
@@ -904,16 +901,6 @@ function App() {
       <ErrorBoundary componentName="World Presentation Director">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading World Presentation Director...</div>}>
           <WorldPresentationDirectorPage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
-
-  if (isPoiVisualPreviewPath) {
-    return (
-      <ErrorBoundary componentName="POI Visual Preview Page">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading POI Visual Preview...</div>}>
-          <PoiVisualPreviewPage />
         </Suspense>
       </ErrorBoundary>
     );

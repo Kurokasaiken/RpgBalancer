@@ -1,5 +1,3 @@
-<!-- markdownlint-disable MD022 MD032 MD060 MD024 -->
-
 # Idle Village Component Index
 
 ## Scopo
@@ -19,7 +17,6 @@ Indice unico dei componenti e integration contracts rilevanti per la vertical sl
 | POI Detail Contract | poi-detail | trusted | `src/docs/docs/idle_village/trusted/poi_detail_trusted.md` | dedicated page | 2026-04-25 | PoiDetailSkinWrapper - TEST-POI-D-ALIGN-001 completed, integration verified |
 | Day/Night Contract | day-night | trusted | `src/docs/docs/idle_village/trusted/daynight_trusted.md` | `/minimal-gameplay` | 2026-04-24 | RT-DAYN-001 audit completed - fully compliant |
 | Roster/Drag Contract | roster-drag | trusted | `src/docs/docs/idle_village/trusted/roster_drag_trusted.md` + `src/ui/idleVillage/roster/index.ts` | `/test`, `/minimal-gameplay` | 2026-07-15 | VillageRosterSection, DragContext, statMatching - INT-DRAG-POI-ASSIGNMENT-001 completed, assignment verified. Shared bundle adopted by MinimalGameplayPage (RT-MG-ROSTER-ADOPT-007). Single source of truth for roster UI across all pages. |
-| World Presentation Runtime Contract | world-presentation | candidate | `src/docs/docs/idle_village/trusted/world_presentation_runtime_trusted.md` | `/world-presentation-director` | 2026-07-22 | WorldState -> PresentationOutput loop; ThreatPresenceEffect visual verb verified. |
 | WorldSurface Component Contract | world-surface-component | candidate | `src/docs/docs/plans/component_based_world_surface_plan.md` | `/world-surface-components` | 2026-07-21 | Component-based map with semantic grouping; candidate contract supersedes layer-centric manifest v1. Trusted doc TBD after Phase 6 close-out. |
 | Interaction Core (drag outcome, flight, extraction, bloom) | interaction-core | trusted | `src/docs/docs/idle_village/interaction_core_spec.md` | `/slot`, `/minimal-roster-slot-integration`, `/minimal-job-poi-roster-integration` | 2026-07-12 | useDragOutcome, DragOutcomeFlight, useExtractionSequence, bloomEffect, RosterDropVerdict, lockedResidentIds; slot blueprints now support role/emptyPenalty/residentRiskModifiers |
 | Quest Assignment Rework | quest-assignment | candidate | `src/docs/docs/plans/quest_role_assignment_rework_strategy.md` | `/poi-quest-detail-roster-integration` | 2026-07-12 | QuestCard, useQuestAssignmentPreview, QuestAssignmentPreview, PoiDetailQuestRosterIntegrationPage, slotBlueprints role/emptyPenalty/residentRiskModifiers; build:check passed |
