@@ -28,7 +28,7 @@ interface WorldSurfaceRendererProps {
   showRegions?: boolean;
   runtimeObjects?: RuntimeObject[];
   renderObjects?: boolean;
-  imageFit?: 'fill' | 'cover' | 'contain';
+  imageFit?: 'fill' | 'cover' | 'contain' | 'none';
   autoFit?: boolean;
   autoFitTrigger?: number;
 }
@@ -499,7 +499,7 @@ interface LayerViewProps {
   layer: EffectiveLayer;
   worldPoint: { x: number; y: number };
   worldName: string;
-  imageFit: 'fill' | 'cover' | 'contain';
+  imageFit: 'fill' | 'cover' | 'contain' | 'none';
   scale?: number;
   offset?: { x: number; y: number };
 }
@@ -526,6 +526,7 @@ const LayerView: React.FC<LayerViewProps> = ({ layer, worldPoint, worldName, ima
     width: '100%',
     height: '100%',
     objectFit: imageFit,
+    objectPosition: imageFit === 'none' ? '0 0' : undefined,
     mixBlendMode: BLEND_MODE_CSS[layer.blendMode],
     filter: layer.grayscale ? 'grayscale(100%)' : undefined,
     ...animationStyle,

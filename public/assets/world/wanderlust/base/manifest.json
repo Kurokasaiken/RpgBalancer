@@ -44,7 +44,7 @@
     "enableForParticles": true,
     "enableForShaders": true,
     "fallbackToDom": true,
-    "imageFit": "contain",
+    "imageFit": "none",
     "autoFit": true
   },
   "surfaceLayers": [
