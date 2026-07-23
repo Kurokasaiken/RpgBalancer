@@ -3,7 +3,6 @@ import './fidelity-header.css';
 import ForgottenObservatory from './ForgottenObservatory';
 import NewObservatory from './NewObservatory';
 import PlateQuad from './PlateQuad';
-import { HaloCoronaLab } from './HaloCoronaLab';
 
 /**
  * Visual Fidelity Lab — /visual-fidelity-lab
@@ -56,11 +55,6 @@ export const VisualFidelityLabPage: React.FC = () => (
       </figcaption>
       <PlateQuad />
     </figure>
-
-    {/* ── Halo Corona prototype (countdown states) ── */}
-    <div style={{ maxWidth: 760, margin: '0 auto 56px' }}>
-      <HaloCoronaLab />
-    </div>
 
     {/* ── The rebuild, alone (blind step 1) ── */}
     <div style={{ display: 'flex', gap: '40px', justifyContent: 'center', flexWrap: 'wrap' }}>
