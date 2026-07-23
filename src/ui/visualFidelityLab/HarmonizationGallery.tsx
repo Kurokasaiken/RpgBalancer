@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import './matericSkin.css';
 import { ErrorBoundary } from '@/ui/organisms/ErrorBoundary';
@@ -13,8 +13,13 @@ import { FIELD_BACKGROUND, FIELD_VIGNETTE } from './foundationRecipe';
 // slot" banner are testing-only artifacts, so we mount the real roster surface
 // instead: `MatericRosterComponent` is exactly what `/minimal-roster` renders.
 import { MatericRosterComponent } from '@/ui/idleVillage/components/MatericRosterComponent';
-import { ClockWidgetStandalone } from '@/ui/idleVillage/frozen/kits/clockKit';
-import { QuestPOIStandalone } from '@/ui/idleVillage/frozen/kits/poiKit';
+// The REAL Clock strip is `TimeEngineStrip` + `DayNightPoiSkin` (same as
+// /minimal-clock) — NOT the bare `ClockWidgetStandalone` QA speed-control
+// panel, which never had the Day/Night medallion. Same mistake pattern as
+// PgCard-vs-Roster / ActivityCapsule-vs-Detail earlier: the bare kit widget
+// is a testing artifact, not the player-facing composite.
+import { TimeEngineStrip } from '@/ui/idleVillage/frozen/kits/clockKit';
+import { DayNightPoiSkin, QuestPOIStandalone } from '@/ui/idleVillage/frozen/kits/poiKit';
 // The REAL POI Detail (per user correction, reference = /poi-detail-verification)
 // is `ActivityCapsuleDetailSkinAware` + `POI_DETAIL_SKIN_CONFIG` ("Dark Luxury"),
 // NOT the bare `ActivityCapsule` — that earlier assumption was wrong. Reusing the
@@ -101,6 +106,67 @@ const POI_DETAIL_FIXTURE = {
   ariaLive: 'polite' as const,
 };
 
+// Same ticking logic as pages/minimal-clock.tsx (the reference page) — reused
+// here so the Gallery's Clock tab shows the REAL composite (dial + strip),
+// not the bare debug widget.
+const ClockGalleryDemo: React.FC = () => {
+  const [isPaused, setIsPaused] = useState(true);
+  const [speed, setSpeed] = useState(1);
+  const [currentDay, setCurrentDay] = useState(1);
+  const [hour, setHour] = useState(6);
+  const [progressFraction, setProgressFraction] = useState(0);
+
+  useEffect(() => {
+    if (isPaused) return;
+    const id = setInterval(() => {
+      setHour((h) => (h >= 23 ? 0 : h + 1));
+      setProgressFraction((p) => (p + 1 / 24 >= 1 ? 0 : p + 1 / 24));
+      if (hour >= 23) setCurrentDay((d) => d + 1);
+    }, 1000 / speed);
+    return () => clearInterval(id);
+  }, [isPaused, speed, hour]);
+
+  const isDayTime = hour >= 6 && hour < 20;
+
+  return (
+    <TimeEngineStrip
+      phaseIcon={<DayNightPoiSkin isDayPhase={isDayTime} cycleProgress={progressFraction} isPaused={isPaused} />}
+      isPlaying={!isPaused}
+      progressFraction={progressFraction}
+      totalSeconds={86400}
+      onToggle={() => setIsPaused(!isPaused)}
+      label="Day/Night Cycle"
+      clockProps={{
+        currentDay,
+        isPaused,
+        speedMultiplier: speed,
+        defaultSpeedMultiplier: 1,
+        maxSpeedMultiplier: 8,
+        tickIntervalMs: 1000,
+        warmupDelayMs: 0,
+        accentHex: '#f59e0b',
+        onSpeedChange: (s: number) => setSpeed(s),
+        availableSpeeds: [1, 2, 4, 8],
+      }}
+      hudState={{
+        activities: [], totalActive: 0, totalCompleted: 0,
+        counts: { jobs: 0, quests: 0, maintenance: 0, total: 0 },
+        hasActiveActivities: false,
+        persistence: {
+          lastSaveTime: null, isDirty: false,
+          preferences: { collapsed: false, maxVisible: 5, sortBy: 'remaining-time' as const, showTypeBadges: true, compactMode: false },
+          uiState: { selectedTypeFilter: 'all' as const, telemetryPanelOpen: false, position: 'top' as const },
+          metadata: { lastSaved: 0, version: '1.0.0' },
+        },
+      }}
+      villageState={{ resources: { gold: 0, wood: 0, stone: 0 } }}
+      secondsPerTimeUnit={1}
+      temporalDisplay={{ year: `ANNO ${currentDay}`, season: isDayTime ? 'GIORNO' : 'NOTTE', time: `ORA ${String(hour).padStart(2, '0')}:00` }}
+      compact
+    />
+  );
+};
+
 const TABS: GalleryTab[] = [
   {
     id: 'roster',
@@ -111,8 +177,8 @@ const TABS: GalleryTab[] = [
   {
     id: 'clock',
     label: 'Clock',
-    note: 'mapping materico da fare — per ora uguale nei due',
-    render: () => <ClockWidgetStandalone />,
+    note: 'FIX: mostrava ClockWidgetStandalone (pannello QA nudo, senza il dial giorno/notte) — corretto a TimeEngineStrip + DayNightPoiSkin, come /minimal-clock. Mapping materico del chrome ancora da fare.',
+    render: (k) => <ClockGalleryDemo key={k} />,
   },
   {
     id: 'poidetail',

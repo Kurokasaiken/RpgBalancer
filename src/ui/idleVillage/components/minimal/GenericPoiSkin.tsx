@@ -149,8 +149,19 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
   const { t } = useTranslation('idleVillage');
   const uniqueId = useId().replace(/:/g, '');
   const svgRef = useRef<SVGSVGElement>(null);
-  const animStateRef = useRef({ phase: 0, fillProgress: 0, rotationPhase: 0 });
+  const animStateRef = useRef({ phase: 0, fillProgress: 0, rotationPhase: 0, reflectPhase: 0 });
   const [isHovered, setIsHovered] = useState(false);
+
+  // Perf gate (AAA critique: N animated feTurbulence instances on a map is
+  // expensive). Read once; always allow full detail when actually hovered —
+  // context-aware detail, not a blanket cut.
+  const [allowFullDetail, setAllowFullDetail] = useState(true);
+  useEffect(() => {
+    const tier = document.documentElement.dataset.perfTier;
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    setAllowFullDetail(tier !== 'low' && !reducedMotion);
+  }, []);
+  const turbulenceActive = allowFullDetail || (isHovered && enableHover);
 
   const isStone = shape === 'stone';
   const completedPinColor = isCompleted ? 'rgba(128, 128, 128, 0.72)' : pinColor;
@@ -198,6 +209,11 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
   const stoneNoiseFilterId = `fn-${uniqueId}`;
   const stoneDispFilterId = `dp-${uniqueId}`;
   const clipId = `cp-${uniqueId}`;
+  // Corona turbulence (AAA critique: the halo must read as LIVE energy, not a
+  // blurred loading spinner) — two displacement filters, seeds animated only
+  // when perf allows. Fixed base seeds (Stable Procedural Identity).
+  const turbAFilterId = `tA-${uniqueId}`;
+  const turbBFilterId = `tB-${uniqueId}`;
 
   const stoneRx = isStone ? 14 : 13;
   const stoneRy = isStone ? 17 : 13;
@@ -208,10 +224,17 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
   const shadowCx = isStone ? 2 : 1.8;
   const shadowCy = isStone ? 21 : 16;
   const outerHaloRadius = isStone ? 23 : 22;
-  const innerHaloRadius = 18.5;
+
+  // Corona layer widths — MUCH thicker, matching the approved reference
+  // (poi-skin-preview.html: TRACK_SW=5 on TRACK_R=28 ⇒ ~18%/25%/9% of radius
+  // for main/glow/fine). All three layers share ONE radius (like the
+  // reference) instead of splitting across two — that stacking IS what reads
+  // as "thick and alive" rather than a thin ring.
+  const coronaGlowWidth = outerHaloRadius * 0.25;
+  const coronaMainWidth = outerHaloRadius * 0.18;
+  const coronaFineWidth = outerHaloRadius * 0.09;
 
   const outerCircumference = TAU * outerHaloRadius;
-  const innerCircumference = TAU * innerHaloRadius;
   const viewBox = isStone ? '-32 -34 64 70' : '-32 -32 64 64';
 
   const easeViscous = (t: number) => {
@@ -233,6 +256,7 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
       const fillProg = easeViscous(raw) * progress;
       state.fillProgress = fillProg;
       state.phase += 0.015;
+      state.reflectPhase += 0.0008;
 
       if (stageState.rotationActive) state.rotationPhase -= 0.02;
 
@@ -243,15 +267,13 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
 
       const outerDrawn = outerCircumference * Math.min(fillProg, 1);
       const outerGap = Math.max(0, outerCircumference - outerDrawn);
-      const innerDrawn = innerCircumference * Math.min(fillProg, 1);
-      const innerGap = Math.max(0, innerCircumference - innerDrawn);
 
       const baseRotation = -90;
       const rotation = stageState.rotationActive ? baseRotation + state.rotationPhase : baseRotation;
 
       const outerEl = svgRef.current.querySelector('[data-halo="outer"]') as SVGCircleElement | null;
       if (outerEl) {
-        const haloColor = `rgba(${expiredCoronaGlow.r},${expiredCoronaGlow.g},${expiredCoronaGlow.b},${(0.5 + 0.3 * fillProg) * pulse})`;
+        const haloColor = `rgba(${expiredCoronaGlow.r},${expiredCoronaGlow.g},${expiredCoronaGlow.b},${(0.5 + 0.3 * fillProg) * basePulse})`;
         outerEl.setAttribute('stroke', haloColor);
         outerEl.setAttribute('stroke-dasharray', `${outerDrawn.toFixed(2)} ${outerGap.toFixed(2)}`);
         outerEl.setAttribute('stroke-linecap', fillProg >= 0.999 ? 'butt' : 'round');
@@ -260,11 +282,54 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
 
       const innerEl = svgRef.current.querySelector('[data-halo="inner"]') as SVGCircleElement | null;
       if (innerEl) {
-        const innerColor = `rgba(${expiredCoronaCore.r},${expiredCoronaCore.g},${expiredCoronaCore.b},${(0.45 + 0.25 * fillProg) * pulse})`;
+        const innerColor = `rgba(${expiredCoronaCore.r},${expiredCoronaCore.g},${expiredCoronaCore.b},${(0.78 + 0.15 * fillProg) * basePulse})`;
         innerEl.setAttribute('stroke', innerColor);
-        innerEl.setAttribute('stroke-dasharray', `${innerDrawn.toFixed(2)} ${innerGap.toFixed(2)}`);
+        innerEl.setAttribute('stroke-dasharray', `${outerDrawn.toFixed(2)} ${outerGap.toFixed(2)}`);
         innerEl.setAttribute('stroke-linecap', fillProg >= 0.999 ? 'butt' : 'round');
         innerEl.setAttribute('transform', `rotate(${rotation})`);
+      }
+
+      const fineEl = svgRef.current.querySelector('[data-halo="fine"]') as SVGCircleElement | null;
+      if (fineEl) {
+        const fineColor = `rgba(${Math.min(255, expiredCoronaCore.r + 30)},${Math.min(255, expiredCoronaCore.g + 20)},${Math.min(255, expiredCoronaCore.b + 10)},${(0.45 * basePulse).toFixed(3)})`;
+        fineEl.setAttribute('stroke', fineColor);
+        fineEl.setAttribute('stroke-dasharray', `${outerDrawn.toFixed(2)} ${outerGap.toFixed(2)}`);
+        fineEl.setAttribute('stroke-linecap', fillProg >= 0.999 ? 'butt' : 'round');
+        fineEl.setAttribute('transform', `rotate(${rotation})`);
+      }
+
+      // REFLECT — a bright sliver drifting back and forth within the filled
+      // arc (reference: crownReflect). This is what makes the corona read as
+      // liquid/metallic and alive, distinct from the fixed meniscus cap.
+      const reflectEl = svgRef.current.querySelector('[data-halo="reflect"]') as SVGCircleElement | null;
+      if (reflectEl) {
+        if (fillProg > 0.12) {
+          const refLen = outerCircumference * 0.14;
+          const maxOffset = Math.max(0, outerDrawn - refLen - outerCircumference * 0.04);
+          const reflO = Math.sin(state.reflectPhase) * 0.5 + 0.5;
+          const refStart = maxOffset * reflO;
+          const refGap = outerCircumference - refLen;
+          reflectEl.setAttribute('stroke-dasharray', `${refLen.toFixed(2)} ${refGap.toFixed(2)}`);
+          reflectEl.setAttribute('stroke-dashoffset', `${(-refStart).toFixed(2)}`);
+          reflectEl.setAttribute('transform', `rotate(${rotation})`);
+          reflectEl.setAttribute('opacity', `${(0.6 * fillProg * basePulse).toFixed(3)}`);
+        } else {
+          reflectEl.setAttribute('opacity', '0');
+        }
+      }
+
+      const menEl = svgRef.current.querySelector('[data-halo="meniscus"]') as SVGCircleElement | null;
+      if (menEl) {
+        if (fillProg > 0.01 && fillProg < 0.999) {
+          const menLen = outerCircumference * 0.02;
+          const menOffset = -Math.max(0, outerDrawn - menLen);
+          menEl.setAttribute('stroke-dasharray', `${menLen.toFixed(2)} ${(outerCircumference - menLen).toFixed(2)}`);
+          menEl.setAttribute('stroke-dashoffset', `${menOffset.toFixed(2)}`);
+          menEl.setAttribute('transform', `rotate(${rotation})`);
+          menEl.setAttribute('opacity', `${0.85 * basePulse}`);
+        } else {
+          menEl.setAttribute('stroke-dasharray', '0 1000');
+        }
       }
 
       requestAnimationFrame(loop);
@@ -272,7 +337,7 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
 
     const frameId = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(frameId);
-  }, [progress, expiredCoronaCore, expiredCoronaGlow, stageState, outerCircumference, innerCircumference]);
+  }, [progress, expiredCoronaCore, expiredCoronaGlow, stageState, outerCircumference]);
 
   const haloColor = `rgba(${expiredCoronaGlow.r},${expiredCoronaGlow.g},${expiredCoronaGlow.b},0.5)`;
   const innerHaloColor = `rgba(${expiredCoronaCore.r},${expiredCoronaCore.g},${expiredCoronaCore.b},0.55)`;
@@ -354,6 +419,24 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
           <clipPath id={clipId}>
             {isStone ? <ellipse cx="0" cy="0" rx={stoneRx} ry={stoneRy} /> : <circle cx="0" cy="0" r={stoneRx} />}
           </clipPath>
+
+          {/* corona turbulence — animated seed ONLY when turbulenceActive (perf-gated) */}
+          <filter id={turbAFilterId} x="-15%" y="-15%" width="130%" height="130%">
+            <feTurbulence type="turbulence" baseFrequency=".008 .04" numOctaves="3" seed="9" result="t">
+              {turbulenceActive && (
+                <animate attributeName="seed" values="9;10;11;12;9" dur="7.3s" repeatCount="indefinite" />
+              )}
+            </feTurbulence>
+            <feDisplacementMap in="SourceGraphic" in2="t" scale="3.2" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+          <filter id={turbBFilterId} x="-8%" y="-8%" width="116%" height="116%">
+            <feTurbulence type="turbulence" baseFrequency=".025 .08" numOctaves="2" seed="33" result="t">
+              {turbulenceActive && (
+                <animate attributeName="seed" values="33;34;35;33" dur="3.1s" repeatCount="indefinite" />
+              )}
+            </feTurbulence>
+            <feDisplacementMap in="SourceGraphic" in2="t" scale="1.6" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
         </defs>
 
         <style>{`
@@ -379,13 +462,23 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
           <circle cx="0" cy="0" r="22" fill="none" stroke="rgba(192,160,60,.08)" strokeWidth="1.8" />
         )}
 
+        {/* Cold channel/reservoir REMOVED (2026-07-19, user feedback): on a
+            small circular medallion, a full-circle static ring under the
+            corona reads as a stray extra "line" competing with the bronze
+            rim — the legibility law that motivated it (roster bars) doesn't
+            transplant to this geometry. The dark stone body already reads as
+            the empty reservoir; no extra ring needed here. */}
+
+        {/* THICKER corona (per approved reference): glow/main/fine now share
+            ONE radius, stacked, matching poi-skin-preview.html's proportions
+            (TRACK_SW=5 / TRACK_R=28 ≈ 18% main, 25% glow, 9% fine). */}
         <circle
           cx="0"
           cy="0"
           r={outerHaloRadius}
           fill="none"
           stroke={haloColor}
-          strokeWidth="2"
+          strokeWidth={coronaGlowWidth}
           strokeLinecap="round"
           filter={`url(#${glowFilterId})`}
           opacity={0.68}
@@ -396,14 +489,60 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
         <circle
           cx="0"
           cy="0"
-          r={innerHaloRadius}
+          r={outerHaloRadius}
           fill="none"
           stroke={innerHaloColor}
-          strokeWidth="1.6"
+          strokeWidth={coronaMainWidth}
           strokeLinecap="round"
-          filter={`url(#${glowFilterId})`}
-          opacity={0.58}
+          filter={`url(#${turbAFilterId})`}
+          opacity={0.9}
           data-halo="inner"
+          transform="rotate(-90)"
+        />
+
+        {/* fine turbulent highlight — the "this is alive, not a spinner" layer */}
+        <circle
+          cx="0"
+          cy="0"
+          r={outerHaloRadius}
+          fill="none"
+          stroke={innerHaloColor}
+          strokeWidth={coronaFineWidth}
+          strokeLinecap="round"
+          filter={`url(#${turbBFilterId})`}
+          opacity={0.5}
+          data-halo="fine"
+          transform="rotate(-90)"
+        />
+
+        {/* REFLECT — bright sliver drifting within the filled arc (reference:
+            crownReflect). Liquid/metallic life, distinct from the fixed
+            meniscus cap below. */}
+        <circle
+          cx="0"
+          cy="0"
+          r={outerHaloRadius}
+          fill="none"
+          stroke={`rgba(${Math.min(255, expiredCoronaCore.r + 60)},${Math.min(255, expiredCoronaCore.g + 50)},${Math.min(255, expiredCoronaCore.b + 30)},0.9)`}
+          strokeWidth={coronaMainWidth * 0.6}
+          strokeLinecap="round"
+          opacity={0}
+          data-halo="reflect"
+          transform="rotate(-90)"
+        />
+
+        {/* MENISCUS — bright cap at the fill-front (glance-read cue, AAA
+            critique #1). Zero-length until the rAF loop below positions it. */}
+        <circle
+          cx="0"
+          cy="0"
+          r={outerHaloRadius}
+          fill="none"
+          stroke="rgba(255,246,220,0.85)"
+          strokeWidth={coronaMainWidth * 0.5}
+          strokeLinecap="round"
+          strokeDasharray="0 1000"
+          data-halo="meniscus"
           transform="rotate(-90)"
         />
 

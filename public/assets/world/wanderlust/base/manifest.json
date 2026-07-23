@@ -1,5 +1,5 @@
 {
-  "version": "1.1.1",
+  "version": "1.1.2",
   "world": "wanderlust",
   "variant": "base",
   "coordinateSystem": {
@@ -55,6 +55,9 @@
       "zIndex": 5,
       "opacity": 1,
       "blendMode": "normal",
+      "offsetX": 174,
+      "offsetY": 177,
+      "scale": 0.99679,
       "parallax": {
         "x": 0,
         "y": 0
@@ -64,12 +67,31 @@
       ]
     },
     {
+      "id": "sea",
+      "file": "Mare.png",
+      "type": "texture",
+      "zIndex": 10,
+      "opacity": 1,
+      "blendMode": "normal",
+      "offsetX": 0,
+      "offsetY": 0,
+      "parallax": {
+        "x": 0.02,
+        "y": 0
+      },
+      "tags": [
+        "water"
+      ]
+    },
+    {
       "id": "island_bottom_left",
       "file": "Isola basso sinistra.png",
       "type": "texture",
       "zIndex": 15,
       "opacity": 1,
       "blendMode": "normal",
+      "offsetX": 1487,
+      "offsetY": 2406,
       "parallax": {
         "x": 0.03,
         "y": 0
@@ -85,6 +107,8 @@
       "zIndex": 20,
       "opacity": 1,
       "blendMode": "normal",
+      "offsetX": 3509,
+      "offsetY": 2168,
       "parallax": {
         "x": 0.03,
         "y": 0
@@ -100,6 +124,9 @@
       "zIndex": 25,
       "opacity": 1,
       "blendMode": "normal",
+      "offsetX": 324,
+      "offsetY": 1858,
+      "scale": 0.789109,
       "parallax": {
         "x": 0.04,
         "y": 0
@@ -116,6 +143,8 @@
       "zIndex": 30,
       "opacity": 1,
       "blendMode": "normal",
+      "offsetX": 1979,
+      "offsetY": 2030,
       "parallax": {
         "x": 0.05,
         "y": 0
@@ -131,6 +160,8 @@
       "zIndex": 35,
       "opacity": 1,
       "blendMode": "normal",
+      "offsetX": 2671,
+      "offsetY": 1891,
       "parallax": {
         "x": 0.06,
         "y": 0
@@ -146,6 +177,8 @@
       "zIndex": 40,
       "opacity": 1,
       "blendMode": "normal",
+      "offsetX": 2547,
+      "offsetY": 1074,
       "parallax": {
         "x": 0.07,
         "y": 0
@@ -161,6 +194,8 @@
       "zIndex": 45,
       "opacity": 1,
       "blendMode": "normal",
+      "offsetX": 1087,
+      "offsetY": 297,
       "parallax": {
         "x": 0.08,
         "y": 0
@@ -176,6 +211,8 @@
       "zIndex": 50,
       "opacity": 1,
       "blendMode": "normal",
+      "offsetX": 2286,
+      "offsetY": 1049,
       "parallax": {
         "x": 0.09,
         "y": 0
@@ -192,6 +229,8 @@
       "zIndex": 55,
       "opacity": 1,
       "blendMode": "normal",
+      "offsetX": 1401,
+      "offsetY": 1504,
       "parallax": {
         "x": 0.1,
         "y": 0
@@ -207,6 +246,8 @@
       "zIndex": 60,
       "opacity": 1,
       "blendMode": "normal",
+      "offsetX": 3046,
+      "offsetY": 1533,
       "parallax": {
         "x": 0.11,
         "y": 0
@@ -222,6 +263,8 @@
       "zIndex": 65,
       "opacity": 1,
       "blendMode": "normal",
+      "offsetX": 361,
+      "offsetY": 740,
       "parallax": {
         "x": 0.12,
         "y": 0
@@ -237,6 +280,8 @@
       "zIndex": 70,
       "opacity": 1,
       "blendMode": "normal",
+      "offsetX": 1445,
+      "offsetY": 1034,
       "parallax": {
         "x": 0.13,
         "y": 0
@@ -252,6 +297,8 @@
       "zIndex": 75,
       "opacity": 1,
       "blendMode": "normal",
+      "offsetX": 420,
+      "offsetY": 1509,
       "parallax": {
         "x": 0.14,
         "y": 0
@@ -267,6 +314,8 @@
       "zIndex": 80,
       "opacity": 1,
       "blendMode": "normal",
+      "offsetX": 1917,
+      "offsetY": 1725,
       "parallax": {
         "x": 0.15,
         "y": 0
@@ -282,6 +331,8 @@
       "zIndex": 85,
       "opacity": 1,
       "blendMode": "normal",
+      "offsetX": 3275,
+      "offsetY": 732,
       "parallax": {
         "x": 0.16,
         "y": 0
@@ -297,6 +348,9 @@
       "zIndex": 90,
       "opacity": 1,
       "blendMode": "normal",
+      "offsetX": 1640,
+      "offsetY": 619,
+      "scale": 0.945946,
       "parallax": {
         "x": 0.17,
         "y": 0
@@ -312,6 +366,8 @@
       "zIndex": 95,
       "opacity": 1,
       "blendMode": "normal",
+      "offsetX": 1794,
+      "offsetY": 1434,
       "parallax": {
         "x": 0.18,
         "y": 0
@@ -328,6 +384,8 @@
       "zIndex": 97,
       "opacity": 1,
       "blendMode": "normal",
+      "offsetX": 0,
+      "offsetY": 0,
       "parallax": {
         "x": 0,
         "y": 0
@@ -344,6 +402,8 @@
       "zIndex": 99,
       "opacity": 1,
       "blendMode": "normal",
+      "offsetX": 1,
+      "offsetY": 8,
       "parallax": {
         "x": 0,
         "y": 0
