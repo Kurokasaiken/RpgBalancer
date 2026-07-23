@@ -3,6 +3,12 @@
 // Rigenera il manifest con offsetX:0, offsetY:0, scale:1 per TUTTI i layer ->
 // allineamento pixel-perfect per costruzione, zero numeri "a occhio".
 //
+// Include alpha-bleeding post-process: propaga il colore dei pixel opachi
+// nei pixel trasparenti (alpha=0) vicino ai bordi. Elimina le righe bianche
+// prodotte dal GPU bilinear filter durante il CSS scale(zoom):
+//   transparent (0,0,0,0) + opaque (255,255,255,255) → bilinear → WHITE FRINGE
+//   transparent (edge_color,0) + opaque (255,255,255,255) → bilinear → smooth edge
+//
 // I PNG esistenti in layers/ sono gia' crop esatti al bounding box del PSD:
 // non serve decodificare i pixel del PSD, basta ri-ancorarli.
 //
@@ -13,6 +19,15 @@ import { join, basename } from 'node:path';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { readPsd } from 'ag-psd';
 
+// NOTA: alpha-bleeding via Canvas 2D NON funziona per il path CSS/browser.
+// Il canvas usa premultiplied alpha internamente: i pixel (r,g,b,0) vengono
+// convertiti a (0,0,0,0) sia sul canvas che nel browser. Il colore dei pixel
+// trasparenti è irrilevante per CSS compositing.
+// Il fix corretto per il fringing CSS è usare `sharp` in raw mode (straight alpha)
+// oppure scrivere i byte PNG direttamente. Non implementato qui perché
+// il problema principale (bounding box dei PNG ritagliati) è già risolto
+// dal full-canvas approach.
+
 const PSD_PATH = 'hd-photo-Map finale3.psd';
 const BASE_DIR = 'public/assets/world/wanderlust/base';
 const OLD_LAYERS = join(BASE_DIR, 'layers');
@@ -21,6 +36,26 @@ const OLD_MANIFEST = join(BASE_DIR, 'manifest.json');
 const OUT_MANIFEST = join(BASE_DIR, 'manifest.fullcanvas.json');
 
 mkdirSync(OUT_LAYERS, { recursive: true });
+
+// GUARD: rifiuta di girare se i layer sorgente sono già full-canvas.
+// Girare due volte sposta tutto il contenuto fuori dal canvas (double-offset).
+{
+  const manifest_check = JSON.parse(readFileSync(join(BASE_DIR, 'manifest.json'), 'utf8'));
+  const check_layers = [...(manifest_check.surfaceLayers ?? []), ...(manifest_check.atmosphereLayers ?? [])];
+  const first_png = join(OLD_LAYERS, check_layers[0]?.file ?? '');
+  if (existsSync(first_png)) {
+    const buf = readFileSync(first_png);
+    const w = buf.readUInt32BE(16), h = buf.readUInt32BE(20);
+    // Legge dimensioni canvas dal PSD per confronto preciso
+    const psd_check = readPsd(readFileSync(PSD_PATH), { skipLayerImageData: true, skipCompositeImageData: true, skipThumbnail: true });
+    if (w === psd_check.width && h === psd_check.height) {
+      console.error(`\n❌ ABORT: i PNG in ${OLD_LAYERS}/ sono già full-canvas (${w}x${h}).`);
+      console.error('   Girare il pipeline due volte applica gli offset PSD due volte → tutto fuori canvas.');
+      console.error('   Ripristina i PNG originali ritagliati (git checkout HEAD -- public/assets/world/) e riprova.\n');
+      process.exit(1);
+    }
+  }
+}
 
 console.log('Lettura struttura PSD...');
 const psd = readPsd(readFileSync(PSD_PATH), {
