@@ -113,6 +113,18 @@ export const KIT_REGISTRY: KitRegistryEntry[] = [
     },
   },
   {
+    kitId: 'worldSurfaceKit',
+    kitModule: './kits/worldSurfaceKit',
+    status: 'draft',
+    hub: {
+      title: 'World Surface',
+      description: 'Mappa multi-layer full-canvas, allineamento pixel-perfect per effetti di layer',
+      icon: '🗺️',
+      path: '/world-surface',
+    },
+    docPath: 'src/ui/idleVillage/frozen/kits/worldSurfaceKit.md',
+  },
+  {
     kitId: 'poiKit',
     kitModule: './kits/poiKit',
     status: 'certified',

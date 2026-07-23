@@ -55,6 +55,16 @@ export {
   DESTINY_ASTROLABE_PROVIDER_CHAIN,
 } from './destinyAstrolabeKit';
 
+// World Surface Kit (draft) — mappa multi-layer full-canvas, pixel-perfect
+export {
+  WorldSurfaceStandalone,
+  WorldSurfaceRenderer,
+  useWorldSurface,
+  WANDERLUST_BASE_MANIFEST,
+  WORLD_SURFACE_PROVIDER_CHAIN,
+} from './worldSurfaceKit';
+export type { WorldSurfaceStandaloneProps } from './worldSurfaceKit';
+
 // Draft Kits (not yet certified, but available for use)
 export {
   ResourcePanelStandalone,
