@@ -30,6 +30,7 @@ const DesignSystemPage = lazy(() => import('./pages/design-system'));
 const V9SkinSandbox = lazy(() => import('./pages/v9-skin-sandbox').then(m => ({ default: m.V9SkinSandbox })));
 const VisualGrammarValidationPage = lazy(() => import('./ui/visualGrammarValidation/VisualGrammarValidationPage').then(m => ({ default: m.VisualGrammarValidationPage })));
 const VisualFidelityLabPage = lazy(() => import('./ui/visualFidelityLab/VisualFidelityLabPage').then(m => ({ default: m.VisualFidelityLabPage })));
+const HaloCoronaTestPage = lazy(() => import('./ui/visualFidelityLab/HaloCoronaTestPage').then(m => ({ default: m.default })));
 const HarmonizationGalleryPage = lazy(() => import('./ui/visualFidelityLab/HarmonizationGallery').then(m => ({ default: m.HarmonizationGallery })));
 const PoiDetailVerificationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailVerificationPage').then(m => ({ default: m.PoiDetailVerificationPage })));
 const PoiDetailQuestRosterIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailQuestRosterIntegrationPage').then(m => ({ default: m.default })));
@@ -169,6 +170,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/visual-grammar-validation';
   const isVisualFidelityLabPath =
     typeof window !== 'undefined' && window.location.pathname === '/visual-fidelity-lab';
+  const isHaloCoronaTestPath =
+    typeof window !== 'undefined' && window.location.pathname === '/halo-corona-test';
   const isHarmonizationGalleryPath =
     typeof window !== 'undefined' && window.location.pathname === '/harmonization-gallery';
   const isPoiDetailVerificationPath =
@@ -751,6 +754,16 @@ function App() {
       <ErrorBoundary componentName="Visual Fidelity Lab">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Visual Fidelity Lab...</div>}>
           <VisualFidelityLabPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isHaloCoronaTestPath) {
+    return (
+      <ErrorBoundary componentName="Halo Corona Test">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Halo Corona Test...</div>}>
+          <HaloCoronaTestPage />
         </Suspense>
       </ErrorBoundary>
     );

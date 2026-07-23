@@ -1,0 +1,10 @@
+- [Halo Corona Prototype](project_halo_corona_prototype.md) — 3-stage escalation for POI timers (calm/alert/critical); trapianto completato in GenericPoiSkin
+- [DestinyAstrolabe Throw Controls v1](project_astrolabe_throw_controls.md) — 3 independent checkboxes (Skip Animation, Auto, No Sound) replacing single Auto-Tiro toggle
+- [Frozen Kit System](project_frozen_kit_system.md) — KitShell smart + registry: componenti TestHub trapiantabili con una riga via frozen/kits
+- [Skin CSS Variables Layer](project_skin_css_variables.md) — token --skin-* per preset, base=V9 Obsidian, applicati globalmente in App.tsx
+- [Skin Scope + Primitives](project_skin_scope_primitives.md) — eredità automatica per ruolo: <SkinScope> + skinScope.css + primitivi Skin*; pilota OutcomeModal migrato
+- [Destiny Astrolabe V2](project_destiny_astrolabe_v2.md) — fork skin-driven /minimal-destiny-astrolabe-v2: engine canvas nuovo, cristallo sfaccettato, quadrante-soglia con lancetta, hero number, colori V9
+- [Destiny Astrolabe V3 slice](project_astrolabe_v3_slice.md) — riscritta da zero 2026-07-15; coordinator sovrascrive file in-flight, rAF non gira nel preview pane
+- [Visual Grammar Spike](project_visual_grammar_spike.md) — /visual-fidelity-lab approvato: base estetica validata, prossimo step = estrarre Visual Grammar v1 (non SurfacePreset)
+- [Wanderlust Threat Grammar](project_wanderlust_threat_grammar.md) — invasione come organismo: frame-chiave, silhouette-Re, grammatica universale delle minacce, linguaggio per antitesi
+- [Asset Narrative Principles](feedback_asset_narrative_principles.md) — nascita memorabile degli elementi persistenti; asset che raccontano prima del click
