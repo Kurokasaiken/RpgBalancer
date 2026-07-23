@@ -278,4 +278,6 @@ npm run kanban:lint
 | 2026-07-19 | Cascade                 | Step 1-3 implementati: asset pipeline, Zod schemas, useWorldSurface hook, WorldSurfaceRenderer DOM, DebugPanel, TestHub page. Safeguards pass. |
 | 2026-07-19 | Cascade                 | Step 6 implementato: renderer config, scelta DOM/WebGL basata su soglia/oggetti/particle/shader, WorldSurfacePixiOverlay con Pixi.js, controlli debug spawn/clear. Safeguards pass. |
 | 2026-07-21 | Strategia               | v2.0 direction: component-based world surface with semantic grouping defined in `component_based_world_surface_plan.md`. Manifest v1 remains supported through in-memory migration. |
+| 2026-07-23 | Strategia               | HD asset migration pass: new plan `world_surface_hd_asset_migration_plan.md` (IV-WORLD-SURFACE-HD-002) to normalize HD source `hd-photo-Map finale/`, remove obsolete `Livello 1.png`/`mare.png`, add semantic validation and image error handling. |
+| 2026-07-23 | Cascade                 | IV-WORLD-SURFACE-HD-002 implemented: HD assets copied to `layers/`, manifest bumped to v1.1.1, `Bordo.png`/`Frame.png` added, image error handling in `WorldSurfaceRenderer`, `validateWorldSurfaceAssets` semantic utility + tests, README updated. Safeguards pass. |
 <!-- markdownlint-enable MD060 -->

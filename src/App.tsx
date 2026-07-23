@@ -31,6 +31,7 @@ const V9SkinSandbox = lazy(() => import('./pages/v9-skin-sandbox').then(m => ({ 
 const VisualGrammarValidationPage = lazy(() => import('./ui/visualGrammarValidation/VisualGrammarValidationPage').then(m => ({ default: m.VisualGrammarValidationPage })));
 const VisualFidelityLabPage = lazy(() => import('./ui/visualFidelityLab/VisualFidelityLabPage').then(m => ({ default: m.VisualFidelityLabPage })));
 const HaloCoronaTestPage = lazy(() => import('./ui/visualFidelityLab/HaloCoronaTestPage').then(m => ({ default: m.default })));
+const ClockPoiTestPage = lazy(() => import('./ui/visualFidelityLab/ClockPoiTestPage').then(m => ({ default: m.default })));
 const HarmonizationGalleryPage = lazy(() => import('./ui/visualFidelityLab/HarmonizationGallery').then(m => ({ default: m.HarmonizationGallery })));
 const PoiDetailVerificationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailVerificationPage').then(m => ({ default: m.PoiDetailVerificationPage })));
 const PoiDetailQuestRosterIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailQuestRosterIntegrationPage').then(m => ({ default: m.default })));
@@ -172,6 +173,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/visual-fidelity-lab';
   const isHaloCoronaTestPath =
     typeof window !== 'undefined' && window.location.pathname === '/halo-corona-test';
+  const isClockPoiTestPath =
+    typeof window !== 'undefined' && window.location.pathname === '/clock-poi-test';
   const isHarmonizationGalleryPath =
     typeof window !== 'undefined' && window.location.pathname === '/harmonization-gallery';
   const isPoiDetailVerificationPath =
@@ -764,6 +767,16 @@ function App() {
       <ErrorBoundary componentName="Halo Corona Test">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Halo Corona Test...</div>}>
           <HaloCoronaTestPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isClockPoiTestPath) {
+    return (
+      <ErrorBoundary componentName="Clock POI Test">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Clock POI Test...</div>}>
+          <ClockPoiTestPage />
         </Suspense>
       </ErrorBoundary>
     );

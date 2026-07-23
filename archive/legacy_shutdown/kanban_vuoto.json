@@ -1,0 +1,11 @@
+{
+  "tasks": [
+    {
+      "id": "task_completed",
+      "status": "done",
+      "target_file": "ai-worker/examples/hello.py",
+      "prompt": "Create a Python file with a function greet(name) that returns 'Ciao, {name}!' and a small main block that asks for a name and prints the result. Return only raw source code, no markdown, no explanations.",
+      "complexity": 1
+    }
+  ]
+}

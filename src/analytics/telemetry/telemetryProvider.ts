@@ -6,6 +6,7 @@ const stsDiagnostics = createHeadlessDiagnostics('STSCombatMetrics');
 const stressDiagnostics = createHeadlessDiagnostics('StressTestTelemetry');
 const sessionDiagnostics = createHeadlessDiagnostics('STSSessionPersistence');
 const slottedMedalDiagnostics = createHeadlessDiagnostics('SlottedMedal');
+const modifierDiagnostics = createHeadlessDiagnostics('ModifierTelemetry');
 
 /**
  * Events emitted by the Punch Club landing analytics helper.
@@ -39,6 +40,15 @@ export type SlottedMedalEvent =
   | 'slot_medal_completed'
   | 'slot_medal_resist_started'
   | 'slot_medal_resist_cancelled';
+
+/**
+ * Events emitted by the gameplay modifier telemetry pipeline.
+ */
+export type ModifierTelemetryEvent =
+  | 'modifier_applied'
+  | 'modifier_removed'
+  | 'modifier_stack_changed'
+  | 'modifier_evaluated';
 
 /**
  * Payload attached to analytics events. The shape is intentionally open-ended
@@ -141,6 +151,47 @@ export interface SlottedMedalEventPayload {
   };
 }
 
+/**
+ * Payload attached to modifier telemetry events.
+ */
+export interface ModifierTelemetryEventPayload {
+  /** Modifier identifier */
+  modifierId: string;
+  /** Target stat identifier */
+  statId: string;
+  /** Modifier scope */
+  scope: string;
+  /** Modifier operation */
+  operation: string;
+  /** Modifier value */
+  value: number;
+  /** Current stack count */
+  stackCount?: number;
+  /** Maximum allowed stacks */
+  maxStacks?: number;
+  /** Modifier owner metadata */
+  owner?: { type: string; id: string; label: string };
+  /** Source config or preset identifier */
+  sourceConfigId?: string;
+  /** Event timestamp */
+  timestamp?: string;
+  /** Removal or evaluation reason */
+  reason?: string;
+  /** Previous stack count for stack change events */
+  previousStackCount?: number;
+  /** New stack count for stack change events */
+  newStackCount?: number;
+  /** Optional numeric delta */
+  delta?: number;
+  /** Additional context (resident, quest, location) */
+  context?: Record<string, unknown>;
+  /** Error details if event failed */
+  error?: {
+    message: string;
+    code?: string;
+  };
+}
+
 interface PunchClubLandingAnalyticsEntry {
   event: PunchClubLandingEvent;
   payload?: PunchClubLandingEventPayload;
@@ -165,6 +216,12 @@ interface SlottedMedalAnalyticsEntry {
   timestamp: number;
 }
 
+interface ModifierTelemetryAnalyticsEntry {
+  event: ModifierTelemetryEvent;
+  payload?: ModifierTelemetryEventPayload;
+  timestamp: number;
+}
+
 /**
  * Generic analytics entry interface for general analytics events
  */
@@ -180,6 +237,7 @@ declare global {
     __stressTestTelemetryEvents?: StressTestTelemetryAnalyticsEntry[];
     __pwaTelemetryEvents?: PWATelemetryAnalyticsEntry[];
     __slottedMedalEvents?: SlottedMedalAnalyticsEntry[];
+    __modifierTelemetryEvents?: ModifierTelemetryAnalyticsEntry[];
   }
 }
 
@@ -224,6 +282,8 @@ export function trackTelemetryEvent(
     stressDiagnostics.info('Analytics event', payload, ['analytics', eventType]);
   } else if (eventType.startsWith('slot_medal_')) {
     slottedMedalDiagnostics.info('Slotted Medal event', payload, ['slotted_medal', eventType]);
+  } else if (eventType.startsWith('modifier_')) {
+    modifierDiagnostics.info('Modifier telemetry event', payload, ['modifier', eventType]);
   } else {
     // Default to stress diagnostics for unknown event types
     stressDiagnostics.info('Generic telemetry event', payload, ['telemetry', eventType]);
@@ -236,6 +296,49 @@ export function trackTelemetryEvent(
       payload,
       timestamp: Date.now(),
       source: 'trackTelemetryEvent'
+    });
+  }
+}
+
+/**
+ * Records a gameplay modifier telemetry event, forwarding it to the
+ * dedicated diagnostics channel and the shared window event buffer.
+ *
+ * @param event - Modifier telemetry event type
+ * @param payload - Modifier telemetry payload
+ */
+export function trackModifierTelemetry(
+  event: ModifierTelemetryEvent,
+  payload?: ModifierTelemetryEventPayload,
+): void {
+  const entry: ModifierTelemetryAnalyticsEntry = {
+    event,
+    payload,
+    timestamp: Date.now(),
+  };
+
+  if (modifierDiagnostics.isEnabled()) {
+    modifierDiagnostics.info('Modifier telemetry event', entry, ['modifier-telemetry', event]);
+  }
+
+  if (typeof window !== 'undefined') {
+    if (!Array.isArray(window.__modifierTelemetryEvents)) {
+      window.__modifierTelemetryEvents = [];
+    }
+    window.__modifierTelemetryEvents.push(entry);
+    window.dispatchEvent(
+      new CustomEvent('modifier-telemetry-event', {
+        detail: entry,
+      }),
+    );
+  }
+
+  if (typeof window !== 'undefined' && window.telemetryBuffer) {
+    window.telemetryBuffer.push({
+      eventType: event,
+      payload,
+      timestamp: Date.now(),
+      source: 'trackModifierTelemetry',
     });
   }
 }

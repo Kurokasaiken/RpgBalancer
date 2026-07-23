@@ -43,7 +43,7 @@ const diagnostics = [
 for (const step of diagnostics) {
   if (!runStep(step.label, step.command, step.args)) {
     log('Guardian terminato: diagnosi non superata.');
-    shutdownSystem('DIAGNOSTICS_FAILED', `${step.label} failed during Guardian recovery`);
+    log(`SHUTDOWN_CAPABILITY_NOT_OWNED: ${step.label} failed during Guardian recovery`);
     process.exit(1);
   }
 }
@@ -51,18 +51,18 @@ for (const step of diagnostics) {
 if (args.stage === 'commit') {
   ensureArg(args.commitMessage, '--commit-message');
   if (!runStep('git add -A', 'git', ['add', '-A'])) {
-    shutdownSystem('GIT_ADD_FAILED', 'git add -A failed during Guardian recovery');
+    log('SHUTDOWN_CAPABILITY_NOT_OWNED: git add -A failed during Guardian recovery');
     process.exit(1);
   }
   if (!runStep('git commit', 'git', ['commit', '-m', args.commitMessage])) {
-    shutdownSystem('GIT_COMMIT_FAILED', 'git commit failed during Guardian recovery');
+    log('SHUTDOWN_CAPABILITY_NOT_OWNED: git commit failed during Guardian recovery');
     process.exit(1);
   }
   log('✅ Commit ripristinato correttamente.');
 } else {
   const branch = args.branch || detectBranch();
   if (!runStep(`git push origin ${branch}`, 'git', ['push', 'origin', branch])) {
-    shutdownSystem('GIT_PUSH_FAILED', `git push origin ${branch} failed during Guardian recovery`);
+    log(`SHUTDOWN_CAPABILITY_NOT_OWNED: git push origin ${branch} failed during Guardian recovery`);
     process.exit(1);
   }
   log('✅ Push completato dal guardian.');
@@ -137,57 +137,3 @@ function camelCase(input) {
   return input.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
 }
 
-function shutdownSystem(reason, detail) {
-  log(`Session failed - initiating shutdown: ${reason}`);
-  // Create final session summary
-  const finalLog = `test-results/auto-commit-guardian/${new Date().toISOString().replace(/[:.]/g, '-')}-session-complete.log`;
-  const summary = `=== GUARDIAN SESSION COMPLETE ===
-Timestamp: ${new Date().toISOString()}
-Stage: ${stage}
-Branch: ${currentBranch}
-Final Status: FAILED
-Shutdown Reason: ${reason}
-Detail: ${detail}
-================================`;
-  
-  try {
-    fs.mkdirSync(path.dirname(finalLog), { recursive: true });
-    fs.writeFileSync(finalLog, summary);
-    log(`Final session summary written to: ${finalLog}`);
-  } catch (err) {
-    log(`Failed to write session summary: ${err.message}`);
-  }
-
-  // Attempt graceful shutdown with unattended safety checks
-  const { exec, spawnSync } = require('child_process');
-  
-  // Check for unattended sudo access
-  if (process.platform === 'linux') {
-    const sudoCheck = spawnSync('sudo', ['-n', 'true'], { stdio: 'pipe' });
-    if (sudoCheck.status === 0) {
-      log('Executing unattended Linux shutdown...');
-      exec('sudo shutdown -h now', (err) => {
-        if (err) {
-          log('Linux shutdown failed - no fallback available');
-        }
-      });
-    } else {
-      log('No unattended sudo access - cannot shutdown Linux');
-    }
-  } else if (process.platform === 'darwin') {
-    log('Executing macOS shutdown via osascript...');
-    exec('osascript -e "tell application \\"System Events\\" to shut down"', (err) => {
-      if (err) {
-        log('macOS shutdown failed - no fallback available');
-      }
-    });
-  } else {
-    log('Shutdown command not available for this platform - session ended');
-  }
-  
-  // Force exit after short delay to prevent hanging
-  setTimeout(() => {
-    log('Forcing process exit - session ended');
-    process.exit(0);
-  }, 3000);
-}

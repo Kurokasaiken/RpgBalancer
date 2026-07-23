@@ -32,4 +32,41 @@
 
   /* fill rim / meniscus → warm gold */
   --skin-icon-color: #f0cf6a;
+
+  /* Materic-path bar FILLS (the isMateric roster reads these via
+     MATERIC_SKIN_CONFIG's `var(--mat-*-fill, …)` hooks). Lab semantic ramps,
+     SAME 2-layer structure as the config fallback so background-size/blend
+     stay aligned. HP → emerald, Stamina → AMBRA (confirmed choice). */
+  --mat-hp-fill:
+    radial-gradient(ellipse 80% 80% at 20% 50%, rgba(255, 255, 255, 0.12), transparent 50%),
+    linear-gradient(90deg, #1f6e42, #2f8f5c, #4fbd82, #8fe0a8);
+  --mat-stamina-fill:
+    radial-gradient(circle, rgba(255, 255, 255, 0.18) 1px, transparent 1px),
+    linear-gradient(90deg, #8a5410, #c9852e, #ffd98a);
+
+  /* Fill-front MENISCUS (glance-read cue, AAA critique point #1): a bright
+     inset edge line where the fill meets the empty track. Pale-warm variants
+     of each energy so it reads as "the metal catching light", not a UI glow. */
+  --mat-hp-meniscus: rgba(224, 255, 236, 0.75);
+  --mat-stamina-meniscus: rgba(255, 244, 214, 0.8);
+
+  /* Card ELEVATION (AAA critique point #2, corrected): the roster card is
+     DRAGGABLE, so it must read as RAISED (picked up), not carved into the
+     field — a recess signals "fixed in place", the opposite affordance. Outer
+     drop-shadow lifts it; the inset hairline + top sheen reuse the exact
+     GOLD_FILET_SOFT recipe (see foundationRecipe.ts) so the card's frame
+     matches the wells' frame language at a lighter weight (whisper, not
+     shout — the reward plaque keeps the full GOLD_FILET). */
+  --mat-card-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(0, 0, 0, 0.3),
+    inset 0 0 0 1px rgba(198, 150, 54, 0.32),
+    inset 0 1px 0 rgba(224, 178, 66, 0.14);
+
+  /* Status seal (AAA critique point #3): swaps the plain color-only accent
+     dot ("reads as an online-chat LED") for a small bronze/gold seal with a
+     SECOND signal beyond hue — filled+glow=active, filled+static=injured,
+     hollow ring=neutral. Additive: pages without this class keep the dot. */
+  --mat-status-dot-display: none;
+  --mat-status-seal-display: inline-block;
 }

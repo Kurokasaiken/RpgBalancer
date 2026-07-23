@@ -11,6 +11,7 @@ import type {
   WorldSurfaceVisualStateOverride,
 } from '../config/worldSurfaceConfig';
 import { clampPan, clampZoom, viewportToWorld } from '../../../engine/world/model/WorldCoordinate';
+import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 
 interface WorldSurfaceRendererProps {
   manifest: WorldSurfaceManifest;
@@ -531,6 +532,18 @@ const LayerView: React.FC<LayerViewProps> = ({ layer, worldPoint, worldName, ima
   };
 
   const { x: offsetX, y: offsetY } = offset;
+  const [hasError, setHasError] = useState(false);
+
+  const handleImageError = useCallback(() => {
+    if (hasError) return;
+    setHasError(true);
+    trackTelemetryEvent('world_surface_image_load_failed', {
+      layerId: layer.id,
+      file: layer.file,
+      world: worldName,
+      context: 'world-surface-renderer',
+    });
+  }, [hasError, layer.id, layer.file, worldName]);
 
   const scaleStyle: React.CSSProperties = {
     position: 'absolute',
@@ -542,12 +555,17 @@ const LayerView: React.FC<LayerViewProps> = ({ layer, worldPoint, worldName, ima
   return (
     <div style={wrapperStyle}>
       <div style={scaleStyle}>
-        <img
-          src={`/assets/world/${worldName}/base/layers/${encodeURIComponent(layer.file)}`}
-          alt=""
-          style={imgStyle}
-          draggable={false}
-        />
+        {!hasError ? (
+          <img
+            src={`/assets/world/${worldName}/base/layers/${encodeURIComponent(layer.file)}`}
+            alt=""
+            style={imgStyle}
+            draggable={false}
+            onError={handleImageError}
+          />
+        ) : (
+          <div style={{ ...imgStyle, opacity: 0 }} aria-hidden="true" />
+        )}
         {layer.tint && (
           <div
             style={{

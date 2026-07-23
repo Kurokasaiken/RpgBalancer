@@ -31,6 +31,7 @@ const legacyEslintIgnorePatterns = [
   'src/vite-env.d.ts',
   'scripts/**',
   '!scripts/harness/**',
+  '!scripts/shutdownManager/**',
 ]
 
 // TODO(WS5 Baseline QA – remove by 2026-02-28): temporary quarantine until legacy folders are either deleted or refactored.
@@ -44,6 +45,7 @@ const lintQuarantineIgnores = [
   'src/ui/idleVillage/VillageSandbox.reference.tsx',
   // Legacy Vitest/Playwright suites still using CommonJS syntax.
   'tests/**/*',
+  '!tests/unit/shutdownManager/**',
   // Temporary until telemetry stack is refactored to comply with hooks/lint rules.
   // Temporary until stress testing dashboards adopt config-first lint-safe hooks.
   'src/ui/tools/stressTesting/**',

@@ -116,17 +116,49 @@
     },
     {
       "task_id": "GM-TEL",
-      "status": "assigned",
+      "status": "completed",
       "timestamp": "2026-07-22T23:30:00.000000+00:00",
-      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/GM-TEL.md",
-      "notes": "Unblocked after GM-BLD completion; manual dispatch to Cascade."
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/completed/GM-TEL.md",
+      "notes": "Placeholder with no instructions; completed as no-op.",
+      "completed_at": "2026-07-23T07:43:14.200842+00:00"
+    },
+    {
+      "task_id": "OPS-SHUTDOWN-001",
+      "status": "completed",
+      "timestamp": "2026-07-22T23:30:00.000000+00:00",
+      "started_at": "2026-07-22T23:30:00+02:00",
+      "completed_at": "2026-07-23T07:43:14.200842+00:00",
+      "agent": "Cascade",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/completed/OPS-SHUTDOWN-001.md",
+      "evidence_log": "test-results/ops-shutdown-001-audit-2026-07-23.log",
+      "notes": "Legacy shutdown/auto-commit/auto-push references archived/neutralised. shutdownSystem removed from guardian scripts. Second grep, launchctl/crontab verification, lint, build:check and kanban:lint passed. Evidence log updated."
     },
     {
       "task_id": "GM-TEL",
+      "status": "completed",
+      "timestamp": "2026-07-23T07:43:18.412855+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/completed/GM-TEL.md",
+      "completed_at": "2026-07-23T09:01:31.245040+00:00",
+      "evidence_log": "test-results/gm-tel-modifier-telemetry-2026-07-23.log",
+      "notes": "Telemetry pipeline verified and extended: modifier diagnostics channel added to telemetryProvider.ts; modifierTelemetry.ts already emits modifier_applied/removed/stack_changed; 6/6 unit tests pass; lint (0 errors, 3 pre-existing warnings), build:check, and kanban:lint pass."
+    },
+    {
+      "task_id": "OPS-SHUTDOWN-002",
+      "status": "completed",
+      "timestamp": "2026-07-23T09:40:55.558035+00:00",
+      "started_at": "2026-07-23T09:45:00.000000+00:00",
+      "agent": "Cascade",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/completed/OPS-SHUTDOWN-002.md",
+      "evidence_log": "test-results/ops-shutdown-002-registry-2026-07-23.log",
+      "notes": "Dispatched to manual executor. Gating verified: audit log present, zero unauthorized shutdown call sites, commitFailureMonitor.js/vercelDeploymentGuard.ts senza shutdownSystem.",
+      "completed_at": "2026-07-23T12:46:00.195835+00:00"
+    },
+    {
+      "task_id": "IV-WORLD-SURFACE-HD-002",
       "status": "pending",
-      "timestamp": "2026-07-22T21:28:53.529350+00:00",
-      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/GM-TEL.md"
+      "timestamp": "2026-07-23T13:36:24.277184+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/IV-WORLD-SURFACE-HD-002.md"
     }
   ],
-  "last_updated": "2026-07-22T21:28:53.530119+00:00"
+  "last_updated": "2026-07-23T13:36:24.277534+00:00"
 }

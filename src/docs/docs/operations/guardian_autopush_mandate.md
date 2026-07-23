@@ -1,5 +1,12 @@
 # Guardian AutoPush Mandate
 
+> **DEPRECATED / ARCHIVED — OPS-SHUTDOWN-001 (2026-07-23)**
+>
+> The legacy auto-commit / auto-push / shutdown watcher mechanisms described in this document have been audited, disabled, and archived under `archive/legacy_shutdown/`.
+> `shutdownSystem()` has been removed from `scripts/autoCommit/commitFailureMonitor.js` and `scripts/guardian/vercelDeploymentGuard.ts`.
+> Per `50-shutdown-governance.md`, only the **Global Session Shutdown Manager** (`scripts/shutdownManager/`) is authorized to request macOS shutdown.
+> This document is kept for historical reference; do not reactivate the old mechanisms without explicit governance review.
+
 ## 1. Missione e responsabilità
 
 Il Guardian coordina tutti i fallback legati agli script automatici di consegna:

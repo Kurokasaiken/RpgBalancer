@@ -1,5 +1,11 @@
 # Auto-Commit Guardian – Commit Failure Playbook
 
+> **DEPRECATED / UPDATED — OPS-SHUTDOWN-001 (2026-07-23)**
+>
+> `shutdownSystem()` has been removed from `commitFailureMonitor.js`. The guardian now logs `SHUTDOWN_CAPABILITY_NOT_OWNED` and exits cleanly on failure.
+> The legacy `auto_commit_push.sh` combined script has been archived as `archive/legacy_shutdown/auto-commit-push-shutdown.sh.DISABLED`.
+> Per `50-shutdown-governance.md`, only the **Global Session Shutdown Manager** (`scripts/shutdownManager/`) is authorized to request system shutdown.
+
 Questa guida spiega il flusso del guardiano automatico che interviene quando `auto_commit_push.sh` non riesce a completare un commit/push a causa di lint/test/build errors.
 
 ## Flusso

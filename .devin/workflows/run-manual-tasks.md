@@ -35,12 +35,24 @@ This workflow executes manual SWE tasks that have been dispatched to the manual 
    After successful execution, call:
    ```python
    from coordinator.dispatcher import complete_manual_task
-   complete_manual_task("TASK-ID", "Completato")
+   evidence_log = "test-results/<TASK>-<date>.log"
+   complete_manual_task("TASK-ID", "Completato", evidence_log)
    ```
    This will:
    - Move the task file from pending/ to completed/
-   - Update queue.json
+   - Update queue.json with the evidence log
    - Update agent_assignments.md status to "Completato"
+   - Update strategy_tasks.md status / notes
+
+4a. **Sync check**
+   Verify the three sources of truth are aligned:
+   ```bash
+   python3 coordinator/kanban_sync.py --check
+   ```
+   If it reports mismatches, run:
+   ```bash
+   python3 coordinator/kanban_sync.py --fix
+   ```
 
 5. **Mark task as failed** (if execution fails)
    If the task cannot be completed:

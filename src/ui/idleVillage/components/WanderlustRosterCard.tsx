@@ -172,7 +172,14 @@ const WanderlustRosterCard = memo<WanderlustRosterCardProps>(({
   `;
   // Inset-only glow ring: avoids the overflow:auto clipping that was hiding the
   // top border of the first card in the roster list.
-  const cardBoxShadow = isHovered ? hoverInsetShadow : baseInsetShadow;
+  //
+  // token-driven (lab migration): `--mat-card-shadow` overrides the WHOLE
+  // shadow (elevation + gold filet) when the Material Language flag is active;
+  // fallback = the current inset-only recipe, so pages without the token layer
+  // (e.g. /minimal-roster today) render UNCHANGED. AAA critique corrected:
+  // this card is DRAGGABLE, so materic = RAISED (drop-shadow), never carved —
+  // a recess would signal "fixed in place", the opposite affordance.
+  const cardBoxShadow = `var(--mat-card-shadow, ${isHovered ? hoverInsetShadow : baseInsetShadow})`;
 
   const cardGlowStyle: CSSProperties = {
     boxShadow: cardBoxShadow,
@@ -245,17 +252,74 @@ const WanderlustRosterCard = memo<WanderlustRosterCardProps>(({
     gap: '7px',
   };
 
+  // token-driven (lab migration): the plain accent dot is ALWAYS color-only
+  // (AAA critique point #3 — "reads as an online-chat LED, not a fantasy
+  // status"). `--mat-status-dot-display` / `--mat-status-seal-display` swap
+  // it for a small bronze/gold seal ONLY inside `.materic-skin`; fallback =
+  // dot shown, seal hidden, so pages without the flag (e.g. today's
+  // /minimal-roster columns without the class) render UNCHANGED.
   const dotStyle: CSSProperties = {
     width: '7px',
     height: '7px',
     borderRadius: '50%',
     background: COLOR.hp,
-    boxShadow: isHero 
+    boxShadow: isHero
       ? '0 0 7px rgba(123,201,111,0.7)'
       : '0 0 7px rgba(123,201,111,0.7)',
-    display: 'inline-block',
+    display: 'var(--mat-status-dot-display, inline-block)',
     animation: isHero ? 'glow-breath 3s ease-in-out infinite' : 'none',
   };
+
+  // The seal's SECOND accessibility signal is SHAPE, not just hue: filled +
+  // glow = active, filled + static = injured, hollow ring = neutral/other —
+  // readable even if HP-emerald and injured-rust are indistinguishable to a
+  // color-blind player. Injured reuses the EXISTING shipped rust tone
+  // (matericSkinConfig's fatigueFill + the original roster mockup's injured
+  // dot color, #d98a4a) — no new hue invented.
+  type SealVariant = 'active' | 'injured' | 'neutral';
+  const sealVariant: SealVariant | null = !subtitle
+    ? null
+    : isHero
+    ? 'active'
+    : subtitle === 'Ferito'
+    ? 'injured'
+    : 'neutral';
+  const SEAL_PALETTE: Record<SealVariant, { fill: string; ring: string; glow?: string; innerShine: string }> = {
+    active: {
+      fill: 'radial-gradient(circle at 35% 30%, #f0d99a 0%, #d8bd78 45%, #a0762f 80%, #71501f 100%)',
+      ring: 'rgba(0,0,0,0.55)',
+      glow: 'rgba(240,207,106,0.75)',
+      innerShine: 'inset 0 1px 0 rgba(255,246,220,0.4)',
+    },
+    injured: {
+      fill: 'radial-gradient(circle at 35% 30%, #d98a4a 0%, #9e5a4a 70%, #6b3a2a 100%)',
+      ring: 'rgba(0,0,0,0.55)',
+      innerShine: 'inset 0 1px 0 rgba(255,214,180,0.25)',
+    },
+    neutral: {
+      fill: 'transparent',
+      ring: 'rgba(150,130,95,0.55)',
+      innerShine: 'inset 0 1px 1px rgba(0,0,0,0.4)',
+    },
+  };
+  const sealStyle: CSSProperties | null = sealVariant
+    ? (() => {
+        const p = SEAL_PALETTE[sealVariant];
+        return {
+          width: '10px',
+          height: '10px',
+          borderRadius: '50%',
+          background: p.fill,
+          boxShadow: [
+            `inset 0 0 0 1px ${p.ring}`,
+            p.innerShine,
+            p.glow ? `0 0 6px ${p.glow}` : '',
+          ].filter(Boolean).join(', '),
+          display: 'var(--mat-status-seal-display, none)',
+          animation: sealVariant === 'active' ? 'seal-glow-breath 3s ease-in-out infinite' : 'none',
+        };
+      })()
+    : null;
 
   const barsStyle: CSSProperties = {
     display: 'flex',
@@ -312,6 +376,7 @@ const WanderlustRosterCard = memo<WanderlustRosterCardProps>(({
         {subtitle && (
           <div style={roleStyle}>
             <span style={dotStyle} />
+            {sealStyle && <span aria-hidden style={sealStyle} />}
             {subtitle}
           </div>
         )}
@@ -360,11 +425,21 @@ if (typeof document !== 'undefined') {
     style.id = styleId;
     style.textContent = `
       @keyframes glow-breath {
-        0%, 100% { 
+        0%, 100% {
           box-shadow: 0 0 7px rgba(123,201,111,0.7);
         }
-        50% { 
+        50% {
           box-shadow: 0 0 14px rgba(123,201,111,0.9), 0 0 20px rgba(123,201,111,0.4);
+        }
+      }
+      /* Gold breathing glow for the materic status seal's 'active' variant —
+         additive, does not touch the plain dot's green keyframes above. */
+      @keyframes seal-glow-breath {
+        0%, 100% {
+          box-shadow: inset 0 0 0 1px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,246,220,0.4), 0 0 6px rgba(240,207,106,0.75);
+        }
+        50% {
+          box-shadow: inset 0 0 0 1px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,246,220,0.4), 0 0 12px rgba(240,207,106,0.9), 0 0 18px rgba(240,207,106,0.4);
         }
       }
     `;
