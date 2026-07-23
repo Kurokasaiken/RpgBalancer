@@ -359,7 +359,13 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
     width,
     height,
     transformOrigin: 'top left',
-    transform: `translate(${-camera.panX * camera.zoom}px, ${-camera.panY * camera.zoom}px) scale(${camera.zoom})`,
+    // `translateZ(0)` promotes the whole world-box to a single GPU compositing
+    // layer, so every child layer is rasterized in the SAME space and rounds
+    // subpixels identically during fractional zoom — no per-layer drift.
+    // Requires: all layers full-canvas at offset 0/0, scale 1 (see worldSurfaceKit).
+    transform: `translate(${-camera.panX * camera.zoom}px, ${-camera.panY * camera.zoom}px) scale(${camera.zoom}) translateZ(0)`,
+    willChange: 'transform',
+    backfaceVisibility: 'hidden',
   };
 
   const worldPoint = { x: camera.panX, y: camera.panY };

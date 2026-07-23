@@ -55,3 +55,7 @@ assets_originals/
 
 # Coordinator runtime files
 coordinator/last-run-summary.json
+public/assets/world/**/layers-fullcanvas/
+public/assets/world/**/manifest.fullcanvas.json
+public/assets/world/**/*.trimmed.bak/
+public/assets/world/**/manifest.trimmed.bak.json
