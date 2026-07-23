@@ -1,4 +1,70 @@
 {
+  "activityCapsule": {
+    "accessibility": {
+      "activityCapsule": "{label} capsula attività",
+      "closeDetails": "Chiudi dettagli"
+    },
+    "actions": {
+      "cancel": "Annulla",
+      "collect": "Raccogli",
+      "collecting": "Raccolta in corso...",
+      "start": "Avvia"
+    },
+    "ariaLive": {
+      "blocked": "Attività {label} bloccata",
+      "completed": "Attività {label} completata",
+      "idle": "Attività {label} inattiva",
+      "progress": "Progresso {label}: {percent}%",
+      "readyToCollect": "{label} pronta per la raccolta",
+      "slotFreed": "{count, plural, one {{count} slot liberato da {label}} other {{count} slot liberati da {label}}}",
+      "started": "Attività {label} avviata",
+      "workerAssigned": "{count, plural, one {{count} lavoratore assegnato a {label}} other {{count} lavoratori assegnati a {label}}}"
+    },
+    "defaultHalo": "POI",
+    "devTools": {
+      "validationTitle": "Errori di Validazione Skin"
+    },
+    "dropHint": "Rilascia",
+    "info": {
+      "duration": "Durata",
+      "eta": "Tempo Stimato",
+      "reward": "Ricompensa"
+    },
+    "lore": {
+      "locked": "Un'antica vibrazione attende nel silenzio di questa impresa."
+    },
+    "requirements": {
+      "relation": {
+        "all": "Richiesto",
+        "any": "Uno tra",
+        "none": "Proibito"
+      }
+    },
+    "sections": {
+      "assignedCharacters": "Personaggi Assegnati",
+      "lore": "Diario",
+      "requirements": "Requisiti",
+      "telemetry": "Registro Eventi"
+    },
+    "slotLabel": "Slot {index}",
+    "status": {
+      "blocked": "Bloccato",
+      "completed": "Completato",
+      "idle": "Inattivo",
+      "inProgress": "In Corso"
+    },
+    "telemetry": {
+      "empty": "Nessun evento registrato."
+    },
+    "type": {
+      "job": "Lavoro",
+      "maintenance": "Manutenzione",
+      "poi-activity": "Attività POI",
+      "quest": "Missione",
+      "training": "Addestramento"
+    },
+    "workerAlt": "Lavoratore"
+  },
   "workerTooltip": {
     "labels": {
       "hp": "HP",

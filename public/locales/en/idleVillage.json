@@ -1,4 +1,70 @@
 {
+  "activityCapsule": {
+    "accessibility": {
+      "activityCapsule": "{label} activity capsule",
+      "closeDetails": "Close details"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "collect": "Collect",
+      "collecting": "Collecting...",
+      "start": "Start"
+    },
+    "ariaLive": {
+      "blocked": "{label} activity blocked",
+      "completed": "{label} activity completed",
+      "idle": "{label} activity is idle",
+      "progress": "{label} progress: {percent}%",
+      "readyToCollect": "{label} ready to collect",
+      "slotFreed": "{count, plural, one {{count} slot freed from {label}} other {{count} slots freed from {label}}}",
+      "started": "{label} activity started",
+      "workerAssigned": "{count, plural, one {{count} worker assigned to {label}} other {{count} workers assigned to {label}}}"
+    },
+    "defaultHalo": "POI",
+    "devTools": {
+      "validationTitle": "Skin Validation Errors"
+    },
+    "dropHint": "Drop",
+    "info": {
+      "duration": "Duration",
+      "eta": "ETA",
+      "reward": "Reward"
+    },
+    "lore": {
+      "locked": "An ancient vibration awaits in the silence of this endeavor."
+    },
+    "requirements": {
+      "relation": {
+        "all": "Required",
+        "any": "One of",
+        "none": "Forbidden"
+      }
+    },
+    "sections": {
+      "assignedCharacters": "Assigned Characters",
+      "lore": "Journal",
+      "requirements": "Requirements",
+      "telemetry": "Event Log"
+    },
+    "slotLabel": "Slot {index}",
+    "status": {
+      "blocked": "Blocked",
+      "completed": "Completed",
+      "idle": "Idle",
+      "inProgress": "In Progress"
+    },
+    "telemetry": {
+      "empty": "No events recorded."
+    },
+    "type": {
+      "job": "Job",
+      "maintenance": "Maintenance",
+      "poi-activity": "POI Activity",
+      "quest": "Quest",
+      "training": "Training"
+    },
+    "workerAlt": "Worker"
+  },
   "THROW": "Throw",
   "SKIP": "Skip",
   "verdict": "Verdict",
