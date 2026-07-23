@@ -1,0 +1,104 @@
+{
+  "task_id": "OPS-SHUTDOWN-002",
+  "title": "Global Session Registry — Create the machine-wide session registry",
+  "description": "After OPS-SHUTDOWN-001 removed all legacy shutdown paths, build the single aggregated session registry used by the Global Session Shutdown Manager. The registry lives at ~/.rpg-shutdown/session-registry.json (outside any project) and tracks per-project sessions with heartbeats, state, and TTL.",
+  "plan_reference": "src/docs/docs/plans/ops_shutdown_remaining_phases_plan.md § 3.1",
+  "estimated_duration": "60-90 minutes",
+  "objectives": [
+    "Design a Zod-validated JSON registry schema with version, machineId, updatedAt, projects, sessions, and policy",
+    "Implement atomic read/write/lease renewal and stale-session recovery in TypeScript",
+    "Create CLI commands to register, heartbeat, and release sessions from any directory",
+    "Default TTL to 60 seconds; expired heartbeats transition to UNKNOWN",
+    "Keep real shutdown disabled and run only in dry-run / no-op mode"
+  ],
+  "success_criteria": [
+    "Registry file can be created, read, and updated atomically without data races",
+    "CLI commands succeed from any working directory",
+    "Expired sessions become UNKNOWN after TTL expiry",
+    "No code outside scripts/shutdownManager/ calls shutdown",
+    "Evidence log documents schema, commands, and stale-session test results"
+  ],
+  "kpi_targets": {
+    "registry_atomic_operations": "100%",
+    "stale_session_transition": "UNKNOWN after TTL",
+    "cli_cross_directory": "works from any path"
+  },
+  "integration_points": [
+    "~/.rpg-shutdown/session-registry.json",
+    "scripts/shutdownManager/",
+    "package.json scripts (optional registry helpers)",
+    "zod package (already in dependencies)"
+  ],
+  "dependencies": [
+    "OPS-SHUTDOWN-001 completed and verified",
+    "Zero unauthorized shutdown call sites outside scripts/shutdownManager/"
+  ],
+  "guardrails": {
+    "invariants": [
+      ".windsurf/rules/50-shutdown-governance.md — only scripts/shutdownManager/shutdownExecutor.ts may execute shutdown",
+      "Registry is an aggregated runtime view, not a source of truth; source of truth is the live process that heartbeats"
+    ],
+    "trusted_frozen_components": [],
+    "forbidden_actions": [
+      "Do NOT execute any shutdown command",
+      "Do NOT enable policy.shutdownEnabled === true",
+      "Do NOT store user credentials or secrets in the registry",
+      "Do NOT use localStorage/sessionStorage for the registry"
+    ]
+  },
+  "implementation_scope": {
+    "files_to_create": [
+      "scripts/shutdownManager/sessionRegistry.ts",
+      "scripts/shutdownManager/registerSession.ts",
+      "scripts/shutdownManager/heartbeatSession.ts",
+      "scripts/shutdownManager/releaseSession.ts",
+      "test-results/ops-shutdown-002-registry-<date>.log"
+    ],
+    "files_to_modify": [
+      "package.json — add optional registry helper scripts if useful"
+    ],
+    "files_to_delete_or_archive": [],
+    "component_reuse_requirements": [],
+    "testing_requirements": {
+      "unit_tests": [
+        "Registry read/write round-trip",
+        "Stale session TTL expiry",
+        "Zod schema rejects invalid entries",
+        "Concurrent atomic write does not corrupt file"
+      ],
+      "integration_tests": [
+        "CLI register/heartbeat/release from a temp directory outside the repo",
+        "Two parallel registrations for different projects do not collide"
+      ],
+      "accessibility_tests": []
+    },
+    "documentation_updates": [
+      "Add registry schema notes to src/docs/docs/plans/ops_shutdown_remaining_phases_plan.md if implementation diverges",
+      "Evidence log in test-results/"
+    ]
+  },
+  "safeguards": {
+    "lint": {
+      "scope": "scripts/shutdownManager/",
+      "timeout_seconds": 120
+    },
+    "test": {
+      "scope": "scripts/shutdownManager/",
+      "timeout_seconds": 300
+    },
+    "build_check": {
+      "timeout_seconds": 180
+    },
+    "kanban_lint": {
+      "timeout_seconds": 30
+    },
+    "evidence_log": "test-results/ops-shutdown-002-registry-<date>.log"
+  },
+  "execution_hint": "verified",
+  "notes": {
+    "registry_location": "Use path.join(os.homedir(), '.rpg-shutdown', 'session-registry.json'). Create the directory if it does not exist.",
+    "schema": "{ version: string, machineId: string, updatedAt: ISO string, projects: Record<projectId, { status: string, sessions: Record<sessionId, { pid: number, heartbeatAt: ISO, state: SessionState, blockingReason?: string, owner: string, ttlSeconds: number }> }>, policy: { dryRun: boolean, userIdleThresholdSeconds: number, shutdownEnabled: boolean } }",
+    "session_states": "STARTING, RUNNING, IDLE, WAITING_FOR_USER, BLOCKED, QUEUED, COMPLETED, FAILED, STOPPING, UNKNOWN",
+    "handoff": "After this phase completes, the coordinator may queue OPS-SHUTDOWN-003 (decision engine) once canShutdown() tests cover the 16-row decision matrix."
+  }
+}

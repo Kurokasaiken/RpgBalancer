@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, useCallback, type CSSProperties, type ReactNode } from 'react';
 import styles from './DragTestContainer.module.css';
-import { Eye, EyeOff, GripVertical } from 'lucide-react';
+import { Eye, EyeOff, GripVertical, ArrowUpDown } from 'lucide-react';
+import { getFilterStatKeys, getStatDisplayConfig } from '@/ui/idleVillage/config/rosterFilterConfig';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { formatResidentLabel } from '@/ui/idleVillage/residentName';
 import PgCard, { type PgCardProps } from '@/ui/idleVillage/components/PgCard';
@@ -192,6 +193,10 @@ function DragTestContainer({
     minHp: 0,
     maxFatigue: 100,
   });
+  // VISUAL MOCKUP ONLY — see the TODO block above the <select> in the JSX
+  // below for what this control must actually do once implemented.
+  const [statSortMockup, setStatSortMockup] = useState('');
+  const [statSortDirection, setStatSortDirection] = useState<'asc' | 'desc'>('desc');
   const [heroFlashIds, setHeroFlashIds] = useState<string[]>([]);
   const [recentlyDraggedResidentId, setRecentlyDraggedResidentId] = useState<string | null>(null);
   const [isRosterCollapsed, setIsRosterCollapsed] = useState(false);
@@ -1130,6 +1135,77 @@ function DragTestContainer({
                 <option value="dead">Caduti</option>
               </select>
             </label>
+
+            {/*
+             * TODO(roster-stat-sort): VISUAL MOCKUP ONLY — this control does not
+             * sort the roster yet (`statSortMockup`/`statSortDirection` are inert
+             * local state). Real implementation:
+             *
+             * 1. Stat list must stay DYNAMIC, not a hardcoded enum: this project's
+             *    stats are inherited from other systems (e.g. the Balancer), not
+             *    fixed. Keep sourcing options from `getFilterStatKeys()` /
+             *    `getStatDisplayConfig()` in
+             *    `@/ui/idleVillage/config/rosterFilterConfig` — already derived
+             *    from `StatBlock`, so it tracks whatever the Balancer defines.
+             * 2. Must COMBINE with the existing status filter (`filters.status`),
+             *    not replace it: apply the stat sort to `filteredResidents`
+             *    (defined above, ~line 241) — i.e. sort AFTER status filtering,
+             *    never on raw `residents`.
+             * 3. `sortedResidents` (~line 294) currently runs its OWN bespoke
+             *    comparator (hero-group-first, then alphabetical) and does NOT
+             *    go through `rosterSortConfig.ts`'s `sortResidents()` at all.
+             *    Decide: extend that local comparator to also sort by the
+             *    selected stat, or route through `rosterSortConfig.ts` (today
+             *    `RosterSortMode` is a closed union of 4 modes — would need to
+             *    become something like `{ stat: FilterStatKey; direction }` to
+             *    support arbitrary Balancer stats instead of just hp/fatigue).
+             * 4. Read each resident's value the SAME way `matchesCriterion` does
+             *    in rosterFilterConfig.ts: `resident.statSnapshot?.[stat] ?? 0`,
+             *    with a `Number.isFinite` guard before comparing.
+             * 5. Open design question: does hero-group precedence still win over
+             *    stat order, or does selecting a stat bypass hero-first grouping
+             *    entirely? Not decided — surface it for a product call, don't
+             *    assume when implementing.
+             */}
+            <label
+              className="flex items-center gap-1 px-1.5 py-0.5 text-[7px] uppercase tracking-[0.18em]"
+              style={{
+                borderRadius: 'var(--radius-sm, 2px)',
+                border: '1px solid var(--acc-primary-dark, #6a3c10)',
+                background: 'var(--card-bg, rgba(13,11,8,0.96))',
+                color: 'var(--t2, #c0a878)',
+              }}
+            >
+              <select
+                value={statSortMockup}
+                onChange={(e) => setStatSortMockup(e.target.value)}
+                className="bg-transparent text-[7px] uppercase tracking-[0.15em] focus:outline-none"
+                style={{ color: 'var(--t2, #c0a878)' }}
+                aria-label="Ordina residenti per statistica"
+                data-testid="roster-stat-sort-select"
+              >
+                <option value="">Ordina per…</option>
+                {getFilterStatKeys().map((stat) => (
+                  <option key={stat} value={stat}>{getStatDisplayConfig(stat).label}</option>
+                ))}
+              </select>
+            </label>
+            <button
+              type="button"
+              onClick={() => setStatSortDirection((d) => (d === 'asc' ? 'desc' : 'asc'))}
+              className={_controlButtonClassName}
+              style={{
+                borderRadius: 'var(--radius-sm, 2px)',
+                border: '1px solid var(--acc-primary-dark, #6a3c10)',
+                background: 'var(--card-bg, rgba(13,11,8,0.96))',
+                color: 'var(--t2, #c0a878)',
+              }}
+              aria-label={statSortDirection === 'asc' ? 'Ordine crescente' : 'Ordine decrescente'}
+              data-testid="roster-stat-sort-direction"
+            >
+              <ArrowUpDown className="h-2.5 w-2.5" />
+            </button>
+
             {headerControls}
             <button
               type="button"

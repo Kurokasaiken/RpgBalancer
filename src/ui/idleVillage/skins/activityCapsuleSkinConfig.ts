@@ -457,8 +457,54 @@ const RESIDENT_SLOT_RACK_SIGNATURE_ACTIVITY_CAPSULE = mergeActivityCapsuleConfig
   },
 );
 
+/**
+ * Material Language override (2026-07-19) — POI Detail harmonization proof.
+ * Uses this component's OWN override mechanism (no component code touched).
+ * Frame/slot reuse the obsidian+bronze family already validated on the
+ * Observatory wells (WellBronzeBezel) and the roster card (GOLD_FILET_SOFT):
+ * dark obsidian floor, bronze-gold hairline border, circular bronze slots.
+ * Progress = AMBER, not gold: per the semantic material matrix, this capsule
+ * tracks elapsedSeconds/totalDurationSeconds toward completion — a TIMER, the
+ * "tension/countdown" bucket (amber/ember), not the "progress/knowledge"
+ * bucket (molten gold) that XP/survey bars use. CTA (Collect) IS a reward
+ * claim, so it stays gold — same reasoning as the reward plaque.
+ */
+const MATERIC_LAB_ACTIVITY_CAPSULE = mergeActivityCapsuleConfig(
+  DEFAULT_ACTIVITY_CAPSULE_SKIN_CONFIG,
+  {
+    layout: {
+      frameBorder: 'rgba(198, 150, 54, 0.4)',
+      frameBackground: 'linear-gradient(165deg, #0b1620 0%, #060f16 100%)',
+      frameBorderRadius: '10px',
+      frameBoxShadow: 'inset 0 1px 0 rgba(224,178,66,0.12), 0 8px 24px rgba(0,0,0,0.45)',
+      slotBorderRadius: '50%',
+      slotBorder: '1px solid rgba(198, 150, 54, 0.45)',
+      slotBackground: 'radial-gradient(circle at 35% 30%, rgba(20,10,4,0.85), rgba(4,2,1,0.95))',
+    },
+    progress: {
+      progressBackground: 'linear-gradient(180deg, #05101c, #02070f)',
+      progressBorder: '1px solid rgba(60,110,150,0.12)',
+      progressFill: 'linear-gradient(90deg, #8a5410 0%, #c9852e 55%, #ffd98a 100%)',
+      liquidGoldGradient: 'linear-gradient(90deg, #8a5410, #c9852e, #ffd98a, #c9852e)',
+      liquidGoldGlow: '0 0 12px rgba(255,190,90,0.5)',
+      timerColor: '#f0cf6a',
+    },
+    cta: {
+      ctaBackground: 'linear-gradient(135deg, #f2d485 0%, #9c6c22 100%)',
+      ctaBorderColor: '#f0cf6a',
+      ctaTextColor: '#1c0f05',
+      ctaHoverBackground: 'linear-gradient(135deg, #ffe6b6 0%, #d3a63e 100%)',
+      ctaHoverBorderColor: '#fff2c4',
+    },
+    animation: {
+      slotHoverGlow: '0 0 16px rgba(255,190,90,0.4)',
+    },
+  },
+);
+
 export const ACTIVITY_CAPSULE_SKIN_OVERRIDES: Record<string, ActivityCapsuleSkinConfig> = {
   resident_slotrack_signature: RESIDENT_SLOT_RACK_SIGNATURE_ACTIVITY_CAPSULE,
+  materic_lab: MATERIC_LAB_ACTIVITY_CAPSULE,
 };
 
 export function getActivityCapsuleSkinOverrideById(

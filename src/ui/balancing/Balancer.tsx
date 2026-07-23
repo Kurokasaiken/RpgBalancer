@@ -64,6 +64,7 @@ const SortableCard: React.FC<SortableCardProps> = ({
   onOpenStatEditor,
   onOpenCardEditor,
 }) => {
+  const { t } = useTranslation();
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: card.id });
 
   const hasManyStats = card.statIds.length >= 4;

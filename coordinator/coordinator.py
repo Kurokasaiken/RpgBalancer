@@ -21,6 +21,7 @@ from dispatcher import (
     get_manual_status,
     print_manual_reminder,
     send_manual_notification,
+    update_strategy_tasks_status,
 )
 from registry_manager import (
     get_available_models,
@@ -402,7 +403,9 @@ def migrate_strategy_to_assignments() -> int:
         print(f"[MIGRATION] Migrated {len(new_rows)} tasks from strategy_tasks.md to agent_assignments.md")
         for task in new_tasks:
             print(f"  - {task['task_id']}: {task.get('title', 'N/A')}")
-        
+            # Reflect migration in strategy_tasks.md
+            update_strategy_tasks_status(task["task_id"], "In corso")
+
         return len(new_rows)
     except IOError as e:
         print(f"[ERROR] Failed to write to agent_assignments.md: {e}")

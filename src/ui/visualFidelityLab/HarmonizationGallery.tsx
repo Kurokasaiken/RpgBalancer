@@ -3,14 +3,24 @@ import type { CSSProperties, ReactNode } from 'react';
 import './matericSkin.css';
 import { ErrorBoundary } from '@/ui/organisms/ErrorBoundary';
 import { FIELD_BACKGROUND, FIELD_VIGNETTE } from './foundationRecipe';
-import { PgCardStandalone, residentToPgCardProps } from '@/ui/idleVillage/frozen/kits/pgcardKit';
-import { pgcardFixtureResidents } from '@/ui/idleVillage/frozen/kits/pgcardKit.fixture';
-// Import each Standalone DIRECTLY from its kit file — the barrel index re-exports
-// slottedMedalKit, whose `@/ui/idleVillage/components/SlottedMedal` import is broken
-// upstream (pre-existing), and pulling the barrel would fail the whole module.
+// Real embedded contexts, imported DIRECTLY from each kit file — the barrel
+// index (`frozen/kits/index.ts`) re-exports `slottedMedalKit`, whose
+// `@/ui/idleVillage/components/SlottedMedal` import is broken upstream
+// (pre-existing, not ours), so pulling the barrel fails the whole module.
+//
+// NB: the pgCard is NEVER shown solo in the product — the real context is the
+// ROSTER (a list of embedded cards). The standalone card + its "no compatible
+// slot" banner are testing-only artifacts, so we mount the real roster surface
+// instead: `MatericRosterComponent` is exactly what `/minimal-roster` renders.
+import { MatericRosterComponent } from '@/ui/idleVillage/components/MatericRosterComponent';
 import { ClockWidgetStandalone } from '@/ui/idleVillage/frozen/kits/clockKit';
-import { ActivityCapsuleStandalone } from '@/ui/idleVillage/frozen/kits/activityCapsuleKit';
 import { QuestPOIStandalone } from '@/ui/idleVillage/frozen/kits/poiKit';
+// The REAL POI Detail (per user correction, reference = /poi-detail-verification)
+// is `ActivityCapsuleDetailSkinAware` + `POI_DETAIL_SKIN_CONFIG` ("Dark Luxury"),
+// NOT the bare `ActivityCapsule` — that earlier assumption was wrong. Reusing the
+// exact same fixture source as the reference page (no forking/duplicating).
+import { ActivityCapsuleDetailSkinAware } from '@/ui/idleVillage/skins/activityCapsuleDetail/ActivityCapsuleDetailSkinAware';
+import { DEFAULT_IDLE_VILLAGE_CONFIG } from '@/balancing/config/idleVillage/defaultConfig';
 
 /**
  * Harmonization Gallery — the BRIDGE surface (2026-07-18).
@@ -18,42 +28,85 @@ import { QuestPOIStandalone } from '@/ui/idleVillage/frozen/kits/poiKit';
  * Real, canonical components (mounted via their frozen kits, with fixture data)
  * shown so we can judge whether they belong to the same game as the Material
  * Language. HARMONIZATION IS A CSS-VARIABLE FLAG: the `.materic-skin` class
- * (see matericSkin.css) sets ~8 tokens; present = materic, absent = "liscio".
- * The components are UNTOUCHED — they read those tokens with their own fallbacks.
+ * (see matericSkin.css) sets the material tokens; present = materico, absent =
+ * "liscio". The components are UNTOUCHED — they read those tokens with their
+ * own fallbacks (see matericSkinConfig.ts's `var(--mat-*, <current>)` hooks).
  *
- * Modes: "Coppie" (as-is | materic side by side), "Materico" (default look),
- * "Liscio" (revert). The last two ARE the trivial flag the game would use.
+ * Modes: "Coppie" (as-is | materico side by side), "Solo materico" (default
+ * look), "Solo liscio" (revert). The last two ARE the trivial flag the game
+ * would use — to ship materic as the default, add `.materic-skin` at the app
+ * root; to revert, remove it.
  *
- * Today the flag maps the STAT-BAR tokens (proven on PgCard). Components without
- * bars (medal, clock, POI…) render the same in both columns until their own
- * material tokens are mapped — labelled honestly per tab.
+ * NOTE ON THE BLUE FIELD: the `FIELD_BACKGROUND` wrapper below is the lab's
+ * validated blue-night atmosphere (Observatory), used here so each component
+ * is judged in a consistent "world" frame, not on a neutral background. In the
+ * real game a component's own field/surface token applies — this wrapper is a
+ * gallery convenience, not a claim that e.g. the roster's real background
+ * should become this blue.
+ *
+ * KNOWN HAZARD: this project's autonomous coordinator/ai-worker can perform
+ * destructive git operations (an "undo accidental commit" wiped uncommitted
+ * lab edits once already this session — see project memory). Uncommitted work
+ * in this file and its sibling token files is at risk until committed.
  */
 
 type Mode = 'pairs' | 'materic' | 'plain';
-
-const PG_FALLBACK = { workerId: 'gal-pg', label: 'Salvatrice', hp: 168, maxHp: 210, fatigue: 22 };
-let pgProps: Record<string, unknown> = PG_FALLBACK;
-try {
-  const first = pgcardFixtureResidents?.[0];
-  // keep the real portrait from the fixture, but populate the bars with realistic
-  // values (the fixture resident sits at 0 HP → bars would be empty = unjudgeable)
-  if (first) pgProps = { ...residentToPgCardProps(first), label: 'Salvatrice', hp: 168, maxHp: 210, fatigue: 22 };
-} catch {
-  /* keep fallback if fixture/portrait derivation throws at module load */
-}
 
 interface GalleryTab {
   id: string;
   label: string;
   note?: string;
-  render: (instanceKey: string) => ReactNode;
+  render: (instanceKey: string, materic: boolean) => ReactNode;
 }
+
+// Same fixture shape as PoiDetailVerificationPage.tsx (the reference page) —
+// reusing the real quest config, not inventing new data.
+const _questConfig = DEFAULT_IDLE_VILLAGE_CONFIG.activities.quest_dangerous_hunt;
+const _questDurationMs = parseInt(_questConfig.durationFormula, 10);
+const _questProgress = 0.65;
+const _questElapsedMs = Math.floor(_questDurationMs * _questProgress);
+const POI_DETAIL_FIXTURE = {
+  pillar: 'wilderness' as const,
+  activityId: _questConfig.id,
+  name: _questConfig.label,
+  type: 'quest' as const,
+  questTags: _questConfig.tags,
+  subtitle: _questConfig.description,
+  status: 'in-progress' as const,
+  progress: _questProgress,
+  duration: _questDurationMs,
+  elapsed: _questElapsedMs,
+  slots: [
+    { id: 'slot-1', state: 'empty' as const, initial: '', progress: 0 },
+    { id: 'slot-2', state: 'empty' as const, initial: '', progress: 0 },
+    {
+      id: 'slot-3', state: 'active' as const, initial: 'GD', progress: 0.65,
+      assignedWorkerName: 'Giggiolillo', assignedWorkerAvatarUrl: '/assets/portraits/giggiolillo.png',
+    },
+  ],
+  maxSlots: _questConfig.maxSlots === 'infinite' ? 99 : _questConfig.maxSlots,
+  durationDisplay: `${_questDurationMs / 1000}s`,
+  telemetry: [
+    { id: 'tel-1', timestamp: new Date(Date.now() - 3600000), message: 'Activity started', type: 'start' as const },
+    { id: 'tel-2', timestamp: new Date(Date.now() - 1800000), message: 'Worker assigned to slot 3', type: 'assign' as const },
+    { id: 'tel-3', timestamp: new Date(Date.now() - 600000), message: 'Progress update: 65%', type: 'done' as const },
+  ],
+  isOpen: true,
+  showTelemetry: true,
+  showSlots: true,
+  showInfo: true,
+  compact: false,
+  inlineMode: false,
+  ariaLabel: `POI Detail: ${_questConfig.label}`,
+  ariaLive: 'polite' as const,
+};
 
 const TABS: GalleryTab[] = [
   {
-    id: 'pgcard',
-    label: 'PgCard',
-    render: (k) => <PgCardStandalone {...(pgProps as Record<string, never>)} workerId={`gal-pg-${k}`} />,
+    id: 'roster',
+    label: 'Roster',
+    note: 'contesto reale del pgCard: MatericRosterComponent, come /minimal-roster — differenza = colore barre + card rialzata',
+    render: (k) => <MatericRosterComponent componentId={`gallery-roster-${k}`} />,
   },
   {
     id: 'clock',
@@ -64,8 +117,13 @@ const TABS: GalleryTab[] = [
   {
     id: 'poidetail',
     label: 'POI Detail',
-    note: 'mapping materico da fare (field/slot/bar) — per ora uguale nei due',
-    render: () => <ActivityCapsuleStandalone />,
+    note: 'VERDETTO: la skin "Dark Luxury" (POI_DETAIL_SKIN_CONFIG) è GIÀ vicina alla Material Language — bronzo/oro/quasi-nero, slot medaglione, stessi anti-pattern (no flat button, no wide glow). Nessun override costruito: le due colonne sono identiche di proposito. Bug SEPARATO trovato (non materico): chiavi i18n non tradotte visibili a schermo (ACTIVITYCAPSULE.STATUS.*).',
+    render: (k) => (
+      <ActivityCapsuleDetailSkinAware
+        {...POI_DETAIL_FIXTURE}
+        dataTestId={`gallery-poi-detail-${k}`}
+      />
+    ),
   },
   {
     id: 'poi',
@@ -148,7 +206,7 @@ export const HarmonizationGallery: React.FC = () => {
 
       <div
         style={{
-          maxWidth: mode === 'pairs' ? 900 : 480,
+          maxWidth: 1200,
           margin: '0 auto',
           padding: 26,
           borderRadius: 14,
@@ -157,20 +215,20 @@ export const HarmonizationGallery: React.FC = () => {
         }}
       >
         {mode === 'pairs' ? (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28, alignItems: 'start' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 36 }}>
             <div>
               <p style={caption}>as-is (liscio)</p>
-              <Skinned materic={false} tag={`${tab.id}-asis`}>{tab.render('asis')}</Skinned>
+              <Skinned materic={false} tag={`${tab.id}-asis`}>{tab.render('asis', false)}</Skinned>
             </div>
             <div>
               <p style={caption}>materico (default)</p>
-              <Skinned materic tag={`${tab.id}-mat`}>{tab.render('mat')}</Skinned>
+              <Skinned materic tag={`${tab.id}-mat`}>{tab.render('mat', true)}</Skinned>
             </div>
           </div>
         ) : (
           <div>
             <p style={caption}>{mode === 'materic' ? 'materico (default)' : 'liscio (revert)'}</p>
-            <Skinned materic={mode === 'materic'} tag={`${tab.id}-solo`}>{tab.render('solo')}</Skinned>
+            <Skinned materic={mode === 'materic'} tag={`${tab.id}-solo`}>{tab.render('solo', mode === 'materic')}</Skinned>
           </div>
         )}
       </div>

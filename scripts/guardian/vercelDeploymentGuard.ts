@@ -374,64 +374,6 @@ const isDirectExecution = (): boolean => {
   }
 };
 
-function shutdownSystem(reason: string, detail: string): void {
-  console.log(`Session ${reason === 'SUCCESS' ? 'completed' : 'failed'} - initiating shutdown: ${reason}`);
-  
-  // Create final session summary
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const finalLog = `test-results/auto-commit-guardian/${timestamp}-session-complete.log`;
-  const summary = `=== GUARDIAN SESSION COMPLETE ===
-Timestamp: ${new Date().toISOString()}
-Stage: deployment
-Branch: main
-Final Status: ${reason}
-Shutdown Reason: ${reason}
-Detail: ${detail}
-================================`;
-  
-  try {
-    const fs = require('fs');
-    const path = require('path');
-    fs.mkdirSync(path.dirname(finalLog), { recursive: true });
-    fs.writeFileSync(finalLog, summary);
-    console.log(`Final session summary written to: ${finalLog}`);
-  } catch (err) {
-    console.log(`Failed to write session summary: ${(err as Error).message}`);
-  }
-
-  // Attempt graceful shutdown with unattended safety checks
-  const { exec, spawnSync } = require('child_process');
-  
-  // Check for unattended sudo access
-  if (process.platform === 'linux') {
-    const sudoCheck = spawnSync('sudo', ['-n', 'true'], { stdio: 'pipe' });
-    if (sudoCheck.status === 0) {
-      console.log('Executing unattended Linux shutdown...');
-      exec('sudo shutdown -h now', (err: any) => {
-        if (err) {
-          console.log('Linux shutdown failed - no fallback available');
-        }
-      });
-    } else {
-      console.log('No unattended sudo access - cannot shutdown Linux');
-    }
-  } else if (process.platform === 'darwin') {
-    console.log('Executing macOS shutdown via osascript...');
-    exec('osascript -e "tell application \\"System Events\\" to shut down"', (err: any) => {
-      if (err) {
-        console.log('macOS shutdown failed - no fallback available');
-      }
-    });
-  } else {
-    console.log('Shutdown command not available for this platform - session ended');
-  }
-  
-  // Force exit after short delay to prevent hanging
-  setTimeout(() => {
-    console.log('Forcing process exit - session ended');
-    process.exit(0);
-  }, 3000);
-}
 
 // Run deployment guard if called directly
 if (isDirectExecution()) {
@@ -440,17 +382,17 @@ if (isDirectExecution()) {
     .then(result => {
       if (result.success) {
         console.log('\n Deployment guard completed successfully');
-        shutdownSystem('SUCCESS', 'Deployment completed successfully');
+        console.log('SHUTDOWN_CAPABILITY_NOT_OWNED: deployment completed successfully');
         process.exit(0);
       } else {
         console.log(`\n Deployment guard failed: ${result.error}`);
-        shutdownSystem('DEPLOYMENT_FAILED', result.error || 'Unknown deployment error');
+        console.log('SHUTDOWN_CAPABILITY_NOT_OWNED: deployment guard failed - ' + (result.error || 'Unknown deployment error'));
         process.exit(1);
       }
     })
     .catch(error => {
       console.error('Deployment guard error:', error);
-      shutdownSystem('DEPLOYMENT_ERROR', (error as Error).message);
+      console.log('SHUTDOWN_CAPABILITY_NOT_OWNED: deployment guard error - ' + (error as Error).message);
       process.exit(1);
     });
 }

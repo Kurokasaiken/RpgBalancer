@@ -4,6 +4,10 @@
 <!-- Executor values: ai-worker | harness | manual -->
 <!-- Scripts (bridge_ai_worker.py, sync_ai_worker.py) auto-migrate legacy rows to 8-column format -->
 
+| OPS-SHUTDOWN-002 | Completato | 2026-07-23 | Cascade | Gating verificato: audit log presente, zero call site shutdown non autorizzati, commitFailureMonitor.js/vercelDeploymentGuard.ts senza shutdownSystem | manual | Override execution_hint 'verified' → manual: componente architetturale fondazionale, esecuzione manuale supervisionata per handoff coordinator | Prompt: prompts/OPS-SHUTDOWN-002.spec.json; Dispatch: coordinator/manual-dispatch/pending/OPS-SHUTDOWN-002.md |
+
+| OPS-SHUTDOWN-001 | Completato | 2026-07-23 | Cascade | Legacy shutdown/auto-commit/auto-push references archived/neutralised; shutdownSystem removed from commitFailureMonitor.js and vercelDeploymentGuard.ts; second grep, launchctl/crontab, lint, build:check and kanban:lint passed | manual | OPS-SHUTDOWN-001 cleanup executed and verified | Evidence: test-results/ops-shutdown-001-audit-2026-07-22.log |
+
 | OPS-SHUTDOWN-000 | Completato | 2026-07-22 | Cascade | Emergency kill switch complete — evidence: test-results/ops-shutdown-000-emergency-2026-07-22.log | manual | Local shell execution, emergency kill switch, no parallel phases | ```text
 AGENT
 OPS-SHUTDOWN-000 — Emergency Kill Switch
@@ -69,6 +73,46 @@ SAFEGUARDS
 NOTE
 - Se `Foresta 1 chiara alto sin .png` crea problemi di caricamento, rimuovi lo spazio finale e aggiorna il manifest.
 - Al completamento: `KANBAN STATUS: IV-WORLD-SURFACE-HD-001 – Completato (Evidence: test-results/iv-world-surface-hd-001-<YYYY-MM-DD>.log)`
+```
+
+| IV-WORLD-SURFACE-HD-002 | Completato | 2026-07-23 | Cascade | Evidence: `test-results/iv-world-surface-hd-002-2026-07-23.log` | manual | asset judgment, i18n, runtime hardening | ```text
+AGENT
+IV-WORLD-SURFACE-HD-002 — World Surface HD Asset Migration & Runtime Hardening
+
+ISTRUZIONI
+Sei un agente Windsurf: consulta le skill `agent-execution-mandate` e `idle-village-task` prima di iniziare.
+Il prompt completo e' in `prompts/IV-WORLD-SURFACE-HD-002.md`.
+
+OBIETTIVO
+Sostituire i layer PNG in `public/assets/world/wanderlust/base/layers/` con quelli HD in `hd-photo-Map finale/`, rimuovendo `Livello 1.png` e `mare.png` (non piu' presenti nel set scontornato), normalizzare i nomi file (nessuno spazio finale, casing coerente), aggiornare `manifest.json`, aggiungere fallback per immagini mancanti in `WorldSurfaceRenderer.tsx` e validazione semantica dei file referenziati.
+
+FILE CHIAVE
+- `public/assets/world/wanderlust/base/manifest.json`
+- `public/assets/world/wanderlust/base/layers/`
+- `hd-photo-Map finale/` (sorgente HD, non cancellare)
+- `src/ui/idleVillage/components/WorldSurfaceRenderer.tsx`
+- `src/ui/idleVillage/utils/validateWorldSurfaceAssets.ts` (nuovo)
+- `public/assets/world/wanderlust/base/README.md` (nuovo/aggiornato)
+
+INVARIANTI
+- PersistenceService per l'ordine dei layer gia' esistente.
+- i18n namespace `idleVillage`, zero stringhe hardcoded.
+- No CSS standalone, tema Gilded Observatory.
+- JSDoc su nuove funzioni/proprieta'.
+- Il renderer non deve conoscere i nomi dei file: unico SSOT e' `manifest.json`.
+
+SAFEGUARDS
+- `npm run lint -- src/ui/idleVillage/components/WorldSurfaceRenderer.tsx src/ui/idleVillage/utils/validateWorldSurfaceAssets.ts public/assets/world/wanderlust/base/manifest.json`
+- `npm run test -- tests/unit/idleVillage/WorldSurfaceRenderer.test.tsx`
+- `npm run build:check`
+- `npm run kanban:lint`
+- Evidence log: `test-results/iv-world-surface-hd-002-<YYYY-MM-DD>.log`
+
+NOTE
+- Se `Foresta 1 chiara alto sin .png` ha spazio finale, rinominare a `Foresta 1 chiara alto sin.png` e aggiornare `manifest.json`.
+- Allineare `Frame.png`/`frame.png` con il casing scelto dall'artista.
+- `map finale no frame no nuvole.png` e' opzionale: se non serve a runtime, non inserirlo nel manifest.
+- Al completamento: `KANBAN STATUS: IV-WORLD-SURFACE-HD-002 – Completato (Evidence: test-results/iv-world-surface-hd-002-<YYYY-MM-DD>.log)`
 ```
 
 | IV-TRAILER-ANNOUNCE-001 | Completato | 2026-07-18 | Cascade | Evidence: test-results/iv-trailer-announce-001-2026-07-18.log | manual | @trailer-only, design judgment | ```text
@@ -6568,7 +6612,7 @@ Export: `BuilderConfigSchema`, `defaultBuilderConfig`, `BuilderConfig`
 EVIDENCE LOG
 - test-results/gm-bld-builder-tooling-<YYYY-MM-DD>.log
 ```
-| GM-TEL – Gameplay Modifier Telemetry & Logging Pipeline | Assegnato | manual | 2026-07-22T23:30:00Z | Sbloccato dopo completamento GM-BLD. Dispatch manuale Cascade. Prompt: coordinator/manual-dispatch/pending/GM-TEL.md. |
+| GM-TEL – Gameplay Modifier Telemetry & Logging Pipeline | Completato | manual | 2026-07-22T23:30:00Z | Sbloccato dopo completamento GM-BLD. Dispatch manuale Cascade. Prompt: coordinator/manual-dispatch/pending/GM-TEL.md. |
 AGENT
 Telemetry Specialist – Modifier Analytics
 
@@ -11184,7 +11228,7 @@ NOTE:
 | WORLD-PRESENTATION-RUNTIME-FOUNDATION — World Presentation Runtime Foundation | Completato | - | Cascade | 2026-07-20T09:58:00Z | 2026-07-22T16:05:00Z | manual | execution_hint architectural, design judgment | 2026-07-22T16:05:00Z | Closed with trusted doc and evidence log. Evidence: test-results/WORLD-PRESENTATION-RUNTIME-DEMO-2026-07-22.log |
 | WORLD-PRESENTATION-RUNTIME-DEMO — World Presentation Runtime Demo (Milestone A: Threat Semantic Presence) | Completato | WORLD-PRESENTATION-RUNTIME-FOUNDATION | Cascade | 2026-07-22T12:30:00Z | 2026-07-22T16:05:00Z | manual | execution_hint architectural, design judgment | 2026-07-22T16:05:00Z | ThreatPresenceEffect + threat scenario + inspector verified. Evidence: test-results/WORLD-PRESENTATION-RUNTIME-DEMO-2026-07-22.log |
 | IV-SLOT-RACK-RESKIN-001 — Slot Rack Container Reskin to Roster Materic Style | Completato | - | Cascade | 2026-07-22 | Evidence: test-results/iv-slot-rack-reskin-2026-07-22.log; safeguards passed | manual | harness failure, manual retry |
-| POI-MEDALLION-MATERIAL-PREVIEW-00E669 — POI Medallion Material Preview (GenericPoiSkin V2) | In corso | 2026-07-22 | Cascade | prompt:check passed; GenericPoiSkin base medallion V2 with Materic stone/bronze aesthetic; A/B route /poi-visual-preview; canonical files untouched | manual | execution_hint architectural, visual design judgment | Prompt: coordinator/manual-dispatch/pending/POI-MEDALLION-MATERIAL-PREVIEW-00E669.md |
+| POI-MEDALLION-MATERIAL-PREVIEW-00E669 — POI Medallion Material Preview (GenericPoiSkin V2) | Completato | 2026-07-22 | Cascade | prompt:check passed; GenericPoiSkin base medallion V2 with Materic stone/bronze aesthetic; A/B route /poi-visual-preview; canonical files untouched | manual | execution_hint architectural, visual design judgment | Prompt: coordinator/manual-dispatch/pending/POI-MEDALLION-MATERIAL-PREVIEW-00E669.md |
 | AI-SMOKE-TEST-001 — Trivial atomic ai-worker dispatch test | In corso | - | - | Smoke test for ai-worker kanban dispatch | ai-worker | atomic single-file, no safeguards | ```text |
 AGENT
 Write a short markdown file confirming this ai-worker smoke test executed.
