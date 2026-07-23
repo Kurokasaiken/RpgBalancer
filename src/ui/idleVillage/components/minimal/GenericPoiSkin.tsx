@@ -1,6 +1,8 @@
 import type { JSX } from 'react';
 import { useId, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from '@/localization/useTranslation';
+import { computeStageState, colorToRgba, type ColorPalette } from './expiryStageEngine';
+import { getPoiPalette } from '../../../visualFidelityLab/poiMedallionRecipe';
 
 export interface GenericPoiSkinProps {
   icon?: string;
@@ -17,8 +19,10 @@ export interface GenericPoiSkinProps {
   isCompleted?: boolean;
   enableHover?: boolean;
   timeRemainingMs?: number;
-  expirationThresholdMs?: number;
+  totalDurationMs?: number; // Ignored if isExpirable is false; default: 60000 (60s)
+  expirationThresholdMs?: number; // Deprecated: kept for backwards compat, use totalDurationMs instead
   isExpirable?: boolean;
+  cardKind?: 'quest' | 'event' | 'job' | 'activity';
   injuryRisk?: number;
   deathRisk?: number;
   dangerRating?: number | string;
@@ -130,8 +134,10 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
     isCompleted = false,
     enableHover = true,
     timeRemainingMs,
+    totalDurationMs = 60000,
     expirationThresholdMs = 60000,
     isExpirable = false,
+    cardKind,
     injuryRisk,
     deathRisk,
     dangerRating,
@@ -150,23 +156,35 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
   const completedCoronaCore = isCompleted ? desaturate(coronaCore) : coronaCore;
   const completedCoronaGlow = isCompleted ? desaturate(coronaGlow) : coronaGlow;
 
-  const isNearExpiration = timeRemainingMs !== undefined && timeRemainingMs < expirationThresholdMs;
-  const showUrgentPulse = isExpirable && isNearExpiration;
-  const expirationRatio = timeRemainingMs !== undefined && timeRemainingMs > 0 ? Math.min(timeRemainingMs / expirationThresholdMs, 1) : 1;
-  const expirationColorShift = isNearExpiration ? 1 - expirationRatio : 0;
+  // Expiry stage machine (3-stage monotonous escalation)
+  const remainingFraction = useMemo(() => {
+    if (!isExpirable || timeRemainingMs === undefined || totalDurationMs === undefined) return 1;
+    return Math.max(0, Math.min(timeRemainingMs / totalDurationMs, 1));
+  }, [isExpirable, timeRemainingMs, totalDurationMs]);
 
-  const expiredCoronaCore = useMemo(
-    () => (isNearExpiration
-      ? { r: Math.round(completedCoronaCore.r + (255 - completedCoronaCore.r) * expirationColorShift), g: Math.round(completedCoronaCore.g * (1 - expirationColorShift)), b: Math.round(completedCoronaCore.b * (1 - expirationColorShift)) }
-      : completedCoronaCore),
-    [isNearExpiration, expirationColorShift, completedCoronaCore]
-  );
-  const expiredCoronaGlow = useMemo(
-    () => (isNearExpiration
-      ? { r: Math.round(completedCoronaGlow.r + (255 - completedCoronaGlow.r) * expirationColorShift), g: Math.round(completedCoronaGlow.g * (1 - expirationColorShift)), b: Math.round(completedCoronaGlow.b * (1 - expirationColorShift)) }
-      : completedCoronaGlow),
-    [isNearExpiration, expirationColorShift, completedCoronaGlow]
-  );
+  // Get palette for POI type (quest/event/job/activity)
+  const poiPalette = useMemo(() => {
+    const palette = getPoiPalette(cardKind);
+    return palette as ColorPalette;
+  }, [cardKind]);
+
+  const stageState = useMemo(() => {
+    if (!isExpirable) {
+      // No expiry: use calm state with coronaCore/coronaGlow
+      return {
+        stage: 'calm' as const,
+        fillColor: completedCoronaCore,
+        glowColor: completedCoronaGlow,
+        pulseIntensity: 0.2,
+        rotationActive: false,
+      };
+    }
+    return computeStageState(remainingFraction, poiPalette);
+  }, [isExpirable, remainingFraction, poiPalette, completedCoronaCore, completedCoronaGlow]);
+
+  const expiredCoronaCore = stageState.fillColor;
+  const expiredCoronaGlow = stageState.glowColor;
+  const showUrgentPulse = isExpirable && stageState.stage !== 'calm';
 
   const stoneGradientId = `sg-${uniqueId}`;
   const stoneAmbientId = `sa-${uniqueId}`;
@@ -215,8 +233,12 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
       state.fillProgress = fillProg;
       state.phase += 0.015;
 
-      if (isNearExpiration) state.rotationPhase -= 0.02;
-      const pulse = fillProg >= 0.999 ? 0.6 + 0.4 * Math.sin(state.phase) : 1.0;
+      if (stageState.rotationActive) state.rotationPhase -= 0.02;
+
+      // Pulse based on stage + completion
+      const basePulse = fillProg >= 0.999
+        ? 0.6 + 0.4 * Math.sin(state.phase)
+        : 1.0 - stageState.pulseIntensity * 0.3 * (Math.sin(state.phase) - 0.5);
 
       const outerDrawn = outerCircumference * Math.min(fillProg, 1);
       const outerGap = Math.max(0, outerCircumference - outerDrawn);
@@ -224,7 +246,7 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
       const innerGap = Math.max(0, innerCircumference - innerDrawn);
 
       const baseRotation = -90;
-      const rotation = isNearExpiration ? baseRotation + state.rotationPhase : baseRotation;
+      const rotation = stageState.rotationActive ? baseRotation + state.rotationPhase : baseRotation;
 
       const outerEl = svgRef.current.querySelector('[data-halo="outer"]') as SVGCircleElement | null;
       if (outerEl) {
@@ -249,11 +271,7 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
 
     const frameId = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(frameId);
-  }, [progress, expiredCoronaCore, expiredCoronaGlow, isNearExpiration, outerCircumference, innerCircumference]);
-
-  const tickAngles = Array.from({ length: 12 }, (_, i) => (i * 30 * Math.PI) / 180);
-  const tickOuterR = 16;
-  const tickInnerR = 13.5;
+  }, [progress, expiredCoronaCore, expiredCoronaGlow, stageState, outerCircumference, innerCircumference]);
 
   const haloColor = `rgba(${expiredCoronaGlow.r},${expiredCoronaGlow.g},${expiredCoronaGlow.b},0.5)`;
   const innerHaloColor = `rgba(${expiredCoronaCore.r},${expiredCoronaCore.g},${expiredCoronaCore.b},0.55)`;
@@ -435,22 +453,6 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
         ) : (
           <circle cx="0" cy="0" r={rimRx} fill="none" stroke="rgba(255,235,148,.32)" strokeWidth="0.8" strokeDasharray="22 71" strokeDashoffset="18" strokeLinecap="round" />
         )}
-
-        {tickAngles.map((angle, i) => {
-          const isCardinal = i % 3 === 0;
-          const xOut = Math.cos(angle) * tickOuterR;
-          const yOut = Math.sin(angle) * tickOuterR;
-          const xIn = Math.cos(angle) * tickInnerR;
-          const yIn = Math.sin(angle) * tickInnerR;
-          return (
-            <line key={i} x1={xIn} y1={yIn} x2={xOut} y2={yOut} stroke="rgba(255,215,120,.20)" strokeWidth={isCardinal ? 0.9 : 0.8} strokeLinecap="round" />
-          );
-        })}
-
-        {[0, Math.PI / 2, Math.PI, -Math.PI / 2].map((angle, i) => {
-          const r = 14.7;
-          return <circle key={`dot-${i}`} cx={Math.cos(angle) * r} cy={Math.sin(angle) * r} r="1" fill="rgba(255,215,120,.20)" />;
-        })}
 
         {isStone ? (
           <>
