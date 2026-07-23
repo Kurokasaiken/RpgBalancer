@@ -3,6 +3,7 @@ import { useId, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from '@/localization/useTranslation';
 import { computeStageState, colorToRgba, type ColorPalette } from './expiryStageEngine';
 import { getPoiPalette } from '../../../visualFidelityLab/poiMedallionRecipe';
+import { PoiParticles } from './PoiParticles';
 
 export interface GenericPoiSkinProps {
   icon?: string;
@@ -481,6 +482,9 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
         <g data-poi-pin>
           <PoiIcon icon={icon} color={completedPinColor} clipPathId={clipId} />
         </g>
+
+        {/* Particles (perf-gated, only on hover/selected) */}
+        <PoiParticles isVisible={isHovered && enableHover && isExpirable} color={expiredCoronaGlow} />
 
         {isStone ? (
           <>
