@@ -75,7 +75,7 @@ NOTE
 - Al completamento: `KANBAN STATUS: IV-WORLD-SURFACE-HD-001 – Completato (Evidence: test-results/iv-world-surface-hd-001-<YYYY-MM-DD>.log)`
 ```
 
-| IV-WORLD-SURFACE-HD-002 | Completato | 2026-07-23 | Cascade | Evidence: `test-results/iv-world-surface-hd-002-2026-07-23.log` | manual | asset judgment, i18n, runtime hardening | ```text
+| IV-WORLD-SURFACE-HD-002 | Completato | 2026-07-23 | Cascade | Evidence: `test-results/iv-world-surface-hd-002-2026-07-23.log` (includes HD layer offset/scale correction) | manual | asset judgment, i18n, runtime hardening | ```text
 AGENT
 IV-WORLD-SURFACE-HD-002 — World Surface HD Asset Migration & Runtime Hardening
 
