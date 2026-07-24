@@ -158,7 +158,74 @@
       "status": "pending",
       "timestamp": "2026-07-23T13:36:24.277184+00:00",
       "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/IV-WORLD-SURFACE-HD-002.md"
+    },
+    {
+      "task_id": "OPS-OVERNIGHT-001",
+      "status": "completed",
+      "timestamp": "2026-07-23T18:37:05.294067+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/completed/OPS-OVERNIGHT-001.md",
+      "completed_at": "2026-07-23T19:08:41.525493+00:00"
+    },
+    {
+      "task_id": "IV-PROG-P1",
+      "status": "pending",
+      "timestamp": "2026-07-23T18:37:05.295809+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/IV-PROG-P1.md"
+    },
+    {
+      "task_id": "IV-TF-001",
+      "status": "pending",
+      "timestamp": "2026-07-23T18:37:05.297492+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/IV-TF-001.md"
+    },
+    {
+      "task_id": "WL-LORE-DROP-F1",
+      "status": "pending",
+      "timestamp": "2026-07-23T18:37:05.298653+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/WL-LORE-DROP-F1.md"
+    },
+    {
+      "task_id": "IV-WSC-P1",
+      "status": "pending",
+      "timestamp": "2026-07-23T18:37:05.300063+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/IV-WSC-P1.md"
+    },
+    {
+      "task_id": "IV-WSV3-P5",
+      "status": "pending",
+      "timestamp": "2026-07-23T18:37:05.301143+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/IV-WSV3-P5.md"
+    },
+    {
+      "task_id": "REND-SYS-P1",
+      "status": "pending",
+      "timestamp": "2026-07-23T18:37:05.302437+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/REND-SYS-P1.md"
+    },
+    {
+      "task_id": "ART-DIR-UPDATE-001",
+      "status": "pending",
+      "timestamp": "2026-07-23T18:37:05.309969+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/ART-DIR-UPDATE-001.md"
+    },
+    {
+      "task_id": "WL-WPG-001-CONCEPT",
+      "status": "pending",
+      "timestamp": "2026-07-23T18:37:05.311824+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/WL-WPG-001-CONCEPT.md"
+    },
+    {
+      "task_id": "WL-TEASER-D1",
+      "status": "pending",
+      "timestamp": "2026-07-23T18:37:05.313420+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/WL-TEASER-D1.md"
+    },
+    {
+      "task_id": "CDA-00-001",
+      "status": "pending",
+      "timestamp": "2026-07-23T18:37:05.316192+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/CDA-00-001.md"
     }
   ],
-  "last_updated": "2026-07-23T13:36:24.277534+00:00"
+  "last_updated": "2026-07-23T18:37:05.319354+00:00"
 }

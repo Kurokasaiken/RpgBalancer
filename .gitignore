@@ -59,3 +59,6 @@ public/assets/world/**/layers-fullcanvas/
 public/assets/world/**/manifest.fullcanvas.json
 public/assets/world/**/*.trimmed.bak/
 public/assets/world/**/manifest.trimmed.bak.json
+
+# Photoshop source files
+*.psd

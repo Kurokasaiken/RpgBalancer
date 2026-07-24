@@ -1,7 +1,7 @@
 # Implementation Plan — Quest Engine Reconciliation (ADR-001)
 
-**Status:** Draft (Strategist handoff to Coordinator)
-**Date:** 2026-07-15
+**Status:** Completed (T1–T8 delivered, evidence aligned)
+**Date:** 2026-07-22
 **Owning ADR:** ADR-001 — Quest Engine Reconciliation & Opportunity Foundation
 **Scope:** `src/engine/**`, `src/balancing/config/idleVillage/**`, `src/ui/idleVillage/**`
 **Related plans:**
@@ -256,3 +256,5 @@ Strategist flags for Coordinator awareness:
     | `bandit-hunt` → `bandit-camp-demo` | 1.5, 1.2 | 1.35 | Medio |
     | `ancient-ruins` | 1.8, 1.4 | 1.6 | Alto |
     | `herb-gathering` | 0.8 | 0.8 | Facile |
+
+- **2026-07-22:** T1–T8 completed and aligned across Kanban (`strategy_tasks.md` and `agent_assignments.md`). Evidence logs in `test-results/adr001-t*`, `kanban:lint` green (37 prompts validated). Plan status set to Completed.

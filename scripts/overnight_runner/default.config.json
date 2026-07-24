@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "mode": "sequential",
+  "global_timeout_seconds": 14400,
+  "grace_period_seconds": 10,
+  "log_dir": "test-results",
+  "progress_interval_seconds": 30,
+  "fail_fast": true,
+  "tasks": []
+}
