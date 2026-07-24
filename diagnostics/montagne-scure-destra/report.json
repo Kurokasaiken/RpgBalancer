@@ -1,0 +1,33 @@
+{
+  "raw": {
+    "transparentEdgePixels": 5447,
+    "semiTransparentEdgePixels": 0,
+    "transparentEdgeContamination": 0.0443,
+    "semiTransparentEdgeContamination": 0
+  },
+  "alphaBleed": {
+    "transparentEdgePixels": 5447,
+    "semiTransparentEdgePixels": 0,
+    "transparentEdgeContamination": 0.0037,
+    "semiTransparentEdgeContamination": 0
+  },
+  "erode": {
+    "transparentEdgePixels": 5447,
+    "semiTransparentEdgePixels": 0,
+    "transparentEdgeContamination": 0.0037,
+    "semiTransparentEdgeContamination": 0
+  },
+  "deltas": {
+    "rawToBleed": 0,
+    "bleedToErode": 0
+  },
+  "canvas": {
+    "width": 4240,
+    "height": 2828
+  },
+  "zoom": 0.25,
+  "renderSize": {
+    "width": 1280,
+    "height": 720
+  }
+}

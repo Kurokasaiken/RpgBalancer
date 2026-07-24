@@ -225,7 +225,385 @@
       "status": "pending",
       "timestamp": "2026-07-23T18:37:05.316192+00:00",
       "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/CDA-00-001.md"
+    },
+    {
+      "task_id": "ADR001-T1",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.895672+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/ADR001-T1.md"
+    },
+    {
+      "task_id": "ADR001-T2",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.898151+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/ADR001-T2.md"
+    },
+    {
+      "task_id": "ADR001-T3",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.902433+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/ADR001-T3.md"
+    },
+    {
+      "task_id": "ADR001-T4",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.903609+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/ADR001-T4.md"
+    },
+    {
+      "task_id": "ADR001-T6",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.905398+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/ADR001-T6.md"
+    },
+    {
+      "task_id": "ADR001-T7",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.907202+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/ADR001-T7.md"
+    },
+    {
+      "task_id": "ADR001-T8",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.908781+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/ADR001-T8.md"
+    },
+    {
+      "task_id": "IV-PROG-P2",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.910048+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/IV-PROG-P2.md"
+    },
+    {
+      "task_id": "IV-PROG-P3",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.911082+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/IV-PROG-P3.md"
+    },
+    {
+      "task_id": "IV-PROG-P4",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.912489+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/IV-PROG-P4.md"
+    },
+    {
+      "task_id": "IV-PROG-P5",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.913533+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/IV-PROG-P5.md"
+    },
+    {
+      "task_id": "IV-PROG-P6",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.914661+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/IV-PROG-P6.md"
+    },
+    {
+      "task_id": "IV-TF-002",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.915632+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/IV-TF-002.md"
+    },
+    {
+      "task_id": "IV-TF-003",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.916509+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/IV-TF-003.md"
+    },
+    {
+      "task_id": "IV-TF-004",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.917399+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/IV-TF-004.md"
+    },
+    {
+      "task_id": "IV-TF-005",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.918548+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/IV-TF-005.md"
+    },
+    {
+      "task_id": "WL-LORE-001-A",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.919783+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/WL-LORE-001-A.md"
+    },
+    {
+      "task_id": "WL-LORE-001-B",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.921292+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/WL-LORE-001-B.md"
+    },
+    {
+      "task_id": "WL-LORE-001-C",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.923615+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/WL-LORE-001-C.md"
+    },
+    {
+      "task_id": "WL-LORE-001-D",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.925272+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/WL-LORE-001-D.md"
+    },
+    {
+      "task_id": "WL-LORE-001-E",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.926840+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/WL-LORE-001-E.md"
+    },
+    {
+      "task_id": "WL-LORE-DROP-F2",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.928341+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/WL-LORE-DROP-F2.md"
+    },
+    {
+      "task_id": "WL-LORE-DROP-F3",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.929564+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/WL-LORE-DROP-F3.md"
+    },
+    {
+      "task_id": "WL-LORE-DROP-F4",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.931059+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/WL-LORE-DROP-F4.md"
+    },
+    {
+      "task_id": "WL-LORE-DROP-F5",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.932691+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/WL-LORE-DROP-F5.md"
+    },
+    {
+      "task_id": "WL-LORE-DROP-F6",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.934028+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/WL-LORE-DROP-F6.md"
+    },
+    {
+      "task_id": "IV-WSC-P2",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.935116+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/IV-WSC-P2.md"
+    },
+    {
+      "task_id": "IV-WSC-P3",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.936123+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/IV-WSC-P3.md"
+    },
+    {
+      "task_id": "IV-WSC-P4",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.937359+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/IV-WSC-P4.md"
+    },
+    {
+      "task_id": "IV-WSC-P5",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.938896+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/IV-WSC-P5.md"
+    },
+    {
+      "task_id": "IV-WSC-P6",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.940382+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/IV-WSC-P6.md"
+    },
+    {
+      "task_id": "REND-SYS-P2",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.941333+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/REND-SYS-P2.md"
+    },
+    {
+      "task_id": "REND-SYS-P3",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.942661+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/REND-SYS-P3.md"
+    },
+    {
+      "task_id": "REND-SYS-P4",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.943724+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/REND-SYS-P4.md"
+    },
+    {
+      "task_id": "REND-SYS-P5",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.944754+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/REND-SYS-P5.md"
+    },
+    {
+      "task_id": "REND-SYS-P6",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.946202+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/REND-SYS-P6.md"
+    },
+    {
+      "task_id": "REND-SYS-P7",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.948620+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/REND-SYS-P7.md"
+    },
+    {
+      "task_id": "REND-SYS-P8",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.949841+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/REND-SYS-P8.md"
+    },
+    {
+      "task_id": "TRAILER-THREAT-V3-P1",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.950969+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/TRAILER-THREAT-V3-P1.md"
+    },
+    {
+      "task_id": "TRAILER-THREAT-V3-P2",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.952431+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/TRAILER-THREAT-V3-P2.md"
+    },
+    {
+      "task_id": "TRAILER-THREAT-V3-P3",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.954300+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/TRAILER-THREAT-V3-P3.md"
+    },
+    {
+      "task_id": "ART-DIR-CREATURE-001",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.956247+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/ART-DIR-CREATURE-001.md"
+    },
+    {
+      "task_id": "WL-WPG-001-CONFIG",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.957659+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/WL-WPG-001-CONFIG.md"
+    },
+    {
+      "task_id": "WL-TEASER-D2",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.959076+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/WL-TEASER-D2.md"
+    },
+    {
+      "task_id": "WL-TEASER-D3",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.960405+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/WL-TEASER-D3.md"
+    },
+    {
+      "task_id": "WL-TEASER-D4",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.962639+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/WL-TEASER-D4.md"
+    },
+    {
+      "task_id": "WL-TEASER-D5",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.964003+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/WL-TEASER-D5.md"
+    },
+    {
+      "task_id": "CDA-00-002",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.965412+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/CDA-00-002.md"
+    },
+    {
+      "task_id": "CDA-00-003",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.966793+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/CDA-00-003.md"
+    },
+    {
+      "task_id": "CDA-00-004",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.967891+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/CDA-00-004.md"
+    },
+    {
+      "task_id": "CDA-00-005",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.969302+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/CDA-00-005.md"
+    },
+    {
+      "task_id": "CDA-00-006",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.970753+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/CDA-00-006.md"
+    },
+    {
+      "task_id": "CDA-00-007",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.974666+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/CDA-00-007.md"
+    },
+    {
+      "task_id": "CDA-01-001",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.977641+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/CDA-01-001.md"
+    },
+    {
+      "task_id": "CDA-02-001",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.982604+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/CDA-02-001.md"
+    },
+    {
+      "task_id": "CDA-03-001",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.984381+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/CDA-03-001.md"
+    },
+    {
+      "task_id": "CDA-04-001",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.986092+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/CDA-04-001.md"
+    },
+    {
+      "task_id": "CDA-05-001",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.989133+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/CDA-05-001.md"
+    },
+    {
+      "task_id": "CDA-06-001",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.992427+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/CDA-06-001.md"
+    },
+    {
+      "task_id": "CDA-07-001",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.995268+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/CDA-07-001.md"
+    },
+    {
+      "task_id": "CDA-08-001",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:30.998699+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/CDA-08-001.md"
+    },
+    {
+      "task_id": "CDA-09-001",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:31.000163+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/CDA-09-001.md"
+    },
+    {
+      "task_id": "CDA-10-001",
+      "status": "pending",
+      "timestamp": "2026-07-24T08:28:31.001910+00:00",
+      "file_path": "/Users/faustoboni/progetti_personali/RPG/coordinator/manual-dispatch/pending/CDA-10-001.md"
     }
   ],
-  "last_updated": "2026-07-23T18:37:05.319354+00:00"
+  "last_updated": "2026-07-24T08:28:31.002411+00:00"
 }

@@ -1,0 +1,98 @@
+# IV-PROG-P6 — End-to-end tests + plan update
+
+## Context
+Phase P6 of Idle Village Progression System. Creates end-to-end tests for the complete progression system and updates the plan document with completion status and changelog.
+
+## Objectives
+- Create end-to-end tests for progression system
+- Verify complete progression flow (level → power → production → UI)
+- Update plan document with completion status
+- Add changelog entry for progression system
+
+## Scope
+
+### Files to Create
+- `tests/unit/idleVillage/progressionSystem.test.ts` — End-to-end progression tests
+
+### Files to Modify
+- `src/docs/docs/plans/idle_village_progression_system_plan.md` — Update changelog and status
+
+### Out of Scope
+- New progression features (only testing and documentation)
+
+## Guardrails
+
+### Invariants
+- **Documentation**: Update plan changelog with completion status
+- **Runtime Verification**: End-to-end tests must pass with deterministic outcomes
+- **Config-first**: All progression configurations must be in config
+- **i18n**: Any user-facing strings must use `idleVillage` namespace
+
+### Constraints
+- End-to-end tests must cover complete progression flow
+- Plan update must accurately reflect implementation
+- All safeguards must pass before marking task complete
+
+## Implementation Plan
+
+### Step 1: Create End-to-End Tests
+Create `progressionSystem.test.ts` with:
+- Test case for complete progression flow (level 1 → max level)
+- Verification of power calculation at each level
+- Verification of production scaling at each level
+- Verification of telemetry events at each level
+- Edge case tests (level bounds, invalid inputs)
+
+### Step 2: Verify Complete Flow
+- Run end-to-end tests with seeded RNG
+- Verify deterministic outcomes
+- Check for any missing integration points
+- Validate config coverage
+
+### Step 3: Update Plan Document
+Update `idle_village_progression_system_plan.md`:
+- Add changelog entry for P1-P6 completion
+- Document any deviations from original plan
+- Update status to "completed"
+- Add evidence log references
+
+### Step 4: Verify Safeguards
+Run all safeguards:
+- `npm run lint -- src/balancing/config/idleVillage src/engine/game/idleVillage src/analytics/idleVillage src/ui/idleVillage`
+- `npm run test -- tests/unit/idleVillage/progressionSystem.test.ts`
+- `npm run build:check`
+- `npm run kanban:lint`
+
+## Safeguards
+
+### Pre-Execution
+- Verify all previous phases (P1-P5) are marked as `Completato` in Kanban
+- Run `npm run lint -- src/balancing/config/idleVillage src/engine/game/idleVillage` (120s timeout)
+- Run `npm run test -- tests/unit/idleVillage/` (300s timeout)
+
+### Post-Execution
+- Run `npm run lint -- src/balancing/config/idleVillage src/engine/game/idleVillage src/analytics/idleVillage src/ui/idleVillage` (120s timeout)
+- Run `npm run test -- tests/unit/idleVillage/progressionSystem.test.ts` (300s timeout)
+- Run `npm run build:check` (180s timeout)
+- Run `npm run kanban:lint` (30s timeout)
+- Verify plan document is updated
+
+### Evidence Log
+Create `test-results/iv-prog-p6-<date>.log` with:
+- Lint results
+- Test results (end-to-end tests passing)
+- Build check output
+- Kanban lint output
+- Plan update summary
+- Final progression system verification
+
+## Dependencies
+- **blocked_by**: IV-PROG-P1, IV-PROG-P2, IV-PROG-P3, IV-PROG-P4, IV-PROG-P5 (all previous phases)
+
+## Execution Hint
+**verified** — This task touches invariants (documentation governance, runtime verification) and requires comprehensive testing and documentation updates before closing the progression system plan.
+
+## Notes
+- End-to-end tests are critical for validating complete progression flow
+- Plan update must accurately reflect all phases completed
+- All safeguards must pass before marking task complete
