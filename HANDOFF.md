@@ -108,6 +108,17 @@ callback generico `onExpire?: () => void`, fired UNA VOLTA quando `remainingFrac
 Il chiamante decide cosa fare (unmount/implode vs dispatch evento/detonazione). Il componente
 visivo non possiede logica di gameplay — solo stato/rendering + lifecycle hook.
 
+## 6bis. LIMITE STRUMENTO scoperto (2026-07-19)
+La tab del Browser pane automatizzato NON è mai `document.hidden=false`/focalizzata per il
+browser reale → `requestAnimationFrame` viene THROTTLED (comportamento standard tab-in-background).
+Risultato: qualunque animazione guidata da rAF (il fill della corona, i pulse) NON avanza in modo
+affidabile quando verificata da qui — resta bloccata vicino al valore iniziale anche aspettando
+a lungo. Un click reale sulla pagina dà `hasFocus=true` e sblocca un burst di frame, ma non un
+loop sostenuto. **Non è un bug del codice** (verificato con contatori diagnostici temporanei,
+rimossi). Per verificare comportamenti rAF-driven (fill che avanza, escalation, reflect a fill
+alto) serve la tab REALE dell'utente (foreground), non gli screenshot automatizzati — chiedere
+conferma visiva diretta invece di fidarsi di uno screenshot di questo pane per quel tipo di stato.
+
 ## 7. Regole di lavoro (IMPORTANTE)
 
 - **No blind touch componenti frozen**: Skin Binding System (`SkinBindingRegistry.ts`) + config-driven skin. Armonizzare via token/config seam, additivo, fallback = look attuale. Test verdi prima/dopo.

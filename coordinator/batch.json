@@ -1,4 +1,95 @@
 {
   "max_parallel": 20,
-  "tasks": []
+  "tasks": [
+    {
+      "task_id": "IV-PROG-MASTER-001",
+      "channel": "manual",
+      "model": "qwen/qwen3-coder:free",
+      "file_targets": [],
+      "prompt": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a72",
+      "title": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a72",
+      "description": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a72"
+    },
+    {
+      "task_id": "IV-TF-MASTER-001",
+      "channel": "manual",
+      "model": "qwen/qwen3-coder:free",
+      "file_targets": [],
+      "prompt": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a73",
+      "title": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a73",
+      "description": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a73"
+    },
+    {
+      "task_id": "WL-LORE-DROP-001",
+      "channel": "manual",
+      "model": "qwen/qwen3-coder:free",
+      "file_targets": [],
+      "prompt": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a75",
+      "title": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a75",
+      "description": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a75"
+    },
+    {
+      "task_id": "IV-WSC-001",
+      "channel": "manual",
+      "model": "qwen/qwen3-coder:free",
+      "file_targets": [],
+      "prompt": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a76",
+      "title": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a76",
+      "description": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a76"
+    },
+    {
+      "task_id": "IV-WSV3-005",
+      "channel": "manual",
+      "model": "qwen/qwen3-coder:free",
+      "file_targets": [],
+      "prompt": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a77",
+      "title": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a77",
+      "description": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a77"
+    },
+    {
+      "task_id": "REND-SYS-001",
+      "channel": "manual",
+      "model": "qwen/qwen3-coder:free",
+      "file_targets": [],
+      "prompt": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a78",
+      "title": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a78",
+      "description": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a78"
+    },
+    {
+      "task_id": "ART-DIR-001",
+      "channel": "manual",
+      "model": "qwen/qwen3-coder:free",
+      "file_targets": [],
+      "prompt": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a710",
+      "title": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a710",
+      "description": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a710"
+    },
+    {
+      "task_id": "WL-WPG-001",
+      "channel": "manual",
+      "model": "qwen/qwen3-coder:free",
+      "file_targets": [],
+      "prompt": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a711",
+      "title": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a711",
+      "description": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a711"
+    },
+    {
+      "task_id": "WL-TEASER-001",
+      "channel": "manual",
+      "model": "qwen/qwen3-coder:free",
+      "file_targets": [],
+      "prompt": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a712",
+      "title": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a712",
+      "description": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a712"
+    },
+    {
+      "task_id": "CDA-MASTER-001",
+      "channel": "manual",
+      "model": "qwen/qwen3-coder:free",
+      "file_targets": [],
+      "prompt": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a713",
+      "title": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a713",
+      "description": "Prompt pending: see coordinator_handoff_2026-07-23.md \u00a713"
+    }
+  ]
 }
