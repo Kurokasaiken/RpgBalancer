@@ -137,6 +137,87 @@ Il percorso dei PNG è derivato dal manifest come
 
 ---
 
+## Post-processing dei PNG (alpha-bleed + erode + dilation) — 2026-07-24
+
+Dopo la rigenerazione full-canvas, tre problemi visivi erano ancora visibili
+a zoom intermedi (0.3–0.5×):
+
+### 1. Color fringing ai bordi dei layer (linea chiara/bianca)
+
+**Causa:** Il browser CSS usa bilinear interpolation per scalare le immagini.
+Un pixel trasparente `(0,0,0,0)` interpolato con un pixel opaco produce un
+colore medio dominato dalla componente nera → linea scura o bianca sui bordi.
+
+**Fix — `scripts/alpha-bleed-sharp.cjs`:**
+Per ogni pixel con `alpha=0` entro radius 3px da un pixel con `alpha>0`,
+copia il colore RGB del vicino più prossimo (senza cambiare l'alpha).
+Il pixel resta invisibile ma il suo RGB corrisponde al colore del bordo →
+bilinear interpola tra colori omogenei → nessun fringe.
+
+Usare **sharp in raw mode** (straight alpha), NON Canvas 2D (usa premultiplied
+alpha che azzera l'RGB dei pixel trasparenti vanificando il fix).
+
+```bash
+node scripts/alpha-bleed-sharp.cjs               # tutti i layer
+node scripts/alpha-bleed-sharp.cjs path/file.png  # singolo file
+```
+
+### 2. Outline visibile attorno ai blob di terreno baked-in
+
+**Causa:** Ogni layer elemento (alberi, montagne, foreste) include una copia
+del terreno sottostante baked-in dal PSD. In Photoshop era composto senza
+problemi; in CSS Normal blend mode il bordo del blob è visibile come linea.
+
+**Fix — `scripts/erode-alpha-edge.cjs`:**
+Per ogni pixel con `0 < alpha < 255`, se ha un vicino `alpha=0` entro radius
+3px, imposta alpha=0. Rimuove la zona semi-trasparente al bordo del blob
+senza toccare i pixel completamente opachi.
+Applicato a tutti i layer tranne: `background`, `sea`, `border`, `frame`.
+
+```bash
+node scripts/erode-alpha-edge.cjs
+```
+
+### 3. Anello chiaro + macchia grigia attorno alle isole nel mare
+
+**Causa strutturale:** `Mare.png` ha dei buchi trasparenti in corrispondenza
+delle isole (la maschera Photoshop include le isole nel buco).
+I pixel semi-trasparenti al bordo del buco blendano il parchment background
+→ anello chiaro visibile. Un fill naïve (campionando il pixel opaco più vicino)
+campionava pixel di montagna (grigio) invece del mare (turchese) → macchia grigia.
+
+**Fix in due parti:**
+
+1. **Erode-alpha su Mare.png** (radius 4px): azzera i semi-trasparenti al
+   bordo del buco. Il buco cresce leggermente ma viene coperto dall'isola.
+
+2. **Dilation delle isole** (+12px, in-place nel PNG): per ogni pixel `alpha=0`
+   dell'isola entro 12px da un pixel opaco, copia il colore del vicino opaco
+   e imposta `alpha=255`. L'isola diventa leggermente più grande e copre
+   completamente il bordo del buco nel mare.
+
+   Questo è implementato inline nello script di sessione; se serve ripetere:
+   ```bash
+   # Vedi commit 0a10ef6e per l'implementazione esatta
+   # layer: Isola basso a destra.png, Isola basso sinistra.png
+   # DILATION_R = 12
+   ```
+
+### Ordine corretto delle operazioni su un layer
+
+```
+1. Rigenera full-canvas (npm run world:extract)
+2. alpha-bleed (scripts/alpha-bleed-sharp.cjs)
+3. erode-alpha-edge (scripts/erode-alpha-edge.cjs)  ← dopo il bleed
+4. Per le isole: dilation +12px
+5. Per Mare.png: erode-alpha con radius 4 (non erode-alpha-edge standard)
+```
+
+**Invariante:** alpha-bleed PRIMA di erode. Se inverti, erode rimuove
+semi-trasparenti e poi bleed non trova più vicini utili per il fringe.
+
+---
+
 ## Rinforzo renderer (già applicato)
 
 `WorldSurfaceRenderer` promuove la world-box a un singolo layer di compositing

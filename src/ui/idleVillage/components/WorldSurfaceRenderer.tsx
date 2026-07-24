@@ -379,6 +379,7 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
       onMouseLeave={handleMouseUp}
       onWheel={handleWheel}
       className="relative h-full w-full cursor-grab overflow-hidden bg-slate-950 active:cursor-grabbing"
+      data-testid="world-surface-renderer"
       role="img"
       aria-label={translate('world.title')}
     >
