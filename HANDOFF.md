@@ -1,138 +1,176 @@
-# HANDOFF — Redesign UI "Material Language" · RPG/Wanderlust
+# HANDOFF — Restyle "Material Language" · RPG/Wanderlust
 
-## 1. Cos'è il progetto
-Idle-village game fantasy ("Wanderlust"), React + Vite + TypeScript, in `/Users/faustoboni/progetti_personali/RPG`. Estetica target: AAA da 70€ su Steam, fantasy materico (bronzo/oro/ossidiana + blu notte), NON web-app/dashboard. Dev server via `npm run dev`. Test: vitest, config multipli (`vitest.config.ts` default esclude `src/ui/**`; `vitest.idlevillage.config.ts`).
+## 0. Il quadro generale (LEGGI QUESTO PRIMA)
+Il progetto è un **restyle grafico dell'intera applicazione** (idle-village fantasy "Wanderlust"),
+non un singolo task. L'obiettivo: portare TUTTI i componenti reali del gioco (quelli linkati da
+**`/test-hub`**, l'hub che raccoglie le pagine di test/minimal-slice/gallery) a una **Material
+Language** unica e coerente — bronzo/oro/ossidiana/blu-notte, "AAA da 70€ su Steam", MAI
+web-app/dashboard. Il lavoro procede componente per componente, con un metodo fisso a 3 fasi:
 
-## 2. Obiettivo di questa fase
-Armonizzare la Material Language validata su `/visual-fidelity-lab` sui componenti reali/canonici senza rifarli. Superfici:
+1. **Fidelity Lab** (`/visual-fidelity-lab`) — si prova UN'ipotesi visiva isolata, a basso rischio,
+   su un artefatto sintetico (non il componente reale).
+2. **Harmonization Gallery** (`/harmonization-gallery`) — l'ipotesi validata si monta sul
+   **componente VERO** (via i suoi frozen kit, con fixture reali), affiancato as-is/materico,
+   per giudicare "appartiene allo stesso gioco?" a occhio.
+3. **Trapianto nel componente canonico** — solo dopo il via libera, si applica al file vero
+   condiviso da tutto il gioco, con rete di sicurezza (test) e verifica sulle pagine `/minimal-*`
+   reali (non sintetiche).
 
-- `/visual-fidelity-lab` = proving ground (magro, non gonfiare)
-- `/harmonization-gallery` = Harmonization Gallery (nuova): monta componenti VERI con dati fixture, tab (Roster / Clock / POI Detail / POI), toggle Coppie / Solo materico / Solo liscio. Serve a giudicare "stesso gioco?" a occhio.
+**Stato del restyle per componente** (vedi §5 per dettagli):
+| Componente | Stato |
+|---|---|
+| Roster (pgCard, stat bar, sigillo di stato) | ✅ FATTO — token migrati, verificato |
+| POI Detail (modal missione, skin "Dark Luxury") | ✅ VERIFICATO già allineato, nessun intervento |
+| **POI / Clock (medaglione condiviso — corona halo)** | 🔧 **IN CORSO — vedi §6, thread attivo** |
+| SlotRack, Balancer (tool-tier), altri | ⏳ non ancora iniziati |
 
-## 3. Leggi ("bibbia tecnica") già codificate
+## 1. Ambiente
+`/Users/faustoboni/progetti_personali/RPG` · React+Vite+TS · `npm run dev` · test: vitest
+(`vitest.config.ts` default ESCLUDE `src/ui/**` e `*.rtl.test.tsx` → per quei test serve
+`VITEST_INCLUDE=<path> npx vitest run` o `vitest.idlevillage.config.ts`).
 
-- **Composizione a layer / spend-photons-up**: costruire volume con layer deliberati (glow → corpo → highlight → reflect), la luce sale.
-- **Single Physical Geometry**: un oggetto = una geometria fisica coerente, non effetti sovrapposti scollegati.
-- **Stable Procedural Identity / imperfezioni**: imperfezioni (grana, turbulence) con seed FISSI per-istanza, mai ri-rollati; il materiale ha imperfezioni statiche, solo l'energia è animata.
-- **Leggibilità #1**: su una barra/meter il fronte-riempimento ha un menisco brillante; canale vuoto freddo (azure-black); numerico = segnale primario, colore secondario.
+## 2. Le pagine-chiave della "rete" di restyle
+- **`/test-hub`** — hub che raccoglie tutte le pagine `/minimal-*` (roster, poi, clock,
+  slotRack, ecc.) e le gallery. Punto di partenza per navigare l'intero ecosistema.
+- **`/visual-fidelity-lab`** — proving ground, magro. ⚠️ **si rompe con gli screenshot**
+  (compositing SVG pesante di WanderlustSurface) — non fidarsi degli screenshot lì, verificare
+  via DOM/computed-style o pagine dedicate.
+- **`/harmonization-gallery`** — monta componenti VERI, tab (Roster/Clock/POI Detail/POI),
+  toggle Coppie/Solo-materico/Solo-liscio. Screenshot funzionante qui.
+- **`/minimal-poi`, `/minimal-clock`, `/minimal-roster`, `/poi-detail-verification`** — pagine
+  REALI isolate (non sintetiche), screenshot funzionante.
+- **`/poi-corona-lab`** — pagina lab dedicata al redesign del medaglione (§6), ora usa il
+  componente REALE `GenericPoiSkin` con le 4 palette affiancate + bottone "Avanza tempo".
+
+## 3. Leggi della Material Language ("bibbia tecnica")
+- **Composizione a layer / spend-photons-up**: volume = layer deliberati (glow→corpo→highlight→
+  reflect), la luce sale.
+- **Single Physical Geometry**: un oggetto = una geometria fisica coerente, non effetti scollegati.
+- **Stable Procedural Identity**: imperfezioni (grana/turbulence) con seed FISSI per-istanza, mai
+  ri-rollati; il materiale ha imperfezioni statiche, solo l'energia è animata.
+- **Leggibilità #1**: il fronte-riempimento di una barra ha un menisco brillante; canale vuoto
+  freddo (azure-black) — MA vedi §6: su un piccolo medaglione CIRCOLARE questa legge del canale
+  freddo non si trasporta bene (letta come "riga di troppo", rimossa lì).
 - **Warm-only**: bronzo/oro/ambra/ossidiana. Grigio/argento freddo BANDITO.
 - **Frame weight = gerarchia**: reward URLA (gold filet pieno), elementi ripetuti SUSSURRANO.
-- **Anti-perfezione**: no bordi machine-perfect, no ombre a 8 livelli, no glow largo, no bottone flat.
-- **Depth hierarchy**: no "buchi dentro buchi"; elementi trascinabili = RIALZATI (drop-shadow), mai scavati.
+- **Anti-perfezione**: no bordi machine-perfect, no ombre >3-4 livelli, no glow largo, no bottone flat.
+- **Depth hierarchy**: no "buchi dentro buchi"; elementi trascinabili = RIALZATI, mai scavati.
+- **Matrice semantica energie** (LEGGE game-wide, una costruzione/`CarvedBar` + N energie): HP→
+  smeraldo · Stamina→ambra · Mana→ametista · XP/progresso→oro fuso · Pericolo/timer→brace ·
+  Capacità/slot→bronzo desaturato · Azure→SOLO ambient, mai semantico.
+- **Tool/Config vs Diegetic** (proposta non ancora congelata): schermi tool/power-user (Balancer)
+  possono restare densi; schermi player-facing seguono sempre la Material Language.
 
-## 4. Matrice semantica dei materiali (LEGGE game-wide)
-Una sola costruzione (canale scavato/`CarvedBar`), N energie:
-- HP → smeraldo · Stamina → ambra · Mana → ametista · XP/progresso → oro fuso · Pericolo/timer → brace · Capacità/slot → bronzo desaturato · Azure → solo ambient
+## 4. Regole di lavoro/governance (IMPORTANTE, sempre valide)
+- **Mai toccare alla cieca i componenti canonici/frozen.** C'è uno Skin Binding System
+  (`SkinBindingRegistry.ts`) + skin config-driven per componente. Armonizzare via seam
+  token/config, ADDITIVO, fallback = comportamento/aspetto attuale invariato. Test verdi
+  prima/dopo ogni modifica a un file condiviso.
+- **Il componente "di test" NON è mai il vero consumer player-facing.** Errore ripetuto 3 volte
+  in questo lavoro: PgCard-standalone ≠ Roster reale; ActivityCapsule bare ≠
+  ActivityCapsuleDetailSkinAware; ClockWidgetStandalone (pannello QA nudo) ≠ TimeEngineStrip+
+  DayNightPoiSkin (il vero Clock coi dial). **Prima di giudicare/armonizzare un componente,
+  verificare qual è il vero composito player-facing**, non il widget "bare" usato nei test.
+- **PERICOLO repo**: c'è un coordinator/ai-worker autonomo che fa commit/checkout automatici.
+  Verificare `git status` prima di assumere che un file sia stato perso/rotto da noi — spesso
+  è un falso allarme (letture in istanti di transizione, dep-optimizer di Vite non assestato
+  su server fresco: aspettare 5-15s e ricontrollare prima di conclude una regressione).
+- **LIMITE STRUMENTO scoperto**: la tab del Browser-pane automatizzato non è mai
+  `document.hidden=false`/focalizzata per il browser reale → `requestAnimationFrame` è
+  THROTTLED. Qualunque animazione rAF-driven (fill, pulse, escalation) NON avanza in modo
+  affidabile se verificata da qui, anche aspettando a lungo — un click reale sblocca solo un
+  breve burst di frame, non un loop sostenuto. **Non è un bug del codice.** Per verificare
+  comportamenti animati serve la tab REALE dell'utente (foreground) — chiedere conferma visiva
+  diretta all'utente invece di fidarsi di uno screenshot automatizzato per quello specifico stato.
+- **Kit frozen** (`src/ui/idleVillage/frozen/kits/`): il barrel `index.ts` è AVVELENATO
+  (`slottedMedalKit` importa un `SlottedMedal` inesistente) → importare i kit SEMPRE dai singoli
+  file, mai dal barrel.
+- **Il lab resta lab**: i consumatori reali non devono importare da `visualFidelityLab` a lungo
+  termine — è un'area di prova, non una home definitiva per i primitivi.
 
-## 5. Cosa è FATTO e verificato (71/71 test roster verdi)
+## 5. Cosa è FATTO e verificato (roadmap per componente)
+- **Roster**: `CarvedBar` primitivo estratto; `WanderlustStatBar` migrato a token (fallback =
+  valori attuali, zero regressione); sigillo di stato (dot verde → sigillo bronzo, 2 segnali
+  forma+colore); filtro "Ordina per stat" (mockup). 71/71 test roster verdi.
+- **POI Detail**: skin "Dark Luxury" (`ActivityCapsuleDetailSkinAware` + `POI_DETAIL_SKIN_CONFIG`)
+  già vicina alla Material Language di suo — NESSUN intervento fatto, verdetto = va bene così.
+  C'è un nuovo `poi-detail.skin.json` ricevuto dall'utente (palette/bronzo-3-zone/rack/slot-bezel
+  per l'INTERO modal) — NON ancora processato, tema separato dall'halo, da riprendere a parte.
+- **Harmonization Gallery**: tab Clock corretto (montava il widget QA sbagliato, ora monta il
+  vero TimeEngineStrip+DayNightPoiSkin).
 
-- `CarvedBar` primitivo estratto
-- Migrazione roster ai token (WanderlustStatBar token-driven, fallback = valori attuali)
-- Sigillo di stato (dot verde → sigillo bronzo con 2 segnali forma+colore)
-- Filtro "Ordina per stat" (mockup)
-- POI Detail "Dark Luxury" (già vicino, no override forzato)
+## 6. THREAD ATTIVO — redesign medaglione POI + Clock (`GenericPoiSkin`)
+`GenericPoiSkin` (`src/ui/idleVillage/components/minimal/GenericPoiSkin.tsx`) = SVG puro
+palette-driven, CONDIVISO da: Clock giorno/notte (`DayNightPoiSkin`), tutti i marker POI
+(Job/Activity/Quest), medaglione del POI Detail. Blast radius alto.
 
-## 6. LAVORO IN CORSO — redesign medaglione POI + Clock
+**Target approvato** (HTML `poi-skin-preview.html` dell'utente): halo "corona" turbolento che si
+riempie (glow+arco+fine+reflect), pietra ossidiana, rim bronzo. Rimosse le "stanghette" (tick
+ring + dot cardinali) e i due anelli sfocati originali.
 
-`GenericPoiSkin` (~542 righe) = SVG puro palette-driven, CONDIVISO da: Clock giorno/notte, tutti i marker POI, medaglione del POI Detail.
+**Trapianto fatto**: al momento di intervenire, il file era GIÀ parzialmente riscritto da un
+altro processo (palette-per-tipo via `getPoiPalette(cardKind)` — usa `poiMedallionRecipe.ts`,
+4 palette: amber/lapis/ember/verdigris —, macchina a 3 stadi in nuovo `expiryStageEngine.ts`
+calm/alert/critical su soglie proporzionali 50%/15%, particelle in nuovo `PoiParticles.tsx`
+seed-fisse CSS-only, tick-mark già rimossi). Aggiunto SOPRA (non riscritto): canale freddo (poi
+RIMOSSO, vedi sotto), turbolenza vera (`feTurbulence`+`feDisplacementMap`, 2 filtri, seed fissi,
+gate perf), menisco (bright cap al fronte), layer "reflect" (riflesso che scivola nell'arco).
 
-Target approvato = `poi-skin-preview.html`: halo turbolento + pietra ossidiana + rim bronzo.
-- RIMUOVERE: stanghette (tick ring + dot cardinali) + due anelli sfocati
-- TENERE: animazione ring (rim-breath + sweep hover)
-- AGGIUNGERE: menisco + canale freddo
+**Bug preesistente trovato e corretto**: variabile `basePulse` dichiarata ma referenziata come
+`pulse` (non definita) in più punti → eccezione silenziosa nel loop rAF, animazione bloccata al
+primo frame. Fix con sed su tutto il file.
 
-### Spec comportamentale halo
+**Ispessimento (richiesta esplicita utente)**: gli spessori originali (2/1.6/0.9) su DUE raggi
+diversi leggevano sottili. Il riferimento disegna glow/main/fine allo STESSO raggio con spessori
+~25%/18%/9% del raggio. Fix: unificato tutto a `outerHaloRadius`, spessori proporzionali
+(`coronaGlowWidth`/`coronaMainWidth`/`coronaFineWidth`), aggiunto layer `reflect` mancante.
+Verificato via DOM: `innerStrokeWidth` 1.6px→3.96px.
 
-- **Fill (attività in corso)**: orario, colore-skin.
-- **Timed/scadenza**: carico, scarica ANTIORARIO, virata brace.
-  - 3 stadi monotòni guidati da `remainingFraction`:
-    - **Calmo** (>50%): base color, no rotation
-    - **Allerta** (≤50%): pulse medio + flash soglia, antiorario rotation
-    - **Critico** (≤~15%): brace pieno, pulse rapido, movimento aggiunto
-  - Milestone proporzionali alla durata totale, NON ms assoluti.
-  - Escalation monotòna (evitare crying-wolf).
-- **Pronto non raccolto**: halo pieno + pulsazione leggera (riusa `poi-bloom-pulse`).
-- **Disambiguazione fill vs discharge**: fill (cresce=buono) vs discharge (cala=cattivo) → disambiguare con direzione + colore.
-- **Perf**: gatare turbulenza animata su `data-perf-tier` + `prefers-reduced-motion`.
-- **Particelle**: implementarle, perf-gated.
-- **Clock**: eredita ESTETICA corona, NON logica scadenza (è ciclo giorno/notte).
+**REGRESSIONE segnalata dall'utente e in parte corretta**: "gli halo sono strani e brutti... ci
+sono delle linee che non voglio vedere". Diagnosi: il **canale freddo** (2 cerchi statici pieni
+a 360° sotto la corona, pensati per la leggibilità delle barre LINEARI) su un piccolo medaglione
+CIRCOLARE legge come una riga di troppo che compete col rim bronzo già presente — **RIMOSSO**.
+Non ancora confermato dall'utente se la rimozione risolve del tutto la percezione "strana/brutta"
+— **verifica pendente**, vedi §6bis sul limite dello strumento (non posso verificare l'animazione
+dal vivo da qui).
 
-### TRAPIANTO IN `GenericPoiSkin` — FATTO E VERIFICATO (2026-07-19)
-Scoperta importante: al momento del trapianto, il file era GIÀ stato parzialmente riscritto
-(non da me in questa sessione — probabilmente coordinator/altro processo) con: palette-per-tipo
-già collegata (`getPoiPalette(cardKind)`), una macchina a 3 stadi già implementata in un nuovo
-file `expiryStageEngine.ts` (calm/alert/critical, soglie proporzionali 50%/15%, coerente col
-piano), un nuovo `PoiParticles.tsx` (particelle deterministiche, seed fisso, CSS-only), e le
-stanghette/tick-mark GIÀ RIMOSSE. Mancava però la parte centrale: corona turbolenta/menisco/
-canale freddo — l'halo era ancora blur piatto. Aggiunto SOPRA il lavoro esistente (non riscritto):
-- Canale freddo (azure-black, sempre visibile) dietro l'arco
-- Due filtri di turbolenza (`feTurbulence`+`feDisplacementMap`, seed fissi, animati solo se
-  perf-tier lo consente) → l'arco "inner" e un nuovo strato "fine" (highlight sottile)
-- Menisco (bright cap al fronte-riempimento), posizionato/animato dallo stesso loop rAF esistente
-- Gate perf (`data-perf-tier !== 'low'` + `!prefers-reduced-motion`, sempre pieno su hover)
-**BUG PREESISTENTE trovato e corretto** (non mio, nel codice già lì): variabile dichiarata
-`basePulse` ma referenziata come `pulse` (non definita) in 2 punti → probabile eccezione silenziosa
-dentro il loop `requestAnimationFrame` che fermava l'animazione al primo frame senza errore
-visibile. Corretto con sed su tutto il file.
-**NOTA ARCHITETTURALE non risolta**: il componente reale ha UN SOLO arco guidato da `progress`,
-con l'urgenza come overlay (colore+pulse+deriva rotazionale), NON due archi separati (fill-cresce
-vs timed-si-scarica) come nel prototipo lab. Non ho cambiato questo — decisione da prendere
-esplicitamente se si vuole il vero doppio-verso "antiorario quando si scarica".
-**Verificato**: nessun crash, zero errori console, su `/minimal-poi` (21 medaglioni, menisco/fine/
-outer tutti presenti e animati, zero tick mark) e `/minimal-clock` (dial giorno/notte, stessa
-estetica, logica invariata). Un allarme di "pagina vuota" durante la verifica si è rivelato un
-falso positivo (dep-optimizer di Vite non ancora assestato su server fresco, non un bug del
-trapianto — confermato riproducendo lo stesso vuoto su `/minimal-roster`, non toccato).
+**Nota architetturale aperta, non risolta**: il componente reale ha UN SOLO arco guidato da
+`progress`, con l'urgenza-scadenza come overlay (colore/pulse/rotazione), NON due archi separati
+(fill-cresce vs timed-si-scarica antiorario) come nel prototipo lab iniziale. Non cambiato —
+decisione esplicita da prendere se si vuole il vero doppio-verso.
 
-**Corona ISPESSITA (2026-07-19, richiesta esplicita utente).** L'utente ha ricaricato lo stesso
-`poi-skin-preview.html` + un nuovo `poi-detail.skin.json` (spec Dark Luxury per il POI Detail
-modal — palette/bronzo/rack, non l'halo) e ha chiesto: "l'halo è molto più spessa e interessante
-in questa versione, la voglio così". Causa: outer/inner/fine erano rimasti sugli spessori SOTTILI
-originali (2/1.6/0.9) su DUE raggi diversi (outerHaloRadius≈22-23 vs innerHaloRadius=18.5), mentre
-il riferimento disegna glow/main/fine allo STESSO raggio con spessori ~18%/25%/9% del raggio
-(molto più spessi) — più uno strato "reflect" (riflesso che scivola nell'arco pieno) assente dal
-mio trapianto. Fix: unificato tutto a `outerHaloRadius`, nuovi spessori proporzionali
-(`coronaGlowWidth`=25%, `coronaMainWidth`=18%, `coronaFineWidth`=9% del raggio), aggiunto lo
-strato `reflect` (drift sinusoidale, stessa formula del riferimento, soglia fillProg>0.12).
-Canale freddo ispessito in coerenza. Verificato: `innerStrokeWidth` passato da 1.6px→3.96px
-(misurato via DOM), 21 istanze con `reflect` presente e cablato correttamente (opacity=0 su
-questa pagina solo perché nessuna fixture demo supera 12% di fill — soglia/matematica identiche
-al riferimento, non testato oltre per non modificare dati demo fuori scope). Nessun crash.
-Il nuovo JSON `poi-detail.skin.json` (Dark Luxury per l'intero modal POI Detail: palette,
-bronzo 3-zone, slot bezel, rack blu mezzanotte) NON ancora processato/applicato — riguarda la
-skin del modal, non l'halo; da valutare separatamente se/quando si riprende il POI Detail.
+**Trigger a zero — RISOLTO**: esistono entrambi i casi (sparizione E trigger evento) → il
+componente espone un callback generico `onExpire?: () => void`, fired una volta a
+`remainingFraction=0`. Il chiamante decide il comportamento (il componente non possiede logica
+di gameplay).
 
-### Trigger a zero — RISOLTO
-Esistono entrambi i casi (sparizione E trigger evento) → il componente NON decide: espone un
-callback generico `onExpire?: () => void`, fired UNA VOLTA quando `remainingFraction` tocca 0.
-Il chiamante decide cosa fare (unmount/implode vs dispatch evento/detonazione). Il componente
-visivo non possiede logica di gameplay — solo stato/rendering + lifecycle hook.
+**Verificato senza crash** (zero errori console) su `/minimal-poi`, `/minimal-clock`,
+`/poi-corona-lab`. **NON verificabile da questo strumento**: il comportamento dell'animazione a
+fill medio/alto (vedi limite in §4) — serve conferma dell'utente sulla sua tab reale.
 
-## 6bis. LIMITE STRUMENTO scoperto (2026-07-19)
-La tab del Browser pane automatizzato NON è mai `document.hidden=false`/focalizzata per il
-browser reale → `requestAnimationFrame` viene THROTTLED (comportamento standard tab-in-background).
-Risultato: qualunque animazione guidata da rAF (il fill della corona, i pulse) NON avanza in modo
-affidabile quando verificata da qui — resta bloccata vicino al valore iniziale anche aspettando
-a lungo. Un click reale sulla pagina dà `hasFocus=true` e sblocca un burst di frame, ma non un
-loop sostenuto. **Non è un bug del codice** (verificato con contatori diagnostici temporanei,
-rimossi). Per verificare comportamenti rAF-driven (fill che avanza, escalation, reflect a fill
-alto) serve la tab REALE dell'utente (foreground), non gli screenshot automatizzati — chiedere
-conferma visiva diretta invece di fidarsi di uno screenshot di questo pane per quel tipo di stato.
+**Prossimo step immediato**: attendere il verdetto dell'utente su (a) se la rimozione del canale
+freddo risolve "strano/brutto", (b) se lo spessore a fill realistico (40-70%, testabile col
+bottone "Avanza tempo" su `/poi-corona-lab`) convince.
 
-## 7. Regole di lavoro (IMPORTANTE)
+## 7. File chiave
+- `src/ui/visualFidelityLab/`: CarvedBar.tsx, FieldGrain.tsx, matericSkin.css,
+  poiMedallionRecipe.ts (4 palette + mappa tipo→skin), HarmonizationGallery.tsx,
+  PoiCoronaHaloLab.tsx (showcase reale + bottone avanza-tempo)
+- `src/ui/wanderlust-surface/`: matericSkinConfig.ts, layout/WanderlustStatBar.tsx
+- `src/ui/idleVillage/components/minimal/`: GenericPoiSkin.tsx (il file del thread attivo),
+  expiryStageEngine.ts, PoiParticles.tsx, ClockWidget.tsx, TimeEngineStrip.tsx,
+  DayNightPoiSkin.tsx, QuestPOI.tsx, JobPOI.tsx, ActivityPOI.tsx
+- `src/ui/idleVillage/components/`: WanderlustRosterCard.tsx
+- `src/ui/idleVillage/skins/`: activityCapsuleSkinConfig.ts, poi/poiDetailSkinConfig.ts,
+  SkinBindingRegistry.ts
+- `src/ui/idleVillage/frozen/kits/`: poiKit.tsx, clockKit.tsx (import DIRETTO dai singoli file,
+  mai dal barrel index.ts)
+- Riferimenti utente (Downloads): `poi-skin-preview.html` (target halo), `poi-detail.skin.json`
+  (target skin modal POI Detail — separato, non processato)
+- Memoria persistente completa (dettagli storici oltre questo file):
+  `/Users/faustoboni/.claude/projects/-Users-faustoboni-progetti-personali-RPG/memory/project_visual_grammar_spike.md`
 
-- **No blind touch componenti frozen**: Skin Binding System (`SkinBindingRegistry.ts`) + config-driven skin. Armonizzare via token/config seam, additivo, fallback = look attuale. Test verdi prima/dopo.
-- **PERICOLO**: repo ha ai-worker autonomo. Verificare `git status`.
-- **Screenshot**: si rompe su `/visual-fidelity-lab` (SVG pesanti), funziona su `/minimal-poi`, `/harmonization-gallery`, `/poi-detail-verification`.
-- **Kit frozen**: `src/ui/idleVillage/frozen/kits/`. Barrel `index.ts` avvelenato → importare dai singoli file.
-- **Lab è lab**: consumatori reali non importano da `visualFidelityLab` a lungo.
-
-## 8. File chiave
-
-- `src/ui/visualFidelityLab/`: CarvedBar.tsx, FieldGrain.tsx, matericSkin.css, poiMedallionRecipe.ts, HarmonizationGallery.tsx
-- `src/ui/wanderlust-surface/`: matericSkinConfig.ts, WanderlustStatBar.tsx
-- `src/ui/idleVillage/components/`: WanderlustRosterCard.tsx, GenericPoiSkin.tsx, ClockWidget.tsx, minimal/*
-- `src/ui/idleVillage/skins/`: activityCapsuleSkinConfig.ts, SkinBindingRegistry.ts
-
-## 9. Prossimo step
-Prototipare corona halo (menisco, canale freddo, ring conservato, 3-stadi timed, ready-pulse, perf-gate) su `/minimal-poi`; poi trapiantare in `GenericPoiSkin` con test; poi Clock.
+## 8. Domanda aperta con l'utente (bloccante per il thread attivo)
+Dopo la rimozione del canale freddo: l'halo ora ti sembra giusto, o resta "strano"? E a fill
+40-70% (bottone "Avanza tempo" su `/poi-corona-lab`, verificato sulla TUA tab reale) lo spessore
+ti convince?
