@@ -161,17 +161,6 @@ export const KIT_REGISTRY: KitRegistryEntry[] = [
     docPath: 'src/ui/idleVillage/frozen/kits/clockKit.md',
   },
   {
-    kitId: 'questDetailKit',
-    kitModule: './kits/questDetailKit',
-    status: 'certified',
-    hub: {
-      title: 'Quest Chronicle',
-      description: 'Dettaglio quest con fasi, progress bar, esito finale',
-      icon: '📜',
-      path: '/minimal-quest-detail',
-    },
-  },
-  {
     kitId: 'resourceHudKit',
     kitModule: './kits/resourceHudKit',
     status: 'draft',
@@ -222,19 +211,6 @@ export const KIT_REGISTRY: KitRegistryEntry[] = [
     },
     certManifestPath: 'src/ui/idleVillage/frozen/kits/marketKit.cert.json',
     docPath: 'src/ui/idleVillage/frozen/kits/marketKit.md',
-  },
-  {
-    kitId: 'integrationQuestFlowKit',
-    kitModule: './kits/integrationQuestFlowKit',
-    status: 'draft',
-    hub: {
-      title: 'Quest Flow Integration',
-      description: 'Flusso completo: QuestCard -> SkillCheck -> Outcome',
-      icon: '🔗',
-      path: '/minimal-integration-quest-flow',
-    },
-    certManifestPath: 'src/ui/idleVillage/frozen/kits/integrationQuestFlowKit.cert.json',
-    docPath: 'src/ui/idleVillage/frozen/kits/integrationQuestFlowKit.md',
   },
   {
     kitId: 'skillCheckKit',

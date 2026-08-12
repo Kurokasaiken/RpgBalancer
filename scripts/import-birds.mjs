@@ -163,6 +163,7 @@ async function main() {
         dx: ${flight.dx},
         dy: ${flight.dy},
         flightSeconds: ${flight.flightSeconds},
+        startDelaySeconds: ${Math.round(scatter(index, 0.53) * flight.cycleSeconds)},
         cycleSeconds: ${flight.cycleSeconds},
         flapSeconds: ${flight.flapSeconds},
         opacity: ${flight.opacity},

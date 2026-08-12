@@ -87,10 +87,6 @@ export {
 } from './marketKit';
 
 export {
-  IntegrationQuestFlowKitShell,
-} from './integrationQuestFlowKit';
-
-export {
   SkillCheckComponentStandalone,
   SkillCheckKitShell,
   SKILL_CHECK_PROVIDER_CHAIN,

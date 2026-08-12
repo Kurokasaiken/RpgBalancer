@@ -1,5 +1,6 @@
 import type { PresentationEffect } from '../types';
 import { createThreatPresenceEffect, ThreatPresenceEffect } from '../effects/ThreatPresenceEffect';
+import { createSeaCreatureEffect, SeaCreatureEffect } from '../effects/SeaCreatureEffect';
 import type { ThreatPresenceEffectConfig } from './threatPresenceEffectConfig';
 
 export type PresentationEffectFactory = (config?: unknown) => PresentationEffect;
@@ -13,6 +14,8 @@ export type PresentationEffectFactory = (config?: unknown) => PresentationEffect
 const PRESENTATION_EFFECT_REGISTRY: Record<string, PresentationEffectFactory> = {
   threat_presence: (config?: unknown) =>
     createThreatPresenceEffect(config as ThreatPresenceEffectConfig | undefined),
+  sea_creature_presence: (config?: unknown) =>
+    createSeaCreatureEffect(config as any),
 };
 
 /**
@@ -48,4 +51,4 @@ export function registerPresentationEffect(id: string, factory: PresentationEffe
   PRESENTATION_EFFECT_REGISTRY[id] = factory;
 }
 
-export { ThreatPresenceEffect, createThreatPresenceEffect };
+export { ThreatPresenceEffect, createThreatPresenceEffect, SeaCreatureEffect, createSeaCreatureEffect };

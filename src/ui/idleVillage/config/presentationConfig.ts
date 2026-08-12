@@ -92,6 +92,7 @@ export const PRESENTATION_SCENARIOS: PresentationScenario[] = [
     manifest: WANDERLUST_PRESENTATION_MANIFEST,
     rules: getPresentationRules('wanderlust_default'),
     seed: DEFAULT_PRESENTATION_SEED,
+    effectIds: ['sea_creature_presence'],
   },
   {
     id: 'threat',

@@ -120,6 +120,15 @@ const EXTRA_PAGES: TestPageLink[] = [
     icon: '🔬',
     status: 'ok',
   },
+  // Non-kit page: Quest detail component candidates for POI quest opening.
+  {
+    id: 'quest-detail-candidates',
+    title: 'Quest Detail Candidates',
+    description: 'All Quest/QuestDetail/QuestChronicle candidates for opening a quest POI',
+    path: '/quest-detail-candidates',
+    icon: '🧭',
+    status: 'ok',
+  },
   // Non-kit page: World Surface - the living painted map. Pan, zoom, 21 layers, debug panel.
   {
     id: 'world-surface',

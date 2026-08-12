@@ -94,6 +94,11 @@
   "deathPercent": "Death Percent",
   "difficulty": "Difficulty",
   "dpr": "DPR",
+  "floatingPanel": {
+    "minimize": "Minimise panel",
+    "restore": "Restore panel",
+    "close": "Close panel"
+  },
   "hitStop": "Hit Stop",
   "milestoneCheck": {
     "ariaLabel": "Quest phase skill check",
@@ -222,6 +227,22 @@
       "branch": "branch",
       "timedChoice": "timed choice"
     }
+  },
+  "questReward": {
+    "panelTitle": "Rewards",
+    "eyebrowVictory": "Expedition returned",
+    "eyebrowDefeat": "Expedition broken",
+    "trialsPassed": "{passed} of {total} trials passed",
+    "trials": "Trials",
+    "passed": "Passed",
+    "failed": "Failed",
+    "rewards": "Rewards",
+    "noRewards": "The expedition brought nothing home",
+    "party": "Party",
+    "stateNone": "Unharmed",
+    "stateInjured": "Wounded",
+    "stateDead": "Fallen",
+    "collect": "Collect rewards"
   },
   "roster": {
     "sort": {

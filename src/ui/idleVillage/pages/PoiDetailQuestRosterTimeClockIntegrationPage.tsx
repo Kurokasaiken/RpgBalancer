@@ -11,8 +11,16 @@
  *   Se la quest card è chiusa il check si risolve comunque, fuori scena.
  * - Il fallimento di una fase non interrompe la quest; il giocatore può però
  *   interromperla a mano.
- * - A spedizione avviata il click sul POI apre la `QuestChronicle` al posto del
- *   detail; le ricompense si applicano solo con "Raccogli ricompense".
+ * - A spedizione avviata il click sul POI apre la quest card al posto del detail;
+ *   a quest conclusa la card diventa `QuestRewardPanel` e le ricompense si
+ *   applicano solo con "Raccogli ricompense".
+ *
+ * Desiderata v4:
+ * - Detail, quest card e skill check sono `FloatingPanel`: spostabili,
+ *   riducibili a icona, e senza backdrop — la pagina resta sempre usabile.
+ * - Le fasi si risolvono una alla volta: mentre un check attende il giocatore il
+ *   tempo della quest non avanza, quindi fra una fase e l'altra passa davvero
+ *   tempo. Ridurre a icona il check lo affida al destino e la quest riprende.
  *
  * Route: /poi-quest-detail-roster-time-clock
  */
@@ -30,6 +38,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core';
+import { useTranslation } from '@/localization/useTranslation';
 import { getBloomStyle, type BloomState } from '@/ui/idleVillage/interaction/bloomEffect';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
 import {
@@ -42,6 +51,13 @@ import { ClockWidgetStandalone } from '@/ui/idleVillage/frozen/kits/clockKit';
 import { DayNightPOI, QuestPOI, type QuestPOIPhase } from '@/ui/idleVillage/frozen/kits/poiKit';
 import { MagicCircleHalo } from '@/ui/idleVillage/components/MagicCircleHalo';
 import { MilestoneCheckModal } from '@/ui/idleVillage/components/MilestoneCheckModal';
+import { FloatingPanel } from '@/ui/idleVillage/components/FloatingPanel';
+import {
+  QuestRewardPanel,
+  type QuestRewardPhaseLine,
+  type QuestRewardLine,
+  type QuestRewardPartyLine,
+} from '@/ui/idleVillage/components/QuestRewardPanel';
 import QuestChronicle, {
   type QuestChroniclePhase,
   type PhaseVisualState,
@@ -385,6 +401,7 @@ function DroppablePoi({
 }
 
 const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
+  const { t } = useTranslation('idleVillage');
   const { residentsById } = useRosterKitData();
 
   const defaultAssignments = {} as Record<string, string | null>;
@@ -425,6 +442,11 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
   const [activeMilestone, setActiveMilestone] = useState<MilestoneEvent | null>(null);
   /** Consumables the player is spending on the current check. */
   const [milestoneConsumableIds, setMilestoneConsumableIds] = useState<string[]>([]);
+  /**
+   * Whether the open check has been collapsed to an icon. Minimising it means
+   * "let fate decide": the phase resolves off-screen and the quest resumes.
+   */
+  const [isMilestoneMinimized, setIsMilestoneMinimized] = useState(false);
   /** Whether the quest card has replaced the POI detail. */
   const [isQuestCardOpen, setIsQuestCardOpen] = useState(false);
   /**
@@ -680,17 +702,27 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
       : 'idle';
 
   /**
+   * True while a skill check is open and waiting for the player.
+   *
+   * This is what makes the phases resolve one at a time: quest time does not
+   * advance while a check is on the table, so the next milestone can never be
+   * crossed before the current one is settled. Minimising the panel drops the
+   * wait — see the auto-resolve effect below.
+   */
+  const isCheckAwaiting = activeMilestone !== null && !isMilestoneMinimized;
+
+  /**
    * Countdown loop. The cadence is fixed and the clock's speed multiplier
    * scales the increment, so ×8 really advances the quest eight times faster;
    * pausing the clock freezes the inscription mid-word.
    */
   useEffect(() => {
-    if (!isQuestRunning || isPaused) return;
+    if (!isQuestRunning || isPaused || isCheckAwaiting) return;
     const countdown = setInterval(() => {
       setElapsedMs((prev) => Math.min(prev + COUNTDOWN_TICK_MS * speed, questDurationMs));
     }, COUNTDOWN_TICK_MS);
     return () => clearInterval(countdown);
-  }, [isQuestRunning, isPaused, speed, questDurationMs]);
+  }, [isQuestRunning, isPaused, isCheckAwaiting, speed, questDurationMs]);
 
   const partyResidents = useMemo(
     () =>
@@ -847,6 +879,44 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
     addTelemetry,
   ]);
 
+  /**
+   * Minimising an unresolved check hands the phase to fate: it resolves
+   * off-screen, exactly as it would with the card closed, and quest time starts
+   * flowing again. An already-resolved check is left alone.
+   */
+  useEffect(() => {
+    if (!activeMilestone || !isMilestoneMinimized) return;
+    const index = activeMilestone.milestoneIndex;
+    if (phaseResults[index]) {
+      setActiveMilestone(null);
+      setIsMilestoneMinimized(false);
+      return;
+    }
+    const phase = questPhases[index];
+    const spent = MOCK_QUEST_ITEMS.filter((item) => milestoneConsumableIds.includes(item.id));
+    const risk = applyConsumableRiskEffects(
+      {
+        injuryChance: phase?.riskProfile?.injuryChance ?? 0,
+        deathChance: phase?.riskProfile?.deathChance ?? 0,
+      },
+      spent,
+    );
+    recordPhaseResult(
+      index,
+      resolveMilestoneWithoutAnimation({ skills: buildSkillsForPhaseIndex(index), risk }),
+    );
+    setActiveMilestone(null);
+    setIsMilestoneMinimized(false);
+  }, [
+    activeMilestone,
+    isMilestoneMinimized,
+    phaseResults,
+    questPhases,
+    milestoneConsumableIds,
+    buildSkillsForPhaseIndex,
+    recordPhaseResult,
+  ]);
+
   /** Returns the POI to its pre-assignment state and frees the party. */
   const resetQuestRun = useCallback(() => {
     setElapsedMs(0);
@@ -858,6 +928,7 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
     setMilestoneConsumableIds([]);
     setIsQuestCardOpen(false);
     setIsConsequencesOpen(true);
+    setIsMilestoneMinimized(false);
     setAssignments({});
     setSelectedItemIds([]);
     resetMilestones();
@@ -874,6 +945,7 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
     setMilestoneConsumableIds([]);
     setIsQuestCardOpen(false);
     setIsConsequencesOpen(true);
+    setIsMilestoneMinimized(false);
     setAssignments({});
     setTelemetry(mockTelemetry);
     setIsDetailOpen(false);
@@ -906,6 +978,55 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
         return 'locked';
       }),
     [questPhases, phaseResults, isQuestRunning, currentPhaseIndex],
+  );
+
+  /** Trials recap for the reward surface. */
+  const rewardPhaseLines = useMemo<QuestRewardPhaseLine[]>(
+    () =>
+      questPhases.map((phase, index) => {
+        const result = phaseResults[index];
+        return {
+          id: phase.id,
+          title: phase.title,
+          icon: phase.icon,
+          passed: !!result && isPassingVerdict(result.verdict),
+          verdictLabel: result?.verdict,
+          wounded: result?.wounded,
+          dead: result?.dead,
+        };
+      }),
+    [questPhases, phaseResults],
+  );
+
+  /** Rewards earned, with the outcome multiplier already applied. */
+  const rewardLines = useMemo<QuestRewardLine[]>(() => {
+    const multiplier = embarkResult?.rewardMultiplier ?? 1;
+    return (activity.rewards ?? []).map((reward) => {
+      const base = Number(reward.amountFormula);
+      const amount = Number.isFinite(base)
+        ? `+${Math.round(base * multiplier * 10) / 10}`
+        : `+${reward.amountFormula}`;
+      return { id: reward.resourceId, label: reward.resourceId, amount };
+    });
+  }, [activity.rewards, embarkResult?.rewardMultiplier]);
+
+  /** Fate of each party member, from the engine's consequences. */
+  const rewardPartyLines = useMemo<QuestRewardPartyLine[]>(
+    () =>
+      (embarkResult?.consequences ?? []).map((consequence) => {
+        const resident = residentsById[consequence.residentId];
+        return {
+          residentId: consequence.residentId,
+          name: resident ? formatResidentLabel(resident) : consequence.residentId,
+          state:
+            consequence.consequence === 'dead'
+              ? 'dead'
+              : consequence.consequence === 'injured'
+                ? 'injured'
+                : 'none',
+        };
+      }),
+    [embarkResult?.consequences, residentsById],
   );
 
   const poiPhaseDots = useMemo<QuestPOIPhase[]>(
@@ -1325,27 +1446,57 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
           </div>
 
           {/*
-            Detail and quest card open as a centred overlay: on this page the POI
-            sits far down a tall column, and an inline panel would open partly
-            off-screen. Once the expedition has left, the quest card takes the
-            detail's place — the POI no longer offers slots to fill, it tells the
-            story of what is happening out there.
+            Detail and quest card are floating panels, not modals: movable,
+            minimisable, and they leave the rest of the surface usable. Once the
+            expedition has left, the quest card takes the detail's place — the
+            POI no longer offers slots to fill, it tells the story of what is
+            happening out there.
           */}
-          {(isDetailOpen || isQuestCardOpen) && (
-            <div
-              data-testid="poi-detail-overlay"
-              className="fixed inset-0 z-40 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm sm:p-8"
-              onClick={() => {
-                setIsDetailOpen(false);
-                setIsQuestCardOpen(false);
-              }}
+          {isDetailOpen && !isQuestCardOpen && (
+            <FloatingPanel
+              panelId="poi-detail"
+              title={activity.label}
+              icon={activityIcon}
+              width={760}
+              initialPosition={{ x: 220, y: 90 }}
+              onClose={() => setIsDetailOpen(false)}
             >
-              <div
-                className="max-h-[92vh] w-full max-w-4xl overflow-y-auto"
-                onClick={(event) => event.stopPropagation()}
-              >
-                {isQuestCardOpen ? (
-                  <QuestChronicle
+              <ActivityCapsuleDetailSkinAware {...detailProps} />
+            </FloatingPanel>
+          )}
+
+          {isQuestCardOpen && (
+            <FloatingPanel
+              panelId="quest-card"
+              title={
+                embarkResult
+                  ? t('idleVillage:questReward.panelTitle', { defaultValue: 'Rewards' })
+                  : activity.label
+              }
+              icon={embarkResult ? '🏆' : activityIcon}
+              width={embarkResult ? 620 : 860}
+              initialPosition={{ x: 180, y: 70 }}
+              onClose={() => setIsQuestCardOpen(false)}
+            >
+              {embarkResult ? (
+                <QuestRewardPanel
+                  questTitle={activity.label}
+                  isVictory={
+                    embarkResult.outcome !== 'fail' && embarkResult.outcome !== 'deadly'
+                  }
+                  outcomeLabel={QUEST_OUTCOME_LABELS[embarkResult.outcome]}
+                  phasesPassed={
+                    phaseResults.filter((entry) => entry && isPassingVerdict(entry.verdict)).length
+                  }
+                  phasesTotal={questPhases.length}
+                  phases={rewardPhaseLines}
+                  rewards={rewardLines}
+                  rewardMultiplier={embarkResult.rewardMultiplier}
+                  party={rewardPartyLines}
+                  onCollect={handleCollect}
+                />
+              ) : (
+                <QuestChronicle
                     title={activity.label}
                     questId={activity.id}
                     questTags={activity.tags}
@@ -1370,41 +1521,55 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
                           }
                         : undefined
                     }
-                    onCollect={embarkResult ? handleCollect : undefined}
+                    onCollect={undefined}
                   />
-                ) : (
-                  <ActivityCapsuleDetailSkinAware {...detailProps} />
-                )}
-              </div>
-            </div>
+              )}
+            </FloatingPanel>
           )}
 
-          {/* Milestone skill check — only rendered when the player is watching */}
+          {/*
+            Milestone skill check — a floating panel like the others. Minimising
+            it hands the phase over to fate: the check resolves off-screen and
+            the quest clock, which waits while the panel is open, resumes.
+          */}
           {activeMilestone && questPhases[activeMilestone.milestoneIndex] && (
-            <MilestoneCheckModal
-              phaseTitle={questPhases[activeMilestone.milestoneIndex].title}
-              phaseIcon={questPhases[activeMilestone.milestoneIndex].icon}
-              phaseSummary={questPhases[activeMilestone.milestoneIndex].copy?.summary}
-              milestoneLabel={`${activeMilestone.milestoneIndex + 1} / ${questPhases.length}`}
-              skills={buildSkillsForPhaseIndex(activeMilestone.milestoneIndex)}
-              injuryChance={
-                questPhases[activeMilestone.milestoneIndex].riskProfile?.injuryChance ?? 0
-              }
-              deathChance={
-                questPhases[activeMilestone.milestoneIndex].riskProfile?.deathChance ?? 0
-              }
-              consumables={MOCK_QUEST_ITEMS}
-              spentConsumableIds={milestoneConsumableIds}
-              onToggleConsumable={(itemId) =>
-                setMilestoneConsumableIds((prev) =>
-                  prev.includes(itemId)
-                    ? prev.filter((id) => id !== itemId)
-                    : [...prev, itemId],
-                )
-              }
-              onResolved={handleMilestoneResolved}
-              onDismiss={() => setActiveMilestone(null)}
-            />
+            <FloatingPanel
+              panelId="milestone-check"
+              title={`${questPhases[activeMilestone.milestoneIndex].title} · ${
+                activeMilestone.milestoneIndex + 1
+              }/${questPhases.length}`}
+              icon={questPhases[activeMilestone.milestoneIndex].icon ?? '🎲'}
+              width={720}
+              initialPosition={{ x: 300, y: 60 }}
+              isMinimized={isMilestoneMinimized}
+              onMinimizedChange={setIsMilestoneMinimized}
+              onClose={() => setActiveMilestone(null)}
+            >
+              <MilestoneCheckModal
+                phaseTitle={questPhases[activeMilestone.milestoneIndex].title}
+                phaseIcon={questPhases[activeMilestone.milestoneIndex].icon}
+                phaseSummary={questPhases[activeMilestone.milestoneIndex].copy?.summary}
+                milestoneLabel={`${activeMilestone.milestoneIndex + 1} / ${questPhases.length}`}
+                skills={buildSkillsForPhaseIndex(activeMilestone.milestoneIndex)}
+                injuryChance={
+                  questPhases[activeMilestone.milestoneIndex].riskProfile?.injuryChance ?? 0
+                }
+                deathChance={
+                  questPhases[activeMilestone.milestoneIndex].riskProfile?.deathChance ?? 0
+                }
+                consumables={MOCK_QUEST_ITEMS}
+                spentConsumableIds={milestoneConsumableIds}
+                onToggleConsumable={(itemId) =>
+                  setMilestoneConsumableIds((prev) =>
+                    prev.includes(itemId)
+                      ? prev.filter((id) => id !== itemId)
+                      : [...prev, itemId],
+                  )
+                }
+                onResolved={handleMilestoneResolved}
+                onDismiss={() => setActiveMilestone(null)}
+              />
+            </FloatingPanel>
           )}
 
           <DragOutcomeFlight

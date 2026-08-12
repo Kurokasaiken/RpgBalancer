@@ -59,6 +59,17 @@ Questo file è la bussola operativa. Contiene ciò che Fausto ha chiesto, con le
 - Integrata la seconda round di review multi-AI (Gemini Web, Claude Web, cold read ChatGPT API) nel piano tattico: Engine Pipeline Pattern, QuadTree/spatial indexing, hover intent tolerance, texture warmup, background pause, HiDPI scaling, preemption matrix, wonder timeline, catalogo biomi con ambient life, FrameBudget/quality profiles, World Clock frozen kit (`clockKit`), correzioni FSM, Tier 3 de-escalation, persistence keys, testing aggiornato.
 - Verificato che il World Clock è già un frozen kit certificato (`clockKit`) importabile con una singola riga; non serve fix.
 
+**Aggiornamento 2026-08-12 (atmosfera: onde, uccelli, maschere terreno):**
+- `WorldSurfaceSeaRipple` (Pixi DisplacementFilter) **rimosso**: il piano tattico §294 budgeta l'acqua come "texture/sprite motion (no UV ripple se non profilato)" e il filtro era esattamente l'UV ripple escluso, non profilato — oltre a essere invisibile a schermo.
+- Sostituito da `WorldSurfaceWaves`: 18 segni di risacca vettoriali in mare aperto, che compaiono e svaniscono su ciclo di 15s. Posizioni derivate da `points.json`, campionato dall'alfa dei layer con una fascia di esclusione attorno a ogni costa.
+- Nuovo `scripts/build-terrain-masks.mjs`: emette `sea_mask`/`land_mask` complementari (per lo switch nuvola→ombra), `shallow_mask` (tinta acqua bassa cotta, zero costo runtime) e i punti di posizionamento per onde e stormi.
+- **Bug corretto in `build-foam-mask.mjs`**: la sfocatura di una maschera che tocca i bordi della canvas accendeva l'intera cornice (valore 241 nell'angolo, media 143 sul bordo), quindi la schiuma disegnava una fascia lungo tutto il perimetro della mappa. Margine ora azzerato; copertura scesa a 2.28%.
+- Uccelli riscritti come **evento**: decollo in formazione da un punto entroterra, salita diagonale, ~1.2s di volo, poi cielo vuoto per ~1 minuto. Coerente con `DESIGN_PILLARS.md` §22 ("vita ambientale rara, non rumore continuo", "stormo" fra le sorprese rare).
+- Aggiunte vignettatura e ombra portata della cornice.
+- **Verificato al browser**: pan mano(-180,-110) → mondo (-180,-110) esatto; zoom rotella 1.000 → 1.100; 18 onde / 12 uccelli / 8 nuvole / 8 ombre montati; tinta acqua bassa attiva.
+- Safeguard: 22 test verdi (4 file), lint 0 errori, `build:check` passato.
+- **Aperto**: la forma delle onde è in scelta fra tre candidate (swell / anelli / galloni); il runtime `/world-presentation-director` è `trusted` ma non è consumato da `WorldSurfaceRenderer` (0 riferimenti) — è la sede naturale per eventi rari tipo mostri marini.
+
 **Aggiornamento 2026-08-13 (decomposizione):**
 - Il Director richiede di usare la **skill `strategist` di Mind Weaver** per la decomposizione del piano tattico v2.2, passando come contesto i mandate RPG `strategist-mandate` e `coordinator-mandate`.
 - L'output deve essere una suddivisione in sub-piani/task con classificazione `direct`/`task`/`sub-plan` e, per ogni nodo, i campi `invariants`, `constraints`, `approach_notes`, `execution_hint` e `safeguards` derivati dai mandate RPG.
@@ -222,6 +233,14 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 - **Altri difetti corretti**: dopo Start restava aperto il detail invece della quest card; esito finale incoerente ("PERFETTO" con 0/3 fasi) ora derivato dalle fasi via `resolveQuestOutcomeTier`; durata "6MS"; namespace i18n `activityCapsule` assente; interpolazione i18n con parentesi doppie invece che singole; rumore floating point nei rischi; ref scritto durante il render in `useMilestoneEngine`.
 - **Safeguard**: tsc, kanban:lint, build:check (con il polyfill crypto) verdi; **98 test passed**; route 200.
 - **Segnalato a parte**: `tests/unit/idleVillage/DayNightPOI.test.tsx` ha 13/14 test rossi, verificato **preesistente** (identici su HEAD) — il file asserisce una vecchia API.
+
+**Round 3 — desiderata v4 (2026-08-12):** il Director ha elencato sei problemi e li ha promossi a desiderata (`.mw/desiderata.md` **v4 FROZEN**). Risolti tutti:
+- **Pannelli flottanti** (`FloatingPanel`, nuovo): detail, quest card e skill check si spostano trascinando l'intestazione, si riducono a icona, si chiudono, e **non bloccano più la pagina** (nessun backdrop; verificato via hit-test che il clock resta raggiungibile). Lo stack porta davanti l'ultimo pannello toccato.
+- **Ritmo delle fasi**: mentre un check è aperto il tempo della quest non avanza, quindi le fasi si risolvono **una alla volta con tempo che scorre in mezzo**. Con 3 fasi su 6s le milestone scattano a 2.0s / 4.0s / 6.0s (verificato). Ridurre a icona il check lo fa risolvere fuori scena e la quest riprende.
+- **Schermata ricompensa** (`QuestRewardPanel`, nuovo): riscritta da zero sui ruoli di `/design-system` (`SkinScope`, `data-skin="panel|section|badge|title|cta"`, token `--skin-*`); un test verifica che nessun elemento imposti un colore letterale.
+- `MilestoneCheckModal` è ora contenuto puro, ospitato in un pannello.
+- **Difetti corretti**: il drag dipendeva dal successo di `setPointerCapture`; una posizione NaN veniva scartata silenziosamente da React; `rect.width ?? width` non intercettava `width: 0`.
+- **Safeguard**: tsc, build:check, kanban:lint, eslint verdi; **124 test passed** (26 nuovi); route 200.
 
 ---
 

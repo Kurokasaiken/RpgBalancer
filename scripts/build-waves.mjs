@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Generates the coastal wave marks and writes their placement into the atmosphere
- * config.
+ * Generates the open-water swell marks and writes their placement into the
+ * atmosphere config.
  *
  * Why sprites and not a shader
  * ----------------------------
@@ -17,12 +17,16 @@
  *
  * Why they are drawn here
  * -----------------------
- * The marks are the wave hatches of an antique chart: two or three curved strokes.
+ * The marks are the swell lines of an antique chart: two or three long strokes.
  * Drawing them as vectors keeps them in the map's ink idiom, needs no artist, and
  * lets the stroke weight follow the sprite size instead of being resampled.
  *
- * Placement comes from `points.json`, which is sampled from the shoreline itself, so
- * every mark sits on a real coast and re-exporting the illustration re-derives them.
+ * Where they go
+ * -------------
+ * Placement comes from the `sea` set in `points.json`, sampled from open water with
+ * a wide belt around every shore excluded. Against the painted coastline a mark
+ * competes with the ink that is already there; out in open water it has the surface
+ * to itself and reads as swell. Re-exporting the illustration re-derives the lot.
  *
  * Usage
  *   node scripts/build-waves.mjs
@@ -43,19 +47,29 @@ const SPRITE_WIDTH = 320;
 const SPRITE_ASPECT = 0.42;
 
 /**
- * The three hatch shapes, as SVG paths in a 320x134 box.
+ * Swell lines, as SVG paths in a 320x134 box.
  *
- * Deliberately uneven: identical marks repeated around a coastline read as a
- * pattern, and a pattern reads as tiling rather than as water.
+ * Long and flat rather than tightly wavy. The first pass used steep hatches, which
+ * at map scale read as a scribble competing with the painted coastline instead of
+ * as water. A swell is nearly horizontal — the eye reads the slight lift as
+ * distance, not as noise.
+ *
+ * The three are deliberately uneven: an identical mark repeated across an ocean
+ * reads as tiling.
  */
 const SHAPES = [
-  ['M14,74 q40,-30 80,0 q40,30 80,0 q40,-30 78,0', 'M60,104 q34,-22 68,0 q34,22 66,0'],
-  ['M10,60 q46,-34 92,0 q46,34 92,0', 'M44,96 q40,-26 80,0 q40,26 78,0', 'M120,34 q30,-20 60,0'],
-  ['M18,84 q52,-36 104,0 q52,36 100,0', 'M78,44 q36,-24 72,0'],
+  ['M18,60 q70,-16 140,0 q70,16 144,0', 'M56,90 q60,-13 120,0 q60,13 120,0'],
+  ['M12,74 q84,-19 168,0 q60,14 128,0', 'M70,102 q54,-12 108,0 q54,12 106,0', 'M92,44 q46,-11 92,0'],
+  ['M24,66 q76,-18 152,0 q72,17 140,0', 'M88,96 q50,-11 100,0 q50,11 98,0'],
 ];
 
-/** Widths the marks are shown at, in world px. Varied so the coast is not uniform. */
-const MARK_WIDTHS = [150, 200, 260];
+/**
+ * Widths the marks are shown at, in world px.
+ *
+ * Larger than the first pass: these sit in open water with nothing around them, so
+ * they have to carry on their own rather than lean on the coastline.
+ */
+const MARK_WIDTHS = [280, 340, 420];
 
 /** Same golden-ratio scatter the other importers use, for the same reason. */
 function scatter(index, seed) {
@@ -66,8 +80,8 @@ async function main() {
   if (!existsSync(POINTS_PATH)) {
     throw new Error(`missing ${POINTS_PATH} — run scripts/build-terrain-masks.mjs first`);
   }
-  const { coast } = JSON.parse(readFileSync(POINTS_PATH, 'utf8'));
-  if (!coast?.length) throw new Error('points.json carries no coast points');
+  const { sea } = JSON.parse(readFileSync(POINTS_PATH, 'utf8'));
+  if (!sea?.length) throw new Error('points.json carries no open-sea points');
 
   if (existsSync(OUT_DIR)) rmSync(OUT_DIR, { recursive: true, force: true });
   mkdirSync(OUT_DIR, { recursive: true });
@@ -81,7 +95,7 @@ async function main() {
       .map(
         (d, j) =>
           `<path d="${d}" fill="none" stroke="#ffffff" stroke-linecap="round" ` +
-          `stroke-width="${9 - j * 2}" opacity="${(1 - j * 0.22).toFixed(2)}"/>`,
+          `stroke-width="${10 - j}" opacity="${(1 - j * 0.22).toFixed(2)}"/>`,
       )
       .join('');
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${SPRITE_WIDTH}" height="${height}" viewBox="0 0 320 134">${paths}</svg>`;
@@ -95,7 +109,7 @@ async function main() {
     console.log(`  ✓ wave_0${i + 1}.webp  ${info.width}x${info.height}  ${(info.size / 1024).toFixed(1)} KB`);
   }
 
-  const marks = coast.map((point, i) => {
+  const marks = sea.map((point, i) => {
     const shape = (i % SHAPES.length) + 1;
     const width = MARK_WIDTHS[Math.floor(scatter(i, 0.31) * MARK_WIDTHS.length)];
     const markHeight = Math.round(width * SPRITE_ASPECT);
@@ -108,10 +122,10 @@ async function main() {
   });
 
   const block = `  waves: {
-    cycleSeconds: 17,
-    visibleFraction: 0.3,
-    opacity: 0.32,
-    bobWorldPx: 6,
+    cycleSeconds: 46,
+    visibleFraction: 0.16,
+    opacity: 0.46,
+    bobWorldPx: 3,
     marks: [
 ${marks.join('\n')}
     ],
