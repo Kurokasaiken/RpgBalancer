@@ -60,6 +60,8 @@ const DEFAULT_SHALLOW = 45;
 /** How many scattered points to emit for each surface. */
 const COAST_POINTS = 26;
 const LAND_POINTS = 6;
+/** Swell marks, out in open water away from every shore. */
+const SEA_POINTS = 18;
 
 function parseArgs(argv) {
   const opts = { feather: DEFAULT_FEATHER, shallow: DEFAULT_SHALLOW };
@@ -181,22 +183,32 @@ async function main() {
     .toBuffer();
   const shallowInfo = await writeAlphaMask(shallow, width, height, join(OUT_DIR, 'shallow_mask.webp'));
 
-  // Wave marks sit on the shoreline band; flocks lift off from well inland, so the
-  // land shape is eroded first and only its core is sampled.
   const coastPath = join(LAYERS_DIR, COAST_SOURCE);
   const coast = existsSync(coastPath)
     ? await scatterPoints(await sharp(coastPath).toBuffer(), width, height, COAST_POINTS, 40)
     : [];
+
+  // Flocks lift off from well inland, so the land shape is eroded first and only its
+  // core is sampled — otherwise a take-off point lands on a beach or in the water.
   const inland = await sharp(landHard).blur(30).threshold(230).toBuffer();
   const land = await scatterPoints(inland, width, height, LAND_POINTS, 200);
 
-  writeFileSync(join(OUT_DIR, 'points.json'), `${JSON.stringify({ coast, land }, null, 2)}\n`);
+  // Open water: the sea minus a wide belt around every shore. `spread` is already
+  // the falloff away from land, so inverting it and keeping the dark part leaves the
+  // water that is far from any coast. Swell belongs out there — against the painted
+  // shoreline a wave mark competes with the ink instead of reading as sea.
+  const offshore = await sharp(await sharp(spread).negate().threshold(250).toBuffer())
+    .composite([{ input: await sharp(seaOnly).threshold(128).toBuffer(), blend: 'multiply' }])
+    .toBuffer();
+  const sea = await scatterPoints(offshore, width, height, SEA_POINTS, 200);
+
+  writeFileSync(join(OUT_DIR, 'points.json'), `${JSON.stringify({ coast, land, sea }, null, 2)}\n`);
 
   const cover = async (buf) => (((await sharp(buf).stats()).channels[0].mean / 255) * 100).toFixed(1);
   console.log(`\n  ✓ sea_mask.webp      ${(seaInfo.size / 1024).toFixed(0)} KB   ${await cover(seaSoft)}% mare`);
   console.log(`  ✓ land_mask.webp     ${(landInfo.size / 1024).toFixed(0)} KB   ${await cover(landSoft)}% terra`);
   console.log(`  ✓ shallow_mask.webp  ${(shallowInfo.size / 1024).toFixed(0)} KB   ${await cover(shallow)}% acqua bassa`);
-  console.log(`  ✓ points.json        ${coast.length} punti costa, ${land.length} punti entroterra`);
+  console.log(`  ✓ points.json        ${coast.length} costa, ${land.length} entroterra, ${sea.length} mare aperto`);
 
   if (coast.length < COAST_POINTS) console.warn(`\n⚠️  solo ${coast.length}/${COAST_POINTS} punti costa`);
   if (land.length < LAND_POINTS) console.warn(`⚠️  solo ${land.length}/${LAND_POINTS} punti entroterra`);

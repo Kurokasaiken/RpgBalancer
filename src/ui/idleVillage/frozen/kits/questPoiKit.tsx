@@ -27,8 +27,17 @@ import { createKitShell, withKitShell, type KitProviderName } from '../_infra/Ki
 export { MagicCircleHalo } from '@/ui/idleVillage/components/MagicCircleHalo';
 export { MilestoneCheckModal } from '@/ui/idleVillage/components/MilestoneCheckModal';
 export { default as QuestChronicle } from '@/ui/idleVillage/components/QuestChronicle';
+export { FloatingPanel } from '@/ui/idleVillage/components/FloatingPanel';
+export { QuestRewardPanel } from '@/ui/idleVillage/components/QuestRewardPanel';
 export type { MagicCircleHaloProps } from '@/ui/idleVillage/components/MagicCircleHalo';
 export type { MilestoneCheckModalProps } from '@/ui/idleVillage/components/MilestoneCheckModal';
+export type { FloatingPanelProps } from '@/ui/idleVillage/components/FloatingPanel';
+export type {
+  QuestRewardPanelProps,
+  QuestRewardPhaseLine,
+  QuestRewardLine,
+  QuestRewardPartyLine,
+} from '@/ui/idleVillage/components/QuestRewardPanel';
 export type {
   QuestChronicleProps,
   QuestChroniclePhase,

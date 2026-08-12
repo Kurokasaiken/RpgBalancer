@@ -89,3 +89,40 @@ I POI di tipo *quest* si distinguono dagli altri POI della famiglia per tre cara
 
 **Formulazione approvata (FROZEN):**
 I POI di tipo *quest* si distinguono dagli altri POI della famiglia per tre caratteristiche. (1) **Timer visivo**: durante la spedizione, attorno al POI si scrive progressivamente un cerchio magico — iscrizione arcana che si materializza carattere per carattere partendo dalle ore 12, senza binari né cerchio preesistente, nel linguaggio visivo "si riempie di luce". (2) **Skill check per milestone**: a ogni 25% della durata totale (calcolata dalla somma delle fasi del blueprint) si esegue uno skill check con Destiny Astrolabe V1, alimentato dalla somma delle stat dei residenti assegnati; ogni fase può produrre ferite/morte/loot modifier senza interrompere la quest; il giocatore può interrompere manualmente. (3) **Quest card con esito manuale**: completato il cerchio, il POI è cliccabile — si apre la `QuestChronicle` (card cinematografica a fasi) con rope luminosa, un riquadro per fase, animazione Astrolabe visibile, consumabili spendibili prima del lancio, e un pulsante "Raccogli ricompense" che chiude la card, restituisce i residenti al roster e applica le ricompense. Tutto il sistema — timer, card, slot behavior, coupling al time engine — deve essere portabile con una riga (frozen kit) e valido per tutta la famiglia POI, non solo per il POI quest.
+
+---
+
+## v4 — POI Quest System: pannelli flottanti e ritmo delle fasi
+
+**Status:** FROZEN
+**Date:** 2026-08-12
+**Authorized by:** Fausto
+**Reason:** avallo esplicito — "considerali come la desiderata e risolvili tutti uno ad uno".
+
+**Intento del Director (verbatim):**
+- "quando si apre il Detail nn posso + uscire e nn posso interagire con nient'altro."
+- "quando sn nella quest nn posso interagire"
+- "quei pannelli devono essere poter spostati (ded)"
+- "Le fasi della risoluzione devono essere risolti 1 ad uno, ma deve passare il tempo tra le varie fasi. Se c sn 4 fasi, e la quest dura un minuto, 60/4 secondi è qunato dura ogni fase. nn possono risolversi tutte insieme."
+- "quando sono nelle milestone nn posso ridurre a icona, o interagire con il resto della pagina"
+- "la pagina di reward/vittoria deve essere fatta da 0 partendo da: /design-system"
+
+**Formulazione approvata (FROZEN):**
+I pannelli del POI quest — POI detail, quest card e skill check di milestone — non
+sono modali che bloccano lo schermo: sono **pannelli flottanti**. Ognuno si può
+**spostare** trascinandone l'intestazione, **ridurre a icona** e **chiudere**, e
+mentre è aperto il resto della pagina resta pienamente interagibile: nessun
+backdrop, nessuna cattura del puntatore. Più pannelli possono coesistere e quello
+toccato per ultimo passa davanti.
+
+Le fasi di una quest si risolvono **una alla volta, con tempo reale che scorre tra
+l'una e l'altra**: ogni fase occupa una fetta uguale della durata della quest
+(quattro fasi su un minuto = quindici secondi ciascuna) e non è mai possibile che
+più fasi si risolvano nello stesso istante. Finché uno skill check è aperto e in
+attesa del giocatore il tempo della quest non avanza; se il giocatore lo riduce a
+icona la fase si risolve da sé e la quest riprende a scorrere.
+
+La schermata di **ricompensa/vittoria** è riscritta da zero sui primitivi del
+design system (`/design-system`): non è più uno splash sovrapposto alla cronaca,
+ma una superficie propria che presenta esito, fasi affrontate, ricompense e sorte
+del party, e da cui si raccoglie.

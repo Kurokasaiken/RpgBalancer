@@ -259,3 +259,116 @@
 .trailer-ws-badge .ws-content {
   padding: 0 !important;
 }
+
+/* ── TrailerThreatComponent ───────────────────────────────────────── */
+
+.trailer-threat-component {
+  width: min(420px, 86vw);
+  opacity: 0;
+  transform: scale(0.92) translateY(12px);
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.trailer-threat-component--in,
+.trailer-threat-component--idle {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+.trailer-threat-component__surface .ws-content {
+  padding: 0 !important;
+}
+
+.trailer-threat-component__content {
+  padding: 28px 30px 30px;
+  text-align: center;
+}
+
+.trailer-threat-component__plaque {
+  margin-bottom: 8px;
+}
+
+.trailer-threat-component__title {
+  margin: 0;
+}
+
+.trailer-threat-component__subtitle {
+  margin: 4px 0 0;
+}
+
+.trailer-threat-component__sticker {
+  width: 56%;
+  margin: 18px auto 0;
+}
+
+.trailer-threat-component__sticker img {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.55));
+}
+
+.trailer-threat-component__ring {
+  position: relative;
+  width: 92px;
+  height: 92px;
+  margin: 18px auto 0;
+}
+
+.trailer-threat-component__ring-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.trailer-threat-component__ring-track {
+  fill: none;
+  stroke: rgba(201, 162, 39, 0.22);
+  stroke-width: 6;
+}
+
+.trailer-threat-component__ring-progress {
+  fill: none;
+  stroke: #c9a227;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-dasharray: 289;
+  stroke-dashoffset: 289;
+  transition: stroke-dashoffset 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.trailer-threat-component--in .trailer-threat-component__ring-progress,
+.trailer-threat-component--idle .trailer-threat-component__ring-progress {
+  stroke-dashoffset: 0;
+}
+
+.trailer-threat-component__ring-number {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--trailer-font-display);
+  font-size: 2rem;
+  font-weight: 900;
+  color: #c9a227;
+}
+
+.trailer-threat-component__days {
+  display: block;
+  margin-top: 8px;
+  font-family: var(--trailer-font-display);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--trailer-parchment);
+}
+
+.trailer-threat-component__replay {
+  margin-top: 20px;
+}

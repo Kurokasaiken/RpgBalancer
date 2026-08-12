@@ -56,15 +56,15 @@ const MinimalDestinyAstrolabeV3Page = lazy(() => import('./pages/minimal-destiny
 const MinimalDestinyAstrolabeV4Page = lazy(() => import('./pages/minimal-destiny-astrolabe-v4').then(m => ({ default: m.default })));
 const MinimalOutcomeModalPage = lazy(() => import('./pages/minimal-outcome').then(m => ({ default: m.default })));
 const MinimalMarketActionCardPage = lazy(() => import('./pages/minimal-market-page').then(m => ({ default: m.default })));
-const MinimalIntegrationQuestFlowPage = lazy(() => import('./pages/minimal-integration-quest-flow').then(m => ({ default: m.default })));
+const QuestDetailCandidatesPage = lazy(() => import('./pages/quest-detail-candidates').then(m => ({ default: m.default })));
 const MinimalJobPoiRosterIntegrationPage = lazy(() => import('./pages/minimal-job-poi-roster-integration').then(m => ({ default: m.default })));
 const MinimalJobPoiRosterTimeIntegrationPage = lazy(() => import('./pages/minimal-job-poi-roster-time-integration').then(m => ({ default: m.default })));
-const MinimalQuestDetailPage = lazy(() => import('./pages/minimal-quest-detail').then(m => ({ default: m.default })));
 const MinimalTimeDaynightIntegrationPage = lazy(() => import('./pages/minimal-time-daynight-integration').then(m => ({ default: m.default })));
 const SpellCreatorTestPage = lazy(() => import('./pages/spell-creator').then(m => ({ default: m.default })));
 const TrailerViewer = lazy(() => import('./ui/idleVillage/trailer/TrailerViewer'));
 const TrailerThreatIter = lazy(() => import('./ui/idleVillage/trailer/TrailerThreatIter'));
 const TrailerThreatPage = lazy(() => import('./ui/idleVillage/trailer/TrailerThreatPage').then(m => ({ default: m.TrailerThreatPage })));
+const TrailerThreatComponentPage = lazy(() => import('./ui/idleVillage/trailer/TrailerThreatComponentPage').then(m => ({ default: m.TrailerThreatComponentPage })));
 const TrailerChoicePage = lazy(() => import('./ui/idleVillage/trailer/TrailerChoicePage').then(m => ({ default: m.TrailerChoicePage })));
 const TrailerPreparationPage = lazy(() => import('./ui/idleVillage/trailer/TrailerPreparationPage').then(m => ({ default: m.TrailerPreparationPage })));
 const TrailerRiskPage = lazy(() => import('./ui/idleVillage/trailer/TrailerRiskPage').then(m => ({ default: m.TrailerRiskPage })));
@@ -223,20 +223,20 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/minimal-outcome';
   const isMinimalMarketActionCardPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-market';
-  const isMinimalIntegrationQuestFlowPath =
-    typeof window !== 'undefined' && window.location.pathname === '/minimal-integration-quest-flow';
+  const isQuestDetailCandidatesPath =
+    typeof window !== 'undefined' && window.location.pathname === '/quest-detail-candidates';
   const isMinimalJobPoiRosterIntegrationPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-job-poi-roster-integration';
   const isMinimalJobPoiRosterTimeIntegrationPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-job-poi-roster-time-integration';
-  const isMinimalQuestDetailPath =
-    typeof window !== 'undefined' && window.location.pathname === '/minimal-quest-detail';
   const isMinimalTimeDaynightIntegrationPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-time-daynight-integration';
   const isSpellCreatorPath =
     typeof window !== 'undefined' && window.location.pathname === '/spell-creator';
   const isTrailerThreatPath =
     typeof window !== 'undefined' && window.location.pathname === '/trailer-threat';
+  const isTrailerThreatComponentPath =
+    typeof window !== 'undefined' && window.location.pathname === '/trailer-threat-component';
   const isTrailerChoicePath =
     typeof window !== 'undefined' && window.location.pathname === '/trailer-choice';
   const isTrailerPreparationPath =
@@ -595,11 +595,11 @@ function App() {
     );
   }
 
-  if (isMinimalIntegrationQuestFlowPath) {
+  if (isQuestDetailCandidatesPath) {
     return (
-      <ErrorBoundary componentName="Minimal Integration Quest Flow Page">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Integration Quest Flow Test…</div>}>
-          <MinimalIntegrationQuestFlowPage />
+      <ErrorBoundary componentName="Quest Detail Candidates Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Quest Detail Candidates…</div>}>
+          <QuestDetailCandidatesPage />
         </Suspense>
       </ErrorBoundary>
     );
@@ -620,16 +620,6 @@ function App() {
       <ErrorBoundary componentName="Minimal Job POI Roster Time Integration Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading POI Roster Time Integration…</div>}>
           <MinimalJobPoiRosterTimeIntegrationPage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
-
-  if (isMinimalQuestDetailPath) {
-    return (
-      <ErrorBoundary componentName="Minimal Quest Detail Page">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Quest Detail…</div>}>
-          <MinimalQuestDetailPage />
         </Suspense>
       </ErrorBoundary>
     );
@@ -660,6 +650,16 @@ function App() {
       <ErrorBoundary componentName="Trailer Threat">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer Threat…</div>}>
           <TrailerThreatPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isTrailerThreatComponentPath) {
+    return (
+      <ErrorBoundary componentName="Trailer Threat Component">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer Threat Component…</div>}>
+          <TrailerThreatComponentPage />
         </Suspense>
       </ErrorBoundary>
     );

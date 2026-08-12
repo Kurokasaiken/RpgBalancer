@@ -5,19 +5,19 @@
  * consumables against the phase's risk, then the Destiny Astrolabe animation
  * plays and its verdict is read back.
  *
- * It renders as a full-viewport overlay because the astrolabe is a cinematic,
- * self-sizing component; nesting it inside the quest card's layout would fight
- * its own chrome. The player still reads the card underneath once the check is
- * dismissed.
+ * It renders content only — no overlay, no backdrop, no dialog chrome. The
+ * caller hosts it in a `FloatingPanel`, so the check can be moved, minimised
+ * and left open while the player keeps using the rest of the surface
+ * (desiderata v4).
  *
- * The modal is presentation only: difficulty, stats and risk all arrive as
- * props, resolved from config by the caller.
+ * Presentation only: difficulty, stats and risk all arrive as props, resolved
+ * from config by the caller.
  */
 
 import { useCallback, useMemo, useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from '@/localization/useTranslation';
-import { SkinScope, SkinButton, SkinTitle } from '@/ui/idleVillage/skins/primitives';
+import { SkinButton } from '@/ui/idleVillage/skins/primitives';
 import { DestinyAstrolabeStandalone } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeKit';
 import type {
   AstrolabeResult,
@@ -63,7 +63,7 @@ type ModalStep = 'prepare' | 'roll';
 /**
  * MilestoneCheckModal — see module docblock.
  * @param props - Component props
- * @returns The full-viewport skill check overlay
+ * @returns The skill check content, to be hosted in a FloatingPanel
  */
 export function MilestoneCheckModal({
   phaseTitle,
@@ -103,28 +103,20 @@ export function MilestoneCheckModal({
   );
 
   return (
-    <div
-      data-testid="milestone-check-modal"
-      role="dialog"
-      aria-modal="true"
-      aria-label={t('idleVillage:milestoneCheck.ariaLabel', {
-        defaultValue: 'Quest phase skill check',
-      })}
-      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/92 p-4"
-    >
-      <SkinScope className="w-full max-w-3xl">
+    <div data-testid="milestone-check-modal" className="w-full">
+      <div>
         {step === 'prepare' ? (
-          <div className="space-y-5 rounded-xl border border-amber-700/40 bg-slate-950/95 p-6 shadow-2xl">
+          <div className="space-y-5 p-5">
             <header className="space-y-1 text-center">
               <p className="text-[10px] uppercase tracking-[0.4em] text-amber-200/60">
                 {t('idleVillage:milestoneCheck.eyebrow', { defaultValue: 'Milestone' })}
                 {' · '}
                 {milestoneLabel}
               </p>
-              <SkinTitle>
+              <p className="text-lg tracking-[0.14em] text-amber-100">
                 {phaseIcon ? `${phaseIcon} ` : ''}
                 {phaseTitle}
-              </SkinTitle>
+              </p>
               {phaseSummary && (
                 <p className="mx-auto max-w-xl text-sm italic text-slate-400">{phaseSummary}</p>
               )}
@@ -252,7 +244,7 @@ export function MilestoneCheckModal({
             )}
           </div>
         )}
-      </SkinScope>
+      </div>
     </div>
   );
 }

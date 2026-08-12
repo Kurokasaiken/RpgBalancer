@@ -50,6 +50,11 @@
       "maintenance": "Manutenzione"
     }
   },
+  "floatingPanel": {
+    "minimize": "Riduci a icona",
+    "restore": "Ripristina il pannello",
+    "close": "Chiudi il pannello"
+  },
   "interactionMode": {
     "mode": {
       "sandbox": {
@@ -373,6 +378,22 @@
       "branch": "diramazione",
       "timedChoice": "scelta a tempo"
     }
+  },
+  "questReward": {
+    "panelTitle": "Ricompense",
+    "eyebrowVictory": "La spedizione è tornata",
+    "eyebrowDefeat": "La spedizione è stata spezzata",
+    "trialsPassed": "{passed} prove superate su {total}",
+    "trials": "Prove",
+    "passed": "Superata",
+    "failed": "Fallita",
+    "rewards": "Ricompense",
+    "noRewards": "La spedizione non ha portato nulla a casa",
+    "party": "Party",
+    "stateNone": "Illeso",
+    "stateInjured": "Ferito",
+    "stateDead": "Caduto",
+    "collect": "Raccogli ricompense"
   },
   "workerTooltip": {
     "labels": {

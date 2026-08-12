@@ -2,7 +2,6 @@
  * questDetailKit — canonical QuestDetail isolated component.
  *
  * Contract subtree: `[data-testid="quest-detail"]`
- * Route: /minimal-quest-detail
  *
  * Shows full detail panel for a Quest:
  * narrative, skill checks, risks, rewards, party composition.

@@ -29,7 +29,11 @@ export function WorldSurfaceWaves({ enabled = true, zIndex }: WorldSurfaceWavesP
   if (!cfg || cfg.marks.length === 0) return null;
 
   const visible = Math.min(99, Math.max(1, cfg.visibleFraction * 100));
-  const peak = (visible / 2).toFixed(2);
+  // Ramp on, HOLD, ramp off — not a triangle peak. A mark that is only ever fading
+  // in or out never sits still, and the water has to read as still with a hint of
+  // movement, not as something continuously breathing.
+  const rampInPct = (visible * 0.22).toFixed(1);
+  const rampOutPct = (visible * 0.78).toFixed(1);
 
   return (
     <div
@@ -45,7 +49,8 @@ export function WorldSurfaceWaves({ enabled = true, zIndex }: WorldSurfaceWavesP
       <style>{`
         @keyframes wsWaveBreak {
           0% { opacity: 0; transform: translate3d(0, var(--ws-wave-bob), 0) scaleX(var(--ws-wave-flip)); }
-          ${peak}% { opacity: var(--ws-wave-opacity); transform: translate3d(0, 0, 0) scaleX(var(--ws-wave-flip)); }
+          ${rampInPct}% { opacity: var(--ws-wave-opacity); }
+          ${rampOutPct}% { opacity: var(--ws-wave-opacity); }
           ${visible}% { opacity: 0; transform: translate3d(0, calc(var(--ws-wave-bob) * -1), 0) scaleX(var(--ws-wave-flip)); }
           100% { opacity: 0; transform: translate3d(0, calc(var(--ws-wave-bob) * -1), 0) scaleX(var(--ws-wave-flip)); }
         }
