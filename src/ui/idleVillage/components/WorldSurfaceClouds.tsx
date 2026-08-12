@@ -1,0 +1,101 @@
+import { atmosphereAssets } from '../config/atmosphereAssets';
+
+export interface WorldSurfaceCloudsProps {
+  enabled?: boolean;
+  /** World canvas size, in world px. */
+  canvasSize: { width: number; height: number };
+  /**
+   * Stacking order. Must be above every terrain layer: those carry explicit
+   * z-index values, and a positioned element with z-index >= 1 paints over one
+   * with `auto` no matter what the DOM order is — so leaving this unset makes the
+   * clouds render behind the map even as the last child.
+   */
+  zIndex: number;
+}
+
+/**
+ * Drifting cloud layer.
+ *
+ * Each sprite is an independent <img> translated by a CSS animation, so the drift
+ * runs on the compositor and costs no JavaScript per frame. An earlier version
+ * advanced a React `elapsedSeconds` state every rAF tick and re-rendered the whole
+ * map — 21 full-canvas layers — which is what pushed p95 frame time past 300 ms.
+ *
+ * Depth comes from the band config: far clouds are smaller, slower and fainter
+ * than near ones. All three bands sit under the terrain layers, so the map reads
+ * as seen from above the weather, not through it.
+ */
+export function WorldSurfaceClouds({ enabled = true, canvasSize, zIndex }: WorldSurfaceCloudsProps) {
+  if (!enabled) return null;
+
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        position: 'absolute',
+        inset: 0,
+        zIndex,
+        // Clouds must not spill outside the map while crossing it.
+        overflow: 'hidden',
+        pointerEvents: 'none',
+        // Clouds thin out over the continent instead of being cut off at the shore:
+        // the mask is opaque over water and ~25% over land, ramped across a feathered
+        // coastline. Over land the player follows the shadow, not the cloud, so the
+        // map stays readable underneath.
+        //
+        // The mask is static — the browser rasterises it once and only the sprites
+        // animate inside it, so the per-frame cost stays plain alpha compositing.
+        maskImage: 'url(/assets/atmosphere/terrain/cloud_mask.webp)',
+        WebkitMaskImage: 'url(/assets/atmosphere/terrain/cloud_mask.webp)',
+        maskSize: '100% 100%',
+        WebkitMaskSize: '100% 100%',
+        maskRepeat: 'no-repeat',
+        WebkitMaskRepeat: 'no-repeat',
+      }}
+    >
+      <style>{`
+        @keyframes wsCloudDrift {
+          from { transform: translate3d(var(--ws-cloud-from), 0, 0); }
+          to   { transform: translate3d(var(--ws-cloud-to), 0, 0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .ws-cloud { animation: none !important; }
+        }
+      `}</style>
+
+      {atmosphereAssets.clouds.map((band) =>
+        band.sprites.map((sprite) => (
+          <img
+            key={`${band.name}-${sprite.src}-${sprite.y}`}
+            className="ws-cloud"
+            src={`/assets/atmosphere/${sprite.src}`}
+            alt=""
+            style={{
+              position: 'absolute',
+              top: sprite.y,
+              left: 0,
+              width: sprite.width,
+              height: 'auto',
+              opacity: band.opacity,
+              willChange: 'transform',
+              // Travel a full canvas width plus the sprite's own width, so it is
+              // fully off one edge before reappearing at the other.
+              ['--ws-cloud-from' as string]: `${-sprite.width}px`,
+              ['--ws-cloud-to' as string]: `${canvasSize.width}px`,
+              animationName: 'wsCloudDrift',
+              animationDuration: `${band.driftSeconds}s`,
+              animationTimingFunction: 'linear',
+              animationIterationCount: 'infinite',
+              // Negative delay starts each sprite partway through its crossing,
+              // so the band is spread out from the first frame instead of
+              // entering as a clump.
+              animationDelay: `${-sprite.delaySeconds}s`,
+            }}
+          />
+        )),
+      )}
+    </div>
+  );
+}
+
+export default WorldSurfaceClouds;

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useWorldSurface } from '../hooks/useWorldSurface';
 import { WorldSurfaceRenderer } from '../components/WorldSurfaceRenderer';
 import { WorldSurfaceDebugPanel } from '../components/WorldSurfaceDebugPanel';
+import { WorldSurfacePerfHud } from '../components/WorldSurfacePerfHud';
 import { selectWorldSurfaceRenderer } from '../config/worldSurfaceConfig';
 import { isWebGLSupported } from '../utils/webglSupport';
 import { useWorldState } from '../../../engine/world/systems/WorldState';
@@ -14,6 +15,12 @@ const WorldSurfacePixiOverlay = lazy(() => import('../components/WorldSurfacePix
 const MANIFEST_PATH = '/assets/world/wanderlust/base/manifest.json';
 const PERSIST_LAYER_OVERRIDES_KEY = 'worldSurfaceLayerOverrides';
 const PERSIST_LAYER_ORDER_KEY = 'worldSurfaceLayerOrder';
+
+// Slice 2 — hidden reaction zone (world-space coords), over the painted village.
+// Note: the manifest's `village_01` anchor (624,416) does NOT match where the
+// village is actually painted — these coords were measured off the rendered map.
+// Hard-coded for now; moves to manifest in Slice 3.
+const REACTION_ZONE = { x: 1830, y: 1350, width: 500, height: 400 } as const;
 
 function defaultCamera(config: CameraConfig) {
   return { panX: 0, panY: 0, zoom: config.defaultZoom };
@@ -44,6 +51,11 @@ export const WorldSurfaceTestPage: React.FC = () => {
   const [surfaceLayerOrder, setSurfaceLayerOrder] = useState<string[] | undefined>(undefined);
   const [mouseWorld, setMouseWorld] = useState<{ x: number; y: number } | null>(null);
   const [autoFitTrigger, setAutoFitTrigger] = useState(1);
+  const [breathEnabled, setBreathEnabled] = useState(true);
+  const [reactionTrigger, setReactionTrigger] = useState<'camera-enter' | 'pointer-dwell'>('camera-enter');
+  const [reactionActive, setReactionActive] = useState(false);
+  const dwellTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mainRef = useRef<HTMLDivElement>(null);
 
   // Initialise local state once the manifest is loaded.
   const overridesLoaded = useRef(false);
@@ -107,6 +119,46 @@ export const WorldSurfaceTestPage: React.FC = () => {
     }
   }, [layerScales, layerOffsets, surfaceLayerOrder]);
 
+  // camera-enter: active whenever the reaction zone intersects the current viewport.
+  useEffect(() => {
+    if (reactionTrigger !== 'camera-enter' || !mainRef.current) return;
+    const vw = mainRef.current.clientWidth;
+    const vh = mainRef.current.clientHeight;
+    const viewRight = camera.panX + vw / camera.zoom;
+    const viewBottom = camera.panY + vh / camera.zoom;
+    const intersects =
+      viewRight > REACTION_ZONE.x &&
+      camera.panX < REACTION_ZONE.x + REACTION_ZONE.width &&
+      viewBottom > REACTION_ZONE.y &&
+      camera.panY < REACTION_ZONE.y + REACTION_ZONE.height;
+    setReactionActive(intersects);
+  }, [camera, reactionTrigger]);
+
+  // pointer-dwell: fires after 2s continuous hover inside the zone.
+  // Stays active once discovered; resets on trigger mode change.
+  useEffect(() => {
+    if (reactionTrigger !== 'pointer-dwell') return;
+    if (!mouseWorld) return;
+    const inZone =
+      mouseWorld.x >= REACTION_ZONE.x &&
+      mouseWorld.x <= REACTION_ZONE.x + REACTION_ZONE.width &&
+      mouseWorld.y >= REACTION_ZONE.y &&
+      mouseWorld.y <= REACTION_ZONE.y + REACTION_ZONE.height;
+    if (inZone) {
+      if (!dwellTimerRef.current) {
+        dwellTimerRef.current = setTimeout(() => setReactionActive(true), 2000);
+      }
+    } else {
+      if (dwellTimerRef.current) { clearTimeout(dwellTimerRef.current); dwellTimerRef.current = null; }
+    }
+  }, [mouseWorld, reactionTrigger]);
+
+  // Reset state when switching trigger mode.
+  useEffect(() => {
+    if (dwellTimerRef.current) { clearTimeout(dwellTimerRef.current); dwellTimerRef.current = null; }
+    setReactionActive(false);
+  }, [reactionTrigger]);
+
   const handleResetCamera = useCallback(() => {
     if (!cameraConfig || !manifest) return;
     if (manifest.renderer?.autoFit) {
@@ -115,6 +167,7 @@ export const WorldSurfaceTestPage: React.FC = () => {
       setCamera(defaultCamera(cameraConfig));
     }
   }, [cameraConfig, manifest]);
+
 
   const rendererType = useMemo(() => {
     if (!manifest) return 'dom' as const;
@@ -189,7 +242,10 @@ export const WorldSurfaceTestPage: React.FC = () => {
         </a>
       </header>
 
-      <main className="relative flex-1">
+      <main
+        ref={mainRef}
+        className="relative flex-1 overflow-hidden"
+      >
         <WorldSurfaceRenderer
           manifest={manifest}
           camera={camera}
@@ -203,12 +259,89 @@ export const WorldSurfaceTestPage: React.FC = () => {
           runtimeObjects={objects}
           renderObjects={rendererType !== 'webgl'}
           autoFitTrigger={autoFitTrigger}
+          showRegions={false}
+          breathEnabled={breathEnabled}
         />
 
         {rendererType === 'webgl' && (
           <Suspense fallback={null}>
             <WorldSurfacePixiOverlay manifest={manifest} camera={camera} objects={objects} />
           </Suspense>
+        )}
+
+        {/* Reaction zone overlay — world-space coords, same transform as the renderer's world div */}
+        {manifest && (
+          <>
+            <style>{`
+              @keyframes wsReactionPulse {
+                0%, 100% { opacity: 0.55; }
+                50% { opacity: 1; }
+              }
+            `}</style>
+            <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: manifest.coordinateSystem.canvas.width,
+                height: manifest.coordinateSystem.canvas.height,
+                transformOrigin: 'top left',
+                transform: `translate(${-camera.panX * camera.zoom}px, ${-camera.panY * camera.zoom}px) scale(${camera.zoom})`,
+              }}>
+                {/* Zone indicator disabled — removed debug riquadro giallo */}
+                {false && (
+                  <div style={{
+                    position: 'absolute',
+                    left: REACTION_ZONE.x,
+                    top: REACTION_ZONE.y,
+                    width: REACTION_ZONE.width,
+                    height: REACTION_ZONE.height,
+                    border: '1px dashed rgba(251,191,36,0.25)',
+                    pointerEvents: 'none',
+                  }} />
+                )}
+                {false && reactionActive && (
+                  <div style={{
+                    position: 'absolute',
+                    left: REACTION_ZONE.x,
+                    top: REACTION_ZONE.y,
+                    width: REACTION_ZONE.width,
+                    height: REACTION_ZONE.height,
+                    border: '2px solid rgba(251,191,36,0.85)',
+                    boxShadow: '0 0 28px rgba(251,191,36,0.35), inset 0 0 28px rgba(251,191,36,0.12)',
+                    borderRadius: 6,
+                    animationName: 'wsReactionPulse',
+                    animationDuration: '2.5s',
+                    animationTimingFunction: 'ease-in-out',
+                    animationIterationCount: 'infinite',
+                  }}>
+                    <div style={{
+                      position: 'absolute',
+                      bottom: -26,
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      color: '#fbbf24',
+                      fontSize: 14,
+                      fontWeight: 600,
+                      textShadow: '0 1px 4px rgba(0,0,0,0.9)',
+                      whiteSpace: 'nowrap',
+                      letterSpacing: '0.06em',
+                    }}>
+                      qualcosa si muove...
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        )}
+
+        {import.meta.env.DEV && (
+          <WorldSurfacePerfHud
+            containerRef={mainRef}
+            visibleLayerCount={visibleLayerIds.size}
+            zoom={camera.zoom}
+          />
         )}
 
         <WorldSurfaceDebugPanel
@@ -235,6 +368,11 @@ export const WorldSurfaceTestPage: React.FC = () => {
           objectCount={objects.length}
           onSpawnObjects={handleSpawnObjects}
           onClearObjects={handleClearObjects}
+          breathEnabled={breathEnabled}
+          onBreathEnabledChange={setBreathEnabled}
+          reactionTrigger={reactionTrigger}
+          reactionActive={reactionActive}
+          onReactionTriggerChange={setReactionTrigger}
         />
       </main>
     </div>

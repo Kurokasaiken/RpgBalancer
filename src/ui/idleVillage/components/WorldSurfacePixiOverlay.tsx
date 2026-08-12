@@ -173,6 +173,11 @@ export const WorldSurfacePixiOverlay: React.FC<WorldSurfacePixiOverlayProps> = (
 
     const initTask = (async () => {
       await app!.init({
+        // Pin WebGL: Pixi's WebGPU→WebGL fallback does not always fire inside a
+        // WebView (pixijs#10906), and when it misses, rendering fails outright
+        // instead of degrading. Tauri ships WKWebView/WebView2, so we never want
+        // WebGPU auto-selection here.
+        preference: 'webgl',
         backgroundAlpha: 0,
         antialias,
         resolution,

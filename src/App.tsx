@@ -74,6 +74,8 @@ const TrailerOutroPage = lazy(() => import('./ui/idleVillage/trailer/TrailerOutr
 const WorldSurfaceTestPage = lazy(() => import('./ui/idleVillage/pages/WorldSurfaceTestPage').then(m => ({ default: m.WorldSurfaceTestPage })));
 const WorldPresentationDirectorPage = lazy(() => import('./ui/idleVillage/pages/WorldPresentationDirectorPage').then(m => ({ default: m.default })));
 const UseClientPage = lazy(() => import('./ui/idleVillage/pages/UseClientPage').then(m => ({ default: m.default })));
+const PoiMarkerLabPage = lazy(() => import('./ui/idleVillage/pages/PoiMarkerLabPage').then(m => ({ default: m.PoiMarkerLabPage })));
+const PoiDetailQuestRosterTimeClockIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailQuestRosterTimeClockIntegrationPage').then(m => ({ default: m.default })));
 
 interface AppNavControls {
   getActiveTab: () => AppNavTabId;
@@ -255,6 +257,10 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/world-presentation-director';
   const isUseClientPath =
     typeof window !== 'undefined' && window.location.pathname === '/use-client';
+  const isPoiMarkerLabPath =
+    typeof window !== 'undefined' && window.location.pathname === '/poi-marker-lab';
+  const isPoiQuestDetailRosterTimeClockIntegrationPath =
+    typeof window !== 'undefined' && window.location.pathname === '/poi-quest-detail-roster-time-clock';
   const isRootPath =
     typeof window !== 'undefined' &&
     (window.location.pathname === '/' || window.location.pathname === '/index.html');
@@ -809,6 +815,16 @@ function App() {
     );
   }
 
+  if (isPoiQuestDetailRosterTimeClockIntegrationPath) {
+    return (
+      <ErrorBoundary componentName="Quest POI Detail Roster Time Clock Integration Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Quest POI Detail Roster Time Clock Integration...</div>}>
+          <PoiDetailQuestRosterTimeClockIntegrationPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
   if (isPoiJobDetailRosterIntegrationPath) {
     return (
       <ErrorBoundary componentName="Job POI Detail Roster Integration Page">
@@ -914,6 +930,16 @@ function App() {
       <ErrorBoundary componentName="World Presentation Director">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading World Presentation Director...</div>}>
           <WorldPresentationDirectorPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isPoiMarkerLabPath) {
+    return (
+      <ErrorBoundary componentName="POI Marker Lab Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading POI Marker Lab...</div>}>
+          <PoiMarkerLabPage />
         </Suspense>
       </ErrorBoundary>
     );

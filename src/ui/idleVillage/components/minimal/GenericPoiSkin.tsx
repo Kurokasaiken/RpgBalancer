@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
 import { useId, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from '@/localization/useTranslation';
-import { computeStageState, colorToRgba, type ColorPalette } from './expiryStageEngine';
+import { computeStageState, type ColorPalette } from './expiryStageEngine';
 import { getPoiPalette } from '../../../visualFidelityLab/poiMedallionRecipe';
 import { PoiParticles } from './PoiParticles';
 
@@ -174,10 +174,25 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
     return Math.max(0, Math.min(timeRemainingMs / totalDurationMs, 1));
   }, [isExpirable, timeRemainingMs, totalDurationMs]);
 
-  // Get palette for POI type (quest/event/job/activity)
-  const poiPalette = useMemo(() => {
-    const palette = getPoiPalette(cardKind);
-    return palette as ColorPalette;
+  // Get palette for POI type (quest/event/job/activity) and convert to ColorPalette format
+  const colorPalette = useMemo((): ColorPalette => {
+    const poiPalette = getPoiPalette(cardKind);
+    // Convert PoiPalette to ColorPalette format for expiry stage engine
+    // base: normal state, alert: warning state, critical: urgent state, glow: outer glow
+    return {
+      base: poiPalette.coronaCore,
+      alert: { 
+        r: Math.min(255, poiPalette.coronaCore.r + 40), 
+        g: Math.max(0, poiPalette.coronaCore.g - 30), 
+        b: Math.max(0, poiPalette.coronaCore.b - 20) 
+      },
+      critical: { 
+        r: Math.min(255, poiPalette.coronaCore.r + 80), 
+        g: Math.max(0, poiPalette.coronaCore.g - 60), 
+        b: Math.max(0, poiPalette.coronaCore.b - 40) 
+      },
+      glow: poiPalette.coronaGlow,
+    };
   }, [cardKind]);
 
   const stageState = useMemo(() => {
@@ -191,8 +206,8 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
         rotationActive: false,
       };
     }
-    return computeStageState(remainingFraction, poiPalette);
-  }, [isExpirable, remainingFraction, poiPalette, completedCoronaCore, completedCoronaGlow]);
+    return computeStageState(remainingFraction, colorPalette);
+  }, [isExpirable, remainingFraction, colorPalette, completedCoronaCore, completedCoronaGlow]);
 
   const expiredCoronaCore = stageState.fillColor;
   const expiredCoronaGlow = stageState.glowColor;
@@ -223,7 +238,10 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
   const bloomRy = isStone ? 28 : 32;
   const shadowCx = isStone ? 2 : 1.8;
   const shadowCy = isStone ? 21 : 16;
-  const outerHaloRadius = isStone ? 23 : 22;
+
+  // Vary radius by cardKind: quest smaller/faster, job larger/heavier, activity medium
+  const radiusModifier = cardKind === 'quest' ? 0.85 : cardKind === 'job' ? 1.15 : 1.0;
+  const outerHaloRadius = (isStone ? 23 : 22) * radiusModifier;
 
   // Corona layer widths — MUCH thicker, matching the approved reference
   // (poi-skin-preview.html: TRACK_SW=5 on TRACK_R=28 ⇒ ~18%/25%/9% of radius
@@ -481,7 +499,7 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
           strokeWidth={coronaGlowWidth}
           strokeLinecap="round"
           filter={`url(#${glowFilterId})`}
-          opacity={0.68}
+          opacity={progress < 0.15 ? 0 : 0.68}
           data-halo="outer"
           transform="rotate(-90)"
         />
@@ -495,7 +513,7 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
           strokeWidth={coronaMainWidth}
           strokeLinecap="round"
           filter={`url(#${turbAFilterId})`}
-          opacity={0.9}
+          opacity={progress < 0.15 ? 0 : 0.9}
           data-halo="inner"
           transform="rotate(-90)"
         />
@@ -510,7 +528,7 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
           strokeWidth={coronaFineWidth}
           strokeLinecap="round"
           filter={`url(#${turbBFilterId})`}
-          opacity={0.5}
+          opacity={progress < 0.15 ? 0 : 0.5}
           data-halo="fine"
           transform="rotate(-90)"
         />
@@ -526,7 +544,7 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
           stroke={`rgba(${Math.min(255, expiredCoronaCore.r + 60)},${Math.min(255, expiredCoronaCore.g + 50)},${Math.min(255, expiredCoronaCore.b + 30)},0.9)`}
           strokeWidth={coronaMainWidth * 0.6}
           strokeLinecap="round"
-          opacity={0}
+          opacity={progress < 0.15 ? 0 : 0}
           data-halo="reflect"
           transform="rotate(-90)"
         />

@@ -36,6 +36,18 @@ export interface QuestChronicleProps {
   panoramaUrl?: string;
   loreDrop?: LoreDrop | null;
   loreDropDiscovered?: boolean;
+  /**
+   * Overall quest progress 0–1, driving the rope at the bottom of the card.
+   * Distinct from `activePhaseProgress`, which is progress inside one phase.
+   * Omit to hide the rope entirely.
+   */
+  questProgress?: number;
+  /**
+   * Called when the player collects the rewards. When provided and the quest
+   * has an outcome, the card shows the collect button and does not close on
+   * its own — the player decides when to leave.
+   */
+  onCollect?: () => void;
 }
 
 const RISK_FALLBACKS: Record<QuestPhaseType, { injury: number; death: number }> = {
@@ -137,6 +149,8 @@ const QuestChronicle: React.FC<QuestChronicleProps> = ({
   panoramaUrl,
   loreDrop,
   loreDropDiscovered = false,
+  questProgress,
+  onCollect,
 }) => {
   const [isNarrativeExpanded, setIsNarrativeExpanded] = useState(true);
   const { t } = useTranslation('idleVillage');
@@ -330,7 +344,7 @@ const QuestChronicle: React.FC<QuestChronicleProps> = ({
 
             {/* Main row: phases + narrative */}
             <div style={{ display: 'flex', gap: '2.5%', alignItems: 'stretch', flexWrap: 'wrap' }}>
-              {/* Phase cards */}
+              {/* Phase cards — one square per quest phase, with its outcome */}
               <div style={{ flex: '1 1 280px', display: 'flex', gap: '1.8%', minWidth: 0 }}>
                 {cards.map((card) => (
                   <PhaseCard key={card.key} card={card} />
@@ -416,6 +430,11 @@ const QuestChronicle: React.FC<QuestChronicleProps> = ({
                 </div>
               </div>
             </div>
+
+            {/* Rope — the whole-quest timer, filling with light as time runs out */}
+            {questProgress !== undefined && (
+              <QuestRope progress={questProgress} label={t('idleVillage:questChronicle.ropeLabel', { defaultValue: 'Quest time' })} />
+            )}
           </div>
 
           {/* Outcome splash overlay */}
@@ -463,10 +482,108 @@ const QuestChronicle: React.FC<QuestChronicleProps> = ({
                     {_outcome.subLabel}
                   </div>
                 )}
+                {/*
+                  Collect gate: the card never dismisses itself. The player
+                  reads what happened and leaves on their own terms.
+                */}
+                {onCollect && (
+                  <button
+                    type="button"
+                    data-testid="quest-chronicle-collect"
+                    onClick={onCollect}
+                    style={{
+                      marginTop: 14,
+                      padding: '9px 26px',
+                      borderRadius: 4,
+                      border: '1px solid rgba(214,170,66,.6)',
+                      background: 'linear-gradient(180deg, rgba(72,50,14,.95), rgba(36,24,6,.95))',
+                      color: '#f4e3ab',
+                      fontFamily: "'Trebuchet MS', sans-serif",
+                      fontSize: 'clamp(8px, 0.9vw, 11px)',
+                      letterSpacing: '0.32em',
+                      textTransform: 'uppercase',
+                      cursor: 'pointer',
+                      boxShadow: '0 0 18px rgba(212,168,64,.28), inset 0 1px 0 rgba(255,232,150,.22)',
+                    }}
+                  >
+                    {t('idleVillage:questChronicle.collectRewards', {
+                      defaultValue: 'Collect rewards',
+                    })}
+                  </button>
+                )}
               </div>
             </div>
           )}
         </div>
+      </div>
+    </div>
+  );
+};
+
+interface QuestRopeProps {
+  /** Overall quest progress 0–1. */
+  progress: number;
+  /** Accessible label for the timer. */
+  label: string;
+}
+
+/**
+ * QuestRope — the whole-quest timer along the bottom of the card.
+ *
+ * Hearthstone's rope burns down; ours fills with light, which is the project's
+ * visual language for elapsing time (desiderata v3): the groove starts unlit
+ * and the light travels along it, with a brighter head at the leading edge.
+ * @param props - Progress and accessible label
+ * @returns The rope track
+ */
+const QuestRope: React.FC<QuestRopeProps> = ({ progress, label }) => {
+  const pct = Math.min(100, Math.max(0, progress * 100));
+
+  return (
+    <div style={{ marginTop: '2.6%' }}>
+      <div
+        data-testid="quest-chronicle-rope"
+        role="progressbar"
+        aria-label={label}
+        aria-valuenow={Math.round(pct)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        style={{
+          position: 'relative',
+          height: 7,
+          borderRadius: 4,
+          background: 'linear-gradient(180deg, rgba(0,0,0,.72), rgba(12,10,6,.5))',
+          boxShadow: 'inset 0 1px 3px rgba(0,0,0,.9), inset 0 -1px 0 rgba(120,90,30,.14)',
+          overflow: 'hidden',
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            inset: '0 auto 0 0',
+            width: `${pct}%`,
+            borderRadius: 4,
+            background: 'linear-gradient(90deg, rgba(120,74,16,.85), #d9a63c 62%, #ffeaa6 100%)',
+            boxShadow: '0 0 10px rgba(240,196,92,.55)',
+            transition: 'width 220ms linear',
+          }}
+        />
+        {pct > 0 && pct < 100 && (
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              top: -1,
+              bottom: -1,
+              left: `calc(${pct}% - 2px)`,
+              width: 4,
+              borderRadius: 3,
+              background: '#fff6d2',
+              boxShadow: '0 0 12px rgba(255,238,170,.95)',
+              transition: 'left 220ms linear',
+            }}
+          />
+        )}
       </div>
     </div>
   );

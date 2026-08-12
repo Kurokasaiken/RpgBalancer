@@ -27,3 +27,5 @@ Format: `[filename](path) — one sentence — \`tag\``
 [AGENTS.md](AGENTS.md) — agent instructions for RPG — `agent`
 [CLAUDE.md](CLAUDE.md) — pointer to AGENTS.md — `agent`
 [RICHIESTE.md](RICHIESTE.md) — intent ledger — `agent`
+[src/docs/docs/plans/poi_quest_system_exploration.md](src/docs/docs/plans/poi_quest_system_exploration.md) — POI quest: cerchio magico come timer, quest card a fasi, skill check per fase (R-005, esplorazione con risposte) — `exploration` `idle-village`
+[src/docs/docs/plans/poi_quest_system_plan.md](src/docs/docs/plans/poi_quest_system_plan.md) — POI quest: piano implementativo T-001→T-009, desiderata v3 FROZEN — `plan` `idle-village`

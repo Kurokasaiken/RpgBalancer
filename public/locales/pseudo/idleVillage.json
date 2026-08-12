@@ -1044,5 +1044,41 @@
     "legendNucleus": "[!! Céntràl cöré: crîtîcàl sûccéss !!]",
     "legendWound": "[!! Crîmsön strîpé: wöûnd !!]",
     "legendDeath": "[!! Blàck strîpé: déàth !!]"
+  },
+  "poiMarkerLab": {
+    "title": "POI Marker Lab",
+    "subtitle": "Opportunity marker baseline: colour + icon = what, timer ring = when, material = where. Placed over the canonical Wanderlust surface, because that is the only honest test.",
+    "inContext": "In context",
+    "matrix": "Type / state matrix",
+    "playground": "Playground",
+    "type": "Type",
+    "state": "State",
+    "importance": "Importance",
+    "progress": "Time left",
+    "size": "Size",
+    "counterClockwise": "Counter-clockwise (deadline)",
+    "showMap": "Show world surface",
+    "types": {
+      "quest": "Quest",
+      "job": "Job",
+      "event": "Event"
+    },
+    "states": {
+      "new": "New",
+      "available": "Available",
+      "assigned": "Assigned",
+      "expiring": "Expiring",
+      "expired": "Expired"
+    },
+    "importances": {
+      "normal": "Normal",
+      "important": "Important",
+      "critical": "Critical"
+    },
+    "variant": "Variant",
+    "variants": {
+      "baseline": "Baseline (V1)",
+      "runic": "Runic (V2)"
+    }
   }
 }

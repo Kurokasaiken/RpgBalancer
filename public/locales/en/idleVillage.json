@@ -1,17 +1,228 @@
 {
-  "THROW": "Throw",
   "SKIP": "Skip",
-  "verdict": "Verdict",
-  "stats": "Stats",
-  "difficulty": "Difficulty",
+  "THROW": "Throw",
+  "activityCapsule": {
+    "slotLabel": "Slot {index}",
+    "accessibility": {
+      "activityCapsule": "{label} activity capsule",
+      "closeDetails": "Close details"
+    },
+    "actions": {
+      "start": "Start",
+      "cancel": "Cancel",
+      "collect": "Collect"
+    },
+    "status": {
+      "idle": "Idle",
+      "inProgress": "In progress",
+      "completed": "Completed",
+      "blocked": "Blocked"
+    },
+    "sections": {
+      "assignedCharacters": "Assigned characters",
+      "requirements": "Requirements",
+      "telemetry": "Telemetry",
+      "lore": "Lore"
+    },
+    "info": {
+      "duration": "Duration",
+      "eta": "ETA",
+      "reward": "Reward"
+    },
+    "requirements": {
+      "relation": {
+        "all": "all of",
+        "any": "any of",
+        "none": "none of"
+      }
+    },
+    "telemetry": {
+      "empty": "No events yet"
+    },
+    "lore": {
+      "locked": "Lore not yet discovered"
+    },
+    "devTools": {
+      "validationTitle": "Skin Validation Errors"
+    },
+    "type": {
+      "job": "Job",
+      "quest": "Quest",
+      "training": "Training",
+      "maintenance": "Maintenance"
+    }
+  },
+  "astrolabeV3": {
+    "verdictSuccess": "Victory",
+    "verdictNearMiss": "By a Whisker",
+    "verdictFail": "Defeat",
+    "verdictCrit": "Ruin",
+    "wounded": "Wounded",
+    "dead": "Fallen",
+    "rollAgain": "Roll again",
+    "throwControls": "Throw controls",
+    "skip": "Skip",
+    "auto": "Auto",
+    "mute": "Mute",
+    "onboardingStar": "Your strength: the higher the stat, the longer the ivory lobe stretches.",
+    "onboardingRisk": "Crimson crown: land there and you are wounded. Violet chasms: a lethal fall.",
+    "onboardingThrow": "Throw the spark — where it stops is the proof of your fate."
+  },
+  "astrolabeV4": {
+    "verdictBigwin": "Triumph",
+    "subBigwin": "The sun itself signs your deed.",
+    "subSuccess": "The summit bows to your stride.",
+    "subNearMiss": "The spark danced on the rim… and slipped beyond.",
+    "subFail": "The mountain repels mortals.",
+    "subCrit": "The abyss claims those who dare too much.",
+    "explanation": "Explanation",
+    "explainContinue": "Continue",
+    "explainRequired": "The black columns are the values demanded by the trial: one for each axis of the check.",
+    "explainEnemy": "This surface is the Enemy. If the spark stops here, the check fails.",
+    "explainStats": "The white columns are your expedition's stats: the higher they rise, the further your star reaches.",
+    "explainStar": "The ivory star is your ground. If the spark stops inside it, the check succeeds.",
+    "explainLegend": "Every colour is a fate. Read the field before you throw:",
+    "legendStar": "White — star interior: success",
+    "legendAlmost": "Bronze — star rim: Almost (failed by a whisker)",
+    "legendEnemy": "Slate — the Enemy: failure",
+    "legendCrit": "Dark band inside the Enemy's edge: critical failure",
+    "legendNucleus": "Central core: critical success",
+    "legendWound": "Crimson stripe: wound",
+    "legendDeath": "Black stripe: death"
+  },
   "critPercent": "Crit Percent",
-  "woundPercent": "Wound Percent",
   "deathPercent": "Death Percent",
-  "nearMissBand": "Near Miss Band",
-  "spinDuration": "Spin Duration",
-  "slowMo": "Slow Mo",
-  "hitStop": "Hit Stop",
+  "difficulty": "Difficulty",
   "dpr": "DPR",
+  "hitStop": "Hit Stop",
+  "milestoneCheck": {
+    "ariaLabel": "Quest phase skill check",
+    "eyebrow": "Milestone",
+    "skills": "Checks to face",
+    "partyStat": "Party {value}",
+    "difficulty": "Difficulty {value}",
+    "consumables": "Spend consumables",
+    "riskLine": "Injury {injury}% · Death {death}%",
+    "roll": "Consult destiny",
+    "passed": "Phase passed",
+    "failed": "Phase failed",
+    "wounded": "A hero was wounded during this phase",
+    "casualty": "A hero fell during this phase",
+    "dismiss": "Continue"
+  },
+  "nearMissBand": "Near Miss Band",
+  "poiDetail": {
+    "risk": {
+      "injury": {
+        "title": "Chance a resident is injured"
+      },
+      "death": {
+        "title": "Chance a resident dies"
+      },
+      "danger": {
+        "title": "Danger rating of this activity"
+      }
+    }
+  },
+  "poiMarkerLab": {
+    "title": "POI Marker Lab",
+    "subtitle": "Opportunity marker baseline: colour + icon = what, timer ring = when, material = where. Placed over the canonical Wanderlust surface, because that is the only honest test.",
+    "inContext": "In context",
+    "matrix": "Type / state matrix",
+    "playground": "Playground",
+    "type": "Type",
+    "state": "State",
+    "importance": "Importance",
+    "progress": "Time left",
+    "size": "Size",
+    "counterClockwise": "Counter-clockwise (deadline)",
+    "showMap": "Show world surface",
+    "types": {
+      "quest": "Quest",
+      "job": "Job",
+      "event": "Event"
+    },
+    "states": {
+      "new": "New",
+      "available": "Available",
+      "assigned": "Assigned",
+      "expiring": "Expiring",
+      "expired": "Expired"
+    },
+    "importances": {
+      "normal": "Normal",
+      "important": "Important",
+      "critical": "Critical"
+    },
+    "variant": "Variant",
+    "variants": {
+      "baseline": "Baseline (V1)",
+      "runic": "Runic (V2)"
+    }
+  },
+  "presentation": {
+    "play": "Play",
+    "pause": "Pause",
+    "step": "Step",
+    "seed": "Seed",
+    "tick": "Tick",
+    "objects": "Objects",
+    "layers": "Layers",
+    "layerOrder": {
+      "title": "Layer Order",
+      "moveUp": "move up",
+      "moveDown": "move down"
+    },
+    "states": {
+      "unknown": "Unknown"
+    },
+    "director": {
+      "title": "World Presentation Director"
+    },
+    "inspector": {
+      "title": "Output Inspector",
+      "activeState": "Active State",
+      "runtimeObjects": "Runtime Objects",
+      "visualStateOverrides": "Visual Overrides",
+      "tick": "Tick"
+    },
+    "scenarios": {
+      "title": "Scenario",
+      "peaceful": "Peaceful",
+      "threat": "Threat",
+      "corruption": "Corruption"
+    }
+  },
+  "questChronicle": {
+    "title": "Quest Chronicle",
+    "journal": "Journal",
+    "openTheater": "Open Theater",
+    "collectRewards": "Collect rewards",
+    "ropeLabel": "Quest time",
+    "boardStatus": {
+      "success": "Last trial passed",
+      "failure": "Trial failed",
+      "pending": "Waiting for patrol outcome"
+    },
+    "outcome": {
+      "success": "Success",
+      "failure": "Failure"
+    },
+    "risk": {
+      "injury": "{percent}% injury",
+      "death": "{percent}% death"
+    },
+    "phaseType": {
+      "check": "check",
+      "fight": "fight",
+      "stealth": "stealth",
+      "trap": "trap",
+      "explore": "explore",
+      "dialogue": "dialogue",
+      "branch": "branch",
+      "timedChoice": "timed choice"
+    }
+  },
   "roster": {
     "sort": {
       "label": "Sort",
@@ -109,44 +320,27 @@
       }
     }
   },
-  "astrolabeV3": {
-    "verdictSuccess": "Victory",
-    "verdictNearMiss": "By a Whisker",
-    "verdictFail": "Defeat",
-    "verdictCrit": "Ruin",
-    "wounded": "Wounded",
-    "dead": "Fallen",
-    "rollAgain": "Roll again",
-    "throwControls": "Throw controls",
-    "skip": "Skip",
-    "auto": "Auto",
-    "mute": "Mute",
-    "onboardingStar": "Your strength: the higher the stat, the longer the ivory lobe stretches.",
-    "onboardingRisk": "Crimson crown: land there and you are wounded. Violet chasms: a lethal fall.",
-    "onboardingThrow": "Throw the spark — where it stops is the proof of your fate."
+  "slowMo": "Slow Mo",
+  "spinDuration": "Spin Duration",
+  "stats": "Stats",
+  "threatStatus": {
+    "title": "THREAT STATUS",
+    "page": {
+      "title": "Threat Status Indicator",
+      "description": "Client-only component showcase for use client directive"
+    },
+    "urgency": {
+      "calm": "CALM",
+      "warning": "WARNING",
+      "critical": "CRITICAL"
+    },
+    "type": {
+      "GOBLIN_RAID": "Goblin Raid",
+      "PLAGUE": "Plague",
+      "SIEGE": "Siege"
+    }
   },
-  "astrolabeV4": {
-    "verdictBigwin": "Triumph",
-    "subBigwin": "The sun itself signs your deed.",
-    "subSuccess": "The summit bows to your stride.",
-    "subNearMiss": "The spark danced on the rim… and slipped beyond.",
-    "subFail": "The mountain repels mortals.",
-    "subCrit": "The abyss claims those who dare too much.",
-    "explanation": "Explanation",
-    "explainContinue": "Continue",
-    "explainRequired": "The black columns are the values demanded by the trial: one for each axis of the check.",
-    "explainEnemy": "This surface is the Enemy. If the spark stops here, the check fails.",
-    "explainStats": "The white columns are your expedition's stats: the higher they rise, the further your star reaches.",
-    "explainStar": "The ivory star is your ground. If the spark stops inside it, the check succeeds.",
-    "explainLegend": "Every colour is a fate. Read the field before you throw:",
-    "legendStar": "White — star interior: success",
-    "legendAlmost": "Bronze — star rim: Almost (failed by a whisker)",
-    "legendEnemy": "Slate — the Enemy: failure",
-    "legendCrit": "Dark band inside the Enemy's edge: critical failure",
-    "legendNucleus": "Central core: critical success",
-    "legendWound": "Crimson stripe: wound",
-    "legendDeath": "Black stripe: death"
-  },
+  "verdict": "Verdict",
   "world": {
     "title": "World Surface",
     "loading": "Loading world surface…",
@@ -160,7 +354,8 @@
       "scale": "Scale",
       "offsetX": "Offset X",
       "offsetY": "Offset Y",
-      "saveDefaults": "Save defaults"
+      "saveDefaults": "Save defaults",
+      "dragHandle": "Drag to reorder"
     },
     "states": {
       "default": "Default",
@@ -196,54 +391,5 @@
     "threat-tint": "Threat Tint",
     "resource-tint": "Resource Tint"
   },
-  "presentation": {
-    "play": "Play",
-    "pause": "Pause",
-    "step": "Step",
-    "seed": "Seed",
-    "tick": "Tick",
-    "objects": "Objects",
-    "layers": "Layers",
-    "layerOrder": {
-      "title": "Layer Order",
-      "moveUp": "move up",
-      "moveDown": "move down"
-    },
-    "states": {
-      "unknown": "Unknown"
-    },
-    "director": {
-      "title": "World Presentation Director"
-    },
-    "inspector": {
-      "title": "Output Inspector",
-      "activeState": "Active State",
-      "runtimeObjects": "Runtime Objects",
-      "visualStateOverrides": "Visual Overrides",
-      "tick": "Tick"
-    },
-    "scenarios": {
-      "title": "Scenario",
-      "peaceful": "Peaceful",
-      "threat": "Threat",
-      "corruption": "Corruption"
-    }
-  },
-  "threatStatus": {
-    "title": "THREAT STATUS",
-    "page": {
-      "title": "Threat Status Indicator",
-      "description": "Client-only component showcase for use client directive"
-    },
-    "urgency": {
-      "calm": "CALM",
-      "warning": "WARNING",
-      "critical": "CRITICAL"
-    },
-    "type": {
-      "GOBLIN_RAID": "Goblin Raid",
-      "PLAGUE": "Plague",
-      "SIEGE": "Siege"
-    }
-  }
+  "woundPercent": "Wound Percent"
 }

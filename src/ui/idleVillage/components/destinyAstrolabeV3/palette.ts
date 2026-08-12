@@ -1,4 +1,3 @@
-```typescript
 import { useState, useEffect } from 'react';
 
 const getSkinToken = (tokenName: string) => {

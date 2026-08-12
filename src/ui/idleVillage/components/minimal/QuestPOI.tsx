@@ -1,4 +1,4 @@
-import type { JSX } from 'react';
+import type { JSX, ReactNode } from 'react';
 import { useSkinPreferences } from '@/ui/idleVillage/hooks/useSkinPreferences';
 import {
   getQuestPoiSkinForPreset,
@@ -50,10 +50,24 @@ export interface QuestPOIProps {
   isExpirable?: boolean;
   /** Danger rating 0–10 for the badge. */
   dangerRating?: number;
+  /** Show the projected injury/death risk badges on the medallion. */
+  showRiskBadges?: boolean;
+  /** Projected injury chance in percentage points, shown when badges are on. */
+  injuryRisk?: number;
+  /** Projected death chance in percentage points, shown when badges are on. */
+  deathRisk?: number;
   /** Override Style Lab preset id. */
   skinPresetId?: string;
   /** Rendered size in pixels. */
   size?: number;
+  /**
+   * Layer drawn concentric with the medallion — e.g. the quest's magic circle.
+   *
+   * It is anchored to the medallion's own square, not to the whole component:
+   * the risk badges and the label sit below the medallion and would otherwise
+   * drag the centre down with them.
+   */
+  medallionOverlay?: ReactNode;
   /** Called when the medallion is clicked — caller opens QuestChronicle. */
   onClick?: () => void;
 }
@@ -83,8 +97,12 @@ export function QuestPOI(props: QuestPOIProps): JSX.Element {
     expirationThresholdMs,
     isExpirable,
     dangerRating = 0,
+    showRiskBadges = false,
+    injuryRisk,
+    deathRisk,
     skinPresetId,
     size,
+    medallionOverlay,
     onClick,
   } = props;
 
@@ -152,7 +170,24 @@ export function QuestPOI(props: QuestPOIProps): JSX.Element {
           timeRemainingMs={timeRemainingMs}
           expirationThresholdMs={expirationThresholdMs}
           isExpirable={isExpirable}
+          showRiskBadges={showRiskBadges}
+          injuryRisk={injuryRisk}
+          deathRisk={deathRisk}
+          // Danger is presented by this component's own badge; leaving it unset
+          // here avoids showing the same rating twice.
+          dangerRating={undefined}
         />
+
+        {/* Concentric with the medallion square, so badges below never shift it. */}
+        {medallionOverlay && (
+          <div
+            data-testid="quest-poi-medallion-overlay"
+            className="pointer-events-none absolute"
+            style={{ left: '50%', top: renderSize / 2, transform: 'translate(-50%, -50%)' }}
+          >
+            {medallionOverlay}
+          </div>
+        )}
 
         {/* Status badge — top-center */}
         {status === 'completed' && (
@@ -180,11 +215,13 @@ export function QuestPOI(props: QuestPOIProps): JSX.Element {
           </div>
         )}
 
-        {/* Danger badge — bottom-right */}
+        {/* Danger badge — bottom-right of the medallion square */}
         {showDanger && (
           <div
-            className="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded text-[9px] font-semibold leading-none"
+            className="absolute px-1.5 py-0.5 rounded text-[9px] font-semibold leading-none"
             style={{
+              top: renderSize - 10,
+              right: -4,
               background: 'rgba(15,23,42,.88)',
               border: `1px solid ${dangerColor}`,
               color: dangerColor,
@@ -194,11 +231,17 @@ export function QuestPOI(props: QuestPOIProps): JSX.Element {
           </div>
         )}
 
-        {/* Phase progress indicator — bottom-left (active phase index) */}
+        {/*
+          Phase progress indicator — bottom-left of the medallion square.
+          Anchored to the medallion rather than the component box, so the risk
+          badge row rendered underneath cannot collide with it.
+        */}
         {status === 'in_progress' && phases.length > 0 && (
           <div
-            className="absolute -bottom-1 -left-1 px-1.5 py-0.5 rounded text-[9px] font-semibold leading-none whitespace-nowrap"
+            className="absolute px-1.5 py-0.5 rounded text-[9px] font-semibold leading-none whitespace-nowrap"
             style={{
+              top: renderSize - 10,
+              left: -4,
               background: 'rgba(15,23,42,.88)',
               border: `1px solid ${dotCfg.activeColor}`,
               color: dotCfg.activeColor,

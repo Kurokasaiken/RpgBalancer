@@ -136,6 +136,18 @@ export const KIT_REGISTRY: KitRegistryEntry[] = [
     },
   },
   {
+    kitId: 'questPoiKit',
+    kitModule: './kits/questPoiKit',
+    status: 'draft',
+    hub: {
+      title: 'Quest POI System',
+      description:
+        'Cerchio magico come timer, skill check per milestone, quest card con raccolta ricompense',
+      icon: '🔮',
+      path: '/poi-quest-detail-roster-time-clock',
+    },
+  },
+  {
     kitId: 'clockKit',
     kitModule: './kits/clockKit',
     status: 'certified',
