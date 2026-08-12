@@ -4,6 +4,7 @@
 <!-- Executor values: ai-worker | harness | manual -->
 <!-- Scripts (bridge_ai_worker.py, sync_ai_worker.py) auto-migrate legacy rows to 8-column format -->
 
+| IV-POI-QUEST-R005 | Completato | 2026-08-11 | Claude | POI Quest System (R-005, desiderata v3): MagicCircleHalo che si scrive dalle ore 12, milestone equispaziate una per fase con Destiny Astrolabe, QuestChronicle con rope luminosa e gate "Raccogli ricompense", DayNightPOI aggiunto, questPoiKit registrato (draft). Corretti 5 difetti preesistenti (quest risolta all'avvio, moltiplicatore velocità inefficace, esito scartato alla chiusura del pannello, chiavi React duplicate, chiavi i18n mancanti) e un bug Zod 4 sui default annidati. Safeguard: tsc/lint/build:check/kanban:lint passed, 72 nuovi test passed, route 200. Evidence: test-results/poi-quest-system-r005-2026-08-11.md | manual | Task multi-file di UI/gameplay eseguito in sessione con mw-executor | Evidence: test-results/poi-quest-system-r005-2026-08-11.md |
 | OPS-OVERNIGHT-001 | Completato | 2026-07-23 | Cascade | OPS-OVERNIGHT-001 dry-run completed after robustness fix; PASS=1, FAIL=1, TIMEOUT=2, STUCK=1; global timeout exit_code=2; verify.py PASS real_batch/per_task_timeout/global_timeout; evidence: test-results/overnight-runner-dryrun-20260723T205155Z.log, test-results/overnight-runner-verify-20260723T201556Z.log | manual | Isolated Python ops script; human dry-run verification before overnight use | ```text
 AGENT
 OPS-OVERNIGHT-001 — Overnight Safety Runner

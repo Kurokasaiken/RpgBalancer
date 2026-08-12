@@ -17,6 +17,7 @@ import ActiveHUD from '@/ui/idleVillage/components/ActiveHUD';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import type { TimeEngineSkinConfig } from '@/ui/idleVillage/skins/timeEngineSkinConfig';
 import { createTimeEngineSkinConfig } from '@/ui/idleVillage/skins/timeEngineSkinConfig';
+import { defaultDayNightPoiConfig } from '@/ui/idleVillage/skins/dayNightPoiSkinConfig';
 
 /**
  * Elegant Play/Pause mechanical toggle icon
@@ -127,6 +128,9 @@ interface TimeEngineStripProps {
     time?: string;
   };
   
+  /** Whether the current day/night phase is day (true) or night (false). */
+  isDayPhase?: boolean;
+
   /** Strip layout options */
   compact?: boolean;
   showClockDetails?: boolean;
@@ -161,6 +165,7 @@ export function TimeEngineStrip({
   villageState,
   secondsPerTimeUnit,
   temporalDisplay,
+  isDayPhase,
   compact = false,
   showClockDetails = false,
   maxVisibleActivities = 4,
@@ -234,7 +239,19 @@ export function TimeEngineStrip({
   const clampedProgress = clamp01(progressFraction);
   const elapsedSeconds = clampedProgress * totalSeconds;
   const icon = phaseIcon; // Always use phaseIcon; skin handles pause state internally
-  
+
+  const dayNightPalette =
+    isDayPhase !== undefined
+      ? isPlaying
+        ? isDayPhase
+          ? defaultDayNightPoiConfig.dayRunning
+          : defaultDayNightPoiConfig.nightRunning
+        : defaultDayNightPoiConfig.paused
+      : null;
+  const phaseRingColor = dayNightPalette?.ringColor ?? 'rgba(255,255,255,0.15)';
+  const phaseProgressColor = dayNightPalette?.glowColor ?? 'rgba(255,255,255,0.18)';
+  const phaseTrackColor = dayNightPalette?.ringColor ?? 'rgba(255,255,255,0.05)';
+
   // Day/Night card sizing
   const haloSizePx = compact ? 80 : 160;
   const haloSize = clamp(haloSizePx, 80, 360, 160);
@@ -262,9 +279,11 @@ export function TimeEngineStrip({
       >
         <div className="flex items-center gap-3">
           <div
-            className="relative flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/40"
+            className="relative flex h-10 w-10 items-center justify-center rounded-full border bg-black/40"
             style={{
-              background: `conic-gradient(from -90deg, rgba(255,255,255,0.18) ${clampedProgress * 360}deg, rgba(255,255,255,0.05) 0deg)`,
+              borderColor: phaseRingColor,
+              transition: 'border-color 400ms ease',
+              background: `conic-gradient(from -90deg, ${phaseProgressColor} ${clampedProgress * 360}deg, ${phaseTrackColor} 0deg)`,
             }}
             aria-label={`Cycle progress ${Math.round(clampedProgress * 100)}%`}
           >

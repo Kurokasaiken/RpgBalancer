@@ -13,17 +13,28 @@
 
 ## 1. I tre pillar
 
-### Pillar 1 — UI & mappa: *Dispatch* (centrale operativa)
+### Pillar 1 — UI & mappa: *World Surface* (mondo da esplorare con gli occhi)
 
 **Cosa prendiamo:**
-- La schermata di gioco non è un mondo esplorabile, è una **dashboard tattica**: una mappa stilizzata con nodi (POI) e pannelli laterali.
-- Tutto succede *sulla mappa* o in pannelli che si aprono *sopra* la mappa (overlay), mai con cambi di scena.
-- Estetica scura/glassmorfica con accenti ambra/oro/rosso. Tipografia pulita, leggibile, tipo "control room".
-- Stato del villaggio leggibile **in colpo d'occhio**: chi sta facendo cosa, quanto manca, cosa sta per scadere.
+- La mappa non è più una dashboard tattica, ma un **continente dipinto da esplorare con lo sguardo**: montagne, foreste, mare, creature, vita atmosferica e dettagli nascosti.
+- **Layer visivi concettuali multipli**: base dipinta, atmosfera, landmark, creature, acqua/eventi, cornice/carving, overlay Pixi. A runtime i sistemi *costosi* restano 4-5, con DOM/CSS per il contenuto statico e PixiJS per la dinamica.
+- **Respiro globale e parallasse leggibile**: il mondo reagisce dolcemente al cursore e alla viewport. Stato del villaggio, timer e avvisi si leggono *sul mondo*, non in pannelli che lo coprono.
+- **Vita ambientale rara, non rumore continuo**: 80% calma, 15% comunicazione ambientale, 5% sorprese rare (Kraken, balena, drago, meteora, aurora, nave fantasma, tempesta, stormo).
+- **Reazioni nascoste data-driven**: niente sequenze di click rapidi. Trigger candidati: hover intenzionale breve (1.5-3s) su landmark, attraversamento di zone, condizioni di mondo (notte/pioggia), catene di osservazione.
+- **Tier di presentazione eventi**:
+  - Ambienti: nessun rischio permanente, effetto locale.
+  - Minaccia: avviso localizzato, nessuna interruzione.
+  - Maggiore: presentazione più marcata ma non bloccante.
+  - Minaccia al run (es. Invasione Goblin che può chiudere la run): trattamento cinematico pieno, raro e giustificato.
+- **Target Tauri desktop**: finestra dedicata, meno throttling del browser, ma rendering sempre WebView. Budget effetti misurato e non illimitato; niente mesh deformation continua, rifrazione fisica o volumetric fog senza profilazione.
+- **Stile visivo**: pittorico e fantasy, con il linguaggio di Hearthstone/Marvel Snap: cornice intagliata (gargoyle/drago), colori caldi, luci drammatiche, frame come oggetto fisico.
 
 **Cosa NON prendiamo:**
-- Niente sprite di camminata, niente personaggi che si muovono su griglie.
-- Niente menù annidati profondi (max 1 livello di overlay).
+- Non è più una centrale operativa (Dispatch): niente POI = verbo + slot, niente dashboard con pannelli che coprono la mappa di default.
+- Non è una griglia di sprite che camminano.
+- Non sono effetti cinematografici a ogni evento: il 95% degli eventi resta localizzato e non blocca l'interazione.
+- Non sette sistemi di rendering indipendenti e costosi: sette *concetti* sì, ma massimo 4-5 passi reali.
+- Non un motore 3D/shader nativo: si resta in React + DOM/CSS + PixiJS.
 
 ### Pillar 2 — Meccanica core: *Cultist Simulator* (halo, slot-verbi, carte)
 
@@ -56,16 +67,16 @@
 
 | Meccanica della slice                | Pillar dominante         | Pillar secondari               | Stato componente nel repo                             |
 | ------------------------------------ | ------------------------ | ------------------------------ | ----------------------------------------------------- |
-| Mappa con POI nodi                   | Dispatch                 | Cultist Sim                    | `MinimalGameplayPage` + `map/` ✅                      |
-| Halo (rosso → giallo) su POI         | Cultist Sim              | Dispatch                       | `ActionHalo.tsx` ✅                                    |
+| Mappa con POI nodi                   | World Surface                 | Cultist Sim                    | `MinimalGameplayPage` + `map/` ✅                      |
+| Halo (rosso → giallo) su POI         | Cultist Sim              | World Surface                       | `ActionHalo.tsx` ✅                                    |
 | Drag medaglione → slot POI           | Cultist Sim              | LoW (worker placement)         | `SlottedMedal` + `ActionCardBase` ✅                   |
 | Quest card con requisiti (stat/eq.)  | Cultist Sim              | LoW                            | `QuestActionCard` ✅ (manca preview requisiti)         |
 | Skill check resolution pannello      | Cultist Sim              | —                              | **MANCA** (vedi `vertical_slice_completion_analysis`) |
-| Job ripetibile (taglialegna/oro)     | LoW (worker placement)   | Dispatch                       | `JobActionCard` ✅                                     |
+| Job ripetibile (taglialegna/oro)     | LoW (worker placement)   | World Surface                       | `JobActionCard` ✅                                     |
 | Peasants assegnati permanenti        | LoW (worker placement)   | —                              | **DA AGGIUNGERE** (regola di config + UI badge)       |
-| Pannello Village + Blueprint/Upgrade | LoW (engine building)    | Dispatch (overlay)             | `BuildingCard` ✅ (manca screen Villaggio)             |
-| Mercante con countdown               | Dispatch (countdown vis) | Cultist Sim (POI temporaneo)   | `MarketActionCard` ✅                                  |
-| Day clock / event timeline           | Dispatch                 | Cultist Sim                    | **DA AGGIUNGERE** (widget timeline)                   |
+| Pannello Village + Blueprint/Upgrade | LoW (engine building)    | World Surface (overlay)             | `BuildingCard` ✅ (manca screen Villaggio)             |
+| Mercante con countdown               | World Surface (countdown vis) | Cultist Sim (POI temporaneo)   | `MarketActionCard` ✅                                  |
+| Day clock / event timeline           | World Surface                 | Cultist Sim                    | **DA AGGIUNGERE** (widget timeline)                   |
 | Cronaca esiti (log narrativo)        | Cultist Sim              | —                              | **DA AGGIUNGERE** (strip in basso)                    |
 | Level up eroe + animazione           | LoW (engine breath)      | Cultist Sim (carta evento)     | `SlottedMedal` ring ✅ (manca trigger + FX)            |
 
@@ -75,11 +86,11 @@
 
 Questa è la sezione operativa: cosa cambiare/aggiungere per rendere il gameplay più interessante e soddisfacente, **senza** uscire dallo scope della slice. Ogni raffinamento ha: *cosa*, *perché psicologico/UX*, *dove agire nel codice*.
 
-### 3.1 Raffinamenti Dispatch (UI / mappa)
+### 3.1 Raffinamenti World Surface (UI / mappa)
 
-**R1.1 — Layout "control room" fisso a tre regioni**
-- *Cosa:* la pagina `/minimal-gameplay` è divisa in tre regioni stabili: **Mappa centrale**, **Roster a sinistra** (verticale, scrollabile), **HUD risorse + day-clock in alto**. Il pannello Villaggio si apre come overlay glassmorfico sopra la mappa (non spinge).
-- *Perché:* il giocatore deve sapere *dove guardare* per ogni informazione. Lo stesso pattern di Dispatch: chi-cosa-quando sempre nello stesso posto.
+**R1.1 — Layout a tre regioni con il mondo al centro**
+- *Cosa:* la pagina `/minimal-gameplay` è divisa in tre regioni stabili: **Mappa centrale** (mondo dipinto esplorabile), **Roster a sinistra** (verticale, scrollabile), **HUD risorse + day-clock in alto**. Il pannello Villaggio si apre solo su richiesta come overlay glassmorfico leggero sopra la mappa.
+- *Perché:* il giocatore deve leggere il mondo prima dei pannelli. Lo stato emergente dalla mappa (POI, luci, particelle, orizzonte) è il primario; le UI laterali/superiori sono accessori di supporto.
 - *Dove:* refactor minimale di `MinimalGameplayPage.tsx`; il roster esiste già (`VillageRosterSection`), l'HUD risorse esiste (`VillageResourcePanel`).
 
 **R1.2 — Day-clock e timeline eventi**

@@ -26,7 +26,7 @@
     "resolution": "prefer_hd"
   },
   "camera": {
-    "minZoom": 0.05,
+    "minZoom": 0.18,
     "maxZoom": 3,
     "defaultZoom": 1,
     "panEnabled": true,
@@ -44,13 +44,13 @@
     "enableForParticles": true,
     "enableForShaders": true,
     "fallbackToDom": true,
-    "imageFit": "none",
+    "imageFit": "fill",
     "autoFit": true
   },
   "surfaceLayers": [
     {
       "id": "background",
-      "file": "Background.png",
+      "file": "Background.webp",
       "type": "texture",
       "zIndex": 5,
       "opacity": 1,
@@ -67,7 +67,7 @@
     },
     {
       "id": "sea",
-      "file": "Mare.png",
+      "file": "Mare.webp",
       "type": "texture",
       "zIndex": 10,
       "opacity": 1,
@@ -75,7 +75,7 @@
       "offsetX": 0,
       "offsetY": 0,
       "parallax": {
-        "x": 0.02,
+        "x": 0,
         "y": 0
       },
       "tags": [
@@ -84,7 +84,7 @@
     },
     {
       "id": "island_bottom_left",
-      "file": "Isola basso sinistra.png",
+      "file": "Isola basso sinistra.webp",
       "type": "texture",
       "zIndex": 15,
       "opacity": 1,
@@ -92,7 +92,7 @@
       "offsetX": 0,
       "offsetY": 0,
       "parallax": {
-        "x": 0.03,
+        "x": 0,
         "y": 0
       },
       "tags": [
@@ -101,7 +101,7 @@
     },
     {
       "id": "island_bottom_right",
-      "file": "Isola basso a destra.png",
+      "file": "Isola basso a destra.webp",
       "type": "texture",
       "zIndex": 20,
       "opacity": 1,
@@ -109,7 +109,7 @@
       "offsetX": 0,
       "offsetY": 0,
       "parallax": {
-        "x": 0.03,
+        "x": 0,
         "y": 0
       },
       "tags": [
@@ -118,7 +118,7 @@
     },
     {
       "id": "mountain_island_bottom_left",
-      "file": "Montagna isola basso sinistra.png",
+      "file": "Montagna isola basso sinistra.webp",
       "type": "texture",
       "zIndex": 25,
       "opacity": 1,
@@ -126,7 +126,7 @@
       "offsetX": 0,
       "offsetY": 0,
       "parallax": {
-        "x": 0.04,
+        "x": 0,
         "y": 0
       },
       "tags": [
@@ -136,7 +136,7 @@
     },
     {
       "id": "mountains_dark_bottom",
-      "file": "Montagne scure basso.png",
+      "file": "Montagne scure basso.webp",
       "type": "texture",
       "zIndex": 30,
       "opacity": 1,
@@ -144,7 +144,7 @@
       "offsetX": 0,
       "offsetY": 0,
       "parallax": {
-        "x": 0.05,
+        "x": 0,
         "y": 0
       },
       "tags": [
@@ -153,7 +153,7 @@
     },
     {
       "id": "mountains_light_bottom_right",
-      "file": "Montagne chiare basso destra.png",
+      "file": "Montagne chiare basso destra.webp",
       "type": "texture",
       "zIndex": 35,
       "opacity": 1,
@@ -161,7 +161,7 @@
       "offsetX": 0,
       "offsetY": 0,
       "parallax": {
-        "x": 0.06,
+        "x": 0,
         "y": 0
       },
       "tags": [
@@ -170,7 +170,7 @@
     },
     {
       "id": "mountains_dark_right",
-      "file": "Montagne scure destra.png",
+      "file": "Montagne scure destra.webp",
       "type": "texture",
       "zIndex": 40,
       "opacity": 1,
@@ -178,7 +178,7 @@
       "offsetX": 0,
       "offsetY": 0,
       "parallax": {
-        "x": 0.07,
+        "x": 0,
         "y": 0
       },
       "tags": [
@@ -187,7 +187,7 @@
     },
     {
       "id": "mountain_zone_north",
-      "file": "Zona montana nord.png",
+      "file": "Zona montana nord.webp",
       "type": "texture",
       "zIndex": 45,
       "opacity": 1,
@@ -195,7 +195,7 @@
       "offsetX": 0,
       "offsetY": 0,
       "parallax": {
-        "x": 0.08,
+        "x": 0,
         "y": 0
       },
       "tags": [
@@ -204,7 +204,7 @@
     },
     {
       "id": "trees_brown_hills_center",
-      "file": "Alberi e colline marroni al centro.png",
+      "file": "Alberi e colline marroni al centro.webp",
       "type": "texture",
       "zIndex": 50,
       "opacity": 1,
@@ -212,7 +212,7 @@
       "offsetX": 0,
       "offsetY": 0,
       "parallax": {
-        "x": 0.09,
+        "x": 0,
         "y": 0
       },
       "tags": [
@@ -222,7 +222,7 @@
     },
     {
       "id": "small_trees_center",
-      "file": "Alberelli centro mappa.png",
+      "file": "Alberelli centro mappa.webp",
       "type": "texture",
       "zIndex": 55,
       "opacity": 1,
@@ -230,7 +230,7 @@
       "offsetX": 0,
       "offsetY": 0,
       "parallax": {
-        "x": 0.1,
+        "x": 0,
         "y": 0
       },
       "tags": [
@@ -239,7 +239,7 @@
     },
     {
       "id": "trees_center_right",
-      "file": "Alberi destra centrali.png",
+      "file": "Alberi destra centrali.webp",
       "type": "texture",
       "zIndex": 60,
       "opacity": 1,
@@ -247,7 +247,7 @@
       "offsetX": 0,
       "offsetY": 0,
       "parallax": {
-        "x": 0.11,
+        "x": 0,
         "y": 0
       },
       "tags": [
@@ -256,7 +256,7 @@
     },
     {
       "id": "forest_1_top_left",
-      "file": "Foresta 1 Alto Sin.png",
+      "file": "Foresta 1 Alto Sin.webp",
       "type": "texture",
       "zIndex": 65,
       "opacity": 1,
@@ -264,7 +264,7 @@
       "offsetX": 0,
       "offsetY": 0,
       "parallax": {
-        "x": 0.12,
+        "x": 0,
         "y": 0
       },
       "tags": [
@@ -273,7 +273,7 @@
     },
     {
       "id": "forest_1_light_top_left",
-      "file": "Foresta 1 chiara alto sin.png",
+      "file": "Foresta 1 chiara alto sin.webp",
       "type": "texture",
       "zIndex": 70,
       "opacity": 1,
@@ -281,7 +281,7 @@
       "offsetX": 0,
       "offsetY": 0,
       "parallax": {
-        "x": 0.13,
+        "x": 0,
         "y": 0
       },
       "tags": [
@@ -290,7 +290,7 @@
     },
     {
       "id": "forest_2_dark_bottom_left",
-      "file": "Foresta 2 scura basso sin.png",
+      "file": "Foresta 2 scura basso sin.webp",
       "type": "texture",
       "zIndex": 75,
       "opacity": 1,
@@ -298,7 +298,7 @@
       "offsetX": 0,
       "offsetY": 0,
       "parallax": {
-        "x": 0.14,
+        "x": 0,
         "y": 0
       },
       "tags": [
@@ -307,7 +307,7 @@
     },
     {
       "id": "forest_3_dark_bottom",
-      "file": "Foresta 3 scura basso.png",
+      "file": "Foresta 3 scura basso.webp",
       "type": "texture",
       "zIndex": 80,
       "opacity": 1,
@@ -315,7 +315,7 @@
       "offsetX": 0,
       "offsetY": 0,
       "parallax": {
-        "x": 0.15,
+        "x": 0,
         "y": 0
       },
       "tags": [
@@ -324,7 +324,7 @@
     },
     {
       "id": "forest_light_right_center",
-      "file": "Foresta chiara destra centro.png",
+      "file": "Foresta chiara destra centro.webp",
       "type": "texture",
       "zIndex": 85,
       "opacity": 1,
@@ -332,7 +332,7 @@
       "offsetX": 0,
       "offsetY": 0,
       "parallax": {
-        "x": 0.16,
+        "x": 0,
         "y": 0
       },
       "tags": [
@@ -341,7 +341,7 @@
     },
     {
       "id": "forest_dark_north",
-      "file": "Foresta scura nord.png",
+      "file": "Foresta scura nord.webp",
       "type": "texture",
       "zIndex": 90,
       "opacity": 1,
@@ -349,7 +349,7 @@
       "offsetX": 0,
       "offsetY": 0,
       "parallax": {
-        "x": 0.17,
+        "x": 0,
         "y": 0
       },
       "tags": [
@@ -358,7 +358,7 @@
     },
     {
       "id": "village",
-      "file": "Villaggio.png",
+      "file": "Villaggio.webp",
       "type": "texture",
       "zIndex": 95,
       "opacity": 1,
@@ -366,7 +366,7 @@
       "offsetX": 0,
       "offsetY": 0,
       "parallax": {
-        "x": 0.18,
+        "x": 0,
         "y": 0
       },
       "tags": [
@@ -376,7 +376,7 @@
     },
     {
       "id": "border",
-      "file": "Bordo.png",
+      "file": "Bordo.webp",
       "type": "ui_overlay",
       "zIndex": 97,
       "opacity": 1,
@@ -394,7 +394,7 @@
     },
     {
       "id": "frame",
-      "file": "Frame.png",
+      "file": "Frame.webp",
       "type": "ui_overlay",
       "zIndex": 99,
       "opacity": 1,

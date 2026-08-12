@@ -1,46 +1,53 @@
 {
-  "workerTooltip": {
-    "labels": {
-      "hp": "HP",
-      "fatigue": "Fatica",
-      "performance": "Prestazione",
-      "specialties": "Specialità",
-      "bio": "Bio",
-      "recommendations": "Raccomandazioni",
-      "risk": "Livello di Rischio"
-    },
-    "statuses": {
-      "working": "In Incarico",
-      "resting": "In Riposo",
-      "injured": "Ferito",
-      "recovering": "In Recupero",
-      "available": "Disponibile",
-      "away": "Assente",
-      "exhausted": "Esausto",
-      "dead": "Caduto"
-    },
-    "riskLevels": {
-      "low": "Rischio Basso",
-      "medium": "Rischio Medio",
-      "high": "Rischio Alto",
-      "critical": "Rischio Critico"
-    },
-    "recommendations": {
-      "lowHp": "Riposo necessario - HP critico",
-      "highFatigue": "Fatica alta - considera riposo",
-      "injured": "In recupero da ferita",
-      "critical": "Riposo immediato richiesto"
-    },
+  "activityCapsule": {
+    "slotLabel": "Slot {index}",
     "accessibility": {
-      "tooltipDetails": "{name} - Dettagli lavoratore",
-      "riskBadge": "Stato {level}",
-      "closeTooltip": "Chiudi tooltip per {name}"
+      "activityCapsule": "Capsula attività {label}",
+      "closeDetails": "Chiudi il dettaglio"
     },
     "actions": {
-      "close": "Chiudi tooltip"
+      "start": "Avvia",
+      "cancel": "Annulla",
+      "collect": "Raccogli"
+    },
+    "status": {
+      "idle": "Inattivo",
+      "inProgress": "In corso",
+      "completed": "Completato",
+      "blocked": "Bloccato"
     },
     "sections": {
-      "quote": "Citazione"
+      "assignedCharacters": "Personaggi assegnati",
+      "requirements": "Requisiti",
+      "telemetry": "Telemetria",
+      "lore": "Lore"
+    },
+    "info": {
+      "duration": "Durata",
+      "eta": "Tempo rimasto",
+      "reward": "Ricompensa"
+    },
+    "requirements": {
+      "relation": {
+        "all": "tutti",
+        "any": "almeno uno",
+        "none": "nessuno"
+      }
+    },
+    "telemetry": {
+      "empty": "Nessun evento"
+    },
+    "lore": {
+      "locked": "Lore non ancora scoperta"
+    },
+    "devTools": {
+      "validationTitle": "Errori di validazione dello skin"
+    },
+    "type": {
+      "job": "Lavoro",
+      "quest": "Quest",
+      "training": "Allenamento",
+      "maintenance": "Manutenzione"
     }
   },
   "interactionMode": {
@@ -271,6 +278,144 @@
           "ariaDescription": "Il selettore di modalità è stato chiuso"
         }
       }
+    }
+  },
+  "milestoneCheck": {
+    "ariaLabel": "Prova di abilità della fase",
+    "eyebrow": "Milestone",
+    "skills": "Prove da affrontare",
+    "partyStat": "Party {value}",
+    "difficulty": "Difficoltà {value}",
+    "consumables": "Spendi consumabili",
+    "riskLine": "Ferite {injury}% · Morte {death}%",
+    "roll": "Consulta il destino",
+    "passed": "Fase superata",
+    "failed": "Fase fallita",
+    "wounded": "Un eroe è stato ferito in questa fase",
+    "casualty": "Un eroe è caduto in questa fase",
+    "dismiss": "Continua"
+  },
+  "poiDetail": {
+    "risk": {
+      "injury": {
+        "title": "Probabilità che un residente venga ferito"
+      },
+      "death": {
+        "title": "Probabilità che un residente muoia"
+      },
+      "danger": {
+        "title": "Grado di pericolo di questa attività"
+      }
+    }
+  },
+  "poiMarkerLab": {
+    "title": "POI Marker Lab",
+    "subtitle": "Baseline del marker opportunità: colore + icona = cosa, anello timer = quando, materiale = dove. Posato sulla superficie Wanderlust canonica, l'unico test onesto.",
+    "inContext": "In contesto",
+    "matrix": "Matrice tipo / stato",
+    "playground": "Banco di prova",
+    "type": "Tipo",
+    "state": "Stato",
+    "importance": "Importanza",
+    "progress": "Tempo residuo",
+    "size": "Dimensione",
+    "counterClockwise": "Antiorario (scadenza)",
+    "showMap": "Mostra la mappa",
+    "types": {
+      "quest": "Quest",
+      "job": "Lavoro",
+      "event": "Evento"
+    },
+    "states": {
+      "new": "Nuovo",
+      "available": "Disponibile",
+      "assigned": "Assegnato",
+      "expiring": "In scadenza",
+      "expired": "Scaduto"
+    },
+    "importances": {
+      "normal": "Normale",
+      "important": "Importante",
+      "critical": "Critico"
+    },
+    "variant": "Variante",
+    "variants": {
+      "baseline": "Baseline (V1)",
+      "runic": "Runica (V2)"
+    }
+  },
+  "questChronicle": {
+    "title": "Cronaca della Quest",
+    "journal": "Diario",
+    "openTheater": "Apri il Teatro",
+    "collectRewards": "Raccogli ricompense",
+    "ropeLabel": "Tempo della quest",
+    "boardStatus": {
+      "success": "Ultima prova superata",
+      "failure": "Prova fallita",
+      "pending": "In attesa dell'esito della spedizione"
+    },
+    "outcome": {
+      "success": "Successo",
+      "failure": "Fallimento"
+    },
+    "risk": {
+      "injury": "{percent}% ferite",
+      "death": "{percent}% morte"
+    },
+    "phaseType": {
+      "check": "prova",
+      "fight": "combattimento",
+      "stealth": "furtività",
+      "trap": "trappola",
+      "explore": "esplorazione",
+      "dialogue": "dialogo",
+      "branch": "diramazione",
+      "timedChoice": "scelta a tempo"
+    }
+  },
+  "workerTooltip": {
+    "labels": {
+      "hp": "HP",
+      "fatigue": "Fatica",
+      "performance": "Prestazione",
+      "specialties": "Specialità",
+      "bio": "Bio",
+      "recommendations": "Raccomandazioni",
+      "risk": "Livello di Rischio"
+    },
+    "statuses": {
+      "working": "In Incarico",
+      "resting": "In Riposo",
+      "injured": "Ferito",
+      "recovering": "In Recupero",
+      "available": "Disponibile",
+      "away": "Assente",
+      "exhausted": "Esausto",
+      "dead": "Caduto"
+    },
+    "riskLevels": {
+      "low": "Rischio Basso",
+      "medium": "Rischio Medio",
+      "high": "Rischio Alto",
+      "critical": "Rischio Critico"
+    },
+    "recommendations": {
+      "lowHp": "Riposo necessario - HP critico",
+      "highFatigue": "Fatica alta - considera riposo",
+      "injured": "In recupero da ferita",
+      "critical": "Riposo immediato richiesto"
+    },
+    "accessibility": {
+      "tooltipDetails": "{name} - Dettagli lavoratore",
+      "riskBadge": "Stato {level}",
+      "closeTooltip": "Chiudi tooltip per {name}"
+    },
+    "actions": {
+      "close": "Chiudi tooltip"
+    },
+    "sections": {
+      "quote": "Citazione"
     }
   }
 }

@@ -19,7 +19,7 @@ import { MatericRosterComponent } from '@/ui/idleVillage/components/MatericRoste
 // PgCard-vs-Roster / ActivityCapsule-vs-Detail earlier: the bare kit widget
 // is a testing artifact, not the player-facing composite.
 import { TimeEngineStrip } from '@/ui/idleVillage/frozen/kits/clockKit';
-import { DayNightPoiSkin, QuestPOIStandalone } from '@/ui/idleVillage/frozen/kits/poiKit';
+import { DayNightPoiSkin, QuestPOIStandalone, ActivityPOIStandalone, JobPOIStandalone } from '@/ui/idleVillage/frozen/kits/poiKit';
 // The REAL POI Detail (per user correction, reference = /poi-detail-verification)
 // is `ActivityCapsuleDetailSkinAware` + `POI_DETAIL_SKIN_CONFIG` ("Dark Luxury"),
 // NOT the bare `ActivityCapsule` — that earlier assumption was wrong. Reusing the
@@ -131,6 +131,7 @@ const ClockGalleryDemo: React.FC = () => {
   return (
     <TimeEngineStrip
       phaseIcon={<DayNightPoiSkin isDayPhase={isDayTime} cycleProgress={progressFraction} isPaused={isPaused} />}
+      isDayPhase={isDayTime}
       isPlaying={!isPaused}
       progressFraction={progressFraction}
       totalSeconds={86400}
@@ -172,19 +173,19 @@ const TABS: GalleryTab[] = [
     id: 'roster',
     label: 'Roster',
     note: 'contesto reale del pgCard: MatericRosterComponent, come /minimal-roster — differenza = colore barre + card rialzata',
-    render: (k) => <MatericRosterComponent componentId={`gallery-roster-${k}`} />,
+    render: (k, materic) => <MatericRosterComponent componentId={`gallery-roster-${k}`} />,
   },
   {
     id: 'clock',
     label: 'Clock',
     note: 'FIX: mostrava ClockWidgetStandalone (pannello QA nudo, senza il dial giorno/notte) — corretto a TimeEngineStrip + DayNightPoiSkin, come /minimal-clock. Mapping materico del chrome ancora da fare.',
-    render: (k) => <ClockGalleryDemo key={k} />,
+    render: (k, materic) => <ClockGalleryDemo key={k} />,
   },
   {
     id: 'poidetail',
     label: 'POI Detail',
     note: 'VERDETTO: la skin "Dark Luxury" (POI_DETAIL_SKIN_CONFIG) è GIÀ vicina alla Material Language — bronzo/oro/quasi-nero, slot medaglione, stessi anti-pattern (no flat button, no wide glow). Nessun override costruito: le due colonne sono identiche di proposito. Bug SEPARATO trovato (non materico): chiavi i18n non tradotte visibili a schermo (ACTIVITYCAPSULE.STATUS.*).',
-    render: (k) => (
+    render: (k, materic) => (
       <ActivityCapsuleDetailSkinAware
         {...POI_DETAIL_FIXTURE}
         dataTestId={`gallery-poi-detail-${k}`}
@@ -194,8 +195,23 @@ const TABS: GalleryTab[] = [
   {
     id: 'poi',
     label: 'POI',
-    note: 'mapping materico da fare (token/bezel) — per ora uguale nei due',
-    render: () => <QuestPOIStandalone />,
+    note: '4 colori: quest(amber-oro), event(ember-rosso), activity(lapis-blu), job(verdigris-verde)',
+    render: (k, materic) => (
+      <div style={{ display: 'flex', gap: 32, justifyContent: 'center', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+          <QuestPOIStandalone />
+          <p style={{ fontSize: 10, color: 'var(--skin-subtitle-color)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Quest (Amber)</p>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+          <ActivityPOIStandalone />
+          <p style={{ fontSize: 10, color: 'var(--skin-subtitle-color)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Activity (Lapis)</p>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+          <JobPOIStandalone />
+          <p style={{ fontSize: 10, color: 'var(--skin-subtitle-color)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Job (Verdigris)</p>
+        </div>
+      </div>
+    ),
   },
 ];
 
@@ -276,7 +292,9 @@ export const HarmonizationGallery: React.FC = () => {
           margin: '0 auto',
           padding: 26,
           borderRadius: 14,
-          background: FIELD_BACKGROUND,
+          background: tabId === 'poi'
+            ? `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(/map.jpg) center / cover`
+            : FIELD_BACKGROUND,
           boxShadow: FIELD_VIGNETTE,
         }}
       >

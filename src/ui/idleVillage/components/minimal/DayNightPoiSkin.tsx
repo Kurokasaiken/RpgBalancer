@@ -49,7 +49,7 @@ export default function DayNightPoiSkin(props: DayNightPoiSkinProps): JSX.Elemen
 
   const uniqueId = useId().replace(/:/g, '');
   const bloomGradientId = `dn-bloom-${uniqueId}`;
-  const bronzeGradientId = `dn-bronze-${uniqueId}`;
+  const medallionGradientId = `dn-medallion-${uniqueId}`;
   const coreHighlightGradientId = `dn-core-highlight-${uniqueId}`;
   const glowFilterId = `dn-glow-${uniqueId}`;
   const bigBloomFilterId = `dn-bigbloom-${uniqueId}`;
@@ -82,6 +82,11 @@ export default function DayNightPoiSkin(props: DayNightPoiSkinProps): JSX.Elemen
   const glowColor = palette.glowColor;
   const glowOpacity = palette.glowOpacity;
   const coreColor = palette.coreColor;
+
+  // Medallion outer shell gradient — follows palette state
+  const medallionGlowStart = isPaused ? '#f5f5f7' : isDayPhase ? '#f0d070' : '#b8a8ff';
+  const medallionGlowMid = isPaused ? '#d8dde5' : isDayPhase ? '#b07828' : '#6d4fff';
+  const medallionGlowEnd = isPaused ? '#8a8f9f' : isDayPhase ? '#200e02' : '#1a0f4d';
 
   // Frozen metallic platinum used to "crystallize" the icons while paused.
   const frostColor = '#e0e0e6';
@@ -120,6 +125,7 @@ export default function DayNightPoiSkin(props: DayNightPoiSkinProps): JSX.Elemen
       aria-hidden="true"
     >
       <svg
+        key={`${isDayPhase}-${isPaused}`}
         width={size}
         height={size}
         viewBox={`-${size / 2} -${size / 2} ${size} ${size}`}
@@ -133,10 +139,11 @@ export default function DayNightPoiSkin(props: DayNightPoiSkinProps): JSX.Elemen
             <stop offset="100%" stopColor={glowColor} stopOpacity="0" />
           </radialGradient>
 
-          <linearGradient id={bronzeGradientId} x1="14%" y1="4%" x2="86%" y2="96%">
-            <stop offset="0%" stopColor="#f0d070" />
-            <stop offset="35%" stopColor="#b07828" />
-            <stop offset="100%" stopColor="#200e02" />
+          {/* Medallion gradient — changes with palette (bronze day, purple night, silver paused) */}
+          <linearGradient id={medallionGradientId} x1="14%" y1="4%" x2="86%" y2="96%">
+            <stop offset="0%" stopColor={medallionGlowStart} />
+            <stop offset="35%" stopColor={medallionGlowMid} />
+            <stop offset="100%" stopColor={medallionGlowEnd} />
           </linearGradient>
 
           <radialGradient id={coreHighlightGradientId} cx="34%" cy="26%" r="72%">
@@ -278,13 +285,14 @@ export default function DayNightPoiSkin(props: DayNightPoiSkinProps): JSX.Elemen
           );
         })}
 
-        {/* Layer 5: core medallion */}
+        {/* Layer 5: core medallion — outer shell follows palette (bronze/purple/silver) */}
         <circle
           cx="0"
           cy="0"
           r={coreMedallionOuterRadius}
-          fill={`url(#${bronzeGradientId})`}
+          fill={`url(#${medallionGradientId})`}
           opacity={0.92}
+          style={{ transition: 'opacity 400ms ease' }}
         />
 
         {/* Metallic grain on the bronze plating */}

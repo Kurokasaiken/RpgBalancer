@@ -531,10 +531,10 @@ interface WorldSurfaceState {
 
 ## Next Steps
 
-1. **Coordinator:** Convert this plan into 4–5 executable prompts
-2. **Strategist:** Create implementation specs for each phase
-3. **Agents:** Execute Phase 1 (Foundation) with config-first design
-4. **Review:** Validate 80/15/5 calibration with playtesting
+1. **Tactical:** Resolve the 3 open points (budget layer/effetti, trigger ambientali, tier eventi) in `world_surface_v3_tactical_plan.md`.
+2. **Coordinator:** Convert the tactical plan into executable prompts.
+3. **Strategist/Agents:** Execute Phase 1 (AttentionZone + budget guard) and Phase 2 (EventSeverity).
+4. **Review:** Validate 80/15/5 calibration and Tauri performance with playtesting.
 
 ---
 

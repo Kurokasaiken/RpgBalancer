@@ -120,22 +120,13 @@ const EXTRA_PAGES: TestPageLink[] = [
     icon: '🔬',
     status: 'ok',
   },
-  // Non-kit page: World Surface Runtime - multi-layer animated map for Wanderlust.
+  // Non-kit page: World Surface - the living painted map. Pan, zoom, 21 layers, debug panel.
   {
     id: 'world-surface',
     title: 'World Surface',
-    description: 'Multi-layer animated map: Wanderlust base variant with pan/zoom and debug panel',
+    description: 'Mappa dipinta multi-layer: pan, zoom, autofit, editor layer e pannello debug',
     path: '/world-surface',
     icon: '🗺️',
-    status: 'ok',
-  },
-  // Non-kit page: World Surface V3 - hierarchical perception system test page.
-  {
-    id: 'world-surface-v3',
-    title: 'World Surface V3',
-    description: 'Hierarchical perception system: parallax, breath, events, wonders, underwater',
-    path: '/world-surface-v3',
-    icon: '🌍',
     status: 'ok',
   },
   // Non-kit page: World Presentation Director - deterministic presentation runtime sandbox.

@@ -51,8 +51,10 @@ export const QuestAssignmentPreview: FC<QuestAssignmentPreviewProps> = ({ previe
 
       {!canEmbark && blockingReasons.length > 0 && (
         <ul className="space-y-1 rounded border border-rose-700/40 bg-rose-950/30 p-2 text-[11px] text-rose-300">
-          {blockingReasons.map((reason) => (
-            <li key={reason}>⚠ {reason}</li>
+          {/* Two identically-named required slots produce the same reason text,
+              so the index is part of the key. */}
+          {blockingReasons.map((reason, index) => (
+            <li key={`${index}-${reason}`}>⚠ {reason}</li>
           ))}
         </ul>
       )}

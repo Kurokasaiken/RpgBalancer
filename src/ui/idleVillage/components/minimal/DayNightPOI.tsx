@@ -25,24 +25,58 @@ import DayNightPoiSkin from './DayNightPoiSkin';
  * @component
  * @returns A visual-only POI indicator for day/night cycle state
  */
-export default function DayNightPOI(): JSX.Element {
+export interface DayNightPOIProps {
+  /**
+   * Drive the phase from the caller's clock instead of the global store.
+   * Supply this on surfaces that run their own time engine, so the cycle
+   * cannot drift away from the clock the player is actually looking at.
+   */
+  isDayPhase?: boolean;
+  /** Progress 0–1 through the current phase; pairs with `isDayPhase`. */
+  cycleProgress?: number;
+  /** Whether the caller's clock is paused; pairs with `isDayPhase`. */
+  isPaused?: boolean;
+  /**
+   * Pause/resume handler for the caller's clock. When omitted, clicking falls
+   * back to toggling the global store.
+   */
+  onTogglePause?: () => void;
+}
+
+export default function DayNightPOI(props: DayNightPOIProps = {}): JSX.Element {
   const gameplayState = useMinimalGameplayWithIdleVillageConfig();
   const { pauseGame, resumeGame } = gameplayState;
 
+  // Controlled whenever the caller supplies a phase; otherwise store-driven.
+  const isControlled = props.isDayPhase !== undefined;
+  const isDayPhase = isControlled ? props.isDayPhase! : gameplayState.state.isDayPhase;
+  const cycleProgress = isControlled
+    ? (props.cycleProgress ?? 0)
+    : (gameplayState.state.cycleProgress || 0);
+  const isPaused = isControlled
+    ? (props.isPaused ?? false)
+    : gameplayState.state.isPaused;
+
+  const { onTogglePause } = props;
+
   const handleClick = useCallback(() => {
+    if (onTogglePause) {
+      onTogglePause();
+      return;
+    }
     if (gameplayState.state.isPaused) {
       resumeGame('user');
     } else {
       pauseGame('user');
     }
-  }, [gameplayState.state.isPaused, pauseGame, resumeGame]);
+  }, [onTogglePause, gameplayState.state.isPaused, pauseGame, resumeGame]);
 
   return (
     <div onClick={handleClick} style={{ cursor: 'pointer' }}>
       <DayNightPoiSkin
-        isDayPhase={gameplayState.state.isDayPhase}
-        cycleProgress={gameplayState.state.cycleProgress || 0}
-        isPaused={gameplayState.state.isPaused}
+        isDayPhase={isDayPhase}
+        cycleProgress={cycleProgress}
+        isPaused={isPaused}
       />
     </div>
   );

@@ -46,6 +46,11 @@ export interface WorldSurfaceDebugPanelProps {
   mouseWorld: { x: number; y: number } | null;
   rendererType?: 'dom' | 'webgl';
   objectCount?: number;
+  breathEnabled?: boolean;
+  onBreathEnabledChange?: (v: boolean) => void;
+  reactionTrigger?: 'camera-enter' | 'pointer-dwell';
+  reactionActive?: boolean;
+  onReactionTriggerChange?: (v: 'camera-enter' | 'pointer-dwell') => void;
 }
 
 /**
@@ -78,6 +83,11 @@ export const WorldSurfaceDebugPanel: React.FC<WorldSurfaceDebugPanelProps> = ({
   mouseWorld,
   rendererType,
   objectCount = 0,
+  breathEnabled = true,
+  onBreathEnabledChange,
+  reactionTrigger = 'camera-enter',
+  reactionActive = false,
+  onReactionTriggerChange,
 }) => {
   const { t } = useTranslation('idleVillage');
   const translate = useCallback(
@@ -190,6 +200,36 @@ export const WorldSurfaceDebugPanel: React.FC<WorldSurfaceDebugPanelProps> = ({
         </button>
       )}
 
+      {onBreathEnabledChange && (
+        <button
+          type="button"
+          onClick={() => onBreathEnabledChange(!breathEnabled)}
+          className={`mt-2 w-full rounded px-2 py-1 text-amber-100 ${breathEnabled ? 'bg-amber-600 hover:bg-amber-500' : 'bg-amber-700/30 hover:bg-amber-700/50'}`}
+        >
+          {breathEnabled ? '🌿 Breath ON' : '🌿 Breath OFF'}
+        </button>
+      )}
+
+      {onReactionTriggerChange && (
+        <div className="mt-2 space-y-1">
+          <div className="text-amber-400/60 text-[10px] uppercase tracking-wider">
+            Reazione nascosta {reactionActive ? '✨ attiva' : '○'}
+          </div>
+          <div className="flex gap-1">
+            {(['camera-enter', 'pointer-dwell'] as const).map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => onReactionTriggerChange(mode)}
+                className={`flex-1 rounded px-1 py-1 text-[10px] ${reactionTrigger === mode ? 'bg-amber-600 text-white' : 'bg-amber-700/30 text-amber-100 hover:bg-amber-700/50'}`}
+              >
+                {mode === 'camera-enter' ? 'camera' : 'dwell 2s'}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="mt-3 flex gap-2">
         <button
           type="button"
@@ -206,6 +246,7 @@ export const WorldSurfaceDebugPanel: React.FC<WorldSurfaceDebugPanelProps> = ({
           {translate('world.debug.clearObjects')}
         </button>
       </div>
+
 
       <div className="mt-4">
         <div className="mb-1 flex items-center justify-between">
