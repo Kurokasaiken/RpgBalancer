@@ -43,13 +43,13 @@ export class SeaCreatureEffect implements PresentationEffect {
         state: 'present',
         visual: {
           renderLayer: 'world',
-          renderMode: 'text',
+          renderMode: 'creature',
           scale: spawn.scale,
-          iconKey: spawn.icon,
           tint: spawn.tint,
           glow: spawn.glow,
+          creatureType: spawn.creatureType ?? 'octopus',
         },
-        data: { opacity },
+        data: { opacity, width: spawn.width, height: spawn.height },
       });
     }
 
@@ -78,8 +78,10 @@ export interface SeaCreatureSpawn {
   id: string;
   x: number;
   y: number;
-  icon: string;
+  creatureType?: 'octopus' | 'squid' | 'leviathan';
   tint: string;
+  width: number;
+  height: number;
   scale: number;
   opacity: number;
   cycleSeconds: number;
@@ -98,10 +100,12 @@ export const DEFAULT_SEA_CREATURE_CONFIG: SeaCreatureEffectConfig = {
       id: 'leviathan_north',
       x: 2120,
       y: 800,
-      icon: '🐙',
+      creatureType: 'octopus',
       tint: '#4a7c7e',
-      scale: 1.2,
-      opacity: 0.7,
+      width: 75,
+      height: 85,
+      scale: 1.1,
+      opacity: 0.75,
       cycleSeconds: 120,
       visibleFraction: 0.08,
       glow: true,
@@ -110,10 +114,12 @@ export const DEFAULT_SEA_CREATURE_CONFIG: SeaCreatureEffectConfig = {
       id: 'leviathan_east',
       x: 3600,
       y: 1800,
-      icon: '🦑',
+      creatureType: 'squid',
       tint: '#5a8c8e',
+      width: 65,
+      height: 90,
       scale: 1.0,
-      opacity: 0.6,
+      opacity: 0.7,
       cycleSeconds: 140,
       visibleFraction: 0.06,
       glow: true,

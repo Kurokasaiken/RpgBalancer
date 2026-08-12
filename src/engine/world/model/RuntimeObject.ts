@@ -25,6 +25,7 @@ export const RenderModeSchema = z.enum([
   'shape',
   'text',
   'particle',
+  'creature',
 ]);
 
 export const RuntimeObjectVisualSchema = z.object({

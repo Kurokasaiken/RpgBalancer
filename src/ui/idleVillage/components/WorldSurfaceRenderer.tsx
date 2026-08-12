@@ -18,6 +18,7 @@ const WorldSurfaceClouds = lazy(() => import('./WorldSurfaceClouds'));
 const WorldSurfaceCloudShadows = lazy(() => import('./WorldSurfaceCloudShadows'));
 const WorldSurfaceFoam = lazy(() => import('./WorldSurfaceFoam'));
 const WorldSurfaceBirds = lazy(() => import('./WorldSurfaceBirds'));
+const WorldSurfaceCreatures = lazy(() => import('./WorldSurfaceCreatures'));
 
 /** Layer the shallow-water tint is composited onto. */
 const SEA_LAYER_ID = 'sea';
@@ -525,6 +526,12 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
           <WorldSurfaceBirds
             canvasSize={manifest.coordinateSystem.canvas}
             zIndex={cloudZIndex - 1}
+          />
+          {/* Sea creatures lurk in the water, below birds but above shadows. */}
+          <WorldSurfaceCreatures
+            creatures={runtimeObjects}
+            zoom={camera.zoom}
+            zIndex={cloudZIndex - 2}
           />
           {/* Shadows and foam both sit ON the ground, so they go below the birds. */}
           <WorldSurfaceCloudShadows
