@@ -1,0 +1,63 @@
+---
+title: TimeEngine ↔ DayNightPOI Interaction
+status: draft
+updated: 2026-08-13
+type: interaction-spec
+---
+
+# TimeEngine ↔ DayNightPOI Interaction
+
+## Data Flow
+
+```text
+TimeEngine (simulation)
+   │
+   │ currentTime
+   │
+   ▼
+useMinimalGameplay (gameplay store)
+   │
+   │ isDayPhase, cycleProgress, isPaused
+   │
+   ▼
+DayNightPOI (presentation)
+```
+
+| Source | Data | Consumer | Effect |
+|---|---|---|---|
+| TimeEngine | `currentTime` | gameplay store | computes phase |
+| gameplay store | `isDayPhase` | DayNightPOI | selects icon color |
+| gameplay store | `cycleProgress` | DayNightPOI | fills progress halo |
+| gameplay store | `isPaused` | DayNightPOI | switches to pause icon |
+
+## State Transitions
+
+When `currentTime` crosses `dayTimeUnits` boundary:
+
+- `isDayPhase` flips `true ↔ false`
+- `cycleProgress` resets to 0 and begins counting up
+- `DayNightPOI` cross-fades the icon over 220ms
+- Telemetry `day_night_transition` is emitted
+
+When `pauseGame()` is called:
+
+- `isPaused` becomes `true`
+- `DayNightPOI` shows pause bars
+- `TimeEngine.advanceTime` is not invoked while paused
+
+## Edge Cases
+
+- Pause at boundary: phase calculation must not flip while paused because `currentTime` is frozen
+- Speed multiplier: DayNightPOI always reads the same `isDayPhase`/`cycleProgress`; speed only changes UI update cadence, not simulation
+- Unmount: DayNightPOI removes its telemetry listener; `useMinimalGameplay` continues on other surfaces
+
+## Invariants
+
+- Day/Night state is a pure function of `currentTime` and config
+- `DayNightPOI` has no local timers or independent phase state
+
+## References
+
+- [`time_engine_spec.md`](./time_engine_spec.md)
+- [`day_night_poi_spec.md`](./day_night_poi_spec.md)
+- [`time_engine_trusted.md`](./trusted/time_engine_trusted.md)
