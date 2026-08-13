@@ -51,6 +51,13 @@ type: component-spec
 **Then:** `state.isDayPhase` flips and a `day_night_transition` event is emitted
 **Visual contract:** DayNightPOI changes sun/moon icon and progress color
 
+### Scenario 5: Pause freezes quest time
+
+**Given:** a quest is running and `isPaused === true`
+**When:** `advanceTime` is not invoked (because the user paused the game or opened the quest detail)
+**Then:** no quest phase, milestone, or reward is resolved; `currentTime` does not change
+**Visual contract:** `DayNightPOI` shows the pause icon; `MagicCircleHalo` stops; no milestone modal appears
+
 ## Invariants
 
 - `currentTime` is monotonically increasing and integer-valued

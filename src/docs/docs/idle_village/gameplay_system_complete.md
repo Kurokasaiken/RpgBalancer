@@ -90,6 +90,17 @@ This document tells the full gameplay story of the Idle Village vertical slice a
 - **What happens:** The player clicks the button. Rewards are applied, residents are released to the roster (return flight if needed), and resource counters update.
 - **Interaction:** [`poi_quest_interaction_spec.md`](./poi_quest_interaction_spec.md)
 
+## POI Quest Page — `/poi-quest-detail-roster-time-clock`
+
+This page follows the same 12 steps, but with four critical specializations:
+
+- **Step 3 (open POI detail)**: opening a `QuestPOI` detail **pauses the game** automatically. The panel is a `FloatingPanel` centered in the map viewport, without extra chrome, and its header is draggable.
+- **Step 5 (Start)**: `Start/Embark` is effective only if the game is not paused. While paused, the quest remains `assembling` and the `MagicCircleHalo` does not draw.
+- **Step 9+ (Milestones)**: if `QuestChronicle` is open, the `MilestoneCheckModal` appears with the V2 `DestinyAstrolabeComponent`; if it is closed, the phase resolves off-screen and the quest continues.
+- **Step 11 (Success)**: the quest is a success if `successi >= fasi_totali / 2`; `QuestRewardPanel` then shows rewards including XP for each assigned resident.
+
+See the dedicated page workflow: [`poi_quest_detail_roster_time_clock_page_workflow.md`](./poi_quest_detail_roster_time_clock_page_workflow.md) and error registry: [`poi_quest_detail_roster_time_clock_error_registry.md`](./poi_quest_detail_roster_time_clock_error_registry.md).
+
 ## Interaction Spec Map
 
 | Step | Components | Interaction Spec |
