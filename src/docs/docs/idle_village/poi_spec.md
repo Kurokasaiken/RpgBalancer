@@ -49,11 +49,27 @@ type: component-spec
 **Then:** rewards are applied and the POI returns to `idle`
 **Visual contract:** Collect button is visible and enabled; after click, resources update and progress resets
 
+### Scenario 5: Quest POI inert before start
+
+**Given:** a `QuestPOI` with required slots not yet filled
+**When:** `DayNightPOI` advances or the user clicks the POI
+**Then:** the `MagicCircleHalo` stays empty, no chronicle opens, and the POI ignores time
+**Visual contract:** Medallion is static; no arcane ring; no pulse
+
+### Scenario 6: Completed Quest POI pulses
+
+**Given:** a quest has resolved all phases and is waiting for the player to open `QuestChronicle`
+**When:** the `QuestPOI` renders in `completed` state
+**Then:** the `MagicCircleHalo` pulses (full ring + glyphs + glow) continuously
+**Visual contract:** The POI medallion has a breathing glow; it remains clickable to open the chronicle
+
 ## Invariants
 
 - POI is a capsule, not a map marker and not an expanded detail view
 - Skin resolution uses `activityCapsuleSkinConfig` and `poiAmberSkinConfig`
 - Drag validation matches the slot rack inside the POI detail
+- A `QuestPOI` ignores time until all required slots are assigned and Start is triggered while time runs
+- A completed `QuestPOI` pulses until the player opens `QuestChronicle`
 - No local timers; progress is derived from `TimeEngine` state
 
 ## References

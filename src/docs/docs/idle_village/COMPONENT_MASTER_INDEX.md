@@ -165,6 +165,8 @@ Questo index segue le regole governative:
 | POI ↔ Quest | interaction | draft | `src/docs/docs/idle_village/poi_quest_interaction_spec.md` | `/poi-quest-detail-roster-time-clock` | 2026-08-13 | T-N+1 — quest lifecycle |
 | TimeEngine ↔ Quest | interaction | draft | `src/docs/docs/idle_village/time_engine_quest_interaction_spec.md` | `/poi-quest-detail-roster-time-clock` | 2026-08-13 | T-N+1 — phase/milestone timing |
 | Gameplay System Complete | system | draft | `src/docs/docs/idle_village/gameplay_system_complete.md` | N/A | 2026-08-13 | T-FINAL — end-to-end narrative |
+| POI Quest Detail/Roster/Time/Clock — Page Workflow | page | draft | `src/docs/docs/idle_village/poi_quest_detail_roster_time_clock_page_workflow.md` | `/poi-quest-detail-roster-time-clock` | 2026-08-13 | R-010 — workflow pagina specifica |
+| POI Quest Detail/Roster/Time/Clock — Error Registry | page | draft | `src/docs/docs/idle_village/poi_quest_detail_roster_time_clock_error_registry.md` | `/poi-quest-detail-roster-time-clock` | 2026-08-13 | R-010 — registro errori pagina |
 
 ---
 

@@ -60,12 +60,35 @@ type: component-spec
 **Then:** rewards are applied, residents are released to the roster, and the panel closes
 **Visual contract:** Reward screen on `/design-system` primitives; residents fly back to the roster
 
+### Scenario 6: Quest inert before start
+
+**Given:** the `QuestPOI` is idle and at least one required slot is empty
+**When:** time advances
+**Then:** the `MagicCircleHalo` does not draw, `QuestChronicle` does not open, and no milestone fires
+**Visual contract:** POI shows static idle medallion; `DayNightPOI` continues normally
+
+### Scenario 7: Milestone resolves off-screen
+
+**Given:** the quest is running and `QuestChronicle` is closed
+**When:** a milestone deadline is reached
+**Then:** `useMilestoneEngine` queues the phase, resolves it without the modal, and the quest continues
+**Visual contract:** POI medallion pulse may change; no modal appears until the player opens `QuestChronicle`
+
+### Scenario 8: Start is gated by running time
+
+**Given:** all required slots are filled
+**When:** the user clicks Start while the game is paused
+**Then:** nothing happens (or a "resume time" hint is shown); the quest begins only when `resumeGame` is called and ticks advance
+**Visual contract:** Start CTA is enabled but the circle does not draw until `isPaused === false`
+
 ## Invariants
 
 - Quest phases are equispaced by total duration / number of phases
 - While a skill check is open, quest time does not advance
 - The magic circle is written from 12 o'clock, with no pre-existing ring
 - Phases resolve one at a time; no two phases resolve simultaneously
+- A quest is considered successful when `successi >= fasi_totali / 2` (half or more phases passed)
+- The quest is inert (no halo, no time consumption, no chronicle) until all required slots are assigned and Start is pressed while time is running
 - All quest data comes from `questBlueprints` and `questSkillCheckConfig`
 
 ## References

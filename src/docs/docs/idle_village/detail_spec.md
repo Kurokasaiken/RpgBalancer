@@ -50,11 +50,35 @@ type: component-spec
 **Then:** rewards are distributed, residents return to `available`, and the panel closes or resets
 **Visual contract:** Reward numbers animate, resident chips move from slots to roster
 
+### Scenario 5: Quest POI detail pauses time
+
+**Given:** the user clicks a `QuestPOI` that has not yet started
+**When:** the POI detail opens
+**Then:** `pauseGame()` is called automatically and `DayNightPOI` shows the paused state
+**Visual contract:** Pause icon appears in the clock; the quest detail is ready for assignment
+
+### Scenario 6: Quest detail restored from reference page
+
+**Given:** the current `POI detail` of a Quest has extra non-functional chrome
+**When:** the page is aligned with `/poi-quest-detail-roster-integration`
+**Then:** the detail contains only: header (draggable), POI info, slot rack, CTA; no extra ornaments or nested panels
+**Visual contract:** Same surface as the reference page; header has `cursor: move`; no backdrop
+
+### Scenario 7: Floating panel centered in map viewport
+
+**Given:** the map viewport has known bounds
+**When:** any floating panel opens
+**Then:** it is positioned at the center of the map viewport and is fully visible (clamped to bounds)
+**Visual contract:** Panel `left`/`top` computed from the map container rect, not the full window
+
 ## Invariants
 
 - Detail is a `FloatingPanel`; it never blocks the page with a backdrop
 - All visual properties come from `ActivityCapsuleDetailSkinPresets`; no hardcoded values
 - Slot data passes through `ActivityDetailSlotData` contract with role, required, emptyPenalty, risk modifiers
+- Opening the Quest POI detail pauses the game automatically
+- The Quest POI detail is visually identical to the reference in `/poi-quest-detail-roster-integration` (no extra chrome)
+- Floating panels open centered in the map viewport and are fully visible
 - State persistence uses `PersistenceService`, never direct localStorage
 
 ## References
