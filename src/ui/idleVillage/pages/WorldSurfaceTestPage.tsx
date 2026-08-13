@@ -248,15 +248,6 @@ export const WorldSurfaceTestPage: React.FC = () => {
     }
   }, [cameraConfig, manifest]);
 
-  // When zoomed in, allow only vertical pan (up/down), not horizontal (left/right)
-  const handleCameraChange = useCallback((newCamera: typeof camera) => {
-    if (newCamera.zoom > 1) {
-      setCamera({ ...newCamera, panX: 0 });
-    } else {
-      setCamera(newCamera);
-    }
-  }, []);
-
 
   const rendererType = useMemo(() => {
     if (!manifest) return 'dom' as const;
@@ -462,7 +453,7 @@ export const WorldSurfaceTestPage: React.FC = () => {
         <WorldSurfaceRenderer
           manifest={manifest}
           camera={camera}
-          onCameraChange={handleCameraChange}
+          onCameraChange={setCamera}
           activeVisualStateId={activeVisualStateId}
           visibleLayerIds={visibleLayerIds}
           layerScales={layerScales}
