@@ -43,14 +43,14 @@ export interface WorldSurfaceDebugPanelProps {
   onResetCamera?: () => void;
   onSpawnObjects?: () => void;
   onClearObjects?: () => void;
+  onSpawnWonders?: () => void;
   mouseWorld: { x: number; y: number } | null;
   rendererType?: 'dom' | 'webgl';
   objectCount?: number;
-  breathEnabled?: boolean;
-  onBreathEnabledChange?: (v: boolean) => void;
-  reactionTrigger?: 'camera-enter' | 'pointer-dwell';
-  reactionActive?: boolean;
-  onReactionTriggerChange?: (v: 'camera-enter' | 'pointer-dwell') => void;
+  cloudScales?: { far: number; mid: number; near: number };
+  onCloudScaleChange?: (scales: { far: number; mid: number; near: number }) => void;
+  eventCovered?: boolean;
+  onEventCoveredChange?: (v: boolean) => void;
 }
 
 /**
@@ -80,20 +80,21 @@ export const WorldSurfaceDebugPanel: React.FC<WorldSurfaceDebugPanelProps> = ({
   onResetCamera,
   onSpawnObjects,
   onClearObjects,
+  onSpawnWonders,
   mouseWorld,
   rendererType,
   objectCount = 0,
-  breathEnabled = true,
-  onBreathEnabledChange,
-  reactionTrigger = 'camera-enter',
-  reactionActive = false,
-  onReactionTriggerChange,
+  cloudScales = { far: 1, mid: 1, near: 1 },
+  onCloudScaleChange,
+  eventCovered = false,
+  onEventCoveredChange,
 }) => {
   const { t } = useTranslation('idleVillage');
   const translate = useCallback(
     (key: string) => String(t(key as never)),
     [t],
   );
+  const [layersCollapsed, setLayersCollapsed] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -119,6 +120,26 @@ export const WorldSurfaceDebugPanel: React.FC<WorldSurfaceDebugPanelProps> = ({
       return a.zIndex - b.zIndex;
     });
   }, [layers, orderIndex]);
+
+  // For the virtual atmosphere layer, the effective z-index follows its drag
+  // position: it sits immediately below the next layer in the stack.
+  const effectiveZMap = useMemo(() => {
+    const map = new Map<string, number>();
+    const frame = layers.find((l) => l.id === 'frame');
+    for (let i = 0; i < orderedLayers.length; i += 1) {
+      const layer = orderedLayers[i];
+      if (layer.id === 'clouds') {
+        const next = orderedLayers[i + 1];
+        map.set(
+          layer.id,
+          next ? Math.max(0, next.zIndex - 1) : frame ? frame.zIndex - 1 : 1000,
+        );
+      } else {
+        map.set(layer.id, layer.zIndex);
+      }
+    }
+    return map;
+  }, [orderedLayers, layers]);
 
   const orderedLayerIds = useMemo(() => orderedLayers.map((l) => l.id), [orderedLayers]);
 
@@ -200,35 +221,43 @@ export const WorldSurfaceDebugPanel: React.FC<WorldSurfaceDebugPanelProps> = ({
         </button>
       )}
 
-      {onBreathEnabledChange && (
-        <button
-          type="button"
-          onClick={() => onBreathEnabledChange(!breathEnabled)}
-          className={`mt-2 w-full rounded px-2 py-1 text-amber-100 ${breathEnabled ? 'bg-amber-600 hover:bg-amber-500' : 'bg-amber-700/30 hover:bg-amber-700/50'}`}
-        >
-          {breathEnabled ? '🌿 Breath ON' : '🌿 Breath OFF'}
-        </button>
-      )}
 
-      {onReactionTriggerChange && (
-        <div className="mt-2 space-y-1">
-          <div className="text-amber-400/60 text-[10px] uppercase tracking-wider">
-            Reazione nascosta {reactionActive ? '✨ attiva' : '○'}
+      {onCloudScaleChange && (
+        <div className="mt-2 space-y-2 border-t border-amber-700/30 pt-2">
+          <div className="text-[10px] uppercase tracking-wider text-amber-400/60">
+            {t('world.clouds.scales')}
           </div>
-          <div className="flex gap-1">
-            {(['camera-enter', 'pointer-dwell'] as const).map((mode) => (
-              <button
-                key={mode}
-                type="button"
-                onClick={() => onReactionTriggerChange(mode)}
-                className={`flex-1 rounded px-1 py-1 text-[10px] ${reactionTrigger === mode ? 'bg-amber-600 text-white' : 'bg-amber-700/30 text-amber-100 hover:bg-amber-700/50'}`}
-              >
-                {mode === 'camera-enter' ? 'camera' : 'dwell 2s'}
-              </button>
-            ))}
+          <div className="space-y-1">
+            <div className="flex justify-between text-xs text-amber-200/80">
+              <span>{t('world.clouds.far')}</span>
+              <span>{cloudScales.far.toFixed(1)}x</span>
+            </div>
+            <input
+              type="range"
+              min={0.2}
+              max={3}
+              step={0.1}
+              value={cloudScales.far}
+              onChange={(e) =>
+                onCloudScaleChange({ ...cloudScales, far: Number(e.target.value), mid: cloudScales.far, near: cloudScales.far })
+              }
+              className="h-1 w-full cursor-pointer appearance-none rounded bg-amber-700/40 accent-amber-500"
+              aria-label={`${t('world.clouds.far')} ${t('world.clouds.scale')}`}
+            />
           </div>
         </div>
       )}
+
+      {onEventCoveredChange && (
+        <button
+          type="button"
+          onClick={() => onEventCoveredChange(!eventCovered)}
+          className={`mt-2 w-full rounded px-2 py-1 text-amber-100 ${eventCovered ? 'bg-amber-500 hover:bg-amber-400' : 'bg-amber-700/30 hover:bg-amber-700/50'}`}
+        >
+          {eventCovered ? '☁️ Event shroud ON' : '☁️ Event shroud OFF'}
+        </button>
+      )}
+
 
       <div className="mt-3 flex gap-2">
         <button
@@ -247,39 +276,61 @@ export const WorldSurfaceDebugPanel: React.FC<WorldSurfaceDebugPanelProps> = ({
         </button>
       </div>
 
+      {onSpawnWonders && (
+        <button
+          type="button"
+          onClick={onSpawnWonders}
+          className="mt-2 w-full rounded bg-amber-700/30 px-2 py-1 text-amber-100 hover:bg-amber-700/50"
+        >
+          {translate('world.debug.spawnWonders')}
+        </button>
+      )}
+
 
       <div className="mt-4">
         <div className="mb-1 flex items-center justify-between">
           <h4 className="font-semibold text-amber-300">{translate('world.layers.title')}</h4>
-          {onSaveLayerDefaults && (
+          <div className="flex gap-1">
             <button
               type="button"
-              onClick={onSaveLayerDefaults}
+              onClick={() => setLayersCollapsed(!layersCollapsed)}
               className="rounded bg-amber-700/30 px-2 py-1 text-amber-100 hover:bg-amber-700/50"
             >
-              {translate('world.layers.saveDefaults')}
+              {layersCollapsed ? '▶' : '▼'}
             </button>
-          )}
+            {onSaveLayerDefaults && (
+              <button
+                type="button"
+                onClick={onSaveLayerDefaults}
+                className="rounded bg-amber-700/30 px-2 py-1 text-amber-100 hover:bg-amber-700/50"
+              >
+                {translate('world.layers.saveDefaults')}
+              </button>
+            )}
+          </div>
         </div>
-        <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-          <SortableContext items={orderedLayerIds} strategy={verticalListSortingStrategy}>
-            <div className="max-h-64 space-y-2 overflow-y-auto">
-              {orderedLayers.map((layer) => (
-                <SortableLayerRow
-                  key={layer.id}
-                  layer={layer}
-                  scale={layerScales[layer.id] ?? layer.scale ?? 1}
-                  offset={layerOffsets[layer.id] ?? { x: layer.offsetX ?? 0, y: layer.offsetY ?? 0 }}
-                  visible={visibleLayerIds.has(layer.id)}
-                  translate={translate}
-                  onToggle={() => onToggleLayer?.(layer.id)}
-                  onScaleChange={(value) => onLayerScaleChange?.(layer.id, value)}
-                  onOffsetChange={(value) => onLayerOffsetChange?.(layer.id, value)}
-                />
-              ))}
-            </div>
-          </SortableContext>
-        </DndContext>
+        {!layersCollapsed && (
+          <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+            <SortableContext items={orderedLayerIds} strategy={verticalListSortingStrategy}>
+              <div className="max-h-64 space-y-2 overflow-y-auto">
+                {orderedLayers.map((layer) => (
+                  <SortableLayerRow
+                    key={layer.id}
+                    layer={layer}
+                    zIndex={effectiveZMap.get(layer.id) ?? layer.zIndex}
+                    scale={layerScales[layer.id] ?? layer.scale ?? 1}
+                    offset={layerOffsets[layer.id] ?? { x: layer.offsetX ?? 0, y: layer.offsetY ?? 0 }}
+                    visible={visibleLayerIds.has(layer.id)}
+                    translate={translate}
+                    onToggle={() => onToggleLayer?.(layer.id)}
+                    onScaleChange={(value) => onLayerScaleChange?.(layer.id, value)}
+                    onOffsetChange={(value) => onLayerOffsetChange?.(layer.id, value)}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        )}
       </div>
 
       <div className="mt-4">
@@ -320,6 +371,7 @@ export const WorldSurfaceDebugPanel: React.FC<WorldSurfaceDebugPanelProps> = ({
 
 interface SortableLayerRowProps {
   layer: WorldSurfaceLayer;
+  zIndex: number;
   scale: number;
   offset: { x: number; y: number };
   visible: boolean;
@@ -334,6 +386,7 @@ interface SortableLayerRowProps {
  */
 const SortableLayerRow: React.FC<SortableLayerRowProps> = ({
   layer,
+  zIndex,
   scale,
   offset,
   visible,
@@ -376,7 +429,7 @@ const SortableLayerRow: React.FC<SortableLayerRowProps> = ({
             className="h-3 w-3 accent-amber-500"
           />
           <span className="flex-1 truncate">{layer.id}</span>
-          <span className="text-amber-400/60">z{layer.zIndex}</span>
+          <span className="text-amber-400/60">z{zIndex}</span>
         </label>
       </div>
       <div className="mt-1 flex items-center gap-2 pl-5">
