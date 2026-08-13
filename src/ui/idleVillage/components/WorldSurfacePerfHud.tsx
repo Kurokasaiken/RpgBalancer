@@ -19,6 +19,8 @@ export interface WorldSurfacePerfHudProps {
   visibleLayerCount?: number;
   /** Current camera zoom, so a reading can be tied to what was on screen. */
   zoom?: number;
+  /** Called when the close button is clicked. */
+  onClose?: () => void;
 }
 
 /** Frame budget at 60fps, the ceiling WKWebView enforces on macOS regardless of display. */
@@ -34,6 +36,7 @@ export const WorldSurfacePerfHud: React.FC<WorldSurfacePerfHudProps> = ({
   containerRef,
   visibleLayerCount,
   zoom,
+  onClose,
 }) => {
   const frame = useFrameMetrics(true);
   const footprint = useImageFootprint(containerRef, true);
@@ -61,12 +64,33 @@ export const WorldSurfacePerfHud: React.FC<WorldSurfacePerfHudProps> = ({
         color: '#e2e8f0',
         font: '11px ui-monospace, SFMono-Regular, Menlo, monospace',
         lineHeight: 1.55,
-        pointerEvents: 'none',
         userSelect: 'none',
       }}
       data-testid="world-surface-perf-hud"
     >
-      <div style={{ marginBottom: 4, letterSpacing: '0.08em', opacity: 0.5 }}>PERF</div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+        <div style={{ letterSpacing: '0.08em', opacity: 0.5 }}>PERF</div>
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#e2e8f0',
+              cursor: 'pointer',
+              fontSize: '14px',
+              padding: '0 2px',
+              opacity: 0.6,
+              transition: 'opacity 0.2s',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.6')}
+          >
+            ✕
+          </button>
+        )}
+      </div>
 
       {row(
         'frame p50',

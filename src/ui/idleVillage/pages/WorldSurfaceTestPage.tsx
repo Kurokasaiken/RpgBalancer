@@ -1,6 +1,8 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useWorldSurface } from '../hooks/useWorldSurface';
+import { seaWonderCatalog, wonderSpawnDefaults } from '../config/seaWonders';
+import { atmosphereAssets } from '../config/atmosphereAssets';
 import { WorldSurfaceRenderer } from '../components/WorldSurfaceRenderer';
 import { WorldSurfaceDebugPanel } from '../components/WorldSurfaceDebugPanel';
 import { WorldSurfacePerfHud } from '../components/WorldSurfacePerfHud';
@@ -48,14 +50,29 @@ export const WorldSurfaceTestPage: React.FC = () => {
   const [visibleLayerIds, setVisibleLayerIds] = useState<Set<string>>(new Set());
   const [layerScales, setLayerScales] = useState<Record<string, number>>({});
   const [layerOffsets, setLayerOffsets] = useState<Record<string, { x: number; y: number }>>({});
+  const [cloudScales, setCloudScales] = useState<{ far: number; mid: number; near: number }>({ far: 1, mid: 1, near: 1 });
   const [surfaceLayerOrder, setSurfaceLayerOrder] = useState<string[] | undefined>(undefined);
   const [mouseWorld, setMouseWorld] = useState<{ x: number; y: number } | null>(null);
   const [autoFitTrigger, setAutoFitTrigger] = useState(1);
-  const [breathEnabled, setBreathEnabled] = useState(true);
+  const [eventCovered, setEventCovered] = useState(false);
+  const [cardOpen, setCardOpen] = useState(false);
   const [reactionTrigger, setReactionTrigger] = useState<'camera-enter' | 'pointer-dwell'>('camera-enter');
   const [reactionActive, setReactionActive] = useState(false);
+  const [wonderAnchors, setWonderAnchors] = useState<{ x: number; y: number }[]>([]);
+  const [perfHudVisible, setPerfHudVisible] = useState(true);
+  const wonderTimeoutsRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
   const dwellTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mainRef = useRef<HTMLDivElement>(null);
+  const objectsRef = useRef(objects);
+  const wonderAnchorsRef = useRef(wonderAnchors);
+
+  useEffect(() => {
+    objectsRef.current = objects;
+  }, [objects]);
+
+  useEffect(() => {
+    wonderAnchorsRef.current = wonderAnchors;
+  }, [wonderAnchors]);
 
   // Initialise local state once the manifest is loaded.
   const overridesLoaded = useRef(false);
@@ -76,6 +93,9 @@ export const WorldSurfaceTestPage: React.FC = () => {
         PERSIST_LAYER_OVERRIDES_KEY,
         { scales: {}, offsets: {} },
       );
+      // Event shroud offsets are animation state, not user-saved overrides.
+      delete data.offsets.event_shroud_left;
+      delete data.offsets.event_shroud_right;
       setLayerScales(data.scales);
       setLayerOffsets(data.offsets);
 
@@ -87,6 +107,34 @@ export const WorldSurfaceTestPage: React.FC = () => {
     void loadOverrides();
   }, [manifest, cameraConfig, layers]);
   /* eslint-enable react-hooks/set-state-in-effect */
+
+  // Where a wonder may surface. The `wonder` anchors are already open water with the
+  // carved frame's silhouette subtracted (see scripts/build-terrain-masks.mjs), so the
+  // only thing left to exclude here is the swell, which is authored in TypeScript and
+  // therefore invisible to the generator.
+  //
+  // No fallback to the raw point list on an empty result: the `sea` points this used
+  // to fall back to are swell marks, every one of which sits under the frame, and
+  // silently spawning there is the bug this replaced.
+  useEffect(() => {
+    fetch('/assets/atmosphere/terrain/points.json')
+      .then((res) => res.json())
+      .then((data: { wonder?: { x: number; y: number }[] }) => {
+        const waveCenters = atmosphereAssets.waves.marks.map((m) => ({
+          x: m.x + m.width / 2,
+          y: m.y,
+        }));
+        setWonderAnchors(
+          (data.wonder ?? []).filter((p) =>
+            waveCenters.every(
+              (w) =>
+                Math.hypot(p.x - w.x, p.y - w.y) >= wonderSpawnDefaults.minDistanceFromWaveMarks,
+            ),
+          ),
+        );
+      })
+      .catch(() => setWonderAnchors([]));
+  }, []);
 
   const handleToggleLayer = useCallback((layerId: string) => {
     setVisibleLayerIds((prev) => {
@@ -159,6 +207,38 @@ export const WorldSurfaceTestPage: React.FC = () => {
     setReactionActive(false);
   }, [reactionTrigger]);
 
+  // Show the event card once the shroud is fully closed.
+  useEffect(() => {
+    if (eventCovered) {
+      const t = window.setTimeout(() => setCardOpen(true), 700);
+      return () => window.clearTimeout(t);
+    }
+    return undefined;
+  }, [eventCovered]);
+
+  const handleEventCoveredChange = useCallback((covered: boolean) => {
+    setEventCovered(covered);
+  }, []);
+
+  const handleEventCardComplete = useCallback(() => {
+    setEventCovered(false);
+  }, []);
+
+  const handleEventCardClose = useCallback(() => {
+    setCardOpen(false);
+  }, []);
+
+  // Slide the two shroud layers in/out of the world canvas based on the event state.
+  useEffect(() => {
+    if (!manifest) return;
+    const { width } = manifest.coordinateSystem.canvas;
+    setLayerOffsets((prev) => ({
+      ...prev,
+      event_shroud_left: { x: eventCovered ? 0 : -width, y: 0 },
+      event_shroud_right: { x: eventCovered ? 0 : width, y: 0 },
+    }));
+  }, [eventCovered, manifest]);
+
   const handleResetCamera = useCallback(() => {
     if (!cameraConfig || !manifest) return;
     if (manifest.renderer?.autoFit) {
@@ -167,6 +247,15 @@ export const WorldSurfaceTestPage: React.FC = () => {
       setCamera(defaultCamera(cameraConfig));
     }
   }, [cameraConfig, manifest]);
+
+  // When zoomed in, allow only vertical pan (up/down), not horizontal (left/right)
+  const handleCameraChange = useCallback((newCamera: typeof camera) => {
+    if (newCamera.zoom > 1) {
+      setCamera({ ...newCamera, panX: 0 });
+    } else {
+      setCamera(newCamera);
+    }
+  }, []);
 
 
   const rendererType = useMemo(() => {
@@ -212,6 +301,130 @@ export const WorldSurfaceTestPage: React.FC = () => {
     }
   }, [objects, removeObject]);
 
+  // Debug: put the whole catalog on the map at once, one wonder per anchor, spread as
+  // widely as the anchors allow. Deliberately does not touch the camera — the viewer
+  // pans to them.
+  const handleSpawnWonders = useCallback(() => {
+    for (const object of objectsRef.current) {
+      if (object.type === 'wonder') {
+        removeObject(object.id);
+      }
+    }
+
+    // Farthest-point sampling, not first-fit: each pick after the seed is the anchor
+    // furthest from everything already chosen, so the three land in different corners
+    // of the map.
+    //
+    // Taking the first three that merely cleared `minWonderSpacing` picked the three
+    // northern anchors: 1797px of longitude between the outermost pair but only 16px
+    // of latitude, so at the default camera they sat in a row along the top edge. This
+    // spreads the same anchors over 2112x2235px instead.
+    const remaining = [...wonderAnchorsRef.current];
+    if (remaining.length === 0) return;
+    const selected = [remaining.shift() as { x: number; y: number }];
+
+    while (selected.length < seaWonderCatalog.length && remaining.length > 0) {
+      let bestIndex = 0;
+      let bestDistance = -1;
+      remaining.forEach((point, index) => {
+        const nearest = Math.min(
+          ...selected.map((s) => Math.hypot(s.x - point.x, s.y - point.y)),
+        );
+        if (nearest > bestDistance) {
+          bestDistance = nearest;
+          bestIndex = index;
+        }
+      });
+      // Even the most distant candidate left is too close to keep: stop rather than
+      // stack two wonders on top of each other.
+      if (bestDistance < wonderSpawnDefaults.minWonderSpacing) break;
+      selected.push(remaining.splice(bestIndex, 1)[0]);
+    }
+
+    // Spawn a wonder for each selected point
+    for (let i = 0; i < selected.length; i += 1) {
+      const wonder = seaWonderCatalog[i];
+      const point = selected[i];
+      addObject({
+        id: crypto.randomUUID(),
+        location: { mode: 'dynamic', x: point.x, y: point.y },
+        type: 'wonder',
+        state: 'active',
+        visual: {
+          renderMode: 'sprite',
+          renderLayer: 'world',
+          scale: 1,
+          glow: true,
+        },
+        animation: { mode: 'idle', speed: 1, direction: 'both' },
+        data: {
+          src: wonder.src,
+          width: wonder.width,
+          height: wonder.height,
+          opacity: wonder.opacity,
+          animation: wonder.animation,
+        },
+      });
+    }
+  }, [addObject, removeObject]);
+
+  useEffect(() => {
+    const spawnWonder = () => {
+      const points = wonderAnchorsRef.current;
+      if (points.length === 0) return;
+
+      const active = objectsRef.current.filter((o) => o.type === 'wonder');
+      if (active.length >= wonderSpawnDefaults.maxActiveWonders) return;
+
+      const eligible = points.filter((p) =>
+        active.every((a) => Math.hypot(a.location.x - p.x, a.location.y - p.y) >= wonderSpawnDefaults.minWonderSpacing),
+      );
+      if (eligible.length === 0) return;
+
+      const wonder = seaWonderCatalog[Math.floor(Math.random() * seaWonderCatalog.length)];
+      const point = eligible[Math.floor(Math.random() * eligible.length)] ?? { x: 0, y: 0 };
+      const id = crypto.randomUUID();
+      const jitter = wonderSpawnDefaults.positionJitter;
+      addObject({
+        id,
+        location: {
+          mode: 'dynamic',
+          x: point.x + (Math.random() - 0.5) * jitter,
+          y: point.y + (Math.random() - 0.5) * jitter,
+        },
+        type: 'wonder',
+        state: 'active',
+        visual: {
+          renderMode: 'sprite',
+          renderLayer: 'world',
+          scale: 1,
+          glow: false,
+        },
+        animation: { mode: 'idle', speed: 1, direction: 'both' },
+        data: {
+          src: wonder.src,
+          width: wonder.width,
+          height: wonder.height,
+          opacity: wonder.opacity,
+          animation: wonder.animation,
+        },
+      });
+
+      const removeTimeout = setTimeout(() => {
+        removeObject(id);
+        wonderTimeoutsRef.current.delete(removeTimeout);
+      }, wonderSpawnDefaults.wonderLifetimeMs);
+      wonderTimeoutsRef.current.add(removeTimeout);
+    };
+
+    const interval = setInterval(spawnWonder, wonderSpawnDefaults.spawnIntervalMs);
+    return () => {
+      clearInterval(interval);
+      wonderTimeoutsRef.current.forEach(clearTimeout);
+      wonderTimeoutsRef.current.clear();
+    };
+  }, [addObject, removeObject]);
+
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-slate-950 text-amber-200">
@@ -249,18 +462,23 @@ export const WorldSurfaceTestPage: React.FC = () => {
         <WorldSurfaceRenderer
           manifest={manifest}
           camera={camera}
-          onCameraChange={setCamera}
+          onCameraChange={handleCameraChange}
           activeVisualStateId={activeVisualStateId}
           visibleLayerIds={visibleLayerIds}
           layerScales={layerScales}
           layerOffsets={layerOffsets}
+          cloudScales={cloudScales}
           surfaceLayerOrder={surfaceLayerOrder}
           onMouseWorldChange={setMouseWorld}
           runtimeObjects={objects}
           renderObjects={rendererType !== 'webgl'}
           autoFitTrigger={autoFitTrigger}
           showRegions={false}
-          breathEnabled={breathEnabled}
+          breathEnabled={false}
+          eventCovered={eventCovered}
+          showEventCard={cardOpen}
+          onEventCardComplete={handleEventCardComplete}
+          onEventCardClose={handleEventCardClose}
         />
 
         {rendererType === 'webgl' && (
@@ -336,11 +554,12 @@ export const WorldSurfaceTestPage: React.FC = () => {
           </>
         )}
 
-        {import.meta.env.DEV && (
+        {import.meta.env.DEV && perfHudVisible && (
           <WorldSurfacePerfHud
             containerRef={mainRef}
             visibleLayerCount={visibleLayerIds.size}
             zoom={camera.zoom}
+            onClose={() => setPerfHudVisible(false)}
           />
         )}
 
@@ -355,6 +574,7 @@ export const WorldSurfaceTestPage: React.FC = () => {
           visibleLayerIds={visibleLayerIds}
           layerScales={layerScales}
           layerOffsets={layerOffsets}
+          cloudScales={cloudScales}
           surfaceLayerOrder={surfaceLayerOrder}
           onToggleLayer={handleToggleLayer}
           onLayerScaleChange={handleLayerScaleChange}
@@ -368,11 +588,10 @@ export const WorldSurfaceTestPage: React.FC = () => {
           objectCount={objects.length}
           onSpawnObjects={handleSpawnObjects}
           onClearObjects={handleClearObjects}
-          breathEnabled={breathEnabled}
-          onBreathEnabledChange={setBreathEnabled}
-          reactionTrigger={reactionTrigger}
-          reactionActive={reactionActive}
-          onReactionTriggerChange={setReactionTrigger}
+          onSpawnWonders={wonderAnchors.length > 0 ? handleSpawnWonders : undefined}
+          onCloudScaleChange={setCloudScales}
+          eventCovered={eventCovered}
+          onEventCoveredChange={handleEventCoveredChange}
         />
       </main>
     </div>
