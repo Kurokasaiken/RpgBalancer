@@ -27,4 +27,11 @@ Use for open requests, idea exploration, and direction evaluation before plannin
 - Do not converge to a single option before the Director has seen the alternatives.
 - Reuse existing context; do not invent new abstractions without a concrete need.
 
+## Post-session learning
+
+- If the session produced a non-trivial assumption, workaround, bugfix, pattern, or insight that other tasks may encounter, invoke `.agents/skills/learn/SKILL.md` before closing.
+- If triggered, create `.mw/runs/<timestamp>/pattern-candidate.md` from the run artifacts.
+- If the same pattern appears in 2+ distinct contexts, add it to `PROPOSALS.md`; only the Director may promote it to `CANON.md`.
+- Do not run `learn` for trivial or purely informational exchanges.
+
 Always begin your response with `explorer:` followed by a blank line.

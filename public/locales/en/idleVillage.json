@@ -9,6 +9,7 @@
     },
     "actions": {
       "start": "Start",
+      "startPending": "Pending…",
       "cancel": "Cancel",
       "collect": "Collect"
     },
@@ -161,8 +162,10 @@
     },
     "variant": "Variant",
     "variants": {
-      "baseline": "Baseline (V1)",
-      "runic": "Runic (V2)"
+      "runic": "Runic (V2)",
+      "runicV3": "Runic V3",
+      "runicV1": "Runic V1",
+      "runicV5": "Runic V5"
     }
   },
   "presentation": {
@@ -378,6 +381,13 @@
       "saveDefaults": "Save defaults",
       "dragHandle": "Drag to reorder"
     },
+    "clouds": {
+      "scales": "Cloud scales",
+      "scale": "scale",
+      "far": "Far",
+      "mid": "Mid",
+      "near": "Near"
+    },
     "states": {
       "default": "Default",
       "corrupted": "Corrupted",
@@ -390,6 +400,49 @@
     "anchors": {
       "village_01": "Village 01"
     },
+    "goblinInvasion": {
+      "title": "GOBLIN INVASION!",
+      "subtitle": "In {count} days an army will attack!",
+      "action": "PREPARE THE DEFENSES",
+      "viewDefenses": "VIEW DEFENSES",
+      "invasion": "Invasion",
+      "eventLabel": "Goblin Invasion",
+      "daysRemaining": "Days Remaining: {count}",
+      "timerLabel": "DAYS REMAINING",
+      "warTable": {
+        "eventLabel": "WORLD EVENT · THREAT",
+        "description": "A goblin army is marching on your lands.",
+        "parchmentDescription": "A goblin army is marching on our lands. Our scouts have spotted large enemy forces moving in from the north toward your stronghold.",
+        "willBeAttacked": "YOUR VILLAGE WILL BE ATTACKED.",
+        "scoutReport": "Our scouts report a massive goblin vanguard marching from the Northern Wastes. Their target is clear: your stronghold will be razed unless defenses are prepared.",
+        "worldEvent": "World Event",
+        "enemy": "ENEMY FORCE",
+        "enemySub": "Moving from the north",
+        "village": "YOUR VILLAGE",
+        "villageSub": "Primary target",
+        "targetObjective": "Target Objective",
+        "threatLevelHigh": "Threat Level: High",
+        "threatLevelCritical": "Threat Level: Critical",
+        "threat": "THREAT",
+        "faction": "GOBLIN ARMY",
+        "factionSub": "Large hostile force detected",
+        "hostileForce": "Hostile Force",
+        "warbands": "~3,500 Warbands",
+        "enemyCount": "3,200+",
+        "enemyUnit": "GOBLINS",
+        "arrivalCount": "2",
+        "arrivalUnit": "DAYS",
+        "targetName": "YOUR VILLAGE",
+        "arrival": "ARRIVAL",
+        "arrivalIn": "Arrival In",
+        "days": "DAYS",
+        "remaining": "REMAINING",
+        "estimatedArrival": "Estimated Arrival",
+        "timeRemaining": "Time Remaining",
+        "dismiss": "Dismiss",
+        "dismissReport": "Dismiss Report"
+      }
+    },
     "debug": {
       "title": "Debug",
       "statesTitle": "States",
@@ -401,7 +454,9 @@
       "renderer": "Renderer",
       "objects": "Objects",
       "spawnObjects": "Spawn 60",
-      "clearObjects": "Clear"
+      "clearObjects": "Clear",
+      "spawnWonders": "Spawn wonders",
+      "despawnWonders": "Despawn wonders"
     }
   },
   "worldEvents": {

@@ -7,6 +7,8 @@ type: component-spec
 
 # Quest Spec
 
+> Child of [`poi_family_spec.md`](./poi_family_spec.md). Quest-specific contracts, milestones, skill checks and reward collection live here.
+
 ## State Machine (ASCII)
 
 ```text
@@ -90,6 +92,20 @@ type: component-spec
 - A quest is considered successful when `successi >= fasi_totali / 2` (half or more phases passed)
 - The quest is inert (no halo, no time consumption, no chronicle) until all required slots are assigned and Start is pressed while time is running
 - All quest data comes from `questBlueprints` and `questSkillCheckConfig`
+
+## Trial of Fire
+
+**GIVEN** a quest with a fatal risk profile (`ActivityDefinition.trialOfFire`)
+
+**WHEN** the final milestone or the quest outcome resolution is reached
+
+**THEN** a `Trial of Fire` skill check is resolved before the normal outcome: it can override death with injury, injury with survival, or escalate failure based on the configured rules
+
+**Visual contract:** the milestone modal shows a fire glyph or a second Astrolabe spin; outcome text reflects the trial result
+
+**Config source:** `src/balancing/config/idleVillage/types.ts` (`trialOfFire?: TrialOfFireRules`) and `src/balancing/config/idleVillage/defaultConfig.ts`
+
+**Test:** `poiFamilyRegressions.spec.ts` — `should resolve a Trial of Fire for a fatal quest`
 
 ## References
 

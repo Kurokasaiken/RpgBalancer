@@ -7,6 +7,8 @@ type: component-spec
 
 # POI Spec
 
+> **Note (2026-08-15):** the root of the POI family has moved to [`poi_family_spec.md`](./poi_family_spec.md). This file still holds the original `ActivityCapsule` scenarios; use it as a component reference, but for the full family contract see the root.
+
 ## State Machine (ASCII)
 
 ```text

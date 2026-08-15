@@ -6,6 +6,8 @@ import type { IdleVillageConfig } from './types';
 import { DEFAULT_QUEST_TYPES } from './questTypeDefaults';
 import { DEFAULT_PASSIVE_EFFECTS } from './passiveEffects';
 import { defaultQuestBlueprints } from './quests/questBlueprints';
+import { DEFAULT_QUEST_TIME_SCALE } from './quests/questTimeScale';
+import { DEFAULT_QUEST_SKILL_CHECK_CONFIG } from './quests/questSkillCheckConfig';
 import { DEFAULT_QUEST_POWER_RULES } from '@/engine/game/idleVillage/QuestPowerEngine';
 
 export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
@@ -1340,6 +1342,12 @@ export const DEFAULT_IDLE_VILLAGE_CONFIG: IdleVillageConfig = {
     // Math.random() roll instead of the real config-driven pipeline.
     questPowerRules: DEFAULT_QUEST_POWER_RULES,
   },
+
+  // Time scale converting authored quest phase units to real milliseconds.
+  questTimeScale: DEFAULT_QUEST_TIME_SCALE,
+
+  // Skill-check resolution rules for quest milestones.
+  questSkillCheckConfig: DEFAULT_QUEST_SKILL_CHECK_CONFIG,
 
   overlaySettings: {
     enabled: true,

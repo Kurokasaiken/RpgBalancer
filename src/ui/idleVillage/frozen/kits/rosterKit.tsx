@@ -107,6 +107,7 @@ export function RosterDraggable({
   onDragEnd: externalOnDragEnd,
   onFlightComplete,
   useExternalDndContext = false,
+  activeResidentId,
   ...props
 }: Omit<VillageRosterSectionProps, 'residents' | 'sortMode' | 'onSortModeChange' | 'onDragEnd'> & {
   defaultFatigue?: number;
@@ -117,6 +118,8 @@ export function RosterDraggable({
   /** Called when a `flightToSlot` verdict finishes landing: apply the assignment here. */
   onFlightComplete?: (residentId: string, slotId?: string) => void;
   useExternalDndContext?: boolean; // If true, don't create internal DndContext
+  /** Optional resident id forced into the drag overlay (e.g. via test hooks). */
+  activeResidentId?: string | null;
 }) {
   const { residents, residentsById } = useRosterKitData(defaultFatigue);
   const [sortMode, setSortMode] = useState<RosterSortMode>(DEFAULT_ROSTER_SORT_MODE);
@@ -201,6 +204,7 @@ export function RosterDraggable({
         residentsById={residentsById}
         usePgCardPreview={true}
         dragVisualState={dragVisualState}
+        forcedResidentId={activeResidentId}
       />
       {/* Magnetic flight into the slot on a flightToSlot verdict */}
       <DragOutcomeFlight

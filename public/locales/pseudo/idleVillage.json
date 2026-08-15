@@ -8,7 +8,8 @@
       "cancel": "!! ÇÇååññççééłł !!",
       "collect": "!! ÇÇööłłłłééççţţ !!",
       "collecting": "!! ÇÇööłłłłééççţţîîññğğ... !!",
-      "start": "!! ŠŠţţååřřţţ !!"
+      "start": "!! ŠŠţţååřřţţ !!",
+      "startPending": "!! ṖṖééññδδîîññğğ… !!"
     },
     "ariaLive": {
       "blocked": "!! {label} ååççţţîîṿṿîîţţÿÿ ββłłööççķķééδδ !!",
@@ -1077,8 +1078,10 @@
     },
     "variant": "Variant",
     "variants": {
-      "baseline": "Baseline (V1)",
-      "runic": "Runic (V2)"
+      "runic": "Runic (V2)",
+      "runicV3": "Rûnîc V3",
+      "runicV1": "Rûnîc V1",
+      "runicV5": "Rûnîc V5"
     }
   }
 }

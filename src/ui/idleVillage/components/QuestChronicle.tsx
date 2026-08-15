@@ -4,6 +4,11 @@ import idleVillagePanorama from '@/assets/ui/idleVillage/idle-village-map.jpg';
 import type { LoreDrop } from '@/balancing/config/lore/loreDropTypes';
 import { useQuestLoreDrop } from '@/ui/idleVillage/hooks/useQuestLoreDrop';
 import { useTranslation } from '@/localization/useTranslation';
+import {
+  getQuestChronicleSkinConfig,
+  type QuestChronicleVariantKey,
+  type QuestChronicleVariantPalette,
+} from '@/ui/idleVillage/skins/questChronicleSkinConfig';
 
 export type PhaseVisualState = 'locked' | 'active' | 'success' | 'failure';
 
@@ -50,53 +55,22 @@ export interface QuestChronicleProps {
   onCollect?: () => void;
 }
 
-const RISK_FALLBACKS: Record<QuestPhaseType, { injury: number; death: number }> = {
-  check: { injury: 18, death: 4 },
-  fight: { injury: 40, death: 15 },
-  stealth: { injury: 25, death: 8 },
-  trap: { injury: 12, death: 2 },
-  explore: { injury: 20, death: 6 },
-  dialogue: { injury: 0, death: 0 },
-  branch: { injury: 0, death: 0 },
-  timedChoice: { injury: 0, death: 0 },
-};
-
-type VariantKey = 've' | 'va' | 'vj';
-
-const VARIANT_MAP: Record<QuestPhaseType, VariantKey> = {
-  check: 'va',
-  fight: 've',
-  stealth: 'va',
-  trap: 'vj',
-  explore: 'va',
-  dialogue: 'va',
-  branch: 'va',
-  timedChoice: 'va',
-};
-
-const PAL: Record<VariantKey, { r0: string; r1: string; r2: string; s0: string; s1: string; g: string }> = {
-  ve: { r0: '#fcd34d', r1: '#b45309', r2: '#78350f', s0: '#1c0e04', s1: '#2e1508', g: 'rgba(245,158,11,.65)' },
-  va: { r0: '#c4b5fd', r1: '#7c3aed', r2: '#3b1789', s0: '#0d0818', s1: '#180d2a', g: 'rgba(167,139,250,.6)' },
-  vj: { r0: '#6ee7b7', r1: '#059669', r2: '#064e3b', s0: '#021a12', s1: '#073020', g: 'rgba(16,185,129,.6)' },
-};
-
-const FILL_GRADIENTS: Record<VariantKey, string> = {
-  ve: 'linear-gradient(90deg,#92400e,#f59e0b,#fde68a)',
-  va: 'linear-gradient(90deg,#5b21b6,#a78bfa,#ddd6fe)',
-  vj: 'linear-gradient(90deg,#064e3b,#10b981,#6ee7b7)',
-};
-
-const FILL_SHADOWS: Record<VariantKey, string> = {
-  ve: '0 0 6px rgba(245,158,11,.55)',
-  va: '0 0 6px rgba(167,139,250,.5)',
-  vj: '0 0 6px rgba(16,185,129,.5)',
+const PHASE_TYPE_VARIANT: Record<QuestPhaseType, QuestChronicleVariantKey> = {
+  check: 'amethyst',
+  fight: 'ember',
+  stealth: 'jade',
+  trap: 'jade',
+  explore: 'amethyst',
+  dialogue: 'amethyst',
+  branch: 'amethyst',
+  timedChoice: 'amethyst',
 };
 
 interface DerivedCard {
   key: string;
   phase: QuestPhase;
   icon: string;
-  variant: VariantKey;
+  variant: QuestChronicleVariantKey;
   progressFraction: number;
   injury: number;
   death: number;
@@ -104,22 +78,10 @@ interface DerivedCard {
   state: PhaseVisualState;
   result?: QuestPhaseResult;
   seed: number;
-  sky: string;
-  midFill: string;
-  fgFill: string;
-  accent: string;
+  palette: QuestChronicleVariantPalette;
+  fill: string;
+  fillGlow: string;
 }
-
-const SKY_MAP: Record<QuestPhaseType, string> = {
-  stealth: '#091420',
-  fight: '#160c08',
-  check: '#08090f',
-  trap: '#090a0a',
-  dialogue: '#100e06',
-  explore: '#091420',
-  branch: '#08090f',
-  timedChoice: '#08090f',
-};
 
 function saturation(state: PhaseVisualState, prog: number): number {
   if (state === 'success' || state === 'failure') return 1;
@@ -155,12 +117,14 @@ const QuestChronicle: React.FC<QuestChronicleProps> = ({
   const [isNarrativeExpanded, setIsNarrativeExpanded] = useState(true);
   const { t } = useTranslation('idleVillage');
 
+  const skin = useMemo(() => getQuestChronicleSkinConfig(), []);
+
   const cards: DerivedCard[] = useMemo(() => {
     return phases.map((entry, index) => {
       const phase = entry.phase;
-      const variant = VARIANT_MAP[phase.type];
+      const variant = PHASE_TYPE_VARIANT[phase.type];
+      const palette = skin.variants[variant];
       const riskProfile = phase.riskProfile;
-      const fallback = RISK_FALLBACKS[phase.type];
       const prog = entry.state === 'success' ? 1 : entry.state === 'failure' ? 1 : entry.state === 'active' ? activePhaseProgress : 0;
       return {
         key: phase.id,
@@ -168,19 +132,18 @@ const QuestChronicle: React.FC<QuestChronicleProps> = ({
         icon: phase.icon ?? (phase.type === 'fight' ? '⚔️' : phase.type === 'check' ? '🎲' : '🛠️'),
         variant,
         progressFraction: prog,
-        injury: riskProfile?.injuryChance ?? fallback.injury,
-        death: riskProfile?.deathChance ?? fallback.death,
+        injury: riskProfile?.injuryChance ?? 0,
+        death: riskProfile?.deathChance ?? 0,
         isCurrent: index === currentPhaseIndex,
         state: entry.state,
         result: entry.result,
         seed: index * 10 + 7,
-        sky: SKY_MAP[phase.type],
-        midFill: `rgba(${phase.type === 'fight' ? '42,20,10' : phase.type === 'stealth' ? '12,36,22' : '20,18,36'},.88)`,
-        fgFill: `rgba(${phase.type === 'fight' ? '18,8,4' : phase.type === 'stealth' ? '5,14,9' : '8,7,18'},.96)`,
-        accent: `rgba(${phase.type === 'fight' ? '165,82,20' : phase.type === 'stealth' ? '30,80,36' : '82,62,165'},.18)`,
+        palette,
+        fill: palette.fill,
+        fillGlow: palette.fillGlow,
       };
     });
-  }, [phases, currentPhaseIndex, activePhaseProgress]);
+  }, [phases, currentPhaseIndex, activePhaseProgress, skin]);
 
   const latestResolved = useMemo(() => {
     const resolved = phases.filter((e) => e.result);
@@ -334,8 +297,8 @@ const QuestChronicle: React.FC<QuestChronicleProps> = ({
                       position: 'absolute', insetBlock: 0, left: 0,
                       width: `${card.progressFraction * 100}%`,
                       borderRadius: 2,
-                      background: FILL_GRADIENTS[card.variant],
-                      boxShadow: FILL_SHADOWS[card.variant],
+                      background: card.fill,
+                      boxShadow: card.fillGlow,
                     }} />
                   </div>
                 ))}
@@ -595,7 +558,7 @@ interface PhaseCardProps {
 
 const PhaseCard: React.FC<PhaseCardProps> = ({ card }) => {
   const { t } = useTranslation('idleVillage');
-  const pal = PAL[card.variant];
+  const { palette } = card;
   const sat = saturation(card.state, card.progressFraction);
   const bri = brightness(card.state, card.progressFraction);
   const isLocked = card.state === 'locked';
@@ -645,13 +608,13 @@ const PhaseCard: React.FC<PhaseCardProps> = ({ card }) => {
         <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 122" preserveAspectRatio="xMidYMid slice">
           <defs>
             <filter id={`fsc${uid}`}><feTurbulence type="fractalNoise" baseFrequency=".022 .03" numOctaves="4" seed={card.seed} result="n" /><feColorMatrix in="n" type="matrix" values="0 0 0 0 .03 0 0 0 0 .08 0 0 0 0 .05 0 0 0 .45 0" result="c" /><feBlend in="SourceGraphic" in2="c" mode="overlay" /></filter>
-            <radialGradient id={`rga${uid}`} cx="50%" cy="38%" r="52%"><stop offset="0%" stopColor={card.accent} /><stop offset="100%" stopColor="rgba(0,0,0,0)" /></radialGradient>
+            <radialGradient id={`rga${uid}`} cx="50%" cy="38%" r="52%"><stop offset="0%" stopColor={palette.sceneAura} /><stop offset="100%" stopColor="rgba(0,0,0,0)" /></radialGradient>
           </defs>
-          <rect width="100" height="122" fill={card.sky} />
+          <rect width="100" height="122" fill={palette.sceneSky} />
           <rect width="100" height="122" filter={`url(#fsc${uid})`} fill="transparent" />
           <ellipse cx="50" cy="46" rx="58" ry="36" fill={`url(#rga${uid})`} />
-          <path d={`M0 68 Q20 56 32 60 Q44 50 58 56 Q72 47 86 53 Q94 48 100 51 L100 122 L0 122Z`} fill={card.midFill} />
-          <path d={`M0 84 Q18 76 32 80 Q48 72 62 77 Q78 69 94 74 L100 72 L100 122 L0 122Z`} fill={card.fgFill} />
+          <path d={`M0 68 Q20 56 32 60 Q44 50 58 56 Q72 47 86 53 Q94 48 100 51 L100 122 L0 122Z`} fill={palette.sceneMid} />
+          <path d={`M0 84 Q18 76 32 80 Q48 72 62 77 Q78 69 94 74 L100 72 L100 122 L0 122Z`} fill={palette.sceneFore} />
         </svg>
         {/* Card vignette */}
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 20%, rgba(4,6,14,.88) 100%)' }} />
@@ -663,15 +626,15 @@ const PhaseCard: React.FC<PhaseCardProps> = ({ card }) => {
               <defs>
                 <filter id={`gl${uid}`} x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="5" result="b" /><feComposite in="SourceGraphic" in2="b" operator="over" /></filter>
                 <filter id={`nm${uid}`}><feTurbulence type="fractalNoise" baseFrequency=".54" numOctaves="3" seed={card.seed + 1} result="n" /><feColorMatrix in="n" type="matrix" values="0 0 0 0 .05 0 0 0 0 .04 0 0 0 0 .01 0 0 0 .22 0" result="c" /><feBlend in="SourceGraphic" in2="c" mode="overlay" /></filter>
-                <radialGradient id={`rs${uid}`} cx="37%" cy="27%" r="68%"><stop offset="0%" stopColor={pal.s1} /><stop offset="55%" stopColor={pal.s0} /><stop offset="100%" stopColor="#010203" /></radialGradient>
+                <radialGradient id={`rs${uid}`} cx="37%" cy="27%" r="68%"><stop offset="0%" stopColor={palette.s1} /><stop offset="55%" stopColor={palette.s0} /><stop offset="100%" stopColor="#010203" /></radialGradient>
                 <linearGradient id={`lr${uid}`} x1="14%" y1="5%" x2="86%" y2="95%">
-                  <stop offset="0%" stopColor={pal.r0} stopOpacity={ringOpacity} />
-                  <stop offset="28%" stopColor={pal.r1} stopOpacity={ringOpacity * 0.9} />
-                  <stop offset="70%" stopColor={pal.r2} stopOpacity={ringOpacity * 0.75} />
+                  <stop offset="0%" stopColor={palette.r0} stopOpacity={ringOpacity} />
+                  <stop offset="28%" stopColor={palette.r1} stopOpacity={ringOpacity * 0.9} />
+                  <stop offset="70%" stopColor={palette.r2} stopOpacity={ringOpacity * 0.75} />
                   <stop offset="100%" stopColor="#050404" stopOpacity={ringOpacity * 0.5} />
                 </linearGradient>
                 <radialGradient id={`rh${uid}`} cx="35%" cy="23%" r="42%"><stop offset="0%" stopColor="rgba(255,255,255,.12)" /><stop offset="100%" stopColor="rgba(255,255,255,0)" /></radialGradient>
-                <radialGradient id={`rg${uid}`} cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor={pal.g} /><stop offset="100%" stopColor="rgba(0,0,0,0)" /></radialGradient>
+                <radialGradient id={`rg${uid}`} cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor={palette.g} /><stop offset="100%" stopColor="rgba(0,0,0,0)" /></radialGradient>
               </defs>
               {/* Active glow pulse */}
               {isActive && <circle cx="34" cy="34" r="30" fill={`url(#rg${uid})`} opacity=".8"><animate attributeName="opacity" values=".85;.3;.85" dur="2.8s" repeatCount="indefinite" /></circle>}
@@ -684,7 +647,7 @@ const PhaseCard: React.FC<PhaseCardProps> = ({ card }) => {
               <circle cx="34" cy="34" r="22.5" fill={`url(#rs${uid})`} filter={`url(#nm${uid})`} />
               <circle cx="34" cy="34" r="22.5" fill={`url(#rh${uid})`} />
               {/* Highlight arc */}
-              <path d="M17 27 Q34 13 51 27" fill="none" stroke={pal.r0} strokeWidth="1.2" strokeLinecap="round" strokeOpacity={isLocked ? 0.04 : isActive ? 0.58 : 0.22}>
+              <path d="M17 27 Q34 13 51 27" fill="none" stroke={palette.r0} strokeWidth="1.2" strokeLinecap="round" strokeOpacity={isLocked ? 0.04 : isActive ? 0.58 : 0.22}>
                 {isActive && <animate attributeName="strokeOpacity" values=".58;.22;.58" dur="9.4s" repeatCount="indefinite" />}
               </path>
               {/* Icon */}
@@ -698,7 +661,7 @@ const PhaseCard: React.FC<PhaseCardProps> = ({ card }) => {
               )}
               {/* Active outer ring pulse */}
               {isActive && (
-                <circle cx="34" cy="34" r="29" fill="none" stroke={pal.r0} strokeWidth="1" strokeOpacity=".5" filter={`url(#gl${uid})`}>
+                <circle cx="34" cy="34" r="29" fill="none" stroke={palette.r0} strokeWidth="1" strokeOpacity=".5" filter={`url(#gl${uid})`}>
                   <animate attributeName="opacity" values=".85;.3;.85" dur="2.8s" repeatCount="indefinite" />
                 </circle>
               )}

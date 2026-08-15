@@ -44,6 +44,7 @@ export interface WorldSurfaceDebugPanelProps {
   onSpawnObjects?: () => void;
   onClearObjects?: () => void;
   onSpawnWonders?: () => void;
+  wondersVisible?: boolean;
   mouseWorld: { x: number; y: number } | null;
   rendererType?: 'dom' | 'webgl';
   objectCount?: number;
@@ -81,6 +82,7 @@ export const WorldSurfaceDebugPanel: React.FC<WorldSurfaceDebugPanelProps> = ({
   onSpawnObjects,
   onClearObjects,
   onSpawnWonders,
+  wondersVisible = false,
   mouseWorld,
   rendererType,
   objectCount = 0,
@@ -282,7 +284,7 @@ export const WorldSurfaceDebugPanel: React.FC<WorldSurfaceDebugPanelProps> = ({
           onClick={onSpawnWonders}
           className="mt-2 w-full rounded bg-amber-700/30 px-2 py-1 text-amber-100 hover:bg-amber-700/50"
         >
-          {translate('world.debug.spawnWonders')}
+          {wondersVisible ? translate('world.debug.despawnWonders') : translate('world.debug.spawnWonders')}
         </button>
       )}
 

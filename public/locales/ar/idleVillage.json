@@ -31,8 +31,10 @@
     },
     "variant": "Variant",
     "variants": {
-      "baseline": "Baseline (V1)",
-      "runic": "Runic (V2)"
+      "runic": "Runic (V2)",
+      "runicV3": "Runic V3",
+      "runicV1": "Runic V1",
+      "runicV5": "Runic V5"
     }
   }
 }

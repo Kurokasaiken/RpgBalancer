@@ -27,4 +27,11 @@ Use when there is enough clarity to commit to a concrete plan.
 - Mark open architectural decisions as open; do not decide them silently.
 - Reference and update the relevant plan files in `src/docs/docs/plans/`.
 
+## Post-plan learning
+
+- If the plan exposes a hidden constraint, a workaround, an unexpected failure, or a reusable pattern, invoke `.agents/skills/learn/SKILL.md` after the plan is battezzato or rejected.
+- When triggered, create `.mw/runs/<timestamp>/pattern-candidate.md` from the run artifacts.
+- If the same pattern appears in 2+ distinct contexts, add it to `PROPOSALS.md`; only the Director may promote it to `CANON.md`.
+- Do not run `learn` for routine or uneventful plans.
+
 Always begin your response with `planner:` followed by a blank line.

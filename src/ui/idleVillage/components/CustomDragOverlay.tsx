@@ -77,6 +77,8 @@ interface CustomDragOverlayProps {
   usePgCardPreview?: boolean;
   /** Premium drag visual state — single source of truth for overlay visibility */
   dragVisualState?: DragVisualState;
+  /** Optional resident id to force the overlay visible when the kit drag state is idle. */
+  forcedResidentId?: string | null;
 }
 
 type DragVisualState = {
@@ -255,6 +257,7 @@ export function CustomDragOverlay({
   usePgCardPreview = true,
   useChildVersion = false,
   dragVisualState,
+  forcedResidentId,
 }: CustomDragOverlayProps) {
   const { setDragPreviewCenter, magnetTargetCenter, setDragHomeCenter } = useDragContext();
   const overlayPreviewIdRef = useRef<string | null>(null);
@@ -264,42 +267,9 @@ export function CustomDragOverlay({
   const [cursorPosition, setCursorPosition] = useState<{ x: number; y: number } | null>(null);
   
   // REGOLA 2: Solo il proxy durante il drag
-  const activeId = dragVisualState?.mode === 'dragging' ? dragVisualState.residentId : null;
+  const activeId = (dragVisualState?.mode === 'dragging' ? dragVisualState.residentId : null) ?? forcedResidentId ?? null;
   const activeResident = activeId && residentsById ? residentsById[activeId] : undefined;
-  
-  // Debug coordinate tracking
-  useEffect(() => {
-    if (!overlayRef.current || !activeId) return;
-    
-    const overlay = overlayRef.current;
-    const rect = overlay.getBoundingClientRect();
-    
-    console.log('=== DRAG OVERLAY DEBUG ===');
-    console.log('Active resident ID:', activeId);
-    console.log('Overlay container rect:', {
-      x: Math.round(rect.left),
-      y: Math.round(rect.top),
-      width: Math.round(rect.width),
-      height: Math.round(rect.height),
-      centerX: Math.round(rect.left + rect.width / 2),
-      centerY: Math.round(rect.top + rect.height / 2)
-    });
-    
-    // Find the medal overlay inside
-    const medalOverlay = overlay.querySelector('.tok-svg');
-    if (medalOverlay) {
-      const medalRect = medalOverlay.getBoundingClientRect();
-      console.log('Medal overlay rect:', {
-        x: Math.round(medalRect.left),
-        y: Math.round(medalRect.top),
-        width: Math.round(medalRect.width),
-        height: Math.round(medalRect.height)
-      });
-    }
-    
-    console.log('Cursor position:', cursorPosition);
-    console.log('========================');
-  }, [activeId, cursorPosition]);
+  const isForcedOverlay = Boolean(forcedResidentId) && dragVisualState?.mode !== 'dragging';
   
   // Calculate magnetic tilt based on distance to nearest slot
   const magneticTilt = useMemo(() => {
@@ -459,45 +429,68 @@ export function CustomDragOverlay({
     };
   }, [activeId, setDragPreviewCenter]);
 
+  const overlayContent = usePgCardPreview && activeResident ? (
+    <WanderlustMedalOverlay
+      portraitUrl={activeResident ? getResidentPortraitUrl(activeResident) : undefined}
+      isDragging={true}
+      sizePx={getDragConfig().overlay.medalSizePx}
+    />
+  ) : useChildVersion ? (
+    <DragOverlayContentChild label={activeId} resident={activeResident} />
+  ) : (
+    <DragOverlayContent label={activeId} resident={activeResident} />
+  );
+
   return (
-    <DragOverlay
-      modifiers={[snapOverlayCenterToCursor]}
-      dropAnimation={centerReturnDropAnimation}
-    >
-      {activeId ? (
+    <>
+      {isForcedOverlay && activeId ? (
         <div
-          ref={overlayRef}
-          data-drag-preview-center={cursorPosition ? `${cursorPosition.x.toFixed(2)},${cursorPosition.y.toFixed(2)}` : (overlayCenter ? `${overlayCenter.x.toFixed(2)},${overlayCenter.y.toFixed(2)}` : undefined)}
           data-drag-preview="true"
-          data-debug-active-id={activeId}
-          data-debug-use-preview={usePgCardPreview ? 'true' : 'false'}
-          data-debug-has-resident={activeResident ? 'true' : 'false'}
+          data-dnd-overlay="true"
+          data-forced-active-id={activeId}
           style={{
-            transform: `rotate(${magneticTilt.rotate}deg) scale(${magneticTilt.scale})`,
-            transition: 'transform 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-            transformOrigin: 'center center',
-            // `block` + lineHeight/fontSize 0 prevents inline line-height from
-            // adding ~3-5 px of phantom height to the wrapper bbox, which would
-            // push the overlay center below the cursor.
-            display: 'block',
-            lineHeight: 0,
-            fontSize: 0,
-            cursor: 'grabbing',
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            zIndex: 9999,
+            transform: `translate(-50%, -50%) rotate(${magneticTilt.rotate}deg) scale(${magneticTilt.scale})`,
+            pointerEvents: 'none',
           }}
         >
-          {usePgCardPreview && activeResident ? (
-            <WanderlustMedalOverlay
-              portraitUrl={activeResident ? getResidentPortraitUrl(activeResident) : undefined}
-              isDragging={true}
-              sizePx={getDragConfig().overlay.medalSizePx}
-            />
-          ) : useChildVersion ? (
-            <DragOverlayContentChild label={activeId} resident={activeResident} />
-          ) : (
-            <DragOverlayContent label={activeId} resident={activeResident} />
-          )}
+          {overlayContent}
         </div>
       ) : null}
-    </DragOverlay>
+      <DragOverlay
+        modifiers={[snapOverlayCenterToCursor]}
+        dropAnimation={centerReturnDropAnimation}
+        style={{ zIndex: 10000 }}
+      >
+        {activeId ? (
+          <div
+            ref={overlayRef}
+            data-dnd-overlay="true"
+            data-drag-preview-center={cursorPosition ? `${cursorPosition.x.toFixed(2)},${cursorPosition.y.toFixed(2)}` : (overlayCenter ? `${overlayCenter.x.toFixed(2)},${overlayCenter.y.toFixed(2)}` : undefined)}
+            data-drag-preview="true"
+            data-debug-active-id={activeId}
+            data-debug-use-preview={usePgCardPreview ? 'true' : 'false'}
+            data-debug-has-resident={activeResident ? 'true' : 'false'}
+            style={{
+              transform: `rotate(${magneticTilt.rotate}deg) scale(${magneticTilt.scale})`,
+              transition: 'transform 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+              transformOrigin: 'center center',
+              // `block` + lineHeight/fontSize 0 prevents inline line-height from
+              // adding ~3-5 px of phantom height to the wrapper bbox, which would
+              // push the overlay center below the cursor.
+              display: 'block',
+              lineHeight: 0,
+              fontSize: 0,
+              cursor: 'grabbing',
+            }}
+          >
+            {overlayContent}
+          </div>
+        ) : null}
+      </DragOverlay>
+    </>
   );
 }

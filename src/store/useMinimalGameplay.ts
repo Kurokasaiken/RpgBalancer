@@ -246,6 +246,7 @@ export interface MinimalGameplayState {
   resumeGame: (source: 'user' | 'auto') => void;
   resetGame: () => void;
   buyFood: (quantity: number) => { success: boolean; reason?: string; message?: string };
+  addResources: (resources: Partial<Record<'gold' | 'food' | 'wood' | 'xp', number>>) => void;
   setSpeedMultiplier: (multiplier: number) => void;
   startActivity: (residentId: string, activityId: string) => void;
   canStartActivity: (residentId: string, activityId: string) => StoreActivityValidationResult;
@@ -483,6 +484,8 @@ const INITIAL_STATE: MinimalGameplayState = {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   resetGame: () => {},
   buyFood: () => ({ success: false, reason: 'not_implemented' }),
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  addResources: () => {},
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setSpeedMultiplier: () => {},
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -922,6 +925,40 @@ const minimalGameplayStoreInitializer: StateCreator<MinimalGameplayState> = (set
     });
 
     return { success: true };
+  },
+
+  addResources: (resources) => {
+    const { state } = get();
+    const gold = Math.max(0, state.gold + (resources.gold ?? 0));
+    const wood = Math.max(0, state.wood + (resources.wood ?? 0));
+    const xp = Math.max(0, state.xp + (resources.xp ?? 0));
+    const foodAdd = Math.max(0, resources.food ?? 0);
+    const food = Math.min(state.maxFood, state.food + foodAdd);
+
+    set((s) => ({
+      state: {
+        ...s.state,
+        gold,
+        wood,
+        xp,
+        food,
+      },
+    }));
+
+    trackTelemetryEvent('minimal_gameplay_add_resources', {
+      resources,
+      newGold: gold,
+      newWood: wood,
+      newXp: xp,
+      newFood: food,
+    });
+
+    queueMicrotask(() => {
+      const latestState = get().state;
+      persistMinimalGameplayState(latestState).catch((err) => {
+        console.error('[MinimalGameplayStore] Persistence failed:', err);
+      });
+    });
   },
 
   setSpeedMultiplier: (multiplier) => {

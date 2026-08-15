@@ -510,6 +510,7 @@ const DetailSlot = memo(({
           onTouchEnd: isAssigned ? cancelExtraction : undefined,
           className: [
             'relative',
+            shouldShowMedal ? '[&_.slot-v12]:hidden' : '',
             dropState === 'invalid' ? 'cursor-not-allowed' : '',
             isExtracting ? 'cursor-grabbing' : '',
           ]
@@ -541,19 +542,21 @@ const DetailSlot = memo(({
                   PG TOKEN
                 </span>
               )}
-              {shouldShowMedal && (
-                <div className={`absolute -top-2 -right-2 z-10 transition-all duration-560 ease-out ${isExtracting ? 'opacity-0 scale-75' : 'opacity-100 scale-100'}`}>
+              {shouldShowMedal ? (
+                <div
+                  data-testid={`slot-medal-${slot.id}`}
+                  className={`absolute inset-0 flex items-center justify-center z-10 transition-all duration-560 ease-out ${isExtracting ? 'opacity-0 scale-75' : 'opacity-100 scale-100'} ${isShaking ? styles.animateSlotShake : ''}`}
+                >
                   <WanderlustMedalOverlay
                     portraitUrl={assignedAvatarUrl}
                     isDragging={false}
-                    sizePx={24}
-                    className="h-6 w-6"
-                    data-testid={`slot-medal-${slot.id}`}
+                    sizePx={40}
+                    className="h-10 w-10"
                   />
                 </div>
-              )}
-              <span
-                className={`flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-black/70 text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-50 ${isShaking ? styles.animateSlotShake : ''}`}
+              ) : (
+                <span
+                  className={`flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-black/70 text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-50 ${isShaking ? styles.animateSlotShake : ''}`}
                 style={pgTokenDebugStyle}
               >
                 {assignedAvatarUrl ? (
@@ -562,6 +565,7 @@ const DetailSlot = memo(({
                   <span style={initialsStyle}>{assignedInitials || assignedLabel.slice(0, 3)}</span>
                 )}
               </span>
+              )}
             </div>
           </div>
         )}

@@ -44,6 +44,14 @@ export function WorldSurfaceWaves({ enabled = true, zIndex }: WorldSurfaceWavesP
         zIndex,
         overflow: 'hidden',
         pointerEvents: 'none',
+        maskImage: 'url(/assets/atmosphere/terrain/sea_mask.webp)',
+        WebkitMaskImage: 'url(/assets/atmosphere/terrain/sea_mask.webp)',
+        maskSize: '100% 100%',
+        WebkitMaskSize: '100% 100%',
+        maskRepeat: 'no-repeat',
+        WebkitMaskRepeat: 'no-repeat',
+        maskPosition: '0 0',
+        WebkitMaskPosition: '0 0',
       }}
     >
       <style>{`
@@ -71,6 +79,8 @@ export function WorldSurfaceWaves({ enabled = true, zIndex }: WorldSurfaceWavesP
             top: mark.y,
             width: mark.width,
             height: mark.height,
+            objectFit: 'contain',
+            objectPosition: 'top center',
             opacity: 0,
             willChange: 'transform, opacity',
             ['--ws-wave-opacity' as string]: cfg.opacity,

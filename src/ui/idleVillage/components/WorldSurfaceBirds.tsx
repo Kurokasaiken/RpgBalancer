@@ -1,4 +1,36 @@
-import { atmosphereAssets } from '../config/atmosphereAssets';
+import { useMemo } from 'react';
+import { atmosphereAssets, type BirdFlight } from '../config/atmosphereAssets';
+
+function randomBetween(min: number, max: number): number {
+  return min + Math.random() * (max - min);
+}
+
+/** Perturbs a flight so it never starts from the same point or direction. */
+function randomizeFlight(flight: BirdFlight): BirdFlight {
+  const rawDx = flight.dx * randomBetween(0.6, 1.4);
+  const dx = rawDx > 0 ? Math.abs(rawDx) : -Math.abs(rawDx);
+  const dy = flight.dy * randomBetween(0.7, 1.3);
+  const flip = rawDx < 0;
+  return {
+    ...flight,
+    originX: Math.max(0, flight.originX + randomBetween(-300, 300)),
+    originY: Math.max(0, flight.originY + randomBetween(-150, 150)),
+    dx,
+    dy,
+    startDelaySeconds: randomBetween(0, flight.cycleSeconds),
+    flightSeconds: flight.flightSeconds * randomBetween(0.7, 1.4),
+    cycleSeconds: flight.cycleSeconds * randomBetween(0.8, 1.2),
+    flapSeconds: flight.flapSeconds * randomBetween(0.8, 1.3),
+    opacity: Math.min(1, flight.opacity * randomBetween(0.8, 1.1)),
+    flip,
+    birds: flight.birds.map((bird) => ({
+      ...bird,
+      offsetX: bird.offsetX + randomBetween(-20, 20),
+      offsetY: bird.offsetY + randomBetween(-10, 10),
+      delayFraction: Math.max(0, Math.min(1, bird.delayFraction + randomBetween(-0.05, 0.05))),
+    })),
+  };
+}
 
 export interface WorldSurfaceBirdsProps {
   enabled?: boolean;
@@ -28,11 +60,13 @@ export function WorldSurfaceBirds({ enabled = true, zIndex }: WorldSurfaceBirdsP
   const cfg = atmosphereAssets.birds;
   if (!cfg || cfg.flights.length === 0) return null;
 
+  const flights = useMemo(() => cfg.flights.map(randomizeFlight), [cfg.flights]);
+
   // Emitted per flight because the flight window is a config value and a keyframe
   // selector cannot be a CSS variable. Transform is restated at every keyframe:
   // listing it only at the ends would let the intermediate opacity stops split the
   // interpolation and re-apply the easing inside the climb.
-  const keyframes = cfg.flights
+  const keyframes = flights
     .map((flight) => {
       const span = Math.min(99, Math.max(0.5, (flight.flightSeconds / flight.cycleSeconds) * 100));
       const at = (fraction: number) =>
@@ -71,7 +105,7 @@ export function WorldSurfaceBirds({ enabled = true, zIndex }: WorldSurfaceBirdsP
         }
       `}</style>
 
-      {cfg.flights.map((flight) =>
+      {flights.map((flight) =>
         flight.birds.map((bird, index) => (
           <div
             key={`${flight.name}-${index}`}

@@ -403,3 +403,8 @@ POI della famiglia.
 - Ricompense reali (resource engine) → separato
 - Persistenza dello stato quest tra reload → separato
 - Multi-POI quest (più quest contemporanee) → separato
+
+## Note post-esecuzione (2026-08-15)
+
+- I bugfix config-first (ERR-019–ERR-027, tranne ERR-026) sono stati eseguiti. `IdleVillageConfig` espone ora `questTimeScale`, `questSkillCheckConfig`; la pagina legge activity/blueprint/power/resources dalla config attiva.
+- **ERR-026 rimane aperto come pianificazione:** i consumabili (`MOCK_QUEST_ITEMS`) sono ancora un mock. Per renderli editabili serve aggiungere a `IdleVillageConfig` un tab/entità Quest Items, con import/export JSON e un editor nel tab Activities (o in un tab dedicato). Non è un bugfix, è una feature mancante da inserire in un piano successivo.

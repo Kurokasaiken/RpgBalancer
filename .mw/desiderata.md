@@ -126,3 +126,67 @@ La schermata di **ricompensa/vittoria** è riscritta da zero sui primitivi del
 design system (`/design-system`): non è più uno splash sovrapposto alla cronaca,
 ma una superficie propria che presenta esito, fasi affrontate, ricompense e sorte
 del party, e da cui si raccoglie.
+
+---
+
+## v5 — Mockup AI → componente React + asset ad hoc: protocollo generale
+
+**Status:** `FROZEN`
+**Date:** 2026-08-14
+**Authorized by:** Fausto
+**Reason:** avallo via "procedi" in sessione
+
+**Intento del Director:**
+Stabilire un protocollo generale, riutilizzabile, per passare da mockup generati con AI a componente React funzionante con asset grafici ad hoc, integrato nel progetto RPG.
+
+**Formulazione proposta da Claude:**
+Definire un protocollo end-to-end — valido per qualsiasi componente UI o World Surface — che copra: generazione e valutazione del mockup; decisione sull’idoneità dell’immagine; produzione degli asset (formati, dimensioni, ottimizzazione Tauri/WebView); stesura di prompt veri e reali; e integrazione nel repo rispettando skin system, frozen kits, i18n, config-first e component reuse.
+
+**Formulazione approvata (FROZEN):**
+Definire un protocollo end-to-end — valido per qualsiasi componente UI o World Surface — che copra: generazione e valutazione del mockup; decisione sull’idoneità dell’immagine; produzione degli asset (formati, dimensioni, ottimizzazione Tauri/WebView); stesura di prompt veri e reali; e integrazione nel repo rispettando skin system, frozen kits, i18n, config-first e component reuse.
+
+**Still unresolved:**
+- Quale generatore AI/tool viene usato per i mockup.
+- Se il protocollo debba produrre anche il componente React o solo gli asset.
+- Workflow one-shot vs iterativo e chi/come valuta la qualità.
+
+---
+
+## v6 — Mockup → CSS/React + asset ad hoc: paintover consentito
+
+**Status:** `FROZEN`  
+**Date:** 2026-08-14  
+**Authorized by:** Fausto  
+**Reason:** avallo via "ok, cambia la regola: puoi fare paintover a tuo piacimento" in sessione; rettifica della decisione v5 handoff "zero paintover"
+
+**Intento del Director:**
+Per qualsiasi componente UI o World Surface, il workflow operativo è: il Director prima prova CSS/React. Se non è soddisfatto, richiede un mockup generato con AI o fornisce un mockup esterno. L'agente converte il mockup in CSS/React al meglio delle sue possibilità, crea solo gli asset che non sono riproducibili in CSS, e può usare paintover come strumento di correzione quando serve. Zero divieti assoluti: il risultato conta più del mezzo.
+
+**Formulazione proposta da Claude:**
+Stabilire un protocollo operativo minimalista per passare da mockup (AI o esterno) a componente React: (1) massimizzare CSS/React, (2) generare o rigenerare solo gli asset strettamente necessari, (3) consentire paintover come correzione legittima, (4) mantenere i vincoli di i18n, config-first, skin system e component reuse, (5) fissare un budget stretto di tempo/iterazioni per evitare loop aperti.
+
+**Formulazione approvata (FROZEN):**
+Per qualsiasi componente UI o World Surface, il workflow operativo è: (1) tentativo CSS/React-first; (2) se il Director non è soddisfatto, generazione o uso di un mockup AI (SDXL 1.0 base, img2img, IP-Adapter) o mockup esterno; (3) conversione in CSS/React al meglio delle capacità; (4) creazione degli asset ad hoc solo per le parti non riproducibili in CSS; (5) paintover consentito come strumento di correzione. Il protocollo resta ancorato a i18n, config-first, skin system, component reuse e a un budget stretto di tempo/iterazioni.
+
+---
+
+## v7 — Documentazione AI-friendly + suite di test per l’integrazione di componenti in pagine
+
+**Status:** `FROZEN`
+**Date:** 2026-08-15
+**Authorized by:** Fausto
+**Reason:** avallo via "va bene così, procediamo" in sessione
+
+**Intento del Director:**
+Quando un agente deve mettere componenti in una pagina, deve sapere come comportarsi senza dover fare domande. Il progetto deve avere documentazione comprensibile per un LLM e una suite di test ad hoc, linkata ai documenti, per catturare regressioni.
+
+**Formulazione proposta da Claude:**
+Ogni superficie di integrazione (pagina, kit, flusso) deve avere un documento AI-readable: sezioni esplicite, contratti in stile `Given/When/Then`, esempi di input/output, riferimenti incrociati a `COMPONENT_MASTER_INDEX.md` e comandi di test eseguibili. Ogni documento ha una suite di test Playwright/RTL linkata, dati di test JSON/config-driven e hook `window.__*TestHooks` esposti. Il primo caso d’uso è la **POI family** (desiderata v3/v4); v7 ne formalizza il metodo e lo rende riutilizzabile.
+
+**Formulazione approvata (FROZEN):**
+Ogni superficie di integrazione (pagina, kit, flusso) deve avere un documento **AI-readable** con: Goal, Data flow, Scenarios, Visual/Runtime contracts, Invariants, Test commands, Evidence. I contratti sono espressi in stile `Given/When/Then`; ogni documento linka ai test Playwright/RTL con dati JSON/config-driven e hook esposti. Il metodo viene applicato per la prima volta alla **POI family**: creare `poi_family_spec.md` come root e le spec figlie per job/training/maintenance/cooldown/quest, con `poiQuestRegressions.spec.ts` esteso o una nuova suite POI. Il pattern "Director input → spec → test → evidence" viene catturato in `.mw/runs/` e, se ricorrente, proposto per `PROPOSALS.md`.
+
+**Still unresolved:**
+- Nome e posizione del template AI-friendly (`.mw/templates/ai-friendly-spec.md` o `src/docs/docs/idle_village/_template.md`).
+- E2E-only, unit-only o entrambi per ogni integrazione.
+- Quando un test è sufficiente oltre Playwright (es. unit per `QuestPowerEngine`).

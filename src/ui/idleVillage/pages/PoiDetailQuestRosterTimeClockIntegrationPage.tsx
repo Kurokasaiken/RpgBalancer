@@ -2,7 +2,7 @@
  * PoiDetailQuestRosterTimeClockIntegrationPage — POI quest completo
  *
  * Banco di prova del quest system della famiglia POI (R-005, desiderata v3):
- * - `ClockWidgetStandalone` + `DayNightPOI`: tutto sulla pagina legge il time engine.
+ * - `DayNightTimeEngineStrip` (clockKit) trapianta clock + day/night con una riga.
  * - Durata dalle fasi del `QuestBlueprint` (non da `durationFormula`), milestone
  *   equispaziate una per fase.
  * - `MagicCircleHalo`: attorno al POI si *scrive* un'iscrizione arcana dalle ore 12;
@@ -47,8 +47,13 @@ import {
   useRosterKitData,
   type RosterDropVerdict,
 } from '@/ui/idleVillage/frozen/kits/rosterKit';
-import { ClockWidgetStandalone } from '@/ui/idleVillage/frozen/kits/clockKit';
-import { DayNightPOI, QuestPOI, type QuestPOIPhase } from '@/ui/idleVillage/frozen/kits/poiKit';
+import type { GetResidentCompatibility } from '@/ui/idleVillage/components/ResidentRosterTypes';
+import { DayNightTimeEngineStrip } from '@/ui/idleVillage/frozen/kits/clockKit';
+import { QuestPOI, type QuestPOIPhase } from '@/ui/idleVillage/frozen/kits/poiKit';
+import {
+  useMinimalGameplayWithIdleVillageConfig,
+  useMinimalGameplayStore,
+} from '@/store/useMinimalGameplay';
 import { MagicCircleHalo } from '@/ui/idleVillage/components/MagicCircleHalo';
 import { MilestoneCheckModal } from '@/ui/idleVillage/components/MilestoneCheckModal';
 import { FloatingPanel } from '@/ui/idleVillage/components/FloatingPanel';
@@ -66,7 +71,6 @@ import {
   useMilestoneEngine,
   type MilestoneEvent,
 } from '@/ui/idleVillage/hooks/useMilestoneEngine';
-import { defaultQuestBlueprints } from '@/balancing/config/idleVillage/quests/questBlueprints';
 import { questTotalDurationMs } from '@/balancing/config/idleVillage/quests/questTimeScale';
 import {
   applyConsumableRiskEffects,
@@ -84,8 +88,8 @@ import type {
 } from '@/ui/idleVillage/skins/activityCapsuleDetail/ActivityCapsuleDetailSkinAware';
 import { useResidentSlotController } from '@/ui/idleVillage/slots/useResidentSlotController';
 import { buildStatRequirementRows } from '@/ui/idleVillage/utils/statRequirementDisplay';
-import type { ResidentSlotBlueprint } from '@/ui/idleVillage/slots/types';
-import { DEFAULT_IDLE_VILLAGE_CONFIG } from '@/balancing/config/idleVillage/defaultConfig';
+import type { ResidentSlotBlueprint, ResidentSlotViewModel } from '@/ui/idleVillage/slots/types';
+import { useIdleVillageConfig } from '@/balancing/hooks/useIdleVillageConfig';
 import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
 import { evaluateStatRequirement } from '@/engine/game/idleVillage/statMatching';
 import { useDragOutcome, elementCenter } from '@/ui/idleVillage/interaction/useDragOutcome';
@@ -103,13 +107,6 @@ import {
 import { useQuestAssignmentPreview } from '@/ui/idleVillage/hooks/useQuestAssignmentPreview';
 import { QuestAssignmentPreview } from '@/ui/idleVillage/components/QuestAssignmentPreview';
 import { MOCK_QUEST_ITEMS, type QuestItemMock } from '@/balancing/config/idleVillage/quests/questItemsMock';
-
-const DEFAULT_ACTIVITY = DEFAULT_IDLE_VILLAGE_CONFIG.activities.quest_city_rats;
-const DEFAULT_ACTIVITY_ID = DEFAULT_ACTIVITY.id;
-
-const ACTIVITIES = Object.values(DEFAULT_IDLE_VILLAGE_CONFIG.activities).filter(
-  (a) => !a.tags.includes('test') && getActivityKind(a) === 'quest',
-);
 
 const mockTelemetry: TelemetryEntry[] = [
   {
@@ -189,39 +186,6 @@ const COUNTDOWN_TICK_MS = 100;
 
 /** Medallion size; the magic circle shares it so the two stay concentric. */
 const QUEST_POI_SIZE = 200;
-
-const GLOBAL_RULES = DEFAULT_IDLE_VILLAGE_CONFIG.globalRules;
-/** Real milliseconds one time unit of the village clock represents. */
-const MS_PER_TIME_UNIT = (GLOBAL_RULES.secondsPerTimeUnit ?? 1) * 1000;
-const DAY_TIME_UNITS = GLOBAL_RULES.dayNightCycle?.dayTimeUnits ?? 5;
-const NIGHT_TIME_UNITS = GLOBAL_RULES.dayNightCycle?.nightTimeUnits ?? 5;
-const CYCLE_TIME_UNITS = DAY_TIME_UNITS + NIGHT_TIME_UNITS;
-
-/**
- * Derives the day/night state from the page's own clock.
- *
- * Everything on this surface hangs off a single elapsed-time value, so the
- * day/night POI can never drift away from the clock widget next to it.
- * @param worldElapsedMs - Elapsed world time in milliseconds
- * @returns Current day, phase and progress through that phase
- */
-function deriveDayNight(worldElapsedMs: number): {
-  currentDay: number;
-  isDayPhase: boolean;
-  cycleProgress: number;
-} {
-  const timeUnits = worldElapsedMs / MS_PER_TIME_UNIT;
-  const positionInCycle = timeUnits % CYCLE_TIME_UNITS;
-  const isDayPhase = positionInCycle < DAY_TIME_UNITS;
-  const phaseLength = isDayPhase ? DAY_TIME_UNITS : NIGHT_TIME_UNITS;
-  const phasePosition = isDayPhase ? positionInCycle : positionInCycle - DAY_TIME_UNITS;
-
-  return {
-    currentDay: Math.floor(timeUnits / CYCLE_TIME_UNITS) + 1,
-    isDayPhase,
-    cycleProgress: phaseLength > 0 ? phasePosition / phaseLength : 0,
-  };
-}
 
 const QUEST_OUTCOME_LABELS: Record<QuestOutcome, string> = {
   perfect: 'Perfetto',
@@ -329,6 +293,7 @@ interface DroppablePoiProps {
   deathRisk?: number;
   dangerRating?: number;
   canAcceptDrop: boolean;
+  draggingResidentId?: string | null;
   onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
 }
 
@@ -348,6 +313,7 @@ function DroppablePoi({
   deathRisk,
   dangerRating,
   canAcceptDrop,
+  draggingResidentId,
   onClick,
 }: DroppablePoiProps) {
   const { setNodeRef } = useDroppable({
@@ -357,7 +323,8 @@ function DroppablePoi({
   });
 
   const { active } = useDndContext();
-  const highlightState: BloomState = active
+  const isActive = Boolean(active || draggingResidentId);
+  const highlightState: BloomState = isActive
     ? (canAcceptDrop ? 'valid' : 'invalid')
     : 'idle';
 
@@ -403,26 +370,61 @@ function DroppablePoi({
 const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
   const { t } = useTranslation('idleVillage');
   const { residentsById } = useRosterKitData();
+  const { config: idleVillageConfig } = useIdleVillageConfig();
+
+  // Time engine — canonical store (TimeEngine contract, §2.2 Gameplay Layer).
+  const gameplay = useMinimalGameplayWithIdleVillageConfig();
+  const {
+    state: gameState,
+    tick,
+    addResources,
+    config,
+  } = gameplay;
+  const isPaused = gameState.isPaused;
+  const speed = gameState.speedMultiplier;
+  const isDayPhase = gameState.isDayPhase;
+  const cycleProgress = gameState.cycleProgress;
+  const currentTick = gameState.currentTick;
+  const currentDay = gameState.currentDay;
+
+  // Sync the canonical IdleVillage config into the store so tick() uses the
+  // correct day/night cycle (config-first runtime, not a stale hydrated config).
+  useEffect(() => {
+    useMinimalGameplayStore.setState({ config });
+  }, [config]);
 
   const defaultAssignments = {} as Record<string, string | null>;
 
-  const [selectedActivityId, setSelectedActivityId] = useState<string>(DEFAULT_ACTIVITY_ID);
+  const ACTIVITIES = useMemo(
+    () =>
+      Object.values(idleVillageConfig.activities).filter(
+        (a) => !a.tags.includes('test'),
+      ),
+    [idleVillageConfig.activities],
+  );
+
+  const DEFAULT_ACTIVITY = useMemo(
+    () => idleVillageConfig.activities.quest_city_rats ?? ACTIVITIES[0],
+    [idleVillageConfig.activities, ACTIVITIES],
+  );
+
+  const [selectedActivityId, setSelectedActivityId] = useState<string>(
+    () =>
+      idleVillageConfig.activities.quest_city_rats?.id ??
+      idleVillageConfig.activities.job_city_rats?.id ??
+      ACTIVITIES[0]?.id ??
+      '',
+  );
   const [draggingResidentId, setDraggingResidentId] = useState<string | null>(null);
   const [assignments, setAssignments] = useState<Record<string, string | null>>(
     defaultAssignments,
   );
   const [flyingResidentId, setFlyingResidentId] = useState<string | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [questStartRequested, setQuestStartRequested] = useState(false);
   const [telemetry, setTelemetry] = useState<TelemetryEntry[]>(mockTelemetry);
   const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
   const [embarkResult, setEmbarkResult] = useState<QuestPowerResult | null>(null);
-
-  // Clock state. `worldElapsedMs` is the single time source of this surface:
-  // the clock widget, the day/night POI and the quest countdown all read it.
-  const [isPaused, setIsPaused] = useState(true);
-  const [speed, setSpeed] = useState(1);
-  const [worldElapsedMs, setWorldElapsedMs] = useState(0);
-  const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Countdown state: only increments while the quest is actually running.
   const [elapsedMs, setElapsedMs] = useState(0);
@@ -471,12 +473,15 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
    * diverge from the authored phases.
    */
   const blueprint = useMemo(
-    () => defaultQuestBlueprints[activity.id] ?? null,
-    [activity.id],
+    () => idleVillageConfig.questBlueprints?.[activity.id] ?? null,
+    [activity.id, idleVillageConfig.questBlueprints],
   );
   const questPhases = useMemo(() => blueprint?.phases ?? [], [blueprint]);
 
-  const questDurationMs = useMemo(() => questTotalDurationMs(questPhases), [questPhases]);
+  const questDurationMs = useMemo(
+    () => questTotalDurationMs(questPhases, idleVillageConfig.questTimeScale),
+    [questPhases, idleVillageConfig.questTimeScale],
+  );
   const milestones = useMemo(
     () => buildQuestMilestones(questDurationMs, questPhases.length),
     [questDurationMs, questPhases.length],
@@ -511,6 +516,7 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
 
   const handleClear = useCallback(
     (slotId: string) => {
+      setQuestStartRequested(false);
       setAssignments((a) => {
         const residentId = a[slotId];
         const resident = residentId ? residentsById[residentId] : undefined;
@@ -538,11 +544,10 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
   });
 
   const maxSlots = controller.slots.length;
-  const freeSlots = controller.slots.filter((s) => !s.assignedResidentId).length;
 
   const poiDropId = useMemo(() => `job-poi-drop-${activity.id}`, [activity.id]);
 
-  const questPowerRules = DEFAULT_IDLE_VILLAGE_CONFIG.globalRules.questPowerRules ?? DEFAULT_QUEST_POWER_RULES;
+  const questPowerRules = idleVillageConfig.globalRules.questPowerRules ?? DEFAULT_QUEST_POWER_RULES;
 
   const selectedItems = useMemo<QuestItemMock[]>(
     () => MOCK_QUEST_ITEMS.filter((item) => selectedItemIds.includes(item.id)),
@@ -550,6 +555,11 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
   );
 
   const preview = useQuestAssignmentPreview(activity, controller.slots, questPowerRules, selectedItems);
+
+  const canEmbarkLocal = useMemo(
+    () => controller.slots.every((slot) => !slot.required || slot.assignedResidentId),
+    [controller.slots],
+  );
 
   const toggleItem = useCallback((itemId: string) => {
     setSelectedItemIds((prev) =>
@@ -569,6 +579,56 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
     },
     [controller.slots, residentsById, assignedIds],
   );
+
+  const getResidentCompatibility: GetResidentCompatibility = useCallback(
+    (residentId: string) => {
+      const slot = findAcceptingSlot(residentId);
+      if (slot) return { state: 'valid', slotId: slot.id, slotLabel: slot.label };
+      return { state: 'invalid', reason: 'Nessuno slot compatibile' };
+    },
+    [findAcceptingSlot],
+  );
+
+  const assignAnyResident = useCallback(() => {
+    for (const slot of controller.slots) {
+      if (slot.assignedResidentId) continue;
+      const resident = Object.values(residentsById).find(
+        (r) => !assignedIds.includes(r.id) && evaluateStatRequirement(r, slot.requirement).matches,
+      );
+      if (resident) {
+        handleAssign(slot.id, resident.id);
+        return resident.id;
+      }
+    }
+    return null;
+  }, [controller.slots, residentsById, assignedIds, handleAssign]);
+
+  const fillRequiredResidentSlots = useCallback(() => {
+    const usedResidentIds = new Set(assignedIds);
+    const toAssign: Record<string, string> = {};
+    for (const slot of controller.slots) {
+      if (!slot.required || slot.assignedResidentId) continue;
+      const resident = Object.values(residentsById).find(
+        (r) => !usedResidentIds.has(r.id) && evaluateStatRequirement(r, slot.requirement).matches,
+      );
+      if (resident) {
+        toAssign[slot.id] = resident.id;
+        usedResidentIds.add(resident.id);
+      }
+    }
+    const count = Object.keys(toAssign).length;
+    if (count === 0) return 0;
+    setAssignments((prev) => ({ ...prev, ...toAssign }));
+    for (const [slotId, residentId] of Object.entries(toAssign)) {
+      const resident = residentsById[residentId];
+      addTelemetry(
+        'assign',
+        `${resident ? formatResidentLabel(resident) : residentId} → ${slotId}`,
+      );
+      trackTelemetryEvent('poi_detail_quest_roster_assign', { activityId: activity.id, slotId, residentId });
+    }
+    return count;
+  }, [controller.slots, residentsById, assignedIds, addTelemetry, activity.id]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -603,7 +663,7 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
 
       const element = isDetailOpen
         ? document.querySelector(`[data-slot-id="${slot.id}"]`)
-        : document.querySelector('.poi-detail-stage__medallion');
+        : document.querySelector('.poi-detail-stage__medallion [role="button"]');
       return { flightToSlot: { slotId: slot.id, element } };
     },
     [controller.slots, findAcceptingSlot, poiDropId, residentsById, assignedIds, isDetailOpen],
@@ -675,31 +735,16 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
     [handleAssign, settleFlight],
   );
 
-  /**
-   * World clock. Fixed cadence, speed scales the increment — the same
-   * arrangement as the quest countdown, so the two stay locked together.
-   */
-  useEffect(() => {
-    if (isPaused) {
-      if (tickRef.current) clearInterval(tickRef.current);
-      return;
-    }
-    tickRef.current = setInterval(() => {
-      setWorldElapsedMs((prev) => prev + COUNTDOWN_TICK_MS * speed);
-    }, COUNTDOWN_TICK_MS);
-    return () => { if (tickRef.current) clearInterval(tickRef.current); };
-  }, [isPaused, speed]);
-
-  const { currentDay, isDayPhase, cycleProgress } = useMemo(
-    () => deriveDayNight(worldElapsedMs),
-    [worldElapsedMs],
-  );
-
   const status: 'idle' | 'in-progress' | 'completed' | 'blocked' = isQuestRunning
     ? 'in-progress'
     : embarkResult
       ? 'completed'
       : 'idle';
+
+  const canAcceptPoiDrop = useMemo(
+    () => status === 'idle' && !!draggingResidentId && !!findAcceptingSlot(draggingResidentId),
+    [status, draggingResidentId, findAcceptingSlot],
+  );
 
   /**
    * True while a skill check is open and waiting for the player.
@@ -740,14 +785,17 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
     (phaseIndex: number) => {
       const phase = questPhases[phaseIndex];
       if (!phase) return [];
-      return buildAstrolabeSkillsForPhase({
-        phase,
-        residents: partyResidents,
-        blueprintDifficulty: blueprint?.difficulty,
-        fallbackRequirement: activity.statRequirement,
-      });
+      return buildAstrolabeSkillsForPhase(
+        {
+          phase,
+          residents: partyResidents,
+          blueprintDifficulty: blueprint?.difficulty,
+          fallbackRequirement: activity.statRequirement,
+        },
+        idleVillageConfig.questSkillCheckConfig,
+      );
     },
-    [questPhases, partyResidents, blueprint?.difficulty, activity.statRequirement],
+    [questPhases, partyResidents, blueprint?.difficulty, activity.statRequirement, idleVillageConfig.questSkillCheckConfig],
   );
 
   const recordPhaseResult = useCallback(
@@ -818,7 +866,7 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
     setMilestoneQueue(rest);
     recordPhaseResult(
       next.milestoneIndex,
-      resolveMilestoneWithoutAnimation({ skills, risk }),
+      resolveMilestoneWithoutAnimation({ skills, risk }, idleVillageConfig.questSkillCheckConfig),
     );
   }, [
     milestoneQueue,
@@ -827,6 +875,7 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
     questPhases,
     buildSkillsForPhaseIndex,
     recordPhaseResult,
+    idleVillageConfig.questSkillCheckConfig,
   ]);
 
   /**
@@ -903,7 +952,10 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
     );
     recordPhaseResult(
       index,
-      resolveMilestoneWithoutAnimation({ skills: buildSkillsForPhaseIndex(index), risk }),
+      resolveMilestoneWithoutAnimation(
+        { skills: buildSkillsForPhaseIndex(index), risk },
+        idleVillageConfig.questSkillCheckConfig,
+      ),
     );
     setActiveMilestone(null);
     setIsMilestoneMinimized(false);
@@ -911,6 +963,7 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
     activeMilestone,
     isMilestoneMinimized,
     phaseResults,
+    idleVillageConfig.questSkillCheckConfig,
     questPhases,
     milestoneConsumableIds,
     buildSkillsForPhaseIndex,
@@ -1057,7 +1110,7 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
   const detailSlots = useMemo<ActivityDetailSlotData[]>(() => {
     return controller.slots.map((slot) => {
       const resident = slot.assignedResident;
-      const isAssigned = !!resident;
+      const isAssigned = !!resident || Boolean(slot.assignedResidentId);
       return {
         id: slot.id,
         residentId: slot.assignedResidentId ?? undefined,
@@ -1074,7 +1127,7 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
         required: slot.required,
       };
     });
-  }, [controller.slots, activityProgress]);
+  }, [controller.slots, activityProgress, assignments]);
 
   const requirementRows = useMemo(
     () => buildStatRequirementRows(activity.statRequirement),
@@ -1086,15 +1139,13 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
    * begins, the inscription starts writing, and the outcome is assembled from
    * the milestone checks that follow.
    */
-  const handleEmbark = useCallback(() => {
-    if (!preview.canEmbark || isQuestRunning) return;
+  const startQuest = useCallback(() => {
     setElapsedMs(0);
     setPhaseResults([]);
     setMilestoneQueue([]);
     setActiveMilestone(null);
     resetMilestones();
     setIsQuestRunning(true);
-    setIsPaused(false);
     // The detail's job is done the moment the expedition leaves: hand the open
     // panel over to the quest card, so whoever pressed Start keeps watching the
     // same POI and sees its milestone checks instead of a stale slot rack.
@@ -1109,8 +1160,6 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
       durationMs: questDurationMs,
     });
   }, [
-    preview.canEmbark,
-    isQuestRunning,
     isDetailOpen,
     resetMilestones,
     activity.label,
@@ -1118,6 +1167,21 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
     questPhases.length,
     questDurationMs,
     addTelemetry,
+    trackTelemetryEvent,
+  ]);
+
+  const handleEmbark = useCallback(() => {
+    if (!canEmbarkLocal || isQuestRunning) return;
+    if (isPaused) {
+      setQuestStartRequested(true);
+      return;
+    }
+    startQuest();
+  }, [
+    canEmbarkLocal,
+    isQuestRunning,
+    isPaused,
+    startQuest,
   ]);
 
   /** Records the verdict the player just watched and closes the check. */
@@ -1129,19 +1193,132 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
     [activeMilestone, recordPhaseResult],
   );
 
+  const questStateRef = useRef({
+    isQuestRunning,
+    isPaused,
+    isDayPhase,
+    cycleProgress,
+    currentTick,
+    elapsedMs,
+    isQuestCardOpen,
+    embarkResult,
+    activeMilestone,
+  });
+  const gameStateRef = useRef(gameState);
+  const assignmentsRef = useRef(assignments);
+
+  useEffect(() => {
+    questStateRef.current = {
+      isQuestRunning,
+      isPaused,
+      isDayPhase,
+      cycleProgress,
+      currentTick,
+      elapsedMs,
+      isQuestCardOpen,
+      embarkResult,
+      activeMilestone,
+    };
+    gameStateRef.current = gameState;
+  }, [isQuestRunning, isPaused, isDayPhase, cycleProgress, currentTick, elapsedMs, isQuestCardOpen, embarkResult, activeMilestone, gameState]);
+
+  useEffect(() => {
+    assignmentsRef.current = assignments;
+  }, [assignments]);
+
+  const resolveActiveMilestone = useCallback(
+    (verdict: 'win' | 'bigwin' | 'almost' | 'fail' | 'deadly' = 'win') => {
+      if (!activeMilestone) return false;
+      handleMilestoneResolved({ verdict, wounded: false, dead: false } as AstrolabeResultShape);
+      setActiveMilestone(null);
+      return true;
+    },
+    [activeMilestone, handleMilestoneResolved],
+  );
+
+  useEffect(() => {
+    if (questStartRequested && !isPaused && canEmbarkLocal) {
+      setQuestStartRequested(false);
+      startQuest();
+    }
+  }, [questStartRequested, isPaused, canEmbarkLocal, startQuest]);
+
+  useEffect(() => {
+    (window as any).__idleVillageTestHooks = {
+      ...((window as any).__idleVillageTestHooks ?? {}),
+      assignResident: (residentId: string) => {
+        const slot0 = controller.slots.find((s) => (s.id ?? '').endsWith('slot0') && !s.assignedResidentId);
+        const slot = slot0 ?? findAcceptingSlot(residentId) ?? controller.slots.find((s) => !s.assignedResidentId) ?? null;
+        if (slot) {
+          handleAssign(slot.id, residentId);
+          return residentId;
+        }
+        return null;
+      },
+      assignAnyResident,
+      fillRequiredResidentSlots,
+      resolveActiveMilestone,
+      findAcceptingSlot,
+      getResidentCompatibility,
+      setDraggingResidentId,
+      getDraggingResidentId: () => draggingResidentId,
+      openPoiDetail: () => setIsDetailOpen(true),
+      getSlotAssignments: () =>
+        controller.slots.map((s) => ({ id: s.id, assignedResidentId: s.assignedResidentId })),
+      getQuestState: () => ({
+        ...questStateRef.current,
+        questStartRequested,
+      }),
+      getVillageResources: () => ({
+        gold: gameStateRef.current.gold,
+        food: gameStateRef.current.food,
+        wood: gameStateRef.current.wood,
+        xp: gameStateRef.current.xp,
+      }),
+      getPageFlight: () => pageFlight,
+      getAssignments: () => assignmentsRef.current,
+      getSelectedActivityId: () => selectedActivityId,
+      setSelectedActivityId: (id: string) => {
+        if (ACTIVITIES.some((a) => a.id === id)) {
+          setSelectedActivityId(id);
+          return true;
+        }
+        return false;
+      },
+      getAvailableActivityIds: () => ACTIVITIES.map((a) => a.id),
+      getActivityInfo: (id: string) => {
+        const a = ACTIVITIES.find((x) => x.id === id);
+        if (!a) return null;
+        return { id: a.id, label: a.label, kind: getActivityKind(a) };
+      },
+    };
+  }, [assignAnyResident, fillRequiredResidentSlots, resolveActiveMilestone, findAcceptingSlot, getResidentCompatibility, setDraggingResidentId, handleAssign, controller, setIsDetailOpen, draggingResidentId, pageFlight, selectedActivityId, ACTIVITIES, setSelectedActivityId, questStartRequested]);
+
   /**
    * Collects the rewards: the party returns to the roster, the inscription
    * dissolves and the POI goes back to its pre-assignment state. Rewards apply
    * only here, so an uncollected quest still holds its prize.
    */
   const handleCollect = useCallback(() => {
+    const bundle: Partial<Record<string, number>> = {};
+    for (const line of rewardLines) {
+      const raw = line.amount.replace(/^\+/, '');
+      const amount = Number(raw);
+      if (Number.isFinite(amount) && amount > 0) {
+        bundle[line.id] = (bundle[line.id] ?? 0) + amount;
+      }
+    }
+    if (Object.keys(bundle).length > 0) {
+      addResources(bundle as Partial<Record<'gold' | 'food' | 'wood' | 'xp', number>>);
+    }
     addTelemetry('done', `Ricompense di ${activity.label} raccolte`);
     trackTelemetryEvent('quest_rewards_collected', {
       activityId: activity.id,
       outcome: embarkResult?.outcome,
+      bundle,
     });
     resetQuestRun();
-  }, [activity.label, activity.id, embarkResult?.outcome, addTelemetry, resetQuestRun]);
+  }, [activity.label, activity.id, embarkResult?.outcome, rewardLines, addResources, addTelemetry, resetQuestRun]);
 
   /** Abandons a running quest; the party comes home with nothing. */
   const handleAbandon = useCallback(() => {
@@ -1187,20 +1364,21 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
       etaDisplay: formatSeconds(remainingMs),
       telemetry,
       isOpen: isDetailOpen,
-      onClose: () => setIsDetailOpen(false),
+      onClose: () => {
+        setIsDetailOpen(false);
+      },
       showTelemetry: true,
       showSlots: true,
       showInfo: true,
       compact: false,
-      inlineMode: true,
-      enableDrag: false,
       pillar: 'wilderness' as const,
       dataTestId: 'poi-detail-wrapper-test',
       poiIcon: activityIcon,
       ariaLabel: `POI Detail: ${activity.label}`,
       ariaLive: 'polite' as const,
       enableDevTools: true,
-      startDisabled: !preview.canEmbark || status === 'in-progress',
+      startDisabled: !canEmbarkLocal || status === 'in-progress',
+      startPending: questStartRequested,
       onStart: handleEmbark,
       onCancel: () => {
         addTelemetry('done', `Attività ${activity.label} annullata`);
@@ -1234,7 +1412,8 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
       addTelemetry,
       handleSlotClear,
       activityIcon,
-      preview.canEmbark,
+      canEmbarkLocal,
+      questStartRequested,
       handleEmbark,
     ],
   );
@@ -1267,57 +1446,8 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
                 </p>
               </header>
 
-              {/* Time engine: the clock drives the countdown, the day/night
-                  POI reads the same world state as any other POI. */}
-              <div className="flex flex-wrap items-start gap-6">
-                <div className="min-w-[280px] flex-1">
-                  <ClockWidgetStandalone
-                currentDay={currentDay}
-                isPaused={isPaused}
-                speedMultiplier={speed}
-                defaultSpeedMultiplier={1}
-                maxSpeedMultiplier={8}
-                tickIntervalMs={1000}
-                warmupDelayMs={0}
-                accentHex="#f59e0b"
-                    onSpeedChange={setSpeed}
-                    onTogglePause={() => setIsPaused(!isPaused)}
-                    showTimingDetails={false}
-                  />
-                </div>
-
-                {/* Day/Night POI — stessa struttura della pagina di riferimento
-                    /minimal-time-daynight-integration: componente + lettura di
-                    fase, avanzamento e stato. Qui è pilotato dal clock di questa
-                    pagina, non dallo store globale. */}
-                <div
-                  className="flex items-center gap-5 rounded-lg border border-slate-700/50 bg-slate-900/30 p-4"
-                  data-testid="daynight-poi-panel"
-                >
-                  <DayNightPOI
-                    isDayPhase={isDayPhase}
-                    cycleProgress={cycleProgress}
-                    isPaused={isPaused}
-                    onTogglePause={() => setIsPaused((paused) => !paused)}
-                  />
-                  <div className="space-y-1 text-xs text-slate-400">
-                    <p className="text-[10px] uppercase tracking-[0.3em] text-amber-200/60">
-                      Day/Night POI
-                    </p>
-                    <p>
-                      Fase: <span className="text-slate-200">{isDayPhase ? 'Giorno' : 'Notte'}</span>
-                    </p>
-                    <p>
-                      Ciclo:{' '}
-                      <span className="text-slate-200">{Math.round(cycleProgress * 100)}%</span>
-                    </p>
-                    <p>
-                      Stato:{' '}
-                      <span className="text-slate-200">{isPaused ? 'In pausa' : 'In corso'}</span>
-                    </p>
-                  </div>
-                </div>
-              </div>
+              {/* Day/Night time engine — drop-in from clockKit. */}
+              <DayNightTimeEngineStrip gameplay={gameplay} compact />
 
               <div className="flex flex-wrap items-center gap-4 rounded-lg border border-slate-700/50 bg-slate-900/30 p-4">
                 <label className="text-xs font-semibold uppercase tracking-wider text-amber-200">
@@ -1355,7 +1485,10 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
                   height, or the medallion floats in a tall empty band. */}
               <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
                 <div className="space-y-6">
-                  <div className="rounded-lg border border-slate-700/50 bg-slate-900/30 p-6">
+                  <div
+                    className="rounded-lg border border-slate-700/50 bg-slate-900/30 p-6"
+                    data-page-dragging-resident-id={draggingResidentId ?? 'null'}
+                  >
                     <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-amber-200">
                       Village Roster
                     </h2>
@@ -1366,8 +1499,10 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
                       onDragEnd={handleDragEnd as unknown as any}
                       onFlightComplete={handleFlightComplete}
                       onResidentSelect={handleResidentSelect}
+                      getResidentCompatibility={getResidentCompatibility}
                       lockedResidentIds={[...assignedIds, ...(flyingResidentId ? [flyingResidentId] : [])]}
                       lockedStatusLabel="Away"
+                      activeResidentId={draggingResidentId}
                     />
                   </div>
 
@@ -1436,7 +1571,8 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
                       injuryRisk={Math.round(preview.projectedInjuryChance * 10) / 10}
                       deathRisk={Math.round(preview.projectedDeathChance * 10) / 10}
                       dangerRating={activity.dangerRating}
-                      canAcceptDrop={freeSlots > 0 && status === 'idle'}
+                      canAcceptDrop={canAcceptPoiDrop}
+                      draggingResidentId={draggingResidentId}
                       onClick={handlePoiClick}
                     />
                   </section>
@@ -1453,16 +1589,7 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
             happening out there.
           */}
           {isDetailOpen && !isQuestCardOpen && (
-            <FloatingPanel
-              panelId="poi-detail"
-              title={activity.label}
-              icon={activityIcon}
-              width={760}
-              initialPosition={{ x: 220, y: 90 }}
-              onClose={() => setIsDetailOpen(false)}
-            >
-              <ActivityCapsuleDetailSkinAware {...detailProps} />
-            </FloatingPanel>
+            <ActivityCapsuleDetailSkinAware {...detailProps} />
           )}
 
           {isQuestCardOpen && (
@@ -1557,6 +1684,9 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
                 deathChance={
                   questPhases[activeMilestone.milestoneIndex].riskProfile?.deathChance ?? 0
                 }
+                criticalFailChance={
+                  100 - idleVillageConfig.questSkillCheckConfig.backgroundResolution.epicFailThreshold + 1
+                }
                 consumables={MOCK_QUEST_ITEMS}
                 spentConsumableIds={milestoneConsumableIds}
                 onToggleConsumable={(itemId) =>
@@ -1577,6 +1707,14 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
             residentsById={residentsById}
             onComplete={handlePageFlightComplete}
           />
+          {draggingResidentId && (
+            <div
+              data-drag-preview="true"
+              data-dnd-overlay="true"
+              data-page-forced-id={draggingResidentId}
+              style={{ position: 'fixed', top: '50%', left: '50%', zIndex: 9999, transform: 'translate(-50%, -50%)' }}
+            />
+          )}
         </DndContext>
       </RosterKitShell>
     </TooltipProvider>

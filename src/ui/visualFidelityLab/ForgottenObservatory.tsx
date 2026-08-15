@@ -122,7 +122,7 @@ export const ForgottenObservatory: React.FC = () => (
             Observatory Progress
           </WanderlustSectionHeader>
           {/* Proof #2 now CONSUMES the extracted CarvedBar primitive (energy=xp). */}
-          <CarvedBar energy="xp" value={63} max={100} label="Survey Completion" />
+          <CarvedBar energy="xp" value={63} max={100} label="Survey Completion" showValue={false} />
         </div>
 
         {/* ── Well 2: reward reveal — DIFFERENTIATED as a special reward plaque ── */}

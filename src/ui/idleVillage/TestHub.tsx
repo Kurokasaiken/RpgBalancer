@@ -120,13 +120,13 @@ const EXTRA_PAGES: TestPageLink[] = [
     icon: '🔬',
     status: 'ok',
   },
-  // Non-kit page: Quest detail component candidates for POI quest opening.
+  // Non-kit page: Mockup to Component - visual handoff workflow lab.
   {
-    id: 'quest-detail-candidates',
-    title: 'Quest Detail Candidates',
-    description: 'All Quest/QuestDetail/QuestChronicle candidates for opening a quest POI',
-    path: '/quest-detail-candidates',
-    icon: '🧭',
+    id: 'mockup-to-component',
+    title: 'Mockup → Component',
+    description: 'Side-by-side mockup reference and derived React component iterations',
+    path: '/mockup-to-component',
+    icon: '🎨',
     status: 'ok',
   },
   // Non-kit page: World Surface - the living painted map. Pan, zoom, 21 layers, debug panel.

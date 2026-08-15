@@ -47,6 +47,11 @@ function createObjectDisplay(object: RuntimeObject): PIXI.Container {
     const container = new PIXI.Container();
     container.label = object.id;
 
+    // These types are drawn by WorldSurfaceCreatures, not the generic WebGL dot.
+    if (object.type === 'wonder' || object.type === 'sea_creature') {
+      return container;
+    }
+
     const { renderMode, scale, tint } = object.visual;
     const color = hexToNumber(tint);
     const visualScale = scale > 0 ? scale : 1;

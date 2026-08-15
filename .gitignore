@@ -29,6 +29,23 @@ src-tauri/target/
 .windsurf/
 .claude/
 
+# Mind Weaver runtime: shared with mind-weaver via symlink; do not commit
+.mw/venv
+.mw/providers
+.mw/catalog
+.mw/deliberation-config.yaml
+.mw/deliberation-config-explorer.yaml
+.mw/deliberation-config-planner.yaml
+.mw/deliberation-config-test.yaml
+.mw/prompt-enhancers.md
+.mw/critique-definition.md
+.mw/runs/
+.mw/prefect/
+.mw/manual-dispatch/
+
+# Mind Weaver Telegram bridge runtime state (contains chat IDs and tokens)
+.mw/telegram-state/
+
 # Exception: coordinator/skills/ is versioned source of truth for agent skills
 # (even though .windsurf/skills/ may be a symlink to it)
 !coordinator/skills/
@@ -52,6 +69,7 @@ st-*-report.md
 bugfix-*-prompt.md
 prompt-iv-*.md
 assets_originals/
+public/mockups/
 
 # Coordinator runtime files
 coordinator/last-run-summary.json
@@ -62,3 +80,52 @@ public/assets/world/**/manifest.trimmed.bak.json
 
 # Photoshop source files
 *.psd
+
+# Generated atmospheres and masks
+assets-source/
+public/assets/atmosphere/waves/
+public/assets/atmosphere/wonders/
+public/assets/atmosphere/terrain/cloud_mask*
+public/assets/ref/
+public/assets/trailer/
+
+# Temporary agent tooling
+tools/
+.mw/bin/
+.mw/bugs/
+.mw/observation.jsonl
+.mw/plans/
+.mw/templates/
+
+# Old painted mockup component iterations (keep V17+ if it exists)
+src/ui/idleVillage/trailer/GoblinEventModalV[1-9].tsx
+src/ui/idleVillage/trailer/GoblinEventModalV1[0-6].tsx
+!src/ui/idleVillage/trailer/GoblinEventModalV17.tsx
+src/ui/idleVillage/pages/GoblinEventLabPage.tsx
+
+# Mind Weaver planner and spec artifacts
+.mw/specs/
+plans/
+context/MIND_WEAVER_MULTI_AI_PROTOCOLS.md
+
+# Generated world / atmosphere masks and scripts
+public/assets/world/wanderlust/base/layers/event_shroud_*.png
+scripts/check-*.mjs
+scripts/convert-*.mjs
+scripts/extract-*.mjs
+scripts/generate-*.mjs
+scripts/scatter-*.mjs
+scripts/test-layer-*.mjs
+scripts/paintover-goblin.py
+scripts/split-goblin-assets.py
+scripts/rpg-gen-mockup*.py
+scripts/overnight_runner/
+scripts/overnight_runner.py
+prompts/OPS-OVERNIGHT-001.spec.json
+coordinator/manual-dispatch/completed/OPS-OVERNIGHT-001.md
+scripts/mw-*.py
+
+# Mind Weaver skill symlinks (keep .windsurf/skills/)
+coordinator/skills/mockup-generator/
+coordinator/skills/painter/
+coordinator/skills/skills

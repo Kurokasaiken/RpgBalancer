@@ -372,3 +372,124 @@
 .trailer-threat-component__replay {
   margin-top: 20px;
 }
+
+/* ── TrailerParchmentClouds ───────────────────────────────────────── */
+
+.trailer-parchment-clouds {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.trailer-parchment-cloud {
+  position: absolute;
+  height: auto;
+  opacity: 0;
+  /* Parchment tint: warm sepia, desaturated, slightly bright. */
+  filter: sepia(1) saturate(0.4) brightness(1.2) contrast(0.95);
+  mix-blend-mode: normal;
+  animation-fill-mode: forwards;
+  animation-timing-function: ease-in-out;
+  will-change: transform, opacity;
+}
+
+@keyframes trailer-parchment-cloud-cover-left {
+  0% {
+    opacity: 0;
+    transform: translate3d(-220vw, 0, 0) scale(1.05);
+  }
+  100% {
+    opacity: 0.96;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes trailer-parchment-cloud-cover-right {
+  0% {
+    opacity: 0;
+    transform: translate3d(220vw, 0, 0) scale(1.05);
+  }
+  100% {
+    opacity: 0.96;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes trailer-parchment-cloud-clear-left {
+  0% {
+    opacity: 0.96;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-220vw, 0, 0) scale(1.05);
+  }
+}
+
+@keyframes trailer-parchment-cloud-clear-right {
+  0% {
+    opacity: 0.96;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(220vw, 0, 0) scale(1.05);
+  }
+}
+
+/* ── WorldSurfaceEventShroud ───────────────────────────────────────── */
+
+.ws-event-shroud {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ws-event-shroud__half {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 58vw;
+  overflow: hidden;
+  will-change: transform;
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ws-event-shroud__half--left {
+  left: 0;
+  transform: translateX(-100%);
+}
+
+.ws-event-shroud__half--right {
+  right: 0;
+  transform: translateX(100%);
+}
+
+.ws-event-shroud__half--left.ws-event-shroud__half--closed,
+.ws-event-shroud__half--right.ws-event-shroud__half--closed {
+  transform: translateX(0);
+}
+
+.ws-event-shroud__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+}
+
+/* ── WorldSurfaceEventCard (world-space layer) ──────────────────────── */
+
+.ws-event-card {
+  opacity: 0;
+  transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.6s;
+  pointer-events: none;
+}
+
+.ws-event-card--visible {
+  opacity: 1;
+  pointer-events: auto;
+}

@@ -4,6 +4,8 @@
 
 import { z } from 'zod';
 import { BuildingDefinitionSchema } from './buildingSchemas';
+import { QuestTimeScaleSchema } from './quests/questTimeScale';
+import { QuestSkillCheckConfigSchema } from './quests/questSkillCheckConfig';
 import { APP_NAV_TAB_IDS, type AppNavTabId } from '@/shared/navigation/navConfig';
 
 export const ResourceDefinitionSchema = z.object({
@@ -307,6 +309,8 @@ export const IdleVillageConfigSchema = z.object({
   buildings: z.record(z.string(), BuildingDefinitionSchema),
   variance: ActivityVarianceConfigSchema,
   globalRules: GlobalRulesSchema,
+  questTimeScale: QuestTimeScaleSchema,
+  questSkillCheckConfig: QuestSkillCheckConfigSchema,
   overlaySettings: OverlaySettingsSchema,
   uiPreferences: IdleVillageUiPreferencesSchema.optional(),
 });
