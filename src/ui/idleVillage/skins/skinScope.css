@@ -165,7 +165,7 @@
   line-height: 1;
   opacity: 0.85;
   color: var(--skin-cta-ornament-color);
-  text-shadow: 0 0 6px rgba(223, 184, 87, 0.4);
+  text-shadow: 0 0 6px var(--skin-cta-ornament-color);
 }
 
 /* ── Close button — gold radial coin ──────────────────────────────────── */

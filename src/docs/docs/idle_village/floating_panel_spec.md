@@ -56,6 +56,10 @@ type: component-spec
 - Positional state is local to the panel component; domain state remains in the store
 - Minimize and close affordances are always available in the header
 
+## Comportamento atteso (2026-08-15)
+
+- **Drag overlay visibile:** durante il drag di un resident token sopra un pannello fluttuante, l'overlay del drag deve restare visibile e non essere nascosto o clippato dal pannello. Test: `should keep the resident drag preview visible when hovering the POI detail`.
+
 ## References
 
 - Used by: [`poi_spec.md`](./poi_spec.md), [`detail_spec.md`](./detail_spec.md), [`quest_spec.md`](./quest_spec.md)

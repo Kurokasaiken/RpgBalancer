@@ -99,7 +99,7 @@ export default defineConfig({
     command: 'npm run preview:playwright',
     url: 'http://127.0.0.1:5179',
     reuseExistingServer: false,
-    timeout: 240 * 1000, // allow extra time for build + preview startup
+    timeout: 600 * 1000, // allow extra time for build + preview startup
     stderr: 'pipe',
     stdout: 'pipe',
     env: {

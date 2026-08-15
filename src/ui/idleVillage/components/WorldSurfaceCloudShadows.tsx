@@ -4,6 +4,8 @@ export interface WorldSurfaceCloudShadowsProps {
   enabled?: boolean;
   canvasSize: { width: number; height: number };
   zIndex: number;
+  /** Per-band width multipliers. */
+  scales?: { far: number; mid: number; near: number };
 }
 
 /**
@@ -13,7 +15,12 @@ export interface WorldSurfaceCloudShadowsProps {
  * of moving weather without obscuring the map. The shadows are semi-transparent
  * and follow the same drift pattern as their parent clouds, offset by depth.
  */
-export function WorldSurfaceCloudShadows({ enabled = true, canvasSize, zIndex }: WorldSurfaceCloudShadowsProps) {
+export function WorldSurfaceCloudShadows({
+  enabled = true,
+  canvasSize,
+  zIndex,
+  scales = { far: 1, mid: 1, near: 1 },
+}: WorldSurfaceCloudShadowsProps) {
   if (!enabled) return null;
 
   return (
@@ -25,6 +32,12 @@ export function WorldSurfaceCloudShadows({ enabled = true, canvasSize, zIndex }:
         zIndex,
         overflow: 'hidden',
         pointerEvents: 'none',
+        maskImage: 'url(/assets/atmosphere/terrain/cloud_mask_land.png)',
+        WebkitMaskImage: 'url(/assets/atmosphere/terrain/cloud_mask_land.png)',
+        maskSize: '100% 100%',
+        WebkitMaskSize: '100% 100%',
+        maskRepeat: 'no-repeat',
+        WebkitMaskRepeat: 'no-repeat',
       }}
     >
       <style>{`
@@ -48,11 +61,12 @@ export function WorldSurfaceCloudShadows({ enabled = true, canvasSize, zIndex }:
               position: 'absolute',
               top: sprite.y,
               left: 0,
-              width: sprite.width,
+              width: sprite.width * band.scale * scales[band.name],
               height: 'auto',
+              mixBlendMode: 'multiply',
               opacity: band.shadowOpacity,
+              ['--ws-shadow-from' as string]: `${-sprite.width * band.scale * scales[band.name]}px`,
               willChange: 'transform',
-              ['--ws-shadow-from' as string]: `${-sprite.width}px`,
               ['--ws-shadow-to' as string]: `${canvasSize.width}px`,
               animationName: 'wsCloudShadowDrift',
               animationDuration: `${band.driftSeconds}s`,

@@ -1,8 +1,9 @@
 // Partly generated. The interfaces are hand-maintained; the data blocks are owned
 // by their importers and are overwritten in place:
-//   clouds: scripts/import-clouds.mjs (also bakes the shadow sprites)
+//   clouds: scripts/scatter-clouds.mjs (also bakes the shadow sprites)
 //   birds:  scripts/import-birds.mjs
 // Edit those blocks by re-running the importer, not by hand.
+import { cloudBands } from './generatedClouds';
 
 /** One drifting cloud instance, positioned in world coordinates. */
 export interface CloudSprite {
@@ -36,6 +37,8 @@ export interface CloudBand {
    * shadows darken every time the clouds were made more solid.
    */
   shadowOpacity: number;
+  /** Scale multiplier for every sprite in the band. */
+  scale: number;
   sprites: CloudSprite[];
 }
 
@@ -131,40 +134,7 @@ export interface AtmosphereConfig {
 }
 
 export const atmosphereAssets: AtmosphereConfig = {
-  clouds: [
-  {
-    name: 'far',
-    driftSeconds: 1100,
-    opacity: 0.5,
-    shadowOpacity: 0.05,
-    sprites: [
-      { src: 'clouds/cloud_01.webp', width: 700, y: 299, delaySeconds: 45, shadowSrc: 'cloud-shadows/cloud_01_shadow.webp' },
-      { src: 'clouds/cloud_02.webp', width: 700, y: 1662, delaySeconds: 725, shadowSrc: 'cloud-shadows/cloud_02_shadow.webp' },
-      { src: 'clouds/cloud_03.webp', width: 700, y: 820, delaySeconds: 304, shadowSrc: 'cloud-shadows/cloud_03_shadow.webp' },
-    ],
-  },
-  {
-    name: 'mid',
-    driftSeconds: 780,
-    opacity: 0.62,
-    shadowOpacity: 0.08,
-    sprites: [
-      { src: 'clouds/cloud_04.webp', width: 1080, y: 1093, delaySeconds: 136, shadowSrc: 'cloud-shadows/cloud_04_shadow.webp' },
-      { src: 'clouds/cloud_05.webp', width: 1080, y: 251, delaySeconds: 618, shadowSrc: 'cloud-shadows/cloud_05_shadow.webp' },
-      { src: 'clouds/cloud_06.webp', width: 1080, y: 1614, delaySeconds: 320, shadowSrc: 'cloud-shadows/cloud_06_shadow.webp' },
-    ],
-  },
-  {
-    name: 'near',
-    driftSeconds: 520,
-    opacity: 0.74,
-    shadowOpacity: 0.11,
-    sprites: [
-      { src: 'clouds/cloud_01.webp', width: 1520, y: 1799, delaySeconds: 152, shadowSrc: 'cloud-shadows/cloud_01_shadow.webp' },
-      { src: 'clouds/cloud_02.webp', width: 1520, y: 957, delaySeconds: 473, shadowSrc: 'cloud-shadows/cloud_02_shadow.webp' },
-    ],
-  },
-  ],
+  clouds: cloudBands,
   foam: {
     texture: 'foam/foam_texture.webp',
     tileWorldPx: 520,
@@ -237,29 +207,18 @@ export const atmosphereAssets: AtmosphereConfig = {
     ],
   },
   waves: {
-    cycleSeconds: 46,
-    visibleFraction: 0.16,
-    opacity: 0.46,
+    cycleSeconds: 30,
+    visibleFraction: 0.45,
+    opacity: 0.75,
     bobWorldPx: 3,
     marks: [
-    { src: 'waves/wave_01.webp', x: -132, y: -59, width: 280, height: 117, delaySeconds: 0.0, flip: false },
-    { src: 'waves/wave_02.webp', x: 3976, y: 1813, width: 280, height: 117, delaySeconds: 77.0, flip: false },
-    { src: 'waves/wave_03.webp', x: 1235, y: 239, width: 280, height: 117, delaySeconds: 54.0, flip: false },
-    { src: 'waves/wave_01.webp', x: 514, y: 2591, width: 280, height: 117, delaySeconds: 31.0, flip: true },
-    { src: 'waves/wave_02.webp', x: 3934, y: 902, width: 280, height: 117, delaySeconds: 8.0, flip: true },
-    { src: 'waves/wave_03.webp', x: 1875, y: 45, width: 340, height: 142, delaySeconds: 85.0, flip: true },
-    { src: 'waves/wave_01.webp', x: 3283, y: 2239, width: 340, height: 142, delaySeconds: 62.0, flip: false },
-    { src: 'waves/wave_02.webp', x: 2563, y: 2687, width: 340, height: 142, delaySeconds: 39.0, flip: false },
-    { src: 'waves/wave_03.webp', x: -170, y: 1469, width: 340, height: 142, delaySeconds: 16.0, flip: true },
-    { src: 'waves/wave_01.webp', x: 3938, y: 153, width: 340, height: 142, delaySeconds: 93.0, flip: true },
-    { src: 'waves/wave_02.webp', x: -137, y: 2496, width: 340, height: 142, delaySeconds: 70.0, flip: true },
-    { src: 'waves/wave_03.webp', x: 534, y: 583, width: 340, height: 142, delaySeconds: 47.0, flip: false },
-    { src: 'waves/wave_01.webp', x: 368, y: -21, width: 340, height: 142, delaySeconds: 24.0, flip: false },
-    { src: 'waves/wave_02.webp', x: 2364, y: 269, width: 340, height: 142, delaySeconds: 1.0, flip: false },
-    { src: 'waves/wave_03.webp', x: 1056, y: 2620, width: 340, height: 142, delaySeconds: 78.0, flip: true },
-    { src: 'waves/wave_01.webp', x: 3830, y: 2347, width: 340, height: 142, delaySeconds: 55.0, flip: true },
-    { src: 'waves/wave_02.webp', x: 45, y: 426, width: 340, height: 142, delaySeconds: 32.0, flip: false },
-    { src: 'waves/wave_03.webp', x: 3118, y: 2728, width: 340, height: 142, delaySeconds: 9.0, flip: false },
+    { src: 'waves/onda2.webp', x: 3822, y: 1408, width: 340, height: 142, delaySeconds: 0.0, flip: false },
+    { src: 'waves/ondine1.webp', x: 75, y: 1499, width: 280, height: 117, delaySeconds: 4.5, flip: true },
+    { src: 'waves/schiuma1.webp', x: 1142, y: 157, width: 340, height: 142, delaySeconds: 9.0, flip: false },
+    { src: 'waves/onda1.webp', x: 26, y: 596, width: 280, height: 117, delaySeconds: 13.5, flip: true },
+    { src: 'waves/onda2.webp', x: 3585, y: 2012, width: 340, height: 142, delaySeconds: 18.0, flip: false },
+    { src: 'waves/schiuma1.webp', x: 314, y: 182, width: 340, height: 142, delaySeconds: 22.5, flip: false },
+    { src: 'waves/onda2.webp', x: 3229, y: 472, width: 340, height: 142, delaySeconds: 27.0, flip: false }
     ],
   },
 };

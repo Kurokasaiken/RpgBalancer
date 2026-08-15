@@ -20,6 +20,27 @@ const CONFIG_PATH = 'src/ui/idleVillage/config/atmosphereAssets.ts';
 const SPRITE_WIDTH = 320;
 const SPRITE_HEIGHT = 134;
 
+/** Full period of one mark, most of which it spends invisible. */
+const CYCLE_SECONDS = 46;
+
+/**
+ * Share of the cycle a mark is on screen.
+ *
+ * With evenly staggered delays the number visible at any moment is simply
+ * marks x this fraction, so it is set from the target count rather than tuned by
+ * eye: 18 x 0.222 = 4 on screen, inside the requested 3-5.
+ */
+const VISIBLE_FRACTION = 0.222;
+
+/**
+ * How far a mark's start may wander from its slot, as a share of one slot.
+ *
+ * Perfectly even delays hold the count exactly at 4 but give the sea a metronome:
+ * one mark appearing every 2.6 s, forever. This jitter breaks the rhythm while
+ * staying inside +/-1 of the target, so the count stays within 3-5.
+ */
+const DELAY_JITTER = 0.35;
+
 /**
  * Deterministic LCG for reproducible scatter.
  * Same seed always yields the same marks.
@@ -27,6 +48,14 @@ const SPRITE_HEIGHT = 134;
 function seededRandom(seed) {
   let s = seed;
   return () => (s = (s * 9301 + 49297) % 233280) / 233280;
+}
+
+/**
+ * Deterministic value in [0,1) from an index. The golden-ratio stride spreads
+ * successive values evenly instead of clumping, and never repeats a run.
+ */
+function scatter(index, seed) {
+  return (seed + index * 0.6180339887498949) % 1;
 }
 
 /**
@@ -114,16 +143,22 @@ async function main() {
     const width = widths[Math.floor(rnd() * widths.length)];
     const markHeight = Math.round(width * (SPRITE_HEIGHT / SPRITE_WIDTH));
 
+    // One slot per mark, evenly spaced round the cycle, nudged off the beat.
+    // Scattered delays (the golden-ratio sequence used elsewhere) left the count
+    // free to swing between 1 and 8; slots hold it at 4.
+    const slot = (i + (scatter(i * 7 + 3, 0.41) * 2 - 1) * DELAY_JITTER) / sea.length;
+    const delay = ((slot % 1) + 1) % 1 * CYCLE_SECONDS;
+
     return (
       `    { src: 'waves/wave_0${shape}.webp', x: ${point.x - Math.round(width / 2)}, ` +
       `y: ${point.y - Math.round(markHeight / 2)}, width: ${width}, height: ${markHeight}, ` +
-      `delaySeconds: ${(((i * 0.77) % 1) * 100).toFixed(1)}, flip: ${((i * 0.19) % 1) > 0.5} },`
+      `delaySeconds: ${delay.toFixed(2)}, flip: ${((i * 0.19) % 1) > 0.5} },`
     );
   });
 
   const block = `  waves: {
-    cycleSeconds: 46,
-    visibleFraction: 0.16,
+    cycleSeconds: ${CYCLE_SECONDS},
+    visibleFraction: ${VISIBLE_FRACTION},
     opacity: 0.46,
     bobWorldPx: 3,
     marks: [

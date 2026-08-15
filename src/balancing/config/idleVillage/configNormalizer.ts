@@ -5,6 +5,8 @@ import type {
   QuestTypeDefinition,
   ResourceRateDefinition,
 } from './types';
+import { DEFAULT_QUEST_TIME_SCALE } from './quests/questTimeScale';
+import { DEFAULT_QUEST_SKILL_CHECK_CONFIG } from './quests/questSkillCheckConfig';
 
 const clone = <T>(value: T): T => {
   if (typeof structuredClone === 'function') {
@@ -59,6 +61,9 @@ export function applyIdleVillageConfigDefaults(config: IdleVillageConfig): IdleV
   normalized.activities = nextActivities;
   normalized.questTypes = normalizeQuestTypes(normalized.questTypes);
   normalized.globalRules = normalizeGlobalRules(normalized.globalRules);
+  normalized.questTimeScale = normalized.questTimeScale ?? clone(DEFAULT_QUEST_TIME_SCALE);
+  normalized.questSkillCheckConfig =
+    normalized.questSkillCheckConfig ?? clone(DEFAULT_QUEST_SKILL_CHECK_CONFIG);
 
   return normalized;
 }

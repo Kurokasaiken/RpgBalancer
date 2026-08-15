@@ -15,13 +15,10 @@ import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 
 const WorldSurfaceWaves = lazy(() => import('./WorldSurfaceWaves'));
 const WorldSurfaceClouds = lazy(() => import('./WorldSurfaceClouds'));
-const WorldSurfaceCloudShadows = lazy(() => import('./WorldSurfaceCloudShadows'));
 const WorldSurfaceFoam = lazy(() => import('./WorldSurfaceFoam'));
 const WorldSurfaceBirds = lazy(() => import('./WorldSurfaceBirds'));
 const WorldSurfaceCreatures = lazy(() => import('./WorldSurfaceCreatures'));
-
-/** Layer the shallow-water tint is composited onto. */
-const SEA_LAYER_ID = 'sea';
+const WorldSurfaceEventCard = lazy(() => import('./WorldSurfaceEventCard'));
 
 /**
  * Carved border the world is seen through. Atmosphere layers paint below it, so
@@ -73,6 +70,7 @@ interface WorldSurfaceRendererProps {
   visibleLayerIds?: Set<string> | string[];
   layerScales?: Record<string, number>;
   layerOffsets?: Record<string, { x: number; y: number }>;
+  cloudScales?: { far: number; mid: number; near: number };
   surfaceLayerOrder?: string[];
   onMouseWorldChange?: (point: { x: number; y: number } | null) => void;
   showAnchors?: boolean;
@@ -83,6 +81,14 @@ interface WorldSurfaceRendererProps {
   autoFit?: boolean;
   autoFitTrigger?: number;
   breathEnabled?: boolean;
+  /** When true, an opaque parchment shroud covers the map for an event transition. */
+  eventCovered?: boolean;
+  /** When true, the event card is visible at the peak of the shroud. */
+  showEventCard?: boolean;
+  /** Called when the event card sequence completes and the shroud should open. */
+  onEventCardComplete?: () => void;
+  /** Called when the event card is ready to be unmounted. */
+  onEventCardClose?: () => void;
 }
 
 interface EffectiveLayer extends WorldSurfaceLayer {
@@ -182,6 +188,7 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
   visibleLayerIds,
   layerScales,
   layerOffsets,
+  cloudScales = { far: 1, mid: 1, near: 1 },
   surfaceLayerOrder,
   onMouseWorldChange,
   showAnchors = true,
@@ -192,6 +199,10 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
   autoFit: autoFitProp,
   autoFitTrigger = 1,
   breathEnabled = true,
+  eventCovered = false,
+  showEventCard = false,
+  onEventCardComplete,
+  onEventCardClose,
 }) => {
   const { t } = useTranslation('idleVillage');
   const translate = useCallback(
@@ -271,9 +282,18 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
   // so weather has to pass UNDER it. Sitting above every layer put the clouds on
   // top of the frame, drifting over the border decoration.
   const cloudZIndex = useMemo(() => {
-    const top = effectiveLayers.reduce((max, layer) => Math.max(max, layer.zIndex), 0);
+    const cloudsIndex = effectiveLayers.findIndex((layer) => layer.id === 'clouds');
+    if (cloudsIndex === -1) {
+      const top = effectiveLayers.reduce((max, layer) => Math.max(max, layer.zIndex), 0);
+      const frame = effectiveLayers.find((layer) => layer.id === FRAME_LAYER_ID);
+      return frame ? frame.zIndex - 1 : top + 10;
+    }
+    // Position the atmosphere immediately below the next layer in the ordered stack,
+    // so dragging clouds in the debug panel actually changes its render order.
+    const nextLayer = effectiveLayers[cloudsIndex + 1];
+    if (nextLayer) return Math.max(0, nextLayer.zIndex - 1);
     const frame = effectiveLayers.find((layer) => layer.id === FRAME_LAYER_ID);
-    return frame ? frame.zIndex - 1 : top + 10;
+    return frame ? frame.zIndex - 1 : 1000;
   }, [effectiveLayers]);
 
   const containerSize = useRef<{ width: number; height: number }>({ width: 0, height: 0 });
@@ -445,6 +465,14 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
     backfaceVisibility: 'hidden',
   };
 
+  const worldCenter = useMemo(() => ({
+    x: manifest.coordinateSystem.canvas.width / 2,
+    y: manifest.coordinateSystem.canvas.height / 2,
+  }), [manifest.coordinateSystem.canvas.width, manifest.coordinateSystem.canvas.height]);
+
+  const fallTarget = useMemo(() => ({ x: 737, y: 859 }), []);
+  const marchTarget = useMemo(() => ({ x: 1498, y: 1140 }), []);
+
   return (
     <div
       ref={containerRef}
@@ -478,10 +506,12 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
       `}</style>
 
       <div style={worldStyle}>
-        {effectiveLayers.map((layer) => (
-          <LayerView
-            key={layer.id}
-            layer={layer}
+        {effectiveLayers
+          .filter((layer) => layer.id !== 'clouds')
+          .map((layer) => (
+            <LayerView
+              key={layer.id}
+              layer={layer}
             worldName={manifest.world}
             imageFit={resolvedImageFit}
             breathEnabled={breathEnabled}
@@ -489,10 +519,15 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
             canvasSize={manifest.coordinateSystem.canvas}
             scale={layerScales?.[layer.id] ?? layer.scale ?? 1}
             offset={
-              layerOffsets?.[layer.id] ?? {
-                x: layer.offsetX ?? 0,
-                y: layer.offsetY ?? 0,
-              }
+              layerOffsets?.[layer.id] ??
+              (layer.id === 'event_shroud_left'
+                ? { x: -manifest.coordinateSystem.canvas.width, y: 0 }
+                : layer.id === 'event_shroud_right'
+                  ? { x: manifest.coordinateSystem.canvas.width, y: 0 }
+                  : {
+                      x: layer.offsetX ?? 0,
+                      y: layer.offsetY ?? 0,
+                    })
             }
           />
         ))}
@@ -518,26 +553,27 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
           invisible anyway — every terrain layer is an opaque full-canvas painting.
         */}
         <Suspense fallback={null}>
-          <WorldSurfaceClouds
-            canvasSize={manifest.coordinateSystem.canvas}
-            zIndex={cloudZIndex}
-          />
+          {visibleLayerIds?.has('clouds') && !eventCovered && (
+            <WorldSurfaceClouds
+              canvasSize={manifest.coordinateSystem.canvas}
+              zIndex={cloudZIndex}
+              scales={cloudScales}
+            />
+          )}
           {/* Birds fly under the weather but over the ground. */}
           <WorldSurfaceBirds
             canvasSize={manifest.coordinateSystem.canvas}
             zIndex={cloudZIndex - 1}
+            enabled={!eventCovered}
           />
           {/* Sea creatures lurk in the water, below birds but above shadows. */}
           <WorldSurfaceCreatures
             creatures={runtimeObjects}
             zoom={camera.zoom}
             zIndex={cloudZIndex - 2}
+            enabled={!eventCovered}
           />
-          {/* Shadows and foam both sit ON the ground, so they go below the birds. */}
-          <WorldSurfaceCloudShadows
-            canvasSize={manifest.coordinateSystem.canvas}
-            zIndex={cloudZIndex - 2}
-          />
+          {/* Foam sits on the ground, so it goes below the birds. */}
           <WorldSurfaceFoam
             canvasSize={manifest.coordinateSystem.canvas}
             zIndex={cloudZIndex - 3}
@@ -545,6 +581,19 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
           {/* Wave marks break on the shoreline, at the bottom of the atmosphere
               stack: they belong to the water surface, not to the sky. */}
           <WorldSurfaceWaves zIndex={cloudZIndex - 4} />
+          {/* Event announcement lives in the map, not the UI, so it pans and zooms
+              with the world. */}
+          <WorldSurfaceEventCard
+            visible={showEventCard}
+            zIndex={cloudZIndex + 1}
+            onComplete={onEventCardComplete}
+            onClose={onEventCardClose}
+            fallTarget={fallTarget}
+            marchTarget={marchTarget}
+            worldCenter={worldCenter}
+            canvasSize={manifest.coordinateSystem.canvas}
+            camera={camera}
+          />
         </Suspense>
       </div>
 
@@ -604,6 +653,13 @@ interface RuntimeObjectMarkerProps {
 const RuntimeObjectMarker: React.FC<RuntimeObjectMarkerProps> = ({ object, anchors, zoom }) => {
   const position = useMemo(() => getRuntimeObjectWorldPosition(object, anchors), [object, anchors]);
   const { renderMode, scale, tint, glow } = object.visual;
+
+  // Sea wonders and creatures have dedicated visual components (WorldSurfaceCreatures)
+  // and should not also render as a generic runtime marker.
+  if (object.type === 'wonder' || object.type === 'sea_creature') {
+    return null;
+  }
+
   const visualScale = scale > 0 ? scale : 1;
   const size = renderMode === 'particle' ? 6 : 16;
   const pixelSize = size * visualScale;
@@ -669,6 +725,8 @@ const LayerView: React.FC<LayerViewProps> = ({ layer, worldName, imageFit, breat
   // sliding those against each other exposes seams rather than revealing depth.
   // Keeping layers untransformed also keeps them in the parent's compositing
   // context, so all of them round subpixels identically at fractional zoom.
+  const isEventShroud = layer.id.startsWith('event_shroud_');
+
   const wrapperStyle: React.CSSProperties = {
     position: 'absolute',
     top: 0,
@@ -677,6 +735,8 @@ const LayerView: React.FC<LayerViewProps> = ({ layer, worldName, imageFit, breat
     height: '100%',
     zIndex: layer.zIndex,
     opacity: layer.opacity,
+    pointerEvents: 'none',
+    overflow: isEventShroud ? 'hidden' : undefined,
     // The carved frame casts onto the map instead of floating over it. This is a
     // filter, which is expensive on ANIMATED elements — the frame never moves, so
     // it rasterises once and is reused.
@@ -706,8 +766,10 @@ const LayerView: React.FC<LayerViewProps> = ({ layer, worldName, imageFit, breat
     height: '100%',
     border: 0,
     outline: 'none',
-    objectFit: imageFit,
-    objectPosition: imageFit === 'none' ? '0 0' : undefined,
+    objectFit: isEventShroud ? 'cover' : imageFit,
+    objectPosition: isEventShroud
+      ? (layer.id.includes('left') ? 'left center' : 'right center')
+      : (imageFit === 'none' ? '0 0' : undefined),
     mixBlendMode: BLEND_MODE_CSS[layer.blendMode],
     filter: layer.grayscale ? 'grayscale(100%)' : undefined,
     ...animationStyle,
@@ -734,6 +796,7 @@ const LayerView: React.FC<LayerViewProps> = ({ layer, worldName, imageFit, breat
     ...(hasScaleTransform
       ? { transform: `translate(${offsetX}px, ${offsetY}px) scale(${scale})`, transformOrigin: 'top left' }
       : {}),
+    ...(isEventShroud ? { transition: 'transform 0.9s cubic-bezier(0.22, 1, 0.36, 1)' } : {}),
   };
 
   return (
@@ -741,7 +804,11 @@ const LayerView: React.FC<LayerViewProps> = ({ layer, worldName, imageFit, breat
       <div style={scaleStyle}>
         {!hasError ? (
           <img
-            src={`/assets/world/${worldName}/base/layers/${encodeURIComponent(layer.file)}`}
+            src={
+              layer.file.includes('/')
+                ? `/assets/atmosphere/${layer.file.split('/').map(encodeURIComponent).join('/')}`
+                : `/assets/world/${worldName}/base/layers/${encodeURIComponent(layer.file)}`
+            }
             alt=""
             style={imgStyle}
             draggable={false}
@@ -749,28 +816,6 @@ const LayerView: React.FC<LayerViewProps> = ({ layer, worldName, imageFit, breat
           />
         ) : (
           <div style={{ ...imgStyle, opacity: 0 }} aria-hidden="true" />
-        )}
-        {/* Shallow-water tint, over the sea image and under everything on land.
-            Derived from the distance to the nearest shore, so coastal water reads
-            lighter than open ocean. Baked into a mask at build time: a depth
-            gradient computed in a shader would cost a pass to say the same thing,
-            and this one costs a static composite. */}
-        {!hasError && layer.id === SEA_LAYER_ID && (
-          <div
-            aria-hidden="true"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              pointerEvents: 'none',
-              backgroundColor: 'rgba(196, 214, 205, 0.30)',
-              maskImage: 'url(/assets/atmosphere/terrain/shallow_mask.webp)',
-              WebkitMaskImage: 'url(/assets/atmosphere/terrain/shallow_mask.webp)',
-              maskSize: '100% 100%',
-              WebkitMaskSize: '100% 100%',
-              maskRepeat: 'no-repeat',
-              WebkitMaskRepeat: 'no-repeat',
-            }}
-          />
         )}
         {layer.tint && (
           <div

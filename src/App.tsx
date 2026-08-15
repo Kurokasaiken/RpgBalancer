@@ -45,6 +45,7 @@ const MinimalPoiPage = lazy(() => import('./pages/minimal-poi').then(m => ({ def
 const MinimalRosterPage = lazy(() => import('./pages/minimal-roster').then(m => ({ default: m.default })));
 const MinimalRosterSlotIntegrationPage = lazy(() => import('./pages/minimal-roster-slot-integration').then(m => ({ default: m.default })));
 const MinimalClockPage = lazy(() => import('./pages/minimal-clock').then(m => ({ default: m.default })));
+const DayNightPoiSkinDebugPage = lazy(() => import('./pages/day-night-poi-skin-debug').then(m => ({ default: m.default })));
 const MinimalSlotRackPage = lazy(() => import('./pages/minimal-slotRack').then(m => ({ default: m.default })));
 const MinimalResourceHUDPage = lazy(() => import('./pages/minimal-resourcehud').then(m => ({ default: m.default })));
 const MinimalQuestCardPage = lazy(() => import('./pages/minimal-questcard').then(m => ({ default: m.default })));
@@ -56,15 +57,14 @@ const MinimalDestinyAstrolabeV3Page = lazy(() => import('./pages/minimal-destiny
 const MinimalDestinyAstrolabeV4Page = lazy(() => import('./pages/minimal-destiny-astrolabe-v4').then(m => ({ default: m.default })));
 const MinimalOutcomeModalPage = lazy(() => import('./pages/minimal-outcome').then(m => ({ default: m.default })));
 const MinimalMarketActionCardPage = lazy(() => import('./pages/minimal-market-page').then(m => ({ default: m.default })));
-const QuestDetailCandidatesPage = lazy(() => import('./pages/quest-detail-candidates').then(m => ({ default: m.default })));
 const MinimalJobPoiRosterIntegrationPage = lazy(() => import('./pages/minimal-job-poi-roster-integration').then(m => ({ default: m.default })));
 const MinimalJobPoiRosterTimeIntegrationPage = lazy(() => import('./pages/minimal-job-poi-roster-time-integration').then(m => ({ default: m.default })));
 const MinimalTimeDaynightIntegrationPage = lazy(() => import('./pages/minimal-time-daynight-integration').then(m => ({ default: m.default })));
 const SpellCreatorTestPage = lazy(() => import('./pages/spell-creator').then(m => ({ default: m.default })));
 const TrailerViewer = lazy(() => import('./ui/idleVillage/trailer/TrailerViewer'));
 const TrailerThreatIter = lazy(() => import('./ui/idleVillage/trailer/TrailerThreatIter'));
+const GoblinEventLabPage = lazy(() => import('./ui/idleVillage/pages/GoblinEventLabPage').then(m => ({ default: m.GoblinEventLabPage })));
 const TrailerThreatPage = lazy(() => import('./ui/idleVillage/trailer/TrailerThreatPage').then(m => ({ default: m.TrailerThreatPage })));
-const TrailerThreatComponentPage = lazy(() => import('./ui/idleVillage/trailer/TrailerThreatComponentPage').then(m => ({ default: m.TrailerThreatComponentPage })));
 const TrailerChoicePage = lazy(() => import('./ui/idleVillage/trailer/TrailerChoicePage').then(m => ({ default: m.TrailerChoicePage })));
 const TrailerPreparationPage = lazy(() => import('./ui/idleVillage/trailer/TrailerPreparationPage').then(m => ({ default: m.TrailerPreparationPage })));
 const TrailerRiskPage = lazy(() => import('./ui/idleVillage/trailer/TrailerRiskPage').then(m => ({ default: m.TrailerRiskPage })));
@@ -76,6 +76,7 @@ const WorldPresentationDirectorPage = lazy(() => import('./ui/idleVillage/pages/
 const UseClientPage = lazy(() => import('./ui/idleVillage/pages/UseClientPage').then(m => ({ default: m.default })));
 const PoiMarkerLabPage = lazy(() => import('./ui/idleVillage/pages/PoiMarkerLabPage').then(m => ({ default: m.PoiMarkerLabPage })));
 const PoiDetailQuestRosterTimeClockIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailQuestRosterTimeClockIntegrationPage').then(m => ({ default: m.default })));
+const MockupToComponentPage = lazy(() => import('./ui/idleVillage/pages/MockupToComponentPage').then(m => ({ default: m.MockupToComponentPage })));
 
 interface AppNavControls {
   getActiveTab: () => AppNavTabId;
@@ -199,6 +200,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/minimal-roster';
   const isMinimalRosterSlotIntegrationPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-roster-slot-integration';
+  const isDayNightPoiSkinDebugPath =
+    typeof window !== 'undefined' && window.location.pathname === '/day-night-poi-skin-debug';
   const isMinimalClockPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-clock';
   const isMinimalSlotRackPath =
@@ -223,8 +226,6 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/minimal-outcome';
   const isMinimalMarketActionCardPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-market';
-  const isQuestDetailCandidatesPath =
-    typeof window !== 'undefined' && window.location.pathname === '/quest-detail-candidates';
   const isMinimalJobPoiRosterIntegrationPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-job-poi-roster-integration';
   const isMinimalJobPoiRosterTimeIntegrationPath =
@@ -235,8 +236,6 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/spell-creator';
   const isTrailerThreatPath =
     typeof window !== 'undefined' && window.location.pathname === '/trailer-threat';
-  const isTrailerThreatComponentPath =
-    typeof window !== 'undefined' && window.location.pathname === '/trailer-threat-component';
   const isTrailerChoicePath =
     typeof window !== 'undefined' && window.location.pathname === '/trailer-choice';
   const isTrailerPreparationPath =
@@ -251,6 +250,10 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/trailer-outro';
   const isTrailerThreatIterPath =
     typeof window !== 'undefined' && window.location.pathname === '/trailer-threat-iter';
+  const isGoblinEventLabPath =
+    typeof window !== 'undefined' && window.location.pathname === '/goblin-event-lab';
+  const isMockupToComponentPath =
+    typeof window !== 'undefined' && window.location.pathname === '/mockup-to-component';
   const isWorldSurfacePath =
     typeof window !== 'undefined' && window.location.pathname === '/world-surface';
   const isWorldPresentationDirectorPath =
@@ -475,6 +478,16 @@ function App() {
     );
   }
 
+  if (isDayNightPoiSkinDebugPath) {
+    return (
+      <ErrorBoundary componentName="Day Night POI Skin Debug Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Day/Night Debug…</div>}>
+          <DayNightPoiSkinDebugPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
   if (isMinimalClockPath) {
     return (
       <ErrorBoundary componentName="Minimal Clock Page">
@@ -595,15 +608,6 @@ function App() {
     );
   }
 
-  if (isQuestDetailCandidatesPath) {
-    return (
-      <ErrorBoundary componentName="Quest Detail Candidates Page">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Quest Detail Candidates…</div>}>
-          <QuestDetailCandidatesPage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
 
   if (isMinimalJobPoiRosterIntegrationPath) {
     return (
@@ -650,16 +654,6 @@ function App() {
       <ErrorBoundary componentName="Trailer Threat">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer Threat…</div>}>
           <TrailerThreatPage />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
-
-  if (isTrailerThreatComponentPath) {
-    return (
-      <ErrorBoundary componentName="Trailer Threat Component">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer Threat Component…</div>}>
-          <TrailerThreatComponentPage />
         </Suspense>
       </ErrorBoundary>
     );
@@ -730,6 +724,26 @@ function App() {
       <ErrorBoundary componentName="Trailer Threat Iter">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer Threat Iter…</div>}>
           <TrailerThreatIter autoStart captureMode={false} />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isGoblinEventLabPath) {
+    return (
+      <ErrorBoundary componentName="Goblin Event Lab">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Goblin Event Lab…</div>}>
+          <GoblinEventLabPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMockupToComponentPath) {
+    return (
+      <ErrorBoundary componentName="Mockup to Component">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Mockup to Component…</div>}>
+          <MockupToComponentPage />
         </Suspense>
       </ErrorBoundary>
     );
@@ -944,6 +958,7 @@ function App() {
       </ErrorBoundary>
     );
   }
+
 
   if (isUseClientPath) {
     return (

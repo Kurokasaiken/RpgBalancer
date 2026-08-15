@@ -30,9 +30,6 @@ export function FlightProxy({
   residentsById,
   isInset
 }: FlightProxyProps) {
-  console.log('=== FLIGHT PROXY MOUNTED ===');
-  console.log('Props:', { residentId, fromX, fromY, toX, toY, slotId, isInset });
-  
   const [isAnimating, setIsAnimating] = useState(true);
   const proxyRef = useRef<HTMLDivElement>(null);
   const onCompleteRef = useRef(onComplete);
@@ -48,58 +45,15 @@ export function FlightProxy({
     isInsetRef.current = isInset;
   }, [onComplete, residentId, slotId, isInset]);
 
-  // Debug coordinate tracking
   useEffect(() => {
-    // Delay debugging to ensure DOM is fully mounted
-    const debugTimer = setTimeout(() => {
-      console.log('=== FLIGHT PROXY DEBUG ===');
-      console.log('Resident ID:', residentId);
-      console.log('Flight coordinates (passed):', {
-        from: { x: Math.round(fromX), y: Math.round(fromY) },
-        to: { x: Math.round(toX), y: Math.round(toY) },
-        distance: Math.round(Math.hypot(toX - fromX, toY - fromY)),
-        duration: `${FLIGHT_DURATION_MS}ms`
-      });
-      console.log('Is animating:', isAnimating);
-      
-      if (proxyRef.current) {
-        const rect = proxyRef.current.getBoundingClientRect();
-        console.log('Proxy element rect (actual):', {
-          x: Math.round(rect.left),
-          y: Math.round(rect.top),
-          width: Math.round(rect.width),
-          height: Math.round(rect.height)
-        });
-        
-        // Also check computed style position
-        const computedStyle = window.getComputedStyle(proxyRef.current);
-        console.log('Proxy CSS position:', {
-          left: computedStyle.left,
-          top: computedStyle.top,
-          position: computedStyle.position,
-          transform: computedStyle.transform
-        });
-      }
-      console.log('========================');
-    }, 50); // Small delay to ensure DOM is ready
-    
-    return () => clearTimeout(debugTimer);
-  }, [residentId, fromX, fromY, toX, toY, isAnimating]);
-
-  useEffect(() => {
-    console.log('=== FLIGHT PROXY USE EFFECT RUNNING ===');
-    console.log(`Will hide animation in ${FLIGHT_DURATION_MS}ms`);
-    
     // Hide animation after duration and call onComplete
     const timer = setTimeout(() => {
-      console.log('=== TIMEOUT FIRED - HIDING ANIMATION AND CALLING ONCOMPLETE ===');
       setIsAnimating(false);
       // Call onComplete to notify parent that flight animation is done
       onCompleteRef.current(residentIdRef.current, slotIdRef.current, isInsetRef.current);
     }, FLIGHT_DURATION_MS); // Fixed duration for flight
 
     return () => {
-      console.log('=== FLIGHT PROXY CLEANUP (unmount) ===');
       clearTimeout(timer);
     };
   }, []); // Empty dependency array - run once on mount
@@ -108,6 +62,7 @@ export function FlightProxy({
     <AnimatePresence>
       {isAnimating && (
         <motion.div
+          data-testid="flight-proxy"
           ref={proxyRef}
           className="fixed pointer-events-none z-9999"
           style={{

@@ -1,7 +1,7 @@
 ---
 title: POI Quest — Detail/Roster/Time/Clock Page Workflow
 status: draft
-updated: 2026-08-13
+updated: 2026-08-15
 type: page-workflow
 ---
 
@@ -64,6 +64,7 @@ idle ──(assemblo party)──► ready
 - Il POI detail contiene lo `ResidentSlotRack` con i suoi slot.
 - Il POI detail deve essere **draggable** trascinando l'intestazione, senza aggiunta di elementi estetici extra.
 - **Solo per il POI detail di una Quest**, l'apertura mette automaticamente il gioco in **pausa**.
+- La chiusura del POI detail riprende il tempo canonico.
 - Il POI detail deve riprendere il look/comportamento di `/poi-quest-detail-roster-integration`: niente ornamenti aggiuntivi, pannello flottante draggabile/minimizzabile/chiudibile.
 
 ### 4.4 Posizionamento pannelli
@@ -73,10 +74,11 @@ idle ──(assemblo party)──► ready
 
 ### 4.5 Start della quest
 
-- Quando tutti gli slot obbligatori sono assegnati e i pg soddisfano i requisiti, il pulsante `Start/Embark` è abilitato.
+- Quando tutti gli slot obbligatori sono assegnati e i pg soddisfano i requisiti, il pulsante `Start/Embark` è ancora disabilitato se il gioco è in pausa.
 - Il pulsante ha bisogno di un restyling visivo (miglioramento UI).
 - `Start` inizia davvero solo se **anche il tempo scorre** (non in pausa).
-- Se il gioco è in pausa, `Start` non fa nulla oppure mostra un feedback "riprendi il tempo per iniziare".
+- Se il gioco è in pausa, `Start` non fa nulla: `handleEmbark` esce precocemente quando `isPaused === true`.
+- L'utente deve riprendere il tempo dal `TimeEngineStrip` (pulsante Play) affinché `Start/Embark` si abiliti.
 - Dopo lo start, i pg possono essere tolti/scambiati? Sì, finché il tempo è in pausa non succede nulla. Start conta solo se il tick avanza.
 
 ## 5. Quest in esecuzione
@@ -131,9 +133,9 @@ idle ──(assemblo party)──► ready
 
 ## 7. Reward
 
-- `QuestRewardPanel` mostra le ricompense.
-- Tra le ricompense c'è anche XP per i pg partecipanti.
-- Al click su "Raccogli" i residenti tornano disponibili nel roster, le ricompense vengono applicate, il POI torna in stato idle/disponibile.
+- `QuestRewardPanel` mostra le ricompense (`gold`, `food`, `wood`, `xp`) derivate dal blueprint della quest e dal moltiplicatore di esito.
+- Al click su "Raccogli" il `QuestRewardPanel` invoca `handleCollect`, che: somma le risorse allo store canonico `useMinimalGameplay` via `addResources`, resetta lo stato della quest, chiude la quest card e rende disponibili i residenti nel roster.
+- Il POI torna in stato idle/disponibile.
 
 ## 8. Invariants pagina-wide
 
@@ -155,3 +157,76 @@ idle ──(assemblo party)──► ready
 - [`slot_rack_spec.md`](./slot_rack_spec.md) — slot obbligatori, validazione
 - [`quest_spec.md`](./quest_spec.md) — fasi, milestone, skill check, reward
 - [`gameplay_system_complete.md`](./gameplay_system_complete.md) — flusso end-to-end aggiornato
+- [`poi_quest_interaction_spec.md`](./poi_quest_interaction_spec.md) — POI ↔ Quest
+- [`time_engine_quest_interaction_spec.md`](./time_engine_quest_interaction_spec.md) — TimeEngine ↔ Quest
+
+## 10. Verifica runtime — Playwright UI tests
+
+La pagina espone hook test-only sotto `window.__idleVillageTestHooks` per permettere setup deterministici senza simulare dnd-kit:
+
+- `assignResident(residentId: string)` — assegna un residente al primo slot compatibile; ritorna `residentId` o `null`.
+- `assignAnyResident()` — assegna il primo residente libero trovato.
+- `fillRequiredResidentSlots()` — riempie tutti gli slot obbligatori della quest corrente.
+- `resolveActiveMilestone(verdict?)` — risolve il milestone attivo off-screen (uso test-only per sbloccare la chiusura della quest card).
+- `findAcceptingSlot(residentId: string)` — ritorna il primo slot libero che accetta il residente (o `null`).
+- `getResidentCompatibility(residentId: string)` — ritorna `{ state: 'valid'|'invalid', slotId?, slotLabel?, reason? }`.
+- `setDraggingResidentId(id: string | null)` — imposta/resetta lo stato drag per esercitare bloom senza un vero drag.
+- `getQuestState()` — ritorna `isQuestRunning`, `isPaused`, `elapsedMs`, `isQuestCardOpen`, `embarkResult`, `activeMilestone`.
+- `getAssignments()` — ritorna lo stato slot/residente corrente.
+
+La suite `tests/e2e/idleVillage/poiQuestDetailRosterTimeClock.spec.ts` copre:
+
+1. Page shell (render, clock, roster, QuestPOI).
+2. Start gating (CTA disabilitato finché non riempiti slot required).
+3. Drop invalido (card rimbalza, rimane disponibile).
+4. Drag del pannello POI detail via header.
+5. Skill check astrolabe completo (`roll` → `Throw` → risultato → `dismiss`).
+6. End-to-end: fill, start, chiudi quest card, auto-resolve milestones, speed 8x, riapri POI, reward panel, `collect` applica ricompense (`gold`/`food`/`wood`/`xp`) allo store, residenti rilasciati.
+7. Pause/resume del timer da `TimeEngineStrip`.
+8. Residente non compatibile → `data-compatibility='invalid'`, `aria-disabled='true'`, grigio, non assegnabile via click.
+9. Bloom POI `valid` per residente compatibile e `invalid` per residente non compatibile.
+10. Bloom slot `valid`/`invalid` nel detail quando un residente viene "trascinato" via `setDraggingResidentId`.
+11. Assegnazione di un residente compatibile al primo slot libero, con reflection nella UI del detail.
+12. Apertura del POI detail e visibilità dello `ResidentSlotRack` interno.
+13. Pausa automatica del gioco all'apertura del POI detail di una Quest.
+
+Risultato ultima run: 17 passati / 1 saltato (0 fallimenti); ERR-005 (Start gating) ora chiuso.
+Evidence: `test-results/poi-quest-detail-roster-time-clock-runtime-2026-08-14.md`.
+
+## 11. Config-first source of truth
+
+### Flusso previsto
+
+Tutti i dati delle quest devono arrivare dalla configurazione editabile caricata da `IdleVillageConfigStore`:
+
+- L'utente modifica le attività nel tab **Activities** di `/idle-village-config` (`IdleVillageConfigRoute` → `IdleVillageActivitiesTab`), che importa/esporta JSON e persiste in `IdleVillageConfigStore`.
+- `useIdleVillageConfig()` espone `config` a runtime.
+- `useMinimalGameplayWithIdleVillageConfig()` trasforma `IdleVillageConfig` in `MinimalConfig` per lo store di gioco.
+- `PoiDetailQuestRosterTimeClockIntegrationPage` dovrebbe leggere: l'activity da `config.activities`, il blueprint da `config.questBlueprints`, le regole di power da `config.globalRules.questPowerRules`, le risorse da `config.resources`.
+- `questTotalDurationMs`, `buildAstrolabeSkillsForPhase`, `resolveMilestoneWithoutAnimation` devono ricevere `questTimeScale` e `questSkillCheckConfig` dal medesimo snapshot, non dai default inline.
+- `QuestChronicle`, `MilestoneCheckModal` e `MagicCircleHalo` devono leggere palette/risk/timing da skin/quest config, senza fallback hardcoded.
+
+### Mismatch confermati (static review)
+
+- `PoiDetailQuestRosterTimeClockIntegrationPage.tsx` importa `DEFAULT_IDLE_VILLAGE_CONFIG` e usa `DEFAULT_IDLE_VILLAGE_CONFIG.activities.quest_city_rats` e `DEFAULT_IDLE_VILLAGE_CONFIG.globalRules` invece di `useIdleVillageConfig().config`.
+- `defaultQuestBlueprints` è importato direttamente dal modulo invece di `config.questBlueprints`.
+- `questPowerRules` fallback a `DEFAULT_QUEST_POWER_RULES` (definiti nel file del motore) anziché da `config.globalRules.questPowerRules`.
+- `questTimeScale` e `questSkillCheckConfig` non sono campi di `IdleVillageConfig`; i motori usano `DEFAULT_QUEST_TIME_SCALE` e `DEFAULT_QUEST_SKILL_CHECK_CONFIG`.
+- `QuestChronicle.tsx` ha `RISK_FALLBACKS`, `PAL`, `VARIANT_MAP`, `FILL_GRADIENTS`, `FILL_SHADOWS` hardcoded.
+- `MilestoneCheckModal.tsx` default `criticalFailChance = 5` non proviene dalla config.
+- `handleCollect` applica solo `gold/food/wood/xp` e ignora `materials`, `renown`, `reputation`, `items` del blueprint.
+- `MOCK_QUEST_ITEMS` è un mock temporaneo; `IdleVillageConfig` non ha ancora un tab Quest Items. Questo non è un bug da chiudere qui, ma un'implementazione mancante tracciata come ERR-026 nel master plan.
+- `questPoiKit.tsx`/`questDetailKit.tsx` leggono resource label/icon da `DEFAULT_IDLE_VILLAGE_CONFIG.resources`.
+
+Vedi `poi_quest_detail_roster_time_clock_error_registry.md` per gli ID (ERR-019 – ERR-027).
+
+## Comportamenti attesi (2026-08-15)
+
+I seguenti comportamenti, derivati dalle indicazioni del Director, sono catturati in `tests/e2e/idleVillage/poiQuestRegressions.spec.ts` e nel registro errori (`ERR-028..033`). Ogni voce punta alla spec che contiene il contratto completo; non duplicare il testo, ma usarla come riferimento.
+
+- **Magnetic snap** — il residente draggato verso il QuestPOI si ancora al centro del POI: `poi_quest_interaction_spec.md`
+- **Ripristino pausa** — chiudere il POI detail preserva lo stato di pausa precedente: `poi_detail_interaction_spec.md`, `time_engine_quest_interaction_spec.md`
+- **Drag overlay visibile** — il token trascinato sopra il POI detail resta visibile: `poi_detail_interaction_spec.md`, `floating_panel_spec.md`
+- **Slot rack overflow** — slot extra = scroll orizzontale, nessun allargamento del detail: `roster_slot_rack_interaction_spec.md`
+- **Quest start** — con tutti i pg correttamente assegnati, Start avvia la quest: `poi_quest_interaction_spec.md`
+- **Day/night tone ring** — nessun quadrato alfa attorno ai ring: `day_night_poi_spec.md`

@@ -1,7 +1,7 @@
 ---
 title: SlotRack ↔ POI Interaction
 status: draft
-updated: 2026-08-13
+updated: 2026-08-14
 type: interaction-spec
 ---
 
@@ -61,6 +61,14 @@ When the activity completes:
 - POI progress is derived from `TimeEngine` state
 - Start CTA state is derived from slot occupancy and required flags
 - Slot rack inside the POI uses the same `ResidentSlotViewModel` contract as the standalone rack
+- POI medallion bloom is per-resident: `valid` only if the dragged resident matches at least one free slot; otherwise `invalid`
+
+## Runtime Evidence
+
+Playwright suite `poiQuestDetailRosterTimeClock.spec.ts` (2026-08-14):
+
+- `should bloom the QuestPOI valid for a compatible resident and invalid for an incompatible one` — `poi-detail-stage__medallion` `style.filter` contains `drop-shadow` for a valid resident and `grayscale(0.7)` for an invalid one.
+- `should assign a compatible resident via the API and reflect it in the detail` — the resident is accepted by the POI-level drop and lands in the first matching slot.
 
 ## References
 

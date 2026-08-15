@@ -187,6 +187,12 @@ export interface ActivityCapsuleDetailSkinAwareProps {
    * legacy heuristic (disabled when there are no idle/open slots left).
    */
   startDisabled?: boolean;
+
+  /**
+   * Visual pending state for a start that has been requested while time is
+   * paused and is waiting for the clock to resume before actually launching.
+   */
+  startPending?: boolean;
   
   /** TS-Series skin configuration */
   pillar?: StyleLabPillar;
@@ -258,6 +264,7 @@ export function ActivityCapsuleDetailSkinAware({
   getSlotActivityState: getSlotActivityStateProp,
   resolveDisplayInfo: resolveDisplayInfoProp,
   startDisabled,
+  startPending,
   pillar,
   skinPresetId,
   motionLevel,
@@ -855,11 +862,19 @@ export function ActivityCapsuleDetailSkinAware({
           <div className="activity-capsule-detail-skin-aware__cta-row">
             {status === 'idle' && onStart && (
               <button
-                className="activity-capsule-detail-skin-aware__button activity-capsule-detail-skin-aware__button--start"
+                type="button"
+                data-testid="poi-detail-start-button"
+                className={[
+                  'activity-capsule-detail-skin-aware__button',
+                  'activity-capsule-detail-skin-aware__button--start',
+                  startPending ? 'activity-capsule-detail-skin-aware__button--start-pending' : '',
+                ].filter(Boolean).join(' ')}
                 onClick={onStart}
                 disabled={startDisabled ?? false}
               >
-                {t('idleVillage:activityCapsule.actions.start')}
+                {startPending
+                  ? t('idleVillage:activityCapsule.actions.startPending')
+                  : t('idleVillage:activityCapsule.actions.start')}
               </button>
             )}
             {status === 'in-progress' && onCancel && (
@@ -1693,6 +1708,11 @@ export function ActivityCapsuleDetailSkinAware({
           filter: var(--skin-cta-hover-filter);
           box-shadow: var(--skin-cta-hover-glow);
         }
+        .activity-capsule-detail-skin-aware__button--start-pending {
+          background: var(--skin-cta-hover-glow, rgba(160, 90, 8, 0.45));
+          box-shadow: 0 0 16px rgba(251, 191, 36, 0.5), inset 0 1px 0 rgba(255, 218, 95, 0.2);
+          animation: activity-capsule-detail-skin-aware__button-pulse 1.6s ease-in-out infinite;
+        }
         .activity-capsule-detail-skin-aware__button--cancel {
           background: var(--skin-btn2-bg);
           border: var(--skin-btn2-border);
@@ -1741,6 +1761,11 @@ export function ActivityCapsuleDetailSkinAware({
         @keyframes slot-appear {
           0% { opacity: 0; transform: scale(0.7); }
           100% { opacity: 1; transform: scale(1); }
+        }
+        
+        @keyframes activity-capsule-detail-skin-aware__button-pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.72; }
         }
         
         /* Motion level adaptations */

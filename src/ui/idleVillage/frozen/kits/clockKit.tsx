@@ -10,10 +10,13 @@ import { DEFAULT_MINIMAL_CONFIG } from '../_infra/CanonicalDataBridge';
 import { createKitShell, withKitShell, type KitProviderName } from '../_infra/KitShell';
 import { ClockWidget } from '@/ui/idleVillage/components/minimal/ClockWidget';
 import { TimeEngineStrip } from '@/ui/idleVillage/components/minimal/TimeEngineStrip';
+import { DayNightTimeEngineStrip } from '@/ui/idleVillage/components/minimal/DayNightTimeEngineStrip';
 
 export { ClockWidget } from '@/ui/idleVillage/components/minimal/ClockWidget';
 export { TimeEngineStrip } from '@/ui/idleVillage/components/minimal/TimeEngineStrip';
+export { DayNightTimeEngineStrip } from '@/ui/idleVillage/components/minimal/DayNightTimeEngineStrip';
 export type { ClockWidgetProps } from '@/ui/idleVillage/components/minimal/ClockWidget';
+export type { DayNightTimeEngineStripProps } from '@/ui/idleVillage/components/minimal/DayNightTimeEngineStrip';
 
 /** Chain mirrors src/pages/minimal-clock.tsx: SkinSystemProvider → SandboxTimingProvider. */
 export const CLOCK_PROVIDER_CHAIN: KitProviderName[] = ['SkinSystemProvider', 'SandboxTimingProvider'];
@@ -26,6 +29,14 @@ export const ClockWidgetStandalone = withKitShell<ComponentProps<typeof ClockWid
   ClockWidget,
   CLOCK_PROVIDER_CHAIN,
   'ClockWidgetStandalone'
+);
+
+/** Drop-in variant: the day/night clock strip pre-wrapped in its smart shell.
+ *  Mounts SkinSystemProvider + SandboxTimingProvider if not already present. */
+export const DayNightTimeEngineStripStandalone = withKitShell<ComponentProps<typeof DayNightTimeEngineStrip>>(
+  DayNightTimeEngineStrip,
+  CLOCK_PROVIDER_CHAIN,
+  'DayNightTimeEngineStripStandalone'
 );
 
 /**

@@ -7,6 +7,7 @@
     },
     "actions": {
       "start": "Avvia",
+      "startPending": "In attesa…",
       "cancel": "Annulla",
       "collect": "Raccogli"
     },
@@ -345,8 +346,10 @@
     },
     "variant": "Variante",
     "variants": {
-      "baseline": "Baseline (V1)",
-      "runic": "Runica (V2)"
+      "runic": "Runica (V2)",
+      "runicV3": "Runica V3",
+      "runicV1": "Runica V1",
+      "runicV5": "Runica V5"
     }
   },
   "questChronicle": {
@@ -437,6 +440,62 @@
     },
     "sections": {
       "quote": "Citazione"
+    }
+  },
+  "world": {
+    "goblinInvasion": {
+      "title": "INVASIONE GOBLIN!",
+      "subtitle": "Fra {count} giorni un esercito attaccherà!",
+      "action": "PREPARA LE DIFESE",
+      "viewDefenses": "VEDI DIFESE",
+      "invasion": "Invasione",
+      "eventLabel": "Invasione Goblin",
+      "daysRemaining": "Giorni Rimanenti: {count}",
+      "timerLabel": "GIORNI RIMANENTI",
+      "warTable": {
+        "eventLabel": "EVENTO MONDIALE · MINACCIA",
+        "description": "Un esercito goblin sta marciando verso le tue terre.",
+        "parchmentDescription": "Un esercito goblin sta marciando sulle nostre terre. I nostri esploratori hanno avvistato grandi forze nemiche che scendono dal nord verso la tua roccaforte.",
+        "willBeAttacked": "IL TUO VILLAGGIO SARÀ ATTACCATO.",
+        "scoutReport": "I nostri esploratori segnalano un massiccio avanguardia goblin che marcia dalle Distese del Nord. Il loro obiettivo è chiaro: la tua roccaforte sarà rasa al suolo a meno che non vengano preparate le difese.",
+        "worldEvent": "Evento Mondiale",
+        "enemy": "FORZA NEMICA",
+        "enemySub": "Si muove dal nord",
+        "village": "IL TUO VILLAGGIO",
+        "villageSub": "Obiettivo principale",
+        "targetObjective": "Obiettivo Primario",
+        "threatLevelHigh": "Livello Minaccia: Alto",
+        "threatLevelCritical": "Livello Minaccia: Critico",
+        "threat": "MINACCIA",
+        "faction": "ESERCITO GOBLIN",
+        "factionSub": "Grande forza ostile rilevata",
+        "hostileForce": "Forza Ostile",
+        "warbands": "~3.500 Banda",
+        "enemyCount": "3.200+",
+        "enemyUnit": "GOBLIN",
+        "arrivalCount": "2",
+        "arrivalUnit": "GIORNI",
+        "targetName": "IL TUO VILLAGGIO",
+        "arrival": "ARRIVO",
+        "arrivalIn": "Arrivo tra",
+        "days": "GIORNI",
+        "remaining": "RIMANENTI",
+        "estimatedArrival": "Arrivo Stimato",
+        "timeRemaining": "Tempo Rimanente",
+        "dismiss": "Ignora",
+        "dismissReport": "Chiudi Rapporto"
+      }
+    },
+    "clouds": {
+      "scales": "Dimensioni nuvole",
+      "scale": "scala",
+      "far": "Lontane",
+      "mid": "Medie",
+      "near": "Vicine"
+    },
+    "debug": {
+      "spawnWonders": "Mostra meraviglie",
+      "despawnWonders": "Nascondi meraviglie"
     }
   }
 }

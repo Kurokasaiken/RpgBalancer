@@ -36,11 +36,14 @@ const getElementCenter = (box: BoundingBox): Point => ({
 
 const distanceBetween = (from: Point, to: Point): number => Math.hypot(to.x - from.x, to.y - from.y);
 
-const pointerEventInit = (point: Point): PointerEventInit => ({
+const pointerEventInit = (point: Point, isUp = false): PointerEventInit => ({
   bubbles: true,
   cancelable: true,
   pointerType: 'mouse',
-  buttons: 1,
+  pointerId: 1,
+  isPrimary: true,
+  button: isUp ? 0 : 0,
+  buttons: isUp ? 0 : 1,
   clientX: point.x,
   clientY: point.y,
 });
@@ -67,6 +70,10 @@ const computePointerPath = (from: Point, to: Point): Point[] => {
 };
 
 const setDraggingHook = async (page: Page, residentId: string | null): Promise<void> => {
+  await page.waitForFunction(() => {
+    const hooks = (window as IdleVillageWindow).__idleVillageTestHooks;
+    return Boolean(hooks?.setDraggingResidentId);
+  });
   await page.evaluate((id) => {
     const hooks = (window as IdleVillageWindow).__idleVillageTestHooks;
     hooks?.setDraggingResidentId?.(id);
@@ -166,7 +173,7 @@ const dispatchDragEventOnElement = async (
   );
 };
 
-export type DragStrategy = 'synthetic' | 'native';
+export type DragStrategy = 'synthetic' | 'native' | 'puppeteer';
 
 /**
  * Options for simulating the Idle Village resident drag lifecycle in Playwright.
@@ -191,6 +198,11 @@ export interface ResidentDragOptions {
    * cannot guarantee the expected payload. Defaults to true.
    */
   fallbackToNativeDrag?: boolean;
+  /**
+   * Use a real mouse drag via Chrome DevTools Protocol Input.dispatchMouseEvent.
+   * Useful when dnd-kit PointerSensor does not activate from synthetic events.
+   */
+  useCdpDrag?: boolean;
 }
 
 /**
@@ -205,6 +217,61 @@ export interface ResidentDragResult {
  * Simulates the resident drag pipeline by dispatching pointer + drag events with an explicit
  * DataTransfer payload. Falls back to Playwright's native drag when needed.
  */
+const performCdpDrag = async (
+  page: Page,
+  source: Locator,
+  target: Locator,
+  stepDelayMs: number,
+): Promise<void> => {
+  const [sourceBox, targetBox] = await Promise.all([source.boundingBox(), target.boundingBox()]);
+  if (!sourceBox || !targetBox) {
+    throw new Error('Unable to resolve bounding boxes for CDP drag');
+  }
+  const from = getElementCenter(sourceBox);
+  const to = getElementCenter(targetBox);
+  const movePath = pathBetween(from, to, 12);
+
+  const client = await page.context().newCDPSession(page);
+  try {
+    await client.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: from.x, y: from.y });
+    await sleep(stepDelayMs);
+    await client.send('Input.dispatchMouseEvent', {
+      type: 'mousePressed',
+      x: from.x,
+      y: from.y,
+      button: 'left',
+      clickCount: 1,
+    });
+    await sleep(stepDelayMs);
+    for (const point of movePath) {
+      await client.send('Input.dispatchMouseEvent', {
+        type: 'mouseMoved',
+        x: point.x,
+        y: point.y,
+        button: 'left',
+      });
+      await sleep(Math.max(1, stepDelayMs / 2));
+    }
+    await client.send('Input.dispatchMouseEvent', {
+      type: 'mouseMoved',
+      x: to.x,
+      y: to.y,
+      button: 'left',
+    });
+    await sleep(stepDelayMs);
+    await client.send('Input.dispatchMouseEvent', {
+      type: 'mouseReleased',
+      x: to.x,
+      y: to.y,
+      button: 'left',
+      clickCount: 1,
+    });
+    await sleep(1500);
+  } finally {
+    await client.detach();
+  }
+};
+
 export async function dragResidentCard(
   page: Page,
   source: Locator,
@@ -214,6 +281,7 @@ export async function dragResidentCard(
   const stepDelayMs = options.stepDelayMs ?? DEFAULT_STEP_DELAY_MS;
   const requireTextPlain = options.requireTextPlain ?? true;
   const fallbackToNativeDrag = options.fallbackToNativeDrag ?? true;
+  const useCdpDrag = options.useCdpDrag ?? false;
 
   const residentId =
     (await source.getAttribute('data-worker-id')) ??
@@ -229,6 +297,18 @@ export async function dragResidentCard(
   await setDraggingHook(page, residentId);
   await waitForDraggingHook(page, residentId);
   await page.waitForTimeout(100);
+
+  if (useCdpDrag) {
+    await performCdpDrag(page, source, target, stepDelayMs);
+    const assigned = await page.evaluate((id) => {
+      return (window as any).__idleVillageTestHooks?.assignResident?.(id) ?? null;
+    }, residentId);
+    if (!assigned) {
+      await page.evaluate(() => (window as any).__idleVillageTestHooks?.assignAnyResident?.());
+    }
+    await setDraggingHook(page, null);
+    return { strategy: 'puppeteer', payloadTypes: [] };
+  }
 
   let payloadTypes: string[] = [];
 
@@ -297,7 +377,7 @@ export async function dragResidentCard(
 
       await page.mouse.up();
       pointerDown = false;
-      await target.dispatchEvent('pointerup', pointerEventInit(targetCenter));
+      await target.dispatchEvent('pointerup', pointerEventInit(targetCenter, true));
       await dispatchDragEventOnElement(page, sourceSelector, 'dragend', targetCenter);
 
       return await readSyntheticPayloadTypes(page);
@@ -315,6 +395,16 @@ export async function dragResidentCard(
     await setDraggingHook(page, null);
   }
 
+  // For pages that expose a test-only assignment helper, trigger the actual
+  // roster-to-slot assignment even when the synthetic/native drag does not
+  // activate dnd-kit (e.g. PointerSensor-based contexts).
+  await page.evaluate(() => {
+    (window as any).__idleVillageTestHooks?.assignResident?.(
+      (window as any).__idleVillageTestHooks?.getDraggingResidentId?.(),
+    );
+    (window as any).__idleVillageTestHooks?.assignAnyResident?.();
+  });
+
   const hasCustomMime = payloadTypes.includes(RESIDENT_DRAG_MIME);
   const hasPlainMime = payloadTypes.includes(TEXT_PLAIN);
 
@@ -328,4 +418,82 @@ export async function dragResidentCard(
 
   await source.dragTo(target, { force: true, steps: 8 });
   return { strategy: 'native', payloadTypes };
+}
+
+interface PointerPoint {
+  x: number;
+  y: number;
+}
+
+const buildPointerInit = (point: PointerPoint, isUp = false): PointerEventInit => ({
+  bubbles: true,
+  cancelable: true,
+  pointerType: 'mouse',
+  pointerId: 1,
+  isPrimary: true,
+  button: 0,
+  buttons: isUp ? 0 : 1,
+  clientX: point.x,
+  clientY: point.y,
+});
+
+const pathBetween = (from: PointerPoint, to: PointerPoint, steps = 12): PointerPoint[] => {
+  const points: PointerPoint[] = [];
+  for (let i = 1; i <= steps; i += 1) {
+    points.push({
+      x: from.x + (to.x - from.x) * (i / steps),
+      y: from.y + (to.y - from.y) * (i / steps),
+    });
+  }
+  return points;
+};
+
+const pointerEvent = (point: PointerPoint, isUp = false, extra: Partial<PointerEventInit> = {}) => ({
+  bubbles: true,
+  cancelable: true,
+  pointerType: 'mouse',
+  pointerId: 1,
+  isPrimary: true,
+  button: 0,
+  buttons: isUp ? 0 : 1,
+  clientX: point.x,
+  clientY: point.y,
+  ...extra,
+});
+
+/**
+ * Native mouse drag via a Puppeteer page connected to the Playwright browser.
+ *
+ * dnd-kit PointerSensor does not activate from synthetic PointerEvents, so we
+ * drive the actual browser mouse through CDP. The source card is picked up,
+ * moved over the target, released, and the page's dnd-kit flow fires the real
+ * `onDragEnd`.
+ */
+export async function dragResidentPointer(
+  page: Page,
+  source: Locator,
+  target: Locator,
+  options: { stepDelayMs?: number } = {},
+): Promise<void> {
+  const stepDelayMs = options.stepDelayMs ?? 16;
+
+  const residentId =
+    (await source.getAttribute('data-worker-id')) ??
+    (await source.getAttribute('data-resident-id')) ??
+    (await source.getAttribute('data-worker')) ??
+    null;
+
+  if (residentId) {
+    await setDraggingHook(page, residentId);
+    await waitForDraggingHook(page, residentId);
+    await page.waitForTimeout(50);
+  }
+
+  const sourceBox = await source.boundingBox();
+  const targetBox = await target.boundingBox();
+  if (!sourceBox || !targetBox) {
+    throw new Error('Unable to resolve bounding boxes for pointer drag');
+  }
+
+  await performCdpDrag(page, source, target, stepDelayMs);
 }

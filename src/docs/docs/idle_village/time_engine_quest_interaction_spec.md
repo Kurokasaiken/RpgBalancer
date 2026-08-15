@@ -1,7 +1,7 @@
 ---
 title: TimeEngine ↔ Quest Interaction
 status: draft
-updated: 2026-08-13
+updated: 2026-08-14
 type: interaction-spec
 ---
 
@@ -77,8 +77,20 @@ When the final phase completes:
 - Milestone resolution blocks quest time advancement
 - The canonical quest outcome is produced by `TimeEngine.resolveActivityOutcome`
 
+## Runtime evidence
+
+- Suite: `tests/e2e/idleVillage/poiQuestDetailRosterTimeClock.spec.ts`
+- Risultato: 17 passati, 1 saltato, 0 fallimenti (Playwright, Desktop Chrome).
+- Test coperti: `TimeEngineStrip` pausa/resume (elapsedMs stabile in pausa e aumento dopo resume); countdown avanza a 4x; milestone apre automaticamente e blocca il tempo; chiusura `QuestChronicle` permette auto-resolve dei milestone in coda; apertura/chiusura `QuestChronicle` non influenza `isPaused`; transizione giorno→notte del ciclo day/night; `Start/Embark` è disabilitato quando `isPaused === true` e diventa abilitato solo dopo il resume (ERR-005 chiuso).
+- Nota: lo speed multiplier accorcia solo il wall-clock; i milestone restano ancorati ai `currentTime` di fase.
+
+## Comportamento atteso (2026-08-15)
+
+- **Ripristino dello stato di pausa:** la chiusura del POI detail ripristina lo stato di pausa esistente prima dell'apertura. Se il gioco era in pausa, resta in pausa; se era in play, riprende a scorrere. Test: `should preserve the pre-open pause state when the POI detail is closed`.
+
 ## References
 
 - [`time_engine_spec.md`](./time_engine_spec.md)
 - [`quest_spec.md`](./quest_spec.md)
 - [`time_engine_trusted.md`](./trusted/time_engine_trusted.md)
+- [`poi_quest_detail_roster_time_clock_page_workflow.md`](./poi_quest_detail_roster_time_clock_page_workflow.md)

@@ -12,29 +12,34 @@
  */
 import React, { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { WorldSurfaceStandalone } from '@/ui/idleVillage/frozen/kits/worldSurfaceKit';
 import { ClockWidgetStandalone } from '@/ui/idleVillage/frozen/kits/clockKit';
 import DayNightPoiSkin from '../components/minimal/DayNightPoiSkin';
-import PoiMarker, {
-  poiMarkerStyles,
+import {
   type PoiMarkerProps,
   type PoiState,
   type PoiType,
 } from '../components/poi/PoiMarker';
 import PoiMarkerRunic, { poiRunicStyles } from '../components/poi/PoiMarkerRunic';
+import PoiMarkerRunicV1, { poiRunicV1Styles } from '../components/poi/PoiMarkerRunicV1';
+import PoiMarkerRunicV3, { poiRunicV3Styles } from '../components/poi/PoiMarkerRunicV3';
+import PoiMarkerRunicV5, { poiRunicV5Styles } from '../components/poi/PoiMarkerRunicV5';
+import PoiMatericV1, { poiMatericV1Styles } from '../components/poi/PoiMatericV1';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 
 const TYPES: PoiType[] = ['quest', 'job', 'event'];
 const STATES: PoiState[] = ['new', 'available', 'assigned', 'expiring', 'expired'];
 const IMPORTANCES = ['normal', 'important', 'critical'] as const;
-const VARIANTS = ['runic', 'baseline'] as const;
+const VARIANTS = ['matericV1', 'runic', 'runicV1', 'runicV3', 'runicV5'] as const;
 
 type Importance = (typeof IMPORTANCES)[number];
 type Variant = (typeof VARIANTS)[number];
 
 const MARKERS: Record<Variant, React.FC<PoiMarkerProps>> = {
-  baseline: PoiMarker,
+  matericV1: PoiMatericV1,
   runic: PoiMarkerRunic,
+  runicV1: PoiMarkerRunicV1,
+  runicV3: PoiMarkerRunicV3,
+  runicV5: PoiMarkerRunicV5,
 };
 
 /** Placements over the map, in percentages of the viewport. */
@@ -51,9 +56,9 @@ export const PoiMarkerLabPage: React.FC = () => {
   const label = useCallback((key: string) => String(t(`poiMarkerLab.${key}` as never)), [t]);
 
   // Marker controls
-  const [variant, setVariant] = useState<Variant>('runic');
-  const [type, setType] = useState<PoiType>('quest');
-  const [state, setState] = useState<PoiState>('available');
+  const [variant, setVariant] = useState<Variant>('matericV1');
+  const type: PoiType = 'quest';
+  const state: PoiState = 'available';
   const [importance, setImportance] = useState<Importance>('normal');
   const [progress, setProgress] = useState(0.62);
   const [size, setSize] = useState(112);
@@ -125,34 +130,6 @@ export const PoiMarkerLabPage: React.FC = () => {
         </fieldset>
 
         <fieldset>
-          <legend>{label('type')}</legend>
-          {TYPES.map((value) => (
-            <button
-              key={value}
-              type="button"
-              data-active={type === value}
-              onClick={() => setType(value)}
-            >
-              {label(`types.${value}`)}
-            </button>
-          ))}
-        </fieldset>
-
-        <fieldset>
-          <legend>{label('state')}</legend>
-          {STATES.map((value) => (
-            <button
-              key={value}
-              type="button"
-              data-active={state === value}
-              onClick={() => setState(value)}
-            >
-              {label(`states.${value}`)}
-            </button>
-          ))}
-        </fieldset>
-
-        <fieldset>
           <legend>{label('importance')}</legend>
           {IMPORTANCES.map((value) => (
             <button
@@ -207,13 +184,16 @@ export const PoiMarkerLabPage: React.FC = () => {
         </label>
       </div>
     ),
-    [label, variant, type, state, importance, progress, size, counterClockwise, showMap],
+    [label, variant, importance, progress, size, counterClockwise, showMap],
   );
 
   const pageContent = (
     <div className="poi-lab">
-      <style>{poiMarkerStyles}</style>
+      <style>{poiMatericV1Styles}</style>
       <style>{poiRunicStyles}</style>
+      <style>{poiRunicV1Styles}</style>
+      <style>{poiRunicV3Styles}</style>
+      <style>{poiRunicV5Styles}</style>
       <style>{labPageStyles}</style>
 
       <header className="poi-lab__header">
@@ -239,7 +219,14 @@ export const PoiMarkerLabPage: React.FC = () => {
       {controls}
 
       <section className="poi-lab__stage" aria-label={label('inContext')}>
-        {showMap && <WorldSurfaceStandalone className="poi-lab__map" />}
+        {showMap && (
+          <img
+            className="poi-lab__map poi-lab__map--static"
+            src={encodeURI('/map orizzontale.png')}
+            alt=""
+            aria-hidden="true"
+          />
+        )}
         <div className="poi-lab__overlay">
           {MAP_PLACEMENTS.map((placement) => (
             <div
@@ -386,6 +373,7 @@ const labPageStyles = `
   border: 1px solid #2b2f27; border-radius: 8px; overflow: hidden; background: #172019;
 }
 .poi-lab__map { position: absolute; inset: 0; }
+.poi-lab__map--static { width: 100%; height: 100%; object-fit: cover; display: block; }
 .poi-lab__overlay { position: absolute; inset: 0; pointer-events: none; }
 .poi-lab__pin { position: absolute; transform: translate(-50%, -50%); pointer-events: auto; }
 .poi-lab__matrix, .poi-lab__playground { margin-top: 32px; }

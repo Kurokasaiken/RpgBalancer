@@ -1,7 +1,7 @@
 ---
 title: POI Detail Spec
 status: draft
-updated: 2026-08-13
+updated: 2026-08-14
 type: component-spec
 ---
 
@@ -26,8 +26,8 @@ type: component-spec
 
 **Given:** a POI on the map is idle
 **When:** the user clicks it
-**Then:** a `FloatingPanel` opens, showing `ActivityCapsuleDetailSkinAware` with POI info, slots, progress, and CTA
-**Visual contract:** Panel opens with a 300-400ms animation; the page behind remains interactive
+**Then:** `ActivityCapsuleDetailSkinAware` opens as a draggable detail panel with POI info, slots, progress, and CTA
+**Visual contract:** Panel opens with a 300-400ms animation; the page behind remains interactive; the drag handle is visible and the panel can be moved by pointer dragging
 
 ### Scenario 2: Assign resident to a slot inside detail
 
@@ -73,13 +73,23 @@ type: component-spec
 
 ## Invariants
 
-- Detail is a `FloatingPanel`; it never blocks the page with a backdrop
+- Detail is a `ActivityCapsuleDetailSkinAware` draggable window; it never blocks the page with a backdrop
 - All visual properties come from `ActivityCapsuleDetailSkinPresets`; no hardcoded values
 - Slot data passes through `ActivityDetailSlotData` contract with role, required, emptyPenalty, risk modifiers
 - Opening the Quest POI detail pauses the game automatically
 - The Quest POI detail is visually identical to the reference in `/poi-quest-detail-roster-integration` (no extra chrome)
 - Floating panels open centered in the map viewport and are fully visible
 - State persistence uses `PersistenceService`, never direct localStorage
+
+## Runtime Evidence
+
+Playwright suite `poiQuestDetailRosterTimeClock.spec.ts` (2026-08-14):
+
+- `should open the Quest POI detail and show the ResidentSlotRack` — validates Scenario 1 (open + slot rack visible).
+- `should pause the game when opening the Quest POI detail` — validates Scenario 5 (`__idleVillageTestHooks.getQuestState().isPaused` becomes `true`).
+- `should drag the POI detail panel by its header` — validates Scenario 1 (draggable header).
+- `should keep Start disabled until a required slot is filled` — validates Scenario 2/3 (slot assignment enables Start CTA).
+- `should run the quest end-to-end, auto-resolve milestones and collect rewards` — validates Scenario 3/4 (start, complete, collect, close).
 
 ## References
 

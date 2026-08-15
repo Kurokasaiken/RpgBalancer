@@ -11,6 +11,8 @@ export interface WorldSurfaceCloudsProps {
    * clouds render behind the map even as the last child.
    */
   zIndex: number;
+  /** Per-band width multipliers. */
+  scales?: { far: number; mid: number; near: number };
 }
 
 /**
@@ -25,7 +27,12 @@ export interface WorldSurfaceCloudsProps {
  * than near ones. All three bands sit under the terrain layers, so the map reads
  * as seen from above the weather, not through it.
  */
-export function WorldSurfaceClouds({ enabled = true, canvasSize, zIndex }: WorldSurfaceCloudsProps) {
+export function WorldSurfaceClouds({
+  enabled = true,
+  canvasSize,
+  zIndex,
+  scales = { far: 1, mid: 1, near: 1 },
+}: WorldSurfaceCloudsProps) {
   if (!enabled) return null;
 
   return (
@@ -38,19 +45,6 @@ export function WorldSurfaceClouds({ enabled = true, canvasSize, zIndex }: World
         // Clouds must not spill outside the map while crossing it.
         overflow: 'hidden',
         pointerEvents: 'none',
-        // Clouds thin out over the continent instead of being cut off at the shore:
-        // the mask is opaque over water and ~25% over land, ramped across a feathered
-        // coastline. Over land the player follows the shadow, not the cloud, so the
-        // map stays readable underneath.
-        //
-        // The mask is static — the browser rasterises it once and only the sprites
-        // animate inside it, so the per-frame cost stays plain alpha compositing.
-        maskImage: 'url(/assets/atmosphere/terrain/cloud_mask.webp)',
-        WebkitMaskImage: 'url(/assets/atmosphere/terrain/cloud_mask.webp)',
-        maskSize: '100% 100%',
-        WebkitMaskSize: '100% 100%',
-        maskRepeat: 'no-repeat',
-        WebkitMaskRepeat: 'no-repeat',
       }}
     >
       <style>{`
@@ -74,13 +68,13 @@ export function WorldSurfaceClouds({ enabled = true, canvasSize, zIndex }: World
               position: 'absolute',
               top: sprite.y,
               left: 0,
-              width: sprite.width,
+              width: sprite.width * band.scale * scales[band.name],
               height: 'auto',
               opacity: band.opacity,
               willChange: 'transform',
               // Travel a full canvas width plus the sprite's own width, so it is
               // fully off one edge before reappearing at the other.
-              ['--ws-cloud-from' as string]: `${-sprite.width}px`,
+              ['--ws-cloud-from' as string]: `${-sprite.width * band.scale * scales[band.name]}px`,
               ['--ws-cloud-to' as string]: `${canvasSize.width}px`,
               animationName: 'wsCloudDrift',
               animationDuration: `${band.driftSeconds}s`,

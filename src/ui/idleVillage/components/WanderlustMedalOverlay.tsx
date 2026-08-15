@@ -8,6 +8,7 @@ export interface WanderlustMedalOverlayProps {
   className?: string;
   style?: React.CSSProperties;
   cursorVelocity?: { x: number; y: number } | null;
+  'data-testid'?: string;
 }
 
 export const WanderlustMedalOverlay: React.FC<WanderlustMedalOverlayProps> = ({
@@ -17,6 +18,7 @@ export const WanderlustMedalOverlay: React.FC<WanderlustMedalOverlayProps> = ({
   className = '',
   style,
   cursorVelocity = null,
+  'data-testid': dataTestId,
 }) => {
   const { t } = useTranslation('idleVillage');
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -43,52 +45,7 @@ export const WanderlustMedalOverlay: React.FC<WanderlustMedalOverlayProps> = ({
     return () => { alive = false; };
   }, [portraitUrl]);
 
-  // Debug coordinate tracking
-  useEffect(() => {
-    if (!containerRef.current) return;
-    
-    const container = containerRef.current;
-    const rect = container.getBoundingClientRect();
-    
-    // Find the image element inside the token
-    const imageElement = container.querySelector('image') as SVGImageElement;
-    const imageRect = imageElement?.getBoundingClientRect();
-    
-    console.log('=== TOKEN DEBUG ===');
-    console.log('Is dragging:', isDragging);
-    console.log('Token container rect:', {
-      x: Math.round(rect.left),
-      y: Math.round(rect.top),
-      width: Math.round(rect.width),
-      height: Math.round(rect.height),
-      centerX: Math.round(rect.left + rect.width / 2),
-      centerY: Math.round(rect.top + rect.height / 2)
-    });
-    
-    if (imageRect) {
-      console.log('Image element rect:', {
-        x: Math.round(imageRect.left),
-        y: Math.round(imageRect.top),
-        width: Math.round(imageRect.width),
-        height: Math.round(imageRect.height),
-        centerX: Math.round(imageRect.left + imageRect.width / 2),
-        centerY: Math.round(imageRect.top + imageRect.height / 2)
-      });
-      
-      // Calculate relative position of image within token
-      const relativeX = imageRect.left - rect.left;
-      const relativeY = imageRect.top - rect.top;
-      console.log('Image relative to token:', {
-        x: Math.round(relativeX),
-        y: Math.round(relativeY),
-        isCentered: Math.abs(relativeX - (rect.width - imageRect.width) / 2) < 2 && 
-                   Math.abs(relativeY - (rect.height - imageRect.height) / 2) < 2
-      });
-    } else {
-      console.log('Image element: NOT FOUND');
-    }
-    console.log('================');
-  }, [isDragging]);
+
 
   useEffect(() => {
     if (!cursorVelocity) return;
@@ -165,6 +122,7 @@ export const WanderlustMedalOverlay: React.FC<WanderlustMedalOverlayProps> = ({
     <div
       ref={containerRef}
       role="img"
+      data-testid={dataTestId}
       aria-label={t('idleVillage:medalOverlay.ariaLabel', { defaultValue: 'Resident medal' })}
       className={`tok-svg ${className}`}
       style={{

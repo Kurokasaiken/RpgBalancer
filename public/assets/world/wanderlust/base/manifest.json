@@ -343,7 +343,7 @@
       "id": "forest_dark_north",
       "file": "Foresta scura nord.webp",
       "type": "texture",
-      "zIndex": 90,
+      "zIndex": 89,
       "opacity": 1,
       "blendMode": "normal",
       "offsetX": 0,
@@ -360,7 +360,7 @@
       "id": "village",
       "file": "Villaggio.webp",
       "type": "texture",
-      "zIndex": 95,
+      "zIndex": 90,
       "opacity": 1,
       "blendMode": "normal",
       "offsetX": 0,
@@ -372,6 +372,42 @@
       "tags": [
         "settlements",
         "landmarks"
+      ]
+    },
+    {
+      "id": "event_shroud_left",
+      "file": "event_shroud_left.png",
+      "type": "texture",
+      "zIndex": 96,
+      "opacity": 1,
+      "blendMode": "normal",
+      "offsetX": 0,
+      "offsetY": 0,
+      "parallax": {
+        "x": 0,
+        "y": 0
+      },
+      "tags": [
+        "event",
+        "shroud"
+      ]
+    },
+    {
+      "id": "event_shroud_right",
+      "file": "event_shroud_right.png",
+      "type": "texture",
+      "zIndex": 96,
+      "opacity": 1,
+      "blendMode": "normal",
+      "offsetX": 0,
+      "offsetY": 0,
+      "parallax": {
+        "x": 0,
+        "y": 0
+      },
+      "tags": [
+        "event",
+        "shroud"
       ]
     },
     {
@@ -411,7 +447,26 @@
       ]
     }
   ],
-  "atmosphereLayers": [],
+  "atmosphereLayers": [
+    {
+      "id": "clouds",
+      "file": "clouds/cloud_01.webp",
+      "type": "particle_system",
+      "zIndex": 98,
+      "opacity": 1,
+      "blendMode": "normal",
+      "offsetX": 0,
+      "offsetY": 0,
+      "parallax": {
+        "x": 0,
+        "y": 0
+      },
+      "tags": [
+        "atmosphere",
+        "clouds"
+      ]
+    }
+  ],
   "visualStates": [
     {
       "id": "default",

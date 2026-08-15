@@ -925,7 +925,7 @@ export const VillageSandboxContent: React.FC<VillageSandboxContentProps> = ({
         setSelectedSlot: (slotId) => setSelectedSlot(slotId),
       };
 
-      window.__idleVillageTestHooks = hooks;
+      window.__idleVillageTestHooks = { ...(window.__idleVillageTestHooks ?? {}), ...hooks };
       hooksRef.current = hooks;
 
       cleanupHooks = () => {

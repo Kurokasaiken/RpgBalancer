@@ -295,11 +295,15 @@ export const WorldSurfaceTestPage: React.FC = () => {
   // Debug: put the whole catalog on the map at once, one wonder per anchor, spread as
   // widely as the anchors allow. Deliberately does not touch the camera — the viewer
   // pans to them.
-  const handleSpawnWonders = useCallback(() => {
-    for (const object of objectsRef.current) {
-      if (object.type === 'wonder') {
-        removeObject(object.id);
+  const handleToggleWonders = useCallback(() => {
+    const anyVisible = objectsRef.current.some((o) => o.type === 'wonder');
+    if (anyVisible) {
+      for (const object of objectsRef.current) {
+        if (object.type === 'wonder') {
+          removeObject(object.id);
+        }
       }
+      return;
     }
 
     // Farthest-point sampling, not first-fit: each pick after the seed is the anchor
@@ -354,6 +358,7 @@ export const WorldSurfaceTestPage: React.FC = () => {
           height: wonder.height,
           opacity: wonder.opacity,
           animation: wonder.animation,
+          entrance: wonder.entrance,
         },
       });
     }
@@ -398,6 +403,7 @@ export const WorldSurfaceTestPage: React.FC = () => {
           height: wonder.height,
           opacity: wonder.opacity,
           animation: wonder.animation,
+          entrance: wonder.entrance,
         },
       });
 
@@ -579,7 +585,8 @@ export const WorldSurfaceTestPage: React.FC = () => {
           objectCount={objects.length}
           onSpawnObjects={handleSpawnObjects}
           onClearObjects={handleClearObjects}
-          onSpawnWonders={wonderAnchors.length > 0 ? handleSpawnWonders : undefined}
+          onSpawnWonders={wonderAnchors.length > 0 ? handleToggleWonders : undefined}
+          wondersVisible={objects.some((o) => o.type === 'wonder')}
           onCloudScaleChange={setCloudScales}
           eventCovered={eventCovered}
           onEventCoveredChange={handleEventCoveredChange}

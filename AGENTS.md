@@ -25,6 +25,27 @@ Direzione e storia non sono la stessa cosa di un vincolo, e non vanno trattate c
 - Quando il Director esprime un'intenzione operativa, catturala in `RICHIESTE.md` prima di rispondere.
   Il riferimento deve essere `.mw/desiderata.md` v1 (FROZEN).
 
+## Riferimenti operativi Mind Weaver in RPG
+
+- **Python runtime multi-AI:** `RPG/.mw/venv/bin/python` (symlink al venv di `mind-weaver`).
+- **Script multi-AI:** `RPG/scripts/mw-ask.py`, `RPG/scripts/mw-iterative-deliberate.py`,
+  `RPG/scripts/mw-broadcast.py`, `RPG/scripts/mw-critique-plan.py`, ecc.
+  **Invoca sempre come** `python scripts/<nome>.py` **, mai** `./scripts/<nome>.py`**: i wrapper in
+  `RPG/scripts/` sono symlinks a `.mw/bin/forward.py` e non hanno il bit eseguibile.
+- **Configurazione:** `RPG/.mw/deliberation-config.yaml`, `.mw/deliberation-config-explorer.yaml`,
+  `.mw/deliberation-config-planner.yaml`, `.mw/prompt-enhancers.md`, `.mw/critique-definition.md`.
+- **Credenziali:** `RPG/.env` (symlink a `mind-weaver/.env`). Contiene API key e `TELEGRAM_BOT_TOKEN`.
+- **Provider API supportati:** `openrouter`, `groq`, `anthropic`, `openai`, `cerebras`, `mistral`,
+  `gemini` (usa `GOOGLE_API_KEY`).
+- **Provider web:** `chatgpt`, `claude` — richiedono sessioni autenticate in `.mw/providers/sessions/`.
+- **Bridge Telegram:** `RPG/tools/telegram-mw-bridge.py` legge `.env` di RPG, invoca
+  `RPG/scripts/mw-ask.py` con fallback a `mind-weaver/scripts/mw-ask.py`.
+- **Skill di apprendimento e bugfix:**
+  - `RPG/.agents/skills/learn/SKILL.md` — cattura pattern e mantiene contesto.
+  - `RPG/.agents/skills/bugfix/SKILL.md` — workflow generico di bugfix.
+- **Output delle deliberazioni:** `RPG/.mw/runs/<timestamp>/` per i risultati di
+  `mw-iterative-deliberate.py` e delle skill `learn`/`bugfix`.
+
 ## Cosa fai
 
 Prima di rispondere a qualcosa che può modificare la direzione — gameplay, monetizzazione,

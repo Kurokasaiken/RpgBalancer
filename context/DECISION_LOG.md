@@ -199,6 +199,32 @@ Documented in `RPG_PROJECT_CONTEXT.md` §3.1 (canonical source).
 
 ---
 
+## Decision 008: POI Quest Config-First Cleanup
+
+**Date:** 2026-08-15  
+**Context:** The POI Quest page, QuestChronicle card, MilestoneCheckModal, and quest detail kits were reading hardcoded defaults or importing `DEFAULT_IDLE_VILLAGE_CONFIG` instead of the active `IdleVillageConfig`. This made the `/idle-village-config` editor ineffective for quest timing, skill checks, rewards, and visuals.
+
+**Decision:**
+1. `IdleVillageConfig` owns `questTimeScale` and `questSkillCheckConfig` canonically.
+2. `PoiDetailQuestRosterTimeClockIntegrationPage` reads `activities`, `questBlueprints`, `globalRules.questPowerRules`, `questTimeScale`, and `questSkillCheckConfig` from `useIdleVillageConfig().config`.
+3. Engine functions (`questTotalDurationMs`, `buildAstrolabeSkillsForPhase`, `resolveMilestoneWithoutAnimation`, `resolveQuestPower`) receive their tuning explicitly from the page, with safe module defaults preserved for tests and other callers.
+4. `QuestChronicle` derives phase palette and risk from `questChronicleSkinConfig` and `phase.riskProfile`; no hardcoded color/risk tables.
+5. `questDetailKit` resolves resource labels/icons from the active `IdleVillageConfig.resources`, not `DEFAULT_IDLE_VILLAGE_CONFIG.resources`.
+
+**Rationale:**
+- Config-first invariant requires that gameplay/UI values come from editable config, not module-level defaults.
+- Passing config explicitly to pure engine functions keeps the engines testable and decoupled from the store.
+- The existing `questChronicleSkinConfig` already contained the needed tokens; using it closes the visual hardcoding gap without duplicating values.
+
+**Implications:**
+- Any future change to quest timing or skill-check tuning is now reachable through the `/idle-village-config` editor.
+- `MilestoneCheckModal` `criticalFailChance` is calculated from `questSkillCheckConfig.backgroundResolution.epicFailThreshold`, so the astrolabe and the milestone resolver agree.
+- `MOCK_QUEST_ITEMS` remains a mock until `IdleVillageConfig` gains a Quest Items tab (ERR-026 now tracked as "da pianificare").
+
+**Status:** ✅ Closed — R-022 marked `fatta` in `RICHIESTE.md`; TP1–TP5 verified by `build:check`, `kanban:lint`, `npm run test -- idleVillage`, and Playwright `poiQuestDetailRosterTimeClock.spec.ts` (17 passed, 1 skipped).
+
+---
+
 ## Regressions Found & Fixed
 
 **Regression 001: Drag Pickup Alignment**
@@ -273,6 +299,27 @@ Documented in `RPG_PROJECT_CONTEXT.md` §3.1 (canonical source).
 
 ---
 
+## Decision 0xx: Test hooks programmatici per E2E dnd-kit in Idle Village
+
+**Date:** 2026-08-15  
+**Context:** Le regression ERR-028 e ERR-030 richiedono di verificare drag/drop e drag overlay in Playwright, ma CDP drag non attiva in modo deterministico il `PointerSensor` di `@dnd-kit`.
+
+**Decision:** Esporre in `__idleVillageTestHooks` hook specifici (`setDraggingResidentId`, `assignResident`, `openPoiDetail`) e usarli dai test helper (`dragResident.ts`) in combinazione con CDP per il movimento visivo del puntatore.
+
+**Rationale:**
+- dnd-kit è solido in produzione, ma non test-friendly a livello E2E.
+- I test hook non alterano il contratto runtime: sono accessibili solo in build di test.
+- Permette di verificare in modo stabile lo stato applicativo e il rendering dell'overlay / medaglia.
+
+**Implications:**
+- I test non simulano piú unicamente l'evento drag, ma una sequenza ibrida: mouse via CDP + stato via hook.
+- Eventuali refactory dnd-kit futuri devono mantenere i nomi dei test hook o aggiornare i test.
+- La medaglia dello slot continua a essere renderizzata solo per lo slot 0 (o equivalente). Se questo constraint cambia, va aggiornata la doc del componente.
+
+**Status:** 🔄 Proposto, in attesa di esecuzione piano PLAN-004
+
+---
+
 ## Future Decisions (Roadmap)
 
 - **Macro-Fase B onwards:** Will need decisions on MarketActionCard design, outcome modal layout, level-up animation, etc. Log decisions here as they arise.
@@ -281,6 +328,6 @@ Documented in `RPG_PROJECT_CONTEXT.md` §3.1 (canonical source).
 
 ---
 
-**Last updated:** 2026-05-20  
+**Last updated:** 2026-08-15  
 **Frequency:** Update after each major decision (expected ~1x week during development)  
 **Owner:** Fausto Boni

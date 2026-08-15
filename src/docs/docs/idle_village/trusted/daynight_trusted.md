@@ -14,13 +14,15 @@
 - Runtime/Test Pages:
   - `/minimal-gameplay` (primary)
   - `/idle-village` (secondary)
-- Last Certified: `2026-04-24`
-- Last Updated By: `Cascade (DOC-DAYN-STATUS-001)`
+  - `/poi-quest-detail-roster-time-clock` (UI integration, RT-DAYN-002)
+- Last Certified: `2026-08-14`
+- Last Updated By: `Devin (DOC-DAYN-STATUS-002)`
 - Related Contracts:
   - `[Time Engine Contract](time_engine_trusted.md)`
   - `[Minimal Gameplay Store](../minimal_gameplay_implementation_plan.md)`
   - `[Frozen Kits Pattern](../../../../ui/idleVillage/frozen/README.md)`
-- Notes: `RT-DAYN-001 audit completed - fully compliant. Kit pattern adopted 2026-01-20.`
+  - `[POI Quest Roster Time Clock Page](../poi_quest_detail_roster_time_clock_page_workflow.md)`
+- Notes: `RT-DAYN-002: runtime UI tests pass on /poi-quest-detail-roster-time-clock for halo progress, pause and day/night transition.`
 
 ## 1. Purpose
 The Day/Night Cycle System provides visual representation and control of the game's temporal progression. It displays the current phase (day/night), progress through the phase, and allows users to pause/resume the cycle. The system integrates with the Minimal Gameplay store to maintain temporal state consistency across the application.
@@ -85,6 +87,13 @@ The Day/Night Cycle System provides visual representation and control of the gam
 - **Night Running**: Purple ring, moon icon, reduced bloom
 - **Paused**: Gray ring, pause icon, minimal bloom (0.34 opacity)
 - **Transitions**: Smooth 220ms opacity changes between phase icons
+
+### Runtime test attributes (DayNightPoiSkin)
+The skin exposes deterministic `data-*` attributes on the root `svg` for UI contract testing:
+- `data-testid="day-night-poi-skin"` — root SVG locator
+- `data-phase="day" | "night"` — current phase
+- `data-paused="true" | "false"` — paused state
+- `data-progress="0..100"` — rounded percentage of progress through the current phase
 
 ### Forbidden Visual Outcomes
 - Missing progress indication
@@ -162,6 +171,7 @@ interface DayNightActionCardProps {
 - [ ] Visual styling uses Style Laboratory tokens
 - [ ] No hardcoded temporal parameters
 - [ ] Component renders correctly in minimal gameplay page
+- [ ] `data-testid`, `data-phase`, `data-paused`, `data-progress` attributes are emitted for UI contract tests
 - [ ] Visual consistency maintained across all states
 
 ## 9. Verification

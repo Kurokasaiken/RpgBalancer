@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
 /**
  * SkinButton — a role-tagged button. Inside a <SkinScope> it renders as the
@@ -6,29 +7,38 @@ import React from 'react';
  *
  *   variant="utility"   → struck-bronze plate (default)
  *   variant="secondary" → engraved-slate ghost
- *   variant="cta"       → gold notched plaque (the "AVVIA" primary action),
- *                         wrapped with flanking ◈ ornaments
+ *   variant="cta"       → arcane azure-violet notched plate (the "AVVIA" primary action)
  */
 export type SkinButtonVariant = 'utility' | 'secondary' | 'cta';
 
 export interface SkinButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: SkinButtonVariant;
-  /** For variant="cta": show the flanking ◈ ornaments (default true). */
+  /** For variant="cta": show the flanking ◈ ornaments (default false). */
   ornaments?: boolean;
 }
 
 export const SkinButton: React.FC<SkinButtonProps> = ({
   variant = 'utility',
-  ornaments = true,
+  ornaments = false,
+  disabled,
   className,
   children,
   ...rest
 }) => {
   if (variant === 'cta') {
     const button = (
-      <button type="button" data-skin="cta" className={className} {...rest}>
+      <motion.button
+        type="button"
+        data-skin="cta"
+        className={className}
+        disabled={disabled}
+        whileHover={disabled ? undefined : { scale: 1.03, y: -1 }}
+        whileTap={disabled ? undefined : { scale: 0.97 }}
+        transition={{ type: 'spring', stiffness: 420, damping: 14 }}
+        {...rest}
+      >
         {children}
-      </button>
+      </motion.button>
     );
     if (!ornaments) return button;
     return (
@@ -46,6 +56,7 @@ export const SkinButton: React.FC<SkinButtonProps> = ({
       data-skin="button"
       data-variant={variant === 'secondary' ? 'secondary' : undefined}
       className={className}
+      disabled={disabled}
       {...rest}
     >
       {children}

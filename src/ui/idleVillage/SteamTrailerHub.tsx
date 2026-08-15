@@ -9,14 +9,6 @@ import { TestHub, type TestPageLink } from './TestHub';
 
 const TRAILER_PAGES: TestPageLink[] = [
   {
-    id: 'trailer-threat-component',
-    title: 'Trailer: Threat Component',
-    description: 'Isolated goblin-invasion threat card with V9 design-system surface',
-    path: '/trailer-threat-component',
-    icon: '🎴',
-    status: 'ok',
-  },
-  {
     id: 'trailer-threat-iter',
     title: 'Trailer: Threat Iter',
     description: 'Scene 1 iteration — Goblin Invasion with VFL teal/obsidian theme and POI kit',

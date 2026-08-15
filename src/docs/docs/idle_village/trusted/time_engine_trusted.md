@@ -6,12 +6,12 @@
 - Canonical Name: TimeEngine - Core time & activity engine for Idle Village
 - Primary Files:
   - `src/engine/game/idleVillage/TimeEngine.ts`
-  - `src/engine/game/idleVillage/TimeEngine.test.ts`
+  - `src/engine/game/idleVillage/TimeEngine.unit.test.ts`
 - Runtime/Test Pages:
   - `/minimal-gameplay`
   - `/test` (via useMinimalGameplay integration)
-- Last Certified: `2026-04-22`
-- Last Updated By: `Cascade`
+- Last Certified: `2026-08-15`
+- Last Updated By: `Devin`
 - Related Contracts:
   - `[COMPONENT_MASTER_INDEX.md](../COMPONENT_MASTER_INDEX.md)`
 

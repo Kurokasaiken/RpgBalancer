@@ -786,6 +786,59 @@ export interface IdleVillageUiPreferences {
   defaultAppTabId?: AppNavTabId;
 }
 
+/**
+ * Quest phase time scale: conversion from authored narrative time units
+ * (`ticks`, `hours`, `days`) to the real milliseconds the quest engine runs on.
+ */
+export interface QuestTimeScale {
+  /** Real milliseconds one authored `ticks` unit represents. */
+  msPerTick: number;
+  /** Real milliseconds one authored `hours` unit represents. */
+  msPerHour: number;
+  /** Real milliseconds one authored `days` unit represents. */
+  msPerDay: number;
+  /** Fallback total used when a quest has no phases to sum. */
+  fallbackTotalMs: number;
+}
+
+/**
+ * Quest skill-check resolution configuration.
+ * Defines difficulty targets, party-stat clamping, and background resolution.
+ */
+export interface QuestSkillCheckConfig {
+  /** D100 target per blueprint difficulty tier. */
+  difficultyByTier: Record<string, number>;
+  /** D100 target per authored `difficultyLabel`. */
+  difficultyByLabel: Record<string, number>;
+  /** Additive modifier applied to the target for each phase type. */
+  phaseTypeDelta: Record<string, number>;
+  /** Target used when neither a label nor a known tier resolves. */
+  defaultDifficulty: number;
+  /** Lowest D100 target a resolved difficulty may take. */
+  difficultyFloor: number;
+  /** Highest D100 target a resolved difficulty may take. */
+  difficultyCeiling: number;
+  /** Value attributed to an unstaffed check. */
+  unstaffedStatFloor: number;
+  /** Upper clamp on the summed party stat fed to the astrolabe. */
+  statCeiling: number;
+  /** Parameters for resolving a milestone without the astrolabe animation. */
+  backgroundResolution: {
+    /** Success chance when stat exactly equals difficulty. */
+    parSuccessChance: number;
+    /** Lowest success chance after stat/difficulty are applied. */
+    successFloor: number;
+    /** Highest success chance after stat/difficulty are applied. */
+    successCeiling: number;
+    /** Fraction of the success band that reads as a critical success. */
+    criticalWinFraction: number;
+    /** Width in points of the near-miss band just past a failure. */
+    nearMissBand: number;
+    /** A roll at or above this value is a critical failure. */
+    epicFailThreshold: number;
+  };
+}
+
 export interface IdleVillageConfig {
   version: string;
   resources: Record<string, ResourceDefinition>;
@@ -802,6 +855,10 @@ export interface IdleVillageConfig {
   buildings: Record<string, import('./buildings').BuildingDefinition>;
   variance: ActivityVarianceConfig;
   globalRules: GlobalRules;
+  /** Time scale converting authored quest phase units to real milliseconds. */
+  questTimeScale: QuestTimeScale;
+  /** Skill-check resolution rules for quest milestones. */
+  questSkillCheckConfig: QuestSkillCheckConfig;
   overlaySettings: OverlaySettings;
   uiPreferences?: IdleVillageUiPreferences;
 }

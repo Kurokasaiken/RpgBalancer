@@ -52,12 +52,18 @@ const createSynthSound = (
   oscillator.connect(gainNode);
   gainNode.connect(audioContext.destination);
   
+  if (!Number.isFinite(frequency) || frequency <= 0 || !Number.isFinite(duration) || duration <= 0) {
+    console.warn('Invalid synth sound parameters:', { frequency, duration });
+    return;
+  }
+
   oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
   oscillator.type = type;
-  
-  gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
-  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-  
+
+  const rampTime = audioContext.currentTime + duration;
+  gainNode.gain.setValueAtTime(Number.isFinite(volume) && volume > 0 ? volume : 0.001, audioContext.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(0.01, rampTime);
+
   oscillator.start(audioContext.currentTime);
   oscillator.stop(audioContext.currentTime + duration);
 };
@@ -67,12 +73,18 @@ export const useSlotSounds = (config: SlotSoundsConfig = {}): SlotSoundsControls
   const styleLabTokens = useStyleLabTokens();
   
   // Extract audio physics tokens from Style Lab
-  const audioPhysics = (styleLabTokens.preset.interactionPhysics || {
+  const rawAudioPhysics = (styleLabTokens.preset.interactionPhysics || {
     mass: 1.0,
     damping: 0.15,
     stiffness: 100,
     shadowDepth: 8,
   }) as any;
+  const audioPhysics = {
+    mass: Number.isFinite(rawAudioPhysics.mass) && rawAudioPhysics.mass > 0 ? rawAudioPhysics.mass : 1.0,
+    damping: Number.isFinite(rawAudioPhysics.damping) && rawAudioPhysics.damping >= 0 ? rawAudioPhysics.damping : 0.15,
+    stiffness: Number.isFinite(rawAudioPhysics.stiffness) ? rawAudioPhysics.stiffness : 100,
+    shadowDepth: Number.isFinite(rawAudioPhysics.shadowDepth) ? rawAudioPhysics.shadowDepth : 8,
+  };
   
   const getAudioContext = useCallback(() => {
     if (mergedConfig.audioContext) {
