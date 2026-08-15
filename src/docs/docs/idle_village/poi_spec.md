@@ -13,8 +13,8 @@ type: component-spec
 
 ```text
 [mount] ──► idle
- idle ──(assign slot)──► ready
- ready ──(start)──► in-progress
+ idle ──(assign slot)──► idle  [slots filled, but still idle]
+ idle ──(start)──► in-progress
  in-progress ──(advance)──► in-progress
  in-progress ──(complete)──► completed
  completed ──(collect)──► idle

@@ -123,7 +123,7 @@ idle ──(assign)──► ready ──(start)──► running
 - [ ] `resolutionMode: 'tick'` means per-tick payout; `resolutionMode: 'final'` means one payout at completion.
 - [ ] `continuousJob: true` keeps the resident assigned across ticks; `continuousJob: false` releases them at completion.
 - [ ] `dailyFatigueCost` is the canonical source for per-day stamina drain; per-tick delta is derived by dividing by ticks per day.
-- [ ] Auto-extract happens only when the resident's fatigue is insufficient for the next tick.
+- [ ] When the resident's fatigue is insufficient for the next tick, the job stops producing rewards but the resident remains assigned until manually extracted.
 - [ ] The resource HUD `+` delta is driven by `dailyRewardProfile` and is purely visual feedback; the actual resource change is applied through the store.
 - [ ] No local timers; the job engine queries `TimeEngine` elapsed time.
 
