@@ -3,7 +3,7 @@
  *
  * GoblinEventModalV17 — reconstruction from split-asset mockup.
  *
- * Each visual element is a separate asset or React text.
+ * Each visual element is a separate asset or React/i18n text.
  * No whole-mockup background. Buttons are real <button> elements.
  */
 
@@ -14,6 +14,7 @@ import { goblinEventModalTokens } from '@/balancing/config/idleVillage/goblinEve
 export interface GoblinEventModalV17Props {
   isOpen?: boolean;
   onPrepare?: () => void;
+  daysLeft?: number;
   version?: number;
 }
 
@@ -26,16 +27,16 @@ const ASSET = {
   buttonPrimary: '/mockups/goblin-invasion-painted/goblin-invasion-button-primary.png',
   buttonSecondary: '/mockups/goblin-invasion-painted/goblin-invasion-button-secondary.png',
   iconEnemy: '/mockups/goblin-invasion-painted/goblin-invasion-icon-enemy.png',
-  iconArrival: '/mockups/goblin-invasion-painted/goblin-invasion-icon-arrival.png',
   iconTarget: '/mockups/goblin-invasion-painted/goblin-invasion-icon-target.png',
 };
 
-const { palette, typography } = goblinEventModalTokens;
+const { palette, typography, layout } = goblinEventModalTokens;
 
 export const GoblinEventModalV17: React.FC<GoblinEventModalV17Props> = ({
   isOpen = true,
   onPrepare,
-  version = 6,
+  daysLeft = 2,
+  version = 7,
 }) => {
   const { t } = useTranslation('idleVillage');
 
@@ -48,9 +49,9 @@ export const GoblinEventModalV17: React.FC<GoblinEventModalV17Props> = ({
   const enemy = String(t('world.goblinInvasion.warTable.enemy'));
   const enemyCount = String(t('world.goblinInvasion.warTable.enemyCount'));
   const enemyUnit = String(t('world.goblinInvasion.warTable.enemyUnit'));
-  const arrival = String(t('world.goblinInvasion.warTable.arrival'));
-  const arrivalCount = String(t('world.goblinInvasion.warTable.arrivalCount'));
-  const arrivalUnit = String(t('world.goblinInvasion.warTable.arrivalUnit'));
+  const arrival = String(t('world.goblinInvasion.warTable.arrivalIn'));
+  const arrivalUnit = String(t('world.goblinInvasion.warTable.days'));
+  const arrivalRemaining = String(t('world.goblinInvasion.warTable.remaining'));
   const target = String(t('world.goblinInvasion.warTable.targetObjective'));
   const targetName = String(t('world.goblinInvasion.warTable.targetName'));
   const action = String(t('world.goblinInvasion.action'));
@@ -71,39 +72,36 @@ export const GoblinEventModalV17: React.FC<GoblinEventModalV17Props> = ({
       <img
         src={ASSET.hero}
         alt=""
-        className="absolute left-[11%] top-[12.4%] z-0 w-[77.9%]"
-        style={{ aspectRatio: '846 / 640' }}
+        className="absolute z-0 h-auto"
+        style={{
+          top: layout.heroTop,
+          left: layout.heroLeft,
+          width: layout.heroWidth,
+          aspectRatio: '846 / 520',
+        }}
       />
 
       {/* L1 — banner background */}
       <img
         src={ASSET.banner}
         alt=""
-        className="absolute top-[8.3%] z-10 h-[9.7%] w-[77.9%] object-fill"
-        style={{ left: '11%' }}
+        className="absolute z-10 object-fill"
+        style={{
+          top: layout.bannerTop,
+          left: layout.bannerLeft,
+          width: layout.bannerWidth,
+          height: layout.bannerHeight,
+        }}
       />
 
-      {/* L2 — badge + title text */}
-      <div
-        className="absolute z-50 w-full text-center font-extrabold uppercase"
-        style={{
-          top: '9.7%',
-          fontSize: typography.badgeSize,
-          fontWeight: typography.badgeWeight,
-          letterSpacing: typography.badgeTracking,
-          color: palette.parchmentDim,
-        }}
-      >
-        {eventLabel}
-      </div>
-
+      {/* L2 — title text */}
       <h2
         className="absolute z-50 w-full text-center font-black uppercase"
         style={{
-          top: '14.5%',
-          fontSize: '1.65rem',
-          fontWeight: '900',
-          letterSpacing: '0.16em',
+          top: layout.titleTop,
+          fontSize: typography.titleSize,
+          fontWeight: typography.titleWeight,
+          letterSpacing: typography.titleTracking,
           color: palette.woodDark,
         }}
       >
@@ -113,7 +111,11 @@ export const GoblinEventModalV17: React.FC<GoblinEventModalV17Props> = ({
       {/* L3 — lower panel background */}
       <div
         className="absolute left-1/2 z-10 -translate-x-1/2"
-        style={{ top: '53.9%', width: '72.3%', aspectRatio: '786 / 220' }}
+        style={{
+          top: layout.panelTop,
+          width: layout.panelWidth,
+          height: layout.panelHeight,
+        }}
       >
         <img
           src={ASSET.panel}
@@ -122,24 +124,44 @@ export const GoblinEventModalV17: React.FC<GoblinEventModalV17Props> = ({
         />
       </div>
 
-      {/* L4 — panel text + stats */}
+      {/* L4 — panel header */}
+      <div
+        className="absolute left-1/2 z-50 w-[72.3%] -translate-x-1/2 text-center font-extrabold uppercase"
+        style={{
+          top: layout.panelHeaderTop,
+          fontSize: typography.badgeSize,
+          fontWeight: typography.badgeWeight,
+          letterSpacing: typography.badgeTracking,
+          color: palette.parchmentDim,
+        }}
+      >
+        {eventLabel}
+      </div>
+
+      {/* L5 — body + warning text */}
       <div
         className="absolute left-1/2 z-50 flex w-[72.3%] -translate-x-1/2 flex-col items-center justify-center"
-        style={{ top: '55.5%' }}
+        style={{ top: layout.bodyTop }}
       >
         <p
           className="text-center font-semibold uppercase"
           style={{
-            fontSize: '0.48rem',
+            fontSize: typography.bodySize,
             color: palette.parchment,
           }}
         >
           {description}
         </p>
+      </div>
+
+      <div
+        className="absolute left-1/2 z-50 w-[72.3%] -translate-x-1/2 text-center"
+        style={{ top: layout.warningTop }}
+      >
         <p
-          className="mt-0.5 text-center font-extrabold uppercase"
+          className="font-extrabold uppercase"
           style={{
-            fontSize: '0.58rem',
+            fontSize: typography.warningSize,
             color: palette.crimsonLight,
           }}
         >
@@ -147,19 +169,27 @@ export const GoblinEventModalV17: React.FC<GoblinEventModalV17Props> = ({
         </p>
       </div>
 
+      {/* L6 — stats row */}
       <div
         className="absolute left-1/2 z-50 grid w-[72.3%] -translate-x-1/2 grid-cols-3 gap-1 text-center"
-        style={{ top: '63.5%' }}
+        style={{ top: layout.statsTop }}
       >
         <StatBlock
           icon={ASSET.iconEnemy}
           label={enemy}
-          value={`${enemyCount} ${enemyUnit}`}
+          value={
+            <>
+              {enemyCount}
+              <br />
+              {enemyUnit}
+            </>
+          }
         />
-        <StatBlock
-          icon={ASSET.iconArrival}
+        <ArrivalStat
           label={arrival}
-          value={`${arrivalCount} ${arrivalUnit}`}
+          count={daysLeft}
+          unit={arrivalUnit}
+          remaining={arrivalRemaining}
         />
         <StatBlock
           icon={ASSET.iconTarget}
@@ -168,23 +198,22 @@ export const GoblinEventModalV17: React.FC<GoblinEventModalV17Props> = ({
         />
       </div>
 
-      {/* L5 — real buttons */}
+      {/* L7 — real buttons */}
       <button
         type="button"
         onClick={onPrepare}
-        className="absolute left-1/2 z-50 -translate-x-1/2 font-extrabold uppercase transition hover:brightness-110 active:brightness-90"
+        className="absolute left-1/2 z-50 -translate-x-1/2 whitespace-nowrap font-extrabold uppercase transition hover:brightness-110 active:brightness-90"
         style={{
-          top: '74.6%',
-          width: '48.4%',
-          height: '5.9%',
-          fontSize: '0.55rem',
-          fontWeight: '900',
-          letterSpacing: '0.12em',
+          top: layout.primaryButtonTop,
+          width: layout.primaryButtonWidth,
+          height: layout.primaryButtonHeight,
+          fontSize: typography.buttonSize,
+          fontWeight: typography.buttonWeight,
           color: palette.parchment,
           backgroundImage: `url(${ASSET.buttonPrimary})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          clipPath: 'polygon(5% 0%, 95% 0%, 100% 50%, 95% 100%, 5% 100%, 0% 50%)',
+          clipPath: goblinEventModalTokens.effects.buttonNotchedClip,
           border: 'none',
           cursor: 'pointer',
         }}
@@ -194,19 +223,18 @@ export const GoblinEventModalV17: React.FC<GoblinEventModalV17Props> = ({
 
       <button
         type="button"
-        className="absolute left-1/2 z-50 -translate-x-1/2 font-extrabold uppercase transition hover:brightness-110 active:brightness-90"
+        className="absolute left-1/2 z-50 -translate-x-1/2 whitespace-nowrap font-extrabold uppercase transition hover:brightness-110 active:brightness-90"
         style={{
-          top: '81.5%',
-          width: '44.8%',
-          height: '4.1%',
-          fontSize: '0.48rem',
-          fontWeight: '900',
-          letterSpacing: '0.1em',
+          top: layout.secondaryButtonTop,
+          width: layout.secondaryButtonWidth,
+          height: layout.secondaryButtonHeight,
+          fontSize: typography.buttonSize,
+          fontWeight: typography.buttonWeight,
           color: palette.parchment,
           backgroundImage: `url(${ASSET.buttonSecondary})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          clipPath: 'polygon(5% 0%, 95% 0%, 100% 50%, 95% 100%, 5% 100%, 0% 50%)',
+          clipPath: goblinEventModalTokens.effects.buttonNotchedClip,
           border: 'none',
           cursor: 'pointer',
         }}
@@ -214,7 +242,7 @@ export const GoblinEventModalV17: React.FC<GoblinEventModalV17Props> = ({
         {viewDefenses}
       </button>
 
-      {/* L6 — frame on top */}
+      {/* L8 — frame on top */}
       <img
         src={ASSET.frame}
         alt=""
@@ -227,24 +255,29 @@ export const GoblinEventModalV17: React.FC<GoblinEventModalV17Props> = ({
 interface StatBlockProps {
   icon: string;
   label: string;
-  value: string;
+  value: React.ReactNode;
 }
 
 const StatBlock: React.FC<StatBlockProps> = ({ icon, label, value }) => (
   <div className="flex flex-col items-center justify-center">
-    <img src={icon} alt="" className="mb-0.5 h-8 w-8 object-contain" />
-    <span
-      className="block font-extrabold uppercase tracking-wider"
+    <div
+      className="font-extrabold uppercase"
       style={{
         fontSize: typography.labelSize,
         fontWeight: typography.labelWeight,
-        color: palette.parchmentDim,
+        color: palette.parchment,
       }}
     >
       {label}
-    </span>
-    <span
-      className="block font-black"
+    </div>
+    <img
+      src={icon}
+      alt=""
+      className="my-0.5 object-contain"
+      style={{ width: layout.iconSize, height: layout.iconSize }}
+    />
+    <div
+      className="font-black"
       style={{
         fontSize: typography.valueSize,
         fontWeight: typography.valueWeight,
@@ -252,6 +285,51 @@ const StatBlock: React.FC<StatBlockProps> = ({ icon, label, value }) => (
       }}
     >
       {value}
+    </div>
+  </div>
+);
+
+interface ArrivalStatProps {
+  label: string;
+  count: number;
+  unit: string;
+  remaining: string;
+}
+
+const ArrivalStat: React.FC<ArrivalStatProps> = ({ label, count, unit, remaining }) => (
+  <div
+    className="absolute left-1/2 z-50 flex -translate-x-1/2 flex-col items-center"
+    style={{ top: layout.arrivalLabelTop }}
+  >
+    <span
+      className="font-extrabold uppercase"
+      style={{
+        fontSize: typography.labelSize,
+        fontWeight: typography.labelWeight,
+        color: palette.parchment,
+      }}
+    >
+      {label}
+    </span>
+    <span
+      className="font-black"
+      style={{
+        fontSize: typography.arrivalCountSize,
+        fontWeight: typography.valueWeight,
+        color: palette.amber,
+      }}
+    >
+      {count}
+    </span>
+    <span
+      className="font-extrabold uppercase"
+      style={{
+        fontSize: typography.arrivalUnitSize,
+        fontWeight: typography.labelWeight,
+        color: palette.parchment,
+      }}
+    >
+      {unit} {remaining}
     </span>
   </div>
 );

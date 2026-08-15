@@ -18,6 +18,7 @@ const ITERATIONS = [
   { id: 'goblin-event-modal-v17-004', version: 4, label: 'V17.4 — paintover base + i18n overlay' },
   { id: 'goblin-event-modal-v17-005', version: 5, label: 'V17.5 — split assets' },
   { id: 'goblin-event-modal-v17-006', version: 6, label: 'V17.6 — split assets + real buttons' },
+  { id: 'goblin-event-modal-v17-007', version: 7, label: 'V17.7 — cleaned panel/banner/buttons' },
 ];
 
 export const MockupToComponentPage: React.FC = () => {
