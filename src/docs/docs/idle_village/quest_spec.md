@@ -13,13 +13,10 @@ type: component-spec
 
 ```text
 [mount] ──► idle
- idle ──(open detail)──► assembling
- assembling ──(assign slots)──► ready
- ready ──(embark)──► running
+ idle ──(assign slots)──► ready
+ ready ──(embark while time runs)──► running
  running ──(phase elapsed)──► milestone
- milestone ──(skill check open)──► resolving
- resolving ──(resolve)──► running
- resolving ──(player reduces to icon)──► auto-resolve
+ milestone ──(resolve / auto-resolve)──► running
  running ──(last phase done)──► completed
  completed ──(open chronicle)──► rewards
  rewards ──(collect)──► idle

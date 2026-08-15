@@ -32,7 +32,7 @@ ActivityDefinition (cardKind: 'job')
 Job resolution engine
         │
         ├── time tick ──► stream rewards ──► Resource HUD
-        └── fatigue >= threshold ──► extract resident ──► rest
+        └── manual extract or activity completion ──► resident released
 ```
 
 | Step | Source | Data | Consumer | Effect |
@@ -56,8 +56,7 @@ idle ──(assign)──► ready ──(start)──► in-progress
 
 ```text
 idle ──(assign)──► ready ──(start)──► running
- running ──(tick)──► running ──(fatigue empty)──► resting
- resting ──(fatigue full)──► running
+ running ──(tick)──► running
  running ──(manual extract)──► idle
 ```
 
@@ -87,39 +86,27 @@ idle ──(assign)──► ready ──(start)──► running
 
 **Test:** `poiFamilyRegressions.spec.ts` — `should stream rewards for a continuous job`
 
-### J-003 — Auto-extract on fatigue
+### J-003 — Continuous job continues until manual extract
 
-**GIVEN** a continuous job with `dailyFatigueCost` > 0
+**GIVEN** a continuous job with `continuousJob: true` and `resolutionMode: 'tick'`
 
-**WHEN** the resident's fatigue reaches 0 (or a configured minimum)
+**WHEN** the resident's fatigue reaches the configured minimum
 
-**THEN** the resident is automatically removed from the slot and enters a rest state; the POI pauses production until a valid replacement is assigned
+**THEN** the job stops producing rewards but the resident remains assigned until manually extracted
 
-**Visual contract:** resident token slides back to the roster; POI halo dims; a brief tooltip/text signals "too tired"
+**Visual contract:** resident card is disabled; POI halo dims or turns warning; resource `+` stops
 
-**Test:** `poiFamilyRegressions.spec.ts` — `should extract a tired resident from a continuous job`
+**Test:** `poiFamilyRegressions.spec.ts` — `should pause reward stream when a resident is exhausted`
 
-### J-004 — Rest and resume
+### J-004 — Manual extract resets the job
 
-**GIVEN** a continuous job that was paused because the resident was exhausted
+**GIVEN** an exhausted or finished resident in a continuous job slot
 
-**WHEN** the same resident's fatigue regenerates over time
+**WHEN** the user extracts the resident
 
-**THEN** the resident returns to the slot and production resumes without user intervention
+**THEN** the slot is empty, the resident returns to the roster, and the POI returns to `idle`
 
-**Visual contract:** resident token flies back to the slot; resource `+` reappears
-
-**Test:** `poiFamilyRegressions.spec.ts` — `should re-assign a rested resident to a continuous job`
-
-### J-005 — Never-ending continuous job
-
-**GIVEN** a continuous job with the option to never stop (or `continuousJob: true` and `supportsAutoRepeat: true`)
-
-**WHEN** the resident is removed or replaced
-
-**THEN** the job stops producing; when a new compatible resident is added, the user must press Start/Embark again
-
-**Visual contract:** Start CTA becomes active again when a valid resident is assigned
+**Visual contract:** resident token flies back to the roster; the CTA returns to Start
 
 **Test:** `poiFamilyRegressions.spec.ts` — `should cancel a continuous job when the resident is extracted`
 
@@ -128,8 +115,7 @@ idle ──(assign)──► ready ──(start)──► running
 - **One-shot:** a Collect CTA appears at completion; rewards are applied on click; resident returns to roster.
 - **Continuous:** no Collect CTA; rewards are applied automatically each tick; resident stays unless extracted.
 - **Resource HUD delta:** the `dailyRewardProfile` drives a small `+<resource>` animation on the relevant resource row.
-- **Fatigue bar / status:** resident card shows fatigue depletion; at threshold, card is disabled and the resident is extracted.
-- **Rest state:** resident is `Resting` (not `Away`) until fatigue regenerates; continuous jobs can auto-restart if `continuousJob` is set and `supportsAutoRepeat` is true.
+- **Fatigue bar / status:** resident card shows fatigue depletion; at threshold, card is disabled and reward production stops; the user must manually extract the resident.
 
 ## Invariants
 

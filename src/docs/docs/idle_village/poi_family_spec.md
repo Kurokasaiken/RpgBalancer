@@ -166,7 +166,7 @@ Resource HUD + Roster + Chronicle
 - [ ] Every POI is an `ActivityDefinition` from `IdleVillageConfig`; no hardcoded lists in pages.
 - [ ] No local timers; `TimeEngine` is the single source of time.
 - [ ] Drag flow never writes resident status; it changes the assignment store, and the roster re-derives.
-- [ ] Start/Embark is a pending intent that is invalidated on any state mutation.
+- [ ] Start/Embark begins the activity only when time is running and all required slots are valid.
 - [ ] `ActivitySlotModifier` (per slot index) and `residentRiskModifiers` (per slot blueprint) compose: environment multiplier + resident delta.
 - [ ] Every specialized POI behavior (quest, job, training, cooldown) is documented in a child spec and linked from this root.
 - [ ] Every spec links to its test command and evidence log.
