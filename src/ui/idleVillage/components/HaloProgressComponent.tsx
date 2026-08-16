@@ -93,7 +93,7 @@ const HaloProgressComponent = memo(({
           strokeWidth={strokeWidth}
           strokeDasharray={circumference}
           strokeDashoffset={offset}
-          strokeLinecap="round"
+          strokeLinecap="butt"
           animate={{
             strokeDashoffset: offset,
           }}

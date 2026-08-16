@@ -120,6 +120,15 @@ const EXTRA_PAGES: TestPageLink[] = [
     icon: '🔬',
     status: 'ok',
   },
+  // Non-kit page: Missing Hub — catalog of missing, mocked and draft components.
+  {
+    id: 'missing-hub',
+    title: 'Missing Hub',
+    description: 'Placeholder catalog for missing, mocked and draft Idle Village components',
+    path: '/missing-hub',
+    icon: '🕳️',
+    status: 'ok',
+  },
   // Non-kit page: Mockup to Component - visual handoff workflow lab.
   {
     id: 'mockup-to-component',

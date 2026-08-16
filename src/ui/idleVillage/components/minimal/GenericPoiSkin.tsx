@@ -558,7 +558,7 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
           fill="none"
           stroke="rgba(255,246,220,0.85)"
           strokeWidth={coronaMainWidth * 0.5}
-          strokeLinecap="round"
+          strokeLinecap="butt"
           strokeDasharray="0 1000"
           data-halo="meniscus"
           transform="rotate(-90)"
@@ -607,9 +607,9 @@ export function GenericPoiSkin(props: GenericPoiSkinProps): JSX.Element {
         </g>
 
         {isStone ? (
-          <ellipse cx="0" cy="0" rx={rimRx} ry={rimRy} fill="none" stroke="rgba(255,235,148,.34)" strokeWidth="0.8" strokeDasharray="20 100" strokeDashoffset="20" strokeLinecap="round" />
+          <ellipse cx="0" cy="0" rx={rimRx} ry={rimRy} fill="none" stroke="rgba(255,235,148,.34)" strokeWidth="0.8" strokeDasharray="20 100" strokeDashoffset="20" strokeLinecap="butt" />
         ) : (
-          <circle cx="0" cy="0" r={rimRx} fill="none" stroke="rgba(255,235,148,.32)" strokeWidth="0.8" strokeDasharray="22 71" strokeDashoffset="18" strokeLinecap="round" />
+          <circle cx="0" cy="0" r={rimRx} fill="none" stroke="rgba(255,235,148,.32)" strokeWidth="0.8" strokeDasharray="22 71" strokeDashoffset="18" strokeLinecap="butt" />
         )}
 
         {isStone ? (

@@ -259,45 +259,29 @@ export default function DayNightPoiSkin(props: DayNightPoiSkinProps): JSX.Elemen
 
         {d.outerGuide && (
           <>
-            {/* Layer 2: outer guide */}
-            <circle
-              cx="0"
-              cy="0"
-              r={outerGuideRadius}
-              fill="none"
-              style={{
-                stroke: ringColor,
-                strokeWidth: 1.6 * scaleFactor,
-                opacity: 0.16,
-                transition: 'stroke 400ms ease',
-              }}
-            />
+            {/* Layer 2: outer guide intentionally left empty.
+                The previous 0.16 opacity ring read as a stray binario around
+                the medallion and telegraphed the path before any progress was
+                made, violating the FROZEN contract. The layer flag is preserved
+                for the debug page and backward compatibility, but it now renders
+                nothing. */}
           </>
         )}
 
         {d.progressHalo && (
           <>
-            {/* Layer 3: progress halo track + arc (frozen-in-place on pause) */}
+            {/* Layer 3: progress halo arc only (frozen-in-place on pause).
+                The faded track ring has been removed: it read as a stray
+                binario around the medallion and violated the FROZEN contract
+                that nothing must telegraph the path at progress 0. */}
             <g transform="rotate(-90)" style={{ opacity: progress < 0.01 ? 0 : 1, transition: 'opacity 200ms ease' }}>
           <circle
             cx="0"
             cy="0"
             r={progressHaloRadius}
             fill="none"
-            style={{
-              stroke: ringColor,
-              strokeWidth: progressStrokeWidth,
-              opacity: 0.14,
-              transition: 'stroke 400ms ease',
-            }}
-          />
-          <circle
-            cx="0"
-            cy="0"
-            r={progressHaloRadius}
-            fill="none"
             strokeDasharray={progressDashArray}
-            strokeLinecap="round"
+            strokeLinecap="butt"
             filter={`url(#${glowFilterId})`}
             style={{
               stroke: glowColor,
