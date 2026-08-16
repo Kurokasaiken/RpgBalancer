@@ -240,7 +240,7 @@ export function MagicCircleHalo({
                   fill="none"
                   stroke={palette.glyphColor}
                   strokeWidth={config.glyphStrokeWidth}
-                  strokeLinecap="round"
+                  strokeLinecap="butt"
                   strokeLinejoin="round"
                   vectorEffect="non-scaling-stroke"
                 />

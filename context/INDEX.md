@@ -47,4 +47,8 @@ Format: `[filename](path) — one sentence — \`tag\``
 [.mw/runs/handoff-mockup-to-component-20260814.md](.mw/runs/handoff-mockup-to-component-20260814.md) — handoff di sessione: lezioni, errori, decisioni, prossimo passo — `handoff` `art-direction`
 [public/mockups/external/goblin-event-lab/MOCKUP.md](public/mockups/external/goblin-event-lab/MOCKUP.md) — esempio esterno di mockup (goblin invasion) su cui provare il pilot v2 — `evidence` `art-direction` `mockup`
 [.mw/runs/2026-08-15/pattern-candidate-poi-quest-dnd-overlay-test-hooks.md](.mw/runs/2026-08-15/pattern-candidate-poi-quest-dnd-overlay-test-hooks.md) — pattern: test hook fallback per E2E dnd-kit — `pattern` `idle-village` `testing`
+|[src/docs/docs/idle_village/village_event_system_spec.md](src/docs/docs/idle_village/village_event_system_spec.md) — event system, post-quest outcomes, world events, timeout — `idle-village` `events`
+|[src/docs/docs/idle_village/idle_village_gameplay_math_spec.md](src/docs/docs/idle_village/idle_village_gameplay_math_spec.md) — gameplay math: time, fatigue, injury, quest power, rewards — `idle-village` `math`
+|[src/docs/docs/idle_village/skill_check_workflow_spec.md](src/docs/docs/idle_village/skill_check_workflow_spec.md) — D20 and D100 skill check subsystems, spell creator gap — `idle-village` `skill`
+|[src/docs/docs/idle_village/quest_failure_and_recovery_spec.md](src/docs/docs/idle_village/quest_failure_and_recovery_spec.md) — quest failure, timeout, injury/death, recovery — `idle-village` `quest`
 [plans/PLAN-004-poi-quest-ui-regressions.md](plans/PLAN-004-poi-quest-ui-regressions.md) — piano di battaglia per ERR-028/030 — `plan` `idle-village` `bugfix"

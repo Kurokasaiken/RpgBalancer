@@ -23,6 +23,7 @@ const GameplayTestSimple = lazy(() => import('./ui/idleVillage/components/Gamepl
 const GameplayTestMinimal = lazy(() => import('./ui/idleVillage/components/GameplayTestMinimal'));
 const TestRosterPage = lazy(() => import('./ui/idleVillage/TestRosterPage'));
 const TestHub = lazy(() => import('./ui/idleVillage/TestHub').then(m => ({ default: m.TestHub })));
+const MissingHub = lazy(() => import('./ui/idleVillage/MissingHub').then(m => ({ default: m.MissingHub })));
 const SteamTrailerHub = lazy(() => import('./ui/idleVillage/SteamTrailerHub').then(m => ({ default: m.SteamTrailerHub })));
 const IdleVillageConfigRoute = lazy(() => import('./pages/idle-village-config'));
 const StyleLabDemoPage = lazy(() => import('./pages/style-lab-demo'));
@@ -162,6 +163,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/test';
   const isTestHubPath =
     typeof window !== 'undefined' && window.location.pathname === '/test-hub';
+  const isMissingHubPath =
+    typeof window !== 'undefined' && window.location.pathname === '/missing-hub';
   const isSteamTrailerHubPath =
     typeof window !== 'undefined' && window.location.pathname === '/test-hub/steam-trailer-hub';
   const isV9SkinSandboxPath =
@@ -432,6 +435,16 @@ function App() {
       <ErrorBoundary componentName="Test Hub">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Test Hub…</div>}>
           <TestHub />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMissingHubPath) {
+    return (
+      <ErrorBoundary componentName="Missing Hub">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Missing Hub…</div>}>
+          <MissingHub />
         </Suspense>
       </ErrorBoundary>
     );

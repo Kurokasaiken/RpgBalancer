@@ -15,14 +15,14 @@
   - `/minimal-gameplay` (primary)
   - `/idle-village` (secondary)
   - `/poi-quest-detail-roster-time-clock` (UI integration, RT-DAYN-002)
-- Last Certified: `2026-08-14`
+- Last Certified: `2026-08-15`
 - Last Updated By: `Devin (DOC-DAYN-STATUS-002)`
 - Related Contracts:
   - `[Time Engine Contract](time_engine_trusted.md)`
   - `[Minimal Gameplay Store](../minimal_gameplay_implementation_plan.md)`
   - `[Frozen Kits Pattern](../../../../ui/idleVillage/frozen/README.md)`
   - `[POI Quest Roster Time Clock Page](../poi_quest_detail_roster_time_clock_page_workflow.md)`
-- Notes: `RT-DAYN-002: runtime UI tests pass on /poi-quest-detail-roster-time-clock for halo progress, pause and day/night transition.`
+- Notes: `RT-DAYN-002: runtime UI tests pass on /poi-quest-detail-roster-time-clock for halo progress, pause and day/night transition.` SVG `metalNoiseId` now clips `feTurbulence` to the source circle with `feComposite in="mono" in2="SourceGraphic" operator="in"` to avoid rectangular alpha artifact on the core medallion. Progress halo `stroke-linecap` changed from `round` to `butt` to eliminate the starting dot / "quadratino" at the 12 o'clock origin.
 
 ## 1. Purpose
 The Day/Night Cycle System provides visual representation and control of the game's temporal progression. It displays the current phase (day/night), progress through the phase, and allows users to pause/resume the cycle. The system integrates with the Minimal Gameplay store to maintain temporal state consistency across the application.
@@ -214,6 +214,44 @@ requires:
 5. Evidence log with verification results
 
 ## 12. Change Log
+
+### 2026-08-15 (SVG metal-noise alpha-bleed fix)
+- **STATUS**: Visual fix applied to `DayNightPoiSkin` core medallion
+- **Problem**: `feTurbulence` noise in the `metalNoiseId` filter produced a rectangular (square) alpha artifact that protruded from the core medallion region, visible in both `/minimal-clock` and `/poi-quest-detail-roster-time-clock`.
+- **Root cause**: The SVG filter generated noise across its rectangular filter region; the output was not composited against the circular `SourceGraphic`, so the unclipped noise produced a visible square.
+- **Fix**: Added `feComposite in="mono" in2="SourceGraphic" operator="in"` after `feColorMatrix` in the `metalNoiseId` filter. This clips the monochrome noise to the opaque area of the source circle.
+- **Verification**: `npm run build:check` passes; Playwright screenshots of `/day-night-poi-skin-debug` and `/minimal-clock` show the square gone while the core medallion still retains its metal grain.
+- **Evidence**: `test-results/minimal-clock-metal-noise-fix.png`
+
+### 2026-08-15 (Progress halo starting dot fix)
+- **STATUS**: Visual fix applied to `DayNightPoiSkin` progress halo
+- **Problem**: When time starts and `cycleProgress` is near 0, the progress halo at the 12 o'clock origin showed a round starting dot (perceived as a small square/dot) because `stroke-linecap` was `round`.
+- **Root cause**: `stroke-linecap="round"` draws a semicircle at each end of a `stroke-dasharray` segment; when the dash is tiny, the two round caps overlap and create a visible dot at the top of the halo.
+- **Fix**: Changed the progress halo `<circle>` from `strokeLinecap="round"` to `strokeLinecap="butt"`. With `butt`, the stroke begins cleanly from the top with no dot; the full ring is still a closed circle because at `progress === 1` the dash covers the entire circumference.
+- **Verification**: `npm run build:check` passes; Playwright progression screenshots at `/day-night-poi-skin-debug` (progress 3%, 8%, 100%) show the halo starting clean from 12 o'clock.
+- **Evidence**: `test-results/debug-progress-5.png` (now clean origin)
+
+### 2026-08-15 (Generic POI and magic circle halo dot fix)
+- **STATUS**: Visual fix applied to `GenericPoiSkin` and `MagicCircleHalo`
+- **Problem**: On `/poi-quest-detail-roster-time-clock`, the quest medallion showed an unwanted bright dot at the top of the ring both at rest and as time started. Two independent `stroke-linecap="round"` instances caused the dot:
+  1. The decorative rim arc in `GenericPoiSkin` (`strokeDasharray="22 71"` / `20 100`) used `round` caps, producing a dot where the short arc started.
+  2. The hidden meniscus `<circle>` (`strokeDasharray="0 1000"`) used `round` caps, so a zero-length dash still rendered a round cap as a dot.
+- **Root cause**: `round` caps always append a semicircle at the end of a dash. When the dash is tiny or zero, that semicircle collapses to a visible dot.
+- **Fix**: Changed `GenericPoiSkin` decorative rim `ellipse`/`circle` and meniscus `circle` to `strokeLinecap="butt"`. Also changed `MagicCircleHalo` glyph paths and `HaloProgressComponent` progress circle to `butt` for the same reason.
+- **Verification**: `npm run build:check` passes; Playwright screenshot of `/poi-quest-detail-roster-time-clock` shows the top dot gone while the medallion and halo still render correctly.
+- **Evidence**: `test-results/poi-quest-square-0.png` (dot removed)
+
+### 2026-08-15 (Day/Night binario/outer guide and progress track removal)
+- **STATUS**: Visual fix applied to `DayNightPoiSkin`
+- **Problem**: The day/night clock showed a faint circular track ("binario") around the medallion at all times, which became more prominent as time started and remained after pausing. A second track ring was also rendered inside the progress halo layer. Both violated the FROZEN contract that no ring/track may telegraph the path at progress 0.
+- **Root cause**:
+  1. The `Layer 2: outer guide` `<circle>` was always drawn with `opacity: 0.16` regardless of `progress`.
+  2. The `Layer 3: progress halo` group contained a separate static track ring (`opacity: 0.14`) behind the animated progress arc.
+- **Fix**:
+  1. Left `Layer 2: outer guide` intentionally empty while keeping the layer flag for the debug page; the visual circle is no longer rendered.
+  2. Removed the static track `<circle>` from `Layer 3: progress halo`, keeping only the animated progress arc. The arc itself already hides with `g opacity: 0` when `progress < 0.01`.
+- **Verification**: `npm run build:check` passes; Playwright screenshots of `/day-night-poi-skin-debug` at progress 0% and 35% show no track/binario and a clean halo start.
+- **Evidence**: `test-results/daynight-debug-0.png`, `test-results/daynight-debug-35.png`
 
 ### 2026-04-24 (RT-DAYN-001 Audit Completed)
 - **STATUS**: Full compliance verified - implementation already aligned with trusted contract

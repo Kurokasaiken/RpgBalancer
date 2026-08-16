@@ -17,7 +17,7 @@ Indice unico dei componenti e integration contracts rilevanti per la vertical sl
 | Time Engine Contract | time | trusted | `src/docs/docs/idle_village/trusted/time_engine_trusted.md` | `/minimal-gameplay` | 2026-04-25 | Single tick source - INT-TIME-DAYNIGHT-001 completed, dual-layer verified |
 | POI Standard Contract | poi | trusted | `src/docs/docs/idle_village/trusted/poi_standard_trusted.md` | dedicated page | 2026-04-22 | ActivityCapsule family |
 | POI Detail Contract | poi-detail | trusted | `src/docs/docs/idle_village/trusted/poi_detail_trusted.md` | dedicated page | 2026-04-25 | PoiDetailSkinWrapper - TEST-POI-D-ALIGN-001 completed, integration verified |
-| Day/Night Contract | day-night | trusted | `src/docs/docs/idle_village/trusted/daynight_trusted.md` | `/minimal-gameplay` | 2026-04-24 | RT-DAYN-001 audit completed - fully compliant |
+| Day/Night Contract | day-night | trusted | `src/docs/docs/idle_village/trusted/daynight_trusted.md` | `/minimal-gameplay`, `/minimal-clock`, `/poi-quest-detail-roster-time-clock` | 2026-08-15 | Metal-noise square alpha-bleed fixed; `feComposite` clip to `SourceGraphic` verified. Progress halo `stroke-linecap` switched to `butt`. DayNightPoiSkin outer guide (binario) and progress halo track ring removed to eliminate the visible track around the medallion |
 | Roster/Drag Contract | roster-drag | trusted | `src/docs/docs/idle_village/trusted/roster_drag_trusted.md` + `src/ui/idleVillage/roster/index.ts` | `/test`, `/minimal-gameplay` | 2026-07-15 | VillageRosterSection, DragContext, statMatching - INT-DRAG-POI-ASSIGNMENT-001 completed, assignment verified. Shared bundle adopted by MinimalGameplayPage (RT-MG-ROSTER-ADOPT-007). Single source of truth for roster UI across all pages. |
 | WorldSurface Component Contract | world-surface-component | candidate | `src/docs/docs/plans/component_based_world_surface_plan.md` | `/world-surface-components` | 2026-07-21 | Component-based map with semantic grouping; candidate contract supersedes layer-centric manifest v1. Trusted doc TBD after Phase 6 close-out. |
 | Interaction Core (drag outcome, flight, extraction, bloom) | interaction-core | trusted | `src/docs/docs/idle_village/interaction_core_spec.md` | `/slot`, `/minimal-roster-slot-integration`, `/minimal-job-poi-roster-integration` | 2026-07-12 | useDragOutcome, DragOutcomeFlight, useExtractionSequence, bloomEffect, RosterDropVerdict, lockedResidentIds; slot blueprints now support role/emptyPenalty/residentRiskModifiers |
@@ -33,6 +33,7 @@ Indice unico dei componenti e integration contracts rilevanti per la vertical sl
 || POI Maintenance Contract | poi-maintenance | draft | `src/docs/docs/idle_village/poi_maintenance_spec.md` | `/poi-quest-detail-roster-time-clock` | 2026-08-15 | Resource upkeep / building condition. |
 || clockKit Day/Night Time Engine | time-clock | candidate | `src/ui/idleVillage/frozen/kits/clockKit.md` | `/minimal-clock`, `/poi-quest-detail-roster-time-clock` | 2026-08-15 | `DayNightTimeEngineStrip` one-line drop-in; owns canonical `tick()` loop; `DayNightTimeEngineStripStandalone` mounts providers; Space is a global page-wide play/pause shortcut. No local timers in pages. Tests: `poiQuestRegressions.spec.ts` and `clockKitSpaceControl.spec.ts`. |
 ||| DayNightTimeEngineStrip | time | trusted | `src/docs/docs/idle_village/trusted/day_night_time_engine_strip_trusted.md` | `/minimal-clock`, `/poi-quest-detail-roster-time-clock` | 2026-08-15 | Component that owns the canonical `tick()` loop and the global `Space` play/pause shortcut. Display from `useMinimalGameplay` store; no local time state. Tests: `clockKitSpaceControl.spec.ts`. |
+|||| PgCard / PgToken | roster | trusted | `src/docs/docs/idle_village/trusted/pgcard_trusted.md` | `/minimal-pgcard`, `/test`, `/minimal-gameplay` | 2026-08-15 | Draggable resident card/token: portrait, frame, drag/freeze semantics, spring-back, magnetic tilt. Kit: `pgcardKit.md`. |
 
 ## Regole di aggiornamento
 
@@ -95,7 +96,7 @@ Questo index segue le regole governative:
 - **Contract**: `src/docs/docs/idle_village/trusted/daynight_trusted.md`
 - **Status**: trusted
 - **Area**: Temporal cycle system
-- **Last Certified**: 2026-04-24
+- **Last Certified**: 2026-08-15
 - **Notes**: RT-DAYN-001 audit completed - fully compliant with trusted contract
 
 ### Roster/Drag System
@@ -127,22 +128,22 @@ Questo index segue le regole governative:
 
 | Kit ID | Status | Source of Truth | Runtime/Test Page | Last Certified | Owner / Notes |
 | --- | --- | --- | --- | --- | --- |
-| rosterKit | frozen | src/ui/idleVillage/frozen/kits/rosterKit.md | /minimal-roster | 2026-07-14 | KIT_REGISTRY status: certified |
-| pgcardKit | frozen | src/ui/idleVillage/frozen/kits/pgcardKit.md | N/A | 2026-07-14 | KIT_REGISTRY status: certified |
-| slotRackKit | frozen | src/ui/idleVillage/frozen/kits/slotRackKit.md | /minimal-slotRack | 2026-07-14 | KIT_REGISTRY status: certified |
-| destinyAstrolabeKit | draft | TBD | /minimal-destiny-astrolabe | 2026-07-14 | KIT_REGISTRY status: certified |
-| poiKit | draft | TBD | /minimal-poi | 2026-07-14 | KIT_REGISTRY status: certified |
+| rosterKit | frozen | src/ui/idleVillage/frozen/kits/rosterKit.md | /minimal-roster | 2026-08-15 | Frozen re-export of VillageRosterSection / RosterDraggable with FULL_PROVIDER_CHAIN shell. |
+| pgcardKit | frozen | src/ui/idleVillage/frozen/kits/pgcardKit.md | /minimal-pgcard | 2026-08-15 | Frozen re-export of PgCard with FULL_PROVIDER_CHAIN shell. |
+| slotRackKit | frozen | src/ui/idleVillage/frozen/kits/slotRackKit.md | /minimal-slotRack | 2026-08-15 | Frozen re-export of ResidentSlotRack / ResidentSlotRackSkin with FULL_PROVIDER_CHAIN shell. |
+| destinyAstrolabeKit | candidate | `src/ui/idleVillage/frozen/kits/destinyAstrolabeKit.md` | `/minimal-destiny-astrolabe` | 2026-08-15 | Frozen re-export of DestinyAstrolabe with SkinSystemProvider shell; candidate pending full certification. |
+| poiKit | candidate | `src/ui/idleVillage/frozen/kits/poiKit.md` | `/minimal-poi` | 2026-08-15 | Frozen re-export of JobPOI/ActivityPOI/QuestPOI/DayNightPOI with DndContext provider chain. |
 | clockKit | frozen | src/ui/idleVillage/frozen/kits/clockKit.md | /minimal-clock | 2026-07-14 | KIT_REGISTRY status: certified |
-| resourceHudKit | draft | src/ui/idleVillage/frozen/kits/resourceHudKit.md | /minimal-resourcehud | 2026-07-14 | KIT_REGISTRY status: draft |
-| questCardKit | draft | src/ui/idleVillage/frozen/kits/questCardKit.md | /minimal-questcard | 2026-07-14 | KIT_REGISTRY status: draft |
+| resourceHudKit | candidate | `src/ui/idleVillage/frozen/kits/resourceHudKit.md` | `/minimal-resourcehud` | 2026-08-15 | Frozen re-export of ResourcePanel with SkinSystemProvider + SandboxTimingProvider shell. |
+| questCardKit | candidate | `src/ui/idleVillage/frozen/kits/questCardKit.md` | `/minimal-questcard` | 2026-08-15 | Frozen re-export of QuestCard with SkinSystemProvider + SandboxTimingProvider shell. |
 | outcomeKit | draft | src/ui/idleVillage/frozen/kits/outcomeKit.md | /minimal-outcome | 2026-07-14 | KIT_REGISTRY status: draft |
 | marketKit | draft | src/ui/idleVillage/frozen/kits/marketKit.md | /minimal-market | 2026-07-14 | KIT_REGISTRY status: draft |
-| skillCheckKit | draft | src/ui/idleVillage/frozen/kits/skillCheckKit.md | N/A | 2026-07-14 | KIT_REGISTRY status: draft |
-| activeHudKit | draft | src/ui/idleVillage/frozen/kits/activeHudKit.md | N/A | 2026-07-14 | KIT_REGISTRY status: draft |
-| activityCapsuleKit | draft | src/ui/idleVillage/frozen/kits/activityCapsuleKit.md | N/A | 2026-07-14 | KIT_REGISTRY status: draft |
-| slottedMedalKit | draft | src/ui/idleVillage/frozen/kits/slottedMedalKit.md | N/A | 2026-07-14 | KIT_REGISTRY status: draft |
-| jobDetailKit | draft | TBD | N/A | 2026-07-14 | KIT_REGISTRY status: draft |
-| locationDetailKit | candidate | src/ui/idleVillage/frozen/kits/locationDetailKit.tsx | /minimal-location-detail | 2026-07-15 | ancient-ruins demo location now derived from C2 `ActivityDefinition` |
+| skillCheckKit | candidate | `src/ui/idleVillage/frozen/kits/skillCheckKit.md` | `/minimal-skillcheck` | 2026-08-15 | Frozen re-export of SkillCheckComponent with SkinSystemProvider + SandboxTimingProvider shell. |
+| activeHudKit | candidate | `src/ui/idleVillage/frozen/kits/activeHudKit.md` | N/A | 2026-08-15 | Frozen re-export of ActiveHUD with FULL_PROVIDER_CHAIN shell. |
+| activityCapsuleKit | candidate | `src/ui/idleVillage/frozen/kits/activityCapsuleKit.md` | `/minimal-poi` | 2026-08-15 | Frozen re-export of ActivityCapsule with FULL_PROVIDER_CHAIN shell. |
+| slottedMedalKit | candidate | `src/ui/idleVillage/frozen/kits/slottedMedalKit.md` | `/minimal-slot` | 2026-08-15 | Frozen re-export of SlottedMedal with FULL_PROVIDER_CHAIN shell. |
+| jobDetailKit | candidate | `src/ui/idleVillage/frozen/kits/jobDetailKit.md` | `/minimal-job-detail` | 2026-08-15 | Canonical JobDetail panel with demo jobs and SkinSystemProvider + SandboxTimingProvider shell. |
+| locationDetailKit | candidate | `src/ui/idleVillage/frozen/kits/locationDetailKit.md` | `/minimal-location-detail` | 2026-08-15 | Canonical LocationDetail panel; ancient-ruins demo location derived from C2 `ActivityDefinition`. |
 | rosterSlotKit | draft | TBD | /minimal-roster-slot-integration | 2026-07-14 | KIT_REGISTRY status: draft |
 | jobPoiRosterKit | draft | TBD | /minimal-job-poi-roster-integration | 2026-07-14 | KIT_REGISTRY status: draft |
 | jobPoiRosterTimeKit | draft | TBD | /minimal-job-poi-roster-time-integration | 2026-07-14 | KIT_REGISTRY status: draft |
@@ -175,5 +176,5 @@ Questo index segue le regole governative:
 
 ---
 
-*Last Updated: 2026-08-13*
-*Status: Reconciled from KIT_REGISTRY + gameplay catalog session.*
+*Last Updated: 2026-08-15*
+*Status: Reconciled from KIT_REGISTRY + gameplay catalog session + time engine / POI family / clock docs alignment.*
