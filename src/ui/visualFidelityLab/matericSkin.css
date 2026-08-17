@@ -60,7 +60,6 @@
   --mat-card-shadow:
     0 4px 10px rgba(0, 0, 0, 0.5),
     0 1px 0 rgba(0, 0, 0, 0.3),
-    inset 0 0 0 1px rgba(198, 150, 54, 0.32),
     inset 0 1px 0 rgba(224, 178, 66, 0.14);
 
   /* Status seal (AAA critique point #3): swaps the plain color-only accent

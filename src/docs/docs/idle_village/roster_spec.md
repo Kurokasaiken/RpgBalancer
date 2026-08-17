@@ -46,8 +46,8 @@ type: component-spec
 ### Scenario 4: Extraction
 
 **Given:** a resident is locked in a slot
-**When:** the user press-and-holds the occupied slot for ~560ms
-**Then:** `useExtractionSequence` runs teeth retract + bezel open, then `onExtracted` removes the resident and a return flight lands in the roster
+**When:** the user press-and-holds the occupied slot
+**Then:** `useExtractionSequence` runs a hold (560ms), teeth retract + bezel open (560ms), overshoot (300ms), then `onExtracted` removes the resident and a return flight lands in the roster
 **Visual contract:** Slot chip stays until `onExtracted`; then a FlightProxy carries the card back to the roster
 
 ## Invariants

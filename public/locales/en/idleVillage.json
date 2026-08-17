@@ -456,7 +456,8 @@
       "spawnObjects": "Spawn 60",
       "clearObjects": "Clear",
       "spawnWonders": "Spawn wonders",
-      "despawnWonders": "Despawn wonders"
+      "despawnWonders": "Despawn wonders",
+      "breath": "Breath"
     }
   },
   "worldEvents": {

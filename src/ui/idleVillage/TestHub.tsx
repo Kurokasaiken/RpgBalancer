@@ -93,6 +93,15 @@ const EXTRA_PAGES: TestPageLink[] = [
     icon: '🎨',
     status: 'ok',
   },
+  // Non-kit page: side-by-side comparison between /design-system and /visual-fidelity-lab.
+  {
+    id: 'design-vs-fidelity',
+    title: 'Design vs Fidelity',
+    description: 'Compare the canonical UI reference with the visual fidelity candidate and missing components',
+    path: '/design-vs-fidelity',
+    icon: '⚖️',
+    status: 'ok',
+  },
   // Non-kit page: Steam Trailer Hub — grouped trailer scenes.
   {
     id: 'steam-trailer-hub',

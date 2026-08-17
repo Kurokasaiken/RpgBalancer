@@ -201,6 +201,24 @@ const ENTRIES: CatalogEntry[] = [
   },
   /* ── Primitives ────────────────────────────────────────────────────── */
   {
+    id: 'material-stat-bar',
+    title: 'MaterialStatBar',
+    category: 'primitive',
+    statusOverride: 'candidate',
+    maturity: 'stable',
+    visibility: 'public',
+    visualRole: 'a carved channel showing vital energy — HP, stamina, fatigue',
+    usage: ['stat bars in roster', 'stat bars in character sheet', 'progress bars for vitals'],
+    forbiddenUsage: ['generic progress bars', 'XP bars'],
+    alternative: 'MaterialDial for cyclic progress',
+    bindings: ['--skin-statbar-hp-start', '--skin-statbar-stamina-start', '--skin-statbar-fatigue-start', '--mat-hp-fill', '--mat-stamina-fill'],
+    compositionRules: {
+      primaryContexts: ['roster', 'character', 'vital display'],
+      forbiddenContexts: ['quest progress', 'crafting progress'],
+    },
+    sourcePath: 'src/ui/idleVillage/skins/primitives/index.ts',
+  },
+  {
     id: 'skin-button',
     title: 'SkinButton',
     category: 'primitive',

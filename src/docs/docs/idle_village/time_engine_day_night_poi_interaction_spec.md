@@ -59,6 +59,8 @@ When `pauseGame()` is called:
 
 ## Runtime Evidence
 
+Evidence log: `test-results/minimal-clock-time-engine-2026-08-15.md`
+
 `/poi-quest-detail-roster-time-clock` Playwright suite (2026-08-14):
 
 - `should advance the day/night cycle halo while time runs` — after resuming and selecting 4x speed, `currentTick > 0`, `data-progress > 0` and `data-paused="false"`.

@@ -56,6 +56,15 @@ When the user starts dragging a resident:
 - `lockedResidentIds` includes assigned + flying residents
 - Drag flow never writes resident `status`
 
+## Runtime Evidence
+
+Playwright suites:
+
+- `tests/e2e/idleVillage/testRosterTimeEngine.spec.ts` — roster reflects `away`/`available`/`injured`/`dead` status as `TimeEngine` advances.
+- `tests/e2e/idleVillage/poiQuestDetailRosterTimeClock.spec.ts` — resident assignment and release through quest completion.
+
+Evidence log: `test-results/poi-quest-detail-roster-time-clock-err-028-030-2026-08-15.md`
+
 ## References
 
 - [`time_engine_spec.md`](./time_engine_spec.md)

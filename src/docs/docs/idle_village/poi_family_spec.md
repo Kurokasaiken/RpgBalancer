@@ -201,6 +201,7 @@ npm run kanban:lint
 - Template: `.mw/templates/ai-friendly-spec.md`
 - Plan: `plans/PLAN-005-poi-family-ai-friendly.md`
 - Existing quest evidence: `test-results/poi-quest-detail-roster-time-clock-err-028-030-2026-08-15.md`
+- Doc alignment evidence: `test-results/poi-family-docs-alignment-2026-08-15.md`
 - Build log: `test-results/build-check-2026-08-15.log` (passed)
 
 ## Child specs

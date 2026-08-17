@@ -52,3 +52,4 @@ Format: `[filename](path) — one sentence — \`tag\``
 |[src/docs/docs/idle_village/skill_check_workflow_spec.md](src/docs/docs/idle_village/skill_check_workflow_spec.md) — D20 and D100 skill check subsystems, spell creator gap — `idle-village` `skill`
 |[src/docs/docs/idle_village/quest_failure_and_recovery_spec.md](src/docs/docs/idle_village/quest_failure_and_recovery_spec.md) — quest failure, timeout, injury/death, recovery — `idle-village` `quest`
 [plans/PLAN-004-poi-quest-ui-regressions.md](plans/PLAN-004-poi-quest-ui-regressions.md) — piano di battaglia per ERR-028/030 — `plan` `idle-village` `bugfix"
+[src/docs/docs/plans/world_surface_reactive_artifact_plan.md](src/docs/docs/plans/world_surface_reactive_artifact_plan.md) — piano no-parallax: mappa come manufatto reattivo — `plan` `world-surface` `no-parallax`

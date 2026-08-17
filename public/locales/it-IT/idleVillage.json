@@ -495,7 +495,8 @@
     },
     "debug": {
       "spawnWonders": "Mostra meraviglie",
-      "despawnWonders": "Nascondi meraviglie"
+      "despawnWonders": "Nascondi meraviglie",
+      "breath": "Respira"
     }
   }
 }

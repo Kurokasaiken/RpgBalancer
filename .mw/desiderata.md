@@ -190,3 +190,26 @@ Ogni superficie di integrazione (pagina, kit, flusso) deve avere un documento **
 - Nome e posizione del template AI-friendly (`.mw/templates/ai-friendly-spec.md` o `src/docs/docs/idle_village/_template.md`).
 - E2E-only, unit-only o entrambi per ogni integrazione.
 - Quando un test è sufficiente oltre Playwright (es. unit per `QuestPowerEngine`).
+
+---
+
+## v8 — Golden UI Foundation
+
+**Status:** `FROZEN`
+**Date:** 2026-08-17
+**Authorized by:** Fausto
+**Reason:** avallo via "3" in sessione
+
+**Intento del Director:**
+Il piano Golden UI Foundation v2 è approvato come direzione. Non costruiamo un design system astratto: stabiliamo un processo per trovare e congelare la qualità visiva canonica di Idle Village, partendo da un audit forense, estrarre il DNA dai componenti migliori (Golden 0), e usarlo per produrre 5 Golden Screens con baseline deterministiche.
+
+**Formulazione proposta da Claude:**
+Convalidare il DNA visivo di Idle Village attraverso: (1) una fase di Target Freeze condizionale su artefatti visivi reali; (2) un Forensic UI/Art Audit con la metrica Identity; (3) una fase Golden 0 — Trusted Component Forensics che non presuppone `PgCard` + `SlottedMedal` ma li usa come candidati iniziali; (4) un Visual DNA Contract con token, materiali, tipografia e invariants; (5) una Golden Foundation minimale derivata dalle 5 Golden Screens; (6) `/design-system` come UI Lab; (7) screenshot baseline Playwright con metadati semantici e distinzione hard/soft regression; (8) un agent skill che dice agli agenti cosa è Golden, cosa è legacy e cosa non può cambiare. Out of scope: Storybook, AestheticPolicyEngine, freeze di N componenti prima dell'audit, Figma come source of truth.
+
+**Formulazione approvata (FROZEN):**
+Il progetto RPG adotta il **Golden UI Foundation** come processo per determinare e congelare la qualità visiva canonica del gioco. Il percorso parte da: (1) **Target Freeze** condizionale su artefatti visivi reali in `Prismatic Wanderlust`, con approvazione del Director sui due pilastri (Wilderness/Empire) e del **Kill List**; (2) **Forensic UI/Art Audit** con criteri Visual Quality, DNA Fidelity, Identity, **Bible Compliance**, **Fidelity**, Reuse, Technical Health; (3) **Golden 0 — Trusted Component Forensics** sui 2–3 componenti top dell'audit, senza presupporre `PgCard` + `SlottedMedal`, mappati contro la **bibbia artistica** `src/docs/docs/plans/art_direction_plan.md` v0.10, la **costituzione del Visual Fidelity Lab** `src/ui/visualFidelityLab/fidelity-notes.md` e la **foundation recipe** `src/ui/visualFidelityLab/foundationRecipe.ts`; (4) **Visual DNA Contract** con token semantici, **Shared Material Recipe** (10 layer), **Silhouette-Adaptation Laws**, Material/Frame libraries, tipografia e `visualInvariants`; (5) **Golden Foundation** minimale, costruita solo ciò che serve alle 5 Golden Screens (World Map, Character, Settlement, Quest/Expedition, Event/Outcome); (6) **`/design-system`, `/visual-fidelity-lab` e `/design-vs-fidelity` come UI Labs**; (7) **baseline deterministiche Playwright** con metadati semantici e distinzione hard/soft regression; (8) **agent skill** per bloccare la deriva visiva. Esplicitamente out of scope: Storybook, `AestheticPolicyEngine`, freeze di un numero fisso di componenti prima dell'audit, Figma come source of truth, ricostruire `/visual-fidelity-lab` o `/design-vs-fidelity`. Il piano di riferimento è `.mw/runs/2026-08-17-golden-ui-foundation/golden_ui_foundation_plan_v2.md` e l'audit iniziale è `.mw/runs/2026-08-17-golden-ui-foundation/UI_AUDIT.md`.
+
+**Still unresolved:**
+- Quale skin diverrà ufficialmente canonical: `Prismatic Wanderlust` è candidata, ma deve essere approvata su artefatti visivi reali (Phase 0).
+- Quali componenti entreranno nel Golden 0 dipende dai risultati dell'audit e dalla review visiva.
+- Quale tool e soglia di diff per le baseline deterministiche.

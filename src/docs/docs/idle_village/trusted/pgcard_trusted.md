@@ -41,6 +41,7 @@ CustomDragOverlay / FlightProxy
 ### Frame / Rarity Ring
 - `frameType` (`heroic`, `minimal`, `wilderness`, `empire`, etc.) is resolved by `getPgCardFrameTokens` / `getPgCardFrameStyle`.
 - Border radius, corner decorations, accent color are all token-driven (`pgCardFrameConfig`).
+- The base card has **no hardcoded outer border**; the frame is provided by `pgCardFrameStyle` and `pgcard-frame-*` classes.
 - Rarity ring is part of the frame; it is not a separate CSS file.
 
 ### Status and Compatibility

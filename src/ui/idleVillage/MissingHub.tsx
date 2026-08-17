@@ -19,7 +19,7 @@ export interface MissingItem {
   note: string;
 }
 
-const MISSING_ITEMS: MissingItem[] = [
+export const MISSING_ITEMS: MissingItem[] = [
   // Draft kits / contracts
   { id: 'questPoiKit', name: 'questPoiKit', area: 'POI', status: 'draft', note: 'Manca il contratto per certified' },
   { id: 'poiJob', name: 'POI Job Contract', area: 'POI', status: 'draft', note: 'One-shot / continuous jobs, stamina, auto-collect' },
@@ -48,6 +48,13 @@ const MISSING_ITEMS: MissingItem[] = [
   { id: 'rewardVariance', name: 'Reward Variance', area: 'Math', status: 'stub', note: 'Usa solo la prima rewardCategory e il midpoint' },
   { id: 'injuryRecovery', name: 'Injury Recovery Logic', area: 'Math', status: 'stub', note: 'Light injury dura 1 giorno; recovery completa TODO' },
   { id: 'levelUp', name: 'Level-Up Stat Growth', area: 'Progression', status: 'missing', note: 'XP assegnato; crescita non connessa' },
+
+  // Trailer / marketing components
+  { id: 'threatPresence', name: 'ThreatPresence', area: 'Trailer', status: 'missing', note: 'P1 TrailerThreatIter V3: 4 static frames for threat presence' },
+  { id: 'trailerThreatAlert', name: 'TrailerThreatAlert', area: 'Trailer', status: 'missing', note: 'Alert/notification tost per fase di minaccia nel trailer' },
+  { id: 'trailerThreatPoiMarker', name: 'TrailerThreatPoiMarker', area: 'Trailer', status: 'missing', note: 'Poi marker wrapper opzionale per threat iter' },
+  { id: 'wanderlustHeading', name: 'WanderlustHeading', area: 'Trailer', status: 'missing', note: 'Titolo scena Outro "WANDERLUST TRIUMPH"' },
+  { id: 'outcomeModal', name: 'OutcomeModal', area: 'UI', status: 'missing', note: 'Modal esito post skill-check; esiste solo skin config' },
 ];
 
 const STATUS_LABEL: Record<MissingItem['status'], string> = {
