@@ -15,6 +15,7 @@ import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 
 const WorldSurfaceWaves = lazy(() => import('./WorldSurfaceWaves'));
 const WorldSurfaceClouds = lazy(() => import('./WorldSurfaceClouds'));
+const WorldSurfaceCloudShadows = lazy(() => import('./WorldSurfaceCloudShadows'));
 const WorldSurfaceFoam = lazy(() => import('./WorldSurfaceFoam'));
 const WorldSurfaceBirds = lazy(() => import('./WorldSurfaceBirds'));
 const WorldSurfaceCreatures = lazy(() => import('./WorldSurfaceCreatures'));
@@ -89,6 +90,7 @@ interface WorldSurfaceRendererProps {
   onEventCardComplete?: () => void;
   /** Called when the event card is ready to be unmounted. */
   onEventCardClose?: () => void;
+  children?: React.ReactNode;
 }
 
 interface EffectiveLayer extends WorldSurfaceLayer {
@@ -198,11 +200,12 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
   imageFit: imageFitProp,
   autoFit: autoFitProp,
   autoFitTrigger = 1,
-  breathEnabled = true,
+  breathEnabled = false,
   eventCovered = false,
   showEventCard = false,
   onEventCardComplete,
   onEventCardClose,
+  children,
 }) => {
   const { t } = useTranslation('idleVillage');
   const translate = useCallback(
@@ -581,6 +584,13 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
           {/* Wave marks break on the shoreline, at the bottom of the atmosphere
               stack: they belong to the water surface, not to the sky. */}
           <WorldSurfaceWaves zIndex={cloudZIndex - 4} />
+          {/* Cloud shadows drift across the land, below the weather. */}
+          {breathEnabled && (
+            <WorldSurfaceCloudShadows
+              canvasSize={manifest.coordinateSystem.canvas}
+              zIndex={cloudZIndex - 5}
+            />
+          )}
           {/* Event announcement lives in the map, not the UI, so it pans and zooms
               with the world. */}
           <WorldSurfaceEventCard
@@ -595,6 +605,7 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
             camera={camera}
           />
         </Suspense>
+        {children}
       </div>
 
       {/*

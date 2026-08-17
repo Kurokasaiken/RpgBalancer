@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import DayNightPoiSkin, { type DayNightDebugLayers } from '@/ui/idleVillage/components/minimal/DayNightPoiSkin';
+import { DayNightPoiSkin, type DayNightDebugLayers } from '@/ui/idleVillage/frozen/kits/poiKit';
 
 const layerLabels: Record<keyof DayNightDebugLayers, string> = {
   darkBaseRing: 'Dark base ring fill',

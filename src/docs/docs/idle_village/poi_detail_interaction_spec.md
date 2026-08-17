@@ -38,7 +38,7 @@ When the user clicks a POI:
 - `FloatingPanel` opens at a default or remembered position
 - `ActivityCapsuleDetailSkinAware` receives the same `activityId`
 - Panel header, POI display, slot rack, and CTA render
-- For Quest POIs, the game is paused so the player can assemble the party without time passing
+- Time does not pause automatically when a detail opens; the player can keep time running while assembling the party
 
 When a slot is assigned inside the detail:
 
@@ -63,17 +63,18 @@ When Start is clicked:
 - Detail does not own activity state; it only delegates actions to the store/TimeEngine
 - `FloatingPanel` is non-modal; the map remains interactive
 - The same slot blueprints are used by POI and Detail (single source: `ActivityDefinition`)
-- Opening a Quest POI detail pauses the game
-- Closing a Quest POI detail resumes the canonical clock
+- Opening or closing a POI detail does not change the global pause/play state
 
 ## Runtime Evidence
 
-Playwright suite `poiQuestDetailRosterTimeClock.spec.ts` (2026-08-14):
+Playwright suite `poiQuestDetailRosterTimeClock.spec.ts` (2026-08-15):
 
 - `should open the Quest POI detail and show the ResidentSlotRack` — click on `QuestPOI` opens `poi-detail-wrapper-test`; `resident-slot-rack-root` is visible and at least one `slot-button-*` is present.
-- `should pause the game when opening the Quest POI detail` — `__idleVillageTestHooks.getQuestState().isPaused` flips from `false` to `true` after the click.
-- `should drag the POI detail panel by its header` — the detail `FloatingPanel` moves when the header is dragged (pre-existing coverage).
-- `should resume the game when the POI detail is closed and reopen on POI click` — closing `poi-detail-wrapper-test` flips `__idleVillageTestHooks.getQuestState().isPaused` back to `false`; clicking `QuestPOI` again reopens the detail.
+- `should drag the POI detail panel by its header` — the detail `FloatingPanel` moves when the header is dragged.
+- `should preserve the pre-open pause state when the POI detail is closed` — closing the detail restores the same `isPaused` value that was in effect before opening.
+- `should keep the resident drag preview visible when hovering the POI detail` — the drag overlay stays above the floating panel.
+
+Evidence log: `test-results/poi-quest-detail-roster-time-clock-err-028-030-2026-08-15.md`
 
 ## Comportamento atteso (2026-08-15)
 

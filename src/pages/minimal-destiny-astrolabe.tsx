@@ -281,6 +281,29 @@ export default function MinimalDestinyAstrolabe() {
           </div>
         </div>
       </div>
+
+      {/* ════════ BOARD SHAPE EXAMPLE — circle + star ════════ */}
+      <div className="bg-gray-800 p-6 rounded-lg border border-amber-600/30 mt-6">
+        <h2 className="text-xl font-bold text-amber-400 mb-4">Example D100 Board (circle = SKILL, star = CHECK)</h2>
+        <div className="flex flex-col md:flex-row items-start gap-8">
+          <img
+            src="/example-circle-star.svg"
+            alt="D100 board example: circle = SKILL, star = CHECK"
+            className="w-full max-w-sm rounded-lg block"
+          />
+          <ul className="text-sm space-y-2 mt-2 md:mt-0">
+            <li><span className="inline-block w-3 h-3 rounded-full mr-2" style={{ background: '#000' }} />Black lines = <b>5 stat axes</b> (length = stat value, drawn on top)</li>
+            <li><span className="inline-block w-3 h-3 rounded-full mr-2" style={{ background: '#fdd97b' }} />Gold star = <b>win</b> (tips touch boundary at parity)</li>
+            <li><span className="inline-block w-3 h-3 rounded-full mr-2" style={{ background: '#b08035' }} />Bronze stroke = <b>almost</b> (fixed %, border of the star)</li>
+            <li><span className="inline-block w-3 h-3 rounded-full mr-2" style={{ background: '#fff' }} />White dot = <b>bigwin</b> (center)</li>
+            <li><span className="inline-block w-3 h-3 rounded-full mr-2" style={{ background: '#5a6bff' }} />Indigo ring = <b>fail</b></li>
+            <li><span className="inline-block w-3 h-3 rounded-full mr-2" style={{ background: '#9e2b20' }} />Crimson ring = <b>epicfail</b> (inner rim)</li>
+            <li><span className="inline-block w-3 h-3 rounded-full mr-2" style={{ background: '#ff3df0' }} />Magenta band = <b>wounded</b> (cross-cutting)</li>
+            <li><span className="inline-block w-3 h-3 rounded-full mr-2" style={{ background: '#02020b' }} />Black band = <b>dead</b> (cross-cutting)</li>
+            <li><span className="inline-block w-3 h-3 rounded-full mr-2" style={{ background: '#3fa9f5' }} />Cyan dot = <b>dice ball</b></li>
+          </ul>
+        </div>
+      </div>
     </div>
     </SkinSystemProvider>
   );

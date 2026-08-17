@@ -160,13 +160,11 @@ const WanderlustRosterCard = memo<WanderlustRosterCardProps>(({
 
   // Hover / active hero glow tokens (no transform, so first-card border is not clipped)
   const baseInsetShadow = `
-    inset 0 1px 0 rgba(223,184,87,0.10),
     inset 0 2px 10px rgba(0,0,0,0.35),
     inset 0 -1px 0 rgba(0,0,0,0.30)
   `;
   const hoverInsetShadow = `
     inset 0 1px 0 rgba(240,207,106,0.18),
-    inset 0 0 0 1px rgba(223,184,87,0.25),
     inset 0 2px 10px rgba(0,0,0,0.35),
     inset 0 -1px 0 rgba(0,0,0,0.30)
   `;

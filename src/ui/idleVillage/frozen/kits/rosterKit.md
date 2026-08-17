@@ -1,9 +1,9 @@
 # rosterKit
 
-**Status:** Draft (pending certification)
+**Status:** frozen
 **Version:** 1.0.0
-**Owner:** TBD
-**Last Updated:** 2026-05-21
+**Owner:** Devin
+**Last Updated:** 2026-08-15
 
 ## Source
 - **Canonical component:** `VillageRosterSection` (`src/ui/idleVillage/components/VillageRosterSection.tsx`)
@@ -16,6 +16,8 @@
 ```tsx
 import {
   VillageRosterSection,
+  RosterDraggable,
+  RosterKitShell,
   useRosterKitData,
   ROSTER_KIT_VERSION,
 } from '@/ui/idleVillage/frozen/kits/rosterKit';
@@ -24,8 +26,11 @@ import { IsolatedShowcase } from '@/ui/idleVillage/frozen';
 function MinimalRoster() {
   const { residents } = useRosterKitData();
   return (
-    <IsolatedShowcase componentName="VillageRosterSection" specPath="src/docs/docs/minimal_slice/03_roster.md">
-      <VillageRosterSection residents={residents} componentId="minimal-roster-component" />
+    <IsolatedShowcase componentName="RosterDraggable" specPath="src/ui/idleVillage/frozen/kits/rosterKit.md">
+      <RosterDraggable
+        componentId="minimal-roster-component"
+        onFlightComplete={(residentId, slotId) => console.log('assigned', residentId, slotId)}
+      />
     </IsolatedShowcase>
   );
 }
@@ -48,11 +53,13 @@ Fixture sources are re-exports of the canonical config files:
 The `canonicalResidentData(defaultFatigue)` factory is the same function `TestRosterPage` uses to materialize the working dataset.
 
 ## Certification
-- **Status:** Pending (created 2026-05-21, certification scheduled Day 5)
+- **Status:** frozen (certified 2026-08-15)
 - **Manifest:** `rosterKit.cert.json`
 - **Evidence:**
   - Contract test: `tests/contract/minimal-vs-test.spec.ts`
-  - DOM snapshot: `__tests__/rosterKit.dom.test.tsx`
+  - DOM snapshot: `tests/unit/frozen/rosterKit.dom.test.tsx`
+  - E2E: `tests/e2e/idleVillage/testRosterPgCards.spec.ts`, `tests/e2e/idleVillage/testRosterPgCardSkin.spec.ts`, `tests/e2e/idleVillage/rosterSlotPoiIntegration.spec.ts`
+  - Build: `npm run build:check`
 
 ## Historical reference
 See the 1:1 backup at `src/ui/idleVillage/_ARCHIVED_ROSTER_SLOT_INTERACTION/components/TestRosterPage.tsx` (Feb 20 2026 snapshot) and the postmortem at `src/docs/docs/freeze/POSTMORTEM_ARCHIVED.md`.

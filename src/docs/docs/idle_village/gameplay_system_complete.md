@@ -11,6 +11,13 @@ type: system-spec
 
 This document tells the full gameplay story of the Idle Village vertical slice as a sequence of user actions, component involvements, and integration contracts.
 
+### Step 0 — Residents exist before the user opens the app
+
+- **Components involved:** character storage → `toVillageResident()` → `VillageResidentStore`
+- **Links:** [`character_resident_trusted.md`](./trusted/character_resident_trusted.md), [`roster_spec.md`](./roster_spec.md)
+- **What happens:** Characters are created or acquired elsewhere and converted into canonical residents. `VillageResidentStore` is the single source of truth for roster presentation, drag-and-drop, and assignment.
+- **Status:** implemented
+
 ### Step 1 — User opens the app
 
 - **Component involved:** `App.tsx` routes, `MinimalGameplayPage`
@@ -94,8 +101,8 @@ This document tells the full gameplay story of the Idle Village vertical slice a
 
 This page follows the same 12 steps, but with four critical specializations:
 
-- **Step 3 (open POI detail)**: opening a `QuestPOI` detail **pauses the game** automatically. The panel is a `FloatingPanel` centered in the map viewport, without extra chrome, and its header is draggable.
-- **Step 5 (Start)**: `Start/Embark` is effective only if the game is not paused. While paused, the quest remains `assembling` and the `MagicCircleHalo` does not draw.
+- **Step 3 (open POI detail)**: opening a `QuestPOI` detail opens a floating, draggable, minimizable panel. Time does **not** pause automatically.
+- **Step 5 (Start)**: `Start/Embark` is effective only if the game is not paused. While paused, the quest remains `idle` and the `MagicCircleHalo` does not draw.
 - **Step 9+ (Milestones)**: if `QuestChronicle` is open, the `MilestoneCheckModal` appears with the V2 `DestinyAstrolabeComponent`; if it is closed, the phase resolves off-screen and the quest continues.
 - **Step 11 (Success)**: the quest is a success if `successi >= fasi_totali / 2`; `QuestRewardPanel` then shows rewards including XP for each assigned resident.
 
@@ -112,6 +119,50 @@ See the dedicated page workflow: [`poi_quest_detail_roster_time_clock_page_workf
 | 5+ | TimeEngine → Quest | [`time_engine_quest_interaction_spec.md`](./time_engine_quest_interaction_spec.md) |
 | 9+ | POI → Quest | [`poi_quest_interaction_spec.md`](./poi_quest_interaction_spec.md) |
 
+## Config-first gameplay pipeline
+
+All engine values come from `IdleVillageConfig`, not from hardcoded constants.
+
+- **Source of truth:** `src/balancing/config/idleVillage/defaultConfig.ts` (base) + `src/ui/idleVillage/config/dynamicConfig.json` (live edits).
+- **Consumers:** `TimeEngine`, `JobResolver`, `QuestResolver`, `QuestPowerEngine`, `InjuryEngine`, skin presets.
+- **Note:** the legacy 1v1 balancer module is a separate reference; Idle Village runtime math lives in `src/engine/game/idleVillage/` and is configured through `IdleVillageConfig`.
+- **See also:** [`idle_village_gameplay_math_spec.md`](./idle_village_gameplay_math_spec.md)
+
+## Skill check / spell resolution at milestones
+
+- **Component involved:** `MilestoneCheckModal`, `DestinyAstrolabeV4`
+- **What happens:** each milestone uses `AstrolabeSkill[]` (resident stat + difficulty) to compute a D100 threshold. The astrolabe rolls, returns `success|near-miss|fail|crit|wounded|dead`, and feeds the phase outcome.
+- **Status:** `DestinyAstrolabe` implemented; a future "spell creator" would author `AstrolabeSkill` entries from config.
+- **See also:** [`skill_check_workflow_spec.md`](./skill_check_workflow_spec.md)
+
+## Quest outcomes, failure, timeout and recovery
+
+- **Component involved:** `QuestPowerEngine`, `QuestResolver`, `QuestChronicle`
+- **What happens:** `QuestPowerEngine` rolls one of five outcomes (`perfect`, `success`, `partial`, `fail`, `deadly`) from the party power vs quest difficulty ratio. `QuestResolver` emits the completion event and returns raw rewards and `injuryRolls`. The downstream injury/death application is not fully wired to the UI, and there is no explicit `quest_timeout` event yet.
+- **Status:** power engine and resolver implemented; failure/recovery UI missing; timeout logic missing.
+- **See also:** [`quest_failure_and_recovery_spec.md`](./quest_failure_and_recovery_spec.md), [`idle_village_gameplay_math_spec.md`](./idle_village_gameplay_math_spec.md)
+
+## Village and world events
+
+- **System involved:** `VillageState.eventLog`, `worldEventRegistry`
+- **What happens:** `TimeEngine` and resolvers append `VillageEvent`s for scheduling, start, completion, fatigue, injury, food, and trial-of-fire. `worldEventRegistry` has weather/threat/resource templates, but world events are not yet integrated into the village event queue.
+- **Status:** village event log implemented; world event → gameplay integration missing.
+- **See also:** [`village_event_system_spec.md`](./village_event_system_spec.md)
+
+## Implementation status
+
+| Area | Status | Reference |
+|---|---|---|
+| Time tick & scheduling | implemented | `TimeEngine.ts` |
+| Job reward formulas | partially implemented | `JobResolver.ts` (non-numeric formulas return `0`) |
+| Quest power & outcome distribution | implemented (not wired to reward multipliers) | `QuestPowerEngine.ts` |
+| Quest reward variance | stubbed | `QuestResolver.ts` |
+| Injury from fatigue | implemented | `InjuryEngine.ts` |
+| Quest timeout / partial failure | missing | [`quest_failure_and_recovery_spec.md`](./quest_failure_and_recovery_spec.md) |
+| Quest failure / recovery UI | missing | [`quest_failure_and_recovery_spec.md`](./quest_failure_and_recovery_spec.md) |
+| World events → village queue | missing | [`village_event_system_spec.md`](./village_event_system_spec.md) |
+| Spell creator / custom skill editor | not implemented | [`skill_check_workflow_spec.md`](./skill_check_workflow_spec.md) |
+
 ## Invariants (system-wide)
 
 - All persistence goes through `PersistenceService`
@@ -123,7 +174,11 @@ See the dedicated page workflow: [`poi_quest_detail_roster_time_clock_page_workf
 
 ## Verification
 
-- [ ] All 12 steps are represented
-- [ ] Each step has a component link and at least one interaction link
-- [ ] No step is skipped or duplicated
-- [ ] The story reads coherently from open app to reward collection
+- [x] Step 0 — resident acquisition/creation is represented
+- [x] Steps 1–12 are represented
+- [x] Config-first pipeline is documented
+- [x] Skill check / spell resolution is linked
+- [x] Quest outcomes, failure and timeout are documented
+- [x] Village/world events are documented
+- [ ] Each missing area is marked with a concrete reference doc
+- [ ] The story reads coherently from resident acquisition to reward collection

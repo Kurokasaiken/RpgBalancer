@@ -154,7 +154,11 @@ Questo file è la bussola operativa. Contiene ciò che Fausto ha chiesto, con le
   - **Fail-safe:** il canvas è sovrapposto all'`<img>` statico, non lo sostituisce. Se WebGL manca o Pixi non inizializza, il mare resta dipinto e fermo invece di sparire.
   - Verificato in-browser: canvas WebGL vivo, backing 1060×707, 21/21 layer, nessuna regressione visiva. **L'animazione non è osservabile nel browser pane** (`document.hidden=true` blocca rAF e quindi il ticker Pixi): va guardata in un browser reale.
 
-**Collegamenti:** `src/docs/docs/plans/world_surface_v3_strategic_plan.md`, `src/docs/docs/plans/world_surface_v3_tactical_plan.md`, `src/docs/docs/plans/world_surface_v3_subplans_index.md`, `src/docs/docs/plans/component_based_world_surface_plan.md`, `src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md` (riga `world-surface-component`), `DESIGN_PILLARS.md`, `src/ui/idleVillage/worldSurface/`, `/tmp/ws_broadcast/BROADCAST.md` (output multi-AI), `.mw/desiderata.md`, `src/ui/idleVillage/frozen/kits/clockKit.tsx`, `test-results/world-surface-v3-subplan-A-critique/synthesis.md`.
+**Aggiornamento 2026-08-17:** nuova contro-proposta ricevuta dal Director (critica ChatGPT alla mappa viva). Creato `src/docs/docs/plans/world_surface_reactive_artifact_plan.md`: piano no-parallax con 6 effetti prioritari e fette verticali; da avallare in sessione.
+|
+**Risposte Director (sessione 2026-08-17):** (1) mappa come manufatto sul tavolo — confermata idea iniziale; (2) parallasse non usabile; (3) 6 priorità diventano P0; (4) inchiostro via paintover: provare e decidere.
+|
+|**Collegamenti:** `src/docs/docs/plans/world_surface_v3_strategic_plan.md`, `src/docs/docs/plans/world_surface_v3_tactical_plan.md`, `src/docs/docs/plans/world_surface_v3_subplans_index.md`, `src/docs/docs/plans/component_based_world_surface_plan.md`, `src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md` (riga `world-surface-component`), `DESIGN_PILLARS.md`, `src/ui/idleVillage/worldSurface/`, `/tmp/ws_broadcast/BROADCAST.md` (output multi-AI), `.mw/desiderata.md`, `src/ui/idleVillage/frozen/kits/clockKit.tsx`, `test-results/world-surface-v3-subplan-A-critique/synthesis.md`.
 
 ---
 
@@ -600,3 +604,17 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 1. L'utente usa la pagina per identificare il layer incriminato.
 2. Fix mirato sul layer identificato.
 3. Verifica visuale e regression test.
+
+---
+
+## R-028 — Golden UI Foundation: eseguire Phase 1 Forensic UI/Art Audit
+
+**Richiesta:** *"v2 APPROVATO come direzione. Esegui Phase 1 — Forensic UI/Art Audit sul repository e fai emergere i veri candidati Golden."*
+**Data:** 2026-08-17
+**Stato:** `in corso`
+**Desiderata FROZEN:** `.mw/desiderata.md` v8 — Golden UI Foundation.
+**Cosa è successo:** piano v2 approvato con 3 micro-correzioni (Golden 0 da audit, metrica Identity, Target Freeze su artefatti visivi); avviato CDP; deliberazione web non eseguibile per sessioni scadute; plan v2 integrato con critiche DeepSeek/Cerebras/ChatGPT e ricerca web; desiderata v8 FROZEN; prodotta `UI_AUDIT.md` preliminare basata su repo.
+**Cosa manca:**
+1. Completare valutazione Identity/Visual Quality con screenshot o Director review.
+2. Eseguire Golden 0 forensics sui componenti confermati.
+3. Produrre `GOLDEN_0_DNA.md`.

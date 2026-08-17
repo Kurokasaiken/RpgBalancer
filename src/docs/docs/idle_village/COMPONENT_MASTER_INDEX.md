@@ -33,7 +33,7 @@ Indice unico dei componenti e integration contracts rilevanti per la vertical sl
 || POI Maintenance Contract | poi-maintenance | draft | `src/docs/docs/idle_village/poi_maintenance_spec.md` | `/poi-quest-detail-roster-time-clock` | 2026-08-15 | Resource upkeep / building condition. |
 || clockKit Day/Night Time Engine | time-clock | candidate | `src/ui/idleVillage/frozen/kits/clockKit.md` | `/minimal-clock`, `/poi-quest-detail-roster-time-clock` | 2026-08-15 | `DayNightTimeEngineStrip` one-line drop-in; owns canonical `tick()` loop; `DayNightTimeEngineStripStandalone` mounts providers; Space is a global page-wide play/pause shortcut. No local timers in pages. Tests: `poiQuestRegressions.spec.ts` and `clockKitSpaceControl.spec.ts`. |
 ||| DayNightTimeEngineStrip | time | trusted | `src/docs/docs/idle_village/trusted/day_night_time_engine_strip_trusted.md` | `/minimal-clock`, `/poi-quest-detail-roster-time-clock` | 2026-08-15 | Component that owns the canonical `tick()` loop and the global `Space` play/pause shortcut. Display from `useMinimalGameplay` store; no local time state. Tests: `clockKitSpaceControl.spec.ts`. |
-|||| PgCard / PgToken | roster | trusted | `src/docs/docs/idle_village/trusted/pgcard_trusted.md` | `/minimal-pgcard`, `/test`, `/minimal-gameplay` | 2026-08-15 | Draggable resident card/token: portrait, frame, drag/freeze semantics, spring-back, magnetic tilt. Kit: `pgcardKit.md`. |
+|||| PgCard / PgToken | roster | trusted | `src/docs/docs/idle_village/trusted/pgcard_trusted.md` | `/minimal-pgcard`, `/test`, `/minimal-gameplay` | 2026-08-17 | Draggable resident card/token: portrait, frame, drag/freeze semantics, spring-back, magnetic tilt. Hardcoded `border` on base card removed. Kit: `pgcardKit.md`. |
 
 ## Regole di aggiornamento
 
@@ -173,8 +173,12 @@ Questo index segue le regole governative:
 | Gameplay System Complete | system | draft | `src/docs/docs/idle_village/gameplay_system_complete.md` | N/A | 2026-08-13 | T-FINAL — end-to-end narrative |
 | POI Quest Detail/Roster/Time/Clock — Page Workflow | page | draft | `src/docs/docs/idle_village/poi_quest_detail_roster_time_clock_page_workflow.md` | `/poi-quest-detail-roster-time-clock` | 2026-08-15 | R-010 — workflow pagina specifica; test hook Playwright esposti; ERR-028/030 chiusi; 6/6 UI tests pass |
 | POI Quest Detail/Roster/Time/Clock — Error Registry | page | draft | `src/docs/docs/idle_village/poi_quest_detail_roster_time_clock_error_registry.md` | `/poi-quest-detail-roster-time-clock` | 2026-08-15 | R-010 — registro errori pagina; ERR-010/011/012/013 e ERR-028/029/030/031/032/033 chiusi, ERR-014 confermato |
+|| Idle Village Gameplay Math | math | candidate | `src/docs/docs/idle_village/idle_village_gameplay_math_spec.md` | N/A | 2026-08-16 | Gameplay math spec: time, fatigue, injury, quest power, rewards |
+|| Skill Check / Spell Resolution Workflow | skill | candidate | `src/docs/docs/idle_village/skill_check_workflow_spec.md` | `/minimal-skillcheck` | 2026-08-16 | D20 and D100 skill-check subsystems, spell creator gap |
+|| Village Event System | events | candidate | `src/docs/docs/idle_village/village_event_system_spec.md` | `/minimal-gameplay` | 2026-08-16 | `VillageEvent` lifecycle and world-event integration gaps |
+|| Quest Failure, Timeout and Recovery | quest | candidate | `src/docs/docs/idle_village/quest_failure_and_recovery_spec.md` | `/poi-quest-detail-roster-time-clock` | 2026-08-16 | Quest outcomes, failure/recovery UI, timeout behavior |
 
 ---
 
-*Last Updated: 2026-08-15*
+*Last Updated: 2026-08-16*
 *Status: Reconciled from KIT_REGISTRY + gameplay catalog session + time engine / POI family / clock docs alignment.*

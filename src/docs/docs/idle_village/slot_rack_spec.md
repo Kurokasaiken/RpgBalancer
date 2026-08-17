@@ -13,9 +13,7 @@ type: component-spec
 [config load] ──► empty
  empty ──(drag enter)──► preview
  preview ──(drop valid)──► occupied
- occupied ──(start)──► active
- active ──(complete)──► done
- done ──(collect/extract)──► empty
+ occupied ──(extract)──► empty
  preview ──(drop invalid)──► empty
 ```
 
@@ -25,7 +23,7 @@ type: component-spec
 
 **Given:** an `ActivityDefinition` with `metadata.slotBlueprints` and `maxSlots`
 **When:** `ResidentSlotRack` mounts
-**Then:** it renders the configured number of `CardSocket` slots with role labels and requirement hints
+**Then:** it renders the configured number of `Slot` components with role labels and requirement hints
 **Visual contract:** Slots appear in a grid; empty slots show a placeholder ghost
 
 ### Scenario 2: Drag over a valid slot
@@ -46,15 +44,15 @@ type: component-spec
 
 **Given:** `maxSlots: 'infinite'` and the last free slot is filled
 **When:** a resident is assigned to the last slot
-**Then:** a new empty `CardSocket` appears at the end of the rack
-**Visual contract:** A new slot is appended before the flight lands
+**Then:** a new empty `Slot` is appended to the rack
+**Visual contract:** A new slot appears before the flight lands
 
 ## Invariants
 
 - Slot list is derived from config; no hardcoded slots in page code
 - `useResidentSlotController` produces `ResidentSlotViewModel[]` from assignments + blueprints
 - Each slot evaluates requirements via `statMatching`
-- `CardSocket` never applies `box-shadow` bloom; only `drop-shadow` bloom
+- `Slot` / `ResidentSlotRack` never applies `box-shadow` bloom; only `drop-shadow` bloom
 
 ## References
 

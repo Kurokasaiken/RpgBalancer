@@ -28,6 +28,7 @@ const SteamTrailerHub = lazy(() => import('./ui/idleVillage/SteamTrailerHub').th
 const IdleVillageConfigRoute = lazy(() => import('./pages/idle-village-config'));
 const StyleLabDemoPage = lazy(() => import('./pages/style-lab-demo'));
 const DesignSystemPage = lazy(() => import('./pages/design-system'));
+const DesignVsFidelityPage = lazy(() => import('./pages/design-vs-fidelity'));
 const V9SkinSandbox = lazy(() => import('./pages/v9-skin-sandbox').then(m => ({ default: m.V9SkinSandbox })));
 const VisualGrammarValidationPage = lazy(() => import('./ui/visualGrammarValidation/VisualGrammarValidationPage').then(m => ({ default: m.VisualGrammarValidationPage })));
 const VisualFidelityLabPage = lazy(() => import('./ui/visualFidelityLab/VisualFidelityLabPage').then(m => ({ default: m.VisualFidelityLabPage })));
@@ -172,6 +173,8 @@ function App() {
     ['/v9-skin-sandbox', '/skin-lab', '/skin-sandbox'].includes(window.location.pathname);
   const isDesignSystemPath =
     typeof window !== 'undefined' && window.location.pathname === '/design-system';
+  const isDesignVsFidelityPath =
+    typeof window !== 'undefined' && window.location.pathname === '/design-vs-fidelity';
   const isVisualGrammarValidationPath =
     typeof window !== 'undefined' && window.location.pathname === '/visual-grammar-validation';
   const isVisualFidelityLabPath =
@@ -817,6 +820,16 @@ function App() {
       <ErrorBoundary componentName="Design System Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Design System...</div>}>
           <DesignSystemPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isDesignVsFidelityPath) {
+    return (
+      <ErrorBoundary componentName="Design vs Fidelity Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Design vs Fidelity...</div>}>
+          <DesignVsFidelityPage />
         </Suspense>
       </ErrorBoundary>
     );

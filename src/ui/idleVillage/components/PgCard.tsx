@@ -400,8 +400,8 @@ const PgCard = memo<PgCardProps>(({
   const constrainedHp = hp;
   const constrainedFatigue = fatigue;
   const baseTokenClasses = horizontal
-    ? 'flex items-center gap-3 rounded-[18px] border border-[var(--skin-surface-border)] bg-transparent px-3 py-2 text-left text-xs text-[var(--skin-text-primary)] shadow-[0_12px_26px_rgba(0,0,0,0.45)] backdrop-blur-md transition-all max-w-sm'
-    : 'flex flex-col gap-2 rounded-[22px] border border-[var(--skin-surface-border)] bg-transparent px-4 py-3 text-left text-xs text-[var(--skin-text-primary)] shadow-[0_18px_30px_rgba(0,0,0,0.5)] backdrop-blur-md transition-all';
+    ? 'flex items-center gap-3 rounded-[18px] bg-transparent px-3 py-2 text-left text-xs text-[var(--skin-text-primary)] shadow-[0_12px_26px_rgba(0,0,0,0.45)] backdrop-blur-md transition-all max-w-sm'
+    : 'flex flex-col gap-2 rounded-[22px] bg-transparent px-4 py-3 text-left text-xs text-[var(--skin-text-primary)] shadow-[0_18px_30px_rgba(0,0,0,0.5)] backdrop-blur-md transition-all';
 
   const returningOverlayClass = isReturning
     ? 'pointer-events-none opacity-60 grayscale animate-bounce-spring'

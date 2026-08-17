@@ -19,7 +19,7 @@
   - See `docs/SKIN_BINDING_REGISTRY_GUIDE.md` and `docs/COMPONENT_SKIN_INTEGRATION_GUIDE.md` for integration patterns
 
 ## Freeze reference
-- Snapshot commit hash: `<TO_FILL_AFTER_COMMIT>` (update once merged).
+- Snapshot commit hash: tracked via git tags; use the latest tag in `git tag --list '*roster*'`.
 
 - To restore quickly:
 
@@ -47,7 +47,7 @@
 
 ## Interaction contract with Slot Rack
 
-- The roster **only** exposes drag metadata via `RESIDENT_DRAG_MIME`. Slot racks (ResidentSlotRack, ActivitySlotCard) pull assignments from `useResidentSlotController` and never mutate roster state directly.
+- The roster **only** exposes drag metadata via `RESIDENT_DRAG_MIME`. Slot racks (`ResidentSlotRack`) pull assignments from `useResidentSlotController` and never mutate roster state directly.
 - Drag feedback (`DropState`, bloom halos, audio cues) must reuse the controller outputs documented in `src/docs/docs/plans/idle_village_resident_slot_plan.md`.
 - `getResidentCompatibility` implementations should thread diagnostics from `useSandboxDragController` so `CertifiedWorkerPickerSheet` and `ResidentSlotRack` agree on validation reasons.
 - When a resident is dropped into a slot, the roster is responsible for clearing its own activeId/alpha state within 16 ms to avoid the “ghost” cards reported on 2026‑02‑17.

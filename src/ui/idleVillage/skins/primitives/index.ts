@@ -10,3 +10,9 @@ export { SkinTitle, type SkinTitleProps } from './SkinTitle';
 export { SkinButton, type SkinButtonProps, type SkinButtonVariant } from './SkinButton';
 export { SkinCloseButton, type SkinCloseButtonProps } from './SkinCloseButton';
 export { SkinBadge, type SkinBadgeProps } from './SkinBadge';
+export {
+  WanderlustStatBar as MaterialStatBar,
+  type WanderlustStatBarProps as MaterialStatBarProps,
+  type StatBarVariant as MaterialStatBarVariant,
+  type StatBarSize as MaterialStatBarSize,
+} from '@/ui/wanderlust-surface/layout/WanderlustStatBar';

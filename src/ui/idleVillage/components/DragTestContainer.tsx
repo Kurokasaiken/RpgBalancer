@@ -792,10 +792,10 @@ function DragTestContainer({
   }, [renderResidentCard, cardVariant]);
 
   const wrapperClassName = [
-    'relative overflow-hidden rounded-[26px] border border-[color:var(--panel-border)] bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,0.08),rgba(5,9,18,0.92))] p-4 shadow-[0_25px_45px_rgba(0,0,0,0.55)]',
+    'relative overflow-hidden rounded-[26px] bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,0.08),rgba(5,9,18,0.92))] p-4 shadow-[0_25px_45px_rgba(0,0,0,0.55)]',
     isInlineLayout && 'rounded-2xl border border-white/10 bg-black/25 p-3 shadow-[0_15px_30px_rgba(0,0,0,0.4)]',
     isGridLayout && 'rounded-2xl border border-white/10 bg-black/25 p-4 shadow-[0_15px_30px_rgba(0,0,0,0.4)]',
-    useWanderlustSkin && 'rounded-[20px] bg-[linear-gradient(180deg,rgba(3,2,2,0.95)_0%,rgba(6,4,3,0.98)_100%)] shadow-[inset_0_1px_0_rgba(216,177,62,0.08),0_4px_20px_rgba(0,0,0,0.6),0_0_0_1px_rgba(216,177,62,0.05)]',
+    useWanderlustSkin && 'rounded-[20px] bg-[linear-gradient(180deg,rgba(3,2,2,0.95)_0%,rgba(6,4,3,0.98)_100%)] shadow-[inset_0_1px_0_rgba(216,177,62,0.08),0_4px_20px_rgba(0,0,0,0.6)]',
     className,
   ]
     .filter(Boolean)
@@ -998,7 +998,6 @@ function DragTestContainer({
         cursor: isDragging ? 'grabbing' : componentId ? 'grab' : 'default',
         zIndex: isDragging ? 1000 : 1,
         background: 'var(--skin-surface-bg)',
-        borderColor: 'var(--skin-surface-border)',
       }}
       className={wrapperClassName}
       data-testid="drag-test-container"

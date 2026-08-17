@@ -1,25 +1,57 @@
-# SlotRackKit
+# slotRackKit
 
-**Status:** Draft
+**Status:** frozen
 **Version:** 1.0.0
+**Owner:** Devin
+**Last Updated:** 2026-08-15
 
 ## Source
-- Canonical component: TBD
-- Reference route: TBD (e.g. `/test` or `/minimal-gameplay`)
+- Canonical component: `ResidentSlotRack` (`src/ui/idleVillage/components/ResidentSlotRack.tsx`)
+- Canonical skin: `ResidentSlotRackSkin` (`src/ui/idleVillage/components/ResidentSlotRackSkin.tsx`)
+- Reference route: `/test` → `TestRosterPage` → `ResidentSlotRackSkin`
 - Minimal route: `/minimal-slot-rack`
+- Provider chain (canonical): `SkinSystemProvider → SandboxTimingProvider → DragProvider → DndContext` via `SlotRackKitShell`
 
-## Usage
+## Public API
+
 ```tsx
-import { SlotRack } from '@/ui/idleVillage/frozen/kits/slotRackKit';
+import {
+  ResidentSlotRack,
+  ResidentSlotRackSkin,
+  useSlotRackKitData,
+  SlotRackKitShell,
+  SLOT_LAB_CONFIG,
+} from '@/ui/idleVillage/frozen/kits/slotRackKit';
+import { PgCard } from '@/ui/idleVillage/frozen/kits/pgcardKit';
+
+function MinimalSlotRack() {
+  const { slots } = useSlotRackKitData();
+  return (
+    <SlotRackKitShell>
+      <ResidentSlotRack slots={slots} />
+    </SlotRackKitShell>
+  );
+}
 ```
 
 ## Contract
-See `slotRackKit.contract.ts` for the frozen TypeScript contract.
+The frozen TypeScript contract lives in `slotRackKit.contract.ts`. The subtree selector used by the contract test is `[data-testid="resident-slot-rack-root"]`.
+
+Any change to the props the page passes — or to the canonical component's rendered DOM under that selector — invalidates the certification and requires:
+1. A version bump in `slotRackKit.contract.ts`.
+2. A new `slotRackKit.cert.json` produced by the cert pipeline.
+3. A new git tag `frozen/slotRackKit-v<version>`.
 
 ## Fixture
-See `slotRackKit.fixture.ts` for canonical data sources.
+Fixture sources are re-exports of the canonical config files:
+- `SLOT_LAB_CONFIG` (`@/ui/idleVillage/frozen/_infra/CanonicalDataBridge`)
+- `useCanonicalRosterBundle` (`@/ui/idleVillage/frozen/_infra/CanonicalDataBridge`)
 
 ## Certification
-- Status: Pending
-- Manifest: `slotRackKit.cert.json`
-- Evidence: TBD
+- **Status:** frozen (certified 2026-08-15)
+- **Manifest:** `slotRackKit.cert.json`
+- **Evidence:**
+  - Contract test: `tests/contract/minimal-vs-test.spec.ts`
+  - DOM snapshot: `tests/unit/frozen/slotRackKit.dom.test.tsx` if present
+  - E2E: `tests/e2e/idleVillage/rosterSlotPoiIntegration.spec.ts`
+  - Build: `npm run build:check`
