@@ -792,10 +792,10 @@ function DragTestContainer({
   }, [renderResidentCard, cardVariant]);
 
   const wrapperClassName = [
-    'relative overflow-hidden rounded-[26px] bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,0.08),rgba(5,9,18,0.92))] p-4 shadow-[0_25px_45px_rgba(0,0,0,0.55)]',
+    'relative',
     isInlineLayout && 'rounded-2xl border border-white/10 bg-black/25 p-3 shadow-[0_15px_30px_rgba(0,0,0,0.4)]',
     isGridLayout && 'rounded-2xl border border-white/10 bg-black/25 p-4 shadow-[0_15px_30px_rgba(0,0,0,0.4)]',
-    useWanderlustSkin && 'rounded-[20px] bg-[linear-gradient(180deg,rgba(3,2,2,0.95)_0%,rgba(6,4,3,0.98)_100%)] shadow-[inset_0_1px_0_rgba(216,177,62,0.08),0_4px_20px_rgba(0,0,0,0.6)]',
+    useWanderlustSkin && 'relative overflow-hidden rounded-[20px] bg-[linear-gradient(180deg,rgba(3,2,2,0.95)_0%,rgba(6,4,3,0.98)_100%)] shadow-[inset_0_1px_0_rgba(216,177,62,0.08),0_4px_20px_rgba(0,0,0,0.6)]',
     className,
   ]
     .filter(Boolean)
@@ -1019,7 +1019,7 @@ function DragTestContainer({
     >
       {isMateric && (
         <div
-          className="pointer-events-none absolute inset-0"
+          className="pointer-events-none absolute inset-0 rounded-[20px]"
           style={{
             backgroundImage: `url(${MATERIC_SKIN_CONFIG.grain.textureUrl})`,
             backgroundSize: MATERIC_SKIN_CONFIG.grain.size,
@@ -1074,8 +1074,8 @@ function DragTestContainer({
           ))}
         </div>
       )}
-      {useWanderlustSkin && <WellBronzeBezel band={5} rx={17.5} />}
-      <div className={`relative z-10 space-y-4 ${useWanderlustSkin ? 'p-6' : ''}`.trim()}>
+      {useWanderlustSkin && <WellBronzeBezel band={1.5} rx={19} flush />}
+      <div className={`relative z-10 space-y-4 ${useWanderlustSkin ? 'p-6' : 'p-4'}`.trim()}>
         {useWanderlustSkin && (
           <div 
             className="block h-px mx-2 mb-5"

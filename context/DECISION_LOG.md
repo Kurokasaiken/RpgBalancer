@@ -320,6 +320,35 @@ Documented in `RPG_PROJECT_CONTEXT.md` §3.1 (canonical source).
 
 ---
 
+## Decision 010: Protocol-First Approach (Read Desiderata Before Coding)
+
+**Date:** 2026-08-17  
+**Context:** Session on "improve Destiny Astrolabe V1" resulted in 3000 LOC V5 rewrite that violated desiderata FROZEN v3/v4 (which required V1 canonical). Root cause: skipped reading desiderata.md and AGENTS.md before starting.
+
+**Decision:** Establish protocol rule: **ALWAYS read desiderata.md FROZEN before writing a single line of code**. If task says "improve X" and you think "needs rewrite", STOP and ask: "Is rewrite approved, or is desiderata requesting patch?"
+
+Formalize in AGENTS.md §F3.1:
+- Scope tension with desiderata must be stated before proceeding, citing the line
+- Unilateral decisions to deviate from desiderata are forbidden
+- Pattern logged in `.mw/pattern-big-rewrite-without-authority.md`
+
+**Rationale:**
+- desiderata.md is the ground truth for scope; project decisions are recorded in DECISION_LOG and DESIGN_PILLARS
+- Skipping the protocol read led to: wrong scope, wrong component version, wasted 8 hours, late discovery of i18n error
+- AGENTS.md §F3 already forbids silent scope deviation; it was simply not read
+
+**Alternative rejected:** "Assume large component improvements need rewrite" — This violated explicit desiderata that said V1 must stay canonical.
+
+**Implications:**
+- Every task begins with 10-min read of: AGENTS.md, desiderata.md, context/INDEX.md
+- Any detected scope tension requires asking Director before coding
+- Verification must be incremental (max 200 LOC before browser test)
+- Pattern is high-replicability; reachable future agents must read this decision
+
+**Status:** ✅ Approved & mandatory going forward
+
+---
+
 ## Future Decisions (Roadmap)
 
 - **Macro-Fase B onwards:** Will need decisions on MarketActionCard design, outcome modal layout, level-up animation, etc. Log decisions here as they arise.

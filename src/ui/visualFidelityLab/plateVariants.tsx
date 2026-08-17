@@ -142,11 +142,11 @@ export const BezelMolding: React.FC<PlateVariantProps> = ({ children, className,
  * first child of a position:relative well. Content stays inset by the well's
  * padding, so it never collides with the thin perimeter band.
  */
-export const WellBronzeBezel: React.FC<{ band?: number; rx?: number }> = ({ band = 1.75, rx = RX - 1 }) => {
+export const WellBronzeBezel: React.FC<{ band?: number; rx?: number; flush?: boolean }> = ({ band = 1.75, rx = RX - 1, flush = false }) => {
   const { ref, w, h } = usePlateSize();
   const uid = useId().replace(/:/g, '');
-  const inset = band / 2 + 1;
-  const innerX = band + 1;
+  const inset = flush ? band / 2 : band / 2 + 1;
+  const innerX = flush ? band : band + 1;
   return (
     <div ref={ref} aria-hidden style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
       <svg width="100%" height="100%" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" style={{ display: 'block' }}>

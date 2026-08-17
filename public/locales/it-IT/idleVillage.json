@@ -1,4 +1,28 @@
 {
+  "astrolabeV5": {
+    "throw": "Tira",
+    "rollAgain": "Tira di nuovo",
+    "awaiting": "In attesa del tiro",
+    "trackCheck": "Prova",
+    "trackRisk": "Rischio",
+    "verdictSuccess": "Successo",
+    "verdictNearMiss": "Per un soffio",
+    "verdictFail": "Fallimento",
+    "verdictCrit": "Rovina",
+    "riskDeclared": "{{death}}% morte · {{wound}}% ferita",
+    "riskNone": "Nessuno",
+    "riskHeld": "Illeso",
+    "riskWounded": "Ferito",
+    "riskDead": "Morto",
+    "throwControls": "Controlli di tiro",
+    "skip": "Salta",
+    "auto": "Auto",
+    "mute": "Muto",
+    "axisReadout": "{{skill}}: {{stat}} contro difficoltà {{difficulty}} — {{relation}}",
+    "relation_margin": "sopra la soglia",
+    "relation_deficit": "sotto la soglia",
+    "relation_even": "pari alla soglia"
+  },
   "activityCapsule": {
     "slotLabel": "Slot {index}",
     "accessibility": {

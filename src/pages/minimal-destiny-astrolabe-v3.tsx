@@ -104,6 +104,12 @@ const MinimalDestinyAstrolabeV3 = () => {
             >
               V4
             </a>
+            <a
+              href="/minimal-destiny-astrolabe-v5"
+              className="px-3 py-1 rounded text-sm font-semibold bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors"
+            >
+              V5
+            </a>
           </div>
         </div>
         {lastResult && (

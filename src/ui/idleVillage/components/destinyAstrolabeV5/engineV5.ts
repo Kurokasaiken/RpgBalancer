@@ -115,7 +115,12 @@ export interface EngineV5Opts {
   onResolve?: (r: AstrolabeV5Result) => void;
   /** Emesso a ogni rebuild: alimenta la lista sr-only e la result plate. */
   onReadout?: (rows: PillarReadout[]) => void;
-  /** Il rischio si riempie DOPO il verdetto: è la prova che i dadi sono due. */
+  /** QUANTITÀ del rischio, emessa durante l'arm: è ciò che il giocatore deve
+   *  sapere PRIMA di lanciare per scegliere i consumabili (vincolo FROZEN,
+   *  `.mw/desiderata.md:88`). Non dice se il rischio si avvererà. */
+  onRiskDeclared?: (r: { deathPct: number; woundPct: number }) => void;
+  /** RISOLUZIONE del rischio, emessa DOPO il verdetto: è la prova che i due
+   *  dadi sono due. Dice se il rischio dichiarato si è avverato. */
   onRiskRevealed?: (r: { riskRoll: number; wounded: boolean; dead: boolean }) => void;
   onSound?: (
     kind: 'arm' | 'pillar-slam' | 'spin' | 'bounce' | 'snap' | 'quake' | 'success' | 'failure',
@@ -215,6 +220,10 @@ export function createAstrolabeV5Engine(
   let tier: PillarTier = 'compact';
   const backdrop = document.createElement('canvas');
   let backdropDirty = true;
+  /* dichiarata QUI e non con gli altri path: `resize()` la invalida ed è
+     chiamata durante l'init, prima del blocco della path cache. Lasciarla più
+     in basso la mette in temporal dead zone e il componente esplode al mount. */
+  let cachedPathsFor: GeometrySnapshot | null = null;
 
   function resize() {
     const rect = root.getBoundingClientRect();
@@ -346,7 +355,6 @@ export function createAstrolabeV5Engine(
 
   /* ── path cache ── */
   const SEG = cfg.pathSegments;
-  let cachedPathsFor: GeometrySnapshot | null = null;
   let starPath = new Path2D();
   let challengePath = new Path2D();
   let outsideStarPath = new Path2D();
@@ -481,6 +489,61 @@ export function createAstrolabeV5Engine(
     ctx.strokeStyle = rgba(palette.gold, 0.22);
     ctx.lineWidth = Math.max(1, R * 0.004);
     ctx.stroke(challengePath);
+    ctx.restore();
+  }
+
+  /**
+   * Dichiarazione del rischio — la QUANTITÀ, non la risoluzione.
+   *
+   * Un arco inciso sul perimetro la cui ESTENSIONE è proporzionale al rischio
+   * totale, diviso in due tratti: morte e ferita. Si legge a colpo d'occhio
+   * quanto è pericoloso il tiro, e quanto di quel pericolo è mortale — che è
+   * l'informazione su cui il giocatore decide se spendere un consumabile.
+   *
+   * V3 diceva la stessa cosa versando una banda cremisi PIENA sul board e
+   * tenendocela per ~8 secondi prima del verdetto: informazione giusta, resa
+   * sbagliata. Qui sono due hairline sul bordo, fuori dal campo di gioco, che
+   * non competono con il fiore né con la pallina.
+   *
+   * Non dice MAI se il rischio si avvererà: quello è il secondo dado, e arriva
+   * dopo il verdetto.
+   */
+  function drawRiskDeclaration(s: GeometrySnapshot, reveal: number) {
+    if (!cfg.riskArcEnabled || reveal <= 0) return;
+    const death = Math.max(0, s.input.deathPct);
+    const wound = Math.max(0, s.input.woundPct);
+    const total = Math.min(cfg.riskPctMax, death + wound);
+    if (total <= 0) return;
+
+    const rr = R * cfg.riskArcR;
+    const start = -Math.PI / 2;
+    const sweep = (total / 100) * TAU * reveal;
+    const deathSweep = total > 0 ? sweep * (death / total) : 0;
+
+    ctx.save();
+    ctx.lineCap = 'butt';
+    ctx.lineWidth = Math.max(cfg.riskArcWidthPx, R * 0.005) * dpr;
+
+    if (deathSweep > 0) {
+      ctx.strokeStyle = rgba(palette.death, cfg.riskArcAlpha);
+      ctx.beginPath();
+      ctx.arc(cx, cy, rr, start, start + deathSweep);
+      ctx.stroke();
+    }
+    if (sweep - deathSweep > 0) {
+      ctx.strokeStyle = rgba(palette.wound, cfg.riskArcAlpha);
+      ctx.beginPath();
+      ctx.arc(cx, cy, rr, start + deathSweep, start + sweep);
+      ctx.stroke();
+    }
+    /* tacca d'inizio: dà un punto zero all'arco, altrimenti la sua estensione
+       non è misurabile a occhio */
+    ctx.strokeStyle = rgba(palette.ivory, cfg.riskArcAlpha * 0.8);
+    ctx.lineWidth = Math.max(1, R * 0.003);
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(start) * rr * 0.985, cy + Math.sin(start) * rr * 0.985);
+    ctx.lineTo(cx + Math.cos(start) * rr * 1.02, cy + Math.sin(start) * rr * 1.02);
+    ctx.stroke();
     ctx.restore();
   }
 
@@ -621,9 +684,18 @@ export function createAstrolabeV5Engine(
     ctx.save();
     ctx.globalAlpha = d;
 
-    /* il corpo sale dal basso: la caduta è verticale, non un fade */
-    const rise = 1 - easeOutCubic(d);
-    ctx.translate(0, -rise * p.height * R * 0.55);
+    /* ── caduta lungo il PROPRIO asse ───────────────────────────────────────
+       Non è un fade e non è una traslazione verticale in Y schermo. In questa
+       camera l'altezza si proietta radialmente verso l'esterno: un monolito che
+       cade dal cielo parte quindi PIÙ IN FUORI e rientra nel proprio invaso.
+       Una caduta verticale identica per tutti e cinque sarebbe lo stesso errore
+       di proiezione che il corpo di V3 commetteva — e che qui è stato corretto:
+       non va reintrodotto nell'animazione.                                    */
+    const fallH = (1 - easeOutCubic(d)) * cfg.pillarFallHeightR;
+    if (fallH > 0) {
+      const out = (p.baseR * fallH) / Math.max(1e-6, cfg.cameraHeightR - fallH);
+      ctx.translate(Math.cos(p.angle) * out * R, Math.sin(p.angle) * out * R);
+    }
 
     const poly = (pts: { x: number; y: number }[]) => {
       ctx.beginPath();
@@ -1005,6 +1077,14 @@ export function createAstrolabeV5Engine(
   let quakeHealed = 0;
   let shakeT0 = 0;
   let shakeActive = false;
+  /** Istante di atterraggio di ciascun monolito, -1 se non è ancora atterrato.
+   *  Alimenta la micro-scossa d'impatto: cinque colpi sfalsati dallo stagger. */
+  let pillarImpactAt: number[] = new Array(AXES).fill(-1);
+  let riskDeclared = false;
+  /** Comparsa dell'arco che dichiara la quantità di rischio. Sale nella
+   *  finestra armRisk e poi RESTA: il rischio dichiarato è leggibile per tutto
+   *  il tempo in cui il giocatore può ancora decidere se spendere qualcosa. */
+  let riskArcReveal = 0;
 
   function tickTimeline(now: number) {
     const dtMs = Math.max(0, now - lastFrame);
@@ -1020,11 +1100,30 @@ export function createAstrolabeV5Engine(
       for (let i = 0; i < AXES; i += 1) {
         const s = cfg.armThreatStart + i * cfg.pillarStaggerMs;
         pillarDrop[i] = easeOutCubic(envelope(now, phaseT0, s, s + cfg.pillarDropMs));
+        /* il monolito si è appena piantato: registra il colpo. Cinque impatti
+           sfalsati dallo stagger, non un rimbombo unico. */
+        if (pillarDrop[i] >= 1 && pillarImpactAt[i] < 0) {
+          pillarImpactAt[i] = now;
+          opts.onSound?.('pillar-slam');
+        }
+      }
+      /* la QUANTITÀ di rischio è dichiarata durante l'arm, non dopo: è ciò che
+         rende informata la scelta dei consumabili prima del lancio */
+      riskArcReveal = cfg.riskDeclaredAtArm
+        ? easeOutCubic(envelope(now, phaseT0, cfg.armRiskStart, cfg.armRiskEnd))
+        : 0;
+      if (cfg.riskDeclaredAtArm && !riskDeclared && now - phaseT0 >= cfg.armRiskStart) {
+        riskDeclared = true;
+        opts.onRiskDeclared?.({
+          deathPct: snap.input.deathPct,
+          woundPct: snap.input.woundPct,
+        });
       }
       if (now - phaseT0 >= cfg.tArmTotal) {
         chalReveal = 1;
         starScale = 1;
         pillarDrop = new Array(AXES).fill(1);
+        if (cfg.riskDeclaredAtArm) riskArcReveal = 1;
         setArmed(true);
         setPhase('ready');
       }
@@ -1170,15 +1269,31 @@ export function createAstrolabeV5Engine(
             che si è rotto.                                                   */
     let sx = 0;
     let sy = 0;
-    if (shakeActive && fracture) {
-      const noQuake = fracture.kind === 'none';
-      const amp = noQuake ? fracture.shakeAmp || cfg.shakeAmpWound * cfg.riskFlexAmpMul : fracture.shakeAmp;
-      const tau = noQuake ? 60 : fracture.shakeTauMs;
-      const allowed = boardPx >= cfg.shakeMinBoardPx && !opts.reducedMotion;
-      if (allowed) {
+    const shakeAllowed = boardPx >= cfg.shakeMinBoardPx && !opts.reducedMotion;
+
+    if (shakeAllowed) {
+      /* 1. scossa del terremoto */
+      if (shakeActive && fracture) {
+        const noQuake = fracture.kind === 'none';
+        const amp = noQuake
+          ? cfg.shakeAmpWound * cfg.riskFlexAmpMul
+          : fracture.shakeAmp;
+        const tau = noQuake ? 60 : fracture.shakeTauMs;
         const o = shakeOffset(now - shakeT0, amp, tau, cfg);
-        sx = o.x * R;
-        sy = o.y * R;
+        sx += o.x * R;
+        sy += o.y * R;
+      }
+      /* 2. micro-impatti dei monoliti che si piantano nel piano.
+            Si SOMMANO: cinque colpi sfalsati dallo stagger, ognuno che decade
+            in ~90ms, invece di un rimbombo unico. È il contatto che si legge. */
+      for (let i = 0; i < AXES; i += 1) {
+        const t0 = pillarImpactAt[i];
+        if (t0 < 0) continue;
+        const el = now - t0;
+        if (el > cfg.pillarImpactTauMs * 5) continue;
+        const o = shakeOffset(el, cfg.pillarImpactShakeAmp, cfg.pillarImpactTauMs, cfg);
+        sx += o.x * R;
+        sy += o.y * R;
       }
     }
     ctx.translate(cx + sx, cy + sy);
@@ -1188,6 +1303,7 @@ export function createAstrolabeV5Engine(
     ctx.drawImage(backdrop, 0, 0);
     drawStars(now);
     if (chalReveal > 0) drawChallenge(s, chalReveal);
+    if (riskArcReveal > 0) drawRiskDeclaration(s, riskArcReveal);
     if (starScale > 0) {
       const glow = phase === 'arm' || phase === 'ready' ? 1 : 0;
       drawStar(s, starScale, glow);
@@ -1246,12 +1362,23 @@ export function createAstrolabeV5Engine(
     chalReveal = 0;
     starScale = 0;
     pillarDrop = new Array(AXES).fill(0);
+    pillarImpactAt = new Array(AXES).fill(-1);
+    riskDeclared = false;
+    riskArcReveal = 0;
     setArmed(false);
     opts.onSound?.('arm');
     if (opts.reducedMotion) {
       chalReveal = 1;
       starScale = 1;
       pillarDrop = new Array(AXES).fill(1);
+      if (cfg.riskDeclaredAtArm) {
+        riskArcReveal = 1;
+        riskDeclared = true;
+        opts.onRiskDeclared?.({
+          deathPct: snap.input.deathPct,
+          woundPct: snap.input.woundPct,
+        });
+      }
       setArmed(true);
       setPhase('ready');
     } else {
@@ -1265,6 +1392,9 @@ export function createAstrolabeV5Engine(
     chalReveal = 1;
     starScale = 1;
     pillarDrop = new Array(AXES).fill(1);
+    /* il rischio dichiarato resta a schermo: era già leggibile prima del tiro
+       e non deve sparire proprio nel momento in cui diventa rilevante */
+    if (cfg.riskDeclaredAtArm) riskArcReveal = 1;
     setArmed(false);
     seedCounter = (seedCounter + 0x1000193) >>> 0;
     const sim = simulateThrowV5(snap, seedCounter, cfg);

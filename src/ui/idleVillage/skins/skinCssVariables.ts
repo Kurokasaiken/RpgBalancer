@@ -84,6 +84,12 @@ export const BASE_SKIN_CSS_VARS: SkinCssVarMap = {
   '--skin-astro-nucleus': '#ffe9b0',
   '--skin-astro-stripe-wound': '#c22a3d',
   '--skin-astro-stripe-death': '#05060a',
+  /* Destiny Astrolabe V5 — basalto (cornice del reliquiario e corpo dei
+     monoliti, distinti per FINITURA non per tinta) e teal profondo delle
+     ombre. Il teal esiste perché su questo board le ombre non sono mai nere:
+     una proiezione nera è la firma dell'oggetto incollato. */
+  '--skin-astro-basalt': '#141a1f',
+  '--skin-astro-shadow-teal': '#0a282c',
 
   /* Inset panels */
   '--skin-inset-bg': '#060f16',
