@@ -1,0 +1,219 @@
+/**
+ * astrolabe-v5.css — SOLO layout e scatola. Skin-token driven, mai hex nudi.
+ *
+ * Il tema vive nei token --skin-*; qui c'è unicamente la geometria del
+ * reliquiario e il posizionamento del chrome. Nessun colore è inventato: ogni
+ * valore cromatico è un var(--skin-*) con fallback.
+ *
+ * MATERIALE — basalto su basalto, distinto per FINITURA (non per tinta):
+ *   cornice  = levigata, venatura fitta, intarsi d'oro sottili
+ *   monoliti = grezzi e fratturati (disegnati su canvas)
+ * È l'unico modo di restare monomaterici senza che i monoliti si mimetizzino
+ * nel telaio.
+ *
+ * NOTA: `--dav5-board` è scritta dall'ENGINE sul root a ogni resize
+ * (engineV5.ts, `root.style.setProperty`). Non va mai ridefinita qui con un
+ * valore statico: serve alla tipografia per scalare col board.
+ */
+
+.dav5-box {
+  /* la scatola: quadrato + chrome sotto. `aspect-ratio` + `min-height`
+     esplicito così NON dipende dall'altezza del parent — era il modo in cui
+     V3 collassava a 160×160 in silenzio dentro un contenitore ad altezza auto */
+  --dav5-chrome-h: 88px;
+  --dav5-pad: 10px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  box-sizing: border-box;
+  padding: var(--dav5-pad);
+  min-width: 180px;
+  min-height: calc(180px + var(--dav5-chrome-h) + var(--dav5-pad) * 2);
+  border-radius: 14px;
+  /* basalto levigato: venatura fitta, due strati appena sfalsati */
+  background:
+    linear-gradient(148deg,
+      color-mix(in srgb, var(--skin-astro-basalt, #141a1f) 92%, white 8%) 0%,
+      var(--skin-astro-basalt, #141a1f) 38%,
+      color-mix(in srgb, var(--skin-astro-basalt, #141a1f) 88%, black 12%) 72%,
+      var(--skin-astro-basalt, #141a1f) 100%),
+    var(--skin-surface-base, #060f16);
+  /* intarsio d'oro: una hairline, non una cornice */
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--skin-icon-color, #dfb857) 34%, transparent),
+    inset 0 1px 0 0 color-mix(in srgb, var(--skin-close-color, #f7dd80) 22%, transparent),
+    0 12px 32px -10px rgb(0 0 0 / 0.7);
+}
+
+/* compatto: la scatola rinuncia al chrome pieno prima che al board */
+.dav5-box[data-tier='tight'],
+.dav5-box[data-tier='glyph'] {
+  --dav5-chrome-h: 60px;
+}
+
+.dav5-board {
+  /* il quadrato che ospita il canvas. Resta VUOTO nel JSX: il canvas è creato
+     e appeso dall'engine. */
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.dav5-canvas {
+  display: block;
+  /* l'engine fissa width/height inline in px: qui solo il reset */
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* ── chrome: result plate + CTA. FUORI dal quadrato, e immobile ────────────
+   La plate è DOM, quindi resta ferma mentre il canvas scuote durante il
+   terremoto: è la prova visiva diretta che ciò che ha detto il risultato non è
+   ciò che si è rotto. */
+.dav5-chrome {
+  width: 100%;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 8px;
+}
+
+.dav5-plate {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 2px 10px;
+  padding: 7px 10px;
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--skin-surface-base, #060f16) 82%, black 18%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--skin-icon-color, #dfb857) 18%, transparent);
+}
+
+/* Le DUE righe esistono sempre, montate entrambe dall'arm. Anche a rischio
+   zero la seconda riga è presente e legge "nessuno": se comparisse solo quando
+   il rischio esiste, la sua sola apparizione sarebbe uno spoiler. */
+.dav5-plate-row {
+  display: contents;
+}
+
+.dav5-plate-label {
+  grid-column: 1;
+  font-size: clamp(8px, calc(var(--dav5-board, 380px) * 0.026), 11px);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--skin-text-primary, #f5f2e8) 52%, transparent);
+  white-space: nowrap;
+}
+
+.dav5-plate-value {
+  grid-column: 2;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: clamp(11px, calc(var(--dav5-board, 380px) * 0.042), 19px);
+  font-weight: 600;
+  color: var(--skin-text-primary, #f5f2e8);
+  line-height: 1.15;
+}
+
+.dav5-plate-roll {
+  grid-column: 3;
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(9px, calc(var(--dav5-board, 380px) * 0.032), 14px);
+  color: color-mix(in srgb, var(--skin-icon-color, #dfb857) 78%, transparent);
+  white-space: nowrap;
+}
+
+/* il valore in attesa: presente ma muto, così la riga non "compare" dopo */
+.dav5-plate-value[data-pending='true'],
+.dav5-plate-roll[data-pending='true'] {
+  color: color-mix(in srgb, var(--skin-text-primary, #f5f2e8) 26%, transparent);
+}
+
+.dav5-plate-value[data-kind='success'] { color: var(--skin-close-color, #f7dd80); }
+.dav5-plate-value[data-kind='wound']   { color: var(--skin-status-wound, #a11d33); }
+.dav5-plate-value[data-kind='dead']    { color: var(--skin-status-death, #6d3fb0); }
+
+.dav5-cta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dav5-throw {
+  flex: 1 1 auto;
+  padding: 6px 14px;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: clamp(10px, calc(var(--dav5-board, 380px) * 0.034), 15px);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--skin-surface-base, #060f16);
+  background: linear-gradient(180deg,
+    var(--skin-close-color, #f7dd80) 0%,
+    var(--skin-icon-color, #dfb857) 100%);
+  box-shadow: 0 2px 8px -2px color-mix(in srgb, var(--skin-icon-color, #dfb857) 55%, transparent);
+  /* il respiro del bottone è l'UNICO movimento della fase ready: è il glow
+     primario di quel momento, e non compete con nulla */
+  animation: dav5-breath 2.4s ease-in-out infinite;
+}
+.dav5-throw:disabled {
+  cursor: default;
+  filter: grayscale(0.7) brightness(0.6);
+  animation: none;
+}
+
+@keyframes dav5-breath {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.022); }
+}
+
+.dav5-controls {
+  display: flex;
+  gap: 8px;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.dav5-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: clamp(8px, calc(var(--dav5-board, 380px) * 0.024), 10px);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--skin-text-primary, #f5f2e8) 58%, transparent);
+  cursor: pointer;
+  user-select: none;
+}
+.dav5-toggle input { accent-color: var(--skin-icon-color, #dfb857); }
+
+/* lista accessibile: sostituisce le placche DOM ancorate di V3, che si
+   scollavano al resize e venivano tagliate nei box stretti */
+.dav5-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dav5-throw { animation: none; }
+}

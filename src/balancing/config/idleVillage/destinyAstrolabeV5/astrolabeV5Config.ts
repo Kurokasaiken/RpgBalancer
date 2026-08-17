@@ -113,6 +113,16 @@ export const AstrolabeV5ConfigSchema = AstrolabeV3ConfigSchema.extend({
   armRiskEnd: z.number().default(900),
   pillarStaggerMs: z.number().min(0).max(200).default(55),
   pillarDropMs: z.number().min(50).max(600).default(200),
+  /** Altezza da cui il monolito cade, in multipli di R. La caduta avviene
+   *  lungo il PROPRIO asse: per questa camera "più in alto" significa proiettato
+   *  più in fuori, quindi il pilastro entra dall'esterno e si pianta nel suo
+   *  invaso. Una caduta verticale in Y schermo — uguale per tutti e cinque —
+   *  sarebbe lo stesso errore di proiezione che V3 commetteva sul corpo. */
+  pillarFallHeightR: z.number().min(0).max(1.5).default(0.42),
+  /** Micro-scossa all'atterraggio di ogni monolito. Un blocco di basalto che si
+   *  pianta nel piano deve far tremare il piano, o il contatto non si legge. */
+  pillarImpactShakeAmp: z.number().min(0).max(0.03).default(0.0055),
+  pillarImpactTauMs: z.number().min(20).max(400).default(90),
 
   /* ── Timeline: spin ───────────────────────────────────────────────────── */
   /** Durata a orologio dello spin. Manopola unica per ritarare tutto: il resto
@@ -135,6 +145,28 @@ export const AstrolabeV5ConfigSchema = AstrolabeV3ConfigSchema.extend({
   /** Il silenzio che separa i due dadi. Sotto 200 i due eventi si fondono e il
    *  rischio torna a leggersi come parte del D100. */
   tClosureBeatMs: z.number().min(0).max(800).default(260),
+
+  /* ── Dichiarazione del rischio (PRIMA del lancio) ─────────────────────── */
+  /** La QUANTITÀ di rischio è visibile dall'arm; la sua RISOLUZIONE resta dopo
+   *  il verdetto. Sono due cose diverse e vanno separate:
+   *   - quantità  = "questo tiro può uccidermi nel 5% dei casi" → serve PRIMA,
+   *     o la scelta dei consumabili/modificatori è cieca. È un vincolo FROZEN:
+   *     `.mw/desiderata.md:88` ("consumabili spendibili prima del lancio") e
+   *     `RICHIESTE.md:205` Q6, più R-025 sui modificatori che alterano la % di
+   *     morte;
+   *   - risoluzione = "è successo / non è successo" → dopo il verdetto, o i due
+   *     dadi tornano a leggersi come uno solo.
+   *  V3 dichiarava la quantità versando una banda cremisi piena sul board per
+   *  ~8 secondi: informazione giusta, resa sbagliata. Qui è un numero sulla
+   *  result plate più un arco inciso sul perimetro. */
+  riskDeclaredAtArm: z.boolean().default(true),
+  /** Arco inciso sul perimetro: la sua ESTENSIONE è proporzionale al rischio
+   *  totale, così la quantità si legge a colpo d'occhio senza numeri. */
+  riskArcEnabled: z.boolean().default(true),
+  riskArcAlpha: z.number().min(0).max(1).default(0.5),
+  riskArcWidthPx: z.number().min(0.5).max(6).default(1.6),
+  /** Raggio dell'arco, in multipli di R: appena fuori dalla lastra. */
+  riskArcR: z.number().min(0.9).max(1.3).default(1.005),
 
   /* ── Frattura: attivazione e forma ────────────────────────────────────── */
   fractureEnabled: z.boolean().default(true),
