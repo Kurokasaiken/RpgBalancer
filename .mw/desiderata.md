@@ -279,3 +279,77 @@ Costruire un piano ombrello con sub-piani per: (1) scheda del personaggio, (2) m
 
 **Formulazione approvata (FROZEN):**
 Il progetto RPG costruisce un piano ombrello con sub-piani per scheda del personaggio, meccanismo di equip, oggetti equippabili, oggetti consumabili e skill da equippare. Ogni componente sarà un placeholder funzionalmente corretto e skin-wired, integrato con skinConfig, i18n, config-first e component reuse, in modo che il lavoro Golden UI possa affinare l’estetica senza rifare i contratti.
+
+---
+
+## v11 — Skill Check Web V1: la rete lanciata, e il fallimento critico messo in scena
+
+**Status:** `FROZEN`
+**Date:** 2026-08-18
+**Authorized by:** Fausto
+**Reason:** decisioni date esplicitamente in sessione, una per una
+
+**Intento del Director:**
+Uno *skill check cinematografico*, non un astrolabio. L'avversario è una
+ragnatela — scelta contro il rovereto dopo test di fattibilità comparato. Il
+fallimento critico vale il 5%, **viene dato** dal sistema, e va **messo in
+scena**, non modellato.
+
+**Decisioni ferme (ognuna data dal Director, non dedotta):**
+
+1. **Nome:** `skill-check-web-v1` (rotta, cartella `src/ui/skillCheckWebV1/`,
+   componente `SkillCheckWebV1`). Scelto per non collidere con
+   `/minimal-skillcheck` e `/minimal-skillcheck-v6` già esistenti.
+2. **Metafora:** ragnatela. Il rovereto è stato prototipato e scartato: leggeva
+   come ghirlanda decorativa invece che come minaccia — l'opposto del motivo per
+   cui era stato proposto.
+3. **Il ragno NON esiste.** Corollario dato dal Director: i fili non si posano
+   uno per volta, la rete **viene lanciata** come evento unico. Il beat 1 non è
+   tessitura, è **lancio**.
+4. **I raggi sono addolciti verso il BASSO** in coordinate mondo, non
+   perpendicolarmente al raggio. Argomento del Director: se piegano verso il
+   basso non può nascere una spirale, perché metà delle linee curverebbe verso
+   l'alto. Verificato: regge anche a curvatura estrema.
+5. **Il bordo** è una curva liscia a fascio doppio con nodi di ancoraggio.
+   Approvato dopo tre tentativi falliti (cerchio con tremolio, esagono,
+   tridecagono): il difetto comune erano le faccette.
+6. **Le punte della stella BUCANO il telaio.** Dentro il muro la stella è piena
+   (regione di successo vera, dove la pallina può fermarsi); fuori resta solo il
+   contorno, perché la pallina non esce dall'arena e una campitura piena
+   promette un successo non ottenibile.
+7. **Fallimento critico: 5%, viene dato, NON è una regione geometrica.**
+   Non c'è vittoria automatica: il fallimento critico esiste sempre. Ma non si
+   modella una probabilità nel board — l'esito è scelto a monte e il board lo
+   mette in scena. Messa in scena approvata: la pallina si è **già fermata sulla
+   stella** e un filo superstite la agguanta. Sapore X-COM: la drammaturgia sta
+   nella sorpresa dopo il sollievo, non in una meccanica di dadi.
+
+**Cosa questo NON autorizza:**
+- Nessun tetto geometrico, anello o sacca dedicati al fallimento critico. Il
+  tetto alle valli è stato implementato, misurato (area 0.13–0.53%, sacca larga
+  3px) e **smontato**: un tetto sul raggio non può garantire un'area.
+- Nessuna vittoria automatica, in nessuna forma.
+- La parola "spirale" non descrive niente di questa geometria: le trasversali
+  sono **trame**, corde fra raggi consecutivi. Il lessico è quello della
+  tessitura (ordito / trame), non della biologia.
+
+**Invarianti verificati che non possono rompersi:**
+- punte della stella esattamente a `rOf(stat)` — errore misurato `0.0e+0`
+- parità = 50.09% dell'area a **ogni** livello (`VALLEY_F = 0.3675`),
+  scale-invariante da 20/20 a 95/95
+- graduazione **equal-area** (`rim·√(k/N)`): lettura esatta, scarto `0.000`. La
+  graduazione lineare — quella di V6/V7 oggi — sbaglia fino a **+12.5 pt** e fa
+  leggere tre numeri diversi alle tre parità
+- la graduazione vive sul **board** (scala 1..99), non sulla tela: la tela porta
+  il carattere, il board porta la misura
+
+**Still unresolved:**
+- Il beat del fallimento critico è in progettazione verificata; la messa in
+  scena precisa (tempi, meccanismo del filo, cosa non deve telegrafare) non è
+  ancora chiusa.
+- Il movimento del lancio non è mai stato giudicato: il pane del browser congela
+  `requestAnimationFrame`, quindi solo il Director può approvarlo.
+- La rete quasi scompare a stat molto alta. Con il crit-fail non geometrico non è
+  più un problema di correttezza, ma resta una scelta di regia aperta.
+- Se le tacche di `drawAxisRig` in V6/V7 vadano corrette a equal-area: per la
+  stessa ragione dimostrata qui, **la scala attuale di V6/V7 è fuorviante**.
