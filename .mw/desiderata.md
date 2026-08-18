@@ -213,3 +213,69 @@ Il progetto RPG adotta il **Golden UI Foundation** come processo per determinare
 - Quale skin diverrà ufficialmente canonical: `Prismatic Wanderlust` è candidata, ma deve essere approvata su artefatti visivi reali (Phase 0).
 - Quali componenti entreranno nel Golden 0 dipende dai risultati dell'audit e dalla review visiva.
 - Quale tool e soglia di diff per le baseline deterministiche.
+
+---
+
+## v9 — La geometria avversariale non deve essere amorfa
+
+**Status:** `FROZEN`
+**Date:** 2026-08-18
+**Authorized by:** Fausto
+**Reason:** avallo diretto in sessione — "Desiderata V9 = la geometria avversariale non deve essere per forza un goo o qualcosa di amorfo"
+
+**Intento del Director:**
+Il goo — blob scuro dai contorni organici e irregolari — non è l'unica forma
+ammessa per rappresentare la difficoltà dello skill check, e non sta
+funzionando. La geometria avversariale è libera di non essere amorfa.
+
+**Formulazione approvata (FROZEN):**
+La geometria avversariale dello skill check **non deve essere per forza un goo
+o qualcosa di amorfo**.
+
+**Cosa questo sblocca (e cosa no):**
+Questo desiderata è un *permesso*, non un mandato. Congela la libertà di
+abbandonare il blob organico; **non** congela quale metafora la sostituisca.
+La ragnatela è la direzione che il Director ha scelto di prototipare per prima,
+non la forma approvata in via definitiva.
+
+**Contesto tecnico:**
+- Il carattere amorfo del bordo nasce da una singola funzione, non dalla forma
+  d'insieme: `gooBlob(θ) = 1 + 0.035·sin(3θ) + 0.022·sin(5θ) + 0.014·sin(7θ)`
+  in `src/ui/idleVillage/components/destinyAstrolabeV7/engine.ts`
+  (antenato: `blob(theta)` in `destinyAstrolabeV3/geometry.ts:97`). È quella
+  somma di seni che fa sembrare arbitraria una soglia che è un numero preciso.
+- La spec canonica dell'astrolabio **nomina il goo** in tre punti di
+  `.mw/specs/destiny-astrolabe/prompt.md` (base, Empire, Wilderness) e nel
+  `design-intent.md` ("failure is *in the goo*"). Sostituirlo richiede una
+  revisione di quegli artefatti, che hanno provenance firmata.
+- Perimetro di rischio: **V1 resta canonica** per il gameplay (desiderata v3,
+  RICHIESTE Q5). V6/V7 sono laboratori: la sperimentazione non tocca le quest.
+
+**Still unresolved:**
+- Quale metafora vince: ragnatela, ombre portate, morsa, corrente. Solo la
+  prima viene prototipata.
+- Se la *contabilità* (unità discrete e numerabili) diventi un requisito
+  vincolante o resti una proprietà desiderabile di una sola soluzione.
+- Se il numero mostrato resti la formula `50+(stat−diff)` o diventi la
+  probabilità geometrica reale (`geo.probPct`): divergono fino a −43.8 pt nel
+  caso multi-skill, dove è la formula a sbagliare.
+- Se e quando revisionare `prompt.md` / `design-intent.md` della spec
+  canonica.
+
+---
+
+## v10 — Placeholder funzionali e skin-ready per scheda, equip, consumabili e skill equip
+
+**Status:** `FROZEN`
+**Date:** 2026-08-18
+**Authorized by:** Fausto
+**Reason:** avallo via "ok" in sessione
+
+**Intento del Director:**
+Costruire componenti placeholder per scheda del personaggio, meccanismo di equip, oggetti equippabili, oggetti consumabili e skill da equippare. I componenti devono essere già funzionali e collegati al sistema di skin, in modo che il lavoro Golden UI possa concentrarsi sull’estetica senza rifare i contratti.
+
+**Formulazione proposta da Claude:**
+Costruire un piano ombrello con sub-piani per: (1) scheda del personaggio, (2) meccanismo di equip, (3) oggetti equippabili, (4) oggetti consumabili, (5) skill da equippare. Ogni componente sarà un placeholder che implementa il contratto funzionale e l’integrazione con il sistema di skin (skinConfig, i18n, config-first, component reuse), in modo che il successivo lavoro Golden UI possa affinare la qualità visiva senza rifare i contratti.
+
+**Formulazione approvata (FROZEN):**
+Il progetto RPG costruisce un piano ombrello con sub-piani per scheda del personaggio, meccanismo di equip, oggetti equippabili, oggetti consumabili e skill da equippare. Ogni componente sarà un placeholder funzionalmente corretto e skin-wired, integrato con skinConfig, i18n, config-first e component reuse, in modo che il lavoro Golden UI possa affinare l’estetica senza rifare i contratti.

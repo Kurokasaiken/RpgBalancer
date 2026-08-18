@@ -29,6 +29,7 @@ const IdleVillageConfigRoute = lazy(() => import('./pages/idle-village-config'))
 const StyleLabDemoPage = lazy(() => import('./pages/style-lab-demo'));
 const DesignSystemPage = lazy(() => import('./pages/design-system'));
 const DesignVsFidelityPage = lazy(() => import('./pages/design-vs-fidelity'));
+const PrimitivesPage = lazy(() => import('./pages/primitives').then(m => ({ default: m.default })));
 const V9SkinSandbox = lazy(() => import('./pages/v9-skin-sandbox').then(m => ({ default: m.V9SkinSandbox })));
 const VisualGrammarValidationPage = lazy(() => import('./ui/visualGrammarValidation/VisualGrammarValidationPage').then(m => ({ default: m.VisualGrammarValidationPage })));
 const VisualFidelityLabPage = lazy(() => import('./ui/visualFidelityLab/VisualFidelityLabPage').then(m => ({ default: m.VisualFidelityLabPage })));
@@ -58,6 +59,11 @@ const MinimalDestinyAstrolabeV2Page = lazy(() => import('./pages/minimal-destiny
 const MinimalDestinyAstrolabeV3Page = lazy(() => import('./pages/minimal-destiny-astrolabe-v3').then(m => ({ default: m.default })));
 const MinimalDestinyAstrolabeV4Page = lazy(() => import('./pages/minimal-destiny-astrolabe-v4').then(m => ({ default: m.default })));
 const MinimalDestinyAstrolabeV5Page = lazy(() => import('./pages/minimal-destiny-astrolabe-v5').then(m => ({ default: m.default })));
+const MinimalDestinyAstrolabeV6Page = lazy(() => import('./pages/minimal-destiny-astrolabe-v6').then(m => ({ default: m.default })));
+const MinimalDestinyAstrolabeV7Page = lazy(() => import('./pages/minimal-destiny-astrolabe-v7').then(m => ({ default: m.default })));
+const SkillCheckWebV1Page = lazy(() => import('./pages/skill-check-web-v1').then(m => ({ default: m.default })));
+const AdversaryShapesPage = lazy(() => import('./pages/adversary-shapes').then(m => ({ default: m.default })));
+const HeroComponentsLabPage = lazy(() => import('./pages/hero-components-lab').then(m => ({ default: m.default })));
 const MinimalOutcomeModalPage = lazy(() => import('./pages/minimal-outcome').then(m => ({ default: m.default })));
 const MinimalMarketActionCardPage = lazy(() => import('./pages/minimal-market-page').then(m => ({ default: m.default })));
 const MinimalJobPoiRosterIntegrationPage = lazy(() => import('./pages/minimal-job-poi-roster-integration').then(m => ({ default: m.default })));
@@ -174,6 +180,8 @@ function App() {
     ['/v9-skin-sandbox', '/skin-lab', '/skin-sandbox'].includes(window.location.pathname);
   const isDesignSystemPath =
     typeof window !== 'undefined' && window.location.pathname === '/design-system';
+  const isPrimitivesPath =
+    typeof window !== 'undefined' && window.location.pathname === '/primitives';
   const isDesignVsFidelityPath =
     typeof window !== 'undefined' && window.location.pathname === '/design-vs-fidelity';
   const isVisualGrammarValidationPath =
@@ -231,6 +239,16 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/minimal-destiny-astrolabe-v4';
   const isMinimalDestinyAstrolabeV5Path =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-destiny-astrolabe-v5';
+  const isMinimalDestinyAstrolabeV6Path =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-destiny-astrolabe-v6';
+  const isMinimalDestinyAstrolabeV7Path =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-destiny-astrolabe-v7';
+  const isSkillCheckWebV1Path =
+    typeof window !== 'undefined' && window.location.pathname === '/skill-check-web-v1';
+  const isAdversaryShapesPath =
+    typeof window !== 'undefined' && window.location.pathname === '/adversary-shapes';
+  const isHeroComponentsLabPath =
+    typeof window !== 'undefined' && window.location.pathname === '/hero-components-lab';
   const isMinimalOutcomeModalPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-outcome';
   const isMinimalMarketActionCardPath =
@@ -617,6 +635,56 @@ function App() {
     );
   }
 
+  if (isMinimalDestinyAstrolabeV6Path) {
+    return (
+      <ErrorBoundary componentName="Minimal Destiny Astrolabe V6 Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Destiny Astrolabe V6…</div>}>
+          <MinimalDestinyAstrolabeV6Page />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMinimalDestinyAstrolabeV7Path) {
+    return (
+      <ErrorBoundary componentName="Minimal Destiny Astrolabe V7 Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Destiny Astrolabe V7…</div>}>
+          <MinimalDestinyAstrolabeV7Page />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isAdversaryShapesPath) {
+    return (
+      <ErrorBoundary componentName="Adversary Shapes Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading shapes…</div>}>
+          <AdversaryShapesPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isHeroComponentsLabPath) {
+    return (
+      <ErrorBoundary componentName="Hero Components Lab Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading hero components…</div>}>
+          <HeroComponentsLabPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isSkillCheckWebV1Path) {
+    return (
+      <ErrorBoundary componentName="Skill Check Web V1 Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Skill Check Web V1…</div>}>
+          <SkillCheckWebV1Page />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
   if (isMinimalOutcomeModalPath) {
     return (
       <ErrorBoundary componentName="Minimal OutcomeModal Page">
@@ -823,6 +891,16 @@ function App() {
       <ErrorBoundary componentName="POI Corona Halo Lab">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading POI Corona Halo Lab...</div>}>
           <PoiCoronaHaloLabPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isPrimitivesPath) {
+    return (
+      <ErrorBoundary componentName="Primitives Lab">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Primitives Lab...</div>}>
+          <PrimitivesPage />
         </Suspense>
       </ErrorBoundary>
     );
