@@ -13,7 +13,6 @@ import {
   AXES,
   DEFAULTS,
   R,
-  effectiveValleyF,
   phaseAt,
   readout,
   rOf,
@@ -112,9 +111,7 @@ export default function RagnatelaLab() {
       k: Math.min(cw, ch) / 2 / (R * 1.02),
       rFrame: rOf(p.difficulty),
       /* raggio PIENO della stella: la scala la applica drawWeb */
-      /* fattore di valle effettivo: a vantaggio schiacciante le valli si
-         approfondiscono per lasciare le sacche del fallimento critico */
-      rStar: (a) => rStarAt(a, tips, 1, effectiveValleyF(rOf(p.stat), rOf(p.difficulty))),
+      rStar: (a) => rStarAt(a, tips, 1),
       seed: 7,
       /* il righello: 1..99 sull'intero board, così punta-stella e muro-arena
          si leggono sullo stesso metro */
@@ -127,10 +124,14 @@ export default function RagnatelaLab() {
       },
     };
 
+    /* showStar era scritto dalla checkbox e non letto da nessuno: la regione di
+       SUCCESSO non si poteva spegnere, quindi ogni giudizio su "si vede in
+       anticipo?" veniva dato guardando un board che mostra sempre la risposta. */
     drawWeb(ctx, S, w, {
       launch: ph.weaveP,
       starS: ph.starS,
       tearT: ph.tearT,
+      showStar: p.showStar,
       snapFrac: p.snapFrac,
       recoil: p.recoil,
       damping: p.damping,
@@ -365,29 +366,6 @@ export default function RagnatelaLab() {
               />
               stella
             </label>
-            <div className="space-y-1.5 pt-1">
-              <span className="text-xs text-gray-400">Graduazione</span>
-              <div className="flex gap-1.5">
-                {(['area', 'linear'] as const).map((g) => (
-                  <button
-                    key={g}
-                    onClick={() => set('graduation', g)}
-                    className={`flex-1 px-2 py-1 rounded text-xs font-semibold ${
-                      p.graduation === g
-                        ? 'bg-amber-500 text-black'
-                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                    }`}
-                  >
-                    {g === 'area' ? 'Equal-area' : 'Lineare'}
-                  </button>
-                ))}
-              </div>
-              <p className="text-[11px] leading-snug text-gray-500">
-                {p.graduation === 'area'
-                  ? 'tacche a rim·\u221A(k/N): la lettura sui fili e\u0301 esatta'
-                  : 'tacche equispaziate in raggio (come V7 oggi): mente fino a +12.5 pt'}
-              </p>
-            </div>
             <button
               onClick={() => {
                 setP(DEFAULTS);
