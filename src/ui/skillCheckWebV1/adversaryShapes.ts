@@ -286,6 +286,8 @@ export interface WebAnim {
   starS: number;
   /** ms dall'inizio dello sfondamento, per le vibrazioni smorzate */
   tearT: number;
+  /** durata totale dello sfondamento (ms): serve a DATARE lo scatto di ogni filo */
+  tearMs: number;
   /** frazione di raggio consumata oltre la quale il filo scatta */
   snapFrac: number;
   /** ampiezza del rinculo allo scatto, in unità engine */
@@ -305,13 +307,32 @@ const STATIC: WebAnim = {
   launch: 1,
   showStar: true,
   starS: 1,
-  tearT: 0,
+  tearT: 1e6,
+  tearMs: 900,
   snapFrac: 0.55,
   recoil: 0,
   damping: 6,
 };
 
+/** quanto dura la ritrazione di un filo scattato (ms) */
+const RETRACT_MS = 220;
+
 const easeOut3 = (p: number) => 1 - (1 - p) ** 3;
+/**
+ * Inversa di easeInOutCubic, in forma chiusa.
+ *
+ * Serve per datare lo scatto: la stella cresce con easeInOutCubic, quindi il
+ * filo i scatta a starS = snapAt(i), e questa funzione dice a QUALE FRAZIONE
+ * dello sfondamento corrisponde. Senza, la ritrazione andrebbe pilotata dallo
+ * scarto di starS e resterebbe congelata a meta' durante l'assestamento, dove
+ * starS vale 1 fisso.
+ */
+const invEaseInOutCubic = (e: number): number => {
+  if (e <= 0) return 0;
+  if (e >= 1) return 1;
+  if (e < 0.5) return Math.cbrt(e / 4);
+  return 1 - Math.cbrt(2 * (1 - e)) / 2;
+};
 const cl01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 /** sovraelongazione: supera il bersaglio e rientra. È la molla della rete. */
 const easeOutBack = (p: number, over: number) => {
@@ -338,7 +359,22 @@ export function drawWeb(
 ): void {
   const A = anim ?? STATIC;
   const { cx, cy, k, rFrame } = S;
-  const rnd = mulberry32(S.seed);
+  /* STREAM PRNG SEPARATI PER SOTTOSISTEMA.
+     Prima c'era un solo stream condiviso, e ogni raggio che moriva saltava le 15
+     estrazioni del suo ciclo di campioni: tutto il rumore a valle (jitter della
+     seconda passata del telaio, wobble di ogni trama, posizione delle gocce) si
+     rigenerava diverso. Risultato: un GUIZZO GLOBALE della tela sincronizzato al
+     frame esatto in cui un filo moriva — un tell che l'occhio prende benissimo e
+     che puntava al momento della morte.
+     Con stream indipendenti `dead[]` non puo' piu' spostare il rumore di nessun
+     altro elemento: non "consumo comunque", elimino la classe di bug. */
+  const rndAnc = mulberry32((S.seed ^ 0x9e3779b1) >>> 0);
+  const rndAng = mulberry32((S.seed ^ 0x85ebca6b) >>> 0);
+  const rndFrm = mulberry32((S.seed ^ 0xc2b2ae35) >>> 0);
+  const rndWft = mulberry32((S.seed ^ 0x27d4eb2f) >>> 0);
+  /** stream dedicato al raggio i: indipendente da quanti altri sono morti */
+  const rayRnd = (i: number) =>
+    mulberry32((Math.imul(S.seed, 0x27d4eb2d) ^ Math.imul(i + 1, 0x9e3779b1)) >>> 0);
 
   drawArena(ctx, S);
 
@@ -382,10 +418,10 @@ export function drawWeb(
   const AN = Math.max(3, o.anchors);
   const ancA: number[] = [];
   for (let i = 0; i < AN; i += 1) {
-    ancA.push(-Math.PI / 2 + (i / AN) * TAU + (rnd() - 0.5) * (TAU / AN) * 0.55);
+    ancA.push(-Math.PI / 2 + (i / AN) * TAU + (rndAnc() - 0.5) * (TAU / AN) * 0.55);
   }
   ancA.sort((x, y) => x - y);
-  const ancR = ancA.map(() => rFrame * (1 - rnd() * o.anchorJitter));
+  const ancR = ancA.map(() => rFrame * (1 - rndAnc() * o.anchorJitter));
 
   /** raggio del telaio all'angolo a: intersezione raggio/segmento fra ancoraggi */
   const frameRadiusAt = (a: number): number => {
@@ -428,7 +464,7 @@ export function drawWeb(
   /* ── ORDITO ─────────────────────────────────────────────────────────── */
   const ang: number[] = [];
   for (let i = 0; i < N; i += 1) {
-    ang.push(-Math.PI / 2 + (i / N) * TAU + (rnd() - 0.5) * (TAU / N) * 0.6);
+    ang.push(-Math.PI / 2 + (i / N) * TAU + (rndAng() - 0.5) * (TAU / N) * 0.6);
   }
   ang.sort((x, y) => x - y);
 
@@ -450,34 +486,57 @@ export function drawWeb(
     const r0Adj = rsAt(a) + fz;
     /* UNA SOLA CAUSA DI MORTE: lo sfondamento del telaio. Prima c'era anche
        `span <= 0.5`, e a parita' perfetta faceva svanire 3 raggi su 26 nel frame
-       culminante dello sfondamento — dove per specifica non deve accadere
-       niente. Era un tell FALSO: l'occhio registra "e' successo qualcosa" e
-       impara a diffidare di un segnale che non significa nulla. Ora uno span
-       piccolo ACCORCIA il filo, non lo cancella. */
+       culminante — dove per specifica non deve accadere niente. Era un tell
+       FALSO. Ora uno span piccolo ACCORCIA il filo, non lo cancella. */
     const span = Math.max(0, rOut - r0Adj);
     rInner.push(r0Adj);
     const gone = punchedAt(a);
     dead.push(gone);
-    if (gone || span < 0.2) continue;
+    if (span < 0.2) continue;
 
+    /* IL FILO SI RITRAE, NON SVANISCE.
+       Prima un raggio scattato faceva `continue` e scompariva in un frame: un
+       pop. Qui lo scatto e' DATATO — il filo i scatta quando la stella arriva a
+       snapAt(i) — e da quel momento il filo si ritira verso il telaio in
+       RETRACT_MS, vibrando. Il capo che sopravvive e' quello ESTERNO, annodato
+       al telaio: la stella lo ha mangiato dall'interno. */
+    const rs1 = S.rStar(a);
+    const snapAt = rs1 > 0 ? (rOut * (1 + o.punchOut)) / rs1 : Infinity;
+    let retract = 0;
+    if (Number.isFinite(snapAt) && snapAt <= 1) {
+      const snapMs = invEaseInOutCubic(snapAt) * Math.max(1, A.tearMs);
+      retract = cl01((A.tearT - snapMs) / RETRACT_MS);
+    }
+    if (retract >= 1) continue;
+
+    /* RINCULO COME CONSEGUENZA, non come profezia.
+       Prima vibravano i fili che STAVANO PER rompersi (soglia su snapFrac): a
+       meta' crescita 11 fili tremavano con zero morti, quindi la vibrazione
+       pre-marcava i condannati e i fermi erano i superstiti. Ora vibra solo chi
+       ha GIA' scattato, dal proprio istante di scatto. I vivi hanno rinculo zero. */
     let kick = 0;
-    if (A.recoil > 0 && r0Adj / rOut > A.snapFrac) {
-      const tau = Math.max(0, A.tearT) / 1000;
+    if (A.recoil > 0 && retract > 0) {
+      const snapMs = invEaseInOutCubic(snapAt) * Math.max(1, A.tearMs);
+      const tau = Math.max(0, A.tearT - snapMs) / 1000;
       kick = A.recoil * Math.exp(-A.damping * tau * 0.6) * Math.sin(tau * 26);
     }
 
-    const amp = o.curveMode === 'none' ? 0 : o.curve * span;
+    /* la ritrazione alza l'estremo INTERNO verso il telaio */
+    const rStart = r0Adj + span * easeOut3(retract);
+    const spanNow = Math.max(0, rOut - rStart);
+    const amp = o.curveMode === 'none' ? 0 : o.curve * spanNow;
     /* `gravity`: versore FISSO verso il basso, non ruota con l'angolo — è questo
        che rende impossibile il vortice. */
     const px = o.curveMode === 'gravity' ? 0 : -Math.sin(a);
     const py = o.curveMode === 'gravity' ? 1 : Math.cos(a);
+    const rr = rayRnd(i);
     const segs = 14;
     const pts: { x: number; y: number }[] = [];
     for (let sI = 0; sI <= segs; sI += 1) {
       const t = sI / segs;
-      const r = r0Adj + kick + span * t;
+      const r = rStart + kick + spanNow * t;
       const bow = amp * Math.sin(t * Math.PI) * k;
-      const jit = (rnd() - 0.5) * o.wobble * Math.sin(t * Math.PI);
+      const jit = (rr() - 0.5) * o.wobble * Math.sin(t * Math.PI);
       pts.push(P(r, a, px * bow + jit, py * bow + jit));
     }
     fillTapered(ctx, pts, 1.5, 0.9, INK.silk);
@@ -493,8 +552,8 @@ export function drawWeb(
     y: (u.y + v.y) / 2,
   });
   for (let pass = 0; pass < 2; pass += 1) {
-    const jx = pass === 0 ? 0 : (rnd() - 0.5) * 2.2;
-    const jy = pass === 0 ? 0 : (rnd() - 0.5) * 2.2;
+    const jx = pass === 0 ? 0 : (rndFrm() - 0.5) * 2.2;
+    const jy = pass === 0 ? 0 : (rndFrm() - 0.5) * 2.2;
     ctx.strokeStyle = INK.frame;
     ctx.lineWidth = pass === 0 ? 1.9 : 0.85;
     ctx.globalAlpha = pass === 0 ? 1 : 0.5;
@@ -566,8 +625,8 @@ export function drawWeb(
       const dx = cx + offX - mx;
       const dy = cy + offY - my;
       const dl = Math.hypot(dx, dy) || 1;
-      const qx = mx + (dx / dl) * pull + (rnd() - 0.5) * o.wobble;
-      const qy = my + (dy / dl) * pull + (rnd() - 0.5) * o.wobble;
+      const qx = mx + (dx / dl) * pull + (rndWft() - 0.5) * o.wobble;
+      const qy = my + (dy / dl) * pull + (rndWft() - 0.5) * o.wobble;
 
       ctx.beginPath();
       ctx.moveTo(p0.x, p0.y);
@@ -576,7 +635,7 @@ export function drawWeb(
       ctx.lineWidth = 0.75;
       ctx.stroke();
 
-      if (o.droplets && r > rFrame * 0.72 && rnd() < 0.16) drops.push({ x: qx, y: qy });
+      if (o.droplets && r > rFrame * 0.72 && rndWft() < 0.16) drops.push({ x: qx, y: qy });
     }
   }
 

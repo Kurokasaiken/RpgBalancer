@@ -80,6 +80,12 @@ export default function RagnatelaLab() {
   const [playing, setPlaying] = useState(true);
   const [loop, setLoop] = useState(true);
   const [t, setT] = useState(0);
+  /* SEED PER PROVA. Prima era `seed: 7` cablato: la tela era identica bit per bit
+     a ogni tiro — stessi 13 ancoraggi, stessi 26 raggi, stessi fili che muoiono
+     nello stesso ordine. Il lucchetto serve ai confronti A/B, dove la tela deve
+     restare ferma mentre si cambia un parametro. */
+  const [seed, setSeed] = useState(7);
+  const [seedLock, setSeedLock] = useState(false);
 
   const set = <K extends keyof RagnatelaParams>(k: K, v: RagnatelaParams[K]) =>
     setP((prev) => ({ ...prev, [k]: v }));
@@ -93,7 +99,9 @@ export default function RagnatelaLab() {
     pausedAtRef.current = 0;
     setT(0);
     setPlaying(true);
-  }, []);
+    /* ogni replay e' una PROVA nuova: tela diversa, salvo lucchetto */
+    if (!seedLock) setSeed((v) => (v * 1664525 + 1013904223) >>> 8);
+  }, [seedLock]);
 
   /* Mappa la timeline sulla rete.
      Il beat 1 non è più tessitura: è LANCIO. Il ragno non esiste, quindi non
@@ -112,7 +120,7 @@ export default function RagnatelaLab() {
       rFrame: rOf(p.difficulty),
       /* raggio PIENO della stella: la scala la applica drawWeb */
       rStar: (a) => rStarAt(a, tips, 1),
-      seed: 7,
+      seed,
       /* il righello: 1..99 sull'intero board, così punta-stella e muro-arena
          si leggono sullo stesso metro */
       rig: {
@@ -131,6 +139,7 @@ export default function RagnatelaLab() {
       launch: ph.weaveP,
       starS: ph.starS,
       tearT: ph.tearT,
+      tearMs: p.tearMs,
       showStar: p.showStar,
       snapFrac: p.snapFrac,
       recoil: p.recoil,
@@ -173,7 +182,7 @@ export default function RagnatelaLab() {
     return () => {
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
-  }, [p, w, playing, loop, total]);
+  }, [p, w, seed, playing, loop, total]);
 
   const togglePlay = () => {
     if (playing) {
@@ -263,6 +272,17 @@ export default function RagnatelaLab() {
             <label className="flex items-center gap-1.5 text-xs text-gray-400">
               <input type="checkbox" checked={loop} onChange={(e) => setLoop(e.target.checked)} />
               loop
+            </label>
+            <label
+              className="flex items-center gap-1.5 text-xs text-gray-400"
+              title="tiene la stessa tela fra un replay e l'altro, per confronti A/B"
+            >
+              <input
+                type="checkbox"
+                checked={seedLock}
+                onChange={(e) => setSeedLock(e.target.checked)}
+              />
+              tela fissa
             </label>
             <input
               type="range"
