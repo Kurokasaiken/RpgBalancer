@@ -292,10 +292,18 @@ export interface WebAnim {
   recoil: number;
   /** smorzamento della vibrazione */
   damping: number;
+  /**
+   * Disegnare la stella? Serve a SPEGNERE LA RISPOSTA: senza questo, ogni
+   * giudizio su "il beat si vede in anticipo?" viene dato guardando un board che
+   * mostra sempre la soluzione. Era un parametro scritto dalla checkbox e mai
+   * letto da nessuno.
+   */
+  showStar: boolean;
 }
 
 const STATIC: WebAnim = {
   launch: 1,
+  showStar: true,
   starS: 1,
   tearT: 0,
   snapFrac: 0.55,
@@ -311,6 +319,16 @@ const easeOutBack = (p: number, over: number) => {
   const q = p - 1;
   return 1 + (c + 1) * q * q * q + c * q * q;
 };
+
+/** gocce selettive: 200 punti seppellirebbero la pallina */
+function drawDroplets(ctx: CanvasRenderingContext2D, drops: { x: number; y: number }[]): void {
+  for (const d of drops) {
+    ctx.beginPath();
+    ctx.arc(d.x, d.y, 1.5, 0, TAU);
+    ctx.fillStyle = INK.frame;
+    ctx.fill();
+  }
+}
 
 export function drawWeb(
   ctx: CanvasRenderingContext2D,
@@ -396,14 +414,16 @@ export function drawWeb(
 
   const rsAt = (a: number) => S.rStar(a) * A.starS;
 
-  /* Nessuna vittoria automatica: il fallimento critico esiste SEMPRE, quindi la
-     rete non svanisce mai del tutto. Ci pensa il tetto alle valli (VALLEY_CAP in
-     webEngine): a vantaggio schiacciante le valli si approfondiscono e la rete
-     sopravvive in cinque sacche — e quelle sacche SONO il fallimento critico,
-     visibile come luogo sul board invece che nascosto in un tiro di dado. */
+  /* Il FALLIMENTO CRITICO NON E' SUL BOARD — decisione del Director. Il 5% viene
+     dato dal sistema, l'esito e' scelto a monte, e il board mette in scena solo
+     l'esito geometrico onesto: la HUD dice il resto. Quindi qui non esiste ne'
+     una regione dedicata, ne' un agente, ne' un tetto alle valli — c'era, era
+     misurato a 0.13% d'area con sacche larghe 3px, ed e' stato rimosso.
+     Conseguenza accettata: a vantaggio schiacciante la rete puo' sparire del
+     tutto, e va bene — vuol dire che hai coperto tutto. */
   const punchedAt = (a: number) => rsAt(a) >= frameRadiusAt(a) * (1 + o.punchOut);
 
-  drawStar(ctx, S, rsAt, rFrame);
+  if (A.showStar) drawStar(ctx, S, rsAt, rFrame);
 
   /* ── ORDITO ─────────────────────────────────────────────────────────── */
   const ang: number[] = [];
@@ -428,11 +448,17 @@ export function drawWeb(
     const gapAvail = Math.max(0, rOut - rsAt(a));
     const fz = Math.min(o.freeZone, gapAvail * 0.35);
     const r0Adj = rsAt(a) + fz;
-    const span = rOut - r0Adj;
+    /* UNA SOLA CAUSA DI MORTE: lo sfondamento del telaio. Prima c'era anche
+       `span <= 0.5`, e a parita' perfetta faceva svanire 3 raggi su 26 nel frame
+       culminante dello sfondamento — dove per specifica non deve accadere
+       niente. Era un tell FALSO: l'occhio registra "e' successo qualcosa" e
+       impara a diffidare di un segnale che non significa nulla. Ora uno span
+       piccolo ACCORCIA il filo, non lo cancella. */
+    const span = Math.max(0, rOut - r0Adj);
     rInner.push(r0Adj);
-    const gone = span <= 0.5 || punchedAt(a);
+    const gone = punchedAt(a);
     dead.push(gone);
-    if (gone) continue;
+    if (gone || span < 0.2) continue;
 
     let kick = 0;
     if (A.recoil > 0 && r0Adj / rOut > A.snapFrac) {
@@ -505,7 +531,13 @@ export function drawWeb(
      Esistono tutte dal primo frame: è il lancio che le porta fuori. */
   const alive = rInner.map((r, i) => (dead[i] ? Infinity : r));
   const minInner = Math.min(...alive);
-  if (!Number.isFinite(minInner)) return;
+  /* Niente early return: quando tutti i raggi sono morti usciva di qui e
+     cancellava anche trame, mozzo e gocce — la rete SPARIVA in un frame. Ora
+     salta le sole trame, che senza raggi vivi non hanno appigli. */
+  if (!Number.isFinite(minInner)) {
+    drawDroplets(ctx, []);
+    return;
+  }
 
   const drops: { x: number; y: number }[] = [];
   ctx.lineCap = 'round';
@@ -562,14 +594,7 @@ export function drawWeb(
     ctx.stroke();
   }
 
-  /* gocce selettive: 200 punti seppellirebbero la pallina, che è già l'oggetto
-     meno visibile del board */
-  for (const d of drops) {
-    ctx.beginPath();
-    ctx.arc(d.x, d.y, 1.5, 0, TAU);
-    ctx.fillStyle = INK.frame;
-    ctx.fill();
-  }
+  drawDroplets(ctx, drops);
 }
 
 /* ── (b) ROVERETO ────────────────────────────────────────────────────────

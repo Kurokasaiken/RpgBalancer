@@ -33,22 +33,6 @@ export const R_CORE = Math.max(30, R * 0.12);
  */
 export const VALLEY_F = 0.3675;
 
-/**
- * Tetto alle VALLI della stella, in frazione del raggio dell'arena.
- *
- * Esiste perché il fallimento critico esiste SEMPRE: non c'è vittoria
- * automatica, nemmeno con un vantaggio schiacciante. Quindi la stella non può
- * mai coprire il 100% dell'arena — deve restare una regione di fallimento.
- *
- * Il tetto agisce solo sulle valli, mai sulle punte: le punte devono restare a
- * rOf(stat) (invariante del Director). Quando le valli sfonderebbero il tetto,
- * si APPROFONDISCONO invece di essere tagliate — cioè la stella diventa più
- * spigolosa. Effetto: a vantaggio estremo la rete sopravvive solo in cinque
- * sacche profonde nelle valli, e il fallimento critico diventa un LUOGO
- * VISIBILE sul board invece di un tiro di dado nascosto.
- */
-export const VALLEY_CAP = 0.9;
-
 const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
 const normAng = (a: number) => {
   let x = a % TAU;
@@ -78,20 +62,6 @@ export const TIP = (i: number) => -Math.PI / 2 + i * (TAU / AXES);
  * `starTip[i]` — mai il risultato di un solve, che era il bug per cui le punte
  * non arrivavano al valore della stat.
  */
-/**
- * Fattore di valle EFFETTIVO: normalmente VALLEY_F, ma si approfondisce quando
- * serve per non violare il tetto. Nel range normale non tocca niente — a parità
- * la valle sta a 0.3675 del muro, lontanissima dal tetto di 0.9.
- */
-export function effectiveValleyF(
-  tipR: number,
-  rFrame: number,
-  cap = VALLEY_CAP,
-): number {
-  if (tipR <= 0) return VALLEY_F;
-  return Math.min(VALLEY_F, (rFrame * cap) / tipR);
-}
-
 export function rStarAt(
   theta: number,
   starTip: number[],
@@ -114,22 +84,31 @@ export function rStarAt(
 }
 
 /**
- * Dove cadono le tacche della graduazione.
+ * Graduazione di AREA — attenzione, NON è il righello del board.
  *
- * `linear` — equispaziate in raggio. MENTE: la lunghezza è lineare in r, l'area
- *   è quadratica, quindi "bruciato fino a metà" non è "metà probabilità".
- *   Misurato: scarto fino a +12.5 punti, con segno incoerente, e le tre parità
- *   leggono 45.6 / 59.1 / 62.6 invece di 50 tutte e tre.
+ * Sono due strumenti con due mestieri diversi, e confonderli rompe un
+ * invariante:
  *
- * `area` — tacca k-esima a `rim·√(k/N)`, equispaziata in AREA dall'origine.
- *   Lettura ESATTA: scarto 0.000 su tutti i casi a difficoltà uniforme, perché
- *   area = ½∫r²dθ e quindi la media di r²/rim² È il rapporto di aree.
- *   Un'identità, non un'approssimazione fortunata.
+ *   RIGHELLO DEL BOARD — tacca del valore `v` a `rOf(v)`. Legge «la punta è a
+ *     85». È obbligato così dall'invariante del Director: se il PG ha 40, la
+ *     punta della stella deve cadere sulla 4ª stanghetta. Non va toccato.
  *
- * Caveat: con difficoltà diverse per asse l'identità cade (media di un rapporto
- * ≠ rapporto di medie). Lì ogni asse resta esatto per sé, ma un numero globale
- * non esiste — e non è una perdita, perché la formula lineare in quel caso
- * sbagliava di −43.8 punti.
+ *   GRADUAZIONE DI AREA — tacca k-esima a `rim·√(k/N)`, equispaziata in area
+ *     dall'origine e relativa al MURO dell'arena. Leggerebbe «la stella copre
+ *     il 60% dell'arena». Rende quella lettura ESATTA: scarto 0.000, perché
+ *     area = ½∫r²dθ e quindi la media di r²/rim² È il rapporto di aree. Una
+ *     spaziatura lineare in raggio sbaglierebbe fino a +12.5 punti e farebbe
+ *     leggere tre numeri diversi alle tre parità.
+ *
+ * `gradRadii` implementa la seconda. Oggi non è cablata da nessuna parte, e va
+ * bene: sul board non esiste (ancora) una lettura di probabilità da graduare.
+ * Cablarla nel righello sposterebbe la tacca di «40» via da `rOf(40)` e
+ * romperebbe l'invariante — è l'errore che una revisione automatica ha proposto.
+ *
+ * Caveat della legge: con difficoltà diverse per asse l'identità cade (media di
+ * un rapporto ≠ rapporto di medie). Lì ogni asse resta esatto per sé, ma un
+ * numero globale non esiste — e non è una perdita, perché la formula lineare in
+ * quel caso sbagliava di −43.8 punti.
  */
 export type Graduation = 'area' | 'linear';
 
@@ -160,7 +139,6 @@ export interface RagnatelaParams {
   /** smorzamento della vibrazione post-scatto */
   damping: number;
   showStar: boolean;
-  graduation: Graduation;
 }
 
 export const DEFAULTS: RagnatelaParams = {
@@ -174,7 +152,6 @@ export const DEFAULTS: RagnatelaParams = {
   recoil: 14,
   damping: 6,
   showStar: true,
-  graduation: 'area',
 };
 
 /* ── TIMELINE ──────────────────────────────────────────────────────────
@@ -226,7 +203,6 @@ export function readout(p: RagnatelaParams): Readout {
   const n = Math.max(1, p.strands);
   const rimR = rOf(p.difficulty);
   const starTip = Array.from({ length: AXES }, () => rOf(p.stat));
-  const vf = effectiveValleyF(rOf(p.stat), rimR);
   const full = Math.max(1, rimR - R_CORE);
 
   /* integrazione fine sull'angolo: equal-area e area vera vengono da qui */
@@ -237,7 +213,7 @@ export function readout(p: RagnatelaParams): Readout {
   let arenaA = 0;
   for (let i = 0; i < NA; i += 1) {
     const a = -Math.PI / 2 + i * dA;
-    const rs = clamp(rStarAt(a, starTip, 1, vf), R_CORE, rimR);
+    const rs = clamp(rStarAt(a, starTip, 1), R_CORE, rimR);
     areaSum += (rs * rs) / (rimR * rimR) / NA;
     starA += 0.5 * rs * rs * dA;
     arenaA += 0.5 * rimR * rimR * dA;
@@ -248,7 +224,7 @@ export function readout(p: RagnatelaParams): Readout {
   let eatenSum = 0;
   for (let j = 0; j < n; j += 1) {
     const angle = -Math.PI / 2 + (j / n) * TAU;
-    const rs = rStarAt(angle, starTip, 1, vf);
+    const rs = rStarAt(angle, starTip, 1);
     eatenSum += clamp(rs - R_CORE, 0, full) / full;
     if (rs < rimR) survivors += 1;
   }
