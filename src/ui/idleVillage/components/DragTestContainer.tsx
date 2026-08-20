@@ -14,7 +14,7 @@ import { rendererStackInstrumentation } from '@/ui/idleVillage/utils/rendererSta
 import { getResidentPortraitUrl } from '@/engine/game/idleVillage/residentVisualResolver';
 import { useMatericSkin } from '@/ui/wanderlust-surface/MatericSkinContext';
 import { MATERIC_SKIN_CONFIG } from '@/ui/wanderlust-surface/matericSkinConfig';
-import { WellBronzeBezel } from '@/ui/visualFidelityLab/plateVariants';
+import { BezelMolding } from '@/ui/visualFidelityLab/plateVariants';
 
 /**
  * DragTestContainer - Resident Roster Container (CANONICAL VERSION)
@@ -1074,7 +1074,7 @@ function DragTestContainer({
           ))}
         </div>
       )}
-      {useWanderlustSkin && <WellBronzeBezel band={1.5} rx={19} flush />}
+      {useWanderlustSkin && <WellBronzeBezel band={2} rx={19} flush />}
       <div className={`relative z-10 space-y-4 ${useWanderlustSkin ? 'p-6' : 'p-4'}`.trim()}>
         {useWanderlustSkin && (
           <div 

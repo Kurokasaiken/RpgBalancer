@@ -1,0 +1,44 @@
+[
+  {
+    "id": "iron-sword",
+    "name": "Iron Sword",
+    "slot": "weapon",
+    "rarity": "Common",
+    "effect": "+2 damage"
+  },
+  {
+    "id": "steel-dagger",
+    "name": "Steel Dagger",
+    "slot": "offhand",
+    "rarity": "Rare",
+    "effect": "+1 damage, +1 crit"
+  },
+  {
+    "id": "leather-vest",
+    "name": "Leather Vest",
+    "slot": "armor",
+    "rarity": "Common",
+    "effect": "+1 armor"
+  },
+  {
+    "id": "amulet",
+    "name": "Amulet",
+    "slot": "trinket",
+    "rarity": "Epic",
+    "effect": "+1 wisdom"
+  },
+  {
+    "id": "buckler",
+    "name": "Buckler",
+    "slot": "offhand",
+    "rarity": "Common",
+    "effect": "+1 block"
+  },
+  {
+    "id": "riding-horse",
+    "name": "Riding Horse",
+    "slot": "mount",
+    "rarity": "Common",
+    "effect": "+1 speed"
+  }
+]

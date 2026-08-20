@@ -1,7 +1,7 @@
 ---
 title: Richieste esplicite
 type: intent-ledger
-updated: 2026-08-15
+updated: 2026-08-18
 ---
 
 # Richieste esplicite
@@ -618,3 +618,32 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 1. Completare valutazione Identity/Visual Quality con screenshot o Director review.
 2. Eseguire Golden 0 forensics sui componenti confermati.
 3. Produrre `GOLDEN_0_DNA.md`.
+
+---
+
+## R-029 — Hero components placeholder: test hub e sub-plan B–E
+
+**Richiesta:** *"continua con il resto del plan"* in risposta al completamento del Sub-Plan A e della pagina `HeroComponentsLab`. Il Director conferma di voler procedere con C, D ed E "tutti insieme", con Sub-Plan B in modalità drag-and-drop e modificabile a piacere.
+**Data:** 2026-08-18
+**Stato:** `fatta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v10 — Hero Components placeholder.
+**Cosa è successo:**
+- Completato Sub-Plan B (`EquipSlotRack`, `useEquipment`, `ItemDragToken`) con drag-and-drop.
+- Completati Sub-Plan C (`EquippableItemCard`), D (`ConsumablePile`), E (`SkillDeck` + `useSkillLoadout`).
+- Aggiornata `HeroComponentsLabPage` con tutti i componenti A–E.
+- Aggiunte prove di salvaguardia `build:check`, `lint`, `test`, `kanban:lint` e smoke test 200 OK.
+
+---
+
+## R-030 — Collegare i hero components placeholder alla logica di gioco
+
+**Richiesta:** *"adesso dobbiamo collegare davvero quei componenti alla logica"*.
+**Data:** 2026-08-18
+**Stato:** `fatta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v10 — Hero Components placeholder.
+**Cosa è successo:**
+1. Creato `src/balancing/config/idleVillage/heroItems.ts` con Zod schemas e JSON (`equippableItems.json`, `consumables.json`, `skills.json`) — source of truth per item/consumabili/skill.
+2. Creato `useResidentHeroState` che lega `ResidentState` a stato hero (equip, inventario, skill loadout) con persistenza `PersistenceService`.
+3. `HeroComponentsLabPage` ora usa i dati JSON, `useResidentHeroState` e riflette le modifiche in `PgDetailCard`.
+4. Lo `SkillDeck` persiste il loadout ma non tocca il skill check (R-030 escludeva il skill check).
+5. Fix test `PgDetailCard` per compatibilità con `Materic*`/`WanderlustSurface`.

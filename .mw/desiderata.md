@@ -353,3 +353,131 @@ scena**, non modellato.
   più un problema di correttezza, ma resta una scelta di regia aperta.
 - Se le tacche di `drawAxisRig` in V6/V7 vadano corrette a equal-area: per la
   stessa ragione dimostrata qui, **la scala attuale di V6/V7 è fuorviante**.
+
+---
+
+## v12 — Strato punti-stat, Trial by Fire, consumabili e authoring delle attivita'
+
+**Status:** `FROZEN`
+**Date:** 2026-08-20
+**Authorized by:** Fausto
+**Reason:** "approvo cn queste modifiche" — avallo esplicito sulla candidata rev. 2 presentata in sessione, con le correzioni del turno finale (config-first, "pool" invece di "DB")
+
+**Relazione con v10:** v10 congela i *contratti dei componenti placeholder* (scheda, equip,
+equippabili, consumabili, skill) realizzati in `src/pages/hero-components-lab.tsx`. v12 sta
+**sopra** v10: definisce da dove vengono i numeri, come i consumabili entrano ed escono dalle
+attivita', e come le attivita' si autorano. Non rimpiazza v10, la alimenta.
+
+### Vincolo trasversale (ribadito dal Director, prevale su tutto il resto)
+
+**Config-first, sempre. Tutti i numeri e i valori nominati qui sono il DEFAULT ATTUALE, non
+valori hardcoded.** Vivono in config modules validati Zod e consumati read-only da UI/logica
+(`.windsurf/rules/philosophy.md` §Config-first). Ogni numero in questo documento va letto come
+"il default che stiamo usando adesso", mai come costante. Corollario: **single source of truth**
+— ogni concern ha esattamente una casa canonica, la duplicazione e' un bug.
+
+### User-stated
+
+- Le stat vivono su una **scala a punti** con **modificatori di peso** per stat:
+  HP x4 (-20 punti = -80 HP; base 200 -> 120), TxC ~x1 su base 50% +25% se armato
+  (-20 punti -> 55% di colpire). Default attuali, non hardcoded.
+- Ordini di grandezza a occhio: eroi fino a ~+25, PG normali fino a ~+5, negativi fino a ~-20.
+  **Non stabiliti a tavolino: vanno decisi e implementati.** Requisito fermo: facilmente
+  modificabili — cioe' config-first.
+- Confine Balancer<->equip: il danno medio della scheda e' il danno di un'**arma media**;
+  il +25% TxC e' l'essere armato.
+- POI -> POI-detail -> **slot rack** -> slot. **Ogni slot ha modificatori specifici e ne
+  conferisce.**
+- Mandare **piu' PG degli obbligatori** deve poter dare: loot migliore, minor probabilita' di
+  morte, o **spostare la probabilita' di morte da un PG a un altro** (PG deboli come carne da
+  macello).
+- **Trial by Fire**: un PG non-eroe che supera **3 quest** (default) con **deathChance >= 5%**
+  (default) diventa un personaggio eroico; le sue stat aumentano vertiginosamente. Da
+  implementare **e da documentare**.
+- **Tutti possono equipaggiare tutto.** Il **numero di skill equipaggiabili dipende da un
+  valore tipo Intelligenza** (o simile).
+- Consumabili: modo per **mostrarli**, ottenerli da **quest o job di edifici speciali**,
+  **mandarli** nelle quest e **usarli** nelle quest. Il consumo e' **scelta del giocatore**.
+- Modo **carino, estetico** per creare e modificare le attivita' (quest/job), e per generarle
+  **automaticamente**.
+- Deve esistere comunque un **pool di quest prestabilite** (non un DB reale: nel progetto oggi
+  non si usano DB — JSON o formato equivalente).
+- Distinguere nome-del-valore da nome-della-stat (HP = valore, Costituzione = stat che lo
+  calcola con un calcolo matematico): **riconosciuto ma rinviato**, non interessa ora.
+- Dove serve un nome non ancora deciso, usare **nomi temporanei**.
+
+### AI inference (marcata come tale)
+
+- Il livello mancante e' uno **strato punti-stat sopra lo strato valori**, con tasso di cambio
+  per stat. Il tasso di cambio e' il **peso HP_eq gia' esistente e gia' validato Monte Carlo**
+  (`+10 Damage ~ +50 HP`, weight 5.0; TxC 2.0), non un secondo sistema parallelo.
+- La formula del Director combacia con quella canonica: `hitChance = TxC + 50 - Evasion`
+  (`src/docs/docs/BALANCING_SYSTEM.md`), con `BASELINE_STATS.txc = 25`. Il "+25% perche' armato"
+  non e' un modificatore percentuale: e' il contributo `txc` dell'arma. `50 + 25 - 20 = 55`.
+- Serve **un solo modello di contributo con provenance**
+  (`base | equip | skill | consumable | slot | trial-by-fire`): le fonti nominate dal Director
+  sono la stessa operazione sulla stessa valuta. E' cio' che rende vero il "facilmente
+  modificabile" invece che dichiarato.
+- `deathChance` va da **per-quest** (`questConfig.ts:58`, default 0.01-0.08) a **per-slot**:
+  senza questo, "spostare la morte da un PG a un altro" non ha dove esistere. Prerequisito
+  strutturale delle altre due parti.
+- `survivalCount` esiste gia' su `ResidentState` (`testResidents.ts:26`) ed e' il contatore
+  naturale di Trial by Fire, ma **non filtra per deathChance**: va filtrato o affiancato da un
+  secondo contatore.
+- Il confine PG<->equip e' **gia' dichiarato** nel Balancer dal flag `baseStat`:
+  `hp, damage, txc, evasion, critChance, critMult` = pool umano; `ward, armor, resistance,
+  armorPen, penPercent, lifesteal, regen` = solo equip/talenti/razze; `isDetrimental` per
+  `failChance/failMult`. **Il caso non coperto e' l'equip che contribuisce a una `baseStat`**
+  (l'arma su `txc`).
+- `intelligence` esiste gia' in `defaultConfig.ts:292` ma **come requisito di archetipo, non
+  come stat del residente**: per reggere gli slot skill va promossa a stat, oppure va scelto
+  un altro valore.
+- **Tre baseline HP in conflitto**: `BASELINE_STATS.hp = 100` (il bersaglio su cui sono stati
+  tarati TUTTI i pesi Monte Carlo), 200 (l'umano base dichiarato dal Director), 280/210
+  (`TEST_RESIDENTS`). Non e' estetica: se l'umano base ha 200 HP, ogni punto HP vale metta' in
+  TTK e **tutti gli altri pesi sono fuori scala di 2x**. Una sola puo' essere l'unita' di
+  misura; le altre due derivano da lei.
+- Collisione lessicale: `heroic` oggi qualifica la **difficolta' quest**
+  (`story|skirmish|dangerous|heroic`, soglie skill-check 30/45/60/75 in
+  `questSkillCheckConfig.ts:24`), non lo stato del PG.
+- Quest Chronicle: **il momento della scelta esiste gia'** come tipo di fase `timedChoice`
+  (`types.ts:283`, colore skin in `QuestChronicle.tsx:66`). **Manca il consumabile**:
+  `QuestPhaseRequirement` copre solo Trial / Combat / Work, e `PhaseOutcomeEffects` da'
+  `resources / reputation / unlockActivityIds` — nessun oggetto d'inventario ne' in ingresso
+  ne' in uscita. Va aggiunto un quarto tipo di requirement e un effetto di consumo.
+- Il pool di quest prestabilite **esiste gia' come formato**: `QuestBlueprint` con `phases[]`,
+  `requirements`, `successEffects/failureEffects`, `copy`, `riskProfile` (`types.ts:313`) e
+  schema Zod in `quests/questBlueprints.schema.ts`. La domanda aperta non e' "dove sta il pool"
+  ma **chi scrive dentro il pool**.
+- Base UI: componenti v10 in `src/pages/hero-components-lab.tsx` (`EquipSlotRack`,
+  `ConsumablePile`, `SkillDeck`, `PgDetailCard`, `EquippableItemCard`, `ItemDragToken`) piu'
+  `ResidentSlotRack` sul lato POI.
+
+### Nomi temporanei (autorizzati dal Director, sostituibili)
+
+- `veteran` — il PG promosso da Trial by Fire (perche' `heroic` e' occupato dalla difficolta').
+- `statPoints` — lo strato a punti (-20..+25 circa).
+- `statScale` — il tasso di cambio punti -> valore di gioco (HP x4, TxC x1, ...).
+
+### Still unresolved
+
+- Di quanto salgono le stat alla promozione; se la promozione e' certa o probabilistica; se e'
+  irreversibile e se un veteran puo' retrocedere.
+- La formula esatta slot-skill <-> Intelligenza (o quale valore la governa).
+- Percorso di authoring delle attivita': editor in-game, offline, o ibrido (JSON canonico +
+  editor che esporta verso quel JSON + generatore che produce lo stesso formato). Rischio
+  nominato: un editor che salva "per comodita'" in localStorage crea una quarta sorgente di
+  verita'.
+- Quale delle tre baseline HP e' l'unita' di misura canonica. **Vincolo fermo: una sola
+  sorgente, le altre derivate.**
+- Se il negativo (-20) e' raggiungibile per debuff, per nascita, o entrambi.
+- Nomenclatura valore<->stat (HP / Costituzione): rinviata esplicitamente dal Director.
+
+### Cosa v12 NON autorizza
+
+- Nessun numero hardcoded in componenti o logica: tutti i default nominati qui vivono in config
+  Zod-validata.
+- Nessuna seconda sorgente di verita' per baseline, pesi, blueprint quest o inventario.
+- Nessun secondo sistema di pesi parallelo a HP_eq.
+- Nessuna implementazione prima che il planner abbia prodotto un piano: v12 e' una desiderata,
+  non un mandato di esecuzione.

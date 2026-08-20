@@ -57,6 +57,15 @@ const EXTRA_PAGES: TestPageLink[] = [
     icon: '🗺️',
     status: 'ok',
   },
+  // Non-kit page: marker lab for the POI "opportunity" marker.
+  {
+    id: 'poi-marker-lab',
+    title: 'POI Marker Lab',
+    description: "POI 'opportunity' marker in-context + matrix; materic/runic variants",
+    path: '/poi-marker-lab',
+    icon: '🔬',
+    status: 'ok',
+  },
   // Non-kit page: integration page for POI quest + roster; TBD future merge/deprecation.
   {
     id: 'poi-quest-detail-roster-integration',
@@ -82,6 +91,15 @@ const EXTRA_PAGES: TestPageLink[] = [
     description: 'Modern Spell Creator with default skin system, i18n, and async persistence',
     path: '/spell-creator',
     icon: '🪄',
+    status: 'ok',
+  },
+  // Non-kit page: Equipment Creator test page with default skin system.
+  {
+    id: 'equipment-creator',
+    title: 'Equipment Creator (Default Skin)',
+    description: 'Create weapons, armor and accessories with stat modifiers and base-skill links',
+    path: '/equipment-creator',
+    icon: '🛡️',
     status: 'ok',
   },
   // Non-kit page: Design System reference page.
@@ -145,6 +163,24 @@ const EXTRA_PAGES: TestPageLink[] = [
     description: 'Side-by-side mockup reference and derived React component iterations',
     path: '/mockup-to-component',
     icon: '🎨',
+    status: 'ok',
+  },
+  // Non-kit page: Primitive Lab — canonical materic primitives from PLAN-007.
+  {
+    id: 'primitives-lab',
+    title: 'Primitive Lab',
+    description: 'Canonical materic primitives (MatericFrame, Surface, Field, StatBar, Slot, etc.)',
+    path: '/primitives',
+    icon: '🧱',
+    status: 'ok',
+  },
+  // Non-kit page: Hero Components Lab — placeholders for hero sheet, equipment, items, consumables and skills.
+  {
+    id: 'hero-components-lab',
+    title: 'Hero Components Lab',
+    description: 'Placeholder components for hero sheet, equipment, items, consumables and skills',
+    path: '/hero-components-lab',
+    icon: '🦸',
     status: 'ok',
   },
   // Non-kit page: World Surface - the living painted map. Pan, zoom, 21 layers, debug panel.
