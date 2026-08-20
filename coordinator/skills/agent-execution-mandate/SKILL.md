@@ -234,6 +234,35 @@ Trusted docs updated if touching frozen components
 COMPONENT_MASTER_INDEX updated if applicable
 Evidence log created in test-results
 Kanban status set to "Completato"
+
+Git commit gate (obbligatorio, NON saltabile):
+Prima di chiamare task_complete o scrivere KANBAN STATUS Completato,
+DEVI eseguire in sequenza:
+
+1. Verifica che i file creati/modificati esistono su disco:
+   ls -la <ogni file_target>
+   Se un file non esiste: task è BLOCKED, non Completato.
+
+2. Verifica content validation (niente TODO/placeholder):
+   grep -r 'TODO\|placeholder\|not implemented\|coming soon' <file_targets>
+   Se trova match: task è BLOCKED.
+
+3. Commit dei file:
+   git add <ogni file_target specifico, NON git add .>
+   git commit -m '<task_id>: <descrizione breve>'
+   Se il commit fallisce: task è BLOCKED.
+
+4. Push:
+   git push
+   Se il push fallisce: git pull --rebase, poi riprova.
+   Se fallisce ancora: logga l'errore, task è BLOCKED.
+
+Solo dopo che tutti e 4 gli step passano:
+→ aggiorna Kanban a 'Completato'
+→ scrivi KANBAN STATUS: <ID> - Completato (Evidence: ...)
+
+Un task senza commit è un task non fatto.
+
 Response ends with: KANBAN STATUS: <Prompt ID> – Completato (Evidence: <log principale>)
 Failure Modes
 If unable to complete task:
