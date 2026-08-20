@@ -1,0 +1,17 @@
+# Mind Weaver — Web multi-AI cold read
+models:
+  A:
+    provider: chatgpt
+    transport: web
+    model: gpt-4o
+    timeout_s: 120
+  B:
+    provider: claude
+    transport: web
+    model: claude-sonnet-4-20250514
+    timeout_s: 120
+fallbacks:
+  - provider: openrouter
+    model: openai/gpt-4o
+    api_key_env: OPENROUTER_API_KEY
+    timeout_s: 120

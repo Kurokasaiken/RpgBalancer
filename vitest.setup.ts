@@ -109,6 +109,15 @@ Object.defineProperty(window, '__ENABLE_IDLE_VILLAGE_TEST_HOOKS', {
   value: true,
 });
 
+// Polyfill ResizeObserver for jsdom so components using WanderlustSurface render in tests.
+if (typeof (globalThis as unknown as Record<string, unknown>).ResizeObserver === 'undefined') {
+  (globalThis as unknown as Record<string, unknown>).ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
+
 if (typeof Array.prototype.findLastIndex !== 'function') {
   Object.defineProperty(Array.prototype, 'findLastIndex', {
     configurable: true,
