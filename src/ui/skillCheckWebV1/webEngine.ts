@@ -33,6 +33,33 @@ export const R_CORE = Math.max(30, R * 0.12);
  */
 export const VALLEY_F = 0.3675;
 
+/**
+ * FALLIMENTO CRITICO — regola del sistema, non del board.
+ *
+ * Il sistema tira un D100: da 00 a `CRIT_FAIL_MAX` è SEMPRE fallimento,
+ * qualunque sia la geometria. Quindi il crit-fail è DISGIUNTO, non
+ * moltiplicativo: la probabilità mostrabile si CAPA, non si scala.
+ *
+ *     mostrabile = min(probabilità geometrica, 100 − CRIT_FAIL_PCT)
+ *
+ * Serve perché senza il cap il pannello arriva a dichiarare 100.00% (misurato a
+ * 95/20, 99/10, 99/1) mentre il sistema trattiene sempre quella fascia: non è
+ * una sorpresa, è un numero che mente. L'effetto X-COM funziona solo se il
+ * numero mostrato è quello onorato.
+ *
+ * ATTENZIONE ALL'OFF-BY-ONE: «da 00 a 05» sono SEI valori su un D100 0..99,
+ * cioè il 6%, mentre in sessione era stato detto «il 5%». Le due cose
+ * differiscono di un valore. Qui è cablato l'intervallo dichiarato (00..05);
+ * se il numero giusto è 5% va messo CRIT_FAIL_MAX = 4.
+ */
+export const CRIT_FAIL_MAX = 5;
+/** quanti valori del D100 sono fallimento automatico: 00..CRIT_FAIL_MAX */
+export const CRIT_FAIL_PCT = CRIT_FAIL_MAX + 1;
+
+/** la probabilità che il board può onorare, dato il crit-fail disgiunto */
+export const shownProb = (geometricPct: number): number =>
+  Math.min(geometricPct, 100 - CRIT_FAIL_PCT);
+
 const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
 const normAng = (a: number) => {
   let x = a % TAU;
@@ -195,6 +222,8 @@ export interface Readout {
   areaEaten: number;
   /** probabilità geometrica vera: area(stella ∩ arena) / area(arena) */
   areaProb: number;
+  /** la probabilità che il sistema può ONORARE: capata dal crit-fail disgiunto */
+  shownPct: number;
   /** la formula lineare 50 + stat − difficoltà, per confronto */
   formulaTst: number;
 }
@@ -235,6 +264,7 @@ export function readout(p: RagnatelaParams): Readout {
     lengthEaten: eatenSum / n,
     areaEaten: areaSum * 100,
     areaProb: arenaA > 0 ? (starA / arenaA) * 100 : 0,
+    shownPct: shownProb(arenaA > 0 ? (starA / arenaA) * 100 : 0),
     formulaTst: clamp(50 + (p.stat - p.difficulty), 1, 99),
   };
 }
