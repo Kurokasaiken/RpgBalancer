@@ -1,4 +1,70 @@
 {
+  "activityCapsule": {
+    "accessibility": {
+      "activityCapsule": "كبسولة نشاط {label}",
+      "closeDetails": "إغلاق التفاصيل"
+    },
+    "actions": {
+      "cancel": "إلغاء",
+      "collect": "جمع",
+      "collecting": "جارٍ الجمع...",
+      "start": "بدء"
+    },
+    "ariaLive": {
+      "blocked": "نشاط {label} محظور",
+      "completed": "اكتمل نشاط {label}",
+      "idle": "نشاط {label} خامل",
+      "progress": "تقدم {label}: {percent}%",
+      "readyToCollect": "{label} جاهز للجمع",
+      "slotFreed": "{count, plural, one {تم تحرير {count} فتحة من {label}} other {تم تحرير {count} فتحات من {label}}}",
+      "started": "بدأ نشاط {label}",
+      "workerAssigned": "{count, plural, one {تم تعيين {count} عامل إلى {label}} other {تم تعيين {count} عمال إلى {label}}}"
+    },
+    "defaultHalo": "نقطة اهتمام",
+    "devTools": {
+      "validationTitle": "أخطاء التحقق من المظهر"
+    },
+    "dropHint": "إفلات",
+    "info": {
+      "duration": "المدة",
+      "eta": "الوقت المتوقع للوصول",
+      "reward": "المكافأة"
+    },
+    "lore": {
+      "locked": "اهتزاز قديم ينتظر في صمت هذا المسعى."
+    },
+    "requirements": {
+      "relation": {
+        "all": "مطلوب",
+        "any": "واحد من",
+        "none": "ممنوع"
+      }
+    },
+    "sections": {
+      "assignedCharacters": "الشخصيات المعينة",
+      "lore": "المذكرات",
+      "requirements": "المتطلبات",
+      "telemetry": "سجل الأحداث"
+    },
+    "slotLabel": "الفتحة {index}",
+    "status": {
+      "blocked": "محظور",
+      "completed": "مكتمل",
+      "idle": "خامل",
+      "inProgress": "قيد التنفيذ"
+    },
+    "telemetry": {
+      "empty": "لا توجد أحداث مسجلة."
+    },
+    "type": {
+      "job": "وظيفة",
+      "maintenance": "صيانة",
+      "poi-activity": "نشاط نقطة اهتمام",
+      "quest": "مهمة",
+      "training": "تدريب"
+    },
+    "workerAlt": "عامل"
+  },
   "poiMarkerLab": {
     "title": "POI Marker Lab",
     "subtitle": "Opportunity marker baseline: colour + icon = what, timer ring = when, material = where. Placed over the canonical Wanderlust surface, because that is the only honest test.",
