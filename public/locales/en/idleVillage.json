@@ -601,5 +601,10 @@
     "availableSkills": "Available skills",
     "equippedSkills": "Equipped skills",
     "empty": "Empty"
+  },
+  "poiVisualPreview": {
+    "title": "POI Medallion Preview",
+    "v1Label": "GenericPoiSkin V1 (Amber)",
+    "v2Label": "GenericPoiSkin V2 (Materic)"
   }
 }
