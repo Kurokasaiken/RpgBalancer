@@ -37,8 +37,22 @@ export interface ShapeCtx {
   cy: number;
   /** unità engine -> px */
   k: number;
-  /** raggio del muro dell'arena in unità engine */
+  /** raggio del muro dell'arena in unità engine (valore RAPPRESENTATIVO: serve
+   *  a normalizzare il lancio anche quando il muro è per-angolo) */
   rFrame: number;
+  /**
+   * MURO PER ANGOLO. Assente = arena circolare di raggio `rFrame`.
+   *
+   * Serve perché nella V7 la prova è multi-skill: ogni asse porta la sua
+   * difficoltà, quindi il muro dell'arena è un PROFILO, non un cerchio. Il
+   * telaio della tela È quel muro, quindi ancoraggi, sfondamento e clip della
+   * stella devono leggerlo da qui.
+   */
+  rFrameAt?: (theta: number) => number;
+  /** l'host disegna già campo e righello: qui non ridisegnarli */
+  skipArena?: boolean;
+  /** palette dell'host: la tela porta il carattere, non il colore */
+  ink?: Partial<Ink>;
   /** raggio PIENO della stella a un dato angolo (la scala la applica drawWeb) */
   rStar: (theta: number) => number;
   seed: number;
@@ -53,7 +67,13 @@ export interface ShapeCtx {
   rig?: { axes: number[]; ticks: { r: number; major: boolean }[] };
 }
 
-const INK = {
+export type Ink = Record<
+  | 'bg' | 'field' | 'silk' | 'silkDim' | 'frame' | 'wood' | 'woodDark' | 'leaf'
+  | 'star' | 'starEdge' | 'tick' | 'tickMajor',
+  string
+>;
+
+const INK: Ink = {
   bg: '#0d1117',
   field: '#161c24',
   silk: '#aab6c2',
@@ -106,12 +126,12 @@ function fillTapered(
 }
 
 /** il campo dell'arena, poi il righello SOPRA */
-function drawArena(ctx: CanvasRenderingContext2D, S: ShapeCtx): void {
+function drawArena(ctx: CanvasRenderingContext2D, S: ShapeCtx, C: Ink): void {
   const { cx, cy, k } = S;
 
   ctx.beginPath();
   ctx.arc(cx, cy, S.rFrame * k, 0, TAU);
-  ctx.fillStyle = INK.field;
+  ctx.fillStyle = C.field;
   ctx.fill();
 
   /* Le tacche vanno DOPO il disco, o il disco le copre. Dentro l'arena sono più
@@ -131,7 +151,7 @@ function drawArena(ctx: CanvasRenderingContext2D, S: ShapeCtx): void {
       ctx.beginPath();
       ctx.moveTo(x - cp * len, y - sp * len);
       ctx.lineTo(x + cp * len, y + sp * len);
-      ctx.strokeStyle = t.major ? INK.tickMajor : INK.tick;
+      ctx.strokeStyle = t.major ? C.tickMajor : C.tick;
       ctx.globalAlpha = t.r < S.rFrame ? 0.55 : 1;
       ctx.lineWidth = t.major ? 1.4 : 0.9;
       ctx.stroke();
@@ -154,7 +174,8 @@ function drawStar(
   ctx: CanvasRenderingContext2D,
   S: ShapeCtx,
   radiusAt: (a: number) => number,
-  clipTo?: number,
+  C: Ink,
+  clipTo?: (a: number) => number,
 ): void {
   const path = () => {
     ctx.beginPath();
@@ -170,23 +191,34 @@ function drawStar(
     ctx.closePath();
   };
 
-  if (clipTo !== undefined) {
+  if (clipTo) {
+    /* clip POLIGONALE, non circolare: con muro per-angolo un cerchio taglierebbe
+       dove il muro non c'è. */
     ctx.save();
     ctx.beginPath();
-    ctx.arc(S.cx, S.cy, clipTo * S.k, 0, TAU);
+    const STEP = 240;
+    for (let i = 0; i <= STEP; i += 1) {
+      const a = -Math.PI / 2 + (i / STEP) * TAU;
+      const r = clipTo(a) * S.k;
+      const x = S.cx + Math.cos(a) * r;
+      const y = S.cy + Math.sin(a) * r;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
     ctx.clip();
     path();
-    ctx.fillStyle = INK.star;
+    ctx.fillStyle = C.star;
     ctx.fill();
     ctx.restore();
   } else {
     path();
-    ctx.fillStyle = INK.star;
+    ctx.fillStyle = C.star;
     ctx.fill();
   }
 
   path();
-  ctx.strokeStyle = INK.starEdge;
+  ctx.strokeStyle = C.starEdge;
   ctx.lineWidth = 1.6;
   ctx.stroke();
 }
@@ -348,7 +380,7 @@ const easeOut3 = (p: number) => 1 - (1 - p) ** 3;
  * scarto di starS e resterebbe congelata a meta' durante l'assestamento, dove
  * starS vale 1 fisso.
  */
-const invEaseInOutCubic = (e: number): number => {
+export const invEaseInOutCubic = (e: number): number => {
   if (e <= 0) return 0;
   if (e >= 1) return 1;
   if (e < 0.5) return Math.cbrt(e / 4);
@@ -363,11 +395,15 @@ const easeOutBack = (p: number, over: number) => {
 };
 
 /** gocce selettive: 200 punti seppellirebbero la pallina */
-function drawDroplets(ctx: CanvasRenderingContext2D, drops: { x: number; y: number }[]): void {
+function drawDroplets(
+  ctx: CanvasRenderingContext2D,
+  drops: { x: number; y: number }[],
+  C: Ink,
+): void {
   for (const d of drops) {
     ctx.beginPath();
     ctx.arc(d.x, d.y, 1.5, 0, TAU);
-    ctx.fillStyle = INK.frame;
+    ctx.fillStyle = C.frame;
     ctx.fill();
   }
 }
@@ -380,6 +416,9 @@ export function drawWeb(
 ): void {
   const A = anim ?? STATIC;
   const { cx, cy, k, rFrame } = S;
+  const C: Ink = S.ink ? { ...INK, ...S.ink } : INK;
+  /** il muro dell'arena all'angolo a: per-angolo se l'host lo fornisce */
+  const wallAt = (a: number) => (S.rFrameAt ? S.rFrameAt(a) : rFrame);
   /* STREAM PRNG SEPARATI PER SOTTOSISTEMA.
      Prima c'era un solo stream condiviso, e ogni raggio che moriva saltava le 15
      estrazioni del suo ciclo di campioni: tutto il rumore a valle (jitter della
@@ -397,7 +436,7 @@ export function drawWeb(
   const rayRnd = (i: number) =>
     mulberry32((Math.imul(S.seed, 0x27d4eb2d) ^ Math.imul(i + 1, 0x9e3779b1)) >>> 0);
 
-  drawArena(ctx, S);
+  if (!S.skipArena) drawArena(ctx, S, C);
 
   const N = Math.max(8, o.radii);
 
@@ -469,7 +508,8 @@ export function drawWeb(
     ancA.push(-Math.PI / 2 + (i / AN) * TAU + (rndAnc() - 0.5) * (TAU / AN) * 0.55);
   }
   ancA.sort((x, y) => x - y);
-  const ancR = ancA.map(() => rFrame * (1 - rndAnc() * o.anchorJitter));
+  /* gli ancoraggi stanno SUL muro, che può variare con l'angolo */
+  const ancR = ancA.map((a) => wallAt(a) * (1 - rndAnc() * o.anchorJitter));
 
   /** raggio del telaio all'angolo a: intersezione raggio/segmento fra ancoraggi */
   const frameRadiusAt = (a: number): number => {
@@ -507,7 +547,7 @@ export function drawWeb(
      tutto, e va bene — vuol dire che hai coperto tutto. */
   const punchedAt = (a: number) => rsAt(a) >= frameRadiusAt(a) * (1 + o.punchOut);
 
-  if (A.showStar) drawStar(ctx, S, rsAt, rFrame);
+  if (A.showStar) drawStar(ctx, S, rsAt, C, frameRadiusAt);
 
   /* ── ORDITO ─────────────────────────────────────────────────────────── */
   const ang: number[] = [];
@@ -591,7 +631,7 @@ export function drawWeb(
       const jit = (rr() - 0.5) * o.wobble * Math.sin(t * Math.PI);
       pts.push(P(r, a, px * bow + jit, py * bow + jit));
     }
-    fillTapered(ctx, pts, 1.5, 0.9, INK.silk);
+    fillTapered(ctx, pts, 1.5, 0.9, C.silk);
   }
 
   /* ── TELAIO: un FASCIO liscio con i NODI ────────────────────────────────
@@ -606,7 +646,7 @@ export function drawWeb(
   for (let pass = 0; pass < 2; pass += 1) {
     const jx = pass === 0 ? 0 : (rndFrm() - 0.5) * 2.2;
     const jy = pass === 0 ? 0 : (rndFrm() - 0.5) * 2.2;
-    ctx.strokeStyle = INK.frame;
+    ctx.strokeStyle = C.frame;
     ctx.lineWidth = pass === 0 ? 1.9 : 0.85;
     ctx.globalAlpha = pass === 0 ? 1 : 0.5;
     let started = false;
@@ -633,7 +673,7 @@ export function drawWeb(
     if (punchedAt(ancA[i])) continue;
     ctx.beginPath();
     ctx.arc(fpt[i].x, fpt[i].y, 1.8, 0, TAU);
-    ctx.fillStyle = INK.frame;
+    ctx.fillStyle = C.frame;
     ctx.fill();
   }
 
@@ -646,7 +686,7 @@ export function drawWeb(
      cancellava anche trame, mozzo e gocce — la rete SPARIVA in un frame. Ora
      salta le sole trame, che senza raggi vivi non hanno appigli. */
   if (!Number.isFinite(minInner)) {
-    drawDroplets(ctx, []);
+    drawDroplets(ctx, [], C);
     return;
   }
 
@@ -683,7 +723,7 @@ export function drawWeb(
       ctx.beginPath();
       ctx.moveTo(p0.x, p0.y);
       ctx.quadraticCurveTo(qx, qy, p1.x, p1.y);
-      ctx.strokeStyle = INK.silkDim;
+      ctx.strokeStyle = C.silkDim;
       ctx.lineWidth = 0.75;
       ctx.stroke();
 
@@ -700,12 +740,12 @@ export function drawWeb(
     ctx.beginPath();
     ctx.moveTo(p0.x, p0.y);
     ctx.quadraticCurveTo(cx + offX, cy + offY, p1.x, p1.y);
-    ctx.strokeStyle = INK.silkDim;
+    ctx.strokeStyle = C.silkDim;
     ctx.lineWidth = 0.5;
     ctx.stroke();
   }
 
-  drawDroplets(ctx, drops);
+  drawDroplets(ctx, drops, C);
 }
 
 /* ── (b) ROVERETO ────────────────────────────────────────────────────────
@@ -802,8 +842,8 @@ export function drawBrambles(
 ): void {
   const { cx, cy, k, rFrame } = S;
   const rnd = mulberry32(S.seed);
-  drawArena(ctx, S);
-  drawStar(ctx, S, (a) => S.rStar(a), S.rFrame);
+  drawArena(ctx, S, INK);
+  drawStar(ctx, S, (a) => S.rStar(a), INK, () => S.rFrame);
 
   const stems: Stem[] = [];
   const P = (r: number, a: number) => ({
