@@ -1,0 +1,26 @@
+[
+  {
+    "id": "slash",
+    "name": "Slash",
+    "initial": "S",
+    "effect": "Deal weapon damage"
+  },
+  {
+    "id": "parry",
+    "name": "Parry",
+    "initial": "P",
+    "effect": "Reduce next attack"
+  },
+  {
+    "id": "aim",
+    "name": "Aim",
+    "initial": "A",
+    "effect": "Increase next hit chance"
+  },
+  {
+    "id": "bandage",
+    "name": "Bandage",
+    "initial": "B",
+    "effect": "Stabilize a wound"
+  }
+]

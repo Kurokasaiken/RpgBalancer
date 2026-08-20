@@ -1,0 +1,17 @@
+[
+  {
+    "id": "potion",
+    "name": "Potion",
+    "count": 3
+  },
+  {
+    "id": "bandage",
+    "name": "Bandage",
+    "count": 2
+  },
+  {
+    "id": "antidote",
+    "name": "Antidote",
+    "count": 2
+  }
+]

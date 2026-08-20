@@ -70,6 +70,7 @@ const MinimalJobPoiRosterIntegrationPage = lazy(() => import('./pages/minimal-jo
 const MinimalJobPoiRosterTimeIntegrationPage = lazy(() => import('./pages/minimal-job-poi-roster-time-integration').then(m => ({ default: m.default })));
 const MinimalTimeDaynightIntegrationPage = lazy(() => import('./pages/minimal-time-daynight-integration').then(m => ({ default: m.default })));
 const SpellCreatorTestPage = lazy(() => import('./pages/spell-creator').then(m => ({ default: m.default })));
+const EquipmentCreatorPage = lazy(() => import('./pages/equipment-creator').then(m => ({ default: m.default })));
 const TrailerViewer = lazy(() => import('./ui/idleVillage/trailer/TrailerViewer'));
 const TrailerThreatIter = lazy(() => import('./ui/idleVillage/trailer/TrailerThreatIter'));
 const GoblinEventLabPage = lazy(() => import('./ui/idleVillage/pages/GoblinEventLabPage').then(m => ({ default: m.GoblinEventLabPage })));
@@ -261,6 +262,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/minimal-time-daynight-integration';
   const isSpellCreatorPath =
     typeof window !== 'undefined' && window.location.pathname === '/spell-creator';
+  const isEquipmentCreatorPath =
+    typeof window !== 'undefined' && window.location.pathname === '/equipment-creator';
   const isTrailerThreatPath =
     typeof window !== 'undefined' && window.location.pathname === '/trailer-threat';
   const isTrailerChoicePath =
@@ -741,6 +744,16 @@ function App() {
       <ErrorBoundary componentName="Spell Creator Test Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Spell Creator…</div>}>
           <SpellCreatorTestPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isEquipmentCreatorPath) {
+    return (
+      <ErrorBoundary componentName="Equipment Creator Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Equipment Creator…</div>}>
+          <EquipmentCreatorPage />
         </Suspense>
       </ErrorBoundary>
     );

@@ -497,16 +497,16 @@ export const PoiMatericV1: React.FC<PoiMarkerProps> = ({
             </feMerge>
           </filter>
 
-          <filter id={`${id}-drop`} x="-60%" y="-60%" width="220%" height="220%">
-            <feGaussianBlur in="SourceAlpha" stdDeviation="3.2" result="blur" />
-            <feOffset dy="3" result="off" />
+          <filter id={`${id}-drop`} x="-80%" y="-80%" width="260%" height="260%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="5.2" result="blur" />
+            <feOffset dy="5" result="off" />
             <feColorMatrix
               in="off"
               type="matrix"
               values="0 0 0 0 0
                       0 0 0 0 0
                       0 0 0 0 0
-                      0 0 0 .6 0"
+                      0 0 0 .5 0"
             />
             <feBlend in="SourceGraphic" />
           </filter>
@@ -553,7 +553,21 @@ export const PoiMatericV1: React.FC<PoiMarkerProps> = ({
             <feComposite in="grainAlpha" in2="SourceAlpha" operator="in" result="grainInside" />
             <feBlend in="SourceGraphic" in2="grainInside" mode="soft-light" />
           </filter>
-        </defs>
+        {/* Enamel inlay: a coloured vitreous glaze on top of the stone. */}
+        <radialGradient id={`${id}-enamel`} cx="45%" cy="42%" r="65%">
+          <stop offset="0%" stopColor={ember.light} stopOpacity="0.18" />
+          <stop offset="40%" stopColor={ember.core} stopOpacity="0.10" />
+          <stop offset="100%" stopColor={ember.deep} stopOpacity="0.06" />
+        </radialGradient>
+
+        {/* Glass dome: a convex lens that encases the inner seal. */}
+        <radialGradient id={`${id}-glass`} cx="38%" cy="28%" r="78%">
+          <stop offset="0%" stopColor={ember.light} stopOpacity="0.16" />
+          <stop offset="18%" stopColor={ember.core} stopOpacity="0.08" />
+          <stop offset="60%" stopColor={ember.core} stopOpacity="0.03" />
+          <stop offset="100%" stopColor="#000000" stopOpacity="0.14" />
+        </radialGradient>
+      </defs>
 
         {/* Contact shadow: what stops it floating above the map. */}
         <ellipse cx="60" cy="103" rx="24" ry="4.4" fill="#000" opacity="0.5" filter={`url(#${id}-drop)`} />

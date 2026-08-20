@@ -110,6 +110,19 @@ const MinimalDestinyAstrolabeV3 = () => {
             >
               V5
             </a>
+            <a
+              href="/minimal-destiny-astrolabe-v6"
+              className="px-3 py-1 rounded text-sm font-semibold bg-amber-600 text-black hover:bg-amber-500 transition-colors"
+            >
+              V6
+            </a>
+            <a
+              href="/minimal-skillcheck-v6"
+              className="px-3 py-1 rounded text-sm font-semibold bg-indigo-700 text-indigo-100 hover:bg-indigo-600 transition-colors"
+              title="AltVisuals V6 · Asterism (Skill Check Preview Lab)"
+            >
+              Asterism V6
+            </a>
           </div>
         </div>
         {lastResult && (
