@@ -267,6 +267,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/spell-creator';
   const isEquipmentCreatorPath =
     typeof window !== 'undefined' && window.location.pathname === '/equipment-creator';
+  const isTrailerPath =
+    typeof window !== 'undefined' && window.location.pathname === '/trailer';
   const isTrailerThreatPath =
     typeof window !== 'undefined' && window.location.pathname === '/trailer-threat';
   const isTrailerChoicePath =
@@ -847,6 +849,16 @@ function App() {
       <ErrorBoundary componentName="Trailer Threat Iter">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer Threat Iter…</div>}>
           <TrailerThreatIter autoStart captureMode={false} />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isTrailerPath) {
+    return (
+      <ErrorBoundary componentName="Trailer">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer…</div>}>
+          <TrailerViewer />
         </Suspense>
       </ErrorBoundary>
     );

@@ -39,6 +39,15 @@ const KIT_PAGES: TestPageLink[] = KIT_REGISTRY.filter((entry) => entry.hub).map(
 
 /** Test pages not (yet) backed by a frozen kit. */
 const EXTRA_PAGES: TestPageLink[] = [
+  // Non-kit page: Steam teaser trailer — marketing asset, not a gameplay kit.
+  {
+    id: 'trailer',
+    title: 'Steam Teaser Trailer',
+    description: 'Trailer deterministico da 55 secondi con 7 scene (Threat, Choice, Preparation, Risk, Consequence, Legacy, Outro)',
+    path: '/trailer',
+    icon: '🎬',
+    status: 'ok',
+  },
   // Non-kit page: visual sandbox for v9 skin, not a component kit.
   {
     id: 'v9-skin-sandbox',
