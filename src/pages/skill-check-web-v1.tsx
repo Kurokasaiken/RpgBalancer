@@ -427,6 +427,12 @@ export default function RagnatelaLab() {
                 </div>
               </div>
               <div className="bg-gray-800 rounded p-2">
+                <div className="text-gray-500">onorabile (cap D100)</div>
+                <div className="text-lg font-bold text-amber-400 tabular-nums">
+                  {r.shownPct.toFixed(1)}%
+                </div>
+              </div>
+              <div className="bg-gray-800 rounded p-2">
                 <div className="text-gray-500">formula V7</div>
                 <div className="text-lg font-bold text-gray-400 tabular-nums">{r.formulaTst}%</div>
               </div>
