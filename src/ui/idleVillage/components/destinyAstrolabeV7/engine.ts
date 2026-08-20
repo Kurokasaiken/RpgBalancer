@@ -4,6 +4,8 @@
 /* eslint-disable */
 // @ts-nocheck
 
+import { drawWeb, WEB_DEFAULTS, invEaseInOutCubic } from '@/ui/skillCheckWebV1/adversaryShapes';
+
 export interface AstrolabeSkill { name: string; stat: number; difficulty: number; }
 export interface AstrolabeConfig { crit?: number; wound?: number; dead?: number; mode?: string;
   tSlam?: number; tBurst?: number; tPour?: number; tSpin?: number; tSnap?: number; }
@@ -247,8 +249,9 @@ const scene={
   ball:{x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false},
   snapFrom:null,
   shocks:[], sparks:[],
+  webSeed:7,                            // tela deterministica per tiro
   gooRipple:0,                          // boosts displacement scale
-  gooReveal:0,                          // 0 in idle → goo wells up cinematically
+  gooReveal:0,                          // 0 in idle → la tela viene scoccata
   ringReveal:0,                         // 0 until the bronze ring locks in
   motes:Array.from({length:22},()=>({x:Math.random()*W,y:Math.random()*W,r:.5+Math.random()*1.5,
     sp:2.5+Math.random()*6,ph:Math.random()*TAU,sw:Math.random()*TAU})),
@@ -307,6 +310,7 @@ function launchRoll(){
   recomputeGeometry();
   buildPillars();
   scene.starScale=0; scene.pourP=0; scene.streamAlpha=0;
+  scene.webSeed=(Math.random()*1e9)|0;   // una tela diversa a ogni tiro
   scene.gooReveal=0; scene.ringReveal=0;
   scene.ball={x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false};
   scene.warp=0;
@@ -777,16 +781,61 @@ function drawChallengeSurface(now){
   fill.addColorStop(1,'rgba(2,3,16,0.90)');
   ctx.fillStyle=fill; ctx.fill(path);
 
-  /* 2. UN SOLO BORDO scuro. È il fallimento critico ED è il muro fisico del board:
-     la pallina può entrare nella banda, non può uscire dal cerchio. */
-  ctx.strokeStyle=`rgba(30,25,35,${(0.72*rev).toFixed(3)})`;
-  ctx.lineWidth=4;
-  ctx.stroke(path);
+  /* 2. NIENTE BORDO DISEGNATO: il muro adesso lo porta il TELAIO DELLA TELA.
+     Il bordo scuro e il telaio sono la stessa cosa fisica (dove la pallina
+     rimbalza), e due tratti sugli stessi pixel si contraddicono. Resta qui solo
+     il vuoto: la tela ci si appoggia sopra. */
 
   /* V6: rimossi i marker luminosi sui vertici — gli obelischi già segnano
      quelle posizioni, erano un secondo sistema sugli stessi pixel. */
 
   ctx.restore();
+}
+
+/* ── LA TELA AL POSTO DEL GOO ─────────────────────────────────────────────
+   L'avversario non è più una materia che sale: è una TELA SCOCCATA, e il suo
+   telaio È il muro dell'arena — cioè `rCheckAt`, che qui è un PROFILO e non un
+   cerchio, perché ogni asse porta la sua difficoltà.
+
+   Cosa NON cambia: la fisica. La pallina resta confinata da `rCheckAt` esattamente
+   come prima; la tela è la lettura di quel muro, non un secondo muro.
+
+   Le tempistiche vengono dallo stato che già esiste:
+     lancio  = gooReveal   (la tela arriva dove prima saliva il goo)
+     strappo = starScale   (la stella cresce e mangia i fili dall'interno)
+   `tearT` è ricavato invertendo l'easing della crescita, così un filo scatta
+   ESATTAMENTE quando la stella raggiunge il suo raggio: la datazione è la stessa
+   grandezza per il disegno e per il verdetto. */
+const WEB_INK={
+  silk:'rgba(196,226,236,0.82)',        // seta: luce fredda, non grigio
+  silkDim:'rgba(120,178,196,0.42)',
+  frame:'rgba(214,240,246,0.92)',
+};
+const WEB_OPTS={...WEB_DEFAULTS, radii:22, weftStep:15,
+  /* le gocce leggerebbero come palline: qui la pallina è una sola */
+  droplets:false};
+function drawWebLayer(){
+  const rev=scene.gooReveal;
+  if(rev<=0.001) return;
+  const s=Math.min(1,scene.starScale||0);
+  drawWeb(ctx, {
+    cx:CX, cy:CY, k:1,
+    rFrame:Math.max(...geo.axisCheck),
+    rFrameAt:(a)=>rCheckAt(a),
+    rStar:(a)=>rStarAt(a,1),
+    seed:scene.webSeed,
+    skipArena:true,                      // il vuoto e il righello li disegna la V7
+    ink:WEB_INK,
+  }, WEB_OPTS, {
+    launch:Math.min(1,rev),
+    showStar:false,                      // la stella è disegnata da drawStar()
+    starS:s,
+    tearMs:900,
+    tearT:invEaseInOutCubic(s)*900,
+    snapFrac:0.55,
+    recoil:3.5,
+    damping:6,
+  });
 }
 
 /* ASSI COME STRUMENTI DI MISURA — ogni vettore è una scala 0-100 con 10 tacche.
@@ -1406,6 +1455,7 @@ function frame(now){
   ctx.clearRect(0,0,W,W);
   drawBackdrop(now);
   drawChallengeSurface(now);
+  drawWebLayer();
   drawAxisRig(now);
   drawBlueprint(now);
   drawStar(now);
