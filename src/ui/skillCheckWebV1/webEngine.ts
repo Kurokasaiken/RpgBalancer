@@ -47,14 +47,15 @@ export const VALLEY_F = 0.3675;
  * una sorpresa, è un numero che mente. L'effetto X-COM funziona solo se il
  * numero mostrato è quello onorato.
  *
- * ATTENZIONE ALL'OFF-BY-ONE: «da 00 a 05» sono SEI valori su un D100 0..99,
- * cioè il 6%, mentre in sessione era stato detto «il 5%». Le due cose
- * differiscono di un valore. Qui è cablato l'intervallo dichiarato (00..05);
- * se il numero giusto è 5% va messo CRIT_FAIL_MAX = 4.
+ * OFF-BY-ONE RISOLTO: il numero di sistema è il 5%, non il 6%. Su un D100
+ * percentile la fascia di fallimento automatico è 01..05 — cinque valori,
+ * cinque punti percentuali. Prima qui era cablato 00..05 (sei valori, 6%),
+ * che gonfiava il cap di un punto.
  */
+export const CRIT_FAIL_MIN = 1;
 export const CRIT_FAIL_MAX = 5;
-/** quanti valori del D100 sono fallimento automatico: 00..CRIT_FAIL_MAX */
-export const CRIT_FAIL_PCT = CRIT_FAIL_MAX + 1;
+/** quanti valori del D100 sono fallimento automatico: CRIT_FAIL_MIN..CRIT_FAIL_MAX */
+export const CRIT_FAIL_PCT = CRIT_FAIL_MAX - CRIT_FAIL_MIN + 1;
 
 /** la probabilità che il board può onorare, dato il crit-fail disgiunto */
 export const shownProb = (geometricPct: number): number =>

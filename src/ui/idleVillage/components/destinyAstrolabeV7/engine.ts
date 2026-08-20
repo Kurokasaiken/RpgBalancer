@@ -246,7 +246,7 @@ const scene={
   pourP:0, streamAlpha:0,
   ball:{x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false},
   snapFrom:null,
-  shocks:[], rimHits:[], sparks:[],
+  shocks:[], sparks:[],
   gooRipple:0,                          // boosts displacement scale
   gooReveal:0,                          // 0 in idle → goo wells up cinematically
   ringReveal:0,                         // 0 until the bronze ring locks in
@@ -310,7 +310,7 @@ function launchRoll(){
   scene.gooReveal=0; scene.ringReveal=0;
   scene.ball={x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false};
   scene.warp=0;
-  scene.shocks.length=0; scene.rimHits.length=0; scene.sparks.length=0;
+  scene.shocks.length=0; scene.sparks.length=0;
   armed=false; emitArmed(false);
   /* panel result removed */
   /* ACT 0 — the Sun-Bronze ring slams into place like an ancient telescope lens */
@@ -530,7 +530,6 @@ function stepBall(p){
     const nx=(b.x-CX)/d, ny=(b.y-CY)/d;
     chaoticBounce(nx,ny,false);
     b.x=CX+nx*edge; b.y=CY+ny*edge;
-    scene.rimHits.push({ang:Math.atan2(ny,nx),life:600});
     addSpark(b.x,b.y);
   }
 
@@ -557,10 +556,6 @@ function stepBall(p){
     const s=scene.sparks[i]; s.life-=dt;
     if(s.life<=0){scene.sparks.splice(i,1);continue;}
     s.x+=s.vx; s.y+=s.vy; s.vy+=0.04;
-  }
-  for(let i=scene.rimHits.length-1;i>=0;i-=1){
-    scene.rimHits[i].life-=dt;
-    if(scene.rimHits[i].life<=0) scene.rimHits.splice(i,1);
   }
 }
 function addSpark(x,y){
@@ -1338,17 +1333,6 @@ function drawShocks(dt){
     ctx.restore();
   }
 }
-function drawRimHits(){
-  scene.rimHits.forEach(h=>{
-    const a=h.life/600;
-    ctx.save();
-    ctx.globalAlpha=a*.85;
-    ctx.strokeStyle='#fce890'; ctx.lineWidth=4;
-    ctx.shadowColor='#fce890'; ctx.shadowBlur=16;
-    ctx.beginPath(); ctx.arc(CX,CY,R-5,h.ang-.16,h.ang+.16); ctx.stroke();
-    ctx.restore();
-  });
-}
 function drawBall(now){
   const b=scene.ball;
   if(!b.on && scene.state!=='resolution') return;
@@ -1430,7 +1414,6 @@ function frame(now){
   scene.whitePillars.forEach(p=>drawPillar(p,true));  // draw first (behind)
   scene.blackPillars.forEach(p=>drawPillar(p,false)); // draw last (in front)
   drawShocks(dt);
-  drawRimHits();
   drawMotes(now,dt);
   drawBall(now);
  }catch(e){ if(!window.__frameErrLogged){ window.__frameErrLogged=true; console.error('FRAME ERROR:', e && e.stack || e); } }
