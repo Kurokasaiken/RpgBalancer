@@ -159,8 +159,11 @@
   opacity:0;pointer-events:none;text-align:center;padding:0;width:min(80%,560px);}
 .destiny-astrolabe .card::before{content:'';position:absolute;left:50%;top:50%;z-index:-1;pointer-events:none;
   width:165%;height:230%;transform:translate(-50%,-50%);border-radius:50%;
-  background:radial-gradient(closest-side, rgba(6,5,12,.5), rgba(6,5,12,.22) 46%, transparent 74%);
-  filter:blur(10px);}
+  /* SCRIM: era .5/.22 e bastava sul vuoto, non sul CREMA del fiore — sopra un
+     petalo a 17:1 di luminanza il sottotitolo e i numeri scendevano quasi a
+     contrasto nullo. Ora copre davvero cio' che sta sotto il testo. */
+  background:radial-gradient(closest-side, rgba(6,5,12,.86), rgba(6,5,12,.62) 55%, transparent 78%);
+  filter:blur(12px);}
 .destiny-astrolabe .card::after{content:'';position:absolute;left:50%;top:50%;z-index:-1;pointer-events:none;
   width:118%;height:150%;transform:translate(-50%,-50%);border-radius:50%;
   border:1px solid rgba(201,162,39,.16);
@@ -211,7 +214,8 @@
   text-shadow:0 1px 8px rgba(0,0,0,.9), 0 0 22px rgba(0,0,0,.7), 0 0 30px rgba(252,232,144,.25);}
 .destiny-astrolabe .card.fail .sub, .destiny-astrolabe .card.epic .sub{color:#cdbfe0;
   text-shadow:0 1px 8px rgba(0,0,0,.95), 0 0 22px rgba(0,0,0,.8);}
-.destiny-astrolabe .card .nums{margin-top:9px;font-family:'Cinzel',serif;font-weight:700;letter-spacing:.28em;
+/* letter-spacing ridotto: .28em in maiuscoletto costa il 10-15% di velocita' di lettura */
+.destiny-astrolabe .card .nums{margin-top:9px;font-family:'Cinzel',serif;font-weight:700;letter-spacing:.14em;
   text-transform:uppercase;font-size:11px;color:#d8c386;
   text-shadow:0 1px 6px rgba(0,0,0,.95), 0 0 14px rgba(0,0,0,.8);}
 .destiny-astrolabe .card .chips{display:flex;gap:26px;justify-content:center;margin-top:15px;padding-top:12px;position:relative;}
