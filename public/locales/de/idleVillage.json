@@ -1,4 +1,70 @@
 {
+  "activityCapsule": {
+    "accessibility": {
+      "activityCapsule": "{label} Aktivitätskapsel",
+      "closeDetails": "Details schließen"
+    },
+    "actions": {
+      "cancel": "Abbrechen",
+      "collect": "Einsammeln",
+      "collecting": "Wird eingesammelt...",
+      "start": "Starten"
+    },
+    "ariaLive": {
+      "blocked": "Aktivität {label} blockiert",
+      "completed": "Aktivität {label} abgeschlossen",
+      "idle": "Aktivität {label} ist inaktiv",
+      "progress": "Fortschritt {label}: {percent}%",
+      "readyToCollect": "{label} bereit zum Einsammeln",
+      "slotFreed": "{count, plural, one {{count} Slot von {label} freigegeben} other {{count} Slots von {label} freigegeben}}",
+      "started": "Aktivität {label} gestartet",
+      "workerAssigned": "{count, plural, one {{count} Arbeiter {label} zugewiesen} other {{count} Arbeiter {label} zugewiesen}}"
+    },
+    "defaultHalo": "POI",
+    "devTools": {
+      "validationTitle": "Skin-Validierungsfehler"
+    },
+    "dropHint": "Ablegen",
+    "info": {
+      "duration": "Dauer",
+      "eta": "Voraussichtliche Ankunft",
+      "reward": "Belohnung"
+    },
+    "lore": {
+      "locked": "Eine uralte Schwingung wartet in der Stille dieses Unterfangens."
+    },
+    "requirements": {
+      "relation": {
+        "all": "Erforderlich",
+        "any": "Eines von",
+        "none": "Verboten"
+      }
+    },
+    "sections": {
+      "assignedCharacters": "Zugewiesene Charaktere",
+      "lore": "Tagebuch",
+      "requirements": "Anforderungen",
+      "telemetry": "Ereignisprotokoll"
+    },
+    "slotLabel": "Slot {index}",
+    "status": {
+      "blocked": "Blockiert",
+      "completed": "Abgeschlossen",
+      "idle": "Inaktiv",
+      "inProgress": "In Bearbeitung"
+    },
+    "telemetry": {
+      "empty": "Keine Ereignisse aufgezeichnet."
+    },
+    "type": {
+      "job": "Job",
+      "maintenance": "Wartung",
+      "poi-activity": "POI-Aktivität",
+      "quest": "Quest",
+      "training": "Training"
+    },
+    "workerAlt": "Arbeiter"
+  },
   "poiMarkerLab": {
     "title": "POI Marker Lab",
     "subtitle": "Opportunity marker baseline: colour + icon = what, timer ring = when, material = where. Placed over the canonical Wanderlust surface, because that is the only honest test.",
