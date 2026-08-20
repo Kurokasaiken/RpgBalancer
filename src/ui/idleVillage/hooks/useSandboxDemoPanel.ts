@@ -3,7 +3,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import { loadData, saveData } from '@/shared/persistence/PersistenceService';
 import type { ActivityDefinition } from '@/balancing/config/idleVillage/types';
 import type { VerbDetailPreview } from '@/ui/idleVillage/types/VerbDetailPreview';
-import { type DropState } from '@/ui/idleVillage/components/ActivitySlot';
+// COMMENTED: unused import — import { type DropState } from '@/ui/idleVillage/components/ActivitySlot';
 import type { VillageState, ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 
 export type DemoRequirement = 'none' | 'hp200';
