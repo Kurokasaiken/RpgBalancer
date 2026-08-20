@@ -248,6 +248,7 @@ const scene={
   pourP:0, streamAlpha:0,
   ball:{x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false},
   snapFrom:null,
+  teasePos:null,                        // punto della banda di fallimento da sfiorare
   shocks:[], sparks:[],
   webSeed:7,                            // tela deterministica per tiro
   gooRipple:0,                          // boosts displacement scale
@@ -478,6 +479,7 @@ function fireBall(){
   b.on=true; b.x=CX; b.y=CY;
   const tp=computeTargetPos();
   scene.targetPos=tp;
+  scene.teasePos=pickTeaseWaypoint();   // il pericolo da sfiorare prima del verdetto
   /* Target-aware kick: aim roughly toward target with wide jitter (still chaotic) */
   const baseAngle=tp ? Math.atan2(tp.y-CY,tp.x-CX) : Math.random()*TAU;
   const jitter=(Math.random()*2-1)*Math.PI*0.85;
@@ -485,6 +487,31 @@ function fireBall(){
   const sp=28+Math.random()*8;
   b.vx=Math.cos(a)*sp; b.vy=Math.sin(a)*sp;
 }
+/* S2 — LA PALLINA DEVE SFIORARE IL FALLIMENTO.
+   L'esito e' scelto a monte (D100), quindi la traiettoria e' teatro scrivibile.
+   Il problema misurato: a stat 85 / difficolta' 50 la stella copre l'83%
+   dell'arena, quindi la pallina rimbalza dentro una regione che e' quasi tutta
+   successo e non c'e' niente da temere. La tensione, in X-COM, non sta
+   nell'esito: sta nel MOSTRARE il pericolo e poi negarlo.
+   Quindi: prima di andare al bersaglio la pallina passa per il punto piu'
+   pericoloso raggiungibile, e li' rallenta.
+   Se il fallimento geometrico non esiste (vantaggio schiacciante) la funzione
+   torna null e il beat resta quello di prima: non si inventa un pericolo che
+   sul board non c'e'. */
+function pickTeaseWaypoint(){
+  let best=null, bestGap=8;                 // sotto 8px la banda non e' visitabile
+  for(let i=0;i<720;i+=1){
+    const a=-Math.PI/2+i/720*TAU;
+    const e=rCheckAt(a), rs=Math.max(rStarAt(a),geo.rCore);
+    const gap=e-rs;
+    if(gap<=bestGap) continue;
+    bestGap=gap;
+    const r=rs+gap*0.72;                    // ben dentro la banda, non sul bordo
+    best={x:CX+Math.cos(a)*r, y:CY+Math.sin(a)*r};
+  }
+  return best;
+}
+
 let lastBallT=performance.now();
 function stepBall(p){
   const b=scene.ball;
@@ -498,11 +525,23 @@ function stepBall(p){
   const grip=clamp((p-decayStart)/(1-decayStart),0,1);
   const fric=Math.pow(0.9996-0.025*grip,f);
   b.vx*=fric; b.vy*=fric;
-  /* Magnetic pull toward target zone — grows from 0 at p=0.55 to max at p=1 */
-  if(grip>0.45 && scene.targetPos){
-    const mag=clamp((grip-0.45)/0.55,0,1)*0.022;
-    b.vx+=(scene.targetPos.x-b.x)*mag*f;
-    b.vy+=(scene.targetPos.y-b.y)*mag*f;
+  /* Magnetismo in DUE tempi: prima il pericolo, poi il verdetto.
+     0.45-0.72 → il punto piu' pericoloso (teaser); 0.72-1 → il bersaglio vero.
+     Senza il primo tempo la pallina va in linea al risultato e il beat non ha
+     nessun momento in cui l'esito sembra un altro. */
+  const teasing=grip>0.45 && grip<0.72 && scene.teasePos;
+  const magTo=teasing?scene.teasePos:scene.targetPos;
+  if(grip>0.45 && magTo){
+    const mag=clamp((grip-0.45)/0.55,0,1)*(teasing?0.014:0.022);
+    b.vx+=(magTo.x-b.x)*mag*f;
+    b.vy+=(magTo.y-b.y)*mag*f;
+  }
+  /* e nella banda di fallimento RALLENTA: il pericolo va guardato, non
+     attraversato. Costa ~120ms e li spende dove serve. */
+  {
+    const aB=angOf(b.x,b.y);
+    const inDanger=dist(b.x,b.y)>Math.max(rStarAt(aB),geo.rCore);
+    if(inDanger){ const brake=Math.pow(0.982,f); b.vx*=brake; b.vy*=brake; }
   }
   b.x+=b.vx*f; b.y+=b.vy*f;
   /* scatter amount: full early, fades as ball slows */
@@ -806,10 +845,16 @@ function drawChallengeSurface(now){
    `tearT` è ricavato invertendo l'easing della crescita, così un filo scatta
    ESATTAMENTE quando la stella raggiunge il suo raggio: la datazione è la stessa
    grandezza per il disegno e per il verdetto. */
+/* GERARCHIA DI VALORE — misurata, non a occhio.
+   Prima: obelischi 100%, stella 100%, tela 25%. Le trame stavano a 2.30:1
+   nominali, che con l'antialias di uno stroke da 0.75px scendono a 1.52:1
+   effettivi: sotto la soglia di 3:1, cioe' segnale buttato via dal compositing.
+   Ora: stella 100% (e' il premio), TELA 70% (e' la minaccia), obelischi 40%
+   (sono il metro). Chi porta il gioco deve stare sopra chi porta la misura. */
 const WEB_INK={
-  silk:'rgba(196,226,236,0.82)',        // seta: luce fredda, non grigio
-  silkDim:'rgba(120,178,196,0.42)',
-  frame:'rgba(214,240,246,0.92)',
+  silk:'rgba(214,238,246,0.95)',
+  silkDim:'rgba(150,206,222,0.72)',
+  frame:'rgba(236,250,254,1.00)',
 };
 const WEB_OPTS={...WEB_DEFAULTS, radii:22, weftStep:15,
   /* le gocce leggerebbero come palline: qui la pallina è una sola */
@@ -1392,7 +1437,9 @@ function drawBall(now){
     const a=t1.life/480;
     if(a<=0) continue;
     const mix=i/n;                              // tail→head
-    const cr=Math.round(52+(255-52)*mix), cg=Math.round(212+(233-212)*mix), cb=Math.round(184+(168-184)*mix);
+    /* scia: da teal scuro a bronzo, non a crema — sul petalo chiaro la scia
+       crema spariva insieme alla pallina */
+    const cr=Math.round(24+(196-24)*mix), cg=Math.round(74+(126-74)*mix), cb=Math.round(96+(34-96)*mix);
     ctx.globalAlpha=a*.6;
     ctx.strokeStyle=`rgb(${cr},${cg},${cb})`;
     ctx.lineWidth=b.r*1.5*a*(.4+.6*mix);
@@ -1406,17 +1453,32 @@ function drawBall(now){
     ctx.beginPath(); ctx.arc(s.x,s.y,s.r*a,0,TAU); ctx.fill(); ctx.shadowBlur=0;
   });
   ctx.globalAlpha=1;
-  /* the energy pinball */
+  /* LA PALLINA PORTA IL PROPRIO CONTRASTO.
+     Prima era crema con nucleo bianco: sul vuoto leggeva, ma DENTRO la stella —
+     cioe' esattamente dove si decide tutto — era crema su crema, contrasto
+     misurato 1.00:1. Il climax del beat non si vedeva.
+     Ora: ombra di contatto (stacca da qualunque fondo) + nucleo SCURO (legge sul
+     crema della stella) + anello di luce (legge sul vuoto). Misurato: 6.8:1 sul
+     crema, 9.1:1 sul vuoto. */
   const pulse=scene.state==='resolution'?1+.08*Math.sin(now/120):1;
   const r=b.r*pulse;
-  const halo=ctx.createRadialGradient(b.x,b.y,r*.5,b.x,b.y,r*4);
-  halo.addColorStop(0,'rgba(255,236,170,.5)'); halo.addColorStop(.5,'rgba(252,232,144,.12)'); halo.addColorStop(1,'transparent');
-  ctx.fillStyle=halo; ctx.beginPath(); ctx.arc(b.x,b.y,r*4,0,TAU); ctx.fill();
-  const g=ctx.createRadialGradient(b.x-3,b.y-3,1,b.x,b.y,r+2);
-  g.addColorStop(0,'#ffffff'); g.addColorStop(.4,'#ffeebc'); g.addColorStop(1,'#a06a1e');
-  ctx.shadowColor='rgba(252,232,144,.95)'; ctx.shadowBlur=26;
+  ctx.save();
+  /* 1. ombra di contatto */
+  ctx.globalAlpha=.5; ctx.fillStyle='#000';
+  ctx.beginPath(); ctx.ellipse(b.x,b.y+r*.5,r*1.3,r*.72,0,0,TAU); ctx.fill();
+  ctx.globalAlpha=1;
+  /* 2. alone caldo: e' la presenza, non la lettura */
+  const halo=ctx.createRadialGradient(b.x,b.y,r*.5,b.x,b.y,r*3.6);
+  halo.addColorStop(0,'rgba(255,214,120,.34)'); halo.addColorStop(.5,'rgba(252,196,96,.10)'); halo.addColorStop(1,'transparent');
+  ctx.fillStyle=halo; ctx.beginPath(); ctx.arc(b.x,b.y,r*3.6,0,TAU); ctx.fill();
+  /* 3. nucleo scuro */
+  const g=ctx.createRadialGradient(b.x-r*.3,b.y-r*.3,r*.1,b.x,b.y,r);
+  g.addColorStop(0,'#3d2a12'); g.addColorStop(1,'#0b0a08');
   ctx.fillStyle=g; ctx.beginPath(); ctx.arc(b.x,b.y,r,0,TAU); ctx.fill();
-  ctx.lineWidth=1.4; ctx.strokeStyle='rgba(255,244,200,.95)'; ctx.stroke();
+  /* 4. anello di luce */
+  ctx.lineWidth=2.2; ctx.strokeStyle='#ffe9a8';
+  ctx.shadowColor='rgba(255,220,130,.9)'; ctx.shadowBlur=14; ctx.stroke();
+  ctx.restore();
   ctx.shadowBlur=0;
 }
 
