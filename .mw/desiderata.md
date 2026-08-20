@@ -213,3 +213,271 @@ Il progetto RPG adotta il **Golden UI Foundation** come processo per determinare
 - Quale skin diverrà ufficialmente canonical: `Prismatic Wanderlust` è candidata, ma deve essere approvata su artefatti visivi reali (Phase 0).
 - Quali componenti entreranno nel Golden 0 dipende dai risultati dell'audit e dalla review visiva.
 - Quale tool e soglia di diff per le baseline deterministiche.
+
+---
+
+## v9 — La geometria avversariale non deve essere amorfa
+
+**Status:** `FROZEN`
+**Date:** 2026-08-18
+**Authorized by:** Fausto
+**Reason:** avallo diretto in sessione — "Desiderata V9 = la geometria avversariale non deve essere per forza un goo o qualcosa di amorfo"
+
+**Intento del Director:**
+Il goo — blob scuro dai contorni organici e irregolari — non è l'unica forma
+ammessa per rappresentare la difficoltà dello skill check, e non sta
+funzionando. La geometria avversariale è libera di non essere amorfa.
+
+**Formulazione approvata (FROZEN):**
+La geometria avversariale dello skill check **non deve essere per forza un goo
+o qualcosa di amorfo**.
+
+**Cosa questo sblocca (e cosa no):**
+Questo desiderata è un *permesso*, non un mandato. Congela la libertà di
+abbandonare il blob organico; **non** congela quale metafora la sostituisca.
+La ragnatela è la direzione che il Director ha scelto di prototipare per prima,
+non la forma approvata in via definitiva.
+
+**Contesto tecnico:**
+- Il carattere amorfo del bordo nasce da una singola funzione, non dalla forma
+  d'insieme: `gooBlob(θ) = 1 + 0.035·sin(3θ) + 0.022·sin(5θ) + 0.014·sin(7θ)`
+  in `src/ui/idleVillage/components/destinyAstrolabeV7/engine.ts`
+  (antenato: `blob(theta)` in `destinyAstrolabeV3/geometry.ts:97`). È quella
+  somma di seni che fa sembrare arbitraria una soglia che è un numero preciso.
+- La spec canonica dell'astrolabio **nomina il goo** in tre punti di
+  `.mw/specs/destiny-astrolabe/prompt.md` (base, Empire, Wilderness) e nel
+  `design-intent.md` ("failure is *in the goo*"). Sostituirlo richiede una
+  revisione di quegli artefatti, che hanno provenance firmata.
+- Perimetro di rischio: **V1 resta canonica** per il gameplay (desiderata v3,
+  RICHIESTE Q5). V6/V7 sono laboratori: la sperimentazione non tocca le quest.
+
+**Still unresolved:**
+- Quale metafora vince: ragnatela, ombre portate, morsa, corrente. Solo la
+  prima viene prototipata.
+- Se la *contabilità* (unità discrete e numerabili) diventi un requisito
+  vincolante o resti una proprietà desiderabile di una sola soluzione.
+- Se il numero mostrato resti la formula `50+(stat−diff)` o diventi la
+  probabilità geometrica reale (`geo.probPct`): divergono fino a −43.8 pt nel
+  caso multi-skill, dove è la formula a sbagliare.
+- Se e quando revisionare `prompt.md` / `design-intent.md` della spec
+  canonica.
+
+---
+
+## v10 — Placeholder funzionali e skin-ready per scheda, equip, consumabili e skill equip
+
+**Status:** `FROZEN`
+**Date:** 2026-08-18
+**Authorized by:** Fausto
+**Reason:** avallo via "ok" in sessione
+
+**Intento del Director:**
+Costruire componenti placeholder per scheda del personaggio, meccanismo di equip, oggetti equippabili, oggetti consumabili e skill da equippare. I componenti devono essere già funzionali e collegati al sistema di skin, in modo che il lavoro Golden UI possa concentrarsi sull’estetica senza rifare i contratti.
+
+**Formulazione proposta da Claude:**
+Costruire un piano ombrello con sub-piani per: (1) scheda del personaggio, (2) meccanismo di equip, (3) oggetti equippabili, (4) oggetti consumabili, (5) skill da equippare. Ogni componente sarà un placeholder che implementa il contratto funzionale e l’integrazione con il sistema di skin (skinConfig, i18n, config-first, component reuse), in modo che il successivo lavoro Golden UI possa affinare la qualità visiva senza rifare i contratti.
+
+**Formulazione approvata (FROZEN):**
+Il progetto RPG costruisce un piano ombrello con sub-piani per scheda del personaggio, meccanismo di equip, oggetti equippabili, oggetti consumabili e skill da equippare. Ogni componente sarà un placeholder funzionalmente corretto e skin-wired, integrato con skinConfig, i18n, config-first e component reuse, in modo che il lavoro Golden UI possa affinare l’estetica senza rifare i contratti.
+
+---
+
+## v11 — Skill Check Web V1: la rete lanciata, e il fallimento critico messo in scena
+
+**Status:** `FROZEN`
+**Date:** 2026-08-18
+**Authorized by:** Fausto
+**Reason:** decisioni date esplicitamente in sessione, una per una
+
+**Intento del Director:**
+Uno *skill check cinematografico*, non un astrolabio. L'avversario è una
+ragnatela — scelta contro il rovereto dopo test di fattibilità comparato. Il
+fallimento critico vale il 5%, **viene dato** dal sistema, e va **messo in
+scena**, non modellato.
+
+**Decisioni ferme (ognuna data dal Director, non dedotta):**
+
+1. **Nome:** `skill-check-web-v1` (rotta, cartella `src/ui/skillCheckWebV1/`,
+   componente `SkillCheckWebV1`). Scelto per non collidere con
+   `/minimal-skillcheck` e `/minimal-skillcheck-v6` già esistenti.
+2. **Metafora:** ragnatela. Il rovereto è stato prototipato e scartato: leggeva
+   come ghirlanda decorativa invece che come minaccia — l'opposto del motivo per
+   cui era stato proposto.
+3. **Il ragno NON esiste.** Corollario dato dal Director: i fili non si posano
+   uno per volta, la rete **viene lanciata** come evento unico. Il beat 1 non è
+   tessitura, è **lancio**.
+4. **I raggi sono addolciti verso il BASSO** in coordinate mondo, non
+   perpendicolarmente al raggio. Argomento del Director: se piegano verso il
+   basso non può nascere una spirale, perché metà delle linee curverebbe verso
+   l'alto. Verificato: regge anche a curvatura estrema.
+5. **Il bordo** è una curva liscia a fascio doppio con nodi di ancoraggio.
+   Approvato dopo tre tentativi falliti (cerchio con tremolio, esagono,
+   tridecagono): il difetto comune erano le faccette.
+6. **Le punte della stella BUCANO il telaio.** Dentro il muro la stella è piena
+   (regione di successo vera, dove la pallina può fermarsi); fuori resta solo il
+   contorno, perché la pallina non esce dall'arena e una campitura piena
+   promette un successo non ottenibile.
+7. **Fallimento critico: 5%, viene dato, NON è una regione geometrica.**
+   Non c'è vittoria automatica: il fallimento critico esiste sempre. Ma non si
+   modella una probabilità nel board — l'esito è scelto a monte e il board lo
+   mette in scena. Messa in scena approvata: la pallina si è **già fermata sulla
+   stella** e un filo superstite la agguanta. Sapore X-COM: la drammaturgia sta
+   nella sorpresa dopo il sollievo, non in una meccanica di dadi.
+
+**Cosa questo NON autorizza:**
+- Nessun tetto geometrico, anello o sacca dedicati al fallimento critico. Il
+  tetto alle valli è stato implementato, misurato (area 0.13–0.53%, sacca larga
+  3px) e **smontato**: un tetto sul raggio non può garantire un'area.
+- Nessuna vittoria automatica, in nessuna forma.
+- La parola "spirale" non descrive niente di questa geometria: le trasversali
+  sono **trame**, corde fra raggi consecutivi. Il lessico è quello della
+  tessitura (ordito / trame), non della biologia.
+
+**Invarianti verificati che non possono rompersi:**
+- punte della stella esattamente a `rOf(stat)` — errore misurato `0.0e+0`
+- parità = 50.09% dell'area a **ogni** livello (`VALLEY_F = 0.3675`),
+  scale-invariante da 20/20 a 95/95
+- graduazione **equal-area** (`rim·√(k/N)`): lettura esatta, scarto `0.000`. La
+  graduazione lineare — quella di V6/V7 oggi — sbaglia fino a **+12.5 pt** e fa
+  leggere tre numeri diversi alle tre parità
+- la graduazione vive sul **board** (scala 1..99), non sulla tela: la tela porta
+  il carattere, il board porta la misura
+
+**Still unresolved:**
+- Il beat del fallimento critico è in progettazione verificata; la messa in
+  scena precisa (tempi, meccanismo del filo, cosa non deve telegrafare) non è
+  ancora chiusa.
+- Il movimento del lancio non è mai stato giudicato: il pane del browser congela
+  `requestAnimationFrame`, quindi solo il Director può approvarlo.
+- La rete quasi scompare a stat molto alta. Con il crit-fail non geometrico non è
+  più un problema di correttezza, ma resta una scelta di regia aperta.
+- Se le tacche di `drawAxisRig` in V6/V7 vadano corrette a equal-area: per la
+  stessa ragione dimostrata qui, **la scala attuale di V6/V7 è fuorviante**.
+
+---
+
+## v12 — Strato punti-stat, Trial by Fire, consumabili e authoring delle attivita'
+
+**Status:** `FROZEN`
+**Date:** 2026-08-20
+**Authorized by:** Fausto
+**Reason:** "approvo cn queste modifiche" — avallo esplicito sulla candidata rev. 2 presentata in sessione, con le correzioni del turno finale (config-first, "pool" invece di "DB")
+
+**Relazione con v10:** v10 congela i *contratti dei componenti placeholder* (scheda, equip,
+equippabili, consumabili, skill) realizzati in `src/pages/hero-components-lab.tsx`. v12 sta
+**sopra** v10: definisce da dove vengono i numeri, come i consumabili entrano ed escono dalle
+attivita', e come le attivita' si autorano. Non rimpiazza v10, la alimenta.
+
+### Vincolo trasversale (ribadito dal Director, prevale su tutto il resto)
+
+**Config-first, sempre. Tutti i numeri e i valori nominati qui sono il DEFAULT ATTUALE, non
+valori hardcoded.** Vivono in config modules validati Zod e consumati read-only da UI/logica
+(`.windsurf/rules/philosophy.md` §Config-first). Ogni numero in questo documento va letto come
+"il default che stiamo usando adesso", mai come costante. Corollario: **single source of truth**
+— ogni concern ha esattamente una casa canonica, la duplicazione e' un bug.
+
+### User-stated
+
+- Le stat vivono su una **scala a punti** con **modificatori di peso** per stat:
+  HP x4 (-20 punti = -80 HP; base 200 -> 120), TxC ~x1 su base 50% +25% se armato
+  (-20 punti -> 55% di colpire). Default attuali, non hardcoded.
+- Ordini di grandezza a occhio: eroi fino a ~+25, PG normali fino a ~+5, negativi fino a ~-20.
+  **Non stabiliti a tavolino: vanno decisi e implementati.** Requisito fermo: facilmente
+  modificabili — cioe' config-first.
+- Confine Balancer<->equip: il danno medio della scheda e' il danno di un'**arma media**;
+  il +25% TxC e' l'essere armato.
+- POI -> POI-detail -> **slot rack** -> slot. **Ogni slot ha modificatori specifici e ne
+  conferisce.**
+- Mandare **piu' PG degli obbligatori** deve poter dare: loot migliore, minor probabilita' di
+  morte, o **spostare la probabilita' di morte da un PG a un altro** (PG deboli come carne da
+  macello).
+- **Trial by Fire**: un PG non-eroe che supera **3 quest** (default) con **deathChance >= 5%**
+  (default) diventa un personaggio eroico; le sue stat aumentano vertiginosamente. Da
+  implementare **e da documentare**.
+- **Tutti possono equipaggiare tutto.** Il **numero di skill equipaggiabili dipende da un
+  valore tipo Intelligenza** (o simile).
+- Consumabili: modo per **mostrarli**, ottenerli da **quest o job di edifici speciali**,
+  **mandarli** nelle quest e **usarli** nelle quest. Il consumo e' **scelta del giocatore**.
+- Modo **carino, estetico** per creare e modificare le attivita' (quest/job), e per generarle
+  **automaticamente**.
+- Deve esistere comunque un **pool di quest prestabilite** (non un DB reale: nel progetto oggi
+  non si usano DB — JSON o formato equivalente).
+- Distinguere nome-del-valore da nome-della-stat (HP = valore, Costituzione = stat che lo
+  calcola con un calcolo matematico): **riconosciuto ma rinviato**, non interessa ora.
+- Dove serve un nome non ancora deciso, usare **nomi temporanei**.
+
+### AI inference (marcata come tale)
+
+- Il livello mancante e' uno **strato punti-stat sopra lo strato valori**, con tasso di cambio
+  per stat. Il tasso di cambio e' il **peso HP_eq gia' esistente e gia' validato Monte Carlo**
+  (`+10 Damage ~ +50 HP`, weight 5.0; TxC 2.0), non un secondo sistema parallelo.
+- La formula del Director combacia con quella canonica: `hitChance = TxC + 50 - Evasion`
+  (`src/docs/docs/BALANCING_SYSTEM.md`), con `BASELINE_STATS.txc = 25`. Il "+25% perche' armato"
+  non e' un modificatore percentuale: e' il contributo `txc` dell'arma. `50 + 25 - 20 = 55`.
+- Serve **un solo modello di contributo con provenance**
+  (`base | equip | skill | consumable | slot | trial-by-fire`): le fonti nominate dal Director
+  sono la stessa operazione sulla stessa valuta. E' cio' che rende vero il "facilmente
+  modificabile" invece che dichiarato.
+- `deathChance` va da **per-quest** (`questConfig.ts:58`, default 0.01-0.08) a **per-slot**:
+  senza questo, "spostare la morte da un PG a un altro" non ha dove esistere. Prerequisito
+  strutturale delle altre due parti.
+- `survivalCount` esiste gia' su `ResidentState` (`testResidents.ts:26`) ed e' il contatore
+  naturale di Trial by Fire, ma **non filtra per deathChance**: va filtrato o affiancato da un
+  secondo contatore.
+- Il confine PG<->equip e' **gia' dichiarato** nel Balancer dal flag `baseStat`:
+  `hp, damage, txc, evasion, critChance, critMult` = pool umano; `ward, armor, resistance,
+  armorPen, penPercent, lifesteal, regen` = solo equip/talenti/razze; `isDetrimental` per
+  `failChance/failMult`. **Il caso non coperto e' l'equip che contribuisce a una `baseStat`**
+  (l'arma su `txc`).
+- `intelligence` esiste gia' in `defaultConfig.ts:292` ma **come requisito di archetipo, non
+  come stat del residente**: per reggere gli slot skill va promossa a stat, oppure va scelto
+  un altro valore.
+- **Tre baseline HP in conflitto**: `BASELINE_STATS.hp = 100` (il bersaglio su cui sono stati
+  tarati TUTTI i pesi Monte Carlo), 200 (l'umano base dichiarato dal Director), 280/210
+  (`TEST_RESIDENTS`). Non e' estetica: se l'umano base ha 200 HP, ogni punto HP vale metta' in
+  TTK e **tutti gli altri pesi sono fuori scala di 2x**. Una sola puo' essere l'unita' di
+  misura; le altre due derivano da lei.
+- Collisione lessicale: `heroic` oggi qualifica la **difficolta' quest**
+  (`story|skirmish|dangerous|heroic`, soglie skill-check 30/45/60/75 in
+  `questSkillCheckConfig.ts:24`), non lo stato del PG.
+- Quest Chronicle: **il momento della scelta esiste gia'** come tipo di fase `timedChoice`
+  (`types.ts:283`, colore skin in `QuestChronicle.tsx:66`). **Manca il consumabile**:
+  `QuestPhaseRequirement` copre solo Trial / Combat / Work, e `PhaseOutcomeEffects` da'
+  `resources / reputation / unlockActivityIds` — nessun oggetto d'inventario ne' in ingresso
+  ne' in uscita. Va aggiunto un quarto tipo di requirement e un effetto di consumo.
+- Il pool di quest prestabilite **esiste gia' come formato**: `QuestBlueprint` con `phases[]`,
+  `requirements`, `successEffects/failureEffects`, `copy`, `riskProfile` (`types.ts:313`) e
+  schema Zod in `quests/questBlueprints.schema.ts`. La domanda aperta non e' "dove sta il pool"
+  ma **chi scrive dentro il pool**.
+- Base UI: componenti v10 in `src/pages/hero-components-lab.tsx` (`EquipSlotRack`,
+  `ConsumablePile`, `SkillDeck`, `PgDetailCard`, `EquippableItemCard`, `ItemDragToken`) piu'
+  `ResidentSlotRack` sul lato POI.
+
+### Nomi temporanei (autorizzati dal Director, sostituibili)
+
+- `veteran` — il PG promosso da Trial by Fire (perche' `heroic` e' occupato dalla difficolta').
+- `statPoints` — lo strato a punti (-20..+25 circa).
+- `statScale` — il tasso di cambio punti -> valore di gioco (HP x4, TxC x1, ...).
+
+### Still unresolved
+
+- Di quanto salgono le stat alla promozione; se la promozione e' certa o probabilistica; se e'
+  irreversibile e se un veteran puo' retrocedere.
+- La formula esatta slot-skill <-> Intelligenza (o quale valore la governa).
+- Percorso di authoring delle attivita': editor in-game, offline, o ibrido (JSON canonico +
+  editor che esporta verso quel JSON + generatore che produce lo stesso formato). Rischio
+  nominato: un editor che salva "per comodita'" in localStorage crea una quarta sorgente di
+  verita'.
+- Quale delle tre baseline HP e' l'unita' di misura canonica. **Vincolo fermo: una sola
+  sorgente, le altre derivate.**
+- Se il negativo (-20) e' raggiungibile per debuff, per nascita, o entrambi.
+- Nomenclatura valore<->stat (HP / Costituzione): rinviata esplicitamente dal Director.
+
+### Cosa v12 NON autorizza
+
+- Nessun numero hardcoded in componenti o logica: tutti i default nominati qui vivono in config
+  Zod-validata.
+- Nessuna seconda sorgente di verita' per baseline, pesi, blueprint quest o inventario.
+- Nessun secondo sistema di pesi parallelo a HP_eq.
+- Nessuna implementazione prima che il planner abbia prodotto un piano: v12 e' una desiderata,
+  non un mandato di esecuzione.

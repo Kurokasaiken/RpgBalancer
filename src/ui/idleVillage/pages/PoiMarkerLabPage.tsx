@@ -7,13 +7,16 @@
  *     of the rework is that the marker must belong to that painted map.
  *  2. Matrix: 3 types x 5 states on a neutral field, to compare the grammar.
  *
- * Clock integration: ClockWidgetStandalone for deadline-driven timing tests.
+ * Clock integration: DayNightTimeEngineStrip provides the canonical time engine
+ * and Day/Night POI skin, so marker behavior can be compared against the cycle.
  * Route: /poi-marker-lab
  */
-import React, { useCallback, useMemo, useState, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ClockWidgetStandalone } from '@/ui/idleVillage/frozen/kits/clockKit';
-import DayNightPoiSkin from '../components/minimal/DayNightPoiSkin';
+import { DayNightTimeEngineStrip } from '@/ui/idleVillage/frozen/kits/clockKit';
+import { useMinimalGameplayWithIdleVillageConfig } from '@/store/useMinimalGameplay';
+import { SkinSystemProvider } from '@/ui/idleVillage/hooks/useSkinSystem';
+import { SandboxTimingProvider } from '@/ui/idleVillage/hooks/useSandboxTimingBridge';
 import {
   type PoiMarkerProps,
   type PoiState,
@@ -43,10 +46,10 @@ const MARKERS: Record<Variant, React.FC<PoiMarkerProps>> = {
 };
 
 /** Placements over the map, in percentages of the viewport. */
-const MAP_PLACEMENTS: Array<{ id: string; type: PoiType; state: PoiState; top: string; left: string }> = [
-  { id: 'plain-quest', type: 'quest', state: 'available', top: '30%', left: '26%' },
-  { id: 'village-job', type: 'job', state: 'assigned', top: '52%', left: '48%' },
-  { id: 'ridge-event', type: 'event', state: 'expiring', top: '36%', left: '70%' },
+const MAP_PLACEMENTS: Array<{ id: string; type: PoiType; state: PoiState; top: string; left: string; time?: boolean }> = [
+  { id: 'plain-quest', type: 'quest', state: 'assigned', top: '30%', left: '26%', time: true },
+  { id: 'village-job', type: 'job', state: 'assigned', top: '52%', left: '48%', time: true },
+  { id: 'ridge-event', type: 'event', state: 'assigned', top: '36%', left: '70%', time: true },
   { id: 'south-quest', type: 'quest', state: 'new', top: '70%', left: '34%' },
   { id: 'coast-job', type: 'job', state: 'available', top: '66%', left: '66%' },
 ];
@@ -54,6 +57,49 @@ const MAP_PLACEMENTS: Array<{ id: string; type: PoiType; state: PoiState; top: s
 export const PoiMarkerLabPage: React.FC = () => {
   const { t } = useTranslation('idleVillage');
   const label = useCallback((key: string) => String(t(`poiMarkerLab.${key}` as never)), [t]);
+
+  // Canonical time engine state (shared with DayNightTimeEngineStrip)
+  const gameplay = useMinimalGameplayWithIdleVillageConfig();
+  const { state: gameState, config } = gameplay;
+  const tickIntervalMs = config.loop?.tickIntervalMs ?? 1000;
+
+  // Smooth day/night progress for time-bound POIs (grows continuously, not tick-by-tick)
+  const [smoothProgress, setSmoothProgress] = useState(0);
+  const gameStateRef = useRef(gameState);
+  const lastTickAtRef = useRef(performance.now());
+  const lastTickRef = useRef(gameState.currentTick);
+  const wasPausedRef = useRef(gameState.isPaused);
+
+  useEffect(() => {
+    gameStateRef.current = gameState;
+    if (gameState.currentTick !== lastTickRef.current) {
+      lastTickAtRef.current = performance.now();
+      lastTickRef.current = gameState.currentTick;
+    }
+    if (!gameState.isPaused && wasPausedRef.current) {
+      lastTickAtRef.current = performance.now();
+    }
+    wasPausedRef.current = gameState.isPaused;
+  }, [gameState]);
+
+  useEffect(() => {
+    let frame: number;
+    const tick = () => {
+      const { currentTick, isPaused, speedMultiplier } = gameStateRef.current;
+      const dayNightCycle = config.globalRules.dayNightCycle;
+      if (!isPaused && dayNightCycle && dayNightCycle.dayTimeUnits + dayNightCycle.nightTimeUnits > 0) {
+        const totalCycleTicks = dayNightCycle.dayTimeUnits + dayNightCycle.nightTimeUnits;
+        const now = performance.now();
+        const fraction = Math.min(1, (now - lastTickAtRef.current) / tickIntervalMs);
+        const ticksToAdd = Math.floor((tickIntervalMs / 1000) * Math.max(1, speedMultiplier || 1));
+        const smoothTick = currentTick + ticksToAdd * fraction;
+        setSmoothProgress(Math.min(1, Math.max(0, smoothTick) / totalCycleTicks));
+      }
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [config, tickIntervalMs]);
 
   // Marker controls
   const [variant, setVariant] = useState<Variant>('matericV1');
@@ -66,35 +112,6 @@ export const PoiMarkerLabPage: React.FC = () => {
   const [showMap, setShowMap] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  // Clock state for deadline-driven testing
-  const [isPaused, setIsPaused] = useState(true);
-  const [speed, setSpeed] = useState(1);
-  const [currentDay, setCurrentDay] = useState(1);
-  const [hour, setHour] = useState(6);
-  const [progressFraction, setProgressFraction] = useState(0);
-  const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  // Clock tick loop
-  useEffect(() => {
-    if (isPaused) {
-      if (tickRef.current) clearInterval(tickRef.current);
-      return;
-    }
-    tickRef.current = setInterval(() => {
-      setHour((h) => {
-        if (h >= 23) {
-          setCurrentDay((d) => d + 1);
-          return 0;
-        }
-        return h + 1;
-      });
-      setProgressFraction((p) => {
-        const next = p + 1 / 24;
-        return next >= 1 ? 0 : next;
-      });
-    }, 1000 / speed);
-    return () => { if (tickRef.current) clearInterval(tickRef.current); };
-  }, [isPaused, speed]);
 
   const timerDirection = counterClockwise ? 'counterclockwise' : 'clockwise';
   const Marker = MARKERS[variant];
@@ -201,20 +218,8 @@ export const PoiMarkerLabPage: React.FC = () => {
         <p>{label('subtitle')}</p>
       </header>
 
-      {/* Clock widget for deadline-driven timing tests */}
-      <ClockWidgetStandalone
-        currentDay={currentDay}
-        isPaused={isPaused}
-        speedMultiplier={speed}
-        defaultSpeedMultiplier={1}
-        maxSpeedMultiplier={8}
-        tickIntervalMs={1000}
-        warmupDelayMs={0}
-        accentHex="#f59e0b"
-        onSpeedChange={setSpeed}
-        onTogglePause={() => setIsPaused(!isPaused)}
-        showTimingDetails={false}
-      />
+      {/* Canonical day/night time engine with DayNight POI skin */}
+      <DayNightTimeEngineStrip compact />
 
       {controls}
 
@@ -236,8 +241,14 @@ export const PoiMarkerLabPage: React.FC = () => {
             >
               <Marker
                 type={placement.type}
-                state={placement.state}
-                progress={placement.state === 'assigned' || placement.state === 'expiring' ? progress : 1}
+                state={placement.time && smoothProgress >= 1 ? 'available' : placement.state}
+                progress={
+                  placement.time
+                    ? (smoothProgress >= 1 ? 1 : smoothProgress)
+                    : placement.state === 'assigned' || placement.state === 'expiring'
+                      ? progress
+                      : 1
+                }
                 importance={placement.state === 'expiring' ? 'critical' : 'normal'}
                 size={size}
                 timerDirection={timerDirection}
@@ -285,13 +296,13 @@ export const PoiMarkerLabPage: React.FC = () => {
         <div className="poi-lab__playground-body">
           <Marker
             type={type}
-            state={state}
-            progress={progress}
+            state={smoothProgress >= 1 ? 'available' : 'assigned'}
+            progress={smoothProgress >= 1 ? 1 : smoothProgress}
             importance={importance}
             size={size}
             timerDirection={timerDirection}
             selected={selectedId === 'playground'}
-            onClick={() => handleSelect('playground', type, state)}
+            onClick={() => handleSelect('playground', type, 'assigned')}
           />
           <div className="poi-lab__scale">
             {[112, 72, 48, 32].map((s) => (
@@ -309,39 +320,16 @@ export const PoiMarkerLabPage: React.FC = () => {
         </div>
       </section>
 
-      <section className="poi-lab__reference" aria-label="Reference: Day/Night POI Cycle">
-        <h2>Reference: Day/Night Cycle POI (for comparison)</h2>
-        <p style={{ fontSize: '11px', opacity: 0.65, marginBottom: '16px' }}>
-          This is how a real POI behaves with the clock. Press Play above to see the halo fill/empty.
-          The cycle is 24 hours; paused state shows frozen glass effect.
-        </p>
-        <div className="poi-lab__reference-body">
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
-            <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-end' }}>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '9px', opacity: 0.6, marginBottom: '8px' }}>Day (running)</div>
-                <DayNightPoiSkin isDayPhase={true} cycleProgress={progressFraction} isPaused={isPaused} />
-              </div>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '9px', opacity: 0.6, marginBottom: '8px' }}>Night (running)</div>
-                <DayNightPoiSkin isDayPhase={false} cycleProgress={progressFraction} isPaused={isPaused} />
-              </div>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '9px', opacity: 0.6, marginBottom: '8px' }}>Paused</div>
-                <DayNightPoiSkin isDayPhase={true} cycleProgress={0.5} isPaused={true} />
-              </div>
-            </div>
-            <div style={{ fontSize: '10px', opacity: 0.55, maxWidth: '60ch' }}>
-              Notice: the ring **fills as time passes**, the icon shows phase (☀️ day / 🌙 night),
-              bloom intensifies when running, and frosted glass appears on pause. This is the POI contract.
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 
-  return pageContent;
+  return (
+    <SkinSystemProvider>
+      <SandboxTimingProvider>
+        {pageContent}
+      </SandboxTimingProvider>
+    </SkinSystemProvider>
+  );
 };
 
 /** Page chrome only — the marker's own material lives in `poiMarkerStyles`. */

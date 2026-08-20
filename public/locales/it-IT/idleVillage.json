@@ -1,4 +1,50 @@
 {
+  "equipment": {
+    "title": "Crea Equipaggiamento",
+    "subtitle": "Forgia oggetti dai template base",
+    "description": "Scegli un tipo di oggetto, regola i modificatori di stat, spendi il budget e salva. Le armi collegano sempre una skill base di attacco; armature e trinket forniscono modificatori passivi.",
+    "identity": "Identità",
+    "name": "Nome",
+    "namePlaceholder": "Nuovo oggetto",
+    "type": "Tipo",
+    "rarity": "Rarità",
+    "weapon": "Arma",
+    "armor": "Armatura",
+    "offhand": "Mano secondaria",
+    "trinket": "Trinket",
+    "ring": "Anello",
+    "mount": "Cavalcatura",
+    "grantedSkill": "Skill associata",
+    "stats": "Modificatori di stat",
+    "stat": {
+      "hp": "HP",
+      "damage": "Danno",
+      "txc": "TxC",
+      "evasion": "Evasione",
+      "critChance": "Critico %",
+      "critMult": "Moltiplicatore crit",
+      "armor": "Armatura",
+      "resistance": "Resistenza",
+      "armorPen": "Pen armatura",
+      "penPercent": "Pen %",
+      "lifesteal": "Ruba vita",
+      "regen": "Rigenerazione",
+      "ward": "Scudo ward",
+      "block": "Blocco",
+      "movementSpeed": "Velocità movimento"
+    },
+    "balance": "Bilancio",
+    "power": "Potere",
+    "cost": "Costo",
+    "budget": "Budget",
+    "balanceBar": "Uso budget",
+    "balanced": "Nel budget ({{balance}} punti liberi)",
+    "overBudget": "Fuori budget di {{balance}} punti",
+    "save": "Salva equipaggiamento",
+    "saved": "Equipaggiamento salvato",
+    "saveFailed": "Salvataggio fallito",
+    "unnamed": "Oggetto senza nome"
+  },
   "astrolabeV5": {
     "throw": "Tira",
     "rollAgain": "Tira di nuovo",
@@ -522,5 +568,61 @@
       "despawnWonders": "Nascondi meraviglie",
       "breath": "Respira"
     }
+  },
+  "pgDetailCard": {
+    "close": "Chiudi scheda",
+    "profile": "Profilo",
+    "fullFigure": "Figura intera",
+    "openArchetype": "Apri archetipo",
+    "unknownPreset": "Preset sconosciuto: {{id}}",
+    "hp": {
+      "label": "HP"
+    },
+    "fatigue": {
+      "label": "Fatica",
+      "ready": "Pronto",
+      "exhausted": "Esausto"
+    },
+    "statistics": {
+      "label": "Statistiche",
+      "count": "{{count}} valori",
+      "empty": "Nessuno snapshot disponibile."
+    },
+    "equipment": {
+      "label": "Equipaggiamento",
+      "weapon": "Arma",
+      "offhand": "Secondaria",
+      "armor": "Armatura",
+      "trinket": "Trinket",
+      "ring": "Anello",
+      "mount": "Compagno"
+    },
+    "inventory": {
+      "label": "Inventario",
+      "empty": "Nessun oggetto registrato."
+    },
+    "status": {
+      "available": "Disponibile",
+      "away": "Assente",
+      "exhausted": "Esausto",
+      "injured": "Ferito",
+      "dead": "Caduto"
+    }
+  },
+  "heroComponentsLab": {
+    "title": "Hero Components Lab",
+    "subtitle": "Vetrina placeholder per la scheda, equip, oggetti, consumabili e skill.",
+    "sectionA": "A — Scheda del personaggio",
+    "sectionB": "B — Raccoglitore slot equip",
+    "sectionC": "C — Card oggetto equippabile",
+    "sectionD": "D — Mazzo consumabili",
+    "sectionE": "E — Deck skill equippabili",
+    "rarity": "Rarità",
+    "effect": "Effetto",
+    "slot": "Slot",
+    "use": "Usa",
+    "availableSkills": "Skill disponibili",
+    "equippedSkills": "Skill equipaggiate",
+    "empty": "Vuoto"
   }
 }

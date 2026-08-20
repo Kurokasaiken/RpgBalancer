@@ -1,11 +1,21 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { X } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState, type FC } from 'react';
+import { useTranslation } from '@/localization/useTranslation';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { resolveResidentPortrait } from '@/engine/game/idleVillage/residentVisualResolver';
 import { formatResidentLabel } from '@/ui/idleVillage/residentName';
-import { useThemeSwitcher } from '@/hooks/useThemeSwitcher';
 import { getArchetypeSummary } from '@/ui/idleVillage/archetypeDirectory';
 import { dispatchOpenArchetypeDetailEvent } from '@/shared/events/archetypeEvents';
+import {
+  MatericSurface,
+  MatericPlaque,
+  MatericCloseButton,
+  MatericPortrait,
+  MatericStatBar,
+  MatericButton,
+  MatericBadge,
+  MatericField,
+  MatericRecordList,
+} from '@/ui/designSystem/primitives';
 
 export interface PgDetailCardProps {
   resident: ResidentState;
@@ -26,11 +36,17 @@ const isDragExemptTarget = (target: EventTarget | null): boolean => {
   return false;
 };
 
-const PgDetailCard: React.FC<PgDetailCardProps> = ({ resident, onClose }) => {
-  const { activePreset } = useThemeSwitcher();
-  const hpPercent = resident.maxHp > 0 ? clampPercent(Math.round((resident.currentHp / resident.maxHp) * 100)) : 0;
-  const fatiguePercent = clampPercent(Math.round(resident.fatigue));
-  const statusLabel = resident.isInjured ? 'Ferito' : resident.status;
+/**
+ * PgDetailCard — scheda placeholder del personaggio.
+ *
+ * Skin-compliant: composizione di Materic* primitives con drag/close interno.
+ */
+const PgDetailCard: FC<PgDetailCardProps> = ({ resident, onClose }) => {
+  const { t } = useTranslation('idleVillage');
+
+  const statusLabel = resident.isInjured
+    ? t('pgDetailCard.status.injured')
+    : t(`pgDetailCard.status.${resident.status}` as any, resident.status);
   const snapshotEntries = useMemo(() => {
     const snapshot = resident.statSnapshot ?? {};
     return Object.entries(snapshot)
@@ -54,14 +70,14 @@ const PgDetailCard: React.FC<PgDetailCardProps> = ({ resident, onClose }) => {
       return undefined;
     };
     return [
-      { id: 'weapon', label: 'Arma', value: getter('weapon', 'equippedWeapon', 'primaryWeapon', 'weaponName') },
-      { id: 'offhand', label: 'Secondaria', value: getter('offhand', 'shield', 'secondaryWeapon') },
-      { id: 'armor', label: 'Armatura', value: getter('armor', 'equippedArmor', 'plate') },
-      { id: 'trinket', label: 'Trinket', value: getter('trinket', 'amulet', 'relic') },
-      { id: 'ring', label: 'Anello', value: getter('ring', 'ringSlot', 'sigil') },
-      { id: 'mount', label: 'Compagno', value: getter('companion', 'pet', 'mount') },
+      { id: 'weapon', label: t('pgDetailCard.equipment.weapon'), value: getter('weapon', 'equippedWeapon', 'primaryWeapon', 'weaponName') },
+      { id: 'offhand', label: t('pgDetailCard.equipment.offhand'), value: getter('offhand', 'shield', 'secondaryWeapon') },
+      { id: 'armor', label: t('pgDetailCard.equipment.armor'), value: getter('armor', 'equippedArmor', 'plate') },
+      { id: 'trinket', label: t('pgDetailCard.equipment.trinket'), value: getter('trinket', 'amulet', 'relic') },
+      { id: 'ring', label: t('pgDetailCard.equipment.ring'), value: getter('ring', 'ringSlot', 'sigil') },
+      { id: 'mount', label: t('pgDetailCard.equipment.mount'), value: getter('companion', 'pet', 'mount') },
     ];
-  }, [resident.statSnapshot]);
+  }, [resident.statSnapshot, t]);
   const inventoryTokens = useMemo(() => {
     const snapshot = resident.statSnapshot as Record<string, unknown> | undefined;
     const inventory = snapshot?.inventory;
@@ -89,20 +105,6 @@ const PgDetailCard: React.FC<PgDetailCardProps> = ({ resident, onClose }) => {
   const [isDragging, setIsDragging] = useState(false);
   const dragOriginRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const pointerOriginRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
-  const frameStyle = useMemo(() => {
-    const tokens = activePreset.tokens;
-    return {
-      background: tokens['card-surface'] ?? 'var(--card-surface, rgba(5,7,12,0.95))',
-      borderColor: tokens['panel-border'] ?? 'var(--panel-border, rgba(255,215,0,0.35))',
-      boxShadow: `0 35px 75px ${tokens['card-shadow-color'] ?? 'rgba(0,0,0,0.65)'}`,
-    };
-  }, [activePreset]);
-  const auraStyle = useMemo(
-    () => ({
-      background: activePreset.tokens['card-surface-radial'] ?? 'var(--card-surface-radial, rgba(255,255,255,0.06))',
-    }),
-    [activePreset],
-  );
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -145,190 +147,105 @@ const PgDetailCard: React.FC<PgDetailCardProps> = ({ resident, onClose }) => {
     setIsDragging(true);
   };
 
+  const initials = resident.displayName.slice(0, 2).toUpperCase();
+
   return (
-    <div
+    <MatericSurface
       data-testid="pg-detail-card"
-      className="relative pointer-events-auto flex w-full max-w-sm flex-col overflow-hidden rounded-[22px] border text-ivory backdrop-blur-xl text-[11px] leading-snug"
+      shape="panel"
+      material="bronze"
       onPointerDown={handlePointerDown}
       style={{
-        ...frameStyle,
         transform: `translate3d(${position.x}px, ${position.y}px, 0)`,
         cursor: isDragging ? 'grabbing' : 'grab',
         maxHeight: '80vh',
+        width: '100%',
+        maxWidth: 360,
+        padding: 0,
       }}
     >
-      <div className="absolute inset-0 opacity-45" style={auraStyle} aria-hidden />
-      <div className="absolute -inset-6 bg-black/30 blur-[28px]" aria-hidden />
-      <div className="relative z-10 flex flex-col">
-      <div className="flex flex-col gap-3 border-b border-amber-400/40 px-4 py-3 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex-1">
-            <div className="text-lg font-semibold leading-tight text-amber-200">{formatResidentLabel(resident)}</div>
-            <div className="text-[10px] uppercase tracking-[0.35em] text-slate-400">{statusLabel}</div>
-          </div>
+      <div style={{ padding: 12, borderBottom: '1px solid rgba(180,130,30,0.35)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <MatericPlaque>{formatResidentLabel(resident)}</MatericPlaque>
+          <div style={{ fontSize: 10, color: 'var(--skin-body-color)', textTransform: 'uppercase', letterSpacing: '0.18em' }}>{statusLabel}</div>
         </div>
-        <div className="ml-auto flex items-center">
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-full border border-white/15 bg-white/5 p-1.5 text-slate-200 transition hover:border-rose-400/50 hover:text-rose-200"
-            aria-label="Chiudi scheda"
-          >
-            <X className="h-3.5 w-3.5" />
-          </button>
-        </div>
+        <MatericCloseButton onClick={onClose} style={{ width: 28, height: 28 }} aria-label={t('pgDetailCard.close')} />
       </div>
 
-      <div className="flex-1 overflow-y-auto px-3 py-3">
-        <div className="grid gap-3 lg:grid-cols-[0.8fr_1.1fr_0.8fr]">
-          <div className="space-y-3">
-          <div className="relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/70 text-center shadow-inner shadow-black/70">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_0%,rgba(255,255,255,0.2),transparent_65%)] opacity-40" />
-            <div className="relative z-10 p-2">
-              <div
-                className="mx-auto h-32 w-24 overflow-hidden rounded-2xl border border-white/15 shadow-[0_12px_25px_rgba(0,0,0,0.4)]"
-                style={{
-                  background:
-                    portraitUrl ??
-                    'radial-gradient(circle at 30% 10%, rgba(255,255,255,0.12), rgba(3,5,10,0.9))',
-                  backgroundSize: portraitUrl ? 'cover' : undefined,
-                  backgroundPosition: 'center',
-                }}
-              >
-                {portraitUrl && <img src={portraitUrl} alt="" className="h-full w-full object-cover" />}
-              </div>
-              {fullFigureUrl && (
-                <a
-                  href={fullFigureUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-1.5 inline-flex items-center justify-center rounded-full border border-amber-300/40 px-2.5 py-0.5 text-[8px] uppercase tracking-[0.32em] text-amber-100 transition hover:border-amber-200 hover:text-amber-50"
-                >
-                  Figura intera
+      <div style={{ padding: 12, overflowY: 'auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <MatericSurface shape="card" material="obsidian" style={{ padding: 12 }}>
+            <MatericPortrait portraitUrl={portraitUrl} initials={initials} size={96} isHero />
+            {fullFigureUrl && (
+              <MatericButton style={{ marginTop: 8, fontSize: 9 }}>
+                <a href={fullFigureUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>
+                  {t('pgDetailCard.fullFigure')}
                 </a>
-              )}
-              <p className="mt-1.5 text-[9px] uppercase tracking-[0.35em] text-slate-400">Profilo</p>
-              {archetypeSummary ? (
-                <div className="flex flex-col gap-1 text-left">
-                  <p className="text-sm font-semibold text-amber-200">{archetypeSummary.name}</p>
-                  <p className="text-[10px] uppercase tracking-[0.35em] text-slate-400">{archetypeSummary.category}</p>
-                  <div className="flex flex-wrap gap-1 text-[10px] text-slate-200">
-                    {archetypeSummary.tags.slice(0, 3).map((tag) => (
-                      <span key={tag} className="rounded-full border border-slate-700 px-2 py-0.5">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleOpenArchetype}
-                    className="inline-flex items-center justify-center rounded-full border border-emerald-300/40 px-3 py-1 text-[10px] uppercase tracking-[0.32em] text-emerald-100 transition hover:border-emerald-200 hover:text-emerald-50"
-                  >
-                    Apri archetipo
-                  </button>
+              </MatericButton>
+            )}
+            <div style={{ marginTop: 8, fontSize: 9, color: 'var(--skin-body-color)', textTransform: 'uppercase', letterSpacing: '0.18em' }}>{t('pgDetailCard.profile')}</div>
+            {archetypeSummary ? (
+              <div style={{ marginTop: 8 }}>
+                <MatericPlaque>{archetypeSummary.name}</MatericPlaque>
+                <div style={{ fontSize: 9, color: 'var(--skin-body-color)', textTransform: 'uppercase', letterSpacing: '0.12em', marginTop: 4 }}>{archetypeSummary.category}</div>
+                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 6 }}>
+                  {archetypeSummary.tags.slice(0, 3).map((tag) => (
+                    <MatericBadge key={tag}>{tag}</MatericBadge>
+                  ))}
                 </div>
-              ) : (
-                <p className="text-[12px] text-amber-200">{resident.statProfileId ?? 'Preset sconosciuto'}</p>
-              )}
-            </div>
-          </div>
-        </div>
+                <MatericButton onClick={handleOpenArchetype} style={{ marginTop: 8, fontSize: 10 }}>
+                  {t('pgDetailCard.openArchetype')}
+                </MatericButton>
+              </div>
+            ) : (
+              <p style={{ fontSize: 12, color: 'var(--skin-body-color)' }}>
+                {t('pgDetailCard.unknownPreset', { id: resident.statProfileId ?? '—' })}
+              </p>
+            )}
+          </MatericSurface>
 
-        <div className="space-y-3">
-          <div className="grid gap-2 sm:grid-cols-2">
-            <div className="rounded-xl border border-slate-800 bg-slate-950/70 px-2.5 py-2 shadow-inner shadow-black/60">
-              <div className="text-[8px] uppercase tracking-[0.3em] text-emerald-200/70">HP</div>
-              <div className="flex items-center justify-between text-[10px] font-semibold text-emerald-200">
-                <span>
-                  {resident.currentHp}/{resident.maxHp}
-                </span>
-                <span>{hpPercent}%</span>
-              </div>
-              <div className="mt-1 h-1 rounded-full bg-slate-900">
-                <div
-                  className="h-full rounded-full bg-linear-to-r from-emerald-500 via-emerald-300 to-cyan-400"
-                  style={{ width: `${hpPercent}%` }}
-                />
-              </div>
-            </div>
-            <div className="rounded-xl border border-slate-800 bg-slate-950/70 px-2.5 py-2 shadow-inner shadow-black/60">
-              <div className="text-[8px] uppercase tracking-[0.3em] text-amber-200/80">Fatigue</div>
-              <div className="flex items-center justify-between text-[10px] font-semibold text-amber-200">
-                <span>{fatiguePercent}%</span>
-                <span>{resident.status === 'exhausted' ? 'Esausto' : 'Pronto'}</span>
-              </div>
-              <div className="mt-1 h-1 rounded-full bg-slate-900">
-                <div
-                  className="h-full rounded-full bg-linear-to-r from-amber-400 via-amber-300 to-rose-400"
-                  style={{ width: `${fatiguePercent}%` }}
-                />
-              </div>
-            </div>
-          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <MatericStatBar variant="hp" size="sm" value={resident.currentHp} max={resident.maxHp} />
+            <MatericStatBar variant="stamina" size="sm" value={resident.fatigue} max={100} />
 
-          <div className="rounded-xl border border-slate-800 bg-slate-950/70 px-2.5 py-2">
-            <div className="flex items-center justify-between text-[8px] uppercase tracking-[0.35em] text-slate-400">
-              <span>Statistiche</span>
-              <span>{snapshotEntries.length} valori</span>
-            </div>
-            <div className="mt-1.5 max-h-32 overflow-y-auto rounded-lg border border-slate-900 bg-black/30">
-              {snapshotEntries.length ? (
-                <table className="w-full text-left text-[9px] uppercase tracking-[0.25em] text-slate-200">
-                  <tbody>
-                    {snapshotEntries.map(([key, value]) => (
-                      <tr key={key} className="border-b border-white/5 last:border-none">
-                        <td className="px-1.5 py-1 text-[8px] text-slate-500">{key}</td>
-                        <td className="px-1.5 py-1 text-right font-semibold text-amber-100">{Number(value).toFixed(2)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <p className="px-1.5 py-2 text-[9px] text-slate-500">Nessuno snapshot disponibile.</p>
-              )}
-            </div>
-          </div>
-        </div>
+            <MatericSurface shape="card" material="obsidian" style={{ padding: 10 }}>
+              <MatericRecordList
+                columns={[
+                  { width: '1fr', variant: 'label' },
+                  { width: '1fr', variant: 'value' },
+                ]}
+                records={[
+                  [t('pgDetailCard.statistics.label'), t('pgDetailCard.statistics.count', { count: snapshotEntries.length })],
+                  ...snapshotEntries.map(([key, value]) => [key, Number(value).toFixed(2)]),
+                ]}
+              />
+            </MatericSurface>
 
-        <div className="space-y-3">
-          <div className="rounded-xl border border-slate-800 bg-slate-950/70 px-2.5 py-2">
-            <div className="text-[8px] uppercase tracking-[0.35em] text-slate-400">Equipaggiamento</div>
-            <div className="mt-1.5 grid gap-1.5 sm:grid-cols-2">
-              {equipmentSlots.map((slot) => (
-                <div
-                  key={slot.id}
-                  className="rounded-lg border border-slate-800 bg-black/30 px-2 py-1.5 text-[9px] uppercase tracking-[0.25em] text-slate-300"
-                >
-                  <div className="text-[7px] text-slate-500">{slot.label}</div>
-                  <div className="text-xs font-semibold text-amber-200">
-                    {slot.value ?? '—'}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="rounded-xl border border-slate-800 bg-slate-950/70 px-2.5 py-2">
-            <div className="text-[8px] uppercase tracking-[0.35em] text-slate-400">Inventario</div>
-            <div className="mt-1.5 flex flex-wrap gap-1">
-              {inventoryTokens.length
-                ? inventoryTokens.map((token) => (
-                    <span
-                      key={token}
-                      className="rounded-lg border border-white/10 bg-black/40 px-2 py-0.5 text-[9px] text-slate-100"
-                    >
-                      {token}
-                    </span>
+            <MatericSurface shape="card" material="obsidian" style={{ padding: 10 }}>
+              <MatericField label={t('pgDetailCard.equipment.label')} value="" />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginTop: 6 }}>
+                {equipmentSlots.map((slot) => (
+                  <MatericField key={slot.id} label={slot.label} value={slot.value ?? '—'} />
+                ))}
+              </div>
+            </MatericSurface>
+
+            <MatericSurface shape="card" material="obsidian" style={{ padding: 10 }}>
+              <MatericField label={t('pgDetailCard.inventory.label')} value="" />
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
+                {inventoryTokens.length ? (
+                  inventoryTokens.map((token) => (
+                    <MatericBadge key={token}>{token}</MatericBadge>
                   ))
-                : (
-                  <span className="text-[9px] text-slate-500">Nessun oggetto registrato.</span>
+                ) : (
+                  <span style={{ fontSize: 9, color: 'var(--skin-body-color)' }}>{t('pgDetailCard.inventory.empty')}</span>
                 )}
-            </div>
+              </div>
+            </MatericSurface>
           </div>
         </div>
-        </div>
       </div>
-      </div>
-    </div>
+    </MatericSurface>
   );
 };
 

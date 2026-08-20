@@ -1,4 +1,57 @@
 {
+  "equipment": {
+    "title": "Equipment Creator",
+    "subtitle": "Forge items from base templates",
+    "description": "Choose an item type, adjust stat modifiers, spend your equipment budget, and save. Weapons always link a base attack skill; armor and trinkets provide passive modifiers.",
+    "identity": "Identity",
+    "name": "Name",
+    "namePlaceholder": "New equipment",
+    "type": "Type",
+    "rarity": "Rarity",
+    "weapon": "Weapon",
+    "armor": "Armor",
+    "offhand": "Offhand",
+    "trinket": "Trinket",
+    "ring": "Ring",
+    "mount": "Mount",
+    "rarity": {
+      "common": "Common",
+      "uncommon": "Uncommon",
+      "rare": "Rare",
+      "epic": "Epic",
+      "legendary": "Legendary"
+    },
+    "grantedSkill": "Granted skill",
+    "stats": "Stat modifiers",
+    "stat": {
+      "hp": "HP",
+      "damage": "Damage",
+      "txc": "TxC",
+      "evasion": "Evasion",
+      "critChance": "Crit chance",
+      "critMult": "Crit mult",
+      "armor": "Armor",
+      "resistance": "Resistance",
+      "armorPen": "Armor pen",
+      "penPercent": "Pen %",
+      "lifesteal": "Lifesteal",
+      "regen": "Regen",
+      "ward": "Ward",
+      "block": "Block",
+      "movementSpeed": "Movement speed"
+    },
+    "balance": "Balance",
+    "power": "Power",
+    "cost": "Cost",
+    "budget": "Budget",
+    "balanceBar": "Budget usage",
+    "balanced": "Within budget ({{balance}} points free)",
+    "overBudget": "Over budget by {{balance}} points",
+    "save": "Save equipment",
+    "saved": "Equipment saved",
+    "saveFailed": "Failed to save equipment",
+    "unnamed": "Unnamed equipment"
+  },
   "SKIP": "Skip",
   "THROW": "Throw",
   "activityCapsule": {
@@ -492,5 +545,61 @@
     "threat-tint": "Threat Tint",
     "resource-tint": "Resource Tint"
   },
-  "woundPercent": "Wound Percent"
+  "woundPercent": "Wound Percent",
+  "pgDetailCard": {
+    "close": "Close character sheet",
+    "profile": "Profile",
+    "fullFigure": "Full figure",
+    "openArchetype": "Open archetype",
+    "unknownPreset": "Unknown preset: {{id}}",
+    "hp": {
+      "label": "HP"
+    },
+    "fatigue": {
+      "label": "Fatigue",
+      "ready": "Ready",
+      "exhausted": "Exhausted"
+    },
+    "statistics": {
+      "label": "Statistics",
+      "count": "{{count}} values",
+      "empty": "No snapshot available."
+    },
+    "equipment": {
+      "label": "Equipment",
+      "weapon": "Weapon",
+      "offhand": "Off hand",
+      "armor": "Armor",
+      "trinket": "Trinket",
+      "ring": "Ring",
+      "mount": "Mount"
+    },
+    "inventory": {
+      "label": "Inventory",
+      "empty": "No items recorded."
+    },
+    "status": {
+      "available": "Available",
+      "away": "Away",
+      "exhausted": "Exhausted",
+      "injured": "Injured",
+      "dead": "Dead"
+    }
+  },
+  "heroComponentsLab": {
+    "title": "Hero Components Lab",
+    "subtitle": "Placeholder catalog for the hero sheet, equipment, items, consumables and skills.",
+    "sectionA": "A — Character Sheet",
+    "sectionB": "B — Equip Slot Rack",
+    "sectionC": "C — Equippable Item Card",
+    "sectionD": "D — Consumable Pile",
+    "sectionE": "E — Equippable Skill Deck",
+    "rarity": "Rarity",
+    "effect": "Effect",
+    "slot": "Slot",
+    "use": "Use",
+    "availableSkills": "Available skills",
+    "equippedSkills": "Equipped skills",
+    "empty": "Empty"
+  }
 }
