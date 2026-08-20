@@ -87,6 +87,7 @@ const UseClientPage = lazy(() => import('./ui/idleVillage/pages/UseClientPage').
 const PoiMarkerLabPage = lazy(() => import('./ui/idleVillage/pages/PoiMarkerLabPage').then(m => ({ default: m.PoiMarkerLabPage })));
 const PoiDetailQuestRosterTimeClockIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailQuestRosterTimeClockIntegrationPage').then(m => ({ default: m.default })));
 const MockupToComponentPage = lazy(() => import('./ui/idleVillage/pages/MockupToComponentPage').then(m => ({ default: m.MockupToComponentPage })));
+const MinimalSlottedMedalPage = lazy(() => import('./pages/minimal-slottedmedal').then(m => ({ default: m.default })));
 
 interface AppNavControls {
   getActiveTab: () => AppNavTabId;
@@ -222,6 +223,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/minimal-clock';
   const isMinimalSlotRackPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-slotRack';
+  const isMinimalSlottedMedalPath =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-slottedmedal';
   const isMinimalResourceHUDPath =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-resourcehud';
   const isMinimalQuestCardPath =
@@ -543,6 +546,16 @@ function App() {
       <ErrorBoundary componentName="Minimal SlotRack Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading SlotRack Test…</div>}>
           <MinimalSlotRackPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMinimalSlottedMedalPath) {
+    return (
+      <ErrorBoundary componentName="Minimal SlottedMedal Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading SlottedMedal Test…</div>}>
+          <MinimalSlottedMedalPage />
         </Suspense>
       </ErrorBoundary>
     );
