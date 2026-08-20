@@ -246,6 +246,21 @@ export interface WebOpts {
   throwOffset: number;
   /** quanto il centro ritarda rispetto al perimetro (0..0.8) */
   centerLag: number;
+  /**
+   * SPAZZATA ANGOLARE — è la differenza fra una ragnatela e una rete da pesca.
+   *
+   * Una rete si apre come un disco: tutto il perimetro arriva insieme, ruotando.
+   * Una tela LANCIATA no: parte un filo, colpisce, e la struttura si TENDE in
+   * un'onda che gira attorno all'anello a partire dal punto d'impatto. Ogni
+   * raggio, ogni ancoraggio e ogni trama arriva col proprio ritardo, funzione
+   * della distanza angolare da `shotAngle`.
+   *
+   * 0 = tutto insieme (la rete). 0.5-0.7 = l'onda si legge come tensione che si
+   * propaga. Sopra 0.8 si vede il ragno tessere, e il ragno NON ESISTE.
+   */
+  sweep: number;
+  /** direzione da cui arriva il filo, radianti (0 = dall'alto) */
+  shotAngle: number;
   /** stacco fra stella e prima trama, in unità engine */
   freeZone: number;
   /** tolleranza prima di considerare il telaio sfondato: a parità niente scintille */
@@ -262,10 +277,16 @@ export const WEB_DEFAULTS: WebOpts = {
   curveMode: 'gravity',
   anchors: 13,
   anchorJitter: 0.035,
-  overshoot: 0.07,
-  spin: 0.38,
+  overshoot: 0.1,
+  /* la ROTAZIONE è la firma della rete lanciata a mano: un filo scoccato non
+     ruota. Ne resta solo un residuo, come frustata all'arrivo. */
+  spin: 0.07,
   throwOffset: 0.16,
-  centerLag: 0.35,
+  /* il ritardo del centro serviva a far leggere "si apre": adesso il read lo
+     porta la spazzata, e un centerLag alto la impasterebbe. */
+  centerLag: 0.16,
+  sweep: 0.55,
+  shotAngle: 0,
   freeZone: 16,
   punchOut: 0.07,
   droplets: true,
@@ -380,33 +401,60 @@ export function drawWeb(
 
   const N = Math.max(8, o.radii);
 
-  /* ── IL LANCIO ──────────────────────────────────────────────────────────
-     Quattro meccaniche, e servono tutte:
-     1. scala con SOVRAELONGAZIONE — supera il 100% e rientra;
-     2. ROTAZIONE che decelera — senza, leggi uno zoom invece di un lancio;
-     3. SCOSTAMENTO iniziale che rientra — il percorso da fuori centro a centro
-        È la traiettoria, ed evita di far nascere la minaccia dal centro dove poi
-        sboccia la stella: arriva in Z, verso chi guarda;
-     4. il CENTRO RITARDA sul perimetro — quando una rete si apre l'anello
-        esterno vola via prima e l'interno rincorre. È ciò che distingue "si
-        apre" da "si scala".                                                  */
+  /* ── IL LANCIO: TELA SCOCCATA, NON RETE GETTATA ─────────────────────────
+     La differenza sta tutta in COME arriva il perimetro.
+
+     Una rete da pesca è un disco che si apre: tutto l'anello parte insieme e
+     ruota. Una tela viene SCOCCATA: parte un filo lungo una direzione, si
+     appiccica, e da quel punto d'impatto la struttura si TENDE in un'onda che
+     gira attorno all'anello. Quindi:
+
+     1. SPAZZATA angolare (`sweep`) — ogni raggio, ancoraggio e trama ha il suo
+        istante d'arrivo, ordinato per distanza angolare da `shotAngle`. È il
+        meccanismo principale: senza, qualsiasi altra cosa resta una rete;
+     2. TENSIONE con sovraelongazione — il filo arriva teso e rimbalza, non si
+        gonfia;
+     3. traiettoria ALLINEATA al tiro — la tela entra dal lato da cui è stata
+        scoccata, non da un angolo arbitrario;
+     4. rotazione ridotta a un residuo — un filo scoccato non gira;
+     5. il centro ritarda appena: la seta si estende dal mozzo verso il telaio.
+
+     NON è il ragno che tesse: la topologia è completa dal primo frame, è solo
+     l'ordine in cui i fili si TENDONO che segue il colpo.                    */
   const L = cl01(A.launch);
   const settled = easeOut3(L);
   const spin = o.spin * (1 - settled);
-  const offX = o.throwOffset * rFrame * k * (1 - settled) * 0.8;
-  const offY = -o.throwOffset * rFrame * k * (1 - settled);
+  const shotA = -Math.PI / 2 + o.shotAngle;
+  const travel = o.throwOffset * rFrame * k * (1 - settled);
+  const offX = Math.cos(shotA) * travel;
+  const offY = Math.sin(shotA) * travel;
 
-  /** scala al raggio normalizzato u (0 = centro, 1 = telaio) */
-  const scaleAt = (u: number) => {
+  /** ritardo normalizzato di un angolo: 0 = colpito per primo, 1 = per ultimo */
+  const sweepAt = (a: number) => {
+    /* distanza angolare ripiegata in 0..PI, poi normalizzata */
+    const d = Math.abs((((a - shotA) % TAU + TAU * 1.5) % TAU) - Math.PI);
+    return d / Math.PI;
+  };
+
+  /** avanzamento locale del lancio all'angolo a */
+  const launchAt = (a: number) => {
     if (L >= 1) return 1;
+    const lag = o.sweep * sweepAt(a);
+    return cl01((L - lag) / Math.max(0.05, 1 - o.sweep));
+  };
+
+  /** scala al raggio normalizzato u (0 = centro, 1 = telaio), all'angolo a */
+  const scaleAt = (u: number, a: number) => {
+    if (L >= 1) return 1;
+    const la = launchAt(a);
     const lag = o.centerLag * (1 - cl01(u));
     const span = Math.max(0.05, 1 - o.centerLag);
-    return easeOutBack(cl01((L - lag) / span), o.overshoot);
+    return easeOutBack(cl01((la - lag) / span), o.overshoot);
   };
 
   /** un punto della rete, con lancio applicato */
   const P = (r: number, a: number, jx = 0, jy = 0) => {
-    const sc = scaleAt(r / Math.max(1, rFrame));
+    const sc = scaleAt(r / Math.max(1, rFrame), a);
     const aa = a + spin;
     return {
       x: cx + Math.cos(aa) * r * sc * k + jx + offX,
@@ -524,7 +572,11 @@ export function drawWeb(
     /* la ritrazione alza l'estremo INTERNO verso il telaio */
     const rStart = r0Adj + span * easeOut3(retract);
     const spanNow = Math.max(0, rOut - rStart);
-    const amp = o.curveMode === 'none' ? 0 : o.curve * spanNow;
+    /* FRUSTATA D'ARRIVO: finché il filo i sta ancora arrivando è inarcato, e si
+       raddrizza nel tendersi. È ciò che fa leggere "filo scoccato che si tende"
+       invece di "segmento che cresce"; svanisce del tutto quando ha finito. */
+    const whip = (1 - easeOut3(launchAt(a))) * 0.28 * spanNow;
+    const amp = (o.curveMode === 'none' ? 0 : o.curve * spanNow) + whip;
     /* `gravity`: versore FISSO verso il basso, non ruota con l'angolo — è questo
        che rende impossibile il vortice. */
     const px = o.curveMode === 'gravity' ? 0 : -Math.sin(a);

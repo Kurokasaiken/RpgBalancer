@@ -311,6 +311,14 @@ export default function RagnatelaLab() {
           <section className="space-y-3">
             <h2 className="text-sm font-bold text-amber-400">Beat 1 — lancio</h2>
             {num('Durata', 'weaveMs', 150, 2000, 25, (v) => `${v} ms`)}
+            {/* la spazzata è il parametro che separa la tela dalla rete: a 0 il
+                perimetro arriva tutto insieme e torna a leggersi come rete. */}
+            <Slider label="Spazzata (tela↔rete)" value={w.sweep} min={0} max={0.85} step={0.05}
+              fmt={(v) => (v === 0 ? 'rete' : v.toFixed(2))}
+              onChange={(v) => setW({ ...w, sweep: v })} />
+            <Slider label="Direzione tiro" value={w.shotAngle} min={0} max={6.28} step={0.05}
+              fmt={(v) => `${Math.round((v * 180) / Math.PI)}°`}
+              onChange={(v) => setW({ ...w, shotAngle: v })} />
             <Slider label="Sovraelongazione" value={w.overshoot} min={0} max={0.3} step={0.01}
               fmt={(v) => `${Math.round(v * 100)}%`}
               onChange={(v) => setW({ ...w, overshoot: v })} />
