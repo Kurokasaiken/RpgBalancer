@@ -570,7 +570,7 @@ export const PoiMatericV1: React.FC<PoiMarkerProps> = ({
       </defs>
 
         {/* Contact shadow: what stops it floating above the map. */}
-        <ellipse cx="60" cy="103" rx="24" ry="4.4" fill="#000" opacity="0.5" filter={`url(#${id}-drop)`} />
+        <ellipse cx="60" cy="106" rx="27" ry="5.5" fill="#000" opacity="0.55" filter={`url(#${id}-drop)`} />
 
         {/* ── The summoned circle, hanging in the air ────────────────────────
             Two staggered rows of 100 glyphs, ring segments, and four
@@ -738,8 +738,19 @@ export const PoiMatericV1: React.FC<PoiMarkerProps> = ({
           className="poim1__hearth"
         />
 
+        {/* Enamel inlay: a coloured vitreous glaze between the stone and the icon. */}
+        <circle
+          cx="60"
+          cy="60"
+          r="28"
+          fill={`url(#${id}-enamel)`}
+          opacity="0.55"
+          className="poim1__enamel"
+          pointerEvents="none"
+        />
+
         {/* Sculpted glyph: four stacked layers give the icon its own mass. */}
-        <g transform="translate(60 60)" className="poim1__emblem" opacity={1}>
+        <g transform="translate(60 60) scale(1.25)" className="poim1__emblem" opacity={1}>
           <g fill="#100804" stroke="#070402" strokeWidth="1.3" strokeLinejoin="round" transform="translate(1.35 1.65)">
             {glyphFor(type)}
           </g>
@@ -753,6 +764,30 @@ export const PoiMatericV1: React.FC<PoiMarkerProps> = ({
             {glyphFor(type)}
           </g>
         </g>
+
+        {/* Glass dome: convex lens reflection over the inner seal. */}
+        <circle
+          cx="60"
+          cy="60"
+          r="27.5"
+          fill={`url(#${id}-glass)`}
+          opacity="0.28"
+          className="poim1__glass"
+          pointerEvents="none"
+        />
+
+        {/* Asymmetric specular: a bright top-left glint off the glass. */}
+        <ellipse
+          cx="44"
+          cy="36"
+          rx="9"
+          ry="4.5"
+          fill={ember.light}
+          opacity="0.18"
+          transform="rotate(-30 44 36)"
+          filter={`url(#${id}-arcane)`}
+          pointerEvents="none"
+        />
 
         {/* Struck highlight along the top-left rim. */}
         <path
@@ -806,9 +841,16 @@ export const poiMatericV1Styles = `
              poim1-drift 42s linear 900ms infinite;
 }
 
+/* Completed POI: the inner hearth pulses with a slow bloom instead of resetting. */
+.poim1--available .poim1__hearth {
+  animation: poim1-glow-pulse 2.8s ease-in-out infinite;
+}
+
 .poim1--disabled, .poim1--expired { cursor: default; filter: saturate(.55) brightness(.8); }
 
 @keyframes poim1-breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.008); } }
+
+@keyframes poim1-glow-pulse { 0%,100% { opacity: 0.82; } 50% { opacity: 1; } }
 
 @media (prefers-reduced-motion: reduce) {
   .poim1, .poim1 * { animation: none !important; transition: none !important; }
