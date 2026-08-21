@@ -14,6 +14,8 @@ export interface ConsumablePileProps {
   useLabel: string;
   /** Called when the user uses one unit of a consumable. */
   onUse: (itemId: string) => void;
+  /** Visual variant. `flat` removes the surface border. */
+  variant?: 'default' | 'flat';
 }
 
 /**
@@ -21,14 +23,26 @@ export interface ConsumablePileProps {
  *
  * Renders one badge + button per item. The parent owns the count state.
  */
-export function ConsumablePile({ items, useLabel, onUse }: ConsumablePileProps): JSX.Element {
+export function ConsumablePile({ items, useLabel, onUse, variant = 'default' }: ConsumablePileProps): JSX.Element {
+  const content = (
+    <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+      {items.map((item) => (
+        <ConsumableToken key={item.id} item={item} useLabel={useLabel} onUse={onUse} />
+      ))}
+    </div>
+  );
+
+  if (variant === 'flat') {
+    return (
+      <div style={{ padding: 12, background: 'var(--skin-surface-bg)', borderRadius: 8 }}>
+        {content}
+      </div>
+    );
+  }
+
   return (
     <MatericSurface shape="card" material="jade" style={{ padding: 12 }}>
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-        {items.map((item) => (
-          <ConsumableToken key={item.id} item={item} useLabel={useLabel} onUse={onUse} />
-        ))}
-      </div>
+      {content}
     </MatericSurface>
   );
 }
