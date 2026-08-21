@@ -155,9 +155,16 @@ export function buildFracture(
 
   /* la morte apre di più e va più lontano: è la differenza di scala fra "il
      terreno ha ceduto" e "il terreno non c'è più" */
-  const armCount = kind === 'death' ? 3 : 2;
-  const reach = scale * (kind === 'death' ? 0.62 : 0.34);
-  const halfW = scale * (kind === 'death' ? 0.055 : 0.022);
+  /* PORTATA. Verificato a schermo che 0.62/0.34 producevano crepe da 60-70px su
+     un'arena da 192 di raggio: leggibili ma timide, e "il terreno non c'e' piu'"
+     non e' un graffio. La morte arriva quasi al muro, la ferita a meta' strada:
+     l'antitesi resta nel FINALE (chiude / non chiude), la scala la rinforza. */
+  const armCount = kind === 'death' ? 4 : 3;
+  const reach = scale * (kind === 'death' ? 1.0 : 0.52);
+  /* la ferita era 0.022 della scala, cioè ~4px di semilarghezza a difficoltà 50:
+     una fessura da 8px che si apre e si richiude in 1.5s si perde. Serve corpo,
+     restando la MINORE delle due: l'antitesi sta nel finale, non nella taglia. */
+  const halfW = scale * (kind === 'death' ? 0.075 : 0.042);
 
   const branches: FractureBranch[] = [];
   const base = Math.atan2(epicenter.y, epicenter.x) + (rng() - 0.5) * 0.8;
