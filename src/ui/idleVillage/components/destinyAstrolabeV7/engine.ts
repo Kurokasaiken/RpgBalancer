@@ -340,9 +340,12 @@ function drawField(now){
       ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y1); ctx.stroke();
     };
     /* alone largo: e' lui che assorbe l'errore di tangenza residuo */
-    line(11+9*f, (0.10+0.30*f)*br, 'rgba(150,120,255,1)');
-    line(4.5+2*f, (0.30+0.45*f)*br, 'rgba(190,170,255,1)');
-    line(1.6+1.2*f, (0.85+0.15*f)*br, f>0.02?'rgba(240,236,255,1)':'rgba(214,206,255,1)');
+    line(13+10*f, (0.14+0.30*f)*br, 'rgba(140,110,255,1)');
+    /* sottofondo scuro: la barra passa anche SOPRA il fiore, e un viola chiaro su
+       petalo crema non si vedrebbe. Stessa soluzione della pallina e della seta. */
+    ctx.shadowBlur=0; line(5.6, 0.55, 'rgba(14,10,38,1)');
+    line(4.8+2*f, (0.42+0.45*f)*br, 'rgba(178,150,255,1)');
+    line(2.4+1.4*f, (0.95+0.05*f)*br, f>0.02?'rgba(252,248,255,1)':'rgba(228,220,255,1)');
     B.flash=Math.max(0,B.flash-0.035);
   }
   ctx.shadowBlur=0;
@@ -374,6 +377,16 @@ function emitArmed(b){ try{ if(typeof opts!=='undefined'&&opts&&opts.onArmed) op
 let armed=false;                 // true while the TIRA button should be shown
 const GOO_MS=620;                // springy goo-expansion duration
 const WEB_MS=900;                // la tela scoccata sopra il fiore
+/* RAGGIO DEL TELAIO, per tiro.
+   Un valore fisso a 0.94R coprirebbe il fiore a qualunque stat ma lascerebbe 18px
+   ai tiranti, che spariscono: e i tiranti sono il modo in cui la tela e' APPESA
+   alla ghiera. Quindi il telaio abbraccia cio' che deve coprire — il fiore E
+   l'arena, perche' la pallina non deve mai rimbalzare fuori dalla tela — con un
+   margine del 6%, e tutto lo spazio che resta va ai tiranti. */
+function webRadius(){
+  const need=Math.max(Math.max(...geo.starTip),Math.max(...geo.axisCheck));
+  return clamp(need*1.06, R*0.62, R*0.93);
+}
 function setState(s){
   scene.state=s; scene.t0=performance.now();
   suite.dataset.state=s;
@@ -678,6 +691,8 @@ function stepBall(p){
     const nx=(b.x-CX)/d, ny=(b.y-CY)/d;
     chaoticBounce(nx,ny,false);
     b.x=CX+nx*edge; b.y=CY+ny*edge;
+    /* la regola si manifesta quando viene invocata: lampeggia la barra baciata */
+    flashFieldAt(Math.atan2(ny,nx));
     addSpark(b.x,b.y);
   }
 
@@ -970,11 +985,12 @@ const WEB_INK={
   shade:'rgba(6,14,22,0.88)',
 };
 const WEB_OPTS={...WEB_DEFAULTS, radii:18, weftStep:16,
-  /* PIU' ANCORAGGI, FESTONE PIU' BASSO: il muro fisico e' rCheckAt, quindi il
-     filo disegnato deve starci sopra o la pallina rimbalza contro il nulla. Con
-     15 ancoraggi il festone rientra del ~6% invece del ~15%: la concavita' si
-     legge ancora, ma il rimbalzo cade sul filo. */
-  perSector:2, secFrame:0.10,
+  /* FESTONE PIENO. Quando il telaio era il muro fisico dovevo tenerlo basso
+     (~6%) o la pallina rimbalzava contro il nulla. Ora il muro e' il campo di
+     barre, quindi il festone e' libero di essere profondo: 10 ancoraggi e 0.16
+     danno archi concavi larghi, che sono il motivo per cui il bordo non legge
+     come un cerchio. */
+  perSector:1, secFrame:0.16,
   /* GOCCE VISCIDE riaccese. Le avevo spente temendo che leggessero come
      palline: la paura era giusta, la risposta sbagliata. La risposta e'
      dimensione e numero — 1px contro una pallina da 9px con alone e ombra,
@@ -984,17 +1000,17 @@ const WEB_OPTS={...WEB_DEFAULTS, radii:18, weftStep:16,
 function drawWebLayer(){
   const rev=scene.webP;
   if(rev<=0.001) return;
+  const wr=webRadius();
   drawWeb(ctx, {
     cx:CX, cy:CY, k:1,
-    /* LA TELA STA DOVE STAVA IL GOO — grandezza e posizione dell'arena.
-       Il telaio torna sul muro (rCheckAt), cioe' esattamente l'ingombro che
-       aveva il goo: la tela E' la pelle dell'arena, non un velo sul board.
-       Cosi' il muro su cui la pallina rimbalza e il filo che si vede sono la
-       stessa cosa, e la fisica non cambia di un pixel.
-       Il fiore, dove sfonda l'arena, esce da SOTTO la tela: e' giusto, perche'
-       la pallina non puo' fermarsi fuori dall'arena — quel che conta e' coperto. */
-    rFrame:Math.max(...geo.axisCheck),
-    rFrameAt:(a)=>rCheckAt(a),
+    /* LA TELA E' GRANDE COME IL BOARD E APPESA ALLA GHIERA (desiderata v13).
+       Non e' piu' la pelle dell'arena: quel mestiere e' passato al campo di
+       contenimento, che e' fatto di barre e non di un cerchio. Liberata dal
+       vincolo fisico, la tela puo' coprire tutto — fiore compreso, a qualunque
+       stat — ed essere disegnata intera. La ghiera diventa il ramo a cui e'
+       legata dai tiranti. */
+    rFrame:wr,
+    rFrameAt:()=>wr,
     rStar:(a)=>rStarAt(a,1),
     /* ancoraggi maestri = gli OBELISCHI: stanno gia' sul muro, quindi muro,
        picchetti e telaio diventano una cosa sola invece di tre cerchi */
@@ -1002,7 +1018,7 @@ function drawWebLayer(){
     /* il ramo = la ghiera di bronzo, che resta circolare a R (decisione del
        Director). I tiranti attraversano il campo vuoto e lo rendono lo spazio
        in cui la tela e' sospesa, invece di un vuoto che non e' di nessuno. */
-    rTether:R*0.99,   // i tiranti attraversano il campo vuoto fino alla ghiera
+    rTether:R*0.995,  // i tiranti arrivano alla ghiera: e' lei il ramo
     seed:scene.webSeed,
     skipArena:true,                      // il vuoto e il righello li disegna la V7
     ink:WEB_INK,
@@ -1670,6 +1686,11 @@ function frame(now){
   drawAxisRig(now);
   drawBlueprint(now);
   drawStar(now);
+  /* IL CAMPO sopra il fiore ma SOTTO la tela: gerarchia di v13 — il fiore e' il
+     premio, la tela e' la minaccia, il campo e' la regola. La regola si vede
+     anche sopra il premio (deve dire dove la pallina rimbalza) ma sta sotto la
+     minaccia, perche' non e' lei a fare paura. */
+  drawField(now);
   /* LA TELA DAVANTI AL FIORE: disegnata DOPO la stella. Da sola l'inversione
      non basterebbe — i raggi partivano dal contorno della stella, quindi non
      c'era mai un filo sopra il petalo. Serve `overStar`, che li radica al
