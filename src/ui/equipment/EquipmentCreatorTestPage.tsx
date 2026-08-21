@@ -106,7 +106,9 @@ export const EquipmentCreatorTestPage: React.FC = () => {
   );
 
   const getStatSteps = (field: string) => {
-    return statSteps[field] || getEquipmentStatTicks(field);
+    const saved = statSteps[field];
+    if (saved && saved.length > 0) return saved;
+    return getEquipmentStatTicks(field);
   };
 
   const updateEquipmentStat = (field: string, idx: number) => {
@@ -154,11 +156,29 @@ export const EquipmentCreatorTestPage: React.FC = () => {
   const removeStatStep = (field: string, idx: number) => {
     setStatSteps((prev) => {
       const existing = prev[field] || [];
-      if (existing.length <= 1) return prev;
       const steps = [...existing];
       steps.splice(idx, 1);
+      if (steps.length === 0) {
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      }
       return { ...prev, [field]: steps };
     });
+
+    if ((statSteps[field]?.length || 1) <= 1) {
+      setEquipment((prev) => {
+        const nextStats = { ...prev.stats };
+        delete nextStats[field];
+        return { ...prev, stats: nextStats };
+      });
+      setSelectedTicks((prev) => {
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      });
+      setStatOrder((prev) => prev.filter((f) => f !== field));
+    }
   };
 
   const handleTypeChange = (type: EquipmentType) => {
