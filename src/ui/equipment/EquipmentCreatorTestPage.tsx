@@ -4,7 +4,8 @@ import { toast } from 'sonner';
 import { Sparkles, Shield } from 'lucide-react';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import { useSkinPreferences } from '@/ui/idleVillage/hooks/useSkinPreferences';
-import { StatsGrid } from '@/ui/spell/components/StatsGrid';
+import { StatsGrid } from '@/ui/spells/components/StatsGrid';
+import { useBalancerConfig } from '@/balancing/hooks/useBalancerConfig';
 import { MatericButton } from '@/ui/designSystem/primitives/MatericButton';
 import type { EquipmentItem, EquipmentRarity, EquipmentType } from '@/balancing/equipment/equipmentTypes';
 import { useSpellConfig } from '@/spells/hooks/useSpellConfig';
@@ -65,6 +66,7 @@ export const EquipmentCreatorTestPage: React.FC = () => {
     resetToDefaults,
   } = useEquipmentDefaultStorage();
   const { config } = useSpellConfig();
+  const { config: balancerConfig } = useBalancerConfig();
 
   const [skillSearch, setSkillSearch] = useState('');
 
@@ -130,7 +132,7 @@ export const EquipmentCreatorTestPage: React.FC = () => {
   const removeStatStep = (field: string, idx: number) => {
     setStatSteps((prev) => {
       const existing = prev[field] || [];
-      if (existing.length <= 3) return prev;
+      if (existing.length <= 1) return prev;
       const steps = [...existing];
       steps.splice(idx, 1);
       return { ...prev, [field]: steps };
@@ -154,7 +156,7 @@ export const EquipmentCreatorTestPage: React.FC = () => {
       id: prev.id,
       type,
       slot: nextTypeConfig.slot,
-      grantedSkillIds: [...nextTypeConfig.grantedSkillIds],
+      grantedSkillIds: [...(nextTypeConfig.grantedSkillIds || [])],
       stats: nextStats,
     }));
     setStatOrder(nextTypeConfig.unlockedStats);
@@ -186,6 +188,19 @@ export const EquipmentCreatorTestPage: React.FC = () => {
     setEquipment((prev) => ({
       ...prev,
       grantedSkillIds: (prev.grantedSkillIds || []).filter((id) => id !== spellId),
+    }));
+  };
+
+  const handleAddStat = (field: string) => {
+    if (statOrder.includes(field)) return;
+    const steps = getEquipmentStatTicks(field);
+    const value = steps[0]?.value ?? 0;
+    setStatOrder((prev) => [...prev, field]);
+    setStatSteps((prev) => ({ ...prev, [field]: steps }));
+    setSelectedTicks((prev) => ({ ...prev, [field]: 0 }));
+    setEquipment((prev) => ({
+      ...prev,
+      stats: { ...prev.stats, [field]: value },
     }));
   };
 
@@ -682,8 +697,33 @@ export const EquipmentCreatorTestPage: React.FC = () => {
             onDragStart={handleDragStart}
             onDragOver={handleDragOver}
             onDrop={handleDrop}
-            getStatLabel={(field) => t(`equipment.stat.${field}`)}
+            getStatLabel={(field) => t(`equipment.stat.${field}`, field)}
           />
+        </div>
+
+        <div className="mt-4 flex items-center gap-2">
+          <select
+            value=""
+            onChange={(e) => {
+              if (e.target.value) handleAddStat(e.target.value);
+              e.target.value = '';
+            }}
+            className="flex-1 rounded px-2 py-2 text-xs"
+            style={{
+              backgroundColor: 'var(--skin-surface-base)',
+              border: '1px solid var(--skin-surface-border)',
+              color: 'var(--skin-text-primary)',
+            }}
+          >
+            <option value="">{t('equipment.addStat', '+ Stat')}</option>
+            {Object.values(balancerConfig?.stats || {})
+              .filter((stat) => !statOrder.includes(stat.id) && !['id', 'name', 'description'].includes(stat.id))
+              .map((stat) => (
+                <option key={stat.id} value={stat.id}>
+                  {stat.name || t(`equipment.stat.${stat.id}`, stat.id)}
+                </option>
+              ))}
+          </select>
         </div>
 
         <div

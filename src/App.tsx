@@ -71,6 +71,7 @@ const MinimalJobPoiRosterTimeIntegrationPage = lazy(() => import('./pages/minima
 const MinimalTimeDaynightIntegrationPage = lazy(() => import('./pages/minimal-time-daynight-integration').then(m => ({ default: m.default })));
 const SpellCreatorTestPage = lazy(() => import('./pages/spell-creator').then(m => ({ default: m.default })));
 const EquipmentCreatorPage = lazy(() => import('./pages/equipment-creator').then(m => ({ default: m.default })));
+const EquipmentLibraryPage = lazy(() => import('./pages/equipment-library').then(m => ({ default: m.default })));
 const TrailerViewer = lazy(() => import('./ui/idleVillage/trailer/TrailerViewer'));
 const TrailerThreatIter = lazy(() => import('./ui/idleVillage/trailer/TrailerThreatIter'));
 const GoblinEventLabPage = lazy(() => import('./ui/idleVillage/pages/GoblinEventLabPage').then(m => ({ default: m.GoblinEventLabPage })));
@@ -268,6 +269,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/spell-creator';
   const isEquipmentCreatorPath =
     typeof window !== 'undefined' && window.location.pathname === '/equipment-creator';
+  const isEquipmentLibraryPath =
+    typeof window !== 'undefined' && window.location.pathname === '/equipment-library';
   const isTrailerPath =
     typeof window !== 'undefined' && window.location.pathname === '/trailer';
   const isTrailerThreatPath =
@@ -772,6 +775,16 @@ function App() {
       <ErrorBoundary componentName="Equipment Creator Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Equipment Creator…</div>}>
           <EquipmentCreatorPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isEquipmentLibraryPath) {
+    return (
+      <ErrorBoundary componentName="Equipment Library Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Equipment Library…</div>}>
+          <EquipmentLibraryPage />
         </Suspense>
       </ErrorBoundary>
     );

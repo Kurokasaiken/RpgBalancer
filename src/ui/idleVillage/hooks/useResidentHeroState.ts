@@ -6,7 +6,9 @@ import {
   equippableItems,
   consumables,
 } from '@/balancing/config/idleVillage/heroItems';
-import type { ConsumableItem } from '@/balancing/config/idleVillage/heroItems';
+import type { ConsumableItem, EquippableItem } from '@/balancing/config/idleVillage/heroItems';
+import { getAllEquipment } from '@/balancing/equipment/equipmentStorage';
+import type { EquipmentItem } from '@/balancing/equipment/equipmentTypes';
 
 /**
  * Persisted hero state for a single resident.
@@ -69,6 +71,7 @@ export function useResidentHeroState({
   maxSkills = 3,
 }: UseResidentHeroStateOptions): UseResidentHeroStateReturn {
   const [heroState, setHeroState] = useState<HeroState>(() => defaultHeroState(resident));
+  const [savedEquipment, setSavedEquipment] = useState<EquipmentItem[]>([]);
 
   // Load persisted state on mount or when resident id changes.
   useEffect(() => {
@@ -78,6 +81,9 @@ export function useResidentHeroState({
         if (mounted) setHeroState(loaded);
       },
     );
+    getAllEquipment().then((all) => {
+      if (mounted) setSavedEquipment(all);
+    });
     return () => {
       mounted = false;
     };
@@ -93,14 +99,23 @@ export function useResidentHeroState({
     saveData(heroStateKey(resident.id), heroState).catch(() => undefined);
   }, [heroState, resident.id]);
 
+  type EquippableLike = EquippableItem | EquipmentItem;
+
+  const allItems = useMemo<EquippableLike[]>(
+    () => [...equippableItems, ...savedEquipment],
+    [savedEquipment]
+  );
+
   const equipment = useMemo(() => {
     const map: Record<string, string | null> = {};
     for (const [slot, itemId] of Object.entries(heroState.equipment)) {
-      const item = equippableItems.find((i) => i.id === itemId);
+      const item = allItems.find((i) => i.id === itemId);
       map[slot] = item ? item.name : null;
     }
     return map;
-  }, [heroState.equipment]);
+  }, [heroState.equipment, allItems]);
+
+  const equipmentIds = useMemo(() => heroState.equipment, [heroState.equipment]);
 
   const inventory = useMemo(() => {
     return consumables.map((c) => {
@@ -110,7 +125,7 @@ export function useResidentHeroState({
   }, [heroState.inventory]);
 
   const equip = useCallback((slotId: string, itemId: string) => {
-    const item = equippableItems.find((i) => i.id === itemId);
+    const item = allItems.find((i) => i.id === itemId);
     if (!item) return;
     // Optional slot validation: only allow the item in its declared slot for now.
     if (item.slot !== slotId) return;
@@ -124,7 +139,7 @@ export function useResidentHeroState({
       ...prev,
       equipment: { ...prev.equipment, [slotId]: itemId },
     }));
-  }, [resident.id]);
+  }, [resident.id, allItems]);
 
   const unequip = useCallback((slotId: string) => {
     trackTelemetryEvent('hero_unequip', { residentId: resident.id, slotId });
@@ -180,12 +195,12 @@ export function useResidentHeroState({
         ...resident,
         statSnapshot: {
           ...resident.statSnapshot,
-          equipment,
+          equipment: equipmentIds,
           inventory: inventory.map((i) => i.name),
           skills: skillLoadout,
         },
       } as unknown as ResidentState),
-    [resident, equipment, inventory, skillLoadout],
+    [resident, equipmentIds, inventory, skillLoadout],
   );
 
   return {

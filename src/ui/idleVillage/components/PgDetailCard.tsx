@@ -5,6 +5,9 @@ import { resolveResidentPortrait } from '@/engine/game/idleVillage/residentVisua
 import { formatResidentLabel } from '@/ui/idleVillage/residentName';
 import { getArchetypeSummary } from '@/ui/idleVillage/archetypeDirectory';
 import { dispatchOpenArchetypeDetailEvent } from '@/shared/events/archetypeEvents';
+import { getAllEquipment } from '@/balancing/equipment/equipmentStorage';
+import type { EquipmentItem } from '@/balancing/equipment/equipmentTypes';
+import { EquipmentDiabloPanel } from '@/ui/equipment/EquipmentDiabloPanel';
 import {
   MatericSurface,
   MatericPlaque,
@@ -20,6 +23,7 @@ import {
 export interface PgDetailCardProps {
   resident: ResidentState;
   onClose?: () => void;
+  onSlotClick?: (slotId: string) => void;
 }
 
 const clampPercent = (value: number): number => {
@@ -41,8 +45,22 @@ const isDragExemptTarget = (target: EventTarget | null): boolean => {
  *
  * Skin-compliant: composizione di Materic* primitives con drag/close interno.
  */
-const PgDetailCard: FC<PgDetailCardProps> = ({ resident, onClose }) => {
+const PgDetailCard: FC<PgDetailCardProps> = ({ resident, onClose, onSlotClick }) => {
   const { t } = useTranslation('idleVillage');
+  const [equipmentMap, setEquipmentMap] = useState<Record<string, EquipmentItem>>({});
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const all = await getAllEquipment();
+        const byId = Object.fromEntries(all.map((item) => [item.id, item]));
+        setEquipmentMap(byId);
+      } catch (error) {
+        console.warn('[PgDetailCard] Failed to load equipment:', error);
+      }
+    };
+    void load();
+  }, []);
 
   const statusLabel = resident.isInjured
     ? t('pgDetailCard.status.injured')
@@ -60,12 +78,23 @@ const PgDetailCard: FC<PgDetailCardProps> = ({ resident, onClose }) => {
   const equipmentSlots = useMemo(() => {
     const snapshot = (resident.statSnapshot ?? {}) as Record<string, unknown>;
     const equipment = (snapshot.equipment as Record<string, unknown> | undefined) ?? {};
+    const resolve = (value: unknown): string | undefined => {
+      if (typeof value === 'string' && value.trim().length > 0) {
+        const item = equipmentMap[value];
+        return item?.name || value;
+      }
+      if (typeof value === 'object' && value && 'id' in value) {
+        const id = String((value as { id: string }).id);
+        const item = equipmentMap[id];
+        return item?.name || id;
+      }
+      return undefined;
+    };
     const getter = (...keys: string[]) => {
       for (const key of keys) {
         const value = equipment[key] ?? snapshot[key];
-        if (typeof value === 'string' && value.trim().length > 0) {
-          return value;
-        }
+        const resolved = resolve(value);
+        if (resolved) return resolved;
       }
       return undefined;
     };
@@ -77,7 +106,7 @@ const PgDetailCard: FC<PgDetailCardProps> = ({ resident, onClose }) => {
       { id: 'ring', label: t('pgDetailCard.equipment.ring'), value: getter('ring', 'ringSlot', 'sigil') },
       { id: 'mount', label: t('pgDetailCard.equipment.mount'), value: getter('companion', 'pet', 'mount') },
     ];
-  }, [resident.statSnapshot, t]);
+  }, [resident.statSnapshot, t, equipmentMap]);
   const inventoryTokens = useMemo(() => {
     const snapshot = resident.statSnapshot as Record<string, unknown> | undefined;
     const inventory = snapshot?.inventory;
@@ -221,14 +250,7 @@ const PgDetailCard: FC<PgDetailCardProps> = ({ resident, onClose }) => {
               />
             </MatericSurface>
 
-            <MatericSurface shape="card" material="obsidian" style={{ padding: 10 }}>
-              <MatericField label={t('pgDetailCard.equipment.label')} value="" />
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginTop: 6 }}>
-                {equipmentSlots.map((slot) => (
-                  <MatericField key={slot.id} label={slot.label} value={slot.value ?? '—'} />
-                ))}
-              </div>
-            </MatericSurface>
+            <EquipmentDiabloPanel slots={equipmentSlots} onSlotClick={onSlotClick} />
 
             <MatericSurface shape="card" material="obsidian" style={{ padding: 10 }}>
               <MatericField label={t('pgDetailCard.inventory.label')} value="" />

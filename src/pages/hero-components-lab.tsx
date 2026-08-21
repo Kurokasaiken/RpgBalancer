@@ -1,10 +1,13 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { DndContext, type DragEndEvent } from '@dnd-kit/core';
 import { useTranslation } from '@/localization/useTranslation';
 import PgDetailCard from '@/ui/idleVillage/components/PgDetailCard';
 import { EquipSlotRack } from '@/ui/idleVillage/components/EquipSlotRack';
 import { ItemDragToken } from '@/ui/idleVillage/components/ItemDragToken';
 import { EquippableItemCard } from '@/ui/idleVillage/components/EquippableItemCard';
+import { EquipmentDragToken } from '@/ui/equipment/EquipmentDragToken';
+import { getAllEquipment } from '@/balancing/equipment/equipmentStorage';
+import type { EquipmentItem } from '@/balancing/equipment/equipmentTypes';
 import { ConsumablePile } from '@/ui/idleVillage/components/ConsumablePile';
 import { SkillDeck } from '@/ui/idleVillage/components/SkillDeck';
 import { useResidentHeroState } from '@/ui/idleVillage/hooks/useResidentHeroState';
@@ -29,6 +32,17 @@ import {
  */
 export default function HeroComponentsLabPage(): JSX.Element {
   const { t } = useTranslation('idleVillage');
+  const [savedEquipment, setSavedEquipment] = useState<EquipmentItem[]>([]);
+  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+  const [pendingItem, setPendingItem] = useState<string>('');
+
+  useEffect(() => {
+    let mounted = true;
+    getAllEquipment().then((all) => {
+      if (mounted) setSavedEquipment(all);
+    });
+    return () => { mounted = false; };
+  }, []);
 
   const baseResident = useMemo<ResidentState>(
     () => ({
@@ -114,7 +128,46 @@ export default function HeroComponentsLabPage(): JSX.Element {
         >
           <div>
             <MatericSectionHeader tier="tertiary" hint="A">{t('heroComponentsLab.sectionA')}</MatericSectionHeader>
-            <PgDetailCard resident={resident} />
+            <PgDetailCard resident={resident} onSlotClick={setSelectedSlot} />
+            {selectedSlot && (
+              <div style={{ marginTop: 12, padding: 12, border: '1px solid var(--skin-surface-border)', borderRadius: 8, background: 'var(--skin-surface-bg)' }}>
+                <div style={{ fontSize: 10, marginBottom: 8, color: 'var(--skin-text-muted)' }}>
+                  {t('heroComponentsLab.selectedSlot')}: {selectedSlot}
+                </div>
+                {resident.statSnapshot?.equipment?.[selectedSlot] && (
+                  <button
+                    type="button"
+                    onClick={() => { unequip(selectedSlot); setSelectedSlot(null); }}
+                    style={{ fontSize: 10, color: 'var(--skin-glow-primary)' }}
+                  >
+                    {t('heroComponentsLab.unequip')}
+                  </button>
+                )}
+                {!resident.statSnapshot?.equipment?.[selectedSlot] && (
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <select
+                      value={pendingItem}
+                      onChange={(e) => setPendingItem(e.target.value)}
+                      style={{ flex: 1, fontSize: 10 }}
+                    >
+                      <option value="">{t('heroComponentsLab.selectItem')}</option>
+                      {[...equippableItems, ...savedEquipment]
+                        .filter((item) => item.slot === selectedSlot)
+                        .map((item) => (
+                          <option key={item.id} value={item.id}>{item.name}</option>
+                        ))}
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => { if (pendingItem) { equip(selectedSlot, pendingItem); setPendingItem(''); setSelectedSlot(null); } }}
+                      style={{ fontSize: 10, color: 'var(--skin-glow-accent)' }}
+                    >
+                      {t('heroComponentsLab.equip')}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div>
@@ -124,6 +177,9 @@ export default function HeroComponentsLabPage(): JSX.Element {
                 <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
                   {equippableItems.map((item) => (
                     <ItemDragToken key={item.id} item={item} />
+                  ))}
+                  {savedEquipment.map((item) => (
+                    <EquipmentDragToken key={item.id} item={item} />
                   ))}
                 </div>
               </EquipSlotRack>
