@@ -506,6 +506,43 @@ fallimento critico e' una costante di sistema. Ora la soglia e' proporzionale
 e' uniforme. Le due hanno la stessa area (5%) ma non la stessa forma. Unificarle vuol dire far
 leggere al resolver il giro di trame del tiro corrente.
 
+### Emendamento rev.3 — 2026-08-21 (Director, stessa sessione)
+
+Decisioni sulla CATENA DI RISOLUZIONE, tutte User-stated:
+
+1. **Si tirano ENTRAMBI i D100 prima di qualunque disegno**: esito *e*
+   ferita/morte/niente. Non "prima l'esito, poi il rischio".
+2. **Dalla coppia si ricava il punto d'atterraggio**, e lo si sa prima di animare.
+3. **Prima dell'animazione si deve sapere che il board disegnato puo' soddisfare quel punto.**
+4. **Se non lo puo', si cambia la GEOMETRIA** — non si riestrae il tiro. E basta cambiare
+   «la posizione o l'inclinazione», non ridimensionare le bande.
+5. **Il vincolo e' di INTERSEZIONE, non di evitamento.** Correzione esplicita di una mia
+   inferenza sbagliata: avevo scritto che le crepe del terremoto non devono toccare il punto
+   d'atterraggio. Falso — se l'esito e' `almost + ferita` **ci deve essere** un punto dove il
+   terremoto della ferita tocca l'almost. La regione richiesta e'
+   `regione(esito) ∩ zona raggiunta dal terremoto(rischio)`.
+6. **Tiro unico**, e la pallina si ferma dove deve. Non nei paraggi.
+7. **`almost` NON e' garantito**, puo' stare fuori dall'area. Garantiti sono solo il **5% di
+   fallimento critico** e il **5% di successo critico**, ed entrambi sono **valori variabili**
+   da config, non costanti.
+8. **Il bordo ha priorita' SULLA stella:** «epicFail e' semplicemente il bordo come sempre».
+   La tela sta sopra il fiore, quindi il bordo non viene mai coperto.
+9. **Successo critico = 5% dell'area di successo** (stella ∩ arena), non dell'arena e non
+   dell'unione.
+10. **Messa in scena del secondo dado:** i due terremoti — fenditura che si chiude per la
+    ferita, spacco che resta aperto per la morte.
+11. **Impatto puntuale** al posto del flash bianco globale finale.
+
+**AI inference (misurato) che sostiene il punto 4:** le trasformazioni ammesse per far esistere
+l'intersezione devono **conservare la misura** — rotazione, fase, seed — perche' ridimensionare
+una banda cambierebbe la probabilita', cioe' romperebbe il numero mostrato al giocatore per far
+entrare un caso particolare. Rotazione e fase si': raggio e spessore no.
+
+**AI inference (misurato) sul cap:** con `almost` non garantito l'unica banda incassata a
+prescindere e' il 5% di fallimento critico, quindi il massimo successo mostrabile e' **95** —
+cioe' quello che `shownProb` fa gia'. Il mio 90 di due turni prima assumeva `almost` garantito
+ed era sbagliato.
+
 ### Still unresolved
 
 - Di quanto salgono le stat alla promozione; se la promozione e' certa o probabilistica; se e'
