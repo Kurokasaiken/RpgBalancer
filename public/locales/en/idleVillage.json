@@ -516,6 +516,16 @@
       "label": "Inventory",
       "empty": "No items recorded."
     },
+    "equipment": {
+      "label": "Equipment",
+      "weapon": "Weapon",
+      "offhand": "Off hand",
+      "armor": "Armor",
+      "trinket": "Trinket",
+      "ring": "Ring",
+      "mount": "Mount",
+      "empty": "Empty"
+    },
     "status": {
       "available": "Available",
       "away": "Away",
@@ -538,7 +548,12 @@
     "use": "Use",
     "availableSkills": "Available skills",
     "equippedSkills": "Equipped skills",
-    "empty": "Empty"
+    "empty": "Empty",
+    "grantedSkill": "Granted by equipment",
+    "selectedSlot": "Selected slot",
+    "unequip": "Unequip",
+    "selectItem": "Select item",
+    "equip": "Equip"
   },
   "poiVisualPreview": {
     "title": "POI Medallion Preview",
@@ -609,6 +624,11 @@
     "saveFailed": "Failed to save equipment",
     "unnamed": "Unnamed equipment",
     "reset": "Reset",
-    "saveDefault": "Save default"
+    "saveDefault": "Save default",
+    "library": "Equipment library",
+    "new": "New",
+    "emptyLibrary": "No equipment in library.",
+    "edit": "Edit",
+    "loading": "Loading..."
   }
 }

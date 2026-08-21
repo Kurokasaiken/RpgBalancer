@@ -39,6 +39,8 @@ export interface UseResidentHeroStateReturn {
   inventory: ConsumableItem[];
   /** Equipped skill ids. */
   skillLoadout: string[];
+  /** Skill ids granted by currently equipped items. */
+  grantedSkills: string[];
   /** Equip an item by id in a slot. */
   equip: (slotId: string, itemId: string) => void;
   /** Remove the item from a slot. */
@@ -189,6 +191,20 @@ export function useResidentHeroState({
 
   const skillLoadout = heroState.skills;
 
+  const grantedSkills = useMemo(() => {
+    const ids = new Set<string>();
+    for (const itemId of Object.values(heroState.equipment)) {
+      if (!itemId) continue;
+      const item = allItems.find((i) => i.id === itemId);
+      if (item && 'grantedSkillIds' in item) {
+        for (const id of (item as EquipmentItem).grantedSkillIds ?? []) {
+          ids.add(id);
+        }
+      }
+    }
+    return Array.from(ids);
+  }, [heroState.equipment, allItems]);
+
   const syntheticResident = useMemo(
     () =>
       ({
@@ -208,6 +224,7 @@ export function useResidentHeroState({
     equipment,
     inventory,
     skillLoadout,
+    grantedSkills,
     equip,
     unequip,
     useConsumable,

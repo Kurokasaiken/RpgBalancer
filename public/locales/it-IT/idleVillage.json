@@ -546,6 +546,16 @@
       "label": "Inventario",
       "empty": "Nessun oggetto registrato."
     },
+    "equipment": {
+      "label": "Equipaggiamento",
+      "weapon": "Arma",
+      "offhand": "Mano secondaria",
+      "armor": "Armatura",
+      "trinket": "Trinket",
+      "ring": "Anello",
+      "mount": "Cavalcatura",
+      "empty": "Vuoto"
+    },
     "status": {
       "available": "Disponibile",
       "away": "Assente",
@@ -568,7 +578,12 @@
     "use": "Usa",
     "availableSkills": "Skill disponibili",
     "equippedSkills": "Skill equipaggiate",
-    "empty": "Vuoto"
+    "empty": "Vuoto",
+    "grantedSkill": "Concessa dall'equipaggiamento",
+    "selectedSlot": "Slot selezionato",
+    "unequip": "Rimuovi",
+    "selectItem": "Scegli oggetto",
+    "equip": "Equipaggia"
   },
   "equipment": {
     "label": "Equipaggiamento",
@@ -634,6 +649,11 @@
     "saveFailed": "Salvataggio fallito",
     "unnamed": "Oggetto senza nome",
     "reset": "Reset",
-    "saveDefault": "Salva default"
+    "saveDefault": "Salva default",
+    "library": "Libreria equipaggiamento",
+    "new": "Nuovo",
+    "emptyLibrary": "Nessun oggetto in libreria.",
+    "edit": "Modifica",
+    "loading": "Caricamento..."
   }
 }

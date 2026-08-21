@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Sparkles, Shield } from 'lucide-react';
@@ -11,7 +11,7 @@ import type { EquipmentItem, EquipmentRarity, EquipmentType } from '@/balancing/
 import { useSpellConfig } from '@/spells/hooks/useSpellConfig';
 import { useEquipmentDefaultStorage } from '@/shared/hooks/useEquipmentDefaultStorage';
 import { EquipmentCostModule } from '@/balancing/equipment/EquipmentCostModule';
-import { upsertEquipment } from '@/balancing/equipment/equipmentStorage';
+import { upsertEquipment, getEquipment } from '@/balancing/equipment/equipmentStorage';
 import {
   getEquipmentStatTicks,
   getEquipmentTypeConfig,
@@ -69,6 +69,28 @@ export const EquipmentCreatorTestPage: React.FC = () => {
   const { config: balancerConfig } = useBalancerConfig();
 
   const [skillSearch, setSkillSearch] = useState('');
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const editId = searchParams.get('id');
+    if (!editId) return;
+    getEquipment(editId).then((loaded) => {
+      if (!loaded) return;
+      setEquipment(loaded);
+      setStatOrder(Object.keys(loaded.stats));
+      const steps: Record<string, { value: number; weight: number }[]> = {};
+      const ticks: Record<string, number> = {};
+      for (const [field, value] of Object.entries(loaded.stats)) {
+        const defaultSteps = getEquipmentStatTicks(field);
+        const matchIdx = defaultSteps.findIndex((s) => s.value === value);
+        ticks[field] = matchIdx >= 0 ? matchIdx : 0;
+        steps[field] = defaultSteps.map((s) => ({ value: s.value, weight: s.weight }));
+      }
+      setStatSteps(steps);
+      setSelectedTicks(ticks);
+      setCollapsedStats({});
+    });
+  }, [setEquipment, setStatOrder, setStatSteps, setSelectedTicks, setCollapsedStats]);
 
   const { cost, budget, balance, isBalanced, power, tier } = useMemo(() => {
     const breakdown = EquipmentCostModule.getCompleteCost(equipment);
