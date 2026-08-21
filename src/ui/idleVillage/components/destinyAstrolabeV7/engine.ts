@@ -260,6 +260,7 @@ const scene={
   pourP:0, streamAlpha:0,
   ball:{x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false},
   snapFrom:null,
+  impact:null,                          // {x,y,t,warm} — pulsazione d'impatto puntuale
   teasePos:null,                        // punto della banda di fallimento da sfiorare
   shocks:[], sparks:[],
   webSeed:7,                            // tela deterministica per tiro
@@ -401,7 +402,7 @@ function launchRoll(){
   recomputeGeometry();
   buildPillars();
   scene.starScale=0; scene.pourP=0; scene.streamAlpha=0; scene.webP=0;
-  scene.rigP=0; scene.threatP=0; scene.wardP=0;
+  scene.rigP=0; scene.threatP=0; scene.wardP=0; scene.impact=null;
   scene.webSeed=(Math.random()*1e9)|0;   // una tela diversa a ogni tiro
   scene.ringReveal=0;
   scene.ball={x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false};
@@ -782,13 +783,14 @@ function resolve(){
   } else {
     suite.dataset.tone=(res.verdict==='epicfail')?'grim':'doom';
   }
-  /* SOLAR CLIMAX — blinding burst from the core + massive unified screen punch,
-     fired the same millisecond the typography appears */
-  const climax=$id('climax');
-  climax.classList.remove('burst','cold');
-  if(isLoss) climax.classList.add('cold');
-  void climax.offsetWidth;
-  climax.classList.add('burst');
+  /* IMPATTO PUNTUALE al posto del flash bianco globale.
+     Il `.climax` era un lampo radiale centrato sul CENTRO dell'arena che scalava
+     a 2.8x: un colpo di scena che non guardava dove era finita la pallina, e
+     anzi la cancellava proprio nel fotogramma in cui conta. Ora la pulsazione
+     nasce sul punto esatto d'arresto — e' li' che il verdetto e' accaduto.
+     Disegnata su canvas e non in CSS: le coordinate sono quelle vere della
+     pallina, senza rimappature di percentuali su un elemento con inset -12%. */
+  scene.impact={x:b.x,y:b.y,t:0,warm:!isLoss};
   shake('shake-resolve');
   $id('launch').classList.add('pulse');
   /* panel result removed */
@@ -1566,6 +1568,48 @@ function drawShocks(dt){
     ctx.restore();
   }
 }
+/* PULSAZIONE D'IMPATTO — due anelli sfasati piu' un nucleo, sul punto d'arresto.
+   Due anelli e non uno: uno solo legge come un cerchio che cresce, due sfasati
+   leggono come un COLPO che si propaga. */
+function drawImpact(dt){
+  const im=scene.impact;
+  if(!im) return;
+  im.t+=dt;
+  const D=560;
+  if(im.t>D){ scene.impact=null; return; }
+  const p=im.t/D;
+  const warm=im.warm;
+  const col=warm?'255,238,176':'190,215,255';
+  const hot=warm?'255,255,245':'238,246,255';
+  ctx.save();
+  /* nucleo: brucia e sparisce nei primi 140ms — e' il fotogramma dell'impatto */
+  const k=clamp(1-im.t/140,0,1);
+  if(k>0){
+    const g=ctx.createRadialGradient(im.x,im.y,0,im.x,im.y,26*(0.5+0.5*k));
+    g.addColorStop(0,`rgba(${hot},${(0.95*k).toFixed(3)})`);
+    g.addColorStop(0.45,`rgba(${col},${(0.5*k).toFixed(3)})`);
+    g.addColorStop(1,'transparent');
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(im.x,im.y,26,0,TAU); ctx.fill();
+  }
+  for(let i=0;i<2;i+=1){
+    const q=clamp((p-i*0.16)/(1-i*0.16),0,1);
+    if(q<=0) continue;
+    const e=1-Math.pow(1-q,3);
+    const r=6+ (i===0?78:52)*e;
+    /* l'anello porta il PROPRIO contrasto: un anello crema su petalo crema
+       spariva, esattamente come la pallina e la seta prima di lui */
+    ctx.globalAlpha=(1-q)*(i===0?0.75:0.45);
+    ctx.lineWidth=(i===0?9:5)*(1-q)+1.2;
+    ctx.strokeStyle='rgba(8,6,16,1)'; ctx.shadowBlur=0;
+    ctx.beginPath(); ctx.arc(im.x,im.y,r,0,TAU); ctx.stroke();
+    ctx.globalAlpha=(1-q)*(i===0?1:0.6);
+    ctx.lineWidth=(i===0?5:2.8)*(1-q)+0.6;
+    ctx.strokeStyle=`rgb(${col})`;
+    ctx.shadowColor=`rgb(${col})`; ctx.shadowBlur=16*(1-q);
+    ctx.beginPath(); ctx.arc(im.x,im.y,r,0,TAU); ctx.stroke();
+  }
+  ctx.restore();
+}
 function drawBall(now){
   const b=scene.ball;
   if(!b.on && scene.state!=='resolution') return;
@@ -1677,6 +1721,7 @@ function frame(now){
   drawShocks(dt);
   drawMotes(now,dt);
   drawBall(now);
+  drawImpact(dt);
  }catch(e){ if(!window.__frameErrLogged){ window.__frameErrLogged=true; console.error('FRAME ERROR:', e && e.stack || e); } }
  requestAnimationFrame(frame);
 }
