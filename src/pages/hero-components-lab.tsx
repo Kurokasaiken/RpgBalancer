@@ -187,7 +187,7 @@ export default function HeroComponentsLabPage(): JSX.Element {
           <div>
             <MatericSectionHeader tier="tertiary" hint="B">{t('heroComponentsLab.sectionB')}</MatericSectionHeader>
             <DndContext onDragEnd={handleDragEnd}>
-              <EquipSlotRack slots={slotOrder} equipment={equipment} onUnequip={unequip}>
+              <EquipSlotRack slots={slotOrder} equipment={equipment} onUnequip={unequip} variant="flat">
                 <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
                   {equippableItems.map((item) => (
                     <ItemDragToken key={item.id} item={item} onClick={setSelectedEquippable} />
@@ -209,6 +209,7 @@ export default function HeroComponentsLabPage(): JSX.Element {
                 effect: t('heroComponentsLab.effect'),
                 slot: t('heroComponentsLab.slot'),
               }}
+              variant="flat"
             />
           </div>
 
@@ -218,6 +219,7 @@ export default function HeroComponentsLabPage(): JSX.Element {
               items={inventory}
               useLabel={t('heroComponentsLab.use')}
               onUse={useConsumable}
+              variant="flat"
             />
           </div>
 
@@ -232,6 +234,7 @@ export default function HeroComponentsLabPage(): JSX.Element {
                 empty: t('heroComponentsLab.empty'),
               }}
               onToggle={toggleSkill}
+              variant="flat"
             />
           </div>
         </div>

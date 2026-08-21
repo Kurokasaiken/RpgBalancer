@@ -18,6 +18,8 @@ export interface EquipSlotRackProps {
   onUnequip: (slotId: string) => void;
   /** Optional item token tray rendered under the slots. */
   children?: React.ReactNode;
+  /** Visual variant. `flat` removes the surface border. */
+  variant?: 'default' | 'flat';
 }
 
 /**
@@ -27,9 +29,9 @@ export interface EquipSlotRackProps {
  * via the surrounding `DndContext`; clicking the slot clears it. The equipment
  * mapping is owned by the caller (e.g. `useResidentHeroState`).
  */
-export function EquipSlotRack({ slots, equipment, onUnequip, children }: EquipSlotRackProps): JSX.Element {
-  return (
-    <MatericSurface shape="card" material="jade" style={{ padding: 12 }}>
+export function EquipSlotRack({ slots, equipment, onUnequip, children, variant = 'default' }: EquipSlotRackProps): JSX.Element {
+  const content = (
+    <>
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
         {slots.map((slot) => {
           const item = equipment[slot.id] ?? null;
@@ -44,6 +46,20 @@ export function EquipSlotRack({ slots, equipment, onUnequip, children }: EquipSl
         })}
       </div>
       {children}
+    </>
+  );
+
+  if (variant === 'flat') {
+    return (
+      <div style={{ padding: 12, background: 'var(--skin-surface-bg)', borderRadius: 8 }}>
+        {content}
+      </div>
+    );
+  }
+
+  return (
+    <MatericSurface shape="card" material="jade" style={{ padding: 12 }}>
+      {content}
     </MatericSurface>
   );
 }

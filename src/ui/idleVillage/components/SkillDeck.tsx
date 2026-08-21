@@ -20,6 +20,8 @@ export interface SkillDeckProps {
   };
   /** Called when a skill is clicked (equip if available, unequip if in loadout). */
   onToggle: (skillId: string) => void;
+  /** Visual variant. `flat` removes the surface border. */
+  variant?: 'default' | 'flat';
 }
 
 /**
@@ -28,7 +30,7 @@ export interface SkillDeckProps {
  * Shows the available skill pool and the currently equipped slots. The parent
  * owns the loadout state (e.g. `useSkillLoadout`).
  */
-export function SkillDeck({ skills, loadout, labels, onToggle }: SkillDeckProps): JSX.Element {
+export function SkillDeck({ skills, loadout, labels, onToggle, variant = 'default' }: SkillDeckProps): JSX.Element {
   const handleSkillClick = useCallback(
     (skillId: string) => () => onToggle(skillId),
     [onToggle],
@@ -37,8 +39,8 @@ export function SkillDeck({ skills, loadout, labels, onToggle }: SkillDeckProps)
   const equippedSkills = skills.filter((skill) => loadout.includes(skill.id));
   const availableSkills = skills.filter((skill) => !loadout.includes(skill.id));
 
-  return (
-    <MatericSurface shape="card" material="jade" style={{ padding: 12 }}>
+  const content = (
+    <>
       <div style={{ marginBottom: 12 }}>
         <MatericPlaque>{labels.available}</MatericPlaque>
         <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
@@ -74,6 +76,20 @@ export function SkillDeck({ skills, loadout, labels, onToggle }: SkillDeckProps)
           ))}
         </div>
       </div>
+    </>
+  );
+
+  if (variant === 'flat') {
+    return (
+      <div style={{ padding: 12, background: 'var(--skin-surface-bg)', borderRadius: 8 }}>
+        {content}
+      </div>
+    );
+  }
+
+  return (
+    <MatericSurface shape="card" material="jade" style={{ padding: 12 }}>
+      {content}
     </MatericSurface>
   );
 }
