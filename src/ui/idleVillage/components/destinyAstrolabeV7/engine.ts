@@ -855,10 +855,17 @@ const WEB_INK={
   silk:'rgba(214,238,246,0.95)',
   silkDim:'rgba(150,206,222,0.72)',
   frame:'rgba(236,250,254,1.00)',
+  /* la tela passa davanti al fiore: senza sottofondo scuro i raggi sul petalo
+     crema hanno contrasto quasi nullo */
+  shade:'rgba(6,14,22,0.88)',
 };
-const WEB_OPTS={...WEB_DEFAULTS, radii:22, weftStep:15,
-  /* le gocce leggerebbero come palline: qui la pallina è una sola */
-  droplets:false};
+const WEB_OPTS={...WEB_DEFAULTS, radii:18, weftStep:16,
+  /* GOCCE VISCIDE riaccese. Le avevo spente temendo che leggessero come
+     palline: la paura era giusta, la risposta sbagliata. La risposta e'
+     dimensione e numero — 1px contro una pallina da 9px con alone e ombra,
+     poche e solo nella fascia esterna, dove la pallina passa di rado. Senza di
+     loro la tela non dice "appiccicoso" e resta un reticolo di linee. */
+  droplets:true, beads:0.10};
 function drawWebLayer(){
   const rev=scene.gooReveal;
   if(rev<=0.001) return;
@@ -868,6 +875,13 @@ function drawWebLayer(){
     rFrame:Math.max(...geo.axisCheck),
     rFrameAt:(a)=>rCheckAt(a),
     rStar:(a)=>rStarAt(a,1),
+    /* ancoraggi maestri = gli OBELISCHI: stanno gia' sul muro, quindi muro,
+       picchetti e telaio diventano una cosa sola invece di tre cerchi */
+    anchorAngles:Array.from({length:AXES},(_,i)=>-Math.PI/2+i*TAU/AXES),
+    /* il ramo = la ghiera di bronzo, che resta circolare a R (decisione del
+       Director). I tiranti attraversano il campo vuoto e lo rendono lo spazio
+       in cui la tela e' sospesa, invece di un vuoto che non e' di nessuno. */
+    rTether:R,
     seed:scene.webSeed,
     skipArena:true,                      // il vuoto e il righello li disegna la V7
     ink:WEB_INK,
@@ -1430,21 +1444,27 @@ function drawShocks(dt){
 function drawBall(now){
   const b=scene.ball;
   if(!b.on && scene.state!=='resolution') return;
-  /* gold→teal comet trail */
+  /* SCIA A DUE PASSATE.
+     Un colore solo non puo' funzionare su due fondi opposti: sul vuoto deve
+     essere chiara, sul crema della stella deve essere scura. Il bronzo che
+     c'era prima stava a 2.86:1 sul petalo — l'avevo scelto guardandolo sul
+     vuoto, cioe' non dove la pallina passa davvero.
+     Quindi: nucleo SCURO largo (17:1 sul crema) + filo di luce sottile sopra
+     (16:1 sul vuoto). E il read migliora: la pallina INCIDE il board invece di
+     illuminarlo, coerente con una pallina che e' un nucleo scuro. */
   const n=b.trail.length;
-  for(let i=1;i<n;i+=1){
-    const t0=b.trail[i-1], t1=b.trail[i];
-    const a=t1.life/480;
-    if(a<=0) continue;
-    const mix=i/n;                              // tail→head
-    /* scia: da teal scuro a bronzo, non a crema — sul petalo chiaro la scia
-       crema spariva insieme alla pallina */
-    const cr=Math.round(24+(196-24)*mix), cg=Math.round(74+(126-74)*mix), cb=Math.round(96+(34-96)*mix);
-    ctx.globalAlpha=a*.6;
-    ctx.strokeStyle=`rgb(${cr},${cg},${cb})`;
-    ctx.lineWidth=b.r*1.5*a*(.4+.6*mix);
-    ctx.lineCap='round';
-    ctx.beginPath(); ctx.moveTo(t0.x,t0.y); ctx.lineTo(t1.x,t1.y); ctx.stroke();
+  for(let pass=0;pass<2;pass+=1){
+    for(let i=1;i<n;i+=1){
+      const t0=b.trail[i-1], t1=b.trail[i];
+      const a=t1.life/480;
+      if(a<=0) continue;
+      const mix=i/n;                            // coda -> testa
+      ctx.globalAlpha=a*(pass===0?0.72:0.9);
+      ctx.strokeStyle=pass===0?'#0c0a0e':'#ffe9a8';
+      ctx.lineWidth=(pass===0?b.r*1.9:b.r*0.55)*a*(0.35+0.65*mix);
+      ctx.lineCap='round';
+      ctx.beginPath(); ctx.moveTo(t0.x,t0.y); ctx.lineTo(t1.x,t1.y); ctx.stroke();
+    }
   }
   ctx.globalAlpha=1;
   scene.sparks.forEach(s=>{
@@ -1517,10 +1537,14 @@ function frame(now){
   ctx.clearRect(0,0,W,W);
   drawBackdrop(now);
   drawChallengeSurface(now);
-  drawWebLayer();
   drawAxisRig(now);
   drawBlueprint(now);
   drawStar(now);
+  /* LA TELA DAVANTI AL FIORE: disegnata DOPO la stella. Da sola l'inversione
+     non basterebbe — i raggi partivano dal contorno della stella, quindi non
+     c'era mai un filo sopra il petalo. Serve `overStar`, che li radica al
+     mozzo. Le trame restano fuori: sopra il fiore passano solo i raggi. */
+  drawWebLayer();
   /* V6: drawValleyRisks() disattivato — ferita e morte tornano con una
      grammatica propria, fuori dall'area del goo. */
   scene.whitePillars.forEach(p=>drawPillar(p,true));  // draw first (behind)

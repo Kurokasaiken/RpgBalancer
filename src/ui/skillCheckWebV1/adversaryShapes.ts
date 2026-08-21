@@ -49,6 +49,20 @@ export interface ShapeCtx {
    * stella devono leggerlo da qui.
    */
   rFrameAt?: (theta: number) => number;
+  /**
+   * ANCORAGGI MAESTRI imposti dall'host (angoli). Nella V7 sono gli obelischi:
+   * stanno già sul muro, quindi ancorando la tela a loro il muro, i picchetti e
+   * il telaio diventano UNA cosa sola invece di tre cerchi che si contraddicono.
+   * Fra due maestri il modulo inserisce gli ancoraggi intermedi.
+   */
+  anchorAngles?: number[];
+  /**
+   * IL RAMO. Raggio a cui arrivano i fili di ancoraggio che escono dalla tela.
+   * Una tela vera è appesa a qualcosa di esterno, e senza quei fili lo spazio
+   * fra il muro e la cornice non appartiene a nessuno: a difficoltà 50 è il 72%
+   * dell'area dentro la ghiera. Assente = nessun filo verso l'esterno.
+   */
+  rTether?: number;
   /** l'host disegna già campo e righello: qui non ridisegnarli */
   skipArena?: boolean;
   /** palette dell'host: la tela porta il carattere, non il colore */
@@ -69,7 +83,7 @@ export interface ShapeCtx {
 
 export type Ink = Record<
   | 'bg' | 'field' | 'silk' | 'silkDim' | 'frame' | 'wood' | 'woodDark' | 'leaf'
-  | 'star' | 'starEdge' | 'tick' | 'tickMajor',
+  | 'star' | 'starEdge' | 'tick' | 'tickMajor' | 'shade',
   string
 >;
 
@@ -86,6 +100,13 @@ const INK: Ink = {
   starEdge: '#8b96a3',
   tick: '#39424e',
   tickMajor: '#5d6875',
+  /* SOTTOFONDO SCURO DELLA SETA. Serve perché la tela adesso passa DAVANTI al
+     fiore: una seta pallida su un petalo crema ha contrasto quasi nullo, e i
+     raggi sopra la stella semplicemente non si vedevano. Stessa soluzione della
+     pallina — porta il proprio contrasto invece di prenderlo in prestito: una
+     passata scura più larga sotto il filo chiaro. Su fondo scuro è scuro su
+     scuro e non si vede; sul crema è lei a reggere la lettura. */
+  shade: 'rgba(4,8,14,0.9)',
 };
 
 /* ── utilità ─────────────────────────────────────────────────────────── */
@@ -293,10 +314,76 @@ export interface WebOpts {
   sweep: number;
   /** direzione da cui arriva il filo, radianti (0 = dall'alto) */
   shotAngle: number;
+  /**
+   * FILO-PONTE. Frazione iniziale del lancio in cui esiste UNA SOLA LINEA.
+   *
+   * Prima il primo mezzo secondo mostrava una miniatura della tela finita
+   * all'8% di scala: una struttura completa e minuscola al centro esatto del
+   * board, che legge come un bozzolo che si schiude — l'opposto di una tela
+   * scoccata, e in contraddizione col fatto che la minaccia non deve nascere
+   * dal centro dove poi sboccia la stella.
+   *
+   * Ogni tela reale comincia con un filo solo, teso da un appoggio all'altro
+   * (il bridge thread). Come lettura è anche il gesto di un tiro: un filo
+   * parte, colpisce, si tende. Quindi qui i primi `bridge` del lancio hanno una
+   * riga e nient'altro; la struttura arriva dopo.
+   */
+  bridge: number;
+  /**
+   * LA TELA DAVANTI AL FIORE.
+   *
+   * A `false` (come era) il raggio parte dal contorno della stella: quando il
+   * fiore sboccia i fili si accorciano dall'interno, cioe' la tela SI RITIRA
+   * davanti al fiore e non gli passa mai sopra. Per questo cambiare l'ordine di
+   * disegno non produceva alcun pixel diverso.
+   *
+   * A `true` il raggio e' radicato al MOZZO e attraversa la stella: il fiore
+   * sboccia DIETRO la tela, e il premio si vede attraverso la trappola. Le
+   * trame restano fuori dalla stella — nelle tele vere la spirale di cattura non
+   * entra nella zona libera — quindi sopra il fiore passano solo i raggi: legge
+   * come una GABBIA e non come un tessuto che impasta il premio.
+   */
+  overStar: boolean;
+  /** raggio del mozzo come frazione del festone: sotto 0.12 legge come radar */
+  hubR: number;
   /** stacco fra stella e prima trama, in unità engine */
   freeZone: number;
   /** tolleranza prima di considerare il telaio sfondato: a parità niente scintille */
   punchOut: number;
+  /**
+   * TELAIO SECONDARIO — è questo che toglie il cerchio.
+   *
+   * Il telaio primario deve stare SUL muro, perché il muro è fisico: è dove la
+   * pallina rimbalza. Ma un bordo che sta su un muro quasi circolare legge come
+   * un cerchio. Nelle tele vere la soluzione esiste già ed è il telaio
+   * secondario: corde che tagliano gli angoli appena dentro il primario, con
+   * cedimento VERSO IL CENTRO, e i raggi si attaccano a quelle.
+   *
+   * La concavità è la chiave. I tre bordi che ho sbagliato prima erano poligoni
+   * CONVESSI (esagono, tridecagono) e leggevano come faccette; una corda tesa
+   * fra due punti *deve* cedere all'interno, quindi la concavità non legge come
+   * geometria, legge come tensione.
+   *
+   * 0 = spento (bordo sul muro, cioè il cerchio di prima).
+   */
+  secFrame: number;
+  /** ancoraggi intermedi inseriti fra due maestri: 1 = un festone per mezzo settore */
+  perSector: number;
+  /** fili di ancoraggio verso il ramo: quanti per ogni maestro. 0 = spenti */
+  tether: number;
+  /**
+   * LAMPO SPECULARE. La seta è una fibra speculare: cattura la luce a lampi
+   * discontinui, non con un tratto a opacità costante — e un tratto a opacità
+   * costante È line-art per definizione. Qui i fili perpendicolari alla luce
+   * brillano e quelli paralleli si spengono, con una sola direzione di luce.
+   */
+  glint: number;
+  /** alone diffuso sotto ogni filo: trasforma il tratto in FIBRA. 0 = spento */
+  halo: number;
+  /** gocce viscide sulla spirale di cattura (frazione dei punti candidati) */
+  beads: number;
+  /** nodi agli incroci: due linee che si sovrappongono leggono come vettoriale */
+  knots: boolean;
   droplets: boolean;
 }
 
@@ -319,6 +406,16 @@ export const WEB_DEFAULTS: WebOpts = {
   centerLag: 0.16,
   sweep: 0.55,
   shotAngle: 0,
+  overStar: true,
+  hubR: 0.15,
+  bridge: 0.18,
+  secFrame: 0.16,
+  perSector: 1,
+  tether: 2,
+  glint: 0.45,
+  halo: 0.1,
+  beads: 0.14,
+  knots: true,
   freeZone: 16,
   punchOut: 0.07,
   droplets: true,
@@ -460,7 +557,11 @@ export function drawWeb(
 
      NON è il ragno che tesse: la topologia è completa dal primo frame, è solo
      l'ordine in cui i fili si TENDONO che segue il colpo.                    */
-  const L = cl01(A.launch);
+  /* IL FILO-PONTE consuma la prima frazione del lancio: prima c'e' una riga
+     sola, poi la struttura parte da zero sul tempo rimasto. */
+  const L0 = cl01(A.launch);
+  const L = o.bridge > 0 ? cl01((L0 - o.bridge) / (1 - o.bridge)) : L0;
+  const bridgeP = o.bridge > 0 ? cl01(L0 / o.bridge) : 1;
   const settled = easeOut3(L);
   const spin = o.spin * (1 - settled);
   const shotA = -Math.PI / 2 + o.shotAngle;
@@ -501,39 +602,108 @@ export function drawWeb(
     };
   };
 
-  /* ── ANCORAGGI ──────────────────────────────────────────────────────── */
-  const AN = Math.max(3, o.anchors);
+  /* ── LAMPO SPECULARE ────────────────────────────────────────────────────
+     Una sola direzione di luce, dall'alto a sinistra come da art direction. Un
+     filo perpendicolare alla luce la riflette verso chi guarda e brilla; uno
+     parallelo si spegne. Senza questo l'opacita' e' costante lungo tutta la
+     tela, e un tratto a opacita' costante E' line-art per definizione. */
+  const LIGHT = -Math.PI * 0.75;
+  const glintAt = (a: number) => {
+    if (o.glint <= 0) return 1;
+    const f = Math.abs(Math.sin(a - LIGHT));            // 0 parallelo, 1 perpendicolare
+    return 1 - o.glint * (1 - f * f);
+  };
+
+  /* ── ANCORAGGI ──────────────────────────────────────────────────────────
+     Se l'host li impone (`anchorAngles`) quelli sono i MAESTRI — nella V7 gli
+     obelischi — e fra due maestri si inseriscono `perSector` intermedi. Se non
+     li impone, si generano come prima. Tutti stanno SUL muro: è il muro che
+     porta il telaio primario, perché il muro è fisico. */
   const ancA: number[] = [];
-  for (let i = 0; i < AN; i += 1) {
-    ancA.push(-Math.PI / 2 + (i / AN) * TAU + (rndAnc() - 0.5) * (TAU / AN) * 0.55);
+  const ancMaster: boolean[] = [];
+  if (S.anchorAngles && S.anchorAngles.length >= 3) {
+    const M = S.anchorAngles.length;
+    const per = Math.max(0, Math.round(o.perSector));
+    for (let i = 0; i < M; i += 1) {
+      const a0 = S.anchorAngles[i];
+      let a1 = S.anchorAngles[(i + 1) % M];
+      while (a1 <= a0) a1 += TAU;
+      ancA.push(a0);
+      ancMaster.push(true);
+      for (let j = 1; j <= per; j += 1) {
+        /* jitter sugli intermedi: festoni tutti uguali leggono come un centrino.
+           I maestri restano dove li vuole il gioco, l'irregolarita' sta fra loro. */
+        const base = ((a1 - a0) * j) / (per + 1);
+        ancA.push(a0 + base + (rndAnc() - 0.5) * (a1 - a0) * 0.22);
+        ancMaster.push(false);
+      }
+    }
+  } else {
+    const AN0 = Math.max(3, o.anchors);
+    for (let i = 0; i < AN0; i += 1) {
+      ancA.push(-Math.PI / 2 + (i / AN0) * TAU + (rndAnc() - 0.5) * (TAU / AN0) * 0.55);
+      ancMaster.push(i % 3 === 0);
+    }
+    ancA.sort((x, y) => x - y);
   }
-  ancA.sort((x, y) => x - y);
-  /* gli ancoraggi stanno SUL muro, che può variare con l'angolo */
+  const AN = ancA.length;
   const ancR = ancA.map((a) => wallAt(a) * (1 - rndAnc() * o.anchorJitter));
 
-  /** raggio del telaio all'angolo a: intersezione raggio/segmento fra ancoraggi */
+  /** TELAIO PRIMARIO: sta sul muro. Interpola il jitter, non taglia le corde. */
   const frameRadiusAt = (a: number): number => {
-    let t = a;
-    while (t < ancA[0]) t += TAU;
-    while (t >= ancA[0] + TAU) t -= TAU;
+    const t = ((a - ancA[0]) % TAU + TAU) % TAU;
     let i = AN - 1;
-    for (let j = 0; j < AN - 1; j += 1) {
-      if (t >= ancA[j] && t < ancA[j + 1]) {
+    for (let j = 0; j < AN; j += 1) {
+      const t0 = ((ancA[j] - ancA[0]) % TAU + TAU) % TAU;
+      const t1 = j + 1 < AN ? ((ancA[j + 1] - ancA[0]) % TAU + TAU) % TAU : TAU;
+      if (t >= t0 && t < t1) {
         i = j;
         break;
       }
     }
     const j = (i + 1) % AN;
-    const ax = Math.cos(ancA[i]) * ancR[i];
-    const ay = Math.sin(ancA[i]) * ancR[i];
-    const bx = Math.cos(ancA[j]) * ancR[j];
-    const by = Math.sin(ancA[j]) * ancR[j];
-    const dx = bx - ax;
-    const dy = by - ay;
-    const den = Math.cos(t) * dy - Math.sin(t) * dx;
-    if (Math.abs(den) < 1e-9) return rFrame;
-    const r = (ax * dy - ay * dx) / den;
-    return r > 0 ? r : rFrame;
+    const t0 = ((ancA[i] - ancA[0]) % TAU + TAU) % TAU;
+    const t1 = i + 1 < AN ? ((ancA[j] - ancA[0]) % TAU + TAU) % TAU : TAU;
+    const f = t1 > t0 ? (t - t0) / (t1 - t0) : 0;
+    const sm = f * f * (3 - 2 * f);
+    /* il rapporto ancoraggio/muro interpolato: il telaio segue il muro con la
+       sua irregolarità, senza diventare un poligono */
+    const k0 = ancR[i] / Math.max(1, wallAt(ancA[i]));
+    const k1 = ancR[j] / Math.max(1, wallAt(ancA[j]));
+    return wallAt(a) * (k0 + (k1 - k0) * sm);
+  };
+
+  /** TELAIO SECONDARIO: il festone concavo fra due ancoraggi. È il bordo del
+   *  CORPO della tela — i raggi si attaccano qui, non al primario. */
+  const rimAt = (a: number): number => {
+    const prim = frameRadiusAt(a);
+    if (o.secFrame <= 0) return prim;
+    let i = AN - 1;
+    const t = ((a - ancA[0]) % TAU + TAU) % TAU;
+    for (let j = 0; j < AN; j += 1) {
+      const t0 = ((ancA[j] - ancA[0]) % TAU + TAU) % TAU;
+      const t1 = j + 1 < AN ? ((ancA[j + 1] - ancA[0]) % TAU + TAU) % TAU : TAU;
+      if (t >= t0 && t < t1) {
+        i = j;
+        break;
+      }
+    }
+    const j = (i + 1) % AN;
+    const a0 = ancA[i];
+    let a1 = ancA[j];
+    while (a1 <= a0) a1 += TAU;
+    let aa = a;
+    while (aa < a0) aa += TAU;
+    while (aa > a1) aa -= TAU;
+    const f = (a1 - a0) / 1 > 0 ? (aa - a0) / (a1 - a0) : 0;
+    /* la CORDA fra i due ancoraggi (che già scende sotto il muro), più il
+       cedimento verso il centro: campana, massima a metà, zero agli ancoraggi */
+    const half = (a1 - a0) / 2;
+    const chordR = Math.cos(half) / Math.max(1e-6, Math.cos(half - (aa - a0)));
+    const bell = Math.sin(f * Math.PI);
+    const sag = o.secFrame * 2 * Math.sin(half) * bell;
+    const r = prim * (chordR - sag);
+    return Math.min(prim, Math.max(prim * 0.55, r));
   };
 
   const rsAt = (a: number) => S.rStar(a) * A.starS;
@@ -545,9 +715,56 @@ export function drawWeb(
      misurato a 0.13% d'area con sacche larghe 3px, ed e' stato rimosso.
      Conseguenza accettata: a vantaggio schiacciante la rete puo' sparire del
      tutto, e va bene — vuol dire che hai coperto tutto. */
+  /* lo sfondamento si misura sul telaio PRIMARIO, che è il muro: è quello che
+     la stella deve bucare per uscire dall'arena. Il festone secondario è più
+     dentro, quindi i raggi muoiono prima — ma il muro cede solo qui. */
   const punchedAt = (a: number) => rsAt(a) >= frameRadiusAt(a) * (1 + o.punchOut);
 
   if (A.showStar) drawStar(ctx, S, rsAt, C, frameRadiusAt);
+
+  /* ── IL FILO-PONTE ──────────────────────────────────────────────────────
+     Una riga sola, tesa fra due ancoraggi ai lati del tiro, che si allunga e si
+     tende. Finche' non e' arrivata NON esiste nient'altro: e' il primo gesto di
+     ogni tela vera ed e' l'unico modo di non far nascere la minaccia come un
+     bozzolo al centro del board. */
+  if (o.bridge > 0 && bridgeP < 1) {
+    const iA = ancA.reduce(
+      (best, a, i) => (Math.abs(sweepAt(a) - 0.28) < Math.abs(sweepAt(ancA[best]) - 0.28) ? i : best),
+      0,
+    );
+    const iB = ancA.reduce(
+      (best, a, i) => (Math.abs(sweepAt(a) - 0.34) < Math.abs(sweepAt(ancA[best]) - 0.34) && i !== iA ? i : best),
+      0,
+    );
+    const pA = { x: cx + Math.cos(ancA[iA]) * ancR[iA] * k, y: cy + Math.sin(ancA[iA]) * ancR[iA] * k };
+    const pB = { x: cx + Math.cos(ancA[iB]) * ancR[iB] * k, y: cy + Math.sin(ancA[iB]) * ancR[iB] * k };
+    const e = easeOut3(bridgeP);
+    const SEG = 16;
+    const pts: { x: number; y: number }[] = [];
+    for (let q = 0; q <= SEG; q += 1) {
+      const u = (q / SEG) * e;
+      /* il filo cede mentre e' ancora lasso e si tende arrivando */
+      const droop = Math.sin((q / SEG) * Math.PI) * (1 - e) * 46 * k;
+      pts.push({ x: pA.x + (pB.x - pA.x) * u, y: pA.y + (pB.y - pA.y) * u + droop });
+    }
+    if (o.halo > 0) {
+      ctx.globalAlpha = o.halo * 1.6;
+      fillTapered(ctx, pts, 5.0, 4.0, C.frame);
+      ctx.globalAlpha = 1;
+    }
+    fillTapered(ctx, pts, 2.2, 1.4, C.frame);
+    ctx.beginPath();
+    ctx.arc(pA.x, pA.y, 2.6, 0, TAU);
+    ctx.fillStyle = C.frame;
+    ctx.fill();
+    if (e >= 1) {
+      ctx.beginPath();
+      ctx.arc(pB.x, pB.y, 2.6, 0, TAU);
+      ctx.fill();
+    }
+    if (!S.skipArena) drawDroplets(ctx, [], C);
+    return;
+  }
 
   /* ── ORDITO ─────────────────────────────────────────────────────────── */
   const ang: number[] = [];
@@ -557,12 +774,13 @@ export function drawWeb(
   ang.sort((x, y) => x - y);
 
   const rInner: number[] = [];
+  const weftInner: number[] = [];
   const rOuter: number[] = [];
   const dead: boolean[] = [];
 
   for (let i = 0; i < N; i += 1) {
     const a = ang[i];
-    const rOut = frameRadiusAt(a);
+    const rOut = rimAt(a);
     rOuter.push(rOut);
 
     /* La zona libera non puo' essere assoluta: nelle sacche del fallimento
@@ -571,13 +789,22 @@ export function drawWeb(
        all'anello, con un tetto sul valore nominale. */
     const gapAvail = Math.max(0, rOut - rsAt(a));
     const fz = Math.min(o.freeZone, gapAvail * 0.35);
-    const r0Adj = rsAt(a) + fz;
+    /* IL MOZZO: sotto il 12% del festone venti raggi convergono in un punto
+       matematico e la tela legge come un grafico a raggi. Nelle tele vere e' il
+       15-25% e i raggi non si toccano al centro. */
+    const hub = Math.max(fz, rOut * o.hubR);
+    /* la radice del filo: al mozzo (tela DAVANTI al fiore) o al contorno della
+       stella (tela che si ritira). Le trame partono comunque dalla stella. */
+    const r0Adj = o.overStar ? hub : rsAt(a) + fz;
     /* UNA SOLA CAUSA DI MORTE: lo sfondamento del telaio. Prima c'era anche
        `span <= 0.5`, e a parita' perfetta faceva svanire 3 raggi su 26 nel frame
        culminante — dove per specifica non deve accadere niente. Era un tell
        FALSO. Ora uno span piccolo ACCORCIA il filo, non lo cancella. */
     const span = Math.max(0, rOut - r0Adj);
     rInner.push(r0Adj);
+    /* limite interno delle TRAME: sempre il contorno della stella, anche quando
+       i raggi la attraversano */
+    weftInner.push(Math.max(rsAt(a) + fz, hub));
     const gone = punchedAt(a);
     dead.push(gone);
     if (span < 0.2) continue;
@@ -631,56 +858,133 @@ export function drawWeb(
       const jit = (rr() - 0.5) * o.wobble * Math.sin(t * Math.PI);
       pts.push(P(r, a, px * bow + jit, py * bow + jit));
     }
-    fillTapered(ctx, pts, 1.5, 0.9, C.silk);
+    /* CALIBRI: cavo di telaio 2.6, raggio 1.6, corda 1.2. Il rapporto c'era
+       gia', il valore assoluto no — sotto 1px lo schermo butta via meta' del
+       segnale, e la delicatezza la deve portare l'alone, non la sottigliezza. */
+    if (o.halo > 0) {
+      ctx.globalAlpha = o.halo;
+      fillTapered(ctx, pts, 4.2, 3.0, C.silk);
+      ctx.globalAlpha = 1;
+    }
+    /* sottofondo scuro: e' cio' che rende il filo leggibile sul petalo */
+    fillTapered(ctx, pts, 3.0, 2.2, C.shade);
+    ctx.globalAlpha = glintAt(a);
+    fillTapered(ctx, pts, 1.6, 1.0, C.silk);
+    ctx.globalAlpha = 1;
   }
 
-  /* ── TELAIO: un FASCIO liscio con i NODI ────────────────────────────────
-     Curva liscia (quadratiche per i punti medi) con raggio che varia poco e in
-     modo continuo, più due passate quasi parallele — un filo di telaio vero è
-     rinforzato, il ragno ci ripassa — e i nodi dove è attaccato. */
+  /* ── TELAIO ─────────────────────────────────────────────────────────────
+     IL BORDO NON E' UN CERCHIO, e non puo' esserlo: il tratto piu' esterno e
+     piu' contrastato e' quello che decide la forma percepita, e un tratto sul
+     muro (che e' quasi circolare, perche' e' fisico) legge come cerchio.
+
+     Una tela vera, guardata di fronte, NON ha un bordo circolare: ha pochi fili
+     di telaio tesi fra pochi ancoraggi, e ogni filo cede verso il centro. Il
+     tondo di una tela e' la spirale di cattura DENTRO, non il perimetro.
+
+     Quindi qui il fascio segue il FESTONE (`rimAt`), che passa per gli
+     ancoraggi e cede all'interno fra l'uno e l'altro. Il muro resta segnato dai
+     nodi degli ancoraggi e dai tiranti che ne escono — cioe' dai punti in cui
+     la tela lo tocca davvero — e non da un anello disegnato.
+
+     La concavita' e' la chiave: i tre bordi che ho sbagliato prima erano
+     poligoni CONVESSI e leggevano come faccette. Un filo teso fra due punti
+     DEVE cedere all'interno, quindi la concavita' non legge come geometria,
+     legge come tensione. */
   const fpt = ancA.map((a, i) => P(ancR[i], a));
-  const midOf = (u: { x: number; y: number }, v: { x: number; y: number }) => ({
-    x: (u.x + v.x) / 2,
-    y: (u.y + v.y) / 2,
-  });
-  for (let pass = 0; pass < 2; pass += 1) {
-    const jx = pass === 0 ? 0 : (rndFrm() - 0.5) * 2.2;
-    const jy = pass === 0 ? 0 : (rndFrm() - 0.5) * 2.2;
-    ctx.strokeStyle = C.frame;
-    ctx.lineWidth = pass === 0 ? 1.9 : 0.85;
-    ctx.globalAlpha = pass === 0 ? 1 : 0.5;
-    let started = false;
-    ctx.beginPath();
+  {
+    const SEG = 24;
     for (let i = 0; i < AN; i += 1) {
       const j = (i + 1) % AN;
-      const aMid = (ancA[i] + ancA[j] + (j === 0 ? TAU : 0)) / 2;
-      if (punchedAt(aMid)) {
-        started = false;
-        continue;
+      const a0 = ancA[i];
+      let a1 = ancA[j];
+      while (a1 <= a0) a1 += TAU;
+      const aMid = (a0 + a1) / 2;
+      if (punchedAt(aMid)) continue;
+      const pts: { x: number; y: number }[] = [];
+      for (let q = 0; q <= SEG; q += 1) {
+        const a = a0 + ((a1 - a0) * q) / SEG;
+        pts.push(P(rimAt(a), a));
       }
-      const mPrev = midOf(fpt[(i - 1 + AN) % AN], fpt[i]);
-      const mNext = midOf(fpt[i], fpt[j]);
-      if (!started) {
-        ctx.moveTo(mPrev.x + jx, mPrev.y + jy);
-        started = true;
+      if (o.halo > 0) {
+        ctx.globalAlpha = o.halo * 1.4;
+        fillTapered(ctx, pts, 5.4, 5.4, C.frame);
+        ctx.globalAlpha = 1;
       }
-      ctx.quadraticCurveTo(fpt[i].x + jx, fpt[i].y + jy, mNext.x + jx, mNext.y + jy);
+      /* due passate quasi parallele: un filo di telaio vero e' rinforzato */
+      fillTapered(ctx, pts, 4.2, 4.2, C.shade);
+      ctx.globalAlpha = glintAt(aMid);
+      fillTapered(ctx, pts, 2.6, 2.6, C.frame);
+      ctx.globalAlpha = glintAt(aMid) * 0.45;
+      const jx = (rndFrm() - 0.5) * 2.4;
+      const jy = (rndFrm() - 0.5) * 2.4;
+      fillTapered(
+        ctx,
+        pts.map((p) => ({ x: p.x + jx, y: p.y + jy })),
+        1.1,
+        1.1,
+        C.frame,
+      );
+      ctx.globalAlpha = 1;
     }
-    ctx.stroke();
-    ctx.globalAlpha = 1;
   }
   for (let i = 0; i < AN; i += 1) {
     if (punchedAt(ancA[i])) continue;
     ctx.beginPath();
-    ctx.arc(fpt[i].x, fpt[i].y, 1.8, 0, TAU);
+    ctx.arc(fpt[i].x, fpt[i].y, ancMaster[i] ? 2.6 : 1.7, 0, TAU);
     ctx.fillStyle = C.frame;
     ctx.fill();
   }
 
+  /* ── TIRANTI: la tela è APPESA a qualcosa ───────────────────────────────
+     Fili che escono dagli ancoraggi maestri e vanno al ramo. Senza, lo spazio
+     fra il muro e la cornice non appartiene a nessuno — a difficoltà 50 è il
+     72% dell'area dentro la ghiera — e la tela sembra piccola invece di
+     sospesa. Con questi, la cornice diventa il ramo a cui è legata. */
+  if (o.tether > 0 && S.rTether && S.rTether > rFrame) {
+    const T = Math.max(1, Math.round(o.tether));
+    for (let i = 0; i < AN; i += 1) {
+      if (!ancMaster[i]) continue;
+      if (punchedAt(ancA[i])) continue;
+      for (let t = 0; t < T; t += 1) {
+        /* i tiranti DIVERGONO: un ancoraggio vero è tenuto da più fili che
+           vanno in punti diversi, ed è la divergenza a far leggere "appeso" */
+        const spread = (t - (T - 1) / 2) * 0.16 + (rndFrm() - 0.5) * 0.05;
+        const SEG = 10;
+        const pts: { x: number; y: number }[] = [];
+        for (let q = 0; q <= SEG; q += 1) {
+          const u = q / SEG;
+          const r = ancR[i] + (S.rTether - ancR[i]) * u;
+          const a = ancA[i] + spread * u;
+          /* cedimento verso il basso in coordinate mondo, come per l'ordito */
+          const droop = Math.sin(u * Math.PI) * 0.05 * (S.rTether - ancR[i]);
+          const p = P(r, a);
+          pts.push({ x: p.x, y: p.y + droop * k });
+        }
+        if (o.halo > 0) {
+          ctx.globalAlpha = o.halo * 0.8;
+          fillTapered(ctx, pts, 3.0, 2.2, C.frame);
+          ctx.globalAlpha = 1;
+        }
+        ctx.globalAlpha = glintAt(ancA[i]) * 0.85;
+        fillTapered(ctx, pts, 1.5, 0.7, C.frame);
+        ctx.globalAlpha = 1;
+      }
+    }
+  }
+
   /* ── TRAME ──────────────────────────────────────────────────────────────
-     Corde fra raggi consecutivi, passo uniforme, cedenti verso il mozzo.
-     Esistono tutte dal primo frame: è il lancio che le porta fuori. */
-  const alive = rInner.map((r, i) => (dead[i] ? Infinity : r));
+     Corde fra raggi consecutivi. NON piu' a raggio uniforme: ogni corda si
+     posiziona sulla FRAZIONE u della campata del suo raggio, fra il mozzo (0) e
+     il festone (1). Cambia tutto per due motivi:
+       - a raggio uniforme le corde erano cerchi concentrici, e con le tacche
+         degli assi sopra il risultato leggeva come un grafico a radar;
+       - seguendo la campata, le corde sono parallele al festone in periferia e
+         parallele al mozzo al centro: e' cosi' che si dispone una spirale di
+         cattura vera, e il festone concavo si propaga a tutto il corpo.
+     Il gradino fra un raggio e il successivo e' cio' che fa scendere la corda.
+     Esistono tutte dal primo frame: e' il lancio che le porta fuori. */
+  const alive = weftInner.map((r, i) => (dead[i] ? Infinity : r));
   const minInner = Math.min(...alive);
   /* Niente early return: quando tutti i raggi sono morti usciva di qui e
      cancellava anche trame, mozzo e gocce — la rete SPARIVA in un frame. Ora
@@ -691,44 +995,82 @@ export function drawWeb(
   }
 
   const drops: { x: number; y: number }[] = [];
+  const knots: { x: number; y: number }[] = [];
   ctx.lineCap = 'round';
-  let r = Math.min(...rOuter) * 0.97;
-  const step = o.weftStep / N;
-  let guard = 0;
-  while (r > minInner && guard < N * 80) {
+  const span = rOuter.map((ro, i) => Math.max(0, ro - weftInner[i]));
+  const maxSpan = Math.max(...span, 1);
+  /* passo in frazione di campata, non in unita' engine */
+  const du = Math.max(0.012, o.weftStep / maxSpan);
+  const rAtU = (i: number, u: number) => weftInner[i] + span[i] * cl01(u);
+  const turns = Math.floor(1 / du);
+  for (let t = 0; t < turns; t += 1) {
     for (let i = 0; i < N; i += 1) {
       const j = (i + 1) % N;
-      const rNext = r - step;
-      guard += 1;
-      if (rNext <= minInner) {
-        r = rNext;
-        break;
-      }
-      r = rNext;
       if (dead[i] || dead[j]) continue;
-      if (r <= alive[i] || rNext <= alive[j]) continue;
+      /* il gradino: la corda scende di 1/N di passo passando da un raggio al
+         successivo, quindi il giro non si chiude su se stesso */
+      const u0 = 1 - t * du - (i / N) * du;
+      const u1 = u0 - du / N;
+      if (u1 <= 0.015) continue;
+      if (span[i] < 1 || span[j] < 1) continue;
 
-      const p0 = P(r, ang[i]);
-      const p1 = P(rNext, ang[j] + (j === 0 ? TAU : 0));
+      const p0 = P(rAtU(i, u0), ang[i]);
+      const p1 = P(rAtU(j, u1), ang[j] + (j === 0 ? TAU : 0));
       const mx = (p0.x + p1.x) / 2;
       const my = (p0.y + p1.y) / 2;
       const chord = Math.hypot(p1.x - p0.x, p1.y - p0.y);
-      const pull = o.sag * chord;
+      /* CEDIMENTO VARIABILE: era una frazione costante, quindi tutte le corde si
+         assomigliavano e il risultato leggeva come griglia. Ora dipende dalla
+         corda e da un seed per raggio: tensione disomogenea, come in una tela. */
+      const rr = rayRnd(i * 31 + t);
+      const pull = o.sag * chord * (0.7 + 0.6 * rr());
       const dx = cx + offX - mx;
       const dy = cy + offY - my;
       const dl = Math.hypot(dx, dy) || 1;
       const qx = mx + (dx / dl) * pull + (rndWft() - 0.5) * o.wobble;
       const qy = my + (dy / dl) * pull + (rndWft() - 0.5) * o.wobble;
 
+      /* ALONE: la seta diffonde la luce. Senza questa passata un filo e' un
+         tratto; con questa e' una fibra. E' la modifica col miglior rapporto
+         costo/effetto di tutto il pacchetto. */
+      if (o.halo > 0) {
+        ctx.beginPath();
+        ctx.moveTo(p0.x, p0.y);
+        ctx.quadraticCurveTo(qx, qy, p1.x, p1.y);
+        ctx.strokeStyle = C.silkDim;
+        ctx.globalAlpha = o.halo;
+        ctx.lineWidth = 3.4;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
       ctx.beginPath();
       ctx.moveTo(p0.x, p0.y);
       ctx.quadraticCurveTo(qx, qy, p1.x, p1.y);
       ctx.strokeStyle = C.silkDim;
-      ctx.lineWidth = 0.75;
+      ctx.globalAlpha = glintAt((ang[i] + ang[j]) / 2);
+      ctx.lineWidth = 1.2;   // sotto 1px lo schermo butta via meta' del segnale
       ctx.stroke();
+      ctx.globalAlpha = 1;
 
-      if (o.droplets && r > rFrame * 0.72 && rndWft() < 0.16) drops.push({ x: qx, y: qy });
+      /* NODI: due linee che si sovrappongono leggono come vettoriale. Un punto
+         dove la corda incontra il raggio dice ANNODATO invece di DISEGNATO. */
+      if (o.knots) knots.push(p0);
+      /* GOCCE VISCIDE: nella letteratura di rendering delle tele sono LA
+         tecnica. Le avevo spente per paura che leggessero come palline: la
+         risposta giusta non e' spegnerle, e' 1px contro una pallina da 9px con
+         alone, poche e solo nella fascia esterna. */
+      if (o.beads > 0 && u0 > 0.45 && rndWft() < o.beads) drops.push({ x: qx, y: qy });
     }
+  }
+  if (o.knots) {
+    ctx.fillStyle = C.silk;
+    ctx.globalAlpha = 0.75;
+    for (const p of knots) {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 0.85, 0, TAU);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
   }
 
   /* mozzo: poche corde corte attorno alla stella */
@@ -745,7 +1087,7 @@ export function drawWeb(
     ctx.stroke();
   }
 
-  drawDroplets(ctx, drops, C);
+  drawDroplets(ctx, o.droplets ? drops : [], C);
 }
 
 /* ── (b) ROVERETO ────────────────────────────────────────────────────────

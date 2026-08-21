@@ -120,6 +120,13 @@ export default function RagnatelaLab() {
       rFrame: rOf(p.difficulty),
       /* raggio PIENO della stella: la scala la applica drawWeb */
       rStar: (a) => rStarAt(a, tips, 1),
+      /* ancoraggi maestri sugli assi, come nella V7 dove sono gli obelischi */
+      anchorAngles: Array.from(
+        { length: AXES },
+        (_, i) => -Math.PI / 2 + (i * Math.PI * 2) / AXES,
+      ),
+      /* il ramo: la tela e' appesa al bordo del board */
+      rTether: R,
       seed,
       /* il righello: 1..99 sull'intero board, così punta-stella e muro-arena
          si leggono sullo stesso metro */
@@ -351,6 +358,40 @@ export default function RagnatelaLab() {
             <Slider label="Sporgenza punte" value={w.punchOut} min={0} max={0.4} step={0.01}
               fmt={(v) => `${Math.round(v * 100)}%`}
               onChange={(v) => setW({ ...w, punchOut: v })} />
+            <Slider label="Mozzo" value={w.hubR} min={0} max={0.3} step={0.01}
+              fmt={(v) => `${Math.round(v * 100)}%`}
+              onChange={(v) => setW({ ...w, hubR: v })} />
+            <Slider label="Filo-ponte" value={w.bridge} min={0} max={0.5} step={0.02}
+              fmt={(v) => (v === 0 ? 'no' : `${Math.round(v * 100)}%`)}
+              onChange={(v) => setW({ ...w, bridge: v })} />
+            {/* a 0 il bordo torna sul muro, cioe' torna un cerchio */}
+            <Slider label="Festone (no cerchio)" value={w.secFrame} min={0} max={0.35} step={0.01}
+              fmt={(v) => (v === 0 ? 'cerchio' : v.toFixed(2))}
+              onChange={(v) => setW({ ...w, secFrame: v })} />
+            <Slider label="Festoni per settore" value={w.perSector} min={0} max={3}
+              onChange={(v) => setW({ ...w, perSector: v })} />
+            <Slider label="Tiranti" value={w.tether} min={0} max={4}
+              fmt={(v) => (v === 0 ? 'no' : String(v))}
+              onChange={(v) => setW({ ...w, tether: v })} />
+            <Slider label="Lampo speculare" value={w.glint} min={0} max={0.9} step={0.05}
+              fmt={(v) => v.toFixed(2)} onChange={(v) => setW({ ...w, glint: v })} />
+            <Slider label="Alone" value={w.halo} min={0} max={0.3} step={0.01}
+              fmt={(v) => v.toFixed(2)} onChange={(v) => setW({ ...w, halo: v })} />
+            <Slider label="Gocce" value={w.beads} min={0} max={0.4} step={0.02}
+              fmt={(v) => (v === 0 ? 'no' : v.toFixed(2))}
+              onChange={(v) => setW({ ...w, beads: v })} />
+            <div className="flex gap-3 pt-0.5">
+              <label className="flex items-center gap-1.5 text-[11px] text-gray-300">
+                <input type="checkbox" checked={w.overStar}
+                  onChange={(e) => setW({ ...w, overStar: e.target.checked })} />
+                tela davanti al fiore
+              </label>
+              <label className="flex items-center gap-1.5 text-[11px] text-gray-300">
+                <input type="checkbox" checked={w.knots}
+                  onChange={(e) => setW({ ...w, knots: e.target.checked })} />
+                nodi
+              </label>
+            </div>
             <div className="flex gap-1.5">
               {(['gravity', 'swirl', 'none'] as const).map((m) => (
                 <button
