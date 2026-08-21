@@ -31,9 +31,9 @@ export const useStatSlider = ({ ticks, onSelectTick }: UseStatSliderParams) => {
 
   /**
    * Determines if a tick can be removed
-   * Requires at least 3 ticks to maintain functionality
+   * Requires at least 1 tick to maintain functionality
    */
-  const canRemoveTick = useMemo(() => ticks.length > 3, [ticks.length]);
+  const canRemoveTick = useMemo(() => ticks.length > 1, [ticks.length]);
 
   return {
     handleRangeChange,

@@ -1,4 +1,4 @@
-import { useRef, useCallback, type ChangeEvent, type FC, type MouseEvent } from 'react';
+import { useRef, useCallback, useEffect, type ChangeEvent, type FC, type MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { StatTick } from './types';
 import styles from './styles.module.css';
@@ -26,6 +26,7 @@ interface StatSliderTrackProps {
 export const StatSliderTrack: FC<StatSliderTrackProps> = ({ ticks, selectedTick, onChange }) => {
   const { t } = useTranslation('spell');
   const hitAreaRef = useRef<HTMLDivElement | null>(null);
+  const draggingRef = useRef(false);
 
   const computeIndexFromX = useCallback((clientX: number) => {
     const rect = hitAreaRef.current?.getBoundingClientRect();
@@ -38,6 +39,13 @@ export const StatSliderTrack: FC<StatSliderTrackProps> = ({ ticks, selectedTick,
     );
   }, [selectedTick, ticks.length]);
 
+  const commitIndex = useCallback((clientX: number) => {
+    const idx = computeIndexFromX(clientX);
+    if (idx !== selectedTick) {
+      onChange(idx);
+    }
+  }, [computeIndexFromX, onChange, selectedTick]);
+
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     onChange(Number(event.target.value));
   };
@@ -45,6 +53,29 @@ export const StatSliderTrack: FC<StatSliderTrackProps> = ({ ticks, selectedTick,
   const handleTrackClick = (event: MouseEvent<HTMLDivElement>) => {
     onChange(computeIndexFromX(event.clientX));
   };
+
+  const handleMouseDown = (event: MouseEvent<HTMLDivElement>) => {
+    draggingRef.current = true;
+    commitIndex(event.clientX);
+  };
+
+  const handleMouseMove = useCallback((event: MouseEvent) => {
+    if (!draggingRef.current) return;
+    commitIndex(event.clientX);
+  }, [commitIndex]);
+
+  const handleMouseUp = useCallback(() => {
+    draggingRef.current = false;
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [handleMouseMove, handleMouseUp]);
 
   return (
     <div className={styles.trackWrapper}>
@@ -62,6 +93,7 @@ export const StatSliderTrack: FC<StatSliderTrackProps> = ({ ticks, selectedTick,
         ref={hitAreaRef}
         className={styles.trackHitArea}
         onClick={handleTrackClick}
+        onMouseDown={handleMouseDown}
         aria-hidden="true"
       />
 
