@@ -65,6 +65,7 @@ export const EnhancedStatSlider: FC<EnhancedStatSliderProps> = ({
                     value={step.value}
                     placeholder="Val"
                     isSelected={selectedTick === idx}
+                    onSelect={() => onSelectTick(idx)}
                     onChange={(value) => onStepChange(idx, { ...step, value })}
                     leadingAction={
                       <button
@@ -104,6 +105,7 @@ export const EnhancedStatSlider: FC<EnhancedStatSliderProps> = ({
                     step={0.1}
                     placeholder="Wgt"
                     isSelected={selectedTick === idx}
+                    onSelect={() => onSelectTick(idx)}
                     onChange={(value) => onStepChange(idx, { ...step, weight: value })}
                     trailingAction={
                       canRemoveTick && (

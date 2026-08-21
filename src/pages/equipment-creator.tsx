@@ -1,3 +1,3 @@
-import { EquipmentCreatorNew } from '../ui/equipment/EquipmentCreatorNew';
+import { EquipmentCreatorTestPage } from '../ui/equipment/EquipmentCreatorTestPage';
 
-export default EquipmentCreatorNew;
+export default EquipmentCreatorTestPage;

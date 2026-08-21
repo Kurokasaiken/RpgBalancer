@@ -7,7 +7,7 @@
 
 import { createHeadlessDiagnostics } from '@/shared/telemetry/headlessDiagnostics';
 import { saveData, loadData } from '@/shared/persistence/PersistenceService';
-import type { CombatResult, TrainingResult } from '@/ui/punchClub/hooks/usePunchClubGame';
+// COMMENTED: import type { CombatResult, TrainingResult } from '@/ui/punchClub/hooks/usePunchClubGame';
 
 const sessionDiagnostics = createHeadlessDiagnostics('SessionTagging');
 

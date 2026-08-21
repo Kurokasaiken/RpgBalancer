@@ -13,6 +13,7 @@ interface StatSliderTickProps {
   placeholder: string;
   isSelected: boolean;
   onChange: (value: number) => void;
+  onSelect?: () => void;
   step?: number;
   leadingAction?: ReactNode;
   trailingAction?: ReactNode;
@@ -50,6 +51,7 @@ export const StatSliderTick: FC<StatSliderTickProps> = ({
   placeholder,
   isSelected,
   onChange,
+  onSelect,
   step = 1,
   leadingAction,
   trailingAction
@@ -58,7 +60,7 @@ export const StatSliderTick: FC<StatSliderTickProps> = ({
   const { input, selected } = variantClasses[variant];
 
   return (
-    <div className={styles.tick}>
+    <div className={styles.tick} onClick={onSelect} style={onSelect ? { cursor: 'pointer' } : undefined}>
       {leadingAction && <div className={styles.leadingAction}>{leadingAction}</div>}
 
       <input

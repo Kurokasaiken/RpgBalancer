@@ -260,6 +260,95 @@ const scene={
   stars:Array.from({length:42},()=>({x:Math.random()*W,y:Math.random()*W,
     r:.4+Math.random()*1.2,ph:Math.random()*TAU,sp:.4+Math.random()*1.1})),
 };
+/* ═══════════════════════════════════════════════════════════════════════════
+   CAMPO DI CONTENIMENTO — desiderata v13, direzione A.
+
+   Il muro dell'arena non e' piu' segnato dalla tela: la tela e' grande come il
+   board e appesa alla ghiera. Quindi serve un oggetto che dica DOVE la pallina
+   rimbalza, e il Director lo vuole (a) magico e di un'altra famiglia, (b) fatto
+   di LINEE e non di un cerchio, (c) circa dove stava il goo.
+
+   LE BARRE SONO TANGENTI, NON CORDE. Un poligono circoscritto tocca la curva in
+   un punto per lato e sta fuori altrove: la pallina non puo' attraversare una
+   barra e la bacia dove la barra e' tangente. Con le corde succede l'opposto —
+   la pallina passa oltre il disegno. Non e' estetica, e' la differenza fra
+   funzionare e non funzionare.
+
+   E LA TANGENTE VA PRESA SULLA CURVA, NON SU UN CERCHIO. Prima ipotesi
+   sbagliata e misurata: barre perpendicolari al bisettore del proprio arco
+   sbagliano fino a 27-85px quando le cinque difficolta' sono diverse, perche'
+   rCheckAt attraversa ogni settore variando in modo monotono. Con la tangente
+   vera (dr/dtheta incluso) e lo spostamento minimo verso l'esterno:
+
+     barre |  tutte 50 |  misto 65/55/70/40/85 | estremo 10/90/15/85/20
+        16 |    9.0px  |         13.9px        |        19.4px
+        24 |    ~4px   |         ~6px          |         ~9px
+
+   dove l'errore e' quanto la pallina si ferma PRIMA di toccare la barra nel
+   punto peggiore. Con 24 barre l'alone (8-10px) lo assorbe.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const FIELD_BARS=24;
+const FIELD_GAP=0.74;            // frazione della corda disegnata: il resto e' vuoto
+const fieldBars=[];              // {nx,ny,c,half,tx,ty,flash}
+function buildField(){
+  fieldBars.length=0;
+  const N=FIELD_BARS, h=1e-3;
+  const P=(t)=>{const r=rCheckAt(t); return [Math.cos(t)*r, Math.sin(t)*r];};
+  for(let b=0;b<N;b+=1){
+    const a0=-Math.PI/2+b*TAU/N, a1=a0+TAU/N, m=(a0+a1)/2;
+    const [x0,y0]=P(m), [xa,ya]=P(m-h), [xb,yb]=P(m+h);
+    let tx=xb-xa, ty=yb-ya; const L=Math.hypot(tx,ty)||1; tx/=L; ty/=L;
+    let nx=-ty, ny=tx;
+    if(nx*x0+ny*y0<0){ nx=-nx; ny=-ny; }        // normale verso l'esterno
+    const c0=nx*x0+ny*y0;
+    let push=0;
+    for(let i=0;i<=32;i+=1){ const t=a0+(a1-a0)*i/32; const [x,y]=P(t);
+      push=Math.max(push,(nx*x+ny*y)-c0); }     // fuori quanto basta: mai attraversata
+    const c=c0+push;
+    fieldBars.push({nx,ny,c,tx,ty,half:Math.tan((a1-a0)/2)*c*FIELD_GAP,flash:0});
+  }
+}
+/* la barra piu' vicina a un angolo: serve per farla lampeggiare all'impatto */
+function flashFieldAt(ang){
+  const x=Math.cos(ang), y=Math.sin(ang);
+  let best=-1, bestD=-Infinity;
+  for(let i=0;i<fieldBars.length;i+=1){
+    const d=fieldBars[i].nx*x+fieldBars[i].ny*y;
+    if(d>bestD){ bestD=d; best=i; }
+  }
+  if(best>=0) fieldBars[best].flash=1;
+}
+function drawField(now){
+  const rev=scene.gooReveal;
+  if(rev<=0.001||!fieldBars.length) return;
+  ctx.save();
+  ctx.lineCap='round';
+  for(let i=0;i<fieldBars.length;i+=1){
+    const B=fieldBars[i];
+    /* il campo ARRIVA a ondata, un settore per volta */
+    const t=clamp((rev-i/fieldBars.length*0.35)/0.65,0,1);
+    if(t<=0.001) continue;
+    const cx=CX+B.nx*B.c, cy=CY+B.ny*B.c;
+    const hl=B.half*easeOutCubic(t);
+    const x0=cx-B.tx*hl, y0=cy-B.ty*hl, x1=cx+B.tx*hl, y1=cy+B.ty*hl;
+    /* respiro lento e sfasato: un campo magico non e' una decalcomania */
+    const br=0.78+0.22*Math.sin(now/900+i*0.7);
+    const f=B.flash;
+    const line=(w,a,col)=>{
+      ctx.lineWidth=w; ctx.globalAlpha=a*t;
+      ctx.strokeStyle=col; ctx.shadowColor=col; ctx.shadowBlur=w*2.2;
+      ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y1); ctx.stroke();
+    };
+    /* alone largo: e' lui che assorbe l'errore di tangenza residuo */
+    line(11+9*f, (0.10+0.30*f)*br, 'rgba(150,120,255,1)');
+    line(4.5+2*f, (0.30+0.45*f)*br, 'rgba(190,170,255,1)');
+    line(1.6+1.2*f, (0.85+0.15*f)*br, f>0.02?'rgba(240,236,255,1)':'rgba(214,206,255,1)');
+    B.flash=Math.max(0,B.flash-0.035);
+  }
+  ctx.shadowBlur=0;
+  ctx.restore();
+}
+
 function buildPillars(){
   /* per axis: white obelisk at the stat radius, black obelisk at the check
      radius — both on the SAME spoke so the star reaches white and the goo
@@ -312,6 +401,7 @@ function launchRoll(){
   /* recompute geometry, build obelisks, reset all scene state */
   recomputeGeometry();
   buildPillars();
+  buildField();
   scene.starScale=0; scene.pourP=0; scene.streamAlpha=0; scene.webP=0;
   scene.webSeed=(Math.random()*1e9)|0;   // una tela diversa a ogni tiro
   scene.gooReveal=0; scene.ringReveal=0;
