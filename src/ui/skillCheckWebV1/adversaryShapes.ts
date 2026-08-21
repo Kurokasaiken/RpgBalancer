@@ -63,6 +63,18 @@ export interface ShapeCtx {
    * dell'area dentro la ghiera. Assente = nessun filo verso l'esterno.
    */
   rTether?: number;
+  /**
+   * IL MURO FISICO, distinto dal telaio della tela.
+   *
+   * Da quando la tela e' grande come il board, il suo telaio non e' piu' il muro:
+   * il muro e' dove la pallina rimbalza e sta molto piu' dentro. Il confine viene
+   * disegnato con le TRAME VERE della tela che passano da quelle parti, in
+   * evidenza — non con un oggetto separato, che rischierebbe di diventare un
+   * secondo goo.
+   */
+  rWallAt?: (theta: number) => number;
+  /** lampo 0..1 del confine a un dato angolo: la regola si manifesta all'impatto */
+  flashAt?: (theta: number) => number;
   /** l'host disegna già campo e righello: qui non ridisegnarli */
   skipArena?: boolean;
   /** palette dell'host: la tela porta il carattere, non il colore */
@@ -83,7 +95,7 @@ export interface ShapeCtx {
 
 export type Ink = Record<
   | 'bg' | 'field' | 'silk' | 'silkDim' | 'frame' | 'wood' | 'woodDark' | 'leaf'
-  | 'star' | 'starEdge' | 'tick' | 'tickMajor' | 'shade',
+  | 'star' | 'starEdge' | 'tick' | 'tickMajor' | 'shade' | 'ward' | 'wardGlow',
   string
 >;
 
@@ -107,6 +119,10 @@ const INK: Ink = {
      passata scura più larga sotto il filo chiaro. Su fondo scuro è scuro su
      scuro e non si vede; sul crema è lei a reggere la lettura. */
   shade: 'rgba(4,8,14,0.9)',
+  /* IL CONFINE. Altra famiglia di materiale: la seta e' fredda e diffusa, il
+     confine e' glifo saturo. Deve dirsi "magico" e "regola", non "tela". */
+  ward: 'rgba(238,232,255,1)',
+  wardGlow: 'rgba(150,118,255,1)',
 };
 
 /* ── utilità ─────────────────────────────────────────────────────────── */
@@ -384,6 +400,30 @@ export interface WebOpts {
   beads: number;
   /** nodi agli incroci: due linee che si sovrappongono leggono come vettoriale */
   knots: boolean;
+  /**
+   * IL BORDO SPESSO E' IL FALLIMENTO CRITICO — non e' estetica (Director).
+   *
+   * Il confine e' un giro di trame vere appese al muro. Ogni trama CEDE verso il
+   * mozzo, quindi fra la corda e il muro resta una lunetta, e l'insieme delle
+   * lunette e' la fascia di fallimento critico: se la pallina si ferma li',
+   * critico.
+   *
+   * La proprieta' che rende la cosa onesta e non decorativa: l'area della fascia
+   * dipende SOLO dalla struttura della tela (numero di raggi x cedimento) e non
+   * dalla difficolta'. Misurato identico a difficolta' 20, 50 e 80:
+   *
+   *     raggi 14 → 9.22%   raggi 18 → 6.35%
+   *     raggi 22 → 5.23%   raggi 26 → 3.93%     (cedimento 0.17)
+   *
+   * Qui il giro viene poi scalato per bisezione fino a far valere alla fascia
+   * ESATTAMENTE `critBand`%. Cosi' la FORMA resta casuale — segue il jitter dei
+   * raggi, quindi la fascia e' spessa dove i raggi sono larghi e sottile dove
+   * sono vicini, e cambia a ogni tiro — mentre il NUMERO e' imposto.
+   * Forma libera, area esatta.
+   *
+   * 0 = nessun confine in evidenza.
+   */
+  critBand: number;
   droplets: boolean;
 }
 
@@ -416,6 +456,7 @@ export const WEB_DEFAULTS: WebOpts = {
   halo: 0.1,
   beads: 0.14,
   knots: true,
+  critBand: 5,
   freeZone: 16,
   punchOut: 0.07,
   droplets: true,
@@ -1088,6 +1129,148 @@ export function drawWeb(
   }
 
   drawDroplets(ctx, o.droplets ? drops : [], C);
+
+  /* ── IL CONFINE: TRAME VERE IN EVIDENZA ────────────────────────────────
+     Prima si disegna la tela intera, poi si ripassa in evidenza la parte che fa
+     da muro: un oggetto, due letture. Le barre viola separate sono state
+     smontate — un highlight su fili che esistono gia' non puo' diventare un
+     secondo goo, perche' non ha materia propria.
+
+     PERCHE' UNA TRAMA FA DA MURO PER COSTRUZIONE: una trama cede verso il mozzo,
+     quindi il suo punto piu' interno e' a meta'. Fra la corda e il muro resta una
+     LUNETTA, e l'insieme delle lunette e' la fascia di fallimento critico.
+
+     L'area della fascia dipende solo da (raggi x cedimento), non dalla
+     difficolta' — verificato identico a 20, 50 e 80. Qui il giro viene scalato
+     per bisezione finche' la fascia vale esattamente `critBand`%: la forma resta
+     casuale e cambia a ogni tiro, il numero e' imposto. */
+  if (o.critBand > 0 && S.rWallAt) {
+    const wl = S.rWallAt;
+    /* area dell'arena (integrale polare) */
+    let aArena = 0;
+    const M = 720;
+    for (let i = 0; i < M; i += 1) aArena += 0.5 * wl(-Math.PI / 2 + (i / M) * TAU) ** 2 * (TAU / M);
+    /* il giro di corde al fattore di scala sc, campionato */
+    const ringAt = (sc: number) => {
+      const out: { x: number; y: number }[] = [];
+      for (let i = 0; i < N; i += 1) {
+        const a0 = ang[i];
+        const a1 = i + 1 < N ? ang[i + 1] : ang[0] + TAU;
+        const r0 = wl(a0) * sc;
+        const r1 = wl(a1) * sc;
+        const x0 = Math.cos(a0) * r0;
+        const y0 = Math.sin(a0) * r0;
+        const x1 = Math.cos(a1) * r1;
+        const y1 = Math.sin(a1) * r1;
+        const mx = (x0 + x1) / 2;
+        const my = (y0 + y1) / 2;
+        const chord = Math.hypot(x1 - x0, y1 - y0);
+        const dl = Math.hypot(mx, my) || 1;
+        const pull = o.sag * chord;
+        const qx = mx - (mx / dl) * pull;
+        const qy = my - (my / dl) * pull;
+        for (let q = 0; q < 10; q += 1) {
+          const t = q / 10;
+          const u = 1 - t;
+          out.push({
+            x: u * u * x0 + 2 * u * t * qx + t * t * x1,
+            y: u * u * y0 + 2 * u * t * qy + t * t * y1,
+          });
+        }
+      }
+      return out;
+    };
+    const polyArea = (p: { x: number; y: number }[]) => {
+      let A = 0;
+      for (let i = 0; i < p.length; i += 1) {
+        const q = p[(i + 1) % p.length];
+        A += p[i].x * q.y - q.x * p[i].y;
+      }
+      return Math.abs(A) / 2;
+    };
+    const target = aArena * (1 - o.critBand / 100);
+    let lo = 0.55;
+    let hi = 1.25;
+    for (let it = 0; it < 22; it += 1) {
+      const m = (lo + hi) / 2;
+      if (polyArea(ringAt(m)) > target) hi = m;
+      else lo = m;
+    }
+    const sc = (lo + hi) / 2;
+
+    /* disegno: per ogni settore la corda in evidenza, piu' il NODO agli estremi.
+       "Non solo i nodi" (Director): la linea porta il confine, il nodo lo ancora. */
+    for (let i = 0; i < N; i += 1) {
+      const a0 = ang[i];
+      const a1 = i + 1 < N ? ang[i + 1] : ang[0] + TAU;
+      const r0 = wl(a0) * sc;
+      const r1 = wl(a1) * sc;
+      const p0 = P(r0, a0);
+      const p1 = P(r1, a1);
+      const mx = (p0.x + p1.x) / 2;
+      const my = (p0.y + p1.y) / 2;
+      const chord = Math.hypot(p1.x - p0.x, p1.y - p0.y);
+      const dx = cx + offX - mx;
+      const dy = cy + offY - my;
+      const dl = Math.hypot(dx, dy) || 1;
+      const pull = o.sag * chord;
+      const qx = mx + (dx / dl) * pull;
+      const qy = my + (dy / dl) * pull;
+      const fl = S.flashAt ? cl01(S.flashAt((a0 + a1) / 2)) : 0;
+      const br = 0.82 + 0.18 * Math.sin((a0 + a1) * 3.1);
+
+      /* LA LUNETTA RIEMPITA: e' QUESTO lo "spessore" del bordo, e vale il 5%.
+         Il bordo non e' una linea con un alone decorativo: e' una FASCIA, il suo
+         bordo interno e' una trama vera, il suo bordo esterno e' il muro fisico
+         (quindi la pallina rimbalza sul disegno, non contro il nulla), e la sua
+         area e' il fallimento critico. Spessa dove i raggi sono larghi, sottile
+         dove sono vicini: la casualita' della tela si vede nello spessore. */
+      ctx.beginPath();
+      ctx.moveTo(p0.x, p0.y);
+      ctx.quadraticCurveTo(qx, qy, p1.x, p1.y);
+      {
+        const STEP = 10;
+        for (let q = STEP; q >= 0; q -= 1) {
+          const aw = a0 + ((a1 - a0) * q) / STEP;
+          const pw = P(wl(aw), aw);
+          ctx.lineTo(pw.x, pw.y);
+        }
+      }
+      ctx.closePath();
+      ctx.fillStyle = C.wardGlow;
+      ctx.globalAlpha = (0.13 + 0.22 * fl) * br;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      const pass = (w: number, alpha: number, col: string) => {
+        ctx.beginPath();
+        ctx.moveTo(p0.x, p0.y);
+        ctx.quadraticCurveTo(qx, qy, p1.x, p1.y);
+        ctx.lineWidth = w;
+        ctx.globalAlpha = alpha;
+        ctx.strokeStyle = col;
+        ctx.shadowColor = col;
+        ctx.shadowBlur = w * 2.1;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+        ctx.shadowBlur = 0;
+      };
+      pass(12 + 10 * fl, (0.13 + 0.3 * fl) * br, C.wardGlow);
+      pass(5.2, 0.5, C.shade);            // stacca dal petalo crema
+      pass(3.4 + 1.6 * fl, (0.5 + 0.4 * fl) * br, C.wardGlow);
+      pass(1.7 + 1.1 * fl, 0.92 + 0.08 * fl, C.ward);
+      /* i nodi: dove il confine e' annodato al proprio raggio */
+      for (const p of [p0, p1]) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 2.4 + 1.6 * fl, 0, TAU);
+        ctx.fillStyle = C.ward;
+        ctx.shadowColor = C.wardGlow;
+        ctx.shadowBlur = 8 + 8 * fl;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+  }
+
 }
 
 /* ── (b) ROVERETO ────────────────────────────────────────────────────────

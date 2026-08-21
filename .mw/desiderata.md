@@ -459,6 +459,53 @@ valori hardcoded.** Vivono in config modules validati Zod e consumati read-only 
 - `statPoints` — lo strato a punti (-20..+25 circa).
 - `statScale` — il tasso di cambio punti -> valore di gioco (HP x4, TxC x1, ...).
 
+### Emendamento rev.2 — 2026-08-21 (Director, stessa sessione)
+
+Quattro decisioni che cambiano la direzione A come registrata sopra:
+
+1. **Il confine non e' un oggetto separato: e' la TELA IN EVIDENZA.** Prima si disegna la
+   ragnatela intera, poi si ripassa il giro di trame che passa dal muro. Le 24 barre viola
+   tangenti sono smontate — un oggetto separato che segna un'area rischiava di diventare il
+   secondo goo, che e' l'errore individuato dal Director sul goo stesso.
+2. **Il confine deve avere la casualita' della tela**, e puo' cambiare forma a ogni tiro:
+   «puo' cambiare, anzi e' meglio». Quindi nessun blocco del jitter degli angoli dei raggi.
+3. **Le proporzioni non devono essere precise al 100%:** «noi sappiamo in anticipo dove si deve
+   fermare la pallina». L'esito e' scelto a monte, quindi la geometria e' un'illustrazione
+   accurata a qualche punto percentuale, non un calcolo vincolante.
+4. **IL BORDO SPESSO E' IL FALLIMENTO CRITICO — «non e' solo estetica».** Questo **revoca** il
+   divieto della v11 («nessun tetto geometrico, anello o sacca dedicati al fallimento
+   critico»): il Director assegna esplicitamente al bordo il mestiere di portare il 5%.
+   Nota di provenienza: il divieto della v11 nasceva da una misura sulle SACCHE nelle valli
+   (0.13% d'area, larghe 3px) — un anello invece regge il numero, ed e' questo che rende
+   praticabile la decisione nuova.
+5. **«Non solo i nodi»:** la linea porta il confine, il nodo lo ancora. Entrambi.
+
+**Meccanismo (AI inference, misurato):** una trama e' una corda fra due raggi consecutivi che
+cede verso il mozzo, quindi fra la corda e il muro resta una LUNETTA. L'insieme delle lunette
+e' la fascia di fallimento critico, con bordo interno = un filo vero della tela e bordo esterno
+= il muro fisico (quindi la pallina rimbalza sul disegno, non contro il nulla).
+L'area della fascia dipende **solo** da (raggi x cedimento) e **non** dalla difficolta' —
+verificato identico a difficolta' 20, 50 e 80:
+
+```
+cedimento 0.17:  14 raggi -> 9.22%   18 -> 6.35%   22 -> 5.23%   26 -> 3.93%
+spread fra 6 seed a 22 raggi: 4.73-5.26%
+```
+
+Quindi 22 raggi e il giro scalato per bisezione fino all'area esatta: **forma casuale, area
+imposta**. Lo spessore e' irregolare per costruzione — spesso dove i raggi sono larghi, sottile
+dove sono vicini — ed e' li' che si vede la casualita' della tela.
+
+**Bug trovato e corretto di conseguenza:** `inEpic` usava una fascia di spessore FISSO
+(`epicW = (R-3)*crit% = 17.9px`), che valeva il 31.9% dell'area a difficolta' 20, il 17.8% a 50,
+il 12.4% a 80 e il 10.4% a 99 — invece del 5%, e variabile con la difficolta' mentre il
+fallimento critico e' una costante di sistema. Ora la soglia e' proporzionale
+(`muro * sqrt(1-crit/100)`), quindi l'area e' esattamente crit% a ogni difficolta'.
+
+**Cosa resta disallineato, dichiarato:** la fascia DISEGNATA e' festonata, quella del VERDETTO
+e' uniforme. Le due hanno la stessa area (5%) ma non la stessa forma. Unificarle vuol dire far
+leggere al resolver il giro di trame del tiro corrente.
+
 ### Still unresolved
 
 - Di quanto salgono le stat alla promozione; se la promozione e' certa o probabilistica; se e'
