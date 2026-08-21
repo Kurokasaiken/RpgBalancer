@@ -481,3 +481,92 @@ valori hardcoded.** Vivono in config modules validati Zod e consumati read-only 
 - Nessun secondo sistema di pesi parallelo a HP_eq.
 - Nessuna implementazione prima che il planner abbia prodotto un piano: v12 e' una desiderata,
   non un mandato di esecuzione.
+
+## v13 — Skill Check Web V1: contenimento e avversario sono due oggetti distinti
+
+**Status:** `FROZEN`
+**Date:** 2026-08-21
+**Authorized by:** Fausto
+**Reason:** "Aggiorna, scelgo A" — avallo esplicito sull'aggiornamento e scelta della
+direzione A fra le tre presentate in sessione esplorativa.
+
+**Relazione con v11:** v13 **sostituisce** i punti 3 e 6 di v11 e ne conserva tutto il resto.
+v11 diceva che la tela *e'* il muro dell'arena e che la stella la strappa crescendo; v13 dice
+che il muro e' un oggetto separato e che la tela resta intera. Gli invarianti numerici di v11
+(punte a `rOf(stat)`, parita' = 50%, `VALLEY_F = 0.3675`) restano validi e non sono toccati —
+e' proprio la separazione a garantirlo.
+
+### User-stated (dato dal Director, non dedotto)
+
+1. **Il contenimento e l'avversario sono due cose diverse.** La pallina deve rimbalzare
+   *circa* dove stava il goo, ma quell'area si puo' rappresentare come si vuole.
+2. **Quell'area deve mostrarsi DIVERSA** — magica, di un altro colore.
+3. **Non un cerchio: LINEE** che stanno circa da quelle parti. La pallina puo' muoversi
+   ovunque ma non superarle.
+4. **La ragnatela va disegnata tutta, bella e intera.** Non si spacca.
+5. **Ordine dei beat:** prima appare il fiore, poi le si butta addosso la tela.
+6. **Il goo non esiste piu'.** Una cosa sola puo' essere l'avversario.
+7. **La ghiera di bronzo resta un cerchio** al bordo del board.
+8. **Direzione scelta: A — campo di contenimento a barre tangenti.** Scartate: B (confine che
+   si rivela solo all'impatto) e C (confine come cambio di medium).
+
+### AI inference (derivato, marcato come tale)
+
+- **Le barre devono essere TANGENTI al muro, non corde.** Un poligono circoscritto tocca la
+  curva in un punto per lato e sta fuori altrove: la pallina non puo' attraversare una barra,
+  e la bacia dove la barra e' tangente. Con le corde succede l'opposto: la pallina passa oltre.
+  Questa non e' una scelta estetica, e' la differenza fra funzionare e non funzionare.
+- **La tangenza va calcolata sulla CURVA del muro, non su un cerchio.** Prima ipotesi mia,
+  sbagliata: barre perpendicolari al bisettore del proprio arco. Misurata: errore massimo fino
+  a 27-85px con difficolta' disomogenee, perche' `rCheckAt` varia in modo monotono attraverso
+  ogni settore e una retta tangente a un cerchio non la segue. Tangente alla curva vera
+  (includendo dr/dtheta) e poi spostata in fuori del minimo necessario:
+
+  ```
+  barre |  tutte 50 |  tutte 20 | misto 65/55/70/40/85 | estremo 10/90/15/85/20
+     12 |   15.8px  |    8.5px  |        23.2px        |        33.9px
+     16 |    9.0px  |    4.8px  |        13.9px        |        19.4px
+     20 |    5.4px  |    2.9px  |         8.9px        |        12.4px
+     26 |    3.6px  |    1.9px  |         5.5px        |         7.6px
+  ```
+  `errore` = quanto la pallina si ferma PRIMA di toccare la barra, nel punto peggiore.
+  **20-26 barre tengono l'errore sotto la decina di pixel su tutto lo spazio delle
+  difficolta'**, e con la pallina di raggio 9 e un alone di 8-10px sulla barra il residuo e'
+  assorbito dall'alone.
+- **Il muro fisico resta `rCheckAt` invariato**, quindi nessuna probabilita' si muove: la
+  separazione fra contenimento e disegno costa **zero** sul bilanciamento. Per confronto,
+  portare il muro sul festone della tela costerebbe la parita' da 50.00% a 54.32% e una
+  ricalibrazione di `VALLEY_F` da 0.3675 a 0.2955 (misurato).
+- **Gerarchia di valore:** fiore (premio) sopra tutto, tela (minaccia) al 70%, barre (regola)
+  distinte per famiglia di materiale — la seta e' fredda e diffusa, la barra e' glifo compatto
+  e saturo. Le barre vanno **sotto** la tela.
+- **La barra reagisce solo quando viene invocata:** al bacio della pallina lampeggia. La regola
+  si manifesta all'impatto, non prima.
+- **La tela non racconta piu' le probabilita'.** Prima copriva la sola regione di fallimento,
+  quindi la sua estensione *era* il rischio. Ora copre tutto e non si rompe: il numero lo
+  dicono la stella e l'arena, e lo risolve la pallina.
+
+### Cosa questo NON autorizza
+
+- Nessuna ricalibrazione di `VALLEY_F` ne' spostamento del muro fisico: `rCheckAt` non si
+  tocca.
+- Nessuna regione geometrica per il fallimento critico — il divieto di v11 resta in vigore, e
+  le barre non sono un'eccezione: non devono fare niente di speciale al crit-fail finche' il
+  Director non lo chiede.
+- Nessun ritorno del goo sotto altro nome: niente campiture d'area che leggano come sostanza.
+- Nessuna barra come CORDA del muro (la pallina la attraverserebbe).
+
+### Still unresolved
+
+- **Estensione della tela**, ora che non e' piu' portante: grande come il board e appesa alla
+  ghiera coi tiranti, oppure poco piu' grande del fiore per coprirlo sempre. Decisione di
+  regia, aperta.
+- **Se le barre debbano portare la misura** (piu' fitte o piu' accese = difficolta' piu' alta)
+  o se la misura resti al righello sul board.
+- **Se la tela debba riavere un mestiere informativo** senza rompersi — l'ipotesi sul tavolo e'
+  la densita' proporzionale alla difficolta'.
+- **Il movimento non e' mai stato giudicato:** il pane del browser congela
+  `requestAnimationFrame`, quindi lancio, arrivo della tela e rimbalzi li approva solo il
+  Director.
+
+---
