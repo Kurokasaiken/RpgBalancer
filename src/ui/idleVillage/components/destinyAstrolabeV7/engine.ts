@@ -21,6 +21,8 @@ import {
 } from '@/ui/skillCheckWebV1/zones';
 import { resolveCheck as scResolveCheck, bandsFromAreas as scBands,
          shownSuccessPct as scShownPct, isSuccess as scIsSuccess } from '@/ui/skillCheckWebV1/resolution';
+import { buildFracture as scBuildFracture, ribbonPolygon as scRibbon,
+         openAt as scOpenAt } from '@/ui/skillCheckWebV1/fracture';
 
 export interface AstrolabeSkill { name: string; stat: number; difficulty: number; }
 export interface AstrolabeConfig { crit?: number; critWin?: number; almostPct?: number; wound?: number; dead?: number; mode?: string;
@@ -320,6 +322,7 @@ const scene={
   snapFrom:null,
   chain:null,                           // esito+atterraggio+traiettoria, deciso al lancio
   glass:{p:0,breakT:-1,from:null,fromRim:false,fall:0},
+  quake:null,                           // {fracture, t} — la messa in scena del 2o dado
   impact:null,                          // {x,y,t,warm} — pulsazione d'impatto puntuale
   teasePos:null,                        // punto della banda di fallimento da sfiorare
   shocks:[], sparks:[],
@@ -461,9 +464,10 @@ function launchRoll(){
   /* recompute geometry, build obelisks, reset all scene state */
   recomputeGeometry();
   buildPillars();
-  scene.starScale=0; scene.pourP=0; scene.streamAlpha=0; scene.webP=0;
+  scene.starScale=STAR_SEED_SCALE; scene.pourP=0; scene.streamAlpha=0; scene.webP=0;
   scene.rigP=0; scene.threatP=0; scene.wardP=0; scene.impact=null; scene.chain=null;
   scene.glass={p:0,breakT:-1,from:null,fromRim:false,fall:0};
+  scene.quake=null;
   scene.webSeed=(Math.random()*1e9)|0;   // una tela diversa a ogni tiro
   scene.ringReveal=0;
   scene.ball={x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false};
@@ -504,6 +508,10 @@ function throwBall(){
 const RING_MS=140;   // V6: la ghiera non esiste più, resta solo un beat tecnico
 const HERO_MS=780;   // obelischi bianchi + righello
 const STAR_MS=620;   // il fiore sboccia
+/* il seme: da qui il fiore cresce. Dichiarato con gli altri tempi e non
+   accanto al disegno, o `reset()` lo userebbe prima della sua inizializzazione
+   (TDZ) — errore gia' fatto una volta su questo file. */
+const STAR_SEED_SCALE=0.13;
 const WARD_MS=700;   // il confine si accende
 
 /* advance choreography (called every frame) */
@@ -527,6 +535,8 @@ function tickTimeline(){
      ultima si accende la regola. Il goo non c'e' in nessuno dei cinque passi —
      era lui a partire per primo, e non deve esistere.                        */
   else if(s==='hero-rise'){
+    /* il seme respira mentre gli obelischi scendono: e' vivo, non un simbolo */
+    scene.starScale=STAR_SEED_SCALE*(1+0.06*Math.sin(scene.nowMs/420));
     /* 1 — GLI OBELISCHI BIANCHI: la stat, cioe' chi e' il PG. Con loro entra il
        righello, che e' il metro condiviso su cui piu' tardi si leggera' anche
        la difficolta'. */
@@ -544,9 +554,10 @@ function tickTimeline(){
     if(p>=1){ scene.rigP=1; setState('star-bloom'); }
   }
   else if(s==='star-bloom'){
-    /* 2 — IL FIORE: il premio, ancorato alle punte bianche appena posate. */
+    /* 2 — IL FIORE CRESCE dal seme fino alla sua dimensione vera. Non compare:
+       era gia' li' piccolo, e si apre. */
     const p=phaseT(STAR_MS);
-    scene.starScale=easeOutBack(p);
+    scene.starScale=STAR_SEED_SCALE+(1-STAR_SEED_SCALE)*easeOutBack(p);
     if(p>=1){ scene.starScale=1; setState('web-cast'); }
   }
   else if(s==='web-cast'){
@@ -625,6 +636,7 @@ function tickTimeline(){
   /* decay one-shot fx */
   /* rottura e caduta avanzano nel tempo, non a fotogrammi fissi */
   if(scene.glass.breakT>=0) scene.glass.breakT+=16.7;
+  if(scene.quake) scene.quake.t+=16.7;
   scene.gooRipple=Math.max(0,scene.gooRipple-0.02);
   scene.blackPillars.concat(scene.whitePillars).forEach(pl=>pl.flash=Math.max(0,pl.flash-0.03));
 }
@@ -919,6 +931,18 @@ function resolve(){
     scene.glass.from={x:b.x,y:b.y};
   }
   scene.glass.fall=(verdict==='bigwin'||verdict==='win')?0:1;   // 1 = cadra' nel vuoto
+  /* ── IL SECONDO DADO IN SCENA (T-007b) ────────────────────────────────────
+     Dopo la rottura, non prima: il primo dado si risolve con la caduta, il
+     secondo con il terremoto. Se arrivassero insieme il giocatore leggerebbe
+     una cosa sola. */
+  if(CH&&(dead||wounded)){
+    scene.quake={
+      fracture:scBuildFracture(CH.snap, dead?'death':'wound', CH.landing,
+        (CH.rolled.roll*7919+CH.rolled.riskRoll)|0,
+        {inZone:!CH.relaxed, relaxed:CH.relaxed}),
+      t:-QUAKE_DELAY_MS,
+    };
+  }
   shake('shake-resolve');
   $id('launch').classList.add('pulse');
   /* panel result removed */
@@ -1767,6 +1791,8 @@ function drawImpact(dt){
    flat digital plane e sta nella kill list. Riflessi speculari, sfaccettature,
    bordo che rifrange. */
 const GLASS_BREAK_MS=520;
+const QUAKE_DELAY_MS=260;      // il terremoto entra DOPO la caduta, non con lei
+const QUAKE_MS=1500;           // durata dell'apertura (e della richiusura, per la ferita)
 const GLASS_FALL_MS=700;
 function glassPath(){
   const P=new Path2D();
@@ -1788,28 +1814,75 @@ function drawGlass(now){
   const path=glassPath();
   ctx.save();
   ctx.clip(path);
-  /* 1. lastra: un velo freddissimo, non un colore. Sparisce mentre si rompe. */
+  /* GHIACCIO, non vetro liscio (Director: «non si capisce bene dove è, magari
+     fallo più effetto ghiaccio»). Il vetro trasparente non ha superficie da
+     guardare: l'occhio non ha niente su cui appoggiarsi e il confine torna a
+     essere solo una linea. Il ghiaccio invece ha una TESSITURA — brina che
+     cresce dal bordo, sfaccettature, microfratture — e una tessitura si legge
+     come area anche a bassa opacità. */
   const veil=1-bp*0.85;
+  /* 1. lastra: velo freddo, più corposo di prima (era 0.055: invisibile) */
   const g=ctx.createLinearGradient(CX-260,CY-260,CX+260,CY+260);
-  g.addColorStop(0,`rgba(150,222,214,${(0.055*G.p*veil).toFixed(3)})`);
-  g.addColorStop(0.45,`rgba(255,255,255,${(0.020*G.p*veil).toFixed(3)})`);
-  g.addColorStop(1,`rgba(120,196,200,${(0.045*G.p*veil).toFixed(3)})`);
+  g.addColorStop(0,`rgba(176,232,228,${(0.20*G.p*veil).toFixed(3)})`);
+  g.addColorStop(0.42,`rgba(240,255,254,${(0.10*G.p*veil).toFixed(3)})`);
+  g.addColorStop(1,`rgba(128,198,206,${(0.19*G.p*veil).toFixed(3)})`);
   ctx.fillStyle=g; ctx.fill(path);
-  /* 2. riflessi speculari: due strisce oblique, e' cio' che dice "vetro" */
-  ctx.globalAlpha=0.5*G.p*veil;
-  for(const [off,w,al] of [[-120,74,0.10],[96,38,0.07]]){
+  /* 2. BRINA: cresce dal bordo verso l'interno, aghi corti quasi radiali. È il
+     dettaglio che dice "ghiaccio" e insieme MARCA IL PERIMETRO — la brina è più
+     densa dove il freddo entra, cioè esattamente sul confine. */
+  const frostRnd=mulberry32Local(0x1ce);
+  ctx.lineCap='round';
+  for(let i=0;i<360;i+=1){
+    const a=frostRnd()*TAU;
+    const w=rCheckAt(a);
+    /* distribuzione schiacciata sul bordo: u^6 concentra sull'esterno */
+    const u=Math.pow(frostRnd(),0.14);
+    const r=w*(0.30+0.70*u);
+    const len=(3+frostRnd()*13)*(0.35+0.65*u);
+    const tilt=(frostRnd()-0.5)*1.1;
+    const x0=CX+Math.cos(a)*r, y0=CY+Math.sin(a)*r;
+    const x1=x0-Math.cos(a+tilt)*len, y1=y0-Math.sin(a+tilt)*len;
+    ctx.globalAlpha=(0.10+0.34*u)*G.p*veil;
+    ctx.lineWidth=0.8+frostRnd()*1.2;
+    ctx.strokeStyle='rgba(236,254,255,1)';
+    ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y1); ctx.stroke();
+  }
+  /* 3. sfaccettature: poche placche poligonali appena più chiare. Il ghiaccio
+     non è omogeneo, e sono loro a dare lo SPESSORE alla lastra. */
+  for(let i=0;i<7;i+=1){
+    const a=frostRnd()*TAU, w=rCheckAt(a), r=w*(0.15+frostRnd()*0.7);
+    const cx0=CX+Math.cos(a)*r, cy0=CY+Math.sin(a)*r;
+    const n=4+Math.floor(frostRnd()*3), rad=18+frostRnd()*54;
+    ctx.beginPath();
+    for(let k=0;k<n;k+=1){
+      const aa=(k/n)*TAU+frostRnd()*0.5, rr=rad*(0.55+frostRnd()*0.45);
+      const px=cx0+Math.cos(aa)*rr, py=cy0+Math.sin(aa)*rr;
+      if(k===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    }
+    ctx.closePath();
+    ctx.globalAlpha=0.055*G.p*veil;
+    ctx.fillStyle='rgba(255,255,255,1)'; ctx.fill();
+    ctx.globalAlpha=0.11*G.p*veil;
+    ctx.lineWidth=0.8; ctx.strokeStyle='rgba(214,248,252,1)'; ctx.stroke();
+  }
+  /* 4. riflessi speculari obliqui: la luce che scorre sulla lastra */
+  ctx.globalAlpha=0.55*G.p*veil;
+  for(const [off,w,al] of [[-120,74,0.13],[96,38,0.09]]){
     const s2=ctx.createLinearGradient(CX+off-w,CY-320,CX+off+w,CY+320);
     s2.addColorStop(0,'rgba(255,255,255,0)');
-    s2.addColorStop(0.5,`rgba(238,252,250,${al})`);
+    s2.addColorStop(0.5,`rgba(242,255,254,${al})`);
     s2.addColorStop(1,'rgba(255,255,255,0)');
     ctx.fillStyle=s2; ctx.fill(path);
   }
   ctx.globalAlpha=1;
   ctx.restore();
-  /* 3. bordo che rifrange: il vetro ha uno SPESSORE, e si vede sul taglio */
+  /* 5. il TAGLIO della lastra: tre linee, non una. È lo spessore del ghiaccio
+     visto di taglio, ed è ciò che chiude la lettura "qui finisce il pavimento". */
   ctx.globalAlpha=G.p*veil;
-  ctx.lineWidth=2.2; ctx.strokeStyle='rgba(196,240,236,0.42)'; ctx.stroke(path);
-  ctx.lineWidth=0.9; ctx.strokeStyle='rgba(255,232,170,0.30)'; ctx.stroke(path);
+  ctx.lineWidth=6.0; ctx.strokeStyle='rgba(120,208,206,0.22)'; ctx.stroke(path);
+  ctx.lineWidth=2.6; ctx.strokeStyle='rgba(196,244,244,0.50)'; ctx.stroke(path);
+  ctx.lineWidth=1.2; ctx.strokeStyle='rgba(240,255,254,0.85)'; ctx.stroke(path);
+  ctx.lineWidth=0.6; ctx.strokeStyle='rgba(255,232,168,0.42)'; ctx.stroke(path);
   ctx.globalAlpha=1;
 
   /* 4. LE CREPE. Nascono dove la pallina si e' fermata — o dal BORDO, quando
@@ -1857,6 +1930,40 @@ function mulberry32Local(seed){
     t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   I DUE TERREMOTI — la messa in scena del secondo dado.
+   LA FERITA SI CHIUDE, LA MORTE RESTA APERTA: non due effetti diversi con lo
+   stesso significato, ma lo stesso gesto con due finali opposti. */
+function drawQuake(){
+  const Q=scene.quake;
+  if(!Q||Q.t<0) return;
+  const F=Q.fracture;
+  if(!F||F.tier==='none') return;
+  const open=scOpenAt(F.tier,Q.t,QUAKE_MS);
+  if(open<=0.001) return;
+  const isDeath=F.kind==='death';
+  ctx.save();
+  ctx.clip(glassPath());
+  for(const br of F.branches){
+    const poly=scRibbon(br,open);
+    if(poly.length<3) continue;
+    ctx.beginPath();
+    ctx.moveTo(CX+poly[0].x,CY+poly[0].y);
+    for(let i=1;i<poly.length;i+=1) ctx.lineTo(CX+poly[i].x,CY+poly[i].y);
+    ctx.closePath();
+    /* l'apertura non e' un colore: e' ASSENZA. Nero quasi puro, e il bordo
+       caldo perche' la crosta appena spaccata e' ancora incandescente. */
+    ctx.fillStyle=isDeath?'rgba(2,3,10,0.96)':'rgba(4,6,14,0.9)';
+    ctx.fill();
+    ctx.lineWidth=isDeath?2.2:1.4;
+    ctx.strokeStyle=isDeath?'rgba(120,60,220,0.55)':'rgba(255,164,96,0.6)';
+    ctx.shadowColor=isDeath?'rgba(90,40,200,0.8)':'rgba(255,140,70,0.8)';
+    ctx.shadowBlur=isDeath?16:10;
+    ctx.stroke();
+    ctx.shadowBlur=0;
+  }
+  ctx.restore();
+}
 function drawBall(now){
   const b=scene.ball;
   if(!b.on && scene.state!=='resolution') return;
@@ -1932,22 +2039,17 @@ function drawBall(now){
 }
 
 /* blueprint preview in idle — zones update live as sliders move */
-function drawBlueprint(now){
-  if(scene.state!=='idle') return;
-  /* the void before creation: only a single breathing ember-seed at the core */
-  const t=now/1000;
-  const pul=0.5+0.5*Math.sin(t*1.6);
-  ctx.save();
-  const sg=ctx.createRadialGradient(CX,CY,0,CX,CY,18+10*pul);
-  sg.addColorStop(0,`rgba(255,236,170,${0.5+0.3*pul})`);
-  sg.addColorStop(0.5,`rgba(201,162,39,${0.12+0.1*pul})`);
-  sg.addColorStop(1,'transparent');
-  ctx.fillStyle=sg;
-  ctx.beginPath(); ctx.arc(CX,CY,18+10*pul,0,TAU); ctx.fill();
-  ctx.fillStyle=`rgba(255,248,225,${0.7+0.3*pul})`;
-  ctx.beginPath(); ctx.arc(CX,CY,1.6+0.6*pul,0,TAU); ctx.fill();
-  ctx.restore();
-}
+/* IL SIMBOLO PRE-FIORE NON ESISTE PIU'.
+   C'era un "ember-seed": un alone dorato con un puntino al centro, che non era
+   ne' il fiore ne' niente — un segnaposto. Il Director: «brutto, non possiamo
+   usare un fiore piccolino che cresce fino a dove deve essere?».
+   Risposta: si', ed e' meglio anche per un'altra ragione. Il fiore in miniatura
+   non rivela niente, perche' l'informazione che porta e' la sua DIMENSIONE
+   FINALE: a scala 0.13 non dice la stat. Quindi non c'e' nessun motivo per
+   sostituirlo con un simbolo, e un simbolo in piu' e' un elemento in piu' da
+   far leggere. Ora `STAR_SEED_SCALE` e' il minimo da cui il fiore cresce, e la
+   fioritura e' una crescita continua invece di una comparsa. */
+function drawBlueprint(){ /* niente: il fiore piccolo lo disegna drawStar */ }
 
 /* =========================================================================
    MAIN LOOP
@@ -1966,7 +2068,7 @@ function frame(now){
   ctx.clearRect(0,0,W,W);
   drawBackdrop(now);
   drawAxisRig(now);
-  drawBlueprint(now);
+  drawBlueprint();
   drawStar(now);
   /* LA TELA DAVANTI AL FIORE: disegnata DOPO la stella. Da sola l'inversione
      non basterebbe — i raggi partivano dal contorno della stella, quindi non
@@ -1978,6 +2080,7 @@ function frame(now){
      la superficie piu' alta. E la tela vista ATTRAVERSO il vetro e' la lettura
      giusta — la trappola sta sotto, e quando il vetro si rompe ci si cade. */
   drawGlass(now);
+  drawQuake();
   /* V6: drawValleyRisks() disattivato — ferita e morte tornano con una
      grammatica propria, fuori dall'area del goo. */
   scene.whitePillars.forEach(p=>drawPillar(p,true));  // draw first (behind)

@@ -357,8 +357,23 @@ export function teasePoint(s: Snapshot, landing: Point, want: RegionId): Point |
   /* si esita DENTRO, a un soffio dal bordo: il margine è metà del raggio della
      pallina, così il disco non sborda visivamente dalla regione giusta */
   const inward = lo + Math.sign(best.dIn - hi || 1) * 4.5;
-  return isWant(inward) ? at(inward) : at(lo);
+  const p = isWant(inward) ? at(inward) : at(lo);
+
+  /* TETTO ALLA DISTANZA — il difetto che il Director ha visto: «la risoluzione
+     finale cambia troppo velocemente e si allontana, si vede che stiamo
+     cheattando».
+     Causa: per un atterraggio in mezzo a una regione grande (win può valere il
+     90% dell'arena) il confine più vicino sta anche a 100px, e lo scatto finale
+     trascinava la pallina per 100px in 260ms. Nessuna fisica fa quel movimento:
+     legge come una mano che la sposta.
+     Quindi: si esita solo su un confine RAGGIUNGIBILE con un rotolamento
+     credibile. Più lontano di così, meglio nessuna esitazione che una bugia. */
+  const dist = Math.hypot(p.x - landing.x, p.y - landing.y);
+  return dist <= TEASE_MAX_PX ? p : null;
 }
+
+/** oltre questa distanza dall'atterraggio l'esitazione diventa un teletrasporto */
+export const TEASE_MAX_PX = 38;
 
 /**
  * Traiettoria SINTETIZZATA in QUATTRO FASI, non simulata.
@@ -378,6 +393,9 @@ export function teasePoint(s: Snapshot, landing: Point, want: RegionId): Point |
  * T-005 non può CORREGGERE il punto: lo farebbe diventare una seconda
  * risoluzione dell'esito. Il punto arriva già valido da `pickLanding`.
  */
+export const TEASE_FROM = 0.66;
+export const TEASE_TO = 0.88;
+
 export function synthesizeTrajectory(
   s: Snapshot,
   landing: Point,
@@ -396,6 +414,9 @@ export function synthesizeTrajectory(
   let sp = 30 + rng() * 8;
   let x = 0;
   let y = 0;
+  /* il punto da cui parte l'assestamento: fissato al primo frame della fase, o
+     l'interpolazione inseguirebbe un bersaglio che si muove */
+  let settleFrom: Point | null = null;
 
   for (let i = 0; i < steps; i += 1) {
     const t = i / (steps - 1);
@@ -405,6 +426,22 @@ export function synthesizeTrajectory(
     sp *= fric;
     x += Math.cos(ang) * sp;
     y += Math.sin(ang) * sp;
+
+    /* LA CONCA. Dalla decelerazione in poi il board si comporta come una
+       superficie che pende verso il punto: un'attrazione debole e crescente.
+       Serve perché senza di lei la fisica si fermava DOVE CAPITAVA e
+       l'assestamento finale doveva trascinare la pallina per l'intera arena —
+       misurato fino a 27px per frame, ed è esattamente il «si vede che stiamo
+       cheattando» del Director. Con la conca, all'inizio dell'assestamento la
+       pallina è già a una decina di pixel: il rotolamento finale è vero.
+       Non è la fisica a garantire l'arrivo — quello lo garantisce la
+       costruzione — è la fisica a renderlo credibile. */
+    if (t > 0.34) {
+      const target = tease ?? landing;
+      const mag = 0.012 + 0.075 * ((t - 0.34) / 0.66);
+      x += (target.x - x) * mag;
+      y += (target.y - y) * mag;
+    }
 
     /* rimbalzo NON speculare: nessun percorso a specchio, e il muro è quello
        vero — la pallina rimbalza sulla stessa funzione che il board disegna */
@@ -422,23 +459,31 @@ export function synthesizeTrajectory(
       sp *= 0.9;
     }
 
-    /* ESITAZIONE: fra 0.72 e 0.90 la posizione converge sul punto di confine e
-       ci resta, con un tremolio minimo. Non è un rallentamento generico: è la
-       pallina che sta *su* una decisione. */
-    if (tease && t > 0.72 && t <= 0.9) {
-      const k = (t - 0.72) / 0.18;
+    /* ESITAZIONE: la pallina converge sul confine e ci RESTA, con un tremolio
+       che si spegne. Non è un rallentamento generico: è la pallina che sta *su*
+       una decisione. */
+    if (tease && t > TEASE_FROM && t <= TEASE_TO) {
+      const k = (t - TEASE_FROM) / (TEASE_TO - TEASE_FROM);
       const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
-      const jx = (rng() - 0.5) * 1.6 * (1 - e);
-      const jy = (rng() - 0.5) * 1.6 * (1 - e);
+      const jx = (rng() - 0.5) * 1.4 * (1 - e * 0.85);
+      const jy = (rng() - 0.5) * 1.4 * (1 - e * 0.85);
       x = x * (1 - e) + (tease.x + jx) * e;
       y = y * (1 - e) + (tease.y + jy) * e;
+      /* la velocità va spenta o il tratto successivo eredita uno scatto */
+      sp *= 0.82;
     }
-    /* SCATTO: l'ultimo 10% cade dentro la regione vera */
-    if (t > 0.9) {
-      const k = (t - 0.9) / 0.1;
-      const e = 1 - Math.pow(1 - k, 3);
-      x = x * (1 - e) + landing.x * e;
-      y = y * (1 - e) + landing.y * e;
+    /* ASSESTAMENTO: dall'esitazione (o da dove si è fermata) all'atterraggio, in
+       linea retta e in DECELERAZIONE, senza fisica addosso. È un rotolamento in
+       una conca, non uno spostamento: dura il 12% della durata su una distanza
+       di al più TEASE_MAX_PX, cioè una velocità plausibile.
+       Prima erano 100px in 260ms con la fisica ancora attiva: si vedeva. */
+    if (t > TEASE_TO) {
+      const k = (t - TEASE_TO) / (1 - TEASE_TO);
+      const e = 1 - Math.pow(1 - k, 2.2);
+      const from = settleFrom ?? (settleFrom = { x, y });
+      x = from.x + (landing.x - from.x) * e;
+      y = from.y + (landing.y - from.y) * e;
+      sp = 0;
     }
     pts.push({ x, y });
   }
