@@ -101,7 +101,8 @@ export interface ShapeCtx {
 
 export type Ink = Record<
   | 'bg' | 'field' | 'silk' | 'silkDim' | 'frame' | 'wood' | 'woodDark' | 'leaf'
-  | 'star' | 'starEdge' | 'tick' | 'tickMajor' | 'shade' | 'ward' | 'wardGlow',
+  | 'star' | 'starEdge' | 'tick' | 'tickMajor' | 'shade' | 'ward' | 'wardGlow'
+  | 'wardCool' | 'wardWarm',
   string
 >;
 
@@ -125,10 +126,20 @@ const INK: Ink = {
      passata scura più larga sotto il filo chiaro. Su fondo scuro è scuro su
      scuro e non si vede; sul crema è lei a reggere la lettura. */
   shade: 'rgba(4,8,14,0.9)',
-  /* IL CONFINE. Altra famiglia di materiale: la seta e' fredda e diffusa, il
-     confine e' glifo saturo. Deve dirsi "magico" e "regola", non "tela". */
-  ward: 'rgba(238,232,255,1)',
-  wardGlow: 'rgba(150,118,255,1)',
+  /* IL CONFINE — SETA IRIDESCENTE, non neon.
+     Il viola di prima (rgba(150,118,255)) era neon puro e leggeva cyberpunk
+     perche' lo era: la bibbia DNA Prismatic Wanderlust non contiene viola ne'
+     magenta. Prescrive ombre Deep & Cool Teal, luce "Solar Triumph" bianca
+     accecante con lens flare PRISMATICI, e fra i materiali canonici c'e' la
+     SETA IRIDESCENTE — che e' esattamente di cosa e' fatto questo confine.
+     Quindi: nucleo bianco caldo, frangia prismatica (una passata fredda e una
+     calda leggermente sfalsate: e' il modo in cui un film sottile separa i
+     colori), ombra teal. Il "diverso" lo porta l'iridescenza, che non compare
+     da nessun'altra parte sul board — non un colore inventato. */
+  ward: 'rgba(252,250,244,1)',
+  wardGlow: 'rgba(120,214,198,1)',
+  wardCool: 'rgba(96,206,214,1)',
+  wardWarm: 'rgba(255,214,140,1)',
 };
 
 /* ── utilità ─────────────────────────────────────────────────────────── */
@@ -1249,7 +1260,7 @@ export function drawWeb(
       }
       ctx.closePath();
       ctx.fillStyle = C.wardGlow;
-      ctx.globalAlpha = (0.13 + 0.22 * fl) * br;
+      ctx.globalAlpha = (0.10 + 0.20 * fl) * br;
       ctx.fill();
       ctx.globalAlpha = 1;
       const pass = (w: number, alpha: number, col: string) => {
@@ -1265,16 +1276,40 @@ export function drawWeb(
         ctx.globalAlpha = 1;
         ctx.shadowBlur = 0;
       };
-      pass(12 + 10 * fl, (0.13 + 0.3 * fl) * br, C.wardGlow);
+      /* alone teal: e' l'OMBRA della seta, non un neon */
+      pass(12 + 10 * fl, (0.11 + 0.26 * fl) * br, C.wardGlow);
       pass(5.2, 0.5, C.shade);            // stacca dal petalo crema
-      pass(3.4 + 1.6 * fl, (0.5 + 0.4 * fl) * br, C.wardGlow);
-      pass(1.7 + 1.1 * fl, 0.92 + 0.08 * fl, C.ward);
+      /* FRANGIA PRISMATICA: due passate sfalsate di mezzo pixel in direzioni
+         opposte, una fredda e una calda. È così che un film sottile separa i
+         colori, ed è ciò che fa leggere "seta iridescente" invece di "linea
+         colorata". Lo sfalsamento è perpendicolare alla corda. */
+      {
+        const dx = p1.x - p0.x;
+        const dy = p1.y - p0.y;
+        const L = Math.hypot(dx, dy) || 1;
+        const nx = (-dy / L) * 0.9;
+        const ny = (dx / L) * 0.9;
+        const shift = (ox: number, oy: number, w: number, alpha: number, col: string) => {
+          ctx.beginPath();
+          ctx.moveTo(p0.x + ox, p0.y + oy);
+          ctx.quadraticCurveTo(qx + ox, qy + oy, p1.x + ox, p1.y + oy);
+          ctx.lineWidth = w;
+          ctx.globalAlpha = alpha;
+          ctx.strokeStyle = col;
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+        };
+        shift(nx, ny, 2.2 + fl, (0.55 + 0.3 * fl) * br, C.wardCool);
+        shift(-nx, -ny, 2.2 + fl, (0.45 + 0.3 * fl) * br, C.wardWarm);
+      }
+      /* nucleo: luce Solar Triumph, bianca e calda */
+      pass(1.7 + 1.1 * fl, 0.94 + 0.06 * fl, C.ward);
       /* i nodi: dove il confine e' annodato al proprio raggio */
       for (const p of [p0, p1]) {
         ctx.beginPath();
         ctx.arc(p.x, p.y, 2.4 + 1.6 * fl, 0, TAU);
         ctx.fillStyle = C.ward;
-        ctx.shadowColor = C.wardGlow;
+        ctx.shadowColor = C.wardCool;
         ctx.shadowBlur = 8 + 8 * fl;
         ctx.fill();
         ctx.shadowBlur = 0;

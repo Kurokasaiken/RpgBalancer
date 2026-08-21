@@ -5,9 +5,25 @@
 // @ts-nocheck
 
 import { drawWeb, WEB_DEFAULTS } from '@/ui/skillCheckWebV1/adversaryShapes';
+/* PLAN-008: la geometria e la risoluzione vivono in skillCheckWebV1, non qui.
+   Le formule dell'engine e quelle del modulo sono state verificate IDENTICHE al
+   bit (scarto 0.0e+0 su rOf, stella e muro) prima di delegare — vedi
+   scripts/verify-geom-parity.ts. Una sola implementazione, o le due copie
+   divergono e il disegno smette di corrispondere al verdetto. */
+import {
+  buildSnapshot as scBuildSnapshot,
+  regionAt as scRegionAt,
+  zoneAt as scZoneAt,
+  rStarAt as scRStarAt,
+  rWallAt as scRWallAt,
+  rOf as scROf,
+  type Snapshot as ScSnapshot,
+} from '@/ui/skillCheckWebV1/zones';
+import { resolveCheck as scResolveCheck, bandsFromAreas as scBands,
+         shownSuccessPct as scShownPct, isSuccess as scIsSuccess } from '@/ui/skillCheckWebV1/resolution';
 
 export interface AstrolabeSkill { name: string; stat: number; difficulty: number; }
-export interface AstrolabeConfig { crit?: number; critWin?: number; wound?: number; dead?: number; mode?: string;
+export interface AstrolabeConfig { crit?: number; critWin?: number; almostPct?: number; wound?: number; dead?: number; mode?: string;
   tSlam?: number; tBurst?: number; tPour?: number; tSpin?: number; tSnap?: number; }
 export interface AstrolabeResult { verdict: string; roll: number; riskRoll: number;
   skillIndex: number; skillName: string; wounded: boolean; dead: boolean; }
@@ -41,7 +57,7 @@ export function createDestinyAstrolabeV7Engine(root: HTMLElement, opts: Astrolab
    CONFIG — bound to the tweak panel
    ========================================================================= */
 /* config + skills injected by the React host */
-const cfg=Object.assign({stat:60,req:55,crit:5,critWin:5,wound:10,dead:5,tSlam:900,tBurst:1100,tPour:220,tSpin:2600,tSnap:650,mode:'random'}, opts.config||{});
+const cfg=Object.assign({stat:60,req:55,crit:5,critWin:5,almostPct:5,wound:10,dead:5,tSlam:900,tBurst:1100,tPour:220,tSpin:2600,tSnap:650,mode:'random'}, opts.config||{});
 let skills=(opts.skills&&opts.skills.length)?opts.skills.slice():[{name:'Skill',stat:60,difficulty:50}];
 let skillAxes=[];
 function recomputeSkillAxes(){
@@ -89,9 +105,29 @@ function getSkillIndexFromAngle(x,y){
 }
 
 /* map a 0..100 value to a radius from core outward (white=stat, black=check) */
-function rOf(v){ return geo.rCore + clamp(v,1,99)/100*(R-22-geo.rCore); }
+/* ── LO SNAPSHOT: il ponte verso la catena esito-prima (PLAN-008) ───────────
+   Un solo oggetto porta stat, difficolta' e config al modulo puro. Memoizzato
+   sulla chiave della geometria; `recomputeGeometry` lo invalida. */
+let snapCache=null;
+/* invalidazione ESPLICITA e non per chiave: `rStarAt`/`rCheckAt` sono chiamate
+   migliaia di volte per frame dal disegno, e comporre una stringa-chiave a ogni
+   chiamata sarebbe una regressione di performance mascherata da cache. */
+function invalidateSnap(){ snapCache=null; }
+function snap(){
+  if(snapCache) return snapCache;
+  const pick=(i)=>skills[geo.axisSkill[i]]||skills[0]||{stat:60,difficulty:50};
+  snapCache=scBuildSnapshot(
+    {stats:Array.from({length:AXES},(_,i)=>pick(i).stat),
+     diffs:Array.from({length:AXES},(_,i)=>pick(i).difficulty)},
+    {crit:cfg.crit, critWin:cfg.critWin, almost:cfg.almostPct,
+     death:cfg.dead, wound:cfg.wound});
+  return snapCache;
+}
+
+function rOf(v){ return scROf(v); }   // delegata: una sola implementazione
 
 function recomputeGeometry(skillIndex=0){
+  invalidateSnap();   // la geometria cambia: lo snapshot va ricostruito
   geo.rCore=Math.max(30,R*0.12);
   /* assign each of the 5 axes to a skill, per the punte distribution */
   geo.axisSkill=[];
@@ -192,7 +228,10 @@ function radialFromAxes(theta,arr,scale){
   }
 }
 /* star radius (success boundary) — per-axis flower, reaches the white obelisk (stat) */
-function rStarAt(theta,scale=1){ return radialFromAxes(theta,geo.starTip,scale); }
+function rStarAt(theta,scale=1){
+  /* delegata al modulo: `snap()` porta gli stessi axisTip/axisCheck */
+  return scRStarAt(snap(),theta)*scale;
+}
 /* GOO EDGE = failure boundary = the ball's physical wall. A SMOOTH blob that
    touches each black obelisk (the check) and interpolates smoothly between
    adjacent ones (no deep star valleys), so the goo's area is bounded exactly by
@@ -209,12 +248,9 @@ function gooBlob(theta){
   return 1 + 0.035*Math.sin(theta*3+0.7) + 0.022*Math.sin(theta*5-1.3) + 0.014*Math.sin(theta*7+2.1);
 }
 function rCheckAt(theta,scale=1){
-  const t=((normAng(theta+Math.PI/2)%TAU)+TAU)%TAU;   // 0 at axis 0
-  const seg=TAU/AXES;                                 // 72° between adjacent obelisks
-  const k=Math.floor(t/seg), f=(t-k*seg)/seg;
-  const r0=geo.axisCheck[k%AXES], r1=geo.axisCheck[(k+1)%AXES];
-  const s=f*f*(3-2*f);                                // smoothstep between neighbours
-  return Math.max(geo.rCore+30, (r0+(r1-r0)*s)*gooBlob(theta))*scale;  // blobby, floored
+  /* delegata al modulo: e' il MURO FISICO, e deve essere la stessa funzione che
+     usa la partizione, o il rimbalzo e il verdetto parlano di due muri diversi */
+  return scRWallAt(snap(),theta)*scale;
 }
 const dist=(x,y)=>Math.hypot(x-CX,y-CY);
 const angOf=(x,y)=>Math.atan2(y-CY,x-CX);
@@ -971,6 +1007,12 @@ const WEB_INK={
   /* la tela passa davanti al fiore: senza sottofondo scuro i raggi sul petalo
      crema hanno contrasto quasi nullo */
   shade:'rgba(6,14,22,0.88)',
+  /* CONFINE = seta iridescente, non neon viola. Ombra teal (dottrina DNA),
+     nucleo Solar Triumph, frangia prismatica fredda+calda. */
+  ward:'rgba(252,250,244,1)',
+  wardGlow:'rgba(104,198,186,1)',
+  wardCool:'rgba(88,200,210,1)',
+  wardWarm:'rgba(255,212,138,1)',
 };
 const WEB_OPTS={...WEB_DEFAULTS,
   /* 22 RAGGI NON E' ESTETICA: l'area della fascia di fallimento critico dipende
@@ -1841,6 +1883,7 @@ requestAnimationFrame(frame);
   function setConfig(newSkills, newConfig){
     if(newSkills){ skills = newSkills.slice(); recomputeSkillAxes(); }
     if(newConfig){ Object.assign(cfg, newConfig); }
+    invalidateSnap();
     recomputeGeometry();
     /* reposition existing obelisks live to the new per-axis radii (keep drop state) */
     if(scene.whitePillars && scene.whitePillars.length){
