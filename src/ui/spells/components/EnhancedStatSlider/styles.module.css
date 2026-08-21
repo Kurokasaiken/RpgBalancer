@@ -121,6 +121,18 @@
   pointer-events: none;
 }
 
+.trackHitArea {
+  position: absolute;
+  left: 2.25rem;
+  right: 2.6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 1.5rem;
+  border-radius: 999px;
+  cursor: pointer;
+  z-index: 2;
+}
+
 .rangeInput {
   position: absolute;
   inset: 0;

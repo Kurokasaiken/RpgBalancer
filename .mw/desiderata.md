@@ -558,9 +558,12 @@ e' proprio la separazione a garantirlo.
 
 ### Still unresolved
 
-- **Estensione della tela**, ora che non e' piu' portante: grande come il board e appesa alla
-  ghiera coi tiranti, oppure poco piu' grande del fiore per coprirlo sempre. Decisione di
-  regia, aperta.
+- ~~Estensione della tela~~ **RISOLTO 2026-08-21, Director:** «grande come il board e appesa
+  alla ghiera coi tiranti». La tela copre tutto il board e i tiranti la legano alla ghiera, che
+  diventa il ramo. Corollario: il muro dell'arena non e' piu' segnato dalla tela in nessun
+  punto, quindi il campo a barre non e' un abbellimento — e' l'unica cosa che dice dove la
+  pallina rimbalza. I due pezzi vanno insieme o il board mostra una pallina che sbatte
+  contro il nulla.
 - **Se le barre debbano portare la misura** (piu' fitte o piu' accese = difficolta' piu' alta)
   o se la misura resti al righello sul board.
 - **Se la tela debba riavere un mestiere informativo** senza rompersi — l'ipotesi sul tavolo e'

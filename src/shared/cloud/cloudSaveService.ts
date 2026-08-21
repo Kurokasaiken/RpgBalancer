@@ -14,7 +14,7 @@
 
 import { saveData, loadData } from '@/shared/persistence/PersistenceService';
 import { createHeadlessDiagnostics } from '@/shared/telemetry/headlessDiagnostics';
-import type { GameState } from '@/ui/punchClub/hooks/usePunchClubGame';
+// COMMENTED: import type { GameState } from '@/ui/punchClub/hooks/usePunchClubGame';
 
 const cloudDiagnostics = createHeadlessDiagnostics('CloudSaveService');
 

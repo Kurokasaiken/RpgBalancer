@@ -32,7 +32,7 @@ import {
   type VerbSummary,
 } from '@/ui/idleVillage/verbSummaries';
 import ResidentRoster from '@/ui/idleVillage/legacy/ResidentRoster';
-import ResidentSlotRack from '@/ui/idleVillage/slots/ResidentSlotRack';
+// COMMENTED: import ResidentSlotRack from '@/ui/idleVillage/slots/ResidentSlotRack';
 import MapSlotVerbCluster from '@/ui/idleVillage/components/MapSlotVerbCluster';
 import TheaterView from '@/ui/idleVillage/components/TheaterView';
 import MapLocationSlot from '@/ui/idleVillage/components/MapLocationSlot';

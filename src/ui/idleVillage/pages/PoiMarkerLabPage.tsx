@@ -27,18 +27,22 @@ import PoiMarkerRunicV1, { poiRunicV1Styles } from '../components/poi/PoiMarkerR
 import PoiMarkerRunicV3, { poiRunicV3Styles } from '../components/poi/PoiMarkerRunicV3';
 import PoiMarkerRunicV5, { poiRunicV5Styles } from '../components/poi/PoiMarkerRunicV5';
 import PoiMatericV1, { poiMatericV1Styles } from '../components/poi/PoiMatericV1';
+import PoiMatericV2, { poiMatericV2Styles } from '../components/poi/PoiMatericV2';
+import PoiMatericV3, { poiMatericV3Styles } from '../components/poi/PoiMatericV3';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 
 const TYPES: PoiType[] = ['quest', 'job', 'event'];
 const STATES: PoiState[] = ['new', 'available', 'assigned', 'expiring', 'expired'];
 const IMPORTANCES = ['normal', 'important', 'critical'] as const;
-const VARIANTS = ['matericV1', 'runic', 'runicV1', 'runicV3', 'runicV5'] as const;
+const VARIANTS = ['matericV1', 'matericV2', 'matericV3', 'runic', 'runicV1', 'runicV3', 'runicV5'] as const;
 
 type Importance = (typeof IMPORTANCES)[number];
 type Variant = (typeof VARIANTS)[number];
 
 const MARKERS: Record<Variant, React.FC<PoiMarkerProps>> = {
   matericV1: PoiMatericV1,
+  matericV2: PoiMatericV2,
+  matericV3: PoiMatericV3,
   runic: PoiMarkerRunic,
   runicV1: PoiMarkerRunicV1,
   runicV3: PoiMarkerRunicV3,
@@ -102,7 +106,7 @@ export const PoiMarkerLabPage: React.FC = () => {
   }, [config, tickIntervalMs]);
 
   // Marker controls
-  const [variant, setVariant] = useState<Variant>('matericV1');
+  const [variant, setVariant] = useState<Variant>('matericV3');
   const type: PoiType = 'quest';
   const state: PoiState = 'available';
   const [importance, setImportance] = useState<Importance>('normal');
@@ -141,7 +145,7 @@ export const PoiMarkerLabPage: React.FC = () => {
               data-active={variant === value}
               onClick={() => setVariant(value)}
             >
-              {label(`variants.${value}`)}
+              {value}
             </button>
           ))}
         </fieldset>
@@ -207,6 +211,8 @@ export const PoiMarkerLabPage: React.FC = () => {
   const pageContent = (
     <div className="poi-lab">
       <style>{poiMatericV1Styles}</style>
+      <style>{poiMatericV2Styles}</style>
+      <style>{poiMatericV3Styles}</style>
       <style>{poiRunicStyles}</style>
       <style>{poiRunicV1Styles}</style>
       <style>{poiRunicV3Styles}</style>

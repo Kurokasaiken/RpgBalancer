@@ -7,7 +7,7 @@ import { DEFAULT_IDLE_VILLAGE_CONFIG } from '@/balancing/config/idleVillage/defa
 import type { ResidentRosterPanelProps } from '@/ui/idleVillage/components/ResidentRosterPanel';
 import type { TheaterOverlayProps } from '@/ui/idleVillage/components/TheaterOverlay';
 import type { ActivityAreaSlot, ActivityAreaHandlers, ActivityAreaProps } from '@/ui/idleVillage/ActivityArea';
-import type { ResidentSlotRackProps } from '@/ui/idleVillage/slots/ResidentSlotRack';
+// COMMENTED: import type { ResidentSlotRackProps } from '@/ui/idleVillage/slots/ResidentSlotRack';
 import type { AncillarySlotEntry } from '@/ui/idleVillage/components/AncillaryPanels';
 import type { LocationCardProps } from '@/ui/idleVillage/components/LocationCard';
 import type { DetailPanelStackProps } from '@/ui/idleVillage/components/DetailPanelStack';

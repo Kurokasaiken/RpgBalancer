@@ -1,4 +1,4 @@
-import type { ChangeEvent, FC } from 'react';
+import { useRef, useCallback, type ChangeEvent, type FC, type MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { StatTick } from './types';
 import styles from './styles.module.css';
@@ -25,9 +25,25 @@ interface StatSliderTrackProps {
  */
 export const StatSliderTrack: FC<StatSliderTrackProps> = ({ ticks, selectedTick, onChange }) => {
   const { t } = useTranslation('spell');
+  const hitAreaRef = useRef<HTMLDivElement | null>(null);
+
+  const computeIndexFromX = useCallback((clientX: number) => {
+    const rect = hitAreaRef.current?.getBoundingClientRect();
+    if (!rect) return selectedTick;
+    const x = clientX - rect.left;
+    const ratio = x / rect.width;
+    return Math.min(
+      ticks.length - 1,
+      Math.max(0, Math.round(ratio * (ticks.length - 1)))
+    );
+  }, [selectedTick, ticks.length]);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     onChange(Number(event.target.value));
+  };
+
+  const handleTrackClick = (event: MouseEvent<HTMLDivElement>) => {
+    onChange(computeIndexFromX(event.clientX));
   };
 
   return (
@@ -41,6 +57,13 @@ export const StatSliderTrack: FC<StatSliderTrackProps> = ({ ticks, selectedTick,
       <div className={styles.trackTailSpacer} />
 
       <div className={styles.trackBackground} />
+
+      <div
+        ref={hitAreaRef}
+        className={styles.trackHitArea}
+        onClick={handleTrackClick}
+        aria-hidden="true"
+      />
 
       <input
         type="range"
