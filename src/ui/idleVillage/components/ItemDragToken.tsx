@@ -6,6 +6,8 @@ import type { EquippableItem } from '@/ui/idleVillage/types/heroComponentItems';
 export interface ItemDragTokenProps {
   /** Item definition from hero config. */
   item: EquippableItem;
+  /** Optional click handler to inspect the item. */
+  onClick?: (item: EquippableItem) => void;
 }
 
 /**
@@ -14,7 +16,7 @@ export interface ItemDragTokenProps {
  * Wraps a `MatericBadge` in `dnd-kit` drag handlers and exposes the item id
  * and name in `active.data.current` for the drop target.
  */
-export function ItemDragToken({ item }: ItemDragTokenProps): JSX.Element {
+export function ItemDragToken({ item, onClick }: ItemDragTokenProps): JSX.Element {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: `item-${item.id}`,
     data: { itemId: item.id, itemName: item.name },
@@ -25,6 +27,7 @@ export function ItemDragToken({ item }: ItemDragTokenProps): JSX.Element {
       ref={setNodeRef}
       {...listeners}
       {...attributes}
+      onClick={() => onClick?.(item)}
       style={{
         transform: CSS.Translate.toString(transform),
         opacity: isDragging ? 0.5 : 1,

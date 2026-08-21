@@ -16,6 +16,8 @@ import {
   equippableItems,
   skills,
 } from '@/balancing/config/idleVillage/heroItems';
+import type { Skill } from '@/balancing/config/idleVillage/heroItems';
+import type { EquippableItem } from '@/ui/idleVillage/types/heroComponentItems';
 import {
   MatericHeading,
   MatericSectionHeader,
@@ -35,6 +37,7 @@ export default function HeroComponentsLabPage(): JSX.Element {
   const [savedEquipment, setSavedEquipment] = useState<EquipmentItem[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [pendingItem, setPendingItem] = useState<string>('');
+  const [selectedEquippable, setSelectedEquippable] = useState<EquippableItem | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -75,11 +78,22 @@ export default function HeroComponentsLabPage(): JSX.Element {
     equipment,
     inventory,
     skillLoadout,
+    grantedSkills,
     equip,
     unequip,
     useConsumable,
     toggleSkill,
   } = useResidentHeroState({ resident: baseResident, maxSkills: 3 });
+
+  const availableSkills = useMemo<Skill[]>(() => {
+    const granted = grantedSkills.map((id) => ({
+      id,
+      name: id,
+      initial: id.charAt(0).toUpperCase(),
+      effect: t('heroComponentsLab.grantedSkill', { defaultValue: 'Granted by equipment' }),
+    }));
+    return [...skills, ...granted];
+  }, [grantedSkills, t]);
 
   const slotOrder = useMemo(
     () => [
@@ -176,7 +190,7 @@ export default function HeroComponentsLabPage(): JSX.Element {
               <EquipSlotRack slots={slotOrder} equipment={equipment} onUnequip={unequip}>
                 <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
                   {equippableItems.map((item) => (
-                    <ItemDragToken key={item.id} item={item} />
+                    <ItemDragToken key={item.id} item={item} onClick={setSelectedEquippable} />
                   ))}
                   {savedEquipment.map((item) => (
                     <EquipmentDragToken key={item.id} item={item} />
@@ -189,7 +203,7 @@ export default function HeroComponentsLabPage(): JSX.Element {
           <div>
             <MatericSectionHeader tier="tertiary" hint="C">{t('heroComponentsLab.sectionC')}</MatericSectionHeader>
             <EquippableItemCard
-              item={equippableItems[0]}
+              item={selectedEquippable || equippableItems[0]}
               labels={{
                 rarity: t('heroComponentsLab.rarity'),
                 effect: t('heroComponentsLab.effect'),
@@ -210,7 +224,7 @@ export default function HeroComponentsLabPage(): JSX.Element {
           <div>
             <MatericSectionHeader tier="tertiary" hint="E">{t('heroComponentsLab.sectionE')}</MatericSectionHeader>
             <SkillDeck
-              skills={skills}
+              skills={availableSkills}
               loadout={skillLoadout}
               labels={{
                 available: t('heroComponentsLab.availableSkills'),
