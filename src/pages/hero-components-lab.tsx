@@ -144,7 +144,7 @@ export default function HeroComponentsLabPage(): JSX.Element {
             <MatericSectionHeader tier="tertiary" hint="A">{t('heroComponentsLab.sectionA')}</MatericSectionHeader>
             <PgDetailCard resident={resident} onSlotClick={setSelectedSlot} />
             {selectedSlot && (
-              <div style={{ marginTop: 12, padding: 12, border: '1px solid var(--skin-surface-border)', borderRadius: 8, background: 'var(--skin-surface-bg)' }}>
+              <div style={{ marginTop: 12, padding: 12 }}>
                 <div style={{ fontSize: 10, marginBottom: 8, color: 'var(--skin-text-muted)' }}>
                   {t('heroComponentsLab.selectedSlot')}: {selectedSlot}
                 </div>

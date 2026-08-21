@@ -81,7 +81,7 @@ function SlotDropTarget({ slot, item, onUnequip }: SlotDropTargetProps): JSX.Ele
       ref={setNodeRef}
       onClick={handleClick}
       style={{
-        outline: isOver ? '2px dashed var(--minimal-accent-color, #d4af37)' : undefined,
+        outline: isOver ? '2px dashed var(--minimal-accent-color, #d4af37)' : 'none',
         outlineOffset: 4,
         borderRadius: 8,
         cursor: item ? 'pointer' : 'default',
