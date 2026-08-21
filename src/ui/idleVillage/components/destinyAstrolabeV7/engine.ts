@@ -7,7 +7,7 @@
 import { drawWeb, WEB_DEFAULTS } from '@/ui/skillCheckWebV1/adversaryShapes';
 
 export interface AstrolabeSkill { name: string; stat: number; difficulty: number; }
-export interface AstrolabeConfig { crit?: number; wound?: number; dead?: number; mode?: string;
+export interface AstrolabeConfig { crit?: number; critWin?: number; wound?: number; dead?: number; mode?: string;
   tSlam?: number; tBurst?: number; tPour?: number; tSpin?: number; tSnap?: number; }
 export interface AstrolabeResult { verdict: string; roll: number; riskRoll: number;
   skillIndex: number; skillName: string; wounded: boolean; dead: boolean; }
@@ -41,7 +41,7 @@ export function createDestinyAstrolabeV7Engine(root: HTMLElement, opts: Astrolab
    CONFIG — bound to the tweak panel
    ========================================================================= */
 /* config + skills injected by the React host */
-const cfg=Object.assign({stat:60,req:55,crit:5,wound:10,dead:5,tSlam:900,tBurst:1100,tPour:220,tSpin:2600,tSnap:650,mode:'random'}, opts.config||{});
+const cfg=Object.assign({stat:60,req:55,crit:5,critWin:5,wound:10,dead:5,tSlam:900,tBurst:1100,tPour:220,tSpin:2600,tSnap:650,mode:'random'}, opts.config||{});
 let skills=(opts.skills&&opts.skills.length)?opts.skills.slice():[{name:'Skill',stat:60,difficulty:50}];
 let skillAxes=[];
 function recomputeSkillAxes(){
@@ -65,7 +65,8 @@ const geo={
   tst:55,            // target success threshold
   rTip:200,          // star tip radius  (∝ TST)
   rValley:90,
-  rCore:46,          // 12-layer core ring (Big Win)
+  rCore:46,          // OFFSET DELLA SCALA dei valori — NON la regione di trionfo
+  rCrit:30,          // raggio del SUCCESSO CRITICO: critWin% dell'area di successo
   epicW:14,          // epic-fail outer band thickness (∝ crit%)
   axisTip:[200,200,200,200,200],    // per-axis star tip radius (white obelisk = stat)
   axisCheck:[300,300,300,300,300],  // per-axis failure inner radius (black obelisk = check)
@@ -146,6 +147,23 @@ function recomputeGeometry(skillIndex=0){
       starA+=0.5*r*r*dA; arenaA+=0.5*w*w*dA;
     }
     geo.probPct=arenaA>0?clamp(starA/arenaA*100,0,100):0;
+    /* SUCCESSO CRITICO = critWin% dell'area di SUCCESSO, cioe' della stella
+       intersecata con l'arena — non dell'arena e non dell'unione.
+       Misurato, e' la sola normalizzazione definita su tutto il dominio:
+         - sull'ARENA il disco richiesto non entra nella stella a 30/80 (63px
+           contro una valle da 49) ne' a 1/99 (75 contro 17): una parte di
+           "successo critico" cadrebbe nel fallimento;
+         - sull'UNIONE il denominatore include le punte che sporgono FUORI
+           dall'arena, dove la pallina non arriva mai — a 99/1 l'unione e' 179k
+           contro i 17k dell'arena, nove decimi di terreno irraggiungibile;
+         - sull'INTERSEZIONE entra sempre, ed e' gia' la definizione che usa
+           `inStar` per il verdetto: nessuna terza definizione di "successo".
+       Prima il trionfo era un disco di RAGGIO FISSO (43.4px), quindi valeva dal
+       4.8% al 99.3% della stella secondo la prova — a 1/99 il nucleo era piu'
+       grande della stella e tutto il successo era critico. Stesso difetto di
+       `epicW`: pixel fissi su un raggio variabile. */
+    geo.rCrit=clamp(Math.sqrt(clamp(cfg.critWin,0,100)/100*starA/Math.PI),
+                    8, Math.max(9,Math.min(...geo.starTip)*VALLEY_F));
   }
   /* cosmetic aggregate radii (halo/gradients) */
   geo.rTip=Math.max(...geo.starTip);
@@ -204,7 +222,11 @@ const angOf=(x,y)=>Math.atan2(y-CY,x-CX);
    si appiattisce contro di esso. Vale per il disegno e per il verdetto, così
    l'area che l'occhio misura è esattamente quella che spatialVerdict risolve. */
 const inStar=(x,y,s=1)=>{const a=angOf(x,y);return dist(x,y)<=Math.min(rStarAt(a,s),rCheckAt(a));};
-const inCore=(x,y)=>dist(x,y)<=geo.rCore;
+/* TRIONFO: il disco del successo critico, non l'offset della scala. `geo.rCore`
+   e' dentro `rOf()` e regge tutta la mappatura dei valori — cambiarlo avrebbe
+   spostato punte, muro e la calibrazione della parita'. Sono due cose diverse
+   che prima portavano lo stesso nome. */
+const inCore=(x,y)=>dist(x,y)<=geo.rCrit;
 /* almost = thin margin just past the flower (success edge) */
 const inAlmost=(x,y)=>{const a=angOf(x,y),d=dist(x,y),rs=rStarAt(a);return d>rs&&d<=rs+ALMOST_W;};
 /* FALLIMENTO CRITICO = LA FASCIA DEL BORDO, e la sua AREA deve valere il crit%.
@@ -1161,28 +1183,32 @@ function drawStar(now){
     ctx.strokeStyle=`rgba(160,106,30,${.32-.07*i})`;
     ctx.stroke(starPath(s*k));
   });
+  /* L10-L11 IL SEGGIO DEL TRIONFO — disegnato su `geo.rCrit`, non su `geo.rCore`.
+     Il disco dorato deve coincidere con la regione che il resolver chiama
+     'bigwin', o mente su dove sta il trionfo: prima era grande 43.4px sempre,
+     cioe' dal 4.8% al 99.3% della stella secondo la prova. */
   /* L10 core outer ring */
   ctx.lineWidth=3;
   ctx.strokeStyle='#8a5a18';
-  ctx.beginPath(); ctx.arc(CX,CY,geo.rCore*s,0,TAU); ctx.stroke();
+  ctx.beginPath(); ctx.arc(CX,CY,geo.rCrit*s,0,TAU); ctx.stroke();
   /* L11 brushed bronze-on-gold core (the BIG WIN seat) */
-  const core=ctx.createRadialGradient(CX-8,CY-10,2,CX,CY,geo.rCore*s);
+  const core=ctx.createRadialGradient(CX-8,CY-10,2,CX,CY,geo.rCrit*s);
   core.addColorStop(0,'#f7e1ad'); core.addColorStop(.55,'#cf9d4a'); core.addColorStop(1,'#7d4d12');
   ctx.fillStyle=core;
-  ctx.beginPath(); ctx.arc(CX,CY,geo.rCore*s-2,0,TAU); ctx.fill();
+  ctx.beginPath(); ctx.arc(CX,CY,geo.rCrit*s-2,0,TAU); ctx.fill();
   ctx.save();
-  ctx.beginPath(); ctx.arc(CX,CY,geo.rCore*s-2,0,TAU); ctx.clip();
+  ctx.beginPath(); ctx.arc(CX,CY,geo.rCrit*s-2,0,TAU); ctx.clip();
   ctx.globalAlpha=.3;
   for(let i=0;i<9;i+=1){                      // brushed arcs
     ctx.strokeStyle=i%2?'rgba(255,240,200,.5)':'rgba(96,44,8,.5)';
     ctx.lineWidth=.7;
-    ctx.beginPath(); ctx.arc(CX,CY,(geo.rCore*s-3)*(i+1)/10,t*.3*(i%2?1:-1),t*.3*(i%2?1:-1)+TAU*.8); ctx.stroke();
+    ctx.beginPath(); ctx.arc(CX,CY,(geo.rCrit*s-3)*(i+1)/10,t*.3*(i%2?1:-1),t*.3*(i%2?1:-1)+TAU*.8); ctx.stroke();
   }
   ctx.globalAlpha=1; ctx.restore();
   /* L12 core inner sun-spark ring */
   ctx.lineWidth=1.2;
   ctx.strokeStyle=`rgba(255,238,188,${.55+.3*Math.sin(t*2.4)})`;
-  ctx.beginPath(); ctx.arc(CX,CY,geo.rCore*s*.55,0,TAU); ctx.stroke();
+  ctx.beginPath(); ctx.arc(CX,CY,geo.rCrit*s*.55,0,TAU); ctx.stroke();
   /* V6: glint prismatici rimossi — erano un quarto colore (ciano) sulle punte. */
 
   ctx.restore();
