@@ -285,10 +285,6 @@ function emitArmed(b){ try{ if(typeof opts!=='undefined'&&opts&&opts.onArmed) op
 let armed=false;                 // true while the TIRA button should be shown
 const GOO_MS=620;                // springy goo-expansion duration
 const WEB_MS=900;                // la tela scoccata sopra il fiore
-/* raggio del telaio della tela: 311 su un board da 362. Copre il fiore fino a
-   stat 92 (rOf(92)=316); sopra quel valore le punte lo bucano, e va bene — a
-   vantaggio estremo la stella che perfora la trappola e' una lettura giusta. */
-const WEB_R=R*0.86;
 function setState(s){
   scene.state=s; scene.t0=performance.now();
   suite.dataset.state=s;
@@ -884,6 +880,11 @@ const WEB_INK={
   shade:'rgba(6,14,22,0.88)',
 };
 const WEB_OPTS={...WEB_DEFAULTS, radii:18, weftStep:16,
+  /* PIU' ANCORAGGI, FESTONE PIU' BASSO: il muro fisico e' rCheckAt, quindi il
+     filo disegnato deve starci sopra o la pallina rimbalza contro il nulla. Con
+     15 ancoraggi il festone rientra del ~6% invece del ~15%: la concavita' si
+     legge ancora, ma il rimbalzo cade sul filo. */
+  perSector:2, secFrame:0.10,
   /* GOCCE VISCIDE riaccese. Le avevo spente temendo che leggessero come
      palline: la paura era giusta, la risposta sbagliata. La risposta e'
      dimensione e numero — 1px contro una pallina da 9px con alone e ombra,
@@ -895,16 +896,15 @@ function drawWebLayer(){
   if(rev<=0.001) return;
   drawWeb(ctx, {
     cx:CX, cy:CY, k:1,
-    /* LA TELA COPRE TUTTO, non solo l'arena.
-       Prima il telaio stava sul muro (rCheckAt): a difficolta' 50 il muro e' 192
-       e le punte del fiore arrivano a 296, quindi la tela finiva DENTRO il fiore
-       e leggeva come un centrino appoggiato sopra. Se la si butta addosso, deve
-       coprirlo: il telaio va oltre le punte.
-       Costo dichiarato: il telaio non e' piu' il muro dell'arena. Il muro resta
-       un fatto fisico (la pallina e' confinata da rCheckAt come sempre) segnato
-       dagli obelischi; la tela e' il velo gettato sul board, non la sua pelle. */
-    rFrame:WEB_R,
-    rFrameAt:()=>WEB_R,
+    /* LA TELA STA DOVE STAVA IL GOO — grandezza e posizione dell'arena.
+       Il telaio torna sul muro (rCheckAt), cioe' esattamente l'ingombro che
+       aveva il goo: la tela E' la pelle dell'arena, non un velo sul board.
+       Cosi' il muro su cui la pallina rimbalza e il filo che si vede sono la
+       stessa cosa, e la fisica non cambia di un pixel.
+       Il fiore, dove sfonda l'arena, esce da SOTTO la tela: e' giusto, perche'
+       la pallina non puo' fermarsi fuori dall'arena — quel che conta e' coperto. */
+    rFrame:Math.max(...geo.axisCheck),
+    rFrameAt:(a)=>rCheckAt(a),
     rStar:(a)=>rStarAt(a,1),
     /* ancoraggi maestri = gli OBELISCHI: stanno gia' sul muro, quindi muro,
        picchetti e telaio diventano una cosa sola invece di tre cerchi */
@@ -912,7 +912,7 @@ function drawWebLayer(){
     /* il ramo = la ghiera di bronzo, che resta circolare a R (decisione del
        Director). I tiranti attraversano il campo vuoto e lo rendono lo spazio
        in cui la tela e' sospesa, invece di un vuoto che non e' di nessuno. */
-    rTether:R*0.99,
+    rTether:R*0.99,   // i tiranti attraversano il campo vuoto fino alla ghiera
     seed:scene.webSeed,
     skipArena:true,                      // il vuoto e il righello li disegna la V7
     ink:WEB_INK,
