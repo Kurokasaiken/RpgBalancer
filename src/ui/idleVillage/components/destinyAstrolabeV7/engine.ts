@@ -25,7 +25,7 @@ import { buildFracture as scBuildFracture, ribbonPolygon as scRibbon,
          openAt as scOpenAt } from '@/ui/skillCheckWebV1/fracture';
 
 export interface AstrolabeSkill { name: string; stat: number; difficulty: number; }
-export interface AstrolabeConfig { crit?: number; critWin?: number; almostPct?: number; wound?: number; dead?: number; mode?: string;
+export interface AstrolabeConfig { crit?: number; critWin?: number; almostPct?: number; wound?: number; dead?: number; mode?: string; forceRisk?: string;
   tSlam?: number; tBurst?: number; tPour?: number; tSpin?: number; tSnap?: number; }
 export interface AstrolabeResult { verdict: string; roll: number; riskRoll: number;
   skillIndex: number; skillName: string; wounded: boolean; dead: boolean; }
@@ -498,7 +498,16 @@ function throwBall(){
      "trova" l'esito, lo mette in scena.
      `cfg.mode` forzato resta come strumento di test, ma non sovrascrive piu' il
      verdetto a valle: rientra come vincolo sulla regione estratta. */
-  scene.chain=scResolveCheck(snap(), (Math.random()*1e9)|0);
+  /* il select "esito forzato" della pagina era rimasto MUTO: la catena decide
+     tutto e `cfg.mode` non veniva più letto da nessuno. Rientra qui come
+     vincolo sulla coppia estratta, insieme al rischio forzato — senza un modo
+     di chiamare ferita e morte (15% insieme) un beat da 1.5s si collauda per
+     tentativi. */
+  const MODE_TO_REGION={bigwin:'critWin',win:'win',almost:'almost',fail:'fail',epicfail:'critFail'};
+  const force={};
+  if(cfg.mode&&MODE_TO_REGION[cfg.mode]) force.region=MODE_TO_REGION[cfg.mode];
+  if(cfg.forceRisk==='wound'||cfg.forceRisk==='death'||cfg.forceRisk==='none') force.zone=cfg.forceRisk;
+  scene.chain=scResolveCheck(snap(), (Math.random()*1e9)|0, force);
   if(!scene.chain.verified){
     console.error('[chain] asserzione violata: la regione del punto non e\' quella estratta',
       scene.chain.rolled, scene.chain.landing);
@@ -1951,14 +1960,24 @@ function drawQuake(){
     ctx.moveTo(CX+poly[0].x,CY+poly[0].y);
     for(let i=1;i<poly.length;i+=1) ctx.lineTo(CX+poly[i].x,CY+poly[i].y);
     ctx.closePath();
-    /* l'apertura non e' un colore: e' ASSENZA. Nero quasi puro, e il bordo
-       caldo perche' la crosta appena spaccata e' ancora incandescente. */
-    ctx.fillStyle=isDeath?'rgba(2,3,10,0.96)':'rgba(4,6,14,0.9)';
+    /* CONTRASTO. L'apertura e' assenza — nero — ma nero su un board scuro non
+       si vede: quinta volta che lo stesso difetto si presenta qui. Quindi prima
+       un ALONE chiaro attorno alla crepa (la luce che scappa dal taglio), poi il
+       nero dell'apertura, poi il bordo incandescente. E' l'ordine che rende una
+       fessura leggibile: si vede il bagliore, non il buco. */
+    ctx.save();
+    ctx.lineWidth=(isDeath?16:11);
+    ctx.strokeStyle=isDeath?'rgba(150,110,255,0.30)':'rgba(255,190,120,0.34)';
+    ctx.shadowColor=isDeath?'rgba(130,90,255,0.9)':'rgba(255,170,90,0.9)';
+    ctx.shadowBlur=isDeath?26:18;
+    ctx.stroke();
+    ctx.restore();
+    ctx.fillStyle=isDeath?'rgba(1,2,7,0.97)':'rgba(3,5,11,0.94)';
     ctx.fill();
-    ctx.lineWidth=isDeath?2.2:1.4;
-    ctx.strokeStyle=isDeath?'rgba(120,60,220,0.55)':'rgba(255,164,96,0.6)';
-    ctx.shadowColor=isDeath?'rgba(90,40,200,0.8)':'rgba(255,140,70,0.8)';
-    ctx.shadowBlur=isDeath?16:10;
+    ctx.lineWidth=isDeath?2.6:1.8;
+    ctx.strokeStyle=isDeath?'rgba(186,158,255,0.85)':'rgba(255,206,150,0.9)';
+    ctx.shadowColor=isDeath?'rgba(120,70,255,0.9)':'rgba(255,150,80,0.95)';
+    ctx.shadowBlur=isDeath?14:10;
     ctx.stroke();
     ctx.shadowBlur=0;
   }

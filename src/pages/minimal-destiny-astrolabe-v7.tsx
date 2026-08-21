@@ -56,6 +56,7 @@ export default function MinimalDestinyAstrolabeV7() {
   const [woundChance, setWoundChance] = useState(10);
   const [deathChance, setDeathChance] = useState(5);
   const [forcedVerdict, setForcedVerdict] = useState<string>('');
+  const [forcedRisk, setForcedRisk] = useState<string>('');
 
   const handleComplete = (result: DestinyAstrolabeV7Result) => {
     setLastResult(result);
@@ -162,6 +163,7 @@ export default function MinimalDestinyAstrolabeV7() {
             wound: woundChance,
             dead: deathChance,
             mode: forcedVerdict || 'random',
+            forceRisk: forcedRisk || undefined,
           }}
           onResolve={handleComplete}
           autoStart
@@ -333,6 +335,18 @@ export default function MinimalDestinyAstrolabeV7() {
               <option value="almost">Almost</option>
               <option value="fail">Failure</option>
               <option value="epicfail">Epic Fail</option>
+            </select>
+          </div>
+          <div>
+            {/* il rischio pesa il 15% fra ferita e morte: senza un modo di
+                chiamarlo, il beat del terremoto si collauda per tentativi */}
+            <label className="block text-xs font-semibold mb-1 text-gray-300">Force Risk (terremoto)</label>
+            <select value={forcedRisk} onChange={(e) => setForcedRisk(e.target.value)}
+              className="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1">
+              <option value="">Random</option>
+              <option value="none">Nessuno</option>
+              <option value="wound">Ferita — la fenditura si chiude</option>
+              <option value="death">Morte — lo spacco resta aperto</option>
             </select>
           </div>
         </div>

@@ -122,7 +122,12 @@ export interface Rolled {
  * `P(morte)` vengono dal dado, non dalla geometria — ed è la ragione per cui la
  * forma della crepa può cambiare liberamente senza toccare nessuna probabilità.
  */
-export function rollBoth(s: Snapshot, rng: () => number): Rolled {
+export interface Forced {
+  region?: RegionId;
+  zone?: ZoneId;
+}
+
+export function rollBoth(s: Snapshot, rng: () => number, force?: Forced): Rolled {
   const roll = 1 + Math.floor(rng() * 100);
   const riskRoll = 1 + Math.floor(rng() * 100);
   const bands = bandsFromAreas(s);
@@ -134,7 +139,16 @@ export function rollBoth(s: Snapshot, rng: () => number): Rolled {
       : riskRoll <= s.config.death + s.config.wound
         ? 'wound'
         : 'none';
-  return { roll, riskRoll, region, zone };
+  /* FORZATURA per il collaudo. Non è un ramo di gioco: sostituisce l'esito
+     estratto DOPO il tiro, e i due dadi restano nel risultato così che si veda
+     cosa avrebbero dato. Serve perché il rischio pesa il 15%: senza un modo di
+     chiamarlo, un beat che dura 1.5s si collauda per tentativi. */
+  return {
+    roll,
+    riskRoll,
+    region: force?.region ?? region,
+    zone: force?.zone ?? zone,
+  };
 }
 
 /* ── T-003/T-004: l'insieme richiesto, e come garantirlo ──────────────────── */
@@ -504,9 +518,9 @@ export interface Resolved {
   verified: boolean;
 }
 
-export function resolveCheck(s: Snapshot, seed: number): Resolved {
+export function resolveCheck(s: Snapshot, seed: number, force?: Forced): Resolved {
   const rng = createRng(seed);
-  const rolled = rollBoth(s, rng);
+  const rolled = rollBoth(s, rng, force);
   const { point, repairs, relaxed, snap } = pickLanding(s, rolled, rng);
   /* seed della traiettoria salato: non consuma dallo stream dei dadi, o un
      campione in più cambierebbe TUTTI gli esiti a parità di seed */
