@@ -264,8 +264,14 @@ const scene={
   shocks:[], sparks:[],
   webSeed:7,                            // tela deterministica per tiro
   webP:0,                               // 0..1 avanzamento del lancio della tela
+  /* NUOVA CATENA DI RIVELAZIONI (Director): eroe -> premio -> trappola ->
+     misura -> regola. Il goo non esiste piu' in nessuna forma, quindi
+     Il goo non esiste piu': al suo posto tre variabili con un nome
+     che dice cosa rivelano. */
+  rigP:0,                               // il righello (con gli obelischi bianchi)
+  threatP:0,                            // la difficolta' (obelischi scuri)
+  wardP:0,                              // la tela magica: il confine si accende
   gooRipple:0,                          // boosts displacement scale
-  gooReveal:0,                          // 0 in idle → la tela viene scoccata
   ringReveal:0,                         // 0 until the bronze ring locks in
   motes:Array.from({length:22},()=>({x:Math.random()*W,y:Math.random()*W,r:.5+Math.random()*1.5,
     sp:2.5+Math.random()*6,ph:Math.random()*TAU,sw:Math.random()*TAU})),
@@ -395,8 +401,9 @@ function launchRoll(){
   recomputeGeometry();
   buildPillars();
   scene.starScale=0; scene.pourP=0; scene.streamAlpha=0; scene.webP=0;
+  scene.rigP=0; scene.threatP=0; scene.wardP=0;
   scene.webSeed=(Math.random()*1e9)|0;   // una tela diversa a ogni tiro
-  scene.gooReveal=0; scene.ringReveal=0;
+  scene.ringReveal=0;
   scene.ball={x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false};
   scene.warp=0;
   scene.shocks.length=0; scene.sparks.length=0;
@@ -414,13 +421,16 @@ function throwBall(){
   if(s==='idle'||s==='the-spin'||s==='magnetic-snap'||s==='resolution') return;
   armed=false; emitArmed(false);
   /* warp: snap any still-playing reveal so we never fire from an empty scene */
-  scene.gooReveal=1; scene.starScale=1; scene.pourP=1; scene.streamAlpha=0.34; scene.webP=1;
+  scene.starScale=1; scene.pourP=1; scene.streamAlpha=0.34;
+  scene.webP=1; scene.rigP=1; scene.threatP=1; scene.wardP=1;
   scene.blackPillars.concat(scene.whitePillars).forEach(pl=>{ pl.drop=1; pl.landed=true; });
   if(s!=='action-trigger'){ scene.warp=1; scene.gooRipple=1; }   // visual warp flash when skipping
   setState('the-spin'); fireBall();
 }
 const RING_MS=140;   // V6: la ghiera non esiste più, resta solo un beat tecnico
-const AXIS_READ_MS=560;  // V6: pausa per leggere i 5 assi prima che entri il PG
+const HERO_MS=780;   // obelischi bianchi + righello
+const STAR_MS=620;   // il fiore sboccia
+const WARD_MS=700;   // il confine si accende
 
 /* advance choreography (called every frame) */
 function tickTimeline(){
@@ -431,45 +441,25 @@ function tickTimeline(){
     const p=phaseT(RING_MS);
     scene.ringReveal=clamp(p/0.68,0,1);     // ring fades/locks into being
     scene.ringShaken=true;                  // V6: nessuno shake per la ghiera rimossa
-    if(p>=1){ scene.ringReveal=1; setState('threat-slam'); }
+    if(p>=1){ scene.ringReveal=1; setState('hero-rise'); }
   }
-  else if(s==='threat-slam'){
-    const p=phaseT(cfg.tSlam);
-    /* void seeds: nucleus forms while obelisks slam down */
-    scene.gooReveal=0.14*easeOutCubic(clamp(p/0.5,0,1));
-    scene.blackPillars.forEach((pl,i)=>{
-      const local=clamp((p-(i*0.13))/0.4,0,1);
-      const prev=pl.drop;
-      pl.drop=easeInCubic(local);
-      if(prev<1&&pl.drop>=1&&!pl.landed){
-        pl.landed=true; pl.flash=1;
-        scene.gooRipple=1; shake('shake-slam');
-        addShock(pl,'rgba(200,134,46,.9)');
-      }
-    });
-    if(p>=1) setState('goo-expand');
-  }
-  else if(s==='goo-expand'){
-    /* GOO EXPANSION — erupts from the seeded core and springs outward to the
-       black obelisks with a cubic-bezier(.34,1.56,.64,1)-style overshoot. */
-    const p=phaseT(GOO_MS);
-    scene.gooReveal=clamp(easeOutBack(p),0,1.08);   // springy overshoot
-    scene.gooRipple=Math.max(scene.gooRipple,0.6*(1-p));
-    if(p>=1){
-      scene.gooReveal=1;
-      setState('axis-read');           // V6: beat di lettura prima della risposta del PG
-    }
-  }
-  else if(s==='axis-read'){
-    /* BEAT DI LETTURA — la difficoltà è posata e misurabile, niente si muove.
-       È l'unico momento in cui il giocatore può leggere i 5 assi da soli. */
-    if(phaseT(AXIS_READ_MS)>=1) setState('agency-burst');
-  }
-  else if(s==='agency-burst'){
-    const p=phaseT(cfg.tBurst);
-    /* Pillars drop first (compressed into first 65% of phase) */
+  /* ═══ CATENA DI RIVELAZIONI (Director) ════════════════════════════════════
+     1 obelischi BIANCHI  → 2 il FIORE  → 3 la TELA  → 4 obelischi SCURI
+     → 5 la TELA MAGICA (il confine si accende)
+
+     La drammaturgia si e' invertita rispetto a prima, dove partiva la minaccia
+     e il PG rispondeva. Ora: l'eroe si dichiara, il premio sboccia, la
+     trappola gli cade addosso, la misura arriva a dire quanto e' dura, e per
+     ultima si accende la regola. Il goo non c'e' in nessuno dei cinque passi —
+     era lui a partire per primo, e non deve esistere.                        */
+  else if(s==='hero-rise'){
+    /* 1 — GLI OBELISCHI BIANCHI: la stat, cioe' chi e' il PG. Con loro entra il
+       righello, che e' il metro condiviso su cui piu' tardi si leggera' anche
+       la difficolta'. */
+    const p=phaseT(HERO_MS);
+    scene.rigP=easeOutCubic(clamp(p/0.45,0,1));
     scene.whitePillars.forEach((pl,i)=>{
-      const local=clamp((p-(i*0.07))/0.26,0,1);
+      const local=clamp((p-(i*0.09))/0.34,0,1);
       const prev=pl.drop;
       pl.drop=easeInCubic(local);
       if(prev<1&&pl.drop>=1&&!pl.landed){
@@ -477,25 +467,47 @@ function tickTimeline(){
         addShock(pl,'rgba(255,242,200,.95)');
       }
     });
-    /* Star appears AFTER all pillars are landed (p≥0.65), grows with overshoot */
-    const STAR_START=0.65;
-    scene.starScale=easeOutBack(clamp((p-STAR_START)/(1-STAR_START),0,1));
-    if(p>=1){
-      scene.starScale=1;
-      setState('web-cast');            // prima il fiore, POI la tela sopra
-    }
+    if(p>=1){ scene.rigP=1; setState('star-bloom'); }
+  }
+  else if(s==='star-bloom'){
+    /* 2 — IL FIORE: il premio, ancorato alle punte bianche appena posate. */
+    const p=phaseT(STAR_MS);
+    scene.starScale=easeOutBack(p);
+    if(p>=1){ scene.starScale=1; setState('web-cast'); }
   }
   else if(s==='web-cast'){
-    /* LA TELA VIENE SCOCCATA SOPRA IL FIORE.
-       Ordine dei beat invertito su richiesta del Director: il premio si mostra
-       prima, e solo dopo l'avversario gli butta la tela addosso. Prima la tela
-       arrivava con la difficolta' e il fiore la scacciava crescendo, cioe' la
-       tela non era mai sopra il premio. */
+    /* 3 — LA TELA, buttata addosso al fiore: il premio si mostra prima, e solo
+       dopo l'avversario gli cala la trappola sopra. */
     const p=phaseT(WEB_MS);
     scene.webP=clamp(p,0,1);
+    if(p>=1){ scene.webP=1; setState('threat-slam'); }
+  }
+  else if(s==='threat-slam'){
+    /* 4 — GLI OBELISCHI SCURI: la difficolta'. Arrivano DOPO la tela, quindi
+       non annunciano piu' la minaccia: la misurano. */
+    const p=phaseT(cfg.tSlam);
+    scene.threatP=easeOutCubic(clamp(p/0.55,0,1));
+    scene.blackPillars.forEach((pl,i)=>{
+      const local=clamp((p-(i*0.13))/0.4,0,1);
+      const prev=pl.drop;
+      pl.drop=easeInCubic(local);
+      if(prev<1&&pl.drop>=1&&!pl.landed){
+        pl.landed=true; pl.flash=1;
+        shake('shake-slam');
+        addShock(pl,'rgba(200,134,46,.9)');
+      }
+    });
+    if(p>=1){ scene.threatP=1; setState('ward-light'); }
+  }
+  else if(s==='ward-light'){
+    /* 5 — LA TELA MAGICA: il confine si accende sulle trame che passano dal
+       muro. E' l'ultima cosa a comparire perche' e' la REGOLA, e una regola si
+       legge dopo aver visto i pezzi a cui si applica. */
+    const p=phaseT(WARD_MS);
+    scene.wardP=easeOutCubic(p);
     if(p>=1){
-      scene.webP=1;
-      armed=true; emitArmed(true);     // il THROW si arma quando la tela e' posata
+      scene.wardP=1;
+      armed=true; emitArmed(true);   // il THROW si arma a scena completa
       setState('risk-pour');
     }
   }
@@ -902,38 +914,13 @@ function gooBlobPath(rev,shrink){
   return P;
 }
 
-/* SUPERFICIE SFIDA — danger void that bounds the ball.
-   Clean, legible: pure dark fill + single pulsing danger border.
-   No crystal facets — those conflicted visually with the star. */
-function drawChallengeSurface(now){
-  const rev=scene.gooReveal;
-  if(rev<=0.001) return;
-  const t=now/1000;
-  const path=gooBlobPath(rev,0);
-  ctx.save();
-
-  /* IL GOO NON ESISTE PIU'.
-     Restava il suo disco scuro, e con la tela sopra la domanda del Director era
-     giusta: se il goo c'e' ancora, a che serve la tela? Una cosa sola puo'
-     essere l'avversario. Qui rimane solo un velo appena percettibile che stacca
-     l'arena dal fondo — non un corpo, non una materia: il muro lo dicono il
-     telaio della tela e i nodi sugli obelischi. */
-  const fill=ctx.createRadialGradient(CX,CY,0,CX,CY,geo.rTip*rev*1.5);
-  fill.addColorStop(0,'rgba(1,3,14,0.30)');
-  fill.addColorStop(0.7,'rgba(2,4,16,0.22)');
-  fill.addColorStop(1,'rgba(2,3,16,0.10)');
-  ctx.fillStyle=fill; ctx.fill(path);
-
-  /* 2. NIENTE BORDO DISEGNATO: il muro adesso lo porta il TELAIO DELLA TELA.
-     Il bordo scuro e il telaio sono la stessa cosa fisica (dove la pallina
-     rimbalza), e due tratti sugli stessi pixel si contraddicono. Resta qui solo
-     il vuoto: la tela ci si appoggia sopra. */
-
-  /* V6: rimossi i marker luminosi sui vertici — gli obelischi già segnano
-     quelle posizioni, erano un secondo sistema sugli stessi pixel. */
-
-  ctx.restore();
-}
+/* IL GOO NON ESISTE PIU'.
+   `drawChallengeSurface` disegnava il vuoto scuro dell'arena — l'ultimo residuo
+   del goo, ridotto a un velo al 30% e poi rimosso del tutto su richiesta del
+   Director: "c'e' ancora il goo iniziale, non ci deve essere". Una cosa sola puo'
+   essere l'avversario, e quella cosa e' la tela.
+   Il muro dell'arena non resta muto: lo dicono gli obelischi scuri (che ci
+   stanno sopra) e la tela magica (il confine acceso sulle trame che ci passano). */
 
 /* ── LA TELA AL POSTO DEL GOO ─────────────────────────────────────────────
    L'avversario non è più una materia che sale: è una TELA SCOCCATA, e il suo
@@ -943,12 +930,10 @@ function drawChallengeSurface(now){
    Cosa NON cambia: la fisica. La pallina resta confinata da `rCheckAt` esattamente
    come prima; la tela è la lettura di quel muro, non un secondo muro.
 
-   Le tempistiche vengono dallo stato che già esiste:
-     lancio  = gooReveal   (la tela arriva dove prima saliva il goo)
-     strappo = starScale   (la stella cresce e mangia i fili dall'interno)
-   `tearT` è ricavato invertendo l'easing della crescita, così un filo scatta
-   ESATTAMENTE quando la stella raggiunge il suo raggio: la datazione è la stessa
-   grandezza per il disegno e per il verdetto. */
+   Le tempistiche vengono dalla catena di rivelazioni:
+     lancio     = scene.webP   (beat 3, dopo il fiore)
+     confine    = scene.wardP  (beat 5, l'ultimo)
+   Lo strappo non esiste piu': la tela non si spacca. */
 /* GERARCHIA DI VALORE — misurata, non a occhio.
    Prima: obelischi 100%, stella 100%, tela 25%. Le trame stavano a 2.30:1
    nominali, che con l'antialias di uno stroke da 0.75px scendono a 1.52:1
@@ -1009,6 +994,7 @@ function drawWebLayer(){
        appende il giro di trame in evidenza */
     rWallAt:(a)=>rCheckAt(a),
     flashAt:(a)=>wardFlashAt(a),
+    wardReveal:scene.wardP,
     skipArena:true,                      // il vuoto e il righello li disegna la V7
     ink:WEB_INK,
   }, WEB_OPTS, {
@@ -1038,14 +1024,18 @@ function drawWebLayer(){
    Quando la stella esiste, una seconda tacca calda segna la stat del PG. */
 const AXIS_TICKS=10;
 function drawAxisRig(now){
-  const rev=scene.gooReveal;
+  /* il righello entra con gli obelischi BIANCHI: e' il metro dell'eroe, e piu'
+     tardi ci si leggera' sopra anche la difficolta' */
+  const rev=scene.rigP;
   if(rev<=0.001) return;
   const rMax=rOf(100);
   ctx.save();
   for(let i=0;i<AXES;i+=1){
     const a=TIP(i);
     const ca=Math.cos(a), sa=Math.sin(a);
-    const rDiff=rCheckAt(a,rev);                       // dove arriva la difficoltà
+    /* la tacca della difficolta' compare con gli obelischi SCURI, non col
+       righello: prima di quel beat il giocatore non deve poterla leggere */
+    const rDiff=rCheckAt(a,Math.max(0.001,scene.threatP));
     const rStat=geo.axisTip[i]*Math.min(1,scene.starScale||0);
 
     /* asta dell'asse */
@@ -1671,7 +1661,6 @@ function frame(now){
 
   ctx.clearRect(0,0,W,W);
   drawBackdrop(now);
-  drawChallengeSurface(now);
   drawAxisRig(now);
   drawBlueprint(now);
   drawStar(now);

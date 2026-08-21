@@ -75,6 +75,12 @@ export interface ShapeCtx {
   rWallAt?: (theta: number) => number;
   /** lampo 0..1 del confine a un dato angolo: la regola si manifesta all'impatto */
   flashAt?: (theta: number) => number;
+  /**
+   * RIVELAZIONE DEL CONFINE, 0..1. Il confine e' l'ULTIMA cosa che compare:
+   * e' la regola, e una regola si legge dopo aver visto i pezzi a cui si
+   * applica. Assente = acceso da subito.
+   */
+  wardReveal?: number;
   /** l'host disegna già campo e righello: qui non ridisegnarli */
   skipArena?: boolean;
   /** palette dell'host: la tela porta il carattere, non il colore */
@@ -1144,7 +1150,8 @@ export function drawWeb(
      difficolta' — verificato identico a 20, 50 e 80. Qui il giro viene scalato
      per bisezione finche' la fascia vale esattamente `critBand`%: la forma resta
      casuale e cambia a ogni tiro, il numero e' imposto. */
-  if (o.critBand > 0 && S.rWallAt) {
+  const wardP = S.wardReveal === undefined ? 1 : cl01(S.wardReveal);
+  if (o.critBand > 0 && S.rWallAt && wardP > 0.001) {
     const wl = S.rWallAt;
     /* area dell'arena (integrale polare) */
     let aArena = 0;
@@ -1217,7 +1224,11 @@ export function drawWeb(
       const qx = mx + (dx / dl) * pull;
       const qy = my + (dy / dl) * pull;
       const fl = S.flashAt ? cl01(S.flashAt((a0 + a1) / 2)) : 0;
-      const br = 0.82 + 0.18 * Math.sin((a0 + a1) * 3.1);
+      /* si accende a ONDATA, un settore per volta: un confine che compare tutto
+         insieme legge come un interruttore, non come una regola che si posa */
+      const wp = cl01((wardP - (i / N) * 0.4) / 0.6);
+      if (wp <= 0.001) continue;
+      const br = (0.82 + 0.18 * Math.sin((a0 + a1) * 3.1)) * wp;
 
       /* LA LUNETTA RIEMPITA: e' QUESTO lo "spessore" del bordo, e vale il 5%.
          Il bordo non e' una linea con un alone decorativo: e' una FASCIA, il suo
