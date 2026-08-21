@@ -207,8 +207,20 @@ const inStar=(x,y,s=1)=>{const a=angOf(x,y);return dist(x,y)<=Math.min(rStarAt(a
 const inCore=(x,y)=>dist(x,y)<=geo.rCore;
 /* almost = thin margin just past the flower (success edge) */
 const inAlmost=(x,y)=>{const a=angOf(x,y),d=dist(x,y),rs=rStarAt(a);return d>rs&&d<=rs+ALMOST_W;};
-/* critical failure = the BORDER of the goo (its outermost band, against the wall) */
-const inEpic=(x,y)=>{const a=angOf(x,y),d=dist(x,y),e=rCheckAt(a);return d>e-geo.epicW&&d<=e;};
+/* FALLIMENTO CRITICO = LA FASCIA DEL BORDO, e la sua AREA deve valere il crit%.
+   Prima era una fascia di spessore FISSO (epicW = (R-3)*crit% = 17.9px) misurata
+   verso l'interno dal muro. Misurato quanto valeva davvero:
+       difficolta' 20 -> 31.9% dell'area    difficolta' 50 -> 17.8%
+       difficolta' 80 -> 12.4%              difficolta' 99 -> 10.4%
+   invece del 5% voluto — e peggio, VARIABILE con la difficolta', mentre il
+   fallimento critico e' una costante di sistema. Uno spessore fisso non puo'
+   garantire un'area su un'arena di raggio variabile.
+   Con la soglia in proporzione, l'area e' esattamente crit% a ogni difficolta':
+       area fascia / area arena = 1 - (soglia/muro)^2 = crit%
+   Cosi' il verdetto e la fascia disegnata dalle trame valgono lo stesso numero. */
+/* funzione e non costante: cfg.crit puo' cambiare a runtime via setConfig */
+const epicK=()=>Math.sqrt(Math.max(0,1-clamp(cfg.crit,0,100)/100));
+const inEpic=(x,y)=>{const a=angOf(x,y),d=dist(x,y),e=rCheckAt(a);return d>e*epicK()&&d<=e;};
 /* FERITA zone: outer band of goo (just inside goo edge), proportional to wound% */
 const inWoundZone=(x,y)=>{const a=angOf(x,y),d=dist(x,y),starR=rStarAt(a);if(d<=starR)return false;const e=rCheckAt(a);return d>=e-geo.woundW&&d<=e;};
 /* MORTE zone: strip just outside star edge in valley directions, proportional to dead% */
@@ -287,69 +299,37 @@ const scene={
    dove l'errore e' quanto la pallina si ferma PRIMA di toccare la barra nel
    punto peggiore. Con 24 barre l'alone (8-10px) lo assorbe.
    ═══════════════════════════════════════════════════════════════════════════ */
-const FIELD_BARS=24;
-const FIELD_GAP=0.74;            // frazione della corda disegnata: il resto e' vuoto
-const fieldBars=[];              // {nx,ny,c,half,tx,ty,flash}
-function buildField(){
-  fieldBars.length=0;
-  const N=FIELD_BARS, h=1e-3;
-  const P=(t)=>{const r=rCheckAt(t); return [Math.cos(t)*r, Math.sin(t)*r];};
-  for(let b=0;b<N;b+=1){
-    const a0=-Math.PI/2+b*TAU/N, a1=a0+TAU/N, m=(a0+a1)/2;
-    const [x0,y0]=P(m), [xa,ya]=P(m-h), [xb,yb]=P(m+h);
-    let tx=xb-xa, ty=yb-ya; const L=Math.hypot(tx,ty)||1; tx/=L; ty/=L;
-    let nx=-ty, ny=tx;
-    if(nx*x0+ny*y0<0){ nx=-nx; ny=-ny; }        // normale verso l'esterno
-    const c0=nx*x0+ny*y0;
-    let push=0;
-    for(let i=0;i<=32;i+=1){ const t=a0+(a1-a0)*i/32; const [x,y]=P(t);
-      push=Math.max(push,(nx*x+ny*y)-c0); }     // fuori quanto basta: mai attraversata
-    const c=c0+push;
-    fieldBars.push({nx,ny,c,tx,ty,half:Math.tan((a1-a0)/2)*c*FIELD_GAP,flash:0});
+/* ═══════════════════════════════════════════════════════════════════════════
+   IL CONFINE E' FATTO DALLE TRAME VERE DELLA TELA (Director, v13 rev.2).
+
+   Le 24 barre viola tangenti sono state smontate: erano un oggetto separato, e
+   un oggetto separato che segna un'area rischiava di diventare il secondo goo —
+   l'errore che il Director aveva individuato sul goo stesso. Ora il confine e' la
+   TELA IN EVIDENZA: prima si disegna la tela intera, poi si ripassa il giro di
+   trame che passa dal muro. Un oggetto, due letture.
+
+   Una trama fa da muro per costruzione: cede verso il mozzo, quindi fra la corda
+   e il muro resta una lunetta. L'insieme delle lunette E' la fascia di
+   fallimento critico, e la sua area dipende solo da (raggi x cedimento), non
+   dalla difficolta'. La forma resta casuale e cambia a ogni tiro — il Director:
+   "puo' cambiare, anzi e' meglio" — mentre l'area viene imposta per bisezione.
+
+   Qui resta solo lo stato dei LAMPI: la regola si manifesta quando e' invocata. */
+const wardFlashes=[];            // {ang,v}
+function flashWardAt(ang){ wardFlashes.push({ang,v:1}); if(wardFlashes.length>24) wardFlashes.shift(); }
+function wardFlashAt(ang){
+  let m=0;
+  for(const f of wardFlashes){
+    const d=Math.abs(((ang-f.ang+Math.PI*3)%TAU)-Math.PI);
+    if(d<0.28) m=Math.max(m,f.v*(1-d/0.28));
   }
+  return m;
 }
-/* la barra piu' vicina a un angolo: serve per farla lampeggiare all'impatto */
-function flashFieldAt(ang){
-  const x=Math.cos(ang), y=Math.sin(ang);
-  let best=-1, bestD=-Infinity;
-  for(let i=0;i<fieldBars.length;i+=1){
-    const d=fieldBars[i].nx*x+fieldBars[i].ny*y;
-    if(d>bestD){ bestD=d; best=i; }
+function decayWardFlashes(){
+  for(let i=wardFlashes.length-1;i>=0;i-=1){
+    wardFlashes[i].v-=0.035;
+    if(wardFlashes[i].v<=0) wardFlashes.splice(i,1);
   }
-  if(best>=0) fieldBars[best].flash=1;
-}
-function drawField(now){
-  const rev=scene.gooReveal;
-  if(rev<=0.001||!fieldBars.length) return;
-  ctx.save();
-  ctx.lineCap='round';
-  for(let i=0;i<fieldBars.length;i+=1){
-    const B=fieldBars[i];
-    /* il campo ARRIVA a ondata, un settore per volta */
-    const t=clamp((rev-i/fieldBars.length*0.35)/0.65,0,1);
-    if(t<=0.001) continue;
-    const cx=CX+B.nx*B.c, cy=CY+B.ny*B.c;
-    const hl=B.half*easeOutCubic(t);
-    const x0=cx-B.tx*hl, y0=cy-B.ty*hl, x1=cx+B.tx*hl, y1=cy+B.ty*hl;
-    /* respiro lento e sfasato: un campo magico non e' una decalcomania */
-    const br=0.78+0.22*Math.sin(now/900+i*0.7);
-    const f=B.flash;
-    const line=(w,a,col)=>{
-      ctx.lineWidth=w; ctx.globalAlpha=a*t;
-      ctx.strokeStyle=col; ctx.shadowColor=col; ctx.shadowBlur=w*2.2;
-      ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y1); ctx.stroke();
-    };
-    /* alone largo: e' lui che assorbe l'errore di tangenza residuo */
-    line(13+10*f, (0.14+0.30*f)*br, 'rgba(140,110,255,1)');
-    /* sottofondo scuro: la barra passa anche SOPRA il fiore, e un viola chiaro su
-       petalo crema non si vedrebbe. Stessa soluzione della pallina e della seta. */
-    ctx.shadowBlur=0; line(5.6, 0.55, 'rgba(14,10,38,1)');
-    line(4.8+2*f, (0.42+0.45*f)*br, 'rgba(178,150,255,1)');
-    line(2.4+1.4*f, (0.95+0.05*f)*br, f>0.02?'rgba(252,248,255,1)':'rgba(228,220,255,1)');
-    B.flash=Math.max(0,B.flash-0.035);
-  }
-  ctx.shadowBlur=0;
-  ctx.restore();
 }
 
 function buildPillars(){
@@ -414,7 +394,6 @@ function launchRoll(){
   /* recompute geometry, build obelisks, reset all scene state */
   recomputeGeometry();
   buildPillars();
-  buildField();
   scene.starScale=0; scene.pourP=0; scene.streamAlpha=0; scene.webP=0;
   scene.webSeed=(Math.random()*1e9)|0;   // una tela diversa a ogni tiro
   scene.gooReveal=0; scene.ringReveal=0;
@@ -691,8 +670,8 @@ function stepBall(p){
     const nx=(b.x-CX)/d, ny=(b.y-CY)/d;
     chaoticBounce(nx,ny,false);
     b.x=CX+nx*edge; b.y=CY+ny*edge;
-    /* la regola si manifesta quando viene invocata: lampeggia la barra baciata */
-    flashFieldAt(Math.atan2(ny,nx));
+    /* la regola si manifesta quando viene invocata: lampeggia il confine baciato */
+    flashWardAt(Math.atan2(ny,nx));
     addSpark(b.x,b.y);
   }
 
@@ -984,7 +963,13 @@ const WEB_INK={
      crema hanno contrasto quasi nullo */
   shade:'rgba(6,14,22,0.88)',
 };
-const WEB_OPTS={...WEB_DEFAULTS, radii:18, weftStep:16,
+const WEB_OPTS={...WEB_DEFAULTS,
+  /* 22 RAGGI NON E' ESTETICA: l'area della fascia di fallimento critico dipende
+     solo da (raggi x cedimento) ed e' invariante rispetto alla difficolta'.
+     Misurato con cedimento 0.17: 14 raggi -> 9.22%, 18 -> 6.35%, 22 -> 5.23%,
+     26 -> 3.93%. A 22 la fascia naturale e' gia' il 5%, quindi la bisezione che
+     la porta esatta lavora vicino a 1 e non deforma il giro. */
+  radii:22, weftStep:16, critBand:5,
   /* FESTONE PIENO. Quando il telaio era il muro fisico dovevo tenerlo basso
      (~6%) o la pallina rimbalzava contro il nulla. Ora il muro e' il campo di
      barre, quindi il festone e' libero di essere profondo: 10 ancoraggi e 0.16
@@ -1020,6 +1005,10 @@ function drawWebLayer(){
        in cui la tela e' sospesa, invece di un vuoto che non e' di nessuno. */
     rTether:R*0.995,  // i tiranti arrivano alla ghiera: e' lei il ramo
     seed:scene.webSeed,
+    /* il muro FISICO, distinto dal telaio della tela: e' qui che il modulo
+       appende il giro di trame in evidenza */
+    rWallAt:(a)=>rCheckAt(a),
+    flashAt:(a)=>wardFlashAt(a),
     skipArena:true,                      // il vuoto e il righello li disegna la V7
     ink:WEB_INK,
   }, WEB_OPTS, {
@@ -1686,16 +1675,12 @@ function frame(now){
   drawAxisRig(now);
   drawBlueprint(now);
   drawStar(now);
-  /* IL CAMPO sopra il fiore ma SOTTO la tela: gerarchia di v13 — il fiore e' il
-     premio, la tela e' la minaccia, il campo e' la regola. La regola si vede
-     anche sopra il premio (deve dire dove la pallina rimbalza) ma sta sotto la
-     minaccia, perche' non e' lei a fare paura. */
-  drawField(now);
   /* LA TELA DAVANTI AL FIORE: disegnata DOPO la stella. Da sola l'inversione
      non basterebbe — i raggi partivano dal contorno della stella, quindi non
      c'era mai un filo sopra il petalo. Serve `overStar`, che li radica al
      mozzo. Le trame restano fuori: sopra il fiore passano solo i raggi. */
   drawWebLayer();
+  decayWardFlashes();
   /* V6: drawValleyRisks() disattivato — ferita e morte tornano con una
      grammatica propria, fuori dall'area del goo. */
   scene.whitePillars.forEach(p=>drawPillar(p,true));  // draw first (behind)
