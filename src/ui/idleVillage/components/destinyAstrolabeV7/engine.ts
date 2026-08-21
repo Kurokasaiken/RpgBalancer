@@ -4,7 +4,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { drawWeb, WEB_DEFAULTS, invEaseInOutCubic } from '@/ui/skillCheckWebV1/adversaryShapes';
+import { drawWeb, WEB_DEFAULTS } from '@/ui/skillCheckWebV1/adversaryShapes';
 
 export interface AstrolabeSkill { name: string; stat: number; difficulty: number; }
 export interface AstrolabeConfig { crit?: number; wound?: number; dead?: number; mode?: string;
@@ -251,6 +251,7 @@ const scene={
   teasePos:null,                        // punto della banda di fallimento da sfiorare
   shocks:[], sparks:[],
   webSeed:7,                            // tela deterministica per tiro
+  webP:0,                               // 0..1 avanzamento del lancio della tela
   gooRipple:0,                          // boosts displacement scale
   gooReveal:0,                          // 0 in idle → la tela viene scoccata
   ringReveal:0,                         // 0 until the bronze ring locks in
@@ -283,6 +284,11 @@ function emitState(s){ try{ if(typeof opts!=='undefined'&&opts&&opts.onState) op
 function emitArmed(b){ try{ if(typeof opts!=='undefined'&&opts&&opts.onArmed) opts.onArmed(b); }catch(e){} }
 let armed=false;                 // true while the TIRA button should be shown
 const GOO_MS=620;                // springy goo-expansion duration
+const WEB_MS=900;                // la tela scoccata sopra il fiore
+/* raggio del telaio della tela: 311 su un board da 362. Copre il fiore fino a
+   stat 92 (rOf(92)=316); sopra quel valore le punte lo bucano, e va bene — a
+   vantaggio estremo la stella che perfora la trappola e' una lettura giusta. */
+const WEB_R=R*0.86;
 function setState(s){
   scene.state=s; scene.t0=performance.now();
   suite.dataset.state=s;
@@ -310,7 +316,7 @@ function launchRoll(){
   /* recompute geometry, build obelisks, reset all scene state */
   recomputeGeometry();
   buildPillars();
-  scene.starScale=0; scene.pourP=0; scene.streamAlpha=0;
+  scene.starScale=0; scene.pourP=0; scene.streamAlpha=0; scene.webP=0;
   scene.webSeed=(Math.random()*1e9)|0;   // una tela diversa a ogni tiro
   scene.gooReveal=0; scene.ringReveal=0;
   scene.ball={x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false};
@@ -330,7 +336,7 @@ function throwBall(){
   if(s==='idle'||s==='the-spin'||s==='magnetic-snap'||s==='resolution') return;
   armed=false; emitArmed(false);
   /* warp: snap any still-playing reveal so we never fire from an empty scene */
-  scene.gooReveal=1; scene.starScale=1; scene.pourP=1; scene.streamAlpha=0.34;
+  scene.gooReveal=1; scene.starScale=1; scene.pourP=1; scene.streamAlpha=0.34; scene.webP=1;
   scene.blackPillars.concat(scene.whitePillars).forEach(pl=>{ pl.drop=1; pl.landed=true; });
   if(s!=='action-trigger'){ scene.warp=1; scene.gooRipple=1; }   // visual warp flash when skipping
   setState('the-spin'); fireBall();
@@ -398,7 +404,20 @@ function tickTimeline(){
     scene.starScale=easeOutBack(clamp((p-STAR_START)/(1-STAR_START),0,1));
     if(p>=1){
       scene.starScale=1;
-      armed=true; emitArmed(true);     // arm the THROW button after star finishes expanding
+      setState('web-cast');            // prima il fiore, POI la tela sopra
+    }
+  }
+  else if(s==='web-cast'){
+    /* LA TELA VIENE SCOCCATA SOPRA IL FIORE.
+       Ordine dei beat invertito su richiesta del Director: il premio si mostra
+       prima, e solo dopo l'avversario gli butta la tela addosso. Prima la tela
+       arrivava con la difficolta' e il fiore la scacciava crescendo, cioe' la
+       tela non era mai sopra il premio. */
+    const p=phaseT(WEB_MS);
+    scene.webP=clamp(p,0,1);
+    if(p>=1){
+      scene.webP=1;
+      armed=true; emitArmed(true);     // il THROW si arma quando la tela e' posata
       setState('risk-pour');
     }
   }
@@ -813,11 +832,16 @@ function drawChallengeSurface(now){
   const path=gooBlobPath(rev,0);
   ctx.save();
 
-  /* 1. Deep void fill */
+  /* IL GOO NON ESISTE PIU'.
+     Restava il suo disco scuro, e con la tela sopra la domanda del Director era
+     giusta: se il goo c'e' ancora, a che serve la tela? Una cosa sola puo'
+     essere l'avversario. Qui rimane solo un velo appena percettibile che stacca
+     l'arena dal fondo — non un corpo, non una materia: il muro lo dicono il
+     telaio della tela e i nodi sugli obelischi. */
   const fill=ctx.createRadialGradient(CX,CY,0,CX,CY,geo.rTip*rev*1.5);
-  fill.addColorStop(0,'rgba(1,3,14,0.97)');
-  fill.addColorStop(0.6,'rgba(3,5,20,0.95)');
-  fill.addColorStop(1,'rgba(2,3,16,0.90)');
+  fill.addColorStop(0,'rgba(1,3,14,0.30)');
+  fill.addColorStop(0.7,'rgba(2,4,16,0.22)');
+  fill.addColorStop(1,'rgba(2,3,16,0.10)');
   ctx.fillStyle=fill; ctx.fill(path);
 
   /* 2. NIENTE BORDO DISEGNATO: il muro adesso lo porta il TELAIO DELLA TELA.
@@ -867,13 +891,20 @@ const WEB_OPTS={...WEB_DEFAULTS, radii:18, weftStep:16,
      loro la tela non dice "appiccicoso" e resta un reticolo di linee. */
   droplets:true, beads:0.10};
 function drawWebLayer(){
-  const rev=scene.gooReveal;
+  const rev=scene.webP;
   if(rev<=0.001) return;
-  const s=Math.min(1,scene.starScale||0);
   drawWeb(ctx, {
     cx:CX, cy:CY, k:1,
-    rFrame:Math.max(...geo.axisCheck),
-    rFrameAt:(a)=>rCheckAt(a),
+    /* LA TELA COPRE TUTTO, non solo l'arena.
+       Prima il telaio stava sul muro (rCheckAt): a difficolta' 50 il muro e' 192
+       e le punte del fiore arrivano a 296, quindi la tela finiva DENTRO il fiore
+       e leggeva come un centrino appoggiato sopra. Se la si butta addosso, deve
+       coprirlo: il telaio va oltre le punte.
+       Costo dichiarato: il telaio non e' piu' il muro dell'arena. Il muro resta
+       un fatto fisico (la pallina e' confinata da rCheckAt come sempre) segnato
+       dagli obelischi; la tela e' il velo gettato sul board, non la sua pelle. */
+    rFrame:WEB_R,
+    rFrameAt:()=>WEB_R,
     rStar:(a)=>rStarAt(a,1),
     /* ancoraggi maestri = gli OBELISCHI: stanno gia' sul muro, quindi muro,
        picchetti e telaio diventano una cosa sola invece di tre cerchi */
@@ -881,18 +912,27 @@ function drawWebLayer(){
     /* il ramo = la ghiera di bronzo, che resta circolare a R (decisione del
        Director). I tiranti attraversano il campo vuoto e lo rendono lo spazio
        in cui la tela e' sospesa, invece di un vuoto che non e' di nessuno. */
-    rTether:R,
+    rTether:R*0.99,
     seed:scene.webSeed,
     skipArena:true,                      // il vuoto e il righello li disegna la V7
     ink:WEB_INK,
   }, WEB_OPTS, {
     launch:Math.min(1,rev),
     showStar:false,                      // la stella è disegnata da drawStar()
-    starS:s,
+    /* LA TELA NON SI SPACCA — decisione del Director. `starS:0` significa che
+       per la tela la stella non esiste: nessun filo viene mangiato, nessuno
+       scatta, il telaio non viene bucato. La tela si posa INTERA sopra il
+       fiore e resta intera.
+       Conseguenza da tenere presente: la tela non racconta piu' le probabilita'
+       (copriva la sola regione di fallimento, ora copre tutto). Il numero lo
+       leggono la stella e l'arena, e lo risolve la pallina.
+       Il meccanismo dello strappo resta nel modulo, spento da qui: si riaccende
+       passando starS/tearT invece di 0. */
+    starS:0,
     tearMs:900,
-    tearT:invEaseInOutCubic(s)*900,
+    tearT:0,
     snapFrac:0.55,
-    recoil:3.5,
+    recoil:0,
     damping:6,
   });
 }
