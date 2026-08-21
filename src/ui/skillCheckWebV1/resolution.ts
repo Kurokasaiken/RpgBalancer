@@ -36,7 +36,7 @@ import {
   zoneAt,
 } from './zones';
 
-const TAU = Math.PI * 2;
+/* TAU non serve piu qui: le funzioni angolari vivono in zones.ts */
 
 export interface Point {
   x: number;

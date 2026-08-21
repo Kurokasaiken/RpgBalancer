@@ -318,6 +318,8 @@ const scene={
   pourP:0, streamAlpha:0,
   ball:{x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false},
   snapFrom:null,
+  chain:null,                           // esito+atterraggio+traiettoria, deciso al lancio
+  glass:{p:0,breakT:-1,from:null,fromRim:false,fall:0},
   impact:null,                          // {x,y,t,warm} — pulsazione d'impatto puntuale
   teasePos:null,                        // punto della banda di fallimento da sfiorare
   shocks:[], sparks:[],
@@ -460,7 +462,8 @@ function launchRoll(){
   recomputeGeometry();
   buildPillars();
   scene.starScale=0; scene.pourP=0; scene.streamAlpha=0; scene.webP=0;
-  scene.rigP=0; scene.threatP=0; scene.wardP=0; scene.impact=null;
+  scene.rigP=0; scene.threatP=0; scene.wardP=0; scene.impact=null; scene.chain=null;
+  scene.glass={p:0,breakT:-1,from:null,fromRim:false,fall:0};
   scene.webSeed=(Math.random()*1e9)|0;   // una tela diversa a ogni tiro
   scene.ringReveal=0;
   scene.ball={x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false};
@@ -484,6 +487,18 @@ function throwBall(){
   scene.webP=1; scene.rigP=1; scene.threatP=1; scene.wardP=1;
   scene.blackPillars.concat(scene.whitePillars).forEach(pl=>{ pl.drop=1; pl.landed=true; });
   if(s!=='action-trigger'){ scene.warp=1; scene.gooRipple=1; }   // visual warp flash when skipping
+  /* ── LA CATENA ESITO-PRIMA (PLAN-008) ────────────────────────────────────
+     Qui si decide TUTTO: i due D100, il punto d'atterraggio che soddisfa la
+     coppia, e la traiettoria che finisce su quel punto. Prima di questa riga il
+     board non sa niente; dopo, non c'e' piu' niente da scoprire — la pallina non
+     "trova" l'esito, lo mette in scena.
+     `cfg.mode` forzato resta come strumento di test, ma non sovrascrive piu' il
+     verdetto a valle: rientra come vincolo sulla regione estratta. */
+  scene.chain=scResolveCheck(snap(), (Math.random()*1e9)|0);
+  if(!scene.chain.verified){
+    console.error('[chain] asserzione violata: la regione del punto non e\' quella estratta',
+      scene.chain.rolled, scene.chain.landing);
+  }
   setState('the-spin'); fireBall();
 }
 const RING_MS=140;   // V6: la ghiera non esiste più, resta solo un beat tecnico
@@ -564,6 +579,9 @@ function tickTimeline(){
        legge dopo aver visto i pezzi a cui si applica. */
     const p=phaseT(WARD_MS);
     scene.wardP=easeOutCubic(p);
+    /* il vetro si posa insieme al confine: e' lo stesso gesto — la regola e il
+       pavimento su cui la regola vale */
+    scene.glass.p=easeOutCubic(p);
     if(p>=1){
       scene.wardP=1;
       armed=true; emitArmed(true);   // il THROW si arma a scena completa
@@ -581,13 +599,32 @@ function tickTimeline(){
        button is already armed; the spin will not start on its own. */
   }
   else if(s==='the-spin'){
-    const p=phaseT(cfg.tSpin);
-    stepBall(p);
-    /* when ball effectively stops, resolve immediately rather than waiting */
-    const spd=Math.hypot(scene.ball.vx,scene.ball.vy);
-    if(p>=1||(p>0.7&&spd<0.4)){ resolve(); }
+    const T=scene.chain&&scene.chain.trajectory;
+    const p=phaseT(T?T.durationMs:cfg.tSpin);
+    if(T){
+      /* la pallina LEGGE la traiettoria sintetizzata: non c'e' fisica da cui
+         sperare l'arrivo. Le quattro fasi (caos, decelerazione, esitazione sul
+         confine vero, scatto) sono dentro quei campioni. */
+      const b=scene.ball;
+      const n=T.points.length;
+      const i=Math.min(n-1,Math.max(0,Math.round(p*(n-1))));
+      const prev=T.points[Math.max(0,i-1)];
+      const cur=T.points[i];
+      b.vx=cur.x-prev.x; b.vy=cur.y-prev.y;
+      b.x=CX+cur.x; b.y=CY+cur.y;
+      b.on=true;
+      b.trail.push({x:b.x,y:b.y,life:480});
+      for(let k=b.trail.length-1;k>=0;k-=1){ b.trail[k].life-=16; if(b.trail[k].life<=0) b.trail.splice(k,1); }
+      if(p>=1) resolve();
+    } else {
+      stepBall(p);
+      const spd=Math.hypot(scene.ball.vx,scene.ball.vy);
+      if(p>=1||(p>0.7&&spd<0.4)){ resolve(); }
+    }
   }
   /* decay one-shot fx */
+  /* rottura e caduta avanzano nel tempo, non a fotogrammi fissi */
+  if(scene.glass.breakT>=0) scene.glass.breakT+=16.7;
   scene.gooRipple=Math.max(0,scene.gooRipple-0.02);
   scene.blackPillars.concat(scene.whitePillars).forEach(pl=>pl.flash=Math.max(0,pl.flash-0.03));
 }
@@ -796,13 +833,30 @@ function resolve(){
   /* Verdict = ball position in 2D space relative to the two surfaces */
   const _d=Math.hypot(b.x-CX,b.y-CY);
   console.log(`[resolve] ball=(${(b.x-CX).toFixed(1)},${(b.y-CY).toFixed(1)}) dist=${_d.toFixed(1)} rStar=${rStarAt(Math.atan2(b.y-CY,b.x-CX)).toFixed(1)} rCheck=${rCheckAt(Math.atan2(b.y-CY,b.x-CX)).toFixed(1)} spd=${Math.hypot(b.vx,b.vy).toFixed(2)}`);
-  const _sv=spatialVerdict(b.x,b.y);
-  const forced=(cfg.mode&&cfg.mode!=='random'&&['bigwin','win','almost','fail','epicfail'].includes(cfg.mode))?cfg.mode:null;
-  let verdict=forced||_sv;
-  let dead=false, wounded=false, riskRoll=0;
-  if(verdict==='fail_dead'){verdict='fail';dead=true;riskRoll=1;}
-  else if(verdict==='fail_wound'){verdict='fail';wounded=true;riskRoll=cfg.dead+1;}
-  else{const rr=spatialRiskRoll();dead=rr.dead;wounded=rr.wounded;riskRoll=rr.riskRoll;}
+  /* IL VERDETTO VIENE DAI DADI, non dalla posizione. `spatialVerdict` resta come
+     ASSERZIONE: se dissente e' un bug che deve gridare, non una sovrascrittura
+     silenziosa. Prima faceva l'opposto — `verdict = forced || spatialVerdict(...)`
+     ignorava dove la pallina si era davvero fermata, e la carta poteva dire
+     ROVINA con la pallina su un petalo. */
+  const CH=scene.chain;
+  const REGION_TO_VERDICT={critWin:'bigwin',win:'win',almost:'almost',fail:'fail',critFail:'epicfail'};
+  let verdict, dead, wounded, riskRoll;
+  if(CH){
+    verdict=REGION_TO_VERDICT[CH.rolled.region]||'fail';
+    dead=CH.rolled.zone==='death';
+    wounded=CH.rolled.zone==='wound';
+    riskRoll=CH.rolled.riskRoll;
+    const seen=scRegionAt(CH.snap,b.x-CX,b.y-CY);
+    if(seen!==CH.rolled.region){
+      console.error(`[chain] ASSERZIONE: estratto ${CH.rolled.region}, la pallina e' in ${seen}`);
+    }
+  } else {
+    const _sv=spatialVerdict(b.x,b.y);
+    verdict=_sv; dead=false; wounded=false; riskRoll=0;
+    if(verdict==='fail_dead'){verdict='fail';dead=true;riskRoll=1;}
+    else if(verdict==='fail_wound'){verdict='fail';wounded=true;riskRoll=cfg.dead+1;}
+    else{const rr=spatialRiskRoll();dead=rr.dead;wounded=rr.wounded;riskRoll=rr.riskRoll;}
+  }
   const skillIndex=getSkillIndexFromAngle(b.x,b.y);
   recomputeGeometry(skillIndex);
   scene.res={verdict,roll:0,riskRoll,skillIndex,wounded,dead};
@@ -849,6 +903,22 @@ function resolve(){
      Disegnata su canvas e non in CSS: le coordinate sono quelle vere della
      pallina, senza rimappature di percentuali su un elemento con inset -12%. */
   scene.impact={x:b.x,y:b.y,t:0,warm:!isLoss};
+  /* IL VETRO SI ROMPE, e il verdetto si sposta dalla fermata alla CADUTA.
+     Le crepe nascono sotto la pallina — tranne nel fallimento critico, dove
+     nascono dal BORDO: il pavimento che cede da fuori e' un'altra cosa dal
+     pavimento che cede sotto di te.
+     Se il punto e' sul fiore la pallina resta: l'isola la regge. Altrimenti
+     cade nel vuoto e sparisce. */
+  scene.glass.breakT=0;
+  scene.glass.fromRim=(verdict==='epicfail');
+  if(scene.glass.fromRim){
+    const ang=Math.atan2(b.y-CY,b.x-CX);
+    const rr=rCheckAt(ang);
+    scene.glass.from={x:CX+Math.cos(ang)*rr,y:CY+Math.sin(ang)*rr};
+  } else {
+    scene.glass.from={x:b.x,y:b.y};
+  }
+  scene.glass.fall=(verdict==='bigwin'||verdict==='win')?0:1;   // 1 = cadra' nel vuoto
   shake('shake-resolve');
   $id('launch').classList.add('pulse');
   /* panel result removed */
@@ -1678,6 +1748,115 @@ function drawImpact(dt){
   }
   ctx.restore();
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   IL VETRO — la lastra su cui viaggia la pallina, e che si rompe.
+
+   Risolve il problema che il Director ha posto («non si capisce che l'area e'
+   delimitata dalle linee»), e lo risolve alla radice invece che con piu'
+   contrasto sulla linea: una linea chiusa chiede all'occhio un atto di
+   inferenza, una SUPERFICIE no. Il vetro c'e', e dove finisce finisce il
+   pavimento.
+
+   E sposta il verdetto dalla FERMATA alla CADUTA: la pallina si ferma, il vetro
+   si rompe, e solo allora si vede dove cade. Un beat in piu' esattamente dove
+   serviva, e per la prima volta l'`almost` diventa leggibile — cadere per un
+   soffio fuori dal petalo E' «per un soffio».
+
+   Materiale da bibbia DNA (§Overlay Layer: "effetti di vetro, cristallo" e
+   texture "Crystal Reflections"): NON una campitura piatta, che sarebbe un
+   flat digital plane e sta nella kill list. Riflessi speculari, sfaccettature,
+   bordo che rifrange. */
+const GLASS_BREAK_MS=520;
+const GLASS_FALL_MS=700;
+function glassPath(){
+  const P=new Path2D();
+  const SEG=180;
+  for(let i=0;i<=SEG;i+=1){
+    const a=-Math.PI/2+i/SEG*TAU, r=rCheckAt(a);
+    const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
+    if(i===0) P.moveTo(x,y); else P.lineTo(x,y);
+  }
+  P.closePath();
+  return P;
+}
+function drawGlass(now){
+  const G=scene.glass;
+  if(G.p<=0.001) return;
+  const broken=G.breakT>=0;
+  const bp=broken?clamp(G.breakT/GLASS_BREAK_MS,0,1):0;
+  ctx.save();
+  const path=glassPath();
+  ctx.save();
+  ctx.clip(path);
+  /* 1. lastra: un velo freddissimo, non un colore. Sparisce mentre si rompe. */
+  const veil=1-bp*0.85;
+  const g=ctx.createLinearGradient(CX-260,CY-260,CX+260,CY+260);
+  g.addColorStop(0,`rgba(150,222,214,${(0.055*G.p*veil).toFixed(3)})`);
+  g.addColorStop(0.45,`rgba(255,255,255,${(0.020*G.p*veil).toFixed(3)})`);
+  g.addColorStop(1,`rgba(120,196,200,${(0.045*G.p*veil).toFixed(3)})`);
+  ctx.fillStyle=g; ctx.fill(path);
+  /* 2. riflessi speculari: due strisce oblique, e' cio' che dice "vetro" */
+  ctx.globalAlpha=0.5*G.p*veil;
+  for(const [off,w,al] of [[-120,74,0.10],[96,38,0.07]]){
+    const s2=ctx.createLinearGradient(CX+off-w,CY-320,CX+off+w,CY+320);
+    s2.addColorStop(0,'rgba(255,255,255,0)');
+    s2.addColorStop(0.5,`rgba(238,252,250,${al})`);
+    s2.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=s2; ctx.fill(path);
+  }
+  ctx.globalAlpha=1;
+  ctx.restore();
+  /* 3. bordo che rifrange: il vetro ha uno SPESSORE, e si vede sul taglio */
+  ctx.globalAlpha=G.p*veil;
+  ctx.lineWidth=2.2; ctx.strokeStyle='rgba(196,240,236,0.42)'; ctx.stroke(path);
+  ctx.lineWidth=0.9; ctx.strokeStyle='rgba(255,232,170,0.30)'; ctx.stroke(path);
+  ctx.globalAlpha=1;
+
+  /* 4. LE CREPE. Nascono dove la pallina si e' fermata — o dal BORDO, quando
+     l'esito e' critico: il pavimento che cede da fuori e' un'altra cosa dal
+     pavimento che cede sotto di te. */
+  if(broken&&G.from){
+    const rnd=mulberry32Local(scene.chain?scene.chain.rolled.roll*7919:7);
+    ctx.save();
+    ctx.clip(path);
+    const arms=G.fromRim?9:7;
+    for(let i=0;i<arms;i+=1){
+      const a0=(G.fromRim?-Math.PI/2:Math.atan2(G.from.y-CY,G.from.x-CX))
+        +(i/arms)*TAU+(rnd()-0.5)*0.5;
+      const len=(G.fromRim?R*0.9:R*0.75)*(0.45+rnd()*0.55)*easeOutCubic(bp);
+      let x=G.from.x, y=G.from.y, a=a0;
+      ctx.beginPath(); ctx.moveTo(x,y);
+      const segs=7;
+      for(let k=1;k<=segs;k+=1){
+        a+=(rnd()-0.5)*0.42;
+        x+=Math.cos(a)*(len/segs); y+=Math.sin(a)*(len/segs);
+        ctx.lineTo(x,y);
+      }
+      /* la crepa porta il PROPRIO contrasto: chiara su chiara non si vedeva —
+         quarta volta che lo stesso difetto si presenta su questo board */
+      ctx.globalAlpha=(1-bp*0.25)*0.85;
+      ctx.lineWidth=5.0*(1-bp*0.3)+1.2;
+      ctx.strokeStyle='rgba(6,16,22,0.9)';
+      ctx.shadowBlur=0;
+      ctx.stroke();
+      ctx.globalAlpha=(1-bp*0.25);
+      ctx.lineWidth=2.0*(1-bp*0.35)+0.6;
+      ctx.strokeStyle='rgba(236,254,252,0.95)';
+      ctx.shadowColor='rgba(150,230,222,0.9)'; ctx.shadowBlur=10;
+      ctx.stroke();
+      ctx.shadowBlur=0;
+      ctx.globalAlpha=1;
+    }
+    ctx.restore();
+  }
+  ctx.restore();
+}
+function mulberry32Local(seed){
+  let a=seed>>>0;
+  return ()=>{a=(a+0x6d2b79f5)>>>0;let t=Math.imul(a^(a>>>15),1|a);
+    t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};
+}
+
 function drawBall(now){
   const b=scene.ball;
   if(!b.on && scene.state!=='resolution') return;
@@ -1717,9 +1896,22 @@ function drawBall(now){
      Ora: ombra di contatto (stacca da qualunque fondo) + nucleo SCURO (legge sul
      crema della stella) + anello di luce (legge sul vuoto). Misurato: 6.8:1 sul
      crema, 9.1:1 sul vuoto. */
+  /* LA CADUTA: dopo la rottura, se il punto non e' sul fiore la pallina scende
+     nel vuoto e sparisce — e' quella la rivelazione, non la fermata. Se e' sul
+     fiore resta, con un rimbalzino di appoggio. */
+  const G=scene.glass;
+  let fallK=0;
+  if(G.breakT>GLASS_BREAK_MS*0.45&&G.fall>0){
+    fallK=clamp((G.breakT-GLASS_BREAK_MS*0.45)/GLASS_FALL_MS,0,1);
+    if(fallK>=1) return;                      // caduta finita: la pallina non c'e' piu'
+  }
   const pulse=scene.state==='resolution'?1+.08*Math.sin(now/120):1;
-  const r=b.r*pulse;
+  const r=b.r*pulse*(1-fallK*0.75);           // rimpicciolisce cadendo: profondita'
   ctx.save();
+  if(fallK>0){
+    ctx.globalAlpha=1-fallK*fallK;            // svanisce, non taglia
+    b.y+=fallK*0.9;                           // scivola giu' di poco: e' un pozzo, non un salto
+  }
   /* 1. ombra di contatto */
   ctx.globalAlpha=.5; ctx.fillStyle='#000';
   ctx.beginPath(); ctx.ellipse(b.x,b.y+r*.5,r*1.3,r*.72,0,0,TAU); ctx.fill();
@@ -1782,6 +1974,10 @@ function frame(now){
      mozzo. Le trame restano fuori: sopra il fiore passano solo i raggi. */
   drawWebLayer();
   decayWardFlashes();
+  /* IL VETRO SOPRA LA TELA: la pallina viaggia sulla lastra, quindi la lastra e'
+     la superficie piu' alta. E la tela vista ATTRAVERSO il vetro e' la lettura
+     giusta — la trappola sta sotto, e quando il vetro si rompe ci si cade. */
+  drawGlass(now);
   /* V6: drawValleyRisks() disattivato — ferita e morte tornano con una
      grammatica propria, fuori dall'area del goo. */
   scene.whitePillars.forEach(p=>drawPillar(p,true));  // draw first (behind)
