@@ -32,14 +32,44 @@ export const ASTROLABE_MARKUP = `<div class="suite" data-suite data-state="idle"
 
       <svg class="astro-bezel" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <defs>
-          <!-- NMM ladder: raised metal read as one vertical light -->
-          <linearGradient id="bezelBand" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stop-color="#fff3c9"/>
-            <stop offset="11%"  stop-color="#f0cf6a"/>
-            <stop offset="33%"  stop-color="#dfb857"/>
-            <stop offset="55%"  stop-color="#b0803a"/>
-            <stop offset="80%"  stop-color="#5f3f16"/>
-            <stop offset="100%" stop-color="#7a5220"/>
+          <!-- BRONZO OSSIDATO, iniettato da PoiMatericV3 (g-b).
+               Prima era una scala NMM VERTICALE che passava dal crema al bronzo
+               scuro restando bronzo per tutta l'altezza: leggeva come un cerchio
+               d'oro uniforme, cioe' un hoop, non come metallo. Il bronzo di
+               MatericV3 e' DIAGONALE e collassa nel quasi-nero (#060f16) dopo il
+               52%: meta' della ghiera sta in ombra, ed e' quella meta' a dire
+               "questo e' un oggetto illuminato da una parte" invece di "questo e'
+               un anello colorato d'oro". Direzione della luce: alto-sinistra,
+               come prescrive la bibbia (Solar Triumph). -->
+          <linearGradient id="bezelBand" x1="14%" y1="4%" x2="86%" y2="96%">
+            <stop offset="0%"   stop-color="#f0cf6a"/>
+            <stop offset="9%"   stop-color="#dfb857"/>
+            <stop offset="28%"  stop-color="#8a5a20"/>
+            <stop offset="46%"  stop-color="#3d2a12"/>
+            <!-- ADATTAMENTO, non porto letterale: su MatericV3 la meta' in ombra
+                 e' #060f16 piatto, e su un medaglione da 86px funziona. Su una
+                 ghiera da 700px meta' anello in nero piatto diventa un buco —
+                 un flat digital plane, che sta nella kill list. Qui l'ombra e'
+                 BRONZO IN OMBRA con la componente teal che prescrive la bibbia:
+                 resta metallo, e resta scura. -->
+            <stop offset="62%"  stop-color="#1a2a2e"/>
+            <stop offset="84%"  stop-color="#0e1a20"/>
+            <stop offset="100%" stop-color="#152329"/>
+          </linearGradient>
+          <!-- bevel diagonale di MatericV3 (g-bv): il rilievo sopra il bronzo -->
+          <linearGradient id="bezelBevel" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stop-color="rgba(255,240,165,.30)"/>
+            <stop offset="22%"  stop-color="rgba(255,225,135,.09)"/>
+            <stop offset="58%"  stop-color="rgba(255,210,100,.02)"/>
+            <stop offset="100%" stop-color="rgba(0,0,0,.62)"/>
+          </linearGradient>
+          <!-- anello interno di MatericV3 (g-ri): il gradino ha una sua luce -->
+          <linearGradient id="bezelInner" x1="12%" y1="8%" x2="88%" y2="92%">
+            <stop offset="0%"   stop-color="#f0cf6a"/>
+            <stop offset="16%"  stop-color="#dfb857"/>
+            <stop offset="46%"  stop-color="#8a5a20"/>
+            <stop offset="80%"  stop-color="#060f16"/>
+            <stop offset="100%" stop-color="#060f16"/>
           </linearGradient>
           <!-- contact shadow the raised bezel casts down into the well -->
           <linearGradient id="bezelDrop" x1="0" y1="0" x2="0" y2="1">
@@ -57,8 +87,13 @@ export const ASTROLABE_MARKUP = `<div class="suite" data-suite data-state="idle"
 
         <!-- dark seat line: separates the molding from the field -->
         <circle cx="500" cy="500" r="497" fill="none" stroke="rgba(0,0,0,0.6)" stroke-width="3"/>
-        <!-- THE molding: one thick band, one vertical light -->
+        <!-- LA GHIERA: bronzo ossidato + bevel sopra, due passate sulla stessa
+             banda. Il bevel e' cio' che la fa leggere sollevata invece che
+             dipinta. -->
         <circle cx="500" cy="500" r="469" fill="none" stroke="url(#bezelBand)" stroke-width="46"/>
+        <circle cx="500" cy="500" r="469" fill="none" stroke="url(#bezelBevel)" stroke-width="46"/>
+        <!-- gradino interno: sottile, con la sua luce diagonale -->
+        <circle cx="500" cy="500" r="451" fill="none" stroke="url(#bezelInner)" stroke-width="5"/>
         <!-- hard inner step edge -->
         <circle cx="500" cy="500" r="446" fill="none" stroke="rgba(1,3,6,0.85)" stroke-width="2.5"/>
         <!-- shadow cast into the well, and the lit lip at the bottom -->
