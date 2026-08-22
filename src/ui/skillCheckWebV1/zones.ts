@@ -114,6 +114,44 @@ export interface Snapshot {
   voidCenters: { x: number; y: number }[];
   /** fase della geometria del rischio: è la sola manopola RIGIDA della riparazione */
   riskPhase: number;
+  /**
+   * LA COROLLA — due manopole per due mansioni (idea del Director).
+   *
+   * Il fiore faceva due lavori incompatibili: misurare la stat (punte a
+   * `rOf(stat)`) ed essere l'area di successo. In conflitto ogni volta che
+   * stat > difficolta', perche' il primo spinge le punte oltre il muro e il
+   * secondo dice che quella parte non conta — da li' il fiore diventava
+   * l'oggetto piu' grande del board e copriva tutto.
+   *
+   * Separati: `valleyF` decide la FORMA, `bodyScale` l'AREA. Le punte restano
+   * a `rOf(stat)` come AGHI disegnati a parte, sottili, che non coprono niente.
+   *
+   * E la direzione della forma e' l'opposta dell'intuizione, per necessita'
+   * geometrica: una forma che riempie molto di un cerchio DEVE essere tonda —
+   * non si occupa l'85% di un disco con cinque punte affilate senza uscirne.
+   * Misurato: lasciando risolvere anche la forma, a 95/20 la matematica risponde
+   * `valleyF = 1.000`, cioe' un cerchio.
+   *     probabilita' alta -> corolla piena e tonda
+   *     probabilita' bassa -> stella esile e aguzza
+   *
+   * Assenti = comportamento storico (`VALLEY_F`, scala 1): V7/V8/V9 non cambiano.
+   */
+  valleyF: number;
+  bodyScale: number;
+  /**
+   * LA COROLLA, una manopola sola. 0 = stella aguzza con le punte a `rOf(stat)`;
+   * 1 = la FORMA DELL'ARENA rimpicciolita fin sulla fascia critica.
+   *
+   * Perché la forma dell'arena e non un cerchio: il muro ondula del ±7% e ogni
+   * asse ha la sua difficoltà, quindi un cerchio inscritto nel muro MINIMO
+   * lascia vuoti i rigonfiamenti — misurato, il tetto si fermava all'82% invece
+   * del 95%. Per riempire un'arena ondulata serve la sua stessa sagoma.
+   *
+   * `undefined` = comportamento storico: V7/V8/V9 non cambiano di un pixel.
+   */
+  bodyMix?: number;
+  /** scala che porta le punte della stella aguzza a baciare la fascia critica */
+  bodyFit?: number;
   /** aree misurate (in % dell'arena) — la fonte delle bande del D100 */
   areas: Record<RegionId, number>;
   /** area di successo (stella ∩ arena) in unità engine² */
@@ -138,19 +176,47 @@ const blob = (theta: number): number =>
 
 /** raggio della stella all'angolo theta: le punte cadono esattamente su axisTip */
 export function rStarAt(s: Snapshot, theta: number): number {
+  if (s.bodyMix !== undefined) return rBodyAt(s, theta);
+  return rStarRaw(s, theta, s.valleyF ?? VALLEY_F, s.bodyScale ?? 1);
+}
+
+/** la stella storica: punte su axisTip*scala, valli a scala*vf */
+function rStarRaw(s: Snapshot, theta: number, vf: number, sc: number): number {
   const t = (((theta + Math.PI / 2) % TAU) + TAU) % TAU;
   const seg = TAU / (AXES * 2);
   const k = Math.floor(t / seg);
   const f = (t - k * seg) / seg;
-  const tip = (i: number) => s.axisTip[((i % AXES) + AXES) % AXES];
+  const tip = (i: number) => s.axisTip[((i % AXES) + AXES) % AXES] * sc;
   if (k % 2 === 0) {
     const a = tip(k / 2);
-    const b = Math.min(tip(k / 2), tip(k / 2 + 1)) * VALLEY_F;
+    const b = Math.min(tip(k / 2), tip(k / 2 + 1)) * vf;
     return a + (b - a) * f;
   }
   const b = tip((k + 1) / 2);
-  const a = Math.min(tip((k - 1) / 2), tip((k + 1) / 2)) * VALLEY_F;
+  const a = Math.min(tip((k - 1) / 2), tip((k + 1) / 2)) * vf;
   return a + (b - a) * f;
+}
+
+/**
+ * La corolla: fusione fra la stella aguzza e la sagoma dell'arena.
+ *
+ * Entrambi i termini sono CONTENUTI nel muro per costruzione — la stella è
+ * scalata perché le sue punte bacino la fascia critica (`bodyFit`), la sagoma è
+ * il muro stesso rimpicciolito. Una combinazione convessa di due funzioni
+ * contenute è contenuta: **il corpo non può uscire, e non c'è niente da
+ * clippare.**
+ *
+ * Senza il `bodyFit` le punte sporgevano fino a 33px nella fascia media, perché
+ * il termine "stella" partiva da `rOf(stat)` che a stat alta è oltre il muro.
+ *
+ * `bodyScale` serve solo alla coda bassa: sotto l'area minima della stella
+ * aguzza (~5%) non si può assottigliare di più, e la corolla si fa più piccola.
+ */
+function rBodyAt(s: Snapshot, theta: number): number {
+  const star = rStarRaw(s, theta, VALLEY_MIN, s.bodyFit ?? 1);
+  const hull = rWallAt(s, theta) * s.kEpic;
+  const u = clamp(s.bodyMix ?? 0, 0, 1);
+  return (star * (1 - u) + hull * u) * (s.bodyScale ?? 1);
 }
 
 /** raggio del muro dell'arena all'angolo theta — il confine FISICO della pallina */
@@ -294,6 +360,7 @@ export function buildSnapshot(
   input: SkillInput,
   config: CheckConfig = DEFAULT_CHECK_CONFIG,
   riskPhase = 0,
+  shape?: { valleyF?: number; bodyScale?: number; bodyMix?: number; bodyFit?: number },
 ): Snapshot {
   const n = Math.max(1, Math.min(AXES, input.stats.length));
   const stats = Array.from({ length: AXES }, (_, i) => input.stats[i % n]);
@@ -326,6 +393,10 @@ export function buildSnapshot(
     voidRadius: 0,
     voidCenters: [],
     riskPhase,
+    valleyF: shape?.valleyF ?? VALLEY_F,
+    bodyScale: shape?.bodyScale ?? 1,
+    bodyMix: shape?.bodyMix,
+    bodyFit: shape?.bodyFit,
     areas: { critWin: 0, win: 0, almost: 0, fail: 0, critFail: 0 },
     successArea: 0,
     arenaArea: 0,
@@ -463,4 +534,94 @@ export function buildZoneLayer(s: Snapshot, g: CellGrid): Uint8Array {
     out[i] = ZONE_IDS.indexOf(zoneAt(s, g.cx[i], g.cy[i]));
   }
   return out;
+}
+
+/* ── LA COROLLA RISOLTA ───────────────────────────────────────────────────────
+   `tst` è la probabilità di successo come REGOLA DI GIOCO, non come conseguenza
+   del disegno. È l'inversione di direzione che la corolla richiede, e va detta:
+   fino a qui la geometria era la fonte della verità e l'area la si misurava;
+   con la corolla il numero viene prima e la geometria lo illustra fedelmente.
+   Più fragile (una svista nel disegno e il board mente) ma la forma torna libera.
+
+   Il cap a `100 − crit` non è una scelta: la fascia critica vale `crit`% a ogni
+   combinazione, quindi quel successo non è mostrabile nemmeno volendo. */
+export const tstOf = (stat: number, difficulty: number, crit = 5): number =>
+  Math.min(100 - crit, clamp(50 + (stat - difficulty), 1, 99));
+
+/**
+ * LA COROLLA, in due regimi. `valleyF` e `bodyScale` non sono entrambi liberi:
+ * il vincolo di contenimento (il corpo non esce dal muro) ne lega uno.
+ *
+ * REGIME ALTO — la scala è FISSATA al contenimento: le punte del corpo baciano
+ * la fascia critica, cioè il massimo consentito. L'incognita è la profondità
+ * delle valli, e la geometria la determina: per riempire molto di un cerchio la
+ * forma DEVE farsi tonda. Misurato: al cap (95%) la matematica risponde valli
+ * ≈ 1, cioè un disco. Non è una scelta di stile, è l'unica soluzione.
+ *
+ * REGIME BASSO — sotto l'area minima ottenibile con le valli più profonde
+ * (cinque aghi che arrivano al muro), le valli sono già al minimo e l'incognita
+ * torna la scala: la corolla si fa più piccola, non più aguzza.
+ *
+ * In entrambi i casi l'area centra il bersaglio e il corpo resta dentro. Gli
+ * AGHI, disegnati a parte a `rOf(stat)`, portano la misura e possono uscire:
+ * sono larghi due pixel e non coprono niente.
+ */
+export const VALLEY_MIN = 0.14;
+
+/**
+ * Risolve la manopola della corolla perché l'area di successo valga esattamente
+ * `pct`% dell'arena.
+ *
+ * Monotona per costruzione: a `bodyMix = 0` la corolla è la stella aguzza (area
+ * minima), a 1 è la sagoma dell'arena meno la fascia critica (area = il cap).
+ * Quindi ogni bersaglio nell'intervallo ha una soluzione, e una sola bisezione
+ * la trova. Il corpo non può uscire dal muro nemmeno volendo, perché il termine
+ * a cui tende è il muro stesso: **non c'è niente da clippare.**
+ *
+ * La forma che ne esce non è una scelta di stile: probabilità alta ⇒ corolla
+ * piena che abbraccia il muro, probabilità bassa ⇒ stella esile. Abbondanza
+ * contro scarsità, e la geometria non permette il contrario.
+ */
+export function solveCorolla(
+  input: SkillInput,
+  config: CheckConfig,
+  pct: number,
+): { bodyMix: number; bodyFit: number; bodyScale: number; got: number } {
+  /* bodyFit: la scala a cui le punte della stella aguzza baciano la fascia
+     critica. Si misura sul muro MINIMO, così nessun angolo può sporgere. */
+  const probe = buildSnapshot(input, config, 0, {});
+  let minWall = Infinity;
+  for (let i = 0; i < 360; i += 1) {
+    minWall = Math.min(minWall, rWallAt(probe, -Math.PI / 2 + (i / 360) * TAU));
+  }
+  const bodyFit = (minWall * probe.kEpic) / Math.max(1, Math.max(...probe.axisTip));
+
+  const areaAt = (bodyMix: number, bodyScale = 1) => {
+    const s = buildSnapshot(input, config, 0, { bodyMix, bodyFit, bodyScale });
+    return s.areas.critWin + s.areas.win;
+  };
+
+  const floor = areaAt(0);
+  if (pct < floor) {
+    /* coda bassa: la stella è già al minimo di spessore, si rimpicciolisce */
+    let lo = 0.02;
+    let hi = 1;
+    for (let i = 0; i < 34; i += 1) {
+      const m = (lo + hi) / 2;
+      if (areaAt(0, m) > pct) hi = m;
+      else lo = m;
+    }
+    const bodyScale = (lo + hi) / 2;
+    return { bodyMix: 0, bodyFit, bodyScale, got: areaAt(0, bodyScale) };
+  }
+
+  let lo = 0;
+  let hi = 1;
+  for (let i = 0; i < 34; i += 1) {
+    const m = (lo + hi) / 2;
+    if (areaAt(m) > pct) hi = m;
+    else lo = m;
+  }
+  const bodyMix = (lo + hi) / 2;
+  return { bodyMix, bodyFit, bodyScale: 1, got: areaAt(bodyMix) };
 }

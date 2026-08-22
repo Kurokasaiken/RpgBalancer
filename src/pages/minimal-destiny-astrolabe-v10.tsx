@@ -1,11 +1,11 @@
 /**
  * Minimal Destiny Astrolabe Test Page
- * Tests the reusable DestinyAstrolabeV7Component with various configurations
+ * Tests the reusable DestinyAstrolabeV10Component with various configurations
  */
 
 import React, { useRef, useState } from 'react';
-import { DestinyAstrolabeV7Standalone } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeV7Kit';
-import type { AstrolabeResult as DestinyAstrolabeV7Result, AstrolabeSkill as DestinyAstrolabeV7Skill, DestinyAstrolabeV7Handle } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeV7Kit';
+import { DestinyAstrolabeV10Standalone } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeV10Kit';
+import type { AstrolabeResult as DestinyAstrolabeV10Result, AstrolabeSkill as DestinyAstrolabeV10Skill, DestinyAstrolabeV10Handle } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeV10Kit';
 
 /**
  * Glifo per skill. Il progetto non ha ancora un set di icone per le skill
@@ -48,22 +48,22 @@ const SKILL_PRESETS = {
   ],
 };
 
-export default function MinimalDestinyAstrolabeV7() {
-  const astrolabeRef = useRef<DestinyAstrolabeV7Handle>(null);
-  const [lastResult, setLastResult] = useState<DestinyAstrolabeV7Result | null>(null);
-  const [skills, setSkills] = useState<DestinyAstrolabeV7Skill[]>(SKILL_PRESETS.single);
+export default function MinimalDestinyAstrolabeV10() {
+  const astrolabeRef = useRef<DestinyAstrolabeV10Handle>(null);
+  const [lastResult, setLastResult] = useState<DestinyAstrolabeV10Result | null>(null);
+  const [skills, setSkills] = useState<DestinyAstrolabeV10Skill[]>(SKILL_PRESETS.single);
   const [critChance, setCritChance] = useState(5);
   const [woundChance, setWoundChance] = useState(10);
   const [deathChance, setDeathChance] = useState(5);
   const [forcedVerdict, setForcedVerdict] = useState<string>('');
   const [forcedRisk, setForcedRisk] = useState<string>('');
 
-  const handleComplete = (result: DestinyAstrolabeV7Result) => {
+  const handleComplete = (result: DestinyAstrolabeV10Result) => {
     setLastResult(result);
     console.log('Skill check completed:', result);
   };
 
-  const updateSkill = (idx: number, patch: Partial<DestinyAstrolabeV7Skill>) => {
+  const updateSkill = (idx: number, patch: Partial<DestinyAstrolabeV10Skill>) => {
     setSkills((prev) => prev.map((s, i) => (i === idx ? { ...s, ...patch } : s)));
   };
 
@@ -116,7 +116,8 @@ export default function MinimalDestinyAstrolabeV7() {
             >
               V6
             </a>
-            <span className="px-3 py-1 rounded text-sm font-semibold bg-amber-500 text-black">V7</span>
+            <a href="/minimal-destiny-astrolabe-v7" className="px-3 py-1 rounded text-sm font-semibold bg-amber-600 text-black hover:bg-amber-500 transition-colors">V7</a>
+            <span className="px-3 py-1 rounded text-sm font-semibold bg-amber-500 text-black">V10</span>
             <a
               href="/minimal-destiny-astrolabe-v8"
               className="px-3 py-1 rounded text-sm font-semibold bg-amber-600 text-black hover:bg-amber-500 transition-colors"
@@ -128,12 +129,6 @@ export default function MinimalDestinyAstrolabeV7() {
               className="px-3 py-1 rounded text-sm font-semibold bg-amber-600 text-black hover:bg-amber-500 transition-colors"
             >
               V9
-            </a>
-            <a
-              href="/minimal-destiny-astrolabe-v10"
-              className="px-3 py-1 rounded text-sm font-semibold bg-emerald-600 text-black hover:bg-emerald-500 transition-colors"
-            >
-              V10
             </a>
             <a
               href="/minimal-skillcheck-v6"
@@ -173,7 +168,7 @@ export default function MinimalDestinyAstrolabeV7() {
 
       {/* Astrolabe — fills remaining height, clipping the suite's 100vw/100vh overflow */}
       <div className="flex-1 border-2 border-amber-600 rounded-lg mx-6 mb-3 overflow-hidden" style={{ minHeight: 0 }}>
-        <DestinyAstrolabeV7Standalone
+        <DestinyAstrolabeV10Standalone
           ref={astrolabeRef}
           skills={skills}
           config={{

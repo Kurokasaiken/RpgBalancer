@@ -63,6 +63,7 @@ const MinimalDestinyAstrolabeV6Page = lazy(() => import('./pages/minimal-destiny
 const MinimalDestinyAstrolabeV7Page = lazy(() => import('./pages/minimal-destiny-astrolabe-v7').then(m => ({ default: m.default })));
 const MinimalDestinyAstrolabeV8Page = lazy(() => import('./pages/minimal-destiny-astrolabe-v8').then(m => ({ default: m.default })));
 const MinimalDestinyAstrolabeV9Page = lazy(() => import('./pages/minimal-destiny-astrolabe-v9').then(m => ({ default: m.default })));
+const MinimalDestinyAstrolabeV10Page = lazy(() => import('./pages/minimal-destiny-astrolabe-v10').then(m => ({ default: m.default })));
 const SkillCheckWebV1Page = lazy(() => import('./pages/skill-check-web-v1').then(m => ({ default: m.default })));
 const AdversaryShapesPage = lazy(() => import('./pages/adversary-shapes').then(m => ({ default: m.default })));
 const HeroComponentsLabPage = lazy(() => import('./pages/hero-components-lab').then(m => ({ default: m.default })));
@@ -251,6 +252,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/minimal-destiny-astrolabe-v6';
   const isMinimalDestinyAstrolabeV7Path =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-destiny-astrolabe-v7';
+  const isMinimalDestinyAstrolabeV10Path =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-destiny-astrolabe-v10';
   const isMinimalDestinyAstrolabeV8Path =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-destiny-astrolabe-v8';
   const isMinimalDestinyAstrolabeV9Path =
@@ -700,6 +703,16 @@ function App() {
       <ErrorBoundary componentName="Hero Components Lab Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading hero components…</div>}>
           <HeroComponentsLabPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMinimalDestinyAstrolabeV10Path) {
+    return (
+      <ErrorBoundary componentName="Minimal Destiny Astrolabe V10 Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Destiny Astrolabe V10…</div>}>
+          <MinimalDestinyAstrolabeV10Page />
         </Suspense>
       </ErrorBoundary>
     );
