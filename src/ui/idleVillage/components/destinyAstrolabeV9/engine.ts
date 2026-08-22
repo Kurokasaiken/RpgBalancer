@@ -46,8 +46,8 @@ export interface AstrolabeEngineHandle {
   destroy: () => void;
 }
 
-export function createDestinyAstrolabeV7Engine(root: HTMLElement, opts: AstrolabeEngineOpts): AstrolabeEngineHandle {
-  console.log('[engine] createDestinyAstrolabeV7Engine called, skills=', opts.skills?.map(s=>`${s.name}:${s.stat}/${s.difficulty}`));
+export function createDestinyAstrolabeV9Engine(root: HTMLElement, opts: AstrolabeEngineOpts): AstrolabeEngineHandle {
+  console.log('[engine] createDestinyAstrolabeV9Engine called, skills=', opts.skills?.map(s=>`${s.name}:${s.stat}/${s.difficulty}`));
   const DUMMY: any = new Proxy(function(){}, {
     get(_t, p){ if(p==='style'||p==='classList'||p==='dataset') return DUMMY;
       if(p==='value') return '0'; if(p==='textContent'||p==='innerHTML') return ''; return DUMMY; },
@@ -1303,11 +1303,40 @@ function drawStar(now){
   ctx.save();
   /* V6: L0 halo rimosso — l'alone allargava il bordo della stella di ~40px,
      cioè sfocava esattamente il confine che porta la probabilità. */
-  /* L1 radiant white-gold ivory face with strong inner glow */
+  /* ══ V9 — SOTTRAZIONE ══════════════════════════════════════════════════
+     Unica differenza dalla V7. Il fiore non copre piu' il campo di gioco: la
+     campitura piena esiste SOLO dentro l'arena, e cio' che eccede resta
+     contorno tratteggiato.
+     Ragione: la pallina non puo' fermarsi fuori dall'arena, quindi riempire
+     quella parte promette un successo non ottenibile — ed e' proprio quella
+     eccedenza a rendere il fiore l'oggetto piu' grande del board (raggio 296
+     contro i 192 del muro) e a far sparire ghiaccio, confine, crepe e pallina.
+     Il tratteggio dice "qui non si atterra" senza togliere la lettura della
+     stat: la punta arriva dove deve, semplicemente non e' pavimento. */
   const face=ctx.createRadialGradient(CX-30,CY-46,6,CX,CY,geo.rTip*s);
   face.addColorStop(0,'#ffffff'); face.addColorStop(.42,'#fdf8e9'); face.addColorStop(1,'#ecd49a');
+  ctx.save();
+  {
+    const ap=new Path2D();
+    const SEG=200;
+    for(let i=0;i<=SEG;i+=1){
+      const a=-Math.PI/2+i/SEG*TAU, r=rCheckAt(a);
+      const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
+      if(i===0) ap.moveTo(x,y); else ap.lineTo(x,y);
+    }
+    ap.closePath();
+    ctx.clip(ap);
+  }
   ctx.fillStyle=face;
-  ctx.fill(p);                              // V6: nessun shadowBlur sul corpo
+  ctx.fill(p);
+  ctx.restore();
+  /* fuori dall'arena: solo contorno tratteggiato */
+  ctx.save();
+  ctx.setLineDash([9,7]);
+  ctx.lineWidth=2.0;
+  ctx.strokeStyle='rgba(255,226,150,0.55)';
+  ctx.stroke(p);
+  ctx.restore();
   /* L2 rotating specular sheen */
   ctx.save(); ctx.clip(p);
   const ang=now/2600, sx=CX+Math.cos(ang)*240, sy=CY+Math.sin(ang)*240;

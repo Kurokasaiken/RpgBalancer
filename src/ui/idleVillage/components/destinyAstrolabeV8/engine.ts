@@ -46,8 +46,8 @@ export interface AstrolabeEngineHandle {
   destroy: () => void;
 }
 
-export function createDestinyAstrolabeV7Engine(root: HTMLElement, opts: AstrolabeEngineOpts): AstrolabeEngineHandle {
-  console.log('[engine] createDestinyAstrolabeV7Engine called, skills=', opts.skills?.map(s=>`${s.name}:${s.stat}/${s.difficulty}`));
+export function createDestinyAstrolabeV8Engine(root: HTMLElement, opts: AstrolabeEngineOpts): AstrolabeEngineHandle {
+  console.log('[engine] createDestinyAstrolabeV8Engine called, skills=', opts.skills?.map(s=>`${s.name}:${s.stat}/${s.difficulty}`));
   const DUMMY: any = new Proxy(function(){}, {
     get(_t, p){ if(p==='style'||p==='classList'||p==='dataset') return DUMMY;
       if(p==='value') return '0'; if(p==='textContent'||p==='innerHTML') return ''; return DUMMY; },
@@ -1303,11 +1303,37 @@ function drawStar(now){
   ctx.save();
   /* V6: L0 halo rimosso — l'alone allargava il bordo della stella di ~40px,
      cioè sfocava esattamente il confine che porta la probabilità. */
-  /* L1 radiant white-gold ivory face with strong inner glow */
+  /* ══ V8 — INVERSIONE DI VALORE ══════════════════════════════════════════
+     Unica differenza dalla V7. Il fiore era la cosa piu' grande, piu' chiara e
+     piu' centrale del board: misurato, il 33% del board contro il 28% dell'area
+     di gioco, e con un raggio (296) MAGGIORE del muro dell'arena (192). Da
+     quella sola cosa venivano cinque "non si vede": il ghiaccio e' un velo su
+     crema quasi bianco, il confine traccia una linea DENTRO il premio, e
+     pallina, crepe e anelli d'impatto viaggiano tutti su un petalo chiaro.
+     Qui il fiore e' una SUPERFICIE a bassa luminanza con il bordo caldo, e la
+     luce arriva solo come PREMIO: `bloom` sale a risoluzione e solo se la
+     pallina si e' fermata sopra. Prima il board sembrava gia' vinto. */
+  const bloom=(scene.res&&(scene.res.verdict==='win'||scene.res.verdict==='bigwin'))
+    ? clamp((scene.scrim?scene.scrim.t:0)/520,0,1) : 0;
+  const mixc=(a,b,k)=>{
+    const h=(c)=>[parseInt(c.slice(1,3),16),parseInt(c.slice(3,5),16),parseInt(c.slice(5,7),16)];
+    const A=h(a), B=h(b);
+    return `rgb(${Math.round(A[0]+(B[0]-A[0])*k)},${Math.round(A[1]+(B[1]-A[1])*k)},${Math.round(A[2]+(B[2]-A[2])*k)})`;
+  };
   const face=ctx.createRadialGradient(CX-30,CY-46,6,CX,CY,geo.rTip*s);
-  face.addColorStop(0,'#ffffff'); face.addColorStop(.42,'#fdf8e9'); face.addColorStop(1,'#ecd49a');
+  face.addColorStop(0,   mixc('#243642','#ffffff',bloom));
+  face.addColorStop(.42, mixc('#18262e','#fdf8e9',bloom));
+  face.addColorStop(1,   mixc('#0f1c23','#ecd49a',bloom));
   ctx.fillStyle=face;
-  ctx.fill(p);                              // V6: nessun shadowBlur sul corpo
+  ctx.fill(p);
+  /* il BORDO resta caldo sempre: e' lui a dire "qui si vince", non la
+     campitura. Se non fosse il tratto piu' contrastato del board, il confine fra
+     successo e fallimento spariderebbe — che e' il difetto opposto ma peggiore. */
+  ctx.lineWidth=3.4;
+  ctx.strokeStyle='rgba(255,226,150,0.95)';
+  ctx.shadowColor='rgba(255,206,120,0.7)'; ctx.shadowBlur=12;
+  ctx.stroke(p);
+  ctx.shadowBlur=0;
   /* L2 rotating specular sheen */
   ctx.save(); ctx.clip(p);
   const ang=now/2600, sx=CX+Math.cos(ang)*240, sy=CY+Math.sin(ang)*240;

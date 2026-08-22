@@ -61,6 +61,8 @@ const MinimalDestinyAstrolabeV4Page = lazy(() => import('./pages/minimal-destiny
 const MinimalDestinyAstrolabeV5Page = lazy(() => import('./pages/minimal-destiny-astrolabe-v5').then(m => ({ default: m.default })));
 const MinimalDestinyAstrolabeV6Page = lazy(() => import('./pages/minimal-destiny-astrolabe-v6').then(m => ({ default: m.default })));
 const MinimalDestinyAstrolabeV7Page = lazy(() => import('./pages/minimal-destiny-astrolabe-v7').then(m => ({ default: m.default })));
+const MinimalDestinyAstrolabeV8Page = lazy(() => import('./pages/minimal-destiny-astrolabe-v8').then(m => ({ default: m.default })));
+const MinimalDestinyAstrolabeV9Page = lazy(() => import('./pages/minimal-destiny-astrolabe-v9').then(m => ({ default: m.default })));
 const SkillCheckWebV1Page = lazy(() => import('./pages/skill-check-web-v1').then(m => ({ default: m.default })));
 const AdversaryShapesPage = lazy(() => import('./pages/adversary-shapes').then(m => ({ default: m.default })));
 const HeroComponentsLabPage = lazy(() => import('./pages/hero-components-lab').then(m => ({ default: m.default })));
@@ -249,6 +251,10 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/minimal-destiny-astrolabe-v6';
   const isMinimalDestinyAstrolabeV7Path =
     typeof window !== 'undefined' && window.location.pathname === '/minimal-destiny-astrolabe-v7';
+  const isMinimalDestinyAstrolabeV8Path =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-destiny-astrolabe-v8';
+  const isMinimalDestinyAstrolabeV9Path =
+    typeof window !== 'undefined' && window.location.pathname === '/minimal-destiny-astrolabe-v9';
   const isSkillCheckWebV1Path =
     typeof window !== 'undefined' && window.location.pathname === '/skill-check-web-v1';
   const isAdversaryShapesPath =
@@ -694,6 +700,26 @@ function App() {
       <ErrorBoundary componentName="Hero Components Lab Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading hero components…</div>}>
           <HeroComponentsLabPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMinimalDestinyAstrolabeV8Path) {
+    return (
+      <ErrorBoundary componentName="Minimal Destiny Astrolabe V8 Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Destiny Astrolabe V8…</div>}>
+          <MinimalDestinyAstrolabeV8Page />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isMinimalDestinyAstrolabeV9Path) {
+    return (
+      <ErrorBoundary componentName="Minimal Destiny Astrolabe V9 Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Destiny Astrolabe V9…</div>}>
+          <MinimalDestinyAstrolabeV9Page />
         </Suspense>
       </ErrorBoundary>
     );
