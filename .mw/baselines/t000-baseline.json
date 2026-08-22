@@ -1,0 +1,1671 @@
+{
+  "gate": "T-000",
+  "plan": "PLAN-009",
+  "constants": {
+    "R": 362,
+    "R_CORE": 43.44,
+    "AXES": 5,
+    "VALLEY_F": 0.3675,
+    "GRID_ANGLES": 720,
+    "GRID_RADII": 240
+  },
+  "config": {
+    "crit": 5,
+    "critWin": 5,
+    "almost": 5,
+    "death": 5,
+    "wound": 10
+  },
+  "cases": [
+    {
+      "stat": 1,
+      "diff": 99,
+      "tst": 1,
+      "rOfStat": 46.4056,
+      "rCore": 43.44,
+      "wallMin": 313.740215,
+      "wallMax": 360.328585,
+      "arenaArea": 357200.289015,
+      "starArea": 3574.528344,
+      "regionArea": {
+        "critWin": 170.065764,
+        "win": 3404.46258,
+        "almost": 17850.90295,
+        "fail": 318138.093452,
+        "critFail": 17636.76427
+      },
+      "regionProb": {
+        "critWin": 0.0476,
+        "win": 0.9531,
+        "almost": 4.9974,
+        "fail": 89.0643,
+        "critFail": 4.9375
+      },
+      "zoneArea": {
+        "none": 355829.236758,
+        "wound": 733.288588,
+        "death": 637.76367
+      },
+      "bands": [
+        {
+          "region": "critFail",
+          "lo": 1,
+          "hi": 5
+        },
+        {
+          "region": "fail",
+          "lo": 6,
+          "hi": 94
+        },
+        {
+          "region": "almost",
+          "lo": 95,
+          "hi": 99
+        },
+        {
+          "region": "win",
+          "lo": 100,
+          "hi": 100
+        },
+        {
+          "region": "critWin",
+          "lo": 0,
+          "hi": -1
+        }
+      ],
+      "landings": [
+        {
+          "want": "critWin+none",
+          "x": 4.7036,
+          "y": 3.9353,
+          "stage": 1
+        },
+        {
+          "want": "critWin+wound",
+          "x": 6.6663,
+          "y": 2.2262,
+          "stage": 1
+        },
+        {
+          "want": "critWin+death",
+          "x": 4.7036,
+          "y": 3.9353,
+          "stage": 0
+        },
+        {
+          "want": "win+none",
+          "x": 10.8195,
+          "y": 12.061,
+          "stage": 0
+        },
+        {
+          "want": "win+wound",
+          "x": 30.1118,
+          "y": 34.5397,
+          "stage": 0
+        },
+        {
+          "want": "win+death",
+          "x": 10.2602,
+          "y": 8.9524,
+          "stage": 0
+        },
+        {
+          "want": "almost+none",
+          "x": 51.4024,
+          "y": 41.7824,
+          "stage": 0
+        },
+        {
+          "want": "almost+wound",
+          "x": 27.2523,
+          "y": 20.6151,
+          "stage": 0
+        },
+        {
+          "want": "almost+death",
+          "x": 12.6349,
+          "y": 4.8769,
+          "stage": 0
+        },
+        {
+          "want": "fail+none",
+          "x": 164.7469,
+          "y": 133.9144,
+          "stage": 0
+        },
+        {
+          "want": "fail+wound",
+          "x": 163.3448,
+          "y": 134.651,
+          "stage": 2
+        },
+        {
+          "want": "fail+death",
+          "x": 163.3448,
+          "y": 134.651,
+          "stage": 2
+        },
+        {
+          "want": "critFail+none",
+          "x": 269.0238,
+          "y": 218.6758,
+          "stage": 0
+        },
+        {
+          "want": "critFail+wound",
+          "x": 163.3448,
+          "y": 134.651,
+          "stage": 2
+        },
+        {
+          "want": "critFail+death",
+          "x": 163.3448,
+          "y": 134.651,
+          "stage": 2
+        }
+      ],
+      "tipRadialError": 0
+    },
+    {
+      "stat": 20,
+      "diff": 80,
+      "tst": 1,
+      "rOfStat": 102.752,
+      "rCore": 43.44,
+      "wallMin": 261.288205,
+      "wallMax": 300.087795,
+      "arenaArea": 247748.499802,
+      "starArea": 2479.236613,
+      "regionArea": {
+        "critWin": 117.954938,
+        "win": 2361.281675,
+        "almost": 12381.105397,
+        "fail": 220655.575615,
+        "critFail": 12232.582178
+      },
+      "regionProb": {
+        "critWin": 0.0476,
+        "win": 0.9531,
+        "almost": 4.9974,
+        "fail": 89.0643,
+        "critFail": 4.9375
+      },
+      "zoneArea": {
+        "none": 246797.55953,
+        "wound": 508.597426,
+        "death": 442.342846
+      },
+      "bands": [
+        {
+          "region": "critFail",
+          "lo": 1,
+          "hi": 5
+        },
+        {
+          "region": "fail",
+          "lo": 6,
+          "hi": 94
+        },
+        {
+          "region": "almost",
+          "lo": 95,
+          "hi": 99
+        },
+        {
+          "region": "win",
+          "lo": 100,
+          "hi": 100
+        },
+        {
+          "region": "critWin",
+          "lo": 0,
+          "hi": -1
+        }
+      ],
+      "landings": [
+        {
+          "want": "critWin+none",
+          "x": 3.9172,
+          "y": 3.2774,
+          "stage": 1
+        },
+        {
+          "want": "critWin+wound",
+          "x": 5.5518,
+          "y": 1.854,
+          "stage": 1
+        },
+        {
+          "want": "critWin+death",
+          "x": 3.9172,
+          "y": 3.2774,
+          "stage": 0
+        },
+        {
+          "want": "win+none",
+          "x": 9.0106,
+          "y": 10.0446,
+          "stage": 0
+        },
+        {
+          "want": "win+wound",
+          "x": 25.0777,
+          "y": 28.7652,
+          "stage": 0
+        },
+        {
+          "want": "win+death",
+          "x": 8.5449,
+          "y": 7.4557,
+          "stage": 0
+        },
+        {
+          "want": "almost+none",
+          "x": 42.8088,
+          "y": 34.7971,
+          "stage": 0
+        },
+        {
+          "want": "almost+wound",
+          "x": 22.6962,
+          "y": 17.1686,
+          "stage": 0
+        },
+        {
+          "want": "almost+death",
+          "x": 10.5225,
+          "y": 4.0615,
+          "stage": 0
+        },
+        {
+          "want": "fail+none",
+          "x": 137.204,
+          "y": 111.5262,
+          "stage": 0
+        },
+        {
+          "want": "fail+wound",
+          "x": 136.0363,
+          "y": 112.1397,
+          "stage": 2
+        },
+        {
+          "want": "fail+death",
+          "x": 136.0363,
+          "y": 112.1397,
+          "stage": 2
+        },
+        {
+          "want": "critFail+none",
+          "x": 224.0476,
+          "y": 182.1169,
+          "stage": 0
+        },
+        {
+          "want": "critFail+wound",
+          "x": 136.0363,
+          "y": 112.1397,
+          "stage": 2
+        },
+        {
+          "want": "critFail+death",
+          "x": 136.0363,
+          "y": 112.1397,
+          "stage": 2
+        }
+      ],
+      "tipRadialError": 0
+    },
+    {
+      "stat": 30,
+      "diff": 80,
+      "tst": 1,
+      "rOfStat": 132.408,
+      "rCore": 43.44,
+      "wallMin": 261.288205,
+      "wallMax": 300.087795,
+      "arenaArea": 247748.499802,
+      "starArea": 2479.236613,
+      "regionArea": {
+        "critWin": 117.954938,
+        "win": 2361.281675,
+        "almost": 12381.105397,
+        "fail": 220655.575615,
+        "critFail": 12232.582178
+      },
+      "regionProb": {
+        "critWin": 0.0476,
+        "win": 0.9531,
+        "almost": 4.9974,
+        "fail": 89.0643,
+        "critFail": 4.9375
+      },
+      "zoneArea": {
+        "none": 246797.55953,
+        "wound": 508.597426,
+        "death": 442.342846
+      },
+      "bands": [
+        {
+          "region": "critFail",
+          "lo": 1,
+          "hi": 5
+        },
+        {
+          "region": "fail",
+          "lo": 6,
+          "hi": 94
+        },
+        {
+          "region": "almost",
+          "lo": 95,
+          "hi": 99
+        },
+        {
+          "region": "win",
+          "lo": 100,
+          "hi": 100
+        },
+        {
+          "region": "critWin",
+          "lo": 0,
+          "hi": -1
+        }
+      ],
+      "landings": [
+        {
+          "want": "critWin+none",
+          "x": 3.9172,
+          "y": 3.2774,
+          "stage": 1
+        },
+        {
+          "want": "critWin+wound",
+          "x": 5.5518,
+          "y": 1.854,
+          "stage": 1
+        },
+        {
+          "want": "critWin+death",
+          "x": 3.9172,
+          "y": 3.2774,
+          "stage": 0
+        },
+        {
+          "want": "win+none",
+          "x": 9.0106,
+          "y": 10.0446,
+          "stage": 0
+        },
+        {
+          "want": "win+wound",
+          "x": 25.0777,
+          "y": 28.7652,
+          "stage": 0
+        },
+        {
+          "want": "win+death",
+          "x": 8.5449,
+          "y": 7.4557,
+          "stage": 0
+        },
+        {
+          "want": "almost+none",
+          "x": 42.8088,
+          "y": 34.7971,
+          "stage": 0
+        },
+        {
+          "want": "almost+wound",
+          "x": 22.6962,
+          "y": 17.1686,
+          "stage": 0
+        },
+        {
+          "want": "almost+death",
+          "x": 10.5225,
+          "y": 4.0615,
+          "stage": 0
+        },
+        {
+          "want": "fail+none",
+          "x": 137.204,
+          "y": 111.5262,
+          "stage": 0
+        },
+        {
+          "want": "fail+wound",
+          "x": 136.0363,
+          "y": 112.1397,
+          "stage": 2
+        },
+        {
+          "want": "fail+death",
+          "x": 136.0363,
+          "y": 112.1397,
+          "stage": 2
+        },
+        {
+          "want": "critFail+none",
+          "x": 224.0476,
+          "y": 182.1169,
+          "stage": 0
+        },
+        {
+          "want": "critFail+wound",
+          "x": 136.0363,
+          "y": 112.1397,
+          "stage": 2
+        },
+        {
+          "want": "critFail+death",
+          "x": 136.0363,
+          "y": 112.1397,
+          "stage": 2
+        }
+      ],
+      "tipRadialError": 0
+    },
+    {
+      "stat": 40,
+      "diff": 60,
+      "tst": 30,
+      "rOfStat": 162.064,
+      "rCore": 43.44,
+      "wallMin": 206.075563,
+      "wallMax": 236.676437,
+      "arenaArea": 154107.726433,
+      "starArea": 46224.102344,
+      "regionArea": {
+        "critWin": 2319.035076,
+        "win": 43905.067268,
+        "almost": 7703.619737,
+        "fail": 92570.935359,
+        "critFail": 7609.068993
+      },
+      "regionProb": {
+        "critWin": 1.5048,
+        "win": 28.4899,
+        "almost": 4.9989,
+        "fail": 60.069,
+        "critFail": 4.9375
+      },
+      "zoneArea": {
+        "none": 136286.422858,
+        "wound": 9584.735454,
+        "death": 8236.568122
+      },
+      "bands": [
+        {
+          "region": "critFail",
+          "lo": 1,
+          "hi": 5
+        },
+        {
+          "region": "fail",
+          "lo": 6,
+          "hi": 65
+        },
+        {
+          "region": "almost",
+          "lo": 66,
+          "hi": 70
+        },
+        {
+          "region": "win",
+          "lo": 71,
+          "hi": 98
+        },
+        {
+          "region": "critWin",
+          "lo": 99,
+          "hi": 100
+        }
+      ],
+      "landings": [
+        {
+          "want": "critWin+none",
+          "x": 20.6701,
+          "y": 16.2109,
+          "stage": 1
+        },
+        {
+          "want": "critWin+wound",
+          "x": 24.6524,
+          "y": 8.0605,
+          "stage": 1
+        },
+        {
+          "want": "critWin+death",
+          "x": 20.6701,
+          "y": 16.2109,
+          "stage": 0
+        },
+        {
+          "want": "win+none",
+          "x": 74.7254,
+          "y": 83.3001,
+          "stage": 0
+        },
+        {
+          "want": "win+wound",
+          "x": 104.8437,
+          "y": 104.5438,
+          "stage": 0
+        },
+        {
+          "want": "win+death",
+          "x": 26.7161,
+          "y": 20.9525,
+          "stage": 0
+        },
+        {
+          "want": "almost+none",
+          "x": 84.2572,
+          "y": 50.4627,
+          "stage": 0
+        },
+        {
+          "want": "almost+wound",
+          "x": 111.4359,
+          "y": 108.0112,
+          "stage": 0
+        },
+        {
+          "want": "almost+death",
+          "x": 36.9009,
+          "y": 13.5081,
+          "stage": 0
+        },
+        {
+          "want": "fail+none",
+          "x": 160.3927,
+          "y": 108.6182,
+          "stage": 0
+        },
+        {
+          "want": "fail+wound",
+          "x": 110.4585,
+          "y": 160.5162,
+          "stage": 0
+        },
+        {
+          "want": "fail+death",
+          "x": 72.6311,
+          "y": 32.4985,
+          "stage": 1
+        },
+        {
+          "want": "critFail+none",
+          "x": 176.7043,
+          "y": 143.6339,
+          "stage": 0
+        },
+        {
+          "want": "critFail+wound",
+          "x": 121.3827,
+          "y": 86.5814,
+          "stage": 2
+        },
+        {
+          "want": "critFail+death",
+          "x": -200.5434,
+          "y": -65.5705,
+          "stage": 1
+        }
+      ],
+      "tipRadialError": 0
+    },
+    {
+      "stat": 50,
+      "diff": 50,
+      "tst": 50,
+      "rOfStat": 191.72,
+      "rCore": 43.44,
+      "wallMin": 178.469242,
+      "wallMax": 204.970758,
+      "arenaArea": 115584.122953,
+      "starArea": 57788.66471,
+      "regionArea": {
+        "critWin": 2892.45601,
+        "win": 54896.2087,
+        "almost": 5780.91303,
+        "fail": 46307.579142,
+        "critFail": 5706.966071
+      },
+      "regionProb": {
+        "critWin": 2.5025,
+        "win": 47.4946,
+        "almost": 5.0015,
+        "fail": 40.064,
+        "critFail": 4.9375
+      },
+      "zoneArea": {
+        "none": 90159.266687,
+        "wound": 10795.272442,
+        "death": 14629.583824
+      },
+      "bands": [
+        {
+          "region": "critFail",
+          "lo": 1,
+          "hi": 5
+        },
+        {
+          "region": "fail",
+          "lo": 6,
+          "hi": 45
+        },
+        {
+          "region": "almost",
+          "lo": 46,
+          "hi": 50
+        },
+        {
+          "region": "win",
+          "lo": 51,
+          "hi": 97
+        },
+        {
+          "region": "critWin",
+          "lo": 98,
+          "hi": 100
+        }
+      ],
+      "landings": [
+        {
+          "want": "critWin+none",
+          "x": 21.1657,
+          "y": 17.8269,
+          "stage": 0
+        },
+        {
+          "want": "critWin+wound",
+          "x": 54.5172,
+          "y": 53.5739,
+          "stage": 2
+        },
+        {
+          "want": "critWin+death",
+          "x": 54.5172,
+          "y": 53.5739,
+          "stage": 2
+        },
+        {
+          "want": "win+none",
+          "x": 93.7588,
+          "y": 97.4499,
+          "stage": 0
+        },
+        {
+          "want": "win+wound",
+          "x": 110.8026,
+          "y": 111.213,
+          "stage": 0
+        },
+        {
+          "want": "win+death",
+          "x": 56.1678,
+          "y": 31.2702,
+          "stage": 0
+        },
+        {
+          "want": "almost+none",
+          "x": -56.3579,
+          "y": -102.7187,
+          "stage": 0
+        },
+        {
+          "want": "almost+wound",
+          "x": 114.9172,
+          "y": 103.8572,
+          "stage": 0
+        },
+        {
+          "want": "almost+death",
+          "x": 100.3804,
+          "y": 40.7723,
+          "stage": 0
+        },
+        {
+          "want": "fail+none",
+          "x": 130.7354,
+          "y": 85.2445,
+          "stage": 0
+        },
+        {
+          "want": "fail+wound",
+          "x": 116.3469,
+          "y": 121.7543,
+          "stage": 0
+        },
+        {
+          "want": "fail+death",
+          "x": 106.1507,
+          "y": 38.858,
+          "stage": 0
+        },
+        {
+          "want": "critFail+none",
+          "x": 151.7431,
+          "y": 123.3442,
+          "stage": 0
+        },
+        {
+          "want": "critFail+wound",
+          "x": -173.0504,
+          "y": -55.9536,
+          "stage": 0
+        },
+        {
+          "want": "critFail+death",
+          "x": 122.6093,
+          "y": 146.6698,
+          "stage": 1
+        }
+      ],
+      "tipRadialError": 0
+    },
+    {
+      "stat": 60,
+      "diff": 50,
+      "tst": 60,
+      "rOfStat": 221.376,
+      "rCore": 43.44,
+      "wallMin": 178.469242,
+      "wallMax": 204.970758,
+      "arenaArea": 115584.122953,
+      "starArea": 69346.507307,
+      "regionArea": {
+        "critWin": 3469.438402,
+        "win": 65877.068905,
+        "almost": 5787.537822,
+        "fail": 34743.111753,
+        "critFail": 5706.966071
+      },
+      "regionProb": {
+        "critWin": 3.0017,
+        "win": 56.9949,
+        "almost": 5.0072,
+        "fail": 30.0587,
+        "critFail": 4.9375
+      },
+      "zoneArea": {
+        "none": 86036.605181,
+        "wound": 11990.039152,
+        "death": 17557.47862
+      },
+      "bands": [
+        {
+          "region": "critFail",
+          "lo": 1,
+          "hi": 5
+        },
+        {
+          "region": "fail",
+          "lo": 6,
+          "hi": 35
+        },
+        {
+          "region": "almost",
+          "lo": 36,
+          "hi": 40
+        },
+        {
+          "region": "win",
+          "lo": 41,
+          "hi": 97
+        },
+        {
+          "region": "critWin",
+          "lo": 98,
+          "hi": 100
+        }
+      ],
+      "landings": [
+        {
+          "want": "critWin+none",
+          "x": 22.7924,
+          "y": 18.5268,
+          "stage": 0
+        },
+        {
+          "want": "critWin+wound",
+          "x": 112.6709,
+          "y": 103.2439,
+          "stage": 2
+        },
+        {
+          "want": "critWin+death",
+          "x": 112.6709,
+          "y": 103.2439,
+          "stage": 2
+        },
+        {
+          "want": "win+none",
+          "x": 49.4227,
+          "y": 49.6058,
+          "stage": 0
+        },
+        {
+          "want": "win+wound",
+          "x": 117.7513,
+          "y": 118.1874,
+          "stage": 0
+        },
+        {
+          "want": "win+death",
+          "x": 116.1879,
+          "y": 59.4714,
+          "stage": 0
+        },
+        {
+          "want": "almost+none",
+          "x": 128.4027,
+          "y": 88.2487,
+          "stage": 2
+        },
+        {
+          "want": "almost+wound",
+          "x": 121.3214,
+          "y": 117.5928,
+          "stage": 0
+        },
+        {
+          "want": "almost+death",
+          "x": 122.5553,
+          "y": 52.2892,
+          "stage": 0
+        },
+        {
+          "want": "fail+none",
+          "x": 133.5267,
+          "y": 87.0645,
+          "stage": 0
+        },
+        {
+          "want": "fail+wound",
+          "x": 124.8766,
+          "y": 116.8816,
+          "stage": 0
+        },
+        {
+          "want": "fail+death",
+          "x": 133.2448,
+          "y": 51.4307,
+          "stage": 0
+        },
+        {
+          "want": "critFail+none",
+          "x": 156.6561,
+          "y": 122.8601,
+          "stage": 0
+        },
+        {
+          "want": "critFail+wound",
+          "x": 110.0867,
+          "y": 151.0659,
+          "stage": 0
+        },
+        {
+          "want": "critFail+death",
+          "x": 122.6093,
+          "y": 146.6698,
+          "stage": 1
+        }
+      ],
+      "tipRadialError": 0
+    },
+    {
+      "stat": 65,
+      "diff": 60,
+      "tst": 55,
+      "rOfStat": 236.204,
+      "rCore": 43.44,
+      "wallMin": 206.075563,
+      "wallMax": 236.676437,
+      "arenaArea": 154107.726433,
+      "starArea": 84755.234492,
+      "regionArea": {
+        "critWin": 4235.890186,
+        "win": 80519.344306,
+        "almost": 7707.673237,
+        "fail": 54035.749712,
+        "critFail": 7609.068993
+      },
+      "regionProb": {
+        "critWin": 2.7487,
+        "win": 52.2487,
+        "almost": 5.0015,
+        "fail": 35.0636,
+        "critFail": 4.9375
+      },
+      "zoneArea": {
+        "none": 117452.766658,
+        "wound": 15192.68115,
+        "death": 21462.278626
+      },
+      "bands": [
+        {
+          "region": "critFail",
+          "lo": 1,
+          "hi": 5
+        },
+        {
+          "region": "fail",
+          "lo": 6,
+          "hi": 40
+        },
+        {
+          "region": "almost",
+          "lo": 41,
+          "hi": 45
+        },
+        {
+          "region": "win",
+          "lo": 46,
+          "hi": 97
+        },
+        {
+          "region": "critWin",
+          "lo": 98,
+          "hi": 100
+        }
+      ],
+      "landings": [
+        {
+          "want": "critWin+none",
+          "x": 17.1116,
+          "y": 14.4123,
+          "stage": 0
+        },
+        {
+          "want": "critWin+wound",
+          "x": 90.4214,
+          "y": 85.8067,
+          "stage": 2
+        },
+        {
+          "want": "critWin+death",
+          "x": 90.4214,
+          "y": 85.8067,
+          "stage": 2
+        },
+        {
+          "want": "win+none",
+          "x": 125.2675,
+          "y": 125.7314,
+          "stage": 0
+        },
+        {
+          "want": "win+wound",
+          "x": 133.2659,
+          "y": 129.1703,
+          "stage": 0
+        },
+        {
+          "want": "win+death",
+          "x": 87.4054,
+          "y": 46.6817,
+          "stage": 0
+        },
+        {
+          "want": "almost+none",
+          "x": 151.436,
+          "y": 104.0791,
+          "stage": 2
+        },
+        {
+          "want": "almost+wound",
+          "x": 134.6303,
+          "y": 130.4928,
+          "stage": 0
+        },
+        {
+          "want": "almost+death",
+          "x": 127.4799,
+          "y": 54.3903,
+          "stage": 0
+        },
+        {
+          "want": "fail+none",
+          "x": 144.5121,
+          "y": 94.2274,
+          "stage": 0
+        },
+        {
+          "want": "fail+wound",
+          "x": 136.8674,
+          "y": 141.3247,
+          "stage": 0
+        },
+        {
+          "want": "fail+death",
+          "x": 136.1048,
+          "y": 52.5346,
+          "stage": 0
+        },
+        {
+          "want": "critFail+none",
+          "x": 175.2153,
+          "y": 142.4236,
+          "stage": 0
+        },
+        {
+          "want": "critFail+wound",
+          "x": 125.9702,
+          "y": 174.0588,
+          "stage": 0
+        },
+        {
+          "want": "critFail+death",
+          "x": 142.7679,
+          "y": 170.7843,
+          "stage": 1
+        }
+      ],
+      "tipRadialError": 0
+    },
+    {
+      "stat": 75,
+      "diff": 50,
+      "tst": 75,
+      "rOfStat": 265.86,
+      "rCore": 43.44,
+      "wallMin": 178.469242,
+      "wallMax": 204.970758,
+      "arenaArea": 115584.122953,
+      "starArea": 86687.755759,
+      "regionArea": {
+        "critWin": 4340.434561,
+        "win": 82347.321198,
+        "almost": 5703.370991,
+        "fail": 17486.030132,
+        "critFail": 5706.966071
+      },
+      "regionProb": {
+        "critWin": 3.7552,
+        "win": 71.2445,
+        "almost": 4.9344,
+        "fail": 15.1284,
+        "critFail": 4.9375
+      },
+      "zoneArea": {
+        "none": 79892.473576,
+        "wound": 13740.126504,
+        "death": 21951.522873
+      },
+      "bands": [
+        {
+          "region": "critFail",
+          "lo": 1,
+          "hi": 5
+        },
+        {
+          "region": "fail",
+          "lo": 6,
+          "hi": 20
+        },
+        {
+          "region": "almost",
+          "lo": 21,
+          "hi": 25
+        },
+        {
+          "region": "win",
+          "lo": 26,
+          "hi": 96
+        },
+        {
+          "region": "critWin",
+          "lo": 97,
+          "hi": 100
+        }
+      ],
+      "landings": [
+        {
+          "want": "critWin+none",
+          "x": 13.7659,
+          "y": 11.1896,
+          "stage": 0
+        },
+        {
+          "want": "critWin+wound",
+          "x": 55.177,
+          "y": 48.8165,
+          "stage": 2
+        },
+        {
+          "want": "critWin+death",
+          "x": 55.177,
+          "y": 48.8165,
+          "stage": 2
+        },
+        {
+          "want": "win+none",
+          "x": 38.1528,
+          "y": 35.7101,
+          "stage": 0
+        },
+        {
+          "want": "win+wound",
+          "x": 122.3837,
+          "y": 122.837,
+          "stage": 0
+        },
+        {
+          "want": "win+death",
+          "x": 115.5951,
+          "y": 56.6442,
+          "stage": 0
+        },
+        {
+          "want": "almost+none",
+          "x": 147.6288,
+          "y": 101.4625,
+          "stage": 2
+        },
+        {
+          "want": "almost+wound",
+          "x": 130.7742,
+          "y": 126.7551,
+          "stage": 0
+        },
+        {
+          "want": "almost+death",
+          "x": 146.4167,
+          "y": 68.605,
+          "stage": 0
+        },
+        {
+          "want": "fail+none",
+          "x": 162.8347,
+          "y": 106.1745,
+          "stage": 0
+        },
+        {
+          "want": "fail+wound",
+          "x": 134.5125,
+          "y": 125.9006,
+          "stage": 0
+        },
+        {
+          "want": "fail+death",
+          "x": 163.0463,
+          "y": 66.2258,
+          "stage": 0
+        },
+        {
+          "want": "critFail+none",
+          "x": 158.9032,
+          "y": 120.2033,
+          "stage": 0
+        },
+        {
+          "want": "critFail+wound",
+          "x": 117.3794,
+          "y": 149.796,
+          "stage": 0
+        },
+        {
+          "want": "critFail+death",
+          "x": 170.7873,
+          "y": 99.0254,
+          "stage": 1
+        }
+      ],
+      "tipRadialError": 0
+    },
+    {
+      "stat": 85,
+      "diff": 50,
+      "tst": 85,
+      "rOfStat": 295.516,
+      "rCore": 43.44,
+      "wallMin": 178.469242,
+      "wallMax": 204.970758,
+      "arenaArea": 115584.122953,
+      "starArea": 98234.929987,
+      "regionArea": {
+        "critWin": 4912.697386,
+        "win": 93322.232601,
+        "almost": 5376.784664,
+        "fail": 6265.442232,
+        "critFail": 5706.966071
+      },
+      "regionProb": {
+        "critWin": 4.2503,
+        "win": 80.7397,
+        "almost": 4.6518,
+        "fail": 5.4207,
+        "critFail": 4.9375
+      },
+      "zoneArea": {
+        "none": 80077.61756,
+        "wound": 14643.286201,
+        "death": 20863.219192
+      },
+      "bands": [
+        {
+          "region": "critFail",
+          "lo": 1,
+          "hi": 5
+        },
+        {
+          "region": "fail",
+          "lo": 6,
+          "hi": 10
+        },
+        {
+          "region": "almost",
+          "lo": 11,
+          "hi": 15
+        },
+        {
+          "region": "win",
+          "lo": 16,
+          "hi": 96
+        },
+        {
+          "region": "critWin",
+          "lo": 97,
+          "hi": 100
+        }
+      ],
+      "landings": [
+        {
+          "want": "critWin+none",
+          "x": 22.7924,
+          "y": 18.5268,
+          "stage": 0
+        },
+        {
+          "want": "critWin+wound",
+          "x": 75.037,
+          "y": 64.0876,
+          "stage": 2
+        },
+        {
+          "want": "critWin+death",
+          "x": 75.037,
+          "y": 64.0876,
+          "stage": 2
+        },
+        {
+          "want": "win+none",
+          "x": 116.9411,
+          "y": 102.0354,
+          "stage": 0
+        },
+        {
+          "want": "win+wound",
+          "x": 128.1743,
+          "y": 128.649,
+          "stage": 0
+        },
+        {
+          "want": "win+death",
+          "x": 137.4226,
+          "y": 64.3907,
+          "stage": 0
+        },
+        {
+          "want": "almost+none",
+          "x": 162.735,
+          "y": 111.8447,
+          "stage": 2
+        },
+        {
+          "want": "almost+wound",
+          "x": 138.126,
+          "y": 129.2827,
+          "stage": 0
+        },
+        {
+          "want": "almost+death",
+          "x": 165.535,
+          "y": 74.0678,
+          "stage": 0
+        },
+        {
+          "want": "fail+none",
+          "x": -33.4322,
+          "y": 187.5752,
+          "stage": 0
+        },
+        {
+          "want": "fail+wound",
+          "x": 154.9198,
+          "y": 117.1901,
+          "stage": 0
+        },
+        {
+          "want": "fail+death",
+          "x": 172.6863,
+          "y": 73.678,
+          "stage": 0
+        },
+        {
+          "want": "critFail+none",
+          "x": 157.5754,
+          "y": 119.1989,
+          "stage": 0
+        },
+        {
+          "want": "critFail+wound",
+          "x": 128.6978,
+          "y": 143.4658,
+          "stage": 0
+        },
+        {
+          "want": "critFail+death",
+          "x": 178.7627,
+          "y": 76.2705,
+          "stage": 0
+        }
+      ],
+      "tipRadialError": 0
+    },
+    {
+      "stat": 95,
+      "diff": 20,
+      "tst": 95,
+      "rOfStat": 325.172,
+      "rCore": 43.44,
+      "wallMin": 95.650279,
+      "wallMax": 109.853721,
+      "arenaArea": 33200.445328,
+      "starArea": 31561.17334,
+      "regionArea": {
+        "critWin": 1577.201378,
+        "win": 29983.971962,
+        "almost": 0,
+        "fail": 0,
+        "critFail": 1639.271988
+      },
+      "regionProb": {
+        "critWin": 4.7505,
+        "win": 90.312,
+        "almost": 0,
+        "fail": 0,
+        "critFail": 4.9375
+      },
+      "zoneArea": {
+        "none": 25403.678309,
+        "wound": 3438.322748,
+        "death": 4358.444272
+      },
+      "bands": [
+        {
+          "region": "critFail",
+          "lo": 1,
+          "hi": 5
+        },
+        {
+          "region": "fail",
+          "lo": 0,
+          "hi": -1
+        },
+        {
+          "region": "almost",
+          "lo": 0,
+          "hi": -1
+        },
+        {
+          "region": "win",
+          "lo": 6,
+          "hi": 95
+        },
+        {
+          "region": "critWin",
+          "lo": 96,
+          "hi": 100
+        }
+      ],
+      "landings": [
+        {
+          "want": "critWin+none",
+          "x": 9.4511,
+          "y": 7.6823,
+          "stage": 0
+        },
+        {
+          "want": "critWin+wound",
+          "x": 54.6073,
+          "y": 45.0148,
+          "stage": 2
+        },
+        {
+          "want": "critWin+death",
+          "x": 54.6073,
+          "y": 45.0148,
+          "stage": 2
+        },
+        {
+          "want": "win+none",
+          "x": 58.2825,
+          "y": 49.0887,
+          "stage": 0
+        },
+        {
+          "want": "win+wound",
+          "x": 70.5569,
+          "y": 70.8182,
+          "stage": 0
+        },
+        {
+          "want": "win+death",
+          "x": 93.5717,
+          "y": 41.8682,
+          "stage": 0
+        },
+        {
+          "want": "almost+none",
+          "x": 81.3957,
+          "y": 67.0975,
+          "stage": 2
+        },
+        {
+          "want": "almost+wound",
+          "x": 81.3957,
+          "y": 67.0975,
+          "stage": 2
+        },
+        {
+          "want": "almost+death",
+          "x": 81.3957,
+          "y": 67.0975,
+          "stage": 2
+        },
+        {
+          "want": "fail+none",
+          "x": 81.3957,
+          "y": 67.0975,
+          "stage": 2
+        },
+        {
+          "want": "fail+wound",
+          "x": 81.3957,
+          "y": 67.0975,
+          "stage": 2
+        },
+        {
+          "want": "fail+death",
+          "x": 81.3957,
+          "y": 67.0975,
+          "stage": 2
+        },
+        {
+          "want": "critFail+none",
+          "x": 81.3957,
+          "y": 67.0975,
+          "stage": 2
+        },
+        {
+          "want": "critFail+wound",
+          "x": 75.1544,
+          "y": 72.8447,
+          "stage": 0
+        },
+        {
+          "want": "critFail+death",
+          "x": 96.8074,
+          "y": 43.316,
+          "stage": 0
+        }
+      ],
+      "tipRadialError": 0
+    },
+    {
+      "stat": 99,
+      "diff": 10,
+      "tst": 95,
+      "rOfStat": 337.0344,
+      "rCore": 43.44,
+      "wallMin": 73.44,
+      "wallMax": 78.148041,
+      "arenaArea": 17311.513096,
+      "starArea": 16456.757137,
+      "regionArea": {
+        "critWin": 825.032672,
+        "win": 15631.724465,
+        "almost": 0,
+        "fail": 0,
+        "critFail": 854.755959
+      },
+      "regionProb": {
+        "critWin": 4.7658,
+        "win": 90.2967,
+        "almost": 0,
+        "fail": 0,
+        "critFail": 4.9375
+      },
+      "zoneArea": {
+        "none": 13215.105962,
+        "wound": 1769.618592,
+        "death": 2326.788541
+      },
+      "bands": [
+        {
+          "region": "critFail",
+          "lo": 1,
+          "hi": 5
+        },
+        {
+          "region": "fail",
+          "lo": 0,
+          "hi": -1
+        },
+        {
+          "region": "almost",
+          "lo": 0,
+          "hi": -1
+        },
+        {
+          "region": "win",
+          "lo": 6,
+          "hi": 95
+        },
+        {
+          "region": "critWin",
+          "lo": 96,
+          "hi": 100
+        }
+      ],
+      "landings": [
+        {
+          "want": "critWin+none",
+          "x": 9.6732,
+          "y": 7.8629,
+          "stage": 0
+        },
+        {
+          "want": "critWin+wound",
+          "x": 53.5058,
+          "y": 44.1068,
+          "stage": 2
+        },
+        {
+          "want": "critWin+death",
+          "x": 53.5058,
+          "y": 44.1068,
+          "stage": 2
+        },
+        {
+          "want": "win+none",
+          "x": 53.0756,
+          "y": 44.7032,
+          "stage": 0
+        },
+        {
+          "want": "win+wound",
+          "x": 49.3098,
+          "y": 49.4925,
+          "stage": 0
+        },
+        {
+          "want": "win+death",
+          "x": 60.9672,
+          "y": 28.5668,
+          "stage": 0
+        },
+        {
+          "want": "almost+none",
+          "x": 58.3922,
+          "y": 48.1348,
+          "stage": 2
+        },
+        {
+          "want": "almost+wound",
+          "x": 58.3922,
+          "y": 48.1348,
+          "stage": 2
+        },
+        {
+          "want": "almost+death",
+          "x": 58.3922,
+          "y": 48.1348,
+          "stage": 2
+        },
+        {
+          "want": "fail+none",
+          "x": 58.3922,
+          "y": 48.1348,
+          "stage": 2
+        },
+        {
+          "want": "fail+wound",
+          "x": 58.3922,
+          "y": 48.1348,
+          "stage": 2
+        },
+        {
+          "want": "fail+death",
+          "x": 58.3922,
+          "y": 48.1348,
+          "stage": 2
+        },
+        {
+          "want": "critFail+none",
+          "x": 58.3922,
+          "y": 48.1348,
+          "stage": 2
+        },
+        {
+          "want": "critFail+wound",
+          "x": 51.9591,
+          "y": 52.1515,
+          "stage": 0
+        },
+        {
+          "want": "critFail+death",
+          "x": 67.2539,
+          "y": 31.5125,
+          "stage": 0
+        }
+      ],
+      "tipRadialError": 0
+    }
+  ]
+}

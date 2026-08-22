@@ -1,0 +1,118 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8">
+<title>Fessure + fondo desaturato — preview statica</title>
+<style>
+ body{margin:0;background:#0d1114;color:#e8e2d4;font:14px/1.5 ui-sans-serif,system-ui,sans-serif}
+ h1{font-size:17px;font-weight:600;letter-spacing:.02em;margin:22px 26px 4px}
+ p.sub{margin:0 26px 18px;color:#8d9aa0;max-width:78ch}
+ .row{display:flex;flex-wrap:wrap;gap:10px;padding:0 22px 26px}
+ figure{margin:0}
+ figcaption{font-size:12px;color:#93a0a6;text-align:center;padding-top:6px}
+ figcaption b{color:#e8e2d4;font-weight:600}
+ h2{font-size:13px;font-weight:600;color:#9fb0b6;margin:6px 26px 10px;letter-spacing:.06em;text-transform:uppercase}
+ canvas{display:block;border-radius:3px}
+</style></head><body>
+<h1>Le fessure che non hai mai visto, e il fondo desaturato dietro</h1>
+<p class="sub">Ogni forma è calcolata, non disegnata a mano: l'ampiezza delle fessure è
+risolta per bisezione perché l'area della vittoria sia <em>esattamente</em> la percentuale
+scritta sotto. Le punte restano su rOf(stat). Il fondo è <code>bg.png</code> desaturato:
+è quello che si vede DENTRO le fessure e nella fascia al muro.</p>
+
+<h2>A — fessure fra gli assi (le valli di oggi, strette)</h2>
+<div class="row" id="rowA"></div>
+<h2>B — fessure sugli assi (una per skill: «questa skill ti tradisce»)</h2>
+<div class="row" id="rowB"></div>
+<h2>C — senza fondo dipinto, per isolare la sola geometria</h2>
+<div class="row" id="rowC"></div>
+
+<script>
+const TAU=Math.PI*2, AXES=5, SIZE=252, PAD=8;
+const R=(SIZE/2)-PAD;              // muro dell'arena, in px di preview
+const FLOOR=0.30;                  // fondo della fessura, frazione di R
+const GOO=0.062*R;                 // fascia di goo al muro: >= raggio pallina
+const BALL=0.047*R;
+const WIN='#2f9e6b', WIN_HI='#7fe0ab', GOO_C='#141a1c';
+
+/* profilo: raggio pieno, tranne dentro +-half dall'asse della fessura */
+function rProf(th, half, onAxis){
+  const off = onAxis ? 0 : Math.PI/AXES;
+  let best=1e9;
+  for(let i=0;i<AXES;i++){
+    let d=Math.abs(((th-(-Math.PI/2+i*TAU/AXES+off))%TAU+TAU+Math.PI)%TAU-Math.PI);
+    if(d<best)best=d;
+  }
+  const rMax=R-GOO;
+  if(best>=half) return rMax;
+  const u=best/half;                       // 0 in fondo alla fessura
+  const sm=u*u*(3-2*u);
+  return rMax*(FLOOR+(1-FLOOR)*sm);
+}
+function area(half,onAxis){                 // integrazione radiale in forma chiusa
+  let a=0,N=4000;
+  for(let i=0;i<N;i++){const th=i*TAU/N;const r=rProf(th+TAU/(2*N),half,onAxis);a+=0.5*r*r*(TAU/N);}
+  return a;
+}
+function solve(target,onAxis){              // ampiezza tale che area == target*arena
+  const arena=Math.PI*R*R, want=target*arena;
+  /* area monotona DECRESCENTE nell'ampiezza: fessura larga = meno area */
+  let lo=0.0005, hi=Math.PI/AXES;
+  for(let k=0;k<60;k++){
+    const m=(lo+hi)/2;
+    if(area(m,onAxis)>want) lo=m; else hi=m;
+  }
+  return (lo+hi)/2;
+}
+function path(ctx,half,onAxis){
+  ctx.beginPath();
+  for(let i=0;i<=1440;i++){const th=i*TAU/1440,r=rProf(th,half,onAxis);
+    const x=Math.cos(th)*r,y=Math.sin(th)*r; i?ctx.lineTo(x,y):ctx.moveTo(x,y);}
+  ctx.closePath();
+}
+function draw(cv,pct,onAxis,bg){
+  const ctx=cv.getContext('2d'); ctx.translate(SIZE/2,SIZE/2);
+  const half=solve(pct,onAxis);
+  const measured=area(half,onAxis)/(Math.PI*R*R);
+
+  /* 1. LA SUPERFICIE DEL FALLIMENTO: tutto il disco */
+  ctx.save(); ctx.beginPath(); ctx.arc(0,0,R,0,TAU); ctx.clip();
+  if(bg){ ctx.filter='grayscale(1) brightness(.34) contrast(1.25)';
+          ctx.drawImage(bg,-R,-R,R*2,R*2); ctx.filter='none'; }
+  else { ctx.fillStyle='#171d20'; ctx.fillRect(-R,-R,R*2,R*2); }
+  /* la fascia di goo al muro: la stessa materia, coagulata */
+  const g=ctx.createRadialGradient(0,0,R-GOO*2.6,0,0,R);
+  g.addColorStop(0,'rgba(10,14,15,0)'); g.addColorStop(.55,'rgba(10,14,15,.72)'); g.addColorStop(1,'rgba(8,11,12,.97)');
+  ctx.fillStyle=g; ctx.fillRect(-R,-R,R*2,R*2);
+  ctx.restore();
+
+  /* 2. LA VITTORIA: la forma, con le fessure che lasciano vedere il fondo */
+  ctx.save(); path(ctx,half,onAxis);
+  const vg=ctx.createRadialGradient(0,0,0,0,0,R);
+  vg.addColorStop(0,WIN_HI); vg.addColorStop(.5,WIN); vg.addColorStop(1,'#1c6b4a');
+  ctx.fillStyle=vg; ctx.fill();
+  ctx.lineWidth=1.6; ctx.strokeStyle='rgba(200,255,225,.55)'; ctx.stroke();
+  ctx.restore();
+
+  /* 3. la pallina, in scala, appoggiata dentro una fessura */
+  const off=onAxis?0:Math.PI/AXES, th=-Math.PI/2+off;
+  const rin=(R-GOO)*(FLOOR)+BALL*1.1;
+  ctx.beginPath(); ctx.arc(Math.cos(th)*rin,Math.sin(th)*rin,BALL,0,TAU);
+  ctx.fillStyle='#f4ead6'; ctx.fill(); ctx.lineWidth=1; ctx.strokeStyle='#0a0d0e'; ctx.stroke();
+
+  return {half:half*180/Math.PI, measured};
+}
+function mount(rowId,onAxis,bg){
+  const row=document.getElementById(rowId);
+  [0.50,0.70,0.85,0.91].forEach(pct=>{
+    const fig=document.createElement('figure');
+    const cv=document.createElement('canvas'); cv.width=cv.height=SIZE;
+    fig.appendChild(cv); const cap=document.createElement('figcaption'); fig.appendChild(cap);
+    row.appendChild(fig);
+    const r=draw(cv,pct,onAxis,bg);
+    cap.innerHTML='<b>successo '+(pct*100).toFixed(0)+'%</b><br>fessura '+r.half.toFixed(1)+
+      '&deg; di semi-ampiezza<br>area misurata '+(r.measured*100).toFixed(2)+'%';
+  });
+}
+const img=new Image();
+img.onload=()=>{mount('rowA',false,img);mount('rowB',true,img);mount('rowC',false,null);};
+img.onerror=()=>{mount('rowA',false,null);mount('rowB',true,null);mount('rowC',false,null);};
+img.src='/assets/ui/bg.png';
+</script></body></html>
