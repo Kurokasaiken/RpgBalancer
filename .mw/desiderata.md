@@ -657,3 +657,103 @@ e' proprio la separazione a garantirlo.
   Director.
 
 ---
+
+## v14 — Skill Check: una materia sola, due stati. Il goo è la tela coagulata
+
+**Status:** `FROZEN`
+**Date:** 2026-08-22
+**Authorized by:** Fausto
+**Reason:** "approvo" esplicito sulla candidata presentata in sessione, dopo sei turni di
+esplorazione e una ricerca sulla semiotica del segno visivo (Peirce: icona / indice / simbolo).
+
+**Relazione con v13:** v14 **sostituisce** la direzione A della v13 (il confine come oggetto
+separato, prima barre tangenti poi trame in evidenza). La catena di risoluzione di v13 rev.3
+(PLAN-008: due D100 prima, intersezione, atterraggio garantito) **resta valida e non è toccata**.
+
+### Il difetto che v14 corregge, e perché era strutturale
+
+Sei tentativi hanno fallito sulla stessa domanda del Director — «si capisce a colpo d'occhio che
+se cadi qui hai perso?» — e la causa non era il contrasto (misurato 9.1:1, tre volte la soglia)
+né la palette. Era che **il fallimento non era una cosa**: era l'avanzo del fiore. Un avanzo non
+ha nome, e ciò che non si può nominare non si può leggere.
+
+In termini di Peirce si stavano costruendo **simboli** (forme che vanno spiegate) dove serviva un
+**indice** (un segno che si legge per connessione fisica, senza convenzione). Le forme astratte
+richiedono contesto e familiarità per significare: è l'opposto di «a colpo d'occhio».
+
+### User-stated (parole del Director)
+
+1. **La ragnatela è una materia sola, e un pezzo di essa si separa come GOO.** Il goo è il
+   fallimento.
+2. **La stella cambia forma** in funzione dello spazio che occuperebbe: tanto spazio → fiore
+   (valli larghe); spazio medio → stella; tutto lo spazio → stella con **valli ancora più
+   strette**.
+3. Il fallimento è una **superficie forte**: se ti fermi lì, hai perso.
+4. **La parte dove rimbalza la pallina deve essere materia negativa**, non chiara.
+5. **Il cerchio attorno alla ragnatela va via.**
+6. Una differenza di **30 punti** fra stat e difficoltà non può già rendere il fallimento
+   illeggibile.
+7. La stella a cinque punte ha senso **con cinque stat**; con altri numeri il Director è aperto
+   a proposte.
+8. La tela va **sotto** (disegnata prima), come nelle versioni precedenti.
+
+### AI inference (derivata, marcata come tale)
+
+- **La variabile è l'AMPIEZZA delle valli, non la profondità.** L'area costa larghezza ×
+  profondità, la visibilità costa solo lunghezza: stringendo l'ampiezza il costo in area crolla e
+  l'incisione resta lunga. Misurato su un'arena da 192 di raggio:
+
+  ```
+  successo 50% → valli 38.4°  (fiore)          fallimento come anello: 56px spalmati
+  successo 70% → valli 23.0°  (stella)                                  31px
+  successo 85% → valli 11.5°  (stella aguzza)                           15px
+  successo 95% → valli  3.8°  (disco inciso)                             5px
+  a 95%: cinque fessure larghe 13px alla bocca e LUNGHE 144px, contro un anello da 5px
+  ```
+
+  La progressione del punto 2 non è una scelta di stile: è la soluzione dell'equazione.
+- Il tentativo precedente (variare la profondità a ampiezza fissa) porta necessariamente al
+  cerchio — misurato: a 95/20 la matematica risponde «valli = 1.000», cioè un disco. È l'errore
+  che v14 corregge.
+- **Il goo deve circondare il muro per tutto il giro**, o il punto 4 non è garantito. La fascia
+  costa il suo spessore in successo massimo mostrabile, e lo spessore minimo è il raggio della
+  pallina (4.7% del raggio dell'arena → 9% dell'area → cap 91%).
+- **Filamento → massa è un INDICE**, e per questo si legge senza legenda: è la ragione per cui
+  questa direzione è più forte di spine (icona ambigua: già scartate come «ghirlanda
+  decorativa») e di crepe (segno già occupato dal secondo dado).
+- Le fessure devono **allargarsi verso la bocca**: a 95% sono larghe 13px e la pallina ha raggio
+  9, quindi appoggiata dentro coprirebbe tutta la fessura e la lettura sarebbe ambigua.
+- Il passaggio filamento→massa deve leggersi come **la stessa materia**: stessa famiglia di
+  colore e filamenti annegati visibili nel goo, come insetti nella resina. Un goo a tinta piatta
+  annulla il meccanismo.
+
+### Cosa questo NON autorizza
+
+- Nessun anello, cerchio o bordo continuo disegnato attorno alla tela (punto 5) — incluso il
+  taglio della lastra di ghiaccio, che è il cerchio attualmente visibile.
+- Nessuna variazione della sola profondità delle valli a ampiezza fissa: è la strada che porta al
+  cerchio.
+- Nessun secondo significato sulle crepe: restano la messa in scena del secondo dado.
+- Nessun ritorno del fallimento come «avanzo» senza nome.
+
+### Invarianti che restano
+
+- punte della stella a `rOf(stat)`, errore misurato `0.0e+0`;
+- `rCheckAt` è il muro fisico: non si tocca, o si muovono tutte le probabilità;
+- catena di risoluzione di PLAN-008: due D100 prima del disegno, punto d'atterraggio
+  nell'intersezione esito ∩ zona, traiettoria che termina sul punto, `spatialVerdict` asserzione;
+- lo stream RNG della frattura resta salato e separato.
+
+### Still unresolved
+
+- se le fessure stanno **sugli assi** (una per skill, quindi «questa skill ti tradisce») o **fra
+  gli assi** come le valli di oggi;
+- **il colore della vittoria** — mai scelto. Candidata non confermata: smeraldo (praterie della
+  bibbia, convenzione vivo/morto, non compete col bronzo);
+- **quanto può scendere il successo massimo mostrabile** per pagare la fascia di goo al muro
+  (il minimo derivato è 91%);
+- la famiglia di forme per numeri di stat **diversi da cinque**;
+- se `bg.png` desaturato c'entra ancora: il Director ha messo in dubbio la propria idea, quindi
+  resta candidata aperta e non è un requisito.
+
+---
