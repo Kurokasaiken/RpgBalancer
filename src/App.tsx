@@ -65,6 +65,7 @@ const MinimalDestinyAstrolabeV8Page = lazy(() => import('./pages/minimal-destiny
 const MinimalDestinyAstrolabeV9Page = lazy(() => import('./pages/minimal-destiny-astrolabe-v9').then(m => ({ default: m.default })));
 const MinimalDestinyAstrolabeV10Page = lazy(() => import('./pages/minimal-destiny-astrolabe-v10').then(m => ({ default: m.default })));
 const SkillCheckWebV1Page = lazy(() => import('./pages/skill-check-web-v1').then(m => ({ default: m.default })));
+const SkillCheckV15Page = lazy(() => import('./pages/skill-check-v15').then(m => ({ default: m.default })));
 const AdversaryShapesPage = lazy(() => import('./pages/adversary-shapes').then(m => ({ default: m.default })));
 const HeroComponentsLabPage = lazy(() => import('./pages/hero-components-lab').then(m => ({ default: m.default })));
 const MinimalOutcomeModalPage = lazy(() => import('./pages/minimal-outcome').then(m => ({ default: m.default })));
@@ -260,6 +261,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/minimal-destiny-astrolabe-v9';
   const isSkillCheckWebV1Path =
     typeof window !== 'undefined' && window.location.pathname === '/skill-check-web-v1';
+  const isSkillCheckV15Path =
+    typeof window !== 'undefined' && window.location.pathname === '/skill-check-v15';
   const isAdversaryShapesPath =
     typeof window !== 'undefined' && window.location.pathname === '/adversary-shapes';
   const isHeroComponentsLabPath =
@@ -733,6 +736,16 @@ function App() {
       <ErrorBoundary componentName="Minimal Destiny Astrolabe V9 Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Destiny Astrolabe V9…</div>}>
           <MinimalDestinyAstrolabeV9Page />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isSkillCheckV15Path) {
+    return (
+      <ErrorBoundary componentName="Skill Check V15 Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Skill Check V15…</div>}>
+          <SkillCheckV15Page />
         </Suspense>
       </ErrorBoundary>
     );
