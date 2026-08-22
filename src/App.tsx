@@ -262,7 +262,9 @@ function App() {
   const isSkillCheckWebV1Path =
     typeof window !== 'undefined' && window.location.pathname === '/skill-check-web-v1';
   const isSkillCheckV15Path =
-    typeof window !== 'undefined' && window.location.pathname === '/skill-check-v15';
+    typeof window !== 'undefined' &&
+    (window.location.pathname === '/skill-check-v15' ||
+     window.location.pathname === '/minimal-destiny-astrolabe-v15');
   const isAdversaryShapesPath =
     typeof window !== 'undefined' && window.location.pathname === '/adversary-shapes';
   const isHeroComponentsLabPath =
