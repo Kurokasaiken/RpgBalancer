@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Minus } from 'lucide-react';
 import {
   MatericAmbientField,
   MatericBadge,
@@ -21,11 +22,11 @@ import {
   MatericStatBar,
   MatericSurface,
   MatericTitleSep,
+  MatericEventCard,
+  MatericCloudWall,
 } from '@/ui/designSystem/primitives';
 import { Slot } from '@/ui/idleVillage/components/Slot';
 import DayNightPoiSkin from '@/ui/idleVillage/components/minimal/DayNightPoiSkin';
-import { ClockWidget } from '@/ui/idleVillage/components/minimal/ClockWidget';
-import TimeEngineStrip from '@/ui/idleVillage/components/minimal/TimeEngineStrip';
 import { WanderlustMedalOverlay } from '@/ui/idleVillage/components/WanderlustMedalOverlay';
 import ThreatStatusIndicator from '@/ui/idleVillage/components/ThreatStatusIndicator';
 import { SkinTitle } from '@/ui/idleVillage/skins/primitives/SkinTitle';
@@ -45,7 +46,9 @@ type TabId =
   | 'medallion'
   | 'glass'
   | 'threat'
-  | 'skin';
+  | 'skin'
+  | 'cloud'
+  | 'event';
 
 const FIELD_BACKGROUND = [
   'radial-gradient(circle at 50% -10%, rgba(0,229,255,0.13) 0%, rgba(0,150,255,0.03) 50%, transparent 80%)',
@@ -65,6 +68,8 @@ const TABS: { id: TabId; label: string }[] = [
   { id: 'medallion', label: 'Medallion' },
   { id: 'threat', label: 'Threat' },
   { id: 'skin', label: 'Skin' },
+  { id: 'cloud', label: 'Cloud' },
+  { id: 'event', label: 'Event' },
 ];
 
 /** A compact demo panel that keeps the tab viewport above the fold. */
@@ -83,15 +88,10 @@ function DemoPanel({ children }: { children: React.ReactNode }): JSX.Element {
 function FrameTab(): JSX.Element {
   return (
     <DemoPanel>
-      <MatericHeading title="MatericFrame" subtitle="Molding with/without floor" />
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-        <MatericFrame variant="molding">
-          <div style={{ padding: 12, color: 'var(--skin-body-color)', fontSize: 11 }}>With floor</div>
-        </MatericFrame>
-        <MatericFrame variant="molding" floor={false}>
-          <div style={{ padding: 12, color: 'var(--skin-body-color)', fontSize: 11 }}>Frame only</div>
-        </MatericFrame>
-      </div>
+      <MatericHeading title="MatericFrame" subtitle="Molding frame only" />
+      <MatericFrame variant="molding" floor={false}>
+        <div style={{ padding: 12, color: 'var(--skin-body-color)', fontSize: 11 }}>Frame only</div>
+      </MatericFrame>
     </DemoPanel>
   );
 }
@@ -327,33 +327,19 @@ function AllTab(): JSX.Element {
 function GaugeTab(): JSX.Element {
   return (
     <DemoPanel>
-      <MatericHeading title="Gauge / Dial" subtitle="Day/Night, clock, time strip" />
-      <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+      <MatericHeading title="Gauge / Dial" subtitle="Day/Night arc" />
+      <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
         <DayNightPoiSkin isDayPhase cycleProgress={0.35} isPaused />
-        <ClockWidget currentDay={3} isPaused={false} speedMultiplier={1} />
-        <TimeEngineStrip currentDay={3} isDaytime />
       </div>
     </DemoPanel>
   );
 }
 
 function MedallionTab(): JSX.Element {
-  const label = (text: string) => (
-    <span style={{ fontSize: 9, color: 'var(--skin-label-primary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 4 }}>{text}</span>
-  );
   return (
     <DemoPanel>
       <MatericHeading title="Medallion" subtitle="WanderlustMedalOverlay" />
-      <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <WanderlustMedalOverlay sizePx={64} />
-          {label('Empty medal')}
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <WanderlustMedalOverlay sizePx={64} portraitUrl="/assets/portraits/portrait male warrior.png" />
-          {label('With portrait')}
-        </div>
-      </div>
+      <WanderlustMedalOverlay sizePx={96} portraitUrl="/assets/portraits/portrait male warrior.png" />
     </DemoPanel>
   );
 }
@@ -381,11 +367,61 @@ function SkinTab(): JSX.Element {
           <SkinTitle level="section">Section</SkinTitle>
           <SkinTitle level="subtitle">Subtitle</SkinTitle>
           <div style={{ display: 'flex', gap: 8 }}>
-            <MatericButton style={{ padding: '6px 10px' }}>—</MatericButton>
+            <MatericButton style={{ padding: 6 }} aria-label="Minimize">
+              <Minus size={16} />
+            </MatericButton>
             <MatericCloseButton style={{ width: 28, height: 28 }} />
           </div>
         </div>
       </SkinScope>
+    </DemoPanel>
+  );
+}
+
+function EventTab(): JSX.Element {
+  return (
+    <DemoPanel>
+      <MatericHeading title="Event Card" subtitle="MatericEventCard — centered icon with CTA" />
+      <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+        <MatericEventCard
+          title="Goblin Invasion"
+          subtitle="5 days remain"
+          badge="Invasion"
+          imageUrl="/goblin-march-trasparente.png"
+          imageAlt="Goblin"
+          actionLabel="Scout the frontier"
+          onAction={() => {}}
+        />
+        <MatericEventCard
+          variant="reminder"
+          title="Goblin Invasion"
+          imageUrl="/goblin-march-trasparente.png"
+          imageAlt="Goblin"
+          daysLeftLabel="3 days left"
+        />
+      </div>
+    </DemoPanel>
+  );
+}
+
+function CloudTab(): JSX.Element {
+  return (
+    <DemoPanel>
+      <MatericHeading title="Cloud Wall" subtitle="MatericCloudWall — square cloud stage" />
+      <div style={{ position: 'relative', width: 460, height: 460 }}>
+        <MatericCloudWall size={460} style={{ top: 0, left: 0 }} />
+        <MatericEventCard
+          clouds={false}
+          title="Goblin Invasion"
+          subtitle="5 days remain"
+          badge="Invasion"
+          imageUrl="/goblin-march-trasparente.png"
+          imageAlt="Goblin"
+          actionLabel="Scout the frontier"
+          onAction={() => {}}
+          style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+        />
+      </div>
     </DemoPanel>
   );
 }
@@ -403,6 +439,8 @@ const TAB_CONTENT: Record<TabId, () => JSX.Element> = {
   medallion: MedallionTab,
   threat: ThreatTab,
   skin: SkinTab,
+  cloud: CloudTab,
+  event: EventTab,
 };
 
 export default function PrimitivesPage(): JSX.Element {

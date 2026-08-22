@@ -107,8 +107,16 @@
   8%{opacity:1;transform:scale(.5) rotate(6deg);}     
   100%{opacity:0;transform:scale(2.8) rotate(24deg);} 
 }
-.destiny-astrolabe .suite[data-tone="doom"] .arena{filter:saturate(.55) brightness(.62) hue-rotate(-8deg);}
-.destiny-astrolabe .suite[data-tone="grim"]  .arena{filter:saturate(.45) brightness(.45) hue-rotate(-14deg);}
+/* IL FILTRO SUL CANVAS E' RIMOSSO.
+   `.arena` contiene il canvas, quindi `brightness(.45)` moltiplicava per 0.45
+   anche TUTTI i beat della risoluzione: pulsazione d'impatto, rottura del
+   ghiaccio, caduta, terremoto. Misurato sul filmato: la carta diceva CADUTO e lo
+   spacco non si vedeva — non perche' non fosse disegnato, ma perche' stava al
+   45% di luminosita' sotto lo scrim della carta.
+   Al suo posto uno scrim su canvas con un BUCO sul punto d'arresto: la periferia
+   si spegne, l'impatto resta a piena luminosita'. Vedi drawResolutionScrim. */
+.destiny-astrolabe .suite[data-tone="doom"] .arena,
+.destiny-astrolabe .suite[data-tone="grim"] .arena{filter:none;}
 .destiny-astrolabe .stage.shake-hard{animation:shakehard .42s cubic-bezier(.36,.07,.19,.97) both;}
 
 @keyframes shakehard{

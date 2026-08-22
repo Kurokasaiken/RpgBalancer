@@ -323,6 +323,7 @@ const scene={
   chain:null,                           // esito+atterraggio+traiettoria, deciso al lancio
   glass:{p:0,breakT:-1,from:null,fromRim:false,fall:0},
   quake:null,                           // {fracture, t} — la messa in scena del 2o dado
+  scrim:null,                           // {x,y,t} — lo scrim col buco sul punto d'arresto
   impact:null,                          // {x,y,t,warm} — pulsazione d'impatto puntuale
   teasePos:null,                        // punto della banda di fallimento da sfiorare
   shocks:[], sparks:[],
@@ -467,7 +468,7 @@ function launchRoll(){
   scene.starScale=STAR_SEED_SCALE; scene.pourP=0; scene.streamAlpha=0; scene.webP=0;
   scene.rigP=0; scene.threatP=0; scene.wardP=0; scene.impact=null; scene.chain=null;
   scene.glass={p:0,breakT:-1,from:null,fromRim:false,fall:0};
-  scene.quake=null;
+  scene.quake=null; scene.scrim=null;
   scene.webSeed=(Math.random()*1e9)|0;   // una tela diversa a ogni tiro
   scene.ringReveal=0;
   scene.ball={x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false};
@@ -646,6 +647,7 @@ function tickTimeline(){
   /* rottura e caduta avanzano nel tempo, non a fotogrammi fissi */
   if(scene.glass.breakT>=0) scene.glass.breakT+=16.7;
   if(scene.quake) scene.quake.t+=16.7;
+  if(scene.scrim) scene.scrim.t+=16.7;
   scene.gooRipple=Math.max(0,scene.gooRipple-0.02);
   scene.blackPillars.concat(scene.whitePillars).forEach(pl=>pl.flash=Math.max(0,pl.flash-0.03));
 }
@@ -924,6 +926,7 @@ function resolve(){
      Disegnata su canvas e non in CSS: le coordinate sono quelle vere della
      pallina, senza rimappature di percentuali su un elemento con inset -12%. */
   scene.impact={x:b.x,y:b.y,t:0,warm:!isLoss};
+  scene.scrim={x:b.x,y:b.y,t:0};
   /* IL VETRO SI ROMPE, e il verdetto si sposta dalla fermata alla CADUTA.
      Le crepe nascono sotto la pallina — tranne nel fallimento critico, dove
      nascono dal BORDO: il pavimento che cede da fuori e' un'altra cosa dal
@@ -1742,6 +1745,26 @@ function drawShocks(dt){
 /* PULSAZIONE D'IMPATTO — due anelli sfasati piu' un nucleo, sul punto d'arresto.
    Due anelli e non uno: uno solo legge come un cerchio che cresce, due sfasati
    leggono come un COLPO che si propaga. */
+/* SCRIM DELLA RISOLUZIONE — al posto del filtro CSS che spegneva il canvas.
+   La periferia si spegne, il punto d'arresto resta a piena luminosita': si
+   spegne INTORNO a cio' che va guardato, non sopra. */
+function drawResolutionScrim(){
+  const S2=scene.scrim;
+  const R2=scene.res;
+  /* timer PROPRIO: appoggiarsi a `scene.impact.t` faceva sparire lo scrim dopo
+     560ms, quando la pulsazione d'impatto viene liberata. Lo scrim deve durare
+     quanto la risoluzione. */
+  if(!R2||!S2) return;
+  const isLoss=(R2.verdict==='fail'||R2.verdict==='epicfail');
+  const p=clamp(S2.t/420,0,1)*(isLoss?(R2.verdict==='epicfail'?0.92:0.72):0.42);
+  if(p<=0.001) return;
+  const g=ctx.createRadialGradient(S2.x,S2.y,40,S2.x,S2.y,R*1.05);
+  g.addColorStop(0,'rgba(2,4,12,0)');
+  g.addColorStop(0.22,`rgba(2,4,12,${(0.42*p).toFixed(3)})`);
+  g.addColorStop(1,`rgba(2,4,12,${(0.80*p).toFixed(3)})`);
+  ctx.fillStyle=g;
+  ctx.fillRect(0,0,W,W);
+}
 function drawImpact(dt){
   const im=scene.impact;
   if(!im) return;
@@ -2054,6 +2077,18 @@ function drawBall(now){
   ctx.lineWidth=2.2; ctx.strokeStyle='#ffe9a8';
   ctx.shadowColor='rgba(255,220,130,.9)'; ctx.shadowBlur=14; ctx.stroke();
   ctx.restore();
+  /* IL PUNTO DI CONTATTO. Misurato: il disco della pallina (18px) e' da 2 a 7
+     volte lo spessore della fascia del fallimento critico (2.6-8.5px secondo la
+     difficolta'), quindi quando "si ferma nel critico" copre critico, fail e un
+     pezzo di stella insieme: la lettura e' ambigua per costruzione.
+     La pallina resta grande — e' il protagonista — ma cio' che il board LEGGE e'
+     questo marcatore da 3px, che dentro una fascia da 4.85px ci sta.
+     Il disco dice "guardami", il marcatore dice "sono qui". */
+  if(fallK<=0){
+    ctx.beginPath(); ctx.arc(b.x,b.y,3,0,TAU);
+    ctx.fillStyle='rgba(8,6,14,0.95)'; ctx.fill();
+    ctx.lineWidth=1; ctx.strokeStyle='rgba(255,236,180,0.95)'; ctx.stroke();
+  }
   ctx.shadowBlur=0;
 }
 
@@ -2100,6 +2135,7 @@ function frame(now){
      giusta — la trappola sta sotto, e quando il vetro si rompe ci si cade. */
   drawGlass(now);
   drawQuake();
+  drawResolutionScrim();
   /* V6: drawValleyRisks() disattivato — ferita e morte tornano con una
      grammatica propria, fuori dall'area del goo. */
   scene.whitePillars.forEach(p=>drawPillar(p,true));  // draw first (behind)

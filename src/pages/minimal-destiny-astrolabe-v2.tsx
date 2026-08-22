@@ -108,6 +108,18 @@ export default function MinimalDestinyAstrolabeV2() {
               V7
             </a>
             <a
+              href="/minimal-destiny-astrolabe-v8"
+              className="px-3 py-1 rounded text-sm font-semibold bg-amber-600 text-black hover:bg-amber-500 transition-colors"
+            >
+              V8
+            </a>
+            <a
+              href="/minimal-destiny-astrolabe-v9"
+              className="px-3 py-1 rounded text-sm font-semibold bg-amber-600 text-black hover:bg-amber-500 transition-colors"
+            >
+              V9
+            </a>
+            <a
               href="/minimal-skillcheck-v6"
               className="px-3 py-1 rounded text-sm font-semibold bg-indigo-700 text-indigo-100 hover:bg-indigo-600 transition-colors"
               title="AltVisuals V6 · Asterism (Skill Check Preview Lab)"

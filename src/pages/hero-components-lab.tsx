@@ -20,7 +20,9 @@ import type { Skill } from '@/balancing/config/idleVillage/heroItems';
 import type { EquippableItem } from '@/ui/idleVillage/types/heroComponentItems';
 import {
   MatericHeading,
-  MatericSectionHeader,
+  MatericSurface,
+  MatericPlaque,
+  MatericInset,
 } from '@/ui/designSystem/primitives';
 
 /**
@@ -140,103 +142,125 @@ export default function HeroComponentsLabPage(): JSX.Element {
             alignItems: 'start',
           }}
         >
-          <div>
-            <MatericSectionHeader tier="tertiary" hint="A">{t('heroComponentsLab.sectionA')}</MatericSectionHeader>
-            <PgDetailCard resident={resident} onSlotClick={setSelectedSlot} />
-            {selectedSlot && (
-              <div style={{ marginTop: 12, padding: 12 }}>
-                <div style={{ fontSize: 10, marginBottom: 8, color: 'var(--skin-text-muted)' }}>
-                  {t('heroComponentsLab.selectedSlot')}: {selectedSlot}
-                </div>
-                {resident.statSnapshot?.equipment?.[selectedSlot] && (
-                  <button
-                    type="button"
-                    onClick={() => { unequip(selectedSlot); setSelectedSlot(null); }}
-                    style={{ fontSize: 10, color: 'var(--skin-glow-primary)' }}
-                  >
-                    {t('heroComponentsLab.unequip')}
-                  </button>
-                )}
-                {!resident.statSnapshot?.equipment?.[selectedSlot] && (
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <select
-                      value={pendingItem}
-                      onChange={(e) => setPendingItem(e.target.value)}
-                      style={{ flex: 1, fontSize: 10 }}
-                    >
-                      <option value="">{t('heroComponentsLab.selectItem')}</option>
-                      {[...equippableItems, ...savedEquipment]
-                        .filter((item) => item.slot === selectedSlot)
-                        .map((item) => (
-                          <option key={item.id} value={item.id}>{item.name}</option>
-                        ))}
-                    </select>
+          {/* A — Character Sheet */}
+          <MatericSurface shape="card" material="obsidian" style={{ padding: 0 }}>
+            <div style={{ padding: '10px 12px', borderBottom: '1px solid rgba(180,130,30,0.35)' }}>
+              <MatericPlaque>{t('heroComponentsLab.sectionA')}</MatericPlaque>
+            </div>
+            <MatericInset material="obsidian" style={{ padding: 12 }}>
+              <PgDetailCard resident={resident} onSlotClick={setSelectedSlot} />
+              {selectedSlot && (
+                <div style={{ marginTop: 12, padding: 12 }}>
+                  <div style={{ fontSize: 10, marginBottom: 8, color: 'var(--skin-text-muted)' }}>
+                    {t('heroComponentsLab.selectedSlot')}: {selectedSlot}
+                  </div>
+                  {resident.statSnapshot?.equipment?.[selectedSlot] && (
                     <button
                       type="button"
-                      onClick={() => { if (pendingItem) { equip(selectedSlot, pendingItem); setPendingItem(''); setSelectedSlot(null); } }}
-                      style={{ fontSize: 10, color: 'var(--skin-glow-accent)' }}
+                      onClick={() => { unequip(selectedSlot); setSelectedSlot(null); }}
+                      style={{ fontSize: 10, color: 'var(--skin-glow-primary)' }}
                     >
-                      {t('heroComponentsLab.equip')}
+                      {t('heroComponentsLab.unequip')}
                     </button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div>
-            <MatericSectionHeader tier="tertiary" hint="B">{t('heroComponentsLab.sectionB')}</MatericSectionHeader>
-            <DndContext onDragEnd={handleDragEnd}>
-              <EquipSlotRack slots={slotOrder} equipment={equipment} onUnequip={unequip} variant="flat">
-                <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
-                  {equippableItems.map((item) => (
-                    <ItemDragToken key={item.id} item={item} onClick={setSelectedEquippable} />
-                  ))}
-                  {savedEquipment.map((item) => (
-                    <EquipmentDragToken key={item.id} item={item} />
-                  ))}
+                  )}
+                  {!resident.statSnapshot?.equipment?.[selectedSlot] && (
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <select
+                        value={pendingItem}
+                        onChange={(e) => setPendingItem(e.target.value)}
+                        style={{ flex: 1, fontSize: 10 }}
+                      >
+                        <option value="">{t('heroComponentsLab.selectItem')}</option>
+                        {[...equippableItems, ...savedEquipment]
+                          .filter((item) => item.slot === selectedSlot)
+                          .map((item) => (
+                            <option key={item.id} value={item.id}>{item.name}</option>
+                          ))}
+                      </select>
+                      <button
+                        type="button"
+                        onClick={() => { if (pendingItem) { equip(selectedSlot, pendingItem); setPendingItem(''); setSelectedSlot(null); } }}
+                        style={{ fontSize: 10, color: 'var(--skin-glow-accent)' }}
+                      >
+                        {t('heroComponentsLab.equip')}
+                      </button>
+                    </div>
+                  )}
                 </div>
-              </EquipSlotRack>
-            </DndContext>
-          </div>
+              )}
+            </MatericInset>
+          </MatericSurface>
 
-          <div>
-            <MatericSectionHeader tier="tertiary" hint="C">{t('heroComponentsLab.sectionC')}</MatericSectionHeader>
-            <EquippableItemCard
-              item={selectedEquippable || equippableItems[0]}
-              labels={{
-                rarity: t('heroComponentsLab.rarity'),
-                effect: t('heroComponentsLab.effect'),
-                slot: t('heroComponentsLab.slot'),
-              }}
-              variant="flat"
-            />
-          </div>
+          {/* B — Equip Slot Rack */}
+          <MatericSurface shape="card" material="jade" style={{ padding: 0 }}>
+            <div style={{ padding: '10px 12px', borderBottom: '1px solid rgba(180,130,30,0.35)' }}>
+              <MatericPlaque>{t('heroComponentsLab.sectionB')}</MatericPlaque>
+            </div>
+            <MatericInset material="bronze" style={{ padding: 12 }}>
+              <DndContext onDragEnd={handleDragEnd}>
+                <EquipSlotRack slots={slotOrder} equipment={equipment} onUnequip={unequip}>
+                  <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+                    {equippableItems.map((item) => (
+                      <ItemDragToken key={item.id} item={item} onClick={setSelectedEquippable} />
+                    ))}
+                    {savedEquipment.map((item) => (
+                      <EquipmentDragToken key={item.id} item={item} />
+                    ))}
+                  </div>
+                </EquipSlotRack>
+              </DndContext>
+            </MatericInset>
+          </MatericSurface>
 
-          <div>
-            <MatericSectionHeader tier="tertiary" hint="D">{t('heroComponentsLab.sectionD')}</MatericSectionHeader>
-            <ConsumablePile
-              items={inventory}
-              useLabel={t('heroComponentsLab.use')}
-              onUse={useConsumable}
-              variant="flat"
-            />
-          </div>
+          {/* C — Equippable Item Card */}
+          <MatericSurface shape="card" material="jade" style={{ padding: 0 }}>
+            <div style={{ padding: '10px 12px', borderBottom: '1px solid rgba(180,130,30,0.35)' }}>
+              <MatericPlaque>{t('heroComponentsLab.sectionC')}</MatericPlaque>
+            </div>
+            <MatericInset material="bronze" style={{ padding: 12 }}>
+              <EquippableItemCard
+                item={selectedEquippable || equippableItems[0]}
+                labels={{
+                  rarity: t('heroComponentsLab.rarity'),
+                  effect: t('heroComponentsLab.effect'),
+                  slot: t('heroComponentsLab.slot'),
+                }}
+              />
+            </MatericInset>
+          </MatericSurface>
 
-          <div>
-            <MatericSectionHeader tier="tertiary" hint="E">{t('heroComponentsLab.sectionE')}</MatericSectionHeader>
-            <SkillDeck
-              skills={availableSkills}
-              loadout={skillLoadout}
-              labels={{
-                available: t('heroComponentsLab.availableSkills'),
-                equipped: t('heroComponentsLab.equippedSkills'),
-                empty: t('heroComponentsLab.empty'),
-              }}
-              onToggle={toggleSkill}
-              variant="flat"
-            />
-          </div>
+          {/* D — Consumable Pile */}
+          <MatericSurface shape="card" material="jade" style={{ padding: 0 }}>
+            <div style={{ padding: '10px 12px', borderBottom: '1px solid rgba(180,130,30,0.35)' }}>
+              <MatericPlaque>{t('heroComponentsLab.sectionD')}</MatericPlaque>
+            </div>
+            <MatericInset material="bronze" style={{ padding: 12 }}>
+              <ConsumablePile
+                items={inventory}
+                useLabel={t('heroComponentsLab.use')}
+                onUse={useConsumable}
+              />
+            </MatericInset>
+          </MatericSurface>
+
+          {/* E — Equippable Skill Deck */}
+          <MatericSurface shape="card" material="jade" style={{ padding: 0 }}>
+            <div style={{ padding: '10px 12px', borderBottom: '1px solid rgba(180,130,30,0.35)' }}>
+              <MatericPlaque>{t('heroComponentsLab.sectionE')}</MatericPlaque>
+            </div>
+            <MatericInset material="bronze" style={{ padding: 12 }}>
+              <SkillDeck
+                skills={availableSkills}
+                loadout={skillLoadout}
+                labels={{
+                  available: t('heroComponentsLab.availableSkills'),
+                  equipped: t('heroComponentsLab.equippedSkills'),
+                  empty: t('heroComponentsLab.empty'),
+                }}
+                onToggle={toggleSkill}
+              />
+            </MatericInset>
+          </MatericSurface>
         </div>
       </div>
     </div>
