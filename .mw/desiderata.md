@@ -757,3 +757,83 @@ richiedono contesto e familiarità per significare: è l'opposto di «a colpo d'
   resta candidata aperta e non è un requisito.
 
 ---
+
+## v15 — La stella copre la trama. Il personaggio, la difficoltà, e la differenza
+
+**Status:** `FROZEN`
+**Date:** 2026-08-22
+**Authorized by:** Fausto
+**Reason:** "Approvo il piano, procedi" — sulla candidata v15 presentata in sessione.
+
+**Relazione con v14:** v15 **sostituisce** la v14. Non la corregge: ne rovescia la direzione.
+La v14 trattava il fallimento come una fascia da inventare al muro, e la forma come un
+parametro da adattare fino a far tornare l'area. Qui non si adatta niente: ci sono due
+forme, entrambe date dai dati, e la prova è la loro differenza.
+
+### Il modello
+
+    la stella   = il personaggio      (cinque punte, le cinque stat)
+    la trama    = la difficolta       (la materia sotto)
+    la prova    = quanto resta scoperto
+
+### User-stated (parole del Director)
+
+1. **La stella è il personaggio.** Cinque punte, le cinque stat.
+2. **La difficoltà è la materia sotto**, e la prova è **quanto ne resta scoperto** rispetto
+   alla stella che le sta sopra.
+3. La percentuale di successo è la parte **coperta**.
+4. **La materia della difficoltà è tessuta, non colata.** «Non riusciamo a fare un'estetica
+   con movimenti tipo catrame, per questo siamo passati alla ragnatela.» Questo è il vincolo
+   che decide la materia: il catrame chiede una superficie che si deforma in continuo, la
+   seta no.
+5. Come il sistema di **Dispatch** (cinque stat, la prova come copertura di una richiesta),
+   ma **più bello e più ricco**.
+6. **Ferita e morte stanno dentro entrambe le regioni**: ferito+successo e morte+fallimento
+   devono poter accadere.
+7. **Solo la stella.** Nessuna famiglia di forme alternative: il fiore non serve.
+8. **Nessun tetto artificiale.** Se il successo è automatico non si tira lo skill check: si
+   mostra il risultato.
+
+### AI inference (derivata, marcata come tale)
+
+9. Il dominio della pallina è la materia della difficoltà: si ferma sul coperto → successo,
+   sullo scoperto → fallimento. È un **indice** e non ha bisogno di legenda.
+10. `P(successo) = area(trama ∩ stella) / area(trama)`. Nessun fitting, nessuna bisezione,
+    nessuna manopola: due forme dai dati, la percentuale è la sottrazione.
+11. La geometria della difficoltà **esiste già** nel codice — `axisCheck` / `rCheckAt`. Oggi
+    è un muro invisibile: va resa visibile, non inventata.
+12. Lo scoperto appare **dove la stat non arriva**, cioè sull'asse della skill che tradisce:
+    è questo il «più ricco» rispetto a una barra di copertura.
+13. La stella che sborda oltre la trama non copre niente, perché là non c'è materia da
+    coprire: è talento che la prova non chiede.
+14. Il punto 8 **sostituisce** il tetto dell'87,98% e la fascia di spessore minimo della
+    v14: erano artefatti di una banda inventata dall'AI, non requisiti del Director.
+15. Cadono anche: il colore della vittoria (la stella è il personaggio, non ha un colore
+    della vittoria — la voce era un'invenzione dell'AI nata da una preview dipinta di verde),
+    e la domanda «fessure sugli assi o fra gli assi», che si risolve da sé perché lo scoperto
+    compare dove la stat è corta.
+
+### Cosa questo NON autorizza
+
+- nessuna materia che richieda deformazione continua di superficie (catrame, colata, fluido);
+- nessuna forma scelta o adattata per far tornare una percentuale;
+- nessuna fascia, anello o bordo continuo inventato per «fare da fallimento»;
+- nessun secondo significato sulle crepe: restano la messa in scena del secondo dado.
+
+### Invarianti che restano
+
+- punte della stella a `rOf(stat)`, errore misurato `0.0e+0`;
+- catena di risoluzione di PLAN-008: due D100 prima del disegno, atterraggio
+  nell'intersezione esito ∩ zona, traiettoria che termina sul punto;
+- i due assi ortogonali di `zones.ts` — ed è il punto 6 che li conferma come scelta, non
+  più solo come correzione di un bug;
+- lo stream RNG della frattura resta salato e separato.
+
+### Still unresolved (differite dal Director: «vedremo»)
+
+- se la trama scoperta è **dipinta** (`bg.png` desaturato come impasto) o solo **di filo**:
+  si decide dopo i test, guardando entrambe le versioni;
+- la soglia oltre la quale il check non si tira più — 95%+ «la cosa di XCOM», o un disegno
+  specifico per il 95%.
+
+---
