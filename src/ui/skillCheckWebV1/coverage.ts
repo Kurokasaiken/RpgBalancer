@@ -85,8 +85,13 @@ export function rHeroAt(tips: number[], theta: number, valleyF = VALLEY_F): numb
  * Il passaggio e' governato dall'allungamento punta/trama: finche' la punta sta
  * dentro la materia c'e' spazio per i petali, quando la supera serve la punta.
  */
-export const FLOWER_UNTIL = 0.82;   // sotto: fiore puro
-export const STAR_FROM = 1.16;      // sopra: stella pura
+/* LE SOGLIE. Il Director: «il fiore della V6 voglio che di base sia quello».
+   Con 0.82/1.16 a parita' l'allungamento e' 1.0 e la forma era gia' per il 60%
+   stella: il fiore non era la base, era il caso del personaggio scarso. Ora il
+   fiore tiene FINO A OLTRE LA PARITA' e la stella entra solo quando la punta
+   sfonda la prova per davvero. */
+export const FLOWER_UNTIL = 1.08;   // sotto: fiore puro — e' la base
+export const STAR_FROM = 1.55;      // sopra: stella pura
 export const STAR_VALLEY_WIDE = 0.40;   // la stella appena entra: mai piu' grassa
 export const STAR_VALLEY_SLIM = 0.22;   // affilata, quando sfonda la trama
 
