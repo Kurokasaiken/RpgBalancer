@@ -266,7 +266,15 @@ export function shouldRoll(cov: Coverage, threshold = AUTO_THRESHOLD_PCT): boole
  * non e' raggiungibile dal lancio della pallina».
  */
 
-/** area della trama, la base di tutte le percentuali */
+/**
+ * IL RAGGIO DELLA PALLINA in unita' engine. Il centro della pallina non puo'
+ * avvicinarsi al muro piu' del proprio raggio: quello e' il punto piu' profondo
+ * che un tiro raggiunge davvero, ed e' il vincolo FISICO su cui si appoggia la
+ * banda del fallimento critico.
+ */
+export const BALL_R = 9;
+
+/** area della trama: la materia della difficolta, tutta intera */
 export function tramaArea(s: Snapshot, angles = 2880): number {
   const dth = TAU / angles;
   let a = 0;
@@ -279,12 +287,35 @@ export function tramaArea(s: Snapshot, angles = 2880): number {
 }
 
 /**
+ * L'AREA DI TIRO, ed e' questa la base delle percentuali. Il Director:
+ *
+ *     «e' il 5% dell'area totale entro cui puo' rimbalzare la pallina, l'area
+ *      dello skill check»
+ *
+ * Non e' l'area della trama: il CENTRO della pallina non puo' avvicinarsi al
+ * muro piu' del proprio raggio, quindi l'area davvero disponibile e' quella
+ * dentro `trama - BALL_R`. Misurare sulla trama piena gonfia la base e rende
+ * ogni banda piu' piccola del suo valore dichiarato — e di quanto dipende dalla
+ * difficolta', perche' `BALL_R` e' costante mentre la trama no.
+ */
+export function reachArea(s: Snapshot, angles = 2880): number {
+  const dth = TAU / angles;
+  let a = 0;
+  for (let i = 0; i < angles; i += 1) {
+    const th = -Math.PI / 2 + (i + 0.5) * dth;
+    const rr = Math.max(0, rWallAt(s, th) - BALL_R);
+    a += 0.5 * rr * rr * dth;
+  }
+  return a;
+}
+
+/**
  * SUCCESSO CRITICO: il disco al centro la cui area e' `pct`% della trama.
  * Sta tutto dentro la stella finche' il nucleo non supera l'incavo — e quando
  * lo supera lo diciamo, invece di lasciar sbordare il trionfo nel fallimento.
  */
 export function solveCoreRadius(s: Snapshot, pct: number, angles = 2880): number {
-  return Math.sqrt((tramaArea(s, angles) * (pct / 100)) / Math.PI);
+  return Math.sqrt((reachArea(s, angles) * (pct / 100)) / Math.PI);
 }
 
 /**
@@ -292,13 +323,6 @@ export function solveCoreRadius(s: Snapshot, pct: number, angles = 2880): number
  * banda parte dove finisce la precedente. Ritorna i fattori cumulativi `e`
  * tali che la banda k va da `rHero*(1+e[k-1])` a `rHero*(1+e[k])`.
  */
-/**
- * IL RAGGIO DELLA PALLINA in unita' engine. Il centro della pallina non puo'
- * avvicinarsi al muro piu' del proprio raggio: quello e' il punto piu' profondo
- * che un tiro raggiunge davvero, ed e' il vincolo FISICO su cui si appoggia la
- * banda del fallimento critico.
- */
-export const BALL_R = 9;
 
 /**
  * FALLIMENTO CRITICO = il bordo interno del goo, e il goo comincia dove il tiro
@@ -324,7 +348,7 @@ export function solveGooBand(
   angles = 1440,
 ): number {
   const dth = TAU / angles;
-  const want = tramaArea(s, angles) * (pct / 100);
+  const want = reachArea(s, angles) * (pct / 100);
   const areaOf = (f: number) => {
     let a = 0;
     for (let i = 0; i < angles; i += 1) {
@@ -350,7 +374,7 @@ export function solveOuterBands(
   angles = 1440,
 ): number[] {
   const dth = TAU / angles;
-  const base = tramaArea(s, angles);
+  const base = reachArea(s, angles);
   const areaUpTo = (e: number) => {
     let a = 0;
     for (let i = 0; i < angles; i += 1) {

@@ -11,22 +11,22 @@
  */
 import { buildSnapshot, DEFAULT_CHECK_CONFIG, AXES, rWallAt } from '@/ui/skillCheckWebV1/zones';
 import { buildHeroShape, rHeroNarrowAt, solveOuterBands, solveGooBand, solveCoreRadius,
-         tramaArea, BALL_R } from '@/ui/skillCheckWebV1/coverage';
+         reachArea, BALL_R } from '@/ui/skillCheckWebV1/coverage';
 
 const TAU = Math.PI * 2;
 const five = (v: number) => Array.from({ length: AXES }, () => v);
 const CRIT = DEFAULT_CHECK_CONFIG.crit;
 let fails = 0;
 
-console.log('T-009 — le tre bande, ognuna il 5% della trama');
+console.log("T-009 — le tre bande, sull'AREA DI TIRO (trama meno il raggio della pallina)");
 console.log('  prova   | crit win | crit fail | almost  | nucleo dentro la stella?');
 for (const [s, d] of [[20,80],[40,60],[50,50],[60,50],[75,50],[85,50],[95,30],[99,15]] as [number,number][]) {
   const snap = buildSnapshot({ stats: five(s), diffs: five(d) }, DEFAULT_CHECK_CONFIG, 0);
   const shape = buildHeroShape(snap);
   const hero = (th: number) => rHeroNarrowAt(shape, th);
-  const base = tramaArea(snap, 5760);
+  const base = reachArea(snap, 5760);
   /* almost attaccato alla stella, il critico sul bordo interno del goo */
-  const [e1] = solveOuterBands(snap, hero, [CRIT], 2880);
+  const [e1] = solveOuterBands(snap, hero, [DEFAULT_CHECK_CONFIG.almost], 2880);
   const fGoo = solveGooBand(snap, CRIT, 2880);
 
   /* misura INDIPENDENTE dal solver: integrazione a griglia piu' fitta */

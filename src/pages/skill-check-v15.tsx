@@ -14,7 +14,7 @@
  * un consumabile che alza una stat cambia le props e il board si ridisegna.
  */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { AXES } from '@/ui/skillCheckWebV1/zones';
+import { AXES, DEFAULT_CHECK_CONFIG } from '@/ui/skillCheckWebV1/zones';
 import { shouldRoll, type Coverage } from '@/ui/skillCheckWebV1/coverage';
 import { SkillCheckBoardV15 } from '@/ui/skillCheckWebV1/SkillCheckBoardV15';
 
@@ -32,6 +32,8 @@ export default function SkillCheckV15Page(): JSX.Element {
   const [cov, setCov] = useState<Coverage | null>(null);
   const [narrow, setNarrow] = useState(true);
   const [beat, setBeat] = useState<'nascita' | 'check' | 'uscita'>('check');
+  const [pcts, setPcts] = useState({ almost: 5, crit: 5, critWin: 5 });
+  const config = useMemo(() => ({ ...DEFAULT_CHECK_CONFIG, ...pcts }), [pcts]);
 
   useEffect(() => {
     const img = new Image();
@@ -61,6 +63,7 @@ export default function SkillCheckV15Page(): JSX.Element {
             clipIn={beat === 'nascita' ? 0 : 1}
             outbound={beat === 'uscita' ? 0.55 : 0}
             mode={beat === 'check' ? 'dark' : 'woven'}
+            config={config}
             onMeasure={setCov}
           />
         </div>
@@ -103,6 +106,18 @@ export default function SkillCheckV15Page(): JSX.Element {
                      onChange={e => setDiffs(d => setAt(d, i, Number(e.target.value)))} />
             </div>
           ))}
+          <div style={{ marginTop: 12, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            {([['almost', 'almost'], ['crit', 'fall. critico'], ['critWin', 'succ. critico']] as const)
+              .map(([k, label]) => (
+                <label key={k} style={{ color: '#9fb0b6', fontSize: 12 }}>
+                  {label}{' '}
+                  <input type="number" min={0} max={40} step={1} value={pcts[k]}
+                         onChange={e => setPcts(v => ({ ...v, [k]: Number(e.target.value) }))}
+                         style={{ width: 52, background: '#0d1417', color: '#e8e2d4',
+                                  border: '1px solid #2a3a3e', borderRadius: 4, padding: '2px 4px' }} />%
+                </label>
+              ))}
+          </div>
           <div style={{ marginTop: 12, display: 'flex', gap: 6 }}>
             {(['nascita', 'check', 'uscita'] as const).map(b => (
               <button key={b} onClick={() => setBeat(b)}
