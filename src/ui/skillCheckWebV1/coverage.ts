@@ -45,92 +45,130 @@ export function rHeroAt(tips: number[], theta: number, valleyF = VALLEY_F): numb
   return a + (b - a) * f;
 }
 
-/* ── LA PUNTA CHE SI ALLUNGA E SI STRINGE ──────────────────────────────────
- * Il sistema della desiderata v14 punto 2, che nella riscrittura della v15 era
- * sparito: la punta cresce con la stat (lo fa gia', sta su `rOf(stat)`) e la
- * valle si STRINGE mentre cresce.
+/* ── LA STELLA, QUELLA VERA ────────────────────────────────────────────────
+ * Il Director, guardando le prime tre versioni: «la forma del pg e' sempre
+ * strana. Sai cosa e' una stella?»
  *
- * `rHeroAt` fa variare la PROFONDITA' su settori fissi da 36 gradi: e' il
- * motivo per cui una stella lunga restava larga e la forma leggeva fiore a
- * qualunque stat. Qui la variabile e' l'AMPIEZZA: la punta occupa `pw` gradi
- * attorno al suo asse, e fuori da `pw` c'e' il fondovalle.
+ * Aveva ragione e la causa e' precisa. I profili precedenti interpolavano il
+ * RAGGIO in funzione dell'angolo — con `smoothstep` nel primo caso, lineare nel
+ * secondo. Un raggio che varia dolcemente con l'angolo produce petali TONDI, e
+ * un fondovalle a raggio costante produce un DISCO: fiore e disco, mai stella.
  *
- * L'ampiezza non e' una manopola: e' una FUNZIONE dell'allungamento, cioe' di
- * quanto la punta supera la trama su quel raggio. Sotto la v15 questo si puo'
- * fare senza rompere niente, perche' la copertura e' un OUTPUT — sotto la v14
- * no, e per questo l'avevo accantonato: la restrizione riduce l'area, e la' l'
- * area doveva tornare a un numero deciso prima.
+ * Una stella e' un POLIGONO: dieci vertici, cinque punte a `rOf(stat_i)` e
+ * cinque incavi a meta' fra due punte, uniti da SEGMENTI DRITTI. I fianchi
+ * retti e gli angoli vivi non sono uno stile: sono la definizione.
+ *
+ * Il raggio del bordo a un angolo si ricava dalla CORDA fra due vertici, in
+ * forma chiusa — non si campiona e non si arrotonda:
+ *
+ *     r(t) = r0*r1*sin(a1-a0) / ( r0*sin(t-a0) + r1*sin(a1-t) )
+ *
+ * PUNTE CHE SI ALLUNGANO E SI STRINGONO. In una stella a cinque punte gli assi
+ * distano 72 gradi fissi: la snellezza NON e' un angolo libero, e' il rapporto
+ * fra incavo e punta. Abbassare l'incavo allunga e assottiglia; alzarlo
+ * ingrassa. Quindi la variabile e' `valleyF`, ma come FUNZIONE
+ * dell'allungamento e non come manopola.
  */
-export const PW_MAX = (Math.PI / AXES) * 0.98;   // ~35 gradi: petalo pieno
-export const PW_MIN = (Math.PI / AXES) * 0.26;   // ~9 gradi: spillo
 
 /**
- * Ampiezza della punta in funzione dell'allungamento punta/trama.
+ * LA PROGRESSIONE. Decisione del Director, e il vincolo negativo e' esplicito:
  *
- * LA SOGLIA E' 1, e non e' una taratura: e' il punto in cui la punta RAGGIUNGE
- * la trama. Prima di quel momento la punta ha ancora materia da coprire e
- * stringerla toglierebbe copertura per niente; dopo, cresce solo in territorio
- * che la prova non chiede, ed e' li' che stringere ha un senso — e' la frase
- * del Director «quando occuperebbe troppo spazio rispetto al goo».
+ *     «Quando possibile voglio il fiore, quando non possibile da stella a
+ *      stella stretta e allungata. La stella cicciona non voglio vederla mai.»
  *
- * Misurato con soglia 0.55 (il primo tentativo): la copertura crollava a 38% a
- * parita' e diventava NON MONOTONA — 37.8 -> 38.7 -> 38.5 — cioe' piu' stat
- * dava meno successo. Con la soglia a 1 la parita' resta intatta perche' li'
- * l'allungamento e' 0.99 e la punta e' ancora piena.
+ * Quindi non c'e' una stella che ingrassa: ci sono DUE FAMIGLIE e un passaggio.
+ * Il fiore e' un profilo dolce (raggio interpolato, petali tondi); la stella e'
+ * un poligono a fianchi retti come `tracePerfectStar` della V6. La stella entra
+ * in scena GIA' SNELLA — incavo 0.40, il valore della V6 — e da li' si affila.
+ * Il tratto grasso non esiste in nessun punto del dominio.
  *
- * La RAMPA e' 1.6 e non 1.2 per lo stesso motivo misurato: con 1.2 restava una
- * inversione di 0.27 punti fra stat 70 e 85, dove lo stringersi mangiava esatta-
- * mente cio' che l'allungarsi guadagnava. Con 1.6 le inversioni sono 0.0000 su
- * tutte e tre le difficolta' provate. Il PLATEAU invece resta, ed e' voluto:
- * salire di stat li' non compra quasi niente, che e' la frase del Director
- * «avere una stat alta non ti da il 100% di vittoria automaticamente».
+ * Il passaggio e' governato dall'allungamento punta/trama: finche' la punta sta
+ * dentro la materia c'e' spazio per i petali, quando la supera serve la punta.
  */
-export function pointWidth(elong: number): number {
-  const u = clamp((elong - 1) / 1.6, 0, 1);
-  return PW_MAX - (PW_MAX - PW_MIN) * (u * u * (3 - 2 * u));
+export const FLOWER_UNTIL = 0.82;   // sotto: fiore puro
+export const STAR_FROM = 1.16;      // sopra: stella pura
+export const STAR_VALLEY_WIDE = 0.40;   // la stella appena entra: mai piu' grassa
+export const STAR_VALLEY_SLIM = 0.22;   // affilata, quando sfonda la trama
+
+/** 0 = fiore, 1 = stella. Fra le due si mescola, e non si vede mai il salto. */
+export function starMix(elong: number): number {
+  const u = clamp((elong - FLOWER_UNTIL) / (STAR_FROM - FLOWER_UNTIL), 0, 1);
+  return u * u * (3 - 2 * u);
+}
+
+/** incavo della stella: parte snella e si affila con l'allungamento */
+export function valleyDepthFor(elong: number): number {
+  const u = clamp((elong - STAR_FROM) / 1.9, 0, 1);
+  return STAR_VALLEY_WIDE - (STAR_VALLEY_WIDE - STAR_VALLEY_SLIM) * (u * u * (3 - 2 * u));
 }
 
 export interface HeroShape {
+  /** angoli dei dieci vertici della stella, crescenti */
+  angs: number[];
+  /** raggi dei dieci vertici: punta, incavo, punta, incavo... */
+  radii: number[];
   tips: number[];
-  /** ampiezza per asse, derivata: NON si passa a mano */
-  widths: number[];
-  valleyF: number;
+  /** quanto la forma e' stella invece che fiore, per asse */
+  mix: number[];
 }
 
-/** costruisce la forma: le ampiezze escono dal rapporto punta/trama, per asse */
-export function buildHeroShape(s: Snapshot, valleyF = VALLEY_F): HeroShape {
-  const widths = s.axisTip.map((tipR, i) => {
-    const a = -Math.PI / 2 + (i * TAU) / AXES;
-    const trama = rWallAt(s, a);
-    return pointWidth(trama > 0 ? tipR / trama : 1);
-  });
-  return { tips: s.axisTip, widths, valleyF };
+/** i dieci vertici piu' il mix fiore/stella. Niente qui e' scelto a mano. */
+export function buildHeroShape(s: Snapshot, valleyF?: number): HeroShape {
+  const angs: number[] = [];
+  const radii: number[] = [];
+  const mix: number[] = [];
+  for (let i = 0; i < AXES; i += 1) {
+    const aTip = -Math.PI / 2 + (i * TAU) / AXES;
+    const tipR = s.axisTip[i];
+    angs.push(aTip);
+    radii.push(tipR);
+    mix.push(starMix(tipR / Math.max(1e-6, rWallAt(s, aTip))));
+
+    /* l'incavo fra la punta i e la i+1 appartiene a entrambe, quindi segue la
+       PIU' CORTA delle due: e' cosi' che un asse debole scava la valle */
+    const aVal = aTip + Math.PI / AXES;
+    const weak = Math.min(tipR, s.axisTip[(i + 1) % AXES]);
+    const trama = rWallAt(s, aVal);
+    const vf = valleyF ?? valleyDepthFor(trama > 0 ? weak / trama : 1);
+    angs.push(aVal);
+    radii.push(weak * vf);
+  }
+  return { angs, radii, tips: s.axisTip, mix };
+}
+
+/** il bordo della STELLA: intersezione del raggio con la corda, forma chiusa */
+function rStarChord(sh: HeroShape, theta: number): number {
+  const n = sh.angs.length;
+  const a0 = sh.angs[0];
+  const t = (((theta - a0) % TAU) + TAU) % TAU;
+  const seg = TAU / n;
+  const k = Math.floor(t / seg) % n;
+  const rA = sh.radii[k];
+  const rB = sh.radii[(k + 1) % n];
+  const d = seg;
+  const u = t - k * seg;
+  const den = rA * Math.sin(u) + rB * Math.sin(d - u);
+  if (Math.abs(den) < 1e-12) return Math.max(rA, rB);
+  return (rA * rB * Math.sin(d)) / den;
 }
 
 /**
- * Il profilo a punte strette. La valle e' PIATTA al fondo: e' li' che la
- * materia scura si vede per tutta la sua lunghezza, ed e' il motivo per cui
- * stringere rende il fallimento leggibile invece di nasconderlo.
+ * Il bordo dell'eroe: fiore, stella, o la mescola fra i due. Il mix e' preso
+ * sull'asse piu' vicino, cosi' una scheda squilibrata puo' avere un petalo da
+ * una parte e una punta dall'altra — che e' il ritratto giusto.
  */
 export function rHeroNarrowAt(sh: HeroShape, theta: number): number {
+  const star = rStarChord(sh, theta);
+  const flower = rHeroAt(sh.tips, theta, VALLEY_F);
   let best = Infinity;
   let bi = 0;
   for (let i = 0; i < AXES; i += 1) {
     const a = -Math.PI / 2 + (i * TAU) / AXES;
-    let d = Math.abs((((theta - a) % TAU) + TAU + Math.PI) % TAU - Math.PI);
-    if (d < best) { best = d; bi = i; }
+    const dd = Math.abs((((theta - a) % TAU) + TAU + Math.PI) % TAU - Math.PI);
+    if (dd < best) { best = dd; bi = i; }
   }
-  const tipR = sh.tips[bi];
-  /* il fondovalle resta ancorato alla punta MINORE delle due vicine, come nel
-     profilo storico: e' quello che tiene la valle bassa su un asse debole */
-  const prev = sh.tips[(bi + AXES - 1) % AXES];
-  const next = sh.tips[(bi + 1) % AXES];
-  const floor = Math.min(tipR, Math.min(prev, next)) * sh.valleyF;
-  const pw = sh.widths[bi];
-  if (best >= pw) return floor;
-  const u = 1 - best / pw;
-  const sm = u * u * (3 - 2 * u);
-  return floor + (tipR - floor) * sm;
+  const m = sh.mix[bi];
+  return flower * (1 - m) + star * m;
 }
 
 export interface Coverage {
@@ -201,6 +239,129 @@ export const AUTO_THRESHOLD_PCT = 100;
 
 export function shouldRoll(cov: Coverage, threshold = AUTO_THRESHOLD_PCT): boolean {
   return cov.pct < threshold;
+}
+
+/* ── LE TRE BANDE, OGNUNA IL 5% ────────────────────────────────────────────
+ * Il Director: «non vedo almost, non vedo successo critico o fallimento
+ * critico, tutti devono essere 5% (5% del valore interno allo skill check)».
+ *
+ * «Valore interno allo skill check» = l'area della TRAMA, che e' il dominio in
+ * cui la pallina si ferma. Quindi tutte e tre le bande si misurano sulla stessa
+ * base, e nessuna delle tre e' disegnata a spessore fisso: lo spessore si
+ * RISOLVE perche' l'area sia quella. Una banda a spessore fisso porta una
+ * probabilita' diversa a ogni difficolta' — e' il difetto misurato in PLAN-008,
+ * dove la fascia critica valeva il 31.9% dell'area a difficolta' 20 e il 10.4% a
+ * 99.
+ *
+ * Ordine dal centro verso fuori:
+ *
+ *     SUCCESSO CRITICO  il nucleo della stella
+ *     successo          il resto della stella
+ *     [bordo stella]
+ *     FALLIMENTO CRITICO  la prima materia scura che incontri mancando
+ *     ALMOST              subito oltre
+ *     fallimento          il resto della trama
+ *
+ * Il critico sta DENTRO e non al muro per decisione del Director: «all'esterno
+ * non e' raggiungibile dal lancio della pallina».
+ */
+
+/** area della trama, la base di tutte le percentuali */
+export function tramaArea(s: Snapshot, angles = 2880): number {
+  const dth = TAU / angles;
+  let a = 0;
+  for (let i = 0; i < angles; i += 1) {
+    const th = -Math.PI / 2 + (i + 0.5) * dth;
+    const rt = rWallAt(s, th);
+    a += 0.5 * rt * rt * dth;
+  }
+  return a;
+}
+
+/**
+ * SUCCESSO CRITICO: il disco al centro la cui area e' `pct`% della trama.
+ * Sta tutto dentro la stella finche' il nucleo non supera l'incavo — e quando
+ * lo supera lo diciamo, invece di lasciar sbordare il trionfo nel fallimento.
+ */
+export function solveCoreRadius(s: Snapshot, pct: number, angles = 2880): number {
+  return Math.sqrt((tramaArea(s, angles) * (pct / 100)) / Math.PI);
+}
+
+/**
+ * Le bande esterne, in cascata: ogni `pcts[i]` e' la sua fetta di trama, e la
+ * banda parte dove finisce la precedente. Ritorna i fattori cumulativi `e`
+ * tali che la banda k va da `rHero*(1+e[k-1])` a `rHero*(1+e[k])`.
+ */
+/**
+ * ALMOST: la banda DENTRO il bordo della stella. Il Director:
+ *
+ *     «Il bordo esterno della stella e' almost», e il fallimento critico e' il
+ *     bordo interno del goo — cioe' i due stanno sui lati OPPOSTI dello stesso
+ *     confine.
+ *
+ * Ha una conseguenza sul significato che vale la pena dire: almost cade DENTRO
+ * la stella, quindi e' un successo ottenuto per un soffio, e il critico e' il
+ * fallimento subito fuori. Piu' ti avvicini al bordo, piu' l'esito e' estremo
+ * da entrambe le parti.
+ */
+export function solveInnerBand(
+  s: Snapshot,
+  rHero: (theta: number) => number,
+  pct: number,
+  angles = 1440,
+): number {
+  const dth = TAU / angles;
+  const want = tramaArea(s, angles) * (pct / 100);
+  const areaOf = (e: number) => {
+    let a = 0;
+    for (let i = 0; i < angles; i += 1) {
+      const th = -Math.PI / 2 + (i + 0.5) * dth;
+      const rt = rWallAt(s, th);
+      const r1 = Math.min(rHero(th), rt);
+      const r0 = r1 * (1 - e);
+      a += 0.5 * (r1 * r1 - r0 * r0) * dth;
+    }
+    return a;
+  };
+  let lo = 0, hi = 1;
+  for (let k = 0; k < 44; k += 1) {
+    const m = (lo + hi) / 2;
+    if (areaOf(m) < want) lo = m; else hi = m;
+  }
+  return (lo + hi) / 2;
+}
+
+export function solveOuterBands(
+  s: Snapshot,
+  rHero: (theta: number) => number,
+  pcts: number[],
+  angles = 1440,
+): number[] {
+  const dth = TAU / angles;
+  const base = tramaArea(s, angles);
+  const areaUpTo = (e: number) => {
+    let a = 0;
+    for (let i = 0; i < angles; i += 1) {
+      const th = -Math.PI / 2 + (i + 0.5) * dth;
+      const rt = rWallAt(s, th);
+      const r0 = Math.min(rHero(th), rt);
+      const r1 = Math.min(r0 * (1 + e), rt);
+      a += 0.5 * (r1 * r1 - r0 * r0) * dth;
+    }
+    return a;
+  };
+  const out: number[] = [];
+  let want = 0;
+  for (const pct of pcts) {
+    want += base * (pct / 100);
+    let lo = 0, hi = 4;
+    for (let k = 0; k < 44; k += 1) {
+      const m = (lo + hi) / 2;
+      if (areaUpTo(m) < want) lo = m; else hi = m;
+    }
+    out.push((lo + hi) / 2);
+  }
+  return out;
 }
 
 /* ── IL BORDO INTERNO = IL FALLIMENTO CRITICO ──────────────────────────────
