@@ -293,32 +293,44 @@ export function solveCoreRadius(s: Snapshot, pct: number, angles = 2880): number
  * tali che la banda k va da `rHero*(1+e[k-1])` a `rHero*(1+e[k])`.
  */
 /**
- * ALMOST: la banda DENTRO il bordo della stella. Il Director:
- *
- *     «Il bordo esterno della stella e' almost», e il fallimento critico e' il
- *     bordo interno del goo — cioe' i due stanno sui lati OPPOSTI dello stesso
- *     confine.
- *
- * Ha una conseguenza sul significato che vale la pena dire: almost cade DENTRO
- * la stella, quindi e' un successo ottenuto per un soffio, e il critico e' il
- * fallimento subito fuori. Piu' ti avvicini al bordo, piu' l'esito e' estremo
- * da entrambe le parti.
+ * IL RAGGIO DELLA PALLINA in unita' engine. Il centro della pallina non puo'
+ * avvicinarsi al muro piu' del proprio raggio: quello e' il punto piu' profondo
+ * che un tiro raggiunge davvero, ed e' il vincolo FISICO su cui si appoggia la
+ * banda del fallimento critico.
  */
-export function solveInnerBand(
+export const BALL_R = 9;
+
+/**
+ * FALLIMENTO CRITICO = il bordo interno del goo, e il goo comincia dove il tiro
+ * arriva. Il Director:
+ *
+ *     «All'esterno non e' raggiungibile dal lancio della pallina, deve essere
+ *      interno. Se si ferma li e' fallimento critico.»
+ *     «Il fallimento critico e' il bordo interno del goo, non il bordo esterno
+ *      della stella. Il bordo esterno della stella e' almost.»
+ *
+ * Quindi le due bande NON sono adiacenti: almost sta attaccato alla stella
+ * (mancata di un soffio), il critico sta piu' in fuori, e fra i due c'e' il
+ * fallimento normale. Il bordo esterno della banda critica e' `trama - BALL_R`,
+ * cioe' il punto piu' profondo raggiungibile: oltre, la pallina non ci arriva e
+ * una probabilita' assegnata la' non accadrebbe mai.
+ *
+ * Ritorna il fattore `f` tale che la banda va da `(trama - BALL_R) * (1 - f)` a
+ * `trama - BALL_R`.
+ */
+export function solveGooBand(
   s: Snapshot,
-  rHero: (theta: number) => number,
   pct: number,
   angles = 1440,
 ): number {
   const dth = TAU / angles;
   const want = tramaArea(s, angles) * (pct / 100);
-  const areaOf = (e: number) => {
+  const areaOf = (f: number) => {
     let a = 0;
     for (let i = 0; i < angles; i += 1) {
       const th = -Math.PI / 2 + (i + 0.5) * dth;
-      const rt = rWallAt(s, th);
-      const r1 = Math.min(rHero(th), rt);
-      const r0 = r1 * (1 - e);
+      const r1 = Math.max(0, rWallAt(s, th) - BALL_R);
+      const r0 = r1 * (1 - f);
       a += 0.5 * (r1 * r1 - r0 * r0) * dth;
     }
     return a;
