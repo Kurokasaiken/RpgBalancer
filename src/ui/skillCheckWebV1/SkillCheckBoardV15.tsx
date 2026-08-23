@@ -18,8 +18,8 @@
  */
 import React, { useEffect, useMemo, useRef } from 'react';
 import { buildSnapshot, DEFAULT_CHECK_CONFIG, AXES, rWallAt, R, R_CORE } from './zones';
-import { measureCoverage, rHeroAt, rHeroNarrowAt, buildHeroShape, solveCritBand,
-         type Coverage } from './coverage';
+import { measureCoverage, rHeroAt, rHeroNarrowAt, buildHeroShape,
+         solveCoreRadius, solveOuterBands, solveInnerBand, type Coverage } from './coverage';
 import { drawTrama, TRAMA_DEFAULTS } from './trama';
 
 const TAU = Math.PI * 2;
@@ -204,31 +204,59 @@ export function SkillCheckBoardV15({
     ctx.fill();
     ctx.restore();
 
-    pathOf(heroAt);
-    ctx.lineWidth = 1.1;
-    ctx.strokeStyle = `rgba(255,240,206,${0.5 + 0.4 * (1 - ci)})`;
-    ctx.stroke();
+    /* IL CONTORNO DELLA STELLA C'E' SOLO ALLA NASCITA. Durante il check il
+       confine e' il salto fra almost e fallimento critico: un contorno in piu'
+       era il terzo dei «3 bordi» segnalati dal Director. */
+    if (ci < 0.5) {
+      pathOf(heroAt);
+      ctx.lineWidth = 1.1;
+      ctx.strokeStyle = `rgba(255,240,206,${0.5 + 0.4 * (1 - ci)})`;
+      ctx.stroke();
+    }
 
-    /* ── 3. IL BORDO INTERNO = IL FALLIMENTO CRITICO ──────────────────────
-       Fuori dalla stella, appoggiato al suo bordo: e' il primo pezzo di materia
-       scura che incontri mancando la copertura, ed e' raggiungibile — la fascia
-       al muro non lo era. Lo spessore e' risolto perche' l'area sia crit% della
-       trama, quindi la fascia PORTA la sua probabilita' invece di illustrarla. */
+    /* ── 3. LE TRE BANDE, OGNUNA IL 5% DELLA TRAMA ───────────────────────
+       I due lati dello STESSO confine, come chiesto dal Director:
+         dentro il bordo della stella  -> ALMOST
+         fuori, sul bordo interno del goo -> FALLIMENTO CRITICO
+       E un bordo solo: le tre linee concentriche di prima («la stella ha 3
+       bordi») erano il contorno della stella, lo stroke della banda e il taglio
+       del riempimento sovrapposti. Qui la stella non ha piu' contorno proprio —
+       il confine e' il salto fra le due bande. */
     if (mode === 'dark' || ci > 0.5) {
-      const e = solveCritBand(snap, heroRaw, DEFAULT_CHECK_CONFIG.crit, 1440);
+      const crit = DEFAULT_CHECK_CONFIG.crit;
+      const [eOut] = solveOuterBands(snap, heroRaw, [crit], 1440);
+      const eIn = solveInnerBand(snap, heroRaw, crit, 1440);
+      const rCore = solveCoreRadius(snap, DEFAULT_CHECK_CONFIG.critWin) * K * out;
+
+      /* FALLIMENTO CRITICO: il bordo interno del goo */
       ctx.save();
       pathOf(tramaAt);
       ctx.clip();
       ctx.beginPath();
-      addRing((a) => Math.min(heroAt(a) * (1 + e), tramaAt(a)));
+      addRing((a) => Math.min(heroAt(a) * (1 + eOut), tramaAt(a)));
       addRing(heroAt);
-      ctx.fillStyle = 'rgba(196,74,58,0.32)';
+      ctx.fillStyle = 'rgba(196,74,58,0.5)';
       ctx.fill('evenodd');
-      pathOf(heroAt);
-      ctx.lineWidth = 2.2;
-      ctx.strokeStyle = 'rgba(255,142,110,0.92)';
-      ctx.stroke();
       ctx.restore();
+
+      /* ALMOST: dentro il bordo della stella */
+      ctx.beginPath();
+      addRing(heroAt);
+      addRing((a) => heroAt(a) * (1 - eIn));
+      ctx.fillStyle = 'rgba(226,178,110,0.55)';
+      ctx.fill('evenodd');
+
+      /* SUCCESSO CRITICO: il nucleo. Se non ci sta dentro la stella lo dice,
+         invece di lasciare il trionfo sconfinare nel fallimento. */
+      let minHero = Infinity;
+      for (let i = 0; i < 720; i += 1) minHero = Math.min(minHero, heroAt((i / 720) * TAU));
+      ctx.beginPath();
+      ctx.arc(CX, CY, Math.min(rCore, minHero), 0, TAU);
+      ctx.fillStyle = 'rgba(126,224,171,0.3)';
+      ctx.fill();
+      ctx.lineWidth = 1.4;
+      ctx.strokeStyle = rCore > minHero ? 'rgba(255,120,120,0.9)' : 'rgba(150,240,190,0.85)';
+      ctx.stroke();
     }
 
     /* le cinque punte a rOf(stat): l'invariante che non si muove */
