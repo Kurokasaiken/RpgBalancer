@@ -66,6 +66,7 @@ const MinimalDestinyAstrolabeV9Page = lazy(() => import('./pages/minimal-destiny
 const MinimalDestinyAstrolabeV10Page = lazy(() => import('./pages/minimal-destiny-astrolabe-v10').then(m => ({ default: m.default })));
 const SkillCheckWebV1Page = lazy(() => import('./pages/skill-check-web-v1').then(m => ({ default: m.default })));
 const SkillCheckV15Page = lazy(() => import('./pages/skill-check-v15').then(m => ({ default: m.default })));
+const SkillCheckV16Page = lazy(() => import('./pages/skill-check-v16').then(m => ({ default: m.default })));
 const AdversaryShapesPage = lazy(() => import('./pages/adversary-shapes').then(m => ({ default: m.default })));
 const HeroComponentsLabPage = lazy(() => import('./pages/hero-components-lab').then(m => ({ default: m.default })));
 const MinimalOutcomeModalPage = lazy(() => import('./pages/minimal-outcome').then(m => ({ default: m.default })));
@@ -261,6 +262,10 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/minimal-destiny-astrolabe-v9';
   const isSkillCheckWebV1Path =
     typeof window !== 'undefined' && window.location.pathname === '/skill-check-web-v1';
+  const isSkillCheckV16Path =
+    typeof window !== 'undefined' &&
+    (window.location.pathname === '/skill-check-v16' ||
+     window.location.pathname === '/minimal-destiny-astrolabe-v16');
   const isSkillCheckV15Path =
     typeof window !== 'undefined' &&
     (window.location.pathname === '/skill-check-v15' ||
@@ -738,6 +743,16 @@ function App() {
       <ErrorBoundary componentName="Minimal Destiny Astrolabe V9 Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Destiny Astrolabe V9…</div>}>
           <MinimalDestinyAstrolabeV9Page />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isSkillCheckV16Path) {
+    return (
+      <ErrorBoundary componentName="Skill Check V16 Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Skill Check V16…</div>}>
+          <SkillCheckV16Page />
         </Suspense>
       </ErrorBoundary>
     );
