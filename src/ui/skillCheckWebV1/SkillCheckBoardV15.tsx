@@ -17,7 +17,8 @@
  * calcola per conto suo — o tornerebbero due verita' diverse sullo schermo.
  */
 import React, { useEffect, useMemo, useRef } from 'react';
-import { buildSnapshot, DEFAULT_CHECK_CONFIG, AXES, rWallAt, R, R_CORE } from './zones';
+import { buildSnapshot, DEFAULT_CHECK_CONFIG, AXES, rWallAt, R, R_CORE,
+         type CheckConfig } from './zones';
 import { measureCoverage, rHeroAt, rHeroNarrowAt, buildHeroShape,
          solveCoreRadius, solveOuterBands, solveGooBand, BALL_R, type Coverage } from './coverage';
 import { drawTrama, TRAMA_DEFAULTS } from './trama';
@@ -50,6 +51,12 @@ export interface SkillCheckBoardV15Props {
    * pallina.
    */
   mode?: 'woven' | 'dark';
+  /**
+   * Le percentuali delle tre bande. Sono CONFIGURABILI e vengono da qui: prima
+   * il board leggeva `DEFAULT_CHECK_CONFIG` da se, quindi cambiarle dal gioco
+   * non avrebbe avuto effetto sul disegno.
+   */
+  config?: CheckConfig;
   /** la copertura misurata, verso l'alto: la percentuale e' un output */
   onMeasure?: (c: Coverage) => void;
 }
@@ -57,13 +64,14 @@ export interface SkillCheckBoardV15Props {
 export function SkillCheckBoardV15({
   stats, diffs, size = 760, seed = 0x51c5, valleyF, paintedWith = null, onMeasure,
   narrow = false, clipIn = 1, outbound = 0, mode = 'woven',
+  config = DEFAULT_CHECK_CONFIG,
 }: SkillCheckBoardV15Props): JSX.Element {
   const cv = useRef<HTMLCanvasElement | null>(null);
   const K = (size / 2 - 28) / R;
 
   const snap = useMemo(
-    () => buildSnapshot({ stats, diffs }, DEFAULT_CHECK_CONFIG, 0),
-    [stats, diffs],
+    () => buildSnapshot({ stats, diffs }, config, 0),
+    [stats, diffs, config],
   );
   const cov = useMemo(() => measureCoverage(snap, 7200, narrow), [snap, narrow]);
   useEffect(() => { onMeasure?.(cov); }, [cov, onMeasure]);
@@ -225,10 +233,11 @@ export function SkillCheckBoardV15({
                                      profondo che il tiro raggiunge
        Un bordo solo sulla stella: e' il salto fra il pieno e la banda di almost. */
     if (mode === 'dark' || ci > 0.5) {
-      const crit = DEFAULT_CHECK_CONFIG.crit;
-      const [eAlmost] = solveOuterBands(snap, heroRaw, [crit], 1440);
-      const fGoo = solveGooBand(snap, crit, 1440);
-      const rCore = solveCoreRadius(snap, DEFAULT_CHECK_CONFIG.critWin) * K * out;
+      /* ognuna la SUA voce di config: almost, crit, critWin sono tre numeri
+         diversi e prima li avevo cablati tutti su `crit` */
+      const [eAlmost] = solveOuterBands(snap, heroRaw, [config.almost], 1440);
+      const fGoo = solveGooBand(snap, config.crit, 1440);
+      const rCore = solveCoreRadius(snap, config.critWin) * K * out;
       const reachAt = (a: number) =>
         Math.max(0, (rWallAt(snap, a) - BALL_R)) * K * out * (0.94 + 0.06 * fray(a) * 1.06);
 
@@ -265,16 +274,7 @@ export function SkillCheckBoardV15({
       ctx.stroke();
     }
 
-    /* le cinque punte a rOf(stat): l'invariante che non si muove */
-    for (let i = 0; i < AXES; i += 1) {
-      const a = -Math.PI / 2 + i * TAU / AXES;
-      const r = snap.axisTip[i] * K * out;
-      ctx.beginPath();
-      ctx.arc(CX + Math.cos(a) * r, CY + Math.sin(a) * r, 2.4, 0, TAU);
-      ctx.fillStyle = 'rgba(255,248,232,0.9)';
-      ctx.fill();
-    }
-  }, [snap, size, seed, valleyF, paintedWith, K, narrow, clipIn, outbound, mode]);
+  }, [snap, size, seed, valleyF, paintedWith, K, narrow, clipIn, outbound, mode, config]);
 
   return <canvas ref={cv} width={size} height={size} style={{ borderRadius: 6, display: 'block' }} />;
 }
