@@ -30,6 +30,8 @@ export default function SkillCheckV15Page(): JSX.Element {
   const [seed, setSeed] = useState(0x51c5);
   const [bg, setBg] = useState<HTMLImageElement | null>(null);
   const [cov, setCov] = useState<Coverage | null>(null);
+  const [narrow, setNarrow] = useState(true);
+  const [beat, setBeat] = useState<'nascita' | 'check' | 'uscita'>('check');
 
   useEffect(() => {
     const img = new Image();
@@ -55,6 +57,10 @@ export default function SkillCheckV15Page(): JSX.Element {
             stats={stats} diffs={diffs} size={SIZE} seed={seed}
             valleyF={starShape ? 0.2675 : undefined}
             paintedWith={painted ? bg : null}
+            narrow={narrow}
+            clipIn={beat === 'nascita' ? 0 : 1}
+            outbound={beat === 'uscita' ? 0.55 : 0}
+            mode={beat === 'check' ? 'dark' : 'woven'}
             onMeasure={setCov}
           />
         </div>
@@ -97,7 +103,20 @@ export default function SkillCheckV15Page(): JSX.Element {
                      onChange={e => setDiffs(d => setAt(d, i, Number(e.target.value)))} />
             </div>
           ))}
-          <label style={{ display: 'block', marginTop: 12, color: '#9fb0b6' }}>
+          <div style={{ marginTop: 12, display: 'flex', gap: 6 }}>
+            {(['nascita', 'check', 'uscita'] as const).map(b => (
+              <button key={b} onClick={() => setBeat(b)}
+                      style={{ ...btn, background: beat === b ? '#2b4a3f' : '#16211f' }}>
+                {b}
+              </button>
+            ))}
+          </div>
+          <label style={{ display: 'block', marginTop: 10, color: '#9fb0b6' }}>
+            <input type="checkbox" checked={narrow}
+                   onChange={e => setNarrow(e.target.checked)} />{' '}
+            punte che si allungano e si stringono
+          </label>
+          <label style={{ display: 'block', marginTop: 6, color: '#9fb0b6' }}>
             <input type="checkbox" checked={starShape}
                    onChange={e => setStarShape(e.target.checked)} />{' '}
             stella (valle 0,2675) invece di fiore — la parità scende a ~44,6%
