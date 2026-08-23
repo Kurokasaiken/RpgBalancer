@@ -10,8 +10,8 @@
  * costante.
  */
 import { buildSnapshot, DEFAULT_CHECK_CONFIG, AXES, rWallAt } from '@/ui/skillCheckWebV1/zones';
-import { buildHeroShape, rHeroNarrowAt, solveOuterBands, solveInnerBand, solveCoreRadius,
-         tramaArea } from '@/ui/skillCheckWebV1/coverage';
+import { buildHeroShape, rHeroNarrowAt, solveOuterBands, solveGooBand, solveCoreRadius,
+         tramaArea, BALL_R } from '@/ui/skillCheckWebV1/coverage';
 
 const TAU = Math.PI * 2;
 const five = (v: number) => Array.from({ length: AXES }, () => v);
@@ -25,9 +25,9 @@ for (const [s, d] of [[20,80],[40,60],[50,50],[60,50],[75,50],[85,50],[95,30],[9
   const shape = buildHeroShape(snap);
   const hero = (th: number) => rHeroNarrowAt(shape, th);
   const base = tramaArea(snap, 5760);
-  /* i due lati dello STESSO confine: almost dentro, critico fuori */
+  /* almost attaccato alla stella, il critico sul bordo interno del goo */
   const [e1] = solveOuterBands(snap, hero, [CRIT], 2880);
-  const eIn = solveInnerBand(snap, hero, CRIT, 2880);
+  const fGoo = solveGooBand(snap, CRIT, 2880);
 
   /* misura INDIPENDENTE dal solver: integrazione a griglia piu' fitta */
   const N = 5760, dth = TAU / N;
@@ -37,9 +37,10 @@ for (const [s, d] of [[20,80],[40,60],[50,50],[60,50],[75,50],[85,50],[95,30],[9
     const rt = rWallAt(snap, th);
     const r0 = Math.min(hero(th), rt);
     const r1 = Math.min(r0 * (1 + e1), rt);
-    const rIn = r0 * (1 - eIn);
-    aCritFail += 0.5 * (r1 * r1 - r0 * r0) * dth;
-    aAlmost += 0.5 * (r0 * r0 - rIn * rIn) * dth;
+    aAlmost += 0.5 * (r1 * r1 - r0 * r0) * dth;
+    const g1 = Math.max(0, rt - BALL_R);
+    const g0 = g1 * (1 - fGoo);
+    aCritFail += 0.5 * (g1 * g1 - g0 * g0) * dth;
   }
   const rCore = solveCoreRadius(snap, DEFAULT_CHECK_CONFIG.critWin, 5760);
   const aCore = Math.PI * rCore * rCore;
@@ -51,7 +52,7 @@ for (const [s, d] of [[20,80],[40,60],[50,50],[60,50],[75,50],[85,50],[95,30],[9
   const pc = (a: number) => (a / base) * 100;
   console.log(
     `  ${(s + '/' + d).padEnd(8)}|${pc(aCore).toFixed(3).padStart(9)}%|` +
-    `${pc(aCritFail).toFixed(3).padStart(18)}%|${pc(aAlmost).toFixed(3).padStart(16)}%| ${fits ? 'si' : 'NO — sborda'}`);
+    `${pc(aAlmost).toFixed(3).padStart(22)}%|${pc(aCritFail).toFixed(3).padStart(22)}%| ${fits ? 'si' : 'NO — sborda'}`);
 
   for (const [name, val] of [['crit win', pc(aCore)], ['crit fail', pc(aCritFail)], ['almost', pc(aAlmost)]] as [string, number][]) {
     /* tolleranza: le bande esterne possono venire TRONCATE dal muro quando la

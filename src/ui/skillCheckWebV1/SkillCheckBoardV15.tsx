@@ -19,7 +19,7 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { buildSnapshot, DEFAULT_CHECK_CONFIG, AXES, rWallAt, R, R_CORE } from './zones';
 import { measureCoverage, rHeroAt, rHeroNarrowAt, buildHeroShape,
-         solveCoreRadius, solveOuterBands, solveInnerBand, type Coverage } from './coverage';
+         solveCoreRadius, solveOuterBands, solveGooBand, BALL_R, type Coverage } from './coverage';
 import { drawTrama, TRAMA_DEFAULTS } from './trama';
 
 const TAU = Math.PI * 2;
@@ -82,6 +82,17 @@ export function SkillCheckBoardV15({
     const shape = narrow ? buildHeroShape(snap, valleyF) : null;
     const heroRaw = (a: number) =>
       (shape ? rHeroNarrowAt(shape, a) : rHeroAt(snap.axisTip, a, valleyF));
+    /* IL BORDO STRAPPATO, definito UNA VOLTA e usato da tutti. Prima il bordo
+       esterno era sfrangiato e la fascia critica seguiva `rWallAt` liscio: a
+       schermo la fascia rileggeva come un cerchio disegnato attorno, cioe' la
+       cosa che il Director ha rifiutato quattro volte. Il bordo interno del goo
+       e' un bordo DEL GOO, quindi porta la stessa irregolarita'. */
+    const s0 = (seed % 1000) / 1000;
+    const fray = (a: number) =>
+      1 - 0.055
+        - 0.030 * Math.sin(a * 3.7 + s0 * 6.3)
+        - 0.020 * Math.sin(a * 6.1 - s0 * 2.7)
+        - 0.013 * Math.sin(a * 9.3 + s0 * 4.1);
     const tramaAt = (a: number) => rWallAt(snap, a) * K * out;
     const heroAt = (a: number) => heroRaw(a) * K * out;
     /* `addRing` NON apre un path: serve per comporre due contorni in UNO solo,
@@ -121,15 +132,9 @@ export function SkillCheckBoardV15({
          una ruota dentata, cioe' di nuovo una forma geometrica attorno. Tre
          armoniche basse e incommensurabili danno un contorno irregolare che non
          ha periodo visibile. */
-      const s0 = (seed % 1000) / 1000;
-      const jitter = (a: number) =>
-        1 - 0.055
-          - 0.030 * Math.sin(a * 3.7 + s0 * 6.3)
-          - 0.020 * Math.sin(a * 6.1 - s0 * 2.7)
-          - 0.013 * Math.sin(a * 9.3 + s0 * 4.1);
       for (let i = 0; i <= 360; i += 1) {
         const a = (i / 360) * TAU;
-        const r = tramaAt(a) * jitter(a);
+        const r = tramaAt(a) * fray(a);
         const x = CX + Math.cos(a) * r, y = CY + Math.sin(a) * r;
         if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y);
       }
@@ -157,12 +162,9 @@ export function SkillCheckBoardV15({
       if (paintedWith) {
         ctx.save();
         ctx.beginPath();
-        const s1 = (seed % 1000) / 1000;
-        const rnd = (a: number) =>
-          1 - 0.05 - 0.03 * Math.sin(a * 3.7 + s1 * 6.3) - 0.02 * Math.sin(a * 6.1 - s1 * 2.7);
         for (let i = 0; i <= 220; i += 1) {
           const a = (i / 220) * TAU;
-          const r = tramaAt(a) * rnd(a);
+          const r = tramaAt(a) * fray(a);
           const x = CX + Math.cos(a) * r, y = CY + Math.sin(a) * r;
           if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y);
         }
@@ -215,36 +217,40 @@ export function SkillCheckBoardV15({
     }
 
     /* ── 3. LE TRE BANDE, OGNUNA IL 5% DELLA TRAMA ───────────────────────
-       I due lati dello STESSO confine, come chiesto dal Director:
-         dentro il bordo della stella  -> ALMOST
-         fuori, sul bordo interno del goo -> FALLIMENTO CRITICO
-       E un bordo solo: le tre linee concentriche di prima («la stella ha 3
-       bordi») erano il contorno della stella, lo stroke della banda e il taglio
-       del riempimento sovrapposti. Qui la stella non ha piu' contorno proprio —
-       il confine e' il salto fra le due bande. */
+         nucleo della stella      -> SUCCESSO CRITICO
+         subito fuori dalla stella-> ALMOST (mancata di un soffio: e' un
+                                     fallimento, per questo sta FUORI)
+         fra i due                -> fallimento normale
+         bordo interno del goo    -> FALLIMENTO CRITICO, appoggiato al punto piu'
+                                     profondo che il tiro raggiunge
+       Un bordo solo sulla stella: e' il salto fra il pieno e la banda di almost. */
     if (mode === 'dark' || ci > 0.5) {
       const crit = DEFAULT_CHECK_CONFIG.crit;
-      const [eOut] = solveOuterBands(snap, heroRaw, [crit], 1440);
-      const eIn = solveInnerBand(snap, heroRaw, crit, 1440);
+      const [eAlmost] = solveOuterBands(snap, heroRaw, [crit], 1440);
+      const fGoo = solveGooBand(snap, crit, 1440);
       const rCore = solveCoreRadius(snap, DEFAULT_CHECK_CONFIG.critWin) * K * out;
+      const reachAt = (a: number) =>
+        Math.max(0, (rWallAt(snap, a) - BALL_R)) * K * out * (0.94 + 0.06 * fray(a) * 1.06);
 
-      /* FALLIMENTO CRITICO: il bordo interno del goo */
       ctx.save();
       pathOf(tramaAt);
       ctx.clip();
+
+      /* FALLIMENTO CRITICO: il bordo interno del goo */
       ctx.beginPath();
-      addRing((a) => Math.min(heroAt(a) * (1 + eOut), tramaAt(a)));
-      addRing(heroAt);
+      addRing(reachAt);
+      addRing((a) => reachAt(a) * (1 - fGoo));
       ctx.fillStyle = 'rgba(196,74,58,0.5)';
       ctx.fill('evenodd');
-      ctx.restore();
 
-      /* ALMOST: dentro il bordo della stella */
+      /* ALMOST: subito fuori dalla stella */
       ctx.beginPath();
+      addRing((a) => Math.min(heroAt(a) * (1 + eAlmost), tramaAt(a)));
       addRing(heroAt);
-      addRing((a) => heroAt(a) * (1 - eIn));
-      ctx.fillStyle = 'rgba(226,178,110,0.55)';
+      ctx.fillStyle = 'rgba(226,178,110,0.5)';
       ctx.fill('evenodd');
+
+      ctx.restore();
 
       /* SUCCESSO CRITICO: il nucleo. Se non ci sta dentro la stella lo dice,
          invece di lasciare il trionfo sconfinare nel fallimento. */
