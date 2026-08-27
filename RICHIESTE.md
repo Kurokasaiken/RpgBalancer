@@ -999,3 +999,24 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 - Evidence log: `test-results/r-051-obelischi-resolution-2026-08-27.log`.
 - `build:check`, test 4/4 e `kanban:lint` passati.
 **Cosa manca:** conferma visiva del Director.
+
+---
+
+## R-052 — Bordo del goo in colore negativo (non chiaro)
+
+**Richiesta:** *"il bordo del goo deve essere di un colore associato a qualcosa d negativo, nn chiaro"*.
+**Data:** 2026-08-27
+**Stato:** `fatta`
+**Cosa è successo:**
+- `tarGooConfig.ts`: il bordo è diventato un crimson scuro/sangue:
+  - `specularColor: [0.55, 0.04, 0.02]`
+  - `specularIntensity: 0.25`
+  - `fresnelColor: [0.55, 0.0, 0.04]`
+  - descrizione Zod aggiornata.
+- Verifica con Puppeteer (single 85/50):
+  - al muro destro (r≈190): `RGB(107,4,16)` — bordo crimson scuro
+  - corpo del goo: `RGB(55,27,10)`
+  - sfondo teal: `RGB(59,133,129)`
+- Evidence log: `test-results/r-052-goo-rim-negative-2026-08-27.log`.
+- `build:check`, test 4/4 e `kanban:lint` passati.
+**Cosa manca:** conferma visiva del Director.
