@@ -284,7 +284,6 @@ const stateChip=$id('stateChip');
 function emitState(s){ try{ if(typeof opts!=='undefined'&&opts&&opts.onState) opts.onState(s); }catch(e){} }
 function emitArmed(b){ try{ if(typeof opts!=='undefined'&&opts&&opts.onArmed) opts.onArmed(b); }catch(e){} }
 let armed=false;                 // true while the TIRA button should be shown
-const GOO_MS=620;                // springy goo-expansion duration
 function setState(s){
   scene.state=s; scene.t0=performance.now();
   suite.dataset.state=s;
@@ -295,7 +294,10 @@ function phaseT(durMs){ return clamp((performance.now()-scene.t0)/durMs,0,1); }
 const easeOutCubic=t=>1-Math.pow(1-t,3);
 const easeInCubic=t=>t*t*t;
 const easeOutBack=t=>{const c=1.7;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2);};
+const easeOutHeavy=t=>1-Math.pow(1-t,3.5);         // V6.2: tar spreads slow and settles, no bounce.
 const easeElastic=t=>t===0?0:t===1?1:Math.pow(2,-10*t)*Math.sin((t*10-0.75)*(TAU/3))+1;
+
+const GOO_MS=900;                                  // V6.2: slower, heavier tar spread
 
 function shake(kind){
   stage.classList.remove('shake-hard','shake-low','shake-slam');
@@ -367,11 +369,11 @@ function tickTimeline(){
     if(p>=1) setState('goo-expand');
   }
   else if(s==='goo-expand'){
-    /* GOO EXPANSION — erupts from the seeded core and springs outward to the
-       black obelisks with a cubic-bezier(.34,1.56,.64,1)-style overshoot. */
+    /* V6.2 GOO EXPANSION — the tar mass wells up from the core and crawls
+       outward to the black obelisks: heavy, viscous, no springy overshoot. */
     const p=phaseT(GOO_MS);
-    scene.gooReveal=clamp(easeOutBack(p),0,1.08);   // springy overshoot
-    scene.gooRipple=Math.max(scene.gooRipple,0.6*(1-p));
+    scene.gooReveal=clamp(easeOutHeavy(p),0,1.0);   // slow settle, no overshoot
+    scene.gooRipple=Math.max(scene.gooRipple,0.55*(1-p));
     if(p>=1){
       scene.gooReveal=1;
       setState('axis-read');           // V6: beat di lettura prima della risposta del PG
@@ -692,7 +694,7 @@ function tickGooSim(now){
   const dt=gooSim.lastMs?Math.min(50,now-gooSim.lastMs):16.7;
   gooSim.lastMs=now;
   const k=dt/16.7;                                   // frame-rate normalizer
-  const rev=clamp(scene.gooReveal,0,1.08);
+  const rev=clamp(scene.gooReveal,0,1.0);
   const damp=Math.pow(simCfg.damping,k);
   for(let i=0;i<gooSim.N;i+=1){
     const theta=i/gooSim.N*TAU;
