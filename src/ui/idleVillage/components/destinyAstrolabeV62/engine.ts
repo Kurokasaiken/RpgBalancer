@@ -636,6 +636,9 @@ function resolve(){
   scene.res={verdict,roll:0,riskRoll,skillIndex,wounded,dead};
   const res=scene.res;
   setState('resolution');
+  scene.whitePillars.forEach(p=>p.drop=0);
+  scene.blackPillars.forEach(p=>p.drop=0);
+  scene.axisAlpha=0;
   const V=VERDICT_TEXT[verdict];
   /* title: split into letters for the crumble effect */
   const titleEl=$id('cardTitle');

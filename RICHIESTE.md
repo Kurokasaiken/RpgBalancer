@@ -983,3 +983,19 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 - Evidence log: `test-results/r-050-flower-clip-2026-08-27.log`.
 - `build:check`, test 4/4, `kanban:lint` e smoke `curl` 200 passati.
 **Cosa manca:** conferma visiva del Director.
+
+---
+
+## R-051 — Gli obelischi non devono essere presenti nella schermata vittoria/sconfitta
+
+**Richiesta:** *"nella schermata vittoria o sconfitta gli obelischi nn devono essere presenti"*.
+**Data:** 2026-08-27
+**Stato:** `fatta`
+**Cosa è successo:**
+- In `resolve()` (engine.ts), subito dopo `setState('resolution')`:
+  - `scene.whitePillars` e `scene.blackPillars` vengono forzati a `drop=0`.
+  - `scene.axisAlpha=0` nasconde anche il visualizzatore dei valori delle skill.
+- Così la carta del verdetto appare sempre senza obelischi bianchi/neri e senza scala skill, anche se la risoluzione avviene prima che finisca il fade del `risk-pour`.
+- Evidence log: `test-results/r-051-obelischi-resolution-2026-08-27.log`.
+- `build:check`, test 4/4 e `kanban:lint` passati.
+**Cosa manca:** conferma visiva del Director.
