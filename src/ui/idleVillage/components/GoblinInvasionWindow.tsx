@@ -167,8 +167,8 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
   className,
   style,
   backgroundImage = defaultBackgroundImage,
-  goblinImage: goblinNoSticker = defaultGoblinImage,
-  goblinImageWithBorder: goblinWithSticker = defaultGoblinImageWithBorder,
+  goblinImage = defaultGoblinImage,
+  goblinImageWithBorder = defaultGoblinImageWithBorder,
   variant = 'C',
 }) => {
   const [peeled, setPeeled] = useState(false);
