@@ -78,7 +78,7 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
   marchTarget,
 }) => {
   const { t } = useTranslation('idleVillage');
-  const [stage, setStage] = useState<Stage>('idle');
+  const [stage, setStage] = useState<Stage>('modal');
   const [daysLeft] = useState<number>(DAYS_LEFT);
 
   const goblinBase = useMemo(() => ({ x: 0, y: -300 }), []);
