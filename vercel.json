@@ -3,7 +3,7 @@
   "framework": "vite",
   "outputDirectory": "dist",
   "installCommand": "npm ci",
-  "buildCommand": "npm run build",
+  "buildCommand": "npm run build:deploy",
   "devCommand": "npm run dev",
   "rewrites": [
     {
@@ -13,7 +13,7 @@
   ],
   "build": {
     "env": {
-      "NODE_VERSION": "20.19.6"
+      "NODE_VERSION": "22"
     }
   },
   "headers": [

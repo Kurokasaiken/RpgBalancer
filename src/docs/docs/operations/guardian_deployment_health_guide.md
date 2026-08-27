@@ -41,7 +41,7 @@ The Guardian Deployment Health system ensures that every deployment to Vercel is
 ### Required Tools
 
 ```bash
-# Node.js 20.19.6+ (already configured in .nvmrc)
+# Node.js 22+ (already configured in .nvmrc)
 source ~/.nvm/nvm.sh && nvm use
 
 # Vercel CLI (global installation)
@@ -459,7 +459,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20.19.6'
+          node-version: '22.23.1'
           
       - name: Install dependencies
         run: npm ci
@@ -655,7 +655,7 @@ npm run guardian:deploy-guard
 cat test-results/guardian-deployment-log.json | jq '.[-1]'
 
 # Monitor bundle size
-npm run build && du -sh dist/*
+npm run build:deploy && du -sh dist/*
 ```
 
 ---
@@ -669,13 +669,13 @@ When Vercel deployment fails but local build succeeds:
 #### Node Version Mismatch
 ```bash
 # Fix .nvmrc
-echo "20.19.6" > .nvmrc
+echo "22" > .nvmrc
 
 # Update vercel.json
 {
   "build": {
     "env": {
-      "NODE_VERSION": "20.19.6"
+      "NODE_VERSION": "22"
     }
   }
 }
@@ -691,18 +691,18 @@ echo "20.19.6" > .nvmrc
 ```bash
 # Use npm ci instead of npm install
 "installCommand": "npm ci",
-"buildCommand": "npm run build"
+"buildCommand": "npm run build:deploy"
 ```
 
 ### Quick Fix Template
 ```bash
 # 1. Fix Node version
-echo "20.19.6" > .nvmrc
+echo "22" > .nvmrc
 
 # 2. Clean rebuild
 rm -rf dist node_modules package-lock.json
 npm install
-npm run build
+npm run build:deploy
 
 # 3. Fix vercel.json conflicts
 # 4. Deploy

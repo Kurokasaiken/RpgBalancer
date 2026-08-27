@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSkinPreferences } from './hooks/useSkinPreferences';
 import { DEFAULT_IDLE_VILLAGE_CONFIG } from '../../balancing/config/idleVillage/defaultConfig';
-import { ActivityDefinition } from '../../balancing/config/idleVillage/types';
+import type { ActivityDefinition } from '../../balancing/config/idleVillage/types';
 import { ActivityCapsule } from './components/ActivityCapsule';
 import ActivityCardDetail from './components/ActivityCardDetail';
 import { useMinimalGameplayWithIdleVillageConfig } from '@/store/useMinimalGameplay';
