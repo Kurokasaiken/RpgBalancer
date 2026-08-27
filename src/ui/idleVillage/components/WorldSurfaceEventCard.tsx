@@ -43,6 +43,8 @@ const DAYS_LEFT = Number(trailerConfig.threat.announcement.timerRing.number) || 
 const GOBLIN_IMAGE = trailerConfig.threat.goblinImage;
 const CARD_HEIGHT = 500;
 const CARD_SCALE = 3;
+const MARCH_DURATION_MS = trailerConfig.threat.goblin.marchDurationMs;
+const MARCH_DURATION_S = MARCH_DURATION_MS / 1000;
 
 /** Synthetic thud produced when the goblins hit the forest floor. */
 const playThud = () => {
@@ -82,18 +84,24 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
   const goblinHalf = useMemo(() => goblinSize / 2, [goblinSize]);
 
   const goblinBase = useMemo(
-    () => ({ x: 0, y: -(CARD_HEIGHT * CARD_SCALE) / 2 - goblinHalf }),
+    () => ({ x: goblinHalf, y: -(CARD_HEIGHT * CARD_SCALE) / 2 }),
     [goblinHalf],
   );
 
   const fallOffset = useMemo(
-    () => ({ x: fallTarget.x - worldCenter.x, y: fallTarget.y - worldCenter.y }),
-    [fallTarget, worldCenter],
+    () => ({
+      x: fallTarget.x - worldCenter.x + goblinHalf,
+      y: fallTarget.y - worldCenter.y + goblinHalf,
+    }),
+    [fallTarget, worldCenter, goblinHalf],
   );
 
   const marchOffset = useMemo(
-    () => ({ x: marchTarget.x - worldCenter.x, y: marchTarget.y - worldCenter.y }),
-    [marchTarget, worldCenter],
+    () => ({
+      x: marchTarget.x - worldCenter.x + goblinHalf,
+      y: marchTarget.y - worldCenter.y + goblinHalf,
+    }),
+    [marchTarget, worldCenter, goblinHalf],
   );
 
   const reminderOffset = useMemo(() => {
@@ -126,7 +134,7 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
       const timer = window.setTimeout(() => {
         setStage('done');
         onClose?.();
-      }, 200500);
+      }, MARCH_DURATION_MS + 500);
       return () => window.clearTimeout(timer);
     }
     return undefined;
@@ -171,8 +179,8 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
         }
       : stage === 'marching'
         ? {
-            x: { duration: 200, ease: 'linear' },
-            y: { duration: 200, ease: 'linear' },
+            x: { duration: MARCH_DURATION_S, ease: 'linear' },
+            y: { duration: MARCH_DURATION_S, ease: 'linear' },
             rotate: { duration: 0.6, times: [0, 0.25, 0.5, 1] },
           }
         : { duration: 0.4 };
@@ -271,6 +279,7 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
           top: 0,
           width: goblinSize,
           height: goblinSize,
+          maxWidth: 'none',
           marginLeft: -goblinHalf,
           marginTop: -goblinHalf,
           pointerEvents: 'none',
