@@ -207,6 +207,7 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
             <div style={{ width: 364, height: 294, overflow: 'hidden', margin: '0 auto' }}>
               <GoblinInvasionWindow
                 ariaLabel={String(t('world.goblinInvasion.title'))}
+                peeled={stage !== 'modal'}
                 style={{ transform: 'scale(0.7)', transformOrigin: 'top left' }}
               />
             </div>
