@@ -872,18 +872,19 @@ const marbleTex=(()=>{                // ancient translucent marble with vein no
 
 function drawBackdrop(now){
   const t=now/1000;
-  /* V2-style teal-azure base fill */
+  /* V2-style teal-azure base fill — brightness from tarGooConfig.backdrop */
+  const bd=tarGooConfig.backdrop;
   ctx.save();
   const _bg=ctx.createRadialGradient(CX,CY,0,CX,CY,R*1.15);
-  _bg.addColorStop(0,'rgba(0,22,32,1)');
-  _bg.addColorStop(1,'#02020b');
+  _bg.addColorStop(0,bd.inner);
+  _bg.addColorStop(1,bd.outer);
   ctx.fillStyle=_bg;
   ctx.beginPath(); ctx.arc(CX,CY,R*1.12,0,TAU); ctx.fill();
   /* azure light-leak from top-left (V9 signature) */
   const _leak=ctx.createRadialGradient(CX-R*.7,CY-R*.7,0,CX-R*.7,CY-R*.7,R*1.4);
-  _leak.addColorStop(0,'rgba(0,229,255,.16)');
-  _leak.addColorStop(.5,'rgba(0,229,255,.03)');
-  _leak.addColorStop(1,'rgba(0,0,0,0)');
+  _leak.addColorStop(0,bd.leakCore);
+  _leak.addColorStop(.5,bd.leakMid);
+  _leak.addColorStop(1,bd.leakEdge);
   ctx.fillStyle=_leak;
   ctx.beginPath(); ctx.arc(CX,CY,R*1.12,0,TAU); ctx.fill();
   ctx.restore();

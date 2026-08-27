@@ -897,3 +897,26 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
   - In `tickGooSim` il `gooRipple` idle parte quando `rev>0.99` e sono passati **>500ms** da `gooFullMs`, anziché solo in `state==='idle'`. Inoltre `gooRipple` decade dolcemente fino al valore idle.
 - `build:check` e test 4/4 passati.
 **Cosa manca:** conferma visiva del Director.
+
+---
+
+## R-047 — Aumento luminosità sfondo e verifica contrasto col goo
+
+**Richiesta:** *"aumenta la luminosità del colore di sfondo (quel verde scuro ttipo cielo stellato). controlla cn pupeteer che sia molto facile da distingue dal colore del goo"*.
+**Data:** 2026-08-27
+**Stato:** `fatta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v6 (CSS/React-first, budget stretto).
+**Cosa è successo:**
+- `tarGooConfig.ts`: aggiunta sezione `backdrop` (config-first) con colori più luminosi e light-leak più intenso:
+  - `inner`: `rgba(80,160,155,1)`
+  - `outer`: `rgba(38,105,102,1)`
+  - `leakCore`: `rgba(0,229,255,.50)`
+  - `leakMid`: `rgba(0,229,255,.22)`
+- `engine.ts`: `drawBackdrop` legge i colori da `tarGooConfig.backdrop` invece di hardcoded.
+- Verifica con Puppeteer sul 5-skill preset:
+  - sfondo: `RGB(42,144,146)` (luminance 0.446)
+  - goo: `RGB(27,63,65)` (luminance 0.206)
+  - **contrasto: 1.94** (prima ~1.05)
+- Evidence log: `test-results/r-047-v62-backdrop-goo-puppeteer-2026-08-27.log`.
+- `build:check` e test 4/4 passati.
+**Cosa manca:** conferma visiva del Director.
