@@ -943,3 +943,22 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 - Evidence log: `test-results/r-048-goo-border-puppeteer-2026-08-27.log`.
 - `build:check` e test 4/4 passati.
 **Cosa manca:** conferma visiva del Director.
+
+---
+
+## R-049 — Fiore che diventa stella quando PG >= skill check
+
+**Richiesta:** *"quando i valori del pg sn pari o maggiori della valore dello skill check invece di un fiore deve diventare una stella, sai d che aprlo? fa una ricerca online"*.
+**Data:** 2026-08-27
+**Stato:** `fatta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v6 (CSS/React-first, budget stretto).
+**Cosa è successo:**
+- Ricerca online: le rose curves (rose/grandi) e le equazioni polari mostrano che la forma fiore/stella è controllata dall'ampiezza/lunghezza dei lobi radiali. Nel codice V6.2 lo stesso effetto è già controllato dal parametro `valleyF` in `radialFromAxes`.
+- `tarGooConfig.ts`: aggiunta sezione `star` (config-first):
+  - `valleyFlower: 0.65` — petali arrotondati quando il PG è ben sotto il check
+  - `valleyStar: 0.15` — stella affilata quando il PG è pari o sopra
+  - `transitionR: 0.25` — frazione di `R` su cui avviene la transizione
+- `engine.ts`: `updateGeometry` calcola `geo.valleyF` dal peggior margine per asse `starTip[i] - axisCheck[i]`. Se `stat >= difficoltà` (margine >= 0) la forma è stella, altrimenti fiore, con lerp nella zona di transizione.
+- Evidence log: `test-results/r-049-star-shape-2026-08-27.log`.
+- `build:check`, test 4/4 e `kanban:lint` passati.
+**Cosa manca:** conferma visiva del Director.
