@@ -465,12 +465,14 @@ function EventTab(): JSX.Element {
 function WindowTab(): JSX.Element {
   return (
     <DemoPanel>
-      <MatericHeading title="Window" subtitle="Goblin Invasion glass case with sticker peel" />
+      <MatericHeading title="Window" subtitle="Goblin Invasion glass case — frame A/B/C prototypes" />
       <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-          <GoblinInvasionWindow ariaLabel="Goblin Invasion" />
-          <span style={{ fontSize: 10, color: 'var(--skin-body-color)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Goblin Invasion Window</span>
-        </div>
+        {(['A', 'B', 'C'] as const).map((v) => (
+          <div key={v} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+            <GoblinInvasionWindow ariaLabel={`Goblin Invasion ${v}`} variant={v} />
+            <span style={{ fontSize: 10, color: 'var(--skin-body-color)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{v}</span>
+          </div>
+        ))}
       </div>
     </DemoPanel>
   );
