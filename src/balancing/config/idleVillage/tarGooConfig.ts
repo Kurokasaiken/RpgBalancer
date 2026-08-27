@@ -110,9 +110,9 @@ export const tarGooConfig: TarGooConfig = tarGooConfigSchema.parse({
   },
   simulation: {
     rimSamples: 96,
-    stiffness: 0.024,
-    damping: 0.925,
-    maxSpeed: 7,
+    stiffness: 0.018,
+    damping: 0.96,
+    maxSpeed: 5.5,
     dropletCount: 12,
     dropletCrawlSpeed: [0.04, 0.12],
     dropletRadius: [9, 22],

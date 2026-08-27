@@ -755,6 +755,14 @@ function tickGooSim(now){
   for(let i=0;i<gooSim.N;i+=1){
     const theta=i/gooSim.N*TAU;
     const rFinal=rev<=0.001?0:rCheckAt(theta,1);
+    /* End-of-pour hard lock: once the tar is fully revealed, pin the rim to
+       its final shape and kill any residual spring velocity so it never
+       rebounds past the target. */
+    if(rev>=0.999){
+      gooSim.r[i]=rFinal;
+      gooSim.v[i]=0;
+      continue;
+    }
     const target=Math.min(rFinal,front);
     let vel=(gooSim.v[i]+(target-gooSim.r[i])*simCfg.stiffness*k)*damp;
     const vMax=simCfg.maxSpeed*k*(1+2*(scene.gooRipple||0));
