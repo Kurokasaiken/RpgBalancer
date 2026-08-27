@@ -407,13 +407,13 @@ function EventTab(): JSX.Element {
       >
         {show ? 'Hide Event' : 'Show Event'}
       </button>
-      <div style={{ position: 'relative', width: 500, height: 560 }}>
+      <div style={{ position: 'relative', width: 500, height: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {show && (
           <>
             <MatericCloudWall
               size={500}
               rimLight={false}
-              style={{ top: 0, left: 0, zIndex: 1 }}
+              style={{ position: 'absolute', top: 0, left: 0, zIndex: 1 }}
             />
             <motion.div
               initial={{ x: 0, y: 0, scale: 1 }}
@@ -434,20 +434,21 @@ function EventTab(): JSX.Element {
                 badge={String(t('world.goblinInvasion.invasion'))}
                 subtitle={String(t('world.goblinInvasion.subtitle', { count: mockedDays }))}
                 image={
-                  <div style={{ width: 364, height: 294, overflow: 'hidden', margin: '0 auto' }}>
+                  <div style={{ position: 'relative', width: 364, height: 294, overflow: 'hidden', margin: '0 auto' }}>
                     <GoblinInvasionWindow
                       ariaLabel={String(t('world.goblinInvasion.title'))}
-                      style={{ transform: 'scale(0.7)', transformOrigin: 'top left' }}
+                      style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%) scale(0.7)',
+                      }}
                     />
                   </div>
                 }
                 actionLabel={String(t('world.goblinInvasion.action'))}
                 onAction={() => isModal && setStage('reminder')}
                 style={{
-                  position: 'absolute',
-                  left: 0,
-                  top: 0,
-                  transform: 'translate(-50%, -50%) scale(3)',
                   zIndex: 2,
                   maxWidth: 460,
                   width: 460,
@@ -465,22 +466,11 @@ function EventTab(): JSX.Element {
 function WindowTab(): JSX.Element {
   return (
     <DemoPanel>
-      <MatericHeading title="Window" subtitle="Goblin Invasion glass case with carved frame" />
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
-        <GoblinInvasionWindow
-          ariaLabel="Goblin Invasion"
-          style={{ transform: 'scale(1.35)', transformOrigin: 'top left' }}
-        />
-        <div style={{ fontSize: 12, color: 'var(--skin-body-color)', maxWidth: 220 }}>
-          <p style={{ margin: '0 0 8px' }}><strong>Frame v2</strong></p>
-          <ul style={{ paddingLeft: 16, margin: 0 }}>
-            <li>Carved timber / dark bronze</li>
-            <li>Asymmetric clip-path silhouette</li>
-            <li>Gold as highlight, not material</li>
-            <li>Volume: highlight, plane, recess, shadow</li>
-          </ul>
-        </div>
-      </div>
+      <MatericHeading title="Window" subtitle="Goblin Invasion glass case with bronze frame" />
+      <GoblinInvasionWindow
+        ariaLabel="Goblin Invasion"
+        style={{ transform: 'scale(0.7)', transformOrigin: 'top left' }}
+      />
     </DemoPanel>
   );
 }
