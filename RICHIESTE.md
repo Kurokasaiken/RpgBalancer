@@ -920,3 +920,26 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 - Evidence log: `test-results/r-047-v62-backdrop-goo-puppeteer-2026-08-27.log`.
 - `build:check` e test 4/4 passati.
 **Cosa manca:** conferma visiva del Director.
+
+---
+
+## R-048 — Bordo del goo molto riconoscibile
+
+**Richiesta:** *"il bordo del goo deve rendere molto riconoscibile la delimitazione del goo"*.
+**Data:** 2026-08-27
+**Stato:** `fatta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v6 (CSS/React-first, budget stretto).
+**Cosa è successo:**
+- `tarGooConfig.ts` — tuning del materiale per accentuare il bordo:
+  - `fresnelColor`: `[0.85, 1.0, 1.0]` (bianco-ciano)
+  - `fresnelIntensity`: `1.0`
+  - `fresnelPower`: `1.0`
+  - `edgeHeightFalloff`: `8`
+- Verifica con Puppeteer (scansione radiale sul preset 5 skill):
+  - corpo del goo: `RGB(6,8,14)` luminance 0.032
+  - bordo del goo: `RGB(185,218,222)` luminance 0.818
+  - sfondo: `RGB(56,129,125)` luminance 0.418
+  - il bordo è ~19x più luminoso del corpo e ~2x più luminoso dello sfondo.
+- Evidence log: `test-results/r-048-goo-border-puppeteer-2026-08-27.log`.
+- `build:check` e test 4/4 passati.
+**Cosa manca:** conferma visiva del Director.
