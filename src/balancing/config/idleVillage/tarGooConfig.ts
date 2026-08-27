@@ -47,6 +47,20 @@ const tarGooConfigSchema = z.object({
     dropletRadius: z.tuple([z.number(), z.number()]),
     /** How far outside the rim a droplet may bulge, in px (keeps obelisks legible). */
     dropletOvershoot: z.number().min(0).max(40),
+    /** Falling tar drops before the main pour starts. */
+    seedDropCount: z.number().int().min(0).max(8),
+    /** Seed drop radius range in px. */
+    seedDropRadius: z.tuple([z.number(), z.number()]),
+    /** Seed drop gravity in px / ms^2 (viscous = low). */
+    seedDropGravity: z.number().min(0).max(5),
+    /** Per-frame velocity retention for falling drops (viscous damping). */
+    seedDropDamping: z.number().min(0).max(1),
+    /** Horizontal scatter from the central vertical at spawn. */
+    seedDropScatter: z.number().min(0).max(120),
+    /** Spawn height above the centre in px. */
+    seedDropHeight: z.number().min(50).max(400),
+    /** Delay between consecutive seed drops in ms. */
+    seedDropStagger: z.number().min(0).max(1000),
   }),
   field: z.object({
     /** Smooth-min blend distance k in px — the surface-tension bridge width. */
@@ -90,8 +104,8 @@ export type TarGooConfig = z.infer<typeof tarGooConfigSchema>;
  */
 export const tarGooConfig: TarGooConfig = tarGooConfigSchema.parse({
   timing: {
-    seedMs: 520,
-    pourMs: 1300,
+    seedMs: 700,
+    pourMs: 1100,
     seedReveal: 0.08,
   },
   simulation: {
@@ -103,6 +117,13 @@ export const tarGooConfig: TarGooConfig = tarGooConfigSchema.parse({
     dropletCrawlSpeed: [0.03, 0.09],
     dropletRadius: [9, 22],
     dropletOvershoot: 14,
+    seedDropCount: 3,
+    seedDropRadius: [14, 22],
+    seedDropGravity: 0.0012,
+    seedDropDamping: 0.94,
+    seedDropScatter: 70,
+    seedDropHeight: 180,
+    seedDropStagger: 90,
   },
   field: {
     smoothMinK: 26,

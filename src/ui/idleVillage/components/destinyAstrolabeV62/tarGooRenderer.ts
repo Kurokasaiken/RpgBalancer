@@ -146,7 +146,9 @@ void main(){
   vec3 body = mix(uAlbedo, uAlbedoLit, clamp(diff * 0.55 + swirl, 0.0, 1.0));
   vec3 color = body + uSpecColor * spec + uFresColor * fres;
 
-  float alpha = smoothstep(1.5, -1.5, d) * clamp(uReveal * 1.4, 0.0, 1.0);
+  /* V6.2: alpha is driven by the SDF itself, not by uReveal, so falling seed
+     blobs are visible even before the main rim has started growing. */
+  float alpha = smoothstep(1.5, -1.5, d);
   outColor = vec4(color, alpha);
 }
 `;
