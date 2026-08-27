@@ -474,7 +474,16 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
   }), [manifest.coordinateSystem.canvas.width, manifest.coordinateSystem.canvas.height]);
 
   const fallTarget = useMemo(() => ({ x: 737, y: 859 }), []);
-  const marchTarget = useMemo(() => ({ x: 1498, y: 1140 }), []);
+  const marchTarget = useMemo(() => {
+    const forest = manifest.regions.find((r) => r.tags?.includes('forest'));
+    if (forest) {
+      return {
+        x: forest.bounds.x + forest.bounds.width / 2,
+        y: forest.bounds.y + forest.bounds.height / 2,
+      };
+    }
+    return { x: 1498, y: 1140 };
+  }, [manifest]);
 
   return (
     <div
