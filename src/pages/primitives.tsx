@@ -24,8 +24,6 @@ import {
   MatericTitleSep,
   MatericEventCard,
   MatericCloudWall,
-  MatericThreatAura,
-  StickerFrame,
 } from '@/ui/designSystem/primitives';
 import { Slot } from '@/ui/idleVillage/components/Slot';
 import { GoblinInvasionWindow } from '@/ui/idleVillage/components/GoblinInvasionWindow';
@@ -383,23 +381,11 @@ function SkinTab(): JSX.Element {
 
 function EventTab(): JSX.Element {
   const [show, setShow] = useState(true);
-  const [parallax, setParallax] = useState({ x: 0, y: 0 });
   const mockedDays = 5;
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    const x = Math.max(-1, Math.min(1, (e.clientX - cx) / (rect.width / 2)));
-    const y = Math.max(-1, Math.min(1, (e.clientY - cy) / (rect.height / 2)));
-    setParallax({ x, y });
-  };
-
-  const handleMouseLeave = () => setParallax({ x: 0, y: 0 });
 
   return (
     <DemoPanel>
-      <MatericHeading title="Event" subtitle="MatericEventCard on MatericCloudWall with goblin sticker" />
+      <MatericHeading title="Event" subtitle="Goblin Invasion Window inside MatericEventCard" />
       <button
         type="button"
         onClick={() => setShow(s => !s)}
@@ -407,40 +393,51 @@ function EventTab(): JSX.Element {
       >
         {show ? 'Hide Event' : 'Show Event'}
       </button>
-      <div
-        style={{ position: 'relative', width: 500, height: 500 }}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-      >
+      <div style={{ position: 'relative', width: 500, height: 560 }}>
         <MatericCloudWall size={500} rimLight={false} style={{ top: 0, left: 0, zIndex: 1 }} />
         {show && (
-          <MatericEventCard
-            badge="Invasion"
-            subtitle={`${mockedDays} days`}
-            style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 2, minHeight: 420, width: 450 }}
+          <MatericFrame
+            variant="molding"
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              zIndex: 2,
+              width: 460,
+              minHeight: 500,
+            }}
           >
-            <MatericButton variant="utility" onClick={() => {}} style={{ marginTop: 260 }}>Prepare</MatericButton>
-          </MatericEventCard>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                padding: '28px 24px 32px',
+                gap: 10,
+              }}
+            >
+              <MatericPlaque style={{ fontSize: 18, letterSpacing: '0.22em', padding: '8px 20px' }}>
+                Invasion
+              </MatericPlaque>
+              <SkinTitle level="1" style={{ fontSize: 32, lineHeight: 1 }}>
+                Goblin Invasion
+              </SkinTitle>
+              <SkinTitle level="subtitle" style={{ fontSize: 14, opacity: 0.85 }}>
+                {mockedDays} days remain
+              </SkinTitle>
+              <div style={{ width: 364, height: 294, margin: '6px auto 0', overflow: 'hidden' }}>
+                <GoblinInvasionWindow
+                  ariaLabel="Goblin Invasion"
+                  style={{ transform: 'scale(0.7)', transformOrigin: 'top left' }}
+                />
+              </div>
+              <MatericButton onClick={() => {}} style={{ marginTop: 8, padding: '12px 36px', fontSize: 14, letterSpacing: '0.18em' }}>
+                Prepare
+              </MatericButton>
+            </div>
+          </MatericFrame>
         )}
-        <MatericThreatAura
-          size={300}
-          parallax={parallax}
-          style={{
-            position: 'absolute',
-            left: '50%',
-            top: '50%',
-            transform: 'translate(-50%, -50%)',
-            zIndex: 3,
-          }}
-        >
-          <StickerFrame
-            imageSrc="/goblin-march-trasparente.png"
-            imageAlt="Goblin sticker"
-            width={300}
-            height={300}
-            drawDuration={2}
-          />
-        </MatericThreatAura>
       </div>
     </DemoPanel>
   );
