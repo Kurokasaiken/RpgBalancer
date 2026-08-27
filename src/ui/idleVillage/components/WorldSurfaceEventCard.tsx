@@ -3,8 +3,8 @@
  *
  * Uses the `MatericEventCard` primitive from the design system. After the
  * player confirms, the card shrinks and glides to the top-right of the world,
- * and the goblin with the sticker border falls from above the card and marches
- * to the bottom-right, matching the original shroud event behavior.
+ * and the goblin sticker from the `GoblinInvasionWindow` falls from the card
+ * and marches toward the center of `forest_1_top_left`.
  */
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -29,7 +29,7 @@ export interface WorldSurfaceEventCardProps {
   worldCenter: { x: number; y: number };
   /** World canvas size, used to place the final badge in the top-right. */
   canvasSize: { width: number; height: number };
-  /** Current world camera, used to keep the goblin a constant screen size. */
+  /** Current world camera, used to keep the card grounded in the world. */
   camera: { panX: number; panY: number; zoom: number };
   /** World point where the goblins fall (centre of forest_1_top_left). */
   fallTarget: { x: number; y: number };
@@ -40,11 +40,13 @@ export interface WorldSurfaceEventCardProps {
 type Stage = 'idle' | 'modal' | 'falling' | 'marching' | 'done';
 
 const DAYS_LEFT = Number(trailerConfig.threat.announcement.timerRing.number) || 5;
-const GOBLIN_IMAGE = trailerConfig.threat.goblinImage;
 const CARD_HEIGHT = 500;
 const CARD_SCALE = 3;
 const MARCH_DURATION_MS = trailerConfig.threat.goblin.marchDurationMs;
 const MARCH_DURATION_S = MARCH_DURATION_MS / 1000;
+const GOBLIN_WINDOW_W = 520;
+const GOBLIN_WINDOW_H = 420;
+const GOBLIN_MODAL_SCALE = 2.1;
 
 /** Synthetic thud produced when the goblins hit the forest floor. */
 const playThud = () => {
@@ -72,7 +74,6 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
   onClose,
   worldCenter,
   canvasSize,
-  camera,
   fallTarget,
   marchTarget,
 }) => {
@@ -80,28 +81,16 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
   const [stage, setStage] = useState<Stage>('idle');
   const [daysLeft] = useState<number>(DAYS_LEFT);
 
-  const goblinSize = useMemo(() => Math.max(600, 400 / camera.zoom), [camera.zoom]);
-  const goblinHalf = useMemo(() => goblinSize / 2, [goblinSize]);
-
-  const goblinBase = useMemo(
-    () => ({ x: goblinHalf, y: -(CARD_HEIGHT * CARD_SCALE) / 2 }),
-    [goblinHalf],
-  );
+  const goblinBase = useMemo(() => ({ x: 0, y: 0 }), []);
 
   const fallOffset = useMemo(
-    () => ({
-      x: fallTarget.x - worldCenter.x + goblinHalf,
-      y: fallTarget.y - worldCenter.y + goblinHalf,
-    }),
-    [fallTarget, worldCenter, goblinHalf],
+    () => ({ x: fallTarget.x - worldCenter.x, y: fallTarget.y - worldCenter.y }),
+    [fallTarget, worldCenter],
   );
 
   const marchOffset = useMemo(
-    () => ({
-      x: marchTarget.x - worldCenter.x + goblinHalf,
-      y: marchTarget.y - worldCenter.y + goblinHalf,
-    }),
-    [marchTarget, worldCenter, goblinHalf],
+    () => ({ x: marchTarget.x - worldCenter.x, y: marchTarget.y - worldCenter.y }),
+    [marchTarget, worldCenter],
   );
 
   const reminderOffset = useMemo(() => {
@@ -165,23 +154,23 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
 
   const goblinAnimate =
     stage === 'falling'
-      ? { x: fallOffset.x, y: fallOffset.y, rotate: [0, 0, 0, -12, 12, 0] }
+      ? { x: fallOffset.x, y: fallOffset.y, scale: GOBLIN_MODAL_SCALE }
       : stage === 'marching'
-        ? { x: marchOffset.x, y: marchOffset.y, rotate: [0, -6, 6, 0] }
-        : { x: goblinBase.x, y: goblinBase.y, rotate: 0 };
+        ? { x: marchOffset.x, y: marchOffset.y, scale: 1 }
+        : { x: goblinBase.x, y: goblinBase.y, scale: GOBLIN_MODAL_SCALE };
 
   const goblinTransition =
     stage === 'falling'
       ? {
           x: { duration: 1.5, ease: 'easeIn' },
           y: { duration: 1.5, ease: 'easeIn' },
-          rotate: { duration: 1.5, times: [0, 0.6, 0.8, 0.9, 0.95, 1] },
+          scale: { duration: 0.3 },
         }
       : stage === 'marching'
         ? {
             x: { duration: MARCH_DURATION_S, ease: 'linear' },
             y: { duration: MARCH_DURATION_S, ease: 'linear' },
-            rotate: { duration: 0.6, times: [0, 0.25, 0.5, 1] },
+            scale: { duration: MARCH_DURATION_S, ease: 'linear' },
           }
         : { duration: 0.4 };
 
@@ -222,15 +211,6 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
                 variant="modal"
                 badge={String(t('world.goblinInvasion.invasion'))}
                 subtitle={String(t('world.goblinInvasion.subtitle', { count: daysLeft }))}
-                image={
-                  <div style={{ width: 364, height: 294, overflow: 'hidden', margin: '0 auto' }}>
-                    <GoblinInvasionWindow
-                      ariaLabel={String(t('world.goblinInvasion.title'))}
-                      peeled={stage !== 'modal'}
-                      style={{ transform: 'scale(0.7)', transformOrigin: 'top left' }}
-                    />
-                  </div>
-                }
                 actionLabel={String(t('world.goblinInvasion.action'))}
                 onAction={handleAction}
                 style={{
@@ -266,28 +246,26 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
         </AnimatePresence>
       </motion.div>
 
-      <motion.img
-        initial={{ x: goblinBase.x, y: goblinBase.y }}
+      <motion.div
+        initial={{ x: goblinBase.x, y: goblinBase.y, scale: GOBLIN_MODAL_SCALE }}
         animate={goblinAnimate}
         transition={goblinTransition}
         onAnimationComplete={stage === 'falling' ? handleFallingComplete : undefined}
-        src={GOBLIN_IMAGE}
-        alt=""
         style={{
           position: 'absolute',
           left: 0,
           top: 0,
-          width: goblinSize,
-          height: goblinSize,
-          maxWidth: 'none',
-          marginLeft: -goblinHalf,
-          marginTop: -goblinHalf,
+          marginLeft: -GOBLIN_WINDOW_W / 2,
+          marginTop: -GOBLIN_WINDOW_H / 2,
           pointerEvents: 'none',
           zIndex: 10,
-          filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.6))',
         }}
-        aria-hidden="true"
-      />
+      >
+        <GoblinInvasionWindow
+          ariaLabel={String(t('world.goblinInvasion.title'))}
+          peeled={stage !== 'modal'}
+        />
+      </motion.div>
     </div>
   );
 };
