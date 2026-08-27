@@ -794,3 +794,17 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
   - `seedMs` 700 → **900** per dare tempo a tutte le 6 gocce di cadere e fondersi.
 - `build:check` e test 4/4 passati.
 **Cosa manca:** feedback del Director sul numero di gocce e tempi.
+
+---
+
+## R-040 — No rebound del catrame a fine espansione
+
+**Richiesta:** *"quando finisce l'animazione che il goo si allargada nn deve fare il rebound"*.
+**Data:** 2026-08-27
+**Stato:** `fatta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v6 (CSS/React-first, budget stretto).
+**Cosa è successo:**
+- `tarGooConfig.ts`: `stiffness` 0.024 → **0.018**, `damping` 0.925 → **0.96**, `maxSpeed` 7 → **5.5** (smorzamento più forte, velocità più bassa).
+- `engine.ts`: in `tickGooSim`, quando `gooReveal >= 0.999` il raggio di ogni campione viene bloccato (`gooSim.r[i] = rFinal`) e la velocità azzerata (`gooSim.v[i] = 0`), così il bordo non può superare il target.
+- `build:check` e test 4/4 passati.
+**Cosa manca:** conferma visiva del Director che non rimbalzi.
