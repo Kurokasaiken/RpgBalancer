@@ -250,6 +250,7 @@ const scene={
   res:null, target:null,
   blackPillars:[], whitePillars:[],     // {ang,r,drop:0..1,flash,landed}
   axisAlpha:1,
+  gooFullMs:0,
   starScale:0,
   pourP:0, streamAlpha:0,
   ball:{x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false},
@@ -322,7 +323,7 @@ function launchRoll(){
   /* recompute geometry, build obelisks, reset all scene state */
   recomputeGeometry();
   buildPillars();
-  scene.starScale=0; scene.pourP=0; scene.streamAlpha=0; scene.axisAlpha=1;
+  scene.starScale=0; scene.pourP=0; scene.streamAlpha=0; scene.axisAlpha=1; scene.gooFullMs=0;
   scene.gooReveal=0; scene.ringReveal=0;
   scene.ball={x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false};
   scene.warp=0;
@@ -341,7 +342,7 @@ function throwBall(){
   if(s==='idle'||s==='the-spin'||s==='magnetic-snap'||s==='resolution') return;
   armed=false; emitArmed(false);
   /* warp: snap any still-playing reveal so we never fire from an empty scene */
-  scene.gooReveal=1; scene.starScale=1; scene.pourP=1; scene.streamAlpha=0.34; scene.axisAlpha=1;
+  scene.gooReveal=1; scene.starScale=1; scene.pourP=1; scene.streamAlpha=0.34; scene.axisAlpha=1; scene.gooFullMs=performance.now();
   scene.blackPillars.concat(scene.whitePillars).forEach(pl=>{ pl.drop=1; pl.landed=true; });
   if(s!=='action-trigger'){ scene.warp=1; scene.gooRipple=1; }   // visual warp flash when skipping
   setState('the-spin'); fireBall();
@@ -388,6 +389,7 @@ function tickTimeline(){
     scene.gooRipple=Math.max(scene.gooRipple,swell);
     if(p>=1){
       scene.gooReveal=1;
+      scene.gooFullMs=performance.now();    // mark when the tar becomes fully revealed
       setState('axis-read');           // V6: beat di lettura prima della risposta del PG
     }
   }
@@ -749,9 +751,12 @@ function tickGooSim(now){
   gooSim.lastMs=now;
   const k=dt/16.7;                                   // frame-rate normalizer
   const rev=clamp(scene.gooReveal,0,1.0);
-  /* Idle simmer: a slow, gentle boil on the tar rim so it never looks frozen. */
-  if(scene.state==='idle' && rev>0.99){
-    scene.gooRipple=Math.max(scene.gooRipple, 0.12 + 0.06*Math.sin(now/900));
+  /* Idle simmer: a slow, gentle boil on the tar rim once it has been fully
+     revealed for at least 0.5s, so it never looks frozen in any post-pour state. */
+  const sinceFull=now-(scene.gooFullMs||0);
+  if(rev>0.99 && sinceFull>500){
+    const idle=0.12+0.06*Math.sin(now/900);
+    scene.gooRipple=Math.max(scene.gooRipple*0.98, idle);
   }
   const damp=Math.pow(simCfg.damping,k);
   /* Invasion front: a single tar wave that grows outward from the core.

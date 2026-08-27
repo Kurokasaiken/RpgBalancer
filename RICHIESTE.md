@@ -881,3 +881,19 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 - `engine.ts`: in `tickGooSim` aggiunto **sticky non-overshoot**. Se il frame successivo farebbe superare il `target`, o il campione è già oltre e non sta tornando indietro, il raggio viene bloccato sul `target` e la velocità azzerata.
 - `build:check` e test 4/4 passati.
 **Cosa manca:** conferma visiva del Director.
+
+---
+
+## R-046 — Idle boil del bordo del goo dopo 0.5s dall'espansione
+
+**Richiesta:** *"nn vedo l'animazione di idle del bordo del goo (dopo che ha smesso di allargarsi per almeno 0,5 secondi)"*.
+**Data:** 2026-08-27
+**Stato:** `fatta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v6 (CSS/React-first, budget stretto).
+**Cosa è successo:**
+- `engine.ts`:
+  - Aggiunto `scene.gooFullMs` (inizializzato in `scene`, `launchRoll`, `throwBall`).
+  - In `goo-expand` `p>=1` setta `scene.gooFullMs=performance.now()`.
+  - In `tickGooSim` il `gooRipple` idle parte quando `rev>0.99` e sono passati **>500ms** da `gooFullMs`, anziché solo in `state==='idle'`. Inoltre `gooRipple` decade dolcemente fino al valore idle.
+- `build:check` e test 4/4 passati.
+**Cosa manca:** conferma visiva del Director.
