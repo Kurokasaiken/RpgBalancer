@@ -4,6 +4,7 @@
  */
 
 import React, { useRef, useState } from 'react';
+import { MatericFrame } from '@/ui/designSystem/primitives';
 import { DestinyAstrolabeV62Standalone } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeV62Kit';
 import type { AstrolabeResult as DestinyAstrolabeV62Result, AstrolabeSkill as DestinyAstrolabeV62Skill, DestinyAstrolabeV62Handle } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeV62Kit';
 
@@ -196,7 +197,8 @@ export default function MinimalDestinyAstrolabeV62() {
       </div>
 
       {/* Astrolabe — fills remaining height, clipping the suite's 100vw/100vh overflow */}
-      <div className="flex-1 border-2 border-amber-600 rounded-lg mx-6 mb-3 overflow-hidden" style={{ minHeight: 0 }}>
+      <div className="flex-1 relative rounded-lg mx-6 mb-3 overflow-hidden" style={{ minHeight: 0 }}>
+        <MatericFrame variant="bronze-bezel" band={2.5} rx={8} flush />
         <DestinyAstrolabeV62Standalone
           ref={astrolabeRef}
           skills={skills}

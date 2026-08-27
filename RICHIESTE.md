@@ -1039,3 +1039,23 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 - Evidence log: `test-results/r-053-flower-to-star-morph-2026-08-27.log`.
 - `build:check`, test 4/4 e `kanban:lint` passati.
 **Cosa manca:** conferma visiva del Director.
+
+---
+
+## R-054 — Anello bronzeo esterno con skin del medallion
+
+**Richiesta:** *"il bordo esterno il ring bronzeo, deve avere la skin che vedi in http://localhost:5173/primitives medalion"*.
+**Data:** 2026-08-27
+**Stato:** `fatta`
+**Cosa è successo:**
+- `src/pages/minimal-destiny-astrolabe-v6-2.tsx`:
+  - sostituito il bordo piatto `border-2 border-amber-600` con `MatericFrame variant="bronze-bezel"`.
+  - `band={2.5}`, `rx={8}`, `flush`.
+  - `MatericFrame` renderizza `WellBronzeBezel`, la stessa scala NMM oro → bronzo → umber del medallion.
+  - `DestinyAstrolabeV62Standalone` è adesso dentro un well `position: relative` con l'overlay del frame come sibling.
+- Verifica con Puppeteer:
+  - l'SVG del bezel è presente nel container.
+  - gradient: `#d8bd78 → #cfaf63 → #c2a355 → #a0762f → #5f3f16 → #71501f`.
+- Evidence log: `test-results/r-054-astrolabe-bronze-bezel-2026-08-27.log`.
+- `build:check`, test 4/4 e `kanban:lint` passati.
+**Cosa manca:** conferma visiva del Director.
