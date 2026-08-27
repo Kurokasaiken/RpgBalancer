@@ -101,7 +101,7 @@ tools/
 src/ui/idleVillage/trailer/GoblinEventModalV[1-9].tsx
 src/ui/idleVillage/trailer/GoblinEventModalV1[0-6].tsx
 !src/ui/idleVillage/trailer/GoblinEventModalV17.tsx
-src/ui/idleVillage/pages/GoblinEventLabPage.tsx
+
 
 # Mind Weaver planner and spec artifacts
 .mw/specs/

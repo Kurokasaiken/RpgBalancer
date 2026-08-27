@@ -465,29 +465,21 @@ function EventTab(): JSX.Element {
 function WindowTab(): JSX.Element {
   return (
     <DemoPanel>
-      <MatericHeading title="Window" subtitle="Goblin Invasion glass case — frame A/B/C prototypes" />
-      <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-        {(['A', 'B', 'C'] as const).map((v) => (
-          <div
-            key={v}
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-              minWidth: 1040,
-              minHeight: 840,
-            }}
-          >
-            <GoblinInvasionWindow
-              ariaLabel={`Goblin Invasion ${v}`}
-              variant={v}
-              style={{ transform: 'scale(2)' }}
-            />
-            <span style={{ fontSize: 10, color: 'var(--skin-body-color)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{v}</span>
-          </div>
-        ))}
+      <MatericHeading title="Window" subtitle="Goblin Invasion glass case with carved frame" />
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
+        <GoblinInvasionWindow
+          ariaLabel="Goblin Invasion"
+          style={{ transform: 'scale(1.35)', transformOrigin: 'top left' }}
+        />
+        <div style={{ fontSize: 12, color: 'var(--skin-body-color)', maxWidth: 220 }}>
+          <p style={{ margin: '0 0 8px' }}><strong>Frame v2</strong></p>
+          <ul style={{ paddingLeft: 16, margin: 0 }}>
+            <li>Carved timber / dark bronze</li>
+            <li>Asymmetric clip-path silhouette</li>
+            <li>Gold as highlight, not material</li>
+            <li>Volume: highlight, plane, recess, shadow</li>
+          </ul>
+        </div>
       </div>
     </DemoPanel>
   );

@@ -16,20 +16,20 @@ export interface GoblinInvasionWindowProps {
   goblinImage?: string;
   /** Goblin image with the sticker border. */
   goblinImageWithBorder?: string;
-  /** Frame prototype level: A structural, B material, C history. */
-  variant?: 'A' | 'B' | 'C';
   /** If provided, the peeled sticker state is controlled from outside. */
   peeled?: boolean;
 }
 
 const W = 520;
 const H = 420;
-const RIM = 26;
+const RIM = 22;
 const INNER_W = W - RIM * 2;
 const INNER_H = H - RIM * 2;
-const RX = 24;
 
 const BUDGET = { dust: 16, ash: 6, ember: 2 };
+
+const OUTER_CLIP = 'polygon(2% 0%, 98% 0%, 100% 3%, 99.3% 96%, 96% 100%, 4% 100%, 0% 97%, 1% 3%)';
+const INNER_CLIP = 'polygon(1% 0%, 99% 0%, 100% 2%, 99.5% 98%, 98% 100%, 2% 100%, 0% 98%, 0.5% 2%)';
 
 function useReducedMotion(): boolean {
   const [reduced, setReduced] = useState(false);
@@ -149,7 +149,7 @@ const DustCanvas: React.FC<{ mx: number; my: number; active: boolean }> = ({ mx,
         left: RIM,
         width: INNER_W,
         height: INNER_H,
-        borderRadius: 16,
+        borderRadius: 8,
         pointerEvents: 'none',
         zIndex: 7,
       }}
@@ -161,7 +161,7 @@ const DustCanvas: React.FC<{ mx: number; my: number; active: boolean }> = ({ mx,
 /**
  * `GoblinInvasionWindow` — a 2.5D glass case for the Goblin Invasion event.
  *
- * Material bronze frame, narrative golden light, three particle families,
+ * Carved timber + dark bronze frame, narrative golden light, three particle families,
  * convex glass and a physical sticker reveal.
  */
 export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
@@ -171,7 +171,6 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
   backgroundImage = defaultBackgroundImage,
   goblinImage = defaultGoblinImage,
   goblinImageWithBorder = defaultGoblinImageWithBorder,
-  variant = 'C',
   peeled: peeledProp,
 }) => {
   const [internalPeeled, setInternalPeeled] = useState(false);
@@ -180,7 +179,6 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
   const [my, setMy] = useState(0);
   const reduced = useReducedMotion();
   const rootRef = useRef<HTMLDivElement>(null);
-  const uid = React.useId();
 
   const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     if (!rootRef.current) return;
@@ -207,10 +205,19 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
         position: 'relative',
         width: W,
         height: H,
-        borderRadius: RX,
-        overflow: 'hidden',
+        padding: RIM,
+        clipPath: OUTER_CLIP,
         cursor: 'pointer',
-        boxShadow: '0 22px 50px rgba(0,0,0,0.65), 0 10px 24px rgba(0,0,0,0.45)',
+        background: `
+          linear-gradient(135deg, rgba(255,220,145,.35), transparent 12%),
+          linear-gradient(155deg, #67451f 0%, #4a3015 18%, #3b2718 52%, #5c3c1d 82%, #7a5225 100%)
+        `,
+        boxShadow: `
+          0 22px 50px rgba(0,0,0,0.65),
+          0 10px 24px rgba(0,0,0,0.45),
+          inset 0 1px 0 rgba(255,235,170,.45),
+          inset 0 -4px 8px rgba(0,0,0,.65)
+        `,
         '--mx': mx,
         '--my': my,
         ...style,
@@ -219,77 +226,53 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
       aria-label={ariaLabel}
       aria-hidden={!ariaLabel}
     >
-      {/* Material frame */}
-      <svg width={W} height={H} style={{ position: 'absolute', inset: 0, zIndex: 1 }} aria-hidden="true">
-        <defs>
-          <linearGradient id={`bronze-${uid}`} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#c9a45c" />
-            <stop offset="22%" stopColor="#8a5a20" />
-            <stop offset="55%" stopColor="#4a2810" />
-            <stop offset="85%" stopColor="#1f1208" />
-            <stop offset="100%" stopColor="#140a05" />
-          </linearGradient>
-          {variant !== 'A' && (
-            <filter id={`noise-${uid}`} x="0%" y="0%" width="100%" height="100%">
-              <feTurbulence type="fractalNoise" baseFrequency="0.52" numOctaves={variant === 'C' ? 4 : 3} seed="7" result="n" />
-              <feColorMatrix in="n" type="matrix" values="0 0 0 0 .45  0 0 0 0 .35  0 0 0 0 .22  0 0 0 .15 0" result="c" />
-              <feBlend in="SourceGraphic" in2="c" mode="overlay" />
-            </filter>
-          )}
-          {variant !== 'A' && (
-            <linearGradient id={`patina-${uid}`} x1="0%" y1="100%" x2="0%" y2="0%">
-              <stop offset="0%" stopColor="#0b2a26" stopOpacity={0.55} />
-              <stop offset="55%" stopColor="#1a3d36" stopOpacity={0.2} />
-              <stop offset="100%" stopColor="transparent" />
-            </linearGradient>
-          )}
-        </defs>
-        <rect
-          x={0} y={0} width={W} height={H} rx={RX}
-          fill={`url(#bronze-${uid})`}
-          filter={variant !== 'A' ? `url(#noise-${uid})` : undefined}
-        />
-        {variant !== 'A' && (
-          <path d="M0 360 Q260 430 520 370 L520 420 L0 420 Z" fill={`url(#patina-${uid})`} style={{ mixBlendMode: 'multiply' }} />
-        )}
-        {variant === 'C' && (
-          <path d="M500 0 Q530 210 480 420 L520 420 L520 0 Z" fill="#0b2a26" opacity={0.25} style={{ mixBlendMode: 'multiply' }} />
-        )}
-        {variant !== 'A' && (
-          <>
-            <rect x={6} y={6} width={W - 12} height={H - 12} rx={RX - 6} fill="none" stroke="rgba(240,207,106,.2)" strokeWidth={1.5} />
-            <rect x={10} y={10} width={W - 20} height={H - 20} rx={RX - 10} fill="none" stroke="rgba(0,0,0,.5)" strokeWidth={2} />
-          </>
-        )}
-        {variant === 'C' && (
-          <>
-            <path d="M22 38 L34 41 L22 44 Z" fill="#0a0502" opacity={0.7} />
-            <path d="M498 78 L486 81 L498 84 Z" fill="#0a0502" opacity={0.6} />
-            <path d="M42 398 L54 395 L42 392 Z" fill="#0a0502" opacity={0.5} />
-            <path d="M470 60 Q500 120 490 180" stroke="#c9a45c" strokeWidth="1" strokeOpacity={0.25} fill="none" filter="blur(1px)" />
-            <path d="M60 390 Q120 396 180 382" stroke="#f0cf6a" strokeWidth="0.8" strokeOpacity={0.18} fill="none" filter="blur(1px)" />
-          </>
-        )}
-      </svg>
+      {/* Bevel / highlight plane */}
       <div
         style={{
           position: 'absolute',
-          inset: 0,
-          borderRadius: RX,
-          boxShadow: 'inset 0 1px 0 rgba(255,245,200,.28), inset 0 -4px 10px rgba(0,0,0,.55)',
+          inset: 8,
+          clipPath: OUTER_CLIP,
+          background: `
+            linear-gradient(145deg, rgba(255,238,180,.55), transparent 14%),
+            linear-gradient(325deg, rgba(15,7,2,.65), transparent 22%)
+          `,
           zIndex: 2,
           pointerEvents: 'none',
         }}
       />
+
+      {/* Secondary carved plane */}
       <div
         style={{
           position: 'absolute',
-          inset: 0,
-          borderRadius: RX,
-          border: '1px solid transparent',
-          borderTopColor: 'rgba(240,207,106,.4)',
-          borderLeftColor: 'rgba(240,207,106,.2)',
+          inset: 14,
+          clipPath: INNER_CLIP,
+          background: `
+            linear-gradient(180deg, rgba(255,222,142,.35), transparent 8%),
+            linear-gradient(0deg, rgba(0,0,0,.55), transparent 15%),
+            #1b110b
+          `,
+          boxShadow: `
+            inset 0 1px 0 rgba(255,255,255,.25),
+            inset 0 -2px 4px rgba(0,0,0,.7)
+          `,
           zIndex: 3,
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* Inner rim light — discontinuous */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 14,
+          clipPath: INNER_CLIP,
+          border: '1px solid transparent',
+          borderTopColor: 'rgba(240,207,106,.45)',
+          borderLeftColor: 'rgba(240,207,106,.22)',
+          borderBottomColor: 'rgba(0,0,0,.55)',
+          borderRightColor: 'rgba(0,0,0,.35)',
+          zIndex: 4,
           pointerEvents: 'none',
         }}
       />
@@ -297,17 +280,15 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
       {/* Diorama */}
       <div
         style={{
-          position: 'absolute',
-          top: RIM,
-          left: RIM,
+          position: 'relative',
           width: INNER_W,
           height: INNER_H,
-          borderRadius: 16,
+          clipPath: INNER_CLIP,
           overflow: 'hidden',
           transform: reduced
             ? 'none'
             : `perspective(900px) rotateX(calc(var(--my) * -1deg)) rotateY(calc(var(--mx) * 1.5deg))`,
-          zIndex: 4,
+          zIndex: 5,
         }}
       >
         <img
@@ -362,7 +343,7 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
             transform: reduced
               ? 'none'
               : `translate3d(calc(var(--mx) * 7px), calc(var(--my) * 4px), 0)`,
-            filter: peeled ? 'drop-shadow(8px 0 18px rgba(0,0,0,0.55))' : 'none',
+            filter: isPeeled ? 'drop-shadow(8px 0 18px rgba(0,0,0,0.55))' : 'none',
           }}
         />
 
@@ -407,7 +388,6 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
           style={{
             position: 'absolute',
             inset: 0,
-            borderRadius: 16,
             pointerEvents: 'none',
             zIndex: 8,
             background: `
@@ -427,7 +407,6 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
             style={{
               position: 'absolute',
               inset: 0,
-              borderRadius: 16,
               background: 'linear-gradient(135deg, rgba(255,255,255,.16), transparent 20%, transparent 80%, rgba(255,220,150,.08))',
             }}
           />
@@ -438,13 +417,31 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
           style={{
             position: 'absolute',
             inset: 0,
-            borderRadius: 16,
             background: 'radial-gradient(ellipse at 50% 45%, transparent 40%, rgba(0,0,0,.45) 100%)',
             pointerEvents: 'none',
             zIndex: 9,
           }}
         />
       </div>
+
+      {/* Contact shadow between frame and diorama */}
+      <div
+        style={{
+          position: 'absolute',
+          top: RIM,
+          left: RIM,
+          width: INNER_W,
+          height: INNER_H,
+          clipPath: INNER_CLIP,
+          pointerEvents: 'none',
+          zIndex: 10,
+          boxShadow: `
+            inset 0 0 0 1px rgba(255,220,150,.12),
+            inset 0 0 18px rgba(0,0,0,.75),
+            inset 0 -10px 20px rgba(0,0,0,.28)
+          `,
+        }}
+      />
     </div>
   );
 };
