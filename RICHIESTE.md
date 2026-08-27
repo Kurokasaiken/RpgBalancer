@@ -808,3 +808,17 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 - `engine.ts`: in `tickGooSim`, quando `gooReveal >= 0.999` il raggio di ogni campione viene bloccato (`gooSim.r[i] = rFinal`) e la velocità azzerata (`gooSim.v[i] = 0`), così il bordo non può superare il target.
 - `build:check` e test 4/4 passati.
 **Cosa manca:** conferma visiva del Director che non rimbalzi.
+
+---
+
+## R-041 — Scala e linea bronzea sotto il fiore clippato
+
+**Richiesta:** *"quando il fiore viene clippato sparisce anche la scala del valore delle stats e la linea bronzea che fa da limite (quella che appare insieme agli obelischi bianchi)"*.
+**Data:** 2026-08-27
+**Stato:** `fatta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v6 (CSS/React-first, budget stretto).
+**Cosa è successo:**
+- `drawStar` in `engine.ts`: la faccia piena del fiore è ora disegnata con `globalAlpha=0.82`, così la scala (`drawAxisRig`) e le linee bronzee interne del fiore rimangono leggibili attraverso la faccia.
+- La clip al muro del catrame resta; rimangono il contorno tratteggiato fuori dal goo e le linee bronzee sul bordo.
+- `build:check` e test 4/4 passati.
+**Cosa manca:** feedback del Director sulla leggibilità di scala e bronzo.

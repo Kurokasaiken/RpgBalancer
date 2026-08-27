@@ -1055,7 +1055,9 @@ function drawStar(now){
     ctx.clip(ap);
   }
   ctx.fillStyle=face;
+  ctx.globalAlpha=0.82;
   ctx.fill(p);
+  ctx.globalAlpha=1.0;
   ctx.restore();
   /* fuori dall'arena: contorno tratteggiato luminoso */
   ctx.save();
