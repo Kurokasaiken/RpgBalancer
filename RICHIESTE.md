@@ -850,3 +850,19 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 - `drawStar` in `engine.ts`: la clip del fiore non è più immediata. `clipReveal = smoothstep(0.6, 1.0, s)` controlla la transizione: per `s < 0.6` il fiore è intero, poi la maschera si restringe dal cerchio esterno (`R*1.6`) fino al muro del catrame (`rCheckAt(a,1)`).
 - `build:check` e test 4/4 passati.
 **Cosa manca:** feedback del Director sui tempi e sull'aspetto della transizione.
+
+---
+
+## R-044 — Scomparsa obelischi e scala dopo clip del fiore
+
+**Richiesta:** *"dopo che l'animazione che clippa il fiore termina fa sparire tutti gli obelischi e il visualizzatore del valore delle skill"*.
+**Data:** 2026-08-27
+**Stato:** `fatta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v6 (CSS/React-first, budget stretto).
+**Cosa è successo:**
+- `engine.ts`:
+  - Aggiunto `scene.axisAlpha` (inizializzato a 1 in `scene`, `launchRoll`, `throwBall`).
+  - `risk-pour`: oltre agli obelischi bianchi, ora sfuma anche gli obelischi neri e la scala (`axisAlpha = 1 - easeInCubic(p/0.85)`).
+  - `drawAxisRig`: disegna solo se `axisAlpha > 0.001` e applica `ctx.globalAlpha = axisAlpha` così la scala svanisce.
+- `build:check` e test 4/4 passati.
+**Cosa manca:** conferma visiva del Director.
