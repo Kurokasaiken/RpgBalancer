@@ -716,3 +716,17 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 - `engine.ts`: le prime `seedDropCount` gocce `gooSim.drops` cadono dall'alto con gravità e damping viscoso, atterrano al centro e si fondono; poi diventano gocce striscianti sulla colata. Il bordo principale (`gooSim.r`) rimane 0 durante la fase `threat-slam` e inizia a crescere con `goo-expand`.
 - `build:check` passato, test 4/4 passati.
 **Cosa manca:** feedback del Director sulle gocce cadenti.
+
+---
+
+## R-035 — Clip punte fiore e sparizione obelischi alabastro
+
+**Richiesta:** *"quando il fiore finisce di espandersi, fa una animazione x cui le punte del fiore si clippano come nella V9. quando finisce l'animazione fa sparire gli obelischi di alabastro"*.
+**Data:** 2026-08-27
+**Stato:** `fatta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v6 (CSS/React-first, budget stretto); v9 (geometria avversariale libera).
+**Cosa è successo:**
+- `drawStar` in `engine.ts` modellato su V9: la faccia piena del fiore viene clipppata al bordo del catrame (`rCheckAt(a,1)`) e ciò che eccede resta solo un contorno tratteggiato dorato.
+- `risk-pour` in `engine.ts`: gli obelischi bianchi (alabastro) si ritirano/ritraggono (`pl.drop` da 1 a 0) non appena finisce l'espansione della stella.
+- `build:check` e test 4/4 passati.
+**Cosa manca:** feedback del Director sul nuovo aspetto.
