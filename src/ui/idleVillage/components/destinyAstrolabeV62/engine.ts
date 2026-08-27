@@ -341,14 +341,16 @@ function launchRoll(){
 }
 
 /* THROW (TIRA) — starts the spin. If clicked mid-reveal it WARPS: the reveal
-   snaps complete (no hard cut) and the ball fires immediately. */
+   snaps complete (no hard cut) and the ball fires immediately.
+   During the throw/bounces the obelisks, axis ruler and side streams are hidden. */
 function throwBall(){
   const s=scene.state;
   if(s==='idle'||s==='the-spin'||s==='magnetic-snap'||s==='resolution') return;
   armed=false; emitArmed(false);
-  /* warp: snap any still-playing reveal so we never fire from an empty scene */
-  scene.gooReveal=1; scene.starScale=1; scene.pourP=1; scene.streamAlpha=0.34; scene.axisAlpha=1; scene.gooFullMs=performance.now();
-  scene.blackPillars.concat(scene.whitePillars).forEach(pl=>{ pl.drop=1; pl.landed=true; });
+  /* warp: snap surface fully, but keep UI chrome (obelisks/axis/streams) off
+     so only the tar wall, star and ball are visible during the spin. */
+  scene.gooReveal=1; scene.starScale=1; scene.pourP=1; scene.streamAlpha=0; scene.axisAlpha=0; scene.gooFullMs=performance.now();
+  scene.blackPillars.concat(scene.whitePillars).forEach(pl=>{ pl.drop=0; pl.landed=true; });
   if(s!=='action-trigger'){ scene.warp=1; scene.gooRipple=1; }   // visual warp flash when skipping
   setState('the-spin'); fireBall();
 }

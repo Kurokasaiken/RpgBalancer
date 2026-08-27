@@ -1059,3 +1059,19 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 - Evidence log: `test-results/r-054-astrolabe-bronze-bezel-2026-08-27.log`.
 - `build:check`, test 4/4 e `kanban:lint` passati.
 **Cosa manca:** conferma visiva del Director.
+
+---
+
+## R-055 — Durante il lancio nasconde obelischi, assi e segmenti laterali
+
+**Richiesta:** *"durante il lancio e i rimbalzi della pallina nn si devono vedere: i segmenti laterali, gli obelischi, la scala che misura la grandezza delle stat"*.
+**Data:** 2026-08-27
+**Stato:** `fatta`
+**Cosa è successo:**
+- `engine.ts` `throwBall()`: al lancio imposta `scene.axisAlpha=0`, `pl.drop=0` su tutti i pilastri e `scene.streamAlpha=0`.
+- Durante `the-spin` e `magnetic-snap` `drawAxisRig`, `drawPillar` e i rischi laterali non disegnano più.
+- La superficie del goo, la stella e la pallina restano visibili.
+- `resolve()` continuava a nasconderli alla fine.
+- Evidence log: `test-results/r-055-clean-throw-2026-08-27.log`.
+- `build:check`, test 4/4 e `kanban:lint` passati.
+**Cosa manca:** conferma visiva del Director.
