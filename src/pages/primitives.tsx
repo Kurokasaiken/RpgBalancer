@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Minus } from 'lucide-react';
+import { motion } from 'framer-motion';
 import {
   MatericAmbientField,
   MatericBadge,
@@ -380,63 +382,80 @@ function SkinTab(): JSX.Element {
 }
 
 function EventTab(): JSX.Element {
+  const { t } = useTranslation('idleVillage');
   const [show, setShow] = useState(true);
+  const [stage, setStage] = useState<'modal' | 'reminder'>('modal');
   const mockedDays = 5;
+
+  const isModal = stage === 'modal';
+
+  const handleToggle = () => {
+    setShow((s) => {
+      const next = !s;
+      if (next) setStage('modal');
+      return next;
+    });
+  };
 
   return (
     <DemoPanel>
       <MatericHeading title="Event" subtitle="Goblin Invasion Window inside MatericEventCard" />
       <button
         type="button"
-        onClick={() => setShow(s => !s)}
+        onClick={handleToggle}
         style={{ marginBottom: 16, padding: '8px 16px' }}
       >
         {show ? 'Hide Event' : 'Show Event'}
       </button>
       <div style={{ position: 'relative', width: 500, height: 560 }}>
-        <MatericCloudWall size={500} rimLight={false} style={{ top: 0, left: 0, zIndex: 1 }} />
         {show && (
-          <MatericFrame
-            variant="molding"
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              zIndex: 2,
-              width: 460,
-              minHeight: 500,
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                padding: '28px 24px 32px',
-                gap: 10,
+          <>
+            <MatericCloudWall
+              size={500}
+              rimLight={false}
+              style={{ top: 0, left: 0, zIndex: 1 }}
+            />
+            <motion.div
+              initial={{ x: 0, y: 0, scale: 1 }}
+              animate={
+                isModal
+                  ? { x: 0, y: 0, scale: 1 }
+                  : { x: 120, y: -180, scale: 0.35 }
+              }
+              transition={{
+                x: { duration: 1.2, ease: 'easeInOut' },
+                y: { duration: 1.2, ease: 'easeInOut' },
+                scale: { duration: 1.2, ease: 'easeInOut' },
               }}
+              style={{ position: 'relative' }}
             >
-              <MatericPlaque style={{ fontSize: 18, letterSpacing: '0.22em', padding: '8px 20px' }}>
-                Invasion
-              </MatericPlaque>
-              <SkinTitle level="1" style={{ fontSize: 32, lineHeight: 1 }}>
-                Goblin Invasion
-              </SkinTitle>
-              <SkinTitle level="subtitle" style={{ fontSize: 14, opacity: 0.85 }}>
-                {mockedDays} days remain
-              </SkinTitle>
-              <div style={{ width: 364, height: 294, margin: '6px auto 0', overflow: 'hidden' }}>
-                <GoblinInvasionWindow
-                  ariaLabel="Goblin Invasion"
-                  style={{ transform: 'scale(0.7)', transformOrigin: 'top left' }}
-                />
-              </div>
-              <MatericButton onClick={() => {}} style={{ marginTop: 8, padding: '12px 36px', fontSize: 14, letterSpacing: '0.18em' }}>
-                Prepare
-              </MatericButton>
-            </div>
-          </MatericFrame>
+              <MatericEventCard
+                variant="modal"
+                badge={String(t('world.goblinInvasion.invasion'))}
+                subtitle={String(t('world.goblinInvasion.subtitle', { count: mockedDays }))}
+                image={
+                  <div style={{ width: 364, height: 294, overflow: 'hidden', margin: '0 auto' }}>
+                    <GoblinInvasionWindow
+                      ariaLabel={String(t('world.goblinInvasion.title'))}
+                      style={{ transform: 'scale(0.7)', transformOrigin: 'top left' }}
+                    />
+                  </div>
+                }
+                actionLabel={String(t('world.goblinInvasion.action'))}
+                onAction={() => isModal && setStage('reminder')}
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  transform: 'translate(-50%, -50%)',
+                  zIndex: 2,
+                  maxWidth: 460,
+                  width: 460,
+                  minHeight: 500,
+                }}
+              />
+            </motion.div>
+          </>
         )}
       </div>
     </DemoPanel>
