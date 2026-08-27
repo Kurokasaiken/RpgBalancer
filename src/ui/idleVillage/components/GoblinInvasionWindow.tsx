@@ -18,6 +18,8 @@ export interface GoblinInvasionWindowProps {
   goblinImageWithBorder?: string;
   /** Frame prototype level: A structural, B material, C history. */
   variant?: 'A' | 'B' | 'C';
+  /** If provided, the peeled sticker state is controlled from outside. */
+  peeled?: boolean;
 }
 
 const W = 520;
@@ -170,8 +172,10 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
   goblinImage = defaultGoblinImage,
   goblinImageWithBorder = defaultGoblinImageWithBorder,
   variant = 'C',
+  peeled: peeledProp,
 }) => {
-  const [peeled, setPeeled] = useState(false);
+  const [internalPeeled, setInternalPeeled] = useState(false);
+  const isPeeled = peeledProp !== undefined ? peeledProp : internalPeeled;
   const [mx, setMx] = useState(0);
   const [my, setMy] = useState(0);
   const reduced = useReducedMotion();
@@ -196,7 +200,7 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
     <div
       ref={rootRef}
       className={className}
-      onClick={() => setPeeled((p) => !p)}
+      onClick={() => peeledProp === undefined && setInternalPeeled((p) => !p)}
       onPointerMove={reduced ? undefined : handlePointerMove}
       onPointerLeave={reduced ? undefined : handleLeave}
       style={{
@@ -351,7 +355,7 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
             width: '100%',
             height: '100%',
             objectFit: 'contain',
-            clipPath: peeled
+            clipPath: isPeeled
               ? 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
               : 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)',
             transition: reduced ? 'none' : 'clip-path 0.9s cubic-bezier(0.22, 1, 0.36, 1)',
