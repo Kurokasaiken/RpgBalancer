@@ -242,5 +242,8 @@
     "src/ui/idleVillage/**/*.{ts,tsx}": "npx eslint --cache --fix --max-warnings=55",
     "src/engine/game/idleVillage/**/*.{ts,tsx}": "npx eslint --cache --fix --max-warnings=55",
     "src/ui/styleLab/!(physics|physicsLab)/**/*.{ts,tsx}": "npx eslint --cache --fix --max-warnings=55"
+  },
+  "engines": {
+    "node": "22.x"
   }
 }
