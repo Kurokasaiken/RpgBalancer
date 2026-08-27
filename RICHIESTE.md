@@ -669,7 +669,7 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 
 **Richiesta:** *"fammi una versione che sia v6.2. ma il goo voglio che tu faccia una ricerca approfondita su come ottenere al meglio quel risultato. Ti do delle ricerche e informazioni preliminari. Usa l'explorer e fa ricerche cn il giusto cappello e prompt potenziato. [...] è possibile fare l'effetto di un goo, tipo una colata di catrame che si estende, ecc che sia credibile per un umano? Fino ad ora ho avuto risultati molto deludenti."*
 **Data:** 2026-08-27
-**Stato:** `in corso`
+**Stato:** `fatta`
 **Desiderata FROZEN:** `.mw/desiderata.md` v9 (la geometria avversariale non deve essere per forza un goo — permesso, non mandato: il Director qui sceglie esplicitamente di perfezionare il goo, nessuna tensione); v6 (CSS/React-first, budget stretto).
 **Contesto fornito:** tre ricerche preliminari (Gemini + altre AI) su metaballs, blur+contrast, WebGL/SDF, liquid-gooey, fluidkit, Matter.js, con conclusione condivisa: CSS puro non basta, serve rendering per-pixel + pseudo-fisica viscosa + materiale speculare.
 **Cosa è successo:**
