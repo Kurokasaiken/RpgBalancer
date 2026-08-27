@@ -776,3 +776,21 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 - Le tacche della scala restano (a seconda di `rDiff`), ma il cursore colorato non viene più disegnato.
 - `build:check` e test 4/4 passati.
 **Cosa manca:** conferma del Director che non ci siano più linee rosse.
+
+---
+
+## R-039 — Più gocce cadenti per aumentare il catrame V6.2
+
+**Richiesta:** *"voglio + effetti di gocce che cadono x aumentare il catrame"*.
+**Data:** 2026-08-27
+**Stato:** `fatta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v6 (CSS/React-first, budget stretto).
+**Cosa è successo:**
+- `tarGooConfig.ts`:
+  - `seedDropCount` 3 → **6** gocce iniziali.
+  - `seedDropHeight` 180 → **220**, `seedDropScatter` 70 → **90**, `seedDropStagger` 90 → **60**.
+  - `seedDropRadius` [14,22] → **[14,24]**.
+  - `dropletCount` 9 → **12** (6 seed + 6 che strisciano sulla colata).
+  - `seedMs` 700 → **900** per dare tempo a tutte le 6 gocce di cadere e fondersi.
+- `build:check` e test 4/4 passati.
+**Cosa manca:** feedback del Director sul numero di gocce e tempi.
