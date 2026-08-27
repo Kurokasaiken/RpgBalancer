@@ -468,8 +468,23 @@ function WindowTab(): JSX.Element {
       <MatericHeading title="Window" subtitle="Goblin Invasion glass case — frame A/B/C prototypes" />
       <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
         {(['A', 'B', 'C'] as const).map((v) => (
-          <div key={v} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-            <GoblinInvasionWindow ariaLabel={`Goblin Invasion ${v}`} variant={v} />
+          <div
+            key={v}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              minWidth: 1040,
+              minHeight: 840,
+            }}
+          >
+            <GoblinInvasionWindow
+              ariaLabel={`Goblin Invasion ${v}`}
+              variant={v}
+              style={{ transform: 'scale(2)' }}
+            />
             <span style={{ fontSize: 10, color: 'var(--skin-body-color)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{v}</span>
           </div>
         ))}
