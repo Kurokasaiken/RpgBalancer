@@ -290,6 +290,7 @@ function setState(s){
   suite.dataset.state=s;
   stateChip.textContent=s;
   emitState(s);
+  if(s==='threat-slam'){ resetDrops(scene.t0); }
 }
 function phaseT(durMs){ return clamp((performance.now()-scene.t0)/durMs,0,1); }
 const easeOutCubic=t=>1-Math.pow(1-t,3);
@@ -360,8 +361,9 @@ function tickTimeline(){
   }
   else if(s==='threat-slam'){
     const p=phaseT(cfg.tSlam);
-    /* V6.2 tar seed: a small pool forms around the core while obelisks slam. */
-    scene.gooReveal=tarGooConfig.timing.seedReveal*easeOutCubic(clamp(p/0.5,0,1));
+    /* V6.2 tar seed: no central pool yet — seed drops fall from above and
+       merge while the black obelisks slam. The main rim stays at 0. */
+    scene.gooReveal=0;
     scene.blackPillars.forEach((pl,i)=>{
       const local=clamp((p-(i*0.13))/0.4,0,1);
       const prev=pl.drop;
@@ -684,20 +686,52 @@ const gooSim=(()=>{
   const simCfg=tarGooConfig.simulation;
   const N=simCfg.rimSamples;
   const rnd=(a,b)=>a+Math.random()*(b-a);
+  const drops=Array.from({length:simCfg.dropletCount},(_,i)=>({
+    ang:0.0,
+    w:0.0,
+    rr:0.0,
+    ph:0.0,
+    mode:'crawl',
+    x:0.0,
+    y:0.0,
+    vy:0.0,
+    startT:0.0,
+  })) as ({ang:number,w:number,rr:number,ph:number,mode:'fall'|'crawl',x:number,y:number,vy:number,startT:number})[];
   return {
     N,
     r:new Float32Array(N),                 // current sprung radius per sample
     v:new Float32Array(N),                 // radial velocity per sample
     blobs:new Float32Array(simCfg.dropletCount*3),
-    drops:Array.from({length:simCfg.dropletCount},()=>({
-      ang:Math.random()*TAU,
-      w:rnd(simCfg.dropletCrawlSpeed[0],simCfg.dropletCrawlSpeed[1])*(Math.random()<0.5?-1:1),
-      rr:rnd(simCfg.dropletRadius[0],simCfg.dropletRadius[1]),
-      ph:Math.random()*TAU,
-    })),
+    blobCount:0,
+    drops,
     lastMs:0,
   };
 })();
+
+function resetDrops(t0:number){
+  const simCfg=tarGooConfig.simulation;
+  const rnd=(a,b)=>a+Math.random()*(b-a);
+  gooSim.r.fill(0); gooSim.v.fill(0);
+  for(let i=0;i<gooSim.drops.length;i+=1){
+    const d=gooSim.drops[i];
+    d.ph=Math.random()*TAU;
+    if(i<simCfg.seedDropCount){
+      d.mode='fall';
+      d.x=CX+rnd(-simCfg.seedDropScatter,simCfg.seedDropScatter);
+      d.y=CY-simCfg.seedDropHeight;
+      d.vy=0;
+      d.startT=t0+i*simCfg.seedDropStagger;
+      d.rr=rnd(simCfg.seedDropRadius[0],simCfg.seedDropRadius[1]);
+      d.w=rnd(simCfg.dropletCrawlSpeed[0],simCfg.dropletCrawlSpeed[1])*(Math.random()<0.5?-1:1);
+    }else{
+      d.mode='crawl';
+      d.ang=Math.random()*TAU;
+      d.w=rnd(simCfg.dropletCrawlSpeed[0],simCfg.dropletCrawlSpeed[1])*(Math.random()<0.5?-1:1);
+      d.rr=rnd(simCfg.dropletRadius[0],simCfg.dropletRadius[1]);
+      d.x=CX; d.y=CY; d.vy=0; d.startT=0;
+    }
+  }
+}
 function tickGooSim(now){
   const simCfg=tarGooConfig.simulation;
   const dt=gooSim.lastMs?Math.min(50,now-gooSim.lastMs):16.7;
@@ -719,19 +753,45 @@ function tickGooSim(now){
     gooSim.v[i]=vel;
     gooSim.r[i]=Math.max(0,gooSim.r[i]+vel*k);
   }
-  /* droplets crawl along the actual rim of the current axis, not a uniform one */
+  /* Droplets: the first seedDropCount fall from above and merge; the rest
+     crawl on the rim once it exists. */
   const t=now/1000;
+  let active=0;
   for(let i=0;i<gooSim.drops.length;i+=1){
     const d=gooSim.drops[i];
-    d.ang+=d.w*dt/1000;
-    const idx=Math.round((d.ang/TAU)*gooSim.N)%gooSim.N;
-    const rim=rev<=0.001?0:gooSim.r[idx];
-    const bulge=Math.sin(t*0.3+d.ph)*simCfg.dropletOvershoot;
-    const rad=Math.max(geo.rCore*0.6,rim-d.rr*0.8+bulge);
-    gooSim.blobs[i*3]=CX+Math.cos(d.ang)*rad;
-    gooSim.blobs[i*3+1]=CY+Math.sin(d.ang)*rad;
-    gooSim.blobs[i*3+2]=d.rr*clamp(rev,0,1);
+    if(d.mode==='fall'){
+      if(now>=d.startT){
+        d.vy += simCfg.seedDropGravity*dt;
+        d.vy *= Math.pow(simCfg.seedDropDamping, k);
+        d.y += d.vy*dt;
+        /* landing: when the drop reaches / passes the centre plane */
+        if(d.y >= CY-d.rr*0.5){
+          d.y=Math.min(d.y,CY+d.rr*0.5);
+          d.mode='crawl';
+          d.ang=Math.atan2(d.y-CY,d.x-CX);
+          scene.gooRipple=Math.max(scene.gooRipple,0.65);
+        }
+      }
+      if(now>=d.startT){
+        gooSim.blobs[active*3]=d.x;
+        gooSim.blobs[active*3+1]=d.y;
+        gooSim.blobs[active*3+2]=d.rr;
+        active+=1;
+      }
+    }else{
+      d.ang+=d.w*dt/1000;
+      const idx=Math.round((d.ang/TAU)*gooSim.N)%gooSim.N;
+      const rim=rev<=0.001?0:gooSim.r[idx];
+      const bulge=Math.sin(t*0.3+d.ph)*simCfg.dropletOvershoot;
+      const rad=Math.max(geo.rCore*0.6,rim-d.rr*0.8+bulge);
+      gooSim.blobs[active*3]=CX+Math.cos(d.ang)*rad;
+      gooSim.blobs[active*3+1]=CY+Math.sin(d.ang)*rad;
+      gooSim.blobs[active*3+2]=d.rr;
+      active+=1;
+    }
   }
+  gooSim.blobCount=active;
+  scene.gooRipple=Math.max(0,scene.gooRipple*0.95);
 }
 
 /* ---- procedural material textures (generated once) ---- */
@@ -849,12 +909,12 @@ function gooBlobPath(rev,shrink){
 function drawChallengeSurface(now){
   const rev=scene.gooReveal;
   tickGooSim(now);
-  if(rev<=0.001) return;
+  if(rev<=0.001 && gooSim.blobCount===0) return;
   if(gooRenderer){
     const layer=gooRenderer.render({
       radii:gooSim.r,
       blobs:gooSim.blobs,
-      blobCount:gooSim.drops.length,
+      blobCount:gooSim.blobCount,
       timeMs:now,
       reveal:clamp(rev,0,1),
       ripple:clamp(scene.gooRipple||0,0,1),

@@ -701,3 +701,18 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 - La colata ora non è più una semplice scala radiale uniforme: un singolo `front` d'invasione cresce da 0 a `geo.tarRMax`; ogni asse raggiunge il proprio `rCheckAt(theta, 1)` quando il front lo supera. Gli assi corti si riempiono prima, i lunghi continuano, dando la sensazione che la colata "spinga" a velocità diverse a seconda della distanza.
 - `tickGooSim` campiona `min(rFinal, front)` per ogni sample; le gocce usano il raggio reale del campione più vicino.
 **Cosa manca:** feedback del Director sul flusso asimmetrico.
+
+---
+
+## R-034 — Animazione iniziale a gocce cadenti
+
+**Richiesta:** *"x l'animazione iniziale, invece di cominciare da 1 cerchio, puoi fare cadere diverse gocce, che mi sembra che l'animazione venga molto bene?"*
+**Data:** 2026-08-27
+**Stato:** `fatta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v6 (CSS/React-first, budget stretto); v9 (geometria avversariale libera).
+**Cosa è successo:**
+- `tarGooConfig.ts`: aggiunti parametri `seedDrop*` (count, raggio, gravità, damping, scatter, altezza, stagger).
+- `tarGooRenderer.ts`: alpha dell'SDF non moltiplicata più per `uReveal`, quindi le gocce sono visibili prima che il bordo principale cresca.
+- `engine.ts`: le prime `seedDropCount` gocce `gooSim.drops` cadono dall'alto con gravità e damping viscoso, atterrano al centro e si fondono; poi diventano gocce striscianti sulla colata. Il bordo principale (`gooSim.r`) rimane 0 durante la fase `threat-slam` e inizia a crescere con `goo-expand`.
+- `build:check` passato, test 4/4 passati.
+**Cosa manca:** feedback del Director sulle gocce cadenti.
