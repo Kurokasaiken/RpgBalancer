@@ -427,7 +427,7 @@ function EventTab(): JSX.Element {
                 y: { duration: 1.2, ease: 'easeInOut' },
                 scale: { duration: 1.2, ease: 'easeInOut' },
               }}
-              style={{ position: 'relative' }}
+              style={{ position: 'relative', alignSelf: 'flex-start', marginTop: 20 }}
             >
               <MatericEventCard
                 variant="modal"
