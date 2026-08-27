@@ -131,12 +131,16 @@ function recomputeGeometry(skillIndex=0){
      della stat (mai al 100%). Inoltre `tst` deriva da UNA sola skill, quindi su
      un board multi-skill il bersaglio era mal posto per costruzione.
 
-     L'unico parametro di forma resta la profondità delle valli, ora una
-     COSTANTE tarata: a VALLEY_F la parità (stat == difficoltà) legge esattamente
-     il 50% dell'arena, e la proprietà è scale-invariant — vale a 20/20 come a
-     95/95, perché dipende solo dal rapporto fra i raggi. */
-  const VALLEY_F=0.3675;
-  geo.valleyF=VALLEY_F;
+     L'unico parametro di forma resta la profondità delle valli, regolata dal
+     margine del PG rispetto allo skill check: valli basse = stella affilata
+     quando stat >= difficoltà, valli alte = fiore dai petali arrotondati quando
+     il PG è sotto. */
+  const sCfg=tarGooConfig.star;
+  const range=sCfg.transitionR*R;
+  const margins=geo.starTip.map((s,i)=>s-geo.axisCheck[i]);
+  const minMargin=Math.min(...margins);
+  const t=clamp((minMargin+range)/range,0,1);
+  geo.valleyF=sCfg.valleyFlower+(sCfg.valleyStar-sCfg.valleyFlower)*t;
   geo.starTip=geo.obeliskTip.slice();   // la punta È l'obelisco bianco
   /* probabilità reale, misurata sulla geometria che il giocatore vede.
      Stessa formula di inStar: min(stella, muro) — il muro taglia la stella. */
@@ -155,7 +159,7 @@ function recomputeGeometry(skillIndex=0){
   }
   /* cosmetic aggregate radii (halo/gradients) */
   geo.rTip=Math.max(...geo.starTip);
-  geo.rValley=Math.min(...geo.starTip)*VALLEY_F;
+  geo.rValley=Math.min(...geo.starTip)*geo.valleyF;
   /* critical-fail band thickness — purely proportional to the arena radius and
      scaled by crit% (like the wound/death sectors). No fixed pixel values. */
   geo.epicW=(R-3)*clamp(cfg.crit/100,0.04,0.5);

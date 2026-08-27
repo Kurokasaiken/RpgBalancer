@@ -102,6 +102,16 @@ const tarGooConfigSchema = z.object({
     leakMid: z.string(),
     leakEdge: z.string(),
   }),
+  /** Star/flower shape. The silhouette morphs from rounded petals to a sharp star
+      as the player stat reaches and exceeds the skill check. */
+  star: z.object({
+    /** Valley depth when the player is well below the skill check (rounded flower). */
+    valleyFlower: z.number().min(0).max(1),
+    /** Valley depth when the player is at or above the skill check (sharp star). */
+    valleyStar: z.number().min(0).max(1),
+    /** Fraction of the arena radius over which the flower → star transition occurs. */
+    transitionR: z.number().min(0).max(1),
+  }),
 });
 
 /** Inferred tar goo config type. */
@@ -157,5 +167,10 @@ export const tarGooConfig: TarGooConfig = tarGooConfigSchema.parse({
     leakCore: 'rgba(0,229,255,.50)',
     leakMid: 'rgba(0,229,255,.22)',
     leakEdge: 'rgba(0,0,0,0)',
+  },
+  star: {
+    valleyFlower: 0.65,
+    valleyStar: 0.15,
+    transitionR: 0.25,
   },
 });
