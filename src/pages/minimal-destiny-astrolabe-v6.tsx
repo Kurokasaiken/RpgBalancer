@@ -111,6 +111,13 @@ export default function MinimalDestinyAstrolabeV6() {
             </a>
             <span className="px-3 py-1 rounded text-sm font-semibold bg-amber-500 text-black">V6</span>
             <a
+              href="/minimal-destiny-astrolabe-v6-2"
+              className="px-3 py-1 rounded text-sm font-semibold bg-amber-600 text-black hover:bg-amber-500 transition-colors"
+              title="V6.2 · tar goo viscoso (WebGL2 SDF)"
+            >
+              V6.2
+            </a>
+            <a
               href="/minimal-destiny-astrolabe-v7"
               className="px-3 py-1 rounded text-sm font-semibold bg-amber-600 text-black hover:bg-amber-500 transition-colors"
             >
