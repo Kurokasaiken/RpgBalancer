@@ -962,3 +962,24 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 - Evidence log: `test-results/r-049-star-shape-2026-08-27.log`.
 - `build:check`, test 4/4 e `kanban:lint` passati.
 **Cosa manca:** conferma visiva del Director.
+
+---
+
+## R-050 — Il fiore/stella deve essere clippato al muro del catrame
+
+**Richiesta:** *"il fiore nn è clippato"*.
+**Data:** 2026-08-27
+**Stato:** `fatta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v6 (CSS/React-first, budget stretto).
+**Cosa è successo:**
+- In `drawStar` (engine.ts) la clip esisteva ma copriva solo il `fill` della faccia (L1); i bordi bronzo/bianchi e lo sheen venivano disegnati senza clip, quindi la stella sembrava non tagliata.
+- Ristrutturato `drawStar`:
+  - calcola la maschera `ap` prima di disegnare;
+  - disegna il contorno tratteggiato `p` non clippato;
+  - applica `ctx.clip(ap)` una volta sola per tutti i livelli rimanenti (faccia, sheen, bordi, core).
+- Verifica con Puppeteer (single 85 vs 50):
+  - punta superiore: stella a `dy=200`, muro a `dy=210`, contorno tratteggiato ancora visibile a `dy=280`.
+  - lato destro: stella a `dx=170`, muro a `dx=190`, sfondo a `dx=195`.
+- Evidence log: `test-results/r-050-flower-clip-2026-08-27.log`.
+- `build:check`, test 4/4, `kanban:lint` e smoke `curl` 200 passati.
+**Cosa manca:** conferma visiva del Director.

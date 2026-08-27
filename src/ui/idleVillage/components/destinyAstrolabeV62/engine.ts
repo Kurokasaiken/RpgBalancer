@@ -1061,45 +1061,44 @@ function drawStar(now){
   const t=now/1000;
   const p=starPath(s);
   /* V6.2: il fiore viene CLIPpato al muro del catrame come in V9.
-     La faccia piena cresce fino ai bordi del goo; ciò che eccede resta
+     La faccia e i bordi crescono fino al muro; ciò che eccede resta
      solo contorno tratteggiato, così le punte non coprono board/confini. */
-  ctx.save();
-  /* V6: L0 halo rimosso — l'alone allargava il bordo della stella di ~40px,
-     cioè sfocava esattamente il confine che porta la probabilità. */
-  /* L1 radiant white-gold ivory face with strong inner glow —
-     clipped to the tar wall so only the in-arena part is filled. */
   const face=ctx.createRadialGradient(CX-30,CY-46,6,CX,CY,geo.rTip*s);
   face.addColorStop(0,'#ffffff'); face.addColorStop(.42,'#fdf8e9'); face.addColorStop(1,'#ecd49a');
-  ctx.save();
-  {
-    /* Il fiore nasce intero; il catrame lo clippa solo verso la fine della
-       sua espansione. La maschera morfa da un cerchio grande (nessun clip) alla
-       forma del muro del catrame. */
-    const clipReveal=smoothstep(0.6,1.0,s);
-    const rLarge=R*1.6;
-    const ap=new Path2D();
-    const SEG=200;
-    for(let i=0;i<=SEG;i+=1){
-      const a=-Math.PI/2+i/SEG*TAU;
-      const r=rLarge*(1.0-clipReveal)+rCheckAt(a,1)*clipReveal;
-      const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
-      if(i===0) ap.moveTo(x,y); else ap.lineTo(x,y);
-    }
-    ap.closePath();
-    ctx.clip(ap);
+
+  /* Il fiore nasce intero; il catrame lo clippa solo verso la fine della
+     sua espansione. La maschera morfa da un cerchio grande (nessun clip) alla
+     forma del muro del catrame. */
+  const clipReveal=smoothstep(0.6,1.0,s);
+  const rLarge=R*1.6;
+  const ap=new Path2D();
+  const SEG=200;
+  for(let i=0;i<=SEG;i+=1){
+    const a=-Math.PI/2+i/SEG*TAU;
+    const r=rLarge*(1.0-clipReveal)+rCheckAt(a,1)*clipReveal;
+    const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
+    if(i===0) ap.moveTo(x,y); else ap.lineTo(x,y);
   }
-  ctx.fillStyle=face;
-  ctx.globalAlpha=0.82;
-  ctx.fill(p);
-  ctx.globalAlpha=1.0;
-  ctx.restore();
-  /* fuori dall'arena: contorno tratteggiato luminoso */
+  ap.closePath();
+
+  /* fuori dall'arena: contorno tratteggiato luminoso (non clippato). */
   ctx.save();
   ctx.setLineDash([9,7]);
   ctx.lineWidth=2.0;
   ctx.strokeStyle='rgba(255,226,150,0.55)';
   ctx.stroke(p);
   ctx.restore();
+
+  /* Tutti i livelli interni sono clippati alla maschera del catrame. */
+  ctx.save();
+  ctx.clip(ap);
+
+  /* L1 radiant white-gold ivory face with strong inner glow */
+  ctx.fillStyle=face;
+  ctx.globalAlpha=0.82;
+  ctx.fill(p);
+  ctx.globalAlpha=1.0;
+
   /* L2 rotating specular sheen */
   ctx.save(); ctx.clip(p);
   const ang=now/2600, sx=CX+Math.cos(ang)*240, sy=CY+Math.sin(ang)*240;
@@ -1107,6 +1106,7 @@ function drawStar(now){
   sh.addColorStop(.42,'rgba(255,255,255,0)'); sh.addColorStop(.5,'rgba(255,255,255,.35)'); sh.addColorStop(.58,'rgba(255,255,255,0)');
   ctx.fillStyle=sh; ctx.fillRect(0,0,W,W);
   ctx.restore();
+
   /* L3-L5 triple bronze rim — the ALMOST band */
   ctx.lineJoin='round';
   ctx.lineWidth=ALMOST_W; ctx.strokeStyle='rgba(96,44,8,.55)'; ctx.stroke(starPath(s*1.0));
