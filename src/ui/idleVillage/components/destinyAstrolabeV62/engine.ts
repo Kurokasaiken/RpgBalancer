@@ -773,8 +773,19 @@ function tickGooSim(now){
     let vel=(gooSim.v[i]+(target-gooSim.r[i])*simCfg.stiffness*k)*damp;
     const vMax=simCfg.maxSpeed*k*(1+2*(scene.gooRipple||0));
     if(vel>vMax)vel=vMax; else if(vel<-vMax)vel=-vMax;
-    gooSim.v[i]=vel;
-    gooSim.r[i]=Math.max(0,gooSim.r[i]+vel*k);
+    const next=gooSim.r[i]+vel*k;
+    /* Sticky non-overshoot: viscous tar must not rebound. If the next frame
+       would cross the target, or the sample is already past it and not moving
+       back, snap to the target and kill the spring. */
+    const cross=(vel>0 && next>=target) || (vel<0 && next<=target);
+    const away=(gooSim.r[i]>target && vel>=0) || (gooSim.r[i]<target && vel<=0);
+    if(cross || away){
+      gooSim.r[i]=target;
+      gooSim.v[i]=0;
+    }else{
+      gooSim.r[i]=Math.max(0,next);
+      gooSim.v[i]=vel;
+    }
   }
   /* Droplets: the first seedDropCount fall from above and merge; the rest
      crawl on the rim once it exists. */

@@ -866,3 +866,18 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
   - `drawAxisRig`: disegna solo se `axisAlpha > 0.001` e applica `ctx.globalAlpha = axisAlpha` così la scala svanisce.
 - `build:check` e test 4/4 passati.
 **Cosa manca:** conferma visiva del Director.
+
+---
+
+## R-045 — Arresto del goo meno elastico, più viscoso e appiccicoso
+
+**Richiesta:** *"l'animazione cn cui si arresta la crescita del goo è ancora tropppo rebound, fa una ricerca online su come renderla meno elastica. Deve essere un movimento viscoso e appiccicoso."*.
+**Data:** 2026-08-27
+**Stato:** `fatta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v6 (CSS/React-first, budget stretto).
+**Cosa è successo:**
+- Ricerca online: la letteratura su viscoelastic fluids e critical damping (Goktekin et al. SIGGRAPH 2004, "critical spring damper" di The Orange Duck) suggerisce di evitare l'overshoot con un **arrival clamp** (non-overshoot) piuttosto che modellare ogni forza interna.
+- `tarGooConfig.ts`: `stiffness` 0.018 → **0.015**, `damping` 0.96 → **0.985**, `maxSpeed` 5.5 → **5.0**.
+- `engine.ts`: in `tickGooSim` aggiunto **sticky non-overshoot**. Se il frame successivo farebbe superare il `target`, o il campione è già oltre e non sta tornando indietro, il raggio viene bloccato sul `target` e la velocità azzerata.
+- `build:check` e test 4/4 passati.
+**Cosa manca:** conferma visiva del Director.
