@@ -662,3 +662,20 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 - Integrato nella tab `Event` di `/primitives` con parallasse al movimento del mouse, bordo dorato irregolare, sfondo teal radiale pulsante e particelle luminose.
 - `npm run build:check`, `npm run lint -- <scope>` e `npm run kanban:lint` passati.
 - Smoke test Puppeteer su `http://localhost:5173/primitives` OK.
+
+---
+
+## R-032 — Astrolabe v6.2: goo credibile (colata di catrame) con ricerca approfondita
+
+**Richiesta:** *"fammi una versione che sia v6.2. ma il goo voglio che tu faccia una ricerca approfondita su come ottenere al meglio quel risultato. Ti do delle ricerche e informazioni preliminari. Usa l'explorer e fa ricerche cn il giusto cappello e prompt potenziato. [...] è possibile fare l'effetto di un goo, tipo una colata di catrame che si estende, ecc che sia credibile per un umano? Fino ad ora ho avuto risultati molto deludenti."*
+**Data:** 2026-08-27
+**Stato:** `in corso`
+**Desiderata FROZEN:** `.mw/desiderata.md` v9 (la geometria avversariale non deve essere per forza un goo — permesso, non mandato: il Director qui sceglie esplicitamente di perfezionare il goo, nessuna tensione); v6 (CSS/React-first, budget stretto).
+**Contesto fornito:** tre ricerche preliminari (Gemini + altre AI) su metaballs, blur+contrast, WebGL/SDF, liquid-gooey, fluidkit, Matter.js, con conclusione condivisa: CSS puro non basta, serve rendering per-pixel + pseudo-fisica viscosa + materiale speculare.
+**Cosa è successo:**
+- Ricerca a due binari: explorer multi-AI con cappello `ui_developer` (codex in usage-limit, cerebras 402; risposto groq/gpt-oss) + verifica web indipendente. Convergenza: WebGL SDF smooth-min + materiale tar (albedo quasi-nero, specular stretto, fresnel rim) + molle ad alto damping. Scoperte chiave: `ctx.filter` non esiste su Safari/WebKit (la ricetta blur+contrast in-canvas delle preliminari fallirebbe in Tauri); `interactive-metaballs` citato dalle AI non esiste.
+- Il Director ha scelto la **Direzione A** (WebGL shader) e il clone v6 → v6.2.
+- Creati: `tarGooConfig.ts` (Zod, config-first), `tarGooRenderer.ts` (WebGL2 raw — pixi scartato per init async vs factory sincrona), `destinyAstrolabeV62/` (engine clone con sim viscosa + fallback flat), kit `destinyAstrolabeV62Kit`, pagina `/minimal-destiny-astrolabe-v6-2` + route.
+- Safeguards passati (build:check, lint scope, test 4/4, kanban:lint); smoke test Puppeteer con WebGL2 (SwiftShader): tar mass organica renderizzata, zero errori console.
+- Evidence: `test-results/r-032-astrolabe-v62-tar-goo-2026-08-27.log`.
+**Cosa manca:** giudizio estetico del Director sul catrame live + eventuale tuning (tutto in `tarGooConfig.ts`); verifica su WebView Tauri reale.
