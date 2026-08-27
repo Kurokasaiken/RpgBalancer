@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import defaultBackgroundImage from '@/assets/ui/idleVillage/goblin-invasion-libro-background.jpg';
 import defaultGoblinImage from '@/assets/ui/idleVillage/goblin-invasion-transparent-no-sticker.png';
 import defaultGoblinImageWithBorder from '@/assets/ui/idleVillage/goblin-march-trasparente.png';
@@ -16,6 +16,8 @@ export interface GoblinInvasionWindowProps {
   goblinImage?: string;
   /** Goblin image with the sticker border. */
   goblinImageWithBorder?: string;
+  /** Frame prototype level: A structural, B material, C history. */
+  variant?: 'A' | 'B' | 'C';
 }
 
 const W = 520;
@@ -25,9 +27,11 @@ const INNER_W = W - RIM * 2;
 const INNER_H = H - RIM * 2;
 const RX = 24;
 
+const BUDGET = { dust: 16, ash: 6, ember: 2 };
+
 function useReducedMotion(): boolean {
-  const [reduced, setReduced] = React.useState(false);
-  React.useEffect(() => {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
     if (typeof window === 'undefined') return undefined;
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
     const update = () => setReduced(mq.matches);
@@ -42,7 +46,7 @@ function useReducedMotion(): boolean {
   return reduced;
 }
 
-type Depth = 'far' | 'mid' | 'front';
+type Kind = 'dust' | 'ash' | 'ember';
 
 interface Mote {
   x: number;
@@ -51,7 +55,42 @@ interface Mote {
   vx: number;
   vy: number;
   o: number;
-  depth: Depth;
+  kind: Kind;
+}
+
+function createMotes(w: number, h: number): Mote[] {
+  const out: Mote[] = [];
+  for (let i = 0; i < BUDGET.dust; i++) {
+    out.push({
+      x: Math.random() * w, y: Math.random() * h,
+      r: 1 + Math.random() * 0.6,
+      vx: (Math.random() - 0.5) * 0.06,
+      vy: (Math.random() - 0.5) * 0.04,
+      o: 0.12 + Math.random() * 0.08,
+      kind: 'dust',
+    });
+  }
+  for (let i = 0; i < BUDGET.ash; i++) {
+    out.push({
+      x: Math.random() * w, y: Math.random() * h,
+      r: 1.8 + Math.random() * 1.2,
+      vx: (Math.random() - 0.5) * 0.12,
+      vy: (Math.random() - 0.5) * 0.06,
+      o: 0.25 + Math.random() * 0.12,
+      kind: 'ash',
+    });
+  }
+  for (let i = 0; i < BUDGET.ember; i++) {
+    out.push({
+      x: Math.random() * w, y: Math.random() * h,
+      r: 2 + Math.random() * 1,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: -0.05 - Math.random() * 0.25,
+      o: 0.55 + Math.random() * 0.2,
+      kind: 'ember',
+    });
+  }
+  return out;
 }
 
 const DustCanvas: React.FC<{ mx: number; my: number; active: boolean }> = ({ mx, my, active }) => {
@@ -67,35 +106,25 @@ const DustCanvas: React.FC<{ mx: number; my: number; active: boolean }> = ({ mx,
     if (!ctx) return undefined;
 
     if (motesRef.current.length === 0) {
-      const depths: Depth[] = ['far', 'far', 'mid', 'mid', 'mid', 'front', 'front', 'front'];
-      motesRef.current = depths.map((depth) => ({
-        x: Math.random() * INNER_W,
-        y: Math.random() * INNER_H,
-        r: depth === 'far' ? 1 : depth === 'mid' ? 2 : 3,
-        vx: (Math.random() - 0.5) * 0.08,
-        vy: (Math.random() - 0.5) * 0.08,
-        o: depth === 'far' ? 0.12 : depth === 'mid' ? 0.25 : 0.42,
-        depth,
-      }));
+      motesRef.current = createMotes(INNER_W, INNER_H);
     }
 
     const loop = () => {
       ctx.clearRect(0, 0, INNER_W, INNER_H);
-      const t = Date.now() * 0.0006;
+      const t = Date.now() * 0.0005;
       for (const m of motesRef.current) {
-        m.x += m.vx;
-        m.y += m.vy;
-        if (m.x < 0) m.x += INNER_W;
-        if (m.x > INNER_W) m.x -= INNER_W;
-        if (m.y < 0) m.y += INNER_H;
-        if (m.y > INNER_H) m.y -= INNER_H;
-        const p = m.depth === 'far' ? 0.8 : m.depth === 'mid' ? 2.5 : 5;
-        const px = m.x + mx * p;
-        const py = m.y + my * p;
-        const flicker = 1 + Math.sin(t + m.x * 0.1) * 0.18;
+        m.x += m.vx + mx * (m.kind === 'dust' ? 0.2 : m.kind === 'ash' ? 0.5 : 1.2);
+        m.y += m.vy + my * (m.kind === 'dust' ? 0.05 : m.kind === 'ash' ? 0.1 : 0.25);
+        if (m.y < -8) m.y = INNER_H + 8;
+        if (m.y > INNER_H + 8) m.y = -8;
+        if (m.x < -8) m.x = INNER_W + 8;
+        if (m.x > INNER_W + 8) m.x = -8;
+        const flicker = 1 + Math.sin(t + m.x * 0.1 + m.y * 0.05) * 0.2;
         ctx.beginPath();
-        ctx.arc(px, py, m.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,245,200,${m.o * flicker})`;
+        ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2);
+        ctx.fillStyle = m.kind === 'ember'
+          ? `rgba(255,170,60,${m.o * flicker})`
+          : `rgba(210,195,160,${m.o * flicker})`;
         ctx.fill();
       }
       rafRef.current = requestAnimationFrame(loop);
@@ -130,7 +159,8 @@ const DustCanvas: React.FC<{ mx: number; my: number; active: boolean }> = ({ mx,
 /**
  * `GoblinInvasionWindow` — a 2.5D glass case for the Goblin Invasion event.
  *
- * React + CSS parallax, golden ray, Canvas dust, convex glass and a sticker peel.
+ * Material bronze frame, narrative golden light, three particle families,
+ * convex glass and a physical sticker reveal.
  */
 export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
   ariaLabel,
@@ -139,22 +169,22 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
   backgroundImage = defaultBackgroundImage,
   goblinImage: goblinNoSticker = defaultGoblinImage,
   goblinImageWithBorder: goblinWithSticker = defaultGoblinImageWithBorder,
+  variant = 'C',
 }) => {
-  const [peeled, setPeeled] = React.useState(false);
-  const [mx, setMx] = React.useState(0);
-  const [my, setMy] = React.useState(0);
+  const [peeled, setPeeled] = useState(false);
+  const [mx, setMx] = useState(0);
+  const [my, setMy] = useState(0);
   const reduced = useReducedMotion();
   const rootRef = useRef<HTMLDivElement>(null);
+  const uid = React.useId();
 
   const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     if (!rootRef.current) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
     const y = (e.clientY - rect.top) / rect.height;
-    const px = (x - 0.5) * 2;
-    const py = (y - 0.5) * 2;
-    setMx(px);
-    setMy(py);
+    setMx((x - 0.5) * 2);
+    setMy((y - 0.5) * 2);
   }, []);
 
   const handleLeave = useCallback(() => {
@@ -177,7 +207,6 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
         overflow: 'hidden',
         cursor: 'pointer',
         boxShadow: '0 22px 50px rgba(0,0,0,0.65), 0 10px 24px rgba(0,0,0,0.45)',
-        background: '#060f16',
         '--mx': mx,
         '--my': my,
         ...style,
@@ -186,39 +215,82 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
       aria-label={ariaLabel}
       aria-hidden={!ariaLabel}
     >
-      {/* Outer frame */}
+      {/* Material frame */}
+      <svg width={W} height={H} style={{ position: 'absolute', inset: 0, zIndex: 1 }} aria-hidden="true">
+        <defs>
+          <linearGradient id={`bronze-${uid}`} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#c9a45c" />
+            <stop offset="22%" stopColor="#8a5a20" />
+            <stop offset="55%" stopColor="#4a2810" />
+            <stop offset="85%" stopColor="#1f1208" />
+            <stop offset="100%" stopColor="#140a05" />
+          </linearGradient>
+          {variant !== 'A' && (
+            <filter id={`noise-${uid}`} x="0%" y="0%" width="100%" height="100%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.52" numOctaves={variant === 'C' ? 4 : 3} seed="7" result="n" />
+              <feColorMatrix in="n" type="matrix" values="0 0 0 0 .45  0 0 0 0 .35  0 0 0 0 .22  0 0 0 .15 0" result="c" />
+              <feBlend in="SourceGraphic" in2="c" mode="overlay" />
+            </filter>
+          )}
+          {variant !== 'A' && (
+            <linearGradient id={`patina-${uid}`} x1="0%" y1="100%" x2="0%" y2="0%">
+              <stop offset="0%" stopColor="#0b2a26" stopOpacity={0.55} />
+              <stop offset="55%" stopColor="#1a3d36" stopOpacity={0.2} />
+              <stop offset="100%" stopColor="transparent" />
+            </linearGradient>
+          )}
+        </defs>
+        <rect
+          x={0} y={0} width={W} height={H} rx={RX}
+          fill={`url(#bronze-${uid})`}
+          filter={variant !== 'A' ? `url(#noise-${uid})` : undefined}
+        />
+        {variant !== 'A' && (
+          <path d="M0 360 Q260 430 520 370 L520 420 L0 420 Z" fill={`url(#patina-${uid})`} style={{ mixBlendMode: 'multiply' }} />
+        )}
+        {variant === 'C' && (
+          <path d="M500 0 Q530 210 480 420 L520 420 L520 0 Z" fill="#0b2a26" opacity={0.25} style={{ mixBlendMode: 'multiply' }} />
+        )}
+        {variant !== 'A' && (
+          <>
+            <rect x={6} y={6} width={W - 12} height={H - 12} rx={RX - 6} fill="none" stroke="rgba(240,207,106,.2)" strokeWidth={1.5} />
+            <rect x={10} y={10} width={W - 20} height={H - 20} rx={RX - 10} fill="none" stroke="rgba(0,0,0,.5)" strokeWidth={2} />
+          </>
+        )}
+        {variant === 'C' && (
+          <>
+            <path d="M22 38 L34 41 L22 44 Z" fill="#0a0502" opacity={0.7} />
+            <path d="M498 78 L486 81 L498 84 Z" fill="#0a0502" opacity={0.6} />
+            <path d="M42 398 L54 395 L42 392 Z" fill="#0a0502" opacity={0.5} />
+            <path d="M470 60 Q500 120 490 180" stroke="#c9a45c" strokeWidth="1" strokeOpacity={0.25} fill="none" filter="blur(1px)" />
+            <path d="M60 390 Q120 396 180 382" stroke="#f0cf6a" strokeWidth="0.8" strokeOpacity={0.18} fill="none" filter="blur(1px)" />
+          </>
+        )}
+      </svg>
       <div
         style={{
           position: 'absolute',
           inset: 0,
           borderRadius: RX,
-          background: 'linear-gradient(135deg, #f0cf6a 0%, #dfb857 12%, #8a5a20 32%, #060f16 58%, #060f16 100%)',
-          boxShadow: 'inset 0 1px 1px rgba(255,255,255,.18), inset 0 -2px 6px rgba(0,0,0,.55)',
+          boxShadow: 'inset 0 1px 0 rgba(255,245,200,.28), inset 0 -4px 10px rgba(0,0,0,.55)',
+          zIndex: 2,
+          pointerEvents: 'none',
         }}
       />
       <div
         style={{
           position: 'absolute',
-          inset: 4,
-          borderRadius: RX - 4,
-          border: '1px solid rgba(240,207,106,.26)',
-          boxShadow: 'inset 0 0 5px rgba(240,207,106,.15)',
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          top: RIM - 5,
-          left: RIM - 5,
-          right: RIM - 5,
-          bottom: RIM - 5,
-          borderRadius: 22,
-          background: 'linear-gradient(135deg, rgba(240,207,106,.55), rgba(138,90,32,.35) 40%, rgba(6,15,22,.92) 80%)',
-          boxShadow: '0 0 0 1px rgba(0,0,0,.7), inset 0 0 4px rgba(0,0,0,.5)',
+          inset: 0,
+          borderRadius: RX,
+          border: '1px solid transparent',
+          borderTopColor: 'rgba(240,207,106,.4)',
+          borderLeftColor: 'rgba(240,207,106,.2)',
+          zIndex: 3,
+          pointerEvents: 'none',
         }}
       />
 
-      {/* Diorama: the inner world */}
+      {/* Diorama */}
       <div
         style={{
           position: 'absolute',
@@ -231,9 +303,9 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
           transform: reduced
             ? 'none'
             : `perspective(900px) rotateX(calc(var(--my) * -1deg)) rotateY(calc(var(--mx) * 1.5deg))`,
+          zIndex: 4,
         }}
       >
-        {/* Background layer — parallax slow */}
         <img
           src={backgroundImage}
           alt=""
@@ -250,20 +322,16 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
               : `translate3d(calc(var(--mx) * 2px), calc(var(--my) * 1px), 0)`,
           }}
         />
-
-        {/* Field stone recede */}
         <div
           style={{
             position: 'absolute',
             inset: 0,
-            background: 'radial-gradient(ellipse at 45% 40%, rgba(12,21,23,.0) 0%, rgba(6,15,22,.55) 65%, rgba(5,10,13,.85) 100%)',
+            background: 'radial-gradient(ellipse at 45% 40%, transparent 0%, rgba(6,15,22,.55) 65%, rgba(5,10,13,.85) 100%)',
             mixBlendMode: 'multiply',
           }}
         />
-
-        {/* Goblin group — parallax mid */}
         <img
-          src={goblinNoSticker}
+          src={goblinImage}
           alt=""
           style={{
             position: 'absolute',
@@ -276,7 +344,7 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
           }}
         />
         <img
-          src={goblinWithSticker}
+          src={goblinImageWithBorder}
           alt=""
           style={{
             position: 'absolute',
@@ -286,30 +354,32 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
             clipPath: peeled
               ? 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
               : 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)',
-            transition: reduced ? 'none' : 'clip-path 0.8s ease-in-out',
+            transition: reduced ? 'none' : 'clip-path 0.9s cubic-bezier(0.22, 1, 0.36, 1)',
             transform: reduced
               ? 'none'
               : `translate3d(calc(var(--mx) * 7px), calc(var(--my) * 4px), 0)`,
+            filter: peeled ? 'drop-shadow(8px 0 18px rgba(0,0,0,0.55))' : 'none',
           }}
         />
 
-        {/* Golden ray */}
+        {/* Golden light */}
         <div
           style={{
             position: 'absolute',
-            width: '35%',
-            height: '130%',
-            top: '-15%',
-            left: '52%',
-            background: 'linear-gradient(90deg, transparent, rgba(255,205,100,.12), rgba(255,225,150,.24), transparent)',
-            filter: 'blur(18px)',
+            top: '-20%',
+            left: '-10%',
+            width: '70%',
+            height: '140%',
+            background: 'linear-gradient(115deg, transparent 35%, rgba(255,205,100,.14) 45%, rgba(255,235,180,.24) 50%, transparent 60%)',
+            filter: 'blur(22px)',
+            mixBlendMode: 'screen',
+            opacity: 0.75,
+            animation: reduced ? 'none' : 'window-light-breathe 6s ease-in-out infinite',
             transform: reduced
               ? 'rotate(18deg)'
               : 'rotate(18deg) translateX(calc(var(--mx) * -8px))',
-            mixBlendMode: 'screen',
-            opacity: 0.75,
-            animation: reduced ? 'none' : 'window-light-breathe 7s ease-in-out infinite',
             pointerEvents: 'none',
+            zIndex: 6,
           }}
         />
 
@@ -318,22 +388,24 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
           style={{
             position: 'absolute',
             inset: 0,
-            background: 'radial-gradient(ellipse at 50% 45%, rgba(220,190,130,.08), transparent 65%)',
+            background: 'radial-gradient(ellipse at 50% 45%, rgba(220,190,130,.06), transparent 65%)',
             mixBlendMode: 'screen',
             pointerEvents: 'none',
+            zIndex: 6,
           }}
         />
 
-        {/* Dust motes via Canvas */}
+        {/* Dust motes */}
         <DustCanvas mx={mx} my={my} active={!reduced} />
 
-        {/* Glass layer */}
+        {/* Glass */}
         <div
           style={{
             position: 'absolute',
             inset: 0,
             borderRadius: 16,
             pointerEvents: 'none',
+            zIndex: 8,
             background: `
               linear-gradient(125deg, transparent 35%, rgba(255,255,255,.06) 45%, rgba(255,255,255,.14) 48%, transparent 56%),
               linear-gradient(-45deg, transparent 65%, rgba(255,255,255,.04) 95%)
@@ -342,7 +414,7 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
             boxShadow: `
               inset 0 1px 0 rgba(255,255,255,.35),
               inset 1px 0 0 rgba(255,255,255,.15),
-              inset 0 -2px 4px rgba(0,0,0,.35),
+              inset 0 -2px 6px rgba(0,0,0,.45),
               inset 0 0 18px rgba(180,210,255,.05)
             `,
           }}
@@ -365,6 +437,7 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
             borderRadius: 16,
             background: 'radial-gradient(ellipse at 50% 45%, transparent 40%, rgba(0,0,0,.45) 100%)',
             pointerEvents: 'none',
+            zIndex: 9,
           }}
         />
       </div>
