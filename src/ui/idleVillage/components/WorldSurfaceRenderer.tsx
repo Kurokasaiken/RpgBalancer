@@ -12,6 +12,7 @@ import type {
 } from '../config/worldSurfaceConfig';
 import { clampPan, clampZoom, viewportToWorld } from '../../../engine/world/model/WorldCoordinate';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
+import { trailerConfig } from '@/balancing/config/idleVillage/trailerConfig';
 
 const WorldSurfaceWaves = lazy(() => import('./WorldSurfaceWaves'));
 const WorldSurfaceClouds = lazy(() => import('./WorldSurfaceClouds'));
@@ -473,19 +474,22 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
     y: manifest.coordinateSystem.canvas.height / 2,
   }), [manifest.coordinateSystem.canvas.width, manifest.coordinateSystem.canvas.height]);
 
-  // Empirical center of the forest_1_top_left layer from a Puppeteer measurement
-  // of /assets/world/wanderlust/base/layers/Foresta%201%20Alto%20Sin.webp.
-  // Image: 3072x2049; visible forest bounding box center: (728, 810).
-  const FOREST_1_TOP_LEFT_NATURAL = { width: 3072, height: 2049, cx: 728, cy: 810 };
-
-  const fallTarget = useMemo(() => ({ x: 737, y: 859 }), []);
   const marchTarget = useMemo(() => {
     const canvas = manifest.coordinateSystem.canvas;
-    return {
-      x: Math.round((FOREST_1_TOP_LEFT_NATURAL.cx / FOREST_1_TOP_LEFT_NATURAL.width) * canvas.width),
-      y: Math.round((FOREST_1_TOP_LEFT_NATURAL.cy / FOREST_1_TOP_LEFT_NATURAL.height) * canvas.height),
-    };
-  }, [manifest.coordinateSystem.canvas.height, manifest.coordinateSystem.canvas.width]);
+    const camp = trailerConfig.threat.pois.find((p) => p.id === 'goblin-camp');
+    if (camp) {
+      return {
+        x: Math.round((camp.x / 100) * canvas.width),
+        y: Math.round((camp.y / 100) * canvas.height),
+      };
+    }
+    return { x: 737, y: 859 };
+  }, [manifest.coordinateSystem.canvas.height,manifest.coordinateSystem.canvas.width]);
+
+  const fallTarget = useMemo(
+    () => ({ x: marchTarget.x - 200, y: marchTarget.y }),
+    [marchTarget.x, marchTarget.y],
+  );
 
   return (
     <div
