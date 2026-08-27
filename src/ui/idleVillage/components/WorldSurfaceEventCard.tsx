@@ -46,7 +46,7 @@ const MARCH_DURATION_MS = trailerConfig.threat.goblin.marchDurationMs;
 const MARCH_DURATION_S = MARCH_DURATION_MS / 1000;
 const GOBLIN_WINDOW_W = 520;
 const GOBLIN_WINDOW_H = 420;
-const GOBLIN_MODAL_SCALE = 2.1;
+const GOBLIN_MODAL_SCALE = 1.5;
 
 /** Synthetic thud produced when the goblins hit the forest floor. */
 const playThud = () => {
@@ -81,7 +81,7 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
   const [stage, setStage] = useState<Stage>('idle');
   const [daysLeft] = useState<number>(DAYS_LEFT);
 
-  const goblinBase = useMemo(() => ({ x: 0, y: 0 }), []);
+  const goblinBase = useMemo(() => ({ x: 0, y: -300 }), []);
 
   const fallOffset = useMemo(
     () => ({ x: fallTarget.x - worldCenter.x, y: fallTarget.y - worldCenter.y }),
