@@ -3,7 +3,8 @@
  *
  * Uses the `MatericEventCard` primitive from the design system. After the
  * player confirms, the card shrinks and glides to the top-right of the world,
- * matching the shroud-to-sticker behavior of the previous event card.
+ * and the goblin with the sticker border falls from above the card and marches
+ * to the bottom-right, matching the original shroud event behavior.
  */
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -25,20 +26,41 @@ export interface WorldSurfaceEventCardProps {
   onClose?: () => void;
   /** World point at the centre of the map where the modal appears. */
   worldCenter: { x: number; y: number };
-  /** World canvas size (kept for compatibility with the renderer contract). */
+  /** World canvas size, used to place the final badge in the top-right. */
   canvasSize: { width: number; height: number };
-  /** Current world camera (kept for compatibility with the renderer contract). */
+  /** Current world camera, used to keep the goblin a constant screen size. */
   camera: { panX: number; panY: number; zoom: number };
-  /** World point where the goblins fall (kept for compatibility with the renderer contract). */
+  /** World point where the goblins fall (centre of forest_1_top_left). */
   fallTarget: { x: number; y: number };
-  /** World point the goblins slowly march toward (kept for compatibility with the renderer contract). */
+  /** World point the goblins slowly march toward after landing. */
   marchTarget: { x: number; y: number };
 }
 
-type Stage = 'idle' | 'modal' | 'reminder';
+type Stage = 'idle' | 'modal' | 'falling' | 'marching' | 'done';
 
 const DAYS_LEFT = Number(trailerConfig.threat.announcement.timerRing.number) || 5;
-const REMINDER_DURATION_MS = 200_500;
+const GOBLIN_IMAGE = trailerConfig.threat.goblinImage;
+const CARD_HEIGHT = 500;
+const CARD_SCALE = 3;
+
+/** Synthetic thud produced when the goblins hit the forest floor. */
+const playThud = () => {
+  const AudioContext =
+    (window as never as { AudioContext?: AudioContext; webkitAudioContext?: AudioContext }).AudioContext ||
+    (window as never as { AudioContext?: AudioContext; webkitAudioContext?: AudioContext }).webkitAudioContext;
+  if (!AudioContext) return;
+  const ctx = new AudioContext();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.frequency.setValueAtTime(120, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(35, ctx.currentTime + 0.12);
+  gain.gain.setValueAtTime(0.7, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start();
+  osc.stop(ctx.currentTime + 0.2);
+};
 
 export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
   visible,
@@ -47,10 +69,31 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
   onClose,
   worldCenter,
   canvasSize,
+  camera,
+  fallTarget,
+  marchTarget,
 }) => {
   const { t } = useTranslation('idleVillage');
   const [stage, setStage] = useState<Stage>('idle');
   const [daysLeft] = useState<number>(DAYS_LEFT);
+
+  const goblinSize = useMemo(() => Math.max(600, 400 / camera.zoom), [camera.zoom]);
+  const goblinHalf = useMemo(() => goblinSize / 2, [goblinSize]);
+
+  const goblinBase = useMemo(
+    () => ({ x: 0, y: -(CARD_HEIGHT * CARD_SCALE) / 2 - goblinHalf }),
+    [goblinHalf],
+  );
+
+  const fallOffset = useMemo(
+    () => ({ x: fallTarget.x - worldCenter.x, y: fallTarget.y - worldCenter.y }),
+    [fallTarget, worldCenter],
+  );
+
+  const marchOffset = useMemo(
+    () => ({ x: marchTarget.x - worldCenter.x, y: marchTarget.y - worldCenter.y }),
+    [marchTarget, worldCenter],
+  );
 
   const reminderOffset = useMemo(() => {
     const cellW = canvasSize.width / 3;
@@ -74,10 +117,23 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
   /* eslint-enable react-hooks/set-state-in-effect */
 
   useEffect(() => {
-    if (stage !== 'reminder') return undefined;
-    const timer = window.setTimeout(() => onClose?.(), REMINDER_DURATION_MS);
-    return () => window.clearTimeout(timer);
+    if (stage === 'falling') {
+      const timer = window.setTimeout(() => setStage('marching'), 1500);
+      return () => window.clearTimeout(timer);
+    }
+    if (stage === 'marching') {
+      const timer = window.setTimeout(() => {
+        setStage('done');
+        onClose?.();
+      }, 200500);
+      return () => window.clearTimeout(timer);
+    }
+    return undefined;
   }, [stage, onClose]);
+
+  const handleFallingComplete = useCallback(() => {
+    playThud();
+  }, []);
 
   const handleAction = useCallback(() => {
     if (stage !== 'modal') return;
@@ -89,14 +145,36 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
       metadata: {},
     });
     onComplete?.();
-    setStage('reminder');
+    setStage('falling');
   }, [daysLeft, onComplete, stage]);
 
   if (!visible) {
     return null;
   }
 
-  const isModal = stage === 'modal';
+  const isModal = stage === 'modal' || stage === 'falling';
+
+  const goblinAnimate =
+    stage === 'falling'
+      ? { x: fallOffset.x, y: fallOffset.y, rotate: [0, 0, 0, -12, 12, 0] }
+      : stage === 'marching'
+        ? { x: marchOffset.x, y: marchOffset.y, rotate: [0, -6, 6, 0] }
+        : { x: goblinBase.x, y: goblinBase.y, rotate: 0 };
+
+  const goblinTransition =
+    stage === 'falling'
+      ? {
+          x: { duration: 1.5, ease: 'easeIn' },
+          y: { duration: 1.5, ease: 'easeIn' },
+          rotate: { duration: 1.5, times: [0, 0.6, 0.8, 0.9, 0.95, 1] },
+        }
+      : stage === 'marching'
+        ? {
+            x: { duration: 200, ease: 'linear' },
+            y: { duration: 200, ease: 'linear' },
+            rotate: { duration: 0.6, times: [0, 0.25, 0.5, 1] },
+          }
+        : { duration: 0.4 };
 
   return (
     <div
@@ -146,6 +224,28 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
           }}
         />
       </motion.div>
+
+      <motion.img
+        initial={{ x: goblinBase.x, y: goblinBase.y }}
+        animate={goblinAnimate}
+        transition={goblinTransition}
+        onAnimationComplete={stage === 'falling' ? handleFallingComplete : undefined}
+        src={GOBLIN_IMAGE}
+        alt=""
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          width: goblinSize,
+          height: goblinSize,
+          marginLeft: -goblinHalf,
+          marginTop: -goblinHalf,
+          pointerEvents: 'none',
+          zIndex: 10,
+          filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.6))',
+        }}
+        aria-hidden="true"
+      />
     </div>
   );
 };
