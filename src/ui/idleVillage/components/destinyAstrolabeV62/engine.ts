@@ -249,6 +249,7 @@ const scene={
   t0:0,
   res:null, target:null,
   blackPillars:[], whitePillars:[],     // {ang,r,drop:0..1,flash,landed}
+  axisAlpha:1,
   starScale:0,
   pourP:0, streamAlpha:0,
   ball:{x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false},
@@ -321,7 +322,7 @@ function launchRoll(){
   /* recompute geometry, build obelisks, reset all scene state */
   recomputeGeometry();
   buildPillars();
-  scene.starScale=0; scene.pourP=0; scene.streamAlpha=0;
+  scene.starScale=0; scene.pourP=0; scene.streamAlpha=0; scene.axisAlpha=1;
   scene.gooReveal=0; scene.ringReveal=0;
   scene.ball={x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false};
   scene.warp=0;
@@ -340,7 +341,7 @@ function throwBall(){
   if(s==='idle'||s==='the-spin'||s==='magnetic-snap'||s==='resolution') return;
   armed=false; emitArmed(false);
   /* warp: snap any still-playing reveal so we never fire from an empty scene */
-  scene.gooReveal=1; scene.starScale=1; scene.pourP=1; scene.streamAlpha=0.34;
+  scene.gooReveal=1; scene.starScale=1; scene.pourP=1; scene.streamAlpha=0.34; scene.axisAlpha=1;
   scene.blackPillars.concat(scene.whitePillars).forEach(pl=>{ pl.drop=1; pl.landed=true; });
   if(s!=='action-trigger'){ scene.warp=1; scene.gooRipple=1; }   // visual warp flash when skipping
   setState('the-spin'); fireBall();
@@ -418,12 +419,16 @@ function tickTimeline(){
   }
   else if(s==='risk-pour'){
     const p=phaseT(cfg.tPour);
-    /* gli obelischi d'alabastro restano sullo schermo ~0.5s in piu',
-       poi si ritirano verso l'alto con un fade piu' lento. */
+    /* Dopo che la clip del fiore e' terminata, obelischi e scala scompaiono. */
     scene.whitePillars.forEach((pl,i)=>{
       const local=clamp((p-(i*0.05))/0.75,0,1);
       pl.drop=1-easeInCubic(local);
     });
+    scene.blackPillars.forEach((pl,i)=>{
+      const local=clamp((p-(i*0.05))/0.75,0,1);
+      pl.drop=1-easeInCubic(local);
+    });
+    scene.axisAlpha=1-easeInCubic(clamp(p/0.85,0,1));
     scene.pourP=easeOutCubic(p);
     scene.streamAlpha=0.5;
     if(p>=1){ scene.streamAlpha=0.34; setState('action-trigger'); }   // GATE: wait for TIRA
@@ -961,9 +966,10 @@ function drawChallengeSurface(now){
 const AXIS_TICKS=10;
 function drawAxisRig(now){
   const rev=scene.gooReveal;
-  if(rev<=0.001) return;
+  if(rev<=0.001 || scene.axisAlpha<=0.001) return;
   const rMax=rOf(100);
   ctx.save();
+  ctx.globalAlpha=clamp(scene.axisAlpha,0,1);
   for(let i=0;i<AXES;i+=1){
     const a=TIP(i);
     const ca=Math.cos(a), sa=Math.sin(a);
