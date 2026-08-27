@@ -106,6 +106,22 @@ MINIMAL_MODE=true  # Per landing temporanea
 
 ---
 
+### 3. Node Version
+
+The project uses **Node.js 22** (see `.nvmrc` and `vercel.json`):
+
+```json
+{
+  "build": {
+    "env": {
+      "NODE_VERSION": "22"
+    }
+  }
+}
+```
+
+This ensures the Vercel build runs the same Node major version used locally.
+
 ## Performance Attesa
 
 | Metric | Development | Production |

@@ -68,7 +68,7 @@ vercel env add NPM_CONFIG_PRODUCTION false
 
 **Crea/Aggiorna `.nvmrc`:**
 ```bash
-echo "20.19.6" > .nvmrc
+echo "22" > .nvmrc
 ```
 
 **Aggiungi `vercel.json` con Node version:**
@@ -76,17 +76,17 @@ echo "20.19.6" > .nvmrc
 {
   "version": 2,
   "framework": "vite",
-  "buildCommand": "npm run build",
+  "buildCommand": "npm run build:deploy",
   "outputDirectory": "dist",
   "installCommand": "npm ci",
   "functions": {
     "src/api/**/*.ts": {
-      "runtime": "nodejs20.x"
+      "runtime": "nodejs22.x"
     }
   },
   "build": {
     "env": {
-      "NODE_VERSION": "20.19.6"
+      "NODE_VERSION": "22"
     }
   }
 }
@@ -101,7 +101,7 @@ echo "20.19.6" > .nvmrc
   "framework": "vite",
   "outputDirectory": "dist",
   "installCommand": "npm ci",
-  "buildCommand": "source ~/.nvm/nvm.sh && nvm use && npm run build",
+  "buildCommand": "npm run build:deploy",
   "devCommand": "npm run dev"
 }
 ```
@@ -138,7 +138,7 @@ dist
 # 1. Pulisci e rebuild
 rm -rf dist node_modules package-lock.json
 npm install
-npm run build
+npm run build:deploy
 
 # 2. Test production build
 npm run preview
@@ -358,7 +358,7 @@ vercel domains ls
 
 ```bash
 # 1. Fix Node version
-echo "20.19.6" > .nvmrc
+echo "22" > .nvmrc
 
 # 2. Update vercel.json
 cat > vercel.json << 'EOF'
@@ -367,7 +367,7 @@ cat > vercel.json << 'EOF'
   "framework": "vite",
   "outputDirectory": "dist",
   "installCommand": "npm ci",
-  "buildCommand": "npm run build",
+  "buildCommand": "npm run build:deploy",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]
@@ -377,7 +377,7 @@ EOF
 # 3. Clean build
 rm -rf dist node_modules package-lock.json
 npm install
-npm run build
+npm run build:deploy
 
 # 4. Deploy
 vercel --prod
