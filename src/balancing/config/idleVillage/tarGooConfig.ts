@@ -81,7 +81,7 @@ const tarGooConfigSchema = z.object({
     specularIntensity: z.number().min(0).max(1),
     /** Blinn-Phong exponent — tight highlight = dense, viscous read. */
     specularExponent: z.number().min(4).max(256),
-    /** Teal fresnel rim, matches the board's azure light-leak. */
+    /** Dark crimson/blood fresnel rim — reads as a danger/corruption line. */
     fresnelColor: rgbSchema,
     /** Fresnel rim intensity at grazing angles. */
     fresnelIntensity: z.number().min(0).max(1),
@@ -151,10 +151,11 @@ export const tarGooConfig: TarGooConfig = tarGooConfigSchema.parse({
   material: {
     albedo: [0.012, 0.016, 0.034],
     albedoLit: [0.05, 0.07, 0.11],
-    specularColor: [1.0, 0.94, 0.82],
-    specularIntensity: 0.42,
+    specularColor: [0.55, 0.04, 0.02],
+    specularIntensity: 0.25,
     specularExponent: 64,
-    fresnelColor: [0.85, 1.0, 1.0],
+    /** Dark crimson/blood fresnel rim — the edge reads as a danger/corruption line. */
+    fresnelColor: [0.55, 0.0, 0.04],
     fresnelIntensity: 1.0,
     fresnelPower: 1.0,
     edgeHeightFalloff: 8,
