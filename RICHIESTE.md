@@ -822,3 +822,17 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 - La clip al muro del catrame resta; rimangono il contorno tratteggiato fuori dal goo e le linee bronzee sul bordo.
 - `build:check` e test 4/4 passati.
 **Cosa manca:** feedback del Director sulla leggibilità di scala e bronzo.
+
+---
+
+## R-042 — Obelischi bianchi visibili 0.5s in più
+
+**Richiesta:** *"gli obelischi bianchi devono rimanere 0,5 secondi in + presenti sullo schermo"*.
+**Data:** 2026-08-27
+**Stato:** `fatta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v6 (CSS/React-first, budget stretto).
+**Cosa è successo:**
+- `engine.ts`: `cfg.tPour` 220 → **720** ms.
+- La finestra di fade degli obelischi bianchi passata da `0.5` a `0.75` del `risk-pour`, così l'ultimo obelisco scompare a ~684ms (≈ 0.5s in più di presenza).
+- `build:check` e test 4/4 passati.
+**Cosa manca:** conferma visiva del Director.

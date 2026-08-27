@@ -45,7 +45,7 @@ export function createDestinyAstrolabeV62Engine(root: HTMLElement, opts: Astrola
    CONFIG — bound to the tweak panel
    ========================================================================= */
 /* config + skills injected by the React host */
-const cfg=Object.assign({stat:60,req:55,crit:5,wound:10,dead:5,tSlam:tarGooConfig.timing.seedMs,tBurst:1100,tPour:220,tSpin:2600,tSnap:650,mode:'random'}, opts.config||{});
+const cfg=Object.assign({stat:60,req:55,crit:5,wound:10,dead:5,tSlam:tarGooConfig.timing.seedMs,tBurst:1100,tPour:720,tSpin:2600,tSnap:650,mode:'random'}, opts.config||{});
 let skills=(opts.skills&&opts.skills.length)?opts.skills.slice():[{name:'Skill',stat:60,difficulty:50}];
 let skillAxes=[];
 function recomputeSkillAxes(){
@@ -418,9 +418,10 @@ function tickTimeline(){
   }
   else if(s==='risk-pour'){
     const p=phaseT(cfg.tPour);
-    /* gli obelischi d'alabastro spariscono (si ritirano verso l'alto) */
+    /* gli obelischi d'alabastro restano sullo schermo ~0.5s in piu',
+       poi si ritirano verso l'alto con un fade piu' lento. */
     scene.whitePillars.forEach((pl,i)=>{
-      const local=clamp((p-(i*0.05))/0.5,0,1);
+      const local=clamp((p-(i*0.05))/0.75,0,1);
       pl.drop=1-easeInCubic(local);
     });
     scene.pourP=easeOutCubic(p);
