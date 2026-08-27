@@ -1045,10 +1045,16 @@ function drawStar(now){
   face.addColorStop(0,'#ffffff'); face.addColorStop(.42,'#fdf8e9'); face.addColorStop(1,'#ecd49a');
   ctx.save();
   {
+    /* Il fiore nasce intero; il catrame lo clippa solo verso la fine della
+       sua espansione. La maschera morfa da un cerchio grande (nessun clip) alla
+       forma del muro del catrame. */
+    const clipReveal=smoothstep(0.6,1.0,s);
+    const rLarge=R*1.6;
     const ap=new Path2D();
     const SEG=200;
     for(let i=0;i<=SEG;i+=1){
-      const a=-Math.PI/2+i/SEG*TAU, r=rCheckAt(a,1);
+      const a=-Math.PI/2+i/SEG*TAU;
+      const r=rLarge*(1.0-clipReveal)+rCheckAt(a,1)*clipReveal;
       const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
       if(i===0) ap.moveTo(x,y); else ap.lineTo(x,y);
     }

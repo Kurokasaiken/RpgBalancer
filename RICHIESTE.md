@@ -836,3 +836,17 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 - La finestra di fade degli obelischi bianchi passata da `0.5` a `0.75` del `risk-pour`, così l'ultimo obelisco scompare a ~684ms (≈ 0.5s in più di presenza).
 - `build:check` e test 4/4 passati.
 **Cosa manca:** conferma visiva del Director.
+
+---
+
+## R-043 — Animazione di clip del fiore (non clippato alla nascita)
+
+**Richiesta:** *"il fiore nn deve nascere già clippato, deve essere una animazione che lo clippa (fa una ricerca online su che tipo d transizione possiamo fare)"*.
+**Data:** 2026-08-27
+**Stato:** `fatta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v6 (CSS/React-first, budget stretto).
+**Cosa è successo:**
+- Ricerca online: le transizioni più comuni per clip organiche sono il *radial wipe* e il *clock wipe*. Per il catrame la soluzione più adatta è una **morph clip** (la maschera morfa da un cerchio grande al bordo del goo) invece di un semplice on/off.
+- `drawStar` in `engine.ts`: la clip del fiore non è più immediata. `clipReveal = smoothstep(0.6, 1.0, s)` controlla la transizione: per `s < 0.6` il fiore è intero, poi la maschera si restringe dal cerchio esterno (`R*1.6`) fino al muro del catrame (`rCheckAt(a,1)`).
+- `build:check` e test 4/4 passati.
+**Cosa manca:** feedback del Director sui tempi e sull'aspetto della transizione.
