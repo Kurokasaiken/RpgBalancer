@@ -8,7 +8,7 @@
  */
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { MatericEventCard } from '@/ui/designSystem/primitives';
 import { GoblinInvasionWindow } from '@/ui/idleVillage/components/GoblinInvasionWindow';
@@ -199,31 +199,61 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
         }}
         style={{ position: 'relative' }}
       >
-        <MatericEventCard
-          variant="modal"
-          badge={String(t('world.goblinInvasion.invasion'))}
-          subtitle={String(t('world.goblinInvasion.subtitle', { count: daysLeft }))}
-          image={
-            <div style={{ width: 364, height: 294, overflow: 'hidden', margin: '0 auto' }}>
-              <GoblinInvasionWindow
-                ariaLabel={String(t('world.goblinInvasion.title'))}
-                peeled={stage !== 'modal'}
-                style={{ transform: 'scale(0.7)', transformOrigin: 'top left' }}
+        <AnimatePresence>
+          <motion.div
+            key={isModal ? 'modal' : 'reminder'}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            style={{ position: 'absolute', left: 0, top: 0 }}
+          >
+            {isModal ? (
+              <MatericEventCard
+                variant="modal"
+                badge={String(t('world.goblinInvasion.invasion'))}
+                subtitle={String(t('world.goblinInvasion.subtitle', { count: daysLeft }))}
+                image={
+                  <div style={{ width: 364, height: 294, overflow: 'hidden', margin: '0 auto' }}>
+                    <GoblinInvasionWindow
+                      ariaLabel={String(t('world.goblinInvasion.title'))}
+                      peeled={stage !== 'modal'}
+                      style={{ transform: 'scale(0.7)', transformOrigin: 'top left' }}
+                    />
+                  </div>
+                }
+                actionLabel={String(t('world.goblinInvasion.action'))}
+                onAction={handleAction}
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  transform: 'translate(-50%, -50%) scale(3)',
+                  maxWidth: 460,
+                  width: 460,
+                  minHeight: 500,
+                }}
               />
-            </div>
-          }
-          actionLabel={String(t('world.goblinInvasion.action'))}
-          onAction={handleAction}
-          style={{
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            transform: 'translate(-50%, -50%) scale(3)',
-            maxWidth: 460,
-            width: 460,
-            minHeight: 500,
-          }}
-        />
+            ) : (
+              <MatericEventCard
+                variant="reminder"
+                title={String(t('world.goblinInvasion.eventLabel'))}
+                imageUrl={GOBLIN_IMAGE}
+                imageAlt=""
+                daysLeftLabel={String(t('world.goblinInvasion.daysRemaining', { count: daysLeft }))}
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  transform: 'translate(-50%, -50%) scale(3)',
+                  maxWidth: 240,
+                  width: 240,
+                  minHeight: 160,
+                }}
+              />
+            )}
+          </motion.div>
+        </AnimatePresence>
       </motion.div>
 
       <motion.img
