@@ -1020,3 +1020,22 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 - Evidence log: `test-results/r-052-goo-rim-negative-2026-08-27.log`.
 - `build:check`, test 4/4 e `kanban:lint` passati.
 **Cosa manca:** conferma visiva del Director.
+
+---
+
+## R-053 — Flower/star morph più pulito
+
+**Richiesta:** *"quando i valori cambiano la forma del fiore deve diventare una stella, nn un fiore brutto"*.
+**Data:** 2026-08-27
+**Stato:** `fatta`
+**Cosa è successo:**
+- `engine.ts` `radialFromAxes`: aggiunta easing coseno (`(1-cos(f*π))/2`) al profilo radiale, così punte e valli sono arrotondate anziché segmenti lineari spezzati.
+- `tarGooConfig.ts`:
+  - `valleyFlower: 0.78` — fiore molto arrotondato quando il PG è sotto
+  - `valleyStar: 0.12` — stella appuntita quando il PG è pari/sopra
+- Verifica Puppeteer:
+  - `single 85/50`: punta della stella a `r≈164` brillante, già al pixel successivo (`r≈172`) il catrame scuro — forma affilata.
+  - `HARD 30/80`: piccola forma arrotondata che arriva a `r≈115`, poi corpo del catrame — morbido fiore a 5 petali.
+- Evidence log: `test-results/r-053-flower-to-star-morph-2026-08-27.log`.
+- `build:check`, test 4/4 e `kanban:lint` passati.
+**Cosa manca:** conferma visiva del Director.
