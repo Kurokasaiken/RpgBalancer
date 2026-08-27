@@ -12,6 +12,7 @@ import type {
 } from '../config/worldSurfaceConfig';
 import { clampPan, clampZoom, viewportToWorld } from '../../../engine/world/model/WorldCoordinate';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
+import { trailerConfig } from '@/balancing/config/idleVillage/trailerConfig';
 
 const WorldSurfaceWaves = lazy(() => import('./WorldSurfaceWaves'));
 const WorldSurfaceClouds = lazy(() => import('./WorldSurfaceClouds'));
@@ -474,7 +475,17 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
   }), [manifest.coordinateSystem.canvas.width, manifest.coordinateSystem.canvas.height]);
 
   const fallTarget = useMemo(() => ({ x: 737, y: 859 }), []);
-  const marchTarget = fallTarget;
+  const marchTarget = useMemo(() => {
+    const canvas = manifest.coordinateSystem.canvas;
+    const camp = trailerConfig.threat.pois.find((p) => p.id === 'goblin-camp');
+    if (camp) {
+      return {
+        x: (camp.x / 100) * canvas.width,
+        y: (camp.y / 100) * canvas.height,
+      };
+    }
+    return { x: 1498, y: 1140 };
+  }, [manifest.coordinateSystem.canvas.height, manifest.coordinateSystem.canvas.width]);
 
   return (
     <div
