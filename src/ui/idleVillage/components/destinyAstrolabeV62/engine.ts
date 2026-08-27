@@ -418,6 +418,11 @@ function tickTimeline(){
   }
   else if(s==='risk-pour'){
     const p=phaseT(cfg.tPour);
+    /* gli obelischi d'alabastro spariscono (si ritirano verso l'alto) */
+    scene.whitePillars.forEach((pl,i)=>{
+      const local=clamp((p-(i*0.05))/0.5,0,1);
+      pl.drop=1-easeInCubic(local);
+    });
     scene.pourP=easeOutCubic(p);
     scene.streamAlpha=0.5;
     if(p>=1){ scene.streamAlpha=0.34; setState('action-trigger'); }   // GATE: wait for TIRA
@@ -1024,32 +1029,38 @@ function drawStar(now){
   if(s<=0.01) return;
   const t=now/1000;
   const p=starPath(s);
-  /* ── LA STELLA È SOPRA IL GOO. INTERA, PIENA, MAI OSCURATA ─────────
-     La stella arriva agli obelischi bianchi (la stat), il goo ai neri (la
-     difficoltà). Se la stat sfonda la prova la stella ESCE dal goo, e va
-     disegnata così: una silhouette sola, cinque punte aguzze, niente clip e
-     niente velo.
-
-     Due tentativi sbagliati, per non riprovarli:
-     1. clip al muro — troncava le punte (smussate) e la forma si spezzava in
-        due oggetti diversi;
-     2. velo d'ombra oltre il muro — la stella sembrava finire SOTTO una
-        superficie scura, esattamente il contrario di "sopra".
-     L'errore comune era assumere che il denominatore della probabilità fosse
-     la stella. È il GOO: l'occhio misura quanto del blob avversario resta
-     scoperto (le cinque insenature nelle valli). L'eccedenza fuori dal goo sta
-     fuori dal confronto, quindi non falsa nulla e non va marcata.
-
-     Il verdetto resta comunque corretto senza toccare il disegno: inStar è
-     min(stella, muro) e la pallina è confinata dentro rCheckAt. */
+  /* V6.2: il fiore viene CLIPpato al muro del catrame come in V9.
+     La faccia piena cresce fino ai bordi del goo; ciò che eccede resta
+     solo contorno tratteggiato, così le punte non coprono board/confini. */
   ctx.save();
   /* V6: L0 halo rimosso — l'alone allargava il bordo della stella di ~40px,
      cioè sfocava esattamente il confine che porta la probabilità. */
-  /* L1 radiant white-gold ivory face with strong inner glow */
+  /* L1 radiant white-gold ivory face with strong inner glow —
+     clipped to the tar wall so only the in-arena part is filled. */
   const face=ctx.createRadialGradient(CX-30,CY-46,6,CX,CY,geo.rTip*s);
   face.addColorStop(0,'#ffffff'); face.addColorStop(.42,'#fdf8e9'); face.addColorStop(1,'#ecd49a');
+  ctx.save();
+  {
+    const ap=new Path2D();
+    const SEG=200;
+    for(let i=0;i<=SEG;i+=1){
+      const a=-Math.PI/2+i/SEG*TAU, r=rCheckAt(a,1);
+      const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
+      if(i===0) ap.moveTo(x,y); else ap.lineTo(x,y);
+    }
+    ap.closePath();
+    ctx.clip(ap);
+  }
   ctx.fillStyle=face;
-  ctx.fill(p);                              // V6: nessun shadowBlur sul corpo
+  ctx.fill(p);
+  ctx.restore();
+  /* fuori dall'arena: contorno tratteggiato luminoso */
+  ctx.save();
+  ctx.setLineDash([9,7]);
+  ctx.lineWidth=2.0;
+  ctx.strokeStyle='rgba(255,226,150,0.55)';
+  ctx.stroke(p);
+  ctx.restore();
   /* L2 rotating specular sheen */
   ctx.save(); ctx.clip(p);
   const ang=now/2600, sx=CX+Math.cos(ang)*240, sy=CY+Math.sin(ang)*240;
