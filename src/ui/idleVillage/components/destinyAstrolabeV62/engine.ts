@@ -743,6 +743,10 @@ function tickGooSim(now){
   gooSim.lastMs=now;
   const k=dt/16.7;                                   // frame-rate normalizer
   const rev=clamp(scene.gooReveal,0,1.0);
+  /* Idle simmer: a slow, gentle boil on the tar rim so it never looks frozen. */
+  if(scene.state==='idle' && rev>0.99){
+    scene.gooRipple=Math.max(scene.gooRipple, 0.12 + 0.06*Math.sin(now/900));
+  }
   const damp=Math.pow(simCfg.damping,k);
   /* Invasion front: a single tar wave that grows outward from the core.
      Each axis reaches its own final radius when the front passes it, so
@@ -980,15 +984,6 @@ function drawAxisRig(now){
       ctx.lineTo(px+sa*half,py-ca*half);
       ctx.stroke();
     }
-
-    /* cursore della difficoltà: la tacca che conta */
-    const dx=CX+ca*rDiff, dy=CY+sa*rDiff;
-    ctx.lineWidth=4;
-    ctx.strokeStyle=`rgba(255,120,140,${(0.95*rev).toFixed(3)})`;
-    ctx.beginPath();
-    ctx.moveTo(dx-sa*17,dy+ca*17);
-    ctx.lineTo(dx+sa*17,dy-ca*17);
-    ctx.stroke();
 
     /* cursore della stat: compare con la stella, caldo */
     if(rStat>geo.rCore){
