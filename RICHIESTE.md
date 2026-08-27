@@ -748,3 +748,31 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
   - `STAR_VALLEY_REACH` = 0.90 (la restringimento delle valli ora è più rapido)
 - `build:check` passato.
 **Cosa manca:** verifica visiva del Director sulla V16 a skill pari/superiori.
+
+---
+
+## R-037 — Idle boil sul bordo del catrame V6.2
+
+**Richiesta:** *"ad animazione idle il bordo del goo deve muoversi lentamente, tipo 'ribollire'"*.
+**Data:** 2026-08-27
+**Stato:** `fatta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v6 (CSS/React-first, budget stretto).
+**Cosa è successo:**
+- `tarGooConfig.ts`: aumentati `undulationAmp` (4.5), `undulationSpeed` (0.42), `dropletCount` (9), `dropletCrawlSpeed` ([0.04,0.12]), `dropletOvershoot` (16) per dare più vita al bordo in idle.
+- `engine.ts`: quando `scene.state === 'idle'` e il catrame è pieno, `gooRipple` viene tenuto a un andamento lento sinusoidale (`0.12 + 0.06*sin(now/900)`) così il bordo dello shader ha un sobbollimento continuo.
+- `build:check` e test 4/4 passati.
+**Cosa manca:** feedback del Director sull'intensità del ribollimento.
+
+---
+
+## R-038 — Rimozione linee rosse sul goo durante l'espansione
+
+**Richiesta:** *"il goo quando si espande sembra avere delle linee rosse, nn devono esserci"*.
+**Data:** 2026-08-27
+**Stato:** `fatta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v6 (CSS/React-first, budget stretto).
+**Cosa è successo:**
+- In `engine.ts` rimosso il cursore della difficoltà rosa/rosso da `drawAxisRig`. Erano le `rgba(255,120,140,...)` che durante `goo-expand` apparivano sopra il catrame, facendo sembrare che il goo avesse linee rosse.
+- Le tacche della scala restano (a seconda di `rDiff`), ma il cursore colorato non viene più disegnato.
+- `build:check` e test 4/4 passati.
+**Cosa manca:** conferma del Director che non ci siano più linee rosse.
