@@ -694,4 +694,7 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 - `tarGooConfig.ts`: aggiunto blocco `timing` (seedMs, pourMs, seedReveal) e sim più calma (damping 0.925, stiffness 0.024, maxSpeed 7, ondulazione 0.24).
 - `engine.ts`: `tSlam` e `GOO_MS` ora vengono da `tarGooConfig.timing`; `gooReveal` segue `tarPour(t)` (S-curve da seed a 1); `gooRipple` è un mild swell al centro della colata, non uno splash.
 - `build:check` passato, test 4/4 passati.
-**Cosa manca:** feedback del Director sul nuovo timing live.
+**Aggiornamento (feedback Director — troppo squadrato al centro):**
+- La massa iniziale partiva con i lobi a piena ampiezza, rendendola a stella/punteggiata. Modificata `gooBlob(theta, rev)` e `rCheckAt(theta, scale)` in `engine.ts` e l'ondulazione in `tarGooRenderer.ts` perché l'ampiezza dei lobi scala con `gooReveal`: inizia come un cerchio e solo mentre cola sviluppa i suoi bordi strani.
+- `build:check` e test 4/4 passati.
+**Cosa manca:** feedback del Director sul nuovo aspetto della nascita della colata.

@@ -107,7 +107,9 @@ float veins(vec2 p, float t){
 
 float field(vec2 p){
   float theta = atan(p.y, p.x);
-  float und = uUndAmp * (1.0 + 2.2 * uRipple)
+  /* Surface undulation grows with reveal: the tar starts as a smooth circle
+     and only gets its strange edges as it pours outward. */
+  float und = uUndAmp * (1.0 + 2.2 * uRipple) * clamp(uReveal, 0.0, 1.0)
     * ( sin(theta * 3.0 + uTime * uUndSpeed * TAU * 0.5)
       + 0.6 * sin(theta * 5.0 - uTime * uUndSpeed * TAU * 0.33 + 1.7) );
   float d = length(p) - (rimAt(theta) + und);
