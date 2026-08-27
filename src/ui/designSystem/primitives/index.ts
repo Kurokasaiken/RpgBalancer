@@ -2,8 +2,10 @@ export { MatericAmbientField, type MatericAmbientFieldProps } from './MatericAmb
 export { MatericBadge, type MatericBadgeProps } from './MatericBadge';
 export { MatericButton, type MatericButtonProps, type MatericButtonVariant } from './MatericButton';
 export { MatericCarvedBar, type MatericCarvedBarProps, type MatericBarEnergy, MATERIC_BAR_ENERGY } from './MatericCarvedBar';
+export { MatericCloudWall, type MatericCloudWallProps } from './MatericCloudWall';
 export { MatericCloseButton, type MatericCloseButtonProps } from './MatericCloseButton';
 export { MatericDivider, type MatericDividerProps } from './MatericDivider';
+export { MatericEventCard, type MatericEventCardProps } from './MatericEventCard';
 export { MatericField, type MatericFieldProps, type MatericFieldOrientation, type MatericFieldTier } from './MatericField';
 export { MatericFieldGroup, type MatericFieldGroupProps, type MatericGroupLayout, type MatericDensity } from './MatericFieldGroup';
 export { MatericFrame, type MatericFrameProps, type MatericFrameVariant } from './MatericFrame';
@@ -19,3 +21,7 @@ export { MatericRequirementList, type MatericRequirementListProps, type MatericR
 export { MatericSectionHeader, type MatericSectionHeaderProps } from './MatericSectionHeader';
 export { MatericStatBar, type MatericStatBarProps, type MatericStatBarVariant, type MatericStatBarSize } from './MatericStatBar';
 export { MatericSurface, type MatericSurfaceProps, type MatericShape, type MatericLayerConfig } from './MatericSurface';
+export { MatericThreatAura, type MatericThreatAuraProps } from './MatericThreatAura';
+export { StickerFrame, type StickerFrameProps } from './StickerFrame';
+export { TabWindow, type TabWindowProps, type TabItem } from './TabWindow';
+export { Window, type WindowProps } from './Window';

@@ -1,0 +1,826 @@
+<title>Bronzo e Luce</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Spectral:ital,wght@0,300;0,600;1,300&family=JetBrains+Mono:wght@400;600&display=swap">
+
+<style>
+/* Mondo visivo unico e dichiarato: il marker si giudica su fondo scuro, come
+   sulla mappa. Nessuno swap di tema — ogni colore è dipinto esplicitamente. */
+:root {
+  --ground:    #100e0a;
+  --panel:     #1a1712;
+  --panel-2:   #211d16;
+  --rule:      #3a3327;
+  --ink:       #ece3cd;
+  --ink-dim:   #a2947a;
+  --ink-faint: #6d634f;
+  --bronze:    #f0cf6a;
+  --bad:       #b8503f;
+  --good:      #7fa963;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: 'Spectral', Georgia, 'Times New Roman', serif;
+  font-weight: 300;
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 28px 120px; }
+
+/* ---------- Testata ---------- */
+
+.masthead {
+  padding: 84px 0 44px;
+  border-bottom: 1px solid var(--rule);
+  display: flex; flex-direction: column; gap: 22px;
+}
+.eyebrow {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--ink-faint);
+}
+h1 {
+  font-family: 'Cinzel', Georgia, serif;
+  font-weight: 700;
+  font-size: clamp(38px, 6.5vw, 66px);
+  line-height: 1.02; letter-spacing: 0.02em;
+  margin: 0; text-wrap: balance; color: var(--bronze);
+}
+.standfirst { max-width: 62ch; font-size: 20px; line-height: 1.55; margin: 0; }
+.standfirst em { color: var(--bronze); font-style: italic; }
+
+.correction {
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--bronze);
+  background: var(--panel);
+  padding: 18px 22px;
+  max-width: 74ch;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.correction p { margin: 0; font-size: 16px; }
+
+/* ---------- Sezioni ---------- */
+
+section { padding: 66px 0 0; }
+section + section { border-top: 1px solid var(--rule); margin-top: 66px; }
+
+.q { display: flex; flex-direction: column; gap: 10px; margin-bottom: 30px; }
+.q-quote {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 12px; line-height: 1.7; color: var(--ink-faint);
+  border-left: 2px solid var(--rule); padding-left: 14px;
+}
+h2 {
+  font-family: 'Cinzel', Georgia, serif; font-weight: 500;
+  font-size: clamp(25px, 3.4vw, 34px); line-height: 1.15; letter-spacing: 0.03em;
+  margin: 0; text-wrap: balance;
+}
+h3 {
+  font-family: 'Cinzel', Georgia, serif; font-weight: 500;
+  font-size: 19px; letter-spacing: 0.04em; margin: 0 0 14px; color: var(--ink);
+}
+p { max-width: 66ch; margin: 0; }
+.prose { display: flex; flex-direction: column; gap: 18px; margin-bottom: 34px; }
+
+strong { font-weight: 600; color: #fff5df; }
+code {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.86em; color: var(--bronze);
+  background: rgba(240,207,106,0.07); padding: 1px 5px; border-radius: 2px;
+}
+
+/* ---------- Diagnosi ---------- */
+
+.findings { display: flex; flex-direction: column; gap: 2px; background: var(--rule); border: 1px solid var(--rule); margin-bottom: 34px; }
+.finding {
+  background: var(--panel); padding: 20px 24px;
+  border-left: 3px solid var(--bad);
+  display: flex; flex-direction: column; gap: 9px;
+}
+.finding .eyebrow { color: var(--bad); }
+.finding p { max-width: 74ch; font-size: 16px; }
+
+/* ---------- Griglia provini ---------- */
+
+.specimens {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(228px, 1fr));
+  gap: 2px; background: var(--rule); border: 1px solid var(--rule);
+  margin-bottom: 30px;
+}
+.specimen {
+  background: var(--panel); padding: 22px 18px 20px;
+  display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center;
+}
+.specimen.on-map { background: var(--panel-2); }
+.stage {
+  width: 200px; height: 200px; display: grid; place-items: center; border-radius: 3px;
+  /* Imita la carta della mappa: il sigillo va giudicato lì, non sul nero. */
+  background:
+    radial-gradient(circle at 30% 26%, rgba(150,168,104,0.32), transparent 62%),
+    radial-gradient(circle at 74% 78%, rgba(122,104,68,0.36), transparent 58%),
+    #2b2b1e;
+}
+.stage svg { width: 190px; height: 190px; display: block; }
+.caption { display: flex; flex-direction: column; gap: 5px; }
+.caption .name {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase;
+}
+.caption .note { font-size: 14px; line-height: 1.45; color: var(--ink-dim); max-width: 32ch; }
+.tag {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+  padding: 2px 7px; border-radius: 2px; align-self: center;
+}
+.tag--now  { color: var(--bad);     border: 1px solid rgba(184,80,63,0.5);  background: rgba(184,80,63,0.10); }
+.tag--next { color: var(--good);    border: 1px solid rgba(127,169,99,0.5); background: rgba(127,169,99,0.10); }
+.tag--alt  { color: var(--ink-dim); border: 1px solid var(--rule); }
+
+/* ---------- Fonti ---------- */
+
+.sources, .open-list { display: flex; flex-direction: column; gap: 2px; background: var(--rule); border: 1px solid var(--rule); }
+.source {
+  background: var(--panel); padding: 18px 22px;
+  display: grid; grid-template-columns: minmax(140px, 190px) 1fr minmax(96px, auto);
+  gap: 8px 24px; align-items: baseline;
+}
+.source .s-name { font-family: 'Cinzel', Georgia, serif; font-size: 17px; }
+.source .s-name a { color: var(--bronze); text-decoration: none; border-bottom: 1px solid rgba(240,207,106,0.3); }
+.source .s-name a:hover, .source .s-name a:focus-visible { border-bottom-color: var(--bronze); }
+.source .s-what { font-size: 15px; color: var(--ink-dim); line-height: 1.5; max-width: 62ch; }
+.source .s-lic {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px; letter-spacing: 0.08em; color: var(--ink-faint); text-align: right;
+}
+@media (max-width: 700px) {
+  .source { grid-template-columns: 1fr; }
+  .source .s-lic { text-align: left; }
+}
+
+.open-item { background: var(--panel); padding: 20px 24px; display: flex; flex-direction: column; gap: 7px; }
+.open-item .oi-q { font-family: 'Cinzel', Georgia, serif; font-size: 17px; color: var(--ink); }
+.open-item .oi-a { font-size: 15px; color: var(--ink-dim); max-width: 74ch; line-height: 1.55; }
+
+a { color: var(--bronze); }
+:focus-visible { outline: 2px solid var(--bronze); outline-offset: 3px; }
+
+footer {
+  margin-top: 66px; padding-top: 28px; border-top: 1px solid var(--rule);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint);
+  display: flex; flex-wrap: wrap; gap: 8px 22px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+</style>
+
+<!-- Filtri del componente attuale, riprodotti verbatim per il confronto. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- Sfoca la SORGENTE: l'alone eredita il colore di ciò che sfoca.
+         Su lettere nere produce fuliggine, non luce. -->
+    <filter id="f-legacy" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="g1"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="g2"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="g3"/>
+      <feMerge>
+        <feMergeNode in="g1"/><feMergeNode in="g2"/><feMergeNode in="g3"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <!-- Il "glow sotto le scritte": in realtà allarga una banda quasi nera. -->
+    <filter id="f-back" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+</svg>
+
+<div class="wrap">
+
+<header class="masthead">
+  <div class="eyebrow">Studio visivo · POI marker materic V3</div>
+  <h1>Bronzo e Luce</h1>
+  <p class="standfirst">
+    Il marker oro non è "il tipo giusto": è l'unico in cui la materia e la luce
+    raccontano la stessa storia. E il cerchio magico non ha un glow debole —
+    ha <em>una banda nera al posto del glow</em>. Qui ci sono le tre cause
+    verificate nel codice, i provini vivi e le fonti per le icone.
+  </p>
+  <div class="correction">
+    <div class="eyebrow">Correzione</div>
+    <p>
+      La prima versione di questa pagina mockava la banda incisa <em>dentro</em>
+      il medaglione. Il soggetto è il <strong>cerchio magico esterno</strong> —
+      le due guide dorate con le cento lettere in mezzo. Tutti i provini di luce
+      e iscrizione qui sotto sono rifatti su quello, ai raggi reali del
+      componente: guide a 45 e 54, lettere a 47,5 e 51,5.
+    </p>
+  </div>
+</header>
+
+<!-- ==================== 1. IL GLOW DEL CERCHIO MAGICO ==================== -->
+<section>
+  <div class="q">
+    <div class="q-quote">"L'effetto del glow sotto le scritte del magic circle, nn sn abbastanza glow luminoso"<br>"Quel glow dovrebbe cambiare in base ai colori di base del componente, no?"</div>
+    <h2>Sotto le scritte non c'è un glow</h2>
+  </div>
+
+  <div class="findings">
+    <div class="finding">
+      <div class="eyebrow">Causa 1 · la banda sotto le lettere è nera per progetto</div>
+      <p>
+        Quello che leggi come "glow non abbastanza luminoso" è
+        <code>poiv3__track</code>: un anello di
+        <code>rgba(22,22,28,0.92)</code> spesso 11 unità, allargato da
+        <code>#f-back</code> con <code>stdDeviation="12"</code>. Il commento nel
+        codice lo dice: <em>dark backing track for light-surface contrast</em>.
+        Non è un alone smorto — è <strong>un binario d'ombra</strong>, messo lì
+        per staccare le lettere dalla carta chiara della mappa. Non diventerà
+        mai luminoso: è quasi nero per mandato.
+      </p>
+    </div>
+    <div class="finding">
+      <div class="eyebrow">Causa 2 · il filtro sporca invece di illuminare</div>
+      <p>
+        <code>.poiv3__seal</code> applica <code>#f-glow</code>, che fa
+        <code>feGaussianBlur in="SourceGraphic"</code>: sfoca <em>la
+        sorgente</em>, quindi l'alone eredita il colore di ciò che sfoca. Dentro
+        al gruppo ci sono le guide oro <strong>e cento lettere
+        <code>#000000</code></strong>: la sfocatura mescola una nuvola nera
+        nell'alone dorato e lo spegne. Alzare i raggi non lo salva, lo sporca.
+        In più <code>opacity: 0.85</code> sull'intero gruppo taglia in partenza
+        la luminosità.
+      </p>
+    </div>
+    <div class="finding">
+      <div class="eyebrow">Causa 3 · non può cambiare colore</div>
+      <p>
+        Le guide sono <code>#f0cf6a</code> letterale e il componente dichiara
+        <code>const accent = 'rgb(240, 207, 106)'</code>: anche
+        <code>--poi-accent-rgb</code>, che sembra parametrica, è quella
+        costante. Intanto <code>poiColorConfig</code> <strong>ha già</strong>
+        <code>coronaCore</code> e <code>coronaGlow</code> per ogni tipo, e V3
+        non li legge. Quindi sì, dovrebbe cambiare — e il dato è già lì, è il
+        cablaggio che manca.
+      </p>
+    </div>
+  </div>
+
+  <h3>Il confronto</h3>
+  <div class="specimens" id="sp-glow"></div>
+
+  <div class="prose">
+    <p>
+      La proposta fa tre cose insieme, e vanno insieme: il binario nero diventa
+      un'ombra sottile e stretta invece di una fascia larga sfocata; le lettere
+      passano da nere a luminose nella tinta del tipo; l'alone nasce da
+      <code>SourceAlpha</code> — la <em>forma</em>, non il colore — viene tinto
+      con <code>feColorMatrix</code> e sommato sotto la sorgente. Togliere una
+      sola delle tre non produce il risultato.
+    </p>
+  </div>
+
+  <h3>Lo stesso sigillo, tre tipi</h3>
+  <div class="specimens" id="sp-tint"></div>
+
+  <div class="prose">
+    <p>
+      <strong>Il vincolo che non va ignorato:</strong> il bloom costa, e in
+      mappa i marker sono decine. La ricerca è netta — catene oltre i quattro
+      primitivi affondano il rendering su mobile. La versione qui sta in
+      quattro (tre sfocature più il merge tinto), ma va misurata su una mappa
+      piena, non su tre provini. Se non regge, la via d'uscita è
+      pre-renderizzare l'alone come sprite: un'altra architettura, non una
+      regolazione.
+    </p>
+    <p>
+      <strong>E la critica più dura alla proposta:</strong> il binario nero
+      esisteva per un motivo vero. Su una porzione chiara di mappa — la sabbia
+      a destra, i campi gialli — lettere luminose senza contrasto dietro
+      rischiano di sparire. Il provino le mostra su fondo carta proprio per
+      questo. Se svaniscono, la risposta non è rimettere la fascia nera larga,
+      ma dare alle lettere un contorno scuro sottile e stretto, di un'unità:
+      contrasto locale invece di una fascia che uccide la luce.
+    </p>
+  </div>
+</section>
+
+<!-- ==================== 2. LE SCRITTE ==================== -->
+<section>
+  <div class="q">
+    <div class="q-quote">"Le scritte nere sul glow nn m fanno impazzire, cosa potrei usare?"</div>
+    <h2>Il nero puro è un buco, non un'incisione</h2>
+  </div>
+
+  <div class="prose">
+    <p>
+      È lo stesso principio che i pittori applicano alle ombre: il nero puro
+      desatura tutto ciò che tocca, e le ombre smettono di leggersi come volume
+      — diventano <em>buchi nella superficie</em>. La soluzione classica è il
+      <strong>chromatic dark</strong>: scurire restando nella tinta, o virando
+      verso il complementare, invece di spegnere col nero.
+    </p>
+    <p>
+      Sul cerchio magico ci sono tre risposte possibili, e non sono equivalenti.
+      La terza è l'unica che risolve <em>anche</em> il glow, perché smette di
+      mettere un'iscrizione nera dentro un gruppo che deve emettere luce.
+    </p>
+  </div>
+
+  <div class="specimens" id="sp-script"></div>
+
+  <div class="prose">
+    <p>
+      <strong>Perché non ti convinceva:</strong> il nero non era solo brutto,
+      era <em>incoerente</em>. Un'iscrizione nera dentro un anello che emette
+      luce afferma due cose opposte nello stesso millimetro — che i segni sono
+      cavi e che stanno bruciando. C decide: l'anello è cavo e scuro, la luce
+      esce dai segni. È anche la lettura più fedele alla desiderata v3, dove il
+      cerchio "si materializza carattere per carattere" e "si riempie di luce":
+      se le lettere sono nere, non è la luce a riempirlo.
+    </p>
+  </div>
+</section>
+
+<!-- ==================== 3. IL COLORE E IL METALLO ==================== -->
+<section>
+  <div class="q">
+    <div class="q-quote">"Lo sfondo interno di quei colori nn m fa impazzire"</div>
+    <h2>Il colore ha preso il posto del metallo</h2>
+  </div>
+
+  <div class="findings">
+    <div class="finding">
+      <div class="eyebrow">Diagnosi verificata nel codice</div>
+      <p>
+        <code>rimColors</code> non colora un dettaglio: alimenta
+        <code>g-b</code> (il corpo intero del medaglione) e <code>g-ri</code>
+        (l'anello interno). Il tipo quindi <strong>sostituisce la
+        materia</strong>. Il bronzo regge perché
+        <code>['#fce890','#c09030','#200e02']</code> è una vera rampa metallica
+        — speculare caldo, mid saturo, quasi-nero — e coincide con l'accent
+        della croce. Il teal <code>['#a0f5e8','#30c0b0','#0a2f2a']</code> ha un
+        mid che è <em>pigmento</em>: nessuna lucidatura lo farà sembrare fuso.
+      </p>
+    </div>
+  </div>
+
+  <div class="specimens" id="sp-color"></div>
+
+  <div class="prose">
+    <p>
+      <strong>Critica all'inlay (B):</strong> sposta il colore su una fascia più
+      stretta, quindi a dimensione mappa — 112 px, spesso scalati sotto — il
+      tipo diventa più difficile da riconoscere a colpo d'occhio. Se il colore
+      serve a distinguere una quest da una spedizione <em>da lontano</em>, B
+      indebolisce proprio la funzione che deve svolgere.
+    </p>
+    <p>
+      <strong>Critica alla lega propria (C):</strong> moltiplica le materie da
+      mantenere. Ogni tipo non è più una tupla in config ma una lega da
+      progettare — rampa di valori, patina, come invecchia. Resa più alta,
+      manutenzione peggiore. Da decidere sapendo quanti tipi esisteranno.
+    </p>
+  </div>
+</section>
+
+<!-- ==================== 4. LE ICONE ==================== -->
+<section>
+  <div class="q">
+    <div class="q-quote">"vorrei usare delle icone + belle, interessanti materiche e pesanti, dove posso trovarle?"</div>
+    <h2>Le icone materiche non si scaricano</h2>
+  </div>
+
+  <div class="prose">
+    <p>
+      Questa è la risposta scomoda: <strong>non esiste una libreria di icone
+      "materiche"</strong>, e cercarla è la ricerca sbagliata. La materia non è
+      nel file, è nel trattamento. Le librerie serie danno
+      <em>silhouette</em>: monocromatiche, piatte, fatte proprio per essere
+      ricolorate. Il peso lo aggiungi tu, una volta, con la stessa pipeline che
+      il medaglione già applica al resto.
+    </p>
+    <p>
+      Il provino qui sotto è la <em>stessa identica path</em>, prima e dopo:
+      rampa di valori, ombra portata per lo spessore, labbro speculare sul lato
+      illuminato. Nessun file nuovo.
+    </p>
+  </div>
+
+  <div class="specimens" id="sp-icon"></div>
+
+  <div class="sources">
+    <div class="source">
+      <div class="s-name"><a href="https://game-icons.net/">Game-icons.net</a></div>
+      <div class="s-what">
+        La fonte giusta per questo progetto. 4.180+ SVG di Lorc e Delapouite,
+        nati da una raccolta RPG su OpenGameArt: armi, sigilli, creature,
+        araldica. Stile monocromatico volutamente spesso — bianco su nero — cioè
+        esattamente la forma piena che il trattamento metallico richiede. Nuovi
+        simboli ogni settimana.
+      </div>
+      <div class="s-lic">CC BY 3.0<br>attribuzione</div>
+    </div>
+    <div class="source">
+      <div class="s-name"><a href="https://opengameart.org/">OpenGameArt</a></div>
+      <div class="s-what">
+        La radice da cui è nato game-icons. Utile quando serve qualcosa di più
+        irregolare e disegnato a mano, meno sistematico. Licenze miste: vanno
+        lette una per una.
+      </div>
+      <div class="s-lic">miste<br>verificare</div>
+    </div>
+    <div class="source">
+      <div class="s-name"><a href="https://craftpix.net/categorys/free-icons-for-games/">CraftPix</a></div>
+      <div class="s-what">
+        Set già dipinti e pesanti, materia inclusa. Comodi come
+        <em>riferimento</em> per capire dove va la luce; scomodi come asset,
+        perché portano una direzione artistica loro che combatte con la tua e
+        non si ricolorano per tipo.
+      </div>
+      <div class="s-lic">free + premium<br>vincoli d'uso</div>
+    </div>
+  </div>
+
+  <div class="prose" style="margin-top:30px">
+    <p>
+      <strong>Su cosa hai già:</strong> la croce attuale non è un'icona presa
+      altrove, è <code>CROSS_ARM</code> ripetuta per rotazione — quattro bracci
+      uguali. È il motivo per cui regge: ha una logica araldica. Prima di
+      sostituirla con un catalogo, la domanda vera è se il problema sia l'icona
+      o il fatto che <em>tutti i tipi condividono la stessa</em>.
+    </p>
+  </div>
+</section>
+
+<!-- ==================== 5. APERTO ==================== -->
+<section>
+  <div class="q">
+    <div class="eyebrow">Cosa non ho deciso al posto tuo</div>
+    <h2>Resta aperto</h2>
+  </div>
+
+  <div class="open-list">
+    <div class="open-item">
+      <div class="oi-q">Il binario scuro va tolto o solo stretto?</div>
+      <div class="oi-a">
+        Serviva a un problema reale: leggibilità sulle porzioni chiare della
+        mappa. I provini lo mostrano stretto, non assente. Se le lettere
+        svaniscono sulla sabbia, la risposta è contrasto locale — un contorno di
+        un'unità — non il ritorno della fascia larga.
+      </div>
+    </div>
+    <div class="open-item">
+      <div class="oi-q">Il colore serve a riconoscere il tipo, o a dare atmosfera?</div>
+      <div class="oi-a">
+        È la domanda che decide fra inlay e lega propria. Se deve farti
+        riconoscere una quest senza cliccare, l'inlay è troppo timido. Se serve
+        a dare temperatura alla mappa, basta e costa poco.
+      </div>
+    </div>
+    <div class="open-item">
+      <div class="oi-q">Il bloom regge su una mappa piena?</div>
+      <div class="oi-a">
+        Da misurare, non da assumere. Decine di marker, un filtro ciascuno.
+      </div>
+    </div>
+    <div class="open-item">
+      <div class="oi-q">Nessuno di questi provini è codice di progetto</div>
+      <div class="oi-a">
+        Sono mock costruiti per questa pagina ai raggi reali del componente.
+        <code>PoiMatericV3.tsx</code> non è stato toccato. Le guide del sigillo
+        sono disegnate come due cerchi continui invece di duecento segmenti
+        adiacenti: al 100% di progresso i segmenti combaciano, quindi il
+        risultato è identico e il DOM molto più leggero.
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>Studio visivo</span>
+  <span>Nessun file di progetto modificato</span>
+  <span>Provini ai raggi reali · 45 / 47,5 / 51,5 / 54</span>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* Vocabolario ripreso dal componente, così i provini mentono il meno
+     possibile su come apparirà davvero. */
+  var LETTERS = [
+    'M -1.2,-5 L -1.2,5 M -1.2,-1.8 Q 2,-2.8 2,-0.5 Q 2,1.5 -1.2,0.8',
+    'M -1.5,-5 L -1.5,5 M -1.5,-2.2 Q 1.5,-2.2 1.5,0.2 Q 1.5,2 -0.8,2.8',
+    'M -3,-5 L -3,5 M 3,-5 L 3,5 M -3,-3 Q 0,-5.2 3,-3',
+    'M 0,-2.2 A 2 2 0 1 1 0 1.8 A 2 2 0 1 1 0 -2.2 M -1.6,0.6 Q -2.2,2.8 -2.8,4.5 M 1.6,0.6 Q 2.2,2.8 2.8,4.5',
+    'M -2.8,-4.5 Q -0.8,-1.5 1.2,-2.5 Q 3.2,-3.5 2.8,-0.5 Q 2.4,2.5 -1.2,2.5 Q -3.2,2.5 -2.8,4.5',
+    'M -0.5,2 L -0.5,5 M 0,-2 A 2.2 2.2 0 1 1 -0.1 -2 M -0.5,1.6 Q -2,0.5 -2,-1.5',
+    'M -3,-4.5 L 3,-4.5 M 0,-4.5 L 0,5 M 0,0 Q 2,0.5 2,2.5',
+    'M -3,-4 L 3,-4 Q 3.6,0 0,2 Q -3.6,4 -3,0.5 Q -2.6,-2.5 0,-2.5',
+    'M -3,-5 Q 0,-1 3,-5 M -3,0 Q 0,3 3,0 M -3,0 L 3,0',
+    'M -3,-5 Q 0,-2 3,0 Q 0,2 -3,5',
+    'M -2.5,-5 L 2.5,5 M 2.5,-5 L -2.5,5',
+    'M -2.2,-1.5 L 2.2,-1.5 Q 2.2,3.5 0,3.5 Q -2.2,3.5 -2.2,-1.5'
+  ];
+
+  var CROSS_ARM = 'M-3 -5 L-3 -17 L-6.4 -21 L-3.4 -22.2 L0 -18.4 L3.4 -22.2 L6.4 -21 L3 -17 L3 -5 Z';
+
+  /* Geometria reale del componente. */
+  var C = 43;
+  var R_OUTER_RAIL = 54, R_INNER_RAIL = 45;
+  var R_UPPER = 51.5, R_LOWER = 47.5;
+  var R_TRACK = (R_OUTER_RAIL + R_INNER_RAIL) / 2;   // 49.5
+  var LETTER_COUNT = 100;
+
+  /* Rampa metallica canonica: la struttura di valori che fa leggere "fuso". */
+  var BRONZE = ['#fce890', '#c09030', '#200e02'];
+
+  var uid = 0;
+  function id(p) { return p + '-' + (++uid); }
+
+  function hexToRgb(h) {
+    var n = parseInt(h.slice(1), 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+
+  /* Bloom vero: l'alone nasce da SourceAlpha (la FORMA), viene tinto e sommato
+     sotto la sorgente. Non eredita il colore di ciò che sfoca. */
+  function bloomFilter(fid, hex, strength) {
+    var c = hexToRgb(hex);
+    var r = (c[0] / 255).toFixed(3), g = (c[1] / 255).toFixed(3), b = (c[2] / 255).toFixed(3);
+    return '<filter id="' + fid + '" x="-120%" y="-120%" width="340%" height="340%" color-interpolation-filters="sRGB">' +
+      '<feGaussianBlur in="SourceAlpha" stdDeviation="0.5" result="b1"/>' +
+      '<feGaussianBlur in="SourceAlpha" stdDeviation="1.6" result="b2"/>' +
+      '<feGaussianBlur in="SourceAlpha" stdDeviation="4.2" result="b3"/>' +
+      '<feMerge result="halo"><feMergeNode in="b3"/><feMergeNode in="b2"/><feMergeNode in="b1"/></feMerge>' +
+      '<feColorMatrix in="halo" type="matrix" result="tint" values="' +
+        '0 0 0 0 ' + r + ' 0 0 0 0 ' + g + ' 0 0 0 0 ' + b + ' 0 0 0 ' + strength + ' 0"/>' +
+      '<feMerge><feMergeNode in="tint"/><feMergeNode in="SourceGraphic"/></feMerge>' +
+    '</filter>';
+  }
+
+  /* Una banda di lettere del cerchio magico. */
+  function letterBand(radius, offsetHalfStep, stroke, lip, width) {
+    var step = 360 / LETTER_COUNT;
+    var s = '';
+    for (var i = 0; i < LETTER_COUNT; i++) {
+      var a = -90 - (i + (offsetHalfStep ? 0.5 : 0)) * step;
+      var rad = a * Math.PI / 180;
+      var x = (C + radius * Math.cos(rad)).toFixed(2);
+      var y = (C + radius * Math.sin(rad)).toFixed(2);
+      var d = LETTERS[i % LETTERS.length];
+      s += '<g transform="translate(' + x + ' ' + y + ') rotate(' + a.toFixed(1) + ')"><g transform="scale(0.28)">';
+      if (lip) {
+        s += '<path d="' + d + '" fill="none" stroke="' + lip + '" stroke-opacity="0.34" stroke-width="' + width + '" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" transform="translate(1.4 1.7)"/>';
+      }
+      s += '<path d="' + d + '" fill="none" stroke="' + stroke + '" stroke-width="' + width + '" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>';
+      s += '</g></g>';
+    }
+    return s;
+  }
+
+  /* Il marker completo: medaglione + cerchio magico. */
+  function marker(o) {
+    var ring    = o.ring || BRONZE;
+    var accent  = o.accent || '#f0cf6a';
+    var inlay   = o.inlay || null;
+    var crossFx = o.cross || 'flat';
+
+    var sealOn  = o.seal !== false;
+    var track   = o.track   || 'dark';       // dark | thin | none
+    var script  = o.script  || 'black';      // black | chromatic | luminous
+    var glow    = o.glow    || 'legacy';     // legacy | bloom | none
+    var glowCol = o.glowColor || accent;
+    var railCol = o.railColor || accent;
+    var rimScript = o.rimScript || 'chromatic';
+
+    var gb = id('gb'), bev = id('bev'), gri = id('gri'), gf = id('gf'),
+        gl = id('gl'), gin = id('gin'), bl = id('bl'), cid = id('cx');
+
+    var s = '<svg viewBox="-20 -20 126 126" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="' + (o.alt || 'provino') + '">';
+    s += '<defs>';
+
+    s += '<linearGradient id="' + gb + '" x1="14%" y1="4%" x2="86%" y2="96%">' +
+         '<stop offset="0%" stop-color="' + ring[0] + '"/><stop offset="6%" stop-color="' + ring[0] + '"/>' +
+         '<stop offset="22%" stop-color="' + ring[1] + '"/><stop offset="72%" stop-color="' + ring[1] + '"/>' +
+         '<stop offset="90%" stop-color="' + ring[2] + '"/><stop offset="100%" stop-color="' + ring[2] + '"/></linearGradient>';
+    s += '<linearGradient id="' + bev + '" x1="0%" y1="0%" x2="100%" y2="100%">' +
+         '<stop offset="0%" stop-color="' + ring[0] + '" stop-opacity="0.34"/>' +
+         '<stop offset="30%" stop-color="' + ring[0] + '" stop-opacity="0.07"/>' +
+         '<stop offset="100%" stop-color="' + ring[2] + '" stop-opacity="0.78"/></linearGradient>';
+    s += '<linearGradient id="' + gri + '" x1="12%" y1="8%" x2="88%" y2="92%">' +
+         '<stop offset="0%" stop-color="' + ring[0] + '"/><stop offset="24%" stop-color="' + ring[1] + '"/>' +
+         '<stop offset="78%" stop-color="' + ring[1] + '"/><stop offset="100%" stop-color="' + ring[2] + '"/></linearGradient>';
+    if (inlay) {
+      s += '<radialGradient id="' + gin + '" cx="34%" cy="26%" r="82%">' +
+           '<stop offset="0%" stop-color="' + inlay + '" stop-opacity="0.95"/>' +
+           '<stop offset="55%" stop-color="' + inlay + '" stop-opacity="0.62"/>' +
+           '<stop offset="100%" stop-color="#04090c" stop-opacity="0.92"/></radialGradient>';
+    }
+    s += '<radialGradient id="' + gf + '" cx="38%" cy="30%" r="78%">' +
+         '<stop offset="0%" stop-color="#12202a"/><stop offset="100%" stop-color="#04080c"/></radialGradient>';
+    s += '<radialGradient id="' + gl + '" cx="30%" cy="22%" r="70%">' +
+         '<stop offset="0%" stop-color="#ffffff" stop-opacity="0.26"/>' +
+         '<stop offset="45%" stop-color="#ffffff" stop-opacity="0.05"/>' +
+         '<stop offset="100%" stop-color="#000000" stop-opacity="0.30"/></radialGradient>';
+    if (glow === 'bloom') s += bloomFilter(bl, glowCol, o.glowStrength || 0.55);
+    if (crossFx === 'metal') {
+      s += '<linearGradient id="' + cid + '" x1="18%" y1="0%" x2="82%" y2="100%">' +
+           '<stop offset="0%" stop-color="#fff3c4"/><stop offset="38%" stop-color="' + accent + '"/>' +
+           '<stop offset="72%" stop-color="#9a6c1e"/><stop offset="100%" stop-color="#4a2f08"/></linearGradient>';
+    }
+    s += '</defs>';
+
+    /* ---------- CERCHIO MAGICO (sotto il medaglione, come nel componente) ---------- */
+    if (sealOn) {
+      // Il binario. 'dark' riproduce l'attuale: fascia quasi nera, allargata.
+      if (track === 'dark') {
+        s += '<circle cx="' + C + '" cy="' + C + '" r="' + R_TRACK + '" fill="none" ' +
+             'stroke="rgba(22,22,28,0.92)" stroke-width="11" filter="url(#f-back)" opacity="0.98"/>';
+      } else if (track === 'thin') {
+        s += '<circle cx="' + C + '" cy="' + C + '" r="' + R_TRACK + '" fill="none" ' +
+             'stroke="rgba(10,12,16,0.72)" stroke-width="4.5"/>';
+      }
+
+      var lStroke, lLip = null, lw = 1;
+      if (script === 'black') {
+        lStroke = '#000000';
+      } else if (script === 'chromatic') {
+        lStroke = o.darkInk || '#2a1a04';
+        lLip = '#ffe9a8';
+      } else {
+        lStroke = o.letterColor || glowCol;
+        lw = 0.95;
+      }
+
+      var fx = '';
+      if (glow === 'legacy') fx = ' filter="url(#f-legacy)"';
+      if (glow === 'bloom')  fx = ' filter="url(#' + bl + ')"';
+      var op = glow === 'legacy' ? ' opacity="0.85"' : '';
+
+      s += '<g' + fx + op + '>';
+      // Guide: due cerchi continui — al 100% i segmenti del componente combaciano.
+      s += '<circle cx="' + C + '" cy="' + C + '" r="' + R_OUTER_RAIL + '" fill="none" stroke="' + railCol + '" stroke-opacity="0.78" stroke-width="2.4" vector-effect="non-scaling-stroke"/>';
+      s += '<circle cx="' + C + '" cy="' + C + '" r="' + R_INNER_RAIL + '" fill="none" stroke="' + railCol + '" stroke-opacity="0.78" stroke-width="2.4" vector-effect="non-scaling-stroke"/>';
+      s += letterBand(R_UPPER, false, lStroke, lLip, lw);
+      s += letterBand(R_LOWER, true,  lStroke, lLip, lw);
+      s += '</g>';
+
+      /* Passaggio di nucleo: un bloom vero è alone PIÙ nucleo nitido. Senza
+         questo l'alone annega l'iscrizione e resta una ciambella di colore. */
+      if (glow === 'bloom') {
+        var core = o.coreColor || (script === 'luminous' ? '#fffbe8' : lStroke);
+        s += '<g>';
+        s += '<circle cx="' + C + '" cy="' + C + '" r="' + R_OUTER_RAIL + '" fill="none" stroke="' + railCol + '" stroke-width="1.5" vector-effect="non-scaling-stroke"/>';
+        s += '<circle cx="' + C + '" cy="' + C + '" r="' + R_INNER_RAIL + '" fill="none" stroke="' + railCol + '" stroke-width="1.5" vector-effect="non-scaling-stroke"/>';
+        s += letterBand(R_UPPER, false, core, null, 0.85);
+        s += letterBand(R_LOWER, true,  core, null, 0.85);
+        s += '</g>';
+      }
+    }
+
+    /* ---------- MEDAGLIONE ---------- */
+    s += '<circle cx="' + C + '" cy="' + C + '" r="42" fill="#060f16"/>';
+    s += '<circle cx="' + C + '" cy="' + C + '" r="42" fill="url(#' + gb + ')" opacity="0.92"/>';
+    s += '<circle cx="' + C + '" cy="' + C + '" r="42" fill="url(#' + bev + ')" opacity="0.5"/>';
+    s += '<circle cx="' + C + '" cy="' + C + '" r="41" fill="none" stroke="' + ring[0] + '" stroke-opacity="0.62" stroke-width="0.9" stroke-dasharray="76 178" stroke-dashoffset="82" stroke-linecap="round"/>';
+
+    if (inlay) {
+      s += '<circle cx="' + C + '" cy="' + C + '" r="38.5" fill="none" stroke="url(#' + gin + ')" stroke-width="9"/>';
+      s += '<circle cx="' + C + '" cy="' + C + '" r="34" fill="none" stroke="rgba(0,0,0,0.5)" stroke-width="1.2"/>';
+    }
+
+    s += '<circle cx="' + C + '" cy="' + C + '" r="34" fill="#060f16"/>';
+    s += '<circle cx="' + C + '" cy="' + C + '" r="34" fill="url(#' + gri + ')" opacity="0.68"/>';
+    s += '<circle cx="' + C + '" cy="' + C + '" r="34" fill="none" stroke="rgba(0,0,0,.75)" stroke-width="2.2" transform="translate(.3,.35)"/>';
+    s += '<circle cx="' + C + '" cy="' + C + '" r="30.5" fill="url(#' + gf + ')"/>';
+
+    // Banda incisa del medaglione (24 glifi), tenuta costante nei confronti sul sigillo.
+    var rimStroke = rimScript === 'black' ? 'rgba(4,9,13,.9)' : (ring[2] || '#200e02');
+    var rimLip = rimScript === 'black' ? null : ring[0];
+    for (var i = 0; i < 24; i++) {
+      var a = -90 + i * 15;
+      var rad = a * Math.PI / 180;
+      var x = (C + 38 * Math.cos(rad)).toFixed(2);
+      var y = (C + 38 * Math.sin(rad)).toFixed(2);
+      var d = LETTERS[i % LETTERS.length];
+      s += '<g transform="translate(' + x + ' ' + y + ') rotate(' + a + ')"><g transform="scale(0.66)">';
+      if (rimLip) s += '<path d="' + d + '" fill="none" stroke="' + rimLip + '" stroke-opacity="0.28" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" transform="translate(0.5 0.6)"/>';
+      s += '<path d="' + d + '" fill="none" stroke="' + rimStroke + '" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>';
+      s += '</g></g>';
+    }
+
+    // Croce
+    var cfill = crossFx === 'metal' ? 'url(#' + cid + ')' : accent;
+    s += '<g transform="translate(' + C + ' ' + C + ') scale(0.9)">';
+    if (crossFx === 'metal') {
+      s += '<g transform="translate(0.7 0.9)" opacity="0.55">';
+      [0, 90, 180, 270].forEach(function (r) { s += '<path d="' + CROSS_ARM + '" fill="#000" transform="rotate(' + r + ')"/>'; });
+      s += '<circle r="4" fill="#000"/></g>';
+    }
+    [0, 90, 180, 270].forEach(function (r) { s += '<path d="' + CROSS_ARM + '" fill="' + cfill + '" transform="rotate(' + r + ')"/>'; });
+    s += '<circle r="4" fill="' + cfill + '"/>';
+    if (crossFx === 'metal') {
+      s += '<g opacity="0.85">';
+      [0, 90, 180, 270].forEach(function (r) {
+        s += '<path d="' + CROSS_ARM + '" fill="none" stroke="#fff8d8" stroke-opacity="0.5" stroke-width="0.5" transform="rotate(' + r + ') translate(-0.35 -0.45)"/>';
+      });
+      s += '</g>';
+    }
+    s += '</g>';
+
+    // Vetro
+    s += '<circle cx="' + C + '" cy="' + C + '" r="27.5" fill="none" stroke="rgba(0,0,0,.6)" stroke-width="1.8" transform="translate(.28,.35)"/>';
+    s += '<circle cx="' + C + '" cy="' + C + '" r="27.5" fill="url(#' + gl + ')"/>';
+    s += '<ellipse cx="31" cy="23" rx="11" ry="4.6" fill="rgba(255,255,255,0.20)"/>';
+
+    s += '</svg>';
+    return s;
+  }
+
+  function render(host, items) {
+    var el = document.getElementById(host);
+    if (!el) return;
+    el.innerHTML = items.map(function (it) {
+      return '<div class="specimen' + (it.map ? ' on-map' : '') + '">' +
+        '<div class="stage">' + marker(it.opts) + '</div>' +
+        '<span class="tag tag--' + it.tag + '">' + it.tagLabel + '</span>' +
+        '<div class="caption"><div class="name">' + it.name + '</div>' +
+        '<div class="note">' + it.note + '</div></div></div>';
+    }).join('');
+  }
+
+  var TEAL = ['#a0f5e8', '#30c0b0', '#0a2f2a'];
+
+  /* --- 1. il glow del cerchio magico --- */
+  render('sp-glow', [
+    { tag: 'now', tagLabel: 'oggi', name: 'binario nero + f-glow',
+      note: 'Fascia quasi nera larga 11 sotto le lettere, filtro che sfoca la sorgente, gruppo a opacity 0.85.',
+      opts: { track: 'dark', script: 'black', glow: 'legacy', cross: 'flat', rimScript: 'black', alt: 'sigillo attuale' } },
+    { tag: 'next', tagLabel: 'proposta', name: 'binario stretto + bloom',
+      note: 'Ombra sottile invece della fascia, lettere luminose, alone da SourceAlpha tinto e sommato.',
+      opts: { track: 'thin', script: 'luminous', glow: 'bloom', glowColor: '#ffd873', glowStrength: 0.55, cross: 'metal', alt: 'sigillo con bloom' } }
+  ]);
+
+  render('sp-tint', [
+    { map: true, tag: 'next', tagLabel: 'wilderness', name: 'coronaCore 210·138·28',
+      note: 'La luce del sigillo viene dal tipo, non da una costante.',
+      opts: { track: 'thin', script: 'luminous', glow: 'bloom', glowColor: '#f5c24a', railColor: '#f0cf6a', glowStrength: 0.55, cross: 'metal', alt: 'sigillo oro' } },
+    { map: true, tag: 'next', tagLabel: 'quest', name: 'coronaCore 45·195·180',
+      note: 'Stessa lega, stessa incisione. Cambia solo la luce.',
+      opts: { track: 'thin', script: 'luminous', glow: 'bloom', glowColor: '#35c8b6', railColor: '#7fe6da', glowStrength: 0.55, inlay: '#1fa596', cross: 'metal', alt: 'sigillo teal' } },
+    { map: true, tag: 'next', tagLabel: 'empire', name: 'coronaCore 180·40·40',
+      note: 'La config ha già questi valori per ogni tipo: nessuno li legge.',
+      opts: { track: 'thin', script: 'luminous', glow: 'bloom', glowColor: '#e8604a', railColor: '#f2a184', glowStrength: 0.55, inlay: '#a8321f', cross: 'metal', alt: 'sigillo ember' } }
+  ]);
+
+  /* --- 2. le scritte del sigillo --- */
+  render('sp-script', [
+    { map: true, tag: 'now', tagLabel: 'oggi', name: 'A · nero puro',
+      note: 'Cento lettere #000000 dentro un gruppo che dovrebbe emettere luce. Buchi, non solchi.',
+      opts: { track: 'thin', script: 'black', glow: 'bloom', glowColor: '#ffd873', glowStrength: 0.5, cross: 'metal', alt: 'lettere nere' } },
+    { map: true, tag: 'next', tagLabel: 'proposta', name: 'B · chromatic dark',
+      note: 'Bruno caldo al fondo del valore, più un labbro di luce sul bordo illuminato. È un solco.',
+      opts: { track: 'thin', script: 'chromatic', glow: 'bloom', glowColor: '#ffd873', glowStrength: 0.5, cross: 'metal', alt: 'lettere incise' } },
+    { map: true, tag: 'next', tagLabel: 'proposta', name: 'C · inversione',
+      note: 'Anello cavo e scuro, segni luminosi. Le lettere non combattono l\'alone: lo generano.',
+      opts: { track: 'thin', script: 'luminous', glow: 'bloom', glowColor: '#ffd873', glowStrength: 0.62, cross: 'metal', alt: 'lettere luminose' } }
+  ]);
+
+  /* --- 3. dove vive il colore --- */
+  render('sp-color', [
+    { tag: 'now', tagLabel: 'oggi', name: 'A · metallo ridipinto',
+      note: 'rimColors sostituisce la lega. Il mid è pigmento: legge come plastica, e la croce d\'oro stona.',
+      opts: { ring: TEAL, script: 'black', glow: 'legacy', track: 'dark', cross: 'flat', rimScript: 'black', alt: 'marker teal attuale' } },
+    { tag: 'next', tagLabel: 'proposta', name: 'B · smalto in cornice',
+      note: 'Bronzo invariante, colore confinato a una fascia di smalto vetroso. Il tipo entra, la materia resta.',
+      opts: { ring: BRONZE, inlay: '#1fa596', script: 'luminous', glow: 'bloom', glowColor: '#35c8b6', railColor: '#7fe6da', glowStrength: 0.5, track: 'thin', cross: 'metal', alt: 'marker con smalto teal' } },
+    { tag: 'alt', tagLabel: 'alternativa', name: 'C · lega propria',
+      note: 'Non bronzo dipinto di verde: bronzo ossidato. Stessa struttura di valori, patina diversa.',
+      opts: { ring: ['#d8f0e0', '#4e8f78', '#0d221c'], script: 'luminous', glow: 'bloom', glowColor: '#35c8b6', railColor: '#9fe8d8', glowStrength: 0.5, track: 'thin', cross: 'metal', alt: 'marker verderame' } }
+  ]);
+
+  /* --- 4. le icone --- */
+  render('sp-icon', [
+    { tag: 'now', tagLabel: 'silhouette', name: 'la path, nuda',
+      note: 'È così che arriva da qualunque libreria: piatta, monocroma, senza peso. Non è un difetto.',
+      opts: { seal: false, cross: 'flat', alt: 'icona piatta' } },
+    { tag: 'next', tagLabel: 'trattata', name: 'la stessa path, fusa',
+      note: 'Rampa di valori, ombra portata per lo spessore, labbro speculare. Nessun file nuovo.',
+      opts: { seal: false, cross: 'metal', alt: 'icona metallica' } }
+  ]);
+})();
+</script>

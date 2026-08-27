@@ -24,8 +24,11 @@ import {
   MatericTitleSep,
   MatericEventCard,
   MatericCloudWall,
+  MatericThreatAura,
+  StickerFrame,
 } from '@/ui/designSystem/primitives';
 import { Slot } from '@/ui/idleVillage/components/Slot';
+import { GoblinInvasionWindow } from '@/ui/idleVillage/components/GoblinInvasionWindow';
 import DayNightPoiSkin from '@/ui/idleVillage/components/minimal/DayNightPoiSkin';
 import { WanderlustMedalOverlay } from '@/ui/idleVillage/components/WanderlustMedalOverlay';
 import ThreatStatusIndicator from '@/ui/idleVillage/components/ThreatStatusIndicator';
@@ -47,8 +50,8 @@ type TabId =
   | 'glass'
   | 'threat'
   | 'skin'
-  | 'cloud'
-  | 'event';
+  | 'event'
+  | 'window';
 
 const FIELD_BACKGROUND = [
   'radial-gradient(circle at 50% -10%, rgba(0,229,255,0.13) 0%, rgba(0,150,255,0.03) 50%, transparent 80%)',
@@ -68,8 +71,8 @@ const TABS: { id: TabId; label: string }[] = [
   { id: 'medallion', label: 'Medallion' },
   { id: 'threat', label: 'Threat' },
   { id: 'skin', label: 'Skin' },
-  { id: 'cloud', label: 'Cloud' },
   { id: 'event', label: 'Event' },
+  { id: 'window', label: 'Window' },
 ];
 
 /** A compact demo panel that keeps the tab viewport above the fold. */
@@ -379,48 +382,79 @@ function SkinTab(): JSX.Element {
 }
 
 function EventTab(): JSX.Element {
+  const [show, setShow] = useState(true);
+  const [parallax, setParallax] = useState({ x: 0, y: 0 });
+  const mockedDays = 5;
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const x = Math.max(-1, Math.min(1, (e.clientX - cx) / (rect.width / 2)));
+    const y = Math.max(-1, Math.min(1, (e.clientY - cy) / (rect.height / 2)));
+    setParallax({ x, y });
+  };
+
+  const handleMouseLeave = () => setParallax({ x: 0, y: 0 });
+
   return (
     <DemoPanel>
-      <MatericHeading title="Event Card" subtitle="MatericEventCard — centered icon with CTA" />
-      <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-        <MatericEventCard
-          title="Goblin Invasion"
-          subtitle="5 days remain"
-          badge="Invasion"
-          imageUrl="/goblin-march-trasparente.png"
-          imageAlt="Goblin"
-          actionLabel="Scout the frontier"
-          onAction={() => {}}
-        />
-        <MatericEventCard
-          variant="reminder"
-          title="Goblin Invasion"
-          imageUrl="/goblin-march-trasparente.png"
-          imageAlt="Goblin"
-          daysLeftLabel="3 days left"
-        />
+      <MatericHeading title="Event" subtitle="MatericEventCard on MatericCloudWall with goblin sticker" />
+      <button
+        type="button"
+        onClick={() => setShow(s => !s)}
+        style={{ marginBottom: 16, padding: '8px 16px' }}
+      >
+        {show ? 'Hide Event' : 'Show Event'}
+      </button>
+      <div
+        style={{ position: 'relative', width: 500, height: 500 }}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+      >
+        <MatericCloudWall size={500} rimLight={false} style={{ top: 0, left: 0, zIndex: 1 }} />
+        {show && (
+          <MatericEventCard
+            badge="Invasion"
+            subtitle={`${mockedDays} days`}
+            style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 2, minHeight: 420, width: 450 }}
+          >
+            <MatericButton variant="utility" onClick={() => {}} style={{ marginTop: 260 }}>Prepare</MatericButton>
+          </MatericEventCard>
+        )}
+        <MatericThreatAura
+          size={300}
+          parallax={parallax}
+          style={{
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            zIndex: 3,
+          }}
+        >
+          <StickerFrame
+            imageSrc="/goblin-march-trasparente.png"
+            imageAlt="Goblin sticker"
+            width={300}
+            height={300}
+            drawDuration={2}
+          />
+        </MatericThreatAura>
       </div>
     </DemoPanel>
   );
 }
 
-function CloudTab(): JSX.Element {
+function WindowTab(): JSX.Element {
   return (
     <DemoPanel>
-      <MatericHeading title="Cloud Wall" subtitle="MatericCloudWall — square cloud stage" />
-      <div style={{ position: 'relative', width: 460, height: 460 }}>
-        <MatericCloudWall size={460} style={{ top: 0, left: 0 }} />
-        <MatericEventCard
-          clouds={false}
-          title="Goblin Invasion"
-          subtitle="5 days remain"
-          badge="Invasion"
-          imageUrl="/goblin-march-trasparente.png"
-          imageAlt="Goblin"
-          actionLabel="Scout the frontier"
-          onAction={() => {}}
-          style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
-        />
+      <MatericHeading title="Window" subtitle="Goblin Invasion glass case with sticker peel" />
+      <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+          <GoblinInvasionWindow ariaLabel="Goblin Invasion" />
+          <span style={{ fontSize: 10, color: 'var(--skin-body-color)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Goblin Invasion Window</span>
+        </div>
       </div>
     </DemoPanel>
   );
@@ -439,12 +473,12 @@ const TAB_CONTENT: Record<TabId, () => JSX.Element> = {
   medallion: MedallionTab,
   threat: ThreatTab,
   skin: SkinTab,
-  cloud: CloudTab,
   event: EventTab,
+  window: WindowTab,
 };
 
 export default function PrimitivesPage(): JSX.Element {
-  const [tab, setTab] = useState<TabId>('all');
+  const [tab, setTab] = useState<TabId>(TABS[TABS.length - 1].id);
   const TabComponent = TAB_CONTENT[tab];
 
   return (
