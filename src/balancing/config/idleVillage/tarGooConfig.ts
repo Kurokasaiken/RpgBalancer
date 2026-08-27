@@ -170,8 +170,10 @@ export const tarGooConfig: TarGooConfig = tarGooConfigSchema.parse({
     leakEdge: 'rgba(0,0,0,0)',
   },
   star: {
-    valleyFlower: 0.65,
-    valleyStar: 0.15,
+    /** Very rounded when the player is below the check — reads as a 5-petal flower. */
+    valleyFlower: 0.78,
+    /** Very sharp when the player matches/exceeds the check — a true star. */
+    valleyStar: 0.12,
     transitionR: 0.25,
   },
 });

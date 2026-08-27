@@ -175,12 +175,13 @@ function radialFromAxes(theta,arr,scale){
   const k=Math.floor(t/seg), f=(t-k*seg)/seg;
   const tipR=i=>arr[((i%AXES)+AXES)%AXES]*scale;      // radius at star point i
   const vF=(geo.valleyF===undefined?0.3675:geo.valleyF);   // profondità delle valli
+  const ease=(1-Math.cos(f*Math.PI))/2;               // rounded petals / sharp tips
   if(k%2===0){                                        // tip → valley
     const a=tipR(k/2), b=Math.min(tipR(k/2),tipR(k/2+1))*vF;
-    return a+(b-a)*f;
+    return a+(b-a)*ease;
   } else {                                            // valley → tip
     const b=tipR((k+1)/2), a=Math.min(tipR((k-1)/2),tipR((k+1)/2))*vF;
-    return a+(b-a)*f;
+    return a+(b-a)*ease;
   }
 }
 /* star radius (success boundary) — per-axis flower, reaches the white obelisk (stat) */
