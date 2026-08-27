@@ -447,7 +447,7 @@ function EventTab(): JSX.Element {
                   position: 'absolute',
                   left: 0,
                   top: 0,
-                  transform: 'translate(-50%, -50%)',
+                  transform: 'translate(-50%, -50%) scale(3)',
                   zIndex: 2,
                   maxWidth: 460,
                   width: 460,
