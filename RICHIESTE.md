@@ -730,3 +730,21 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 - `risk-pour` in `engine.ts`: gli obelischi bianchi (alabastro) si ritirano/ritraggono (`pl.drop` da 1 a 0) non appena finisce l'espansione della stella.
 - `build:check` e test 4/4 passati.
 **Cosa manca:** feedback del Director sul nuovo aspetto.
+
+---
+
+## R-036 — V16: fiore -> stella in base a skill vs difficoltà
+
+**Richiesta:** *"guarda http://localhost:5173/minimal-destiny-astrolabe-v16 quando le skill del giocatore sono pari o speriori a quelle richieste dallo skill check la forma del fiore deve aver valli + strette e diventare via via + vicina ad una stella vera e propria (invece che petali di un fiore)"*.
+**Data:** 2026-08-27
+**Stato:** `fatta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v6 (CSS/React-first, budget stretto).
+**Cosa è successo:**
+- Modificati i parametri di transizione fiore/stella in `src/ui/skillCheckWebV1/coverage.ts`:
+  - `FLOWER_UNTIL` 1.08 → 0.85 (la stella inizia ad apparire già intorno alla parità)
+  - `STAR_FROM` 1.55 → 1.30 (stella pura raggiunta prima)
+  - `STAR_VALLEY_WIDE` 0.40 → 0.30 (valli della stella già più strette)
+  - `STAR_VALLEY_SLIM` 0.22 → 0.15 (valli affilate a stat molto superiori)
+  - `STAR_VALLEY_REACH` = 0.90 (la restringimento delle valli ora è più rapido)
+- `build:check` passato.
+**Cosa manca:** verifica visiva del Director sulla V16 a skill pari/superiori.
