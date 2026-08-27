@@ -94,6 +94,14 @@ const tarGooConfigSchema = z.object({
     /** Light direction (unit-ish vec3, z up toward viewer). Top-left to match backdrop. */
     lightDir: z.tuple([z.number(), z.number(), z.number()]),
   }),
+  /** Astral board backdrop — must contrast with the near-black tar. */
+  backdrop: z.object({
+    inner: z.string(),
+    outer: z.string(),
+    leakCore: z.string(),
+    leakMid: z.string(),
+    leakEdge: z.string(),
+  }),
 });
 
 /** Inferred tar goo config type. */
@@ -142,5 +150,12 @@ export const tarGooConfig: TarGooConfig = tarGooConfigSchema.parse({
     edgeHeightFalloff: 22,
     swirlIntensity: 0.22,
     lightDir: [-0.55, -0.62, 0.56],
+  },
+  backdrop: {
+    inner: 'rgba(80,160,155,1)',
+    outer: 'rgba(38,105,102,1)',
+    leakCore: 'rgba(0,229,255,.50)',
+    leakMid: 'rgba(0,229,255,.22)',
+    leakEdge: 'rgba(0,0,0,0)',
   },
 });
