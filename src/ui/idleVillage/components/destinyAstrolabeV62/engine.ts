@@ -143,9 +143,11 @@ function recomputeGeometry(skillIndex=0){
   {
     const SEG=360, dA=TAU/SEG;
     let starA=0, arenaA=0;
+    geo.tarRMax=0;
     for(let i=0;i<SEG;i+=1){
       const a=-Math.PI/2+i*dA;
       const w=rCheckAt(a,1);
+      geo.tarRMax=Math.max(geo.tarRMax,w);
       const r=Math.min(Math.max(rStarAt(a),geo.rCore),w);
       starA+=0.5*r*r*dA; arenaA+=0.5*w*w*dA;
     }
@@ -703,21 +705,27 @@ function tickGooSim(now){
   const k=dt/16.7;                                   // frame-rate normalizer
   const rev=clamp(scene.gooReveal,0,1.0);
   const damp=Math.pow(simCfg.damping,k);
+  /* Invasion front: a single tar wave that grows outward from the core.
+     Each axis reaches its own final radius when the front passes it, so
+     short arms fill first and the long arms keep pushing — like real tar. */
+  const front=rev<=0.001?0:rev*geo.tarRMax;
   for(let i=0;i<gooSim.N;i+=1){
     const theta=i/gooSim.N*TAU;
-    const target=rev<=0.001?0:rCheckAt(theta,rev);
+    const rFinal=rev<=0.001?0:rCheckAt(theta,1);
+    const target=Math.min(rFinal,front);
     let vel=(gooSim.v[i]+(target-gooSim.r[i])*simCfg.stiffness*k)*damp;
     const vMax=simCfg.maxSpeed*k*(1+2*(scene.gooRipple||0));
     if(vel>vMax)vel=vMax; else if(vel<-vMax)vel=-vMax;
     gooSim.v[i]=vel;
     gooSim.r[i]=Math.max(0,gooSim.r[i]+vel*k);
   }
-  /* droplets crawl slowly along the rim, bulging in and out of it */
+  /* droplets crawl along the actual rim of the current axis, not a uniform one */
   const t=now/1000;
   for(let i=0;i<gooSim.drops.length;i+=1){
     const d=gooSim.drops[i];
     d.ang+=d.w*dt/1000;
-    const rim=rev<=0.001?0:rCheckAt(d.ang,rev);
+    const idx=Math.round((d.ang/TAU)*gooSim.N)%gooSim.N;
+    const rim=rev<=0.001?0:gooSim.r[idx];
     const bulge=Math.sin(t*0.3+d.ph)*simCfg.dropletOvershoot;
     const rad=Math.max(geo.rCore*0.6,rim-d.rr*0.8+bulge);
     gooSim.blobs[i*3]=CX+Math.cos(d.ang)*rad;

@@ -697,4 +697,7 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 **Aggiornamento (feedback Director — troppo squadrato al centro):**
 - La massa iniziale partiva con i lobi a piena ampiezza, rendendola a stella/punteggiata. Modificata `gooBlob(theta, rev)` e `rCheckAt(theta, scale)` in `engine.ts` e l'ondulazione in `tarGooRenderer.ts` perché l'ampiezza dei lobi scala con `gooReveal`: inizia come un cerchio e solo mentre cola sviluppa i suoi bordi strani.
 - `build:check` e test 4/4 passati.
-**Cosa manca:** feedback del Director sul nuovo aspetto della nascita della colata.
+**Aggiornamento (flusso asimmetrico per asse):**
+- La colata ora non è più una semplice scala radiale uniforme: un singolo `front` d'invasione cresce da 0 a `geo.tarRMax`; ogni asse raggiunge il proprio `rCheckAt(theta, 1)` quando il front lo supera. Gli assi corti si riempiono prima, i lunghi continuano, dando la sensazione che la colata "spinga" a velocità diverse a seconda della distanza.
+- `tickGooSim` campiona `min(rFinal, front)` per ogni sample; le gocce usano il raggio reale del campione più vicino.
+**Cosa manca:** feedback del Director sul flusso asimmetrico.
