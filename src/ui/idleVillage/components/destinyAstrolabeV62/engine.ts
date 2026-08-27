@@ -184,15 +184,12 @@ function rStarAt(theta,scale=1){ return radialFromAxes(theta,geo.starTip,scale);
    adjacent ones (no deep star valleys), so the goo's area is bounded exactly by
    the dark obelisks. This is both the visible goo rim and the ball's container. */
 /* organic blob deformation — deterministic low-freq lobes so the goo edge is an
-   irregular blob, never a clean circle (stable per angle for physics + drawing) */
-function gooBlob(theta){
-  /* V6: ampiezza ridotta da .13/.08/.05 a .035/.022/.014. Con i lobi grossi
-     l'arena si gonfiava FRA gli obelischi fino al +26%, quindi (a) la forma non
-     sembrava agganciata agli obelischi — era un'ameba a caso — e (b) la stella,
-     ancorata alle punte, non poteva coprire più del ~73% dell'arena per
-     costruzione, rendendo impossibili le probabilità alte. Ora l'arena passa
-     PER gli obelischi con una sola ondulazione organica sopra. */
-  return 1 + 0.035*Math.sin(theta*3+0.7) + 0.022*Math.sin(theta*5-1.3) + 0.014*Math.sin(theta*7+2.1);
+   irregular blob, never a clean circle (stable per angle for physics + drawing).
+   V6.2: lobe amplitude scales with `rev` so the tar starts as a small circle
+   and grows its strange edges as it pours outward. */
+function gooBlob(theta, rev=1){
+  const amp = rev;
+  return 1 + amp*(0.035*Math.sin(theta*3+0.7) + 0.022*Math.sin(theta*5-1.3) + 0.014*Math.sin(theta*7+2.1));
 }
 function rCheckAt(theta,scale=1){
   const t=((normAng(theta+Math.PI/2)%TAU)+TAU)%TAU;   // 0 at axis 0
@@ -200,7 +197,9 @@ function rCheckAt(theta,scale=1){
   const k=Math.floor(t/seg), f=(t-k*seg)/seg;
   const r0=geo.axisCheck[k%AXES], r1=geo.axisCheck[(k+1)%AXES];
   const s=f*f*(3-2*f);                                // smoothstep between neighbours
-  return Math.max(geo.rCore+30, (r0+(r1-r0)*s)*gooBlob(theta))*scale;  // blobby, floored
+  /* V6.2: gooBlob lobe amplitude scales with `scale` (=gooReveal) so the seed
+     is a small circle and the strange edges grow with the pour. */
+  return Math.max(geo.rCore+30, (r0+(r1-r0)*s)*gooBlob(theta,scale))*scale;
 }
 const dist=(x,y)=>Math.hypot(x-CX,y-CY);
 const angOf=(x,y)=>Math.atan2(y-CY,x-CX);
