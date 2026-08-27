@@ -1,13 +1,21 @@
 import React, { useEffect, useRef, useCallback } from 'react';
-import backgroundImage from '@/assets/ui/idleVillage/goblin-invasion-libro-background.jpg';
-import goblinNoSticker from '@/assets/ui/idleVillage/goblin-invasion-transparent-no-sticker.png';
-import goblinWithSticker from '@/assets/ui/idleVillage/goblin-march-trasparente.png';
+import defaultBackgroundImage from '@/assets/ui/idleVillage/goblin-invasion-libro-background.jpg';
+import defaultGoblinImage from '@/assets/ui/idleVillage/goblin-invasion-transparent-no-sticker.png';
+import defaultGoblinImageWithBorder from '@/assets/ui/idleVillage/goblin-march-trasparente.png';
 
 export interface GoblinInvasionWindowProps {
   /** Accessible name for the scene. Pass an i18n-resolved string if it is not purely decorative. */
   ariaLabel?: string;
   /** Additional CSS class. */
   className?: string;
+  /** Inline styles for the root element. */
+  style?: React.CSSProperties;
+  /** Background image URL. */
+  backgroundImage?: string;
+  /** Base goblin image (without sticker border). */
+  goblinImage?: string;
+  /** Goblin image with the sticker border. */
+  goblinImageWithBorder?: string;
 }
 
 const W = 520;
@@ -127,6 +135,10 @@ const DustCanvas: React.FC<{ mx: number; my: number; active: boolean }> = ({ mx,
 export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
   ariaLabel,
   className,
+  style,
+  backgroundImage = defaultBackgroundImage,
+  goblinImage = defaultGoblinImage,
+  goblinImageWithBorder = defaultGoblinImageWithBorder,
 }) => {
   const [peeled, setPeeled] = React.useState(false);
   const [mx, setMx] = React.useState(0);
@@ -168,6 +180,7 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
         background: '#060f16',
         '--mx': mx,
         '--my': my,
+        ...style,
       } as React.CSSProperties}
       role="img"
       aria-label={ariaLabel}
