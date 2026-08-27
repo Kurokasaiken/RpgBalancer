@@ -79,7 +79,6 @@ const EquipmentCreatorPage = lazy(() => import('./pages/equipment-creator').then
 const EquipmentLibraryPage = lazy(() => import('./pages/equipment-library').then(m => ({ default: m.default })));
 const TrailerViewer = lazy(() => import('./ui/idleVillage/trailer/TrailerViewer'));
 const TrailerThreatIter = lazy(() => import('./ui/idleVillage/trailer/TrailerThreatIter'));
-const GoblinEventLabPage = lazy(() => import('./ui/idleVillage/pages/GoblinEventLabPage').then(m => ({ default: m.GoblinEventLabPage })));
 const TrailerThreatPage = lazy(() => import('./ui/idleVillage/trailer/TrailerThreatPage').then(m => ({ default: m.TrailerThreatPage })));
 const TrailerChoicePage = lazy(() => import('./ui/idleVillage/trailer/TrailerChoicePage').then(m => ({ default: m.TrailerChoicePage })));
 const TrailerPreparationPage = lazy(() => import('./ui/idleVillage/trailer/TrailerPreparationPage').then(m => ({ default: m.TrailerPreparationPage })));
@@ -308,8 +307,6 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/trailer-outro';
   const isTrailerThreatIterPath =
     typeof window !== 'undefined' && window.location.pathname === '/trailer-threat-iter';
-  const isGoblinEventLabPath =
-    typeof window !== 'undefined' && window.location.pathname === '/goblin-event-lab';
   const isMockupToComponentPath =
     typeof window !== 'undefined' && window.location.pathname === '/mockup-to-component';
   const isWorldSurfacePath =
@@ -944,16 +941,6 @@ function App() {
       <ErrorBoundary componentName="Trailer">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer…</div>}>
           <TrailerViewer />
-        </Suspense>
-      </ErrorBoundary>
-    );
-  }
-
-  if (isGoblinEventLabPath) {
-    return (
-      <ErrorBoundary componentName="Goblin Event Lab">
-        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Goblin Event Lab…</div>}>
-          <GoblinEventLabPage />
         </Suspense>
       </ErrorBoundary>
     );
