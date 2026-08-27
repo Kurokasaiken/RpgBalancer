@@ -9,6 +9,7 @@ import { getAllEquipment } from '@/balancing/equipment/equipmentStorage';
 import type { EquipmentItem } from '@/balancing/equipment/equipmentTypes';
 import { EquipmentDiabloPanel } from '@/ui/equipment/EquipmentDiabloPanel';
 import {
+  MatericFrame,
   MatericSurface,
   MatericPlaque,
   MatericCloseButton,
@@ -179,10 +180,8 @@ const PgDetailCard: FC<PgDetailCardProps> = ({ resident, onClose, onSlotClick })
   const initials = resident.displayName.slice(0, 2).toUpperCase();
 
   return (
-    <MatericSurface
+    <div
       data-testid="pg-detail-card"
-      shape="panel"
-      material="bronze"
       onPointerDown={handlePointerDown}
       style={{
         transform: `translate3d(${position.x}px, ${position.y}px, 0)`,
@@ -190,31 +189,24 @@ const PgDetailCard: FC<PgDetailCardProps> = ({ resident, onClose, onSlotClick })
         maxHeight: '80vh',
         width: '100%',
         maxWidth: 360,
-        padding: 0,
       }}
     >
-      <div style={{ padding: 12, borderBottom: '1px solid rgba(180,130,30,0.35)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <MatericPlaque>{formatResidentLabel(resident)}</MatericPlaque>
-          <div style={{ fontSize: 10, color: 'var(--skin-body-color)', textTransform: 'uppercase', letterSpacing: '0.18em' }}>{statusLabel}</div>
+      <MatericFrame variant="molding" floor={false} style={{ padding: 12 }}>
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <div>
+            <MatericPlaque>{formatResidentLabel(resident)}</MatericPlaque>
+            <div style={{ fontSize: 10, color: 'var(--skin-body-color)', textTransform: 'uppercase', letterSpacing: '0.18em' }}>{statusLabel}</div>
+          </div>
+          <MatericCloseButton onClick={onClose} style={{ width: 28, height: 28 }} aria-label={t('pgDetailCard.close')} />
         </div>
-        <MatericCloseButton onClick={onClose} style={{ width: 28, height: 28 }} aria-label={t('pgDetailCard.close')} />
-      </div>
 
-      <div style={{ padding: 12, overflowY: 'auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          <MatericSurface shape="card" material="obsidian" style={{ padding: 12 }}>
-            <MatericPortrait portraitUrl={portraitUrl} initials={initials} size={96} isHero />
-            {fullFigureUrl && (
-              <MatericButton style={{ marginTop: 8, fontSize: 9 }}>
-                <a href={fullFigureUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>
-                  {t('pgDetailCard.fullFigure')}
-                </a>
-              </MatericButton>
-            )}
-            <div style={{ marginTop: 8, fontSize: 9, color: 'var(--skin-body-color)', textTransform: 'uppercase', letterSpacing: '0.18em' }}>{t('pgDetailCard.profile')}</div>
+        {/* Portrait & identity */}
+        <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 12 }}>
+          <MatericPortrait portraitUrl={portraitUrl} initials={initials} size={80} isHero />
+          <div style={{ flex: 1 }}>
             {archetypeSummary ? (
-              <div style={{ marginTop: 8 }}>
+              <>
                 <MatericPlaque>{archetypeSummary.name}</MatericPlaque>
                 <div style={{ fontSize: 9, color: 'var(--skin-body-color)', textTransform: 'uppercase', letterSpacing: '0.12em', marginTop: 4 }}>{archetypeSummary.category}</div>
                 <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 6 }}>
@@ -222,52 +214,64 @@ const PgDetailCard: FC<PgDetailCardProps> = ({ resident, onClose, onSlotClick })
                     <MatericBadge key={tag}>{tag}</MatericBadge>
                   ))}
                 </div>
-                <MatericButton onClick={handleOpenArchetype} style={{ marginTop: 8, fontSize: 10 }}>
-                  {t('pgDetailCard.openArchetype')}
-                </MatericButton>
-              </div>
+              </>
             ) : (
               <p style={{ fontSize: 12, color: 'var(--skin-body-color)' }}>
                 {t('pgDetailCard.unknownPreset', { id: resident.statProfileId ?? '—' })}
               </p>
             )}
-          </MatericSurface>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <MatericStatBar variant="hp" size="sm" value={resident.currentHp} max={resident.maxHp} />
-            <MatericStatBar variant="stamina" size="sm" value={resident.fatigue} max={100} />
-
-            <MatericSurface shape="card" material="obsidian" style={{ padding: 10 }}>
-              <MatericRecordList
-                columns={[
-                  { width: '1fr', variant: 'label' },
-                  { width: '1fr', variant: 'value' },
-                ]}
-                records={[
-                  [t('pgDetailCard.statistics.label'), t('pgDetailCard.statistics.count', { count: snapshotEntries.length })],
-                  ...snapshotEntries.map(([key, value]) => [key, Number(value).toFixed(2)]),
-                ]}
-              />
-            </MatericSurface>
-
-            <EquipmentDiabloPanel slots={equipmentSlots} onSlotClick={onSlotClick} />
-
-            <MatericSurface shape="card" material="obsidian" style={{ padding: 10 }}>
-              <MatericField label={t('pgDetailCard.inventory.label')} value="" />
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
-                {inventoryTokens.length ? (
-                  inventoryTokens.map((token) => (
-                    <MatericBadge key={token}>{token}</MatericBadge>
-                  ))
-                ) : (
-                  <span style={{ fontSize: 9, color: 'var(--skin-body-color)' }}>{t('pgDetailCard.inventory.empty')}</span>
-                )}
-              </div>
-            </MatericSurface>
+            {fullFigureUrl && (
+              <MatericButton style={{ marginTop: 8, fontSize: 9 }}>
+                <a href={fullFigureUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>
+                  {t('pgDetailCard.fullFigure')}
+                </a>
+              </MatericButton>
+            )}
           </div>
         </div>
-      </div>
-    </MatericSurface>
+
+        {/* Vitals — frame-only sections */}
+        <MatericFrame variant="molding" floor={false} style={{ padding: 10, marginBottom: 12 }}>
+          <MatericStatBar variant="hp" size="sm" value={resident.currentHp} max={resident.maxHp} />
+          <div style={{ marginTop: 8 }}>
+            <MatericStatBar variant="stamina" size="sm" value={resident.fatigue} max={100} />
+          </div>
+        </MatericFrame>
+
+        {/* Statistics */}
+        <MatericFrame variant="molding" floor={false} style={{ padding: 10, marginBottom: 12 }}>
+          <MatericRecordList
+            columns={[
+              { width: '1fr', variant: 'label' },
+              { width: '1fr', variant: 'value' },
+            ]}
+            records={[
+              [t('pgDetailCard.statistics.label'), t('pgDetailCard.statistics.count', { count: snapshotEntries.length })],
+              ...snapshotEntries.map(([key, value]) => [key, Number(value).toFixed(2)]),
+            ]}
+          />
+        </MatericFrame>
+
+        {/* Equipment */}
+        <MatericFrame variant="molding" floor={false} style={{ padding: 10, marginBottom: 12 }}>
+          <EquipmentDiabloPanel slots={equipmentSlots} onSlotClick={onSlotClick} />
+        </MatericFrame>
+
+        {/* Inventory */}
+        <MatericFrame variant="molding" floor={false} style={{ padding: 10 }}>
+          <MatericField label={t('pgDetailCard.inventory.label')} value="" />
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
+            {inventoryTokens.length ? (
+              inventoryTokens.map((token) => (
+                <MatericBadge key={token}>{token}</MatericBadge>
+              ))
+            ) : (
+              <span style={{ fontSize: 9, color: 'var(--skin-body-color)' }}>{t('pgDetailCard.inventory.empty')}</span>
+            )}
+          </div>
+        </MatericFrame>
+      </MatericFrame>
+    </div>
   );
 };
 

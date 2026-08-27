@@ -247,3 +247,15 @@
 /* ── Status colors (met / unmet), reusable helpers ────────────────────── */
 .skin-scope :where(.skin-status-met) { color: var(--skin-status-met); }
 .skin-scope :where(.skin-status-unmet) { color: var(--skin-status-unmet); }
+
+/* ── Window particle float animation (global, used by Window primitive) ── */
+@keyframes window-float {
+  0% { transform: translate(0, 0); opacity: 0.35; }
+  100% { transform: translate(0, -20px); opacity: 0.9; }
+}
+
+/* ── Window golden light breathe (global, used by GoblinInvasionWindow) ── */
+@keyframes window-light-breathe {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 0.85; }
+}

@@ -647,3 +647,18 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 3. `HeroComponentsLabPage` ora usa i dati JSON, `useResidentHeroState` e riflette le modifiche in `PgDetailCard`.
 4. Lo `SkillDeck` persiste il loadout ma non tocca il skill check (R-030 escludeva il skill check).
 5. Fix test `PgDetailCard` per compatibilità con `Materic*`/`WanderlustSurface`.
+
+---
+
+## R-031 — Incorniciare lo sticker goblin in `MatericEventCard` con bordo, sfondo, luce, parallasse e particelle
+
+**Richiesta:** *"Voglio che usi pupeteer o qualocsa del genere per analizzare l'estetica della card. Voglio che il componente dello sticker dei goblin sia racchiuso in un componente che lo renda + interessante: un bordo, uno sfondo interessante, effetti d luce, ecc. Qualcosa tipo parallasse? particelle luminose? Usa explorer per trovare soluzioni interessanti e protocollo multi Ai"*
+**Data:** 2026-08-27
+**Stato:** `fatta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v8 — Golden UI Foundation; `.mw/desiderata.md` v6 — mockup → CSS/React + asset ad hoc (paintover consentito).
+**Cosa è successo:**
+- Il Director ha scelto la **Direzione B — Teal Threat Aura**.
+- Creato `MatericThreatAura` in `src/ui/designSystem/primitives/MatericThreatAura.tsx` e i token `matericThreatAuraTokens.ts` in `src/balancing/config/idleVillage/`.
+- Integrato nella tab `Event` di `/primitives` con parallasse al movimento del mouse, bordo dorato irregolare, sfondo teal radiale pulsante e particelle luminose.
+- `npm run build:check`, `npm run lint -- <scope>` e `npm run kanban:lint` passati.
+- Smoke test Puppeteer su `http://localhost:5173/primitives` OK.

@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useTranslation } from '@/localization/useTranslation';
+import { getDefaultPoiColors } from '@/balancing/config/idleVillage/poiColorConfig';
 import type { PoiMarkerProps } from './PoiMarker';
 
 export interface PoiMatericV3Props extends PoiMarkerProps {
@@ -69,35 +70,15 @@ function generateImperfections() {
   return { patinaSpots, scratches };
 }
 
-function ringSegmentPath(cx: number, cy: number, r: number, startAngle: number, endAngle: number) {
+function arcPath(cx: number, cy: number, r: number, startAngle: number, endAngle: number, sweep: number, large: number) {
   const x1 = cx + r * Math.cos(startAngle);
   const y1 = cy + r * Math.sin(startAngle);
   const x2 = cx + r * Math.cos(endAngle);
   const y2 = cy + r * Math.sin(endAngle);
-  return `M ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 0 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`;
+  return `M ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${large} ${sweep} ${x2.toFixed(2)} ${y2.toFixed(2)}`;
 }
 
-const GLYPHS = [
-  'M0 -3.6 L0 3.6 M0 -1.2 L2.2 -3.4 M0 -1.2 L-2.2 -3.4',
-  'M-1.8 3.6 L-1.8 -3.6 L2 -1.2 L-1.8 0.9',
-  'M-2 3.6 L0 -3.6 L2 3.6 M-1.2 0.9 L1.2 0.9',
-  'M-2 -3.6 L2 3.6 M2 -3.6 L-2 3.6',
-  'M-1.9 3.6 L-1.9 -3.6 L0 -0.5 L1.9 -3.6 L1.9 3.6',
-  'M0 -3.6 L0 3.6 M0 0 L2.2 -2.2 M0 0 L2.2 2.2',
-  'M-2 -3.6 L2 -3.6 M0 -3.6 L0 3.6',
-  'M-1.8 -3.6 L1.8 -1.6 L-1.8 0.5 L1.8 2.5 L-1.8 3.6',
-  'M0 -3.4 A3.4 3.4 0 1 1 -0.1 -3.4 M0 -1 L0 3',
-  'M-2 0 L0 -3.4 L2 0 L0 3.4 Z',
-];
-
-/** Four-point flare, like the cardinal sparks on the reference seals. */
-const FLARE = 'M0 -9 Q0.9 -1.4 8 0 Q0.9 1.4 0 9 Q-0.9 1.4 -8 0 Q-0.9 -1.4 0 -9 Z';
-
-const GLYPH_COUNT = 14;
 const LETTER_COUNT = 100;
-
-/** Where the summoned circle hangs, clear of the medallion's rim. */
-const SEAL_RADIUS = 50;
 
 export const PoiMatericV3: React.FC<PoiMatericV3Props> = ({
   type,
@@ -115,6 +96,13 @@ export const PoiMatericV3: React.FC<PoiMatericV3Props> = ({
   'data-testid': dataTestId,
 }) => {
   const { t } = useTranslation('idleVillage');
+  const colors = useMemo(() => getDefaultPoiColors(type), [type]);
+  const [ringLight, ringMid, ringDark] = colors.rimColors;
+  const uid = useId();
+  const gid = (id: string) => `${uid}-${id}`;
+  const accent = 'rgb(240, 207, 106)';
+  const { r, g, b } = { r: 240, g: 207, b: 106 };
+  const rgba = (a: number) => `rgba(${r}, ${g}, ${b}, ${a})`;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rimAngleTargetRef = useRef(0);
   const rimIntensityRef = useRef(0);
@@ -182,7 +170,8 @@ export const PoiMatericV3: React.FC<PoiMatericV3Props> = ({
       const rad = (a * Math.PI) / 180;
       const d = LETTERS[letterCursor++ % LETTERS.length];
       const dist = Math.abs(i - t);
-      const lit = clamp(1.5 - 2 * dist);
+      // At rest the sweep has not started: no letter is lit (not even the one at 12).
+      const lit = activeRim <= 0 ? 0 : clamp(1.5 - 2 * dist);
       return {
         d,
         a,
@@ -196,26 +185,9 @@ export const PoiMatericV3: React.FC<PoiMatericV3Props> = ({
   // V1-style summoned circle (halo).
   const isExpired = state === 'expired';
   const ccw = timerDirection === 'counterclockwise';
+  const sweep = ccw ? -1 : 1;
   const sealProgress = isExpired ? 0 : state === 'available' || state === 'new' ? 1 : clamp(progress);
-
-  const glyphs = useMemo(() => {
-    const written = sealProgress * GLYPH_COUNT;
-    const sweep = ccw ? -1 : 1;
-    return Array.from({ length: GLYPH_COUNT }, (_, i) => ({
-      i,
-      angle: sweep * (i + 0.5) * (360 / GLYPH_COUNT),
-      lit: clamp(written - i),
-      d: GLYPHS[i % GLYPHS.length],
-    })).filter((g) => g.lit > 0.001);
-  }, [sealProgress, ccw]);
-
-  const flares = useMemo(
-    () =>
-      [0, 1, 2, 3]
-        .map((i) => ({ i, angle: (ccw ? -1 : 1) * i * 90, lit: clamp((sealProgress - i / 4) * 4) }))
-        .filter((f) => f.lit > 0.001),
-    [sealProgress, ccw]
-  );
+  const visualProgress = sealProgress;
 
   const letterStep = 360 / LETTER_COUNT;
   const outerRingRadius = 54;
@@ -224,17 +196,23 @@ export const PoiMatericV3: React.FC<PoiMatericV3Props> = ({
   const lowerBandRadius = 47.5;
 
   const outerBand = useMemo(() => {
-    const litCount = Math.floor(sealProgress * LETTER_COUNT);
+    const written = visualProgress * LETTER_COUNT;
+    const litCount = Math.floor(written);
+    const fraction = written - litCount;
     const stepRad = (letterStep * Math.PI) / 180;
     const halfStep = stepRad / 2;
-    const tipWindow = LETTER_COUNT * 0.05;
+
     let letterCursor = 0;
     return Array.from({ length: LETTER_COUNT }, (_, i) => {
-      const a = -90 + i * letterStep;
+      const a = -90 + sweep * i * letterStep;
       const rad = (a * Math.PI) / 180;
-      const lit = i < litCount ? 1 : 0;
-      const tipFactor = clamp((sealProgress * LETTER_COUNT - i) / tipWindow);
+      const isLeading = i === litCount;
+      const lit = isLeading ? fraction : (i < litCount ? 1 : 0);
+      const tipFactor = i === litCount ? fraction : 0;
       const d = LETTERS[letterCursor++ % LETTERS.length];
+      const endAngle = isLeading
+        ? rad + sweep * (fraction * stepRad - halfStep)
+        : rad + sweep * halfStep;
       return {
         d,
         a,
@@ -242,21 +220,24 @@ export const PoiMatericV3: React.FC<PoiMatericV3Props> = ({
         tipFactor,
         x: 43 + upperBandRadius * Math.cos(rad),
         y: 43 + upperBandRadius * Math.sin(rad),
-        outerD: ringSegmentPath(43, 43, outerRingRadius, rad - halfStep, rad + halfStep),
-        innerD: ringSegmentPath(43, 43, innerRingRadius, rad - halfStep, rad + halfStep),
+        outerD: arcPath(43, 43, outerRingRadius, rad - sweep * halfStep, endAngle, (sweep + 1) / 2, 0),
+        innerD: arcPath(43, 43, innerRingRadius, rad - sweep * halfStep, endAngle, (sweep + 1) / 2, 0),
       };
     }).filter((g) => g.lit > 0.001);
-  }, [sealProgress]);
+  }, [visualProgress, sweep]);
 
   const lowerBand = useMemo(() => {
-    const litCount = Math.floor(sealProgress * LETTER_COUNT);
-    const tipWindow = LETTER_COUNT * 0.05;
+    const written = visualProgress * LETTER_COUNT;
+    const litCount = Math.floor(written);
+    const fraction = written - litCount;
+
     let letterCursor = 0;
     return Array.from({ length: LETTER_COUNT }, (_, i) => {
-      const a = -90 + (i + 0.5) * letterStep;
+      const a = -90 + sweep * (i + 0.5) * letterStep;
       const rad = (a * Math.PI) / 180;
-      const lit = i < litCount ? 1 : 0;
-      const tipFactor = clamp((sealProgress * LETTER_COUNT - i) / tipWindow);
+      const isLeading = i === litCount;
+      const lit = isLeading ? fraction : (i < litCount ? 1 : 0);
+      const tipFactor = i === litCount ? fraction : 0;
       const d = LETTERS[letterCursor++ % LETTERS.length];
       return {
         d,
@@ -267,17 +248,17 @@ export const PoiMatericV3: React.FC<PoiMatericV3Props> = ({
         y: 43 + lowerBandRadius * Math.sin(rad),
       };
     }).filter((g) => g.lit > 0.001);
-  }, [sealProgress]);
+  }, [visualProgress, sweep]);
 
   const cardinals = useMemo(() => {
     const flareRadius = 54;
     return [
-      { x: 43, y: 43 - flareRadius, lit: clamp(sealProgress * 4) },
-      { x: 43 + flareRadius, y: 43, lit: clamp((sealProgress - 0.25) * 4) },
-      { x: 43, y: 43 + flareRadius, lit: clamp((sealProgress - 0.5) * 4) },
-      { x: 43 - flareRadius, y: 43, lit: clamp((sealProgress - 0.75) * 4) },
+      { x: 43, y: 43 - flareRadius, lit: clamp(visualProgress * 4) },
+      { x: 43 + flareRadius, y: 43, lit: clamp((visualProgress - (ccw ? 0.75 : 0.25)) * 4) },
+      { x: 43, y: 43 + flareRadius, lit: clamp((visualProgress - 0.5) * 4) },
+      { x: 43 - flareRadius, y: 43, lit: clamp((visualProgress - (ccw ? 0.25 : 0.75)) * 4) },
     ];
-  }, [sealProgress]);
+  }, [visualProgress, ccw]);
 
   // 100% completion burst: glow + runes flash for 200 ms.
   useEffect(() => {
@@ -331,11 +312,11 @@ export const PoiMatericV3: React.FC<PoiMatericV3Props> = ({
       
       ctx.beginPath();
       ctx.arc(cx, cy, r, a0, a1);
-      ctx.strokeStyle = `rgba(240,207,106,${opacity * 0.28})`;
+      ctx.strokeStyle = rgba(opacity * 0.28);
       ctx.lineWidth = 3.5;
       ctx.lineCap = 'round';
       ctx.stroke();
-      
+
       ctx.beginPath();
       ctx.arc(cx, cy, r, a0 + (a1 - a0) * 0.35, a1 - (a1 - a0) * 0.35);
       ctx.strokeStyle = `rgba(245,242,232,${opacity * 0.55})`;
@@ -387,11 +368,11 @@ export const PoiMatericV3: React.FC<PoiMatericV3Props> = ({
         width: `${sizePx}px`,
         height: `${sizePx}px`,
         visibility: 'visible',
+        '--poi-accent-rgb': `${r}, ${g}, ${b}`,
         ...style,
-      }}
+      } as React.CSSProperties}
     >
       <div className="poiv3__vignette" aria-hidden="true" />
-      <div className="poiv3__ground" aria-hidden="true" />
       <div className="poiv3__fog" aria-hidden="true" />
       <canvas
         ref={canvasRef}
@@ -430,31 +411,32 @@ export const PoiMatericV3: React.FC<PoiMatericV3Props> = ({
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
-            {/* Bronze - warm oxidized */}
-            <linearGradient id="g-b" x1="14%" y1="4%" x2="86%" y2="96%">
-              <stop offset="0%" stopColor="#f0cf6a" />
-              <stop offset="9%" stopColor="#dfb857" />
-              <stop offset="28%" stopColor="#8a5a20" />
-              <stop offset="52%" stopColor="#060f16" />
-              <stop offset="76%" stopColor="#060f16" />
-              <stop offset="100%" stopColor="#060f16" />
+            {/* Outer ring metal */}
+            <linearGradient id={gid('g-b')} x1="14%" y1="4%" x2="86%" y2="96%">
+              <stop offset="0%" stopColor={ringLight} />
+              <stop offset="6%" stopColor={ringLight} />
+              <stop offset="22%" stopColor={ringMid} />
+              <stop offset="72%" stopColor={ringMid} />
+              <stop offset="90%" stopColor={ringDark} />
+              <stop offset="100%" stopColor={ringDark} />
             </linearGradient>
 
             {/* Bevel diagonal */}
-            <linearGradient id="g-bv" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="rgba(255,240,165,.30)" />
-              <stop offset="22%" stopColor="rgba(255,225,135,.09)" />
-              <stop offset="58%" stopColor="rgba(255,210,100,.02)" />
-              <stop offset="100%" stopColor="rgba(0,0,0,.62)" />
+            <linearGradient id={gid('g-bv')} x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor={ringLight} stopOpacity="0.30" />
+              <stop offset="22%" stopColor={ringLight} stopOpacity="0.09" />
+              <stop offset="58%" stopColor={ringLight} stopOpacity="0.02" />
+              <stop offset="100%" stopColor={ringDark} stopOpacity="0.75" />
             </linearGradient>
 
             {/* Inner ring */}
-            <linearGradient id="g-ri" x1="12%" y1="8%" x2="88%" y2="92%">
-              <stop offset="0%" stopColor="#f0cf6a" />
-              <stop offset="16%" stopColor="#dfb857" />
-              <stop offset="46%" stopColor="#8a5a20" />
-              <stop offset="80%" stopColor="#060f16" />
-              <stop offset="100%" stopColor="#060f16" />
+            <linearGradient id={gid('g-ri')} x1="12%" y1="8%" x2="88%" y2="92%">
+              <stop offset="0%" stopColor={ringLight} />
+              <stop offset="8%" stopColor={ringLight} />
+              <stop offset="24%" stopColor={ringMid} />
+              <stop offset="78%" stopColor={ringMid} />
+              <stop offset="92%" stopColor={ringDark} />
+              <stop offset="100%" stopColor={ringDark} />
             </linearGradient>
 
             {/* Field stone */}
@@ -501,12 +483,6 @@ export const PoiMatericV3: React.FC<PoiMatericV3Props> = ({
             </radialGradient>
 
             {/* Filters */}
-            <filter id="f-nm" x="0%" y="0%" width="100%" height="100%">
-              <feTurbulence type="fractalNoise" baseFrequency="0.52" numOctaves={4} seed="3" stitchTiles="stitch" result="n" />
-              <feColorMatrix in="n" type="matrix" values="0 0 0 0 .020  0 0 0 0 .030  0 0 0 0 .040  0 0 0 .25 0" result="c" />
-              <feBlend in="SourceGraphic" in2="c" mode="overlay" />
-            </filter>
-            
             <filter id="f-fs" x="0%" y="0%" width="100%" height="100%">
               <feTurbulence type="fractalNoise" baseFrequency="0.90" numOctaves={5} seed="11" stitchTiles="stitch" result="n" />
               <feColorMatrix in="n" type="matrix" values="0 0 0 0 .020  0 0 0 0 .030  0 0 0 0 .040  0 0 0 .18 0" result="c" />
@@ -541,6 +517,12 @@ export const PoiMatericV3: React.FC<PoiMatericV3Props> = ({
               <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.5" xChannelSelector="R" yChannelSelector="G" />
             </filter>
 
+            {/* Dark backing track for light-surface contrast */}
+            <filter id="f-back" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+
             {/* Clips */}
             <clipPath id="c-port">
               <circle cx="43" cy="43" r="27.5" />
@@ -552,143 +534,132 @@ export const PoiMatericV3: React.FC<PoiMatericV3Props> = ({
           </defs>
 
           {/* V1 magic circle — summoned circle around the medallion */}
-          {sealProgress > 0.001 && (
-            <g className="poiv3__seal">
-              {outerBand.map((g, i) => (
-                <g key={`s-${i}`}>
-                  <path
-                    d={g.outerD}
-                    fill="none"
-                    stroke="#f0cf6a"
-                    strokeOpacity={0.7 + 0.3 * g.tipFactor}
-                    strokeWidth="2.4"
-                    strokeLinecap="butt"
-                    vectorEffect="non-scaling-stroke"
-                  />
-                  <path
-                    d={g.innerD}
-                    fill="none"
-                    stroke="#f0cf6a"
-                    strokeOpacity={0.7 + 0.3 * g.tipFactor}
-                    strokeWidth="2.4"
-                    strokeLinecap="butt"
-                    vectorEffect="non-scaling-stroke"
-                  />
-                </g>
-              ))}
-
-              {outerBand.map((g, i) => (
-                <g
-                  key={`u-${i}`}
-                  transform={`translate(${g.x.toFixed(2)} ${g.y.toFixed(2)}) rotate(${g.a})`}
-                >
-                  <g transform="scale(0.28)">
+          {visualProgress > 0.001 && (
+            <>
+              {visualProgress >= 0.999 ? (
+                <circle
+                  className="poiv3__track"
+                  cx={43}
+                  cy={43}
+                  r={(outerRingRadius + innerRingRadius) / 2}
+                  fill="none"
+                  stroke="rgba(22,22,28,0.92)"
+                  strokeWidth="11"
+                  filter="url(#f-back)"
+                  opacity={0.98}
+                />
+              ) : (
+                <path
+                  className="poiv3__track"
+                  d={arcPath(
+                    43,
+                    43,
+                    (outerRingRadius + innerRingRadius) / 2,
+                    -Math.PI / 2,
+                    ((-90 + sweep * visualProgress * 360) * Math.PI) / 180,
+                    (sweep + 1) / 2,
+                    visualProgress > 0.5 ? 1 : 0
+                  )}
+                  fill="none"
+                  stroke="rgba(22,22,28,0.92)"
+                  strokeWidth="11"
+                  strokeLinecap="round"
+                  filter="url(#f-back)"
+                  opacity={0.98}
+                />
+              )}
+              <g className="poiv3__seal">
+                {outerBand.map((g, i) => (
+                  <g key={`s-${i}`}>
                     <path
-                      d={g.d}
+                      d={g.outerD}
                       fill="none"
                       stroke="#f0cf6a"
-                      strokeOpacity={0.65 + 0.35 * g.tipFactor}
-                      strokeWidth="1"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+                      strokeOpacity={0.7 + 0.3 * g.tipFactor}
+                      strokeWidth="2.4"
+                      strokeLinecap="butt"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                    <path
+                      d={g.innerD}
+                      fill="none"
+                      stroke="#f0cf6a"
+                      strokeOpacity={0.7 + 0.3 * g.tipFactor}
+                      strokeWidth="2.4"
+                      strokeLinecap="butt"
                       vectorEffect="non-scaling-stroke"
                     />
                   </g>
-                </g>
-              ))}
+                ))}
 
-              {lowerBand.map((g, i) => (
-                <g
-                  key={`o-${i}`}
-                  transform={`translate(${g.x.toFixed(2)} ${g.y.toFixed(2)}) rotate(${g.a})`}
-                >
-                  <g transform="scale(0.28)">
-                    <path
-                      d={g.d}
-                      fill="none"
-                      stroke="#f0cf6a"
-                      strokeOpacity={0.65 + 0.35 * g.tipFactor}
-                      strokeWidth="1"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      vectorEffect="non-scaling-stroke"
-                    />
+                {outerBand.map((g, i) => (
+                  <g
+                    key={`u-${i}`}
+                    transform={`translate(${g.x.toFixed(2)} ${g.y.toFixed(2)}) rotate(${g.a})`}
+                  >
+                    <g transform="scale(0.28)">
+                      <path
+                        d={g.d}
+                        fill="none"
+                        stroke="#000000"
+                        strokeOpacity={1}
+                        strokeWidth="1"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        vectorEffect="non-scaling-stroke"
+                      />
+                    </g>
                   </g>
-                </g>
-              ))}
+                ))}
 
-              {cardinals.map((c, i) => (
-                <g
-                  key={`c-${i}`}
-                  transform={`translate(${c.x} ${c.y}) scale(0.7)`}
-                  opacity={c.lit}
-                >
-                  <path d={FLARE} fill="#f0cf6a" />
-                </g>
-              ))}
-
-              {glyphs.map((g) => (
-                <g
-                  key={`g-${g.i}`}
-                  transform={`rotate(${g.angle}) translate(0 -${SEAL_RADIUS}) scale(0.5)`}
-                  opacity={g.lit}
-                >
-                  <path
-                    d={g.d}
-                    fill="none"
-                    stroke="#f0cf6a"
-                    strokeWidth="1"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </g>
-              ))}
-
-              {flares.map((f) => (
-                <g
-                  key={`f-${f.i}`}
-                    transform={`rotate(${f.angle}) translate(0 -${SEAL_RADIUS}) scale(0.7)`}
-                  opacity={f.lit}
-                >
-                  <path d={FLARE} fill="#f0cf6a" />
-                </g>
-              ))}
-
-              {/* Leading tip of the seal progression */}
-              <g
-                transform={`rotate(${-90 + sealProgress * 360}) translate(0 -${outerRingRadius}) scale(0.5)`}
-                opacity={sealProgress > 0.001 ? 1 : 0}
-              >
-                <path d={FLARE} fill="#fff8d7" filter="url(#f-glow)" />
+                {lowerBand.map((g, i) => (
+                  <g
+                    key={`o-${i}`}
+                    transform={`translate(${g.x.toFixed(2)} ${g.y.toFixed(2)}) rotate(${g.a})`}
+                  >
+                    <g transform="scale(0.28)">
+                      <path
+                        d={g.d}
+                        fill="none"
+                        stroke="#000000"
+                        strokeOpacity={1}
+                        strokeWidth="1"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        vectorEffect="non-scaling-stroke"
+                      />
+                    </g>
+                  </g>
+                ))}
               </g>
-            </g>
+            </>
           )}
 
           {/* MEDALLION BODY */}
           <g className="poiv3__medal" clipPath="url(#c-medal)">
             {/* L1: Bronze outer body + texture + bevel */}
             <circle cx="43" cy="43" r="42" fill="#060f16" />
-            <circle className="poiv3__body" cx="43" cy="43" r="42" fill="url(#g-b)" filter={isDragging ? undefined : "url(#f-nm)"} opacity=".90" />
-            <circle className="poiv3__bevel" cx="43" cy="43" r="42" fill="url(#g-bv)" filter={isDragging ? undefined : "url(#f-dp)"} opacity=".48" />
+            <circle className="poiv3__body" cx="43" cy="43" r="42" fill={`url(#${gid('g-b')})`} opacity=".90" />
+            <circle className="poiv3__bevel" cx="43" cy="43" r="42" fill={`url(#${gid('g-bv')})`} filter={isDragging ? undefined : "url(#f-dp)"} opacity=".48" />
 
             {/* L2: Rim top - arc of warm light */}
             <circle cx="43" cy="43" r="40.5" fill="none"
-              stroke="rgba(240,207,106,.26)" strokeWidth="3.5"
+              stroke={ringLight} strokeOpacity={0.26} strokeWidth="3.5"
               strokeDasharray="108 148" strokeDashoffset="72"
               strokeLinecap="round" filter={isDragging ? undefined : "url(#f-gl)"} />
             <circle cx="43" cy="43" r="41" fill="none"
-              stroke="rgba(240,207,106,.68)" strokeWidth=".9"
+              stroke={ringLight} strokeOpacity={0.68} strokeWidth=".9"
               strokeDasharray="76 178" strokeDashoffset="82"
               strokeLinecap="round" />
 
             {/* L3: Inner ring separator */}
             <circle cx="43" cy="43" r="34" fill="#060f16" />
-            <circle cx="43" cy="43" r="34" fill="url(#g-ri)" filter={isDragging ? undefined : "url(#f-nm)"} opacity=".68" />
+            <circle cx="43" cy="43" r="34" fill={`url(#${gid('g-ri')})`} opacity=".68" />
             <circle cx="43" cy="43" r="34" fill="none"
               stroke="rgba(0,0,0,.75)" strokeWidth="2.2"
               transform="translate(.3,.35)" />
             <circle cx="43" cy="43" r="33.4" fill="none"
-              stroke="rgba(240,207,106,.18)" strokeWidth=".8" />
+              stroke={ringLight} strokeOpacity={0.18} strokeWidth=".8" />
 
             {/* L4: Field stone */}
             <circle cx="43" cy="43" r="30.5" fill="url(#g-f)" />
@@ -704,15 +675,29 @@ export const PoiMatericV3: React.FC<PoiMatericV3Props> = ({
                   opacity={0.8 + 0.2 * g.lit}
                 >
                   <g transform="scale(0.66)">
+                    {/* Lower lip of the incision: a hair of bronze light under the cut */}
+                    {g.lit <= 0.01 && (
+                      <path
+                        d={g.d}
+                        fill="none"
+                        stroke={ringLight}
+                        strokeOpacity={0.22}
+                        strokeWidth={1.4}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        vectorEffect="non-scaling-stroke"
+                        transform="translate(0.45 0.55)"
+                      />
+                    )}
                     <path
                       d={g.d}
                       fill="none"
-                      stroke={g.lit > 0.01 ? '#f0cf6a' : '#4A3B22'}
+                      stroke={g.lit > 0.01 ? accent : 'rgba(4,9,13,.88)'}
                       strokeWidth={1.4 + 1.1 * g.lit}
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       vectorEffect="non-scaling-stroke"
-                      filter={g.lit > 0.01 ? 'url(#f-glow)' : 'url(#f-gl)'}
+                      filter={g.lit > 0.01 ? 'url(#f-glow)' : undefined}
                     />
                   </g>
                 </g>
@@ -906,15 +891,14 @@ export const poiMatericV3Styles = `
   position: relative;
   display: inline-flex;
   cursor: pointer;
-  filter: drop-shadow(0 4px 3px rgba(0,0,0,0.45));
-  transition: filter 250ms ease;
+  overflow: visible;
+  border-radius: 50%;
 }
-.poiv3:hover { filter: drop-shadow(0 6px 5px rgba(0,0,0,0.55)); }
 .poiv3__svg { position: relative; width: 100%; height: 100%; overflow: visible; z-index: 4; }
 .poiv3__seal { filter: url(#f-glow); opacity: 0.85; }
-.poiv3__medal { filter: url(#f-glow) drop-shadow(0 8px 6px rgba(0,0,0,0.55)); }
-.poiv3--burst .poiv3__seal { opacity: 1; filter: url(#f-glow) drop-shadow(0 0 24px rgba(240,207,106,0.55)); }
-.poiv3--burst .poiv3__medal { filter: url(#f-glow) drop-shadow(0 8px 6px rgba(0,0,0,0.55)) drop-shadow(0 0 28px rgba(240,207,106,0.35)); }
+.poiv3__medal { filter: url(#f-glow); }
+.poiv3--burst .poiv3__seal { opacity: 1; filter: url(#f-glow) drop-shadow(0 0 24px rgba(var(--poi-accent-rgb),0.55)); }
+.poiv3--burst .poiv3__medal { filter: url(#f-glow) drop-shadow(0 0 28px rgba(var(--poi-accent-rgb),0.35)); }
 .poiv3__body { transition: filter 250ms ease; }
 .poiv3:hover .poiv3__body { filter: brightness(1.14); }
 .poiv3__bevel { transition: filter 250ms ease; }
@@ -934,27 +918,9 @@ export const poiMatericV3Styles = `
   width: 150px;
   height: 150px;
   border-radius: 50%;
-  filter: blur(10px);
   pointer-events: none;
   z-index: 0;
-  background: radial-gradient(circle at 50% 56%,
-    rgba(0,0,0,0.68) 0%,
-    rgba(0,0,0,0.42) 30%,
-    rgba(0,0,0,0.18) 55%,
-    transparent 82%
-  );
-}
-.poiv3__ground {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 96px;
-  height: 96px;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 1;
-  backdrop-filter: blur(1.2px) saturate(1.08);
+  opacity: 0;
 }
 .poiv3__fog {
   position: absolute;
@@ -967,8 +933,8 @@ export const poiMatericV3Styles = `
   pointer-events: none;
   z-index: 2;
   background: radial-gradient(circle at 50% 46%,
-    rgba(240,207,106,0.12) 0%,
-    rgba(240,207,106,0.05) 45%,
+    rgba(var(--poi-accent-rgb),0.12) 0%,
+    rgba(var(--poi-accent-rgb),0.05) 45%,
     transparent 72%
   );
 }

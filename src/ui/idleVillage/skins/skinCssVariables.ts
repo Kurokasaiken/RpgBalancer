@@ -256,6 +256,29 @@ export const BASE_SKIN_CSS_VARS: SkinCssVarMap = {
   '--skin-modal-container-border': 'rgba(223,184,87,0.35)',
   '--skin-modal-z-index': '1000',
 
+  /* Window / artifact glass encasing */
+  '--skin-window-size': '320px',
+  '--skin-window-frame-width': '10px',
+  '--skin-window-frame-base': 'var(--skin-surface-base)',
+  '--skin-window-frame-highlight': 'var(--skin-surface-border)',
+  '--skin-window-frame-shine': 'var(--skin-title-color)',
+  '--skin-window-shadow': 'rgba(0,0,0,0.65)',
+  '--skin-window-drop-shadow': '0 18px 40px rgba(0,0,0,0.6)',
+  '--skin-window-glass-shine': 'rgba(255,255,255,0.22)',
+  '--skin-window-glass-faint': 'rgba(255,255,255,0.08)',
+  '--skin-window-particle': 'var(--skin-title-color)',
+  '--skin-window-particle-glow': 'var(--skin-glow-primary)',
+  '--skin-window-ambient-glow': 'var(--skin-glow-primary)',
+  '--skin-window-ambient-accent': 'var(--skin-glow-accent)',
+
+  /* Tab window */
+  '--skin-tab-active-bg': 'var(--skin-surface-bg)',
+  '--skin-tab-inactive-bg': 'rgba(0,0,0,0.25)',
+  '--skin-tab-active-color': 'var(--skin-title-color)',
+  '--skin-tab-inactive-color': 'var(--skin-text-secondary)',
+  '--skin-tab-border': 'var(--skin-surface-border)',
+  '--skin-tab-active-border': 'var(--skin-title-color)',
+
   /* ── Bridge → legacy WanderlustLayout `--wl-*` variables ─────────────── */
   '--wl-font-display': '"Cinzel", "Trajan Pro", serif',
   '--wl-font-serif': '"EB Garamond", Georgia, serif',

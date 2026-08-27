@@ -54,8 +54,6 @@ const MAP_PLACEMENTS: Array<{ id: string; type: PoiType; state: PoiState; top: s
   { id: 'plain-quest', type: 'quest', state: 'assigned', top: '30%', left: '26%', time: true },
   { id: 'village-job', type: 'job', state: 'assigned', top: '52%', left: '48%', time: true },
   { id: 'ridge-event', type: 'event', state: 'assigned', top: '36%', left: '70%', time: true },
-  { id: 'south-quest', type: 'quest', state: 'new', top: '70%', left: '34%' },
-  { id: 'coast-job', type: 'job', state: 'available', top: '66%', left: '66%' },
 ];
 
 export const PoiMarkerLabPage: React.FC = () => {
