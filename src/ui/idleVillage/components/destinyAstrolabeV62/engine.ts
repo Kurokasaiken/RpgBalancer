@@ -45,7 +45,7 @@ export function createDestinyAstrolabeV62Engine(root: HTMLElement, opts: Astrola
    CONFIG — bound to the tweak panel
    ========================================================================= */
 /* config + skills injected by the React host */
-const cfg=Object.assign({stat:60,req:55,crit:5,wound:10,dead:5,tSlam:900,tBurst:1100,tPour:220,tSpin:2600,tSnap:650,mode:'random'}, opts.config||{});
+const cfg=Object.assign({stat:60,req:55,crit:5,wound:10,dead:5,tSlam:tarGooConfig.timing.seedMs,tBurst:1100,tPour:220,tSpin:2600,tSnap:650,mode:'random'}, opts.config||{});
 let skills=(opts.skills&&opts.skills.length)?opts.skills.slice():[{name:'Skill',stat:60,difficulty:50}];
 let skillAxes=[];
 function recomputeSkillAxes(){
@@ -294,10 +294,15 @@ function phaseT(durMs){ return clamp((performance.now()-scene.t0)/durMs,0,1); }
 const easeOutCubic=t=>1-Math.pow(1-t,3);
 const easeInCubic=t=>t*t*t;
 const easeOutBack=t=>{const c=1.7;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2);};
-const easeOutHeavy=t=>1-Math.pow(1-t,3.5);         // V6.2: tar spreads slow and settles, no bounce.
+const smoothstep=(t,a,b)=>{ if(t<=a)return 0; if(t>=b)return 1; const m=(t-a)/(b-a); return m*m*(3-2*m); };
+/* V6.2 tar-pour curve: pooled seed → slow spread → settle, no overshoot.
+   Follows an S-curve (smoothstep) so the mass has time to look heavy. */
+const tarPour=t=> tarGooConfig.timing.seedReveal
+  + (1-tarGooConfig.timing.seedReveal)*(t*t*(3-2*t));
+const easeOutHeavy=t=>1-Math.pow(1-t,3.5);         // kept for other uses
 const easeElastic=t=>t===0?0:t===1?1:Math.pow(2,-10*t)*Math.sin((t*10-0.75)*(TAU/3))+1;
 
-const GOO_MS=900;                                  // V6.2: slower, heavier tar spread
+const GOO_MS=tarGooConfig.timing.pourMs;           // V6.2: main tar pour duration
 
 function shake(kind){
   stage.classList.remove('shake-hard','shake-low','shake-slam');
@@ -354,8 +359,8 @@ function tickTimeline(){
   }
   else if(s==='threat-slam'){
     const p=phaseT(cfg.tSlam);
-    /* void seeds: nucleus forms while obelisks slam down */
-    scene.gooReveal=0.14*easeOutCubic(clamp(p/0.5,0,1));
+    /* V6.2 tar seed: a small pool forms around the core while obelisks slam. */
+    scene.gooReveal=tarGooConfig.timing.seedReveal*easeOutCubic(clamp(p/0.5,0,1));
     scene.blackPillars.forEach((pl,i)=>{
       const local=clamp((p-(i*0.13))/0.4,0,1);
       const prev=pl.drop;
@@ -369,11 +374,14 @@ function tickTimeline(){
     if(p>=1) setState('goo-expand');
   }
   else if(s==='goo-expand'){
-    /* V6.2 GOO EXPANSION — the tar mass wells up from the core and crawls
-       outward to the black obelisks: heavy, viscous, no springy overshoot. */
+    /* V6.2 TAR POUR — the seeded pool spreads outward like a slow colata.
+       Curve: S-curve (smoothstep) from seed to full, so the mass is readable
+       at every stage and never snaps like water. */
     const p=phaseT(GOO_MS);
-    scene.gooReveal=clamp(easeOutHeavy(p),0,1.0);   // slow settle, no overshoot
-    scene.gooRipple=Math.max(scene.gooRipple,0.55*(1-p));
+    scene.gooReveal=tarPour(p);
+    /* Calm swell in the middle of the pour: the mass pushes, then settles. */
+    const swell=0.24*(1-Math.abs(2*p-1));
+    scene.gooRipple=Math.max(scene.gooRipple,swell);
     if(p>=1){
       scene.gooReveal=1;
       setState('axis-read');           // V6: beat di lettura prima della risposta del PG
