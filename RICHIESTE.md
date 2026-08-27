@@ -679,3 +679,19 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 - Safeguards passati (build:check, lint scope, test 4/4, kanban:lint); smoke test Puppeteer con WebGL2 (SwiftShader): tar mass organica renderizzata, zero errori console.
 - Evidence: `test-results/r-032-astrolabe-v62-tar-goo-2026-08-27.log`.
 **Cosa manca:** giudizio estetico del Director sul catrame live + eventuale tuning (tutto in `tarGooConfig.ts`); verifica su WebView Tauri reale.
+
+---
+
+## R-033 — Retime del catrame: ricerca e correzione tempistiche della colata
+
+**Richiesta:** *"cambia il timing dell'animazione, fa una ricerca su come fare la colata del catrame, con calma e le tempistiche corrette"*.
+**Data:** 2026-08-27
+**Stato:** `fatta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v6 (CSS/React-first, budget stretto); v9 (geometria avversariale libera).
+**Cosa è successo:**
+- Research web su viscous-fluid timing: catrame/miele/spesso non deve essere <1s per il flusso principale ("one-second rule" per non sembrare acqua), pilea invece di diffondersi, movimento "sluggish", slow merging, no splash, easing S-curve o heavy ease-out.
+- Ricetta del timing V6.2: seed (piccolo pool) → pour (colata S-curve smoothstep) → settle (arrivo ai bordi), tutto lento (~1.3s di pour, ~0.5s di seed).
+- `tarGooConfig.ts`: aggiunto blocco `timing` (seedMs, pourMs, seedReveal) e sim più calma (damping 0.925, stiffness 0.024, maxSpeed 7, ondulazione 0.24).
+- `engine.ts`: `tSlam` e `GOO_MS` ora vengono da `tarGooConfig.timing`; `gooReveal` segue `tarPour(t)` (S-curve da seed a 1); `gooRipple` è un mild swell al centro della colata, non uno splash.
+- `build:check` passato, test 4/4 passati.
+**Cosa manca:** feedback del Director sul nuovo timing live.

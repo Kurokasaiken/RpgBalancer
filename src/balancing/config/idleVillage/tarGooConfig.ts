@@ -22,6 +22,14 @@ const rgbSchema = z.tuple([z.number().min(0).max(1), z.number().min(0).max(1), z
  * Zod schema for the tar-goo rendering/simulation contract.
  */
 const tarGooConfigSchema = z.object({
+  timing: z.object({
+    /** Black obelisks slam and the tar nucleus seeds (fast, percussive). */
+    seedMs: z.number().int().min(200).max(1200),
+    /** Main tar pour / spread. >= 1000 ms to avoid a watery snap. */
+    pourMs: z.number().int().min(600).max(3000),
+    /** How much goo is present at the end of the seed phase (0..1). */
+    seedReveal: z.number().min(0).max(0.5),
+  }),
   simulation: z.object({
     /** Number of radial spring samples around the rim (shader uniform size). */
     rimSamples: z.number().int().min(16).max(128),
@@ -81,20 +89,25 @@ export type TarGooConfig = z.infer<typeof tarGooConfigSchema>;
  * Canonical tar-goo parameters for DestinyAstrolabe V6.2.
  */
 export const tarGooConfig: TarGooConfig = tarGooConfigSchema.parse({
+  timing: {
+    seedMs: 520,
+    pourMs: 1300,
+    seedReveal: 0.08,
+  },
   simulation: {
     rimSamples: 96,
-    stiffness: 0.028,
-    damping: 0.9,
-    maxSpeed: 9,
+    stiffness: 0.024,
+    damping: 0.925,
+    maxSpeed: 7,
     dropletCount: 7,
-    dropletCrawlSpeed: [0.04, 0.14],
+    dropletCrawlSpeed: [0.03, 0.09],
     dropletRadius: [9, 22],
     dropletOvershoot: 14,
   },
   field: {
     smoothMinK: 26,
-    undulationAmp: 4.5,
-    undulationSpeed: 0.35,
+    undulationAmp: 3.6,
+    undulationSpeed: 0.24,
   },
   material: {
     albedo: [0.012, 0.016, 0.034],
