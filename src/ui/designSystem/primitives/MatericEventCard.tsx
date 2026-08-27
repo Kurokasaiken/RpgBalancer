@@ -78,7 +78,7 @@ export const MatericEventCard: React.FC<MatericEventCardProps> = ({
       alt={imageAlt}
       style={
         variant === 'reminder'
-          ? { width: 80, height: 80, objectFit: 'contain', margin: '0 auto 8px' }
+          ? { width: 56, height: 56, objectFit: 'contain', display: 'block' }
           : { width: 120, height: 120, objectFit: 'contain', margin: '16px auto 0', display: 'block' }
       }
     />
@@ -93,14 +93,34 @@ export const MatericEventCard: React.FC<MatericEventCardProps> = ({
     >
       <SkinScope style={{ position: 'relative', zIndex: 1, padding: 24 }}>
         {variant === 'reminder' ? (
-          <>
-            {image ?? defaultImage}
-            {title && <SkinTitle level="1">{title}</SkinTitle>}
-            {subtitle && <SkinTitle level="subtitle">{subtitle}</SkinTitle>}
-            {daysLeftLabel && (
-              <MatericBadge style={{ marginTop: 8 }}>{daysLeftLabel}</MatericBadge>
-            )}
-          </>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 14,
+              textAlign: 'left',
+            }}
+          >
+            <div
+              style={{
+                width: 64,
+                height: 64,
+                flexShrink: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              {image ?? defaultImage}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              {title && <SkinTitle level="1" style={{ fontSize: 16, lineHeight: 1.2 }}>{title}</SkinTitle>}
+              {subtitle && <SkinTitle level="subtitle" style={{ fontSize: 11, opacity: 0.85 }}>{subtitle}</SkinTitle>}
+              {daysLeftLabel && (
+                <MatericBadge style={{ marginTop: 4 }}>{daysLeftLabel}</MatericBadge>
+              )}
+            </div>
+          </div>
         ) : (
           <>
             {badge && <MatericPlaque style={{ display: 'inline-block', marginBottom: 8 }}>{badge}</MatericPlaque>}

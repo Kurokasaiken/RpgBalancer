@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { MatericEventCard } from '@/ui/designSystem/primitives';
 import { GoblinInvasionWindow } from '@/ui/idleVillage/components/GoblinInvasionWindow';
+import { PoiMatericV3 } from '@/ui/idleVillage/components/poi/PoiMatericV3';
 import { trailerConfig } from '@/balancing/config/idleVillage/trailerConfig';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 
@@ -238,17 +239,18 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
               <MatericEventCard
                 variant="reminder"
                 title={String(t('world.goblinInvasion.eventLabel'))}
-                imageUrl={GOBLIN_IMAGE}
-                imageAlt=""
+                subtitle={String(t('world.goblinInvasion.invasion'))}
+                image={<PoiMatericV3 type="event" state="available" size={64} />}
                 daysLeftLabel={String(t('world.goblinInvasion.daysRemaining', { count: daysLeft }))}
                 style={{
                   position: 'absolute',
                   left: 0,
                   top: 0,
                   transform: 'translate(-50%, -50%) scale(3)',
-                  maxWidth: 240,
-                  width: 240,
-                  minHeight: 160,
+                  textAlign: 'left',
+                  maxWidth: 320,
+                  width: 320,
+                  minHeight: 120,
                 }}
               />
             )}
