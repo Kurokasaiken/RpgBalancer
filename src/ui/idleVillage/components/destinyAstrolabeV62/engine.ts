@@ -1188,8 +1188,30 @@ function drawAxisRig(now){
 }
 
 /* star path sampled from the same radial function used for membership */
+/* IL PERCORSO DELLA STELLA: DIECI VERTICI, LINEE DRITTE.
+   E' la costruzione di `tracePerfectStar` in AltVisualsV6Asterism — dieci righe,
+   giusta dal primo giorno, e il Director ha dovuto indicarmela tre volte.
+   Campionare `rStarAt` a 80 punti equivalenti non e' sbagliato, ma passare dai
+   vertici e' esatto per costruzione e non dipende dal fatto che 80 sia multiplo
+   di 10: le punte cadono sui vertici e non "vicino" ai vertici.
+   Il FIORE resta campionato, perche' i petali tondi sono curve e non corde. */
 function starPath(scale){
   const p=new Path2D();
+  const fam=geo.starMix||0;
+  if(fam>=0.5){
+    const vF=(geo.valleyF===undefined?0.3675:geo.valleyF);
+    for(let i=0;i<AXES*2;i+=1){
+      const a=-Math.PI/2+i*(Math.PI/AXES);
+      const k=i>>1;
+      const r=(i%2===0)
+        ? geo.starTip[k%AXES]*scale
+        : Math.min(geo.starTip[k%AXES],geo.starTip[(k+1)%AXES])*vF*scale;
+      const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
+      if(i===0) p.moveTo(x,y); else p.lineTo(x,y);
+    }
+    p.closePath();
+    return p;
+  }
   const SEG=80;
   for(let i=0;i<=SEG;i+=1){
     const a=-Math.PI/2+i/SEG*TAU;
@@ -1260,8 +1282,20 @@ function drawStar(now){
   ctx.restore();
 
   /* L3-L5 triple bronze rim — the ALMOST band */
-  ctx.lineJoin='round';
-  ctx.lineWidth=ALMOST_W; ctx.strokeStyle='rgba(96,44,8,.55)'; ctx.stroke(starPath(s*1.0));
+  /* PUNTE AGUZZE: `lineJoin='round'` con uno stroke da 16px arrotonda OGNI punta
+     e OGNI incavo con raggio 8 e ingrassa i bracci — la geometria era una stella
+     e la pittura la trasformava in una stella marina. Con `miter` e un limite
+     alto gli angoli restano vivi. */
+  ctx.lineJoin='miter'; ctx.miterLimit=12;
+  /* ALMOST come AREA fra due profili, non come stroke grasso: uno stroke centrato
+     sul bordo mangia dentro la stella e la gonfia fuori, cioe' falsa la
+     silhouette che porta la probabilita'. */
+  {
+    const inner=starPath(s), outer=starPath(s*1.085);
+    const band=new Path2D(); band.addPath(outer); band.addPath(inner);
+    ctx.fillStyle='rgba(96,44,8,.55)';
+    ctx.fill(band,'evenodd');
+  }
   ctx.lineWidth=4.5; ctx.strokeStyle='#602c08'; ctx.stroke(p);
   ctx.lineWidth=2.4;
   const rim=ctx.createLinearGradient(CX-120,CY-120,CX+120,CY+120);
