@@ -12,7 +12,6 @@ import type {
 } from '../config/worldSurfaceConfig';
 import { clampPan, clampZoom, viewportToWorld } from '../../../engine/world/model/WorldCoordinate';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
-import { trailerConfig } from '@/balancing/config/idleVillage/trailerConfig';
 
 const WorldSurfaceWaves = lazy(() => import('./WorldSurfaceWaves'));
 const WorldSurfaceClouds = lazy(() => import('./WorldSurfaceClouds'));
@@ -474,22 +473,25 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
     y: manifest.coordinateSystem.canvas.height / 2,
   }), [manifest.coordinateSystem.canvas.width, manifest.coordinateSystem.canvas.height]);
 
+  // Alpha centroids of the two painted layers, expressed as canvas fractions so
+  // they survive a re-export at a different resolution:
+  //  - forest_1_top_left ("Foresta 1 Alto Sin"): where the goblin sticker lands;
+  //  - the village ("Villaggio"): what it slowly marches toward.
+  const fallTarget = useMemo(() => {
+    const canvas = manifest.coordinateSystem.canvas;
+    return {
+      x: Math.round(canvas.width * 0.239),
+      y: Math.round(canvas.height * 0.417),
+    };
+  }, [manifest.coordinateSystem.canvas]);
+
   const marchTarget = useMemo(() => {
     const canvas = manifest.coordinateSystem.canvas;
-    const camp = trailerConfig.threat.pois.find((p) => p.id === 'goblin-camp');
-    if (camp) {
-      return {
-        x: Math.round((camp.x / 100) * canvas.width),
-        y: Math.round((camp.y / 100) * canvas.height),
-      };
-    }
-    return { x: 737, y: 859 };
-  }, [manifest.coordinateSystem.canvas.height,manifest.coordinateSystem.canvas.width]);
-
-  const fallTarget = useMemo(
-    () => ({ x: marchTarget.x - 200, y: marchTarget.y }),
-    [marchTarget.x, marchTarget.y],
-  );
+    return {
+      x: Math.round(canvas.width * 0.486),
+      y: Math.round(canvas.height * 0.554),
+    };
+  }, [manifest.coordinateSystem.canvas]);
 
   return (
     <div

@@ -19,7 +19,10 @@ import { readFileSync, readdirSync, statSync } from 'fs';
 import { join, relative } from 'path';
 
 const ROOT = process.cwd();
-const TARGET_FILES = ['src/ui/idleVillage/trailer/GoblinEventModalV17.tsx'];
+const TARGET_FILES = [
+  'src/ui/idleVillage/trailer/GoblinEventModalV17.tsx',
+  'src/ui/idleVillage/components/poi/PoiMatericV4.tsx',
+];
 const EXCLUDE_DIRS = ['node_modules', 'dist', 'build'];
 
 const COLOR_LITERAL_RE = /(?:#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6,8})\b|(?:rgb|rgba|hsl|hwb)\s*\([^)]*\))/g;

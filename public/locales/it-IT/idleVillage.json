@@ -350,6 +350,7 @@
     "progress": "Tempo residuo",
     "size": "Dimensione",
     "counterClockwise": "Antiorario (scadenza)",
+    "grounded": "Ombra di appoggio",
     "showMap": "Mostra la mappa",
     "types": {
       "quest": "Quest",
