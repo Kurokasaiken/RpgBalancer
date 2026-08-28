@@ -150,41 +150,18 @@ function recomputeGeometry(skillIndex=0){
      Anche i valori erano fuori scala: valle a 0.78 del raggio della punta e'
      quasi un cerchio, valle a 0.12 e' uno spillo. */
   const elong=Math.min(...geo.starTip.map((s,i)=>s/Math.max(1e-6,geo.axisCheck[i])));
-  const eT=clamp((elong-V62_FLOWER_UNTIL)/(V62_STAR_FROM-V62_FLOWER_UNTIL),0,1);
-  /* DUE COSE DIVERSE, DUE CURVE DIVERSE. Prima ne usavo una sola, e per questo
-     la lama arrivava subito.
-       - la FAMIGLIA del profilo (petali tondi -> fianchi dritti) deve passare
-         PRESTO: appena si e' in territorio di stella serve una stella NORMALE,
-         e una stella normale ha i fianchi dritti;
-       - la PROFONDITA' dell'incavo deve passare TARDI: e' lei che porta la forma
-         oltre la soglia in cui il sigillo diventa lama, e ci deve arrivare solo
-         al delta estremo.
-     Il Director: «piu' c'e' delta e piu' deve essere in quel modo, ma a queste
-     proporzioni una stella normale basta». */
-  /* LA FAMIGLIA CAMBIA ALLA PARITA', non dentro una banda.
-     Misurato sul caso reale: a 60/55 l'allungamento e' 1.072, quindi con la
-     soglia a 1.08 la famiglia restava a 0.000 — petali tondi, cioe' un fiore, ed
-     e' esattamente cio' che il Director continuava a vedere. La sua regola e'
-     letterale: «quando il fiore e' pari o maggiore come valori dello skill check
-     deve essere una stella». Quindi il passaggio sta SULLA parita', in una
-     finestra stretta, e da li' in poi e' una stella con l'incavo classico
-     (0.3675, che e' il rapporto della stella a cinque punte). La lama resta
-     tardi: e' l'incavo a portarla, non la famiglia. */
-  const fam=smoothstep(elong,0.98,1.10);
-  const eS=fam;                                        // famiglia: alla parita'
-  const blade=Math.pow(smoothstep(eT,0.60,1.0),3);     // incavo: tardi, al cubo
-  geo.valleyF=V62_VALLEY_FLOWER+(V62_VALLEY_STAR-V62_VALLEY_FLOWER)*blade;
-  /* IL VALORE DELLA VALLE NON BASTA: SERVE CAMBIARE FAMIGLIA DI PROFILO.
-     `radialFromAxes` interpola il RAGGIO linearmente nell'angolo, e in polari
-     questo e' un arco che si GONFIA verso l'esterno: petali tondi, sempre.
-     Misurato contro una stella vera, il fianco sporge del 18.5% del raggio
-     della punta a valle 0.3675 e del 30.6% a valle 0.22 — cioe' scavare la
-     valle PEGGIORA il gonfiore invece di affilare la punta. E' per questo che
-     a stat alta si vedeva ancora un fiore.
-     Una stella e' un POLIGONO: i fianchi sono corde dritte fra il vertice
-     della punta e quello dell'incavo. `starMix` fa passare dall'una all'altra
-     con la stessa soglia della valle. */
-  geo.starMix=eS;
+  /* FAMIGLIA: cambia alla parita', in una finestra stretta. Sotto e' fiore
+     (petali tondi), sopra e' stella (fianchi dritti). Misurato che con la soglia
+     a 1.08 un caso da allungamento 1.072 restava fiore. */
+  const fam=smoothstep(elong,0.96,1.06);
+  const eS=fam;
+  /* VALLE: 0.3675 (fiore) e 0.382 (stella) sono quasi lo stesso numero, quindi
+     il passaggio fiore->stella e' TUTTO nella famiglia e non si vede un salto di
+     profondita'. La valle si scava solo avvicinandosi a phi^2, dove la stella
+     normale coprirebbe il goo per intero. */
+  const blade=smoothstep(elong,V62_COVER_ALL*0.70,V62_COVER_ALL);
+  const vStar=V62_VALLEY_FLOWER+(V62_VALLEY_STAR-V62_VALLEY_FLOWER)*fam;
+  geo.valleyF=vStar+(V62_VALLEY_BLADE-vStar)*blade;
   geo.starTip=geo.obeliskTip.slice();   // la punta È l'obelisco bianco
   /* probabilità reale, misurata sulla geometria che il giocatore vede.
      Stessa formula di inStar: min(stella, muro) — il muro taglia la stella. */
@@ -410,12 +387,29 @@ function setState(s){
 function phaseT(durMs){ return clamp((performance.now()-scene.t0)/durMs,0,1); }
 const easeOutCubic=t=>1-Math.pow(1-t,3);
 const easeInCubic=t=>t*t*t;
-/* LA PROGRESSIONE DELLA FORMA — stessi numeri della V16, misurati li':
-   fiore fino a oltre la parita', poi stella che si affila. */
-const V62_FLOWER_UNTIL=1.08;      // punta/trama sotto cui e' fiore pieno
-const V62_STAR_FROM=1.55;         // sopra cui e' stella affilata
+/* LE TRE FORME, E LE SOGLIE NON SONO INVENTATE.
+ *
+ *   punta < muro            -> FIORE           (petali tondi)
+ *   punta ~ muro .. phi^2   -> STELLA NORMALE  (fianchi dritti, valle 0.382)
+ *   punta -> phi^2 * muro   -> STELLA STIRATA  (la valle si scava)
+ *
+ * 0.382 non e' a occhio: nella stella a cinque punte il rapporto fra raggio
+ * interno ed esterno e' `cos(2pi/5)/cos(pi/5) = 1/phi^2 = 0.381966`. E' LA
+ * proporzione della stella, verificata numericamente. La V6 Asterism usa 0.4,
+ * che e' la stessa cosa a occhio.
+ *
+ * E la terza soglia e' quella che il Director ha DEFINITO invece di scegliere:
+ * «quando con la stella il goo sarebbe interamente coperto». Il punto piu' basso
+ * del bordo e' la valle, quindi la stella copre tutto quando
+ *     0.382 * punta >= muro   ->   punta/muro >= 1/0.382 = phi^2 = 2.618
+ * Da li' in poi la valle DEVE scavarsi, o il fallimento sparisce dal disegno.
+ */
+const PHI=(1+Math.sqrt(5))/2;
+const V62_STAR_AT=1.0;            // la parita': da qui e' stella
+const V62_COVER_ALL=PHI*PHI;      // 2.618: qui la stella normale coprirebbe tutto
 const V62_VALLEY_FLOWER=0.3675;   // la costante tarata: parita = 50% dell'area
-const V62_VALLEY_STAR=0.22;       // stella affilata quando sfonda la prova
+const V62_VALLEY_STAR=1/(PHI*PHI);// 0.381966 — la proporzione della stella
+const V62_VALLEY_BLADE=0.22;      // stirata: la valle scavata per non coprire tutto
 const easeOutBack=t=>{const c=1.7;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2);};
 const smoothstep=(t,a,b)=>{ if(t<=a)return 0; if(t>=b)return 1; const m=(t-a)/(b-a); return m*m*(3-2*m); };
 /* V6.2 tar-pour curve: pooled seed → slow spread → settle, no overshoot.
