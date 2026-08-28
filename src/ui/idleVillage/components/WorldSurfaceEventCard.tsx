@@ -1,24 +1,21 @@
 /**
  * WorldSurfaceEventCard — Goblin Invasion announcement shown at the peak of the shroud.
  *
- * Layout is the one validated in the `Event` tab of `/primitives`: a
- * `MatericEventCard` in `modal` variant whose central image is the
- * `GoblinInvasionWindow` glass case.
+ * The card appears reduced by 33% and shows only the "Invasion" badge plus
+ * a clickable POI. After the player confirms, the sticker detaches and the
+ * card shrinks into a narrow, tall reminder parked in the top-right of the world.
  *
  * Sequence, after the player confirms:
- *  1. `peeling`  — the bordered goblin sticker peels off the diorama;
- *  2. `falling`  — that sticker detaches from the card and flies onto the map,
- *                  landing on the centre of `forest_1_top_left` (thud);
- *  3. `marching` — it crawls very slowly toward the village;
- *  in parallel the card shrinks into a narrow, tall reminder card (pgCard
- *  proportions) parked in the top-right of the world.
+ *  1. `peeling`  — the bordered goblin sticker begins to detach;
+ *  2. `falling`  — the sticker lands on the centre of `forest_1_top_left` (thud);
+ *  3. `marching` — it crawls very slowly toward the village.
  */
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { MatericEventCard } from '@/ui/designSystem/primitives';
-import { GoblinInvasionWindow } from '@/ui/idleVillage/components/GoblinInvasionWindow';
+
 import { PoiMatericV3 } from '@/ui/idleVillage/components/poi/PoiMatericV3';
 import goblinStickerImage from '@/assets/ui/idleVillage/goblin-march-trasparente.png';
 import { trailerConfig } from '@/balancing/config/idleVillage/trailerConfig';
@@ -52,18 +49,15 @@ const DAYS_LEFT = Number(trailerConfig.threat.announcement.timerRing.number) || 
 /**
  * World-pixel scale of the announcement card. The map canvas is 4240×2828, so
  * the card is authored at its design size (460px wide) and blown up here.
- * Doubled from the previous value: at scale 3 the card read as a stamp.
+ * Reduced by 33% from the original modal size so it appears at this scale
+ * from the moment the shroud shows it.
  */
-const CARD_SCALE = 6;
-/** The card is reduced by 33% as soon as the shroud starts peeling. */
-const SHROUDED_SCALE = CARD_SCALE * 0.67;
+const CARD_SCALE = 6 * 0.67;
 /** The reminder is a narrow, tall pgCard-shaped chip, so it needs less scale. */
 const REMINDER_SCALE = 3.4;
 
 const CARD_W = 460;
-/** Viewport that crops the glass case inside the card (from /primitives). */
-const WINDOW_BOX_W = 364;
-const WINDOW_BOX_H = 294;
+/** Scale of the sticker relative to the card while still attached. */
 const WINDOW_INNER_SCALE = 0.7;
 
 /** pgCard proportions (172×260 in the roster) for the parked reminder. */
@@ -183,7 +177,6 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
 
   /** The card keeps its modal shape while the sticker is still attached. */
   const isModal = stage === 'modal' || stage === 'peeling';
-  const isPeeling = stage === 'peeling';
   const stickerDetached = stage === 'falling' || stage === 'marching' || stage === 'done';
 
   const stickerAnimate = stage === 'falling'
@@ -218,7 +211,7 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
         initial={{ x: 0, y: 0, scale: CARD_SCALE }}
         animate={
           isModal
-            ? { x: 0, y: 0, scale: isPeeling ? SHROUDED_SCALE : CARD_SCALE }
+            ? { x: 0, y: 0, scale: CARD_SCALE }
             : { x: reminderOffset.x, y: reminderOffset.y, scale: REMINDER_SCALE }
         }
         transition={{ duration: 1.2, ease: 'easeInOut' }}
@@ -243,35 +236,14 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
               <MatericEventCard
                 variant="modal"
                 badge={String(t('world.goblinInvasion.invasion'))}
-                subtitle={!isPeeling ? String(t('world.goblinInvasion.subtitle', { count: daysLeft })) : undefined}
                 image={
-                  !isPeeling ? (
-                    <div
-                      style={{
-                        position: 'relative',
-                        width: WINDOW_BOX_W,
-                        height: WINDOW_BOX_H,
-                        overflow: 'hidden',
-                        margin: '0 auto',
-                      }}
-                    >
-                      <GoblinInvasionWindow
-                        ariaLabel={String(t('world.goblinInvasion.title'))}
-                        peeled={stage === 'peeling'}
-                        style={{
-                          position: 'absolute',
-                          top: '50%',
-                          left: '50%',
-                          transform: `translate(-50%, -50%) scale(${WINDOW_INNER_SCALE})`,
-                        }}
-                      />
-                    </div>
-                  ) : (
-                    <PoiMatericV3 type="event" state="available" size={72} />
-                  )
+                  <PoiMatericV3
+                    type="event"
+                    state="available"
+                    size={72}
+                    onClick={stage === 'modal' ? handleAction : undefined}
+                  />
                 }
-                actionLabel={!isPeeling ? String(t('world.goblinInvasion.action')) : undefined}
-                onAction={!isPeeling ? handleAction : undefined}
                 style={{ maxWidth: CARD_W, width: CARD_W }}
               />
             </motion.div>
