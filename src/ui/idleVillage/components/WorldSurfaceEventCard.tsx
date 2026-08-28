@@ -15,7 +15,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { MatericEventCard } from '@/ui/designSystem/primitives';
-
+import { GoblinInvasionWindow } from '@/ui/idleVillage/components/GoblinInvasionWindow';
 import { PoiMatericV3 } from '@/ui/idleVillage/components/poi/PoiMatericV3';
 import goblinStickerImage from '@/assets/ui/idleVillage/goblin-march-trasparente.png';
 import { trailerConfig } from '@/balancing/config/idleVillage/trailerConfig';
@@ -57,7 +57,9 @@ const CARD_SCALE = 6 * 0.67;
 const REMINDER_SCALE = 3.4;
 
 const CARD_W = 460;
-/** Scale of the sticker relative to the card while still attached. */
+/** Viewport that crops the glass case inside the card (from /primitives). */
+const WINDOW_BOX_W = 364;
+const WINDOW_BOX_H = 294;
 const WINDOW_INNER_SCALE = 0.7;
 
 /** pgCard proportions (172×260 in the roster) for the parked reminder. */
@@ -237,12 +239,27 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
                 variant="modal"
                 badge={String(t('world.goblinInvasion.invasion'))}
                 image={
-                  <PoiMatericV3
-                    type="event"
-                    state="available"
-                    size={72}
+                  <div
                     onClick={stage === 'modal' ? handleAction : undefined}
-                  />
+                    style={{
+                      position: 'relative',
+                      width: WINDOW_BOX_W,
+                      height: WINDOW_BOX_H,
+                      overflow: 'hidden',
+                      margin: '0 auto',
+                    }}
+                  >
+                    <GoblinInvasionWindow
+                      ariaLabel={String(t('world.goblinInvasion.title'))}
+                      peeled={stage === 'peeling'}
+                      style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: `translate(-50%, -50%) scale(${WINDOW_INNER_SCALE})`,
+                      }}
+                    />
+                  </div>
                 }
                 style={{ maxWidth: CARD_W, width: CARD_W }}
               />
