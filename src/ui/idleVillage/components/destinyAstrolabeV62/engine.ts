@@ -135,12 +135,22 @@ function recomputeGeometry(skillIndex=0){
      margine del PG rispetto allo skill check: valli basse = stella affilata
      quando stat >= difficoltà, valli alte = fiore dai petali arrotondati quando
      il PG è sotto. */
-  const sCfg=tarGooConfig.star;
-  const range=sCfg.transitionR*R;
-  const margins=geo.starTip.map((s,i)=>s-geo.axisCheck[i]);
-  const minMargin=Math.min(...margins);
-  const t=clamp((minMargin+range)/range,0,1);
-  geo.valleyF=sCfg.valleyFlower+(sCfg.valleyStar-sCfg.valleyFlower)*t;
+  /* IL PASSAGGIO STAVA DALLA PARTE SBAGLIATA DELLA PARITA'.
+     Con `t = (minMargin + range)/range` e range = 0.25*R, a PARITA' il margine
+     e' 0 e quindi t = 1: la forma era gia' la stella piu' affilata possibile, e
+     tornava fiore solo scendendo di 90 unita' SOTTO la prova. Tutta la
+     transizione viveva nella meta' in cui il PG perde, e sopra la parita' non
+     succedeva piu' niente.
+     La regola concordata e' l'opposta: il FIORE e' la base e tiene fino a
+     oltre la parita'; la stella entra — e progressivamente si affila — quando
+     la punta SUPERA la materia. La variabile e' l'allungamento punta/trama, e
+     la soglia e' 1 perche' e' li' che la punta raggiunge la trama.
+     Anche i valori erano fuori scala: valle a 0.78 del raggio della punta e'
+     quasi un cerchio, valle a 0.12 e' uno spillo. */
+  const elong=Math.min(...geo.starTip.map((s,i)=>s/Math.max(1e-6,geo.axisCheck[i])));
+  const eT=clamp((elong-V62_FLOWER_UNTIL)/(V62_STAR_FROM-V62_FLOWER_UNTIL),0,1);
+  const eS=eT*eT*(3-2*eT);
+  geo.valleyF=V62_VALLEY_FLOWER+(V62_VALLEY_STAR-V62_VALLEY_FLOWER)*eS;
   geo.starTip=geo.obeliskTip.slice();   // la punta È l'obelisco bianco
   /* probabilità reale, misurata sulla geometria che il giocatore vede.
      Stessa formula di inStar: min(stella, muro) — il muro taglia la stella. */
@@ -162,11 +172,57 @@ function recomputeGeometry(skillIndex=0){
   geo.rValley=Math.min(...geo.starTip)*geo.valleyF;
   /* critical-fail band thickness — purely proportional to the arena radius and
      scaled by crit% (like the wound/death sectors). No fixed pixel values. */
-  geo.epicW=(R-3)*clamp(cfg.crit/100,0.04,0.5);
-  /* Wound corona: outer band thickness ∝ wound%, from goo edge inward */
-  geo.woundW=(R-3)*clamp(cfg.wound/100,0.04,0.4)*0.65;
-  /* Death void: strip depth just outside star edge in valleys, ∝ dead% */
-  geo.deathDepth=(geo.rValley||80)*clamp(cfg.dead/100,0.02,0.3)*4.5;
+  /* LE PROPORZIONI ERANO SBAGLIATE, ed e' lo stesso difetto tre volte: uno
+     SPESSORE proporzionale a `R` non e' una PROBABILITA' proporzionale a
+     niente. `epicW = (R-3)*crit%` da' una fascia sempre alta uguale, ma
+     l'arena cambia con la difficolta': misurato in PLAN-008, la stessa fascia
+     valeva il 31.9% dell'area a difficolta' 20 e il 10.4% a 99.
+     La logica concordata: lo spessore si RISOLVE perche' l'AREA sia la
+     percentuale voluta, e la base e' l'AREA DI TIRO — l'arena meno il raggio
+     della pallina, perche' il centro della pallina non arriva piu' in la'. */
+  {
+    const SEG=720, dA=TAU/SEG, BALL_R=9;
+    const wallAt=a=>rCheckAt(a,1);
+    const reachAt=a=>Math.max(0,wallAt(a)-BALL_R);
+    let reachA=0;
+    for(let i=0;i<SEG;i+=1){ const r=reachAt(-Math.PI/2+i*dA); reachA+=0.5*r*r*dA; }
+    /* area di una fascia di spessore `w` verso l'interno da un profilo */
+    const bandArea=(outer,w)=>{
+      let s=0;
+      for(let i=0;i<SEG;i+=1){
+        const a=-Math.PI/2+i*dA;
+        const r1=outer(a), r0=Math.max(geo.rCore,r1-w);
+        s+=0.5*(r1*r1-r0*r0)*dA;
+      }
+      return s;
+    };
+    const solveW=(outer,pct)=>{
+      const want=reachA*clamp(pct,0,60)/100;
+      let lo=0,hi=R;
+      for(let k=0;k<40;k+=1){ const m=(lo+hi)/2; if(bandArea(outer,m)<want) lo=m; else hi=m; }
+      return (lo+hi)/2;
+    };
+    geo.epicW=solveW(reachAt,cfg.crit);
+    geo.woundW=solveW(reachAt,cfg.wound);
+    /* la morte e' una striscia appena FUORI dal bordo della stella: cresce
+       verso l'esterno, quindi si risolve sull'altro verso */
+    {
+      const want=reachA*clamp(cfg.dead,0,60)/100;
+      const outward=w=>{
+        let s=0;
+        for(let i=0;i<SEG;i+=1){
+          const a=-Math.PI/2+i*dA;
+          const r0=Math.min(rStarAt(a),wallAt(a));
+          const r1=Math.min(r0+w,wallAt(a));
+          s+=0.5*(r1*r1-r0*r0)*dA;
+        }
+        return s;
+      };
+      let lo=0,hi=R;
+      for(let k=0;k<40;k+=1){ const m=(lo+hi)/2; if(outward(m)<want) lo=m; else hi=m; }
+      geo.deathDepth=(lo+hi)/2;
+    }
+  }
 }
 /* interpolate a per-axis radius array around the wheel (tips at TIP(i)) */
 function radialFromAxes(theta,arr,scale){
@@ -302,6 +358,12 @@ function setState(s){
 function phaseT(durMs){ return clamp((performance.now()-scene.t0)/durMs,0,1); }
 const easeOutCubic=t=>1-Math.pow(1-t,3);
 const easeInCubic=t=>t*t*t;
+/* LA PROGRESSIONE DELLA FORMA — stessi numeri della V16, misurati li':
+   fiore fino a oltre la parita', poi stella che si affila. */
+const V62_FLOWER_UNTIL=1.08;      // punta/trama sotto cui e' fiore pieno
+const V62_STAR_FROM=1.55;         // sopra cui e' stella affilata
+const V62_VALLEY_FLOWER=0.3675;   // la costante tarata: parita = 50% dell'area
+const V62_VALLEY_STAR=0.22;       // stella affilata quando sfonda la prova
 const easeOutBack=t=>{const c=1.7;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2);};
 const smoothstep=(t,a,b)=>{ if(t<=a)return 0; if(t>=b)return 1; const m=(t-a)/(b-a); return m*m*(3-2*m); };
 /* V6.2 tar-pour curve: pooled seed → slow spread → settle, no overshoot.
@@ -569,7 +631,11 @@ function stepBall(p){
     const nx=(b.x-CX)/d, ny=(b.y-CY)/d;
     chaoticBounce(nx,ny,false);
     b.x=CX+nx*edge; b.y=CY+ny*edge;
-    scene.rimHits.push({ang:Math.atan2(ny,nx),life:600});
+    /* NIENTE PINBALL. Il Director, due volte: «c'e' ancora l'effetto pinball
+       con dei segmenti che si illuminano rispetto a dove colpisce la pallina,
+       non ci devono essere». Il segmento acceso dice «hai colpito QUI», cioe'
+       trasforma un rimbalzo in un punteggio: e' il linguaggio del flipper, non
+       quello di una prova. L'evento resta nella fisica, non nella grafica. */
     addSpark(b.x,b.y);
   }
 
@@ -772,10 +838,37 @@ function tickGooSim(now){
   /* Invasion front: a single tar wave that grows outward from the core.
      Each axis reaches its own final radius when the front passes it, so
      short arms fill first and the long arms keep pushing — like real tar. */
-  const front=rev<=0.001?0:rev*geo.tarRMax;
+  /* DUE TEMPI, NON UNO. Il Director: «l'animazione dell'espansione del goo
+     sembra fermarsi in uno step, vorrei che invece si allargasse prima come
+     tentacoli fino agli obelischi neri e poi si espandesse».
+     Il fronte era `rev * tarRMax`, cioe' un cerchio che cresce uguale in tutte
+     le direzioni: arrivava e si fermava, e non c'era nessun secondo tempo da
+     vedere. Ora il fronte e' ANGOLARMENTE SELETTIVO:
+       tempo 1 (rev 0 -> 0.58)  le braccia corrono LUNGO GLI ASSI, cioe' verso
+                                gli obelischi neri, e fra un asse e l'altro la
+                                materia resta indietro: sono tentacoli;
+       tempo 2 (rev 0.50 -> 1)  la selettivita' si scioglie e il vuoto fra le
+                                braccia si riempie.
+     Le due fasi si sovrappongono di 8 centesimi perche' un tentacolo che si
+     ferma e POI riparte legge come due animazioni diverse. */
+  const armT=smoothstep(rev,0.0,0.58);
+  const fillT=smoothstep(rev,0.50,1.0);
+  const segHalf=Math.PI/AXES;
+  const angToAxis=(th)=>{
+    let best=Math.PI;
+    for(let a=0;a<AXES;a+=1){
+      const d=Math.abs(((th-TIP(a))%TAU+TAU+Math.PI)%TAU-Math.PI);
+      if(d<best) best=d;
+    }
+    return best;
+  };
   for(let i=0;i<gooSim.N;i+=1){
     const theta=i/gooSim.N*TAU;
     const rFinal=rev<=0.001?0:rCheckAt(theta,1);
+    /* peso del braccio: 1 sull'asse, 0 a meta' strada fra due assi */
+    const u=angToAxis(theta)/segHalf;
+    const w=1-smoothstep(u,0.0,0.62);
+    const front=rFinal*(w*armT+(1-w)*fillT);
     /* End-of-pour hard lock: once the tar is fully revealed, pin the rim to
        its final shape and kill any residual spring velocity so it never
        rebounds past the target. */
@@ -1536,17 +1629,7 @@ function drawShocks(dt){
     ctx.restore();
   }
 }
-function drawRimHits(){
-  scene.rimHits.forEach(h=>{
-    const a=h.life/600;
-    ctx.save();
-    ctx.globalAlpha=a*.85;
-    ctx.strokeStyle='#fce890'; ctx.lineWidth=4;
-    ctx.shadowColor='#fce890'; ctx.shadowBlur=16;
-    ctx.beginPath(); ctx.arc(CX,CY,R-5,h.ang-.16,h.ang+.16); ctx.stroke();
-    ctx.restore();
-  });
-}
+function drawRimHits(){ /* rimosso: era l'effetto pinball */ }
 function drawBall(now){
   const b=scene.ball;
   if(!b.on && scene.state!=='resolution') return;
