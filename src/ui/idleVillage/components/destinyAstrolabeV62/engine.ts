@@ -9,6 +9,8 @@
 
 import { tarGooConfig } from '@/balancing/config/idleVillage/tarGooConfig';
 import { createTarGooRenderer } from './tarGooRenderer';
+import { createTentacles, tickPose, buildBlobs, poolFraction,
+         SAMPLES_PER_ARM } from './tentacles';
 
 export interface AstrolabeSkill { name: string; stat: number; difficulty: number; }
 export interface AstrolabeConfig { crit?: number; wound?: number; dead?: number; mode?: string;
@@ -821,6 +823,12 @@ const ctx=cv.getContext('2d',{alpha:true});
    Crawling droplets merge into the rim through smooth-min bridges.
    ========================================================================= */
 const gooRenderer=createTarGooRenderer(W,tarGooConfig);
+/* I TENTACOLI vivono in un modulo a parte: il loro modello geometrico non e'
+   r(theta) ma una centerline per braccio, e mescolarli qui li avrebbe riportati
+   a essere lobi angolari. */
+const tent=createTentacles(AXES,0x7ea1);
+/* buffer unico per renderer: bracci + gocce, riallocato solo se serve */
+let gooBlend=new Float32Array(AXES*SAMPLES_PER_ARM*3+64);
 const gooSim=(()=>{
   const simCfg=tarGooConfig.simulation;
   const N=simCfg.rimSamples;
@@ -875,6 +883,7 @@ function tickGooSim(now){
   const simCfg=tarGooConfig.simulation;
   const dt=gooSim.lastMs?Math.min(50,now-gooSim.lastMs):16.7;
   gooSim.lastMs=now;
+  tickPose(tent,now,dt);
   const k=dt/16.7;                                   // frame-rate normalizer
   const rev=clamp(scene.gooReveal,0,1.0);
   /* Idle simmer: a slow, gentle boil on the tar rim once it has been fully
@@ -901,76 +910,20 @@ function tickGooSim(now){
                                 braccia si riempie.
      Le due fasi si sovrappongono di 8 centesimi perche' un tentacolo che si
      ferma e POI riparte legge come due animazioni diverse. */
-  /* TENTACOLI, NON PETALI. Il Director: «i tentacoli hanno la forma dei petali
-     dei fiori». Il difetto era di VOCABOLARIO: un peso angolare morbido su
-     mezzo settore (`1-smoothstep(u,0,0.62)`) e' letteralmente un lobo
-     sinusoidale, cioe' un petalo. La grammatica di un tentacolo e' un'altra:
-         radice larga -> COLLO STRETTO -> braccio lungo rastremato -> punta
-     Il collo e' la modifica singola piu' importante: strozzare l'attacco rompe
-     subito la lettura "petalo". Sono tutte cose che un bordo radiale r(theta)
-     puo' dire; servirebbe un campo 2D solo per serpeggiamento, biforcazioni e
-     sovrapposizione davanti/dietro alla stella.
-     Cosa NON si fa, e sono le trappole: rumore sul bordo (da' una massa
-     frastagliata, non un tentacolo), cinque bracci identici (stessa lunghezza e
-     stessa fase = petali), spostare le ancore (devono puntare alle punte). */
-  const segHalf=Math.PI/AXES;
-  /* i cinque bracci NON sono uguali: lunghezza, ritardo e sbilanciamento
-     laterale deterministici per indice, cosi' la simmetria si rompe senza che
-     le ancore si muovano */
-  const ARM=[
-    {len:1.00, lag:0.00, skew: 0.22},
-    {len:0.88, lag:0.10, skew:-0.16},
-    {len:0.96, lag:0.04, skew: 0.10},
-    {len:0.83, lag:0.14, skew:-0.24},
-    {len:0.93, lag:0.07, skew: 0.17},
-  ];
-  const fillT=smoothstep(rev,0.52,1.0);
-  /* LA POZZA. Piccola all'inizio, o il collo non si vede; ma deve arrivare a
-     coprire TUTTO da sola, perche' se si ferma sotto il muro il riempimento
-     finale lo fa il lucchetto `if(rev>=0.999) r=rFinal` — ed e' quello il
-     salto che il Director sentiva come «si ferma in uno step». Misurato prima
-     della correzione: a rev 1.0 la pozza era a 0.38 del muro e il resto
-     compariva di colpo. */
-  const seed=0.16*smoothstep(rev,0.02,0.20);
-  const baseFrac=Math.max(seed,fillT);
-  const nearest=(th)=>{
-    let bi=0, bd=Math.PI;
-    for(let a=0;a<AXES;a+=1){
-      const d=((th-TIP(a))%TAU+TAU+Math.PI)%TAU-Math.PI;
-      if(Math.abs(d)<Math.abs(bd)){bd=d;bi=a;}
-    }
-    return {i:bi, d:bd};
-  };
+  /* IL RIM DURANTE IL TRANSITORIO E' SOLO LA POZZA.
+     I bracci non stanno piu' qui: sono una centerline per braccio nel modulo
+     `tentacles`, e arrivano al renderer come primitive che il suo smooth-min
+     fonde col corpo. Provare a scriverli come peso angolare su r(theta) e' il
+     tentativo che ha prodotto due volte dei petali — con un raggio per angolo
+     non esiste nessun asse che percorra lo spazio.
+     La pozza cresce fino a 1.0 da sola: e' lei che fa CONVERGERE l'unione sulla
+     sagoma radiale, cosi' a riposo la fisica e le probabilita' restano quelle di
+     prima e il passaggio non si vede. */
+  const pool=poolFraction(rev);
   for(let i=0;i<gooSim.N;i+=1){
     const theta=i/gooSim.N*TAU;
     const rFinal=rev<=0.001?0:rCheckAt(theta,1);
-    const nb=nearest(theta);
-    const arm=ARM[nb.i];
-    /* avanzamento del braccio, con il suo ritardo */
-    const armT=smoothstep(rev,arm.lag,arm.lag+0.52);
-    /* SBILANCIAMENTO: un fianco del braccio scende prima dell'altro */
-    const sk=nb.d<0?(1+arm.skew):(1-arm.skew);
-    const u=Math.abs(nb.d)/segHalf*sk;
-    /* IL COLLO e LA RASTREMAZIONE: la semilarghezza angolare del braccio si
-       STRINGE mentre il braccio avanza. Larga alla radice, sottile in punta:
-       e' questo che lo fa leggere come un arto e non come un lobo. */
-    const halfW=0.44-0.26*armT;
-    const armEdge=1-smoothstep(u,halfW*0.42,halfW);
-    /* ondulazione LUNGO il braccio: bassa frequenza e ampiezza piccola, non
-       rumore — un arto vivo non e' rettilineo */
-    const wob=1+0.05*Math.sin(theta*7+nb.i*2.1+now/620);
-    const front=Math.max(
-      rFinal*baseFrac,
-      rFinal*arm.len*armT*armEdge*wob,
-    );
-    /* End-of-pour hard lock: once the tar is fully revealed, pin the rim to
-       its final shape and kill any residual spring velocity so it never
-       rebounds past the target. */
-    if(rev>=0.999){
-      gooSim.r[i]=rFinal;
-      gooSim.v[i]=0;
-      continue;
-    }
+    const front=rFinal*pool;
     const target=Math.min(rFinal,front);
     let vel=(gooSim.v[i]+(target-gooSim.r[i])*simCfg.stiffness*k)*damp;
     const vMax=simCfg.maxSpeed*k*(1+2*(scene.gooRipple||0));
@@ -1148,10 +1101,22 @@ function drawChallengeSurface(now){
   tickGooSim(now);
   if(rev<=0.001 && gooSim.blobCount===0) return;
   if(gooRenderer){
+    /* LE PRIMITIVE: prima i bracci, poi le gocce. I bracci hanno priorita'
+       perche' sono la silhouette; le gocce sono dettaglio e possono essere
+       troncate dal tetto di MAX_BLOBS senza che nessuno lo noti.
+       Sopra rev 0.97 i bracci non si emettono piu': la pozza li ha raggiunti,
+       quindi non aggiungerebbero niente e sprecherebbero slot. */
+    const armN=rev<0.97
+      ? buildBlobs(tent,CX,CY,rev,(i)=>TIP(i),(a)=>rCheckAt(a,1))
+      : 0;
+    const total=armN+gooSim.blobCount;
+    if(gooBlend.length<total*3) gooBlend=new Float32Array(total*3);
+    gooBlend.set(tent.blobs.subarray(0,armN*3),0);
+    gooBlend.set(gooSim.blobs.subarray(0,gooSim.blobCount*3),armN*3);
     const layer=gooRenderer.render({
       radii:gooSim.r,
-      blobs:gooSim.blobs,
-      blobCount:gooSim.blobCount,
+      blobs:gooBlend,
+      blobCount:total,
       timeMs:now,
       reveal:clamp(rev,0,1),
       ripple:clamp(scene.gooRipple||0,0,1),

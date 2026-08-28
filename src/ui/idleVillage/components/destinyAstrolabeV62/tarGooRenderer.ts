@@ -43,7 +43,10 @@ export interface TarGooRenderer {
   destroy(): void;
 }
 
-const MAX_BLOBS = 12;
+/* 24 e non 12: i tentacoli entrano come primitive (5 bracci x 4 campioni = 20) e
+   devono convivere con le gocce che strisciano. Il costo e' un ciclo di distanze
+   in piu' per pixel sul solo quad del board, non una passata a schermo pieno. */
+const MAX_BLOBS = 24;
 
 const VERT = `#version 300 es
 precision highp float;
