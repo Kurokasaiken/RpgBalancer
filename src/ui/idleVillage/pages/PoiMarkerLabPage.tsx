@@ -14,7 +14,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DayNightTimeEngineStrip } from '@/ui/idleVillage/frozen/kits/clockKit';
-import { useMinimalGameplayWithIdleVillageConfig } from '@/store/useMinimalGameplay';
+import {
+  useMinimalGameplayStore,
+  useMinimalGameplayWithIdleVillageConfig,
+} from '@/store/useMinimalGameplay';
 import { SkinSystemProvider } from '@/ui/idleVillage/hooks/useSkinSystem';
 import { SandboxTimingProvider } from '@/ui/idleVillage/hooks/useSandboxTimingBridge';
 import {
@@ -29,12 +32,25 @@ import PoiMarkerRunicV5, { poiRunicV5Styles } from '../components/poi/PoiMarkerR
 import PoiMatericV1, { poiMatericV1Styles } from '../components/poi/PoiMatericV1';
 import PoiMatericV2, { poiMatericV2Styles } from '../components/poi/PoiMatericV2';
 import PoiMatericV3, { poiMatericV3Styles } from '../components/poi/PoiMatericV3';
+import PoiMatericV4, { poiMatericV4Styles } from '../components/poi/PoiMatericV4';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
+
+/** How long the seal takes to write itself once, at x1. Long enough to judge. */
+const POI_FILL_DURATION_MS = 120_000;
+/** Beat at the top of the cycle, so a completed circle can be seen as complete. */
+const POI_FILL_HOLD_MS = 4_000;
+/**
+ * Ceiling on a single frame's delta, so a backgrounded tab does not jump the
+ * ring forward on return. Kept well above a slow frame: too tight a clamp
+ * silently throttles the fill whenever the renderer drops below the ceiling's
+ * frame rate, which looks like the ramp running slow rather than like a guard.
+ */
+const MAX_FRAME_DELTA_MS = 250;
 
 const TYPES: PoiType[] = ['quest', 'job', 'event'];
 const STATES: PoiState[] = ['new', 'available', 'assigned', 'expiring', 'expired'];
 const IMPORTANCES = ['normal', 'important', 'critical'] as const;
-const VARIANTS = ['matericV1', 'matericV2', 'matericV3', 'runic', 'runicV1', 'runicV3', 'runicV5'] as const;
+const VARIANTS = ['matericV1', 'matericV2', 'matericV3', 'matericV4', 'runic', 'runicV1', 'runicV3', 'runicV5'] as const;
 
 type Importance = (typeof IMPORTANCES)[number];
 type Variant = (typeof VARIANTS)[number];
@@ -43,6 +59,7 @@ const MARKERS: Record<Variant, React.FC<PoiMarkerProps>> = {
   matericV1: PoiMatericV1,
   matericV2: PoiMatericV2,
   matericV3: PoiMatericV3,
+  matericV4: PoiMatericV4,
   runic: PoiMarkerRunic,
   runicV1: PoiMarkerRunicV1,
   runicV3: PoiMarkerRunicV3,
@@ -62,49 +79,65 @@ export const PoiMarkerLabPage: React.FC = () => {
 
   // Canonical time engine state (shared with DayNightTimeEngineStrip)
   const gameplay = useMinimalGameplayWithIdleVillageConfig();
-  const { state: gameState, config } = gameplay;
-  const tickIntervalMs = config.loop?.tickIntervalMs ?? 1000;
 
-  // Smooth day/night progress for time-bound POIs (grows continuously, not tick-by-tick)
+  /**
+   * Fill ramp for the time-bound markers.
+   *
+   * This used to derive the seal's progress from the day/night cycle by
+   * interpolating between engine ticks. That cycle is ten ticks long, so the
+   * circle filled in ten seconds at x1 and about one at x8, and the progress
+   * arrived in ten-percent jumps that the interpolation could only partly hide
+   * — overshooting, then snapping back on every real tick. It was never going
+   * to be fluid at speed, because it was smoothing a staircase.
+   *
+   * Here the ramp is driven by elapsed wall-clock time scaled by the speed
+   * multiplier, so it is continuous by construction at any speed, and long
+   * enough to actually judge the fill. It loops, with a short hold at the top,
+   * because a lab you have to reload to watch again is a lab nobody watches.
+   */
   const [smoothProgress, setSmoothProgress] = useState(0);
-  const gameStateRef = useRef(gameState);
-  const lastTickAtRef = useRef(performance.now());
-  const lastTickRef = useRef(gameState.currentTick);
-  const wasPausedRef = useRef(gameState.isPaused);
-
-  useEffect(() => {
-    gameStateRef.current = gameState;
-    if (gameState.currentTick !== lastTickRef.current) {
-      lastTickAtRef.current = performance.now();
-      lastTickRef.current = gameState.currentTick;
-    }
-    if (!gameState.isPaused && wasPausedRef.current) {
-      lastTickAtRef.current = performance.now();
-    }
-    wasPausedRef.current = gameState.isPaused;
-  }, [gameState]);
-
+  const fillRef = useRef(0);
+  const lastFrameRef = useRef<number | null>(null);
   useEffect(() => {
     let frame: number;
-    const tick = () => {
-      const { currentTick, isPaused, speedMultiplier } = gameStateRef.current;
-      const dayNightCycle = config.globalRules.dayNightCycle;
-      if (!isPaused && dayNightCycle && dayNightCycle.dayTimeUnits + dayNightCycle.nightTimeUnits > 0) {
-        const totalCycleTicks = dayNightCycle.dayTimeUnits + dayNightCycle.nightTimeUnits;
-        const now = performance.now();
-        const fraction = Math.min(1, (now - lastTickAtRef.current) / tickIntervalMs);
-        const ticksToAdd = Math.floor((tickIntervalMs / 1000) * Math.max(1, speedMultiplier || 1));
-        const smoothTick = currentTick + ticksToAdd * fraction;
-        setSmoothProgress(Math.min(1, Math.max(0, smoothTick) / totalCycleTicks));
+    const step = () => {
+      const now = performance.now();
+      const previous = lastFrameRef.current;
+      lastFrameRef.current = now;
+      /**
+       * Read the engine straight from the store rather than through a ref fed by
+       * an effect: inside an animation loop the ref is only as fresh as the last
+       * render, so a speed change that does not happen to re-render this page
+       * would never reach the ramp.
+       */
+      const engine = useMinimalGameplayStore.getState();
+      const { isPaused } = engine.state;
+      const speed = Math.max(1, engine.state.speedMultiplier || 1);
+      /**
+       * Reference the CONFIGURED default, not a value captured at runtime. An
+       * anchor taken on the first running frame makes the response depend on
+       * which speed happened to be selected at that moment — press x4 before
+       * the ramp starts and x1 becomes a quarter-speed rather than the norm.
+       */
+      const baseSpeed = Math.max(1, engine.config.loop?.defaultSpeedMultiplier || 1);
+      if (previous !== null && !isPaused) {
+        // Clamp the delta so a backgrounded tab does not jump the ring forward.
+        const delta = Math.min(now - previous, MAX_FRAME_DELTA_MS);
+        const span = POI_FILL_DURATION_MS + POI_FILL_HOLD_MS;
+        const relativeSpeed = speed / baseSpeed;
+        const advanced = fillRef.current + (delta * relativeSpeed) / span;
+        fillRef.current = advanced % 1;
+        // The hold is the tail of the cycle: progress reads as complete there.
+        setSmoothProgress(Math.min(1, (fillRef.current * span) / POI_FILL_DURATION_MS));
       }
-      frame = requestAnimationFrame(tick);
+      frame = requestAnimationFrame(step);
     };
-    frame = requestAnimationFrame(tick);
+    frame = requestAnimationFrame(step);
     return () => cancelAnimationFrame(frame);
-  }, [config, tickIntervalMs]);
+  }, []);
 
   // Marker controls
-  const [variant, setVariant] = useState<Variant>('matericV3');
+  const [variant, setVariant] = useState<Variant>('matericV4');
   const type: PoiType = 'quest';
   const state: PoiState = 'available';
   const [importance, setImportance] = useState<Importance>('normal');
@@ -112,6 +145,8 @@ export const PoiMarkerLabPage: React.FC = () => {
   const [size, setSize] = useState(112);
   const [counterClockwise, setCounterClockwise] = useState(true);
   const [showMap, setShowMap] = useState(true);
+  /** Grounding shadow is opt-in on the marker, so the lab exposes it as a toggle. */
+  const [grounded, setGrounded] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
 
@@ -196,6 +231,15 @@ export const PoiMarkerLabPage: React.FC = () => {
         <label className="poi-lab__toggle">
           <input
             type="checkbox"
+            checked={grounded}
+            onChange={(e) => setGrounded(e.target.checked)}
+          />
+          <span>{label('grounded')}</span>
+        </label>
+
+        <label className="poi-lab__toggle">
+          <input
+            type="checkbox"
             checked={showMap}
             onChange={(e) => setShowMap(e.target.checked)}
           />
@@ -203,7 +247,7 @@ export const PoiMarkerLabPage: React.FC = () => {
         </label>
       </div>
     ),
-    [label, variant, importance, progress, size, counterClockwise, showMap],
+    [label, variant, importance, progress, size, counterClockwise, showMap, grounded],
   );
 
   const pageContent = (
@@ -211,6 +255,7 @@ export const PoiMarkerLabPage: React.FC = () => {
       <style>{poiMatericV1Styles}</style>
       <style>{poiMatericV2Styles}</style>
       <style>{poiMatericV3Styles}</style>
+      <style>{poiMatericV4Styles}</style>
       <style>{poiRunicStyles}</style>
       <style>{poiRunicV1Styles}</style>
       <style>{poiRunicV3Styles}</style>
@@ -223,7 +268,9 @@ export const PoiMarkerLabPage: React.FC = () => {
       </header>
 
       {/* Canonical day/night time engine with DayNight POI skin */}
-      <DayNightTimeEngineStrip compact />
+      {/* Passing the page's own gameplay instance is what the kit asks for:
+          omitting it makes the strip call the hook again and subscribe twice. */}
+      <DayNightTimeEngineStrip compact gameplay={gameplay} />
 
       {controls}
 
@@ -256,6 +303,7 @@ export const PoiMarkerLabPage: React.FC = () => {
                 importance={placement.state === 'expiring' ? 'critical' : 'normal'}
                 size={size}
                 timerDirection={timerDirection}
+                grounded={grounded}
                 selected={selectedId === placement.id}
                 onClick={() => handleSelect(placement.id, placement.type, placement.state)}
               />
@@ -287,6 +335,7 @@ export const PoiMarkerLabPage: React.FC = () => {
                     importance={cellState === 'expiring' ? 'critical' : 'normal'}
                     size={96}
                     timerDirection={timerDirection}
+                    grounded={grounded}
                   />
                 </div>
               ))}
@@ -305,6 +354,7 @@ export const PoiMarkerLabPage: React.FC = () => {
             importance={importance}
             size={size}
             timerDirection={timerDirection}
+            grounded={grounded}
             selected={selectedId === 'playground'}
             onClick={() => handleSelect('playground', type, 'assigned')}
           />
@@ -318,6 +368,7 @@ export const PoiMarkerLabPage: React.FC = () => {
                 importance={importance}
                 size={s}
                 timerDirection={timerDirection}
+                grounded={grounded}
               />
             ))}
           </div>
@@ -367,7 +418,12 @@ const labPageStyles = `
 .poi-lab__map { position: absolute; inset: 0; }
 .poi-lab__map--static { width: 100%; height: 100%; object-fit: cover; display: block; }
 .poi-lab__overlay { position: absolute; inset: 0; pointer-events: none; }
-.poi-lab__pin { position: absolute; transform: translate(-50%, -50%); pointer-events: auto; }
+/* Centred with a translated child rather than a transform on the pin itself:
+   a transform here creates a stacking context, which isolates the marker's
+   blended cast shadow from the map and leaves it painting a flat patch instead
+   of darkening the terrain. */
+.poi-lab__pin { position: absolute; pointer-events: auto; display: grid; place-items: center; width: 0; height: 0; }
+.poi-lab__pin > * { grid-area: 1 / 1; }
 .poi-lab__matrix, .poi-lab__playground { margin-top: 32px; }
 .poi-lab__matrix h2, .poi-lab__playground h2 { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; opacity: .6; margin: 0 0 12px; }
 .poi-lab__grid { display: grid; grid-template-columns: 90px repeat(5, 1fr); gap: 8px; align-items: center; }

@@ -52,9 +52,9 @@ const DAYS_LEFT = Number(trailerConfig.threat.announcement.timerRing.number) || 
  * Reduced by 33% from the original modal size so it appears at this scale
  * from the moment the shroud shows it.
  */
-const CARD_SCALE = 6 * 0.67;
+const CARD_SCALE = 6 * 0.75;
 /** The reminder is a narrow, tall pgCard-shaped chip, so it needs less scale. */
-const REMINDER_SCALE = 3.4;
+const REMINDER_SCALE = 3.4 * 0.75;
 
 const CARD_W = 460;
 /** Viewport that crops the glass case inside the card (from /primitives). */
@@ -238,9 +238,9 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
               <MatericEventCard
                 variant="modal"
                 badge={String(t('world.goblinInvasion.invasion'))}
+                subtitle={String(t('world.goblinInvasion.subtitle', { count: daysLeft }))}
                 image={
                   <div
-                    onClick={stage === 'modal' ? handleAction : undefined}
                     style={{
                       position: 'relative',
                       width: WINDOW_BOX_W,
@@ -261,6 +261,8 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
                     />
                   </div>
                 }
+                actionLabel={String(t('world.goblinInvasion.action'))}
+                onAction={handleAction}
                 style={{ maxWidth: CARD_W, width: CARD_W }}
               />
             </motion.div>

@@ -123,12 +123,39 @@ export const MatericEventCard: React.FC<MatericEventCardProps> = ({
           </div>
         ) : (
           <>
-            {badge && <MatericPlaque style={{ display: 'inline-block', marginBottom: 8 }}>{badge}</MatericPlaque>}
+            {badge && (
+              <MatericPlaque
+                style={{
+                  display: 'inline-block',
+                  marginBottom: 8,
+                  border: '1px solid rgba(240,207,106,.45)',
+                  color: '#f0cf6a',
+                  fontWeight: 800,
+                  letterSpacing: '0.22em',
+                  textShadow: '0 0 8px rgba(240,207,106,.5), 0 1px 2px rgba(0,0,0,.8)',
+                  boxShadow: '0 0 12px rgba(240,207,106,.18), inset 0 1px 0 rgba(255,240,180,.15)',
+                }}
+              >
+                {badge}
+              </MatericPlaque>
+            )}
             {title && <SkinTitle level="1">{title}</SkinTitle>}
-            {subtitle && <SkinTitle level="subtitle">{subtitle}</SkinTitle>}
+            {subtitle && <SkinTitle level="subtitle" style={{ marginBottom: 12 }}>{subtitle}</SkinTitle>}
             {image ?? defaultImage}
             {actionLabel && (
-              <MatericButton onClick={onAction} style={{ marginTop: 20 }}>
+              <MatericButton
+                onClick={onAction}
+                style={{
+                  marginTop: 20,
+                  background: 'linear-gradient(180deg, #7a5225, #3b2414)',
+                  border: '1px solid rgba(240,207,106,.45)',
+                  color: '#ffe5a0',
+                  fontWeight: 800,
+                  letterSpacing: '0.15em',
+                  boxShadow: '0 4px 12px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,240,180,.25)',
+                  textShadow: '0 1px 2px rgba(0,0,0,.7)',
+                }}
+              >
                 {actionLabel}
               </MatericButton>
             )}

@@ -47,6 +47,14 @@ export type PoiMarkerProps = {
   /** Visual importance only. It does not change the semantic color. */
   importance?: "normal" | "important" | "critical";
 
+  /**
+   * Opt-in contact shadow, for markers that must read as an object resting on a
+   * surface rather than an icon drawn over it. Off by default: on a plain
+   * background a grounding shadow has nothing to ground against, and variants
+   * that do not implement it simply ignore the flag.
+   */
+  grounded?: boolean;
+
   size?: number;
   selected?: boolean;
   disabled?: boolean;

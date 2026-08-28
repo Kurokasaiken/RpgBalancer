@@ -77,6 +77,7 @@
     "progress": "Time left",
     "size": "Size",
     "counterClockwise": "Counter-clockwise (deadline)",
+    "grounded": "Contact shadow",
     "showMap": "Show world surface",
     "types": {
       "quest": "Quest",

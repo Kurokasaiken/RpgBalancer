@@ -25,11 +25,9 @@ const H = 420;
 const RIM = 22;
 const INNER_W = W - RIM * 2;
 const INNER_H = H - RIM * 2;
+const RX = 16;
 
 const BUDGET = { dust: 16, ash: 6, ember: 2 };
-
-const OUTER_CLIP = 'polygon(2% 0%, 98% 0%, 100% 3%, 99.3% 96%, 96% 100%, 4% 100%, 0% 97%, 1% 3%)';
-const INNER_CLIP = 'polygon(1% 0%, 99% 0%, 100% 2%, 99.5% 98%, 98% 100%, 2% 100%, 0% 98%, 0.5% 2%)';
 
 function useReducedMotion(): boolean {
   const [reduced, setReduced] = useState(false);
@@ -149,7 +147,7 @@ const DustCanvas: React.FC<{ mx: number; my: number; active: boolean }> = ({ mx,
         left: RIM,
         width: INNER_W,
         height: INNER_H,
-        borderRadius: 8,
+        borderRadius: 16,
         pointerEvents: 'none',
         zIndex: 7,
       }}
@@ -161,8 +159,9 @@ const DustCanvas: React.FC<{ mx: number; my: number; active: boolean }> = ({ mx,
 /**
  * `GoblinInvasionWindow` — a 2.5D glass case for the Goblin Invasion event.
  *
- * Carved timber + dark bronze frame, narrative golden light, three particle families,
- * convex glass and a physical sticker reveal.
+ * The frame is a rectangular adaptation of the WanderlustMedalOverlay bronze
+ * ladder: dark oxidized bronze body, NMM bevel, inner ring, patina, glass and
+ * solar light.  No gold; only bronze and the warm light that strikes it.
  */
 export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
   ariaLabel,
@@ -179,6 +178,7 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
   const [my, setMy] = useState(0);
   const reduced = useReducedMotion();
   const rootRef = useRef<HTMLDivElement>(null);
+  const uid = React.useId().replace(/:/g, '');
 
   const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     if (!rootRef.current) return;
@@ -205,19 +205,10 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
         position: 'relative',
         width: W,
         height: H,
-        padding: RIM,
-        clipPath: OUTER_CLIP,
+        borderRadius: RX,
+        overflow: 'hidden',
         cursor: 'pointer',
-        background: `
-          linear-gradient(135deg, rgba(255,220,145,.35), transparent 12%),
-          linear-gradient(155deg, #67451f 0%, #4a3015 18%, #3b2718 52%, #5c3c1d 82%, #7a5225 100%)
-        `,
-        boxShadow: `
-          0 22px 50px rgba(0,0,0,0.65),
-          0 10px 24px rgba(0,0,0,0.45),
-          inset 0 1px 0 rgba(255,235,170,.45),
-          inset 0 -4px 8px rgba(0,0,0,.65)
-        `,
+        boxShadow: '0 22px 50px rgba(0,0,0,0.65), 0 10px 24px rgba(0,0,0,0.45)',
         '--mx': mx,
         '--my': my,
         ...style,
@@ -226,69 +217,170 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
       aria-label={ariaLabel}
       aria-hidden={!ariaLabel}
     >
-      {/* Bevel / highlight plane */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 8,
-          clipPath: OUTER_CLIP,
-          background: `
-            linear-gradient(145deg, rgba(255,238,180,.55), transparent 14%),
-            linear-gradient(325deg, rgba(15,7,2,.65), transparent 22%)
-          `,
-          zIndex: 2,
-          pointerEvents: 'none',
-        }}
-      />
+      {/* Bronze rectangular frame derived from the medal ladder */}
+      <svg width={W} height={H} style={{ position: 'absolute', inset: 0, zIndex: 1 }} aria-hidden="true">
+        <defs>
+          <clipPath id={`c-body-${uid}`}>
+            <rect x={0} y={0} width={W} height={H} rx={RX} />
+          </clipPath>
+          <clipPath id={`c-field-${uid}`}>
+            <rect x={RIM} y={RIM} width={INNER_W} height={INNER_H} rx={RX - 8} />
+          </clipPath>
 
-      {/* Secondary carved plane */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 14,
-          clipPath: INNER_CLIP,
-          background: `
-            linear-gradient(180deg, rgba(255,222,142,.35), transparent 8%),
-            linear-gradient(0deg, rgba(0,0,0,.55), transparent 15%),
-            #1b110b
-          `,
-          boxShadow: `
-            inset 0 1px 0 rgba(255,255,255,.25),
-            inset 0 -2px 4px rgba(0,0,0,.7)
-          `,
-          zIndex: 3,
-          pointerEvents: 'none',
-        }}
-      />
+          {/* L1: Bronze outer body — NMM ladder */}
+          <linearGradient id={`g-b-${uid}`} x1="14%" y1="4%" x2="86%" y2="96%">
+            <stop offset="0%" stopColor="#f0cf6a" />
+            <stop offset="9%" stopColor="#dfb857" />
+            <stop offset="28%" stopColor="#8a5a20" />
+            <stop offset="52%" stopColor="#060f16" />
+            <stop offset="76%" stopColor="#060f16" />
+            <stop offset="100%" stopColor="#060f16" />
+          </linearGradient>
 
-      {/* Inner rim light — discontinuous */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 14,
-          clipPath: INNER_CLIP,
-          border: '1px solid transparent',
-          borderTopColor: 'rgba(240,207,106,.45)',
-          borderLeftColor: 'rgba(240,207,106,.22)',
-          borderBottomColor: 'rgba(0,0,0,.55)',
-          borderRightColor: 'rgba(0,0,0,.35)',
-          zIndex: 4,
-          pointerEvents: 'none',
-        }}
-      />
+          {/* Bevel diagonal */}
+          <linearGradient id={`g-bv-${uid}`} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="rgba(255,240,165,.30)" />
+            <stop offset="22%" stopColor="rgba(255,225,135,.09)" />
+            <stop offset="58%" stopColor="rgba(255,210,100,.02)" />
+            <stop offset="100%" stopColor="rgba(0,0,0,.62)" />
+          </linearGradient>
+
+          {/* Inner ring */}
+          <linearGradient id={`g-ri-${uid}`} x1="12%" y1="8%" x2="88%" y2="92%">
+            <stop offset="0%" stopColor="#f0cf6a" />
+            <stop offset="16%" stopColor="#dfb857" />
+            <stop offset="46%" stopColor="#8a5a20" />
+            <stop offset="80%" stopColor="#060f16" />
+            <stop offset="100%" stopColor="#060f16" />
+          </linearGradient>
+
+          {/* Field stone */}
+          <radialGradient id={`g-f-${uid}`} cx="40%" cy="33%" r="70%">
+            <stop offset="0%" stopColor="#0c1517" />
+            <stop offset="38%" stopColor="#060f16" />
+            <stop offset="72%" stopColor="#060f16" />
+            <stop offset="100%" stopColor="#050a0d" />
+          </radialGradient>
+
+          {/* Specular soft */}
+          <radialGradient id={`g-sp-${uid}`} cx="26%" cy="20%" r="56%">
+            <stop offset="0%" stopColor="rgba(255,245,200,.22)" />
+            <stop offset="42%" stopColor="rgba(255,232,168,.05)" />
+            <stop offset="100%" stopColor="rgba(255,220,140,0)" />
+          </radialGradient>
+
+          {/* Glass gradients */}
+          <radialGradient id={`g-glass-${uid}`} cx="50%" cy="48%" r="52%">
+            <stop offset="0%" stopColor="rgba(220,235,255,0)" />
+            <stop offset="60%" stopColor="rgba(200,220,255,.028)" />
+            <stop offset="100%" stopColor="rgba(180,210,255,.065)" />
+          </radialGradient>
+          <radialGradient id={`g-glass-hl-${uid}`} cx="28%" cy="22%" r="38%">
+            <stop offset="0%" stopColor="rgba(255,255,255,.26)" />
+            <stop offset="35%" stopColor="rgba(255,255,255,.08)" />
+            <stop offset="70%" stopColor="rgba(255,255,255,.02)" />
+            <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+          </radialGradient>
+          <radialGradient id={`g-glass-b-${uid}`} cx="74%" cy="78%" r="32%">
+            <stop offset="0%" stopColor="rgba(255,255,255,.05)" />
+            <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+          </radialGradient>
+
+          {/* Texture noise */}
+          <filter id={`f-nm-${uid}`} x="0%" y="0%" width="100%" height="100%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.52" numOctaves={4} seed="3" stitchTiles="stitch" result="n" />
+            <feColorMatrix in="n" type="matrix" values="0 0 0 0 .020  0 0 0 0 .030  0 0 0 0 .040  0 0 0 .25 0" result="c" />
+            <feBlend in="SourceGraphic" in2="c" mode="overlay" />
+          </filter>
+
+          <filter id={`f-fs-${uid}`} x="0%" y="0%" width="100%" height="100%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.90" numOctaves={5} seed="11" stitchTiles="stitch" result="n" />
+            <feColorMatrix in="n" type="matrix" values="0 0 0 0 .020  0 0 0 0 .030  0 0 0 0 .040  0 0 0 .18 0" result="c" />
+            <feBlend in="SourceGraphic" in2="c" mode="overlay" />
+          </filter>
+
+          <filter id={`f-dp-${uid}`} x="0%" y="0%" width="100%" height="100%">
+            <feTurbulence type="turbulence" baseFrequency="0.030" numOctaves={3} seed="7" result="t" />
+            <feDisplacementMap in="SourceGraphic" in2="t" scale="3.5" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+
+          <filter id={`f-patina-${uid}`} x="-20%" y="-20%" width="140%" height="140%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.15" numOctaves={3} seed="42" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.5" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+
+          <filter id={`f-gl-${uid}`} x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="1.5" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+          </filter>
+        </defs>
+
+        {/* BODY */}
+        <g clipPath={`url(#c-body-${uid})`}>
+          {/* L1: Bronze outer body + texture + bevel */}
+          <rect x={0} y={0} width={W} height={H} rx={RX} fill="#060f16" />
+          <rect x={0} y={0} width={W} height={H} rx={RX} fill={`url(#g-b-${uid})`} filter="url(#f-nm)" opacity={0.90} />
+          <rect x={0} y={0} width={W} height={H} rx={RX} fill={`url(#g-bv-${uid})`} filter="url(#f-dp)" opacity={0.48} />
+
+          {/* L2: Rim top — arcs of warm light become rectangular dashes */}
+          <rect x={4} y={4} width={W - 8} height={H - 8} rx={RX - 4} fill="none"
+            stroke="rgba(240,207,106,.26)" strokeWidth="3.5"
+            strokeDasharray={`${W * 0.42} ${(W + H) * 2}`}
+            strokeDashoffset={-W * 0.08}
+            strokeLinecap="round" filter="url(#f-gl)" />
+          <rect x={5} y={5} width={W - 10} height={H - 10} rx={RX - 5} fill="none"
+            stroke="rgba(240,207,106,.68)" strokeWidth="0.9"
+            strokeDasharray={`${W * 0.28} ${(W + H) * 2}`}
+            strokeDashoffset={-W * 0.18}
+            strokeLinecap="round" />
+
+          {/* L3: Inner ring separator */}
+          <rect x={RIM - 6} y={RIM - 6} width={INNER_W + 12} height={INNER_H + 12} rx={RX - 4} fill="#060f16" />
+          <rect x={RIM - 6} y={RIM - 6} width={INNER_W + 12} height={INNER_H + 12} rx={RX - 4} fill={`url(#g-ri-${uid})`} filter="url(#f-nm)" opacity={0.68} />
+          <rect x={RIM - 6} y={RIM - 6} width={INNER_W + 12} height={INNER_H + 12} rx={RX - 4} fill="none"
+            stroke="rgba(0,0,0,.75)" strokeWidth="2.2" transform="translate(0.3, 0.35)" />
+          <rect x={RIM - 5} y={RIM - 5} width={INNER_W + 10} height={INNER_H + 10} rx={RX - 5} fill="none"
+            stroke="rgba(240,207,106,.18)" strokeWidth="0.8" />
+
+          {/* L4: Field stone */}
+          <rect x={RIM} y={RIM} width={INNER_W} height={INNER_H} rx={RX - 8} fill={`url(#g-f-${uid})`} />
+          <rect x={RIM} y={RIM} width={INNER_W} height={INNER_H} rx={RX - 8} fill={`url(#g-f-${uid})`} filter="url(#f-fs)" opacity={0.56} />
+          <rect x={RIM} y={RIM} width={INNER_W} height={INNER_H} rx={RX - 8} fill={`url(#g-sp-${uid})`} />
+
+          {/* L7: Patina spots */}
+          <ellipse cx={RIM - 10} cy={RIM - 6} rx="6" ry="5" fill="rgba(34,18,8,.40)" filter="url(#f-patina)" />
+          <ellipse cx={RIM - 14} cy={RIM - 1} rx="3.5" ry="3" fill="rgba(28,14,6,.32)" filter="url(#f-patina)" />
+          <ellipse cx={W - RIM + 10} cy={RIM - 6} rx="5.5" ry="4.5" fill="rgba(32,16,8,.36)" filter="url(#f-patina)" />
+          <ellipse cx={RIM - 6} cy={H - RIM + 6} rx="4.5" ry="4" fill="rgba(32,16,8,.34)" filter="url(#f-patina)" />
+          <ellipse cx={W - RIM + 6} cy={H - RIM + 4} rx="4" ry="3.5" fill="rgba(28,14,6,.30)" filter="url(#f-patina)" />
+          <ellipse cx={W / 2} cy={RIM - 6} rx="3.5" ry="3" fill="rgba(36,20,8,.22)" filter="url(#f-patina)" />
+
+          {/* Scratches */}
+          <line x1={RIM - 14} y1={H / 2 - 4} x2={RIM - 6} y2={H / 2 + 4} stroke="rgba(0,0,0,.44)" strokeWidth="1.2" strokeLinecap="round" />
+          <line x1={W - RIM + 6} y1={H / 2 - 2} x2={W - RIM + 14} y2={H / 2 + 6} stroke="rgba(0,0,0,.36)" strokeWidth="1" strokeLinecap="round" />
+          <line x1={RIM + 10} y1={H - RIM + 6} x2={RIM + 18} y2={H - RIM + 10} stroke="rgba(0,0,0,.32)" strokeWidth="0.9" strokeLinecap="round" />
+          <line x1={W - RIM - 10} y1={H - RIM + 6} x2={W - RIM - 2} y2={H - RIM + 10} stroke="rgba(0,0,0,.28)" strokeWidth="0.8" strokeLinecap="round" />
+
+          {/* Oxidation streaks */}
+          <line x1={RIM - 12} y1={RIM - 2} x2={RIM - 4} y2={RIM + 10} stroke="rgba(72,92,52,.20)" strokeWidth="1.4" strokeLinecap="round" />
+          <line x1={W - RIM + 4} y1={H - RIM - 8} x2={W - RIM + 12} y2={H - RIM + 2} stroke="rgba(72,92,52,.16)" strokeWidth="1.1" strokeLinecap="round" />
+        </g>
+      </svg>
 
       {/* Diorama */}
       <div
         style={{
-          position: 'relative',
+          position: 'absolute',
+          top: RIM,
+          left: RIM,
           width: INNER_W,
           height: INNER_H,
-          clipPath: INNER_CLIP,
+          borderRadius: RX - 8,
           overflow: 'hidden',
           transform: reduced
             ? 'none'
             : `perspective(900px) rotateX(calc(var(--my) * -1deg)) rotateY(calc(var(--mx) * 1.5deg))`,
-          zIndex: 5,
+          zIndex: 4,
         }}
       >
         <img
@@ -339,12 +431,10 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
             clipPath: isPeeled
               ? 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
               : 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)',
-            transition: reduced
-              ? 'none'
-              : 'clip-path 0.9s cubic-bezier(0.22, 1, 0.36, 1), transform 0.9s cubic-bezier(0.22, 1, 0.36, 1)',
+            transition: reduced ? 'none' : 'clip-path 0.9s cubic-bezier(0.22, 1, 0.36, 1)',
             transform: reduced
               ? 'none'
-              : `translate3d(calc(var(--mx) * 9px - ${isPeeled ? 0 : 60}px), calc(var(--my) * 6px + ${isPeeled ? 0 : 20}px), 0) scale(${isPeeled ? 1 : 0.97})`,
+              : `translate3d(calc(var(--mx) * 7px), calc(var(--my) * 4px), 0)`,
             filter: isPeeled ? 'drop-shadow(8px 0 18px rgba(0,0,0,0.55))' : 'none',
           }}
         />
@@ -385,65 +475,51 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
         {/* Dust motes */}
         <DustCanvas mx={mx} my={my} active={!reduced} />
 
-        {/* Glass */}
-        <div
+        {/* Glass — derived from WanderlustMedalOverlay convex crystal */}
+        <svg
+          width={INNER_W}
+          height={INNER_H}
+          viewBox={`0 0 ${INNER_W} ${INNER_H}`}
           style={{
             position: 'absolute',
-            inset: 0,
+            top: 0,
+            left: 0,
+            borderRadius: RX - 8,
             pointerEvents: 'none',
             zIndex: 8,
-            background: `
-              linear-gradient(125deg, transparent 35%, rgba(255,255,255,.06) 45%, rgba(255,255,255,.14) 48%, transparent 56%),
-              linear-gradient(-45deg, transparent 65%, rgba(255,255,255,.04) 95%)
-            `,
             transform: reduced ? 'none' : `translateX(calc(var(--mx) * 4px))`,
-            boxShadow: `
-              inset 0 1px 0 rgba(255,255,255,.35),
-              inset 1px 0 0 rgba(255,255,255,.15),
-              inset 0 -2px 6px rgba(0,0,0,.45),
-              inset 0 0 18px rgba(180,210,255,.05)
-            `,
           }}
+          aria-hidden="true"
         >
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'linear-gradient(135deg, rgba(255,255,255,.16), transparent 20%, transparent 80%, rgba(255,220,150,.08))',
-            }}
-          />
-        </div>
+          <g clipPath={`url(#c-field-${uid})`}>
+            <rect x={0} y={0} width={INNER_W} height={INNER_H} fill={`url(#g-glass-${uid})`} />
+            <rect x={0} y={0} width={INNER_W} height={INNER_H} fill={`url(#g-glass-hl-${uid})`} />
+            <rect x={0} y={0} width={INNER_W} height={INNER_H} fill={`url(#g-glass-b-${uid})`} />
+            <rect x={2} y={2} width={INNER_W - 4} height={INNER_H - 4} rx={RX - 10} fill="none"
+              stroke="rgba(255,255,255,.22)" strokeWidth="0.6"
+              strokeDasharray={`${INNER_W * 0.35} ${(INNER_W + INNER_H) * 2}`}
+              strokeDashoffset={-INNER_W * 0.05}
+              strokeLinecap="round" />
+            <rect x={2} y={2} width={INNER_W - 4} height={INNER_H - 4} rx={RX - 10} fill="none"
+              stroke="rgba(0,0,0,.30)" strokeWidth="0.5"
+              strokeDasharray={`${INNER_W * 0.33} ${(INNER_W + INNER_H) * 2}`}
+              strokeDashoffset={-INNER_W * 0.65}
+              strokeLinecap="round" />
+          </g>
+        </svg>
 
         {/* Vignette */}
         <div
           style={{
             position: 'absolute',
             inset: 0,
+            borderRadius: RX - 8,
             background: 'radial-gradient(ellipse at 50% 45%, transparent 40%, rgba(0,0,0,.45) 100%)',
             pointerEvents: 'none',
             zIndex: 9,
           }}
         />
       </div>
-
-      {/* Contact shadow between frame and diorama */}
-      <div
-        style={{
-          position: 'absolute',
-          top: RIM,
-          left: RIM,
-          width: INNER_W,
-          height: INNER_H,
-          clipPath: INNER_CLIP,
-          pointerEvents: 'none',
-          zIndex: 10,
-          boxShadow: `
-            inset 0 0 0 1px rgba(255,220,150,.12),
-            inset 0 0 18px rgba(0,0,0,.75),
-            inset 0 -10px 20px rgba(0,0,0,.28)
-          `,
-        }}
-      />
     </div>
   );
 };
