@@ -159,7 +159,17 @@ function recomputeGeometry(skillIndex=0){
          al delta estremo.
      Il Director: «piu' c'e' delta e piu' deve essere in quel modo, ma a queste
      proporzioni una stella normale basta». */
-  const eS=smoothstep(eT,0.0,0.42);                    // famiglia: presto
+  /* LA FAMIGLIA CAMBIA ALLA PARITA', non dentro una banda.
+     Misurato sul caso reale: a 60/55 l'allungamento e' 1.072, quindi con la
+     soglia a 1.08 la famiglia restava a 0.000 — petali tondi, cioe' un fiore, ed
+     e' esattamente cio' che il Director continuava a vedere. La sua regola e'
+     letterale: «quando il fiore e' pari o maggiore come valori dello skill check
+     deve essere una stella». Quindi il passaggio sta SULLA parita', in una
+     finestra stretta, e da li' in poi e' una stella con l'incavo classico
+     (0.3675, che e' il rapporto della stella a cinque punte). La lama resta
+     tardi: e' l'incavo a portarla, non la famiglia. */
+  const fam=smoothstep(elong,0.98,1.10);
+  const eS=fam;                                        // famiglia: alla parita'
   const blade=Math.pow(smoothstep(eT,0.60,1.0),3);     // incavo: tardi, al cubo
   geo.valleyF=V62_VALLEY_FLOWER+(V62_VALLEY_STAR-V62_VALLEY_FLOWER)*blade;
   /* IL VALORE DELLA VALLE NON BASTA: SERVE CAMBIARE FAMIGLIA DI PROFILO.
