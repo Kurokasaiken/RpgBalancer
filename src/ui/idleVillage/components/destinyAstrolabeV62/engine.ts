@@ -151,6 +151,17 @@ function recomputeGeometry(skillIndex=0){
   const eT=clamp((elong-V62_FLOWER_UNTIL)/(V62_STAR_FROM-V62_FLOWER_UNTIL),0,1);
   const eS=eT*eT*(3-2*eT);
   geo.valleyF=V62_VALLEY_FLOWER+(V62_VALLEY_STAR-V62_VALLEY_FLOWER)*eS;
+  /* IL VALORE DELLA VALLE NON BASTA: SERVE CAMBIARE FAMIGLIA DI PROFILO.
+     `radialFromAxes` interpola il RAGGIO linearmente nell'angolo, e in polari
+     questo e' un arco che si GONFIA verso l'esterno: petali tondi, sempre.
+     Misurato contro una stella vera, il fianco sporge del 18.5% del raggio
+     della punta a valle 0.3675 e del 30.6% a valle 0.22 — cioe' scavare la
+     valle PEGGIORA il gonfiore invece di affilare la punta. E' per questo che
+     a stat alta si vedeva ancora un fiore.
+     Una stella e' un POLIGONO: i fianchi sono corde dritte fra il vertice
+     della punta e quello dell'incavo. `starMix` fa passare dall'una all'altra
+     con la stessa soglia della valle. */
+  geo.starMix=eS;
   geo.starTip=geo.obeliskTip.slice();   // la punta È l'obelisco bianco
   /* probabilità reale, misurata sulla geometria che il giocatore vede.
      Stessa formula di inStar: min(stella, muro) — il muro taglia la stella. */
@@ -225,6 +236,19 @@ function recomputeGeometry(skillIndex=0){
   }
 }
 /* interpolate a per-axis radius array around the wheel (tips at TIP(i)) */
+/* il fianco DRITTO: intersezione del raggio con la corda fra due vertici */
+function chordFromAxes(theta,arr,scale){
+  const t=((normAng(theta+Math.PI/2)%TAU)+TAU)%TAU;
+  const seg=TAU/(AXES*2);
+  const k=Math.floor(t/seg), u=t-k*seg;
+  const tipR=i=>arr[((i%AXES)+AXES)%AXES]*scale;
+  const vF=(geo.valleyF===undefined?0.3675:geo.valleyF);
+  const rA=(k%2===0)?tipR(k/2):Math.min(tipR((k-1)/2),tipR((k+1)/2))*vF;
+  const rB=(k%2===0)?Math.min(tipR(k/2),tipR(k/2+1))*vF:tipR((k+1)/2);
+  const den=rA*Math.sin(u)+rB*Math.sin(seg-u);
+  if(Math.abs(den)<1e-9) return Math.max(rA,rB);
+  return rA*rB*Math.sin(seg)/den;
+}
 function radialFromAxes(theta,arr,scale){
   const t=((normAng(theta+Math.PI/2)%TAU)+TAU)%TAU;   // 0 at first tip (axis 0)
   const seg=TAU/(AXES*2);                             // 36°
@@ -241,7 +265,12 @@ function radialFromAxes(theta,arr,scale){
   }
 }
 /* star radius (success boundary) — per-axis flower, reaches the white obelisk (stat) */
-function rStarAt(theta,scale=1){ return radialFromAxes(theta,geo.starTip,scale); }
+function rStarAt(theta,scale=1){
+  const m=geo.starMix||0;
+  if(m<=0.001) return radialFromAxes(theta,geo.starTip,scale);
+  if(m>=0.999) return chordFromAxes(theta,geo.starTip,scale);
+  return radialFromAxes(theta,geo.starTip,scale)*(1-m)+chordFromAxes(theta,geo.starTip,scale)*m;
+}
 /* GOO EDGE = failure boundary = the ball's physical wall. A SMOOTH blob that
    touches each black obelisk (the check) and interpolates smoothly between
    adjacent ones (no deep star valleys), so the goo's area is bounded exactly by
