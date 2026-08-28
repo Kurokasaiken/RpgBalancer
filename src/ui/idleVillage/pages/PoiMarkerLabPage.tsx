@@ -14,10 +14,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DayNightTimeEngineStrip } from '@/ui/idleVillage/frozen/kits/clockKit';
-import {
-  useMinimalGameplayStore,
-  useMinimalGameplayWithIdleVillageConfig,
-} from '@/store/useMinimalGameplay';
+import { useMinimalGameplayStore } from '@/store/useMinimalGameplay';
 import { SkinSystemProvider } from '@/ui/idleVillage/hooks/useSkinSystem';
 import { SandboxTimingProvider } from '@/ui/idleVillage/hooks/useSandboxTimingBridge';
 import {
@@ -77,8 +74,8 @@ export const PoiMarkerLabPage: React.FC = () => {
   const { t } = useTranslation('idleVillage');
   const label = useCallback((key: string) => String(t(`poiMarkerLab.${key}` as never)), [t]);
 
-  // Canonical time engine state (shared with DayNightTimeEngineStrip)
-  const gameplay = useMinimalGameplayWithIdleVillageConfig();
+  // The fill ramp reads the engine straight from the store, so this page needs
+  // no subscription of its own.
 
   /**
    * Fill ramp for the time-bound markers.
@@ -268,9 +265,11 @@ export const PoiMarkerLabPage: React.FC = () => {
       </header>
 
       {/* Canonical day/night time engine with DayNight POI skin */}
-      {/* Passing the page's own gameplay instance is what the kit asks for:
-          omitting it makes the strip call the hook again and subscribe twice. */}
-      <DayNightTimeEngineStrip compact gameplay={gameplay} />
+      {/* Left to mount its own gameplay instance on purpose: the strip resolves
+          its source with `gameplayProp ?? useHook()`, which is a conditional
+          hook call, so passing the prop changes its hook order and crashes it.
+          The store is shared anyway, so nothing is lost by omitting it. */}
+      <DayNightTimeEngineStrip compact />
 
       {controls}
 
