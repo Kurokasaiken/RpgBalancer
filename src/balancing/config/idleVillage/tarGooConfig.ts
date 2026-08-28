@@ -154,9 +154,15 @@ export const tarGooConfig: TarGooConfig = tarGooConfigSchema.parse({
     specularColor: [0.55, 0.04, 0.02],
     specularIntensity: 0.25,
     specularExponent: 64,
-    /** Dark crimson/blood fresnel rim — the edge reads as a danger/corruption line. */
-    fresnelColor: [0.55, 0.0, 0.04],
-    fresnelIntensity: 1.0,
+    /**
+     * NIENTE BORDO ROSSO. Era un cremisi dichiarato «danger/corruption line»:
+     * rosso-uguale-pericolo e' un SIMBOLO, cioe' una convenzione da imparare, e
+     * per giunta un bordo continuo rinforza la CHIUSURA — che e' la firma del
+     * contenitore, l'opposto di «perdita». Il bordo ora e' un colmo bagnato
+     * freddo: si legge per rilievo, non per convenzione, come nella V16.
+     */
+    fresnelColor: [0.36, 0.62, 0.60],
+    fresnelIntensity: 0.85,
     fresnelPower: 1.0,
     edgeHeightFalloff: 8,
     swirlIntensity: 0.22,
