@@ -149,8 +149,19 @@ function recomputeGeometry(skillIndex=0){
      quasi un cerchio, valle a 0.12 e' uno spillo. */
   const elong=Math.min(...geo.starTip.map((s,i)=>s/Math.max(1e-6,geo.axisCheck[i])));
   const eT=clamp((elong-V62_FLOWER_UNTIL)/(V62_STAR_FROM-V62_FLOWER_UNTIL),0,1);
-  const eS=eT*eT*(3-2*eT);
-  geo.valleyF=V62_VALLEY_FLOWER+(V62_VALLEY_STAR-V62_VALLEY_FLOWER)*eS;
+  /* DUE COSE DIVERSE, DUE CURVE DIVERSE. Prima ne usavo una sola, e per questo
+     la lama arrivava subito.
+       - la FAMIGLIA del profilo (petali tondi -> fianchi dritti) deve passare
+         PRESTO: appena si e' in territorio di stella serve una stella NORMALE,
+         e una stella normale ha i fianchi dritti;
+       - la PROFONDITA' dell'incavo deve passare TARDI: e' lei che porta la forma
+         oltre la soglia in cui il sigillo diventa lama, e ci deve arrivare solo
+         al delta estremo.
+     Il Director: «piu' c'e' delta e piu' deve essere in quel modo, ma a queste
+     proporzioni una stella normale basta». */
+  const eS=smoothstep(eT,0.0,0.42);                    // famiglia: presto
+  const blade=Math.pow(smoothstep(eT,0.60,1.0),3);     // incavo: tardi, al cubo
+  geo.valleyF=V62_VALLEY_FLOWER+(V62_VALLEY_STAR-V62_VALLEY_FLOWER)*blade;
   /* IL VALORE DELLA VALLE NON BASTA: SERVE CAMBIARE FAMIGLIA DI PROFILO.
      `radialFromAxes` interpola il RAGGIO linearmente nell'angolo, e in polari
      questo e' un arco che si GONFIA verso l'esterno: petali tondi, sempre.
@@ -880,24 +891,68 @@ function tickGooSim(now){
                                 braccia si riempie.
      Le due fasi si sovrappongono di 8 centesimi perche' un tentacolo che si
      ferma e POI riparte legge come due animazioni diverse. */
-  const armT=smoothstep(rev,0.0,0.58);
-  const fillT=smoothstep(rev,0.50,1.0);
+  /* TENTACOLI, NON PETALI. Il Director: «i tentacoli hanno la forma dei petali
+     dei fiori». Il difetto era di VOCABOLARIO: un peso angolare morbido su
+     mezzo settore (`1-smoothstep(u,0,0.62)`) e' letteralmente un lobo
+     sinusoidale, cioe' un petalo. La grammatica di un tentacolo e' un'altra:
+         radice larga -> COLLO STRETTO -> braccio lungo rastremato -> punta
+     Il collo e' la modifica singola piu' importante: strozzare l'attacco rompe
+     subito la lettura "petalo". Sono tutte cose che un bordo radiale r(theta)
+     puo' dire; servirebbe un campo 2D solo per serpeggiamento, biforcazioni e
+     sovrapposizione davanti/dietro alla stella.
+     Cosa NON si fa, e sono le trappole: rumore sul bordo (da' una massa
+     frastagliata, non un tentacolo), cinque bracci identici (stessa lunghezza e
+     stessa fase = petali), spostare le ancore (devono puntare alle punte). */
   const segHalf=Math.PI/AXES;
-  const angToAxis=(th)=>{
-    let best=Math.PI;
+  /* i cinque bracci NON sono uguali: lunghezza, ritardo e sbilanciamento
+     laterale deterministici per indice, cosi' la simmetria si rompe senza che
+     le ancore si muovano */
+  const ARM=[
+    {len:1.00, lag:0.00, skew: 0.22},
+    {len:0.88, lag:0.10, skew:-0.16},
+    {len:0.96, lag:0.04, skew: 0.10},
+    {len:0.83, lag:0.14, skew:-0.24},
+    {len:0.93, lag:0.07, skew: 0.17},
+  ];
+  const fillT=smoothstep(rev,0.52,1.0);
+  /* LA POZZA. Piccola all'inizio, o il collo non si vede; ma deve arrivare a
+     coprire TUTTO da sola, perche' se si ferma sotto il muro il riempimento
+     finale lo fa il lucchetto `if(rev>=0.999) r=rFinal` — ed e' quello il
+     salto che il Director sentiva come «si ferma in uno step». Misurato prima
+     della correzione: a rev 1.0 la pozza era a 0.38 del muro e il resto
+     compariva di colpo. */
+  const seed=0.16*smoothstep(rev,0.02,0.20);
+  const baseFrac=Math.max(seed,fillT);
+  const nearest=(th)=>{
+    let bi=0, bd=Math.PI;
     for(let a=0;a<AXES;a+=1){
-      const d=Math.abs(((th-TIP(a))%TAU+TAU+Math.PI)%TAU-Math.PI);
-      if(d<best) best=d;
+      const d=((th-TIP(a))%TAU+TAU+Math.PI)%TAU-Math.PI;
+      if(Math.abs(d)<Math.abs(bd)){bd=d;bi=a;}
     }
-    return best;
+    return {i:bi, d:bd};
   };
   for(let i=0;i<gooSim.N;i+=1){
     const theta=i/gooSim.N*TAU;
     const rFinal=rev<=0.001?0:rCheckAt(theta,1);
-    /* peso del braccio: 1 sull'asse, 0 a meta' strada fra due assi */
-    const u=angToAxis(theta)/segHalf;
-    const w=1-smoothstep(u,0.0,0.62);
-    const front=rFinal*(w*armT+(1-w)*fillT);
+    const nb=nearest(theta);
+    const arm=ARM[nb.i];
+    /* avanzamento del braccio, con il suo ritardo */
+    const armT=smoothstep(rev,arm.lag,arm.lag+0.52);
+    /* SBILANCIAMENTO: un fianco del braccio scende prima dell'altro */
+    const sk=nb.d<0?(1+arm.skew):(1-arm.skew);
+    const u=Math.abs(nb.d)/segHalf*sk;
+    /* IL COLLO e LA RASTREMAZIONE: la semilarghezza angolare del braccio si
+       STRINGE mentre il braccio avanza. Larga alla radice, sottile in punta:
+       e' questo che lo fa leggere come un arto e non come un lobo. */
+    const halfW=0.44-0.26*armT;
+    const armEdge=1-smoothstep(u,halfW*0.42,halfW);
+    /* ondulazione LUNGO il braccio: bassa frequenza e ampiezza piccola, non
+       rumore — un arto vivo non e' rettilineo */
+    const wob=1+0.05*Math.sin(theta*7+nb.i*2.1+now/620);
+    const front=Math.max(
+      rFinal*baseFrac,
+      rFinal*arm.len*armT*armEdge*wob,
+    );
     /* End-of-pour hard lock: once the tar is fully revealed, pin the rim to
        its final shape and kill any residual spring velocity so it never
        rebounds past the target. */
