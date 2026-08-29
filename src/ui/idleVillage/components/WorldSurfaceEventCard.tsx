@@ -99,6 +99,37 @@ const playThud = () => {
   osc.stop(ctx.currentTime + 0.2);
 };
 
+/**
+ * POI that starts with an empty magic circle and fills counter-clockwise.
+ */
+const FillingPoi: React.FC<{ size: number }> = ({ size }) => {
+  const [progress, setProgress] = useState(0);
+  const duration = trailerConfig.threat.goblin.poiFillDurationMs;
+
+  useEffect(() => {
+    let raf = 0;
+    let start = 0;
+    const step = (t: number) => {
+      if (!start) start = t;
+      const p = Math.min(1, (t - start) / duration);
+      setProgress(p);
+      if (p < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [duration]);
+
+  return (
+    <PoiMatericV3
+      type="event"
+      state="active"
+      progress={progress}
+      timerDirection="counterclockwise"
+      size={size}
+    />
+  );
+};
+
 export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
   visible,
   zIndex,
@@ -283,14 +314,19 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
             >
               <MatericEventCard
                 variant="modal"
-                badge={String(t('world.goblinInvasion.eventLabel'))}
                 title={String(t('world.goblinInvasion.invasion'))}
-                subtitle={String(t('world.goblinInvasion.daysRemaining', { count: daysLeft }))}
-                image={<PoiMatericV3 type="event" state="available" size={72} />}
+                image={
+                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <FillingPoi size={80} />
+                  </div>
+                }
                 style={{
                   maxWidth: REMINDER_W,
                   width: REMINDER_W,
                   minHeight: REMINDER_H,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
                 }}
               />
             </motion.div>

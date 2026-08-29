@@ -360,3 +360,47 @@ Formalize in AGENTS.md §F3.1:
 **Last updated:** 2026-08-15  
 **Frequency:** Update after each major decision (expected ~1x week during development)  
 **Owner:** Fausto Boni
+
+---
+
+## 2026-08-28 — Il prop `gameplay` di DayNightTimeEngineStrip è sicuro, e non è un'ottimizzazione
+
+**Da:** la documentazione del kit (`clockKit.md`) e la JSDoc del componente
+raccomandavano di passare `gameplay` alle pagine che già chiamano l'hook, «per
+evitare una doppia sottoscrizione».
+
+**A:** passare il prop era **l'unico modo di rompere il componente**. La
+risoluzione era `gameplayProp ?? useMinimalGameplayWithIdleVillageConfig()`, che
+salta l'hook quando il prop è presente: una chiamata condizionale a un hook. Ogni
+pagina che seguiva l'esempio documentato crashava con *"change in the order of
+Hooks"* appena il prop compariva o spariva tra due render, hot reload incluso.
+Ora l'hook è chiamato incondizionalmente e il prop viene solo preferito dopo. Le
+due forme sono equivalenti; passare il prop è una comodità, non un risparmio.
+
+**Motivo:** seguito l'esempio della JSDoc su `/poi-marker-lab` e ottenuto il
+crash, con `TypeError: Cannot read properties of undefined` a valle. Fix
+verificato esercitando il prop path: strip renderizzato, nessun errore di ordine
+degli hook.
+
+**Fonte:** `.mw/runs/2026-08-28-poi-materic-v4/pattern-candidate.md`
+
+---
+
+## 2026-08-28 — Gli archi progressivi non usano mai `strokeLinecap="round"`
+
+**Da:** invariante applicata caso per caso, tre volte, su componenti diversi
+(`DayNightPoiSkin`, `GenericPoiSkin`, `MagicCircleHalo`,
+`HaloProgressComponent` il 2026-08-15).
+
+**A:** è una regola generale e va scritta come tale. Un arco la cui lunghezza
+nasce da zero dipinge il proprio cap come un disco della larghezza dello stroke
+nel punto iniziale: con cap tondo resta un punto a ore 12 prima che il timer
+abbia scritto nulla, tanto più grosso quanto più spesso è il tratto. Il fronte
+morbido va ottenuto con un elemento dedicato, non col cap.
+
+**Motivo:** il pattern era già in `observation.jsonl` da due sessioni e **non ha
+impedito la regressione**: `PoiMatericV4` l'ha reintrodotto da zero su cinque
+archi, incluso il binario d'ombra spesso 4,5 unità. Registrare l'osservazione non
+è bastato; serve l'invariante in un posto che si legge prima di scrivere.
+
+**Fonte:** `.mw/runs/2026-08-28-poi-materic-v4/pattern-candidate.md`

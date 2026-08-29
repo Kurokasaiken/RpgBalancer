@@ -42,9 +42,13 @@ export interface DayNightTimeEngineStripProps
     'phaseIcon' | 'isPlaying' | 'progressFraction' | 'totalSeconds' | 'onToggle' | 'clockProps' | 'hudState' | 'villageState' | 'secondsPerTimeUnit' | 'temporalDisplay'
   > {
   /**
-   * Gameplay source. When omitted the hook is called internally, which is fine
-   * because the Zustand store is shared. Passing it explicitly lets pages that
-   * already call the hook avoid a double subscription.
+   * Gameplay source. Optional: when omitted the component uses its own
+   * subscription to the shared Zustand store, which is equivalent.
+   *
+   * Passing it is a convenience for pages that already hold the instance, not
+   * an optimisation — the hook is called either way, because skipping it would
+   * make the call conditional. Do not pass a value that can flip between
+   * defined and undefined across renders.
    */
   gameplay?: ReturnType<typeof useMinimalGameplayWithIdleVillageConfig>;
   label?: string;
@@ -74,7 +78,21 @@ export function DayNightTimeEngineStrip({
   compact = false,
   ...rest
 }: DayNightTimeEngineStripProps) {
-  const gameplay = gameplayProp ?? useMinimalGameplayWithIdleVillageConfig();
+  /**
+   * The hook is called unconditionally and the prop only chosen afterwards.
+   *
+   * This used to read `gameplayProp ?? useMinimalGameplayWithIdleVillageConfig()`,
+   * which skips the hook whenever the prop is supplied — a conditional hook
+   * call. Any page following this component's own documented example crashed
+   * with "change in the order of Hooks" the moment the prop appeared or
+   * disappeared between renders, including on hot reload.
+   *
+   * The cost of always calling it is one extra subscription to a shared Zustand
+   * store, which is a re-render subscription and nothing more. That is a much
+   * smaller price than a hook-order violation in a frozen kit.
+   */
+  const internalGameplay = useMinimalGameplayWithIdleVillageConfig();
+  const gameplay = gameplayProp ?? internalGameplay;
   const { state: gameState, pauseGame, resumeGame, setSpeedMultiplier, config } = gameplay;
   const isPaused = gameState.isPaused;
   const speed = gameState.speedMultiplier;

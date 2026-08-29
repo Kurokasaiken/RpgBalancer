@@ -25,6 +25,28 @@ function MyPage() {
 `SandboxTimingProvider` automatically if they are not already in the tree, so the
 page does not need to know the provider chain.
 
+### The `gameplay` prop is optional, and not an optimisation
+
+`DayNightTimeEngineStrip` accepts an optional `gameplay` prop. Both forms are
+valid and behave identically:
+
+```tsx
+<DayNightTimeEngineStrip compact />                      // own subscription
+<DayNightTimeEngineStrip compact gameplay={gameplay} />  // reuses yours
+```
+
+Passing it is a convenience for pages that already hold the instance. It does
+**not** save a subscription: the hook is called either way, deliberately.
+
+Until 2026-08-28 the component resolved its source with
+`gameplayProp ?? useMinimalGameplayWithIdleVillageConfig()`, which skipped the
+hook whenever the prop was supplied — a conditional hook call. Any page that
+followed the documented example crashed with React's *"change in the order of
+Hooks"* as soon as the prop appeared or disappeared between renders, hot reload
+included. The prop's stated purpose, avoiding a double subscription, was the very
+thing that broke it. Do not reintroduce that shape, and do not pass a value that
+can flip between defined and undefined across renders.
+
 ### Active time engine
 
 `DayNightTimeEngineStrip` is not just a display: it owns the canonical real-time
