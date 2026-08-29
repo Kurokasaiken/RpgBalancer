@@ -112,8 +112,9 @@ export const trailerConfig = {
       scale: 0.33,
       spawnDurationMs: 600,
       toLeftDurationMs: 1000,
+      poiFillDurationMs: 2500,
       // 1/10 of current march speed, ending just before the centre of the viewport.
-      marchDurationMs: 100000,
+      marchDurationMs: 1000000,
       marchEndPercent: 50,
       marchEndOffsetVw: 2,
     },

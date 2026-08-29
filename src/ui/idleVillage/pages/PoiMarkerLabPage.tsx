@@ -265,10 +265,8 @@ export const PoiMarkerLabPage: React.FC = () => {
       </header>
 
       {/* Canonical day/night time engine with DayNight POI skin */}
-      {/* Left to mount its own gameplay instance on purpose: the strip resolves
-          its source with `gameplayProp ?? useHook()`, which is a conditional
-          hook call, so passing the prop changes its hook order and crashes it.
-          The store is shared anyway, so nothing is lost by omitting it. */}
+      {/* No `gameplay` prop: the ramp reads the store directly, so this page
+          holds no instance to hand over. Both forms are equivalent. */}
       <DayNightTimeEngineStrip compact />
 
       {controls}

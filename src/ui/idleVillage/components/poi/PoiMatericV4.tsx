@@ -80,6 +80,14 @@ interface SealLetter {
  * circle is drawn as several stacked windows — settled body, wake, bright head
  * — so it reads as a channel FILLING rather than a rail being laid: constant
  * stroke and constant light are exactly what make an arc look mechanical.
+ *
+ * Every arc built here is stroked with `butt` caps, never `round`. An arc that
+ * grows from zero length paints its cap as a disc of the stroke's width at the
+ * start point, so a round cap leaves a dot sitting at twelve o'clock before the
+ * script has written anything — worst of all on the shadow rail, which is three
+ * times wider than the others. The same defect was removed twice from
+ * DayNightPoiSkin, GenericPoiSkin, MagicCircleHalo and HaloProgressComponent on
+ * 2026-08-15; the soft leading edge is the job of the meniscus bead instead.
  */
 /**
  * A point on the seal at a given fraction of the circle, measured from twelve
@@ -459,7 +467,7 @@ export const PoiMatericV4: React.FC<PoiMatericV4Props> = ({
               fill="none"
               stroke={T.seal.trackColor}
               strokeWidth={T.seal.trackWidth}
-              strokeLinecap="round"
+              strokeLinecap="butt"
             />
 
             {/* Halo pass */}
@@ -473,7 +481,7 @@ export const PoiMatericV4: React.FC<PoiMatericV4Props> = ({
                     stroke={identity.rail}
                     strokeOpacity={T.seal.flow.settledOpacity}
                     strokeWidth={T.seal.railWidth}
-                    strokeLinecap="round"
+                    strokeLinecap="butt"
                     vectorEffect="non-scaling-stroke"
                   />
                   {/*
@@ -488,7 +496,7 @@ export const PoiMatericV4: React.FC<PoiMatericV4Props> = ({
                       stroke={identity.rail}
                       strokeOpacity={0.16}
                       strokeWidth={T.seal.railWidth}
-                      strokeLinecap="round"
+                      strokeLinecap="butt"
                       vectorEffect="non-scaling-stroke"
                     />
                   ))}
@@ -498,7 +506,7 @@ export const PoiMatericV4: React.FC<PoiMatericV4Props> = ({
                     fill="none"
                     stroke={identity.rail}
                     strokeWidth={T.seal.railWidth * 1.15}
-                    strokeLinecap="round"
+                    strokeLinecap="butt"
                     vectorEffect="non-scaling-stroke"
                   />
                 </React.Fragment>
@@ -563,7 +571,7 @@ export const PoiMatericV4: React.FC<PoiMatericV4Props> = ({
                   fill="none"
                   stroke={identity.rail}
                   strokeWidth={T.seal.coreRailWidth}
-                  strokeLinecap="round"
+                  strokeLinecap="butt"
                   vectorEffect="non-scaling-stroke"
                 />
               ))}

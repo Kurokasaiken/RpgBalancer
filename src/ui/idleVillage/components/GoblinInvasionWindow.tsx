@@ -431,7 +431,7 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
             clipPath: isPeeled
               ? 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
               : 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)',
-            transition: reduced ? 'none' : 'clip-path 0.9s cubic-bezier(0.22, 1, 0.36, 1)',
+            transition: reduced ? 'none' : (isPeeled ? 'clip-path 0.9s cubic-bezier(0.22, 1, 0.36, 1)' : 'clip-path 0.08s ease-out'),
             transform: reduced
               ? 'none'
               : `translate3d(calc(var(--mx) * 7px), calc(var(--my) * 4px), 0)`,

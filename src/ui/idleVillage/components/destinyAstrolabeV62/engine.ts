@@ -153,8 +153,23 @@ function recomputeGeometry(skillIndex=0){
   /* FAMIGLIA: cambia alla parita', in una finestra stretta. Sotto e' fiore
      (petali tondi), sopra e' stella (fianchi dritti). Misurato che con la soglia
      a 1.08 un caso da allungamento 1.072 restava fiore. */
-  const fam=smoothstep(elong,0.96,1.06);
-  const eS=fam;
+  /* LA FINESTRA STAVA A CAVALLO DELLA PARITA', NON PRIMA.
+     Con 0.96..1.06, ad allungamento 1.000 — stat esattamente uguale alla
+     difficolta' — smoothstep vale 0.352: la forma era ancora per due terzi
+     fiore proprio nel caso che la regola chiama STELLA. Misurato sui pixel a
+     parita': fianco a 18 gradi fuori di 24.45px e punta larga 8.5 gradi.
+     La regola dice `< 1.00 fiore`, `1.00..1.83 stella`: la transizione deve
+     essere FINITA a 1.00, quindi la finestra si chiude li'. */
+  const fam=smoothstep(elong,0.90,1.00);
+  /* LA FAMIGLIA NON ERA MAI STATA COLLEGATA AL DISEGNO.
+     `fam` finiva in una `eS` che nessuno leggeva e `geo.starMix` restava
+     undefined: sia `rStarAt` sia `starPath` prendono il ramo del fiore quando
+     starMix vale 0, quindi il profilo a corda e i dieci vertici erano codice
+     irraggiungibile. La stella "non arrivava" perche' non veniva mai chiesta.
+     Misurato sui PIXEL DIPINTI, prima di collegarla: a 18 gradi dalla punta il
+     bordo stava a 206px invece dei 155px della corda (+52px di fianco convesso)
+     e la punta era larga 16.75 gradi invece di 4. */
+  geo.starMix=fam;
   /* VALLE: 0.3675 (fiore) e 0.382 (stella) sono quasi lo stesso numero, quindi
      il passaggio fiore->stella e' TUTTO nella famiglia e non si vede un salto di
      profondita'. La valle si scava solo avvicinandosi a phi^2, dove la stella
@@ -263,6 +278,27 @@ function radialFromAxes(theta,arr,scale){
     const b=tipR((k+1)/2), a=Math.min(tipR((k-1)/2),tipR((k+1)/2))*vF;
     return a+(b-a)*ease;
   }
+}
+/* LA MAREA — e perche' NON passa dalla molla del rim.
+   Primo tentativo: sommare l'onda al bersaglio della molla in `tickGooSim`, per
+   far salire "la massa vera". Misurato: a onda 0.78 la maschera aveva gia'
+   mangiato fino a 282px mentre il catrame stava a 208 — il tetto di velocita'
+   della molla non la lascia seguire, quindi la stella si dissolveva nel vuoto
+   invece di essere mangiata; e al ritorno il catrame restava 35px oltre il muro
+   quando il giocatore poteva gia' tirare.
+   La molla porta la FISICA e deve restare quella. La marea e' una deformazione
+   della superficie al momento del disegno: istantanea, esatta, e a onda zero
+   sparisce da sola — il muro torna su `rCheckAt` senza nessun assestamento.
+   Un solo posto per il numero, perche' la superficie disegnata e il bordo che
+   cancella devono essere LO STESSO bordo. */
+function tideCrestAt(theta,starS){
+  return Math.max(rCheckAt(theta,1), rStarAt(theta,starS)*1.04);
+}
+/* quanto la marea alza la superficie su quell'angolo, in pixel */
+function tideLiftAt(theta,amount){
+  if(amount<=0.001) return 0;
+  const w=rCheckAt(theta,1);
+  return (tideCrestAt(theta,scene.starScale||0)-w)*amount;
 }
 /* star radius (success boundary) — per-axis flower, reaches the white obelisk (stat) */
 function rStarAt(theta,scale=1){
@@ -437,6 +473,7 @@ function launchRoll(){
   recomputeGeometry();
   buildPillars();
   scene.starScale=0; scene.pourP=0; scene.streamAlpha=0; scene.axisAlpha=1; scene.gooFullMs=0;
+  scene.tideP=0; scene.tideWave=0;
   scene.gooReveal=0; scene.ringReveal=0;
   scene.ball={x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false};
   scene.warp=0;
@@ -458,6 +495,7 @@ function throwBall(){
   /* warp: snap surface fully, but keep UI chrome (obelisks/axis/streams) off
      so only the tar wall, star and ball are visible during the spin. */
   scene.gooReveal=1; scene.starScale=1; scene.pourP=1; scene.streamAlpha=0; scene.axisAlpha=0; scene.gooFullMs=performance.now();
+  scene.tideP=1; scene.tideWave=0;
   scene.blackPillars.concat(scene.whitePillars).forEach(pl=>{ pl.drop=0; pl.landed=true; });
   if(s!=='action-trigger'){ scene.warp=1; scene.gooRipple=1; }   // visual warp flash when skipping
   setState('the-spin'); fireBall();
@@ -545,6 +583,25 @@ function tickTimeline(){
       const local=clamp((p-(i*0.05))/0.75,0,1);
       pl.drop=1-easeInCubic(local);
     });
+    /* LA MAREA DEL CATRAME. La stella e' gia' sbocciata INTERA nel beat
+       precedente — non nasce clippata, e questo e' il punto. Qui il catrame si
+       ALZA, le mangia l'eccedenza fuori dall'arena, e si ritira.
+       Due grandezze e non una, perche' non sono la stessa cosa:
+         tideWave — la massa che sale e TORNA (0->1->0). Deve tornare: il muro
+                    porta le probabilita' e deve restare sugli obelischi neri,
+                    quindi a riposo la sagoma e' di nuovo `rCheckAt` esatta e
+                    fisica e verdetto non si accorgono di niente.
+         tideP    — quanto la marea ha gia' MANGIATO. E' il massimo corrente
+                    dell'onda, quindi monotono per costruzione: cio' che il
+                    catrame ha preso resta preso, e quando l'onda si ritira
+                    sotto non ricompare la campitura ma il tratteggio.
+       Usando lo stesso normalizzato per entrambe, il bordo che cancella E' la
+       superficie del catrame: non e' un ritaglio che si stringe per conto suo. */
+    {
+      const q=clamp((p-0.06)/0.52,0,1);
+      scene.tideWave=Math.sin(Math.PI*q);
+      scene.tideP=Math.max(scene.tideP||0,scene.tideWave);
+    }
     scene.axisAlpha=1-easeInCubic(clamp(p/0.85,0,1));
     scene.pourP=easeOutCubic(p);
     scene.streamAlpha=0.5;
@@ -820,7 +877,20 @@ const gooRenderer=createTarGooRenderer(W,tarGooConfig);
 /* I TENTACOLI vivono in un modulo a parte: il loro modello geometrico non e'
    r(theta) ma una centerline per braccio, e mescolarli qui li avrebbe riportati
    a essere lobi angolari. */
-const tent=createTentacles(AXES,0x7ea1);
+/* I TENTACOLI NON DEVONO RIMARE CON LA STELLA.
+   Erano `AXES` bracci mandati su `TIP(i)`: cinque bracci sui cinque assi della
+   stella, stesso numero e stesso orientamento. Durante la colata il catrame ERA
+   una stella a cinque punte, e nessuna taratura di lunghezza, posa o flessione
+   poteva togliere quella lettura — la simmetria stava nel MAPPING, non nei
+   parametri. Sette e' coprimo con cinque: nessun braccio si allinea a una
+   punta, a una valle o a un obelisco, e il giro non si chiude mai su una figura
+   regolare. Gli scarti fissi tolgono anche la regolarita' dell'ettagono, e sono
+   costanti scritte a mano perche' la scena non deve cambiare fra due tiri. */
+const TENT_ARMS=7;
+const TENT_SKEW=[0.18,-0.24,0.09,0.26,-0.13,0.21,-0.17];
+const tentAngle=i=>-Math.PI/2+(i+0.5)*(TAU/TENT_ARMS)+TENT_SKEW[i%TENT_ARMS];
+const tent=createTentacles(TENT_ARMS,0x7ea1);
+let tideRim=null;
 /* buffer unico per renderer: bracci + gocce, riallocato solo se serve */
 let gooBlend=new Float32Array(AXES*SAMPLES_PER_ARM*3+64);
 const gooSim=(()=>{
@@ -1101,14 +1171,23 @@ function drawChallengeSurface(now){
        Sopra rev 0.97 i bracci non si emettono piu': la pozza li ha raggiunti,
        quindi non aggiungerebbero niente e sprecherebbero slot. */
     const armN=rev<0.97
-      ? buildBlobs(tent,CX,CY,rev,(i)=>TIP(i),(a)=>rCheckAt(a,1))
+      ? buildBlobs(tent,CX,CY,rev,tentAngle,(a)=>rCheckAt(a,1))
       : 0;
     const total=armN+gooSim.blobCount;
     if(gooBlend.length<total*3) gooBlend=new Float32Array(total*3);
     gooBlend.set(tent.blobs.subarray(0,armN*3),0);
     gooBlend.set(gooSim.blobs.subarray(0,gooSim.blobCount*3),armN*3);
+    /* la superficie che si vede e' quella simulata PIU' la marea; `gooSim.r`
+       resta intatto, quindi il muro della pallina non si muove mai */
+    let rimOut=gooSim.r;
+    const lift=clamp(scene.tideWave||0,0,1);
+    if(lift>0.001){
+      if(!tideRim||tideRim.length!==gooSim.r.length) tideRim=new Float32Array(gooSim.r.length);
+      for(let i=0;i<gooSim.r.length;i+=1) tideRim[i]=gooSim.r[i]+tideLiftAt(i/gooSim.r.length*TAU,lift);
+      rimOut=tideRim;
+    }
     const layer=gooRenderer.render({
-      radii:gooSim.r,
+      radii:rimOut,
       blobs:gooBlend,
       blobCount:total,
       timeMs:now,
@@ -1240,17 +1319,45 @@ function drawStar(now){
   const face=ctx.createRadialGradient(CX-30,CY-46,6,CX,CY,geo.rTip*s);
   face.addColorStop(0,'#ffffff'); face.addColorStop(.42,'#fdf8e9'); face.addColorStop(1,'#ecd49a');
 
-  /* Il fiore nasce intero; il catrame lo clippa solo verso la fine della
-     sua espansione. La maschera morfa da un cerchio grande (nessun clip) alla
-     forma del muro del catrame. */
-  const clipReveal=smoothstep(0.6,1.0,s);
-  const rLarge=R*1.6;
-  const ap=new Path2D();
+  /* LA MASCHERA E' LA SUPERFICIE DEL CATRAME, NON UN RITAGLIO CHE SI STRINGE.
+     Il tentativo precedente morfava la maschera da un cerchio grande alla forma
+     del muro con `clipReveal=smoothstep(0.6,1.0,s)`. Due difetti, e il primo lo
+     rendeva muto: la firma e' `smoothstep(t,a,b)`, quindi con t=0.6 e a=1.0 la
+     funzione ritorna 0 SEMPRE — la maschera restava il cerchio da R*1.6 e non
+     ha mai clippato niente. Misurato sui pixel al preset 85/50: muro a 194px,
+     avorio dipinto fino a 295px.
+     Il secondo difetto stava nell'idea: la maschera intermedia era un CERCHIO,
+     e una forma estranea che spazza sopra la stella non racconta chi le sta
+     togliendo il terreno.
+     Qui il bordo che cancella E' il catrame che sale (`scene.tideP` e' il
+     massimo raggiunto dall'onda, la stessa che gonfia la sagoma in tickGooSim).
+     Regione tenuta = dentro il muro, PIU' quello che la marea non ha ancora
+     raggiunto. Tre contorni con evenodd: dentro il muro 3 attraversamenti
+     (dispari, tenuto), fra muro e marea 2 (pari, mangiato), oltre la marea 1
+     (dispari, ancora in piedi). A marea 0 il contorno della marea coincide col
+     muro, l'anello e' vuoto e il fiore resta INTERO: non nasce clippato. */
+  const tide=clamp(scene.tideP||0,0,1);
+  const rLarge=R*1.9;
   const SEG=200;
+  const ap=new Path2D();
+  const wallR=new Float64Array(SEG+1);
+  for(let i=0;i<=SEG;i+=1) wallR[i]=rCheckAt(-Math.PI/2+i/SEG*TAU,1);
+  for(let i=0;i<=SEG;i+=1){
+    const a=-Math.PI/2+i/SEG*TAU, r=wallR[i];
+    const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
+    if(i===0) ap.moveTo(x,y); else ap.lineTo(x,y);
+  }
+  ap.closePath();
   for(let i=0;i<=SEG;i+=1){
     const a=-Math.PI/2+i/SEG*TAU;
-    const r=rLarge*(1.0-clipReveal)+rCheckAt(a,1)*clipReveal;
+    const r=wallR[i]+(tideCrestAt(a,s)-wallR[i])*tide;
     const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
+    if(i===0) ap.moveTo(x,y); else ap.lineTo(x,y);
+  }
+  ap.closePath();
+  for(let i=0;i<=SEG;i+=1){
+    const a=-Math.PI/2+i/SEG*TAU;
+    const x=CX+Math.cos(a)*rLarge, y=CY+Math.sin(a)*rLarge;
     if(i===0) ap.moveTo(x,y); else ap.lineTo(x,y);
   }
   ap.closePath();
@@ -1265,7 +1372,7 @@ function drawStar(now){
 
   /* Tutti i livelli interni sono clippati alla maschera del catrame. */
   ctx.save();
-  ctx.clip(ap);
+  ctx.clip(ap,'evenodd');
 
   /* L1 radiant white-gold ivory face with strong inner glow */
   ctx.fillStyle=face;
@@ -1296,6 +1403,16 @@ function drawStar(now){
     ctx.fillStyle='rgba(96,44,8,.55)';
     ctx.fill(band,'evenodd');
   }
+  /* LE TRE GHIERE ERANO STROKE CENTRATI SUL BORDO — stesso difetto della banda
+     di almost, un giro dopo. Meta' larghezza cade FUORI dal path e su un vertice
+     da 36 gradi il giunto miter la moltiplica per 1/sin(18) = 3.24: isolando gli
+     strati uno alla volta, la sola ghiera da 2.4px spingeva la punta DIPINTA
+     2.92px oltre la punta teorica (0.08px con quella spenta), e la ghiera scura
+     da 4.5px mangiava 7.3px di avorio DENTRO la punta, lasciando una scheggia
+     di bronzo al posto del vertice chiaro.
+     Clippate al path diventano ghiere INTERNE: la silhouette dipinta coincide
+     con la geometria che porta la probabilita'. */
+  ctx.save(); ctx.clip(p);
   ctx.lineWidth=4.5; ctx.strokeStyle='#602c08'; ctx.stroke(p);
   ctx.lineWidth=2.4;
   const rim=ctx.createLinearGradient(CX-120,CY-120,CX+120,CY+120);
@@ -1303,6 +1420,7 @@ function drawStar(now){
   ctx.strokeStyle=rim; ctx.stroke(p);
   /* L6 white specular hairline */
   ctx.lineWidth=.8; ctx.strokeStyle='rgba(255,248,215,.85)'; ctx.stroke(p);
+  ctx.restore();
   /* L7-L9 inset mechanical outlines */
   [0.8,0.62,0.45].forEach((k,i)=>{
     ctx.lineWidth=1;
@@ -1317,14 +1435,20 @@ function drawStar(now){
   const core=ctx.createRadialGradient(CX-8,CY-10,2,CX,CY,geo.rCore*s);
   core.addColorStop(0,'#f7e1ad'); core.addColorStop(.55,'#cf9d4a'); core.addColorStop(1,'#7d4d12');
   ctx.fillStyle=core;
-  ctx.beginPath(); ctx.arc(CX,CY,geo.rCore*s-2,0,TAU); ctx.fill();
+  /* IL NUCLEO SI RIMPICCIOLISCE PRIMA DI ESISTERE. `drawStar` passa da s>0.01,
+     ma con rCore=43 il raggio `rCore*s-2` e' NEGATIVO per s sotto 0.046, e
+     `arc()` con raggio negativo lancia: la try/catch del frame inghiottiva
+     l'eccezione e con essa tutto cio' che viene dopo drawStar — obelischi,
+     pallina, moti — per i due o tre fotogrammi iniziali del bloom. */
+  const rCoreIn=Math.max(0,geo.rCore*s-2);
+  ctx.beginPath(); ctx.arc(CX,CY,rCoreIn,0,TAU); ctx.fill();
   ctx.save();
-  ctx.beginPath(); ctx.arc(CX,CY,geo.rCore*s-2,0,TAU); ctx.clip();
+  ctx.beginPath(); ctx.arc(CX,CY,rCoreIn,0,TAU); ctx.clip();
   ctx.globalAlpha=.3;
   for(let i=0;i<9;i+=1){                      // brushed arcs
     ctx.strokeStyle=i%2?'rgba(255,240,200,.5)':'rgba(96,44,8,.5)';
     ctx.lineWidth=.7;
-    ctx.beginPath(); ctx.arc(CX,CY,(geo.rCore*s-3)*(i+1)/10,t*.3*(i%2?1:-1),t*.3*(i%2?1:-1)+TAU*.8); ctx.stroke();
+    ctx.beginPath(); ctx.arc(CX,CY,Math.max(0,geo.rCore*s-3)*(i+1)/10,t*.3*(i%2?1:-1),t*.3*(i%2?1:-1)+TAU*.8); ctx.stroke();
   }
   ctx.globalAlpha=1; ctx.restore();
   /* L12 core inner sun-spark ring */
