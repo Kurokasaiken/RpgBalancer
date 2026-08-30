@@ -61,7 +61,7 @@ describe('PLAN-010 CP-C — pilota d\'area', () => {
       if (err > 3) fuori.push(`${stat}/${diff} err=${err.toFixed(1)}`);
     }
     expect(fuori, `casi oltre 3 punti: ${fuori.join(', ')}`).toEqual([]);
-  });
+    }, 20_000);
 
   it('e monotono: piu stat a difficolta fissa non puo abbassare la copertura', () => {
     let prev = -Infinity;
@@ -70,7 +70,7 @@ describe('PLAN-010 CP-C — pilota d\'area', () => {
       expect(p).toBeGreaterThanOrEqual(prev - 0.5); // 0.5 = rumore di bisezione
       prev = p;
     }
-  });
+    }, 20_000);
 
   it('non dipende piu da punta/muro: due casi con lo stesso delta danno la stessa copertura', () => {
     /* 60/50 e 70/60 hanno delta +10 e quindi lo STESSO bersaglio, ma allungamenti

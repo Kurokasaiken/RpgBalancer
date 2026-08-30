@@ -1153,7 +1153,35 @@ Test: `WorldSurfaceLayerOrder`, `WorldSurfaceRenderer`, `validateWorldSurfaceAss
 | copertura di moto sul mare | 0% | 27,9% | 16,4% |
 | aspetto del mare fermo | pulito | **macchiato** | pulito |
 
+**Il riferimento, misurato (2026-08-30).** Il Director ha chiesto perche il video MTG Arena sia difficile da replicare. Misurato il suo video a 1 secondo di distanza: copertura 68,3% a delta >= 3, delta medio 5,04. Poi sfocati progressivamente i due frame per separare le componenti:
+
+| sfocatura | copertura Δ>=3 | delta medio |
+| --- | --- | --- |
+| nessuna | 68,3% | 5,04 |
+| σ=4 | 60,0% | 4,40 |
+| σ=12 (dettaglio fine distrutto) | **52,5%** | 3,73 |
+
+La variazione **sopravvive alla sfocatura**: tre quarti del moto in quell'acqua sono variazione tonale ampia a bassa frequenza — la superficie che si ri-illumina — non texture che trasla. Stavo replicando la componente che conta meno. La tecnica (shader Unity, normal map animate, risposta speculare per-pixel) non e replicabile sotto i vincoli del progetto; la **firma percettiva** si.
+
+**P0b — Pool di luce sul mare: `fatta`.** Dodici gradienti radiali morbidi e molto grandi (1900-3200 px) su griglia jitterata che copre tutto il mondo, mascherati su `sea_mask`, ciascuno con deriva e pulsazione su periodi mutuamente primi. Solo `transform` e `opacity`. Prima erano sei piazzati a mano, e non coprivano tutto il mare — la richiesta esplicita del Director era *"effetto mare ovunque"*.
+
+**Due difetti del mio metodo di misura, corretti:**
+1. **Attesa di 120 ms dopo il seek**: sufficiente per una `transform` sul compositor, non per un `opacity` su gradienti grandi che richiede repaint. Il secondo screenshot catturava il frame precedente e il campo risultava immobile. Portata a 260 ms.
+2. **Campione singolo**: misurare una sola coppia di istanti e una monetina, perche ogni layer sta sulla sua sinusoide e una coppia puo cadere sul flesso. Produceva oscillazioni fra 6% e 32% a config invariata, e faceva dipendere il risultato dal viewport. Ora media su cinque coppie.
+
+**Risultato.**
+
+| | riferimento MTG Arena | nostro mare, prima | nostro mare, ora |
+| --- | --- | --- | --- |
+| copertura Δ>=3 | 68,3% (a 1 s) | 0% | **37,9%** (a 5 s, campioni 28-51%) |
+| delta medio sul mare | 5,04 | 0 | **5,89** |
+| aspetto del mare fermo | — | pulito | pulito, nessuna macchia |
+| frame p50 / p95 | — | 16,7 / 16,7 ms | 16,7 / **16,8** ms, 60 fps |
+
+L'ampiezza supera il riferimento; la copertura e circa la meta. Evidence log: `test-results/r-056-light-pools-2026-08-30.json`. Test 11/11, `tsc` pulito sui file toccati.
+
 **Cosa manca:**
+- **Conferma visiva del Director**: e la terza taratura, e le prime due sono state respinte a ragione.
 - **Decisione di direzione del Director.** Il campo a tratto non sporca piu, ma e molto discreto. Due strade: alzarne l'ampiezza fino a renderlo chiaramente visibile, oppure abbandonare l'overlay e animare i **tratti d'acqua gia dipinti** nella mappa, che sono il linguaggio nativo dell'artwork.
 - Conferma visiva del Director sul mare, e giudizio sulle ombre delle nuvole (potrebbero leggere come sporco sul dipinto: sono al minimo apposta).
 - P2 raggi di luce CSS, P3 puntatore che modula la luce anziche la posizione, P4 polvere in Pixi, P5 displacement sul layer di dettaglio (solo se P0 non basta), P6 revisione degli eventi onda.
