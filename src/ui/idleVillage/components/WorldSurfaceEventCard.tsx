@@ -62,9 +62,25 @@ const WINDOW_BOX_W = 364;
 const WINDOW_BOX_H = 294;
 const WINDOW_INNER_SCALE = 0.7;
 
-/** pgCard proportions (172×260 in the roster) for the parked reminder. */
-const REMINDER_W = 180;
-const REMINDER_H = 268;
+/**
+ * Landscape pgCard proportions for the parked reminder: short and long, like the
+ * horizontal roster card, not a tall narrow chip. The reminder is a single row —
+ * POI medallion on the left, name and countdown stacked on the right — so a
+ * portrait box only stretched that row into empty height.
+ */
+const REMINDER_W = 320;
+const REMINDER_H = 140;
+
+/**
+ * Diameter of the POI medallion inside the reminder, in design px.
+ *
+ * The reminder renders at REMINDER_SCALE inside a camera that fits the 4240px
+ * canvas to the viewport (~0.27 zoom), so a design px lands at roughly 0.69 CSS
+ * px on screen. At the previous 20px the magic circle and its filling ring were
+ * ~14 CSS px across and unreadable; 92 puts it near 63 CSS px, where the ring
+ * progress is legible.
+ */
+const REMINDER_POI_SIZE = 92;
 
 /** Natural size of the sticker sprite once detached from the card. */
 const STICKER_W = 476;
@@ -315,13 +331,15 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
               <MatericEventCard
                 variant="reminder"
                 title={String(t('world.goblinInvasion.invasion'))}
-                image={<FillingPoi size={20} />}
+                daysLeftLabel={String(
+                  t('world.goblinInvasion.daysRemaining', { count: DAYS_LEFT }),
+                )}
+                image={<FillingPoi size={REMINDER_POI_SIZE} />}
                 style={{
                   maxWidth: REMINDER_W,
                   width: REMINDER_W,
                   minHeight: REMINDER_H,
                   display: 'flex',
-                  flexDirection: 'column',
                   justifyContent: 'center',
                 }}
               />

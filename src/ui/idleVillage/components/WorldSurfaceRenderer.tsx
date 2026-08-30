@@ -12,6 +12,7 @@ import type {
 } from '../config/worldSurfaceConfig';
 import { clampPan, clampZoom, viewportToWorld } from '../../../engine/world/model/WorldCoordinate';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
+import { eventShroudGradeConfig } from '@/balancing/config/idleVillage/eventShroudGradeTokens';
 
 const WorldSurfaceWaves = lazy(() => import('./WorldSurfaceWaves'));
 const WorldSurfaceClouds = lazy(() => import('./WorldSurfaceClouds'));
@@ -526,6 +527,28 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
         }
       `}</style>
 
+      {/*
+        Gradient map for the event shroud. `feColorMatrix type="luminanceToAlpha"`
+        is not what we want here: we need the parchment's own luminance re-mapped
+        onto a teal ramp, so we desaturate first and then run each channel through
+        a table transfer. The ink linework lands in the dark end of the ramp and
+        goes deep teal; the cream highlights stay bright. Ramp values are config.
+      */}
+      <svg
+        aria-hidden="true"
+        focusable="false"
+        style={{ position: 'absolute', width: 0, height: 0, pointerEvents: 'none' }}
+      >
+        <filter id={eventShroudGradeConfig.filterId} colorInterpolationFilters="sRGB">
+          <feColorMatrix type="saturate" values="0" />
+          <feComponentTransfer>
+            <feFuncR type="table" tableValues={eventShroudGradeConfig.ramp.red.join(' ')} />
+            <feFuncG type="table" tableValues={eventShroudGradeConfig.ramp.green.join(' ')} />
+            <feFuncB type="table" tableValues={eventShroudGradeConfig.ramp.blue.join(' ')} />
+          </feComponentTransfer>
+        </filter>
+      </svg>
+
       <div style={worldStyle}>
         {effectiveLayers
           .filter((layer) => layer.id !== 'clouds')
@@ -808,7 +831,15 @@ const LayerView: React.FC<LayerViewProps> = ({ layer, worldName, imageFit, breat
       ? (layer.id.includes('left') ? 'left center' : 'right center')
       : (imageFit === 'none' ? '0 0' : undefined),
     mixBlendMode: BLEND_MODE_CSS[layer.blendMode],
-    filter: layer.grayscale ? 'grayscale(100%)' : undefined,
+    // The shroud is graded to deep teal as it travels, so the colour arrives WITH
+    // the curtains instead of appearing once they have closed. The filter applies
+    // to the asset's own pixels, alpha included, so it cannot bleed onto the map
+    // through the transparent gaps the way a full-rect overlay would.
+    filter: layer.grayscale
+      ? 'grayscale(100%)'
+      : isEventShroud && eventShroudGradeConfig.enabled
+        ? `url(#${eventShroudGradeConfig.filterId})`
+        : undefined,
     ...animationStyle,
   };
 

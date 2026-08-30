@@ -1124,7 +1124,19 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 Il diff amplificato mostra il mare interamente coperto di striature di variazione e la terra a nero assoluto: la maschera confina il campo all'acqua. Evidence log: `test-results/r-056-water-field-2026-08-30.json`.
 Test: `WorldSurfaceLayerOrder`, `WorldSurfaceRenderer`, `validateWorldSurfaceAssets` **11/11 passati**; `tsc` senza errori sui file toccati.
 
+**Rifiutato dal Director (2026-08-30):** *"nn mi fa impazzire"*. Aveva ragione, e le cause sono due, entrambe mie:
+1. **Ho ottimizzato la metrica perdendo il risultato.** Avevo alzato l'opacita a 0,95/0,78 per far passare il 27,9%, e il costo e stato un film grigio sul mare. La misura era diventata il bersaglio.
+2. **La forma della texture era sbagliata per questa mappa.** Il mare e disegnato a **tratto** — linee curve che seguono la costa — e io ci avevo messo sopra macchie di value noise, che in quel linguaggio leggono come sporco. La tinta invece era corretta: l'acqua aperta e RGB (110, 136, 141) con luminanza p10-p90 di 112-150, e le tinte cadevano dentro.
+
+**Correzione.** Banco di prova offline (tile composte sul ritaglio reale del dipinto, ridotte allo zoom 0.23 della mappa) per giudicare l'asset contro l'artwork invece che nel browser. Confermato che la versione spedita era la peggiore del set. Il generatore ora costruisce **tratti**: bande deformate da noise a bassa frequenza e ridotte alle loro creste, spezzate in trattini lunghi e sottili. Opacita riportata a 0,60/0,48.
+
+| | pulito (campo off) | blob 0,95 (rifiutato) | tratto 0,60 (ora) |
+| --- | --- | --- | --- |
+| copertura di moto sul mare | 0% | 27,9% | 16,4% |
+| aspetto del mare fermo | pulito | **macchiato** | pulito |
+
 **Cosa manca:**
+- **Decisione di direzione del Director.** Il campo a tratto non sporca piu, ma e molto discreto. Due strade: alzarne l'ampiezza fino a renderlo chiaramente visibile, oppure abbandonare l'overlay e animare i **tratti d'acqua gia dipinti** nella mappa, che sono il linguaggio nativo dell'artwork.
 - Conferma visiva del Director sul mare, e giudizio sulle ombre delle nuvole (potrebbero leggere come sporco sul dipinto: sono al minimo apposta).
 - P2 raggi di luce CSS, P3 puntatore che modula la luce anziche la posizione, P4 polvere in Pixi, P5 displacement sul layer di dettaglio (solo se P0 non basta), P6 revisione degli eventi onda.
 - Il `Window` di vetro (decisione 3) non e ancora stato toccato.

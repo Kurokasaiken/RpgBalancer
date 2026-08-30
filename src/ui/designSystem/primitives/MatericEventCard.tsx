@@ -91,13 +91,13 @@ export const MatericEventCard: React.FC<MatericEventCardProps> = ({
       className={className}
       style={{ maxWidth: 360, textAlign: 'center', position: 'relative', ...style }}
     >
-      <SkinScope style={{ position: 'relative', zIndex: 1, padding: 24 }}>
+      <SkinScope style={{ position: 'relative', zIndex: 1, padding: variant === 'reminder' ? 18 : 24 }}>
         {variant === 'reminder' ? (
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 14,
+              gap: 16,
               textAlign: 'left',
             }}
           >
@@ -114,7 +114,13 @@ export const MatericEventCard: React.FC<MatericEventCardProps> = ({
               {image ?? defaultImage}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              {title && <SkinTitle level="1" style={{ fontSize: 16, lineHeight: 1.2 }}>{title}</SkinTitle>}
+              {/*
+                The reminder title has to read as a title, not as a list row. At
+                the old 16px it sat at roughly half the canonical --skin-title-size
+                and, paired inline with an icon, read as a label; 26px restores the
+                hierarchy while still fitting the landscape card's text column.
+              */}
+              {title && <SkinTitle level="1" style={{ fontSize: 26, lineHeight: 1.15 }}>{title}</SkinTitle>}
               {subtitle && <SkinTitle level="subtitle" style={{ fontSize: 11, opacity: 0.85 }}>{subtitle}</SkinTitle>}
               {daysLeftLabel && (
                 <MatericBadge style={{ marginTop: 4 }}>{daysLeftLabel}</MatericBadge>
