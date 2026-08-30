@@ -112,6 +112,36 @@ const tarGooConfigSchema = z.object({
     /** Fraction of the arena radius over which the flower → star transition occurs. */
     transitionR: z.number().min(0).max(1),
   }),
+  /**
+   * V6.3 — LA COLATA VISCOSA (PLAN-010 CP-E).
+   *
+   * Blocco separato, e non per ordine: `simulation` e `timing` sono letti anche
+   * dalla V6.2, che deve restare confrontabile fino a fine piano. Cambiare li'
+   * muoverebbe il termine di paragone insieme all'esperimento.
+   */
+  v63: z.object({
+    /**
+     * Esponente della legge di Huppert (1982, JFM 121:43-58) per un flusso di
+     * gravita' viscoso: `r ~ t^((3a+1)/8)` con volume `~ t^a`. A flusso costante
+     * (a=1) l'esponente e' 1/2.
+     *
+     * Sostituisce una smoothstep, la cui derivata `6t(1-t)` e' ZERO all'inizio e
+     * MASSIMA a meta': il catrame accelerava nella prima meta' della colata, che
+     * e' l'opposto di viscoso. Con 1/2 la derivata decresce sempre — «sempre piu'
+     * lentamente» diventa letterale invece che un'impressione.
+     */
+    pourExponent: z.number().min(0.05).max(1),
+    /**
+     * Smorzamento del bordo. Il numero non e' il fine: il fine e' che il bordo
+     * arrivi e si fermi, senza assestamento oscillante. Col valore condiviso
+     * (0.985) il rapporto di smorzamento vale 0.061 — gravemente sottosmorzato,
+     * e infatti il bordo scavallava a 267px con il muro a 205 ed era ancora a 240
+     * quando l'onda era gia' tornata a zero: suonava come gelatina, non catrame.
+     */
+    damping: z.number().min(0.5).max(0.99),
+    /** Rigidezza della molla del bordo. */
+    stiffness: z.number().min(0.001).max(0.2),
+  }),
 });
 
 /** Inferred tar goo config type. */
@@ -181,5 +211,10 @@ export const tarGooConfig: TarGooConfig = tarGooConfigSchema.parse({
     /** Very sharp when the player matches/exceeds the check — a true star. */
     valleyStar: 0.12,
     transitionR: 0.25,
+  },
+  v63: {
+    pourExponent: 0.5,   // flusso costante: r ~ t^(1/2)
+    damping: 0.75,       // rapporto di smorzamento ~1.0 con la rigidezza qui sotto
+    stiffness: 0.015,
   },
 });

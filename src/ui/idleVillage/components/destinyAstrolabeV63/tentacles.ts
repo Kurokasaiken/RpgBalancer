@@ -73,7 +73,8 @@ export interface TentacleField {
 }
 
 /** rng deterministico: la scena non deve cambiare fra due esecuzioni */
-const rng32 = (seed: number) => {
+/** RNG deterministico a seme. Esportato per la sim del catrame (PLAN-010 CP-E). */
+export const rng32 = (seed: number) => {
   let a = seed >>> 0;
   return () => {
     a = (a + 0x6d2b79f5) >>> 0;
@@ -205,7 +206,29 @@ export function buildBlobs(
  * il lucchetto della simulazione: di colpo, ed e' il difetto che il Director
  * chiamava «si ferma in uno step».
  */
+/**
+ * LA SECONDA CURVA, che vanificava la prima (PLAN-010 CP-E).
+ *
+ * Il fronte del catrame non segue `tarPour`: segue QUESTA. E qui c'era una
+ * `smoothstep(rev, 0.52, 1.0)` che riaccelerava nella sua prima meta' cio' che a
+ * monte era gia' stato reso decelerante. Misurato sul fronte simulato: velocita'
+ * per quarto `[0.93, 0.89, 3.09, 3.85]` — il catrame accelerava lo stesso.
+ *
+ * Il ritardo iniziale resta: la pozza seminata sta ferma, poi cede. Ma la salita
+ * dopo il ritardo ora e' `^0.5`, cioe' la stessa legge viscosa di monte: la
+ * composizione di due mappe decrescenti resta decrescente, e la velocita' del
+ * fronte non puo' piu' risalire.
+ */
 export function poolFraction(rev: number): number {
+  /* NESSUNA SECONDA CURVA. `rev` porta gia' la legge viscosa; qui si lasciava
+     passare, e invece c'era una `smoothstep(rev, 0.52, 1.0)` che riaccelerava a
+     valle cio' che a monte era stato reso decelerante.
+     Ne e' caduto anche il plateau: la pozza restava ferma fino a rev=0.52 e poi
+     ripartiva, e un plateau seguito da movimento RICHIEDE un'accelerazione — non
+     e' una taratura da aggiustare, e' la forma. Misurato prima: velocita' per
+     quarto `[0.93, 0.89, 3.09, 3.85]`.
+     Resta il pavimento del seme, che e' la pozza iniziale gia' presente e non un
+     ritardo: superato subito dalla colata, non introduce nessun salto. */
   const seed = 0.15 * smoothstep(rev, 0.02, 0.20);
-  return Math.max(seed, smoothstep(rev, 0.52, 1.0));
+  return Math.max(seed, Math.min(1, rev));
 }

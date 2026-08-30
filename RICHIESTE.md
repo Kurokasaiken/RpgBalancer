@@ -1095,4 +1095,37 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 - `src/ui/idleVillage/config/atmosphereAssets.ts:137-144` — schiuma: **un solo elemento**, tile 520 px che scorre in 90 s (5,8 px/s), opacita che pulsa fra **0,10 e 0,22**.
 - Conteggio live su `/world-surface` via `document.getAnimations()`: **42 animazioni totali** (9 nuvole, 24 uccelli, 2 schiuma, 7 onde). Zero luce, zero polvere, zero reattivita al puntatore, zero moto sulla cornice.
 
-**Cosa manca:** decisioni del Director sulle domande aperte (registro del moto di fondo, budget, priorita fra mare/luce/polvere/parallasse/Window) prima di pianificare.
+**Decisioni del Director (2026-08-30):**
+1. Il vincolo "80% calma" di `DESIGN_PILLARS.md:24` riguarda gli **eventi**, non il moto di fondo. Il registro di respiro continuo e ammesso.
+2. Procedere; ordine a discrezione.
+3. Per il `Window`: vetro via `filter: url(#glass)` sull'immagine, non glassmorphism CSS.
+
+**Ricerca (2026-08-30).** Ricerche web + deliberazione multi-AI (`.mw/runs/r056-breathing/`): ChatGPT Web riuscito, Claude Web recuperato dall'HTML di debug dopo un falso fallimento dello scraper. Le due analisi convergono sulla diagnosi: **il problema non e il numero di animazioni ma la loro categoria** — 42 animazioni tutte di *object motion*, zero di *surface motion*. Il sistema visivo misura coerenza temporale locale: una nave lascia il 99% della scena con correlazione temporale 1.0, e il cervello segmenta in "sfondo statico + oggetto animato". Inoltre e molto piu sensibile al moto di pattern ad **alta frequenza spaziale** che a quello di forme grandi e morbide — per cui una nuvola a 4 px/s puo leggere come piu ferma di un pattern di onde a 1,5 px/s.
+
+**Misura sull'asset (2026-08-30).** Energia ad alta frequenza del mare dipinto (`Mare.webp`, originale meno blur 3px): **YAVG 2,4-3,4 su 255, circa l'1%**. Il `DisplacementFilter` Pixi rimosso non fallo per potenza ma per **assenza di segnale**: spostare pixel identici produce pixel identici. Palette campionata: media RGB (110, 136, 141), luminanza p25-p75 = 120-142.
+
+**P0 — Campo di micro-moto dell'acqua: `fatta`.**
+- `scripts/build-water-detail.mjs` (nuovo): genera due tile RGBA con noise di valore su lattice **periodico** (seamless per costruzione, nessun mirror), anisotropo per produrre striature allungate. Tinte derivate dal mare stesso, ±12 punti di luminanza attorno alla sua media — dentro la p25-p75 del dipinto, cosi il dettaglio legge come superficie e non come pellicola.
+- `src/ui/idleVillage/components/WorldSurfaceWaterField.tsx` (nuovo): due fogli mascherati su `sea_mask`, con i loop X e Y su elementi annidati a periodi indipendenti — ogni asse trasla di una tile intera, quindi ogni loop e esattamente seamless, e la coppia batte su un ciclo molto piu lungo di entrambi. La base dipinta non si muove: `DESIGN_PILLARS.md:38` resta rispettato.
+- Parametri: layer A tile 384 px a 3,0 px/s lungo 12 gradi; layer B tile 256 px a 1,5 px/s lungo 108 gradi. Velocita e direzioni **non** simmetriche, per evitare che il battimento diventi leggibile.
+- **Errore corretto in corso d'opera:** con `opacity: 0.038` sulle tile il contributo massimo era **0,46 punti RGB**, sotto la soglia di visibilita. Le tile portano il pattern nel canale alpha e sono gia quasi trasparenti, quindi l'opacita non deve attenuare una seconda volta. Portata a 0,95 / 0,78 per un picco di ~11 punti, dentro la banda 8-15 indicata.
+
+**P1 — Gerarchia delle nuvole: `fatta`.** `scripts/scatter-clouds.mjs` emetteva **una sola banda**; il discriminante `far`/`mid`/`near` di `CloudBand` descriveva una gerarchia senza dati. Ora tre bande a **2,0 / 3,5 / 6,0 px/s** (16 sprite contro 9). `shadowOpacity` era **0** su tutte: `WorldSurfaceCloudShadows` montava e animava nove sprite disegnandole interamente trasparenti. Ora 0,02 / 0,03 / 0,04 — volutamente all'estremo basso, da giudicare sul dipinto reale.
+
+**Verifica.** `scripts/measure-world-motion.mjs` (nuovo) e il criterio di accettazione: due screenshot a `Animation.currentTime` pilotato (l'attesa non funziona — headless e pannello di preview congelano le animazioni), pixel di mare classificati per colore anziche per box di viewport, perche il mondo rende a zoom 0.30 e una box fissa finiva a misurare il deserto.
+
+| | prima | dopo |
+| --- | --- | --- |
+| copertura di moto sul mare (delta >= 3 RGB su 5 s) | ~0% (mare pixel-identico) | **27,9%** (target >= 25) |
+| delta medio sul mare | 0 | 2,49 |
+| animazioni | 42 | 46 |
+| frame p50 / p95 | 16,7 / 16,7 ms | **16,7 / 16,7 ms, 60 fps** |
+
+Il diff amplificato mostra il mare interamente coperto di striature di variazione e la terra a nero assoluto: la maschera confina il campo all'acqua. Evidence log: `test-results/r-056-water-field-2026-08-30.json`.
+Test: `WorldSurfaceLayerOrder`, `WorldSurfaceRenderer`, `validateWorldSurfaceAssets` **11/11 passati**; `tsc` senza errori sui file toccati.
+
+**Cosa manca:**
+- Conferma visiva del Director sul mare, e giudizio sulle ombre delle nuvole (potrebbero leggere come sporco sul dipinto: sono al minimo apposta).
+- P2 raggi di luce CSS, P3 puntatore che modula la luce anziche la posizione, P4 polvere in Pixi, P5 displacement sul layer di dettaglio (solo se P0 non basta), P6 revisione degli eventi onda.
+- Il `Window` di vetro (decisione 3) non e ancora stato toccato.
+- **Nota d'ambiente:** un processo coordinator in background ha committato questo lavoro in corso dentro commit V6.3 non correlati (`e0d2c6e5`, `9e7e2cdb`). Nulla e perso, ma la storia e sporca.

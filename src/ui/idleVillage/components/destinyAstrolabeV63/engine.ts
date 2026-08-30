@@ -11,7 +11,7 @@ import { tarGooConfig } from '@/balancing/config/idleVillage/tarGooConfig';
 import { buildSnapshot } from '@/ui/skillCheckWebV1/zones';
 import { solveShapeReported, rHeroNarrowAt } from '@/ui/skillCheckWebV1/coverage';
 import { createTarGooRenderer } from './tarGooRenderer';
-import { createTentacles, tickPose, buildBlobs, poolFraction,
+import { rng32, createTentacles, tickPose, buildBlobs, poolFraction,
          SAMPLES_PER_ARM } from './tentacles';
 
 export interface AstrolabeSkill { name: string; stat: number; difficulty: number; }
@@ -421,11 +421,22 @@ const easeOutBack=t=>{const c=1.7;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,
 const smoothstep=(t,a,b)=>{ if(t<=a)return 0; if(t>=b)return 1; const m=(t-a)/(b-a); return m*m*(3-2*m); };
 /* V6.3 tar-pour curve: pooled seed → slow spread → settle, no overshoot.
    Follows an S-curve (smoothstep) so the mass has time to look heavy. */
+/* LA COLATA VISCOSA (PLAN-010 CP-E).
+   Qui c'era una smoothstep: `t^2(3-2t)`, derivata `6t(1-t)` — zero all'inizio,
+   MASSIMA a meta'. Il catrame accelerava nella prima meta' della colata, che e'
+   l'opposto di viscoso, e nessuna taratura dei tempi poteva rimediarlo perche' il
+   difetto stava nella forma della curva.
+   Ora e' la legge del flusso di gravita' viscoso (Huppert 1982, JFM 121:43-58):
+   `r ~ t^((3a+1)/8)` con volume `~ t^a`; a flusso costante (a=1) l'esponente e'
+   1/2. La derivata `~t^(-1/2)` decresce sempre: «sempre piu' lentamente» diventa
+   letterale. La derivata infinita a t=0 non produce uno scatto perche' il tetto
+   di velocita' della molla la assorbe. */
 const tarPour=t=> tarGooConfig.timing.seedReveal
-  + (1-tarGooConfig.timing.seedReveal)*(t*t*(3-2*t));
+  + (1-tarGooConfig.timing.seedReveal)*Math.pow(clamp(t,0,1),tarGooConfig.v63.pourExponent);
 const easeOutHeavy=t=>1-Math.pow(1-t,3.5);         // kept for other uses
 const easeElastic=t=>t===0?0:t===1?1:Math.pow(2,-10*t)*Math.sin((t*10-0.75)*(TAU/3))+1;
 
+const V63_STIFFNESS=tarGooConfig.v63.stiffness;
 const GOO_MS=tarGooConfig.timing.pourMs;           // V6.3: main tar pour duration
 
 function shake(kind){
@@ -864,10 +875,19 @@ const tent=createTentacles(TENT_ARMS,0x7ea1);
 let tideRim=null;
 /* buffer unico per renderer: bracci + gocce, riallocato solo se serve */
 let gooBlend=new Float32Array(AXES*SAMPLES_PER_ARM*3+64);
+/* LA DINAMICA DEL CATRAME E' DETERMINISTICA (PLAN-010 CP-E).
+   Le gocce nascevano da `Math.random`, quindi due esecuzioni con gli stessi
+   ingressi davano fronti diversi e il banco di misura non poteva sorvegliare
+   niente: un harness su un sistema non riproducibile misura il rumore.
+   Seme fisso, stesso RNG gia' usato dai tentacoli. Il resto del motore — moti,
+   stelle, scintille, tiro del rischio — resta casuale: e' decorazione e sta
+   fuori da CP-E. */
+const GOO_SEED=0x9e37;
+let gooRnd=rng32(GOO_SEED);
 const gooSim=(()=>{
   const simCfg=tarGooConfig.simulation;
   const N=simCfg.rimSamples;
-  const rnd=(a,b)=>a+Math.random()*(b-a);
+  const rnd=(a,b)=>a+gooRnd()*(b-a);
   const drops=Array.from({length:simCfg.dropletCount},(_,i)=>({
     ang:0.0,
     w:0.0,
@@ -892,11 +912,13 @@ const gooSim=(()=>{
 
 function resetDrops(t0:number){
   const simCfg=tarGooConfig.simulation;
-  const rnd=(a,b)=>a+Math.random()*(b-a);
+  /* si riparte dal seme: stessa colata a ogni tiro, quindi misurabile */
+  gooRnd=rng32(GOO_SEED);
+  const rnd=(a,b)=>a+gooRnd()*(b-a);
   gooSim.r.fill(0); gooSim.v.fill(0);
   for(let i=0;i<gooSim.drops.length;i+=1){
     const d=gooSim.drops[i];
-    d.ph=Math.random()*TAU;
+    d.ph=gooRnd()*TAU;
     if(i<simCfg.seedDropCount){
       d.mode='fall';
       d.x=CX+rnd(-simCfg.seedDropScatter,simCfg.seedDropScatter);
@@ -904,11 +926,11 @@ function resetDrops(t0:number){
       d.vy=0;
       d.startT=t0+i*simCfg.seedDropStagger;
       d.rr=rnd(simCfg.seedDropRadius[0],simCfg.seedDropRadius[1]);
-      d.w=rnd(simCfg.dropletCrawlSpeed[0],simCfg.dropletCrawlSpeed[1])*(Math.random()<0.5?-1:1);
+      d.w=rnd(simCfg.dropletCrawlSpeed[0],simCfg.dropletCrawlSpeed[1])*(gooRnd()<0.5?-1:1);
     }else{
       d.mode='crawl';
-      d.ang=Math.random()*TAU;
-      d.w=rnd(simCfg.dropletCrawlSpeed[0],simCfg.dropletCrawlSpeed[1])*(Math.random()<0.5?-1:1);
+      d.ang=gooRnd()*TAU;
+      d.w=rnd(simCfg.dropletCrawlSpeed[0],simCfg.dropletCrawlSpeed[1])*(gooRnd()<0.5?-1:1);
       d.rr=rnd(simCfg.dropletRadius[0],simCfg.dropletRadius[1]);
       d.x=CX; d.y=CY; d.vy=0; d.startT=0;
     }
@@ -928,7 +950,9 @@ function tickGooSim(now){
     const idle=0.12+0.06*Math.sin(now/900);
     scene.gooRipple=Math.max(scene.gooRipple*0.98, idle);
   }
-  const damp=Math.pow(simCfg.damping,k);
+  /* smorzamento V6.3: il bordo deve arrivare e FERMARSI. Col valore condiviso il
+     rapporto di smorzamento valeva 0.061 e il bordo suonava come gelatina. */
+  const damp=Math.pow(tarGooConfig.v63.damping,k);
   /* Invasion front: a single tar wave that grows outward from the core.
      Each axis reaches its own final radius when the front passes it, so
      short arms fill first and the long arms keep pushing — like real tar. */
@@ -960,7 +984,7 @@ function tickGooSim(now){
     const rFinal=rev<=0.001?0:rCheckAt(theta,1);
     const front=rFinal*pool;
     const target=Math.min(rFinal,front);
-    let vel=(gooSim.v[i]+(target-gooSim.r[i])*simCfg.stiffness*k)*damp;
+    let vel=(gooSim.v[i]+(target-gooSim.r[i])*V63_STIFFNESS*k)*damp;
     const vMax=simCfg.maxSpeed*k*(1+2*(scene.gooRipple||0));
     if(vel>vMax)vel=vMax; else if(vel<-vMax)vel=-vMax;
     const next=gooSim.r[i]+vel*k;
@@ -2017,7 +2041,7 @@ updateMathPanel();
     (window as any).__ASTROLABE_V63__ = {
       step: (now: number) => renderFrame(now),
       freeze: () => { engineAlive = false; cancelAnimationFrame(rafId); },
-      geo, scene, cfg, setConfig,
+      geo, scene, cfg, setConfig, gooSim,
       rStarAt, rCheckAt, CX, CY, R,
     };
   }

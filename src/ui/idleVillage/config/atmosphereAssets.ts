@@ -280,7 +280,7 @@ export const atmosphereAssets: AtmosphereConfig = {
         periodXSeconds: 130.9,
         stepY: 384,
         periodYSeconds: 615.7,
-        opacity: 0.75,
+        opacity: 0.60,
       },
       {
         // 1.5 px/s along 108° — half the speed, travelling up and to the left.
@@ -293,7 +293,7 @@ export const atmosphereAssets: AtmosphereConfig = {
         periodXSeconds: 552.4,
         stepY: 256,
         periodYSeconds: 179.4,
-        opacity: 0.60,
+        opacity: 0.48,
       },
     ],
   },
