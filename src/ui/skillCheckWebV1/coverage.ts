@@ -195,9 +195,23 @@ export interface Coverage {
  * dove le due funzioni sono lineari a tratti — nessun bias di discretizzazione
  * radiale come quello che falsava la banda critica di 0.063 punti.
  */
-export function measureCoverage(s: Snapshot, angles = 7200, narrow = false): Coverage {
+export function measureCoverage(
+  s: Snapshot,
+  angles = 7200,
+  narrow = false,
+  /**
+   * Profondita' della valle, come frazione della punta. Assente = comportamento
+   * storico (`VALLEY_F` per il fiore, `valleyDepthFor` per la stella): nessuna
+   * chiamata esistente cambia risultato.
+   *
+   * Esiste perche' la valle e' la manopola dell'AREA, e senza poterla muovere non
+   * si puo' rispondere alla domanda di CP-B — quale copertura e' raggiungibile,
+   * caso per caso, dentro l'insieme delle forme ammesse.
+   */
+  valleyF?: number,
+): Coverage {
   const tips = s.axisTip;
-  const shape = narrow ? buildHeroShape(s) : null;
+  const shape = narrow ? buildHeroShape(s, valleyF) : null;
   let trama = 0, covered = 0, wasted = 0;
   const perAxisExposed = new Array<number>(AXES).fill(0);
   const perAxisTotal = new Array<number>(AXES).fill(0);
@@ -205,7 +219,7 @@ export function measureCoverage(s: Snapshot, angles = 7200, narrow = false): Cov
   for (let i = 0; i < angles; i += 1) {
     const th = -Math.PI / 2 + (i + 0.5) * dth;
     const rt = rWallAt(s, th);
-    const rh = shape ? rHeroNarrowAt(shape, th) : rHeroAt(tips, th);
+    const rh = shape ? rHeroNarrowAt(shape, th) : rHeroAt(tips, th, valleyF);
     const cov = Math.min(rt, rh);
     const at = 0.5 * rt * rt * dth;
     const ac = 0.5 * cov * cov * dth;
