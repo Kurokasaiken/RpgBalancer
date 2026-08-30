@@ -17,6 +17,7 @@ const WorldSurfaceWaves = lazy(() => import('./WorldSurfaceWaves'));
 const WorldSurfaceClouds = lazy(() => import('./WorldSurfaceClouds'));
 const WorldSurfaceCloudShadows = lazy(() => import('./WorldSurfaceCloudShadows'));
 const WorldSurfaceFoam = lazy(() => import('./WorldSurfaceFoam'));
+const WorldSurfaceWaterField = lazy(() => import('./WorldSurfaceWaterField'));
 const WorldSurfaceBirds = lazy(() => import('./WorldSurfaceBirds'));
 const WorldSurfaceCreatures = lazy(() => import('./WorldSurfaceCreatures'));
 const WorldSurfaceEventCard = lazy(() => import('./WorldSurfaceEventCard'));
@@ -601,6 +602,14 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
           {/* Wave marks break on the shoreline, at the bottom of the atmosphere
               stack: they belong to the water surface, not to the sky. */}
           <WorldSurfaceWaves zIndex={cloudZIndex - 4} />
+          {/* The sea's own surface, at the very bottom of the atmosphere stack:
+              the wave marks and the foam break ON it, so they have to sit above.
+              This is the layer that keeps the largest surface on the map from
+              being pixel-identical frame to frame. */}
+          <WorldSurfaceWaterField
+            canvasSize={manifest.coordinateSystem.canvas}
+            zIndex={cloudZIndex - 6}
+          />
           {/* Cloud shadows drift across the land, below the weather. */}
           {breathEnabled && (
             <WorldSurfaceCloudShadows

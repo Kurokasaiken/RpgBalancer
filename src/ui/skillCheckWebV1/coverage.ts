@@ -196,34 +196,6 @@ export const MORPH_VALLEY_STAR = STAR_VALLEY_SLIM;
 export const valleyForMorph = (m: number): number =>
   MORPH_VALLEY_FLOWER + (MORPH_VALLEY_STAR - MORPH_VALLEY_FLOWER) * clamp(m, 0, 1);
 
-/**
- * I dieci vertici da un morph GIA' DECISO, uno per petalo.
- *
- * Conserva le due proprieta' di V16 che non sono negoziabili: la valle appartiene
- * a due punte e segue la PIU' CORTA (e' cosi' che un asse debole scava la valle,
- * ed e' la lettura «quale skill ti tradisce»), e il mix e' per asse.
- */
-export function buildHeroShapeFromMorph(s: Snapshot, morph: number[]): HeroShape {
-  const angs: number[] = [];
-  const radii: number[] = [];
-  const mix: number[] = [];
-  const flowerValley: number[] = [];
-  for (let i = 0; i < AXES; i += 1) {
-    const aTip = -Math.PI / 2 + (i * TAU) / AXES;
-    angs.push(aTip);
-    radii.push(s.axisTip[i]);
-    mix.push(clamp(morph[i], 0, 1));
-
-    const j = (i + 1) % AXES;
-    /* l'asse debole detta sia il raggio di base sia la profondita': se una stat e'
-       corta, la sua valle affonda anche dal lato del vicino forte */
-    const weakIdx = s.axisTip[i] <= s.axisTip[j] ? i : j;
-    angs.push(aTip + Math.PI / AXES);
-    radii.push(s.axisTip[weakIdx] * valleyForMorph(morph[weakIdx]));
-    flowerValley.push(valleyForMorph(morph[weakIdx]));
-  }
-  return { angs, radii, tips: s.axisTip, mix, flowerValley };
-}
 
 /** copertura del solo settore dell'asse `k`, in % dell'area di quel settore */
 function sectorCoverage(s: Snapshot, sh: HeroShape, k: number, angles = 240): number {
@@ -264,29 +236,85 @@ function sectorCoverage(s: Snapshot, sh: HeroShape, k: number, angles = 240): nu
  * una taratura opportunistica. CP-B ha misurato che il caso peggiore sfonda di 4.9
  * punti su 61 casi giocabili.
  */
-export function solveMorph(s: Snapshot, targets: number[], passes = 4, steps = 18): number[] {
-  const morph = new Array<number>(AXES).fill(0.5);
-  for (let pass = 0; pass < passes; pass += 1) {
-    for (let k = 0; k < AXES; k += 1) {
-      let lo = 0;
-      let hi = 1;
-      for (let it = 0; it < steps; it += 1) {
-        const m = (lo + hi) / 2;
-        morph[k] = m;
-        /* piu' stella -> meno area: se copro ancora troppo devo andare verso la
-           stella, cioe' alzare il morph */
-        if (sectorCoverage(s, buildHeroShapeFromMorph(s, morph), k) > targets[k]) lo = m;
-        else hi = m;
-      }
-      morph[k] = (lo + hi) / 2;
-    }
+/**
+ * I dieci vertici da profondita' di valle gia' decise.
+ *
+ * Il `mix` — quanto la punta e' spigolo invece che arco — segue in PROPORZIONE,
+ * come chiede il Director: e' la posizione delle valli dentro l'intervallo
+ * fiore..stella, mediata fra le due che delimitano quel petalo. Un petalo con
+ * valli profonde ha la punta acuta; uno con valli alte ce l'ha tonda.
+ */
+export function buildHeroShapeFromValleys(s: Snapshot, valleys: number[]): HeroShape {
+  const angs: number[] = [];
+  const radii: number[] = [];
+  const mix: number[] = [];
+  const flowerValley: number[] = [];
+  const toMorph = (vf: number) =>
+    clamp((MORPH_VALLEY_FLOWER - vf) / (MORPH_VALLEY_FLOWER - MORPH_VALLEY_STAR), 0, 1);
+  for (let i = 0; i < AXES; i += 1) {
+    const aTip = -Math.PI / 2 + (i * TAU) / AXES;
+    const j = (i + 1) % AXES;
+    const prev = (i + AXES - 1) % AXES;
+    angs.push(aTip);
+    radii.push(s.axisTip[i]);
+    mix.push((toMorph(valleys[prev]) + toMorph(valleys[i])) / 2);
+    /* il raggio di base resta quello dell'asse debole: e' geometria, non stile —
+       una valle piu' lunga della punta piu' corta rovescerebbe il vertice */
+    const weakIdx = s.axisTip[i] <= s.axisTip[j] ? i : j;
+    angs.push(aTip + Math.PI / AXES);
+    radii.push(s.axisTip[weakIdx] * valleys[i]);
+    flowerValley.push(valleys[i]);
   }
-  return morph;
+  return { angs, radii, tips: s.axisTip, mix, flowerValley };
 }
 
-/** la forma che il contratto impone, dati i bersagli per asse */
+/**
+ * IL SOLVER SULLE VALLI — cinque incognite, cinque bersagli.
+ *
+ * Il solver per-petalo (`solveMorph`) lasciava saturare un asse forte fra vicini
+ * deboli: nella sua parametrizzazione la valle e' condivisa, quindi il morph di un
+ * petalo non basta a controllare i propri due confini. Misurato: -13 punti.
+ *
+ * Ma le valli sono CINQUE e i bersagli sono CINQUE: il sistema e' quadrato, e non
+ * c'e' nessuna scelta da fare fra «la valle» e «il contratto» — c'era solo una
+ * parametrizzazione che sprecava gradi di liberta'.
+ *
+ * Qui le incognite sono le profondita' delle valli. Ogni valle confina con due
+ * settori, quindi si rilassa: si guarda l'errore di ciascun settore e si spingono
+ * le sue due valli nella direzione che lo riduce. Piu' copertura del dovuto ->
+ * valli piu' profonde.
+ */
+export function solveValleys(s: Snapshot, targets: number[], passes = 400): number[] {
+  const lo = MORPH_VALLEY_STAR;
+  const hi = MORPH_VALLEY_FLOWER;
+  const v = new Array<number>(AXES).fill((lo + hi) / 2);
+  const shapeOf = () => buildHeroShapeFromValleys(s, v);
+  for (let pass = 0; pass < passes; pass += 1) {
+    const sh = shapeOf();
+    const err = targets.map((t, k) => sectorCoverage(s, sh, k) - t);
+    if (Math.max(...err.map(Math.abs)) < 0.05) break;
+    /* la valle j delimita i settori j e j+1: la muove la somma dei loro errori */
+    const next = v.slice();
+    for (let j = 0; j < AXES; j += 1) {
+      const e = err[j] + err[(j + 1) % AXES];
+      next[j] = clamp(v[j] - e * 0.004, lo, hi);
+    }
+    for (let j = 0; j < AXES; j += 1) v[j] = next[j];
+  }
+  return v;
+}
+
+
+/**
+ * La forma che il contratto impone. UN SOLO percorso: delega al solver sulle valli.
+ *
+ * Per un giro qui e' esistito un secondo solver (per-petalo) mentre il motore usava
+ * gia' quello sulle valli. I test misuravano il morto e restavano verdi. Un secondo
+ * percorso silenzioso e' il difetto che ha aperto questa sessione: non se ne tiene
+ * uno "per compatibilita'".
+ */
 export function solveHeroShape(s: Snapshot, targets: number[]): HeroShape {
-  return buildHeroShapeFromMorph(s, solveMorph(s, targets));
+  return buildHeroShapeFromValleys(s, solveValleys(s, targets));
 }
 
 /* ── LA POLICY DI SATURAZIONE — PLAN-010 CP-D ───────────────────────────────
@@ -338,16 +366,27 @@ export const CONTRACT_TOLERANCE = 3;
  * Risolve la forma E dice cosa e' successo. E' `solveHeroShape` piu' il verbale.
  */
 export function solveShapeReported(s: Snapshot, targets: number[]): SolvedShape {
-  const morph = solveMorph(s, targets);
-  const shape = buildHeroShapeFromMorph(s, morph);
+  const valleys = solveValleys(s, targets);
+  const shape = buildHeroShapeFromValleys(s, valleys);
+  const morph = shape.mix.slice();
+  const pinnedFlower = valleys.some((v) => v >= MORPH_VALLEY_FLOWER - SAT_EPS);
+  const pinnedStar = valleys.some((v) => v <= MORPH_VALLEY_STAR + SAT_EPS);
   const report: AxisReport[] = [];
   for (let k = 0; k < AXES; k += 1) {
     const achieved = sectorCoverage(s, shape, k);
     const residual = achieved - targets[k];
     let saturated: AxisReport['saturated'] = 'none';
     if (Math.abs(residual) > CONTRACT_TOLERANCE) {
-      if (morph[k] <= SAT_EPS) saturated = 'flower';
-      else if (morph[k] >= 1 - SAT_EPS) saturated = 'star';
+      /* La frontiera si guarda sul SISTEMA, non sulla singola valle. Le valli sono
+         cinque e i bersagli cinque, ma se anche una sola si incolla a un bordo
+         restano quattro incognite per cinque equazioni: il sistema e'
+         sovravincolato e NESSUN settore e' piu' garantito esatto, nemmeno quelli
+         con le proprie valli libere. Misurato su [90,30,60,75,45]: due valli al
+         tetto del fiore e l'errore che si distribuisce su tutti e cinque i settori
+         a +-2.9, invece di concentrarsi. Attribuirlo a `none` perche' «la mia
+         valle non e' incollata» sarebbe uno scarto muto travestito. */
+      if (pinnedFlower) saturated = 'flower';
+      else if (pinnedStar) saturated = 'star';
     }
     report.push({
       axis: k,

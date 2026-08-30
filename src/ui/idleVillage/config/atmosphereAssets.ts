@@ -126,11 +126,57 @@ export interface WavesConfig {
   marks: WaveMark[];
 }
 
+/**
+ * One drifting sheet of sea micro-detail.
+ *
+ * The step/period pairs are precomputed rather than derived from a speed and an
+ * angle at runtime, because a tiled background is only exactly seamless when it
+ * translates by a whole tile: `stepX` and `stepY` must stay whole multiples of
+ * `tilePx`. Storing the speed instead would invite someone to tune it to a value
+ * that puts a visible seam through the sea every few minutes.
+ */
+export interface WaterDetailLayer {
+  name: string;
+  src: string;
+  /** Edge of one texture tile, in world px. */
+  tilePx: number;
+  /** Horizontal travel per loop. A whole tile, signed for direction. */
+  stepX: number;
+  /** Time to travel `stepX`. Derived from the layer's speed and heading. */
+  periodXSeconds: number;
+  /** Vertical travel per loop. A whole tile, signed for direction. */
+  stepY: number;
+  periodYSeconds: number;
+  /**
+   * NOT the "0.03-ish" of a solid overlay texture — read this before tuning it.
+   *
+   * The amplitude that matters is the change in the final on-screen pixel, which
+   * wants to land around 8-15 RGB points: inside the sea painting's own p25-p75
+   * luminance spread of 120-142, so the detail reads as the water's surface rather
+   * than as a film over it.
+   *
+   * These tiles carry the pattern in their alpha channel and are mostly
+   * transparent (mean alpha 16/255 for A, 26/255 for B), so the sparseness is
+   * already baked in. The final amplitude is `opacity * alpha * 12` — attenuating
+   * again here with a 0.03 would put the peak change at 0.4 RGB points, which is
+   * below the threshold of visibility and measures as no motion at all.
+   *
+   * So: peak alpha 1.0 * 0.75 * 12 tint points ~= 9 points of change at the
+   * pattern's brightest, fading to nothing across most of the tile.
+   */
+  opacity: number;
+}
+
+export interface WaterFieldConfig {
+  layers: WaterDetailLayer[];
+}
+
 export interface AtmosphereConfig {
   clouds: CloudBand[];
   foam: FoamConfig;
   birds: BirdsConfig;
   waves: WavesConfig;
+  waterField: WaterFieldConfig;
 }
 
 export const atmosphereAssets: AtmosphereConfig = {
@@ -219,6 +265,36 @@ export const atmosphereAssets: AtmosphereConfig = {
     { src: 'waves/onda2.webp', x: 3585, y: 2012, width: 340, height: 142, delaySeconds: 18.0, flip: false },
     { src: 'waves/schiuma1.webp', x: 314, y: 182, width: 340, height: 142, delaySeconds: 22.5, flip: false },
     { src: 'waves/onda2.webp', x: 3229, y: 472, width: 340, height: 142, delaySeconds: 27.0, flip: false }
+    ],
+  },
+  waterField: {
+    // Headings are 12° and 108°: diverging, and deliberately not 90° apart. Two
+    // sheets crossing at a right angle produce a visible grid where they overlap.
+    layers: [
+      {
+        // 3.0 px/s along 12°. The larger, lighter sheet — broken highlights.
+        name: 'a',
+        src: 'water/water_detail_a.webp',
+        tilePx: 384,
+        stepX: 384,
+        periodXSeconds: 130.9,
+        stepY: 384,
+        periodYSeconds: 615.7,
+        opacity: 0.75,
+      },
+      {
+        // 1.5 px/s along 108° — half the speed, travelling up and to the left.
+        // Finer and darker; it is what keeps sheet A from reading as one moving
+        // surface rather than as water.
+        name: 'b',
+        src: 'water/water_detail_b.webp',
+        tilePx: 256,
+        stepX: -256,
+        periodXSeconds: 552.4,
+        stepY: 256,
+        periodYSeconds: 179.4,
+        opacity: 0.60,
+      },
     ],
   },
 };

@@ -121,6 +121,34 @@ describe('PLAN-010 CP-D — contratto e saturazione', () => {
     expect(salti, `salti: ${salti.slice(0, 6).join(', ')}`).toEqual([]);
   }, 20_000);
 
+  /**
+   * L'invariante «nessuno scarto muto» va verificato anche sui board MULTI-SKILL:
+   * li' i settori sono accoppiati dalle valli condivise e il rilassamento puo'
+   * lasciare una coda. Misurato: con il guadagno fisso la coda stava a ~3.2 punti,
+   * sotto tolleranza a skill singola ma SOPRA su un board sbilanciato — cioe'
+   * esattamente uno scarto muto, che questo test prende e il precedente no.
+   */
+  it('nessuno scarto muto nemmeno sui board multi-skill', () => {
+    const boards = [
+      [90, 30, 60, 75, 45],
+      [95, 20, 60, 60, 60],
+      [80, 80, 20, 20, 50],
+      [60, 60, 60, 60, 60],
+    ];
+    const muti: string[] = [];
+    for (const stats of boards) {
+      const diffs = stats.map(() => 50);
+      const s = buildSnapshot({ stats, diffs });
+      const { report } = solveShapeReported(s, stats.map((st) => target(st, 50)));
+      for (const r of report) {
+        if (Math.abs(r.residual) > CONTRACT_TOLERANCE && r.saturated === 'none') {
+          muti.push(`[${stats.join(',')}] a${r.axis} res=${r.residual}`);
+        }
+      }
+    }
+    expect(muti, `scarti muti: ${muti.join(', ')}`).toEqual([]);
+  }, 20_000);
+
   it('la saturazione dichiara la frontiera giusta', () => {
     /* bersaglio 1% con la punta molto piu' corta del muro: copre comunque troppo,
        quindi si ferma contro la frontiera STELLA (la forma piu' magra ammessa) */
