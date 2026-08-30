@@ -29,19 +29,34 @@ const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
  * fondovalle. Nessuna scala, nessun `bodyMix`: se una punta esce dalla trama,
  * esce — la parte fuori non copre niente perche' non c'e' niente da coprire.
  */
-export function rHeroAt(tips: number[], theta: number, valleyF = VALLEY_F): number {
+export function rHeroAt(
+  tips: number[],
+  theta: number,
+  /**
+   * Scalare, oppure UN VALORE PER INCAVO. Il vettore serve al pilota d'area: con
+   * un morph per petalo le cinque valli sono diverse, e uno scalare le
+   * appiattirebbe tutte sulla stessa profondita' — cancellando proprio la lettura
+   * «quale skill ti tradisce».
+   */
+  valleyF: number | number[] = VALLEY_F,
+): number {
   const t = (((theta + Math.PI / 2) % TAU) + TAU) % TAU;
   const seg = TAU / (AXES * 2);
   const k = Math.floor(t / seg);
   const f = (t - k * seg) / seg;
   const tip = (i: number) => tips[((i % AXES) + AXES) % AXES];
+  /* l'incavo del segmento k: pari = fra k/2 e k/2+1, dispari = fra (k-1)/2 e (k+1)/2 */
+  const vAt = (i: number): number => {
+    if (typeof valleyF === 'number') return valleyF;
+    return valleyF[((i % AXES) + AXES) % AXES];
+  };
   if (k % 2 === 0) {
     const a = tip(k / 2);
-    const b = Math.min(tip(k / 2), tip(k / 2 + 1)) * valleyF;
+    const b = Math.min(tip(k / 2), tip(k / 2 + 1)) * vAt(k / 2);
     return a + (b - a) * f;
   }
   const b = tip((k + 1) / 2);
-  const a = Math.min(tip((k - 1) / 2), tip((k + 1) / 2)) * valleyF;
+  const a = Math.min(tip((k - 1) / 2), tip((k + 1) / 2)) * vAt((k - 1) / 2);
   return a + (b - a) * f;
 }
 
@@ -115,6 +130,16 @@ export interface HeroShape {
   tips: number[];
   /** quanto la forma e' stella invece che fiore, per asse */
   mix: number[];
+  /**
+   * Valle del ramo FIORE, una per incavo. Assente = `VALLEY_F`, cioe' il
+   * comportamento di V16.
+   *
+   * Serve perche' `rHeroNarrowAt` miscela DUE profili: se la valle del ramo stella
+   * si muove col morph e quella del fiore resta inchiodata, al capo fiore la forma
+   * non arriva mai al petalo pieno — misurato, e' proprio il tetto che faceva
+   * mancare 5 punti a 85/50.
+   */
+  flowerValley?: number[];
 }
 
 /** i dieci vertici piu' il mix fiore/stella. Niente qui e' scelto a mano. */
@@ -141,6 +166,127 @@ export function buildHeroShape(s: Snapshot, valleyF?: number): HeroShape {
   return { angs, radii, tips: s.axisTip, mix };
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   IL PILOTA D'AREA — PLAN-010 CP-C, desiderata v17
+
+   Qui non cambia nessuna primitiva di forma: `rHeroAt`, `rStarChord` e
+   `rHeroNarrowAt` restano quelle di V16. Cambia CHI decide `mix` e `valleyF`.
+
+   Prima decideva l'allungamento `punta/muro`. Il Director l'ha dichiarato morto,
+   e la v17 dice cosa mettere al suo posto: **il contratto di copertura vince sulla
+   forma**, quindi la forma e' quella che serve a produrre `50 + delta`.
+
+   UN SOLO parametro per petalo, `morph`, e la punta lo segue in proporzione —
+   e' la regola del Director: «in proporzione a quanto e' fiore e quanto e'
+   stella dovrebbe essere anche la forma della punta».
+
+       morph = 0  -> fiore:  punta tonda,  valle alta  -> AREA MASSIMA
+       morph = 1  -> stella: punta acuta,  valle bassa -> AREA MINIMA
+
+   Il tetto della valle non e' inventato: CP-B ha misurato che serve **0.774**
+   (caso 10/20) per rendere EXACT il dominio giocabile. 0.80 tiene il margine.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/** valle al capo FIORE del morph. Da CP-B: serve 0.774, questo tiene il margine. */
+export const MORPH_VALLEY_FLOWER = 0.80;
+/** valle al capo STELLA del morph: la forma piu' magra che il modello ammette. */
+export const MORPH_VALLEY_STAR = STAR_VALLEY_SLIM;
+
+/** la valle che corrisponde a una posizione del morph */
+export const valleyForMorph = (m: number): number =>
+  MORPH_VALLEY_FLOWER + (MORPH_VALLEY_STAR - MORPH_VALLEY_FLOWER) * clamp(m, 0, 1);
+
+/**
+ * I dieci vertici da un morph GIA' DECISO, uno per petalo.
+ *
+ * Conserva le due proprieta' di V16 che non sono negoziabili: la valle appartiene
+ * a due punte e segue la PIU' CORTA (e' cosi' che un asse debole scava la valle,
+ * ed e' la lettura «quale skill ti tradisce»), e il mix e' per asse.
+ */
+export function buildHeroShapeFromMorph(s: Snapshot, morph: number[]): HeroShape {
+  const angs: number[] = [];
+  const radii: number[] = [];
+  const mix: number[] = [];
+  const flowerValley: number[] = [];
+  for (let i = 0; i < AXES; i += 1) {
+    const aTip = -Math.PI / 2 + (i * TAU) / AXES;
+    angs.push(aTip);
+    radii.push(s.axisTip[i]);
+    mix.push(clamp(morph[i], 0, 1));
+
+    const j = (i + 1) % AXES;
+    /* l'asse debole detta sia il raggio di base sia la profondita': se una stat e'
+       corta, la sua valle affonda anche dal lato del vicino forte */
+    const weakIdx = s.axisTip[i] <= s.axisTip[j] ? i : j;
+    angs.push(aTip + Math.PI / AXES);
+    radii.push(s.axisTip[weakIdx] * valleyForMorph(morph[weakIdx]));
+    flowerValley.push(valleyForMorph(morph[weakIdx]));
+  }
+  return { angs, radii, tips: s.axisTip, mix, flowerValley };
+}
+
+/** copertura del solo settore dell'asse `k`, in % dell'area di quel settore */
+function sectorCoverage(s: Snapshot, sh: HeroShape, k: number, angles = 240): number {
+  const half = Math.PI / AXES;
+  const centre = -Math.PI / 2 + (k * TAU) / AXES;
+  const dth = (2 * half) / angles;
+  let trama = 0;
+  let covered = 0;
+  for (let i = 0; i < angles; i += 1) {
+    const th = centre - half + (i + 0.5) * dth;
+    const rt = rWallAt(s, th);
+    const rh = rHeroNarrowAt(sh, th);
+    trama += 0.5 * rt * rt * dth;
+    covered += 0.5 * Math.min(rt, rh) * Math.min(rt, rh) * dth;
+  }
+  return trama > 0 ? (covered / trama) * 100 : 0;
+}
+
+/**
+ * IL SOLVER. Trova il morph per petalo che porta la copertura di ogni settore al
+ * proprio bersaglio.
+ *
+ * `targets` e' un vettore, uno per asse, e non un numero solo: su un board a piu'
+ * skill ogni punta ha il suo delta, e il sorgente dell'astrolabio ammette che con
+ * un bersaglio unico «su un board multi-skill il bersaglio era mal posto per
+ * costruzione». Con un bersaglio per settore ogni petalo dice la verita' sulla
+ * PROPRIA skill, e il totale viene da se'. Con una skill sola i cinque bersagli
+ * coincidono e il vettore degenera nel caso singolo.
+ *
+ * I settori sono accoppiati — ogni valle appartiene a due petali — quindi si itera:
+ * la copertura di un settore CALA quando il suo morph cresce (piu' stella = meno
+ * area), percio' la bisezione per asse e' lecita e le passate convergono.
+ *
+ * Dove il bersaglio sta fuori dall'insieme ammesso il morph SATURA al capo giusto:
+ * e' la policy della v17 — lo scarto viene dalla frontiera di fattibilita', non da
+ * una taratura opportunistica. CP-B ha misurato che il caso peggiore sfonda di 4.9
+ * punti su 61 casi giocabili.
+ */
+export function solveMorph(s: Snapshot, targets: number[], passes = 4, steps = 18): number[] {
+  const morph = new Array<number>(AXES).fill(0.5);
+  for (let pass = 0; pass < passes; pass += 1) {
+    for (let k = 0; k < AXES; k += 1) {
+      let lo = 0;
+      let hi = 1;
+      for (let it = 0; it < steps; it += 1) {
+        const m = (lo + hi) / 2;
+        morph[k] = m;
+        /* piu' stella -> meno area: se copro ancora troppo devo andare verso la
+           stella, cioe' alzare il morph */
+        if (sectorCoverage(s, buildHeroShapeFromMorph(s, morph), k) > targets[k]) lo = m;
+        else hi = m;
+      }
+      morph[k] = (lo + hi) / 2;
+    }
+  }
+  return morph;
+}
+
+/** la forma che il contratto impone, dati i bersagli per asse */
+export function solveHeroShape(s: Snapshot, targets: number[]): HeroShape {
+  return buildHeroShapeFromMorph(s, solveMorph(s, targets));
+}
+
 /** il bordo della STELLA: intersezione del raggio con la corda, forma chiusa */
 function rStarChord(sh: HeroShape, theta: number): number {
   const n = sh.angs.length;
@@ -164,7 +310,7 @@ function rStarChord(sh: HeroShape, theta: number): number {
  */
 export function rHeroNarrowAt(sh: HeroShape, theta: number): number {
   const star = rStarChord(sh, theta);
-  const flower = rHeroAt(sh.tips, theta, VALLEY_F);
+  const flower = rHeroAt(sh.tips, theta, sh.flowerValley ?? VALLEY_F);
   let best = Infinity;
   let bi = 0;
   for (let i = 0; i < AXES; i += 1) {
@@ -209,9 +355,11 @@ export function measureCoverage(
    * caso per caso, dentro l'insieme delle forme ammesse.
    */
   valleyF?: number,
+  /** forma gia' risolta (dal pilota d'area): se c'e', vince su `narrow`/`valleyF` */
+  shapeOverride?: HeroShape,
 ): Coverage {
   const tips = s.axisTip;
-  const shape = narrow ? buildHeroShape(s, valleyF) : null;
+  const shape = shapeOverride ?? (narrow ? buildHeroShape(s, valleyF) : null);
   let trama = 0, covered = 0, wasted = 0;
   const perAxisExposed = new Array<number>(AXES).fill(0);
   const perAxisTotal = new Array<number>(AXES).fill(0);
