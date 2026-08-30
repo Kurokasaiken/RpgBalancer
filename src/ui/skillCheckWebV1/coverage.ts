@@ -289,6 +289,78 @@ export function solveHeroShape(s: Snapshot, targets: number[]): HeroShape {
   return buildHeroShapeFromMorph(s, solveMorph(s, targets));
 }
 
+/* ── LA POLICY DI SATURAZIONE — PLAN-010 CP-D ───────────────────────────────
+   Dove il contratto non e' raggiungibile la forma va al massimo ammesso e lo
+   scarto resta. La v17 chiede che quello scarto sia **spiegato dalla frontiera**
+   e non da una taratura opportunistica — e per esserlo dev'essere ISPEZIONABILE.
+
+   Senza questo la saturazione e' muta: il quadro smette di predire l'esito e
+   nessuno se ne accorge. Con questo, chi guarda sa quale asse ha ceduto, contro
+   quale limite, e di quanto.
+
+   Due frontiere, e dicono cose diverse:
+     'flower' — morph al minimo: la forma e' gia' il petalo piu' pieno ammesso e
+                non c'e' altra area da prendere. Succede a un asse forte i cui
+                vicini deboli gli scavano le valli (misurato: oltre ~20 punti di
+                spread fra le stat, sempre e solo un settore).
+     'star'   — morph al massimo: la forma e' gia' la piu' magra ammessa e copre
+                comunque troppo. Succede quando la punta e' molto piu' corta del
+                muro, cioe' ai bersagli bassissimi.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+export interface AxisReport {
+  axis: number;
+  /** il bersaglio del contratto per questo settore */
+  target: number;
+  /** cio' che la forma risolta copre davvero in quel settore */
+  achieved: number;
+  morph: number;
+  /** contro quale frontiera si e' fermata, se si e' fermata */
+  saturated: 'none' | 'flower' | 'star';
+  /** achieved - target, con segno */
+  residual: number;
+}
+
+export interface SolvedShape {
+  shape: HeroShape;
+  morph: number[];
+  report: AxisReport[];
+  /** vero se almeno un settore ha ceduto contro una frontiera */
+  anySaturated: boolean;
+}
+
+/** quanto un morph puo' avvicinarsi al bordo prima di chiamarsi saturo */
+const SAT_EPS = 1e-3;
+/** oltre questo scarto la saturazione e' degna di nota, non rumore di bisezione */
+export const CONTRACT_TOLERANCE = 3;
+
+/**
+ * Risolve la forma E dice cosa e' successo. E' `solveHeroShape` piu' il verbale.
+ */
+export function solveShapeReported(s: Snapshot, targets: number[]): SolvedShape {
+  const morph = solveMorph(s, targets);
+  const shape = buildHeroShapeFromMorph(s, morph);
+  const report: AxisReport[] = [];
+  for (let k = 0; k < AXES; k += 1) {
+    const achieved = sectorCoverage(s, shape, k);
+    const residual = achieved - targets[k];
+    let saturated: AxisReport['saturated'] = 'none';
+    if (Math.abs(residual) > CONTRACT_TOLERANCE) {
+      if (morph[k] <= SAT_EPS) saturated = 'flower';
+      else if (morph[k] >= 1 - SAT_EPS) saturated = 'star';
+    }
+    report.push({
+      axis: k,
+      target: targets[k],
+      achieved: +achieved.toFixed(2),
+      morph: +morph[k].toFixed(4),
+      saturated,
+      residual: +residual.toFixed(2),
+    });
+  }
+  return { shape, morph, report, anySaturated: report.some((r) => r.saturated !== 'none') };
+}
+
 /** il bordo della STELLA: intersezione del raggio con la corda, forma chiusa */
 function rStarChord(sh: HeroShape, theta: number): number {
   const n = sh.angs.length;
