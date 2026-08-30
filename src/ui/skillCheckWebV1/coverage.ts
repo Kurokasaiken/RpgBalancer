@@ -18,7 +18,7 @@
  * (stat == difficolta') la copertura sia esattamente il 50%.
  */
 
-import { AXES, rWallAt, type Snapshot, type SkillInput, type CheckConfig,
+import { AXES, R_CORE, rWallAt, type Snapshot, type SkillInput, type CheckConfig,
          VALLEY_F, DEFAULT_CHECK_CONFIG, buildSnapshot } from './zones';
 
 const TAU = Math.PI * 2;
@@ -235,9 +235,11 @@ function sectorCoverage(s: Snapshot, sh: HeroShape, k: number, angles = 240): nu
   for (let i = 0; i < angles; i += 1) {
     const th = centre - half + (i + 0.5) * dth;
     const rt = rWallAt(s, th);
-    const rh = rHeroNarrowAt(sh, th);
+    /* il pavimento del nucleo: il successo e' «nucleo + stella», non solo stella */
+    const rh = Math.max(rHeroNarrowAt(sh, th), R_CORE);
+    const c = Math.min(rt, rh);
     trama += 0.5 * rt * rt * dth;
-    covered += 0.5 * Math.min(rt, rh) * Math.min(rt, rh) * dth;
+    covered += 0.5 * c * c * dth;
   }
   return trama > 0 ? (covered / trama) * 100 : 0;
 }
@@ -354,12 +356,22 @@ export function measureCoverage(
    * si puo' rispondere alla domanda di CP-B — quale copertura e' raggiungibile,
    * caso per caso, dentro l'insieme delle forme ammesse.
    */
-  valleyF?: number,
-  /** forma gia' risolta (dal pilota d'area): se c'e', vince su `narrow`/`valleyF` */
-  shapeOverride?: HeroShape,
+  opts: {
+    valleyF?: number;
+    /** forma gia' risolta (dal pilota d'area): se c'e', vince su `narrow`/`valleyF` */
+    shape?: HeroShape;
+    /**
+     * Conta anche il NUCLEO come successo. Il Director definisce il successo come
+     * «nucleo + stella clippata al muro», e nel regime a valle bassa il nucleo
+     * sporge oltre la valle: senza questo, il solver centra un bersaglio che non
+     * e' quello che il giocatore vede. Default spento: V15/V16 non si muovono.
+     */
+    withCore?: boolean;
+  } = {},
 ): Coverage {
   const tips = s.axisTip;
-  const shape = shapeOverride ?? (narrow ? buildHeroShape(s, valleyF) : null);
+  const shape = opts.shape ?? (narrow ? buildHeroShape(s, opts.valleyF) : null);
+  const floor = opts.withCore ? R_CORE : 0;
   let trama = 0, covered = 0, wasted = 0;
   const perAxisExposed = new Array<number>(AXES).fill(0);
   const perAxisTotal = new Array<number>(AXES).fill(0);
@@ -367,7 +379,8 @@ export function measureCoverage(
   for (let i = 0; i < angles; i += 1) {
     const th = -Math.PI / 2 + (i + 0.5) * dth;
     const rt = rWallAt(s, th);
-    const rh = shape ? rHeroNarrowAt(shape, th) : rHeroAt(tips, th, valleyF);
+    const rh0 = shape ? rHeroNarrowAt(shape, th) : rHeroAt(tips, th, opts.valleyF);
+    const rh = Math.max(rh0, floor);
     const cov = Math.min(rt, rh);
     const at = 0.5 * rt * rt * dth;
     const ac = 0.5 * cov * cov * dth;

@@ -28,7 +28,7 @@ function solvedPct(stat: number, diff: number) {
   const s = snapOf([stat], [diff]);
   const tg = target(stat, diff);
   const shape = solveHeroShape(s, new Array(AXES).fill(tg));
-  return measureCoverage(s, 7200, true, undefined, shape).pct;
+  return measureCoverage(s, 7200, true, { shape, withCore: true }).pct;
 }
 
 describe('PLAN-010 CP-C — pilota d\'area', () => {
@@ -90,6 +90,40 @@ describe('PLAN-010 CP-C — pilota d\'area', () => {
     expect(Math.abs(bumped[0] - base[0])).toBeGreaterThan(0.02);
     // gli assi non adiacenti alla punta toccata restano fermi
     for (const i of [2, 3]) expect(Math.abs(bumped[i] - base[i])).toBeLessThan(0.05);
+  });
+
+  /**
+   * CONFLITTO STRUTTURALE, non un difetto del solver. Due regole approvate
+   * separatamente si contraddicono quando gli assi adiacenti sono molto diversi:
+   *
+   *   1. «la valle segue l'asse piu' debole» — da V16, conservata: e' cio' che
+   *      rende leggibile «quale skill ti tradisce»;
+   *   2. «un bersaglio per settore» — scelta del Director.
+   *
+   * La (1) fa scavare le valli di un asse FORTE dai suoi vicini deboli, e allora
+   * la (2) non e' raggiungibile per quel settore. Misurato su board a spread
+   * crescente (difficolta' fissa 50): fino a ~20 punti di spread il contratto
+   * tiene esatto; sopra, satura SEMPRE UN SOLO settore — il forte accanto al
+   * debole — e lo scarto cresce col spread (40 -> 4.7, 60 -> 11.8, 75 -> 16.1).
+   *
+   * Questo test non pretende che il conflitto non esista: lo INCHIODA, cosi' che
+   * se un giorno cambia lo si veda. La decisione su quale regola cede e' di CP-D.
+   */
+  it('documenta il conflitto valle-debole vs bersaglio-per-settore', () => {
+    const casi: Array<[number[], number]> = [
+      [[60, 60, 60, 60, 60], 0],
+      [[70, 50, 60, 60, 60], 0],
+      [[90, 30, 60, 60, 60], 1],
+    ];
+    for (const [stats, attesiFuori] of casi) {
+      const diffs = stats.map(() => 50);
+      const tg = stats.map((st) => target(st, 50));
+      const s = snapOf(stats, diffs);
+      const shape = solveHeroShape(s, tg);
+      const cov = measureCoverage(s, 7200, true, { shape, withCore: true });
+      const fuori = cov.exposedByAxis.filter((e, i) => Math.abs(100 - e - tg[i]) > 3).length;
+      expect(fuori, `stats ${stats.join(',')}`).toBe(attesiFuori);
+    }
   });
 
   it('e deterministico', () => {
