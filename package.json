@@ -142,7 +142,10 @@
     "i18n:validate": "tsx scripts/i18n/validateKeys.ts",
     "i18n:audit": "tsx scripts/i18n/auditKeys.ts",
     "i18n:export": "tsx scripts/i18n/exportTms.ts",
-    "i18n:import": "tsx scripts/i18n/importTms.ts"
+    "i18n:import": "tsx scripts/i18n/importTms.ts",
+    "astrolabe:baseline": "node scripts/astrolabe/v63-baseline.mjs",
+    "astrolabe:baseline:check": "node scripts/astrolabe/v63-baseline.mjs --check",
+    "astrolabe:coverage": "NODE_OPTIONS=--require=./polyfill-crypto.cjs vitest run tests/unit/astrolabe/v63-coverage.test.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

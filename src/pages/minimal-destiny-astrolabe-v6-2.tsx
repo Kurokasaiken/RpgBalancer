@@ -123,6 +123,13 @@ export default function MinimalDestinyAstrolabeV62() {
               V6.2
             </span>
             <a
+              href="/minimal-destiny-astrolabe-v6-3"
+              className="px-3 py-1 rounded text-sm font-semibold bg-amber-600 text-black hover:bg-amber-500 transition-colors"
+              title="V6.3 · modello V16 pilotato dall area"
+            >
+              V6.3
+            </a>
+            <a
               href="/minimal-destiny-astrolabe-v7"
               className="px-3 py-1 rounded text-sm font-semibold bg-amber-600 text-black hover:bg-amber-500 transition-colors"
             >

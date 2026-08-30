@@ -103,8 +103,8 @@ export const MatericEventCard: React.FC<MatericEventCardProps> = ({
           >
             <div
               style={{
-                width: 64,
-                height: 64,
+                width: 'auto',
+                height: 'auto',
                 flexShrink: 0,
                 display: 'flex',
                 alignItems: 'center',

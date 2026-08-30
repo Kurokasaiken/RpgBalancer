@@ -313,13 +313,9 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
               }}
             >
               <MatericEventCard
-                variant="modal"
+                variant="reminder"
                 title={String(t('world.goblinInvasion.invasion'))}
-                image={
-                  <div style={{ display: 'flex', justifyContent: 'center' }}>
-                    <FillingPoi size={80} />
-                  </div>
-                }
+                image={<FillingPoi size={20} />}
                 style={{
                   maxWidth: REMINDER_W,
                   width: REMINDER_W,
