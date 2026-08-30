@@ -141,6 +141,14 @@ const tarGooConfigSchema = z.object({
     damping: z.number().min(0.5).max(0.99),
     /** Rigidezza della molla del bordo. */
     stiffness: z.number().min(0.001).max(0.2),
+    /**
+     * IL CONTATTO (CP-F). Larghezza in px dell'ombra che la stella proietta sul
+     * catrame, e del menisco che il catrame forma arrampicandosi sul suo fianco.
+     * Entrambi vivono SOLO dal lato del catrame: la silhouette della stella — che
+     * porta la probabilita' — non si sposta di un pixel.
+     */
+    contactShadowPx: z.number().min(0).max(40),
+    contactMeniscusPx: z.number().min(0).max(12),
   }),
 });
 
@@ -216,5 +224,7 @@ export const tarGooConfig: TarGooConfig = tarGooConfigSchema.parse({
     pourExponent: 0.5,   // flusso costante: r ~ t^(1/2)
     damping: 0.75,       // rapporto di smorzamento ~1.0 con la rigidezza qui sotto
     stiffness: 0.015,
+    contactShadowPx: 16,
+    contactMeniscusPx: 3,
   },
 });

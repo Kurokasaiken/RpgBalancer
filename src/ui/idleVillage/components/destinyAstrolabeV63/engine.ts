@@ -1359,6 +1359,44 @@ function drawStar(now){
   ctx.save();
   ctx.clip(ap,'evenodd');
 
+  /* ── IL CONTATTO (PLAN-010 CP-F) ────────────────────────────────────────
+     La stella COPRE, non rimuove: nessuno spostamento del catrame, perche' la
+     v15 dice «la prova e' quanto resta scoperto» e uno spostamento
+     racconterebbe che la difficolta' si e' RIDOTTA. Ma senza nessun segno al
+     bordo la stella resta un adesivo appoggiato sopra — il difetto che tutte e
+     tre le critiche esterne avevano visto nel video.
+     Due segni, entrambi DAL LATO DEL CATRAME: la silhouette della stella, che
+     porta la probabilita', non si sposta di un pixel.
+       - ombra di contatto: prova che la stella sta SOPRA;
+       - menisco: la superficie che si arrampica sul fianco, che e' bagnatura.
+     Niente `ctx.filter`: non esiste su WebKit, quindi la morbidezza si fa a
+     strati di alfa calante invece che con una sfocatura. */
+  {
+    const cShadow=tarGooConfig.v63.contactShadowPx;
+    const cMenisc=tarGooConfig.v63.contactMeniscusPx;
+    const tarSide=new Path2D();
+    for(let i=0;i<=SEG;i+=1){
+      const a=-Math.PI/2+i/SEG*TAU;
+      const x=CX+Math.cos(a)*wallR[i], y=CY+Math.sin(a)*wallR[i];
+      if(i===0) tarSide.moveTo(x,y); else tarSide.lineTo(x,y);
+    }
+    tarSide.closePath();
+    tarSide.addPath(p);
+    ctx.save();
+    ctx.clip(tarSide,'evenodd');      // il catrame e basta: mai dentro la stella
+    ctx.lineJoin='round';
+    for(let k=4;k>=1;k-=1){
+      ctx.lineWidth=cShadow*2*(k/4);
+      ctx.strokeStyle=`rgba(0,0,0,${0.16*(1-(k-1)/4)+0.06})`;
+      ctx.stroke(p);
+    }
+    /* il colmo bagnato: sottile, freddo, appena piu' chiaro del catrame */
+    ctx.lineWidth=cMenisc*2;
+    ctx.strokeStyle='rgba(150,214,208,0.30)';
+    ctx.stroke(p);
+    ctx.restore();
+  }
+
   /* L1 radiant white-gold ivory face with strong inner glow */
   ctx.fillStyle=face;
   ctx.globalAlpha=0.82;

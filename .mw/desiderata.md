@@ -1024,3 +1024,33 @@ ogni taratura futura ricadrebbe nello stesso conflitto.
 - il fondo interno: **pergamena** e' la candidata principale, non confermata.
 
 ---
+
+## v18 — Knowledge & Design Repository governato per RPG
+
+**Status:** `FROZEN`
+**Date:** 2026-08-30
+**Authorized by:** Fausto
+**Reason:** avallo esplicito "approvo, usa chatGPT web e claude web"
+
+### User-stated
+- Consolidare le informazioni sparse (due account ChatGPT, repo Git, agenti) per il progetto RPG in un'unica fonte di verità.
+- Il repository Git resta la fonte di verità: documentazione versionata, ADR, game data.
+- ChatGPT Web, altri account ChatGPT, Devin, agenti e IDE devono consultare le stesse fonti.
+- ChatGPT Web rimane interfaccia comoda per discutere gameplay, bilanciamento, design (voce/chat).
+- Usare il protocollo multi-AI web con ChatGPT Web e Claude Web per esplorare l'architettura.
+
+### AI inference
+- Architettura: Git repo → canonical docs + game data + decisions → MCP → client AI.
+- Gerarchia della verità: ADR accepted → canonical docs → game data → current implementation → proposals → agent notes → discussion.
+- Separazione read path (retrieval via MCP/Git) e write path (proposta → PR → validazione → merge).
+- Struttura `/docs` con sezioni numerate (`00_PROJECT`, `10_GAMEPLAY`, `20_BALANCE`, `30_DESIGN`, `40_ARCHITECTURE`, `decisions`, `agents`).
+- Documenti chiave: `SOURCE_PRIORITY.md`, `CURRENT_STATE.md`, `AGENT_RULES.md`, `DECISION_PROCESS.md`.
+- MCP inizialmente read-only; scrittura su workflow controllato.
+- Fasi proposte: (1) consolidamento, (2) canonicalizzazione, (3) MCP, (4) AI orchestration.
+
+### Still unresolved
+- Trasferimento manuale dei contenuti dalle conversazioni ChatGPT: fuori scope tecnico ma da indicare.
+- Quando abilitare la scrittura via MCP.
+- Stack del server MCP (Node/TypeScript, Python, stdio/SSE).
+- Criterio di done per la fase di esplorazione.
+- Se il pattern deve essere clonabile per altri progetti e come.
