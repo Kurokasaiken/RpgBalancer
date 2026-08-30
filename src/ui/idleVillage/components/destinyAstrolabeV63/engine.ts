@@ -437,6 +437,8 @@ const easeOutHeavy=t=>1-Math.pow(1-t,3.5);         // kept for other uses
 const easeElastic=t=>t===0?0:t===1?1:Math.pow(2,-10*t)*Math.sin((t*10-0.75)*(TAU/3))+1;
 
 const V63_STIFFNESS=tarGooConfig.v63.stiffness;
+const V63_SPAWN_RING=tarGooConfig.v63.spawnRingFactor;
+const V63_AXIS_BIAS=tarGooConfig.v63.axisBias;
 const GOO_MS=tarGooConfig.timing.pourMs;           // V6.3: main tar pour duration
 
 function shake(kind){
@@ -894,11 +896,12 @@ const gooSim=(()=>{
     rr:0.0,
     ph:0.0,
     mode:'crawl',
+    rad:0.0,
     x:0.0,
     y:0.0,
     vy:0.0,
     startT:0.0,
-  })) as ({ang:number,w:number,rr:number,ph:number,mode:'fall'|'crawl',x:number,y:number,vy:number,startT:number})[];
+  })) as ({ang:number,w:number,rr:number,ph:number,mode:'fall'|'crawl',x:number,y:number,vy:number,startT:number,rad:number})[];
   return {
     N,
     r:new Float32Array(N),                 // current sprung radius per sample
@@ -920,10 +923,31 @@ function resetDrops(t0:number){
     const d=gooSim.drops[i];
     d.ph=gooRnd()*TAU;
     if(i<simCfg.seedDropCount){
+      /* CP-G: NASCE SULL'ANELLO, NON SOPRA IL CENTRO.
+         Prima: `x` sparso attorno a CX e `y` sopra il board — cioe' esattamente la
+         nascita centrale che il video raccontava e che il modello smentisce. Il goo
+         E' la difficolta': una condizione che c'e' gia', non un evento che nasce al
+         centro e invade. Ora le gocce compaiono su un anello FUORI dall'arena e
+         scivolano nella conca — che la ghiera stabilisce gia', il markup la chiama
+         «the well».
+         L'angolo e' pesato sugli assi piu' difficili: dove la prova e' dura arriva
+         piu' materia, e il lobo del muro se lo merita invece di essere disegnato. */
+      const base=(i/simCfg.seedDropCount)*TAU+gooRnd()*0.5;
+      let ang=base;
+      if(V63_AXIS_BIAS>0){
+        let best=0,bestW=-1;
+        for(let k=0;k<AXES;k+=1){
+          const w=geo.axisCheck[k]*(0.6+gooRnd()*0.8);
+          if(w>bestW){bestW=w;best=k;}
+        }
+        ang=base+(TIP(best)-base)*V63_AXIS_BIAS*gooRnd();
+      }
       d.mode='fall';
-      d.x=CX+rnd(-simCfg.seedDropScatter,simCfg.seedDropScatter);
-      d.y=CY-simCfg.seedDropHeight;
-      d.vy=0;
+      d.ang=ang;
+      d.rad=R*V63_SPAWN_RING;
+      d.x=CX+Math.cos(ang)*d.rad;
+      d.y=CY+Math.sin(ang)*d.rad;
+      d.vy=0;                       // ora e' la velocita' RADIALE, verso il centro
       d.startT=t0+i*simCfg.seedDropStagger;
       d.rr=rnd(simCfg.seedDropRadius[0],simCfg.seedDropRadius[1]);
       d.w=rnd(simCfg.dropletCrawlSpeed[0],simCfg.dropletCrawlSpeed[1])*(gooRnd()<0.5?-1:1);
@@ -1009,14 +1033,19 @@ function tickGooSim(now){
     const d=gooSim.drops[i];
     if(d.mode==='fall'){
       if(now>=d.startT){
+        /* CP-G: la goccia scivola nella conca lungo il proprio raggio. `vy` e' la
+           velocita' RADIALE; lo smorzamento e' lo stesso di prima, quindi la
+           convergenza decelera come la colata (CP-E) invece di accelerare. */
         d.vy += simCfg.seedDropGravity*dt;
         d.vy *= Math.pow(simCfg.seedDropDamping, k);
-        d.y += d.vy*dt;
-        /* landing: when the drop reaches / passes the centre plane */
-        if(d.y >= CY-d.rr*0.5){
-          d.y=Math.min(d.y,CY+d.rr*0.5);
+        d.rad = Math.max(0, d.rad - d.vy*dt);
+        d.x = CX+Math.cos(d.ang)*d.rad;
+        d.y = CY+Math.sin(d.ang)*d.rad;
+        /* si posa quando raggiunge il livello del catrame su quel raggio */
+        const livello=Math.max(geo.rCore, rCheckAt(d.ang,1)*0.92);
+        if(d.rad <= livello){
+          d.rad=livello;
           d.mode='crawl';
-          d.ang=Math.atan2(d.y-CY,d.x-CX);
           scene.gooRipple=Math.max(scene.gooRipple,0.65);
         }
       }

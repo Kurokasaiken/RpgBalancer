@@ -1062,6 +1062,24 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 
 ---
 
+## R-056 — Ottanio sulle nuvole dell'Event Shroud e reminder card landscape con POI leggibile
+
+**Richiesta:** *"1) metti un effetto ottanio sulle nuvole della transizione... in /primitives event dovresti trovare le nuvole cn l'effetto ottanio (devi mettere quell'effetto ottanio sulle nuvole di quella animazione, e possbilmente migliorarlo). 2) il componente finale cn POI e Titolo Invasion nn è interessante o bello, deve avere la forma di una pgCard... Invasion nn sembra un titolo, il POI è praticamente illeggibile a quelle dimensioni."* Poi, a chiarimento: *"intendevo il POI componente (circolare, cn il magic circle che si riempie)"*, *"Deve essere corto e lungo, attualmente è alto e stretto"*, *"nn stiamo facendo una rappresentazione cinematografica, ma i componenti che utilizzerò x il trailer... Questo è x il gameplay vero."*
+**Data:** 2026-08-30
+**Stato:** `fatta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v2 — World Surface; v8 — Golden UI Foundation.
+**Cosa è successo:**
+- Creato `src/balancing/config/idleVillage/eventShroudGradeTokens.ts`: rampa gradient-map config-first per lo shroud, con `EVENT_SHROUD_FILTER_ID` e i table values di `feComponentTransfer`.
+- `WorldSurfaceRenderer.tsx`: montato il filtro SVG (`feColorMatrix saturate=0` + `feComponentTransfer`) e applicato via `filter: url(#...)` ai soli layer `event_shroud_*`. Il filtro agisce sui pixel dell'asset, alpha inclusa, quindi non sborda sulla mappa attraverso i varchi delle tende (cosa che un overlay multiply a rettangolo pieno avrebbe fatto: le metà sono trasparenti al ~50%).
+- **Nota:** `WorldSurfaceEventShroud.tsx` è dead code — nessun import. Le tende reali sono i layer di manifest renderizzati da `LayerView`. L'effetto è stato applicato lì.
+- Rampa ancorata all'istogramma reale dell'asset (98% dei pixel opachi tra t=0.44 e 0.95, mediana t=0.845): una rampa a spaziatura uniforme mandava il corpo delle nuvole sull'estremo chiaro e usciva menta pallido. Ancorando la mediana al mid-ottanio la tenda legge come ottanio profondo. Gamma tonale utile 206 livelli contro 85 della ricetta `hue-rotate` di `MatericCloudWall`.
+- `WorldSurfaceEventCard.tsx`: reminder da 180×268 (alto e stretto, ratio 0,67) a **320×140 (corto e lungo, ratio 2,29)**; rimosso l'override `flexDirection: column` che stirava in altezza la riga orizzontale del primitivo; `FillingPoi` da `size={20}` a `size={92}`; passato `daysLeftLabel` con la chiave i18n esistente `world.goblinInvasion.daysRemaining`, che prima non veniva passata e faceva sparire il countdown nel passaggio da modale a marker.
+- `MatericEventCard.tsx` (variante `reminder`, unico call site): titolo da `fontSize: 16` a `26` — a 16px stava a poco più di metà del token canonico `--skin-title-size` e, in riga con un'icona, leggeva come voce di lista; padding 24→18 e gap 14→16 per far stare il titolo nella colonna di testo.
+- **Verificato al browser** su `/world-surface`: filtro presente su entrambi i layer shroud; reminder renderizzata a **157,8 × 76,9 CSS px (ratio 2,05)**; POI circolare a **45,4 CSS px** (era ~13,7); testo `INVASION / DAYS REMAINING: 5`; nessun errore React in console.
+- `npm run build:check`, `npm run kanban:lint` e smoke test route (200 su `/world-surface` e `/primitives`) passati.
+
+---
+
 ## R-055 — Durante il lancio nasconde obelischi, assi e segmenti laterali
 
 **Richiesta:** *"durante il lancio e i rimbalzi della pallina nn si devono vedere: i segmenti laterali, gli obelischi, la scala che misura la grandezza delle stat"*.
