@@ -837,3 +837,190 @@ forme, entrambe date dai dati, e la prova è la loro differenza.
   specifico per il 95%.
 
 ---
+
+## v16 — Il goo torna, ma come densità e non come colata. La stella dimagrisce per gradi
+
+**Status:** `FROZEN`
+**Date:** 2026-08-29
+**Authorized by:** Fausto
+**Reason:** «fai la V16. rieproviamo cn goo e valutiamo. A+B va bene» — avallo esplicito
+sulla revoca del divieto della v15 e sulla direzione A+B emersa in sessione esplorativa.
+
+**Relazione con v15:** v16 **revoca il divieto di materia fluida** della v15 e **conserva
+integralmente il modello**. La v15 vietava «catrame, colata, fluido» perche' il Director aveva
+constatato che non si riusciva a ottenere quell'estetica; il Director decide ora di riprovarci
+con una diagnosi nuova, e di valutare il risultato. Tutto il resto della v15 — stella =
+personaggio, materia sotto = difficolta', prova = quanto resta scoperto — resta in vigore.
+
+**Nota di processo:** le richieste R-032..R-039 hanno lavorato sul catrame **saltando la v15**,
+che era la FROZEN piu' recente e lo vietava. La v16 sana quella deriva a posteriori. Il lavoro
+gia' fatto non viene buttato: viene ricondotto sotto mandato.
+
+### Il difetto che la v16 corregge, e perche' non era un problema di rifinitura
+
+Sei tentativi sul goo, e tre AI esterne consultate sul video, hanno tutti concluso «manca
+materialita' e fisica: aggiungi viscosita', filamenti, gocce, menischi, specular». La diagnosi
+percettiva era giusta, il livello era sbagliato. Due risultati la ancorano:
+
+- **Motoyoshi et al. (Nature, 2007)** e la letteratura successiva: la lucentezza percepita di
+  una superficie dipende dalla **skewness positiva dell'istogramma di luminanza**, e correla
+  *inversamente* con l'albedo. Una superficie scura viene riconosciuta come **materiale** solo
+  se possiede una piccola popolazione di pixel molto luminosi.
+- Una regione che assorbe tutta la luce viene letta come **vuoto**, e un occlusore quasi
+  uniforme genera l'impressione che dietro non ci sia niente.
+
+Misurato nel sorgente: il catrame e' dipinto con `rgba(1,3,14,.97)` → `rgba(3,5,20,.95)` →
+`rgba(2,3,16,.90)`. **Tutta la massa vive in tre valori sul fondo della scala**, quindi la sua
+skewness e' nulla per costruzione. Non e' catrame poco rifinito: e' percettivamente un buco, e
+nessuna quantita' di viscosita' lo trasforma in sostanza.
+
+### User-stated (parole del Director)
+
+1. **Si riprova con il goo e si valuta.** Il divieto della v15 e' revocato.
+2. **Direzione A+B approvata:**
+   - **A — la coreografia.** La minaccia non nasce piu' al centro e cresce. Il modello dice
+     che la minaccia e' *cio' che la stella non copre*, quindi periferica: l'animazione deve
+     smettere di raccontare il contrario.
+   - **B — il nero diventa densita', non colore.** Distribuzione di luminanza reale, con
+     pochi picchi luminosi. Non simulazione fisica: indizi percettivi.
+3. **Il bottone resta al centro.** «Se nn al centro nn so dove metterlo in modo che abbia senso
+   se nn li. Fuori nn ha senso. Decentrato nn ha senso.»
+4. **La ghiera di bronzo e' brutta e va rifatta.** Doveva essere «letteralmente il ring della
+   Medal di /primitives», con «tipo 8 layer», secondo la guida sui componenti UI e la bibbia
+   estetica del progetto.
+5. **La stella dimagrisce per gradi.** «Nn dovrebbe essere fiore o stella o stella allungata,
+   ma variare poco a poco (ogni petalo) in base al delta.» Le tre forme discrete cadono.
+6. **Il teal interno non convince** e potrebbe avere piu' senso qualcos'altro.
+7. **L'almost va mostrato correttamente.**
+8. **Gli obelischi non restano in scena** con questo tipo di animazione.
+
+### AI inference (derivata, marcata come tale)
+
+9. Il punto 5 **sostituisce la regola delle tre forme** (fiore sotto 1.00, stella normale
+   1.00-1.83, stella stirata verso phi^2) che era stata dichiarata chiusa. La famiglia discreta
+   con commutazione a finestra sparisce: resta una funzione continua del delta, **valutata per
+   punta** e non per l'intera figura, perche' ogni punta ha la sua stat e il suo delta. Sono
+   cinque numeri, non uno: e' questo che rende leggibile *quale* skill ti tradisce (v15 §12).
+10. Il punto 7 ha una causa misurata: la banda di *almost* **dipinta** e' un profilo scalato
+    radialmente (`s*1.085`), quindi spessa ~25px sulle punte e ~10px nelle valli, mentre la
+    fisica `inAlmost` usa **16px costanti**. Il disegno dice una cosa e il verdetto un'altra.
+    «Mostrarlo correttamente» significa: la banda dipinta e' la banda che il verdetto usa.
+11. Il punto 4 e' misurabile: il bezel attuale sono **tre cerchi** SVG, contro gli 8-12 layer
+    che `visual_design_philosophy.md` prescrive come standard del progetto.
+12. Il punto 2A non implica che gli obelischi restino in scena — il punto 8 lo esclude
+    esplicitamente. La propagazione periferica va ottenuta senza ancore persistenti.
+13. Vincolo di piattaforma confermato: Tauri su system WebView, **WebGPU non affidabile**
+    (nessuna configurazione documentata in Tauri, 2026). Il WebGL2 SDF esistente e' il tetto
+    tecnico: niente compute shader.
+14. La geometria del modello **e' gia' corretta e gia' misurata** — `P = area(stella ∩ arena) /
+    area(arena)`, punte a `rOf(stat)`, silhouette dipinta a 0.08px dalla teoria. Il lavoro della
+    v16 e' sulla **pelle e sulla coreografia**, non sul modello.
+
+### Cosa questo NON autorizza
+
+- nessuna riscrittura del modello di probabilita': `P` resta l'area coperta sull'area totale;
+- nessuno spostamento di `rCheckAt` — e' il muro fisico, e con lui tutte le probabilita';
+- nessun compute shader / WebGPU;
+- nessun ritorno della famiglia discreta di forme (fiore | stella | stella stirata);
+- nessuna banda, anello o bordo inventato che non corrisponda a una regione che il verdetto usa
+  davvero;
+- nessun obelisco persistente in scena.
+
+### Invarianti che restano
+
+- punte della stella a `rOf(stat)`;
+- `rCheckAt` invariato;
+- catena di risoluzione di PLAN-008: due D100 prima del disegno, atterraggio nell'intersezione
+  esito ∩ zona, traiettoria che termina sul punto;
+- lo stream RNG della frattura resta salato e separato.
+
+### Criteri di accettazione (misurabili, non estetici)
+
+- **skewness** dell'istogramma di luminanza della regione scura **> 0**, con almeno 1-2% di
+  pixel in fascia alta e nessun bin oltre il 65% del totale della regione;
+- **nessun fotogramma** in cui la regione scura sia una macchia *centrale* connessa che occupa
+  meno del 60% del raggio dell'arena;
+- **contatto:** gradiente di luminanza misurabile entro N px dal bordo della stella, su tutto
+  il perimetro (se e' 0, la stella e' un adesivo);
+- **almost:** lo spessore dipinto coincide con `ALMOST_W` entro 1px su tutto il perimetro;
+- **test a freddo:** 5 persone che non conoscono il gioco, frame statico, «quale regione e' la
+  difficolta'?» — ≥80% corrette in ≤2s.
+
+### Still unresolved
+
+- **il colore interno** (punto 6): il teal e' in discussione, la sostituzione non e' scelta;
+- **quale ricetta di ring** riusare come base per gli 8-12 layer: il progetto non ha oggi una
+  ghiera che raggiunga quello standard, quindi va scelta o composta;
+- **la forma della funzione di dimagrimento** per punta: monotona nel delta, ma la curva
+  esatta non e' decisa.
+
+---
+
+## v17 — Il contratto di copertura vince sulla forma
+
+**Status:** `FROZEN`
+**Date:** 2026-08-30
+**Authorized by:** Fausto
+**Reason:** «avallo la desiderata» — avallo esplicito sulla formulazione presentata.
+**Origine:** decisione del Director in sessione di pianificazione, verbatim:
+«fiore pieno va bene, vince il contratto».
+
+**Relazione con v16:** v17 **non sostituisce** la v16, la **completa**. La v16 stabiliva che
+la stella dimagrisce per gradi e che ogni petalo varia col proprio delta, ma non diceva cosa
+fare quando la forma richiesta dal contratto e la forma voluta dall'occhio divergono. Questa
+e' quella regola, e serve perche' la divergenza e' stata **misurata**, non ipotizzata.
+
+### Il difetto che la v17 chiude
+
+Misurato sul modello parametrico gia' esistente:
+
+- alla parita' una **stella vera** (fianchi a corda) copre il **34.4%**, non il 50%;
+- con la valle del fiore inchiodata a 0.3675, **sette casi su sedici** sfondano in alto: a
+  85/50 il massimo ottenibile e' 78.6% contro un bersaglio di 85%;
+- la via d'uscita «stella grassa» e' vietata dal Director stesso, nel sorgente di V16:
+  «la stella cicciona non voglio vederla mai».
+
+Quindi contratto e forma **non sono conciliabili ovunque**, e senza una regola di precedenza
+ogni taratura futura ricadrebbe nello stesso conflitto.
+
+### User-stated (parole del Director)
+
+1. **Vince il contratto.** `copertura = 50 + (stat − difficolta')`. La forma e' quella che
+   serve a produrlo.
+2. **Il fiore pieno e' accettato**, anche sopra la parita', anche dove l'occhio avrebbe
+   preferito una stella.
+
+### AI inference (derivata, marcata come tale)
+
+3. La regola non e' dolorosa dove conta, e il motivo e' geometrico: **sotto e attorno alla
+   parita' comanda la forma**, perche' li' le punte stanno dentro il muro e si leggono;
+   **sopra la parita' comanda il contratto**, perche' li' il muro taglia comunque le punte e
+   il contratto non contende niente di visibile.
+4. Ne segue che **la valle del fiore va sbloccata** da 0.3675 fino a ~0.55 (0.416 a 80/50,
+   0.442 a 85/50, 0.503 a 95/50, 0.541 a 99/50). La punta resta tonda: nessuna cicciona.
+5. La precedenza vale **oltre il singolo piano**: governa il componente, non il lavoro in
+   corso. E' per questo che sta in desiderata e non solo nella Spec di PLAN-010.
+
+### Cosa questo NON autorizza
+
+- nessuna stella a punta acuta con valle alta (la «cicciona»): resta vietata, ed e' impossibile
+  da costruire nel modello V16;
+- nessun ritorno della regola `punta/muro` come pilota della forma;
+- nessun disco con cinque fessure;
+- nessuna forma fuori dall'insieme ammesso, nemmeno per centrare il contratto: dove il
+  contratto non e' raggiungibile si **satura**, e lo scarto va spiegato dalla frontiera di
+  fattibilita' e non da una taratura opportunistica.
+
+### Invarianti che restano
+
+- punte della stella a `rOf(stat)`;
+- `rCheckAt` e' il muro fisico e non si tocca;
+- il bottone THROW resta al centro; gli obelischi non restano in scena;
+- catena di risoluzione di PLAN-008.
+
+### Still unresolved
+
+- il caso **50/35** (scarto +7.7 nel campione), rimandato dal Director;
+- il fondo interno: **pergamena** e' la candidata principale, non confermata.
+
+---

@@ -1,12 +1,12 @@
 /**
- * Minimal Destiny Astrolabe V6.2 Test Page (R-032)
+ * Minimal Destiny Astrolabe V6.3 Test Page (R-032)
  * V6 board with the viscous tar-goo challenge surface (WebGL2 SDF).
  */
 
 import React, { useRef, useState } from 'react';
 import { MatericFrame } from '@/ui/designSystem/primitives';
-import { DestinyAstrolabeV62Standalone } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeV62Kit';
-import type { AstrolabeResult as DestinyAstrolabeV62Result, AstrolabeSkill as DestinyAstrolabeV62Skill, DestinyAstrolabeV62Handle } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeV62Kit';
+import { DestinyAstrolabeV63Standalone } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeV63Kit';
+import type { AstrolabeResult as DestinyAstrolabeV63Result, AstrolabeSkill as DestinyAstrolabeV63Skill, DestinyAstrolabeV63Handle } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeV63Kit';
 
 /**
  * Glifo per skill. Il progetto non ha ancora un set di icone per le skill
@@ -49,21 +49,21 @@ const SKILL_PRESETS = {
   ],
 };
 
-export default function MinimalDestinyAstrolabeV62() {
-  const astrolabeRef = useRef<DestinyAstrolabeV62Handle>(null);
-  const [lastResult, setLastResult] = useState<DestinyAstrolabeV62Result | null>(null);
-  const [skills, setSkills] = useState<DestinyAstrolabeV62Skill[]>(SKILL_PRESETS.single);
+export default function MinimalDestinyAstrolabeV63() {
+  const astrolabeRef = useRef<DestinyAstrolabeV63Handle>(null);
+  const [lastResult, setLastResult] = useState<DestinyAstrolabeV63Result | null>(null);
+  const [skills, setSkills] = useState<DestinyAstrolabeV63Skill[]>(SKILL_PRESETS.single);
   const [critChance, setCritChance] = useState(5);
   const [woundChance, setWoundChance] = useState(10);
   const [deathChance, setDeathChance] = useState(5);
   const [forcedVerdict, setForcedVerdict] = useState<string>('');
 
-  const handleComplete = (result: DestinyAstrolabeV62Result) => {
+  const handleComplete = (result: DestinyAstrolabeV63Result) => {
     setLastResult(result);
     console.log('Skill check completed:', result);
   };
 
-  const updateSkill = (idx: number, patch: Partial<DestinyAstrolabeV62Skill>) => {
+  const updateSkill = (idx: number, patch: Partial<DestinyAstrolabeV63Skill>) => {
     setSkills((prev) => prev.map((s, i) => (i === idx ? { ...s, ...patch } : s)));
   };
 
@@ -116,19 +116,19 @@ export default function MinimalDestinyAstrolabeV62() {
             >
               V6
             </a>
-            <span
-              className="px-3 py-1 rounded text-sm font-semibold bg-amber-500 text-black"
+            <a
+              href="/minimal-destiny-astrolabe-v6-2"
+              className="px-3 py-1 rounded text-sm font-semibold bg-amber-600 text-black hover:bg-amber-500 transition-colors"
               title="V6.2 · tar goo viscoso (WebGL2 SDF)"
             >
               V6.2
-            </span>
-            <a
-              href="/minimal-destiny-astrolabe-v6-3"
-              className="px-3 py-1 rounded text-sm font-semibold bg-amber-600 text-black hover:bg-amber-500 transition-colors"
-              title="V6.3 · modello V16 pilotato dall area"
+            </a>
+            <span
+              className="px-3 py-1 rounded text-sm font-semibold bg-amber-500 text-black"
+              title="V6.3 · tar goo viscoso (WebGL2 SDF)"
             >
               V6.3
-            </a>
+            </span>
             <a
               href="/minimal-destiny-astrolabe-v7"
               className="px-3 py-1 rounded text-sm font-semibold bg-amber-600 text-black hover:bg-amber-500 transition-colors"
@@ -206,7 +206,7 @@ export default function MinimalDestinyAstrolabeV62() {
       {/* Astrolabe — fills remaining height, clipping the suite's 100vw/100vh overflow */}
       <div className="flex-1 relative rounded-lg mx-6 mb-3 overflow-hidden" style={{ minHeight: 0 }}>
         <MatericFrame variant="bronze-bezel" band={2.5} rx={8} flush />
-        <DestinyAstrolabeV62Standalone
+        <DestinyAstrolabeV63Standalone
           ref={astrolabeRef}
           skills={skills}
           config={{

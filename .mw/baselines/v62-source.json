@@ -1,0 +1,10 @@
+{
+  "files": {
+    "src/ui/idleVillage/components/destinyAstrolabeV62/engine.ts": "152bd7af1bdd33105952645122c5aaf7030a396f5169f72c45432c11c3312933",
+    "src/ui/idleVillage/components/destinyAstrolabeV62/DestinyAstrolabeV62.tsx": "d90bc0344a0f1609635f74b3ca82148b66df9dff09108cc7e1d3b4aa152e4b60",
+    "src/ui/idleVillage/components/destinyAstrolabeV62/tarGooRenderer.ts": "d1287a173de84a821b554dd0442014a47d0461edda09412c76fb5bf30d0f0b29",
+    "src/ui/idleVillage/components/destinyAstrolabeV62/tentacles.ts": "3b62b37a4b137c95fa339abd0c3e990f64022e2a36c5510f69b0719e9007312e",
+    "src/ui/idleVillage/frozen/kits/destinyAstrolabeV62Kit.tsx": "f256db70d18d95d5c6fda86ecf8e06d24836e1cbc5bd12fafe0c024504c42f52",
+    "src/pages/minimal-destiny-astrolabe-v6-2.tsx": "b7050ca6e72f0bd55e5fab22d05f000fdfd3ae719c917ca11f667322b275f009"
+  }
+}
