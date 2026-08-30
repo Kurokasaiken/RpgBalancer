@@ -1075,3 +1075,24 @@ Tutto (time engine, slots → comportamento, resident assignment, bloom, cerchio
 - Evidence log: `test-results/r-055-clean-throw-2026-08-27.log`.
 - `build:check`, test 4/4 e `kanban:lint` passati.
 **Cosa manca:** conferma visiva del Director.
+
+---
+
+## R-056 — La mappa non respira: moto ambientale diffuso, parallasse al mouse, luce, polvere, e vetro sul Window
+
+**Richiesta:** *"ho visto un bell'effetto x il mare, onde 'piccole', realistiche e nn stilizzate su MTG arena. vorrei aggiungere un po' + di effetti dinamici, un minimo d parallasse quando muovo il mouse, cose del genere. Qualche effetto di luce, particelle di dust, ecc. Prendi anche il componente window in /primitives, dovrebbe avere un effetto 'vetro', che lo rende + interessante"* e, dopo il video: *"sembra troppo ferma, le nuvole si muovo poco, il mare ha qualche effetto interessante cn asset specifici, uccelli che prendono il volo, ma 'nn respira', deve esserci sempre qualcosa che si muove anche solo di poco"*.
+**Data:** 2026-08-30
+**Stato:** `aperta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v2 — World Surface: mappa viva da esplorare con gli occhi.
+
+**Misura del problema (2026-08-30).** Estratti i frame dal video del Director (`Registrazione schermo 2026-08-30 alle 17.44.28.mov`, 1982x1320, 7s) e calcolato il diff pixel fra il primo e l'ultimo frame. Cambiano soltanto: i contorni delle nuvole (1-2 px), la nave sprite in alto a sinistra, due uccelli, e il pannello di debug. Mare, terra, cornice e luce: zero moto misurabile.
+
+**Cause trovate nel codice, con numeri reali:**
+- `src/ui/idleVillage/config/generatedClouds.ts:6` — `driftSeconds: 2000` su un mondo largo 4240 px = **2,12 px/s in world**, cioe ~1 px/s a schermo. In 7 secondi le nuvole percorrono ~7 px.
+- `scripts/scatter-clouds.mjs:106-114` — esiste **una sola banda** (`far`), 9 sprite. L'architettura a tre bande (`far`/`mid`/`near`) dichiarata in `atmosphereAssets.ts:28-42` non ha mai avuto dati: non c'e gerarchia di profondita.
+- `scripts/scatter-clouds.mjs:110` — `shadowOpacity: 0`. `WorldSurfaceCloudShadows.tsx` monta 9 sprite, le anima, e le disegna a opacita zero. **Layer interamente invisibile.**
+- `src/ui/idleVillage/config/atmosphereAssets.ts:209-221` — onde: **7 marchi** su 4240x2828 px, bob di **3 px**, ciclo 30 s con `visibleFraction 0.45`. Ogni marchio e visibile 13,5 s su 30 e si muove 3 px.
+- `src/ui/idleVillage/config/atmosphereAssets.ts:137-144` — schiuma: **un solo elemento**, tile 520 px che scorre in 90 s (5,8 px/s), opacita che pulsa fra **0,10 e 0,22**.
+- Conteggio live su `/world-surface` via `document.getAnimations()`: **42 animazioni totali** (9 nuvole, 24 uccelli, 2 schiuma, 7 onde). Zero luce, zero polvere, zero reattivita al puntatore, zero moto sulla cornice.
+
+**Cosa manca:** decisioni del Director sulle domande aperte (registro del moto di fondo, budget, priorita fra mare/luce/polvere/parallasse/Window) prima di pianificare.

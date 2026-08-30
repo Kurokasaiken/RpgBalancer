@@ -35,7 +35,7 @@ const ANGLES_CHECK = 7200;
 const target = (stat: number, diff: number) => Math.max(1, Math.min(99, 50 + stat - diff));
 
 const coverageAt = (stat: number, diff: number, valleyF: number, angles = ANGLES_SWEEP) =>
-  measureCoverage(buildSnapshot({ stats: [stat], diffs: [diff] }), angles, false, valleyF).pct;
+  measureCoverage(buildSnapshot({ stats: [stat], diffs: [diff] }), angles, false, { valleyF, withCore: true }).pct;
 
 /**
  * La copertura cresce con la valle (valle piu' alta = petalo piu' pieno), quindi la

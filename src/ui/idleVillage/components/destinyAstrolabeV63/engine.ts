@@ -8,6 +8,8 @@
 // @ts-nocheck
 
 import { tarGooConfig } from '@/balancing/config/idleVillage/tarGooConfig';
+import { buildSnapshot } from '@/ui/skillCheckWebV1/zones';
+import { solveHeroShape, rHeroNarrowAt } from '@/ui/skillCheckWebV1/coverage';
 import { createTarGooRenderer } from './tarGooRenderer';
 import { createTentacles, tickPose, buildBlobs, poolFraction,
          SAMPLES_PER_ARM } from './tentacles';
@@ -149,35 +151,29 @@ function recomputeGeometry(skillIndex=0){
      la soglia e' 1 perche' e' li' che la punta raggiunge la trama.
      Anche i valori erano fuori scala: valle a 0.78 del raggio della punta e'
      quasi un cerchio, valle a 0.12 e' uno spillo. */
-  const elong=Math.min(...geo.starTip.map((s,i)=>s/Math.max(1e-6,geo.axisCheck[i])));
-  /* FAMIGLIA: cambia alla parita', in una finestra stretta. Sotto e' fiore
-     (petali tondi), sopra e' stella (fianchi dritti). Misurato che con la soglia
-     a 1.08 un caso da allungamento 1.072 restava fiore. */
-  /* LA FINESTRA STAVA A CAVALLO DELLA PARITA', NON PRIMA.
-     Con 0.96..1.06, ad allungamento 1.000 — stat esattamente uguale alla
-     difficolta' — smoothstep vale 0.352: la forma era ancora per due terzi
-     fiore proprio nel caso che la regola chiama STELLA. Misurato sui pixel a
-     parita': fianco a 18 gradi fuori di 24.45px e punta larga 8.5 gradi.
-     La regola dice `< 1.00 fiore`, `1.00..1.83 stella`: la transizione deve
-     essere FINITA a 1.00, quindi la finestra si chiude li'. */
-  const fam=smoothstep(elong,0.90,1.00);
-  /* LA FAMIGLIA NON ERA MAI STATA COLLEGATA AL DISEGNO.
-     `fam` finiva in una `eS` che nessuno leggeva e `geo.starMix` restava
-     undefined: sia `rStarAt` sia `starPath` prendono il ramo del fiore quando
-     starMix vale 0, quindi il profilo a corda e i dieci vertici erano codice
-     irraggiungibile. La stella "non arrivava" perche' non veniva mai chiesta.
-     Misurato sui PIXEL DIPINTI, prima di collegarla: a 18 gradi dalla punta il
-     bordo stava a 206px invece dei 155px della corda (+52px di fianco convesso)
-     e la punta era larga 16.75 gradi invece di 4. */
-  geo.starMix=fam;
-  /* VALLE: 0.3675 (fiore) e 0.382 (stella) sono quasi lo stesso numero, quindi
-     il passaggio fiore->stella e' TUTTO nella famiglia e non si vede un salto di
-     profondita'. La valle si scava solo avvicinandosi a phi^2, dove la stella
-     normale coprirebbe il goo per intero. */
-  const blade=smoothstep(elong,V63_COVER_ALL*0.70,V63_COVER_ALL);
-  const vStar=V63_VALLEY_FLOWER+(V63_VALLEY_STAR-V63_VALLEY_FLOWER)*fam;
-  geo.valleyF=vStar+(V63_VALLEY_BLADE-vStar)*blade;
+  /* ── IL PILOTA D'AREA (PLAN-010 CP-C, desiderata v17) ──────────────────
+     Qui prima viveva una famiglia a tre forme commutata dall'allungamento
+     `punta/muro`. Il Director l'ha dichiarata morta, e la v17 dice cosa mettere
+     al suo posto: **il contratto di copertura vince sulla forma**. La forma non
+     si sceglie piu': si RISOLVE, perche' produca `50 + (stat - difficolta)`.
+
+     Un bersaglio PER SETTORE, non uno globale: su un board a piu' skill ogni
+     punta ha il suo delta, e con un bersaglio unico il bersaglio era «mal posto
+     per costruzione» — lo diceva gia' il commento che stava qui sotto. Cosi'
+     ogni petalo dice la verita' sulla propria skill e il totale viene da se'.
+
+     Il modello geometrico e' quello di V16 (`skillCheckWebV1`), non una copia:
+     i due mondi condividono il sistema di coordinate — `rOf` identica e blob
+     con le stesse fasi — quindi non c'e' conversione, c'e' consumo. */
   geo.starTip=geo.obeliskTip.slice();   // la punta È l'obelisco bianco
+  {
+    /* per-asse, seguendo la mappatura asse->skill del board (non ciclica) */
+    const statsPerAxis=geo.axisSkill.map(si=>(skills[si]||{stat:60}).stat);
+    const diffsPerAxis=geo.axisSkill.map(si=>(skills[si]||{difficulty:50}).difficulty);
+    geo.snap=buildSnapshot({stats:statsPerAxis,diffs:diffsPerAxis});
+    geo.targets=statsPerAxis.map((st,i)=>clamp(50+st-diffsPerAxis[i],1,99));
+    geo.heroShape=solveHeroShape(geo.snap,geo.targets);
+  }
   /* probabilità reale, misurata sulla geometria che il giocatore vede.
      Stessa formula di inStar: min(stella, muro) — il muro taglia la stella. */
   {
@@ -195,7 +191,8 @@ function recomputeGeometry(skillIndex=0){
   }
   /* cosmetic aggregate radii (halo/gradients) */
   geo.rTip=Math.max(...geo.starTip);
-  geo.rValley=Math.min(...geo.starTip)*geo.valleyF;
+  /* il fondovalle piu' basso della forma risolta: serve solo a gradienti e aloni */
+  geo.rValley=Math.min(...geo.heroShape.radii.filter((_,i)=>i%2===1));
   /* critical-fail band thickness — purely proportional to the arena radius and
      scaled by crit% (like the wound/death sectors). No fixed pixel values. */
   /* LE PROPORZIONI ERANO SBAGLIATE, ed e' lo stesso difetto tre volte: uno
@@ -252,33 +249,6 @@ function recomputeGeometry(skillIndex=0){
 }
 /* interpolate a per-axis radius array around the wheel (tips at TIP(i)) */
 /* il fianco DRITTO: intersezione del raggio con la corda fra due vertici */
-function chordFromAxes(theta,arr,scale){
-  const t=((normAng(theta+Math.PI/2)%TAU)+TAU)%TAU;
-  const seg=TAU/(AXES*2);
-  const k=Math.floor(t/seg), u=t-k*seg;
-  const tipR=i=>arr[((i%AXES)+AXES)%AXES]*scale;
-  const vF=(geo.valleyF===undefined?0.3675:geo.valleyF);
-  const rA=(k%2===0)?tipR(k/2):Math.min(tipR((k-1)/2),tipR((k+1)/2))*vF;
-  const rB=(k%2===0)?Math.min(tipR(k/2),tipR(k/2+1))*vF:tipR((k+1)/2);
-  const den=rA*Math.sin(u)+rB*Math.sin(seg-u);
-  if(Math.abs(den)<1e-9) return Math.max(rA,rB);
-  return rA*rB*Math.sin(seg)/den;
-}
-function radialFromAxes(theta,arr,scale){
-  const t=((normAng(theta+Math.PI/2)%TAU)+TAU)%TAU;   // 0 at first tip (axis 0)
-  const seg=TAU/(AXES*2);                             // 36°
-  const k=Math.floor(t/seg), f=(t-k*seg)/seg;
-  const tipR=i=>arr[((i%AXES)+AXES)%AXES]*scale;      // radius at star point i
-  const vF=(geo.valleyF===undefined?0.3675:geo.valleyF);   // profondità delle valli
-  const ease=(1-Math.cos(f*Math.PI))/2;               // rounded petals / sharp tips
-  if(k%2===0){                                        // tip → valley
-    const a=tipR(k/2), b=Math.min(tipR(k/2),tipR(k/2+1))*vF;
-    return a+(b-a)*ease;
-  } else {                                            // valley → tip
-    const b=tipR((k+1)/2), a=Math.min(tipR((k-1)/2),tipR((k+1)/2))*vF;
-    return a+(b-a)*ease;
-  }
-}
 /* LA MAREA — e perche' NON passa dalla molla del rim.
    Primo tentativo: sommare l'onda al bersaglio della molla in `tickGooSim`, per
    far salire "la massa vera". Misurato: a onda 0.78 la maschera aveva gia'
@@ -302,10 +272,9 @@ function tideLiftAt(theta,amount){
 }
 /* star radius (success boundary) — per-axis flower, reaches the white obelisk (stat) */
 function rStarAt(theta,scale=1){
-  const m=geo.starMix||0;
-  if(m<=0.001) return radialFromAxes(theta,geo.starTip,scale);
-  if(m>=0.999) return chordFromAxes(theta,geo.starTip,scale);
-  return radialFromAxes(theta,geo.starTip,scale)*(1-m)+chordFromAxes(theta,geo.starTip,scale)*m;
+  /* il bordo della stella E' quello del modello V16, risolto dal pilota d'area.
+     Nessun profilo locale: se ne esistesse uno secondo, divergerebbe. */
+  return rHeroNarrowAt(geo.heroShape,theta)*scale;
 }
 /* GOO EDGE = failure boundary = the ball's physical wall. A SMOOTH blob that
    touches each black obelisk (the check) and interpolates smoothly between
@@ -442,10 +411,6 @@ const easeInCubic=t=>t*t*t;
  */
 const PHI=(1+Math.sqrt(5))/2;
 const V63_STAR_AT=1.0;            // la parita': da qui e' stella
-const V63_COVER_ALL=PHI*PHI;      // 2.618: qui la stella normale coprirebbe tutto
-const V63_VALLEY_FLOWER=0.3675;   // la costante tarata: parita = 50% dell'area
-const V63_VALLEY_STAR=1/(PHI*PHI);// 0.381966 — la proporzione della stella
-const V63_VALLEY_BLADE=0.22;      // stirata: la valle scavata per non coprire tutto
 const easeOutBack=t=>{const c=1.7;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2);};
 const smoothstep=(t,a,b)=>{ if(t<=a)return 0; if(t>=b)return 1; const m=(t-a)/(b-a); return m*m*(3-2*m); };
 /* V6.3 tar-pour curve: pooled seed → slow spread → settle, no overshoot.
@@ -1275,23 +1240,13 @@ function drawAxisRig(now){
    di 10: le punte cadono sui vertici e non "vicino" ai vertici.
    Il FIORE resta campionato, perche' i petali tondi sono curve e non corde. */
 function starPath(scale){
+  /* IL PROFILO MISCELATO NON E' UN POLIGONO, quindi qui si campiona e basta.
+     Il ramo a dieci vertici che stava qui valeva solo per la stella pura: con il
+     morph continuo la forma e' `fiore*(1-m) + stella*m`, e passare per i vertici
+     taglierebbe la componente curva del fiore proprio dove e' piu' grassa.
+     360 campioni: a raggio 300 un passo e' ~5px, sotto la larghezza del tratto. */
   const p=new Path2D();
-  const fam=geo.starMix||0;
-  if(fam>=0.5){
-    const vF=(geo.valleyF===undefined?0.3675:geo.valleyF);
-    for(let i=0;i<AXES*2;i+=1){
-      const a=-Math.PI/2+i*(Math.PI/AXES);
-      const k=i>>1;
-      const r=(i%2===0)
-        ? geo.starTip[k%AXES]*scale
-        : Math.min(geo.starTip[k%AXES],geo.starTip[(k+1)%AXES])*vF*scale;
-      const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
-      if(i===0) p.moveTo(x,y); else p.lineTo(x,y);
-    }
-    p.closePath();
-    return p;
-  }
-  const SEG=80;
+  const SEG=360;
   for(let i=0;i<=SEG;i+=1){
     const a=-Math.PI/2+i/SEG*TAU;
     const r=rStarAt(a,scale);
