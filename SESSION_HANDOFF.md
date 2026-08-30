@@ -1,42 +1,33 @@
 # Session handoff
 
-**Current state:** `PLAN-010-astrolabe-v63` battezzato (2026-08-30). Task list pronta, nessun
-task iniziato. Desiderata di riferimento: **v16 FROZEN**.
+**Current state:** `PLAN-011-knowledge-repository-inventory` completato (2026-08-30). Tutti i task T-001..T-007 eseguiti. Desiderata di riferimento: **v18 FROZEN**.
 
-**Next step:** `CP-A` — fork della rotta `destinyAstrolabeV63/` + harness minimo di misura.
-Nessuna dipendenza, è il primo task.
+**Next step:** Review umano di `KNOWLEDGE_INVENTORY.md` e `KNOWLEDGE_CONFLICTS.md`, quindi Fase 2 — canonicalizzazione (selezionare ADR da `context/DECISION_LOG.md` e allineare `/docs`) o eventuale commit dello stato attuale.
 
 ## Decisions made
 
-- **Il contratto di copertura vince sulla forma** (Director, 2026-08-30: «fiore pieno va bene,
-  vince il contratto»). Sopra la parità la forma è quella che serve a produrre `50+delta`.
-- **Il morph di V16 si riusa, non si riscrive.** `buildHeroShape` / `rHeroNarrowAt` /
-  `starMix` / `valleyDepthFor` restano; si sostituisce solo il pilota da `punta/muro` a errore
-  d'area.
-- **La valle del fiore va sbloccata** da 0.3675 fino a ~0.55, o sette casi su sedici sfondano
-  in alto. La punta resta tonda, quindi nessuna «stella cicciona».
-- Un solo parametro di morph per petalo; la forma della punta lo segue in proporzione.
-- Ghiera declassata da task a criterio dentro `CP-H`.
+- **Piano ombrello per il Knowledge & Design Repository** (2026-08-30, Director «sì»). Fase 1 = inventory read-only, nessuna modifica ai file esistenti, nessun MCP/database.
+- **Git resta record system; MCP è solo access layer futuro.**
+- **`PLAN-006` non viene duplicato**: idle_village resta in scope di quel piano.
+- **Classificazione iniziale**: canonical / candidate / historical / transient / superseded / conflicting.
+- **Gerarchia source priority**: Explicit Director approval > Accepted ADR > Canonical /docs > Validated /game-data > Code+tests > AGENTS.md / rules > RICHIESTE.md > context/ > .mw/ > AI conversations.
 
 ## Do not touch
 
-- `rCheckAt` — è il muro fisico: si muovono tutte le probabilità.
-- Punte a `rOf(stat)`.
-- Il bottone THROW resta al centro; gli obelischi non restano in scena.
-- V6.2 resta intatta e confrontabile fino a `CP-I`.
+- Nessun file esistente (`src/docs/docs/`, `context/`, `.mw/`, `plans/`, root) durante la fase di inventory.
+- `PLAN-006-docs-and-code-alignment.md` e il lavoro idle_village ad esso associato.
+- Non creare ADR reali: solo template `decisions/ADR-TEMPLATE.md`.
 
 ## Working tree non committato
 
-Modifiche a `destinyAstrolabeV62/engine.ts` fatte in sessione e verificate a misura: marea che
-clippa la stella al muro, tentacoli a 7 bracci, `MAX_BLOBS` 36, raggi negativi corretti,
-ghiere interne clippate al path. **Da valutare se committare su V6.2 o portare solo su V6.3.**
-
-File di lavoro da rimuovere: `public/__morph.html` (visualizzazione del morph),
-`public/__diff.js` (preesistente, non mio).
+- Nuovi file: `plans/PLAN-011-knowledge-repository-inventory.md`, `scripts/inventory.ts`, `docs/FULL_FILE_LIST.json`, `docs/FILENAMES_METADATA.json`, `docs/CLASSIFICATION.md`, `KNOWLEDGE_INVENTORY.md`, `KNOWLEDGE_CONFLICTS.md`, `docs/SOURCE_PRIORITY.md`, `decisions/ADR-TEMPLATE.md`.
+- Modificati: `package.json` (+ script `inventory`), `ROADMAP.md`.
+- Da committare su esplicito avallo. Il precedente handoff di `PLAN-010-astrolabe-v63` è nella history git.
 
 ## Open questions
 
-- Il caso **50/35** (scarto +7.7) è rimandato per decisione del Director.
-- Il colore/fondo definitivo: pergamena è la candidata principale, non confermata.
-- Se la regola di precedenza («il contratto vince») vada promossa a desiderata **v17**:
-  oggi vive solo nella Spec di PLAN-010.
+- Quale stack per il futuro MCP (Node/TypeScript, Python, stdio/SSE)?
+- Quando abilitare il write path del MCP?
+- Come trasferire contenuti dalle conversazioni ChatGPT (processo manuale, fuori scope di questo piano).
+- Se il pattern Knowledge Repository debba essere clonabile per altri progetti.
+- Se `KNOWLEDGE_CONFLICTS.md` va affinato per ridurre ulteriori falsi positivi.

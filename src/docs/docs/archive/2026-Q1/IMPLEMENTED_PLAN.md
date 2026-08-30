@@ -1,3 +1,8 @@
+---
+status: superseded
+superseded_by: docs/IMPLEMENTED_PLAN.md
+---
+
 # IMPLEMENTED PLAN – Stato Attuale del Progetto
 
 > Panoramica sintetica di cosa è **implementato**, cosa è **mock/demo** e cosa è solo **plan**, con link ai documenti originali.

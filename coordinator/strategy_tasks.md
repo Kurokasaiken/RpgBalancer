@@ -1,3 +1,8 @@
+---
+status: superseded
+superseded_by: docs/coordinator/strategy_tasks.md
+---
+
 # Strategy Tasks - RPG Balancer
 
 This file tracks all strategy tasks assigned by the Strategist to the Coordinator for agent execution.

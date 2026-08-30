@@ -1,3 +1,8 @@
+---
+status: superseded
+superseded_by: docs/strategy/go_to_market_steam_first.md
+---
+
 # Go-To-Market "Steam First"
 
 **Owner:** Cascade (Go-To-Market pod)  
