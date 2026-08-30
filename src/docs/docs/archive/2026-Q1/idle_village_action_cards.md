@@ -1,3 +1,8 @@
+---
+status: superseded
+superseded_by: docs/plans/idle_village_action_cards.md
+---
+
 # Idle Village – ActionCard Architecture
 
 > Fonte ufficiale per WS13+ e per qualsiasi modifica a `src/ui/idleVillage/**`.

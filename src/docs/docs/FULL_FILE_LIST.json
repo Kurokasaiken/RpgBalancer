@@ -1,0 +1,6752 @@
+[
+  {
+    "path": "src/docs/docs/ACTIVITY_ACTION_CARD_MIGRATION.md",
+    "size": 3921,
+    "mtime": "2026-03-03T10:49:57.992Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/ACTIVITY_CAPSULE_TESTING_PLAN.md",
+    "size": 17293,
+    "mtime": "2026-03-11T11:32:07.675Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/ARCHITECTURE.md",
+    "size": 13379,
+    "mtime": "2026-01-08T10:47:14.188Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/ARCHITECTURE_BIBLE.md",
+    "size": 6385,
+    "mtime": "2026-02-11T21:53:42.376Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/ARCHITECTURE_REFERENCE.md",
+    "size": 8596,
+    "mtime": "2026-01-08T10:47:30.114Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/BALANCING_DEEP_DIVE.md",
+    "size": 6636,
+    "mtime": "2025-12-18T09:05:56.706Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/BALANCING_SYSTEM.md",
+    "size": 19233,
+    "mtime": "2026-01-13T11:06:52.948Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/CAPSULE_TEST_INTEGRATION.md",
+    "size": 4177,
+    "mtime": "2026-03-03T10:50:10.583Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/CLASSIFICATION.md",
+    "size": 182596,
+    "mtime": "2026-08-30T21:22:16.058Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/COMBAT_SYSTEM_DESIGN.md",
+    "size": 22098,
+    "mtime": "2026-01-08T10:59:26.307Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/COMPONENTS.md",
+    "size": 7795,
+    "mtime": "2026-01-08T11:00:15.683Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/COMPONENT_SKIN_INTEGRATION_GUIDE.md",
+    "size": 33676,
+    "mtime": "2026-03-03T17:24:53.047Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/DEVELOPMENT_GUIDELINES.md",
+    "size": 11785,
+    "mtime": "2026-05-21T06:15:18.219Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/DOCUMENTATION_GOVERNANCE.md",
+    "size": 9013,
+    "mtime": "2026-05-20T16:52:08.964Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/FILENAMES_METADATA.json",
+    "size": 1966493,
+    "mtime": "2026-08-30T21:22:16.052Z",
+    "extension": ".json"
+  },
+  {
+    "path": "src/docs/docs/FULL_FILE_LIST.json",
+    "size": 174134,
+    "mtime": "2026-08-30T21:22:15.112Z",
+    "extension": ".json"
+  },
+  {
+    "path": "src/docs/docs/IMPLEMENTATION_PLANS_INDEX.md",
+    "size": 8540,
+    "mtime": "2026-05-21T06:15:18.219Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/IMPLEMENTED_PLAN.md",
+    "size": 14988,
+    "mtime": "2026-03-01T21:49:26.592Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/MASTER_PLAN.md",
+    "size": 55770,
+    "mtime": "2026-07-22T20:46:42.619Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/PROJECT_PHILOSOPHY.md",
+    "size": 13720,
+    "mtime": "2026-02-11T21:55:23.965Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/QA/minimal_checklist_howto.md",
+    "size": 4402,
+    "mtime": "2026-02-12T21:18:53.238Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/QA/test-route-drag-guidelines.md",
+    "size": 7800,
+    "mtime": "2026-03-06T14:22:25.491Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/QA/theater_kpi.md",
+    "size": 0,
+    "mtime": "2026-01-06T19:31:01.650Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/SKIN_BINDING_REGISTRY_GUIDE.md",
+    "size": 12639,
+    "mtime": "2026-03-03T17:23:26.865Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/SLOTTED_MEDAL_FAILED_STATE_IMPLEMENTATION.md",
+    "size": 6220,
+    "mtime": "2026-03-01T21:18:59.413Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/SLOTTED_MEDAL_IMPLEMENTATION_PLAN.md",
+    "size": 16019,
+    "mtime": "2026-03-01T21:26:48.059Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/SOURCE_PRIORITY.md",
+    "size": 972,
+    "mtime": "2026-08-30T21:22:16.067Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/SPELL_CREATION_SPEC.md",
+    "size": 4743,
+    "mtime": "2026-01-08T11:00:01.113Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/SPELL_TYPE_GUIDELINES.md",
+    "size": 4259,
+    "mtime": "2026-01-08T10:46:23.060Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/STAT_BALANCING_ANALYSIS.md",
+    "size": 13148,
+    "mtime": "2025-12-18T09:05:56.716Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/STORAGE_TESTING_GUIDE.md",
+    "size": 14013,
+    "mtime": "2026-01-10T14:39:32.570Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/STRESS_TESTING_CI_REGRESSION_MONITOR.md",
+    "size": 10727,
+    "mtime": "2026-01-12T20:59:50.359Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/STS_PERFORMANCE_BENCHMARKS.md",
+    "size": 7902,
+    "mtime": "2026-01-19T11:15:20.918Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/VERCEL_DEPLOYMENT_GUIDE.md",
+    "size": 4855,
+    "mtime": "2026-08-27T17:53:11.391Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/a11y/sts_simulator_accessibility.md",
+    "size": 19405,
+    "mtime": "2026-01-16T17:28:23.998Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/accessibility/idle_village_drag_accessibility.md",
+    "size": 13045,
+    "mtime": "2026-02-11T21:25:44.269Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/altVisuals/AltVisualGuidelines.md",
+    "size": 6567,
+    "mtime": "2026-01-13T20:32:35.640Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/analysis/idle_rpg_market_projection.md",
+    "size": 8619,
+    "mtime": "2026-02-08T17:57:50.230Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/analysis/react_electron_performance_guidelines.md",
+    "size": 1763,
+    "mtime": "2026-02-08T19:15:08.742Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/analytics/archetype_drift_detector.md",
+    "size": 31680,
+    "mtime": "2026-01-20T07:54:31.239Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/analytics/balancer_stress_report_generator.md",
+    "size": 7864,
+    "mtime": "2026-01-21T17:13:11.150Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/analytics/idle_village_activity_loop.md",
+    "size": 20919,
+    "mtime": "2026-01-20T07:36:04.925Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/analytics/idle_village_activity_slots.md",
+    "size": 10398,
+    "mtime": "2026-01-19T08:23:02.895Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/analytics/idle_village_crew_sentiment.md",
+    "size": 17269,
+    "mtime": "2026-01-19T22:30:52.505Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/analytics/idle_village_drop_validation.md",
+    "size": 21821,
+    "mtime": "2026-01-20T08:14:24.320Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/analytics/idle_village_fatigue_predictor.md",
+    "size": 13974,
+    "mtime": "2026-01-19T08:48:04.266Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/analytics/idle_village_quest_feed.md",
+    "size": 13885,
+    "mtime": "2026-01-19T21:32:27.795Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/analytics/idle_village_session_variance.md",
+    "size": 11198,
+    "mtime": "2026-01-20T07:40:30.071Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/analytics/memory_leak_guard.md",
+    "size": 18980,
+    "mtime": "2026-01-20T07:37:17.077Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/analytics/performance_dashboard_guide.md",
+    "size": 7774,
+    "mtime": "2026-01-07T22:03:16.999Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/analytics/sts_agency_gap_timeline.md",
+    "size": 17303,
+    "mtime": "2026-01-19T22:13:46.940Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/analytics/sts_combat_rhythm.md",
+    "size": 31990,
+    "mtime": "2026-01-20T07:41:32.472Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/analytics/sts_combo_heatmap.md",
+    "size": 8603,
+    "mtime": "2026-01-16T10:49:44.442Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/analytics/sts_data_lake.md",
+    "size": 10782,
+    "mtime": "2026-01-19T21:02:56.906Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/analytics/sts_intent_accuracy.md",
+    "size": 14202,
+    "mtime": "2026-01-19T21:00:34.820Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/analytics/sts_mana_variance.md",
+    "size": 9669,
+    "mtime": "2026-01-19T21:01:45.889Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/analytics/sts_telemetry_drift.md",
+    "size": 9209,
+    "mtime": "2026-01-20T15:01:18.035Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/analytics/telemetry_leak_guard.md",
+    "size": 15288,
+    "mtime": "2026-01-21T16:59:31.274Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/analytics/webhook_bridge.md",
+    "size": 18380,
+    "mtime": "2026-01-24T12:56:14.146Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/architecture/PersistencePolicy.md",
+    "size": 7433,
+    "mtime": "2026-01-11T21:29:52.238Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/architecture/idle_village_complete_architecture.md",
+    "size": 16788,
+    "mtime": "2026-04-22T12:42:52.864Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/architecture_state.md",
+    "size": 2005,
+    "mtime": "2026-02-05T14:55:12.521Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archive/2026-Q1/CODE_AUDIT_REPORT.md",
+    "size": 10742,
+    "mtime": "2025-12-18T09:05:56.709Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archive/2026-Q1/GAME_VISION_IDLE_INCREMENTAL.md",
+    "size": 20155,
+    "mtime": "2025-12-27T11:01:08.036Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archive/2026-Q1/IMPLEMENTED_PLAN.md",
+    "size": 10255,
+    "mtime": "2026-08-30T21:22:01.416Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archive/2026-Q1/SPELL_CREATOR.md",
+    "size": 8752,
+    "mtime": "2026-01-11T14:29:30.519Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archive/2026-Q1/WHATS_MISSING.md",
+    "size": 4611,
+    "mtime": "2025-12-23T20:26:08.440Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archive/2026-Q1/go_to_market_steam_first.md",
+    "size": 5250,
+    "mtime": "2026-08-30T21:22:05.934Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archive/2026-Q1/idle_village_action_cards.md",
+    "size": 23316,
+    "mtime": "2026-08-30T21:22:06.445Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archive/2026-Q1/idle_village_drag_simulation.md",
+    "size": 2771,
+    "mtime": "2026-01-03T13:20:27.694Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archive/2026-Q1/idle_village_vision.md",
+    "size": 7262,
+    "mtime": "2026-01-04T10:56:39.707Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archive/README.md",
+    "size": 1148,
+    "mtime": "2026-02-11T21:58:16.577Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/Archmage_Fight_Principles.md",
+    "size": 10033,
+    "mtime": "2026-01-16T17:24:03.132Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/Arcimago_Mana_System_Plan.md",
+    "size": 2334,
+    "mtime": "2026-01-23T15:36:00.113Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/ArtDirection_Wanderlust.md",
+    "size": 2198,
+    "mtime": "2026-02-12T21:18:53.238Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/CombatMock_Prototype.md",
+    "size": 3157,
+    "mtime": "2026-01-08T20:52:51.233Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/DocumentationAudit.md",
+    "size": 7104,
+    "mtime": "2026-01-08T10:45:19.581Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/FocusShift_Jan2026.md",
+    "size": 3717,
+    "mtime": "2026-01-08T20:37:09.377Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/GameplayPillars.md",
+    "size": 4246,
+    "mtime": "2026-01-08T11:30:23.817Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/Glossary.md",
+    "size": 1301,
+    "mtime": "2026-01-08T09:48:06.571Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/LocalizationPlan.md",
+    "size": 1994,
+    "mtime": "2026-01-08T09:42:33.927Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/MTG_Weaknesses_Cascade.md",
+    "size": 9143,
+    "mtime": "2026-01-09T09:35:51.753Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/MTG_Weaknesses_ChatGPT.md",
+    "size": 5783,
+    "mtime": "2026-01-09T09:59:52.027Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/MTG_Weaknesses_ChatTranscript_2026-01-09.md",
+    "size": 15307,
+    "mtime": "2026-01-09T17:18:35.520Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/MTG_Weaknesses_ChatTranscript_2026-01-10.md",
+    "size": 9452,
+    "mtime": "2026-01-09T23:28:29.296Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/MTG_Weaknesses_Claude.md",
+    "size": 11270,
+    "mtime": "2026-01-09T09:47:31.544Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/MTG_Weaknesses_DeepSeek.md",
+    "size": 7753,
+    "mtime": "2026-01-09T09:39:32.000Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/MTG_Weaknesses_Grok.md",
+    "size": 5300,
+    "mtime": "2026-01-09T09:51:23.706Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/MTG_Weaknesses_MasterGameplay.md",
+    "size": 8879,
+    "mtime": "2026-01-09T23:42:26.205Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/MTG_Weaknesses_Research.md",
+    "size": 5822,
+    "mtime": "2026-01-09T09:20:12.044Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/README.md",
+    "size": 2242,
+    "mtime": "2026-01-08T09:26:58.502Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/TechnicalDirection.md",
+    "size": 3340,
+    "mtime": "2026-02-12T21:18:53.239Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/Vision.md",
+    "size": 3609,
+    "mtime": "2026-01-08T11:44:48.556Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/mana_token_vfx.md",
+    "size": 16888,
+    "mtime": "2026-01-24T10:10:00.535Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/mental_palace_visualizer.md",
+    "size": 16442,
+    "mtime": "2026-01-21T21:26:41.811Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/spell_lifecycle_exporter.md",
+    "size": 6525,
+    "mtime": "2026-01-24T10:42:54.475Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/spell_lifecycle_incident_monitor.md",
+    "size": 6099,
+    "mtime": "2026-01-24T12:16:31.074Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/spell_lifecycle_telemetry.md",
+    "size": 5393,
+    "mtime": "2026-01-24T11:24:48.080Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/archmage/spell_lifecycle_telemetry_plan.md",
+    "size": 23427,
+    "mtime": "2026-01-21T21:14:46.932Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/bronze-relic-guardian/decision-log.md",
+    "size": 669,
+    "mtime": "2026-07-20T20:10:05.681Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/bronze-relic-guardian/design-intent.md",
+    "size": 769,
+    "mtime": "2026-07-20T20:09:41.246Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/bronze-relic-guardian/identity.md",
+    "size": 3225,
+    "mtime": "2026-07-20T20:09:48.397Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/bronze-relic-guardian/prompt.md",
+    "size": 1550,
+    "mtime": "2026-07-20T20:10:02.394Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/bronze-relic-guardian/reference-card.md",
+    "size": 1366,
+    "mtime": "2026-07-20T20:09:59.325Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/bronze-relic-guardian/versions/v1.0.0.md",
+    "size": 373,
+    "mtime": "2026-07-20T20:10:05.885Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/emerald-scale-serpent/decision-log.md",
+    "size": 644,
+    "mtime": "2026-07-20T20:10:36.106Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/emerald-scale-serpent/design-intent.md",
+    "size": 739,
+    "mtime": "2026-07-20T20:10:13.278Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/emerald-scale-serpent/identity.md",
+    "size": 3164,
+    "mtime": "2026-07-20T20:10:20.425Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/emerald-scale-serpent/prompt.md",
+    "size": 1555,
+    "mtime": "2026-07-20T20:10:33.981Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/emerald-scale-serpent/reference-card.md",
+    "size": 1368,
+    "mtime": "2026-07-20T20:10:31.172Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/emerald-scale-serpent/versions/v1.0.0.md",
+    "size": 389,
+    "mtime": "2026-07-20T20:10:36.119Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/gnarled-nightmare/decision-log.md",
+    "size": 960,
+    "mtime": "2026-07-20T16:37:12.544Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/gnarled-nightmare/design-intent.md",
+    "size": 758,
+    "mtime": "2026-07-20T16:36:39.031Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/gnarled-nightmare/identity.md",
+    "size": 3283,
+    "mtime": "2026-07-20T16:36:51.441Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/gnarled-nightmare/prompt.md",
+    "size": 1572,
+    "mtime": "2026-07-20T16:37:06.291Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/gnarled-nightmare/reference-card.md",
+    "size": 1448,
+    "mtime": "2026-07-20T16:36:59.061Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/gnarled-nightmare/versions/v0.1.0.md",
+    "size": 342,
+    "mtime": "2026-07-20T16:37:28.581Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/gnarled-nightmare/versions/v0.2.0.md",
+    "size": 453,
+    "mtime": "2026-07-20T16:37:33.951Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/gnarled-nightmare/versions/v0.3.0.md",
+    "size": 488,
+    "mtime": "2026-07-20T16:37:42.422Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/gnarled-nightmare/versions/v1.0.0.md",
+    "size": 389,
+    "mtime": "2026-07-20T16:37:50.197Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/momentum-bruiser/decision-log.md",
+    "size": 635,
+    "mtime": "2026-07-20T20:11:09.171Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/momentum-bruiser/design-intent.md",
+    "size": 716,
+    "mtime": "2026-07-20T20:10:43.230Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/momentum-bruiser/identity.md",
+    "size": 3154,
+    "mtime": "2026-07-20T20:10:50.194Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/momentum-bruiser/prompt.md",
+    "size": 1552,
+    "mtime": "2026-07-20T20:11:07.663Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/momentum-bruiser/reference-card.md",
+    "size": 1366,
+    "mtime": "2026-07-20T20:11:02.736Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/creatures/momentum-bruiser/versions/v1.0.0.md",
+    "size": 380,
+    "mtime": "2026-07-20T20:11:11.305Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/families/ancient-constructs/family-dna.md",
+    "size": 1533,
+    "mtime": "2026-07-20T16:38:11.758Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/families/ancient-constructs/rejected-directions.md",
+    "size": 566,
+    "mtime": "2026-07-20T16:38:28.729Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/families/beasts/family-dna.md",
+    "size": 1376,
+    "mtime": "2026-07-20T20:09:26.962Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/families/beasts/rejected-directions.md",
+    "size": 482,
+    "mtime": "2026-07-20T20:09:33.054Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/families/forest-parasites/family-dna.md",
+    "size": 1625,
+    "mtime": "2026-07-20T16:36:16.113Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/families/forest-parasites/rejected-directions.md",
+    "size": 600,
+    "mtime": "2026-07-20T16:36:26.729Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/families/mythic-beasts/family-dna.md",
+    "size": 1429,
+    "mtime": "2026-07-20T20:09:10.477Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/families/mythic-beasts/rejected-directions.md",
+    "size": 562,
+    "mtime": "2026-07-20T20:09:17.052Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/art-direction/creatures/registry.md",
+    "size": 2164,
+    "mtime": "2026-07-20T20:11:25.415Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/audio/minimal_audio_alert_scaffold.md",
+    "size": 12608,
+    "mtime": "2026-02-12T21:18:53.239Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/balancer/formula_safety_storage_test_suite.md",
+    "size": 12720,
+    "mtime": "2026-01-24T11:34:35.870Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/balancer/storage_integrity_evidence_cli.md",
+    "size": 12103,
+    "mtime": "2026-01-21T21:20:54.917Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/balancer_system_reference.md",
+    "size": 3559,
+    "mtime": "2026-01-11T13:17:04.431Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/balancing/config_compression.md",
+    "size": 12193,
+    "mtime": "2026-01-24T10:10:30.439Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/balancing/config_snapshot_diff.md",
+    "size": 11799,
+    "mtime": "2026-01-23T21:30:55.076Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/balancing/phase_10_5_user_guide.md",
+    "size": 9840,
+    "mtime": "2026-01-07T21:58:47.251Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/balancing/stat_stress_telemetry_dashboard.md",
+    "size": 16560,
+    "mtime": "2026-01-24T10:40:59.950Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/balancing/stat_weight_sensitivity.md",
+    "size": 16207,
+    "mtime": "2026-01-24T10:07:25.097Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/balancing/stress_heatmap_cli.md",
+    "size": 9922,
+    "mtime": "2026-01-24T10:46:30.644Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/balancing/stress_testing.md",
+    "size": 0,
+    "mtime": "2026-01-06T19:01:48.232Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/balancing/sts_boss_dynamic_events.md",
+    "size": 17776,
+    "mtime": "2026-01-19T22:18:56.035Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/balancing/sts_card_recipes.md",
+    "size": 21310,
+    "mtime": "2026-01-20T07:53:28.066Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/balancing/sts_damage_curve_guard.md",
+    "size": 9832,
+    "mtime": "2026-01-16T16:07:33.404Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/balancing/sts_deck_consistency.md",
+    "size": 8643,
+    "mtime": "2026-01-16T14:44:11.598Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/balancing/sts_mana_slot_decay.md",
+    "size": 20331,
+    "mtime": "2026-01-19T22:13:17.599Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/balancing/synergy_heatmap_ui.md",
+    "size": 16164,
+    "mtime": "2026-01-19T21:55:39.533Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/ci/STS_Matrix_Runner_Guide.md",
+    "size": 16166,
+    "mtime": "2026-01-11T22:01:22.411Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/cli/balancer_formula_sharing.md",
+    "size": 17935,
+    "mtime": "2026-01-19T21:55:49.685Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/cli/idle_village_phaseE_serializer.md",
+    "size": 13869,
+    "mtime": "2026-02-11T16:32:19.574Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/cli/idle_village_scheduler_export.md",
+    "size": 10525,
+    "mtime": "2026-01-19T08:32:27.644Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/cli/sts_combat_replay.md",
+    "size": 8865,
+    "mtime": "2026-01-16T12:03:12.149Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/cli/sts_scenario_exporter.md",
+    "size": 17532,
+    "mtime": "2026-01-16T16:35:51.768Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/combat_system_audit.md",
+    "size": 9862,
+    "mtime": "2025-12-18T09:05:56.698Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coord/kanban-history-export-guide.md",
+    "size": 16228,
+    "mtime": "2026-01-11T15:47:32.635Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/KS-005_Policy_Refresh.md",
+    "size": 8777,
+    "mtime": "2026-01-14T14:57:14.661Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/PROMPT_CLEANUP_INSTRUCTIONS.md",
+    "size": 4239,
+    "mtime": "2026-01-23T14:46:29.404Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/agent_assignments.backup.md",
+    "size": 122230,
+    "mtime": "2026-04-19T16:22:31.861Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/agent_assignments.md",
+    "size": 581115,
+    "mtime": "2026-08-15T14:57:32.738Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/agent_assignments_new_prompts.md",
+    "size": 305251,
+    "mtime": "2026-01-15T09:57:51.720Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/agent_coordination.md",
+    "size": 8410,
+    "mtime": "2026-01-14T18:29:56.047Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/agent_execution_guidelines.md",
+    "size": 20739,
+    "mtime": "2026-02-08T19:26:34.263Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/blocked_prompts.md",
+    "size": 4071,
+    "mtime": "2026-01-23T21:14:08.959Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/component_lab_intake_IV-CLP-101.md",
+    "size": 9426,
+    "mtime": "2026-02-15T01:56:02.391Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/component_lab_intake_IV-CLP-102.md",
+    "size": 9508,
+    "mtime": "2026-02-15T01:44:33.096Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/component_lab_intake_IV-CLP-105.md",
+    "size": 6727,
+    "mtime": "2026-02-16T08:42:20.747Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/component_lab_intake_template.md",
+    "size": 5668,
+    "mtime": "2026-02-15T01:09:11.207Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/coordinator_conversation_2026-01-04_part1.md",
+    "size": 1008,
+    "mtime": "2026-01-04T00:15:46.515Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/coordinator_handoff_2026-07-23.md",
+    "size": 26486,
+    "mtime": "2026-07-23T18:14:09.998Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/dependency_graph_export.md",
+    "size": 15375,
+    "mtime": "2026-01-24T11:51:14.427Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/file_locks.json",
+    "size": 2,
+    "mtime": "2026-07-14T20:39:38.082Z",
+    "extension": ".json"
+  },
+  {
+    "path": "src/docs/docs/coordinator/idle-village-testhub-audit-prompt.md",
+    "size": 5816,
+    "mtime": "2026-06-04T15:31:35.258Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/idle_map_context_refactor.md",
+    "size": 12533,
+    "mtime": "2026-02-11T08:28:55.767Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/idle_village_new_tasks.md",
+    "size": 1059,
+    "mtime": "2026-02-08T12:22:17.378Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/idle_village_vertical_slice_prompts.md",
+    "size": 24069,
+    "mtime": "2026-04-22T12:42:58.039Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/localization_prompts.md",
+    "size": 61430,
+    "mtime": "2026-07-10T21:26:40.598Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/master_prompt_framework.md",
+    "size": 11245,
+    "mtime": "2026-01-12T22:46:23.431Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/minimal_gameplay_prompts.md",
+    "size": 13526,
+    "mtime": "2026-03-01T21:49:16.366Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/minimal_gameplay_vertical_slice_plan.md",
+    "size": 17097,
+    "mtime": "2026-02-13T16:32:14.531Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/ops_shutdown_implementation_plan.md",
+    "size": 7625,
+    "mtime": "2026-07-22T21:00:18.601Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/prompt_buffer_drift_reporter.md",
+    "size": 410,
+    "mtime": "2026-01-24T11:35:58.951Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/prompt_conflict_detector.md",
+    "size": 13722,
+    "mtime": "2026-01-21T21:35:45.733Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/prompt_consistency_cli.md",
+    "size": 13251,
+    "mtime": "2026-01-20T07:56:25.717Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/prompt_delivery_log.md",
+    "size": 2236,
+    "mtime": "2026-01-19T12:13:52.289Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/prompt_dependency_heatmap.md",
+    "size": 11430,
+    "mtime": "2026-01-24T11:39:17.946Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/prompt_quick_buffer.md",
+    "size": 1272,
+    "mtime": "2026-08-27T16:41:58.603Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/prompt_quick_buffer_automation.md",
+    "size": 8449,
+    "mtime": "2026-01-24T11:26:53.528Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/prompt_writing_guide.md",
+    "size": 11445,
+    "mtime": "2026-01-15T22:13:34.103Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/punch_sts_cleanup_log.md",
+    "size": 10829,
+    "mtime": "2026-02-11T16:43:46.779Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/safeguard_monitoring.md",
+    "size": 7216,
+    "mtime": "2026-01-13T20:29:36.827Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/strategy_tasks.md",
+    "size": 84097,
+    "mtime": "2026-08-11T14:16:09.697Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/coordinator/time_tracking_guide.md",
+    "size": 10253,
+    "mtime": "2026-01-07T21:07:00.608Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/design/INTERACTION_TOKENS.md",
+    "size": 10285,
+    "mtime": "2026-03-01T21:49:16.367Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/design/game_feel_design_guide.md",
+    "size": 11695,
+    "mtime": "2026-03-01T21:49:16.367Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/design/primitive_composition_rules.md",
+    "size": 3888,
+    "mtime": "2026-08-27T16:41:58.603Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/devops/multi_app_boot_guard.md",
+    "size": 8025,
+    "mtime": "2026-01-14T13:46:28.932Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/diagnostics/worker_picker.md",
+    "size": 0,
+    "mtime": "2026-01-06T19:27:47.864Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/exports/sts_card_notebook.md",
+    "size": 11239,
+    "mtime": "2026-01-19T21:02:05.567Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/freeze/AUDIT_MINIMALGAMEPLAYPAGE.md",
+    "size": 6958,
+    "mtime": "2026-06-11T13:11:02.175Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/freeze/AUDIT_TESTROSTERPAGE_SUBTREE.md",
+    "size": 13434,
+    "mtime": "2026-06-11T13:11:02.175Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/freeze/POSTMORTEM_ARCHIVED.md",
+    "size": 8722,
+    "mtime": "2026-06-11T13:11:02.176Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/freeze/WAVE_0_SUMMARY.md",
+    "size": 6052,
+    "mtime": "2026-06-11T13:11:02.176Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/guardian/evidence_archive_rotator.md",
+    "size": 18971,
+    "mtime": "2026-01-20T07:57:34.675Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/guardian/evidence_indexer.md",
+    "size": 17483,
+    "mtime": "2026-01-20T07:51:51.036Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/guardian/guardian_autopush_dryrun.md",
+    "size": 18238,
+    "mtime": "2026-01-19T22:20:08.717Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/i18n/TOOLING.md",
+    "size": 2673,
+    "mtime": "2026-07-10T15:56:19.758Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/i18n/TRANSLATION_QUEUE.md",
+    "size": 648,
+    "mtime": "2026-01-08T09:48:44.895Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idleVillage/drop_validation_telemetry_export.md",
+    "size": 17898,
+    "mtime": "2026-01-20T08:08:26.104Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idleVillage/interaction_mode_copy.md",
+    "size": 4789,
+    "mtime": "2026-01-20T12:28:35.219Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md",
+    "size": 19293,
+    "mtime": "2026-08-17T12:52:52.853Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/activityslot_persistence_resilience.md",
+    "size": 12905,
+    "mtime": "2026-01-24T10:37:38.781Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/activityslot_telemetry_mirror.md",
+    "size": 16613,
+    "mtime": "2026-01-21T21:37:39.627Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/builder_tooling.md",
+    "size": 13712,
+    "mtime": "2026-07-22T21:17:38.590Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/card_system_description.md",
+    "size": 15856,
+    "mtime": "2026-05-20T16:52:24.132Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/crew_scheduler_stress.md",
+    "size": 11305,
+    "mtime": "2026-01-24T10:38:02.634Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/day_night_poi_spec.md",
+    "size": 3817,
+    "mtime": "2026-08-15T14:57:32.742Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/detail_spec.md",
+    "size": 4703,
+    "mtime": "2026-08-15T14:57:32.744Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/drag_diagnostics_cli.md",
+    "size": 15708,
+    "mtime": "2026-01-21T21:55:31.688Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/drop_validation_playwright.md",
+    "size": 24556,
+    "mtime": "2026-01-20T08:11:23.110Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/floating_panel_spec.md",
+    "size": 2436,
+    "mtime": "2026-08-15T14:57:32.746Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/gameplay_components_inventory.md",
+    "size": 7959,
+    "mtime": "2026-08-15T14:57:30.013Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/gameplay_system_complete.md",
+    "size": 12199,
+    "mtime": "2026-08-16T16:12:01.238Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/idle_village_gameplay_math_spec.md",
+    "size": 7749,
+    "mtime": "2026-08-15T16:15:15.321Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/interaction_core_spec.md",
+    "size": 16272,
+    "mtime": "2026-07-12T16:19:48.592Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/interaction_mode_accessibility.md",
+    "size": 12926,
+    "mtime": "2026-01-21T17:10:20.495Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/location_drop_validation.md",
+    "size": 18913,
+    "mtime": "2026-01-20T08:04:45.196Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/minimal_activity_log.md",
+    "size": 12312,
+    "mtime": "2026-02-12T21:18:53.240Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/minimal_hud_tokens.md",
+    "size": 10435,
+    "mtime": "2026-02-12T21:18:53.241Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/minimal_persistence_playbook.md",
+    "size": 6827,
+    "mtime": "2026-02-12T21:18:53.241Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/minimal_qa_checklist_generator.md",
+    "size": 14254,
+    "mtime": "2026-02-12T21:18:53.241Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/minimal_risk_heatmap.md",
+    "size": 4927,
+    "mtime": "2026-02-12T21:18:53.242Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/minimal_risk_heatmap_export.md",
+    "size": 19293,
+    "mtime": "2026-02-12T21:18:53.242Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/minimal_snapshot_schema.md",
+    "size": 8470,
+    "mtime": "2026-02-12T21:18:53.242Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/poi_cooldown_spec.md",
+    "size": 4271,
+    "mtime": "2026-08-15T14:57:32.747Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/poi_detail_interaction_spec.md",
+    "size": 3742,
+    "mtime": "2026-08-15T15:21:50.676Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/poi_family_spec.md",
+    "size": 10121,
+    "mtime": "2026-08-15T14:57:55.643Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/poi_job_spec.md",
+    "size": 6755,
+    "mtime": "2026-08-15T14:57:34.182Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/poi_maintenance_spec.md",
+    "size": 1872,
+    "mtime": "2026-08-15T14:57:32.751Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/poi_quest_detail_roster_time_clock_error_registry.md",
+    "size": 10332,
+    "mtime": "2026-08-15T14:57:32.753Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/poi_quest_detail_roster_time_clock_page_workflow.md",
+    "size": 15171,
+    "mtime": "2026-08-15T14:57:32.754Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/poi_quest_interaction_spec.md",
+    "size": 4044,
+    "mtime": "2026-08-15T14:57:32.755Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/poi_spec.md",
+    "size": 3571,
+    "mtime": "2026-08-15T14:57:34.184Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/poi_training_spec.md",
+    "size": 1997,
+    "mtime": "2026-08-15T14:57:32.756Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/quest_failure_and_recovery_spec.md",
+    "size": 5089,
+    "mtime": "2026-08-15T16:17:48.606Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/quest_spec.md",
+    "size": 5185,
+    "mtime": "2026-08-15T14:57:33.657Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/roster_bundle_usage.md",
+    "size": 4589,
+    "mtime": "2026-07-16T09:05:47.548Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/roster_slot_integration_spec.md",
+    "size": 27996,
+    "mtime": "2026-04-24T09:06:52.363Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/roster_slot_interaction_documentation.md",
+    "size": 26516,
+    "mtime": "2026-03-06T23:14:35.268Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/roster_slot_rack_interaction_spec.md",
+    "size": 3103,
+    "mtime": "2026-08-15T14:57:32.780Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/roster_spec.md",
+    "size": 2565,
+    "mtime": "2026-08-15T15:15:58.788Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/roster_trusted_components.md",
+    "size": 5350,
+    "mtime": "2026-08-15T15:16:13.203Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/skill_check_workflow_spec.md",
+    "size": 6797,
+    "mtime": "2026-08-15T16:17:27.579Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/slot_rack_poi_interaction_spec.md",
+    "size": 2478,
+    "mtime": "2026-08-15T14:57:32.782Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/slot_rack_spec.md",
+    "size": 2180,
+    "mtime": "2026-08-15T15:15:48.903Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/test_hub_pages.md",
+    "size": 12063,
+    "mtime": "2026-08-20T13:14:09.017Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/theater_overlay_accessibility.md",
+    "size": 13511,
+    "mtime": "2026-01-24T10:35:28.914Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/time_engine_day_night_poi_interaction_spec.md",
+    "size": 2816,
+    "mtime": "2026-08-15T15:22:12.101Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/time_engine_quest_interaction_spec.md",
+    "size": 3660,
+    "mtime": "2026-08-15T14:57:32.784Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/time_engine_roster_interaction_spec.md",
+    "size": 2268,
+    "mtime": "2026-08-15T15:22:06.202Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/time_engine_spec.md",
+    "size": 3368,
+    "mtime": "2026-08-15T14:57:32.785Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/trusted/character_resident_trusted.md",
+    "size": 11126,
+    "mtime": "2026-07-22T20:16:59.195Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/trusted/day_night_time_engine_strip_trusted.md",
+    "size": 4168,
+    "mtime": "2026-08-15T14:57:32.786Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/trusted/daynight_trusted.md",
+    "size": 16090,
+    "mtime": "2026-08-15T18:06:30.613Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/trusted/pgcard_trusted.md",
+    "size": 6563,
+    "mtime": "2026-08-17T12:53:02.713Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/trusted/poi_detail_trusted.md",
+    "size": 18171,
+    "mtime": "2026-07-17T06:33:17.399Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/trusted/poi_standard_trusted.md",
+    "size": 15759,
+    "mtime": "2026-06-28T16:08:51.620Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/trusted/roster_drag_trusted.md",
+    "size": 9054,
+    "mtime": "2026-04-22T14:26:09.881Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/trusted/time_engine_trusted.md",
+    "size": 12709,
+    "mtime": "2026-08-15T14:57:32.787Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/trusted/world_presentation_runtime_trusted.md",
+    "size": 9624,
+    "mtime": "2026-07-22T18:33:14.689Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/idle_village/village_event_system_spec.md",
+    "size": 6081,
+    "mtime": "2026-08-15T16:14:41.210Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/internal/SHARE_UPDATE_STATE.md",
+    "size": 278,
+    "mtime": "2025-12-18T09:05:56.693Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/internal/ai_sprite_workflow.md",
+    "size": 5222,
+    "mtime": "2025-12-18T09:05:56.683Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/internal/animation_schema_spec.md",
+    "size": 4822,
+    "mtime": "2025-12-18T09:05:56.686Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/internal/phase10_ops_status_2025-12-17.md",
+    "size": 4792,
+    "mtime": "2025-12-18T09:06:51.734Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/internal/tactical_sprite_animation_brief.md",
+    "size": 3007,
+    "mtime": "2025-12-18T09:05:56.688Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/localization/TRANSLATION_GUIDE.md",
+    "size": 5135,
+    "mtime": "2026-07-13T21:45:05.536Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/logs/2026-01-08_archmage_discussion.md",
+    "size": 145724,
+    "mtime": "2026-01-08T08:48:06.229Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/logs/2026-01-08_archmage_discussion_numbered.md",
+    "size": 164827,
+    "mtime": "2026-01-08T08:51:57.858Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/minimal_slice/01_pgtoken.semantics.json",
+    "size": 11356,
+    "mtime": "2026-05-20T13:15:48.343Z",
+    "extension": ".json"
+  },
+  {
+    "path": "src/docs/docs/mobile/PunchClubLoop.md",
+    "size": 9395,
+    "mtime": "2026-01-13T22:50:29.870Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/mobile/sts_gesture_recorder_guide.md",
+    "size": 26365,
+    "mtime": "2026-01-19T09:20:58.208Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/monitoring/balancer_undo_redo_monitor.md",
+    "size": 14531,
+    "mtime": "2026-01-19T21:55:37.766Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/monitoring/task_intake_validation.md",
+    "size": 18793,
+    "mtime": "2026-01-19T22:10:26.562Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/moodboards/combat_viewer_visual/README.md",
+    "size": 3078,
+    "mtime": "2025-12-23T20:26:08.440Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/operations/guardian_autopush_mandate.md",
+    "size": 9424,
+    "mtime": "2026-07-23T06:51:13.109Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/operations/guardian_deployment_health_guide.md",
+    "size": 14874,
+    "mtime": "2026-08-27T17:52:36.370Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/operations/vercel_deploy_troubleshooting.md",
+    "size": 7314,
+    "mtime": "2026-08-27T17:53:10.432Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/ops/minimal_evidence_pipeline.md",
+    "size": 9692,
+    "mtime": "2026-02-12T21:18:53.242Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/outputs/2026-01-08_archmage_notes.md",
+    "size": 67680,
+    "mtime": "2026-01-08T09:06:05.019Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/physics_lab/asset_pipeline.md",
+    "size": 11994,
+    "mtime": "2026-02-19T14:26:20.544Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/1v1_combat_viewer_plan.md",
+    "size": 6319,
+    "mtime": "2025-12-19T17:48:46.402Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/1v1_tasks.md",
+    "size": 9652,
+    "mtime": "2025-12-21T18:44:36.042Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/ai_mockup_workflow.md",
+    "size": 6068,
+    "mtime": "2026-08-14T22:41:54.336Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/alt_visuals_v6_rigged_throw_plan.md",
+    "size": 4569,
+    "mtime": "2025-12-23T20:26:08.440Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/alt_visuals_v8_plan.md",
+    "size": 1856,
+    "mtime": "2026-01-07T20:45:04.781Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/archetype_balancing_plan.md",
+    "size": 14458,
+    "mtime": "2025-12-29T22:08:03.247Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/archetype_tasks.md",
+    "size": 13798,
+    "mtime": "2025-12-18T09:05:56.626Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/art_direction_plan.md",
+    "size": 16434,
+    "mtime": "2026-07-20T20:12:04.498Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/atomic_evolution_plan.md",
+    "size": 8713,
+    "mtime": "2025-12-18T09:05:56.630Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/atomic_evolution_tasks.md",
+    "size": 3523,
+    "mtime": "2025-12-18T09:05:56.600Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/balancer_ui_fix_tasks.md",
+    "size": 3572,
+    "mtime": "2025-12-18T09:05:56.624Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/balancing_spell_weapon_armor_plan.md",
+    "size": 12849,
+    "mtime": "2026-01-13T12:26:19.780Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/ci-regression-monitor-plan.md",
+    "size": 16036,
+    "mtime": "2026-01-11T16:56:26.208Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/combat_animator_implementation.md",
+    "size": 5079,
+    "mtime": "2025-12-21T18:44:21.032Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/combat_expansion_plan.md",
+    "size": 13252,
+    "mtime": "2025-12-18T09:05:56.604Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/combat_simulation_plan.md",
+    "size": 16988,
+    "mtime": "2026-01-13T15:32:44.772Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/combat_simulation_tasks.md",
+    "size": 5348,
+    "mtime": "2025-12-18T09:05:56.636Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/combat_viewer_visual_mock_plan.md",
+    "size": 9601,
+    "mtime": "2025-12-20T11:50:35.442Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/component_based_world_surface_plan.md",
+    "size": 18761,
+    "mtime": "2026-07-21T10:30:21.929Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/component_freezing_certification_plan.md",
+    "size": 15110,
+    "mtime": "2026-06-11T13:11:02.176Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/component_freezing_certification_plan_v2.md",
+    "size": 19397,
+    "mtime": "2026-06-11T13:11:02.176Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/config_driven_architecture_00_architecture_foundation.md",
+    "size": 7230,
+    "mtime": "2026-07-16T09:05:47.548Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/config_driven_architecture_01_component_runtime.md",
+    "size": 20127,
+    "mtime": "2026-07-16T09:05:47.548Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/config_driven_architecture_02_rendering_primitives.md",
+    "size": 20633,
+    "mtime": "2026-07-16T09:05:47.549Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/config_driven_architecture_03_material_engine.md",
+    "size": 19290,
+    "mtime": "2026-07-16T09:05:47.549Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/config_driven_architecture_04_physics_system.md",
+    "size": 18191,
+    "mtime": "2026-07-16T09:05:47.550Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/config_driven_architecture_05_seed_system.md",
+    "size": 19048,
+    "mtime": "2026-07-16T09:05:47.550Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/config_driven_architecture_06_village_evolution.md",
+    "size": 21500,
+    "mtime": "2026-07-16T09:05:47.550Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/config_driven_architecture_07_poi_world_map.md",
+    "size": 7027,
+    "mtime": "2026-07-16T09:05:47.551Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/config_driven_architecture_08_frozen_kit_migration.md",
+    "size": 17823,
+    "mtime": "2026-07-16T09:05:47.551Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/config_driven_architecture_09_modding_layer.md",
+    "size": 18168,
+    "mtime": "2026-07-16T09:05:47.552Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/config_driven_architecture_10_ai_production_pipeline.md",
+    "size": 7120,
+    "mtime": "2026-07-16T09:05:47.552Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/config_driven_architecture_plan.md",
+    "size": 27932,
+    "mtime": "2026-07-16T09:05:47.552Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/config_driven_balancer_plan.md",
+    "size": 73535,
+    "mtime": "2026-01-20T15:10:49.669Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/config_driven_balancer_tasks.md",
+    "size": 11161,
+    "mtime": "2025-12-18T09:06:37.476Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/destiny_astrolabe_v3_implementation_plan.md",
+    "size": 24920,
+    "mtime": "2026-07-15T15:17:02.611Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/game_localization_implementation_plan.md",
+    "size": 27917,
+    "mtime": "2026-07-13T22:01:28.638Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/harness_automation_plan.md",
+    "size": 2025,
+    "mtime": "2026-07-14T10:29:51.232Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/hybrid_monolith_strategy_plan.md",
+    "size": 3209,
+    "mtime": "2026-02-11T08:59:01.510Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/idle_village_action_cards.md",
+    "size": 6835,
+    "mtime": "2026-03-02T16:36:53.728Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/idle_village_art_style_plan.md",
+    "size": 7099,
+    "mtime": "2025-12-18T09:05:56.661Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/idle_village_crew_alert_rules.md",
+    "size": 16477,
+    "mtime": "2026-01-19T21:31:41.833Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/idle_village_drag_drop_e2e_plan.md",
+    "size": 14528,
+    "mtime": "2026-01-13T22:07:59.490Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/idle_village_ftue_plan.md",
+    "size": 16424,
+    "mtime": "2025-12-18T09:05:56.646Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/idle_village_hero_components_placeholder_plan.md",
+    "size": 8702,
+    "mtime": "2026-08-18T18:41:16.002Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/idle_village_map_plan.md",
+    "size": 10254,
+    "mtime": "2026-02-12T21:18:53.243Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/idle_village_modifiers_plan.md",
+    "size": 41681,
+    "mtime": "2026-07-22T21:20:38.119Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/idle_village_phase12_task_breakdown.md",
+    "size": 12946,
+    "mtime": "2026-04-24T09:14:39.225Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/idle_village_phase_e.md",
+    "size": 3867,
+    "mtime": "2026-01-03T13:21:28.962Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/idle_village_plan.md",
+    "size": 167752,
+    "mtime": "2026-07-16T09:05:47.554Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/idle_village_progression_system_plan.md",
+    "size": 21832,
+    "mtime": "2026-07-22T20:43:04.993Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/idle_village_resident_slot_plan.md",
+    "size": 12917,
+    "mtime": "2026-03-06T23:14:48.379Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/idle_village_scenario_planner_phase_e.md",
+    "size": 18408,
+    "mtime": "2026-01-13T16:45:49.730Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/idle_village_tasks.md",
+    "size": 13873,
+    "mtime": "2025-12-29T17:43:28.257Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/idle_village_trial_of_fire_plan.md",
+    "size": 11635,
+    "mtime": "2025-12-27T11:01:41.871Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/idle_village_workstreams.md",
+    "size": 2844,
+    "mtime": "2026-01-10T23:39:02.081Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/item_creator_plan.md",
+    "size": 2703,
+    "mtime": "2025-12-18T09:05:56.654Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/ks-080-sts-like-simulator.md",
+    "size": 5443,
+    "mtime": "2026-01-11T14:45:57.054Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/ks-081-sts-mobile-shortcuts-design.md",
+    "size": 10690,
+    "mtime": "2026-01-12T19:42:25.169Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/legacy_quarantine_plan.md",
+    "size": 2112,
+    "mtime": "2026-01-01T19:52:04.751Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/lore_drop_prototype_plan.md",
+    "size": 10909,
+    "mtime": "2026-07-10T10:28:57.909Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/lore_system_plan.md",
+    "size": 11404,
+    "mtime": "2026-07-10T09:38:46.176Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/materic_roster_vertical_slice_plan.md",
+    "size": 11840,
+    "mtime": "2026-07-23T18:01:58.081Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/minimal_gameplay_implementation_plan.md",
+    "size": 15656,
+    "mtime": "2026-04-22T12:52:13.352Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/minimal_gameplay_phase_guard_plan.md",
+    "size": 4082,
+    "mtime": "2026-02-10T11:11:41.437Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/overnight_safety_runner_plan.md",
+    "size": 17304,
+    "mtime": "2026-07-23T20:52:29.210Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/physical_e2e_testing_plan.md",
+    "size": 20829,
+    "mtime": "2026-01-15T20:05:35.636Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/poi_quest_system_exploration.md",
+    "size": 15374,
+    "mtime": "2026-08-11T17:14:32.868Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/poi_quest_system_plan.md",
+    "size": 18042,
+    "mtime": "2026-08-15T14:57:32.788Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/quest_engine_reconciliation_plan.md",
+    "size": 17432,
+    "mtime": "2026-07-23T18:47:11.192Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/quest_role_assignment_rework_strategy.md",
+    "size": 13528,
+    "mtime": "2026-07-12T15:46:24.105Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/rendering_system_implementation_plan.md",
+    "size": 32947,
+    "mtime": "2026-07-16T09:05:47.555Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/roster_slot_poi_integration.md",
+    "size": 11072,
+    "mtime": "2026-03-06T23:10:55.692Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/runtime_component_alignment_plan.md",
+    "size": 18137,
+    "mtime": "2026-04-22T13:25:49.690Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/scenario_ui_plan.md",
+    "size": 20002,
+    "mtime": "2025-12-18T09:05:56.607Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/scenario_ui_tasks.md",
+    "size": 5729,
+    "mtime": "2025-12-18T09:05:56.589Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/skill_check_preview_lab_plan.md",
+    "size": 6669,
+    "mtime": "2025-12-24T01:05:07.772Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/skill_check_preview_lab_tasks.md",
+    "size": 2070,
+    "mtime": "2025-12-24T01:05:36.194Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/skill_check_web_v1_critfail_beat_spec.md",
+    "size": 35654,
+    "mtime": "2026-08-19T09:49:14.506Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/skin_rendering_fix_plan.md",
+    "size": 12582,
+    "mtime": "2026-03-10T15:06:45.469Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/slot_integration_plan.md",
+    "size": 10534,
+    "mtime": "2026-04-14T10:04:31.559Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/spell_creation_system_plan.md",
+    "size": 8008,
+    "mtime": "2026-01-13T12:25:02.794Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/spell_creator_new_plan.md",
+    "size": 12673,
+    "mtime": "2025-12-18T09:05:56.617Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/spell_trigger_conditional_plan.md",
+    "size": 8431,
+    "mtime": "2026-01-11T21:26:30.498Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/stat_stress_testing_plan.md",
+    "size": 75252,
+    "mtime": "2026-02-11T16:32:19.565Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/stat_stress_testing_tasks.md",
+    "size": 10737,
+    "mtime": "2026-01-13T23:00:30.948Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/stress-pipeline-latency-profiler-plan.md",
+    "size": 17188,
+    "mtime": "2026-01-11T16:31:57.770Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/stress_testing_api_implementation.md",
+    "size": 8784,
+    "mtime": "2026-01-12T18:56:00.904Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/sts_buff_library_unification.md",
+    "size": 11180,
+    "mtime": "2026-01-16T16:25:56.852Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/sts_lcg_analytics_plan.md",
+    "size": 7181,
+    "mtime": "2026-01-11T21:46:10.605Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/sts_proto_min_plan.md",
+    "size": 3112,
+    "mtime": "2026-01-13T22:02:45.673Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/sts_simulator_ui_redesign_plan.md",
+    "size": 69113,
+    "mtime": "2026-01-12T21:28:32.583Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/systems_governance_alignment_plan.md",
+    "size": 18057,
+    "mtime": "2026-07-14T20:56:31.896Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/tactical_missions_plan.md",
+    "size": 9733,
+    "mtime": "2025-12-18T09:05:56.622Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/testing_infrastructure_tasks.md",
+    "size": 4068,
+    "mtime": "2025-12-18T09:05:56.648Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/trailer_threat_iter_plan_v3.md",
+    "size": 6826,
+    "mtime": "2026-07-19T09:47:05.135Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/trailer_threat_iter_rework_plan.md",
+    "size": 9749,
+    "mtime": "2026-07-18T09:34:42.263Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/trailer_v9_skin_alignment_plan.md",
+    "size": 9877,
+    "mtime": "2026-07-17T22:34:38.954Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/trailer_vertical_slice_plan.md",
+    "size": 19971,
+    "mtime": "2026-07-17T06:33:17.400Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/trailer_vertical_slice_tasks.md",
+    "size": 5465,
+    "mtime": "2026-07-13T20:44:04.742Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/turns_currency_balancer_plan.md",
+    "size": 8607,
+    "mtime": "2026-01-11T13:48:15.153Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/ui_game_dev_system_prompt.md",
+    "size": 10545,
+    "mtime": "2026-02-08T13:05:40.867Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/verb_detail_component_plan.md",
+    "size": 3016,
+    "mtime": "2025-12-18T09:05:56.658Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/vertical_slice_implementation_plan.md",
+    "size": 23849,
+    "mtime": "2026-05-20T16:52:34.081Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/vertical_slice_pacifista.md",
+    "size": 6136,
+    "mtime": "2026-02-19T12:09:46.616Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/village_sandbox_activitycard_refactor_plan.md",
+    "size": 8946,
+    "mtime": "2025-12-28T21:21:56.243Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/village_sandbox_refactor_plan.md",
+    "size": 5245,
+    "mtime": "2026-07-14T11:08:41.650Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/wanderlust_balancer_skin_rollout.md",
+    "size": 6091,
+    "mtime": "2026-03-18T11:32:31.083Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/wanderlust_triumph_steam_concept_slice_plan.md",
+    "size": 14423,
+    "mtime": "2026-07-13T21:57:50.125Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/world_life_teaser_asset_spec.md",
+    "size": 6754,
+    "mtime": "2026-08-11T15:43:09.727Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/world_presence_grammar_plan.md",
+    "size": 12750,
+    "mtime": "2026-07-18T16:54:22.751Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/world_presentation_runtime_implementation_plan.md",
+    "size": 21007,
+    "mtime": "2026-07-22T18:33:55.194Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/world_presentation_runtime_rfc.md",
+    "size": 9285,
+    "mtime": "2026-07-20T13:27:11.565Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/world_surface_hd_asset_migration_plan.md",
+    "size": 9376,
+    "mtime": "2026-07-23T14:18:51.517Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/world_surface_reactive_artifact_plan.md",
+    "size": 11927,
+    "mtime": "2026-08-17T06:52:49.192Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/world_surface_runtime_implementation_plan.md",
+    "size": 11059,
+    "mtime": "2026-07-23T16:12:30.178Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/world_surface_v3_consumer_audit_ARCHIVED.md",
+    "size": 10198,
+    "mtime": "2026-08-11T12:02:01.429Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/world_surface_v3_critique_and_counterplan.md",
+    "size": 22210,
+    "mtime": "2026-08-11T12:44:15.804Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/world_surface_v3_domain_model_decision.md",
+    "size": 14673,
+    "mtime": "2026-08-11T11:47:58.221Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/world_surface_v3_strategic_plan.md",
+    "size": 16069,
+    "mtime": "2026-08-11T09:43:16.980Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/world_surface_v3_subplan_A1_consumer_audit.md",
+    "size": 3494,
+    "mtime": "2026-08-11T12:00:14.352Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/world_surface_v3_subplan_A2_contract_validation.md",
+    "size": 7889,
+    "mtime": "2026-08-11T12:08:02.424Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/world_surface_v3_subplan_A3_registry_migration.md",
+    "size": 8919,
+    "mtime": "2026-08-11T12:08:20.080Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/world_surface_v3_subplan_A_root_config.md",
+    "size": 9164,
+    "mtime": "2026-08-11T11:25:12.697Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/world_surface_v3_subplan_B_worldclock_adapter.md",
+    "size": 7768,
+    "mtime": "2026-08-11T12:22:29.234Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/world_surface_v3_subplan_C_effect_admission.md",
+    "size": 2628,
+    "mtime": "2026-08-11T11:05:57.236Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/world_surface_v3_subplan_D_attention_zone.md",
+    "size": 3674,
+    "mtime": "2026-08-11T11:05:57.371Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/world_surface_v3_subplan_E_event_severity.md",
+    "size": 3788,
+    "mtime": "2026-08-11T11:05:57.506Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/world_surface_v3_subplan_F_wonder_spawner.md",
+    "size": 3498,
+    "mtime": "2026-08-11T11:11:47.002Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/world_surface_v3_subplan_G_breath_parallax_underwater.md",
+    "size": 3742,
+    "mtime": "2026-08-11T11:11:47.070Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/world_surface_v3_subplan_H_demo_integration.md",
+    "size": 3702,
+    "mtime": "2026-08-11T11:11:47.132Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/world_surface_v3_subplan_I_docs_kanban.md",
+    "size": 3244,
+    "mtime": "2026-08-11T11:11:47.201Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/world_surface_v3_subplans_index.md",
+    "size": 2518,
+    "mtime": "2026-08-11T11:45:22.115Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/world_surface_v3_tactical_plan.md",
+    "size": 50916,
+    "mtime": "2026-08-11T11:13:25.283Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/ws3-theater-controller-crew-scheduler.md",
+    "size": 18908,
+    "mtime": "2026-01-19T18:46:15.835Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/plans/ws6-3-useSandboxInteractionMode-spec.md",
+    "size": 11807,
+    "mtime": "2026-01-11T15:41:44.342Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/playtest/live_bug_snapshotter.md",
+    "size": 4822,
+    "mtime": "2026-02-08T12:50:40.379Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/playtest/mobile_playtest_logger.md",
+    "size": 20780,
+    "mtime": "2026-01-24T11:53:31.044Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/playtest/mobile_stress_harness.md",
+    "size": 1335,
+    "mtime": "2026-01-24T12:51:19.689Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/playtest/playtest_annotation_assistant.md",
+    "size": 5991,
+    "mtime": "2026-02-09T18:09:49.990Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/prompts/AUDITOR.md",
+    "size": 2384,
+    "mtime": "2026-02-12T21:18:53.245Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/prompts/prompt_library.md",
+    "size": 38679,
+    "mtime": "2026-07-20T20:12:43.514Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/prompts/sprite_templates.md",
+    "size": 5566,
+    "mtime": "2026-01-08T10:50:45.044Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/pwa/asset_prefetch.md",
+    "size": 3908,
+    "mtime": "2026-01-24T12:55:55.359Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/pwa/crash_watchdog.md",
+    "size": 11262,
+    "mtime": "2026-01-24T12:45:31.371Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/pwa/install_benchmark_reporter.md",
+    "size": 3746,
+    "mtime": "2026-02-08T12:32:08.349Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/pwa/offline_bundle_optimizer.md",
+    "size": 13295,
+    "mtime": "2026-01-24T12:34:04.042Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/pwa/offline_patch_package_builder.md",
+    "size": 4160,
+    "mtime": "2026-02-09T18:02:11.650Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/pwa/push_audit_playbook.md",
+    "size": 9348,
+    "mtime": "2026-01-24T12:26:01.417Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/pwa/push_diagnostic_overlay.md",
+    "size": 4165,
+    "mtime": "2026-02-10T11:07:08.400Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/reports/StressTestingReportTemplate.md",
+    "size": 4354,
+    "mtime": "2026-01-10T23:30:46.828Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/reports/np-011-quest-risk-badges-2026-01-13.md",
+    "size": 12251,
+    "mtime": "2026-01-13T09:51:24.884Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/reports/np-013-crew-scheduler-determinism-guard-2026-01-13.md",
+    "size": 15548,
+    "mtime": "2026-01-13T09:57:41.721Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/reports/np-014-drag-drop-stress-test-suite-2026-01-13.md",
+    "size": 17547,
+    "mtime": "2026-01-13T10:05:59.683Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/reports/np-016-activity-slot-telemetry-mapper-2026-01-13.md",
+    "size": 18907,
+    "mtime": "2026-01-13T10:20:40.794Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/reports/np-018-crew-scheduler-cli-export-2026-01-13.md",
+    "size": 17351,
+    "mtime": "2026-01-13T10:27:23.298Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/reports/np-019-fatigue-predictor-2026-01-13.md",
+    "size": 10017,
+    "mtime": "2026-01-13T10:53:28.976Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/reports/np-021-quest-reward-balancer-2026-01-13.md",
+    "size": 16239,
+    "mtime": "2026-01-13T11:06:56.170Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/reports/safe-audit-2025-12-24.md",
+    "size": 5243,
+    "mtime": "2025-12-24T00:09:11.581Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/reports/sts-accessibility-audit-2026-01-13.md",
+    "size": 8854,
+    "mtime": "2026-01-13T09:36:06.914Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/reports/village_base_production_system_implementation_2026-01-15.md",
+    "size": 10816,
+    "mtime": "2026-01-15T19:08:00.458Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/reports/weekly_review_template.md",
+    "size": 873,
+    "mtime": "2026-02-05T15:28:10.489Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/specs/village_sandbox_perf.md",
+    "size": 13967,
+    "mtime": "2025-12-30T19:40:57.941Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/storybook_accessibility_guide.md",
+    "size": 8492,
+    "mtime": "2026-02-19T15:02:47.498Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/storybook_deployment_guide.md",
+    "size": 6262,
+    "mtime": "2026-02-19T15:03:38.125Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/strategies/MINIMAL_GAMEPLAY_STRATEGY.md",
+    "size": 3951,
+    "mtime": "2026-02-10T10:54:46.014Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/strategy/Archmage: trascend the trascendence.md",
+    "size": 151237,
+    "mtime": "2026-01-09T23:28:57.954Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/strategy/archmage_monetization_strategy.md",
+    "size": 9110,
+    "mtime": "2026-01-08T11:29:39.332Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/strategy/go_to_market_steam_first.md",
+    "size": 8101,
+    "mtime": "2026-01-11T15:56:29.209Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/sts/NumericSimulatorMetrics.md",
+    "size": 16113,
+    "mtime": "2026-01-20T14:29:20.351Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/sts/STS_Macro_Workbench.md",
+    "size": 15230,
+    "mtime": "2026-01-13T20:55:02.304Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/sts/deck_archetype_classifier.md",
+    "size": 2030,
+    "mtime": "2026-01-24T10:13:11.843Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/sts/deck_visual_consistency.md",
+    "size": 12502,
+    "mtime": "2026-01-21T21:09:47.072Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/sts/numeric_simulator_export.md",
+    "size": 8888,
+    "mtime": "2026-01-24T10:44:11.231Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/sts/telemetry_dashboard_accessibility.md",
+    "size": 12327,
+    "mtime": "2026-01-24T10:44:48.946Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/telemetry/phase10_router.md",
+    "size": 25916,
+    "mtime": "2026-01-20T07:53:55.570Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/testing/persistence_chaos_monkey.md",
+    "size": 29022,
+    "mtime": "2026-01-20T08:00:46.845Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/testing/playwright_coverage_reporter.md",
+    "size": 7724,
+    "mtime": "2026-01-23T21:35:26.118Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/tests/GT-3-mobile-playtest-checklist.md",
+    "size": 12420,
+    "mtime": "2026-01-11T15:47:59.276Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/tests/PLAYWRIGHT_GUIDE.md",
+    "size": 51651,
+    "mtime": "2026-01-15T21:22:55.605Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/tests/README.md",
+    "size": 1317,
+    "mtime": "2026-01-02T11:58:15.036Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/tests/STS_QA_CHECKLIST.md",
+    "size": 10865,
+    "mtime": "2026-01-11T15:15:13.526Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/tests/idle_village_drag_stress.md",
+    "size": 14223,
+    "mtime": "2026-01-19T20:41:03.146Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/tools/idle_risk_calibration.md",
+    "size": 16303,
+    "mtime": "2026-01-19T21:53:11.079Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/tools/sts_combatant_preset_lint.md",
+    "size": 9129,
+    "mtime": "2026-01-19T16:28:42.362Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/tools/sts_seed_diff.md",
+    "size": 10065,
+    "mtime": "2026-01-19T21:33:03.882Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/tutorial/tutorial_skip_system.md",
+    "size": 21164,
+    "mtime": "2026-01-24T12:08:37.746Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/ui_regressions/stat_profile_radar.md",
+    "size": 1931,
+    "mtime": "2026-01-03T13:29:12.702Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/ui_regressions/stress_test_dashboard.md",
+    "size": 2351,
+    "mtime": "2026-02-12T21:18:53.245Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/v8_skin_sandbox_guide.md",
+    "size": 31940,
+    "mtime": "2026-06-16T14:05:46.628Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/visual/sts_intent_overlay_baseline.md",
+    "size": 8146,
+    "mtime": "2026-01-20T11:13:31.070Z",
+    "extension": ".md"
+  },
+  {
+    "path": "src/docs/docs/visual_design_philosophy.md",
+    "size": 14482,
+    "mtime": "2026-06-11T07:55:30.006Z",
+    "extension": ".md"
+  },
+  {
+    "path": "context/APPROACH_CONSTRUCTIVE_CRITIQUE.md",
+    "size": 14230,
+    "mtime": "2026-05-20T13:24:07.590Z",
+    "extension": ".md"
+  },
+  {
+    "path": "context/DECISION_LOG.md",
+    "size": 18234,
+    "mtime": "2026-08-28T17:34:54.739Z",
+    "extension": ".md"
+  },
+  {
+    "path": "context/INDEX.md",
+    "size": 8669,
+    "mtime": "2026-08-28T17:34:54.772Z",
+    "extension": ".md"
+  },
+  {
+    "path": "context/MIND_WEAVER_MULTI_AI_PROTOCOLS.md",
+    "size": 4656,
+    "mtime": "2026-08-13T21:46:07.831Z",
+    "extension": ".md"
+  },
+  {
+    "path": "context/REAL_COMPONENTS_ONLY.md",
+    "size": 13251,
+    "mtime": "2026-05-20T13:32:15.534Z",
+    "extension": ".md"
+  },
+  {
+    "path": "context/RPG_PROJECT_CONTEXT.md",
+    "size": 26434,
+    "mtime": "2026-07-20T20:13:06.461Z",
+    "extension": ".md"
+  },
+  {
+    "path": "context/VERTICAL_SLICE_ENTITIES_FULL.md",
+    "size": 15096,
+    "mtime": "2026-05-20T13:23:28.987Z",
+    "extension": ".md"
+  },
+  {
+    "path": "context/VERTICAL_SLICE_FROZEN_VERSIONS.md",
+    "size": 8427,
+    "mtime": "2026-05-20T14:17:27.945Z",
+    "extension": ".md"
+  },
+  {
+    "path": "context/VERTICAL_SLICE_REFERENCE.md",
+    "size": 5140,
+    "mtime": "2026-05-20T14:08:31.316Z",
+    "extension": ".md"
+  },
+  {
+    "path": "plans/PLAN-004-poi-quest-ui-regressions.md",
+    "size": 2396,
+    "mtime": "2026-08-15T09:46:18.981Z",
+    "extension": ".md"
+  },
+  {
+    "path": "plans/PLAN-005-poi-family-ai-friendly.md",
+    "size": 3781,
+    "mtime": "2026-08-15T11:39:50.327Z",
+    "extension": ".md"
+  },
+  {
+    "path": "plans/PLAN-005-poi-family-tasks.md",
+    "size": 1430,
+    "mtime": "2026-08-15T12:01:34.750Z",
+    "extension": ".md"
+  },
+  {
+    "path": "plans/PLAN-006-docs-and-code-alignment.md",
+    "size": 2742,
+    "mtime": "2026-08-15T14:42:17.901Z",
+    "extension": ".md"
+  },
+  {
+    "path": "plans/PLAN-007-observatory-primitives.md",
+    "size": 2597,
+    "mtime": "2026-08-18T13:19:03.030Z",
+    "extension": ".md"
+  },
+  {
+    "path": "plans/PLAN-008-resolution-chain.md",
+    "size": 8678,
+    "mtime": "2026-08-21T13:54:36.306Z",
+    "extension": ".md"
+  },
+  {
+    "path": "plans/PLAN-009-la-stella-copre-la-trama.md",
+    "size": 4775,
+    "mtime": "2026-08-22T19:47:54.176Z",
+    "extension": ".md"
+  },
+  {
+    "path": "plans/PLAN-010-astrolabe-v63.md",
+    "size": 25506,
+    "mtime": "2026-08-30T20:56:28.421Z",
+    "extension": ".md"
+  },
+  {
+    "path": "plans/PLAN-011-knowledge-repository-inventory.md",
+    "size": 5160,
+    "mtime": "2026-08-30T21:14:14.437Z",
+    "extension": ".md"
+  },
+  {
+    "path": "plans/PLAN-MOCKUP-TO-COMPONENT-v1.md",
+    "size": 7834,
+    "mtime": "2026-08-14T17:21:23.986Z",
+    "extension": ".md"
+  },
+  {
+    "path": "plans/PLAN-MOCKUP-TO-COMPONENT-v2.md",
+    "size": 26202,
+    "mtime": "2026-08-14T17:55:30.319Z",
+    "extension": ".md"
+  },
+  {
+    "path": "plans/PLAN-MOCKUP-TO-COMPONENT-v3.md",
+    "size": 14169,
+    "mtime": "2026-08-14T19:07:08.899Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/INDEX.md",
+    "size": 436,
+    "mtime": "2026-08-07T12:00:26.728Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/baselines/t000-baseline.json",
+    "size": 34119,
+    "mtime": "2026-08-27T16:41:54.764Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/baselines/v62-source.json",
+    "size": 838,
+    "mtime": "2026-08-30T15:24:28.600Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/bugs/2026-08-15-clock-halo-binario/bug.md",
+    "size": 1035,
+    "mtime": "2026-08-15T12:34:30.917Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/bugs/2026-08-15-poi-quest-tp1-schema/bug.md",
+    "size": 3394,
+    "mtime": "2026-08-14T08:32:53.173Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/bugs/2026-08-15-poi-quest-tp1-schema/result.json",
+    "size": 201,
+    "mtime": "2026-08-14T08:33:30.262Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/bugs/2026-08-15-poi-quest-ui-regressions/PROMPT.md",
+    "size": 6310,
+    "mtime": "2026-08-15T06:35:40.959Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/bugs/2026-08-15-poi-quest-ui-regressions/bug.md",
+    "size": 3151,
+    "mtime": "2026-08-15T06:31:33.051Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/bugs/2026-08-27-goblin-forest-center/bug.md",
+    "size": 1525,
+    "mtime": "2026-08-27T20:06:24.572Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/bugs/2026-08-27-goblin-sticker/bug.md",
+    "size": 1787,
+    "mtime": "2026-08-27T10:41:08.914Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/bugs/20260818-v6-star-tips-stat/bug.md",
+    "size": 2497,
+    "mtime": "2026-08-18T10:15:47.897Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/bugs/20260818-v6-star-tips-stat/tests/measure.mjs",
+    "size": 8907,
+    "mtime": "2026-08-18T10:14:41.167Z",
+    "extension": ".mjs"
+  },
+  {
+    "path": ".mw/bugs/20260818-v6-star-tips-stat/tests/verify.mjs",
+    "size": 5951,
+    "mtime": "2026-08-18T12:41:47.117Z",
+    "extension": ".mjs"
+  },
+  {
+    "path": ".mw/deliberation-config-web-gg.yaml",
+    "size": 433,
+    "mtime": "2026-08-27T16:41:53.780Z",
+    "extension": ".yaml"
+  },
+  {
+    "path": ".mw/deliberation-config-web.yaml",
+    "size": 348,
+    "mtime": "2026-08-20T12:49:44.262Z",
+    "extension": ".yaml"
+  },
+  {
+    "path": ".mw/desiderata.md",
+    "size": 68521,
+    "mtime": "2026-08-30T20:41:05.993Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/pattern-big-rewrite-without-authority.md",
+    "size": 4344,
+    "mtime": "2026-08-17T15:05:55.829Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/plans/poi-quest-config-first-cleanup.md",
+    "size": 2866,
+    "mtime": "2026-08-14T08:32:52.537Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-15/pattern-candidate-halo-stroke-linecap-dot.md",
+    "size": 2357,
+    "mtime": "2026-08-15T16:18:10.566Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-15/pattern-candidate-metal-noise-square.md",
+    "size": 2142,
+    "mtime": "2026-08-15T15:01:51.812Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-15/pattern-candidate-poi-clock-halo-test.md",
+    "size": 2108,
+    "mtime": "2026-08-15T12:02:05.877Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-15/pattern-candidate-poi-quest-dnd-overlay-test-hooks.md",
+    "size": 2308,
+    "mtime": "2026-08-15T09:28:12.343Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-15/pattern-candidate-poi-quest-dnd-overlay.md",
+    "size": 3434,
+    "mtime": "2026-08-15T07:04:03.945Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-15/pattern-candidate-visual-bug-screenshot.md",
+    "size": 1111,
+    "mtime": "2026-08-15T12:43:01.078Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-15/pattern-candidate.md",
+    "size": 2337,
+    "mtime": "2026-08-15T06:32:30.726Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-15/plan-deliberation/cycle-01/A.md",
+    "size": 704,
+    "mtime": "2026-08-15T09:36:13.104Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-15/plan-deliberation/cycle-01/B.md",
+    "size": 2783,
+    "mtime": "2026-08-15T09:36:13.104Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-15/plan-deliberation/cycle-01/convergence.txt",
+    "size": 35,
+    "mtime": "2026-08-15T09:36:13.104Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/2026-08-15/plan-deliberation/cycle-01/critiques.txt",
+    "size": 1046,
+    "mtime": "2026-08-15T09:36:13.104Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/2026-08-15/plan-deliberation/cycle-01/metadata.json",
+    "size": 559,
+    "mtime": "2026-08-15T09:36:13.104Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/2026-08-15/plan-deliberation/cycle-02/A.md",
+    "size": 875,
+    "mtime": "2026-08-15T09:40:07.470Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-15/plan-deliberation/cycle-02/B.md",
+    "size": 3224,
+    "mtime": "2026-08-15T09:40:07.470Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-15/plan-deliberation/cycle-02/convergence.txt",
+    "size": 60,
+    "mtime": "2026-08-15T09:40:07.470Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/2026-08-15/plan-deliberation/cycle-02/critiques.txt",
+    "size": 1349,
+    "mtime": "2026-08-15T09:40:07.470Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/2026-08-15/plan-deliberation/cycle-02/metadata.json",
+    "size": 559,
+    "mtime": "2026-08-15T09:40:07.470Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/2026-08-15/plan-deliberation/cycle-03/A.md",
+    "size": 704,
+    "mtime": "2026-08-15T09:43:13.613Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-15/plan-deliberation/cycle-03/B.md",
+    "size": 2893,
+    "mtime": "2026-08-15T09:43:13.613Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-15/plan-deliberation/cycle-03/convergence.txt",
+    "size": 75,
+    "mtime": "2026-08-15T09:43:13.614Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/2026-08-15/plan-deliberation/cycle-03/critiques.txt",
+    "size": 1525,
+    "mtime": "2026-08-15T09:43:13.614Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/2026-08-15/plan-deliberation/cycle-03/metadata.json",
+    "size": 559,
+    "mtime": "2026-08-15T09:43:13.613Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/2026-08-15/plan-deliberation/final.md",
+    "size": 6128,
+    "mtime": "2026-08-15T09:43:13.614Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-15/plan-deliberation/residual-critiques.txt",
+    "size": 1525,
+    "mtime": "2026-08-15T09:43:13.614Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/2026-08-15/plan-prompt.txt",
+    "size": 640,
+    "mtime": "2026-08-15T09:33:04.673Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/2026-08-17-golden-ui-foundation/GOLDEN_0_DNA.md",
+    "size": 14858,
+    "mtime": "2026-08-17T12:40:05.483Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-17-golden-ui-foundation/UI_AUDIT.md",
+    "size": 10577,
+    "mtime": "2026-08-17T09:05:29.590Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-17-golden-ui-foundation/critique/BROADCAST.md",
+    "size": 7954,
+    "mtime": "2026-08-17T08:04:05.374Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-17-golden-ui-foundation/critique/critique-report.md",
+    "size": 3162,
+    "mtime": "2026-08-17T08:04:05.389Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-17-golden-ui-foundation/critique/metadata.json",
+    "size": 9203,
+    "mtime": "2026-08-17T08:04:05.374Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/2026-08-17-golden-ui-foundation/critique/prompt.md",
+    "size": 4731,
+    "mtime": "2026-08-17T08:01:48.174Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-17-golden-ui-foundation/critique/synthesis.md",
+    "size": 346,
+    "mtime": "2026-08-17T08:04:05.389Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-17-golden-ui-foundation/critique_cerebras.md",
+    "size": 2674,
+    "mtime": "2026-08-17T08:05:48.259Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-17-golden-ui-foundation/critique_chatgpt_api.md",
+    "size": 110,
+    "mtime": "2026-08-17T08:05:07.925Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-17-golden-ui-foundation/critique_claude_api.md",
+    "size": 210,
+    "mtime": "2026-08-17T08:05:18.727Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-17-golden-ui-foundation/critique_deepseek_api.md",
+    "size": 2547,
+    "mtime": "2026-08-17T08:05:07.493Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-17-golden-ui-foundation/critique_gemini.md",
+    "size": 235,
+    "mtime": "2026-08-17T08:06:08.349Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-17-golden-ui-foundation/critique_groq.md",
+    "size": 298,
+    "mtime": "2026-08-17T08:06:04.739Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-17-golden-ui-foundation/critique_v2/BROADCAST.md",
+    "size": 8290,
+    "mtime": "2026-08-17T08:14:40.162Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-17-golden-ui-foundation/critique_v2/critique-report.md",
+    "size": 375,
+    "mtime": "2026-08-17T08:14:40.174Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-17-golden-ui-foundation/critique_v2/metadata.json",
+    "size": 9563,
+    "mtime": "2026-08-17T08:14:40.163Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/2026-08-17-golden-ui-foundation/critique_v2/prompt.md",
+    "size": 7854,
+    "mtime": "2026-08-17T08:14:08.891Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-17-golden-ui-foundation/critique_v2/synthesis.md",
+    "size": 346,
+    "mtime": "2026-08-17T08:14:40.174Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-17-golden-ui-foundation/golden-ui-forensic-audit.md",
+    "size": 20158,
+    "mtime": "2026-08-17T10:12:08.451Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-17-golden-ui-foundation/golden_ui_foundation_plan_v1.md",
+    "size": 4197,
+    "mtime": "2026-08-17T08:01:44.417Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-17-golden-ui-foundation/golden_ui_foundation_plan_v2.md",
+    "size": 14845,
+    "mtime": "2026-08-17T10:11:57.851Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-18-ragnatela-greybox/pattern-candidate.md",
+    "size": 2667,
+    "mtime": "2026-08-18T14:47:07.743Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-28-poi-materic-v4/pattern-candidate.md",
+    "size": 4907,
+    "mtime": "2026-08-28T17:33:44.879Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-30-invasion-teaser/BROADCAST.md",
+    "size": 15389,
+    "mtime": "2026-08-30T15:31:38.896Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-30-invasion-teaser/metadata.json",
+    "size": 16432,
+    "mtime": "2026-08-30T15:31:38.896Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/2026-08-30-invasion-teaser/prompt.md",
+    "size": 7179,
+    "mtime": "2026-08-30T15:25:43.024Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-30-invasion-teaser-claude/BROADCAST.md",
+    "size": 14912,
+    "mtime": "2026-08-30T15:33:55.828Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-30-invasion-teaser-claude/metadata.json",
+    "size": 15494,
+    "mtime": "2026-08-30T15:33:55.828Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/2026-08-30-knowledge-plan/context.txt",
+    "size": 1114,
+    "mtime": "2026-08-30T21:05:24.833Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/2026-08-30-knowledge-plan/cycle-01/A.md",
+    "size": 4414,
+    "mtime": "2026-08-30T21:10:21.712Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-30-knowledge-plan/cycle-01/B.md",
+    "size": 6045,
+    "mtime": "2026-08-30T21:10:21.712Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-30-knowledge-plan/cycle-01/convergence.txt",
+    "size": 110,
+    "mtime": "2026-08-30T21:10:21.713Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/2026-08-30-knowledge-plan/cycle-01/critiques.txt",
+    "size": 2811,
+    "mtime": "2026-08-30T21:10:21.713Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/2026-08-30-knowledge-plan/cycle-01/metadata.json",
+    "size": 565,
+    "mtime": "2026-08-30T21:10:21.712Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/2026-08-30-knowledge-plan/final.md",
+    "size": 6661,
+    "mtime": "2026-08-30T21:10:21.713Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-30-knowledge-plan/prompt.txt",
+    "size": 1706,
+    "mtime": "2026-08-30T21:05:24.511Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/2026-08-30-knowledge-repo/A.md",
+    "size": 9376,
+    "mtime": "2026-08-30T20:49:11.047Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-30-knowledge-repo/B.md",
+    "size": 157,
+    "mtime": "2026-08-30T20:49:11.047Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-30-knowledge-repo/caller_final.md",
+    "size": 18674,
+    "mtime": "2026-08-30T20:49:11.047Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-30-knowledge-repo/context.txt",
+    "size": 1371,
+    "mtime": "2026-08-30T20:41:40.970Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/2026-08-30-knowledge-repo/final.md",
+    "size": 18674,
+    "mtime": "2026-08-30T20:49:11.048Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/2026-08-30-knowledge-repo/metadata.json",
+    "size": 1145,
+    "mtime": "2026-08-30T20:49:11.048Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/2026-08-30-knowledge-repo/prompt.txt",
+    "size": 1397,
+    "mtime": "2026-08-30T20:41:40.755Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/20260821-145441-plan/cycle-01/A.md",
+    "size": 6556,
+    "mtime": "2026-08-21T13:01:19.923Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260821-145441-plan/cycle-01/B.md",
+    "size": 3821,
+    "mtime": "2026-08-21T13:01:19.923Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260821-145441-plan/cycle-01/convergence.txt",
+    "size": 137,
+    "mtime": "2026-08-21T13:01:19.924Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/20260821-145441-plan/cycle-01/critiques.txt",
+    "size": 1292,
+    "mtime": "2026-08-21T13:01:19.923Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/20260821-145441-plan/cycle-01/metadata.json",
+    "size": 558,
+    "mtime": "2026-08-21T13:01:19.923Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/20260821-153321-web/cycle-01/A.md",
+    "size": 8118,
+    "mtime": "2026-08-21T13:37:37.040Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260821-153321-web/cycle-01/B.md",
+    "size": 9318,
+    "mtime": "2026-08-21T13:37:37.040Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260821-153321-web/cycle-01/convergence.txt",
+    "size": 42,
+    "mtime": "2026-08-21T13:37:37.046Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/20260821-153321-web/cycle-01/critiques.txt",
+    "size": 0,
+    "mtime": "2026-08-21T13:37:37.045Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/20260821-153321-web/cycle-01/metadata.json",
+    "size": 542,
+    "mtime": "2026-08-21T13:37:37.045Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/20260821-153321-web/final.md",
+    "size": 11402,
+    "mtime": "2026-08-21T13:37:37.047Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260821-154309-web2/cycle-01/A.md",
+    "size": 11692,
+    "mtime": "2026-08-21T13:46:40.969Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260821-154309-web2/cycle-01/B.md",
+    "size": 12003,
+    "mtime": "2026-08-21T13:46:40.969Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260821-154309-web2/cycle-01/convergence.txt",
+    "size": 42,
+    "mtime": "2026-08-21T13:46:40.969Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/20260821-154309-web2/cycle-01/critiques.txt",
+    "size": 0,
+    "mtime": "2026-08-21T13:46:40.969Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/20260821-154309-web2/cycle-01/metadata.json",
+    "size": 542,
+    "mtime": "2026-08-21T13:46:40.969Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/20260821-154309-web2/final.md",
+    "size": 11536,
+    "mtime": "2026-08-21T13:46:40.969Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260822-203014/cycle-01/A.md",
+    "size": 12808,
+    "mtime": "2026-08-22T18:32:57.313Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260822-203014/cycle-01/B.md",
+    "size": 116,
+    "mtime": "2026-08-22T18:32:57.314Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260822-203014/cycle-01/convergence.txt",
+    "size": 42,
+    "mtime": "2026-08-22T18:32:57.314Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/20260822-203014/cycle-01/critiques.txt",
+    "size": 0,
+    "mtime": "2026-08-22T18:32:57.314Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/20260822-203014/cycle-01/metadata.json",
+    "size": 638,
+    "mtime": "2026-08-22T18:32:57.314Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/20260822-203014/final.md",
+    "size": 13234,
+    "mtime": "2026-08-22T18:32:57.314Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260822-203014/prompt.md",
+    "size": 1700,
+    "mtime": "2026-08-22T18:30:14.773Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260822-203403/cycle-01/A.md",
+    "size": 12804,
+    "mtime": "2026-08-22T18:35:47.546Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260822-203403/cycle-01/B.md",
+    "size": 2425,
+    "mtime": "2026-08-22T18:35:47.546Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260822-203403/cycle-01/convergence.txt",
+    "size": 42,
+    "mtime": "2026-08-22T18:35:47.547Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/20260822-203403/cycle-01/critiques.txt",
+    "size": 0,
+    "mtime": "2026-08-22T18:35:47.547Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/20260822-203403/cycle-01/metadata.json",
+    "size": 533,
+    "mtime": "2026-08-22T18:35:47.547Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/20260822-203403/final.md",
+    "size": 13075,
+    "mtime": "2026-08-22T18:35:47.547Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260822-203403/prompt.md",
+    "size": 1700,
+    "mtime": "2026-08-22T18:34:03.320Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260828-101514/A.md",
+    "size": 3109,
+    "mtime": "2026-08-28T08:18:00.143Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260828-101514/B.md",
+    "size": 3478,
+    "mtime": "2026-08-28T08:18:00.144Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260828-101514/caller_final.md",
+    "size": 3747,
+    "mtime": "2026-08-28T08:18:00.144Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260828-101514/final.md",
+    "size": 3747,
+    "mtime": "2026-08-28T08:18:00.144Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260828-101514/metadata.json",
+    "size": 987,
+    "mtime": "2026-08-28T08:18:00.144Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/20260828-101514/prompt.md",
+    "size": 2573,
+    "mtime": "2026-08-28T08:15:14.640Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260828-183214/A.md",
+    "size": 18263,
+    "mtime": "2026-08-28T16:37:56.995Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260828-183214/B.md",
+    "size": 8194,
+    "mtime": "2026-08-28T16:37:56.996Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260828-183214/caller_final.md",
+    "size": 17207,
+    "mtime": "2026-08-28T16:37:56.996Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260828-183214/context.md",
+    "size": 1984,
+    "mtime": "2026-08-28T16:32:14.884Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260828-183214/final.md",
+    "size": 17207,
+    "mtime": "2026-08-28T16:37:56.996Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260828-183214/metadata.json",
+    "size": 987,
+    "mtime": "2026-08-28T16:37:56.996Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/20260828-183214/prompt.md",
+    "size": 1197,
+    "mtime": "2026-08-28T16:32:14.888Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260829-210443-goo-critique/A.md",
+    "size": 14622,
+    "mtime": "2026-08-29T19:11:08.574Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260829-210443-goo-critique/B.md",
+    "size": 6993,
+    "mtime": "2026-08-29T19:11:08.574Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260829-210443-goo-critique/caller.md",
+    "size": 31,
+    "mtime": "2026-08-29T19:11:08.575Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260829-210443-goo-critique/caller_final.md",
+    "size": 12980,
+    "mtime": "2026-08-29T19:11:08.573Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260829-210443-goo-critique/metadata.json",
+    "size": 1008,
+    "mtime": "2026-08-29T19:11:08.575Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/20260829-215810-v63-plan/cycle-01/A.md",
+    "size": 13211,
+    "mtime": "2026-08-29T20:03:18.838Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260829-215810-v63-plan/cycle-01/B.md",
+    "size": 1740,
+    "mtime": "2026-08-29T20:03:18.838Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260829-215810-v63-plan/cycle-01/convergence.txt",
+    "size": 42,
+    "mtime": "2026-08-29T20:03:18.839Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/20260829-215810-v63-plan/cycle-01/critiques.txt",
+    "size": 0,
+    "mtime": "2026-08-29T20:03:18.838Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/20260829-215810-v63-plan/cycle-01/metadata.json",
+    "size": 542,
+    "mtime": "2026-08-29T20:03:18.838Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/20260829-215810-v63-plan/final.md",
+    "size": 4335,
+    "mtime": "2026-08-29T20:03:18.839Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260830-002801-v63-plan/cycle-01/A.md",
+    "size": 22339,
+    "mtime": "2026-08-29T22:34:14.365Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260830-002801-v63-plan/cycle-01/B.md",
+    "size": 157,
+    "mtime": "2026-08-29T22:34:14.365Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/20260830-002801-v63-plan/cycle-01/convergence.txt",
+    "size": 42,
+    "mtime": "2026-08-29T22:34:14.366Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/20260830-002801-v63-plan/cycle-01/critiques.txt",
+    "size": 0,
+    "mtime": "2026-08-29T22:34:14.366Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/20260830-002801-v63-plan/cycle-01/metadata.json",
+    "size": 689,
+    "mtime": "2026-08-29T22:34:14.366Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/20260830-002801-v63-plan/final.md",
+    "size": 18882,
+    "mtime": "2026-08-29T22:34:14.366Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/PLAN-007-observatory-primitives/inventory.md",
+    "size": 3657,
+    "mtime": "2026-08-18T13:20:23.663Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/PLAN-007-observatory-primitives/primitive-catalog.md",
+    "size": 11441,
+    "mtime": "2026-08-18T14:52:36.488Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/cold-read-prompt.txt",
+    "size": 2933,
+    "mtime": "2026-08-18T10:33:17.163Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/coldread-mockup-v2/PROMPT.md",
+    "size": 30247,
+    "mtime": "2026-08-14T17:56:17.879Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/coldread-mockup-v2/SYNTHESIS.md",
+    "size": 18857,
+    "mtime": "2026-08-14T18:59:19.997Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/coldread-mockup-v2-chatgpt/BROADCAST.md",
+    "size": 54448,
+    "mtime": "2026-08-14T17:57:35.675Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/coldread-mockup-v2-chatgpt/metadata.json",
+    "size": 56306,
+    "mtime": "2026-08-14T17:57:35.769Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/coldread-mockup-v2-claude/BROADCAST.md",
+    "size": 30446,
+    "mtime": "2026-08-14T18:22:56.135Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/coldread-mockup-v2-claude/metadata.json",
+    "size": 31371,
+    "mtime": "2026-08-14T18:22:56.135Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/coldread-mockup-v2-claude-retry/BROADCAST.md",
+    "size": 30446,
+    "mtime": "2026-08-14T18:48:19.548Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/coldread-mockup-v2-claude-retry/metadata.json",
+    "size": 31371,
+    "mtime": "2026-08-14T18:48:19.548Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/coldread-mockup-v2-deepseek/BROADCAST.md",
+    "size": 47482,
+    "mtime": "2026-08-14T18:58:03.185Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/coldread-mockup-v2-deepseek/metadata.json",
+    "size": 48726,
+    "mtime": "2026-08-14T18:58:03.185Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/coldread-mockup-v2-gemini/BROADCAST.md",
+    "size": 32361,
+    "mtime": "2026-08-14T18:56:24.166Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/coldread-mockup-v2-gemini/metadata.json",
+    "size": 33314,
+    "mtime": "2026-08-14T18:56:24.168Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/coldread-mockup-v2-grok/BROADCAST.md",
+    "size": 37925,
+    "mtime": "2026-08-14T18:55:12.682Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/coldread-mockup-v2-grok/metadata.json",
+    "size": 39015,
+    "mtime": "2026-08-14T18:55:12.683Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/critique-mockup-v3/BROADCAST.md",
+    "size": 59643,
+    "mtime": "2026-08-14T19:14:52.856Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/critique-mockup-v3/critique-report.md",
+    "size": 42594,
+    "mtime": "2026-08-14T19:14:52.880Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/critique-mockup-v3/metadata.json",
+    "size": 62459,
+    "mtime": "2026-08-14T19:14:52.857Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/critique-mockup-v3/prompt.md",
+    "size": 14703,
+    "mtime": "2026-08-14T19:09:55.597Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/critique-mockup-v3/synthesis.md",
+    "size": 43379,
+    "mtime": "2026-08-14T19:14:52.886Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/d100-board-broadcast/BROADCAST.md",
+    "size": 6910,
+    "mtime": "2026-08-16T08:33:03.069Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/d100-board-broadcast/metadata.json",
+    "size": 7437,
+    "mtime": "2026-08-16T08:33:03.069Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/d100-board-broadcast/prompt-detailed.txt",
+    "size": 6753,
+    "mtime": "2026-08-15T17:23:03.999Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/d100-board-broadcast/prompt-v2.txt",
+    "size": 5757,
+    "mtime": "2026-08-16T07:45:08.929Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/d100-board-broadcast/prompt.txt",
+    "size": 1806,
+    "mtime": "2026-08-15T17:21:05.827Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/d100-board-exploration/A.md",
+    "size": 5505,
+    "mtime": "2026-08-15T17:07:20.149Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/d100-board-exploration/B.md",
+    "size": 3213,
+    "mtime": "2026-08-15T17:07:20.149Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/d100-board-exploration/caller_final.md",
+    "size": 6497,
+    "mtime": "2026-08-15T17:07:20.149Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/d100-board-exploration/context.txt",
+    "size": 855,
+    "mtime": "2026-08-15T17:02:27.501Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/d100-board-exploration/final.md",
+    "size": 6497,
+    "mtime": "2026-08-15T17:07:20.151Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/d100-board-exploration/metadata.json",
+    "size": 1026,
+    "mtime": "2026-08-15T17:07:20.150Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/d100-board-exploration/prompt.txt",
+    "size": 2600,
+    "mtime": "2026-08-15T17:02:27.416Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/d100-board-exploration-2/A.md",
+    "size": 2424,
+    "mtime": "2026-08-15T17:16:18.336Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/d100-board-exploration-2/B.md",
+    "size": 2366,
+    "mtime": "2026-08-15T17:16:18.336Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/d100-board-exploration-2/caller_final.md",
+    "size": 6742,
+    "mtime": "2026-08-15T17:16:18.336Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/d100-board-exploration-2/final.md",
+    "size": 6742,
+    "mtime": "2026-08-15T17:16:18.337Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/d100-board-exploration-2/metadata.json",
+    "size": 1044,
+    "mtime": "2026-08-15T17:16:18.336Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/d100-board-exploration-2/prompt.txt",
+    "size": 2769,
+    "mtime": "2026-08-15T17:11:59.759Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/event-card-cta-title-critique-2026-08-27/BROADCAST.md",
+    "size": 22504,
+    "mtime": "2026-08-27T20:27:14.982Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/event-card-cta-title-critique-2026-08-27/critique-report.md",
+    "size": 13457,
+    "mtime": "2026-08-27T20:27:53.647Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/event-card-cta-title-critique-2026-08-27/metadata.json",
+    "size": 24027,
+    "mtime": "2026-08-27T20:27:14.985Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/event-card-cta-title-critique-2026-08-27/plan.md",
+    "size": 2643,
+    "mtime": "2026-08-27T20:23:53.922Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/event-card-cta-title-critique-2026-08-27/prompt.md",
+    "size": 3177,
+    "mtime": "2026-08-27T20:24:00.097Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/event-card-cta-title-critique-2026-08-27/synthesis.md",
+    "size": 13717,
+    "mtime": "2026-08-27T20:28:34.282Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-goblin-sticker-frame/prompt.txt",
+    "size": 785,
+    "mtime": "2026-08-27T13:04:57.529Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/explore-mockup-to-component/BROADCAST.md",
+    "size": 36894,
+    "mtime": "2026-08-14T17:24:49.503Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-mockup-to-component/PROMPT.md",
+    "size": 11651,
+    "mtime": "2026-08-14T17:22:34.484Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-mockup-to-component/SYNTHESIS.md",
+    "size": 12696,
+    "mtime": "2026-08-14T17:31:59.353Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-mockup-to-component/metadata.json",
+    "size": 39127,
+    "mtime": "2026-08-14T17:24:49.504Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/explore-mockup-to-component-claude/BROADCAST.md",
+    "size": 25309,
+    "mtime": "2026-08-14T17:29:33.517Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-mockup-to-component-claude/metadata.json",
+    "size": 26030,
+    "mtime": "2026-08-14T17:29:33.517Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/explore-mockup-v6-20260814/A.md",
+    "size": 15862,
+    "mtime": "2026-08-14T22:35:14.687Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-mockup-v6-20260814/B.md",
+    "size": 8687,
+    "mtime": "2026-08-14T22:35:14.688Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-mockup-v6-20260814/caller_final.md",
+    "size": 12880,
+    "mtime": "2026-08-14T22:35:14.688Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-mockup-v6-20260814/deliberation-config-coldread.yaml",
+    "size": 1069,
+    "mtime": "2026-08-14T22:30:12.714Z",
+    "extension": ".yaml"
+  },
+  {
+    "path": ".mw/runs/explore-mockup-v6-20260814/final.md",
+    "size": 12880,
+    "mtime": "2026-08-14T22:35:14.689Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-mockup-v6-20260814/metadata.json",
+    "size": 989,
+    "mtime": "2026-08-14T22:35:14.688Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/explore-mockup-v6-20260814/prompt.md",
+    "size": 3594,
+    "mtime": "2026-08-14T22:23:18.331Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-painter-skill-20260815/A.md",
+    "size": 4654,
+    "mtime": "2026-08-15T09:12:47.858Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-painter-skill-20260815/B.md",
+    "size": 5413,
+    "mtime": "2026-08-15T09:12:47.859Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-painter-skill-20260815/BROADCAST.md",
+    "size": 37108,
+    "mtime": "2026-08-15T09:31:18.295Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-painter-skill-20260815/anthropic-claude.md",
+    "size": 0,
+    "mtime": "2026-08-15T09:16:15.496Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-painter-skill-20260815/caller_final.md",
+    "size": 9958,
+    "mtime": "2026-08-15T09:12:47.859Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-painter-skill-20260815/deliberation-config.yaml",
+    "size": 1467,
+    "mtime": "2026-08-15T09:10:30.026Z",
+    "extension": ".yaml"
+  },
+  {
+    "path": ".mw/runs/explore-painter-skill-20260815/final.md",
+    "size": 9958,
+    "mtime": "2026-08-15T09:12:47.860Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-painter-skill-20260815/groq-llama-v2.md",
+    "size": 3404,
+    "mtime": "2026-08-15T09:17:42.311Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-painter-skill-20260815/groq-llama.md",
+    "size": 7267,
+    "mtime": "2026-08-15T09:17:05.099Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-painter-skill-20260815/metadata.json",
+    "size": 40783,
+    "mtime": "2026-08-15T09:31:18.296Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/explore-painter-skill-20260815/openrouter-gpt4o.md",
+    "size": 0,
+    "mtime": "2026-08-15T09:15:33.140Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-painter-skill-20260815/prompt-broadcast.md",
+    "size": 2976,
+    "mtime": "2026-08-15T09:13:27.606Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-painter-skill-20260815/prompt.md",
+    "size": 3541,
+    "mtime": "2026-08-15T09:09:32.500Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-poi-marker-sculpted-a/cerebras.md",
+    "size": 7167,
+    "mtime": "2026-08-14T09:49:02.763Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-poi-marker-sculpted-a/groq.md",
+    "size": 1839,
+    "mtime": "2026-08-14T09:48:59.919Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-solutions-mockup-20260815/A.md",
+    "size": 7607,
+    "mtime": "2026-08-15T05:59:00.527Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-solutions-mockup-20260815/B.md",
+    "size": 2899,
+    "mtime": "2026-08-15T05:59:00.527Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-solutions-mockup-20260815/caller_final.md",
+    "size": 8685,
+    "mtime": "2026-08-15T05:59:00.527Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-solutions-mockup-20260815/deliberation-config-coldread.yaml",
+    "size": 1069,
+    "mtime": "2026-08-15T05:56:54.592Z",
+    "extension": ".yaml"
+  },
+  {
+    "path": ".mw/runs/explore-solutions-mockup-20260815/final.md",
+    "size": 8685,
+    "mtime": "2026-08-15T05:59:00.528Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/explore-solutions-mockup-20260815/metadata.json",
+    "size": 1026,
+    "mtime": "2026-08-15T05:59:00.528Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/explore-solutions-mockup-20260815/prompt.md",
+    "size": 2217,
+    "mtime": "2026-08-15T05:56:39.664Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/goblin-window-aaa-critique-2026-08-27/BROADCAST.md",
+    "size": 20761,
+    "mtime": "2026-08-27T16:37:03.120Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/goblin-window-aaa-critique-2026-08-27/critique-report.md",
+    "size": 17249,
+    "mtime": "2026-08-27T16:37:08.673Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/goblin-window-aaa-critique-2026-08-27/metadata.json",
+    "size": 22623,
+    "mtime": "2026-08-27T16:37:03.120Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/goblin-window-aaa-critique-2026-08-27/plan.md",
+    "size": 1933,
+    "mtime": "2026-08-27T16:33:52.783Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/goblin-window-aaa-critique-2026-08-27/prompt.md",
+    "size": 2467,
+    "mtime": "2026-08-27T16:34:01.213Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/goblin-window-aaa-critique-2026-08-27/synthesis.md",
+    "size": 18151,
+    "mtime": "2026-08-27T16:37:39.241Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/goblin-window-enhance-2026-08-27/BROADCAST.md",
+    "size": 25547,
+    "mtime": "2026-08-27T16:02:08.738Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/goblin-window-enhance-2026-08-27/critique-report.md",
+    "size": 22780,
+    "mtime": "2026-08-27T16:02:44.946Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/goblin-window-enhance-2026-08-27/metadata.json",
+    "size": 27221,
+    "mtime": "2026-08-27T16:02:08.738Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/goblin-window-enhance-2026-08-27/plan.md",
+    "size": 1454,
+    "mtime": "2026-08-27T15:59:37.296Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/goblin-window-enhance-2026-08-27/prompt.md",
+    "size": 1988,
+    "mtime": "2026-08-27T15:59:41.741Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/goblin-window-enhance-2026-08-27/synthesis.md",
+    "size": 16412,
+    "mtime": "2026-08-27T16:03:48.557Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/goblin-window-frame-critique-2026-08-27/BROADCAST.md",
+    "size": 19398,
+    "mtime": "2026-08-27T17:02:07.691Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/goblin-window-frame-critique-2026-08-27/critique-report.md",
+    "size": 16487,
+    "mtime": "2026-08-27T17:02:13.134Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/goblin-window-frame-critique-2026-08-27/metadata.json",
+    "size": 21083,
+    "mtime": "2026-08-27T17:02:07.692Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/goblin-window-frame-critique-2026-08-27/plan.md",
+    "size": 1393,
+    "mtime": "2026-08-27T16:59:46.355Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/goblin-window-frame-critique-2026-08-27/prompt.md",
+    "size": 1927,
+    "mtime": "2026-08-27T16:59:56.623Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/goblin-window-frame-critique-2026-08-27/synthesis.md",
+    "size": 17055,
+    "mtime": "2026-08-27T17:02:43.781Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/goblin-window-v2-critique-2026-08-27/BROADCAST.md",
+    "size": 26657,
+    "mtime": "2026-08-27T19:15:32.593Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/goblin-window-v2-critique-2026-08-27/critique-report.md",
+    "size": 22584,
+    "mtime": "2026-08-27T19:16:08.393Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/goblin-window-v2-critique-2026-08-27/metadata.json",
+    "size": 28460,
+    "mtime": "2026-08-27T19:15:32.593Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/goblin-window-v2-critique-2026-08-27/plan.md",
+    "size": 2938,
+    "mtime": "2026-08-27T19:12:54.066Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/goblin-window-v2-critique-2026-08-27/prompt.md",
+    "size": 3472,
+    "mtime": "2026-08-27T19:12:58.590Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/goblin-window-v2-critique-2026-08-27/synthesis.md",
+    "size": 16772,
+    "mtime": "2026-08-27T19:17:12.417Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/handoff-mockup-to-component-20260814.md",
+    "size": 4356,
+    "mtime": "2026-08-14T19:29:57.455Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/iterative-deliberation/A.md",
+    "size": 6918,
+    "mtime": "2026-08-18T07:43:30.549Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/iterative-deliberation/B.md",
+    "size": 8138,
+    "mtime": "2026-08-18T07:43:30.549Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/iterative-deliberation/caller_final.md",
+    "size": 6364,
+    "mtime": "2026-08-18T07:43:30.550Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/iterative-deliberation/final.md",
+    "size": 6364,
+    "mtime": "2026-08-18T07:43:30.550Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/iterative-deliberation/metadata.json",
+    "size": 1044,
+    "mtime": "2026-08-18T07:43:30.550Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/learn-mockup-to-component-20260814-224334/pattern-candidate.md",
+    "size": 5693,
+    "mtime": "2026-08-14T20:58:25.751Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/r056-breathing/A.md",
+    "size": 16557,
+    "mtime": "2026-08-30T20:10:54.020Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/r056-breathing/B.md",
+    "size": 157,
+    "mtime": "2026-08-30T20:10:54.020Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/r056-breathing/caller_final.md",
+    "size": 16314,
+    "mtime": "2026-08-30T20:10:54.020Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/r056-breathing/final.md",
+    "size": 16314,
+    "mtime": "2026-08-30T20:10:54.021Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/r056-breathing/metadata.json",
+    "size": 1136,
+    "mtime": "2026-08-30T20:10:54.021Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/sticker-peel-2026-08-27/BROADCAST.md",
+    "size": 3767,
+    "mtime": "2026-08-27T14:42:20.369Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/sticker-peel-2026-08-27/critique-report.md",
+    "size": 459,
+    "mtime": "2026-08-27T14:42:20.404Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/sticker-peel-2026-08-27/metadata.json",
+    "size": 4598,
+    "mtime": "2026-08-27T14:42:20.370Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/sticker-peel-2026-08-27/plan.md",
+    "size": 2722,
+    "mtime": "2026-08-27T14:29:32.790Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/sticker-peel-2026-08-27/prompt.md",
+    "size": 3256,
+    "mtime": "2026-08-27T14:29:50.593Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/sticker-peel-2026-08-27/synthesis.md",
+    "size": 346,
+    "mtime": "2026-08-27T14:42:20.405Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/web-cold-read/cycle-01/A.md",
+    "size": 4345,
+    "mtime": "2026-08-18T10:35:52.751Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/web-cold-read/cycle-01/B.md",
+    "size": 1434,
+    "mtime": "2026-08-18T10:35:52.752Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/web-cold-read/cycle-01/convergence.txt",
+    "size": 42,
+    "mtime": "2026-08-18T10:35:52.753Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/web-cold-read/cycle-01/critiques.txt",
+    "size": 0,
+    "mtime": "2026-08-18T10:35:52.752Z",
+    "extension": ".txt"
+  },
+  {
+    "path": ".mw/runs/web-cold-read/cycle-01/metadata.json",
+    "size": 542,
+    "mtime": "2026-08-18T10:35:52.752Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/web-cold-read/final.md",
+    "size": 5925,
+    "mtime": "2026-08-18T10:35:52.753Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/window-critique-2026-08-27/BROADCAST.md",
+    "size": 28623,
+    "mtime": "2026-08-27T13:47:18.733Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/window-critique-2026-08-27/critique-report.md",
+    "size": 20931,
+    "mtime": "2026-08-27T13:47:54.555Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/window-critique-2026-08-27/metadata.json",
+    "size": 30442,
+    "mtime": "2026-08-27T13:47:18.733Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/runs/window-critique-2026-08-27/plan.md",
+    "size": 5890,
+    "mtime": "2026-08-27T13:43:32.521Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/window-critique-2026-08-27/prompt.md",
+    "size": 6424,
+    "mtime": "2026-08-27T13:44:43.978Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/runs/window-critique-2026-08-27/synthesis.md",
+    "size": 19533,
+    "mtime": "2026-08-27T13:48:59.886Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/d100-pinball/design-intent.md",
+    "size": 1892,
+    "mtime": "2026-08-15T16:24:35.247Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/d100-pinball/identity.md",
+    "size": 2310,
+    "mtime": "2026-08-15T16:24:35.433Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/d100-pinball/prompt.md",
+    "size": 623,
+    "mtime": "2026-08-15T16:24:35.614Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/destiny-astrolabe/asset-identity.md",
+    "size": 1934,
+    "mtime": "2026-08-15T15:40:43.640Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/destiny-astrolabe/authority.md",
+    "size": 3099,
+    "mtime": "2026-08-15T15:38:54.463Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/destiny-astrolabe/design-intent.md",
+    "size": 1688,
+    "mtime": "2026-08-15T15:40:43.423Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/destiny-astrolabe/identity.md",
+    "size": 1934,
+    "mtime": "2026-08-15T15:41:49.566Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/destiny-astrolabe/prompt.md",
+    "size": 2640,
+    "mtime": "2026-08-15T15:40:43.857Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/destiny-astrolabe/provenance.md",
+    "size": 1814,
+    "mtime": "2026-08-15T16:17:04.093Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-event-modal/MOCKUP.md",
+    "size": 1178,
+    "mtime": "2026-08-15T17:27:02.382Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-event-modal/asset-acceptance-report.md",
+    "size": 1152,
+    "mtime": "2026-08-16T09:39:16.833Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-event-modal/assets/V002-hero/design-intent.md",
+    "size": 845,
+    "mtime": "2026-08-15T17:46:39.431Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-event-modal/assets/V002-hero/identity.md",
+    "size": 1165,
+    "mtime": "2026-08-15T17:46:39.576Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-event-modal/assets/V002-hero/prompt.md",
+    "size": 1835,
+    "mtime": "2026-08-16T09:00:44.931Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-event-modal/assets/V002-hero/provenance.md",
+    "size": 1201,
+    "mtime": "2026-08-16T09:36:50.274Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-event-modal/assets/V002-hero/reference-card.md",
+    "size": 811,
+    "mtime": "2026-08-15T17:46:55.736Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-event-modal/authority.md",
+    "size": 1656,
+    "mtime": "2026-08-15T17:27:02.185Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-event-modal/implementation-map.md",
+    "size": 1654,
+    "mtime": "2026-08-15T17:33:58.973Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-event-modal/landmarks.json",
+    "size": 896,
+    "mtime": "2026-08-15T17:33:58.770Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/specs/goblin-event-modal/reconstruction-spec.md",
+    "size": 2001,
+    "mtime": "2026-08-15T17:33:58.560Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-event-modal/tokens.md",
+    "size": 882,
+    "mtime": "2026-08-15T17:33:59.140Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-event-modal/visual-inventory.json",
+    "size": 1491,
+    "mtime": "2026-08-15T17:33:58.418Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/specs/goblin-event-modal/visual-inventory.md",
+    "size": 1551,
+    "mtime": "2026-08-15T17:33:58.169Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-event-modal-v17/MOCKUP.md",
+    "size": 1301,
+    "mtime": "2026-08-15T09:35:22.815Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-event-modal-v17/assets/totem/provenance.md",
+    "size": 532,
+    "mtime": "2026-08-15T09:36:31.389Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-event-modal-v17/authority.md",
+    "size": 1775,
+    "mtime": "2026-08-15T10:13:57.959Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-event-modal-v17/implementation-map.md",
+    "size": 1623,
+    "mtime": "2026-08-15T12:36:22.666Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-event-modal-v17/landmarks.json",
+    "size": 607,
+    "mtime": "2026-08-15T09:35:50.469Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/specs/goblin-event-modal-v17/reconstruction-spec.md",
+    "size": 2924,
+    "mtime": "2026-08-15T12:36:07.898Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-event-modal-v17/reference.json",
+    "size": 302,
+    "mtime": "2026-08-15T09:35:13.133Z",
+    "extension": ".json"
+  },
+  {
+    "path": ".mw/specs/goblin-event-modal-v17/tokens.md",
+    "size": 1861,
+    "mtime": "2026-08-15T09:36:12.813Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-event-modal-v17/visual-inventory.md",
+    "size": 3204,
+    "mtime": "2026-08-15T12:35:47.438Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-invasion-totem/decomposition.md",
+    "size": 3927,
+    "mtime": "2026-08-15T06:33:34.220Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-invasion-totem/design-intent.md",
+    "size": 1193,
+    "mtime": "2026-08-14T22:46:05.562Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-invasion-totem/identity.md",
+    "size": 2612,
+    "mtime": "2026-08-14T22:46:16.876Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-invasion-totem/prompt.md",
+    "size": 2511,
+    "mtime": "2026-08-14T22:46:29.089Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-invasion-totem/tokens.md",
+    "size": 2510,
+    "mtime": "2026-08-15T06:35:01.886Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-totem-hero/design-intent.md",
+    "size": 1380,
+    "mtime": "2026-08-15T06:36:16.595Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-totem-hero/identity.md",
+    "size": 816,
+    "mtime": "2026-08-15T06:36:32.347Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-totem-hero/prompt.md",
+    "size": 893,
+    "mtime": "2026-08-15T07:19:43.364Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-window-frame-2026-08-27/authority.md",
+    "size": 1156,
+    "mtime": "2026-08-27T16:58:07.048Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-window-frame-2026-08-27/implementation-map.md",
+    "size": 899,
+    "mtime": "2026-08-27T16:58:27.513Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-window-frame-2026-08-27/reconstruction-spec.md",
+    "size": 1010,
+    "mtime": "2026-08-27T16:58:23.016Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/goblin-window-frame-2026-08-27/visual-inventory.md",
+    "size": 1851,
+    "mtime": "2026-08-27T16:58:17.219Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/poi-quest-icons/design-intent.md",
+    "size": 1123,
+    "mtime": "2026-08-22T16:40:37.988Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/poi-quest-icons/identity.md",
+    "size": 1035,
+    "mtime": "2026-08-22T17:28:50.472Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/poi-quest-icons/prompt.md",
+    "size": 2805,
+    "mtime": "2026-08-22T16:40:38.066Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/poi-quest-icons/provenance.md",
+    "size": 943,
+    "mtime": "2026-08-22T16:40:38.036Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/specs/skill-check-web-v1/critfail-beat-spec.md",
+    "size": 35654,
+    "mtime": "2026-08-19T09:48:46.248Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/telegram-state/authorized-chats.yaml",
+    "size": 140,
+    "mtime": "2026-08-13T15:21:48.836Z",
+    "extension": ".yaml"
+  },
+  {
+    "path": ".mw/templates/ai-friendly-spec.md",
+    "size": 1727,
+    "mtime": "2026-08-15T11:39:38.914Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/templates/mockup-asset-spec/design-intent.md",
+    "size": 983,
+    "mtime": "2026-08-14T22:45:35.497Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/templates/mockup-asset-spec/identity.md",
+    "size": 1580,
+    "mtime": "2026-08-14T22:45:46.641Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".mw/templates/mockup-asset-spec/prompt.md",
+    "size": 1123,
+    "mtime": "2026-08-14T22:45:54.105Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".windsurf/rules/00-project-invariants.md",
+    "size": 4848,
+    "mtime": "2026-07-14T20:17:45.981Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".windsurf/rules/10-canonical-dev-port.md",
+    "size": 1931,
+    "mtime": "2026-08-17T08:01:25.966Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".windsurf/rules/10-ui-invariants.md",
+    "size": 3009,
+    "mtime": "2026-07-15T20:11:40.416Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".windsurf/rules/15-browser-preview-guard.md",
+    "size": 1891,
+    "mtime": "2026-08-17T08:19:55.276Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".windsurf/rules/20-config-persistence.md",
+    "size": 939,
+    "mtime": "2026-07-14T07:08:46.476Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".windsurf/rules/30-frozen-kits.md",
+    "size": 1490,
+    "mtime": "2026-07-14T11:32:47.736Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".windsurf/rules/40-documentation-governance.md",
+    "size": 1637,
+    "mtime": "2026-07-14T11:43:36.898Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".windsurf/rules/45-director-intent-to-spec.md",
+    "size": 2956,
+    "mtime": "2026-08-15T06:41:55.316Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".windsurf/rules/50-interaction-patterns.md",
+    "size": 2161,
+    "mtime": "2026-07-16T06:48:39.994Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".windsurf/rules/50-shutdown-governance.md",
+    "size": 3100,
+    "mtime": "2026-07-22T20:48:49.773Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".windsurf/rules/mw-rpg-bridge.md",
+    "size": 2137,
+    "mtime": "2026-08-03T19:54:39.437Z",
+    "extension": ".md"
+  },
+  {
+    "path": ".windsurf/rules/philosophy.md",
+    "size": 1816,
+    "mtime": "2026-07-14T07:13:51.643Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/AI_WORKER_SMOKE_TEST.md",
+    "size": 110,
+    "mtime": "2026-07-22T16:00:05.130Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/batch-test.json",
+    "size": 1012,
+    "mtime": "2026-07-19T11:35:56.650Z",
+    "extension": ".json"
+  },
+  {
+    "path": "coordinator/batch.json",
+    "size": 3914,
+    "mtime": "2026-08-30T21:19:22.449Z",
+    "extension": ".json"
+  },
+  {
+    "path": "coordinator/canonical-systems.md",
+    "size": 5077,
+    "mtime": "2026-07-14T20:56:44.997Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/failure-patterns.md",
+    "size": 1699,
+    "mtime": "2026-07-14T19:53:36.964Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/last-run-summary.json",
+    "size": 25613,
+    "mtime": "2026-08-30T21:19:22.460Z",
+    "extension": ".json"
+  },
+  {
+    "path": "coordinator/live_registry.json",
+    "size": 345,
+    "mtime": "2026-08-30T21:19:22.431Z",
+    "extension": ".json"
+  },
+  {
+    "path": "coordinator/manual-dispatch/completed/DOC-CHARACTER-RESIDENT-RECONCILIATION-001.md",
+    "size": 914,
+    "mtime": "2026-07-22T20:08:06.253Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/completed/GM-BLD-pending-stub.md",
+    "size": 543,
+    "mtime": "2026-07-22T21:08:37.339Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/completed/GM-BLD.md",
+    "size": 1175,
+    "mtime": "2026-07-22T21:23:51.877Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/completed/GM-MP.md",
+    "size": 1755,
+    "mtime": "2026-07-22T20:39:05.600Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/completed/GM-TEL.md",
+    "size": 1375,
+    "mtime": "2026-07-23T09:09:35.772Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/completed/IV-TRAILER-ANNOUNCE-001.md",
+    "size": 6400,
+    "mtime": "2026-07-18T09:28:47.895Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/completed/IV-TRAILER-DAY4-006.md",
+    "size": 227,
+    "mtime": "2026-07-16T12:37:58.750Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/completed/IV-WORLD-SURFACE-001.md",
+    "size": 5352,
+    "mtime": "2026-07-19T10:21:28.866Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/completed/IV-WORLD-SURFACE-003.md",
+    "size": 821,
+    "mtime": "2026-07-19T11:28:02.671Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/completed/IV-WORLD-SURFACE-HD-001.md",
+    "size": 2404,
+    "mtime": "2026-07-22T19:27:56.539Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/completed/OPS-SHUTDOWN-000.md",
+    "size": 3784,
+    "mtime": "2026-07-22T21:06:33.364Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/completed/OPS-SHUTDOWN-001.md",
+    "size": 4394,
+    "mtime": "2026-07-22T21:43:29.811Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/completed/OPS-SHUTDOWN-002.md",
+    "size": 1814,
+    "mtime": "2026-07-23T09:46:10.242Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/completed/POI-MEDALLION-MATERIAL-PREVIEW-00E669.md",
+    "size": 478,
+    "mtime": "2026-07-22T15:50:47.764Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/completed/TRAILER-V9-PHASE1.md",
+    "size": 219,
+    "mtime": "2026-07-17T14:37:15.930Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/completed/TRAILER-V9-PHASE2.md",
+    "size": 5346,
+    "mtime": "2026-07-17T16:19:44.394Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/completed/TRAILER-V9-PHASE3.md",
+    "size": 4955,
+    "mtime": "2026-07-17T16:19:44.394Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/completed/TRAILER-V9-PHASE4.md",
+    "size": 4292,
+    "mtime": "2026-07-17T16:19:44.394Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/completed/WORLD-PRESENTATION-RUNTIME-DEMO.md",
+    "size": 12623,
+    "mtime": "2026-07-22T15:50:47.765Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/completed/WORLD-PRESENTATION-RUNTIME-FOUNDATION.md",
+    "size": 5665,
+    "mtime": "2026-07-22T15:50:47.765Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/ADR001-T1.md",
+    "size": 310,
+    "mtime": "2026-07-24T08:28:30.896Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/ADR001-T2.md",
+    "size": 310,
+    "mtime": "2026-07-24T08:28:30.898Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/ADR001-T3.md",
+    "size": 399,
+    "mtime": "2026-07-24T08:28:30.903Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/ADR001-T4.md",
+    "size": 499,
+    "mtime": "2026-07-24T08:28:30.904Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/ADR001-T6.md",
+    "size": 369,
+    "mtime": "2026-07-24T08:28:30.906Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/ADR001-T7.md",
+    "size": 365,
+    "mtime": "2026-07-24T08:28:30.907Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/ADR001-T8.md",
+    "size": 552,
+    "mtime": "2026-07-24T08:28:30.909Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/ART-DIR-CREATURE-001.md",
+    "size": 326,
+    "mtime": "2026-07-24T08:28:30.956Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/ART-DIR-UPDATE-001.md",
+    "size": 318,
+    "mtime": "2026-07-23T18:37:05.310Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/CDA-00-001.md",
+    "size": 286,
+    "mtime": "2026-07-23T18:37:05.317Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/CDA-00-002.md",
+    "size": 286,
+    "mtime": "2026-07-24T08:28:30.966Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/CDA-00-003.md",
+    "size": 286,
+    "mtime": "2026-07-24T08:28:30.967Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/CDA-00-004.md",
+    "size": 286,
+    "mtime": "2026-07-24T08:28:30.968Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/CDA-00-005.md",
+    "size": 286,
+    "mtime": "2026-07-24T08:28:30.969Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/CDA-00-006.md",
+    "size": 286,
+    "mtime": "2026-07-24T08:28:30.971Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/CDA-00-007.md",
+    "size": 286,
+    "mtime": "2026-07-24T08:28:30.975Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/CDA-01-001.md",
+    "size": 286,
+    "mtime": "2026-07-24T08:28:30.978Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/CDA-02-001.md",
+    "size": 286,
+    "mtime": "2026-07-24T08:28:30.983Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/CDA-03-001.md",
+    "size": 286,
+    "mtime": "2026-07-24T08:28:30.985Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/CDA-04-001.md",
+    "size": 286,
+    "mtime": "2026-07-24T08:28:30.987Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/CDA-05-001.md",
+    "size": 286,
+    "mtime": "2026-07-24T08:28:30.990Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/CDA-06-001.md",
+    "size": 286,
+    "mtime": "2026-07-24T08:28:30.993Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/CDA-07-001.md",
+    "size": 286,
+    "mtime": "2026-07-24T08:28:30.996Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/CDA-08-001.md",
+    "size": 286,
+    "mtime": "2026-07-24T08:28:30.999Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/CDA-09-001.md",
+    "size": 286,
+    "mtime": "2026-07-24T08:28:31.000Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/CDA-10-001.md",
+    "size": 286,
+    "mtime": "2026-07-24T08:28:31.002Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/IV-PROG-P1.md",
+    "size": 286,
+    "mtime": "2026-07-23T18:37:05.296Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/IV-PROG-P2.md",
+    "size": 286,
+    "mtime": "2026-07-24T08:28:30.910Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/IV-PROG-P3.md",
+    "size": 286,
+    "mtime": "2026-07-24T08:28:30.911Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/IV-PROG-P4.md",
+    "size": 286,
+    "mtime": "2026-07-24T08:28:30.913Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/IV-PROG-P5.md",
+    "size": 286,
+    "mtime": "2026-07-24T08:28:30.914Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/IV-PROG-P6.md",
+    "size": 286,
+    "mtime": "2026-07-24T08:28:30.915Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/IV-TF-001.md",
+    "size": 282,
+    "mtime": "2026-07-23T18:37:05.298Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/IV-TF-002.md",
+    "size": 282,
+    "mtime": "2026-07-24T08:28:30.916Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/IV-TF-003.md",
+    "size": 282,
+    "mtime": "2026-07-24T08:28:30.917Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/IV-TF-004.md",
+    "size": 282,
+    "mtime": "2026-07-24T08:28:30.918Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/IV-TF-005.md",
+    "size": 282,
+    "mtime": "2026-07-24T08:28:30.919Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/IV-WORLD-SURFACE-HD-002.md",
+    "size": 2571,
+    "mtime": "2026-07-23T13:36:24.277Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/IV-WSC-P1.md",
+    "size": 282,
+    "mtime": "2026-07-23T18:37:05.300Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/IV-WSC-P2.md",
+    "size": 282,
+    "mtime": "2026-07-24T08:28:30.935Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/IV-WSC-P3.md",
+    "size": 282,
+    "mtime": "2026-07-24T08:28:30.936Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/IV-WSC-P4.md",
+    "size": 282,
+    "mtime": "2026-07-24T08:28:30.938Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/IV-WSC-P5.md",
+    "size": 282,
+    "mtime": "2026-07-24T08:28:30.939Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/IV-WSC-P6.md",
+    "size": 282,
+    "mtime": "2026-07-24T08:28:30.941Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/IV-WSV3-P5.md",
+    "size": 286,
+    "mtime": "2026-07-23T18:37:05.301Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/REND-SYS-P1.md",
+    "size": 290,
+    "mtime": "2026-07-23T18:37:05.303Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/REND-SYS-P2.md",
+    "size": 290,
+    "mtime": "2026-07-24T08:28:30.941Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/REND-SYS-P3.md",
+    "size": 290,
+    "mtime": "2026-07-24T08:28:30.943Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/REND-SYS-P4.md",
+    "size": 290,
+    "mtime": "2026-07-24T08:28:30.944Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/REND-SYS-P5.md",
+    "size": 290,
+    "mtime": "2026-07-24T08:28:30.945Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/REND-SYS-P6.md",
+    "size": 290,
+    "mtime": "2026-07-24T08:28:30.946Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/REND-SYS-P7.md",
+    "size": 290,
+    "mtime": "2026-07-24T08:28:30.949Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/REND-SYS-P8.md",
+    "size": 290,
+    "mtime": "2026-07-24T08:28:30.950Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/TRAILER-THREAT-V3-P1.md",
+    "size": 326,
+    "mtime": "2026-07-24T08:28:30.951Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/TRAILER-THREAT-V3-P2.md",
+    "size": 326,
+    "mtime": "2026-07-24T08:28:30.953Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/TRAILER-THREAT-V3-P3.md",
+    "size": 326,
+    "mtime": "2026-07-24T08:28:30.955Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/WL-LORE-001-A.md",
+    "size": 298,
+    "mtime": "2026-07-24T08:28:30.920Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/WL-LORE-001-B.md",
+    "size": 298,
+    "mtime": "2026-07-24T08:28:30.922Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/WL-LORE-001-C.md",
+    "size": 298,
+    "mtime": "2026-07-24T08:28:30.924Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/WL-LORE-001-D.md",
+    "size": 298,
+    "mtime": "2026-07-24T08:28:30.926Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/WL-LORE-001-E.md",
+    "size": 298,
+    "mtime": "2026-07-24T08:28:30.927Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/WL-LORE-DROP-F1.md",
+    "size": 306,
+    "mtime": "2026-07-23T18:37:05.299Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/WL-LORE-DROP-F2.md",
+    "size": 306,
+    "mtime": "2026-07-24T08:28:30.929Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/WL-LORE-DROP-F3.md",
+    "size": 306,
+    "mtime": "2026-07-24T08:28:30.930Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/WL-LORE-DROP-F4.md",
+    "size": 306,
+    "mtime": "2026-07-24T08:28:30.931Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/WL-LORE-DROP-F5.md",
+    "size": 306,
+    "mtime": "2026-07-24T08:28:30.933Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/WL-LORE-DROP-F6.md",
+    "size": 306,
+    "mtime": "2026-07-24T08:28:30.934Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/WL-TEASER-D1.md",
+    "size": 294,
+    "mtime": "2026-07-23T18:37:05.314Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/WL-TEASER-D2.md",
+    "size": 294,
+    "mtime": "2026-07-24T08:28:30.959Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/WL-TEASER-D3.md",
+    "size": 294,
+    "mtime": "2026-07-24T08:28:30.961Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/WL-TEASER-D4.md",
+    "size": 294,
+    "mtime": "2026-07-24T08:28:30.963Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/WL-TEASER-D5.md",
+    "size": 294,
+    "mtime": "2026-07-24T08:28:30.964Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/WL-WPG-001-CONCEPT.md",
+    "size": 318,
+    "mtime": "2026-07-23T18:37:05.312Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/pending/WL-WPG-001-CONFIG.md",
+    "size": 314,
+    "mtime": "2026-07-24T08:28:30.958Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/manual-dispatch/queue.json",
+    "size": 26018,
+    "mtime": "2026-07-24T08:28:31.003Z",
+    "extension": ".json"
+  },
+  {
+    "path": "coordinator/registry-events/processed/AI-SMOKE-TEST-001-end.json",
+    "size": 105,
+    "mtime": "2026-07-22T16:00:05.130Z",
+    "extension": ".json"
+  },
+  {
+    "path": "coordinator/skills/README.md",
+    "size": 3160,
+    "mtime": "2026-07-14T20:55:57.715Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/skills/agent-execution-mandate/SKILL.md",
+    "size": 10683,
+    "mtime": "2026-08-20T13:16:00.901Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/skills/coordinator-mandate/SKILL.md",
+    "size": 14193,
+    "mtime": "2026-07-19T10:38:38.102Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/skills/idle-village-task/SKILL.md",
+    "size": 9441,
+    "mtime": "2026-08-16T10:07:49.127Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/skills/mockup-generator/SKILL.md",
+    "size": 4986,
+    "mtime": "2026-08-14T22:41:43.222Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/skills/mw-executor/SKILL.md",
+    "size": 1785,
+    "mtime": "2026-08-16T10:07:49.128Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/skills/mw-explorer/SKILL.md",
+    "size": 1719,
+    "mtime": "2026-08-16T10:07:49.128Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/skills/mw-planner/SKILL.md",
+    "size": 1608,
+    "mtime": "2026-08-16T10:07:49.129Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/skills/mw-regression/SKILL.md",
+    "size": 813,
+    "mtime": "2026-08-07T12:01:17.142Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/skills/painter/SKILL.md",
+    "size": 17285,
+    "mtime": "2026-08-15T19:16:52.602Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/skills/strategist-mandate/SKILL.md",
+    "size": 8101,
+    "mtime": "2026-07-15T15:17:02.596Z",
+    "extension": ".md"
+  },
+  {
+    "path": "coordinator/strategy_tasks.md",
+    "size": 34529,
+    "mtime": "2026-08-30T21:22:09.110Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/ADR001-T1.md",
+    "size": 3681,
+    "mtime": "2026-07-24T08:21:34.240Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/ADR001-T1.spec.json",
+    "size": 2315,
+    "mtime": "2026-07-15T15:12:36.876Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/ADR001-T2.md",
+    "size": 3451,
+    "mtime": "2026-07-24T08:21:39.664Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/ADR001-T2.spec.json",
+    "size": 3082,
+    "mtime": "2026-07-15T15:12:41.248Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/ADR001-T3.md",
+    "size": 3958,
+    "mtime": "2026-07-24T08:17:21.064Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/ADR001-T3.spec.json",
+    "size": 3400,
+    "mtime": "2026-07-15T15:12:49.317Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/ADR001-T4.md",
+    "size": 3686,
+    "mtime": "2026-07-24T08:17:28.998Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/ADR001-T4.spec.json",
+    "size": 3838,
+    "mtime": "2026-07-15T15:12:59.263Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/ADR001-T5.spec.json",
+    "size": 4498,
+    "mtime": "2026-07-15T15:13:08.425Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/ADR001-T6.md",
+    "size": 3650,
+    "mtime": "2026-07-24T08:17:33.662Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/ADR001-T6.spec.json",
+    "size": 2833,
+    "mtime": "2026-07-15T15:14:21.240Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/ADR001-T7.md",
+    "size": 3672,
+    "mtime": "2026-07-24T08:17:38.334Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/ADR001-T7.spec.json",
+    "size": 3289,
+    "mtime": "2026-07-15T15:13:12.599Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/ADR001-T8.md",
+    "size": 4243,
+    "mtime": "2026-07-24T08:17:42.048Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/ADR001-T8.spec.json",
+    "size": 4499,
+    "mtime": "2026-07-15T15:14:28.124Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/ART-DIR-CREATURE-001.md",
+    "size": 2241,
+    "mtime": "2026-07-24T08:22:51.345Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/ART-DIR-UPDATE-001.md",
+    "size": 1915,
+    "mtime": "2026-07-23T18:28:09.365Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/ASTRO-V3-F0.spec.json",
+    "size": 4536,
+    "mtime": "2026-07-15T15:17:02.597Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/ASTRO-V3-F1.spec.json",
+    "size": 4582,
+    "mtime": "2026-07-15T15:17:02.597Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/ASTRO-V3-F2.spec.json",
+    "size": 4593,
+    "mtime": "2026-07-15T15:17:02.597Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/ASTRO-V3-F3.spec.json",
+    "size": 4428,
+    "mtime": "2026-07-15T15:17:02.598Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/ASTRO-V3-F4.spec.json",
+    "size": 4718,
+    "mtime": "2026-07-15T15:17:02.598Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/CDA-00-001.md",
+    "size": 2451,
+    "mtime": "2026-07-23T18:27:41.744Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/CDA-00-002.md",
+    "size": 3969,
+    "mtime": "2026-07-24T08:19:45.354Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/CDA-00-003.md",
+    "size": 3422,
+    "mtime": "2026-07-24T08:19:49.118Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/CDA-00-004.md",
+    "size": 4171,
+    "mtime": "2026-07-24T08:20:22.792Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/CDA-00-005.md",
+    "size": 3775,
+    "mtime": "2026-07-24T08:20:41.956Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/CDA-00-006.md",
+    "size": 4242,
+    "mtime": "2026-07-24T08:20:46.834Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/CDA-00-007.md",
+    "size": 3823,
+    "mtime": "2026-07-24T08:20:50.219Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/CDA-01-001.md",
+    "size": 3410,
+    "mtime": "2026-07-24T08:23:28.495Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/CDA-02-001.md",
+    "size": 2563,
+    "mtime": "2026-07-24T08:23:31.460Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/CDA-03-001.md",
+    "size": 2682,
+    "mtime": "2026-07-24T08:23:34.832Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/CDA-04-001.md",
+    "size": 2598,
+    "mtime": "2026-07-24T08:23:37.617Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/CDA-05-001.md",
+    "size": 2464,
+    "mtime": "2026-07-24T08:23:40.696Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/CDA-06-001.md",
+    "size": 2504,
+    "mtime": "2026-07-24T08:23:45.624Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/CDA-07-001.md",
+    "size": 2654,
+    "mtime": "2026-07-24T08:23:49.596Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/CDA-08-001.md",
+    "size": 3492,
+    "mtime": "2026-07-24T08:23:54.284Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/CDA-09-001.md",
+    "size": 3156,
+    "mtime": "2026-07-24T08:23:58.109Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/CDA-10-001.md",
+    "size": 3022,
+    "mtime": "2026-07-24T08:24:01.887Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/CR-004-FOLLOWUP.md",
+    "size": 3183,
+    "mtime": "2026-07-15T13:47:04.080Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/CR-005.spec.json",
+    "size": 4859,
+    "mtime": "2026-07-15T13:00:50.775Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/DOC-MG-ROSTER-RECONCILIATION-008.spec.json",
+    "size": 4235,
+    "mtime": "2026-07-15T13:01:21.357Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/GM-ENG.md",
+    "size": 3299,
+    "mtime": "2026-07-20T14:09:57.916Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/GM-MP.md",
+    "size": 2995,
+    "mtime": "2026-07-22T20:28:43.333Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/GM-REG.spec.json",
+    "size": 4459,
+    "mtime": "2026-07-15T13:01:30.390Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/GOBLIN-V17-NEXT-ITERATION.md",
+    "size": 3866,
+    "mtime": "2026-08-15T14:58:50.067Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/GOV-001.md",
+    "size": 3493,
+    "mtime": "2026-07-14T11:25:46.849Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/GOV-001.spec.json",
+    "size": 2567,
+    "mtime": "2026-07-15T15:17:02.598Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/GOV-002.md",
+    "size": 2982,
+    "mtime": "2026-07-14T11:26:18.810Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/GOV-002.spec.json",
+    "size": 2260,
+    "mtime": "2026-07-15T15:17:02.599Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/GOV-003.md",
+    "size": 5282,
+    "mtime": "2026-07-14T14:18:44.055Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/GOV-003.spec.json",
+    "size": 2281,
+    "mtime": "2026-07-15T15:17:02.599Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/GOV-004.md",
+    "size": 2844,
+    "mtime": "2026-07-14T10:53:43.294Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/GOV-004.spec.json",
+    "size": 2471,
+    "mtime": "2026-07-15T15:17:02.599Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/GOV-005.md",
+    "size": 3086,
+    "mtime": "2026-07-14T10:53:58.139Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/GOV-005.spec.json",
+    "size": 2255,
+    "mtime": "2026-07-15T15:17:02.600Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/GOV-006.md",
+    "size": 3213,
+    "mtime": "2026-07-14T10:54:16.224Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/GOV-006.spec.json",
+    "size": 2120,
+    "mtime": "2026-07-15T15:17:02.600Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/GOV-007.md",
+    "size": 3911,
+    "mtime": "2026-07-14T11:26:45.601Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/GOV-007.spec.json",
+    "size": 2859,
+    "mtime": "2026-07-15T15:17:02.601Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/GOV-008.md",
+    "size": 3337,
+    "mtime": "2026-07-14T11:27:06.264Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/GOV-008.spec.json",
+    "size": 2807,
+    "mtime": "2026-07-15T15:17:02.605Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/IV-POI-VISUAL-001.spec.json",
+    "size": 2728,
+    "mtime": "2026-07-14T19:33:59.250Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/IV-PROG-P1.md",
+    "size": 3077,
+    "mtime": "2026-07-23T18:27:15.925Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/IV-PROG-P2.md",
+    "size": 3738,
+    "mtime": "2026-07-24T08:17:52.302Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/IV-PROG-P3.md",
+    "size": 3699,
+    "mtime": "2026-07-24T08:17:59.109Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/IV-PROG-P4.md",
+    "size": 3606,
+    "mtime": "2026-07-24T08:18:03.993Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/IV-PROG-P5.md",
+    "size": 3661,
+    "mtime": "2026-07-24T08:18:09.891Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/IV-PROG-P6.md",
+    "size": 3750,
+    "mtime": "2026-07-24T08:18:22.607Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/IV-SLOT-RACK-RESKIN-001.spec.json",
+    "size": 7921,
+    "mtime": "2026-07-22T09:43:33.164Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/IV-TF-001.md",
+    "size": 2241,
+    "mtime": "2026-07-23T18:27:21.833Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/IV-TF-002.md",
+    "size": 3593,
+    "mtime": "2026-07-24T08:18:33.395Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/IV-TF-003.md",
+    "size": 3422,
+    "mtime": "2026-07-24T08:18:38.906Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/IV-TF-004.md",
+    "size": 3268,
+    "mtime": "2026-07-24T08:18:41.948Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/IV-TF-005.md",
+    "size": 3283,
+    "mtime": "2026-07-24T08:18:44.744Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/IV-WORLD-SURFACE-002.spec.json",
+    "size": 3635,
+    "mtime": "2026-07-19T11:07:29.971Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/IV-WORLD-SURFACE-HD-001.md",
+    "size": 7341,
+    "mtime": "2026-07-22T19:24:35.268Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/IV-WORLD-SURFACE-HD-002.md",
+    "size": 7674,
+    "mtime": "2026-07-23T13:30:07.254Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/IV-WSC-P1.md",
+    "size": 2485,
+    "mtime": "2026-07-23T18:27:28.646Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/IV-WSC-P2.md",
+    "size": 3608,
+    "mtime": "2026-07-24T08:20:52.717Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/IV-WSC-P3.md",
+    "size": 3370,
+    "mtime": "2026-07-24T08:20:55.699Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/IV-WSC-P4.md",
+    "size": 4250,
+    "mtime": "2026-07-24T08:20:58.959Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/IV-WSV3-P5.md",
+    "size": 2053,
+    "mtime": "2026-07-23T18:28:04.567Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/IV-WSV3-P6.md",
+    "size": 3539,
+    "mtime": "2026-07-24T08:19:13.211Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/IV-WSV3-P7.md",
+    "size": 3480,
+    "mtime": "2026-07-24T08:19:17.060Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/IV-WSV3-P8.md",
+    "size": 3730,
+    "mtime": "2026-07-24T08:19:21.327Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/MG-03.spec.json",
+    "size": 4966,
+    "mtime": "2026-07-15T13:01:03.000Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/MG-FIGHT-001.md",
+    "size": 4550,
+    "mtime": "2026-07-15T13:17:37.735Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/MG-IDLE-ALIGNMENT-001.md",
+    "size": 5640,
+    "mtime": "2026-07-15T13:05:41.740Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/NP-106.spec.json",
+    "size": 3711,
+    "mtime": "2026-07-15T13:01:11.743Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/OPS-SHUTDOWN-000.spec.json",
+    "size": 4587,
+    "mtime": "2026-07-22T20:49:44.915Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/OPS-SHUTDOWN-001.spec.json",
+    "size": 6122,
+    "mtime": "2026-07-22T20:50:03.258Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/OPS-SHUTDOWN-002.spec.json",
+    "size": 4940,
+    "mtime": "2026-07-23T09:30:41.520Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/PANELS-FIX-COMPONENT-REUSE.spec.json",
+    "size": 4850,
+    "mtime": "2026-07-15T15:17:02.605Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/PANELS-STEP-01-design-system-page.spec.json",
+    "size": 3177,
+    "mtime": "2026-07-14T21:10:51.321Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/PANELS-STEP-01.spec.json",
+    "size": 3171,
+    "mtime": "2026-07-15T15:17:02.606Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/PANELS-STEP-02-tokens-section.spec.json",
+    "size": 3189,
+    "mtime": "2026-07-14T21:10:54.421Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/PANELS-STEP-02.spec.json",
+    "size": 3309,
+    "mtime": "2026-07-15T15:17:02.606Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/PANELS-STEP-03-panels-store.spec.json",
+    "size": 3256,
+    "mtime": "2026-07-14T21:10:57.921Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/PANELS-STEP-03.spec.json",
+    "size": 3870,
+    "mtime": "2026-07-14T21:14:26.267Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/PANELS-STEP-04-panel-shell.spec.json",
+    "size": 3312,
+    "mtime": "2026-07-14T21:11:01.143Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/PANELS-STEP-04.spec.json",
+    "size": 3737,
+    "mtime": "2026-07-14T21:14:31.285Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/PANELS-STEP-05-v9-panel-shell.spec.json",
+    "size": 3478,
+    "mtime": "2026-07-14T21:11:04.497Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/PANELS-STEP-05.spec.json",
+    "size": 3618,
+    "mtime": "2026-07-14T21:14:36.434Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/PANELS-STEP-06-design-system-integration.spec.json",
+    "size": 2627,
+    "mtime": "2026-07-14T21:11:07.074Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/PANELS-STEP-06-populate-shell-section.spec.json",
+    "size": 4356,
+    "mtime": "2026-07-15T09:12:02.997Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/PANELS-STEP-06.spec.json",
+    "size": 4169,
+    "mtime": "2026-07-15T15:17:02.606Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/POI-DETAIL-VISUAL-IMPROVEMENTS.md",
+    "size": 9467,
+    "mtime": "2026-07-14T22:03:10.212Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/POI-DETAIL-VISUAL-IMPROVEMENTS.spec.json",
+    "size": 12587,
+    "mtime": "2026-07-15T15:17:02.607Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/POI-JOB-DETAIL-FIX.md",
+    "size": 6235,
+    "mtime": "2026-07-14T11:07:45.927Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/REND-SYS-P1.md",
+    "size": 2446,
+    "mtime": "2026-07-23T18:27:36.713Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/REND-SYS-P2.md",
+    "size": 3523,
+    "mtime": "2026-07-24T08:19:32.177Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/REND-SYS-P3.md",
+    "size": 3395,
+    "mtime": "2026-07-24T08:19:36.204Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/REND-SYS-P4.md",
+    "size": 3892,
+    "mtime": "2026-07-24T08:19:40.706Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/ROSTER-COMPONENTIZATION.spec.json",
+    "size": 1974,
+    "mtime": "2026-07-15T15:17:02.607Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/ROSTER-STAT-FILTER.spec.json",
+    "size": 7303,
+    "mtime": "2026-07-16T09:05:47.543Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/RT-INT-DRAG-POI-001.spec.json",
+    "size": 3842,
+    "mtime": "2026-07-15T13:00:29.537Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/RT-INT-TIME-DAYN-001.spec.json",
+    "size": 4074,
+    "mtime": "2026-07-15T13:00:40.739Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/SC-UI-001.md",
+    "size": 8230,
+    "mtime": "2026-07-14T12:12:51.878Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/SC-UI-001.spec.json",
+    "size": 5650,
+    "mtime": "2026-07-15T15:17:02.607Z",
+    "extension": ".json"
+  },
+  {
+    "path": "prompts/TEST-001.md",
+    "size": 1150,
+    "mtime": "2026-07-14T10:25:21.023Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/TRAILER-THREAT-V3-P1.md",
+    "size": 2821,
+    "mtime": "2026-07-24T08:22:42.529Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/TRAILER-THREAT-V3-P2.md",
+    "size": 2386,
+    "mtime": "2026-07-24T08:22:46.079Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/TRAILER-THREAT-V3-P3.md",
+    "size": 2501,
+    "mtime": "2026-07-24T08:22:48.856Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/WL-LORE-001-A.md",
+    "size": 3237,
+    "mtime": "2026-07-24T08:21:43.474Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/WL-LORE-001-B.md",
+    "size": 3187,
+    "mtime": "2026-07-24T08:21:47.900Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/WL-LORE-001-C.md",
+    "size": 3067,
+    "mtime": "2026-07-24T08:21:51.201Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/WL-LORE-001-D.md",
+    "size": 3297,
+    "mtime": "2026-07-24T08:22:06.177Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/WL-LORE-001-E.md",
+    "size": 3559,
+    "mtime": "2026-07-24T08:22:10.608Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/WL-LORE-DROP-F1.md",
+    "size": 2124,
+    "mtime": "2026-07-23T18:27:58.414Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/WL-LORE-DROP-F2.md",
+    "size": 3444,
+    "mtime": "2026-07-24T08:18:56.242Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/WL-LORE-DROP-F3.md",
+    "size": 3544,
+    "mtime": "2026-07-24T08:19:00.201Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/WL-LORE-DROP-F4.md",
+    "size": 4013,
+    "mtime": "2026-07-24T08:19:08.061Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/WL-LORE-DROP-F5.md",
+    "size": 1952,
+    "mtime": "2026-07-24T08:22:22.556Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/WL-LORE-DROP-F6.md",
+    "size": 2398,
+    "mtime": "2026-07-24T08:22:25.370Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/WL-TEASER-D1.md",
+    "size": 2348,
+    "mtime": "2026-07-23T18:28:25.065Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/WL-TEASER-D2.md",
+    "size": 2801,
+    "mtime": "2026-07-24T08:22:59.871Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/WL-TEASER-D3.md",
+    "size": 3135,
+    "mtime": "2026-07-24T08:23:03.244Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/WL-TEASER-D4.md",
+    "size": 2847,
+    "mtime": "2026-07-24T08:23:07.896Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/WL-TEASER-D5.md",
+    "size": 2538,
+    "mtime": "2026-07-24T08:23:12.634Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/WL-WPG-001-CONCEPT.md",
+    "size": 1874,
+    "mtime": "2026-07-23T18:28:20.016Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/WL-WPG-001-CONFIG.md",
+    "size": 3176,
+    "mtime": "2026-07-24T08:22:56.164Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/WORLD-PRESENTATION-RUNTIME-FOUNDATION.md",
+    "size": 4712,
+    "mtime": "2026-07-20T14:10:12.246Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/WORLD-SURFACE-V3-EVENTS-002.md",
+    "size": 5489,
+    "mtime": "2026-07-22T19:56:18.953Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/WORLD-SURFACE-V3-FOUNDATION-001.md",
+    "size": 6586,
+    "mtime": "2026-07-22T19:56:03.678Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/WORLD-SURFACE-V3-UNDERWATER-004.md",
+    "size": 5597,
+    "mtime": "2026-07-22T19:56:58.768Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/WORLD-SURFACE-V3-WONDERS-003.md",
+    "size": 5277,
+    "mtime": "2026-07-22T19:56:38.852Z",
+    "extension": ".md"
+  },
+  {
+    "path": "prompts/portrait-propagation-regression.spec.json",
+    "size": 1963,
+    "mtime": "2026-07-15T15:17:02.608Z",
+    "extension": ".json"
+  },
+  {
+    "path": "RICHIESTE.md",
+    "size": 113296,
+    "mtime": "2026-08-30T20:59:24.046Z",
+    "extension": ".md"
+  },
+  {
+    "path": "AGENTS.md",
+    "size": 3895,
+    "mtime": "2026-08-15T14:57:32.555Z",
+    "extension": ".md"
+  },
+  {
+    "path": "DESIGN_PILLARS.md",
+    "size": 27929,
+    "mtime": "2026-08-17T07:13:59.651Z",
+    "extension": ".md"
+  },
+  {
+    "path": "ROADMAP.md",
+    "size": 454,
+    "mtime": "2026-08-30T21:14:16.218Z",
+    "extension": ".md"
+  },
+  {
+    "path": "SESSION_HANDOFF.md",
+    "size": 2232,
+    "mtime": "2026-08-30T21:14:24.564Z",
+    "extension": ".md"
+  }
+]

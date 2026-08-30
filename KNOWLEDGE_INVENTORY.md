@@ -1,0 +1,2470 @@
+# Knowledge Inventory
+
+## canonical (48)
+- `src/docs/docs/art-direction/creatures/creatures/bronze-relic-guardian/decision-log.md` — Bronze Relic Guardian — Decision Log  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/creatures/bronze-relic-guardian/design-intent.md` — Bronze Relic Guardian — Design Intent  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/creatures/bronze-relic-guardian/identity.md` — Bronze Relic Guardian  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/creatures/bronze-relic-guardian/prompt.md` — Bronze Relic Guardian — Image Prompt Injection  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/creatures/bronze-relic-guardian/reference-card.md` — Bronze Relic Guardian — Reference Card  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/creatures/bronze-relic-guardian/versions/v1.0.0.md` — Bronze Relic Guardian v1.0.0 — Canonical  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/creatures/emerald-scale-serpent/decision-log.md` — Emerald Scale Serpent — Decision Log  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/creatures/emerald-scale-serpent/design-intent.md` — Emerald Scale Serpent — Design Intent  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/creatures/emerald-scale-serpent/identity.md` — Emerald Scale Serpent  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/creatures/emerald-scale-serpent/prompt.md` — Emerald Scale Serpent — Image Prompt Injection  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/creatures/emerald-scale-serpent/reference-card.md` — Emerald Scale Serpent — Reference Card  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/creatures/emerald-scale-serpent/versions/v1.0.0.md` — Emerald Scale Serpent v1.0.0 — Canonical  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/creatures/gnarled-nightmare/decision-log.md` — Gnarled Nightmare — Decision Log  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/creatures/gnarled-nightmare/design-intent.md` — Gnarled Nightmare — Design Intent  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/creatures/gnarled-nightmare/identity.md` — Gnarled Nightmare  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/creatures/gnarled-nightmare/prompt.md` — Gnarled Nightmare — Image Prompt Injection  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/creatures/gnarled-nightmare/reference-card.md` — Gnarled Nightmare — Reference Card  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/creatures/gnarled-nightmare/versions/v1.0.0.md` — Gnarled Nightmare v1.0.0 — Canonical  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/creatures/momentum-bruiser/decision-log.md` — Momentum Bruiser — Decision Log  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/creatures/momentum-bruiser/design-intent.md` — Momentum Bruiser — Design Intent  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/creatures/momentum-bruiser/identity.md` — Momentum Bruiser  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/creatures/momentum-bruiser/prompt.md` — Momentum Bruiser — Image Prompt Injection  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/creatures/momentum-bruiser/reference-card.md` — Momentum Bruiser — Reference Card  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/creatures/momentum-bruiser/versions/v1.0.0.md` — Momentum Bruiser v1.0.0 — Canonical  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/families/ancient-constructs/family-dna.md` — Ancient Constructs — Family DNA  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/families/ancient-constructs/rejected-directions.md` — Ancient Constructs — Rejected Directions  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/families/beasts/family-dna.md` — Beasts — Family DNA  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/families/beasts/rejected-directions.md` — Beasts — Rejected Directions  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/families/forest-parasites/family-dna.md` — Forest Parasites — Family DNA  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/families/forest-parasites/rejected-directions.md` — Forest Parasites — Rejected Directions  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/families/mythic-beasts/family-dna.md` — Mythic Beasts — Family DNA  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/families/mythic-beasts/rejected-directions.md` — Mythic Beasts — Rejected Directions  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/art-direction/creatures/registry.md` — Creature Registry  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/idle_village/roster_trusted_components.md` — Idle Village Roster – Canonical Snapshot (2026-03-03)  
+  - markers: canonical  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/idle_village/trusted/character_resident_trusted.md` — Character-to-Resident Canonical Architecture  
+  - markers: trusted  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/idle_village/trusted/day_night_time_engine_strip_trusted.md` — DayNightTimeEngineStrip — Trusted Contract  
+  - markers: trusted  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/idle_village/trusted/daynight_trusted.md` — Day/Night Cycle System - Trusted Contract  
+  - markers: trusted  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/idle_village/trusted/pgcard_trusted.md` — PgCard / PgToken Trusted Contract  
+  - markers: trusted  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/idle_village/trusted/poi_detail_trusted.md` — POI Detail Contract - Trusted Documentation  
+  - markers: trusted  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/idle_village/trusted/poi_standard_trusted.md` — POI Standard Contract  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/idle_village/trusted/roster_drag_trusted.md` — Roster/Drag System Trusted Contract  
+  - markers: trusted  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/idle_village/trusted/time_engine_trusted.md` — TimeEngine - Trusted Contract  
+  - markers: trusted  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/idle_village/trusted/world_presentation_runtime_trusted.md` — World Presentation Runtime Contract  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `src/docs/docs/plans/config_driven_architecture_08_frozen_kit_migration.md` — Implementation Plan 08: Frozen Kit Migration  
+  - markers: frozen  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `context/VERTICAL_SLICE_FROZEN_VERSIONS.md` — Vertical Slice - Frozen Component Versions  
+  - markers: frozen  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `.mw/desiderata.md` — Desiderata  
+  - markers: frozen  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `prompts/ADR001-T8.md` — ADR001-T8 — End-to-end replay test + trusted docs  
+  - markers: trusted, adr  
+  - reason: trusted/frozen/canonical marker or ADR  
+- `prompts/CDA-08-001.md` — CDA-08-001 — Frozen Kit Migration  
+  - markers: frozen  
+  - reason: trusted/frozen/canonical marker or ADR  
+
+## candidate (648)
+- `src/docs/docs/ACTIVITY_ACTION_CARD_MIGRATION.md` — ActivityCapsule Migration Guide  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/ACTIVITY_CAPSULE_TESTING_PLAN.md` — ActivityCapsule Testing Plan  
+  - markers: decision  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/ARCHITECTURE.md` — RPG Balancer - Technical Architecture  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/ARCHITECTURE_BIBLE.md` — RPG Balancer — Architecture & Strategy Bible  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/ARCHITECTURE_REFERENCE.md` — Single Source of Truth - Architecture Reference  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/BALANCING_DEEP_DIVE.md` — 🔬 Balancing Deep Dive: Analysis & Findings  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/BALANCING_SYSTEM.md` — Balancing System Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/CAPSULE_TEST_INTEGRATION.md` — Capsule Test Integration  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/CLASSIFICATION.md` — File Classification  
+  - markers: proposed  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/COMBAT_SYSTEM_DESIGN.md` — Combat System & Encounter Design Specification  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/COMPONENTS.md` — RPG Balancer Components Gallery  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/COMPONENT_SKIN_INTEGRATION_GUIDE.md` — Component Skin Integration Guide  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/DEVELOPMENT_GUIDELINES.md` — RPG Balancer – Development Guidelines  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/DOCUMENTATION_GOVERNANCE.md` — Idle Village Documentation Governance Pack  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/FILENAMES_METADATA.json` — FILENAMES_METADATA  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/FULL_FILE_LIST.json` — FULL_FILE_LIST  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/IMPLEMENTATION_PLANS_INDEX.md` — Implementation Plans Index - RPG Balancer Project  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/IMPLEMENTED_PLAN.md` — IMPLEMENTED PLAN  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/MASTER_PLAN.md` — 🎯 RPG Balancer - MASTER PLAN  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/PROJECT_PHILOSOPHY.md` — RPG Balancer - Project Philosophy & Design System  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/QA/minimal_checklist_howto.md` — Minimal Gameplay QA Checklist – How To  
+  - markers: todo  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/QA/test-route-drag-guidelines.md` — Test Route Drag & Visual QA Mandate  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/QA/theater_kpi.md` — theater_kpi  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/SKIN_BINDING_REGISTRY_GUIDE.md` — Skin Binding Registry Guide  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/SLOTTED_MEDAL_FAILED_STATE_IMPLEMENTATION.md` — SlottedMedal Failed State Implementation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/SLOTTED_MEDAL_IMPLEMENTATION_PLAN.md` — SlottedMedal Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/SOURCE_PRIORITY.md` — Source Priority (candidate)  
+  - markers: candidate  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/SPELL_CREATION_SPEC.md` — Spell Creation UI - Feature Specification  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/SPELL_TYPE_GUIDELINES.md` — Spell Type Extension Guidelines  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/STAT_BALANCING_ANALYSIS.md` — Project-Specific Stat Balancing Analysis  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/STORAGE_TESTING_GUIDE.md` — Storage Testing Framework Guide  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/STRESS_TESTING_CI_REGRESSION_MONITOR.md` — Stress Testing CI Regression Monitor  
+  - markers: historical  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/STS_PERFORMANCE_BENCHMARKS.md` — STS Performance Benchmark Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/VERCEL_DEPLOYMENT_GUIDE.md` — Vercel Deployment Guide – Build Leggera  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/a11y/sts_simulator_accessibility.md` — STS Simulator Accessibility Audit & Remediation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/accessibility/idle_village_drag_accessibility.md` — Idle Village Drag & Drop Accessibility Guide  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/altVisuals/AltVisualGuidelines.md` — Alt Visuals · Pinball Monitor Guidelines  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/analysis/idle_rpg_market_projection.md` — Proiezioni economiche e analisi di mercato  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/analysis/react_electron_performance_guidelines.md` — React + Electron Performance Guidelines (2026)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/analytics/archetype_drift_detector.md` — Archetype Drift Detector Documentation  
+  - markers: historical  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/analytics/balancer_stress_report_generator.md` — Balancer Stress Report Generator  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/analytics/idle_village_activity_loop.md` — Idle Village Activity Loop Bottleneck Analyzer  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/analytics/idle_village_activity_slots.md` — Idle Village Activity Slots Analytics  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/analytics/idle_village_crew_sentiment.md` — Idle Village Crew Sentiment Diff Tracker  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/analytics/idle_village_drop_validation.md` — Idle Village Drop Validation Telemetry  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/analytics/idle_village_fatigue_predictor.md` — Idle Village Fatigue Predictor - Analytics Documentation  
+  - markers: historical  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/analytics/idle_village_quest_feed.md` — Idle Village Quest Feed Analytics  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/analytics/idle_village_session_variance.md` — Idle Village Session Variance Monitor  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/analytics/memory_leak_guard.md` — Analytics Memory Leak Guard Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/analytics/performance_dashboard_guide.md` — Performance Dashboard Guide  
+  - markers: historical  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/analytics/sts_agency_gap_timeline.md` — STS Agency Gap Timeline Analyzer  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/analytics/sts_combat_rhythm.md` — STS Combat Rhythm Heatmap  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/analytics/sts_combo_heatmap.md` — STS Combo Efficiency Heatmap Analytics  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/analytics/sts_data_lake.md` — STS Telemetry Data Lake Connector  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/analytics/sts_intent_accuracy.md` — STS Intent Forecast Accuracy Reporter  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/analytics/sts_mana_variance.md` — STS Mana Variance Analysis  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/analytics/sts_telemetry_drift.md` — STS Telemetry Drift Monitor  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/analytics/telemetry_leak_guard.md` — Telemetry Memory Leak Guard  
+  - markers: historical  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/analytics/webhook_bridge.md` — Punch Club Analytics Webhook Bridge  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/architecture/PersistencePolicy.md` — Persistence Policy  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/architecture/idle_village_complete_architecture.md` — Idle Village - Complete Architecture Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/architecture_state.md` — 🗺️ Project Architecture State Index  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archive/2026-Q1/CODE_AUDIT_REPORT.md` — Code Audit Report - RPG Balancer Project  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archive/2026-Q1/GAME_VISION_IDLE_INCREMENTAL.md` — Idle Incremental RPG – Game Vision  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archive/2026-Q1/SPELL_CREATOR.md` — Spell Creation System Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archive/2026-Q1/WHATS_MISSING.md` — 📋 What's Missing - Quick Summary  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archive/2026-Q1/idle_village_drag_simulation.md` — Idle Village Drag Simulation Fix  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archive/2026-Q1/idle_village_vision.md` — Idle Village Cross-Device & Mobile Vision (2026-01-04)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archive/README.md` — Documentation Archive  
+  - markers: historical  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archmage/Archmage_Fight_Principles.md` — Archmage Fight: Principles (Jan 2026)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archmage/Arcimago_Mana_System_Plan.md` — Arcimago Mana System Plan (v0.1)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archmage/ArtDirection_Wanderlust.md` — Art Direction – Wanderlust DNA  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archmage/CombatMock_Prototype.md` — Arcimago Combat Mock Prototype  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archmage/DocumentationAudit.md` — Documentation Audit  
+  - markers: historical  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archmage/FocusShift_Jan2026.md` — Focus Shift — January 2026  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archmage/GameplayPillars.md` — Gameplay Pillars  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archmage/Glossary.md` — Archmage Glossary  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archmage/LocalizationPlan.md` — Localization Plan  
+  - markers: draft, todo  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/archmage/MTG_Weaknesses_Cascade.md` — MTG Weaknesses & Solutions Research Document  
+  - markers: proposed  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/archmage/MTG_Weaknesses_ChatGPT.md` — MTG_Weaknesses_ChatGPT  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archmage/MTG_Weaknesses_ChatTranscript_2026-01-09.md` — MTG Weaknesses – ChatGPT Discussion (Jan 9, 2026)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archmage/MTG_Weaknesses_ChatTranscript_2026-01-10.md` — MTG Weaknesses – Chat Transcript (10 Jan 2026)  
+  - markers: proposed  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/archmage/MTG_Weaknesses_Claude.md` — MTG_Weaknesses_Claude  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archmage/MTG_Weaknesses_DeepSeek.md` — Magic: The Gathering Systemic Issues – DeepSeek Summary (Jan 2026)  
+  - markers: proposed, historical  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/archmage/MTG_Weaknesses_Grok.md` — MTG_Weaknesses_Grok  
+  - markers: proposed  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/archmage/MTG_Weaknesses_MasterGameplay.md` — MTG Gameplay Weaknesses – Master Findings (Jan 2026)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archmage/MTG_Weaknesses_Research.md` — Magic: The Gathering – Weakness & Variance Research (Jan 2026)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archmage/README.md` — Archmage Documentation Hub  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archmage/TechnicalDirection.md` — Technical Direction  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archmage/Vision.md` — Archmage Vision  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archmage/mana_token_vfx.md` — Mana Token Visual Effects System  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archmage/mental_palace_visualizer.md` — Mental Palace Visualizer Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archmage/spell_lifecycle_exporter.md` — Archmage Spell Lifecycle Exporter  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archmage/spell_lifecycle_incident_monitor.md` — Archmage Spell Lifecycle Incident Monitor  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archmage/spell_lifecycle_telemetry.md` — Archmage Spell Lifecycle Telemetry  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/archmage/spell_lifecycle_telemetry_plan.md` — Spell Lifecycle Telemetry Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/art-direction/creatures/creatures/gnarled-nightmare/versions/v0.1.0.md` — Gnarled Nightmare v0.1.0 — Goblin Concept  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/art-direction/creatures/creatures/gnarled-nightmare/versions/v0.2.0.md` — Gnarled Nightmare v0.2.0 — Parasitic Wooden Organism  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/art-direction/creatures/creatures/gnarled-nightmare/versions/v0.3.0.md` — Gnarled Nightmare v0.3.0 — Family Reference Candidate  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/audio/minimal_audio_alert_scaffold.md` — Minimal Audio Alert Scaffold  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/balancer/formula_safety_storage_test_suite.md` — Formula Safety Storage Test Suite  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/balancer/storage_integrity_evidence_cli.md` — Balancer Storage Integrity Evidence CLI  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/balancer_system_reference.md` — Balancer System Discussion Reference  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/balancing/config_compression.md` — Balancer Config Export Compression  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/balancing/config_snapshot_diff.md` — Config Snapshot Diff Tool Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/balancing/phase_10_5_user_guide.md` — Phase 10.5 Stat Stress Testing User Guide  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/balancing/stat_stress_telemetry_dashboard.md` — Stat Stress Telemetry Dashboard - NP-035  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/balancing/stat_weight_sensitivity.md` — Stat Weight Sensitivity Analysis  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/balancing/stress_heatmap_cli.md` — Stress Testing Heatmap CLI  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/balancing/stress_testing.md` — stress_testing  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/balancing/sts_boss_dynamic_events.md` — STS Boss Dynamic Events Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/balancing/sts_card_recipes.md` — STS Card Recipe Template Library  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/balancing/sts_damage_curve_guard.md` — STS Damage Curve Regression Guard  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/balancing/sts_deck_consistency.md` — STS Deck Consistency Monitor  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/balancing/sts_mana_slot_decay.md` — STS Mana Slot Decay Regression Guard Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/balancing/synergy_heatmap_ui.md` — Synergy Heatmap UI Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/ci/STS_Matrix_Runner_Guide.md` — STS CI Matrix Runner Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/cli/balancer_formula_sharing.md` — Balancer Formula Sharing CLI - NP-037  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/cli/idle_village_phaseE_serializer.md` — Idle Village Phase E Scenario Serializer CLI  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/cli/idle_village_scheduler_export.md` — Idle Village Crew Scheduler Export CLI  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/cli/sts_combat_replay.md` — STS Combat Telemetry Replay CLI  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/cli/sts_scenario_exporter.md` — STS Scenario Exporter CLI Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/combat_system_audit.md` — Audit Sistema di Combattimento 1v1  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coord/kanban-history-export-guide.md` — Kanban History Export & Archive Guide  
+  - markers: historical  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/KS-005_Policy_Refresh.md` — KS-005 Policy Refresh - CI/CD Integration Guide  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/PROMPT_CLEANUP_INSTRUCTIONS.md` — Istruzioni per Cleanup Prompt Bloccati  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/agent_assignments.backup.md` — Prefazione Kanban  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/agent_assignments.md` — Kanban Agent Assignments  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/agent_assignments_new_prompts.md` — Future Kanban Prompts Backlog  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/agent_coordination.md` — Agent Coordination Playbook  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/agent_execution_guidelines.md` — Agent Execution Guidelines  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/blocked_prompts.md` — Prompt Bloccati - In Attesa Dipendenze  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/component_lab_intake_IV-CLP-101.md` — IV-CLP-101 – Night Threat HUD Intake  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/component_lab_intake_IV-CLP-102.md` — IV-CLP-102 – Expedition List Intake  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/component_lab_intake_IV-CLP-105.md` — Idle Village Component Lab – Resource Pinball Monitor Intake  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/component_lab_intake_template.md` — Idle Village Component Lab – Candidate Intake Template  
+  - markers: candidate  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/coordinator/coordinator_conversation_2026-01-04_part1.md` — Coordinator Conversation Log – 2026-01-04 (Part 1)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/coordinator_handoff_2026-07-23.md` — Strategist → Coordinator Handoff 2026-07-23  
+  - markers: adr  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/dependency_graph_export.md` — Coordinator Dependency Graph Visual Exporter  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/file_locks.json` — file_locks  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/idle-village-testhub-audit-prompt.md` — Idle Village TestHub Audit Prompt  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/idle_map_context_refactor.md` — Idle Village Map Context Refactor Proposal  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/idle_village_new_tasks.md` — Idle Village – Nuovi Task Strategici (Feb 2026)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/idle_village_vertical_slice_prompts.md` — Idle Village Vertical Slice Realignment - Prompts Coordinator  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/localization_prompts.md` — Game Localization - Prompts per Coordinator  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/master_prompt_framework.md` — Master Prompt + Child Pipeline Framework  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/minimal_gameplay_prompts.md` — Minimal Gameplay – Prompts per Coordinator  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/minimal_gameplay_vertical_slice_plan.md` — : Minimal Gameplay Vertical Slice Delivery Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/ops_shutdown_implementation_plan.md` — OPS-SHUTDOWN — Coordinator Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/prompt_buffer_drift_reporter.md` — Coordinator Prompt Buffer Drift Reporter  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/prompt_conflict_detector.md` — Prompt Conflict Detector Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/prompt_consistency_cli.md` — Coordinator Prompt Consistency CLI  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/prompt_delivery_log.md` — Prompt Delivery Log  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/prompt_dependency_heatmap.md` — Prompt Dependency Heatmap  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/prompt_quick_buffer.md` — Prompt Quick Buffer  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/prompt_quick_buffer_automation.md` — Prompt Quick Buffer Automation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/prompt_writing_guide.md` — Prompt Writing Guide  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/punch_sts_cleanup_log.md` — Punch Club & STS Cleanup Log  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/safeguard_monitoring.md` — Safeguard Monitoring  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/strategy_tasks.md` — Strategy Task Intake  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/coordinator/time_tracking_guide.md` — Time Tracking System Guide  
+  - markers: historical  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/design/INTERACTION_TOKENS.md` — INTERACTION_TOKENS.md - Mapping Fisica-Narrativa-UI  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/design/game_feel_design_guide.md` — Game Feel & Juice Design Guide  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/design/primitive_composition_rules.md` — Primitive Composition Rules  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/devops/multi_app_boot_guard.md` — Multi-App Dev Boot Guard & Auto-Recovery (NP-161)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/diagnostics/worker_picker.md` — worker_picker  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/exports/sts_card_notebook.md` — STS Card Notebook Export Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/freeze/AUDIT_MINIMALGAMEPLAYPAGE.md` — Audit: `MinimalGameplayPage.tsx` — Mappa "linea → ruolo" per kit basati su reference `/minimal-gameplay`  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/freeze/AUDIT_TESTROSTERPAGE_SUBTREE.md` — Audit: `TestRosterPage.tsx` — Mappa "linea → ruolo" e subtree di contratto  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/freeze/POSTMORTEM_ARCHIVED.md` — Postmortem: `_ARCHIVED_ROSTER_SLOT_INTERACTION/`  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/freeze/WAVE_0_SUMMARY.md` — Wave 0 — Summary & Gate  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/guardian/evidence_archive_rotator.md` — Guardian Evidence Archive Rotator  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/guardian/evidence_indexer.md` — Guardian Evidence Indexer  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/guardian/guardian_autopush_dryrun.md` — Guardian Autopush Dry-Run Analyzer - NP-041  
+  - markers: historical  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/i18n/TOOLING.md` — I18N Tooling Guide  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/i18n/TRANSLATION_QUEUE.md` — Translation Queue  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idleVillage/drop_validation_telemetry_export.md` — NP-067 – Idle Village Drop Validation Telemetry Export  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idleVillage/interaction_mode_copy.md` — Interaction Mode Copy Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md` — Idle Village Component Index  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/activityslot_persistence_resilience.md` — ActivitySlot Persistence Resilience Testing  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/activityslot_telemetry_mirror.md` — NP-102 ActivitySlot Telemetry Mirror Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/builder_tooling.md` — : Idle Village Modifier Builder & Tooling Guidelines  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/card_system_description.md` — Idle Village Card System - Descrizione Completa per AI  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/crew_scheduler_stress.md` — Idle Village Crew Scheduler Stress Harness  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/day_night_poi_spec.md` — DayNightPOI Spec  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/detail_spec.md` — POI Detail Spec  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/drag_diagnostics_cli.md` — Idle Village Drag Diagnostics CLI  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/drop_validation_playwright.md` — Idle Village Drop Validation Playwright Smoke Tests  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/floating_panel_spec.md` — FloatingPanel Spec  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/gameplay_components_inventory.md` — Gameplay Components Inventory  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/gameplay_system_complete.md` — Gameplay System Complete — End-to-End  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/idle_village_gameplay_math_spec.md` — Idle Village Gameplay Math Spec  
+  - markers: todo  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/interaction_core_spec.md` — Interaction Core — Drag Outcome, Flight, Extraction & Bloom — Integration Spec  
+  - markers: historical  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/interaction_mode_accessibility.md` — Interaction Mode Accessibility Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/location_drop_validation.md` — Idle Village Location Drop Validator Helper  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/minimal_activity_log.md` — Minimal Activity Log Panel  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/minimal_hud_tokens.md` — Minimal HUD Tokens  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/minimal_persistence_playbook.md` — Minimal Persistence Playbook  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/minimal_qa_checklist_generator.md` — Minimal Gameplay QA Checklist Generator  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/minimal_risk_heatmap.md` — Minimal Gameplay Risk Heatmap Export  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/minimal_risk_heatmap_export.md` — Minimal Gameplay Risk Heatmap Export  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/minimal_snapshot_schema.md` — Minimal Snapshot Schema  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/poi_cooldown_spec.md` — POI Cooldown / Expiration Spec  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/poi_detail_interaction_spec.md` — POI ↔ Detail Interaction  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/poi_family_spec.md` — POI Family Spec  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/poi_job_spec.md` — POI Job Spec  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/poi_maintenance_spec.md` — POI Maintenance Spec  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/poi_quest_detail_roster_time_clock_error_registry.md` — Registro errori — `/poi-quest-detail-roster-time-clock`  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/poi_quest_detail_roster_time_clock_page_workflow.md` — Pagina `/poi-quest-detail-roster-time-clock` — Workflow completo  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/poi_quest_interaction_spec.md` — POI ↔ Quest Interaction  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/poi_spec.md` — POI Spec  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/poi_training_spec.md` — POI Training Spec  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/quest_failure_and_recovery_spec.md` — Quest Failure, Timeout and Recovery Spec  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/quest_spec.md` — Quest Spec  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/roster_bundle_usage.md` — Roster Bundle Usage Guide  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/roster_slot_integration_spec.md` — Roster + PgCard + Slot + SlotRack — Integration Spec  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/roster_slot_interaction_documentation.md` — Roster/Slot Interaction Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/roster_slot_rack_interaction_spec.md` — Roster ↔ SlotRack Interaction  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/roster_spec.md` — Roster Spec  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/skill_check_workflow_spec.md` — Skill Check / Spell Resolution Workflow Spec  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/slot_rack_poi_interaction_spec.md` — SlotRack ↔ POI Interaction  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/slot_rack_spec.md` — SlotRack Spec  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/test_hub_pages.md` — Idle Village Test Hub — Catalogo Pagine  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/theater_overlay_accessibility.md` — Theater Overlay Accessibility Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/idle_village/time_engine_day_night_poi_interaction_spec.md` — TimeEngine ↔ DayNightPOI Interaction  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/time_engine_quest_interaction_spec.md` — TimeEngine ↔ Quest Interaction  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/time_engine_roster_interaction_spec.md` — TimeEngine ↔ Roster Interaction  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/time_engine_spec.md` — TimeEngine Spec  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/idle_village/village_event_system_spec.md` — Village Event System Spec  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/internal/SHARE_UPDATE_STATE.md` — SHARE_UPDATE_STATE  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/internal/ai_sprite_workflow.md` — AI Sprite Workflow (Idle Tactical Prototype)  
+  - markers: todo  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/internal/animation_schema_spec.md` — Animation Schema Specification  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/internal/phase10_ops_status_2025-12-17.md` — Phase 10 Operations Status — 2025-12-17  
+  - markers: todo  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/internal/tactical_sprite_animation_brief.md` — Tactical Sprite Animation System Brief  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/localization/TRANSLATION_GUIDE.md` — Translation Guide  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/logs/2026-01-08_archmage_discussion.md` — 2026-01-08_archmage_discussion  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/logs/2026-01-08_archmage_discussion_numbered.md` — 2026-01-08_archmage_discussion_numbered  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/mobile/PunchClubLoop.md` — Punch Club Gameplay Loop Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/mobile/sts_gesture_recorder_guide.md` — STS Mobile Gesture Recorder Guide  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/monitoring/balancer_undo_redo_monitor.md` — Balancer Undo/Redo Persistence Monitor  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/monitoring/task_intake_validation.md` — Task Intake Validation Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/moodboards/combat_viewer_visual/README.md` — Combat Viewer Visual Moodboard – Direttiva “Il Drago”  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/operations/guardian_autopush_mandate.md` — Guardian AutoPush Mandate  
+  - markers: historical  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/operations/guardian_deployment_health_guide.md` — 🛡️ Guardian Deployment Health Guide  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/operations/vercel_deploy_troubleshooting.md` — 🔧 Vercel Deployment Troubleshooting Guide  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/ops/minimal_evidence_pipeline.md` — Minimal Evidence Pipeline  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/outputs/2026-01-08_archmage_notes.md` — 2026-01-08_archmage_notes  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/physics_lab/asset_pipeline.md` — Physics Lab Asset Pipeline Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/1v1_combat_viewer_plan.md` — 1v1 Combat Viewer – Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/1v1_tasks.md` — 1v1 Combat System Polish - Task Checklist  
+  - markers: todo  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/ai_mockup_workflow.md` — AI Mockup → Component/Asset Protocol  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/alt_visuals_v6_rigged_throw_plan.md` — Alt Visuals V6 – Rigged Throw Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/alt_visuals_v8_plan.md` — Alt Visuals v8 – "Obsidian Meridian" (Removed)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/archetype_balancing_plan.md` — Archetype-Based Balancing System - Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/archetype_tasks.md` — Archetype Balancing System - Task Checklist  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/art_direction_plan.md` — DNA PRISMATIC WANDERLUST – BIBBIA DI DIREZIONE ARTISTICA (v0.10)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/atomic_evolution_plan.md` — Project Architecture Refactoring - Modern Best Practices 2024  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/atomic_evolution_tasks.md` — Apply Glassmorphic Design to Other Sections  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/balancer_ui_fix_tasks.md` — 🔧 Tasks: Balancer UI Fixes  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/balancing_spell_weapon_armor_plan.md` — Balancing & Spell/Weapon/Armor System – Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/ci-regression-monitor-plan.md` — ST-Phase10_5-ci-regression-monitor – CI Pipeline Regression Monitor  
+  - markers: historical  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/combat_animator_implementation.md` — Combat Animator Implementation Plan  
+  - markers: todo  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/combat_expansion_plan.md` — Combat System Expansion - Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/combat_simulation_plan.md` — Combat Simulation Testing System - Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/combat_simulation_tasks.md` — Combat Simulation Testing System - Tasks  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/combat_viewer_visual_mock_plan.md` — Combat Viewer Visual Mock Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/component_based_world_surface_plan.md` — Component-Based World Surface with Semantic Grouping — Implementation Plan  
+  - markers: proposed  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/plans/component_freezing_certification_plan.md` — Component Freezing & Certification Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/component_freezing_certification_plan_v2.md` — Component Freezing & Certification Plan — v2 (Optimized)  
+  - markers: proposed  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/plans/config_driven_architecture_00_architecture_foundation.md` — Implementation Plan 00: Architecture Foundation & Documentation  
+  - markers: adr  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/config_driven_architecture_01_component_runtime.md` — Implementation Plan 01: Component Runtime  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/config_driven_architecture_02_rendering_primitives.md` — Implementation Plan 02: Rendering Primitive System  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/config_driven_architecture_03_material_engine.md` — Implementation Plan 03: Material Engine  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/config_driven_architecture_04_physics_system.md` — Implementation Plan 04: Physics System  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/config_driven_architecture_05_seed_system.md` — Implementation Plan 05: Seed / Procedural Variation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/config_driven_architecture_06_village_evolution.md` — Implementation Plan 06: Village Evolution System  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/config_driven_architecture_07_poi_world_map.md` — Implementation Plan 07: POI World Map System  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/config_driven_architecture_09_modding_layer.md` — Implementation Plan 09: Modding Layer  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/config_driven_architecture_10_ai_production_pipeline.md` — Implementation Plan 10: AI Production Pipeline  
+  - markers: adr  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/config_driven_architecture_plan.md` — Config Driven Component-Based Game Architecture  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/config_driven_balancer_plan.md` — Config-Driven Balancer - Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/config_driven_balancer_tasks.md` — Config-Driven Balancer - Tasks  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/destiny_astrolabe_v3_implementation_plan.md` — Destiny Astrolabe V3 — Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/game_localization_implementation_plan.md` — Game Localization Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/harness_automation_plan.md` — Executor Harness Automation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/hybrid_monolith_strategy_plan.md` — Hybrid Monolith Implementation Plan  
+  - markers: todo  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/idle_village_action_cards.md` — Idle Village – ActionCard Architecture V2  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/idle_village_art_style_plan.md` — Idle Incremental RPG – Art Style & Visual Direction  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/idle_village_crew_alert_rules.md` — Crew Scheduler Alert Rules - NP-031  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/idle_village_drag_drop_e2e_plan.md` — Village Sandbox Drag & Drop E2E Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/idle_village_ftue_plan.md` — Idle Incremental RPG – FTUE & First 60 Minutes Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/idle_village_hero_components_placeholder_plan.md` — Idle Village — Hero Components Placeholder Plan (Umbrella)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/idle_village_map_plan.md` — Idle Village Map Plan - Maintenance Advisor (IV-Phase12-maintenance-ai)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/idle_village_modifiers_plan.md` — : Idle Village Gameplay Modifier Registry  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/idle_village_phase12_task_breakdown.md` — Phase 12: Idle Incremental RPG - Task Breakdown  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/idle_village_phase_e.md` — Idle Village Phase E: Resident Drag Drop Validation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/idle_village_plan.md` — Phase 12: Idle Incremental RPG – Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/idle_village_progression_system_plan.md` — Idle Village Progression System – Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/idle_village_resident_slot_plan.md` — Idle Village Resident Slot Expansion – Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/idle_village_scenario_planner_phase_e.md` — NP-040: Idle Village Scenario Task Planner Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/idle_village_tasks.md` — Phase 12: Idle Incremental RPG – Task Checklist  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/idle_village_trial_of_fire_plan.md` — 🛡️ Master Plan: Village Sandbox (Idle Village legacy) – Trial of Fire & Theater View  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/idle_village_workstreams.md` — Idle Village Workstreams  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/item_creator_plan.md` — Item Creator Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/ks-080-sts-like-simulator.md` — KS-080: STSLikeSimulator - Text-Only STS Numeric Simulator  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/ks-081-sts-mobile-shortcuts-design.md` — KS-081-sts-mobile-shortcuts: Mobile Gesture & Shortcut Layer Design  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/lore_drop_prototype_plan.md` — Mini Piano: Prototipo Lore Drop in Idle Village  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/lore_system_plan.md` — Lore System Plan (WL-LORE-001)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/materic_roster_vertical_slice_plan.md` — Materic Roster Vertical Slice — Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/minimal_gameplay_implementation_plan.md` — Minimal Gameplay Implementation Plan – Super Prioritario  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/minimal_gameplay_phase_guard_plan.md` — Minimal Gameplay Phase Guard Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/overnight_safety_runner_plan.md` — Overnight Safety Runner — Strategist Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/physical_e2e_testing_plan.md` — Physical E2E Testing System – Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/poi_quest_system_exploration.md` — POI Quest System — esplorazione  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/plans/poi_quest_system_plan.md` — POI Quest System — Piano implementativo  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/quest_engine_reconciliation_plan.md` — Implementation Plan — Quest Engine Reconciliation (ADR-001)  
+  - markers: adr  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/quest_role_assignment_rework_strategy.md` — Strategia: Quest Assignment "a ruoli" — `/poi-quest-detail-roster-integration`  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/rendering_system_implementation_plan.md` — Rendering System Implementation Plan  
+  - markers: proposed  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/plans/roster_slot_poi_integration.md` — Roster Slot POI Integration Specification  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/runtime_component_alignment_plan.md` — Runtime Component Alignment Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/scenario_ui_plan.md` — Scenario Configuration UI - Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/scenario_ui_tasks.md` — Scenario Configuration UI - Task Checklist  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/skill_check_preview_lab_plan.md` — Skill Check Preview Lab Refactor – Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/skill_check_preview_lab_tasks.md` — Skill Check Preview Lab Refactor – Task List  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/skill_check_web_v1_critfail_beat_spec.md` — SPEC — Beat del Fallimento Critico (5%), Skill Check Web V1  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/skin_rendering_fix_plan.md` — Skin Rendering Fix — Diagnosi e Piano di Implementazione  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/slot_integration_plan.md` — Slot Rack Vertical Slice – Integration Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/spell_creation_system_plan.md` — Spell Creation System – Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/spell_creator_new_plan.md` — Spell Creator New - Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/spell_trigger_conditional_plan.md` — Spell Trigger & Conditional System – Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/stat_stress_testing_plan.md` — Stat Stress Testing & Efficiency Analysis Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/stat_stress_testing_tasks.md` — Stat Stress Testing - Task Checklist  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/stress-pipeline-latency-profiler-plan.md` — ST-Phase10_5-latency-profiler – Stress Pipeline Latency Profiler  
+  - markers: historical  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/stress_testing_api_implementation.md` — KS-105-synergy-api - REST-like Export for Synergy Heatmap  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/sts_buff_library_unification.md` — STS Buff Library Unification Guide  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/sts_lcg_analytics_plan.md` — STS LCG Analytics Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/sts_proto_min_plan.md` — KS-082 – STS Proto Resonance Loop Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/sts_simulator_ui_redesign_plan.md` — STS Simulator UI Redesign Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/systems_governance_alignment_plan.md` — Systems Governance Alignment Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/tactical_missions_plan.md` — Phase 11: Tactical Engagement Missions - Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/testing_infrastructure_tasks.md` — Testing Infrastructure - Task Checklist  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/trailer_threat_iter_plan_v3.md` — TrailerThreatIter Plan v3 — World Presence Teaser  
+  - markers: historical  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/trailer_threat_iter_rework_plan.md` — TrailerThreatIter V2 — Visual Rework Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/trailer_v9_skin_alignment_plan.md` — Trailer V9 Skin Alignment Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/trailer_vertical_slice_plan.md` — Idle Village — Steam Teaser Vertical Slice Implementation Plan v2  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/trailer_vertical_slice_tasks.md` — Idle Village — Trailer Vertical Slice Tasks  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/turns_currency_balancer_plan.md` — Turns Currency Balancer Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/ui_game_dev_system_prompt.md` — System Prompt per Windsurf (UI Game Dev) — 2026 Edition  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/verb_detail_component_plan.md` — Verb Detail Component – Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/vertical_slice_implementation_plan.md` — Vertical Slice Implementation Plan — Incremental Testing & Documentation Strategy  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/vertical_slice_pacifista.md` — Vertical Slice "Pacifista" – Gameplay & Economy Spec  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/village_sandbox_activitycard_refactor_plan.md` — Village Sandbox ActivityCard Refactor – Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/village_sandbox_refactor_plan.md` — Village Sandbox Refactor & Playwright Stabilization Plan (WS6)  
+  - markers: todo  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/wanderlust_balancer_skin_rollout.md` — Wanderlust Balancer Skin Rollout Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/wanderlust_triumph_steam_concept_slice_plan.md` — Wanderlust Triumph — Steam Concept Slice (55s Gameplay Teaser)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/world_life_teaser_asset_spec.md` — World Life Pass — cosa generare adesso  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/plans/world_presence_grammar_plan.md` — WANDERLUST WORLD PRESENCE GRAMMAR — DOCUMENTO 0 (v0.2)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/world_presentation_runtime_implementation_plan.md` — World Presentation Runtime — Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/world_presentation_runtime_rfc.md` — World Presentation Runtime — RFC v1.4  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/world_surface_hd_asset_migration_plan.md` — World Surface HD Asset Migration & Runtime Hardening Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/world_surface_reactive_artifact_plan.md` — World Surface — Piano del manufatto reattivo  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/plans/world_surface_runtime_implementation_plan.md` — World Surface Runtime — Implementation Plan  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/world_surface_v3_consumer_audit_ARCHIVED.md` — World Surface V3 — Consumer Audit  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/world_surface_v3_critique_and_counterplan.md` — Critica al piano tattico World Surface V3, e contro-proposta  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/plans/world_surface_v3_domain_model_decision.md` — World Surface V3 — Central Contract Decision  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/plans/world_surface_v3_strategic_plan.md` — World Surface V3: Hierarchical Perception System  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/world_surface_v3_subplan_A1_consumer_audit.md` — Sub-plan A.1 — Consumer audit (v2)  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/plans/world_surface_v3_subplan_A2_contract_validation.md` — Sub-plan A.2 — Fragments, schemas, validation e normalizzazione (v2)  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/plans/world_surface_v3_subplan_A3_registry_migration.md` — Sub-plan A.3 — Registry e migrazione consumer (v2)  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/plans/world_surface_v3_subplan_A_root_config.md` — Sub-plan A — Contratto centrale (Root Config) v2  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/plans/world_surface_v3_subplan_B_worldclock_adapter.md` — Sub-plan B — WorldClock / TimeEngine adapter (v2)  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/plans/world_surface_v3_subplan_C_effect_admission.md` — Sub-plan C — EffectAdmissionController  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/plans/world_surface_v3_subplan_D_attention_zone.md` — Sub-plan D — AttentionZone Resolver  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/plans/world_surface_v3_subplan_E_event_severity.md` — Sub-plan E — EventSeverity + Event FSM  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/plans/world_surface_v3_subplan_F_wonder_spawner.md` — Sub-plan F — Wonder Spawner + Object Pool  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/plans/world_surface_v3_subplan_G_breath_parallax_underwater.md` — Sub-plan G — Breath, Parallax e Underwater V3  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/plans/world_surface_v3_subplan_H_demo_integration.md` — Sub-plan H — Demo verticale /world-surface-v3  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/plans/world_surface_v3_subplan_I_docs_kanban.md` — Sub-plan I — Freeze, Kanban e aggiornamento documentazione  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/plans/world_surface_v3_subplans_index.md` — World Surface V3 — Sub-plans Index  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/plans/world_surface_v3_tactical_plan.md` — World Surface V3 — Piano tattico per budget, trigger e tier eventi  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `src/docs/docs/plans/ws3-theater-controller-crew-scheduler.md` — WS3: Theater Controller & Crew Scheduler Implementation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/plans/ws6-3-useSandboxInteractionMode-spec.md` — WS6.3 useSandboxInteractionMode Specification  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/playtest/live_bug_snapshotter.md` — Live Bug Snapshotter (NP-258)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/playtest/mobile_playtest_logger.md` — Mobile Playtest Logger  
+  - markers: historical  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/playtest/mobile_stress_harness.md` — Mobile Playtest Stress Harness  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/playtest/playtest_annotation_assistant.md` — Playtest Annotation Assistant  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/prompts/AUDITOR.md` — Prompt: The Code Auditor ("The Sentinel")  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/prompts/prompt_library.md` — MASTER PROMPT: config-balancer-refactor  
+  - markers: historical  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/prompts/sprite_templates.md` — Sprite Prompt Templates (AI Workflow)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/pwa/asset_prefetch.md` — Punch Club Mobile Asset Prefetch Planner  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/pwa/crash_watchdog.md` — Punch Club PWA Crash Loop Auto-Recover  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/pwa/install_benchmark_reporter.md` — NP-261 · PWA Install Benchmark Reporter  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/pwa/offline_bundle_optimizer.md` — Punch Club Offline Bundle Optimizer  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/pwa/offline_patch_package_builder.md` — Punch Club Offline Patch Package Builder  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/pwa/push_audit_playbook.md` — Push Notification Readiness Audit Playbook  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/pwa/push_diagnostic_overlay.md` — Push Diagnostic Overlay (NP-277)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/reports/StressTestingReportTemplate.md` — Stress Testing Report Template  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/reports/np-011-quest-risk-badges-2026-01-13.md` — NP-011 – Idle Village Quest Feed Risk Badges – Documentation  
+  - markers: historical  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/reports/np-013-crew-scheduler-determinism-guard-2026-01-13.md` — NP-013 – Idle Village Crew Scheduler Determinism Guard – Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/reports/np-014-drag-drop-stress-test-suite-2026-01-13.md` — NP-014 – Idle Village Resident Drag & Drop Stress Test Suite – Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/reports/np-016-activity-slot-telemetry-mapper-2026-01-13.md` — NP-016 – Idle Village Activity Slot Telemetry Mapper – Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/reports/np-018-crew-scheduler-cli-export-2026-01-13.md` — NP-018 – Idle Village Crew Scheduler CLI Export – Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/reports/np-019-fatigue-predictor-2026-01-13.md` — NP-019 – Idle Village Resident Fatigue Predictor  
+  - markers: historical  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/reports/np-021-quest-reward-balancer-2026-01-13.md` — NP-021 – Idle Village Quest Reward Balancer  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/reports/safe-audit-2025-12-24.md` — SAFE Cleanup Audit — 24 Dec 2025  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/reports/sts-accessibility-audit-2026-01-13.md` — NP-009 – STS Accessibility High-Contrast Sweep Report  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/reports/village_base_production_system_implementation_2026-01-15.md` — Village Base Production System – Implementation Report  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/reports/weekly_review_template.md` — 🛡️ Weekly Code Health Check  
+  - markers: todo  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/specs/village_sandbox_perf.md` — Village Sandbox Performance Analysis & Optimization Report  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/storybook_accessibility_guide.md` — Storybook & Accessibility Testing Guide  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/storybook_deployment_guide.md` — Storybook Deployment Guide  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/strategies/MINIMAL_GAMEPLAY_STRATEGY.md` — Strategy: Minimal Gameplay Vertical Slice (The "Turbo" Workflow)  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/strategy/Archmage: trascend the trascendence.md` — Archmage: trascend the trascendence  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/strategy/archmage_monetization_strategy.md` — Archmage Monetization Strategy  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/strategy/go_to_market_steam_first.md` — Go-To-Market "Steam First"  
+  - markers: todo  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/sts/NumericSimulatorMetrics.md` — STS Numeric Simulator Metrics Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/sts/STS_Macro_Workbench.md` — STS Macro Search Engine - Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/sts/deck_archetype_classifier.md` — STS Deck Archetype Classifier  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/sts/deck_visual_consistency.md` — STS Deck Visual Consistency Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/sts/numeric_simulator_export.md` — STS Numeric Simulator Telemetry Export CLI  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/sts/telemetry_dashboard_accessibility.md` — STS Telemetry Dashboard Accessibility Audit  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/telemetry/phase10_router.md` — Phase 10 Telemetry Router Documentation - NP-057  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/testing/persistence_chaos_monkey.md` — Persistence Chaos Monkey Guide  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/testing/playwright_coverage_reporter.md` — Playwright Test Coverage Reporter – NP-123  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/tests/GT-3-mobile-playtest-checklist.md` — GT-3 Mobile Playtest Checklist: Punch Club  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/tests/PLAYWRIGHT_GUIDE.md` — Playwright Guide – Idle Village / Punch Club Lab Testing  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/tests/README.md` — Playwright Hooks & Helpers  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/tests/STS_QA_CHECKLIST.md` — STS QA Checklist  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/tests/idle_village_drag_stress.md` — Idle Village Drag Stress Testing Guide  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/tools/idle_risk_calibration.md` — Idle Village Risk Calibration Tool  
+  - markers: historical  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/tools/sts_combatant_preset_lint.md` — STS Combatant Preset Linter  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/tools/sts_seed_diff.md` — STS Seed Diff Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/tutorial/tutorial_skip_system.md` — Tutorial Skip System  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/ui_regressions/stat_profile_radar.md` — Stat Profile Radar Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/ui_regressions/stress_test_dashboard.md` — Stress Test Dashboard – UI Regression Notes  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/v8_skin_sandbox_guide.md` — V8 Skin Sandbox - Complete Guide  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/visual/sts_intent_overlay_baseline.md` — STS Intent Overlay Visual Baseline Documentation  
+  - reason: documentation, pending canonical review  
+- `src/docs/docs/visual_design_philosophy.md` — Visual Design Philosophy - Blizzard-Style Layered Components  
+  - reason: documentation, pending canonical review  
+- `context/APPROACH_CONSTRUCTIVE_CRITIQUE.md` — Constructive Critique: "One Page Per Entity + One Page Per Interaction Pair" Approach  
+  - markers: proposed  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-004-poi-quest-ui-regressions.md` — : Piano ridotto — POI Quest UI regressions ERR-028 e ERR-030  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-005-poi-family-ai-friendly.md` — PLAN-005 — POI Family AI-friendly docs and regression test suite  
+  - markers: todo  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-005-poi-family-tasks.md` — PLAN-005 — Task Checklist  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-006-docs-and-code-alignment.md` — PLAN-006 — Align docs, code, and old minimal_slice docs  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-007-observatory-primitives.md` — Goal  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-008-resolution-chain.md` — Goal  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-009-la-stella-copre-la-trama.md` — PLAN-009 — La stella copre la trama  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-010-astrolabe-v63.md` — PLAN-010 — Astrolabe V6.3  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-MOCKUP-TO-COMPONENT-v1.md` — PLAN-MOCKUP-TO-COMPONENT v1 — Da richiesta a mockup a componente React ottimizzato  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-MOCKUP-TO-COMPONENT-v2.md` — PLAN-MOCKUP-TO-COMPONENT v2 — Da richiesta (o mockup esterno) a componente React  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `plans/PLAN-MOCKUP-TO-COMPONENT-v3.md` — PLAN-MOCKUP-TO-COMPONENT v3 — Da richiesta (o mockup esterno) a componente React  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/bugs/2026-08-27-goblin-sticker/bug.md` — Goblin sticker behaviour lost in WorldSurfaceEventCard  
+  - markers: proposed  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/d100-pinball/design-intent.md` — D100 Pinball — Design Intent  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/d100-pinball/identity.md` — D100 Pinball — Asset Identity  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/d100-pinball/prompt.md` — prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/destiny-astrolabe/asset-identity.md` — Destiny Astrolabe — Asset Identity  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/destiny-astrolabe/authority.md` — Destiny Astrolabe — Authority Resolution  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/destiny-astrolabe/design-intent.md` — Destiny Astrolabe — Design Intent  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/destiny-astrolabe/identity.md` — Destiny Astrolabe — Asset Identity  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/destiny-astrolabe/prompt.md` — Destiny Astrolabe — Generation Prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/destiny-astrolabe/provenance.md` — Destiny Astrolabe — Mockup Provenance  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-event-modal/MOCKUP.md` — Goblin Invasion Mockup Reference  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-event-modal/asset-acceptance-report.md` — Asset Acceptance Report — Goblin Event Modal  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-event-modal/assets/V002-hero/design-intent.md` — Design Intent — V002 Hero  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-event-modal/assets/V002-hero/identity.md` — Identity Card — V002 Hero  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-event-modal/assets/V002-hero/prompt.md` — Image Prompt — V002 Hero  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-event-modal/assets/V002-hero/provenance.md` — Provenance — V002 Hero  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-event-modal/assets/V002-hero/reference-card.md` — Reference Card — V002 Hero  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-event-modal/authority.md` — Authority Resolution — Goblin Event Modal  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-event-modal/implementation-map.md` — Implementation Map — Goblin Event Modal  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-event-modal/landmarks.json` — landmarks  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-event-modal/reconstruction-spec.md` — Reconstruction Spec — Goblin Event Modal  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-event-modal/tokens.md` — Token Contract — Goblin Event Modal  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-event-modal/visual-inventory.json` — visual-inventory  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-event-modal/visual-inventory.md` — Visual Inventory — Goblin Event Modal  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-event-modal-v17/MOCKUP.md` — Goblin Invasion Mockup Reference  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-event-modal-v17/assets/totem/provenance.md` — Totem Asset Provenance  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-event-modal-v17/authority.md` — Authority Resolution — GoblinEventModalV17  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-event-modal-v17/implementation-map.md` — Implementation Map — GoblinEventModalV17  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-event-modal-v17/landmarks.json` — landmarks  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-event-modal-v17/reconstruction-spec.md` — Reconstruction Spec — GoblinEventModalV17  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-event-modal-v17/reference.json` — reference  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-event-modal-v17/tokens.md` — Design Tokens — Goblin Invasion Card  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-event-modal-v17/visual-inventory.md` — Visual Inventory — GoblinEventModalV17  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-invasion-totem/decomposition.md` — Goblin Invasion Event Card — Visual Decomposition  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-invasion-totem/design-intent.md` — Goblin Invasion Totem — Design Intent  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-invasion-totem/identity.md` — Goblin Invasion Totem — Asset Identity Card  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-invasion-totem/prompt.md` — Goblin Invasion Totem — Image Prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-invasion-totem/tokens.md` — Goblin Invasion Event Card — Design Tokens (v1)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-totem-hero/design-intent.md` — Goblin Totem Hero — Design Intent  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-totem-hero/identity.md` — Goblin Totem Hero — Identity  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-totem-hero/prompt.md` — Goblin Totem Hero — Image Prompt  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-window-frame-2026-08-27/authority.md` — Authority — Goblin Invasion Window Frame  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-window-frame-2026-08-27/implementation-map.md` — Implementation Map  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-window-frame-2026-08-27/reconstruction-spec.md` — Reconstruction Spec — Frame Upgrade  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/goblin-window-frame-2026-08-27/visual-inventory.md` — Visual Inventory — Goblin Invasion Window Frame  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/poi-quest-icons/design-intent.md` — Design Intent — POI Quest Icon Set  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/poi-quest-icons/identity.md` — Identity — POI Quest Icon Set  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/poi-quest-icons/prompt.md` — POI Quest Icon Prompts  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/poi-quest-icons/provenance.md` — Provenance — POI Quest Icon Set  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/specs/skill-check-web-v1/critfail-beat-spec.md` — SPEC — Beat del Fallimento Critico (5%), Skill Check Web V1  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/templates/mockup-asset-spec/design-intent.md` — <Asset Name> — Design Intent  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `.mw/templates/mockup-asset-spec/identity.md` — <Asset Name> — Asset Identity Card  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/ADR001-T1.md` — ADR001-T1 — Canonical quest event schema (E1) + RngService  
+  - markers: canonical, adr  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/ADR001-T1.spec.json` — ADR001-T1.spec  
+  - markers: adr  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/ADR001-T2.md` — ADR001-T2 — Build deterministic resolution engine (E2)  
+  - markers: adr  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/ADR001-T2.spec.json` — ADR001-T2.spec  
+  - markers: adr  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/ADR001-T3.md` — ADR001-T3 — Migrate ActivityDefinition → C2 config schema  
+  - markers: adr  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/ADR001-T3.spec.json` — ADR001-T3.spec  
+  - markers: adr  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/ADR001-T4.md` — ADR001-T4 — Purge Math.random() from quest engine  
+  - markers: adr  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/ADR001-T4.spec.json` — ADR001-T4.spec  
+  - markers: adr  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/ADR001-T5.spec.json` — ADR001-T5.spec  
+  - markers: adr  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/ADR001-T6.md` — ADR001-T6 — Quest telemetry + outcome parity tests  
+  - markers: adr  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/ADR001-T6.spec.json` — ADR001-T6.spec  
+  - markers: adr  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/ADR001-T7.md` — ADR001-T7 — Deprecate C1 quest runtime + migration guide  
+  - markers: adr  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/ADR001-T7.spec.json` — ADR001-T7.spec  
+  - markers: adr  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/ADR001-T8.spec.json` — ADR001-T8.spec  
+  - markers: adr  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/ART-DIR-CREATURE-001.md` — ART-DIR-CREATURE-001 — Create canonical creature example (Gnarled Nightmare)  
+  - markers: canonical  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/ART-DIR-UPDATE-001.md` — ART-DIR-UPDATE-001  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/ASTRO-V3-F0.spec.json` — ASTRO-V3-F0.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/ASTRO-V3-F1.spec.json` — ASTRO-V3-F1.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/ASTRO-V3-F2.spec.json` — ASTRO-V3-F2.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/ASTRO-V3-F3.spec.json` — ASTRO-V3-F3.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/ASTRO-V3-F4.spec.json` — ASTRO-V3-F4.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/CDA-00-001.md` — CDA-00-001  
+  - markers: adr, todo  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/CDA-00-002.md` — CDA-00-002 — Component-based world surface runtime  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/CDA-00-003.md` — CDA-00-003 — UI hooks (world surface editor)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/CDA-00-004.md` — CDA-00-004 — Telemetry + end-to-end tests  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/CDA-00-005.md` — CDA-00-005 — World surface controller integration  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/CDA-00-006.md` — CDA-00-006 — Performance optimization + profiling  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/CDA-00-007.md` — CDA-00-007 — Documentation + examples  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/CDA-01-001.md` — CDA-01-001 — Component Runtime (registry/factory/resolver/validation)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/CDA-02-001.md` — CDA-02-001 — Rendering Primitive System  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/CDA-03-001.md` — CDA-03-001 — Material Engine (complexity/layers/binding)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/CDA-04-001.md` — CDA-04-001 — Physics System (profiles + unified hook)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/CDA-05-001.md` — CDA-05-001 — Seed / Procedural Variation  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/CDA-06-001.md` — CDA-06-001 — Village Evolution System  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/CDA-07-001.md` — CDA-07-001 — POI World Map System  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/CDA-09-001.md` — CDA-09-001 — Modding Layer  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/CDA-10-001.md` — CDA-10-001 — AI Production Pipeline  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/CR-004-FOLLOWUP.md` — CR-004-FOLLOWUP - Re-adopt Canonical Village Resident Store in /minimal-gameplay  
+  - markers: canonical  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/CR-005.spec.json` — CR-005.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/DOC-MG-ROSTER-RECONCILIATION-008.spec.json` — DOC-MG-ROSTER-RECONCILIATION-008.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/GM-ENG.md` — GM-ENG  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/GM-MP.md` — GM-MP  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/GM-REG.spec.json` — GM-REG.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/GOBLIN-V17-NEXT-ITERATION.md` — GOBLIN-V17-NEXT-ITERATION  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/GOV-001.md` — GOV-001  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/GOV-001.spec.json` — GOV-001.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/GOV-002.md` — GOV-002  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/GOV-002.spec.json` — GOV-002.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/GOV-003.md` — GOV-003  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/GOV-003.spec.json` — GOV-003.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/GOV-004.md` — GOV-004  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/GOV-004.spec.json` — GOV-004.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/GOV-005.md` — GOV-005  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/GOV-005.spec.json` — GOV-005.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/GOV-006.md` — GOV-006  
+  - markers: draft  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/GOV-006.spec.json` — GOV-006.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/GOV-007.md` — GOV-007  
+  - markers: todo  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/GOV-007.spec.json` — GOV-007.spec  
+  - markers: todo  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/GOV-008.md` — GOV-008  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/GOV-008.spec.json` — GOV-008.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/IV-POI-VISUAL-001.spec.json` — IV-POI-VISUAL-001.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/IV-PROG-P1.md` — IV-PROG-P1  
+  - markers: todo  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/IV-PROG-P2.md` — IV-PROG-P2 — Reward and risk scaling  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/IV-PROG-P3.md` — IV-PROG-P3 — Effective power calculator  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/IV-PROG-P4.md` — IV-PROG-P4 — Production scaling integration  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/IV-PROG-P5.md` — IV-PROG-P5 — Telemetry + UI integration  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/IV-PROG-P6.md` — IV-PROG-P6 — End-to-end tests + plan update  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/IV-SLOT-RACK-RESKIN-001.spec.json` — IV-SLOT-RACK-RESKIN-001.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/IV-TF-001.md` — IV-TF-001  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/IV-TF-002.md` — IV-TF-002 — Tick engine fatigue application  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/IV-TF-003.md` — IV-TF-003 — Resident fatigue state + recovery  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/IV-TF-004.md` — IV-TF-004 — UI hooks (fatigue badges, rest actions)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/IV-TF-005.md` — IV-TF-005 — Modifier integration + tests  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/IV-WORLD-SURFACE-002.spec.json` — IV-WORLD-SURFACE-002.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/IV-WORLD-SURFACE-HD-001.md` — IV-WORLD-SURFACE-HD-001 — World Surface HD Layer Migration + Drag-and-Drop Reorder  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/IV-WORLD-SURFACE-HD-002.md` — IV-WORLD-SURFACE-HD-002 — World Surface HD Asset Migration & Runtime Hardening  
+  - markers: proposed  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/IV-WSC-P1.md` — IV-WSC-P1  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/IV-WSC-P2.md` — IV-WSC-P2 — Surface state management + persistence  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/IV-WSC-P3.md` — IV-WSC-P3 — UI hooks (surface viewer)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/IV-WSC-P4.md` — IV-WSC-P4 — Telemetry + end-to-end tests  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/IV-WSV3-P5.md` — IV-WSV3-P5  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/IV-WSV3-P6.md` — IV-WSV3-P6 — Underwater biome (caustic, luminescence)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/IV-WSV3-P7.md` — IV-WSV3-P7 — UI integration + telemetry  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/IV-WSV3-P8.md` — IV-WSV3-P8 — End-to-end tests + plan update  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/MG-03.spec.json` — MG-03.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/MG-FIGHT-001.md` — MG-FIGHT-001  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/MG-IDLE-ALIGNMENT-001.md` — MG-IDLE-ALIGNMENT-001  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/NP-106.spec.json` — NP-106.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/OPS-SHUTDOWN-000.spec.json` — OPS-SHUTDOWN-000.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/OPS-SHUTDOWN-001.spec.json` — OPS-SHUTDOWN-001.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/OPS-SHUTDOWN-002.spec.json` — OPS-SHUTDOWN-002.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/PANELS-FIX-COMPONENT-REUSE.spec.json` — PANELS-FIX-COMPONENT-REUSE.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/PANELS-STEP-01-design-system-page.spec.json` — PANELS-STEP-01-design-system-page.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/PANELS-STEP-01.spec.json` — PANELS-STEP-01.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/PANELS-STEP-02-tokens-section.spec.json` — PANELS-STEP-02-tokens-section.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/PANELS-STEP-02.spec.json` — PANELS-STEP-02.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/PANELS-STEP-03-panels-store.spec.json` — PANELS-STEP-03-panels-store.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/PANELS-STEP-03.spec.json` — PANELS-STEP-03.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/PANELS-STEP-04-panel-shell.spec.json` — PANELS-STEP-04-panel-shell.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/PANELS-STEP-04.spec.json` — PANELS-STEP-04.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/PANELS-STEP-05-v9-panel-shell.spec.json` — PANELS-STEP-05-v9-panel-shell.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/PANELS-STEP-05.spec.json` — PANELS-STEP-05.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/PANELS-STEP-06-design-system-integration.spec.json` — PANELS-STEP-06-design-system-integration.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/PANELS-STEP-06-populate-shell-section.spec.json` — PANELS-STEP-06-populate-shell-section.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/PANELS-STEP-06.spec.json` — PANELS-STEP-06.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/POI-DETAIL-VISUAL-IMPROVEMENTS.md` — POI-DETAIL-VISUAL-IMPROVEMENTS - POI Detail Visual Improvements  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/POI-DETAIL-VISUAL-IMPROVEMENTS.spec.json` — POI-DETAIL-VISUAL-IMPROVEMENTS.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/POI-JOB-DETAIL-FIX.md` — POI-JOB-DETAIL-FIX - POI Job Detail Roster Integration Fix  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/REND-SYS-P1.md` — REND-SYS-P1  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/REND-SYS-P2.md` — REND-SYS-P2 — Sprite batching + optimization  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/REND-SYS-P3.md` — REND-SYS-P3 — UI hooks (rendering settings)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/REND-SYS-P4.md` — REND-SYS-P4 — Telemetry + end-to-end tests  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/ROSTER-COMPONENTIZATION.spec.json` — ROSTER-COMPONENTIZATION.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/ROSTER-STAT-FILTER.spec.json` — ROSTER-STAT-FILTER.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/RT-INT-DRAG-POI-001.spec.json` — RT-INT-DRAG-POI-001.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/RT-INT-TIME-DAYN-001.spec.json` — RT-INT-TIME-DAYN-001.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/SC-UI-001.md` — SC-UI-001 — Spell Creator Modern UI Migration (Test Hub)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/SC-UI-001.spec.json` — SC-UI-001.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/TEST-001.md` — TEST-001  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/TRAILER-THREAT-V3-P1.md` — TRAILER-THREAT-V3-P1 — 4 static frames  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/TRAILER-THREAT-V3-P2.md` — TRAILER-THREAT-V3-P2 — Static-to-static transition (Expanded ↔ Compact)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/TRAILER-THREAT-V3-P3.md` — TRAILER-THREAT-V3-P3 — Optional polish (timer visual, easing, audio, map reactions)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/WL-LORE-001-A.md` — WL-LORE-001-A — Lore config schema + sample entries  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/WL-LORE-001-B.md` — WL-LORE-001-B — LoreDiscoveryService with triggers  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/WL-LORE-001-C.md` — WL-LORE-001-C — LoreStore with PersistenceService  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/WL-LORE-001-D.md` — WL-LORE-001-D — LoreBook UI components  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/WL-LORE-001-E.md` — WL-LORE-001-E — Gameplay integration (quest/curio/location)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/WL-LORE-DROP-F1.md` — WL-LORE-DROP-F1  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/WL-LORE-DROP-F2.md` — WL-LORE-DROP-F2 — Lore drop mechanics + config  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/WL-LORE-DROP-F3.md` — WL-LORE-DROP-F3 — UI hooks (lore cards, rarity badges)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/WL-LORE-DROP-F4.md` — WL-LORE-DROP-F4 — Telemetry + end-to-end tests  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/WL-LORE-DROP-F5.md` — WL-LORE-DROP-F5 — In-game smoke test  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/WL-LORE-DROP-F6.md` — WL-LORE-DROP-F6 — Evidence log + plan status  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/WL-TEASER-D1.md` — WL-TEASER-D1  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/WL-TEASER-D2.md` — WL-TEASER-D2 — Scene composites (map, village, choice)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/WL-TEASER-D3.md` — WL-TEASER-D3 — Hero, drag & astrolabe  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/WL-TEASER-D4.md` — WL-TEASER-D4 — Consequence, legacy, outro  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/WL-TEASER-D5.md` — WL-TEASER-D5 — Polish & controls  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/WL-WPG-001-CONCEPT.md` — WL-WPG-001-CONCEPT  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/WL-WPG-001-CONFIG.md` — WL-WPG-001-CONFIG — Presence grammar config + validation matrix  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/WORLD-PRESENTATION-RUNTIME-FOUNDATION.md` — WORLD-PRESENTATION-RUNTIME-FOUNDATION  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/WORLD-SURFACE-V3-EVENTS-002.md` — WORLD-SURFACE-V3-EVENTS-002 — World Surface V3 Events (4-Phase Presage)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/WORLD-SURFACE-V3-FOUNDATION-001.md` — WORLD-SURFACE-V3-FOUNDATION-001 — World Surface V3 Foundation (Parallax + Breath)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/WORLD-SURFACE-V3-UNDERWATER-004.md` — WORLD-SURFACE-V3-UNDERWATER-004 — World Surface V3 Underwater (Depth & Caustics)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/WORLD-SURFACE-V3-WONDERS-003.md` — WORLD-SURFACE-V3-WONDERS-003 — World Surface V3 Wonders (Rare Moments)  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+- `prompts/portrait-propagation-regression.spec.json` — portrait-propagation-regression.spec  
+  - reason: draft/candidate/proposed marker, plan or prompt  
+
+## historical (9)
+- `src/docs/docs/minimal_slice/01_pgtoken.semantics.json` — 01_pgtoken.semantics  
+  - reason: archive/legacy/session-handoff  
+- `src/docs/docs/plans/legacy_quarantine_plan.md` — Legacy Sandbox & UI Quarantine Plan  
+  - reason: archive/legacy/session-handoff  
+- `context/DECISION_LOG.md` — RPG Project Decision Log  
+  - markers: decision  
+  - reason: context register, may be superseded  
+- `context/INDEX.md` — Context Index  
+  - reason: context register, may be superseded  
+- `context/MIND_WEAVER_MULTI_AI_PROTOCOLS.md` — Protocolli multi-AI di Mind Weaver in RPG  
+  - reason: context register, may be superseded  
+- `context/REAL_COMPONENTS_ONLY.md` — Real Components Only — Correct Inventory & True Interaction Pairs  
+  - markers: todo  
+  - reason: context register, may be superseded  
+- `context/RPG_PROJECT_CONTEXT.md` — RPG Project Context — Personal Project Governance  
+  - reason: context register, may be superseded  
+- `context/VERTICAL_SLICE_ENTITIES_FULL.md` — Vertical Slice — Complete Entity Inventory & Interaction Matrix  
+  - markers: todo  
+  - reason: context register, may be superseded  
+- `context/VERTICAL_SLICE_REFERENCE.md` — Vertical Slice: Component Versioning & Governance (RPG Context)  
+  - reason: context register, may be superseded  
+
+## transient (377)
+- `.mw/INDEX.md` — `.mw/` index — RPG  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/baselines/t000-baseline.json` — t000-baseline  
+  - reason: run/session/pending context or transient register  
+- `.mw/baselines/v62-source.json` — v62-source  
+  - reason: run/session/pending context or transient register  
+- `.mw/bugs/2026-08-15-clock-halo-binario/bug.md` — Bug: binario dell'halo visibile nel clock  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/2026-08-15-poi-quest-tp1-schema/bug.md` — Bug: IdleVillageConfig schema does not expose quest time and skill-check rules  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/2026-08-15-poi-quest-ui-regressions/PROMPT.md` — Prompt per agente bugfix — POI Quest Detail/Roster/Time UI regressions  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/2026-08-15-poi-quest-ui-regressions/bug.md` — Bug: POI Quest Detail / Roster / Time — UI regressioni (2026-08-15)  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/2026-08-27-goblin-forest-center/bug.md` — Bug: goblin hero does not move to the center of forest_1_top_left  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/bugs/20260818-v6-star-tips-stat/bug.md` — V6 — le punte della stella non arrivano alla stat del PG  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/deliberation-config-web-gg.yaml` — Mind Weaver — Web multi-AI: ChatGPT + Gemini  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/deliberation-config-web.yaml` — Mind Weaver — Web multi-AI cold read  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/pattern-big-rewrite-without-authority.md` — Pattern: Big Rewrite Without Authority  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/plans/poi-quest-config-first-cleanup.md` — Sub-plan: POI Quest config-first cleanup  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/runs/2026-08-15/pattern-candidate-halo-stroke-linecap-dot.md` — pattern-candidate-halo-stroke-linecap-dot  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-15/pattern-candidate-metal-noise-square.md` — pattern-candidate-metal-noise-square  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-15/pattern-candidate-poi-clock-halo-test.md` — pattern-candidate-poi-clock-halo-test  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-15/pattern-candidate-poi-quest-dnd-overlay-test-hooks.md` — : Pattern candidate — test-hook fallback per interazioni dnd-kit in E2E Playwright  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-15/pattern-candidate-poi-quest-dnd-overlay.md` — Pattern Candidate — DnD overlay and slot assignment in synthetic Playwright tests  
+  - markers: candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-15/pattern-candidate-visual-bug-screenshot.md` — pattern-candidate-visual-bug-screenshot  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-15/pattern-candidate.md` — Pattern Candidate — Regression Triage for Idle Village UI  
+  - markers: candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-15/plan-deliberation/cycle-01/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-15/plan-deliberation/cycle-01/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-15/plan-deliberation/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-15/plan-deliberation/cycle-01/critiques.txt` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-15/plan-deliberation/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-15/plan-deliberation/cycle-02/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-15/plan-deliberation/cycle-02/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-15/plan-deliberation/cycle-02/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-15/plan-deliberation/cycle-02/critiques.txt` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-15/plan-deliberation/cycle-02/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-15/plan-deliberation/cycle-03/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-15/plan-deliberation/cycle-03/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-15/plan-deliberation/cycle-03/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-15/plan-deliberation/cycle-03/critiques.txt` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-15/plan-deliberation/cycle-03/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-15/plan-deliberation/final.md` — plans/PLAN-004-poi-quest-ui-regressions.md  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-15/plan-deliberation/residual-critiques.txt` — residual-critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-15/plan-prompt.txt` — plan-prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-17-golden-ui-foundation/GOLDEN_0_DNA.md` — Golden 0 DNA — Roster / PgCard and Clock / DayNightPOI  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-17-golden-ui-foundation/UI_AUDIT.md` — UI / Art Audit — Golden UI Foundation  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-17-golden-ui-foundation/critique/BROADCAST.md` — Broadcast: broadcast-20260817-080148  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-17-golden-ui-foundation/critique/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-17-golden-ui-foundation/critique/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-17-golden-ui-foundation/critique/prompt.md` — Golden UI Foundation — Candidate Plan v1  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-17-golden-ui-foundation/critique/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-17-golden-ui-foundation/critique_cerebras.md` — critique_cerebras  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-17-golden-ui-foundation/critique_chatgpt_api.md` — critique_chatgpt_api  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-17-golden-ui-foundation/critique_claude_api.md` — critique_claude_api  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-17-golden-ui-foundation/critique_deepseek_api.md` — critique_deepseek_api  
+  - markers: candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-17-golden-ui-foundation/critique_gemini.md` — critique_gemini  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-17-golden-ui-foundation/critique_groq.md` — critique_groq  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-17-golden-ui-foundation/critique_v2/BROADCAST.md` — Broadcast: broadcast-20260817-081408  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-17-golden-ui-foundation/critique_v2/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-17-golden-ui-foundation/critique_v2/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-17-golden-ui-foundation/critique_v2/prompt.md` — Golden UI Foundation — Plan v2  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-17-golden-ui-foundation/critique_v2/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-17-golden-ui-foundation/golden-ui-forensic-audit.md` — Golden UI Forensic Audit  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-17-golden-ui-foundation/golden_ui_foundation_plan_v1.md` — Golden UI Foundation — Candidate Plan v1  
+  - markers: candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-17-golden-ui-foundation/golden_ui_foundation_plan_v2.md` — Golden UI Foundation — Plan v2  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-18-ragnatela-greybox/pattern-candidate.md` — Pattern candidate — La graduazione deve essere equal-area, non equal-radius  
+  - markers: candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-28-poi-materic-v4/pattern-candidate.md` — Pattern candidates — POI Materic V4  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-30-invasion-teaser/BROADCAST.md` — Broadcast: broadcast-20260830-152554  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-30-invasion-teaser/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-30-invasion-teaser/prompt.md` — CONTEXT — the artefact under review  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-30-invasion-teaser-claude/BROADCAST.md` — Broadcast: broadcast-20260830-153234  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-30-invasion-teaser-claude/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-30-knowledge-plan/context.txt` — context  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-30-knowledge-plan/cycle-01/A.md` — A  
+  - markers: historical  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-30-knowledge-plan/cycle-01/B.md` — B  
+  - markers: historical  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-30-knowledge-plan/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-30-knowledge-plan/cycle-01/critiques.txt` — critiques  
+  - markers: historical  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-30-knowledge-plan/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-30-knowledge-plan/prompt.txt` — prompt  
+  - markers: historical  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-30-knowledge-repo/A.md` — Knowledge & Design Repository Architecture for the RPG Project  
+  - markers: proposed, adr  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-30-knowledge-repo/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-30-knowledge-repo/caller_final.md` — caller_final  
+  - markers: adr  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-30-knowledge-repo/context.txt` — context  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-30-knowledge-repo/final.md` — final  
+  - markers: adr  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-30-knowledge-repo/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/2026-08-30-knowledge-repo/prompt.txt` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260821-145441-plan/cycle-01/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260821-145441-plan/cycle-01/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260821-145441-plan/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260821-145441-plan/cycle-01/critiques.txt` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260821-145441-plan/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260821-153321-web/cycle-01/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260821-153321-web/cycle-01/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260821-153321-web/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260821-153321-web/cycle-01/critiques.txt` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260821-153321-web/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260821-153321-web/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260821-154309-web2/cycle-01/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260821-154309-web2/cycle-01/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260821-154309-web2/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260821-154309-web2/cycle-01/critiques.txt` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260821-154309-web2/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260821-154309-web2/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260822-203014/cycle-01/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260822-203014/cycle-01/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260822-203014/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260822-203014/cycle-01/critiques.txt` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260822-203014/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260822-203014/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260822-203014/prompt.md` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260822-203403/cycle-01/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260822-203403/cycle-01/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260822-203403/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260822-203403/cycle-01/critiques.txt` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260822-203403/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260822-203403/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260822-203403/prompt.md` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260828-101514/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260828-101514/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260828-101514/caller_final.md` — caller_final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260828-101514/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260828-101514/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260828-101514/prompt.md` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260828-183214/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260828-183214/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260828-183214/caller_final.md` — caller_final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260828-183214/context.md` — context  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260828-183214/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260828-183214/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260828-183214/prompt.md` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260829-210443-goo-critique/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260829-210443-goo-critique/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260829-210443-goo-critique/caller.md` — caller  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260829-210443-goo-critique/caller_final.md` — caller_final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260829-210443-goo-critique/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260829-215810-v63-plan/cycle-01/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260829-215810-v63-plan/cycle-01/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260829-215810-v63-plan/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260829-215810-v63-plan/cycle-01/critiques.txt` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260829-215810-v63-plan/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260829-215810-v63-plan/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260830-002801-v63-plan/cycle-01/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260830-002801-v63-plan/cycle-01/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260830-002801-v63-plan/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260830-002801-v63-plan/cycle-01/critiques.txt` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260830-002801-v63-plan/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/20260830-002801-v63-plan/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/PLAN-007-observatory-primitives/inventory.md` — Inventario — The New Observatory (Prototype)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/PLAN-007-observatory-primitives/primitive-catalog.md` — Catalogo delle primitive — Piano 007  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/cold-read-prompt.txt` — Bozza piano — “The New Observatory” → Canonical Design-System Primitives (Dual-track)  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/coldread-mockup-v2/PROMPT.md` — PIANO DA SOTTOPORRE A COLD READ  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/coldread-mockup-v2/SYNTHESIS.md` — Cold read avversariale — PLAN-MOCKUP-TO-COMPONENT v2  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/coldread-mockup-v2-chatgpt/BROADCAST.md` — Broadcast: broadcast-20260814-175630  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/coldread-mockup-v2-chatgpt/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/coldread-mockup-v2-claude/BROADCAST.md` — Broadcast: broadcast-20260814-175747  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/coldread-mockup-v2-claude/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/coldread-mockup-v2-claude-retry/BROADCAST.md` — Broadcast: broadcast-20260814-182309  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/coldread-mockup-v2-claude-retry/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/coldread-mockup-v2-deepseek/BROADCAST.md` — Broadcast: broadcast-20260814-185647  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/coldread-mockup-v2-deepseek/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/coldread-mockup-v2-gemini/BROADCAST.md` — Broadcast: broadcast-20260814-185546  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/coldread-mockup-v2-gemini/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/coldread-mockup-v2-grok/BROADCAST.md` — Broadcast: broadcast-20260814-185439  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/coldread-mockup-v2-grok/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/critique-mockup-v3/BROADCAST.md` — Broadcast: broadcast-20260814-190955  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/critique-mockup-v3/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/critique-mockup-v3/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/critique-mockup-v3/prompt.md` — PLAN-MOCKUP-TO-COMPONENT v3 — Da richiesta (o mockup esterno) a componente React  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/critique-mockup-v3/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/d100-board-broadcast/BROADCAST.md` — Broadcast: broadcast-20260816-083213  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/d100-board-broadcast/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/d100-board-broadcast/prompt-detailed.txt` — Prompt for D100 Skill-Check Board Exploration — Destiny Astrolabe Visual Refresh  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/d100-board-broadcast/prompt-v2.txt` — Prompt for D100 Skill-Check Board Exploration — Destiny Astrolabe Visual Refresh  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/d100-board-broadcast/prompt.txt` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/d100-board-exploration/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/d100-board-exploration/B.md` — B  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/d100-board-exploration/caller_final.md` — caller_final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/d100-board-exploration/context.txt` — context  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/d100-board-exploration/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/d100-board-exploration/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/d100-board-exploration/prompt.txt` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/d100-board-exploration-2/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/d100-board-exploration-2/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/d100-board-exploration-2/caller_final.md` — caller_final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/d100-board-exploration-2/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/d100-board-exploration-2/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/d100-board-exploration-2/prompt.txt` — prompt  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-card-cta-title-critique-2026-08-27/BROADCAST.md` — Broadcast: broadcast-20260827-202400  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-card-cta-title-critique-2026-08-27/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-card-cta-title-critique-2026-08-27/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-card-cta-title-critique-2026-08-27/plan.md` — Critica meta — Titolo e CTA del componente Event  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-card-cta-title-critique-2026-08-27/prompt.md` — Critica meta — Titolo e CTA del componente Event  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/event-card-cta-title-critique-2026-08-27/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-goblin-sticker-frame/prompt.txt` — prompt  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-mockup-to-component/BROADCAST.md` — Broadcast: broadcast-20260814-172259  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-mockup-to-component/PROMPT.md` — PIANO DA CRITICARE  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-mockup-to-component/SYNTHESIS.md` — Sintesi delibera multi-AI — PLAN-MOCKUP-TO-COMPONENT v1  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-mockup-to-component/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-mockup-to-component-claude/BROADCAST.md` — Broadcast: broadcast-20260814-172713  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-mockup-to-component-claude/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-mockup-v6-20260814/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-mockup-v6-20260814/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-mockup-v6-20260814/caller_final.md` — caller_final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-mockup-v6-20260814/deliberation-config-coldread.yaml` — Custom cold-read deliberation config for mockup-to-component v6  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-mockup-v6-20260814/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-mockup-v6-20260814/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-mockup-v6-20260814/prompt.md` — Director's exploratory question  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-painter-skill-20260815/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-painter-skill-20260815/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-painter-skill-20260815/BROADCAST.md` — Broadcast: broadcast-20260815-092428  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-painter-skill-20260815/anthropic-claude.md` — anthropic-claude  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-painter-skill-20260815/caller_final.md` — caller_final  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-painter-skill-20260815/deliberation-config.yaml` — deliberation-config  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-painter-skill-20260815/final.md` — final  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-painter-skill-20260815/groq-llama-v2.md` — groq-llama-v2  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-painter-skill-20260815/groq-llama.md` — groq-llama  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-painter-skill-20260815/metadata.json` — metadata  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-painter-skill-20260815/openrouter-gpt4o.md` — openrouter-gpt4o  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-painter-skill-20260815/prompt-broadcast.md` — prompt-broadcast  
+  - markers: proposed  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-painter-skill-20260815/prompt.md` — Proposal: create a new RPG skill called `painter`  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-poi-marker-sculpted-a/cerebras.md` — cerebras  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-poi-marker-sculpted-a/groq.md` — groq  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-solutions-mockup-20260815/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-solutions-mockup-20260815/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-solutions-mockup-20260815/caller_final.md` — caller_final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-solutions-mockup-20260815/deliberation-config-coldread.yaml` — Custom cold-read deliberation config for mockup-to-component v6  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-solutions-mockup-20260815/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-solutions-mockup-20260815/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/explore-solutions-mockup-20260815/prompt.md` — Director's exploratory question  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-window-aaa-critique-2026-08-27/BROADCAST.md` — Broadcast: broadcast-20260827-163401  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-window-aaa-critique-2026-08-27/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-window-aaa-critique-2026-08-27/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-window-aaa-critique-2026-08-27/plan.md` — Critica e proposte per GoblinInvasionWindow  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-window-aaa-critique-2026-08-27/prompt.md` — Critica e proposte per GoblinInvasionWindow  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-window-aaa-critique-2026-08-27/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-window-enhance-2026-08-27/BROADCAST.md` — Broadcast: broadcast-20260827-155941  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-window-enhance-2026-08-27/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-window-enhance-2026-08-27/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-window-enhance-2026-08-27/plan.md` — Piano: miglioramento visivo di GoblinInvasionWindow  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-window-enhance-2026-08-27/prompt.md` — Piano: miglioramento visivo di GoblinInvasionWindow  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-window-enhance-2026-08-27/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-window-frame-critique-2026-08-27/BROADCAST.md` — Broadcast: broadcast-20260827-165957  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-window-frame-critique-2026-08-27/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-window-frame-critique-2026-08-27/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-window-frame-critique-2026-08-27/plan.md` — Critica del frame di GoblinInvasionWindow  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-window-frame-critique-2026-08-27/prompt.md` — Critica del frame di GoblinInvasionWindow  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-window-frame-critique-2026-08-27/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-window-v2-critique-2026-08-27/BROADCAST.md` — Broadcast: broadcast-20260827-191258  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-window-v2-critique-2026-08-27/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-window-v2-critique-2026-08-27/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-window-v2-critique-2026-08-27/plan.md` — Critica v2 — GoblinInvasionWindow frame  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-window-v2-critique-2026-08-27/prompt.md` — Critica v2 — GoblinInvasionWindow frame  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/goblin-window-v2-critique-2026-08-27/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/handoff-mockup-to-component-20260814.md` — Handoff — Mockup AI → componente React + asset ad hoc  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/iterative-deliberation/A.md` — Plan: “The New Observatory” → Canonical Design‑System Primitives  
+  - markers: canonical  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/iterative-deliberation/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/iterative-deliberation/caller_final.md` — Plan: “The New Observatory” → Canonical Design‑System Primitives  
+  - markers: canonical  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/iterative-deliberation/final.md` — Plan: “The New Observatory” → Canonical Design‑System Primitives  
+  - markers: canonical  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/iterative-deliberation/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/learn-mockup-to-component-20260814-224334/pattern-candidate.md` — Pattern Candidate — Mockup AI → Component / Asset  
+  - markers: candidate  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r056-breathing/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r056-breathing/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r056-breathing/caller_final.md` — caller_final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r056-breathing/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/r056-breathing/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sticker-peel-2026-08-27/BROADCAST.md` — Broadcast: broadcast-20260827-142950  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sticker-peel-2026-08-27/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sticker-peel-2026-08-27/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sticker-peel-2026-08-27/plan.md` — Piano: animazione "sticker peel" per Goblin Invasion Window  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sticker-peel-2026-08-27/prompt.md` — Piano: animazione "sticker peel" per Goblin Invasion Window  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/sticker-peel-2026-08-27/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/web-cold-read/cycle-01/A.md` — A  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/web-cold-read/cycle-01/B.md` — B  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/web-cold-read/cycle-01/convergence.txt` — convergence  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/web-cold-read/cycle-01/critiques.txt` — critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/web-cold-read/cycle-01/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/web-cold-read/final.md` — final  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/window-critique-2026-08-27/BROADCAST.md` — Broadcast: broadcast-20260827-134444  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/window-critique-2026-08-27/critique-report.md` — Structured Critique Report  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/window-critique-2026-08-27/metadata.json` — metadata  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/window-critique-2026-08-27/plan.md` — Piano: componente Window per RPG  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/window-critique-2026-08-27/prompt.md` — Piano: componente Window per RPG  
+  - reason: run/session/pending context or transient register  
+- `.mw/runs/window-critique-2026-08-27/synthesis.md` — Synthesis of Critiques  
+  - reason: run/session/pending context or transient register  
+- `.mw/telegram-state/authorized-chats.yaml` — authorized-chats  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/templates/ai-friendly-spec.md` — AI-Friendly Spec Template  
+  - reason: Mind Weaver workspace, not game canon  
+- `.mw/templates/mockup-asset-spec/prompt.md` — <Asset Name> — Image Prompt  
+  - reason: Mind Weaver workspace, not game canon  
+- `coordinator/manual-dispatch/completed/DOC-CHARACTER-RESIDENT-RECONCILIATION-001.md` — Manual Task: DOC-CHARACTER-RESIDENT-RECONCILIATION-001  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/completed/GM-BLD-pending-stub.md` — Manual Task: GM-BLD  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/completed/GM-BLD.md` — GM-BLD – Builder & Tooling Guidelines for Modifier Registry  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/completed/GM-MP.md` — GM-MP — Core Plan Updates for Gameplay Modifier System  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/completed/GM-TEL.md` — Manual Task: GM-TEL - COMPLETED  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/completed/IV-TRAILER-ANNOUNCE-001.md` — IV-TRAILER-ANNOUNCE-001  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/completed/IV-TRAILER-DAY4-006.md` — Manual Task: IV-TRAILER-DAY4-006  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/completed/IV-WORLD-SURFACE-001.md` — IV-WORLD-SURFACE-001 — World Surface Runtime Step 1-3  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/completed/IV-WORLD-SURFACE-003.md` — Manual Task: IV-WORLD-SURFACE-003  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/completed/IV-WORLD-SURFACE-HD-001.md` — Manual Task: IV-WORLD-SURFACE-HD-001  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/completed/OPS-SHUTDOWN-000.md` — OPS-SHUTDOWN-000 — Emergency Kill Switch  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/completed/OPS-SHUTDOWN-001.md` — OPS-SHUTDOWN-001 — Legacy Reference Audit & Classification  
+  - markers: historical  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/completed/OPS-SHUTDOWN-002.md` — Manual Task: OPS-SHUTDOWN-002  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/completed/POI-MEDALLION-MATERIAL-PREVIEW-00E669.md` — Manual Task: POI-MEDALLION-MATERIAL-PREVIEW-00E669  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/completed/TRAILER-V9-PHASE1.md` — Manual Task: TRAILER-V9-PHASE1  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/completed/TRAILER-V9-PHASE2.md` — Manual Task: TRAILER-V9-PHASE2  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/completed/TRAILER-V9-PHASE3.md` — Manual Task: TRAILER-V9-PHASE3  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/completed/TRAILER-V9-PHASE4.md` — Manual Task: TRAILER-V9-PHASE4  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/completed/WORLD-PRESENTATION-RUNTIME-DEMO.md` — WORLD-PRESENTATION-RUNTIME-DEMO — World Presentation Runtime Demo  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/completed/WORLD-PRESENTATION-RUNTIME-FOUNDATION.md` — WORLD-PRESENTATION-RUNTIME-FOUNDATION — World Presentation Runtime Foundation  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/ADR001-T1.md` — Manual Task: ADR001-T1  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/ADR001-T2.md` — Manual Task: ADR001-T2  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/ADR001-T3.md` — Manual Task: ADR001-T3  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/ADR001-T4.md` — Manual Task: ADR001-T4  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/ADR001-T6.md` — Manual Task: ADR001-T6  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/ADR001-T7.md` — Manual Task: ADR001-T7  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/ADR001-T8.md` — Manual Task: ADR001-T8  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/ART-DIR-CREATURE-001.md` — Manual Task: ART-DIR-CREATURE-001  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/ART-DIR-UPDATE-001.md` — Manual Task: ART-DIR-UPDATE-001  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/CDA-00-001.md` — Manual Task: CDA-00-001  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/CDA-00-002.md` — Manual Task: CDA-00-002  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/CDA-00-003.md` — Manual Task: CDA-00-003  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/CDA-00-004.md` — Manual Task: CDA-00-004  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/CDA-00-005.md` — Manual Task: CDA-00-005  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/CDA-00-006.md` — Manual Task: CDA-00-006  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/CDA-00-007.md` — Manual Task: CDA-00-007  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/CDA-01-001.md` — Manual Task: CDA-01-001  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/CDA-02-001.md` — Manual Task: CDA-02-001  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/CDA-03-001.md` — Manual Task: CDA-03-001  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/CDA-04-001.md` — Manual Task: CDA-04-001  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/CDA-05-001.md` — Manual Task: CDA-05-001  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/CDA-06-001.md` — Manual Task: CDA-06-001  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/CDA-07-001.md` — Manual Task: CDA-07-001  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/CDA-08-001.md` — Manual Task: CDA-08-001  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/CDA-09-001.md` — Manual Task: CDA-09-001  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/CDA-10-001.md` — Manual Task: CDA-10-001  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/IV-PROG-P1.md` — Manual Task: IV-PROG-P1  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/IV-PROG-P2.md` — Manual Task: IV-PROG-P2  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/IV-PROG-P3.md` — Manual Task: IV-PROG-P3  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/IV-PROG-P4.md` — Manual Task: IV-PROG-P4  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/IV-PROG-P5.md` — Manual Task: IV-PROG-P5  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/IV-PROG-P6.md` — Manual Task: IV-PROG-P6  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/IV-TF-001.md` — Manual Task: IV-TF-001  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/IV-TF-002.md` — Manual Task: IV-TF-002  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/IV-TF-003.md` — Manual Task: IV-TF-003  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/IV-TF-004.md` — Manual Task: IV-TF-004  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/IV-TF-005.md` — Manual Task: IV-TF-005  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/IV-WORLD-SURFACE-HD-002.md` — Manual Task: IV-WORLD-SURFACE-HD-002  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/IV-WSC-P1.md` — Manual Task: IV-WSC-P1  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/IV-WSC-P2.md` — Manual Task: IV-WSC-P2  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/IV-WSC-P3.md` — Manual Task: IV-WSC-P3  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/IV-WSC-P4.md` — Manual Task: IV-WSC-P4  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/IV-WSC-P5.md` — Manual Task: IV-WSC-P5  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/IV-WSC-P6.md` — Manual Task: IV-WSC-P6  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/IV-WSV3-P5.md` — Manual Task: IV-WSV3-P5  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/REND-SYS-P1.md` — Manual Task: REND-SYS-P1  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/REND-SYS-P2.md` — Manual Task: REND-SYS-P2  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/REND-SYS-P3.md` — Manual Task: REND-SYS-P3  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/REND-SYS-P4.md` — Manual Task: REND-SYS-P4  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/REND-SYS-P5.md` — Manual Task: REND-SYS-P5  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/REND-SYS-P6.md` — Manual Task: REND-SYS-P6  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/REND-SYS-P7.md` — Manual Task: REND-SYS-P7  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/REND-SYS-P8.md` — Manual Task: REND-SYS-P8  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/TRAILER-THREAT-V3-P1.md` — Manual Task: TRAILER-THREAT-V3-P1  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/TRAILER-THREAT-V3-P2.md` — Manual Task: TRAILER-THREAT-V3-P2  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/TRAILER-THREAT-V3-P3.md` — Manual Task: TRAILER-THREAT-V3-P3  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/WL-LORE-001-A.md` — Manual Task: WL-LORE-001-A  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/WL-LORE-001-B.md` — Manual Task: WL-LORE-001-B  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/WL-LORE-001-C.md` — Manual Task: WL-LORE-001-C  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/WL-LORE-001-D.md` — Manual Task: WL-LORE-001-D  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/WL-LORE-001-E.md` — Manual Task: WL-LORE-001-E  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/WL-LORE-DROP-F1.md` — Manual Task: WL-LORE-DROP-F1  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/WL-LORE-DROP-F2.md` — Manual Task: WL-LORE-DROP-F2  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/WL-LORE-DROP-F3.md` — Manual Task: WL-LORE-DROP-F3  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/WL-LORE-DROP-F4.md` — Manual Task: WL-LORE-DROP-F4  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/WL-LORE-DROP-F5.md` — Manual Task: WL-LORE-DROP-F5  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/WL-LORE-DROP-F6.md` — Manual Task: WL-LORE-DROP-F6  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/WL-TEASER-D1.md` — Manual Task: WL-TEASER-D1  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/WL-TEASER-D2.md` — Manual Task: WL-TEASER-D2  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/WL-TEASER-D3.md` — Manual Task: WL-TEASER-D3  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/WL-TEASER-D4.md` — Manual Task: WL-TEASER-D4  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/WL-TEASER-D5.md` — Manual Task: WL-TEASER-D5  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/WL-WPG-001-CONCEPT.md` — Manual Task: WL-WPG-001-CONCEPT  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/pending/WL-WPG-001-CONFIG.md` — Manual Task: WL-WPG-001-CONFIG  
+  - reason: run/session/pending context or transient register  
+- `coordinator/manual-dispatch/queue.json` — queue  
+  - reason: run/session/pending context or transient register  
+- `RICHIESTE.md` — Richieste esplicite  
+  - markers: todo  
+  - reason: run/session/pending context or transient register  
+- `SESSION_HANDOFF.md` — Session handoff  
+  - markers: historical  
+  - reason: run/session/pending context or transient register  
+
+## superseded (6)
+- `src/docs/docs/archive/2026-Q1/IMPLEMENTED_PLAN.md` — IMPLEMENTED PLAN – Stato Attuale del Progetto  
+  - markers: superseded  
+  - reason: superseded-by or superseded status  
+- `src/docs/docs/archive/2026-Q1/go_to_market_steam_first.md` — Go-To-Market "Steam First"  
+  - markers: superseded, todo  
+  - reason: superseded-by or superseded status  
+- `src/docs/docs/archive/2026-Q1/idle_village_action_cards.md` — Idle Village – ActionCard Architecture  
+  - markers: superseded  
+  - reason: superseded-by or superseded status  
+- `plans/PLAN-011-knowledge-repository-inventory.md` — PLAN-011 — Knowledge & Design Repository Inventory  
+  - markers: superseded, todo, historical  
+  - reason: superseded-by or superseded status  
+- `.mw/runs/2026-08-30-knowledge-plan/final.md` — final  
+  - markers: superseded, adr, todo, historical  
+  - reason: superseded-by or superseded status  
+- `coordinator/strategy_tasks.md` — Strategy Tasks - RPG Balancer  
+  - markers: superseded  
+  - reason: superseded-by or superseded status  
+
+## conflicting (0)
+_Nessun file in questa classificazione._
+
+## uncategorized (37)
+- `.mw/bugs/2026-08-15-poi-quest-tp1-schema/result.json` — result  
+  - reason: no strong signal  
+- `.mw/bugs/20260818-v6-star-tips-stat/tests/measure.mjs` — measure  
+  - reason: no strong signal  
+- `.mw/bugs/20260818-v6-star-tips-stat/tests/verify.mjs` — verify  
+  - reason: no strong signal  
+- `.windsurf/rules/00-project-invariants.md` — Project Invariants (ALWAYS ON)  
+  - reason: no strong signal  
+- `.windsurf/rules/10-canonical-dev-port.md` — Canonical Dev Server Port for Agent Testing  
+  - markers: canonical  
+  - reason: no strong signal  
+- `.windsurf/rules/10-ui-invariants.md` — UI Invariants (skin, i18n, theme, perf)  
+  - reason: no strong signal  
+- `.windsurf/rules/15-browser-preview-guard.md` — Browser Preview Guard (ALL SKILLS)  
+  - reason: no strong signal  
+- `.windsurf/rules/20-config-persistence.md` — Config & Persistence Invariants  
+  - reason: no strong signal  
+- `.windsurf/rules/30-frozen-kits.md` — Frozen Kits Invariants  
+  - reason: no strong signal  
+- `.windsurf/rules/40-documentation-governance.md` — Documentation Governance Invariants  
+  - reason: no strong signal  
+- `.windsurf/rules/45-director-intent-to-spec.md` — Director Intent → Spec  
+  - reason: no strong signal  
+- `.windsurf/rules/50-interaction-patterns.md` — Interaction Patterns System  
+  - reason: no strong signal  
+- `.windsurf/rules/50-shutdown-governance.md` — Global Session Shutdown Governance  
+  - reason: no strong signal  
+- `.windsurf/rules/mw-rpg-bridge.md` — Mind Weaver → RPG Skill Bridge  
+  - reason: no strong signal  
+- `.windsurf/rules/philosophy.md` — RPG Balancer Philosophy  
+  - reason: no strong signal  
+- `coordinator/AI_WORKER_SMOKE_TEST.md` — AI Worker Smoke Test  
+  - reason: no strong signal  
+- `coordinator/batch-test.json` — batch-test  
+  - reason: no strong signal  
+- `coordinator/batch.json` — batch  
+  - reason: no strong signal  
+- `coordinator/canonical-systems.md` — Canonical Systems - RPG Balancer  
+  - markers: canonical  
+  - reason: no strong signal  
+- `coordinator/failure-patterns.md` — Atomic Task Failure Patterns  
+  - reason: no strong signal  
+- `coordinator/last-run-summary.json` — last-run-summary  
+  - reason: no strong signal  
+- `coordinator/live_registry.json` — live_registry  
+  - reason: no strong signal  
+- `coordinator/registry-events/processed/AI-SMOKE-TEST-001-end.json` — AI-SMOKE-TEST-001-end  
+  - reason: no strong signal  
+- `coordinator/skills/README.md` — Agent Skills Governance  
+  - reason: no strong signal  
+- `coordinator/skills/agent-execution-mandate/SKILL.md` — Agent Execution Mandate  
+  - markers: todo  
+  - reason: no strong signal  
+- `coordinator/skills/coordinator-mandate/SKILL.md` — Coordinator Mandate  
+  - reason: no strong signal  
+- `coordinator/skills/idle-village-task/SKILL.md` — Idle Village Task Mandate  
+  - reason: no strong signal  
+- `coordinator/skills/mockup-generator/SKILL.md` — mockup-generator  
+  - reason: no strong signal  
+- `coordinator/skills/mw-executor/SKILL.md` — mw-executor  
+  - reason: no strong signal  
+- `coordinator/skills/mw-explorer/SKILL.md` — mw-explorer  
+  - reason: no strong signal  
+- `coordinator/skills/mw-planner/SKILL.md` — mw-planner  
+  - reason: no strong signal  
+- `coordinator/skills/mw-regression/SKILL.md` — mw-regression  
+  - reason: no strong signal  
+- `coordinator/skills/painter/SKILL.md` — painter  
+  - reason: no strong signal  
+- `coordinator/skills/strategist-mandate/SKILL.md` — Strategist Mandate  
+  - reason: no strong signal  
+- `AGENTS.md` — AGENTS  
+  - reason: no strong signal  
+- `DESIGN_PILLARS.md` — Design Pillars — Riferimenti d'ispirazione e raffinamenti  
+  - reason: no strong signal  
+- `ROADMAP.md` — Roadmap  
+  - reason: no strong signal  

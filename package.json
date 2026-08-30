@@ -16,6 +16,7 @@
     "safeguards:quick": "npm run lint -- --max-warnings=55 --ignore-pattern src/ui/styleLab/physics --ignore-pattern src/ui/styleLab/physicsLab && npm run test:unit -- tests/unit/idleVillage/MinimalGameplayPage.test.tsx",
     "lint:staged": "lint-staged",
     "docs:audit": "tsx scripts/docs/docsAudit.ts",
+    "inventory": "tsx scripts/inventory.ts",
     "lint:fix": "eslint --fix",
     "lint:painter": "tsx scripts/painter-lint.ts",
     "safeguard": "npm run build && npm run lint && npm run test:unit && npm run kanban:lint",
