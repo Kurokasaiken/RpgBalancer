@@ -18,11 +18,16 @@
  * seam the moment it drifts past.
  *
  * Chromatically inside the painting. The colours are sampled from the sea layer
- * itself: mean RGB (110, 136, 141), luminance p25-p75 of 120-142. The highlight
- * and shadow tints sit about 12 luminance points either side of that mean, so the
- * detail stays inside the sea's own tonal range. A generic white caustic pattern
- * would read as a texture lying on top of the painting instead of as the painting's
- * own surface moving.
+ * itself: open water averages RGB (110, 136, 141) with luminance p10-p90 of
+ * 112-150. The highlight and shadow tints sit inside that band, so the detail stays
+ * within the sea's own tonal range.
+ *
+ * Drawn, not mottled. The first version used isotropic value noise, and it was
+ * wrong for this map: soft tonal blotches read as grime on artwork whose water is
+ * drawn as line work — fine curved strokes following the coast. So the pattern is
+ * built as bands warped by low-frequency noise and reduced to their ridges, giving
+ * broken horizontal strokes that meander like a current. Same idiom as the painting,
+ * so it can be visible without looking like a stain.
  */
 
 import sharp from 'sharp';
@@ -34,7 +39,7 @@ const OUT_DIR = 'public/assets/atmosphere/water';
 /** Sampled from Mare.webp — see the module comment. */
 const SEA_MEAN = { r: 110, g: 136, b: 141 };
 /** Luminance offset either side of the mean, in 0-255 points. */
-const TINT_DELTA = 12;
+const TINT_DELTA = 16;
 
 /**
  * A deterministic PRNG. The tiles are committed assets, so regenerating them must
@@ -90,48 +95,40 @@ function makeNoise(periodX, periodY, rng) {
 }
 
 /**
- * Builds one RGBA tile.
+ * Builds one RGBA tile of broken, meandering strokes.
  *
- * `coverage` is the share of the tile that ends up carrying any alpha at all. The
- * pattern has to stay sparse and broken: a field that covers everything reads as
- * haze, and haze does not move — it is the gaps that let the eye see the drift.
+ * `bandCount` sets how many strokes cross the tile, `warp` how far low-frequency
+ * noise pushes them off straight, and `coverage` how much of the tile keeps any
+ * ink at all. Coverage is the one to reach for first: strokes have to stay sparse,
+ * because it is the empty water between them that lets the eye read the drift.
  */
-function buildTile({ size, seed, stretch, octaves, coverage, contrast, tint }) {
+function buildTile({ size, seed, stretch, bandCount, warp, coverage, contrast, tint }) {
   const rng = mulberry32(seed);
 
-  // Each octave doubles the lattice density. The base period is chosen so the
-  // coarsest features are a good fraction of the tile, not tile-sized blobs.
-  const layers = [];
-  let amplitude = 1;
-  let totalAmplitude = 0;
-  for (let o = 0; o < octaves; o++) {
-    const py = 6 * 2 ** o;
-    const px = Math.max(2, Math.round(py / stretch));
-    layers.push({ noise: makeNoise(px, py, rng), amplitude });
-    totalAmplitude += amplitude;
-    amplitude *= 0.55;
-  }
+  // Two warp fields at different scales, so the strokes bend on a long wavelength
+  // and wobble on a short one instead of marching in parallel.
+  const warpA = makeNoise(4, 5, rng);
+  const warpB = makeNoise(3, 11, rng);
+  // Breaks the continuous ridges into dashes. Stretched hard along x, so a dash is
+  // long and thin rather than a dot.
+  const breakUp = makeNoise(Math.max(2, Math.round(bandCount * 2 / stretch)), bandCount * 3, rng);
 
   const field = new Float32Array(size * size);
-  let min = Infinity;
-  let max = -Infinity;
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
       const u = x / size;
       const v = y / size;
-      let sum = 0;
-      for (const { noise, amplitude: a } of layers) sum += noise(u, v) * a;
-      const value = sum / totalAmplitude;
-      field[y * size + x] = value;
-      if (value < min) min = value;
-      if (value > max) max = value;
+      const dv = (warpA(u, v) - 0.5) * warp + (warpB(u, v) - 0.5) * warp * 0.45;
+      const phase = (v + dv) * bandCount;
+      // Distance to the nearest band centre, as a ridge that peaks on the line.
+      const ridge = Math.max(0, 1 - Math.abs(phase - Math.round(phase)) * 2);
+      field[y * size + x] = ridge * breakUp(u, v);
     }
   }
 
-  // Keep only the top `coverage` of the field. Everything below the cut is fully
-  // transparent, which is what leaves the painting visible between the streaks.
   const sorted = Float32Array.from(field).sort();
   const cut = sorted[Math.floor((1 - coverage) * (sorted.length - 1))];
+  const max = sorted[sorted.length - 1];
   const span = Math.max(1e-6, max - cut);
 
   const out = Buffer.alloc(size * size * 4);
@@ -156,27 +153,29 @@ function tintFromSea(delta) {
 
 const TILES = [
   {
-    // Layer A: the larger, brighter pattern — broken highlights catching the light.
+    // Layer A: the brighter strokes — light catching the top of a swell.
     name: 'water_detail_a.webp',
     size: 384,
     seed: 0x5eaa11,
-    stretch: 5.5,
-    octaves: 4,
-    coverage: 0.34,
-    contrast: 1.6,
+    stretch: 26,
+    bandCount: 22,
+    warp: 0.5,
+    coverage: 0.16,
+    contrast: 1.1,
     tint: tintFromSea(TINT_DELTA),
   },
   {
-    // Layer B: finer, darker, and denser. Travelling the other way, it is what
-    // stops layer A from reading as a single sheet sliding across the sea.
+    // Layer B: finer, darker, denser, and travelling the other way. It is what
+    // keeps A from reading as a single sheet sliding across the sea.
     name: 'water_detail_b.webp',
     size: 256,
     seed: 0x0ceaa2,
-    stretch: 3.5,
-    octaves: 4,
-    coverage: 0.42,
-    contrast: 1.3,
-    tint: tintFromSea(-TINT_DELTA),
+    stretch: 18,
+    bandCount: 15,
+    warp: 0.7,
+    coverage: 0.13,
+    contrast: 1.2,
+    tint: tintFromSea(-TINT_DELTA + 2),
   },
 ];
 
