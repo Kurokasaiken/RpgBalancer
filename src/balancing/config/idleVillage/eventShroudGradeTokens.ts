@@ -34,13 +34,32 @@ export interface ShroudGradeRamp {
 /**
  * Deep teal ("ottanio") ramp for threat-class events.
  *
- * Ramp anchors, as sRGB: ink rgb(7,38,48) -> shadow rgb(18,84,94) ->
- * midtone rgb(158,206,203) -> highlight rgb(250,252,247).
+ * The anchors are placed against the asset's real luminance histogram, not
+ * spread evenly: 98% of the shroud's opaque pixels live between luma 113 and
+ * 242 (t 0.44..0.95), with the median cloud body at t=0.845. Spacing the ramp
+ * evenly would spend half its resolution on a tonal band the art does not use,
+ * which is why an even ramp came out as pale mint — the cloud mass landed on the
+ * bright end. Anchoring the median at mid-octane is what makes the curtain read
+ * as deep teal.
+ *
+ * Resulting tones on the real asset: ink #051922, cloud shadow #1a636f,
+ * dominant cloud body #3a8e98, lit cloud #78bfc3, specular crown near #cdeae8.
+ * Useful tonal range 206 luma levels, against 85 for the `hue-rotate` recipe
+ * this replaces.
  */
 export const EVENT_SHROUD_TEAL_RAMP: ShroudGradeRamp = {
-  red: [0.0275, 0.0467, 0.066, 0.2444, 0.4732, 0.6583, 0.7656, 0.873, 0.9804],
-  green: [0.149, 0.2296, 0.3101, 0.4809, 0.6803, 0.8272, 0.8809, 0.9345, 0.9882],
-  blue: [0.1882, 0.2688, 0.3493, 0.504, 0.6821, 0.8146, 0.8659, 0.9173, 0.9686],
+  red: [
+    0.0157, 0.0168, 0.0179, 0.019, 0.0201, 0.0213, 0.0224, 0.0235, 0.0321,
+    0.043, 0.0616, 0.0803, 0.099, 0.1795, 0.316, 0.5133, 0.8039,
+  ],
+  green: [
+    0.0784, 0.0851, 0.0918, 0.0985, 0.1052, 0.1119, 0.1185, 0.1252, 0.1811,
+    0.2373, 0.2863, 0.3353, 0.3843, 0.4939, 0.6261, 0.7706, 0.9176,
+  ],
+  blue: [
+    0.1059, 0.1142, 0.1226, 0.1309, 0.1393, 0.1477, 0.156, 0.1644, 0.2246,
+    0.2843, 0.3333, 0.3824, 0.4314, 0.5361, 0.657, 0.7838, 0.9098,
+  ],
 };
 
 /** DOM id of the SVG filter the renderer mounts and the shroud layers reference. */

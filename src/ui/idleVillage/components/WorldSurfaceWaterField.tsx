@@ -1,5 +1,17 @@
 import { atmosphereAssets } from '../config/atmosphereAssets';
 
+/**
+ * The sea's own mean colour, measured over the opaque pixels of the sea layer well
+ * away from its edges: rgb(110, 136, 141), luminance p10-p90 of 112-150. Shifting
+ * it a few points keeps every pool inside the tonal range the painting already
+ * uses, which is what makes them read as the water's own light rather than as a
+ * coloured wash laid over it.
+ */
+function seaTint(delta: number): string {
+  const c = (v: number) => Math.max(0, Math.min(255, Math.round(v + delta)));
+  return `rgb(${c(110)}, ${c(136)}, ${c(141)})`;
+}
+
 export interface WorldSurfaceWaterFieldProps {
   enabled?: boolean;
   canvasSize: { width: number; height: number };
@@ -86,10 +98,62 @@ export function WorldSurfaceWaterField({ enabled = true, canvasSize, zIndex }: W
           from { transform: translate3d(0, 0, 0); }
           to   { transform: translate3d(0, var(--ws-water-dy), 0); }
         }
+        @keyframes wsWaterPoolDrift {
+          0%   { transform: translate3d(0, 0, 0); }
+          50%  { transform: translate3d(var(--ws-pool-dx), var(--ws-pool-dy), 0); }
+          100% { transform: translate3d(0, 0, 0); }
+        }
+        @keyframes wsWaterPoolPulse {
+          0%, 100% { opacity: var(--ws-pool-min); }
+          50%      { opacity: var(--ws-pool-max); }
+        }
         @media (prefers-reduced-motion: reduce) {
-          .ws-water-x, .ws-water-y { animation: none !important; }
+          .ws-water-x, .ws-water-y, .ws-water-pool, .ws-water-pool > div { animation: none !important; }
         }
       `}</style>
+
+      {/* The light pools go under the detail tiles: the strokes are highlights ON
+          the water, so they should not be dimmed by a shadow passing over them. */}
+      {cfg.lightPools.map((pool) => {
+        const tint = seaTint(pool.tintDelta);
+        return (
+          <div
+            key={pool.name}
+            className="ws-water-pool"
+            style={{
+              position: 'absolute',
+              left: pool.x - pool.sizePx / 2,
+              top: pool.y - pool.sizePx / 2,
+              width: pool.sizePx,
+              height: pool.sizePx,
+              willChange: 'transform',
+              ['--ws-pool-dx' as string]: `${pool.dx}px`,
+              ['--ws-pool-dy' as string]: `${pool.dy}px`,
+              animationName: 'wsWaterPoolDrift',
+              animationDuration: `${pool.driftSeconds}s`,
+              animationTimingFunction: 'ease-in-out',
+              animationIterationCount: 'infinite',
+            }}
+          >
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                // No hard stop anywhere in the ramp: the pool must never resolve
+                // into an edge the eye can find.
+                background: `radial-gradient(circle, ${tint} 0%, ${tint} 18%, transparent 72%)`,
+                willChange: 'opacity',
+                ['--ws-pool-min' as string]: pool.opacityMin,
+                ['--ws-pool-max' as string]: pool.opacityMax,
+                animationName: 'wsWaterPoolPulse',
+                animationDuration: `${pool.pulseSeconds}s`,
+                animationTimingFunction: 'ease-in-out',
+                animationIterationCount: 'infinite',
+              }}
+            />
+          </div>
+        );
+      })}
 
       {cfg.layers.map((layer) => {
         // The tiled plane overhangs the canvas by one tile on every side, so a

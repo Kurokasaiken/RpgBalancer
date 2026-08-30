@@ -167,8 +167,48 @@ export interface WaterDetailLayer {
   opacity: number;
 }
 
+/**
+ * One broad, soft pool of light drifting over the water.
+ *
+ * These carry most of the effect, and they exist because of what the reference
+ * footage actually does. Blurring two frames of it a second apart with sigma 12 —
+ * destroying every trace of fine detail — still leaves 52% of pixels changed by 3
+ * RGB points or more, down only a quarter from the unblurred 68%. So roughly three
+ * quarters of the motion in water that reads as real is broad tonal change across
+ * large regions: the surface being re-lit, not texture being slid.
+ *
+ * Scrolling detail supplies the other quarter, which is why the tiles alone read as
+ * so little for so much amplitude, and why pushing their opacity up to compensate
+ * muddied the painting instead of animating it.
+ *
+ * Each pool is enormous and very soft, so it never resolves as a shape. It reads as
+ * light because that is the only thing it could be.
+ */
+export interface WaterLightPool {
+  name: string;
+  /** Diameter in world px. Thousands, not hundreds — a small one reads as a stain. */
+  sizePx: number;
+  /** Resting centre in world px. */
+  x: number;
+  y: number;
+  /** Travel over one drift cycle, in world px. */
+  dx: number;
+  dy: number;
+  driftSeconds: number;
+  /** Luminance offset from the sea mean; negative for a shaded pool. */
+  tintDelta: number;
+  opacityMin: number;
+  opacityMax: number;
+  /**
+   * Brightening and drifting run on separate, mutually prime-ish periods. Pools that
+   * pulse together read as one effect switching on and off.
+   */
+  pulseSeconds: number;
+}
+
 export interface WaterFieldConfig {
   layers: WaterDetailLayer[];
+  lightPools: WaterLightPool[];
 }
 
 export interface AtmosphereConfig {
@@ -295,6 +335,28 @@ export const atmosphereAssets: AtmosphereConfig = {
         periodYSeconds: 179.4,
         opacity: 0.48,
       },
+    ],
+    // Sizes run from a third of the world to most of it, and the periods share no
+    // small common multiple, so the field never visibly repeats or beats.
+    // A jittered grid across the whole world, not a handful of hand-placed
+    // pools. Twelve of them at these sizes means every stretch of sea sits under
+    // at least one, which is the point: the water has to breathe everywhere, not
+    // only where someone happened to drop a light. Hand-placed pools also made the
+    // measurement swing with the viewport, because which ones covered visible water
+    // depended on where the camera had settled.
+    lightPools: [
+      { name: 'p01', sizePx: 2400, x: 431, y: 318, dx: -343, dy: -268, driftSeconds: 71, tintDelta: 15, opacityMin: 0.08, opacityMax: 0.52, pulseSeconds: 11 },
+      { name: 'p02', sizePx: 3000, x: 1342, y: 475, dx: -348, dy: 197, driftSeconds: 79, tintDelta: -12, opacityMin: 0.09, opacityMax: 0.55, pulseSeconds: 12 },
+      { name: 'p03', sizePx: 2000, x: 2421, y: 438, dx: -623, dy: -319, driftSeconds: 83, tintDelta: 17, opacityMin: 0.10, opacityMax: 0.58, pulseSeconds: 13 },
+      { name: 'p04', sizePx: 2800, x: 3652, y: 681, dx: -498, dy: -250, driftSeconds: 89, tintDelta: -11, opacityMin: 0.11, opacityMax: 0.61, pulseSeconds: 14 },
+      { name: 'p05', sizePx: 2200, x: 331, y: 1246, dx: 499, dy: -205, driftSeconds: 97, tintDelta: 16, opacityMin: 0.08, opacityMax: 0.64, pulseSeconds: 16 },
+      { name: 'p06', sizePx: 3200, x: 1630, y: 1277, dx: -495, dy: -315, driftSeconds: 101, tintDelta: -13, opacityMin: 0.09, opacityMax: 0.52, pulseSeconds: 17 },
+      { name: 'p07', sizePx: 2600, x: 2717, y: 1412, dx: 569, dy: 321, driftSeconds: 103, tintDelta: 15, opacityMin: 0.10, opacityMax: 0.55, pulseSeconds: 19 },
+      { name: 'p08', sizePx: 1900, x: 3684, y: 1326, dx: -544, dy: -200, driftSeconds: 107, tintDelta: -12, opacityMin: 0.11, opacityMax: 0.58, pulseSeconds: 21 },
+      { name: 'p09', sizePx: 3100, x: 418, y: 2355, dx: 553, dy: 326, driftSeconds: 109, tintDelta: 17, opacityMin: 0.08, opacityMax: 0.61, pulseSeconds: 23 },
+      { name: 'p10', sizePx: 2300, x: 1351, y: 2362, dx: -562, dy: -404, driftSeconds: 113, tintDelta: -11, opacityMin: 0.09, opacityMax: 0.64, pulseSeconds: 25 },
+      { name: 'p11', sizePx: 2700, x: 2606, y: 2560, dx: -565, dy: 262, driftSeconds: 127, tintDelta: 16, opacityMin: 0.10, opacityMax: 0.52, pulseSeconds: 27 },
+      { name: 'p12', sizePx: 2100, x: 3626, y: 2355, dx: 342, dy: -407, driftSeconds: 131, tintDelta: -13, opacityMin: 0.11, opacityMax: 0.55, pulseSeconds: 29 },
     ],
   },
 };

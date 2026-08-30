@@ -83,8 +83,11 @@ async function seek(page, timeMs) {
       }
     }
   }, timeMs);
-  // One frame for the seek to be painted.
-  await new Promise((r) => setTimeout(r, 120));
+  // Long enough for the seek to actually reach the screen. 120ms was not: it is
+  // fine for compositor-only transforms, but the light pools animate `opacity` on
+  // very large gradient elements, which needs a real repaint. The screenshot came
+  // back showing the previous frame, and the whole field measured as motionless.
+  await new Promise((r) => setTimeout(r, 260));
 }
 
 function coverage(a, b, box, width, height) {
@@ -125,7 +128,7 @@ const page = await browser.newPage();
 await page.setViewport({ width: 1600, height: 1000, deviceScaleFactor: 1 });
 await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
 // Layers are lazy and the tiles are fetched, so give the atmosphere time to mount.
-await new Promise((r) => setTimeout(r, 4000));
+await new Promise((r) => setTimeout(r, 5000));
 
 const animations = await page.evaluate(() => {
   const names = {};

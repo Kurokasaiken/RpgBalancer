@@ -149,6 +149,16 @@ const tarGooConfigSchema = z.object({
      */
     contactShadowPx: z.number().min(0).max(40),
     contactMeniscusPx: z.number().min(0).max(12),
+    /**
+     * CP-G — LA CONCA CHE SI RIEMPIE. Le gocce nascono su un anello FUORI
+     * dall'arena e convergono verso il centro, invece di cadere dall'alto su un
+     * punto centrale: il goo e' la difficolta', una condizione che c'e' gia', non
+     * un evento che nasce al centro e invade.
+     * `spawnRingFactor` e' il raggio di nascita in frazioni del raggio dell'arena;
+     * `axisBias` quanto le gocce si addensano sugli assi piu' difficili (0 = niente).
+     */
+    spawnRingFactor: z.number().min(1).max(2),
+    axisBias: z.number().min(0).max(1),
   }),
 });
 
@@ -226,5 +236,7 @@ export const tarGooConfig: TarGooConfig = tarGooConfigSchema.parse({
     stiffness: 0.015,
     contactShadowPx: 16,
     contactMeniscusPx: 3,
+    spawnRingFactor: 1.18,
+    axisBias: 0.6,
   },
 });
