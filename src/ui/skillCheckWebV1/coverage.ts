@@ -289,10 +289,20 @@ export function solveValleys(s: Snapshot, targets: number[], passes = 400): numb
   const hi = MORPH_VALLEY_FLOWER;
   const v = new Array<number>(AXES).fill((lo + hi) / 2);
   const shapeOf = () => buildHeroShapeFromValleys(s, v);
+  /* Uscita per STAGNAZIONE, non solo per convergenza. Le celle sature non
+     convergono mai — le valli sono incollate ai bordi e l'errore resta dov'e' —
+     quindi senza questa bruciano tutte le passate per niente. Misurato: era il
+     motivo per cui il test sulla griglia 9x9 stava a 15.7s e sotto carico
+     sfondava il proprio timeout, cioe' falliva a intermittenza. */
+  let prevErr = Infinity;
+  let fermo = 0;
   for (let pass = 0; pass < passes; pass += 1) {
     const sh = shapeOf();
     const err = targets.map((t, k) => sectorCoverage(s, sh, k) - t);
-    if (Math.max(...err.map(Math.abs)) < 0.05) break;
+    const peggiore = Math.max(...err.map(Math.abs));
+    if (peggiore < 0.05) break;
+    if (prevErr - peggiore < 1e-4) { fermo += 1; if (fermo >= 12) break; } else fermo = 0;
+    prevErr = peggiore;
     /* la valle j delimita i settori j e j+1: la muove la somma dei loro errori */
     const next = v.slice();
     for (let j = 0; j < AXES; j += 1) {

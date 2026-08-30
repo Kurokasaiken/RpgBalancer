@@ -139,12 +139,28 @@ const animations = await page.evaluate(() => {
   return names;
 });
 
-await seek(page, 0);
-const shotA = PNG.sync.read(await page.screenshot({ type: 'png' }));
-await seek(page, GAP_MS);
-const shotB = PNG.sync.read(await page.screenshot({ type: 'png' }));
+/**
+ * Sample several pairs of moments rather than one.
+ *
+ * A single pair is a coin toss. Every layer here is on its own sinusoid, and a pair
+ * that happens to straddle the flat top of one measures almost nothing from it —
+ * tuning against that number produced swings from 6% to 32% with no change to the
+ * config, and made the result depend on the viewport, because which layers covered
+ * visible water shifted with the camera.
+ */
+const STARTS = [0, 7000, 13000, 21000, 34000];
+const shots = [];
+for (const start of STARTS) {
+  await seek(page, start);
+  const a = PNG.sync.read(await page.screenshot({ type: 'png' }));
+  await seek(page, start + GAP_MS);
+  const b = PNG.sync.read(await page.screenshot({ type: 'png' }));
+  shots.push([a, b]);
+}
 
 await browser.close();
+
+const [shotA, shotB] = shots[0];
 
 const { width, height } = shotA;
 const results = {};
@@ -167,38 +183,46 @@ for (const [name, r] of Object.entries(results)) {
 }
 
 // The headline number: of the pixels that are painted sea, how many changed?
-let seaPixels = 0;
-let seaChanged = 0;
-let seaSum = 0;
-for (let i = 0; i < shotA.data.length; i += 4) {
-  const r = shotA.data[i];
-  const g = shotA.data[i + 1];
-  const b = shotA.data[i + 2];
-  if (!isSea(r, g, b)) continue;
-  seaPixels++;
-  const d = Math.max(
-    Math.abs(r - shotB.data[i]),
-    Math.abs(g - shotB.data[i + 1]),
-    Math.abs(b - shotB.data[i + 2]),
-  );
-  seaSum += d;
-  if (d >= DELTA) seaChanged++;
-}
+const samples = shots.map(([a, b]) => {
+  let px = 0;
+  let changed = 0;
+  let sum = 0;
+  for (let i = 0; i < a.data.length; i += 4) {
+    const r = a.data[i];
+    const g = a.data[i + 1];
+    const bl = a.data[i + 2];
+    if (!isSea(r, g, bl)) continue;
+    px++;
+    const d = Math.max(
+      Math.abs(r - b.data[i]),
+      Math.abs(g - b.data[i + 1]),
+      Math.abs(bl - b.data[i + 2]),
+    );
+    sum += d;
+    if (d >= DELTA) changed++;
+  }
+  return { px, coverage: px ? changed / px : 0, meanDelta: px ? sum / px : 0 };
+});
 
-const seaCoverage = seaPixels ? seaChanged / seaPixels : 0;
+const seaPixels = samples[0].px;
+const seaCoverage = samples.reduce((s, x) => s + x.coverage, 0) / samples.length;
+const seaMean = samples.reduce((s, x) => s + x.meanDelta, 0) / samples.length;
+const spread = samples.map((x) => (x.coverage * 100).toFixed(1)).join(' / ');
 const seaShare = seaPixels / (width * height);
 report.sea = {
   pixels: seaPixels,
   shareOfFrame: seaShare,
   coverage: seaCoverage,
-  meanDelta: seaPixels ? seaSum / seaPixels : 0,
+  meanDelta: seaMean,
+  perSample: samples.map((x) => ({ coverage: x.coverage, meanDelta: x.meanDelta })),
 };
 writeFileSync(`${OUT_DIR}/world-motion.json`, JSON.stringify(report, null, 2));
 
 console.log(
   `\nsea: ${seaPixels} px (${(seaShare * 100).toFixed(1)}% of frame)  ` +
-    `mean delta ${report.sea.meanDelta.toFixed(2)}`,
+    `mean delta ${seaMean.toFixed(2)}`,
 );
+console.log(`per-sample coverage: ${spread}`);
 console.log(`sea coverage: ${(seaCoverage * 100).toFixed(1)}%   target >= 25%`);
 console.log(seaCoverage >= 0.25 ? 'PASS' : 'FAIL');
 console.log(`\nreport: ${OUT_DIR}/world-motion.json`);
