@@ -9,7 +9,7 @@
 
 import { tarGooConfig } from '@/balancing/config/idleVillage/tarGooConfig';
 import { buildSnapshot } from '@/ui/skillCheckWebV1/zones';
-import { solveHeroShape, rHeroNarrowAt } from '@/ui/skillCheckWebV1/coverage';
+import { solveShapeReported, rHeroNarrowAt } from '@/ui/skillCheckWebV1/coverage';
 import { createTarGooRenderer } from './tarGooRenderer';
 import { createTentacles, tickPose, buildBlobs, poolFraction,
          SAMPLES_PER_ARM } from './tentacles';
@@ -172,7 +172,13 @@ function recomputeGeometry(skillIndex=0){
     const diffsPerAxis=geo.axisSkill.map(si=>(skills[si]||{difficulty:50}).difficulty);
     geo.snap=buildSnapshot({stats:statsPerAxis,diffs:diffsPerAxis});
     geo.targets=statsPerAxis.map((st,i)=>clamp(50+st-diffsPerAxis[i],1,99));
-    geo.heroShape=solveHeroShape(geo.snap,geo.targets);
+    /* il verbale, non solo il risultato: dove il contratto non e' raggiungibile
+       lo scarto dev'essere ispezionabile, o la saturazione e' muta e il quadro
+       smette di predire l'esito senza che nessuno se ne accorga (CP-D). */
+    const solved=solveShapeReported(geo.snap,geo.targets);
+    geo.heroShape=solved.shape;
+    geo.coverageReport=solved.report;
+    geo.anySaturated=solved.anySaturated;
   }
   /* probabilità reale, misurata sulla geometria che il giocatore vede.
      Stessa formula di inStar: min(stella, muro) — il muro taglia la stella. */
