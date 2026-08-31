@@ -179,6 +179,7 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
   const reduced = useReducedMotion();
   const rootRef = useRef<HTMLDivElement>(null);
   const uid = React.useId().replace(/:/g, '');
+  const glassFilterId = `f-glass-${uid}`;
 
   const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     if (!rootRef.current) return;
@@ -313,6 +314,26 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
             <feGaussianBlur stdDeviation="1.5" result="blur" />
             <feComposite in="SourceGraphic" in2="blur" operator="over" />
           </filter>
+
+          {/* Glass refraction — rectangular lens tuned to the 476 x 376 case. */}
+          <filter id={glassFilterId} colorInterpolationFilters="sRGB" x="0" y="0" width="100%" height="100%">
+            <feImage
+              href="/assets/ui/goblin_case_displacement.png"
+              preserveAspectRatio="none"
+              x="0"
+              y="0"
+              width="100%"
+              height="100%"
+              result="lens"
+            />
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="lens"
+              scale="22"
+              xChannelSelector="R"
+              yChannelSelector="G"
+            />
+          </filter>
         </defs>
 
         {/* BODY */}
@@ -397,6 +418,7 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
             transform: reduced
               ? 'none'
               : `translate3d(calc(var(--mx) * 6px), calc(var(--my) * 3px), 0)`,
+            filter: reduced ? 'none' : `url(#${glassFilterId})`,
           }}
         />
         <div
@@ -418,6 +440,7 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
             transform: reduced
               ? 'none'
               : `translate3d(calc(var(--mx) * 18px), calc(var(--my) * 12px), 0)`,
+            filter: reduced ? 'none' : `url(#${glassFilterId})`,
           }}
         />
         <img
@@ -435,7 +458,11 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
             transform: reduced
               ? 'none'
               : `translate3d(calc(var(--mx) * 18px), calc(var(--my) * 12px), 0)`,
-            filter: isPeeled ? 'drop-shadow(8px 0 18px rgba(0,0,0,0.55))' : 'none',
+            filter: reduced
+              ? 'none'
+              : (isPeeled
+                  ? `url(#${glassFilterId}) drop-shadow(8px 0 18px rgba(0,0,0,0.55))`
+                  : `url(#${glassFilterId})`),
           }}
         />
 
