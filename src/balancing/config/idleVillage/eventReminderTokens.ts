@@ -14,11 +14,16 @@ const tokensSchema = z.object({
     frameGradientStart: z.string(),
     frameGradientMid: z.string(),
     frameGradientEnd: z.string(),
+    frameShadow: z.string(),
     ornamentStroke: z.string(),
     ornamentFill: z.string(),
     gemFill: z.string(),
     gemStroke: z.string(),
     gemGlow: z.string(),
+    gemFace: z.string(),
+    gemShadow: z.string(),
+    gemSpecular: z.string(),
+    gemBezel: z.string(),
   }),
   /** Dark enamel plaque surface. */
   surface: z.object({
@@ -46,9 +51,16 @@ const tokensSchema = z.object({
   countdown: z.object({
     labelSize: z.number(),
     labelColor: z.string(),
+    labelGlow: z.string(),
     numberSize: z.number(),
     numberColor: z.string(),
     numberGlow: z.string(),
+  }),
+  /** Title engraving. */
+  title: z.object({
+    color: z.string(),
+    shadow: z.string(),
+    highlight: z.string(),
   }),
   /** Temporal states. */
   states: z.object({
@@ -83,11 +95,16 @@ export const eventReminderTokens: EventReminderTokens = {
     frameGradientStart: '#f8e4a8',
     frameGradientMid: '#c9a14a',
     frameGradientEnd: '#5a3f18',
+    frameShadow: 'rgba(0, 0, 0, 0.55)',
     ornamentStroke: '#e4bd62',
     ornamentFill: 'rgba(61, 37, 19, 0.55)',
     gemFill: '#48b5a8',
     gemStroke: '#a8e8e0',
     gemGlow: 'rgba(72, 181, 168, 0.55)',
+    gemFace: '#7fd6cd',
+    gemShadow: '#1f5a52',
+    gemSpecular: '#ffffff',
+    gemBezel: '#2a1a0e',
   },
   surface: {
     background:
@@ -114,10 +131,16 @@ export const eventReminderTokens: EventReminderTokens = {
   },
   countdown: {
     labelSize: 10,
-    labelColor: '#7cc4bf',
+    labelColor: '#9ddcd6',
+    labelGlow: '0 1px 2px rgba(0,0,0,.8)',
     numberSize: 34,
     numberColor: '#f0d58b',
-    numberGlow: '0 0 12px rgba(240,207,106,.35), 0 2px 4px rgba(0,0,0,.6)',
+    numberGlow: '0 0 14px rgba(240,207,106,.4), 0 2px 4px rgba(0,0,0,.6)',
+  },
+  title: {
+    color: '#f0d58b',
+    shadow: '0 -1px 0 rgba(255,255,255,.25), 0 1px 0 rgba(0,0,0,.9), 0 3px 6px rgba(0,0,0,.7)',
+    highlight: '0 0 10px rgba(240,207,106,.25)',
   },
   states: {
     calm: {

@@ -113,57 +113,55 @@ export const MatericEventCard: React.FC<MatericEventCardProps> = ({
               {image ?? defaultImage}
             </div>
             <div style={{ flex: 1, minWidth: 0, paddingLeft: 6 }}>
-              {/*
-                The reminder title has to read as a title, not as a list row. At
-                the old 16px it sat at roughly half the canonical --skin-title-size
-                and, paired inline with an icon, read as a label; 26px restores the
-                hierarchy while still fitting the landscape card's text column.
-              */}
-              {title && (
-                <SkinTitle
-                  level="1"
-                  style={{
-                    fontSize: 30,
-                    lineHeight: 1.05,
-                    letterSpacing: '0.04em',
-                    textShadow: '0 1px 0 rgba(0,0,0,.9), 0 2px 4px rgba(0,0,0,.6)',
-                  }}
-                >
-                  {title}
-                </SkinTitle>
-              )}
-              {subtitle && <SkinTitle level="subtitle" style={{ fontSize: 11, opacity: 0.85 }}>{subtitle}</SkinTitle>}
-              {daysLeftValue !== undefined ? (
-                <div style={{ marginTop: 8, display: 'flex', alignItems: 'baseline', gap: 12 }}>
-                  {daysLeftLabel && (
+              {children ?? (
+                <>
+                  {title && (
                     <SkinTitle
-                      level="subtitle"
+                      level="1"
                       style={{
-                        fontSize: 11,
-                        letterSpacing: '0.18em',
-                        lineHeight: 1.3,
-                        textTransform: 'uppercase',
-                        opacity: 0.85,
+                        fontSize: 30,
+                        lineHeight: 1.05,
+                        letterSpacing: '0.04em',
+                        textShadow: '0 1px 0 rgba(0,0,0,.9), 0 2px 4px rgba(0,0,0,.6)',
                       }}
                     >
-                      {daysLeftLabel}
+                      {title}
                     </SkinTitle>
                   )}
-                  <SkinTitle
-                    level="1"
-                    style={{
-                      fontSize: 40,
-                      lineHeight: 1,
-                      letterSpacing: '-0.02em',
-                      textShadow: '0 0 14px rgba(240,207,106,.4), 0 2px 4px rgba(0,0,0,.6)',
-                    }}
-                  >
-                    {daysLeftValue}
-                  </SkinTitle>
-                </div>
-              ) : daysLeftLabel ? (
-                <MatericBadge style={{ marginTop: 4 }}>{daysLeftLabel}</MatericBadge>
-              ) : null}
+                  {subtitle && <SkinTitle level="subtitle" style={{ fontSize: 11, opacity: 0.85 }}>{subtitle}</SkinTitle>}
+                  {daysLeftValue !== undefined ? (
+                    <div style={{ marginTop: 8, display: 'flex', alignItems: 'baseline', gap: 12 }}>
+                      {daysLeftLabel && (
+                        <SkinTitle
+                          level="subtitle"
+                          style={{
+                            fontSize: 11,
+                            letterSpacing: '0.18em',
+                            lineHeight: 1.3,
+                            textTransform: 'uppercase',
+                            opacity: 0.85,
+                          }}
+                        >
+                          {daysLeftLabel}
+                        </SkinTitle>
+                      )}
+                      <SkinTitle
+                        level="1"
+                        style={{
+                          fontSize: 40,
+                          lineHeight: 1,
+                          letterSpacing: '-0.02em',
+                          textShadow: '0 0 14px rgba(240,207,106,.4), 0 2px 4px rgba(0,0,0,.6)',
+                        }}
+                      >
+                        {daysLeftValue}
+                      </SkinTitle>
+                    </div>
+                  ) : daysLeftLabel ? (
+                    <MatericBadge style={{ marginTop: 4 }}>{daysLeftLabel}</MatericBadge>
+                  ) : null}
+                </>
+              )}
             </div>
           </div>
         ) : (

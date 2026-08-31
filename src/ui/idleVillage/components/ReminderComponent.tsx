@@ -2,11 +2,12 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { MatericEventCard } from '@/ui/designSystem/primitives';
 import { PoiMatericV3 } from '@/ui/idleVillage/components/poi/PoiMatericV3';
+import { SkinTitle } from '@/ui/idleVillage/skins/primitives/SkinTitle';
 import { GildedEventFrame } from './GildedEventFrame';
 import { eventReminderTokens } from '@/balancing/config/idleVillage/eventReminderTokens';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 
-const { sizing, poi, glow, surface, gilded } = eventReminderTokens;
+const { sizing, poi, glow, surface, gilded, title: titleTokens, countdown: countdownTokens } = eventReminderTokens;
 
 /**
  * POI that starts with an empty magic circle and fills counter-clockwise.
@@ -125,7 +126,7 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
           position: 'absolute',
           inset: 10,
           borderRadius: 10,
-          background: surface.background,
+          background: `${surface.background}, radial-gradient(circle at 18% 50%, rgba(22,141,147,.15) 0%, transparent 40%)`,
           boxShadow: surface.boxShadow,
           zIndex: 1,
         }}
@@ -146,12 +147,32 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
       >
         <MatericEventCard
           variant="reminder"
-          title={title}
-          daysLeftLabel={daysLeftLabel}
-          daysLeftValue={daysLeftValue}
           image={(
-            <div style={{ filter: `drop-shadow(0 0 18px ${gilded.gemGlow})`, padding: '0 4px' }}>
-              <FillingPoi size={sizing.poiSize} fillDurationMs={poi.fillDurationMs} />
+            <div
+              style={{
+                position: 'relative',
+                width: sizing.poiSize,
+                height: sizing.poiSize,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <span
+                style={{
+                  position: 'absolute',
+                  inset: -14,
+                  borderRadius: '50%',
+                  background: `radial-gradient(circle, ${gilded.gemGlow} 0%, transparent 65%)`,
+                  filter: 'blur(12px)',
+                  opacity: 0.55,
+                  zIndex: 0,
+                }}
+                aria-hidden="true"
+              />
+              <div style={{ position: 'relative', zIndex: 1, filter: `drop-shadow(0 0 18px ${gilded.gemGlow})` }}>
+                <FillingPoi size={sizing.poiSize} fillDurationMs={poi.fillDurationMs} />
+              </div>
             </div>
           )}
           style={{
@@ -159,7 +180,48 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
             width: '100%',
             minHeight: sizing.minHeight - 20,
           }}
-        />
+        >
+          <SkinTitle
+            level="1"
+            style={{
+              fontSize: 30,
+              lineHeight: 1.05,
+              letterSpacing: '0.04em',
+              color: titleTokens.color,
+              textShadow: `${titleTokens.shadow}, ${titleTokens.highlight}`,
+            }}
+          >
+            {title}
+          </SkinTitle>
+          <div style={{ marginTop: 8, display: 'flex', alignItems: 'baseline', gap: 12 }}>
+            <SkinTitle
+              level="subtitle"
+              style={{
+                fontSize: countdownTokens.labelSize,
+                letterSpacing: '0.18em',
+                lineHeight: 1.3,
+                textTransform: 'uppercase',
+                color: countdownTokens.labelColor,
+                textShadow: countdownTokens.labelGlow,
+                opacity: 0.9,
+              }}
+            >
+              {daysLeftLabel}
+            </SkinTitle>
+            <SkinTitle
+              level="1"
+              style={{
+                fontSize: countdownTokens.numberSize,
+                lineHeight: 1,
+                letterSpacing: '-0.02em',
+                color: countdownTokens.numberColor,
+                textShadow: countdownTokens.numberGlow,
+              }}
+            >
+              {daysLeftValue}
+            </SkinTitle>
+          </div>
+        </MatericEventCard>
       </span>
     </motion.button>
   );
