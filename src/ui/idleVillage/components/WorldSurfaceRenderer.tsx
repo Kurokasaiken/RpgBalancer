@@ -1,6 +1,7 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { WorldSurfaceAtmosphere } from './WorldSurfaceAtmosphere';
 import { WorldSurfaceRiverGlint } from './WorldSurfaceRiverGlint';
+import { WorldSurfaceGlassOverlay } from './WorldSurfaceGlassOverlay';
 import { useTranslation } from 'react-i18next';
 import type { RuntimeObject } from '../../../engine/world/model/RuntimeObject';
 import type { WaterFieldConfig } from '../config/atmosphereAssets';
@@ -130,6 +131,8 @@ interface WorldSurfaceRendererProps {
   waterFieldConfig?: WaterFieldConfig;
   /** When true, the ambient light-ray and dust layer is rendered. */
   showAtmosphere?: boolean;
+  /** When true, a glass teca overlay covers the viewport. */
+  showGlass?: boolean;
   children?: React.ReactNode;
 }
 
@@ -243,6 +246,7 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
   breathEnabled = false,
   showWaterField = false,
   showAtmosphere = false,
+  showGlass = true,
   waterFieldConfig,
   eventCovered = false,
   showEventCard = false,
@@ -468,6 +472,14 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
     (event: React.MouseEvent) => {
       reportMouseWorld(event.clientX, event.clientY);
 
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (rect) {
+        const nx = (event.clientX - rect.left) / rect.width - 0.5;
+        const ny = (event.clientY - rect.top) / rect.height - 0.5;
+        containerRef.current?.style.setProperty('--gx', `${(nx * 2).toFixed(4)}`);
+        containerRef.current?.style.setProperty('--gy', `${(ny * 2).toFixed(4)}`);
+      }
+
       if (!isDragging || !dragStart.current || !manifest.camera.panEnabled) return;
 
       // Grab semantics: the map follows the hand. `panX` is the world point at the
@@ -497,6 +509,8 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
     setIsDragging(false);
     setDragOriginPan(null);
     dragStart.current = null;
+    containerRef.current?.style.setProperty('--gx', '0');
+    containerRef.current?.style.setProperty('--gy', '0');
   }, []);
 
   const handleWheel = useCallback(
@@ -762,6 +776,12 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
         </Suspense>
         {children}
       </div>
+
+      {/*
+        Glass teca. Sits OUTSIDE the world box so it does not pan or zoom; the
+        reflections and caustics react to the pointer through CSS variables.
+      */}
+      {showGlass && <WorldSurfaceGlassOverlay />}
 
       {/*
         Vignette. Sits OUTSIDE the world box on purpose: it is a property of how the

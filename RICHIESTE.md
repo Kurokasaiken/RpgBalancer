@@ -1277,6 +1277,8 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 - Visibilita' del vetro e riflessi su `GoblinInvasionWindow` aumentata: `g-glass`, `g-glass-hl`, `g-glass-b`, luce diagonale e nebbia atmosferica raddoppiate di opacita'.
 - Aggiunto parallax 3D piu' marcato, caustiche mobili e transizioni 100ms sui layer vetro perche' l'effetto si legga dinamicamente al movimento del mouse.
 - Aggiunta mappa di spostamento rettangolare `public/assets/ui/goblin_case_displacement.png` e `feDisplacementMap` su `backgroundImage`, `goblinImage` e `goblinImageWithBorder` per replicare il riflesso convesso di `Window`/`Medal` nel case rettangolare.
+- Aggiunto `WorldSurfaceGlassOverlay` su `/world-surface`: teca di vetro viewport-locked con sheen, riflesso diagonale, caustiche e bordo scuro che reagiscono al mouse tramite le variabili CSS `--gx`/`--gy`;
+  configurazione in `atmosphereAssets.glass`, montato in `WorldSurfaceRenderer`.
 
 ---
 

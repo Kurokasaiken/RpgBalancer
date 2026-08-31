@@ -276,6 +276,23 @@ export interface AmbientConfig {
   dust: AmbientDust;
 }
 
+/** Teca di vetro sopra la mappa: riflessi, caustiche e bordo. */
+export interface GlassConfig {
+  enabled: boolean;
+  /** Base sheen opacity (0-1). */
+  sheenOpacity: number;
+  /** Reflection diagonal opacity (0-1). */
+  reflectionOpacity: number;
+  /** Warm caustic opacity (0-1). */
+  causticOpacity: number;
+  /** Edge vignette opacity (0-1). */
+  edgeOpacity: number;
+  /** Base color of the glass. */
+  tint: string;
+  /** Max highlight offset in viewport pixels. */
+  parallaxMaxPx: number;
+}
+
 export interface AtmosphereConfig {
   clouds: CloudBand[];
   foam: FoamConfig;
@@ -285,6 +302,7 @@ export interface AtmosphereConfig {
   waterField: WaterFieldConfig;
   /** Animated light streaks drawn along rivers. */
   riverGlints: RiverGlint[];
+  glass: GlassConfig;
 }
 
 export const atmosphereAssets: AtmosphereConfig = {
@@ -452,6 +470,15 @@ export const atmosphereAssets: AtmosphereConfig = {
       { name: 'p11', sizePx: 2700, x: 2606, y: 2560, dx: -565, dy: 262, driftSeconds: 127, tintDelta: 16, opacityMin: 0.10, opacityMax: 0.52, pulseSeconds: 27 },
       { name: 'p12', sizePx: 2100, x: 3626, y: 2355, dx: 342, dy: -407, driftSeconds: 131, tintDelta: -13, opacityMin: 0.11, opacityMax: 0.55, pulseSeconds: 29 },
     ],
+  },
+  glass: {
+    enabled: true,
+    sheenOpacity: 0.38,
+    reflectionOpacity: 0.45,
+    causticOpacity: 0.36,
+    edgeOpacity: 0.55,
+    tint: 'rgba(210, 230, 255, 0.10)',
+    parallaxMaxPx: 40,
   },
   /** Two animated glints along the main rivers. World coordinates are hand-tuned to the painted map. */
   riverGlints: [
