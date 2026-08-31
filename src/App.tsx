@@ -89,6 +89,7 @@ const TrailerConsequencePage = lazy(() => import('./ui/idleVillage/trailer/Trail
 const TrailerLegacyPage = lazy(() => import('./ui/idleVillage/trailer/TrailerLegacyPage').then(m => ({ default: m.TrailerLegacyPage })));
 const TrailerOutroPage = lazy(() => import('./ui/idleVillage/trailer/TrailerOutroPage').then(m => ({ default: m.TrailerOutroPage })));
 const WorldSurfaceTestPage = lazy(() => import('./ui/idleVillage/pages/WorldSurfaceTestPage').then(m => ({ default: m.WorldSurfaceTestPage })));
+const SeaEffectLabPage = lazy(() => import('./ui/idleVillage/pages/SeaEffectLabPage').then(m => ({ default: m.SeaEffectLabPage })));
 const WorldPresentationDirectorPage = lazy(() => import('./ui/idleVillage/pages/WorldPresentationDirectorPage').then(m => ({ default: m.default })));
 const PoiVisualPreviewPage = lazy(() => import('./ui/idleVillage/pages/PoiVisualPreviewPage').then(m => ({ default: m.default })));
 const UseClientPage = lazy(() => import('./ui/idleVillage/pages/UseClientPage').then(m => ({ default: m.default })));
@@ -317,6 +318,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/mockup-to-component';
   const isWorldSurfacePath =
     typeof window !== 'undefined' && window.location.pathname === '/world-surface';
+  const isSeaEffectLabPath =
+    typeof window !== 'undefined' && window.location.pathname === '/sea-effect-lab';
   const isWorldPresentationDirectorPath =
     typeof window !== 'undefined' && window.location.pathname === '/world-presentation-director';
   const isPoiVisualPreviewPath =
@@ -1187,6 +1190,16 @@ function App() {
       <ErrorBoundary componentName="World Surface Test Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading World Surface...</div>}>
           <WorldSurfaceTestPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isSeaEffectLabPath) {
+    return (
+      <ErrorBoundary componentName="Sea Effect Lab Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Sea Effect Lab…</div>}>
+          <SeaEffectLabPage />
         </Suspense>
       </ErrorBoundary>
     );

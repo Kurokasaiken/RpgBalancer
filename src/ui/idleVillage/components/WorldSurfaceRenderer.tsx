@@ -1,6 +1,7 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { RuntimeObject } from '../../../engine/world/model/RuntimeObject';
+import type { WaterFieldConfig } from '../config/atmosphereAssets';
 import type {
   BlendMode,
   WorldSurfaceAnchor,
@@ -15,6 +16,7 @@ import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import { eventShroudGradeConfig } from '@/balancing/config/idleVillage/eventShroudGradeTokens';
 
 const WorldSurfaceWaves = lazy(() => import('./WorldSurfaceWaves'));
+const WorldSurfaceWaterField = lazy(() => import('./WorldSurfaceWaterField'));
 const WorldSurfaceClouds = lazy(() => import('./WorldSurfaceClouds'));
 const WorldSurfaceCloudShadows = lazy(() => import('./WorldSurfaceCloudShadows'));
 const WorldSurfaceFoam = lazy(() => import('./WorldSurfaceFoam'));
@@ -63,6 +65,35 @@ interface BreathSpec {
 
 const BREATH_MAP: Record<string, BreathSpec> = {};
 
+/**
+ * Depth parallax, from the tactical plan section 8.
+ *
+ * The clouds trail the map as it is dragged, which reads as air between the weather
+ * and the ground. Only the clouds: they are the one atmosphere layer that is
+ * genuinely above the world. Cloud shadows are cast ON the terrain and the wave
+ * marks sit on a painted coastline, so moving either of them relative to the map
+ * would detach them from what they belong to.
+ *
+ * The base map stays at 1.00x and the carved frame is never transformed — the plan
+ * warns that a DOM frame with a transform can tear on Tauri/WebView, and the layers
+ * are full-canvas bakes that would expose empty edges if they moved at all.
+ *
+ * This is driven by the camera pan rather than by mouse position. The plan writes it
+ * as "mouse move -> offset from centre"; pan is the better trigger here because the
+ * motion is something the player performs, so they are already attending to it and
+ * expecting a response. Ambient motion at this scale has repeatedly failed to be
+ * noticed at all; twelve pixels of lag on a deliberate drag is a different problem.
+ *
+ * The plan's 5% dead zone is deliberately not implemented: it exists to stop jitter
+ * when a pointer rests near the centre, and a drag has no jitter to suppress.
+ */
+const PARALLAX = {
+  /** Fraction of the camera pan the clouds add on top of it. 1.20x in the plan. */
+  cloudExcess: 0.2,
+  /** Ceiling on the visible offset, in SCREEN px. */
+  maxOffsetScreenPx: 12,
+} as const;
+
 interface WorldSurfaceRendererProps {
   manifest: WorldSurfaceManifest;
   camera: { panX: number; panY: number; zoom: number };
@@ -91,6 +122,10 @@ interface WorldSurfaceRendererProps {
   onEventCardComplete?: () => void;
   /** Called when the event card is ready to be unmounted. */
   onEventCardClose?: () => void;
+  /** When true, the water field micro-detail overlay is rendered on the sea. */
+  showWaterField?: boolean;
+  /** Optional override for the water field configuration (used by the lab page). */
+  waterFieldConfig?: WaterFieldConfig;
   children?: React.ReactNode;
 }
 
@@ -202,6 +237,8 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
   autoFit: autoFitProp,
   autoFitTrigger = 1,
   breathEnabled = false,
+  showWaterField = false,
+  waterFieldConfig,
   eventCovered = false,
   showEventCard = false,
   onEventCardComplete,
@@ -215,6 +252,18 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
   );
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  /**
+   * Camera pan at the moment the current drag began, or null when not dragging.
+   *
+   * The parallax is measured from here rather than from the camera's absolute pan.
+   * Against absolute pan the offset hits its 12px ceiling after about a hundred
+   * world px and stays pinned there, so it becomes a fixed displacement instead of
+   * motion — the clouds sit slightly off and never appear to move. Measured per
+   * drag it starts at zero every time the hand goes down, grows as the map is
+   * pulled, and eases back when it is released: the band trails the ground and
+   * catches up, which is what depth feels like.
+   */
+  const [dragOriginPan, setDragOriginPan] = useState<{ x: number; y: number } | null>(null);
   const dragStart = useRef<{ x: number; y: number; panX: number; panY: number } | null>(null);
   const hasAutoFitted = useRef(false);
   const prevAutoFitTrigger = useRef(autoFitTrigger);
@@ -285,6 +334,24 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
   // The carved frame is the exception: it is the window the world is seen through,
   // so weather has to pass UNDER it. Sitting above every layer put the clouds on
   // top of the frame, drifting over the border decoration.
+  /**
+   * Extra cloud offset in WORLD px.
+   *
+   * The world box translates by `-pan * zoom` in screen px and then scales, so a
+   * child offset of `d` world px lands as `d * zoom` on screen. Getting the clouds
+   * to 1.20x therefore needs `d = -excess * pan`, and the screen-space ceiling
+   * becomes `max / zoom` in world units.
+   */
+  const cloudParallax = useMemo(() => {
+    if (!dragOriginPan) return { x: 0, y: 0 };
+    const limit = PARALLAX.maxOffsetScreenPx / Math.max(camera.zoom, 0.01);
+    const clamp = (v: number) => Math.max(-limit, Math.min(limit, v));
+    return {
+      x: clamp(-PARALLAX.cloudExcess * (camera.panX - dragOriginPan.x)),
+      y: clamp(-PARALLAX.cloudExcess * (camera.panY - dragOriginPan.y)),
+    };
+  }, [camera.panX, camera.panY, camera.zoom, dragOriginPan]);
+
   const cloudZIndex = useMemo(() => {
     const cloudsIndex = effectiveLayers.findIndex((layer) => layer.id === 'clouds');
     if (cloudsIndex === -1) {
@@ -379,6 +446,7 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
       if (!manifest.camera.panEnabled) return;
       event.preventDefault();
       setIsDragging(true);
+      setDragOriginPan({ x: camera.panX, y: camera.panY });
       dragStart.current = {
         x: event.clientX,
         y: event.clientY,
@@ -420,6 +488,7 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
+    setDragOriginPan(null);
     dragStart.current = null;
   }, []);
 
@@ -601,6 +670,7 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
               canvasSize={manifest.coordinateSystem.canvas}
               zIndex={cloudZIndex}
               scales={cloudScales}
+              parallaxOffset={cloudParallax}
             />
           )}
           {/* Birds fly under the weather but over the ground. */}
@@ -624,6 +694,14 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
           {/* Wave marks break on the shoreline, at the bottom of the atmosphere
               stack: they belong to the water surface, not to the sky. */}
           <WorldSurfaceWaves zIndex={cloudZIndex - 4} />
+          {/* Water field: broad light pools and drifting micro-detail over the sea. */}
+          {showWaterField && (
+            <WorldSurfaceWaterField
+              canvasSize={manifest.coordinateSystem.canvas}
+              zIndex={cloudZIndex - 6}
+              config={waterFieldConfig}
+            />
+          )}
           {/*
             Water field: NOT mounted, deliberately.
 
@@ -644,12 +722,10 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
             one element. See RICHIESTE.md R-056.
           */}
           {/* Cloud shadows drift across the land, below the weather. */}
-          {breathEnabled && (
-            <WorldSurfaceCloudShadows
-              canvasSize={manifest.coordinateSystem.canvas}
-              zIndex={cloudZIndex - 5}
-            />
-          )}
+          <WorldSurfaceCloudShadows
+            canvasSize={manifest.coordinateSystem.canvas}
+            zIndex={cloudZIndex - 5}
+          />
           {/* Event announcement lives in the map, not the UI, so it pans and zooms
               with the world. */}
           <WorldSurfaceEventCard

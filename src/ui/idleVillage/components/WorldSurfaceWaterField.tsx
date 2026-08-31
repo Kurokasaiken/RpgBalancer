@@ -16,6 +16,11 @@ export interface WorldSurfaceWaterFieldProps {
   enabled?: boolean;
   canvasSize: { width: number; height: number };
   zIndex: number;
+  /**
+   * Optional water-field config. When omitted, `atmosphereAssets.waterField` is used.
+   * The lab page uses this to compare intensified variants without mutating the global config.
+   */
+  config?: WaterFieldConfig;
 }
 
 /**
@@ -60,10 +65,10 @@ export interface WorldSurfaceWaterFieldProps {
  * has already failed: the target is that the painting looks like it is moving, not
  * that something is moving on top of the painting.
  */
-export function WorldSurfaceWaterField({ enabled = true, canvasSize, zIndex }: WorldSurfaceWaterFieldProps) {
+export function WorldSurfaceWaterField({ enabled = true, canvasSize, zIndex, config }: WorldSurfaceWaterFieldProps) {
   if (!enabled) return null;
 
-  const cfg = atmosphereAssets.waterField;
+  const cfg = config ?? atmosphereAssets.waterField;
   if (!cfg || cfg.layers.length === 0) return null;
 
   return (

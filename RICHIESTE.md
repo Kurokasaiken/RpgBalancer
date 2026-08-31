@@ -1284,3 +1284,19 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 - `CURRENT_STATE.md` con fotografia del runtime.
 - `GLOSSARY.md` con termini canonici.
 - `context/INDEX.md` e `AGENTS.md` aggiornati per puntare ai nuovi documenti.
+
+---
+
+## R-059 — World Surface: aggiorna vincoli, breath sempre on, e crea Sea Effect Lab
+
+**Richiesta:** *«breath sempre on»*, *«aggiorna i vincoli»*, e *«voglio che tu faccia una pagina ad hoc x il mare e fare diversi tentativi, uno accanto all'altro, sempre raggiungibile da test hub»*.
+**Data:** 2026-08-31
+**Stato:** `fatta`
+**Consegnato:** 2026-08-31
+**Desiderata FROZEN:** `.mw/desiderata.md` v19 — World Surface: ombre nuvole sempre attive, autorizzazione shader/parallasse overlay e Water Effect Lab.
+**Output atteso:**
+|- `.mw/desiderata.md` v19, `DESIGN_PILLARS.md` §1, `context/DECISION_LOG.md`, e `src/docs/docs/plans/world_surface_reactive_artifact_plan.md` aggiornati con i nuovi vincoli.
+|- `WorldSurfaceRenderer.tsx` monta `WorldSurfaceCloudShadows` senza guardia `breathEnabled`.
+|- `WorldSurfaceWaterField.tsx` accetta una `config` opzionale.
+|- Nuova pagina `SeaEffectLabPage.tsx` (`/sea-effect-lab`) con due pannelli affiancati: baseline e water field intensificato.
+|- `TestHub.tsx` e `App.tsx` aggiornati per rendere la pagina raggiungibile.

@@ -404,3 +404,22 @@ archi, incluso il binario d'ombra spesso 4,5 unità. Registrare l'osservazione n
 è bastato; serve l'invariante in un posto che si legge prima di scrivere.
 
 **Fonte:** `.mw/runs/2026-08-28-poi-materic-v4/pattern-candidate.md`
+
+---
+
+## 2026-08-31 — World Surface: revoca dei vincoli no-shader/no-parallasse per il water lab
+
+**Da:** `DESIGN_PILLARS.md` §1 e `world_surface_reactive_artifact_plan.md` vietavano shader custom e parallasse su World Surface.
+
+**A:** il Director revoca esplicitamente i due vincoli in autonomia di sperimentazione:
+- shader custom (GLSL/Pixi filter) ammessi nel water lab e per effetti profilati, con fallback DOM;
+- micro-parallasse ammessa per overlay separabili (nuvole, ombre, luce, token), mai per i layer full-canvas baked 4240×2828.
+
+**Motivo:** i precedenti tentativi sull'acqua (DisplacementFilter, WaterField) sono falliti perché il mare dipinto non ha dettaglio ad alta frequenza. Senza poter provare shader e overlay parallasse in un lab controllato, ogni nuovo tentativo sarebbe cieco. Il Director ha deciso di abbassare la barriera tecnica per permettere confronti misurabili.
+
+**Implicazioni:**
+- `WorldSurfaceCloudShadows` è sempre attivo (`breath` on).
+- `/sea-effect-lab` ospita tentativi affiancati con fallback e profilazione.
+- Ogni shader/parallasse nuova richiede evidence log di frame-time e DPR.
+
+**Fonte:** sessione esecutiva R-059; `.mw/desiderata.md` v19.

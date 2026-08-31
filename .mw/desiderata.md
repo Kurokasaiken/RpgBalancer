@@ -1054,3 +1054,37 @@ ogni taratura futura ricadrebbe nello stesso conflitto.
 - Stack del server MCP (Node/TypeScript, Python, stdio/SSE).
 - Criterio di done per la fase di esplorazione.
 - Se il pattern deve essere clonabile per altri progetti e come.
+
+---
+
+## v19 — World Surface: ombre nuvole sempre attive, autorizzazione shader/parallasse overlay e Water Effect Lab
+
+**Status:** `FROZEN`
+**Date:** 2026-08-31
+**Authorized by:** Fausto
+**Reason:** «breath sempre on», «aggiorna i vincoli», e «voglio una pagina ad hoc x il mare con diversi tentativi uno accanto all'altro» — avallo direttoriale esplicito in sessione esecutiva.
+
+**Relazione con v2, v5 e DESIGN_PILLARS §1:** v19 **non sostituisce** l'intento della mappa viva, ma **revoca due vincoli operativi** che il Director ha deciso di abbassare per permettere sperimentazione controllata sull'acqua e sulla profondità:
+- il divieto di shader custom su World Surface diventa un **permesso condizionato** (lab, profilazione, fallback DOM);
+- il divieto di parallasse si restringe ai **layer full-canvas baked 4240×2828**; nuvole, ombre, luce, token e altri overlay separabili possono usare micro-parallasse.
+
+### User-stated (parole del Director)
+1. **Le ombre delle nuvole devono essere sempre attive** (`breath` sempre on), non legate a un flag.
+2. **I vincoli sono generici e possono essere cambiati dal Director** quando serve: shader custom, parallasse su overlay, e qualsiasi altro vincolo progettuale sono revisionabili su sua decisione esplicita.
+3. **Serve una pagina ad hoc per il mare** dove provare diversi tentativi d'effetto uno accanto all'altro, sempre raggiungibile dal TestHub.
+4. **Per l'acqua serve un piano intelligente, non altri tentativi alla cieca**: la pagina di laboratorio è lo strumento per confrontare tentativi misurabili, non una scappatoia per sperimentare a caso.
+
+### AI inference (derivata, marcata come tale)
+- Il revoca non è una licenza generica: shader e parallasse restano **profilati e documentati**; ogni tecnica nuova deve produrre un evidence log con frame-time, DPR, e fallback DOM.
+- Le nuvole e le ombre sono overlay separabili, quindi la loro micro-parallasse non espone bordi neri sui layer baked.
+- La pagina di lab è un test page (`/sea-effect-lab`) con due o più pannelli affiancati; ogni pannello è una configurazione valida del `WorldSurfaceRenderer`, non un componente isolato.
+
+### Cosa questo NON autorizza
+- Muovere layer full-canvas 4240×2828 con CSS transform o parallasse (resta vietato: esporrebbe bordi e cuciture).
+- Attivare shader custom senza fallback DOM, profilazione, e approvazione del Director.
+- Sostituire `WorldSurfaceWaves` o il piano reattivo con tentativi non misurati: il lab è confronto, non produzione.
+
+### Invarianti che restano
+- `prefers-reduced-motion` per tutti gli effetti.
+- Budget misurato su WebView/Tauri.
+- Config-first e Zod per ogni nuovo parametro.
