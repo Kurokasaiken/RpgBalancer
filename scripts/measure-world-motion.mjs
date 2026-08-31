@@ -62,6 +62,13 @@ const OUT_DIR = 'test-results';
  * with red clearly the darkest channel — forest greens put green above blue,
  * desert puts red on top, and the grey mountains keep all three level.
  */
+/**
+ * KNOWN LIMITATION. This classifies by colour, so a cloud or a bird crossing the
+ * water is counted as the water changing. With 16 cloud sprites drifting over the
+ * sea, a couple of percent of "sea coverage" is theirs. Treat the sea number as an
+ * upper bound, and confirm any change with an isolated diff — hide every other
+ * animated layer and compare two moments — before believing it.
+ */
 function isSea(r, g, b) {
   const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
   return b >= g - 8 && g > r + 10 && lum >= 95 && lum <= 175;

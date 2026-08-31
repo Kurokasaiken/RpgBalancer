@@ -438,6 +438,16 @@ const easeElastic=t=>t===0?0:t===1?1:Math.pow(2,-10*t)*Math.sin((t*10-0.75)*(TAU
 
 const V63_STIFFNESS=tarGooConfig.v63.stiffness;
 /* la variante di fondo attiva: config, sovrascrivibile con ?bg=<nome> */
+/* la palette della stella attiva: config, sovrascrivibile con ?star=<nome> */
+function v63Star(){
+  const set=tarGooConfig.v63.stars;
+  let nome=tarGooConfig.v63.star;
+  try{
+    const q=new URLSearchParams(window.location.search).get('star');
+    if(q&&set[q]) nome=q;
+  }catch(e){ /* nessuna query: resta la config */ }
+  return set[nome]||set.avorio;
+}
 function v63Backdrop(){
   const set=tarGooConfig.v63.backdrops;
   let nome=tarGooConfig.v63.backdrop;
@@ -1342,7 +1352,8 @@ function drawStar(now){
      La faccia e i bordi crescono fino al muro; ciò che eccede resta
      solo contorno tratteggiato, così le punte non coprono board/confini. */
   const face=ctx.createRadialGradient(CX-30,CY-46,6,CX,CY,geo.rTip*s);
-  face.addColorStop(0,'#ffffff'); face.addColorStop(.42,'#fdf8e9'); face.addColorStop(1,'#ecd49a');
+  const SP=v63Star();
+  face.addColorStop(0,SP.face[0]); face.addColorStop(.42,SP.face[1]); face.addColorStop(1,SP.face[2]);
 
   /* LA MASCHERA E' LA SUPERFICIE DEL CATRAME, NON UN RITAGLIO CHE SI STRINGE.
      Il tentativo precedente morfava la maschera da un cerchio grande alla forma
@@ -1476,10 +1487,10 @@ function drawStar(now){
      Clippate al path diventano ghiere INTERNE: la silhouette dipinta coincide
      con la geometria che porta la probabilita'. */
   ctx.save(); ctx.clip(p);
-  ctx.lineWidth=4.5; ctx.strokeStyle='#602c08'; ctx.stroke(p);
+  ctx.lineWidth=4.5; ctx.strokeStyle=SP.rimDark; ctx.stroke(p);
   ctx.lineWidth=2.4;
   const rim=ctx.createLinearGradient(CX-120,CY-120,CX+120,CY+120);
-  rim.addColorStop(0,'#fce890'); rim.addColorStop(.5,'#a06a1e'); rim.addColorStop(1,'#fce890');
+  rim.addColorStop(0,SP.rimA); rim.addColorStop(.5,SP.rimB); rim.addColorStop(1,SP.rimA);
   ctx.strokeStyle=rim; ctx.stroke(p);
   /* L6 white specular hairline */
   ctx.lineWidth=.8; ctx.strokeStyle='rgba(255,248,215,.85)'; ctx.stroke(p);
@@ -1496,7 +1507,7 @@ function drawStar(now){
   ctx.beginPath(); ctx.arc(CX,CY,geo.rCore*s,0,TAU); ctx.stroke();
   /* L11 brushed bronze-on-gold core (the BIG WIN seat) */
   const core=ctx.createRadialGradient(CX-8,CY-10,2,CX,CY,geo.rCore*s);
-  core.addColorStop(0,'#f7e1ad'); core.addColorStop(.55,'#cf9d4a'); core.addColorStop(1,'#7d4d12');
+  core.addColorStop(0,SP.core[0]); core.addColorStop(.55,SP.core[1]); core.addColorStop(1,SP.core[2]);
   ctx.fillStyle=core;
   /* IL NUCLEO SI RIMPICCIOLISCE PRIMA DI ESISTERE. `drawStar` passa da s>0.01,
      ma con rCore=43 il raggio `rCore*s-2` e' NEGATIVO per s sotto 0.046, e

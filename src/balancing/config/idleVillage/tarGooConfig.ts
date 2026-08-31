@@ -171,6 +171,22 @@ const tarGooConfigSchema = z.object({
       inner: z.string(), outer: z.string(),
       leakCore: z.string(), leakMid: z.string(), leakEdge: z.string(),
     })),
+    /**
+     * CP-H — LA STELLA E' ACCOPPIATA AL FONDO. Misurato: su pergamena l'avorio
+     * attuale scende a 1.10 di contrasto contro la pagina, cioe' sparisce. La
+     * palette del personaggio non e' indipendente dal fondo su cui vive, e per
+     * questo si sceglie insieme. `?star=<nome>` la sovrascrive a runtime.
+     *
+     * `face` sono i tre stop della faccia (centro, mezzo, bordo); `rimDark` e
+     * `rimA`/`rimB` la ghiera; `core` i tre stop del nucleo.
+     */
+    star: z.string(),
+    stars: z.record(z.string(), z.object({
+      face: z.tuple([z.string(), z.string(), z.string()]),
+      rimDark: z.string(),
+      rimA: z.string(), rimB: z.string(),
+      core: z.tuple([z.string(), z.string(), z.string()]),
+    })),
   }),
 });
 
@@ -275,6 +291,33 @@ export const tarGooConfig: TarGooConfig = tarGooConfigSchema.parse({
         inner: 'rgba(74,84,96,1)', outer: 'rgba(38,44,54,1)',
         leakCore: 'rgba(180,206,232,.34)', leakMid: 'rgba(150,178,206,.16)',
         leakEdge: 'rgba(0,0,0,0)',
+      },
+    },
+    star: 'avorio',
+    stars: {
+      /** l'attuale: avorio e oro pallido. Nato su fondo scuro, su pergamena sparisce. */
+      avorio: {
+        face: ['#ffffff', '#fdf8e9', '#ecd49a'],
+        rimDark: '#602c08', rimA: '#fce890', rimB: '#a06a1e',
+        core: ['#f7e1ad', '#cf9d4a', '#7d4d12'],
+      },
+      /** bronzo brunito: un sigillo di metallo intarsiato nella pagina. */
+      bronzo: {
+        face: ['#e8b968', '#c08a34', '#8a5a16'],
+        rimDark: '#3a1c04', rimA: '#f0cf7e', rimB: '#6d4310',
+        core: ['#f2d79a', '#a8722a', '#4a2c08'],
+      },
+      /** ceralacca: rosso sangue di bue, il sigillo posato sul foglio. */
+      ceralacca: {
+        face: ['#c4553f', '#9b3526', '#6b1f16'],
+        rimDark: '#2e0c07', rimA: '#e8a48c', rimB: '#5c1a12',
+        core: ['#dda08c', '#a34430', '#4a120c'],
+      },
+      /** verderame: la palette fredda della bibbia, portata sul caldo della carta. */
+      verderame: {
+        face: ['#7fc4ad', '#3f8d78', '#1f5546'],
+        rimDark: '#0c2a22', rimA: '#a8ddca', rimB: '#2a6b58',
+        core: ['#b6e0d0', '#3c8b74', '#123b30'],
       },
     },
   },
