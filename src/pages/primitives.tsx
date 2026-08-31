@@ -519,7 +519,7 @@ const TAB_CONTENT: Record<TabId, () => JSX.Element> = {
 };
 
 export default function PrimitivesPage(): JSX.Element {
-  const [tab, setTab] = useState<TabId>(TABS[TABS.length - 1].id);
+  const [tab, setTab] = useState<TabId>('reminder');
   const TabComponent = TAB_CONTENT[tab];
 
   return (
