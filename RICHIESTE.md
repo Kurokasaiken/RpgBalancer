@@ -1311,7 +1311,11 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 **Consegnato:** 2026-08-31
 **Desiderata FROZEN:** `.mw/desiderata.md` v19 — World Surface: ombre nuvole sempre attive, autorizzazione shader/parallasse overlay e Water Effect Lab.
 **Output atteso:**
-|- `WorldSurfaceClouds.tsx` e `WorldSurfaceCloudShadows.tsx` usano `translate3d` con CSS custom properties per sommare la parallasse di drag e la parallasse del mouse.
-|- `WorldSurfaceRenderer.tsx` calcola e imposta `--ws-mouse-parallax-x/y` in `handleMouseMove`, e le resetta su `onMouseLeave`.
-|- `WorldSurfaceCloudShadows.tsx` accetta e usa `parallaxOffset` come le nuvole.
+|- `WorldSurfaceClouds.tsx` e `WorldSurfaceCloudShadows.tsx` accettano `parallaxOffset` e lo usano per `translate3d` drag-only.
+|- `WorldSurfaceRenderer.tsx` calcola `cloudParallax` solo da `dragOriginPan`, senza variabili CSS legate alla posizione del mouse.
+|- Il prop `breathEnabled` resta indipendente; ombre nuvole sempre attive.
 |- Safeguards: build:check, lint, kanban:lint e `WorldSurfaceRenderer.test.tsx` passano.
+
+**Aggiornamento 2026-08-31:**
+|- Il Director ha ristretto la parallasse al **trascinamento**: nessun offset da semplice posizione del mouse (`hover`).
+|- Valori `PARALLAX` ridotti (`cloudExcess: 0.12`, `maxOffsetScreenPx: 8`) per un effetto più leggero.

@@ -38,9 +38,11 @@ export function WorldSurfaceCloudShadows({
         zIndex,
         overflow: 'hidden',
         pointerEvents: 'none',
-        transform: `translate3d(calc(${(parallaxOffset?.x ?? 0)}px + var(--ws-mouse-parallax-x, 0px)), calc(${(parallaxOffset?.y ?? 0)}px + var(--ws-mouse-parallax-y, 0px)), 0)`,
-        transition: 'transform 400ms ease-out',
-        willChange: 'transform',
+        transform: parallaxOffset
+          ? `translate3d(${parallaxOffset.x}px, ${parallaxOffset.y}px, 0)`
+          : undefined,
+        transition: parallaxOffset ? 'transform 400ms ease-out' : undefined,
+        willChange: parallaxOffset ? 'transform' : undefined,
         maskImage: 'url(/assets/atmosphere/terrain/cloud_mask_land.png)',
         WebkitMaskImage: 'url(/assets/atmosphere/terrain/cloud_mask_land.png)',
         maskSize: '100% 100%',
