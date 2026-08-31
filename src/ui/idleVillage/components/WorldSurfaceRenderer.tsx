@@ -1,5 +1,6 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { WorldSurfaceAtmosphere } from './WorldSurfaceAtmosphere';
+import { WorldSurfaceRiverGlint } from './WorldSurfaceRiverGlint';
 import { useTranslation } from 'react-i18next';
 import type { RuntimeObject } from '../../../engine/world/model/RuntimeObject';
 import type { WaterFieldConfig } from '../config/atmosphereAssets';
@@ -708,11 +709,17 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
           <WorldSurfaceWaves zIndex={cloudZIndex - 4} />
           {/* Water field: broad light pools and drifting micro-detail over the sea. */}
           {showWaterField && (
-            <WorldSurfaceWaterField
-              canvasSize={manifest.coordinateSystem.canvas}
-              zIndex={cloudZIndex - 6}
-              config={waterFieldConfig}
-            />
+            <>
+              <WorldSurfaceWaterField
+                canvasSize={manifest.coordinateSystem.canvas}
+                zIndex={cloudZIndex - 6}
+                config={waterFieldConfig}
+              />
+              <WorldSurfaceRiverGlint
+                canvasSize={manifest.coordinateSystem.canvas}
+                zIndex={cloudZIndex - 5.5}
+              />
+            </>
           )}
           {/*
             Water field: NOT mounted, deliberately.

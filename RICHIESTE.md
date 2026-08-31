@@ -1269,6 +1269,11 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 - Chiarimento del Director su "teca di vetro": il globo del primitivo `Window`, oppure una teca sopra **tutta la mappa** (overlay full-canvas con riflessi)? Sono due lavori diversi e il secondo e piu rischioso.
 - Vetro sul `Window` (approvato: `filter: url(#glass)` sull'immagine). Rischio quasi nullo: `<Window>` non ha consumatori reali, vive solo nella vetrina `/primitives`.
 - Eventuale parallasse da posizione del mouse, per coprire la vista di default.
+**Aggiornamento 2026-08-31 (Fette 1):**
+- Implementato `WorldSurfaceRiverGlint` con due streaks bianche animate lungo i fiumi via SVG `stroke-dashoffset`.
+- Config-first: percorsi, colori, opacita e tempi in `atmosphereAssets.riverGlints`.
+- Montato in `WorldSurfaceRenderer` sotto il layer nuvole/ombre, controllato dal toggle **Water**.
+- Safeguards passati: lint, `WorldSurfaceRenderer.test.tsx`, build:check, kanban:lint.
 
 ---
 

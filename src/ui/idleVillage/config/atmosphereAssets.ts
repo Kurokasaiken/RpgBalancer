@@ -211,6 +211,25 @@ export interface WaterFieldConfig {
   lightPools: WaterLightPool[];
 }
 
+export interface RiverGlint {
+  /** SVG path data (`d` attribute) following a river. */
+  d: string;
+  /** Tint of the glint, with alpha baked in. */
+  color: string;
+  /** Stroke width in world px. */
+  width: number;
+  /** Dash length in world px. */
+  dash: number;
+  /** Gap between dashes in world px. */
+  gap: number;
+  /** Duration of one full cycle, in seconds. */
+  durationSeconds: number;
+  /** Base opacity of the glint. */
+  opacity: number;
+  /** Optional delay before the cycle starts. */
+  delaySeconds?: number;
+}
+
 export interface AmbientLightRays {
   /** Whether the ray fan is rendered at all. */
   enabled: boolean;
@@ -264,6 +283,8 @@ export interface AtmosphereConfig {
   waves: WavesConfig;
   ambient: AmbientConfig;
   waterField: WaterFieldConfig;
+  /** Animated light streaks drawn along rivers. */
+  riverGlints: RiverGlint[];
 }
 
 export const atmosphereAssets: AtmosphereConfig = {
@@ -432,4 +453,25 @@ export const atmosphereAssets: AtmosphereConfig = {
       { name: 'p12', sizePx: 2100, x: 3626, y: 2355, dx: 342, dy: -407, driftSeconds: 131, tintDelta: -13, opacityMin: 0.11, opacityMax: 0.55, pulseSeconds: 29 },
     ],
   },
+  /** Two animated glints along the main rivers. World coordinates are hand-tuned to the painted map. */
+  riverGlints: [
+    {
+      d: 'M 1420 620 C 1540 980, 1480 1360, 1660 1620 C 1840 1880, 1360 2120, 980 2380',
+      color: 'rgba(255, 255, 255, 0.95)',
+      width: 36,
+      dash: 70,
+      gap: 100,
+      durationSeconds: 5.2,
+      opacity: 0.95,
+    },
+    {
+      d: 'M 2720 520 C 2880 920, 3260 1180, 3100 1640 C 2940 2100, 3420 2280, 3760 2000',
+      color: 'rgba(255, 255, 255, 0.90)',
+      width: 28,
+      dash: 50,
+      gap: 80,
+      durationSeconds: 4.8,
+      opacity: 0.9,
+    },
+  ],
 };
