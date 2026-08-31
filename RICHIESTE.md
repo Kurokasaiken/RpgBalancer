@@ -1348,5 +1348,3 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 |- Montato in `WorldSurfaceRenderer` sotto le nuvole, con prop `showAtmosphere`; toggle in `WorldSurfaceTestPage`.
 |- `prefers-reduced-motion` disattiva le animazioni.
 |- Safeguards passano.
-
-**Aggiornamento 2026-08-31:** Il Director ha deciso di rimuovere sia `WorldSurfaceAtmosphere` che `WorldSurfaceBreathOverlay` dalla mappa: nessun impatto visibile con Atmosphere e Breath giudicato non utile. Il toggle `Water` resta.
