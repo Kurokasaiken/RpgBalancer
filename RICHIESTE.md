@@ -1275,6 +1275,7 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 - Montato in `WorldSurfaceRenderer` sotto il layer nuvole/ombre, controllato dal toggle **Water**.
 - Safeguards passati: lint, `WorldSurfaceRenderer.test.tsx`, build:check, kanban:lint.
 - Visibilita' del vetro e riflessi su `GoblinInvasionWindow` aumentata: `g-glass`, `g-glass-hl`, `g-glass-b`, luce diagonale e nebbia atmosferica raddoppiate di opacita'.
+- Aggiunto parallax 3D piu' marcato, caustiche mobili e transizioni 100ms sui layer vetro perche' l'effetto si legga dinamicamente al movimento del mouse.
 
 ---
 

@@ -379,7 +379,7 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
           overflow: 'hidden',
           transform: reduced
             ? 'none'
-            : `perspective(900px) rotateX(calc(var(--my) * -1deg)) rotateY(calc(var(--mx) * 1.5deg))`,
+            : `perspective(900px) rotateX(calc(var(--my) * -2deg)) rotateY(calc(var(--mx) * 3deg))`,
           zIndex: 4,
         }}
       >
@@ -396,7 +396,7 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
             objectFit: 'cover',
             transform: reduced
               ? 'none'
-              : `translate3d(calc(var(--mx) * 2px), calc(var(--my) * 1px), 0)`,
+              : `translate3d(calc(var(--mx) * 6px), calc(var(--my) * 3px), 0)`,
           }}
         />
         <div
@@ -417,7 +417,7 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
             objectFit: 'contain',
             transform: reduced
               ? 'none'
-              : `translate3d(calc(var(--mx) * 7px), calc(var(--my) * 4px), 0)`,
+              : `translate3d(calc(var(--mx) * 18px), calc(var(--my) * 12px), 0)`,
           }}
         />
         <img
@@ -434,7 +434,7 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
             transition: reduced ? 'none' : (isPeeled ? 'clip-path 0.9s cubic-bezier(0.22, 1, 0.36, 1)' : 'clip-path 0.08s ease-out'),
             transform: reduced
               ? 'none'
-              : `translate3d(calc(var(--mx) * 7px), calc(var(--my) * 4px), 0)`,
+              : `translate3d(calc(var(--mx) * 18px), calc(var(--my) * 12px), 0)`,
             filter: isPeeled ? 'drop-shadow(8px 0 18px rgba(0,0,0,0.55))' : 'none',
           }}
         />
@@ -454,7 +454,8 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
             animation: reduced ? 'none' : 'window-light-breathe 6s ease-in-out infinite',
             transform: reduced
               ? 'rotate(18deg)'
-              : 'rotate(18deg) translateX(calc(var(--mx) * -8px))',
+              : 'rotate(18deg) translate3d(calc(var(--mx) * -24px), calc(var(--my) * -18px), 0)',
+            transition: reduced ? 'none' : 'transform 100ms ease-out',
             pointerEvents: 'none',
             zIndex: 6,
           }}
@@ -469,6 +470,26 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
             mixBlendMode: 'screen',
             pointerEvents: 'none',
             zIndex: 6,
+          }}
+        />
+
+        {/* Caustic light pools — warm and cool spots that slide with the glass */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: '-12px',
+            borderRadius: 'inherit',
+            background: `
+              radial-gradient(circle at 30% 25%, rgba(255,230,160,.20) 0%, transparent 30%),
+              radial-gradient(circle at 70% 70%, rgba(160,230,255,.14) 0%, transparent 28%)
+            `,
+            mixBlendMode: 'screen',
+            pointerEvents: 'none',
+            zIndex: 5,
+            transform: reduced
+              ? 'none'
+              : 'translate3d(calc(var(--mx) * -18px), calc(var(--my) * -14px), 0)',
+            transition: reduced ? 'none' : 'transform 100ms ease-out',
           }}
         />
 
@@ -487,7 +508,10 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
             borderRadius: RX - 8,
             pointerEvents: 'none',
             zIndex: 8,
-            transform: reduced ? 'none' : `translateX(calc(var(--mx) * 4px))`,
+            transform: reduced
+              ? 'none'
+              : `translate3d(calc(var(--mx) * 10px), calc(var(--my) * 8px), 0)`,
+            transition: reduced ? 'none' : 'transform 100ms ease-out',
           }}
           aria-hidden="true"
         >
