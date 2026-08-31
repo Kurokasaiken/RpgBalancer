@@ -16,7 +16,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { MatericEventCard } from '@/ui/designSystem/primitives';
 import { GoblinInvasionWindow } from '@/ui/idleVillage/components/GoblinInvasionWindow';
-import { PoiMatericV3 } from '@/ui/idleVillage/components/poi/PoiMatericV3';
+import { ReminderComponent } from './ReminderComponent';
 import goblinStickerImage from '@/assets/ui/idleVillage/goblin-march-trasparente.png';
 import { trailerConfig } from '@/balancing/config/idleVillage/trailerConfig';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
@@ -62,26 +62,6 @@ const WINDOW_BOX_W = 364;
 const WINDOW_BOX_H = 294;
 const WINDOW_INNER_SCALE = 0.7;
 
-/**
- * Landscape pgCard proportions for the parked reminder: short and long, like the
- * horizontal roster card, not a tall narrow chip. The reminder is a single row —
- * POI medallion on the left, name and countdown stacked on the right — so a
- * portrait box only stretched that row into empty height.
- */
-const REMINDER_W = 320;
-const REMINDER_H = 140;
-
-/**
- * Diameter of the POI medallion inside the reminder, in design px.
- *
- * The reminder renders at REMINDER_SCALE inside a camera that fits the 4240px
- * canvas to the viewport (~0.27 zoom), so a design px lands at roughly 0.69 CSS
- * px on screen. At the previous 20px the magic circle and its filling ring were
- * ~14 CSS px across and unreadable; 92 puts it near 63 CSS px, where the ring
- * progress is legible.
- */
-const REMINDER_POI_SIZE = 92;
-
 /** Natural size of the sticker sprite once detached from the card. */
 const STICKER_W = 476;
 const STICKER_H = 376;
@@ -113,37 +93,6 @@ const playThud = () => {
   gain.connect(ctx.destination);
   osc.start();
   osc.stop(ctx.currentTime + 0.2);
-};
-
-/**
- * POI that starts with an empty magic circle and fills counter-clockwise.
- */
-const FillingPoi: React.FC<{ size: number }> = ({ size }) => {
-  const [progress, setProgress] = useState(0);
-  const duration = trailerConfig.threat.goblin.poiFillDurationMs;
-
-  useEffect(() => {
-    let raf = 0;
-    let start = 0;
-    const step = (t: number) => {
-      if (!start) start = t;
-      const p = Math.min(1, (t - start) / duration);
-      setProgress(p);
-      if (p < 1) raf = requestAnimationFrame(step);
-    };
-    raf = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(raf);
-  }, [duration]);
-
-  return (
-    <PoiMatericV3
-      type="event"
-      state="active"
-      progress={progress}
-      timerDirection="counterclockwise"
-      size={size}
-    />
-  );
 };
 
 export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
@@ -324,24 +273,14 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
                 position: 'absolute',
                 left: 0,
                 top: 0,
-                width: REMINDER_W,
-                transform: 'translate(-50%, -50%)',
               }}
             >
-              <MatericEventCard
-                variant="reminder"
+              <ReminderComponent
                 title={String(t('world.goblinInvasion.invasion'))}
                 daysLeftLabel={String(
-                  t('world.goblinInvasion.daysRemaining', { count: DAYS_LEFT }),
+                  t('world.goblinInvasion.daysRemaining', { count: daysLeft }),
                 )}
-                image={<FillingPoi size={REMINDER_POI_SIZE} />}
-                style={{
-                  maxWidth: REMINDER_W,
-                  width: REMINDER_W,
-                  minHeight: REMINDER_H,
-                  display: 'flex',
-                  justifyContent: 'center',
-                }}
+                style={{ transform: 'translate(-50%, -50%)' }}
               />
             </motion.div>
           )}
