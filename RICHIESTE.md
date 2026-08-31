@@ -1333,3 +1333,18 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 |- `Window.tsx` accetta `parallax` e sposta i layer caustica/riflesso con CSS custom properties su mouse move (opposto al puntatore, max 6px).
 |- `glass`, `caustics`, `reflections` sono condizionali e rispettano `prefers-reduced-motion`.
 |- Build:check, lint su `Window.tsx` e kanban:lint passano.
+
+---
+
+## R-062 — World Surface: raggi di luce, dust ed effetti particellari atmosferici
+
+**Richiesta:** Aggiungere alla mappa raggi di luce, dust ed effetti particellari atmosferici, dopo ricerca online sulle tecniche migliori.
+**Data:** 2026-08-31
+**Stato:** `fatta`
+**Consegnato:** 2026-08-31
+**Output atteso:**
+|- `WorldSurfaceAtmosphere` componente con light rays (CSS `repeating-conic-gradient` + pulse) e dust motes (CSS DOM particles).
+|- Config-first: parametri in `atmosphereAssets.ambient` (lightRays, dust).
+|- Montato in `WorldSurfaceRenderer` sotto le nuvole, con prop `showAtmosphere`; toggle in `WorldSurfaceTestPage`.
+|- `prefers-reduced-motion` disattiva le animazioni.
+|- Safeguards passano.
