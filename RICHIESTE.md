@@ -1319,3 +1319,17 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 **Aggiornamento 2026-08-31:**
 |- Il Director ha ristretto la parallasse al **trascinamento**: nessun offset da semplice posizione del mouse (`hover`).
 |- Valori `PARALLAX` (`cloudExcess: 0.15`, `maxOffsetScreenPx: 12`) per un effetto visibile al drag ma con tetto leggero.
+
+---
+
+## R-061 — Window primitive: logica semantica per glass, parallasse, luce e riflessi
+
+**Richiesta:** Aggiungere la logica semantica al componente `Window`: glass, parallasse, effetti di luce, riflessi, ecc.
+**Data:** 2026-08-31
+**Stato:** `fatta`
+**Consegnato:** 2026-08-31
+**Output atteso:**
+|- `WindowProps` espande `glass`, `parallax`, `caustics`, `reflections` con default conservativi.
+|- `Window.tsx` accetta `parallax` e sposta i layer caustica/riflesso con CSS custom properties su mouse move (opposto al puntatore, max 6px).
+|- `glass`, `caustics`, `reflections` sono condizionali e rispettano `prefers-reduced-motion`.
+|- Build:check, lint su `Window.tsx` e kanban:lint passano.
