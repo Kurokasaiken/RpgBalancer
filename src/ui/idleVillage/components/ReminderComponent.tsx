@@ -150,7 +150,7 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
           daysLeftLabel={daysLeftLabel}
           daysLeftValue={daysLeftValue}
           image={(
-            <div style={{ filter: `drop-shadow(0 0 10px ${gilded.gemGlow})` }}>
+            <div style={{ filter: `drop-shadow(0 0 18px ${gilded.gemGlow})`, padding: '0 4px' }}>
               <FillingPoi size={sizing.poiSize} fillDurationMs={poi.fillDurationMs} />
             </div>
           )}
