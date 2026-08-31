@@ -6,6 +6,11 @@ export interface WorldSurfaceCloudShadowsProps {
   zIndex: number;
   /** Per-band width multipliers. */
   scales?: { far: number; mid: number; near: number };
+  /**
+   * Extra offset in WORLD px, on top of the camera's own pan — the parallax.
+   * Mouse parallax is layered in via CSS custom properties from the parent.
+   */
+  parallaxOffset?: { x: number; y: number };
 }
 
 /**
@@ -20,6 +25,7 @@ export function WorldSurfaceCloudShadows({
   canvasSize,
   zIndex,
   scales = { far: 1, mid: 1, near: 1 },
+  parallaxOffset,
 }: WorldSurfaceCloudShadowsProps) {
   if (!enabled) return null;
 
@@ -32,6 +38,9 @@ export function WorldSurfaceCloudShadows({
         zIndex,
         overflow: 'hidden',
         pointerEvents: 'none',
+        transform: `translate3d(calc(${(parallaxOffset?.x ?? 0)}px + var(--ws-mouse-parallax-x, 0px)), calc(${(parallaxOffset?.y ?? 0)}px + var(--ws-mouse-parallax-y, 0px)), 0)`,
+        transition: 'transform 400ms ease-out',
+        willChange: 'transform',
         maskImage: 'url(/assets/atmosphere/terrain/cloud_mask_land.png)',
         WebkitMaskImage: 'url(/assets/atmosphere/terrain/cloud_mask_land.png)',
         maskSize: '100% 100%',

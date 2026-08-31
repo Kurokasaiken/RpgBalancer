@@ -1300,3 +1300,18 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 |- `WorldSurfaceWaterField.tsx` accetta una `config` opzionale.
 |- Nuova pagina `SeaEffectLabPage.tsx` (`/sea-effect-lab`) con due pannelli affiancati: baseline e water field intensificato.
 |- `TestHub.tsx` e `App.tsx` aggiornati per rendere la pagina raggiungibile.
+
+---
+
+## R-060 — World Surface: parallasse al mouse su nuvole e ombre
+
+**Richiesta:** *«prima parallasse»* — aggiungere la parallasse guidata dalla posizione del mouse sugli overlay atmosferici (nuvole e ombre), come previsto e autorizzato dalla desiderata v19.
+**Data:** 2026-08-31
+**Stato:** `fatta`
+**Consegnato:** 2026-08-31
+**Desiderata FROZEN:** `.mw/desiderata.md` v19 — World Surface: ombre nuvole sempre attive, autorizzazione shader/parallasse overlay e Water Effect Lab.
+**Output atteso:**
+|- `WorldSurfaceClouds.tsx` e `WorldSurfaceCloudShadows.tsx` usano `translate3d` con CSS custom properties per sommare la parallasse di drag e la parallasse del mouse.
+|- `WorldSurfaceRenderer.tsx` calcola e imposta `--ws-mouse-parallax-x/y` in `handleMouseMove`, e le resetta su `onMouseLeave`.
+|- `WorldSurfaceCloudShadows.tsx` accetta e usa `parallaxOffset` come le nuvole.
+|- Safeguards: build:check, lint, kanban:lint e `WorldSurfaceRenderer.test.tsx` passano.
