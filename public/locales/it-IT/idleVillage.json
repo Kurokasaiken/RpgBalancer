@@ -522,7 +522,8 @@
       "spawnWonders": "Mostra meraviglie",
       "despawnWonders": "Nascondi meraviglie",
       "breath": "Respira",
-      "water": "Acqua"
+      "water": "Acqua",
+      "atmosphere": "Atmosfera"
     }
   },
   "pgDetailCard": {

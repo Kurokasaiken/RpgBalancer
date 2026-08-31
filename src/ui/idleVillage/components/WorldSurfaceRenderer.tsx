@@ -23,6 +23,7 @@ const WorldSurfaceFoam = lazy(() => import('./WorldSurfaceFoam'));
 const WorldSurfaceBirds = lazy(() => import('./WorldSurfaceBirds'));
 const WorldSurfaceCreatures = lazy(() => import('./WorldSurfaceCreatures'));
 const WorldSurfaceEventCard = lazy(() => import('./WorldSurfaceEventCard'));
+const WorldSurfaceAtmosphere = lazy(() => import('./WorldSurfaceAtmosphere'));
 
 /**
  * Carved border the world is seen through. Atmosphere layers paint below it, so
@@ -126,6 +127,8 @@ interface WorldSurfaceRendererProps {
   showWaterField?: boolean;
   /** Optional override for the water field configuration (used by the lab page). */
   waterFieldConfig?: WaterFieldConfig;
+  /** When true, the ambient light-ray and dust layer is rendered. */
+  showAtmosphere?: boolean;
   children?: React.ReactNode;
 }
 
@@ -238,6 +241,7 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
   autoFitTrigger = 1,
   breathEnabled = false,
   showWaterField = false,
+  showAtmosphere = false,
   waterFieldConfig,
   eventCovered = false,
   showEventCard = false,
@@ -366,6 +370,8 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
     const frame = effectiveLayers.find((layer) => layer.id === FRAME_LAYER_ID);
     return frame ? frame.zIndex - 1 : 1000;
   }, [effectiveLayers]);
+
+  const atmosphereZIndex = useMemo(() => cloudZIndex - 0.5, [cloudZIndex]);
 
   const containerSize = useRef<{ width: number; height: number }>({ width: 0, height: 0 });
 
@@ -671,6 +677,12 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
               zIndex={cloudZIndex}
               scales={cloudScales}
               parallaxOffset={cloudParallax}
+            />
+          )}
+          {showAtmosphere && !eventCovered && (
+            <WorldSurfaceAtmosphere
+              canvasSize={manifest.coordinateSystem.canvas}
+              zIndex={atmosphereZIndex}
             />
           )}
           {/* Birds fly under the weather but over the ground. */}

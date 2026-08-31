@@ -489,7 +489,8 @@
       "spawnWonders": "Spawn wonders",
       "despawnWonders": "Despawn wonders",
       "breath": "Breath",
-      "water": "Water"
+      "water": "Water",
+      "atmosphere": "Atmosphere"
     }
   },
   "worldEvents": {
