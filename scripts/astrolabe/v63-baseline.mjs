@@ -11,9 +11,13 @@
  */
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const ROOT = resolve(import.meta.dirname, '../..');
+/* `import.meta.dirname` esiste solo da Node 20.11: su Node 16 vale `undefined` e
+   `resolve` lancia. Lo script moriva invece di verificare, e una verifica che
+   esplode e' peggio di nessuna verifica — sembra passata se non si guarda. */
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const OUT = resolve(ROOT, '.mw/baselines/v62-source.json');
 
 /** I file che definiscono il comportamento della V6.2. */
