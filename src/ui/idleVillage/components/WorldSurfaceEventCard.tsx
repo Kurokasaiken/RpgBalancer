@@ -273,6 +273,7 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
                 position: 'absolute',
                 left: 0,
                 top: 0,
+                transform: 'translate(-50%, -50%)',
               }}
             >
               <ReminderComponent
@@ -280,7 +281,6 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
                 daysLeftLabel={String(
                   t('world.goblinInvasion.daysRemaining', { count: daysLeft }),
                 )}
-                style={{ transform: 'translate(-50%, -50%)' }}
               />
             </motion.div>
           )}
