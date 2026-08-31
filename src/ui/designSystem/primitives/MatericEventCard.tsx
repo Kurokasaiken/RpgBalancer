@@ -84,14 +84,9 @@ export const MatericEventCard: React.FC<MatericEventCardProps> = ({
     />
   ) : null;
 
-  return (
-    <MatericFrame
-      variant="molding"
-      className={className}
-      style={{ maxWidth: 360, textAlign: 'center', position: 'relative', ...style }}
-    >
-      <SkinScope style={{ position: 'relative', zIndex: 1, padding: variant === 'reminder' ? 18 : 24 }}>
-        {variant === 'reminder' ? (
+  const content = (
+    <SkinScope style={{ position: 'relative', zIndex: 1, padding: variant === 'reminder' ? 18 : 24 }}>
+      {variant === 'reminder' ? (
           <div
             style={{
               display: 'flex',
@@ -206,6 +201,15 @@ export const MatericEventCard: React.FC<MatericEventCardProps> = ({
           </>
         )}
       </SkinScope>
+  );
+
+  return variant === 'reminder' ? (
+    <div className={className} style={{ position: 'relative', maxWidth: 360, textAlign: 'center', ...style }}>
+      {content}
+    </div>
+  ) : (
+    <MatericFrame variant="molding" className={className} style={{ maxWidth: 360, textAlign: 'center', position: 'relative', ...style }}>
+      {content}
     </MatericFrame>
   );
 };
