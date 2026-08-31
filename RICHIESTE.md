@@ -1274,6 +1274,7 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 - Config-first: percorsi, colori, opacita e tempi in `atmosphereAssets.riverGlints`.
 - Montato in `WorldSurfaceRenderer` sotto il layer nuvole/ombre, controllato dal toggle **Water**.
 - Safeguards passati: lint, `WorldSurfaceRenderer.test.tsx`, build:check, kanban:lint.
+- Visibilita' del vetro e riflessi su `GoblinInvasionWindow` aumentata: `g-glass`, `g-glass-hl`, `g-glass-b`, luce diagonale e nebbia atmosferica raddoppiate di opacita'.
 
 ---
 
