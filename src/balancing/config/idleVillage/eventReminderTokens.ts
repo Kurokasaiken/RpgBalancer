@@ -62,20 +62,38 @@ const tokensSchema = z.object({
     shadow: z.string(),
     highlight: z.string(),
   }),
+  /** AAA v2 polish tokens. */
+  v2: z.object({
+    plaqueBorder: z.string(),
+    plaqueBg: z.string(),
+    plaqueShine: z.string(),
+    plaqueShadow: z.string(),
+    glare: z.string(),
+    poiScale: z.number(),
+    poiGlowOpacity: z.number(),
+    handleStroke: z.string(),
+    handleOpacity: z.number(),
+  }),
   /** Temporal states. */
   states: z.object({
     calm: z.object({
       frameGlow: z.string(),
       numberGlow: z.string(),
+      plaqueBorder: z.string(),
+      plaqueText: z.string(),
     }),
     urgent: z.object({
       frameGlow: z.string(),
       numberGlow: z.string(),
       pulseDurationMs: z.number(),
+      plaqueBorder: z.string(),
+      plaqueText: z.string(),
     }),
     active: z.object({
       frameGlow: z.string(),
       numberGlow: z.string(),
+      plaqueBorder: z.string(),
+      plaqueText: z.string(),
     }),
   }),
 });
@@ -137,6 +155,17 @@ export const eventReminderTokens: EventReminderTokens = {
     numberColor: '#f0d58b',
     numberGlow: '0 0 14px rgba(240,207,106,.4), 0 2px 4px rgba(0,0,0,.6)',
   },
+  v2: {
+    plaqueBorder: 'rgba(240,207,106,0.45)',
+    plaqueBg: 'linear-gradient(135deg, rgba(61,37,19,0.75) 0%, rgba(30,18,9,0.85) 100%)',
+    plaqueShine: 'radial-gradient(ellipse at 50% -20%, rgba(255,255,255,0.14) 0%, transparent 40%)',
+    plaqueShadow: 'inset 0 1px 0 rgba(255,255,255,0.12), 0 6px 14px rgba(0,0,0,0.45)',
+    glare: 'radial-gradient(ellipse at 25% 15%, rgba(255,255,255,0.14) 0%, transparent 35%)',
+    poiScale: 0.78,
+    poiGlowOpacity: 0.22,
+    handleStroke: 'rgba(240,207,106,0.55)',
+    handleOpacity: 0.75,
+  },
   title: {
     color: '#f0d58b',
     shadow: '0 -1px 0 rgba(255,255,255,.25), 0 1px 0 rgba(0,0,0,.9), 0 3px 6px rgba(0,0,0,.7)',
@@ -146,15 +175,21 @@ export const eventReminderTokens: EventReminderTokens = {
     calm: {
       frameGlow: 'rgba(22, 141, 147, .20)',
       numberGlow: '0 0 12px rgba(240,207,106,.35), 0 2px 4px rgba(0,0,0,.6)',
+      plaqueBorder: 'rgba(124,196,191,0.55)',
+      plaqueText: '#9ddcd6',
     },
     urgent: {
       frameGlow: 'rgba(72, 181, 168, .45)',
       numberGlow: '0 0 16px rgba(72, 181, 168, .45), 0 2px 4px rgba(0,0,0,.6)',
       pulseDurationMs: 1800,
+      plaqueBorder: 'rgba(240,207,106,0.55)',
+      plaqueText: '#f0d58b',
     },
     active: {
       frameGlow: 'rgba(212, 86, 86, .45)',
       numberGlow: '0 0 16px rgba(212, 86, 86, .45), 0 2px 4px rgba(0,0,0,.6)',
+      plaqueBorder: 'rgba(212,86,86,0.55)',
+      plaqueText: '#ff9d9d',
     },
   },
 };
