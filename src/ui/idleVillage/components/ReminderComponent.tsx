@@ -126,7 +126,7 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
           position: 'absolute',
           inset: 10,
           borderRadius: 10,
-          background: `${surface.background}, radial-gradient(circle at 18% 50%, rgba(22,141,147,.15) 0%, transparent 40%)`,
+          background: surface.background,
           boxShadow: surface.boxShadow,
           zIndex: 1,
         }}
