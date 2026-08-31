@@ -35,8 +35,16 @@ const flag = (name, fallback) => {
 
 /** A change smaller than this is compression noise, not motion. */
 const DELTA = flag('delta', 3);
-/** Simulated seconds between the two samples. */
-const GAP_MS = flag('gap', 5000);
+/**
+ * Milliseconds between the two samples.
+ *
+ * 100, not 5000. A five-second gap measures accumulated drift, which is not what a
+ * viewer sees: the eye adapts to slow luminance change rather than integrating it,
+ * so it responds to the RATE of change, not the total. Tuned against a 5s gap the
+ * sea scored 37.9% and looked completely still, because it was changing at half an
+ * RGB point per second. The reference footage changes at about 14.
+ */
+const GAP_MS = flag('gap', 100);
 const OUT_DIR = 'test-results';
 
 /**
@@ -140,6 +148,12 @@ const animations = await page.evaluate(() => {
 });
 
 /**
+ * Reference: the same measurement taken on the MTG Arena footage the Director gave
+ * as the target, over consecutive frames of it. This is the bar.
+ */
+const REFERENCE = { coverage: 0.140, meanDelta: 1.19, gapMs: 84 };
+
+/**
  * Sample several pairs of moments rather than one.
  *
  * A single pair is a coin toss. Every layer here is on its own sinusoid, and a pair
@@ -223,6 +237,13 @@ console.log(
     `mean delta ${seaMean.toFixed(2)}`,
 );
 console.log(`per-sample coverage: ${spread}`);
-console.log(`sea coverage: ${(seaCoverage * 100).toFixed(1)}%   target >= 25%`);
-console.log(seaCoverage >= 0.25 ? 'PASS' : 'FAIL');
+// Normalise both sides to points per second, so the gap length cannot flatter us.
+const rate = (seaMean / GAP_MS) * 1000;
+const refRate = (REFERENCE.meanDelta / REFERENCE.gapMs) * 1000;
+console.log(`sea coverage: ${(seaCoverage * 100).toFixed(1)}%   reference ${(REFERENCE.coverage * 100).toFixed(1)}%`);
+console.log(
+  `change rate:  ${rate.toFixed(1)} RGB points/s   reference ${refRate.toFixed(1)}   ` +
+    `(${(rate / refRate * 100).toFixed(0)}% of reference)`,
+);
+console.log(seaCoverage >= REFERENCE.coverage * 0.5 ? 'PASS (>= half the reference)' : 'FAIL');
 console.log(`\nreport: ${OUT_DIR}/world-motion.json`);

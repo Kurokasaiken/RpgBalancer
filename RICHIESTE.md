@@ -1180,8 +1180,31 @@ La variazione **sopravvive alla sfocatura**: tre quarti del moto in quell'acqua 
 
 L'ampiezza supera il riferimento; la copertura e circa la meta. Evidence log: `test-results/r-056-light-pools-2026-08-30.json`. Test 11/11, `tsc` pulito sui file toccati.
 
+**Respinto di nuovo (2026-08-30):** *"nn vedo nulla, sei sicuro che usi parametri x umani?"*. No, non li usavo.
+
+**L'errore alla radice: la metrica misurava la cosa sbagliata.** Il criterio di accettazione confrontava due istantanee a **5 secondi** di distanza. Quello misura la deriva accumulata, non la percepibilita: l'occhio si adatta al cambiamento lento invece di integrarlo, quindi risponde alla **velocita** di cambiamento, non al totale. Un pixel puo differire di 6 punti fra t=0 e t=5s ed essere invisibile, perche cambia di 0,02 punti per frame. Ho tarato nuvole, tile e pool contro quel numero per tre giri.
+
+Misurato il riferimento fra **frame consecutivi**, cioe alla scala a cui lavora l'occhio:
+
+| a ~84 ms | riferimento MTG | nostro mare |
+| --- | --- | --- |
+| copertura Δ>=3 | 14,0% | **0,2%** |
+| delta medio | 1,19 | 0,35 |
+| velocita | **14,2 punti/s** | **0,5 punti/s** |
+
+Ventotto volte piu lento. Confermato a occhio: diff a 300 ms con amplificazione 30x, il mare e **nero** e si muove solo la nuvola.
+
+`scripts/measure-world-motion.mjs` ora usa un gap di **100 ms** e riporta punti/s contro il benchmark del riferimento, non piu una soglia inventata al 25%.
+
+**Il tetto dei pool di luce, misurato.** Spinti a valori assurdi (lampeggio ogni 0,8 s, ampiezza 0-1) arrivano a 8,6 punti/s contro i 14,2 del riferimento, e ad ampiezza piena con pulse 1,5 s **peggiorano** (4,5). Non e un problema di parametri: sono gradienti enormi e morbidi, la maggior parte dei pixel cade nella sfumatura dolce dove l'ampiezza effettiva e una frazione, e i pool chiari e scuri sovrapposti si annullano. Riportati a periodi lenti (25-29 s): servono per l'umore, non per il moto percepibile.
+
+**Il vincolo strutturale.** La mappa rende a **zoom 0,23**. Il riferimento e acqua a 1:1 che riempie il fotogramma. Un tratto di 17 px world diventa 4 px a schermo e in 300 ms si sposta di ~1 px. Nessuna taratura di un campo tonale supera questo.
+
+**La strada che segue dall'evidenza.** L'unica cosa che sul monitor del Director si vede davvero muoversi sono le **nuvole**: sprite ad alto contrasto. Il diff a 300 ms lo dimostra — mare nero, nuvola bianca. Quindi il moto del mare va fatto dello stesso materiale che a questo zoom funziona: **sprite d'onda visibili e contrastate, molte, su tutto il mare** — non campi tonali. `WorldSurfaceWaves` fa gia esattamente questo con 7 marchi confinati alla costa; serve moltiplicarli, distribuirli su tutta l'acqua e dargli un moto visibile.
+
 **Cosa manca:**
-- **Conferma visiva del Director**: e la terza taratura, e le prime due sono state respinte a ragione.
+- **Approvazione del Director sulla nuova direzione** (sprite d'onda su tutto il mare) prima di implementarla.
+- Il campo attuale (tile a tratto + pool lenti) resta in piedi: non sporca e non costa (60 fps, p95 16,8 ms), ma da solo non risolve la richiesta.
 - **Decisione di direzione del Director.** Il campo a tratto non sporca piu, ma e molto discreto. Due strade: alzarne l'ampiezza fino a renderlo chiaramente visibile, oppure abbandonare l'overlay e animare i **tratti d'acqua gia dipinti** nella mappa, che sono il linguaggio nativo dell'artwork.
 - Conferma visiva del Director sul mare, e giudizio sulle ombre delle nuvole (potrebbero leggere come sporco sul dipinto: sono al minimo apposta).
 - P2 raggi di luce CSS, P3 puntatore che modula la luce anziche la posizione, P4 polvere in Pixi, P5 displacement sul layer di dettaglio (solo se P0 non basta), P6 revisione degli eventi onda.

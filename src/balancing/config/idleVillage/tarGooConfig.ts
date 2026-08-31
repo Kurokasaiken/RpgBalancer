@@ -159,6 +159,18 @@ const tarGooConfigSchema = z.object({
      */
     spawnRingFactor: z.number().min(1).max(2),
     axisBias: z.number().min(0).max(1),
+    /**
+     * CP-H — IL FONDO E' PARTE DEL SISTEMA DI CONTRASTO, non decorazione postuma.
+     * Misurare la materia del catrame su un fondo e poi cambiarlo invalida la
+     * misura, quindi il fondo si congela PRIMA. Qui stanno le varianti fra cui
+     * scegliere; `backdrop` dice quale e' attiva, e `?bg=<nome>` la sovrascrive a
+     * runtime per poterle confrontare senza ricompilare.
+     */
+    backdrop: z.string(),
+    backdrops: z.record(z.string(), z.object({
+      inner: z.string(), outer: z.string(),
+      leakCore: z.string(), leakMid: z.string(), leakEdge: z.string(),
+    })),
   }),
 });
 
@@ -238,5 +250,32 @@ export const tarGooConfig: TarGooConfig = tarGooConfigSchema.parse({
     contactMeniscusPx: 3,
     spawnRingFactor: 1.18,
     axisBias: 0.6,
+    backdrop: 'teal',
+    backdrops: {
+      /** quello attuale, tenuto come termine di paragone */
+      teal: {
+        inner: 'rgba(80,160,155,1)', outer: 'rgba(38,105,102,1)',
+        leakCore: 'rgba(0,229,255,.50)', leakMid: 'rgba(0,229,255,.22)',
+        leakEdge: 'rgba(0,0,0,0)',
+      },
+      /** la candidata del Director: inchiostro su pergamena si riconosce a colpo d'occhio */
+      pergamena: {
+        inner: 'rgba(236,219,183,1)', outer: 'rgba(188,163,120,1)',
+        leakCore: 'rgba(255,244,214,.55)', leakMid: 'rgba(255,236,190,.24)',
+        leakEdge: 'rgba(0,0,0,0)',
+      },
+      /** pergamena vecchia: piu' calda e piu' sporca, meno contrasto col catrame */
+      pergamenaScura: {
+        inner: 'rgba(206,183,141,1)', outer: 'rgba(150,124,88,1)',
+        leakCore: 'rgba(255,232,186,.42)', leakMid: 'rgba(226,199,152,.20)',
+        leakEdge: 'rgba(0,0,0,0)',
+      },
+      /** ardesia: fondo freddo e scuro, il catrame si distingue per riflesso e non per valore */
+      ardesia: {
+        inner: 'rgba(74,84,96,1)', outer: 'rgba(38,44,54,1)',
+        leakCore: 'rgba(180,206,232,.34)', leakMid: 'rgba(150,178,206,.16)',
+        leakEdge: 'rgba(0,0,0,0)',
+      },
+    },
   },
 });
