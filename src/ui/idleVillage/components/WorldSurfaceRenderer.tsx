@@ -92,6 +92,8 @@ const PARALLAX = {
   cloudExcess: 0.2,
   /** Ceiling on the visible offset, in SCREEN px. */
   maxOffsetScreenPx: 12,
+  /** Ceiling on the mouse-driven parallax, in SCREEN px. */
+  mouseMaxOffsetScreenPx: 20,
 } as const;
 
 interface WorldSurfaceRendererProps {
@@ -461,6 +463,20 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
     (event: React.MouseEvent) => {
       reportMouseWorld(event.clientX, event.clientY);
 
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        const halfW = rect.width / 2;
+        const halfH = rect.height / 2;
+        const dx = halfW ? (event.clientX - rect.left - halfW) / halfW : 0;
+        const dy = halfH ? (event.clientY - rect.top - halfH) / halfH : 0;
+        // Overlay moves opposite to the pointer, like a foreground layer seen from above.
+        const screenX = -dx * PARALLAX.mouseMaxOffsetScreenPx;
+        const screenY = -dy * PARALLAX.mouseMaxOffsetScreenPx;
+        const invZoom = 1 / Math.max(camera.zoom, 0.01);
+        containerRef.current.style.setProperty('--ws-mouse-parallax-x', `${(screenX * invZoom).toFixed(3)}px`);
+        containerRef.current.style.setProperty('--ws-mouse-parallax-y', `${(screenY * invZoom).toFixed(3)}px`);
+      }
+
       if (!isDragging || !dragStart.current || !manifest.camera.panEnabled) return;
 
       // Grab semantics: the map follows the hand. `panX` is the world point at the
@@ -485,6 +501,16 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
     },
     [isDragging, camera, bounds, onCameraChange, reportMouseWorld, manifest.camera.panEnabled],
   );
+
+  const handleMouseLeave = useCallback(() => {
+    setIsDragging(false);
+    setDragOriginPan(null);
+    dragStart.current = null;
+    if (containerRef.current) {
+      containerRef.current.style.removeProperty('--ws-mouse-parallax-x');
+      containerRef.current.style.removeProperty('--ws-mouse-parallax-y');
+    }
+  }, []);
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
@@ -569,7 +595,7 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
+      onMouseLeave={handleMouseLeave}
       onWheel={handleWheel}
       className="relative h-full w-full cursor-grab overflow-hidden bg-slate-950 active:cursor-grabbing"
       data-testid="world-surface-renderer"
@@ -725,6 +751,7 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
           <WorldSurfaceCloudShadows
             canvasSize={manifest.coordinateSystem.canvas}
             zIndex={cloudZIndex - 5}
+            parallaxOffset={cloudParallax}
           />
           {/* Event announcement lives in the map, not the UI, so it pans and zooms
               with the world. */}

@@ -13,6 +13,14 @@ export interface WorldSurfaceCloudsProps {
   zIndex: number;
   /** Per-band width multipliers. */
   scales?: { far: number; mid: number; near: number };
+  /**
+   * Extra offset in WORLD px, on top of the camera's own pan — the parallax.
+   *
+   * Applied to this container rather than to the sprites, because each sprite is
+   * already running a `transform` animation for its drift and an element has only
+   * one transform.
+   */
+  parallaxOffset?: { x: number; y: number };
 }
 
 /**
@@ -32,6 +40,7 @@ export function WorldSurfaceClouds({
   canvasSize,
   zIndex,
   scales = { far: 1, mid: 1, near: 1 },
+  parallaxOffset,
 }: WorldSurfaceCloudsProps) {
   if (!enabled) return null;
 
@@ -45,6 +54,13 @@ export function WorldSurfaceClouds({
         // Clouds must not spill outside the map while crossing it.
         overflow: 'hidden',
         pointerEvents: 'none',
+        transform: `translate3d(calc(${(parallaxOffset?.x ?? 0)}px + var(--ws-mouse-parallax-x, 0px)), calc(${(parallaxOffset?.y ?? 0)}px + var(--ws-mouse-parallax-y, 0px)), 0)`,
+        // The plan's 400ms ease-out. During a drag this is what makes the band
+        // trail the map instead of moving in lockstep with it, which is the whole
+        // effect: without the lag there is no parallax to see, only a band that
+        // happens to sit slightly off.
+        transition: 'transform 400ms ease-out',
+        willChange: 'transform',
       }}
     >
       <style>{`
