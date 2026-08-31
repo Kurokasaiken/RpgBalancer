@@ -511,6 +511,9 @@
         "dismissReport": "Chiudi Rapporto"
       }
     },
+    "eventReminder": {
+      "daysRemaining": "Giorni Rimanenti"
+    },
     "clouds": {
       "scales": "Dimensioni nuvole",
       "scale": "scala",
@@ -521,7 +524,9 @@
     "debug": {
       "spawnWonders": "Mostra meraviglie",
       "despawnWonders": "Nascondi meraviglie",
-      "water": "Acqua"
+      "breath": "Respira",
+      "water": "Acqua",
+      "atmosphere": "Atmosfera"
     }
   },
   "pgDetailCard": {

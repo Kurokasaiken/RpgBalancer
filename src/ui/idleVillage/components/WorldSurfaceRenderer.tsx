@@ -25,7 +25,7 @@ const WorldSurfaceCreatures = lazy(() => import('./WorldSurfaceCreatures'));
 const WorldSurfaceEventCard = lazy(() => import('./WorldSurfaceEventCard'));
 
 /**
- * Carved border the world is seen through. Atmosphere layers paint below it, so
+ * Carved border the world is seen through. Cloud layers paint below it, so
  * nothing drifts over the frame itself.
  */
 const FRAME_LAYER_ID = 'frame';
