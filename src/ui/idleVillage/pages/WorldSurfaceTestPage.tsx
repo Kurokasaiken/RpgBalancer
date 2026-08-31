@@ -6,7 +6,6 @@ import { atmosphereAssets } from '../config/atmosphereAssets';
 import { WorldSurfaceRenderer } from '../components/WorldSurfaceRenderer';
 import { WorldSurfaceDebugPanel } from '../components/WorldSurfaceDebugPanel';
 import { WorldSurfacePerfHud } from '../components/WorldSurfacePerfHud';
-import { WorldSurfaceBreathOverlay } from '../components/WorldSurfaceBreathOverlay';
 import { selectWorldSurfaceRenderer } from '../config/worldSurfaceConfig';
 import { isWebGLSupported } from '../utils/webglSupport';
 import { useWorldState } from '../../../engine/world/systems/WorldState';
@@ -61,9 +60,7 @@ export const WorldSurfaceTestPage: React.FC = () => {
   const [reactionActive, setReactionActive] = useState(false);
   const [wonderAnchors, setWonderAnchors] = useState<{ x: number; y: number }[]>([]);
   const [perfHudVisible, setPerfHudVisible] = useState(true);
-  const [breathActive, setBreathActive] = useState(false);
   const [waterActive, setWaterActive] = useState(false);
-  const [atmosphereActive, setAtmosphereActive] = useState(false);
   const wonderTimeoutsRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
   const dwellTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mainRef = useRef<HTMLDivElement>(null);
@@ -457,24 +454,10 @@ export const WorldSurfaceTestPage: React.FC = () => {
           </a>
           <button
             type="button"
-            onClick={() => setBreathActive((v) => !v)}
-            className={`rounded border border-amber-700/40 px-3 py-1 text-xs hover:bg-amber-700/20 ${breathActive ? 'bg-amber-600 text-amber-950' : ''}`}
-          >
-            {translate('world.debug.breath')}
-          </button>
-          <button
-            type="button"
             onClick={() => setWaterActive((v) => !v)}
             className={`rounded border border-amber-700/40 px-3 py-1 text-xs hover:bg-amber-700/20 ${waterActive ? 'bg-amber-600 text-amber-950' : ''}`}
           >
             {translate('world.debug.water')}
-          </button>
-          <button
-            type="button"
-            onClick={() => setAtmosphereActive((v) => !v)}
-            className={`rounded border border-amber-700/40 px-3 py-1 text-xs hover:bg-amber-700/20 ${atmosphereActive ? 'bg-amber-600 text-amber-950' : ''}`}
-          >
-            {translate('world.debug.atmosphere')}
           </button>
         </div>
       </header>
@@ -498,21 +481,12 @@ export const WorldSurfaceTestPage: React.FC = () => {
           renderObjects={rendererType !== 'webgl'}
           autoFitTrigger={autoFitTrigger}
           showRegions={false}
-          breathEnabled={breathActive}
           showWaterField={waterActive}
-          showAtmosphere={atmosphereActive}
           eventCovered={eventCovered}
           showEventCard={cardOpen}
           onEventCardComplete={handleEventCardComplete}
           onEventCardClose={handleEventCardClose}
-        >
-          {breathActive && (
-            <WorldSurfaceBreathOverlay
-              canvasSize={manifest.coordinateSystem.canvas}
-              mouseWorld={mouseWorld}
-            />
-          )}
-        </WorldSurfaceRenderer>
+        />
 
         {rendererType === 'webgl' && (
           <Suspense fallback={null}>

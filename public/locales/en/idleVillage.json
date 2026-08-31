@@ -488,9 +488,7 @@
       "clearObjects": "Clear",
       "spawnWonders": "Spawn wonders",
       "despawnWonders": "Despawn wonders",
-      "breath": "Breath",
-      "water": "Water",
-      "atmosphere": "Atmosphere"
+      "water": "Water"
     }
   },
   "worldEvents": {

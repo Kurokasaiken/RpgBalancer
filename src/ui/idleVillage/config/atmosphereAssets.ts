@@ -211,58 +211,11 @@ export interface WaterFieldConfig {
   lightPools: WaterLightPool[];
 }
 
-export interface AmbientLightRays {
-  /** Whether the ray fan is rendered at all. */
-  enabled: boolean;
-  /** Light origin as a percentage of the canvas. */
-  originX: string;
-  originY: string;
-  /** Starting angle of the ray fan, in degrees. */
-  angle: number;
-  /** Tint of the rays and halo, with alpha baked in. */
-  color: string;
-  /** Base opacity of the combined ray layer. */
-  opacity: number;
-  /** Period of the subtle opacity pulse. */
-  speedSeconds: number;
-  /** Angular width of one ray, in degrees. */
-  width: number;
-  /** Angular gap between rays, in degrees. */
-  spread: number;
-}
-
-export interface AmbientDust {
-  /** Whether the dust motes are rendered. */
-  enabled: boolean;
-  /** Number of motes. Keep small; each is a real DOM node. */
-  count: number;
-  /** Smallest mote diameter, in world px. */
-  sizeMin: number;
-  /** Largest mote diameter, in world px. */
-  sizeMax: number;
-  /** Lowest mote opacity. */
-  opacityMin: number;
-  /** Highest mote opacity. */
-  opacityMax: number;
-  /** Tint of every mote. */
-  color: string;
-  /** Shortest float cycle, in seconds. */
-  driftSecondsMin: number;
-  /** Longest float cycle, in seconds. */
-  driftSecondsMax: number;
-}
-
-export interface AmbientConfig {
-  lightRays: AmbientLightRays;
-  dust: AmbientDust;
-}
-
 export interface AtmosphereConfig {
   clouds: CloudBand[];
   foam: FoamConfig;
   birds: BirdsConfig;
   waves: WavesConfig;
-  ambient: AmbientConfig;
   waterField: WaterFieldConfig;
 }
 
@@ -353,31 +306,6 @@ export const atmosphereAssets: AtmosphereConfig = {
     { src: 'waves/schiuma1.webp', x: 314, y: 182, width: 340, height: 142, delaySeconds: 22.5, flip: false },
     { src: 'waves/onda2.webp', x: 3229, y: 472, width: 340, height: 142, delaySeconds: 27.0, flip: false }
     ],
-  },
-  ambient: {
-    lightRays: {
-      enabled: true,
-      // North-west corner, where the world is lit from in the base painting.
-      originX: '18%',
-      originY: '12%',
-      angle: 45,
-      color: 'rgba(255, 245, 215, 0.28)',
-      opacity: 0.42,
-      speedSeconds: 10,
-      width: 9,
-      spread: 16,
-    },
-    dust: {
-      enabled: true,
-      count: 48,
-      sizeMin: 2,
-      sizeMax: 5,
-      opacityMin: 0.35,
-      opacityMax: 0.8,
-      color: 'rgba(255, 250, 230, 0.9)',
-      driftSecondsMin: 3,
-      driftSecondsMax: 7,
-    },
   },
   waterField: {
     // Headings are 12° and 108°: diverging, and deliberately not 90° apart. Two
