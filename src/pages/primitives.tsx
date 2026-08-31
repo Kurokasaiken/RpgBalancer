@@ -30,6 +30,7 @@ import {
 import { Slot } from '@/ui/idleVillage/components/Slot';
 import { GoblinInvasionWindow } from '@/ui/idleVillage/components/GoblinInvasionWindow';
 import { ReminderComponent } from '@/ui/idleVillage/components/ReminderComponent';
+import { ReminderComponentV2 } from '@/ui/idleVillage/components/ReminderComponentV2';
 import DayNightPoiSkin from '@/ui/idleVillage/components/minimal/DayNightPoiSkin';
 import { WanderlustMedalOverlay } from '@/ui/idleVillage/components/WanderlustMedalOverlay';
 import ThreatStatusIndicator from '@/ui/idleVillage/components/ThreatStatusIndicator';
@@ -53,6 +54,7 @@ type TabId =
   | 'skin'
   | 'event'
   | 'reminder'
+  | 'reminderV2'
   | 'window';
 
 const FIELD_BACKGROUND = [
@@ -75,6 +77,7 @@ const TABS: { id: TabId; label: string }[] = [
   { id: 'skin', label: 'Skin' },
   { id: 'event', label: 'Event' },
   { id: 'reminder', label: 'Reminder' },
+  { id: 'reminderV2', label: 'Reminder V2' },
   { id: 'window', label: 'Window' },
 ];
 
@@ -500,6 +503,29 @@ function ReminderTab(): JSX.Element {
   );
 }
 
+function ReminderV2Tab(): JSX.Element {
+  const { t } = useTranslation('idleVillage');
+  const [clickCount, setClickCount] = useState(0);
+
+  return (
+    <DemoPanel>
+      <MatericHeading title="Reminder V2" subtitle="AAA polish candidate" />
+      <div style={{ display: 'flex', gap: 24, alignItems: 'center', flexWrap: 'wrap' }}>
+        <ReminderComponentV2
+          title={String(t('world.goblinInvasion.invasion'))}
+          daysLeftLabel={String(t('world.goblinInvasion.timerLabel'))}
+          daysLeftValue={5}
+          state="urgent"
+          onClick={() => setClickCount((c) => c + 1)}
+        />
+        <span style={{ color: '#e4bd62', fontSize: 14 }}>
+          {clickCount > 0 ? `Clicked ${clickCount} time${clickCount === 1 ? '' : 's'}` : 'Click the reminder'}
+        </span>
+      </div>
+    </DemoPanel>
+  );
+}
+
 const TAB_CONTENT: Record<TabId, () => JSX.Element> = {
   all: AllTab,
   frame: FrameTab,
@@ -515,6 +541,7 @@ const TAB_CONTENT: Record<TabId, () => JSX.Element> = {
   skin: SkinTab,
   event: EventTab,
   reminder: ReminderTab,
+  reminderV2: ReminderV2Tab,
   window: WindowTab,
 };
 
