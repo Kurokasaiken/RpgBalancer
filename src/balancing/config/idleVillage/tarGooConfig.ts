@@ -89,6 +89,30 @@ const tarGooConfigSchema = z.object({
     fresnelPower: z.number().min(0.5).max(8),
     /** Height profile: how "puffed" the mass reads near the edge (px falloff). */
     edgeHeightFalloff: z.number().min(2).max(60),
+    /**
+     * IL CORDOLO DEL BORDO (CP-H). Un bordo di catrame non e' un contorno: e' un
+     * rigonfiamento dove la tensione superficiale accumula la materia. Misurato
+     * prima: corpo piatto a luminanza 8, poi una fascia chiara larga 6px uguale
+     * tutt'attorno — cioe' uno stroke luminoso su una sagoma nera, non un fluido.
+     * `beadHeight` quanto si rialza, `beadPos` dove (0 = sul bordo, 1 = dentro),
+     * `beadWidth` quanto e' stretto. `rimDirectional` quanto il riflesso dipende
+     * dalla direzione della LUCE invece che dalla sola vista: a 0 e' un anello
+     * uniforme, a 1 e' un cordolo illuminato da un lato.
+     */
+    beadHeight: z.number().min(0).max(2),
+    beadPos: z.number().min(0).max(1),
+    beadWidth: z.number().min(0.02).max(1),
+    rimDirectional: z.number().min(0).max(1),
+    /**
+     * RILIEVO INTERNO. Il vortice esisteva gia' ma TINGEVA soltanto: entrava nel
+     * mix del colore, non nell'altezza, quindi dentro il corpo la normale restava
+     * verticale e non c'era nessuna ombreggiatura. Misurato: il 94% dei pixel del
+     * catrame in un solo bin di luminanza — un buco, non una materia.
+     * Qui il vortice entra nell'ALTEZZA prima che si calcoli la normale, cosi'
+     * produce diffusa e speculare vere. E' il canale che Motoyoshi indica come
+     * unico modo perche' una superficie scura venga riconosciuta come materiale.
+     */
+    swirlRelief: z.number().min(0).max(2),
     /** Internal swirl contrast (slow moving darker/lighter veins). */
     swirlIntensity: z.number().min(0).max(1),
     /** Light direction (unit-ish vec3, z up toward viewer). Top-left to match backdrop. */
@@ -227,9 +251,18 @@ export const tarGooConfig: TarGooConfig = tarGooConfigSchema.parse({
   material: {
     albedo: [0.012, 0.016, 0.034],
     albedoLit: [0.05, 0.07, 0.11],
-    specularColor: [0.55, 0.04, 0.02],
-    specularIntensity: 0.25,
-    specularExponent: 64,
+    /* IL RIFLESSO BAGNATO. Era [0.55,0.04,0.02] a intensita' 0.25: rosso scuro e
+       fioco, cioe' incapace di produrre un solo pixel luminoso. Il corpo del
+       catrame DEVE restare nerissimo — l'albedo non si tocca — ma un liquido
+       scuro si riconosce dai riflessi, non dal colore: e' la popolazione di
+       pixel brillanti di Motoyoshi. Bianco appena freddo, come il cielo che il
+       catrame rispecchia. */
+    specularColor: [0.86, 0.93, 1.0],
+    specularIntensity: 1.0,   /* il tetto dello schema: non lo allargo per un ritocco */
+    /* 42 spegneva la speculare nel corpo: con la superficie piatta la direzione
+       riflessa da' R.z = 0.56, e pow(0.56,42) vale 2e-11. Serviva un esponente
+       compatibile con l'inclinazione che il rilievo produce davvero. */
+    specularExponent: 12,
     /**
      * NIENTE BORDO ROSSO. Era un cremisi dichiarato «danger/corruption line»:
      * rosso-uguale-pericolo e' un SIMBOLO, cioe' una convenzione da imparare, e
@@ -239,8 +272,13 @@ export const tarGooConfig: TarGooConfig = tarGooConfigSchema.parse({
      */
     fresnelColor: [0.36, 0.62, 0.60],
     fresnelIntensity: 0.85,
-    fresnelPower: 1.0,
+    fresnelPower: 3.0,   /* stretta: un cordolo, non un lavaggio */
     edgeHeightFalloff: 8,
+    beadHeight: 0.55,
+    beadPos: 0.30,
+    beadWidth: 0.18,
+    rimDirectional: 0.8,
+    swirlRelief: 1.6,
     swirlIntensity: 0.22,
     lightDir: [-0.55, -0.62, 0.56],
   },
@@ -266,7 +304,8 @@ export const tarGooConfig: TarGooConfig = tarGooConfigSchema.parse({
     contactMeniscusPx: 3,
     spawnRingFactor: 1.18,
     axisBias: 0.6,
-    backdrop: 'teal',
+    /* CP-H: fondo congelato dal Director (2026-08-31). Da qui la materia si tara su questo. */
+    backdrop: 'ardesia',
     backdrops: {
       /** quello attuale, tenuto come termine di paragone */
       teal: {

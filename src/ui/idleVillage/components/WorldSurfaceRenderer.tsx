@@ -18,7 +18,6 @@ const WorldSurfaceWaves = lazy(() => import('./WorldSurfaceWaves'));
 const WorldSurfaceClouds = lazy(() => import('./WorldSurfaceClouds'));
 const WorldSurfaceCloudShadows = lazy(() => import('./WorldSurfaceCloudShadows'));
 const WorldSurfaceFoam = lazy(() => import('./WorldSurfaceFoam'));
-const WorldSurfaceWaterField = lazy(() => import('./WorldSurfaceWaterField'));
 const WorldSurfaceBirds = lazy(() => import('./WorldSurfaceBirds'));
 const WorldSurfaceCreatures = lazy(() => import('./WorldSurfaceCreatures'));
 const WorldSurfaceEventCard = lazy(() => import('./WorldSurfaceEventCard'));
@@ -625,14 +624,25 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
           {/* Wave marks break on the shoreline, at the bottom of the atmosphere
               stack: they belong to the water surface, not to the sky. */}
           <WorldSurfaceWaves zIndex={cloudZIndex - 4} />
-          {/* The sea's own surface, at the very bottom of the atmosphere stack:
-              the wave marks and the foam break ON it, so they have to sit above.
-              This is the layer that keeps the largest surface on the map from
-              being pixel-identical frame to frame. */}
-          <WorldSurfaceWaterField
-            canvasSize={manifest.coordinateSystem.canvas}
-            zIndex={cloudZIndex - 6}
-          />
+          {/*
+            Water field: NOT mounted, deliberately.
+
+            Two drifting detail tiles plus twelve broad light pools over the sea,
+            built to answer "the map does not breathe". Both halves work and cost
+            nothing measurable — 60fps unchanged — and neither is visible enough on
+            the real artwork at the map's default 0.23 zoom to be worth the layers.
+            The Director saw no difference.
+
+            The measurements that said otherwise were wrong three separate ways: a
+            5s sampling gap, which reads accumulated drift rather than the rate the
+            eye responds to; too short a settle after seeking a paused animation; and
+            a colour-keyed sea test that counts clouds crossing the water as the
+            water itself changing.
+
+            Left in the tree because the components and the tile generator are sound
+            and the analysis written into them is worth keeping. Re-mounting is this
+            one element. See RICHIESTE.md R-056.
+          */}
           {/* Cloud shadows drift across the land, below the weather. */}
           {breathEnabled && (
             <WorldSurfaceCloudShadows

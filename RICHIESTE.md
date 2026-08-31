@@ -1202,8 +1202,41 @@ Ventotto volte piu lento. Confermato a occhio: diff a 300 ms con amplificazione 
 
 **La strada che segue dall'evidenza.** L'unica cosa che sul monitor del Director si vede davvero muoversi sono le **nuvole**: sprite ad alto contrasto. Il diff a 300 ms lo dimostra — mare nero, nuvola bianca. Quindi il moto del mare va fatto dello stesso materiale che a questo zoom funziona: **sprite d'onda visibili e contrastate, molte, su tutto il mare** — non campi tonali. `WorldSurfaceWaves` fa gia esattamente questo con 7 marchi confinati alla costa; serve moltiplicarli, distribuirli su tutta l'acqua e dargli un moto visibile.
 
-**Cosa manca:**
-- **Approvazione del Director sulla nuova direzione** (sprite d'onda su tutto il mare) prima di implementarla.
+**P0c — Sprite d'onda su tutto il mare: implementato (2026-08-30), da giudicare.**
+
+Approvato dal Director (*"procedi"*). Il ragionamento: le nuvole sono l'unica cosa che si vede muoversi, e non perche siano veloci — la banda `near` fa 1,4 px/s a schermo — ma perche sono ad **altissimo contrasto**. Uno spostamento di mezzo pixel di un bordo bianco su blu cambia quei pixel di 100 punti. Il contrasto e il moltiplicatore, non la velocita. Quindi il moto del mare va fatto dello stesso materiale.
+
+- `scripts/build-waves-painted.mjs`: campiona **150 punti direttamente da `sea_mask.webp`** invece di leggere i 18 punti `sea` di `points.json`, che nascono con un'ampia clearance dalla costa e descrivono solo acqua profonda, lasciando ogni baia vuota. Separazione minima 210 px world, rilassata in 4 passate dove un canale stretto non la regge.
+- Timing ribaltato: `cycleSeconds` 46 → **15**, `visibleFraction` 0,222 → **0,84**. Erano tarati per tenerne 4 sullo schermo come evento raro; ora ce ne sono ~126.
+- `WorldSurfaceWaves.tsx`: aggiunta la **deriva orizzontale** (`driftWorldPx` 450, direzione alternata per marchio) e il timing passato da `ease-in-out` a **lineare** — una deriva eased passa la maggior parte della vita quasi ferma ai punti di inversione, che e esattamente la staticita da rimuovere. Il "hold" immobile a meta ciclo, che era il punto dichiarato del vecchio componente, e stato ridotto alle sole rampe di entrata e uscita.
+- Tratti dello sprite ispessiti da 1,2-2,3 a 3,2-5,5 px: uno sprite disegnato a 320 px viene mostrato a ~280 px world e la mappa sta a zoom 0,23, quindi la catena moltiplica per ~0,20. Un tratto da 1,5 px atterrava a **0,3 px a schermo** e il downscale lo mediava via.
+- Opacita 0,46 → **0,92**, per il contrasto.
+
+**Verifica.** Diff isolato (nascosti nuvole, uccelli, creature, schiuma, pool e tile): le striature si vedono muoversi su tutta l'acqua, picco 210 punti, 3,7% del frame oltre i 3 punti in 500 ms. Performance a regime **identica** con e senza i marchi: p50/p95 16,7 ms, worst 16,8, 60 fps; memoria +23 MB. Il p95 di 49,5 ms visto in una misura precedente era decode di avvio, non regime. Test 11/11, `tsc` pulito.
+Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipinto della costa.
+
+**Terzo difetto della metrica, trovato e documentato.** `isSea()` classifica per colore, quindi una nuvola o un uccello che attraversa l'acqua viene contato come acqua che cambia. Con 16 nuvole sul mare, un paio di punti percentuali di "sea coverage" sono loro. Limite scritto nel commento della funzione: il numero del mare e un **limite superiore**, e ogni cambiamento va confermato con un diff isolato prima di crederci. Sommato al gap di 5 s e al tempo di assestamento, la metrica ha sbagliato in tre modi diversi: non e uno strumento affidabile per decidere questa taratura.
+
+**Respinto (2026-08-30):** *"grande fallimento"*. Corretto.
+
+**Perche ha fallito.** Lo sprite d'onda e un rettangolo 320x134 riempito di tratti paralleli **senza dissolvenza ai bordi**. A 150 copie con opacita 0,92 e tratti ispessiti, il bounding box dello sprite diventa leggibile: il mare si e riempito di blocchi rettangolari di righe bianche, come carta strappata appoggiata sull'acqua. Il tratteggio dipinto che dovevano imitare segue le **curve** della costa; il mio era a righe orizzontali allineate agli assi. La mia affermazione che fossero "indistinguibili dal tratteggio dipinto" era falsa: quei blocchi erano gia nel ritaglio che avevo mostrato e li ho letti come disegno.
+
+**Danno collaterale, causato e riparato.** `build-waves-painted.mjs` faceva `rmSync` sull'intera `public/assets/atmosphere/waves/` prima di scrivere. Quella cartella conteneva **quattro asset mai committati** — `onda1`, `onda2`, `ondine1`, `schiuma1` — e li ha distrutti tutti. Recuperati rigenerandoli dai PNG in `assets-source/atmosphere/waves/`, che sono sopravvissuti. Il `rmSync` e stato rimosso da **entrambi** i builder (`build-waves-painted.mjs` e `build-waves.mjs`) con la spiegazione in commento: scrivono i propri file e non toccano il resto.
+
+**Ripristino completo del mare.**
+- Asset originali rigenerati; la pagina carica 7 marchi da `onda2`/`ondine1`/`schiuma1`/`onda1`, zero immagini rotte.
+- `WorldSurfaceWaves.tsx`: rimossa la deriva orizzontale, ripristinato il "ramp on, HOLD, ramp off" e il timing `ease-in-out`.
+- Blocco `waves` del config riportato ai valori originali: `cycleSeconds` 30, `visibleFraction` 0,45, `opacity` 0,75, `bobWorldPx` 3, 7 marchi. `driftWorldPx` rimosso dall'interfaccia.
+- Parametri del builder riallineati, cosi rieseguirlo riproduce l'originale invece di ricreare il fallimento. Il campionamento denso (`scatterOverSea`) resta nel file ma **non e usato**, con in commento la ragione per cui non funziona e cosa servirebbe: uno sprite con dissolvenza alpha ai bordi e tratti che seguono una curva, non piu marchi.
+- Campo d'acqua (tile + 12 pool) **smontato** dal renderer, import incluso. I file restano in albero, non referenziati; rimontarlo e un elemento solo. Motivo scritto nel renderer.
+- Verifica: 7 marchi, 0 pool, 0 tile, 49 animazioni, layer decodificati tornati da 189 a 46, nessun errore in console, mare visivamente pulito. `tsc` pulito, test 11/11.
+
+**Cosa resta della sessione, e va giudicato a parte.** La correzione delle bande nuvole: da **una** banda a tre (`far`/`mid`/`near` a 2,0 / 3,5 / 6,0 px/s, 16 sprite contro 9) e `shadowOpacity` da **0** a 0,02-0,04. Quello era codice morto reale — `WorldSurfaceCloudShadows` montava e animava nove sprite disegnandole interamente trasparenti — ed e l'unica modifica di questa sessione che il Director non ha respinto. **Confermata dal Director (2026-08-30): "tienila".**
+
+**Bilancio.** Quattro tentativi sul mare, quattro respinti: tile a macchie (sporcavano), tile a tratto + pool di luce (invisibili), 150 marchi d'onda (blocchi rettangolari). La causa comune non e stata la tecnica ma la **verifica**: la metrica ha sbagliato in tre modi indipendenti (gap di 5 s, tempo di assestamento, nuvole contate come mare) e ogni volta che contraddiceva l'occhio del Director ho creduto alla metrica. Nessuna nuova proposta sul mare senza prima un metodo di verifica che concordi con l'occhio.
+
+**Cosa manca (storico, tentativo 3).** Il moto era reale e misurabile ma sottile: nel diff serve un'amplificazione 10x perche salti all'occhio. Non dico che ora si vede — l'ho detto due volte e mi sono sbagliato.
+- Le due manopole, se serve piu presenza: `opacity` e `driftWorldPx` nel blocco `waves` di `src/ui/idleVillage/config/atmosphereAssets.ts`, e `MARK_COUNT` in `scripts/build-waves-painted.mjs` (rigenerare con `node scripts/build-waves-painted.mjs`).
 - Il campo attuale (tile a tratto + pool lenti) resta in piedi: non sporca e non costa (60 fps, p95 16,8 ms), ma da solo non risolve la richiesta.
 - **Decisione di direzione del Director.** Il campo a tratto non sporca piu, ma e molto discreto. Due strade: alzarne l'ampiezza fino a renderlo chiaramente visibile, oppure abbandonare l'overlay e animare i **tratti d'acqua gia dipinti** nella mappa, che sono il linguaggio nativo dell'artwork.
 - Conferma visiva del Director sul mare, e giudizio sulle ombre delle nuvole (potrebbero leggere come sporco sul dipinto: sono al minimo apposta).
