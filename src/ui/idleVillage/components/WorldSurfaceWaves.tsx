@@ -29,11 +29,13 @@ export function WorldSurfaceWaves({ enabled = true, zIndex }: WorldSurfaceWavesP
   if (!cfg || cfg.marks.length === 0) return null;
 
   const visible = Math.min(99, Math.max(1, cfg.visibleFraction * 100));
-  // Ramp on, HOLD, ramp off — not a triangle peak. A mark that is only ever fading
-  // in or out never sits still, and the water has to read as still with a hint of
-  // movement, not as something continuously breathing.
-  const rampInPct = (visible * 0.22).toFixed(1);
-  const rampOutPct = (visible * 0.78).toFixed(1);
+  // Ramp on, hold, ramp off. The hold used to be the point: the water was meant to
+  // read as still with a hint of movement. That was the wrong target — with 7 marks
+  // holding motionless for most of a 30s cycle the sea measured as pixel-identical
+  // frame to frame, and read as a painting. Now the marks drift throughout, and the
+  // ramps exist only to hide their appearance and departure.
+  const rampInPct = (visible * 0.16).toFixed(1);
+  const rampOutPct = (visible * 0.84).toFixed(1);
 
   return (
     <div
@@ -56,11 +58,20 @@ export function WorldSurfaceWaves({ enabled = true, zIndex }: WorldSurfaceWavesP
     >
       <style>{`
         @keyframes wsWaveBreak {
-          0% { opacity: 0; transform: translate3d(0, var(--ws-wave-bob), 0) scaleX(var(--ws-wave-flip)); }
+          0% {
+            opacity: 0;
+            transform: translate3d(calc(var(--ws-wave-drift) * -0.5), var(--ws-wave-bob), 0) scaleX(var(--ws-wave-flip));
+          }
           ${rampInPct}% { opacity: var(--ws-wave-opacity); }
           ${rampOutPct}% { opacity: var(--ws-wave-opacity); }
-          ${visible}% { opacity: 0; transform: translate3d(0, calc(var(--ws-wave-bob) * -1), 0) scaleX(var(--ws-wave-flip)); }
-          100% { opacity: 0; transform: translate3d(0, calc(var(--ws-wave-bob) * -1), 0) scaleX(var(--ws-wave-flip)); }
+          ${visible}% {
+            opacity: 0;
+            transform: translate3d(calc(var(--ws-wave-drift) * 0.5), calc(var(--ws-wave-bob) * -1), 0) scaleX(var(--ws-wave-flip));
+          }
+          100% {
+            opacity: 0;
+            transform: translate3d(calc(var(--ws-wave-drift) * 0.5), calc(var(--ws-wave-bob) * -1), 0) scaleX(var(--ws-wave-flip));
+          }
         }
         @media (prefers-reduced-motion: reduce) {
           .ws-wave { animation: none !important; opacity: 0 !important; }
@@ -85,10 +96,15 @@ export function WorldSurfaceWaves({ enabled = true, zIndex }: WorldSurfaceWavesP
             willChange: 'transform, opacity',
             ['--ws-wave-opacity' as string]: cfg.opacity,
             ['--ws-wave-bob' as string]: `${cfg.bobWorldPx}px`,
+            // Alternate the drift direction per mark, so the sea does not read as
+            // one sheet of water sliding the same way.
+            ['--ws-wave-drift' as string]: `${mark.flip ? -cfg.driftWorldPx : cfg.driftWorldPx}px`,
             ['--ws-wave-flip' as string]: mark.flip ? -1 : 1,
             animationName: 'wsWaveBreak',
             animationDuration: `${cfg.cycleSeconds}s`,
-            animationTimingFunction: 'ease-in-out',
+            // Linear, not eased: an eased drift spends most of its life nearly
+            // stopped at the turning points, which is the stillness being removed.
+            animationTimingFunction: 'linear',
             animationIterationCount: 'infinite',
             animationDelay: `${-mark.delaySeconds}s`,
           }}
