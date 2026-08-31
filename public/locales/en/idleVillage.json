@@ -474,9 +474,6 @@
         "dismissReport": "Dismiss Report"
       }
     },
-    "eventReminder": {
-      "daysRemaining": "Days Remaining"
-    },
     "debug": {
       "title": "Debug",
       "statesTitle": "States",

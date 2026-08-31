@@ -4,15 +4,16 @@ import { eventReminderTokens } from '@/balancing/config/idleVillage/eventReminde
 /**
  * Gilded decorative frame for the event reminder.
  *
- * Sculpted metal corners with inset gems and an inner gold lip. The frame
- * should read as an artifact resting on the map, not a generic UI border.
+ * Renders an asymmetric brass-and-gold SVG overlay that sits above the card
+ * surface. Stroke widths are fixed via `vector-effect: non-scaling-stroke` so
+ * the frame scales with the component without losing line weight.
  */
 export const GildedEventFrame: React.FC = () => {
   const { gilded } = eventReminderTokens;
 
   return (
     <svg
-      viewBox="0 0 420 142"
+      viewBox="0 0 420 156"
       preserveAspectRatio="none"
       style={{
         position: 'absolute',
@@ -25,57 +26,32 @@ export const GildedEventFrame: React.FC = () => {
       }}
       aria-hidden="true"
     >
-      <defs>
-        <filter id="gem-glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="2" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-
-      {/* outer raised border */}
       <path
-        d="M 28 6 H 392 Q 414 6 414 28 V 114 Q 414 136 392 136 H 28 Q 6 136 6 114 V 28 Q 6 6 28 6 Z"
-        fill={gilded.ornamentFill}
-        stroke={gilded.frameOuter}
-        strokeWidth={3}
-        vectorEffect="non-scaling-stroke"
-      />
-      {/* inner enamel lip */}
-      <path
-        d="M 30 12 H 390 Q 408 12 408 30 V 112 Q 408 130 390 130 H 30 Q 12 130 12 112 V 30 Q 12 12 30 12 Z"
+        d="M 24 14 H 396 Q 406 14 406 24 V 132 Q 406 142 396 142 H 24 Q 14 142 14 132 V 24 Q 14 14 24 14 Z"
         fill="none"
         stroke={gilded.frameStroke}
-        strokeWidth={2}
+        strokeWidth={2.5}
         vectorEffect="non-scaling-stroke"
       />
-      {/* bright inner line */}
       <path
-        d="M 34 16 H 386 Q 402 16 402 32 V 110 Q 402 126 386 126 H 34 Q 18 126 18 110 V 32 Q 18 16 34 16 Z"
+        d="M 36 26 H 384 Q 394 26 394 36 V 120 Q 394 130 384 130 H 36 Q 26 130 26 120 V 36 Q 26 26 36 26 Z"
         fill="none"
         stroke={gilded.ornamentStroke}
-        strokeWidth={0.8}
+        strokeWidth={1}
         opacity={0.6}
         vectorEffect="non-scaling-stroke"
       />
-
-      {/* corner brackets */}
-      <g stroke={gilded.frameStroke} fill="none" strokeWidth={2.5} vectorEffect="non-scaling-stroke">
-        <path d="M 6 34 V 28 Q 6 6 28 6 H 34" />
-        <path d="M 386 6 H 392 Q 414 6 414 28 V 34" />
-        <path d="M 414 108 V 114 Q 414 136 392 136 H 386" />
-        <path d="M 34 136 H 28 Q 6 136 6 114 V 108" />
-      </g>
-
-      {/* corner gems */}
-      <g fill={gilded.gemFill} stroke={gilded.gemStroke} strokeWidth={0.8} filter="url(#gem-glow)">
-        <circle cx="14" cy="14" r="4" />
-        <circle cx="406" cy="14" r="4" />
-        <circle cx="14" cy="128" r="4" />
-        <circle cx="406" cy="128" r="4" />
-      </g>
+      <path
+        d="M 14 14 L 40 40 M 406 14 L 380 40 M 14 142 L 40 116 M 406 142 L 380 116"
+        stroke={gilded.ornamentStroke}
+        strokeWidth={2}
+        strokeLinecap="round"
+        vectorEffect="non-scaling-stroke"
+      />
+      <circle cx="14" cy="14" r="3" fill={gilded.gemFill} />
+      <circle cx="406" cy="14" r="3" fill={gilded.gemFill} />
+      <circle cx="14" cy="142" r="3" fill={gilded.gemFill} />
+      <circle cx="406" cy="142" r="3" fill={gilded.gemFill} />
     </svg>
   );
 };
