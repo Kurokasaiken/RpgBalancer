@@ -191,7 +191,7 @@ const PgDetailCard: FC<PgDetailCardProps> = ({ resident, onClose, onSlotClick })
         maxWidth: 360,
       }}
     >
-      <MatericFrame variant="molding" floor={false} style={{ padding: 12 }}>
+      <MatericFrame variant="molding" style={{ padding: 12 }}>
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <div>
@@ -231,7 +231,7 @@ const PgDetailCard: FC<PgDetailCardProps> = ({ resident, onClose, onSlotClick })
         </div>
 
         {/* Vitals — frame-only sections */}
-        <MatericFrame variant="molding" floor={false} style={{ padding: 10, marginBottom: 12 }}>
+        <MatericFrame variant="molding" style={{ padding: 10, marginBottom: 12 }}>
           <MatericStatBar variant="hp" size="sm" value={resident.currentHp} max={resident.maxHp} />
           <div style={{ marginTop: 8 }}>
             <MatericStatBar variant="stamina" size="sm" value={resident.fatigue} max={100} />
@@ -239,7 +239,7 @@ const PgDetailCard: FC<PgDetailCardProps> = ({ resident, onClose, onSlotClick })
         </MatericFrame>
 
         {/* Statistics */}
-        <MatericFrame variant="molding" floor={false} style={{ padding: 10, marginBottom: 12 }}>
+        <MatericFrame variant="molding" style={{ padding: 10, marginBottom: 12 }}>
           <MatericRecordList
             columns={[
               { width: '1fr', variant: 'label' },
@@ -253,12 +253,12 @@ const PgDetailCard: FC<PgDetailCardProps> = ({ resident, onClose, onSlotClick })
         </MatericFrame>
 
         {/* Equipment */}
-        <MatericFrame variant="molding" floor={false} style={{ padding: 10, marginBottom: 12 }}>
+        <MatericFrame variant="molding" style={{ padding: 10, marginBottom: 12 }}>
           <EquipmentDiabloPanel slots={equipmentSlots} onSlotClick={onSlotClick} />
         </MatericFrame>
 
         {/* Inventory */}
-        <MatericFrame variant="molding" floor={false} style={{ padding: 10 }}>
+        <MatericFrame variant="molding" style={{ padding: 10 }}>
           <MatericField label={t('pgDetailCard.inventory.label')} value="" />
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
             {inventoryTokens.length ? (

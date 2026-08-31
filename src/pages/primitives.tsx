@@ -95,7 +95,7 @@ function FrameTab(): JSX.Element {
   return (
     <DemoPanel>
       <MatericHeading title="MatericFrame" subtitle="Molding frame only" />
-      <MatericFrame variant="molding" floor={false}>
+      <MatericFrame variant="molding">
         <div style={{ padding: 12, color: 'var(--skin-body-color)', fontSize: 11 }}>Frame only</div>
       </MatericFrame>
     </DemoPanel>
@@ -263,7 +263,7 @@ function AllTab(): JSX.Element {
       <MatericSectionHeader tier="tertiary" hint="surface">Frame, Surface, Grain, Inset</MatericSectionHeader>
 
       <div style={{ display: 'flex', gap: 12, alignItems: 'stretch', marginBottom: 12 }}>
-        <MatericFrame variant="molding" style={{ flex: 1 }} floor={false}>
+        <MatericFrame variant="molding" style={{ flex: 1 }}>
           <div style={{ padding: 12, color: 'var(--skin-body-color)', fontSize: 11 }}>MatericFrame</div>
         </MatericFrame>
         <MatericSurface shape="card" material="jade" style={{ flex: 1, padding: 12 }}>

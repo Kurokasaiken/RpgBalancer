@@ -4,8 +4,8 @@ import { BezelMolding, WellBronzeBezel } from '@/ui/visualFidelityLab/plateVaria
 /**
  * Variants of the canonical materic frame.
  *
- * - `molding`: a complete plate with an NMM sculpted metal band, dark floor,
- *   and content area. Use this when the frame *is* the container.
+ * - `molding`: an NMM sculpted metal band with a transparent interior. Use
+ *   this when the frame defines an edge, not a filled well.
  * - `bronze-bezel`: a frame-only overlay that sits on top of a well that
  *   already owns its background. Use this when you only need the border band.
  */
@@ -33,8 +33,6 @@ export interface MatericFrameProps {
    * When `false`, it is inset by 1px.
    */
   flush?: boolean;
-  /** When `false`, the `molding` variant draws the frame edge only (no inner floor). */
-  floor?: boolean;
 }
 
 /**
@@ -65,14 +63,13 @@ export const MatericFrame: React.FC<MatericFrameProps> = ({
   band = 1.75,
   rx = 8,
   flush = false,
-  floor = true,
 }) => {
   if (variant === 'bronze-bezel') {
     return <WellBronzeBezel band={band} rx={rx} flush={flush} />;
   }
 
   return (
-    <BezelMolding className={className} style={style} floor={floor}>
+    <BezelMolding className={className} style={style}>
       {children}
     </BezelMolding>
   );

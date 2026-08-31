@@ -52,8 +52,6 @@ export interface PlateVariantProps {
   children: React.ReactNode;
   className?: string;
   style?: CSSProperties;
-  /** When `false`, the inner floor is not painted (frame-only look). Default `true`. */
-  floor?: boolean;
 }
 
 /** Obsidian floor + azure leak + contact AO — identical in all variants. */
@@ -79,19 +77,15 @@ const Floor: React.FC<{ w: number; h: number; uid: string }> = ({ w, h, uid }) =
 
 /* ── A · Bezel Molding ───────────────────────────────────────────── */
 
-export const BezelMolding: React.FC<PlateVariantProps> = ({ children, className, style, floor = true }) => {
+export const BezelMolding: React.FC<PlateVariantProps> = ({ children, className, style }) => {
   const { ref, w, h } = usePlateSize();
   const uid = useId().replace(/:/g, '');
   const BAND = 5; // molding thickness
   const inset = BAND / 2 + 1;
-  const innerX = BAND + 1;
   return (
     <div ref={ref} className={`mp-root ${className ?? ''}`.trim()} style={style}>
       <svg className="mp-svg" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden="true">
         <defs>
-          <clipPath id={`clip-${uid}`}>
-            <rect x={innerX} y={innerX} width={w - innerX * 2} height={h - innerX * 2} rx={RX - 4} />
-          </clipPath>
           {/* the molding band as an artist paints raised metal (NMM ladder):
               ivory specular crest → gold → body → bronze turn → warm-umber core
               at ~80% → a reflected-light uptick at the very bottom. Raised = lit
@@ -104,35 +98,12 @@ export const BezelMolding: React.FC<PlateVariantProps> = ({ children, className,
             <stop offset="80%" stopColor="#5f3f16" />
             <stop offset="100%" stopColor="#7a5220" />
           </linearGradient>
-          <linearGradient id={`drop-${uid}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="rgba(0,3,8,0.7)" />
-            <stop offset="100%" stopColor="rgba(0,3,8,0)" />
-          </linearGradient>
         </defs>
 
         {/* dark seat line so the molding separates from the field */}
         <rect x="0.5" y="0.5" width={w - 1} height={h - 1} rx={RX} fill="none" stroke="rgba(0,0,0,0.55)" strokeWidth="1" />
         {/* THE molding: one band, one vertical light */}
         <rect x={inset} y={inset} width={w - inset * 2} height={h - inset * 2} rx={RX - 2} fill="none" stroke={`url(#band-${uid})`} strokeWidth={BAND} />
-        {/* inner step edge (hard) — drawn only when a floor is painted */}
-        {floor && (
-          <rect x={innerX} y={innerX} width={w - innerX * 2} height={h - innerX * 2} rx={RX - 4} fill="none" stroke="rgba(1,3,6,0.8)" strokeWidth="1" />
-        )}
-
-        <g clipPath={`url(#clip-${uid})`}>
-          {floor && (
-            <>
-              <Floor w={w} h={h} uid={uid} />
-              {/* LIFT the interior 4-8 RGB (azure family) so the wall shadow has
-                  luminance to remove — the research's "lift funds the wall" */}
-              <rect x={innerX} y={innerX} width={w - innerX * 2} height={h - innerX * 2} fill="rgba(26,52,72,0.16)" />
-              {/* contact shadow the raised molding casts down into the well (top wall) */}
-              <rect x={innerX} y={innerX} width={w - innerX * 2} height="11" fill={`url(#drop-${uid})`} />
-              {/* load-bearing cue: warm-gold lit lip on the bottom-inside edge */}
-              <rect x={innerX + 1} y={h - innerX - 2} width={w - (innerX + 1) * 2} height="1.25" fill="rgba(240,207,106,0.34)" />
-            </>
-          )}
-        </g>
       </svg>
       <div className="mp-content">{children}</div>
     </div>

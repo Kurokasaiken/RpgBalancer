@@ -6,7 +6,7 @@ How to assemble `Materic*` primitives and Golden Components without visual noise
 
 - `MatericSurface` and `MatericInset` are **top-level containers**.
 - `MatericSurface` / `MatericInset` must **not** be used as internal wrappers inside another component.
-- Inside a component, use `MatericFrame` with `floor={false}` to separate sub-sections.
+- Inside a component, use `MatericFrame` to separate sub-sections.
 
 ## 2. Frame semantics
 
@@ -14,13 +14,7 @@ How to assemble `Materic*` primitives and Golden Components without visual noise
 |-----------|---------|-------|
 | `MatericSurface` | Top-level panels/cards | Carries a thick border and its own floor. |
 | `MatericInset` | Recessed wells inside a surface | Thick border + floor, sits inside a `MatericSurface`. |
-| `MatericFrame` | Internal borders / sub-sections | `floor={false}` by default for nested use. |
-
-## 3. Floor rule
-
-- `MatericFrame` should normally be used with `floor={false}`.
-- Only use `floor={true}` when the frame itself is the visible well and you need the painted floor.
-- In `/primitives` the `Frame` tab demonstrates only the `floor={false}` case.
+| `MatericFrame` | Internal borders / sub-sections | Frame-only edge; no filled floor. |
 
 ## 4. Background colors
 
@@ -34,7 +28,7 @@ How to assemble `Materic*` primitives and Golden Components without visual noise
 
 - Do not stack thick-bordered containers (`MatericSurface`, `MatericInset`) inside each other.
 - One thick border per top-level component is enough.
-- Sub-sections use `MatericFrame floor={false}`.
+- Sub-sections use `MatericFrame`.
 
 ## 6. Backgrounds and backdrops
 
@@ -67,15 +61,15 @@ How to assemble `Materic*` primitives and Golden Components without visual noise
 ### Good — PgDetailCard
 
 ```tsx
-<MatericFrame variant="molding" floor={false}>
+<MatericFrame variant="molding">
   <MatericPortrait ... />
   <MatericPlaque> ... </MatericPlaque>
 
-  <MatericFrame variant="molding" floor={false}>
+  <MatericFrame variant="molding">
     <MatericStatBar ... />
   </MatericFrame>
 
-  <MatericFrame variant="molding" floor={false}>
+  <MatericFrame variant="molding">
     <MatericRecordList ... />
   </MatericFrame>
 </MatericFrame>
@@ -107,6 +101,6 @@ How to assemble `Materic*` primitives and Golden Components without visual noise
 ## Verification
 
 - Before adding a primitive, ask: "Is this inside another component?"
-- If yes, prefer `MatericFrame floor={false}` or a flat layout.
+- If yes, prefer `MatericFrame` or a flat layout.
 - If no, `MatericSurface` / `MatericInset` are acceptable.
 - If a component needs a backdrop, make the backdrop a sibling, not a parent.
