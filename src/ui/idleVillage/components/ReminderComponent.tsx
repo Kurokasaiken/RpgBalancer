@@ -1,13 +1,30 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { MatericEventCard } from '@/ui/designSystem/primitives';
-import { PoiMatericV3 } from '@/ui/idleVillage/components/poi/PoiMatericV3';
+import { PoiMatericV3_5 } from '@/ui/idleVillage/components/poi/PoiMatericV3_5';
 import { SkinTitle } from '@/ui/idleVillage/skins/primitives/SkinTitle';
 import { GildedEventFrame } from './GildedEventFrame';
 import { eventReminderTokens } from '@/balancing/config/idleVillage/eventReminderTokens';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 
 const { sizing, poi, glow, surface, gilded, title: titleTokens, countdown: countdownTokens } = eventReminderTokens;
+
+function useReducedMotion(): boolean {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setReduced(mq.matches);
+    update();
+    if (mq.addEventListener) {
+      mq.addEventListener('change', update);
+      return () => mq.removeEventListener('change', update);
+    }
+    mq.addListener(update);
+    return () => mq.removeListener(update);
+  }, []);
+  return reduced;
+}
 
 /**
  * POI that starts with an empty magic circle and fills counter-clockwise.
@@ -32,7 +49,7 @@ const FillingPoi: React.FC<{ size: number; fillDurationMs: number }> = ({
   }, [fillDurationMs]);
 
   return (
-    <PoiMatericV3
+    <PoiMatericV3_5
       type="event"
       state="active"
       progress={progress}
@@ -78,6 +95,25 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
   style,
 }) => {
   const stateTokens = eventReminderTokens.states[state];
+  const reduced = useReducedMotion();
+  const rootRef = useRef<HTMLButtonElement>(null);
+  const uid = useId().replace(/:/g, '');
+  const glassFilterId = `reminder-glass-${uid}`;
+  const [mx, setMx] = useState(0);
+  const [my, setMy] = useState(0);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLButtonElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    setMx((x - 0.5) * 2);
+    setMy((y - 0.5) * 2);
+  }, []);
+
+  const handlePointerLeave = useCallback(() => {
+    setMx(0);
+    setMy(0);
+  }, []);
 
   const handleClick = useCallback(() => {
     trackTelemetryEvent('event_reminder_click', {
@@ -92,8 +128,11 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
 
   return (
     <motion.button
+      ref={rootRef}
       type="button"
       onClick={handleClick}
+      onPointerMove={reduced ? undefined : handlePointerMove}
+      onPointerLeave={reduced ? undefined : handlePointerLeave}
       aria-label={title}
       whileHover={{ y: -3, scale: 1.01 }}
       whileTap={{ scale: 0.99 }}
@@ -106,8 +145,10 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
         border: 0,
         background: 'transparent',
         cursor: onClick ? 'pointer' : 'default',
+        '--mx': mx.toFixed(3),
+        '--my': my.toFixed(3),
         ...style,
-      }}
+      } as React.CSSProperties}
     >
       <span
         style={{
@@ -133,6 +174,31 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
         aria-hidden="true"
       />
       <GildedEventFrame />
+      <svg
+        style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden' }}
+        aria-hidden="true"
+      >
+        <defs>
+          <filter id={glassFilterId} colorInterpolationFilters="sRGB" x="0" y="0" width="100%" height="100%">
+            <feImage
+              href="/assets/ui/glass_displacement.png"
+              preserveAspectRatio="none"
+              x="0"
+              y="0"
+              width="100%"
+              height="100%"
+              result="lens"
+            />
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="lens"
+              scale="6"
+              xChannelSelector="R"
+              yChannelSelector="G"
+            />
+          </filter>
+        </defs>
+      </svg>
       <span
         style={{
           position: 'absolute',
@@ -170,7 +236,16 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
                 }}
                 aria-hidden="true"
               />
-              <div style={{ position: 'relative', zIndex: 1, filter: `drop-shadow(0 0 18px ${gilded.gemGlow})` }}>
+              <div
+                style={{
+                  position: 'relative',
+                  zIndex: 1,
+                  filter: `drop-shadow(0 0 18px ${gilded.gemGlow}) ${reduced ? '' : `url(#${glassFilterId})`}`,
+                  transform: reduced
+                    ? 'none'
+                    : `translate3d(calc(var(--mx) * 6px), calc(var(--my) * 4px), 0)`,
+                }}
+              >
                 <FillingPoi size={sizing.poiSize} fillDurationMs={poi.fillDurationMs} />
               </div>
             </div>
@@ -193,7 +268,19 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
           >
             {title}
           </SkinTitle>
-          <div style={{ marginTop: 8, display: 'flex', alignItems: 'baseline', gap: 12 }}>
+          <div
+            style={{
+              marginTop: 8,
+              display: 'inline-flex',
+              alignItems: 'baseline',
+              gap: 10,
+              padding: '5px 12px',
+              borderRadius: 7,
+              border: '1px solid rgba(240,207,106,0.45)',
+              background: 'linear-gradient(135deg, rgba(61,37,19,0.55) 0%, rgba(30,18,9,0.72) 100%)',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 4px 8px rgba(0,0,0,0.4)',
+            }}
+          >
             <SkinTitle
               level="subtitle"
               style={{
