@@ -89,9 +89,9 @@ const BREATH_MAP: Record<string, BreathSpec> = {};
  */
 const PARALLAX = {
   /** Fraction of the camera pan the clouds add on top of it. */
-  cloudExcess: 0.12,
+  cloudExcess: 0.15,
   /** Ceiling on the visible offset, in SCREEN px. */
-  maxOffsetScreenPx: 8,
+  maxOffsetScreenPx: 12,
 } as const;
 
 interface WorldSurfaceRendererProps {

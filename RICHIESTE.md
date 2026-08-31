@@ -1318,4 +1318,4 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Aggiornamento 2026-08-31:**
 |- Il Director ha ristretto la parallasse al **trascinamento**: nessun offset da semplice posizione del mouse (`hover`).
-|- Valori `PARALLAX` ridotti (`cloudExcess: 0.12`, `maxOffsetScreenPx: 8`) per un effetto più leggero.
+|- Valori `PARALLAX` (`cloudExcess: 0.15`, `maxOffsetScreenPx: 12`) per un effetto visibile al drag ma con tetto leggero.
