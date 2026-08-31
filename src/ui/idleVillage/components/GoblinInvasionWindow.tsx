@@ -272,17 +272,17 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
           {/* Glass gradients */}
           <radialGradient id={`g-glass-${uid}`} cx="50%" cy="48%" r="52%">
             <stop offset="0%" stopColor="rgba(220,235,255,0)" />
-            <stop offset="60%" stopColor="rgba(200,220,255,.028)" />
-            <stop offset="100%" stopColor="rgba(180,210,255,.065)" />
+            <stop offset="60%" stopColor="rgba(200,220,255,.10)" />
+            <stop offset="100%" stopColor="rgba(180,210,255,.22)" />
           </radialGradient>
-          <radialGradient id={`g-glass-hl-${uid}`} cx="28%" cy="22%" r="38%">
-            <stop offset="0%" stopColor="rgba(255,255,255,.26)" />
-            <stop offset="35%" stopColor="rgba(255,255,255,.08)" />
-            <stop offset="70%" stopColor="rgba(255,255,255,.02)" />
+          <radialGradient id={`g-glass-hl-${uid}`} cx="28%" cy="22%" r="48%">
+            <stop offset="0%" stopColor="rgba(255,255,255,.65)" />
+            <stop offset="35%" stopColor="rgba(255,255,255,.26)" />
+            <stop offset="70%" stopColor="rgba(255,255,255,.08)" />
             <stop offset="100%" stopColor="rgba(255,255,255,0)" />
           </radialGradient>
           <radialGradient id={`g-glass-b-${uid}`} cx="74%" cy="78%" r="32%">
-            <stop offset="0%" stopColor="rgba(255,255,255,.05)" />
+            <stop offset="0%" stopColor="rgba(255,255,255,.18)" />
             <stop offset="100%" stopColor="rgba(255,255,255,0)" />
           </radialGradient>
 
@@ -447,10 +447,10 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
             left: '-10%',
             width: '70%',
             height: '140%',
-            background: 'linear-gradient(115deg, transparent 35%, rgba(255,205,100,.14) 45%, rgba(255,235,180,.24) 50%, transparent 60%)',
+            background: 'linear-gradient(115deg, transparent 35%, rgba(255,205,100,.28) 45%, rgba(255,235,180,.42) 50%, transparent 60%)',
             filter: 'blur(22px)',
             mixBlendMode: 'screen',
-            opacity: 0.75,
+            opacity: 1.0,
             animation: reduced ? 'none' : 'window-light-breathe 6s ease-in-out infinite',
             transform: reduced
               ? 'rotate(18deg)'
@@ -465,7 +465,7 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
           style={{
             position: 'absolute',
             inset: 0,
-            background: 'radial-gradient(ellipse at 50% 45%, rgba(220,190,130,.06), transparent 65%)',
+            background: 'radial-gradient(ellipse at 50% 45%, rgba(220,190,130,.18), transparent 65%)',
             mixBlendMode: 'screen',
             pointerEvents: 'none',
             zIndex: 6,
@@ -496,7 +496,7 @@ export const GoblinInvasionWindow: React.FC<GoblinInvasionWindowProps> = ({
             <rect x={0} y={0} width={INNER_W} height={INNER_H} fill={`url(#g-glass-hl-${uid})`} />
             <rect x={0} y={0} width={INNER_W} height={INNER_H} fill={`url(#g-glass-b-${uid})`} />
             <rect x={2} y={2} width={INNER_W - 4} height={INNER_H - 4} rx={RX - 10} fill="none"
-              stroke="rgba(255,255,255,.22)" strokeWidth="0.6"
+              stroke="rgba(255,255,255,.45)" strokeWidth="0.9"
               strokeDasharray={`${INNER_W * 0.35} ${(INNER_W + INNER_H) * 2}`}
               strokeDashoffset={-INNER_W * 0.05}
               strokeLinecap="round" />
