@@ -29,6 +29,7 @@ import {
 } from '@/ui/designSystem/primitives';
 import { Slot } from '@/ui/idleVillage/components/Slot';
 import { GoblinInvasionWindow } from '@/ui/idleVillage/components/GoblinInvasionWindow';
+import { ReminderComponent } from '@/ui/idleVillage/components/ReminderComponent';
 import DayNightPoiSkin from '@/ui/idleVillage/components/minimal/DayNightPoiSkin';
 import { WanderlustMedalOverlay } from '@/ui/idleVillage/components/WanderlustMedalOverlay';
 import ThreatStatusIndicator from '@/ui/idleVillage/components/ThreatStatusIndicator';
@@ -51,6 +52,7 @@ type TabId =
   | 'threat'
   | 'skin'
   | 'event'
+  | 'reminder'
   | 'window';
 
 const FIELD_BACKGROUND = [
@@ -72,6 +74,7 @@ const TABS: { id: TabId; label: string }[] = [
   { id: 'threat', label: 'Threat' },
   { id: 'skin', label: 'Skin' },
   { id: 'event', label: 'Event' },
+  { id: 'reminder', label: 'Reminder' },
   { id: 'window', label: 'Window' },
 ];
 
@@ -475,6 +478,27 @@ function WindowTab(): JSX.Element {
   );
 }
 
+function ReminderTab(): JSX.Element {
+  const { t } = useTranslation('idleVillage');
+  const [clickCount, setClickCount] = useState(0);
+
+  return (
+    <DemoPanel>
+      <MatericHeading title="Reminder" subtitle="Gilded world event reminder" />
+      <div style={{ display: 'flex', gap: 24, alignItems: 'center', flexWrap: 'wrap' }}>
+        <ReminderComponent
+          title={String(t('world.goblinInvasion.invasion'))}
+          daysLeftLabel={String(t('world.goblinInvasion.daysRemaining', { count: 5 }))}
+          onClick={() => setClickCount((c) => c + 1)}
+        />
+        <span style={{ color: '#e4bd62', fontSize: 14 }}>
+          {clickCount > 0 ? `Clicked ${clickCount} time${clickCount === 1 ? '' : 's'}` : 'Click the reminder'}
+        </span>
+      </div>
+    </DemoPanel>
+  );
+}
+
 const TAB_CONTENT: Record<TabId, () => JSX.Element> = {
   all: AllTab,
   frame: FrameTab,
@@ -489,6 +513,7 @@ const TAB_CONTENT: Record<TabId, () => JSX.Element> = {
   threat: ThreatTab,
   skin: SkinTab,
   event: EventTab,
+  reminder: ReminderTab,
   window: WindowTab,
 };
 
