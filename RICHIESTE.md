@@ -1353,3 +1353,20 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 |- Montato in `WorldSurfaceRenderer` sotto le nuvole, con prop `showAtmosphere`; toggle in `WorldSurfaceTestPage`.
 |- `prefers-reduced-motion` disattiva le animazioni.
 |- Safeguards passano.
+
+---
+
+## R-063 — Rimuovere flag `floor` da `MatericFrame` e componenti correlati
+
+**Richiesta:** *"in primitives nella tab frame c'è un flag `floor`: non voglio che esista da nessuna parte nel progetto. Voglio che qualunque componente lo implementi non lo usi più e non sia più visibile MAI a prescindere."*
+**Data:** 2026-08-31
+**Stato:** `fatta`
+**Consegnato:** 2026-08-31
+**Desiderata FROZEN:** `.mw/desiderata.md` v1 — adozione protocollo Mind Weaver in RPG.
+**Cosa è successo:**
+|- Rimosso il prop `floor` da `MatericFrame`, `MatericEventCard` e `BezelMolding`.
+|- `MatericFrame` variant `molding` è ora un bordo NMM senza pavimento interno.
+|- Aggiornati i consumatori: `src/pages/primitives.tsx` e `src/ui/idleVillage/components/PgDetailCard.tsx`.
+|- Aggiornata `src/docs/docs/design/primitive_composition_rules.md` per riflettere che `MatericFrame` non ha più `floor`.
+**Output atteso:**
+|- Il prop `floor` non esiste più nel progetto; la pavimentazione interna non è mai visibile.

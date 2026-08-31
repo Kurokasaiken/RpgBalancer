@@ -29,8 +29,6 @@ export interface MatericEventCardProps {
   daysLeftLabel?: string;
   /** Days-left numeric value; when present the card renders label + large number. */
   daysLeftValue?: number;
-  /** Whether to paint the inner floor inside the frame. */
-  floor?: boolean;
   /** Additional content. */
   children?: React.ReactNode;
   /** Extra CSS class. */
@@ -70,7 +68,6 @@ export const MatericEventCard: React.FC<MatericEventCardProps> = ({
   onAction,
   daysLeftLabel,
   daysLeftValue,
-  floor = true,
   children,
   className,
   style,
@@ -90,7 +87,6 @@ export const MatericEventCard: React.FC<MatericEventCardProps> = ({
   return (
     <MatericFrame
       variant="molding"
-      floor={floor}
       className={className}
       style={{ maxWidth: 360, textAlign: 'center', position: 'relative', ...style }}
     >
