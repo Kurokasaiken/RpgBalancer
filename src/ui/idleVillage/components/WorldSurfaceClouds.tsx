@@ -54,13 +54,15 @@ export function WorldSurfaceClouds({
         // Clouds must not spill outside the map while crossing it.
         overflow: 'hidden',
         pointerEvents: 'none',
-        transform: `translate3d(calc(${(parallaxOffset?.x ?? 0)}px + var(--ws-mouse-parallax-x, 0px)), calc(${(parallaxOffset?.y ?? 0)}px + var(--ws-mouse-parallax-y, 0px)), 0)`,
+        transform: parallaxOffset
+          ? `translate3d(${parallaxOffset.x}px, ${parallaxOffset.y}px, 0)`
+          : undefined,
         // The plan's 400ms ease-out. During a drag this is what makes the band
         // trail the map instead of moving in lockstep with it, which is the whole
         // effect: without the lag there is no parallax to see, only a band that
         // happens to sit slightly off.
         transition: 'transform 400ms ease-out',
-        willChange: 'transform',
+        willChange: parallaxOffset ? 'transform' : undefined,
       }}
     >
       <style>{`
