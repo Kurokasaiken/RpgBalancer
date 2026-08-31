@@ -394,6 +394,12 @@
     "title": "World Surface",
     "loading": "Loading world surface…",
     "error": "Failed to load world surface",
+    "lab": {
+      "title": "Sea Effect Lab",
+      "baseline": "Baseline",
+      "waterField": "Water field",
+      "back": "Back"
+    },
     "back": "Back",
     "camera": {
       "reset": "Reset camera"

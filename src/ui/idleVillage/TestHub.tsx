@@ -201,6 +201,15 @@ const EXTRA_PAGES: TestPageLink[] = [
     icon: '🗺️',
     status: 'ok',
   },
+  // Non-kit page: Sea Effect Lab - side-by-side water effect attempts.
+  {
+    id: 'sea-effect-lab',
+    title: 'Sea Effect Lab',
+    description: 'Tentativi d\'effetto mare affiancati: baseline vs water field intensificato',
+    path: '/sea-effect-lab',
+    icon: '🌊',
+    status: 'ok',
+  },
   // Non-kit page: World Presentation Director - deterministic presentation runtime sandbox.
   {
     id: 'world-presentation-director',

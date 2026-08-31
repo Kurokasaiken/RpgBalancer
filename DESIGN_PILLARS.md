@@ -18,7 +18,7 @@
 **Cosa prendiamo:**
 - La mappa non è più una dashboard tattica, ma un **continente dipinto da esplorare con lo sguardo**: montagne, foreste, mare, creature, vita atmosferica e dettagli nascosti.
 - **Layer visivi concettuali multipli**: base dipinta, atmosfera, landmark, creature, acqua/eventi, cornice/carving, overlay Pixi. A runtime i sistemi *costosi* restano 4-5, con DOM/CSS per il contenuto statico e PixiJS per la dinamica.
-- **Respiro globale e profondità reattiva**: la mappa è un manufatto dipinto sul tavolo che prende vita quando il giocatore lo interroga. Luce, ombre, inchiostro e token sulla carta comunicano profondità senza parallasse di camera. Stato del villaggio, timer e avvisi si leggono *sul mondo*, non in pannelli che lo coprono.
+- **Respiro globale e profondità reattiva**: la mappa è un manufatto dipinto sul tavolo che prende vita quando il giocatore lo interroga. Luce, ombre, inchiostro, token e micro-parallasse di overlay atmosferici (nuvole, ombre, luce, token separabili) comunicano profondità. I layer full-canvas 4240×2828 restano fermi. Stato del villaggio, timer e avvisi si leggono *sul mondo*, non in pannelli che lo coprono.
 - **Vita ambientale rara, non rumore continuo**: 80% calma, 15% comunicazione ambientale, 5% sorprese rare (Kraken, balena, drago, meteora, aurora, nave fantasma, tempesta, stormo).
 - **Reazioni nascoste data-driven**: niente sequenze di click rapidi. Trigger candidati: hover intenzionale breve (1.5-3s) su landmark, attraversamento di zone, condizioni di mondo (notte/pioggia), catene di osservazione.
 - **Tier di presentazione eventi**:
@@ -34,8 +34,8 @@
 - Non è una griglia di sprite che camminano.
 - Non sono effetti cinematografici a ogni evento: il 95% degli eventi resta localizzato e non blocca l'interazione.
 - Non sette sistemi di rendering indipendenti e costosi: sette *concetti* sì, ma massimo 4-5 passi reali.
-- Non un motore 3D/shader nativo: si resta in React + DOM/CSS + PixiJS.
-- Non parallasse per layer o tilt 3D sui layer 4240×2828: supera il limite WebKit 4096 (verificato empiricamente).
+- Non un motore 3D nativo: si resta in React + DOM/CSS + PixiJS. Shader custom (GLSL/Pixi filter) ammessi in autonomia/lab e per effetti profilati, con fallback DOM e approvazione del Director.
+- Non parallasse per layer o tilt 3D sui layer full-canvas 4240×2828: i layer baked restano fermi per non esporre bordi. Parallasse consentita per overlay separabili (nuvole, ombre, luce, token) entro budget percettivo e WebKit.
 
 ### Pillar 2 — Meccanica core: *Cultist Simulator* (halo, slot-verbi, carte)
 
