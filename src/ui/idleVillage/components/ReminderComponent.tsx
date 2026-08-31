@@ -6,7 +6,7 @@ import { GildedEventFrame } from './GildedEventFrame';
 import { eventReminderTokens } from '@/balancing/config/idleVillage/eventReminderTokens';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 
-const { sizing, poi, glow, surface } = eventReminderTokens;
+const { sizing, poi, glow, surface, gilded } = eventReminderTokens;
 
 /**
  * POI that starts with an empty magic circle and fills counter-clockwise.
