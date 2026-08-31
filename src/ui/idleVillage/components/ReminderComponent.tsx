@@ -1,45 +1,12 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { MatericEventCard } from '@/ui/designSystem/primitives';
-import { PoiMatericV3 } from '@/ui/idleVillage/components/poi/PoiMatericV3';
+import { useTranslation } from 'react-i18next';
 import { GildedEventFrame } from './GildedEventFrame';
+import { EventReminderPoi } from './EventReminderPoi';
 import { eventReminderTokens } from '@/balancing/config/idleVillage/eventReminderTokens';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 
-const { sizing, poi, glow, surface } = eventReminderTokens;
-
-/**
- * POI that starts with an empty magic circle and fills counter-clockwise.
- */
-const FillingPoi: React.FC<{ size: number; fillDurationMs: number }> = ({
-  size,
-  fillDurationMs,
-}) => {
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    let raf = 0;
-    let start = 0;
-    const step = (t: number) => {
-      if (!start) start = t;
-      const p = Math.min(1, (t - start) / fillDurationMs);
-      setProgress(p);
-      if (p < 1) raf = requestAnimationFrame(step);
-    };
-    raf = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(raf);
-  }, [fillDurationMs]);
-
-  return (
-    <PoiMatericV3
-      type="event"
-      state="active"
-      progress={progress}
-      timerDirection="counterclockwise"
-      size={size}
-    />
-  );
-};
+const { sizing, content, glow, surface } = eventReminderTokens;
 
 /**
  * Props for the ReminderComponent.
@@ -47,8 +14,8 @@ const FillingPoi: React.FC<{ size: number; fillDurationMs: number }> = ({
 export interface ReminderComponentProps {
   /** Title shown on the reminder (e.g. "INVASION"). */
   title: string;
-  /** Days-left label shown under the title. */
-  daysLeftLabel: string;
+  /** Number of days remaining until the event triggers. */
+  daysRemaining: number;
   /** Called when the player clicks the reminder to open event details. */
   onClick?: () => void;
   /** Additional inline styles. */
@@ -58,26 +25,28 @@ export interface ReminderComponentProps {
 /**
  * Small, persistent event reminder shown in the world-surface map.
  *
- * Displays a gilded hand-forged frame, the event title, a days-remaining
- * label, and a slowly filling POI medallion to signal that the threat is still
- * active. Clicking it emits telemetry and calls `onClick`.
+ * Displays a gilded hand-forged frame, the event title, a compact days-left
+ * capsule, and a bronze medallion. Clicking it emits telemetry and calls
+ * `onClick`.
  */
 export const ReminderComponent: React.FC<ReminderComponentProps> = ({
   title,
-  daysLeftLabel,
+  daysRemaining,
   onClick,
   style,
 }) => {
+  const { t } = useTranslation('idleVillage');
+
   const handleClick = useCallback(() => {
     trackTelemetryEvent('event_reminder_click', {
       eventType: 'event_reminder_click',
-      data: { title },
+      data: { title, daysRemaining },
       context: 'event-reminder',
       timestamp: Date.now(),
       metadata: {},
     });
     onClick?.();
-  }, [onClick, title]);
+  }, [onClick, title, daysRemaining]);
 
   return (
     <motion.button
@@ -101,10 +70,10 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
       <span
         style={{
           position: 'absolute',
-          inset: '12% 8%',
+          inset: '10% 6%',
           borderRadius: '50%',
           background: `radial-gradient(ellipse, ${glow.ambient}, transparent 70%)`,
-          filter: 'blur(18px)',
+          filter: 'blur(20px)',
           opacity: glow.ambientOpacity,
           zIndex: 0,
         }}
@@ -122,30 +91,74 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
         aria-hidden="true"
       />
       <GildedEventFrame />
-      <span
+      <div
         style={{
           position: 'absolute',
           inset: 0,
           zIndex: 7,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
-          padding: '0 18px',
+          gap: 22,
+          padding: '0 28px',
           pointerEvents: 'none',
         }}
       >
-        <MatericEventCard
-          variant="reminder"
-          title={title}
-          daysLeftLabel={daysLeftLabel}
-          image={<FillingPoi size={sizing.poiSize} fillDurationMs={poi.fillDurationMs} />}
+        <div
           style={{
-            maxWidth: sizing.width - 36,
-            width: '100%',
-            minHeight: sizing.minHeight - 20,
+            width: sizing.medallionSize,
+            height: sizing.medallionSize,
+            flexShrink: 0,
           }}
-        />
-      </span>
+        >
+          <EventReminderPoi />
+        </div>
+        <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
+          <span
+            style={{
+              display: 'block',
+              fontSize: 30,
+              fontWeight: 700,
+              color: content.title,
+              textShadow: content.titleShadow,
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              lineHeight: 1.1,
+            }}
+          >
+            {title}
+          </span>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: 8,
+              marginTop: 4,
+            }}
+          >
+            <span
+              style={{
+                fontSize: 11,
+                color: content.label,
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+              }}
+            >
+              {t('world.eventReminder.daysRemaining', { count: daysRemaining })}
+            </span>
+            <span
+              style={{
+                fontSize: 26,
+                fontWeight: 700,
+                color: content.number,
+                textShadow: content.numberGlow,
+                lineHeight: 1,
+              }}
+            >
+              {daysRemaining}
+            </span>
+          </div>
+        </div>
+      </div>
     </motion.button>
   );
 };

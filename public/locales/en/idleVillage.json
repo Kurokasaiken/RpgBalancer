@@ -474,6 +474,9 @@
         "dismissReport": "Dismiss Report"
       }
     },
+    "eventReminder": {
+      "daysRemaining": "Days Remaining"
+    },
     "debug": {
       "title": "Debug",
       "statesTitle": "States",
@@ -488,7 +491,9 @@
       "clearObjects": "Clear",
       "spawnWonders": "Spawn wonders",
       "despawnWonders": "Despawn wonders",
-      "water": "Water"
+      "breath": "Breath",
+      "water": "Water",
+      "atmosphere": "Atmosphere"
     }
   },
   "worldEvents": {
