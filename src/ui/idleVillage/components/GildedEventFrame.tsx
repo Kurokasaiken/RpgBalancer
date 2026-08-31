@@ -66,7 +66,7 @@ export const GildedEventFrame: React.FC = () => {
       {/* Outer raised border */}
       <path
         d="M 24 4 H 396 Q 416 4 416 24 V 132 Q 416 152 396 152 H 24 Q 4 152 4 132 V 24 Q 4 4 24 4 Z"
-        fill={gilded.ornamentFill}
+        fill="none"
         stroke="url(#gilded-frame-gold)"
         strokeWidth={4}
         filter="url(#gilded-metal-noise)"
