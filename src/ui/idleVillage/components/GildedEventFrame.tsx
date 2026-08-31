@@ -128,10 +128,10 @@ export const GildedEventFrame: React.FC = () => {
       {/* Corner gems: bezel + cabochon + specular */}
       <g>
         {[
-          { cx: 14, cy: 14 },
-          { cx: 406, cy: 14 },
-          { cx: 14, cy: 142 },
-          { cx: 406, cy: 142 },
+          { cx: 22, cy: 22 },
+          { cx: 398, cy: 22 },
+          { cx: 22, cy: 134 },
+          { cx: 398, cy: 134 },
         ].map(({ cx, cy }) => (
           <g key={`gem-${cx}-${cy}`}>
             {/* bezel / socket */}
