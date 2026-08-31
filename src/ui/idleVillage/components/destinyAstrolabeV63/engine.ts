@@ -437,6 +437,16 @@ const easeOutHeavy=t=>1-Math.pow(1-t,3.5);         // kept for other uses
 const easeElastic=t=>t===0?0:t===1?1:Math.pow(2,-10*t)*Math.sin((t*10-0.75)*(TAU/3))+1;
 
 const V63_STIFFNESS=tarGooConfig.v63.stiffness;
+/* la variante di fondo attiva: config, sovrascrivibile con ?bg=<nome> */
+function v63Backdrop(){
+  const set=tarGooConfig.v63.backdrops;
+  let nome=tarGooConfig.v63.backdrop;
+  try{
+    const q=new URLSearchParams(window.location.search).get('bg');
+    if(q&&set[q]) nome=q;
+  }catch(e){ /* nessuna query: resta la config */ }
+  return set[nome]||tarGooConfig.backdrop;
+}
 const V63_SPAWN_RING=tarGooConfig.v63.spawnRingFactor;
 const V63_AXIS_BIAS=tarGooConfig.v63.axisBias;
 const GOO_MS=tarGooConfig.timing.pourMs;           // V6.3: main tar pour duration
@@ -1110,8 +1120,9 @@ const marbleTex=(()=>{                // ancient translucent marble with vein no
 
 function drawBackdrop(now){
   const t=now/1000;
-  /* V2-style teal-azure base fill — brightness from tarGooConfig.backdrop */
-  const bd=tarGooConfig.backdrop;
+  /* CP-H: il fondo e' una variante scelta, non una costante. `?bg=<nome>` la
+     sovrascrive per poter confrontare senza ricompilare. */
+  const bd=v63Backdrop();
   ctx.save();
   const _bg=ctx.createRadialGradient(CX,CY,0,CX,CY,R*1.15);
   _bg.addColorStop(0,bd.inner);
