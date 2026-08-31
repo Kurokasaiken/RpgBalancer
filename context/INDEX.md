@@ -1,7 +1,7 @@
 ---
 title: Context Index
 type: reference
-updated: 2026-08-15
+updated: 2026-08-31
 ---
 
 # Context Index
@@ -56,3 +56,6 @@ Format: `[filename](path) — one sentence — \`tag\``
 [.mw/runs/2026-08-28-poi-materic-v4/pattern-candidate.md](.mw/runs/2026-08-28-poi-materic-v4/pattern-candidate.md) — pattern: archi progressivi con cap tondo (3a ricorrenza), loop rAF che deve leggere lo store, mix-blend-mode isolato da antenati trasformati — `pattern` `idle-village` `svg` `animation`
 [.mw/pattern-big-rewrite-without-authority.md](.mw/pattern-big-rewrite-without-authority.md) — pattern: assunzione di riscrittura senza autorità dalla desiderata FROZEN; regola: leggere sempre desiderata prima di codare — `pattern` `protocol` `learning`
 |[src/docs/docs/plans/idle_village_hero_components_placeholder_plan.md](src/docs/docs/plans/idle_village_hero_components_placeholder_plan.md) — piano ombrello per placeholder scheda/equip/consumabili/skill — `plan` `idle-village` `hero`
+|[CANON.md](CANON.md) — mappa delle autorità documentali — `governance` `canon`
+|[CURRENT_STATE.md](CURRENT_STATE.md) — fotografia dello stato runtime — `state` `reference`
+|[GLOSSARY.md](GLOSSARY.md) — glossario canonico del progetto — `reference`

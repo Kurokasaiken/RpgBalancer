@@ -1243,3 +1243,44 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 - P2 raggi di luce CSS, P3 puntatore che modula la luce anziche la posizione, P4 polvere in Pixi, P5 displacement sul layer di dettaglio (solo se P0 non basta), P6 revisione degli eventi onda.
 - Il `Window` di vetro (decisione 3) non e ancora stato toccato.
 - **Nota d'ambiente:** un processo coordinator in background ha committato questo lavoro in corso dentro commit V6.3 non correlati (`e0d2c6e5`, `9e7e2cdb`). Nulla e perso, ma la storia e sporca.
+
+---
+
+## R-057 — Parallasse sulla manina, teca di vetro, e il resto del piano World Surface
+
+**Richiesta:** *"tienila. l'effetto teca di vetro? il parallasse mentre sposto la mappa cn lo strumento manina? poi che altro possiamo fare? cosa c'è prveristo nel piano"*, poi *"continua il resto del piano"*.
+**Data:** 2026-08-30
+**Stato:** `in corso`
+
+**Stato reale del piano, verificato.** I 13 sub-plan di `world_surface_v3_*` sono **tutti `Draft`, nessuno eseguito**. Gli hook che il sub-plan G nomina — `useParallax`, `useBreathAnimation`, `useUnderwaterSystem` — **non esistono nel repo**. Due voci del §7 sono note come non costruibili o disallineate: lo sway degli alberi (±1,5 px) e impossibile sui layer full-canvas cotti (traslarli slitta un ritaglio del dipinto e scopre tela), e l'acqua e specificata a **ciclo 3-5 s / ±4 px** mentre quella spedita fa 30 s.
+
+**§8 Depth/Parallax — `fatta`.**
+- `WorldSurfaceClouds.tsx`: nuova prop `parallaxOffset`, applicata al **container** e non agli sprite, perche ogni sprite ha gia una `transform` animata per la deriva e un elemento ha una sola transform. Transizione `400ms ease-out` come da piano.
+- `WorldSurfaceRenderer.tsx`: costante `PARALLAX` (`cloudExcess: 0.2` = il 1,20x del piano, `maxOffsetScreenPx: 12`) e calcolo `cloudParallax`.
+- Derivazione del segno: il world box trasla di `-pan * zoom` a schermo e poi scala, quindi un offset `d` px mondo su un figlio atterra come `d * zoom`. Per le nuvole a 1,20x serve `d = -0,2 * pan`, e il tetto a schermo diventa `12 / zoom` in unita mondo.
+- **Solo le nuvole.** Le ombre delle nuvole sono proiettate SUL terreno e i marchi d'onda stanno su una costa dipinta: muovere gli uni o gli altri rispetto alla mappa li staccherebbe da cio a cui appartengono. Mappa base a 1,00x, cornice mai trasformata (il piano avverte del rischio tearing su Tauri/WebView).
+- **Correzione alla formulazione del piano.** Misurata contro il pan **assoluto** la parallasse satura: con un pan di 828 px mondo l'offset era gia al tetto e ci restava, diventando uno spostamento fisso invece di un movimento. Ora e misurata dal pan **al momento in cui comincia la trascinata** (`dragOriginPan`): parte da zero a ogni presa, cresce mentre trascini, e torna a zero al rilascio con l'easing. La banda resta indietro e poi recupera.
+- La dead zone del 5% prevista dal piano **non** e implementata, di proposito: serve a evitare il jitter di un puntatore fermo vicino al centro, e una trascinata non ha jitter da sopprimere.
+- Verifica: a riposo 0,0 px; trascinando −8,5 → −12,1 px a schermo (tetto rispettato al decimo); al rilascio torna a 0,0. Nessun errore in console, `tsc` pulito, test 11/11.
+
+**Limite da sapere.** Alla vista di default (zoom 0,30) il mondo **sta tutto dentro la finestra** — 1272x848 px contro 1400x900 e oltre — quindi il pan e clampato a zero e **la manina non fa nulla**, parallasse inclusa. L'effetto esiste solo da zoomati oltre il fit. Per avere profondita reattiva anche alla vista intera serve la variante del piano guidata dalla **posizione del mouse**, non dal pan.
+
+**Cosa manca:**
+- Chiarimento del Director su "teca di vetro": il globo del primitivo `Window`, oppure una teca sopra **tutta la mappa** (overlay full-canvas con riflessi)? Sono due lavori diversi e il secondo e piu rischioso.
+- Vetro sul `Window` (approvato: `filter: url(#glass)` sull'immagine). Rischio quasi nullo: `<Window>` non ha consumatori reali, vive solo nella vetrina `/primitives`.
+- Eventuale parallasse da posizione del mouse, per coprire la vista di default.
+
+---
+
+## R-058 — Consolidamento documentale: CANON, CURRENT_STATE, GLOSSARY
+
+**Richiesta:** *"Procedi"* al consolidamento documentale Batch 1: creare `CANON.md`, `CURRENT_STATE.md`, `GLOSSARY.md` e aggiornare `context/INDEX.md` e `AGENTS.md` con i riferimenti.
+**Data:** 2026-08-31
+**Stato:** `fatta`
+**Consegnato:** 2026-08-31
+**Desiderata FROZEN:** `.mw/desiderata.md` v1 — adozione protocollo Mind Weaver in RPG.
+**Output atteso:**
+- `CANON.md` con mappa delle autorità.
+- `CURRENT_STATE.md` con fotografia del runtime.
+- `GLOSSARY.md` con termini canonici.
+- `context/INDEX.md` e `AGENTS.md` aggiornati per puntare ai nuovi documenti.

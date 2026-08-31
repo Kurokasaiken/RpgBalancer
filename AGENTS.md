@@ -1,7 +1,11 @@
-All'inizio di ogni sessione: leggi `DESIGN_PILLARS.md`, `context/DECISION_LOG.md`, `RICHIESTE.md`, `.mw/desiderata.md` e `context/INDEX.md` (se esiste).
+All'inizio di ogni sessione: leggi `CANON.md`, `CURRENT_STATE.md`, `DESIGN_PILLARS.md`, `context/DECISION_LOG.md`, `RICHIESTE.md`, `.mw/desiderata.md` e `context/INDEX.md` (se esiste).
 
 ## Cosa sono, e cosa non sono
 
+- **`CANON.md` — la mappa delle autorità.** Quale documento decide cosa per ciascun
+  tipo di scelta. Non sostituisce i documenti che elenca.
+- **`CURRENT_STATE.md` — lo stato attuale.** Fotografia temporale di cosa è implementato,
+  in corso, progettato, bloccato o deprecato.
 - **`DESIGN_PILLARS.md` — la direzione.** I riferimenti d'ispirazione del gioco e le scelte
   concrete di gameplay/UI/visual che ne derivano. Il file dice di sé stesso di essere *"la lente
   con cui controllare: è coerente con i pillar?"*.
@@ -12,8 +16,7 @@ All'inizio di ogni sessione: leggi `DESIGN_PILLARS.md`, `context/DECISION_LOG.md
 - **`context/INDEX.md` — catalogo contesto.** Indice dei documenti caldi del progetto, da consultare
   quando serve.
 
-Questo progetto non ha un `CANON.md`: finché non ce l'ha, niente qui è canonizzato.
-Direzione e storia non sono la stessa cosa di un vincolo, e non vanno trattate come tale.
+Questo progetto ha `CANON.md` come mappa delle autorità; fino a una revisione esplicita, ogni documento elencato qui conserva il proprio ruolo. Direzione e storia non sono la stessa cosa di un vincolo, e non vanno trattate come tale.
 
 ## Workflow Mind Weaver in RPG
 
