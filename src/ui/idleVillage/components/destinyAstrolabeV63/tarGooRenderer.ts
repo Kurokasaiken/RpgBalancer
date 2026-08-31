@@ -84,6 +84,11 @@ uniform vec3 uFresColor;
 uniform float uFresIntensity;
 uniform float uFresPower;
 uniform float uEdgeFalloff;
+uniform float uBeadHeight;
+uniform float uBeadPos;
+uniform float uBeadWidth;
+uniform float uRimDirectional;
+uniform float uSwirlRelief;
 uniform float uSwirl;
 uniform vec3 uLightDir;
 
@@ -132,21 +137,44 @@ void main(){
   vec2 p = px - uCenter;
   float d = field(p);
 
-  /* Rounded shoulder height profile: flat body, domed edge. */
+  /* IL CORDOLO. Il profilo saliva in modo monotono dal bordo al corpo: la
+     normale ruotava una volta sola e il risultato era un alone uniforme, cioe'
+     un contorno disegnato attorno a una sagoma nera.
+     Un bordo di catrame e' un RIGONFIAMENTO: la tensione superficiale accumula
+     materia appena dentro il bordo, quindi il profilo SUPERA il livello del corpo
+     e poi ci ridiscende. La normale cambia segno due volte, e questo produce da
+     solo la coppia luce-gola che dice «fluido». */
   float h = clamp(-d / uEdgeFalloff, 0.0, 1.0);
   float hp = 1.0 - (1.0 - h) * (1.0 - h);
+  float bead = exp(-pow((h - uBeadPos) / uBeadWidth, 2.0)) * uBeadHeight;
+  hp += bead;
 
-  vec3 n = normalize(vec3(-dFdx(hp) * 34.0, -dFdy(hp) * 34.0, 1.0));
+  /* IL VORTICE ENTRA NELL'ALTEZZA, non solo nel colore. Prima tingeva soltanto:
+     dentro il corpo la normale restava verticale, la diffusa era costante e il
+     94% dei pixel finiva in un solo bin di luminanza — un buco, non una materia.
+     Perturbando l'altezza si ottengono ombreggiatura e riflessi veri, che sono
+     l'unico canale per cui una superficie scura viene riconosciuta come tale. */
+  float vh = veins(p + vec2(uTime * 3.0, -uTime * 2.0), uTime);
+  hp += (vh - 0.5) * uSwirlRelief * h;
+
+  /* la scala della normale: con 34 il rilievo interno inclinava troppo poco
+     perche' la speculare si accendesse da qualche parte */
+  vec3 n = normalize(vec3(-dFdx(hp) * 90.0, -dFdy(hp) * 90.0, 1.0));
   vec3 L = normalize(uLightDir);
 
   float diff = max(dot(n, L), 0.0);
   vec3 R = reflect(-L, n);
   float spec = pow(max(R.z, 0.0), uSpecExp) * uSpecIntensity;
+  /* Il riflesso del cordolo era puramente dipendente dalla VISTA (1 meno n.z),
+     quindi brillava uguale tutt'attorno: un anello, non un rilievo illuminato.
+     Modulandolo con la direzione della luce il cordolo si accende da un lato e
+     si spegne dall'altro, ed e' quello che lo fa leggere come volume. */
   float fres = pow(clamp(1.0 - n.z, 0.0, 1.0), uFresPower) * uFresIntensity;
+  float facing = max(dot(normalize(n.xy + vec2(1e-5)), normalize(L.xy + vec2(1e-5))), 0.0);
+  fres *= mix(1.0, facing, uRimDirectional);
 
-  /* Slow internal swirl: the mass is alive, not a flat decal. */
-  float v = veins(p + vec2(uTime * 3.0, -uTime * 2.0), uTime);
-  float swirl = (v - 0.5) * uSwirl;
+  /* la stessa funzione, riusata per la tinta: e' gia' calcolata sopra */
+  float swirl = (vh - 0.5) * uSwirl;
 
   vec3 body = mix(uAlbedo, uAlbedoLit, clamp(diff * 0.55 + swirl, 0.0, 1.0));
   vec3 color = body + uSpecColor * spec + uFresColor * fres;
@@ -227,6 +255,11 @@ export function createTarGooRenderer(size: number, cfg: TarGooConfig): TarGooRen
   gl.uniform1f(u('uFresIntensity'), m.fresnelIntensity);
   gl.uniform1f(u('uFresPower'), m.fresnelPower);
   gl.uniform1f(u('uEdgeFalloff'), m.edgeHeightFalloff);
+  gl.uniform1f(u('uBeadHeight'), m.beadHeight);
+  gl.uniform1f(u('uBeadPos'), m.beadPos);
+  gl.uniform1f(u('uBeadWidth'), m.beadWidth);
+  gl.uniform1f(u('uRimDirectional'), m.rimDirectional);
+  gl.uniform1f(u('uSwirlRelief'), m.swirlRelief);
   gl.uniform1f(u('uSwirl'), m.swirlIntensity);
   gl.uniform3fv(u('uLightDir'), m.lightDir);
 

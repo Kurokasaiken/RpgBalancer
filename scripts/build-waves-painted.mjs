@@ -40,7 +40,7 @@ const SPRITE_WIDTH = 320;
 const SPRITE_HEIGHT = 134;
 
 /** Full period of one mark, most of which it spends invisible. */
-const CYCLE_SECONDS = 15;
+const CYCLE_SECONDS = 46;
 
 /**
  * Share of the cycle a mark is on screen.
@@ -49,7 +49,7 @@ const CYCLE_SECONDS = 15;
  * marks x this fraction, so it is set from the target count rather than tuned by
  * eye: 18 x 0.222 = 4 on screen, inside the requested 3-5.
  */
-const VISIBLE_FRACTION = 0.84;
+const VISIBLE_FRACTION = 0.222;
 
 /**
  * How far a mark's start may wander from its slot, as a share of one slot.
@@ -92,7 +92,7 @@ function generateWaveSVG(variant) {
   let d = '';
 
   // Generate 4-6 horizontal bands of dashes.
-  const bands = 7 + Math.floor(rnd() * 3);
+  const bands = 4 + Math.floor(rnd() * 3);
   for (let b = 0; b < bands; b++) {
     const y = 14 + (b / bands) * (height - 28) + rnd() * 6;
     let x = 8;
@@ -105,14 +105,14 @@ function generateWaveSVG(variant) {
       // the map sits at 0.23 zoom, so the chain multiplies by roughly 0.20: a 1.5px
       // stroke authored for 1:1 lands at 0.3 screen px and the downscale averages it
       // away. These land near 1.5 screen px, which is where an edge can be seen.
-      const sw = (3.2 + rnd() * 2.3).toFixed(1);
+      const sw = (1.2 + rnd() * 1.1).toFixed(1);
       const op = (0.4 + rnd() * 0.55).toFixed(2);
 
       // Dash: short arc that dips slightly, like a swell line.
       d += `<path d="M${x.toFixed(0)},${y.toFixed(0)} q${(len / 2).toFixed(0)},-${lift.toFixed(0)} ${len.toFixed(0)},0" ` +
            `fill="none" stroke="#f5faf9" stroke-linecap="round" stroke-width="${sw}" opacity="${op}"/>`;
 
-      x += len + 4 + rnd() * 9;
+      x += len + 6 + rnd() * 18;
     }
   }
 
@@ -127,7 +127,7 @@ function generateWaveSVG(variant) {
       const x = cx + rnd() * 40;
       const y = cy + rnd() * 30;
       const len = 10 + rnd() * 18;
-      const sw = (3.6 + rnd() * 2.2).toFixed(1);
+      const sw = (1.4 + rnd() * 0.9).toFixed(1);
       const op = (0.6 + rnd() * 0.4).toFixed(2);
       d += `<path d="M${x.toFixed(0)},${y.toFixed(0)} q${(len / 2).toFixed(0)},-2 ${len.toFixed(0)},0" ` +
            `fill="none" stroke="#ffffff" stroke-linecap="round" stroke-width="${sw}" opacity="${op}"/>`;
@@ -192,17 +192,27 @@ async function main() {
   if (!existsSync(POINTS_PATH)) {
     throw new Error(`missing ${POINTS_PATH} — run scripts/build-terrain-masks.mjs first`);
   }
-  const sea = await scatterOverSea(MARK_COUNT, MIN_SEPARATION, seededRandom(20260830));
-  console.log(`  ${sea.length} punti campionati sul mare`);
+  // `scatterOverSea` below can fill the whole sea instead, and DOES NOT WORK: at
+  // 150 marks with visible opacity the sprite's own bounding box becomes legible,
+  // and the sea fills with rectangular blocks of parallel white dashes. The painted
+  // hatching it was meant to imitate follows the coastline in curves; a rectangle of
+  // axis-aligned lines reads as torn paper laid on the water. Fixing it needs a
+  // sprite with an alpha falloff at its edges and strokes that follow a curve, not
+  // more marks. Until then this stays on the sparse open-sea points.
+  const { sea } = JSON.parse(readFileSync(POINTS_PATH, 'utf8'));
+  if (!sea?.length) throw new Error('points.json carries no open-sea points');
 
-  if (existsSync(OUT_DIR)) rmSync(OUT_DIR, { recursive: true, force: true });
+  // Never wipe OUT_DIR. It held four hand-authored wave assets that were never
+  // committed — onda1, onda2, ondine1, schiuma1 — and a recursive delete here
+  // destroyed all four. They were only recoverable because their sources survive in
+  // assets-source/. This writes its own files and leaves everything else alone.
   mkdirSync(OUT_DIR, { recursive: true });
 
   const shapes = [];
   for (let i = 1; i <= 3; i++) {
     const svg = generateWaveSVG(i);
     const info = await sharp(Buffer.from(svg))
-      .blur(0.9)
+      .blur(0.8)
       .webp({ quality: 92, alphaQuality: 100 })
       .toFile(join(OUT_DIR, `wave_0${i}.webp`));
     console.log(`  ✓ wave_0${i}.webp  ${info.width}x${info.height}  ${(info.size / 1024).toFixed(1)} KB`);
@@ -212,7 +222,7 @@ async function main() {
   // Place marks on sea points, cycling through the three variants.
   const marks = sea.map((point, i) => {
     const shape = (i % shapes.length) + 1;
-    const widths = [230, 280, 330];
+    const widths = [280, 340, 420];
     const rnd = seededRandom(i * 0.6180339887498949 + 0.31);
     const width = widths[Math.floor(rnd() * widths.length)];
     const markHeight = Math.round(width * (SPRITE_HEIGHT / SPRITE_WIDTH));
@@ -233,9 +243,8 @@ async function main() {
   const block = `  waves: {
     cycleSeconds: ${CYCLE_SECONDS},
     visibleFraction: ${VISIBLE_FRACTION},
-    opacity: 0.72,
-    bobWorldPx: 11,
-    driftWorldPx: 74,
+    opacity: 0.46,
+    bobWorldPx: 3,
     marks: [
 ${marks.join('\n')}
     ],

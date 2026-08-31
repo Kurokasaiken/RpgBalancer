@@ -83,7 +83,10 @@ async function main() {
   const { sea } = JSON.parse(readFileSync(POINTS_PATH, 'utf8'));
   if (!sea?.length) throw new Error('points.json carries no open-sea points');
 
-  if (existsSync(OUT_DIR)) rmSync(OUT_DIR, { recursive: true, force: true });
+  // Never wipe OUT_DIR. It held four hand-authored wave assets that were never
+  // committed — onda1, onda2, ondine1, schiuma1 — and a recursive delete here
+  // destroyed all four. They were only recoverable because their sources survive in
+  // assets-source/. This writes its own files and leaves everything else alone.
   mkdirSync(OUT_DIR, { recursive: true });
 
   const height = Math.round(SPRITE_WIDTH * SPRITE_ASPECT);
