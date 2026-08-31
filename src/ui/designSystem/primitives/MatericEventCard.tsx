@@ -27,6 +27,8 @@ export interface MatericEventCardProps {
   onAction?: () => void;
   /** Days-left label shown in reminder mode. */
   daysLeftLabel?: string;
+  /** Days-left numeric value; when present the card renders label + large number. */
+  daysLeftValue?: number;
   /** Whether to paint the inner floor inside the frame. */
   floor?: boolean;
   /** Additional content. */
@@ -67,6 +69,7 @@ export const MatericEventCard: React.FC<MatericEventCardProps> = ({
   actionLabel,
   onAction,
   daysLeftLabel,
+  daysLeftValue,
   floor = true,
   children,
   className,
@@ -122,9 +125,29 @@ export const MatericEventCard: React.FC<MatericEventCardProps> = ({
               */}
               {title && <SkinTitle level="1" style={{ fontSize: 26, lineHeight: 1.15 }}>{title}</SkinTitle>}
               {subtitle && <SkinTitle level="subtitle" style={{ fontSize: 11, opacity: 0.85 }}>{subtitle}</SkinTitle>}
-              {daysLeftLabel && (
+              {daysLeftValue !== undefined ? (
+                <div style={{ marginTop: 6, display: 'flex', alignItems: 'baseline', gap: 10 }}>
+                  {daysLeftLabel && (
+                    <SkinTitle
+                      level="subtitle"
+                      style={{
+                        fontSize: 10,
+                        letterSpacing: '0.18em',
+                        lineHeight: 1.3,
+                        textTransform: 'uppercase',
+                        opacity: 0.85,
+                      }}
+                    >
+                      {daysLeftLabel}
+                    </SkinTitle>
+                  )}
+                  <SkinTitle level="1" style={{ fontSize: 34, lineHeight: 1, textShadow: '0 0 12px rgba(240,207,106,.35)' }}>
+                    {daysLeftValue}
+                  </SkinTitle>
+                </div>
+              ) : daysLeftLabel ? (
                 <MatericBadge style={{ marginTop: 4 }}>{daysLeftLabel}</MatericBadge>
-              )}
+              ) : null}
             </div>
           </div>
         ) : (

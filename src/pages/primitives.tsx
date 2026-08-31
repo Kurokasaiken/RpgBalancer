@@ -488,7 +488,8 @@ function ReminderTab(): JSX.Element {
       <div style={{ display: 'flex', gap: 24, alignItems: 'center', flexWrap: 'wrap' }}>
         <ReminderComponent
           title={String(t('world.goblinInvasion.invasion'))}
-          daysLeftLabel={String(t('world.goblinInvasion.daysRemaining', { count: 5 }))}
+          daysLeftLabel={String(t('world.goblinInvasion.timerLabel'))}
+          daysLeftValue={5}
           onClick={() => setClickCount((c) => c + 1)}
         />
         <span style={{ color: '#e4bd62', fontSize: 14 }}>

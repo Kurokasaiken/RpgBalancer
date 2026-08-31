@@ -44,11 +44,17 @@ const FillingPoi: React.FC<{ size: number; fillDurationMs: number }> = ({
 /**
  * Props for the ReminderComponent.
  */
+export type ReminderState = 'calm' | 'urgent' | 'active';
+
 export interface ReminderComponentProps {
   /** Title shown on the reminder (e.g. "INVASION"). */
   title: string;
-  /** Days-left label shown under the title. */
+  /** Days-left label shown under the title (e.g. "DAYS REMAINING"). */
   daysLeftLabel: string;
+  /** Numeric days remaining, rendered large next to the label. */
+  daysLeftValue: number;
+  /** Temporal state that drives color/animation intensity. */
+  state?: ReminderState;
   /** Called when the player clicks the reminder to open event details. */
   onClick?: () => void;
   /** Additional inline styles. */
@@ -65,9 +71,13 @@ export interface ReminderComponentProps {
 export const ReminderComponent: React.FC<ReminderComponentProps> = ({
   title,
   daysLeftLabel,
+  daysLeftValue,
+  state = 'calm',
   onClick,
   style,
 }) => {
+  const stateTokens = eventReminderTokens.states[state];
+
   const handleClick = useCallback(() => {
     trackTelemetryEvent('event_reminder_click', {
       eventType: 'event_reminder_click',
@@ -103,8 +113,8 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
           position: 'absolute',
           inset: '12% 8%',
           borderRadius: '50%',
-          background: `radial-gradient(ellipse, ${glow.ambient}, transparent 70%)`,
-          filter: 'blur(18px)',
+          background: `radial-gradient(ellipse, ${stateTokens.frameGlow}, transparent 70%)`,
+          filter: 'blur(22px)',
           opacity: glow.ambientOpacity,
           zIndex: 0,
         }}
@@ -138,7 +148,12 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
           variant="reminder"
           title={title}
           daysLeftLabel={daysLeftLabel}
-          image={<FillingPoi size={sizing.poiSize} fillDurationMs={poi.fillDurationMs} />}
+          daysLeftValue={daysLeftValue}
+          image={(
+            <div style={{ filter: `drop-shadow(0 0 10px ${gilded.gemGlow})` }}>
+              <FillingPoi size={sizing.poiSize} fillDurationMs={poi.fillDurationMs} />
+            </div>
+          )}
           style={{
             maxWidth: sizing.width - 36,
             width: '100%',
