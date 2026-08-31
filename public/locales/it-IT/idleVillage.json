@@ -521,7 +521,8 @@
     "debug": {
       "spawnWonders": "Mostra meraviglie",
       "despawnWonders": "Nascondi meraviglie",
-      "breath": "Respira"
+      "breath": "Respira",
+      "water": "Acqua"
     }
   },
   "pgDetailCard": {

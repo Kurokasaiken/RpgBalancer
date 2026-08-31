@@ -62,6 +62,7 @@ export const WorldSurfaceTestPage: React.FC = () => {
   const [wonderAnchors, setWonderAnchors] = useState<{ x: number; y: number }[]>([]);
   const [perfHudVisible, setPerfHudVisible] = useState(true);
   const [breathActive, setBreathActive] = useState(false);
+  const [waterActive, setWaterActive] = useState(false);
   const wonderTimeoutsRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
   const dwellTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mainRef = useRef<HTMLDivElement>(null);
@@ -460,6 +461,13 @@ export const WorldSurfaceTestPage: React.FC = () => {
           >
             {translate('world.debug.breath')}
           </button>
+          <button
+            type="button"
+            onClick={() => setWaterActive((v) => !v)}
+            className={`rounded border border-amber-700/40 px-3 py-1 text-xs hover:bg-amber-700/20 ${waterActive ? 'bg-amber-600 text-amber-950' : ''}`}
+          >
+            {translate('world.debug.water')}
+          </button>
         </div>
       </header>
 
@@ -483,6 +491,7 @@ export const WorldSurfaceTestPage: React.FC = () => {
           autoFitTrigger={autoFitTrigger}
           showRegions={false}
           breathEnabled={breathActive}
+          showWaterField={waterActive}
           eventCovered={eventCovered}
           showEventCard={cardOpen}
           onEventCardComplete={handleEventCardComplete}
