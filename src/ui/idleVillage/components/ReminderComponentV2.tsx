@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { PoiMatericV3_5 } from '@/ui/idleVillage/components/poi/PoiMatericV3_5';
 import { SkinScope } from '@/ui/idleVillage/skins/primitives/SkinScope';
@@ -58,23 +58,6 @@ export const ReminderComponentV2: React.FC<ReminderComponentV2Props> = ({
   const stateTokens = eventReminderTokens.states[state];
   const reduced = useReducedMotion();
   const rootRef = useRef<HTMLButtonElement>(null);
-  const uid = useId().replace(/:/g, '');
-  const glassFilterId = `reminder-glass-${uid}`;
-  const [mx, setMx] = useState(0);
-  const [my, setMy] = useState(0);
-
-  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLButtonElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    const y = (e.clientY - rect.top) / rect.height;
-    setMx((x - 0.5) * 2);
-    setMy((y - 0.5) * 2);
-  }, []);
-
-  const handlePointerLeave = useCallback(() => {
-    setMx(0);
-    setMy(0);
-  }, []);
 
   const handleClick = useCallback(() => {
     trackTelemetryEvent('event_reminder_click', {
@@ -94,8 +77,6 @@ export const ReminderComponentV2: React.FC<ReminderComponentV2Props> = ({
       ref={rootRef}
       type="button"
       onClick={handleClick}
-      onPointerMove={reduced ? undefined : handlePointerMove}
-      onPointerLeave={reduced ? undefined : handlePointerLeave}
       aria-label={title}
       whileHover={{ y: -3, scale: 1.01 }}
       whileTap={{ scale: 0.99 }}
@@ -108,8 +89,6 @@ export const ReminderComponentV2: React.FC<ReminderComponentV2Props> = ({
         border: 0,
         background: 'transparent',
         cursor: onClick ? 'pointer' : 'default',
-        '--mx': mx.toFixed(3),
-        '--my': my.toFixed(3),
         ...style,
       } as React.CSSProperties}
     >
@@ -148,31 +127,6 @@ export const ReminderComponentV2: React.FC<ReminderComponentV2Props> = ({
         aria-hidden="true"
       />
       <GildedEventFrameV2 />
-      <svg
-        style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden' }}
-        aria-hidden="true"
-      >
-        <defs>
-          <filter id={glassFilterId} colorInterpolationFilters="sRGB" x="0" y="0" width="100%" height="100%">
-            <feImage
-              href="/assets/ui/glass_displacement.png"
-              preserveAspectRatio="none"
-              x="0"
-              y="0"
-              width="100%"
-              height="100%"
-              result="lens"
-            />
-            <feDisplacementMap
-              in="SourceGraphic"
-              in2="lens"
-              scale="6"
-              xChannelSelector="R"
-              yChannelSelector="G"
-            />
-          </filter>
-        </defs>
-      </svg>
       <span
         style={{
           position: 'absolute',
@@ -228,9 +182,6 @@ export const ReminderComponentV2: React.FC<ReminderComponentV2Props> = ({
                 position: 'relative',
                 zIndex: 1,
                 filter: 'saturate(0.9) brightness(0.95)',
-                transform: reduced
-                  ? 'none'
-                  : `translate3d(calc(var(--mx) * 5px), calc(var(--my) * 3px), 0)`,
               }}
             >
               <StaticPoi size={scaledPoiSize} />
