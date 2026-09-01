@@ -4,7 +4,6 @@
  */
 
 import React, { useRef, useState } from 'react';
-import { MatericFrame } from '@/ui/designSystem/primitives';
 import { DestinyAstrolabeV63Standalone } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeV63Kit';
 import type { AstrolabeResult as DestinyAstrolabeV63Result, AstrolabeSkill as DestinyAstrolabeV63Skill, DestinyAstrolabeV63Handle } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeV63Kit';
 
@@ -57,6 +56,10 @@ export default function MinimalDestinyAstrolabeV63() {
   const [woundChance, setWoundChance] = useState(10);
   const [deathChance, setDeathChance] = useState(5);
   const [forcedVerdict, setForcedVerdict] = useState<string>('');
+  const [bgVariant, setBgVariant] = useState<'mercury' | 'pergamena'>('mercury');
+  const [ringVariant, setRingVariant] = useState<'patina' | 'clean'>('patina');
+  const [ballColor, setBallColor] = useState<'amber' | 'teal' | 'copper'>('amber');
+  const [motion, setMotion] = useState<'on' | 'off'>('on');
 
   const handleComplete = (result: DestinyAstrolabeV63Result) => {
     setLastResult(result);
@@ -203,9 +206,33 @@ export default function MinimalDestinyAstrolabeV63() {
         })}
       </div>
 
-      {/* Astrolabe — fills remaining height, clipping the suite's 100vw/100vh overflow */}
-      <div className="flex-1 relative rounded-lg mx-6 mb-3 overflow-hidden" style={{ minHeight: 0 }}>
-        <MatericFrame variant="bronze-bezel" band={2.5} rx={8} flush />
+      {/* Variant lab controls */}
+      <div className="flex flex-wrap items-center justify-center gap-3 py-2 flex-shrink-0 text-xs text-amber-100/80">
+        <div className="flex items-center gap-1">
+          <span className="uppercase tracking-wider text-amber-200/60">Fondo</span>
+          <button type="button" onClick={() => setBgVariant('mercury')} className={`px-2 py-1 rounded border ${bgVariant === 'mercury' ? 'bg-amber-700 text-white border-amber-700' : 'bg-black/40 border-amber-700/40'}`}>Mercury</button>
+          <button type="button" onClick={() => setBgVariant('pergamena')} className={`px-2 py-1 rounded border ${bgVariant === 'pergamena' ? 'bg-amber-700 text-white border-amber-700' : 'bg-black/40 border-amber-700/40'}`}>Pergamena</button>
+        </div>
+        <div className="flex items-center gap-1">
+          <span className="uppercase tracking-wider text-amber-200/60">Ring</span>
+          <button type="button" onClick={() => setRingVariant('patina')} className={`px-2 py-1 rounded border ${ringVariant === 'patina' ? 'bg-amber-700 text-white border-amber-700' : 'bg-black/40 border-amber-700/40'}`}>Patina</button>
+          <button type="button" onClick={() => setRingVariant('clean')} className={`px-2 py-1 rounded border ${ringVariant === 'clean' ? 'bg-amber-700 text-white border-amber-700' : 'bg-black/40 border-amber-700/40'}`}>Clean</button>
+        </div>
+        <div className="flex items-center gap-1">
+          <span className="uppercase tracking-wider text-amber-200/60">Pallina</span>
+          <button type="button" onClick={() => setBallColor('amber')} className={`px-2 py-1 rounded border ${ballColor === 'amber' ? 'bg-amber-700 text-white border-amber-700' : 'bg-black/40 border-amber-700/40'}`}>Ambra</button>
+          <button type="button" onClick={() => setBallColor('teal')} className={`px-2 py-1 rounded border ${ballColor === 'teal' ? 'bg-amber-700 text-white border-amber-700' : 'bg-black/40 border-amber-700/40'}`}>Teal</button>
+          <button type="button" onClick={() => setBallColor('copper')} className={`px-2 py-1 rounded border ${ballColor === 'copper' ? 'bg-amber-700 text-white border-amber-700' : 'bg-black/40 border-amber-700/40'}`}>Rame</button>
+        </div>
+        <div className="flex items-center gap-1">
+          <span className="uppercase tracking-wider text-amber-200/60">Motion</span>
+          <button type="button" onClick={() => setMotion('on')} className={`px-2 py-1 rounded border ${motion === 'on' ? 'bg-amber-700 text-white border-amber-700' : 'bg-black/40 border-amber-700/40'}`}>On</button>
+          <button type="button" onClick={() => setMotion('off')} className={`px-2 py-1 rounded border ${motion === 'off' ? 'bg-amber-700 text-white border-amber-700' : 'bg-black/40 border-amber-700/40'}`}>Off</button>
+        </div>
+      </div>
+
+      {/* Astrolabe — fills remaining height */}
+      <div className="flex-1 relative" style={{ minHeight: 0 }}>
         <DestinyAstrolabeV63Standalone
           ref={astrolabeRef}
           skills={skills}
@@ -214,6 +241,10 @@ export default function MinimalDestinyAstrolabeV63() {
             wound: woundChance,
             dead: deathChance,
             mode: forcedVerdict || 'random',
+            bgVariant,
+            ringVariant,
+            ballColor,
+            motion,
           }}
           onResolve={handleComplete}
           autoStart

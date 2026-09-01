@@ -1088,3 +1088,36 @@ ogni taratura futura ricadrebbe nello stesso conflitto.
 - `prefers-reduced-motion` per tutti gli effetti.
 - Budget misurato su WebView/Tauri.
 - Config-first e Zod per ogni nuovo parametro.
+
+---
+
+## v20 — Astrolabe V6.3: materialità, prisma sul goo e fondi materici
+
+**Status:** `FROZEN`
+**Date:** 2026-08-31
+**Authorized by:** Fausto
+**Reason:** avallo esplicito in sessione esplorativa: "nero per il goo, fondo interno più materico (mercurio/pergamena), pallina distinta, effetto prismatico benzina sul goo, outer ring stratificato".
+
+### User-stated (parole del Director)
+1. Il **goo nero** deve diventare materia densa con **effetto prismatico tipo benzina** (iridescenza sottile, non psichedelica).
+2. L'**outer ring** deve guadagnare 8-12 layer di graffi, patina, ossidazione, usura; non più pulito.
+3. Il **fondo interno** non deve essere pergamena obbligatoriamente, ma qualcosa di più materico; due varianti da esplorare: **mercurio fuso** (grigio-argento che si muove) e **pergamena viva** (calda, bruciata, venata).
+4. La **pallina** e i suoi effetti luce devono restare distinti dall'avorio del fiore e dal grigio/nero del goo/ombra.
+5. Si desidera esplorazione multi-AI su queste varianti prima di pianificare.
+
+### AI inference (derivata, marcata come tale)
+- L'effetto prismatico va tenuto sottile per non rompere la leggibilità del bordo di fallimento; il goo resta nero in massa, con iridescenza solo sulle creste e sui bordi attivi.
+- Outer ring "stratificato" = non aggiungere 8 layer reali se non performanti, ma simulare l'impressione di 8-12 stadi di usura con 2-3 layer SVG/CSS + texture/filtri.
+- "Mercurio" può essere animato con distorsione canvas/SDF/semplice noise CSS; "pergamena" con gradienti e texture statica o micro-animata.
+- La pallina può usare colori caldi/trasparenti: ambra, rame, turchese, verde acido, con alone proprio.
+
+### Cosa questo NON autorizza
+- Cambiare la geometria, il resolver o il gameplay dello skill check.
+- Aggiungere shader complessi senza fallback DOM/profilazione.
+- Rendere il componente non deterministico o non testabile.
+
+### Invarianti che restano
+- Config-first e Zod per nuovi parametri.
+- `prefers-reduced-motion` per tutti gli effetti.
+- Budget Tauri/WebView misurato.
+- Nessun CSS ad-hoc standalone: preset skinConfigRegistry se nuovi token.

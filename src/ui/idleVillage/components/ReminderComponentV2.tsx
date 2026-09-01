@@ -26,35 +26,15 @@ function useReducedMotion(): boolean {
   return reduced;
 }
 
-const FillingPoi: React.FC<{ size: number; fillDurationMs: number }> = ({
-  size,
-  fillDurationMs,
-}) => {
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    let raf = 0;
-    let start = 0;
-    const step = (t: number) => {
-      if (!start) start = t;
-      const p = Math.min(1, (t - start) / fillDurationMs);
-      setProgress(p);
-      if (p < 1) raf = requestAnimationFrame(step);
-    };
-    raf = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(raf);
-  }, [fillDurationMs]);
-
-  return (
-    <PoiMatericV3_5
-      type="event"
-      state="active"
-      progress={progress}
-      timerDirection="counterclockwise"
-      size={size}
-    />
-  );
-};
+const StaticPoi: React.FC<{ size: number }> = ({ size }) => (
+  <PoiMatericV3_5
+    type="event"
+    state="active"
+    progress={1}
+    timerDirection="counterclockwise"
+    size={size}
+  />
+);
 
 export type ReminderState = 'calm' | 'urgent' | 'active';
 
@@ -224,13 +204,13 @@ export const ReminderComponentV2: React.FC<ReminderComponentV2Props> = ({
                 style={{
                   position: 'relative',
                   zIndex: 1,
-                  filter: `drop-shadow(0 0 14px ${gilded.gemGlow}) ${reduced ? '' : `url(#${glassFilterId})`}`,
+                  filter: 'saturate(0.9) brightness(0.95)',
                   transform: reduced
                     ? 'none'
                     : `translate3d(calc(var(--mx) * 5px), calc(var(--my) * 3px), 0)`,
                 }}
               >
-                <FillingPoi size={scaledPoiSize} fillDurationMs={poi.fillDurationMs} />
+                <StaticPoi size={scaledPoiSize} />
               </div>
             </div>
           )}
@@ -297,10 +277,10 @@ export const ReminderComponentV2: React.FC<ReminderComponentV2Props> = ({
       <span
         style={{
           position: 'absolute',
-          inset: '8% 6%',
+          inset: '6% 8%',
           borderRadius: 'inherit',
           background: v2.glare,
-          opacity: reduced ? 0.5 : 0.85,
+          opacity: reduced ? 0.2 : 0.4,
           pointerEvents: 'none',
           zIndex: 6,
         }}

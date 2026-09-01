@@ -94,6 +94,7 @@ const WorldPresentationDirectorPage = lazy(() => import('./ui/idleVillage/pages/
 const PoiVisualPreviewPage = lazy(() => import('./ui/idleVillage/pages/PoiVisualPreviewPage').then(m => ({ default: m.default })));
 const UseClientPage = lazy(() => import('./ui/idleVillage/pages/UseClientPage').then(m => ({ default: m.default })));
 const PoiMarkerLabPage = lazy(() => import('./ui/idleVillage/pages/PoiMarkerLabPage').then(m => ({ default: m.PoiMarkerLabPage })));
+const PoiBronzeComparePage = lazy(() => import('./ui/idleVillage/pages/PoiBronzeComparePage').then(m => ({ default: m.PoiBronzeComparePage })));
 const PoiDetailQuestRosterTimeClockIntegrationPage = lazy(() => import('./ui/idleVillage/pages/PoiDetailQuestRosterTimeClockIntegrationPage').then(m => ({ default: m.default })));
 const MockupToComponentPage = lazy(() => import('./ui/idleVillage/pages/MockupToComponentPage').then(m => ({ default: m.MockupToComponentPage })));
 const MinimalSlottedMedalPage = lazy(() => import('./pages/minimal-slottedmedal').then(m => ({ default: m.default })));
@@ -328,6 +329,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/use-client';
   const isPoiMarkerLabPath =
     typeof window !== 'undefined' && window.location.pathname === '/poi-marker-lab';
+  const isPoiBronzeComparePath =
+    typeof window !== 'undefined' && window.location.pathname === '/poi-bronze-compare';
   const isPoiQuestDetailRosterTimeClockIntegrationPath =
     typeof window !== 'undefined' && window.location.pathname === '/poi-quest-detail-roster-time-clock';
   const isRootPath =
@@ -1220,6 +1223,16 @@ function App() {
       <ErrorBoundary componentName="POI Marker Lab Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading POI Marker Lab...</div>}>
           <PoiMarkerLabPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isPoiBronzeComparePath) {
+    return (
+      <ErrorBoundary componentName="POI Bronze Compare Page">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading POI Bronze Compare...</div>}>
+          <PoiBronzeComparePage />
         </Suspense>
       </ErrorBoundary>
     );
