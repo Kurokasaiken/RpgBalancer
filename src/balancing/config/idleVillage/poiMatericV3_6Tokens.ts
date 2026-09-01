@@ -38,6 +38,7 @@ export const poiMatericV3_6TokensSchema = z.object({
       })
     ),
     aoOpacity: z.number(),
+    aoWidth: z.number(),
     rimLightOpacity: z.number(),
   }),
 });
@@ -54,7 +55,7 @@ export const POI_MATERIC_V3_6_TOKENS = poiMatericV3_6TokensSchema.parse({
     milledHi: '#cfae68',
     milledLo: '#7a5f2c',
     grain: {
-      baseFrequency: 0.18,
+      baseFrequency: 0.7,
       numOctaves: 4,
       seed: 3,
       opacity: 0.12,
@@ -63,14 +64,15 @@ export const POI_MATERIC_V3_6_TOKENS = poiMatericV3_6TokensSchema.parse({
       baseFrequency: 0.07,
       numOctaves: 2,
       seed: 5,
-      scale: 2.5,
+      scale: 0.35,
     },
     glints: [
       { cx: 28, cy: 19, rx: 3, ry: 1.4, color: '#fff6d8', opacity: 0.9 },
       { cx: 56, cy: 26, rx: 2, ry: 1, color: '#e8dcc0', opacity: 0.7 },
       { cx: 44, cy: 12, rx: 1.6, ry: 0.8, color: '#fff6d8', opacity: 0.55 },
     ],
-    aoOpacity: 0.55,
+    aoOpacity: 0.28,
+    aoWidth: 1,
     rimLightOpacity: 0.68,
   },
 });
