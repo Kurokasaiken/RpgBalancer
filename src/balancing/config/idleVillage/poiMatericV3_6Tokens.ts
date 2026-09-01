@@ -40,6 +40,13 @@ export const poiMatericV3_6TokensSchema = z.object({
     aoOpacity: z.number(),
     aoWidth: z.number(),
     rimLightOpacity: z.number(),
+    rimLightWidth: z.number(),
+    rimLightThinOpacity: z.number(),
+    rimLightThinWidth: z.number(),
+    glazeStartOpacity: z.number(),
+    glazeMidOpacity: z.number(),
+    milledOpacity: z.number(),
+    bevelCatchOpacity: z.number(),
   }),
 });
 
@@ -73,6 +80,13 @@ export const POI_MATERIC_V3_6_TOKENS = poiMatericV3_6TokensSchema.parse({
     ],
     aoOpacity: 0.28,
     aoWidth: 1,
-    rimLightOpacity: 0.68,
+    rimLightOpacity: 0.22,
+    rimLightWidth: 1.1,
+    rimLightThinOpacity: 0.28,
+    rimLightThinWidth: 0.4,
+    glazeStartOpacity: 0.35,
+    glazeMidOpacity: 0.18,
+    milledOpacity: 0.55,
+    bevelCatchOpacity: 0.08,
   },
 });
