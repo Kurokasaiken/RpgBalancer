@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { MatericEventCard } from '@/ui/designSystem/primitives';
 import { PoiMatericV3_5 } from '@/ui/idleVillage/components/poi/PoiMatericV3_5';
+import { SkinScope } from '@/ui/idleVillage/skins/primitives/SkinScope';
 import { SkinTitle } from '@/ui/idleVillage/skins/primitives/SkinTitle';
 import { GildedEventFrameV2 } from './GildedEventFrameV2';
 import { eventReminderTokens } from '@/balancing/config/idleVillage/eventReminderTokens';
@@ -185,106 +185,121 @@ export const ReminderComponentV2: React.FC<ReminderComponentV2Props> = ({
           pointerEvents: 'none',
         }}
       >
-        <MatericEventCard
-          variant="reminder"
-          image={(
-            <div
-              style={{
-                position: 'relative',
-                width: scaledPoiSize,
-                height: scaledPoiSize + 14,
-                display: 'flex',
-                alignItems: 'flex-start',
-                justifyContent: 'center',
-                paddingTop: 7,
-                marginLeft: 5,
-              }}
-            >
-              <span
-                style={{
-                  position: 'absolute',
-                  inset: -12,
-                  borderRadius: '50%',
-                  background: `radial-gradient(circle, ${gilded.gemGlow} 0%, transparent 65%)`,
-                  filter: 'blur(12px)',
-                  opacity: v2.poiGlowOpacity,
-                  zIndex: 0,
-                }}
-                aria-hidden="true"
-              />
-              <div
-                style={{
-                  position: 'relative',
-                  zIndex: 1,
-                  filter: 'saturate(0.9) brightness(0.95)',
-                  transform: reduced
-                    ? 'none'
-                    : `translate3d(calc(var(--mx) * 5px), calc(var(--my) * 3px), 0)`,
-                }}
-              >
-                <StaticPoi size={scaledPoiSize} />
-              </div>
-            </div>
-          )}
+        <SkinScope
           style={{
+            position: 'relative',
+            zIndex: 7,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 24,
+            padding: '18px 24px',
             maxWidth: sizing.width - 36,
             width: '100%',
             minHeight: sizing.minHeight - 20,
+            pointerEvents: 'none',
           }}
         >
-          <SkinTitle
-            level="1"
-            style={{
-              fontSize: 28,
-              lineHeight: 1.05,
-              letterSpacing: '0.04em',
-              color: titleTokens.color,
-              textShadow: `${titleTokens.shadow}, ${titleTokens.highlight}`,
-            }}
-          >
-            {title}
-          </SkinTitle>
           <div
             style={{
-              marginTop: 8,
-              display: 'inline-flex',
-              alignItems: 'baseline',
-              gap: 10,
-              padding: '6px 14px',
-              borderRadius: 8,
-              border: `1px solid ${stateTokens.plaqueBorder}`,
-              background: `${v2.plaqueShine}, ${v2.plaqueBg}`,
-              boxShadow: v2.plaqueShadow,
+              position: 'relative',
+              width: scaledPoiSize,
+              height: scaledPoiSize + 14,
+              display: 'flex',
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+              paddingTop: 7,
+              marginLeft: 5,
             }}
           >
-            <SkinTitle
-              level="subtitle"
+            <span
               style={{
-                fontSize: 9,
-                letterSpacing: '0.2em',
-                lineHeight: 1.3,
-                textTransform: 'uppercase',
-                color: stateTokens.plaqueText,
-                textShadow: countdownTokens.labelGlow,
-                opacity: 0.9,
+                position: 'absolute',
+                inset: -12,
+                borderRadius: '50%',
+                background: `radial-gradient(circle, ${gilded.gemGlow} 0%, transparent 65%)`,
+                filter: 'blur(12px)',
+                opacity: v2.poiGlowOpacity,
+                zIndex: 0,
+              }}
+              aria-hidden="true"
+            />
+            <div
+              style={{
+                position: 'relative',
+                zIndex: 1,
+                filter: 'saturate(0.9) brightness(0.95)',
+                transform: reduced
+                  ? 'none'
+                  : `translate3d(calc(var(--mx) * 5px), calc(var(--my) * 3px), 0)`,
               }}
             >
-              {daysLeftLabel}
-            </SkinTitle>
+              <StaticPoi size={scaledPoiSize} />
+            </div>
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'flex-start',
+              flex: 1,
+              paddingLeft: 10,
+            }}
+          >
             <SkinTitle
               level="1"
               style={{
-                fontSize: 44,
-                lineHeight: 1,
-                letterSpacing: '-0.02em',
-                color: countdownTokens.numberColor,
-                textShadow: stateTokens.numberGlow,
+                fontSize: 28,
+                lineHeight: 1.05,
+                letterSpacing: '0.04em',
+                color: titleTokens.color,
+                textShadow: `${titleTokens.shadow}, ${titleTokens.highlight}`,
               }}
             >
-              {daysLeftValue}
+              {title}
             </SkinTitle>
+            <div
+              style={{
+                marginTop: 8,
+                display: 'inline-flex',
+                alignItems: 'baseline',
+                gap: 10,
+                padding: '6px 14px',
+                borderRadius: 8,
+                border: `1px solid ${stateTokens.plaqueBorder}`,
+                background: `${v2.plaqueShine}, ${v2.plaqueBg}`,
+                boxShadow: v2.plaqueShadow,
+              }}
+            >
+              <SkinTitle
+                level="subtitle"
+                style={{
+                  fontSize: 9,
+                  letterSpacing: '0.2em',
+                  lineHeight: 1.3,
+                  textTransform: 'uppercase',
+                  color: stateTokens.plaqueText,
+                  textShadow: countdownTokens.labelGlow,
+                  opacity: 0.9,
+                }}
+              >
+                {daysLeftLabel}
+              </SkinTitle>
+              <SkinTitle
+                level="1"
+                style={{
+                  fontSize: 44,
+                  lineHeight: 1,
+                  letterSpacing: '-0.02em',
+                  color: countdownTokens.numberColor,
+                  textShadow: stateTokens.numberGlow,
+                }}
+              >
+                {daysLeftValue}
+              </SkinTitle>
+            </div>
           </div>
-        </MatericEventCard>
+        </SkinScope>
       </span>
       <span
         style={{
