@@ -197,6 +197,7 @@ export const ReminderComponentV2: React.FC<ReminderComponentV2Props> = ({
                 alignItems: 'flex-start',
                 justifyContent: 'center',
                 paddingTop: 7,
+                marginLeft: 5,
               }}
             >
               <span
