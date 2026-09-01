@@ -31,6 +31,7 @@ import { Slot } from '@/ui/idleVillage/components/Slot';
 import { GoblinInvasionWindow } from '@/ui/idleVillage/components/GoblinInvasionWindow';
 import { ReminderComponent } from '@/ui/idleVillage/components/ReminderComponent';
 import { ReminderComponentV2 } from '@/ui/idleVillage/components/ReminderComponentV2';
+import { ReminderComponentV3 } from '@/ui/idleVillage/components/ReminderComponentV3';
 import DayNightPoiSkin from '@/ui/idleVillage/components/minimal/DayNightPoiSkin';
 import { WanderlustMedalOverlay } from '@/ui/idleVillage/components/WanderlustMedalOverlay';
 import ThreatStatusIndicator from '@/ui/idleVillage/components/ThreatStatusIndicator';
@@ -483,6 +484,7 @@ function ReminderTab(): JSX.Element {
   const { t } = useTranslation('idleVillage');
   const [v1Clicks, setV1Clicks] = useState(0);
   const [v2Clicks, setV2Clicks] = useState(0);
+  const [v3Clicks, setV3Clicks] = useState(0);
 
   return (
     <DemoPanel>
@@ -509,6 +511,18 @@ function ReminderTab(): JSX.Element {
           />
           <span style={{ color: '#e4bd62', fontSize: 14 }}>
             {v2Clicks > 0 ? `V2 clicked ${v2Clicks} time${v2Clicks === 1 ? '' : 's'}` : 'Click V2'}
+          </span>
+        </div>
+        <div style={{ display: 'flex', gap: 24, alignItems: 'center', flexWrap: 'wrap' }}>
+          <ReminderComponentV3
+            title={String(t('world.goblinInvasion.invasion'))}
+            daysLeftLabel={String(t('world.goblinInvasion.timerLabel'))}
+            daysLeftValue={5}
+            state="urgent"
+            onClick={() => setV3Clicks((c) => c + 1)}
+          />
+          <span style={{ color: '#e4bd62', fontSize: 14 }}>
+            {v3Clicks > 0 ? `V3 clicked ${v3Clicks} time${v3Clicks === 1 ? '' : 's'}` : 'Click V3'}
           </span>
         </div>
       </div>
