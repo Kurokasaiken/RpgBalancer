@@ -201,10 +201,11 @@ export const ReminderComponentV2: React.FC<ReminderComponentV2Props> = ({
               style={{
                 position: 'relative',
                 width: scaledPoiSize,
-                height: scaledPoiSize,
+                height: scaledPoiSize + 14,
                 display: 'flex',
-                alignItems: 'center',
+                alignItems: 'flex-start',
                 justifyContent: 'center',
+                paddingTop: 7,
               }}
             >
               <span
