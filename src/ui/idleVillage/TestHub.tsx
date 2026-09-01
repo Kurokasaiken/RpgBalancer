@@ -75,6 +75,15 @@ const EXTRA_PAGES: TestPageLink[] = [
     icon: '🔬',
     status: 'ok',
   },
+  // Non-kit page: bronze POI V3 / V3.5 / V4 side-by-side comparison.
+  {
+    id: 'poi-bronze-compare',
+    title: 'POI Bronze Compare',
+    description: 'Bronze POI V3, V3.5 and V4 side by side over the world surface',
+    path: '/poi-bronze-compare',
+    icon: '🥉',
+    status: 'ok',
+  },
   // Non-kit page: integration page for POI quest + roster; TBD future merge/deprecation.
   {
     id: 'poi-quest-detail-roster-integration',

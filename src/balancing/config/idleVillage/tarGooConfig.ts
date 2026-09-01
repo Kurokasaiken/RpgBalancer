@@ -211,6 +211,17 @@ const tarGooConfigSchema = z.object({
       rimA: z.string(), rimB: z.string(),
       core: z.tuple([z.string(), z.string(), z.string()]),
     })),
+    /**
+     * V6.3 — IRIDESCENZA SOTTILE BENZINA (v20 FROZEN).
+     * Colori cangianti sulle creste e sul bordo del catrame per leggere come
+     * materia densa, non come buco. Intensita' bassa, non psichedelica.
+     */
+    iridescence: z.object({
+      colorA: rgbSchema, colorB: rgbSchema, colorC: rgbSchema,
+      power: z.number().min(0).max(1),
+      speed: z.number().min(0).max(5),
+      spread: z.number().min(0).max(4),
+    }),
   }),
 });
 
@@ -331,6 +342,12 @@ export const tarGooConfig: TarGooConfig = tarGooConfigSchema.parse({
         leakCore: 'rgba(180,206,232,.34)', leakMid: 'rgba(150,178,206,.16)',
         leakEdge: 'rgba(0,0,0,0)',
       },
+      /** ciano-petrolio: schiarito e raffreddato per staccare il catrame nero */
+      deepTeal: {
+        inner: 'rgba(0,26,38,1)', outer: '#02020b',
+        leakCore: 'rgba(0,235,225,.45)', leakMid: 'rgba(0,165,175,.22)',
+        leakEdge: 'rgba(0,0,0,0)',
+      },
     },
     star: 'avorio',
     stars: {
@@ -358,6 +375,14 @@ export const tarGooConfig: TarGooConfig = tarGooConfigSchema.parse({
         rimDark: '#0c2a22', rimA: '#a8ddca', rimB: '#2a6b58',
         core: ['#b6e0d0', '#3c8b74', '#123b30'],
       },
+    },
+    iridescence: {
+      colorA: [0.18, 0.92, 0.72],
+      colorB: [0.85, 0.28, 0.48],
+      colorC: [0.35, 0.68, 1.0],
+      power: 0.16,
+      speed: 0.12,
+      spread: 1.6,
     },
   },
 });

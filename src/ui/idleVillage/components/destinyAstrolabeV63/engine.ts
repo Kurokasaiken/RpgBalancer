@@ -16,7 +16,8 @@ import { rng32, createTentacles, tickPose, buildBlobs, poolFraction,
 
 export interface AstrolabeSkill { name: string; stat: number; difficulty: number; }
 export interface AstrolabeConfig { crit?: number; wound?: number; dead?: number; mode?: string;
-  tSlam?: number; tBurst?: number; tPour?: number; tSpin?: number; tSnap?: number; }
+  tSlam?: number; tBurst?: number; tPour?: number; tSpin?: number; tSnap?: number;
+  bgVariant?:'mercury'|'pergamena'; ringVariant?:'patina'|'clean'; ballColor?:'amber'|'teal'|'copper'; motion?:'on'|'off'; }
 export interface AstrolabeResult { verdict: string; roll: number; riskRoll: number;
   skillIndex: number; skillName: string; wounded: boolean; dead: boolean; }
 export interface AstrolabeEngineOpts {
@@ -348,7 +349,7 @@ function spatialRiskRoll(){
 const scene={
   state:'idle',
   t0:0,
-  res:null, target:null,
+  res:null, target:null, resolved:null,
   blackPillars:[], whitePillars:[],     // {ang,r,drop:0..1,flash,landed}
   axisAlpha:1,
   gooFullMs:0,
@@ -451,6 +452,8 @@ function v63Star(){
 function v63Backdrop(){
   const set=tarGooConfig.v63.backdrops;
   let nome=tarGooConfig.v63.backdrop;
+  if(cfg.bgVariant==='mercury' && set.deepTeal) nome='deepTeal';
+  if(cfg.bgVariant==='pergamena' && set.pergamenaScura) nome='pergamenaScura';
   try{
     const q=new URLSearchParams(window.location.search).get('bg');
     if(q&&set[q]) nome=q;
@@ -471,6 +474,10 @@ function launchRoll(){
   /* clear previous resolution */
   card.classList.remove('show','triumph','win','almost','fail','epic');
   suite.dataset.tone='';
+  suite.dataset.bgVariant=cfg.bgVariant||'mercury';
+  suite.dataset.ringVariant=cfg.ringVariant||'patina';
+  suite.dataset.ballColor=cfg.ballColor||'amber';
+  suite.dataset.motion=cfg.motion||'on';
   $id('flare').classList.remove('fire');
   $id('launch').classList.remove('pulse');
   /* recompute geometry, build obelisks, reset all scene state */
@@ -480,6 +487,7 @@ function launchRoll(){
   scene.tideP=0; scene.tideWave=0;
   scene.gooReveal=0; scene.ringReveal=0;
   scene.ball={x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false};
+  scene.resolved=null;
   scene.warp=0;
   scene.shocks.length=0; scene.rimHits.length=0; scene.sparks.length=0;
   armed=false; emitArmed(false);
@@ -618,9 +626,15 @@ function tickTimeline(){
   else if(s==='the-spin'){
     const p=phaseT(cfg.tSpin);
     stepBall(p);
-    /* when ball effectively stops, resolve immediately rather than waiting */
-    const spd=Math.hypot(scene.ball.vx,scene.ball.vy);
-    if(p>=1||(p>0.7&&spd<0.4)){ resolve(); }
+    /* resolve when the ball has reached its pre-rolled landing */
+    const b=scene.ball;
+    const target=scene.targetPos;
+    const spd=Math.hypot(b.vx,b.vy);
+    const close=target?Math.hypot(target.x-b.x,target.y-b.y):0;
+    if(p>=1||(p>0.5&&close<10&&spd<0.7)){
+      if(target){ b.x=target.x; b.y=target.y; }
+      resolve();
+    }
   }
   /* decay one-shot fx */
   scene.gooRipple=Math.max(0,scene.gooRipple-0.02);
@@ -677,10 +691,83 @@ function computeTargetPos(){
   return null;
 }
 
+function rollD100(){ return 1+Math.floor(Math.random()*100); }
+
+function pickSkillIndex(outcomeRoll){
+  return (outcomeRoll-1)%Math.max(1,skills.length);
+}
+
+function outcomeToVerdict(outcomeRoll, skillIndex){
+  const sk=skills[skillIndex]||{stat:60,difficulty:50};
+  const tst=clamp(50+(sk.stat-sk.difficulty),1,99);
+  if(outcomeRoll<=cfg.crit) return 'bigwin';
+  if(outcomeRoll<=tst) return 'win';
+  // 'almost' band lives between win and epic-fail, never overlapping it
+  const epicThreshold=100-cfg.crit;
+  const almostBand=clamp(15,1,Math.max(1,epicThreshold-tst));
+  if(outcomeRoll<=tst+almostBand) return 'almost';
+  // critical fail band
+  if(outcomeRoll>epicThreshold) return 'epicfail';
+  return 'fail';
+}
+
+function computeLanding(skillIndex, verdict, dead, wounded){
+  const seg=TAU/Math.max(1,skills.length);
+  const startAng=-Math.PI/2+skillIndex*seg;
+  const ang=startAng+Math.random()*seg;
+  const checkR=rCheckAt(ang);
+  const BALL_R=9;
+  let r=geo.rCore;
+  if(verdict==='bigwin'){
+    r=geo.rCore*(0.2+Math.random()*0.6);
+  }else if(verdict==='win'){
+    r=geo.rCore+Math.random()*Math.max(0,rStarAt(ang)-geo.rCore);
+  }else if(verdict==='almost'){
+    r=rStarAt(ang)+Math.random()*ALMOST_W;
+  }else if(verdict==='fail'){
+    const starR=rStarAt(ang);
+    if(dead){
+      r=starR+Math.random()*Math.max(0,geo.deathDepth);
+    }else if(wounded){
+      r=Math.max(geo.rCore+40, checkR-Math.random()*geo.woundW);
+    }else{
+      r=starR+ALMOST_W+Math.random()*Math.max(0,checkR-geo.epicW-starR-ALMOST_W);
+    }
+  }else if(verdict==='epicfail'){
+    r=Math.max(geo.rCore+30, checkR-geo.epicW+Math.random()*geo.epicW);
+  }
+  r=clamp(r,0,Math.max(0,checkR-BALL_R));
+  return { x:CX+Math.cos(ang)*r, y:CY+Math.sin(ang)*r, ang, r };
+}
+
+function prerollDestiny(){
+  const outcomeRoll=rollD100();
+  const riskRoll=rollD100();
+  const skillIndex=pickSkillIndex(outcomeRoll);
+  recomputeGeometry(skillIndex);
+  const verdict=outcomeToVerdict(outcomeRoll, skillIndex);
+  const dead=riskRoll<=cfg.dead;
+  const wounded=!dead && riskRoll<=cfg.dead+cfg.wound;
+  const landing=computeLanding(skillIndex,verdict,dead,wounded);
+  scene.resolved={outcomeRoll,riskRoll,skillIndex,verdict,dead,wounded,landing};
+  return scene.resolved;
+}
+
 function fireBall(){
   const b=scene.ball;
   b.on=true; b.x=CX; b.y=CY;
-  const tp=computeTargetPos();
+  const mode=(cfg.mode||'random');
+  if(mode==='random' && !scene.resolved){
+    prerollDestiny();
+  }else if(mode!=='random' && (!scene.resolved || scene.resolved.verdict!==mode)){
+    // forced mode: build a resolved state so the landing matches the verdict
+    const forcedVerdict=mode;
+    const skillIndex=Math.floor(Math.random()*Math.max(1,skills.length));
+    recomputeGeometry(skillIndex);
+    const landing=computeLanding(skillIndex,forcedVerdict,false,false);
+    scene.resolved={outcomeRoll:0,riskRoll:0,skillIndex,verdict:forcedVerdict,dead:false,wounded:false,landing};
+  }
+  const tp=scene.resolved?scene.resolved.landing:computeTargetPos();
   scene.targetPos=tp;
   /* Target-aware kick: aim roughly toward target with wide jitter (still chaotic) */
   const baseAngle=tp ? Math.atan2(tp.y-CY,tp.x-CX) : Math.random()*TAU;
@@ -697,16 +784,30 @@ function stepBall(p){
   let dt=Math.min(40,now-lastBallT); lastBallT=now;
   const f=dt/16.7;
 
-  /* Cinematic deceleration + optional target magnetism (for forced verdicts). */
-  const decayStart=0.30;
+  /* Roulette deceleration + progressive guidance toward the pre-rolled landing.
+     The ball starts fast and free, then visibly slows and curves toward the
+     landing zone that was determined before the throw. */
+  const target=scene.targetPos;
+  const decayStart=0.20;
   const grip=clamp((p-decayStart)/(1-decayStart),0,1);
-  const fric=Math.pow(0.9996-0.025*grip,f);
+  // friction grows with grip so the ball slows more and more as it ages
+  const fric=Math.pow(0.992-0.022*grip,f);
   b.vx*=fric; b.vy*=fric;
-  /* Magnetic pull toward target zone — grows from 0 at p=0.55 to max at p=1 */
-  if(grip>0.45 && scene.targetPos){
-    const mag=clamp((grip-0.45)/0.55,0,1)*0.022;
-    b.vx+=(scene.targetPos.x-b.x)*mag*f;
-    b.vy+=(scene.targetPos.y-b.y)*mag*f;
+  // arrive steering toward the landing zone — small at first, then dominant
+  if(target){
+    const toX=target.x-b.x, toY=target.y-b.y;
+    const toDist=Math.hypot(toX,toY);
+    const toAng=Math.atan2(toY,toX);
+    const maxSpeed=28*Math.pow(1-grip,1.5)+0.4;
+    const ramp=60+220*grip;
+    const desiredSpeed=toDist<ramp ? maxSpeed*(toDist/ramp) : maxSpeed;
+    const desiredVx=Math.cos(toAng)*desiredSpeed;
+    const desiredVy=Math.sin(toAng)*desiredSpeed;
+    const steerVx=desiredVx-b.vx;
+    const steerVy=desiredVy-b.vy;
+    const steerMag=0.001+0.10*grip*grip;
+    b.vx+=steerVx*steerMag*f;
+    b.vy+=steerVy*steerMag*f;
   }
   b.x+=b.vx*f; b.y+=b.vy*f;
   /* scatter amount: full early, fades as ball slows */
@@ -797,19 +898,26 @@ const VERDICT_TEXT={
 };
 function resolve(){
   const b=scene.ball;
-  /* Verdict = ball position in 2D space relative to the two surfaces */
-  const _d=Math.hypot(b.x-CX,b.y-CY);
-  console.log(`[resolve] ball=(${(b.x-CX).toFixed(1)},${(b.y-CY).toFixed(1)}) dist=${_d.toFixed(1)} rStar=${rStarAt(Math.atan2(b.y-CY,b.x-CX)).toFixed(1)} rCheck=${rCheckAt(Math.atan2(b.y-CY,b.x-CX)).toFixed(1)} spd=${Math.hypot(b.vx,b.vy).toFixed(2)}`);
-  const _sv=spatialVerdict(b.x,b.y);
+  const target=scene.targetPos||{x:CX,y:CY};
+  b.x=target.x; b.y=target.y; // snap to the pre-rolled landing
+  let resolved=scene.resolved;
   const forced=(cfg.mode&&cfg.mode!=='random'&&['bigwin','win','almost','fail','epicfail'].includes(cfg.mode))?cfg.mode:null;
-  let verdict=forced||_sv;
-  let dead=false, wounded=false, riskRoll=0;
-  if(verdict==='fail_dead'){verdict='fail';dead=true;riskRoll=1;}
-  else if(verdict==='fail_wound'){verdict='fail';wounded=true;riskRoll=cfg.dead+1;}
-  else{const rr=spatialRiskRoll();dead=rr.dead;wounded=rr.wounded;riskRoll=rr.riskRoll;}
-  const skillIndex=getSkillIndexFromAngle(b.x,b.y);
+  if(!resolved){
+    // fallback for direct resolve calls without a pre-roll (forced/manual)
+    const _sv=spatialVerdict(b.x,b.y);
+    resolved={outcomeRoll:0,riskRoll:0,verdict:_sv,dead:false,wounded:false,skillIndex:getSkillIndexFromAngle(b.x,b.y),landing:target};
+  }
+  const verdict=forced||resolved.verdict;
+  let {outcomeRoll,riskRoll,skillIndex}=resolved;
+  if(forced){
+    outcomeRoll=0; riskRoll=0; skillIndex=getSkillIndexFromAngle(b.x,b.y);
+  }
+  let {dead,wounded}=resolved;
+  if(forced){ dead=false; wounded=false; }
   recomputeGeometry(skillIndex);
-  scene.res={verdict,roll:0,riskRoll,skillIndex,wounded,dead};
+  scene.res={verdict,roll:outcomeRoll,riskRoll,skillIndex,wounded,dead};
+  const _d=Math.hypot(b.x-CX,b.y-CY);
+  console.log(`[resolve] pre-rolled=${!forced} ball=(${(b.x-CX).toFixed(1)},${(b.y-CY).toFixed(1)}) dist=${_d.toFixed(1)} rStar=${rStarAt(Math.atan2(b.y-CY,b.x-CX)).toFixed(1)} rCheck=${rCheckAt(Math.atan2(b.y-CY,b.x-CX)).toFixed(1)} verdict=${verdict} roll=${outcomeRoll} risk=${riskRoll} skill=${skills[skillIndex]?.name||'Skill'}`);
   const res=scene.res;
   setState('resolution');
   scene.whitePillars.forEach(p=>p.drop=0);
@@ -1134,18 +1242,19 @@ function drawBackdrop(now){
      sovrascrive per poter confrontare senza ricompilare. */
   const bd=v63Backdrop();
   ctx.save();
-  const _bg=ctx.createRadialGradient(CX,CY,0,CX,CY,R*1.15);
+  const backdropRadius=R*1.0;
+  const _bg=ctx.createRadialGradient(CX,CY,0,CX,CY,backdropRadius*1.03);
   _bg.addColorStop(0,bd.inner);
   _bg.addColorStop(1,bd.outer);
   ctx.fillStyle=_bg;
-  ctx.beginPath(); ctx.arc(CX,CY,R*1.12,0,TAU); ctx.fill();
+  ctx.beginPath(); ctx.arc(CX,CY,backdropRadius,0,TAU); ctx.fill();
   /* azure light-leak from top-left (V9 signature) */
-  const _leak=ctx.createRadialGradient(CX-R*.7,CY-R*.7,0,CX-R*.7,CY-R*.7,R*1.4);
+  const _leak=ctx.createRadialGradient(CX-R*.7,CY-R*.7,0,CX-R*.7,CY-R*.7,backdropRadius);
   _leak.addColorStop(0,bd.leakCore);
   _leak.addColorStop(.5,bd.leakMid);
   _leak.addColorStop(1,bd.leakEdge);
   ctx.fillStyle=_leak;
-  ctx.beginPath(); ctx.arc(CX,CY,R*1.12,0,TAU); ctx.fill();
+  ctx.beginPath(); ctx.arc(CX,CY,backdropRadius,0,TAU); ctx.fill();
   ctx.restore();
   /* cosmic dust: starlit gold + teal grains over astral ink */
   ctx.save();
@@ -1942,14 +2051,20 @@ function drawBall(now){
   /* the energy pinball */
   const pulse=scene.state==='resolution'?1+.08*Math.sin(now/120):1;
   const r=b.r*pulse;
+  const c=(cfg.ballColor||'amber');
+  const palette={
+    amber: {c0:'rgba(255,236,170,.5)',c1:'rgba(252,232,144,.12)',c2:'#ffffff',c3:'#ffeebc',c4:'#a06a1e',glow:'rgba(252,232,144,.95)'},
+    teal: {c0:'rgba(170,255,230,.5)',c1:'rgba(144,245,233,.12)',c2:'#ffffff',c3:'#a3f5f3',c4:'#106c70',glow:'rgba(144,233,245,.95)'},
+    copper: {c0:'rgba(255,210,180,.5)',c1:'rgba(245,185,144,.12)',c2:'#ffffff',c3:'#ffcdb0',c4:'#8a4526',glow:'rgba(245,170,130,.95)'}
+  }[c]||palette.amber;
   const halo=ctx.createRadialGradient(b.x,b.y,r*.5,b.x,b.y,r*4);
-  halo.addColorStop(0,'rgba(255,236,170,.5)'); halo.addColorStop(.5,'rgba(252,232,144,.12)'); halo.addColorStop(1,'transparent');
+  halo.addColorStop(0,palette.c0); halo.addColorStop(.5,palette.c1); halo.addColorStop(1,'transparent');
   ctx.fillStyle=halo; ctx.beginPath(); ctx.arc(b.x,b.y,r*4,0,TAU); ctx.fill();
   const g=ctx.createRadialGradient(b.x-3,b.y-3,1,b.x,b.y,r+2);
-  g.addColorStop(0,'#ffffff'); g.addColorStop(.4,'#ffeebc'); g.addColorStop(1,'#a06a1e');
-  ctx.shadowColor='rgba(252,232,144,.95)'; ctx.shadowBlur=26;
+  g.addColorStop(0,palette.c2); g.addColorStop(.4,palette.c3); g.addColorStop(1,palette.c4);
+  ctx.shadowColor=palette.glow; ctx.shadowBlur=26;
   ctx.fillStyle=g; ctx.beginPath(); ctx.arc(b.x,b.y,r,0,TAU); ctx.fill();
-  ctx.lineWidth=1.4; ctx.strokeStyle='rgba(255,244,200,.95)'; ctx.stroke();
+  ctx.lineWidth=1.4; ctx.strokeStyle='rgba(255,255,255,.95)'; ctx.stroke();
   ctx.shadowBlur=0;
 }
 

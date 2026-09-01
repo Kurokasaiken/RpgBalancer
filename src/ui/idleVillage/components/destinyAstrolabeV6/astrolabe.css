@@ -17,16 +17,10 @@
   --panel-line:rgba(201,162,39,.18);
 }
 .destiny-astrolabe *{box-sizing:border-box;}
-.destiny-astrolabe{margin:0;height:100%;background:var(--obsidian);color:#e9e4cd;
-  font-family:'Space Grotesk',system-ui,sans-serif;overflow:hidden;}
-.destiny-astrolabe .suite{display:flex;width:100vw;height:100vh;}
-.destiny-astrolabe .scene-col{flex:0 0 65%;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;
-  background:
-    radial-gradient(900px 620px at 50% -4%, rgba(120,90,255,.10), transparent 60%),
-    radial-gradient(760px 520px at 8% 102%, rgba(40,150,255,.07), transparent 70%),
-    radial-gradient(820px 520px at 92% 96%, rgba(201,162,39,.08), transparent 70%),
-    radial-gradient(140% 120% at 50% 35%, #0a0a20 0%, #050514 50%, #02020b 100%);
-}
+.destiny-astrolabe{margin:0;height:100%;background:transparent;color:#e9e4cd;
+  font-family:'Space Grotesk',system-ui,sans-serif;}
+.destiny-astrolabe .suite{display:flex;width:100%;height:100%;}
+.destiny-astrolabe .scene-col{flex:0 0 65%;position:relative;display:flex;align-items:center;justify-content:center;background:transparent;}
 .destiny-astrolabe .panel-col{flex:0 0 35%;height:100vh;overflow-y:auto;
   background:linear-gradient(180deg,#0b1216 0%, #080e11 100%);
   border-left:1px solid var(--panel-line);
@@ -34,19 +28,19 @@
   padding:22px 24px 60px;
 }
 @media (max-width:1100px){
-.destiny-astrolabe{overflow:auto;}
+.destiny-astrolabe{overflow:visible;}
 .destiny-astrolabe .suite{flex-direction:column;height:auto;}
 .destiny-astrolabe .scene-col{flex:none;min-height:90vh;}
 .destiny-astrolabe .panel-col{flex:none;height:auto;border-left:none;border-top:1px solid var(--panel-line);}
 }
-.destiny-astrolabe .stage{position:relative;width:min(84vh,92%);aspect-ratio:1/1;
-  /* V6: rimosso il drop-shadow dorato da 60px attorno all'intero board */
-  filter:drop-shadow(0 32px 70px rgba(3,20,18,.9));}
+.destiny-astrolabe .stage{position:relative;width:min(75vh,82%);aspect-ratio:1/1;
+  /* V6: nessuna ombra che crea un quadrato di clipping sotto il ring */
+  filter:none;}
 /* V6: al posto della ghiera V1, un solo bezel circolare spesso — NMM ladder
    portata dal Visual Fidelity Lab (plateVariants.tsx, A · Bezel Molding).
    Statico: nessun fly-in, nessuna rotazione, nessuno sheen animato. */
-.destiny-astrolabe .astro-bezel{position:absolute;inset:0;z-index:6;pointer-events:none;
-  filter:drop-shadow(0 6px 14px rgba(0,0,0,.55));}
+.destiny-astrolabe .astro-bezel{position:absolute;inset:-80px;z-index:6;pointer-events:none;
+  filter:drop-shadow(0 6px 14px rgba(0,0,0,.55)); overflow:visible;}
 
 @keyframes ringlock{
   0%  {transform:translateY(-118%) rotate(-26deg) scale(1.05);}
@@ -57,9 +51,9 @@
 }
 
 @keyframes sheenspin{to{transform:rotate(360deg)}}
-.destiny-astrolabe .arena{position:absolute;inset:5.4%;border-radius:50%;overflow:hidden;isolation:isolate;
-  background:radial-gradient(125% 100% at 50% 8%, #0e0e28 0%, #07071a 44%, #02020b 100%);
-  box-shadow:inset 0 0 120px rgba(4,4,20,.94), inset 0 0 38px rgba(80,60,200,.10);
+.destiny-astrolabe .arena{position:absolute;inset:6.8%;border-radius:50%;overflow:hidden;isolation:isolate;
+  background:#02020b;
+  box-shadow:inset 0 0 90px rgba(0,16,24,.55), inset 0 0 28px rgba(0,40,50,.14);
   transition:filter .9s ease;}
 .destiny-astrolabe .arena canvas{position:relative;z-index:2;display:block;width:100%;height:100%;}
 .destiny-astrolabe .arena .vignette{position:absolute;inset:0;z-index:3;pointer-events:none;
@@ -294,7 +288,15 @@
 .destiny-astrolabe .kbd{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#587d70;text-align:center;margin-top:6px;}
 .destiny-astrolabe .kbd b{color:#8fb5a8;border:1px solid rgba(143,181,168,.4);border-radius:5px;padding:1px 7px;}
 /* layout overrides: fill the host container instead of the viewport, hide the (removed) panel */
-.destiny-astrolabe{position:relative;width:100%;height:100%;overflow:hidden;}
+.destiny-astrolabe{position:relative;width:100%;height:100%;}
 .destiny-astrolabe .suite{width:100%;height:100%;}
 .destiny-astrolabe .scene-col{flex:1 1 100%;width:100%;height:100%;}
 .destiny-astrolabe .panel-col{display:none;}
+
+/* Variant lab overrides: ring = .astro-bezel, motion = .fog/.rays/.climax */
+.destiny-astrolabe .suite[data-ring-variant="patina"] .astro-bezel{filter: sepia(.22) contrast(1.08);}
+.destiny-astrolabe .suite[data-ring-variant="clean"] .astro-bezel{filter: none;}
+.destiny-astrolabe .suite[data-motion="off"] .fog,
+.destiny-astrolabe .suite[data-motion="off"] .rays,
+.destiny-astrolabe .suite[data-motion="off"] .climax,
+.destiny-astrolabe .suite[data-motion="off"] .climax.burst{animation:none !important;}

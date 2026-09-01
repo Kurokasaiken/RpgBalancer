@@ -91,6 +91,12 @@ uniform float uRimDirectional;
 uniform float uSwirlRelief;
 uniform float uSwirl;
 uniform vec3 uLightDir;
+uniform vec3 uIridColorA;
+uniform vec3 uIridColorB;
+uniform vec3 uIridColorC;
+uniform float uIridPower;
+uniform float uIridSpeed;
+uniform float uIridSpread;
 
 const float TAU = 6.28318530718;
 
@@ -179,6 +185,16 @@ void main(){
   vec3 body = mix(uAlbedo, uAlbedoLit, clamp(diff * 0.55 + swirl, 0.0, 1.0));
   vec3 color = body + uSpecColor * spec + uFresColor * fres;
 
+  /* V6.3 — IRIDESCENZA BENZINA (v20). Resta sulle creste e sul bordo,
+     mai nel corpo nero: il catrame si legge come materia densa. */
+  float iridPhase = dot(n.xy, L.xy) * uIridSpread + uTime * uIridSpeed;
+  float fr = fract(iridPhase);
+  vec3 irid = uIridColorA;
+  irid = mix(irid, uIridColorB, smoothstep(0.0, 0.45, fr));
+  irid = mix(irid, uIridColorC, smoothstep(0.55, 1.0, fr));
+  float iridMask = clamp(fres * 1.4 + h * 0.25, 0.0, 1.0);
+  color += irid * iridMask * uIridPower;
+
   /* V6.3: alpha is driven by the SDF itself, not by uReveal, so falling seed
      blobs are visible even before the main rim has started growing. */
   float alpha = smoothstep(1.5, -1.5, d);
@@ -237,6 +253,8 @@ export function createTarGooRenderer(size: number, cfg: TarGooConfig): TarGooRen
   const loc = {
     size: u('uSize'), center: u('uCenter'), radii: u('uRadii'), blobs: u('uBlobs'),
     blobCount: u('uBlobCount'), time: u('uTime'), reveal: u('uReveal'), ripple: u('uRipple'),
+    iridColorA: u('uIridColorA'), iridColorB: u('uIridColorB'), iridColorC: u('uIridColorC'),
+    iridPower: u('uIridPower'), iridSpeed: u('uIridSpeed'), iridSpread: u('uIridSpread'),
   };
 
   /* Static material + field uniforms from config — set once. */
@@ -262,6 +280,13 @@ export function createTarGooRenderer(size: number, cfg: TarGooConfig): TarGooRen
   gl.uniform1f(u('uSwirlRelief'), m.swirlRelief);
   gl.uniform1f(u('uSwirl'), m.swirlIntensity);
   gl.uniform3fv(u('uLightDir'), m.lightDir);
+  const irid = cfg.v63.iridescence;
+  gl.uniform3fv(u('uIridColorA'), irid.colorA);
+  gl.uniform3fv(u('uIridColorB'), irid.colorB);
+  gl.uniform3fv(u('uIridColorC'), irid.colorC);
+  gl.uniform1f(u('uIridPower'), irid.power);
+  gl.uniform1f(u('uIridSpeed'), irid.speed);
+  gl.uniform1f(u('uIridSpread'), irid.spread);
 
   const blobPad = new Float32Array(MAX_BLOBS * 3);
   let destroyed = false;
