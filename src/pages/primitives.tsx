@@ -54,7 +54,6 @@ type TabId =
   | 'skin'
   | 'event'
   | 'reminder'
-  | 'reminderV2'
   | 'window';
 
 const FIELD_BACKGROUND = [
@@ -77,7 +76,6 @@ const TABS: { id: TabId; label: string }[] = [
   { id: 'skin', label: 'Skin' },
   { id: 'event', label: 'Event' },
   { id: 'reminder', label: 'Reminder' },
-  { id: 'reminderV2', label: 'Reminder V2' },
   { id: 'window', label: 'Window' },
 ];
 
@@ -483,44 +481,36 @@ function WindowTab(): JSX.Element {
 
 function ReminderTab(): JSX.Element {
   const { t } = useTranslation('idleVillage');
-  const [clickCount, setClickCount] = useState(0);
+  const [v1Clicks, setV1Clicks] = useState(0);
+  const [v2Clicks, setV2Clicks] = useState(0);
 
   return (
     <DemoPanel>
       <MatericHeading title="Reminder" subtitle="Gilded world event reminder" />
-      <div style={{ display: 'flex', gap: 24, alignItems: 'center', flexWrap: 'wrap' }}>
-        <ReminderComponent
-          title={String(t('world.goblinInvasion.invasion'))}
-          daysLeftLabel={String(t('world.goblinInvasion.timerLabel'))}
-          daysLeftValue={5}
-          onClick={() => setClickCount((c) => c + 1)}
-        />
-        <span style={{ color: '#e4bd62', fontSize: 14 }}>
-          {clickCount > 0 ? `Clicked ${clickCount} time${clickCount === 1 ? '' : 's'}` : 'Click the reminder'}
-        </span>
-      </div>
-    </DemoPanel>
-  );
-}
-
-function ReminderV2Tab(): JSX.Element {
-  const { t } = useTranslation('idleVillage');
-  const [clickCount, setClickCount] = useState(0);
-
-  return (
-    <DemoPanel>
-      <MatericHeading title="Reminder V2" subtitle="AAA polish candidate" />
-      <div style={{ display: 'flex', gap: 24, alignItems: 'center', flexWrap: 'wrap' }}>
-        <ReminderComponentV2
-          title={String(t('world.goblinInvasion.invasion'))}
-          daysLeftLabel={String(t('world.goblinInvasion.timerLabel'))}
-          daysLeftValue={5}
-          state="urgent"
-          onClick={() => setClickCount((c) => c + 1)}
-        />
-        <span style={{ color: '#e4bd62', fontSize: 14 }}>
-          {clickCount > 0 ? `Clicked ${clickCount} time${clickCount === 1 ? '' : 's'}` : 'Click the reminder'}
-        </span>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <div style={{ display: 'flex', gap: 24, alignItems: 'center', flexWrap: 'wrap' }}>
+          <ReminderComponent
+            title={String(t('world.goblinInvasion.invasion'))}
+            daysLeftLabel={String(t('world.goblinInvasion.timerLabel'))}
+            daysLeftValue={5}
+            onClick={() => setV1Clicks((c) => c + 1)}
+          />
+          <span style={{ color: '#e4bd62', fontSize: 14 }}>
+            {v1Clicks > 0 ? `V1 clicked ${v1Clicks} time${v1Clicks === 1 ? '' : 's'}` : 'Click V1'}
+          </span>
+        </div>
+        <div style={{ display: 'flex', gap: 24, alignItems: 'center', flexWrap: 'wrap' }}>
+          <ReminderComponentV2
+            title={String(t('world.goblinInvasion.invasion'))}
+            daysLeftLabel={String(t('world.goblinInvasion.timerLabel'))}
+            daysLeftValue={5}
+            state="urgent"
+            onClick={() => setV2Clicks((c) => c + 1)}
+          />
+          <span style={{ color: '#e4bd62', fontSize: 14 }}>
+            {v2Clicks > 0 ? `V2 clicked ${v2Clicks} time${v2Clicks === 1 ? '' : 's'}` : 'Click V2'}
+          </span>
+        </div>
       </div>
     </DemoPanel>
   );
@@ -541,7 +531,6 @@ const TAB_CONTENT: Record<TabId, () => JSX.Element> = {
   skin: SkinTab,
   event: EventTab,
   reminder: ReminderTab,
-  reminderV2: ReminderV2Tab,
   window: WindowTab,
 };
 
