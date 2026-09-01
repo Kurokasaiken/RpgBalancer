@@ -89,6 +89,7 @@ const TrailerConsequencePage = lazy(() => import('./ui/idleVillage/trailer/Trail
 const TrailerLegacyPage = lazy(() => import('./ui/idleVillage/trailer/TrailerLegacyPage').then(m => ({ default: m.TrailerLegacyPage })));
 const TrailerOutroPage = lazy(() => import('./ui/idleVillage/trailer/TrailerOutroPage').then(m => ({ default: m.TrailerOutroPage })));
 const WorldSurfaceTestPage = lazy(() => import('./ui/idleVillage/pages/WorldSurfaceTestPage').then(m => ({ default: m.WorldSurfaceTestPage })));
+const WorldSurfaceDemoPage = lazy(() => import('./ui/idleVillage/pages/WorldSurfaceDemoPage').then(m => ({ default: m.WorldSurfaceDemoPage })));
 const SeaEffectLabPage = lazy(() => import('./ui/idleVillage/pages/SeaEffectLabPage').then(m => ({ default: m.SeaEffectLabPage })));
 const WorldPresentationDirectorPage = lazy(() => import('./ui/idleVillage/pages/WorldPresentationDirectorPage').then(m => ({ default: m.default })));
 const PoiVisualPreviewPage = lazy(() => import('./ui/idleVillage/pages/PoiVisualPreviewPage').then(m => ({ default: m.default })));
@@ -319,6 +320,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/mockup-to-component';
   const isWorldSurfacePath =
     typeof window !== 'undefined' && window.location.pathname === '/world-surface';
+  const isWorldSurfaceDemoPath =
+    typeof window !== 'undefined' && window.location.pathname === '/world-surface-demo';
   const isSeaEffectLabPath =
     typeof window !== 'undefined' && window.location.pathname === '/sea-effect-lab';
   const isWorldPresentationDirectorPath =
@@ -1183,6 +1186,16 @@ function App() {
       <ErrorBoundary componentName="Minimal Gameplay Page">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Minimal Gameplay...</div>}>
           <MinimalGameplayPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isWorldSurfaceDemoPath) {
+    return (
+      <ErrorBoundary componentName="World Surface Demo Page">
+        <Suspense fallback={<div className="h-screen w-screen" style={{ background: '#020617' }} />}>
+          <WorldSurfaceDemoPage />
         </Suspense>
       </ErrorBoundary>
     );
