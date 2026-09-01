@@ -462,12 +462,9 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
             {/* Outer ring metal — bronze ramp with high value range */}
             <linearGradient id={gid('g-b')} x1="14%" y1="4%" x2="86%" y2="96%">
               <stop offset="0%" stopColor={T6.ring.occluso} />
-              <stop offset="8%" stopColor={T6.ring.dark} />
-              <stop offset="22%" stopColor={T6.ring.mid} />
-              <stop offset="45%" stopColor={T6.ring.light} />
-              <stop offset="68%" stopColor={T6.ring.mid} />
-              <stop offset="85%" stopColor={T6.ring.dark} />
-              <stop offset="94%" stopColor={T6.ring.catch} stopOpacity="0.9" />
+              <stop offset="15%" stopColor={T6.ring.dark} />
+              <stop offset="40%" stopColor={T6.ring.light} />
+              <stop offset="70%" stopColor={T6.ring.dark} />
               <stop offset="100%" stopColor={T6.ring.occluso} />
             </linearGradient>
 
@@ -490,7 +487,7 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
             <filter id="f-ring-grain" color-interpolation-filters="sRGB" x="-20%" y="-20%" width="140%" height="140%">
               <feTurbulence type="fractalNoise" baseFrequency={T6.ring.grain.baseFrequency} numOctaves={T6.ring.grain.numOctaves} seed={T6.ring.grain.seed} result="noise" />
               <feColorMatrix in="noise" type="matrix" values={`0 0 0 0 .32  0 0 0 0 .26  0 0 0 0 .20  0 0 0 ${T6.ring.grain.opacity} 0`} result="grain" />
-              <feComposite in="SourceGraphic" in2="grain" operator="arithmetic" k1="0" k2="1" k3="0.18" k4="0" />
+              <feComposite in="SourceGraphic" in2="grain" operator="arithmetic" k1="0" k2="1" k3="0.06" k4="0" />
             </filter>
 
             {/* Hammered edge: slight waviness on the rim */}
@@ -792,7 +789,7 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
             {/* L1.2: Inner AO on the ring body */}
             <circle
               cx={geo.center} cy={geo.center} r="34.5"
-              fill="none" stroke={`rgba(0,0,0,${T6.ring.aoOpacity})`} strokeWidth="3"
+              fill="none" stroke={`rgba(0,0,0,${T6.ring.aoOpacity})`} strokeWidth={T6.ring.aoWidth}
             />
 
             {/* L1.5: Outer glaze lip */}
