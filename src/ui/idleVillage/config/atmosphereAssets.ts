@@ -285,12 +285,16 @@ export interface GlassConfig {
   reflectionOpacity: number;
   /** Warm caustic opacity (0-1). */
   causticOpacity: number;
-  /** Edge vignette opacity (0-1). */
+  /** Edge response opacity (0-1). */
   edgeOpacity: number;
   /** Base color of the glass. */
   tint: string;
   /** Max highlight offset in viewport pixels. */
   parallaxMaxPx: number;
+  /** Reflection blur radius in pixels. */
+  reflectionBlurPx: number;
+  /** Caustic SVG blur stdDeviation. */
+  causticBlurPx: number;
 }
 
 export interface AtmosphereConfig {
@@ -473,12 +477,14 @@ export const atmosphereAssets: AtmosphereConfig = {
   },
   glass: {
     enabled: true,
-    sheenOpacity: 0.38,
-    reflectionOpacity: 0.45,
-    causticOpacity: 0.36,
-    edgeOpacity: 0.55,
-    tint: 'rgba(210, 230, 255, 0.10)',
-    parallaxMaxPx: 40,
+    sheenOpacity: 0.10,
+    reflectionOpacity: 0.16,
+    causticOpacity: 0.05,
+    edgeOpacity: 0.28,
+    tint: 'rgba(210, 230, 255, 0.025)',
+    parallaxMaxPx: 8,
+    reflectionBlurPx: 18,
+    causticBlurPx: 2.5,
   },
   /** Two animated glints along the main rivers. World coordinates are hand-tuned to the painted map. */
   riverGlints: [

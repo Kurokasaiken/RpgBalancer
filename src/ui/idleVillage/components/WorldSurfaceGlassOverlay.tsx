@@ -23,10 +23,10 @@ function useReducedMotion(): boolean {
 /**
  * Glass teca overlay for the world-surface viewport.
  *
- * Sits on top of the map and adds the convex-glass feel of the Window primitive:
- * subtle backdrop brightening, screen-blended highlights, a diagonal reflection
- * and caustic pools. The light layers follow the mouse through the CSS variables
- * `--gx` and `--gy` that `WorldSurfaceRenderer` sets on the viewport.
+ * v2: a single dominant reflection, edge optical accumulation, two micro-sheens,
+ * and SVG caustics. The layer is intentionally thin — the map is the subject,
+ * not the glass. Pointer reaction is read from the CSS variables `--gx`/`--gy`
+ * that the renderer updates with a smoothed rAF loop.
  */
 export const WorldSurfaceGlassOverlay: React.FC = () => {
   const reduced = useReducedMotion();
@@ -41,7 +41,14 @@ export const WorldSurfaceGlassOverlay: React.FC = () => {
     edgeOpacity,
     tint,
     parallaxMaxPx,
+    reflectionBlurPx,
+    causticBlurPx,
   } = glass;
+
+  const uid = React.useId().replace(/:/g, '');
+  const blurId = `glass-blur-${uid}`;
+
+  const base = { position: 'absolute', inset: 0 } as React.CSSProperties;
 
   return (
     <div
@@ -52,65 +59,113 @@ export const WorldSurfaceGlassOverlay: React.FC = () => {
         pointerEvents: 'none',
         overflow: 'hidden',
         background: tint,
-        boxShadow: `inset 0 0 120px 40px rgba(0,0,0,${edgeOpacity})`,
       }}
     >
-      {/* Glass sheen — cool/warm specular spots */}
+      {/* Edge optical accumulation: light at the sides, slight weight at top/bottom. */}
       <div
         style={{
-          position: 'absolute',
-          inset: 0,
+          ...base,
           background: `
-            radial-gradient(circle at 30% 25%, rgba(255,245,210,${sheenOpacity}) 0%, transparent 30%),
-            radial-gradient(circle at 72% 68%, rgba(180,220,255,${sheenOpacity * 0.7}) 0%, transparent 25%)
+            linear-gradient(
+              90deg,
+              rgba(255,255,255,${edgeOpacity * 0.25}),
+              transparent 8%,
+              transparent 92%,
+              rgba(255,255,255,${edgeOpacity * 0.18})
+            ),
+            linear-gradient(
+              180deg,
+              rgba(255,255,255,${edgeOpacity * 0.22}),
+              transparent 8%,
+              transparent 92%,
+              rgba(0,0,0,${edgeOpacity * 0.30})
+            )
           `,
           mixBlendMode: 'screen',
         }}
       />
 
-      {/* Diagonal reflection that slides with the light source. */}
+      {/* Subtle border to sell the pane. */}
       <div
         style={{
-          position: 'absolute',
-          top: '-20%',
-          left: '-10%',
-          width: '70%',
-          height: '140%',
-          background: `linear-gradient(115deg, transparent 35%, rgba(255,205,100,${reflectionOpacity * 0.7}) 45%, rgba(255,235,180,${reflectionOpacity}) 50%, transparent 60%)`,
-          filter: 'blur(40px)',
-          mixBlendMode: 'screen',
-          transform: reduced
-            ? 'rotate(18deg)'
-            : `rotate(18deg) translate3d(calc(var(--gx, 0) * -${parallaxMaxPx}px), calc(var(--gy, 0) * -${parallaxMaxPx * 0.7}px), 0)`,
-          transition: reduced ? 'none' : 'transform 150ms ease-out',
+          ...base,
+          border: `1px solid rgba(255,255,255,${edgeOpacity * 0.08})`,
         }}
       />
 
-      {/* Caustic light pools. */}
+      {/* Two very soft sheen spots. */}
       <div
         style={{
-          position: 'absolute',
-          inset: '-12px',
+          ...base,
           background: `
-            radial-gradient(circle at 35% 30%, rgba(255,230,160,${causticOpacity}) 0%, transparent 30%),
-            radial-gradient(circle at 70% 72%, rgba(160,230,255,${causticOpacity * 0.8}) 0%, transparent 28%)
+            radial-gradient(circle at 30% 25%, rgba(255,245,210,${sheenOpacity}) 0%, transparent 24%),
+            radial-gradient(circle at 72% 68%, rgba(180,220,255,${sheenOpacity * 0.7}) 0%, transparent 20%)
           `,
           mixBlendMode: 'screen',
           transform: reduced
             ? 'none'
-            : `translate3d(calc(var(--gx, 0) * -${parallaxMaxPx * 0.8}px), calc(var(--gy, 0) * -${parallaxMaxPx * 0.6}px), 0)`,
-          transition: reduced ? 'none' : 'transform 150ms ease-out',
+            : `translate3d(calc(var(--gx, 0) * -${parallaxMaxPx * 0.35}px), calc(var(--gy, 0) * -${parallaxMaxPx * 0.25}px), 0)`,
         }}
       />
 
-      {/* Final vignette to seal the edges. */}
+      {/* Dominant diagonal reflection: the surface. */}
       <div
         style={{
           position: 'absolute',
-          inset: 0,
-          background: 'radial-gradient(ellipse at 50% 45%, transparent 40%, rgba(0,0,0,0.55) 100%)',
+          top: '-15%',
+          left: '-10%',
+          width: '70%',
+          height: '140%',
+          background: `linear-gradient(
+            112deg,
+            transparent 42%,
+            rgba(255, 240, 205, ${reflectionOpacity * 0.25}) 47%,
+            rgba(255, 255, 255, ${reflectionOpacity}) 50%,
+            rgba(255, 240, 205, ${reflectionOpacity * 0.25}) 53%,
+            transparent 58%
+          )`,
+          filter: `blur(${reflectionBlurPx}px)`,
+          mixBlendMode: 'screen',
+          transform: reduced
+            ? 'rotate(112deg)'
+            : `rotate(112deg) translate3d(calc(var(--gx, 0) * -${parallaxMaxPx}px), calc(var(--gy, 0) * -${parallaxMaxPx * 0.7}px), 0)`,
         }}
       />
+
+      {/* SVG caustics: irregular light streaks, not round spots. */}
+      <svg
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+        style={{
+          ...base,
+          mixBlendMode: 'screen',
+          transform: reduced
+            ? 'none'
+            : `translate3d(calc(var(--gx, 0) * -${parallaxMaxPx * 0.12}px), calc(var(--gy, 0) * -${parallaxMaxPx * 0.09}px), 0)`,
+        }}
+      >
+        <defs>
+          <filter id={blurId} colorInterpolationFilters="sRGB" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation={causticBlurPx} />
+          </filter>
+        </defs>
+        <path
+          d="M -5 32 C 14 18, 22 42, 39 30 S 66 18, 82 34 S 104 26, 108 42"
+          fill="none"
+          stroke="white"
+          strokeWidth="3"
+          opacity={causticOpacity}
+          filter={`url(#${blurId})`}
+        />
+        <path
+          d="M -5 68 C 22 80, 34 58, 54 68 S 78 80, 105 65"
+          fill="none"
+          stroke="white"
+          strokeWidth="2.2"
+          opacity={causticOpacity * 0.7}
+          filter={`url(#${blurId})`}
+        />
+      </svg>
     </div>
   );
 };

@@ -260,6 +260,10 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
     [t],
   );
   const containerRef = useRef<HTMLDivElement>(null);
+  /** Target mouse position (-1..1) for the glass parallax. */
+  const mouseTarget = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  /** Smoothed mouse position for the rAF loop. */
+  const mouseCurrent = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   /**
    * Camera pan at the moment the current drag began, or null when not dragging.
@@ -400,6 +404,30 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
     return () => observer.disconnect();
   }, []);
 
+  /**
+   * Smooth the glass parallax through a rAF loop.
+   *
+   * Reading the mouse directly inside `handleMouseMove` couples the highlight
+   * motion to input frequency, which causes micro-jank. A small lerp gives the
+   * glass the mass of a real optic surface without adding transition in the
+   * overlay layers.
+   */
+  useEffect(() => {
+    let raf: number;
+    const loop = () => {
+      const el = containerRef.current;
+      if (el) {
+        mouseCurrent.current.x += (mouseTarget.current.x - mouseCurrent.current.x) * 0.08;
+        mouseCurrent.current.y += (mouseTarget.current.y - mouseCurrent.current.y) * 0.08;
+        el.style.setProperty('--gx', `${mouseCurrent.current.x.toFixed(4)}`);
+        el.style.setProperty('--gy', `${mouseCurrent.current.y.toFixed(4)}`);
+      }
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
   useEffect(() => {
     if (autoFitTrigger !== prevAutoFitTrigger.current) {
       prevAutoFitTrigger.current = autoFitTrigger;
@@ -476,8 +504,7 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
       if (rect) {
         const nx = (event.clientX - rect.left) / rect.width - 0.5;
         const ny = (event.clientY - rect.top) / rect.height - 0.5;
-        containerRef.current?.style.setProperty('--gx', `${(nx * 2).toFixed(4)}`);
-        containerRef.current?.style.setProperty('--gy', `${(ny * 2).toFixed(4)}`);
+        mouseTarget.current = { x: nx * 2, y: ny * 2 };
       }
 
       if (!isDragging || !dragStart.current || !manifest.camera.panEnabled) return;
@@ -509,8 +536,7 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
     setIsDragging(false);
     setDragOriginPan(null);
     dragStart.current = null;
-    containerRef.current?.style.setProperty('--gx', '0');
-    containerRef.current?.style.setProperty('--gy', '0');
+    mouseTarget.current = { x: 0, y: 0 };
   }, []);
 
   const handleWheel = useCallback(
@@ -640,7 +666,7 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
 
       <div style={worldStyle}>
         {effectiveLayers
-          .filter((layer) => layer.id !== 'clouds')
+          .filter((layer) => layer.visible && layer.opacity > 0 && layer.id !== 'clouds')
           .map((layer) => (
             <LayerView
               key={layer.id}
@@ -957,19 +983,18 @@ const LayerView: React.FC<LayerViewProps> = ({ layer, worldName, imageFit, breat
       ? (layer.id.includes('left') ? 'left center' : 'right center')
       : (imageFit === 'none' ? '0 0' : undefined),
     mixBlendMode: BLEND_MODE_CSS[layer.blendMode],
-    // The shroud is graded to deep teal as it travels, so the colour arrives WITH
-    // the curtains instead of appearing once they have closed. The filter applies
-    // to the asset's own pixels, alpha included, so it cannot bleed onto the map
+    // The shroud stays its original parchment colour while it travels. A second,
+    // absolutely-positioned copy of the same asset carries the teal grade and
+    // fades in once the two halves have met, so the colour is born from the
+    // closed curtains rather than arriving with them. The grade copy uses the
+    // asset's own pixels, alpha included, so it cannot bleed onto the map
     // through the transparent gaps the way a full-rect overlay would.
-    filter: layer.grayscale
-      ? 'grayscale(100%)'
-      : isEventShroud && eventShroudGradeConfig.enabled
-        ? `url(#${eventShroudGradeConfig.filterId})`
-        : undefined,
+    filter: layer.grayscale ? 'grayscale(100%)' : undefined,
     ...animationStyle,
   };
 
   const { x: offsetX, y: offsetY } = offset;
+  const shroudClosed = isEventShroud && offsetX === 0 && offsetY === 0;
   const [hasError, setHasError] = useState(false);
 
   const handleImageError = useCallback(() => {
@@ -993,21 +1018,48 @@ const LayerView: React.FC<LayerViewProps> = ({ layer, worldName, imageFit, breat
     ...(isEventShroud ? { transition: 'transform 0.9s cubic-bezier(0.22, 1, 0.36, 1)' } : {}),
   };
 
+  const imageUrl = layer.file.includes('/')
+    ? `/assets/atmosphere/${layer.file.split('/').map(encodeURIComponent).join('/')}`
+    : `/assets/world/${worldName}/base/layers/${encodeURIComponent(layer.file)}`;
+
+  const gradeImgStyle: React.CSSProperties | undefined =
+    isEventShroud && eventShroudGradeConfig.enabled
+      ? {
+          ...imgStyle,
+          position: 'absolute',
+          inset: 0,
+          filter: `url(#${eventShroudGradeConfig.filterId})`,
+          opacity: shroudClosed ? 1 : 0,
+          transition: `opacity ${eventShroudGradeConfig.rampDurationMs}ms cubic-bezier(0.22, 1, 0.36, 1)${shroudClosed ? ` ${eventShroudGradeConfig.rampDelayMs}ms` : ''}`,
+          pointerEvents: 'none',
+        }
+      : undefined;
+
   return (
     <div style={wrapperStyle}>
       <div style={scaleStyle}>
         {!hasError ? (
-          <img
-            src={
-              layer.file.includes('/')
-                ? `/assets/atmosphere/${layer.file.split('/').map(encodeURIComponent).join('/')}`
-                : `/assets/world/${worldName}/base/layers/${encodeURIComponent(layer.file)}`
-            }
-            alt=""
-            style={imgStyle}
-            draggable={false}
-            onError={handleImageError}
-          />
+          <>
+            <img
+              src={imageUrl}
+              alt=""
+              style={imgStyle}
+              draggable={false}
+              loading="lazy"
+              decoding="async"
+              onError={handleImageError}
+            />
+            {gradeImgStyle && (
+              <img
+                src={imageUrl}
+                alt=""
+                style={gradeImgStyle}
+                draggable={false}
+                decoding="async"
+                aria-hidden="true"
+              />
+            )}
+          </>
         ) : (
           <div style={{ ...imgStyle, opacity: 0 }} aria-hidden="true" />
         )}

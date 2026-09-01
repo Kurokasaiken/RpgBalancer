@@ -1279,6 +1279,11 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 - Aggiunta mappa di spostamento rettangolare `public/assets/ui/goblin_case_displacement.png` e `feDisplacementMap` su `backgroundImage`, `goblinImage` e `goblinImageWithBorder` per replicare il riflesso convesso di `Window`/`Medal` nel case rettangolare.
 - Aggiunto `WorldSurfaceGlassOverlay` su `/world-surface`: teca di vetro viewport-locked con sheen, riflesso diagonale, caustiche e bordo scuro che reagiscono al mouse tramite le variabili CSS `--gx`/`--gy`;
   configurazione in `atmosphereAssets.glass`, montato in `WorldSurfaceRenderer`.
+- **Aggiornamento 2026-08-31 (R-058 — Optical Glass Pass):**
+  - `WorldSurfaceGlassOverlay` v2: riflesso diagonale come fenomeno dominante, sheen ridotto, caustiche SVG irregolari, edge response al posto della vignette nera, tinta a `0.025`.
+  - Config in `atmosphereAssets.glass` rifinita: `sheenOpacity: 0.10`, `reflectionOpacity: 0.16`, `causticOpacity: 0.05`, `edgeOpacity: 0.28`, `parallaxMaxPx: 8`, `reflectionBlurPx: 18`, `causticBlurPx: 2.5`.
+  - Smoothing del parallasse via `requestAnimationFrame` + lerp in `WorldSurfaceRenderer`: `--gx`/`--gy` sono ora trascinate dal target, non imposte dal `mousemove`.
+  - Prestazioni base: `effectiveLayers` filtrate per `layer.visible` in `WorldSurfaceRenderer`, cosi' vengono montate solo i 24 layer attivi anziche' 62; `decoding="async"` sulle immagini.
 
 ---
 
