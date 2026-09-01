@@ -470,7 +470,7 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
 
             {/* Bevel diagonal */}
             <linearGradient id={gid('g-bv')} x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor={T6.ring.catch} stopOpacity="0.35" />
+              <stop offset="0%" stopColor={T6.ring.catch} stopOpacity={T6.ring.bevelCatchOpacity} />
               <stop offset="22%" stopColor={T6.ring.light} stopOpacity="0.10" />
               <stop offset="58%" stopColor={T6.ring.light} stopOpacity="0.03" />
               <stop offset="100%" stopColor={T6.ring.dark} stopOpacity="0.85" />
@@ -498,8 +498,8 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
 
             {/* Outer vitrified glaze: bright where the light lands, fading to nearly nothing. */}
             <radialGradient id={gid('glaze')} cx="30%" cy="22%" r="86%">
-              <stop offset="0%" stopColor={ringLight} stopOpacity="0.92" />
-              <stop offset="42%" stopColor={ringLight} stopOpacity="0.44" />
+              <stop offset="0%" stopColor={ringLight} stopOpacity={T6.ring.glazeStartOpacity} />
+              <stop offset="42%" stopColor={ringLight} stopOpacity={T6.ring.glazeMidOpacity} />
               <stop offset="100%" stopColor={ringLight} stopOpacity={T4.surface.glazeFadeOpacity} />
             </radialGradient>
 
@@ -762,12 +762,14 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
               cx={geo.center} cy={geo.center} r={geo.medalRadius}
               fill="none" stroke={T6.ring.milledHi} strokeWidth="1.4"
               strokeDasharray="1.4 2.6" strokeLinecap="butt"
+              strokeOpacity={T6.ring.milledOpacity}
               filter={isDragging ? undefined : "url(#f-ring-hammered)"}
             />
             <circle
               cx={geo.center} cy={geo.center} r={geo.medalRadius}
               fill="none" stroke={T6.ring.milledLo} strokeWidth="1.4"
               strokeDasharray="2.6 1.4" strokeDashoffset="1.4" strokeLinecap="butt"
+              strokeOpacity={T6.ring.milledOpacity}
               filter={isDragging ? undefined : "url(#f-ring-hammered)"}
             />
 
@@ -805,11 +807,11 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
 
             {/* L2: Rim top - arc of warm light */}
             <circle cx={geo.center} cy={geo.center} r="40.5" fill="none"
-              stroke={T6.ring.catch} strokeOpacity={T6.ring.rimLightOpacity} strokeWidth="3.5"
+              stroke={T6.ring.catch} strokeOpacity={T6.ring.rimLightOpacity} strokeWidth={T6.ring.rimLightWidth}
               strokeDasharray="108 148" strokeDashoffset="72"
               strokeLinecap="round" filter={isDragging ? undefined : "url(#f-gl)"} />
             <circle cx={geo.center} cy={geo.center} r="41" fill="none"
-              stroke={T6.ring.catch} strokeOpacity={0.85} strokeWidth=".9"
+              stroke={T6.ring.catch} strokeOpacity={T6.ring.rimLightThinOpacity} strokeWidth={T6.ring.rimLightThinWidth}
               strokeDasharray="76 178" strokeDashoffset="82"
               strokeLinecap="round" />
 
