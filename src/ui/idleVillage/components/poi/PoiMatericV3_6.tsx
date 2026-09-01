@@ -459,28 +459,28 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
-            {/* Outer ring metal — bronze ramp with high value range */}
+            {/* Outer ring metal — type-aware ramp, one central light peak */}
             <linearGradient id={gid('g-b')} x1="14%" y1="4%" x2="86%" y2="96%">
-              <stop offset="0%" stopColor={T6.ring.occluso} />
-              <stop offset="15%" stopColor={T6.ring.dark} />
-              <stop offset="40%" stopColor={T6.ring.light} />
-              <stop offset="70%" stopColor={T6.ring.dark} />
-              <stop offset="100%" stopColor={T6.ring.occluso} />
+              <stop offset="0%" stopColor={ringDark} />
+              <stop offset="15%" stopColor={ringMid} />
+              <stop offset="40%" stopColor={ringLight} />
+              <stop offset="70%" stopColor={ringMid} />
+              <stop offset="100%" stopColor={ringDark} />
             </linearGradient>
 
             {/* Bevel diagonal */}
             <linearGradient id={gid('g-bv')} x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor={T6.ring.catch} stopOpacity={T6.ring.bevelCatchOpacity} />
-              <stop offset="22%" stopColor={T6.ring.light} stopOpacity="0.10" />
-              <stop offset="58%" stopColor={T6.ring.light} stopOpacity="0.03" />
-              <stop offset="100%" stopColor={T6.ring.dark} stopOpacity="0.85" />
+              <stop offset="0%" stopColor={ringLight} stopOpacity={T6.ring.bevelCatchOpacity} />
+              <stop offset="22%" stopColor={ringLight} stopOpacity="0.10" />
+              <stop offset="58%" stopColor={ringLight} stopOpacity="0.03" />
+              <stop offset="100%" stopColor={ringDark} stopOpacity="0.85" />
             </linearGradient>
 
             {/* Milled rim dash pattern */}
             <linearGradient id={gid('g-milled')} x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor={T6.ring.milledHi} />
-              <stop offset="50%" stopColor={T6.ring.milledLo} />
-              <stop offset="100%" stopColor={T6.ring.milledHi} />
+              <stop offset="0%" stopColor={ringLight} />
+              <stop offset="50%" stopColor={ringMid} />
+              <stop offset="100%" stopColor={ringLight} />
             </linearGradient>
 
             {/* Ring grain: subtle metal texture */}
@@ -753,21 +753,21 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
           {/* MEDALLION BODY */}
           <g className="poiv3_6__medal" clipPath="url(#c-medal)">
             {/* L1: Bronze outer body + texture + bevel */}
-            <circle cx={geo.center} cy={geo.center} r={geo.medalRadius} fill={T6.ring.occluso} />
+            <circle cx={geo.center} cy={geo.center} r={geo.medalRadius} fill={ringDark} />
             <circle className="poiv3_6__body" cx={geo.center} cy={geo.center} r={geo.medalRadius} fill={`url(#${gid('g-b')})`} filter="url(#f-ring-grain)" opacity=".92" />
             <circle className="poiv3_6__bevel" cx={geo.center} cy={geo.center} r={geo.medalRadius} fill={`url(#${gid('g-bv')})`} filter={isDragging ? undefined : "url(#f-dp)"} opacity=".48" />
 
             {/* L0.5: Milled outer rim */}
             <circle
               cx={geo.center} cy={geo.center} r={geo.medalRadius}
-              fill="none" stroke={T6.ring.milledHi} strokeWidth="1.4"
+              fill="none" stroke={ringLight} strokeWidth="1.4"
               strokeDasharray="1.4 2.6" strokeLinecap="butt"
               strokeOpacity={T6.ring.milledOpacity}
               filter={isDragging ? undefined : "url(#f-ring-hammered)"}
             />
             <circle
               cx={geo.center} cy={geo.center} r={geo.medalRadius}
-              fill="none" stroke={T6.ring.milledLo} strokeWidth="1.4"
+              fill="none" stroke={ringMid} strokeWidth="1.4"
               strokeDasharray="2.6 1.4" strokeDashoffset="1.4" strokeLinecap="butt"
               strokeOpacity={T6.ring.milledOpacity}
               filter={isDragging ? undefined : "url(#f-ring-hammered)"}
@@ -782,7 +782,7 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
                   cy={glint.cy}
                   rx={glint.rx}
                   ry={glint.ry}
-                  fill={glint.color}
+                  fill={ringLight}
                   opacity={glint.opacity}
                 />
               ))}
@@ -807,11 +807,11 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
 
             {/* L2: Rim top - arc of warm light */}
             <circle cx={geo.center} cy={geo.center} r="40.5" fill="none"
-              stroke={T6.ring.catch} strokeOpacity={T6.ring.rimLightOpacity} strokeWidth={T6.ring.rimLightWidth}
+              stroke={ringLight} strokeOpacity={T6.ring.rimLightOpacity} strokeWidth={T6.ring.rimLightWidth}
               strokeDasharray="108 148" strokeDashoffset="72"
               strokeLinecap="round" filter={isDragging ? undefined : "url(#f-gl)"} />
             <circle cx={geo.center} cy={geo.center} r="41" fill="none"
-              stroke={T6.ring.catch} strokeOpacity={T6.ring.rimLightThinOpacity} strokeWidth={T6.ring.rimLightThinWidth}
+              stroke={ringLight} strokeOpacity={T6.ring.rimLightThinOpacity} strokeWidth={T6.ring.rimLightThinWidth}
               strokeDasharray="76 178" strokeDashoffset="82"
               strokeLinecap="round" />
 
