@@ -136,6 +136,17 @@ export const ReminderComponentV2: React.FC<ReminderComponentV2Props> = ({
         }}
         aria-hidden="true"
       />
+      <span
+        style={{
+          position: 'absolute',
+          inset: 10,
+          borderRadius: 10,
+          background: v2.surfaceTexture,
+          zIndex: 2,
+          pointerEvents: 'none',
+        }}
+        aria-hidden="true"
+      />
       <GildedEventFrameV2 />
       <svg
         style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden' }}
