@@ -74,6 +74,21 @@ const tokensSchema = z.object({
     handleStroke: z.string(),
     handleOpacity: z.number(),
   }),
+  /** AAA v3 polish tokens. */
+  v3: z.object({
+    plaqueBorder: z.string(),
+    plaqueBg: z.string(),
+    plaqueShine: z.string(),
+    plaqueShadow: z.string(),
+    numberColor: z.string(),
+    titleSize: z.number(),
+    numberSize: z.number(),
+    labelSize: z.number(),
+    poiScale: z.number(),
+    poiGlowOpacity: z.number(),
+    glare: z.string(),
+    frameHighlight: z.string(),
+  }),
   /** Temporal states. */
   states: z.object({
     calm: z.object({
@@ -166,6 +181,21 @@ export const eventReminderTokens: EventReminderTokens = {
     poiGlowOpacity: 0.22,
     handleStroke: 'rgba(240,207,106,0.55)',
     handleOpacity: 0.75,
+  },
+  v3: {
+    plaqueBorder: 'rgba(240,207,106,0.55)',
+    plaqueBg: 'linear-gradient(135deg, rgba(8,18,31,0.96) 0%, rgba(2,10,14,0.99) 100%)',
+    plaqueShine: 'radial-gradient(ellipse at 50% -20%, rgba(255,255,255,0.16) 0%, transparent 35%)',
+    plaqueShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 6px 14px rgba(0,118,130,0.18), 0 4px 8px rgba(0,0,0,0.4)',
+    numberColor: '#f0d58b',
+    titleSize: 32,
+    numberSize: 38,
+    labelSize: 10,
+    poiScale: 0.65,
+    poiGlowOpacity: 0.18,
+    glare: 'radial-gradient(ellipse at 12% 10%, rgba(255,255,255,0.18) 0%, transparent 28%)',
+    frameHighlight: 'rgba(255,245,210,0.55)',
+    surfaceTexture: 'radial-gradient(ellipse at 25% 20%, rgba(0,118,130,0.14) 0%, transparent 40%), radial-gradient(ellipse at 80% 90%, rgba(0,200,170,0.12) 0%, transparent 45%), linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.18) 100%)',
   },
   title: {
     color: '#f0d58b',
