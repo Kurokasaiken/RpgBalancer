@@ -520,14 +520,14 @@ export const PoiMatericV3_7: React.FC<PoiMatericV3_7Props> = ({
             </linearGradient>
 
             {/* Ring grain: subtle metal texture */}
-            <filter id="f-ring-grain" color-interpolation-filters="sRGB" x="-20%" y="-20%" width="140%" height="140%">
+            <filter id={gid('f-ring-grain')} colorInterpolationFilters="sRGB" x="-20%" y="-20%" width="140%" height="140%">
               <feTurbulence type="fractalNoise" baseFrequency={T7.ring.grain.baseFrequency} numOctaves={T7.ring.grain.numOctaves} seed={T7.ring.grain.seed} result="noise" />
               <feColorMatrix in="noise" type="matrix" values={`0 0 0 0 .32  0 0 0 0 .26  0 0 0 0 .20  0 0 0 ${T7.ring.grain.opacity} 0`} result="grain" />
               <feComposite in="SourceGraphic" in2="grain" operator="arithmetic" k1="0" k2="1" k3="0.06" k4="0" />
             </filter>
 
             {/* Hammered edge: slight waviness on the rim */}
-            <filter id="f-ring-hammered" color-interpolation-filters="sRGB" x="-20%" y="-20%" width="140%" height="140%">
+            <filter id={gid('f-ring-hammered')} colorInterpolationFilters="sRGB" x="-20%" y="-20%" width="140%" height="140%">
               <feTurbulence type="turbulence" baseFrequency={T7.ring.hammered.baseFrequency} numOctaves={T7.ring.hammered.numOctaves} seed={T7.ring.hammered.seed} result="t" />
               <feDisplacementMap in="SourceGraphic" in2="t" scale={T7.ring.hammered.scale} xChannelSelector="R" yChannelSelector="G" />
             </filter>
