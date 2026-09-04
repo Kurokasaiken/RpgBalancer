@@ -385,6 +385,13 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
 
   const atmosphereZIndex = useMemo(() => cloudZIndex - 0.5, [cloudZIndex]);
 
+  const frameZIndex = useMemo(() => {
+    const frame = effectiveLayers.find((layer) => layer.id === FRAME_LAYER_ID);
+    return frame?.zIndex ?? 1000;
+  }, [effectiveLayers]);
+
+  const glassZIndex = frameZIndex - 1;
+
   const containerSize = useRef<{ width: number; height: number }>({ width: 0, height: 0 });
 
   useEffect(() => {
@@ -861,7 +868,11 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
         Glass teca. Sits OUTSIDE the world box so it does not pan or zoom; the
         reflections and caustics react to the pointer through CSS variables.
       */}
-      {showGlass && <WorldSurfaceGlassOverlay />}
+      {showGlass && (
+        <div style={{ position: 'relative', zIndex: glassZIndex }}>
+          <WorldSurfaceGlassOverlay />
+        </div>
+      )}
 
       {/*
         Vignette. Sits OUTSIDE the world box on purpose: it is a property of how the
