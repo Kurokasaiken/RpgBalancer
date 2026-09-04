@@ -2,6 +2,7 @@ import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } fro
 import { WorldSurfaceAtmosphere } from './WorldSurfaceAtmosphere';
 import { WorldSurfaceRiverGlint } from './WorldSurfaceRiverGlint';
 import { WorldSurfaceGlassOverlay } from './WorldSurfaceGlassOverlay';
+import { WorldBreathingLayer } from './WorldBreathingLayer';
 import { useTranslation } from 'react-i18next';
 import type { RuntimeObject } from '../../../engine/world/model/RuntimeObject';
 import type { WaterFieldConfig } from '../config/atmosphereAssets';
@@ -265,6 +266,8 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
   /** Smoothed mouse position for the rAF loop. */
   const mouseCurrent = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
+  const [isZooming, setIsZooming] = useState(false);
+
   /**
    * Camera pan at the moment the current drag began, or null when not dragging.
    *
@@ -544,6 +547,10 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
       if (!manifest.camera.zoomEnabled) return;
       event.preventDefault();
 
+      // S3: Reduce breathing during zoom interaction
+      setIsZooming(true);
+      const zoomTimeout = setTimeout(() => setIsZooming(false), 300);
+
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return;
 
@@ -565,6 +572,8 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
 
       const clamped = clampPan(nextPanX, nextPanY, nextZoom, containerSize.current, bounds);
       onCameraChange({ panX: clamped.panX, panY: clamped.panY, zoom: nextZoom });
+
+      return () => clearTimeout(zoomTimeout);
     },
     [camera, bounds, manifest.camera, onCameraChange],
   );
@@ -667,29 +676,74 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
       <div style={worldStyle}>
         {effectiveLayers
           .filter((layer) => layer.visible && layer.opacity > 0 && layer.id !== 'clouds')
-          .map((layer) => (
-            <LayerView
-              key={layer.id}
-              layer={layer}
-            worldName={manifest.world}
-            imageFit={resolvedImageFit}
-            breathEnabled={breathEnabled}
-            zoom={camera.zoom}
-            canvasSize={manifest.coordinateSystem.canvas}
-            scale={layerScales?.[layer.id] ?? layer.scale ?? 1}
-            offset={
-              layerOffsets?.[layer.id] ??
-              (layer.id === 'event_shroud_left'
-                ? { x: -manifest.coordinateSystem.canvas.width, y: 0 }
-                : layer.id === 'event_shroud_right'
-                  ? { x: manifest.coordinateSystem.canvas.width, y: 0 }
-                  : {
-                      x: layer.offsetX ?? 0,
-                      y: layer.offsetY ?? 0,
-                    })
+          .map((layer) => {
+            // S2: Hero rollout — forest, mountain, sky with staggered frequencies
+            const breathingHeroLayers = ['forest_1_top_left', 'mountain_zone_north', 'background'];
+            const isBreathingHeroLayer = breathEnabled && breathingHeroLayers.includes(layer.id);
+            if (isBreathingHeroLayer) {
+              // Map layer ID to config params
+              const layerConfigs: Record<string, { freq: number; mag: number; phase: number }> = {
+                forest_1_top_left: { freq: 0.060, mag: 1, phase: 0 },
+                mountain_zone_north: { freq: 0.050, mag: 1, phase: 0 },
+                background: { freq: 0.035, mag: 1, phase: 0 },
+              };
+              const config = layerConfigs[layer.id] || { freq: 0.06, mag: 1, phase: 0 };
+              const imageUrl = layer.file.includes('/')
+                ? `/assets/atmosphere/${layer.file.split('/').map(encodeURIComponent).join('/')}`
+                : `/assets/world/${manifest.world}/base/layers/${encodeURIComponent(layer.file)}`;
+              return (
+                <div
+                  key={layer.id}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    zIndex: layer.zIndex,
+                    opacity: layer.opacity,
+                    pointerEvents: 'none',
+                  }}
+                >
+                  <WorldBreathingLayer
+                    id={layer.id}
+                    src={imageUrl}
+                    imageFit={resolvedImageFit}
+                    magnitudeScreenPx={config.mag}
+                    frequencyHz={config.freq}
+                    phaseRad={config.phase}
+                    enabled={true}
+                    displacementField="/assets/ui/glass_displacement.png"
+                    alt={layer.id}
+                    isInteracting={isDragging || isZooming}
+                  />
+                </div>
+              );
             }
-          />
-        ))}
+            return (
+              <LayerView
+                key={layer.id}
+                layer={layer}
+                worldName={manifest.world}
+                imageFit={resolvedImageFit}
+                breathEnabled={breathEnabled}
+                zoom={camera.zoom}
+                canvasSize={manifest.coordinateSystem.canvas}
+                scale={layerScales?.[layer.id] ?? layer.scale ?? 1}
+                offset={
+                  layerOffsets?.[layer.id] ??
+                  (layer.id === 'event_shroud_left'
+                    ? { x: -manifest.coordinateSystem.canvas.width, y: 0 }
+                    : layer.id === 'event_shroud_right'
+                      ? { x: manifest.coordinateSystem.canvas.width, y: 0 }
+                      : {
+                          x: layer.offsetX ?? 0,
+                          y: layer.offsetY ?? 0,
+                        })
+                }
+              />
+            );
+          })}
 
         {showRegions &&
           manifest.regions.map((region) => (

@@ -322,3 +322,34 @@ export function selectWorldSurfaceRenderer(
 
   return 'dom';
 }
+
+/**
+ * Breathing animation configuration for World Surface layers.
+ * S0 spike: forest_1_top_left as test layer.
+ */
+export const BREATHING_CONFIG = {
+  enabled: true,
+  layers: {
+    forest_1_top_left: {
+      enabled: true,
+      frequency: 0.060,     // Hz (fastest: 16.7s per cycle)
+      magnitude: 1,         // screen px
+      phase: 0,
+      field: '/assets/ui/glass_displacement.png',
+    },
+    mountain_zone_north: {
+      enabled: true,
+      frequency: 0.050,     // Hz (medium: 20s per cycle)
+      magnitude: 1,
+      phase: 0,
+      field: '/assets/ui/glass_displacement.png',
+    },
+    background: {
+      enabled: true,
+      frequency: 0.035,     // Hz (slowest: 28.6s per cycle)
+      magnitude: 1,
+      phase: 0,
+      field: '/assets/ui/glass_displacement.png',
+    },
+  },
+} as const;
