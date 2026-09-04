@@ -578,17 +578,17 @@ export const PoiMatericV3_7: React.FC<PoiMatericV3_7Props> = ({
               <stop offset="100%" stopColor={T4.surface.glassShadow} />
             </radialGradient>
             
-            <filter id="f-dp" x="0%" y="0%" width="100%" height="100%">
+            <filter id={gid('f-dp')} x="0%" y="0%" width="100%" height="100%">
               <feTurbulence type="turbulence" baseFrequency="0.030" numOctaves={3} seed="7" result="t" />
               <feDisplacementMap in="SourceGraphic" in2="t" scale="3.5" xChannelSelector="R" yChannelSelector="G" />
             </filter>
-            
-            <filter id="f-gl" x="-20%" y="-20%" width="140%" height="140%">
+
+            <filter id={gid('f-gl')} x="-20%" y="-20%" width="140%" height="140%">
               <feGaussianBlur stdDeviation="1.5" result="blur" />
               <feComposite in="SourceGraphic" in2="blur" operator="over" />
             </filter>
-            
-            <filter id="f-glow" x="-50%" y="-50%" width="200%" height="200%">
+
+            <filter id={gid('f-glow')} x="-50%" y="-50%" width="200%" height="200%">
               <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="g1" />
               <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="g2" />
               <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="g3" />
@@ -601,13 +601,13 @@ export const PoiMatericV3_7: React.FC<PoiMatericV3_7Props> = ({
             </filter>
 
             {/* Patina deformation - makes circles irregular */}
-            <filter id="f-patina" x="-20%" y="-20%" width="140%" height="140%">
+            <filter id={gid('f-patina')} x="-20%" y="-20%" width="140%" height="140%">
               <feTurbulence type="fractalNoise" baseFrequency="0.15" numOctaves={3} seed="42" result="noise" />
               <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.5" xChannelSelector="R" yChannelSelector="G" />
             </filter>
 
             {/* Dark backing track for light-surface contrast */}
-            <filter id="f-back" x="-50%" y="-50%" width="200%" height="200%">
+            <filter id={gid('f-back')} x="-50%" y="-50%" width="200%" height="200%">
               <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur" />
               <feComposite in="SourceGraphic" in2="blur" operator="over" />
             </filter>
@@ -807,8 +807,8 @@ export const PoiMatericV3_7: React.FC<PoiMatericV3_7Props> = ({
           <g className="poiv3_7__medal" clipPath="url(#c-medal)">
             {/* L1: Bronze outer body + texture + bevel */}
             <circle cx={geo.center} cy={geo.center} r={geo.medalRadius} fill={ringDark} />
-            <circle className="poiv3_7__body" cx={geo.center} cy={geo.center} r={geo.medalRadius} fill={`url(#${gid('g-b')})`} filter="url(#f-ring-grain)" opacity=".92" />
-            <circle className="poiv3_7__bevel" cx={geo.center} cy={geo.center} r={geo.medalRadius} fill={`url(#${gid('g-bv')})`} filter={isDragging ? undefined : "url(#f-dp)"} opacity=".48" />
+            <circle className="poiv3_7__body" cx={geo.center} cy={geo.center} r={geo.medalRadius} fill={`url(#${gid('g-b')})`} filter={`url(#${gid('f-ring-grain')})`} opacity=".92" />
+            <circle className="poiv3_7__bevel" cx={geo.center} cy={geo.center} r={geo.medalRadius} fill={`url(#${gid('g-bv')})`} filter={isDragging ? undefined : `url(#${gid('f-dp')})`} opacity=".48" />
 
             {/* L0.5: Milled outer rim */}
             <circle
@@ -816,14 +816,14 @@ export const PoiMatericV3_7: React.FC<PoiMatericV3_7Props> = ({
               fill="none" stroke={ringLight} strokeWidth="1.4"
               strokeDasharray="1.4 2.6" strokeLinecap="butt"
               strokeOpacity={T7.ring.milledOpacity}
-              filter={isDragging ? undefined : "url(#f-ring-hammered)"}
+              filter={isDragging ? undefined : `url(#${gid('f-ring-hammered')})`}
             />
             <circle
               cx={geo.center} cy={geo.center} r={geo.medalRadius}
               fill="none" stroke={ringMid} strokeWidth="1.4"
               strokeDasharray="2.6 1.4" strokeDashoffset="1.4" strokeLinecap="butt"
               strokeOpacity={T7.ring.milledOpacity}
-              filter={isDragging ? undefined : "url(#f-ring-hammered)"}
+              filter={isDragging ? undefined : `url(#${gid('f-ring-hammered')})`}
             />
 
             {/* L0.8: Metal glints on the ring */}
@@ -862,7 +862,7 @@ export const PoiMatericV3_7: React.FC<PoiMatericV3_7Props> = ({
             <circle cx={geo.center} cy={geo.center} r="40.5" fill="none"
               stroke={ringLight} strokeOpacity={T7.ring.rimLightOpacity} strokeWidth={T7.ring.rimLightWidth}
               strokeDasharray="108 148" strokeDashoffset="72"
-              strokeLinecap="round" filter={isDragging ? undefined : "url(#f-gl)"} />
+              strokeLinecap="round" filter={isDragging ? undefined : `url(#${gid('f-gl')})`} />
             <circle cx={geo.center} cy={geo.center} r="41" fill="none"
               stroke={ringLight} strokeOpacity={T7.ring.rimLightThinOpacity} strokeWidth={T7.ring.rimLightThinWidth}
               strokeDasharray="76 178" strokeDashoffset="82"
@@ -912,7 +912,7 @@ export const PoiMatericV3_7: React.FC<PoiMatericV3_7Props> = ({
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       vectorEffect="non-scaling-stroke"
-                      filter={g.lit > 0.01 ? 'url(#f-glow)' : undefined}
+                      filter={g.lit > 0.01 ? `url(#${gid('f-glow')})` : undefined}
                     />
                   </g>
                 </g>
@@ -983,7 +983,7 @@ export const PoiMatericV3_7: React.FC<PoiMatericV3_7Props> = ({
                 cy={p.cy.toFixed(2)}
                 r={p.r.toFixed(2)}
                 fill={p.color}
-                filter={isDragging ? undefined : "url(#f-patina)"}
+                filter={isDragging ? undefined : `url(#${gid('f-patina')})`}
               />
             ))}
             {imperfections.scratches.map((s, i) => (
