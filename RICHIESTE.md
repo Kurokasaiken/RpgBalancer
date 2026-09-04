@@ -1384,3 +1384,44 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 |- Aggiornata `src/docs/docs/design/primitive_composition_rules.md` per riflettere che `MatericFrame` non ha più `floor`.
 **Output atteso:**
 |- Il prop `floor` non esiste più nel progetto; la pavimentazione interna non è mai visibile.
+
+---
+
+## R-064 — RpgBalancer: continuare l'audit e produrre il Balance Model v1 / Canonical Mathematical Specification
+
+**Richiesta:** *Handoff dalla conversazione precedente su RpgBalancer: continuare l'audit del sistema di balancing, identificare la baseline canonica, consolidare le fonti di verità frammentate e produrre una specifica matematica canonica (Canonical Mathematical Inventory) prima di qualsiasi modifica al bilanciamento.*
+**Data:** 2026-09-04
+**Stato:** `in corso`
+**Desiderata FROZEN:** nessuna corrispondente; richiesta operativa derivata dall'handoff.
+**Cosa è successo:**
+1. Verificato che l'archivio `RpgBalancer_Source_Clean.zip` non è presente nella workspace; audit eseguito sul sorgente locale in `src/balancing/`.
+2. Mappati i file chiave: `defaultConfig.ts`, `baseline.ts`, `balancingConfig.ts`, `registry.ts`, `modules/critical.ts`, `modules/mitigation.ts`, `1v1/mathEngine.ts`, `config/ConfigSolver.ts`, `statWeights.ts`, `modules/spellcost.ts`, `spellStatDefinitions.ts`, `spellTypes.ts`, `spells/config/types.ts`.
+3. Prodotta prima bozza del Canonical Mathematical Inventory: `src/docs/docs/balancer/balance_model_v1.md`.
+4. Aggiornato `context/INDEX.md` con il nuovo documento.
+**Cosa manca:**
+1. Confermare se il sorgente locale è sufficiente o se serve l'archivio/repo remoto `Kurokasaiken/RpgBalancer`.
+2. Risolvere le incongruenze P0 elencate nel documento (baseline, pesi, formule `effectiveDamage`/`attacksPerKo`/hitChance, ward, scenario reali).
+3. Completare la sezione spell (DoT curve, AoE curve, mana model, `dangerous` semantics) e l'Equipment Creator quando richiesto.
+4. Pianificare scenari (A/E, Post, Big Post, ecc.) solo dopo che il modello è stabile.
+**Vincoli:** non modificare il bilanciamento prima dell'audit; usare terminologia "budget" (non "spell budget"); non promuovere valori illustrativi a regole canoniche; Balancer è source of truth per baseline/weight; Spell Creator/Equipment Creator consumano Balancer.
+
+**Aggiornamento 2026-09-04:** il Director ha riformulato l'obiettivo: l'audit tecnico non è fine a sé stesso, ma strumento dentro un progetto di design più ampio. L'output richiesto non è più solo un Balance Model, ma un **Master Context / Handoff** completo (sezioni 00-23) che integri: visione, filosofia, design intent, modello matematico, audit del codice, esperimenti, decisioni confermate e decisioni aperte. Ogni informazione deve essere etichettata con il suo status. Non inventare definizioni di scenario (A/E, Post, Big Post) né promuovere valori sperimentali a canonici.
+
+---
+
+## R-065 — Equipment Creator: nascere dai valori ereditati dal Balancer
+
+**Richiesta:** *La priorità è Equipment Creator. Deve nascere dai valori ereditati dal Balancer, non re-inventare la matematica.*
+**Data:** 2026-09-04
+**Stato:** `aperta`
+**Desiderata FROZEN:** nessuna corrispondente; richiesta operativa.
+**Cosa è successo:**
+1. Scoperto modulo `src/balancing/equipment/` già esistente.
+2. Letti i file `equipmentTypes.ts`, `equipmentBalancingConfig.ts`, `equipmentTemplates.ts`, `EquipmentCostModule.ts`, `equipmentBalancing.ts`, `equipmentStorage.ts`.
+3. Identificati disallineamenti: pesi da `getStatWeight()` (anch'esso in conflitto tra `CORE_STAT_WEIGHTS` e `NORMALIZED_WEIGHTS`), tipi `EquipmentItem`/`EquipmentType`/`EquipmentRarity` duplicati tra `equipmentTypes.ts` e `equipmentTemplates.ts`, `baseStats` dei template non usati come baseline nel costo, `equipmentBalancing.ts` stale, rarities duplicate, range hardcoded.
+**Cosa manca:**
+1. Decidere se Equipment Creator aspetta le decisioni canoniche del Balancer o si ancora al modulo Balancer esistente per ereditarle automaticamente.
+2. Consolidare tipi e config, eliminare duplicazioni.
+3. Far sì che `EquipmentCostModule` calcoli costo/power su `(value - baseline) × weight` usando la baseline corretta (template o config).
+4. Produrre piano/task list compatibili con `MASTER_PLAN.md` se richiesto.
+**Vincoli:** Equipment Creator consuma Balancer per baseline, pesi, stats, range; niente valori hardcoded di gameplay; rispettare config-first e weight-based creator pattern; non promuovere valori sperimentali a canonici.

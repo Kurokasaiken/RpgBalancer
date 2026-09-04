@@ -348,6 +348,12 @@ export const tarGooConfig: TarGooConfig = tarGooConfigSchema.parse({
         leakCore: 'rgba(0,235,225,.45)', leakMid: 'rgba(0,165,175,.22)',
         leakEdge: 'rgba(0,0,0,0)',
       },
+      /** fumo: grigio caldo-neutro, stacca il nero senza essere freddo */
+      smoke: {
+        inner: 'rgba(110,118,132,1)', outer: 'rgba(36,40,48,1)',
+        leakCore: 'rgba(225,230,245,.35)', leakMid: 'rgba(180,188,206,.17)',
+        leakEdge: 'rgba(0,0,0,0)',
+      },
     },
     star: 'avorio',
     stars: {
@@ -380,9 +386,9 @@ export const tarGooConfig: TarGooConfig = tarGooConfigSchema.parse({
       colorA: [0.18, 0.92, 0.72],
       colorB: [0.85, 0.28, 0.48],
       colorC: [0.35, 0.68, 1.0],
-      power: 0.16,
-      speed: 0.12,
-      spread: 1.6,
+      power: 0.45,
+      speed: 0.35,
+      spread: 2.0,
     },
   },
 });

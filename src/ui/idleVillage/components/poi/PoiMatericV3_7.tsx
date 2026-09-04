@@ -2,10 +2,10 @@ import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useTranslation } from '@/localization/useTranslation';
 import { getDefaultPoiColors } from '@/balancing/config/idleVillage/poiColorConfig';
 import { POI_MATERIC_V4_TOKENS } from '@/balancing/config/idleVillage/poiMatericV4Tokens';
-import { POI_MATERIC_V3_6_TOKENS } from '@/balancing/config/idleVillage/poiMatericV3_6Tokens';
+import { POI_MATERIC_V3_7_TOKENS } from '@/balancing/config/idleVillage/poiMatericV3_7Tokens';
 import type { PoiMarkerProps } from './PoiMarker';
 
-export interface PoiMatericV3_6Props extends PoiMarkerProps {
+export interface PoiMatericV3_7Props extends PoiMarkerProps {
   portraitUrl?: string;
   isDragging?: boolean;
   cursorVelocity?: { x: number; y: number } | null;
@@ -34,7 +34,7 @@ const LETTERS: string[] = [
 const RIM_LETTER_COUNT = 24;
 
 const T4 = POI_MATERIC_V4_TOKENS;
-const T6 = POI_MATERIC_V3_6_TOKENS;
+const T7 = POI_MATERIC_V3_7_TOKENS;
 
 const WAKE_STEPS = [0, 0.35, 0.62, 0.82, 0.94];
 
@@ -151,7 +151,7 @@ function generateImperfections(base: {
   return { patinaSpots, scratches };
 }
 
-export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
+export const PoiMatericV3_7: React.FC<PoiMatericV3_7Props> = ({
   type,
   state = 'available',
   progress = 1,
@@ -172,12 +172,22 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
   const [stoneLight, stoneDark] = colors.stoneColors;
   const uid = useId();
   const gid = (id: string) => `${uid}-${id}`;
-  const accent = 'rgb(240, 207, 106)';
-  const { r, g: greenCh, b } = { r: 240, g: 207, b: 106 };
+
+  // Get type-aware icon metal colors instead of hardcoded gold
+  const iconMetalGradient = useMemo(() => {
+    const metals = T7.iconMetals as Record<string, [string, string, string]>;
+    return metals[type] || metals.wilderness;
+  }, [type]);
+  const [metalLight, metalMid, metalDark] = iconMetalGradient;
+
+  // Use accent from the metal palette for proper depth
+  const accent = metalLight;
+  const accentRGB = hexToRgb(metalLight);
+  const { r, g: greenCh, b } = { r: parseInt(accentRGB.split(',')[0]), g: parseInt(accentRGB.split(',')[1]), b: parseInt(accentRGB.split(',')[2]) };
   const rgba = (a: number) => `rgba(${r}, ${greenCh}, ${b}, ${a})`;
 
   const fieldBackgroundGradient = useMemo(() => {
-    const backgrounds = T6.fieldBackgrounds as Record<string, [string, string]>;
+    const backgrounds = T7.fieldBackgrounds as Record<string, [string, string]>;
     return backgrounds[type] || backgrounds.wilderness;
   }, [type]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -410,8 +420,9 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
       ref={containerRef}
       role="img"
       data-testid={dataTestId}
+      data-state={state}
       aria-label={t('idleVillage:medalOverlay.ariaLabel', { defaultValue: 'Resident medal' })}
-      className={`poiv3_6 tok-svg ${className}${burst > 0.001 ? ' poiv3_6--burst' : ''}`}
+      className={`poiv3_7 tok-svg ${className}${burst > 0.001 ? ' poiv3_7--burst' : ''}`}
       onClick={onClick}
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
@@ -422,11 +433,31 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
         height: `${sizePx}px`,
         visibility: 'visible',
         '--poi-accent-rgb': `${r}, ${greenCh}, ${b}`,
+        boxShadow: `${T7.shadow.dx}px ${42 + T7.shadow.gap + T7.shadow.ry}px ${T7.shadow.blur * 2}px rgba(34, 50, 47, ${T7.shadow.opacity})`,
         ...style,
       } as React.CSSProperties}
     >
-      <div className="poiv3_6__vignette" aria-hidden="true" />
-      <div className="poiv3_6__fog" aria-hidden="true" />
+      {/* Halo: V4-style subtle glow behind the marker for depth */}
+      <div
+        className="poiv3_7__halo"
+        style={{
+          position: 'absolute',
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: `${sizePx * 1.35}px`,
+          height: `${sizePx * 1.35}px`,
+          borderRadius: '50%',
+          background: `radial-gradient(circle at 50% 40%, ${accent}33 0%, ${accent}11 35%, transparent 65%)`,
+          filter: `blur(${Math.max(4, sizePx * 0.08)}px)`,
+          pointerEvents: 'none',
+          zIndex: 1,
+          opacity: 0.7,
+        }}
+        aria-hidden="true"
+      />
+      <div className="poiv3_7__vignette" aria-hidden="true" />
+      <div className="poiv3_7__fog" aria-hidden="true" />
       <canvas
         ref={canvasRef}
         width={sizePx}
@@ -456,7 +487,7 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
         }}
       >
         <svg
-          className="poiv3_6__svg"
+          className="poiv3_7__svg"
           width={sizePx}
           height={sizePx}
           viewBox="0 0 86 86"
@@ -475,7 +506,7 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
 
             {/* Bevel diagonal */}
             <linearGradient id={gid('g-bv')} x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor={ringLight} stopOpacity={T6.ring.bevelCatchOpacity} />
+              <stop offset="0%" stopColor={ringLight} stopOpacity={T7.ring.bevelCatchOpacity} />
               <stop offset="22%" stopColor={ringLight} stopOpacity="0.10" />
               <stop offset="58%" stopColor={ringLight} stopOpacity="0.03" />
               <stop offset="100%" stopColor={ringDark} stopOpacity="0.85" />
@@ -490,23 +521,32 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
 
             {/* Ring grain: subtle metal texture */}
             <filter id="f-ring-grain" color-interpolation-filters="sRGB" x="-20%" y="-20%" width="140%" height="140%">
-              <feTurbulence type="fractalNoise" baseFrequency={T6.ring.grain.baseFrequency} numOctaves={T6.ring.grain.numOctaves} seed={T6.ring.grain.seed} result="noise" />
-              <feColorMatrix in="noise" type="matrix" values={`0 0 0 0 .32  0 0 0 0 .26  0 0 0 0 .20  0 0 0 ${T6.ring.grain.opacity} 0`} result="grain" />
+              <feTurbulence type="fractalNoise" baseFrequency={T7.ring.grain.baseFrequency} numOctaves={T7.ring.grain.numOctaves} seed={T7.ring.grain.seed} result="noise" />
+              <feColorMatrix in="noise" type="matrix" values={`0 0 0 0 .32  0 0 0 0 .26  0 0 0 0 .20  0 0 0 ${T7.ring.grain.opacity} 0`} result="grain" />
               <feComposite in="SourceGraphic" in2="grain" operator="arithmetic" k1="0" k2="1" k3="0.06" k4="0" />
             </filter>
 
             {/* Hammered edge: slight waviness on the rim */}
             <filter id="f-ring-hammered" color-interpolation-filters="sRGB" x="-20%" y="-20%" width="140%" height="140%">
-              <feTurbulence type="turbulence" baseFrequency={T6.ring.hammered.baseFrequency} numOctaves={T6.ring.hammered.numOctaves} seed={T6.ring.hammered.seed} result="t" />
-              <feDisplacementMap in="SourceGraphic" in2="t" scale={T6.ring.hammered.scale} xChannelSelector="R" yChannelSelector="G" />
+              <feTurbulence type="turbulence" baseFrequency={T7.ring.hammered.baseFrequency} numOctaves={T7.ring.hammered.numOctaves} seed={T7.ring.hammered.seed} result="t" />
+              <feDisplacementMap in="SourceGraphic" in2="t" scale={T7.ring.hammered.scale} xChannelSelector="R" yChannelSelector="G" />
             </filter>
 
             {/* Outer vitrified glaze: bright where the light lands, fading to nearly nothing. */}
             <radialGradient id={gid('glaze')} cx="30%" cy="22%" r="86%">
-              <stop offset="0%" stopColor={ringLight} stopOpacity={T6.ring.glazeStartOpacity} />
-              <stop offset="42%" stopColor={ringLight} stopOpacity={T6.ring.glazeMidOpacity} />
+              <stop offset="0%" stopColor={ringLight} stopOpacity={T7.ring.glazeStartOpacity} />
+              <stop offset="42%" stopColor={ringLight} stopOpacity={T7.ring.glazeMidOpacity} />
               <stop offset="100%" stopColor={ringLight} stopOpacity={T4.surface.glazeFadeOpacity} />
             </radialGradient>
+
+            {/* Icon metal: type-aware ramp for heraldic marks */}
+            <linearGradient id={gid('icon-metal')} x1="14%" y1="4%" x2="86%" y2="96%">
+              <stop offset="0%" stopColor={metalDark} />
+              <stop offset="15%" stopColor={metalMid} />
+              <stop offset="40%" stopColor={metalLight} />
+              <stop offset="70%" stopColor={metalMid} />
+              <stop offset="100%" stopColor={metalDark} />
+            </linearGradient>
 
             {/* Inner ring */}
             <linearGradient id={gid('g-ri')} x1="12%" y1="8%" x2="88%" y2="92%">
@@ -608,6 +648,12 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
               </feMerge>
             </filter>
 
+            {/* Icon metal: type-aware 2-color linear gradient (light to dark) */}
+            <linearGradient id={gid('icon-metal')} x1="18%" y1="0%" x2="82%" y2="100%">
+              <stop offset="0%" stopColor={iconMetalGradient[0]} />
+              <stop offset="100%" stopColor={iconMetalGradient[1]} />
+            </linearGradient>
+
             {/* Clips */}
             <clipPath id="c-port">
               <circle cx="43" cy="43" r="27.5" />
@@ -618,11 +664,13 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
             </clipPath>
           </defs>
 
+          {/* SHADOW MOVED TO CSS: box-shadow on container for better performance */}
+
           {/* ---------- MAGIC CIRCLE: written by the passage of time ---------- */}
           {sealProgress > 0.001 && (
             <>
               <path
-                className="poiv3_6__track"
+                className="poiv3_7__track"
                 d={sealArcPath((geo.sealOuterRail + geo.sealInnerRail) / 2, sealProgress, sweep)}
                 fill="none"
                 stroke={T4.seal.trackColor}
@@ -630,7 +678,7 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
                 strokeLinecap="butt"
               />
 
-              <g className="poiv3_6__seal-halo" filter={`url(#${gid('bloom')})`}>
+              <g className="poiv3_7__seal-halo" filter={`url(#${gid('bloom')})`}>
                 {[geo.sealOuterRail, geo.sealInnerRail].map((radius) => (
                   <React.Fragment key={`halo-rail-${radius}`}>
                     <path
@@ -710,7 +758,7 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
                 ))}
               </g>
 
-              <g className="poiv3_6__seal-core">
+              <g className="poiv3_7__seal-core">
                 {[geo.sealOuterRail, geo.sealInnerRail].map((radius) => (
                   <path
                     key={`core-rail-${radius}`}
@@ -756,31 +804,31 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
           )}
 
           {/* MEDALLION BODY */}
-          <g className="poiv3_6__medal" clipPath="url(#c-medal)">
+          <g className="poiv3_7__medal" clipPath="url(#c-medal)">
             {/* L1: Bronze outer body + texture + bevel */}
             <circle cx={geo.center} cy={geo.center} r={geo.medalRadius} fill={ringDark} />
-            <circle className="poiv3_6__body" cx={geo.center} cy={geo.center} r={geo.medalRadius} fill={`url(#${gid('g-b')})`} filter="url(#f-ring-grain)" opacity=".92" />
-            <circle className="poiv3_6__bevel" cx={geo.center} cy={geo.center} r={geo.medalRadius} fill={`url(#${gid('g-bv')})`} filter={isDragging ? undefined : "url(#f-dp)"} opacity=".48" />
+            <circle className="poiv3_7__body" cx={geo.center} cy={geo.center} r={geo.medalRadius} fill={`url(#${gid('g-b')})`} filter="url(#f-ring-grain)" opacity=".92" />
+            <circle className="poiv3_7__bevel" cx={geo.center} cy={geo.center} r={geo.medalRadius} fill={`url(#${gid('g-bv')})`} filter={isDragging ? undefined : "url(#f-dp)"} opacity=".48" />
 
             {/* L0.5: Milled outer rim */}
             <circle
               cx={geo.center} cy={geo.center} r={geo.medalRadius}
               fill="none" stroke={ringLight} strokeWidth="1.4"
               strokeDasharray="1.4 2.6" strokeLinecap="butt"
-              strokeOpacity={T6.ring.milledOpacity}
+              strokeOpacity={T7.ring.milledOpacity}
               filter={isDragging ? undefined : "url(#f-ring-hammered)"}
             />
             <circle
               cx={geo.center} cy={geo.center} r={geo.medalRadius}
               fill="none" stroke={ringMid} strokeWidth="1.4"
               strokeDasharray="2.6 1.4" strokeDashoffset="1.4" strokeLinecap="butt"
-              strokeOpacity={T6.ring.milledOpacity}
+              strokeOpacity={T7.ring.milledOpacity}
               filter={isDragging ? undefined : "url(#f-ring-hammered)"}
             />
 
             {/* L0.8: Metal glints on the ring */}
-            <g className="poiv3_6__glints">
-              {T6.ring.glints.map((glint, i) => (
+            <g className="poiv3_7__glints">
+              {T7.ring.glints.map((glint, i) => (
                 <ellipse
                   key={`glint-${i}`}
                   cx={glint.cx}
@@ -796,12 +844,12 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
             {/* L1.2: Inner AO on the ring body */}
             <circle
               cx={geo.center} cy={geo.center} r="34.5"
-              fill="none" stroke={`rgba(0,0,0,${T6.ring.aoOpacity})`} strokeWidth={T6.ring.aoWidth}
+              fill="none" stroke={`rgba(0,0,0,${T7.ring.aoOpacity})`} strokeWidth={T7.ring.aoWidth}
             />
 
             {/* L1.5: Outer glaze lip */}
             <circle
-              className="poiv3_6__glaze"
+              className="poiv3_7__glaze"
               cx={geo.center}
               cy={geo.center}
               r={geo.glazeRadius}
@@ -812,11 +860,11 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
 
             {/* L2: Rim top - arc of warm light */}
             <circle cx={geo.center} cy={geo.center} r="40.5" fill="none"
-              stroke={ringLight} strokeOpacity={T6.ring.rimLightOpacity} strokeWidth={T6.ring.rimLightWidth}
+              stroke={ringLight} strokeOpacity={T7.ring.rimLightOpacity} strokeWidth={T7.ring.rimLightWidth}
               strokeDasharray="108 148" strokeDashoffset="72"
               strokeLinecap="round" filter={isDragging ? undefined : "url(#f-gl)"} />
             <circle cx={geo.center} cy={geo.center} r="41" fill="none"
-              stroke={ringLight} strokeOpacity={T6.ring.rimLightThinOpacity} strokeWidth={T6.ring.rimLightThinWidth}
+              stroke={ringLight} strokeOpacity={T7.ring.rimLightThinOpacity} strokeWidth={T7.ring.rimLightThinWidth}
               strokeDasharray="76 178" strokeDashoffset="82"
               strokeLinecap="round" />
 
@@ -834,7 +882,7 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
             <circle cx={geo.center} cy={geo.center} r={geo.fieldRadius} fill={`url(#${gid('bounce')})`} />
 
             {/* L4.5: Engraved rim script */}
-            <g className="poiv3_6__rim">
+            <g className="poiv3_7__rim">
               {rimBand.map((g, i) => (
                 <g
                   key={`r-${i}`}
@@ -872,29 +920,29 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
             </g>
 
             {/* L5: Heraldic icon — V4-style composite mark */}
-            <g className="poiv3_6__cross" transform="translate(43 43) scale(0.9)">
+            <g className="poiv3_7__cross" transform="translate(43 43) scale(0.9)">
               {/* Shadow pass */}
-              {T6.icons[type].rings.map((ring, i) => (
+              {T7.icons[type].rings.map((ring, i) => (
                 <circle key={`ring-shadow-${i}`} r={ring.r} fill="none" stroke={`rgba(0,0,0,0.55)`} strokeWidth={ring.w} transform="translate(0.8 1)" />
               ))}
-              {T6.icons[type].steps.map((a) => (
-                <path key={`arm-shadow-${a}`} d={T6.icons[type].arm} fill="rgba(0,0,0,0.55)" transform={`rotate(${a}) translate(0.8 1)`} />
+              {T7.icons[type].steps.map((a) => (
+                <path key={`arm-shadow-${a}`} d={T7.icons[type].arm} fill="rgba(0,0,0,0.55)" transform={`rotate(${a}) translate(0.8 1)`} />
               ))}
-              {T6.icons[type].armShort && T6.icons[type].stepsShort?.map((a) => (
-                <path key={`short-shadow-${a}`} d={T6.icons[type].armShort as string} fill="rgba(0,0,0,0.55)" transform={`rotate(${a}) translate(0.8 1)`} />
+              {T7.icons[type].armShort && T7.icons[type].stepsShort?.map((a) => (
+                <path key={`short-shadow-${a}`} d={T7.icons[type].armShort as string} fill="rgba(0,0,0,0.55)" transform={`rotate(${a}) translate(0.8 1)`} />
               ))}
-              <circle r={T6.icons[type].boss} fill="rgba(0,0,0,0.55)" transform="translate(0.8 1)" />
+              <circle r={T7.icons[type].boss} fill="rgba(0,0,0,0.55)" transform="translate(0.8 1)" />
               {/* Main metal pass */}
-              {T6.icons[type].rings.map((ring, i) => (
-                <circle key={`ring-${i}`} r={ring.r} fill="none" stroke="#f0cf6a" strokeWidth={ring.w} />
+              {T7.icons[type].rings.map((ring, i) => (
+                <circle key={`ring-${i}`} r={ring.r} fill="none" stroke={`url(#${gid('icon-metal')})`} strokeWidth={ring.w} />
               ))}
-              {T6.icons[type].steps.map((a) => (
-                <path key={`arm-${a}`} d={T6.icons[type].arm} fill="#f0cf6a" transform={`rotate(${a})`} />
+              {T7.icons[type].steps.map((a) => (
+                <path key={`arm-${a}`} d={T7.icons[type].arm} fill={`url(#${gid('icon-metal')})`} transform={`rotate(${a})`} />
               ))}
-              {T6.icons[type].armShort && T6.icons[type].stepsShort?.map((a) => (
-                <path key={`short-${a}`} d={T6.icons[type].armShort as string} fill="#f0cf6a" transform={`rotate(${a})`} />
+              {T7.icons[type].armShort && T7.icons[type].stepsShort?.map((a) => (
+                <path key={`short-${a}`} d={T7.icons[type].armShort as string} fill={`url(#${gid('icon-metal')})`} transform={`rotate(${a})`} />
               ))}
-              <circle r={T6.icons[type].boss} fill="#f0cf6a" />
+              <circle r={T7.icons[type].boss} fill={`url(#${gid('icon-metal')})`} />
             </g>
 
             {/* Portrait rim - bronze ring */}
@@ -905,7 +953,7 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
               transform="translate(.28,.35)" />
 
             {/* L6: Glass - V4 single sheet with specular */}
-            <g className="poiv3_6__glass">
+            <g className="poiv3_7__glass">
               <circle
                 cx={geo.center}
                 cy={geo.center}
@@ -917,7 +965,7 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
               />
               <circle cx={geo.center} cy={geo.center} r={geo.glassRadius} fill={`url(#${gid('glass')})`} />
               <ellipse
-                className="poiv3_6__specular"
+                className="poiv3_7__specular"
                 cx="31"
                 cy="23"
                 rx="11"
@@ -961,53 +1009,53 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
       </div>
 
       {/* GEM - absolutely positioned below medal center */}
-      <div className="poiv3_6__gem" style={{ position: 'absolute', left: '50%', bottom: '-14px', transform: 'translateX(-50%)', zIndex: 5, pointerEvents: 'none' }}>
+      <div className="poiv3_7__gem" style={{ position: 'absolute', left: '50%', bottom: '-14px', transform: 'translateX(-50%)', zIndex: 5, pointerEvents: 'none' }}>
         <svg width="40" height="32" viewBox="-20 -14 40 32" xmlns="http://www.w3.org/2000/svg" overflow="visible">
           <defs>
-            <linearGradient id="g2-b" x1="14%" y1="4%" x2="86%" y2="96%">
+            <linearGradient id={gid('gem-b')} x1="14%" y1="4%" x2="86%" y2="96%">
               <stop offset="0%" stopColor="#fce890" /><stop offset="9%" stopColor="#e4b048" />
               <stop offset="28%" stopColor="#a05c18" /><stop offset="52%" stopColor="#602c08" />
               <stop offset="76%" stopColor="#341604" /><stop offset="100%" stopColor="#0e0602" />
             </linearGradient>
-            <linearGradient id="g2-ri" x1="12%" y1="8%" x2="88%" y2="92%">
+            <linearGradient id={gid('gem-ri')} x1="12%" y1="8%" x2="88%" y2="92%">
               <stop offset="0%" stopColor="#f0d070" /><stop offset="16%" stopColor="#c88430" />
               <stop offset="46%" stopColor="#7c3e10" /><stop offset="80%" stopColor="#3c1c04" />
               <stop offset="100%" stopColor="#160a02" />
             </linearGradient>
-            <linearGradient id="g2-top" x1="30%" y1="0%" x2="70%" y2="100%">
+            <linearGradient id={gid('gem-top')} x1="30%" y1="0%" x2="70%" y2="100%">
               <stop offset="0%" stopColor="#d8ffd8" /><stop offset="40%" stopColor="#72ee82" />
               <stop offset="100%" stopColor="#1a7830" />
             </linearGradient>
-            <linearGradient id="g2-lu" x1="0%" y1="20%" x2="100%" y2="80%">
+            <linearGradient id={gid('gem-lu')} x1="0%" y1="20%" x2="100%" y2="80%">
               <stop offset="0%" stopColor="#58d868" /><stop offset="100%" stopColor="#0e5c20" />
             </linearGradient>
-            <linearGradient id="g2-ru" x1="100%" y1="20%" x2="0%" y2="80%">
+            <linearGradient id={gid('gem-ru')} x1="100%" y1="20%" x2="0%" y2="80%">
               <stop offset="0%" stopColor="#88ee98" /><stop offset="100%" stopColor="#1a6828" />
             </linearGradient>
-            <linearGradient id="g2-ll" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id={gid('gem-ll')} x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#1a6828" /><stop offset="100%" stopColor="#083c14" />
             </linearGradient>
-            <linearGradient id="g2-rl" x1="100%" y1="0%" x2="0%" y2="100%">
+            <linearGradient id={gid('gem-rl')} x1="100%" y1="0%" x2="0%" y2="100%">
               <stop offset="0%" stopColor="#2a8838" /><stop offset="100%" stopColor="#0a4818" />
             </linearGradient>
-            <linearGradient id="g2-bot" x1="30%" y1="0%" x2="70%" y2="100%">
+            <linearGradient id={gid('gem-bot')} x1="30%" y1="0%" x2="70%" y2="100%">
               <stop offset="0%" stopColor="#0e5020" /><stop offset="100%" stopColor="#042810" />
             </linearGradient>
-            <radialGradient id="g2-caus" cx="68%" cy="72%" r="44%">
+            <radialGradient id={gid('gem-caus')} cx="68%" cy="72%" r="44%">
               <stop offset="0%" stopColor="rgba(140,255,160,.30)" /><stop offset="100%" stopColor="rgba(80,220,100,0)" />
             </radialGradient>
-            <radialGradient id="g2-flash" cx="32%" cy="22%" r="28%">
+            <radialGradient id={gid('gem-flash')} cx="32%" cy="22%" r="28%">
               <stop offset="0%" stopColor="rgba(255,255,255,.88)" /><stop offset="50%" stopColor="rgba(255,255,255,.26)" />
               <stop offset="100%" stopColor="rgba(255,255,255,0)" />
             </radialGradient>
-            <radialGradient id="g2-glow" cx="50%" cy="50%" r="50%">
+            <radialGradient id={gid('gem-glow')} cx="50%" cy="50%" r="50%">
               <stop offset="0%" stopColor="rgba(58,215,80,.32)" /><stop offset="100%" stopColor="rgba(38,180,60,0)" />
             </radialGradient>
-            <radialGradient id="g2-ao" cx="50%" cy="50%" r="50%">
+            <radialGradient id={gid('gem-ao')} cx="50%" cy="50%" r="50%">
               <stop offset="55%" stopColor="rgba(0,0,0,0)" /><stop offset="80%" stopColor="rgba(0,0,0,.52)" />
               <stop offset="100%" stopColor="rgba(0,0,0,.86)" />
             </radialGradient>
-            <filter id="g2-fn" x="-30%" y="-30%" width="160%" height="160%">
+            <filter id={gid('gem-fn')} x="-30%" y="-30%" width="160%" height="160%">
               <feTurbulence type="fractalNoise" baseFrequency="0.52" numOctaves={4} seed="3" stitchTiles="stitch" result="n" />
               <feColorMatrix in="n" type="matrix" values="0 0 0 0 .068  0 0 0 0 .046  0 0 0 0 .021  0 0 0 .25 0" result="c" />
               <feBlend in="SourceGraphic" in2="c" mode="overlay" />
@@ -1015,33 +1063,33 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
           </defs>
 
           {/* Glow */}
-          <ellipse cx="0" cy="0" rx="10" ry="8" fill="url(#g2-glow)" style={{ filter: 'blur(3.5px)' }} />
+          <ellipse cx="0" cy="0" rx="10" ry="8" fill={`url(#${gid('gem-glow')})`} style={{ filter: 'blur(3.5px)' }} />
 
           {/* 6 claws */}
-          <path d="M-1,-9.5 C-.7,-8 -.5,-6.5 -.8,-5.2 C-.5,-4.5 0,-4.2 .8,-5.2 C.5,-6.5 .7,-8 1,-9.5 C.5,-10.2 -.5,-10.2 -1,-9.5 Z" fill="url(#g2-b)" filter="url(#g2-fn)" opacity=".92" />
-          <path d="M7.2,-5.5 C6,-4.5 5.4,-3.6 4.8,-2.6 C5.1,-2 5.8,-1.8 6.5,-2.6 C7,-3.6 7.5,-4.5 8.2,-5.3 C7.6,-6.2 6.8,-6 7.2,-5.5 Z" fill="url(#g2-b)" filter="url(#g2-fn)" opacity=".90" />
-          <path d="M7.2,5.5 C6,4.5 5.4,3.6 4.8,2.6 C5.1,2 5.8,1.8 6.5,2.6 C7,3.6 7.5,4.5 8.2,5.3 C7.6,6.2 6.8,6 7.2,5.5 Z" fill="url(#g2-b)" filter="url(#g2-fn)" opacity=".90" />
-          <path d="M-1,9.5 C-.7,8 -.5,6.5 -.8,5.2 C-.5,4.5 0,4.2 .8,5.2 C.5,6.5 .7,8 1,9.5 C.5,10.2 -.5,10.2 -1,9.5 Z" fill="url(#g2-b)" filter="url(#g2-fn)" opacity=".88" />
-          <path d="M-7.2,5.5 C-6,4.5 -5.4,3.6 -4.8,2.6 C-5.1,2 -5.8,1.8 -6.5,2.6 C-7,3.6 -7.5,4.5 -8.2,5.3 C-7.6,6.2 -6.8,6 -7.2,5.5 Z" fill="url(#g2-b)" filter="url(#g2-fn)" opacity=".90" />
-          <path d="M-7.2,-5.5 C-6,-4.5 -5.4,-3.6 -4.8,-2.6 C-5.1,-2 -5.8,-1.8 -6.5,-2.6 C-7,-3.6 -7.5,-4.5 -8.2,-5.3 C-7.6,-6.2 -6.8,-6 -7.2,-5.5 Z" fill="url(#g2-b)" filter="url(#g2-fn)" opacity=".90" />
+          <path d="M-1,-9.5 C-.7,-8 -.5,-6.5 -.8,-5.2 C-.5,-4.5 0,-4.2 .8,-5.2 C.5,-6.5 .7,-8 1,-9.5 C.5,-10.2 -.5,-10.2 -1,-9.5 Z" fill={`url(#${gid('gem-b')})`} filter={`url(#${gid('gem-fn')})`} opacity=".92" />
+          <path d="M7.2,-5.5 C6,-4.5 5.4,-3.6 4.8,-2.6 C5.1,-2 5.8,-1.8 6.5,-2.6 C7,-3.6 7.5,-4.5 8.2,-5.3 C7.6,-6.2 6.8,-6 7.2,-5.5 Z" fill={`url(#${gid('gem-b')})`} filter={`url(#${gid('gem-fn')})`} opacity=".90" />
+          <path d="M7.2,5.5 C6,4.5 5.4,3.6 4.8,2.6 C5.1,2 5.8,1.8 6.5,2.6 C7,3.6 7.5,4.5 8.2,5.3 C7.6,6.2 6.8,6 7.2,5.5 Z" fill={`url(#${gid('gem-b')})`} filter={`url(#${gid('gem-fn')})`} opacity=".90" />
+          <path d="M-1,9.5 C-.7,8 -.5,6.5 -.8,5.2 C-.5,4.5 0,4.2 .8,5.2 C.5,6.5 .7,8 1,9.5 C.5,10.2 -.5,10.2 -1,9.5 Z" fill={`url(#${gid('gem-b')})`} filter={`url(#${gid('gem-fn')})`} opacity=".88" />
+          <path d="M-7.2,5.5 C-6,4.5 -5.4,3.6 -4.8,2.6 C-5.1,2 -5.8,1.8 -6.5,2.6 C-7,3.6 -7.5,4.5 -8.2,5.3 C-7.6,6.2 -6.8,6 -7.2,5.5 Z" fill={`url(#${gid('gem-b')})`} filter={`url(#${gid('gem-fn')})`} opacity=".90" />
+          <path d="M-7.2,-5.5 C-6,-4.5 -5.4,-3.6 -4.8,-2.6 C-5.1,-2 -5.8,-1.8 -6.5,-2.6 C-7,-3.6 -7.5,-4.5 -8.2,-5.3 C-7.6,-6.2 -6.8,-6 -7.2,-5.5 Z" fill={`url(#${gid('gem-b')})`} filter={`url(#${gid('gem-fn')})`} opacity=".90" />
 
           {/* Base ring */}
-          <circle cx="0" cy="0" r="6.2" fill="none" stroke="url(#g2-ri)" strokeWidth="1.4" filter="url(#g2-fn)" opacity=".80" />
+          <circle cx="0" cy="0" r="6.2" fill="none" stroke={`url(#${gid('gem-ri')})`} strokeWidth="1.4" filter={`url(#${gid('gem-fn')})`} opacity=".80" />
           <circle cx="0" cy="0" r="6.2" fill="none" stroke="rgba(0,0,0,.65)" strokeWidth="1.6" transform="translate(.2,.3)" />
           <circle cx="0" cy="0" r="5.8" fill="none" stroke="rgba(255,218,110,.18)" strokeWidth=".6" />
 
           {/* Gem bed */}
           <ellipse cx="0" cy="0" rx="5.2" ry="6.6" fill="#060402" />
-          <ellipse cx="0" cy="0" rx="5.2" ry="6.6" fill="url(#g2-ao)" />
+          <ellipse cx="0" cy="0" rx="5.2" ry="6.6" fill={`url(#${gid('gem-ao')})`} />
 
           {/* Facets marquise */}
-          <polygon points="0,-6.5 -4.2,0 0,6.5" fill="url(#g2-ll)" opacity=".88" />
-          <polygon points="0,-6.5  4.2,0 0,6.5" fill="url(#g2-rl)" opacity=".88" />
-          <polygon points="-2.2,3.5 2.2,3.5 0,6.5" fill="url(#g2-bot)" opacity=".95" />
-          <polygon points="0,-6.5 -2.8,-2.8 0,-1.4 2.8,-2.8" fill="url(#g2-top)" opacity=".95" />
-          <polygon points="0,-6.5 -4.2,0 -2.8,-2.8" fill="url(#g2-lu)" opacity=".90" />
-          <polygon points="0,-6.5  4.2,0  2.8,-2.8" fill="url(#g2-ru)" opacity=".90" />
-          <polygon points="-2.8,-2.8 0,-1.4 2.8,-2.8 4.2,0 0,2.2 -4.2,0" fill="url(#g2-top)" opacity=".85" />
+          <polygon points="0,-6.5 -4.2,0 0,6.5" fill={`url(#${gid('gem-ll')})`} opacity=".88" />
+          <polygon points="0,-6.5  4.2,0 0,6.5" fill={`url(#${gid('gem-rl')})`} opacity=".88" />
+          <polygon points="-2.2,3.5 2.2,3.5 0,6.5" fill={`url(#${gid('gem-bot')})`} opacity=".95" />
+          <polygon points="0,-6.5 -2.8,-2.8 0,-1.4 2.8,-2.8" fill={`url(#${gid('gem-top')})`} opacity=".95" />
+          <polygon points="0,-6.5 -4.2,0 -2.8,-2.8" fill={`url(#${gid('gem-lu')})`} opacity=".90" />
+          <polygon points="0,-6.5  4.2,0  2.8,-2.8" fill={`url(#${gid('gem-ru')})`} opacity=".90" />
+          <polygon points="-2.8,-2.8 0,-1.4 2.8,-2.8 4.2,0 0,2.2 -4.2,0" fill={`url(#${gid('gem-top')})`} opacity=".85" />
 
           {/* Facet lines */}
           <line x1="0" y1="-6.5" x2="-4.2" y2="0" stroke="rgba(255,255,255,.28)" strokeWidth=".4" />
@@ -1053,8 +1101,8 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
           <line x1="0"    y1="2.2"  x2="4.2"  y2="0" stroke="rgba(0,0,0,.16)" strokeWidth=".35" />
           <line x1="0"    y1="2.2"  x2="0"    y2="6.5" stroke="rgba(0,0,0,.24)" strokeWidth=".35" />
 
-          <ellipse cx="0" cy="0" rx="5.2" ry="6.6" fill="url(#g2-caus)" />
-          <ellipse cx="0" cy="0" rx="5.2" ry="6.6" fill="url(#g2-flash)" />
+          <ellipse cx="0" cy="0" rx="5.2" ry="6.6" fill={`url(#${gid('gem-caus')})`} />
+          <ellipse cx="0" cy="0" rx="5.2" ry="6.6" fill={`url(#${gid('gem-flash')})`} />
           <ellipse cx="0" cy="0" rx="5.2" ry="6.6" fill="rgba(50,210,75,.0)">
             <animate attributeName="rx" values="6.5;9;6.5" dur="3.2s" repeatCount="indefinite" />
             <animate attributeName="ry" values="8.5;12;8.5" dur="3.2s" repeatCount="indefinite" />
@@ -1067,31 +1115,48 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
   );
 };
 
-export const poiMatericV3_6Styles = `
-.poiv3_6 {
+export const poiMatericV3_7Styles = `
+@keyframes poiv3_7-pulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.03);
+    opacity: 0.85;
+  }
+}
+
+.poiv3_7 {
   position: relative;
   display: inline-flex;
   cursor: pointer;
   overflow: visible;
   border-radius: 50%;
 }
-.poiv3_6__svg { position: relative; width: 100%; height: 100%; overflow: visible; z-index: 4; }
-.poiv3_6__seal { filter: url(#f-glow); opacity: 0.85; }
-.poiv3_6__medal { filter: url(#f-glow); }
-.poiv3_6--burst .poiv3_6__seal { opacity: 1; filter: url(#f-glow) drop-shadow(0 0 24px rgba(var(--poi-accent-rgb),0.55)); }
-.poiv3_6--burst .poiv3_6__medal { filter: url(#f-glow) drop-shadow(0 0 28px rgba(var(--poi-accent-rgb),0.35)); }
-.poiv3_6__body { }
-.poiv3_6__bevel { transition: filter 250ms ease; }
-.poiv3_6__glints { pointer-events: none; }
-.poiv3_6:hover .poiv3_6__bevel { filter: brightness(1.2); }
-.poiv3_6__cross { transition: filter 250ms ease; }
-.poiv3_6:hover .poiv3_6__cross { filter: contrast(1.15) brightness(1.15); }
-.poiv3_6__glass { transition: opacity 250ms ease; }
-.poiv3_6:hover .poiv3_6__glass { opacity: 1; }
-.poiv3_6__gem { transition: transform 250ms ease, filter 250ms ease; }
-.poiv3_6:hover .poiv3_6__gem { transform: translateX(-50%) scale(1.08); filter: brightness(1.15); }
-.poiv3_6__specular { transition: transform 80ms ease-out; }
-.poiv3_6__vignette {
+.poiv3_7__svg { position: relative; width: 100%; height: 100%; overflow: visible; z-index: 4; }
+.poiv3_7__seal { filter: url(#f-glow); opacity: 0.85; }
+.poiv3_7__medal { filter: url(#f-glow); }
+.poiv3_7--burst .poiv3_7__seal { opacity: 1; filter: url(#f-glow) drop-shadow(0 0 24px rgba(var(--poi-accent-rgb),0.55)); }
+.poiv3_7--burst .poiv3_7__medal { filter: url(#f-glow) drop-shadow(0 0 28px rgba(var(--poi-accent-rgb),0.35)); }
+.poiv3_7__body { }
+.poiv3_7__bevel { transition: filter 250ms ease; }
+.poiv3_7__glints { pointer-events: none; }
+.poiv3_7:hover .poiv3_7__bevel { filter: brightness(1.2); }
+.poiv3_7__cross { transition: filter 250ms ease; }
+.poiv3_7:hover .poiv3_7__cross { filter: contrast(1.15) brightness(1.15); }
+.poiv3_7__glass { transition: opacity 250ms ease; }
+.poiv3_7:hover .poiv3_7__glass { opacity: 1; }
+.poiv3_7__gem { transition: transform 250ms ease, filter 250ms ease; }
+.poiv3_7:hover .poiv3_7__gem { transform: translateX(-50%) scale(1.08); filter: brightness(1.15); }
+.poiv3_7__specular { transition: transform 80ms ease-out; }
+.poiv3_7__halo {
+  transition: opacity 250ms ease;
+}
+.poiv3_7[data-state="new"] .poiv3_7__halo {
+  animation: poiv3_7-pulse 1s ease-in-out infinite;
+}
+.poiv3_7__vignette {
   position: absolute;
   left: 50%;
   top: 50%;
@@ -1103,7 +1168,7 @@ export const poiMatericV3_6Styles = `
   z-index: 0;
   opacity: 0;
 }
-.poiv3_6__fog {
+.poiv3_7__fog {
   position: absolute;
   left: 50%;
   top: 50%;
@@ -1121,5 +1186,4 @@ export const poiMatericV3_6Styles = `
 }
 `;
 
-
-export default PoiMatericV3_6;
+export default PoiMatericV3_7;

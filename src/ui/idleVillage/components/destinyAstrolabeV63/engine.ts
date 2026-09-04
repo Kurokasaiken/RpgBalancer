@@ -9,7 +9,7 @@
 
 import { tarGooConfig } from '@/balancing/config/idleVillage/tarGooConfig';
 import { buildSnapshot } from '@/ui/skillCheckWebV1/zones';
-import { solveShapeReported, rHeroNarrowAt } from '@/ui/skillCheckWebV1/coverage';
+import { solveShapeReported, rHeroNarrowAt, solveCoreRadius, solveOuterBands, solveGooBand, reachArea } from '@/ui/skillCheckWebV1/coverage';
 import { createTarGooRenderer } from './tarGooRenderer';
 import { rng32, createTentacles, tickPose, buildBlobs, poolFraction,
          SAMPLES_PER_ARM } from './tentacles';
@@ -50,7 +50,7 @@ export function createDestinyAstrolabeV63Engine(root: HTMLElement, opts: Astrola
    CONFIG — bound to the tweak panel
    ========================================================================= */
 /* config + skills injected by the React host */
-const cfg=Object.assign({stat:60,req:55,crit:5,wound:10,dead:5,tSlam:tarGooConfig.timing.seedMs,tBurst:1100,tPour:720,tSpin:2600,tSnap:650,mode:'random'}, opts.config||{});
+const cfg=Object.assign({stat:60,req:55,crit:5,bigwin:5,almost:5,epicfail:5,wound:10,dead:5,tSlam:tarGooConfig.timing.seedMs,tBurst:1100,tPour:720,tSpin:2600,tSnap:650,mode:'random'}, opts.config||{});
 let skills=(opts.skills&&opts.skills.length)?opts.skills.slice():[{name:'Skill',stat:60,difficulty:50}];
 let skillAxes=[];
 function recomputeSkillAxes(){
@@ -74,8 +74,11 @@ const geo={
   tst:55,            // target success threshold
   rTip:200,          // star tip radius  (∝ TST)
   rValley:90,
-  rCore:46,          // 12-layer core ring (Big Win)
-  epicW:14,          // epic-fail outer band thickness (∝ crit%)
+  rCore:46,          // 12-layer core ring (Big Win) — now area-proportional
+  almostFactor:0.08, // almost band as fraction beyond rStar (area-proportional)
+  epicW:14,          // epic-fail outer band thickness (∝ crit%) — kept as px fallback
+  epicFactor:0.08,   // epic-fail as fraction of rCheck (area-proportional)
+  woundFactor:0.08,  // wound band as fraction of rCheck (area-proportional)
   axisTip:[200,200,200,200,200],    // per-axis star tip radius (white obelisk = stat)
   axisCheck:[300,300,300,300,300],  // per-axis failure inner radius (black obelisk = check)
   axisSkill:[0,0,0,0,0],
@@ -210,37 +213,29 @@ function recomputeGeometry(skillIndex=0){
      La logica concordata: lo spessore si RISOLVE perche' l'AREA sia la
      percentuale voluta, e la base e' l'AREA DI TIRO — l'arena meno il raggio
      della pallina, perche' il centro della pallina non arriva piu' in la'. */
+  /* PROBABILITA' = AREE — solver condivisi con la V15.
+     Ogni banda (core, almost, epic, wound) viene risolta in modo che la sua
+     area all'interno dell'arena di tiro corrisponda alla percentuale di
+     probabilità richiesta. */
   {
-    const SEG=720, dA=TAU/SEG, BALL_R=9;
-    const wallAt=a=>rCheckAt(a,1);
-    const reachAt=a=>Math.max(0,wallAt(a)-BALL_R);
-    let reachA=0;
-    for(let i=0;i<SEG;i+=1){ const r=reachAt(-Math.PI/2+i*dA); reachA+=0.5*r*r*dA; }
-    /* area di una fascia di spessore `w` verso l'interno da un profilo */
-    const bandArea=(outer,w)=>{
-      let s=0;
-      for(let i=0;i<SEG;i+=1){
-        const a=-Math.PI/2+i*dA;
-        const r1=outer(a), r0=Math.max(geo.rCore,r1-w);
-        s+=0.5*(r1*r1-r0*r0)*dA;
-      }
-      return s;
-    };
-    const solveW=(outer,pct)=>{
-      const want=reachA*clamp(pct,0,60)/100;
-      let lo=0,hi=R;
-      for(let k=0;k<40;k+=1){ const m=(lo+hi)/2; if(bandArea(outer,m)<want) lo=m; else hi=m; }
-      return (lo+hi)/2;
-    };
-    geo.epicW=solveW(reachAt,cfg.crit);
-    geo.woundW=solveW(reachAt,cfg.wound);
+    const big=cfg.bigwin||cfg.crit||5;
+    const almost=cfg.almost||5;
+    const epic=cfg.epicfail||cfg.crit||5;
+    const minStar=Math.min(...Array.from({length:720},(_,i)=>rStarAt(-Math.PI/2+i*(TAU/720))));
+    geo.rCore=Math.min(minStar, solveCoreRadius(geo.snap, big));
+    const [eAlmost]=solveOuterBands(geo.snap, rStarAt, [almost], 1440);
+    geo.almostFactor=eAlmost;
+    geo.epicFactor=solveGooBand(geo.snap, epic, 1440);
+    geo.woundFactor=solveGooBand(geo.snap, cfg.wound, 1440);
+    geo.epicW=geo.epicFactor*R; // mantenuto in px per i target di debug
     /* la morte e' una striscia appena FUORI dal bordo della stella: cresce
        verso l'esterno, quindi si risolve sull'altro verso */
     {
-      const want=reachA*clamp(cfg.dead,0,60)/100;
+      const want=reachArea(geo.snap,1440)*clamp(cfg.dead,0,60)/100;
       const outward=w=>{
         let s=0;
-        for(let i=0;i<SEG;i+=1){
+        const dA=TAU/1440, wallAt=a=>rCheckAt(a,1);
+        for(let i=0;i<1440;i+=1){
           const a=-Math.PI/2+i*dA;
           const r0=Math.min(rStarAt(a),wallAt(a));
           const r1=Math.min(r0+w,wallAt(a));
@@ -249,7 +244,7 @@ function recomputeGeometry(skillIndex=0){
         return s;
       };
       let lo=0,hi=R;
-      for(let k=0;k<40;k+=1){ const m=(lo+hi)/2; if(outward(m)<want) lo=m; else hi=m; }
+      for(let k=0;k<44;k+=1){ const m=(lo+hi)/2; if(outward(m)<want) lo=m; else hi=m; }
       geo.deathDepth=(lo+hi)/2;
     }
   }
@@ -312,12 +307,12 @@ const angOf=(x,y)=>Math.atan2(y-CY,x-CX);
    l'area che l'occhio misura è esattamente quella che spatialVerdict risolve. */
 const inStar=(x,y,s=1)=>{const a=angOf(x,y);return dist(x,y)<=Math.min(rStarAt(a,s),rCheckAt(a));};
 const inCore=(x,y)=>dist(x,y)<=geo.rCore;
-/* almost = thin margin just past the flower (success edge) */
-const inAlmost=(x,y)=>{const a=angOf(x,y),d=dist(x,y),rs=rStarAt(a);return d>rs&&d<=rs+ALMOST_W;};
+/* almost = proportional margin just past the flower (success edge) */
+const inAlmost=(x,y)=>{const a=angOf(x,y),d=dist(x,y),rs=rStarAt(a);return d>rs&&d<=rs*(1+geo.almostFactor);};
 /* critical failure = the BORDER of the goo (its outermost band, against the wall) */
-const inEpic=(x,y)=>{const a=angOf(x,y),d=dist(x,y),e=rCheckAt(a);return d>e-geo.epicW&&d<=e;};
+const inEpic=(x,y)=>{const a=angOf(x,y),d=dist(x,y),e=rCheckAt(a);return d>e*(1-geo.epicFactor)&&d<=e;};
 /* FERITA zone: outer band of goo (just inside goo edge), proportional to wound% */
-const inWoundZone=(x,y)=>{const a=angOf(x,y),d=dist(x,y),starR=rStarAt(a);if(d<=starR)return false;const e=rCheckAt(a);return d>=e-geo.woundW&&d<=e;};
+const inWoundZone=(x,y)=>{const a=angOf(x,y),d=dist(x,y),starR=rStarAt(a);if(d<=starR)return false;const e=rCheckAt(a);return d>=e*(1-geo.woundFactor)&&d<=e;};
 /* MORTE zone: strip just outside star edge in valley directions, proportional to dead% */
 const inDeathZone=(x,y)=>{const a=angOf(x,y),d=dist(x,y),starR=rStarAt(a);if(d<=starR)return false;return d<=starR+geo.deathDepth;};
 
@@ -452,7 +447,7 @@ function v63Star(){
 function v63Backdrop(){
   const set=tarGooConfig.v63.backdrops;
   let nome=tarGooConfig.v63.backdrop;
-  if(cfg.bgVariant==='mercury' && set.deepTeal) nome='deepTeal';
+  if(cfg.bgVariant==='mercury' && set.smoke) nome='smoke';
   if(cfg.bgVariant==='pergamena' && set.pergamenaScura) nome='pergamenaScura';
   try{
     const q=new URLSearchParams(window.location.search).get('bg');
@@ -659,20 +654,23 @@ function computeTargetPos(){
   }
   if(mode==='almost'){
     const a=TIP(2)+0.1;
-    const r=rStarAt(a)+ALMOST_W*0.5;
+    const starR=rStarAt(a);
+    const r=starR+starR*geo.almostFactor*0.5;
     return {x:CX+Math.cos(a)*r,y:CY+Math.sin(a)*r};
   }
   if(mode==='fail'){
     const a=TIP(1)+Math.PI/AXES;
     const starR=rStarAt(a), checkR=rCheckAt(a);
-    const r=starR+(checkR-starR)*0.5;
+    const almostR=starR*(1+geo.almostFactor);
+    const epicR=checkR*(1-geo.epicFactor);
+    const r=almostR+(epicR-almostR)*0.5;
     return {x:CX+Math.cos(a)*r,y:CY+Math.sin(a)*r};
   }
   if(mode==='fail_wound'){
     /* outer band of failure gap near goo edge */
     const a=TIP(0)+0.22;
     const checkR=rCheckAt(a);
-    const r=Math.max(geo.rCore+40, checkR-geo.woundW*0.4);
+    const r=checkR*(1-geo.woundFactor*0.4);
     return {x:CX+Math.cos(a)*r,y:CY+Math.sin(a)*r};
   }
   if(mode==='fail_dead'){
@@ -685,7 +683,7 @@ function computeTargetPos(){
   if(mode==='epicfail'){
     const a=TIP(3)+0.3;
     const checkR=rCheckAt(a);
-    const r=Math.max(geo.rCore+30,checkR-geo.epicW*0.4);
+    const r=checkR*(1-geo.epicFactor*0.6);
     return {x:CX+Math.cos(a)*r,y:CY+Math.sin(a)*r};
   }
   return null;
@@ -700,11 +698,14 @@ function pickSkillIndex(outcomeRoll){
 function outcomeToVerdict(outcomeRoll, skillIndex){
   const sk=skills[skillIndex]||{stat:60,difficulty:50};
   const tst=clamp(50+(sk.stat-sk.difficulty),1,99);
-  if(outcomeRoll<=cfg.crit) return 'bigwin';
+  const big=cfg.bigwin||cfg.crit||5;
+  const almost=cfg.almost||5;
+  const epic=cfg.epicfail||cfg.crit||5;
+  if(outcomeRoll<=big) return 'bigwin';
   if(outcomeRoll<=tst) return 'win';
   // 'almost' band lives between win and epic-fail, never overlapping it
-  const epicThreshold=100-cfg.crit;
-  const almostBand=clamp(15,1,Math.max(1,epicThreshold-tst));
+  const epicThreshold=100-epic;
+  const almostBand=clamp(almost,1,Math.max(1,epicThreshold-tst));
   if(outcomeRoll<=tst+almostBand) return 'almost';
   // critical fail band
   if(outcomeRoll>epicThreshold) return 'epicfail';
@@ -723,18 +724,19 @@ function computeLanding(skillIndex, verdict, dead, wounded){
   }else if(verdict==='win'){
     r=geo.rCore+Math.random()*Math.max(0,rStarAt(ang)-geo.rCore);
   }else if(verdict==='almost'){
-    r=rStarAt(ang)+Math.random()*ALMOST_W;
-  }else if(verdict==='fail'){
     const starR=rStarAt(ang);
+    r=starR+Math.random()*starR*geo.almostFactor;
+  }else if(verdict==='fail'){
+    const starR=rStarAt(ang), almostR=starR*(1+geo.almostFactor), epicR=checkR*(1-geo.epicFactor);
     if(dead){
       r=starR+Math.random()*Math.max(0,geo.deathDepth);
     }else if(wounded){
-      r=Math.max(geo.rCore+40, checkR-Math.random()*geo.woundW);
+      r=Math.max(geo.rCore+40, checkR*(1-Math.random()*geo.woundFactor));
     }else{
-      r=starR+ALMOST_W+Math.random()*Math.max(0,checkR-geo.epicW-starR-ALMOST_W);
+      r=almostR+Math.random()*Math.max(0,epicR-almostR);
     }
   }else if(verdict==='epicfail'){
-    r=Math.max(geo.rCore+30, checkR-geo.epicW+Math.random()*geo.epicW);
+    r=checkR*(1-geo.epicFactor+Math.random()*geo.epicFactor);
   }
   r=clamp(r,0,Math.max(0,checkR-BALL_R));
   return { x:CX+Math.cos(ang)*r, y:CY+Math.sin(ang)*r, ang, r };
@@ -1242,7 +1244,7 @@ function drawBackdrop(now){
      sovrascrive per poter confrontare senza ricompilare. */
   const bd=v63Backdrop();
   ctx.save();
-  const backdropRadius=R*1.0;
+  const backdropRadius=R*1.15;
   const _bg=ctx.createRadialGradient(CX,CY,0,CX,CY,backdropRadius*1.03);
   _bg.addColorStop(0,bd.inner);
   _bg.addColorStop(1,bd.outer);

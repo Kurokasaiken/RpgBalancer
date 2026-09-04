@@ -33,7 +33,7 @@
 .destiny-astrolabe .scene-col{flex:none;min-height:90vh;}
 .destiny-astrolabe .panel-col{flex:none;height:auto;border-left:none;border-top:1px solid var(--panel-line);}
 }
-.destiny-astrolabe .stage{position:relative;width:min(75vh,82%);aspect-ratio:1/1;
+.destiny-astrolabe .stage{position:relative;width:min(75vh,82%);aspect-ratio:1/1;transform:scale(0.85);transform-origin:center center;
   /* V6: nessuna ombra che crea un quadrato di clipping sotto il ring */
   filter:none;}
 /* V6: al posto della ghiera V1, un solo bezel circolare spesso — NMM ladder
@@ -51,7 +51,7 @@
 }
 
 @keyframes sheenspin{to{transform:rotate(360deg)}}
-.destiny-astrolabe .arena{position:absolute;inset:6.8%;border-radius:50%;overflow:hidden;isolation:isolate;
+.destiny-astrolabe .arena{position:absolute;inset:3.2%;border-radius:50%;overflow:hidden;isolation:isolate;
   background:#02020b;
   box-shadow:inset 0 0 90px rgba(0,16,24,.55), inset 0 0 28px rgba(0,40,50,.14);
   transition:filter .9s ease;}
