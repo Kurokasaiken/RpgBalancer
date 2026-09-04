@@ -943,6 +943,48 @@ export const PoiMatericV3_7: React.FC<PoiMatericV3_7Props> = ({
                 <path key={`short-${a}`} d={T7.icons[type].armShort as string} fill={`url(#${gid('icon-metal')})`} transform={`rotate(${a})`} />
               ))}
               <circle r={T7.icons[type].boss} fill={`url(#${gid('icon-metal')})`} />
+              {/* Specular lip: rim light that says "sculpted metal" */}
+              <g transform="translate(-0.4 -0.5)" opacity="0.45">
+                {T7.icons[type].rings.map((ring, i) => (
+                  <circle
+                    key={`lip-ring-${i}`}
+                    r={ring.r}
+                    fill="none"
+                    stroke={metalLight}
+                    strokeOpacity="0.35"
+                    strokeWidth="0.4"
+                  />
+                ))}
+                {T7.icons[type].steps.map((a) => (
+                  <path
+                    key={`lip-arm-${a}`}
+                    d={T7.icons[type].arm}
+                    fill="none"
+                    stroke={metalLight}
+                    strokeOpacity="0.45"
+                    strokeWidth="0.4"
+                    transform={`rotate(${a})`}
+                  />
+                ))}
+                {T7.icons[type].armShort && T7.icons[type].stepsShort?.map((a) => (
+                  <path
+                    key={`lip-short-${a}`}
+                    d={T7.icons[type].armShort as string}
+                    fill="none"
+                    stroke={metalLight}
+                    strokeOpacity="0.40"
+                    strokeWidth="0.4"
+                    transform={`rotate(${a})`}
+                  />
+                ))}
+                <circle
+                  r={T7.icons[type].boss}
+                  fill="none"
+                  stroke={metalLight}
+                  strokeOpacity="0.35"
+                  strokeWidth="0.4"
+                />
+              </g>
             </g>
 
             {/* Portrait rim - bronze ring */}
