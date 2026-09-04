@@ -175,6 +175,11 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
   const accent = 'rgb(240, 207, 106)';
   const { r, g: greenCh, b } = { r: 240, g: 207, b: 106 };
   const rgba = (a: number) => `rgba(${r}, ${greenCh}, ${b}, ${a})`;
+
+  const fieldBackgroundGradient = useMemo(() => {
+    const backgrounds = T6.fieldBackgrounds as Record<string, [string, string]>;
+    return backgrounds[type] || backgrounds.wilderness;
+  }, [type]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rimAngleTargetRef = useRef(0);
   const rimIntensityRef = useRef(0);
@@ -513,10 +518,10 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
               <stop offset="100%" stopColor={ringDark} />
             </linearGradient>
 
-            {/* Field: very dark green borrowed from the astrolabe arena */}
+            {/* Field: type-aware deep green shadow */}
             <radialGradient id={gid('field')} cx="38%" cy="30%" r="78%">
-              <stop offset="0%" stopColor="#08121f" />
-              <stop offset="100%" stopColor="#020405" />
+              <stop offset="0%" stopColor={fieldBackgroundGradient[0]} />
+              <stop offset="100%" stopColor={fieldBackgroundGradient[1]} />
             </radialGradient>
 
             {/* Bounce light on the lower inner rim of the field */}
@@ -866,12 +871,30 @@ export const PoiMatericV3_6: React.FC<PoiMatericV3_6Props> = ({
               ))}
             </g>
 
-            {/* L5: V1 cross icon */}
+            {/* L5: Heraldic icon — V4-style composite mark */}
             <g className="poiv3_6__cross" transform="translate(43 43) scale(0.9)">
-              {[0, 90, 180, 270].map((a) => (
-                <path key={a} d={CROSS_ARM} fill="#f0cf6a" transform={`rotate(${a})`} />
+              {/* Shadow pass */}
+              {T6.icons[type].rings.map((ring, i) => (
+                <circle key={`ring-shadow-${i}`} r={ring.r} fill="none" stroke={`rgba(0,0,0,0.55)`} strokeWidth={ring.w} transform="translate(0.8 1)" />
               ))}
-              <circle cx="0" cy="0" r="4" fill="#f0cf6a" />
+              {T6.icons[type].steps.map((a) => (
+                <path key={`arm-shadow-${a}`} d={T6.icons[type].arm} fill="rgba(0,0,0,0.55)" transform={`rotate(${a}) translate(0.8 1)`} />
+              ))}
+              {T6.icons[type].armShort && T6.icons[type].stepsShort?.map((a) => (
+                <path key={`short-shadow-${a}`} d={T6.icons[type].armShort as string} fill="rgba(0,0,0,0.55)" transform={`rotate(${a}) translate(0.8 1)`} />
+              ))}
+              <circle r={T6.icons[type].boss} fill="rgba(0,0,0,0.55)" transform="translate(0.8 1)" />
+              {/* Main metal pass */}
+              {T6.icons[type].rings.map((ring, i) => (
+                <circle key={`ring-${i}`} r={ring.r} fill="none" stroke="#f0cf6a" strokeWidth={ring.w} />
+              ))}
+              {T6.icons[type].steps.map((a) => (
+                <path key={`arm-${a}`} d={T6.icons[type].arm} fill="#f0cf6a" transform={`rotate(${a})`} />
+              ))}
+              {T6.icons[type].armShort && T6.icons[type].stepsShort?.map((a) => (
+                <path key={`short-${a}`} d={T6.icons[type].armShort as string} fill="#f0cf6a" transform={`rotate(${a})`} />
+              ))}
+              <circle r={T6.icons[type].boss} fill="#f0cf6a" />
             </g>
 
             {/* Portrait rim - bronze ring */}

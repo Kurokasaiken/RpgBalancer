@@ -1,10 +1,22 @@
 import { z } from 'zod';
 
 /**
- * Material tokens for PoiMatericV3_6 — sculpted bronze outer ring.
- * These values drive the multi-stop metal ramp, micro-texture, milled edge,
- * and specular glints that distinguish V3.6 from V3.5.
+ * Material tokens for PoiMatericV3_6 — V3.6 interior upgraded to V4 style.
+ * The outer ring follows V3.6 sculpted bronze; the inner field now uses
+ * type-aware deep green-shadow gradients instead of a flat black.
+ * Icons rendered as V4 composite marks: arms + rings + boss.
  */
+
+/** One heraldic mark, built by rotating a single arm. */
+const iconSchema = z.object({
+  arm: z.string(),
+  steps: z.array(z.number()).min(1),
+  armShort: z.string().optional(),
+  stepsShort: z.array(z.number()).optional(),
+  boss: z.number(),
+  rings: z.array(z.object({ r: z.number(), w: z.number() })),
+});
+
 export const poiMatericV3_6TokensSchema = z.object({
   /** Outer ring material ramp and detail colors. */
   ring: z.object({
@@ -48,6 +60,23 @@ export const poiMatericV3_6TokensSchema = z.object({
     milledOpacity: z.number(),
     bevelCatchOpacity: z.number(),
   }),
+  /** Per-type field backgrounds: light and dark stops of deep green shadow. */
+  fieldBackgrounds: z.object({
+    wilderness: z.tuple([z.string(), z.string()]),
+    empire: z.tuple([z.string(), z.string()]),
+    obsidian: z.tuple([z.string(), z.string()]),
+    celestial: z.tuple([z.string(), z.string()]),
+    guild: z.tuple([z.string(), z.string()]),
+    quest: z.tuple([z.string(), z.string()]),
+    job: z.tuple([z.string(), z.string()]),
+    event: z.tuple([z.string(), z.string()]),
+    gold: z.tuple([z.string(), z.string()]),
+  }),
+  icons: z.object({
+    quest: iconSchema,
+    job: iconSchema,
+    event: iconSchema,
+  }),
 });
 
 export type PoiMatericV3_6Tokens = z.infer<typeof poiMatericV3_6TokensSchema>;
@@ -88,5 +117,42 @@ export const POI_MATERIC_V3_6_TOKENS = poiMatericV3_6TokensSchema.parse({
     glazeMidOpacity: 0.18,
     milledOpacity: 0.55,
     bevelCatchOpacity: 0.08,
+  },
+  /** Deep green-shadow gradients for the field interior, per POI type. */
+  fieldBackgrounds: {
+    wilderness: ['#12202a', '#04080c'],
+    empire: ['#1a1015', '#050303'],
+    obsidian: ['#0f0f14', '#020205'],
+    celestial: ['#0a0f1a', '#030508'],
+    guild: ['#1a1510', '#050402'],
+    quest: ['#0a1a18', '#020808'],
+    job: ['#1a0a0a', '#050202'],
+    event: ['#12202a', '#04080c'],
+    gold: ['#1a1810', '#050402'],
+  },
+  icons: {
+    quest: {
+      arm: 'M-3 -5 L-3 -17 L-6.4 -21 L-3.4 -22.2 L0 -18.4 L3.4 -22.2 L6.4 -21 L3 -17 L3 -5 Z',
+      steps: [0, 90, 180, 270],
+      boss: 4,
+      rings: [],
+    },
+    job: {
+      arm: 'M-3 -20.5 L3 -20.5 L3 -12.5 L-3 -12.5 Z',
+      steps: [0, 60, 120, 180, 240, 300],
+      boss: 5.2,
+      rings: [
+        { r: 13.5, w: 2.8 },
+        { r: 20.5, w: 1.6 },
+      ],
+    },
+    event: {
+      arm: 'M0 -22 L2.7 -6.5 L0 -3.6 L-2.7 -6.5 Z',
+      steps: [0, 90, 180, 270],
+      armShort: 'M0 -13.5 L1.9 -5.4 L0 -3.2 L-1.9 -5.4 Z',
+      stepsShort: [45, 135, 225, 315],
+      boss: 3.6,
+      rings: [],
+    },
   },
 });

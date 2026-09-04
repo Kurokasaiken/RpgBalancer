@@ -59,3 +59,5 @@ Format: `[filename](path) — one sentence — \`tag\``
 |[CANON.md](CANON.md) — mappa delle autorità documentali — `governance` `canon`
 |[CURRENT_STATE.md](CURRENT_STATE.md) — fotografia dello stato runtime — `state` `reference`
 |[GLOSSARY.md](GLOSSARY.md) — glossario canonico del progetto — `reference`
+|[src/docs/docs/balancer/balance_model_v1.md](src/docs/docs/balancer/balance_model_v1.md) — Canonical Mathematical Inventory del Balancer (audit in corso) — `balancer` `audit` `planning`
+|[src/docs/docs/balancer/RPG_BALANCER_MASTER_CONTEXT.md](src/docs/docs/balancer/RPG_BALANCER_MASTER_CONTEXT.md) — Master Context / Handoff completo del Balancer (visione + design intent + audit) — `balancer` `handoff` `design`

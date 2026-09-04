@@ -70,14 +70,14 @@ export const eventShroudGradeConfig = {
   enabled: true,
   ramp: EVENT_SHROUD_TEAL_RAMP,
   filterId: EVENT_SHROUD_FILTER_ID,
-  /**
-   * How long the grade takes to reach full strength, in ms.
-   *
-   * The colour arrives *with* the curtains rather than after them: the shroud
-   * travel is 900ms, so the grade ramps over the same window and is fully teal
-   * at the moment the two halves meet in the centre.
-   */
+  /** How long the grade takes to fade in to full strength once it starts, in ms. */
   rampDurationMs: 900,
+  /**
+   * How long the shroud halves take to meet. The teal grade waits this long
+   * before it begins to appear, so the colour is born from the closed curtains
+   * rather than arriving with them.
+   */
+  rampDelayMs: 900,
 } as const;
 
 export type EventShroudGradeConfig = typeof eventShroudGradeConfig;
