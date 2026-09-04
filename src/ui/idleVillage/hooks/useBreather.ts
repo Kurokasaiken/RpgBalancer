@@ -5,6 +5,9 @@ import { useState, useEffect, useRef, useCallback } from 'react';
  *
  * Produces a smooth sine-wave offset that pauses/resumes on user interaction.
  * Pause uses smooth easing (200ms) to avoid jarring stops.
+ *
+ * Uses setInterval instead of requestAnimationFrame so animations continue
+ * when the Browser pane is not visible (visibilityState=hidden).
  */
 export const useBreather = (
   frequency: number = 0.06,    // Hz (e.g., 0.06 = 16.7s per cycle)
@@ -13,7 +16,7 @@ export const useBreather = (
 ) => {
   const [offset, setOffset] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const rafRef = useRef<number>();
+  const intervalRef = useRef<NodeJS.Timeout>();
   const startTimeRef = useRef(performance.now());
   const pauseStartRef = useRef<number | null>(null);
   const pausedOffsetRef = useRef(0);
@@ -33,12 +36,12 @@ export const useBreather = (
         const easedOffset = pausedOffsetRef.current * (1 - easeOut);
         setOffset(easedOffset);
       }
-      rafRef.current = requestAnimationFrame(tick);
     };
 
-    rafRef.current = requestAnimationFrame(tick);
+    // Update at ~60fps (16.67ms per frame)
+    intervalRef.current = setInterval(tick, 16.67);
     return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [frequency, magnitude, phase, isPaused]);
 
