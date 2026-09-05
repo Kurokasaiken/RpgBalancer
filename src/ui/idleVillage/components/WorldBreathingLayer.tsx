@@ -1,4 +1,4 @@
-import React, { useId, useEffect } from 'react';
+import React, { useId, useEffect, useRef } from 'react';
 import { useBreather } from '../hooks/useBreather';
 
 export interface WorldBreathingLayerProps {
@@ -45,11 +45,19 @@ export const WorldBreathingLayer: React.FC<WorldBreathingLayerProps> = ({
   const { offset, pause } = useBreather(frequencyHz, magnitudeScreenPx, phaseRad);
   const filterId = useId().replace(/:/g, '');
   const uniqueFilterId = `breathing-${id}-${filterId}`;
+  const displacementMapRef = useRef<SVGFEDisplacementMapElement>(null);
 
   // S3: Wire pause when interacting (dragging/zooming)
   useEffect(() => {
     pause(isInteracting);
   }, [isInteracting, pause]);
+
+  // Animate feDisplacementMap scale via offset
+  useEffect(() => {
+    if (!enabled || !displacementMapRef.current) return;
+    const newScale = magnitudeScreenPx + offset;
+    displacementMapRef.current.setAttribute('scale', String(newScale));
+  }, [offset, enabled, magnitudeScreenPx]);
 
   const containerStyle: React.CSSProperties = {
     position: 'absolute',
@@ -83,6 +91,7 @@ export const WorldBreathingLayer: React.FC<WorldBreathingLayerProps> = ({
           <filter id={uniqueFilterId} colorInterpolationFilters="sRGB" x="-10%" y="-10%" width="120%" height="120%">
             <feImage href={displacementField} result="displacement" preserveAspectRatio="xMidYMid slice" />
             <feDisplacementMap
+              ref={displacementMapRef}
               in="SourceGraphic"
               in2="displacement"
               scale={magnitudeScreenPx}
