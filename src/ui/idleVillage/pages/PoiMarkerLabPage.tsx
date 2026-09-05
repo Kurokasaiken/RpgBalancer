@@ -32,6 +32,7 @@ import PoiMatericV3, { poiMatericV3Styles } from '../components/poi/PoiMatericV3
 import PoiMatericV3_5, { poiMatericV3_5Styles } from '../components/poi/PoiMatericV3_5';
 import PoiMatericV3_6, { poiMatericV3_6Styles } from '../components/poi/PoiMatericV3_6';
 import PoiMatericV3_7, { poiMatericV3_7Styles } from '../components/poi/PoiMatericV3_7';
+import PoiMatericV3_8, { poiMatericV3_8Styles } from '../components/poi/PoiMatericV3_8';
 import PoiMatericV4, { poiMatericV4Styles } from '../components/poi/PoiMatericV4';
 import PoiMatericV5, { poiMatericV5Styles } from '../components/poi/PoiMatericV5';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
@@ -51,7 +52,7 @@ const MAX_FRAME_DELTA_MS = 250;
 const TYPES: PoiType[] = ['quest', 'job', 'event'];
 const STATES: PoiState[] = ['new', 'available', 'assigned', 'expiring', 'expired'];
 const IMPORTANCES = ['normal', 'important', 'critical'] as const;
-const VARIANTS = ['matericV1', 'matericV2', 'matericV3', 'matericV3_5', 'matericV3_6', 'matericV3_7', 'matericV4', 'matericV5', 'runic', 'runicV1', 'runicV3', 'runicV5'] as const;
+const VARIANTS = ['matericV1', 'matericV2', 'matericV3', 'matericV3_5', 'matericV3_6', 'matericV3_7', 'matericV3_8', 'matericV4', 'matericV5', 'runic', 'runicV1', 'runicV3', 'runicV5'] as const;
 
 type Importance = (typeof IMPORTANCES)[number];
 type Variant = (typeof VARIANTS)[number];
@@ -63,6 +64,7 @@ const MARKERS: Record<Variant, React.FC<PoiMarkerProps>> = {
   matericV3_5: PoiMatericV3_5,
   matericV3_6: PoiMatericV3_6,
   matericV3_7: PoiMatericV3_7,
+  matericV3_8: PoiMatericV3_8,
   matericV4: PoiMatericV4,
   matericV5: PoiMatericV5,
   runic: PoiMarkerRunic,
@@ -142,7 +144,7 @@ export const PoiMarkerLabPage: React.FC = () => {
   }, []);
 
   // Marker controls
-  const [variant, setVariant] = useState<Variant>('matericV3_6');
+  const [variant, setVariant] = useState<Variant>('matericV3_8');
   const type: PoiType = 'quest';
   const state: PoiState = 'available';
   const [importance, setImportance] = useState<Importance>('normal');
@@ -263,6 +265,7 @@ export const PoiMarkerLabPage: React.FC = () => {
       <style>{poiMatericV3_5Styles}</style>
       <style>{poiMatericV3_6Styles}</style>
       <style>{poiMatericV3_7Styles}</style>
+      <style>{poiMatericV3_8Styles}</style>
       <style>{poiMatericV4Styles}</style>
       <style>{poiMatericV5Styles}</style>
       <style>{poiRunicStyles}</style>
