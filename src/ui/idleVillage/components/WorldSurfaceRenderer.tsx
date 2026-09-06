@@ -690,9 +690,9 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
             if (isBreathingHeroLayer) {
               // Map layer ID to config params
               const layerConfigs: Record<string, { freq: number; mag: number; phase: number }> = {
-                forest_1_top_left: { freq: 0.060, mag: 1, phase: 0 },
-                mountain_zone_north: { freq: 0.050, mag: 1, phase: 0 },
-                background: { freq: 0.035, mag: 1, phase: 0 },
+                forest_1_top_left: { freq: 0.060, mag: 5, phase: 0 },
+                mountain_zone_north: { freq: 0.050, mag: 5, phase: 0 },
+                background: { freq: 0.035, mag: 5, phase: 0 },
               };
               const config = layerConfigs[layer.id] || { freq: 0.06, mag: 1, phase: 0 };
               const imageUrl = layer.file.includes('/')
