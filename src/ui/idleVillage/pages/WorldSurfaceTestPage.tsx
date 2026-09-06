@@ -506,12 +506,13 @@ export const WorldSurfaceTestPage: React.FC = () => {
           onEventCardComplete={handleEventCardComplete}
           onEventCardClose={handleEventCardClose}
         >
-          {breathActive && (
+          {/* WorldSurfaceBreathOverlay disabled: prototype overlay elements (yellow token, discovery stroke, water circle) not needed for breathing demo */}
+          {/* {breathActive && (
             <WorldSurfaceBreathOverlay
               canvasSize={manifest.coordinateSystem.canvas}
               mouseWorld={mouseWorld}
             />
-          )}
+          )} */}
         </WorldSurfaceRenderer>
 
         {rendererType === 'webgl' && (
