@@ -57,7 +57,10 @@ export const WorldBreathingLayer: React.FC<WorldBreathingLayerProps> = ({
     if (!enabled || !displacementMapRef.current) return;
     const newScale = magnitudeScreenPx + offset;
     displacementMapRef.current.setAttribute('scale', String(newScale));
-  }, [offset, enabled, magnitudeScreenPx]);
+    if (Math.abs(offset) > 0.1) {
+      console.log(`[WorldBreathingLayer ${id}] filter scale updated to ${newScale.toFixed(3)}`);
+    }
+  }, [offset, enabled, magnitudeScreenPx, id]);
 
   const containerStyle: React.CSSProperties = {
     position: 'absolute',

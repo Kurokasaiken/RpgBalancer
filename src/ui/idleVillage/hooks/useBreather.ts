@@ -22,6 +22,7 @@ export const useBreather = (
   const pausedOffsetRef = useRef(0);
 
   useEffect(() => {
+    let frameCount = 0;
     const tick = () => {
       if (!isPaused) {
         const elapsed = (performance.now() - startTimeRef.current) / 1000;
@@ -29,6 +30,11 @@ export const useBreather = (
         const newOffset = magnitude * value;
         setOffset(newOffset);
         pausedOffsetRef.current = newOffset;
+
+        // Log every 60 frames (~1 second at 60fps)
+        if (++frameCount % 60 === 0) {
+          console.log(`[useBreather] offset=${newOffset.toFixed(2)}, elapsed=${elapsed.toFixed(2)}s, freq=${frequency}Hz`);
+        }
       } else if (pauseStartRef.current !== null) {
         // Smooth easing during pause: reduce offset to 0 over 200ms
         const pausedElapsed = (performance.now() - pauseStartRef.current) / 200;
