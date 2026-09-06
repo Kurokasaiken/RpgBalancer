@@ -144,35 +144,33 @@ export const POI_MATERIC_V3_7_TOKENS = poiMatericV3_7TokensSchema.parse({
     milledOpacity: 0.55,
     bevelCatchOpacity: 0.08,
   },
-  /** BRIGHTENED field backgrounds — 3 hue families for visual clustering.
-   *  COOL (blue-green): quest, celestial
-   *  WARM (orange-brown): job, gold, guild
-   *  DARK-COOL (dark green-grey): wilderness, event
-   *  OBSIDIAN (pure black): obsidian
-   *  EMPIRE (dark red adjustment): empire
+  /** Field backgrounds aligned with V1 ember palette.
+   *  GOLD (honey): quest
+   *  TEAL (oxidised copper): job
+   *  RED (banked forge coal): event
    */
   fieldBackgrounds: {
-    /** COOL family — blue-green quest */
-    quest: ['#0a2028', '#050810'],
+    /** GOLD family — honey quest */
+    quest: ['#1a1208', '#050302'],
     /** COOL family — blue-green celestial */
     celestial: ['#152a38', '#0a1018'],
-    /** WARM family — orange-brown job */
-    job: ['#1a0805', '#0f0505'],
+    /** TEAL family — oxidised copper job */
+    job: ['#0a1f1a', '#020808'],
     /** WARM family — orange-brown gold */
     gold: ['#2a2810', '#0a0905'],
     /** WARM family — orange-brown guild */
     guild: ['#2a2210', '#0a0805'],
     /** DARK-COOL family — dark green-grey wilderness */
     wilderness: ['#0a1410', '#050808'],
-    /** DARK-COOL family — dark green-grey event */
-    event: ['#2a3820', '#0f1410'],
+    /** RED family — forge coal event */
+    event: ['#2a0a0a', '#0f0202'],
     /** OBSIDIAN family — pure black */
     obsidian: ['#1a1a20', '#080810'],
     /** EMPIRE family — dark red */
     empire: ['#1a0a0f', '#080505'],
   },
-  /** Icon metal per type: simplified to 2-color linear gradient (light, dark).
-   *  Reduces SVG complexity by 30% and improves visual hierarchy at all zooms.
+  /** Icon metal per type: aligned with V1 ember colours.
+   *  quest = candle-lit honey, job = oxidised copper, event = banked forge coal.
    */
   iconMetals: {
     wilderness: ['#c0b088', '#1a1410'],
@@ -180,9 +178,9 @@ export const POI_MATERIC_V3_7_TOKENS = poiMatericV3_7TokensSchema.parse({
     obsidian: ['#b0b0c0', '#1a1a20'],
     celestial: ['#c0d8ff', '#0a1828'],
     guild: ['#d0c090', '#1a1410'],
-    quest: ['#70d0a8', '#0b201a'],
-    job: ['#e8b888', '#1d0a04'],
-    event: ['#d0a878', '#1a1410'],
+    quest: ['#ffe9b0', '#5e3a0f'],
+    job: ['#e2f0c6', '#12463a'],
+    event: ['#ffb08a', '#4e120c'],
     gold: ['#e8d878', '#1a1200'],
   },
   shadow: {
@@ -203,14 +201,12 @@ export const POI_MATERIC_V3_7_TOKENS = poiMatericV3_7TokensSchema.parse({
       boss: 4,
       rings: [],
     },
+    /* V1 anvil: reads as "work" and survives down to 32px. */
     job: {
-      arm: 'M-3 -20.5 L3 -20.5 L3 -12.5 L-3 -12.5 Z',
-      steps: [0, 60, 120, 180, 240, 300],
-      boss: 5.2,
-      rings: [
-        { r: 13.5, w: 2.8 },
-        { r: 20.5, w: 1.6 },
-      ],
+      arm: 'M-19 -13 L19 -13 L19 -7.5 L10 -7.5 L6.5 -1 L10 3.5 L10 7 L-10 7 L-10 3.5 L-6.5 -1 L-15.5 -7.5 L-19 -7.5 Z M-11.5 7 L11.5 7 L14.5 14 L-14.5 14 Z',
+      steps: [0],
+      boss: 0,
+      rings: [],
     },
     event: {
       arm: 'M0 -22 L2.7 -6.5 L0 -3.6 L-2.7 -6.5 Z',

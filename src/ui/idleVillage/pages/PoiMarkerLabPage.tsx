@@ -144,7 +144,7 @@ export const PoiMarkerLabPage: React.FC = () => {
   }, []);
 
   // Marker controls
-  const [variant, setVariant] = useState<Variant>('matericV3_8');
+  const [variant, setVariant] = useState<Variant>('matericV3_7');
   const type: PoiType = 'quest';
   const state: PoiState = 'available';
   const [importance, setImportance] = useState<Importance>('normal');
