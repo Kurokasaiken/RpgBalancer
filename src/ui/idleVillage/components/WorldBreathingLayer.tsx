@@ -52,15 +52,13 @@ export const WorldBreathingLayer: React.FC<WorldBreathingLayerProps> = ({
     pause(isInteracting);
   }, [isInteracting, pause]);
 
-  // Animate feDisplacementMap scale via offset
-  useEffect(() => {
-    if (!enabled || !displacementMapRef.current) return;
-    const newScale = magnitudeScreenPx + offset;
-    displacementMapRef.current.setAttribute('scale', String(newScale));
-    if (Math.abs(offset) > 0.1) {
-      console.log(`[WorldBreathingLayer ${id}] filter scale updated to ${newScale.toFixed(3)}`);
-    }
-  }, [offset, enabled, magnitudeScreenPx, id]);
+  // Breathing is implemented via opacity pulsing, not filter scale modulation.
+  // The feDisplacementMap applies a subtle static deformation; opacity creates the breathing effect.
+
+  // Map offset (-magnitude to +magnitude) to opacity (0.7 to 1.0)
+  // When offset is at peak (±magnitude), opacity is 1.0
+  // When offset is at trough (0), opacity is 0.7
+  const breathingOpacity = 0.85 + 0.15 * Math.cos(Math.atan2(offset, magnitudeScreenPx));
 
   const containerStyle: React.CSSProperties = {
     position: 'absolute',
@@ -69,6 +67,7 @@ export const WorldBreathingLayer: React.FC<WorldBreathingLayerProps> = ({
     width: '100%',
     height: '100%',
     overflow: 'hidden',
+    opacity: breathingOpacity,
     ...style,
   };
 
