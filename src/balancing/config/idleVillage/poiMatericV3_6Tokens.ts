@@ -118,16 +118,16 @@ export const POI_MATERIC_V3_6_TOKENS = poiMatericV3_6TokensSchema.parse({
     milledOpacity: 0.55,
     bevelCatchOpacity: 0.08,
   },
-  /** Deep green-shadow gradients for the field interior, per POI type. */
+  /** Field backgrounds aligned with V1 ember palette. */
   fieldBackgrounds: {
     wilderness: ['#12202a', '#04080c'],
     empire: ['#1a1015', '#050303'],
     obsidian: ['#0f0f14', '#020205'],
     celestial: ['#0a0f1a', '#030508'],
     guild: ['#1a1510', '#050402'],
-    quest: ['#0a1a18', '#020808'],
-    job: ['#1a0a0a', '#050202'],
-    event: ['#12202a', '#04080c'],
+    quest: ['#1a1208', '#050302'],
+    job: ['#0a1f1a', '#020808'],
+    event: ['#2a0a0a', '#0f0202'],
     gold: ['#1a1810', '#050402'],
   },
   icons: {
@@ -137,14 +137,12 @@ export const POI_MATERIC_V3_6_TOKENS = poiMatericV3_6TokensSchema.parse({
       boss: 4,
       rings: [],
     },
+    /* V1 anvil for job — reads as work. */
     job: {
-      arm: 'M-3 -20.5 L3 -20.5 L3 -12.5 L-3 -12.5 Z',
-      steps: [0, 60, 120, 180, 240, 300],
-      boss: 5.2,
-      rings: [
-        { r: 13.5, w: 2.8 },
-        { r: 20.5, w: 1.6 },
-      ],
+      arm: 'M-19 -13 L19 -13 L19 -7.5 L10 -7.5 L6.5 -1 L10 3.5 L10 7 L-10 7 L-10 3.5 L-6.5 -1 L-15.5 -7.5 L-19 -7.5 Z M-11.5 7 L11.5 7 L14.5 14 L-14.5 14 Z',
+      steps: [0],
+      boss: 0,
+      rings: [],
     },
     event: {
       arm: 'M0 -22 L2.7 -6.5 L0 -3.6 L-2.7 -6.5 Z',
