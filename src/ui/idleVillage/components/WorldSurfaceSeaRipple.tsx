@@ -205,17 +205,15 @@ function SmilSeaRipple({ zIndex, worldName, seaFile, cfg, zoom }: SmilSeaRippleP
         }
       `}</style>
 
-      <img
+      <div
         className="ws-sea-ripple-smil"
-        src={imageUrl}
-        alt=""
-        draggable={false}
         style={{
           position: 'absolute',
           inset: 0,
-          width: '100%',
-          height: '100%',
-          objectFit: cfg.imageFit,
+          backgroundImage: `url(${imageUrl})`,
+          backgroundSize: cfg.imageFit === 'fill' ? '100% 100%' : cfg.imageFit,
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: '0 0',
           filter: `url(#${filterId})`,
           maskImage: `url(${maskUrl})`,
           WebkitMaskImage: `url(${maskUrl})`,
