@@ -17,7 +17,8 @@ import type {
   AstrolabeConfig,
   AstrolabeResult,
   AstrolabeEngineHandle,
-} from './engine';
+  AstrolabePhase,
+} from './astrolabeV63.types';
 import { ASTROLABE_MARKUP } from '@/ui/idleVillage/components/destinyAstrolabeV6/markup';
 import { useAstrolabeAudio } from '@/ui/idleVillage/components/destinyAstrolabeV6/useAstrolabeAudio';
 import { astrolabeV63Config } from '@/balancing/config/idleVillage/astrolabeV63Config';
@@ -90,7 +91,7 @@ export const DestinyAstrolabeV63 = memo(
     const [autoThrowMs, setAutoThrowMs] = useState(0);
     const [skipAnimationEnabled, setSkipAnimationEnabled] = useState(skipAnimation);
     const [removeSoundsEnabled, setRemoveSoundsEnabled] = useState(removeSounds);
-    const [currentState, setCurrentState] = useState('idle');
+    const [currentState, setCurrentState] = useState<AstrolabePhase>('idle');
     const [boardInfo, setBoardInfo] = useState<{ skills: AstrolabeSkill[]; axisSkill: number[]; activeSkillIndex: number } | null>(null);
 
     const play = useAstrolabeAudio(removeSoundsEnabled);

@@ -68,6 +68,18 @@ const astrolabeV63ConfigSchema = z.object({
     /** Violet edge glow around an open death crack. */
     crackEdgeColor: z.string(),
   }),
+  /** Animation phase durations for the V6.3 timeline. Centralized here so the
+      engine and the React wrapper read the same timing tokens. */
+  phaseDurations: z.object({
+    ringMs: z.number().int().min(60).max(2000),
+    slamMs: z.number().int().min(100).max(4000),
+    gooMs: z.number().int().min(200).max(5000),
+    axisReadMs: z.number().int().min(100).max(3000),
+    burstMs: z.number().int().min(100).max(4000),
+    pourMs: z.number().int().min(100).max(4000),
+    spinMs: z.number().int().min(500).max(8000),
+    snapMs: z.number().int().min(100).max(2000),
+  }),
   /** Ball landing — wheel-of-fortune deceleration with fixed-timestep state machine. */
   landing: z.object({
     /** Simulation steps per second. 120 is a good balance for WebView determinism. */
@@ -175,5 +187,15 @@ export const astrolabeV63Config: AstrolabeV63Config = astrolabeV63ConfigSchema.p
     height: 34,
     fontPx: 13,
     activeScale: 1.15,
+  },
+  phaseDurations: {
+    ringMs: 140,
+    slamMs: 900,
+    gooMs: 1100,
+    axisReadMs: 560,
+    burstMs: 1100,
+    pourMs: 720,
+    spinMs: 2600,
+    snapMs: 650,
   },
 });
