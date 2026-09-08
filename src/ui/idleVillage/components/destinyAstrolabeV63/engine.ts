@@ -2279,6 +2279,36 @@ function drawZoneGuides(now){
     if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
   }
   ctx.stroke();
+  /* fascia FERITA (wound) — anello rosso appena dentro il bordo del catrame:
+     la zona in cui la palla si ferma ti lascia ferito */
+  if(geo.woundFactor>0.001){
+    ctx.setLineDash([10,6]);
+    ctx.lineWidth=2.6;
+    ctx.strokeStyle=`rgba(215,50,70,${(0.55*vis*(0.7+0.3*Math.sin(t*2.6+0.6))).toFixed(3)})`;
+    ctx.beginPath();
+    for(let i=0;i<=SEG;i+=1){
+      const a=-Math.PI/2+i/SEG*TAU;
+      const r=rCheckAt(a)*(1-geo.woundFactor);
+      const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+  /* fascia MORTE — striscia violetta appena FUORI dal bordo della stella:
+     la zona più vicina al successo che invece uccide */
+  if(geo.deathDepth>0.5){
+    ctx.setLineDash([2,6]);
+    ctx.lineWidth=3.2;
+    ctx.strokeStyle=`rgba(150,40,235,${(0.6*vis*(0.65+0.35*Math.sin(t*1.4+2.2))).toFixed(3)})`;
+    ctx.beginPath();
+    for(let i=0;i<=SEG;i+=1){
+      const a=-Math.PI/2+i/SEG*TAU;
+      const r=Math.min(rStarAt(a,scene.starScale)+geo.deathDepth,rCheckAt(a));
+      const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
   ctx.setLineDash([]);
   ctx.restore();
 }
