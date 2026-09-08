@@ -1502,3 +1502,5 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 - **Completato 2026-09-08:** F4 card — frase narrativa per skill (`copy.narrativeFlavors`, i18n `en`+`it-IT`), math esplicito `D100 {{roll}} · TST = 50 + ({{stat}} − {{difficulty}}) = {{tst}}`, backdrop `teal` ritocciato (meno verde).
 - **Completato 2026-09-09:** sync completo del piano — tabella stato §0bis, note per F0–F5 e §5.5–5.10, §7 chiuso con decisioni e ordine suggerito.
 - **Rimangono (ordine suggerito nel piano):** F3 auto-throw countdown + Space/Enter; F4/5.7 scrim + climax per esito; F0 `phaseDurations`/`useAstrolabeV63Phase`/types; F2 placche perimetro bronzo; 5.8 fissura WebGL shader; F5 E2E/Monte Carlo; cleanup `astrolabe.css` residual.
+
+**Richiesta (2026-09-09):** *«lo sfondo di default deve essere teal, crea una versione 6.4, che sia un clone di questo codice, ma nn symlink»* — il Director vuole una directory `destinyAstrolabeV64/` con file reali copiati (non symlink, non condivisione del motore V63), sfondo default `teal`, pagina `/minimal-destiny-astrolabe-v6-4` e route in `App.tsx`.

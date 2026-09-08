@@ -716,5 +716,63 @@
         "epicfail": "La stanza si fa gelida: sei solo."
       }
     }
+  },
+  "astrolabeV64": {
+    "check": "Prova",
+    "statVsDc": "{{stat}} contro difficoltà {{difficulty}}",
+    "probability": "Probabilità di riuscita ~{{pct}}%",
+    "risk": "Ferita {{wound}}% · Morte {{dead}}%",
+    "riskWounded": "Ferito",
+    "riskDead": "Caduto",
+    "mathFmt": "D100 {{roll}} · TST = 50 + ({{stat}} − {{difficulty}}) = {{tst}}",
+    "verdict": {
+      "bigwin": "TRIONFO",
+      "win": "SUCCESSO",
+      "almost": "PER UN SOFFIO",
+      "fail": "FALLIMENTO",
+      "epicfail": "DISASTRO"
+    },
+    "narrative": {
+      "bigwin": "Il destino si inchina al tuo passo.",
+      "win": "La prova cede sotto il tuo sforzo.",
+      "almost": "Un soffio, e la verità ti sfugge.",
+      "fail": "La presa scivola.",
+      "epicfail": "Il mondo ti respinge.",
+      "Atletica": {
+        "bigwin": "Superi ogni barriera con un balzo leggendario.",
+        "win": "Il tuo corpo oltrepassa l'ostacolo.",
+        "almost": "Il piede scivola, ma raggiungi il bordo.",
+        "fail": "L'ostacolo resiste al tuo slancio.",
+        "epicfail": "Cadi rovinosamente, il fiato spezzato."
+      },
+      "Destrezza": {
+        "bigwin": "I tuoi polsi superano la trappola in un istante.",
+        "win": "Le dita trovano il meccanismo senza esitazione.",
+        "almost": "Un ronzio: il grilletto sfiora il tuo dito.",
+        "fail": "Il meccanismo si blocca prima del previsto.",
+        "epicfail": "La trappola scatta, implacabile."
+      },
+      "Forza": {
+        "bigwin": "La porta cede sotto un colpo terribile.",
+        "win": "Le cerniere cedono con un gemito.",
+        "almost": "Il legno si spacca, ma tiene ancora.",
+        "fail": "La porta resiste, più dura del previsto.",
+        "epicfail": "Il pugno rimbalza, ferendoti."
+      },
+      "Intelletto": {
+        "bigwin": "Le tessere si riuniscono in una verità luminosa.",
+        "win": "L'enigma si apre come una rosa.",
+        "almost": "Un dettaglio sfugge, ma quasi ci sei.",
+        "fail": "La soluzione ti sfugge tra le dita.",
+        "epicfail": "La mente si annebbia di fronte al mistero."
+      },
+      "Carisma": {
+        "bigwin": "Le parole piegano il mondo al tuo volere.",
+        "win": "L'interlocutore cede con un sospiro.",
+        "almost": "Per un istante sembra cedere, poi no.",
+        "fail": "Il tuo tono non trova presa.",
+        "epicfail": "La stanza si fa gelida: sei solo."
+      }
+    }
   }
 }
