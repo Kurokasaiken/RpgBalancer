@@ -224,8 +224,101 @@ export default interface Resources {
     },
     "astrolabeV63": {
       "check": "Check",
-      "mathFmt": "D100 roll {{roll}} · needed ≤ {{tst}}",
+      "mathFmt": "D100 {{roll}} · TST = 50 + ({{stat}} − {{difficulty}}) = {{tst}}",
       "narrative": {
+        "Atletica": {
+          "almost": "Your foot slips, but you catch the edge.",
+          "bigwin": "You clear every barrier with a legendary leap.",
+          "epicfail": "You fall hard, breath knocked from your lungs.",
+          "fail": "The obstacle holds against your push.",
+          "win": "Your body sails past the obstacle."
+        },
+        "Carisma": {
+          "almost": "For a moment they almost yield, then no.",
+          "bigwin": "Your words bend the world to your will.",
+          "epicfail": "The room turns cold: you stand alone.",
+          "fail": "Your tone finds no purchase.",
+          "win": "The listener relents with a sigh."
+        },
+        "Destrezza": {
+          "almost": "A click: the trigger grazes your finger.",
+          "bigwin": "Your wrists outrace the trap in an instant.",
+          "epicfail": "The trap springs, merciless.",
+          "fail": "The mechanism jams before the release.",
+          "win": "Your fingers find the mechanism without hesitation."
+        },
+        "Forza": {
+          "almost": "The wood splits but still holds.",
+          "bigwin": "The door gives under a terrible blow.",
+          "epicfail": "Your fist rebounds, hurting you.",
+          "fail": "The door stands harder than you thought.",
+          "win": "The hinges groan and yield."
+        },
+        "Intelletto": {
+          "almost": "One detail escapes, but you are close.",
+          "bigwin": "The pieces snap into a luminous truth.",
+          "epicfail": "Your mind clouds before the mystery.",
+          "fail": "The solution slips through your fingers.",
+          "win": "The riddle opens like a rose."
+        },
+        "almost": "A breath, and the truth escapes you.",
+        "bigwin": "Fate bows to your step.",
+        "epicfail": "The world pushes you back.",
+        "fail": "Your grip slips.",
+        "win": "The trial yields to your effort."
+      },
+      "probability": "Success chance ~{{pct}}%",
+      "risk": "Wound {{wound}}% · Death {{dead}}%",
+      "riskDead": "Fallen",
+      "riskWounded": "Wounded",
+      "statVsDc": "{{stat}} vs difficulty {{difficulty}}",
+      "verdict": {
+        "almost": "BY A BREATH",
+        "bigwin": "TRIUMPH",
+        "epicfail": "DISASTER",
+        "fail": "FAILURE",
+        "win": "SUCCESS"
+      }
+    },
+    "astrolabeV64": {
+      "check": "Check",
+      "mathFmt": "D100 {{roll}} · TST = 50 + ({{stat}} − {{difficulty}}) = {{tst}}",
+      "narrative": {
+        "Atletica": {
+          "almost": "Your foot slips, but you catch the edge.",
+          "bigwin": "You clear every barrier with a legendary leap.",
+          "epicfail": "You fall hard, breath knocked from your lungs.",
+          "fail": "The obstacle holds against your push.",
+          "win": "Your body sails past the obstacle."
+        },
+        "Carisma": {
+          "almost": "For a moment they almost yield, then no.",
+          "bigwin": "Your words bend the world to your will.",
+          "epicfail": "The room turns cold: you stand alone.",
+          "fail": "Your tone finds no purchase.",
+          "win": "The listener relents with a sigh."
+        },
+        "Destrezza": {
+          "almost": "A click: the trigger grazes your finger.",
+          "bigwin": "Your wrists outrace the trap in an instant.",
+          "epicfail": "The trap springs, merciless.",
+          "fail": "The mechanism jams before the release.",
+          "win": "Your fingers find the mechanism without hesitation."
+        },
+        "Forza": {
+          "almost": "The wood splits but still holds.",
+          "bigwin": "The door gives under a terrible blow.",
+          "epicfail": "Your fist rebounds, hurting you.",
+          "fail": "The door stands harder than you thought.",
+          "win": "The hinges groan and yield."
+        },
+        "Intelletto": {
+          "almost": "One detail escapes, but you are close.",
+          "bigwin": "The pieces snap into a luminous truth.",
+          "epicfail": "Your mind clouds before the mystery.",
+          "fail": "The solution slips through your fingers.",
+          "win": "The riddle opens like a rose."
+        },
         "almost": "A breath, and the truth escapes you.",
         "bigwin": "Fate bows to your step.",
         "epicfail": "The world pushes you back.",

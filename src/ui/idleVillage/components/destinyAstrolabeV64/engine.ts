@@ -1,0 +1,2640 @@
+/* V6.3 — clone of the V6 engine (originally auto-generated from
+   public/destiny-astrolabe.html) with ONE change: the challenge surface is no
+   longer a flat Path2D fill but a viscous tar mass — WebGL2 SDF smooth-min
+   field (see ./tarGooRenderer) driven by a per-angle spring simulation with
+   heavy damping (R-032). Falls back to the V6 flat drawing when WebGL2 is
+   unavailable. Everything else (timeline, verdicts, physics wall) is V6. */
+/* eslint-disable */
+// @ts-nocheck
+
+import { tarGooConfig } from '@/balancing/config/idleVillage/tarGooConfig';
+import { astrolabeV64Config } from '@/balancing/config/idleVillage/astrolabeV64Config';
+import { buildSnapshot } from '@/ui/skillCheckWebV1/zones';
+import { solveShapeReported, rHeroNarrowAt, solveCoreRadius, solveOuterBands, solveGooBand, reachArea } from '@/ui/skillCheckWebV1/coverage';
+import { createTarGooRenderer } from './tarGooRenderer';
+import { rng32, createTentacles, tickPose, buildBlobs, poolFraction,
+         SAMPLES_PER_ARM } from './tentacles';
+
+export interface AstrolabeSkill { name: string; stat: number; difficulty: number; icon?: string; }
+export interface AstrolabeConfig { 
+  crit?: number; bigwin?: number; almost?: number; epicfail?: number; wound?: number; dead?: number; mode?: string;
+  tSlam?: number; tBurst?: number; tPour?: number; tSpin?: number; tSnap?: number;
+  bgVariant?: string; ringVariant?: string; ballColor?: string; motion?: string;
+  /** V6.3 centralized phase durations. If provided, they override astrolabeV64Config.phaseDurations. */
+  phaseDurations?: {
+    ringMs?: number;
+    slamMs?: number;
+    gooMs?: number;
+    axisReadMs?: number;
+    burstMs?: number;
+    pourMs?: number;
+    spinMs?: number;
+    snapMs?: number;
+  };
+}
+export interface AstrolabeResult { verdict: string; roll: number; riskRoll: number;
+  skillIndex: number; skillName: string; wounded: boolean; dead: boolean; }
+export interface AstrolabeEngineOpts {
+  skills: AstrolabeSkill[];
+  config?: AstrolabeConfig;
+  onResolve?: (r: AstrolabeResult) => void;
+  /** raw state-machine state on every transition */
+  onState?: (state: string) => void;
+  /** true when the TIRA button should be shown (armed), false on throw / new roll */
+  onArmed?: (armed: boolean) => void;
+  /** pre-roll board info: emitted whenever the geometry is (re)computed so the
+      React host can show skill/stat/difficulty/probability before the throw */
+  onInfo?: (info: {
+    skills: AstrolabeSkill[];
+    axisSkill: number[];
+    activeSkillIndex: number;
+    probPct: number;
+    tst: number;
+    woundPct: number;
+    deadPct: number;
+  }) => void;
+}
+export interface AstrolabeEngineHandle {
+  roll: () => void;
+  /** start the spin (TIRA). Warps past any still-playing reveal. */
+  throw: () => void;
+  setConfig: (skills: AstrolabeSkill[], config?: AstrolabeConfig) => void;
+  destroy: () => void;
+}
+
+export function createDestinyAstrolabeV64Engine(root: HTMLElement, opts: AstrolabeEngineOpts): AstrolabeEngineHandle {
+  console.log('[engine] createDestinyAstrolabeV64Engine called, skills=', opts.skills?.map(s=>`${s.name}:${s.stat}/${s.difficulty}`));
+  const DUMMY: any = new Proxy(function(){}, {
+    get(_t, p){ if(p==='style'||p==='classList'||p==='dataset') return DUMMY;
+      if(p==='value') return '0'; if(p==='textContent'||p==='innerHTML') return ''; return DUMMY; },
+    set(){ return true; }, apply(){ return DUMMY; },
+  });
+  const $id = (id: string): any => root.querySelector('#'+id) || (root.querySelector('[data-'+id+']') || DUMMY);
+
+/* =========================================================================
+   CONFIG — bound to the tweak panel
+   ========================================================================= */
+/* config + skills injected by the React host */
+const cfg=Object.assign({stat:60,req:55,crit:5,bigwin:5,almost:5,epicfail:5,wound:10,dead:5,tSlam:tarGooConfig.timing.seedMs,tBurst:1100,tPour:720,tSpin:2600,tSnap:650,mode:'random'}, opts.config||{});
+const phaseDurations=Object.assign({},astrolabeV64Config.phaseDurations,cfg.phaseDurations||{});
+let skills=(opts.skills&&opts.skills.length)?opts.skills.slice():[{name:'Skill',stat:60,difficulty:50}];
+let skillAxes=[];
+function recomputeSkillAxes(){
+  if(skills.length===1) skillAxes=[5];
+  else if(skills.length===2) skillAxes=[3,2];
+  else if(skills.length===3) skillAxes=[2,2,1];
+  else if(skills.length===4) skillAxes=[2,1,1,1];
+  else skillAxes=[1,1,1,1,1].slice(0,skills.length);
+}
+recomputeSkillAxes();
+
+const W=800, CX=400, CY=400, R=362;       // arena disc
+const AXES=5;
+const TIP=i=>-Math.PI/2 + i*(2*Math.PI/AXES);
+const ALMOST_W=16;                        // bronze rim band (visual)
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const TAU=Math.PI*2;
+const normAng=a=>{a%=TAU; if(a<-Math.PI)a+=TAU; if(a>Math.PI)a-=TAU; return a;};
+
+const geo={
+  tst:55,            // target success threshold
+  rTip:200,          // star tip radius  (∝ TST)
+  rValley:90,
+  rCore:46,          // 12-layer core ring (Big Win) — now area-proportional
+  almostFactor:0.08, // almost band as fraction beyond rStar (area-proportional)
+  epicW:14,          // epic-fail outer band thickness (∝ crit%) — kept as px fallback
+  epicFactor:0.08,   // epic-fail as fraction of rCheck (area-proportional)
+  woundFactor:0.08,  // wound band as fraction of rCheck (area-proportional)
+  axisTip:[200,200,200,200,200],    // per-axis star tip radius (white obelisk = stat)
+  axisCheck:[300,300,300,300,300],  // per-axis failure inner radius (black obelisk = check)
+  axisSkill:[0,0,0,0,0],
+  wedges:{           // risk sectors, anchored at the upper rim — never overlapping
+    dead:{a0:0,a1:0}, wound:{a0:0,a1:0},
+  },
+};
+
+/* Determine skill index from ball position (angle)
+   Skills are arranged as equal segments around the circle.
+   E.g. 2 skills = 180° each, 3 skills = 120° each, etc. */
+function getSkillIndexFromAngle(x,y){
+  if(skills.length===0) return 0;
+  if(skills.length===1) return 0;
+  const angle=normAng(angOf(x,y)+Math.PI/2);  // Normalize to 0..TAU starting from top
+  const segmentSize=TAU/skills.length;
+  const skillIndex=Math.floor(angle/segmentSize);
+  return Math.min(skillIndex, skills.length-1);
+}
+
+/* map a 0..100 value to a radius from core outward (white=stat, black=check) */
+function rOf(v){ return geo.rCore + clamp(v,1,99)/100*(R-22-geo.rCore); }
+
+function recomputeGeometry(skillIndex=0){
+  geo.rCore=Math.max(30,R*0.12);
+  /* assign each of the 5 axes to a skill, per the punte distribution */
+  geo.axisSkill=[];
+  for(let s=0;s<skillAxes.length;s+=1){ for(let n=0;n<skillAxes[s];n+=1) geo.axisSkill.push(s); }
+  while(geo.axisSkill.length<AXES) geo.axisSkill.push(geo.axisSkill.length%Math.max(1,skills.length));
+  /* per-axis radii: white obelisk = stat, black obelisk = check */
+  geo.axisTip=[]; geo.axisCheck=[];
+  for(let i=0;i<AXES;i+=1){
+    const sk=skills[geo.axisSkill[i]]||{stat:60,difficulty:50};
+    geo.axisTip[i]=rOf(sk.stat);        // success star reaches the white obelisk (stat)
+    geo.axisCheck[i]=rOf(sk.difficulty);// failure goo reaches the black obelisk (check)
+  }
+  /* save the original stat/difficulty radii for obelisk display (before area solve) */
+  geo.obeliskTip=geo.axisTip.slice();   // white obelisks stay on the stat
+  geo.obeliskCheck=geo.axisCheck.slice();// black obelisks stay on the difficulty
+  /* the star will be rescaled by area-solve but keep the stat silhouette */
+  geo.starTip=geo.axisTip.slice();      // star shape comes from stat, rescaled for probability
+  /* keep a single tst for the verdict roll (needed before the area solve) */
+  {
+    const sk0=skills.length>0?skills[Math.min(skillIndex,skills.length-1)]:{stat:60,difficulty:55};
+    geo.tst=clamp(50+(sk0.stat-sk0.difficulty),1,99);
+  }
+  /* ── GEOMETRIA DIRETTA ────────────────────────────────────────────
+     Non c'è nessun solve: le due forze sono poste dai numeri e la probabilità
+     è ciò che ne RISULTA.
+
+       punta stella[i] = rOf(stat[i])        — dove cade l'obelisco bianco
+       bordo goo[i]    = rOf(difficoltà[i])  — dove cade l'obelisco nero
+       probabilità     = area(stella ∩ goo) / area(goo)
+
+     Il tentativo precedente risolveva la scala della stella per forzare
+     l'area a valere `tst = 50+(stat-diff)`. Era sovradeterminato: con la scala
+     consumata dal solve, la punta non era più pilotabile e finiva al 34..98%
+     della stat (mai al 100%). Inoltre `tst` deriva da UNA sola skill, quindi su
+     un board multi-skill il bersaglio era mal posto per costruzione.
+
+     L'unico parametro di forma resta la profondità delle valli, regolata dal
+     margine del PG rispetto allo skill check: valli basse = stella affilata
+     quando stat >= difficoltà, valli alte = fiore dai petali arrotondati quando
+     il PG è sotto. */
+  /* IL PASSAGGIO STAVA DALLA PARTE SBAGLIATA DELLA PARITA'.
+     Con `t = (minMargin + range)/range` e range = 0.25*R, a PARITA' il margine
+     e' 0 e quindi t = 1: la forma era gia' la stella piu' affilata possibile, e
+     tornava fiore solo scendendo di 90 unita' SOTTO la prova. Tutta la
+     transizione viveva nella meta' in cui il PG perde, e sopra la parita' non
+     succedeva piu' niente.
+     La regola concordata e' l'opposta: il FIORE e' la base e tiene fino a
+     oltre la parita'; la stella entra — e progressivamente si affila — quando
+     la punta SUPERA la materia. La variabile e' l'allungamento punta/trama, e
+     la soglia e' 1 perche' e' li' che la punta raggiunge la trama.
+     Anche i valori erano fuori scala: valle a 0.78 del raggio della punta e'
+     quasi un cerchio, valle a 0.12 e' uno spillo. */
+  /* ── IL PILOTA D'AREA (PLAN-010 CP-C, desiderata v17) ──────────────────
+     Qui prima viveva una famiglia a tre forme commutata dall'allungamento
+     `punta/muro`. Il Director l'ha dichiarata morta, e la v17 dice cosa mettere
+     al suo posto: **il contratto di copertura vince sulla forma**. La forma non
+     si sceglie piu': si RISOLVE, perche' produca `50 + (stat - difficolta)`.
+
+     Un bersaglio PER SETTORE, non uno globale: su un board a piu' skill ogni
+     punta ha il suo delta, e con un bersaglio unico il bersaglio era «mal posto
+     per costruzione» — lo diceva gia' il commento che stava qui sotto. Cosi'
+     ogni petalo dice la verita' sulla propria skill e il totale viene da se'.
+
+     Il modello geometrico e' quello di V16 (`skillCheckWebV1`), non una copia:
+     i due mondi condividono il sistema di coordinate — `rOf` identica e blob
+     con le stesse fasi — quindi non c'e' conversione, c'e' consumo. */
+  geo.starTip=geo.obeliskTip.slice();   // la punta È l'obelisco bianco
+  {
+    /* per-asse, seguendo la mappatura asse->skill del board (non ciclica) */
+    const statsPerAxis=geo.axisSkill.map(si=>(skills[si]||{stat:60}).stat);
+    const diffsPerAxis=geo.axisSkill.map(si=>(skills[si]||{difficulty:50}).difficulty);
+    geo.snap=buildSnapshot({stats:statsPerAxis,diffs:diffsPerAxis});
+    geo.targets=statsPerAxis.map((st,i)=>clamp(50+st-diffsPerAxis[i],1,99));
+    /* il verbale, non solo il risultato: dove il contratto non e' raggiungibile
+       lo scarto dev'essere ispezionabile, o la saturazione e' muta e il quadro
+       smette di predire l'esito senza che nessuno se ne accorga (CP-D). */
+    const solved=solveShapeReported(geo.snap,geo.targets);
+    geo.heroShape=solved.shape;
+    geo.coverageReport=solved.report;
+    geo.anySaturated=solved.anySaturated;
+  }
+  /* probabilità reale, misurata sulla geometria che il giocatore vede.
+     Stessa formula di inStar: min(stella, muro) — il muro taglia la stella. */
+  {
+    const SEG=360, dA=TAU/SEG;
+    let starA=0, arenaA=0;
+    geo.tarRMax=0;
+    for(let i=0;i<SEG;i+=1){
+      const a=-Math.PI/2+i*dA;
+      const w=rCheckAt(a,1);
+      geo.tarRMax=Math.max(geo.tarRMax,w);
+      const r=Math.min(Math.max(rStarAt(a),geo.rCore),w);
+      starA+=0.5*r*r*dA; arenaA+=0.5*w*w*dA;
+    }
+    geo.probPct=arenaA>0?clamp(starA/arenaA*100,0,100):0;
+  }
+  /* cosmetic aggregate radii (halo/gradients) */
+  geo.rTip=Math.max(...geo.starTip);
+  /* il fondovalle piu' basso della forma risolta: serve solo a gradienti e aloni */
+  geo.rValley=Math.min(...geo.heroShape.radii.filter((_,i)=>i%2===1));
+  /* critical-fail band thickness — purely proportional to the arena radius and
+     scaled by crit% (like the wound/death sectors). No fixed pixel values. */
+  /* LE PROPORZIONI ERANO SBAGLIATE, ed e' lo stesso difetto tre volte: uno
+     SPESSORE proporzionale a `R` non e' una PROBABILITA' proporzionale a
+     niente. `epicW = (R-3)*crit%` da' una fascia sempre alta uguale, ma
+     l'arena cambia con la difficolta': misurato in PLAN-008, la stessa fascia
+     valeva il 31.9% dell'area a difficolta' 20 e il 10.4% a 99.
+     La logica concordata: lo spessore si RISOLVE perche' l'AREA sia la
+     percentuale voluta, e la base e' l'AREA DI TIRO — l'arena meno il raggio
+     della pallina, perche' il centro della pallina non arriva piu' in la'. */
+  /* PROBABILITA' = AREE — solver condivisi con la V15.
+     Ogni banda (core, almost, epic, wound) viene risolta in modo che la sua
+     area all'interno dell'arena di tiro corrisponda alla percentuale di
+     probabilità richiesta. */
+  {
+    const big=cfg.bigwin||cfg.crit||5;
+    const almost=cfg.almost||5;
+    const epic=cfg.epicfail||cfg.crit||5;
+    const minStar=Math.min(...Array.from({length:720},(_,i)=>rStarAt(-Math.PI/2+i*(TAU/720))));
+    geo.rCore=Math.min(minStar, solveCoreRadius(geo.snap, big));
+    const [eAlmost]=solveOuterBands(geo.snap, rStarAt, [almost], 1440);
+    geo.almostFactor=eAlmost;
+    geo.epicFactor=solveGooBand(geo.snap, epic, 1440);
+    geo.woundFactor=solveGooBand(geo.snap, cfg.wound, 1440);
+    geo.epicW=geo.epicFactor*R; // mantenuto in px per i target di debug
+    /* la morte e' una striscia appena FUORI dal bordo della stella: cresce
+       verso l'esterno, quindi si risolve sull'altro verso */
+    {
+      const want=reachArea(geo.snap,1440)*clamp(cfg.dead,0,60)/100;
+      const outward=w=>{
+        let s=0;
+        const dA=TAU/1440, wallAt=a=>rCheckAt(a,1);
+        for(let i=0;i<1440;i+=1){
+          const a=-Math.PI/2+i*dA;
+          const r0=Math.min(rStarAt(a),wallAt(a));
+          const r1=Math.min(r0+w,wallAt(a));
+          s+=0.5*(r1*r1-r0*r0)*dA;
+        }
+        return s;
+      };
+      let lo=0,hi=R;
+      for(let k=0;k<44;k+=1){ const m=(lo+hi)/2; if(outward(m)<want) lo=m; else hi=m; }
+      geo.deathDepth=(lo+hi)/2;
+    }
+  }
+}
+/* interpolate a per-axis radius array around the wheel (tips at TIP(i)) */
+/* il fianco DRITTO: intersezione del raggio con la corda fra due vertici */
+/* LA MAREA — e perche' NON passa dalla molla del rim.
+   Primo tentativo: sommare l'onda al bersaglio della molla in `tickGooSim`, per
+   far salire "la massa vera". Misurato: a onda 0.78 la maschera aveva gia'
+   mangiato fino a 282px mentre il catrame stava a 208 — il tetto di velocita'
+   della molla non la lascia seguire, quindi la stella si dissolveva nel vuoto
+   invece di essere mangiata; e al ritorno il catrame restava 35px oltre il muro
+   quando il giocatore poteva gia' tirare.
+   La molla porta la FISICA e deve restare quella. La marea e' una deformazione
+   della superficie al momento del disegno: istantanea, esatta, e a onda zero
+   sparisce da sola — il muro torna su `rCheckAt` senza nessun assestamento.
+   Un solo posto per il numero, perche' la superficie disegnata e il bordo che
+   cancella devono essere LO STESSO bordo. */
+function tideCrestAt(theta,starS){
+  return Math.max(rCheckAt(theta,1), rStarAt(theta,starS)*1.04);
+}
+/* quanto la marea alza la superficie su quell'angolo, in pixel */
+function tideLiftAt(theta,amount){
+  if(amount<=0.001) return 0;
+  const w=rCheckAt(theta,1);
+  return (tideCrestAt(theta,scene.starScale||0)-w)*amount;
+}
+/* star radius (success boundary) — per-axis flower, reaches the white obelisk (stat) */
+function rStarAt(theta,scale=1){
+  /* il bordo della stella E' quello del modello V16, risolto dal pilota d'area.
+     Nessun profilo locale: se ne esistesse uno secondo, divergerebbe. */
+  return rHeroNarrowAt(geo.heroShape,theta)*scale;
+}
+/* GOO EDGE = failure boundary = the ball's physical wall. A SMOOTH blob that
+   touches each black obelisk (the check) and interpolates smoothly between
+   adjacent ones (no deep star valleys), so the goo's area is bounded exactly by
+   the dark obelisks. This is both the visible goo rim and the ball's container. */
+/* organic blob deformation — deterministic low-freq lobes so the goo edge is an
+   irregular blob, never a clean circle (stable per angle for physics + drawing).
+   V6.3: lobe amplitude scales with `rev` so the tar starts as a small circle
+   and grows its strange edges as it pours outward. */
+function gooBlob(theta, rev=1){
+  const amp = rev;
+  return 1 + amp*(0.035*Math.sin(theta*3+0.7) + 0.022*Math.sin(theta*5-1.3) + 0.014*Math.sin(theta*7+2.1));
+}
+function rCheckAt(theta,scale=1){
+  const t=((normAng(theta+Math.PI/2)%TAU)+TAU)%TAU;   // 0 at axis 0
+  const seg=TAU/AXES;                                 // 72° between adjacent obelisks
+  const k=Math.floor(t/seg), f=(t-k*seg)/seg;
+  const r0=geo.axisCheck[k%AXES], r1=geo.axisCheck[(k+1)%AXES];
+  const s=f*f*(3-2*f);                                // smoothstep between neighbours
+  /* V6.3: gooBlob lobe amplitude scales with `scale` (=gooReveal) so the seed
+     is a small circle and the strange edges grow with the pour. */
+  return Math.max(geo.rCore+30, (r0+(r1-r0)*s)*gooBlob(theta,scale))*scale;
+}
+const dist=(x,y)=>Math.hypot(x-CX,y-CY);
+const angOf=(x,y)=>Math.atan2(y-CY,x-CX);
+/* La stella è SEMPRE tagliata dall'arena: dove premerebbe oltre il muro,
+   si appiattisce contro di esso. Vale per il disegno e per il verdetto, così
+   l'area che l'occhio misura è esattamente quella che spatialVerdict risolve. */
+const inStar=(x,y,s=1)=>{const a=angOf(x,y);return dist(x,y)<=Math.min(rStarAt(a,s),rCheckAt(a));};
+const inCore=(x,y)=>dist(x,y)<=geo.rCore;
+/* almost = proportional margin just past the flower (success edge) */
+const inAlmost=(x,y)=>{const a=angOf(x,y),d=dist(x,y),rs=rStarAt(a);return d>rs&&d<=rs*(1+geo.almostFactor);};
+/* critical failure = the BORDER of the goo (its outermost band, against the wall) */
+const inEpic=(x,y)=>{const a=angOf(x,y),d=dist(x,y),e=rCheckAt(a);return d>e*(1-geo.epicFactor)&&d<=e;};
+/* FERITA zone: outer band of goo (just inside goo edge), proportional to wound% */
+const inWoundZone=(x,y)=>{const a=angOf(x,y),d=dist(x,y),starR=rStarAt(a);if(d<=starR)return false;const e=rCheckAt(a);return d>=e*(1-geo.woundFactor)&&d<=e;};
+/* MORTE zone: strip just outside star edge in valley directions, proportional to dead% */
+const inDeathZone=(x,y)=>{const a=angOf(x,y),d=dist(x,y),starR=rStarAt(a);if(d<=starR)return false;return d<=starR+geo.deathDepth;};
+
+/* =========================================================================
+   SPATIAL RESOLUTION — verdict determined by ball position, no D100 pre-roll.
+   The Challenge Surface (rCheckAt) is the ball's physical container.
+   The Player Star (rStarAt) is the success zone.
+   Where the ball stops determines the outcome.
+   ========================================================================= */
+function spatialVerdict(x,y){
+  if(inCore(x,y))       return 'bigwin';
+  if(inStar(x,y))       return 'win';
+  if(inAlmost(x,y))     return 'almost';
+  if(inDeathZone(x,y))  return 'fail_dead';
+  if(inWoundZone(x,y))  return 'fail_wound';
+  if(inEpic(x,y))       return 'epicfail';
+  return 'fail';
+}
+function spatialRiskRoll(){
+  const riskRoll=1+Math.floor(Math.random()*100);
+  const dead=riskRoll<=cfg.dead;
+  const wounded=!dead&&riskRoll<=cfg.dead+cfg.wound;
+  return {riskRoll,dead,wounded};
+}
+
+/* =========================================================================
+   SCENE STATE — choreography data (presentation)
+   ========================================================================= */
+const scene={
+  state:'idle',
+  t0:0,
+  res:null, target:null, resolved:null,
+  blackPillars:[], whitePillars:[],     // {ang,r,drop:0..1,flash,landed}
+  axisAlpha:1,
+  gooFullMs:0,
+  starScale:0,
+  pourP:0, streamAlpha:0,
+  ball:{x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false,state:'settled',alignedDir:{x:0,y:0},decel:0},
+  ballAccum:0,
+  snapFrom:null,
+  shocks:[], rimHits:[], sparks:[], shards:[],
+  gooRipple:0,                          // boosts displacement scale
+  gooReveal:0,                          // 0 in idle → goo wells up cinematically
+  ringReveal:0,                         // 0 until the bronze ring locks in
+  motes:Array.from({length:22},()=>({x:Math.random()*W,y:Math.random()*W,r:.5+Math.random()*1.5,
+    sp:2.5+Math.random()*6,ph:Math.random()*TAU,sw:Math.random()*TAU})),
+  stars:Array.from({length:42},()=>({x:Math.random()*W,y:Math.random()*W,
+    r:.4+Math.random()*1.2,ph:Math.random()*TAU,sp:.4+Math.random()*1.1})),
+};
+function buildPillars(){
+  /* per axis: white obelisk at the stat radius, black obelisk at the check
+     radius — both on the SAME spoke so the star reaches white and the goo
+     reaches black on that axis */
+  scene.whitePillars=Array.from({length:AXES},(_,i)=>({
+    ang:TIP(i), r:geo.axisTip[i], drop:0, flash:0, landed:false, idx:i}));
+  /* black obelisks sit exactly ON the (blobby) goo edge at their spoke */
+  scene.blackPillars=Array.from({length:AXES},(_,i)=>({
+    ang:TIP(i), r:rCheckAt(TIP(i)), drop:0, flash:0, landed:false, idx:i}));
+}
+
+/* =========================================================================
+   TIMELINE — strict data-state pipeline
+   idle → threat-slam → agency-burst → risk-pour → the-spin → magnetic-snap → resolution
+   ========================================================================= */
+const suite=$id('suite');
+const stage=$id('stage');
+const stateChip=$id('stateChip');
+/* host hooks — present when embedded by the React component (opts), no-op in
+   the standalone HTML (typeof guard so the page still runs on its own) */
+function emitState(s){ try{ if(typeof opts!=='undefined'&&opts&&opts.onState) opts.onState(s); }catch(e){} }
+function emitArmed(b){ try{ if(typeof opts!=='undefined'&&opts&&opts.onArmed) opts.onArmed(b); }catch(e){} }
+/* R-067: pre-roll board info for the React overlay — the numbers the player
+   must read BEFORE the throw (skill, stat, difficulty, probability, risk). */
+function emitInfo(){ try{ if(typeof opts!=='undefined'&&opts&&opts.onInfo) opts.onInfo({
+  skills:skills.slice(), axisSkill:geo.axisSkill.slice(), activeSkillIndex:(scene.resolved&&scene.resolved.skillIndex)||0,
+  probPct:geo.probPct||0, tst:geo.tst,
+  woundPct:cfg.wound, deadPct:cfg.dead }); }catch(e){} }
+let armed=false;                 // true while the TIRA button should be shown
+function setState(s){
+  scene.state=s; scene.t0=performance.now();
+  suite.dataset.state=s;
+  stateChip.textContent=s;
+  emitState(s);
+  if(s==='threat-slam'){ resetDrops(scene.t0); }
+}
+function phaseT(durMs){ return clamp((performance.now()-scene.t0)/durMs,0,1); }
+const easeOutCubic=t=>1-Math.pow(1-t,3);
+const easeInCubic=t=>t*t*t;
+/* LE TRE FORME, E LE SOGLIE NON SONO INVENTATE.
+ *
+ *   punta < muro            -> FIORE           (petali tondi)
+ *   punta ~ muro .. phi^2   -> STELLA NORMALE  (fianchi dritti, valle 0.382)
+ *   punta -> phi^2 * muro   -> STELLA STIRATA  (la valle si scava)
+ *
+ * 0.382 non e' a occhio: nella stella a cinque punte il rapporto fra raggio
+ * interno ed esterno e' `cos(2pi/5)/cos(pi/5) = 1/phi^2 = 0.381966`. E' LA
+ * proporzione della stella, verificata numericamente. La V6 Asterism usa 0.4,
+ * che e' la stessa cosa a occhio.
+ *
+ * E la terza soglia e' quella che il Director ha DEFINITO invece di scegliere:
+ * «quando con la stella il goo sarebbe interamente coperto». Il punto piu' basso
+ * del bordo e' la valle, quindi la stella copre tutto quando
+ *     0.382 * punta >= muro   ->   punta/muro >= 1/0.382 = phi^2 = 2.618
+ * Da li' in poi la valle DEVE scavarsi, o il fallimento sparisce dal disegno.
+ */
+const PHI=(1+Math.sqrt(5))/2;
+const V63_STAR_AT=1.0;            // la parita': da qui e' stella
+const easeOutBack=t=>{const c=1.7;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2);};
+const smoothstep=(t,a,b)=>{ if(t<=a)return 0; if(t>=b)return 1; const m=(t-a)/(b-a); return m*m*(3-2*m); };
+/* V6.3 tar-pour curve: pooled seed → slow spread → settle, no overshoot.
+   Follows an S-curve (smoothstep) so the mass has time to look heavy. */
+/* LA COLATA VISCOSA (PLAN-010 CP-E).
+   Qui c'era una smoothstep: `t^2(3-2t)`, derivata `6t(1-t)` — zero all'inizio,
+   MASSIMA a meta'. Il catrame accelerava nella prima meta' della colata, che e'
+   l'opposto di viscoso, e nessuna taratura dei tempi poteva rimediarlo perche' il
+   difetto stava nella forma della curva.
+   Ora e' la legge del flusso di gravita' viscoso (Huppert 1982, JFM 121:43-58):
+   `r ~ t^((3a+1)/8)` con volume `~ t^a`; a flusso costante (a=1) l'esponente e'
+   1/2. La derivata `~t^(-1/2)` decresce sempre: «sempre piu' lentamente» diventa
+   letterale. La derivata infinita a t=0 non produce uno scatto perche' il tetto
+   di velocita' della molla la assorbe. */
+const tarPour=t=> tarGooConfig.timing.seedReveal
+  + (1-tarGooConfig.timing.seedReveal)*Math.pow(clamp(t,0,1),tarGooConfig.v63.pourExponent);
+const easeOutHeavy=t=>1-Math.pow(1-t,3.5);         // kept for other uses
+const easeElastic=t=>t===0?0:t===1?1:Math.pow(2,-10*t)*Math.sin((t*10-0.75)*(TAU/3))+1;
+
+const V63_STIFFNESS=tarGooConfig.v63.stiffness;
+/* la variante di fondo attiva: config, sovrascrivibile con ?bg=<nome> */
+/* la palette della stella attiva: config, sovrascrivibile con ?star=<nome> */
+function v63Star(){
+  const set=tarGooConfig.v63.stars;
+  let nome=tarGooConfig.v63.star;
+  try{
+    const q=new URLSearchParams(window.location.search).get('star');
+    if(q&&set[q]) nome=q;
+  }catch(e){ /* nessuna query: resta la config */ }
+  return set[nome]||set.avorio;
+}
+function v63Backdrop(){
+  const set=tarGooConfig.v63.backdrops;
+  let nome=cfg.bgVariant || tarGooConfig.v63.backdrop;
+  if(cfg.bgVariant==='mercury' && set.smoke) nome='smoke';
+  if(cfg.bgVariant==='pergamena' && set.pergamenaScura) nome='pergamenaScura';
+  try{
+    const q=new URLSearchParams(window.location.search).get('bg');
+    if(q&&set[q]) nome=q;
+  }catch(e){ /* nessuna query: resta la config */ }
+  return set[nome]||set.ardesia;
+}
+const V63_SPAWN_RING=tarGooConfig.v63.spawnRingFactor;
+const V63_AXIS_BIAS=tarGooConfig.v63.axisBias;
+/* phaseDurations from astrolabeV64Config is the source of truth for timings. */
+
+function shake(kind){
+  stage.classList.remove('shake-hard','shake-low','shake-slam');
+  void stage.offsetWidth;
+  stage.classList.add(kind);
+}
+
+function launchRoll(){
+  /* clear previous resolution */
+  card.classList.remove('show','triumph','win','almost','fail','epic');
+  suite.dataset.tone='';
+  suite.dataset.bgVariant=cfg.bgVariant||'mercury';
+  suite.dataset.ringVariant=cfg.ringVariant||'patina';
+  suite.dataset.ballColor=cfg.ballColor||'amber';
+  suite.dataset.motion=cfg.motion||'on';
+  $id('flare').classList.remove('fire');
+  $id('launch').classList.remove('pulse');
+  /* recompute geometry, build obelisks, reset all scene state */
+  prerollDestiny();
+  emitInfo();
+  buildPillars();
+  scene.starScale=0; scene.pourP=0; scene.streamAlpha=0; scene.axisAlpha=1; scene.gooFullMs=0;
+  scene.tideP=0; scene.tideWave=0;
+  scene.gooReveal=0; scene.ringReveal=0;
+  scene.ball={x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false,state:'settled',alignedDir:{x:0,y:0},decel:0};
+  scene.warp=0;
+  scene.shocks.length=0; scene.rimHits.length=0; scene.sparks.length=0; scene.shards.length=0;
+  scene.fissure=null;
+  armed=false; emitArmed(false);
+  /* panel result removed */
+  /* ACT 0 — the Sun-Bronze ring slams into place like an ancient telescope lens */
+  scene.ringShaken=false;
+  setState('ring-lock');
+}
+
+/* THROW (TIRA) — starts the spin. If clicked mid-reveal it WARPS: the reveal
+   snaps complete (no hard cut) and the ball fires immediately.
+   During the throw/bounces the obelisks, axis ruler and side streams are hidden. */
+function throwBall(){
+  const s=scene.state;
+  if(s==='idle'||s==='the-spin'||s==='magnetic-snap'||s==='resolution') return;
+  armed=false; emitArmed(false);
+  /* warp: snap surface fully, but keep UI chrome (obelisks/axis/streams) off
+     so only the tar wall, star and ball are visible during the spin. */
+  scene.gooReveal=1; scene.starScale=1; scene.pourP=1; scene.streamAlpha=0; scene.axisAlpha=0; scene.gooFullMs=performance.now();
+  scene.tideP=1; scene.tideWave=0;
+  scene.blackPillars.concat(scene.whitePillars).forEach(pl=>{ pl.drop=0; pl.landed=true; pl.shattered=true; });
+  if(s!=='action-trigger'){ scene.warp=1; scene.gooRipple=1; }   // visual warp flash when skipping
+  setState('the-spin'); fireBall();
+}
+/* ringMs and axisReadMs are read from phaseDurations. */
+
+/* advance choreography (called every frame) */
+function tickTimeline(){
+  const s=scene.state;
+  if(s==='idle') return;
+
+  if(s==='ring-lock'){
+    const p=phaseT(phaseDurations.ringMs);
+    scene.ringReveal=clamp(p/0.68,0,1);     // ring fades/locks into being
+    scene.ringShaken=true;                  // V6: nessuno shake per la ghiera rimossa
+    if(p>=1){ scene.ringReveal=1; setState('threat-slam'); }
+  }
+  else if(s==='threat-slam'){
+    const p=phaseT(phaseDurations.slamMs);
+    /* V6.3 tar seed: no central pool yet — seed drops fall from above and
+       merge while the black obelisks slam. The main rim stays at 0. */
+    scene.gooReveal=0;
+    scene.blackPillars.forEach((pl,i)=>{
+      const local=clamp((p-(i*0.13))/0.4,0,1);
+      const prev=pl.drop;
+      pl.drop=easeInCubic(local);
+      if(prev<1&&pl.drop>=1&&!pl.landed){
+        pl.landed=true; pl.flash=1;
+        scene.gooRipple=1; shake('shake-slam');
+        addShock(pl,'rgba(200,134,46,.9)');
+      }
+    });
+    if(p>=1) setState('goo-expand');
+  }
+  else if(s==='goo-expand'){
+    /* V6.3 TAR POUR — the seeded pool spreads outward like a slow colata.
+       Curve: S-curve (smoothstep) from seed to full, so the mass is readable
+       at every stage and never snaps like water. */
+    const p=phaseT(phaseDurations.gooMs);
+    scene.gooReveal=tarPour(p);
+    /* Calm swell in the middle of the pour: the mass pushes, then settles. */
+    const swell=0.24*(1-Math.abs(2*p-1));
+    scene.gooRipple=Math.max(scene.gooRipple,swell);
+    if(p>=1){
+      scene.gooReveal=1;
+      scene.gooFullMs=performance.now();    // mark when the tar becomes fully revealed
+      setState('axis-read');           // V6: beat di lettura prima della risposta del PG
+    }
+  }
+  else if(s==='axis-read'){
+    /* BEAT DI LETTURA — la difficoltà è posata e misurabile, niente si muove.
+       È l'unico momento in cui il giocatore può leggere i 5 assi da soli. */
+    if(phaseT(phaseDurations.axisReadMs)>=1) setState('agency-burst');
+  }
+  else if(s==='agency-burst'){
+    const p=phaseT(phaseDurations.burstMs);
+    /* Pillars drop first (compressed into first 65% of phase) */
+    scene.whitePillars.forEach((pl,i)=>{
+      const local=clamp((p-(i*0.07))/0.26,0,1);
+      const prev=pl.drop;
+      pl.drop=easeInCubic(local);
+      if(prev<1&&pl.drop>=1&&!pl.landed){
+        pl.landed=true; pl.flash=1; shake('shake-slam');
+        addShock(pl,'rgba(255,242,200,.95)');
+      }
+    });
+    /* Star appears AFTER all pillars are landed (p≥0.65), grows with overshoot */
+    const STAR_START=0.65;
+    scene.starScale=easeOutBack(clamp((p-STAR_START)/(1-STAR_START),0,1));
+    if(p>=1){
+      scene.starScale=1;
+      armed=true; emitArmed(true);     // arm the THROW button after star finishes expanding
+      setState('risk-pour');
+    }
+  }
+  else if(s==='risk-pour'){
+    const p=phaseT(phaseDurations.pourMs);
+    /* R-067: FRANTUMAZIONE — gli obelischi non risalgono più: a un terzo del
+       gesto si spezzano in schegge che cadono e affondano nel catrame. */
+    scene.whitePillars.forEach((pl,i)=>{
+      const local=clamp((p-(i*0.05))/0.75,0,1);
+      if(local>0.08&&!pl.shattered){ pl.shattered=true; pl.drop=0; spawnShards(pl,true); }
+    });
+    scene.blackPillars.forEach((pl,i)=>{
+      const local=clamp((p-(i*0.05))/0.75,0,1);
+      if(local>0.08&&!pl.shattered){ pl.shattered=true; pl.drop=0; spawnShards(pl,false); }
+    });
+    /* LA MAREA DEL CATRAME. La stella e' gia' sbocciata INTERA nel beat
+       precedente — non nasce clippata, e questo e' il punto. Qui il catrame si
+       ALZA, le mangia l'eccedenza fuori dall'arena, e si ritira.
+       Due grandezze e non una, perche' non sono la stessa cosa:
+         tideWave — la massa che sale e TORNA (0->1->0). Deve tornare: il muro
+                    porta le probabilita' e deve restare sugli obelischi neri,
+                    quindi a riposo la sagoma e' di nuovo `rCheckAt` esatta e
+                    fisica e verdetto non si accorgono di niente.
+         tideP    — quanto la marea ha gia' MANGIATO. E' il massimo corrente
+                    dell'onda, quindi monotono per costruzione: cio' che il
+                    catrame ha preso resta preso, e quando l'onda si ritira
+                    sotto non ricompare la campitura ma il tratteggio.
+       Usando lo stesso normalizzato per entrambe, il bordo che cancella E' la
+       superficie del catrame: non e' un ritaglio che si stringe per conto suo. */
+    {
+      const q=clamp((p-0.06)/0.52,0,1);
+      scene.tideWave=Math.sin(Math.PI*q);
+      scene.tideP=Math.max(scene.tideP||0,scene.tideWave);
+    }
+    scene.axisAlpha=1-easeInCubic(clamp(p/0.85,0,1));
+    scene.pourP=easeOutCubic(p);
+    scene.streamAlpha=0.5;
+    if(p>=1){ scene.streamAlpha=0.34; setState('action-trigger'); }   // GATE: wait for TIRA
+  }
+  else if(s==='action-trigger'){
+    /* WAITING_FOR_INPUT — hold here until the player throws (throwBall). The
+       button is already armed; the spin will not start on its own. */
+  }
+  else if(s==='the-spin'){
+    const p=phaseT(phaseDurations.spinMs);
+    stepBall(p);
+    const b=scene.ball;
+    const target=scene.targetPos;
+    if(b.state==='settled' || p>=1){
+      if(target){ b.x=target.x; b.y=target.y; }
+      resolve();
+    }
+  }
+  /* decay one-shot fx */
+  scene.gooRipple=Math.max(0,scene.gooRipple-0.02);
+  scene.blackPillars.concat(scene.whitePillars).forEach(pl=>pl.flash=Math.max(0,pl.flash-0.03));
+  tickShards(Math.min(50,performance.now()-(scene.lastFxT||performance.now())));
+  scene.lastFxT=performance.now();
+}
+function addShock(pl,color){
+  scene.shocks.push({x:CX+Math.cos(pl.ang)*pl.r,y:CY+Math.sin(pl.ang)*pl.r,t:0,dur:600,c:color});
+}
+
+/* R-067 FRANTUMAZIONE — l'obelisco si spezza in schegge che cadono con
+   gravita', ruotano e affondano nel catrame alla base dell'obelisco.
+   Bianco (stat) → schegge d'oro; nero (check) → schegge d'ossidiana. */
+function spawnShards(pl,isWhite){
+  const cfgS=astrolabeV64Config.shatter;
+  const px=CX+Math.cos(pl.ang)*pl.r, py=CY+Math.sin(pl.ang)*pl.r;
+  const col=isWhite?'#ffe9c0':'#1c2a3a';
+  const edge=isWhite?'rgba(255,221,150,.9)':'rgba(0,180,255,.55)';
+  for(let i=0;i<cfgS.shardsPerPillar;i+=1){
+    const a=Math.random()*TAU;
+    const sp=cfgS.spread[0]+Math.random()*(cfgS.spread[1]-cfgS.spread[0]);
+    scene.shards.push({
+      x:px+(Math.random()*2-1)*10,
+      y:py-20-Math.random()*110,          // punti lungo il fusto
+      vx:Math.cos(a)*sp, vy:-Math.random()*1.2,
+      rot:Math.random()*TAU, vr:(Math.random()*2-1)*cfgS.spin,
+      s:cfgS.size[0]+Math.random()*(cfgS.size[1]-cfgS.size[0]),
+      life:cfgS.lifeMs[0]+Math.random()*(cfgS.lifeMs[1]-cfgS.lifeMs[0]),
+      max:1, floor:py+2, c:col, e:edge,
+    });
+    const sh=scene.shards[scene.shards.length-1];
+    sh.max=sh.life;
+  }
+}
+function tickShards(dt){
+  const g=astrolabeV64Config.shatter.gravity;
+  const k=dt/16.7;
+  for(let i=scene.shards.length-1;i>=0;i-=1){
+    const s=scene.shards[i];
+    s.life-=dt;
+    if(s.life<=0){scene.shards.splice(i,1);continue;}
+    s.vy+=g*dt;                            // cadono
+    s.x+=s.vx*k; s.y+=s.vy*k; s.rot+=s.vr*k;
+    if(s.y>s.floor){ s.y=s.floor; s.vy*=-0.18; s.vx*=0.5; s.life-=dt*2; } // affondano nel catrame
+  }
+}
+function drawShards(){
+  if(!scene.shards.length) return;
+  ctx.save();
+  for(const s of scene.shards){
+    const a=clamp(s.life/s.max,0,1);
+    ctx.globalAlpha=a;
+    ctx.translate(s.x,s.y); ctx.rotate(s.rot);
+    ctx.fillStyle=s.c;
+    ctx.beginPath(); ctx.moveTo(0,-s.s); ctx.lineTo(s.s*.8,s.s*.6); ctx.lineTo(-s.s*.8,s.s*.6); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle=s.e; ctx.lineWidth=.8; ctx.stroke();
+    ctx.setTransform(1,0,0,1,0,0);
+  }
+  ctx.restore(); ctx.globalAlpha=1;
+}
+
+/* R-067 FENDITURA RADIALE — la crepa parte dall'impatto e corre lungo il
+   raggio del cerchio (verso il bordo del catrame). Percorso seghettato:
+   segmenti con scarto angolare casuale ma deterministico (seme da `ang`),
+   confinata dentro la sagoma del goo.
+   wound: si apre, poi si richiude e resta una cicatrice ambrata sottile;
+   death:  si apre e NON si chiude — spacco nero con filo viola. */
+function drawFissure(now){
+  const f=scene.fissure;
+  if(!f) return;
+  const cfgF=astrolabeV64Config.fissure;
+  const el=now-f.t0;
+  const open=clamp(el/cfgF.openMs,0,1);
+  /* wound: dopo l'apertura completa si richiude; death: resta aperta */
+  const closeP=f.dead?0:clamp((el-cfgF.openMs)/cfgF.closeMs,0,1);
+  const width=cfgF.widthPx*open*(1-closeP*0.9);        // wound quasi svanisce
+  const d0=dist(f.x,f.y);
+  const rEdge=rCheckAt(f.ang,1);
+  const rFrom=Math.max(geo.rCore*0.5,d0-26);
+  const rTo=Math.min(rEdge,rFrom+60+(rEdge-rFrom)*open);
+  if(rTo<=rFrom+4) return;
+
+  /* traccia seghettata lungo il raggio, seed deterministico da ang */
+  const SEG=14;
+  const rnd=rng32(Math.floor((f.ang+Math.PI)*1000)+17);
+  const pts=[];
+  for(let i=0;i<=SEG;i+=1){
+    const u=i/SEG, r=rFrom+(rTo-rFrom)*u;
+    const a=f.ang+(rnd()*2-1)*cfgF.jag*0.09*Math.sin(u*Math.PI);
+    pts.push([CX+Math.cos(a)*r,CY+Math.sin(a)*r]);
+  }
+  ctx.save();
+  /* la fenditura parte dalla pallina e puo' attraversare stella E catrame
+     (ferita/morte possono accompagnare qualunque esito), quindi la clip e'
+     solo l'arena, non il goo. */
+  ctx.beginPath(); ctx.arc(CX,CY,R,0,TAU); ctx.clip();
+  ctx.lineJoin='round'; ctx.lineCap='round';
+
+  if(f.dead){
+    /* spacco aperto: corpo nero-viola + filo luminoso viola sui bordi */
+    ctx.strokeStyle=cfgF.crackEdgeColor;
+    ctx.lineWidth=width+3;
+    ctx.globalAlpha=.55*open;
+    ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])); ctx.stroke();
+    ctx.globalAlpha=1;
+    ctx.strokeStyle=cfgF.crackColor;
+    ctx.lineWidth=Math.max(1.2,width);
+    ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])); ctx.stroke();
+  }else{
+    /* wound: apertura scura, poi cicatrice ambrata che resta */
+    if(closeP<1){
+      ctx.strokeStyle='rgba(10,4,18,.92)';
+      ctx.lineWidth=Math.max(.8,width);
+      ctx.globalAlpha=(1-closeP)*0.95;
+      ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])); ctx.stroke();
+    }
+    if(closeP>0.15){
+      const scarA=clamp((closeP-0.15)/0.4,0,1);
+      ctx.globalAlpha=scarA;
+      ctx.strokeStyle=cfgF.scarColor;
+      ctx.lineWidth=1.4;
+      ctx.shadowColor='rgba(232,168,60,.7)'; ctx.shadowBlur=4;
+      ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])); ctx.stroke();
+      ctx.shadowBlur=0;
+    }
+  }
+  ctx.restore();
+}
+
+/* =========================================================================
+   THE BALL — pinball + hidden progressive magnetism + bullet-time snap
+   ========================================================================= */
+/* Compute a target position for the ball based on forced verdict mode.
+   Returns {x,y} in canvas space, or null for random. */
+function computeTargetPos(){
+  const mode=cfg.mode||'random';
+  if(mode==='bigwin') return {x:CX+4,y:CY-6};
+  if(mode==='win'){
+    const a=TIP(0)*0.55+TIP(1)*0.45;
+    const r=geo.axisTip[0]*0.68;
+    return {x:CX+Math.cos(a)*r,y:CY+Math.sin(a)*r};
+  }
+  if(mode==='almost'){
+    const a=TIP(2)+0.1;
+    const starR=rStarAt(a);
+    const r=starR+starR*geo.almostFactor*0.5;
+    return {x:CX+Math.cos(a)*r,y:CY+Math.sin(a)*r};
+  }
+  if(mode==='fail'){
+    const a=TIP(1)+Math.PI/AXES;
+    const starR=rStarAt(a), checkR=rCheckAt(a);
+    const almostR=starR*(1+geo.almostFactor);
+    const epicR=checkR*(1-geo.epicFactor);
+    const r=almostR+(epicR-almostR)*0.5;
+    return {x:CX+Math.cos(a)*r,y:CY+Math.sin(a)*r};
+  }
+  if(mode==='fail_wound'){
+    /* outer band of failure gap near goo edge */
+    const a=TIP(0)+0.22;
+    const checkR=rCheckAt(a);
+    const r=checkR*(1-geo.woundFactor*0.4);
+    return {x:CX+Math.cos(a)*r,y:CY+Math.sin(a)*r};
+  }
+  if(mode==='fail_dead'){
+    /* valley floor just past star edge */
+    const valleyAng=TIP(0)+Math.PI/AXES;
+    const starR=rStarAt(valleyAng);
+    const r=starR+Math.max(14,geo.deathDepth*0.45);
+    return {x:CX+Math.cos(valleyAng)*r,y:CY+Math.sin(valleyAng)*r};
+  }
+  if(mode==='epicfail'){
+    const a=TIP(3)+0.3;
+    const checkR=rCheckAt(a);
+    const r=checkR*(1-geo.epicFactor*0.6);
+    return {x:CX+Math.cos(a)*r,y:CY+Math.sin(a)*r};
+  }
+  return null;
+}
+
+function rollD100(){ return 1+Math.floor(Math.random()*100); }
+
+function pickSkillIndex(outcomeRoll){
+  return (outcomeRoll-1)%Math.max(1,skills.length);
+}
+
+function outcomeToVerdict(outcomeRoll, skillIndex){
+  const sk=skills[skillIndex]||{stat:60,difficulty:50};
+  const tst=clamp(50+(sk.stat-sk.difficulty),1,99);
+  const big=cfg.bigwin||cfg.crit||5;
+  const almost=cfg.almost||5;
+  const epic=cfg.epicfail||cfg.crit||5;
+  if(outcomeRoll<=big) return 'bigwin';
+  if(outcomeRoll<=tst) return 'win';
+  // 'almost' band lives between win and epic-fail, never overlapping it
+  const epicThreshold=100-epic;
+  const almostBand=clamp(almost,1,Math.max(1,epicThreshold-tst));
+  if(outcomeRoll<=tst+almostBand) return 'almost';
+  // critical fail band
+  if(outcomeRoll>epicThreshold) return 'epicfail';
+  return 'fail';
+}
+
+function computeLanding(skillIndex, verdict, dead, wounded){
+  const seg=TAU/Math.max(1,skills.length);
+  const startAng=-Math.PI/2+skillIndex*seg;
+  const ang=startAng+Math.random()*seg;
+  const checkR=rCheckAt(ang);
+  const BALL_R=9;
+  let r=geo.rCore;
+  if(verdict==='bigwin'){
+    r=geo.rCore*(0.2+Math.random()*0.6);
+  }else if(verdict==='win'){
+    r=geo.rCore+Math.random()*Math.max(0,rStarAt(ang)-geo.rCore);
+  }else if(verdict==='almost'){
+    const starR=rStarAt(ang);
+    r=starR+Math.random()*starR*geo.almostFactor;
+  }else if(verdict==='fail'){
+    const starR=rStarAt(ang), almostR=starR*(1+geo.almostFactor), epicR=checkR*(1-geo.epicFactor);
+    if(dead){
+      r=starR+Math.random()*Math.max(0,geo.deathDepth);
+    }else if(wounded){
+      r=Math.max(geo.rCore+40, checkR*(1-Math.random()*geo.woundFactor));
+    }else{
+      r=almostR+Math.random()*Math.max(0,epicR-almostR);
+    }
+  }else if(verdict==='epicfail'){
+    r=checkR*(1-geo.epicFactor+Math.random()*geo.epicFactor);
+  }
+  r=clamp(r,0,Math.max(0,checkR-BALL_R));
+  return { x:CX+Math.cos(ang)*r, y:CY+Math.sin(ang)*r, ang, r };
+}
+
+function prerollDestiny(){
+  const outcomeRoll=rollD100();
+  const riskRoll=rollD100();
+  const skillIndex=pickSkillIndex(outcomeRoll);
+  recomputeGeometry(skillIndex);
+  const verdict=outcomeToVerdict(outcomeRoll, skillIndex);
+  const dead=riskRoll<=cfg.dead;
+  const wounded=!dead && riskRoll<=cfg.dead+cfg.wound;
+  const landing=computeLanding(skillIndex,verdict,dead,wounded);
+  scene.resolved={outcomeRoll,riskRoll,skillIndex,verdict,dead,wounded,landing};
+  return scene.resolved;
+}
+
+function fireBall(){
+  const b=scene.ball;
+  b.on=true; b.x=CX; b.y=CY;
+  const mode=(cfg.mode||'random');
+  if(mode==='random' && !scene.resolved){
+    prerollDestiny();
+  }else if(mode!=='random' && (!scene.resolved || scene.resolved.verdict!==mode)){
+    // forced mode: build a resolved state so the landing matches the verdict
+    const forcedVerdict=mode;
+    const skillIndex=Math.floor(Math.random()*Math.max(1,skills.length));
+    recomputeGeometry(skillIndex);
+    const landing=computeLanding(skillIndex,forcedVerdict,false,false);
+    scene.resolved={outcomeRoll:0,riskRoll:0,skillIndex,verdict:forcedVerdict,dead:false,wounded:false,landing};
+  }
+  const tp=scene.resolved?scene.resolved.landing:computeTargetPos();
+  scene.targetPos=tp;
+  /* Target-aware kick: aim roughly toward target with moderate jitter. */
+  const baseAngle=tp ? Math.atan2(tp.y-CY,tp.x-CX) : Math.random()*TAU;
+  const jitter=(Math.random()*2-1)*Math.PI*0.45;
+  const a=baseAngle+jitter;
+  const sp=28+Math.random()*8;
+  b.vx=Math.cos(a)*sp; b.vy=Math.sin(a)*sp;
+  b.state='bouncing';
+  b.alignedDir={x:0,y:0};
+  b.decel=0;
+  scene.ballAccum=0;
+  lastBallT=performance.now();
+}
+let lastBallT=performance.now();
+const FIXED_DT_S=1/astrolabeV64Config.landing.fixedHz;
+const FIXED_DT_MS=FIXED_DT_S*1000;
+
+/** Bounce helper — reflect + random scatter so no clean mirror paths. */
+function chaoticBounce(b,nx,ny,extra,chaos){
+  const dot=b.vx*nx+b.vy*ny;
+  if(extra&&dot>=0) return false;
+  b.vx-=2*dot*nx; b.vy-=2*dot*ny;
+  const ang=(Math.random()*2-1)*0.55*chaos;
+  const cs=Math.cos(ang), sn=Math.sin(ang);
+  const rvx=b.vx*cs-b.vy*sn, rvy=b.vx*sn+b.vy*cs;
+  b.vx=rvx; b.vy=rvy;
+  const tx=-ny, ty=nx;
+  const spin=(Math.random()*2-1)*2.6*chaos;
+  b.vx+=tx*spin; b.vy+=ty*spin;
+  const rest=0.92+Math.random()*0.08;
+  b.vx*=rest; b.vy*=rest;
+  const od=b.vx*nx+b.vy*ny;
+  if(od>0){ b.vx-=2*od*nx; b.vy-=2*od*ny; }
+  return true;
+}
+/** One fixed-timestep update of the ball. */
+function stepBallFixed(dtMs,p){
+  const b=scene.ball;
+  if(!b.on) return;
+  const f=dtMs/16.6667;
+  const land=astrolabeV64Config.landing;
+  const target=scene.targetPos;
+  const dtS=dtMs/1000;
+
+  /* state machine: BOUNCING → ALIGNING → DECELERATING → SETTLED.
+     Progress gates keep the wheel readable; the exact landing is preserved
+     by the quadratic deceleration along the pre-rolled line. */
+  if(b.state==='bouncing' && p>=land.alignP){
+    b.state='aligning';
+  }else if(b.state==='aligning' && p>=land.decelP && target){
+    b.state='decelerating';
+    const toX=target.x-b.x, toY=target.y-b.y;
+    const d0=Math.hypot(toX,toY);
+    b.alignedDir=d0>0?{x:toX/d0,y:toY/d0}:{x:1,y:0};
+    const vAlong=b.vx*b.alignedDir.x+b.vy*b.alignedDir.y;
+    const v0=Math.max(0.01,vAlong);
+    const dist=Math.max(1,d0);
+    b.decel=-(v0*v0)/(2*dist);            // px per 16.7ms frame
+  }
+
+  /* per-state motion */
+  if(b.state==='bouncing' || b.state==='aligning'){
+    const fric=Math.pow(b.state==='bouncing'?land.bounceFriction:land.alignFriction,f);
+    b.vx*=fric; b.vy*=fric;
+
+    if(b.state==='aligning' && target){
+      const toX=target.x-b.x, toY=target.y-b.y;
+      const d=Math.hypot(toX,toY);
+      const toDir=d>0?{x:toX/d,y:toY/d}:{x:1,y:0};
+      const speed=Math.hypot(b.vx,b.vy);
+      const vDir=speed>0?{x:b.vx/speed,y:b.vy/speed}:toDir;
+      const cross=vDir.x*toDir.y - vDir.y*toDir.x;
+      const dot=vDir.x*toDir.x + vDir.y*toDir.y;
+      const angle=Math.atan2(cross,dot);  // signed angle from vDir to toDir
+      const maxTurn=land.turnRate*dtS;
+      const turn=Math.sign(angle)*Math.min(Math.abs(angle),maxTurn);
+      const cs=Math.cos(turn), sn=Math.sin(turn);
+      const ndx=vDir.x*cs - vDir.y*sn;
+      const ndy=vDir.x*sn + vDir.y*cs;
+      b.vx=ndx*speed; b.vy=ndy*speed;
+    }
+
+    b.x+=b.vx*f; b.y+=b.vy*f;
+  }else if(b.state==='decelerating' && target){
+    const vAlong=b.vx*b.alignedDir.x+b.vy*b.alignedDir.y;
+    const vTanX=b.vx - b.alignedDir.x*vAlong;
+    const vTanY=b.vy - b.alignedDir.y*vAlong;
+    const newV=Math.max(0, vAlong + b.decel*f);
+    const tanDecay=Math.exp(-land.angularDamping*dtS);
+    const newTanX=vTanX*tanDecay;
+    const newTanY=vTanY*tanDecay;
+    b.vx=b.alignedDir.x*newV + newTanX;
+    b.vy=b.alignedDir.y*newV + newTanY;
+    b.x+=b.vx*f; b.y+=b.vy*f;
+
+    const still=Math.hypot(b.vx,b.vy);
+    const near=Math.hypot(target.x-b.x,target.y-b.y);
+    const settle=land.settleSpeed/60;    // px per 16.7ms
+    if(still<settle && near<2){
+      b.state='settled';
+      b.vx=0; b.vy=0;
+      b.x=target.x; b.y=target.y;
+    }
+  }
+
+  /* CHALLENGE SURFACE bounce — ball is strictly confined inside rCheckAt */
+  const d=dist(b.x,b.y);
+  const aB=angOf(b.x,b.y), edge=rCheckAt(aB)-b.r;
+  if(d>edge){
+    const nx=(b.x-CX)/d, ny=(b.y-CY)/d;
+    const chaos=b.state==='bouncing'?1.0: b.state==='aligning'?0.25:0.05;
+    chaoticBounce(b,nx,ny,false,chaos);
+    b.squash=astrolabeV64Config.ball.bounceSquash;
+    b.x=CX+nx*edge; b.y=CY+ny*edge;
+    addSpark(b.x,b.y);
+  }
+
+  /* pillar bounce (skip when ball is nearly stopped) */
+  if(b.state!=='decelerating' && b.state!=='settled'){
+    scene.blackPillars.concat(scene.whitePillars).forEach(pl=>{
+      if(!pl.landed) return;
+      const px=CX+Math.cos(pl.ang)*pl.r, py=CY+Math.sin(pl.ang)*pl.r;
+      const dx=b.x-px, dy=b.y-py, dd=Math.hypot(dx,dy);
+      if(dd<24){
+        const nx=dx/(dd||1), ny=dy/(dd||1);
+        const chaos=b.state==='bouncing'?1.0:0.25;
+        if(chaoticBounce(b,nx,ny,true,chaos)!==false){ b.x=px+nx*24; b.y=py+ny*24; pl.flash=1; addSpark(b.x,b.y); }
+      }
+    });
+  }
+
+  /* trail and FX */
+  b.trail.push({x:b.x,y:b.y,life:astrolabeV64Config.ball.trailLifeMs});
+  for(let i=b.trail.length-1;i>=0;i-=1){
+    b.trail[i].life-=dtMs;
+    if(b.trail[i].life<=0) b.trail.splice(i,1);
+  }
+  if(b.trail.length>astrolabeV64Config.ball.trailMaxSamples)
+    b.trail.splice(0,b.trail.length-astrolabeV64Config.ball.trailMaxSamples);
+  for(let i=scene.sparks.length-1;i>=0;i-=1){
+    const s=scene.sparks[i]; s.life-=dtMs;
+    if(s.life<=0){scene.sparks.splice(i,1);continue;}
+    s.x+=s.vx*f; s.y+=s.vy*f; s.vy+=0.04*f;
+  }
+  for(let i=scene.rimHits.length-1;i>=0;i-=1){
+    scene.rimHits[i].life-=dtMs;
+    if(scene.rimHits[i].life<=0) scene.rimHits.splice(i,1);
+  }
+}
+
+function stepBall(p){
+  const b=scene.ball;
+  if(!b.on) return;
+  const now=performance.now();
+  let dt=Math.min(40,now-lastBallT); lastBallT=now;
+  scene.ballAccum+=dt;
+  while(scene.ballAccum>=FIXED_DT_MS){
+    stepBallFixed(FIXED_DT_MS,p);
+    scene.ballAccum-=FIXED_DT_MS;
+  }
+}
+function addSpark(x,y){
+  for(let i=0;i<6;i+=1){
+    const a=Math.random()*TAU, sp=1+Math.random()*2.4;
+    scene.sparks.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,
+      r:1+Math.random()*2,life:280+Math.random()*220,max:500,
+      c:Math.random()>0.4?'#fce890':'#34d4b8'});
+  }
+}
+
+/* =========================================================================
+   RESOLUTION
+   ========================================================================= */
+const card=$id('card');
+/* R-067 — nomi dei 5 esiti concordati col Director. Sono FALLBACK: il host
+   React passa le stringhe i18n via `config.copy.verdicts` / `copy.chips` —
+   qui non si introducono nuove stringhe utente non sovrascrivibili. */
+const VERDICT_TEXT={
+  bigwin:{title:'TRIONFO',seal:'★',cls:'triumph',sub:'Il destino si inchina al tuo passo.'},
+  win:{title:'SUCCESSO',seal:'✦',cls:'win',sub:'La prova cede sotto il tuo sforzo.'},
+  almost:{title:'PER UN SOFFIO',seal:'◐',cls:'almost',sub:'Un soffio, e la verità ti sfugge.'},
+  fail:{title:'FALLIMENTO',seal:'✕',cls:'fail',sub:'La presa scivola.'},
+  epicfail:{title:'DISASTRO',seal:'✕',cls:'epic',sub:'Il mondo ti respinge.'},
+};
+function resolve(){
+  const b=scene.ball;
+  const target=scene.targetPos||{x:CX,y:CY};
+  b.x=target.x; b.y=target.y; // snap to the pre-rolled landing
+  let resolved=scene.resolved;
+  const forced=(cfg.mode&&cfg.mode!=='random'&&['bigwin','win','almost','fail','epicfail','fail_wound','fail_dead'].includes(cfg.mode))?cfg.mode:null;
+  if(!resolved){
+    // fallback for direct resolve calls without a pre-roll (forced/manual)
+    const _sv=spatialVerdict(b.x,b.y);
+    resolved={outcomeRoll:0,riskRoll:0,verdict:_sv,dead:false,wounded:false,skillIndex:getSkillIndexFromAngle(b.x,b.y),landing:target};
+  }
+  const verdict=forced||resolved.verdict;
+  let {outcomeRoll,riskRoll,skillIndex}=resolved;
+  if(forced){
+    outcomeRoll=0; riskRoll=0; skillIndex=getSkillIndexFromAngle(b.x,b.y);
+  }
+  let {dead,wounded}=resolved;
+  /* i verdicti zonali portano il flag con sé: atterrare nella fascia ferita
+     ferisce, nella striscia morte uccide — anche in forced mode. */
+  if(verdict==='fail_dead'){ dead=true; wounded=false; }
+  else if(verdict==='fail_wound'){ dead=false; wounded=true; }
+  else if(forced){ dead=false; wounded=false; }
+  recomputeGeometry(skillIndex);
+  scene.res={verdict,roll:outcomeRoll,riskRoll,skillIndex,wounded,dead};
+  const res=scene.res;
+  /* R-067 — fenditura radiale nel catrame: parte dal punto d'impatto della
+     pallina e corre lungo il raggio. Ferita = si richiude in cicatrice ambrata;
+     morte = resta aperta, spacco nero/viola. */
+  if(res.wounded||res.dead){
+    scene.fissure={x:b.x,y:b.y,ang:angOf(b.x,b.y),dead:res.dead,t0:performance.now()};
+  }else{
+    scene.fissure=null;
+  }
+  setState('resolution');
+  scene.whitePillars.forEach(p=>p.drop=0);
+  scene.blackPillars.forEach(p=>p.drop=0);
+  scene.axisAlpha=0;
+  /* fail_wound/fail_dead condividono la grafica della sconfitta base */
+  const verdictKey=(verdict==='fail_wound')?'fail':(verdict==='fail_dead')?'epicfail':verdict;
+  const V=Object.assign({},VERDICT_TEXT[verdictKey]||VERDICT_TEXT.fail,(cfg.copy&&cfg.copy.verdicts&&cfg.copy.verdicts[verdictKey])||{});
+  /* title: split into letters for the crumble effect */
+  const titleEl=$id('cardTitle');
+  titleEl.innerHTML=[...V.title].map(ch=>{
+    if(ch===' ') return '<span class="ch">&nbsp;</span>';
+    const dx=(Math.random()*8-4).toFixed(1), dy=(6+Math.random()*12).toFixed(1);
+    const rot=(Math.random()*10-5).toFixed(1), del=(0.05+Math.random()*0.35).toFixed(2);
+    return `<span class="ch" style="--dx:${dx}px;--dy:${dy}px;--rot:${rot}deg;--del:${del}s">${ch}</span>`;
+  }).join('');
+  $id('cardSeal').textContent=V.seal;
+  /* R-067: cardSub = matematica del check (leggibile in <1s); cardNums = frase
+     narrativa contestuale alla skill. Le label arrivano da cfg.copy (i18n). */
+  {
+    const sk=skills[skillIndex]||{name:'Skill',stat:60,difficulty:50};
+    const tst=clamp(50+(sk.stat-sk.difficulty),1,99);
+    const mathFmt=(cfg.copy&&cfg.copy.mathFmt)||'Dado {{roll}} · serviva ≤ {{tst}}';
+    $id('cardSub').textContent=outcomeRoll>0
+      ? mathFmt
+          .replace(/\{\{?roll\}?\}/g,String(outcomeRoll))
+          .replace(/\{\{?stat\}?\}/g,String(sk.stat))
+          .replace(/\{\{?difficulty\}?\}/g,String(sk.difficulty))
+          .replace(/\{\{?tst\}?\}/g,String(tst))
+      : `${sk.name}`;
+    const nFlavors=(cfg.copy&&cfg.copy.narrativeFlavors)||{};
+    const skillNarrative=(nFlavors[sk.name]||{})[verdictKey];
+    $id('cardNums').textContent=skillNarrative||V.sub;
+  }
+  const chips=$id('cardChips');
+  chips.innerHTML='';
+  if(res.wounded) chips.innerHTML+=`<span class="chip wounded">${(cfg.copy&&cfg.copy.chips&&cfg.copy.chips.wounded)||'Ferito'}</span>`;
+  if(res.dead) chips.innerHTML+=`<span class="chip dead">${(cfg.copy&&cfg.copy.chips&&cfg.copy.chips.dead)||'Caduto'}</span>`;
+  card.classList.remove('triumph','win','almost','fail','epic');
+  card.classList.add(V.cls);
+  void card.offsetWidth;
+  card.classList.add('show');
+  /* tone per verdict */
+  const isLoss=(res.verdict==='fail'||res.verdict==='epicfail');
+  if(res.verdict==='bigwin'||res.verdict==='win'){
+    suite.dataset.tone='triumph';
+    $id('flare').classList.remove('fire');
+    void $id('flare').offsetWidth;
+    $id('flare').classList.add('fire');
+  } else if(res.verdict==='almost'){
+    suite.dataset.tone='';
+  } else {
+    suite.dataset.tone=(res.verdict==='epicfail')?'grim':'doom';
+  }
+  /* SOLAR CLIMAX — blinding burst from the core + massive unified screen punch,
+     fired the same millisecond the typography appears */
+  const climax=$id('climax');
+  climax.classList.remove('burst','cold');
+  if(isLoss) climax.classList.add('cold');
+  void climax.offsetWidth;
+  climax.classList.add('burst');
+  shake('shake-resolve');
+  $id('launch').classList.add('pulse');
+  /* panel result removed */
+  /* Post result to parent window */
+  if(opts.onResolve){
+    const skillName=skills.length>0?skills[skillIndex].name:'Skill';
+    opts.onResolve({verdict,roll:0,riskRoll,skillIndex,skillName,wounded,dead});
+  }
+}
+
+/* =========================================================================
+   RENDER — Wanderlust canvas painting
+   ========================================================================= */
+const cv=$id('cv');
+const ctx=cv.getContext('2d',{alpha:true});
+
+/* =========================================================================
+   V6.3 TAR GOO — viscous spring simulation + WebGL2 SDF layer (R-032).
+   The rim is a ring of radial springs chasing rCheckAt(θ)·reveal with heavy
+   damping: the mass surges, lags and settles like tar, never like water.
+   Crawling droplets merge into the rim through smooth-min bridges.
+   ========================================================================= */
+const gooRenderer=createTarGooRenderer(W,tarGooConfig);
+/* I TENTACOLI vivono in un modulo a parte: il loro modello geometrico non e'
+   r(theta) ma una centerline per braccio, e mescolarli qui li avrebbe riportati
+   a essere lobi angolari. */
+/* I TENTACOLI NON DEVONO RIMARE CON LA STELLA.
+   Erano `AXES` bracci mandati su `TIP(i)`: cinque bracci sui cinque assi della
+   stella, stesso numero e stesso orientamento. Durante la colata il catrame ERA
+   una stella a cinque punte, e nessuna taratura di lunghezza, posa o flessione
+   poteva togliere quella lettura — la simmetria stava nel MAPPING, non nei
+   parametri. Sette e' coprimo con cinque: nessun braccio si allinea a una
+   punta, a una valle o a un obelisco, e il giro non si chiude mai su una figura
+   regolare. Gli scarti fissi tolgono anche la regolarita' dell'ettagono, e sono
+   costanti scritte a mano perche' la scena non deve cambiare fra due tiri. */
+const TENT_ARMS=7;
+const TENT_SKEW=[0.18,-0.24,0.09,0.26,-0.13,0.21,-0.17];
+const tentAngle=i=>-Math.PI/2+(i+0.5)*(TAU/TENT_ARMS)+TENT_SKEW[i%TENT_ARMS];
+const tent=createTentacles(TENT_ARMS,0x7ea1);
+let tideRim=null;
+/* buffer unico per renderer: bracci + gocce, riallocato solo se serve */
+let gooBlend=new Float32Array(AXES*SAMPLES_PER_ARM*3+64);
+/* LA DINAMICA DEL CATRAME E' DETERMINISTICA (PLAN-010 CP-E).
+   Le gocce nascevano da `Math.random`, quindi due esecuzioni con gli stessi
+   ingressi davano fronti diversi e il banco di misura non poteva sorvegliare
+   niente: un harness su un sistema non riproducibile misura il rumore.
+   Seme fisso, stesso RNG gia' usato dai tentacoli. Il resto del motore — moti,
+   stelle, scintille, tiro del rischio — resta casuale: e' decorazione e sta
+   fuori da CP-E. */
+const GOO_SEED=0x9e37;
+let gooRnd=rng32(GOO_SEED);
+const gooSim=(()=>{
+  const simCfg=tarGooConfig.simulation;
+  const N=simCfg.rimSamples;
+  const rnd=(a,b)=>a+gooRnd()*(b-a);
+  const drops=Array.from({length:simCfg.dropletCount},(_,i)=>({
+    ang:0.0,
+    w:0.0,
+    rr:0.0,
+    ph:0.0,
+    mode:'crawl',
+    rad:0.0,
+    x:0.0,
+    y:0.0,
+    vy:0.0,
+    startT:0.0,
+  })) as ({ang:number,w:number,rr:number,ph:number,mode:'fall'|'crawl',x:number,y:number,vy:number,startT:number,rad:number})[];
+  return {
+    N,
+    r:new Float32Array(N),                 // current sprung radius per sample
+    v:new Float32Array(N),                 // radial velocity per sample
+    blobs:new Float32Array(simCfg.dropletCount*3),
+    blobCount:0,
+    drops,
+    lastMs:0,
+  };
+})();
+
+function resetDrops(t0:number){
+  const simCfg=tarGooConfig.simulation;
+  /* si riparte dal seme: stessa colata a ogni tiro, quindi misurabile */
+  gooRnd=rng32(GOO_SEED);
+  const rnd=(a,b)=>a+gooRnd()*(b-a);
+  gooSim.r.fill(0); gooSim.v.fill(0);
+  for(let i=0;i<gooSim.drops.length;i+=1){
+    const d=gooSim.drops[i];
+    d.ph=gooRnd()*TAU;
+    if(i<simCfg.seedDropCount){
+      /* CP-G: NASCE SULL'ANELLO, NON SOPRA IL CENTRO.
+         Prima: `x` sparso attorno a CX e `y` sopra il board — cioe' esattamente la
+         nascita centrale che il video raccontava e che il modello smentisce. Il goo
+         E' la difficolta': una condizione che c'e' gia', non un evento che nasce al
+         centro e invade. Ora le gocce compaiono su un anello FUORI dall'arena e
+         scivolano nella conca — che la ghiera stabilisce gia', il markup la chiama
+         «the well».
+         L'angolo e' pesato sugli assi piu' difficili: dove la prova e' dura arriva
+         piu' materia, e il lobo del muro se lo merita invece di essere disegnato. */
+      const base=(i/simCfg.seedDropCount)*TAU+gooRnd()*0.5;
+      let ang=base;
+      if(V63_AXIS_BIAS>0){
+        let best=0,bestW=-1;
+        for(let k=0;k<AXES;k+=1){
+          const w=geo.axisCheck[k]*(0.6+gooRnd()*0.8);
+          if(w>bestW){bestW=w;best=k;}
+        }
+        ang=base+(TIP(best)-base)*V63_AXIS_BIAS*gooRnd();
+      }
+      d.mode='fall';
+      d.ang=ang;
+      d.rad=R*V63_SPAWN_RING;
+      d.x=CX+Math.cos(ang)*d.rad;
+      d.y=CY+Math.sin(ang)*d.rad;
+      d.vy=0;                       // ora e' la velocita' RADIALE, verso il centro
+      d.startT=t0+i*simCfg.seedDropStagger;
+      d.rr=rnd(simCfg.seedDropRadius[0],simCfg.seedDropRadius[1]);
+      d.w=rnd(simCfg.dropletCrawlSpeed[0],simCfg.dropletCrawlSpeed[1])*(gooRnd()<0.5?-1:1);
+    }else{
+      d.mode='crawl';
+      d.ang=gooRnd()*TAU;
+      d.w=rnd(simCfg.dropletCrawlSpeed[0],simCfg.dropletCrawlSpeed[1])*(gooRnd()<0.5?-1:1);
+      d.rr=rnd(simCfg.dropletRadius[0],simCfg.dropletRadius[1]);
+      d.x=CX; d.y=CY; d.vy=0; d.startT=0;
+    }
+  }
+}
+function tickGooSim(now){
+  const simCfg=tarGooConfig.simulation;
+  const dt=gooSim.lastMs?Math.min(50,now-gooSim.lastMs):16.7;
+  gooSim.lastMs=now;
+  tickPose(tent,now,dt);
+  const k=dt/16.7;                                   // frame-rate normalizer
+  const rev=clamp(scene.gooReveal,0,1.0);
+  /* Idle simmer: a slow, gentle boil on the tar rim once it has been fully
+     revealed for at least 0.5s, so it never looks frozen in any post-pour state. */
+  const sinceFull=now-(scene.gooFullMs||0);
+  if(rev>0.99 && sinceFull>500){
+    const idle=0.12+0.06*Math.sin(now/900);
+    scene.gooRipple=Math.max(scene.gooRipple*0.98, idle);
+  }
+  /* smorzamento V6.3: il bordo deve arrivare e FERMARSI. Col valore condiviso il
+     rapporto di smorzamento valeva 0.061 e il bordo suonava come gelatina. */
+  const damp=Math.pow(tarGooConfig.v63.damping,k);
+  /* Invasion front: a single tar wave that grows outward from the core.
+     Each axis reaches its own final radius when the front passes it, so
+     short arms fill first and the long arms keep pushing — like real tar. */
+  /* DUE TEMPI, NON UNO. Il Director: «l'animazione dell'espansione del goo
+     sembra fermarsi in uno step, vorrei che invece si allargasse prima come
+     tentacoli fino agli obelischi neri e poi si espandesse».
+     Il fronte era `rev * tarRMax`, cioe' un cerchio che cresce uguale in tutte
+     le direzioni: arrivava e si fermava, e non c'era nessun secondo tempo da
+     vedere. Ora il fronte e' ANGOLARMENTE SELETTIVO:
+       tempo 1 (rev 0 -> 0.58)  le braccia corrono LUNGO GLI ASSI, cioe' verso
+                                gli obelischi neri, e fra un asse e l'altro la
+                                materia resta indietro: sono tentacoli;
+       tempo 2 (rev 0.50 -> 1)  la selettivita' si scioglie e il vuoto fra le
+                                braccia si riempie.
+     Le due fasi si sovrappongono di 8 centesimi perche' un tentacolo che si
+     ferma e POI riparte legge come due animazioni diverse. */
+  /* IL RIM DURANTE IL TRANSITORIO E' SOLO LA POZZA.
+     I bracci non stanno piu' qui: sono una centerline per braccio nel modulo
+     `tentacles`, e arrivano al renderer come primitive che il suo smooth-min
+     fonde col corpo. Provare a scriverli come peso angolare su r(theta) e' il
+     tentativo che ha prodotto due volte dei petali — con un raggio per angolo
+     non esiste nessun asse che percorra lo spazio.
+     La pozza cresce fino a 1.0 da sola: e' lei che fa CONVERGERE l'unione sulla
+     sagoma radiale, cosi' a riposo la fisica e le probabilita' restano quelle di
+     prima e il passaggio non si vede. */
+  const pool=poolFraction(rev);
+  for(let i=0;i<gooSim.N;i+=1){
+    const theta=i/gooSim.N*TAU;
+    const rFinal=rev<=0.001?0:rCheckAt(theta,1);
+    const front=rFinal*pool;
+    const target=Math.min(rFinal,front);
+    let vel=(gooSim.v[i]+(target-gooSim.r[i])*V63_STIFFNESS*k)*damp;
+    const vMax=simCfg.maxSpeed*k*(1+2*(scene.gooRipple||0));
+    if(vel>vMax)vel=vMax; else if(vel<-vMax)vel=-vMax;
+    const next=gooSim.r[i]+vel*k;
+    /* Sticky non-overshoot: viscous tar must not rebound. If the next frame
+       would cross the target, or the sample is already past it and not moving
+       back, snap to the target and kill the spring. */
+    const cross=(vel>0 && next>=target) || (vel<0 && next<=target);
+    const away=(gooSim.r[i]>target && vel>=0) || (gooSim.r[i]<target && vel<=0);
+    if(cross || away){
+      gooSim.r[i]=target;
+      gooSim.v[i]=0;
+    }else{
+      gooSim.r[i]=Math.max(0,next);
+      gooSim.v[i]=vel;
+    }
+  }
+  /* Droplets: the first seedDropCount fall from above and merge; the rest
+     crawl on the rim once it exists. */
+  const t=now/1000;
+  let active=0;
+  for(let i=0;i<gooSim.drops.length;i+=1){
+    const d=gooSim.drops[i];
+    if(d.mode==='fall'){
+      if(now>=d.startT){
+        /* CP-G: la goccia scivola nella conca lungo il proprio raggio. `vy` e' la
+           velocita' RADIALE; lo smorzamento e' lo stesso di prima, quindi la
+           convergenza decelera come la colata (CP-E) invece di accelerare. */
+        d.vy += simCfg.seedDropGravity*dt;
+        d.vy *= Math.pow(simCfg.seedDropDamping, k);
+        d.rad = Math.max(0, d.rad - d.vy*dt);
+        d.x = CX+Math.cos(d.ang)*d.rad;
+        d.y = CY+Math.sin(d.ang)*d.rad;
+        /* si posa quando raggiunge il livello del catrame su quel raggio */
+        const livello=Math.max(geo.rCore, rCheckAt(d.ang,1)*0.92);
+        if(d.rad <= livello){
+          d.rad=livello;
+          d.mode='crawl';
+          scene.gooRipple=Math.max(scene.gooRipple,0.65);
+        }
+      }
+      if(now>=d.startT){
+        gooSim.blobs[active*3]=d.x;
+        gooSim.blobs[active*3+1]=d.y;
+        gooSim.blobs[active*3+2]=d.rr;
+        active+=1;
+      }
+    }else{
+      d.ang+=d.w*dt/1000;
+      const idx=Math.round((d.ang/TAU)*gooSim.N)%gooSim.N;
+      const rim=rev<=0.001?0:gooSim.r[idx];
+      const bulge=Math.sin(t*0.3+d.ph)*simCfg.dropletOvershoot;
+      const rad=Math.max(geo.rCore*0.6,rim-d.rr*0.8+bulge);
+      gooSim.blobs[active*3]=CX+Math.cos(d.ang)*rad;
+      gooSim.blobs[active*3+1]=CY+Math.sin(d.ang)*rad;
+      gooSim.blobs[active*3+2]=d.rr;
+      active+=1;
+    }
+  }
+  gooSim.blobCount=active;
+  scene.gooRipple=Math.max(0,scene.gooRipple*0.95);
+}
+
+/* ---- procedural material textures (generated once) ---- */
+const stoneTex=(()=>{                 // porous volcanic basalt
+  const c=document.createElement('canvas'); c.width=c.height=96;
+  const x=c.getContext('2d');
+  const img=x.createImageData(96,96);
+  for(let i=0;i<img.data.length;i+=4){
+    const v=18+Math.random()*48;
+    img.data[i]=v*.9; img.data[i+1]=v*.95; img.data[i+2]=v*1.18; img.data[i+3]=255;
+  }
+  x.putImageData(img,0,0);
+  for(let i=0;i<80;i+=1){             // pores & erosions
+    x.fillStyle=`rgba(3,2,7,${.25+Math.random()*.45})`;
+    x.beginPath(); x.arc(Math.random()*96,Math.random()*96,.6+Math.random()*2,0,TAU); x.fill();
+  }
+  return c;
+})();
+const marbleTex=(()=>{                // ancient translucent marble with vein noise
+  const c=document.createElement('canvas'); c.width=c.height=96;
+  const x=c.getContext('2d');
+  const img=x.createImageData(96,96);
+  for(let i=0;i<img.data.length;i+=4){
+    const v=198+Math.random()*57;
+    img.data[i]=v; img.data[i+1]=v*.97; img.data[i+2]=v*.89; img.data[i+3]=255;
+  }
+  x.putImageData(img,0,0);
+  for(let k=0;k<8;k+=1){              // wandering mineral veins
+    x.strokeStyle=`rgba(148,124,84,${.16+Math.random()*.2})`;
+    x.lineWidth=.5+Math.random()*.9;
+    x.beginPath();
+    let px=Math.random()*96, py=-4;
+    x.moveTo(px,py);
+    for(let s=0;s<7;s+=1){ px+=(Math.random()-.5)*28; py+=16; x.lineTo(px,py); }
+    x.stroke();
+  }
+  return c;
+})();
+
+function drawBackdrop(now){
+  const t=now/1000;
+  /* CP-H: il fondo e' una variante scelta, non una costante. `?bg=<nome>` la
+     sovrascrive per poter confrontare senza ricompilare. */
+  const bd=v63Backdrop();
+  ctx.save();
+  const backdropRadius=R*1.15;
+  const _bg=ctx.createRadialGradient(CX,CY,0,CX,CY,backdropRadius*1.03);
+  _bg.addColorStop(0,bd.inner);
+  _bg.addColorStop(1,bd.outer);
+  ctx.fillStyle=_bg;
+  ctx.beginPath(); ctx.arc(CX,CY,backdropRadius,0,TAU); ctx.fill();
+  /* azure light-leak from top-left (V9 signature) */
+  const _leak=ctx.createRadialGradient(CX-R*.7,CY-R*.7,0,CX-R*.7,CY-R*.7,backdropRadius);
+  _leak.addColorStop(0,bd.leakCore);
+  _leak.addColorStop(.5,bd.leakMid);
+  _leak.addColorStop(1,bd.leakEdge);
+  ctx.fillStyle=_leak;
+  ctx.beginPath(); ctx.arc(CX,CY,backdropRadius,0,TAU); ctx.fill();
+  ctx.restore();
+  /* cosmic dust: starlit gold + teal grains over astral ink */
+  ctx.save();
+  ctx.globalCompositeOperation='lighter';
+  scene.stars.forEach((s,i)=>{
+    const tw=.5+.5*Math.sin(t*s.sp+s.ph);
+    const a=.18+.55*tw;
+    const gold=(i%3!==0);
+    ctx.globalAlpha=a;
+    ctx.fillStyle=gold?'#ffe9a8':'#d0dcff';
+    if(tw>.82){ ctx.shadowColor=gold?'#fce890':'#a8b8ff'; ctx.shadowBlur=6+6*tw; } else ctx.shadowBlur=0;
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.r*(.8+.5*tw),0,TAU); ctx.fill();
+  });
+  ctx.shadowBlur=0; ctx.globalAlpha=1;
+  ctx.restore();
+  /* astrolabe engraving */
+  for(let ri=1;ri<=3;ri+=1){
+    ctx.strokeStyle=ri===3?'rgba(201,162,39,.13)':'rgba(110,90,220,.10)';
+    ctx.lineWidth=ri===3?1.2:.8;
+    ctx.beginPath(); ctx.arc(CX,CY,R*ri/3,0,TAU); ctx.stroke();
+  }
+  for(let i=0;i<AXES;i+=1){
+    const a=TIP(i), dx=Math.cos(a), dy=Math.sin(a);
+    const g=ctx.createLinearGradient(CX,CY,CX+dx*R,CY+dy*R);
+    g.addColorStop(0,'rgba(110,90,220,.05)');
+    g.addColorStop(.7,'rgba(90,120,255,.14)');
+    g.addColorStop(1,'rgba(252,232,144,.26)');
+    ctx.strokeStyle=g; ctx.lineWidth=1.3;
+    ctx.beginPath(); ctx.moveTo(CX,CY); ctx.lineTo(CX+dx*R,CY+dy*R); ctx.stroke();
+  }
+}
+function drawMotes(now,dt){
+  const t=now/1000;
+  scene.motes.forEach(m=>{
+    m.y-=m.sp*dt/1000; m.x+=Math.sin(t*.7+m.sw)*.12;
+    if(m.y<-4){m.y=W+4;m.x=Math.random()*W;}
+    ctx.globalAlpha=.1+.18*(.5+.5*Math.sin(t*1.3+m.ph));
+    ctx.fillStyle='#fce890';
+    ctx.beginPath(); ctx.arc(m.x,m.y,m.r,0,TAU); ctx.fill();
+  });
+  ctx.globalAlpha=1;
+}
+
+/* challenge surface path — polygon bounded by rCheckAt (difficulty mesh) */
+function gooBlobPath(rev,shrink){
+  const P=new Path2D();
+  const SEG=160;
+  for(let i=0;i<=SEG;i+=1){
+    const a=i/SEG*TAU, r=Math.max(0,rCheckAt(a,rev)-(shrink||0));
+    const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
+    if(i===0) P.moveTo(x,y); else P.lineTo(x,y);
+  }
+  P.closePath();
+  return P;
+}
+
+/* SUPERFICIE SFIDA V6.3 — the tar mass. WebGL2 SDF layer composited at the
+   exact z-slot of the old flat fill; the physics wall stays rCheckAt (the
+   simulation converges onto it, so obelisks keep sitting ON the edge). */
+function drawChallengeSurface(now){
+  const rev=scene.gooReveal;
+  tickGooSim(now);
+  if(rev<=0.001 && gooSim.blobCount===0) return;
+  if(gooRenderer){
+    /* LE PRIMITIVE: prima i bracci, poi le gocce. I bracci hanno priorita'
+       perche' sono la silhouette; le gocce sono dettaglio e possono essere
+       troncate dal tetto di MAX_BLOBS senza che nessuno lo noti.
+       Sopra rev 0.97 i bracci non si emettono piu': la pozza li ha raggiunti,
+       quindi non aggiungerebbero niente e sprecherebbero slot. */
+    const armN=rev<0.97
+      ? buildBlobs(tent,CX,CY,rev,tentAngle,(a)=>rCheckAt(a,1))
+      : 0;
+    const total=armN+gooSim.blobCount;
+    if(gooBlend.length<total*3) gooBlend=new Float32Array(total*3);
+    gooBlend.set(tent.blobs.subarray(0,armN*3),0);
+    gooBlend.set(gooSim.blobs.subarray(0,gooSim.blobCount*3),armN*3);
+    /* la superficie che si vede e' quella simulata PIU' la marea; `gooSim.r`
+       resta intatto, quindi il muro della pallina non si muove mai */
+    let rimOut=gooSim.r;
+    const lift=clamp(scene.tideWave||0,0,1);
+    if(lift>0.001){
+      if(!tideRim||tideRim.length!==gooSim.r.length) tideRim=new Float32Array(gooSim.r.length);
+      for(let i=0;i<gooSim.r.length;i+=1) tideRim[i]=gooSim.r[i]+tideLiftAt(i/gooSim.r.length*TAU,lift);
+      rimOut=tideRim;
+    }
+    const layer=gooRenderer.render({
+      radii:rimOut,
+      blobs:gooBlend,
+      blobCount:total,
+      timeMs:now,
+      reveal:clamp(rev,0,1),
+      ripple:clamp(scene.gooRipple||0,0,1),
+    });
+    ctx.drawImage(layer,0,0);
+    return;
+  }
+  /* Fallback (no WebGL2): V6 flat drawing — deep void fill + single border. */
+  const path=gooBlobPath(rev,0);
+  ctx.save();
+  const fill=ctx.createRadialGradient(CX,CY,0,CX,CY,geo.rTip*rev*1.5);
+  fill.addColorStop(0,'rgba(1,3,14,0.97)');
+  fill.addColorStop(0.6,'rgba(3,5,20,0.95)');
+  fill.addColorStop(1,'rgba(2,3,16,0.90)');
+  ctx.fillStyle=fill; ctx.fill(path);
+  ctx.strokeStyle=`rgba(30,25,35,${(0.72*rev).toFixed(3)})`;
+  ctx.lineWidth=4;
+  ctx.stroke(path);
+  ctx.restore();
+}
+
+/* ASSI COME STRUMENTI DI MISURA — ogni vettore è una scala 0-100 con 10 tacche.
+   Le tacche fino al bordo del goo sono accese (= quanto arriva la difficoltà su
+   quell'asse), quelle oltre sono spente: l'asse si legge come "8 su 10".
+   Quando la stella esiste, una seconda tacca calda segna la stat del PG. */
+const AXIS_TICKS=10;
+function drawAxisRig(now){
+  const rev=scene.gooReveal;
+  if(rev<=0.001 || scene.axisAlpha<=0.001) return;
+  const rMax=rOf(100);
+  ctx.save();
+  ctx.globalAlpha=clamp(scene.axisAlpha,0,1);
+  for(let i=0;i<AXES;i+=1){
+    const a=TIP(i);
+    const ca=Math.cos(a), sa=Math.sin(a);
+    const rDiff=rCheckAt(a,rev);                       // dove arriva la difficoltà
+    const rStat=geo.axisTip[i]*Math.min(1,scene.starScale||0);
+
+    /* asta dell'asse */
+    ctx.lineWidth=1.4;
+    ctx.strokeStyle=`rgba(150,210,200,${0.34*rev})`;
+    ctx.beginPath();
+    ctx.moveTo(CX+ca*geo.rCore,CY+sa*geo.rCore);
+    ctx.lineTo(CX+ca*rMax,CY+sa*rMax);
+    ctx.stroke();
+
+    /* 10 tacche perpendicolari all'asse */
+    for(let j=1;j<=AXIS_TICKS;j+=1){
+      const rj=rOf(j*(100/AXIS_TICKS));
+      const on=rj<=rDiff;
+      const half=on?(j%5===0?13:9):(j%5===0?9:6);
+      const px=CX+ca*rj, py=CY+sa*rj;
+      ctx.lineWidth=on?3:1.8;
+      ctx.strokeStyle=on
+        ? `rgba(196,255,240,${(0.92*rev).toFixed(3)})`
+        : `rgba(140,195,188,${(0.42*rev).toFixed(3)})`;
+      ctx.beginPath();
+      ctx.moveTo(px-sa*half,py+ca*half);
+      ctx.lineTo(px+sa*half,py-ca*half);
+      ctx.stroke();
+    }
+
+    /* cursore della stat: compare con la stella, caldo */
+    if(rStat>geo.rCore){
+      const sx=CX+ca*rStat, sy=CY+sa*rStat;
+      ctx.lineWidth=4;
+      ctx.strokeStyle=`rgba(255,240,170,${(0.95*Math.min(1,scene.starScale)).toFixed(3)})`;
+      ctx.beginPath();
+      ctx.moveTo(sx-sa*17,sy+ca*17);
+      ctx.lineTo(sx+sa*17,sy-ca*17);
+      ctx.stroke();
+    }
+
+  }
+  ctx.restore();
+}
+
+/* R-067 F2 — ICONA + NUMERI SULL'ASSE (stile Asterism V6): niente nome
+   della skill, solo l'icona (da `skill.icon`) e i valori reali
+   `stat vs difficoltà`, disposti lungo la tangente così restano dritti
+   sopra e sotto l'orizzonte.
+   FUNZIONE SEPARATA da drawAxisRig: la rigatura sfuma con axisAlpha in
+   risk-pour, ma icona e numeri sono i dati del check — devono restare
+   visibili finché il dado non parte (idle → risk-pour → action-trigger). */
+function drawAxisLabels(now){
+  const s=scene.state;
+  const preThrow=(s==='idle'||s==='ring-lock'||s==='threat-slam'||s==='goo-expand'||s==='axis-read'||s==='agency-burst'||s==='risk-pour'||s==='action-trigger');
+  if(!preThrow) return;
+  const rev=scene.gooReveal;
+  if(rev<=0.001) return;
+  const al=Math.max(clamp(scene.axisAlpha,0,1), (s==='action-trigger'||s==='idle')?1:0);
+  if(al<=0.01) return;
+  for(let i=0;i<AXES;i+=1){
+    const a=TIP(i);
+    const ca=Math.cos(a), sa=Math.sin(a);
+    const sk=skills[geo.axisSkill[i]]||{icon:'',stat:0,difficulty:0};
+    const rL=R*astrolabeV64Config.axisLabels.radiusFactor;
+    const lx=CX+ca*rL, ly=CY+sa*rL;
+    const tang=a+Math.PI/2;
+    const flip=sa>0.35;
+    const rot=flip?tang+Math.PI:tang;
+    ctx.save();
+    ctx.translate(lx,ly);
+    ctx.rotate(rot);
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    const F=astrolabeV64Config.axisLabels.fontPx;
+    /* icona della skill */
+    ctx.font=`600 ${F+6}px 'Space Grotesk',system-ui,sans-serif`;
+    ctx.fillStyle=`rgba(248,250,252,${0.95*al})`;
+    ctx.shadowColor='rgba(0,0,0,.8)'; ctx.shadowBlur=6;
+    ctx.fillText(sk.icon||'◆',0,-astrolabeV64Config.axisLabels.lineGapPx/2);
+    /* numeri reali: stat del personaggio vs difficoltà dell'asse */
+    ctx.font=`600 ${F-2}px 'Space Grotesk',system-ui,sans-serif`;
+    ctx.fillStyle=`rgba(200,225,214,${0.9*al})`;
+    ctx.fillText(`${sk.stat} vs ${sk.difficulty}`,0,astrolabeV64Config.axisLabels.lineGapPx/2+6);
+    ctx.restore();
+  }
+}
+
+/* star path sampled from the same radial function used for membership */
+/* IL PERCORSO DELLA STELLA: DIECI VERTICI, LINEE DRITTE.
+   E' la costruzione di `tracePerfectStar` in AltVisualsV6Asterism — dieci righe,
+   giusta dal primo giorno, e il Director ha dovuto indicarmela tre volte.
+   Campionare `rStarAt` a 80 punti equivalenti non e' sbagliato, ma passare dai
+   vertici e' esatto per costruzione e non dipende dal fatto che 80 sia multiplo
+   di 10: le punte cadono sui vertici e non "vicino" ai vertici.
+   Il FIORE resta campionato, perche' i petali tondi sono curve e non corde. */
+function starPath(scale){
+  /* IL PROFILO MISCELATO NON E' UN POLIGONO, quindi qui si campiona e basta.
+     Il ramo a dieci vertici che stava qui valeva solo per la stella pura: con il
+     morph continuo la forma e' `fiore*(1-m) + stella*m`, e passare per i vertici
+     taglierebbe la componente curva del fiore proprio dove e' piu' grassa.
+     360 campioni: a raggio 300 un passo e' ~5px, sotto la larghezza del tratto. */
+  const p=new Path2D();
+  const SEG=360;
+  for(let i=0;i<=SEG;i+=1){
+    const a=-Math.PI/2+i/SEG*TAU;
+    const r=rStarAt(a,scale);
+    const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
+    if(i===0) p.moveTo(x,y); else p.lineTo(x,y);
+  }
+  p.closePath();
+  return p;
+}
+/* THE 12-LAYER MECHANICAL STAR — white gold & sun-bronze */
+function drawStar(now){
+  let s=scene.starScale;
+  /* In fail/epicfail resolution the star fades to let the card text read */
+  if(scene.state==='resolution'&&scene.res){
+    const v=scene.res.verdict;
+    if(v==='fail'||v==='epicfail') s*=0.35;
+    else if(v==='almost') s*=0.65;
+  }
+  if(s<=0.01) return;
+  const t=now/1000;
+  const p=starPath(s);
+  /* V6.3: il fiore viene CLIPpato al muro del catrame come in V9.
+     La faccia e i bordi crescono fino al muro; ciò che eccede resta
+     solo contorno tratteggiato, così le punte non coprono board/confini. */
+  const face=ctx.createRadialGradient(CX-30,CY-46,6,CX,CY,geo.rTip*s);
+  const SP=v63Star();
+  face.addColorStop(0,SP.face[0]); face.addColorStop(.42,SP.face[1]); face.addColorStop(1,SP.face[2]);
+
+  /* LA MASCHERA E' LA SUPERFICIE DEL CATRAME, NON UN RITAGLIO CHE SI STRINGE.
+     Il tentativo precedente morfava la maschera da un cerchio grande alla forma
+     del muro con `clipReveal=smoothstep(0.6,1.0,s)`. Due difetti, e il primo lo
+     rendeva muto: la firma e' `smoothstep(t,a,b)`, quindi con t=0.6 e a=1.0 la
+     funzione ritorna 0 SEMPRE — la maschera restava il cerchio da R*1.6 e non
+     ha mai clippato niente. Misurato sui pixel al preset 85/50: muro a 194px,
+     avorio dipinto fino a 295px.
+     Il secondo difetto stava nell'idea: la maschera intermedia era un CERCHIO,
+     e una forma estranea che spazza sopra la stella non racconta chi le sta
+     togliendo il terreno.
+     Qui il bordo che cancella E' il catrame che sale (`scene.tideP` e' il
+     massimo raggiunto dall'onda, la stessa che gonfia la sagoma in tickGooSim).
+     Regione tenuta = dentro il muro, PIU' quello che la marea non ha ancora
+     raggiunto. Tre contorni con evenodd: dentro il muro 3 attraversamenti
+     (dispari, tenuto), fra muro e marea 2 (pari, mangiato), oltre la marea 1
+     (dispari, ancora in piedi). A marea 0 il contorno della marea coincide col
+     muro, l'anello e' vuoto e il fiore resta INTERO: non nasce clippato. */
+  const tide=clamp(scene.tideP||0,0,1);
+  const rLarge=R*1.9;
+  const SEG=200;
+  const ap=new Path2D();
+  const wallR=new Float64Array(SEG+1);
+  for(let i=0;i<=SEG;i+=1) wallR[i]=rCheckAt(-Math.PI/2+i/SEG*TAU,1);
+  for(let i=0;i<=SEG;i+=1){
+    const a=-Math.PI/2+i/SEG*TAU, r=wallR[i];
+    const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
+    if(i===0) ap.moveTo(x,y); else ap.lineTo(x,y);
+  }
+  ap.closePath();
+  for(let i=0;i<=SEG;i+=1){
+    const a=-Math.PI/2+i/SEG*TAU;
+    const r=wallR[i]+(tideCrestAt(a,s)-wallR[i])*tide;
+    const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
+    if(i===0) ap.moveTo(x,y); else ap.lineTo(x,y);
+  }
+  ap.closePath();
+  for(let i=0;i<=SEG;i+=1){
+    const a=-Math.PI/2+i/SEG*TAU;
+    const x=CX+Math.cos(a)*rLarge, y=CY+Math.sin(a)*rLarge;
+    if(i===0) ap.moveTo(x,y); else ap.lineTo(x,y);
+  }
+  ap.closePath();
+
+  /* fuori dall'arena: contorno tratteggiato luminoso (non clippato). */
+  ctx.save();
+  ctx.setLineDash([9,7]);
+  ctx.lineWidth=2.0;
+  ctx.strokeStyle='rgba(255,226,150,0.55)';
+  ctx.stroke(p);
+  ctx.restore();
+
+  /* Tutti i livelli interni sono clippati alla maschera del catrame. */
+  ctx.save();
+  ctx.clip(ap,'evenodd');
+
+  /* ── IL CONTATTO (PLAN-010 CP-F) ────────────────────────────────────────
+     La stella COPRE, non rimuove: nessuno spostamento del catrame, perche' la
+     v15 dice «la prova e' quanto resta scoperto» e uno spostamento
+     racconterebbe che la difficolta' si e' RIDOTTA. Ma senza nessun segno al
+     bordo la stella resta un adesivo appoggiato sopra — il difetto che tutte e
+     tre le critiche esterne avevano visto nel video.
+     Due segni, entrambi DAL LATO DEL CATRAME: la silhouette della stella, che
+     porta la probabilita', non si sposta di un pixel.
+       - ombra di contatto: prova che la stella sta SOPRA;
+       - menisco: la superficie che si arrampica sul fianco, che e' bagnatura.
+     Niente `ctx.filter`: non esiste su WebKit, quindi la morbidezza si fa a
+     strati di alfa calante invece che con una sfocatura. */
+  {
+    const cShadow=tarGooConfig.v63.contactShadowPx;
+    const cMenisc=tarGooConfig.v63.contactMeniscusPx;
+    const tarSide=new Path2D();
+    for(let i=0;i<=SEG;i+=1){
+      const a=-Math.PI/2+i/SEG*TAU;
+      const x=CX+Math.cos(a)*wallR[i], y=CY+Math.sin(a)*wallR[i];
+      if(i===0) tarSide.moveTo(x,y); else tarSide.lineTo(x,y);
+    }
+    tarSide.closePath();
+    tarSide.addPath(p);
+    ctx.save();
+    ctx.clip(tarSide,'evenodd');      // il catrame e basta: mai dentro la stella
+    ctx.lineJoin='round';
+    for(let k=4;k>=1;k-=1){
+      ctx.lineWidth=cShadow*2*(k/4);
+      ctx.strokeStyle=`rgba(0,0,0,${0.16*(1-(k-1)/4)+0.06})`;
+      ctx.stroke(p);
+    }
+    /* il colmo bagnato: sottile, freddo, appena piu' chiaro del catrame */
+    ctx.lineWidth=cMenisc*2;
+    ctx.strokeStyle='rgba(150,214,208,0.30)';
+    ctx.stroke(p);
+    ctx.restore();
+  }
+
+  /* L1 radiant white-gold ivory face with strong inner glow */
+  ctx.fillStyle=face;
+  ctx.globalAlpha=0.82;
+  ctx.fill(p);
+  ctx.globalAlpha=1.0;
+
+  /* L2 rotating specular sheen */
+  ctx.save(); ctx.clip(p);
+  const ang=now/2600, sx=CX+Math.cos(ang)*240, sy=CY+Math.sin(ang)*240;
+  const sh=ctx.createLinearGradient(CX-(sx-CX),CY-(sy-CY),sx,sy);
+  sh.addColorStop(.42,'rgba(255,255,255,0)'); sh.addColorStop(.5,'rgba(255,255,255,.35)'); sh.addColorStop(.58,'rgba(255,255,255,0)');
+  ctx.fillStyle=sh; ctx.fillRect(0,0,W,W);
+  ctx.restore();
+
+  /* L3-L5 triple bronze rim — the ALMOST band */
+  /* PUNTE AGUZZE: `lineJoin='round'` con uno stroke da 16px arrotonda OGNI punta
+     e OGNI incavo con raggio 8 e ingrassa i bracci — la geometria era una stella
+     e la pittura la trasformava in una stella marina. Con `miter` e un limite
+     alto gli angoli restano vivi. */
+  ctx.lineJoin='miter'; ctx.miterLimit=12;
+  /* ALMOST come AREA fra due profili, non come stroke grasso: uno stroke centrato
+     sul bordo mangia dentro la stella e la gonfia fuori, cioe' falsa la
+     silhouette che porta la probabilita'. */
+  {
+    const inner=starPath(s), outer=starPath(s*1.085);
+    const band=new Path2D(); band.addPath(outer); band.addPath(inner);
+    ctx.fillStyle='rgba(96,44,8,.55)';
+    ctx.fill(band,'evenodd');
+  }
+  /* LE TRE GHIERE ERANO STROKE CENTRATI SUL BORDO — stesso difetto della banda
+     di almost, un giro dopo. Meta' larghezza cade FUORI dal path e su un vertice
+     da 36 gradi il giunto miter la moltiplica per 1/sin(18) = 3.24: isolando gli
+     strati uno alla volta, la sola ghiera da 2.4px spingeva la punta DIPINTA
+     2.92px oltre la punta teorica (0.08px con quella spenta), e la ghiera scura
+     da 4.5px mangiava 7.3px di avorio DENTRO la punta, lasciando una scheggia
+     di bronzo al posto del vertice chiaro.
+     Clippate al path diventano ghiere INTERNE: la silhouette dipinta coincide
+     con la geometria che porta la probabilita'. */
+  ctx.save(); ctx.clip(p);
+  ctx.lineWidth=4.5; ctx.strokeStyle=SP.rimDark; ctx.stroke(p);
+  ctx.lineWidth=2.4;
+  const rim=ctx.createLinearGradient(CX-120,CY-120,CX+120,CY+120);
+  rim.addColorStop(0,SP.rimA); rim.addColorStop(.5,SP.rimB); rim.addColorStop(1,SP.rimA);
+  ctx.strokeStyle=rim; ctx.stroke(p);
+  /* L6 white specular hairline */
+  ctx.lineWidth=.8; ctx.strokeStyle='rgba(255,248,215,.85)'; ctx.stroke(p);
+  ctx.restore();
+  /* L7-L9 inset mechanical outlines */
+  [0.8,0.62,0.45].forEach((k,i)=>{
+    ctx.lineWidth=1;
+    ctx.strokeStyle=`rgba(160,106,30,${.32-.07*i})`;
+    ctx.stroke(starPath(s*k));
+  });
+  /* L10 core outer ring */
+  ctx.lineWidth=3;
+  ctx.strokeStyle='#8a5a18';
+  ctx.beginPath(); ctx.arc(CX,CY,geo.rCore*s,0,TAU); ctx.stroke();
+  /* L11 brushed bronze-on-gold core (the BIG WIN seat) */
+  const core=ctx.createRadialGradient(CX-8,CY-10,2,CX,CY,geo.rCore*s);
+  core.addColorStop(0,SP.core[0]); core.addColorStop(.55,SP.core[1]); core.addColorStop(1,SP.core[2]);
+  ctx.fillStyle=core;
+  /* IL NUCLEO SI RIMPICCIOLISCE PRIMA DI ESISTERE. `drawStar` passa da s>0.01,
+     ma con rCore=43 il raggio `rCore*s-2` e' NEGATIVO per s sotto 0.046, e
+     `arc()` con raggio negativo lancia: la try/catch del frame inghiottiva
+     l'eccezione e con essa tutto cio' che viene dopo drawStar — obelischi,
+     pallina, moti — per i due o tre fotogrammi iniziali del bloom. */
+  const rCoreIn=Math.max(0,geo.rCore*s-2);
+  ctx.beginPath(); ctx.arc(CX,CY,rCoreIn,0,TAU); ctx.fill();
+  ctx.save();
+  ctx.beginPath(); ctx.arc(CX,CY,rCoreIn,0,TAU); ctx.clip();
+  ctx.globalAlpha=.3;
+  for(let i=0;i<9;i+=1){                      // brushed arcs
+    ctx.strokeStyle=i%2?'rgba(255,240,200,.5)':'rgba(96,44,8,.5)';
+    ctx.lineWidth=.7;
+    ctx.beginPath(); ctx.arc(CX,CY,Math.max(0,geo.rCore*s-3)*(i+1)/10,t*.3*(i%2?1:-1),t*.3*(i%2?1:-1)+TAU*.8); ctx.stroke();
+  }
+  ctx.globalAlpha=1; ctx.restore();
+  /* L12 core inner sun-spark ring */
+  ctx.lineWidth=1.2;
+  ctx.strokeStyle=`rgba(255,238,188,${.55+.3*Math.sin(t*2.4)})`;
+  ctx.beginPath(); ctx.arc(CX,CY,geo.rCore*s*.55,0,TAU); ctx.stroke();
+  /* V6: glint prismatici rimossi — erano un quarto colore (ciano) sulle punte. */
+
+  ctx.restore();
+}
+
+/* RISK STREAMS — flowing cosmic rivers / expanding ink veins.
+   Vivid translucent jewel-gel: reads on the astral ink AND tints the white-gold
+   star like stained glass. The centreline MEANDERS and the body SWELLS
+   asymmetrically as it pools inward — never a rigid vertical banner.
+   Coverage angle ∝ risk probability; edges shimmer via animated #fluidWobble. */
+function drawStream(wedge,color,edge,now,pour,variant){
+  if(pour<=0) return;
+  const t=now/1000;
+  const mid=(wedge.a0+wedge.a1)/2;
+  const half=Math.max(0.06,(wedge.a1-wedge.a0)/2);
+  const ge=rCheckAt(mid);                       // source = the goo edge at this wedge
+  const reach=(ge-geo.rCore)*pour;              // pours INTO the goo — proportional to goo depth
+  const STEPS=36;
+  const fade=clamp(pour*1.5,0,1);
+  const col=a=>color.replace('A',a.toFixed(3));
+  /* distinct per-stream personality so the two rivers bend differently */
+  const seed=variant==='wound' ? 1.6 : 4.3;
+  const bendDir=variant==='wound' ? 1 : -1;
+
+  /* u: 0 at the goo-edge source → 1 toward the centre */
+  const centreline=u=> mid
+      + Math.sin(u*2.15 + t*0.5 + seed)*half*0.85*u*bendDir   // growing S-meander
+      + Math.sin(u*4.6 + t*1.0 + seed)*0.018*u;               // fine ripple
+  const swell=u=> half*(0.42 + 1.05*Math.sin(Math.min(1,u*1.04)*Math.PI*0.9)); // vein bulge
+  const radAt=(u,a)=> rCheckAt(a) - reach*u;    // creep inward from the goo edge per angle
+
+  /* ragged, creeping edge: low swell + higher-frequency irregular notches so the
+     border looks like bleeding ink, never a clean petal */
+  const ragged=(u,ph)=> 1
+      + 0.16*Math.sin(u*6.1 + t*1.3 + ph)
+      + 0.13*Math.sin(u*17.0 + ph*1.7 + t*0.5)
+      + 0.09*Math.sin(u*34.0 + ph*0.6)
+      + 0.05*Math.sin(u*61.0 + ph*2.2);
+  const buildPath=(wScale)=>{
+    ctx.beginPath();
+    for(let i=0;i<=STEPS;i+=1){              // left bank: edge → centre
+      const u=i/STEPS, c=centreline(u);
+      const w=swell(u)*wScale*ragged(u,seed);
+      const a=c-w, d=radAt(u,a);
+      ctx.lineTo(CX+Math.cos(a)*d,CY+Math.sin(a)*d);
+    }
+    for(let i=STEPS;i>=0;i-=1){              // right bank: centre → edge (asymmetric)
+      const u=i/STEPS, c=centreline(u);
+      const w=swell(u)*wScale*ragged(u,seed+2.9);
+      const a=c+w, d=radAt(u,a);
+      ctx.lineTo(CX+Math.cos(a)*d,CY+Math.sin(a)*d);
+    }
+    ctx.closePath();
+  };
+
+  ctx.save();
+  ctx.clip(gooBlobPath(1,0));                // rivers stay inside the goo
+  /* no organic wobble — crystal streams have clean, faceted edges */
+
+  /* 1) CRYSTAL ENERGY BODY — additive so it glows like neon, not painted ink */
+  ctx.globalCompositeOperation='lighter';
+  const g=ctx.createRadialGradient(CX,CY,Math.max(0,ge-reach),CX,CY,ge);
+  g.addColorStop(0, col(0.10*fade));
+  g.addColorStop(.5, col(0.52*fade));
+  g.addColorStop(.85,col(0.78*fade));
+  g.addColorStop(1, col(0.92*fade));
+  ctx.fillStyle=g; buildPath(1); ctx.fill();
+
+  /* 2) LUMINOUS CORE — bright additive heart */
+  const c=ctx.createRadialGradient(CX,CY,Math.max(0,ge-reach*0.9),CX,CY,ge);
+  c.addColorStop(0, col(0.0));
+  c.addColorStop(.7, col(0.30*fade));
+  c.addColorStop(1, col(0.58*fade));
+  ctx.fillStyle=c; buildPath(0.5); ctx.fill();
+
+  /* 3) crystalline edge filaments — two bold arcs, vivid */
+  ctx.strokeStyle=edge; ctx.lineCap='round';
+  for(let k=0;k<3;k+=1){
+    ctx.lineWidth=(k===0?2.4:1.1);
+    ctx.globalAlpha=fade*(k===0?0.95:0.55);
+    ctx.beginPath();
+    for(let i=0;i<=STEPS;i+=1){
+      const u=i/STEPS;
+      const a=centreline(u)+(k-1.5)*swell(u)*0.5+Math.sin(t*1.2+i*.4+k*1.9)*half*0.18*u;
+      const d=radAt(u,a)+Math.sin(t*1.5+i*.5+k)*3;
+      const x=CX+Math.cos(a)*d, y=CY+Math.sin(a)*d;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+  /* drifting jewel droplets seeping ahead of the pool */
+  for(let k=0;k<6;k+=1){
+    const u=1+0.04*k;
+    const a=centreline(0.95)+Math.sin(t*.6+k*1.3)*half*0.7;
+    const dd=radAt(0.96,a)-4-Math.abs(Math.sin(t*.7+k*1.9))*Math.min(reach*.35,38);
+    if(dd<8) continue;
+    const dx=CX+Math.cos(a)*dd, dy=CY+Math.sin(a)*dd, rr=1.6+(k%3);
+    const dg=ctx.createRadialGradient(dx,dy,0,dx,dy,rr);
+    dg.addColorStop(0,edge); dg.addColorStop(1,col(0));
+    ctx.globalAlpha=fade*0.85; ctx.fillStyle=dg;
+    ctx.beginPath(); ctx.arc(dx,dy,rr,0,TAU); ctx.fill();
+  }
+
+  ctx.globalAlpha=1;
+  ctx.globalCompositeOperation='source-over';
+  ctx.restore();
+}
+
+/* ZONE DI RISCHIO — drawn ON TOP of the star, visible regardless of gap size.
+   FERITA (wound): amber-crimson arc band around the full star perimeter.
+   MORTE (death): deep-violet void spots at the 5 valley floors.
+   Both use additive glow that bleeds over the star's bronze rim.
+   Pour animation: appears as scene.pourP goes 0→1. */
+function drawValleyRisks(now,pour){
+  if(pour<=0) return;
+  const t=now/1000;
+  const fade=clamp(pour*1.5,0,1);
+
+  /* ── FERITA (WOUND): crimson arc-band around the star's outer rim ── */
+  /* Drawn as an additive glow ring following rStarAt, extending outward.
+     Visible as a danger halo even when failure gap is tiny. */
+  ctx.save();
+  ctx.globalCompositeOperation='lighter';
+  const WOUND_SEGS=120;
+  const woundGlowR=Math.max(18, geo.woundW*0.9+12); // minimum 18px so always visible
+  for(let k=0;k<WOUND_SEGS;k+=1){
+    const a=(k/WOUND_SEGS)*TAU;
+    const starR=rStarAt(a);
+    /* outer band mid-point */
+    const bandMid=starR+woundGlowR*0.4;
+    const wx=CX+Math.cos(a)*bandMid, wy=CY+Math.sin(a)*bandMid;
+    const pulse=0.5+0.5*Math.sin(t*2.1+k*0.23+0.8);
+    const alpha=fade*(0.28+0.22*pulse);
+    const gw=ctx.createRadialGradient(wx,wy,0,wx,wy,woundGlowR);
+    gw.addColorStop(0,`rgba(220,60,30,${alpha})`);
+    gw.addColorStop(0.5,`rgba(180,30,10,${alpha*0.5})`);
+    gw.addColorStop(1,'transparent');
+    ctx.fillStyle=gw;
+    ctx.beginPath(); ctx.arc(wx,wy,woundGlowR,0,TAU); ctx.fill();
+  }
+  ctx.globalAlpha=1;
+  ctx.globalCompositeOperation='source-over';
+  ctx.restore();
+
+  /* Wound arc stroke directly on the star bronze rim */
+  ctx.save();
+  const WOUND_ARC=200;
+  ctx.lineWidth=2.5;
+  for(let k=0;k<WOUND_ARC;k+=1){
+    const a0=(k/WOUND_ARC)*TAU;
+    const a1=((k+1)/WOUND_ARC)*TAU;
+    const r0=rStarAt(a0), r1=rStarAt(a1);
+    const pulse=0.5+0.5*Math.sin(t*2.4+(k/WOUND_ARC)*TAU*3.7);
+    const alpha=fade*(0.55+0.35*pulse);
+    ctx.strokeStyle=`rgba(230,70,30,${alpha})`;
+    ctx.shadowColor='rgba(255,60,20,0.8)'; ctx.shadowBlur=6+4*pulse;
+    ctx.beginPath();
+    ctx.moveTo(CX+Math.cos(a0)*r0, CY+Math.sin(a0)*r0);
+    ctx.lineTo(CX+Math.cos(a1)*r1, CY+Math.sin(a1)*r1);
+    ctx.stroke();
+  }
+  ctx.shadowBlur=0;
+  ctx.restore();
+
+  /* ── MORTE (DEATH): void spots at the 5 valley floors ── */
+  /* Qualitatively different from wound: black cores + violet glow,
+     positioned at star valley tips (not in the failure gap). */
+  ctx.save();
+  for(let i=0;i<AXES;i+=1){
+    const valleyAng=TIP(i)+Math.PI/AXES;  // midpoint between tips = valley
+    const starAtV=rStarAt(valleyAng);
+    /* death void centered just OUTSIDE the star valley edge */
+    const deathR=Math.max(22, geo.deathDepth*1.2);
+    const voidCtrR=starAtV+deathR*0.35;
+    const vx=CX+Math.cos(valleyAng)*voidCtrR;
+    const vy2=CY+Math.sin(valleyAng)*voidCtrR;
+    const pulse=0.5+0.5*Math.sin(t*2.7+i*1.26);
+    const voidSize=deathR*(0.9+0.2*pulse)*pour;
+
+    /* outer violet glow (additive — bleeds over anything) */
+    ctx.globalCompositeOperation='lighter';
+    const g=ctx.createRadialGradient(vx,vy2,0,vx,vy2,voidSize*2.2);
+    g.addColorStop(0,`rgba(120,0,220,${fade*0.7*(0.5+0.5*pulse)})`);
+    g.addColorStop(0.4,`rgba(70,0,150,${fade*0.4})`);
+    g.addColorStop(1,'transparent');
+    ctx.fillStyle=g; ctx.globalAlpha=1;
+    ctx.beginPath(); ctx.arc(vx,vy2,voidSize*2.2,0,TAU); ctx.fill();
+    ctx.globalCompositeOperation='source-over';
+
+    /* black void core — clearly "dead space" */
+    const bc=ctx.createRadialGradient(vx,vy2,0,vx,vy2,voidSize*0.8);
+    bc.addColorStop(0,`rgba(0,0,0,${fade*0.95})`);
+    bc.addColorStop(0.65,`rgba(8,0,20,${fade*0.75})`);
+    bc.addColorStop(1,'transparent');
+    ctx.fillStyle=bc;
+    ctx.beginPath(); ctx.arc(vx,vy2,voidSize*0.8,0,TAU); ctx.fill();
+
+    /* rotating violet ring arcs — qualitatively distinct from wound style */
+    ctx.globalAlpha=fade*(0.55+0.25*pulse);
+    ctx.strokeStyle=`rgba(190,80,255,${0.5+0.3*pulse})`;
+    ctx.lineWidth=1.2; ctx.shadowColor='rgba(160,60,255,0.8)'; ctx.shadowBlur=6;
+    for(let ring=1;ring<=3;ring+=1){
+      const dir=ring%2?1:-1;
+      ctx.beginPath();
+      ctx.arc(vx,vy2,voidSize*(0.18+ring*0.14),t*dir*0.95,t*dir*0.95+TAU*0.7);
+      ctx.stroke();
+    }
+    ctx.shadowBlur=0; ctx.globalAlpha=1;
+  }
+  ctx.restore();
+}
+
+/* obelisk pillars */
+function drawPillar(pl,isWhite){
+  if(pl.drop<=0) return;
+  const px=CX+Math.cos(pl.ang)*pl.r, py=CY+Math.sin(pl.ang)*pl.r;
+  const dropY=(1-pl.drop)*-520;
+  const vy=py+dropY;
+  /* tapered runic monolith with a faceted pyramidion cap — slender & elegant */
+  const bw=13.5, tw=5.5;           // base / shoulder half-widths
+  const h=112, capH=40;            // taller shaft + a longer, sharper pyramidion
+  const footF=11, frontF=3;
+  const lean=isWhite?0:3;           // basalt leans (asymmetry / Rude Beauty)
+  const shoulderY=vy-h;
+  const tipX=px+lean, tipY=shoulderY-capH;
+  const Bc=[px,vy+footF];
+  const bL=[px-bw,vy+frontF], bR=[px+bw,vy+frontF];
+  const sL=[px-tw,shoulderY], sR=[px+tw,shoulderY];
+  const Sc=[px,shoulderY+footF*0.42];
+  const mk=(...pts)=>{const p=new Path2D();pts.forEach((q,i)=>i?p.lineTo(q[0],q[1]):p.moveTo(q[0],q[1]));p.closePath();return p;};
+  const shaftL=mk(Bc,bL,sL,Sc);
+  const shaftR=mk(Bc,bR,sR,Sc);
+  const capL=mk(Sc,sL,[tipX,tipY]);
+  const capR=mk(Sc,sR,[tipX,tipY]);
+  const glow=isWhite?'#ffe9c0':'#c8862e';
+  const fl=pl.flash;
+  ctx.save();
+
+  /* ground shadow + emissive socket where the obelisk roots into the goo */
+  if(pl.drop>=1){
+    ctx.fillStyle='rgba(3,22,20,.62)';
+    ctx.beginPath(); ctx.ellipse(px,py,bw*1.25,bw*.42,0,0,TAU); ctx.fill();
+    const sock=ctx.createRadialGradient(px,py,1,px,py,bw*1.7);
+    sock.addColorStop(0, isWhite?'rgba(255,221,150,.40)':'rgba(56,224,196,.36)');
+    sock.addColorStop(1,'transparent');
+    ctx.fillStyle=sock;
+    ctx.beginPath(); ctx.ellipse(px,py,bw*1.7,bw*.62,0,0,TAU); ctx.fill();
+    /* faint vertical emissive aura hugging the shaft */
+    const aura=ctx.createLinearGradient(px,py,px,py-h-capH);
+    aura.addColorStop(0, isWhite?'rgba(255,224,150,.18)':'rgba(60,224,196,.16)');
+    aura.addColorStop(1,'transparent');
+    ctx.fillStyle=aura;
+    ctx.beginPath(); ctx.ellipse(px,py-(h+capH)*0.5,bw*1.25,(h+capH)*0.5,0,0,TAU); ctx.fill();
+  }
+  /* descent motion-streak while falling */
+  if(pl.drop<1){
+    const tg=ctx.createLinearGradient(px,tipY-70,px,vy);
+    tg.addColorStop(0,glow+'00'); tg.addColorStop(.6,glow+'33'); tg.addColorStop(1,'transparent');
+    ctx.fillStyle=tg; ctx.globalAlpha=.6;
+    ctx.beginPath(); ctx.moveTo(px-tw,tipY-10); ctx.lineTo(px,tipY-72); ctx.lineTo(px+tw,tipY-10); ctx.closePath(); ctx.fill();
+    ctx.globalAlpha=1;
+  }
+
+  /* shadow (left) shaft + cap — near-black obsidian face */
+  ctx.fillStyle=isWhite?'#a48d60':'#07050f'; ctx.fill(shaftL);
+  ctx.fillStyle=isWhite?'#8f7a52':'#050310'; ctx.fill(capL);
+
+  /* lit (right) shaft — dark crystal face with cold azure catch-light */
+  const fg=ctx.createLinearGradient(px-2,shoulderY,px+bw,vy);
+  if(isWhite){ fg.addColorStop(0,'#fefaf0'); fg.addColorStop(.4,'#ece0c1'); fg.addColorStop(1,'#c2a574'); }
+  else { fg.addColorStop(0,'#1c2a3a'); fg.addColorStop(.45,'#0e1a26'); fg.addColorStop(1,'#060d14'); }
+  ctx.fillStyle=fg; ctx.fill(shaftR);
+
+  /* matte material grain clipped to the lit shaft */
+  ctx.save();
+  ctx.clip(shaftR);
+  ctx.globalCompositeOperation='overlay';
+  ctx.globalAlpha=isWhite?.55:.65;
+  ctx.drawImage(isWhite?marbleTex:stoneTex, px-bw, tipY, bw*2.2, h+capH+footF);
+  if(isWhite){
+    ctx.globalCompositeOperation='source-over'; ctx.globalAlpha=1;
+    const ss=ctx.createRadialGradient(px+2,shoulderY+h*.35,0,px+2,shoulderY+h*.35,h*.7);
+    ss.addColorStop(0,'rgba(255,206,128,.20)'); ss.addColorStop(.6,'rgba(255,200,110,.05)'); ss.addColorStop(1,'transparent');
+    ctx.fillStyle=ss; ctx.fillRect(px-bw,tipY,bw*2.2,h+capH+footF);
+  } else {
+    /* subtle azure crystal vein in the lit face */
+    ctx.globalCompositeOperation='screen'; ctx.globalAlpha=.18;
+    const vein=ctx.createLinearGradient(px,shoulderY,px+bw,vy);
+    vein.addColorStop(0,'rgba(0,229,255,1)'); vein.addColorStop(1,'rgba(0,80,120,1)');
+    ctx.fillStyle=vein; ctx.fillRect(px-bw,tipY,bw*2.2,h+capH+footF);
+  }
+  ctx.restore();
+
+  /* lit (right) pyramidion facet */
+  const cg=ctx.createLinearGradient(tipX,tipY,sR[0],shoulderY);
+  if(isWhite){ cg.addColorStop(0,'#fffdf6'); cg.addColorStop(1,'#d8c188'); }
+  else { cg.addColorStop(0,'#243444'); cg.addColorStop(1,'#040210'); }
+  ctx.fillStyle=cg; ctx.fill(capR);
+
+  /* glowing rune fissure down the lit face */
+  ctx.save();
+  ctx.clip(shaftR);
+  const rGlow=0.32+0.68*fl;
+  ctx.strokeStyle=isWhite?`rgba(255,233,176,${0.5*rGlow})`:`rgba(210,140,60,${0.55*rGlow})`;
+  ctx.shadowColor=glow; ctx.shadowBlur=(isWhite?6:5)*(0.4+rGlow);
+  ctx.lineWidth=1.1;
+  ctx.beginPath();
+  let rx=px+3, ry=shoulderY+10;
+  ctx.moveTo(rx,ry);
+  for(let k=1;k<=5;k+=1){ rx=px+3+(k%2?3:-2); ry=shoulderY+10+k*(h*0.62/5); ctx.lineTo(rx,ry); }
+  ctx.stroke();
+  /* a couple of rune notches */
+  ctx.lineWidth=0.9;
+  for(let k=1;k<=2;k+=1){ const ny=shoulderY+18+k*22; ctx.beginPath(); ctx.moveTo(px+1,ny); ctx.lineTo(px+8,ny-4); ctx.stroke(); }
+  ctx.restore();
+
+  /* ball-passage edge ignition */
+  if(fl>0.02){
+    ctx.shadowColor=glow; ctx.shadowBlur=26*fl;
+    ctx.strokeStyle=glow; ctx.lineWidth=.6+1.9*fl; ctx.globalAlpha=fl;
+    ctx.stroke(shaftR); ctx.stroke(capR);
+    ctx.globalAlpha=1; ctx.shadowBlur=0;
+  }
+
+  /* crystal: strong azure back-rim + secondary cap edge — forces dark monolith
+     to read as crystal against the teal background */
+  if(!isWhite){
+    /* primary left-edge azure line */
+    ctx.strokeStyle='rgba(0,229,255,.95)'; ctx.lineWidth=1.8;
+    ctx.shadowColor='rgba(0,200,255,.90)'; ctx.shadowBlur=14;
+    ctx.beginPath();
+    ctx.moveTo(Bc[0],Bc[1]); ctx.lineTo(bL[0],bL[1]); ctx.lineTo(sL[0],sL[1]); ctx.lineTo(tipX,tipY);
+    ctx.stroke();
+    /* secondary softer outer glow pass */
+    ctx.strokeStyle='rgba(0,180,255,.35)'; ctx.lineWidth=5;
+    ctx.shadowBlur=22;
+    ctx.beginPath();
+    ctx.moveTo(bL[0],bL[1]); ctx.lineTo(sL[0],sL[1]); ctx.lineTo(tipX,tipY);
+    ctx.stroke();
+    ctx.shadowBlur=0;
+  }
+
+  /* chiseled specular ridges — sharp catchlights on the lit face */
+  const spec=isWhite?'rgba(255,253,240,.95)':'rgba(160,230,255,.95)';
+  ctx.strokeStyle=spec; ctx.lineWidth=isWhite?1.3:1.5;
+  ctx.shadowColor=spec; ctx.shadowBlur=isWhite?7:10;
+  ctx.beginPath(); ctx.moveTo(tipX,tipY); ctx.lineTo(sR[0],shoulderY); ctx.stroke();   // lit cap ridge
+  ctx.beginPath(); ctx.moveTo(tipX,tipY); ctx.lineTo(Sc[0],Sc[1]); ctx.stroke();       // central spine
+  const evg=ctx.createLinearGradient(sR[0],shoulderY,bR[0],vy);
+  evg.addColorStop(0,spec); evg.addColorStop(.55,isWhite?'rgba(120,80,30,.22)':'rgba(0,120,180,.18)'); evg.addColorStop(1,'transparent');
+  ctx.strokeStyle=evg; ctx.lineWidth=1.1;
+  ctx.beginPath(); ctx.moveTo(sR[0],shoulderY); ctx.lineTo(bR[0],vy+frontF); ctx.stroke();
+  ctx.shadowBlur=0;
+
+  /* basalt: a chipped fracture at the shoulder (broken, ancient) */
+  if(!isWhite){
+    ctx.strokeStyle='rgba(150,95,30,.5)'; ctx.lineWidth=.8;
+    ctx.beginPath(); ctx.moveTo(px-tw,shoulderY+6); ctx.lineTo(px-tw+5,shoulderY-3); ctx.lineTo(px-tw+1,shoulderY-9); ctx.stroke();
+  } else {
+    /* alabaster: a bright crystalline tip glint */
+    ctx.fillStyle='rgba(255,255,255,.9)'; ctx.shadowColor='#fff'; ctx.shadowBlur=8;
+    ctx.beginPath(); ctx.arc(tipX,tipY,1.6,0,TAU); ctx.fill(); ctx.shadowBlur=0;
+  }
+  /* soft emissive halo crowning the pyramidion */
+  const tipHalo=ctx.createRadialGradient(tipX,tipY,0,tipX,tipY,16+10*fl);
+  tipHalo.addColorStop(0, isWhite?`rgba(255,238,180,${.5+.4*fl})`:`rgba(120,210,255,${.32+.4*fl})`);
+  tipHalo.addColorStop(1,'transparent');
+  ctx.fillStyle=tipHalo;
+  ctx.beginPath(); ctx.arc(tipX,tipY,16+10*fl,0,TAU); ctx.fill();
+
+  /* skill icon on the lit face, coming from the balancing config */
+  const skill=skills[pl.idx];
+  if(skill?.icon){
+    ctx.save();
+    ctx.globalCompositeOperation='source-over';
+    ctx.globalAlpha=pl.drop;
+    ctx.font="900 16px 'Space Grotesk', system-ui, sans-serif";
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillStyle=isWhite?'rgba(60,44,20,.9)':'rgba(190,230,255,.95)';
+    ctx.shadowColor=isWhite?'rgba(255,240,200,.6)':'rgba(0,200,255,.5)';
+    ctx.shadowBlur=6;
+    ctx.fillText(skill.icon, tipX, shoulderY-capH*0.38);
+    ctx.restore();
+  }
+
+  ctx.restore();
+}
+
+/* R-067 — ZONE GUIDE: le fasce di esito esistono nella fisica ma non si
+   vedevano. Due contorni sottili e leggibili durante il pre-roll:
+   · ALMOST: cordolo ambrato appena fuori dal bordo della stella;
+   · EPIC (fallimento critico): bordo interno scuro-viola del catrame. */
+function drawZoneGuides(now){
+  const s=scene.state;
+  const vis=(s==='risk-pour'||s==='action-trigger')?1:(s==='agency-burst'?clamp(scene.starScale,0,1):0);
+  if(vis<=0.02||scene.starScale<=0.01) return;
+  const t=now/1000;
+  const SEG=240;
+  ctx.save();
+  /* fascia ALMOST — tratteggio ambrato appena oltre il bordo stella */
+  ctx.setLineDash([6,8]);
+  ctx.lineWidth=1.6;
+  ctx.strokeStyle=`rgba(230,170,80,${(0.5*vis*(0.75+0.25*Math.sin(t*2.2))).toFixed(3)})`;
+  ctx.beginPath();
+  for(let i=0;i<=SEG;i+=1){
+    const a=-Math.PI/2+i/SEG*TAU;
+    const r=rStarAt(a,scene.starScale)*(1+geo.almostFactor);
+    const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+  /* fascia EPIC — il margine interno del catrame (fallimento critico) */
+  ctx.setLineDash([3,10]);
+  ctx.lineWidth=2.2;
+  ctx.strokeStyle=`rgba(170,80,220,${(0.42*vis*(0.7+0.3*Math.sin(t*1.7+1))).toFixed(3)})`;
+  ctx.beginPath();
+  for(let i=0;i<=SEG;i+=1){
+    const a=-Math.PI/2+i/SEG*TAU;
+    const r=rCheckAt(a)*(1-geo.epicFactor);
+    const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+  /* fascia FERITA (wound) — anello rosso appena dentro il bordo del catrame:
+     la zona in cui la palla si ferma ti lascia ferito */
+  if(geo.woundFactor>0.001){
+    ctx.setLineDash([10,6]);
+    ctx.lineWidth=2.6;
+    ctx.strokeStyle=`rgba(215,50,70,${(0.55*vis*(0.7+0.3*Math.sin(t*2.6+0.6))).toFixed(3)})`;
+    ctx.beginPath();
+    for(let i=0;i<=SEG;i+=1){
+      const a=-Math.PI/2+i/SEG*TAU;
+      const r=rCheckAt(a)*(1-geo.woundFactor);
+      const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+  /* fascia MORTE — striscia violetta appena FUORI dal bordo della stella:
+     la zona più vicina al successo che invece uccide */
+  if(geo.deathDepth>0.5){
+    ctx.setLineDash([2,6]);
+    ctx.lineWidth=3.2;
+    ctx.strokeStyle=`rgba(150,40,235,${(0.6*vis*(0.65+0.35*Math.sin(t*1.4+2.2))).toFixed(3)})`;
+    ctx.beginPath();
+    for(let i=0;i<=SEG;i+=1){
+      const a=-Math.PI/2+i/SEG*TAU;
+      const r=Math.min(rStarAt(a,scene.starScale)+geo.deathDepth,rCheckAt(a));
+      const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+  ctx.restore();
+}
+function drawShocks(dt){
+  for(let i=scene.shocks.length-1;i>=0;i-=1){
+    const s=scene.shocks[i]; s.t+=dt;
+    const p=s.t/s.dur;
+    if(p>=1){scene.shocks.splice(i,1);continue;}
+    ctx.save();
+    ctx.globalAlpha=(1-p)*.8;
+    ctx.strokeStyle=s.c; ctx.lineWidth=2.4*(1-p)+.4;
+    ctx.shadowColor=s.c; ctx.shadowBlur=12;
+    ctx.beginPath(); ctx.ellipse(s.x,s.y,8+44*easeOutCubic(p),(8+44*easeOutCubic(p))*.42,0,0,TAU); ctx.stroke();
+    ctx.restore();
+  }
+}
+function drawRimHits(){ /* rimosso: era l'effetto pinball */ }
+function drawBall(now){
+  const b=scene.ball;
+  if(!b.on && scene.state!=='resolution') return;
+  /* R-067 — scia sottile e brillante (ambrata), niente nuvole di particelle */
+  const n=b.trail.length;
+  const TL=astrolabeV64Config.ball.trailLifeMs;
+  for(let i=1;i<n;i+=1){
+    const t0=b.trail[i-1], t1=b.trail[i];
+    const a=t1.life/TL;
+    if(a<=0) continue;
+    const mix=i/n;                              // tail→head
+    const cr=Math.round(180+(255-180)*mix), cg=Math.round(150+(235-150)*mix), cb=Math.round(60+(160-60)*mix);
+    ctx.globalAlpha=a*.55;
+    ctx.strokeStyle=`rgb(${cr},${cg},${cb})`;
+    ctx.lineWidth=b.r*a*(.35+.65*mix);
+    ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(t0.x,t0.y); ctx.lineTo(t1.x,t1.y); ctx.stroke();
+  }
+  ctx.globalAlpha=1;
+  scene.sparks.forEach(s=>{
+    const a=s.life/s.max;
+    ctx.globalAlpha=a; ctx.fillStyle=s.c; ctx.shadowColor=s.c; ctx.shadowBlur=6;
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.r*a,0,TAU); ctx.fill(); ctx.shadowBlur=0;
+  });
+  ctx.globalAlpha=1;
+  /* the energy pinball */
+  const pulse=scene.state==='resolution'?1+.08*Math.sin(now/120):1;
+  const r=b.r*pulse;
+  const c=(cfg.ballColor||'amber');
+  const palette={
+    amber: {c0:'rgba(255,236,170,.5)',c1:'rgba(252,232,144,.12)',c2:'#ffffff',c3:'#ffeebc',c4:'#a06a1e',glow:'rgba(252,232,144,.95)'},
+    teal: {c0:'rgba(170,255,230,.5)',c1:'rgba(144,245,233,.12)',c2:'#ffffff',c3:'#a3f5f3',c4:'#106c70',glow:'rgba(144,233,245,.95)'},
+    copper: {c0:'rgba(255,210,180,.5)',c1:'rgba(245,185,144,.12)',c2:'#ffffff',c3:'#ffcdb0',c4:'#8a4526',glow:'rgba(245,170,130,.95)'}
+  }[c]||palette.amber;
+  const halo=ctx.createRadialGradient(b.x,b.y,r*.5,b.x,b.y,r*4);
+  halo.addColorStop(0,palette.c0); halo.addColorStop(.5,palette.c1); halo.addColorStop(1,'transparent');
+  ctx.fillStyle=halo; ctx.beginPath(); ctx.arc(b.x,b.y,r*4,0,TAU); ctx.fill();
+  /* R-067 GOCCIA DI MERCURIO/AMBRA: corpo allungato lungo il vettore velocità,
+     riflesso speculare che "gira" seguendo il moto, squash sui rimbalzi. */
+  {
+    const spd=Math.hypot(b.vx,b.vy);
+    const st=1+Math.min(1,spd/astrolabeV64Config.ball.stretchSpeed)*(astrolabeV64Config.ball.maxStretch-1);
+    const sq=b.squash!=null?b.squash:1;
+    b.squash=Math.min(1,(b.squash||1)+0.06);        // ritorno elastico alla sfera
+    const vAng=spd>0.4?Math.atan2(b.vy,b.vx):0;
+    ctx.save();
+    ctx.translate(b.x,b.y);
+    ctx.rotate(vAng);
+    ctx.scale(st*sq,(1/Math.sqrt(st))*sq>1?1:(1/Math.sqrt(st))*(2-sq));
+    const gx=-r*0.34-Math.cos(vAng)*2, gy=-r*0.34-Math.sin(vAng)*2;
+    const g=ctx.createRadialGradient(gx,gy,1,0,0,r+2);
+    g.addColorStop(0,palette.c2); g.addColorStop(.4,palette.c3); g.addColorStop(1,palette.c4);
+    ctx.shadowColor=palette.glow; ctx.shadowBlur=26;
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,r,0,TAU); ctx.fill();
+    ctx.lineWidth=1.4; ctx.strokeStyle='rgba(255,255,255,.95)'; ctx.stroke();
+    ctx.restore();
+    ctx.shadowBlur=0;
+  }
+}
+
+/* blueprint preview in idle — zones update live as sliders move */
+function drawBlueprint(now){
+  if(scene.state!=='idle') return;
+  /* the void before creation: only a single breathing ember-seed at the core */
+  const t=now/1000;
+  const pul=0.5+0.5*Math.sin(t*1.6);
+  ctx.save();
+  const sg=ctx.createRadialGradient(CX,CY,0,CX,CY,18+10*pul);
+  sg.addColorStop(0,`rgba(255,236,170,${0.5+0.3*pul})`);
+  sg.addColorStop(0.5,`rgba(201,162,39,${0.12+0.1*pul})`);
+  sg.addColorStop(1,'transparent');
+  ctx.fillStyle=sg;
+  ctx.beginPath(); ctx.arc(CX,CY,18+10*pul,0,TAU); ctx.fill();
+  ctx.fillStyle=`rgba(255,248,225,${0.7+0.3*pul})`;
+  ctx.beginPath(); ctx.arc(CX,CY,1.6+0.6*pul,0,TAU); ctx.fill();
+  ctx.restore();
+}
+
+/* =========================================================================
+   MAIN LOOP
+   ========================================================================= */
+let lastT=performance.now();
+/* Il disegno di UN fotogramma, separato dalla riprogrammazione: e' la cucitura su
+   cui si appoggia il banco di misura, che deve poter avanzare a mano senza
+   accodare rAF (il pannello di anteprima li congela comunque). */
+function renderFrame(now){
+ try{
+  const dt=Math.min(50,now-lastT); lastT=now;
+  scene.nowMs=now;                       // drives the goo's breathing undulation
+  scene.warp=Math.max(0,(scene.warp||0)-0.04);
+  tickTimeline();
+  /* V6: rimosso l'aggiornamento per-frame di #gooTurb/#fluidTurb — quei filtri
+     SVG non erano applicati da nessuna regola CSS, quindi erano due setAttribute
+     per frame a costo di style recalc e zero pixel. */
+
+  ctx.clearRect(0,0,W,W);
+  drawBackdrop(now);
+  drawChallengeSurface(now);
+  drawAxisRig(now);
+  drawAxisLabels(now);
+  drawBlueprint(now);
+  drawStar(now);
+  drawZoneGuides(now);
+  /* V6: drawValleyRisks() disattivato — ferita e morte tornano con una
+     grammatica propria, fuori dall'area del goo. */
+  scene.whitePillars.forEach(p=>drawPillar(p,true));  // draw first (behind)
+  scene.blackPillars.forEach(p=>drawPillar(p,false)); // draw last (in front)
+  drawShards();
+  drawShocks(dt);
+  drawRimHits();
+  drawMotes(now,dt);
+  drawBall(now);
+  drawFissure(now);
+ }catch(e){ if(!window.__frameErrLogged){ window.__frameErrLogged=true; console.error('FRAME ERROR:', e && e.stack || e); } }
+}
+function frame(now){
+ renderFrame(now);
+ /* V6.3: guarded re-schedule — the V6 clone had two parallel self-rescheduling
+    rAF loops that destroy() could never stop (leaked frames after unmount). */
+ if(engineAlive) rafId=requestAnimationFrame(frame);
+}
+
+/* =========================================================================
+   PANEL BINDINGS + LIVE MATH
+   ========================================================================= */
+/* panel sliders removed — config comes from props */
+
+
+function updateMathPanel(){
+  const tst=geo.tst;
+  const failFrom=Math.min(100,tst+6);
+  const failSpan=Math.max(0,100-(tst+5));
+  const epicN=Math.max(1,Math.round(failSpan*cfg.crit/100));
+  const epicFrom=101-epicN;
+  $id('mTst').textContent=tst;
+  $id('mWin').textContent=`1 – ${tst}`;
+  $id('mAlmost').textContent=`${Math.min(100,tst+1)} – ${Math.min(100,tst+5)}`;
+  $id('mFail').textContent=failSpan>0?`${failFrom} – 100`:'—';
+  $id('mEpic').textContent=failSpan>0?`${epicFrom} – 100 (${epicN})`:'—';
+  $id('mWound').textContent=`${cfg.wound}%`;
+  $id('mDead').textContent=`${cfg.dead}%`;
+  const bar=$id('probBar');
+  const sW=tst, aW=Math.min(5,100-tst), fW=Math.max(0,failSpan-epicN), eW=Math.min(epicN,failSpan);
+  bar.innerHTML=`
+    <div class="seg s" style="width:${sW}%"></div>
+    <div class="seg a" style="width:${aW}%"></div>
+    <div class="seg f" style="width:${fW}%"></div>
+    <div class="seg e" style="width:${eW}%"></div>`;
+}
+function updateResultPanel(preOnly){
+  const r=scene.res;
+  if(!r) return;
+  const names={bigwin:'Trionfo',win:'Vittoria',almost:'Per un Soffio',fail:'Sconfitta',epicfail:'Rovina'};
+  const cls={bigwin:'triumph',win:'win',almost:'almost',fail:'fail',epicfail:'epic'};
+  const v=$id('rVerdict');
+  v.textContent=names[r.verdict]+(r.wounded?' · Ferito':'')+(r.dead?' · Caduto':'');
+  v.className='verdict '+cls[r.verdict];
+  $id('rRoll').textContent=r.roll;
+  $id('rVs').textContent=`${r.roll} ${r.roll<=geo.tst?'≤':'>'} ${geo.tst}`;
+  $id('rRisk').textContent=`${r.riskRoll} (≤${cfg.dead} morto · ≤${cfg.dead+cfg.wound} ferito)`;
+  $id('rZone').textContent=preOnly
+    ? `pre-calcolata (${Math.round(scene.target.x)}, ${Math.round(scene.target.y)})`
+    : `raggiunta (${Math.round(scene.ball.x)}, ${Math.round(scene.ball.y)})`;
+}
+
+/* frame decorations */
+(function buildFrame(){
+  return;   // V6: ghiera bronzea rimossa dal markup — niente studs né degree ticks
+  const g=$id('studs');
+  for(let i=0;i<10;i+=1){
+    const a=-Math.PI/2+i*(Math.PI/5);
+    const x=500+Math.cos(a)*473, y=500+Math.sin(a)*473;
+    const big=i%2===0;
+    /* deep rivet shadow, saturated with emerald/teal */
+    const sh=document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+    sh.setAttribute('cx',x+2); sh.setAttribute('cy',y+5);
+    sh.setAttribute('rx',big?14:9); sh.setAttribute('ry',big?6:4);
+    sh.setAttribute('fill','rgba(7,46,38,.65)');
+    g.appendChild(sh);
+    const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',x); c.setAttribute('cy',y);
+    c.setAttribute('r',big?13:8);
+    c.setAttribute('fill','url(#studG)'); c.setAttribute('stroke','#3a2208'); c.setAttribute('stroke-width','2');
+    g.appendChild(c);
+  }
+  const ticks=$id('degreeTicks');
+  for(let i=0;i<72;i+=1){
+    const a=i*(Math.PI/36), r1=489, r2=i%6===0?481:485;
+    const l=document.createElementNS('http://www.w3.org/2000/svg','line');
+    l.setAttribute('x1',500+Math.cos(a)*r1); l.setAttribute('y1',500+Math.sin(a)*r1);
+    l.setAttribute('x2',500+Math.cos(a)*r2); l.setAttribute('y2',500+Math.sin(a)*r2);
+    l.setAttribute('stroke-width',i%6===0?'2':'1');
+    ticks.appendChild(l);
+  }
+})();
+
+$id('launch').addEventListener('click',()=>{ armed?throwBall():launchRoll(); });
+window.addEventListener('keydown',e=>{
+  if(e.code==='Space'&&!e.repeat){ e.preventDefault(); armed?throwBall():launchRoll(); }
+});
+
+recomputeGeometry();
+emitInfo();
+updateMathPanel();
+
+  /* ---- public handle ---- */
+  let engineAlive = true;
+  let rafId = requestAnimationFrame(frame);
+  recomputeGeometry();
+  function setConfig(newSkills, newConfig){
+    if(newSkills){ skills = newSkills.slice(); recomputeSkillAxes(); }
+    if(newConfig){ Object.assign(cfg, newConfig); }
+    recomputeGeometry();
+    emitInfo();
+    /* reposition existing obelisks live to the new per-axis radii (keep drop state) */
+    if(scene.whitePillars && scene.whitePillars.length){
+      for(let i=0;i<scene.whitePillars.length;i+=1){
+        if(geo.obeliskTip[i]!=null) scene.whitePillars[i].r=geo.obeliskTip[i];
+        if(geo.obeliskCheck[i]!=null) scene.blackPillars[i].r=geo.obeliskCheck[i];  // sit on the difficulty
+      }
+    }
+  }
+  function destroy(){ engineAlive=false; cancelAnimationFrame(rafId); gooRenderer?.destroy(); }
+
+  /* ── BANCO DI MISURA (PLAN-010 CP-A) ────────────────────────────────────────
+     Superficie di sola lettura per l'harness, montata SOLO in sviluppo.
+
+     Esiste per due motivi concreti, non per comodita'. Primo: il pannello di
+     anteprima congela `requestAnimationFrame` — misurato, zero frame al secondo
+     con `visibilityState: hidden` — quindi senza un modo di pilotare i fotogrammi
+     a mano non si puo' verificare NIENTE di animato, e in questa sessione la
+     conseguenza e' stata aggiungere e togliere un hook di debug tre volte,
+     lasciandone due in giro. Secondo: le misure di forma vanno lette sui PIXEL
+     DIPINTI, non sul Path2D — tutti i difetti trovati finora stavano negli strati
+     di pittura sopra la geometria, non nella geometria.
+
+     `step(now)` disegna un fotogramma senza riprogrammarsi: e' il pilotaggio
+     deterministico su cui si appoggiano l'harness di copertura e, piu' avanti,
+     i controlli sulla dinamica del catrame. */
+  if (import.meta.env?.DEV) {
+    (window as any).__ASTROLABE_V63__ = {
+      step: (now: number) => renderFrame(now),
+      freeze: () => { engineAlive = false; cancelAnimationFrame(rafId); },
+      geo, scene, cfg, setConfig, gooSim,
+      rStarAt, rCheckAt, CX, CY, R,
+    };
+  }
+
+  return { roll: launchRoll, throw: throwBall, setConfig, destroy };
+}

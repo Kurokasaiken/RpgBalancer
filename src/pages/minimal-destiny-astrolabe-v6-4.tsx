@@ -4,8 +4,8 @@
  */
 
 import React, { useRef, useState } from 'react';
-import { DestinyAstrolabeV63Standalone } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeV63Kit';
-import type { AstrolabeResult as DestinyAstrolabeV63Result, AstrolabeSkill as DestinyAstrolabeV63Skill, DestinyAstrolabeV63Handle } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeV63Kit';
+import { DestinyAstrolabeV64Standalone } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeV64Kit';
+import type { AstrolabeResult as DestinyAstrolabeV64Result, AstrolabeSkill as DestinyAstrolabeV64Skill, DestinyAstrolabeV64Handle } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeV64Kit';
 
 /** Icone della skill: simboli stabili, non lettere iniziali.
  *  Il componente V6.4 le riceve via `skill.icon` e le disegna sull'asse. */
@@ -18,20 +18,9 @@ const SKILL_ICONS: Record<string, string> = {
 };
 const glyphFor = (name: string) => SKILL_ICONS[name] || name.charAt(0).toUpperCase();
 
-function skillPreset(skills: DestinyAstrolabeV63Skill[]): DestinyAstrolabeV63Skill[] {
+function skillPreset(skills: DestinyAstrolabeV64Skill[]): DestinyAstrolabeV64Skill[] {
   return skills.map((s) => ({ ...s, icon: glyphFor(s.name) }));
 }
-
-const ASTROLABE_V64_PHASE_DURATIONS = {
-  ringMs: 140,
-  slamMs: 900,
-  gooMs: 1100,
-  axisReadMs: 560,
-  burstMs: 1100,
-  pourMs: 720,
-  spinMs: 2600,
-  snapMs: 650,
-};
 
 const SKILL_PRESETS = {
   hard: skillPreset([{ name: 'Atletica', stat: 30, difficulty: 80 }]),
@@ -61,9 +50,9 @@ const SKILL_PRESETS = {
 };
 
 export default function MinimalDestinyAstrolabeV64() {
-  const astrolabeRef = useRef<DestinyAstrolabeV63Handle>(null);
-  const [lastResult, setLastResult] = useState<DestinyAstrolabeV63Result | null>(null);
-  const [skills, setSkills] = useState<DestinyAstrolabeV63Skill[]>(SKILL_PRESETS.single);
+  const astrolabeRef = useRef<DestinyAstrolabeV64Handle>(null);
+  const [lastResult, setLastResult] = useState<DestinyAstrolabeV64Result | null>(null);
+  const [skills, setSkills] = useState<DestinyAstrolabeV64Skill[]>(SKILL_PRESETS.single);
   const [critChance, setCritChance] = useState(5);
   const [woundChance, setWoundChance] = useState(10);
   const [deathChance, setDeathChance] = useState(5);
@@ -73,12 +62,12 @@ export default function MinimalDestinyAstrolabeV64() {
   const [ballColor, setBallColor] = useState<'amber' | 'teal' | 'copper'>('amber');
   const [motion, setMotion] = useState<'on' | 'off'>('on');
 
-  const handleComplete = (result: DestinyAstrolabeV63Result) => {
+  const handleComplete = (result: DestinyAstrolabeV64Result) => {
     setLastResult(result);
     console.log('Skill check completed:', result);
   };
 
-  const updateSkill = (idx: number, patch: Partial<DestinyAstrolabeV63Skill>) => {
+  const updateSkill = (idx: number, patch: Partial<DestinyAstrolabeV64Skill>) => {
     setSkills((prev) => prev.map((s, i) => (i === idx ? { ...s, ...patch } : s)));
   };
 
@@ -93,7 +82,7 @@ export default function MinimalDestinyAstrolabeV64() {
       {/* Header bar */}
       <div className="flex items-center justify-between px-6 py-3 flex-shrink-0">
         <div className="flex items-center gap-4">
-          <h1 className="text-xl font-bold text-amber-400">Destiny Astrolabe V6.4 — Test Hub</h1>
+          <h1 className="text-xl font-bold text-amber-400">Destiny Astrolabe — Test Hub</h1>
           <div className="flex gap-2">
             <a
               href="/minimal-destiny-astrolabe"
@@ -138,18 +127,11 @@ export default function MinimalDestinyAstrolabeV64() {
             >
               V6.2
             </a>
-            <a
-              href="/minimal-destiny-astrolabe-v6-3"
-              className="px-3 py-1 rounded text-sm font-semibold bg-amber-600 text-black hover:bg-amber-500 transition-colors"
-              title="V6.3 · tar goo viscoso (WebGL2 SDF)"
-            >
-              V6.3
-            </a>
             <span
               className="px-3 py-1 rounded text-sm font-semibold bg-amber-500 text-black"
               title="V6.4 · tar goo viscoso (WebGL2 SDF)"
             >
-              V6.4
+              V6.3
             </span>
             <a
               href="/minimal-destiny-astrolabe-v7"
@@ -256,7 +238,7 @@ export default function MinimalDestinyAstrolabeV64() {
 
       {/* Astrolabe — fills remaining height */}
       <div className="flex-1 relative" style={{ minHeight: 0 }}>
-        <DestinyAstrolabeV63Standalone
+        <DestinyAstrolabeV64Standalone
           ref={astrolabeRef}
           skills={skills}
           config={{
@@ -268,7 +250,6 @@ export default function MinimalDestinyAstrolabeV64() {
             ringVariant,
             ballColor,
             motion,
-            phaseDurations: ASTROLABE_V64_PHASE_DURATIONS,
           }}
           onResolve={handleComplete}
           autoStart
