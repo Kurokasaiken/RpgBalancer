@@ -8,16 +8,19 @@
 // @ts-nocheck
 
 import { tarGooConfig } from '@/balancing/config/idleVillage/tarGooConfig';
+import { astrolabeV63Config } from '@/balancing/config/idleVillage/astrolabeV63Config';
 import { buildSnapshot } from '@/ui/skillCheckWebV1/zones';
 import { solveShapeReported, rHeroNarrowAt, solveCoreRadius, solveOuterBands, solveGooBand, reachArea } from '@/ui/skillCheckWebV1/coverage';
 import { createTarGooRenderer } from './tarGooRenderer';
 import { rng32, createTentacles, tickPose, buildBlobs, poolFraction,
          SAMPLES_PER_ARM } from './tentacles';
 
-export interface AstrolabeSkill { name: string; stat: number; difficulty: number; }
-export interface AstrolabeConfig { crit?: number; wound?: number; dead?: number; mode?: string;
+export interface AstrolabeSkill { name: string; stat: number; difficulty: number; icon?: string; }
+export interface AstrolabeConfig { 
+  crit?: number; bigwin?: number; almost?: number; epicfail?: number; wound?: number; dead?: number; mode?: string;
   tSlam?: number; tBurst?: number; tPour?: number; tSpin?: number; tSnap?: number;
-  bgVariant?:'mercury'|'pergamena'; ringVariant?:'patina'|'clean'; ballColor?:'amber'|'teal'|'copper'; motion?:'on'|'off'; }
+  bgVariant?: string; ringVariant?: string; ballColor?: string; motion?: string;
+}
 export interface AstrolabeResult { verdict: string; roll: number; riskRoll: number;
   skillIndex: number; skillName: string; wounded: boolean; dead: boolean; }
 export interface AstrolabeEngineOpts {
@@ -28,6 +31,15 @@ export interface AstrolabeEngineOpts {
   onState?: (state: string) => void;
   /** true when the TIRA button should be shown (armed), false on throw / new roll */
   onArmed?: (armed: boolean) => void;
+  /** pre-roll board info: emitted whenever the geometry is (re)computed so the
+      React host can show skill/stat/difficulty/probability before the throw */
+  onInfo?: (info: {
+    skills: AstrolabeSkill[];
+    probPct: number;
+    tst: number;
+    woundPct: number;
+    deadPct: number;
+  }) => void;
 }
 export interface AstrolabeEngineHandle {
   roll: () => void;
@@ -352,7 +364,7 @@ const scene={
   pourP:0, streamAlpha:0,
   ball:{x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false},
   snapFrom:null,
-  shocks:[], rimHits:[], sparks:[],
+  shocks:[], rimHits:[], sparks:[], shards:[],
   gooRipple:0,                          // boosts displacement scale
   gooReveal:0,                          // 0 in idle → goo wells up cinematically
   ringReveal:0,                         // 0 until the bronze ring locks in
@@ -366,10 +378,10 @@ function buildPillars(){
      radius — both on the SAME spoke so the star reaches white and the goo
      reaches black on that axis */
   scene.whitePillars=Array.from({length:AXES},(_,i)=>({
-    ang:TIP(i), r:geo.axisTip[i], drop:0, flash:0, landed:false}));
+    ang:TIP(i), r:geo.axisTip[i], drop:0, flash:0, landed:false, idx:i}));
   /* black obelisks sit exactly ON the (blobby) goo edge at their spoke */
   scene.blackPillars=Array.from({length:AXES},(_,i)=>({
-    ang:TIP(i), r:rCheckAt(TIP(i)), drop:0, flash:0, landed:false}));
+    ang:TIP(i), r:rCheckAt(TIP(i)), drop:0, flash:0, landed:false, idx:i}));
 }
 
 /* =========================================================================
@@ -383,6 +395,11 @@ const stateChip=$id('stateChip');
    the standalone HTML (typeof guard so the page still runs on its own) */
 function emitState(s){ try{ if(typeof opts!=='undefined'&&opts&&opts.onState) opts.onState(s); }catch(e){} }
 function emitArmed(b){ try{ if(typeof opts!=='undefined'&&opts&&opts.onArmed) opts.onArmed(b); }catch(e){} }
+/* R-067: pre-roll board info for the React overlay — the numbers the player
+   must read BEFORE the throw (skill, stat, difficulty, probability, risk). */
+function emitInfo(){ try{ if(typeof opts!=='undefined'&&opts&&opts.onInfo) opts.onInfo({
+  skills:skills.slice(), probPct:geo.probPct||0, tst:geo.tst,
+  woundPct:cfg.wound, deadPct:cfg.dead }); }catch(e){} }
 let armed=false;                 // true while the TIRA button should be shown
 function setState(s){
   scene.state=s; scene.t0=performance.now();
@@ -446,14 +463,14 @@ function v63Star(){
 }
 function v63Backdrop(){
   const set=tarGooConfig.v63.backdrops;
-  let nome=tarGooConfig.v63.backdrop;
+  let nome=cfg.bgVariant || tarGooConfig.v63.backdrop;
   if(cfg.bgVariant==='mercury' && set.smoke) nome='smoke';
   if(cfg.bgVariant==='pergamena' && set.pergamenaScura) nome='pergamenaScura';
   try{
     const q=new URLSearchParams(window.location.search).get('bg');
     if(q&&set[q]) nome=q;
   }catch(e){ /* nessuna query: resta la config */ }
-  return set[nome]||tarGooConfig.backdrop;
+  return set[nome]||set.ardesia;
 }
 const V63_SPAWN_RING=tarGooConfig.v63.spawnRingFactor;
 const V63_AXIS_BIAS=tarGooConfig.v63.axisBias;
@@ -477,6 +494,7 @@ function launchRoll(){
   $id('launch').classList.remove('pulse');
   /* recompute geometry, build obelisks, reset all scene state */
   recomputeGeometry();
+  emitInfo();
   buildPillars();
   scene.starScale=0; scene.pourP=0; scene.streamAlpha=0; scene.axisAlpha=1; scene.gooFullMs=0;
   scene.tideP=0; scene.tideWave=0;
@@ -484,7 +502,8 @@ function launchRoll(){
   scene.ball={x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false};
   scene.resolved=null;
   scene.warp=0;
-  scene.shocks.length=0; scene.rimHits.length=0; scene.sparks.length=0;
+  scene.shocks.length=0; scene.rimHits.length=0; scene.sparks.length=0; scene.shards.length=0;
+  scene.fissure=null;
   armed=false; emitArmed(false);
   /* panel result removed */
   /* ACT 0 — the Sun-Bronze ring slams into place like an ancient telescope lens */
@@ -503,7 +522,7 @@ function throwBall(){
      so only the tar wall, star and ball are visible during the spin. */
   scene.gooReveal=1; scene.starScale=1; scene.pourP=1; scene.streamAlpha=0; scene.axisAlpha=0; scene.gooFullMs=performance.now();
   scene.tideP=1; scene.tideWave=0;
-  scene.blackPillars.concat(scene.whitePillars).forEach(pl=>{ pl.drop=0; pl.landed=true; });
+  scene.blackPillars.concat(scene.whitePillars).forEach(pl=>{ pl.drop=0; pl.landed=true; pl.shattered=true; });
   if(s!=='action-trigger'){ scene.warp=1; scene.gooRipple=1; }   // visual warp flash when skipping
   setState('the-spin'); fireBall();
 }
@@ -581,14 +600,15 @@ function tickTimeline(){
   }
   else if(s==='risk-pour'){
     const p=phaseT(cfg.tPour);
-    /* Dopo che la clip del fiore e' terminata, obelischi e scala scompaiono. */
+    /* R-067: FRANTUMAZIONE — gli obelischi non risalgono più: a un terzo del
+       gesto si spezzano in schegge che cadono e affondano nel catrame. */
     scene.whitePillars.forEach((pl,i)=>{
       const local=clamp((p-(i*0.05))/0.75,0,1);
-      pl.drop=1-easeInCubic(local);
+      if(local>0.08&&!pl.shattered){ pl.shattered=true; pl.drop=0; spawnShards(pl,true); }
     });
     scene.blackPillars.forEach((pl,i)=>{
       const local=clamp((p-(i*0.05))/0.75,0,1);
-      pl.drop=1-easeInCubic(local);
+      if(local>0.08&&!pl.shattered){ pl.shattered=true; pl.drop=0; spawnShards(pl,false); }
     });
     /* LA MAREA DEL CATRAME. La stella e' gia' sbocciata INTERA nel beat
        precedente — non nasce clippata, e questo e' il punto. Qui il catrame si
@@ -634,9 +654,127 @@ function tickTimeline(){
   /* decay one-shot fx */
   scene.gooRipple=Math.max(0,scene.gooRipple-0.02);
   scene.blackPillars.concat(scene.whitePillars).forEach(pl=>pl.flash=Math.max(0,pl.flash-0.03));
+  tickShards(Math.min(50,performance.now()-(scene.lastFxT||performance.now())));
+  scene.lastFxT=performance.now();
 }
 function addShock(pl,color){
   scene.shocks.push({x:CX+Math.cos(pl.ang)*pl.r,y:CY+Math.sin(pl.ang)*pl.r,t:0,dur:600,c:color});
+}
+
+/* R-067 FRANTUMAZIONE — l'obelisco si spezza in schegge che cadono con
+   gravita', ruotano e affondano nel catrame alla base dell'obelisco.
+   Bianco (stat) → schegge d'oro; nero (check) → schegge d'ossidiana. */
+function spawnShards(pl,isWhite){
+  const cfgS=astrolabeV63Config.shatter;
+  const px=CX+Math.cos(pl.ang)*pl.r, py=CY+Math.sin(pl.ang)*pl.r;
+  const col=isWhite?'#ffe9c0':'#1c2a3a';
+  const edge=isWhite?'rgba(255,221,150,.9)':'rgba(0,180,255,.55)';
+  for(let i=0;i<cfgS.shardsPerPillar;i+=1){
+    const a=Math.random()*TAU;
+    const sp=cfgS.spread[0]+Math.random()*(cfgS.spread[1]-cfgS.spread[0]);
+    scene.shards.push({
+      x:px+(Math.random()*2-1)*10,
+      y:py-20-Math.random()*110,          // punti lungo il fusto
+      vx:Math.cos(a)*sp, vy:-Math.random()*1.2,
+      rot:Math.random()*TAU, vr:(Math.random()*2-1)*cfgS.spin,
+      s:cfgS.size[0]+Math.random()*(cfgS.size[1]-cfgS.size[0]),
+      life:cfgS.lifeMs[0]+Math.random()*(cfgS.lifeMs[1]-cfgS.lifeMs[0]),
+      max:1, floor:py+2, c:col, e:edge,
+    });
+    const sh=scene.shards[scene.shards.length-1];
+    sh.max=sh.life;
+  }
+}
+function tickShards(dt){
+  const g=astrolabeV63Config.shatter.gravity;
+  const k=dt/16.7;
+  for(let i=scene.shards.length-1;i>=0;i-=1){
+    const s=scene.shards[i];
+    s.life-=dt;
+    if(s.life<=0){scene.shards.splice(i,1);continue;}
+    s.vy+=g*dt;                            // cadono
+    s.x+=s.vx*k; s.y+=s.vy*k; s.rot+=s.vr*k;
+    if(s.y>s.floor){ s.y=s.floor; s.vy*=-0.18; s.vx*=0.5; s.life-=dt*2; } // affondano nel catrame
+  }
+}
+function drawShards(){
+  if(!scene.shards.length) return;
+  ctx.save();
+  for(const s of scene.shards){
+    const a=clamp(s.life/s.max,0,1);
+    ctx.globalAlpha=a;
+    ctx.translate(s.x,s.y); ctx.rotate(s.rot);
+    ctx.fillStyle=s.c;
+    ctx.beginPath(); ctx.moveTo(0,-s.s); ctx.lineTo(s.s*.8,s.s*.6); ctx.lineTo(-s.s*.8,s.s*.6); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle=s.e; ctx.lineWidth=.8; ctx.stroke();
+    ctx.setTransform(1,0,0,1,0,0);
+  }
+  ctx.restore(); ctx.globalAlpha=1;
+}
+
+/* R-067 FENDITURA RADIALE — la crepa parte dall'impatto e corre lungo il
+   raggio del cerchio (verso il bordo del catrame). Percorso seghettato:
+   segmenti con scarto angolare casuale ma deterministico (seme da `ang`),
+   confinata dentro la sagoma del goo.
+   wound: si apre, poi si richiude e resta una cicatrice ambrata sottile;
+   death:  si apre e NON si chiude — spacco nero con filo viola. */
+function drawFissure(now){
+  const f=scene.fissure;
+  if(!f) return;
+  const cfgF=astrolabeV63Config.fissure;
+  const el=now-f.t0;
+  const open=clamp(el/cfgF.openMs,0,1);
+  /* wound: dopo l'apertura completa si richiude; death: resta aperta */
+  const closeP=f.dead?0:clamp((el-cfgF.openMs)/cfgF.closeMs,0,1);
+  const width=cfgF.widthPx*open*(1-closeP*0.9);        // wound quasi svanisce
+  const d0=dist(f.x,f.y);
+  const rEdge=rCheckAt(f.ang,1);
+  const rFrom=Math.max(geo.rCore*0.5,d0-26);
+  const rTo=Math.min(rEdge,rFrom+60+(rEdge-rFrom)*open);
+  if(rTo<=rFrom+4) return;
+
+  /* traccia seghettata lungo il raggio, seed deterministico da ang */
+  const SEG=14;
+  const rnd=rng32(Math.floor((f.ang+Math.PI)*1000)+17);
+  const pts=[];
+  for(let i=0;i<=SEG;i+=1){
+    const u=i/SEG, r=rFrom+(rTo-rFrom)*u;
+    const a=f.ang+(rnd()*2-1)*cfgF.jag*0.09*Math.sin(u*Math.PI);
+    pts.push([CX+Math.cos(a)*r,CY+Math.sin(a)*r]);
+  }
+  ctx.save();
+  ctx.clip(gooBlobPath(1,0));                 // mai fuori dal catrame
+  ctx.lineJoin='round'; ctx.lineCap='round';
+
+  if(f.dead){
+    /* spacco aperto: corpo nero-viola + filo luminoso viola sui bordi */
+    ctx.strokeStyle=cfgF.crackEdgeColor;
+    ctx.lineWidth=width+3;
+    ctx.globalAlpha=.55*open;
+    ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])); ctx.stroke();
+    ctx.globalAlpha=1;
+    ctx.strokeStyle=cfgF.crackColor;
+    ctx.lineWidth=Math.max(1.2,width);
+    ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])); ctx.stroke();
+  }else{
+    /* wound: apertura scura, poi cicatrice ambrata che resta */
+    if(closeP<1){
+      ctx.strokeStyle='rgba(10,4,18,.92)';
+      ctx.lineWidth=Math.max(.8,width);
+      ctx.globalAlpha=(1-closeP)*0.95;
+      ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])); ctx.stroke();
+    }
+    if(closeP>0.15){
+      const scarA=clamp((closeP-0.15)/0.4,0,1);
+      ctx.globalAlpha=scarA;
+      ctx.strokeStyle=cfgF.scarColor;
+      ctx.lineWidth=1.4;
+      ctx.shadowColor='rgba(232,168,60,.7)'; ctx.shadowBlur=4;
+      ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])); ctx.stroke();
+      ctx.shadowBlur=0;
+    }
+  }
+  ctx.restore();
 }
 
 /* =========================================================================
@@ -840,6 +978,7 @@ function stepBall(p){
   if(d>edge){
     const nx=(b.x-CX)/d, ny=(b.y-CY)/d;
     chaoticBounce(nx,ny,false);
+    b.squash=astrolabeV63Config.ball.bounceSquash;   // R-067: schiacciamento al rimbalzo
     b.x=CX+nx*edge; b.y=CY+ny*edge;
     /* NIENTE PINBALL. Il Director, due volte: «c'e' ancora l'effetto pinball
        con dei segmenti che si illuminano rispetto a dove colpisce la pallina,
@@ -862,12 +1001,13 @@ function stepBall(p){
     });
   }
 
-  b.trail.push({x:b.x,y:b.y,life:480});
+  b.trail.push({x:b.x,y:b.y,life:astrolabeV63Config.ball.trailLifeMs});
   for(let i=b.trail.length-1;i>=0;i-=1){
     b.trail[i].life-=dt;
     if(b.trail[i].life<=0) b.trail.splice(i,1);
   }
-  if(b.trail.length>90) b.trail.splice(0,b.trail.length-90);
+  if(b.trail.length>astrolabeV63Config.ball.trailMaxSamples)
+    b.trail.splice(0,b.trail.length-astrolabeV63Config.ball.trailMaxSamples);
   for(let i=scene.sparks.length-1;i>=0;i-=1){
     const s=scene.sparks[i]; s.life-=dt;
     if(s.life<=0){scene.sparks.splice(i,1);continue;}
@@ -891,12 +1031,15 @@ function addSpark(x,y){
    RESOLUTION
    ========================================================================= */
 const card=$id('card');
+/* R-067 — nomi dei 5 esiti concordati col Director. Sono FALLBACK: il host
+   React passa le stringhe i18n via `config.copy.verdicts` / `copy.chips` —
+   qui non si introducono nuove stringhe utente non sovrascrivibili. */
 const VERDICT_TEXT={
-  bigwin:{title:'TRIONFO',seal:'★',cls:'triumph',sub:'Il sole stesso firma la tua impresa.'},
-  win:{title:'VITTORIA',seal:'★',cls:'win',sub:'La vetta si inchina al tuo passo.'},
-  almost:{title:'PER UN SOFFIO',seal:'◐',cls:'almost',sub:'La sfera danza sul bronzo… e scivola oltre.'},
-  fail:{title:'SCONFITTA',seal:'✕',cls:'fail',sub:'La montagna respinge i mortali.'},
-  epicfail:{title:'ROVINA',seal:'✕',cls:'epic',sub:'L’abisso reclama ciò che osa troppo.'},
+  bigwin:{title:'TRIONFO',seal:'★',cls:'triumph',sub:'Il destino si inchina al tuo passo.'},
+  win:{title:'SUCCESSO',seal:'✦',cls:'win',sub:'La prova cede sotto il tuo sforzo.'},
+  almost:{title:'PER UN SOFFIO',seal:'◐',cls:'almost',sub:'Un soffio, e la verità ti sfugge.'},
+  fail:{title:'FALLIMENTO',seal:'✕',cls:'fail',sub:'La presa scivola.'},
+  epicfail:{title:'DISASTRO',seal:'✕',cls:'epic',sub:'Il mondo ti respinge.'},
 };
 function resolve(){
   const b=scene.ball;
@@ -921,11 +1064,19 @@ function resolve(){
   const _d=Math.hypot(b.x-CX,b.y-CY);
   console.log(`[resolve] pre-rolled=${!forced} ball=(${(b.x-CX).toFixed(1)},${(b.y-CY).toFixed(1)}) dist=${_d.toFixed(1)} rStar=${rStarAt(Math.atan2(b.y-CY,b.x-CX)).toFixed(1)} rCheck=${rCheckAt(Math.atan2(b.y-CY,b.x-CX)).toFixed(1)} verdict=${verdict} roll=${outcomeRoll} risk=${riskRoll} skill=${skills[skillIndex]?.name||'Skill'}`);
   const res=scene.res;
+  /* R-067 — fenditura radiale nel catrame: parte dal punto d'impatto della
+     pallina e corre lungo il raggio. Ferita = si richiude in cicatrice ambrata;
+     morte = resta aperta, spacco nero/viola. */
+  if(res.wounded||res.dead){
+    scene.fissure={x:b.x,y:b.y,ang:angOf(b.x,b.y),dead:res.dead,t0:performance.now()};
+  }else{
+    scene.fissure=null;
+  }
   setState('resolution');
   scene.whitePillars.forEach(p=>p.drop=0);
   scene.blackPillars.forEach(p=>p.drop=0);
   scene.axisAlpha=0;
-  const V=VERDICT_TEXT[verdict];
+  const V=Object.assign({},VERDICT_TEXT[verdict],(cfg.copy&&cfg.copy.verdicts&&cfg.copy.verdicts[verdict])||{});
   /* title: split into letters for the crumble effect */
   const titleEl=$id('cardTitle');
   titleEl.innerHTML=[...V.title].map(ch=>{
@@ -935,13 +1086,21 @@ function resolve(){
     return `<span class="ch" style="--dx:${dx}px;--dy:${dy}px;--rot:${rot}deg;--del:${del}s">${ch}</span>`;
   }).join('');
   $id('cardSeal').textContent=V.seal;
-  $id('cardSub').textContent=V.sub;
-  const posZone=inStar(b.x,b.y)?'Nella Stella':'Fuori dalla Stella';
-  $id('cardNums').textContent=posZone;
+  /* R-067: cardSub = matematica del check (leggibile in <1s); cardNums = frase
+     narrativa + zona. Le label arrivano da cfg.copy (i18n) con fallback. */
+  {
+    const sk=skills[skillIndex]||{name:'Skill',stat:60,difficulty:50};
+    const tst=clamp(50+(sk.stat-sk.difficulty),1,99);
+    const mathFmt=(cfg.copy&&cfg.copy.mathFmt)||'D100 {{roll}} · TST {{tst}}';
+    $id('cardSub').textContent=outcomeRoll>0
+      ? mathFmt.replace(/\{\{?roll\}?\}/,String(outcomeRoll)).replace(/\{\{?tst\}?\}/,String(tst))
+      : `${sk.name}`;
+    $id('cardNums').textContent=V.sub;
+  }
   const chips=$id('cardChips');
   chips.innerHTML='';
-  if(res.wounded) chips.innerHTML+='<span class="chip wounded">Ferito</span>';
-  if(res.dead) chips.innerHTML+='<span class="chip dead">Caduto</span>';
+  if(res.wounded) chips.innerHTML+=`<span class="chip wounded">${(cfg.copy&&cfg.copy.chips&&cfg.copy.chips.wounded)||'Ferito'}</span>`;
+  if(res.dead) chips.innerHTML+=`<span class="chip dead">${(cfg.copy&&cfg.copy.chips&&cfg.copy.chips.dead)||'Caduto'}</span>`;
   card.classList.remove('triumph','win','almost','fail','epic');
   card.classList.add(V.cls);
   void card.offsetWidth;
@@ -1417,6 +1576,47 @@ function drawAxisRig(now){
       ctx.moveTo(sx-sa*17,sy+ca*17);
       ctx.lineTo(sx+sa*17,sy-ca*17);
       ctx.stroke();
+    }
+
+    /* R-067 F2 — SKILL LABEL SULL'ASSE: placca con nome + stat/difficoltà,
+       appena fuori dalla scala, perpendicolare al raggio così resta dritta
+       sopra e sotto. Testo dalla prop `skills` (dati), non hardcoded. */
+    {
+      const sk=skills[geo.axisSkill[i]]||{name:'',stat:0,difficulty:0};
+      if(sk.name){
+        const rL=R*astrolabeV63Config.axisLabels.radiusFactor;
+        const lx=CX+ca*rL, ly=CY+sa*rL;
+        const tang=a+Math.PI/2;
+        /* sotto l'orizzonte il testo si rovescia: ribalta la placca */
+        const flip=sa>0.35;
+        const rot=flip?tang+Math.PI:tang;
+        ctx.save();
+        ctx.translate(lx,ly);
+        ctx.rotate(rot);
+        const F=astrolabeV63Config.axisLabels.fontPx;
+        ctx.font=`700 ${F}px 'Cinzel',serif`;
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        const name=String(sk.name).toUpperCase();
+        const wName=ctx.measureText(name).width;
+        ctx.font=`600 ${F-3}px 'Space Grotesk',system-ui,sans-serif`;
+        const nums=`${sk.stat} ⚔ ${sk.difficulty}`;
+        const wNums=ctx.measureText(nums).width;
+        const pw=Math.max(wName,wNums)+18, ph=F*2+astrolabeV63Config.axisLabels.lineGapPx;
+        /* placca scura con filo d'oro: leggibile su qualunque sfondo */
+        ctx.fillStyle=`rgba(6,12,16,${0.82*clamp(scene.axisAlpha,0,1)})`;
+        ctx.strokeStyle=`rgba(223,184,87,${0.5*clamp(scene.axisAlpha,0,1)})`;
+        ctx.lineWidth=1;
+        ctx.beginPath();
+        if(ctx.roundRect) ctx.roundRect(-pw/2,-ph/2,pw,ph,7); else ctx.rect(-pw/2,-ph/2,pw,ph);
+        ctx.fill(); ctx.stroke();
+        ctx.fillStyle=`rgba(247,221,128,${0.95*clamp(scene.axisAlpha,0,1)})`;
+        ctx.font=`700 ${F}px 'Cinzel',serif`;
+        ctx.fillText(name,0,-astrolabeV63Config.axisLabels.lineGapPx/2);
+        ctx.fillStyle=`rgba(200,225,214,${0.9*clamp(scene.axisAlpha,0,1)})`;
+        ctx.font=`600 ${F-3}px 'Space Grotesk',system-ui,sans-serif`;
+        ctx.fillText(nums,0,astrolabeV63Config.axisLabels.lineGapPx/2+2);
+        ctx.restore();
+      }
     }
   }
   ctx.restore();
@@ -2009,6 +2209,23 @@ function drawPillar(pl,isWhite){
   tipHalo.addColorStop(1,'transparent');
   ctx.fillStyle=tipHalo;
   ctx.beginPath(); ctx.arc(tipX,tipY,16+10*fl,0,TAU); ctx.fill();
+
+  /* skill icon on the lit face, coming from the balancing config */
+  const skill=skills[pl.idx];
+  if(skill?.icon){
+    ctx.save();
+    ctx.globalCompositeOperation='source-over';
+    ctx.globalAlpha=pl.drop;
+    ctx.font="900 16px 'Space Grotesk', system-ui, sans-serif";
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillStyle=isWhite?'rgba(60,44,20,.9)':'rgba(190,230,255,.95)';
+    ctx.shadowColor=isWhite?'rgba(255,240,200,.6)':'rgba(0,200,255,.5)';
+    ctx.shadowBlur=6;
+    ctx.fillText(skill.icon, tipX, shoulderY-capH*0.38);
+    ctx.restore();
+  }
+
   ctx.restore();
 }
 
@@ -2029,17 +2246,18 @@ function drawRimHits(){ /* rimosso: era l'effetto pinball */ }
 function drawBall(now){
   const b=scene.ball;
   if(!b.on && scene.state!=='resolution') return;
-  /* gold→teal comet trail */
+  /* R-067 — scia sottile e brillante (ambrata), niente nuvole di particelle */
   const n=b.trail.length;
+  const TL=astrolabeV63Config.ball.trailLifeMs;
   for(let i=1;i<n;i+=1){
     const t0=b.trail[i-1], t1=b.trail[i];
-    const a=t1.life/480;
+    const a=t1.life/TL;
     if(a<=0) continue;
     const mix=i/n;                              // tail→head
-    const cr=Math.round(52+(255-52)*mix), cg=Math.round(212+(233-212)*mix), cb=Math.round(184+(168-184)*mix);
-    ctx.globalAlpha=a*.6;
+    const cr=Math.round(180+(255-180)*mix), cg=Math.round(150+(235-150)*mix), cb=Math.round(60+(160-60)*mix);
+    ctx.globalAlpha=a*.55;
     ctx.strokeStyle=`rgb(${cr},${cg},${cb})`;
-    ctx.lineWidth=b.r*1.5*a*(.4+.6*mix);
+    ctx.lineWidth=b.r*a*(.35+.65*mix);
     ctx.lineCap='round';
     ctx.beginPath(); ctx.moveTo(t0.x,t0.y); ctx.lineTo(t1.x,t1.y); ctx.stroke();
   }
@@ -2062,12 +2280,27 @@ function drawBall(now){
   const halo=ctx.createRadialGradient(b.x,b.y,r*.5,b.x,b.y,r*4);
   halo.addColorStop(0,palette.c0); halo.addColorStop(.5,palette.c1); halo.addColorStop(1,'transparent');
   ctx.fillStyle=halo; ctx.beginPath(); ctx.arc(b.x,b.y,r*4,0,TAU); ctx.fill();
-  const g=ctx.createRadialGradient(b.x-3,b.y-3,1,b.x,b.y,r+2);
-  g.addColorStop(0,palette.c2); g.addColorStop(.4,palette.c3); g.addColorStop(1,palette.c4);
-  ctx.shadowColor=palette.glow; ctx.shadowBlur=26;
-  ctx.fillStyle=g; ctx.beginPath(); ctx.arc(b.x,b.y,r,0,TAU); ctx.fill();
-  ctx.lineWidth=1.4; ctx.strokeStyle='rgba(255,255,255,.95)'; ctx.stroke();
-  ctx.shadowBlur=0;
+  /* R-067 GOCCIA DI MERCURIO/AMBRA: corpo allungato lungo il vettore velocità,
+     riflesso speculare che "gira" seguendo il moto, squash sui rimbalzi. */
+  {
+    const spd=Math.hypot(b.vx,b.vy);
+    const st=1+Math.min(1,spd/astrolabeV63Config.ball.stretchSpeed)*(astrolabeV63Config.ball.maxStretch-1);
+    const sq=b.squash!=null?b.squash:1;
+    b.squash=Math.min(1,(b.squash||1)+0.06);        // ritorno elastico alla sfera
+    const vAng=spd>0.4?Math.atan2(b.vy,b.vx):0;
+    ctx.save();
+    ctx.translate(b.x,b.y);
+    ctx.rotate(vAng);
+    ctx.scale(st*sq,(1/Math.sqrt(st))*sq>1?1:(1/Math.sqrt(st))*(2-sq));
+    const gx=-r*0.34-Math.cos(vAng)*2, gy=-r*0.34-Math.sin(vAng)*2;
+    const g=ctx.createRadialGradient(gx,gy,1,0,0,r+2);
+    g.addColorStop(0,palette.c2); g.addColorStop(.4,palette.c3); g.addColorStop(1,palette.c4);
+    ctx.shadowColor=palette.glow; ctx.shadowBlur=26;
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,r,0,TAU); ctx.fill();
+    ctx.lineWidth=1.4; ctx.strokeStyle='rgba(255,255,255,.95)'; ctx.stroke();
+    ctx.restore();
+    ctx.shadowBlur=0;
+  }
 }
 
 /* blueprint preview in idle — zones update live as sliders move */
@@ -2115,6 +2348,8 @@ function renderFrame(now){
      grammatica propria, fuori dall'area del goo. */
   scene.whitePillars.forEach(p=>drawPillar(p,true));  // draw first (behind)
   scene.blackPillars.forEach(p=>drawPillar(p,false)); // draw last (in front)
+  drawShards();
+  drawFissure(now);
   drawShocks(dt);
   drawRimHits();
   drawMotes(now,dt);
@@ -2208,6 +2443,7 @@ window.addEventListener('keydown',e=>{
 });
 
 recomputeGeometry();
+emitInfo();
 updateMathPanel();
 
   /* ---- public handle ---- */
@@ -2218,6 +2454,7 @@ updateMathPanel();
     if(newSkills){ skills = newSkills.slice(); recomputeSkillAxes(); }
     if(newConfig){ Object.assign(cfg, newConfig); }
     recomputeGeometry();
+    emitInfo();
     /* reposition existing obelisks live to the new per-axis radii (keep drop state) */
     if(scene.whitePillars && scene.whitePillars.length){
       for(let i=0;i<scene.whitePillars.length;i+=1){

@@ -66,6 +66,17 @@ export default interface Resources {
   },
   "common": {
     "appName": "RPG Balancer",
+    "designVsFidelity": {
+      "backToHub": "Back to Test Hub",
+      "designSystemColumn": "Design System /design-system",
+      "designSystemFrame": "Design System",
+      "kicker": "UI Audit",
+      "missingCount": "{{count}} missing items",
+      "missingSection": "Missing & Mocked Components",
+      "title": "Design System vs Visual Fidelity",
+      "visualFidelityColumn": "Visual Fidelity /visual-fidelity-lab",
+      "visualFidelityFrame": "Visual Fidelity Lab"
+    },
     "examples": {
       "characterGreeting": "{gender, select, male {Welcome, my lord} female {Welcome, my lady} other {Welcome, adventurer}}",
       "riskLevel": "{level, select, low {Low risk} medium {Medium risk} high {High risk} other {Unknown risk}}",
@@ -97,6 +108,58 @@ export default interface Resources {
   "idleVillage": {
     "SKIP": "Skip",
     "THROW": "Throw",
+    "activityCapsule": {
+      "accessibility": {
+        "activityCapsule": "{label} activity capsule",
+        "closeDetails": "Close details"
+      },
+      "actions": {
+        "cancel": "Cancel",
+        "collect": "Collect",
+        "start": "Start",
+        "startPending": "Pending…"
+      },
+      "devTools": {
+        "validationTitle": "Skin Validation Errors"
+      },
+      "info": {
+        "duration": "Duration",
+        "eta": "ETA",
+        "reward": "Reward"
+      },
+      "lore": {
+        "locked": "Lore not yet discovered"
+      },
+      "requirements": {
+        "relation": {
+          "all": "all of",
+          "any": "any of",
+          "none": "none of"
+        }
+      },
+      "sections": {
+        "assignedCharacters": "Assigned characters",
+        "lore": "Lore",
+        "requirements": "Requirements",
+        "telemetry": "Telemetry"
+      },
+      "slotLabel": "Slot {index}",
+      "status": {
+        "blocked": "Blocked",
+        "completed": "Completed",
+        "idle": "Idle",
+        "inProgress": "In progress"
+      },
+      "telemetry": {
+        "empty": "No events yet"
+      },
+      "type": {
+        "job": "Job",
+        "maintenance": "Maintenance",
+        "quest": "Quest",
+        "training": "Training"
+      }
+    },
     "astrolabeV3": {
       "auto": "Auto",
       "dead": "Fallen",
@@ -135,27 +198,284 @@ export default interface Resources {
       "subSuccess": "The summit bows to your stride.",
       "verdictBigwin": "Triumph"
     },
+    "astrolabeV5": {
+      "auto": "Auto",
+      "awaiting": "Awaiting the throw",
+      "axisReadout": "{{skill}}: {{stat}} against difficulty {{difficulty}} — {{relation}}",
+      "mute": "Mute",
+      "relation_deficit": "below the threshold",
+      "relation_even": "level with the threshold",
+      "relation_margin": "above the threshold",
+      "riskDead": "Dead",
+      "riskDeclared": "{{death}}% death · {{wound}}% wound",
+      "riskHeld": "Unharmed",
+      "riskNone": "None",
+      "riskWounded": "Wounded",
+      "rollAgain": "Roll again",
+      "skip": "Skip",
+      "throw": "Throw",
+      "throwControls": "Throw controls",
+      "trackCheck": "Trial",
+      "trackRisk": "Risk",
+      "verdictCrit": "Ruin",
+      "verdictFail": "Failure",
+      "verdictNearMiss": "Almost",
+      "verdictSuccess": "Success"
+    },
+    "astrolabeV63": {
+      "check": "Check",
+      "mathFmt": "D100 {{roll}} · TST {{tst}}",
+      "narrative": {
+        "almost": "A breath, and the truth escapes you.",
+        "bigwin": "Fate bows to your step.",
+        "epicfail": "The world pushes you back.",
+        "fail": "Your grip slips.",
+        "win": "The trial yields to your effort."
+      },
+      "probability": "Success ~{{pct}}%",
+      "risk": "Wound {{wound}}% · Death {{dead}}%",
+      "riskDead": "Fallen",
+      "riskWounded": "Wounded",
+      "statVsDc": "{{stat}} vs DC {{difficulty}} · TST {{tst}}",
+      "verdict": {
+        "almost": "BY A BREATH",
+        "bigwin": "TRIUMPH",
+        "epicfail": "DISASTER",
+        "fail": "FAILURE",
+        "win": "SUCCESS"
+      }
+    },
     "critPercent": "Crit Percent",
     "deathPercent": "Death Percent",
     "difficulty": "Difficulty",
     "dpr": "DPR",
+    "equipment": {
+      "addSkill": "Add granted skill",
+      "balance": "Balance",
+      "balanceBar": "Budget usage",
+      "balanced": "Within budget ({{balance}} points free)",
+      "budget": "Budget",
+      "cost": "Cost",
+      "defaultSaved": "Default configuration saved",
+      "description": "Choose an item type, adjust stat modifiers, spend your equipment budget, and save. Weapons always link a base attack skill; armor and trinkets provide passive modifiers.",
+      "edit": "Edit",
+      "emptyLibrary": "No equipment in library.",
+      "grantedSkill": "Granted skill",
+      "identity": "Identity",
+      "label": "Equipment",
+      "library": "Equipment library",
+      "loading": "Loading...",
+      "name": "Name",
+      "namePlaceholder": "New equipment",
+      "new": "New",
+      "overBudget": "Over budget by {{balance}} points",
+      "power": "Power",
+      "preview": "Preview",
+      "rarity": {
+        "common": "Common",
+        "epic": "Epic",
+        "legendary": "Legendary",
+        "masterpiece": "Masterpiece",
+        "poor": "Poor",
+        "rare": "Rare",
+        "uncommon": "Uncommon"
+      },
+      "rarityLabel": "Rarity",
+      "removeSkill": "Remove granted skill",
+      "reset": "Reset",
+      "save": "Save equipment",
+      "saveDefault": "Save default",
+      "saveFailed": "Failed to save equipment",
+      "saved": "Equipment saved",
+      "searchSkill": "Search skill...",
+      "stat": {
+        "armor": "Armor",
+        "armorPen": "Armor pen",
+        "block": "Block",
+        "critChance": "Crit chance",
+        "critMult": "Crit mult",
+        "damage": "Damage",
+        "evasion": "Evasion",
+        "hp": "HP",
+        "lifesteal": "Lifesteal",
+        "movementSpeed": "Movement speed",
+        "penPercent": "Pen %",
+        "regen": "Regen",
+        "resistance": "Resistance",
+        "txc": "TxC",
+        "ward": "Ward"
+      },
+      "stats": "Stat modifiers",
+      "subtitle": "Forge items from base templates",
+      "tier": "Tier",
+      "title": "Equipment Creator",
+      "type": "Type",
+      "types": {
+        "armor": "Armor",
+        "mount": "Mount",
+        "offhand": "Off hand",
+        "ring": "Ring",
+        "trinket": "Trinket",
+        "weapon": "Weapon"
+      },
+      "unnamed": "Unnamed equipment"
+    },
+    "floatingPanel": {
+      "close": "Close panel",
+      "minimize": "Minimise panel",
+      "restore": "Restore panel"
+    },
+    "heroComponentsLab": {
+      "availableSkills": "Available skills",
+      "effect": "Effect",
+      "empty": "Empty",
+      "equip": "Equip",
+      "equippedSkills": "Equipped skills",
+      "grantedSkill": "Granted by equipment",
+      "rarity": "Rarity",
+      "sectionA": "A — Character Sheet",
+      "sectionB": "B — Equip Slot Rack",
+      "sectionC": "C — Equippable Item Card",
+      "sectionD": "D — Consumable Pile",
+      "sectionE": "E — Equippable Skill Deck",
+      "selectItem": "Select item",
+      "selectedSlot": "Selected slot",
+      "slot": "Slot",
+      "subtitle": "Placeholder catalog for the hero sheet, equipment, items, consumables and skills.",
+      "title": "Hero Components Lab",
+      "unequip": "Unequip",
+      "use": "Use"
+    },
     "hitStop": "Hit Stop",
+    "milestoneCheck": {
+      "ariaLabel": "Quest phase skill check",
+      "casualty": "A hero fell during this phase",
+      "consumables": "Spend consumables",
+      "difficulty": "Difficulty {value}",
+      "dismiss": "Continue",
+      "eyebrow": "Milestone",
+      "failed": "Phase failed",
+      "partyStat": "Party {value}",
+      "passed": "Phase passed",
+      "riskLine": "Injury {injury}% · Death {death}%",
+      "roll": "Consult destiny",
+      "skills": "Checks to face",
+      "wounded": "A hero was wounded during this phase"
+    },
     "nearMissBand": "Near Miss Band",
+    "pgDetailCard": {
+      "close": "Close character sheet",
+      "equipment": {
+        "armor": "Armor",
+        "empty": "Empty",
+        "label": "Equipment",
+        "mount": "Mount",
+        "offhand": "Off hand",
+        "ring": "Ring",
+        "trinket": "Trinket",
+        "weapon": "Weapon"
+      },
+      "fatigue": {
+        "exhausted": "Exhausted",
+        "label": "Fatigue",
+        "ready": "Ready"
+      },
+      "fullFigure": "Full figure",
+      "hp": {
+        "label": "HP"
+      },
+      "inventory": {
+        "empty": "No items recorded.",
+        "label": "Inventory"
+      },
+      "openArchetype": "Open archetype",
+      "profile": "Profile",
+      "statistics": {
+        "count": "{{count}} values",
+        "empty": "No snapshot available.",
+        "label": "Statistics"
+      },
+      "status": {
+        "available": "Available",
+        "away": "Away",
+        "dead": "Dead",
+        "exhausted": "Exhausted",
+        "injured": "Injured"
+      },
+      "unknownPreset": "Unknown preset: {{id}}"
+    },
+    "poiDetail": {
+      "risk": {
+        "danger": {
+          "title": "Danger rating of this activity"
+        },
+        "death": {
+          "title": "Chance a resident dies"
+        },
+        "injury": {
+          "title": "Chance a resident is injured"
+        }
+      }
+    },
+    "poiMarkerLab": {
+      "counterClockwise": "Counter-clockwise (deadline)",
+      "grounded": "Contact shadow",
+      "importance": "Importance",
+      "importances": {
+        "critical": "Critical",
+        "important": "Important",
+        "normal": "Normal"
+      },
+      "inContext": "In context",
+      "matrix": "Type / state matrix",
+      "playground": "Playground",
+      "progress": "Time left",
+      "showMap": "Show world surface",
+      "size": "Size",
+      "state": "State",
+      "states": {
+        "assigned": "Assigned",
+        "available": "Available",
+        "expired": "Expired",
+        "expiring": "Expiring",
+        "new": "New"
+      },
+      "subtitle": "Opportunity marker baseline: colour + icon = what, timer ring = when, material = where. Placed over the canonical Wanderlust surface, because that is the only honest test.",
+      "title": "POI Marker Lab",
+      "type": "Type",
+      "types": {
+        "event": "Event",
+        "job": "Job",
+        "quest": "Quest"
+      },
+      "variant": "Variant",
+      "variants": {
+        "runic": "Runic (V2)",
+        "runicV1": "Runic V1",
+        "runicV3": "Runic V3",
+        "runicV5": "Runic V5"
+      }
+    },
+    "poiVisualPreview": {
+      "title": "POI Medallion Preview",
+      "v1Label": "GenericPoiSkin V1 (Amber)",
+      "v2Label": "GenericPoiSkin V2 (Materic)"
+    },
     "presentation": {
       "director": {
         "title": "World Presentation Director"
       },
       "inspector": {
-        "title": "Output Inspector",
         "activeState": "Active State",
         "runtimeObjects": "Runtime Objects",
-        "visualStateOverrides": "Visual Overrides",
-        "tick": "Tick"
+        "tick": "Tick",
+        "title": "Output Inspector",
+        "visualStateOverrides": "Visual Overrides"
       },
       "layerOrder": {
-        "title": "Layer Order",
+        "moveDown": "move down",
         "moveUp": "move up",
-        "moveDown": "move down"
+        "title": "Layer Order"
       },
       "layers": "Layers",
       "objects": "Objects",
@@ -173,6 +493,52 @@ export default interface Resources {
       },
       "step": "Step",
       "tick": "Tick"
+    },
+    "questChronicle": {
+      "boardStatus": {
+        "failure": "Trial failed",
+        "pending": "Waiting for patrol outcome",
+        "success": "Last trial passed"
+      },
+      "collectRewards": "Collect rewards",
+      "journal": "Journal",
+      "openTheater": "Open Theater",
+      "outcome": {
+        "failure": "Failure",
+        "success": "Success"
+      },
+      "phaseType": {
+        "branch": "branch",
+        "check": "check",
+        "dialogue": "dialogue",
+        "explore": "explore",
+        "fight": "fight",
+        "stealth": "stealth",
+        "timedChoice": "timed choice",
+        "trap": "trap"
+      },
+      "risk": {
+        "death": "{percent}% death",
+        "injury": "{percent}% injury"
+      },
+      "ropeLabel": "Quest time",
+      "title": "Quest Chronicle"
+    },
+    "questReward": {
+      "collect": "Collect rewards",
+      "eyebrowDefeat": "Expedition broken",
+      "eyebrowVictory": "Expedition returned",
+      "failed": "Failed",
+      "noRewards": "The expedition brought nothing home",
+      "panelTitle": "Rewards",
+      "party": "Party",
+      "passed": "Passed",
+      "rewards": "Rewards",
+      "stateDead": "Fallen",
+      "stateInjured": "Wounded",
+      "stateNone": "Unharmed",
+      "trials": "Trials",
+      "trialsPassed": "{passed} of {total} trials passed"
     },
     "roster": {
       "filter": {
@@ -271,11 +637,6 @@ export default interface Resources {
         "nameDescTooltip": "Sort: Name Z → A (click to reverse)"
       }
     },
-    "slotRackPage": {
-      "route": "Route: /minimal-slotRack",
-      "subtitle": "Minimal Slice · SlotRack",
-      "title": "SLOT RACK ISOLATED"
-    },
     "slowMo": "Slow Mo",
     "spinDuration": "Spin Duration",
     "stats": "Stats",
@@ -305,21 +666,83 @@ export default interface Resources {
       "camera": {
         "reset": "Reset camera"
       },
+      "clouds": {
+        "far": "Far",
+        "mid": "Mid",
+        "near": "Near",
+        "scale": "scale",
+        "scales": "Cloud scales"
+      },
       "debug": {
         "activeState": "Active state",
         "anchors": "Anchors",
+        "atmosphere": "Atmosphere",
+        "breath": "Breath",
         "camera": "Camera",
         "clearObjects": "Clear",
+        "despawnWonders": "Despawn wonders",
         "mouseWorld": "Mouse (world)",
         "objects": "Objects",
         "regions": "Regions",
         "renderer": "Renderer",
         "spawnObjects": "Spawn 60",
+        "spawnWonders": "Spawn wonders",
         "statesTitle": "States",
-        "title": "Debug"
+        "title": "Debug",
+        "water": "Water"
       },
       "error": "Failed to load world surface",
+      "goblinInvasion": {
+        "action": "PREPARE THE DEFENSES",
+        "daysRemaining": "Days Remaining: {count}",
+        "eventLabel": "Goblin Invasion",
+        "invasion": "Invasion",
+        "subtitle": "In {count} days an army will attack!",
+        "timerLabel": "DAYS REMAINING",
+        "title": "GOBLIN INVASION!",
+        "viewDefenses": "VIEW DEFENSES",
+        "warTable": {
+          "arrival": "ARRIVAL",
+          "arrivalCount": "2",
+          "arrivalIn": "Arrival In",
+          "arrivalUnit": "DAYS",
+          "days": "DAYS",
+          "description": "A goblin army is marching on your lands.",
+          "dismiss": "Dismiss",
+          "dismissReport": "Dismiss Report",
+          "enemy": "ENEMY FORCE",
+          "enemyCount": "3,200+",
+          "enemySub": "Moving from the north",
+          "enemyUnit": "GOBLINS",
+          "estimatedArrival": "Estimated Arrival",
+          "eventLabel": "WORLD EVENT · THREAT",
+          "faction": "GOBLIN ARMY",
+          "factionSub": "Large hostile force detected",
+          "hostileForce": "Hostile Force",
+          "parchmentDescription": "A goblin army is marching on our lands. Our scouts have spotted large enemy forces moving in from the north toward your stronghold.",
+          "remaining": "REMAINING",
+          "scoutReport": "Our scouts report a massive goblin vanguard marching from the Northern Wastes. Their target is clear: your stronghold will be razed unless defenses are prepared.",
+          "targetName": "YOUR VILLAGE",
+          "targetObjective": "Target Objective",
+          "threat": "THREAT",
+          "threatLevelCritical": "Threat Level: Critical",
+          "threatLevelHigh": "Threat Level: High",
+          "timeRemaining": "Time Remaining",
+          "village": "YOUR VILLAGE",
+          "villageSub": "Primary target",
+          "warbands": "~3,500 Warbands",
+          "willBeAttacked": "YOUR VILLAGE WILL BE ATTACKED.",
+          "worldEvent": "World Event"
+        }
+      },
+      "lab": {
+        "back": "Back",
+        "baseline": "Baseline",
+        "title": "Sea Effect Lab",
+        "waterField": "Water field"
+      },
       "layers": {
+        "dragHandle": "Drag to reorder",
         "offsetX": "Offset X",
         "offsetY": "Offset Y",
         "saveDefaults": "Save defaults",

@@ -1466,4 +1466,7 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 **Cosa è successo:** Il Director ha condiviso tre feedback multi-AI (ChatGPT Lead UI/UX AAA, Claude, Gemini) sull'astrolabe V6.3, evidenziando problemi di semantica, art direction, affordance, tensione e climax.
 **Risposta Director (2026-09-08):** direzione A+B. Skill labels sugli assi come in Asterism V6. Informazioni visibili prima del lancio; il THROW è solo il lancio del dado.
 **Piano:** [src/docs/docs/plans/destiny_astrolabe_v63_semantic_cinematic_plan.md](src/docs/docs/plans/destiny_astrolabe_v63_semantic_cinematic_plan.md).
-**Cosa manca:** avallo esecutivo e inizio F0 (audit, contratto, config).
+**Decisioni visuali (2026-09-08):** input = Skill Core centrale (sigillo dorato, `CHECK`); pallina = goccia di mercurio/ambra (stretch + trail sottile); esiti = card con 5 nomi distinti; ferita/morte = fenditura radiale nel tar-goo; uscita obelischi = frantumazione; gap ring↔cerchio = labbro interno esteso + fondo opaco arena.
+**Stato (2026-09-08):** `in corso` — implementazione V6.3 completata: `astrolabeV63Config.ts` (Zod), `onInfo` engine, label skill sugli assi, Skill Core CHECK, overlay pre-roll, pallina a goccia, fenditura radiale wound/death, frantumazione obelischi, fix gap arena, chiavi i18n `astrolabeV63.*` (en/it-IT). Safeguard verdi: build:check, test destinyAstrolabe+astrolabe (110 test), kanban:lint. Smoke test pagina 200 OK.
+**Evidence:** `test-results/r067-astrolabe-v63-2026-09-08.log`.
+**Cosa manca:** verifica visiva del Director sul TestHub e eventuale certificazione.
