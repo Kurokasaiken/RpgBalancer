@@ -1500,6 +1500,5 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 **Blocco emerso (2026-09-08):** l'outer bronze ring lascia uno spazio vuoto intorno al componente interno. Fix: `astro-bezel` passa a `inset: -12%` (scende in percentuale col `.stage`), `arena` clippata a `inset: 3%` per allinearsi al bordo interno del ring; rimosso `stage::before` scuro che creava alone vuoto. Build:check, test astrolabe e kanban:lint passati.
 
 **Richiesta in corso (2026-09-08):** completare i punti rimanenti del piano `destiny_astrolabe_v63_semantic_cinematic_plan.md`.
-- **Completati:** F4, default teal tarato, trajectory, F3, F2.
-- **In esecuzione ora:** F0 — `astrolabeV63.types.ts`, centralizzazione `phaseDurations` in config.
-- **Pendenti:** F5 (test E2E/RTL), fissura WebGL shader, cleanup `astrolabe.css` residual.
+- **Completati:** F4 resolution card, default teal tarato, trajectory state machine, F3, F2 (skill plaques on bronze bezel con active highlight).
+- **Pendenti:** F0 (types/phase hook), F5 (test E2E/RTL), fissura WebGL shader, cleanup `astrolabe.css` residual.
