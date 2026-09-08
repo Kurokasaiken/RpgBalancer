@@ -349,6 +349,38 @@ Formalize in AGENTS.md §F3.1:
 
 ---
 
+## Decision 011: World Surface Sea Motion — Sparse Painted DOM Marks (PLAN-013)
+
+**Date:** 2026-09-08  
+**Context:** `R-066` asked for a measured, plan-first approach to make the painted sea read as slightly alive. Open-sea crops are nearly flat luminance fields; displacement, colour breathing and scrolling detail either produce no visible motion or fail the painterly/atlas style at normal map zoom.
+
+**Decision:** Adopt `plans/PLAN-013-sea-marks.md`:
+- Keep the baked `Mare.webp` layer completely static — no transform, scale, rotate, or parallax.
+- Add `WorldSurfaceSeaMarks.tsx`, a DOM overlay of 20–40 transparent hand-painted sea marks, placed deterministically from `sea_mask.webp` / `points.json`.
+- Animate only `opacity` and `transform: translate3d()` via CSS `@keyframes` or SMIL, with 2–3 variants per mark and a 1–4 world-px drift.
+- Coast-first, open-water marks optional and conditional: remove them if they do not read at zoom ~0.33.
+- All values config-first via Zod and `skinConfigRegistry`; `prefers-reduced-motion` disables everything; Tauri profiling mandatory before rollout.
+
+**Rationale:**
+- The structural limit is the source image: open sea has almost no high-frequency detail to move, so any full-canvas geometric or shader displacement is invisible or noisy.
+- Independent painted overlays preserve the atlas look, cost very little, and animate with the same CSS/SMIL approach already used for cloud shadows and waves.
+- A DOM overlay avoids a WebGL context and gives a clean `prefers-reduced-motion` kill switch.
+
+**Alternative rejected:**
+- Full-canvas displacement/ripple on `Mare.webp` — invisible on open sea, risks seams.
+- Soft-light / colour-breathing over the whole sea — imperceptible at tasteful intensities; visible at stronger intensities breaks the painting.
+- Tiled scrolling water detail — tiling becomes obvious at real zoom.
+- WebGL/Pixi shader for the sea — unnecessary for the first path; separate from the v21 terraferma displacement workstream.
+
+**Implications:**
+- `SeaEffectLabPage` must show at least two side-by-side `WorldSurfaceRenderer` panels for comparative review.
+- T6 evidence log must record frame-time, DPR, visible mark count, and compositor layer count on a modest WebView target.
+- i18n keys for any new UI labels; no ad-hoc CSS files.
+
+**Status:** ✅ Approved by ChatGPT, Claude, DeepSeek. Gemini and Grok could not respond due to tooling/rate limits. Plan is active in `ROADMAP.md`.
+
+---
+
 ## Future Decisions (Roadmap)
 
 - **Macro-Fase B onwards:** Will need decisions on MarketActionCard design, outcome modal layout, level-up animation, etc. Log decisions here as they arise.
