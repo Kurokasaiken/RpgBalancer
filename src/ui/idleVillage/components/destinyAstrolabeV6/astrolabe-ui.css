@@ -765,7 +765,12 @@
    (usando inset percentuali allineati al viewBox del bezel), così il canvas
    riempie tutto lo spazio fino al bordo e non resta il buco scuro del
    `stage::before`. */
-.da-v63 .astro-bezel { inset: -12%; }
+.da-v63 .astro-bezel { inset: -12%; opacity: 0.08; transition: opacity 0.6s ease; }
+.da-v63 [data-state="goo-expand"] .astro-bezel,
+.da-v63 [data-state="axis-read"] .astro-bezel { opacity: 0.10; }
+.da-v63 [data-state="action-trigger"] .astro-bezel { opacity: 0.42; }
+.da-v63 [data-state="the-spin"] .astro-bezel { opacity: 1; }
+.da-v63 [data-state="resolution"] .astro-bezel { opacity: 0.72; }
 .da-v63 .arena { inset: 3%; background: transparent; }
 
 /* SKILL CORE — sigillo dorato centrale che sostituisce il bottone THROW.
@@ -812,6 +817,14 @@
   letter-spacing: 0.3em;
   text-transform: uppercase;
   color: #3a2403;
+}
+.da-skill-core__countdown {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(6px, 1vmin, 10px);
+  letter-spacing: 0.12em;
+  color: #3a2403;
+  opacity: 0.8;
+  margin-top: -2px;
 }
 .da-skill-core:hover { filter: brightness(1.1); }
 .da-skill-core:active { transform: translate(-50%, -50%) scale(0.9); }
