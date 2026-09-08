@@ -554,7 +554,7 @@ function VariantOverlay({ variant, crop, seed, zoom, gain }: {
       const frames = 16;
       const cols = 4;
       const rows = 4;
-      const cycle = 3;
+      const cycle = 8;
       const keyframes = buildSpriteKeyframes('seaLabCaustics', frames, cols, rows);
       const maskW = SEA_W * zoom;
       const maskH = SEA_H * zoom;
@@ -571,7 +571,7 @@ function VariantOverlay({ variant, crop, seed, zoom, gain }: {
               backgroundImage: `url(${CAUSTICS_SRC})`,
               backgroundSize: `${cols * 100}% ${rows * 100}%`,
               backgroundRepeat: 'no-repeat',
-              opacity: Math.min(1, 0.45 * gain),
+              opacity: Math.min(1, 0.4 * gain),
               mixBlendMode: 'screen',
               maskImage: `url(${SEA_MASK_SRC})`,
               WebkitMaskImage: `url(${SEA_MASK_SRC})`,
