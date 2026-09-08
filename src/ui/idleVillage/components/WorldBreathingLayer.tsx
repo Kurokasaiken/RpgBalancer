@@ -55,9 +55,9 @@ export const WorldBreathingLayer: React.FC<WorldBreathingLayerProps> = ({
   // Breathing is implemented via opacity pulsing, not filter scale modulation.
   // The feDisplacementMap applies a subtle static deformation; opacity creates the breathing effect.
 
-  // TEST: Extreme opacity range (0.5 to 1.0) to verify the mechanism works
-  // If you can't see THIS pulsating, the problem is not the formula but something deeper
-  const breathingOpacity = 0.5 + 0.5 * Math.abs(offset) / magnitudeScreenPx;
+  // Breathing via opacity pulsing: 80% (dim) → 100% (bright)
+  // Offset oscillates via sine wave; opacity modulated with absolute value
+  const breathingOpacity = 0.8 + 0.2 * Math.abs(offset) / magnitudeScreenPx;
 
   const containerStyle: React.CSSProperties = {
     position: 'absolute',
