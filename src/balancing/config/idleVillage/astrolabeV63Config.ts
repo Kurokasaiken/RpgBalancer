@@ -68,6 +68,29 @@ const astrolabeV63ConfigSchema = z.object({
     /** Violet edge glow around an open death crack. */
     crackEdgeColor: z.string(),
   }),
+  /** Ball landing — wheel-of-fortune deceleration with fixed-timestep state machine. */
+  landing: z.object({
+    /** Simulation steps per second. 120 is a good balance for WebView determinism. */
+    fixedHz: z.number().int().min(30).max(240),
+    /** Spin progress (0..1) where the ball leaves chaotic bouncing and starts aligning. */
+    alignP: z.number().min(0).max(1),
+    /** Spin progress (0..1) where the ball enters the exact quadratic deceleration. */
+    decelP: z.number().min(0).max(1),
+    /** Max distance from target that still allows the deceleration phase (safety). */
+    captureRadius: z.number().min(10).max(500),
+    /** Speed (px/s) below which the ball is allowed to enter the final deceleration. */
+    minSpeed: z.number().min(0).max(2000),
+    /** Speed (px/s) below which the ball is considered settled. */
+    settleSpeed: z.number().min(0).max(200),
+    /** Max angular speed at which the ball can turn toward the target, rad/s. */
+    turnRate: z.number().min(0).max(50),
+    /** Per-second decay of the tangential residual during deceleration (1/s). */
+    angularDamping: z.number().min(0).max(20),
+    /** Per-frame friction multiplier while the ball is bouncing (1 = no friction). */
+    bounceFriction: z.number().min(0.8).max(1),
+    /** Per-frame friction multiplier while the ball is aligning (1 = no friction). */
+    alignFriction: z.number().min(0.8).max(1),
+  }),
   /** Axis labels — skill name + stat/difficulty readout per spoke. */
   axisLabels: z.object({
     /** Label radius as a fraction of the arena radius (inside the disc). */
@@ -115,6 +138,18 @@ export const astrolabeV63Config: AstrolabeV63Config = astrolabeV63ConfigSchema.p
     scarColor: 'rgba(232,168,60,0.85)',
     crackColor: 'rgba(6,2,16,0.96)',
     crackEdgeColor: 'rgba(150,70,220,0.6)',
+  },
+  landing: {
+    fixedHz: 120,
+    alignP: 0.42,
+    decelP: 0.75,
+    captureRadius: 140,
+    minSpeed: 120,
+    settleSpeed: 25,
+    turnRate: 8,
+    angularDamping: 2.5,
+    bounceFriction: 0.9915,
+    alignFriction: 0.996,
   },
   axisLabels: {
     radiusFactor: 0.88,

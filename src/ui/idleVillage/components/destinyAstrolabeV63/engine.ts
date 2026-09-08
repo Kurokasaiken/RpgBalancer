@@ -362,7 +362,8 @@ const scene={
   gooFullMs:0,
   starScale:0,
   pourP:0, streamAlpha:0,
-  ball:{x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false},
+  ball:{x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false,state:'settled',alignedDir:{x:0,y:0},decel:0},
+  ballAccum:0,
   snapFrom:null,
   shocks:[], rimHits:[], sparks:[], shards:[],
   gooRipple:0,                          // boosts displacement scale
@@ -499,7 +500,7 @@ function launchRoll(){
   scene.starScale=0; scene.pourP=0; scene.streamAlpha=0; scene.axisAlpha=1; scene.gooFullMs=0;
   scene.tideP=0; scene.tideWave=0;
   scene.gooReveal=0; scene.ringReveal=0;
-  scene.ball={x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false};
+  scene.ball={x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false,state:'settled',alignedDir:{x:0,y:0},decel:0};
   scene.resolved=null;
   scene.warp=0;
   scene.shocks.length=0; scene.rimHits.length=0; scene.sparks.length=0; scene.shards.length=0;
@@ -641,32 +642,12 @@ function tickTimeline(){
   else if(s==='the-spin'){
     const p=phaseT(cfg.tSpin);
     stepBall(p);
-    /* R-067: niente snap secco a fine spin — se la pallina non e' ancora sul
-       bersaglio entra in 'magnetic-snap' e ci scivola VISIBILMENTE, cosi' il
-       punto dove l'occhio la segue e' il punto dove davvero si ferma. */
     const b=scene.ball;
     const target=scene.targetPos;
-    const spd=Math.hypot(b.vx,b.vy);
-    const close=target?Math.hypot(target.x-b.x,target.y-b.y):0;
-    if(target&&(p>=1||(p>0.5&&close<10&&spd<0.7))){
-      /* con la trazione di coda la pallina e' gia' quasi sul punto: lo snap
-         residuo e' invisibile (<3px). magnetic-snap resta solo come fallback
-         se la fisica non e' converguta in tempo. */
-      if(close<3){ b.x=target.x; b.y=target.y; resolve(); }
-      else{ setState('magnetic-snap'); }
-    }else if(!target&&p>=1){ resolve(); }
-  }
-  else if(s==='magnetic-snap'){
-    /* fallback raro: se a fine spin la pallina e' lontana dal landing, la
-       porta a destinazione in un micro-glide veloce (~300ms), non un volo. */
-    const b=scene.ball, target=scene.targetPos;
-    if(!target){ resolve(); return; }
-    const p=phaseT(300);
-    b.x+=(target.x-b.x)*0.35;
-    b.y+=(target.y-b.y)*0.35;
-    b.vx*=0.5; b.vy*=0.5;
-    const close=Math.hypot(target.x-b.x,target.y-b.y);
-    if(close<2||p>=1){ b.x=target.x; b.y=target.y; resolve(); }
+    if(b.state==='settled' || p>=1){
+      if(target){ b.x=target.x; b.y=target.y; }
+      resolve();
+    }
   }
   /* decay one-shot fx */
   scene.gooRipple=Math.max(0,scene.gooRipple-0.02);
@@ -929,127 +910,164 @@ function fireBall(){
   }
   const tp=scene.resolved?scene.resolved.landing:computeTargetPos();
   scene.targetPos=tp;
-  /* Target-aware kick: aim roughly toward target with wide jitter (still chaotic) */
+  /* Target-aware kick: aim roughly toward target with moderate jitter. */
   const baseAngle=tp ? Math.atan2(tp.y-CY,tp.x-CX) : Math.random()*TAU;
-  const jitter=(Math.random()*2-1)*Math.PI*0.85;
+  const jitter=(Math.random()*2-1)*Math.PI*0.45;
   const a=baseAngle+jitter;
   const sp=28+Math.random()*8;
   b.vx=Math.cos(a)*sp; b.vy=Math.sin(a)*sp;
+  b.state='bouncing';
+  b.alignedDir={x:0,y:0};
+  b.decel=0;
+  scene.ballAccum=0;
+  lastBallT=performance.now();
 }
 let lastBallT=performance.now();
-function stepBall(p){
+const FIXED_DT_S=1/astrolabeV63Config.landing.fixedHz;
+const FIXED_DT_MS=FIXED_DT_S*1000;
+
+/** Bounce helper — reflect + random scatter so no clean mirror paths. */
+function chaoticBounce(b,nx,ny,extra,chaos){
+  const dot=b.vx*nx+b.vy*ny;
+  if(extra&&dot>=0) return false;
+  b.vx-=2*dot*nx; b.vy-=2*dot*ny;
+  const ang=(Math.random()*2-1)*0.55*chaos;
+  const cs=Math.cos(ang), sn=Math.sin(ang);
+  const rvx=b.vx*cs-b.vy*sn, rvy=b.vx*sn+b.vy*cs;
+  b.vx=rvx; b.vy=rvy;
+  const tx=-ny, ty=nx;
+  const spin=(Math.random()*2-1)*2.6*chaos;
+  b.vx+=tx*spin; b.vy+=ty*spin;
+  const rest=0.92+Math.random()*0.08;
+  b.vx*=rest; b.vy*=rest;
+  const od=b.vx*nx+b.vy*ny;
+  if(od>0){ b.vx-=2*od*nx; b.vy-=2*od*ny; }
+  return true;
+}
+/** One fixed-timestep update of the ball. */
+function stepBallFixed(dtMs,p){
   const b=scene.ball;
   if(!b.on) return;
-  const now=performance.now();
-  let dt=Math.min(40,now-lastBallT); lastBallT=now;
-  const f=dt/16.7;
-
-  /* Roulette deceleration + progressive guidance toward the pre-rolled landing.
-     The ball starts fast and free, then visibly slows and curves toward the
-     landing zone that was determined before the throw. */
+  const f=dtMs/16.6667;
+  const land=astrolabeV63Config.landing;
   const target=scene.targetPos;
-  const decayStart=0.20;
-  const grip=clamp((p-decayStart)/(1-decayStart),0,1);
-  // friction grows with grip so the ball slows more and more as it ages
-  const fric=Math.pow(0.992-0.022*grip,f);
-  b.vx*=fric; b.vy*=fric;
-  // arrive steering toward the landing zone — small at first, then dominant
-  if(target){
-    const toX=target.x-b.x, toY=target.y-b.y;
-    const toDist=Math.hypot(toX,toY);
-    const toAng=Math.atan2(toY,toX);
-    const maxSpeed=28*Math.pow(1-grip,1.5)+0.4;
-    const ramp=60+220*grip;
-    const desiredSpeed=toDist<ramp ? maxSpeed*(toDist/ramp) : maxSpeed;
-    const desiredVx=Math.cos(toAng)*desiredSpeed;
-    const desiredVy=Math.sin(toAng)*desiredSpeed;
-    const steerVx=desiredVx-b.vx;
-    const steerVy=desiredVy-b.vy;
-    const steerMag=0.001+0.10*grip*grip;
-    b.vx+=steerVx*steerMag*f;
-    b.vy+=steerVy*steerMag*f;
-  }
-  b.x+=b.vx*f; b.y+=b.vy*f;
-  /* R-067 RUOTA DELLA FORTUNA — nell'ultimo tratto la pallina converge
-     direttamente sul punto di arrivo: la "decelerazione" E' l'arrivo, non uno
-     snap a parte. Trazione posizionale esponenziale che cresce col grip, così
-     la pallina inchioda dolcemente sul landing pre-rollato. */
-  if(target&&p>0.5){
-    const late=(p-0.5)/0.5;
-    const pull=0.02+0.30*late*late;
-    b.x+=(target.x-b.x)*pull*f;
-    b.y+=(target.y-b.y)*pull*f;
-    /* quando e' vicina, la velocita' residua si spegne invece di farla
-       rimbalzare via: e' la ruota che inchioda sulla casella */
-    const dLeft=Math.hypot(target.x-b.x,target.y-b.y);
-    if(dLeft<26){ const k=Math.pow(0.80,f); b.vx*=k; b.vy*=k; }
-  }
-  /* scatter amount: full early, fades as ball slows */
-  const chaos=1-grip*0.6;
+  const dtS=dtMs/1000;
 
-  /* NON-SPECULAR bounce — reflect + random scatter so no clean mirror paths */
-  const chaoticBounce=(nx,ny,extra)=>{
-    const dot=b.vx*nx+b.vy*ny;
-    if(extra&&dot>=0) return false;
-    b.vx-=2*dot*nx; b.vy-=2*dot*ny;
-    const ang=(Math.random()*2-1)*0.55*chaos;
-    const cs=Math.cos(ang), sn=Math.sin(ang);
-    const rvx=b.vx*cs-b.vy*sn, rvy=b.vx*sn+b.vy*cs;
-    b.vx=rvx; b.vy=rvy;
-    const tx=-ny, ty=nx;
-    const spin=(Math.random()*2-1)*2.6*chaos;
-    b.vx+=tx*spin; b.vy+=ty*spin;
-    const rest=0.92+Math.random()*0.08;
-    b.vx*=rest; b.vy*=rest;
-    const od=b.vx*nx+b.vy*ny;
-    if(od>0){ b.vx-=2*od*nx; b.vy-=2*od*ny; }
-    return true;
-  };
+  /* state machine: BOUNCING → ALIGNING → DECELERATING → SETTLED.
+     Progress gates keep the wheel readable; the exact landing is preserved
+     by the quadratic deceleration along the pre-rolled line. */
+  if(b.state==='bouncing' && p>=land.alignP){
+    b.state='aligning';
+  }else if(b.state==='aligning' && p>=land.decelP && target){
+    b.state='decelerating';
+    const toX=target.x-b.x, toY=target.y-b.y;
+    const d0=Math.hypot(toX,toY);
+    b.alignedDir=d0>0?{x:toX/d0,y:toY/d0}:{x:1,y:0};
+    const vAlong=b.vx*b.alignedDir.x+b.vy*b.alignedDir.y;
+    const v0=Math.max(0.01,vAlong);
+    const dist=Math.max(1,d0);
+    b.decel=-(v0*v0)/(2*dist);            // px per 16.7ms frame
+  }
+
+  /* per-state motion */
+  if(b.state==='bouncing' || b.state==='aligning'){
+    const fric=Math.pow(b.state==='bouncing'?land.bounceFriction:land.alignFriction,f);
+    b.vx*=fric; b.vy*=fric;
+
+    if(b.state==='aligning' && target){
+      const toX=target.x-b.x, toY=target.y-b.y;
+      const d=Math.hypot(toX,toY);
+      const toDir=d>0?{x:toX/d,y:toY/d}:{x:1,y:0};
+      const speed=Math.hypot(b.vx,b.vy);
+      const vDir=speed>0?{x:b.vx/speed,y:b.vy/speed}:toDir;
+      const cross=vDir.x*toDir.y - vDir.y*toDir.x;
+      const dot=vDir.x*toDir.x + vDir.y*toDir.y;
+      const angle=Math.atan2(cross,dot);  // signed angle from vDir to toDir
+      const maxTurn=land.turnRate*dtS;
+      const turn=Math.sign(angle)*Math.min(Math.abs(angle),maxTurn);
+      const cs=Math.cos(turn), sn=Math.sin(turn);
+      const ndx=vDir.x*cs - vDir.y*sn;
+      const ndy=vDir.x*sn + vDir.y*cs;
+      b.vx=ndx*speed; b.vy=ndy*speed;
+    }
+
+    b.x+=b.vx*f; b.y+=b.vy*f;
+  }else if(b.state==='decelerating' && target){
+    const vAlong=b.vx*b.alignedDir.x+b.vy*b.alignedDir.y;
+    const vTanX=b.vx - b.alignedDir.x*vAlong;
+    const vTanY=b.vy - b.alignedDir.y*vAlong;
+    const newV=Math.max(0, vAlong + b.decel*f);
+    const tanDecay=Math.exp(-land.angularDamping*dtS);
+    const newTanX=vTanX*tanDecay;
+    const newTanY=vTanY*tanDecay;
+    b.vx=b.alignedDir.x*newV + newTanX;
+    b.vy=b.alignedDir.y*newV + newTanY;
+    b.x+=b.vx*f; b.y+=b.vy*f;
+
+    const still=Math.hypot(b.vx,b.vy);
+    const near=Math.hypot(target.x-b.x,target.y-b.y);
+    const settle=land.settleSpeed/60;    // px per 16.7ms
+    if(still<settle && near<2){
+      b.state='settled';
+      b.vx=0; b.vy=0;
+      b.x=target.x; b.y=target.y;
+    }
+  }
 
   /* CHALLENGE SURFACE bounce — ball is strictly confined inside rCheckAt */
   const d=dist(b.x,b.y);
   const aB=angOf(b.x,b.y), edge=rCheckAt(aB)-b.r;
   if(d>edge){
     const nx=(b.x-CX)/d, ny=(b.y-CY)/d;
-    chaoticBounce(nx,ny,false);
-    b.squash=astrolabeV63Config.ball.bounceSquash;   // R-067: schiacciamento al rimbalzo
+    const chaos=b.state==='bouncing'?1.0: b.state==='aligning'?0.25:0.05;
+    chaoticBounce(b,nx,ny,false,chaos);
+    b.squash=astrolabeV63Config.ball.bounceSquash;
     b.x=CX+nx*edge; b.y=CY+ny*edge;
-    /* NIENTE PINBALL. Il Director, due volte: «c'e' ancora l'effetto pinball
-       con dei segmenti che si illuminano rispetto a dove colpisce la pallina,
-       non ci devono essere». Il segmento acceso dice «hai colpito QUI», cioe'
-       trasforma un rimbalzo in un punteggio: e' il linguaggio del flipper, non
-       quello di una prova. L'evento resta nella fisica, non nella grafica. */
     addSpark(b.x,b.y);
   }
 
   /* pillar bounce (skip when ball is nearly stopped) */
-  if(grip<0.9){
+  if(b.state!=='decelerating' && b.state!=='settled'){
     scene.blackPillars.concat(scene.whitePillars).forEach(pl=>{
       if(!pl.landed) return;
       const px=CX+Math.cos(pl.ang)*pl.r, py=CY+Math.sin(pl.ang)*pl.r;
       const dx=b.x-px, dy=b.y-py, dd=Math.hypot(dx,dy);
       if(dd<24){
         const nx=dx/(dd||1), ny=dy/(dd||1);
-        if(chaoticBounce(nx,ny,true)!==false){ b.x=px+nx*24; b.y=py+ny*24; pl.flash=1; addSpark(b.x,b.y); }
+        const chaos=b.state==='bouncing'?1.0:0.25;
+        if(chaoticBounce(b,nx,ny,true,chaos)!==false){ b.x=px+nx*24; b.y=py+ny*24; pl.flash=1; addSpark(b.x,b.y); }
       }
     });
   }
 
+  /* trail and FX */
   b.trail.push({x:b.x,y:b.y,life:astrolabeV63Config.ball.trailLifeMs});
   for(let i=b.trail.length-1;i>=0;i-=1){
-    b.trail[i].life-=dt;
+    b.trail[i].life-=dtMs;
     if(b.trail[i].life<=0) b.trail.splice(i,1);
   }
   if(b.trail.length>astrolabeV63Config.ball.trailMaxSamples)
     b.trail.splice(0,b.trail.length-astrolabeV63Config.ball.trailMaxSamples);
   for(let i=scene.sparks.length-1;i>=0;i-=1){
-    const s=scene.sparks[i]; s.life-=dt;
+    const s=scene.sparks[i]; s.life-=dtMs;
     if(s.life<=0){scene.sparks.splice(i,1);continue;}
-    s.x+=s.vx; s.y+=s.vy; s.vy+=0.04;
+    s.x+=s.vx*f; s.y+=s.vy*f; s.vy+=0.04*f;
   }
   for(let i=scene.rimHits.length-1;i>=0;i-=1){
-    scene.rimHits[i].life-=dt;
+    scene.rimHits[i].life-=dtMs;
     if(scene.rimHits[i].life<=0) scene.rimHits.splice(i,1);
+  }
+}
+
+function stepBall(p){
+  const b=scene.ball;
+  if(!b.on) return;
+  const now=performance.now();
+  let dt=Math.min(40,now-lastBallT); lastBallT=now;
+  scene.ballAccum+=dt;
+  while(scene.ballAccum>=FIXED_DT_MS){
+    stepBallFixed(FIXED_DT_MS,p);
+    scene.ballAccum-=FIXED_DT_MS;
   }
 }
 function addSpark(x,y){
