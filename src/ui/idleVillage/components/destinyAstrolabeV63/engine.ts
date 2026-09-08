@@ -760,7 +760,10 @@ function drawFissure(now){
     pts.push([CX+Math.cos(a)*r,CY+Math.sin(a)*r]);
   }
   ctx.save();
-  ctx.clip(gooBlobPath(1,0));                 // mai fuori dal catrame
+  /* la fenditura parte dalla pallina e puo' attraversare stella E catrame
+     (ferita/morte possono accompagnare qualunque esito), quindi la clip e'
+     solo l'arena, non il goo. */
+  ctx.beginPath(); ctx.arc(CX,CY,R,0,TAU); ctx.clip();
   ctx.lineJoin='round'; ctx.lineCap='round';
 
   if(f.dead){
@@ -2458,11 +2461,11 @@ function renderFrame(now){
   scene.whitePillars.forEach(p=>drawPillar(p,true));  // draw first (behind)
   scene.blackPillars.forEach(p=>drawPillar(p,false)); // draw last (in front)
   drawShards();
-  drawFissure(now);
   drawShocks(dt);
   drawRimHits();
   drawMotes(now,dt);
   drawBall(now);
+  drawFissure(now);
  }catch(e){ if(!window.__frameErrLogged){ window.__frameErrLogged=true; console.error('FRAME ERROR:', e && e.stack || e); } }
 }
 function frame(now){
