@@ -1593,36 +1593,50 @@ function drawAxisRig(now){
       ctx.stroke();
     }
 
-    /* R-067 F2 — ICONA + NUMERI SULL'ASSE (stile Asterism V6): niente nome
-       della skill, solo l'icona (da `skill.icon`) e i valori reali
-       `stat vs difficoltà`, disposti lungo la tangente così restano dritti
-       sopra e sotto l'orizzonte. */
-    {
-      const sk=skills[geo.axisSkill[i]]||{icon:'',stat:0,difficulty:0};
-      const rL=R*astrolabeV63Config.axisLabels.radiusFactor;
-      const lx=CX+ca*rL, ly=CY+sa*rL;
-      const tang=a+Math.PI/2;
-      const flip=sa>0.35;
-      const rot=flip?tang+Math.PI:tang;
-      const al=clamp(scene.axisAlpha,0,1);
-      ctx.save();
-      ctx.translate(lx,ly);
-      ctx.rotate(rot);
-      ctx.textAlign='center'; ctx.textBaseline='middle';
-      const F=astrolabeV63Config.axisLabels.fontPx;
-      /* icona della skill */
-      ctx.font=`600 ${F+6}px 'Space Grotesk',system-ui,sans-serif`;
-      ctx.fillStyle=`rgba(248,250,252,${0.95*al})`;
-      ctx.shadowColor='rgba(0,0,0,.8)'; ctx.shadowBlur=6;
-      ctx.fillText(sk.icon||'◆',0,-astrolabeV63Config.axisLabels.lineGapPx/2);
-      /* numeri reali: stat del personaggio vs difficoltà dell'asse */
-      ctx.font=`600 ${F-2}px 'Space Grotesk',system-ui,sans-serif`;
-      ctx.fillStyle=`rgba(200,225,214,${0.9*al})`;
-      ctx.fillText(`${sk.stat} vs ${sk.difficulty}`,0,astrolabeV63Config.axisLabels.lineGapPx/2+6);
-      ctx.restore();
-    }
   }
   ctx.restore();
+}
+
+/* R-067 F2 — ICONA + NUMERI SULL'ASSE (stile Asterism V6): niente nome
+   della skill, solo l'icona (da `skill.icon`) e i valori reali
+   `stat vs difficoltà`, disposti lungo la tangente così restano dritti
+   sopra e sotto l'orizzonte.
+   FUNZIONE SEPARATA da drawAxisRig: la rigatura sfuma con axisAlpha in
+   risk-pour, ma icona e numeri sono i dati del check — devono restare
+   visibili finché il dado non parte (idle → risk-pour → action-trigger). */
+function drawAxisLabels(now){
+  const s=scene.state;
+  const preThrow=(s==='idle'||s==='ring-lock'||s==='threat-slam'||s==='goo-expand'||s==='axis-read'||s==='agency-burst'||s==='risk-pour'||s==='action-trigger');
+  if(!preThrow) return;
+  const rev=scene.gooReveal;
+  if(rev<=0.001) return;
+  const al=Math.max(clamp(scene.axisAlpha,0,1), (s==='action-trigger'||s==='idle')?1:0);
+  if(al<=0.01) return;
+  for(let i=0;i<AXES;i+=1){
+    const a=TIP(i);
+    const ca=Math.cos(a), sa=Math.sin(a);
+    const sk=skills[geo.axisSkill[i]]||{icon:'',stat:0,difficulty:0};
+    const rL=R*astrolabeV63Config.axisLabels.radiusFactor;
+    const lx=CX+ca*rL, ly=CY+sa*rL;
+    const tang=a+Math.PI/2;
+    const flip=sa>0.35;
+    const rot=flip?tang+Math.PI:tang;
+    ctx.save();
+    ctx.translate(lx,ly);
+    ctx.rotate(rot);
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    const F=astrolabeV63Config.axisLabels.fontPx;
+    /* icona della skill */
+    ctx.font=`600 ${F+6}px 'Space Grotesk',system-ui,sans-serif`;
+    ctx.fillStyle=`rgba(248,250,252,${0.95*al})`;
+    ctx.shadowColor='rgba(0,0,0,.8)'; ctx.shadowBlur=6;
+    ctx.fillText(sk.icon||'◆',0,-astrolabeV63Config.axisLabels.lineGapPx/2);
+    /* numeri reali: stat del personaggio vs difficoltà dell'asse */
+    ctx.font=`600 ${F-2}px 'Space Grotesk',system-ui,sans-serif`;
+    ctx.fillStyle=`rgba(200,225,214,${0.9*al})`;
+    ctx.fillText(`${sk.stat} vs ${sk.difficulty}`,0,astrolabeV63Config.axisLabels.lineGapPx/2+6);
+    ctx.restore();
+  }
 }
 
 /* star path sampled from the same radial function used for membership */
@@ -2413,6 +2427,7 @@ function renderFrame(now){
   drawBackdrop(now);
   drawChallengeSurface(now);
   drawAxisRig(now);
+  drawAxisLabels(now);
   drawBlueprint(now);
   drawStar(now);
   drawZoneGuides(now);
