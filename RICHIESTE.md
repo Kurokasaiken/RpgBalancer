@@ -1496,4 +1496,6 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Blocco emerso (2026-09-08):** l'outer bronze ring lascia uno spazio vuoto intorno al componente interno. Fix: `astro-bezel` passa a `inset: -12%` (scende in percentuale col `.stage`), `arena` clippata a `inset: 3%` per allinearsi al bordo interno del ring; rimosso `stage::before` scuro che creava alone vuoto. Build:check, test astrolabe e kanban:lint passati.
 
-**Richiesta aperta (2026-09-08):** completare i punti rimanenti del piano `destiny_astrolabe_v63_semantic_cinematic_plan.md` (esiti narrativi contestuali per skill, formattazione math/risultato, fissura radiale WebGL/shader, test E2E/RTL delle fasi, cleanup delle fasi e `astrolabe.css` residual, ARIA live se nel contratto, etc.).
+**Richiesta in corso (2026-09-08):** completare i punti rimanenti del piano `destiny_astrolabe_v63_semantic_cinematic_plan.md`.
+- **Completato ora:** F4 resolution card con frase narrativa per skill (`copy.narrativeFlavors`) e matematica esplicita (`roll`, `stat`, `difficulty`, `TST`) in `en` e `it-IT`.
+- **Rimangono:** F3 (auto-throw/countdown + Space/Enter esplicito), F2 (nomi skill sulle placche perimetro se mancanti), F0 (`useAstrolabeV63Phase`/types, `phaseDurations` centralizzati), F5 (E2E/RTL), fissura WebGL shader, cleanup `astrolabe.css` residual.
