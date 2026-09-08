@@ -7,45 +7,38 @@ import React, { useRef, useState } from 'react';
 import { DestinyAstrolabeV63Standalone } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeV63Kit';
 import type { AstrolabeResult as DestinyAstrolabeV63Result, AstrolabeSkill as DestinyAstrolabeV63Skill, DestinyAstrolabeV63Handle } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeV63Kit';
 
-/**
- * Glifo per skill. Il progetto non ha ancora un set di icone per le skill
- * (`public/assets/icons` contiene solo icone app), quindi qui sta una mappa
- * nome → glifo, sostituibile con veri asset senza toccare il resto.
- */
-const SKILL_GLYPHS: Record<string, string> = {
-  Atletica: '⤴',
-  Destrezza: '✦',
-  Forza: '⬢',
-  Intelletto: '◈',
-  Carisma: '☼',
-};
-const glyphFor = (name: string) => SKILL_GLYPHS[name] ?? '◈';
+/** Icona per skill: lettera iniziale del nome, fallback deterministico. */
+const glyphFor = (name: string) => name.charAt(0).toUpperCase();
+
+function skillPreset(skills: DestinyAstrolabeV63Skill[]): DestinyAstrolabeV63Skill[] {
+  return skills.map((s) => ({ ...s, icon: glyphFor(s.name) }));
+}
 
 const SKILL_PRESETS = {
-  hard: [{ name: 'Atletica', stat: 30, difficulty: 80 }],
-  single: [{ name: 'Atletica', stat: 85, difficulty: 50 }],
-  double: [
+  hard: skillPreset([{ name: 'Atletica', stat: 30, difficulty: 80 }]),
+  single: skillPreset([{ name: 'Atletica', stat: 85, difficulty: 50 }]),
+  double: skillPreset([
     { name: 'Atletica', stat: 65, difficulty: 50 },      // Saltare burraco
     { name: 'Destrezza', stat: 55, difficulty: 60 },     // Disarmare trappola
-  ],
-  triple: [
+  ]),
+  triple: skillPreset([
     { name: 'Atletica', stat: 65, difficulty: 50 },      // Saltare
     { name: 'Destrezza', stat: 55, difficulty: 60 },     // Disarmare
     { name: 'Forza', stat: 70, difficulty: 45 },         // Rompere porta
-  ],
-  quadruple: [
+  ]),
+  quadruple: skillPreset([
     { name: 'Atletica', stat: 65, difficulty: 50 },      // Saltare
     { name: 'Destrezza', stat: 55, difficulty: 60 },     // Disarmare
     { name: 'Forza', stat: 70, difficulty: 45 },         // Rompere
     { name: 'Intelletto', stat: 50, difficulty: 55 },    // Risolvere enigma
-  ],
-  five: [
+  ]),
+  five: skillPreset([
     { name: 'Atletica', stat: 65, difficulty: 50 },      // Saltare
     { name: 'Destrezza', stat: 55, difficulty: 60 },     // Disarmare
     { name: 'Forza', stat: 70, difficulty: 45 },         // Rompere
     { name: 'Intelletto', stat: 50, difficulty: 55 },    // Enigma
     { name: 'Carisma', stat: 60, difficulty: 48 },       // Persuadere
-  ],
+  ]),
 };
 
 export default function MinimalDestinyAstrolabeV63() {
@@ -56,7 +49,7 @@ export default function MinimalDestinyAstrolabeV63() {
   const [woundChance, setWoundChance] = useState(10);
   const [deathChance, setDeathChance] = useState(5);
   const [forcedVerdict, setForcedVerdict] = useState<string>('');
-  const [bgVariant, setBgVariant] = useState<'mercury' | 'pergamena'>('mercury');
+  const [bgVariant, setBgVariant] = useState<string>('mercury');
   const [ringVariant, setRingVariant] = useState<'patina' | 'clean'>('patina');
   const [ballColor, setBallColor] = useState<'amber' | 'teal' | 'copper'>('amber');
   const [motion, setMotion] = useState<'on' | 'off'>('on');
@@ -208,10 +201,14 @@ export default function MinimalDestinyAstrolabeV63() {
 
       {/* Variant lab controls */}
       <div className="flex flex-wrap items-center justify-center gap-3 py-2 flex-shrink-0 text-xs text-amber-100/80">
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 flex-wrap">
           <span className="uppercase tracking-wider text-amber-200/60">Fondo</span>
           <button type="button" onClick={() => setBgVariant('mercury')} className={`px-2 py-1 rounded border ${bgVariant === 'mercury' ? 'bg-amber-700 text-white border-amber-700' : 'bg-black/40 border-amber-700/40'}`}>Mercury</button>
           <button type="button" onClick={() => setBgVariant('pergamena')} className={`px-2 py-1 rounded border ${bgVariant === 'pergamena' ? 'bg-amber-700 text-white border-amber-700' : 'bg-black/40 border-amber-700/40'}`}>Pergamena</button>
+          <button type="button" onClick={() => setBgVariant('charcoal')} className={`px-2 py-1 rounded border ${bgVariant === 'charcoal' ? 'bg-amber-700 text-white border-amber-700' : 'bg-black/40 border-amber-700/40'}`}>Carbone</button>
+          <button type="button" onClick={() => setBgVariant('midnight')} className={`px-2 py-1 rounded border ${bgVariant === 'midnight' ? 'bg-amber-700 text-white border-amber-700' : 'bg-black/40 border-amber-700/40'}`}>Notte</button>
+          <button type="button" onClick={() => setBgVariant('warm')} className={`px-2 py-1 rounded border ${bgVariant === 'warm' ? 'bg-amber-700 text-white border-amber-700' : 'bg-black/40 border-amber-700/40'}`}>Bruno</button>
+          <button type="button" onClick={() => setBgVariant('deepTeal')} className={`px-2 py-1 rounded border ${bgVariant === 'deepTeal' ? 'bg-amber-700 text-white border-amber-700' : 'bg-black/40 border-amber-700/40'}`}>Teal</button>
         </div>
         <div className="flex items-center gap-1">
           <span className="uppercase tracking-wider text-amber-200/60">Ring</span>
@@ -416,6 +413,8 @@ export default function MinimalDestinyAstrolabeV63() {
               <option value="almost">Almost</option>
               <option value="fail">Failure</option>
               <option value="epicfail">Epic Fail</option>
+              <option value="fail_wound">Fail + Ferita</option>
+              <option value="fail_dead">Fail + Morte</option>
             </select>
           </div>
         </div>

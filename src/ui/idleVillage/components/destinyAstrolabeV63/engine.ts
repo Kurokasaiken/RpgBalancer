@@ -1077,7 +1077,7 @@ function resolve(){
   const target=scene.targetPos||{x:CX,y:CY};
   b.x=target.x; b.y=target.y; // snap to the pre-rolled landing
   let resolved=scene.resolved;
-  const forced=(cfg.mode&&cfg.mode!=='random'&&['bigwin','win','almost','fail','epicfail'].includes(cfg.mode))?cfg.mode:null;
+  const forced=(cfg.mode&&cfg.mode!=='random'&&['bigwin','win','almost','fail','epicfail','fail_wound','fail_dead'].includes(cfg.mode))?cfg.mode:null;
   if(!resolved){
     // fallback for direct resolve calls without a pre-roll (forced/manual)
     const _sv=spatialVerdict(b.x,b.y);
@@ -1089,7 +1089,11 @@ function resolve(){
     outcomeRoll=0; riskRoll=0; skillIndex=getSkillIndexFromAngle(b.x,b.y);
   }
   let {dead,wounded}=resolved;
-  if(forced){ dead=false; wounded=false; }
+  /* i verdicti zonali portano il flag con sé: atterrare nella fascia ferita
+     ferisce, nella striscia morte uccide — anche in forced mode. */
+  if(verdict==='fail_dead'){ dead=true; wounded=false; }
+  else if(verdict==='fail_wound'){ dead=false; wounded=true; }
+  else if(forced){ dead=false; wounded=false; }
   recomputeGeometry(skillIndex);
   scene.res={verdict,roll:outcomeRoll,riskRoll,skillIndex,wounded,dead};
   const _d=Math.hypot(b.x-CX,b.y-CY);
@@ -1107,7 +1111,9 @@ function resolve(){
   scene.whitePillars.forEach(p=>p.drop=0);
   scene.blackPillars.forEach(p=>p.drop=0);
   scene.axisAlpha=0;
-  const V=Object.assign({},VERDICT_TEXT[verdict],(cfg.copy&&cfg.copy.verdicts&&cfg.copy.verdicts[verdict])||{});
+  /* fail_wound/fail_dead condividono la grafica della sconfitta base */
+  const verdictKey=(verdict==='fail_wound')?'fail':(verdict==='fail_dead')?'epicfail':verdict;
+  const V=Object.assign({},VERDICT_TEXT[verdictKey]||VERDICT_TEXT.fail,(cfg.copy&&cfg.copy.verdicts&&cfg.copy.verdicts[verdictKey])||{});
   /* title: split into letters for the crumble effect */
   const titleEl=$id('cardTitle');
   titleEl.innerHTML=[...V.title].map(ch=>{
