@@ -86,6 +86,7 @@ export const DestinyAstrolabeV63 = memo(
     const [armed, setArmed] = useState(false);
     const [flash, setFlash] = useState(false);
     const [autoThrowEnabled, setAutoThrowEnabled] = useState(autoThrow);
+    const [autoThrowMs, setAutoThrowMs] = useState(0);
     const [skipAnimationEnabled, setSkipAnimationEnabled] = useState(skipAnimation);
     const [removeSoundsEnabled, setRemoveSoundsEnabled] = useState(removeSounds);
 
@@ -143,12 +144,39 @@ export const DestinyAstrolabeV63 = memo(
       doThrow();
     }, [armed, skipAnimationEnabled, doThrow]);
 
-    // Auto-Throw: throw 500ms after arming
+    // Auto-Throw: throw 500ms after arming with a visible countdown
     useEffect(() => {
       if (!armed || !autoThrowEnabled || skipAnimationEnabled) return;
-      const id = window.setTimeout(() => doThrow(), 500);
-      return () => window.clearTimeout(id);
+      const total = 500;
+      setAutoThrowMs(total);
+      const start = Date.now();
+      const display = window.setInterval(() => {
+        setAutoThrowMs(Math.max(0, total - (Date.now() - start)));
+      }, 50);
+      const fire = window.setTimeout(() => {
+        window.clearInterval(display);
+        setAutoThrowMs(0);
+        doThrow();
+      }, total);
+      return () => {
+        window.clearTimeout(fire);
+        window.clearInterval(display);
+      };
     }, [armed, autoThrowEnabled, skipAnimationEnabled, doThrow]);
+
+    // Space/Enter trigger CHECK while armed (ignore inputs/textareas)
+    useEffect(() => {
+      if (!armed) return;
+      const onKey = (e: KeyboardEvent) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        const target = e.target as HTMLElement;
+        if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
+        e.preventDefault();
+        doThrow();
+      };
+      window.addEventListener('keydown', onKey);
+      return () => window.removeEventListener('keydown', onKey);
+    }, [armed, doThrow]);
 
     useEffect(() => {
       const root = rootRef.current;
@@ -211,6 +239,11 @@ export const DestinyAstrolabeV63 = memo(
           >
             <span className="da-skill-core__rune" aria-hidden="true">✦</span>
             <span className="da-skill-core__label">{t('astrolabeV63.check')}</span>
+            {autoThrowEnabled && armed && autoThrowMs > 0 && (
+              <span className="da-skill-core__countdown" aria-hidden="true">
+                {(Math.ceil(autoThrowMs / 100) / 10).toFixed(1)}s
+              </span>
+            )}
           </button>
         )}
 
