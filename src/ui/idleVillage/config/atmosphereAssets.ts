@@ -212,24 +212,40 @@ export interface WaterFieldConfig {
 }
 
 /**
- * Soft SMIL ripple confined to the coastline by a shallow-water mask.
+ * Soft coastal water motion, confined to the coastline by a shallow-water mask.
  *
- * The sea painting itself is not transformed; a masked copy of the sea layer
- * carries the displacement, so motion reads only where there is real painted
- * coastal structure and the open sea stays still.
+ * The sea painting itself is not transformed. Two modes are supported:
+ * - `smil`: procedural `feTurbulence` + `feDisplacementMap` (no external asset).
+ * - `sprite`: a hand-painted or captured animated sprite sheet blended over the
+ *   masked sea, giving the impression of moving light/ripples.
  */
 export interface SeaRippleConfig {
   enabled: boolean;
-  /** Base frequency for feTurbulence. Scaled with zoom at runtime. */
-  baseFrequency: number;
-  /** Displacement scale. Tuned to the lab's `rippleSoft` variant. */
-  scale: number;
-  /** Full SMIL cycle length in seconds. */
-  seconds: number;
   /** Mask that limits the effect to shallow / coastal water. */
   mask: string;
   /** Object-fit used by the sea layer so the masked copy aligns exactly. */
   imageFit: 'fill' | 'cover' | 'contain' | 'none';
+  mode: 'smil' | 'sprite';
+  /** SMIL mode: base frequency for feTurbulence, scaled with zoom. */
+  baseFrequency?: number;
+  /** SMIL mode: displacement scale (lab `rippleSoft` = 4). */
+  scale?: number;
+  /** SMIL mode: full SMIL cycle length in seconds. */
+  seconds?: number;
+  /** Sprite mode: path to the sprite sheet. */
+  spriteSrc?: string;
+  /** Sprite mode: number of animation frames in the sheet. */
+  spriteFrames?: number;
+  /** Sprite mode: columns in the sheet. */
+  spriteColumns?: number;
+  /** Sprite mode: rows in the sheet. */
+  spriteRows?: number;
+  /** Sprite mode: duration of one loop in seconds. */
+  spriteCycleSeconds?: number;
+  /** Sprite mode: CSS blend mode for the overlay. */
+  blendMode?: string;
+  /** Sprite mode: peak opacity of the overlay. */
+  opacity?: number;
 }
 
 export interface RiverGlint {
@@ -448,11 +464,17 @@ export const atmosphereAssets: AtmosphereConfig = {
   },
   seaRipple: {
     enabled: true,
-    baseFrequency: 0.012,
-    scale: 4,
-    seconds: 18,
     mask: '/assets/atmosphere/terrain/shallow_mask.webp',
     imageFit: 'fill',
+    // Director selected the animated-sprite / displacement-texture path.
+    mode: 'sprite',
+    spriteSrc: '/assets/atmosphere/sea/ripples_sprite.webp',
+    spriteFrames: 30,
+    spriteColumns: 5,
+    spriteRows: 6,
+    spriteCycleSeconds: 2,
+    blendMode: 'overlay',
+    opacity: 0.35,
   },
   waterField: {
     // Headings are 12° and 108°: diverging, and deliberately not 90° apart. Two
