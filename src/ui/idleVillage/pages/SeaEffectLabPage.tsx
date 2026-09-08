@@ -83,6 +83,7 @@ type VariantId =
   | 'shimmerOpen'
   | 'caustics'
   | 'swellOpen'
+  | 'flowScroll'
   | 'tint'
   | 'combo';
 
@@ -111,6 +112,7 @@ const VARIANTS: Variant[] = [
   { id: 'shimmerOpen', label: '09b · Shimmer mare aperto', note: 'Shimmer più ampio, mascherato su tutto il mare.' },
   { id: 'caustics', label: '09c · Caustics organiche', note: 'Asset OpenGameArt 16 frame, forme irregolari non geometriche.' },
   { id: 'swellOpen', label: '09d · Swell mare aperto', note: 'feTurbulence molto bassa, mascherato su tutto il mare, lento.' },
+  { id: 'flowScroll', label: '09e · Flow scroll', note: 'water_detail in displacement + feOffset animato, direzionale.' },
   { id: 'tint', label: '10 · Respiro di colore', note: 'Solo tinta che pulsa. Zero geometria.' },
   { id: 'combo', label: '11 · Combo', note: 'Ripple leggero + luce + dashes.' },
 ];
@@ -261,6 +263,36 @@ function RippleFilter({ id, baseFrequency, scale, seconds }: {
             repeatCount="indefinite"
           />
         </feDisplacementMap>
+      </filter>
+    </svg>
+  );
+}
+
+/** Animated displacement that scrolls a water texture instead of pulsing it. */
+function FlowScrollFilter({ id, textureSrc, tileSize, dx, dy, scale, seconds }: {
+  id: string;
+  textureSrc: string;
+  /** World-space tile size used to tile the displacement source. */
+  tileSize: number;
+  /** Scroll speed in world px per second along X. */
+  dx: number;
+  /** Scroll speed in world px per second along Y. */
+  dy: number;
+  /** Displacement scale. */
+  scale: number;
+  /** Scroll period in seconds. */
+  seconds: number;
+}) {
+  return (
+    <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
+      <filter id={id} x="-10%" y="-10%" width="120%" height="120%">
+        <feImage href={textureSrc} result="map" />
+        <feTile in="map" result="tiled" />
+        <feOffset in="tiled" dx={0} dy={0} result="shifted">
+          <animate attributeName="dx" values={`0;${dx * seconds}`} dur={`${seconds}s`} repeatCount="indefinite" />
+          <animate attributeName="dy" values={`0;${dy * seconds}`} dur={`${seconds * 1.3}s`} repeatCount="indefinite" />
+        </feOffset>
+        <feDisplacementMap in="SourceGraphic" in2="shifted" xChannelSelector="R" yChannelSelector="G" scale={scale} />
       </filter>
     </svg>
   );
@@ -617,6 +649,41 @@ function VariantOverlay({ variant, crop, seed, zoom, gain }: {
             baseFrequency={0.002 / zoom}
             scale={6 * zoom * gain}
             seconds={40}
+          />
+          <CropImage crop={crop} filterId={filterId} />
+        </div>
+      );
+    }
+    case 'flowScroll': {
+      const filterId = `seaLabFlowScroll-${crop.id}`;
+      const maskW = SEA_W * zoom;
+      const maskH = SEA_H * zoom;
+      const maskPosX = -crop.x * maskW;
+      const maskPosY = -crop.y * maskH;
+      return (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            overflow: 'hidden',
+            maskImage: `url(${SEA_MASK_SRC})`,
+            WebkitMaskImage: `url(${SEA_MASK_SRC})`,
+            maskSize: `${maskW}px ${maskH}px`,
+            WebkitMaskSize: `${maskW}px ${maskH}px`,
+            maskPosition: `${maskPosX}px ${maskPosY}px`,
+            WebkitMaskPosition: `${maskPosX}px ${maskPosY}px`,
+            maskRepeat: 'no-repeat',
+            WebkitMaskRepeat: 'no-repeat',
+          }}
+        >
+          <FlowScrollFilter
+            id={filterId}
+            textureSrc={`${WATER_DIR}/water_detail_a.webp`}
+            tileSize={256}
+            dx={80}
+            dy={-30}
+            scale={8 * zoom * gain}
+            seconds={12}
           />
           <CropImage crop={crop} filterId={filterId} />
         </div>
