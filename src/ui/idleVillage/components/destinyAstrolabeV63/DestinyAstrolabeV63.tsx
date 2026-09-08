@@ -30,16 +30,6 @@ export interface DestinyAstrolabeV63Handle {
   throw: () => void;
 }
 
-/** Pre-roll board info emitted by the engine (R-067): the numbers the player
- *  reads before launching — skill, stat, difficulty, probability, risk. */
-export interface AstrolabeBoardInfo {
-  skills: AstrolabeSkill[];
-  probPct: number;
-  tst: number;
-  woundPct: number;
-  deadPct: number;
-}
-
 export interface DestinyAstrolabeV63Props {
   skills: AstrolabeSkill[];
   config?: AstrolabeConfig & { mode?: string };
