@@ -820,7 +820,7 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
           />
           {/* Wave marks break on the shoreline, at the bottom of the atmosphere
               stack: they belong to the water surface, not to the sky. */}
-          <WorldSurfaceWaves zIndex={cloudZIndex - 4} />
+          <WorldSurfaceWaves zIndex={cloudZIndex - 4} enabled={showSeaRipple} />
           <WorldSurfaceSeaMarks zIndex={cloudZIndex - 4} enabled={showSeaMarks} />
           {/* Water field: broad light pools and drifting micro-detail over the sea. */}
           {showWaterField && (
