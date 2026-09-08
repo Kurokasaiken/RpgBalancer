@@ -1492,6 +1492,6 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 **Evidence:** `test-results/r067-astrolabe-v63-2026-09-08.log`.
 **Cosa manca:** verifica visiva del Director sul TestHub e eventuale certificazione.
 
-**Blocco emerso / in corso (2026-09-08):** la pallina cambia completamente traiettoria quando deve fermarsi ("snap" visibile). Soluzione raccolta da ricerca multi-AI: state machine `BOUNCING → ALIGNING → DECELERATING → SETTLED` con fixed timestep. Implementazione avviata su richiesta del Director.
+**Blocco emerso / fixato (2026-09-08):** la pallina cambia completamente traiettoria quando deve fermarsi ("snap" visibile). Implementata state machine `BOUNCING → ALIGNING → DECELERATING → SETTLED` in `engine.ts` con fixed-timestep accumulator (120 Hz), rotazione verso il target controllata da `turnRate` e decelerazione quadratica esatta lungo la direzione pre-rollata. Configurazione in `astrolabeV63Config.ts` (`landing.*`). Build:check, test astrolabe e kanban:lint passati; smoke test `/minimal-destiny-astrolabe-v6-3` 200.
 
 **Blocco emerso (2026-09-08):** l'outer bronze ring lascia uno spazio vuoto intorno al componente interno. Fix: `astro-bezel` passa a `inset: -12%` (scende in percentuale col `.stage`), `arena` clippata a `inset: 3%` per allinearsi al bordo interno del ring; rimosso `stage::before` scuro che creava alone vuoto. Build:check, test astrolabe e kanban:lint passati.
