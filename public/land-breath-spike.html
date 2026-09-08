@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Land Breath — T-000b Spike</title>
+  <style>
+    html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #111; }
+    #app canvas { display: block; }
+    #ui {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 260px;
+      padding: 16px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.75);
+      color: #f0f0f0;
+      font: 13px/1.4 system-ui, -apple-system, sans-serif;
+      z-index: 10;
+      backdrop-filter: blur(4px);
+    }
+    #ui h1 { margin: 0 0 12px; font-size: 15px; color: #fff; }
+    #ui label { display: block; margin: 10px 0 4px; color: #ccc; }
+    #ui .row { display: flex; gap: 6px; margin: 6px 0; }
+    #ui button {
+      flex: 1;
+      padding: 6px 8px;
+      border: 1px solid #555;
+      border-radius: 4px;
+      background: #222;
+      color: #eee;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    #ui button.active { background: #4a9; border-color: #4a9; color: #000; }
+    #ui input[type="range"] { width: 100%; }
+    #ui .value { float: right; color: #fff; }
+    #ui .note { margin-top: 10px; font-size: 11px; color: #888; }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <div id="ui">
+    <h1>Land Breath Spike</h1>
+    <div class="row">
+      <button id="variant-scroll" class="active">scroll</button>
+      <button id="variant-scale">scale</button>
+      <button id="variant-combine">combine</button>
+    </div>
+    <label for="amplitude">Amplitude <span class="value" id="amplitude-value">16</span> px</label>
+    <input id="amplitude" type="range" min="0" max="32" step="1" value="16" />
+    <label for="speed">Speed <span class="value" id="speed-value">0.3</span></label>
+    <input id="speed" type="range" min="0" max="2" step="0.05" value="0.3" />
+    <div class="row">
+      <button id="toggle-pause">Pause</button>
+      <button id="toggle-static">Static</button>
+    </div>
+    <div class="row">
+      <button id="toggle-maps">Show maps</button>
+    </div>
+    <p class="note">
+      Sea stays static. Land groups share the same noise texture but with different
+      tileScale/tilePosition. Edge padding = 64px (max safe amplitude ≈ 32px).
+    </p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.4.2/dist/pixi.min.js"></script>
+  <script>
+    (function () {
+      const WORLD_W = 4240;
+      const WORLD_H = 2828;
+      const PADDING = 64;
+      const ASSETS = {
+        background: '/assets/world/wanderlust/base/layers/Background.webp',
+        sea: '/assets/world/wanderlust/base/layers/Mare.webp',
+        islands: '/spike-land-breath/composite-islands.webp',
+        mountains: '/spike-land-breath/composite-mountains.webp',
+        terrain: '/spike-land-breath/composite-terrain.webp',
+        forests: '/spike-land-breath/composite-forests.webp',
+        settlement: '/spike-land-breath/composite-settlement.webp',
+      };
+      const BIOMES = ['islands', 'mountains', 'terrain', 'forests', 'settlement'];
+      const WEIGHTS = { islands: 1.0, mountains: 0.55, terrain: 0.8, forests: 1.15, settlement: 0.35 };
+
+      const app = new PIXI.Application({
+        resizeTo: window,
+        backgroundColor: 0x111111,
+        antialias: false,
+        resolution: Math.min(window.devicePixelRatio || 1, 2),
+      });
+      document.getElementById('app').appendChild(app.view);
+
+      const world = new PIXI.Container();
+      app.stage.addChild(world);
+
+      const mask = new PIXI.Graphics();
+      mask.beginFill(0xffffff);
+      mask.drawRect(0, 0, WORLD_W, WORLD_H);
+      mask.endFill();
+      world.addChild(mask);
+      world.mask = mask;
+
+      function fitWorld() {
+        const sx = app.screen.width / WORLD_W;
+        const sy = app.screen.height / WORLD_H;
+        const s = Math.min(sx, sy) * 0.98;
+        world.scale.set(s);
+        world.position.set((app.screen.width - WORLD_W * s) / 2, (app.screen.height - WORLD_H * s) / 2);
+      }
+      fitWorld();
+      window.addEventListener('resize', fitWorld);
+
+      // Organic low-frequency noise field.
+      const noiseCanvas = document.createElement('canvas');
+      noiseCanvas.width = 512;
+      noiseCanvas.height = 512;
+      const nctx = noiseCanvas.getContext('2d');
+      nctx.fillStyle = 'rgb(128,128,128)';
+      nctx.fillRect(0, 0, 512, 512);
+      nctx.globalCompositeOperation = 'lighter';
+      for (let i = 0; i < 40; i++) {
+        const x = Math.random() * 512;
+        const y = Math.random() * 512;
+        const r = 60 + Math.random() * 160;
+        const dr = (Math.random() - 0.5) * 120;
+        const dg = (Math.random() - 0.5) * 120;
+        const g = nctx.createRadialGradient(x, y, 0, x, y, r);
+        g.addColorStop(0, `rgba(${128 + dr | 0}, ${128 + dg | 0}, 128, 0.35)`);
+        g.addColorStop(1, 'rgba(128,128,128,0)');
+        nctx.fillStyle = g;
+        nctx.beginPath();
+        nctx.arc(x, y, r, 0, Math.PI * 2);
+        nctx.fill();
+      }
+      nctx.globalCompositeOperation = 'source-over';
+
+      const noiseTexture = PIXI.Texture.from(noiseCanvas);
+      noiseTexture.baseTexture.wrapMode = PIXI.WRAP_MODES.REPEAT;
+
+      const state = {
+        variant: 'scroll',
+        amplitude: 16,
+        speed: 0.3,
+        paused: false,
+        static: false,
+      };
+
+      const filters = {};
+      const mapSprites = {};
+      const landSprites = {};
+
+      // Load all layer assets, then build the stage.
+      const loader = new PIXI.Loader();
+      Object.entries(ASSETS).forEach(([key, url]) => loader.add(key, url));
+      loader.load((_, resources) => {
+        function addSprite(key, x, y) {
+          const sp = new PIXI.Sprite(resources[key].texture);
+          sp.position.set(x, y);
+          world.addChild(sp);
+          return sp;
+        }
+
+        addSprite('background', 0, 0);
+        addSprite('sea', 0, 0);
+
+        BIOMES.forEach((biome, idx) => {
+          const sprite = addSprite(biome, -PADDING, -PADDING);
+          landSprites[biome] = sprite;
+
+          const map = new PIXI.TilingSprite(noiseTexture, WORLD_W, WORLD_H);
+          const scaleBase = 0.7 + (idx % 3) * 0.15;
+          map.tileScale.set(scaleBase);
+          map.visible = false;
+          world.addChildAt(map, 0); // behind everything, not rendered visually
+          mapSprites[biome] = map;
+
+          const filter = new PIXI.filters.DisplacementFilter(map, WEIGHTS[biome] * state.amplitude);
+          filter.padding = PADDING; // expand filter output to the padded region
+          sprite.filters = [filter];
+          filters[biome] = filter;
+        });
+
+        // settlement is the top-most layer, but in original DOM order it is above forests.
+        // The order of addSprite above already matches BIOMES array order.
+      });
+
+      app.ticker.add((delta) => {
+        if (state.paused || state.static) return;
+        const t = app.ticker.lastTime / 1000;
+        BIOMES.forEach((biome, idx) => {
+          const map = mapSprites[biome];
+          if (!map) return;
+          if (state.variant === 'scroll' || state.variant === 'combine') {
+            const phase = idx * 1.3;
+            map.tilePosition.x += state.speed * (0.8 + 0.2 * Math.sin(t * 0.05 + phase)) * delta;
+            map.tilePosition.y += state.speed * (0.6 + 0.2 * Math.cos(t * 0.04 + phase)) * delta;
+          }
+          if (state.variant === 'scale' || state.variant === 'combine') {
+            const pulse = 1 + Math.sin(t * 0.2 + idx) * 0.04;
+            const base = 0.7 + (idx % 3) * 0.15;
+            map.tileScale.set(base * pulse);
+          }
+        });
+      });
+
+      function updateAmplitude() {
+        BIOMES.forEach((biome) => {
+          if (filters[biome]) {
+            const v = state.static ? 0 : WEIGHTS[biome] * state.amplitude;
+            filters[biome].scale.x = v;
+            filters[biome].scale.y = v;
+          }
+        });
+      }
+
+      // UI wiring
+      document.getElementById('variant-scroll').addEventListener('click', () => setVariant('scroll'));
+      document.getElementById('variant-scale').addEventListener('click', () => setVariant('scale'));
+      document.getElementById('variant-combine').addEventListener('click', () => setVariant('combine'));
+
+      function setVariant(v) {
+        state.variant = v;
+        ['scroll', 'scale', 'combine'].forEach((id) => {
+          document.getElementById('variant-' + id).classList.toggle('active', id === v);
+        });
+      }
+
+      const amplitudeInput = document.getElementById('amplitude');
+      const amplitudeValue = document.getElementById('amplitude-value');
+      amplitudeInput.addEventListener('input', () => {
+        state.amplitude = Number(amplitudeInput.value);
+        amplitudeValue.textContent = state.amplitude;
+        updateAmplitude();
+      });
+
+      const speedInput = document.getElementById('speed');
+      const speedValue = document.getElementById('speed-value');
+      speedInput.addEventListener('input', () => {
+        state.speed = Number(speedInput.value);
+        speedValue.textContent = state.speed.toFixed(2);
+      });
+
+      const pauseBtn = document.getElementById('toggle-pause');
+      pauseBtn.addEventListener('click', () => {
+        state.paused = !state.paused;
+        pauseBtn.textContent = state.paused ? 'Resume' : 'Pause';
+      });
+
+      const staticBtn = document.getElementById('toggle-static');
+      staticBtn.addEventListener('click', () => {
+        state.static = !state.static;
+        staticBtn.classList.toggle('active', state.static);
+        updateAmplitude();
+      });
+
+      let mapsVisible = false;
+      const mapsBtn = document.getElementById('toggle-maps');
+      mapsBtn.addEventListener('click', () => {
+        mapsVisible = !mapsVisible;
+        BIOMES.forEach((biome) => {
+          if (mapSprites[biome]) mapSprites[biome].visible = mapsVisible;
+        });
+        mapsBtn.textContent = mapsVisible ? 'Hide maps' : 'Show maps';
+      });
+    })();
+  </script>
+</body>
+</html>
