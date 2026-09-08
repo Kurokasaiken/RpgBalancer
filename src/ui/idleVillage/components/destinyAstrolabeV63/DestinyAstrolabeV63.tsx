@@ -95,7 +95,6 @@ export const DestinyAstrolabeV63 = memo(
     const { t } = useTranslation('idleVillage');
     const [armed, setArmed] = useState(false);
     const [flash, setFlash] = useState(false);
-    const [boardInfo, setBoardInfo] = useState<AstrolabeBoardInfo | null>(null);
     const [autoThrowEnabled, setAutoThrowEnabled] = useState(autoThrow);
     const [skipAnimationEnabled, setSkipAnimationEnabled] = useState(skipAnimation);
     const [removeSoundsEnabled, setRemoveSoundsEnabled] = useState(removeSounds);
@@ -164,7 +163,6 @@ export const DestinyAstrolabeV63 = memo(
           play(isSuccess ? 'success' : 'failure', { volume: 0.75 });
         },
         onArmed: (a) => setArmed(a),
-        onInfo: (info) => setBoardInfo(info),
         onState: (s) => {
           if (s === 'action-trigger') play('arm', { volume: 0.6 });
           if (s === 'the-spin') play('spin', { volume: 0.5 });
@@ -201,32 +199,6 @@ export const DestinyAstrolabeV63 = memo(
           {...attributes}
           style={styles}
         />
-
-        {/* R-067 — pre-roll info overlay: tutte le informazioni del check sono
-            visibili PRIMA del lancio; CHECK è solo il lancio del dado. */}
-        {armed && boardInfo && (
-          <div className="da-v63-preroll" aria-hidden="true">
-            <div className="da-v63-preroll__skills">
-              {boardInfo.skills.map((sk, i) => (
-                <span key={i} className="da-v63-preroll__pill">
-                  {sk.icon ? <span className="da-v63-preroll__icon">{sk.icon}</span> : null}
-                  <span className="da-v63-preroll__name">{sk.name}</span>
-                  <span className="da-v63-preroll__vals">
-                    {t('astrolabeV63.statVsDc', { stat: sk.stat, difficulty: sk.difficulty })}
-                  </span>
-                </span>
-              ))}
-            </div>
-            <div className="da-v63-preroll__bottom">
-              <span className="da-v63-preroll__prob">
-                {t('astrolabeV63.probability', { pct: Math.round(boardInfo.probPct) })}
-              </span>
-              <span className="da-v63-preroll__risk">
-                {t('astrolabeV63.risk', { wound: boardInfo.woundPct, dead: boardInfo.deadPct })}
-              </span>
-            </div>
-          </div>
-        )}
 
         {armed && (
           <button
