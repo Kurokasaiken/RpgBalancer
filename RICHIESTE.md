@@ -1488,3 +1488,7 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 **Stato (2026-09-08):** `in corso` — implementazione V6.3 completata: `astrolabeV63Config.ts` (Zod), `onInfo` engine, label skill sugli assi, Skill Core CHECK, overlay pre-roll, pallina a goccia, fenditura radiale wound/death, frantumazione obelischi, fix gap arena, chiavi i18n `astrolabeV63.*` (en/it-IT). Safeguard verdi: build:check, test destinyAstrolabe+astrolabe (110 test), kanban:lint. Smoke test pagina 200 OK.
 **Evidence:** `test-results/r067-astrolabe-v63-2026-09-08.log`.
 **Cosa manca:** verifica visiva del Director sul TestHub e eventuale certificazione.
+
+**Blocco emerso (2026-09-08):** la pallina cambia completamente traiettoria quando deve fermarsi ("snap" visibile). Richiesta del Director: ricerca multi-AI + online con prompt potenziato e hat per trovare una soluzione; poi implementare. Articolo: [`.mw/runs/2026-09-08-192127-astrolabe-trajectory/`](.mw/runs/2026-09-08-192127-astrolabe-trajectory/).
+
+**Blocco emerso (2026-09-08):** l'outer bronze ring lascia uno spazio vuoto intorno al componente interno. Fix: `astro-bezel` passa a `inset: -12%` (scende in percentuale col `.stage`), `arena` clippata a `inset: 3%` per allinearsi al bordo interno del ring; rimosso `stage::before` scuro che creava alone vuoto. Build:check, test astrolabe e kanban:lint passati.
