@@ -1501,5 +1501,5 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Richiesta in corso (2026-09-08):** completare i punti rimanenti del piano `destiny_astrolabe_v63_semantic_cinematic_plan.md`.
 - **Completati:** F4 resolution card, default teal tarato, trajectory state machine, F3, F2 (skill plaques on bronze bezel con active highlight).
-- **Nota:** F0 (types barrel + centralizzazione `phaseDurations`) è stato sperimentato e spostato sul branch `6.4`; non entra nella 6.3.
+- **Nota:** F0 (centralizzazione `phaseDurations`) è sperimentale e disponibile solo sulla route `http://localhost:5173/minimal-destiny-astrolabe-v6-4`; `minimal-destiny-astrolabe-v6-3` resta pre-F0.
 - **Pendenti:** F5 (test E2E/RTL), fissura WebGL shader, cleanup `astrolabe.css` residual.
