@@ -57,7 +57,7 @@ export default function MinimalDestinyAstrolabeV63() {
   const [woundChance, setWoundChance] = useState(10);
   const [deathChance, setDeathChance] = useState(5);
   const [forcedVerdict, setForcedVerdict] = useState<string>('');
-  const [bgVariant, setBgVariant] = useState<string>('mercury');
+  const [bgVariant, setBgVariant] = useState<string>('teal');
   const [ringVariant, setRingVariant] = useState<'patina' | 'clean'>('patina');
   const [ballColor, setBallColor] = useState<'amber' | 'teal' | 'copper'>('amber');
   const [motion, setMotion] = useState<'on' | 'off'>('on');
