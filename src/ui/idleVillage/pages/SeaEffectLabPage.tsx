@@ -27,6 +27,7 @@ import {
 
 const SEA_SRC = '/assets/world/wanderlust/base/layers/Mare.webp';
 const BACKGROUND_SRC = '/assets/world/wanderlust/base/layers/Background.webp';
+const SEA_MASK_SRC = '/assets/atmosphere/terrain/sea_mask.webp';
 const SHALLOW_MASK_SRC = '/assets/atmosphere/terrain/shallow_mask.webp';
 const SPRITE_SRC = '/assets/atmosphere/sea/ripples_sprite.webp';
 const WAVE_DIR = '/assets/atmosphere/waves';
@@ -75,8 +76,10 @@ type VariantId =
   | 'sprite'
   | 'drift'
   | 'detail'
+  | 'detailBoost'
   | 'glints'
   | 'shimmer'
+  | 'shimmerOpen'
   | 'tint'
   | 'combo';
 
@@ -99,8 +102,10 @@ const VARIANTS: Variant[] = [
   { id: 'sprite', label: '03b · Sprite sheet', note: 'Asset OpenGameArt 30 frame, mascherato a coste.' },
   { id: 'drift', label: '06 · Doppia copia', note: 'Copia in soft-light che deriva.' },
   { id: 'detail', label: '07 · Micro-dettaglio', note: 'Tile water_detail in scroll (R-056).' },
+  { id: 'detailBoost', label: '07b · Micro-dettaglio boost', note: 'Stesso tile, opacità/blend più forte per lettura.' },
   { id: 'glints', label: '08 · Riflessi', note: 'Punti speculari che pulsano.' },
   { id: 'shimmer', label: '09 · Shimmer', note: 'Bande chiare in maschera scorrevole.' },
+  { id: 'shimmerOpen', label: '09b · Shimmer mare aperto', note: 'Shimmer più ampio, mascherato su tutto il mare.' },
   { id: 'tint', label: '10 · Respiro di colore', note: 'Solo tinta che pulsa. Zero geometria.' },
   { id: 'combo', label: '11 · Combo', note: 'Ripple leggero + luce + dashes.' },
 ];
@@ -439,6 +444,27 @@ function VariantOverlay({ variant, crop, seed, zoom, gain }: {
           }}
         />
       );
+    case 'detailBoost':
+      return (
+        <div
+          className="sea-lab-anim"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: `url(${WATER_DIR}/water_detail_a.webp), url(${WATER_DIR}/water_detail_b.webp)`,
+            backgroundRepeat: 'repeat, repeat',
+            backgroundSize: `${380 * zoom}px ${380 * zoom}px, ${260 * zoom}px ${260 * zoom}px`,
+            ['--detailA' as string]: `${300 * zoom}px ${80 * zoom}px`,
+            ['--detailB' as string]: `${-220 * zoom}px ${120 * zoom}px`,
+            opacity: Math.min(1, 0.85 * gain),
+            mixBlendMode: 'overlay',
+            animationName: 'seaLabDetail',
+            animationDuration: '34s',
+            animationTimingFunction: 'linear',
+            animationIterationCount: 'infinite',
+          }}
+        />
+      );
     case 'glints':
       return (
         <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', mixBlendMode: 'screen' }}>
@@ -486,6 +512,39 @@ function VariantOverlay({ variant, crop, seed, zoom, gain }: {
           }}
         />
       );
+    case 'shimmerOpen': {
+      const maskW = SEA_W * zoom;
+      const maskH = SEA_H * zoom;
+      const maskPosX = -crop.x * maskW;
+      const maskPosY = -crop.y * maskH;
+      return (
+        <div
+          className="sea-lab-anim"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(180deg, rgba(226,242,246,0.75), rgba(226,242,246,0.22))',
+            mixBlendMode: 'screen',
+            opacity: Math.min(1, 0.75 * gain),
+            maskImage: `repeating-linear-gradient(102deg, rgba(0,0,0,0) 0 ${40 * zoom}px, rgba(0,0,0,1) ${52 * zoom}px, rgba(0,0,0,0) ${78 * zoom}px), url(${SEA_MASK_SRC})`,
+            WebkitMaskImage: `repeating-linear-gradient(102deg, rgba(0,0,0,0) 0 ${40 * zoom}px, rgba(0,0,0,1) ${52 * zoom}px, rgba(0,0,0,0) ${78 * zoom}px), url(${SEA_MASK_SRC})`,
+            maskSize: `cover, ${maskW}px ${maskH}px`,
+            WebkitMaskSize: `cover, ${maskW}px ${maskH}px`,
+            maskPosition: `0 0, ${maskPosX}px ${maskPosY}px`,
+            WebkitMaskPosition: `0 0, ${maskPosX}px ${maskPosY}px`,
+            maskRepeat: 'repeat, no-repeat',
+            WebkitMaskRepeat: 'repeat, no-repeat',
+            maskComposite: 'intersect',
+            WebkitMaskComposite: 'intersect',
+            ['--shimmerShift' as string]: `${260 * zoom}px`,
+            animationName: 'seaLabShimmer',
+            animationDuration: '22s',
+            animationTimingFunction: 'linear',
+            animationIterationCount: 'infinite',
+          }}
+        />
+      );
+    }
     case 'tint':
       return (
         <div
