@@ -1117,8 +1117,6 @@ function resolve(){
   else if(forced){ dead=false; wounded=false; }
   recomputeGeometry(skillIndex);
   scene.res={verdict,roll:outcomeRoll,riskRoll,skillIndex,wounded,dead};
-  const _d=Math.hypot(b.x-CX,b.y-CY);
-  console.log(`[resolve] pre-rolled=${!forced} ball=(${(b.x-CX).toFixed(1)},${(b.y-CY).toFixed(1)}) dist=${_d.toFixed(1)} rStar=${rStarAt(Math.atan2(b.y-CY,b.x-CX)).toFixed(1)} rCheck=${rCheckAt(Math.atan2(b.y-CY,b.x-CX)).toFixed(1)} verdict=${verdict} roll=${outcomeRoll} risk=${riskRoll} skill=${skills[skillIndex]?.name||'Skill'}`);
   const res=scene.res;
   /* R-067 — fenditura radiale nel catrame: parte dal punto d'impatto della
      pallina e corre lungo il raggio. Ferita = si richiude in cicatrice ambrata;
@@ -1145,15 +1143,21 @@ function resolve(){
   }).join('');
   $id('cardSeal').textContent=V.seal;
   /* R-067: cardSub = matematica del check (leggibile in <1s); cardNums = frase
-     narrativa + zona. Le label arrivano da cfg.copy (i18n) con fallback. */
+     narrativa contestuale alla skill. Le label arrivano da cfg.copy (i18n). */
   {
     const sk=skills[skillIndex]||{name:'Skill',stat:60,difficulty:50};
     const tst=clamp(50+(sk.stat-sk.difficulty),1,99);
     const mathFmt=(cfg.copy&&cfg.copy.mathFmt)||'Dado {{roll}} · serviva ≤ {{tst}}';
     $id('cardSub').textContent=outcomeRoll>0
-      ? mathFmt.replace(/\{\{?roll\}?\}/,String(outcomeRoll)).replace(/\{\{?tst\}?\}/,String(tst))
+      ? mathFmt
+          .replace(/\{\{?roll\}?\}/g,String(outcomeRoll))
+          .replace(/\{\{?stat\}?\}/g,String(sk.stat))
+          .replace(/\{\{?difficulty\}?\}/g,String(sk.difficulty))
+          .replace(/\{\{?tst\}?\}/g,String(tst))
       : `${sk.name}`;
-    $id('cardNums').textContent=V.sub;
+    const nFlavors=(cfg.copy&&cfg.copy.narrativeFlavors)||{};
+    const skillNarrative=(nFlavors[sk.name]||{})[verdictKey];
+    $id('cardNums').textContent=skillNarrative||V.sub;
   }
   const chips=$id('cardChips');
   chips.innerHTML='';
