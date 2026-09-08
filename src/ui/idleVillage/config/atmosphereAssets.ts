@@ -466,15 +466,11 @@ export const atmosphereAssets: AtmosphereConfig = {
     enabled: true,
     mask: '/assets/atmosphere/terrain/shallow_mask.webp',
     imageFit: 'fill',
-    // Director selected the animated-sprite / displacement-texture path.
-    mode: 'sprite',
-    spriteSrc: '/assets/atmosphere/sea/ripples_sprite.webp',
-    spriteFrames: 30,
-    spriteColumns: 5,
-    spriteRows: 6,
-    spriteCycleSeconds: 2,
-    blendMode: 'overlay',
-    opacity: 0.35,
+    // Director prefers the coastal ripple over the animated sprite sheet.
+    mode: 'smil',
+    baseFrequency: 0.012,
+    scale: 4,
+    seconds: 18,
   },
   waterField: {
     // Headings are 12° and 108°: diverging, and deliberately not 90° apart. Two

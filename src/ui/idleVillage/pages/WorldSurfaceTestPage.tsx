@@ -499,7 +499,7 @@ export const WorldSurfaceTestPage: React.FC = () => {
           autoFitTrigger={autoFitTrigger}
           showRegions={false}
           breathEnabled={breathActive}
-          showWaterField={waterActive}
+          showSeaRipple={waterActive}
           showAtmosphere={atmosphereActive}
           eventCovered={eventCovered}
           showEventCard={cardOpen}
