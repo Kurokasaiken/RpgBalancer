@@ -316,7 +316,7 @@ export const tarGooConfig: TarGooConfig = tarGooConfigSchema.parse({
     spawnRingFactor: 1.18,
     axisBias: 0.6,
     /* CP-H: fondo congelato dal Director (2026-08-31). Da qui la materia si tara su questo. */
-    backdrop: 'ardesia',
+    backdrop: 'teal',
     backdrops: {
       /** quello attuale, tenuto come termine di paragone */
       teal: {
@@ -352,6 +352,24 @@ export const tarGooConfig: TarGooConfig = tarGooConfigSchema.parse({
       smoke: {
         inner: 'rgba(110,118,132,1)', outer: 'rgba(36,40,48,1)',
         leakCore: 'rgba(225,230,245,.35)', leakMid: 'rgba(180,188,206,.17)',
+        leakEdge: 'rgba(0,0,0,0)',
+      },
+      /** carbone: deep teal-charcoal quasi nero, il colore emerge solo nella luce */
+      charcoal: {
+        inner: 'rgba(22,32,38,1)', outer: 'rgba(8,12,14,1)',
+        leakCore: 'rgba(0,160,160,.32)', leakMid: 'rgba(0,120,130,.14)',
+        leakEdge: 'rgba(0,0,0,0)',
+      },
+      /** notte: midnight blue navy, leggermente piu' freddo e astronomico */
+      midnight: {
+        inner: 'rgba(26,32,50,1)', outer: 'rgba(10,14,26,1)',
+        leakCore: 'rgba(80,120,220,.28)', leakMid: 'rgba(60,90,170,.12)',
+        leakEdge: 'rgba(0,0,0,0)',
+      },
+      /** bruno: warm charcoal/nero-bruno, austero e museale */
+      warm: {
+        inner: 'rgba(46,38,34,1)', outer: 'rgba(18,14,12,1)',
+        leakCore: 'rgba(220,180,140,.30)', leakMid: 'rgba(160,120,90,.13)',
         leakEdge: 'rgba(0,0,0,0)',
       },
     },
