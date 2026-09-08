@@ -35,6 +35,8 @@ export interface AstrolabeEngineOpts {
       React host can show skill/stat/difficulty/probability before the throw */
   onInfo?: (info: {
     skills: AstrolabeSkill[];
+    axisSkill: number[];
+    activeSkillIndex: number;
     probPct: number;
     tst: number;
     woundPct: number;
@@ -399,7 +401,8 @@ function emitArmed(b){ try{ if(typeof opts!=='undefined'&&opts&&opts.onArmed) op
 /* R-067: pre-roll board info for the React overlay — the numbers the player
    must read BEFORE the throw (skill, stat, difficulty, probability, risk). */
 function emitInfo(){ try{ if(typeof opts!=='undefined'&&opts&&opts.onInfo) opts.onInfo({
-  skills:skills.slice(), probPct:geo.probPct||0, tst:geo.tst,
+  skills:skills.slice(), axisSkill:geo.axisSkill.slice(), activeSkillIndex:(scene.resolved&&scene.resolved.skillIndex)||0,
+  probPct:geo.probPct||0, tst:geo.tst,
   woundPct:cfg.wound, deadPct:cfg.dead }); }catch(e){} }
 let armed=false;                 // true while the TIRA button should be shown
 function setState(s){
@@ -494,14 +497,13 @@ function launchRoll(){
   $id('flare').classList.remove('fire');
   $id('launch').classList.remove('pulse');
   /* recompute geometry, build obelisks, reset all scene state */
-  recomputeGeometry();
+  prerollDestiny();
   emitInfo();
   buildPillars();
   scene.starScale=0; scene.pourP=0; scene.streamAlpha=0; scene.axisAlpha=1; scene.gooFullMs=0;
   scene.tideP=0; scene.tideWave=0;
   scene.gooReveal=0; scene.ringReveal=0;
   scene.ball={x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false,state:'settled',alignedDir:{x:0,y:0},decel:0};
-  scene.resolved=null;
   scene.warp=0;
   scene.shocks.length=0; scene.rimHits.length=0; scene.sparks.length=0; scene.shards.length=0;
   scene.fissure=null;

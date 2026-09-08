@@ -100,6 +100,19 @@ const astrolabeV63ConfigSchema = z.object({
     /** Line gap between the skill name and the stat/difficulty row, in px. */
     lineGapPx: z.number().min(2).max(20),
   }),
+  /** Perimeter plaques — skill name/icon on the bronze bezel. */
+  perimeterPlaques: z.object({
+    /** Radius as a fraction of the 500px arena radius (bezel center is at 0.91). */
+    radiusFactor: z.number().min(0.8).max(1.05),
+    /** Plaque width in px. */
+    width: z.number().int().min(60).max(220),
+    /** Plaque height in px. */
+    height: z.number().int().min(20).max(70),
+    /** Font size in px at the 800px reference canvas. */
+    fontPx: z.number().min(8).max(22),
+    /** Scale multiplier for the active skill plaque. */
+    activeScale: z.number().min(1).max(1.5),
+  }),
 });
 
 /** Inferred V6.3 presentation config type. */
@@ -155,5 +168,12 @@ export const astrolabeV63Config: AstrolabeV63Config = astrolabeV63ConfigSchema.p
     radiusFactor: 0.88,
     fontPx: 13,
     lineGapPx: 9,
+  },
+  perimeterPlaques: {
+    radiusFactor: 0.95,
+    width: 120,
+    height: 34,
+    fontPx: 13,
+    activeScale: 1.15,
   },
 });
