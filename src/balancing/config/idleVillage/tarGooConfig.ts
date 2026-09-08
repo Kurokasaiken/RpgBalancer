@@ -320,8 +320,8 @@ export const tarGooConfig: TarGooConfig = tarGooConfigSchema.parse({
     backdrops: {
       /** quello attuale, tenuto come termine di paragone */
       teal: {
-        inner: 'rgba(80,160,155,1)', outer: 'rgba(38,105,102,1)',
-        leakCore: 'rgba(0,229,255,.50)', leakMid: 'rgba(0,229,255,.22)',
+        inner: 'rgba(45,145,155,1)', outer: 'rgba(18,88,98,1)',
+        leakCore: 'rgba(0,229,255,.50)', leakMid: 'rgba(0,170,180,.22)',
         leakEdge: 'rgba(0,0,0,0)',
       },
       /** la candidata del Director: inchiostro su pergamena si riconosce a colpo d'occhio */
