@@ -639,5 +639,28 @@
     "emptyLibrary": "No equipment in library.",
     "edit": "Edit",
     "loading": "Loading..."
+  },
+  "astrolabeV63": {
+    "check": "Check",
+    "statVsDc": "{{stat}} vs DC {{difficulty}} · TST {{tst}}",
+    "probability": "Success ~{{pct}}%",
+    "risk": "Wound {{wound}}% · Death {{dead}}%",
+    "riskWounded": "Wounded",
+    "riskDead": "Fallen",
+    "mathFmt": "D100 {{roll}} · TST {{tst}}",
+    "verdict": {
+      "bigwin": "TRIUMPH",
+      "win": "SUCCESS",
+      "almost": "BY A BREATH",
+      "fail": "FAILURE",
+      "epicfail": "DISASTER"
+    },
+    "narrative": {
+      "bigwin": "Fate bows to your step.",
+      "win": "The trial yields to your effort.",
+      "almost": "A breath, and the truth escapes you.",
+      "fail": "Your grip slips.",
+      "epicfail": "The world pushes you back."
+    }
   }
 }

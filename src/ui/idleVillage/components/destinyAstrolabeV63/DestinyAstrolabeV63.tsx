@@ -9,6 +9,7 @@
  *   <DestinyAstrolabeV63 skills={skills} onResolve={(r) => ...} autoStart />
  */
 import React, { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { useTranslation } from '@/localization/useTranslation';
 import { useSkinBinding } from '@/ui/idleVillage/hooks/useSkinBinding';
 import { createDestinyAstrolabeV63Engine } from './engine';
 import type {
@@ -29,12 +30,25 @@ export interface DestinyAstrolabeV63Handle {
   throw: () => void;
 }
 
+/** Pre-roll board info emitted by the engine (R-067): the numbers the player
+ *  reads before launching — skill, stat, difficulty, probability, risk. */
+export interface AstrolabeBoardInfo {
+  skills: AstrolabeSkill[];
+  probPct: number;
+  tst: number;
+  woundPct: number;
+  deadPct: number;
+}
+
 export interface DestinyAstrolabeV63Props {
   skills: AstrolabeSkill[];
   config?: AstrolabeConfig & { mode?: string };
   onResolve?: (result: AstrolabeResult) => void;
   autoStart?: boolean;
+  autoThrow?: boolean;
+  skipAnimation?: boolean;
   removeSounds?: boolean;
+  hideThrowControls?: boolean;
   className?: string;
 }
 
@@ -65,7 +79,10 @@ export const DestinyAstrolabeV63 = memo(
       config,
       onResolve,
       autoStart = true,
+      autoThrow = false,
+      skipAnimation = false,
       removeSounds = false,
+      hideThrowControls = false,
       className,
     },
     ref,
@@ -75,10 +92,40 @@ export const DestinyAstrolabeV63 = memo(
     const onResolveRef = useRef(onResolve);
     onResolveRef.current = onResolve;
 
+    const { t } = useTranslation('idleVillage');
     const [armed, setArmed] = useState(false);
     const [flash, setFlash] = useState(false);
+    const [boardInfo, setBoardInfo] = useState<AstrolabeBoardInfo | null>(null);
+    const [autoThrowEnabled, setAutoThrowEnabled] = useState(autoThrow);
+    const [skipAnimationEnabled, setSkipAnimationEnabled] = useState(skipAnimation);
+    const [removeSoundsEnabled, setRemoveSoundsEnabled] = useState(removeSounds);
 
-    const play = useAstrolabeAudio(removeSounds);
+    const play = useAstrolabeAudio(removeSoundsEnabled);
+
+    /* R-067: copy i18n iniettata nell'engine via config.copy — nessuna stringa
+       utente nuova hardcoded nel motore (fallback interni restano per la pagina
+       standalone senza i18n). */
+    const copy = React.useMemo(
+      () => ({
+        mathFmt: t('astrolabeV63.mathFmt'),
+        chips: {
+          wounded: t('astrolabeV63.riskWounded'),
+          dead: t('astrolabeV63.riskDead'),
+        },
+        verdicts: {
+          bigwin: { title: t('astrolabeV63.verdict.bigwin'), sub: t('astrolabeV63.narrative.bigwin') },
+          win: { title: t('astrolabeV63.verdict.win'), sub: t('astrolabeV63.narrative.win') },
+          almost: { title: t('astrolabeV63.verdict.almost'), sub: t('astrolabeV63.narrative.almost') },
+          fail: { title: t('astrolabeV63.verdict.fail'), sub: t('astrolabeV63.narrative.fail') },
+          epicfail: { title: t('astrolabeV63.verdict.epicfail'), sub: t('astrolabeV63.narrative.epicfail') },
+        },
+      }),
+      [t],
+    );
+    const engineConfig = React.useMemo(
+      () => ({ ...(config ?? {}), copy }),
+      [config, copy],
+    );
 
     const { classes, attributes, styles } = useSkinBinding(SKIN_BINDING, {
       properties: { skillCount: skills.length },
@@ -90,6 +137,19 @@ export const DestinyAstrolabeV63 = memo(
       window.setTimeout(() => setFlash(false), 260);
     }, []);
 
+    // Skip Animation: throw immediately when armed
+    useEffect(() => {
+      if (!armed || !skipAnimationEnabled) return;
+      doThrow();
+    }, [armed, skipAnimationEnabled, doThrow]);
+
+    // Auto-Throw: throw 500ms after arming
+    useEffect(() => {
+      if (!armed || !autoThrowEnabled || skipAnimationEnabled) return;
+      const id = window.setTimeout(() => doThrow(), 500);
+      return () => window.clearTimeout(id);
+    }, [armed, autoThrowEnabled, skipAnimationEnabled, doThrow]);
+
     useEffect(() => {
       const root = rootRef.current;
       if (!root) return;
@@ -97,13 +157,14 @@ export const DestinyAstrolabeV63 = memo(
 
       const engine = createDestinyAstrolabeV63Engine(root, {
         skills,
-        config,
+        config: engineConfig,
         onResolve: (r) => {
           onResolveRef.current?.(r);
           const isSuccess = r.verdict === 'bigwin' || r.verdict === 'win' || r.verdict === 'almost';
           play(isSuccess ? 'success' : 'failure', { volume: 0.75 });
         },
         onArmed: (a) => setArmed(a),
+        onInfo: (info) => setBoardInfo(info),
         onState: (s) => {
           if (s === 'action-trigger') play('arm', { volume: 0.6 });
           if (s === 'the-spin') play('spin', { volume: 0.5 });
@@ -122,8 +183,8 @@ export const DestinyAstrolabeV63 = memo(
     }, []);
 
     useEffect(() => {
-      engineRef.current?.setConfig(skills, config);
-    }, [skills, config]);
+      engineRef.current?.setConfig(skills, engineConfig);
+    }, [skills, engineConfig]);
 
     useImperativeHandle(
       ref,
@@ -132,7 +193,7 @@ export const DestinyAstrolabeV63 = memo(
     );
 
     return (
-      <div className="destiny-astrolabe-wrap" style={{ position: 'relative', width: '100%', height: '100%' }}>
+      <div className="destiny-astrolabe-wrap da-v63" style={{ position: 'relative', width: '100%', height: '100%' }}>
         <div
           ref={rootRef}
           data-testid="destiny-astrolabe-v62"
@@ -141,19 +202,87 @@ export const DestinyAstrolabeV63 = memo(
           style={styles}
         />
 
+        {/* R-067 — pre-roll info overlay: tutte le informazioni del check sono
+            visibili PRIMA del lancio; CHECK è solo il lancio del dado. */}
+        {armed && boardInfo && (
+          <div className="da-v63-preroll" aria-hidden="true">
+            <div className="da-v63-preroll__skills">
+              {boardInfo.skills.map((sk, i) => {
+                const tst = Math.max(1, Math.min(99, 50 + (sk.stat - sk.difficulty)));
+                return (
+                  <span key={i} className="da-v63-preroll__pill">
+                    {sk.icon ? <span className="da-v63-preroll__icon">{sk.icon}</span> : null}
+                    <span className="da-v63-preroll__name">{sk.name}</span>
+                    <span className="da-v63-preroll__vals">
+                      {t('astrolabeV63.statVsDc', { stat: sk.stat, dc: sk.difficulty, tst })}
+                    </span>
+                  </span>
+                );
+              })}
+            </div>
+            <div className="da-v63-preroll__bottom">
+              <span className="da-v63-preroll__prob">
+                {t('astrolabeV63.probability', { pct: Math.round(boardInfo.probPct) })}
+              </span>
+              <span className="da-v63-preroll__risk">
+                {t('astrolabeV63.risk', { wound: boardInfo.woundPct, dead: boardInfo.deadPct })}
+              </span>
+            </div>
+          </div>
+        )}
+
         {armed && (
           <button
             type="button"
-            className={`da-tira wanderlust-artifact${flash ? ' da-tira--flash' : ''}`}
+            className={`da-skill-core${flash ? ' da-skill-core--implode' : ''}`}
             onClick={doThrow}
-            aria-label="Throw"
-            /* Il centraggio vive in .da-tira (left/top 50% + translate -50%).
-               Nessun override inline: `inset:0` sovrascriveva left/top e la
-               translate residua spostava il bottone di 46px in alto a sinistra. */
+            aria-label={t('astrolabeV63.check')}
             style={{ pointerEvents: 'auto' }}
           >
-            THROW
+            <span className="da-skill-core__rune" aria-hidden="true">✦</span>
+            <span className="da-skill-core__label">{t('astrolabeV63.check')}</span>
           </button>
+        )}
+
+        {!hideThrowControls && (
+          <fieldset className="da-throw-controls" style={{ pointerEvents: 'auto' }}>
+            <legend className="sr-only">Throw controls</legend>
+
+            <label className="da-control-label">
+              <input
+                type="checkbox"
+                className="da-toggle"
+                checked={skipAnimationEnabled}
+                onChange={(e) => setSkipAnimationEnabled(e.target.checked)}
+              />
+              <span className="da-toggle-track" aria-hidden="true" />
+              <span className="da-toggle-label">Skip</span>
+            </label>
+
+            <label className="da-control-label">
+              <input
+                type="checkbox"
+                className="da-toggle"
+                checked={autoThrowEnabled}
+                onChange={(e) => setAutoThrowEnabled(e.target.checked)}
+                disabled={skipAnimationEnabled}
+                title={skipAnimationEnabled ? 'Disabled when Skip is active' : 'Auto-throw 0.5s after arming'}
+              />
+              <span className="da-toggle-track" aria-hidden="true" />
+              <span className="da-toggle-label">Auto</span>
+            </label>
+
+            <label className="da-control-label">
+              <input
+                type="checkbox"
+                className="da-toggle"
+                checked={removeSoundsEnabled}
+                onChange={(e) => setRemoveSoundsEnabled(e.target.checked)}
+              />
+              <span className="da-toggle-track" aria-hidden="true" />
+              <span className="da-toggle-label">Mute</span>
+            </label>
+          </fieldset>
         )}
       </div>
     );

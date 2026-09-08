@@ -658,5 +658,28 @@
     "emptyLibrary": "Nessun oggetto in libreria.",
     "edit": "Modifica",
     "loading": "Caricamento..."
+  },
+  "astrolabeV63": {
+    "check": "Prova",
+    "statVsDc": "{{stat}} vs DC {{difficulty}} · TST {{tst}}",
+    "probability": "Successo ~{{pct}}%",
+    "risk": "Ferita {{wound}}% · Morte {{dead}}%",
+    "riskWounded": "Ferito",
+    "riskDead": "Caduto",
+    "mathFmt": "D100 {{roll}} · TST {{tst}}",
+    "verdict": {
+      "bigwin": "TRIONFO",
+      "win": "SUCCESSO",
+      "almost": "PER UN SOFFIO",
+      "fail": "FALLIMENTO",
+      "epicfail": "DISASTRO"
+    },
+    "narrative": {
+      "bigwin": "Il destino si inchina al tuo passo.",
+      "win": "La prova cede sotto il tuo sforzo.",
+      "almost": "Un soffio, e la verità ti sfugge.",
+      "fail": "La presa scivola.",
+      "epicfail": "Il mondo ti respinge."
+    }
   }
 }

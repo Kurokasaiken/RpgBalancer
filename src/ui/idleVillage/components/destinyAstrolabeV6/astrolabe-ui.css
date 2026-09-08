@@ -87,8 +87,8 @@
   bottom: auto;
   transform: translate(-50%, -50%);
   z-index: 5;
-  width: 92px;
-  height: 92px;
+  width: clamp(52px, 9.5vmin, 108px);
+  height: clamp(52px, 9.5vmin, 108px);
   border-radius: 50%;
   border: 2px solid var(--v8-sun-bronze-dark, #602c08);
   background: radial-gradient(circle at 38% 32%,
@@ -98,8 +98,8 @@
   color: #fce890;
   font-family: 'Cinzel', serif;
   font-weight: 700;
-  letter-spacing: 0.07em;
-  font-size: 14px;
+  letter-spacing: clamp(0.03em, 0.34vmin, 0.34em);
+  font-size: clamp(10px, 1.35vmin, 16px);
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -755,4 +755,188 @@
   .da-screen-flash,
   .da-fate-ring,
   .da-phase-commentary { animation: none; }
+}
+
+/* ===================================================================
+   V6.3 — R-067 semantic/cinematic upgrade (scoped under .da-v63 only)
+   =================================================================== */
+
+/* Gap ring↔cerchio: lo spazio tra il disco dell'arena e il labbro interno
+   del bezel mostrava lo sfondo della pagina. Disco opaco "field stone"
+   (in tinta col gradiente mb-g-f del markup) sotto l'arena, esteso fino a
+   sotto il labbro del ring. */
+.da-v63 .stage::before {
+  content: '';
+  position: absolute;
+  inset: -6%;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    #010810 0%,
+    #010810 62%,
+    #02020b 78%,
+    #02020b 100%);
+  pointer-events: none;
+}
+.da-v63 .arena { background: #010810; }
+
+/* SKILL CORE — sigillo dorato centrale che sostituisce il bottone THROW.
+   Spento durante reveal, pulsante in armed, implode al click. */
+.da-skill-core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 8;
+  width: clamp(64px, 12vmin, 128px);
+  height: clamp(64px, 12vmin, 128px);
+  border-radius: 50%;
+  border: 2px solid rgba(240, 207, 106, 0.85);
+  background: radial-gradient(circle at 38% 30%,
+    #ffeebc 0%, #dfb857 34%, #8a5a20 68%, #3d2610 100%);
+  color: #2a1606;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  box-shadow:
+    inset 0 2px 8px rgba(255, 245, 200, 0.7),
+    inset 0 -5px 12px rgba(60, 30, 5, 0.65),
+    0 0 0 5px rgba(6, 12, 16, 0.55),
+    0 0 0 6px rgba(240, 207, 106, 0.35),
+    0 8px 26px rgba(0, 0, 0, 0.6);
+  animation: da-skill-core-pulse 1.5s ease-in-out infinite;
+  transition: transform 0.1s ease, filter 0.15s ease;
+}
+.da-skill-core__rune {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(16px, 3vmin, 30px);
+  line-height: 1;
+  color: #3a2403;
+  text-shadow: 0 1px 0 rgba(255, 240, 190, 0.8), 0 0 12px rgba(255, 236, 170, 0.6);
+}
+.da-skill-core__label {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: clamp(8px, 1.15vmin, 12px);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #3a2403;
+}
+.da-skill-core:hover { filter: brightness(1.1); }
+.da-skill-core:active { transform: translate(-50%, -50%) scale(0.9); }
+
+@keyframes da-skill-core-pulse {
+  0%, 100% {
+    box-shadow:
+      inset 0 2px 8px rgba(255, 245, 200, 0.7),
+      inset 0 -5px 12px rgba(60, 30, 5, 0.65),
+      0 0 0 5px rgba(6, 12, 16, 0.55),
+      0 0 0 6px rgba(240, 207, 106, 0.35),
+      0 8px 26px rgba(0, 0, 0, 0.6);
+  }
+  50% {
+    box-shadow:
+      inset 0 2px 8px rgba(255, 245, 200, 0.8),
+      inset 0 -5px 12px rgba(60, 30, 5, 0.65),
+      0 0 0 5px rgba(6, 12, 16, 0.55),
+      0 0 0 9px rgba(240, 207, 106, 0.18),
+      0 0 34px 8px rgba(252, 232, 144, 0.5),
+      0 8px 26px rgba(0, 0, 0, 0.6);
+  }
+}
+
+/* Implosione al click: il sigillo collassa verso il centro, poi la pallina
+   parte dal core. */
+.da-skill-core--implode {
+  animation: da-skill-core-implode 0.22s cubic-bezier(.5,0,.8,.4) forwards;
+}
+@keyframes da-skill-core-implode {
+  0%   { transform: translate(-50%, -50%) scale(1);    filter: brightness(1.4); opacity: 1; }
+  60%  { transform: translate(-50%, -50%) scale(0.55); filter: brightness(2.4); opacity: 0.9; }
+  100% { transform: translate(-50%, -50%) scale(0.1);  filter: brightness(3);   opacity: 0; }
+}
+
+/* PRE-ROLL INFO — i dati del check leggibili prima del lancio:
+   skill/stat/difficoltà in alto, probabilità e rischio in basso. */
+.da-v63-preroll {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 7;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7% 6%;
+}
+.da-v63-preroll__skills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  max-width: 92%;
+}
+.da-v63-preroll__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(223, 184, 87, 0.5);
+  background: rgba(6, 15, 22, 0.82);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(247, 221, 128, 0.08);
+  animation: da-badge-in 0.45s cubic-bezier(.18,.9,.24,1.12) both;
+  white-space: nowrap;
+}
+.da-v63-preroll__icon { font-size: 11px; color: #fce890; }
+.da-v63-preroll__name {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #f7dd80;
+}
+.da-v63-preroll__vals {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  color: #c8e1d6;
+  letter-spacing: 0.04em;
+}
+.da-v63-preroll__bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.da-v63-preroll__prob {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(12px, 1.8vmin, 17px);
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #ffeebc;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.9), 0 0 18px rgba(252, 232, 144, 0.45);
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: rgba(6, 15, 22, 0.75);
+  border: 1px solid rgba(223, 184, 87, 0.4);
+}
+.da-v63-preroll__risk {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: clamp(9px, 1.2vmin, 11px);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #e0a8b8;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .da-skill-core,
+  .da-v63-preroll__pill { animation: none; }
 }
