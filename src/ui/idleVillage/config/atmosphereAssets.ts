@@ -211,6 +211,27 @@ export interface WaterFieldConfig {
   lightPools: WaterLightPool[];
 }
 
+/**
+ * Soft SMIL ripple confined to the coastline by a shallow-water mask.
+ *
+ * The sea painting itself is not transformed; a masked copy of the sea layer
+ * carries the displacement, so motion reads only where there is real painted
+ * coastal structure and the open sea stays still.
+ */
+export interface SeaRippleConfig {
+  enabled: boolean;
+  /** Base frequency for feTurbulence. Scaled with zoom at runtime. */
+  baseFrequency: number;
+  /** Displacement scale. Tuned to the lab's `rippleSoft` variant. */
+  scale: number;
+  /** Full SMIL cycle length in seconds. */
+  seconds: number;
+  /** Mask that limits the effect to shallow / coastal water. */
+  mask: string;
+  /** Object-fit used by the sea layer so the masked copy aligns exactly. */
+  imageFit: 'fill' | 'cover' | 'contain' | 'none';
+}
+
 export interface RiverGlint {
   /** SVG path data (`d` attribute) following a river. */
   d: string;
@@ -304,6 +325,8 @@ export interface AtmosphereConfig {
   waves: WavesConfig;
   ambient: AmbientConfig;
   waterField: WaterFieldConfig;
+  /** Soft coastal ripple via SMIL displacement, masked to shallow water. */
+  seaRipple: SeaRippleConfig;
   /** Animated light streaks drawn along rivers. */
   riverGlints: RiverGlint[];
   glass: GlassConfig;
@@ -422,6 +445,14 @@ export const atmosphereAssets: AtmosphereConfig = {
       driftSecondsMin: 3,
       driftSecondsMax: 7,
     },
+  },
+  seaRipple: {
+    enabled: true,
+    baseFrequency: 0.012,
+    scale: 4,
+    seconds: 18,
+    mask: '/assets/atmosphere/terrain/shallow_mask.webp',
+    imageFit: 'fill',
   },
   waterField: {
     // Headings are 12° and 108°: diverging, and deliberately not 90° apart. Two
