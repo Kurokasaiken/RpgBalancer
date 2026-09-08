@@ -166,6 +166,11 @@ Questo file è la bussola operativa. Contiene ciò che Fausto ha chiesto, con le
 - **Desiderata v21 FROZEN**: battito globale continuo, sempre attivo, solo terraferma (mare escluso, ha il suo cantiere), displacement field animato in Pixi mascherato per bioma (riuso `land_mask`/`sea_mask`), config-first, profilazione Tauri obbligatoria.
 - Prossimo passo: piano implementativo (mw-planner) — il codice esistente (`WorldBreathingLayer`, `useBreather`, `BREATHING_CONFIG`, `BREATH_MAP` vuoto in `WorldSurfaceRenderer.tsx:70`) va rivisto o sostituito alla luce della rotta Pixi.
 
+**Aggiornamento 2026-09-08 (delibera multi-AI e battesimo):**
+- 6 round di critica web (`mw-iterative-deliberate` + `mw-critique-plan`): chatgpt/claude/gemini/grok/deepseek. Il piano è evoluto v1→v7: architettura finale = **compositi per bioma come sprite Pixi nello stage esistente** (un solo WebGL context), un DisplacementFilter per sprite (ampiezza = peso bioma), displacement tile PNG condiviso decorrelato per transform, padding `2×maxAmplitudePx` + edge-extend, lifecycle con fallback DOM.
+- **Ratifiche G-0 del Director** (2026-09-08): (a) "mascherato per bioma" = compositing per bioma con gruppo residuo `terrain`; (b) reduced-motion e pausa-drag come eccezioni a "sempre attivo"; (c) camera transform ≠ trasformazione di quad.
+- **Plan battezzato: `PLAN-014-land-breath`** (`.mw/runs/2026-09-08-land-breath/` contiene bozze v1→v7 e tutte le critique). Prossimo task non bloccato: **T-000a** (pre-check numerico, zero Pixi).
+
 ---
 
 ## R-004 — Skill operative = Mind Weaver; le skill storiche di RPG sono contesto, non invocabili
@@ -1446,12 +1451,12 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 3. Quattro crop selezionabili, verificati contro l'alpha del layer mare: `Mare aperto`, `Fascia ovest`, `Stretto est`, `Isolotto sud`. Numero di colonne regolabile.
 4. Nessun RAF: solo keyframe CSS e SMIL, così le animazioni girano anche nel preview pane.
 5. `PLAN-013 — World Surface Sea Marks` redatto e sottoposto a ChatGPT, Claude, Gemini, Grok, DeepSeek: ChatGPT, Claude e DeepSeek hanno approvato; Gemini non ha ricevuto il prompt per un bug dell'adattatore web; Grok è in rate limit. Piano registrato in `plans/PLAN-013-sea-marks.md` e `ROADMAP.md`.
-**Prima evidenza:** sui crop di mare aperto il dipinto è quasi un gradiente piatto e il displacement non si vede — conferma il docblock di `WorldSurfaceWaves.tsx`. Sul crop `Isolotto sud`, dove il dipinto ha texture (anelli d'inchiostro, costa), lo stesso filtro ha qualcosa su cui agire.
+6. **Delibera del Director (2026-09-08):** tra le varianti del lab, solo il *ripple leggero nelle coste* legge bene. Tutto il resto è invisibile o appare come macchie a caso. Implementato `WorldSurfaceSeaRipple` in `WorldSurfaceRenderer`: copia mascherata di `Mare.webp` con `feTurbulence` + `feDisplacementMap` SMIL, limitata da `shallow_mask.webp`, config-first in `atmosphereAssets.seaRipple`, con `prefers-reduced-motion`.
+**Prima evidenza:** sui crop di mare aperto il dipinto è quasi un gradiente piatto e il displacement non si vede — conferma il docblock di `WorldSurfaceWaves.tsx`. Sul crop `Isolotto sud`, dove il dipinto ha texture (anelli d'inchiostro, costa), lo stesso filtro ha qualcosa su cui agire. La variante `rippleSoft` mascherata a coste è l'unica che il Director ha approvato per la mappa vera.
 **Cosa manca:**
 1. Veredetto finale di Grok e Gemini per piena unanimità (Grok rate limit; Gemini adattatore rotto).
-2. Esecuzione di `PLAN-013` con evidence log Tauri e decisione del Director sul gate aperto vs coste-only.
-3. Profilazione della tecnica scelta su WebView/Tauri prima di portarla nel renderer.
-4. Riparare `tests/unit/frozen/worldSurfaceKit.alignment.test.ts` (25/49 rossi: `pngSize()` legge l'header IHDR ma gli asset sono `.webp`).
+2. Profilazione del coastal ripple su WebView/Tauri: frame-time, compositor layer count, DPR, dispositivo modesto, `prefers-reduced-motion`.
+3. Riparare `tests/unit/frozen/worldSurfaceKit.alignment.test.ts` (25/49 rossi: `pngSize()` legge l'header IHDR ma gli asset sono `.webp`).
 **Vincoli:** il lab è uno strumento di confronto, non produzione; nessun layer full-canvas mosso con transform; `prefers-reduced-motion` rispettato; la tecnica vincente va ricostruita config-first dentro `WorldSurfaceRenderer`.
 
 ---

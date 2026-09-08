@@ -21,6 +21,7 @@ import { eventShroudGradeConfig } from '@/balancing/config/idleVillage/eventShro
 
 const WorldSurfaceWaves = lazy(() => import('./WorldSurfaceWaves'));
 const WorldSurfaceSeaMarks = lazy(() => import('./WorldSurfaceSeaMarks'));
+const WorldSurfaceSeaRipple = lazy(() => import('./WorldSurfaceSeaRipple'));
 const WorldSurfaceWaterField = lazy(() => import('./WorldSurfaceWaterField'));
 const WorldSurfaceClouds = lazy(() => import('./WorldSurfaceClouds'));
 const WorldSurfaceCloudShadows = lazy(() => import('./WorldSurfaceCloudShadows'));
@@ -131,6 +132,8 @@ interface WorldSurfaceRendererProps {
   showWaterField?: boolean;
   /** When true, sparse painted sea marks are rendered on the sea. */
   showSeaMarks?: boolean;
+  /** When true, a soft SMIL ripple is applied to coastal shallow water. */
+  showSeaRipple?: boolean;
   /** Optional override for the water field configuration (used by the lab page). */
   waterFieldConfig?: WaterFieldConfig;
   /** When true, the ambient light-ray and dust layer is rendered. */
@@ -250,6 +253,7 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
   breathEnabled = false,
   showWaterField = false,
   showSeaMarks = true,
+  showSeaRipple = true,
   showAtmosphere = false,
   showGlass = true,
   waterFieldConfig,
@@ -321,6 +325,11 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
       ? [...stateOverrides, ...visualStateOverrides]
       : stateOverrides;
   }, [resolvedActiveStateId, visualStateMap, visualStateOverrides]);
+
+  const seaLayer = useMemo(
+    () => manifest.surfaceLayers.find((layer) => layer.id === 'sea'),
+    [manifest.surfaceLayers],
+  );
 
   const effectiveLayers = useMemo<EffectiveLayer[]>(() => {
     const visibleSet =
@@ -846,6 +855,16 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
             and the analysis written into them is worth keeping. Re-mounting is this
             one element. See RICHIESTE.md R-056.
           */}
+          {/* Coastal ripple: a masked, displaced copy of the sea layer.
+              It sits above the painted sea but below cloud shadows and waves. */}
+          {showSeaRipple && seaLayer && (
+            <WorldSurfaceSeaRipple
+              worldName={manifest.world}
+              seaFile={seaLayer.file}
+              zoom={camera.zoom}
+              zIndex={cloudZIndex - 5.5}
+            />
+          )}
           {/* Cloud shadows drift across the land, below the weather. */}
           <WorldSurfaceCloudShadows
             canvasSize={manifest.coordinateSystem.canvas}
