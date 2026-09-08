@@ -856,8 +856,81 @@
    (scoped under .da-v64 only)
    =================================================================== */
 
-.da-v64 .astro-bezel { inset: -12%; }
+.da-v64 .astro-bezel { inset: -12%; opacity: 0.08; transition: opacity 0.6s ease; }
 .da-v64 .arena { inset: 3%; background: transparent; }
+
+/* F3 — curva cornice quiet → tension → explosion (data-state sul .suite). */
+.da-v64 .suite[data-state="goo-expand"] .astro-bezel,
+.da-v64 .suite[data-state="axis-read"] .astro-bezel { opacity: 0.10; }
+.da-v64 .suite[data-state="agency-burst"] .astro-bezel,
+.da-v64 .suite[data-state="risk-pour"] .astro-bezel { opacity: 0.25; }
+.da-v64 .suite[data-state="action-trigger"] .astro-bezel { opacity: 0.42; }
+.da-v64 .suite[data-state="the-spin"] .astro-bezel { opacity: 1; }
+.da-v64 .suite[data-state="resolution"] .astro-bezel { opacity: 0.72; }
+
+/* F4/5.7 — scrim piu' deciso dietro la card (leggibilita' su ogni fondo). */
+.da-v64 .card::before {
+  background: radial-gradient(closest-side, rgba(10,8,5,.74), rgba(10,8,5,.5) 46%, transparent 74%);
+}
+
+/* F4/5.7 — climax differenziato per esito (data-verdict sul .suite).
+   bigwin: anello d'oro che esplode e indugia; almost: sospiro ambrato che si
+   spegne; fail: sussurro, luce che defluisce; epicfail: scoppio freddo
+   violento con coda. `win` usa il burst base. */
+.da-v64 .suite[data-verdict="bigwin"] .climax.burst {
+  animation: da-v64-climax-triumph 1s cubic-bezier(.08,.7,.2,1) forwards;
+}
+.da-v64 .suite[data-verdict="almost"] .climax.burst {
+  animation: da-v64-climax-sigh 1.5s ease-out forwards;
+}
+.da-v64 .suite[data-verdict="fail"] .climax.burst {
+  animation: da-v64-climax-whisper 1.7s ease-out forwards;
+}
+.da-v64 .suite[data-verdict="epicfail"] .climax.burst {
+  animation: da-v64-climax-doom 1.15s cubic-bezier(.3,.6,.3,1) forwards;
+}
+@keyframes da-v64-climax-triumph {
+  0%   { opacity: 0;    transform: scale(.1) rotate(0deg); }
+  10%  { opacity: 1;    transform: scale(.62) rotate(8deg); }
+  55%  { opacity: .85;  transform: scale(1.15) rotate(16deg); }
+  100% { opacity: 0;    transform: scale(1.45) rotate(22deg); }
+}
+@keyframes da-v64-climax-sigh {
+  0%   { opacity: 0;   transform: scale(.3); }
+  30%  { opacity: .55; transform: scale(.8); }
+  100% { opacity: 0;   transform: scale(.92); }
+}
+@keyframes da-v64-climax-whisper {
+  0%   { opacity: 0;  transform: scale(.5); }
+  25%  { opacity: .4; transform: scale(.75); }
+  100% { opacity: 0;  transform: scale(.55); }
+}
+@keyframes da-v64-climax-doom {
+  0%   { opacity: 0;  transform: scale(.2); }
+  8%   { opacity: 1;  transform: scale(.7); }
+  45%  { opacity: .7; transform: scale(1.1); }
+  100% { opacity: 0;  transform: scale(1.3); }
+}
+
+/* F4/5.7 — micro-flash sulla zona di atterraggio (--fx/--fy dal motore),
+   colorato per esito: oro caldo su successo, ambra tenue su almost,
+   violetto freddo su fail/epicfail. */
+.da-v64 .arena .flare {
+  background:
+    radial-gradient(30% 28% at var(--fx, 50%) var(--fy, 50%),
+      rgba(255, 244, 200, .98), rgba(252, 205, 96, .5) 40%, transparent 72%);
+}
+.da-v64 .suite[data-verdict="almost"] .arena .flare {
+  background:
+    radial-gradient(30% 28% at var(--fx, 50%) var(--fy, 50%),
+      rgba(245, 217, 160, .8), rgba(176, 128, 53, .4) 42%, transparent 72%);
+}
+.da-v64 .suite[data-verdict="fail"] .arena .flare,
+.da-v64 .suite[data-verdict="epicfail"] .arena .flare {
+  background:
+    radial-gradient(30% 28% at var(--fx, 50%) var(--fy, 50%),
+      rgba(200, 170, 255, .75), rgba(90, 59, 160, .4) 42%, transparent 72%);
+}
 
 /* Perimeter skill plaques — F2: nome skill + icona sul perimetro bronzo.
    Entrata staggered, la skill attiva si ingrandisce in `armed`. */

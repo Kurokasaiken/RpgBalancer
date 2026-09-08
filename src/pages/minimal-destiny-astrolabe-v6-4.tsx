@@ -131,7 +131,7 @@ export default function MinimalDestinyAstrolabeV64() {
               className="px-3 py-1 rounded text-sm font-semibold bg-amber-500 text-black"
               title="V6.4 · tar goo viscoso (WebGL2 SDF)"
             >
-              V6.3
+              V6.4
             </span>
             <a
               href="/minimal-destiny-astrolabe-v7"
