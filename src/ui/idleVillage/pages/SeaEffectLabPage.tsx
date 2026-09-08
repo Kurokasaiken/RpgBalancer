@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { WorldSurfaceSeaMarks } from '../components/WorldSurfaceSeaMarks';
+import { buildSpriteKeyframes } from '../components/WorldSurfaceSeaRipple';
 import {
   coastOnlySeaMarksConfig,
   defaultSeaMarksConfig,
@@ -26,6 +27,8 @@ import {
 
 const SEA_SRC = '/assets/world/wanderlust/base/layers/Mare.webp';
 const BACKGROUND_SRC = '/assets/world/wanderlust/base/layers/Background.webp';
+const SHALLOW_MASK_SRC = '/assets/atmosphere/terrain/shallow_mask.webp';
+const SPRITE_SRC = '/assets/atmosphere/sea/ripples_sprite.webp';
 const WAVE_DIR = '/assets/atmosphere/waves';
 const WATER_DIR = '/assets/atmosphere/water';
 
@@ -69,6 +72,7 @@ type VariantId =
   | 'rippleSoft'
   | 'rippleStrong'
   | 'rippleSwell'
+  | 'sprite'
   | 'drift'
   | 'detail'
   | 'glints'
@@ -92,6 +96,7 @@ const VARIANTS: Variant[] = [
   { id: 'rippleSoft', label: '03 · Ripple leggero', note: 'feTurbulence + displacement, scale 4.' },
   { id: 'rippleStrong', label: '04 · Ripple forte', note: 'Stesso filtro, scale 14. Soglia alta.' },
   { id: 'rippleSwell', label: '05 · Swell lento', note: 'Frequenza bassa, onda lunga.' },
+  { id: 'sprite', label: '03b · Sprite sheet', note: 'Asset OpenGameArt 30 frame, mascherato a coste.' },
   { id: 'drift', label: '06 · Doppia copia', note: 'Copia in soft-light che deriva.' },
   { id: 'detail', label: '07 · Micro-dettaglio', note: 'Tile water_detail in scroll (R-056).' },
   { id: 'glints', label: '08 · Riflessi', note: 'Punti speculari che pulsano.' },
@@ -354,6 +359,46 @@ function VariantOverlay({ variant, crop, seed, zoom, gain }: {
       return dashLayer;
     case 'sweep':
       return sweepLayer;
+    case 'sprite': {
+      const frames = 30;
+      const cols = 5;
+      const rows = 6;
+      const cycle = 2;
+      const keyframes = buildSpriteKeyframes('seaLabSprite', frames, cols, rows);
+      const maskW = SEA_W * zoom;
+      const maskH = SEA_H * zoom;
+      const maskPosX = -crop.x * maskW;
+      const maskPosY = -crop.y * maskH;
+      return (
+        <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
+          <style>{keyframes}</style>
+          <div
+            className="sea-lab-anim"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              backgroundImage: `url(${SPRITE_SRC})`,
+              backgroundSize: `${cols * 100}% ${rows * 100}%`,
+              backgroundRepeat: 'no-repeat',
+              opacity: Math.min(1, 0.35 * gain),
+              mixBlendMode: 'overlay',
+              maskImage: `url(${SHALLOW_MASK_SRC})`,
+              WebkitMaskImage: `url(${SHALLOW_MASK_SRC})`,
+              maskSize: `${maskW}px ${maskH}px`,
+              WebkitMaskSize: `${maskW}px ${maskH}px`,
+              maskPosition: `${maskPosX}px ${maskPosY}px`,
+              WebkitMaskPosition: `${maskPosX}px ${maskPosY}px`,
+              maskRepeat: 'no-repeat',
+              WebkitMaskRepeat: 'no-repeat',
+              animationName: 'seaLabSprite',
+              animationDuration: `${cycle}s`,
+              animationTimingFunction: `steps(${frames - 1})`,
+              animationIterationCount: 'infinite',
+            }}
+          />
+        </div>
+      );
+    }
     case 'drift':
       return (
         <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
