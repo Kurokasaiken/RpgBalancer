@@ -20,6 +20,17 @@ export interface AstrolabeConfig {
   crit?: number; bigwin?: number; almost?: number; epicfail?: number; wound?: number; dead?: number; mode?: string;
   tSlam?: number; tBurst?: number; tPour?: number; tSpin?: number; tSnap?: number;
   bgVariant?: string; ringVariant?: string; ballColor?: string; motion?: string;
+  /** V6.3 centralized phase durations. If provided, they override astrolabeV63Config.phaseDurations. */
+  phaseDurations?: {
+    ringMs?: number;
+    slamMs?: number;
+    gooMs?: number;
+    axisReadMs?: number;
+    burstMs?: number;
+    pourMs?: number;
+    spinMs?: number;
+    snapMs?: number;
+  };
 }
 export interface AstrolabeResult { verdict: string; roll: number; riskRoll: number;
   skillIndex: number; skillName: string; wounded: boolean; dead: boolean; }
@@ -65,6 +76,7 @@ export function createDestinyAstrolabeV63Engine(root: HTMLElement, opts: Astrola
    ========================================================================= */
 /* config + skills injected by the React host */
 const cfg=Object.assign({stat:60,req:55,crit:5,bigwin:5,almost:5,epicfail:5,wound:10,dead:5,tSlam:tarGooConfig.timing.seedMs,tBurst:1100,tPour:720,tSpin:2600,tSnap:650,mode:'random'}, opts.config||{});
+const phaseDurations=Object.assign({},astrolabeV63Config.phaseDurations,cfg.phaseDurations||{});
 let skills=(opts.skills&&opts.skills.length)?opts.skills.slice():[{name:'Skill',stat:60,difficulty:50}];
 let skillAxes=[];
 function recomputeSkillAxes(){
@@ -478,7 +490,7 @@ function v63Backdrop(){
 }
 const V63_SPAWN_RING=tarGooConfig.v63.spawnRingFactor;
 const V63_AXIS_BIAS=tarGooConfig.v63.axisBias;
-const GOO_MS=tarGooConfig.timing.pourMs;           // V6.3: main tar pour duration
+/* phaseDurations from astrolabeV63Config is the source of truth for timings. */
 
 function shake(kind){
   stage.classList.remove('shake-hard','shake-low','shake-slam');
@@ -529,8 +541,7 @@ function throwBall(){
   if(s!=='action-trigger'){ scene.warp=1; scene.gooRipple=1; }   // visual warp flash when skipping
   setState('the-spin'); fireBall();
 }
-const RING_MS=140;   // V6: la ghiera non esiste più, resta solo un beat tecnico
-const AXIS_READ_MS=560;  // V6: pausa per leggere i 5 assi prima che entri il PG
+/* ringMs and axisReadMs are read from phaseDurations. */
 
 /* advance choreography (called every frame) */
 function tickTimeline(){
@@ -538,13 +549,13 @@ function tickTimeline(){
   if(s==='idle') return;
 
   if(s==='ring-lock'){
-    const p=phaseT(RING_MS);
+    const p=phaseT(phaseDurations.ringMs);
     scene.ringReveal=clamp(p/0.68,0,1);     // ring fades/locks into being
     scene.ringShaken=true;                  // V6: nessuno shake per la ghiera rimossa
     if(p>=1){ scene.ringReveal=1; setState('threat-slam'); }
   }
   else if(s==='threat-slam'){
-    const p=phaseT(cfg.tSlam);
+    const p=phaseT(phaseDurations.slamMs);
     /* V6.3 tar seed: no central pool yet — seed drops fall from above and
        merge while the black obelisks slam. The main rim stays at 0. */
     scene.gooReveal=0;
@@ -564,7 +575,7 @@ function tickTimeline(){
     /* V6.3 TAR POUR — the seeded pool spreads outward like a slow colata.
        Curve: S-curve (smoothstep) from seed to full, so the mass is readable
        at every stage and never snaps like water. */
-    const p=phaseT(GOO_MS);
+    const p=phaseT(phaseDurations.gooMs);
     scene.gooReveal=tarPour(p);
     /* Calm swell in the middle of the pour: the mass pushes, then settles. */
     const swell=0.24*(1-Math.abs(2*p-1));
@@ -578,10 +589,10 @@ function tickTimeline(){
   else if(s==='axis-read'){
     /* BEAT DI LETTURA — la difficoltà è posata e misurabile, niente si muove.
        È l'unico momento in cui il giocatore può leggere i 5 assi da soli. */
-    if(phaseT(AXIS_READ_MS)>=1) setState('agency-burst');
+    if(phaseT(phaseDurations.axisReadMs)>=1) setState('agency-burst');
   }
   else if(s==='agency-burst'){
-    const p=phaseT(cfg.tBurst);
+    const p=phaseT(phaseDurations.burstMs);
     /* Pillars drop first (compressed into first 65% of phase) */
     scene.whitePillars.forEach((pl,i)=>{
       const local=clamp((p-(i*0.07))/0.26,0,1);
@@ -602,7 +613,7 @@ function tickTimeline(){
     }
   }
   else if(s==='risk-pour'){
-    const p=phaseT(cfg.tPour);
+    const p=phaseT(phaseDurations.pourMs);
     /* R-067: FRANTUMAZIONE — gli obelischi non risalgono più: a un terzo del
        gesto si spezzano in schegge che cadono e affondano nel catrame. */
     scene.whitePillars.forEach((pl,i)=>{
@@ -642,7 +653,7 @@ function tickTimeline(){
        button is already armed; the spin will not start on its own. */
   }
   else if(s==='the-spin'){
-    const p=phaseT(cfg.tSpin);
+    const p=phaseT(phaseDurations.spinMs);
     stepBall(p);
     const b=scene.ball;
     const target=scene.targetPos;

@@ -655,17 +655,22 @@ function VariantOverlay({ variant, crop, seed, zoom, gain }: {
       );
     }
     case 'flowScroll': {
-      const filterId = `seaLabFlowScroll-${crop.id}`;
       const maskW = SEA_W * zoom;
       const maskH = SEA_H * zoom;
       const maskPosX = -crop.x * maskW;
       const maskPosY = -crop.y * maskH;
       return (
         <div
+          className="sea-lab-anim"
           style={{
             position: 'absolute',
             inset: 0,
             overflow: 'hidden',
+            backgroundImage: `url(${CAUSTICS_SRC})`,
+            backgroundRepeat: 'repeat',
+            backgroundSize: `${512 * zoom}px ${512 * zoom}px`,
+            opacity: Math.min(1, 0.4 * gain),
+            mixBlendMode: 'overlay',
             maskImage: `url(${SEA_MASK_SRC})`,
             WebkitMaskImage: `url(${SEA_MASK_SRC})`,
             maskSize: `${maskW}px ${maskH}px`,
@@ -675,18 +680,7 @@ function VariantOverlay({ variant, crop, seed, zoom, gain }: {
             maskRepeat: 'no-repeat',
             WebkitMaskRepeat: 'no-repeat',
           }}
-        >
-          <FlowScrollFilter
-            id={filterId}
-            textureSrc={`${WATER_DIR}/water_detail_a.webp`}
-            tileSize={256}
-            dx={80}
-            dy={-30}
-            scale={8 * zoom * gain}
-            seconds={12}
-          />
-          <CropImage crop={crop} filterId={filterId} />
-        </div>
+        />
       );
     }
     case 'tint':
