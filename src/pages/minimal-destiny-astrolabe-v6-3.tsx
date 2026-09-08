@@ -7,8 +7,16 @@ import React, { useRef, useState } from 'react';
 import { DestinyAstrolabeV63Standalone } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeV63Kit';
 import type { AstrolabeResult as DestinyAstrolabeV63Result, AstrolabeSkill as DestinyAstrolabeV63Skill, DestinyAstrolabeV63Handle } from '@/ui/idleVillage/frozen/kits/destinyAstrolabeV63Kit';
 
-/** Icona per skill: lettera iniziale del nome, fallback deterministico. */
-const glyphFor = (name: string) => name.charAt(0).toUpperCase();
+/** Icone della skill: simboli stabili, non lettere iniziali.
+ *  Il componente V6.3 le riceve via `skill.icon` e le disegna sull'asse. */
+const SKILL_ICONS: Record<string, string> = {
+  Atletica: '⤴',
+  Destrezza: '✦',
+  Forza: '⬢',
+  Intelletto: '◈',
+  Carisma: '☼',
+};
+const glyphFor = (name: string) => SKILL_ICONS[name] || name.charAt(0).toUpperCase();
 
 function skillPreset(skills: DestinyAstrolabeV63Skill[]): DestinyAstrolabeV63Skill[] {
   return skills.map((s) => ({ ...s, icon: glyphFor(s.name) }));
