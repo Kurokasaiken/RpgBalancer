@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { atmosphereAssets } from '../config/atmosphereAssets';
 import type { SeaRippleConfig } from '../config/atmosphereAssets';
 
@@ -43,7 +42,7 @@ export function WorldSurfaceSeaRipple({
     return <SpriteSeaRipple zIndex={zIndex} cfg={cfg} />;
   }
 
-  return <SmilSeaRipple zIndex={zIndex} worldName={worldName} seaFile={seaFile} cfg={cfg} zoom={zoom} />;
+  return <SmilSeaRipple zIndex={zIndex} worldName={worldName} seaFile={seaFile} cfg={cfg} />;
 }
 
 /** Generate CSS keyframes that step through a sprite sheet row by row. */
@@ -130,30 +129,11 @@ interface SmilSeaRippleProps {
   worldName: string;
   seaFile: string;
   cfg: SeaRippleConfig;
-  zoom: number;
 }
 
-function SmilSeaRipple({ zIndex, worldName, seaFile, cfg, zoom }: SmilSeaRippleProps) {
-  const filterId = `ws-sea-ripple-${worldName}`;
+function SmilSeaRipple({ zIndex, worldName, seaFile, cfg }: SmilSeaRippleProps) {
   const imageUrl = `/assets/world/${encodeURIComponent(worldName)}/base/layers/${encodeURIComponent(seaFile)}`;
   const maskUrl = cfg.mask;
-
-  const safeZoom = Math.max(zoom, 0.01);
-  const baseFreq = (cfg.baseFrequency ?? 0.012) / safeZoom;
-  const scale = (cfg.scale ?? 4) * safeZoom;
-
-  const turbValues = useMemo(
-    () =>
-      `${baseFreq} ${baseFreq * 1.6};` +
-      `${baseFreq * 1.35} ${baseFreq * 1.15};` +
-      `${baseFreq} ${baseFreq * 1.6}`,
-    [baseFreq],
-  );
-
-  const scaleValues = useMemo(
-    () => `${scale * 0.55};${scale};${scale * 0.55}`,
-    [scale],
-  );
 
   return (
     <div
@@ -166,42 +146,14 @@ function SmilSeaRipple({ zIndex, worldName, seaFile, cfg, zoom }: SmilSeaRippleP
         overflow: 'hidden',
       }}
     >
-      <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
-        <filter id={filterId} x="-5%" y="-5%" width="110%" height="110%">
-          <feTurbulence
-            type="fractalNoise"
-            baseFrequency={`${baseFreq} ${baseFreq * 1.6}`}
-            numOctaves={2}
-            seed={7}
-            result="noise"
-          >
-            <animate
-              attributeName="baseFrequency"
-              dur={`${cfg.seconds}s`}
-              values={turbValues}
-              repeatCount="indefinite"
-            />
-          </feTurbulence>
-          <feDisplacementMap
-            in="SourceGraphic"
-            in2="noise"
-            xChannelSelector="R"
-            yChannelSelector="G"
-            scale={scale}
-          >
-            <animate
-              attributeName="scale"
-              dur={`${(cfg.seconds ?? 18) * 0.7}s`}
-              values={scaleValues}
-              repeatCount="indefinite"
-            />
-          </feDisplacementMap>
-        </filter>
-      </svg>
-
       <style>{`
+        @keyframes wsSeaRippleDrift {
+          0% { background-position: 48% 48%; transform: scale(1.0); }
+          50% { background-position: 52% 52%; transform: scale(1.01); }
+          100% { background-position: 48% 48%; transform: scale(1.0); }
+        }
         @media (prefers-reduced-motion: reduce) {
-          .ws-sea-ripple-smil { filter: none !important; }
+          .ws-sea-ripple-smil { animation: none !important; opacity: 0 !important; }
         }
       `}</style>
 
@@ -211,10 +163,12 @@ function SmilSeaRipple({ zIndex, worldName, seaFile, cfg, zoom }: SmilSeaRippleP
           position: 'absolute',
           inset: 0,
           backgroundImage: `url(${imageUrl})`,
-          backgroundSize: cfg.imageFit === 'fill' ? '100% 100%' : cfg.imageFit,
+          backgroundSize: '104% 104%',
           backgroundRepeat: 'no-repeat',
-          backgroundPosition: '0 0',
-          filter: `url(#${filterId})`,
+          backgroundPosition: '50% 50%',
+          opacity: 0.55,
+          mixBlendMode: 'overlay',
+          animation: `wsSeaRippleDrift ${cfg.seconds ?? 18}s ease-in-out infinite`,
           maskImage: `url(${maskUrl})`,
           WebkitMaskImage: `url(${maskUrl})`,
           maskSize: '100% 100%',
