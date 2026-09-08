@@ -1121,3 +1121,29 @@ ogni taratura futura ricadrebbe nello stesso conflitto.
 - `prefers-reduced-motion` per tutti gli effetti.
 - Budget Tauri/WebView misurato.
 - Nessun CSS ad-hoc standalone: preset skinConfigRegistry se nuovi token.
+
+---
+
+## v21 — World Surface: il mondo respira nella materia (terraferma)
+
+**Status:** `FROZEN`
+**Date:** 2026-09-08
+**Authorized by:** Fausto
+**Reason:** avallo in sessione — "eliminalo" (vincolo layer fermi), "Il mare ci sto lavorando a parte, parliamo solo della terra ferma. va bene x biomi".
+
+### User-stated (parole del Director)
+- La mappa è troppo statica anche con la vita ambientale esistente (nuvole, onde, stormo): guardare lo stesso dipinto fermo stanca l'occhio nel lungo periodo.
+- Obiettivo: **tutto il mondo pulsa lentamente, sempre** — e "pulsa" include **movimento percettibile della materia** della terraferma (foreste, coste, terreno che ondeggiano), non solo luce.
+- Il plan "World Surface Breathing Animation" (feDisplacementMap su DOM, translate, opacity pulsing) è **scartato**: serve un piano adeguato al problema.
+- Il vincolo Pillar 1 "i layer full-canvas restano fermi" è **eliminato**: la deformazione in-place è autorizzata.
+- Scope: **solo terraferma** — il mare ha il suo cantiere (`WorldSurfaceSeaRipple`, Slice 1-bis).
+- Displacement **mascherato per bioma**: approvato ("va bene x biomi").
+
+### Formulazione approvata (FROZEN)
+La terraferma di World Surface deve **pulsare lentamente e continuamente**: la materia dipinta (foreste, coste, terreno) ondeggia in place tramite **displacement field animato dentro Pixi** — si muove il campo, non i quad, quindi nessun bordo si scopre (pattern già certificato su Slice 1-bis per l'acqua). Il displacement è **mascherato per bioma** (riuso delle maschere `land_mask`/`sea_mask`/`shallow_mask` della pipeline `build-terrain-masks.mjs`): intensità differenziata per tipo di terreno. Il mare è escluso dallo scope. L'effetto è sempre attivo (stato di default del mondo, non evento né trigger), a bassa frequenza, con parametri in config (config-first), pausa fluida su drag/zoom, e **profilazione Tauri obbligatoria** prima del rollout. I quad dei layer non subiscono mai trasformazioni geometriche (translate/tilt/scale restano vietati). Il Pillar 1 in `DESIGN_PILLARS.md` è stato emendato di conseguenza (§21, §38).
+
+### Still unresolved
+- Frequenza/ampiezza target del battito: da tarare a occhio in sessione.
+- Intensità differenziata per bioma (foreste vs coste vs montagne): valori da definire nel piano.
+- Se un respiro di luce globale resta come layer complementare o è assorbito nel displacement.
+- Come il displacement convive con i POI marker e le reaction zone ancorate a coordinate mondo (i pixel sotto un POI si muovono — il marker resta fermo o segue?).

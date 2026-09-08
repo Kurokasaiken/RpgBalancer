@@ -166,10 +166,20 @@ Questo file è la bussola operativa. Contiene ciò che Fausto ha chiesto, con le
 - **Desiderata v21 FROZEN**: battito globale continuo, sempre attivo, solo terraferma (mare escluso, ha il suo cantiere), displacement field animato in Pixi mascherato per bioma (riuso `land_mask`/`sea_mask`), config-first, profilazione Tauri obbligatoria.
 - Prossimo passo: piano implementativo (mw-planner) — il codice esistente (`WorldBreathingLayer`, `useBreather`, `BREATHING_CONFIG`, `BREATH_MAP` vuoto in `WorldSurfaceRenderer.tsx:70`) va rivisto o sostituito alla luce della rotta Pixi.
 
+**Aggiornamento 2026-09-08 (T-000a completato):**
+- `scripts/land-breath-pre-check.mjs` creato ed eseguito: report `test-results/land-breath-pre-check-2026-09-08.log`.
+- Risultato: tutti i biomi (forests, islands, mountains, settlement, terrain) hanno residual range 70–100% — dettaglio high-frequency molto superiore al mare. La rotta displacement Pixi non è scartabile a priori.
+
 **Aggiornamento 2026-09-08 (delibera multi-AI e battesimo):**
 - 6 round di critica web (`mw-iterative-deliberate` + `mw-critique-plan`): chatgpt/claude/gemini/grok/deepseek. Il piano è evoluto v1→v7: architettura finale = **compositi per bioma come sprite Pixi nello stage esistente** (un solo WebGL context), un DisplacementFilter per sprite (ampiezza = peso bioma), displacement tile PNG condiviso decorrelato per transform, padding `2×maxAmplitudePx` + edge-extend, lifecycle con fallback DOM.
 - **Ratifiche G-0 del Director** (2026-09-08): (a) "mascherato per bioma" = compositing per bioma con gruppo residuo `terrain`; (b) reduced-motion e pausa-drag come eccezioni a "sempre attivo"; (c) camera transform ≠ trasformazione di quad.
 - **Plan battezzato: `PLAN-014-land-breath`** (`.mw/runs/2026-09-08-land-breath/` contiene bozze v1→v7 e tutte le critique). Prossimo task non bloccato: **T-000a** (pre-check numerico, zero Pixi).
+
+**Aggiornamento 2026-09-08 (T-000b completato per review):**
+- `scripts/build-land-breath-spike-assets.mjs` genera compositi per bioma con padding edge-extend 64px.
+- `public/land-breath-spike.html` è una pagina lab Pixi v7 con tre varianti (scroll/scale/combine), pesi per bioma, sea/background statici. Servita su http://127.0.0.1:5173/land-breath-spike.html.
+- `test-results/land-breath-t000b-2026-09-08.log` documenta i comandi e l'evidence. `npm run build:check` ✅, `npm run kanban:lint` ✅.
+- **Verdetto visivo richiesto al Director** per sbloccare T-001.
 
 ---
 

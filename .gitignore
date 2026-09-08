@@ -70,6 +70,7 @@ bugfix-*-prompt.md
 prompt-iv-*.md
 assets_originals/
 public/mockups/
+public/spike-land-breath/
 
 # Coordinator runtime files
 coordinator/last-run-summary.json
