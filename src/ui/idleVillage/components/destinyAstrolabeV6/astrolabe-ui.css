@@ -761,23 +761,12 @@
    V6.3 — R-067 semantic/cinematic upgrade (scoped under .da-v63 only)
    =================================================================== */
 
-/* Gap ring↔cerchio: lo spazio tra il disco dell'arena e il labbro interno
-   del bezel mostrava lo sfondo della pagina. Disco opaco "field stone"
-   (in tinta col gradiente mb-g-f del markup) sotto l'arena, esteso fino a
-   sotto il labbro del ring. */
-.da-v63 .stage::before {
-  content: '';
-  position: absolute;
-  inset: -6%;
-  border-radius: 50%;
-  background: radial-gradient(circle,
-    #010810 0%,
-    #010810 62%,
-    #02020b 78%,
-    #02020b 100%);
-  pointer-events: none;
-}
-.da-v63 .arena { background: #010810; }
+/* Gap ring↔arena: l'arena viene clippata all'interno del ring in bronzo
+   (usando inset percentuali allineati al viewBox del bezel), così il canvas
+   riempie tutto lo spazio fino al bordo e non resta il buco scuro del
+   `stage::before`. */
+.da-v63 .astro-bezel { inset: -12%; }
+.da-v63 .arena { inset: 3%; background: transparent; }
 
 /* SKILL CORE — sigillo dorato centrale che sostituisce il bottone THROW.
    Spento durante reveal, pulsante in armed, implode al click. */
