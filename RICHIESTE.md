@@ -1504,3 +1504,9 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 - **Rimangono (ordine suggerito nel piano):** F3 auto-throw countdown + Space/Enter; F4/5.7 scrim + climax per esito; F0 `phaseDurations`/`useAstrolabeV63Phase`/types; F2 placche perimetro bronzo; 5.8 fissura WebGL shader; F5 E2E/Monte Carlo; cleanup `astrolabe.css` residual.
 
 **Richiesta (2026-09-09):** *«lo sfondo di default deve essere teal, crea una versione 6.4, che sia un clone di questo codice, ma nn symlink»* — il Director vuole una directory `destinyAstrolabeV64/` con file reali copiati (non symlink, non condivisione del motore V63), sfondo default `teal`, pagina `/minimal-destiny-astrolabe-v6-4` e route in `App.tsx`.
+**Stato:** ✅ fatto (commit `a4c814ab`) — `destinyAstrolabeV64/` con engine/componente/renderer/tentacles/types reali, `astrolabeV64Config.ts` (con `phaseDurations` + `perimeterPlaques`), `destinyAstrolabeV64Kit.tsx`, route registrata, i18n `astrolabeV64.*` in en+it-IT, CSS `.da-v64`. Smoke v6-4 → 200.
+
+**Richiesta (2026-09-09):** *«adesso procedi cn il plan ma su 6.4, 6.3 è offlimits»* — i punti rimanenti del piano si implementano solo su V6.4.
+**Fatto ora:** F3 cornice quiet→tension→explosion (opacità `.astro-bezel` via `data-state`); F4/5.7 — scrim card rinforzato, `data-verdict` sul `.suite`, climax per esito (trionfo/almost-sospiro/fail-sussurro/epicfail-doom), micro-flash `--fx/--fy` sulla zona di atterraggio colorato per esito; badge pagina corretto a V6.4.
+
+**Richiesta (2026-09-09):** *«adesso procedi cn il plan ma su 6.4, 6.3 è offlimits»* — i punti rimanenti del piano `destiny_astrolabe_v63_semantic_cinematic_plan.md` si implementano solo su `destinyAstrolabeV64/` (engine, componente, config, kit, pagina v6-4, CSS `.da-v64`). V63 congelato.

@@ -1180,17 +1180,28 @@ function resolve(){
   card.classList.add(V.cls);
   void card.offsetWidth;
   card.classList.add('show');
-  /* tone per verdict */
+  /* tone per verdict + esito normalizzato esposto al CSS (F4/5.7: climax
+     differenziato per i 5 esiti). */
   const isLoss=(res.verdict==='fail'||res.verdict==='epicfail');
+  suite.dataset.verdict=verdictKey;
   if(res.verdict==='bigwin'||res.verdict==='win'){
     suite.dataset.tone='triumph';
-    $id('flare').classList.remove('fire');
-    void $id('flare').offsetWidth;
-    $id('flare').classList.add('fire');
   } else if(res.verdict==='almost'){
     suite.dataset.tone='';
   } else {
     suite.dataset.tone=(res.verdict==='epicfail')?'grim':'doom';
+  }
+  /* Micro-flash sulla ZONA di atterraggio (non al centro): la fiammata segue
+     il punto d'impatto della pallina, colorata per esito dal CSS `.da-v64`.
+     `flare` e' inset:-20% sull'arena, quindi le frazioni si riscalano /1.4. */
+  {
+    const fl=$id('flare');
+    const fx=50+(b.x/W-0.5)/1.4*100, fy=50+(b.y/W-0.5)/1.4*100;
+    fl.style.setProperty('--fx',`${fx.toFixed(1)}%`);
+    fl.style.setProperty('--fy',`${fy.toFixed(1)}%`);
+    fl.classList.remove('fire');
+    void fl.offsetWidth;
+    fl.classList.add('fire');
   }
   /* SOLAR CLIMAX — blinding burst from the core + massive unified screen punch,
      fired the same millisecond the typography appears */
