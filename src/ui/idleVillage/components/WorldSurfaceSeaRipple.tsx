@@ -47,7 +47,7 @@ export function WorldSurfaceSeaRipple({
 }
 
 /** Generate CSS keyframes that step through a sprite sheet row by row. */
-function buildSpriteKeyframes(
+export function buildSpriteKeyframes(
   name: string,
   frames: number,
   columns: number,
