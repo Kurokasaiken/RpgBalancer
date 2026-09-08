@@ -20,6 +20,7 @@ import type {
 } from './engine';
 import { ASTROLABE_MARKUP } from '@/ui/idleVillage/components/destinyAstrolabeV6/markup';
 import { useAstrolabeAudio } from '@/ui/idleVillage/components/destinyAstrolabeV6/useAstrolabeAudio';
+import { astrolabeV63Config } from '@/balancing/config/idleVillage/astrolabeV63Config';
 import '@/ui/idleVillage/components/destinyAstrolabeV6/astrolabe.css';
 import '@/ui/idleVillage/components/destinyAstrolabeV6/astrolabe-ui.css';
 
@@ -89,6 +90,8 @@ export const DestinyAstrolabeV63 = memo(
     const [autoThrowMs, setAutoThrowMs] = useState(0);
     const [skipAnimationEnabled, setSkipAnimationEnabled] = useState(skipAnimation);
     const [removeSoundsEnabled, setRemoveSoundsEnabled] = useState(removeSounds);
+    const [currentState, setCurrentState] = useState('idle');
+    const [boardInfo, setBoardInfo] = useState<{ skills: AstrolabeSkill[]; axisSkill: number[]; activeSkillIndex: number } | null>(null);
 
     const play = useAstrolabeAudio(removeSoundsEnabled);
 
@@ -193,10 +196,12 @@ export const DestinyAstrolabeV63 = memo(
         },
         onArmed: (a) => setArmed(a),
         onState: (s) => {
+          setCurrentState(s);
           if (s === 'action-trigger') play('arm', { volume: 0.6 });
           if (s === 'the-spin') play('spin', { volume: 0.5 });
           if (s === 'magnetic-snap') play('snap', { volume: 0.8 });
         },
+        onInfo: (info) => setBoardInfo({ skills: info.skills, axisSkill: info.axisSkill, activeSkillIndex: info.activeSkillIndex }),
       });
       engineRef.current = engine;
       if (autoStart) engine.roll();
@@ -228,6 +233,62 @@ export const DestinyAstrolabeV63 = memo(
           {...attributes}
           style={styles}
         />
+
+        {boardInfo && (
+          <svg
+            className={`da-skill-plaques${currentState === 'action-trigger' ? ' da-skill-plaques--armed' : ''}`}
+            viewBox="-100 -100 1200 1200"
+            preserveAspectRatio="xMidYMid meet"
+            aria-hidden="true"
+          >
+            {Array.from({ length: 5 }).map((_, i) => {
+              const skillIdx = boardInfo.axisSkill[i];
+              if (skillIdx == null) return null;
+              const sk = boardInfo.skills[skillIdx];
+              if (!sk) return null;
+              const isActive = skillIdx === boardInfo.activeSkillIndex;
+              const N = 5;
+              const angle = -Math.PI / 2 + (i * 2 * Math.PI) / N;
+              const CX = 500;
+              const CY = 500;
+              const r = 500 * astrolabeV63Config.perimeterPlaques.radiusFactor;
+              const x = CX + Math.cos(angle) * r;
+              const y = CY + Math.sin(angle) * r;
+              const { width: pw, height: ph, activeScale } = astrolabeV63Config.perimeterPlaques;
+              const show = currentState === 'action-trigger';
+              const scale = show ? (isActive ? activeScale : 1) : 0.85;
+              return (
+                <g
+                  key={i}
+                  className={`da-skill-plaque${isActive ? ' da-skill-plaque--active' : ''}`}
+                  style={{
+                    transform: `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${scale.toFixed(3)})`,
+                    opacity: show ? 1 : 0,
+                    transitionDelay: `${i * 60}ms`,
+                  }}
+                >
+                  <rect
+                    x={-pw / 2}
+                    y={-ph / 2}
+                    width={pw}
+                    height={ph}
+                    rx={ph / 4}
+                    className="da-skill-plaque__bg"
+                  />
+                  <text
+                    className="da-skill-plaque__text"
+                    x={0}
+                    y={0}
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                  >
+                    {sk.icon ? `${sk.icon} ${sk.name}` : sk.name}
+                  </text>
+                </g>
+              );
+            })}
+          </svg>
+        )}
 
         {armed && (
           <button
