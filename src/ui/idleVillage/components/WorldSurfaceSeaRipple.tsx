@@ -133,6 +133,7 @@ interface SmilSeaRippleProps {
 
 function SmilSeaRipple({ zIndex, worldName, seaFile, cfg }: SmilSeaRippleProps) {
   const imageUrl = `/assets/world/${encodeURIComponent(worldName)}/base/layers/${encodeURIComponent(seaFile)}`;
+  const maskUrl = cfg.mask;
 
   return (
     <div
@@ -148,7 +149,7 @@ function SmilSeaRipple({ zIndex, worldName, seaFile, cfg }: SmilSeaRippleProps) 
       <style>{`
         @keyframes wsSeaRippleDrift {
           0% { transform: translate3d(0, 0, 0) scale(1.0); }
-          50% { transform: translate3d(-80px, 40px, 0) scale(1.06); }
+          50% { transform: translate3d(-24px, 12px, 0) scale(1.015); }
           100% { transform: translate3d(0, 0, 0) scale(1.0); }
         }
         @media (prefers-reduced-motion: reduce) {
@@ -165,9 +166,17 @@ function SmilSeaRipple({ zIndex, worldName, seaFile, cfg }: SmilSeaRippleProps) 
           backgroundSize: '100% 100%',
           backgroundRepeat: 'no-repeat',
           backgroundPosition: '0 0',
-          opacity: 0.8,
-          mixBlendMode: 'screen',
+          opacity: 0.5,
+          mixBlendMode: 'overlay',
           animation: `wsSeaRippleDrift ${cfg.seconds ?? 18}s ease-in-out infinite`,
+          maskImage: `url(${maskUrl})`,
+          WebkitMaskImage: `url(${maskUrl})`,
+          maskSize: '100% 100%',
+          WebkitMaskSize: '100% 100%',
+          maskRepeat: 'no-repeat',
+          WebkitMaskRepeat: 'no-repeat',
+          maskPosition: '0 0',
+          WebkitMaskPosition: '0 0',
         }}
       />
     </div>

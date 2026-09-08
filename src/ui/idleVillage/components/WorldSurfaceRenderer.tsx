@@ -862,7 +862,7 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
               worldName={manifest.world}
               seaFile={seaLayer.file}
               zoom={camera.zoom}
-              zIndex={cloudZIndex - 5.5}
+              zIndex={frameZIndex - 1}
             />
           )}
           {/* Cloud shadows drift across the land, below the weather. */}
