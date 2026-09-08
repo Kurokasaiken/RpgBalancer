@@ -649,20 +649,22 @@ function tickTimeline(){
     const spd=Math.hypot(b.vx,b.vy);
     const close=target?Math.hypot(target.x-b.x,target.y-b.y):0;
     if(target&&(p>=1||(p>0.5&&close<10&&spd<0.7))){
+      /* con la trazione di coda la pallina e' gia' quasi sul punto: lo snap
+         residuo e' invisibile (<3px). magnetic-snap resta solo come fallback
+         se la fisica non e' converguta in tempo. */
       if(close<3){ b.x=target.x; b.y=target.y; resolve(); }
       else{ setState('magnetic-snap'); }
     }else if(!target&&p>=1){ resolve(); }
   }
   else if(s==='magnetic-snap'){
-    /* la calamita finale: glide esponenziale verso il landing pre-rollato,
-       poi risoluzione. Dura al piu' cfg.tSnap ms. */
+    /* fallback raro: se a fine spin la pallina e' lontana dal landing, la
+       porta a destinazione in un micro-glide veloce (~300ms), non un volo. */
     const b=scene.ball, target=scene.targetPos;
     if(!target){ resolve(); return; }
-    const p=phaseT(cfg.tSnap||650);
-    const pull=1-Math.pow(0.001,Math.min(1,p*1.15));   // easing aggressivo ma continuo
-    b.x+=(target.x-b.x)*pull*0.22;
-    b.y+=(target.y-b.y)*pull*0.22;
-    b.vx*=0.7; b.vy*=0.7;
+    const p=phaseT(300);
+    b.x+=(target.x-b.x)*0.35;
+    b.y+=(target.y-b.y)*0.35;
+    b.vx*=0.5; b.vy*=0.5;
     const close=Math.hypot(target.x-b.x,target.y-b.y);
     if(close<2||p>=1){ b.x=target.x; b.y=target.y; resolve(); }
   }
@@ -965,6 +967,20 @@ function stepBall(p){
     b.vy+=steerVy*steerMag*f;
   }
   b.x+=b.vx*f; b.y+=b.vy*f;
+  /* R-067 RUOTA DELLA FORTUNA — nell'ultimo tratto la pallina converge
+     direttamente sul punto di arrivo: la "decelerazione" E' l'arrivo, non uno
+     snap a parte. Trazione posizionale esponenziale che cresce col grip, così
+     la pallina inchioda dolcemente sul landing pre-rollato. */
+  if(target&&p>0.5){
+    const late=(p-0.5)/0.5;
+    const pull=0.02+0.30*late*late;
+    b.x+=(target.x-b.x)*pull*f;
+    b.y+=(target.y-b.y)*pull*f;
+    /* quando e' vicina, la velocita' residua si spegne invece di farla
+       rimbalzare via: e' la ruota che inchioda sulla casella */
+    const dLeft=Math.hypot(target.x-b.x,target.y-b.y);
+    if(dLeft<26){ const k=Math.pow(0.80,f); b.vx*=k; b.vy*=k; }
+  }
   /* scatter amount: full early, fades as ball slows */
   const chaos=1-grip*0.6;
 
