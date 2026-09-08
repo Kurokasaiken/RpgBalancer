@@ -20,6 +20,7 @@ import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 import { eventShroudGradeConfig } from '@/balancing/config/idleVillage/eventShroudGradeTokens';
 
 const WorldSurfaceWaves = lazy(() => import('./WorldSurfaceWaves'));
+const WorldSurfaceSeaMarks = lazy(() => import('./WorldSurfaceSeaMarks'));
 const WorldSurfaceWaterField = lazy(() => import('./WorldSurfaceWaterField'));
 const WorldSurfaceClouds = lazy(() => import('./WorldSurfaceClouds'));
 const WorldSurfaceCloudShadows = lazy(() => import('./WorldSurfaceCloudShadows'));
@@ -128,6 +129,8 @@ interface WorldSurfaceRendererProps {
   onEventCardClose?: () => void;
   /** When true, the water field micro-detail overlay is rendered on the sea. */
   showWaterField?: boolean;
+  /** When true, sparse painted sea marks are rendered on the sea. */
+  showSeaMarks?: boolean;
   /** Optional override for the water field configuration (used by the lab page). */
   waterFieldConfig?: WaterFieldConfig;
   /** When true, the ambient light-ray and dust layer is rendered. */
@@ -246,6 +249,7 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
   autoFitTrigger = 1,
   breathEnabled = false,
   showWaterField = false,
+  showSeaMarks = true,
   showAtmosphere = false,
   showGlass = true,
   waterFieldConfig,
@@ -808,6 +812,7 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
           {/* Wave marks break on the shoreline, at the bottom of the atmosphere
               stack: they belong to the water surface, not to the sky. */}
           <WorldSurfaceWaves zIndex={cloudZIndex - 4} />
+          <WorldSurfaceSeaMarks zIndex={cloudZIndex - 4} enabled={showSeaMarks} />
           {/* Water field: broad light pools and drifting micro-detail over the sea. */}
           {showWaterField && (
             <>

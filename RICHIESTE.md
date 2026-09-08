@@ -160,6 +160,12 @@ Questo file è la bussola operativa. Contiene ciò che Fausto ha chiesto, con le
 |
 |**Collegamenti:** `src/docs/docs/plans/world_surface_v3_strategic_plan.md`, `src/docs/docs/plans/world_surface_v3_tactical_plan.md`, `src/docs/docs/plans/world_surface_v3_subplans_index.md`, `src/docs/docs/plans/component_based_world_surface_plan.md`, `src/docs/docs/idle_village/COMPONENT_MASTER_INDEX.md` (riga `world-surface-component`), `DESIGN_PILLARS.md`, `src/ui/idleVillage/worldSurface/`, `/tmp/ws_broadcast/BROADCAST.md` (output multi-AI), `.mw/desiderata.md`, `src/ui/idleVillage/frozen/kits/clockKit.tsx`, `test-results/world-surface-v3-subplan-A-critique/synthesis.md`.
 
+**Aggiornamento 2026-09-08 (breathing terraferma):**
+- Il Director ha sottoposto un plan esterno "World Surface Breathing Animation" (feDisplacementMap su DOM, translate, opacity pulsing). Esito della critica: **scartato** — torna a deformare i layer baked via CSS/SVG filter su `<img>` 4240×2828, direzione già fallita in Slice 1 e vietata dal Pillar; `useBreather` con setInterval+setState a 60fps per layer è un costo non sostenibile su WebView.
+- Decisione Director: la mappa è troppo statica anche con la vita ambientale esistente → **vuole la materia della terraferma che si muove**. Il vincolo "i layer full-canvas restano fermi" è **eliminato** dal Pillar 1 (§21 e §38 emendati): restano vietate le trasformazioni dei quad (translate/tilt/scale), ammessa la deformazione in-place via displacement.
+- **Desiderata v21 FROZEN**: battito globale continuo, sempre attivo, solo terraferma (mare escluso, ha il suo cantiere), displacement field animato in Pixi mascherato per bioma (riuso `land_mask`/`sea_mask`), config-first, profilazione Tauri obbligatoria.
+- Prossimo passo: piano implementativo (mw-planner) — il codice esistente (`WorldBreathingLayer`, `useBreather`, `BREATHING_CONFIG`, `BREATH_MAP` vuoto in `WorldSurfaceRenderer.tsx:70`) va rivisto o sostituito alla luce della rotta Pixi.
+
 ---
 
 ## R-004 — Skill operative = Mind Weaver; le skill storiche di RPG sono contesto, non invocabili
@@ -1425,3 +1431,39 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 3. Far sì che `EquipmentCostModule` calcoli costo/power su `(value - baseline) × weight` usando la baseline corretta (template o config).
 4. Produrre piano/task list compatibili con `MASTER_PLAN.md` se richiesto.
 **Vincoli:** Equipment Creator consuma Balancer per baseline, pesi, stats, range; niente valori hardcoded di gameplay; rispettare config-first e weight-based creator pattern; non promuovere valori sperimentali a canonici.
+
+---
+
+## R-066 — Sea Effect Lab: solo il mare, molti riquadri con le soluzioni a confronto
+
+**Richiesta:** *«lascia solo il mare, togli tutto il resto. poi fammi tanti piccoli riquadri con solo il mare e le diverse soluzioni»* (su `/sea-effect-lab`), preceduta da *«mi serve un piano per mostrare l'effetto del mare che si muove leggermente»* su `/world-surface`.
+**Data:** 2026-09-06
+**Stato:** `in corso`
+**Desiderata FROZEN:** v19 — «voglio una pagina ad hoc x il mare con diversi tentativi uno accanto all'altro» e «per l'acqua serve un piano intelligente, non altri tentativi alla cieca».
+**Cosa è successo:**
+1. `SeaEffectLabPage.tsx` riscritta: via `WorldSurfaceRenderer`, via nuvole/ombre/schiuma/uccelli/vetro/cornice. Resta il solo layer `Mare.webp` (con `Background.webp` opzionale sotto).
+2. Griglia di 12 riquadri, uno per tecnica candidata: statico, dashes dipinte, luce che scorre, ripple leggero/forte/swell (feTurbulence + feDisplacementMap animati in SMIL), doppia copia in soft-light, micro-dettaglio water_detail, riflessi, shimmer, respiro di colore, combo.
+3. Quattro crop selezionabili, verificati contro l'alpha del layer mare: `Mare aperto`, `Fascia ovest`, `Stretto est`, `Isolotto sud`. Numero di colonne regolabile.
+4. Nessun RAF: solo keyframe CSS e SMIL, così le animazioni girano anche nel preview pane.
+5. `PLAN-013 — World Surface Sea Marks` redatto e sottoposto a ChatGPT, Claude, Gemini, Grok, DeepSeek: ChatGPT, Claude e DeepSeek hanno approvato; Gemini non ha ricevuto il prompt per un bug dell'adattatore web; Grok è in rate limit. Piano registrato in `plans/PLAN-013-sea-marks.md` e `ROADMAP.md`.
+**Prima evidenza:** sui crop di mare aperto il dipinto è quasi un gradiente piatto e il displacement non si vede — conferma il docblock di `WorldSurfaceWaves.tsx`. Sul crop `Isolotto sud`, dove il dipinto ha texture (anelli d'inchiostro, costa), lo stesso filtro ha qualcosa su cui agire.
+**Cosa manca:**
+1. Veredetto finale di Grok e Gemini per piena unanimità (Grok rate limit; Gemini adattatore rotto).
+2. Esecuzione di `PLAN-013` con evidence log Tauri e decisione del Director sul gate aperto vs coste-only.
+3. Profilazione della tecnica scelta su WebView/Tauri prima di portarla nel renderer.
+4. Riparare `tests/unit/frozen/worldSurfaceKit.alignment.test.ts` (25/49 rossi: `pngSize()` legge l'header IHDR ma gli asset sono `.webp`).
+**Vincoli:** il lab è uno strumento di confronto, non produzione; nessun layer full-canvas mosso con transform; `prefers-reduced-motion` rispettato; la tecnica vincente va ricostruita config-first dentro `WorldSurfaceRenderer`.
+
+---
+
+## R-067 — Plan di miglioramento per Destiny Astrolabe V6.3
+
+**Richiesta:** *«Crea un plan di miglioramento per /minimal-destiny-astrolabe-v6-3 incorporando le critiche e le proposte di ChatGPT, Claude e Gemini. Usa un hat corretto e la skill explorer.»*
+**Data:** 2026-09-08
+**Stato:** `aperta`
+**Desiderata FROZEN:** `.mw/desiderata.md` v3/v4 (Destiny Astrolabe V1 canonico per skill check POI quest), v9 (geometria avversariale libera), v8 (Golden UI Foundation come processo di congelamento visivo).
+**Cosa è successo:** Il Director ha condiviso tre feedback multi-AI (ChatGPT Lead UI/UX AAA, Claude, Gemini) sull'astrolabe V6.3, evidenziando problemi di semantica, art direction, affordance, tensione e climax.
+**Cosa è successo:** Il Director ha condiviso tre feedback multi-AI (ChatGPT Lead UI/UX AAA, Claude, Gemini) sull'astrolabe V6.3, evidenziando problemi di semantica, art direction, affordance, tensione e climax.
+**Risposta Director (2026-09-08):** direzione A+B. Skill labels sugli assi come in Asterism V6. Informazioni visibili prima del lancio; il THROW è solo il lancio del dado.
+**Piano:** [src/docs/docs/plans/destiny_astrolabe_v63_semantic_cinematic_plan.md](src/docs/docs/plans/destiny_astrolabe_v63_semantic_cinematic_plan.md).
+**Cosa manca:** avallo esecutivo e inizio F0 (audit, contratto, config).
