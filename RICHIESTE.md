@@ -1470,7 +1470,6 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 12. **Feedback visuale del Director (2026-09-08):** screenshot del lab mostra che `07b`, `09` e `09b` non risolvono il mare aperto: `micro-dettaglio` sembra lago/raindrop, `shimmer` sembra una proiezione geometrica. La critica è confermata: il mare aperto del dipinto è quasi un gradiente piatto e qualsiasi overlay texturale risulta artificiale.
 13. **Feedback video del Director (2026-09-08):** «09c caustics organiche è promettente, ma è un rettangolo bianco che passa super velocemente» e «nn si vede nulla, nn si capisce, ma nel fermo immagine è lui». La forma statica è corretta, ma in movimento non si percepisce come mare: le caustics cambiano forma senza scorrere, quindi non danno l'impressione di onde che avanzano.
 14. **Richiesta del Director (2026-09-08):** «usa il protocollo multi AI web con hat e prompt potenziato, scrivi bene il problema e come possiamo risolverlo» — per trovare un asset/approccio "ocean scrolling" che non sia geometrico né ripetitivo.
-15. **Risposta multi-AI (2026-09-08):** chatgpt e claude concordano che il problema è mancanza di scroll/direzione, non di forma. Consigliano: heightmap/flow map direzionale, Pixi `DisplacementFilter` con due mappe scrollate in direzioni diverse, oppure CSS/SVG `feTurbulence`/`feOffset` animato. La ricerca punta a asset "ocean waves scrolling / directional wave heightmap / flow map", non caustics o raindrop.
 **Prima evidenza:** sui crop di mare aperto il dipinto è quasi un gradiente piatto e il displacement non si vede — conferma il docblock di `WorldSurfaceWaves.tsx`. Sul crop `Isolotto sud`, dove il dipinto ha texture (anelli d'inchiostro, costa), lo stesso filtro ha qualcosa su cui agire. La variante `rippleSoft` mascherata a coste è l'unica che il Director ha approvato per la mappa vera.
 **Cosa manca:**
 1. Veredetto finale di Grok e Gemini per piena unanimità (Grok rate limit; Gemini adattatore rotto).
@@ -1499,7 +1498,7 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 
 **Blocco emerso (2026-09-08):** l'outer bronze ring lascia uno spazio vuoto intorno al componente interno. Fix: `astro-bezel` passa a `inset: -12%` (scende in percentuale col `.stage`), `arena` clippata a `inset: 3%` per allinearsi al bordo interno del ring; rimosso `stage::before` scuro che creava alone vuoto. Build:check, test astrolabe e kanban:lint passati.
 
-**Richiesta in corso (2026-09-08):** completare i punti rimanenti del piano `destiny_astrolabe_v63_semantic_cinematic_plan.md`.
-- **Completati:** F4 resolution card, default teal tarato, trajectory state machine, F3, F2 (skill plaques on bronze bezel con active highlight).
-- **Nota:** F0 (centralizzazione `phaseDurations`) è sperimentale e disponibile solo sulla route `http://localhost:5173/minimal-destiny-astrolabe-v6-4`; `minimal-destiny-astrolabe-v6-3` resta pre-F0.
-- **Pendenti:** F5 (test E2E/RTL), fissura WebGL shader, cleanup `astrolabe.css` residual.
+**Richiesta in corso (2026-09-08/09):** completare i punti rimanenti del piano `destiny_astrolabe_v63_semantic_cinematic_plan.md` e mantenere il piano sincronizzato con lo stato reale.
+- **Completato 2026-09-08:** F4 card — frase narrativa per skill (`copy.narrativeFlavors`, i18n `en`+`it-IT`), math esplicito `D100 {{roll}} · TST = 50 + ({{stat}} − {{difficulty}}) = {{tst}}`, backdrop `teal` ritocciato (meno verde).
+- **Completato 2026-09-09:** sync completo del piano — tabella stato §0bis, note per F0–F5 e §5.5–5.10, §7 chiuso con decisioni e ordine suggerito.
+- **Rimangono (ordine suggerito nel piano):** F3 auto-throw countdown + Space/Enter; F4/5.7 scrim + climax per esito; F0 `phaseDurations`/`useAstrolabeV63Phase`/types; F2 placche perimetro bronzo; 5.8 fissura WebGL shader; F5 E2E/Monte Carlo; cleanup `astrolabe.css` residual.
