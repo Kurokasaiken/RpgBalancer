@@ -207,18 +207,15 @@ export const DestinyAstrolabeV63 = memo(
         {armed && boardInfo && (
           <div className="da-v63-preroll" aria-hidden="true">
             <div className="da-v63-preroll__skills">
-              {boardInfo.skills.map((sk, i) => {
-                const tst = Math.max(1, Math.min(99, 50 + (sk.stat - sk.difficulty)));
-                return (
-                  <span key={i} className="da-v63-preroll__pill">
-                    {sk.icon ? <span className="da-v63-preroll__icon">{sk.icon}</span> : null}
-                    <span className="da-v63-preroll__name">{sk.name}</span>
-                    <span className="da-v63-preroll__vals">
-                      {t('astrolabeV63.statVsDc', { stat: sk.stat, dc: sk.difficulty, tst })}
-                    </span>
+              {boardInfo.skills.map((sk, i) => (
+                <span key={i} className="da-v63-preroll__pill">
+                  {sk.icon ? <span className="da-v63-preroll__icon">{sk.icon}</span> : null}
+                  <span className="da-v63-preroll__name">{sk.name}</span>
+                  <span className="da-v63-preroll__vals">
+                    {t('astrolabeV63.statVsDc', { stat: sk.stat, difficulty: sk.difficulty })}
                   </span>
-                );
-              })}
+                </span>
+              ))}
             </div>
             <div className="da-v63-preroll__bottom">
               <span className="da-v63-preroll__prob">

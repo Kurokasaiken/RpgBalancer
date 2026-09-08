@@ -224,7 +224,7 @@ export default interface Resources {
     },
     "astrolabeV63": {
       "check": "Check",
-      "mathFmt": "D100 {{roll}} · TST {{tst}}",
+      "mathFmt": "D100 roll {{roll}} · needed ≤ {{tst}}",
       "narrative": {
         "almost": "A breath, and the truth escapes you.",
         "bigwin": "Fate bows to your step.",
@@ -232,11 +232,11 @@ export default interface Resources {
         "fail": "Your grip slips.",
         "win": "The trial yields to your effort."
       },
-      "probability": "Success ~{{pct}}%",
+      "probability": "Success chance ~{{pct}}%",
       "risk": "Wound {{wound}}% · Death {{dead}}%",
       "riskDead": "Fallen",
       "riskWounded": "Wounded",
-      "statVsDc": "{{stat}} vs DC {{difficulty}} · TST {{tst}}",
+      "statVsDc": "{{stat}} vs difficulty {{difficulty}}",
       "verdict": {
         "almost": "BY A BREATH",
         "bigwin": "TRIUMPH",

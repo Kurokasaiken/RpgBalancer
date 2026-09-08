@@ -661,12 +661,12 @@
   },
   "astrolabeV63": {
     "check": "Prova",
-    "statVsDc": "{{stat}} vs DC {{difficulty}} · TST {{tst}}",
-    "probability": "Successo ~{{pct}}%",
+    "statVsDc": "{{stat}} contro difficoltà {{difficulty}}",
+    "probability": "Probabilità di riuscita ~{{pct}}%",
     "risk": "Ferita {{wound}}% · Morte {{dead}}%",
     "riskWounded": "Ferito",
     "riskDead": "Caduto",
-    "mathFmt": "D100 {{roll}} · TST {{tst}}",
+    "mathFmt": "Dado {{roll}} · serviva ≤ {{tst}}",
     "verdict": {
       "bigwin": "TRIONFO",
       "win": "SUCCESSO",

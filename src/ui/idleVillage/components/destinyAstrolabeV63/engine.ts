@@ -641,15 +641,30 @@ function tickTimeline(){
   else if(s==='the-spin'){
     const p=phaseT(cfg.tSpin);
     stepBall(p);
-    /* resolve when the ball has reached its pre-rolled landing */
+    /* R-067: niente snap secco a fine spin — se la pallina non e' ancora sul
+       bersaglio entra in 'magnetic-snap' e ci scivola VISIBILMENTE, cosi' il
+       punto dove l'occhio la segue e' il punto dove davvero si ferma. */
     const b=scene.ball;
     const target=scene.targetPos;
     const spd=Math.hypot(b.vx,b.vy);
     const close=target?Math.hypot(target.x-b.x,target.y-b.y):0;
-    if(p>=1||(p>0.5&&close<10&&spd<0.7)){
-      if(target){ b.x=target.x; b.y=target.y; }
-      resolve();
-    }
+    if(target&&(p>=1||(p>0.5&&close<10&&spd<0.7))){
+      if(close<3){ b.x=target.x; b.y=target.y; resolve(); }
+      else{ setState('magnetic-snap'); }
+    }else if(!target&&p>=1){ resolve(); }
+  }
+  else if(s==='magnetic-snap'){
+    /* la calamita finale: glide esponenziale verso il landing pre-rollato,
+       poi risoluzione. Dura al piu' cfg.tSnap ms. */
+    const b=scene.ball, target=scene.targetPos;
+    if(!target){ resolve(); return; }
+    const p=phaseT(cfg.tSnap||650);
+    const pull=1-Math.pow(0.001,Math.min(1,p*1.15));   // easing aggressivo ma continuo
+    b.x+=(target.x-b.x)*pull*0.22;
+    b.y+=(target.y-b.y)*pull*0.22;
+    b.vx*=0.7; b.vy*=0.7;
+    const close=Math.hypot(target.x-b.x,target.y-b.y);
+    if(close<2||p>=1){ b.x=target.x; b.y=target.y; resolve(); }
   }
   /* decay one-shot fx */
   scene.gooRipple=Math.max(0,scene.gooRipple-0.02);
@@ -1091,7 +1106,7 @@ function resolve(){
   {
     const sk=skills[skillIndex]||{name:'Skill',stat:60,difficulty:50};
     const tst=clamp(50+(sk.stat-sk.difficulty),1,99);
-    const mathFmt=(cfg.copy&&cfg.copy.mathFmt)||'D100 {{roll}} · TST {{tst}}';
+    const mathFmt=(cfg.copy&&cfg.copy.mathFmt)||'Dado {{roll}} · serviva ≤ {{tst}}';
     $id('cardSub').textContent=outcomeRoll>0
       ? mathFmt.replace(/\{\{?roll\}?\}/,String(outcomeRoll)).replace(/\{\{?tst\}?\}/,String(tst))
       : `${sk.name}`;
@@ -2229,6 +2244,44 @@ function drawPillar(pl,isWhite){
   ctx.restore();
 }
 
+/* R-067 — ZONE GUIDE: le fasce di esito esistono nella fisica ma non si
+   vedevano. Due contorni sottili e leggibili durante il pre-roll:
+   · ALMOST: cordolo ambrato appena fuori dal bordo della stella;
+   · EPIC (fallimento critico): bordo interno scuro-viola del catrame. */
+function drawZoneGuides(now){
+  const s=scene.state;
+  const vis=(s==='risk-pour'||s==='action-trigger')?1:(s==='agency-burst'?clamp(scene.starScale,0,1):0);
+  if(vis<=0.02||scene.starScale<=0.01) return;
+  const t=now/1000;
+  const SEG=240;
+  ctx.save();
+  /* fascia ALMOST — tratteggio ambrato appena oltre il bordo stella */
+  ctx.setLineDash([6,8]);
+  ctx.lineWidth=1.6;
+  ctx.strokeStyle=`rgba(230,170,80,${(0.5*vis*(0.75+0.25*Math.sin(t*2.2))).toFixed(3)})`;
+  ctx.beginPath();
+  for(let i=0;i<=SEG;i+=1){
+    const a=-Math.PI/2+i/SEG*TAU;
+    const r=rStarAt(a,scene.starScale)*(1+geo.almostFactor);
+    const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+  /* fascia EPIC — il margine interno del catrame (fallimento critico) */
+  ctx.setLineDash([3,10]);
+  ctx.lineWidth=2.2;
+  ctx.strokeStyle=`rgba(170,80,220,${(0.42*vis*(0.7+0.3*Math.sin(t*1.7+1))).toFixed(3)})`;
+  ctx.beginPath();
+  for(let i=0;i<=SEG;i+=1){
+    const a=-Math.PI/2+i/SEG*TAU;
+    const r=rCheckAt(a)*(1-geo.epicFactor);
+    const x=CX+Math.cos(a)*r, y=CY+Math.sin(a)*r;
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+}
 function drawShocks(dt){
   for(let i=scene.shocks.length-1;i>=0;i-=1){
     const s=scene.shocks[i]; s.t+=dt;
@@ -2344,6 +2397,7 @@ function renderFrame(now){
   drawAxisRig(now);
   drawBlueprint(now);
   drawStar(now);
+  drawZoneGuides(now);
   /* V6: drawValleyRisks() disattivato — ferita e morte tornano con una
      grammatica propria, fuori dall'area del goo. */
   scene.whitePillars.forEach(p=>drawPillar(p,true));  // draw first (behind)
