@@ -94,8 +94,19 @@ export const DestinyAstrolabeV63 = memo(
     /* R-067: copy i18n iniettata nell'engine via config.copy — nessuna stringa
        utente nuova hardcoded nel motore (fallback interni restano per la pagina
        standalone senza i18n). */
-    const copy = React.useMemo(
-      () => ({
+    const copy = React.useMemo(() => {
+      const narrativeFor = (skillName: string, verdict: string) => {
+        const fallback = t(`astrolabeV63.narrative.${verdict}`);
+        return t(`astrolabeV63.narrative.${skillName}.${verdict}`, { defaultValue: fallback });
+      };
+      const narrativeFlavors: Record<string, Record<string, string>> = {};
+      skills.forEach((sk) => {
+        narrativeFlavors[sk.name] = {};
+        ['bigwin', 'win', 'almost', 'fail', 'epicfail'].forEach((v) => {
+          narrativeFlavors[sk.name][v] = narrativeFor(sk.name, v);
+        });
+      });
+      return {
         mathFmt: t('astrolabeV63.mathFmt'),
         chips: {
           wounded: t('astrolabeV63.riskWounded'),
@@ -108,9 +119,9 @@ export const DestinyAstrolabeV63 = memo(
           fail: { title: t('astrolabeV63.verdict.fail'), sub: t('astrolabeV63.narrative.fail') },
           epicfail: { title: t('astrolabeV63.verdict.epicfail'), sub: t('astrolabeV63.narrative.epicfail') },
         },
-      }),
-      [t],
-    );
+        narrativeFlavors,
+      };
+    }, [t, skills]);
     const engineConfig = React.useMemo(
       () => ({ ...(config ?? {}), copy }),
       [config, copy],

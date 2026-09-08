@@ -647,7 +647,7 @@
     "risk": "Wound {{wound}}% · Death {{dead}}%",
     "riskWounded": "Wounded",
     "riskDead": "Fallen",
-    "mathFmt": "D100 roll {{roll}} · needed ≤ {{tst}}",
+    "mathFmt": "D100 {{roll}} · TST = 50 + ({{stat}} − {{difficulty}}) = {{tst}}",
     "verdict": {
       "bigwin": "TRIUMPH",
       "win": "SUCCESS",
@@ -660,7 +660,42 @@
       "win": "The trial yields to your effort.",
       "almost": "A breath, and the truth escapes you.",
       "fail": "Your grip slips.",
-      "epicfail": "The world pushes you back."
+      "epicfail": "The world pushes you back.",
+      "Atletica": {
+        "bigwin": "You clear every barrier with a legendary leap.",
+        "win": "Your body sails past the obstacle.",
+        "almost": "Your foot slips, but you catch the edge.",
+        "fail": "The obstacle holds against your push.",
+        "epicfail": "You fall hard, breath knocked from your lungs."
+      },
+      "Destrezza": {
+        "bigwin": "Your wrists outrace the trap in an instant.",
+        "win": "Your fingers find the mechanism without hesitation.",
+        "almost": "A click: the trigger grazes your finger.",
+        "fail": "The mechanism jams before the release.",
+        "epicfail": "The trap springs, merciless."
+      },
+      "Forza": {
+        "bigwin": "The door gives under a terrible blow.",
+        "win": "The hinges groan and yield.",
+        "almost": "The wood splits but still holds.",
+        "fail": "The door stands harder than you thought.",
+        "epicfail": "Your fist rebounds, hurting you."
+      },
+      "Intelletto": {
+        "bigwin": "The pieces snap into a luminous truth.",
+        "win": "The riddle opens like a rose.",
+        "almost": "One detail escapes, but you are close.",
+        "fail": "The solution slips through your fingers.",
+        "epicfail": "Your mind clouds before the mystery."
+      },
+      "Carisma": {
+        "bigwin": "Your words bend the world to your will.",
+        "win": "The listener relents with a sigh.",
+        "almost": "For a moment they almost yield, then no.",
+        "fail": "Your tone finds no purchase.",
+        "epicfail": "The room turns cold: you stand alone."
+      }
     }
   }
 }
