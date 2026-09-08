@@ -30,6 +30,7 @@ const BACKGROUND_SRC = '/assets/world/wanderlust/base/layers/Background.webp';
 const SEA_MASK_SRC = '/assets/atmosphere/terrain/sea_mask.webp';
 const SHALLOW_MASK_SRC = '/assets/atmosphere/terrain/shallow_mask.webp';
 const SPRITE_SRC = '/assets/atmosphere/sea/ripples_sprite.webp';
+const CAUSTICS_SRC = '/assets/atmosphere/sea/caustics_sprite.webp';
 const WAVE_DIR = '/assets/atmosphere/waves';
 const WATER_DIR = '/assets/atmosphere/water';
 
@@ -80,6 +81,7 @@ type VariantId =
   | 'glints'
   | 'shimmer'
   | 'shimmerOpen'
+  | 'caustics'
   | 'tint'
   | 'combo';
 
@@ -106,6 +108,7 @@ const VARIANTS: Variant[] = [
   { id: 'glints', label: '08 · Riflessi', note: 'Punti speculari che pulsano.' },
   { id: 'shimmer', label: '09 · Shimmer', note: 'Bande chiare in maschera scorrevole.' },
   { id: 'shimmerOpen', label: '09b · Shimmer mare aperto', note: 'Shimmer più ampio, mascherato su tutto il mare.' },
+  { id: 'caustics', label: '09c · Caustics organiche', note: 'Asset OpenGameArt 16 frame, forme irregolari non geometriche.' },
   { id: 'tint', label: '10 · Respiro di colore', note: 'Solo tinta che pulsa. Zero geometria.' },
   { id: 'combo', label: '11 · Combo', note: 'Ripple leggero + luce + dashes.' },
 ];
@@ -543,6 +546,46 @@ function VariantOverlay({ variant, crop, seed, zoom, gain }: {
             animationIterationCount: 'infinite',
           }}
         />
+      );
+    }
+    case 'caustics': {
+      const frames = 16;
+      const cols = 4;
+      const rows = 4;
+      const cycle = 3;
+      const keyframes = buildSpriteKeyframes('seaLabCaustics', frames, cols, rows);
+      const maskW = SEA_W * zoom;
+      const maskH = SEA_H * zoom;
+      const maskPosX = -crop.x * maskW;
+      const maskPosY = -crop.y * maskH;
+      return (
+        <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
+          <style>{keyframes}</style>
+          <div
+            className="sea-lab-anim"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              backgroundImage: `url(${CAUSTICS_SRC})`,
+              backgroundSize: `${cols * 100}% ${rows * 100}%`,
+              backgroundRepeat: 'no-repeat',
+              opacity: Math.min(1, 0.45 * gain),
+              mixBlendMode: 'screen',
+              maskImage: `url(${SEA_MASK_SRC})`,
+              WebkitMaskImage: `url(${SEA_MASK_SRC})`,
+              maskSize: `${maskW}px ${maskH}px`,
+              WebkitMaskSize: `${maskW}px ${maskH}px`,
+              maskPosition: `${maskPosX}px ${maskPosY}px`,
+              WebkitMaskPosition: `${maskPosX}px ${maskPosY}px`,
+              maskRepeat: 'no-repeat',
+              WebkitMaskRepeat: 'no-repeat',
+              animationName: 'seaLabCaustics',
+              animationDuration: `${cycle}s`,
+              animationTimingFunction: `steps(${frames - 1})`,
+              animationIterationCount: 'infinite',
+            }}
+          />
+        </div>
       );
     }
     case 'tint':
