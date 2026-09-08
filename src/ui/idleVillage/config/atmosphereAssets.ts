@@ -424,8 +424,8 @@ export const atmosphereAssets: AtmosphereConfig = {
   waves: {
     cycleSeconds: 30,
     visibleFraction: 0.45,
-    opacity: 0.75,
-    bobWorldPx: 3,
+    opacity: 0.9,
+    bobWorldPx: 12,
     marks: [
     { src: 'waves/onda2.webp', x: 3822, y: 1408, width: 340, height: 142, delaySeconds: 0.0, flip: false },
     { src: 'waves/ondine1.webp', x: 75, y: 1499, width: 280, height: 117, delaySeconds: 4.5, flip: true },
