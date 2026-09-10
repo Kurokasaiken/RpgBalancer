@@ -43,13 +43,6 @@ export interface TarGooRenderer {
   destroy(): void;
 }
 
-/* 24 e non 12: i tentacoli entrano come primitive (5 bracci x 4 campioni = 20) e
-   devono convivere con le gocce che strisciano. Il costo e' un ciclo di distanze
-   in piu' per pixel sul solo quad del board, non una passata a schermo pieno. */
-/* 7 bracci x 4 campioni = 28 primitive per i soli tentacoli: con il tetto a 24
-   l'ultimo braccio spariva e le gocce non entravano proprio. */
-const MAX_BLOBS = 36;
-
 const VERT = `#version 300 es
 precision highp float;
 in vec2 aPos;
@@ -57,7 +50,7 @@ void main(){ gl_Position = vec4(aPos, 0.0, 1.0); }
 `;
 
 /** Builds the fragment shader with compile-time sample/blob counts baked in. */
-function fragSource(samples: number): string {
+function fragSource(samples: number, maxBlobs: number): string {
   return `#version 300 es
 precision highp float;
 out vec4 outColor;
@@ -65,7 +58,7 @@ out vec4 outColor;
 uniform vec2 uSize;          // canvas size in px
 uniform vec2 uCenter;        // goo center in px
 uniform float uRadii[${samples}];
-uniform vec3 uBlobs[${MAX_BLOBS}];
+uniform vec3 uBlobs[${maxBlobs}];
 uniform int uBlobCount;
 uniform float uTime;         // seconds
 uniform float uReveal;
@@ -74,6 +67,11 @@ uniform float uRipple;
 uniform float uSminK;
 uniform float uUndAmp;
 uniform float uUndSpeed;
+
+/* V6.3 — domain warp per spezzare la rotondità delle blob (Venom/goo). */
+uniform float uDomainAmp;
+uniform float uDomainFreq;
+uniform float uDomainSpeed;
 
 uniform vec3 uAlbedo;
 uniform vec3 uAlbedoLit;
@@ -121,18 +119,33 @@ float veins(vec2 p, float t){
   return n * 0.5 + 0.5;
 }
 
+/* Domain warp: due strati di sinusoidi sfasate per spezzare la rotondità
+   matematica delle blob e del bordo. Resta lento e a bassa frequenza,
+   quindi non distorce il muro fisico che la CPU ha già risolto. */
+float warp(vec2 p, float t, float seed){
+  float v = sin(dot(p, vec2(0.13, 0.11)) * uDomainFreq + t * uDomainSpeed + seed);
+  v += 0.5 * sin(dot(p, vec2(-0.09, 0.14)) * uDomainFreq * 1.7 - t * uDomainSpeed * 0.6 + seed * 1.3);
+  return v;
+}
+
 float field(vec2 p){
-  float theta = atan(p.y, p.x);
+  /* Applica il domain warp a una copia locale, così le vene e il resto del
+     material shading in main() possono continuare a usare p. */
+  vec2 q = p;
+  if(uDomainAmp > 0.0){
+    q += vec2(warp(p, uTime, 0.0), warp(p, uTime, 3.1)) * uDomainAmp;
+  }
+  float theta = atan(q.y, q.x);
   /* Surface undulation grows with reveal: the tar starts as a smooth circle
      and only gets its strange edges as it pours outward. */
   float und = uUndAmp * (1.0 + 2.2 * uRipple) * clamp(uReveal, 0.0, 1.0)
     * ( sin(theta * 3.0 + uTime * uUndSpeed * TAU * 0.5)
       + 0.6 * sin(theta * 5.0 - uTime * uUndSpeed * TAU * 0.33 + 1.7) );
-  float d = length(p) - (rimAt(theta) + und);
-  for (int i = 0; i < ${MAX_BLOBS}; i++){
+  float d = length(q) - (rimAt(theta) + und);
+  for (int i = 0; i < ${maxBlobs}; i++){
     if (i >= uBlobCount) break;
     vec3 b = uBlobs[i];
-    float db = length(p - (b.xy - uCenter)) - b.z;
+    float db = length(q - (b.xy - uCenter)) - b.z;
     d = smin(d, db, uSminK);
   }
   return d;
@@ -228,8 +241,9 @@ export function createTarGooRenderer(size: number, cfg: TarGooConfig): TarGooRen
   };
 
   const samples = cfg.simulation.rimSamples;
+  const maxBlobs = cfg.v63.maxBlobs;
   const vs = compile(gl.VERTEX_SHADER, VERT);
-  const fs = compile(gl.FRAGMENT_SHADER, fragSource(samples));
+  const fs = compile(gl.FRAGMENT_SHADER, fragSource(samples, maxBlobs));
   if (!vs || !fs) return null;
   const prog = gl.createProgram();
   if (!prog) return null;
@@ -255,6 +269,7 @@ export function createTarGooRenderer(size: number, cfg: TarGooConfig): TarGooRen
     blobCount: u('uBlobCount'), time: u('uTime'), reveal: u('uReveal'), ripple: u('uRipple'),
     iridColorA: u('uIridColorA'), iridColorB: u('uIridColorB'), iridColorC: u('uIridColorC'),
     iridPower: u('uIridPower'), iridSpeed: u('uIridSpeed'), iridSpread: u('uIridSpread'),
+    domainAmp: u('uDomainAmp'), domainFreq: u('uDomainFreq'), domainSpeed: u('uDomainSpeed'),
   };
 
   /* Static material + field uniforms from config — set once. */
@@ -288,7 +303,15 @@ export function createTarGooRenderer(size: number, cfg: TarGooConfig): TarGooRen
   gl.uniform1f(u('uIridSpeed'), irid.speed);
   gl.uniform1f(u('uIridSpread'), irid.spread);
 
-  const blobPad = new Float32Array(MAX_BLOBS * 3);
+  /* Domain warp: spezza la rotondità delle blob. Se l'utente richiede
+     motion ridotta, l'ampiezza diventa zero e la distorsione si ferma. */
+  const reducedMotion = (typeof window !== 'undefined' &&
+    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) ? 1 : 0;
+  gl.uniform1f(loc.domainAmp, reducedMotion ? 0.0 : cfg.v63.seedDropDomainWarpAmp);
+  gl.uniform1f(loc.domainFreq, cfg.v63.seedDropDomainWarpFreq);
+  gl.uniform1f(loc.domainSpeed, cfg.v63.seedDropDomainWarpSpeed);
+
+  const blobPad = new Float32Array(maxBlobs * 3);
   let destroyed = false;
 
   return {
@@ -298,9 +321,9 @@ export function createTarGooRenderer(size: number, cfg: TarGooConfig): TarGooRen
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.uniform1fv(loc.radii, params.radii);
-      blobPad.set(params.blobs.subarray(0, Math.min(params.blobs.length, MAX_BLOBS * 3)));
+      blobPad.set(params.blobs.subarray(0, Math.min(params.blobs.length, maxBlobs * 3)));
       gl.uniform3fv(loc.blobs, blobPad);
-      gl.uniform1i(loc.blobCount, Math.min(params.blobCount, MAX_BLOBS));
+      gl.uniform1i(loc.blobCount, Math.min(params.blobCount, maxBlobs));
       gl.uniform1f(loc.time, params.timeMs / 1000);
       gl.uniform1f(loc.reveal, params.reveal);
       gl.uniform1f(loc.ripple, params.ripple);
