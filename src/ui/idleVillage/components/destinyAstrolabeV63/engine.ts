@@ -20,17 +20,6 @@ export interface AstrolabeConfig {
   crit?: number; bigwin?: number; almost?: number; epicfail?: number; wound?: number; dead?: number; mode?: string;
   tSlam?: number; tBurst?: number; tPour?: number; tSpin?: number; tSnap?: number;
   bgVariant?: string; ringVariant?: string; ballColor?: string; motion?: string;
-  /** V6.4 optional phase durations. If provided, they override the 6.3 defaults. */
-  phaseDurations?: {
-    ringMs?: number;
-    slamMs?: number;
-    gooMs?: number;
-    axisReadMs?: number;
-    burstMs?: number;
-    pourMs?: number;
-    spinMs?: number;
-    snapMs?: number;
-  };
 }
 export interface AstrolabeResult { verdict: string; roll: number; riskRoll: number;
   skillIndex: number; skillName: string; wounded: boolean; dead: boolean; }
@@ -46,8 +35,6 @@ export interface AstrolabeEngineOpts {
       React host can show skill/stat/difficulty/probability before the throw */
   onInfo?: (info: {
     skills: AstrolabeSkill[];
-    axisSkill: number[];
-    activeSkillIndex: number;
     probPct: number;
     tst: number;
     woundPct: number;
@@ -63,8 +50,7 @@ export interface AstrolabeEngineHandle {
 }
 
 export function createDestinyAstrolabeV63Engine(root: HTMLElement, opts: AstrolabeEngineOpts): AstrolabeEngineHandle {
-  console.log('[engine] createDestinyAstrolabeV63Engine called, skills=', opts.skills?.map(s=>`${s.name}:${s.stat}/${s.difficulty}`));
-  const DUMMY: any = new Proxy(function(){}, {
+  const DUMMY: any = new Proxy(function(){} as any, {
     get(_t, p){ if(p==='style'||p==='classList'||p==='dataset') return DUMMY;
       if(p==='value') return '0'; if(p==='textContent'||p==='innerHTML') return ''; return DUMMY; },
     set(){ return true; }, apply(){ return DUMMY; },
@@ -412,8 +398,7 @@ function emitArmed(b){ try{ if(typeof opts!=='undefined'&&opts&&opts.onArmed) op
 /* R-067: pre-roll board info for the React overlay — the numbers the player
    must read BEFORE the throw (skill, stat, difficulty, probability, risk). */
 function emitInfo(){ try{ if(typeof opts!=='undefined'&&opts&&opts.onInfo) opts.onInfo({
-  skills:skills.slice(), axisSkill:geo.axisSkill.slice(), activeSkillIndex:(scene.resolved&&scene.resolved.skillIndex)||0,
-  probPct:geo.probPct||0, tst:geo.tst,
+  skills:skills.slice(), probPct:geo.probPct||0, tst:geo.tst,
   woundPct:cfg.wound, deadPct:cfg.dead }); }catch(e){} }
 let armed=false;                 // true while the TIRA button should be shown
 function setState(s){
@@ -508,13 +493,14 @@ function launchRoll(){
   $id('flare').classList.remove('fire');
   $id('launch').classList.remove('pulse');
   /* recompute geometry, build obelisks, reset all scene state */
-  prerollDestiny();
+  recomputeGeometry();
   emitInfo();
   buildPillars();
   scene.starScale=0; scene.pourP=0; scene.streamAlpha=0; scene.axisAlpha=1; scene.gooFullMs=0;
   scene.tideP=0; scene.tideWave=0;
   scene.gooReveal=0; scene.ringReveal=0;
   scene.ball={x:CX,y:CY,vx:0,vy:0,r:9,trail:[],on:false,state:'settled',alignedDir:{x:0,y:0},decel:0};
+  scene.resolved=null;
   scene.warp=0;
   scene.shocks.length=0; scene.rimHits.length=0; scene.sparks.length=0; scene.shards.length=0;
   scene.fissure=null;
@@ -542,11 +528,6 @@ function throwBall(){
 }
 const RING_MS=140;   // V6: la ghiera non esiste più, resta solo un beat tecnico
 const AXIS_READ_MS=560;  // V6: pausa per leggere i 5 assi prima che entri il PG
-/* V6.4: phase durations are overridable per instance; 6.3 uses the defaults. */
-const phaseDurations=Object.assign({
-  ringMs:RING_MS,slamMs:cfg.tSlam,gooMs:GOO_MS,axisReadMs:AXIS_READ_MS,
-  burstMs:cfg.tBurst,pourMs:cfg.tPour,spinMs:cfg.tSpin,snapMs:cfg.tSnap
-},cfg.phaseDurations||{});
 
 /* advance choreography (called every frame) */
 function tickTimeline(){
@@ -554,13 +535,13 @@ function tickTimeline(){
   if(s==='idle') return;
 
   if(s==='ring-lock'){
-    const p=phaseT(phaseDurations.ringMs);
+    const p=phaseT(RING_MS);
     scene.ringReveal=clamp(p/0.68,0,1);     // ring fades/locks into being
     scene.ringShaken=true;                  // V6: nessuno shake per la ghiera rimossa
     if(p>=1){ scene.ringReveal=1; setState('threat-slam'); }
   }
   else if(s==='threat-slam'){
-    const p=phaseT(phaseDurations.slamMs);
+    const p=phaseT(cfg.tSlam);
     /* V6.3 tar seed: no central pool yet — seed drops fall from above and
        merge while the black obelisks slam. The main rim stays at 0. */
     scene.gooReveal=0;
@@ -580,7 +561,7 @@ function tickTimeline(){
     /* V6.3 TAR POUR — the seeded pool spreads outward like a slow colata.
        Curve: S-curve (smoothstep) from seed to full, so the mass is readable
        at every stage and never snaps like water. */
-    const p=phaseT(phaseDurations.gooMs);
+    const p=phaseT(GOO_MS);
     scene.gooReveal=tarPour(p);
     /* Calm swell in the middle of the pour: the mass pushes, then settles. */
     const swell=0.24*(1-Math.abs(2*p-1));
@@ -594,10 +575,10 @@ function tickTimeline(){
   else if(s==='axis-read'){
     /* BEAT DI LETTURA — la difficoltà è posata e misurabile, niente si muove.
        È l'unico momento in cui il giocatore può leggere i 5 assi da soli. */
-    if(phaseT(phaseDurations.axisReadMs)>=1) setState('agency-burst');
+    if(phaseT(AXIS_READ_MS)>=1) setState('agency-burst');
   }
   else if(s==='agency-burst'){
-    const p=phaseT(phaseDurations.burstMs);
+    const p=phaseT(cfg.tBurst);
     /* Pillars drop first (compressed into first 65% of phase) */
     scene.whitePillars.forEach((pl,i)=>{
       const local=clamp((p-(i*0.07))/0.26,0,1);
@@ -618,7 +599,7 @@ function tickTimeline(){
     }
   }
   else if(s==='risk-pour'){
-    const p=phaseT(phaseDurations.pourMs);
+    const p=phaseT(cfg.tPour);
     /* R-067: FRANTUMAZIONE — gli obelischi non risalgono più: a un terzo del
        gesto si spezzano in schegge che cadono e affondano nel catrame. */
     scene.whitePillars.forEach((pl,i)=>{
@@ -658,7 +639,7 @@ function tickTimeline(){
        button is already armed; the spin will not start on its own. */
   }
   else if(s==='the-spin'){
-    const p=phaseT(phaseDurations.spinMs);
+    const p=phaseT(cfg.tSpin);
     stepBall(p);
     const b=scene.ball;
     const target=scene.targetPos;
@@ -1243,9 +1224,10 @@ const TENT_ARMS=7;
 const TENT_SKEW=[0.18,-0.24,0.09,0.26,-0.13,0.21,-0.17];
 const tentAngle=i=>-Math.PI/2+(i+0.5)*(TAU/TENT_ARMS)+TENT_SKEW[i%TENT_ARMS];
 const tent=createTentacles(TENT_ARMS,0x7ea1);
+const MAX_BLOBS_V63=tarGooConfig.v63.maxBlobs;
 let tideRim=null;
 /* buffer unico per renderer: bracci + gocce, riallocato solo se serve */
-let gooBlend=new Float32Array(AXES*SAMPLES_PER_ARM*3+64);
+let gooBlend=new Float32Array(MAX_BLOBS_V63*3);
 /* LA DINAMICA DEL CATRAME E' DETERMINISTICA (PLAN-010 CP-E).
    Le gocce nascevano da `Math.random`, quindi due esecuzioni con gli stessi
    ingressi davano fronti diversi e il banco di misura non poteva sorvegliare
@@ -1262,6 +1244,7 @@ const gooSim=(()=>{
   const drops=Array.from({length:simCfg.dropletCount},(_,i)=>({
     ang:0.0,
     w:0.0,
+    wander:0.0,
     rr:0.0,
     ph:0.0,
     mode:'crawl',
@@ -1270,12 +1253,13 @@ const gooSim=(()=>{
     y:0.0,
     vy:0.0,
     startT:0.0,
-  })) as ({ang:number,w:number,rr:number,ph:number,mode:'fall'|'crawl',x:number,y:number,vy:number,startT:number,rad:number})[];
+    tail:[] as {x:number,y:number,vx:number,vy:number,phase:number,r:number}[],
+  })) as ({ang:number,w:number,wander:number,rr:number,ph:number,mode:'fall'|'crawl',x:number,y:number,vy:number,startT:number,rad:number,tail:{x:number,y:number,vx:number,vy:number,phase:number,r:number}[]})[];
   return {
     N,
     r:new Float32Array(N),                 // current sprung radius per sample
     v:new Float32Array(N),                 // radial velocity per sample
-    blobs:new Float32Array(simCfg.dropletCount*3),
+    blobs:new Float32Array(MAX_BLOBS_V63*3),
     blobCount:0,
     drops,
     lastMs:0,
@@ -1284,6 +1268,7 @@ const gooSim=(()=>{
 
 function resetDrops(t0:number){
   const simCfg=tarGooConfig.simulation;
+  const v63Cfg=tarGooConfig.v63;
   /* si riparte dal seme: stessa colata a ogni tiro, quindi misurabile */
   gooRnd=rng32(GOO_SEED);
   const rnd=(a,b)=>a+gooRnd()*(b-a);
@@ -1320,11 +1305,27 @@ function resetDrops(t0:number){
       d.startT=t0+i*simCfg.seedDropStagger;
       d.rr=rnd(simCfg.seedDropRadius[0],simCfg.seedDropRadius[1]);
       d.w=rnd(simCfg.dropletCrawlSpeed[0],simCfg.dropletCrawlSpeed[1])*(gooRnd()<0.5?-1:1);
+      d.wander=v63Cfg.seedDropTendrilWanderSpeed*(gooRnd()<0.5?-1:1);
+      /* VENOM/GOO — ogni seed drop ha una piccola coda di nodi che lo
+         fanno leggere come goccia allungata/piccolo tentacolo, non cerchio. */
+      d.tail.length=0;
+      for(let j=0;j<v63Cfg.seedDropTendrilCount;j+=1){
+        const spacing=d.rr*v63Cfg.seedDropTendrilSpacing*(j+1);
+        const tx=d.x+Math.cos(ang)*spacing;
+        const ty=d.y+Math.sin(ang)*spacing;
+        d.tail.push({
+          x:tx, y:ty, vx:0, vy:0,
+          phase:gooRnd()*TAU,
+          r:Math.max(2, d.rr*(0.55-j*0.15)),
+        });
+      }
     }else{
       d.mode='crawl';
       d.ang=gooRnd()*TAU;
       d.w=rnd(simCfg.dropletCrawlSpeed[0],simCfg.dropletCrawlSpeed[1])*(gooRnd()<0.5?-1:1);
+      d.wander=0;
       d.rr=rnd(simCfg.dropletRadius[0],simCfg.dropletRadius[1]);
+      d.tail.length=0;
       d.x=CX; d.y=CY; d.vy=0; d.startT=0;
     }
   }
@@ -1394,10 +1395,22 @@ function tickGooSim(now){
       gooSim.v[i]=vel;
     }
   }
-  /* Droplets: the first seedDropCount fall from above and merge; the rest
-     crawl on the rim once it exists. */
+  /* Droplets: the first seedDropCount fall from the outer ring and merge.
+     V6.3 Venom/goo — ogni seed drop e' una piccola catena di nodi (testa +
+     coda) che seguono la testa con molla smorzata, invece di un cerchio
+     isolato. Il domain warp nello shader poi spezza la rotondità. */
+  const v63Cfg=tarGooConfig.v63;
+  const reducedMotion=(typeof window!=='undefined' &&
+    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)?1:0;
   const t=now/1000;
   let active=0;
+  const writeBlob=(x:number,y:number,r:number)=>{
+    if(active>=MAX_BLOBS_V63) return;
+    gooSim.blobs[active*3]=x;
+    gooSim.blobs[active*3+1]=y;
+    gooSim.blobs[active*3+2]=r;
+    active+=1;
+  };
   for(let i=0;i<gooSim.drops.length;i+=1){
     const d=gooSim.drops[i];
     if(d.mode==='fall'){
@@ -1408,21 +1421,44 @@ function tickGooSim(now){
         d.vy += simCfg.seedDropGravity*dt;
         d.vy *= Math.pow(simCfg.seedDropDamping, k);
         d.rad = Math.max(0, d.rad - d.vy*dt);
+        /* Piccola deriva angolare per rompere la caduta perfettamente radiale. */
+        if(!reducedMotion) d.ang += d.wander*dt/1000;
         d.x = CX+Math.cos(d.ang)*d.rad;
         d.y = CY+Math.sin(d.ang)*d.rad;
+
+        /* Aggiorna la coda: ogni nodo e' una molla smorzata verso il nodo
+           precedente (la testa per il primo), con un leggero wiggle perpendicolare
+           che da' l'idea di tentacolo viscoso. */
+        if(!reducedMotion && d.tail && d.tail.length>0){
+          let prevX=d.x, prevY=d.y;
+          const stiff=v63Cfg.seedDropTendrilStiffness;
+          const damp=Math.pow(v63Cfg.seedDropTendrilDamping, k);
+          for(let j=0;j<d.tail.length;j+=1){
+            const node=d.tail[j];
+            const dx=prevX-node.x, dy=prevY-node.y;
+            const len=Math.hypot(dx,dy)||1;
+            const perpX=-dy/len, perpY=dx/len;
+            const wiggle=Math.sin(now*0.001*v63Cfg.seedDropTendrilWiggleSpeed+node.phase)*v63Cfg.seedDropTendrilWiggleAmp;
+            node.vx=(node.vx+dx*stiff*k+perpX*wiggle)*damp;
+            node.vy=(node.vy+dy*stiff*k+perpY*wiggle)*damp;
+            node.x+=node.vx*k;
+            node.y+=node.vy*k;
+            prevX=node.x; prevY=node.y;
+          }
+        }
+
         /* si posa quando raggiunge il livello del catrame su quel raggio */
         const livello=Math.max(geo.rCore, rCheckAt(d.ang,1)*0.92);
         if(d.rad <= livello){
           d.rad=livello;
           d.mode='crawl';
+          d.tail.length=0;             // la coda si fonde nel catrame
           scene.gooRipple=Math.max(scene.gooRipple,0.65);
         }
       }
       if(now>=d.startT){
-        gooSim.blobs[active*3]=d.x;
-        gooSim.blobs[active*3+1]=d.y;
-        gooSim.blobs[active*3+2]=d.rr;
-        active+=1;
+        writeBlob(d.x, d.y, d.rr);
+        if(!reducedMotion && d.tail) for(const node of d.tail) writeBlob(node.x, node.y, node.r);
       }
     }else{
       d.ang+=d.w*dt/1000;
@@ -1430,10 +1466,7 @@ function tickGooSim(now){
       const rim=rev<=0.001?0:gooSim.r[idx];
       const bulge=Math.sin(t*0.3+d.ph)*simCfg.dropletOvershoot;
       const rad=Math.max(geo.rCore*0.6,rim-d.rr*0.8+bulge);
-      gooSim.blobs[active*3]=CX+Math.cos(d.ang)*rad;
-      gooSim.blobs[active*3+1]=CY+Math.sin(d.ang)*rad;
-      gooSim.blobs[active*3+2]=d.rr;
-      active+=1;
+      writeBlob(CX+Math.cos(d.ang)*rad, CY+Math.sin(d.ang)*rad, d.rr);
     }
   }
   gooSim.blobCount=active;

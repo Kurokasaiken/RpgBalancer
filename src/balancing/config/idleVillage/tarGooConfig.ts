@@ -174,6 +174,24 @@ const tarGooConfigSchema = z.object({
     contactShadowPx: z.number().min(0).max(40),
     contactMeniscusPx: z.number().min(0).max(12),
     /**
+     * V6.3 — VENOM/GOO SEED DROPS.
+     * Piccoli tentacoli e domain warp per rompere la rotondità delle gocce
+     * iniziali. `maxBlobs` dimensiona l'uniform array dello shader; i parametri
+     * tail controllano la catena di nodi che segue ogni seed drop; il domain
+     * warp aggiunge un'irregolarità amoeboide al bordo delle blob.
+     */
+    maxBlobs: z.number().int().min(16).max(128),
+    seedDropTendrilCount: z.number().int().min(0).max(4),
+    seedDropTendrilStiffness: z.number().min(0.001).max(0.5),
+    seedDropTendrilDamping: z.number().min(0.1).max(0.99),
+    seedDropTendrilSpacing: z.number().min(0.2).max(3),
+    seedDropTendrilWanderSpeed: z.number().min(0).max(0.5),
+    seedDropTendrilWiggleAmp: z.number().min(0).max(2),
+    seedDropTendrilWiggleSpeed: z.number().min(0).max(2),
+    seedDropDomainWarpAmp: z.number().min(0).max(20),
+    seedDropDomainWarpFreq: z.number().min(0).max(1),
+    seedDropDomainWarpSpeed: z.number().min(0).max(2),
+    /**
      * CP-G — LA CONCA CHE SI RIEMPIE. Le gocce nascono su un anello FUORI
      * dall'arena e convergono verso il centro, invece di cadere dall'alto su un
      * punto centrale: il goo e' la difficolta', una condizione che c'e' gia', non
@@ -313,6 +331,18 @@ export const tarGooConfig: TarGooConfig = tarGooConfigSchema.parse({
     stiffness: 0.015,
     contactShadowPx: 16,
     contactMeniscusPx: 3,
+    /* V6.3 — VENOM/GOO SEED DROPS */
+    maxBlobs: 56,
+    seedDropTendrilCount: 2,
+    seedDropTendrilStiffness: 0.10,
+    seedDropTendrilDamping: 0.80,
+    seedDropTendrilSpacing: 1.0,
+    seedDropTendrilWanderSpeed: 0.08,
+    seedDropTendrilWiggleAmp: 0.25,
+    seedDropTendrilWiggleSpeed: 0.35,
+    seedDropDomainWarpAmp: 2.5,
+    seedDropDomainWarpFreq: 0.15,
+    seedDropDomainWarpSpeed: 0.30,
     spawnRingFactor: 1.18,
     axisBias: 0.6,
     /* CP-H: fondo congelato dal Director (2026-08-31). Da qui la materia si tara su questo. */
