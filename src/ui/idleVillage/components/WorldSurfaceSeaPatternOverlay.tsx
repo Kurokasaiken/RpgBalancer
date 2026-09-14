@@ -1,24 +1,30 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useCallback, useEffect, useRef } from 'react';
 import useReducedMotion from '../hooks/useReducedMotion';
 
 const PATTERN_SRC = '/assets/world/wanderlust/base/layers/sea_pattern_tile.png';
 const MASK_SRC = '/assets/atmosphere/terrain/sea_mask.webp';
-const CONFIG_SRC = '/world-surface-sea-pattern-config.json';
+export const SEA_PATTERN_CONFIG_SRC = '/world-surface-sea-pattern-config.json';
 
 const VERT = `#version 300 es
 in vec2 aPos;
 void main() { gl_Position = vec4(aPos, 0.0, 1.0); }
 `;
 
+// No camera uniforms here on purpose: this canvas is mounted INSIDE the world box
+// (the div the renderer pans/zooms with `transform: translate(...) scale(zoom)`),
+// so it is already in world space — one canvas backing-store px is one world px.
+// The previous version lived OUTSIDE the world box as a viewport-sized sibling and
+// re-derived world position from `camera.panX/panY/zoom` by hand; that put it in a
+// stacking context the renderer's internal z-index band (frame, border, clouds...)
+// could never reach, so no z-index value assigned to it could ever land BELOW the
+// frame or the border layers — a sibling with its own stacking context is compared
+// to the renderer's root as a single opaque unit, not to the layers inside it.
 const FRAG = `#version 300 es
 precision highp float;
 out vec4 outColor;
 
 uniform float uDpr;
-uniform vec2 uResolution;
-uniform vec2 uWorldOrigin;
-uniform float uWorldPerCssPx;
+uniform float uWorldHeight;
 uniform float uTime;
 uniform sampler2D uPatternTex;
 uniform float uPatternScale;
@@ -30,11 +36,10 @@ uniform float uMotionPeriod;
 uniform vec2 uMotionDir;
 
 void main() {
-  vec2 cssPx = gl_FragCoord.xy / uDpr;
-  vec2 worldPx = vec2(
-    uWorldOrigin.x + cssPx.x * uWorldPerCssPx,
-    uWorldOrigin.y - cssPx.y * uWorldPerCssPx
-  );
+  // gl_FragCoord has its origin bottom-left with Y up; every other layer here
+  // (the mask, the DOM layers) is authored top-left with Y down, so the Y axis
+  // is flipped on the way in to keep "motion angle" meaning the same as before.
+  vec2 worldPx = vec2(gl_FragCoord.x / uDpr, uWorldHeight - gl_FragCoord.y / uDpr);
 
   vec2 motionOffset = vec2(0.0);
   if (uMotionEnabled && uMotionPeriod > 0.0) {
@@ -49,7 +54,7 @@ void main() {
 }
 `;
 
-interface SeaPatternConfig {
+export interface SeaPatternConfig {
   patternScale: number;
   lineOpacity: number;
   lineWidth: number;
@@ -61,8 +66,15 @@ interface SeaPatternConfig {
   motionAngle: number;
 }
 
-const DEFAULT_CONFIG: SeaPatternConfig = {
-  patternScale: 4500,
+/**
+ * `patternScale` at the slider's own floor, not the 4500 the original authored
+ * preset shipped with — the Director judged the smallest tile the slider allowed
+ * as the one worth defaulting to, and asked for room to go smaller still. Kept out
+ * of the authored-preset override below for the same reason `motionAngle` already
+ * was: a fetched preset should not un-do a default the Director set explicitly.
+ */
+export const DEFAULT_SEA_PATTERN_CONFIG: SeaPatternConfig = {
+  patternScale: 100,
   lineOpacity: 0.65,
   lineWidth: 1,
   lineColor: '#8bbac2',
@@ -73,11 +85,12 @@ const DEFAULT_CONFIG: SeaPatternConfig = {
   motionAngle: 200,
 };
 
-interface WorldSurfaceSeaPatternOverlayProps {
+export interface WorldSurfaceSeaPatternOverlayProps {
   active: boolean;
   canvasSize: { width: number; height: number };
-  camera: { panX: number; panY: number; zoom: number };
-  hidePanel?: boolean;
+  zIndex: number;
+  config?: SeaPatternConfig;
+  onError?: (message: string) => void;
 }
 
 function hexToRgb01(hex: string): [number, number, number] {
@@ -85,46 +98,31 @@ function hexToRgb01(hex: string): [number, number, number] {
   return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
 }
 
-export const WorldSurfaceSeaPatternOverlay: React.FC<WorldSurfaceSeaPatternOverlayProps> = ({
+/**
+ * Sea surface line pattern — the WebGL "authored texture / micro scroll" variant
+ * from `/sea-effect-lab`. Canvas-only: the live-tuning panel lives at the page
+ * level (`WorldSurfaceSeaPatternPanel`) so it can stay fixed in the viewport while
+ * this canvas pans and zooms with the map.
+ */
+export function WorldSurfaceSeaPatternOverlay({
   active,
   canvasSize,
-  camera,
-  hidePanel = false,
-}) => {
-  const { t } = useTranslation('idleVillage');
+  zIndex,
+  config = DEFAULT_SEA_PATTERN_CONFIG,
+  onError,
+}: WorldSurfaceSeaPatternOverlayProps) {
   const reducedMotion = useReducedMotion();
   const reducedMotionRef = useRef(reducedMotion);
   reducedMotionRef.current = reducedMotion;
-  const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const panelOpenRef = useRef(true);
-  const [panelOpen, setPanelOpen] = useState(true);
-  const [config, setConfig] = useState<SeaPatternConfig>(DEFAULT_CONFIG);
-  const [error, setError] = useState<string | null>(null);
+  const configRef = useRef(config);
+  configRef.current = config;
   const glRef = useRef<WebGL2RenderingContext | null>(null);
   const programRef = useRef<WebGLProgram | null>(null);
   const locRef = useRef<Record<string, WebGLUniformLocation | null>>({});
   const textureRef = useRef<WebGLTexture | null>(null);
   const startTRef = useRef(performance.now());
-  const rafRef = useRef<number | null>(null);
-  const containerSizeRef = useRef({ width: 0, height: 0 });
-  const configRef = useRef(config);
-  const cameraRef = useRef(camera);
-
-  configRef.current = config;
-  cameraRef.current = camera;
-
-  // Load authored preset from the spike config.
-  useEffect(() => {
-    fetch(CONFIG_SRC)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (data?.visual) {
-          setConfig((prev) => ({ ...prev, ...data.visual, motionAngle: prev.motionAngle }));
-        }
-      })
-      .catch(() => undefined);
-  }, []);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const setupWebGL = useCallback(() => {
     const canvas = canvasRef.current;
@@ -132,7 +130,7 @@ export const WorldSurfaceSeaPatternOverlay: React.FC<WorldSurfaceSeaPatternOverl
 
     const gl = canvas.getContext('webgl2', { alpha: true, premultipliedAlpha: false });
     if (!gl) {
-      setError('WebGL2 not available');
+      onError?.('WebGL2 not available');
       return false;
     }
 
@@ -175,9 +173,7 @@ export const WorldSurfaceSeaPatternOverlay: React.FC<WorldSurfaceSeaPatternOverl
     const u = (name: string) => gl.getUniformLocation(program, name);
     locRef.current = {
       dpr: u('uDpr'),
-      resolution: u('uResolution'),
-      worldOrigin: u('uWorldOrigin'),
-      worldPerCssPx: u('uWorldPerCssPx'),
+      worldHeight: u('uWorldHeight'),
       time: u('uTime'),
       patternTex: u('uPatternTex'),
       patternScale: u('uPatternScale'),
@@ -207,55 +203,42 @@ export const WorldSurfaceSeaPatternOverlay: React.FC<WorldSurfaceSeaPatternOverl
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, tex);
       };
-      img.onerror = () => setError('Failed to load pattern texture');
+      img.onerror = () => onError?.('Failed to load pattern texture');
       img.src = PATTERN_SRC;
     }
 
     return true;
-  }, []);
+  }, [onError]);
 
+  // Canvas backing store is the WORLD canvas size at 1x — the map's default zoom
+  // (~0.24) already oversamples this several times over, and the parent's own CSS
+  // `scale(camera.zoom)` is what puts it on screen, not this resolution.
   const resize = useCallback(() => {
-    const wrap = wrapRef.current;
     const canvas = canvasRef.current;
     const gl = glRef.current;
-    if (!wrap || !canvas || !gl) return;
-
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const width = wrap.clientWidth;
-    const height = wrap.clientHeight;
-    containerSizeRef.current = { width, height };
-
-    if (canvas.width !== Math.floor(width * dpr) || canvas.height !== Math.floor(height * dpr)) {
-      canvas.width = Math.floor(width * dpr);
-      canvas.height = Math.floor(height * dpr);
+    if (!canvas || !gl) return;
+    if (canvas.width !== canvasSize.width || canvas.height !== canvasSize.height) {
+      canvas.width = canvasSize.width;
+      canvas.height = canvasSize.height;
       gl.viewport(0, 0, canvas.width, canvas.height);
     }
-  }, []);
+  }, [canvasSize.width, canvasSize.height]);
 
   const render = useCallback(() => {
     const gl = glRef.current;
     const program = programRef.current;
-    const canvas = canvasRef.current;
     const loc = locRef.current;
-    if (!gl || !program || !canvas) return;
+    if (!gl || !program) return;
 
     const cfg = configRef.current;
-    const cam = cameraRef.current;
-    const { width, height } = containerSizeRef.current;
-    const dpr = canvas.width / width || 1;
-
-    const worldPerCssPx = 1 / cam.zoom;
-    const worldOriginY = cam.panY + height / cam.zoom;
     const rad = (cfg.motionAngle * Math.PI) / 180;
 
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     gl.useProgram(program);
-    gl.uniform1f(loc.dpr, dpr);
-    gl.uniform2f(loc.resolution, canvas.width, canvas.height);
-    gl.uniform2f(loc.worldOrigin, cam.panX, worldOriginY);
-    gl.uniform1f(loc.worldPerCssPx, worldPerCssPx);
+    gl.uniform1f(loc.dpr, 1);
+    gl.uniform1f(loc.worldHeight, canvasSize.height);
     gl.uniform1f(loc.time, (performance.now() - startTRef.current) / 1000);
     gl.uniform1i(loc.patternTex, 0);
     gl.uniform1f(loc.patternScale, cfg.patternScale);
@@ -268,214 +251,54 @@ export const WorldSurfaceSeaPatternOverlay: React.FC<WorldSurfaceSeaPatternOverl
     gl.uniform2f(loc.motionDir, Math.cos(rad), Math.sin(rad));
 
     gl.drawArrays(gl.TRIANGLES, 0, 3);
-  }, []);
+  }, [canvasSize.height]);
 
-  const loop = useCallback(() => {
-    if (!active) return;
-    render();
-    rafRef.current = requestAnimationFrame(loop);
-  }, [active, render]);
-
+  // setInterval, not requestAnimationFrame: rAF is throttled to nothing on a
+  // hidden document (e.g. this component previewed in an inactive browser tab),
+  // which read as "the pattern doesn't move" even though motion was enabled and
+  // correctly configured. A timer keeps ticking regardless of tab visibility.
   useEffect(() => {
-    if (!active) {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      return;
-    }
+    if (!active) return;
     if (!glRef.current && !setupWebGL()) return;
     resize();
-    loop();
+    render();
+    intervalRef.current = setInterval(render, 1000 / 30);
     return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [active, setupWebGL, resize, loop]);
+  }, [active, setupWebGL, resize, render]);
 
   useEffect(() => {
-    const handleResize = () => resize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    resize();
   }, [resize]);
 
   if (!active) return null;
 
-  const maskUrl = `url(${MASK_SRC})`;
-  const worldW = canvasSize.width;
-  const worldH = canvasSize.height;
-  const maskW = worldW * camera.zoom;
-  const maskH = worldH * camera.zoom;
-  const maskX = -camera.panX * camera.zoom;
-  const maskY = -camera.panY * camera.zoom;
-
-  const update = <K extends keyof SeaPatternConfig>(key: K, value: SeaPatternConfig[K]) => {
-    setConfig((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const togglePanel = () => {
-    panelOpenRef.current = !panelOpenRef.current;
-    setPanelOpen(panelOpenRef.current);
-  };
-
   return (
     <div
-      ref={wrapRef}
+      aria-hidden="true"
       style={{
         position: 'absolute',
         inset: 0,
-        pointerEvents: 'none',
+        zIndex,
         overflow: 'hidden',
-        zIndex: 100,
+        pointerEvents: 'none',
+        maskImage: `url(${MASK_SRC})`,
+        WebkitMaskImage: `url(${MASK_SRC})`,
+        maskSize: '100% 100%',
+        WebkitMaskSize: '100% 100%',
+        maskPosition: '0 0',
+        WebkitMaskPosition: '0 0',
+        maskRepeat: 'no-repeat',
+        WebkitMaskRepeat: 'no-repeat',
       }}
     >
       <canvas
         ref={canvasRef}
-        style={{
-          position: 'absolute',
-          inset: 0,
-          width: '100%',
-          height: '100%',
-          pointerEvents: 'none',
-          maskImage: maskUrl,
-          WebkitMaskImage: maskUrl,
-          maskRepeat: 'no-repeat',
-          WebkitMaskRepeat: 'no-repeat',
-          maskSize: `${maskW}px ${maskH}px`,
-          WebkitMaskSize: `${maskW}px ${maskH}px`,
-          maskPosition: `${maskX}px ${maskY}px`,
-          WebkitMaskPosition: `${maskX}px ${maskY}px`,
-          maskMode: 'alpha',
-        }}
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
       />
-
-      {!hidePanel && panelOpen && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 12,
-            right: 12,
-            width: 280,
-            pointerEvents: 'auto',
-            zIndex: 110,
-          }}
-          className="rounded border border-amber-700/40 bg-slate-900/95 p-3 text-amber-100 shadow-lg backdrop-blur"
-        >
-          <div className="mb-2 flex items-center justify-between">
-            <div className="text-sm font-semibold text-amber-300">{t('world.debug.seaPatternTitle')}</div>
-            <button
-              type="button"
-              onClick={togglePanel}
-              className="rounded px-2 py-0.5 text-xs text-amber-200/70 hover:bg-amber-700/20"
-            >
-              {t('world.debug.seaPatternClose')}
-            </button>
-          </div>
-
-          {error && (
-            <div className="mb-2 rounded border border-red-800 bg-red-950/40 p-2 text-xs text-red-200">
-              {error}
-            </div>
-          )}
-
-          <div className="text-xs italic text-amber-200/70">{t('world.debug.seaPatternLive')}</div>
-
-          <div className="mt-3 space-y-3">
-            <label className="block text-xs">
-              <span className="text-amber-200/90">{t('world.debug.seaPatternScale')}</span>
-              <input
-                type="range"
-                min={1000}
-                max={20000}
-                step={100}
-                value={config.patternScale}
-                onChange={(e) => update('patternScale', Number(e.target.value))}
-                className="w-full accent-teal-500"
-              />
-              <span className="block text-right text-amber-200/70">{config.patternScale}</span>
-            </label>
-
-            <label className="block text-xs">
-              <span className="text-amber-200/90">{t('world.debug.seaPatternOpacity')}</span>
-              <input
-                type="range"
-                min={0}
-                max={1}
-                step={0.01}
-                value={config.lineOpacity}
-                onChange={(e) => update('lineOpacity', Number(e.target.value))}
-                className="w-full accent-teal-500"
-              />
-              <span className="block text-right text-amber-200/70">{config.lineOpacity.toFixed(2)}</span>
-            </label>
-
-            <label className="block text-xs">
-              <span className="text-amber-200/90">{t('world.debug.seaPatternColor')}</span>
-              <input
-                type="color"
-                value={config.lineColor}
-                onChange={(e) => update('lineColor', e.target.value)}
-                className="mt-1 h-7 w-full rounded border border-amber-700/40 bg-slate-800"
-              />
-            </label>
-
-            <label className="block text-xs">
-              <span className="text-amber-200/90">{t('world.debug.seaPatternMotion')}</span>
-              <input
-                type="range"
-                min={0}
-                max={20}
-                step={0.5}
-                value={config.motionAmount}
-                onChange={(e) => update('motionAmount', Number(e.target.value))}
-                className="w-full accent-teal-500"
-              />
-              <span className="block text-right text-amber-200/70">{config.motionAmount.toFixed(1)} wpx</span>
-            </label>
-
-            <label className="block text-xs">
-              <span className="text-amber-200/90">{t('world.debug.seaPatternPeriod')}</span>
-              <input
-                type="range"
-                min={5}
-                max={60}
-                step={1}
-                value={config.motionPeriod}
-                onChange={(e) => update('motionPeriod', Number(e.target.value))}
-                className="w-full accent-teal-500"
-              />
-              <span className="block text-right text-amber-200/70">{config.motionPeriod}s</span>
-            </label>
-
-            <label className="block text-xs">
-              <span className="text-amber-200/90">{t('world.debug.seaPatternAngle')}</span>
-              <input
-                type="range"
-                min={0}
-                max={360}
-                step={5}
-                value={config.motionAngle}
-                onChange={(e) => update('motionAngle', Number(e.target.value))}
-                className="w-full accent-teal-500"
-              />
-              <span className="block text-right text-amber-200/70">{config.motionAngle}°</span>
-            </label>
-
-            <div className="flex items-center gap-2 pt-1">
-              <input
-                id="sea-pattern-motion"
-                type="checkbox"
-                checked={config.motionEnabled}
-                disabled={reducedMotion}
-                onChange={(e) => update('motionEnabled', e.target.checked)}
-                className="accent-teal-500"
-              />
-              <label htmlFor="sea-pattern-motion" className="text-xs text-amber-200/90">
-                {t('world.debug.seaPatternMotionEnabled')}
-                {reducedMotion && (
-                  <span className="ml-1 text-amber-200/50">({t('world.debug.reducedMotion')})</span>
-                )}
-              </label>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
-};
+}
+
+export default WorldSurfaceSeaPatternOverlay;

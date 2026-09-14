@@ -4,7 +4,12 @@ import { useWorldSurface } from '../hooks/useWorldSurface';
 import { seaWonderCatalog, wonderSpawnDefaults } from '../config/seaWonders';
 import { atmosphereAssets } from '../config/atmosphereAssets';
 import { WorldSurfaceRenderer } from '../components/WorldSurfaceRenderer';
-import { WorldSurfaceSeaPatternOverlay } from '../components/WorldSurfaceSeaPatternOverlay';
+import {
+  DEFAULT_SEA_PATTERN_CONFIG,
+  SEA_PATTERN_CONFIG_SRC,
+  type SeaPatternConfig,
+} from '../components/WorldSurfaceSeaPatternOverlay';
+import { WorldSurfaceSeaPatternPanel } from '../components/WorldSurfaceSeaPatternPanel';
 import { WorldSurfaceDebugPanel } from '../components/WorldSurfaceDebugPanel';
 import { WorldSurfacePerfHud } from '../components/WorldSurfacePerfHud';
 import { WorldSurfaceBreathOverlay } from '../components/WorldSurfaceBreathOverlay';
@@ -72,6 +77,7 @@ export const WorldSurfaceTestPage: React.FC = () => {
   const [seaMarksActive, setSeaMarksActive] = useState(true);
   const [wavesActive, setWavesActive] = useState(false);
   const [seaPatternActive, setSeaPatternActive] = useState(false);
+  const [seaPatternConfig, setSeaPatternConfig] = useState<SeaPatternConfig>(DEFAULT_SEA_PATTERN_CONFIG);
   const [uiHidden, setUiHidden] = useState(false);
   // Ripple amplitude, live. In world px: the peak displacement is half of this, and
   // the on-screen amplitude is (rippleScale / 2) * camera.zoom. The lab judges at zoom
@@ -127,6 +133,33 @@ export const WorldSurfaceTestPage: React.FC = () => {
     void loadOverrides();
   }, [manifest, cameraConfig, layers]);
   /* eslint-enable react-hooks/set-state-in-effect */
+
+  // Authored preset from the sea-effect-lab spike. `patternScale` is excluded from
+  // the merge, same as `motionAngle` already was: the Director's "default to the
+  // slider's own floor" call should not be undone by an older preset value (4500)
+  // baked into this file.
+  useEffect(() => {
+    fetch(SEA_PATTERN_CONFIG_SRC)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: { visual?: Partial<SeaPatternConfig> } | null) => {
+        if (data?.visual) {
+          setSeaPatternConfig((prev) => ({
+            ...prev,
+            ...data.visual,
+            patternScale: prev.patternScale,
+            motionAngle: prev.motionAngle,
+          }));
+        }
+      })
+      .catch(() => undefined);
+  }, []);
+
+  const handleSeaPatternConfigChange = useCallback(
+    <K extends keyof SeaPatternConfig>(key: K, value: SeaPatternConfig[K]) => {
+      setSeaPatternConfig((prev) => ({ ...prev, [key]: value }));
+    },
+    [],
+  );
 
   // Where a wonder may surface. The `wonder` anchors are already open water with the
   // carved frame's silhouette subtracted (see scripts/build-terrain-masks.mjs), so the
@@ -579,6 +612,8 @@ export const WorldSurfaceTestPage: React.FC = () => {
           seaRippleConfig={{ ...atmosphereAssets.seaRipple, scale: rippleScale }}
           showSeaMarks={seaMarksActive}
           showWaves={wavesActive}
+          showSeaPattern={seaPatternActive}
+          seaPatternConfig={seaPatternConfig}
           showAtmosphere={atmosphereActive}
           eventCovered={eventCovered}
           showEventCard={cardOpen}
@@ -600,12 +635,13 @@ export const WorldSurfaceTestPage: React.FC = () => {
           </Suspense>
         )}
 
-        <WorldSurfaceSeaPatternOverlay
-          active={seaPatternActive}
-          canvasSize={manifest.coordinateSystem.canvas}
-          camera={camera}
-          hidePanel={uiHidden}
-        />
+        {seaPatternActive && (
+          <WorldSurfaceSeaPatternPanel
+            config={seaPatternConfig}
+            onChange={handleSeaPatternConfigChange}
+            hidden={uiHidden}
+          />
+        )}
 
         {/* Reaction zone overlay — world-space coords, same transform as the renderer's world div */}
         {manifest && (
