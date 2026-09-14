@@ -20,7 +20,6 @@ import type {
 } from './engine';
 import { ASTROLABE_MARKUP } from '@/ui/idleVillage/components/destinyAstrolabeV6/markup';
 import { useAstrolabeAudio } from '@/ui/idleVillage/components/destinyAstrolabeV6/useAstrolabeAudio';
-import { astrolabeV63Config } from '@/balancing/config/idleVillage/astrolabeV63Config';
 import '@/ui/idleVillage/components/destinyAstrolabeV6/astrolabe.css';
 import '@/ui/idleVillage/components/destinyAstrolabeV6/astrolabe-ui.css';
 
@@ -87,11 +86,8 @@ export const DestinyAstrolabeV63 = memo(
     const [armed, setArmed] = useState(false);
     const [flash, setFlash] = useState(false);
     const [autoThrowEnabled, setAutoThrowEnabled] = useState(autoThrow);
-    const [autoThrowMs, setAutoThrowMs] = useState(0);
     const [skipAnimationEnabled, setSkipAnimationEnabled] = useState(skipAnimation);
     const [removeSoundsEnabled, setRemoveSoundsEnabled] = useState(removeSounds);
-    const [currentState, setCurrentState] = useState('idle');
-    const [boardInfo, setBoardInfo] = useState<{ skills: AstrolabeSkill[]; axisSkill: number[]; activeSkillIndex: number } | null>(null);
 
     const play = useAstrolabeAudio(removeSoundsEnabled);
 
@@ -147,39 +143,12 @@ export const DestinyAstrolabeV63 = memo(
       doThrow();
     }, [armed, skipAnimationEnabled, doThrow]);
 
-    // Auto-Throw: throw 500ms after arming with a visible countdown
+    // Auto-Throw: throw 500ms after arming
     useEffect(() => {
       if (!armed || !autoThrowEnabled || skipAnimationEnabled) return;
-      const total = 500;
-      setAutoThrowMs(total);
-      const start = Date.now();
-      const display = window.setInterval(() => {
-        setAutoThrowMs(Math.max(0, total - (Date.now() - start)));
-      }, 50);
-      const fire = window.setTimeout(() => {
-        window.clearInterval(display);
-        setAutoThrowMs(0);
-        doThrow();
-      }, total);
-      return () => {
-        window.clearTimeout(fire);
-        window.clearInterval(display);
-      };
+      const id = window.setTimeout(() => doThrow(), 500);
+      return () => window.clearTimeout(id);
     }, [armed, autoThrowEnabled, skipAnimationEnabled, doThrow]);
-
-    // Space/Enter trigger CHECK while armed (ignore inputs/textareas)
-    useEffect(() => {
-      if (!armed) return;
-      const onKey = (e: KeyboardEvent) => {
-        if (e.key !== 'Enter' && e.key !== ' ') return;
-        const target = e.target as HTMLElement;
-        if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
-        e.preventDefault();
-        doThrow();
-      };
-      window.addEventListener('keydown', onKey);
-      return () => window.removeEventListener('keydown', onKey);
-    }, [armed, doThrow]);
 
     useEffect(() => {
       const root = rootRef.current;
@@ -196,12 +165,10 @@ export const DestinyAstrolabeV63 = memo(
         },
         onArmed: (a) => setArmed(a),
         onState: (s) => {
-          setCurrentState(s);
           if (s === 'action-trigger') play('arm', { volume: 0.6 });
           if (s === 'the-spin') play('spin', { volume: 0.5 });
           if (s === 'magnetic-snap') play('snap', { volume: 0.8 });
         },
-        onInfo: (info) => setBoardInfo({ skills: info.skills, axisSkill: info.axisSkill, activeSkillIndex: info.activeSkillIndex }),
       });
       engineRef.current = engine;
       if (autoStart) engine.roll();
@@ -234,62 +201,6 @@ export const DestinyAstrolabeV63 = memo(
           style={styles}
         />
 
-        {boardInfo && (
-          <svg
-            className={`da-skill-plaques${currentState === 'action-trigger' ? ' da-skill-plaques--armed' : ''}`}
-            viewBox="-100 -100 1200 1200"
-            preserveAspectRatio="xMidYMid meet"
-            aria-hidden="true"
-          >
-            {Array.from({ length: 5 }).map((_, i) => {
-              const skillIdx = boardInfo.axisSkill[i];
-              if (skillIdx == null) return null;
-              const sk = boardInfo.skills[skillIdx];
-              if (!sk) return null;
-              const isActive = skillIdx === boardInfo.activeSkillIndex;
-              const N = 5;
-              const angle = -Math.PI / 2 + (i * 2 * Math.PI) / N;
-              const CX = 500;
-              const CY = 500;
-              const r = 500 * astrolabeV63Config.perimeterPlaques.radiusFactor;
-              const x = CX + Math.cos(angle) * r;
-              const y = CY + Math.sin(angle) * r;
-              const { width: pw, height: ph, activeScale } = astrolabeV63Config.perimeterPlaques;
-              const show = currentState === 'action-trigger';
-              const scale = show ? (isActive ? activeScale : 1) : 0.85;
-              return (
-                <g
-                  key={i}
-                  className={`da-skill-plaque${isActive ? ' da-skill-plaque--active' : ''}`}
-                  style={{
-                    transform: `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${scale.toFixed(3)})`,
-                    opacity: show ? 1 : 0,
-                    transitionDelay: `${i * 60}ms`,
-                  }}
-                >
-                  <rect
-                    x={-pw / 2}
-                    y={-ph / 2}
-                    width={pw}
-                    height={ph}
-                    rx={ph / 4}
-                    className="da-skill-plaque__bg"
-                  />
-                  <text
-                    className="da-skill-plaque__text"
-                    x={0}
-                    y={0}
-                    textAnchor="middle"
-                    dominantBaseline="central"
-                  >
-                    {sk.icon ? `${sk.icon} ${sk.name}` : sk.name}
-                  </text>
-                </g>
-              );
-            })}
-          </svg>
-        )}
-
         {armed && (
           <button
             type="button"
@@ -300,11 +211,6 @@ export const DestinyAstrolabeV63 = memo(
           >
             <span className="da-skill-core__rune" aria-hidden="true">✦</span>
             <span className="da-skill-core__label">{t('astrolabeV63.check')}</span>
-            {autoThrowEnabled && armed && autoThrowMs > 0 && (
-              <span className="da-skill-core__countdown" aria-hidden="true">
-                {(Math.ceil(autoThrowMs / 100) / 10).toFixed(1)}s
-              </span>
-            )}
           </button>
         )}
 

@@ -490,7 +490,21 @@
       "despawnWonders": "Despawn wonders",
       "breath": "Breath",
       "water": "Water",
-      "atmosphere": "Atmosphere"
+      "atmosphere": "Atmosphere",
+      "seaPattern": "Pattern",
+      "seaPatternTitle": "Sea pattern — live",
+      "seaPatternLive": "Authored texture A1 / micro scroll",
+      "seaPatternClose": "Close",
+      "seaPatternScale": "Pattern scale",
+      "seaPatternOpacity": "Line opacity",
+      "seaPatternColor": "Line color",
+      "seaPatternMotion": "Motion amount",
+      "seaPatternPeriod": "Motion period",
+      "seaPatternAngle": "Motion angle",
+      "seaPatternMotionEnabled": "Motion on",
+      "reducedMotion": "reduced motion",
+      "hideUi": "Hide UI",
+      "showUi": "Show UI"
     }
   },
   "worldEvents": {

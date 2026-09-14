@@ -1,13 +1,47 @@
 # Session handoff
 
-**Current state:** `PLAN-014-land-breath` in esecuzione. Desiderata di riferimento: **v21 FROZEN**.
+**Current state:** `PLAN-017-stylized-sea-pattern-evaluation` attivo. Il Director ha richiesto e approvato di portare il pattern authored A1 in `WorldSurfaceTestPage` come overlay di debug/spike. Implementazione completata.
 
-**T-000a completed:** `scripts/land-breath-pre-check.mjs` eseguito. Report `test-results/land-breath-pre-check-2026-09-08.log`: tutti i biomi 70–100% residual range post-blur 3px (molto più dettaglio del mare ~1%).
+**Desiderata FROZEN:** `.mw/desiderata.md` v19 (Water Effect Lab: shader custom condizionati, fallback DOM, profilazione).
 
-**T-000b ready for review:** `scripts/build-land-breath-spike-assets.mjs` + `public/land-breath-spike.html` generano e mostrano i compositi per bioma con DisplacementFilter Pixi. Tre varianti (scroll/scale/combine), padding 64px edge-extend, sea statico. Pagina live su http://127.0.0.1:5173/land-breath-spike.html.
+**Richiesta:** R-068 — Plan di implementazione per il mare Voronoi, riformulato in Stylized Sea Pattern Evaluation.
 
-**Evidence:** `test-results/land-breath-t000b-2026-09-08.log`, `test-results/land-breath-pre-check-2026-09-08.log`.
+**What was done:**
+- Generata texture `sea_pattern_tile.png` (2048x1448, RGBA trasparente) dal riferimento EPS/JPG con high-pass filter.
+- Scritto script riproducibile: `scripts/build-sea-pattern-tile.py`.
+- Creato preset config: `public/sea-spike-config.json`.
+- Riscritto `public/voronoi-sea-spike.html` per renderizzare la texture authored A0/A1 in world-space con micro-scroll.
+- Verificato `npm run build:check` ✅.
+- Preview iniziale: pattern visibile su `Stretto est` a zoom 0.24, patternScale 4500 wpx, lineOpacity 0.35, colore `#8bbac2`, moto 3 wpx / 18 s.
+- **Override Director:** portato lo spike in `WorldSurfaceTestPage` con overlay WebGL (`WorldSurfaceSeaPatternOverlay.tsx`), pulsante `Pattern` e pannello live "Sea pattern — live" / "Pattern mare — dal vivo". Maschera `sea_mask.webp`, ancoraggio world-space a zoom/pan, rispetto `prefers-reduced-motion`, config `public/world-surface-sea-pattern-config.json`.
+|- Aggiunto pulsante `Hide UI`/`Show UI` (default off) per nascondere header, pannelli e HUD lasciando solo la mappa.
 
-**Verdict pending:** il Director deve guardare il browser preview e confermare quale variante/ampiezza/speed funziona. Finché il verdetto non arriva, **T-001+ restano congelati**.
+**URLs / files:**
+- Spike live: `http://localhost:5173/voronoi-sea-spike.html` (porta corrente del dev server).
+- World Surface live: `http://localhost:5173/world-surface`.
+- Browser preview del World Surface: `http://127.0.0.1:62674/world-surface`.
+- Screenshot spike: `test-results/sea-spike-screenshot.png`.
+- Screenshot World Surface normal: `test-results/world-surface-normal.png`.
+- Screenshot World Surface clean (UI off): `test-results/world-surface-clean.png`.
+- Texture: `public/assets/world/wanderlust/base/layers/sea_pattern_tile.png`.
+- Script build texture: `scripts/build-sea-pattern-tile.py`.
+- Script screenshot World Surface: `scripts/screenshot-world-surface-ui-toggle.cjs`.
 
-**Build/health:** `npm run build:check` ✅, `npm run kanban:lint` ✅.
+**Next step:**
+- Valutazione visiva del pattern in `WorldSurfaceTestPage`; confermare opacità, densità e colore.
+- `SEA-01` reference board + `SEA-05` motion tuning: catturare screenshot A0 (statico) e A1 (moto) per i tre crop ai tre zoom e valutare percettivamente.
+- Poi implementare B (dual texture crossfade) e C (Voronoi challenger) per la comparativa.
+
+**Open questions:**
+- La texture sembra ancora un po' troppo "luce/caustica" rispetto a "linea disegnata". Serve un altro passo di processing per sparare i glints brillanti e/o un colore più desaturato.
+- Il pattern attuale è denso; il Director deve decidere se "molto rade" si ottiene abbassando opacità o serve una texture diversa.
+- `patternScale` 4500 wpx sembra un buon punto medio: celle ~50–100 px a schermo a zoom 0.24–0.30. Da confermare.
+
+**Do not touch (salvo nuovo override):**
+- `WorldSurfaceRenderer`, `WorldSurfaceWaves`, ripple costiero, layer baked, TestHub finché non esce uno spike approvato.
+- `WorldSurfaceTestPage` è ora un overlay di spike autorizzato; non promuovere in produzione senza approvazione.
+
+**Rule candidates:**
+- Separazione tra parametri artistici e algoritmici per effetti condivisibili.
+- Gold standard authored vs challenger procedurale.
+- Pattern world-space: nessuna modalità viewport-space.

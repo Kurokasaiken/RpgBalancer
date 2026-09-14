@@ -134,9 +134,43 @@ export const ParallaxConfigSchema = z.object({
   y: z.number().default(0),
 });
 
+/**
+ * Where a cropped layer asset sits inside the original full-canvas painting.
+ *
+ * The layers were authored as full-canvas bakes, and most of them are almost entirely
+ * transparent — measured, 17 of them paint between 1% and 8% of the canvas, and each
+ * one still cost a full 3072x2049x4 = 24 MB of decoded RGBA. 397 MB of the map's
+ * 562 MB was transparent pixels.
+ *
+ * Cropping to the painted bounding box removes that without moving anything: the
+ * renderer places the crop at `x/sourceWidth` of the canvas and sizes it to
+ * `width/sourceWidth` of it, so a source pixel lands exactly where the full-canvas
+ * stretch used to put it. The asset is re-encoded LOSSLESSLY from the decoded
+ * original, and `scripts/verify-world-layer-crops.mjs` recomposes every crop back
+ * into a full canvas and compares it byte-for-byte with the original.
+ *
+ * All values are in pixels of the ORIGINAL asset, not world px — the manifest canvas
+ * is 4240x2828 while the assets are 3072x2049, and `renderer.imageFit: 'fill'`
+ * stretches between the two.
+ */
+export const LayerSourceRectSchema = z.object({
+  x: z.number().int().min(0),
+  y: z.number().int().min(0),
+  width: z.number().int().positive(),
+  height: z.number().int().positive(),
+  /** Dimensions of the original uncropped asset, which define the mapping. */
+  sourceWidth: z.number().int().positive(),
+  sourceHeight: z.number().int().positive(),
+});
+
 export const WorldSurfaceLayerSchema = z.object({
   id: z.string(),
   file: z.string(),
+  /**
+   * Present only on layers whose asset has been cropped to its painted bounds.
+   * Absent means the asset is full-canvas and is stretched by `renderer.imageFit`.
+   */
+  rect: LayerSourceRectSchema.optional(),
   type: LayerTypeSchema,
   zIndex: z.number().int(),
   opacity: z.number().min(0).max(1).default(1),

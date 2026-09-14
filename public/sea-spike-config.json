@@ -1,0 +1,19 @@
+{
+  "visual": {
+    "patternMode": "authoredTexture",
+    "patternScale": 4500,
+    "lineOpacity": 0.65,
+    "lineWidth": 1.0,
+    "lineColor": "#8bbac2",
+    "baseColor": "#0b5c6b",
+    "motionEnabled": true,
+    "motionAmount": 3,
+    "motionPeriod": 18
+  },
+  "algorithm": {
+    "neighborRadius": 3,
+    "cellScale": 120,
+    "gaussianSharpness": 8.0,
+    "curlEpsilon": 0.01
+  }
+}

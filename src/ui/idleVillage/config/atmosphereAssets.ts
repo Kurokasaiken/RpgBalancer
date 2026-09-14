@@ -219,6 +219,15 @@ export interface WaterFieldConfig {
  * - `sprite`: a hand-painted or captured animated sprite sheet blended over the
  *   masked sea, giving the impression of moving light/ripples.
  */
+/**
+ * The `id` of the displacement filter the sea layer references in `smil` mode.
+ *
+ * It lives here, not in `WorldSurfaceSeaRipple.tsx`, because that component is lazy
+ * loaded: importing a constant from it would pull the whole module into the renderer's
+ * chunk and undo the split.
+ */
+export const SEA_RIPPLE_FILTER_ID = 'wsSeaRippleDisplace';
+
 export interface SeaRippleConfig {
   enabled: boolean;
   /** Mask that limits the effect to shallow / coastal water. */
@@ -226,10 +235,38 @@ export interface SeaRippleConfig {
   /** Object-fit used by the sea layer so the masked copy aligns exactly. */
   imageFit: 'fill' | 'cover' | 'contain' | 'none';
   mode: 'smil' | 'sprite';
-  /** SMIL mode: base frequency for feTurbulence, scaled with zoom. */
+  /**
+   * SMIL mode: base frequency for feTurbulence, in **world px** and NOT scaled with
+   * zoom. The filter lives on the sea layer's own `<img>`, which fills the world box,
+   * so filter user space is world px and does not change with the camera. Dividing
+   * this by zoom — as an earlier port did, copying the lab where the subject IS at
+   * screen scale — is wrong by 1/zoom². See WorldSurfaceSeaRipple.tsx.
+   */
   baseFrequency?: number;
-  /** SMIL mode: displacement scale (lab `rippleSoft` = 4). */
+  /** SMIL mode: displacement scale in **world px**. Peak offset is ±scale/2. */
   scale?: number;
+  /**
+   * Layers besides `sea` that also carry the displacement filter.
+   *
+   * Needed because on some islands the waterline is NOT the sea's alpha edge. Measured:
+   * `island_bottom_left` and `island_bottom_right` are painted LARGER than their cutout
+   * in the sea, overlapping the opaque sea by a band of roughly 10 px — 19.9% and 15.1%
+   * of their painted area respectively. The sea's edge therefore sits *inside* the
+   * island, hidden under its paint, and the ripple was 100% and 99.2% occluded there.
+   * The Director saw exactly that: the two islands had no effect on their coasts.
+   *
+   * Putting those layers under the sea instead would let the sea clip a fifth of each
+   * island away, so the fix is to displace the island's own edge, which IS the
+   * waterline there.
+   *
+   * Trade-off, stated because it is real: this displaces the whole island layer, so its
+   * interior warps by the same ±scale/2 world px as its rim. On these two islands that
+   * is ±5 world px ≈ ±1.5 screen px at zoom 0.3. If it reads as the island wobbling
+   * rather than as water lapping, the next step is masking the displacement to the
+   * outer rim (`feMorphology` erode on the alpha, composite the interior back from the
+   * undisplaced source) rather than lowering `scale` for everything.
+   */
+  extraLayerIds?: string[];
   /** SMIL mode: full SMIL cycle length in seconds. */
   seconds?: number;
   /** Sprite mode: path to the sprite sheet. */
@@ -468,9 +505,21 @@ export const atmosphereAssets: AtmosphereConfig = {
     imageFit: 'fill',
     // Director prefers the coastal ripple over the animated sprite sheet.
     mode: 'smil',
-    baseFrequency: 0.012,
-    scale: 4,
+    // World px, no zoom compensation. The lab's approved `rippleSoft` is a wavelength
+    // of 2.71% of the image width and a peak offset of 0.065% of it; on the 4240-wide
+    // world box that is 0.0087 and 5.52. `scale` ships at 10 instead of 5.52 because
+    // the Director approved the lab at zoom 0.33 while the map runs at 0.18, and
+    // 0.33/0.18 = 1.83x: 10 matches the amplitude he actually saw on screen.
+    baseFrequency: 0.0087,
+    scale: 10,
     seconds: 18,
+    // The two islands whose paint overlaps the opaque sea, so their own edge is the
+    // waterline. `mountain_zone_north` (95% occluded) and
+    // `mountain_island_bottom_left` (61%) are deliberately NOT here: the first is the
+    // northern range along the top edge, where a warping mountain would be far more
+    // noticeable than a shoreline, and the second still has 39% of its coast reading
+    // from the sea's own edge.
+    extraLayerIds: ['island_bottom_left', 'island_bottom_right'],
   },
   waterField: {
     // Headings are 12° and 108°: diverging, and deliberately not 90° apart. Two
