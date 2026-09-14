@@ -1,9 +1,20 @@
 import { useCallback, useEffect, useRef } from 'react';
 import useReducedMotion from '../hooks/useReducedMotion';
+import { TEXTURE_EDGE_LIMIT_PX } from '../hooks/useFrameMetrics';
 
 const PATTERN_SRC = '/assets/world/wanderlust/base/layers/sea_pattern_tile.png';
 const MASK_SRC = '/assets/atmosphere/terrain/sea_mask.webp';
 export const SEA_PATTERN_CONFIG_SRC = '/world-surface-sea-pattern-config.json';
+
+/**
+ * The world canvas (4240x2828) is wider than `TEXTURE_EDGE_LIMIT_PX` — the same
+ * WebKit compositing ceiling `WorldSurfaceSeaRipple` documents ("fails blank
+ * rather than throwing"). A `<canvas>` backing store sized 1:1 to the world hit
+ * exactly that: the pattern rendered in some regions and silently dropped out in
+ * others, with no error anywhere. Half the ceiling leaves headroom and is still
+ * 2x oversampled at the map's default zoom (~0.24), so nothing is lost visually.
+ */
+const MAX_CANVAS_EDGE_PX = TEXTURE_EDGE_LIMIT_PX / 2;
 
 const VERT = `#version 300 es
 in vec2 aPos;
@@ -123,6 +134,8 @@ export function WorldSurfaceSeaPatternOverlay({
   const textureRef = useRef<WebGLTexture | null>(null);
   const startTRef = useRef(performance.now());
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  /** World px per canvas backing-store px — see `MAX_CANVAS_EDGE_PX` above. */
+  const worldPerCanvasPxRef = useRef(1);
 
   const setupWebGL = useCallback(() => {
     const canvas = canvasRef.current;
@@ -210,16 +223,23 @@ export function WorldSurfaceSeaPatternOverlay({
     return true;
   }, [onError]);
 
-  // Canvas backing store is the WORLD canvas size at 1x — the map's default zoom
-  // (~0.24) already oversamples this several times over, and the parent's own CSS
-  // `scale(camera.zoom)` is what puts it on screen, not this resolution.
+  // Canvas backing store is capped at `MAX_CANVAS_EDGE_PX` on its longer edge —
+  // NOT the world canvas size at 1x — to stay under the compositing ceiling. CSS
+  // (`width/height: 100%` below) stretches it back up to the full world box; the
+  // shader compensates with `worldPerCanvasPxRef` so the pattern still measures
+  // out in true world px regardless of this internal resolution.
   const resize = useCallback(() => {
     const canvas = canvasRef.current;
     const gl = glRef.current;
     if (!canvas || !gl) return;
-    if (canvas.width !== canvasSize.width || canvas.height !== canvasSize.height) {
-      canvas.width = canvasSize.width;
-      canvas.height = canvasSize.height;
+    const longEdge = Math.max(canvasSize.width, canvasSize.height);
+    const scale = Math.min(1, MAX_CANVAS_EDGE_PX / longEdge);
+    const targetWidth = Math.round(canvasSize.width * scale);
+    const targetHeight = Math.round(canvasSize.height * scale);
+    worldPerCanvasPxRef.current = canvasSize.width / targetWidth;
+    if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
       gl.viewport(0, 0, canvas.width, canvas.height);
     }
   }, [canvasSize.width, canvasSize.height]);
@@ -237,7 +257,7 @@ export function WorldSurfaceSeaPatternOverlay({
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     gl.useProgram(program);
-    gl.uniform1f(loc.dpr, 1);
+    gl.uniform1f(loc.dpr, 1 / worldPerCanvasPxRef.current);
     gl.uniform1f(loc.worldHeight, canvasSize.height);
     gl.uniform1f(loc.time, (performance.now() - startTRef.current) / 1000);
     gl.uniform1i(loc.patternTex, 0);
