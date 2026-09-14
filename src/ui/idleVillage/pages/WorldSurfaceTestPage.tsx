@@ -4,6 +4,7 @@ import { useWorldSurface } from '../hooks/useWorldSurface';
 import { seaWonderCatalog, wonderSpawnDefaults } from '../config/seaWonders';
 import { atmosphereAssets } from '../config/atmosphereAssets';
 import { WorldSurfaceRenderer } from '../components/WorldSurfaceRenderer';
+import { WorldSurfaceSeaPatternOverlay } from '../components/WorldSurfaceSeaPatternOverlay';
 import { WorldSurfaceDebugPanel } from '../components/WorldSurfaceDebugPanel';
 import { WorldSurfacePerfHud } from '../components/WorldSurfacePerfHud';
 import { WorldSurfaceBreathOverlay } from '../components/WorldSurfaceBreathOverlay';
@@ -62,7 +63,22 @@ export const WorldSurfaceTestPage: React.FC = () => {
   const [wonderAnchors, setWonderAnchors] = useState<{ x: number; y: number }[]>([]);
   const [perfHudVisible, setPerfHudVisible] = useState(true);
   const [breathActive, setBreathActive] = useState(false);
+  // Three separate flags on purpose. Until now the single "Water" button drove both
+  // the coastal ripple and the wave marks, while the 34 sea marks were on
+  // unconditionally — so nothing seen on the map could be attributed to one system.
+  // Defaults preserve the behaviour these had when they shared a flag.
   const [waterActive, setWaterActive] = useState(false);
+  const [waterFieldActive, setWaterFieldActive] = useState(false);
+  const [seaMarksActive, setSeaMarksActive] = useState(true);
+  const [wavesActive, setWavesActive] = useState(false);
+  const [seaPatternActive, setSeaPatternActive] = useState(false);
+  const [uiHidden, setUiHidden] = useState(false);
+  // Ripple amplitude, live. In world px: the peak displacement is half of this, and
+  // the on-screen amplitude is (rippleScale / 2) * camera.zoom. The lab judges at zoom
+  // 0.33 and the map runs at ~0.18-0.30, so the value approved there is not the value
+  // the map wants — and finding it through a config file plus a reload is what made
+  // the previous attempts so slow.
+  const [rippleScale, setRippleScale] = useState(atmosphereAssets.seaRipple.scale ?? 10);
   const [atmosphereActive, setAtmosphereActive] = useState(false);
   const wonderTimeoutsRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
   const dwellTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -446,35 +462,94 @@ export const WorldSurfaceTestPage: React.FC = () => {
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-slate-950 text-amber-100">
-      <header className="flex items-center justify-between border-b border-amber-700/30 bg-slate-900 px-4 py-2">
-        <h1 className="text-lg font-semibold text-amber-300">{translate('world.title')}</h1>
+      <header
+        className={
+          uiHidden
+            ? 'absolute right-2 top-2 z-50 flex items-center bg-transparent px-2 py-1'
+            : 'flex items-center justify-between border-b border-amber-700/30 bg-slate-900 px-4 py-2'
+        }
+      >
+        {!uiHidden && <h1 className="text-lg font-semibold text-amber-300">{translate('world.title')}</h1>}
         <div className="flex items-center gap-2">
-          <a
-            href="/test-hub"
-            className="rounded border border-amber-700/40 px-3 py-1 text-xs hover:bg-amber-700/20"
-          >
-            {translate('world.back')}
-          </a>
+          {!uiHidden && (
+            <>
+              <a
+                href="/test-hub"
+                className="rounded border border-amber-700/40 px-3 py-1 text-xs hover:bg-amber-700/20"
+              >
+                {translate('world.back')}
+              </a>
+              <button
+                type="button"
+                onClick={() => setBreathActive((v) => !v)}
+                className={`rounded border border-amber-700/40 px-3 py-1 text-xs hover:bg-amber-700/20 ${breathActive ? 'bg-amber-600 text-amber-950' : ''}`}
+              >
+                {translate('world.debug.breath')}
+              </button>
+              <button
+                type="button"
+                onClick={() => setWaterActive((v) => !v)}
+                className={`rounded border border-amber-700/40 px-3 py-1 text-xs hover:bg-amber-700/20 ${waterActive ? 'bg-amber-600 text-amber-950' : ''}`}
+              >
+                {translate('world.debug.water')}
+              </button>
+              <button
+                type="button"
+                onClick={() => setSeaMarksActive((v) => !v)}
+                title="34 segni d'acqua dipinti (PLAN-013)"
+                className={`rounded border border-amber-700/40 px-3 py-1 text-xs hover:bg-amber-700/20 ${seaMarksActive ? 'bg-amber-600 text-amber-950' : ''}`}
+              >
+                Marks
+              </button>
+              <button
+                type="button"
+                onClick={() => setWavesActive((v) => !v)}
+                title="7 onde dipinte che rompono sulla battigia"
+                className={`rounded border border-amber-700/40 px-3 py-1 text-xs hover:bg-amber-700/20 ${wavesActive ? 'bg-amber-600 text-amber-950' : ''}`}
+              >
+                Waves
+              </button>
+              <button
+                type="button"
+                onClick={() => setSeaPatternActive((v) => !v)}
+                title={t('world.debug.seaPatternTitle')}
+                className={`rounded border border-amber-700/40 px-3 py-1 text-xs hover:bg-amber-700/20 ${seaPatternActive ? 'bg-amber-600 text-amber-950' : ''}`}
+              >
+                {t('world.debug.seaPattern')}
+              </button>
+              {waterActive && (
+                <label className="flex items-center gap-2 text-xs text-amber-200/90">
+                  Ripple
+                  <input
+                    type="range"
+                    min={0}
+                    max={60}
+                    step={1}
+                    value={rippleScale}
+                    onChange={(e) => setRippleScale(Number(e.target.value))}
+                    title="Ampiezza del ripple costiero, in world px"
+                  />
+                  <span className="w-24 tabular-nums text-amber-200/70">
+                    {rippleScale} wpx · ±{((rippleScale / 2) * camera.zoom).toFixed(2)} px
+                  </span>
+                </label>
+              )}
+              <button
+                type="button"
+                onClick={() => setAtmosphereActive((v) => !v)}
+                className={`rounded border border-amber-700/40 px-3 py-1 text-xs hover:bg-amber-700/20 ${atmosphereActive ? 'bg-amber-600 text-amber-950' : ''}`}
+              >
+                {translate('world.debug.atmosphere')}
+              </button>
+            </>
+          )}
           <button
             type="button"
-            onClick={() => setBreathActive((v) => !v)}
-            className={`rounded border border-amber-700/40 px-3 py-1 text-xs hover:bg-amber-700/20 ${breathActive ? 'bg-amber-600 text-amber-950' : ''}`}
+            onClick={() => setUiHidden((v) => !v)}
+            title={uiHidden ? t('world.debug.showUi') : t('world.debug.hideUi')}
+            className={`rounded border border-amber-700/40 px-3 py-1 text-xs hover:bg-amber-700/20 ${uiHidden ? 'bg-amber-600 text-amber-950' : ''}`}
           >
-            {translate('world.debug.breath')}
-          </button>
-          <button
-            type="button"
-            onClick={() => setWaterActive((v) => !v)}
-            className={`rounded border border-amber-700/40 px-3 py-1 text-xs hover:bg-amber-700/20 ${waterActive ? 'bg-amber-600 text-amber-950' : ''}`}
-          >
-            {translate('world.debug.water')}
-          </button>
-          <button
-            type="button"
-            onClick={() => setAtmosphereActive((v) => !v)}
-            className={`rounded border border-amber-700/40 px-3 py-1 text-xs hover:bg-amber-700/20 ${atmosphereActive ? 'bg-amber-600 text-amber-950' : ''}`}
-          >
-            {translate('world.debug.atmosphere')}
+            {uiHidden ? t('world.debug.showUi') : t('world.debug.hideUi')}
           </button>
         </div>
       </header>
@@ -499,7 +574,11 @@ export const WorldSurfaceTestPage: React.FC = () => {
           autoFitTrigger={autoFitTrigger}
           showRegions={false}
           breathEnabled={breathActive}
+          showWaterField={waterFieldActive}
           showSeaRipple={waterActive}
+          seaRippleConfig={{ ...atmosphereAssets.seaRipple, scale: rippleScale }}
+          showSeaMarks={seaMarksActive}
+          showWaves={wavesActive}
           showAtmosphere={atmosphereActive}
           eventCovered={eventCovered}
           showEventCard={cardOpen}
@@ -520,6 +599,13 @@ export const WorldSurfaceTestPage: React.FC = () => {
             <WorldSurfacePixiOverlay manifest={manifest} camera={camera} objects={objects} />
           </Suspense>
         )}
+
+        <WorldSurfaceSeaPatternOverlay
+          active={seaPatternActive}
+          canvasSize={manifest.coordinateSystem.canvas}
+          camera={camera}
+          hidePanel={uiHidden}
+        />
 
         {/* Reaction zone overlay — world-space coords, same transform as the renderer's world div */}
         {manifest && (
@@ -588,7 +674,7 @@ export const WorldSurfaceTestPage: React.FC = () => {
           </>
         )}
 
-        {import.meta.env.DEV && perfHudVisible && (
+        {!uiHidden && import.meta.env.DEV && perfHudVisible && (
           <WorldSurfacePerfHud
             containerRef={mainRef}
             visibleLayerCount={visibleLayerIds.size}
@@ -597,7 +683,7 @@ export const WorldSurfaceTestPage: React.FC = () => {
           />
         )}
 
-        <WorldSurfaceDebugPanel
+        {!uiHidden && <WorldSurfaceDebugPanel
           manifest={manifest}
           layers={layers}
           visualStates={visualStates}
@@ -627,7 +713,7 @@ export const WorldSurfaceTestPage: React.FC = () => {
           onCloudScaleChange={setCloudScales}
           eventCovered={eventCovered}
           onEventCoveredChange={handleEventCoveredChange}
-        />
+        />}
       </main>
     </div>
   );

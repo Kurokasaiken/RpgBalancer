@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sea Pattern Spike — SEA-SPIKE-01</title>
+<style>
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: auto; background: #0a1418; }
+  #stage {
+    position: relative;
+    overflow: hidden;
+    background: #16282c;
+    transform-origin: top left;
+  }
+  #stage img, #stage canvas {
+    position: absolute;
+    left: 0; top: 0;
+    max-width: none;
+    max-height: none;
+    pointer-events: none;
+  }
+  #maskedWrap {
+    position: absolute;
+    inset: 0;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    mask-size: 100% 100%;
+    -webkit-mask-size: 100% 100%;
+    mask-position: 0 0;
+    -webkit-mask-position: 0 0;
+  }
+  #ui {
+    position: fixed;
+    top: 8px;
+    right: 8px;
+    width: 330px;
+    max-height: calc(100vh - 16px);
+    overflow-y: auto;
+    padding: 14px;
+    border-radius: 8px;
+    background: rgba(10, 16, 18, 0.9);
+    color: #e8f0f0;
+    font: 12px/1.4 system-ui, -apple-system, sans-serif;
+    z-index: 10;
+    backdrop-filter: blur(4px);
+  }
+  #ui h1 { margin: 0 0 4px; font-size: 14px; color: #fff; }
+  #ui h2 { margin: 14px 0 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #9fd; border-top: 1px solid #244; padding-top: 8px; }
+  #ui .sub { color: #99b; margin-bottom: 8px; }
+  #ui label { display: block; margin: 8px 0 2px; color: #cde; }
+  #ui .row { display: flex; gap: 4px; margin: 4px 0; flex-wrap: wrap; }
+  #ui button {
+    flex: 1;
+    min-width: 60px;
+    padding: 5px 6px;
+    border: 1px solid #456;
+    border-radius: 4px;
+    background: #1a2a2e;
+    color: #dee;
+    cursor: pointer;
+    font-size: 11px;
+  }
+  #ui button.active { background: #2a8a7a; border-color: #3dbaa4; color: #001; font-weight: 600; }
+  #ui input[type="range"] { width: 100%; accent-color: #3dbaa4; }
+  #ui input[type="color"] { width: 100%; height: 26px; border: 1px solid #456; background: #1a2a2e; }
+  #ui .value { float: right; color: #9fd; font-variant-numeric: tabular-nums; }
+  #ui .note { margin-top: 6px; font-size: 10.5px; color: #789; }
+  #fps { position: fixed; left: 8px; top: 8px; z-index: 10; background: rgba(0,0,0,0.6); color: #9fd; padding: 4px 8px; border-radius: 4px; font: 11px monospace; }
+</style>
+</head>
+<body>
+<div id="fps">-- fps</div>
+<div id="stage">
+  <img id="bgImg" alt="" />
+  <img id="seaImg" alt="" />
+  <div id="maskedWrap">
+    <canvas id="gl"></canvas>
+  </div>
+</div>
+
+<div id="ui">
+  <h1>Sea Pattern Spike — SEA-SPIKE-01</h1>
+  <div class="sub">A0 statico / A1 micro scroll su Mare.webp. Pattern world-space.</div>
+
+  <h2>Scena</h2>
+  <label>Crop <span class="value" id="cropLabel"></span></label>
+  <div class="row" id="cropButtons"></div>
+  <label>Zoom mappa <span class="value" id="zoomLabel"></span></label>
+  <div class="row" id="zoomButtons"></div>
+  <label>Ingrandimento <span class="value" id="magLabel"></span></label>
+  <div class="row" id="magButtons"></div>
+  <div class="row">
+    <button id="toggleBg">Sfondo</button>
+    <button id="toggleSea" class="active">Mare</button>
+  </div>
+
+  <h2>Pattern</h2>
+  <label for="patternScale">Scala pattern <span class="value" id="patternScale-value"></span> wpx</label>
+  <input id="patternScale" type="range" min="1000" max="20000" step="100" value="4500" />
+
+  <label for="lineOpacity">Opacità linee <span class="value" id="lineOpacity-value"></span></label>
+  <input id="lineOpacity" type="range" min="0" max="1" step="0.01" value="0.65" />
+
+  <label for="lineColor">Colore linee</label>
+  <input id="lineColor" type="color" value="#8bbac2" />
+
+  <h2>Movimento (A1)</h2>
+  <div class="row">
+    <button id="toggleMotion" class="active">Moto on</button>
+    <button id="togglePlay" class="active">Play</button>
+    <button id="resetTime">t=0</button>
+  </div>
+  <label for="motionAmount">Ampiezza <span class="value" id="motionAmount-value"></span> wpx</label>
+  <input id="motionAmount" type="range" min="0" max="20" step="0.5" value="3" />
+  <label for="motionPeriod">Periodo <span class="value" id="motionPeriod-value"></span> s</label>
+  <input id="motionPeriod" type="range" min="5" max="60" step="1" value="18" />
+  <label for="motionAngle">Direzione <span class="value" id="motionAngle-value"></span>°</label>
+  <input id="motionAngle" type="range" min="0" max="360" step="5" value="200" />
+
+  <div class="note">
+    prefers-reduced-motion è rispettato automaticamente: disabilita il movimento.
+  </div>
+</div>
+
+<script type="module">
+const CONFIG_SRC = '/sea-spike-config.json';
+const PATTERN_SRC = '/assets/world/wanderlust/base/layers/sea_pattern_tile.png';
+const SEA_SRC = '/assets/world/wanderlust/base/layers/Mare.webp';
+const BACKGROUND_SRC = '/assets/world/wanderlust/base/layers/Background.webp';
+const SEA_MASK_SRC = '/assets/atmosphere/terrain/sea_mask.webp';
+
+const SEA_W = 3072, SEA_H = 2049;
+const SOURCE_TO_WORLD = 4240 / SEA_W;
+const CROPS = [
+  { id: 'open',   label: 'Mare aperto',  x: 0.005, y: 0.005, w: 0.12,  h: 0.058 },
+  { id: 'strait', label: 'Stretto est',  x: 0.86,  y: 0.3,   w: 0.135, h: 0.24 },
+  { id: 'coast',  label: 'Isolotto sud', x: 0.32,  y: 0.82,  w: 0.16,  h: 0.15 },
+];
+const ZOOMS = [0.18, 0.24, 0.30];
+const DEFAULT_CONFIG = {
+  visual: {
+    patternMode: 'authoredTexture',
+    patternScale: 9382,
+    lineOpacity: 0.15,
+    lineWidth: 1.0,
+    lineColor: '#9fdbe6',
+    baseColor: '#0b5c6b',
+    motionEnabled: true,
+    motionAmount: 3,
+    motionPeriod: 18,
+  },
+  algorithm: { neighborRadius: 3, cellScale: 120, gaussianSharpness: 8.0, curlEpsilon: 0.01 },
+};
+
+const config = await fetch(CONFIG_SRC)
+  .then(r => r.ok ? r.json() : DEFAULT_CONFIG)
+  .catch(() => DEFAULT_CONFIG);
+
+const visual = { ...DEFAULT_CONFIG.visual, ...config.visual };
+
+const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const state = {
+  crop: CROPS[1],
+  zoom: ZOOMS[1],
+  showBg: true,
+  showSea: true,
+  magnification: 1,
+  playing: true,
+  t0: performance.now(),
+  pausedAt: 0,
+  motionEnabled: visual.motionEnabled && !prefersReducedMotion,
+  patternScale: visual.patternScale,
+  lineOpacity: visual.lineOpacity,
+  lineColor: visual.lineColor,
+  motionAmount: visual.motionAmount,
+  motionPeriod: visual.motionPeriod,
+  motionAngle: 200,
+};
+
+const $ = (id) => document.getElementById(id);
+const stage = $('stage'), bgImg = $('bgImg'), seaImg = $('seaImg'), maskedWrap = $('maskedWrap'), canvas = $('gl');
+
+function stageMaxW() {
+  const w = window.innerWidth || 1280;
+  return Math.max(320, Math.min(w - 360, 1200));
+}
+
+const worldOriginPx = [0, 0];
+let worldPerScreenPx = 1;
+
+function layoutStage() {
+  const c = state.crop;
+  const trueCw = c.w * SEA_W * SOURCE_TO_WORLD * state.zoom;
+  const trueCh = trueCw * (c.h * SEA_H) / (c.w * SEA_W);
+
+  stage.style.width = `${trueCw}px`;
+  stage.style.height = `${trueCh}px`;
+  stage.style.transform = `scale(${state.magnification})`;
+
+  const boxed = (img) => {
+    img.style.left = `${(-c.x / c.w) * 100}%`;
+    img.style.top = `${(-c.y / c.h) * 100}%`;
+    img.style.width = `${100 / c.w}%`;
+    img.style.height = `${100 / c.h}%`;
+  };
+  boxed(bgImg);
+  boxed(seaImg);
+
+  const maskUrl = `url(${SEA_MASK_SRC})`;
+  maskedWrap.style.maskImage = maskUrl;
+  maskedWrap.style.webkitMaskImage = maskUrl;
+
+  const maskRenderedW = trueCw / c.w;
+  const maskRenderedH = trueCh / c.h;
+  const maskOffsetX = -c.x * maskRenderedW;
+  const maskOffsetY = -c.y * maskRenderedH;
+  maskedWrap.style.maskPosition = `${maskOffsetX}px ${maskOffsetY}px`;
+  maskedWrap.style.webkitMaskPosition = maskedWrap.style.maskPosition;
+  maskedWrap.style.maskSize = `${maskRenderedW}px ${maskRenderedH}px`;
+  maskedWrap.style.webkitMaskSize = maskedWrap.style.maskSize;
+  maskedWrap.style.maskRepeat = 'no-repeat';
+  maskedWrap.style.webkitMaskRepeat = 'no-repeat';
+  maskedWrap.style.maskMode = 'alpha';
+  maskedWrap.style.webkitMaskSourceType = 'alpha';
+
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.style.width = `${trueCw}px`;
+  canvas.style.height = `${trueCh}px`;
+  canvas.width = Math.max(1, Math.round(trueCw * dpr));
+  canvas.height = Math.max(1, Math.round(trueCh * dpr));
+  if (gl) gl.viewport(0, 0, canvas.width, canvas.height);
+
+  worldOriginPx[0] = c.x * SEA_W * SOURCE_TO_WORLD;
+  worldOriginPx[1] = c.y * SEA_H * SOURCE_TO_WORLD;
+  worldPerScreenPx = 1 / state.zoom;
+
+  syncLabels();
+}
+
+bgImg.src = BACKGROUND_SRC;
+seaImg.src = SEA_SRC;
+
+const gl = canvas.getContext('webgl2', { alpha: true, premultipliedAlpha: false, antialias: false, preserveDrawingBuffer: true });
+
+const VERT = `#version 300 es
+in vec2 aPos;
+void main() { gl_Position = vec4(aPos, 0.0, 1.0); }
+`;
+
+const FRAG = `#version 300 es
+precision highp float;
+out vec4 outColor;
+
+uniform vec2 uResolution;
+uniform vec2 uWorldOrigin;
+uniform float uWorldPerScreenPx;
+uniform float uTime;
+uniform sampler2D uPatternTex;
+uniform float uPatternScale;
+uniform float uLineOpacity;
+uniform vec3 uLineColor;
+uniform bool uMotionEnabled;
+uniform float uMotionAmount;
+uniform float uMotionPeriod;
+uniform vec2 uMotionDir;
+
+void main() {
+  vec2 screenPx = gl_FragCoord.xy;
+  vec2 worldPx = uWorldOrigin + screenPx * uWorldPerScreenPx;
+
+  vec2 motionOffset = vec2(0.0);
+  if (uMotionEnabled && uMotionPeriod > 0.0) {
+    float phase = uTime * 6.2831853 / uMotionPeriod;
+    motionOffset = uMotionDir * uMotionAmount * sin(phase);
+  }
+
+  vec2 uv = (worldPx + motionOffset) / uPatternScale;
+  vec4 tex = texture(uPatternTex, uv);
+
+  outColor = vec4(uLineColor, tex.a * uLineOpacity);
+}
+`;
+
+let program = null, loc = {}, patternTex = null;
+
+if (gl) {
+  const compile = (type, src) => {
+    const sh = gl.createShader(type);
+    gl.shaderSource(sh, src);
+    gl.compileShader(sh);
+    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+      console.error('[sea-spike] shader compile failed:', gl.getShaderInfoLog(sh));
+      return null;
+    }
+    return sh;
+  };
+  const vs = compile(gl.VERTEX_SHADER, VERT);
+  const fs = compile(gl.FRAGMENT_SHADER, FRAG);
+  if (vs && fs) {
+    program = gl.createProgram();
+    gl.attachShader(program, vs);
+    gl.attachShader(program, fs);
+    gl.linkProgram(program);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      console.error('[sea-spike] program link failed:', gl.getProgramInfoLog(program));
+      program = null;
+    }
+  }
+}
+
+if (program) {
+  gl.useProgram(program);
+  const quad = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  const aPos = gl.getAttribLocation(program, 'aPos');
+  gl.enableVertexAttribArray(aPos);
+  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+  gl.disable(gl.BLEND);
+
+  const u = (name) => gl.getUniformLocation(program, name);
+  loc = {
+    resolution: u('uResolution'), worldOrigin: u('uWorldOrigin'), worldPerScreenPx: u('uWorldPerScreenPx'),
+    time: u('uTime'), patternTex: u('uPatternTex'), patternScale: u('uPatternScale'),
+    lineOpacity: u('uLineOpacity'), lineColor: u('uLineColor'),
+    motionEnabled: u('uMotionEnabled'), motionAmount: u('uMotionAmount'),
+    motionPeriod: u('uMotionPeriod'), motionDir: u('uMotionDir'),
+  };
+
+  patternTex = gl.createTexture();
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = () => {
+    gl.bindTexture(gl.TEXTURE_2D, patternTex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, patternTex);
+  };
+  img.onerror = () => console.error('[sea-spike] failed to load pattern texture', PATTERN_SRC);
+  img.src = PATTERN_SRC;
+} else {
+  canvas.style.display = 'none';
+  const warn = document.createElement('div');
+  warn.textContent = 'WebGL2 non disponibile: fallback statico.';
+  warn.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;background:rgba(0,0,0,0.4);font:13px sans-serif;text-align:center;padding:12px;';
+  stage.appendChild(warn);
+}
+
+function hexToRgb01(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+}
+
+function paramsFromUI() {
+  return {
+    patternScale: +$('patternScale').value,
+    lineOpacity: +$('lineOpacity').value,
+    lineColor: hexToRgb01($('lineColor').value),
+    motionAmount: +$('motionAmount').value,
+    motionPeriod: +$('motionPeriod').value,
+    motionAngle: +$('motionAngle').value,
+  };
+}
+
+function render(timeMs) {
+  if (!program) return;
+  const p = paramsFromUI();
+  const t = state.playing ? (timeMs - state.t0) / 1000 : state.pausedAt;
+  const rad = (p.motionAngle * Math.PI) / 180;
+  const dprNow = canvas.width / parseFloat(canvas.style.width);
+
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  gl.clearColor(0, 0, 0, 0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.uniform2f(loc.resolution, canvas.width, canvas.height);
+  gl.uniform2f(loc.worldOrigin, worldOriginPx[0], worldOriginPx[1]);
+  gl.uniform1f(loc.worldPerScreenPx, worldPerScreenPx / dprNow);
+  gl.uniform1f(loc.time, t);
+  gl.uniform1i(loc.patternTex, 0);
+  gl.uniform1f(loc.patternScale, p.patternScale);
+  gl.uniform1f(loc.lineOpacity, p.lineOpacity);
+  gl.uniform3fv(loc.lineColor, p.lineColor);
+  gl.uniform1i(loc.motionEnabled, state.motionEnabled ? 1 : 0);
+  gl.uniform1f(loc.motionAmount, p.motionAmount);
+  gl.uniform1f(loc.motionPeriod, p.motionPeriod);
+  gl.uniform2f(loc.motionDir, Math.cos(rad), Math.sin(rad));
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+}
+
+let lastFrameT = performance.now();
+let fpsAcc = 0, fpsN = 0;
+function loop(nowMs) {
+  render(nowMs);
+  const dt = nowMs - lastFrameT;
+  lastFrameT = nowMs;
+  fpsAcc += dt; fpsN++;
+  if (fpsAcc > 400) {
+    $('fps').textContent = `${(1000 / (fpsAcc / fpsN)).toFixed(0)} fps · ${(fpsAcc / fpsN).toFixed(1)} ms/frame`;
+    fpsAcc = 0; fpsN = 0;
+  }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+function buttonGroup(containerId, items, onSelect, activePredicate) {
+  const el = $(containerId);
+  el.innerHTML = '';
+  items.forEach((item) => {
+    const b = document.createElement('button');
+    b.textContent = item.label;
+    if (activePredicate(item)) b.classList.add('active');
+    b.onclick = () => {
+      onSelect(item);
+      [...el.children].forEach((c) => c.classList.remove('active'));
+      b.classList.add('active');
+    };
+    el.appendChild(b);
+  });
+}
+
+buttonGroup('cropButtons', CROPS, (c) => { state.crop = c; layoutStage(); }, (c) => c.id === state.crop.id);
+buttonGroup('zoomButtons', ZOOMS.map((z) => ({ id: z, label: z.toFixed(2) })),
+  (z) => { state.zoom = z.id; layoutStage(); }, (z) => z.id === state.zoom);
+buttonGroup('magButtons', [1, 2, 3, 5].map((m) => ({ id: m, label: `${m}×` })),
+  (m) => { state.magnification = m.id; layoutStage(); }, (m) => m.id === state.magnification);
+
+$('toggleBg').onclick = (e) => { state.showBg = !state.showBg; bgImg.style.display = state.showBg ? '' : 'none'; e.target.classList.toggle('active', state.showBg); };
+$('toggleSea').onclick = (e) => { state.showSea = !state.showSea; seaImg.style.display = state.showSea ? '' : 'none'; e.target.classList.toggle('active', state.showSea); };
+$('toggleBg').classList.toggle('active', state.showBg);
+
+$('toggleMotion').onclick = (e) => {
+  state.motionEnabled = !state.motionEnabled;
+  e.target.classList.toggle('active', state.motionEnabled);
+  e.target.textContent = state.motionEnabled ? 'Moto on' : 'Moto off';
+};
+$('toggleMotion').classList.toggle('active', state.motionEnabled);
+
+$('togglePlay').onclick = (e) => {
+  state.playing = !state.playing;
+  if (!state.playing) state.pausedAt = (performance.now() - state.t0) / 1000;
+  else state.t0 = performance.now() - state.pausedAt * 1000;
+  e.target.classList.toggle('active', state.playing);
+  e.target.textContent = state.playing ? 'Play' : 'Pausa';
+};
+$('resetTime').onclick = () => { state.t0 = performance.now(); state.pausedAt = 0; };
+
+['patternScale', 'lineOpacity', 'motionAmount', 'motionPeriod', 'motionAngle'].forEach((id) => {
+  const el = $(id);
+  const out = $(`${id}-value`);
+  const fmt = () => {
+    if (id === 'lineOpacity') out.textContent = (+el.value).toFixed(2);
+    else if (id === 'patternScale' || id === 'motionAmount' || id === 'motionPeriod') out.textContent = (+el.value).toFixed(1);
+    else out.textContent = el.value;
+  };
+  el.addEventListener('input', fmt);
+  fmt();
+});
+
+function syncLabels() {
+  $('cropLabel').textContent = state.crop.label;
+  $('zoomLabel').textContent = state.zoom.toFixed(2);
+  $('magLabel').textContent = `${state.magnification}× (${canvas.style.width})`;
+}
+
+layoutStage();
+window.addEventListener('resize', layoutStage);
+window.__debugState = state;
+window.__debugRender = render;
+window.__layoutStage = layoutStage;
+</script>
+</body>
+</html>

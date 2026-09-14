@@ -18,11 +18,28 @@ import {
  *
  * Each tile is a fixed crop of the sea layer (`Mare.webp`) with one candidate motion
  * treatment on top. No renderer, no camera, no atmosphere. Nothing here uses RAF:
- * every effect is a CSS keyframe or SMIL, both of which keep running in the preview
- * pane where RAF is frozen.
+ * every effect is a CSS keyframe or SMIL.
+ *
+ * That choice does NOT make the effects visible in an embedded preview pane, and an
+ * earlier version of this comment claimed it did. Measured twice: when
+ * `document.visibilityState` is `hidden` the whole document timeline stops, so CSS
+ * keyframes and SMIL freeze at their first keyframe exactly like RAF does —
+ * `feDisplacementMap.scale.animVal` was identical 1.8s apart. Every tile then renders
+ * as a still frame of t=0, which is indistinguishable from an effect that does
+ * nothing. Four rounds of tuning were spent on that mistake.
+ *
+ * So: judge these tiles in a real browser window, or drive
+ * `svg.setCurrentTime()` / `el.getAnimations()[0].currentTime` by hand. Never judge
+ * motion from a screenshot taken in a hidden pane.
+ *
+ * A second calibration trap: `zoom` defaults to 0.33 and is labelled "(mappa)", but
+ * `/world-surface` renders at zoom 0.18 by default. This lab is deliberately a
+ * magnifying lens — every effect reads ~1.8x stronger here than on the real map.
  *
  * The tiles are a comparison instrument, not production code. Whatever wins here
  * gets rebuilt inside the renderer as a real, config-first, profiled layer.
+ *
+ * @see plans/PLAN-015-sea-ripple-port-and-voronoi.md
  */
 
 const SEA_SRC = '/assets/world/wanderlust/base/layers/Mare.webp';

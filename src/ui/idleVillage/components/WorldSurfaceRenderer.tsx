@@ -5,7 +5,9 @@ import { WorldSurfaceGlassOverlay } from './WorldSurfaceGlassOverlay';
 import { WorldBreathingLayer } from './WorldBreathingLayer';
 import { useTranslation } from 'react-i18next';
 import type { RuntimeObject } from '../../../engine/world/model/RuntimeObject';
-import type { WaterFieldConfig } from '../config/atmosphereAssets';
+import { atmosphereAssets, SEA_RIPPLE_FILTER_ID } from '../config/atmosphereAssets';
+import { useReducedMotion } from '../hooks/useReducedMotion';
+import type { SeaRippleConfig, WaterFieldConfig } from '../config/atmosphereAssets';
 import type {
   BlendMode,
   WorldSurfaceAnchor,
@@ -132,10 +134,26 @@ interface WorldSurfaceRendererProps {
   showWaterField?: boolean;
   /** When true, sparse painted sea marks are rendered on the sea. */
   showSeaMarks?: boolean;
+  /**
+   * When true, the painted wave marks that break on the shoreline are rendered.
+   *
+   * This used to ride on `showSeaRipple`, so one flag drove two unrelated systems and
+   * nothing seen on screen could be attributed to either. Kept separate on purpose.
+   */
+  showWaves?: boolean;
   /** When true, a soft SMIL ripple is applied to coastal shallow water. */
   showSeaRipple?: boolean;
   /** Optional override for the water field configuration (used by the lab page). */
   waterFieldConfig?: WaterFieldConfig;
+  /**
+   * Optional override for the coastal ripple configuration.
+   *
+   * Exists so the amplitude can be tuned live on the real map. The lab judges at zoom
+   * 0.33 while the map runs at ~0.18-0.30, so a value approved there is not the value
+   * the map wants, and the round trip through a config file and a reload is what made
+   * the previous four attempts so slow.
+   */
+  seaRippleConfig?: SeaRippleConfig;
   /** When true, the ambient light-ray and dust layer is rendered. */
   showAtmosphere?: boolean;
   /** When true, a glass teca overlay covers the viewport. */
@@ -253,10 +271,12 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
   breathEnabled = false,
   showWaterField = false,
   showSeaMarks = true,
+  showWaves = false,
   showSeaRipple = true,
   showAtmosphere = false,
   showGlass = true,
   waterFieldConfig,
+  seaRippleConfig,
   eventCovered = false,
   showEventCard = false,
   onEventCardComplete,
@@ -329,6 +349,22 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
   const seaLayer = useMemo(
     () => manifest.surfaceLayers.find((layer) => layer.id === 'sea'),
     [manifest.surfaceLayers],
+  );
+
+  // The ripple is mounted and referenced from a single condition, so the sea layer can
+  // never reference a filter that was not rendered. A CSS `filter: url(#missing)` does
+  // not degrade to "no filter" — per spec the element is not rendered at all, which
+  // would make the sea vanish.
+  const reducedMotion = useReducedMotion();
+  const rippleCfg = seaRippleConfig ?? atmosphereAssets.seaRipple;
+  const seaRippleActive = showSeaRipple && rippleCfg.enabled && !reducedMotion && Boolean(seaLayer);
+  const seaRippleFilterId =
+    seaRippleActive && rippleCfg.mode === 'smil' ? SEA_RIPPLE_FILTER_ID : undefined;
+  // `sea` plus any layer whose own painted edge is the waterline. See
+  // `SeaRippleConfig.extraLayerIds` for why the islands need to be in here.
+  const rippleLayerIds = useMemo(
+    () => new Set<string>(['sea', ...(rippleCfg.extraLayerIds ?? [])]),
+    [rippleCfg.extraLayerIds],
   );
 
   const effectiveLayers = useMemo<EffectiveLayer[]>(() => {
@@ -711,15 +747,19 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
               const imageUrl = layer.file.includes('/')
                 ? `/assets/atmosphere/${layer.file.split('/').map(encodeURIComponent).join('/')}`
                 : `/assets/world/${manifest.world}/base/layers/${encodeURIComponent(layer.file)}`;
+              // Same crop geometry as LayerView. These three layers render through a
+              // separate path when Breath is on, so a cropped asset would be placed
+              // full-canvas here and jump the moment Breath was toggled.
+              const heroRect = layer.rect;
               return (
                 <div
                   key={layer.id}
                   style={{
                     position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
+                    top: heroRect ? `${(heroRect.y / heroRect.sourceHeight) * 100}%` : 0,
+                    left: heroRect ? `${(heroRect.x / heroRect.sourceWidth) * 100}%` : 0,
+                    width: heroRect ? `${(heroRect.width / heroRect.sourceWidth) * 100}%` : '100%',
+                    height: heroRect ? `${(heroRect.height / heroRect.sourceHeight) * 100}%` : '100%',
                     zIndex: layer.zIndex,
                     opacity: layer.opacity,
                     pointerEvents: 'none',
@@ -746,6 +786,9 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
                 layer={layer}
                 worldName={manifest.world}
                 imageFit={resolvedImageFit}
+                // The coastal ripple displaces the painted layers themselves, not a
+                // copy of them: `sea`, plus the layers whose own edge is the waterline.
+                filterId={rippleLayerIds.has(layer.id) ? seaRippleFilterId : undefined}
                 breathEnabled={breathEnabled}
                 zoom={camera.zoom}
                 canvasSize={manifest.coordinateSystem.canvas}
@@ -820,19 +863,19 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
           />
           {/* Wave marks break on the shoreline, at the bottom of the atmosphere
               stack: they belong to the water surface, not to the sky. */}
-          <WorldSurfaceWaves zIndex={cloudZIndex - 4} enabled={showSeaRipple} />
+          <WorldSurfaceWaves zIndex={cloudZIndex - 4} enabled={showWaves} />
           <WorldSurfaceSeaMarks zIndex={cloudZIndex - 4} enabled={showSeaMarks} />
           {/* Water field: broad light pools and drifting micro-detail over the sea. */}
           {showWaterField && (
             <>
               <WorldSurfaceWaterField
                 canvasSize={manifest.coordinateSystem.canvas}
-                zIndex={cloudZIndex - 6}
+                zIndex={frameZIndex - 500}
                 config={waterFieldConfig}
               />
               <WorldSurfaceRiverGlint
                 canvasSize={manifest.coordinateSystem.canvas}
-                zIndex={cloudZIndex - 5.5}
+                zIndex={frameZIndex - 499}
               />
             </>
           )}
@@ -855,15 +898,13 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
             and the analysis written into them is worth keeping. Re-mounting is this
             one element. See RICHIESTE.md R-056.
           */}
-          {/* Coastal ripple: a masked, displaced copy of the sea layer.
-              It sits above the painted sea but below cloud shadows and waves. */}
-          {showSeaRipple && seaLayer && (
-            <WorldSurfaceSeaRipple
-              worldName={manifest.world}
-              seaFile={seaLayer.file}
-              zoom={camera.zoom}
-              zIndex={frameZIndex - 1}
-            />
+          {/* Coastal ripple. In `smil` mode this contributes only the <filter>
+              definition — nothing visible — and the filter is applied to the sea
+              layer's own <img> above, so what displaces is the painted sea's alpha
+              edge against the still background. There is no copy of the sea here.
+              In `sprite` mode it paints its own masked overlay at this zIndex. */}
+          {seaRippleActive && (
+            <WorldSurfaceSeaRipple zIndex={frameZIndex - 1} config={rippleCfg} />
           )}
           {/* Cloud shadows drift across the land, below the weather. */}
           <WorldSurfaceCloudShadows
@@ -1002,6 +1043,14 @@ interface LayerViewProps {
   layer: EffectiveLayer;
   worldName: string;
   imageFit: 'fill' | 'cover' | 'contain' | 'none';
+  /**
+   * Optional SVG filter id applied to this layer's own `<img>`.
+   *
+   * Only ever set for the `sea` layer, by the coastal ripple. The caller must
+   * guarantee the filter is actually in the document: `filter: url(#missing)` does not
+   * degrade to "no filter" — per spec the element is not rendered at all.
+   */
+  filterId?: string;
   breathEnabled?: boolean;
   zoom: number;
   /** World canvas size, needed to size the sea ripple canvas. */
@@ -1010,7 +1059,7 @@ interface LayerViewProps {
   offset?: { x: number; y: number };
 }
 
-const LayerView: React.FC<LayerViewProps> = ({ layer, worldName, imageFit, breathEnabled = true, zoom, canvasSize, scale = 1, offset = { x: 0, y: 0 } }) => {
+const LayerView: React.FC<LayerViewProps> = ({ layer, worldName, imageFit, filterId, breathEnabled = true, zoom, canvasSize, scale = 1, offset = { x: 0, y: 0 } }) => {
   // No per-layer parallax counter-translate.
   //
   // The parent worldStyle div already pans the whole map by -panX*zoom. An earlier
@@ -1028,12 +1077,28 @@ const LayerView: React.FC<LayerViewProps> = ({ layer, worldName, imageFit, breat
   // context, so all of them round subpixels identically at fractional zoom.
   const isEventShroud = layer.id.startsWith('event_shroud_');
 
+  // A cropped layer occupies only its painted sub-rectangle of the canvas. The
+  // percentages are taken against the ORIGINAL asset's dimensions, because
+  // `imageFit: 'fill'` maps the whole source onto the whole canvas linearly: a source
+  // pixel at sx lands at sx/sourceWidth of the canvas either way, so placing the crop
+  // at rect.x/sourceWidth and sizing it to rect.width/sourceWidth reproduces the
+  // full-canvas result exactly. Absent `rect`, this is the original full-canvas box.
+  const rect = layer.rect;
+  const box = rect
+    ? {
+        left: `${(rect.x / rect.sourceWidth) * 100}%`,
+        top: `${(rect.y / rect.sourceHeight) * 100}%`,
+        width: `${(rect.width / rect.sourceWidth) * 100}%`,
+        height: `${(rect.height / rect.sourceHeight) * 100}%`,
+      }
+    : { left: 0, top: 0, width: '100%', height: '100%' };
+
   const wrapperStyle: React.CSSProperties = {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
+    top: box.top,
+    left: box.left,
+    width: box.width,
+    height: box.height,
     zIndex: layer.zIndex,
     opacity: layer.opacity,
     pointerEvents: 'none',
@@ -1078,7 +1143,10 @@ const LayerView: React.FC<LayerViewProps> = ({ layer, worldName, imageFit, breat
     // closed curtains rather than arriving with them. The grade copy uses the
     // asset's own pixels, alpha included, so it cannot bleed onto the map
     // through the transparent gaps the way a full-rect overlay would.
-    filter: layer.grayscale ? 'grayscale(100%)' : undefined,
+    filter: [
+      layer.grayscale ? 'grayscale(100%)' : null,
+      filterId ? `url(#${filterId})` : null,
+    ].filter(Boolean).join(' ') || undefined,
     ...animationStyle,
   };
 
@@ -1098,6 +1166,11 @@ const LayerView: React.FC<LayerViewProps> = ({ layer, worldName, imageFit, breat
   }, [hasError, layer.id, layer.file, worldName]);
 
   const hasScaleTransform = scale !== 1 || offsetX !== 0 || offsetY !== 0;
+  // On a cropped layer `transformOrigin: 'top left'` is the top-left of the CROP, not
+  // of the canvas, so the debug panel's per-layer scale slider now grows the layer
+  // from its own corner instead of from the map's. No shipped layer declares
+  // scale != 1 or a non-zero offset, so `hasScaleTransform` is false at rest and
+  // nothing about the map changes — this only alters how that dev slider feels.
   const scaleStyle: React.CSSProperties = {
     position: 'absolute',
     inset: 0,

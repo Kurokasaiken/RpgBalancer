@@ -63,7 +63,15 @@
       },
       "tags": [
         "background"
-      ]
+      ],
+      "rect": {
+        "x": 123,
+        "y": 129,
+        "width": 2832,
+        "height": 1814,
+        "sourceWidth": 3072,
+        "sourceHeight": 2049
+      }
     },
     {
       "id": "sea",
@@ -97,7 +105,15 @@
       },
       "tags": [
         "island"
-      ]
+      ],
+      "rect": {
+        "x": 1063,
+        "y": 1729,
+        "width": 344,
+        "height": 190,
+        "sourceWidth": 3072,
+        "sourceHeight": 2049
+      }
     },
     {
       "id": "island_bottom_right",
@@ -114,7 +130,15 @@
       },
       "tags": [
         "island"
-      ]
+      ],
+      "rect": {
+        "x": 2528,
+        "y": 1557,
+        "width": 367,
+        "height": 352,
+        "sourceWidth": 3072,
+        "sourceHeight": 2049
+      }
     },
     {
       "id": "mountain_island_bottom_left",
@@ -132,7 +156,15 @@
       "tags": [
         "mountain",
         "island"
-      ]
+      ],
+      "rect": {
+        "x": 219,
+        "y": 1336,
+        "width": 742,
+        "height": 512,
+        "sourceWidth": 3072,
+        "sourceHeight": 2049
+      }
     },
     {
       "id": "mountains_dark_bottom",
@@ -149,7 +181,15 @@
       },
       "tags": [
         "mountain"
-      ]
+      ],
+      "rect": {
+        "x": 1429,
+        "y": 1465,
+        "width": 919,
+        "height": 388,
+        "sourceWidth": 3072,
+        "sourceHeight": 2049
+      }
     },
     {
       "id": "mountains_light_bottom_right",
@@ -166,7 +206,15 @@
       },
       "tags": [
         "mountain"
-      ]
+      ],
+      "rect": {
+        "x": 1930,
+        "y": 1364,
+        "width": 609,
+        "height": 301,
+        "sourceWidth": 3072,
+        "sourceHeight": 2049
+      }
     },
     {
       "id": "mountains_dark_right",
@@ -183,7 +231,15 @@
       },
       "tags": [
         "mountain"
-      ]
+      ],
+      "rect": {
+        "x": 1840,
+        "y": 772,
+        "width": 798,
+        "height": 466,
+        "sourceWidth": 3072,
+        "sourceHeight": 2049
+      }
     },
     {
       "id": "mountain_zone_north",
@@ -200,7 +256,15 @@
       },
       "tags": [
         "mountain"
-      ]
+      ],
+      "rect": {
+        "x": 782,
+        "y": 210,
+        "width": 1752,
+        "height": 409,
+        "sourceWidth": 3072,
+        "sourceHeight": 2049
+      }
     },
     {
       "id": "trees_brown_hills_center",
@@ -218,7 +282,15 @@
       "tags": [
         "trees",
         "hills"
-      ]
+      ],
+      "rect": {
+        "x": 1651,
+        "y": 755,
+        "width": 471,
+        "height": 305,
+        "sourceWidth": 3072,
+        "sourceHeight": 2049
+      }
     },
     {
       "id": "small_trees_center",
@@ -235,7 +307,15 @@
       },
       "tags": [
         "trees"
-      ]
+      ],
+      "rect": {
+        "x": 1010,
+        "y": 1088,
+        "width": 816,
+        "height": 424,
+        "sourceWidth": 3072,
+        "sourceHeight": 2049
+      }
     },
     {
       "id": "trees_center_right",
@@ -252,7 +332,15 @@
       },
       "tags": [
         "trees"
-      ]
+      ],
+      "rect": {
+        "x": 2203,
+        "y": 1106,
+        "width": 624,
+        "height": 244,
+        "sourceWidth": 3072,
+        "sourceHeight": 2049
+      }
     },
     {
       "id": "forest_1_top_left",
@@ -269,7 +357,15 @@
       },
       "tags": [
         "forest"
-      ]
+      ],
+      "rect": {
+        "x": 256,
+        "y": 532,
+        "width": 950,
+        "height": 560,
+        "sourceWidth": 3072,
+        "sourceHeight": 2049
+      }
     },
     {
       "id": "forest_1_light_top_left",
@@ -286,7 +382,15 @@
       },
       "tags": [
         "forest"
-      ]
+      ],
+      "rect": {
+        "x": 1042,
+        "y": 744,
+        "width": 462,
+        "height": 297,
+        "sourceWidth": 3072,
+        "sourceHeight": 2049
+      }
     },
     {
       "id": "forest_2_dark_bottom_left",
@@ -303,7 +407,15 @@
       },
       "tags": [
         "forest"
-      ]
+      ],
+      "rect": {
+        "x": 299,
+        "y": 1088,
+        "width": 731,
+        "height": 398,
+        "sourceWidth": 3072,
+        "sourceHeight": 2049
+      }
     },
     {
       "id": "forest_3_dark_bottom",
@@ -320,7 +432,15 @@
       },
       "tags": [
         "forest"
-      ]
+      ],
+      "rect": {
+        "x": 1384,
+        "y": 1245,
+        "width": 668,
+        "height": 188,
+        "sourceWidth": 3072,
+        "sourceHeight": 2049
+      }
     },
     {
       "id": "forest_light_right_center",
@@ -337,7 +457,15 @@
       },
       "tags": [
         "forest"
-      ]
+      ],
+      "rect": {
+        "x": 2368,
+        "y": 524,
+        "width": 302,
+        "height": 226,
+        "sourceWidth": 3072,
+        "sourceHeight": 2049
+      }
     },
     {
       "id": "forest_dark_north",
@@ -354,7 +482,15 @@
       },
       "tags": [
         "forest"
-      ]
+      ],
+      "rect": {
+        "x": 1184,
+        "y": 441,
+        "width": 974,
+        "height": 246,
+        "sourceWidth": 3072,
+        "sourceHeight": 2049
+      }
     },
     {
       "id": "village",
@@ -372,7 +508,15 @@
       "tags": [
         "settlements",
         "landmarks"
-      ]
+      ],
+      "rect": {
+        "x": 1295,
+        "y": 1037,
+        "width": 400,
+        "height": 187,
+        "sourceWidth": 3072,
+        "sourceHeight": 2049
+      }
     },
     {
       "id": "event_shroud_left",

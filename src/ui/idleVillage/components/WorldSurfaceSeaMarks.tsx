@@ -13,10 +13,14 @@ export interface WorldSurfaceSeaMarksProps {
  * The baked `Mare.webp` layer stays completely still. This component adds 20-40
  * transparent water marks sampled from real coast/open-water points. Each mark
  * fades in, holds, drifts a few world px, and fades out. Animation is CSS-only
- * (`opacity` and `transform: translate3d()`) so it keeps running in preview panes
- * where `requestAnimationFrame` is frozen, and it promotes cleanly to GPU layers.
+ * (`opacity` and `transform: translate3d()`), which promotes cleanly to GPU layers.
+ *
+ * It does NOT keep running in an embedded preview pane, as an earlier version of
+ * this comment claimed: a hidden document stops its whole timeline, CSS keyframes
+ * included. Judge this in a real browser window.
  *
  * @see plans/PLAN-013-sea-marks.md
+ * @see plans/PLAN-015-sea-ripple-port-and-voronoi.md
  */
 export function WorldSurfaceSeaMarks({
   enabled = true,

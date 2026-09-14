@@ -523,7 +523,21 @@
       "despawnWonders": "Nascondi meraviglie",
       "breath": "Respira",
       "water": "Acqua",
-      "atmosphere": "Atmosfera"
+      "atmosphere": "Atmosfera",
+      "seaPattern": "Pattern",
+      "seaPatternTitle": "Pattern mare — dal vivo",
+      "seaPatternLive": "Texture authored A1 / micro scroll",
+      "seaPatternClose": "Chiudi",
+      "seaPatternScale": "Scala pattern",
+      "seaPatternOpacity": "Opacità linee",
+      "seaPatternColor": "Colore linee",
+      "seaPatternMotion": "Ampiezza moto",
+      "seaPatternPeriod": "Periodo moto",
+      "seaPatternAngle": "Angolo moto",
+      "seaPatternMotionEnabled": "Moto attivo",
+      "reducedMotion": "moto ridotto",
+      "hideUi": "Nascondi UI",
+      "showUi": "Mostra UI"
     }
   },
   "pgDetailCard": {
