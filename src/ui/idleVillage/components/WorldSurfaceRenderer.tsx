@@ -8,6 +8,7 @@ import type { RuntimeObject } from '../../../engine/world/model/RuntimeObject';
 import { atmosphereAssets, SEA_RIPPLE_FILTER_ID } from '../config/atmosphereAssets';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import type { SeaRippleConfig, WaterFieldConfig } from '../config/atmosphereAssets';
+import type { SeaPatternConfig } from './WorldSurfaceSeaPatternOverlay';
 import type {
   BlendMode,
   WorldSurfaceAnchor,
@@ -25,6 +26,7 @@ const WorldSurfaceWaves = lazy(() => import('./WorldSurfaceWaves'));
 const WorldSurfaceSeaMarks = lazy(() => import('./WorldSurfaceSeaMarks'));
 const WorldSurfaceSeaRipple = lazy(() => import('./WorldSurfaceSeaRipple'));
 const WorldSurfaceWaterField = lazy(() => import('./WorldSurfaceWaterField'));
+const WorldSurfaceSeaPatternOverlay = lazy(() => import('./WorldSurfaceSeaPatternOverlay'));
 const WorldSurfaceClouds = lazy(() => import('./WorldSurfaceClouds'));
 const WorldSurfaceCloudShadows = lazy(() => import('./WorldSurfaceCloudShadows'));
 const WorldSurfaceFoam = lazy(() => import('./WorldSurfaceFoam'));
@@ -145,6 +147,10 @@ interface WorldSurfaceRendererProps {
   showSeaRipple?: boolean;
   /** Optional override for the water field configuration (used by the lab page). */
   waterFieldConfig?: WaterFieldConfig;
+  /** When true, the WebGL sea surface line pattern is rendered over the sea. */
+  showSeaPattern?: boolean;
+  /** Optional override for the sea pattern configuration. */
+  seaPatternConfig?: SeaPatternConfig;
   /**
    * Optional override for the coastal ripple configuration.
    *
@@ -276,6 +282,8 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
   showAtmosphere = false,
   showGlass = true,
   waterFieldConfig,
+  showSeaPattern = false,
+  seaPatternConfig,
   seaRippleConfig,
   eventCovered = false,
   showEventCard = false,
@@ -865,17 +873,29 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
               stack: they belong to the water surface, not to the sky. */}
           <WorldSurfaceWaves zIndex={cloudZIndex - 4} enabled={showWaves} />
           <WorldSurfaceSeaMarks zIndex={cloudZIndex - 4} enabled={showSeaMarks} />
+          {/* Sea pattern: WebGL line-texture surface motion. Mounted INSIDE the world
+              box (unlike the sea-effect-lab spike this was ported from) so its
+              z-index is compared against `frame`/`border` in the same stacking
+              context instead of sitting above the entire map as an opaque sibling. */}
+          {showSeaPattern && (
+            <WorldSurfaceSeaPatternOverlay
+              active={showSeaPattern}
+              canvasSize={manifest.coordinateSystem.canvas}
+              zIndex={cloudZIndex - 4}
+              config={seaPatternConfig}
+            />
+          )}
           {/* Water field: broad light pools and drifting micro-detail over the sea. */}
           {showWaterField && (
             <>
               <WorldSurfaceWaterField
                 canvasSize={manifest.coordinateSystem.canvas}
-                zIndex={frameZIndex - 500}
+                zIndex={cloudZIndex - 6}
                 config={waterFieldConfig}
               />
               <WorldSurfaceRiverGlint
                 canvasSize={manifest.coordinateSystem.canvas}
-                zIndex={frameZIndex - 499}
+                zIndex={cloudZIndex - 5.5}
               />
             </>
           )}

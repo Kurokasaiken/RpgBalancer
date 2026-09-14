@@ -1,7 +1,7 @@
 {
   "visual": {
     "patternMode": "authoredTexture",
-    "patternScale": 4500,
+    "patternScale": 100,
     "lineOpacity": 1,
     "lineWidth": 1,
     "lineColor": "#8bbac2",
