@@ -64,6 +64,7 @@ export const WorldSurfaceDemoPage: React.FC = () => {
         breathEnabled
         showWaterField
         showRiverGlint
+        showSeaPattern
         showAtmosphere
         showGlass
         imageFit="cover"
