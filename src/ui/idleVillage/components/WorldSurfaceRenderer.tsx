@@ -134,6 +134,13 @@ interface WorldSurfaceRendererProps {
   onEventCardClose?: () => void;
   /** When true, the water field micro-detail overlay is rendered on the sea. */
   showWaterField?: boolean;
+  /**
+   * When true, the animated glint along the main rivers is rendered.
+   *
+   * Used to ride on `showWaterField` — an unrelated system — so it could never be
+   * switched on independently. Kept separate on purpose, same reasoning as `showWaves`.
+   */
+  showRiverGlint?: boolean;
   /** When true, sparse painted sea marks are rendered on the sea. */
   showSeaMarks?: boolean;
   /**
@@ -276,6 +283,7 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
   autoFitTrigger = 1,
   breathEnabled = false,
   showWaterField = false,
+  showRiverGlint = false,
   showSeaMarks = true,
   showWaves = false,
   showSeaRipple = true,
@@ -440,7 +448,14 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
     return frame ? frame.zIndex - 1 : 1000;
   }, [effectiveLayers]);
 
-  const atmosphereZIndex = useMemo(() => cloudZIndex - 0.5, [cloudZIndex]);
+  // Integer only: `z-index` accepts `auto | <integer>` per spec, so a fractional
+  // offset like the `- 0.5` this used to carry is invalid CSS. The browser doesn't
+  // warn — it silently drops the whole declaration and the element falls back to
+  // the default stacking order, which reads as "this layer's z-index prop did
+  // nothing." Verified directly: `el.style.zIndex = 92.5` leaves `el.style.zIndex`
+  // empty, while `92` applies. Every atmosphere z-index below is an integer for
+  // the same reason.
+  const atmosphereZIndex = useMemo(() => cloudZIndex - 1, [cloudZIndex]);
 
   const frameZIndex = useMemo(() => {
     const frame = effectiveLayers.find((layer) => layer.id === FRAME_LAYER_ID);
@@ -854,25 +869,25 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
           {/* Birds fly under the weather but over the ground. */}
           <WorldSurfaceBirds
             canvasSize={manifest.coordinateSystem.canvas}
-            zIndex={cloudZIndex - 1}
+            zIndex={cloudZIndex - 2}
             enabled={!eventCovered}
           />
           {/* Sea creatures lurk in the water, below birds but above shadows. */}
           <WorldSurfaceCreatures
             creatures={runtimeObjects}
             zoom={camera.zoom}
-            zIndex={cloudZIndex - 2}
+            zIndex={cloudZIndex - 3}
             enabled={!eventCovered}
           />
           {/* Foam sits on the ground, so it goes below the birds. */}
           <WorldSurfaceFoam
             canvasSize={manifest.coordinateSystem.canvas}
-            zIndex={cloudZIndex - 3}
+            zIndex={cloudZIndex - 4}
           />
           {/* Wave marks break on the shoreline, at the bottom of the atmosphere
               stack: they belong to the water surface, not to the sky. */}
-          <WorldSurfaceWaves zIndex={cloudZIndex - 4} enabled={showWaves} />
-          <WorldSurfaceSeaMarks zIndex={cloudZIndex - 4} enabled={showSeaMarks} />
+          <WorldSurfaceWaves zIndex={cloudZIndex - 5} enabled={showWaves} />
+          <WorldSurfaceSeaMarks zIndex={cloudZIndex - 5} enabled={showSeaMarks} />
           {/* Sea pattern: WebGL line-texture surface motion. Mounted INSIDE the world
               box (unlike the sea-effect-lab spike this was ported from) so its
               z-index is compared against `frame`/`border` in the same stacking
@@ -881,43 +896,31 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
             <WorldSurfaceSeaPatternOverlay
               active={showSeaPattern}
               canvasSize={manifest.coordinateSystem.canvas}
-              zIndex={cloudZIndex - 4}
+              zIndex={cloudZIndex - 5}
               config={seaPatternConfig}
+            />
+          )}
+          {/* Cloud shadows drift across the land, below the weather. */}
+          <WorldSurfaceCloudShadows
+            canvasSize={manifest.coordinateSystem.canvas}
+            zIndex={cloudZIndex - 6}
+            parallaxOffset={cloudParallax}
+          />
+          {/* River glint: animated light streaks along the two main rivers. */}
+          {showRiverGlint && (
+            <WorldSurfaceRiverGlint
+              canvasSize={manifest.coordinateSystem.canvas}
+              zIndex={cloudZIndex - 7}
             />
           )}
           {/* Water field: broad light pools and drifting micro-detail over the sea. */}
           {showWaterField && (
-            <>
-              <WorldSurfaceWaterField
-                canvasSize={manifest.coordinateSystem.canvas}
-                zIndex={cloudZIndex - 6}
-                config={waterFieldConfig}
-              />
-              <WorldSurfaceRiverGlint
-                canvasSize={manifest.coordinateSystem.canvas}
-                zIndex={cloudZIndex - 5.5}
-              />
-            </>
+            <WorldSurfaceWaterField
+              canvasSize={manifest.coordinateSystem.canvas}
+              zIndex={cloudZIndex - 8}
+              config={waterFieldConfig}
+            />
           )}
-          {/*
-            Water field: NOT mounted, deliberately.
-
-            Two drifting detail tiles plus twelve broad light pools over the sea,
-            built to answer "the map does not breathe". Both halves work and cost
-            nothing measurable — 60fps unchanged — and neither is visible enough on
-            the real artwork at the map's default 0.23 zoom to be worth the layers.
-            The Director saw no difference.
-
-            The measurements that said otherwise were wrong three separate ways: a
-            5s sampling gap, which reads accumulated drift rather than the rate the
-            eye responds to; too short a settle after seeking a paused animation; and
-            a colour-keyed sea test that counts clouds crossing the water as the
-            water itself changing.
-
-            Left in the tree because the components and the tile generator are sound
-            and the analysis written into them is worth keeping. Re-mounting is this
-            one element. See RICHIESTE.md R-056.
-          */}
           {/* Coastal ripple. In `smil` mode this contributes only the <filter>
               definition — nothing visible — and the filter is applied to the sea
               layer's own <img> above, so what displaces is the painted sea's alpha
@@ -926,12 +929,6 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
           {seaRippleActive && (
             <WorldSurfaceSeaRipple zIndex={frameZIndex - 1} config={rippleCfg} />
           )}
-          {/* Cloud shadows drift across the land, below the weather. */}
-          <WorldSurfaceCloudShadows
-            canvasSize={manifest.coordinateSystem.canvas}
-            zIndex={cloudZIndex - 5}
-            parallaxOffset={cloudParallax}
-          />
           {/* Event announcement lives in the map, not the UI, so it pans and zooms
               with the world. */}
           <WorldSurfaceEventCard

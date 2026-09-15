@@ -12,7 +12,6 @@ import {
 import { WorldSurfaceSeaPatternPanel } from '../components/WorldSurfaceSeaPatternPanel';
 import { WorldSurfaceDebugPanel } from '../components/WorldSurfaceDebugPanel';
 import { WorldSurfacePerfHud } from '../components/WorldSurfacePerfHud';
-import { WorldSurfaceBreathOverlay } from '../components/WorldSurfaceBreathOverlay';
 import { selectWorldSurfaceRenderer } from '../config/worldSurfaceConfig';
 import { isWebGLSupported } from '../utils/webglSupport';
 import { useWorldState } from '../../../engine/world/systems/WorldState';
@@ -24,12 +23,6 @@ const WorldSurfacePixiOverlay = lazy(() => import('../components/WorldSurfacePix
 const MANIFEST_PATH = '/assets/world/wanderlust/base/manifest.json';
 const PERSIST_LAYER_OVERRIDES_KEY = 'worldSurfaceLayerOverrides';
 const PERSIST_LAYER_ORDER_KEY = 'worldSurfaceLayerOrder';
-
-// Slice 2 — hidden reaction zone (world-space coords), over the painted village.
-// Note: the manifest's `village_01` anchor (624,416) does NOT match where the
-// village is actually painted — these coords were measured off the rendered map.
-// Hard-coded for now; moves to manifest in Slice 3.
-const REACTION_ZONE = { x: 1830, y: 1350, width: 500, height: 400 } as const;
 
 function defaultCamera(config: CameraConfig) {
   return { panX: 0, panY: 0, zoom: config.defaultZoom };
@@ -63,8 +56,6 @@ export const WorldSurfaceTestPage: React.FC = () => {
   const [autoFitTrigger, setAutoFitTrigger] = useState(1);
   const [eventCovered, setEventCovered] = useState(false);
   const [cardOpen, setCardOpen] = useState(false);
-  const [reactionTrigger, setReactionTrigger] = useState<'camera-enter' | 'pointer-dwell'>('camera-enter');
-  const [reactionActive, setReactionActive] = useState(false);
   const [wonderAnchors, setWonderAnchors] = useState<{ x: number; y: number }[]>([]);
   const [perfHudVisible, setPerfHudVisible] = useState(true);
   const [breathActive, setBreathActive] = useState(false);
@@ -74,6 +65,10 @@ export const WorldSurfaceTestPage: React.FC = () => {
   // Defaults preserve the behaviour these had when they shared a flag.
   const [waterActive, setWaterActive] = useState(false);
   const [waterFieldActive, setWaterFieldActive] = useState(false);
+  // Defaults on: cheap SVG dash animation, no reason to make it opt-in like the
+  // heavier water field. Was previously wired into `showWaterField` with no button
+  // of its own, so it could never actually be switched on from this page.
+  const [riverGlintActive, setRiverGlintActive] = useState(true);
   const [seaMarksActive, setSeaMarksActive] = useState(true);
   const [wavesActive, setWavesActive] = useState(false);
   const [seaPatternActive, setSeaPatternActive] = useState(false);
@@ -87,7 +82,6 @@ export const WorldSurfaceTestPage: React.FC = () => {
   const [rippleScale, setRippleScale] = useState(atmosphereAssets.seaRipple.scale ?? 10);
   const [atmosphereActive, setAtmosphereActive] = useState(false);
   const wonderTimeoutsRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
-  const dwellTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mainRef = useRef<HTMLDivElement>(null);
   const objectsRef = useRef(objects);
   const wonderAnchorsRef = useRef(wonderAnchors);
@@ -219,46 +213,6 @@ export const WorldSurfaceTestPage: React.FC = () => {
       await saveData(PERSIST_LAYER_ORDER_KEY, surfaceLayerOrder);
     }
   }, [layerScales, layerOffsets, surfaceLayerOrder]);
-
-  // camera-enter: active whenever the reaction zone intersects the current viewport.
-  useEffect(() => {
-    if (reactionTrigger !== 'camera-enter' || !mainRef.current) return;
-    const vw = mainRef.current.clientWidth;
-    const vh = mainRef.current.clientHeight;
-    const viewRight = camera.panX + vw / camera.zoom;
-    const viewBottom = camera.panY + vh / camera.zoom;
-    const intersects =
-      viewRight > REACTION_ZONE.x &&
-      camera.panX < REACTION_ZONE.x + REACTION_ZONE.width &&
-      viewBottom > REACTION_ZONE.y &&
-      camera.panY < REACTION_ZONE.y + REACTION_ZONE.height;
-    setReactionActive(intersects);
-  }, [camera, reactionTrigger]);
-
-  // pointer-dwell: fires after 2s continuous hover inside the zone.
-  // Stays active once discovered; resets on trigger mode change.
-  useEffect(() => {
-    if (reactionTrigger !== 'pointer-dwell') return;
-    if (!mouseWorld) return;
-    const inZone =
-      mouseWorld.x >= REACTION_ZONE.x &&
-      mouseWorld.x <= REACTION_ZONE.x + REACTION_ZONE.width &&
-      mouseWorld.y >= REACTION_ZONE.y &&
-      mouseWorld.y <= REACTION_ZONE.y + REACTION_ZONE.height;
-    if (inZone) {
-      if (!dwellTimerRef.current) {
-        dwellTimerRef.current = setTimeout(() => setReactionActive(true), 2000);
-      }
-    } else {
-      if (dwellTimerRef.current) { clearTimeout(dwellTimerRef.current); dwellTimerRef.current = null; }
-    }
-  }, [mouseWorld, reactionTrigger]);
-
-  // Reset state when switching trigger mode.
-  useEffect(() => {
-    if (dwellTimerRef.current) { clearTimeout(dwellTimerRef.current); dwellTimerRef.current = null; }
-    setReactionActive(false);
-  }, [reactionTrigger]);
 
   // Show the event card once the shroud is fully closed.
   useEffect(() => {
@@ -528,6 +482,22 @@ export const WorldSurfaceTestPage: React.FC = () => {
               </button>
               <button
                 type="button"
+                onClick={() => setWaterFieldActive((v) => !v)}
+                title="Pozze di luce e micro-dettaglio alla deriva sul mare"
+                className={`rounded border border-amber-700/40 px-3 py-1 text-xs hover:bg-amber-700/20 ${waterFieldActive ? 'bg-amber-600 text-amber-950' : ''}`}
+              >
+                Water field
+              </button>
+              <button
+                type="button"
+                onClick={() => setRiverGlintActive((v) => !v)}
+                title="Riflessi animati lungo i fiumi principali"
+                className={`rounded border border-amber-700/40 px-3 py-1 text-xs hover:bg-amber-700/20 ${riverGlintActive ? 'bg-amber-600 text-amber-950' : ''}`}
+              >
+                River glint
+              </button>
+              <button
+                type="button"
                 onClick={() => setSeaMarksActive((v) => !v)}
                 title="34 segni d'acqua dipinti (PLAN-013)"
                 className={`rounded border border-amber-700/40 px-3 py-1 text-xs hover:bg-amber-700/20 ${seaMarksActive ? 'bg-amber-600 text-amber-950' : ''}`}
@@ -608,6 +578,7 @@ export const WorldSurfaceTestPage: React.FC = () => {
           showRegions={false}
           breathEnabled={breathActive}
           showWaterField={waterFieldActive}
+          showRiverGlint={riverGlintActive}
           showSeaRipple={waterActive}
           seaRippleConfig={{ ...atmosphereAssets.seaRipple, scale: rippleScale }}
           showSeaMarks={seaMarksActive}
@@ -619,15 +590,7 @@ export const WorldSurfaceTestPage: React.FC = () => {
           showEventCard={cardOpen}
           onEventCardComplete={handleEventCardComplete}
           onEventCardClose={handleEventCardClose}
-        >
-          {/* WorldSurfaceBreathOverlay disabled: prototype overlay elements (yellow token, discovery stroke, water circle) not needed for breathing demo */}
-          {/* {breathActive && (
-            <WorldSurfaceBreathOverlay
-              canvasSize={manifest.coordinateSystem.canvas}
-              mouseWorld={mouseWorld}
-            />
-          )} */}
-        </WorldSurfaceRenderer>
+        />
 
         {rendererType === 'webgl' && (
           <Suspense fallback={null}>
@@ -641,73 +604,6 @@ export const WorldSurfaceTestPage: React.FC = () => {
             onChange={handleSeaPatternConfigChange}
             hidden={uiHidden}
           />
-        )}
-
-        {/* Reaction zone overlay — world-space coords, same transform as the renderer's world div */}
-        {manifest && (
-          <>
-            <style>{`
-              @keyframes wsReactionPulse {
-                0%, 100% { opacity: 0.55; }
-                50% { opacity: 1; }
-              }
-            `}</style>
-            <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
-              <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: manifest.coordinateSystem.canvas.width,
-                height: manifest.coordinateSystem.canvas.height,
-                transformOrigin: 'top left',
-                transform: `translate(${-camera.panX * camera.zoom}px, ${-camera.panY * camera.zoom}px) scale(${camera.zoom})`,
-              }}>
-                {/* Zone indicator disabled — removed debug riquadro giallo */}
-                {false && (
-                  <div style={{
-                    position: 'absolute',
-                    left: REACTION_ZONE.x,
-                    top: REACTION_ZONE.y,
-                    width: REACTION_ZONE.width,
-                    height: REACTION_ZONE.height,
-                    border: '1px dashed rgba(251,191,36,0.25)',
-                    pointerEvents: 'none',
-                  }} />
-                )}
-                {false && reactionActive && (
-                  <div style={{
-                    position: 'absolute',
-                    left: REACTION_ZONE.x,
-                    top: REACTION_ZONE.y,
-                    width: REACTION_ZONE.width,
-                    height: REACTION_ZONE.height,
-                    border: '2px solid rgba(251,191,36,0.85)',
-                    boxShadow: '0 0 28px rgba(251,191,36,0.35), inset 0 0 28px rgba(251,191,36,0.12)',
-                    borderRadius: 6,
-                    animationName: 'wsReactionPulse',
-                    animationDuration: '2.5s',
-                    animationTimingFunction: 'ease-in-out',
-                    animationIterationCount: 'infinite',
-                  }}>
-                    <div style={{
-                      position: 'absolute',
-                      bottom: -26,
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                      color: '#fbbf24',
-                      fontSize: 14,
-                      fontWeight: 600,
-                      textShadow: '0 1px 4px rgba(0,0,0,0.9)',
-                      whiteSpace: 'nowrap',
-                      letterSpacing: '0.06em',
-                    }}>
-                      qualcosa si muove...
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </>
         )}
 
         {!uiHidden && import.meta.env.DEV && perfHudVisible && (
