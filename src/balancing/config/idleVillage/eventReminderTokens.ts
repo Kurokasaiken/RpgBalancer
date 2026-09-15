@@ -1,6 +1,28 @@
 import { z } from 'zod';
 
 /**
+ * Reminder band: a named threshold that quantizes the countdown into discrete states.
+ * Resists habituation by changing form at discrete transitions, not continuously.
+ */
+export interface ReminderBand {
+  maxDays: number;
+  glyph: string;
+  word: string;
+}
+
+export const REMINDER_BANDS = {
+  distant: { maxDays: Infinity, glyph: '◆', word: 'APPROACHING' },
+  closing: { maxDays: 2, glyph: '◆◆', word: 'CLOSING' },
+  imminent: { maxDays: 1, glyph: '▲', word: 'TOMORROW' },
+} as const;
+
+export function bandForDays(days: number): keyof typeof REMINDER_BANDS {
+  if (days <= 1) return 'imminent';
+  if (days <= 2) return 'closing';
+  return 'distant';
+}
+
+/**
  * Zod schema for the event reminder token contract.
  *
  * These tokens drive the visual presentation of the world-surface event

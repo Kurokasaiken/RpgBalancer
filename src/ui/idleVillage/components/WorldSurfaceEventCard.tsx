@@ -40,11 +40,13 @@ export interface WorldSurfaceEventCardProps {
   fallTarget: { x: number; y: number };
   /** World point the goblin slowly marches toward (the village). */
   marchTarget: { x: number; y: number };
+  /** Days remaining (computed by parent from time engine if available). */
+  daysRemaining?: number;
 }
 
 type Stage = 'idle' | 'modal' | 'peeling' | 'falling' | 'marching' | 'done';
 
-const DAYS_LEFT = Number(trailerConfig.threat.announcement.timerRing.number) || 5;
+const DEFAULT_TOTAL_DAYS = Number(trailerConfig.threat.announcement.timerRing.number) || 5;
 
 /**
  * World-pixel scale of the announcement card. The map canvas is 4240×2828, so
@@ -104,10 +106,11 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
   canvasSize,
   fallTarget,
   marchTarget,
+  daysRemaining = DEFAULT_TOTAL_DAYS,
 }) => {
   const { t } = useTranslation('idleVillage');
   const [stage, setStage] = useState<Stage>('modal');
-  const [daysLeft] = useState<number>(DAYS_LEFT);
+  const daysLeft = daysRemaining;
 
   const fallOffset = useMemo(
     () => ({ x: fallTarget.x - worldCenter.x, y: fallTarget.y - worldCenter.y }),
@@ -167,7 +170,7 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
     });
     onComplete?.();
     setStage('peeling');
-  }, [daysLeft, onComplete, stage]);
+  }, [stage, onComplete, daysLeft]);
 
   if (!visible || stage === 'idle') {
     return null;
