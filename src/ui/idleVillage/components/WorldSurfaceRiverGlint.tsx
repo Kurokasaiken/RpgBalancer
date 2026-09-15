@@ -24,48 +24,56 @@ export const WorldSurfaceRiverGlint: React.FC<WorldSurfaceRiverGlintProps> = ({
   const offset = (g: { dash: number; gap: number }) => -(g.dash + g.gap);
 
   return (
-    <svg
-      viewBox={`0 0 ${canvasSize.width} ${canvasSize.height}`}
-      preserveAspectRatio="none"
+    // `z-index` on an <svg> element itself is unreliable — some renderers silently
+    // ignore it, even set directly via `element.style.zIndex` outside React. Put it
+    // on a plain positioned <div> wrapper instead, same as every other atmosphere
+    // layer here (WorldSurfaceCloudShadows, WorldSurfaceWaterField, ...), and let
+    // the SVG just fill it with no stacking opinion of its own.
+    <div
       aria-hidden="true"
-      style={{
-        position: 'absolute',
-        inset: 0,
-        width: '100%',
-        height: '100%',
-        pointerEvents: 'none',
-        zIndex,
-        overflow: 'visible',
-      }}
+      style={{ position: 'absolute', inset: 0, zIndex, pointerEvents: 'none' }}
     >
-      <style>{`
-        @keyframes ws-river-glint {
-          from { stroke-dashoffset: 0; }
-          to { stroke-dashoffset: var(--ws-glint-offset); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .ws-river-glint { animation: none !important; }
-        }
-      `}</style>
-      {riverGlints.map((g, i) => (
-        <path
-          key={`river-glint-${i}`}
-          d={g.d}
-          fill="none"
-          stroke={g.color}
-          strokeWidth={g.width}
-          strokeLinecap="round"
-          strokeDasharray={`${g.dash} ${g.gap}`}
-          opacity={g.opacity}
-          className="ws-river-glint"
-          style={{
-            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-            ['--ws-glint-offset' as string]: `${offset(g)}`,
-            animation: `ws-river-glint ${g.durationSeconds}s linear infinite`,
-            animationDelay: `${g.delaySeconds ?? 0}s`,
-          }}
-        />
-      ))}
-    </svg>
+      <svg
+        viewBox={`0 0 ${canvasSize.width} ${canvasSize.height}`}
+        preserveAspectRatio="none"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          pointerEvents: 'none',
+          overflow: 'visible',
+        }}
+      >
+        <style>{`
+          @keyframes ws-river-glint {
+            from { stroke-dashoffset: 0; }
+            to { stroke-dashoffset: var(--ws-glint-offset); }
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .ws-river-glint { animation: none !important; }
+          }
+        `}</style>
+        {riverGlints.map((g, i) => (
+          <path
+            key={`river-glint-${i}`}
+            d={g.d}
+            fill="none"
+            stroke={g.color}
+            strokeWidth={g.width}
+            strokeLinecap="round"
+            strokeDasharray={`${g.dash} ${g.gap}`}
+            opacity={g.opacity}
+            className="ws-river-glint"
+            style={{
+              // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+              ['--ws-glint-offset' as string]: `${offset(g)}`,
+              animation: `ws-river-glint ${g.durationSeconds}s linear infinite`,
+              animationDelay: `${g.delaySeconds ?? 0}s`,
+            }}
+          />
+        ))}
+      </svg>
+    </div>
   );
 };
