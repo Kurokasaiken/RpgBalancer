@@ -281,9 +281,7 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
             >
               <ReminderComponent
                 title={String(t('world.goblinInvasion.invasion'))}
-                daysLeftLabel={String(t('world.goblinInvasion.timerLabel'))}
                 daysLeftValue={daysLeft}
-                state={daysLeft <= 1 ? 'active' : daysLeft <= 3 ? 'urgent' : 'calm'}
               />
             </motion.div>
           )}

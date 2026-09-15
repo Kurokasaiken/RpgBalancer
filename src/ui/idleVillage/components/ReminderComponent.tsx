@@ -1,13 +1,12 @@
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { MatericEventCard } from '@/ui/designSystem/primitives';
 import { PoiMatericV3_5 } from '@/ui/idleVillage/components/poi/PoiMatericV3_5';
 import { SkinTitle } from '@/ui/idleVillage/skins/primitives/SkinTitle';
 import { GildedEventFrame } from './GildedEventFrame';
-import { eventReminderTokens, bandForDays, REMINDER_BANDS, type ReminderBand } from '@/balancing/config/idleVillage/eventReminderTokens';
+import { eventReminderTokens, bandForDays, REMINDER_BANDS } from '@/balancing/config/idleVillage/eventReminderTokens';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 
-const { sizing, poi, glow, surface, gilded, title: titleTokens, countdown: countdownTokens } = eventReminderTokens;
+const { sizing, glow, surface, gilded, title: titleTokens } = eventReminderTokens;
 
 function useReducedMotion(): boolean {
   const [reduced, setReduced] = useState(false);
@@ -27,39 +26,6 @@ function useReducedMotion(): boolean {
 }
 
 /**
- * POI that starts with an empty magic circle and fills counter-clockwise.
- */
-const FillingPoi: React.FC<{ size: number; fillDurationMs: number }> = ({
-  size,
-  fillDurationMs,
-}) => {
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    let raf = 0;
-    let start = 0;
-    const step = (t: number) => {
-      if (!start) start = t;
-      const p = Math.min(1, (t - start) / fillDurationMs);
-      setProgress(p);
-      if (p < 1) raf = requestAnimationFrame(step);
-    };
-    raf = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(raf);
-  }, [fillDurationMs]);
-
-  return (
-    <PoiMatericV3_5
-      type="event"
-      state="active"
-      progress={progress}
-      timerDirection="counterclockwise"
-      size={size}
-    />
-  );
-};
-
-/**
  * Props for the ReminderComponent.
  */
 export type ReminderState = 'calm' | 'urgent' | 'active';
@@ -67,13 +33,9 @@ export type ReminderState = 'calm' | 'urgent' | 'active';
 export interface ReminderComponentProps {
   /** Title shown on the reminder (e.g. "INVASION"). */
   title: string;
-  /** Days-left label shown under the title (e.g. "DAYS REMAINING"). */
-  daysLeftLabel: string;
-  /** Numeric days remaining, rendered large next to the label. */
+  /** Numeric days remaining, rendered large as the primary data. */
   daysLeftValue: number;
-  /** Temporal state that drives color/animation intensity. */
-  state?: ReminderState;
-  /** Called when the player clicks the reminder to open event details. */
+  /** Optional: Called when the player clicks the reminder to open event details. */
   onClick?: () => void;
   /** Additional inline styles. */
   style?: React.CSSProperties;
@@ -82,15 +44,14 @@ export interface ReminderComponentProps {
 /**
  * Small, persistent event reminder shown in the world-surface map.
  *
- * Displays a gilded hand-forged frame, the event title, a days-remaining
- * label, and a slowly filling POI medallion to signal that the threat is still
- * active. Clicking it emits telemetry and calls `onClick`.
+ * V1 redesign: inverted hierarchy (64px number dominates, title secondary).
+ * Band-based state (distant/closing/imminent) with triple-encoded state
+ * (color + glyph + text). Flash animation on band transition only (no pulsing).
+ * Clicking it emits telemetry and calls `onClick`.
  */
 export const ReminderComponent: React.FC<ReminderComponentProps> = ({
   title,
-  daysLeftLabel,
   daysLeftValue,
-  state = 'calm',
   onClick,
   style,
 }) => {
