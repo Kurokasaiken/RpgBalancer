@@ -265,8 +265,13 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
                 style={{
                   maxWidth: CARD_W,
                   width: CARD_W,
-                  background: 'linear-gradient(135deg, rgba(58, 142, 152, 0.85) 0%, rgba(42, 110, 120, 0.90) 100%)',
-                  backdropFilter: 'blur(4px)',
+                  background:
+                    'radial-gradient(ellipse at 25% 8%, rgba(255,255,255,.08), transparent 42%), ' +
+                    'radial-gradient(ellipse at 85% 95%, rgba(0,118,130,.14), transparent 48%), ' +
+                    'linear-gradient(135deg, #07131b 0%, #0c1921 45%, #061016 100%)',
+                  boxShadow:
+                    'inset 0 1px rgba(255,255,255,.11), inset 0 -2px rgba(0,0,0,.7), ' +
+                    '0 4px 4px rgba(0,0,0,.5), 0 14px 30px rgba(0,0,0,.35)',
                 }}
               />
             </motion.div>
