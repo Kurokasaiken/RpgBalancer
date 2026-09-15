@@ -288,6 +288,27 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
             >
               <span aria-hidden="true">{bandDef.glyph}</span> {bandDef.word}
             </span>
+
+            {/* Progress bar: non-color urgency indicator */}
+            <div
+              style={{
+                marginTop: 8,
+                height: 3,
+                borderRadius: 2,
+                background: 'rgba(255, 255, 255, 0.1)',
+                overflow: 'hidden',
+              }}
+            >
+              <div
+                style={{
+                  height: '100%',
+                  width: `${(1 - daysLeftValue / 50) * 100}%`,
+                  background: stateTokens.plaqueText,
+                  transition: 'width 300ms ease-out',
+                  boxShadow: `0 0 8px ${stateTokens.frameGlow}`,
+                }}
+              />
+            </div>
           </div>
         </motion.div>
       </span>
