@@ -54,6 +54,11 @@ const tokensSchema = z.object({
     rimLight: z.string(),
     texture: z.string(),
   }),
+  /** Deep red/brick surface for the threat reminder badge (invasion identity color). */
+  threatSurface: z.object({
+    background: z.string(),
+    boxShadow: z.string(),
+  }),
   /** Ambient glow behind the reminder. */
   glow: z.object({
     ambient: z.string(),
@@ -171,6 +176,14 @@ export const eventReminderTokens: EventReminderTokens = {
       '0 4px 4px rgba(0,0,0,.5), 0 14px 30px rgba(0,0,0,.35)',
     rimLight: 'rgba(255,255,255,0.10)',
     texture: 'rgba(255,255,255,0.03)',
+  },
+  threatSurface: {
+    background:
+      'radial-gradient(ellipse at 25% 8%, rgba(255,180,140,.10), transparent 42%), ' +
+      'linear-gradient(135deg, #4a1f1a 0%, #351512 45%, #200b09 100%)',
+    boxShadow:
+      'inset 0 1px rgba(255,180,140,.14), inset 0 -2px rgba(0,0,0,.7), ' +
+      '0 4px 4px rgba(0,0,0,.5), 0 14px 30px rgba(0,0,0,.4)',
   },
   glow: {
     ambient: 'rgba(22, 141, 147, .22)',

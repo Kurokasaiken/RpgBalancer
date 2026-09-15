@@ -1,12 +1,11 @@
-import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { PoiMatericV3_5 } from '@/ui/idleVillage/components/poi/PoiMatericV3_5';
 import { SkinTitle } from '@/ui/idleVillage/skins/primitives/SkinTitle';
 import { GildedEventFrame } from './GildedEventFrame';
 import { eventReminderTokens, bandForDays, REMINDER_BANDS } from '@/balancing/config/idleVillage/eventReminderTokens';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 
-const { sizing, glow, surface, gilded, title: titleTokens } = eventReminderTokens;
+const { sizing, glow, threatSurface, gilded, title: titleTokens } = eventReminderTokens;
 
 function useReducedMotion(): boolean {
   const [reduced, setReduced] = useState(false);
@@ -63,8 +62,6 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
 
   const reduced = useReducedMotion();
   const rootRef = useRef<HTMLButtonElement>(null);
-  const uid = useId().replace(/:/g, '');
-  const glassFilterId = `reminder-glass-${uid}`;
   const [mx, setMx] = useState(0);
   const [my, setMy] = useState(0);
 
@@ -147,38 +144,13 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
           position: 'absolute',
           inset: 10,
           borderRadius: 10,
-          background: surface.background,
-          boxShadow: surface.boxShadow,
+          background: threatSurface.background,
+          boxShadow: threatSurface.boxShadow,
           zIndex: 1,
         }}
         aria-hidden="true"
       />
       <GildedEventFrame />
-      <svg
-        style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden' }}
-        aria-hidden="true"
-      >
-        <defs>
-          <filter id={glassFilterId} colorInterpolationFilters="sRGB" x="0" y="0" width="100%" height="100%">
-            <feImage
-              href="/assets/ui/glass_displacement.png"
-              preserveAspectRatio="none"
-              x="0"
-              y="0"
-              width="100%"
-              height="100%"
-              result="lens"
-            />
-            <feDisplacementMap
-              in="SourceGraphic"
-              in2="lens"
-              scale="6"
-              xChannelSelector="R"
-              yChannelSelector="G"
-            />
-          </filter>
-        </defs>
-      </svg>
       <span
         style={{
           position: 'absolute',
@@ -201,7 +173,7 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
             width: '100%',
           }}
         >
-          {/* POI medallion — now secondary */}
+          {/* Medallion: dark bordered circle with the number inside it, per mockup */}
           <div
             style={{
               position: 'relative',
@@ -225,50 +197,71 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
               }}
               aria-hidden="true"
             />
+            {/* Simple dark medallion with a gold double ring — the runic POI art
+                competes with the number for attention, so this reminder uses a
+                plain disc instead (per mockup: legibility over iconography). */}
             <div
               style={{
                 position: 'relative',
                 zIndex: 1,
-                filter: `drop-shadow(0 0 18px ${gilded.gemGlow}) ${reduced ? '' : `url(#${glassFilterId})`}`,
+                width: '100%',
+                height: '100%',
+                borderRadius: '50%',
+                background: 'radial-gradient(circle at 35% 30%, #241814 0%, #0c0705 70%)',
+                border: `3px solid ${gilded.frameStroke}`,
+                boxShadow: `inset 0 0 0 2px rgba(0,0,0,.6), inset 0 2px 6px rgba(0,0,0,.8), 0 0 16px ${gilded.gemGlow}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 transform: reduced
                   ? 'none'
                   : `translate3d(calc(var(--mx) * 6px), calc(var(--my) * 4px), 0)`,
               }}
             >
-              <PoiMatericV3_5
-                type="event"
-                state="active"
-                progress={1 - daysLeftValue / 50}
-                timerDirection="counterclockwise"
-                size={sizing.poiSize}
+              {/* Inner thin ring, echoes the gilded frame's double-lip look */}
+              <span
+                style={{
+                  position: 'absolute',
+                  inset: 6,
+                  borderRadius: '50%',
+                  border: `1px solid ${gilded.ornamentStroke}`,
+                  opacity: 0.55,
+                  pointerEvents: 'none',
+                }}
+                aria-hidden="true"
               />
             </div>
-          </div>
-
-          {/* Content: now INVERTED hierarchy — number dominates */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
-            {/* Big number — primary read */}
+            {/* Number rendered inside the medallion */}
             <SkinTitle
               level="1"
               style={{
-                fontSize: 64,
-                lineHeight: 0.9,
+                position: 'absolute',
+                zIndex: 2,
+                inset: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 34,
+                lineHeight: 1,
                 letterSpacing: '-0.02em',
-                color: stateTokens.plaqueText,
-                textShadow: stateTokens.numberGlow,
+                color: '#f5ede0',
+                textShadow: '0 2px 4px rgba(0,0,0,.85), 0 0 12px rgba(0,0,0,.6)',
                 fontVariantNumeric: 'tabular-nums',
+                pointerEvents: 'none',
               }}
             >
               {daysLeftValue}
             </SkinTitle>
+          </div>
 
-            {/* Title + band: secondary reads */}
+          {/* Content: title + days label, matching the mockup's two-line plaque text */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
             <SkinTitle
-              level="subtitle"
+              level="1"
               style={{
-                fontSize: 18,
-                letterSpacing: '0.04em',
+                fontSize: 26,
                 lineHeight: 1.1,
+                letterSpacing: '0.04em',
                 color: titleTokens.color,
                 textShadow: titleTokens.shadow,
               }}
@@ -276,10 +269,23 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
               {title}
             </SkinTitle>
 
-            {/* Band info: glyph + word, avoids color-only state encoding */}
             <span
               style={{
                 fontSize: 16,
+                letterSpacing: '0.08em',
+                lineHeight: 1.2,
+                color: '#e7dcc4',
+                textShadow: '0 1px 3px rgba(0,0,0,.7)',
+              }}
+            >
+              {daysLeftValue} {daysLeftValue === 1 ? 'GIORNO' : 'GIORNI'}
+            </span>
+
+            {/* Band info: glyph + word, avoids color-only state encoding */}
+            <span
+              style={{
+                marginTop: 2,
+                fontSize: 13,
                 letterSpacing: '0.1em',
                 lineHeight: 1.1,
                 color: stateTokens.plaqueText,
@@ -288,27 +294,6 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
             >
               <span aria-hidden="true">{bandDef.glyph}</span> {bandDef.word}
             </span>
-
-            {/* Progress bar: non-color urgency indicator */}
-            <div
-              style={{
-                marginTop: 8,
-                height: 3,
-                borderRadius: 2,
-                background: 'rgba(255, 255, 255, 0.1)',
-                overflow: 'hidden',
-              }}
-            >
-              <div
-                style={{
-                  height: '100%',
-                  width: `${(1 - daysLeftValue / 50) * 100}%`,
-                  background: stateTokens.plaqueText,
-                  transition: 'width 300ms ease-out',
-                  boxShadow: `0 0 8px ${stateTokens.frameGlow}`,
-                }}
-              />
-            </div>
           </div>
         </motion.div>
       </span>
