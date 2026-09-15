@@ -63,7 +63,6 @@ export const WorldSurfaceDemoPage: React.FC = () => {
         runtimeObjects={[]}
         breathEnabled
         showWaterField
-        showRiverGlint
         showSeaPattern
         showAtmosphere
         showGlass

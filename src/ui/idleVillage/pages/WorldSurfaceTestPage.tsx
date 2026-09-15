@@ -63,12 +63,12 @@ export const WorldSurfaceTestPage: React.FC = () => {
   // the coastal ripple and the wave marks, while the 34 sea marks were on
   // unconditionally — so nothing seen on the map could be attributed to one system.
   // Defaults preserve the behaviour these had when they shared a flag.
-  const [waterActive, setWaterActive] = useState(false);
+  const [waterActive, setWaterActive] = useState(true);
   const [waterFieldActive, setWaterFieldActive] = useState(false);
-  // Defaults on: cheap SVG dash animation, no reason to make it opt-in like the
-  // heavier water field. Was previously wired into `showWaterField` with no button
-  // of its own, so it could never actually be switched on from this page.
-  const [riverGlintActive, setRiverGlintActive] = useState(true);
+  // Off by default — the Director's call. Was previously wired into
+  // `showWaterField` with no button of its own, so it could never actually be
+  // switched on from this page at all; it has its own toggle now.
+  const [riverGlintActive, setRiverGlintActive] = useState(false);
   const [seaMarksActive, setSeaMarksActive] = useState(true);
   const [wavesActive, setWavesActive] = useState(false);
   const [seaPatternActive, setSeaPatternActive] = useState(true);
