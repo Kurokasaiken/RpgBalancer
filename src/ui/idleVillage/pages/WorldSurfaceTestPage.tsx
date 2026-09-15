@@ -71,7 +71,7 @@ export const WorldSurfaceTestPage: React.FC = () => {
   const [riverGlintActive, setRiverGlintActive] = useState(true);
   const [seaMarksActive, setSeaMarksActive] = useState(true);
   const [wavesActive, setWavesActive] = useState(false);
-  const [seaPatternActive, setSeaPatternActive] = useState(false);
+  const [seaPatternActive, setSeaPatternActive] = useState(true);
   const [seaPatternConfig, setSeaPatternConfig] = useState<SeaPatternConfig>(DEFAULT_SEA_PATTERN_CONFIG);
   const [uiHidden, setUiHidden] = useState(false);
   // Ripple amplitude, live. In world px: the peak displacement is half of this, and

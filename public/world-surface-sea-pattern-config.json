@@ -1,14 +1,14 @@
 {
   "visual": {
     "patternMode": "authoredTexture",
-    "patternScale": 100,
-    "lineOpacity": 1,
+    "patternScale": 1150,
+    "lineOpacity": 0.45,
     "lineWidth": 1,
     "lineColor": "#8bbac2",
     "baseColor": "#0b5c6b",
     "motionEnabled": true,
-    "motionAmount": 3,
-    "motionPeriod": 18,
+    "motionAmount": 20,
+    "motionPeriod": 5,
     "motionAngle": 200
   },
   "algorithm": {

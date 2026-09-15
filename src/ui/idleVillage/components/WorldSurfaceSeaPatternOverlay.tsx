@@ -78,21 +78,20 @@ export interface SeaPatternConfig {
 }
 
 /**
- * `patternScale` at the slider's own floor, not the 4500 the original authored
- * preset shipped with — the Director judged the smallest tile the slider allowed
- * as the one worth defaulting to, and asked for room to go smaller still. Kept out
- * of the authored-preset override below for the same reason `motionAngle` already
- * was: a fetched preset should not un-do a default the Director set explicitly.
+ * Tuned live on the real map and locked in as the shipped default. `patternScale`
+ * and `motionAngle` are kept out of the authored-preset override below on
+ * purpose: a fetched preset should not un-do a default the Director set
+ * explicitly by dragging the sliders on the actual map.
  */
 export const DEFAULT_SEA_PATTERN_CONFIG: SeaPatternConfig = {
-  patternScale: 100,
-  lineOpacity: 0.65,
+  patternScale: 1150,
+  lineOpacity: 0.45,
   lineWidth: 1,
   lineColor: '#8bbac2',
   baseColor: '#0b5c6b',
   motionEnabled: true,
-  motionAmount: 3,
-  motionPeriod: 18,
+  motionAmount: 20,
+  motionPeriod: 5,
   motionAngle: 200,
 };
 
