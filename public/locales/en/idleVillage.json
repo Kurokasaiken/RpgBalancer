@@ -472,6 +472,13 @@
         "timeRemaining": "Time Remaining",
         "dismiss": "Dismiss",
         "dismissReport": "Dismiss Report"
+      },
+      "reminder": {
+        "days_singular": "DAY",
+        "days_plural": "DAYS",
+        "band_distant": "APPROACHING",
+        "band_closing": "CLOSING IN",
+        "band_imminent": "TOMORROW"
       }
     },
     "debug": {
