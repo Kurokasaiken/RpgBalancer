@@ -262,7 +262,12 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
                 }
                 actionLabel={String(t('world.goblinInvasion.action'))}
                 onAction={handleAction}
-                style={{ maxWidth: CARD_W, width: CARD_W }}
+                style={{
+                  maxWidth: CARD_W,
+                  width: CARD_W,
+                  background: 'linear-gradient(135deg, rgba(58, 142, 152, 0.85) 0%, rgba(42, 110, 120, 0.90) 100%)',
+                  backdropFilter: 'blur(4px)',
+                }}
               />
             </motion.div>
           ) : (
