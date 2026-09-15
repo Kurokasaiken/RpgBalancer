@@ -231,13 +231,15 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
                 aria-hidden="true"
               />
             </div>
-            {/* Number rendered inside the medallion */}
+            {/* Number rendered inside the medallion. h1 has a browser default
+                vertical margin that throws off the flex centering — reset it. */}
             <SkinTitle
               level="1"
               style={{
                 position: 'absolute',
                 zIndex: 2,
                 inset: 0,
+                margin: 0,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -259,6 +261,7 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
             <SkinTitle
               level="1"
               style={{
+                margin: 0,
                 fontSize: 26,
                 lineHeight: 1.1,
                 letterSpacing: '0.04em',

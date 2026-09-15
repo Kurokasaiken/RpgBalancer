@@ -179,8 +179,8 @@ export const eventReminderTokens: EventReminderTokens = {
   },
   threatSurface: {
     background:
-      'radial-gradient(ellipse at 25% 8%, rgba(255,180,140,.10), transparent 42%), ' +
-      'linear-gradient(135deg, #4a1f1a 0%, #351512 45%, #200b09 100%)',
+      'radial-gradient(ellipse at 25% 8%, rgba(255,120,100,.14), transparent 45%), ' +
+      'linear-gradient(135deg, #7a1a1a 0%, #4d0f10 50%, #240607 100%)',
     boxShadow:
       'inset 0 1px rgba(255,180,140,.14), inset 0 -2px rgba(0,0,0,.7), ' +
       '0 4px 4px rgba(0,0,0,.5), 0 14px 30px rgba(0,0,0,.4)',
