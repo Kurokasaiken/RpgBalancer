@@ -4,7 +4,7 @@ import { MatericEventCard } from '@/ui/designSystem/primitives';
 import { PoiMatericV3_5 } from '@/ui/idleVillage/components/poi/PoiMatericV3_5';
 import { SkinTitle } from '@/ui/idleVillage/skins/primitives/SkinTitle';
 import { GildedEventFrame } from './GildedEventFrame';
-import { eventReminderTokens } from '@/balancing/config/idleVillage/eventReminderTokens';
+import { eventReminderTokens, bandForDays, REMINDER_BANDS, type ReminderBand } from '@/balancing/config/idleVillage/eventReminderTokens';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 
 const { sizing, poi, glow, surface, gilded, title: titleTokens, countdown: countdownTokens } = eventReminderTokens;
@@ -94,13 +94,32 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
   onClick,
   style,
 }) => {
-  const stateTokens = eventReminderTokens.states[state];
+  // Map band to state tokens for color/glow
+  const band = bandForDays(daysLeftValue);
+  const bandDef = REMINDER_BANDS[band];
+  const bandStateKey = band === 'imminent' ? 'active' : band === 'closing' ? 'urgent' : 'calm';
+  const stateTokens = eventReminderTokens.states[bandStateKey];
+
   const reduced = useReducedMotion();
   const rootRef = useRef<HTMLButtonElement>(null);
   const uid = useId().replace(/:/g, '');
   const glassFilterId = `reminder-glass-${uid}`;
   const [mx, setMx] = useState(0);
   const [my, setMy] = useState(0);
+
+  // Flash only once when band changes, not continuously
+  const prevBandRef = useRef(band);
+  const [flash, setFlash] = useState(false);
+
+  useEffect(() => {
+    if (prevBandRef.current !== band) {
+      prevBandRef.current = band;
+      setFlash(true);
+      const t = setTimeout(() => setFlash(false), 600);
+      return () => clearTimeout(t);
+    }
+    return undefined;
+  }, [band]);
 
   const handlePointerMove = useCallback((e: React.PointerEvent<HTMLButtonElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -211,104 +230,105 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
           pointerEvents: 'none',
         }}
       >
-        <MatericEventCard
-          variant="reminder"
-          image={(
+        <motion.div
+          animate={flash && !reduced ? { scale: [1, 1.04, 1] } : { scale: 1 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 16,
+            width: '100%',
+          }}
+        >
+          {/* POI medallion — now secondary */}
+          <div
+            style={{
+              position: 'relative',
+              width: sizing.poiSize,
+              height: sizing.poiSize,
+              flexShrink: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <span
+              style={{
+                position: 'absolute',
+                inset: -14,
+                borderRadius: '50%',
+                background: `radial-gradient(circle, ${gilded.gemGlow} 0%, transparent 65%)`,
+                filter: 'blur(12px)',
+                opacity: 0.55,
+                zIndex: 0,
+              }}
+              aria-hidden="true"
+            />
             <div
               style={{
                 position: 'relative',
-                width: sizing.poiSize,
-                height: sizing.poiSize,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                zIndex: 1,
+                filter: `drop-shadow(0 0 18px ${gilded.gemGlow}) ${reduced ? '' : `url(#${glassFilterId})`}`,
+                transform: reduced
+                  ? 'none'
+                  : `translate3d(calc(var(--mx) * 6px), calc(var(--my) * 4px), 0)`,
               }}
             >
-              <span
-                style={{
-                  position: 'absolute',
-                  inset: -14,
-                  borderRadius: '50%',
-                  background: `radial-gradient(circle, ${gilded.gemGlow} 0%, transparent 65%)`,
-                  filter: 'blur(12px)',
-                  opacity: 0.55,
-                  zIndex: 0,
-                }}
-                aria-hidden="true"
+              <PoiMatericV3_5
+                type="event"
+                state="active"
+                progress={1 - daysLeftValue / 50}
+                timerDirection="counterclockwise"
+                size={sizing.poiSize}
               />
-              <div
-                style={{
-                  position: 'relative',
-                  zIndex: 1,
-                  filter: `drop-shadow(0 0 18px ${gilded.gemGlow}) ${reduced ? '' : `url(#${glassFilterId})`}`,
-                  transform: reduced
-                    ? 'none'
-                    : `translate3d(calc(var(--mx) * 6px), calc(var(--my) * 4px), 0)`,
-                }}
-              >
-                <FillingPoi size={sizing.poiSize} fillDurationMs={poi.fillDurationMs} />
-              </div>
             </div>
-          )}
-          style={{
-            maxWidth: sizing.width - 36,
-            width: '100%',
-            minHeight: sizing.minHeight - 20,
-          }}
-        >
-          <SkinTitle
-            level="1"
-            style={{
-              fontSize: 30,
-              lineHeight: 1.05,
-              letterSpacing: '0.04em',
-              color: titleTokens.color,
-              textShadow: `${titleTokens.shadow}, ${titleTokens.highlight}`,
-            }}
-          >
-            {title}
-          </SkinTitle>
-          <div
-            style={{
-              marginTop: 8,
-              display: 'inline-flex',
-              alignItems: 'baseline',
-              gap: 10,
-              padding: '5px 12px',
-              borderRadius: 7,
-              border: '1px solid rgba(240,207,106,0.45)',
-              background: 'linear-gradient(135deg, rgba(61,37,19,0.55) 0%, rgba(30,18,9,0.72) 100%)',
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 4px 8px rgba(0,0,0,0.4)',
-            }}
-          >
-            <SkinTitle
-              level="subtitle"
-              style={{
-                fontSize: countdownTokens.labelSize,
-                letterSpacing: '0.18em',
-                lineHeight: 1.3,
-                textTransform: 'uppercase',
-                color: countdownTokens.labelColor,
-                textShadow: countdownTokens.labelGlow,
-                opacity: 0.9,
-              }}
-            >
-              {daysLeftLabel}
-            </SkinTitle>
+          </div>
+
+          {/* Content: now INVERTED hierarchy — number dominates */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
+            {/* Big number — primary read */}
             <SkinTitle
               level="1"
               style={{
-                fontSize: countdownTokens.numberSize,
-                lineHeight: 1,
+                fontSize: 64,
+                lineHeight: 0.9,
                 letterSpacing: '-0.02em',
-                color: countdownTokens.numberColor,
-                textShadow: countdownTokens.numberGlow,
+                color: stateTokens.plaqueText,
+                textShadow: stateTokens.numberGlow,
+                fontVariantNumeric: 'tabular-nums',
               }}
             >
               {daysLeftValue}
             </SkinTitle>
+
+            {/* Title + band: secondary reads */}
+            <SkinTitle
+              level="subtitle"
+              style={{
+                fontSize: 18,
+                letterSpacing: '0.04em',
+                lineHeight: 1.1,
+                color: titleTokens.color,
+                textShadow: titleTokens.shadow,
+              }}
+            >
+              {title}
+            </SkinTitle>
+
+            {/* Band info: glyph + word, avoids color-only state encoding */}
+            <span
+              style={{
+                fontSize: 16,
+                letterSpacing: '0.1em',
+                lineHeight: 1.1,
+                color: stateTokens.plaqueText,
+                textShadow: stateTokens.numberGlow,
+              }}
+            >
+              <span aria-hidden="true">{bandDef.glyph}</span> {bandDef.word}
+            </span>
           </div>
-        </MatericEventCard>
+        </motion.div>
       </span>
     </motion.button>
   );

@@ -1200,9 +1200,16 @@ const LayerView: React.FC<LayerViewProps> = ({ layer, worldName, imageFit, filte
     ...(isEventShroud ? { transition: 'transform 0.9s cubic-bezier(0.22, 1, 0.36, 1)' } : {}),
   };
 
-  const imageUrl = layer.file.includes('/')
-    ? `/assets/atmosphere/${layer.file.split('/').map(encodeURIComponent).join('/')}`
-    : `/assets/world/${worldName}/base/layers/${encodeURIComponent(layer.file)}`;
+  // For event shroud layers, use the configured sky variant (pergamena or ottanio)
+  let fileName = layer.file;
+  if (isEventShroud && layer.file.includes('event_shroud')) {
+    const suffix = eventShroudGradeConfig.skyVariant === 'ottanio' ? '_ottanio' : '_pergamena';
+    fileName = layer.file.replace(/\.png$/, `${suffix}.png`);
+  }
+
+  const imageUrl = fileName.includes('/')
+    ? `/assets/atmosphere/${fileName.split('/').map(encodeURIComponent).join('/')}`
+    : `/assets/world/${worldName}/base/layers/${encodeURIComponent(fileName)}`;
 
   const gradeImgStyle: React.CSSProperties | undefined =
     isEventShroud && eventShroudGradeConfig.enabled

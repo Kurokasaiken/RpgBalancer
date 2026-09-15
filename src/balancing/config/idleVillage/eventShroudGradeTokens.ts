@@ -65,6 +65,8 @@ export const EVENT_SHROUD_TEAL_RAMP: ShroudGradeRamp = {
 /** DOM id of the SVG filter the renderer mounts and the shroud layers reference. */
 export const EVENT_SHROUD_FILTER_ID = 'ws-event-shroud-teal';
 
+export type ShroudSkyVariant = 'pergamena' | 'ottanio';
+
 export const eventShroudGradeConfig = {
   /** Whether the teal grade is applied to the event shroud layers at all. */
   enabled: true,
@@ -78,6 +80,11 @@ export const eventShroudGradeConfig = {
    * rather than arriving with them.
    */
   rampDelayMs: 900,
+  /** Sky color variant for event shroud layers.
+   * - 'pergamena': original warm parchment sky (no filter bleed, no teal if filter disabled)
+   * - 'ottanio': deep teal sky (#3a8e98) — aligns with the teal gradient-map intent
+   */
+  skyVariant: 'ottanio' as ShroudSkyVariant,
 } as const;
 
 export type EventShroudGradeConfig = typeof eventShroudGradeConfig;
