@@ -509,6 +509,13 @@
         "timeRemaining": "Tempo Rimanente",
         "dismiss": "Ignora",
         "dismissReport": "Chiudi Rapporto"
+      },
+      "reminder": {
+        "days_singular": "GIORNO",
+        "days_plural": "GIORNI",
+        "band_distant": "APPROSSIMAMENTO",
+        "band_closing": "IMMINENTE",
+        "band_imminent": "DOMANI"
       }
     },
     "clouds": {

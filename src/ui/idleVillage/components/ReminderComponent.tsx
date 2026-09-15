@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { SkinTitle } from '@/ui/idleVillage/skins/primitives/SkinTitle';
 import { GildedEventFrame } from './GildedEventFrame';
 import { eventReminderTokens, bandForDays, REMINDER_BANDS } from '@/balancing/config/idleVillage/eventReminderTokens';
@@ -54,6 +55,8 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
   onClick,
   style,
 }) => {
+  const { t } = useTranslation('idleVillage');
+
   // Map band to state tokens for color/glow
   const band = bandForDays(daysLeftValue);
   const bandDef = REMINDER_BANDS[band];
@@ -281,7 +284,7 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
                 textShadow: '0 1px 3px rgba(0,0,0,.7)',
               }}
             >
-              {daysLeftValue} {daysLeftValue === 1 ? 'GIORNO' : 'GIORNI'}
+              {daysLeftValue} {t(`world.goblinInvasion.reminder.days_${daysLeftValue === 1 ? 'singular' : 'plural'}`)}
             </span>
 
             {/* Band info: glyph + word, avoids color-only state encoding */}
@@ -295,7 +298,7 @@ export const ReminderComponent: React.FC<ReminderComponentProps> = ({
                 textShadow: stateTokens.numberGlow,
               }}
             >
-              <span aria-hidden="true">{bandDef.glyph}</span> {bandDef.word}
+              <span aria-hidden="true">{bandDef.glyph}</span> {t(`world.goblinInvasion.reminder.band_${band}`)}
             </span>
           </div>
         </motion.div>
