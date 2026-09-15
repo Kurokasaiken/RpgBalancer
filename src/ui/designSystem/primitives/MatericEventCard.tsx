@@ -166,12 +166,14 @@ export const MatericEventCard: React.FC<MatericEventCardProps> = ({
                 style={{
                   display: 'inline-block',
                   marginBottom: 8,
-                  border: '1px solid rgba(240,207,106,.45)',
+                  padding: '6px 14px',
+                  border: '2px solid rgba(240,207,106,.65)',
+                  borderRadius: '4px',
                   color: '#f0cf6a',
                   fontWeight: 800,
                   letterSpacing: '0.22em',
                   textShadow: '0 0 8px rgba(240,207,106,.5), 0 1px 2px rgba(0,0,0,.8)',
-                  boxShadow: '0 0 12px rgba(240,207,106,.18), inset 0 1px 0 rgba(255,240,180,.15)',
+                  boxShadow: '0 0 16px rgba(240,207,106,.25), inset 0 1px 0 rgba(255,240,180,.2), inset 0 -2px 0 rgba(0,0,0,.3)',
                 }}
               >
                 {badge}
@@ -185,12 +187,12 @@ export const MatericEventCard: React.FC<MatericEventCardProps> = ({
                 onClick={onAction}
                 style={{
                   marginTop: 20,
-                  background: 'linear-gradient(180deg, #7a5225, #3b2414)',
-                  border: '1px solid rgba(240,207,106,.45)',
-                  color: '#ffe5a0',
+                  background: 'linear-gradient(180deg, #2a9fa8, #1a6b73)',
+                  border: '1px solid rgba(170,230,235,.5)',
+                  color: '#d4f5f7',
                   fontWeight: 800,
                   letterSpacing: '0.15em',
-                  boxShadow: '0 4px 12px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,240,180,.25)',
+                  boxShadow: '0 4px 12px rgba(42,159,168,.35), inset 0 1px 0 rgba(212,245,247,.25)',
                   textShadow: '0 1px 2px rgba(0,0,0,.7)',
                 }}
               >
