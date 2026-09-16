@@ -1632,7 +1632,16 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 - Fatto rilevante per la direzione: la bibbia artistica vieta ombre grigie ("Le ombre non sono mai grigie o marroni", kill list "nebbia grigia") → "grigio ossidato" va letto come desaturato con ombre verderame/teal, non grayscale puro. Esiste già il meccanismo: rampa gradient-map in `eventShroudGradeTokens.ts` e condizioni per-layer `grayscale`/`tint` in `WorldSurfaceRenderer`.
 - **Decisioni del Director (2026-09-16):** (1) `SETTLEMENT LOST` = **fine run** (roguelite, la scena Legacy/knowledge-preserved è il handoff); (2) direzione scelta = **C — Verdetto a schermo (takeover run-ending)**: timer zero → iride/vignetta, desaturazione a livello root, carta del verdetto con l'elenco delle perdite, CTA verso Legacy. Scioglie la tensione con `DESIGN_PILLARS.md` R4.4: la penalità definitiva esiste nel gioco (fine run), non solo nel teaser.
 
-**Cosa manca:** risposta del Director alle domande di chiarimento su scene 3, 6, 7 e sulle tensioni sopra; per scena 5 serve il piano (mw-planner): trigger reale (countdown invasione nel time engine → evento run-ending), superficie di mount (globale, cfr. decisione R-071 "tracker globale"), componente verdetto reale (i18n/skin/config-first, non `@trailer-only`), destinazione dopo il verdetto (schermata Legacy nel gioco vero — oggi esiste solo la facciata `/trailer-legacy`).
+**Cosa manca:** risposta del Director alle domande di chiarimento su scene 3, 6, 7 e sulle tensioni sopra.
+
+**Aggiornamento 2026-09-16 (scena 5 — pianificazione multi-AI web):**
+- Piano draft → critica web 4 provider (`.mw/runs/2026-09-16-settlement-lost-critique/`) → piano v2: `src/docs/docs/plans/settlement_lost_event_plan.md`. Il contratto di fine run esiste già (`useMinimalGameplay.gameOverState` + `resetGame()` + `MinimalGameOverModal`); il piano lo riusa invece di inventare un `runOutcome` parallelo.
+- **Decisioni del Director (2026-09-16, post-critica):**
+  - Lista perdite: **va bene mockarla** (config-driven), la critica "verdetto finto" è scavalcata dal Director.
+  - Mount del takeover: **deciso dall'agente** → root della pagina dove è montato (world surface container, non App root).
+  - Takeover bloccante (no ESC/backdrop): **ratificato**.
+  - Trigger: **bottone debug su `/world-surface`** come il toggle shroud; wiring reale rinviato.
+  - Spike perf filtro sul root: risolto — grade applicato al container world surface (non all'App root).
 
 ---
 
@@ -1655,3 +1664,5 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
 **Piano scritto:** `src/docs/docs/plans/idle_village_hero_sheet_dynamic_stats_plan.md` (Sub-Plan A2 del piano ombrello hero components, Draft in attesa di battesimo). Task T-01→T-09; open decision OD-1 (stat orfane dal registry), OD-3 (destino di `SchedaPergamena` — emerso che è **dormant**: `MapPage`/`StyleLabMapPage` non sono routed in `App.tsx`, quindi oggi non è visibile da nessuna parte).
 
 **Update 2026-09-16 — showcase in `/primitives`:** richiesta Director *"metti questa schedaPergamena nelle /primitive e poi aggiungi anche le altre schede del personaggio che abbiamo"*. Fatto: nuovo tab **PG Cards** in `src/pages/primitives.tsx` con fixture `DEMO_RESIDENT` (Kaelen, `dps_berserker`); mostra `SlottedMedal`, `PgCard` (trusted), `WorkerCard`, `WanderlustRosterCard` (via roster index) dentro `DragProvider`, più `PgDetailCard` inline e `SchedaPergamena` come overlay ancorato. Fix minimo necessario: `SchedaPergamena` chiamava `playSound` (API rimossa da `useSensoryAudio` — crashava all'apertura) → ora `playCue('drop_success')`. Scoperta: `PgCardTS002.tsx` è **sintatticamente rotto** (parse error babel, mai compilato) e usa API stale → escluso dalla gallery, riparazione = decisione a parte. I bug dati noti della pergamena (Difesa/Attacco 0, `resident.level`) restano — sono oggetto di OD-3. Evidence: `test-results/r-073-2026-09-16.log`. Safeguard: lint/test/build:check/kanban:lint passati.
+
+**Update 2026-09-16 (sera) — leggibilità PgDetailCard:** feedback Director *"ha lo sfondo trasparente, è troppo stretto e lungo"*. Fix: wrapper esterno → `MatericSurface obsidian` (opaco), `maxWidth` 360→640, sezioni stats/equip+inventory su 2 colonne. Bonus fix i18n: `pgDetailCard.unknownPreset`/`statistics.count` usavano `{{var}}` ma il progetto è su `i18next-icu` (`{var}` singole) → corrette in en+it-IT; altre chiavi `{{}}` nel file hanno lo stesso bug latente (da auditare).

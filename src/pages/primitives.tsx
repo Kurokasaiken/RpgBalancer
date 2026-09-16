@@ -779,7 +779,7 @@ function PgCardsTab(): JSX.Element {
 
       <MatericSectionHeader tier="tertiary" hint="sheets">Detail sheets</MatericSectionHeader>
       <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start' }}>
-        <div style={{ width: 360, display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ width: 660, maxWidth: '100%', display: 'flex', flexDirection: 'column', gap: 6 }}>
           {showDetail ? (
             <PgDetailCard resident={DEMO_RESIDENT} onClose={() => setShowDetail(false)} />
           ) : (
