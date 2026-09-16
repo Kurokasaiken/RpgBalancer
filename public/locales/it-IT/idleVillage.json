@@ -544,7 +544,24 @@
       "seaPatternMotionEnabled": "Moto attivo",
       "reducedMotion": "moto ridotto",
       "hideUi": "Nascondi UI",
-      "showUi": "Mostra UI"
+      "showUi": "Mostra UI",
+      "settlementLost": "Insediamento Perso"
+    },
+    "settlementLost": {
+      "title": "INSEDIAMENTO PERSO",
+      "subtitle": "L'insediamento è caduto. Ciò che è stato appreso sopravvive.",
+      "lossesTitle": "Cosa è stato perso",
+      "cta": "INIZIA UN NUOVO INSEDIAMENTO",
+      "losses": {
+        "walls": "Le mura sono state violate",
+        "heroes": "I tuoi eroi sono caduti",
+        "stores": "Le scorte sono perdute"
+      },
+      "stats": {
+        "daysSurvived": "Giorni sopravvissuti",
+        "residentsLost": "Residenti persi",
+        "goldEarned": "Oro guadagnato"
+      }
     }
   },
   "pgDetailCard": {
@@ -552,7 +569,7 @@
     "profile": "Profilo",
     "fullFigure": "Figura intera",
     "openArchetype": "Apri archetipo",
-    "unknownPreset": "Preset sconosciuto: {{id}}",
+    "unknownPreset": "Preset sconosciuto: {id}",
     "hp": {
       "label": "HP"
     },
@@ -563,7 +580,7 @@
     },
     "statistics": {
       "label": "Statistiche",
-      "count": "{{count}} valori",
+      "count": "{count} valori",
       "empty": "Nessuno snapshot disponibile."
     },
     "inventory": {

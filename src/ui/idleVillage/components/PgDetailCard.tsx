@@ -186,12 +186,11 @@ const PgDetailCard: FC<PgDetailCardProps> = ({ resident, onClose, onSlotClick })
       style={{
         transform: `translate3d(${position.x}px, ${position.y}px, 0)`,
         cursor: isDragging ? 'grabbing' : 'grab',
-        maxHeight: '80vh',
         width: '100%',
-        maxWidth: 360,
+        maxWidth: 640,
       }}
     >
-      <MatericFrame variant="molding" style={{ padding: 12 }}>
+      <MatericSurface shape="card" material="obsidian" style={{ padding: 12 }}>
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <div>
@@ -238,39 +237,40 @@ const PgDetailCard: FC<PgDetailCardProps> = ({ resident, onClose, onSlotClick })
           </div>
         </MatericFrame>
 
-        {/* Statistics */}
-        <MatericFrame variant="molding" style={{ padding: 10, marginBottom: 12 }}>
-          <MatericRecordList
-            columns={[
-              { width: '1fr', variant: 'label' },
-              { width: '1fr', variant: 'value' },
-            ]}
-            records={[
-              [t('pgDetailCard.statistics.label'), t('pgDetailCard.statistics.count', { count: snapshotEntries.length })],
-              ...snapshotEntries.map(([key, value]) => [key, Number(value).toFixed(2)]),
-            ]}
-          />
-        </MatericFrame>
+        {/* Statistics + loadout side by side so the card reads in one screen */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, alignItems: 'start' }}>
+          <MatericFrame variant="molding" style={{ padding: 10 }}>
+            <MatericRecordList
+              columns={[
+                { width: '1fr', variant: 'label' },
+                { width: '1fr', variant: 'value' },
+              ]}
+              records={[
+                [t('pgDetailCard.statistics.label'), t('pgDetailCard.statistics.count', { count: snapshotEntries.length })],
+                ...snapshotEntries.map(([key, value]) => [key, Number(value).toFixed(2)]),
+              ]}
+            />
+          </MatericFrame>
 
-        {/* Equipment */}
-        <MatericFrame variant="molding" style={{ padding: 10, marginBottom: 12 }}>
-          <EquipmentDiabloPanel slots={equipmentSlots} onSlotClick={onSlotClick} />
-        </MatericFrame>
-
-        {/* Inventory */}
-        <MatericFrame variant="molding" style={{ padding: 10 }}>
-          <MatericField label={t('pgDetailCard.inventory.label')} value="" />
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
-            {inventoryTokens.length ? (
-              inventoryTokens.map((token) => (
-                <MatericBadge key={token}>{token}</MatericBadge>
-              ))
-            ) : (
-              <span style={{ fontSize: 9, color: 'var(--skin-body-color)' }}>{t('pgDetailCard.inventory.empty')}</span>
-            )}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <MatericFrame variant="molding" style={{ padding: 10 }}>
+              <EquipmentDiabloPanel slots={equipmentSlots} onSlotClick={onSlotClick} />
+            </MatericFrame>
+            <MatericFrame variant="molding" style={{ padding: 10 }}>
+              <MatericField label={t('pgDetailCard.inventory.label')} value="" />
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
+                {inventoryTokens.length ? (
+                  inventoryTokens.map((token) => (
+                    <MatericBadge key={token}>{token}</MatericBadge>
+                  ))
+                ) : (
+                  <span style={{ fontSize: 9, color: 'var(--skin-body-color)' }}>{t('pgDetailCard.inventory.empty')}</span>
+                )}
+              </div>
+            </MatericFrame>
           </div>
-        </MatericFrame>
-      </MatericFrame>
+        </div>
+      </MatericSurface>
     </div>
   );
 };

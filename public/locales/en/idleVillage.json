@@ -511,7 +511,24 @@
       "seaPatternMotionEnabled": "Motion on",
       "reducedMotion": "reduced motion",
       "hideUi": "Hide UI",
-      "showUi": "Show UI"
+      "showUi": "Show UI",
+      "settlementLost": "Settlement Lost"
+    },
+    "settlementLost": {
+      "title": "SETTLEMENT LOST",
+      "subtitle": "The settlement has fallen. What was learned carries on.",
+      "lossesTitle": "What was lost",
+      "cta": "BEGIN A NEW SETTLEMENT",
+      "losses": {
+        "walls": "The walls were breached",
+        "heroes": "Your heroes have fallen",
+        "stores": "The stores are lost"
+      },
+      "stats": {
+        "daysSurvived": "Days survived",
+        "residentsLost": "Residents lost",
+        "goldEarned": "Gold earned"
+      }
     }
   },
   "worldEvents": {
@@ -528,7 +545,7 @@
     "profile": "Profile",
     "fullFigure": "Full figure",
     "openArchetype": "Open archetype",
-    "unknownPreset": "Unknown preset: {{id}}",
+    "unknownPreset": "Unknown preset: {id}",
     "hp": {
       "label": "HP"
     },
@@ -539,7 +556,7 @@
     },
     "statistics": {
       "label": "Statistics",
-      "count": "{{count}} values",
+      "count": "{count} values",
       "empty": "No snapshot available."
     },
     "inventory": {
