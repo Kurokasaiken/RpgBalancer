@@ -255,6 +255,12 @@ export interface MinimalGameplayState {
   clearEvents: () => void;
   daysRemaining: () => number;
   gameOver: () => boolean;
+  /**
+   * Ends the current run with reason `settlement_lost` (R-072, direction C).
+   * Idempotent: a no-op when a game over is already recorded. Builds the real
+   * loss summary from live state unless an explicit one is passed.
+   */
+  triggerSettlementLost: (summary?: MinimalGameOverState['summary']) => void;
 }
 
 /**
@@ -324,6 +330,25 @@ function mapSnapshotToStoreState(
     eventLog: snapshot.eventLog ?? [],
     rngState: ensureMinimalRngState(snapshot.rngState, fallbackSeed),
     lastSavedAt: snapshot.lastSavedAt,
+  };
+}
+
+/**
+ * Real loss payload for the run-ending verdict: what the domain actually knows
+ * was lost, not narrative flavour.
+ */
+function buildGameOverSummary(state: MinimalGameplayState['state']): NonNullable<MinimalGameOverState['summary']> {
+  return {
+    daysSurvived: state.currentDay,
+    goldEarned: state.gold,
+    questsCompleted: 0, // TODO: Track quests when implemented
+    residentsLost: state.residents.filter(r => r.isInjured).length,
+    finalRoster: state.residents.map(r => ({
+      id: r.id,
+      name: r.name,
+      level: r.level,
+      isInjured: r.isInjured,
+    })),
   };
 }
 
@@ -498,6 +523,8 @@ const INITIAL_STATE: MinimalGameplayState = {
   clearEvents: () => {},
   daysRemaining: () => 0,
   gameOver: () => false,
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  triggerSettlementLost: () => {},
 };
 
 function mapStoreStateToEngineState(state: MinimalGameplayState['state']): GameState {
@@ -751,18 +778,7 @@ const minimalGameplayStoreInitializer: StateCreator<MinimalGameplayState> = (set
 
       if (isGameOver && !get().gameOverState.isGameOver) {
         const reason: MinimalGameplayGameOverReason = currentState.food <= 0 ? 'food_depleted' : 'all_injured';
-        const summary = {
-          daysSurvived: currentState.currentDay,
-          goldEarned: currentState.gold,
-          questsCompleted: 0, // TODO: Track quests when implemented
-          residentsLost: currentState.residents.filter(r => r.isInjured).length,
-          finalRoster: currentState.residents.map(r => ({
-            id: r.id,
-            name: r.name,
-            level: r.level,
-            isInjured: r.isInjured,
-          })),
-        };
+        const summary = buildGameOverSummary(currentState);
 
         set({
           gameOverState: {
@@ -799,18 +815,7 @@ const minimalGameplayStoreInitializer: StateCreator<MinimalGameplayState> = (set
 
       if (isGameOver && !get().gameOverState.isGameOver) {
         const reason: MinimalGameplayGameOverReason = latestState.food <= 0 ? 'food_depleted' : 'all_injured';
-        const summary = {
-          daysSurvived: latestState.currentDay,
-          goldEarned: latestState.gold,
-          questsCompleted: 0, // TODO: Track quests when implemented
-          residentsLost: latestState.residents.filter(r => r.isInjured).length,
-          finalRoster: latestState.residents.map(r => ({
-            id: r.id,
-            name: r.name,
-            level: r.level,
-            isInjured: r.isInjured,
-          })),
-        };
+        const summary = buildGameOverSummary(latestState);
 
         set({
           gameOverState: {
@@ -890,6 +895,28 @@ const minimalGameplayStoreInitializer: StateCreator<MinimalGameplayState> = (set
     trackTelemetryEvent('minimal_gameplay_restart', {
       reason: gameOverState.reason || 'manual',
       daysSurvived: gameOverState.summary?.daysSurvived || 0,
+    });
+  },
+
+  triggerSettlementLost: (summary) => {
+    if (get().gameOverState.isGameOver) return;
+
+    const resolvedSummary = summary ?? buildGameOverSummary(get().state);
+    set({
+      gameOverState: {
+        isGameOver: true,
+        reason: 'settlement_lost',
+        summary: resolvedSummary,
+        gameOverAt: Date.now(),
+      },
+    });
+
+    trackTelemetryEvent('minimal_gameplay_game_over', {
+      reason: 'settlement_lost',
+      daysSurvived: resolvedSummary.daysSurvived,
+      goldEarned: resolvedSummary.goldEarned,
+      questsCompleted: resolvedSummary.questsCompleted,
+      residentsLost: resolvedSummary.residentsLost,
     });
   },
 

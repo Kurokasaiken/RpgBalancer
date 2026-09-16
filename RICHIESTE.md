@@ -1642,6 +1642,7 @@ Nel fermo immagine i marchi sono indistinguibili per stile dal tratteggio dipint
   - Takeover bloccante (no ESC/backdrop): **ratificato**.
   - Trigger: **bottone debug su `/world-surface`** come il toggle shroud; wiring reale rinviato.
   - Spike perf filtro sul root: risolto — grade applicato al container world surface (non all'App root).
+- **Eseguito 2026-09-16**: T-001…T-006 completi — `triggerSettlementLost` su `useMinimalGameplay`, `SettlementLostOverlay` (iride → grade ossidato → verdetto → CTA `resetGame`), bottone debug su `/world-surface`. Evidence: `test-results/settlement-lost-2026-09-16.log`. Fuori scope V1: countdown reale, schermata Legacy, world event shadow.
 
 ---
 
