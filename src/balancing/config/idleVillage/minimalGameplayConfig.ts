@@ -282,6 +282,7 @@ export interface MinimalGameplayGameOverMessages {
   food_depleted: MinimalGameplayGameOverMessage;
   all_injured: MinimalGameplayGameOverMessage;
   manual_reset: MinimalGameplayGameOverMessage;
+  settlement_lost: MinimalGameplayGameOverMessage;
 }
 
 export interface MinimalGameplayGameOverConfig {
@@ -298,6 +299,8 @@ export interface MinimalGameplayGameOverReasons {
   all_injured: 'all_injured';
   /** Manual reset triggered by user. */
   manual_reset: 'manual_reset';
+  /** The invasion reached the settlement: run ends (R-072, direction C). */
+  settlement_lost: 'settlement_lost';
 }
 
 export type MinimalGameplayGameOverReason = keyof MinimalGameplayGameOverReasons;
@@ -466,6 +469,11 @@ export const MINIMAL_GAMEPLAY_UI_CONFIG: MinimalGameplayUIConfig = {
         title: 'Village Reset',
         description: 'You have chosen to reset your village and start fresh.',
         ctaText: 'Begin Again',
+      },
+      settlement_lost: {
+        title: 'Settlement Lost',
+        description: 'The invasion reached the settlement. This run is over — what was learned carries on.',
+        ctaText: 'Begin a New Settlement',
       },
     },
     statsLayout: {

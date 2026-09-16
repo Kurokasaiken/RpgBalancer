@@ -17,6 +17,10 @@ import { isWebGLSupported } from '../utils/webglSupport';
 import { useWorldState } from '../../../engine/world/systems/WorldState';
 import type { CameraConfig } from '../config/worldSurfaceConfig';
 import { saveData, loadData } from '@/shared/persistence/PersistenceService';
+import { useMinimalGameplayStore } from '@/store/useMinimalGameplay';
+import { SettlementLostOverlay } from '../components/SettlementLostOverlay';
+import { settlementLostConfig } from '@/balancing/config/idleVillage/settlementLostConfig';
+import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 
 const WorldSurfacePixiOverlay = lazy(() => import('../components/WorldSurfacePixiOverlay'));
 
@@ -44,6 +48,20 @@ export const WorldSurfaceTestPage: React.FC = () => {
   const objects = useWorldState((s) => s.objects);
   const addObject = useWorldState((s) => s.addObject);
   const removeObject = useWorldState((s) => s.removeObject);
+  const settlementLostActive = useMinimalGameplayStore(
+    (s) => s.gameOverState.isGameOver && s.gameOverState.reason === 'settlement_lost',
+  );
+
+  const handleTriggerSettlementLost = useCallback(() => {
+    trackTelemetryEvent('settlement_lost_debug_trigger', {
+      eventType: 'settlement_lost_debug_trigger',
+      data: {},
+      context: 'world-surface-test-page',
+      timestamp: Date.now(),
+      metadata: {},
+    });
+    useMinimalGameplayStore.getState().triggerSettlementLost();
+  }, []);
 
   const [camera, setCamera] = useState({ panX: 0, panY: 0, zoom: 1 });
   const [activeVisualStateId, setActiveVisualStateId] = useState<string>('default');
@@ -544,6 +562,14 @@ export const WorldSurfaceTestPage: React.FC = () => {
               >
                 {translate('world.debug.atmosphere')}
               </button>
+              <button
+                type="button"
+                onClick={handleTriggerSettlementLost}
+                title={t('world.settlementLost.title')}
+                className={`rounded border border-red-700/50 px-3 py-1 text-xs text-red-200 hover:bg-red-700/20 ${settlementLostActive ? 'bg-red-700 text-red-50' : ''}`}
+              >
+                {translate('world.debug.settlementLost')}
+              </button>
             </>
           )}
           <button
@@ -560,6 +586,7 @@ export const WorldSurfaceTestPage: React.FC = () => {
       <main
         ref={mainRef}
         className="relative flex-1 overflow-hidden"
+        style={settlementLostActive ? { filter: `url(#${settlementLostConfig.filterId})` } : undefined}
       >
         <WorldSurfaceRenderer
           manifest={manifest}
@@ -647,6 +674,8 @@ export const WorldSurfaceTestPage: React.FC = () => {
           onEventCoveredChange={handleEventCoveredChange}
         />}
       </main>
+
+      <SettlementLostOverlay />
     </div>
   );
 };
