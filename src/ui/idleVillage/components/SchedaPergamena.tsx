@@ -39,7 +39,7 @@ const SchedaPergamena: React.FC<SchedaPergamenaProps> = ({
   anchorElement 
 }) => {
   const { activePreset } = useThemeSwitcher();
-  const { playSound } = useSensoryAudio();
+  const { playCue } = useSensoryAudio();
   const [position, setPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isAnimating, setIsAnimating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -109,8 +109,8 @@ const SchedaPergamena: React.FC<SchedaPergamenaProps> = ({
 
   // Suono di pergamena che si srotola
   const playPergamenaSound = useCallback(() => {
-    playSound('pergamena_open', { volume: 0.3, pitch: 1.0 });
-  }, [playSound]);
+    playCue('drop_success');
+  }, [playCue]);
 
   // Gestisci apertura/chiusura
   useEffect(() => {

@@ -32,12 +32,20 @@ import { GoblinInvasionWindow } from '@/ui/idleVillage/components/GoblinInvasion
 import { ReminderComponent } from '@/ui/idleVillage/components/ReminderComponent';
 import { ReminderComponentV2 } from '@/ui/idleVillage/components/ReminderComponentV2';
 import { ReminderComponentV3 } from '@/ui/idleVillage/components/ReminderComponentV3';
+import { WorldPresenceRail, type WorldPresenceRailItem } from '@/ui/idleVillage/components/WorldPresenceRail';
 import DayNightPoiSkin from '@/ui/idleVillage/components/minimal/DayNightPoiSkin';
 import { WanderlustMedalOverlay } from '@/ui/idleVillage/components/WanderlustMedalOverlay';
 import ThreatStatusIndicator from '@/ui/idleVillage/components/ThreatStatusIndicator';
 import { SkinTitle } from '@/ui/idleVillage/skins/primitives/SkinTitle';
 import { SkinScope } from '@/ui/idleVillage/skins/primitives/SkinScope';
 import { WanderlustSurfaceDefs } from '@/ui/wanderlust-surface';
+import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
+import { DragProvider, WanderlustRosterCard } from '@/ui/idleVillage/roster';
+import PgCard from '@/ui/idleVillage/components/PgCard';
+import WorkerCard from '@/ui/idleVillage/components/WorkerCard';
+import SlottedMedal from '@/ui/idleVillage/components/SlottedMedal';
+import PgDetailCard from '@/ui/idleVillage/components/PgDetailCard';
+import SchedaPergamena from '@/ui/idleVillage/components/SchedaPergamena';
 
 type TabId =
   | 'all'
@@ -55,7 +63,9 @@ type TabId =
   | 'skin'
   | 'event'
   | 'reminder'
-  | 'window';
+  | 'hud'
+  | 'window'
+  | 'pgcards';
 
 const FIELD_BACKGROUND = [
   'radial-gradient(circle at 50% -10%, rgba(0,229,255,0.13) 0%, rgba(0,150,255,0.03) 50%, transparent 80%)',
@@ -77,7 +87,9 @@ const TABS: { id: TabId; label: string }[] = [
   { id: 'skin', label: 'Skin' },
   { id: 'event', label: 'Event' },
   { id: 'reminder', label: 'Reminder' },
+  { id: 'hud', label: 'HUD' },
   { id: 'window', label: 'Window' },
+  { id: 'pgcards', label: 'PG Cards' },
 ];
 
 /** A compact demo panel that keeps the tab viewport above the fold. */
@@ -530,6 +542,285 @@ function ReminderTab(): JSX.Element {
   );
 }
 
+/**
+ * HUD tab — the persistent world-presence rail, built here first because
+ * `/minimal-gameplay` (the canonical runtime surface) does not yet host
+ * World Surface, and the game has no persistent HUD shell of its own yet
+ * (`ActiveHUDNotifications`/`GameplayHeader` exist in the tree but are not
+ * mounted anywhere — a toast queue besides, not a persistent countdown list).
+ * This demo stands in for "the map" with a plain dark field; the rail docks
+ * top-right exactly as it will once dropped onto the real frame.
+ */
+function HudTab(): JSX.Element {
+  const { t } = useTranslation('idleVillage');
+  const [daysLeft, setDaysLeft] = useState(5);
+  const [demoDaysLeft, setDemoDaysLeft] = useState(3);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+
+  const items: WorldPresenceRailItem[] = [
+    {
+      id: 'goblin-invasion',
+      title: String(t('world.goblinInvasion.invasion')),
+      daysLeftValue: daysLeft,
+      onClick: () => setSelectedId('goblin-invasion'),
+    },
+    // Second row is a fixture, not a real event type — here only to show the
+    // rail sorting two active presences by urgency and collapsing past
+    // `maxVisible`. Labelled plainly so it never reads as shipped content.
+    {
+      id: 'demo-event',
+      title: 'SAMPLE EVENT (demo)',
+      daysLeftValue: demoDaysLeft,
+      onClick: () => setSelectedId('demo-event'),
+    },
+  ].filter((item) => item.daysLeftValue > 0);
+
+  const selected = items.find((item) => item.id === selectedId) ?? null;
+
+  return (
+    <DemoPanel>
+      <MatericHeading
+        title="HUD — World Presence Rail"
+        subtitle="Persistent countdown list, screen-space, docked to a frame corner"
+      />
+      <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
+        <MatericButton variant="secondary" onClick={() => setDaysLeft((d) => Math.max(0, d - 1))}>
+          Advance day (Invasion: {daysLeft})
+        </MatericButton>
+        <MatericButton variant="secondary" onClick={() => setDemoDaysLeft((d) => Math.max(0, d - 1))}>
+          Advance day (Sample: {demoDaysLeft})
+        </MatericButton>
+        <MatericButton variant="secondary" onClick={() => { setDaysLeft(5); setDemoDaysLeft(3); setSelectedId(null); }}>
+          Reset
+        </MatericButton>
+      </div>
+
+      <div
+        style={{
+          position: 'relative',
+          height: 360,
+          borderRadius: 12,
+          overflow: 'hidden',
+          background:
+            'radial-gradient(ellipse at 30% 20%, rgba(0,118,130,.10), transparent 55%), linear-gradient(160deg, #0a1520 0%, #050a0f 100%)',
+          border: '1px solid rgba(212,170,80,0.25)',
+        }}
+      >
+        <span
+          style={{
+            position: 'absolute',
+            top: 12,
+            left: 16,
+            fontSize: 11,
+            letterSpacing: '0.1em',
+            color: 'rgba(255,255,255,0.35)',
+          }}
+        >
+          — stand-in for the world map —
+        </span>
+
+        {/* Placeholder marker: resonates on hover, exactly the hook the rail exposes and nothing more. */}
+        {items.map((item, i) => (
+          <span
+            key={item.id}
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              top: 60 + i * 40,
+              left: 80,
+              width: 14,
+              height: 14,
+              borderRadius: '50%',
+              background: hoveredId === item.id ? '#f0d58b' : 'rgba(240,213,139,0.35)',
+              boxShadow: hoveredId === item.id ? '0 0 16px rgba(240,213,139,0.7)' : 'none',
+              transition: 'all 0.2s ease',
+            }}
+          />
+        ))}
+
+        <div style={{ position: 'absolute', top: 16, right: 16 }}>
+          <WorldPresenceRail items={items} maxVisible={3} onHoverItem={setHoveredId} />
+        </div>
+
+        {selected && (
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 16,
+              left: 16,
+              right: 16,
+              padding: '10px 14px',
+              borderRadius: 8,
+              background: 'rgba(4,10,14,0.9)',
+              border: '1px solid rgba(212,170,80,0.4)',
+              color: '#e7dcc4',
+              fontSize: 13,
+            }}
+          >
+            <strong>{selected.title}</strong> — {selected.daysLeftValue}{' '}
+            {t(`world.goblinInvasion.reminder.days_${selected.daysLeftValue === 1 ? 'singular' : 'plural'}`)}
+            <span style={{ opacity: 0.6 }}> — placeholder for the real detail view</span>
+          </div>
+        )}
+      </div>
+    </DemoPanel>
+  );
+}
+
+/**
+ * PG Cards tab — every resident/character representation in the project
+ * rendered on a single demo fixture: roster-level reps (medal + roster cards)
+ * then the two detail sheets (`PgDetailCard` canonical Materic card, and the
+ * legacy `SchedaPergamena` parchment overlay, dormant since MapPage is unrouted).
+ */
+const DEMO_PORTRAIT_URL = '/assets/portraits/portrait male warrior.png';
+
+const DEMO_RESIDENT: ResidentState = {
+  id: 'demo-hero-kaelen',
+  displayName: 'Kaelen',
+  status: 'available',
+  fatigue: 34,
+  statProfileId: 'dps_berserker',
+  portraitUrl: DEMO_PORTRAIT_URL,
+  statSnapshot: {
+    hp: 120,
+    damage: 15,
+    txc: 65,
+    evasion: 10,
+    armor: 8,
+    resistance: 5,
+    critChance: 0.12,
+    regen: 2,
+    // Flat legacy keys SchedaPergamena reads (it predates the nested shape):
+    weapon: 'Longbow',
+    ring: 'Moon Sigil',
+    // Nested shape produced by useResidentHeroState for PgDetailCard:
+    equipment: { weapon: 'longbow_oak', ring: 'moon_sigil' },
+    inventory: ['Health Potion', 'Smoke Bomb'],
+  } as ResidentState['statSnapshot'],
+  statTags: ['dps', 'ranged'],
+  currentHp: 92,
+  maxHp: 120,
+  isHero: true,
+  isInjured: false,
+  survivalCount: 2,
+  survivalScore: 140,
+};
+
+const demoCaptionStyle: React.CSSProperties = {
+  fontSize: 10,
+  color: 'var(--skin-body-color)',
+  textTransform: 'uppercase',
+  letterSpacing: '0.08em',
+  textAlign: 'center',
+};
+
+function PgCardsTab(): JSX.Element {
+  const [showPergamena, setShowPergamena] = useState(false);
+  const [showDetail, setShowDetail] = useState(true);
+  const [pergamenaAnchor, setPergamenaAnchor] = useState<HTMLDivElement | null>(null);
+
+  return (
+    <DemoPanel>
+      <MatericHeading
+        title="PG Cards & Sheets"
+        subtitle="Every character card in the project on one demo resident"
+        description="Roster reps first, detail sheets below. Equip/skill/consumable kit parts live at /hero-components-lab."
+      />
+
+      <MatericSectionHeader tier="tertiary" hint="roster">Roster — medal &amp; cards</MatericSectionHeader>
+      <DragProvider>
+        <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'flex-start', marginBottom: 12 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+            <SlottedMedal id="demo-medal-kaelen" type="gold" residentId={DEMO_RESIDENT.id} isActive />
+            <span style={demoCaptionStyle}>SlottedMedal</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+            <PgCard
+              workerId={DEMO_RESIDENT.id}
+              label="Kaelen"
+              subtitle="Berserker"
+              hp={92}
+              fatigue={34}
+              maxHp={120}
+              portraitUrl={DEMO_PORTRAIT_URL}
+              statusLabel="Available"
+              isInteractive
+            />
+            <span style={demoCaptionStyle}>PgCard (trusted)</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+            <WorkerCard
+              id={DEMO_RESIDENT.id}
+              name="Kaelen"
+              hp={77}
+              fatigue={34}
+              portraitUrl={DEMO_PORTRAIT_URL}
+            />
+            <span style={demoCaptionStyle}>WorkerCard</span>
+          </div>
+        </div>
+        <div style={{ marginBottom: 12 }}>
+          <WanderlustRosterCard
+            workerId={DEMO_RESIDENT.id}
+            label="Kaelen"
+            subtitle="Berserker"
+            hp={92}
+            fatigue={34}
+            maxHp={120}
+            portraitUrl={DEMO_PORTRAIT_URL}
+            statusLabel="Available"
+            isHero
+          />
+          <span style={demoCaptionStyle}>WanderlustRosterCard</span>
+        </div>
+      </DragProvider>
+
+      <MatericSectionHeader tier="tertiary" hint="sheets">Detail sheets</MatericSectionHeader>
+      <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+        <div style={{ width: 360, display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {showDetail ? (
+            <PgDetailCard resident={DEMO_RESIDENT} onClose={() => setShowDetail(false)} />
+          ) : (
+            <MatericButton variant="secondary" onClick={() => setShowDetail(true)}>
+              Show PgDetailCard
+            </MatericButton>
+          )}
+          <span style={demoCaptionStyle}>PgDetailCard — canonical (draggable)</span>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div
+            ref={setPergamenaAnchor}
+            style={{
+              padding: '10px 14px',
+              borderRadius: 8,
+              border: '1px dashed rgba(212,170,80,0.4)',
+              color: 'var(--skin-body-color)',
+              fontSize: 11,
+            }}
+          >
+            anchor — in MapPage the sheet opened on roster-card hover
+          </div>
+          <MatericButton variant="secondary" onClick={() => setShowPergamena(true)}>
+            Open Scheda Pergamena
+          </MatericButton>
+          <span style={demoCaptionStyle}>SchedaPergamena — legacy overlay (Esc / click-outside)</span>
+        </div>
+      </div>
+
+      {showPergamena && (
+        <SchedaPergamena
+          resident={DEMO_RESIDENT}
+          isOpen
+          onClose={() => setShowPergamena(false)}
+          anchorElement={pergamenaAnchor}
+        />
+      )}
+    </DemoPanel>
+  );
+}
+
 const TAB_CONTENT: Record<TabId, () => JSX.Element> = {
   all: AllTab,
   frame: FrameTab,
@@ -545,7 +836,9 @@ const TAB_CONTENT: Record<TabId, () => JSX.Element> = {
   skin: SkinTab,
   event: EventTab,
   reminder: ReminderTab,
+  hud: HudTab,
   window: WindowTab,
+  pgcards: PgCardsTab,
 };
 
 export default function PrimitivesPage(): JSX.Element {
