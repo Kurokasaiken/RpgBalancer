@@ -1197,11 +1197,13 @@ const LayerView: React.FC<LayerViewProps> = ({ layer, worldName, imageFit, filte
     ...(isEventShroud ? { transition: 'transform 0.9s cubic-bezier(0.22, 1, 0.36, 1)' } : {}),
   };
 
-  // For event shroud layers, use the configured sky variant (pergamena or ottanio)
+  // For event shroud layers, use the configured sky variant (pergamena or ottanio).
+  // Both variants ship as webp (re-encoded 2026-09-16: ~65-90% smaller than the
+  // source PNGs, visually identical — see .mw/runs/2026-09-15-world-surface-perf).
   let fileName = layer.file;
   if (isEventShroud && layer.file.includes('event_shroud')) {
     const suffix = eventShroudGradeConfig.skyVariant === 'ottanio' ? '_ottanio' : '_pergamena';
-    fileName = layer.file.replace(/\.png$/, `${suffix}.png`);
+    fileName = layer.file.replace(/\.png$/, `${suffix}.webp`);
   }
 
   const imageUrl = fileName.includes('/')
@@ -1231,7 +1233,12 @@ const LayerView: React.FC<LayerViewProps> = ({ layer, worldName, imageFit, filte
               alt=""
               style={imgStyle}
               draggable={false}
-              loading="lazy"
+              // Event shroud layers are always mounted but sit translated off-canvas
+              // until the reveal; native lazy-loading can read that as "far from
+              // viewport" and defer the fetch until the same frame the close
+              // transition starts, competing with it for main-thread time. Force
+              // eager so the fetch/decode happens well ahead of the animation.
+              loading={isEventShroud ? 'eager' : 'lazy'}
               decoding="async"
               onError={handleImageError}
             />

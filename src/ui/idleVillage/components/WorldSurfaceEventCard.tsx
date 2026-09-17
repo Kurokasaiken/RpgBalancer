@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { MatericEventCard } from '@/ui/designSystem/primitives';
 import { GoblinInvasionWindow } from '@/ui/idleVillage/components/GoblinInvasionWindow';
 import { ReminderComponent } from './ReminderComponent';
-import goblinStickerImage from '@/assets/ui/idleVillage/goblin-march-trasparente.png';
+import goblinStickerImage from '@/assets/ui/idleVillage/goblin-march-trasparente.webp';
 import { trailerConfig } from '@/balancing/config/idleVillage/trailerConfig';
 import { trackTelemetryEvent } from '@/analytics/telemetry/telemetryProvider';
 
@@ -136,6 +136,21 @@ export const WorldSurfaceEventCard: React.FC<WorldSurfaceEventCardProps> = ({
     setStage(visible ? 'modal' : 'idle');
   }, [visible]);
   /* eslint-enable react-hooks/set-state-in-effect */
+
+  /**
+   * The detached sticker only enters the DOM at the `falling` stage — the
+   * browser would otherwise discover this URL and start fetching/decoding it
+   * at the exact moment the peel-to-fall animation starts, which is what
+   * produced the 766ms dropped frame measured at the reveal (see
+   * .mw/runs/2026-09-15-world-surface-perf/findings.md). The modal stage gives
+   * at least PEEL_MS of head start, plus however long the player dwells
+   * reading the announcement before confirming — decode it now instead.
+   */
+  useEffect(() => {
+    if (!visible) return;
+    const img = new Image();
+    img.src = goblinStickerImage;
+  }, [visible]);
 
   useEffect(() => {
     if (stage === 'peeling') {

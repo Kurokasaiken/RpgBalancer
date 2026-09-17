@@ -683,7 +683,7 @@ export function ActivityCapsuleDetailSkinAware({
       material="bronze"
       interactive={enableDrag}
       isDragging={isDragging}
-      className="activity-capsule-detail-surface"
+      className={`activity-capsule-detail-surface${inlineMode ? ' activity-capsule-detail-surface--inline' : ''}`}
       style={surfaceStyle}
     >
       <div
@@ -1264,8 +1264,14 @@ export function ActivityCapsuleDetailSkinAware({
          * WanderlustSurface (ws-root--panel) has ws-content padding: 22px on all sides.
          * We fix the outer surface to 680px; the inner div takes 100% of ws-content's
          * content area (680 - 44 = 636px), which fits inside ws-root without clipping.
+         *
+         * This fixed width is only correct for the floating/fixed-position modal use
+         * case. In inline mode the surface is composed into a page-owned layout column
+         * (e.g. a grid cell) whose width is not 680px, so it must follow the width the
+         * caller already computed via surfaceStyle (100%, capped by
+         * --detail-window-width) instead of overriding it.
          */
-        .activity-capsule-detail-surface {
+        .activity-capsule-detail-surface:not(.activity-capsule-detail-surface--inline) {
           width: 680px !important;
           max-width: 92vw !important;
         }

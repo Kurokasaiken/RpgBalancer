@@ -22,6 +22,21 @@ export function WorldSurfaceSeaPatternPanel({ config, onChange, hidden = false, 
   const { t } = useTranslation('idleVillage');
   const reducedMotion = useReducedMotion();
   const [panelOpen, setPanelOpen] = useState(true);
+  const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'failed'>('idle');
+
+  const handleSaveAsDefault = async () => {
+    setSaveState('saving');
+    try {
+      const response = await fetch('/__sea-pattern-default', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(config),
+      });
+      setSaveState(response.ok ? 'saved' : 'failed');
+    } catch {
+      setSaveState('failed');
+    }
+  };
 
   if (hidden) return null;
 
@@ -147,6 +162,29 @@ export function WorldSurfaceSeaPatternPanel({ config, onChange, hidden = false, 
                   <span className="ml-1 text-amber-200/50">({t('world.debug.reducedMotion')})</span>
                 )}
               </label>
+            </div>
+
+            <div className="border-t border-amber-700/30 pt-2">
+              <button
+                type="button"
+                onClick={handleSaveAsDefault}
+                disabled={saveState === 'saving'}
+                className="w-full rounded border border-teal-600/50 bg-teal-900/30 px-2 py-1.5 text-xs text-teal-100 transition hover:bg-teal-800/40 disabled:opacity-50"
+              >
+                {saveState === 'saving'
+                  ? t('world.debug.seaPatternSaving')
+                  : t('world.debug.seaPatternSaveDefault')}
+              </button>
+              {saveState === 'saved' && (
+                <div className="mt-1 text-center text-[10px] text-teal-300/80">
+                  {t('world.debug.seaPatternSaved')}
+                </div>
+              )}
+              {saveState === 'failed' && (
+                <div className="mt-1 text-center text-[10px] text-red-300/80">
+                  {t('world.debug.seaPatternSaveFailed')}
+                </div>
+              )}
             </div>
           </div>
         </div>

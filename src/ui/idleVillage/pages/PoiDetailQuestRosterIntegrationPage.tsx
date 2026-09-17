@@ -786,7 +786,7 @@ const PoiDetailQuestRosterIntegrationPage: FC = () => {
                   )}
                 </div>
 
-                <StyleLabSurface className="poi-detail-surface" variant="panel">
+                <StyleLabSurface className="poi-detail-surface min-w-0" variant="panel">
                   <section className="poi-detail-stage">
                     <DroppablePoi
                       dropId={poiDropId}

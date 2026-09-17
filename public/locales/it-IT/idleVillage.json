@@ -545,7 +545,11 @@
       "reducedMotion": "moto ridotto",
       "hideUi": "Nascondi UI",
       "showUi": "Mostra UI",
-      "settlementLost": "Insediamento Perso"
+      "settlementLost": "Insediamento Perso",
+      "seaPatternSaveDefault": "Salva come default",
+      "seaPatternSaving": "Salvataggio…",
+      "seaPatternSaved": "Default aggiornati nel sorgente",
+      "seaPatternSaveFailed": "Salvataggio fallito (solo in dev)"
     },
     "settlementLost": {
       "title": "INSEDIAMENTO PERSO",
@@ -581,7 +585,12 @@
     "statistics": {
       "label": "Statistiche",
       "count": "{count} valori",
-      "empty": "Nessuno snapshot disponibile."
+      "empty": "Nessuno snapshot disponibile.",
+      "category": {
+        "offense": "Offesa",
+        "defense": "Difesa",
+        "utility": "Utilità"
+      }
     },
     "inventory": {
       "label": "Inventario",
@@ -603,6 +612,10 @@
       "exhausted": "Esausto",
       "injured": "Ferito",
       "dead": "Caduto"
+    },
+    "vitals": {
+      "hp": "PV",
+      "stamina": "VIG"
     }
   },
   "heroComponentsLab": {
@@ -812,5 +825,26 @@
         "epicfail": "La stanza si fa gelida: sei solo."
       }
     }
+  },
+  "stat": {
+    "damage": "Danno",
+    "accuracy": "Precisione",
+    "critChance": "Crit %",
+    "critMult": "Molt. Crit",
+    "armorPen": "Perf. Armatura",
+    "penPercent": "Perf. Resistenza",
+    "armor": "Armatura",
+    "resistance": "Resistenza",
+    "evasion": "Elusione",
+    "block": "Parata",
+    "ward": "Scudo",
+    "energyShield": "Scudo Energ.",
+    "thorns": "Spine",
+    "agility": "Agilità",
+    "regen": "Rigenerazione",
+    "lifesteal": "Assorb. Vita",
+    "movementSpeed": "Velocità",
+    "cooldownReduction": "Rid. Ricarica",
+    "castSpeed": "Vel. Lancio"
   }
 }

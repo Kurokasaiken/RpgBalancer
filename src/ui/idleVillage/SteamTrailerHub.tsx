@@ -65,6 +65,14 @@ const TRAILER_PAGES: TestPageLink[] = [
     status: 'ok',
   },
   {
+    id: 'trailer-legacy-v2',
+    title: 'Trailer: Legacy V2',
+    description: 'Scene 6 iteration — Preservation Table (condense / draw / reveal)',
+    path: '/trailer-legacy-v2',
+    icon: '⚱️',
+    status: 'ok',
+  },
+  {
     id: 'trailer-outro',
     title: 'Trailer: Outro',
     description: 'Scene 7 — Outro CTA with V9 Explorer Journal theme',

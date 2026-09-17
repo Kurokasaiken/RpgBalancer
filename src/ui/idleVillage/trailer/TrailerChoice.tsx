@@ -15,9 +15,9 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { GenericPoiSkin } from '@/ui/idleVillage/components/minimal/GenericPoiSkin';
-import { WanderlustSurface } from '@/ui/wanderlust-surface/WanderlustSurface';
-import { V9GlassLayers } from '@/ui/v9-skin/V9GlassLayers';
+import { MatericSurface } from '@/ui/designSystem/primitives';
 import { trailerConfig } from '@/balancing/config/idleVillage/trailerConfig';
+import { TrailerSceneShell } from './TrailerSceneShell';
 import type { TrailerSceneProps } from './types';
 import './trailer.css';
 
@@ -59,19 +59,7 @@ export const TrailerChoice: React.FC<TrailerSceneProps> = ({
   }, [autoStart, onComplete, scene.duration]);
 
   return (
-    <div
-      className={`trailer-root trailer-background ${captureMode ? 'trailer-capture-mode' : ''}`}
-      style={{ width: '100%', height: '100vh', position: 'relative', overflow: 'hidden' }}
-    >
-      <V9GlassLayers
-        variant="base"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          fontFamily: 'inherit',
-        }}
-      />
-
+    <TrailerSceneShell captureMode={captureMode}>
       <div
         style={{
           position: 'absolute',
@@ -89,17 +77,7 @@ export const TrailerChoice: React.FC<TrailerSceneProps> = ({
         >
           {scene.title}
         </h2>
-        <p
-          style={{
-            marginTop: '0.75rem',
-            color: 'var(--trailer-parchment, #ede0c4)',
-            fontSize: 'clamp(14px, 2vw, 20px)',
-            letterSpacing: '0.08em',
-            opacity: 0,
-            textTransform: 'uppercase',
-            animation: 'fadeIn 0.8s ease 0.6s forwards',
-          }}
-        >
+        <p className="trailer-subtitle" style={{ animationDelay: '0.6s' }}>
           {scene.subtitle}
         </p>
       </div>
@@ -131,8 +109,8 @@ export const TrailerChoice: React.FC<TrailerSceneProps> = ({
                     position: 'absolute',
                     inset: '-14px',
                     borderRadius: '50%',
-                    border: '2px solid rgba(216,177,62,0.65)',
-                    boxShadow: '0 0 24px rgba(216,177,62,0.35)',
+                    border: '2px solid var(--skin-surface-border)',
+                    boxShadow: '0 0 24px var(--skin-glow-primary)',
                     animation: 'trailer-pulse-ring 1.4s ease-in-out infinite',
                     pointerEvents: 'none',
                   }}
@@ -148,7 +126,7 @@ export const TrailerChoice: React.FC<TrailerSceneProps> = ({
                 pillar={choice.type === 'safe' ? 'empire' : 'wilderness'}
               />
             </div>
-            <WanderlustSurface
+            <MatericSurface
               shape="card"
               material={choice.type === 'safe' ? 'jade' : 'obsidian'}
               interactive={false}
@@ -177,10 +155,10 @@ export const TrailerChoice: React.FC<TrailerSceneProps> = ({
               >
                 {choice.description}
               </div>
-            </WanderlustSurface>
+            </MatericSurface>
           </div>
         );
       })}
-    </div>
+    </TrailerSceneShell>
   );
 };

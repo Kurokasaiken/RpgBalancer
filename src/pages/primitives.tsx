@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Minus } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -41,6 +41,9 @@ import { SkinScope } from '@/ui/idleVillage/skins/primitives/SkinScope';
 import { WanderlustSurfaceDefs } from '@/ui/wanderlust-surface';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
 import { DragProvider, WanderlustRosterCard } from '@/ui/idleVillage/roster';
+import { canonicalResidentData } from '@/ui/idleVillage/roster/CanonicalRosterBundle';
+import { useResidentHeroState } from '@/ui/idleVillage/hooks/useResidentHeroState';
+import { getArchetypeSummary } from '@/ui/idleVillage/archetypeDirectory';
 import PgCard from '@/ui/idleVillage/components/PgCard';
 import WorkerCard from '@/ui/idleVillage/components/WorkerCard';
 import SlottedMedal from '@/ui/idleVillage/components/SlottedMedal';
@@ -674,39 +677,12 @@ function HudTab(): JSX.Element {
  * then the two detail sheets (`PgDetailCard` canonical Materic card, and the
  * legacy `SchedaPergamena` parchment overlay, dormant since MapPage is unrouted).
  */
-const DEMO_PORTRAIT_URL = '/assets/portraits/portrait male warrior.png';
-
-const DEMO_RESIDENT: ResidentState = {
-  id: 'demo-hero-kaelen',
-  displayName: 'Kaelen',
-  status: 'available',
-  fatigue: 34,
-  statProfileId: 'dps_berserker',
-  portraitUrl: DEMO_PORTRAIT_URL,
-  statSnapshot: {
-    hp: 120,
-    damage: 15,
-    txc: 65,
-    evasion: 10,
-    armor: 8,
-    resistance: 5,
-    critChance: 0.12,
-    regen: 2,
-    // Flat legacy keys SchedaPergamena reads (it predates the nested shape):
-    weapon: 'Longbow',
-    ring: 'Moon Sigil',
-    // Nested shape produced by useResidentHeroState for PgDetailCard:
-    equipment: { weapon: 'longbow_oak', ring: 'moon_sigil' },
-    inventory: ['Health Potion', 'Smoke Bomb'],
-  } as ResidentState['statSnapshot'],
-  statTags: ['dps', 'ranged'],
-  currentHp: 92,
-  maxHp: 120,
-  isHero: true,
-  isInjured: false,
-  survivalCount: 2,
-  survivalScore: 140,
-};
+/**
+ * The demo resident is not a fixture: it is the seeded roster hero run through
+ * the real creation pipeline (SavedCharacter -> savedCharacterToResident ->
+ * useResidentHeroState), so what the cards show here is what the game produces.
+ */
+const DEMO_RESIDENT_ID = 'hero-giggiolillo';
 
 const demoCaptionStyle: React.CSSProperties = {
   fontSize: 10,
@@ -721,6 +697,17 @@ function PgCardsTab(): JSX.Element {
   const [showDetail, setShowDetail] = useState(true);
   const [pergamenaAnchor, setPergamenaAnchor] = useState<HTMLDivElement | null>(null);
 
+  // Same call the real roster runtime makes, so nothing here is hand-authored.
+  const roster = useMemo(() => canonicalResidentData(), []);
+  const baseResident = useMemo(
+    () => roster.find((entry) => entry.id === DEMO_RESIDENT_ID) ?? roster[0],
+    [roster],
+  );
+  const { resident } = useResidentHeroState({ resident: baseResident });
+  const archetype = getArchetypeSummary(resident.statProfileId);
+  const fatiguePercent = Math.round(resident.fatigue ?? 0);
+  const hpPercent = resident.maxHp > 0 ? Math.round((resident.currentHp / resident.maxHp) * 100) : 0;
+
   return (
     <DemoPanel>
       <MatericHeading
@@ -729,49 +716,53 @@ function PgCardsTab(): JSX.Element {
         description="Roster reps first, detail sheets below. Equip/skill/consumable kit parts live at /hero-components-lab."
       />
 
+      <div style={{ ...demoCaptionStyle, textAlign: 'left', marginBottom: 8 }}>
+        Live data — {resident.displayName} ({resident.id}) via canonicalResidentData -&gt; useResidentHeroState
+      </div>
+
       <MatericSectionHeader tier="tertiary" hint="roster">Roster — medal &amp; cards</MatericSectionHeader>
       <DragProvider>
         <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'flex-start', marginBottom: 12 }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-            <SlottedMedal id="demo-medal-kaelen" type="gold" residentId={DEMO_RESIDENT.id} isActive />
+            <SlottedMedal id={`demo-medal-${resident.id}`} type="gold" residentId={resident.id} isActive />
             <span style={demoCaptionStyle}>SlottedMedal</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
             <PgCard
-              workerId={DEMO_RESIDENT.id}
-              label="Kaelen"
-              subtitle="Berserker"
-              hp={92}
-              fatigue={34}
-              maxHp={120}
-              portraitUrl={DEMO_PORTRAIT_URL}
-              statusLabel="Available"
+              workerId={resident.id}
+              label={resident.displayName}
+              subtitle={archetype?.name ?? resident.statProfileId}
+              hp={resident.currentHp}
+              fatigue={fatiguePercent}
+              maxHp={resident.maxHp}
+              portraitUrl={resident.portraitUrl}
+              statusLabel={resident.status}
               isInteractive
             />
             <span style={demoCaptionStyle}>PgCard (trusted)</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
             <WorkerCard
-              id={DEMO_RESIDENT.id}
-              name="Kaelen"
-              hp={77}
-              fatigue={34}
-              portraitUrl={DEMO_PORTRAIT_URL}
+              id={resident.id}
+              name={resident.displayName}
+              hp={hpPercent}
+              fatigue={fatiguePercent}
+              portraitUrl={resident.portraitUrl}
             />
             <span style={demoCaptionStyle}>WorkerCard</span>
           </div>
         </div>
         <div style={{ marginBottom: 12 }}>
           <WanderlustRosterCard
-            workerId={DEMO_RESIDENT.id}
-            label="Kaelen"
-            subtitle="Berserker"
-            hp={92}
-            fatigue={34}
-            maxHp={120}
-            portraitUrl={DEMO_PORTRAIT_URL}
-            statusLabel="Available"
-            isHero
+            workerId={resident.id}
+            label={resident.displayName}
+            subtitle={archetype?.name ?? resident.statProfileId}
+            hp={resident.currentHp}
+            fatigue={fatiguePercent}
+            maxHp={resident.maxHp}
+            portraitUrl={resident.portraitUrl}
+            statusLabel={resident.status}
+            isHero={resident.isHero}
           />
           <span style={demoCaptionStyle}>WanderlustRosterCard</span>
         </div>
@@ -779,9 +770,9 @@ function PgCardsTab(): JSX.Element {
 
       <MatericSectionHeader tier="tertiary" hint="sheets">Detail sheets</MatericSectionHeader>
       <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start' }}>
-        <div style={{ width: 660, maxWidth: '100%', display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ width: 780, maxWidth: '100%', display: 'flex', flexDirection: 'column', gap: 6 }}>
           {showDetail ? (
-            <PgDetailCard resident={DEMO_RESIDENT} onClose={() => setShowDetail(false)} />
+            <PgDetailCard resident={resident} onClose={() => setShowDetail(false)} />
           ) : (
             <MatericButton variant="secondary" onClick={() => setShowDetail(true)}>
               Show PgDetailCard
@@ -811,7 +802,7 @@ function PgCardsTab(): JSX.Element {
 
       {showPergamena && (
         <SchedaPergamena
-          resident={DEMO_RESIDENT}
+          resident={resident}
           isOpen
           onClose={() => setShowPergamena(false)}
           anchorElement={pergamenaAnchor}

@@ -58,6 +58,74 @@ const guardianStatsPlugin = (): Plugin => ({
   },
 });
 
+/**
+ * Dev-only: persist the live-tuned sea pattern values as the shipped default.
+ *
+ * The panel POSTs its current config here and the endpoint rewrites
+ * DEFAULT_SEA_PATTERN_CONFIG in place, so a value the Director dialled in on the
+ * real map survives a reload instead of living only in component state.
+ */
+function seaPatternDefaultsPlugin(): Plugin {
+  const TARGET = path.resolve(dirname, 'src/ui/idleVillage/components/WorldSurfaceSeaPatternOverlay.tsx');
+  const NUMERIC_KEYS = ['patternScale', 'lineOpacity', 'lineWidth', 'motionAmount', 'motionPeriod', 'motionAngle'] as const;
+  const COLOR_KEYS = ['lineColor', 'baseColor'] as const;
+
+  return {
+    name: 'sea-pattern-defaults',
+    apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use('/__sea-pattern-default', (req, res) => {
+        if (req.method !== 'POST') {
+          res.statusCode = 405;
+          res.end('Method Not Allowed');
+          return;
+        }
+        let body = '';
+        req.on('data', (chunk) => {
+          body += chunk;
+          if (body.length > 4096) req.destroy();
+        });
+        req.on('end', () => {
+          try {
+            const raw = JSON.parse(body) as Record<string, unknown>;
+            // Whitelist + coerce: these values are written into a source file, so
+            // nothing outside the known shape may reach the emitted literal.
+            const lines: string[] = [];
+            for (const key of NUMERIC_KEYS) {
+              const value = Number(raw[key]);
+              if (!Number.isFinite(value)) throw new Error(`invalid ${key}`);
+              lines.push(`  ${key}: ${value},`);
+            }
+            for (const key of COLOR_KEYS) {
+              const value = String(raw[key] ?? '');
+              if (!/^#[0-9a-fA-F]{6}$/.test(value)) throw new Error(`invalid ${key}`);
+              lines.push(`  ${key}: '${value}',`);
+            }
+            lines.push(`  motionEnabled: ${raw.motionEnabled === true},`);
+
+            const source = fs.readFileSync(TARGET, 'utf-8');
+            const marker = 'export const DEFAULT_SEA_PATTERN_CONFIG: SeaPatternConfig = {';
+            const start = source.indexOf(marker);
+            if (start === -1) throw new Error('DEFAULT_SEA_PATTERN_CONFIG not found');
+            const end = source.indexOf('};', start);
+            if (end === -1) throw new Error('unterminated DEFAULT_SEA_PATTERN_CONFIG');
+
+            const next = `${source.slice(0, start)}${marker}\n${lines.join('\n')}\n${source.slice(end)}`;
+            fs.writeFileSync(TARGET, next, 'utf-8');
+
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ ok: true }));
+          } catch (error) {
+            res.statusCode = 400;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ ok: false, error: (error as Error).message }));
+          }
+        });
+      });
+    },
+  };
+}
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
   plugins: [
@@ -120,6 +188,7 @@ export default defineConfig(({ mode }) => ({
         return null;
       }
     },
+    seaPatternDefaultsPlugin(),
     ...(process.env.GUARDIAN_BUILD_STATS === 'true' ? [guardianStatsPlugin()] : [])
   ],
   resolve: {

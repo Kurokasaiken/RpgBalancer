@@ -15,11 +15,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { GenericPoiSkin } from '@/ui/idleVillage/components/minimal/GenericPoiSkin';
-import { WanderlustPortrait } from '@/ui/wanderlust-surface/layout/WanderlustPortrait';
-import { WanderlustStatBar } from '@/ui/wanderlust-surface/layout/WanderlustStatBar';
-import { InsetPanelDelicate } from '@/ui/wanderlust-surface/InsetPanelDelicate';
-import { V9GlassLayers } from '@/ui/v9-skin/V9GlassLayers';
+import { MatericPortrait, MatericStatBar, MatericInset } from '@/ui/designSystem/primitives';
 import { trailerConfig } from '@/balancing/config/idleVillage/trailerConfig';
+import { TrailerSceneShell } from './TrailerSceneShell';
 import type { TrailerSceneProps } from './types';
 import './trailer.css';
 
@@ -51,21 +49,9 @@ export const TrailerPreparation: React.FC<TrailerSceneProps> = ({
   }, [autoStart, onComplete, scene.duration]);
 
   return (
-    <div
-      className={`trailer-root trailer-background ${captureMode ? 'trailer-capture-mode' : ''}`}
-      style={{ width: '100%', height: '100vh', position: 'relative', overflow: 'hidden' }}
-    >
-      <V9GlassLayers
-        variant="base"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          fontFamily: 'inherit',
-        }}
-      />
-
+    <TrailerSceneShell captureMode={captureMode}>
       {/* Hero sheet */}
-      <InsetPanelDelicate
+      <MatericInset
         material="obsidian"
         style={{
           position: 'absolute',
@@ -82,7 +68,7 @@ export const TrailerPreparation: React.FC<TrailerSceneProps> = ({
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem' }}>
-          <WanderlustPortrait initials={hero.initials} size={72} isHero />
+          <MatericPortrait initials={hero.initials} size={72} isHero />
           <div>
             <div
               style={{
@@ -110,11 +96,11 @@ export const TrailerPreparation: React.FC<TrailerSceneProps> = ({
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          <WanderlustStatBar label="Attack" value={hero.attack} maxValue={20} variant="stamina" size="lg" showValue />
-          <WanderlustStatBar label="Defense" value={hero.defense} maxValue={20} variant="hp" size="lg" showValue />
-          <WanderlustStatBar label="Magic" value={hero.magic} maxValue={20} variant="fatigue" size="lg" showValue />
+          <MatericStatBar label="Attack" value={hero.attack} maxValue={20} variant="stamina" size="lg" showValue />
+          <MatericStatBar label="Defense" value={hero.defense} maxValue={20} variant="hp" size="lg" showValue />
+          <MatericStatBar label="Magic" value={hero.magic} maxValue={20} variant="fatigue" size="lg" showValue />
         </div>
-      </InsetPanelDelicate>
+      </MatericInset>
 
       {/* Target POI */}
       <div
@@ -137,8 +123,8 @@ export const TrailerPreparation: React.FC<TrailerSceneProps> = ({
                 position: 'absolute',
                 inset: '-10px',
                 borderRadius: '50%',
-                border: '2px solid rgba(216,177,62,0.55)',
-                boxShadow: '0 0 28px rgba(216,177,62,0.35)',
+                border: '2px solid var(--skin-surface-border)',
+                boxShadow: '0 0 28px var(--skin-glow-primary)',
                 animation: 'trailer-pulse-ring 1.1s ease-in-out infinite',
                 pointerEvents: 'none',
               }}
@@ -159,8 +145,8 @@ export const TrailerPreparation: React.FC<TrailerSceneProps> = ({
           style={{
             padding: '0.5rem 1rem',
             borderRadius: '999px',
-            background: 'rgba(6, 6, 8, 0.8)',
-            border: '1px solid rgba(216,177,62,0.25)',
+            background: 'rgba(6, 15, 22, 0.8)',
+            border: '1px solid var(--trailer-border)',
             color: 'var(--trailer-parchment, #ede0c4)',
             fontSize: '13px',
             letterSpacing: '0.1em',
@@ -189,12 +175,12 @@ export const TrailerPreparation: React.FC<TrailerSceneProps> = ({
             gap: '0.5rem',
             padding: '0.5rem 0.75rem',
             borderRadius: '999px',
-            background: 'rgba(6, 6, 8, 0.92)',
-            border: '1px solid rgba(216,177,62,0.45)',
+            background: 'rgba(6, 15, 22, 0.92)',
+            border: '1px solid var(--trailer-border)',
             boxShadow: '0 8px 24px rgba(0,0,0,0.45)',
           }}
         >
-          <WanderlustPortrait initials={hero.initials} size={36} isHero />
+          <MatericPortrait initials={hero.initials} size={36} isHero />
           <span
             style={{
               color: 'var(--trailer-gold-bright, #f0cf6a)',
@@ -207,6 +193,6 @@ export const TrailerPreparation: React.FC<TrailerSceneProps> = ({
           </span>
         </div>
       </div>
-    </div>
+    </TrailerSceneShell>
   );
 };

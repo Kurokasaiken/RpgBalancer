@@ -24,13 +24,16 @@
   --trailer-transition-duration: 0.3s;
   --trailer-glow-intensity: 0.8;
   --trailer-text-scale: 1.2;
+  /* Canonical materic field — same recipe as the /primitives DemoPanel:
+     cyan light leak from the top over obsidian #08121f. */
+  --trailer-field-bg:
+    radial-gradient(circle at 50% -10%, rgba(0, 229, 255, 0.13) 0%, rgba(0, 150, 255, 0.03) 50%, transparent 80%),
+    #08121f;
 }
 
-/* Dark background for cinematic feel with V9 volumetric lighting (cyan top-left + gold bottom-right). */
+/* Materic obsidian field — replaces the old V9 oily-glass backdrop. */
 .trailer-background {
-  background:
-    radial-gradient(circle at 100% 100%, var(--trailer-gold-glow) 0%, transparent 45%),
-    var(--trailer-surface-bg);
+  background: var(--trailer-field-bg);
 }
 
 /* Gold text for emphasis */
@@ -120,16 +123,38 @@
   }
 }
 
-/* Banner text styling */
-.trailer-banner {
+/* Banner text styling — engraved gold title, same recipe as the skin's
+   h1 / MatericHeading (gradient text + double drop-shadow). Scoped under
+   .trailer-root so it wins over the .skin-scope :where(h1) rule. */
+.trailer-root .trailer-banner {
   font-family: var(--trailer-font-display);
   font-size: clamp(24px, 4vw, 48px);
-  font-weight: bold;
+  font-weight: 900;
   text-transform: uppercase;
   letter-spacing: var(--trailer-title-tracking);
-  color: var(--trailer-gold);
-  text-shadow: 0 0 20px var(--trailer-gold-glow);
+  line-height: 1.05;
+  margin: 0;
+  background: var(--skin-title-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  filter: var(--skin-title-shadow);
   animation: fadeIn 0.5s ease-in;
+}
+
+/* Tracked-out caption under a banner — skin subtitle recipe with a tighter
+   tracking so longer trailer copy stays readable. */
+.trailer-root .trailer-subtitle {
+  margin-top: 0.75rem;
+  font-family: var(--trailer-font-display);
+  color: var(--skin-subtitle-color);
+  font-size: clamp(13px, 1.8vw, 18px);
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0;
+  animation: fadeIn 0.8s ease forwards;
 }
 
 /* Capture mode: hide all debug UI */
@@ -228,7 +253,7 @@
   }
 }
 
-/* CTA button glow pulse */
+/* CTA button glow pulse (box-shadow variant, for unclipped elements) */
 @keyframes trailer-cta-pulse {
   0%,
   100% {
@@ -236,6 +261,18 @@
   }
   50% {
     box-shadow: 0 0 24px var(--trailer-gold-glow);
+  }
+}
+
+/* CTA glow that follows the notched MatericButton silhouette — drop-shadow
+   filters honour clip-path, box-shadow does not. */
+@keyframes trailer-cta-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 6px rgba(223, 184, 87, 0.25));
+  }
+  50% {
+    filter: drop-shadow(0 0 22px rgba(223, 184, 87, 0.55));
   }
 }
 
@@ -254,6 +291,10 @@
 /* Phase 2 helpers: remove WanderlustSurface content padding for full-bleed scene wrappers and badge CTA */
 .trailer-ws-fullbleed .ws-content {
   padding: 0 !important;
+  /* .ws-content is position:relative — without this it collapses to zero
+     height when every child is absolutely positioned (map grids, POIs). */
+  position: absolute;
+  inset: 0;
 }
 
 .trailer-ws-badge .ws-content {
@@ -492,4 +533,436 @@
 .ws-event-card--visible {
   opacity: 1;
   pointer-events: auto;
+}
+
+/* ── Trailer Legacy V2 — Preservation Table ───────────────────────────
+   Ruins veil (desaturated teal) → memory traces (azure) → preservation
+   (warm gold) → foundation (ivory). Three verbs: condense/draw/reveal,
+   then a fixation sweep + sigil lock instead of a checkmark. */
+
+.trailer-v2-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  pointer-events: none;
+  opacity: 1;
+  background:
+    radial-gradient(ellipse at 50% 62%, rgba(10, 40, 44, 0.55) 0%, transparent 65%),
+    linear-gradient(180deg, rgba(8, 30, 34, 0.92) 0%, rgba(5, 13, 19, 0.85) 100%);
+  backdrop-filter: grayscale(0.85) saturate(0.5) brightness(0.8);
+  -webkit-backdrop-filter: grayscale(0.85) saturate(0.5) brightness(0.8);
+  animation-name: trailer-v2-veil-out;
+  animation-timing-function: ease-in;
+  animation-fill-mode: forwards;
+}
+
+@keyframes trailer-v2-veil-out {
+  to {
+    opacity: 0;
+  }
+}
+
+.trailer-v2-table {
+  position: absolute;
+  top: 60%;
+  left: 15%;
+  right: 15%;
+  height: 2px;
+  z-index: 18;
+  pointer-events: none;
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: center;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--trailer-gold) 18%,
+    #fff4d6 50%,
+    var(--trailer-gold) 82%,
+    transparent 100%
+  );
+  box-shadow: 0 0 16px var(--trailer-gold-glow);
+  animation-name: trailer-v2-draw-x;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: forwards;
+}
+
+@keyframes trailer-v2-draw-x {
+  0% {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+.trailer-v2-item {
+  position: absolute;
+  bottom: 40%;
+  width: 240px;
+  height: 300px;
+  transform: translateX(-50%);
+  z-index: 20;
+  pointer-events: none;
+}
+
+.trailer-v2-visual {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 30px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.trailer-v2-visual--heroes {
+  bottom: 64px;
+}
+
+/* Artifact — CONDENSE */
+.trailer-v2-artifact-wrap {
+  position: relative;
+  width: 110px;
+  height: 140px;
+}
+
+.trailer-v2-artifact {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  filter: blur(10px);
+  transform: scale(0.82);
+  animation-name: trailer-v2-materialize;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: forwards;
+}
+
+@keyframes trailer-v2-materialize {
+  0% {
+    opacity: 0;
+    filter: blur(12px) brightness(1.6);
+    transform: scale(0.82);
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0) brightness(1) drop-shadow(0 0 16px var(--trailer-gold-glow));
+    transform: scale(1);
+  }
+}
+
+.trailer-v2-particle {
+  position: absolute;
+  left: 50%;
+  top: 55%;
+  border-radius: 50%;
+  background: var(--trailer-azure);
+  box-shadow: 0 0 9px var(--trailer-azure);
+  opacity: 0;
+  transform: translate(var(--px), var(--py)) scale(0.4);
+  animation-name: trailer-v2-condense;
+  animation-duration: 1.45s;
+  animation-timing-function: cubic-bezier(0.3, 0.7, 0.3, 1);
+  animation-fill-mode: forwards;
+}
+
+@keyframes trailer-v2-condense {
+  0% {
+    opacity: 0;
+    transform: translate(var(--px), var(--py)) scale(0.4);
+    background: var(--trailer-azure);
+    box-shadow: 0 0 9px var(--trailer-azure);
+  }
+  25% {
+    opacity: 1;
+  }
+  72% {
+    opacity: 0.95;
+    transform: translate(calc(var(--px) * 0.14), calc(var(--py) * 0.14)) scale(1);
+    background: var(--trailer-azure);
+    box-shadow: 0 0 9px var(--trailer-azure);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.55);
+    background: var(--trailer-gold);
+    box-shadow: 0 0 12px var(--trailer-gold);
+  }
+}
+
+/* Blueprint — DRAW */
+.trailer-v2-blueprint {
+  width: 190px;
+  height: 173px;
+  overflow: visible;
+}
+
+.trailer-v2-ghost {
+  opacity: 0;
+  animation: fadeIn 0.9s ease-out forwards;
+}
+
+.trailer-v2-ghost path {
+  fill: none;
+  stroke: var(--trailer-azure);
+  stroke-width: 1.4;
+  opacity: 0.22;
+}
+
+.trailer-v2-stroke {
+  fill: none;
+  stroke: var(--trailer-gold);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  filter: drop-shadow(0 0 5px var(--trailer-gold-glow));
+  animation-name: trailer-v2-draw-stroke;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
+
+@keyframes trailer-v2-draw-stroke {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Heroes — REVEAL */
+.trailer-v2-heroes {
+  position: relative;
+  display: flex;
+  gap: 16px;
+  opacity: 0;
+  filter: brightness(3) blur(10px) saturate(0);
+  transform: scale(0.92);
+  animation-name: trailer-v2-reveal;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: forwards;
+}
+
+.trailer-v2-heroes-halo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 220px;
+  height: 220px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 229, 255, 0.28) 0%, transparent 62%);
+  pointer-events: none;
+}
+
+@keyframes trailer-v2-reveal {
+  0% {
+    opacity: 0;
+    filter: brightness(3) blur(10px) saturate(0);
+    transform: scale(0.92);
+  }
+  55% {
+    opacity: 1;
+    filter: brightness(2) blur(4px) saturate(0.4);
+  }
+  100% {
+    opacity: 1;
+    filter: none;
+    transform: scale(1);
+  }
+}
+
+/* Shared preservation energy filament */
+.trailer-v2-link {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 1.5px;
+  height: 42px;
+  opacity: 0;
+  transform: translateX(-50%) scaleY(0);
+  transform-origin: bottom;
+  background: linear-gradient(0deg, var(--trailer-gold), transparent);
+  animation: trailer-v2-link-draw 0.7s ease-out forwards;
+}
+
+@keyframes trailer-v2-link-draw {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scaleY(0);
+  }
+  100% {
+    opacity: 0.9;
+    transform: translateX(-50%) scaleY(1);
+  }
+}
+
+/* Fixation — golden sweep across the object */
+.trailer-v2-fixsweep {
+  position: absolute;
+  top: 58%;
+  left: -15%;
+  width: 130%;
+  height: 3px;
+  opacity: 0;
+  transform: translateX(-60%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--trailer-gold) 38%,
+    #fff4d6 50%,
+    var(--trailer-gold) 62%,
+    transparent 100%
+  );
+  box-shadow: 0 0 18px var(--trailer-gold-glow);
+  animation: trailer-v2-fix-sweep 0.75s ease-out forwards;
+}
+
+@keyframes trailer-v2-fix-sweep {
+  0% {
+    opacity: 0;
+    transform: translateX(-60%);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(60%);
+  }
+}
+
+/* Sigil lock on the table line */
+.trailer-v2-sigil {
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid var(--trailer-gold);
+  box-shadow:
+    0 0 12px var(--trailer-gold-glow),
+    inset 0 0 8px rgba(240, 207, 106, 0.25);
+  opacity: 0;
+  transform: translate(-50%, 50%) scale(1.7);
+  animation: trailer-v2-sigil-lock 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.35) forwards;
+}
+
+.trailer-v2-sigil-dot {
+  position: absolute;
+  inset: 40%;
+  border-radius: 50%;
+  background: var(--trailer-gold);
+  box-shadow: 0 0 8px var(--trailer-gold);
+}
+
+@keyframes trailer-v2-sigil-lock {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 50%) scale(1.7);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(-50%, 50%) scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 50%) scale(1);
+  }
+}
+
+/* Labels under the table */
+.trailer-v2-label {
+  position: absolute;
+  top: calc(100% + 14px);
+  left: 0;
+  right: 0;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(6px);
+  animation: trailer-v2-label-in 0.6s ease-out forwards;
+}
+
+.trailer-v2-label-text {
+  display: block;
+  font-family: var(--trailer-font-display);
+  color: var(--trailer-gold);
+  font-size: clamp(11px, 1.15vw, 15px);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-shadow: 0 0 12px var(--trailer-gold-glow);
+}
+
+.trailer-v2-label-caption {
+  display: block;
+  margin-top: 5px;
+  font-family: var(--skin-font-serif, Georgia, serif);
+  font-style: italic;
+  color: var(--trailer-text-secondary);
+  font-size: clamp(10px, 1vw, 13px);
+  letter-spacing: 0.04em;
+}
+
+@keyframes trailer-v2-label-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Title block — the transmutation's conclusion */
+.trailer-v2-titleblock {
+  position: absolute;
+  top: 12vh;
+  left: 0;
+  right: 0;
+  text-align: center;
+  z-index: 20;
+  pointer-events: none;
+}
+
+/* Scoped under .trailer-root to outrank the .trailer-banner / .trailer-subtitle
+   base animations (specificity 0,2,0). */
+.trailer-root .trailer-v2-title {
+  opacity: 0;
+  animation: trailer-v2-title-in 1.5s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+
+@keyframes trailer-v2-title-in {
+  0% {
+    opacity: 0;
+    filter: blur(16px) brightness(2.4);
+    letter-spacing: 0.45em;
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0) brightness(1);
+    letter-spacing: var(--trailer-title-tracking);
+  }
+}
+
+.trailer-v2-titleline {
+  width: min(430px, 50vw);
+  height: 1.5px;
+  margin: 14px auto 0;
+  background: linear-gradient(90deg, transparent, var(--trailer-gold), transparent);
+  box-shadow: 0 0 10px var(--trailer-gold-glow);
+  opacity: 0;
+  transform: scaleX(0);
+  animation: trailer-v2-draw-x 0.9s ease-out forwards;
+}
+
+.trailer-root .trailer-v2-subtitle {
+  opacity: 0;
+  animation: fadeIn 0.9s ease-out forwards;
 }

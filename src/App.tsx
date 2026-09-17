@@ -88,6 +88,7 @@ const TrailerPreparationPage = lazy(() => import('./ui/idleVillage/trailer/Trail
 const TrailerRiskPage = lazy(() => import('./ui/idleVillage/trailer/TrailerRiskPage').then(m => ({ default: m.TrailerRiskPage })));
 const TrailerConsequencePage = lazy(() => import('./ui/idleVillage/trailer/TrailerConsequencePage').then(m => ({ default: m.TrailerConsequencePage })));
 const TrailerLegacyPage = lazy(() => import('./ui/idleVillage/trailer/TrailerLegacyPage').then(m => ({ default: m.TrailerLegacyPage })));
+const TrailerLegacyV2Page = lazy(() => import('./ui/idleVillage/trailer/TrailerLegacyV2Page').then(m => ({ default: m.TrailerLegacyV2Page })));
 const TrailerOutroPage = lazy(() => import('./ui/idleVillage/trailer/TrailerOutroPage').then(m => ({ default: m.TrailerOutroPage })));
 const WorldSurfaceTestPage = lazy(() => import('./ui/idleVillage/pages/WorldSurfaceTestPage').then(m => ({ default: m.WorldSurfaceTestPage })));
 const WorldSurfaceDemoPage = lazy(() => import('./ui/idleVillage/pages/WorldSurfaceDemoPage').then(m => ({ default: m.WorldSurfaceDemoPage })));
@@ -315,6 +316,8 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname === '/trailer-consequence';
   const isTrailerLegacyPath =
     typeof window !== 'undefined' && window.location.pathname === '/trailer-legacy';
+  const isTrailerLegacyV2Path =
+    typeof window !== 'undefined' && window.location.pathname === '/trailer-legacy-v2';
   const isTrailerOutroPath =
     typeof window !== 'undefined' && window.location.pathname === '/trailer-outro';
   const isTrailerThreatIterPath =
@@ -959,6 +962,16 @@ function App() {
       <ErrorBoundary componentName="Trailer Legacy">
         <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer Legacy…</div>}>
           <TrailerLegacyPage />
+        </Suspense>
+      </ErrorBoundary>
+    );
+  }
+
+  if (isTrailerLegacyV2Path) {
+    return (
+      <ErrorBoundary componentName="Trailer Legacy V2">
+        <Suspense fallback={<div className="p-4 text-xs text-slate-300">Loading Trailer Legacy V2…</div>}>
+          <TrailerLegacyV2Page />
         </Suspense>
       </ErrorBoundary>
     );

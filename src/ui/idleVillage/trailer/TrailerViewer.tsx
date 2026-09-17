@@ -160,13 +160,13 @@ export default function TrailerViewer({
             gap: '8px',
             padding: '12px',
             borderRadius: '10px',
-            background: 'rgba(6, 6, 8, 0.92)',
-            border: '1px solid rgba(216,177,62,0.35)',
-            color: 'var(--trailer-parchment, #ede0c4)',
+            background: 'rgba(6, 15, 22, 0.92)',
+            border: '1px solid var(--skin-surface-border, rgba(223,184,87,0.5))',
+            color: 'var(--skin-text-primary, #ede0c4)',
             fontSize: '12px',
           }}
         >
-          <div style={{ fontWeight: 700, color: 'var(--trailer-gold, #d8b13e)', marginBottom: '4px' }}>
+          <div style={{ fontWeight: 700, color: 'var(--skin-title-color, #f0cf6a)', marginBottom: '4px' }}>
             Trailer Controls
           </div>
           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
@@ -178,9 +178,9 @@ export default function TrailerViewer({
                 style={{
                   padding: '4px 8px',
                   borderRadius: '6px',
-                  border: '1px solid rgba(216,177,62,0.4)',
-                  background: currentScene === sceneId ? 'rgba(216,177,62,0.25)' : 'rgba(0,0,0,0.4)',
-                  color: 'var(--trailer-parchment, #ede0c4)',
+                  border: '1px solid var(--skin-surface-border, rgba(223,184,87,0.5))',
+                  background: currentScene === sceneId ? 'var(--skin-glow-primary, rgba(223,184,87,0.25))' : 'rgba(0,0,0,0.4)',
+                  color: 'var(--skin-text-primary, #ede0c4)',
                   cursor: 'pointer',
                   fontSize: '11px',
                 }}
@@ -196,9 +196,9 @@ export default function TrailerViewer({
               style={{
                 padding: '4px 12px',
                 borderRadius: '6px',
-                border: '1px solid rgba(123,201,111,0.5)',
+                border: '1px solid var(--skin-status-met, #7bc96f)',
                 background: 'rgba(0,0,0,0.4)',
-                color: '#7bc96f',
+                color: 'var(--skin-status-met, #7bc96f)',
                 cursor: 'pointer',
                 fontSize: '11px',
               }}

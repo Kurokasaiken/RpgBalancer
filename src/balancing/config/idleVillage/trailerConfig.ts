@@ -229,6 +229,44 @@ export const trailerConfig = {
     ],
   },
 
+  /**
+   * Legacy V2 — "Preservation Table" iteration of scene 6.
+   * The wounded field of Settlement Lost lifts its desaturated teal veil
+   * while three different forms of heritage materialize on an engraved
+   * axis: matter condenses, knowledge is drawn, living memory is revealed.
+   * Each element is then "fixed" by a golden sweep + sigil lock — the act
+   * of preservation, not a success checkmark.
+   */
+  legacyV2: {
+    duration: 10000,
+    title: "KNOWLEDGE PRESERVED",
+    subtitle: "What survives becomes the foundation",
+    beats: {
+      veilFadeStart: 900,
+      veilFadeDuration: 2100,
+      tableDrawAt: 1300,
+      tableDrawDuration: 1100,
+      linkDrawAt: 2200,
+      itemStartAt: 1700,
+      itemStagger: 750,
+      materializeDuration: 1700,
+      fixationDelay: 1900,
+      sigilDelay: 2500,
+      labelDelay: 2850,
+      titleAt: 6300,
+      subtitleAt: 7700,
+    },
+    items: [
+      { id: 'artifact', verb: 'condense', label: 'ANCIENT ARTIFACT', caption: 'Matter survives', anchorX: 27 },
+      { id: 'blueprint', verb: 'draw', label: 'SACRED ALTAR BLUEPRINT', caption: 'Knowledge survives', anchorX: 50 },
+      { id: 'heroes', verb: 'reveal', label: 'SURVIVING HEROES', caption: 'Memory survives', anchorX: 73 },
+    ],
+    heroPortraits: [
+      '/assets/portraits/portrait male warrior.png',
+      '/assets/portraits/portrait female magician.png',
+    ],
+  },
+
   outro: {
     duration: 5000,
     title: "WANDERLUST TRIUMPH",

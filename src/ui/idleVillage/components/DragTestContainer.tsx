@@ -14,7 +14,7 @@ import { rendererStackInstrumentation } from '@/ui/idleVillage/utils/rendererSta
 import { getResidentPortraitUrl } from '@/engine/game/idleVillage/residentVisualResolver';
 import { useMatericSkin } from '@/ui/wanderlust-surface/MatericSkinContext';
 import { MATERIC_SKIN_CONFIG } from '@/ui/wanderlust-surface/matericSkinConfig';
-import { BezelMolding } from '@/ui/visualFidelityLab/plateVariants';
+import { BezelMolding, WellBronzeBezel } from '@/ui/visualFidelityLab/plateVariants';
 
 /**
  * DragTestContainer - Resident Roster Container (CANONICAL VERSION)
