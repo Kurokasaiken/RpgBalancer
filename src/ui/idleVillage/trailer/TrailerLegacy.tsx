@@ -14,9 +14,9 @@
  */
 
 import React, { useEffect, useMemo } from 'react';
-import { WanderlustSurface } from '@/ui/wanderlust-surface/WanderlustSurface';
-import { V9GlassLayers } from '@/ui/v9-skin/V9GlassLayers';
+import { MatericSurface, MatericPlaque, MatericTitleSep } from '@/ui/designSystem/primitives';
 import { trailerConfig } from '@/balancing/config/idleVillage/trailerConfig';
+import { TrailerSceneShell } from './TrailerSceneShell';
 import type { TrailerSceneProps } from './types';
 import './trailer.css';
 
@@ -46,19 +46,7 @@ export const TrailerLegacy: React.FC<TrailerSceneProps> = ({
   }, [autoStart, onComplete, scene.duration]);
 
   return (
-    <div
-      className={`trailer-root trailer-background ${captureMode ? 'trailer-capture-mode' : ''}`}
-      style={{ width: '100%', height: '100vh', position: 'relative', overflow: 'hidden' }}
-    >
-      <V9GlassLayers
-        variant="base"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          fontFamily: 'inherit',
-        }}
-      />
-
+    <TrailerSceneShell captureMode={captureMode}>
       <div
         style={{
           position: 'absolute',
@@ -71,19 +59,13 @@ export const TrailerLegacy: React.FC<TrailerSceneProps> = ({
         }}
       >
         <h2 className="trailer-banner" style={{ animationDelay: '0ms' }}>{scene.title}</h2>
-        <p
-          style={{
-            marginTop: '0.75rem',
-            color: 'var(--trailer-parchment, #ede0c4)',
-            fontSize: 'clamp(14px, 2vw, 20px)',
-            letterSpacing: '0.08em',
-            opacity: 0,
-            textTransform: 'uppercase',
-            animation: 'fadeIn 0.8s ease 0.5s forwards',
-          }}
-        >
+        <p className="trailer-subtitle" style={{ animationDelay: '0.5s' }}>
           {scene.subtitle}
         </p>
+        <MatericTitleSep
+          ornament="✦"
+          style={{ width: 'min(460px, 52vw)', margin: '14px auto 0', opacity: 0, animation: 'fadeIn 0.8s ease 0.9s forwards' }}
+        />
       </div>
 
       <div
@@ -110,7 +92,7 @@ export const TrailerLegacy: React.FC<TrailerSceneProps> = ({
               animationDelay: `${1200 + index * 700}ms`,
             }}
           >
-            <WanderlustSurface shape="card" material="bronze" interactive={false}>
+            <MatericSurface shape="card" material="bronze" interactive={false}>
               <div
                 style={{
                   display: 'flex',
@@ -123,17 +105,7 @@ export const TrailerLegacy: React.FC<TrailerSceneProps> = ({
                 }}
               >
                 <div style={{ fontSize: 'clamp(32px, 4vw, 48px)' }}>{item.icon}</div>
-                <div
-                  style={{
-                    color: 'var(--trailer-parchment, #ede0c4)',
-                    fontSize: '11px',
-                    letterSpacing: '0.2em',
-                    textTransform: 'uppercase',
-                    opacity: 0.7,
-                  }}
-                >
-                  {item.category}
-                </div>
+                <MatericPlaque>{item.category}</MatericPlaque>
                 <div
                   style={{
                     color: 'var(--trailer-gold-bright, #f0cf6a)',
@@ -151,11 +123,11 @@ export const TrailerLegacy: React.FC<TrailerSceneProps> = ({
                     height: '32px',
                     borderRadius: '50%',
                     background: 'rgba(123,201,111,0.15)',
-                    border: '1px solid rgba(123,201,111,0.5)',
+                    border: '1px solid var(--skin-status-met)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#7bc96f',
+                    color: 'var(--skin-status-met)',
                     fontSize: '16px',
                     marginTop: '0.25rem',
                     opacity: 0,
@@ -166,10 +138,10 @@ export const TrailerLegacy: React.FC<TrailerSceneProps> = ({
                   ✓
                 </div>
               </div>
-            </WanderlustSurface>
+            </MatericSurface>
           </div>
         ))}
       </div>
-    </div>
+    </TrailerSceneShell>
   );
 };

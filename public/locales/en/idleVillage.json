@@ -512,7 +512,11 @@
       "reducedMotion": "reduced motion",
       "hideUi": "Hide UI",
       "showUi": "Show UI",
-      "settlementLost": "Settlement Lost"
+      "settlementLost": "Settlement Lost",
+      "seaPatternSaveDefault": "Save as default",
+      "seaPatternSaving": "Saving…",
+      "seaPatternSaved": "Defaults written to source",
+      "seaPatternSaveFailed": "Save failed (dev server only)"
     },
     "settlementLost": {
       "title": "SETTLEMENT LOST",
@@ -557,14 +561,19 @@
     "statistics": {
       "label": "Statistics",
       "count": "{count} values",
-      "empty": "No snapshot available."
+      "empty": "No snapshot available.",
+      "category": {
+        "offense": "Offense",
+        "defense": "Defense",
+        "utility": "Utility"
+      }
     },
     "inventory": {
       "label": "Inventory",
       "empty": "No items recorded."
     },
     "equipment": {
-      "label": "Equipment",
+      "label": "Loadout",
       "weapon": "Weapon",
       "offhand": "Off hand",
       "armor": "Armor",
@@ -579,6 +588,10 @@
       "exhausted": "Exhausted",
       "injured": "Injured",
       "dead": "Dead"
+    },
+    "vitals": {
+      "hp": "HP",
+      "stamina": "STA"
     }
   },
   "heroComponentsLab": {
@@ -793,5 +806,26 @@
         "epicfail": "The room turns cold: you stand alone."
       }
     }
+  },
+  "stat": {
+    "damage": "Damage",
+    "accuracy": "Accuracy",
+    "critChance": "Crit Chance",
+    "critMult": "Crit Mult.",
+    "armorPen": "Armor Pen",
+    "penPercent": "Resist. Pen",
+    "armor": "Armor",
+    "resistance": "Resistance",
+    "evasion": "Evasion",
+    "block": "Block",
+    "ward": "Ward",
+    "energyShield": "Energy Shield",
+    "thorns": "Thorns",
+    "agility": "Agility",
+    "regen": "Regen",
+    "lifesteal": "Lifesteal",
+    "movementSpeed": "Move Speed",
+    "cooldownReduction": "Cooldown",
+    "castSpeed": "Cast Speed"
   }
 }

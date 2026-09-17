@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import defaultBackgroundImage from '@/assets/ui/idleVillage/goblin-invasion-libro-background.jpg';
-import defaultGoblinImage from '@/assets/ui/idleVillage/goblin-invasion-transparent-no-sticker.png';
-import defaultGoblinImageWithBorder from '@/assets/ui/idleVillage/goblin-march-trasparente.png';
+import defaultGoblinImage from '@/assets/ui/idleVillage/goblin-invasion-transparent-no-sticker.webp';
+import defaultGoblinImageWithBorder from '@/assets/ui/idleVillage/goblin-march-trasparente.webp';
 
 export interface GoblinInvasionWindowProps {
   /** Accessible name for the scene. Pass an i18n-resolved string if it is not purely decorative. */

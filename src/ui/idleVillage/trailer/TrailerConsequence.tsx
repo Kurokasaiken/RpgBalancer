@@ -14,9 +14,9 @@
  */
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { V9GlassLayers } from '@/ui/v9-skin/V9GlassLayers';
 import { trailerConfig } from '@/balancing/config/idleVillage/trailerConfig';
 import { TeaserImpactOverlay } from './TeaserImpactOverlay';
+import { TrailerSceneShell } from './TrailerSceneShell';
 import type { TrailerSceneProps } from './types';
 import './trailer.css';
 
@@ -82,28 +82,11 @@ export const TrailerConsequence: React.FC<TrailerSceneProps> = ({
   }, [autoStart, onComplete, scene.duration]);
 
   return (
-    <div
-      className={`trailer-root trailer-background ${showLost ? 'trailer-greyscale' : ''} ${
-        captureMode ? 'trailer-capture-mode' : ''
-      }`}
-      style={{
-        width: '100%',
-        height: '100vh',
-        position: 'relative',
-        overflow: 'hidden',
-        transition: 'filter 1.2s ease',
-      }}
+    <TrailerSceneShell
+      captureMode={captureMode}
+      className={showLost ? 'trailer-greyscale' : ''}
+      style={{ transition: 'filter 1.2s ease' }}
     >
-      <V9GlassLayers
-        variant="sapphire"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          opacity: 0.75,
-          fontFamily: 'inherit',
-        }}
-      />
-
       <div
         style={{
           position: 'absolute',
@@ -120,11 +103,11 @@ export const TrailerConsequence: React.FC<TrailerSceneProps> = ({
             fontSize: 'clamp(24px, 4vw, 40px)',
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
-            color: showLost ? 'rgba(239, 68, 68, 0.95)' : 'var(--trailer-gold, #d8b13e)',
+            color: showLost ? 'var(--skin-status-wound)' : 'var(--trailer-gold, #d8b13e)',
             fontWeight: 700,
             textShadow: showLost
-              ? '0 0 24px rgba(239, 68, 68, 0.55)'
-              : '0 0 16px rgba(216, 177, 62, 0.35)',
+              ? '0 0 24px rgba(161, 29, 51, 0.55)'
+              : '0 0 16px var(--skin-glow-primary)',
             transition: 'all 0.8s ease',
           }}
         >
@@ -132,14 +115,8 @@ export const TrailerConsequence: React.FC<TrailerSceneProps> = ({
         </div>
         {showLost && (
           <div
-            style={{
-              marginTop: '0.75rem',
-              color: 'var(--trailer-parchment, #ede0c4)',
-              fontSize: 'clamp(14px, 2vw, 20px)',
-              letterSpacing: '0.06em',
-              opacity: 0,
-              animation: 'fadeIn 0.8s ease 0.3s forwards',
-            }}
+            className="trailer-subtitle"
+            style={{ animationDelay: '0.3s', textTransform: 'none' }}
           >
             {scene.subMessage}
           </div>
@@ -169,8 +146,8 @@ export const TrailerConsequence: React.FC<TrailerSceneProps> = ({
               gap: '0.75rem',
               padding: '0.75rem 1rem',
               borderRadius: '10px',
-              background: 'rgba(20, 10, 10, 0.88)',
-              border: '1px solid rgba(248,113,113,0.4)',
+              background: 'rgba(6, 15, 22, 0.9)',
+              border: '1px solid var(--skin-status-wound)',
               color: 'var(--trailer-parchment, #ede0c4)',
               fontSize: '14px',
               boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
@@ -184,6 +161,6 @@ export const TrailerConsequence: React.FC<TrailerSceneProps> = ({
       </div>
 
       <TeaserImpactOverlay visible={showImpact} intensity={showLost ? 1 : 0} />
-    </div>
+    </TrailerSceneShell>
   );
 };

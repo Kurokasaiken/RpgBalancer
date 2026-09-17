@@ -232,7 +232,12 @@ A scene-by-scene storyboard page is now live and accessible from the main menu (
 
 ---
 
-## 7. Open Questions
+## 7. Iteration Log
+
+- **2026-09-16 — Materic restyle**: all scenes moved to `TrailerSceneShell` (SkinScope + `MatericAmbientField` on the obsidian/cyan field), titles on the skin's engraved gold gradient, legacy/outro rebuilt on Materic primitives. Evidence: `test-results/trailer-materic-restyle-2026-09-16.log`.
+- **2026-09-16 — Legacy V2 "Preservation Table"**: iteration of scene 6 at `/trailer-legacy-v2` (V1 kept at `/trailer-legacy` for comparison). Replaces the loot-card list with a transformation beat: desaturated teal veil lifts from the wounded field, then three different forms of heritage materialize on an engraved golden axis — Artifact **condenses** from memory particles, Blueprint is **drawn** as a gold-line altar schematic over an azure ghost, Heroes are **revealed** from light silhouettes into real portraits. A golden sweep + sigil lock replaces the `✓` checkmark (the act of preservation, not a success state). Title condenses last. Config: `trailerConfig.legacyV2`. Pending: Director comparison V1 vs V2.
+
+## 8. Open Questions
 
 1. Should the `MapPage` be used directly, or is a simplified `TeaserMapScene` with `LocationCard` components preferred?
 2. Should the existing `WanderlustMockupPage` (`/wanderlust`) be replaced or left as a separate design mock?

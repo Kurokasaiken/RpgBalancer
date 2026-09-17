@@ -116,10 +116,11 @@ export function savedCharacterToResident(
   const hpValue = typeof statBlock.hp === 'number' && Number.isFinite(statBlock.hp) ? statBlock.hp : FALLBACK_MAX_HP;
   const defaultFatigue =
     typeof options?.defaultFatigue === 'number' && Number.isFinite(options.defaultFatigue) ? options.defaultFatigue : 0;
-  const resolvedStatSnapshot =
-    character.statSnapshot && Object.keys(character.statSnapshot).length > 0
-      ? { ...character.statSnapshot }
-      : { ...statBlock };
+  // The creation-time stat block is the base and the snapshot holds runtime
+  // overrides on top of it. Preferring the snapshot wholesale used to hide the
+  // whole block behind a seed that carried only `{ hp }`, so a hero built with
+  // damage/evasion/agility reached the UI as a single HP value.
+  const resolvedStatSnapshot = { ...statBlock, ...(character.statSnapshot ?? {}) };
   const resolvedStatTags = mergeStatTags(character);
   const resolvedFatigue =
     typeof character.fatigue === 'number' && Number.isFinite(character.fatigue) ? character.fatigue : defaultFatigue;

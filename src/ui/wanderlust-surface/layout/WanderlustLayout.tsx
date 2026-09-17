@@ -356,11 +356,25 @@ const CELL_STYLE: Record<NonNullable<RecordColumn['variant']>, CSSProperties> = 
   },
 };
 
+/** Compact rows are narrow by definition, so every cell must clip rather than
+ *  run under its neighbour. */
+const CLIP: CSSProperties = { display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' };
+
+const CELL_STYLE_COMPACT: Record<NonNullable<RecordColumn['variant']>, CSSProperties> = {
+  caption: { ...CELL_STYLE.caption, ...CLIP, fontSize: '10px' },
+  body: { ...CELL_STYLE.body, ...CLIP, fontSize: '11px', lineHeight: '1.3' },
+  value: { ...CELL_STYLE.value, ...CLIP, fontSize: '12.5px' },
+  label: { ...CELL_STYLE.label, ...CLIP, fontSize: '9px', letterSpacing: '0.08em' },
+};
+
+const RECORD_ROW_PADDING: Record<Density, string> = { comfortable: '9px 14px', compact: '3px 8px' };
+
 export const WanderlustRecordList: React.FC<WanderlustRecordListProps> = ({
   columns, records, density = 'comfortable', rail = true, className, style,
 }) => {
   const gap = sp(DENSITY_GAP[density]);
   const template = columns.map(c => c.width).join(' ');
+  const cellStyles = density === 'compact' ? CELL_STYLE_COMPACT : CELL_STYLE;
 
   return (
     <div className={className} role="list" style={{
@@ -374,8 +388,8 @@ export const WanderlustRecordList: React.FC<WanderlustRecordListProps> = ({
       {records.map((cells, rowIdx) => (
         <div key={rowIdx} role="listitem" style={{
           display: 'grid', gridTemplateColumns: template,
-          gap: sp('lg'), alignItems: 'baseline',
-          padding: '9px 14px', borderRadius: '4px', position: 'relative',
+          gap: sp(density === 'compact' ? 'sm' : 'lg'), alignItems: 'baseline',
+          padding: RECORD_ROW_PADDING[density], borderRadius: '4px', position: 'relative',
         }}>
           {rail && (
             <span style={{
@@ -388,7 +402,7 @@ export const WanderlustRecordList: React.FC<WanderlustRecordListProps> = ({
             const col = columns[colIdx];
             return (
               <span key={colIdx} style={{
-                ...CELL_STYLE[col?.variant ?? 'body'],
+                ...cellStyles[col?.variant ?? 'body'],
                 textAlign: col?.align ?? 'left', minWidth: 0,
               }}>{cell}</span>
             );

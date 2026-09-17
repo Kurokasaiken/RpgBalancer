@@ -85,14 +85,14 @@ export interface SeaPatternConfig {
  */
 export const DEFAULT_SEA_PATTERN_CONFIG: SeaPatternConfig = {
   patternScale: 1150,
-  lineOpacity: 0.45,
+  lineOpacity: 0.2,
   lineWidth: 1,
+  motionAmount: 20,
+  motionPeriod: 9,
+  motionAngle: 200,
   lineColor: '#8bbac2',
   baseColor: '#0b5c6b',
   motionEnabled: true,
-  motionAmount: 20,
-  motionPeriod: 5,
-  motionAngle: 200,
 };
 
 export interface WorldSurfaceSeaPatternOverlayProps {

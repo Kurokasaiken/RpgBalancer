@@ -15,9 +15,9 @@
 
 import React, { useEffect, useMemo } from 'react';
 import { GenericPoiSkin } from '@/ui/idleVillage/components/minimal/GenericPoiSkin';
-import { WanderlustSurface } from '@/ui/wanderlust-surface/WanderlustSurface';
-import { V9GlassLayers } from '@/ui/v9-skin/V9GlassLayers';
+import { MatericSurface, MatericAmbientField } from '@/ui/designSystem/primitives';
 import { trailerConfig } from '@/balancing/config/idleVillage/trailerConfig';
+import { TrailerSceneShell } from './TrailerSceneShell';
 import type { TrailerSceneProps } from './types';
 import './trailer.css';
 
@@ -55,30 +55,24 @@ export const TrailerThreat: React.FC<TrailerSceneProps> = ({
   }, [autoStart, onComplete, scene.duration]);
 
   return (
-    <div
-      className={`trailer-root trailer-background ${captureMode ? 'trailer-capture-mode' : ''}`}
-      style={{
-        width: '100%',
-        height: '100vh',
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-    >
-      <WanderlustSurface
+    <TrailerSceneShell captureMode={captureMode} fireflyCount={0}>
+      <MatericSurface
         shape="panel"
         material="bronze"
         interactive={false}
         className="trailer-ws-fullbleed"
         style={{ position: 'absolute', inset: 0 }}
       >
-        <V9GlassLayers
-          variant="base"
+        <MatericAmbientField
+          fireflyCount={3}
           style={{
             position: 'absolute',
             inset: 0,
             fontFamily: 'inherit',
+            pointerEvents: 'none',
           }}
-        >
+        />
+        <div style={{ position: 'absolute', inset: 0 }}>
           {/* Decorative map grid */}
           <svg
             width="100%"
@@ -110,17 +104,7 @@ export const TrailerThreat: React.FC<TrailerSceneProps> = ({
             <h1 className="trailer-banner" style={{ textAlign: 'center', animationDelay: '200ms' }}>
               {scene.banner}
             </h1>
-            <p
-              style={{
-                marginTop: '0.75rem',
-                color: 'var(--trailer-parchment, #ede0c4)',
-                fontSize: 'clamp(14px, 2vw, 20px)',
-                letterSpacing: '0.12em',
-                opacity: 0,
-                textTransform: 'uppercase',
-                animation: 'fadeIn 0.8s ease 0.8s forwards',
-              }}
-            >
+            <p className="trailer-subtitle" style={{ animationDelay: '0.8s' }}>
               {scene.subBanner}
             </p>
           </div>
@@ -152,8 +136,8 @@ export const TrailerThreat: React.FC<TrailerSceneProps> = ({
               />
             </div>
           ))}
-        </V9GlassLayers>
-      </WanderlustSurface>
-    </div>
+        </div>
+      </MatericSurface>
+    </TrailerSceneShell>
   );
 };
