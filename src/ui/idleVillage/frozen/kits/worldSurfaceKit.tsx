@@ -57,6 +57,14 @@ export interface WorldSurfaceStandaloneProps {
   showAnchors?: boolean;
   /** Show region overlays. */
   showRegions?: boolean;
+  /**
+   * Cloud-shadow breathing on the terrain. Defaults to `true`: desiderata v19
+   * (`.mw/desiderata.md`) makes this "sempre attivo... non legato a un flag",
+   * not an opt-in effect.
+   */
+  breathEnabled?: boolean;
+  /** Ambient life layer (rare creatures, birds, atmospheric particles). */
+  showAtmosphere?: boolean;
   /** Extra class on the fill container (must have a sized parent). */
   className?: string;
 }
@@ -70,6 +78,8 @@ export const WorldSurfaceStandalone: React.FC<WorldSurfaceStandaloneProps> = ({
   initialZoom,
   showAnchors = false,
   showRegions = false,
+  breathEnabled = true,
+  showAtmosphere = false,
   className,
 }) => {
   const { isLoading, error, manifest, cameraConfig } = useWorldSurface(manifestPath);
@@ -107,6 +117,8 @@ export const WorldSurfaceStandalone: React.FC<WorldSurfaceStandaloneProps> = ({
         onCameraChange={handleCameraChange}
         showAnchors={showAnchors}
         showRegions={showRegions}
+        breathEnabled={breathEnabled}
+        showAtmosphere={showAtmosphere}
         imageFit={manifest.renderer?.imageFit ?? 'none'}
         autoFit={manifest.renderer?.autoFit}
       />
