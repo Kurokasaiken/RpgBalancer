@@ -846,5 +846,31 @@
     "movementSpeed": "Velocità",
     "cooldownReduction": "Rid. Ricarica",
     "castSpeed": "Vel. Lancio"
+  },
+  "gameFrame": {
+    "title": "Wanderlust",
+    "nav": {
+      "ariaLabel": "Sezioni di gioco",
+      "village": "Villaggio",
+      "map": "Mappa",
+      "workshop": "Officina",
+      "tavern": "Taverna",
+      "locked": "Non ancora"
+    },
+    "resources": {
+      "gold": "Oro",
+      "food": "Cibo",
+      "wood": "Legno"
+    },
+    "center": {
+      "title": "Heartholm",
+      "subtitle": "Giorno {day}"
+    },
+    "status": {
+      "villageLevel": "Villaggio Lv",
+      "freeHeroes": "Eroi liberi: {count}",
+      "day": "Giorno {day}",
+      "nextEvent": "Prossimo evento: alba tra poche ore"
+    }
   }
 }

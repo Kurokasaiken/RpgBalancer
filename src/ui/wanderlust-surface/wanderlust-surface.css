@@ -42,6 +42,19 @@
 .ws-content {
   position: relative;
   z-index: 2;
+  /*
+   * A consumer may set `display: flex` on `.ws-root` (via the `style` prop)
+   * to have `.ws-content` stretch to fill the root's height as a flex item.
+   * Flex items default to `min-width: auto` / `min-height: auto`, which
+   * refuses to shrink below the content's own intrinsic size — so wide
+   * content (e.g. a roster panel) silently grows `.ws-content` past the
+   * root's box instead of being contained by it (only `.ws-root`'s
+   * `overflow: hidden` keeps it from spilling further). Zeroing both here
+   * is inert for every non-flex consumer and lets flex consumers actually
+   * constrain to the root's size.
+   */
+  min-width: 0;
+  min-height: 0;
 }
 
 /* ── Shape variants ────────────────────────────────────────────── */

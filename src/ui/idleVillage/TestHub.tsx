@@ -210,6 +210,16 @@ const EXTRA_PAGES: TestPageLink[] = [
     icon: '🗺️',
     status: 'ok',
   },
+  // Non-kit page: Game Frame - the persistent game shell (topbar, roster rail,
+  // map viewport, quest rail, status bar). The map is a component inside it.
+  {
+    id: 'game-frame',
+    title: 'Game Frame',
+    description: 'Cornice di gioco persistente: topbar, roster, mappa al centro, quest rail, status bar (R-075)',
+    path: '/game-frame',
+    icon: '🖼️',
+    status: 'ok',
+  },
   // Non-kit page: Sea Effect Lab - side-by-side water effect attempts.
   {
     id: 'sea-effect-lab',

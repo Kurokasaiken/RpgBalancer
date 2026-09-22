@@ -827,5 +827,31 @@
     "movementSpeed": "Move Speed",
     "cooldownReduction": "Cooldown",
     "castSpeed": "Cast Speed"
+  },
+  "gameFrame": {
+    "title": "Wanderlust",
+    "nav": {
+      "ariaLabel": "Game sections",
+      "village": "Village",
+      "map": "Map",
+      "workshop": "Workshop",
+      "tavern": "Tavern",
+      "locked": "Not yet"
+    },
+    "resources": {
+      "gold": "Gold",
+      "food": "Food",
+      "wood": "Wood"
+    },
+    "center": {
+      "title": "Heartholm",
+      "subtitle": "Day {day}"
+    },
+    "status": {
+      "villageLevel": "Village Lv",
+      "freeHeroes": "Heroes: {count} free",
+      "day": "Day {day}",
+      "nextEvent": "Next event: dawn in a few hours"
+    }
   }
 }
