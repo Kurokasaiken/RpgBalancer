@@ -195,6 +195,7 @@ export const OverrideTypeSchema = z.enum([
   'set_visibility',
   'set_opacity',
   'tint_layer',
+  'filter_layer',
   'set_animation',
 ]);
 
@@ -218,6 +219,23 @@ export const WorldSurfaceVisualStateOverrideSchema = z.discriminatedUnion('type'
     type: z.literal('tint_layer'),
     layerId: z.string(),
     tint: z.string(),
+  }),
+  z.object({
+    type: z.literal('filter_layer'),
+    layerId: z.string(),
+    /**
+     * A CSS filter string applied to the layer's own image, e.g.
+     * `hue-rotate(-28deg) saturate(1.4) brightness(1.5)`.
+     *
+     * Prefer this over `tint_layer` for recolouring. `tint_layer` paints a
+     * full-canvas rect in `mix-blend-mode` over the layer, which (a) bleeds
+     * through the asset's transparent areas because it tints the rectangle
+     * rather than the pixels, and (b) forces the compositor to blend the
+     * whole 4240x2828 canvas on every repaint — measured at a 1016ms worst
+     * frame against 50ms with it off. A filter runs on the image's own
+     * pixels, respects its alpha, and stays on the GPU fast path.
+     */
+    filter: z.string(),
   }),
   z.object({
     type: z.literal('set_animation'),
