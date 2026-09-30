@@ -455,3 +455,94 @@ archi, incluso il binario d'ombra spesso 4,5 unità. Registrare l'osservazione n
 - Ogni shader/parallasse nuova richiede evidence log di frame-time e DPR.
 
 **Fonte:** sessione esecutiva R-059; `.mw/desiderata.md` v19.
+
+---
+
+## 2026-09-29 — Mission Planner: il modello di rischio canonico è quello per-fase, esteso per residente
+
+**Da:** PLAN-018 T-000 — coesistevano due modelli di rischio: risk roll singolo per fase durante la quest (`resolveMilestoneWithoutAnimation`, `riskProfile`) e `resolvePartyConsequences` (chance uniforme per esito, per residente) a fine quest (`QuestPowerEngine`).
+
+**A:** opzione **A** approvata dal Director. Il modello **per-fase** diventa canonico ed è esteso **per residente**: ogni fase produce chance di ferita/morte per ogni membro della spedizione (rischio base della fase + `residentRiskModifiers` dello slot occupato + contributi del loadout). `resolvePartyConsequences` smette di essere la fonte delle conseguenze; la risoluzione userà lo stesso modello per-fase che il Planner mostra in anteprima.
+
+**Motivo:** il Planner deve mostrare il rischio che accadrà davvero — se mostra un modello e la risoluzione ne usa un altro, i numeri mentono. La scelta è coerente con desiderata v3 ("ogni fase può produrre ferite/morte") e v12 (morte spostabile fra membri, che richiede chance per-slot).
+
+**Implicazioni:**
+- `computeMemberRisk` nel planner engine aggrega il rischio sulle fasi per singolo residente; l'aggregato party (P almeno un morto/ferito) deriva da quello.
+- Le fasi oggi producono un solo `wounded`/`dead` per fase — il resolver va esteso a risultati per-residente accumulati per fase.
+- PLAN-018 T-001/T-006 aggiornati di conseguenza.
+
+**Fonte:** scelta "A" del Director in sessione 2026-09-29; `plans/PLAN-018-mission-planner.md`.
+
+---
+
+## 2026-09-29 — Mission Planner: almost non conta, solo i morti escono, la cavalcatura occupa uno slot
+
+**Da:** critica multi-AI su PLAN-018 (chatgpt/claude/deepseek, run
+`.mw/runs/2026-09-29-plan-018-critique/`): il piano congelava l'architettura ma
+non la matematica, e tre punti semantici erano irrisolti.
+
+**A:** tre decisioni del Director (desiderata v23 rev.3):
+
+1. **`almost` NON conta come fase superata.** `isPassingVerdict` passa a
+   `bigwin | win` soltanto; la banda near-miss resta narrativa. È una modifica
+   alla semantica runtime di `resolveQuestOutcomeTier`, non solo al Planner.
+2. **Solo il morto smette di contribuire alle fasi successive** (precisazione
+   Director "solo morto"). Il ferito resta: contribuisce normalmente e continua
+   a tirare rischi (può morire dopo). Le fasi cessano comunque di essere
+   indipendenti: la probabilità di passare la fase k dipende da chi è
+   sopravvissuto alle fasi 1..k−1. Il motore analitico del Planner deve quindi
+   essere una **programmazione dinamica esatta sull'insieme dei vivi**
+   (2^m insiemi × n fasi), non una Poisson-binomiale su probabilità fisse.
+   Il rischio per-membro resta in forma chiusa perché i tiri rischio non
+   dipendono dagli esiti delle fasi.
+3. **La cavalcatura occupa uno slot equip.** Velocità = trade-off meccanico,
+   non free lunch.
+
+**Motivo:** (1) v23 dice "partial non è successo" e il near-miss non è un
+superamento; (2) senza esclusione dei caduti il modello sarebbe matematicamente
+più semplice ma narrativamente falso e meno drammatico — la cascata di perdita
+è esattamente il tipo di conseguenza che il Planner deve far sentire; (3) il
+Director vuole che la velocità competa con la sopravvivenza dentro il loadout.
+
+**Implicazioni:**
+- Impatto balance: quasi-passate (~10pp a fase) smettono di contare → le quest
+  diventano più difficili. PLAN-018 richiede un'analisi comparativa del tasso
+  di successo/mortalità vecchio vs nuovo sui blueprint esistenti prima del
+  merge del nuovo resolver.
+- Il resolver runtime deve tracciare lo stato per-membro lungo le fasi
+  (funzionale / ferito / morto) — stato nuovo nel loop di risoluzione.
+- Il test Monte Carlo diventa verifica secondaria con tolleranza fissata; il
+  contratto primario è il modello analitico deterministico.
+
+**Fonte:** risposte del Director in sessione 2026-09-29; `plans/PLAN-018-mission-planner.md` v2.
+
+---
+
+## 2026-09-30 — Mission Planner: cover, checkpoint ritiro, consumabili pool, checkStatTags
+
+**Da:** PLAN-018 v3 "Decisioni aperte" D1–D4 dopo la review avversariale.
+
+**A:** risposte del Director (desiderata v23 rev.4):
+
+1. **D1 sì — meccanica cover.** Slot/item/tag stat possono dichiarare
+   `coverRiskDelta` (pp negativi) che riducono il rischio degli **altri**
+   membri. Il membro che assorbe resta il più esposto (coerente con v12).
+2. **D2 — checkpoint continua/ritirati tra le fasi.** Il giocatore sceglie a
+   ogni fine fase se proseguire o ritirarsi. Ritiro → tier sulle fasi giocate
+   (regola ≥50% invariata), effetti delle fasi risolte già applicati. Wipe
+   (S=∅) → chiusura forzata `deadly`. È una feature del loop di risoluzione:
+   entra in PLAN-018 MP-06 e nella spec matematica (MP-00).
+3. **D3 sì — consumabili pool party**, applicati a ogni check, consumati al
+   lancio.
+4. **D4 sì — `checkStatTags` separati dal gate + `partyStatMult`** in
+   `questSkillCheckConfig`, valore dal balance report MP-00.
+
+**Implicazioni:**
+- Il planner modella la full-run; il checkpoint è una feature di risoluzione.
+  La spec formalizza anche "P(sopravvivere alla fase k)" come output derivato —
+  base per un futuro "consigliere di ritiro".
+- MP-06 cresce: oltre al resolver per-residente serve il punto decisionale
+  continue/retreat nella superficie quest (chronicle/card).
+- D1+D4 cambiano lo schema item e le fasi: MP-02 è bloccato da MP-00.
+
+**Fonte:** risposte del Director in sessione 2026-09-30; `plans/PLAN-018-mission-planner.md` v3.
