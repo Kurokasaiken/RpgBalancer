@@ -13,7 +13,6 @@
 import type { AstrolabeSkill } from '@/ui/idleVillage/components/destinyAstrolabe/engine';
 import type {
   QuestPhase,
-  StatRequirement,
   TrialPhaseRequirement,
 } from '@/balancing/config/idleVillage/types';
 import {
@@ -45,35 +44,32 @@ export function buildQuestMilestones(
 }
 
 /**
- * Extracts the stat tags a phase tests.
+ * Extracts the numeric stat tags a phase tests.
  *
- * Blueprints in the wild use either the trial shape (`requiredStatTags`) or a
- * plain `statRequirement`, so both are read before falling back to the
- * activity-level requirement supplied by the caller.
+ * Resolution order (mission_planner_data_model_fix.md §2.2):
+ * 1. `requirements.checkStatTags` — authored numeric stat keys (MP-02);
+ * 2. `requirements.requiredStatTags` — legacy trial shape, same semantics;
+ * 3. `fallbackCheckStatTags` — caller-supplied numeric fallback.
+ *
+ * `requirements.statRequirement` is deliberately NOT read: it is a role/gate
+ * list matched via `statMatching`, and feeding it to `sumPartyStat` used to pin
+ * every check at the unstaffed floor.
  * @param phase - The quest phase
- * @param fallbackRequirement - Activity-level requirement used when the phase declares none
+ * @param fallbackCheckStatTags - Numeric stat tags used when the phase declares none
  * @returns Distinct stat tags, in declaration order
  */
 export function resolvePhaseStatTags(
   phase: Pick<QuestPhase, 'requirements'>,
-  fallbackRequirement?: StatRequirement,
+  fallbackCheckStatTags?: readonly string[],
 ): string[] {
   const requirements = phase.requirements as
-    | (TrialPhaseRequirement & { statRequirement?: StatRequirement })
+    | (TrialPhaseRequirement & { checkStatTags?: string[] })
     | undefined;
 
+  const fromCheck = requirements?.checkStatTags ?? [];
   const fromTrial = requirements?.requiredStatTags ?? [];
-  const phaseStatRequirement = requirements?.statRequirement;
-  const requirement = phaseStatRequirement ?? fallbackRequirement;
 
-  const fromRequirement: string[] = requirement
-    ? [
-        ...(requirement.allOf ?? []).filter((entry): entry is string => typeof entry === 'string'),
-        ...(requirement.anyOf ?? []),
-      ]
-    : [];
-
-  return Array.from(new Set([...fromTrial, ...fromRequirement]));
+  return Array.from(new Set([...fromCheck, ...fromTrial, ...(fallbackCheckStatTags ?? [])]));
 }
 
 /**
@@ -108,12 +104,12 @@ export function buildAstrolabeSkillsForPhase(
     phase: QuestPhase;
     residents: readonly ResidentState[];
     blueprintDifficulty?: string;
-    fallbackRequirement?: StatRequirement;
+    fallbackCheckStatTags?: readonly string[];
     genericSkillName?: string;
   },
   config: QuestSkillCheckConfig = DEFAULT_QUEST_SKILL_CHECK_CONFIG,
 ): AstrolabeSkill[] {
-  const { phase, residents, blueprintDifficulty, fallbackRequirement, genericSkillName } = options;
+  const { phase, residents, blueprintDifficulty, fallbackCheckStatTags, genericSkillName } = options;
   const requirements = phase.requirements as TrialPhaseRequirement | undefined;
 
   const difficulty = resolvePhaseDifficulty(
@@ -128,7 +124,7 @@ export function buildAstrolabeSkillsForPhase(
   const clampStat = (value: number): number =>
     Math.round(Math.min(config.statCeiling, Math.max(config.unstaffedStatFloor, value)));
 
-  const statTags = resolvePhaseStatTags(phase, fallbackRequirement);
+  const statTags = resolvePhaseStatTags(phase, fallbackCheckStatTags);
 
   if (statTags.length === 0) {
     return [
@@ -145,9 +141,11 @@ export function buildAstrolabeSkillsForPhase(
     ];
   }
 
+  // partyStatMult bridges the resident stat scale to the D100 target; the
+  // generic fallback above stays unscaled by design (spec §2.3).
   return statTags.map((statTag) => ({
     name: statTag,
-    stat: clampStat(sumPartyStat(residents, statTag)),
+    stat: clampStat(sumPartyStat(residents, statTag) * config.partyStatMult),
     difficulty,
   }));
 }

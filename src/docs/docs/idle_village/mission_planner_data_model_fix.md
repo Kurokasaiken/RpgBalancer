@@ -27,10 +27,10 @@ Three confirmed mismatches between authored data and what the check actually con
 
 ## 2. Schema changes (MP-02 implements; normative here)
 
-### 2.1 `QuestPhase.checkStatTags`
+### 2.1 `QuestPhase.requirements.checkStatTags` ✅ landed in MP-02
 
 ```ts
-// QuestPhaseSchema additions (questBlueprints.schema.ts)
+// PhaseRequirementsSchema addition (questBlueprints.schema.ts)
 checkStatTags: z.array(z.string().min(1)).optional(),
 ```
 
@@ -46,25 +46,27 @@ checkStatTags: z.array(z.string().min(1)).optional(),
 `requirements.statRequirement` keeps its gate meaning (matched by `statMatching` on
 resident `statTags` — strings like `warden`, `lantern`, `edge`). Migration:
 
-- `resolvePhaseStatTags` MUST stop reading `statRequirement`; its inputs become
-  `phase.checkStatTags` → `requirements.requiredStatTags` (trial shape) → activity
-  fallback → empty.
+- `resolvePhaseStatTags` no longer reads `statRequirement` (landed in MP-02); its
+  inputs are `requirements.checkStatTags` → `requirements.requiredStatTags` (trial
+  shape) → explicit `fallbackCheckStatTags` (numeric tags only — the activity-level
+  `statRequirement` is a gate and was removed from this chain) → empty.
 - Existing `allOf: ['lantern']` / `['edge']` entries are **kept as gates** (slot/quest
   eligibility still uses them); they are re-authored into `checkStatTags` only where a
   real numeric stat exists — see §5 for the blueprint mapping proposal.
 
-### 2.3 `partyStatMult`
+### 2.3 `partyStatMult` ✅ landed in MP-02
 
 ```ts
 // QuestSkillCheckConfigSchema addition (questSkillCheckConfig.ts)
-partyStatMult: z.number().min(0).max(10).default(1),
+partyStatMult: z.number().min(0).max(10).default(4),
 ```
 
-Applied to the party sum before clamp (math spec §2.3). Default `1` preserves every
-existing check verbatim; the recommended gameplay value comes from the MP-00 balance
-report (`test-results/mp00-balance-report-*.md`) and is set by MP-02.
+Applied to the party sum before clamp (math spec §2.3); NOT applied to the generic
+no-tag skill. Default `4` comes from the MP-00 balance report
+(`test-results/mission-planner-balance-*.md`): a 3-villager reference party lands a
+`dangerous` quest at ~31% success.
 
-### 2.4 Item/equipment schema deltas (consumed by MP-02/MP-03)
+### 2.4 Item/equipment schema deltas ✅ schema landed in MP-02 (`questItems.schema.ts` + `questItems.ts` pool; consumed by MP-03)
 
 All pp deltas unless noted. Canonical contribution order: math spec §3.4.
 
@@ -75,15 +77,16 @@ All pp deltas unless noted. Canonical contribution order: math spec §3.4.
 | `coverRiskDelta: { injuryChance?: number; deathChance?: number }` | **other** living members | pp additive; negative values protect; ends when provider dies (D1) |
 | `durationDelta` / `durationMult` | quest | additive units / multiplicative, applied per math spec §4.5 |
 | `rewardMultiplierDelta` | quest | additive on expected reward multiplier |
-| `slot: 'weapon'\|'armor'\|'item'\|'mount'\|…` | wearer | mount occupies an equipment slot (Director decision) — one `mount` slot max per member |
+| `slot: 'weapon'\|'armor'\|'mount'\|'trinket'` | wearer | mount occupies an equipment slot (Director decision) — one item per slot per member |
 
 `QuestPhaseRiskProfile` stays the base layer; slot `residentRiskModifiers` and
 `emptyPenalty` (already in `slots/types.ts`) are per-member terms in §3.1.
 
-## 3. Proposed `checkStatTags` for existing blueprints
+## 3. Proposed `checkStatTags` for existing blueprints ✅ authored in MP-02
 
-Verified against `MINIMAL_GAMEPLAY_RESIDENTS` stat keys. Proposals for MP-02; values
-marked ★ are the ones the balance report is computed on.
+Verified against `MINIMAL_GAMEPLAY_RESIDENTS` stat keys. Values marked ★ are the
+ones the balance report is computed on — all three landed verbatim in
+`questBlueprints.ts`.
 
 | Blueprint / phase | Role gate (unchanged) | `checkStatTags` proposal |
 |---|---|---|

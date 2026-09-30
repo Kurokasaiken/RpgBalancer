@@ -862,15 +862,26 @@
       "food": "Cibo",
       "wood": "Legno"
     },
-    "center": {
-      "title": "Heartholm",
-      "subtitle": "Giorno {day}"
+    "speed": {
+      "ariaLabel": "Velocità simulazione"
     },
     "status": {
-      "villageLevel": "Villaggio Lv",
-      "freeHeroes": "Eroi liberi: {count}",
-      "day": "Giorno {day}",
-      "nextEvent": "Prossimo evento: alba tra poche ore"
+      "dayLabel": "Giorno"
+    },
+    "subtitle": "Prismatic Wanderlust",
+    "place": "Le Marche Orientali",
+    "invasion": {
+      "body": "Un'orda goblin arriva fra {count} giorni."
+    }
+  },
+  "missionPlanner": {
+    "items": {
+      "draftHorse": "Cavallo da Tiro",
+      "ironBlade": "Lama di Ferro",
+      "heavyPlate": "Piastra Pesante",
+      "guardianBanner": "Vessillo del Guardiano",
+      "healingDraught": "Pozione Curativa",
+      "luckyCoin": "Moneta Fortunata"
     }
   }
 }

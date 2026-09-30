@@ -6,7 +6,7 @@
  *
  *   npx tsx --tsconfig tsconfig.json scripts/idleVillage/missionPlannerBalance.ts
  *
- * Outputs a markdown report to `test-results/mp00-balance-report-<date>.md`.
+ * Outputs a markdown report to `test-results/mission-planner-balance-<date>.md`.
  *
  * Legacy model (as coded today):
  *   - check stat = sumPartyStat over statRequirement tags (role tags → 0 → floor),
@@ -81,24 +81,20 @@ const PARTIES: Array<{ label: string; refs: RefResident[]; members: MissionMembe
   },
 ];
 
-/** Proposed checkStatTags per phase id (data-model fix spec §3). */
-const CHECK_TAGS_BY_PHASE: Record<string, string[]> = {
-  scout_tunnels: ['perception', 'agility'],
-  crush_brood: ['strength', 'endurance'],
-  purge_vents: ['intelligence', 'perception'],
-};
-
 /** Narrative unit → normalized unit (ms ratios of the default time scale). */
 const UNIT_FACTOR: Record<string, number> = { ticks: 1, hours: 1, days: 8 };
 
 function toPhaseSpec(phase: QuestPhase, blueprint: QuestBlueprint): MissionPhaseSpec {
+  // Authored checkStatTags (MP-02); proposals in data-model spec §3 seeded them.
+  const authored = (phase.requirements as { checkStatTags?: string[] } | undefined)
+    ?.checkStatTags;
   return {
     phaseId: phase.id,
     difficulty: resolvePhaseDifficulty({
       blueprintDifficulty: blueprint.difficulty,
       phaseType: phase.type,
     }),
-    checkStatTags: CHECK_TAGS_BY_PHASE[phase.id] ?? [],
+    checkStatTags: authored ?? [],
     baseInjuryChance: phase.riskProfile?.injuryChance ?? 0,
     baseDeathChance: phase.riskProfile?.deathChance ?? 0,
     durationUnits: phase.durationValue * (UNIT_FACTOR[phase.durationUnits] ?? 1),
@@ -325,6 +321,6 @@ log('');
 const date = new Date().toISOString().slice(0, 10);
 const outDir = resolve(process.cwd(), 'test-results');
 mkdirSync(outDir, { recursive: true });
-const outPath = resolve(outDir, `mp00-balance-report-${date}.md`);
+const outPath = resolve(outDir, `mission-planner-balance-${date}.md`);
 writeFileSync(outPath, `${lines.join('\n')}\n`);
 console.log(`\nReport written to ${outPath}`);

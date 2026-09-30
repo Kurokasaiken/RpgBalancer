@@ -59,7 +59,19 @@ const TelemetrySettingsSchema = z.object({
 });
 
 const PhaseRequirementsSchema = z.object({
+  /**
+   * Role/gate requirement only: matched against resident `statTags` via
+   * `statMatching`. NEVER fed to the numeric skill check (see
+   * `mission_planner_data_model_fix.md` §2.2).
+   */
   statRequirement: StatRequirementSchema.optional(),
+  /**
+   * Numeric stat keys summed across the living party for the D100 skill check
+   * (MP-02, desiderata v23 rev.4 D4). Ordered — the weakest tag drives the
+   * phase. When absent the phase falls back to `requiredStatTags`, then to the
+   * generic party-size skill.
+   */
+  checkStatTags: z.array(z.string().min(1)).optional(),
   encounterId: z.string().optional(),
   skillCheckId: z.string().optional(),
   materials: z.array(ResourceDeltaDefinitionSchema).optional(),

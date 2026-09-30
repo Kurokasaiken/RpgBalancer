@@ -173,7 +173,7 @@ export function MilestoneCheckModal({
                       }`}
                     >
                       <span aria-hidden>{item.icon}</span>
-                      <span>{item.label}</span>
+                      <span>{t(`idleVillage:${item.labelKey}`, { defaultValue: item.id })}</span>
                     </button>
                   );
                 })}

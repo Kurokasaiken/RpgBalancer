@@ -69,6 +69,12 @@ describe('phaseWeakestStat (spec §2.3)', () => {
     expect(phaseWeakestStat(members, 0b001, p, 1).stat).toBe(5);
   });
 
+  it('never multiplies the generic skill by partyStatMult (spec §2.3)', () => {
+    const members = [member('a', {}), member('b', {})];
+    const p = phase({ checkStatTags: [] });
+    expect(phaseWeakestStat(members, 0b11, p, 10).stat).toBe(10); // still 2 × 5
+  });
+
   it('partyStatMult bridges the scale', () => {
     const members = [member('a', { strength: 15 }), member('b', { strength: 15 })];
     const p = phase({ checkStatTags: ['strength'] });

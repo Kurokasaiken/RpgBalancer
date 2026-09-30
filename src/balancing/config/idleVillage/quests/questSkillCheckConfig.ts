@@ -55,6 +55,15 @@ export const QuestSkillCheckConfigSchema = z.object({
   /** Upper clamp on the summed party stat fed to the astrolabe. */
   statCeiling: z.number().min(1).default(95),
   /**
+   * Multiplier applied to the summed party stat before the floor/ceiling clamp
+   * (desiderata v23 rev.4 D4). Bridges the resident stat scale (~2–8 villagers,
+   * ~10–70 heroes) to the D100 difficulty scale. Default `4` comes from the
+   * MP-00 balance report (`test-results/mission-planner-balance-*.md`): a 3-villager
+   * party lands a `dangerous` quest at ~31% success. Only applies to phases
+   * with declared stat tags; the generic party-size skill is unscaled.
+   */
+  partyStatMult: z.number().min(0).max(10).default(4),
+  /**
    * Parameters for resolving a milestone without the astrolabe animation,
    * used when the quest card is closed and the check happens off-screen.
    * The astrolabe resolves by ball physics; this is its probabilistic
