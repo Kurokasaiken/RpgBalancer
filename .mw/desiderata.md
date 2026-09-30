@@ -1147,3 +1147,142 @@ La terraferma di World Surface deve **pulsare lentamente e continuamente**: la m
 - Intensità differenziata per bioma (foreste vs coste vs montagne): valori da definire nel piano.
 - Se un respiro di luce globale resta come layer complementare o è assorbito nel displacement.
 - Come il displacement convive con i POI marker e le reaction zone ancorate a coordinate mondo (i pixel sotto un POI si muovono — il marker resta fermo o segue?).
+
+---
+
+## v22 — Audit e direzioni per l'HUD esterno di RpgBalancer
+
+**Status:** `FROZEN`
+**Date:** 2026-09-22
+**Authorized by:** Fausto
+**Reason:** approvazione esplicita in sessione della desiderata candidata
+
+### User-stated
+- Esaminare il mockup fornito come proposta per l'HUD esterno di **RpgBalancer**.
+- Verificare se è coerente con lo stile visivo del progetto, il DNA **Prismatic Wanderlust** e le informazioni/componenti che il gioco deve mostrare.
+- Operare con la prospettiva di un **lead senior UI designer AAA**.
+- Fare ricerca online su riferimenti, pattern e soluzioni comparabili.
+- Produrre una critica spietata ma costruttiva del componente.
+- Proporre soluzioni alternative concrete, includendo esempi di codice.
+
+### AI inference
+- La valutazione distingue identità artistica, gerarchia informativa, leggibilità/accessibilità, navigazione, rapporto tra mappa e chrome, scalabilità e compatibilità con i sistemi esistenti.
+- Prima di proporre codice vengono esaminati il progetto RPG reale, lo stack UI e le decisioni documentate.
+- Le alternative possono mettere in discussione layout, densità, navigazione e ruolo della schermata, non soltanto la palette.
+
+### Still unresolved
+- Quali elementi debbano essere sempre visibili e quali contestuali.
+- Quale direzione proposta verrà adottata.
+- Il livello di fedeltà degli esempi di codice, dipendente dallo stack effettivo del repository.
+
+### Formulazione approvata (FROZEN)
+Valutare il mockup dell'HUD esterno di RpgBalancer contro Prismatic Wanderlust, i pillar, i sistemi e i componenti reali del progetto; svolgere ricerca online comparativa; produrre una critica UI AAA spietata e costruttiva; proporre più direzioni alternative con esempi tecnici coerenti con React, config-first, skin system, i18n e component reuse, senza assumere che il mockup sia una specifica da copiare.
+
+---
+
+## v23 — Mission Planner: la spedizione come problema da risolvere con simulazione live
+
+**Status:** `FROZEN`
+**Date:** 2026-09-29
+**Authorized by:** Fausto
+**Reason:** avallo via "procedi" in sessione sulla candidata presentata, dopo le 4 decisioni Director registrate in R-078
+
+**Relazione con altre desiderata:** risponde alla domanda aperta di R-076 (il divertimento vive *prima* della quest). Sta **sopra** v12 (consumabili come scelta del giocatore, più PG degli obbligatori, deathChance per-slot) e ne rende visibili gli effetti; non modifica la risoluzione della quest di v3/v4.
+
+### User-stated
+- Serve un'interfaccia per stabilire chi mandare in missione e vedere **istantaneamente** come cambiano i risultati: aggiungo/tolgo un PG, aggiungo un consumabile, cambio un equip → le % di morte/ferita/successo cambiano subito.
+- Nessun pulsante "Calcola"/"Simula": è un **mission planner reattivo**. "Costruisco la soluzione e vedo immediatamente cosa comporta".
+- I risultati devono essere **leggibili come conseguenze delle scelte**: delta visibili e spiegazione del perché.
+- Tre zone: `PARTY` (chi parte), `LOADOUT` (con cosa parte ciascuno), `OUTCOME` (conseguenza live).
+- Deve esistere già dalle prime quest: è il tutorial invisibile della scelta ("posso mandare qualcuno con lui — ma quel villager non lavora per quei giorni").
+- Decisioni 2026-09-29: (1) `partial` **non** è successo — successo = **almeno il 50% delle prove superate**; (2) durata modificabile dal loadout, **tipo con le cavalcature**; (3) rischio **per slot e anche totale aggregato**; (4) **pannello separato**, nome **"Planner"**.
+
+### AI inference
+- Il motore reattivo esiste già: `useQuestAssignmentPreview` (deterministico, rng-free, ricalcolo su slot/item) sopra `QuestPowerEngine`. Va esteso, non riscritto.
+- "P(≥50% fasi superate)" richiede la probabilità di successo **per fase** (da `buildAstrolabeSkillsForPhase` / `questSkillCheckConfig`) combinata sulle fasi; è la parte di modello più nuova.
+- Il rischio per-residente è lo stesso prerequisito che v12 indica per "spostare la morte da un PG a un altro".
+
+### Formulazione approvata (FROZEN)
+1. **Planner come pannello separato** (nome "Planner"), `FloatingPanel` non bloccante (v4), apribile dalla quest prima della partenza.
+2. **Tre zone:** `PARTY` (add/remove residente negli slot), `LOADOUT` (equip e consumabili per membro), `OUTCOME` (derivato, mai editabile).
+3. **Reattività totale:** ogni modifica ricalcola immediatamente successo, ferita, morte, durata, reward. Calcolo **deterministico e rng-free**, esteso da `useQuestAssignmentPreview`/`QuestPowerEngine`.
+4. **Leggibilità:** ogni metrica mostra il delta rispetto alla configurazione precedente (`18% → 11% ↓`); una sezione **WHY** elenca i contributi per sorgente (stat PG, equip, slot, consumabile, penalità).
+5. **Successo** = probabilità di superare **almeno il 50% degli skill check di fase**; `partial` non conta come successo.
+6. **Rischio per slot e aggregato:** ferita/morte per ogni membro della spedizione **e** totale party.
+7. **Durata modificabile** tramite canale dedicato (`durationDelta`/`timeMult`) popolato da config su item/equip specifici (es. cavalcature), non da regole generiche.
+8. **Invarianti:** config-first (Zod), i18n, skin via `skinConfigRegistry` (niente CSS standalone), riuso primitive e placeholder v10.
+
+**Fuori scope:** risoluzione della quest (cerchio magico, astrolabe, chronicle — v3/v4).
+
+### Still unresolved
+- Formula esatta di combinazione delle probabilità per fase (fasi indipendenti vs correlate) e arrotondamento della soglia 50% con numero dispari di fasi (es. 3 fasi → 2 su 3?).
+- Come si esprime il "costo opportunità" (giorni di lavoro persi dal villager) nel Planner: mostrato o solo implicito.
+- Se il Planner resta aperto e riprende lo stato dopo la chiusura (draft della spedizione) o si resetta.
+
+### Emendamento rev.2 — 2026-09-29 (Director, stessa sessione)
+
+Requisito concettuale aggiunto, verbatim del Director:
+
+«Il Planner deve essere progettato come uno spazio di sperimentazione reversibile.
+Il giocatore deve poter aggiungere, rimuovere e sostituire membri/equip/consumabili
+in qualsiasi ordine e vedere immediatamente le conseguenze, senza confermare o
+simulare. Ogni modifica deve essere reversibile e la configurazione ripristinata
+deve produrre esattamente gli stessi outcome. La UI deve rendere evidente la
+relazione causa → effetto, non soltanto il risultato numerico.»
+
+Precisazioni del Director sulla UI:
+
+1. **Distinzione netta INPUT / OUTPUT.** PARTY e LOADOUT sono input liberamente
+   modificabili; OUTCOME e BY MEMBER sono conseguenze derivate, mai editabili.
+2. **BY MEMBER obbligatorio:** ferita/morte per ogni singolo membro della
+   spedizione, sempre visibile accanto all'aggregato — il membro che assorbe il
+   rischio deve risultare il più esposto («carne da macello», v12). Mai un unico
+   "Death 8%" che nasconde chi rischia.
+3. **WHY prima delle percentuali:** contributi raggruppati per metrica, in
+   linguaggio causa → effetto (`+ Companion → + Strength contribution →
+   − injury risk`), non log tecnico.
+4. **Reversibilità esatta come test:** `A → A+PG → A+PG+equip → A+PG+equip+
+   consumabile → … → A` produce outcome identici. Esatti, non approssimati.
+5. **Niente costo opportunità numerico** (es. "−20 gold"): il costo emerge dal
+   gioco (durata missione, membro che non lavora). Il Planner non è un foglio
+   Excel.
+6. Il Planner è una **feature di gameplay fondamentale**: è il laboratorio dove
+   il giocatore impara il sistema (PG → equip → skill → consumabile = modi
+   diversi di manipolare il rischio), senza spiegazioni verbali della matematica.
+
+### Emendamento rev.3 — 2026-09-29 (Director, risposte alla critica multi-AI)
+
+Tre decisioni sui punti aperti sollevati dalla cold read di PLAN-018:
+
+1. **`almost` NON è una fase superata.** Ai fini della regola "almeno il 50%"
+   passano solo `win` e `bigwin`. Questo cambia la semantica runtime:
+   `isPassingVerdict` smette di contare `almost` come passata — la banda
+   near-miss resta narrativa (cronaca/astrolabe) ma non conta nel tier.
+   *Impatta il balance: le quest diventano più difficili (~10pp per fase).*
+2. **Solo un membro morto smette di contribuire alle fasi successive**
+   (precisazione Director: "solo morto"). Le sue stat escono dalla somma party
+   delle skill-check successive e non tira più rischi. **Il ferito resta**:
+   contribuisce normalmente alle fasi successive e continua a tirare rischi
+   (può morire dopo; la ferita resta come esito persistente a fine quest).
+   Le fasi diventano **dipendenti** tramite l'insieme dei vivi: il modello
+   analitico non può assumere indipendenza.
+3. **La cavalcatura occupa uno slot equip.** Ridurre la durata ha un costo
+   meccanico: lo slot non può ospitare altro equip. Niente "free lunch".
+
+### Emendamento rev.4 — 2026-09-30 (Director, risposte D1–D4 della v3)
+
+1. **D1 — cover approvato:** esiste una meccanica di protezione per cui
+   slot/item/tag stat di un membro riducono il rischio degli **altri** membri
+   (`coverRiskDelta`, pp). Così "+compagno → − rischio aggregato" è possibile e
+   la catena WHY è vera.
+2. **D2 — checkpoint continua/ritirati:** «il giocatore dovrebbe avere
+   l'opzione di scegliere tra ogni fase se vuole continuare o quittare».
+   Ogni fase termina con un punto decisionale: continuare alla fase successiva
+   o ritirarsi. Il ritiro chiude la quest con il tier calcolato sulle fasi
+   giocate (stessa regola ≥50%); gli effetti delle fasi già risolte restano
+   applicati. Wipe (tutti morti) = chiusura forzata → `deadly`.
+3. **D3 — consumabili pool party:** applicati a ogni check (semantica
+   esistente), consumati al lancio.
+4. **D4 — `checkStatTags` + `partyStatMult`:** separata la stat numerica del
+   check dal gate di ruolo (`statRequirement`); valore del moltiplicatore dal
+   balance report MP-00.

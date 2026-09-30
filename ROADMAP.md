@@ -9,3 +9,4 @@
 | [PLAN-013](plans/PLAN-013-sea-marks.md) | active | P2 | Event Reminder AAA v2 — polish round 3 |
 | [PLAN-014](plans/PLAN-014-land-breath.md) | active | P1 | Land Breath: terraferma che pulsa via displacement Pixi (desiderata v21) |
 | [PLAN-017](plans/PLAN-017-stylized-sea-pattern-evaluation.md) | active | P2 | Stylized Sea Pattern Evaluation: A gold standard, C challenger (desiderata v19) |
+| [PLAN-018](plans/PLAN-018-mission-planner.md) | active | P1 | Mission Planner: PARTY/LOADOUT/OUTCOME con esiti live (desiderata v23, R-078); T-000 deciso (modello A) |
