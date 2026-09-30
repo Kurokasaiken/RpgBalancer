@@ -153,11 +153,12 @@ Ogni task richiede lo stato garantito dal precedente.
 - `statSnapshot` persistito mai mutato (test deep-equal); campi party-level (duration/cover/qty) non applicati qui per contratto.
 - execution_hint: `verified`. Evidence: `test-results/mp03-2026-09-30.log`.
 
-### T-004 — Stato del Planner
+### T-004 — Stato del Planner — ✅ COMPLETATO (MP-04, 2026-09-30)
 - Bozza di spedizione in **Context locale** al pannello; **recomputa da stato live a ogni render** → se un residente cambia stato a pannello aperto, la bozza si invalida in modo visibile (warning + `canEmbark` false).
-- Contratto di lancio: payload tipizzato (party + per-member loadout + consumabili con quantità), validato, atomicità e rollback dichiarati se l'avvio fallisce.
-- Delta = vs output precedente (T-000.5). Bozza **non persiste** alla chiusura (default v23; se cambia → `PersistenceService`).
-- execution_hint: `verified`.
+- `missionPlannerDraft.ts` (puro): ops immutabili assign/remove/loadout/consumable, `validateDraft` vs live, `toMissionDraft` → engine input (slotIndex canonico, emptySlotPenalty, residentRiskModifiers), `buildLaunchPayload` atomico → `{questId, party[{residentId,slotId,loadout}], consumables}` oppure issues.
+- `useMissionPlannerDraft.tsx` (Context locale, non persistito, non Zustand): preview via `questOutcomeDistribution` a ogni cambio; Undo (history stack) + Reset to baseline (montaggio); `prevOutcome` per delta; hook telemetry `MISSION_PLANNER_DRAFT_CHANGE_EVENT` + sink `onDraftChange` — nessuna emissione fino a MP-05.
+- Rollback definito: la bozza è immutabile e mai toccata dal lancio → embark fallito = draft intatto.
+- execution_hint: `verified`. Evidence: `test-results/mp04-2026-09-30.log`.
 
 ### T-005 — UI del Planner — **dipende da T-004**
 - `FloatingPanel` "Planner", separazione netta INPUT/OUTPUT (rev.2). Pattern dalla ricerca UI (2026-09-30, hat `ui_developer`):
