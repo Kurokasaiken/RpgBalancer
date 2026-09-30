@@ -150,10 +150,10 @@ Ogni task richiede lo stato garantito dal precedente.
 - `resolvePhaseStatTags`: `checkStatTags` → `requiredStatTags` → `fallbackCheckStatTags` esplicito; `statRequirement` mai letto come stat; caller pagina aggiornato.
 - execution_hint: `verified`. Evidence: `test-results/mp02-2026-09-30.log`.
 
-### T-003 — Equip → stat nel calcolo
-- `applyLoadoutToResident(resident, loadout, itemConfig)` pura → stat effettive. Usata da motore Planner **e** resolver (stessa funzione, stessi input).
-- `statSnapshot` persistito mai mutato; inventario dei consumatori delle stat effettive per evitare due fonti di verità.
-- execution_hint: `verified`.
+### T-003 — Equip → stat nel calcolo — ✅ COMPLETATO (MP-03, 2026-09-30)
+- `applyLoadoutToResident(resident, loadout, catalog)` pura in `missionPlannerLoadout.ts` → `{ resident (copia con stat effettive), contributions }` per il WHY; `LoadoutError` tipizzato (UNKNOWN_ITEM/SLOT_MISMATCH); ordine canonico = QUEST_EQUIP_SLOTS.
+- `statSnapshot` persistito mai mutato (test deep-equal); campi party-level (duration/cover/qty) non applicati qui per contratto.
+- execution_hint: `verified`. Evidence: `test-results/mp03-2026-09-30.log`.
 
 ### T-004 — Stato del Planner
 - Bozza di spedizione in **Context locale** al pannello; **recomputa da stato live a ogni render** → se un residente cambia stato a pannello aperto, la bozza si invalida in modo visibile (warning + `canEmbark` false).
