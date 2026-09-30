@@ -1,17 +1,16 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-// GameFrame is a fresh, not-yet-kitted composition (R-075) — the
-// `no-restricted-imports` nudge toward `frozen/kits/*` does not apply to it.
+// A/B comparison route (R-075) — same exemption as /game-frame.
 // eslint-disable-next-line no-restricted-imports
 import {
-  FloatingWorldOrnaments,
   GameFrame,
   HudGlyph,
   HudHangingTag,
-  ResourceReadout,
   SpeedControl,
   WhenWhereCluster,
 } from '@/ui/idleVillage/components/gameFrame';
+// eslint-disable-next-line no-restricted-imports -- same R-075 exemption as the GameFrame barrel above.
+import { ResourceMedallionRow } from '@/ui/idleVillage/components/gameFrame/ResourceMedallion';
 import {
   WorldSurfaceStandalone,
   type WorldSurfaceVisualStateOverride,
@@ -21,28 +20,26 @@ import { useMinimalGameplayWithIdleVillageConfig } from '@/store/useMinimalGamep
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 
 /**
- * `/game-frame` — GameFrame reference wiring (R-075 v3).
+ * `/gameframe-cartographer` — variant B of the R-075 review's A/B ask.
  *
- * v3 adopts the composition of the Director's reference mockup — shaped
- * ribbons, a hung tag, world full-bleed — while taking none of its
- * mechanics: no weather, no notification bell, no crystal/stone resources.
- * Every value on screen is real state from `useMinimalGameplayWithIdleVillageConfig`
- * except the invasion countdown, which is still the R-071 fixture because no
- * presence system exists yet to feed it.
+ * Same structure, same slots, same config as `/gameframe-living-atlas` —
+ * only the material changes:
+ *   - `GameFrame variant="cartographer"` gives every ribbon a carved bevel
+ *     (inset highlight + inset shadow) instead of a flat fill.
+ *   - Resources render as `ResourceMedallionRow` — small sigil discs "set on
+ *     the desk" next to the map — instead of an inline icon+label row.
  *
- * The map's own painted frame and border layers are switched off here (see
- * `worldDressing` in `gameFrameConfig`) so this shell is the only frame, and
- * the sea is pushed toward the chrome's teal so map and UI read as one image.
- *
- * Not wired into `/minimal-gameplay` yet — see RICHIESTE.md R-075.
+ * This is deliberately NOT a second shell: it reuses `GameFrame`,
+ * `HudRibbon`, `HudHangingTag`, `WhenWhereCluster`, `SpeedControl` verbatim,
+ * because the review's candidate is Living Atlas *structure* carrying
+ * Cartographer's Desk *materiality* — not two competing component trees.
  */
-export default function GameFramePage() {
+export default function GameFrameCartographerPage() {
   const { t } = useTranslation('idleVillage');
   const gameplay = useMinimalGameplayWithIdleVillageConfig();
   const { state, config } = gameplay;
 
   const [activeNavId, setActiveNavId] = useState('map');
-  // Fixture: no real presence/countdown system exists yet (R-071).
   const [daysLeft, setDaysLeft] = useState(5);
 
   const availableSpeeds = [1, 2, 4, 8].filter((s) => s <= config.loop.maxSpeedMultiplier);
@@ -71,6 +68,7 @@ export default function GameFramePage() {
   return (
     <div style={{ width: '100vw', height: '100vh', overflow: 'hidden', background: '#02060a' }}>
       <GameFrame
+        variant="cartographer"
         title={t('gameFrame.title')}
         subtitle={t('gameFrame.subtitle')}
         navItems={DEFAULT_GAME_FRAME_CONFIG.navItems}
@@ -86,23 +84,23 @@ export default function GameFramePage() {
           />
         }
         resourcesSlot={
-          <ResourceReadout
+          <ResourceMedallionRow
             items={[
               {
                 id: 'gold',
-                icon: <HudGlyph iconId="gold" label={t('gameFrame.resources.gold')} />,
+                icon: <HudGlyph iconId="gold" label={t('gameFrame.resources.gold')} size={16} />,
                 label: t('gameFrame.resources.gold'),
                 value: state.gold,
               },
               {
                 id: 'food',
-                icon: <HudGlyph iconId="food" label={t('gameFrame.resources.food')} />,
+                icon: <HudGlyph iconId="food" label={t('gameFrame.resources.food')} size={16} />,
                 label: t('gameFrame.resources.food'),
                 value: `${state.food}/${state.maxFood}`,
               },
               {
                 id: 'wood',
-                icon: <HudGlyph iconId="wood" label={t('gameFrame.resources.wood')} />,
+                icon: <HudGlyph iconId="wood" label={t('gameFrame.resources.wood')} size={16} />,
                 label: t('gameFrame.resources.wood'),
                 value: state.wood,
               },
@@ -129,7 +127,6 @@ export default function GameFramePage() {
             onSpeedChange={gameplay.setSpeedMultiplier}
           />
         }
-        floatingSlot={<FloatingWorldOrnaments />}
       >
         <WorldSurfaceStandalone
           manifestPath={worldDressing.manifestPath}
@@ -141,7 +138,6 @@ export default function GameFramePage() {
             ...atmosphereAssets.seaRipple,
             mode: worldDressing.rippleMode,
             animateFrequency: worldDressing.rippleAnimateFrequency,
-            // The sheet that shipped in 0bb46308: 30 frames, 5x6, 59 KB.
             spriteSrc: '/assets/atmosphere/sea/ripples_sprite.webp',
             spriteFrames: 30,
             spriteColumns: 5,

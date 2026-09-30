@@ -8,6 +8,12 @@ export interface WorldSurfaceSeaRippleProps {
   zIndex: number;
   /** Optional override. Defaults to {@link atmosphereAssets.seaRipple}. */
   config?: SeaRippleConfig;
+  /**
+   * World canvas size, in world px. `sprite` mode needs this to cap its own masked
+   * wrapper's backing-store size — see the comment on `MAX_MASK_EDGE_PX` below.
+   * Not needed by `smil` mode (that path has no element of its own to cap).
+   */
+  canvasSize?: { width: number; height: number };
 }
 
 /**
@@ -66,12 +72,13 @@ export function WorldSurfaceSeaRipple({
   enabled = true,
   zIndex,
   config,
+  canvasSize,
 }: WorldSurfaceSeaRippleProps) {
   const cfg = config ?? atmosphereAssets.seaRipple;
   if (!enabled || !cfg.enabled) return null;
 
   if (cfg.mode === 'sprite') {
-    return <SpriteSeaRipple zIndex={zIndex} cfg={cfg} />;
+    return <SpriteSeaRipple zIndex={zIndex} cfg={cfg} canvasSize={canvasSize} />;
   }
 
   return <SeaRippleFilterDefs cfg={cfg} />;
@@ -105,6 +112,7 @@ function SeaRippleFilterDefs({ cfg }: { cfg: SeaRippleConfig }) {
   const bf = cfg.baseFrequency ?? 0.0087;
   const scale = cfg.scale ?? 10;
   const seconds = cfg.seconds ?? 18;
+  const animateFrequency = cfg.animateFrequency ?? true;
 
   // Same shape as the lab: X rises while Y falls, so the noise field DEFORMS rather
   // than scrolls. A scrolling field reads as a texture sliding over the painting; a
@@ -132,12 +140,16 @@ function SeaRippleFilterDefs({ cfg }: { cfg: SeaRippleConfig }) {
           seed={7}
           result="noise"
         >
-          <animate
-            attributeName="baseFrequency"
-            dur={`${seconds}s`}
-            values={bfValues}
-            repeatCount="indefinite"
-          />
+          {/* The expensive one: re-deriving the noise field every frame. Opt out
+              via `animateFrequency: false` and the field is generated once. */}
+          {animateFrequency && (
+            <animate
+              attributeName="baseFrequency"
+              dur={`${seconds}s`}
+              values={bfValues}
+              repeatCount="indefinite"
+            />
+          )}
         </feTurbulence>
         <feDisplacementMap
           in="SourceGraphic"
@@ -161,7 +173,17 @@ function SeaRippleFilterDefs({ cfg }: { cfg: SeaRippleConfig }) {
 interface SpriteSeaRippleProps {
   zIndex: number;
   cfg: SeaRippleConfig;
+  canvasSize?: { width: number; height: number };
 }
+
+/**
+ * Same ceiling as `WorldSurfaceSeaPatternOverlay`'s masking wrapper, half of
+ * `TEXTURE_EDGE_LIMIT_PX` for the same headroom reason — see the long comment there.
+ * Duplicated rather than imported: these two files don't otherwise share a dependency,
+ * and the constant is small enough that a shared import would cost more to navigate
+ * than it saves.
+ */
+const MAX_MASK_EDGE_PX = 2048;
 
 /**
  * Pre-authored animated sprite sheet blended over the masked sea — the Director's
@@ -172,8 +194,18 @@ interface SpriteSeaRippleProps {
  * stacking context has nothing outside it to blend with — the overlay silently
  * composited as `normal` against its own transparent parent instead of against the
  * painted sea.
+ *
+ * SIZE CAP: `mask-image` forces this element onto its own compositing layer, and
+ * WebKit is documented to rasterize that layer's backing store at the element's CSS
+ * box size (not the smaller post-`scale(camera.zoom)` on-screen size), failing blank
+ * past `TEXTURE_EDGE_LIMIT_PX` — see the comment above this file's `<filter>` element
+ * and `WorldSurfaceSeaPatternOverlay.tsx`. This is the leading hypothesis for the
+ * Director's report (2026-09-22, Tauri/WKWebView) that the ripple is only partly
+ * visible, though not yet confirmed by re-testing on the Director's machine. When
+ * `canvasSize` is known, the element is capped to `MAX_MASK_EDGE_PX` on its long edge
+ * and scaled back up with a CSS transform instead of a bigger CSS box.
  */
-function SpriteSeaRipple({ zIndex, cfg }: SpriteSeaRippleProps) {
+function SpriteSeaRipple({ zIndex, cfg, canvasSize }: SpriteSeaRippleProps) {
   const {
     spriteSrc,
     spriteFrames = 1,
@@ -191,13 +223,25 @@ function SpriteSeaRipple({ zIndex, cfg }: SpriteSeaRippleProps) {
     [spriteFrames, spriteColumns, spriteRows],
   );
 
+  const longEdge = canvasSize ? Math.max(canvasSize.width, canvasSize.height) : 0;
+  const capScale = canvasSize ? Math.min(1, MAX_MASK_EDGE_PX / longEdge) : 1;
+  const sizeStyle = canvasSize
+    ? {
+        left: 0,
+        top: 0,
+        width: Math.round(canvasSize.width * capScale),
+        height: Math.round(canvasSize.height * capScale),
+        transform: `scale(${1 / capScale})`,
+        transformOrigin: '0 0' as const,
+      }
+    : { inset: 0 };
+
   return (
     <>
       <style>{`
         ${keyframes}
         .ws-sea-ripple-sprite {
           position: absolute;
-          inset: 0;
           pointer-events: none;
           background-image: url(${spriteSrc});
           background-size: ${spriteColumns * 100}% ${spriteRows * 100}%;
@@ -218,7 +262,7 @@ function SpriteSeaRipple({ zIndex, cfg }: SpriteSeaRippleProps) {
           .ws-sea-ripple-sprite { animation: none !important; opacity: 0 !important; }
         }
       `}</style>
-      <div className="ws-sea-ripple-sprite" style={{ zIndex }} />
+      <div className="ws-sea-ripple-sprite" style={{ zIndex, ...sizeStyle }} />
     </>
   );
 }

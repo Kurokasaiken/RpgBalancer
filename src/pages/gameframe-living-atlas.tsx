@@ -1,10 +1,8 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-// GameFrame is a fresh, not-yet-kitted composition (R-075) — the
-// `no-restricted-imports` nudge toward `frozen/kits/*` does not apply to it.
+// A/B comparison route (R-075) — same exemption as /game-frame.
 // eslint-disable-next-line no-restricted-imports
 import {
-  FloatingWorldOrnaments,
   GameFrame,
   HudGlyph,
   HudHangingTag,
@@ -21,28 +19,25 @@ import { useMinimalGameplayWithIdleVillageConfig } from '@/store/useMinimalGamep
 import { DEFAULT_GAME_FRAME_CONFIG } from '@/balancing/config/idleVillage/gameFrameConfig';
 
 /**
- * `/game-frame` — GameFrame reference wiring (R-075 v3).
+ * `/gameframe-living-atlas` — variant A of the R-075 review's A/B ask.
  *
- * v3 adopts the composition of the Director's reference mockup — shaped
- * ribbons, a hung tag, world full-bleed — while taking none of its
- * mechanics: no weather, no notification bell, no crystal/stone resources.
- * Every value on screen is real state from `useMinimalGameplayWithIdleVillageConfig`
- * except the invasion countdown, which is still the R-071 fixture because no
- * presence system exists yet to feed it.
+ * Review verdict (2026-09-22): "Living Atlas è attualmente il candidato più
+ * solido, ma deve prendere da Cartographer's Desk la materialità degli
+ * oggetti. Non approverei ancora una convergenza definitiva senza
+ * confrontare visivamente almeno queste due direzioni."
  *
- * The map's own painted frame and border layers are switched off here (see
- * `worldDressing` in `gameFrameConfig`) so this shell is the only frame, and
- * the sea is pushed toward the chrome's teal so map and UI read as one image.
- *
- * Not wired into `/minimal-gameplay` yet — see RICHIESTE.md R-075.
+ * This is that comparison's first half: `GameFrame` at `variant="atlas"` —
+ * thin minimal-line ribbons, no bevel, flat readouts. Everything else
+ * (wiring, data, world dressing) is identical to `/gameframe-cartographer`
+ * on purpose, so the only variable between the two tabs is ribbon material.
+ * `/game-frame` remains the production route and is untouched by this file.
  */
-export default function GameFramePage() {
+export default function GameFrameLivingAtlasPage() {
   const { t } = useTranslation('idleVillage');
   const gameplay = useMinimalGameplayWithIdleVillageConfig();
   const { state, config } = gameplay;
 
   const [activeNavId, setActiveNavId] = useState('map');
-  // Fixture: no real presence/countdown system exists yet (R-071).
   const [daysLeft, setDaysLeft] = useState(5);
 
   const availableSpeeds = [1, 2, 4, 8].filter((s) => s <= config.loop.maxSpeedMultiplier);
@@ -71,6 +66,7 @@ export default function GameFramePage() {
   return (
     <div style={{ width: '100vw', height: '100vh', overflow: 'hidden', background: '#02060a' }}>
       <GameFrame
+        variant="atlas"
         title={t('gameFrame.title')}
         subtitle={t('gameFrame.subtitle')}
         navItems={DEFAULT_GAME_FRAME_CONFIG.navItems}
@@ -129,7 +125,6 @@ export default function GameFramePage() {
             onSpeedChange={gameplay.setSpeedMultiplier}
           />
         }
-        floatingSlot={<FloatingWorldOrnaments />}
       >
         <WorldSurfaceStandalone
           manifestPath={worldDressing.manifestPath}
@@ -141,7 +136,6 @@ export default function GameFramePage() {
             ...atmosphereAssets.seaRipple,
             mode: worldDressing.rippleMode,
             animateFrequency: worldDressing.rippleAnimateFrequency,
-            // The sheet that shipped in 0bb46308: 30 frames, 5x6, 59 KB.
             spriteSrc: '/assets/atmosphere/sea/ripples_sprite.webp',
             spriteFrames: 30,
             spriteColumns: 5,
