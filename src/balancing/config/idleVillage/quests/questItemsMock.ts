@@ -1,12 +1,16 @@
-// MOCK — nessun inventario reale. Lista statica di oggetti assegnabili a una
-// quest, usata solo per dimostrare l'effetto sui calcoli di preview live
-// (useQuestAssignmentPreview). Da sostituire quando esisterà un vero
-// item/inventory system condiviso col resto del gioco.
+// ADAPTER — legacy preview shape backed by the canonical quest item pool
+// (questItems.ts). Keeps the `effect` grouping expected by
+// applyConsumableRiskEffects / useQuestAssignmentPreview until those call
+// sites migrate to the canonical QuestItem type (MP-03+).
 
+import { defaultQuestItems } from './questItems';
+
+/** Legacy consumable shape consumed by the milestone-check UI and preview. */
 export interface QuestItemMock {
   id: string;
-  label: string;
-  icon: string;
+  /** i18n key for the display label (idleVillage namespace). */
+  labelKey: string;
+  icon?: string;
   effect: {
     deathChanceDelta?: number; // percentage points
     injuryChanceDelta?: number; // percentage points
@@ -14,23 +18,20 @@ export interface QuestItemMock {
   };
 }
 
-export const MOCK_QUEST_ITEMS: QuestItemMock[] = [
-  {
-    id: 'potion_heal',
-    label: 'Pozione di Cura',
-    icon: '🧪',
-    effect: { deathChanceDelta: -10 },
-  },
-  {
-    id: 'bandages',
-    label: 'Bende',
-    icon: '🩹',
-    effect: { injuryChanceDelta: -15 },
-  },
-  {
-    id: 'lucky_charm',
-    label: 'Amuleto Fortunato',
-    icon: '🍀',
-    effect: { rewardMultiplierDelta: 0.1 },
-  },
-];
+/**
+ * Consumables from the canonical pool (D3: party pool, applied on each check).
+ * `qty` stays on the canonical item; the legacy shape only carries the per-use
+ * effect deltas.
+ */
+export const MOCK_QUEST_ITEMS: QuestItemMock[] = Object.values(defaultQuestItems)
+  .filter((item) => item.kind === 'consumable')
+  .map((item) => ({
+    id: item.id,
+    labelKey: item.labelKey,
+    icon: item.icon,
+    effect: {
+      deathChanceDelta: item.deathChanceDelta,
+      injuryChanceDelta: item.injuryChanceDelta,
+      rewardMultiplierDelta: item.rewardMultiplierDelta,
+    },
+  }));

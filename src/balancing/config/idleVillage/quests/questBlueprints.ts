@@ -40,10 +40,13 @@ const RAW_DEFAULT_BLUEPRINTS: Record<string, QuestBlueprint> = {
         durationValue: 2,
         durationUnits: 'hours',
         requirements: {
+          // Role gate (unchanged): slot eligibility still requires the tag.
           statRequirement: {
             label: 'Lantern Scout',
             allOf: ['lantern'],
           },
+          // Numeric stats tested by the D100 check (MP-02 data-model fix).
+          checkStatTags: ['perception', 'agility'],
         },
         successEffects: {
           notes: 'Rivela i nodi infestati e riduce il rischio del combattimento.',
@@ -74,6 +77,7 @@ const RAW_DEFAULT_BLUEPRINTS: Record<string, QuestBlueprint> = {
         durationUnits: 'hours',
         requirements: {
           encounterId: 'city_rats_pack',
+          checkStatTags: ['strength', 'endurance'],
           custom: {
             recommendedPower: 2,
           },
@@ -111,6 +115,7 @@ const RAW_DEFAULT_BLUEPRINTS: Record<string, QuestBlueprint> = {
         durationUnits: 'hours',
         requirements: {
           materials: [{ resourceId: 'materials', amountFormula: '1' }],
+          checkStatTags: ['intelligence', 'perception'],
         },
         successEffects: {
           reputation: {

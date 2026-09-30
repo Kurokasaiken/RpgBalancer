@@ -99,13 +99,15 @@ describe('useQuestAssignmentPreview', () => {
       }),
     ];
 
+    const injuryReducer = MOCK_QUEST_ITEMS.find((item) => item.effect.injuryChanceDelta);
+    expect(injuryReducer).toBeDefined();
     const { result: withoutItems } = renderHook(() => useQuestAssignmentPreview(baseActivity, slots, DEFAULT_QUEST_POWER_RULES));
-    const { result: withBandages } = renderHook(() =>
-      useQuestAssignmentPreview(baseActivity, slots, DEFAULT_QUEST_POWER_RULES, [MOCK_QUEST_ITEMS[1]])
+    const { result: withConsumable } = renderHook(() =>
+      useQuestAssignmentPreview(baseActivity, slots, DEFAULT_QUEST_POWER_RULES, [injuryReducer!])
     );
 
-    expect(withBandages.current.projectedInjuryChance).toBeLessThan(withoutItems.current.projectedInjuryChance);
-    expect(withBandages.current.projectedDeathChance).toBe(withoutItems.current.projectedDeathChance);
+    expect(withConsumable.current.projectedInjuryChance).toBeLessThan(withoutItems.current.projectedInjuryChance);
+    expect(withConsumable.current.projectedDeathChance).toBe(withoutItems.current.projectedDeathChance);
   });
 
   it('clamps projected chances to 0-100', () => {

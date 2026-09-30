@@ -843,15 +843,26 @@
       "food": "Food",
       "wood": "Wood"
     },
-    "center": {
-      "title": "Heartholm",
-      "subtitle": "Day {day}"
+    "speed": {
+      "ariaLabel": "Simulation speed"
     },
     "status": {
-      "villageLevel": "Village Lv",
-      "freeHeroes": "Heroes: {count} free",
-      "day": "Day {day}",
-      "nextEvent": "Next event: dawn in a few hours"
+      "dayLabel": "Day"
+    },
+    "subtitle": "Prismatic Wanderlust",
+    "place": "The Eastern Marches",
+    "invasion": {
+      "body": "A goblin host arrives in {count} days."
+    }
+  },
+  "missionPlanner": {
+    "items": {
+      "draftHorse": "Draft Horse",
+      "ironBlade": "Iron Blade",
+      "heavyPlate": "Heavy Plate",
+      "guardianBanner": "Guardian Banner",
+      "healingDraught": "Healing Draught",
+      "luckyCoin": "Lucky Coin"
     }
   }
 }

@@ -66,6 +66,7 @@ import {
 import { useQuestAssignmentPreview } from '@/ui/idleVillage/hooks/useQuestAssignmentPreview';
 import { QuestAssignmentPreview } from '@/ui/idleVillage/components/QuestAssignmentPreview';
 import { MOCK_QUEST_ITEMS, type QuestItemMock } from '@/balancing/config/idleVillage/quests/questItemsMock';
+import { useTranslation } from '@/localization/useTranslation';
 
 /** Attività di riferimento usata dalla pagina di verification. */
 const DEFAULT_ACTIVITY = DEFAULT_IDLE_VILLAGE_CONFIG.activities.quest_city_rats;
@@ -327,6 +328,7 @@ function DroppablePoi({
 }
 
 const PoiDetailQuestRosterIntegrationPage: FC = () => {
+  const { t } = useTranslation('idleVillage');
   const { residentsById } = useRosterKitData();
 
   // No pre-fill: the first slot must appear empty until the player assigns a resident.
@@ -768,7 +770,7 @@ const PoiDetailQuestRosterIntegrationPage: FC = () => {
                             }`}
                           >
                             <span>{item.icon}</span>
-                            <span>{item.label}</span>
+                            <span>{t(item.labelKey, { defaultValue: item.id })}</span>
                           </button>
                         );
                       })}

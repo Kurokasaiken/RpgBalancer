@@ -14,7 +14,11 @@ import {
   questTotalDurationMs,
   DEFAULT_QUEST_TIME_SCALE,
 } from '@/balancing/config/idleVillage/quests/questTimeScale';
-import { resolvePhaseDifficulty } from '@/balancing/config/idleVillage/quests/questSkillCheckConfig';
+import {
+  resolvePhaseDifficulty,
+  DEFAULT_QUEST_SKILL_CHECK_CONFIG,
+} from '@/balancing/config/idleVillage/quests/questSkillCheckConfig';
+import type { QuestSkillCheckConfig } from '@/balancing/config/idleVillage/quests/questSkillCheckConfig';
 import { defaultQuestBlueprints } from '@/balancing/config/idleVillage/quests/questBlueprints';
 import type { QuestPhase } from '@/balancing/config/idleVillage/types';
 import type { ResidentState } from '@/engine/game/idleVillage/TimeEngine';
@@ -84,14 +88,28 @@ describe('quest duration comes from the authored phases', () => {
 });
 
 describe('resolvePhaseStatTags', () => {
-  it('reads the trial shape first', () => {
+  it('reads authored checkStatTags first (MP-02)', () => {
+    const tags = resolvePhaseStatTags(
+      phase({
+        requirements: {
+          checkStatTags: ['perception', 'agility'],
+          statRequirement: { label: 'Scout', allOf: ['lantern'] },
+        },
+      } as Partial<QuestPhase>),
+    );
+    expect(tags).toEqual(['perception', 'agility']);
+  });
+
+  it('reads the trial shape when no checkStatTags exist', () => {
     const tags = resolvePhaseStatTags(
       phase({ requirements: { requiredStatTags: ['edge', 'ward'] } }),
     );
     expect(tags).toEqual(['edge', 'ward']);
   });
 
-  it('falls back to a phase statRequirement, flattening allOf and anyOf', () => {
+  it('never feeds a role-gate statRequirement to the numeric check', () => {
+    // statRequirement is a role gate matched via statMatching — reading it as a
+    // numeric stat is the data-model bug fixed in MP-02.
     const tags = resolvePhaseStatTags(
       phase({
         requirements: {
@@ -99,23 +117,20 @@ describe('resolvePhaseStatTags', () => {
         },
       } as Partial<QuestPhase>),
     );
-    expect(tags).toEqual(['lantern', 'clarity']);
+    expect(tags).toEqual([]);
   });
 
-  it('falls back to the activity requirement when the phase declares none', () => {
-    const tags = resolvePhaseStatTags(phase({ requirements: { encounterId: 'rats' } }), {
-      label: 'Veteran',
-      allOf: ['edge'],
-    });
-    expect(tags).toEqual(['edge']);
-  });
-
-  it('deduplicates tags declared in more than one place', () => {
+  it('merges checkStatTags over the trial shape with deduplication', () => {
     const tags = resolvePhaseStatTags(
-      phase({ requirements: { requiredStatTags: ['edge'] } }),
-      { label: 'x', allOf: ['edge'], anyOf: ['edge'] },
+      phase({
+        requirements: {
+          checkStatTags: ['perception'],
+          requiredStatTags: ['perception', 'agility'],
+        },
+      } as Partial<QuestPhase>),
+      ['perception'],
     );
-    expect(tags).toEqual(['edge']);
+    expect(tags).toEqual(['perception', 'agility']);
   });
 });
 
@@ -136,14 +151,41 @@ describe('sumPartyStat', () => {
 });
 
 describe('buildAstrolabeSkillsForPhase', () => {
+  /** Multiplier-free config for tests that assert the raw party sum. */
+  const unitMult: QuestSkillCheckConfig = {
+    ...DEFAULT_QUEST_SKILL_CHECK_CONFIG,
+    partyStatMult: 1,
+  };
+
   it('produces one skill per tested stat, carrying the summed party value', () => {
-    const skills = buildAstrolabeSkillsForPhase({
-      phase: phase({ requirements: { requiredStatTags: ['edge', 'ward'] } }),
-      residents: [resident('a', { edge: 20, ward: 5 }), resident('b', { edge: 15, ward: 10 })],
-    });
+    const skills = buildAstrolabeSkillsForPhase(
+      {
+        phase: phase({ requirements: { requiredStatTags: ['edge', 'ward'] } }),
+        residents: [resident('a', { edge: 20, ward: 5 }), resident('b', { edge: 15, ward: 10 })],
+      },
+      unitMult,
+    );
     expect(skills.map((s) => s.name)).toEqual(['edge', 'ward']);
     expect(skills[0].stat).toBe(35);
     expect(skills[1].stat).toBe(15);
+  });
+
+  it('applies partyStatMult before the stat clamp', () => {
+    const skills = buildAstrolabeSkillsForPhase({
+      phase: phase({ requirements: { requiredStatTags: ['edge'] } }),
+      residents: [resident('a', { edge: 10 }), resident('b', { edge: 5 })],
+    });
+    // 15 × 4 = 60 on the default config
+    expect(skills[0].stat).toBe(60);
+  });
+
+  it('never multiplies the generic no-tag skill', () => {
+    const skills = buildAstrolabeSkillsForPhase({
+      phase: phase({ requirements: { encounterId: 'rats' } }),
+      residents: [resident('a', { hp: 100 }), resident('b', { hp: 100 })],
+    });
+    // 2 members × unstaffedStatFloor (5) — no partyStatMult (spec §2.3)
+    expect(skills[0].stat).toBe(10);
   });
 
   it('never hands the astrolabe an unwinnable zero for an empty slot', () => {
@@ -191,6 +233,29 @@ describe('buildAstrolabeSkillsForPhase', () => {
     });
     // dangerous (60) + fight (+10)
     expect(skills[0].difficulty).toBe(70);
+  });
+
+  it('produces a non-floor check for an authored blueprint with real villager stats', () => {
+    // Acceptance (MP-02): quest_city_rats phases carry authored checkStatTags, so
+    // a villager-scale party (stats 2-8 × partyStatMult 4) escapes the 5% floor.
+    const blueprint = defaultQuestBlueprints.quest_city_rats;
+    const party = [
+      resident('v1', { perception: 6, agility: 4 }),
+      resident('v2', { perception: 5, agility: 3 }),
+      resident('v3', { perception: 4, agility: 2 }),
+    ];
+    const skills = buildAstrolabeSkillsForPhase({
+      phase: blueprint.phases[0],
+      residents: party,
+      blueprintDifficulty: blueprint.difficulty,
+    });
+    // perception (15 × 4 = 60) and agility (9 × 4 = 36): both above the floor.
+    expect(skills.map((s) => s.name)).toEqual(['perception', 'agility']);
+    expect(skills[0].stat).toBe(60);
+    expect(skills[1].stat).toBe(36);
+    for (const skill of skills) {
+      expect(skill.stat).toBeGreaterThan(DEFAULT_QUEST_SKILL_CHECK_CONFIG.unstaffedStatFloor);
+    }
   });
 });
 

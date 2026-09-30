@@ -790,12 +790,11 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
           phase,
           residents: partyResidents,
           blueprintDifficulty: blueprint?.difficulty,
-          fallbackRequirement: activity.statRequirement,
         },
         idleVillageConfig.questSkillCheckConfig,
       );
     },
-    [questPhases, partyResidents, blueprint?.difficulty, activity.statRequirement, idleVillageConfig.questSkillCheckConfig],
+    [questPhases, partyResidents, blueprint?.difficulty, idleVillageConfig.questSkillCheckConfig],
   );
 
   const recordPhaseResult = useCallback(
@@ -1526,7 +1525,7 @@ const PoiDetailQuestRosterTimeClockIntegrationPage: FC = () => {
                             }`}
                           >
                             <span>{item.icon}</span>
-                            <span>{item.label}</span>
+                            <span>{t(item.labelKey, { defaultValue: item.id })}</span>
                           </button>
                         );
                       })}

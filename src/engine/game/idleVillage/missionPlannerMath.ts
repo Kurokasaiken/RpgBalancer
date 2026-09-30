@@ -203,8 +203,10 @@ export function phaseWeakestStat(
     Math.round(clampPp(value, config.unstaffedStatFloor, config.statCeiling));
 
   if (phase.checkStatTags.length === 0) {
+    // Generic party-size skill: deliberately unscaled by partyStatMult
+    // (spec §2.3 — the multiplier only bridges declared stat sums).
     return {
-      stat: clampStat(countBits(aliveMask) * config.unstaffedStatFloor * partyStatMult),
+      stat: clampStat(countBits(aliveMask) * config.unstaffedStatFloor),
       tag: null,
     };
   }
