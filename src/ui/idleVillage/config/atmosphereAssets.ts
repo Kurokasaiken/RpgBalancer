@@ -269,20 +269,6 @@ export interface SeaRippleConfig {
   extraLayerIds?: string[];
   /** SMIL mode: full SMIL cycle length in seconds. */
   seconds?: number;
-  /**
-   * SMIL mode: animate `feTurbulence`'s `baseFrequency` as well as the
-   * displacement `scale`. Defaults to `true` — the shipped, Director-approved
-   * look, where the noise field DEFORMS (the painting itself moves) rather
-   * than merely pulsing.
-   *
-   * It is also, by a wide margin, the most expensive thing on the map.
-   * Animating `baseFrequency` means the Perlin field is regenerated from
-   * scratch every frame over ~911 kpx (the sea plus the two island layers),
-   * and `feTurbulence` is CPU-bound in Chromium. Set to `false` and the field
-   * is generated once and cached, with only the displacement amount pulsing:
-   * the water still moves, it just laps rather than deforms.
-   */
-  animateFrequency?: boolean;
   /** Sprite mode: path to the sprite sheet. */
   spriteSrc?: string;
   /** Sprite mode: number of animation frames in the sheet. */

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { atmosphereAssets } from '../config/atmosphereAssets';
 import type { WaterFieldConfig } from '../config/atmosphereAssets';
 
@@ -72,8 +73,56 @@ export function WorldSurfaceWaterField({ enabled = true, canvasSize, zIndex, con
   const cfg = config ?? atmosphereAssets.waterField;
   if (!cfg || cfg.layers.length === 0) return null;
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  const timeRef = useRef(0);
+
+  // Drive animation with setInterval so it keeps running even when hidden
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const fps = 30;
+    const dtMs = 1000 / fps;
+    const interval = setInterval(() => {
+      timeRef.current += dtMs;
+
+      // Animate detail tiles
+      cfg.layers.forEach((layer, idx) => {
+        const el = container.querySelector(`.ws-water-x[data-layer="${idx}"]`) as HTMLElement | null;
+        const yEl = el?.querySelector('.ws-water-y') as HTMLElement | null;
+        if (!el || !yEl) return;
+
+        const xProgress = (timeRef.current / (layer.periodXSeconds * 1000)) % 1;
+        const yProgress = (timeRef.current / (layer.periodYSeconds * 1000)) % 1;
+
+        el.style.transform = `translate3d(${layer.stepX * xProgress}px, 0, 0)`;
+        yEl.style.transform = `translate3d(0, ${layer.stepY * yProgress}px, 0)`;
+      });
+
+      // Animate light pools
+      cfg.lightPools.forEach((pool, idx) => {
+        const el = container.querySelector(`.ws-water-pool[data-pool="${idx}"]`) as HTMLElement | null;
+        const innerEl = el?.querySelector('div') as HTMLElement | null;
+        if (!el || !innerEl) return;
+
+        const progress = (timeRef.current / (pool.driftSeconds * 1000)) % 1;
+        const driftProgress = progress < 0.5 ? progress * 2 : 2 - progress * 2;
+        const x = pool.dx * driftProgress;
+        const y = pool.dy * driftProgress;
+
+        el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+
+        const pulseProgress = Math.abs(Math.sin(Math.PI * ((timeRef.current / (pool.pulseSeconds * 1000)) % 1)));
+        innerEl.style.opacity = String(pool.opacityMin + (pool.opacityMax - pool.opacityMin) * pulseProgress);
+      });
+    }, dtMs);
+
+    return () => clearInterval(interval);
+  }, [cfg]);
+
   return (
     <div
+      ref={containerRef}
       aria-hidden="true"
       style={{
         position: 'absolute',
