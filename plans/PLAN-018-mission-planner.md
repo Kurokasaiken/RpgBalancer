@@ -136,13 +136,11 @@ Ogni task richiede lo stato garantito dal precedente.
 - Tolleranza Monte Carlo fissata: 10k tiri seeded, **tolleranza ±1.5pp** su success/per-member death (errore std ~0.5pp a p=0.5 → ~3σ). È verifica secondaria, mai prova primaria.
 - execution_hint: `verified`.
 
-### T-001 — Motore analitico del Planner (puro, rng-free) — **dipende da T-002 e T-003**
-- Nuovo modulo `src/engine/game/idleVillage/missionPlannerEngine.ts` implementando il contratto T-000.5:
-  - `phasePassChance(S, k)` (checkStatTags × `partyStatMult`), DP `questOutcomeDistribution(draft)` → success, tier dist, per-member risks, aggregati, `contributions`, wipe→deadly.
-  - `expeditionDuration(phases, loadout, config)`, `rewardMultiplier(items)`.
-- Nessuna costante: tutti i parametri da `questSkillCheckConfig`, `questPowerRules`, `questTimeScale`, schema item.
-- Test unitari: golden fixture con **output numerici esatti** (non solo relazioni); boundary 0/50/100%, n=1/2/3; morte in cascata (il morto indebolisce le fasi successive, il ferito no); wipe → deadly; cover (D1); clamp; conflitto modificatori; palindromo di reversibilità a livello engine.
-- execution_hint: `verified`.
+### T-001 — Motore analitico del Planner (puro, rng-free) — ✅ COMPLETATO (MP-01, 2026-09-30)
+- `src/engine/game/idleVillage/missionPlannerEngine.ts`: `questOutcomeDistribution(draft)` → draft canonico (membri ordinati slotIndex→residentId, loadout via MP-03, consumabili pool validati con qty, itemEffects equip→quest-level) → `computeMissionPreview`; `buildMissionPhaseSpecs(blueprint)`; `serializeOutcome`; cap `plannerMaxMembers` (config, default 12) con `MissionPlannerEngineError` tipizzato.
+- Fix nel math layer trovato dai golden test: `anyInjury` ora conta la massa injury-free dei wipe (un morto non tira ferita).
+- Golden fixture: distribuzione esatta 1m/1f, dipendenza morte→fasi successive, ferito resta, wipe→deadly, boundary d+w>100, cover, palindromo `serializeOutcome`, accordo seeded col resolver (10k, ±1.5pp).
+- execution_hint: `verified`. Evidence: `test-results/mp01-2026-09-30.log`.
 
 ### T-002 — Schema item/loadout + fix data model fasi (config) — ✅ COMPLETATO (MP-02, 2026-09-30)
 - Schema Zod `src/balancing/config/idleVillage/quests/questItems.schema.ts` + pool `questItems.ts` (mount `durationMult 0.5`, weapon `statDeltas`, armor `deathChanceDelta<0`/`durationDelta`, trinket `coverRiskDelta`, 2 consumabili pool).
