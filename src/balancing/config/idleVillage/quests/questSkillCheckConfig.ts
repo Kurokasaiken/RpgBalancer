@@ -64,6 +64,12 @@ export const QuestSkillCheckConfigSchema = z.object({
    */
   partyStatMult: z.number().min(0).max(10).default(4),
   /**
+   * Hard cap on drafted party size for the Mission Planner. The exact DP is
+   * O(n·2^m) over the alive-set, so the engine refuses drafts beyond this and
+   * callers must surface the error rather than truncate the party silently.
+   */
+  plannerMaxMembers: z.number().int().min(1).max(31).default(12),
+  /**
    * Parameters for resolving a milestone without the astrolabe animation,
    * used when the quest card is closed and the check happens off-screen.
    * The astrolabe resolves by ball physics; this is its probabilistic

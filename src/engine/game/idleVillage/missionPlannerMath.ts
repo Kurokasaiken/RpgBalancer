@@ -64,11 +64,24 @@ export interface MissionConsumableSpec {
   durationMult?: number;
 }
 
+/**
+ * Quest-level effect of an equipped item (duration/reward only — member-level
+ * stat/risk/cover deltas live on {@link MissionMemberSpec}).
+ */
+export interface MissionItemEffect {
+  itemId: string;
+  durationDelta?: number;
+  durationMult?: number;
+  rewardMultiplierDelta?: number;
+}
+
 /** Full planner draft + rules. */
 export interface MissionPlannerInput {
   members: readonly MissionMemberSpec[];
   phases: readonly MissionPhaseSpec[];
   consumables?: readonly MissionConsumableSpec[];
+  /** Quest-level effects contributed by equipped items (mount, relics…). */
+  itemEffects?: readonly MissionItemEffect[];
   /** Aggregate pp delta from empty required slots (shared penalty). */
   emptySlotPenalty?: { injuryChanceDelta?: number; deathChanceDelta?: number };
   rewardMultipliers?: Partial<Record<QuestOutcomeTier, number>>;
@@ -397,6 +410,9 @@ export function computeMissionPreview(
   });
 
   const phaseOut: MissionPreviewResult['phases'] = [];
+  // Injury-free mass absorbed by wipes (dead members roll no injury) — kept
+  // out of the F/A arrays because wipe states never continue.
+  let wipeNoInjuryMass = 0;
 
   for (let k = 0; k < n; k += 1) {
     const nextF = new Float64Array(cellCount);
@@ -443,7 +459,11 @@ export function computeMissionPreview(
             }
           }
 
-          if (transProb > 0 && surv > 0) {
+          if (surv === 0) {
+            // Wipe: absorbing for F, but a dead member rolls no injury — the
+            // injury-free share of the wipe mass still counts for anyInjury.
+            wipeNoInjuryMass += aAllMass * unscathedAll;
+          } else if (transProb > 0) {
             nextF[cell(surv, c)] += mass * transProb * (1 - p);
             nextF[cell(surv, c + 1)] += mass * transProb * p;
             nextAAll[cell(surv, c)] += aAllMass * unscathedAll * (1 - p);
@@ -459,8 +479,6 @@ export function computeMissionPreview(
               nextA[i][cell(surv, c + 1)] += aMember[i] * unscathedProb * p;
             }
           }
-          // surv === 0 is a wipe: absorbing, tracked only via arrive-at-next mass.
-
           if (dead === 0) break;
           dead = (dead - 1) & mask;
         }
@@ -536,13 +554,20 @@ export function computeMissionPreview(
   });
 
   const rewardMultipliers = input.rewardMultipliers ?? {};
+  const itemEffects = input.itemEffects ?? [];
+  const itemRewardDelta = itemEffects.reduce((acc, it) => acc + (it.rewardMultiplierDelta ?? 0), 0);
   const expectedRewardMultiplier =
     TIERS.reduce((acc, t) => acc + tiers[t] * (rewardMultipliers[t] ?? 1), 0) +
-    sumDelta(consumables, 'rewardMultiplierDelta');
+    sumDelta(consumables, 'rewardMultiplierDelta') +
+    itemRewardDelta;
 
   const rawDuration =
-    phases.reduce((acc, p) => acc + p.durationUnits, 0) + sumDelta(consumables, 'durationDelta');
-  const durationMult = consumables.reduce((acc, it) => acc * (it.durationMult ?? 1), 1);
+    phases.reduce((acc, p) => acc + p.durationUnits, 0) +
+    sumDelta(consumables, 'durationDelta') +
+    itemEffects.reduce((acc, it) => acc + (it.durationDelta ?? 0), 0);
+  const durationMult =
+    consumables.reduce((acc, it) => acc * (it.durationMult ?? 1), 1) *
+    itemEffects.reduce((acc, it) => acc * (it.durationMult ?? 1), 1);
   const duration = Math.max(input.durationMin ?? 1, Math.round(rawDuration * durationMult));
 
   return {
@@ -552,7 +577,7 @@ export function computeMissionPreview(
     members: memberOut,
     aggregate: {
       anyDeath: round6(1 - noDeathMass),
-      anyInjury: round6(1 - noInjuryMass),
+      anyInjury: round6(Math.max(0, 1 - noInjuryMass - wipeNoInjuryMass)),
       expectedDeaths: round6(members.reduce((acc, _mm, i) => acc + (1 - memberAlive[i]), 0)),
       expectedInjuries: round6(
         members.reduce(
@@ -641,6 +666,32 @@ function collectContributions(
   });
 
   // Duration/reward effects.
+  (input.itemEffects ?? []).forEach((item) => {
+    if (item.durationDelta) {
+      list.push({
+        metric: 'duration',
+        source: 'equipment',
+        sourceId: item.itemId,
+        delta: item.durationDelta,
+      });
+    }
+    if (item.durationMult && item.durationMult !== 1) {
+      list.push({
+        metric: 'duration',
+        source: 'equipment',
+        sourceId: item.itemId,
+        delta: item.durationMult,
+      });
+    }
+    if (item.rewardMultiplierDelta) {
+      list.push({
+        metric: 'reward',
+        source: 'equipment',
+        sourceId: item.itemId,
+        delta: item.rewardMultiplierDelta,
+      });
+    }
+  });
   consumables.forEach((item) => {
     if (item.durationDelta) {
       list.push({
@@ -666,6 +717,26 @@ function collectContributions(
         delta: item.rewardMultiplierDelta,
       });
     }
+  });
+
+  // Canonical WHY order: (metric, source, sourceId, member, provider).
+  const metricOrder: MissionContribution['metric'][] = [
+    'success',
+    'injury',
+    'death',
+    'duration',
+    'reward',
+  ];
+  list.sort((a, b) => {
+    const byMetric = metricOrder.indexOf(a.metric) - metricOrder.indexOf(b.metric);
+    if (byMetric !== 0) return byMetric;
+    const bySource = a.source.localeCompare(b.source);
+    if (bySource !== 0) return bySource;
+    const byId = a.sourceId.localeCompare(b.sourceId);
+    if (byId !== 0) return byId;
+    const byResident = (a.residentId ?? '').localeCompare(b.residentId ?? '');
+    if (byResident !== 0) return byResident;
+    return (a.providerId ?? '').localeCompare(b.providerId ?? '');
   });
 
   return list;
