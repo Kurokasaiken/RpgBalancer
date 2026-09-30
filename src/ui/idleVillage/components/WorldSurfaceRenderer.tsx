@@ -2,6 +2,7 @@ import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } fro
 import { WorldSurfaceAtmosphere } from './WorldSurfaceAtmosphere';
 import { WorldSurfaceRiverGlint } from './WorldSurfaceRiverGlint';
 import { WorldSurfaceGlassOverlay } from './WorldSurfaceGlassOverlay';
+import { WorldBreathingLayer } from './WorldBreathingLayer';
 import { useTranslation } from 'react-i18next';
 import type { RuntimeObject } from '../../../engine/world/model/RuntimeObject';
 import { atmosphereAssets, SEA_RIPPLE_FILTER_ID } from '../config/atmosphereAssets';
@@ -71,6 +72,8 @@ interface BreathSpec {
   /** Amplitude the player should PERCEIVE, in screen pixels. */
   swayPx: number;
 }
+
+const BREATH_MAP: Record<string, BreathSpec> = {};
 
 /**
  * Depth parallax, from the tactical plan section 8.
@@ -176,8 +179,6 @@ interface EffectiveLayer extends WorldSurfaceLayer {
   grayscale: boolean;
   tint?: string;
   tintBlendMode: React.CSSProperties['mixBlendMode'];
-  /** CSS filter applied to the layer's own image (see the `filter_layer` override). */
-  colorFilter?: string;
 }
 
 const BLEND_MODE_CSS: Record<BlendMode, React.CSSProperties['mixBlendMode']> = {
@@ -201,7 +202,6 @@ function applyOverrides(
     grayscale: false,
     tint: undefined,
     tintBlendMode: 'multiply',
-    colorFilter: undefined,
   };
 
   for (const override of overrides) {
@@ -241,10 +241,6 @@ function applyOverrides(
       }
       case 'tint_layer': {
         effective.tint = override.tint;
-        break;
-      }
-      case 'filter_layer': {
-        effective.colorFilter = override.filter;
         break;
       }
       case 'set_animation': {
@@ -315,16 +311,6 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
   const mouseCurrent = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [isZooming, setIsZooming] = useState(false);
-  /**
-   * The previous version created a fresh `setTimeout` on every wheel tick with no
-   * way to cancel the one before it (a `useCallback`'s return value isn't a React
-   * cleanup — only a `useEffect`'s is, so `return () => clearTimeout(...)` there
-   * was dead code, never called). Rapid scrolling stacked many overlapping
-   * timeouts, each independently flipping `isZooming` back to `false` mid-gesture
-   * and re-triggering breath suppression on/off. This ref lets each new tick
-   * cancel the previous one, so only the LAST tick's timeout ever fires.
-   */
-  const zoomTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   /**
    * Camera pan at the moment the current drag began, or null when not dragging.
@@ -507,22 +493,8 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
    * motion to input frequency, which causes micro-jank. A small lerp gives the
    * glass the mass of a real optic surface without adding transition in the
    * overlay layers.
-   *
-   * `--gx`/`--gy` are read ONLY by the glass overlay below (`{showGlass && (...)}`).
-   * This loop used to run unconditionally regardless of `showGlass` — on every
-   * page with the glass off (`/game-frame`'s `worldDressing.showGlass: false`, and
-   * every other consumer that doesn't explicitly opt in) it was writing two CSS
-   * custom properties on the root world container 60 times a second, forever,
-   * for a value nothing ever read. Director report (2026-09-22): "questa UI non
-   * è per niente reattiva... i pulsanti siano così lenti" — a style write on the
-   * container that hosts every HUD ribbon and every map layer runs a style
-   * recalc on that whole subtree each time, so the main thread never actually
-   * goes idle between frames, which delays event handling (clicks, hover) behind
-   * queued frame work. Gating this on `showGlass` removes that cost entirely on
-   * every page that isn't using the glass effect.
    */
   useEffect(() => {
-    if (!showGlass) return;
     let raf: number;
     const loop = () => {
       const el = containerRef.current;
@@ -536,7 +508,7 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [showGlass]);
+  }, []);
 
   useEffect(() => {
     if (autoFitTrigger !== prevAutoFitTrigger.current) {
@@ -554,20 +526,13 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
       const rect = containerRef.current.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) return;
 
-      // `imageFit` governs how each LAYER's own image is stretched into the world
-      // box (`'fill'` stretches, `'none'` leaves it 1:1) — it says nothing about
-      // whether the CAMERA should cover or contain the container, but this used to
-      // treat every value other than `'cover'`/`'none'` as contain. `'fill'` is the
-      // default and the value every flattened manifest ships with, so in practice
-      // almost every consumer of this autoFit path was being contain-fit: at a
-      // container aspect wider than the canvas (2000x1024 against a 4240x2828
-      // canvas measured on `/game-frame`, 2026-09-22) that leaves the camera at
-      // ~0.36x zoom with panX/panY pinned to 0 instead of the ~0.47x cover-fit
-      // needed, exposing raw background down the right edge — visible on Chromium
-      // too, not a WebKit-only issue. The one case where contain is actually wanted
-      // (an image meant to letterbox) isn't reachable through `imageFit` at all, so
-      // cover is simply always correct here, per Pillar 1 (no bare canvas edges).
-      const fitZoom = Math.max(rect.width / width, rect.height / height);
+      // imageFit:'none' means world div IS the canvas — use cover formula so the map
+      // fills the viewport with no dark bg edges on initial load.
+      const useCover = resolvedImageFit === 'cover' || resolvedImageFit === 'none';
+      const rawFitZoom = useCover
+        ? Math.max(rect.width / width, rect.height / height)
+        : Math.min(rect.width / width, rect.height / height);
+      const fitZoom = useCover ? rawFitZoom : Math.min(1, rawFitZoom);
       const clampedZoom = clampZoom(fitZoom, manifest.camera.minZoom, manifest.camera.maxZoom);
 
       onCameraChange({ panX: 0, panY: 0, zoom: clampedZoom });
@@ -577,6 +542,7 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
   }, [
     resolvedAutoFit,
     autoFitTrigger,
+    resolvedImageFit,
     width,
     height,
     manifest.camera.minZoom,
@@ -656,15 +622,13 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
   }, []);
 
   const handleWheel = useCallback(
-    (event: WheelEvent) => {
+    (event: React.WheelEvent) => {
       if (!manifest.camera.zoomEnabled) return;
       event.preventDefault();
 
-      // S3: Reduce breathing during zoom interaction. Cancel any timeout from a
-      // previous tick first — see the comment on `zoomTimeoutRef` above.
+      // S3: Reduce breathing during zoom interaction
       setIsZooming(true);
-      if (zoomTimeoutRef.current) clearTimeout(zoomTimeoutRef.current);
-      zoomTimeoutRef.current = setTimeout(() => setIsZooming(false), 300);
+      const zoomTimeout = setTimeout(() => setIsZooming(false), 300);
 
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return;
@@ -687,35 +651,11 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
 
       const clamped = clampPan(nextPanX, nextPanY, nextZoom, containerSize.current, bounds);
       onCameraChange({ panX: clamped.panX, panY: clamped.panY, zoom: nextZoom });
+
+      return () => clearTimeout(zoomTimeout);
     },
     [camera, bounds, manifest.camera, onCameraChange],
   );
-
-  // Cancel a pending zoomTimeout on unmount so it never fires `setIsZooming` on an
-  // unmounted component.
-  useEffect(() => {
-    return () => {
-      if (zoomTimeoutRef.current) clearTimeout(zoomTimeoutRef.current);
-    };
-  }, []);
-
-  /**
-   * Wheel zoom needs `preventDefault()` (to stop the page/ancestor from scrolling
-   * instead of zooming the map), but React attaches `wheel` as a PASSIVE listener
-   * at the root by default — calling `preventDefault()` from a JSX `onWheel` prop
-   * throws "Unable to preventDefault inside passive event listener invocation" on
-   * every single wheel tick and, worse, the preventDefault is silently dropped.
-   * Director report (2026-09-22): "questa UI non è per niente reattiva" — this
-   * fired continuously while scrolling/zooming the map, which is most of what a
-   * player actually does on this screen. A native listener attached directly to
-   * the element, registered non-passive, is the standard fix.
-   */
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    el.addEventListener('wheel', handleWheel, { passive: false });
-    return () => el.removeEventListener('wheel', handleWheel);
-  }, [handleWheel]);
 
   const worldStyle: React.CSSProperties = {
     position: 'absolute',
@@ -765,6 +705,7 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
+      onWheel={handleWheel}
       className="relative h-full w-full cursor-grab overflow-hidden bg-slate-950 active:cursor-grabbing"
       data-testid="world-surface-renderer"
       role="img"
@@ -815,6 +756,53 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
         {effectiveLayers
           .filter((layer) => layer.visible && layer.opacity > 0 && layer.id !== 'clouds')
           .map((layer) => {
+            // S2: Hero rollout — forest, mountain, sky with staggered frequencies
+            const breathingHeroLayers = ['forest_1_top_left', 'mountain_zone_north', 'background'];
+            const isBreathingHeroLayer = breathEnabled && breathingHeroLayers.includes(layer.id);
+            if (isBreathingHeroLayer) {
+              // Map layer ID to config params
+              const layerConfigs: Record<string, { freq: number; mag: number; phase: number }> = {
+                forest_1_top_left: { freq: 0.060, mag: 5, phase: 0 },
+                mountain_zone_north: { freq: 0.050, mag: 5, phase: 0 },
+                background: { freq: 0.035, mag: 5, phase: 0 },
+              };
+              const config = layerConfigs[layer.id] || { freq: 0.06, mag: 1, phase: 0 };
+              const imageUrl = layer.file.includes('/')
+                ? `/assets/atmosphere/${layer.file.split('/').map(encodeURIComponent).join('/')}`
+                : `/assets/world/${manifest.world}/base/layers/${encodeURIComponent(layer.file)}`;
+              // Same crop geometry as LayerView. These three layers render through a
+              // separate path when Breath is on, so a cropped asset would be placed
+              // full-canvas here and jump the moment Breath was toggled.
+              const heroRect = layer.rect;
+              return (
+                <div
+                  key={layer.id}
+                  style={{
+                    position: 'absolute',
+                    top: heroRect ? `${(heroRect.y / heroRect.sourceHeight) * 100}%` : 0,
+                    left: heroRect ? `${(heroRect.x / heroRect.sourceWidth) * 100}%` : 0,
+                    width: heroRect ? `${(heroRect.width / heroRect.sourceWidth) * 100}%` : '100%',
+                    height: heroRect ? `${(heroRect.height / heroRect.sourceHeight) * 100}%` : '100%',
+                    zIndex: layer.zIndex,
+                    opacity: layer.opacity,
+                    pointerEvents: 'none',
+                  }}
+                >
+                  <WorldBreathingLayer
+                    id={layer.id}
+                    src={imageUrl}
+                    imageFit={resolvedImageFit}
+                    magnitudeScreenPx={config.mag}
+                    frequencyHz={config.freq}
+                    phaseRad={config.phase}
+                    enabled={true}
+                    displacementField="/assets/ui/glass_displacement.png"
+                    alt={layer.id}
+                    isInteracting={isDragging || isZooming}
+                  />
+                </div>
+              );
+            }
             return (
               <LayerView
                 key={layer.id}
@@ -939,11 +927,7 @@ export const WorldSurfaceRenderer: React.FC<WorldSurfaceRendererProps> = ({
               edge against the still background. There is no copy of the sea here.
               In `sprite` mode it paints its own masked overlay at this zIndex. */}
           {seaRippleActive && (
-            <WorldSurfaceSeaRipple
-              zIndex={frameZIndex - 1}
-              config={rippleCfg}
-              canvasSize={manifest.coordinateSystem.canvas}
-            />
+            <WorldSurfaceSeaRipple zIndex={frameZIndex - 1} config={rippleCfg} />
           )}
           {/* Event announcement lives in the map, not the UI, so it pans and zooms
               with the world. */}
@@ -1178,7 +1162,6 @@ const LayerView: React.FC<LayerViewProps> = ({ layer, worldName, imageFit, filte
     // through the transparent gaps the way a full-rect overlay would.
     filter: [
       layer.grayscale ? 'grayscale(100%)' : null,
-      layer.colorFilter ?? null,
       filterId ? `url(#${filterId})` : null,
     ].filter(Boolean).join(' ') || undefined,
     ...animationStyle,
@@ -1202,13 +1185,9 @@ const LayerView: React.FC<LayerViewProps> = ({ layer, worldName, imageFit, filte
   const hasScaleTransform = scale !== 1 || offsetX !== 0 || offsetY !== 0;
   // On a cropped layer `transformOrigin: 'top left'` is the top-left of the CROP, not
   // of the canvas, so the debug panel's per-layer scale slider now grows the layer
-  // from its own corner instead of from the map's. Most shipped layers declare
-  // neither scale != 1 nor a non-zero offset, so `hasScaleTransform` is false at
-  // rest for them — but `event_shroud_left`/`event_shroud_right` are the
-  // documented exception: they're given a non-zero `offset` on purpose (see the
-  // `layerOffsets` fallback near `manifest.coordinateSystem.canvas.width` above)
-  // so they can slide in when the invasion event fires, so this IS non-trivial at
-  // rest for those two.
+  // from its own corner instead of from the map's. No shipped layer declares
+  // scale != 1 or a non-zero offset, so `hasScaleTransform` is false at rest and
+  // nothing about the map changes — this only alters how that dev slider feels.
   const scaleStyle: React.CSSProperties = {
     position: 'absolute',
     inset: 0,
@@ -1237,24 +1216,7 @@ const LayerView: React.FC<LayerViewProps> = ({ layer, worldName, imageFit, filte
           ...imgStyle,
           position: 'absolute',
           inset: 0,
-          /*
-           * Only filter while the shroud is actually closed.
-           *
-           * This copy lives permanently in the tree so its opacity can ramp,
-           * but it used to carry `url(#...)` unconditionally — so the browser
-           * ran an SVG colour-grade over ~700 kpx of image, twice (left and
-           * right), on every repaint, forever, for something at opacity 0 that
-           * nobody can see. The invasion shroud fires about once an hour; it
-           * was costing for the other fifty-nine minutes. Measured on
-           * `/game-frame`: 1398 kpx of filtered surface, all of it waste.
-           *
-           * The fade-IN is unchanged — the grade is present from the first
-           * frame of the ramp, exactly as before. Only the fade-OUT differs:
-           * the grade now drops at the instant the curtains start opening
-           * rather than fading with them, which is invisible in practice
-           * because opacity is heading to 0 at the same moment.
-           */
-          filter: shroudClosed ? `url(#${eventShroudGradeConfig.filterId})` : undefined,
+          filter: `url(#${eventShroudGradeConfig.filterId})`,
           opacity: shroudClosed ? 1 : 0,
           transition: `opacity ${eventShroudGradeConfig.rampDurationMs}ms cubic-bezier(0.22, 1, 0.36, 1)${shroudClosed ? ` ${eventShroudGradeConfig.rampDelayMs}ms` : ''}`,
           pointerEvents: 'none',
