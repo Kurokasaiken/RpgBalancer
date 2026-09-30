@@ -85,10 +85,10 @@ export interface SeaPatternConfig {
  */
 export const DEFAULT_SEA_PATTERN_CONFIG: SeaPatternConfig = {
   patternScale: 1150,
-  lineOpacity: 0.2,
+  lineOpacity: 0.21,
   lineWidth: 1,
-  motionAmount: 20,
-  motionPeriod: 9,
+  motionAmount: 6.5,
+  motionPeriod: 5,
   motionAngle: 200,
   lineColor: '#8bbac2',
   baseColor: '#0b5c6b',
@@ -291,14 +291,57 @@ export function WorldSurfaceSeaPatternOverlay({
     resize();
   }, [resize]);
 
+  // `setupWebGL` allocates a program, two shaders and a texture that live in refs
+  // across `active` toggles (deliberately — see the `if (!glRef.current && ...)`
+  // guard above, which reuses them rather than re-creating on every re-activate).
+  // Nothing freed them on component UNMOUNT, though: repeatedly mounting/
+  // unmounting this overlay (e.g. navigating between pages that toggle
+  // `showSeaPattern`) leaked one GPU program + texture per mount. The canvas
+  // element's own context is reclaimed by the browser once it's detached, but
+  // that's not a substitute for explicitly freeing the objects first.
+  useEffect(() => {
+    return () => {
+      const gl = glRef.current;
+      if (!gl) return;
+      if (programRef.current) gl.deleteProgram(programRef.current);
+      if (textureRef.current) gl.deleteTexture(textureRef.current);
+      glRef.current = null;
+      programRef.current = null;
+      textureRef.current = null;
+    };
+  }, []);
+
   if (!active) return null;
+
+  // The masking wrapper below needs its own isolated compositing layer (any element
+  // with `mask-image` forces one). WebKit is documented elsewhere in this codebase
+  // (`WorldSurfaceSeaRipple.tsx`, `TEXTURE_EDGE_LIMIT_PX`) as rasterizing that kind of
+  // layer's backing store at the element's CSS box size rather than the smaller
+  // post-`scale(camera.zoom)` on-screen size, and as "failing blank rather than
+  // throwing" past ~4096px. An `inset: 0` div sized to the world box (up to ~4240px)
+  // hits that ceiling independently of the canvas above it already being capped, and
+  // this is the leading hypothesis for the Director's report (2026-09-22, Tauri/
+  // WKWebView): pattern visible only in the map's top strip there, fully visible here
+  // in the Chromium preview pane where the ceiling is far higher — not yet confirmed
+  // by re-testing on the Director's machine. Fix: give the wrapper the SAME capped
+  // intrinsic size as the canvas, then scale it back up with a CSS transform (which
+  // does not require a bigger backing store).
+  const longEdge = Math.max(canvasSize.width, canvasSize.height);
+  const wrapScale = Math.min(1, MAX_CANVAS_EDGE_PX / longEdge);
+  const wrapWidth = Math.round(canvasSize.width * wrapScale);
+  const wrapHeight = Math.round(canvasSize.height * wrapScale);
 
   return (
     <div
       aria-hidden="true"
       style={{
         position: 'absolute',
-        inset: 0,
+        left: 0,
+        top: 0,
+        width: wrapWidth,
+        height: wrapHeight,
+        transform: `scale(${1 / wrapScale})`,
+        transformOrigin: '0 0',
         zIndex,
         overflow: 'hidden',
         pointerEvents: 'none',
